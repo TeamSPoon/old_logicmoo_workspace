@@ -30,11 +30,8 @@ user:file_search_path(prologmud, '../prolog/prologmud/').
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
 % :- add_game_dir('../games/src_game_sims',prolog_repl).
 % :- add_game_dir('../games/src_game_startrek',prolog_repl).
-:- add_game_dir('../games/src_game_nani',prolog_repl).       
+% :- add_game_dir('../games/src_game_nani',prolog_repl).       
 
-% [Optional] the following game files though can be loaded separate instead
-% :- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
-% :- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
 
 % [Optional] Creates or suppliments a world
 
@@ -93,7 +90,15 @@ do_ensure_some_pathBetween:-
     must((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1)))))).
 
 
+% [Optionaly] Start the telent server
+:-at_start(toploop_telnet:start_mud_telnet(4000)).
+
+
 :-onEachLoad(must(do_ensure_some_pathBetween)).
+
+% [Optional] the following game files though can be loaded separate instead
+:- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
+:- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
 
 
 % [Manditory] This loads the game and initializes so test can be ran
@@ -101,9 +106,6 @@ do_ensure_some_pathBetween:-
 
 % [Manditory] But soon it will be triggerd by the next block
 :- (((user:do_ensure_some_pathBetween))).
-
-% [Optionaly] Start the telent server
-:-at_start(toploop_telnet:start_mud_telnet(4000)).
 
 
 % [Optionaly] Run a battery of tests

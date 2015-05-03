@@ -39,6 +39,10 @@
 
 :- pfc_begin.
 
+
+% argsQuoted(P) => {assert_into_someplace(argsQuoted(P))}.
+
+
 % this mean to leave terms at EL:  foo('QuoteFn'([cant,touch,me])).
 argsQuoted('QuoteFn').
 quasiQuote('QuoteFn').

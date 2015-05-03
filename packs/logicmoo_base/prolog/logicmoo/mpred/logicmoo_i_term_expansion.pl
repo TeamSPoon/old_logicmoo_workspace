@@ -90,7 +90,6 @@ default_te(IF,VAR,VAL):-assertz(te_setting(IF,VAR,VAL)).
 :-default_te((<=>),use_te, file_pfc).
 :-default_te((<=),use_te, file_pfc).
 
-
 %
 %  
 % :- directive:  process_directive, call
@@ -146,7 +145,7 @@ functor_declares_instance(P,tCol):- arg(_,s(tCol,tSpec,ttFormatType),P).
 %functor_declares_instance(P,tPred):-isa_asserted(P,ttPredType),!.
 %functor_declares_instance(P,tCol):-isa_asserted(P,functorDeclares),\+functor_declares_instance(P,tPred).
 
-functor_declares_instance(P,P):-arity(P,1),\+((arity(P,N),N>1)).
+functor_declares_instance(P,P):-functorDeclares(P). % arity(P,1),\+((arity(P,N),N>1)).
 
 functor_declares_collectiontype(typeProps,ttTemporalType).
 

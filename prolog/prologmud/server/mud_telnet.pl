@@ -382,6 +382,42 @@ display_grid_labels :-
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 :- use_module(library(socket)).
 
 %%	telnet_server(?Port, +Options)
@@ -429,8 +465,9 @@ telnet_server(Port, Options) :-
 		      ]).
 
 
-make_client_alias(Host,AliasH):- compound(Host),Host=..HostL, must(atomic_list_concat(['client@', HostL,'-'], AliasH)),!.
-make_client_alias(Host,AliasH):- must(atomic_list_concat(['client@', Host,'-'], AliasH)).
+make_client_alias(Host,AliasH):- compound(Host),Host=..HostL, must(atomic_list_concat(['client@'| HostL],'-', AliasH)),!.
+make_client_alias(Host,AliasH):- is_list(Host),must(atomic_list_concat(['client@'| Host], ' ', AliasH)),!.
+make_client_alias(Host,AliasH):- term_to_atom(Host,AHost),must(atomic_list_concat(['client@', AHost], ' ', AliasH)).
 
 server_loop(ServerSocket, Options) :-
 	tcp_accept(ServerSocket, Slave, Peer),
