@@ -1,4 +1,6 @@
 #!/bin/bash
+sudo apt-get install swi-prolog
+
 ./clone_externals.sh 2>/dev/null
 ./externals/hMUD/policyd
 
