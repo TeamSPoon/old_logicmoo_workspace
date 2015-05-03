@@ -3,7 +3,7 @@ export OLDPWD="`pwd`"
 export NEWPWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/ && pwd )"
 export LD_LIBRARY_PATH=/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/server
 #export SWIPL=/usr/local/lib/swipl-7.1.11/bin/x86_64-linux/swipl
-export RUNFILE="run_debug.pl"
+export RUNFILE=$NEWPWD/run_mud_server.pl --debug=debug_once
 if [ $# -eq 0 ] 
  then
     echo "No arguments supplied"
@@ -11,18 +11,17 @@ if [ $# -eq 0 ]
     export RUNFILE="$1"
 fi
 
-export $PROLOGUSER=logicmoo_mud
 
 echo "You should not see this ever";
 reset -w
 echo -ne '\033]50;ClearScrollback\a'
 echo -en "\ec\e[3J"
 echo `pwd`
-sudo su -c "killall -9 swipl" $PROLOGUSER
+killall -9 swipl
 echo "Hit CTRL+C ${BASH_SOURCE[0]} $RUNFILE ";
 sleep 1;
 cd $NEWPWD
-sudo su -c "swipl -L32G -G32G -T32G -f ${RUNFILE}" $PROLOGUSER
-sudo su -c "killall -9 swipl" $PROLOIGUSER
+swipl -L32G -G32G -T32G -f ${RUNFILE}
+killall -9 swipl
 cd $OLDPWD
 echo exit $?

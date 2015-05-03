@@ -16,6 +16,98 @@
 % kretract[all](Obj,height(ObjHt))  == kretract[all](Obj,height,ObjHt) == pretract[all](height,Obj,ObjHt) == del[all](QueryForm)
 % keraseall(AnyTerm).
 %
+% when deciding the setting for a pred in file foof.pl
+%
+%  foom:foo(1):-bar(2).
+%
+%      we search in this order:  SOURCE:LOADTYPE:PRED
+%
+% SOURCETYPE
+%                  source_file('/dir/foof.pl')
+%                  source_module(foom)
+%                  source_user(u)
+%                  source_filetype(pl)
+%                  source_caller(user)   % module it's being loaded for
+%                  (missing)*
+% LOADTYPE
+%                  consult
+%                  assert
+%                  (missing)*
+%                  
+% CLAUSETYPE
+%                  rule
+%                  fact
+%                  directive
+%                  (missing)*
+%                  
+% PRED INDICATOR
+%                  
+%                  foo(int),
+%                  foo/1
+%                  foo,
+%                  (:-)/2  % neck used
+%                  (missing)*
+%
+%
+%
+% clause types: (:-)/1, (:-)/2, (=>)/1,  (=>)/2, (<=)/1,  (<=)/2, (<=>)/2, fact/1
+%
+default_te(IF,VAR,VAL):-assertz(te_setting(IF,VAR,VAL)).
+
+:-default_te([source_filetype(pl) ],use_te,file_prolog).
+:-default_te([source_filetype(pfc) ],use_te,file_pfc).
+:-default_te([source_filetype(console) ],use_te,file_prolog).
+
+:-default_te(file_prolog,proccess_directive, proccess_directive).
+:-default_te(file_prolog,compile_clause, compile_clause).
+:-default_te(file_prolog,rule_neck, (head :- body)).
+:-default_te(file_prolog,fact_neck, (head :- true)).
+
+:-default_te(file_pfc, compile_clause, pfc_assert).
+:-default_te(file_pfc, expand_clause, fully_expand_clause).
+:-default_te(file_pfc, proccess_directive, proccess_directive).
+:-default_te(file_pfc, fact_neck, (clause <= true)).
+:-default_te(file_pfc, rule_neck, (head :- body)).
+
+:-default_te(file_syspreds,isa_detector, always_fail(i,c)).
+:-default_te(file_syspreds,isa_holder, c(i)).
+:-default_te(file_syspreds,isa_varholder, t(c,i)).  % was isa(i,c).
+:-default_te(file_syspreds,pred_holder, head).  % was isa(i,c).
+:-default_te(file_syspreds,pred_varholder, newhead=..[t,pred|args]).
+:-default_te(file_syspreds,proccess_directive, proccess_directive).
+:-default_te(file_syspreds,compile_clause, compile_clause).
+:-default_te(file_syspreds,rule_neck, (head :- body)).
+:-default_te(file_syspreds,fact_neck, (clause :- true)).
+:-default_te(file_syspreds, expand_clause, (=)).
+
+:-default_te(file_syspreds:pred(*), neck_override, (cwc)).
+:-default_te(file_pfc:pred(*), neck_override, (hybrid)).
+:-default_te(file_prolog:pred(*), neck_override, (hybrid)).
+
+:-default_te((:-)/1, compile_clause, proccess_directive).
+:-default_te((:-)/2, rule_neck, clause).
+:-default_te((=>),use_te, file_pfc).
+:-default_te((<=>),use_te, file_pfc).
+:-default_te((<=),use_te, file_pfc).
+
+
+%
+%  
+% :- directive:  process_directive, call
+% fact:  fwc(pfc), bwc(pfc), *cwc(prolog), bwc(pttp), implies(snark), other
+% :- rule:  fwc(pfc), bwc(pfc), *cwc(prolog), bwc(pttp), implies(snark), other
+% <= rule:   fwc(pfc), *bwc(pfc), cwc(prolog), bwc(pttp), implies(snark), other
+% => rule:   *fwc(pfc), bwc(pfc), cwc(prolog), bwc(pttp), implies(snark), other
+% <= fact:   fwc(pfc), *bwc(pfc), cwc(prolog), bwc(pttp), implies(snark), other
+% => fact:   *fwc(pfc), bwc(pfc), cwc(prolog), bwc(pttp), implies(snark), other
+% loading:  compile_clause, process_directive, assertz, 
+% head types: code, *hybrid, functor(outer), holds(outer)
+% body types: code, *hybrid, functor(outer), holds(outer)
+% isa holder:   isa(i,c), t(c,i),  *c(i).
+% isa holder var c:   isa(i,c), *t(c,i).
+% varpred_head:  *t(P,A,B).
+% varpred_body:  *t(P,A,B).
+% body types: code, *hybrid, functor(outer), holds(outer)
 
 Interestingly there are three main components I have finally admit to needing despite the fact that using Prolog was to provide these exact components.  
 First of all a defaulting system using to shadow (hidden) behind assertions
@@ -44,19 +136,19 @@ functor_declares_instance(decl_mpred_prolog,prologOnly).
 
 functor_declares_instance(prologSideEffects,tPred).
 functor_declares_instance(tPred,tPred).
+functor_declares_instance(meta_argtypes,tRelation).
+functor_declares_instance(prologMacroHead,tRelation).
+functor_declares_instance(tFunction,tFunction).
 functor_declares_instance(P,tPred):- arg(_,s(tPred,prologMultiValued,mpred_prop,user:mpred_prop,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,
        predCanHaveSingletons,prologOnly,prologMacroHead,prologListValued,prologSingleValued),P).
 
-functor_declares_instance(meta_argtypes,meta_argtypes).
-functor_declares_instance(prologMacroHead,prologMacroHead).
-functor_declares_instance(tFunction,tFunction).
 functor_declares_instance(P,tCol):- arg(_,s(tCol,tSpec,ttFormatType),P).
 %functor_declares_instance(P,tPred):-isa_asserted(P,ttPredType),!.
 %functor_declares_instance(P,tCol):-isa_asserted(P,functorDeclares),\+functor_declares_instance(P,tPred).
 
 functor_declares_instance(P,P):-arity(P,1),\+((arity(P,N),N>1)).
 
-functor_declares_collection(typeProps,tCol).
+functor_declares_collectiontype(typeProps,ttTemporalType).
 
 instTypePropsToType(instTypeProps,ttSpatialType).
 expand_to_hb((HH:-BB),HH,BB):-!.
@@ -82,7 +174,7 @@ dbase_head_expansion(_,V,V).
 any_op_to_call_op(_,call(conjecture)).
 
 db_expand_maplist(FE,[E],E,G,O):- !,call(FE,G,O).
-db_expand_maplist(FE,[E|List],T,G,O):- copy_term(T+G,CT+CG),E=CT,!,call(FE,CG,O1),db_expand_maplist(FE,List,T,G,O2),pfc_conjoin(O1,O2,O).
+db_expand_maplist(FE,[E|List],T,G,O):- copy_term(T+G,CT+CG),E=CT,!,call(FE,CG,O1),db_expand_maplist(FE,List,T,G,O2),conjoin(O1,O2,O).
 db_expand_maplist(FE,List,T,G,O):-findall(M, (member(T,List),call(FE,G,M)), ML),list_to_conjuncts(ML,O).
 
 
@@ -201,18 +293,11 @@ db_expand_chain(_,isa(I,Not),INot):-Not==not,!,INot =.. [Not,I].
 db_expand_chain(_,P,PE):-fail,cyc_to_pfc_expansion_entry(P,PE).
 db_expand_chain(_,(=>P),P) :- !.
 
-db_expand_a(Op ,(S1,S2),SentO):-db_expand_a(Op ,S1,S1O),db_expand_a(Op ,S2,S2O),pfc_conjoin(S1O,S2O,SentO).
-db_expand_a(Op ,Sent,SentO):-db_expand_final(Op ,Sent,SentO),!.
-db_expand_a(A,B,C):- loop_check(db_expand_0(A,B,C),B=C).
-db_expand_0(_ ,NC,NC):-not(compound(NC)),!.
-db_expand_0(_ ,NC,NC):-as_is_term(NC),!.
-
-
+db_expand_a(Op ,(S1,S2),SentO):-db_expand_a(Op ,S1,S1O),db_expand_a(Op ,S2,S2O),conjoin(S1O,S2O,SentO).
+db_expand_a(A,B,C):- loop_check_term(db_expand_0(A,B,C),db_expand_0(A,B,C),trace_or_throw(loop_check(db_expand_0(A,B,C)))).
+db_expand_a_noloop(A,B,C):- loop_check_term(db_expand_0(A,B,C),db_expand_0(A,B,C),B=C).
 
 db_expand_0(Op ,Sent,SentO):-db_expand_final(Op ,Sent,SentO),!.
-db_expand_0(Op,(True,Term),OUT):- is_true(True),!,db_expand_0(Op,(Term),OUT).
-db_expand_0(Op,(Term,True),OUT):- is_true(True),!,db_expand_0(Op,(Term),OUT).
-db_expand_0(Op,(Term1,Term2),Out):- Term1==Term2,!,db_expand_0(Op,Term1,Out).
 
 db_expand_0(Op,(:-(CALL)),(:-(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
 db_expand_0(Op,isa(I,O),INot):-Not==not,!,INot =.. [Not,I],!,db_expand_term(Op,INot,O).
@@ -239,11 +324,11 @@ db_expand_0(Op,pddlTypes(EL),O):- listToE(EL,E),db_expand_0(Op,isa(E,tCol),O).
 db_expand_0(Op,pddlPredicates(EL),O):- listToE(EL,E),db_expand_0(Op,isa(E,tPred),O).
 
 db_expand_0(Op,EACH,O):- EACH=..[each|List],db_expand_maplist(fully_expand_now(Op),List,T,T,O).
-db_expand_0(Op,DECL,O):-DECL=..[D,F/A|Args],is_relation_type(TPRED),functor_declares_instance(D,TPRED),integer(A),expand_props(Prefix,Op,props(F,[arity(A),D,TPRED|Args]),O),!.
-db_expand_0(Op,DECL,O):-DECL=..[D,F,A|Args],is_relation_type(TPRED),functor_declares_instance(D,TPRED),integer(A),expand_props(Prefix,Op,props(F,[arity(A),D,TPRED|Args]),O),!.
-db_expand_0(Op,DECL,O):-DECL=..  [D,C|Args],is_relation_type(TPRED),functor_declares_instance(D,TPRED),compound(C),get_functor(C,F,A),
-  (\+((arg(_,C,Arg),nonvar(Arg))) -> ArgList = tRelation ; ArgList=meta_argtypes(C)),
-  expand_props(Prefix,Op,props(F,[TPRED,ArgList,D,arity(A)|Args]),O),!.
+db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F/A|Args],is_relation_type(TPRED),functor_declares_instance(D,TPRED),integer(A),expand_props(Prefix,Op,props(F,[D,TPRED|Args]),O),!.
+db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F,A|Args],is_relation_type(TPRED),functor_declares_instance(D,TPRED),integer(A),expand_props(Prefix,Op,props(F,[D,TPRED|Args]),O),!.
+db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..  [D,C|Args],is_relation_type(TPRED),functor_declares_instance(D,TPRED),compound(C),get_functor(C,F,A),  
+  expand_props(Prefix,Op,props(F,[D,TPRED|Args]),M),!,
+  (\+((arg(_,C,Arg),var(Arg))) -> O = (meta_argtypes(C),M) ; (O= (M))).
 
 
 db_expand_0(Op,DECL,O):-DECL=..[D,F,A1|Args],functor_declares_instance(D,DType),not((arity(D,N),N>1)),expand_props(Prefix,Op,props(F,[DType,D,A1|Args]),O),!.
@@ -260,7 +345,7 @@ db_expand_0(Op,ClassTemplate,OUT):- ClassTemplate=..[TypePropsFunctor,Inst|Props
 
 % typeProps(tCrackers,.....).
 db_expand_0(Op,ClassTemplate,OUT):- ClassTemplate=..[TypeTypePropsFunctor,Type|Props],
-   functor_declares_collection(TypeTypePropsFunctor,PropsIsa),
+   functor_declares_collectiontype(TypeTypePropsFunctor,PropsIsa),
    \+ compound_all_open(ClassTemplate),
    pfc_assert(isa(Type,tCol)),
    pfc_assert(isa(Type,PropsIsa)),
@@ -286,7 +371,7 @@ db_expand_0(Op,ClassTemplate,OUT):- ClassTemplate=..[props,Inst,Second,Third|Pro
    expand_props(Prefix,Op,props(Inst,[Second,Third|Props]),OUT),!.
 
 db_expand_0(Op,IN,OUT):- IN=..[F|Args],F==t,!,must(from_univ(_,Op,Args,OUT)).
-db_expand_0(Op,isa(A,F),OO):-atom(F),O=..[F,A],!,db_expand_a(Op,O,OO).
+db_expand_0(Op,isa(A,F),OO):-atom(F),O=..[F,A],!,db_expand_0(Op,O,OO).
 db_expand_0(Op,isa(A,F),OO):-nonvar(A),nonvar(F),expand_props(Prefix,Op,props(A,F),OO).
 db_expand_0(Op,props(A,F),OO):-expand_props(Prefix,Op,props(A,F),OO).
 
@@ -319,19 +404,6 @@ db_expand_0(Op,KB:Term,KB:O):- atom(KB),!,with_assertions(thlocal:caller_module(
 demodulize(Op,H,HHH):-once(strip_module(H,_,HH)),H\==HH,!,demodulize(Op,HH,HHH).
 demodulize(Op,H,HH):-compound(H),H=..[F|HL],!,maplist(demodulize(Op),HL,HHL),HH=..[F|HHL],!.
 demodulize(_ ,HB,HB).
-
-conjuncts_to_list(Var,[Var]):-is_ftVar(Var),!.
-conjuncts_to_list(true,[]).
-conjuncts_to_list([],[]).
-conjuncts_to_list([A|B],ABL):-!,
-  conjuncts_to_list(A,AL),
-  conjuncts_to_list(B,BL),
-  append(AL,BL,ABL).
-conjuncts_to_list((A,B),ABL):-!,
-  conjuncts_to_list(A,AL),
-  conjuncts_to_list(B,BL),
-  append(AL,BL,ABL).
-conjuncts_to_list(Lit,[Lit]).
 
 db_expand_1(_,X,X).
 
@@ -375,8 +447,8 @@ from_univ(Prefix,Op,MORE,Out):-atom(Prefix),!,from_univ(_,Op,[Prefix|MORE],Out).
 from_univ(Prefix,Op,[PROP|MORE],Out):-atom(PROP),!,Mid=..[PROP|MORE],db_expand_up(Prefix,Op,Mid,Out).
 from_univ(Prefix,_,In,Out):-Mid=..[t|In],!,db_expand_up(Prefix,Op,Mid,Out).
 
-db_expand_up(Prefix,Op,Mid,OOUT):- db_expand_a(Op,Mid,Out), compound(Prefix),subst(Prefix,value,Out,OOUT).
-db_expand_up(_,Op,Mid,Out):- db_expand_a(Op,Mid,Out).
+db_expand_up(Prefix,Op,Mid,OOUT):- db_expand_a_noloop(Op,Mid,Out), compound(Prefix),subst(Prefix,value,Out,OOUT).
+db_expand_up(_,Op,Mid,Out):- db_expand_a_noloop(Op,Mid,Out).
 
 expand_props(Op,Term,OUT):-expand_props(_,Op,Term,OUT).
 
@@ -386,7 +458,7 @@ expand_props(Prefix,Op,Sent,OUT):-Sent=..[And|C12],is_logical_functor(And),!,map
 expand_props(Prefix,Op,props(Obj,Open),props(Obj,Open)):- var(Open),!. % ,trace_or_throw(expand_props(Prefix,Op,props(Obj,Open))->OUT).
 expand_props(Prefix,_ ,props(Obj,List),ftID(Obj)):- List==[],!.
 expand_props(Prefix,Op,props(Obj,[P]),OUT):- nonvar(P),!,expand_props(Prefix,Op,props(Obj,P),OUT).
-expand_props(Prefix,Op,props(Obj,[P|ROPS]),OUT):- !,expand_props(Prefix,Op,props(Obj,P),OUT1),expand_props(Prefix,Op,props(Obj,ROPS),OUT2),pfc_conjoin(OUT1,OUT2,OUT).
+expand_props(Prefix,Op,props(Obj,[P|ROPS]),OUT):- !,expand_props(Prefix,Op,props(Obj,P),OUT1),expand_props(Prefix,Op,props(Obj,ROPS),OUT2),conjoin(OUT1,OUT2,OUT).
 expand_props(Prefix,Op,props(Obj,PropVal),OUT):- atom(PropVal),!,from_univ(Prefix,Op,[PropVal,Obj],OUT).
 expand_props(Prefix,Op,props(Obj,PropVal),OUT):- safe_univ(PropVal,[Prop,NonVar|Val]),Obj==NonVar,!,from_univ(Prefix,Op,[Prop,Obj|Val],OUT).
 expand_props(Prefix,Op,props(Obj,PropVal),OUT):- PropVal=..[Op,Pred|Val],comparitiveOp(Op),
@@ -402,9 +474,6 @@ expand_props(Prefix,Op,ClassTemplate,OUT):- ClassTemplate=..[props,Inst,Second,T
 expand_props(Prefix,_,Sent,Sent).
 
 
-:-export(conjoin_op/3).
-conjoin_op(Op,A,B,C) :-  C =.. [Op,A,B].
-
 
 db_quf_l(Op,And,[C],D2,D4):- !, db_quf(Op,C,D2,D3),!,D4=..[And,D3].
 db_quf_l(Op,And,C12,Pre2,Templ2):-db_quf_l_0(Op,And,C12,Pre2,Templ2).
@@ -413,7 +482,7 @@ db_quf_l_0(Op,_And,[C],D2,D3):- db_quf(Op,C,D2,D3),!.
 db_quf_l_0(Op, And,[C|C12],PreO,TemplO):-
   db_quf(Op,C,Pre,Next),
   db_quf_l_0(Op,And,C12,Pre2,Templ2),
-  pfc_conjoin(Pre,Pre2,PreO),
+  conjoin(Pre,Pre2,PreO),
   conjoin_op(And,Next,Templ2,TemplO).
 
 :-export(db_quf/4).

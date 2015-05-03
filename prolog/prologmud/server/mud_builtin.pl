@@ -40,7 +40,7 @@ tCol(tFunction).
 tCol(tInferInstanceFromArgType).
 tCol(tPred).
 tCol(tRelation).
-tCol(ttFormatted).
+tCol(meta_argtypes).
 tCol(ttSpatialType).
 tCol(ttTypeType).
 
@@ -100,7 +100,7 @@ relationAllInstance(BP,_,_)=>tBinaryPredicate(BP).
 % (isa(Inst,Type), tCol(Inst)) => isa(Type,ttTypeType).
 % (isa(TypeType,ttTypeType) , isa(Inst,TypeType), genls(SubInst,Inst)) => isa(SubInst,TypeType).
 
-(ttFormatType(FT),{compound(FT)})=>ttFormatted(FT).
+(ttFormatType(FT),{compound(FT)})=>meta_argtypes(FT).
 
 => tCol(vtDirection).
 
@@ -217,7 +217,7 @@ isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 => tCol(ttSpatialType).
 
 % Representations
-vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
+vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => meta_argtypes(ArgTypes).
 
 
 
@@ -352,10 +352,10 @@ genls(isEach('PortableObject','ProtectiveAttire','SomethingToWear'),tCarryAble).
 genls(isEach('ProtectiveAttire','SomethingToWear'),tWearAble).
 genls(isEach(tRegion,tAgentGeneric),tChannel).
 
-tCol(ttFormatted).
-ttFormatted(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
-ttFormatted(apathFn(tRegion,vtDirection)).
-ttFormatted(xyzFn(tRegion,ftInt,ftInt,ftInt)).
+tCol(meta_argtypes).
+meta_argtypes(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
+meta_argtypes(apathFn(tRegion,vtDirection)).
+meta_argtypes(xyzFn(tRegion,ftInt,ftInt,ftInt)).
 
 :- do_gc.
 

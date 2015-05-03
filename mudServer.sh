@@ -24,10 +24,14 @@ do
 	echo -en "\ec\e[3J"
 	echo "Hit CTRL+C ${BASH_SOURCE[0]} ";
         echo ". ./debug_once.sh ${RUNFILE} ";
-        sudo su -c "killall -9 swipl" prologmud
-        sleep 4;
         cd $NEWPWD
-        . ./debug_once.sh $RUNFILE
-        cd $OLDPWD
+        if [[ $EUID -eq 0 ]];
+          then
+	     sudo su -p -l -s $SHELL -c ". ./debug_once.sh $RUNFILE" prologmud
+          else
+             . ./debug_once.sh $RUNFILE
+        fi
+        cd $NEWPWD
+        sleep 4;
 done
 

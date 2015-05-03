@@ -81,7 +81,7 @@ list_to_conjuncts([H],HH):-list_to_conjuncts(H,HH).
 list_to_conjuncts([H|T],Body):-!,
     list_to_conjuncts(H,HH),
     list_to_conjuncts(T,TT),
-    pfc_conjoin(HH,TT,Body).
+    conjoin(HH,TT,Body).
 list_to_conjuncts(H,H).
 
 to_assertable([A],B):-nonvar(A),!,to_assertable(A,B).
@@ -229,8 +229,8 @@ pfc_rule_hb(Outcome,OutcomeO,AnteO):-pfc_rule_hb_0(Outcome,OutcomeO,Ante),pfc_ru
 
 pfc_rule_hb_0(Outcome,OutcomeO,true):-is_ftVar(Outcome),!,OutcomeO=Outcome.
 pfc_rule_hb_0((Outcome1,Outcome2),OutcomeO,AnteO):-!,pfc_rule_hb(Outcome1,Outcome1O,Ante1),pfc_rule_hb(Outcome2,Outcome2O,Ante2),
-                   pfc_conjoin(Outcome1O,Outcome2O,OutcomeO),
-                   pfc_conjoin(Ante1,Ante2,AnteO).
+                   conjoin(Outcome1O,Outcome2O,OutcomeO),
+                   conjoin(Ante1,Ante2,AnteO).
 pfc_rule_hb_0(Ante1=>Outcome,OutcomeO,(Ante1,Ante2)):-!,pfc_rule_hb(Outcome,OutcomeO,Ante2).
 pfc_rule_hb_0(Outcome<=Ante1,OutcomeO,(Ante1,Ante2)):-!,pfc_rule_hb(Outcome,OutcomeO,Ante2).
 pfc_rule_hb_0(Outcome<=>Ante1,OutcomeO,(Ante1,Ante2)):-pfc_rule_hb(Outcome,OutcomeO,Ante2).
@@ -1461,7 +1461,7 @@ build_trigger([T|Triggers],Consequent,pt(T,X)) :-
 
 build_neg_test(T,Testin,Testout) :-
   build_test(Testin,Testmid),
-  pfc_conjoin((pfc_call(T)),Testmid,Testout).
+  conjoin((pfc_call(T)),Testmid,Testout).
 
 
 % this just strips away any currly brackets.
@@ -1539,14 +1539,14 @@ pfc_union([Head|Tail],L,[Head|Tail2]) :-
   pfc_union(Tail,L,Tail2).
 
 
-%= pfc_conjoin(+Conjunct1,+Conjunct2,?Conjunction).
+%= conjoin(+Conjunct1,+Conjunct2,?Conjunction).
 %= arg3 is a simplified expression representing the conjunction of
 %= args 1 and 2.
 
-pfc_conjoin(TRUE,X,X) :- TRUE==true, !.
-pfc_conjoin(X,X,TRUE) :- TRUE==true, !.
-pfc_conjoin(X,Y,Z) :- X==Y,Z=X,!.
-pfc_conjoin(C1,C2,(C1,C2)).
+conjoin(TRUE,X,X) :- TRUE==true, !.
+conjoin(X,X,TRUE) :- TRUE==true, !.
+conjoin(X,Y,Z) :- X==Y,Z=X,!.
+conjoin(C1,C2,(C1,C2)).
 
 % ======================= pfc_file('pfcsupport').	% support maintenance
 

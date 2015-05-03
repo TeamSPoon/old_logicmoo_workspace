@@ -29,7 +29,6 @@ pred_type_test(H,F/_):-!,atom(F),THFA=..[H,F],clause(THFA,true).
 pred_type_test(H,F):- \+ compound(F), !,atom(F),THFA=..[H,F/_],clause(THFA,true).
 pred_type_test(H,P):-functor(P,F,A),!,THFA=..[H,F/A],THF=..[H,F],(clause(THFA,true);clause(HF,true)).
 
-
 pred_type_test2(T,F):- \+ compound(F),!,arity(F,A),!,pred_type_test(T,F,A).
 pred_type_test2(T,F/A):-!,atom(F),arity(F,A),!,pred_type_test(T,F,A).
 pred_type_test2(T,P):-functor(P,F,A),!,pred_type_test(T,F,A).

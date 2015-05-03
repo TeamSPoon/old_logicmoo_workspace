@@ -1105,7 +1105,7 @@ build_trigger([T|Triggers],Consequent,pt(T,X)) :-
 
 build_neg_test(T,Testin,Testout) :-
   build_test(Testin,Testmid),
-  pfc_conjoin((pfc_call(T)),Testmid,Testout).
+  conjoin((pfc_call(T)),Testmid,Testout).
 
 
 % this just strips away any currly brackets.
@@ -1182,14 +1182,7 @@ pfc_union([Head|Tail],L,[Head|Tail2]) :-
   pfc_union(Tail,L,Tail2).
 
 
-%= pfc_conjoin(+Conjunct1,+Conjunct2,?Conjunction).
-%= arg3 is a simplified expression representing the conjunction of
-%= args 1 and 2.
 
-pfc_conjoin(TRUE,X,X) :- TRUE==true, !.
-pfc_conjoin(X,X,TRUE) :- TRUE==true, !.
-pfc_conjoin(X,Y,Z) :- X==Y,trace,Z=X,!.
-pfc_conjoin(C1,C2,(C1,C2)).
 
 % ======================= pfc_file('pfcsupport').	% support maintenance
 

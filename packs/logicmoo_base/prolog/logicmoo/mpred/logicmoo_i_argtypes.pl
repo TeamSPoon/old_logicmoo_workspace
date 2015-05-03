@@ -60,7 +60,7 @@ term_is_ft(Term,Type):- no_repeats_old(Type,(term_is_ft_how(Term,Was),trans_subf
 
 term_is_ft_how(Term,Type):- is_asserted(quotedDefnIff(Type,Info)),nonvar(Info),(show_call_success((Info='SubLQuoteFn'(LISPSYMBOL),nop(Term+Type+LISPSYMBOL)))->fail;(append_term(Info,Term,CALL),mpred_call(CALL))),!.
 term_is_ft_how(Term,Type):- compound(Term),functor(Term,F,A),functor(Type,F,A),
-  once((t(ttFormatted,Type),Type=..[_|Types],Term=..[_|Args],maplist(isa,Args,Types))).
+  once((t(meta_argtypes,Type),Type=..[_|Types],Term=..[_|Args],maplist(isa,Args,Types))).
 
 trans_subft(FT,FT).
 trans_subft(FT,Sub):-is_asserted(subFormat(FT,Sub)).
@@ -165,7 +165,7 @@ argIsa_call_0(Col,1,Col):-t(tCol,Col).
 argIsa_call_0(Col,2,ftVoprop):-t(tCol,Col).
 argIsa_call_0(quotedDefnIff,1,ttFormatType).
 argIsa_call_0(quotedDefnIff,2,ftCallable).
-argIsa_call_0(ttFormatted,1,ttFormatType).
+argIsa_call_0(meta_argtypes,1,ttFormatType).
 
 
 argIsa_call_0(isa,1,ftID).
@@ -240,7 +240,7 @@ grab_argsIsa(P, A):-P=='$was_imported_kb_content$',trace_or_throw(crazy_grab_arg
 grab_argsIsa(P, A):-P=={}, trace_or_throw(crazy_grab_argsIsa({}, A)).
 grab_argsIsa(F,Types):- grab_argsIsa_6(Types),get_functor(Types,F0),!,F0==F,assert_predArgTypes_fa(F,Types).
 
-grab_argsIsa_6(Types):- ttFormatted(Types).
+grab_argsIsa_6(Types):- meta_argtypes(Types).
 grab_argsIsa_6(mudColor(tSpatialThing, vtColor)).
 grab_argsIsa_6(Types):- meta_argtypes(Types).
 grab_argsIsa_6(Types):- is_asserted(quotedDefnIff(Types,_)),maybe_argtypes(Types).
@@ -287,7 +287,7 @@ correctArgsIsa(_,NC,NC):-as_is_term(NC),!.
 correctArgsIsa(_,G,G):- (\+ thlocal:infMustArgIsa), (is_release; bad_idea; skipWrapper;  thlocal:infSkipArgIsa),!.
 correctArgsIsa(Op,M:G,MAA):- nonvar(M),!,correctArgsIsa(Op,G,GG),M:GG=MAA.
 correctArgsIsa(_,(A,B),(AA,BB)):-!,correctArgsIsa(Op,A,AA),correctArgsIsa(Op,B,BB).
-correctArgsIsa(_,isa(Args,PredArgTypes),isa(Args,PredArgTypes)):- meta_argtypes==meta_argtypes,!.
+correctArgsIsa(_,isa(Args,PredArgTypes),isa(Args,PredArgTypes)):- PredArgTypes==meta_argtypes,!.
 correctArgsIsa(_,G,GG):- get_functor(G,F,A),
   arg(_,vv('{}'/_,  genls/_,user:mpred_prop/_,
     t/2,arity/_,genls/_,'<=>'/_,pt/_,rhs/_,nt/_,bt/_,

@@ -1011,8 +1011,8 @@ pfc_get_head_body_0(Head,HeadO,true):-pfc_is_unbound(Head),!,HeadO=Head.
 pfc_get_head_body_0((Head1,Head2),HeadO,BodyO):-!,
    pfc_get_head_body(Head1,Head1O,Body1),
    pfc_get_head_body(Head2,Head2O,Body2),
-   pfc_conjoin(Head1O,Head2O,HeadO),
-   pfc_conjoin(Body1,Body2,BodyO).
+   conjoin(Head1O,Head2O,HeadO),
+   conjoin(Body1,Body2,BodyO).
 pfc_get_head_body_0((BM => Head),HeadO,BodyO):-nonvar(BM),BM=(Body/Precond),!,pfc_get_head_body((Body => (Head/Precond)),HeadO,BodyO).
 pfc_get_head_body_0((Head <= BM),HeadO,BodyO):-nonvar(BM),BM=(Body/Precond),!,pfc_get_head_body(((Head/Precond) <= Body),HeadO,BodyO).
 pfc_get_head_body_0('=>'(Head),HeadO,Body2):-!,pfc_get_head_body(Head,HeadO,Body2).
@@ -1154,7 +1154,7 @@ pfc_xform(load,S,((Q:-P)),(   (user:pfc_mark_B(Q),user:pfc_mark_C(Q),user:pfc_ad
 pfc_xform(load,S,P,(   user:pfc_add(P,S))):- mpred_prop(P,pfc_is_fc),!.
 pfc_xform(load,S,P,(   user:pfc_add(P,S))):- mpred_prop(P,pfc_control),!.
 pfc_xform(load,S,P,O):- loop_check(pfc_transform_neck(P,H)), H \=@= P, must(pfc_xform_lc(load,S,H,O)).
-pfc_xform(load,S,(P1,P2),O):- !,pfc_xform_lc(load,S,P1,O1),pfc_xform_lc(load,S,P2,O2),pfc_conjoin(O1,O2,O).
+pfc_xform(load,S,(P1,P2),O):- !,pfc_xform_lc(load,S,P1,O1),pfc_xform_lc(load,S,P2,O2),conjoin(O1,O2,O).
 pfc_xform(load,S,P,(   user:pfc_add(P,S))):- pfc_neg_holder(P),!.
 pfc_xform(load,S,P,(:- user:CALL )):- transitive(mpred_get(load),P,How),must(P\=@=How),How\==(=),atom(How),current_predicate(How/1),CALL=..[How,P],!.
 pfc_xform(load,S,B,A):- pfc_xform_lc(load,S,B,BA), (B\=@=BA -> pfc_xform_lc(load,S,BA,A) ; (A = B)).
@@ -1163,7 +1163,7 @@ pfc_xform(load,S,B,A):- pfc_xform_lc(load,S,B,BA), (B\=@=BA -> pfc_xform_lc(load
 
 %pfc_xformc(FMT,S,(H:-B),(H<=B)) :- head_singletons_hb(H,B,_),!,pmsg("adding pfc_bC instead of Neck ~q",[pfc_add1(H<=B)]).
 %pfc_xformc(FMT,S,(B=>H),(H<=B)) :-head_singletons_hb(H,B,_),!,pmsg("adding pfc_bC instead of pfc_fWC ~q",[pfc_add1(H<=B)]).
-pfc_xform(FMT,S,(P1,P2),O):- !,pfc_xform_lc(FMT,S,P1,O1),pfc_xform_lc(FMT,S,P2,O2),pfc_conjoin(O1,O2,O).
+pfc_xform(FMT,S,(P1,P2),O):- !,pfc_xform_lc(FMT,S,P1,O1),pfc_xform_lc(FMT,S,P2,O2),conjoin(O1,O2,O).
 pfc_xform(FMT,S,(P1;P2),O):- !,pfc_xform_lc(FMT,S,P1,O1),pfc_xform_lc(FMT,S,P2,O2),pfc_op_join((';'),O1,O2,O).
 pfc_xform(FMT,S,(=>(P)),O):- pfc_is_bound(P),!,pfc_xform_lc(FMT,S,P,O).
 pfc_xform(FMT,S,(TRUE=>P),O):- is_true(TRUE),pfc_is_bound(P),!,pfc_xform_lc(FMT,S,P,O).
@@ -2299,7 +2299,7 @@ pfc_buildTrigger([T|Triggers],Consequent,pt(T,X)) :-
 
 pfc_buildNtTest(T,Testin,Testout) :-
   pfc_buildTest(Testin,Testmid),
-  pfc_conjoin(pfc_bc_caching(T),Testmid,Testout).
+  conjoin(pfc_bc_caching(T),Testmid,Testout).
 
   
 % this just strips away any currly brackets.
@@ -2382,14 +2382,14 @@ pfc_union([Head|Tail],L,[Head|Tail2]) :-
   pfc_union(Tail,L,Tail2).
 
 
-%= pfc_conjoin(+Conjunct1,+Conjunct2,?Conjunction).
+%= conjoin(+Conjunct1,+Conjunct2,?Conjunction).
 %= arg3 is a simplified expression representing the conjunction of
 %= args 1 and 2.
 
-pfc_conjoin(TRUE,X,X) :- is_true(TRUE),!.
-pfc_conjoin(X,TRUE,X) :- is_true(TRUE),!.
-pfc_conjoin(X,Y,O):- X==Y,!,O=X.
-pfc_conjoin(C1,C2,(C1,C2)).
+conjoin(TRUE,X,X) :- is_true(TRUE),!.
+conjoin(X,TRUE,X) :- is_true(TRUE),!.
+conjoin(X,Y,O):- X==Y,!,O=X.
+conjoin(C1,C2,(C1,C2)).
 
 
 % pfc_op_join(OP,TRUE,X,X) :- is_true(TRUE),!.
@@ -2433,7 +2433,7 @@ pfc_removeSupportItems(P,Types):-
   pfc_maptree(pfc_rem1,Results,[]).
 
 pfc_typeFilter_l(ResultsO,Filter,ResultsO):-pfc_typeFilter(ResultsO,Filter).
-pfc_typeFilter_l((Body,More),Filter,ResultsO):-!,pfc_typeFilter_l(Body,Filter,BodyO),pfc_typeFilter_l((More),Filter,(ResultsM)),pfc_conjoin(BodyO,ResultsM,ResultsO).
+pfc_typeFilter_l((Body,More),Filter,ResultsO):-!,pfc_typeFilter_l(Body,Filter,BodyO),pfc_typeFilter_l((More),Filter,(ResultsM)),conjoin(BodyO,ResultsM,ResultsO).
 pfc_typeFilter_l(_,_Filter,!).
 
 pfc_filterSupports(Support,Filter,ResultsO):- 

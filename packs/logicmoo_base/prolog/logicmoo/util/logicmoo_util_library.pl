@@ -92,6 +92,47 @@ append_term(T,I,HEAD):-atom(T),HEAD=..[T,I],!.
 append_term(Call,E,CallE):-var(Call), must(compound(CallE)),CallE=..ListE,append(List,[E],ListE),Call=..List.
 append_term(Call,E,CallE):-must(compound(Call)), Call=..List, append(List,[E],ListE), CallE=..ListE.
 
+
+:- export(conjuncts_to_list/3).
+conjuncts_to_list(Var,[Var]):-is_ftVar(Var),!.
+conjuncts_to_list(true,[]).
+conjuncts_to_list([],[]).
+conjuncts_to_list([A|B],ABL):-!,
+  conjuncts_to_list(A,AL),
+  conjuncts_to_list(B,BL),
+  append(AL,BL,ABL).
+conjuncts_to_list((A,B),ABL):-!,
+  conjuncts_to_list(A,AL),
+  conjuncts_to_list(B,BL),
+  append(AL,BL,ABL).
+conjuncts_to_list(Lit,[Lit]).
+
+
+:- export(list_to_conjuncts/2).
+list_to_conjuncts(I,O):-list_to_conjuncts((,),I,O).
+
+:- export(list_to_conjuncts/3).
+list_to_conjuncts(_,V,V):-not(compound(V)),!.
+list_to_conjuncts(_,[],true).
+list_to_conjuncts(OP,[H],HH):-list_to_conjuncts(OP,H,HH).
+list_to_conjuncts(OP,[H|T],Body):-!,
+    list_to_conjuncts(OP,H,HH),
+    list_to_conjuncts(OP,T,TT),
+    conjoin_op(OP,HH,TT,Body).
+list_to_conjuncts(_,H,H).
+
+
+conjoin(A,B,C):-conjoin_op((,),A,B,C).
+
+%= conjoin_op(OP,+Conjunct1,+Conjunct2,?Conjunction).
+%= arg4 is a simplified expression representing the conjunction of
+%= args 2 and 3.
+
+conjoin_op(_,TRUE,X,X) :- TRUE==true, !.
+conjoin_op(_,X,X,TRUE) :- TRUE==true, !.
+conjoin_op(_,X,Y,Z) :- X==Y,Z=X,!.
+conjoin_op(OP,C1,C2,C):-C =..[OP,C1,C2].
+
 % =================================================================================
 % Utils
 % =================================================================================

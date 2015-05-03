@@ -5,7 +5,6 @@
 %   Purpose: consult system file for ensure
 
 
-
 % ======================= pfc_file('pfccore').	% core of Pfc.
 
 %   File   : pfccore.pl
@@ -68,11 +67,11 @@ second_order(_,_):-fail.
 :- multifile(pfc_select/2).
 :- multifile(pfc_search/1).
 
-to_assertable([A],B):-nonvar(A),!,to_assertable(A,B).
-to_assertable((P=>Q),was_new_rule((P=>Q))):-!.
-to_assertable((P<=Q),was_new_rule((P<=Q))):-!.
-to_assertable((P<=>Q),was_new_rule((P<=>Q))):-!.
-to_assertable(P,P).
+to_db_assertable([A],B):-nonvar(A),!,to_db_assertable(A,B).
+to_db_assertable((P=>Q),was_new_rule((P=>Q))):-!.
+to_db_assertable((P<=Q),was_new_rule((P<=Q))):-!.
+to_db_assertable((P<=>Q),was_new_rule((P<=>Q))):-!.
+to_db_assertable(P,P).
 
 pfc_each_literal(P,E):-conjuncts_to_list(P,List),member(E,List).
 
@@ -81,15 +80,6 @@ to_addable_form_wte(P0,P):- must(to_addable_form(P0,P)),!, (P0\=@=P->wdmsg(to_ad
 retract_eq_quitely((H:-B)):-ignore((clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!,erase(Ref))).
 retract_eq_quitely((H)):-ignore((clause(H,true,Ref),clause(HH,BB,Ref),H=@=HH,BB==true,!,erase(Ref))).
 assert_eq_quitely(H):-assert_if_new(H).
-
-list_to_conjuncts(V,V):-not(compound(V)),!.
-list_to_conjuncts([],true).
-list_to_conjuncts([H],HH):-list_to_conjuncts(H,HH).
-list_to_conjuncts([H|T],Body):-!,
-    list_to_conjuncts(H,HH),
-    list_to_conjuncts(T,TT),
-    pfc_conjoin(HH,TT,Body).
-list_to_conjuncts(H,H).
 
 
 to_addable_form(I,OO):-is_list(I),!,maplist(to_addable_form,I,O),flatten(O,OO),!.
@@ -209,8 +199,8 @@ pfc_rule_hb(Outcome,OutcomeO,AnteO):-pfc_rule_hb_0(Outcome,OutcomeO,Ante),pfc_ru
 
 pfc_rule_hb_0(Outcome,OutcomeO,true):-is_ftVar(Outcome),!,OutcomeO=Outcome.
 pfc_rule_hb_0((Outcome1,Outcome2),OutcomeO,AnteO):-!,pfc_rule_hb(Outcome1,Outcome1O,Ante1),pfc_rule_hb(Outcome2,Outcome2O,Ante2),
-                   pfc_conjoin(Outcome1O,Outcome2O,OutcomeO),
-                   pfc_conjoin(Ante1,Ante2,AnteO).
+                   conjoin(Outcome1O,Outcome2O,OutcomeO),
+                   conjoin(Ante1,Ante2,AnteO).
 pfc_rule_hb_0(Ante1=>Outcome,OutcomeO,(Ante1,Ante2)):-!,pfc_rule_hb(Outcome,OutcomeO,Ante2).
 pfc_rule_hb_0(Outcome<=Ante1,OutcomeO,(Ante1,Ante2)):-!,pfc_rule_hb(Outcome,OutcomeO,Ante2).
 pfc_rule_hb_0(Outcome<=>Ante1,OutcomeO,(Ante1,Ante2)):-pfc_rule_hb(Outcome,OutcomeO,Ante2).
@@ -476,21 +466,17 @@ pfc_post1_sp(S,P) :-
   %= db pfc_add_db_to_head(P,P2),
   % pfc_remove_old_version(P),
   pfc_add_support(P,S),
-  to_assertable(P,AP),
-  pfc_post1_sp_3(S,P,AP).
+  to_db_assertable(P,AP),
+  must(pfc_post1_sp_3(S,P,AP)).
 
 
-pfc_post1_sp(_,_).
-%=pfc_post1_sp(S,P) :-  pfc_warn("pfc_post1(~w,~w) failed",[P,S]).
+% pfc_post1_sp(_,_).
+pfc_post1_sp(S,P) :-  pfc_warn("pfc_post1(~w,~w) failed",[P,S]).
 
-pfc_post1_sp_3(S,P,(AP1,AP2)):-!,pfc_post1_sp_3(S,P,AP1),pfc_post1_sp_3(S,P,AP2).
-pfc_post1_sp_3(S,(AP1,AP2),P):-!,pfc_post1_sp_3(S,AP1,P),pfc_post1_sp_3(S,AP2,P).
-pfc_post1_sp_3(S,[P],AP):-!,pfc_post1_sp_3(S,P,AP).
-pfc_post1_sp_3(S,P,[AP]):-!,pfc_post1_sp_3(S,P,AP).
-pfc_post1_sp_3(S,[P|More],AP):-!,pfc_post1_sp_3(S,P,AP),pfc_post1_sp_3(S,More,AP).
-pfc_post1_sp_3(S,P,[AP|More]):-!,pfc_post1_sp_3(S,P,AP),pfc_post1_sp_3(S,P,More).
+pfc_assert_fast_i(P,S):- pfc_add_support(P,S), pfc_post1_sp_3(S,P,P).
+
+pfc_post1_sp_3(S,P,AP):- \+ pfc_unique_u(AP),!.
 pfc_post1_sp_3(S,P,AP):-
-  pfc_unique_u(AP),
   assert_u(AP),
   pfc_trace_add(P,S),
   !,
@@ -659,7 +645,7 @@ pfc_add_trigger(pt(Trigger,Body),Support) :-
   pfc_trace_msg('~N%       Adding p-trigger ~q~n',
 		[pt(Trigger,Body)]),
   pfc_assert_i(pt(Trigger,Body),Support),   
-   pfc_mark_as(Support,Trigger,pfcPosTrigger),
+   pfc_mark_as(Support,p,Trigger,pfcPosTrigger),
   copy_term(pt(Trigger,Body),Tcopy),
   call_u(Trigger),
   pfc_eval_lhs(Body,(Trigger,Tcopy)),
@@ -670,7 +656,7 @@ pfc_add_trigger(nt(Trigger,Test,Body),Support) :-
   !,
   pfc_trace_msg('~N%       Adding n-trigger: ~q~n       test: ~q~n       body: ~q~n',
 		[Trigger,Test,Body]),
-   pfc_mark_as(Support,Trigger,pfcNegTrigger),
+   pfc_mark_as(Support,n,Trigger,pfcNegTrigger),
   copy_term(Trigger,TriggerCopy),
   pfc_assert_i(nt(TriggerCopy,Test,Body),Support),
   \+ call_u(Test),
@@ -683,7 +669,7 @@ pfc_add_trigger(bt(Trigger,Body),Support) :-
    pfc_trace_msg('~N%       Adding b-trigger ~q~n',   [pt(Trigger,Body)]),  
    wdmsg('~N%       Adding b-trigger ~q~n',   [pt(Trigger,Body)]),  
    assertz_if_new((Trigger:-pfc_bc_only(Trigger))),
-   must(pfc_mark_as(Support,Trigger,pfcBcTrigger)),
+   must(pfc_mark_as(Support,b,Trigger,pfcBcTrigger)),
   % WAS pfc_bt_pt_combine(Trigger,Body).
   pfc_bt_pt_combine(Sup,Trigger,Body,Support).
 
@@ -1396,23 +1382,27 @@ build_rhs(Sup,X,[X2]) :-
 
 pfc_compile_rhsTerm(Sup,P,P):-is_ftVar(P),!.
 pfc_compile_rhsTerm(Sup,(P/C),((P0:-C))) :- !,pfc_compile_rhsTerm(Sup,P,P0).
-pfc_compile_rhsTerm(Sup,I,O):-fully_expand(I,O),pfc_mark_as(Sup,O,pfcRHS),!.
+pfc_compile_rhsTerm(Sup,I,O):-fully_expand(I,O),pfc_mark_as(Sup,r,O,pfcRHS),!.
 
 
-pfc_mark_as(_Sup,P,_):-var(P),!.
-pfc_mark_as(Sup,neg(P),Type):-var(P)->true;(get_functor(P,F,A),pfc_assert_fast(pfcMark(Type,neg,F,A),Sup)).
-pfc_mark_as(Sup,P,Type):-get_functor(P,F,A),pfc_mark_fa_as(Sup,F,A,Type).
 
-pfc_mark_fa_as(Sup,isa,_,_):- !.
-pfc_mark_fa_as(Sup,t,_,_):- !.
-pfc_mark_fa_as(Sup,argIsa,N,_):- must(N=3).
-pfc_mark_fa_as(Sup,arity,N,_):- must(N=2).
-%pfc_mark_fa_as(Sup,Other,1,_):- must(N=2).
-pfc_mark_fa_as(Sup,pfcMark,_,_):- !.
-pfc_mark_fa_as(Sup,mpred_prop,N,_):- must(N=2).
-pfc_mark_fa_as(Sup,_:mpred_prop,N,_):- must(N=2).
+pfc_mark_as(_,_,P,_):-var(P),!.
+pfc_mark_as(Sup,_PosNeg,neg(P),Type):-pfc_mark_as(Sup,neg,P,Type).
+pfc_mark_as(Sup,_PosNeg,\+(P),Type):-pfc_mark_as(Sup,neg,P,Type).
+pfc_mark_as(Sup,_PosNeg,-(P),Type):-pfc_mark_as(Sup,neg,P,Type).
+pfc_mark_as(Sup,_PosNeg,~(P),Type):-pfc_mark_as(Sup,neg,P,Type).
+pfc_mark_as(Sup,PosNeg,P,Type):-get_functor(P,F,A),pfc_mark_fa_as(Sup,PosNeg,P,F,A,Type).
 
-pfc_mark_fa_as(Sup,F,A,Type):- pfc_assert_fast(pfcMark(Type,pos,F,A),Sup).
+pfc_mark_fa_as(_Sup,_PosNeg,_P,F,A,_):- arity(F,A),!.
+pfc_mark_fa_as(_Sup,_PosNeg,_P,isa,_,_):- !.
+pfc_mark_fa_as(_Sup,_PosNeg,_P,t,_,_):- !.
+pfc_mark_fa_as(_Sup,_PosNeg,_P,argIsa,N,_):- !,must(N=3).
+pfc_mark_fa_as(_Sup,_PosNeg,_P,arity,N,_):- !,must(N=2).
+pfc_mark_fa_as(_Sup,_PosNeg,_P,pfcMark,_,_):- !,must(N=4).
+pfc_mark_fa_as(_Sup,_PosNeg,_P,mpred_prop,N,_):- must(N=2).
+pfc_mark_fa_as(_Sup,_PosNeg,_P,_:mpred_prop,N,_):- must(N=2).
+pfc_mark_fa_as(Sup,PosNeg,_P,F,A,Type):- pfc_assert_fast_i(pfcMark(Type,PosNeg,F,A),(s(Sup),g)).
+
 
 :-debug.
 %isInstFn(A):-!,trace_or_throw(isInstFn(A)).
@@ -1505,7 +1495,7 @@ build_trigger([T|Triggers],Consequent,pt(T,X)) :-
 
 build_neg_test(T,Testin,Testout) :-
   build_test(Testin,Testmid),
-  pfc_conjoin((call_u(T)),Testmid,Testout).
+  conjoin((call_u(T)),Testmid,Testout).
 
 
 % this just strips away any currly brackets.
@@ -1583,14 +1573,6 @@ pfc_union([Head|Tail],L,[Head|Tail2]) :-
   pfc_union(Tail,L,Tail2).
 
 
-%= pfc_conjoin(+Conjunct1,+Conjunct2,?Conjunction).
-%= arg3 is a simplified expression representing the conjunction of
-%= args 1 and 2.
-
-pfc_conjoin(TRUE,X,X) :- TRUE==true, !.
-pfc_conjoin(X,X,TRUE) :- TRUE==true, !.
-pfc_conjoin(X,Y,Z) :- X==Y,Z=X,!.
-pfc_conjoin(C1,C2,(C1,C2)).
 
 % ======================= pfc_file('pfcsupport').	% support maintenance
 

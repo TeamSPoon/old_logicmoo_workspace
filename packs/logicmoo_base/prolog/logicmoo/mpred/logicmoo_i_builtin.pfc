@@ -143,7 +143,7 @@ completelyAssertedCollection(C)=>tCol(C).
 completelyAssertedCollection(tCol).  % a type is a type
 completelyAssertedCollection(tSpec). % A specification is sort of a type
 tSpec(tCol).  % A specification may be a type
-tSpec(ttFormatted).  % A specification may be a syntactic description
+tSpec(meta_argtypes).  % A specification may be a syntactic description
 
 % Cols are either syntactic or existential
 completelyAssertedCollection(ttFormatType).  % syntactic
@@ -166,7 +166,6 @@ completelyAssertedCollection(ftTerm).
 completelyAssertedCollection(meta_argtypes).
 completelyAssertedCollection(pfcControlled).
 completelyAssertedCollection(predCanHaveSingletons).
-completelyAssertedCollection(ttFormatted).
 completelyAssertedCollection(prologHybrid).
 completelyAssertedCollection(tTemporalThing).
 completelyAssertedCollection(prologMultiValued).
@@ -260,7 +259,7 @@ arity(prologMacroHead,1).
 
 :-dmsg("line 128").
 
-ttPredType(isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,prologHybrid,
+ttPredType(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologHybrid,
   predCanHaveSingletons,prologOnly,tPred,prologMacroHead,prologListValued,prologSingleValued)).
 prologMacroHead(prologMacroHead).
 ttPredType(X)=>functorDeclares(X).
@@ -301,10 +300,9 @@ nearestGenls(C1,C2)=>
 % prologHybrid(F/A)/(atom(F),number(A)) => arity(F,A),{show_call(dynamic_safe(F/A))}.
 
 % Functions
-tFunction(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
-ttFormatted(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
-% Preds
-meta_argtypes(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
+tFunction(ArgTypes)/is_declarations(ArgTypes) => meta_argtypes(ArgTypes).
+% FormatTypes
+ttFormatType(ArgTypes)/is_declarations(ArgTypes) => meta_argtypes(ArgTypes).
 
 
 
@@ -344,7 +342,7 @@ arity(argQuoted,1).
 % (isa(Inst,Type), tCol(Inst)) => isa(Type,ttTypeType).
 
 
-(ttFormatType(FT),{compound(FT)})=>ttFormatted(FT).
+(ttFormatType(FT),{compound(FT)})=>meta_argtypes(FT).
 
 => tCol(vtDirection).
 
@@ -416,19 +414,11 @@ tCol(tSpatialThing).
 completelyAssertedCollection(ttTypeType).
 completelyAssertedCollection(tCol).
 
-ttPredType(H)/atom(H) =>  {THP=..[H,P] % , THFA=..[H,F/A],THF=..[H,F]
-                                        },
- added((THP:-cwc,pred_type_test(H,P))).
- /*
- added((THP:-cwc,compound(P),functor(P,F,A),F\==(/),!,THFA)),
- added((THFA:-cwc,atom(F),arity(F,A),(clause_asserted(THF);(integer(A),functor(P,F,A),clause_asserted(THP))))),
- added((THF:-cwc,atom(F),arity(F,A),THFA)).
-*/
 
 ((completeIsaAsserted(I), isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}) => ({dif:dif(Sub, Super)}, isa(I,Super))).
 % (isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}, ~neg(completelyAssertedCollection(Super))) => ({dif:dif(Sub, Super)}, isa(I,Super)).
 
-( ttFormatted(FT), {dif:dif(FT,COL)}, genls(FT, COL),tCol(COL),{not(isa(COL,ttFormatType))}) => formatted_resultIsa(FT,COL).
+( meta_argtypes(FT), {dif:dif(FT,COL)}, genls(FT, COL),tCol(COL),{not(isa(COL,ttFormatType))}) => formatted_resultIsa(FT,COL).
 
 
 % asserting mpred_sv(p,2) causes p/2 to be treated as a mpred_sv, i.e.
@@ -483,7 +473,7 @@ prologOnly(pfc_select/2).
 :- pfc_add(((vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
 :- pfc_add(((user:action_info(ArgTypes,_)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
 :- pfc_add(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
-(ttFormatType(FT)/is_declarations(FT))=>ttFormatted(FT).
+(ttFormatType(FT)/is_declarations(FT))=>meta_argtypes(FT).
 
 
 */
@@ -588,11 +578,11 @@ prologHybrid(isEach( tCol/1, disjointWith/2, genls/2,genlPreds/2, meta_argtypes/
 
 :- ignore(show_call_failure(arity(typeProps,2))).
 :- must(pfc_call(arity(typeProps,2))).
-:- add((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologHybrid,prologPTTP,predCanHaveSingletons,prologOnly,prologMacroHead,prologListValued,prologSingleValued),1,tPred))).
+:- add((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,predCanHaveSingletons,prologOnly,prologMacroHead,prologListValued,prologSingleValued),1,tPred))).
 :- add((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologHybrid,prologPTTP,prologOnly,prologMacroHead,prologListValued,prologSingleValued),2,ftListFn(ftVoprop)))).
 :-dmsg("line 427").
 :- add((isa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,prologHybrid,predCanHaveSingletons,prologOnly,prologOnly,prologMacroHead,prologListValued,prologSingleValued),functorDeclares))).
-:- add((genls(isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologHybrid,prologPTTP,prologOnly,prologMacroHead,prologListValued,prologSingleValued),tPred))).
+:- add((genls(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,prologOnly,prologMacroHead,prologListValued,prologSingleValued),tPred))).
 :- assert_hasInstance(tCol,tCol).
 :- begin_transform_moo_preds.
 :- debug.
@@ -622,7 +612,7 @@ tCol(tFunction).
 tCol(tInferInstanceFromArgType).
 tCol(tPred).
 tCol(tRelation).
-tCol(ttFormatted).
+tCol(meta_argtypes).
 tCol(ttTemporalType).
 tCol(ttTypeType).
 % tCol(tPathway).
@@ -654,18 +644,18 @@ prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, localityOfObject/2, subForm
 % :-pfc_add((I/fully_expand(_,I,O)=>O)).
 
 subFormat(ftDeplictsFn(tCol),ftSpec).
-subFormat(ftDeplictsFn(ttFormatted),ftSpec).
+subFormat(ftDeplictsFn(meta_argtypes),ftSpec).
 subFormat(ftVoprop,ftSpec).
 
-ttFormatted(isEach(ftRest(ftTerm))).
-ttFormatted(isRandom(tCol)).
-ttFormatted(isAnd(ftRest(ftSpec))).
-ttFormatted(isMost(ftRest(ftSpec))).
-ttFormatted(isOneOf(ftRest(ftSpec))).
-ttFormatted(isNot(ftSpec)).
-ttFormatted(isOptional(ftSpec,ftTerm)).
-ttFormatted(isOptionalStr(ftString)).
-ttFormatted(exactStr(ftString)).
+tFunction(isEach(ftRest(ftTerm))).
+tFunction(isRandom(tCol)).
+tFunction(isAnd(ftRest(ftSpec))).
+tFunction(isMost(ftRest(ftSpec))).
+tFunction(isOneOf(ftRest(ftSpec))).
+tFunction(isNot(ftSpec)).
+tFunction(isOptional(ftSpec,ftTerm)).
+tFunction(isOptionalStr(ftString)).
+tFunction(exactStr(ftString)).
 
 resultIsa(F,C)=>(isa(F,'tFunction'),isa(C,ftSpec)).
 resultIsa(ftDeplictsFn,ftSpec).
@@ -684,9 +674,9 @@ isa(prologMultiValued, tCol).
 arity(ftListFn,1).
 arity(isLikeFn,2).
 arity(ftDeplictsFn,1).
-ttFormatted(ftDice(ftInt,ftInt,ftInt)).
-ttFormatted(ftListFn(ftRest)).
-ttFormatted(ftDeplictsFn(tCol)).
+tFunction(ftDice(ftInt,ftInt,ftInt)).
+tFunction(ftListFn(ftRest)).
+tFunction(ftDeplictsFn(tCol)).
 
 completelyAssertedCollection(tAvoidForwardChain).
 completelyAssertedCollection('SententialOperator').
@@ -724,20 +714,20 @@ ttFormatType(ftVoprop).
 % :-dynamic((disjointWith/2,genls/2)).
 
 
-meta_argtypes(argQuotedIsa(tRelation,ftInt,ttFormatType)).
-meta_argtypes(argIsa(tRelation,ftInt,tCol)).
-meta_argtypes(argSingleValueDefault(prologSingleValued,ftInt,ftTerm)).
-meta_argtypes(formatted_resultIsa(ttFormatType,tCol)).
+prologHybrid(argQuotedIsa(tRelation,ftInt,ttFormatType)).
+prologHybrid(argIsa(tRelation,ftInt,tCol)).
+prologHybrid(argSingleValueDefault(prologSingleValued,ftInt,ftTerm)).
+prologHybrid(formatted_resultIsa(ttFormatType,tCol)).
 
-meta_argtypes(quotedDefnIff(ttFormatType,ftTerm)).
-meta_argtypes(defnNecessary(ttFormatType,ftTerm)).
-meta_argtypes(defnIff(ttFormatType,ftTerm)).
-meta_argtypes(quotedDefnIff(ttFormatType,ftTerm)).
+prologHybrid(quotedDefnIff(ttFormatType,ftTerm)).
+prologHybrid(defnNecessary(ttFormatType,ftTerm)).
+prologHybrid(defnIff(ttFormatType,ftTerm)).
+prologHybrid(quotedDefnIff(ttFormatType,ftTerm)).
 
 
-meta_argtypes(isLikeFn(tPred,tCol)).
-meta_argtypes('=>'(ftAskable,ftAssertable)).
-meta_argtypes('<='(ftAssertable,ftAskable)).
+tFuncton(isLikeFn(tPred,tCol)).
+tRelation('=>'(ftAskable,ftAssertable)).
+tRelation('<='(ftAssertable,ftAskable)).
 prologHybrid(instTypeProps(ftID,tCol,ftRest(ftVoprop))).
 prologHybrid(subFormat(ttFormatType,ttFormatType)).
 prologMacroHead(macroSomethingDescription(ftTerm,ftListFn(ftString))).
@@ -1327,10 +1317,10 @@ nearestIsa(I,C) <= is_user_supported(isa(I,C)).
 nearestGenls(I,C) <= is_user_supported(genls(I,C)).
 
 
-ttFormatted(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
-meta_argtypes(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
+meta_argtypes(ArgTypes)/is_declarations(ArgTypes) => {wdmsg(in_loop(meta_argtypes))},meta_argtypes(ArgTypes).
+tRelation(ArgTypes)/is_declarations(ArgTypes) => meta_argtypes(ArgTypes).
 :- pfc_add(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
-(ttFormatType(FT)/is_declarations(FT))=>ttFormatted(FT).
+(ttFormatType(FT)/is_declarations(FT))=>meta_argtypes(FT).
 
 :- show_call(source_location(_,_)).
 
