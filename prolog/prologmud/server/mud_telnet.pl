@@ -428,6 +428,10 @@ telnet_server(Port, Options) :-
 		      [ alias(telnet_server)
 		      ]).
 
+
+make_client_alias(Host,AliasH):- compound(Host),Host=..HostL, must(atomic_list_concat(['client@', HostL,'-'], AliasH)),!.
+make_client_alias(Host,AliasH):- must(atomic_list_concat(['client@', Host,'-'], AliasH)).
+
 server_loop(ServerSocket, Options) :-
 	tcp_accept(ServerSocket, Slave, Peer),
 	tcp_open_socket(Slave, In, Out),
@@ -438,7 +442,7 @@ server_loop(ServerSocket, Options) :-
 	;   between(2, 1000, Num),
 	    Postfix = [-, Num]
 	),*/
-	atomic_list_concat(['client@', Host,'-'], AliasH),
+	make_client_alias(Host,AliasH),
         gensym(AliasH,Alias),
 	catch(thread_create(
 		  service_client(Slave, In, Out, Host, Peer, Options),
