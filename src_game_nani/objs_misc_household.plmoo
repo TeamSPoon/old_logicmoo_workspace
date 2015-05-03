@@ -23,7 +23,7 @@
 
 
 
-:- decl_thlocal(infSupertypeName).
+:- thread_local(infSupertypeName).
 % alolwos lexical deduction such as tStandTable is a tTable and a tBedRoom is a tRoom
 % :-onSpawn localityOfObject(tStandTable, tBedRoom).
 
