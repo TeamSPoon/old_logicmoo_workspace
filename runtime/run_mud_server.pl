@@ -12,7 +12,7 @@ user:file_search_path(cliopatria, '../externals/ClioPatria'). % :- current_prolo
 user:file_search_path(user, '../externals/ClioPatria/user/').
 user:file_search_path(swish, '../externals/swish'):- current_prolog_flag(unix,true).
 user:file_search_path(pack, '../packs/').
-user:file_search_path(prologmud, '../packs/prologmud/prolog/prologmud/').
+user:file_search_path(prologmud, '../prolog/prologmud/').
 :- attach_packs.
 
 % [Required] Load the Logicmioo Base System
@@ -52,6 +52,9 @@ pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','tWea
 pddlSomethingIsa('iComBadge674',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
+
+
+
 
 tAgentGeneric(iExplorer7).
 wearsClothing(iExplorer7,'iBoots773').
