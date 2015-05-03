@@ -269,7 +269,8 @@ pfc_debug_trace(F,A):-wdmsg(F,A),!.
 
 % user''s program''s database
 assert_u(arity(prologHybrid,0)):-trace_or_throw(assert_u(arity(prologHybrid,0))).
-assert_u(X):-dynamic(X),assert(X).
+assert_u(X):-dynamic(X),show_call_success(clause_asserted(X)),!.
+assert_u(X):- assert(X).
 asserta_u(X):-asserta(X).
 assertz_u(X):-assertz(X).
 retract_u(X):-retract(X).
