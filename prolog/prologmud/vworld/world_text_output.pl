@@ -58,7 +58,7 @@ show_kb_via_pred(WPred,ToSTR,L):-!,
 :-export(show_kb_via_pred_0/3).
 
 show_kb_via_pred_0(WPred,ToSTR,listof(Call)):- contains_var(Call,value),subst(Call,value,P,PCall),subst(Call,value,PS,PSCall),!,
-                                               show_kb_via_pred_0(WPred,ToSTR,forEach(findall(P,PCall,PS),fmt(PSCall))).
+                                               show_kb_via_pred_0(WPred,ToSTR,forEach(findall(P,no_repeats(PCall),PS),fmt(PSCall))).
 
 show_kb_via_pred_0(WPred,ToSTR,listof(Call)):- !,show_kb_via_pred_format_call(WPred,ToSTR,Call,listof(Call)).
                                                
@@ -67,7 +67,7 @@ show_kb_via_pred_0(WPred,ToSTR,F = Call):- contains_var(Call,value), !,show_kb_v
 show_kb_via_pred_0(WPred,ToSTR,F = Call):- !,show_kb_via_pred_format_call(WPred,ToSTR, F = Call ,Call).
 show_kb_via_pred_0(WPred,ToSTR,forEach(Call,Show)):-!, show_kb_via_pred_format_call(WPred,ToSTR, Show, forEach(Call)).
 show_kb_via_pred_0(WPred,ToSTR,fmt(Show)):- !, show_kb_via_pred_format_call(WPred,ToSTR, Show ,true).
-show_kb_via_pred_0(_WPred,_STR,call(Call)):- !,  with_output_to(string(Value),req(Call)),
+show_kb_via_pred_0(_WPred,_STR,call(Call)):- !,  with_output_to(string(Value),no_repeats(Call)),
       fmt(Value),!.
       % show_kb_via_pred_0(WPred,ToSTR,fmt(Value)).
 

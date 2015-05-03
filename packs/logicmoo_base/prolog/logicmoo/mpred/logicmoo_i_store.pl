@@ -246,7 +246,7 @@ clr0(P):-
 
 
 % -  preq(Query) = query with P note
-preq(P,C0):- must(not((atom(C0)))),agenda_do_prequery,mpred_op(query(t,P),C0).
+preq(P,C0):- must(not((atom(C0)))),agenda_do_prequery,no_repeats(mpred_op(query(t,P),C0)).
 
 % -  req(Query) = Normal query
 req(C0):- nop(dmsg(req(C0))), preq(req,/*to_exp*/(C0)).

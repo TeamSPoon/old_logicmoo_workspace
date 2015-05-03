@@ -75,7 +75,7 @@ to_db_assertable(P,P).
 
 pfc_each_literal(P,E):-conjuncts_to_list(P,List),member(E,List).
 
-to_addable_form_wte(P0,P):- must(to_addable_form(P0,P)),!, (P0\=@=P->wdmsg(to_addable_form(P0,P));true).
+to_addable_form_wte(P0,P):- must(to_addable_form(P0,P)),!, (P0\=@=P->pfc_debug_trace(to_addable_form(P0,P));true).
 
 retract_eq_quitely((H:-B)):-ignore((clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!,erase(Ref))).
 retract_eq_quitely((H)):-ignore((clause(H,true,Ref),clause(HH,BB,Ref),H=@=HH,BB==true,!,erase(Ref))).
@@ -106,6 +106,7 @@ to_predicate_isas0(C,CO):-C=..[F|CL],maplist(to_predicate_isas0,CL,CLO),!,CO=..[
 
 :-source_location(F,_),asserta(absolute_source_location_pfc(F)).
 exact_args(_):-!,fail.
+exact_args(Q):-argsQuoted(Q).
 exact_args(asserted(_)).
 exact_args(retract_eq_quitely(_)).
 exact_args(asserts_eq_quitely(_)).
@@ -179,7 +180,7 @@ pfc_pbody(H,infoF(INFO),R,B,Why):-!,pfc_pbody_f(H,INFO,R,B,Why).
 pfc_pbody(H,B,R,BIn,WHY):- is_true(B),!,BIn=B,get_why(H,H,R,WHY).
 pfc_pbody(H,B,R,B,asserted(R,(H:-B))).
 
-get_why(H,CL,R,asserted(R,CL)):- clause(spft(CL, U, U),true),!.
+get_why(_,CL,R,asserted(R,CL)):- clause(spft(CL, U, U),true),!.
 get_why(H,CL,R,deduced(R,WHY)):-pfc_get_support(H,WH)*->WHY=(H=WH);(pfc_get_support(CL,WH),WHY=(CL=WH)).
 
 
@@ -258,8 +259,13 @@ is_action_body(P):- (wac==P ; (compound(P),arg(1,P,E),is_action_body(E))),!.
 :-multifile(pfc_default/1).
 :-dynamic(pfc_default/1).
 
+:-thread_local(pfc_debug_local/0).
 :-dynamic(pfc_silient/0).
-% pfc_silient.
+pfc_silient :- \+ pfc_debug_local.
+
+pfc_debug_trace(A):-pfc_debug_trace('~q.~n',A).
+pfc_debug_trace(_,_):-pfc_silient,!.
+pfc_debug_trace(F,A):-wdmsg(F,A),!.
 
 % user''s program''s database
 assert_u(arity(prologHybrid,0)):-trace_or_throw(assert_u(arity(prologHybrid,0))).
@@ -430,7 +436,7 @@ pfc_assert_fast_sp0(S,P) :-
    pfc_rule_hb(P,OutcomeO,_),
      loop_check_term((pfc_post1_sp(S,P),pfc_run_maybe),
      pfc_asserting(OutcomeO),
-     (pfc_post1_sp(S,P),dmsg(looped_outcome((P))))),!.
+     (pfc_post1_sp(S,P),pfc_debug_trace(looped_outcome((P))))),!.
   
 
 
@@ -572,7 +578,12 @@ pfc_run0.
 
 pfc_run_queued:- repeat,sleep(1.0),pfc_run,fail.
 
-:-thread_create(pfc_run_queued,_,[alias(pfc_runing_queue)]).
+:-thread_property(X,alias(pfc_running_queue))-> true ; thread_create(pfc_run_queued,_,[alias(pfc_running_queue)]).
+
+pfc_one_second_timer:- repeat,sleep(1.0),pfc_one_second_timer,fail.
+
+:-thread_property(X,alias(pfc_one_second_timer))-> true ; thread_create(pfc_one_second_timer,_,[alias(pfc_one_second_timer)]).
+
 
 % pfc_step removes one entry from the pfc_queue and reasons from it.
 
@@ -582,7 +593,7 @@ pfc_step0 :-
   % if pfc_halt_signal(Signal) is true, reset it and fail, thereby stopping inferencing.
   pfc_retract_db_type(pfc_halt_signal(Signal)),
   !,
-  pfc_trace("~N% Stopping on signal ~w",[Signal]),
+  pfc_warn("~N% Stopping on signal ~w",[Signal]),
   fail.
 
 pfc_step0 :-
@@ -864,7 +875,7 @@ pfc_undo_u(Fact) :-
      pfc_unfwc1(Fact).
 
 pfc_undo_e(Fact) :- 
-     pfc_warn("Fact not found in user db: ~w",[Fact]),
+     pfc_debug_trace("Fact not found in user db: ~w",[Fact]),
      pfc_trace_rem(Fact),
      pfc_unfwc(Fact).
 
@@ -1682,9 +1693,8 @@ pfc_database_item(Term) :-
   clause_u(Term,_).
 
 pfc_retract_or_warn_i(X) :-  retract_i(X), !.
-pfc_retract_or_warn_i(_) :- pfc_silient,!.
 pfc_retract_or_warn_i(X) :- 
-  pfc_warn("Couldn't retract ~p.",[X]),!.
+  pfc_debug_trace("Couldn't retract ~p.",[X]),!.
 pfc_retract_or_warn_i(_).
 
 % ======================= pfc_file('pfcdebug').	% debugging aids (e.g. tracing).
@@ -1909,15 +1919,14 @@ pfc_trace_add(P,S) :-
    pfc_trace_break(P,S).
 
 
-pfc_trace_addPrint(P,S):-pfc_silient,!.
 pfc_trace_addPrint(P,S):- (\+ \+ pfc_trace_addPrint_0(P,S)).
 pfc_trace_addPrint_0(P,S) :-
   pfc_traced(P),
   !,
   must(S=(F,T)),
   (F==T
-       -> format("~N% Adding (~w) ~w ~n",[F,P])
-        ; format("~N% Adding (:) ~w    <-------- (~q <=TF=> ~q)~n",[P,(T),(F)])).
+       -> pfc_debug_trace("~N% Adding (~w) ~w ~n",[F,P])
+        ; pfc_debug_trace("~N% Adding (:) ~w    <-------- (~q <=TF=> ~q)~n",[P,(T),(F)])).
 
 pfc_trace_addPrint_0(_,_).
 
@@ -1939,7 +1948,7 @@ pfc_trace_rem(nt2(_,_)) :-
 
 pfc_trace_rem(P) :-
   ((pfc_traced(P))
-     -> (pfc_silient; format('~N% Removing ~w.~n',[P]))
+     -> (pfc_debug_trace('~N% Removing ~w.~n',[P]))
       ; true),
   (pfc_spied(P,rem)
    -> (format("~N% Breaking on pfc_rem1(~w)",[P]),
