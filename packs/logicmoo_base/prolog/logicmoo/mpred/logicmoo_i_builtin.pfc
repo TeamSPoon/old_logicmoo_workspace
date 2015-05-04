@@ -120,7 +120,7 @@ tPred(F),arity(F,A)/(integer(A),A>1) => (not_col(F),support_hilog(F,A)).
     functor(Head,F,A),
    dynamic_safe(F/A),
     must(( \+ static_predicate(Head))),
-   show_call(discontiguous(F/A)),
+   discontiguous(F/A),
     multifile(F/A)}),
    prologHybrid(F),
    arity(F,A))).
@@ -771,10 +771,13 @@ subFormat(ftVoprop,ftRest(ftVoprop)).
 subFormat(ftVoprop,ftTerm).
 
 
+tCol(W)=>{guess_supertypes(W)}.
 
 
 tCol(tNewlyCreated).
 tCol(ttTypeFacet).
+
+tNewlyCreated(W)=>{guess_types(W)}.
 
 ttTypeFacet(tNewlyCreated).
 ttTypeFacet(ttTypeFacet).

@@ -2481,6 +2481,8 @@ term_color0(db_op,hfg(blue)).
 mesg_color(T,C):-var(T),!,dumpST,!,C=[blink(slow),fg(red),hbg(black)],!.
 mesg_color(T,C):- string(T),!,must(f_word(T,F)),!,functor_color(F,C).
 mesg_color(T,C):-not(compound(T)),text_to_string(T,S),!,mesg_color(S,C).
+mesg_color(succeed(T),C):-nonvar(T),mesg_color(T,C).
+mesg_color(debug(T),C):-nonvar(T),mesg_color(T,C).
 mesg_color(_:T,C):-nonvar(T),!,mesg_color(T,C).
 mesg_color(T,C):-functor_safe(T,F,_),member(F,[color,ansi]),compound(T),arg(1,T,C),nonvar(C).
 mesg_color(T,C):-predef_functor_color(F,C),mesg_arg1(T,F).

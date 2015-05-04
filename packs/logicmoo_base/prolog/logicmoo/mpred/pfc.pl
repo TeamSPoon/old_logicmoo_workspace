@@ -1426,7 +1426,9 @@ pfc_one_minute_timer_tick:-once(pfc_cleanup),fail.
 
 pfc_cleanup:- forall((no_repeats(F-A,(pfcMark(pfcRHS,_,F,A),A>1))),pfc_cleanup(F,A)).
 
-pfc_cleanup(F,A):-functor(P,F,A),predicate_property(P,dynamic)->(findall(P-B-Ref,clause(P,B,Ref),L),forall(member(P-B-Ref,L),(erase(Ref),assertz_if_new((P:-B)))));true.
+pfc_cleanup(F,A):-functor(P,F,A),predicate_property(P,dynamic)->pfc_cleanup_0(P);true.
+
+pfc_cleanup_0(P):- findall(P-B-Ref,clause(P,B,Ref),L),forall(member(P-B-Ref,L),erase(Ref)),forall(member(P-B-Ref,L),assertz_if_new((P:-B))).
 
 :-debug.
 %isInstFn(A):-!,trace_or_throw(isInstFn(A)).

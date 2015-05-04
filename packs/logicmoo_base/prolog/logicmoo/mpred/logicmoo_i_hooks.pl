@@ -262,32 +262,6 @@ create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
    assert_isa_safe(SystemName,NewSuggestedClass),
    assert_isa_safe(SystemName,SuggestedClass).
 
-toUpperCamelcase(Type,TypeUC):-toCamelcase(Type,TypeC),toPropercase(TypeC,TypeUC),!.
-:-export(i_name/2).
-i_name(OType,IType):-typename_to_iname0('',OType,IOType),!,IOType=IType.
-:-export(i_name/3).
-i_name(I,OType,IType):-typename_to_iname0(I,OType,IOType),!,IOType=IType.
-
-:-export(typename_to_iname0/3).
-
-typename_to_iname0(I, [], O):- trace_or_throw(bad_typename_to_iname0(I, [], O)).
-typename_to_iname0(I,OType,IType):-type_prefix(Prefix,_),atom_concat(Prefix,Type,OType),capitalized(Type),!,typename_to_iname0(I,Type,IType).
-typename_to_iname0(I,Type,IType):-nonvar(Type),toUpperCamelcase(Type,UType),atom_concat(I,UType,IType).
-
-:-export(split_name_type/3).
-:- '$hide'(split_name_type/3).
-split_name_type(Suggest,InstName,Type):- must_det(split_name_type_0(Suggest,NewInstName,NewType)),!,must((NewInstName=InstName,NewType=Type)),!.
-
-split_name_type_0(S,P,C):- string(S),!,atom_string(A,S),split_name_type_0(A,P,C),!.
-split_name_type_0(FT,FT,ttFormatType):-t(ttFormatType,FT),!,dmsg(trace_or_throw(ttFormatType(FT))),fail.
-split_name_type_0(T,T,C):- compound(T),functor(T,C,_),!.
-split_name_type_0(T,T,C):- hotrace((once(atomic_list_concat_safe([CO,'-'|_],T)),atom_string(C,CO))).
-split_name_type_0(T,T,C):- hotrace((atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catchv(number_codes(_,Digits),_,fail),atom_codes(CC,Type),!,i_name(t,CC,C))).
-split_name_type_0(C,P,C):- var(P),atom(C),i_name(i,C,I),gensym(I,P),!.
-
-
-
-
 % =======================================================
 % term utils
 % =======================================================

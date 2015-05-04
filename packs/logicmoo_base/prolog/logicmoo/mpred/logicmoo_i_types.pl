@@ -396,12 +396,39 @@ cached_isa(I,T):-hotrace(isa_backchaing(I,T)).
 
 
 
+toUpperCamelcase(Type,TypeUC):-toCamelcase(Type,TypeC),toPropercase(TypeC,TypeUC),!.
+:-export(i_name/2).
+i_name(OType,IType):-typename_to_iname0('',OType,IOType),!,IOType=IType.
+:-export(i_name/3).
+i_name(I,OType,IType):-typename_to_iname0(I,OType,IOType),!,IOType=IType.
+
+:-export(typename_to_iname0/3).
+
+typename_to_iname0(I, [], O):- trace_or_throw(bad_typename_to_iname0(I, [], O)).
+typename_to_iname0(I,OType,IType):-type_prefix(Prefix,_),atom_concat(Prefix,Type,OType),capitalized(Type),!,typename_to_iname0(I,Type,IType).
+typename_to_iname0(I,Type,IType):-nonvar(Type),toUpperCamelcase(Type,UType),atom_concat(I,UType,IType).
+
+:-export(split_name_type/3).
+:- '$hide'(split_name_type/3).
+split_name_type(Suggest,InstName,Type):- must_det(split_name_type_0(Suggest,NewInstName,NewType)),!,must((NewInstName=InstName,NewType=Type)),!.
+
+split_name_type_0(S,P,C):- string(S),!,atom_string(A,S),split_name_type_0(A,P,C),!.
+split_name_type_0(FT,FT,ttFormatType):-t(ttFormatType,FT),!,dmsg(trace_or_throw(ttFormatType(FT))),fail.
+split_name_type_0(T,T,C):- compound(T),functor(T,C,_),!.
+split_name_type_0(T,T,C):- hotrace((once(atomic_list_concat_safe([CO,'-'|_],T)),atom_string(C,CO))).
+split_name_type_0(T,T,C):- hotrace((atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catchv(number_codes(_,Digits),_,fail),atom_codes(CC,Type),!,i_name(t,CC,C))).
+split_name_type_0(C,P,C):- var(P),atom(C),i_name(i,C,I),gensym(I,P),!.
+
+
+
+
+
 % ============================================
 % decl_type/1
 % ============================================
 :-export(decl_type_safe/1).
 decl_type_safe(T):- compound(T),!.
-decl_type_safe(T):- ignore((atom(T),not(never_type_why(T,_)),not(number(T)),decl_type(T))).
+decl_type_safe(T):- ignore((atom(T),not(never_type_why(T,_)),not(number(T)),show_call(decl_type(T)))).
 
 
 :-export(decl_type/1).
@@ -415,7 +442,7 @@ decl_type((A,L)):-!,decl_type(A),decl_type(L).
 decl_type(Spec):- decl_type_unsafe(Spec),!.
 
 decl_type_unsafe(Spec):- never_type_why(Spec,Why),!,trace_or_throw(never_type_why(Spec,Why)).
-decl_type_unsafe(Spec):- !,pfc_add(tCol(Spec)).
+decl_type_unsafe(Spec):- !,pfc_add(tCol(Spec)),guess_supertypes(Spec).
 
 
 
@@ -442,9 +469,13 @@ define_ft_0(Spec):- hooked_asserta(isa(Spec,ttFormatType)),(compound(Spec)->hook
 :-export(assert_subclass/2).
 assert_subclass(O,T):-assert_subclass_safe(O,T).
 
+:-export(assert_p_safe/3).
+assert_p_safe(P,O,T):-
+  ignore((nonvar(O),nonvar(T),nonvar(P),nop((not(chk_ft(O)),not(chk_ft(T)))),pfc_assert_guess(t(P,O,T)))).
+
 :-export(assert_subclass_safe/2).
 assert_subclass_safe(O,T):-
-  ignore((nonvar(O),decl_type_safe(O),nonvar(T),decl_type_safe(T),nonvar(O),nop((not(chk_ft(O)),not(chk_ft(T)))),pfc_add(genls(O,T)))).
+  ignore((nonvar(O),decl_type_safe(O),nonvar(T),decl_type_safe(T),nonvar(O),nop((not(chk_ft(O)),not(chk_ft(T)))),pfc_assert_guess(genls(O,T)))).
 
 :-export(assert_isa_safe/2).
 assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(O,T))).
@@ -455,11 +486,35 @@ assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(
 %OLD user:decl_database_hook(change(assert,_A_or_Z),isa(W,ttTemporalType)):-decl_type_safe(W). %,call_after_mpred_load(forall(isa(I,W),create_instance(I,W))).
 %OLD user:decl_database_hook(change(assert,_A_or_Z),isa(W,tCol)):- (test_tl(infSupertypeName);true),guess_supertypes(W).
 
-guess_supertypes(W):-atom(W),atomic_list_concat(List,'_',W),length(List,S),S>2,!, append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),
-            atomic_list_concat(FirstPart,'_',_NewCol),show_call_failure(assert_subclass_safe(W,Last)).
-guess_supertypes(W):-atom(W),to_first_break(W,lower,tt,_,upper),!,assert_isa(W,ttTypeType),!.
-guess_supertypes(W):-atom(W),T=t,to_first_break(W,lower,T,All,upper),!,to_first_break(All,upper,_,Super,Rest),
-   atom_length(Rest,L),!,L>2,i_name(T,Rest,Super),show_call_failure(assert_subclass_safe(W,Super)),!.
+:-dynamic(tried_guess_types_from_name/1).
+:-dynamic(did_learn_from_name/1).
+
+guess_types(W):- tried_guess_types_from_name(W),!.
+guess_types(W):- isa_from_morphology(W,What),!,ignore(guess_types(W,What)).
+
+guess_types(W,tCol):- !, guess_supertypes(W).
+guess_types(W,What):- asserta(tried_guess_types_from_name(W)),ignore((atom(W),guess_types_0(W,What))).
+guess_types_0(W,ftID):-hotrace((atom(W),atom_concat(i,T,W), 
+   atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catchv(number_codes(_,Digits),_,fail),atom_codes(CC,Type),!,i_name(t,CC,NewType))),
+   decl_type_safe(NewType),(tCol(NewType)->(assert_isa_safe(W,NewType),asserta(did_learn_from_name(W)),guess_supertypes(NewType));true).
+
+
+guess_supertypes(W):- tried_guess_types_from_name(W),!.
+guess_supertypes(W):- asserta(tried_guess_types_from_name(W)),ignore((atom(W),guess_supertypes_0(W))).
+
+guess_supertypes_0(W):-atom(W),atomic_list_concat(List,'_',W),length(List,S),S>2,!, append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),
+            atomic_list_concat(FirstPart,'_',_NewCol),pfc_assert_guess(genls(W,Last)),asserta(did_learn_from_name(W)).
+guess_supertypes_0(W):-T=t,to_first_break(W,lower,T,All,upper),to_first_break(All,upper,Super,Rest,_),
+   atom_length(Rest,L),!,L>2,i_name(tt,Rest,NewSuper),atom_concat(NewSuper,'Type',SuperTT),pfc_assert_guess(isa(SuperTT,ttTypeType)),
+  pfc_assert_guess(isa(W,SuperTT)),asserta(did_learn_from_name(W)),!,guess_typetypes(SuperTT).
+
+pfc_assert_guess(G):-show_call(pfc_assert(G,(d,d))).
+
+guess_typetypes(W):- tried_guess_types_from_name(W),!.
+guess_typetypes(W):- asserta(tried_guess_types_from_name(W)),ignore((atom(W),guess_typetypes_0(W))).
+
+guess_typetypes_0(TtTypeType):-atom_concat(tt,TypeType,TtTypeType),atom_concat(Type,'Type',TypeType),
+ atom_concat(t,Type,TType),pfc_assert_guess((isa(T,TtTypeType)=>genls(T,TType))).
 
 /*
 system:term_expansion(isa(Compound,PredArgTypes),
