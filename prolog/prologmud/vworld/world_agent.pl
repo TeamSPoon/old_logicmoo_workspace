@@ -151,7 +151,7 @@ with_current_agent(Who,Cmd):- get_session_id(ID),with_assertions(thlocal:session
 get_agent_session(P,O):- once(thlocal:session_agent(O,P);thglobal:global_session_agent(O,P)).
 
 foc_current_player(P):- current_agent(P),nonvar(P),!.
-foc_current_player(P):- nonvar(P),tAgentGeneric(P),become_player(P),!.
+foc_current_player(P):- nonvar(P),tAgent(P),become_player(P),!.
 foc_current_player(P):- 
   prolog_must_l([    
              get_session_id(O),
@@ -180,12 +180,12 @@ random_instance(Type,Value,Test):- must(random_instance_no_throw(Type,Value,Test
 
 
 
-get_dettached_npc(P):-random_instance_no_throw(tAgentGeneric,P,true),not(isa(P,tHumanPlayer)),!.
+get_dettached_npc(P):-random_instance_no_throw(tAgent,P,true),\+ isa(P,tHumanPlayer),!.
 
 % generate_new_player(P):- req(agent(P)),!.
-generate_new_player(P):- prolog_must_l([gensym(iPlayer,N),not((isa_asserted(N,tAgentGeneric))),P=N,ensure_new_player(P)]),!.
+generate_new_player(P):- prolog_must_l([gensym(iPlayer,N),not((isa_asserted(N,tAgent))),P=N,ensure_new_player(P)]),!.
 
-ensure_new_player(P):- prolog_must_l([assert_isa(P,tExplorer),assert_isa(P,tPlayer),assert_isa(P,tAgentGeneric)]),!.
+ensure_new_player(P):- prolog_must_l([assert_isa(P,tExplorer),assert_isa(P,tPlayer),assert_isa(P,tAgent)]),!.
 
 deatch_player(P):- thglobal:global_session_agent(_,P),!,trace_or_throw(deatch_player(P)).
 deatch_player(_).
@@ -199,7 +199,7 @@ become_player(_Old,NewName):-become_player(NewName).
 % Lists all the agents in the run. Except for other monsters.
 list_agents(Agents) :- agent_list(Agents), !.
 list_agents(Agents) :- % build cache
-	findall(NearAgent,req(tAgentGeneric(NearAgent)),Agents),
+	findall(NearAgent,req(tAgent(NearAgent)),Agents),
 	assert(agent_list(Agents)),!.
 
 :-export((agent_into_corpse/1, display_stats/1)).

@@ -13,7 +13,7 @@
 
 tCol(vtPosture).
 
-prologSingleValued(mudStance(tAgentGeneric,vtPosture),prologHybrid).
+prologSingleValued(mudStance(tAgent,vtPosture),prologHybrid).
 
 vtPosture(vSit).
 vtPosture(vStand).

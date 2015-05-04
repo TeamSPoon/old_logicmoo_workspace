@@ -23,6 +23,10 @@
 :- dynamic(pfc_univ/3).
 :- multifile(pfc_univ/3).
 
+:-dynamic(user:hook_one_second_timer_tick/0).
+:-multifile(user:hook_one_second_timer_tick/0).
+:-dynamic(user:hook_one_minute_timer_tick/0).
+:-multifile(user:hook_one_minute_timer_tick/0).
 
 :- dynamic(completelyAssertedCollection/1).
 :- multifile(completelyAssertedCollection/1).

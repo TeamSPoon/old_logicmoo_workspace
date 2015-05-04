@@ -28,7 +28,7 @@ user:agent_call_command(_Agent,actWhere(SObj)) :-
         fmt(cmdresult(actWhere,mudAtLoc(Obj,LOC)))).
 
 
-user:action_info(actWho(isOptional(tAgentGeneric,isMissing)),"Lists who is online (where they are at least)").
+user:action_info(actWho(isOptional(tAgent,isMissing)),"Lists who is online (where they are at least)").
 
 user:agent_call_command(_Gent,actWho(W)) :- mud_cmd_who(W).
 
@@ -36,7 +36,7 @@ mud_cmd_who(isMissing):-!,mud_cmd_who_1(_).
 mud_cmd_who(Who):- mud_cmd_who_1(Who).
 
 mud_cmd_who_1(Who):-
-     forall(tAgentGeneric(Who),
+     forall(tAgent(Who),
       once((inRegion(Who,Where),
             fmt(cmdresult(actWho(Who),inRegion(Who,Where)))))).
 

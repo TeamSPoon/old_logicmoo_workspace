@@ -102,12 +102,12 @@ isa_any(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(A,
 prop_memb(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(A,B),_Results).
 
 tCol(tItem).
-tCol(tAgentGeneric).
+tCol(tAgent).
 tCol(tRegion).
 tCol(tItem).
 tCol(tItem).
 exisitingThing(O):-tItem(O).
-exisitingThing(O):-tAgentGeneric(O).
+exisitingThing(O):-tAgent(O).
 exisitingThing(O):-tRegion(O).
 anyInst(O):-tCol(O).
 anyInst(O):-exisitingThing(O).
@@ -145,7 +145,7 @@ genls(tFood,tItem).
 %ttSpatialType(FT):- nonvar(FT),ttFormatType(FT),!,fail.
 %ttSpatialType(FT):- nonvar(FT),ttNotSpatialType(FT),!,fail.
 %ttSpatialType(tItem). %  col, formattype, 
-% ttSpatialType(SubType):-member(SubType,[tAgentGeneric,tItem,tRegion]).
+% ttSpatialType(SubType):-member(SubType,[tAgent,tItem,tRegion]).
 %ttSpatialType(S):- is_asserted(ttSpatialType(T)), impliedSubClass(S,T).
 
 %createableSubclassType(S,T):-mpred_call(  ttSpatialType(T)),is_asserted(genls(S,T)).
@@ -153,7 +153,7 @@ genls(tFood,tItem).
 
 create_agent(P):-functor(P,isKappaFn,_),!.
 create_agent(P):-create_agent(P,[]).
-create_agent(P,List):-must_det(create_instance(P,tAgentGeneric,List)).
+create_agent(P,List):-must_det(create_instance(P,tAgent,List)).
 
 
 :-export(create_instance/1).
@@ -187,9 +187,9 @@ create_instance_0(I,_,_):-asserta_if_new(is_creating_now(I)),fail.
 create_instance_0(What,FormatType,List):- FormatType\==tCol, ttFormatType(FormatType),!,trace_or_throw(ttFormatType(FormatType,create_instance(What,FormatType,List))).
 create_instance_0(SubType,tCol,List):-add(tCol(SubType)),padd(SubType,List).
 
-ttSpatialType(tAgentGeneric).
-genls(tActor,tAgentGeneric).
-genls(tExplorer,tAgentGeneric).
+ttSpatialType(tAgent).
+genls(tActor,tAgent).
+genls(tExplorer,tAgent).
 
 :-dynamic_multifile_exported(predTypeMax/3).
 :-dynamic_multifile_exported(predInstMax/3).
@@ -199,11 +199,11 @@ genls(tExplorer,tAgentGeneric).
 
 punless(Cond,Action):- once((call(Cond);call(Action))).
 
-create_instance_0(T,tAgentGeneric,List):-
+create_instance_0(T,tAgent,List):-
   must_det_l([
    retractall(agent_list(_)),
-   create_meta(T,_,tAgentGeneric,P),
-   mreq(isa(P,tAgentGeneric)),
+   create_meta(T,_,tAgent,P),
+   mreq(isa(P,tAgent)),
    padd(P,List),   
    % punless(mudPossess(P,_),rez_to_inventory(P,food,_Food)),
    rez_to_inventory(P,tFood,_Food),

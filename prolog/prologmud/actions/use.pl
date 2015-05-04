@@ -31,9 +31,9 @@ mudWielding(A,O) => mudPossess(A,O).
 wearsClothing(A,O) => mudPossess(A,O).
 
 
-prologMultiValued(wearsClothing(tAgentGeneric,tWearAble)).
-prologMultiValued(mudWielding(tAgentGeneric,tWieldAble)).
-prologMultiValued(mudStowing(tAgentGeneric,tStowAble)).
+prologMultiValued(wearsClothing(tAgent,tWearAble)).
+prologMultiValued(mudWielding(tAgent,tWieldAble)).
+prologMultiValued(mudStowing(tAgent,tStowAble)).
 prologMultiValued(mudContains(tContainer,tObj)).
 
 
@@ -41,7 +41,7 @@ prologHybrid(genlPreds/2).
 genlPreds(wearsClothing,mudPossess).
 genlPreds(mudWielding,mudPossess).
 genlPreds(mudStowing,mudPossess).
-prologHybrid(mudKnowing(tAgentGeneric,ftTerm)).
+prologHybrid(mudKnowing(tAgent,ftTerm)).
 genlPreds(mudKnowing,mudPossess).
 % genlPreds(mudPossess,mudContains).
 genlInverse(mudContains,mudInsideOf).

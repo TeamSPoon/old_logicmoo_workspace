@@ -300,7 +300,7 @@ p2q(tItem,knowrob,'HumanScaleObject').
 p2q(tSpatialThing,knowrob,'SpatialThing').
 p2q(genls,rdfs,subClassOf).
 p2q(tRegion,knowrob,'FixedStructure').
-p2q(tAgentGeneric,knowrob,'Agent-Generic').
+p2q(tAgent,knowrob,'Agent-Generic').
 p2q(ftInt,xsd,integer).
 p2q(string,xsd,string).
 p2q(ftString,xsd,string).

@@ -580,16 +580,6 @@ pfc_run0.
 pfc_run_queued:- repeat,sleep(1.0),pfc_run,fail.
 :-thread_property(X,alias(pfc_running_queue))-> true ; thread_create(pfc_run_queued,_,[alias(pfc_running_queue)]).
 
-:-dynamic(pfc_one_second_timer_tick/0).
-pfc_one_second_timer:- repeat,sleep(1.0),pfc_one_second_timer_tick,fail.
-:-thread_property(X,alias(pfc_one_second_timer))-> true ; thread_create(pfc_one_second_timer,_,[alias(pfc_one_second_timer)]).
-
-
-:-dynamic(pfc_one_minute_timer_tick/0).
-pfc_one_minute_timer:- repeat,sleep(60.0),pfc_one_minute_timer_tick,fail.
-:-thread_property(X,alias(pfc_one_minute_timer))-> true ; thread_create(pfc_one_minute_timer,_,[alias(pfc_one_minute_timer)]).
-
-
 
 % pfc_step removes one entry from the pfc_queue and reasons from it.
 
@@ -970,8 +960,10 @@ pfc_wfflist([X|Rest],L) :-
 % The supports for a user-defined fact are: [u].
 
 supports_f_l(F,[Fact|MoreFacts]) :-
-  pfc_get_support(F,(Fact,Trigger)),
+  pfc_get_support_precanonical(F,(Fact,Trigger)),
   trigger_supports_f_l(Trigger,MoreFacts).
+
+pfc_get_support_precanonical(F,Sup):-fully_expand(F,P),pfc_get_support(P,Sup).
 
 trigger_supports_f_l(u,[]) :- !.
 trigger_supports_f_l(Trigger,[Fact|MoreFacts]) :-
@@ -1422,7 +1414,7 @@ pfc_mark_fa_as(_Sup,_PosNeg,_P,_:mpred_prop,N,_):- must(N=2).
 pfc_mark_fa_as(Sup,PosNeg,_P,F,A,Type):- pfc_assert_fast_i(pfcMark(Type,PosNeg,F,A),(s(Sup),g)).
 
 
-pfc_one_minute_timer_tick:-once(pfc_cleanup),fail.
+user:hook_one_minute_timer_tick:-pfc_cleanup.
 
 pfc_cleanup:- forall((no_repeats(F-A,(pfcMark(pfcRHS,_,F,A),A>1))),pfc_cleanup(F,A)).
 
@@ -1851,10 +1843,8 @@ print_db_items(Title,Mask,SHOW,What0):-
       (flag(linenum,LI,LI),LI>0->draw_line;true).
 print_db_items(_,_,_,_).
 
-pfc_contains_term(What,Inside):-compound(What),!,
-  (\+ \+ ((numbervars(Inside),contains_term(What,Inside)))).
-pfc_contains_term(What,Inside):- (\+ \+ ((numbervars(Inside),contains_term(In,Inside),                
-                       (compound(In)->(functor(In,F,_),F=What);What=In)))).
+pfc_contains_term(What,Inside):-compound(What),!,(\+ \+ ((numbervars(Inside),contains_term(What,Inside)))).
+pfc_contains_term(What,Inside):- (\+ \+ ((subst(Inside,What,foundZadooksy,Diff),Diff \=@= Inside ))).
 
 user:listing_mpred_hook(What):- debugOnError(pfc_listing(What)).
 
@@ -2182,12 +2172,19 @@ pfc_descendants(P,L) :-
 % ***** predicates for brousing justifications *****
 
 :-dynamic(whymemory/2).
+:-thread_local(thlocal:pfc_interactive_why).
 
 :- use_module(library(lists)).
+
+pfc_interactive_why:- with_assertions(thlocal:pfc_interactive_why,pfc_why).
 
 pfc_why :-
   whymemory(P,_),
   pfc_why(P).
+
+user:why(N) :- pfc_why(N).
+
+pfc_interactive_why(N):- with_assertions(thlocal:pfc_interactive_why,pfc_why(N)).
 
 pfc_why(N) :-
   number(N),
@@ -2207,14 +2204,15 @@ pfc_why1(P) :-
 
 pfc_whyBrouse(P,Js) :-
   pp_justifications(P,Js),
+  pfc_interactive_why -> ((
   pfc_ask(' >> ',Answer),
-  pfc_why_command(Answer,P,Js).
+  pfc_why_command(Answer,P,Js))); true.
 
 pfc_why_command(q,_,_) :- !.
 pfc_why_command(h,_,_) :-
   !,
   format("~N%
-Justification Brouser Commands:
+Justification Browser Commands:
  q   quit.
  N   focus on Nth justification.
  N.M brouse step M of the Nth justification

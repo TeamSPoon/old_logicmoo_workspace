@@ -272,7 +272,7 @@ write_pretty_aux([[Head]|Tail], Return, Column) :-
 	write_pretty_aux(Tail, Return, Ctemp).
 write_pretty_aux([[Agent]|Tail],Return,Column) :-
 	Ctemp is Column + 1,
-	isa(Agent,tAgentGeneric),
+	isa(Agent,tAgent),
 	write('Ag'), write(' '),
 	write_pretty_aux(Tail,Return,Ctemp).
 write_pretty_aux([[_|_]|Tail],Return,Column) :-
@@ -345,7 +345,7 @@ cmdShowRoomGrid(Room,Old,N,N) :-
 cmdShowRoomGrid(Room,Y,X,N) :-
       loc_to_xy(Room,X,Y,LOC),
 	asserted_atloc(Obj,LOC),
-        props(Obj,isa(tAgentGeneric)),
+        props(Obj,isa(tAgent)),
 	list_agents(Agents),
 	obj_memb(Agent,Agents),
 	asserted_atloc(Agent,LOC),
@@ -365,7 +365,7 @@ cmdShowRoomGrid(Room,Y,X,N) :-
 cmdShowRoomGrid(Room,Y,X,N) :-
       loc_to_xy(Room,X,Y,LOC),
 	asserted_atloc(Agent,LOC),
-	isa(Agent,tAgentGeneric),
+	isa(Agent,tAgent),
 	write('Ag'), write(' '),
 	XX is X + 1,
 	!,

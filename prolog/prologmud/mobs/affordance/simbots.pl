@@ -334,7 +334,7 @@ actionVerb= "Operate",
 textName= "Look busy doing something!",
 slAnim= anim_TYPE]).
 
-defined_affordance([subjType= tAgentGeneric,
+defined_affordance([subjType= tAgent,
 actionVerb= "Talk",
 'NonLoneliness_Social'= 10 * 15,
 'Fun'= 1 * 1,
@@ -410,7 +410,7 @@ slAnim= animETWO_PUNCH,
 'Fun'= 10 * 10,
 'Hygiene'= -10 * -10]).
 
-defined_affordance([subjType= tAgentGeneric,actionVerb= "Tickle",
+defined_affordance([subjType= tAgent,actionVerb= "Tickle",
 textName= "Play with",
 slAnim= anim_SHOOT_BOW_L,
 alsoType= tLookAble,
@@ -423,25 +423,25 @@ slAnim= anim_DRINK,
 'Hygiene'= 0 * -5,
 'NonHunger'= 40 * 20]).
 
-defined_affordance([subjType= tAgentGeneric,actionVerb= "Argue",
+defined_affordance([subjType= tAgent,actionVerb= "Argue",
 textName= "Argue",
 alsoType= tLookAble,
 slAnim= anim_ONETWO_PUNCH,
 'Energy'= -11 * -20]).
 
-defined_affordance([subjType= tAgentGeneric,actionVerb= "Talk",
+defined_affordance([subjType= tAgent,actionVerb= "Talk",
 textName= "Talk to",
 mudActionMaxDistance= 3,
 alsoType= tLookAble,
 slAnim= anim_TALK,
 'NonLoneliness_Social'= 11 * 20]).
 
-defined_affordance([subjType= tAgentGeneric,actionVerb= "Attack",
+defined_affordance([subjType= tAgent,actionVerb= "Attack",
 textName= "Beat up",
 slAnim= anim_SWORD_STRIKE,
 'Energy'= -11 * -20]).
 
-defined_affordance([subjType= tAgentGeneric,actionVerb= "Kiss",
+defined_affordance([subjType= tAgent,actionVerb= "Kiss",
 textName= "Kiss",
 slAnim= anim_BLOW_KISS,
 'NonLoneliness_Social'= 11 * 20,
@@ -494,7 +494,7 @@ do_define_type_affordance(_,[]).
 do_define_type_affordance(Type,[H|LIST]):-do_define_type_affordance1(Type,H),!,do_define_type_affordance(Type,LIST),!.
 
 user:world_agent_plan(_World,Agent,Act):-
-   (isa(Agent,tSimian);isa(Agent,tAgentGeneric)),
+   (isa(Agent,tSimian);isa(Agent,tAgent)),
    simian_idea(Agent,Act).
 
 :-export(simian_ideas_possible/2).
@@ -659,12 +659,12 @@ verb_desc(actSleep, tLayAble, "Lay on").
 verb_desc(actClean, tLookAble, "Clean").
 verb_desc(actObserve, tLookAble, "Observe").
 verb_desc(actExcersize, tSitAble, "Excersize").
-verb_desc(actTickle, tAgentGeneric, "Play with").
+verb_desc(actTickle, tAgent, "Play with").
 verb_desc(actSearch, tContainer, "Eat_from").
-verb_desc(actArgue, tAgentGeneric, "Argue").
-verb_desc(actTalk, tAgentGeneric, "Talk to").
-verb_desc(actAttack, tAgentGeneric, "Beat up").
-verb_desc(actKiss, tAgentGeneric, "Kiss").
+verb_desc(actArgue, tAgent, "Argue").
+verb_desc(actTalk, tAgent, "Talk to").
+verb_desc(actAttack, tAgent, "Beat up").
+verb_desc(actKiss, tAgent, "Kiss").
 verb_desc(actThinkAbout, tLookAble, "Think about").
 
 :- dynamic verb_affordance/5.
@@ -730,19 +730,19 @@ verb_affordance(actObserve, tReadAble, mudFun, 10, 10).
 verb_affordance(actObserve, tReadAble, mudSecureRoom, 20, 20).
 verb_affordance(actObserve, tArt, mudFun, 10, 10).
 verb_affordance(actObserve, tArt, mudSecureRoom, 20, 20).
-verb_affordance(actTalk, tAgentGeneric, mudNonLonelinessSocial, 10, 15).
-verb_affordance(actTalk, tAgentGeneric, mudFun, 1, 1).
-verb_affordance(actArgue, tAgentGeneric, mudNonLonelinessSocial, 10, 15).
-verb_affordance(actArgue, tAgentGeneric, mudEnergy, 0, + -10).
-verb_affordance(actArgue, tAgentGeneric, mudSadToHappy, + -10, + -10).
-verb_affordance(actArgue, tAgentGeneric, mudFun, 20, 10).
-verb_affordance(actAttack, tAgentGeneric, mudNonLonelinessSocial, 10, 15).
-verb_affordance(actAttack, tAgentGeneric, mudSadToHappy, 0, + -10).
-verb_affordance(actAttack, tAgentGeneric, mudEnergy, 0, + -10).
-verb_affordance(actAttack, tAgentGeneric, mudFun, 20, 10).
-verb_affordance(actKiss, tAgentGeneric, mudNonLonelinessSocial, 10, 15).
-verb_affordance(actKiss, tAgentGeneric, mudSadToHappy, 10, 10).
-verb_affordance(actKiss, tAgentGeneric, mudFun, 10, 10).
+verb_affordance(actTalk, tAgent, mudNonLonelinessSocial, 10, 15).
+verb_affordance(actTalk, tAgent, mudFun, 1, 1).
+verb_affordance(actArgue, tAgent, mudNonLonelinessSocial, 10, 15).
+verb_affordance(actArgue, tAgent, mudEnergy, 0, + -10).
+verb_affordance(actArgue, tAgent, mudSadToHappy, + -10, + -10).
+verb_affordance(actArgue, tAgent, mudFun, 20, 10).
+verb_affordance(actAttack, tAgent, mudNonLonelinessSocial, 10, 15).
+verb_affordance(actAttack, tAgent, mudSadToHappy, 0, + -10).
+verb_affordance(actAttack, tAgent, mudEnergy, 0, + -10).
+verb_affordance(actAttack, tAgent, mudFun, 20, 10).
+verb_affordance(actKiss, tAgent, mudNonLonelinessSocial, 10, 15).
+verb_affordance(actKiss, tAgent, mudSadToHappy, 10, 10).
+verb_affordance(actKiss, tAgent, mudFun, 10, 10).
 verb_affordance(actTouch, tTouchAble, mudFun, 1, 1).
 verb_affordance(actTouch, tTouchAble, mudSecureRoom, 1, 1).
 verb_affordance(actSit, tSitAble, mudComfort, 1, 0).
@@ -760,15 +760,15 @@ verb_affordance(actObserve, tLookAble, mudFun, 2, 1).
 verb_affordance(actObserve, tLookAble, mudEnergy, 0, + -1).
 verb_affordance(actExcersize, tSitAble, mudFun, 10, 10).
 verb_affordance(actExcersize, tSitAble, mudHygiene, + -10, + -10).
-verb_affordance(actTickle, tAgentGeneric, mudEnergy, + -10, + -10).
-verb_affordance(actTickle, tAgentGeneric, mudFun, 20, 10).
+verb_affordance(actTickle, tAgent, mudEnergy, + -10, + -10).
+verb_affordance(actTickle, tAgent, mudFun, 20, 10).
 verb_affordance(actSearch, tContainer, mudHygiene, 0, + -5).
 verb_affordance(actSearch, tContainer, mudNonHunger, 40, 20).
-verb_affordance(actArgue, tAgentGeneric, mudEnergy, + -11, + -20).
-verb_affordance(actTalk, tAgentGeneric, mudNonLonelinessSocial, 11, 20).
-verb_affordance(actAttack, tAgentGeneric, mudEnergy, + -11, + -20).
-verb_affordance(actKiss, tAgentGeneric, mudNonLonelinessSocial, 11, 20).
-verb_affordance(actKiss, tAgentGeneric, mudFun, 21, 20).
+verb_affordance(actArgue, tAgent, mudEnergy, + -11, + -20).
+verb_affordance(actTalk, tAgent, mudNonLonelinessSocial, 11, 20).
+verb_affordance(actAttack, tAgent, mudEnergy, + -11, + -20).
+verb_affordance(actKiss, tAgent, mudNonLonelinessSocial, 11, 20).
+verb_affordance(actKiss, tAgent, mudFun, 21, 20).
 verb_affordance(actThinkAbout, tLookAble, mudFun, 1, 2).
 
 :- dynamic verb_for_type/2.
@@ -816,10 +816,10 @@ verb_for_type(actTake, tEatAble).
 verb_for_type(actObserve, tArt).
 verb_for_type(actOperate, tDanceFloor).
 verb_for_type(actOperate, tComputer).
-verb_for_type(actTalk, tAgentGeneric).
-verb_for_type(actArgue, tAgentGeneric).
-verb_for_type(actAttack, tAgentGeneric).
-verb_for_type(actKiss, tAgentGeneric).
+verb_for_type(actTalk, tAgent).
+verb_for_type(actArgue, tAgent).
+verb_for_type(actAttack, tAgent).
+verb_for_type(actKiss, tAgent).
 verb_for_type(actTouch, tTouchAble).
 verb_for_type(actSit, tSitAble).
 verb_for_type(actPutXOn, tHasSurface).
@@ -829,7 +829,7 @@ verb_for_type(actSleep, tLayAble).
 verb_for_type(actClean, tLookAble).
 verb_for_type(actObserve, tLookAble).
 verb_for_type(actExcersize, tSitAble).
-verb_for_type(actTickle, tAgentGeneric).
+verb_for_type(actTickle, tAgent).
 verb_for_type(actSearch, tContainer).
 verb_for_type(actThinkAbout, tLookAble).
 

@@ -39,12 +39,12 @@ tCol(tLivingRoom).
 genls(tLivingRoom,tRegion).
 genls(tOfficeRoom,tRegion).
 
-tAgentGeneric(iCommanderData66).
-isa(iCommanderData66,'tExplorer').
-wearsClothing(iCommanderData66,'iBoots673').
-wearsClothing(iCommanderData66,'iComBadge674').
-wearsClothing(iCommanderData66,'iGoldUniform675').
-mudStowing(iCommanderData66,'iPhaser676').
+tAgent(iCommander_data66).
+isa(iCommander_data66,'tExplorer').
+wearsClothing(iCommander_data66,'iBoots673').
+wearsClothing(iCommander_data66,'iComBadge674').
+wearsClothing(iCommander_data66,'iGoldUniform675').
+mudStowing(iCommander_data66,'iPhaser676').
 pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iComBadge674',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
@@ -53,7 +53,7 @@ pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','Por
 
 
 
-tAgentGeneric(iExplorer7).
+tAgent(iExplorer7).
 wearsClothing(iExplorer7,'iBoots773').
 wearsClothing(iExplorer7,'iComBadge774').
 wearsClothing(iExplorer7,'iGoldUniform775').
@@ -64,12 +64,12 @@ pddlSomethingIsa('iComBadge774',['tComBadge','ProtectiveAttire','PortableObject'
 pddlSomethingIsa('iGoldUniform775',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
 
-isa(iCommanderData66,'tMonster').
-mudDescription(iCommanderData66,txtFormatFn("Very screy looking monster named ~w",[iCommanderData66])).
+isa(iCommander_data66,'tMonster').
+mudDescription(iCommander_data66,txtFormatFn("Very screy looking monster named ~w",[iCommander_data66])).
 
 
 :-onSpawn(localityOfObject(tExplorer,tLivingRoom)).
-:-onSpawn(localityOfObject(iCommanderData66,tOfficeRoom)).
+:-onSpawn(localityOfObject(iCommander_data66,tOfficeRoom)).
 :-onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
 
 

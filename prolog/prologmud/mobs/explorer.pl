@@ -36,7 +36,7 @@ prologHybrid(typeHasGlyph(tCol,ftString)).
 mudLabelTypeProps('Px',tExplorer,[]).
 
 user:world_agent_plan(_World,Agent,ActV):-
-   tAgentGeneric(Agent),
+   tAgent(Agent),
   % isa(Agent,explorer),
    explorer_idea(Agent,Act),
    vette_idea(Agent,Act,ActV).
@@ -84,7 +84,7 @@ explorer_idea(Agent,actMove(1,Dir)) :-
 
 explorer_idea(Agent,actMove(1,Dir)) :-
 	mudGetPrecepts(Agent,List),
-	list_object_dir_sensed(_,List,tAgentGeneric,Dir).
+	list_object_dir_sensed(_,List,tAgent,Dir).
 
 explorer_idea(Agent,actMove(5,Dir)) :-
 	mudMemory(Agent,aDirectionsFn([Dir|_])),

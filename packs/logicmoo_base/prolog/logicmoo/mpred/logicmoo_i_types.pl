@@ -102,7 +102,6 @@ isa_from_morphology(Inst,Type):-atom(Inst),type_prefix(Prefix,Type),atom_concat(
 type_suffix('Fn',ftFunctional).
 type_suffix('Type',ttTypeType).
 type_suffix('Able',ttTypeByAction).
-type_suffix('able',ttTypeByAction).
 
 
 type_prefix(vt,ttValueType).
@@ -123,11 +122,12 @@ type_prefix(is,tFunction).
 type_prefix(a,tFunction).
 type_prefix(t,tFunction).
 type_prefix(fn,tFunction).
+type_prefix(mud,tMudPred).
 type_prefix(mud,tPred).
 type_prefix(prop,tPred).
 type_prefix(prolog,ttPredType).
 type_prefix(ft,ttFormatType).
-type_prefix(pred,ttPredType).
+type_prefix(pred,tPred).
 type_prefix(macro,ttMacroType).
 
 % ========================================
@@ -159,7 +159,7 @@ was_isa0(not(_),_,_):-!,fail.
 % was_isa0(a(tCol,I),I,tCol).
 was_isa0(ttNotTemporalType(I),I,ttNotTemporalType).
 was_isa0(tChannel(I),I,tChannel).
-was_isa0(tAgentGeneric(I),I,tAgentGeneric).
+was_isa0(tAgent(I),I,tAgent).
 was_isa0(t(C,_),_,_):- \+ new_was_isa, never_type_why(C,_),!,fail.
 was_isa0(t(C,I),I,C).
 was_isa0(t(P,I,C),I,C):-!,P==isa.
@@ -224,9 +224,9 @@ is_known_true(isa(_,ftID)).
 
 :-export(is_known_trew/1).
 is_known_trew(genls(tRegion,tChannel)).
-is_known_trew(genls('MaleAnimal',tAgentGeneric)).
+is_known_trew(genls('MaleAnimal',tAgent)).
 is_known_trew(genls(prologSingleValued, extentDecidable)).
-is_known_trew(genls(tAgentGeneric,tChannel)).
+is_known_trew(genls(tAgent,tChannel)).
 is_known_trew(genls(completelyAssertedCollection, extentDecidable)).
 is_known_trew(genls(ttFormatType,tCol)).
 is_known_trew(genls(ttFormatType,ttNotTemporalType)).
@@ -251,7 +251,7 @@ has_free_args(C):- not(ground(C)), compound(C),not(not(arg(_,C,var))),!.
 
 % is_known_false(genls(A,B)):-disjointWith(A,B).
 
-disjointWith0(tAgentGeneric,tItem).
+disjointWith0(tAgent,tItem).
 disjointWith0(tRegion,tObj).
 disjointWith0(ttFormatType,tItem).
 disjointWith0(ttFormatType,tObj).
@@ -276,7 +276,7 @@ not_mud_isa0(I,meta_argtypes):-!,not(compound(I)).
 not_mud_isa0(I,meta_argtypes):-!,not(compound(I)).
 not_mud_isa0(_,prologHybrid):-!,fail.
 not_mud_isa0(prologMacroHead, ttFormatType).
-not_mud_isa0(tAgentGeneric,ttFormatType).
+not_mud_isa0(tAgent,ttFormatType).
 not_mud_isa0(tCol,ttFormatType).
 not_mud_isa0(tItem,ttFormatType).
 not_mud_isa0(tObj, ttFormatType).
@@ -320,7 +320,7 @@ isa_backchaing_0(I,T):-  isa_asserted(I,AT),transitive_subclass_or_same(AT,T).
 
 :-export(type_isa/2).
 
-type_isa(Type,ttTemporalType):-arg(_,vv(tAgentGeneric,tItem,tObj,tRegion),Type),!.
+type_isa(Type,ttTemporalType):-arg(_,vv(tAgent,tItem,tObj,tRegion),Type),!.
 type_isa(ArgIsa,ttPredType):-a(ttPredType,ArgIsa),!.
 type_isa(ftString,ttFormatType):-!.
 type_isa(Type,ttFormatType):-chk_ft(Type),!. % text

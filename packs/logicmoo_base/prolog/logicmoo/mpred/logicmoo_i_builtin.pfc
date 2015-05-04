@@ -90,6 +90,8 @@ pfc_select(conflict(X),W) :- pfc_queue(conflict(X),W).
 (either(P,Q) => (neg(P) => Q), (neg(Q) => P)).
 % ((P,Q => false) => (P => neg(Q)), (Q => neg(P))).
 
+type_prefix(_Prefix,Type)=>tCol(Type).
+type_suffix(_Suffix,Type)=>tCol(Type).
 
 
 

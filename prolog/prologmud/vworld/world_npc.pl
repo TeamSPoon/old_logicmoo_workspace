@@ -38,7 +38,7 @@ npc_tick:-
 join_npcs_long_running.
 
 % skip manually controled agents
-npc_controller(simple_world_agent_plan,Who):- isa(Who,tAgentGeneric),not(thglobal:agent_message_stream(Who,_,_,_)).
+npc_controller(simple_world_agent_plan,Who):- isa(Who,tAgent),not(thglobal:agent_message_stream(Who,_,_,_)).
 
 tick_controller(simple_world_agent_plan,Who):- command_actTick(Who).
 
@@ -86,10 +86,10 @@ command_actIdea(Who,IdeaS):-
 user:action_info(actNpcTimer(ftInt),"sets how often to let NPCs run").
 
 user:action_info(actTock,"Makes All NPCs do something brilliant").
-user:action_info(actTick(tAgentGeneric),"Makes some agent do something brilliant").
+user:action_info(actTick(tAgent),"Makes some agent do something brilliant").
 user:action_info(actTick,"Makes *your* agent do something brilliant").
 
-user:action_info(actIdea(isOptional(tAgentGeneric,isSelfAgent)),"Makes some agent (or self) think of something brilliant").
+user:action_info(actIdea(isOptional(tAgent,isSelfAgent)),"Makes some agent (or self) think of something brilliant").
 user:action_info(actProlog(ftCallable),"Call a ftCallable").
 
 user:agent_text_command(Agent,["prolog",X],Agent,actProlog(X)):-ignore(X=isRandom(ftCallable)).

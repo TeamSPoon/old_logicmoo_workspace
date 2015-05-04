@@ -13075,7 +13075,7 @@ example(1) :-
 %%% KRIS-Example
 % setof(C,ask_M(isa(iMary,C)),L)
 % gives L = ['tTOP',grandparent,tRangeParent,parent_with_sons_only,
-%            parent_with_two_children,tAgentGeneric] 
+%            parent_with_two_children,tAgent] 
 % in Total runtime 12.167 sec. (05.06.92)
 example(2) :-
 	makeEnvironment('ex2','krisExample'),
@@ -13084,8 +13084,8 @@ example(2) :-
 	defprimconcept(tFemale,isTDisjoint(tMale)),
 	defconcept(males,someM(mudSex,tMale)),
 	defconcept(females,someM(mudSex,tFemale)),
-	defprimconcept(tAgentGeneric,someM(mudSex,orM([tMale,tFemale]))),
-	defconcept(tRangeParent,andM([tAgentGeneric,someM(roleChild,tAgentGeneric)])),
+	defprimconcept(tAgent,someM(mudSex,orM([tMale,tFemale]))),
+	defconcept(tRangeParent,andM([tAgent,someM(roleChild,tAgent)])),
 	defconcept(tRangeMother,andM([tRangeParent,someM(mudSex,tFemale)])),
 	defconcept(tRangeFather,andM([tRangeParent,isTDisjoint(tRangeMother)])),
 	defconcept(grandparent,andM([tRangeParent,someM(roleChild,tRangeParent)])),
@@ -13164,8 +13164,8 @@ example(9) :-
 	initEnvironment,
 	defprimconcept(tMale),
 	defprimconcept(tFemale,isTDisjoint(tMale)),
-	defprimconcept(tAgentGeneric,orM([tMale,tFemale])),
-	defconcept(tRangeParent,andM([tAgentGeneric,someM(roleChild,tAgentGeneric)])),
+	defprimconcept(tAgent,orM([tMale,tFemale])),
+	defconcept(tRangeParent,andM([tAgent,someM(roleChild,tAgent)])),
 	defconcept(tRangeMother,andM([tRangeParent,tFemale])),
 	defconcept(tRangeFather,andM([tRangeParent,isTDisjoint(tRangeMother)])),
 	defconcept(grandparent,andM([tRangeParent,someM(roleChild,tRangeParent)])),
@@ -13203,16 +13203,16 @@ example(11) :-
 example(12) :-
 	makeEnvironment('ex12','Subsumption'),
 	initEnvironment,
-	defconcept(c1,andM([tAgentGeneric,atleast(2,roleChild)])),
-	defconcept(c2,andM([tAgentGeneric,atleast(3,restr(roleChild,tLawyerJob))])).
+	defconcept(c1,andM([tAgent,atleast(2,roleChild)])),
+	defconcept(c2,andM([tAgent,atleast(3,restr(roleChild,tLawyerJob))])).
 %%% Example 13:
 % subsumes([],c1,c2)
 % succeeds in Total runtime 0.117 sec. (05.06.92)
 example(13) :-
 	makeEnvironment('ex13','Subsumption'),
 	initEnvironment,
-	defconcept(c1,andM([tAgentGeneric,atmost(4,restr(roleChild,tDoctor))])),
-	defconcept(c2,andM([tAgentGeneric,tFemale,atmost(3,roleChild)])).
+	defconcept(c1,andM([tAgent,atmost(4,restr(roleChild,tDoctor))])),
+	defconcept(c2,andM([tAgent,tFemale,atmost(3,roleChild)])).
 %%% Example 14:
 % subsumes([],c1,c2)
 % succeeds ???
@@ -13229,8 +13229,8 @@ example(14) :-
 example(15) :-
 	makeEnvironment('ex15','Subsumption'),
 	initEnvironment,
-	defconcept(c1,andM([tAgentGeneric,allM(friend,tDoctor),allM(restr(friend,tDoctor),atleast(1,speciality))])),
-	defconcept(c2,andM([tAgentGeneric,allM(friend,atleast(1,speciality))])).
+	defconcept(c1,andM([tAgent,allM(friend,tDoctor),allM(restr(friend,tDoctor),atleast(1,speciality))])),
+	defconcept(c2,andM([tAgent,allM(friend,atleast(1,speciality))])).
 %%% Example 16:
 % subsumes([],c2,c1)
 % succeeds in Total runtime 0.450 sec. (06.06.92)
@@ -13820,12 +13820,12 @@ example(58) :-
 example(59) :-
 	sb_defenv('mybox','sb.lit'),
 	sb_initenv,
-	sb_primconcept(tAgentGeneric),
-	sb_primconcept(tFemale,[supers([tAgentGeneric])]),
-	sb_primconcept(tMale,[supers([tAgentGeneric])]),
+	sb_primconcept(tAgent),
+	sb_primconcept(tFemale,[supers([tAgent])]),
+	sb_primconcept(tMale,[supers([tAgent])]),
 	sb_disjoint(tMale,tFemale),
-	sb_primelemrole(roleChild,'domain-range'(tRangeParent,tAgentGeneric,tAgentGeneric)),
-	sb_defconcept(tRangeParent,[supers([tAgentGeneric]),
+	sb_primelemrole(roleChild,'domain-range'(tRangeParent,tAgent,tAgent)),
+	sb_defconcept(tRangeParent,[supers([tAgent]),
                               nr(roleChild,1,30,2)]),
 	sb_defconcept(tRangeMother,[supers([tRangeParent,tFemale])]),
 	sb_defconcept(tRangeFather,[supers([tRangeParent,tMale])]),
@@ -14413,7 +14413,7 @@ testMotelExample(58) :-
 	go_goal_for_example.
 testMotelExample(59) :-
 	tryGoal(sb_ask(isa(iHarry,tRangeParent))),
-	tryGoal(sb_ask(isa(iHarry,tAgentGeneric))),
+	tryGoal(sb_ask(isa(iHarry,tAgent))),
 	printTime(setof((X,Y),sb_ask(role(roleChild,X,Y)),L1)), print(L1), nl,
 	printTime(setof(X,sb_ask(roleDef(roleChild,X)),L2)), print(L2), nl,
 	printTime(setof((X,Y),sb_ask(roleNr('marys-roleChild',X,Y)),L3)), print(L3), nl,

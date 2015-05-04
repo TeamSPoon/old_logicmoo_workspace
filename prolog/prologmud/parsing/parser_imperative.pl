@@ -101,7 +101,7 @@ desc_len(S0,Region):- call(term_to_atom(S0,S)),
 
 
 :-export(objects_match_for_agent/3).
-objects_match_for_agent(Agent,Text,ObjList):- objects_match_for_agent(Agent,Text,[mudPossess(Agent,isSelf),isSame(mudAtLoc),isSame(localityOfObject),tAgentGeneric,tItem,tRegion],ObjList).  
+objects_match_for_agent(Agent,Text,ObjList):- objects_match_for_agent(Agent,Text,[mudPossess(Agent,isSelf),isSame(mudAtLoc),isSame(localityOfObject),tAgent,tItem,tRegion],ObjList).  
 :-export(objects_match_for_agent/4).
 objects_match_for_agent(Agent,Text,Match,ObjList):- objects_for_agent(Agent,isOneOf([text_means(Agent,Text,isSelf),isAnd([isOneOf(Match),match_object(Text,isSelf)])]),ObjList).  
 
@@ -152,7 +152,7 @@ object_string_0_5(O,String):-object_string(_,O,0-5,String),!.
 :-retractall(object_string_fmt(_,_,_)).
 object_string(_,O,DescSpecs,String):- object_string_fmt(O,DescSpecs,String),!.
 object_string(Agent,O,DescSpecs,String):- String = [O], 
-   object_print_details(save_fmt(String),Agent,O,DescSpecs,[tCol,tItem,ftProlog,ftID,ftTerm,tAgentGeneric,tChannel]),
+   object_print_details(save_fmt(String),Agent,O,DescSpecs,[tCol,tItem,ftProlog,ftID,ftTerm,tAgent,tChannel]),
    asserta(object_string_fmt(O,DescSpecs,String)),!.
 
 save_fmt(OS,' ~w ',[A]):-!,save_fmt_e(OS,A),!.
@@ -525,9 +525,9 @@ map_term(_,Term,Term):-!.
 
 some tests
 
- phrase_parseForTypes([isOptional(tAgentGeneric, isRandom(tAgentGeneric))], ['Crush'], A, B).
+ phrase_parseForTypes([isOptional(tAgent, isRandom(tAgent))], ['Crush'], A, B).
 
-  phrase_parseForTypes([isOptional(tAgentGeneric, isRandom(tAgentGeneric))], ['Crush'], A, B).
+  phrase_parseForTypes([isOptional(tAgent, isRandom(tAgent))], ['Crush'], A, B).
 
 parser_imperative:phrase_parseForTypes_9([isOptional(isAnd([obj, isNot(region)]), 'NpcCol1000-Geordi684'), isOptionalStr("to"), isOptional(region, isRandom(region))], [food, 'Turbolift'], GOODARGS,[]).
 parser_imperative:phrase_parseForTypes_9([isOptional(isAnd([obj, isNot(region)]), 'NpcCol1000-Geordi684')], [food], GOODARGS,[]).

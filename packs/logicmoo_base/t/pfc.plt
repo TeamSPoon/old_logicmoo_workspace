@@ -232,10 +232,10 @@ genls(tPartofObj,tItem).
 
 % dividesBetween(tItem,tPathways).
 dividesBetween(tItem,tMassfull,tMassless).
-dividesBetween(tObj,tItem,tAgentGeneric).
+dividesBetween(tObj,tItem,tAgent).
 dividesBetween(tObj,tMassfull,tMassless).
 dividesBetween(tSpatialThing,tObj,tRegion).
-dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
+dividesBetween(tAgent,tPlayer,tNpcPlayer).
 
 dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 

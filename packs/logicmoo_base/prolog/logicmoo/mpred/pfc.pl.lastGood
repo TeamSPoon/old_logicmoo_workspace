@@ -1425,7 +1425,7 @@ print_db_items(Title,Mask,What0):-
 print_db_items(_,_,_).
 
 pfc_contains_term(What,Inside):-compound(What),!,(\+ \+ ((numbervars(Inside),contains_term(What,Inside)))).
-pfc_contains_term(What,Inside):- (\+ \+ ((subst(Inside,What,found,Diff),Diff \=@= Inside ))).
+pfc_contains_term(What,Inside):- (\+ \+ ((subst(Inside,What,foundZadooksy,Diff),Diff \=@= Inside ))).
 
 user:listing_mpred_hook(What):- debugOnError(pfc_listing(What)).
 

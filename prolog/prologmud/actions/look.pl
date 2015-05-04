@@ -125,7 +125,7 @@ cmdLookTest(Agent,LOC):-current_agent(Agent),mudAtLoc(Agent,LOC),
 nameStringsList(Region,ValueList):-findall(Value,nameStrings(Region,Value),ValueList).
 
 tLooking(Agent):- current_agent(Agent),!.
-tLooking(Agent):- tAgentGeneric(Agent),not(tDeleted(Agent)).
+tLooking(Agent):- tAgent(Agent),not(tDeleted(Agent)).
 
 % ********** TOP LEVEL PREDICATE: this is the predicate agents use to look
 % Look, reports everything not blocked up to two locations away
@@ -145,7 +145,7 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 
 % Get only the Percepts
 
-:-decl_mpred(mudGetPrecepts(tAgentGeneric,ftListFn(tSpatialThing)),[mpred_module(user)]).
+:-decl_mpred(mudGetPrecepts(tAgent,ftListFn(tSpatialThing)),[mpred_module(user)]).
 mudGetPrecepts(Agent,Percepts) :- mudGetPrecepts0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts).
 mudGetPrecepts0(Agent,Percepts) :-
   call((
@@ -157,7 +157,7 @@ mudGetPrecepts0(Agent,Percepts) :-
 	!.
 
 % Look at locations immediately around argent
-% :-decl_mpred(mudNearReach(tAgentGeneric,ftListFn(tSpatialThing)),[mpred_module(user)]).
+% :-decl_mpred(mudNearReach(tAgent,ftListFn(tSpatialThing)),[mpred_module(user)]).
 mudNearReach(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
    
 get_near0(Agent,Percepts) :-
@@ -166,8 +166,8 @@ get_near0(Agent,Percepts) :-
 	near_vectors(Dirs),
 	view_dirs(Agent,Dirs,Percepts))),!.
 
-% Look only at location tAgentGeneric is currently in.
-% :-decl_mpred(mudNearFeet(tAgentGeneric,ftListFn(tSpatialThing)),[mpred_module(user)]).
+% Look only at location tAgent is currently in.
+% :-decl_mpred(mudNearFeet(tAgent,ftListFn(tSpatialThing)),[mpred_module(user)]).
 mudNearFeet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
 
 get_feet0(Agent,Percepts):-
@@ -196,13 +196,13 @@ view_vectors(_Agent,[[vNW,vNW],[vNorth,vNW],[vNorth,vNorth],[vNorth,vNE],[vNE,vN
 	    [vWest,vSW],[vSW,vHere],[vSouth,vHere],[vSE,vHere],[vEast,vSE],
 	    [vSW,vSW],[vSouth,vSW],[vSouth,vSouth],[vSouth,vSE],[vSE,vSE]]).
 
-% A view list of only the locations immediately surrounding the tAgentGeneric.
+% A view list of only the locations immediately surrounding the tAgent.
 near_vectors([[vNW,vHere],[vNorth,vHere],[vNE,vHere],
 	[vWest,vHere],[vDown,vUp],[vEast,vHere],
 	[vSW,vHere],[vSouth,vHere],[vSE,vHere]]).
 
 :-dynamic(visually_blocked/2).
-:-decl_mpred_prolog(visually_blocked(tAgentGeneric,ftListFn(vtDirection))).
+:-decl_mpred_prolog(visually_blocked(tAgent,ftListFn(vtDirection))).
 
 % :-listing(visually_blocked).
 
@@ -226,7 +226,7 @@ meta_argtypes(mudTexture(tSpatialThing,vtTexture)).
 
 prologHybrid(mudHeightOnObj(tSpatialThing,ftNumber)).
 % High enough to see over obstacles??
-% Check to see how tall the tAgentGeneric is and if they are standing on an item
+% Check to see how tall the tAgent is and if they are standing on an item
 mudHeightOnObj(Agent,Ht) :-
 	mudAtLoc(Agent,LOC),
 	mudAtLocList(LOC,Objs),
@@ -275,7 +275,7 @@ dark_if_yes(yes,_,[vDark]).
 %dark_if_yes(no,[[]],[]).
 dark_if_yes(no,[P],P).
 
-% Builds the Percepts ftListFn. (everything located up to 2 locations away from tAgentGeneric).
+% Builds the Percepts ftListFn. (everything located up to 2 locations away from tAgent).
 view_dirs(_,[],[]).
 view_dirs(Agent,[[D1|D2]|Rest],Percepts) :-
       tLooking(Agent),
