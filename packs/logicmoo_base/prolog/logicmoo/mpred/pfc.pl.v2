@@ -445,10 +445,10 @@ pfc_settings_retractall(P,S,O):-retractall(pfc_settings(P,S,O)).
 
 
 pfc_retract(Why,P) :- deny_pfc_Permission_to_remove(Why,P,Because),!, pfc_warn("Denying ~w retract access to ~w because ~w",[Why,P,Because]),!.
-pfc_retract(_,pfcAction(A)) :-  
+pfc_retract(_,pfc_action(A)) :-  
   % undo an action by finding a method and successfully executing it.
   !,
-  pfcRemActionTrace(pfcAction(A)).
+  pfcRemActionTrace(pfc_action(A)).
 pfc_retract(_,pfcPT3(Key,Head,Body)) :-  
   % undo a positive trigger.
   %
@@ -701,7 +701,7 @@ pfc_addPreTermExpansion(Info):-pfc_file_expansion_each(Info,What),!,What=(:-Call
 :- decl_mpred_pfc 'nt'/3.
 :- decl_mpred_pfc 'bt'/2.
 :- decl_mpred_pfc pfcUndoMethod/2.
-:- decl_mpred_pfc pfcAction/2.
+:- decl_mpred_pfc (pfc_action)/1.
 
 :- decl_mpred_pfc pfc_select/1.
 :- decl_mpred_pfc pfcDatabaseTerm/1.
@@ -1026,9 +1026,9 @@ pfcGetTrigger(Trigger):-pfcGetTriggerQuick(Trigger).
 
 pfc_addActionTrace(Action,Support) :- 
   % adds an action trace and it's support.
-  pfc_addSupport(pfcAction(Action),Support).
+  pfc_addSupport(pfc_action(Action),Support).
 
-pfcRemActionTrace(pfcAction(A)) :-
+pfcRemActionTrace(pfc_action(A)) :-
   pfcUndoMethod(A,M),
   M,
   !.
@@ -1843,7 +1843,7 @@ pfc_db_type(pfcPT3(_,_,_),Type) :- !, Type=trigger.
 pfc_db_type(pt(_,_),Type) :- !, Type=trigger.
 pfc_db_type(nt(_,_,_),Type) :- !,  Type=trigger.
 pfc_db_type(bt(_,_),Type) :- !,  Type=trigger.
-pfc_db_type(pfcAction(_),Type) :- !, Type=action.
+pfc_db_type(pfc_action(_),Type) :- !, Type=action.
 pfc_db_type((('::::'(_,X))),Type) :- !, pfc_db_type(X,Type).
 pfc_db_type(_,fact) :-
   %= if it's not one of the above, it must be a fact!

@@ -30,7 +30,7 @@
 
 :- dynamic(completelyAssertedCollection/1).
 :- multifile(completelyAssertedCollection/1).
-:- dynamic(tCol/1).
+:- dynamic(((tCol/1,tSet/1,mpred_module/2))).
 :- multifile(tCol/1).
 :- dynamic(ttPredType/1).
 :- multifile(ttPredType/1).
@@ -44,14 +44,73 @@
 :- multifile(tRelation/1).
 :- dynamic(arity/2).
 :- multifile(arity/2).
+:- dynamic(neg/1).
+:- multifile(neg/1).
 
+:- dynamic(pfcControlled/1).
+:- multifile(pfcControlled/1).
 
+:- dynamic(('=>')/1).
+:- dynamic(('neg')/1).
+:- dynamic(('=>')/2).
+:- dynamic(('<=')/2).
+:- dynamic(('::::')/2).
+:- dynamic(('<=>')/2).
+:- dynamic('pt'/2).
+:- dynamic('pk'/3).
+:- dynamic('nt'/3).
+:- dynamic('bt'/2).
+
+:- dynamic('spft'/3).
+:- dynamic(pfc_undo_method/2).
+:- dynamic(fcTmsMode/1).
+:- dynamic(pfc_queue/2).
+:- dynamic(pfc_halt_signal/1).
+:- dynamic(pfc_select/2).
+:- dynamic(pfc_search/1).
+
+:- multifile(('=>')/1).
+:- multifile(('neg')/1).
+:- multifile(('=>')/2).
+:- multifile(('<=')/2).
+:- multifile(('::::')/2).
+:- multifile(('<=>')/2).
+:- multifile('pt'/2).
+:- multifile('pk'/3).
+:- multifile('nt'/3).
+:- multifile('bt'/2).
+:- multifile(pfc_undo_method/2).
+:- multifile((pfc_action)/1).
+:- multifile(fcTmsMode/1).
+:- multifile(pfc_queue/2).
+:- multifile(pfc_halt_signal/1).
+:- multifile(pfc_select/2).
+:- multifile(pfc_search/1).
+
+:- dynamic(user:asserted_argIsa_known/3).
+:- dynamic(user:argQuotedIsa/3).
+:- dynamic(user:resultGenls/2).
+:- multifile(user:resultGenls/2).
+
+:- dynamic(user:argGenls/3).
+:- multifile(user:argGenls/3).
 
 :- dynamic(user:prologSideEffects/1).
 :- multifile(user:prologSideEffects/1).
 
 :- dynamic(user:argsQuoted/1).
 :- multifile(user:argsQuoted/1).
+
+:- dynamic(was_chain_rule/1).
+:- multifile(was_chain_rule/1).
+
+
+:- dynamic(is_edited_clause/3).
+:- multifile(is_edited_clause/3).
+
+
+
+:-thread_local(thlocal:print_mode/1).
 
 %:-dynamic((t/1,t/2)).
 :- dynamic((
@@ -166,9 +225,20 @@
 % these do not get defined!?
 % :-dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
+:-dynamic((
+                     user:argIsa/3,
+                     user:isa/2,
+                     user:resultIsa/2,
+                      user:ttTemporalType/1)).
+:-multifile((
+                     user:argIsa/3,
+                     user:isa/2,
+                     user:resultIsa/2,
+                      user:ttTemporalType/1)).
+
 :- multifile(mpred_online:semweb_startup).
 
-:-dynamic(thlocal:infForward).
+:- dynamic(thlocal:infForward).
 :- dynamic(mpred_module_ready).
 :- dynamic thglobal:pfcManageHybrids/0.
 :- thread_local thlocal:into_form_code/0.

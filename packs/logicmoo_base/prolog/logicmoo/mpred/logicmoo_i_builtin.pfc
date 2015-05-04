@@ -44,6 +44,8 @@
 
 
 % this mean to leave terms at EL:  foo('QuoteFn'([cant,touch,me])).
+
+argsQuoted('make_key').
 argsQuoted('QuoteFn').
 quasiQuote('QuoteFn').
 argsQuoted(pfc_add).
@@ -107,6 +109,8 @@ neg(tCol(genlPreds)).
 
 neg(arity(argIsa,1)).
 arity(pddlObjects,2).
+
+prologHybrid(genls/2).
 
 tPred(F),arity(F,A)/(integer(A),A>1) => (not_col(F),support_hilog(F,A)).
 

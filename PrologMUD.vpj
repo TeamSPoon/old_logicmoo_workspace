@@ -40,18 +40,18 @@
 				Refilter="1"
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
-		<Folder Name="prolog">
-			<F
-				N="prolog/*.*"
-				Recurse="1"
-				Refilter="1"
-				Excludes=".git/;*.*~;*~/"/>
-		</Folder>		
 		<Folder Name="packs">
 			<F
 				N="packs/*.*"
 				Recurse="1"
 				Refilter="0"
+				Excludes=".git/;*.*~;*~/"/>
+		</Folder>
+		<Folder Name="prolog">
+			<F
+				N="prolog/*.*"
+				Recurse="1"
+				Refilter="1"
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
 		<Folder Name="runtime">

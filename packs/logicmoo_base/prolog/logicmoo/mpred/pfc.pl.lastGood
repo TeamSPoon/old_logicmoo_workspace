@@ -143,7 +143,7 @@ pfcVersion(1.2).
 :- dynamic('nt'/3).
 :- dynamic('bt'/2).
 :- dynamic(pfc_undo_method/2).
-:- dynamic(fcAction/2).
+:- dynamic((pfc_action)/1).
 :- dynamic(fcTmsMode/1).
 :- dynamic(pfc_queue/2).
 :- dynamic(pfc_database/1).

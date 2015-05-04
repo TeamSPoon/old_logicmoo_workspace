@@ -24,7 +24,7 @@ menvext(_Goal,F,top(A,B,C,D),top([F|A],B,C,D)).
 menv(top([],[],[],[])).
 
 
-lmdmsg(D):-format(user_error,'dmsg: ~q~n',[D]).
+lmdmsg(D):-format('dmsg: ~q~n',[D]).
 lmdmsg_call(D):- ( (lmdmsg(lmdmsg_call(D)),call(D),lmdmsg(lmdmsg_exit(D))) *-> true ; lmdmsg(lmdmsg_failed(D))).
 
 :-use_module(library(apply)).

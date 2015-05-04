@@ -503,7 +503,7 @@ default_module(user).
 :- dynamic(('nt')/3).
 :- dynamic(('pt')/2).
 :- dynamic(('pfc_t_pkey')/3).
-:- dynamic((pfc_action)/2).
+:- dynamic((pfc_action)/1).
 :- dynamic((pfc_haltSignal)/1).
 :- dynamic((pfc_queue)/2).
 :- dynamic((pfc_select)/2).
@@ -3140,7 +3140,7 @@ pfc_ify(F/A):- export(F/A),((pfc_wont_assert(F/A)->pfc_mark_P(F/A);pfc_mark_S(F/
 :- pfc_mark_S(('<=>')/2).
 :- pfc_mark_S(('=>')/2).
 :- pfc_mark_S(('=>')/1).
-:- pfc_mark_S(pfc_action/2).
+:- pfc_mark_S((pfc_action)/1).
 :- pfc_mark_S(pfc_haltSignal/1).
 :- pfc_mark_S(pfc_queue/2).
 :- pfc_mark_S(pfc_select/2).

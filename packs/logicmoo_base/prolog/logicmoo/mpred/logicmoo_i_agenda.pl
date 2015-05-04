@@ -44,10 +44,14 @@ rescan_mpred_loaded_pass2:- ignore((thglobal:after_mpred_load, loop_check(call_a
 % Agenda system - standard database
 % ================================================
 
-timer_tick(Time,Pred):- repeat,sleep(Time),doall(logOnError(call_no_cuts(Pred))),fail.
+time_tick(Time,Pred):- repeat,sleep(Time),doall(logOnError(call_no_cuts(Pred))),fail.
+
+user:hook_one_second_timer_tick.
 
 pfc_one_second_timer:- repeat,time_tick(1.0,user:hook_one_second_timer_tick),fail.
 :-thread_property(X,alias(pfc_one_second_timer))-> true ; thread_create(pfc_one_second_timer,_,[alias(pfc_one_second_timer)]).
+
+user:hook_one_minute_timer_tick.
 
 pfc_one_minute_timer:- repeat,time_tick(60.0,user:hook_one_minute_timer_tick),fail.
 :-thread_property(X,alias(pfc_one_minute_timer))-> true ; thread_create(pfc_one_minute_timer,_,[alias(pfc_one_minute_timer)]).

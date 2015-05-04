@@ -20,7 +20,7 @@
 :- set_prolog_flag(generate_debug_info, true).
 % [Optionaly] Set the Prolog optimize/debug flags
 :- set_prolog_flag(verbose_load,true).
-:- use_module(library(gui_tracer)).
+%:- use_module(library(gui_tracer)).
 :- set_prolog_flag(gui_tracer, false).
 :- set_prolog_flag(answer_write_options, [quoted(true), portray(true), max_depth(1000), spacing(next_argument)]).
 :- catch(noguitracer,_,true).
@@ -59,7 +59,7 @@ prolog:message(git(update_versions),A,A):-!.
 
 % [Optionaly] Solve the Halting problem
 :-use_module(library(process)).
-:-use_module(library(pce)).
+% :-use_module(library(pce)).
 :- has_gui_debug -> true ; remove_pred(pce_principal,send,2).
 :- has_gui_debug -> true ; remove_pred(pce_principal,new,2).
 

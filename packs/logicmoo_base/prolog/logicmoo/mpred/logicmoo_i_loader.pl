@@ -257,12 +257,12 @@ load_moo_files(F0):- user:ensure_loaded(F0).
 
 load_moo_files(M:F0,List):-!,
   locate_moo_file(M:F0,F),  % scope_settings  expand(true),register(false),
-  % 'format'(user_error,'%  ~q + ~q -> ~q.~n',[M,F0,F]),
+  % 'format'(user_output /*e*/,'%  ~q + ~q -> ~q.~n',[M,F0,F]),
   load_files(F,[if(not_loaded), must_be_module(true)|List]).
    %load_files(F,[redefine_module(false),if(not_loaded),silent(false),redynamic_multifile_exported(true),must_be_module(true)|List]).   
 load_moo_files(M:F0,List):-
   locate_moo_file(M:F0,F),  % scope_settings
-  'format'(user_error,'% load_moo_files_M ~q.~n',[M=locate_moo_file(F0,F)]),
+  'format'(user_output /*e*/,'% load_moo_files_M ~q.~n',[M=locate_moo_file(F0,F)]),
    load_files(F,[redefine_module(false),module(M),expand(true),if(not_loaded),redynamic_multifile_exported(true),register(false),silent(false),must_be_module(true)|List]).
 
 
@@ -298,7 +298,7 @@ include_moo_files(Mask):-
      forall(filematch(Mask,E),ensure_moo_loaded(E)).
 /*
 module(M,Preds):-
-    'format'(user_error,'% visting module ~w.~n',[M]),
+    'format'(user_output /*e*/,'% visting module ~w.~n',[M]),
     forall(member(P,Preds),export(P)).
 */
 scan_updates:-thread_property(X,alias(loading_code)),thread_property(X,status(running)),!.
@@ -502,8 +502,8 @@ expanded_already_functor(_:NV):-nonvar(NV),!,expanded_already_functor(NV).
 
 :- multifile(system:term_expansion/2).
 :- multifile(system:goal_expansion/2).
-system:goal_expansion(A,_B):-fail,hotrace((source_module(M),(M=pfc_sanity;M=user;M=system),if_defined(pmsg(M:goal_expansion(A)),format(user_error,'~N% ~q~n',M:goal_expansion(A))))),fail.
-system:term_expansion(A,_B):-fail,hotrace((source_module(M),(M=pfc_sanity;M=user;M=system),if_defined(pmsg(M:term_expansion(A)),format(user_error,'~N% ~q~n',M:term_expansion(A))))),fail.
+system:goal_expansion(A,_B):-fail,hotrace((source_module(M),(M=pfc_sanity;M=user;M=system),if_defined(pmsg(M:goal_expansion(A)),format(user_output /*e*/,'~N% ~q~n',M:goal_expansion(A))))),fail.
+system:term_expansion(A,_B):-fail,hotrace((source_module(M),(M=pfc_sanity;M=user;M=system),if_defined(pmsg(M:term_expansion(A)),format(user_output /*e*/,'~N% ~q~n',M:term_expansion(A))))),fail.
 
 system:goal_expansion(N,pfc_prove_neg(P)):-fail,pfc_from_negation_plus_holder(N,P),show_call_failure(mpred_prop(P,pfcControlled)).
 

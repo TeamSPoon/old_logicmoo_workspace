@@ -41,7 +41,7 @@ argIsa(1).
 :- multifile('nt'/3).
 :- multifile('bt'/2).
 :- multifile(pfc_undo_method/2).
-:- multifile(fcAction/2).
+:- multifile((pfc_action)/1).
 :- multifile(fcTmsMode/1).
 :- multifile(pfc_queue/2).
 :- multifile(pfc_database/1).
@@ -64,7 +64,7 @@ compiled(F/A):- dynamic(F/A),compile_predicates([F/A]).
 :- dynamic('nt'/3).
 :- dynamic('bt'/2).
 :- dynamic(pfc_undo_method/2).
-:- dynamic(fcAction/2).
+:- dynamic((pfc_action)/1).
 :- dynamic(fcTmsMode/1).
 :- dynamic(pfc_queue/2).
 :- dynamic(pfc_database/1).
@@ -85,9 +85,9 @@ list_to_conjuncts([H|T],Body):-!,
 list_to_conjuncts(H,H).
 
 to_assertable([A],B):-nonvar(A),!,to_assertable(A,B).
-to_assertable((P=>Q),was_new_rule((P=>Q))):-!.
-to_assertable((P<=Q),was_new_rule((P<=Q))):-!.
-to_assertable((P<=>Q),was_new_rule((P<=>Q))):-!.
+to_assertable((P=>Q),was_chain_rule((P=>Q))):-!.
+to_assertable((P<=Q),was_chain_rule((P<=Q))):-!.
+to_assertable((P<=>Q),was_chain_rule((P<=>Q))):-!.
 to_assertable(P,P).
 
 
@@ -1722,7 +1722,7 @@ pp_item(M,O):- (\+ \+ (numbervars(M:O),pp_item0(M,O))),!.
 
 
 pp_item0(M,(H:-true)):-pp_item0(M,H).
-pp_item0(M,was_new_rule(H)):-pp_item0(M,H).
+pp_item0(M,was_chain_rule(H)):-pp_item0(M,H).
 pp_item0(M,spft(W,U,U)):-!,pp_item0(M,U:W).
 pp_item0(M,spft(W,F,U)):- atom(U),!,
   format('~N%~n',[]),pp_item0(M,U:W),
@@ -1821,10 +1821,10 @@ pfc_listing_1(What):-
    print_db_items("Positive triggers",pt(_,_),What),
    print_db_items("Negative triggers", nt(_,_,_),What),
    print_db_items("Goal triggers",bt(_,_),What),
-   print_db_items("Forward Rules",was_new_rule(A=>B),What),
-   print_db_items("Bidirectional Rules",was_new_rule(A<=>B),What), 
-   print_db_items("Backchaining Rules",was_new_rule(A<=B),What),
-   print_db_items("Forward Facts",was_new_rule(=>(A)),(=>(A)),What),
+   print_db_items("Forward Rules",was_chain_rule(A=>B),What),
+   print_db_items("Bidirectional Rules",was_chain_rule(A<=>B),What), 
+   print_db_items("Backchaining Rules",was_chain_rule(A<=B),What),
+   print_db_items("Forward Facts",was_chain_rule(=>(A)),(=>(A)),What),
    dif(A,B),print_db_items("Pfc Supports",spft(_,A,B),What),
    dif(G,u),print_db_items("Non-user/God Facts",spft(_,G,G),What),
    print_db_items("User Supported Facts",spft(_,u,u),What),

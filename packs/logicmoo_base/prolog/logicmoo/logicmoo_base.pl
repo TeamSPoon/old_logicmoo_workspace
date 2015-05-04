@@ -83,6 +83,7 @@ when_debugging(_,_).
 % ================================================
 % DBASE_T System
 % ================================================
+:- ensure_loaded(library(logicmoo/mpred_online/logicmoo_i_www)).
 :- ensure_loaded(mpred/pfc).
 :- ensure_loaded(mpred/logicmoo_i_loader).
 :- ensure_loaded(mpred/logicmoo_i_types).

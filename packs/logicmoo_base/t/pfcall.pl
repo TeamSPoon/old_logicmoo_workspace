@@ -137,7 +137,7 @@ term_expansion(A,B):- once(true ; thlocal:pfcExpansion), once(pfc_term_expansion
 :- dynamic 'trigNeg'/3.
 :- dynamic 'trigBC'/2.
 :- dynamic fcUndoMethod/2.
-:- dynamic fcAction/2.
+:- dynamic (pfc_action)/1.
 :- dynamic fcTmsMode/1.
 :- dynamic pfc_queue/1.
 :- dynamic pfcDatabase/1.
@@ -383,9 +383,9 @@ pfcGetTrigger(Trigger) :-  db_clause(Trigger,true).
 
 pfc_addActionTrace(Action,Support) :- 
   % adds an action trace and it's support.
-  pfc_addSupport(pfcAction(Action),Support).
+  pfc_addSupport(pfc_action(Action),Support).
 
-pfcRemActionTrace(pfcAction(A)) :-
+pfcRemActionTrace(pfc_action(A)) :-
   fcUndoMethod(A,M),
   M,
   !.
@@ -505,10 +505,10 @@ pfcRemoveSupportsQuietly(_).
 % fcUndo(X) undoes X.
 
 
-fcUndo(pfcAction(A)) :-  
+fcUndo(pfc_action(A)) :-  
   % undo an action by finding a method and successfully executing it.
   !,
-  pfcRemActionTrace(pfcAction(A)).
+  pfcRemActionTrace(pfc_action(A)).
 
 fcUndo(trigPos(Key,Head,Body)) :-  
   % undo a positive trigger.
@@ -1084,7 +1084,7 @@ pfc_db_type(trigPos(_,_,_),Type) :- !, Type=trigger.
 pfc_db_type(trigPos(_,_),Type) :- !, Type=trigger.
 pfc_db_type(trigNeg(_,_,_),Type) :- !,  Type=trigger.
 pfc_db_type(trigBC(_,_),Type) :- !,  Type=trigger.
-pfc_db_type(pfcAction(_),Type) :- !, Type=action.
+pfc_db_type(pfc_action(_),Type) :- !, Type=action.
 pfc_db_type((('::::'(_,X))),Type) :- !, pfc_db_type(X,Type).
 pfc_db_type(_,fact) :-
   %% if it's not one of the above, it must be a fact!

@@ -215,7 +215,7 @@ argIsa_call_0(mpred_module,2,ftAtom).
 % argIsa_call_0(user:agent_text_command,_,ftTerm).
 argIsa_call_0('<=>',_,ftTerm).
 argIsa_call_0(class_template,N,Type):- (N=1 -> Type=tCol;Type=ftListFn(ftVoprop)).
-argIsa_call_0(Arity,N,T):-mpred_arity_pred(Arity),arity(Arity,A),N=<A,arg(N,vv(tPred,ftInt,tCol),T).
+argIsa_call_0(Arity,N,T):-mpred_arity_pred(Arity),arity(Arity,A),number(A),number(N),N=<A,arg(N,vv(tPred,ftInt,tCol),T).
 argIsa_call_0(F,2,ftString):-member(F,[descriptionHere,mudDescription,nameStrings,mudKeyword]),!.
 
 argIsa_call_0(F,N,Type):-t(functorDeclares,F),!,(N=1 -> Type=F ; Type=ftTerm(ftVoprop)).
@@ -236,13 +236,12 @@ argIsa_call_3(subFormat,ttFormatType).
 
 
 grab_argsIsa(resultIsa,resultIsa(tFunction,tCol)).
-grab_argsIsa(P, A):-P=='$was_imported_kb_content$',trace_or_throw(crazy_grab_argsIsa('$was_imported_kb_content$', A)).
-grab_argsIsa(P, A):-P=={}, trace_or_throw(crazy_grab_argsIsa({}, A)).
+%grab_argsIsa(P, A):-P=='$was_imported_kb_content$',trace_or_throw(crazy_grab_argsIsa('$was_imported_kb_content$', A)).
+%grab_argsIsa(P, A):-P=={}, trace_or_throw(crazy_grab_argsIsa({}, A)).
 grab_argsIsa(F,Types):- grab_argsIsa_6(Types),get_functor(Types,F0),!,F0==F,assert_predArgTypes_fa(F,Types).
 
 grab_argsIsa_6(Types):- meta_argtypes(Types).
 grab_argsIsa_6(mudColor(tSpatialThing, vtColor)).
-grab_argsIsa_6(Types):- meta_argtypes(Types).
 grab_argsIsa_6(Types):- is_asserted(quotedDefnIff(Types,_)),maybe_argtypes(Types).
 grab_argsIsa_6(Types):- current_predicate(get_all_templates/1),get_all_templates(Types),maybe_argtypes(Types).
 
@@ -273,7 +272,7 @@ argIsa_call_7(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa(P
    Type=argIsaFn(Prop,N1).
 argIsa_call_7(F,N,Type):- debugOnError(t(argIsa,F,N,Type)).
 
-argIsa_call_9(Prop,N1,Type):- arity(Prop,Arity),dmsg(todo(define(argIsa_known(Prop,N1,'_TYPE')))),must(N1=<Arity),Type=argIsaFn(Prop,N1).
+argIsa_call_9(Prop,N1,Type):- arity(Prop,Arity),dmsg(todo(define(argIsa_known(Prop,N1,'_TYPE')))),number(Arity),number(N1),must(N1=<Arity),Type=argIsaFn(Prop,N1).
 argIsa_call_9(Prop,N1,Type):- dmsg(todo(define(argIsa_known(Prop,N1,'_TYPE')))),Type=argIsaFn(Prop,N1).
 argIsa_call_9(_,_,ftTerm).
 
@@ -314,7 +313,7 @@ correctArgsIsa00(Op,[KP,Prop|Args],[KP|AA]):-is_holds_false(KP),!,correctArgsIsa
 correctArgsIsa00(Op,[Prop,ArgI],[Prop,ArgO]):- isa(Prop,tCol),!, correctAnyType(query(ftID,Op),ArgI,Prop,ArgO).
 correctArgsIsa00(Op,[Prop|Args],[Prop|AArgs]):- discoverAndCorrectArgsIsa(Op,Prop,1,Args,AArgs).
 
-discoverAndCorrectArgsIsa(Op,Prop,_,ArgsIn,ArgsOut):- length(ArgsIn,ArgUsed),show_call_failure((mpred_full_arity(Prop,MaxArity),(ArgUsed=<MaxArity))),
+discoverAndCorrectArgsIsa(Op,Prop,_,ArgsIn,ArgsOut):- length(ArgsIn,ArgUsed),show_call_failure((mpred_full_arity(Prop,MaxArity),(number(ArgUsed),number(MaxArity),ArgUsed=<MaxArity))),
     discoverAndCorrectArgsIsa_from_right(Op,Prop,MaxArity,ArgsIn,ArgsOut),!.
 discoverAndCorrectArgsIsa(Op,Prop,N,ArgsIn,ArgsOut):-discoverAndCorrectArgsIsa_from_left(Op,Prop,N,ArgsIn,ArgsOut),!.
 
