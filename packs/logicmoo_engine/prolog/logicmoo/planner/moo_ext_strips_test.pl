@@ -1,6 +1,7 @@
 
 
 :- style_check(-discontiguous).
+:- style_check(-singleton).
 /****************************************************************************/
 /****************************************************************************/
 /****************************************************************************/
@@ -9,63 +10,63 @@
 % Database blocks
 
 /* stack(X,Y) */
-preclist(stack(X,Y), [holding(X),clear(Y)]).
-dellist(stack(X,Y), [holding(X),clear(Y)]).
-addlist(stack(X,Y), [handempty,on(X,Y),clear(X)]).
+preclist(stack(X,Y), [mudPossess(Agnt,X),clear(Y)]).
+dellist(stack(X,Y), [mudPossess(Agnt,X),clear(Y)]).
+addlist(stack(X,Y), [handempty(Agnt),localityOfObject(X,Y),clear(X)]).
 
-/* pickup(X) */
-preclist(pickup(X),  [ontable(X), clear(X), handempty]).
-dellist(pickup(X),  [ontable(X),clear(X),handempty]).
-addlist(pickup(X),  [holding(X)]).
+/* actTake(X) */
+preclist(actTake(X),  [localityOfObject(X,iTable7), clear(X), handempty(Agnt)]).
+dellist(actTake(X),  [localityOfObject(X,iTable7),clear(X),handempty(Agnt)]).
+addlist(actTake(X),  [mudPossess(Agnt,X)]).
 
 /* unstack(X,Y) */
-preclist(unstack(X,Y), [on(X,Y), clear(X), handempty]).
-dellist(unstack(X,Y), [handempty,clear(Y),on(X,Y)]).
-addlist(unstack(X,Y), [holding(X),clear(Y)]).
+preclist(unstack(X,Y), [localityOfObject(X,Y), clear(X), handempty(Agnt)]).
+dellist(unstack(X,Y), [handempty(Agnt),clear(Y),localityOfObject(X,Y)]).
+addlist(unstack(X,Y), [mudPossess(Agnt,X),clear(Y)]).
 
 /* putdown(X) */
-preclist(putdown(X), [holding(X)]).
-dellist(putdown(X), [holding(X)]).
-addlist(putdown(X), [ontable(X),handempty,clear(X)]).
+preclist(putdown(X), [mudPossess(Agnt,X)]).
+dellist(putdown(X), [mudPossess(Agnt,X)]).
+addlist(putdown(X), [localityOfObject(X,iTable7),handempty(Agnt),clear(X)]).
 
 prec( Action, Cond ) :- preclist( Action, Plist ), member( Cond, Plist ).
 adds( Action, Cond ) :- addlist( Action, Alist), member( Cond, Alist ). 
 dels( Action, Cond ) :- dellist( Action, Dlist), member( Cond, Dlist ). 
 
 
-inconsistent(holding(X), on(X,_)).
-inconsistent(holding(X), on(_,X)).
-inconsistent(holding(X), ontable(X)).
-inconsistent(holding(_), handempty).
-inconsistent(holding(X), holding(Y)) :- not(X=Y).
-inconsistent(on(X,Y), on(X,Z)) :- not(Z=Y).
-inconsistent(on(Y,X), on(Z,X)) :- not(Z=Y).
-inconsistent(clear(X), on(_,X)).
-inconsistent(clear(X), holding(X)).
-inconsistent(ontable(X), on(X,_)).
+inconsistent(mudPossess(Agnt,X), localityOfObject(X,_)).
+inconsistent(mudPossess(Agnt,X), localityOfObject(_,X)).
+inconsistent(mudPossess(Agnt,X), localityOfObject(X,iTable7)).
+inconsistent(mudPossess(Agnt,_), handempty(Agnt)).
+inconsistent(mudPossess(Agnt,X), mudPossess(Agnt,Y)) :- not(X=Y).
+inconsistent(localityOfObject(X,Y), localityOfObject(X,Z)) :- not(Z=Y).
+inconsistent(localityOfObject(Y,X), localityOfObject(Z,X)) :- not(Z=Y).
+inconsistent(clear(X), localityOfObject(_,X)).
+inconsistent(clear(X), mudPossess(Agnt,X)).
+inconsistent(localityOfObject(X,iTable7), localityOfObject(X,_)).
 
 
 
 
 % Initilize state
-init_state1([clear(a),clear(b),clear(c),ontable(a),ontable(b),ontable(c),handempty]).
-goal1([on(a,b),on(b,c)]).
+init_state1([clear(iA7),clear(iB7),clear(iC7),localityOfObject(iA7,iTable7),localityOfObject(iB7,iTable7),localityOfObject(iC7,iTable7),handempty(Agnt)]).
+goal1([localityOfObject(iA7,iB7),localityOfObject(iB7,iC7)]).
 
-init_state2([clear(a),clear(b),clear(c),ontable(a),ontable(b),ontable(c),handempty]).
-goal2([on(b,c),on(a,b) ]).
+init_state2([clear(iA7),clear(iB7),clear(iC7),localityOfObject(iA7,iTable7),localityOfObject(iB7,iTable7),localityOfObject(iC7,iTable7),handempty(Agnt)]).
+goal2([localityOfObject(iB7,iC7),localityOfObject(iA7,iB7) ]).
 
-init_state3([clear(b),clear(c),ontable(a),ontable(b),on(c,a),handempty]).
-goal3([on(a,b),on(b,c)]).
+init_state3([clear(iB7),clear(iC7),localityOfObject(iA7,iTable7),localityOfObject(iB7,iTable7),localityOfObject(iC7,iA7),handempty(Agnt)]).
+goal3([localityOfObject(iA7,iB7),localityOfObject(iB7,iC7)]).
 
 % Imposible goal
-init_state4([clear(a),clear(b),ontable(a),ontable(b),handempty]).
-goal4([on(a,b),on(b,a)]).
+init_state4([clear(iA7),clear(iB7),localityOfObject(iA7,iTable7),localityOfObject(iB7,iTable7),handempty(Agnt)]).
+goal4([localityOfObject(iA7,iB7),localityOfObject(iB7,iA7)]).
 
-init_state5([clear(c),ontable(a),on(b,a),on(c,b),handempty]).
-goal5([on(a,b),on(b,c)]).
+init_state5([clear(iC7),localityOfObject(iA7,iTable7),localityOfObject(iB7,iA7),localityOfObject(iC7,iB7),handempty(Agnt)]).
+goal5([localityOfObject(iA7,iB7),localityOfObject(iB7,iC7)]).
 
-init_state6([clear(a),clear(b),clear(c),ontable(a),ontable(b),ontable(c),handempty]).
-goal6([holding(a)]).
+init_state6([clear(iA7),clear(iB7),clear(iC7),localityOfObject(iA7,iTable7),localityOfObject(iB7,iTable7),localityOfObject(iC7,iTable7),handempty(Agnt)]).
+goal6([mudPossess(Agnt,iA7)]).
 
 
 test1 :-
@@ -115,36 +116,36 @@ do_it(Goal, InitState) :-
 % Database blocks
 
 /* stack(X,Y) */
-prec(stack(X,Y), [holding(X),clear(Y)]).
-dels(stack(X,Y), [holding(X),clear(Y)]).
-adds(stack(X,Y), [handempty,on(X,Y),clear(X)]).
+prec(stack(X,Y), [mudPossess(Agnt,X),clear(Y)]).
+dels(stack(X,Y), [mudPossess(Agnt,X),clear(Y)]).
+adds(stack(X,Y), [handempty(Agnt),localityOfObject(X,Y),clear(X)]).
 
-/* pickup(X) */
-prec(pickup(X),  [ontable(X), clear(X), handempty]).
-dels(pickup(X),  [ontable(X),clear(X),handempty]).
-adds(pickup(X),  [holding(X)]).
+/* actTake(X) */
+prec(actTake(X),  [localityOfObject(X,iTable7), clear(X), handempty(Agnt)]).
+dels(actTake(X),  [localityOfObject(X,iTable7),clear(X),handempty(Agnt)]).
+adds(actTake(X),  [mudPossess(Agnt,X)]).
 
 /* unstack(X,Y) */
-prec(unstack(X,Y), [on(X,Y), clear(X), handempty]).
-dels(unstack(X,Y), [handempty,clear(Y),on(X,Y)]).
-adds(unstack(X,Y), [holding(X),clear(Y)]).
+prec(unstack(X,Y), [localityOfObject(X,Y), clear(X), handempty(Agnt)]).
+dels(unstack(X,Y), [handempty(Agnt),clear(Y),localityOfObject(X,Y)]).
+adds(unstack(X,Y), [mudPossess(Agnt,X),clear(Y)]).
 
 /* putdown(X) */
-prec(putdown(X), [holding(X)]).
-dels(putdown(X), [holding(X)]).
-adds(putdown(X), [ontable(X),handempty,clear(X)]).
+prec(putdown(X), [mudPossess(Agnt,X)]).
+dels(putdown(X), [mudPossess(Agnt,X)]).
+adds(putdown(X), [localityOfObject(X,iTable7),handempty(Agnt),clear(X)]).
 
 
-inconsistent(holding(X), on(X,_)).
-inconsistent(holding(X), on(_,X)).
-inconsistent(holding(X), ontable(X)).
-inconsistent(holding(_), handempty).
-inconsistent(holding(X), holding(Y)) :- not(X=Y).
-inconsistent(on(X,Y), on(X,Z)) :- not(Z=Y).
-inconsistent(on(Y,X), on(Z,X)) :- not(Z=Y).
-inconsistent(clear(X), on(_,X)).
-inconsistent(clear(X), holding(X)).
-inconsistent(ontable(X), on(X,_)).
+inconsistent(mudPossess(Agnt,X), localityOfObject(X,_)).
+inconsistent(mudPossess(Agnt,X), localityOfObject(_,X)).
+inconsistent(mudPossess(Agnt,X), localityOfObject(X,iTable7)).
+inconsistent(mudPossess(Agnt,_), handempty(Agnt)).
+inconsistent(mudPossess(Agnt,X), mudPossess(Agnt,Y)) :- not(X=Y).
+inconsistent(localityOfObject(X,Y), localityOfObject(X,Z)) :- not(Z=Y).
+inconsistent(localityOfObject(Y,X), localityOfObject(Z,X)) :- not(Z=Y).
+inconsistent(clear(X), localityOfObject(_,X)).
+inconsistent(clear(X), mudPossess(Agnt,X)).
+inconsistent(localityOfObject(X,iTable7), localityOfObject(X,_)).
 
 
 
@@ -155,9 +156,9 @@ inconsistent(ontable(X), on(X,_)).
                        / \
 
     +-----+
-    |  c  |
+    |  iC7  |
     +-----+      +-----+
-    |  a  |      |  b  |
+    |  iA7  |      |  iB7  |
 ----+-----+------+-----+----------------
 */
 
@@ -170,36 +171,36 @@ inconsistent(ontable(X), on(X,_)).
 
 
     +-----+      +-----+     +-----+
-    |  a  |      |  b  |     |  c  |
+    |  iA7  |      |  iB7  |     |  iC7  |
 ----+-----+------+-----+-----+-----+------
 */
 % Initilize state
-init_state1a([clear(a),clear(b),clear(c),ontable(a),ontable(b),ontable(c),handempty]).
-goal1a([on(a,b),on(b,c) ]).
+init_state1a([clear(iA7),clear(iB7),clear(iC7),localityOfObject(iA7,iTable7),localityOfObject(iB7,iTable7),localityOfObject(iC7,iTable7),handempty(Agnt)]).
+goal1a([localityOfObject(iA7,iB7),localityOfObject(iB7,iC7) ]).
 
-init_state2a([clear(a),clear(b),clear(c),ontable(a),ontable(b),ontable(c),handempty]).
-goal2a([on(b,c),on(a,b) ]).
+init_state2a([clear(iA7),clear(iB7),clear(iC7),localityOfObject(iA7,iTable7),localityOfObject(iB7,iTable7),localityOfObject(iC7,iTable7),handempty(Agnt)]).
+goal2a([localityOfObject(iB7,iC7),localityOfObject(iA7,iB7) ]).
 
-init_state3a([clear(b),clear(c),ontable(a),ontable(b),on(c,a),handempty]).
-goal3a([on(a,b),on(b,c)]).
+init_state3a([clear(iB7),clear(iC7),localityOfObject(iA7,iTable7),localityOfObject(iB7,iTable7),localityOfObject(iC7,iA7),handempty(Agnt)]).
+goal3a([localityOfObject(iA7,iB7),localityOfObject(iB7,iC7)]).
 
-init_state4a([clear(a),on(a,b),on(b,c),ontable(c),handempty]).
-goal4a([on(a,b),on(b,a)]).
+init_state4a([clear(iA7),localityOfObject(iA7,iB7),localityOfObject(iB7,iC7),localityOfObject(iC7,iTable7),handempty(Agnt)]).
+goal4a([localityOfObject(iA7,iB7),localityOfObject(iB7,iA7)]).
 
-init_state5a([clear(c),ontable(a),on(b,a),on(c,b),handempty]).
-goal5a([on(a,b),on(b,c)]).
+init_state5a([clear(iC7),localityOfObject(iA7,iTable7),localityOfObject(iB7,iA7),localityOfObject(iC7,iB7),handempty(Agnt)]).
+goal5a([localityOfObject(iA7,iB7),localityOfObject(iB7,iC7)]).
 
-init_state6a([clear(c),ontable(a),on(c,a),ontable(b), clear(b),handempty]).
-goal6a([on(a,b),on(b,c)]).
+init_state6a([clear(iC7),localityOfObject(iA7,iTable7),localityOfObject(iC7,iA7),localityOfObject(iB7,iTable7), clear(iB7),handempty(Agnt)]).
+goal6a([localityOfObject(iA7,iB7),localityOfObject(iB7,iC7)]).
 
-init_state7a([clear(a),clear(b),clear(c),ontable(a),ontable(b),ontable(c),handempty]).
-goal7a([on(b,c),on(c,a),on(a,b) ]).
+init_state7a([clear(iA7),clear(iB7),clear(iC7),localityOfObject(iA7,iTable7),localityOfObject(iB7,iTable7),localityOfObject(iC7,iTable7),handempty(Agnt)]).
+goal7a([localityOfObject(iB7,iC7),localityOfObject(iC7,iA7),localityOfObject(iA7,iB7) ]).
 
-init_state8a([clear(b),on(b,a), on(a,d), on(d,c), ontable(c),handempty]).
-goal8a([on(a,b),ontable(b), on(c,d),ontable(d)]).
+init_state8a([clear(iB7),localityOfObject(iB7,iA7), localityOfObject(iA7,iD7), localityOfObject(iD7,iC7), localityOfObject(iC7,iTable7),handempty(Agnt)]).
+goal8a([localityOfObject(iA7,iB7),localityOfObject(iB7,iTable7), localityOfObject(iC7,iD7),localityOfObject(iD7,iTable7)]).
 
-init_state9a([clear(a),on(a, b), on(b,d), on(d,c), ontable(c),handempty]).
-goal9a([on(a,b),ontable(b), on(c,d),ontable(d)]).
+init_state9a([clear(iA7),localityOfObject(iA7, iB7), localityOfObject(iB7,iD7), localityOfObject(iD7,iC7), localityOfObject(iC7,iTable7),handempty(Agnt)]).
+goal9a([localityOfObject(iA7,iB7),localityOfObject(iB7,iTable7), localityOfObject(iC7,iD7),localityOfObject(iD7,iTable7)]).
 
 test1a :-
 	init_state1a(InitState),

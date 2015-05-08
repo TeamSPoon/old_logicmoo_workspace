@@ -601,7 +601,7 @@ display\_regression( \un, X , \un, Op1) :- % Execute upon backtracking
 
 
 
-
+:-prolog.
 
 
 

@@ -1,7 +1,9 @@
 git pull
-% hg pull
-% hg commit -m "$*"
+git --git-dir=games/.git --work-tree=games pull
+
+#% hg pull
+#% hg commit -m "$*"
 git commit -a -m "$*"
-git push
-% hg push
+#git push
+#% hg push
 

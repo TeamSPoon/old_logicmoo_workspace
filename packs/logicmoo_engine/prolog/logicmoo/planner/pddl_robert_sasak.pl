@@ -10,8 +10,8 @@
 end_of_file.
 
 :- expects_dialect(sicstus).
-:-use_module(library(timeout)).
-:-use_module(library(lists)).
+:- use_module(library(timeout)).
+:- use_module(library(lists)).
 
 
 

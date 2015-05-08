@@ -6,7 +6,7 @@ CurrentProject=PrologMUD.vpj
 PrologMUD.vpj=20150503193724685
 [TreeExpansion2]
 - PrologMUD.vpj
-  - externals
+  + externals
     + ClioPatria
       + api
       - applications
@@ -159,16 +159,16 @@ PrologMUD.vpj=20150503193724685
         + images
       + swfobject
         + src
-    + MUD_DB_LeanCOR
+    - MUD_DB_LeanCOR
       + tests
         + ontologies
           + examples
         + scripts
     + MUD_DeepParsing
-      + prolog
-        + chat80
+      - prolog
+        - chat80
         + CURT
-    + MUD_DLog
+    - MUD_DLog
       + CVSROOT
       + dlog-benchmark
         + LUBM
@@ -213,7 +213,7 @@ PrologMUD.vpj=20150503193724685
           + test
           + unfold
         + test
-    + MUD_ircbot
+    - MUD_ircbot
       - eggdrop
       - prolog
     + MUD_KnowRob
@@ -1321,7 +1321,7 @@ PrologMUD.vpj=20150503193724685
             + styles
           + render
           + tutorials
-  + games
+  - games
     - src_game_nani
       + web
         + css
@@ -1391,42 +1391,42 @@ PrologMUD.vpj=20150503193724685
               + failing_or_too_slow
               + others
               + sanity
+            + elevators
+            + hanoi
+            + ipc2008-no-cybersec
+              + netben-opt
+                + crewplanning-numeric
+                + elevators-numeric
+                + elevators-strips
+                + openstacks-adl
+                + openstacks-numericadl
+                + openstacks-stripsneg
+                + pegsol-strips
+                + transport-numeric
+                + woodworking-numeric
+              + seq-opt
+                + elevators-strips
+                + openstacks-adl
+                + openstacks-strips
+                + parcprinter-strips
+                + pegsol-strips
+                + scanalyzer-strips
+                + sokoban-strips
+                + transport-strips
+                + woodworking-strips
+              + seq-sat
+                + elevators-strips
+                + openstacks-adl
+                + openstacks-strips
+                + parcprinter-strips
+                + pegsol-strips
             + misc_planner
             + Rakiduam07
               + continuos
               + socket_udp
             + test
               + blocks
-              + elevators
               - gripper
-              + hanoi
-              + ipc2008-no-cybersec
-                - netben-opt
-                  + crewplanning-numeric
-                  + elevators-numeric
-                  + elevators-strips
-                  + openstacks-adl
-                  + openstacks-numericadl
-                  + openstacks-stripsneg
-                  + pegsol-strips
-                  + transport-numeric
-                  + woodworking-numeric
-                - seq-opt
-                  + elevators-strips
-                  + openstacks-adl
-                  + openstacks-strips
-                  - parcprinter-strips
-                  + pegsol-strips
-                  + scanalyzer-strips
-                  - sokoban-strips
-                  + transport-strips
-                  + woodworking-strips
-                - seq-sat
-                  + elevators-strips
-                  + openstacks-adl
-                  + openstacks-strips
-                  + parcprinter-strips
-                  + pegsol-strips
     + logicmoo_online
       - prolog
         - logicmoo
@@ -1526,95 +1526,83 @@ PrologMUD.vpj=20150503193724685
               + swi
               + trace
               + xref
-scroll:73
+scroll:0
 [State]
 SCREEN: 1920 1080 0 56 1612 948 0 0 M 0 0 0 0 1481 644
-CWD: packs\logicmoo_engine\prolog\logicmoo\planner
-BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\pfc.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.38317 CL=1 LE=0 CX=0 CY=19 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\logicmoo_planner.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.132 CL=29 LE=0 CX=28 CY=5 WI=5 BI=20 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_base\t\pfc_sanity.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2699 CL=33 LE=0 CX=32 CY=17 WI=5 BI=34 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\flux\fluent.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\flux\fluent3.chr"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.8196 CL=32 LE=0 CX=31 CY=18 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
+CWD: games\src_game_nani
+BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\planner\moo_ext_strips_test_orig.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1 CL=1 LE=0 CX=0 CY=1 WI=5 BI=44 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\planner\moo_ext_strips.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.26080 CL=10 LE=0 CX=9 CY=19 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\logicmoo_engine.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1814 CL=31 LE=0 CX=30 CY=18 WI=5 BI=49 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\logicmoo_base.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.3072 CL=1 LE=0 CX=0 CY=15 WI=5 BI=39 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\flux\fluent_swi.chr"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2372 CL=1 LE=0 CX=0 CY=10 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\flux\flux3.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.10699 CL=29 LE=0 CX=28 CY=36 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\planner\moo_ext_strips.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.10797 CL=1 LE=0 CX=0 CY=25 WI=5 BI=37 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\flux\fluent3.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=42 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\planner\moo_ext_strips_test.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.5196 CL=13 LE=0 CX=12 CY=24 WI=5 BI=41 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.3319 CL=3 LE=0 CX=2 CY=22 WI=5 BI=56 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_loader.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.459 CL=31 LE=0 CX=30 CY=21 WI=5 BI=43 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\planner\dbase_i_hyhtn.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.116953 CL=1 LE=0 CX=0 CY=17 WI=5 BI=36 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1283 446 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\logicmoo_planner.pl"
-VIEW: LN=.203 CL=1 LE=0 CX=0 CY=7 WI=222 BI=20 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1283 446 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\logicmoo_base.pl"
-VIEW: LN=.3060 CL=1 LE=0 CX=0 CY=13 WI=218 BI=39 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1283 446 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\planner\moo_ext_strips.pl"
-VIEW: LN=.26072 CL=1 LE=0 CX=0 CY=27 WI=220 BI=37 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1283 446 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\flux\fluent3.chr"
-VIEW: LN=.8196 CL=32 LE=0 CX=31 CY=18 WI=226 BI=27 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1283 446 -1 -1 N  WF=0 WT=14 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\flux\flux3.pl"
-VIEW: LN=.10699 CL=29 LE=0 CX=28 CY=36 WI=232 BI=5 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1283 446 -1 -1 N  WF=0 WT=13 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\flux\fluent_swi.chr"
-VIEW: LN=.2372 CL=1 LE=0 CX=0 CY=10 WI=230 BI=31 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.14014 CL=34 LE=0 CX=33 CY=12 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="prolog\prologmud\vworld\world_agent.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="prolog\prologmud\vworld\world_npc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1368 CL=34 LE=0 CX=33 CY=10 WI=5 BI=39 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\planner\moo_ext_strips_test.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.7830 CL=1 LE=0 CX=0 CY=19 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="games\src_game_nani\andrew_ke.plmoo"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="games\src_game_nani\objs_misc_household.plmoo"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=53 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="prolog\prologmud\vworld\world_2d.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=41 HT=0 HN=0 HF=0 HC=4
 WINDOW: 44 44 1283 446 -1 -1 N  WF=0 WT=12 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\flux\fluent3.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=228 BI=42 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1283 446 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\flux\fluent.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=224 BI=22 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1283 446 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="games\src_game_nani\objs_misc_household.plmoo"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=265 BI=53 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1283 446 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
 BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\planner\moo_ext_strips_test.pl"
-VIEW: LN=.2225 CL=9 LE=0 CX=8 CY=25 WI=216 BI=41 HT=0 HN=0 HF=0 HC=4
-WINDOW: 198 198 1283 446 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
+VIEW: LN=.7830 CL=1 LE=0 CX=0 CY=19 WI=251 BI=19 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1283 446 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
+BUFFER: BN="prolog\prologmud\vworld\world_agent.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=257 BI=29 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1283 446 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
+BUFFER: BN="games\src_game_nani\andrew_ke.plmoo"
+VIEW: LN=.394 CL=1 LE=0 CX=0 CY=8 WI=263 BI=16 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1283 446 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
+BUFFER: BN="prolog\prologmud\vworld\world_2d.pl"
+VIEW: LN=.7717 CL=20 LE=0 CX=19 CY=11 WI=261 BI=41 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1283 446 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\planner\moo_ext_strips.pl"
+VIEW: LN=.26080 CL=10 LE=0 CX=9 CY=19 WI=249 BI=5 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1283 446 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
 BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_loader.pl"
-VIEW: LN=.459 CL=31 LE=0 CX=30 CY=21 WI=109 BI=43 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.14014 CL=34 LE=0 CX=33 CY=12 WI=188 BI=25 HT=0 HN=0 HF=0 HC=4
 WINDOW: 132 132 1283 446 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_base\t\pfc_sanity.pl"
-VIEW: LN=.2699 CL=33 LE=0 CX=32 CY=17 WI=181 BI=34 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\logicmoo_base.pl"
+VIEW: LN=.3319 CL=3 LE=0 CX=2 CY=22 WI=255 BI=56 HT=0 HN=0 HF=0 HC=4
 WINDOW: 110 110 1283 446 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\planner\dbase_i_hyhtn.pl"
-VIEW: LN=.116953 CL=1 LE=0 CX=0 CY=20 WI=126 BI=36 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1283 446 -1 -1 M  WF=0 WT=2 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\pfc.pl"
-VIEW: LN=.38317 CL=1 LE=0 CX=0 CY=19 WI=215 BI=28 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\logicmoo_engine.pl"
+VIEW: LN=.1814 CL=31 LE=0 CX=30 CY=18 WI=253 BI=49 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1283 446 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\planner\moo_ext_strips_test_orig.pl"
+VIEW: LN=.1 CL=1 LE=0 CX=0 CY=1 WI=248 BI=44 HT=0 HN=0 HF=0 HC=4
+WINDOW: 198 198 1283 446 -1 -1 M  WF=0 WT=9 "Default Fixed Font,10,0,1"
+BUFFER: BN="prolog\prologmud\vworld\world_npc.pl"
+VIEW: LN=.1849 CL=34 LE=0 CX=33 CY=12 WI=259 BI=39 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-packs\logicmoo_engine\prolog\logicmoo\engine\flux\fluent.pl
-packs\logicmoo_engine\prolog\logicmoo\engine\flux\fluent3.pl
-packs\logicmoo_engine\prolog\logicmoo\engine\flux\fluent3.chr
-packs\logicmoo_engine\prolog\logicmoo\engine\flux\fluent_swi.chr
-packs\logicmoo_engine\prolog\logicmoo\engine\flux\flux3.pl
 packs\logicmoo_base\prolog\logicmoo\logicmoo_base.pl
-packs\logicmoo_engine\prolog\logicmoo\planner\moo_ext_strips.pl
-packs\logicmoo_base\prolog\logicmoo\mpred\pfc.pl
-packs\logicmoo_engine\prolog\logicmoo\logicmoo_planner.pl
+packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_loader.pl
+prolog\prologmud\vworld\world_agent.pl
+prolog\prologmud\vworld\world_npc.pl
+prolog\prologmud\vworld\world_2d.pl
+games\src_game_nani\a_nani_household.plmoo
+games\src_game_nani\andrew_ke.plmoo
+packs\logicmoo_engine\prolog\logicmoo\planner\moo_ext_strips_test.pl
+games\src_game_nani\objs_misc_household.plmoo
