@@ -1,0 +1,15 @@
+This directory contains the code for CHAPTER 8 of Poole, Mackworth and Goebel,
+"Computational Intelligence: A Logicical Approach". All the code is copyright
+by Poole, Mackworth and Goebel 1995.
+
+This contains two representations and 4 planners for the deliver robot domain.
+
+delrob_strips.pl  is the delivery robot world in the STRIPS representation
+delrob_sitc.pl    is the delivery robot world in the Situation Calculus
+
+bprove.pl         is a depth bounded meta-interpreter suitable for planning
+                  using the situation calculus representation
+strips_strips.pl  is a STRIPS planner that uses the STRIPS representation
+regr_strips.pl    is a regression planner that uses the STRIPS representation
+pop.pl            is a parial order planner that uses the STRIPS representation
+
