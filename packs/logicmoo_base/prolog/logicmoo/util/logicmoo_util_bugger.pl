@@ -167,6 +167,9 @@ for obvious reasons.
      export_all_preds/1 ]).
 
 
+:-thread_local(thlocal:session_id/1).
+:-multifile(thlocal:session_id/1).
+
 hotrace:-notrace.
 :- export(hotrace/1).
 :- meta_predicate(hotrace(:)).
@@ -430,10 +433,9 @@ must_det_l(MC):- strip_module(MC,M,C),!, '@'(must_det_lm(M,C),M).
 :-module_transparent(must_det_lm/2).
 must_det_lm(_,C):-var(C),trace_or_throw(var_must_det_l(C)),!.
 must_det_lm(_,[]):-!.
-must_det_lm(M,[C|List]):-nonvar(C),!,M:must(M:C),!,must_det_lm(M,List).
-must_det_lm(M,(C,List)):-nonvar(C),!,M:must(M:C),!,must_det_lm(M,List).
-must_det_lm(M,C):- is_list(C),!,trace_or_throw(list_must_det_lm(M,C)),!.
-must_det_lm(M,C):- !,must_det(M:C).
+must_det_lm(M,[C|List]):-!,M:must(C),!,must_det_lm(M,List).
+must_det_lm(M,(C,List)):-!,M:must(C),!,must_det_lm(M,List).
+must_det_lm(M,C):- !,must(M:C).
 
 :-thread_local  tlbugger:skip_use_slow_sanity/0.
 
@@ -552,6 +554,36 @@ moo_show_childs(M,F,A,_MPred):- moo_trace_hidechilds(M,F,A,0,0).
 
 
 
+% ===================================================================
+% Substitution based on ==
+% ===================================================================
+% Usage: dbgsubst(+Fml,+X,+Sk,?FmlSk)
+
+:- export(dbgsubst/4).
+dbgsubst(A,B,C,A):- B==C,!.
+dbgsubst(A,B,C,D):-var(A),!,dmsg(dbgsubst(A,B,C,D)),dumpST,dtrace,dbgsubst0(A,B,C,D).
+dbgsubst(A,B,C,D):-dbgsubst0(A,B,C,D).
+
+dbgsubst0(A,B,C,D):- 
+      catchv(hotrace(nd_dbgsubst(A,B,C,D)),E,(dumpST,dmsg(E:nd_dbgsubst(A,B,C,D)),fail)),!.
+dbgsubst0(A,_B,_C,A).
+
+nd_dbgsubst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
+nd_dbgsubst(  P, X,Sk, P1 ) :- functor_safe(P,_,N),nd_dbgsubst1( X, Sk, P, N, P1 ).
+
+nd_dbgsubst1( _,  _, P, 0, P  ).
+nd_dbgsubst1( X, Sk, P, N, P1 ) :- N > 0, P =.. [F|Args], 
+            nd_dbgsubst2( X, Sk, Args, ArgS ),
+            nd_dbgsubst2( X, Sk, [F], [FS] ),  
+            P1 =.. [FS|ArgS].
+
+nd_dbgsubst2( _,  _, [], [] ).
+nd_dbgsubst2( X, Sk, [A|As], [Sk|AS] ) :- X == A, !, nd_dbgsubst2( X, Sk, As, AS).
+nd_dbgsubst2( X, Sk, [A|As], [A|AS]  ) :- var(A), !, nd_dbgsubst2( X, Sk, As, AS).
+nd_dbgsubst2( X, Sk, [A|As], [Ap|AS] ) :- nd_dbgsubst( A,X,Sk,Ap ),nd_dbgsubst2( X, Sk, As, AS).
+nd_dbgsubst2( _X, _Sk, L, L ).
+
+
 % ----------
 :- export(static_predicate/3).
 :- meta_predicate(static_predicate(+,+,+)).
@@ -581,6 +613,74 @@ dynamic_safe(M,F,A):- functor(C,F,A),predicate_property(C,imported_from(system))
 dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> show_call(convert_to_dynamic(M,F,A)) ; logOnErrorIgnore((dynamic(M:F/A),multifile(M:F/A)))). % , warn_module_dupes(M,F,A).
 :-op(1150,fx,user:dynamic_safe).
 
+
+% pred_prop(Spec,DO,TEST,DONT)
+pred_prop((M:F/A),DO,TEST,true):-pred_prop(M:F/A,DO,TEST).
+pred_prop(M:F/A,(lock_predicate(M:F/A)),(built_in),unlock_predicate(M:F/A)).
+pred_prop(M:F/A, (dynamic(M:F/A)) ,(dynamic), show_call(compile_predicates([F/A]))).
+
+pred_prop(_,(meta_predicate Spec),(meta_predicate Spec)).
+pred_prop(M:F/A,multifile(M:F/A)	       ,(multifile)).
+pred_prop(M:F/A,module_transparent(M:F/A) ,(transparent)).
+pred_prop(M:F/A,discontiguous(M:F/A) ,(discontiguous)).
+pred_prop(M:F/A,volatile(M:F/A)	  ,(volatile)).
+pred_prop(M:F/A,public(M:F/A)     ,(public)).
+pred_prop(M:F/A,thread_local(M:F/A),(thread_local)).
+pred_prop(M:F/A,noprofile(M:F/A)	    , (noprofile)).
+pred_prop(M:F/A,'$iso'(M:F/A) ,(iso)).
+
+
+:-dynamic(mpred_impl/2).
+:-multifile(mpred_impl/2).
+
+%%  rebuild_pred_into(OMC,NMC,AssertZ,[+dynamic,-built_in,+volatile, etc]).
+
+:-meta_predicate(rebuild_pred_into(0,1,?)).
+rebuild_pred_into(C,AssertZ,OtherTraits):-rebuild_pred_into(C,C,AssertZ,OtherTraits).
+
+:-meta_predicate(rebuild_pred_into(0,0,1,?)).
+rebuild_pred_into(_,NMC,AssertZ,_):-mpred_impl(NMC,AssertZ),!.
+rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
+  lsting(OMC),
+  asserta(mpred_impl(NMC,AssertZ)),
+  show_call((predicate_property(OMC,number_of_clauses(_)))),
+  strip_module(OMC, OM, OC),
+  strip_module(NMC, NM, NC),
+   must_det_l((
+      '$set_source_module'(Before, OM),  
+      functor(NC,NF,A), functor(OC,OF,A), 
+      (show_call(predicate_property(OMC,number_of_clauses(_)))),
+      must(show_call_failure(predicate_property(OMC,number_of_clauses(_)))),
+      forall(predicate_property(OC,PP),asserta(pp_temp(NC,PP))),
+      findall((OC:-B),((clause(OC,B),assertz(pp_clauses((OC:-B))))),List),
+      '$set_source_module'(_, NM),
+      forall(member(-PP,OtherTraits),retractall(pp_temp(NC,PP))),
+      forall(member(+PP,OtherTraits),asserta(pp_temp(NC,PP))),      
+      once(pp_temp(NC,(built_in))->(redefine_system_predicate(NF/A),unlock_predicate(NF/A));true),      
+      show_call(must(abolish(NF/A))),
+      show_call(must(abolish(NF/A))),
+      garbage_collect_clauses,
+      ignore(convert_to_dynamic(NM,NF,A)),
+      garbage_collect_clauses,
+      %must(\+ predicate_property(NMC,_)),
+      %once(memberchk(CC,List)->true;(CC=((NC:-fail,1234)))),
+      %convert_to_dynamic(NM,NF,A),
+      %ignore(logOnError(pp_temp(NC,(dynamic))->dynamic(NF/A);true)),
+      %ignore(once(pp_temp(NC,(multifile))->multifile(NF/A);true)),
+      must(((pp_temp(NC,file(File)),pp_temp(NC,line_count(_Line))))
+        -> 
+            must(('$compile_aux_clauses'(CC, File),retractall(CC)));
+            must(dmsg(noFileFor(NC)))),
+      forall(pred_prop(NM:NF/A,TODO,PP,ELSE),(pp_temp(NC,PP)->must(TODO);must(ELSE))),
+      (pp_temp(NC,meta_predicate(NC))->meta_predicate(NC);true),
+      dbgsubst(List,OF,NF,ListO),maplist(AssertZ,ListO),!,
+      
+      retractall(mpred_impl(NMC,_)),
+      asserta(mpred_impl(NMC,AssertZ)),
+      '$set_source_module'(_, Before),
+      lsting(NMC),      
+      retractall(pp_temp(NC,_))
+      )).
 
 
 % ----------
@@ -636,34 +736,6 @@ with_mfa_of(Pred3,_CM,M,_P,F//A):- Ap2 is A+2, M:call(Pred3,M,F,Ap2).
 with_mfa_of(Pred3,_CM,M,_P,F/A):-M:call(Pred3,M,F,A).
 
 % ----------
-
-% ===================================================================
-% Substitution based on ==
-% ===================================================================
-% Usage: dbgsubst(+Fml,+X,+Sk,?FmlSk)
-
-:- export(dbgsubst/4).
-dbgsubst(A,B,C,D):-var(A),!,dmsg(dbgsubst(A,B,C,D)),dumpST,dtrace,dbgsubst0(A,B,C,D).
-dbgsubst(A,B,C,D):-dbgsubst0(A,B,C,D).
-
-dbgsubst0(A,B,C,D):- 
-      catchv(hotrace(nd_dbgsubst(A,B,C,D)),E,(dumpST,dmsg(E:nd_dbgsubst(A,B,C,D)),fail)),!.
-dbgsubst0(A,_B,_C,A).
-
-nd_dbgsubst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
-nd_dbgsubst(  P, X,Sk, P1 ) :- functor_safe(P,_,N),nd_dbgsubst1( X, Sk, P, N, P1 ).
-
-nd_dbgsubst1( _,  _, P, 0, P  ).
-nd_dbgsubst1( X, Sk, P, N, P1 ) :- N > 0, P =.. [F|Args], 
-            nd_dbgsubst2( X, Sk, Args, ArgS ),
-            nd_dbgsubst2( X, Sk, [F], [FS] ),  
-            P1 =.. [FS|ArgS].
-
-nd_dbgsubst2( _,  _, [], [] ).
-nd_dbgsubst2( X, Sk, [A|As], [Sk|AS] ) :- X == A, !, nd_dbgsubst2( X, Sk, As, AS).
-nd_dbgsubst2( X, Sk, [A|As], [A|AS]  ) :- var(A), !, nd_dbgsubst2( X, Sk, As, AS).
-nd_dbgsubst2( X, Sk, [A|As], [Ap|AS] ) :- nd_dbgsubst( A,X,Sk,Ap ),nd_dbgsubst2( X, Sk, As, AS).
-nd_dbgsubst2( _X, _Sk, L, L ).
 
 
 :-module_transparent(make_transparent/4).
@@ -1812,7 +1884,7 @@ debugOnFailureIgnore(C):-ignore(debugOnFailure(C)).
 
 logOnFailure0(C):- one_must(C,dmsg(logOnFailure(C))).
 logOnFailureEach(C):-prolog_ecall(1,logOnFailure,C).
-logOnFailureIgnore(C):-ignore(logOnFailure(C)).
+logOnFailureIgnore(C):-ignore(logOnFailure0(logOnError0(C))).
 
 
 %debugOnFailure0(X):-ctrace,X.

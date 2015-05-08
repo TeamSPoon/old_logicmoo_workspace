@@ -166,11 +166,13 @@ run_database_hooks_0(TypeIn,HookIn):-
 % ========================================
 
 onSpawn(ClassFact):-fully_expand(ClassFact,ClassFactO),!,onSpawn_0(ClassFactO).
-onSpawn_0(ClassFact):- ClassFact=..[Funct,InstA],
- createByNameMangle(InstA,Inst,Type2),
- assert_isa(Type2,tCol),
- assert_isa(Inst,Funct),
- assert_isa(Inst,Type2),!.
+onSpawn_0(ClassFact):- ClassFact=..[FunctArgType,InstA],
+ tCol(FunctArgType),
+ createByNameMangle(InstA,Inst,TypeA),
+ assert_isa(TypeA,tCol),
+ assert_isa(Inst,FunctArgType),
+ assert_isa(Inst,TypeA),
+ add(genls(TypeA,FunctArgType)),!.
 onSpawn_0(ClassFact):- ClassFact=..[Funct|InstADeclB],must_det(onSpawn_f_args(Funct,InstADeclB)).
 
 onSpawn_f_args(Funct,List):-
@@ -192,9 +194,14 @@ convertOneSpawnArg(_,_,nospawn(O),O):-!.
 convertOneSpawnArg(Funct,N,isInstFn(A),O):-spawnOneSpawnArg(Funct,N,A,O).
 convertOneSpawnArg(Funct,N,A,O):-spawnOneSpawnArg(Funct,N,A,O).
 
-spawnOneSpawnArg(Funct,N,A,O):-
- createByNameMangle(A,O,TypeA),assert_isa(TypeA,tCol).
- %must(assert_subclass_on_argIsa(Funct,N,TypeA)).
+spawnOneSpawnArg(Funct,N,InstA,Inst):- 
+    must(argIsa(Funct,N,FunctArgType)),
+    createByNameMangle(InstA,Inst,TypeA),
+    assert_isa(TypeA,tCol),
+    assert_isa(Inst,FunctArgType),
+    assert_isa(Inst,TypeA),
+    add(genls(TypeA,FunctArgType)),!,
+    add(argIsa(Funct,N,TypeA)).
  
 
 convertOneTypedSpawnArg(Type,A,O):-
@@ -311,12 +318,18 @@ createByNameMangle0(Suggest,InstA,Type):- once(split_name_type(Suggest,InstA,Typ
 createByNameMangle0(OType,InstA,Type):- create_from_type(OType,InstA,Type),!.
 createByNameMangle0(InstA,IDA,InstA):- gensym(InstA,IDA), englishServerInterface([actCreate,InstA,IDA]).
 
+:-dynamic(thglobal:current_source_suffix/1).
+
+get_source_suffix('7').
+%get_source_suffix(SS):- thglobal:current_source_suffix(SS),!.
+%get_source_suffix(SS):- source_location(F,_),!,file_directory_name(F,DN),file_base_name(DN,SS),concat_atom(['-',SS,'7'],SSM),asserta_if_new(thglobal:current_source_suffix(SSM)).
+
 
 create_from_type(OType,InstA,Type):- sanity(var(InstA)),
    i_name(OType,TypeWT),
    atom_concat('t',TypeWT,Type),
-
-   atom_concat(Type,'7',InstA7),
+   get_source_suffix(SS),
+   atom_concat(Type,SS,InstA7),!,
    i_name(i,InstA7,InstA),
    must_det(assert_isa(InstA,Type)),!. 
  % call_after_mpred_load_slow(isa(InstA,Type)).

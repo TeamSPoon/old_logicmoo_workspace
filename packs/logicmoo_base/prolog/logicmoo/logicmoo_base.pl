@@ -12,12 +12,23 @@
 % Douglas Miles
 */
 
+:- dynamic   user:file_search_path/2.
+:- multifile user:file_search_path/2.
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(logicmoo,Dir)).
 :- dynamic(user:isa_pred_now_locked/0).
 
 :- nb_setval(pldoc_object,pldoc_object_missing).
 
 :- include(mpred/logicmoo_i_header).
+:- meta_predicate user:call_mpred_body(*,0).
+:- meta_predicate user:decl_mpred_hybrid_ilc_0(*,*,0,*).
+:- meta_predicate user:assert_isa_hooked(0,*).
+:- meta_predicate user:t(7,?,?,?,?,?,?,?).
+:- meta_predicate user:t(6,?,?,?,?,?,?).
+:- meta_predicate user:t(5,?,?,?,?,?).
+:- meta_predicate user:t(3,?,?,?).
+:- meta_predicate user:t(4,?,?,?,?).
+:- meta_predicate user:t(2,?,?).
 
 
 % ========================================
@@ -41,10 +52,7 @@ swi_module(M,E):-dmsg(swi_module(M,E)).
 :-endif.
 
 
-:- export(with_no_mpred_expansions/1).
-:- meta_predicate(with_no_mpred_expansions(0)).
-%with_no_mpred_expansions(Goal):-
-%  with_assertions(thlocal:disable_mpred_term_expansions_locally,Goal).
+
 
 
 % ================================================
@@ -80,24 +88,29 @@ when_debugging(_,_).
 :- set_prolog_flag(double_quotes, string).
 
 
+
 % ================================================
 % DBASE_T System
 % ================================================
 :- ensure_loaded(library(logicmoo/mpred_online/logicmoo_i_www)).
 :- ensure_loaded(mpred/pfc).
 :- ensure_loaded(mpred/logicmoo_i_loader).
+
 :- ensure_loaded(mpred/logicmoo_i_types).
+:- ensure_loaded(mpred/logicmoo_i_term_expansion).
 :- ensure_loaded(mpred/logicmoo_i_mpred_props).
 :- ensure_loaded(mpred/logicmoo_i_agenda).
 :- ensure_loaded(mpred/logicmoo_i_call).
 :- ensure_loaded(mpred/logicmoo_i_coroutining).
 :- ensure_loaded(mpred/logicmoo_i_hooks).
-:- ensure_loaded(mpred/logicmoo_i_term_expansion).
 :- ensure_loaded(mpred/logicmoo_i_store).
 :- ensure_loaded(mpred/logicmoo_i_mpred_stubs).
 :- ensure_loaded(mpred/logicmoo_i_argtypes).
+:- with_no_mpred_expansions(autoload).
 
 :- ensure_loaded(logicmoo('mpred/logicmoo_i_builtin.pfc')).
 
-:- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(dbase/mpred_i_rdf_store)))).
+%:- with_no_term_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/mpred_online/dbase_i_rdf_store)))).
+%:- with_no_term_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_engine)))).
+:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
 

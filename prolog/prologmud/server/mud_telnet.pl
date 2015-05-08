@@ -57,7 +57,7 @@ service_client_call(Call, Slave, In, Out, Host, Peer, Options):-
    call(Call).
   
 login_and_run_nodebug:- 
- % must(set_no_debug), 
+ must(set_no_debug), 
  must(login_and_run).
 
 login_and_run:-
@@ -527,7 +527,7 @@ service_client(Slave, In, Out, Host, Peer, Options) :-
          call_pred(Call, Options), !,
          setup_streams(In, Out),
          thread_self(Id),
-	'format'(Out,'% Welcome ~q to the SWI-Prolog LogicMOO server on thread ~w~n~n', [Peer,service_client(Slave, In, Out, Host, Peer, Options)]),
+	wdmsg(user_error,'% Welcome ~q to the SWI-Prolog LogicMOO server on thread ~w~n~n', [Peer,service_client(Slave, In, Out, Host, Peer, call(Call,Options))]),
 	call_close_and_detatch(In, Out, Id, service_client_call(Call, Slave, In, Out, Host, Peer, Options)).
 
 service_client(_Slave, In, Out, Host, Peer, _Options):- 

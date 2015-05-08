@@ -1,6 +1,9 @@
 :- multifile(mpred_online:semweb_startup).
-:- ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all').
+:- include(logicmoo(mpred/logicmoo_i_header)).
 
+
+:- dynamic   user:file_search_path/2.
+:- multifile user:file_search_path/2.
 :- multifile
 	prolog:message/3.
 
@@ -14,7 +17,7 @@ do_semweb_startup_late_once:-asserta(did_semweb_startup_late_once),forall(clause
 load_blog_core:- use_module(library(arouter)),use_module(library(docstore)),use_module(library(bc/bc_main)),use_module(library(bc/bc_view)),
    thread_create(bc_main('site.docstore',[port(3080)]),_,[]).
 
-:- load_blog_core.
+%:- load_blog_core.
 
 % :- debug(daemon).
 
@@ -27,7 +30,7 @@ load_blog_core:- use_module(library(arouter)),use_module(library(docstore)),use_
 
 % [Optionaly] Solve the Halting problem
 :-use_module(library(process)).
-:-use_module(library(pce)).
+% :-use_module(library(pce)).
 %:- has_gui_debug -> true ; remove_pred(pce_principal,send,2).
 %:- has_gui_debug -> true ; remove_pred(pce_principal,new,2).
 
@@ -159,10 +162,16 @@ http_open:location(A, B) :-
 */
 semweb_startup_late:- cp_server:attach_account_info.
 
-:- asserta((user:file_search_path(A,B):-pre_file_search_path(A,B))).
+% :- asserta((user:file_search_path(A,B):-pre_file_search_path(A,B))).
  
-
-semweb_startup_late:- debug(http_request(_)),debug(cm(_)),debug(swish(_)),debug(storage).
+:-debug(_).
+:- nodebug(syntax_error(illegal_number)).
+:- nodebug(number_codes/2).
+:- nodebug(number_codes(_,_)).
+:- nodebug(logicmoo_util_bugger_catch).
+:- nodebug(logicmoo_util_bugger_catch:catchv/3).
+:- nodebug(type_error(number,t)).
+% semweb_startup_late:- debug(http_request(_)),debug(cm(_)),debug(swish(_)),debug(storage).
 semweb_startup_late:- listing(pre_http_location/3).
 semweb_startup_late:- listing(location/3).
 semweb_startup_late:- ensure_webserver.
@@ -179,3 +188,5 @@ mpred_online:semweb_startup:- do_semweb_startup_late_once.
 :- if_startup_script(do_semweb_startup_late_once).
 
 :- do_semweb_startup_late_once.
+
+:-ensure_webserver.

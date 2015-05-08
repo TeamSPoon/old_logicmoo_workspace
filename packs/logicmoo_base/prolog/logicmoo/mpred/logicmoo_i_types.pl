@@ -296,8 +296,7 @@ not_mud_isa(G,tCol,Why):-never_type_why(G,Why).
 % ==========================
 % isa_backchaing(i,c)
 % ==========================
-isa(I,T):- nonvar(T)->true;((no_repeats(ttTemporalType(T);tSet(T);tCol(T)),atom(T)), loop_check(isa_backchaing(I,T))).
-isa(F,P):- loop_check(isa_backchaing(F,P)).
+isa(I,T):- cwc, (nonvar(T)->true;((no_repeats(ttTemporalType(T);tSet(T);tCol(T)),atom(T)))), loop_check(isa_backchaing(I,T)).
 %a(P,F):-loop_check(isa(F,P)).
 %a(T,I):- thglobal:pfcManageHybrids,clause_safe(isa(I,T),true).
 :-export(isa_backchaing/2).

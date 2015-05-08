@@ -204,9 +204,9 @@ pfc_fully_expand_warn(Type,B,A):-pfc_fully_expand(Type,B,A),(B\=@=A->wdmsg(error
 
 % :- ignore((current_predicate(not/1),abolish(system:not/1),abolish(not/1),dynamic(not/1),assert(((not(P):- nonvar(P), \+ P))),meta_predicate(not(0)))).
 :- op(0,fx,'decl_mpred_pfc').
-isa(pfcMetaPred,tCol).
+isa(pfcDatabaseTerm,tCol).
 isa(pfcMustFC,tCol).
-decl_mpred_pfc(F/A):-!,export(F/A),dynamic(F/A),asserta_if_new(user:mpred_prop(F,prologOnly)),asserta_if_new(arity(F,A)),asserta_if_new(user:mpred_prop(F,pfcMetaPred)).
+decl_mpred_pfc(F/A):-!,export(F/A),dynamic(F/A),asserta_if_new(user:mpred_prop(F,prologOnly)),asserta_if_new(arity(F,A)),asserta_if_new(user:mpred_prop(F,pfcDatabaseTerm)).
 decl_mpred_pfc(F):-atom(F),!,decl_mpred_pfc(F/0).
 :- op(1150,fx,'decl_mpred_pfc').
 
@@ -303,7 +303,7 @@ pfcUpdateClauses(F,A):-make_functor(P,F,A),forall((clause(P,T),is_true(T)),hooke
 
 maybe_hybrid(F/_):-isa(F,prologOnly),!.
 maybe_hybrid(F/_):-isa(F,prologHybrid),!.
-maybe_hybrid(F/_):-isa(F,pfcMetaPred),!.
+maybe_hybrid(F/_):-isa(F,pfcDatabaseTerm),!.
 maybe_hybrid(F/_):-isa(F,X),atom(X),!.
 maybe_hybrid(F/A):-atom(F),debugOnError(current_predicate(F/A)),!.
 % maybe_hybrid(C/1):-ignore((nonvar(C)->decl_mpred_hybrid(C/1);ignore(decl_mpred_hybrid(isa/2))))
@@ -320,13 +320,13 @@ pfc_lambda([A1,A2,A3,A4],Body,A1,A2,A3,A4):-Body.
 
 % :-call(pfc_lambda([E],writeln(E)),hello_lambda).
 
-:-dynamic(pfcMetaPred/1).
+:-dynamic(pfcDatabaseTerm/1).
 :-dynamic(pfcControlled/1).
 :-dynamic(pfcWatched/1).
 :-dynamic(pfcMustFC/1).
 
 pfcPreds:-
-  listing(pfcMetaPred/1),
+  listing(pfcDatabaseTerm/1),
   listing(pfcControlled/1),
   listing(pfcWatched/1),
   listing(pfcMustFC/1),
@@ -367,7 +367,7 @@ pfc_manage_hybrids :- if_defined(thglobal:pfcManageHybrids),!.
 pfc_local(G):-get_functor(G,F,A),pfc_local(G,F,A).
 
 pfc_local(_,F,A):-pfcDatabaseTerm(F/A),!.
-pfc_local(_,F,_):-pfc_mpred_prop(F,pfcMetaPred),!.
+pfc_local(_,F,_):-pfc_mpred_prop(F,pfcDatabaseTerm),!.
 pfc_local(_,F,_):-pfc_mpred_prop(F,prologOnly).
 pfc_local(G,_,_):-pfc_manage_hybrids,!,pfc_mark_C(G),!.
 pfc_local(G,_,_):-pfc_manage_hybrids,!,pfc_mark_W(G),!.
@@ -474,7 +474,7 @@ pfc_assert0(G):- pfc_local(G),!,
 
 pfc_assert0(G):- trace,add(G),pfc_mark_C(G).
 
-user:mpred_prop(F,prologOnly):-user:mpred_prop(F,pfcMetaPred).
+user:mpred_prop(F,prologOnly):-user:mpred_prop(F,pfcDatabaseTerm).
 
 pfc_add_minfo(G):-pfc_add_minfo(assertz_if_new,G).
 pfc_add_minfo(How,(H:-True)):-is_true(True),must(nonvar(H)),!,pfc_add_minfo(How,H).

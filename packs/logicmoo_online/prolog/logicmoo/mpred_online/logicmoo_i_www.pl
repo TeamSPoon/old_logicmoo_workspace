@@ -29,503 +29,67 @@
 */
 
 % :- module(logicmoo_i_www,[ html_print_term/2  ]).  % +Term, +Options
-	  
+
+:- dynamic   http:location/3.
+:- multifile http:location/3.
+
 :- include(logicmoo(mpred/logicmoo_i_header)).
+% :- ['../logicmoo_run_swish'].
+:- ['../run_clio'].
+
+:- doc_collect(true).
+%:- use_module(library(pldoc/doc_library)).
+%:- doc_load_library.
 
 :- use_module(library(option)).
 :- style_check(-discontiguous). %  toMarkup/4, toMarkupFormula/4.
 :- style_check(-singleton).
 
-/** <module> Pretty Print Prolog terms
+:- debug(_).
 
-This module is a first  start  of   what  should  become a full-featured
-pretty printer for Prolog  terms  with   many  options  and  parameters.
-Eventually,  it  should  replace  portray_clause/1   and  various  other
-special-purpose predicates.
-
-@tbd This is just a quicky. We  need proper handling of portray/1, avoid
-printing very long terms  multiple   times,  spacing (around operators),
-etc.
-
-@tbd Use a record for the option-processing.
-
-@tbd The current ahtml_pproach is far too simple, often resulting in illegal
-     terms.
-*/
-
-:- predicate_options(html_print_term/2, 2,
-		     [ output(stream),
-		       right_margin(integer),
-		       left_margin(integer),
-		       tab_width(integer),
-		       indent_arguments(integer),
-		       operators(boolean),
-		       write_options(list)
-		     ]).
-
-%%	html_print_term(+Term, +Options) is det.
-%
-%	Pretty print a Prolog term. The following options are processed:
-%
-%	  * output(+Stream)
-%	  Define the output stream.  Default is =user_output=
-%	  * right_margin(+Integer)
-%	  Width of a line.  Default is 72 characters.
-%	  * left_margin(+Integer)
-%	  Left margin for continuation lines.  Default is 0.
-%	  * tab_width(+Integer)
-%	  Distance between tab-stops.  Default is 8 characters.
-%	  * indent_arguments(+Spec)
-%	  Defines how arguments of compound terms are placed.  Defined
-%	  values are:
-%	    $ =false= :
-%	    Simply place them left to right (no line-breaks)
-%	    $ =true= :
-%	    Place them vertically, aligned with the open bracket (not
-%	    implemented)
-%	    $ =auto= (default) :
-%	    As horizontal if line-width is not exceeded, vertical
-%	    otherwise.
-%	    $ An integer :
-%	    Place them vertically aligned, <N> spaces to the right of
-%	    the beginning of the head.
-%	  * operators(+Boolean)
-%	  This is the inverse of the write_term/3 option =ignore_ops=.
-%	  Default is to respect them.
-%	  * write_options(+List)
-%	  List of options passed to write_term/3 for terms that are
-%	  not further processed.  Default:
-%	    ==
-%		[ numbervars(true),
-%		  quoted(true),
-%		  portray(true)
-%	        ]
-%	    ==
-
-html_print_term(Term, Options) :-
-	\+ \+ html_print_term_2(Term, Options).
-
-html_print_term_2(Term, Options0) :-
-	prepare_term(Term, Template, Cycles, Constraints),
-	defaults(Defs),
-	merge_options(Options0, Defs, Options),
-	option(write_options(WrtOpts), Options),
-	option(max_depth(MaxDepth), WrtOpts, infinite),
-	option(left_margin(LeftMargin), Options, 0),
-	Context	= ctx(LeftMargin,0,1200,MaxDepth),
-	html_pp(Template, Context, Options),
-	html_print_extra(Cycles, Context, 'where', Options),
-	html_print_extra(Constraints, Context, 'with constraints', Options).
-
-html_print_extra([], _, _, _) :- !.
-html_print_extra(List, Context, Comment, Options) :-
-	option(output(Out), Options),
-	format(Out, ', % ~w', [Comment]),
-	modify_context(Context, [indent=4], Context1),
-	html_print_extra_2(List, Context1, Options).
-
-html_print_extra_2([H|T], Context, Options) :-
-	option(output(Out), Options),
-	context(Context, indent, Indent),
-	indent(Out, Indent, Options),
-	html_pp(H, Context, Options),
-	(   T == []
-	->  true
-	;   format(Out, ',', []),
-	    html_print_extra_2(T, Context, Options)
-	).
-
-
-%%	prepare_term(+Term, -Template, -Cycles, -Constraints)
-%
-%	Prepare a term, possibly  holding   cycles  and  constraints for
-%	printing.
-
-prepare_term(Term, Template, Cycles, Constraints) :-
-	term_attvars(Term, []), !,
-	Constraints = [],
-	'$factorize_term'(Term, Template, Factors),
-	bind_non_cycles(Factors, 1, Cycles),
-	numbervars(Template+Cycles+Constraints, 0, _,
-		   [singletons(true)]).
-prepare_term(Term, Template, Cycles, Constraints) :-
-	copy_term(Term, Copy, Constraints), !,
-	'$factorize_term'(Copy, Template, Factors),
-	bind_non_cycles(Factors, 1, Cycles),
-	numbervars(Template+Cycles+Constraints, 0, _,
-		   [singletons(true)]).
-
-
-bind_non_cycles([], _, []).
-bind_non_cycles([V=Term|T], I, L) :-
-	unify_with_occurs_check(V, Term), !,
-	bind_non_cycles(T, I, L).
-bind_non_cycles([H|T0], I, [H|T]) :-
-	H = ('$VAR'(Name)=_),
-	atom_concat('_S', I, Name),
-	I2 is I + 1,
-	bind_non_cycles(T0, I2, T).
-
-
-defaults([ output(user_output),
-	   right_margin(72),
-	   indent_arguments(auto),
-	   operators(true),
-	   write_options([ quoted(true),
-			   numbervars(true),
-			   portray(true),
-			   attributes(portray)
-			 ])
-	 ]).
-
-
-		 /*******************************
-		 *	       CONTEXT		*
-		 *******************************/
-
-context_attribute(indent,     1).
-context_attribute(depth,      2).
-context_attribute(precedence, 3).
-context_attribute(max_depth,  4).
-
-context(Ctx, Name, Value) :-
-	context_attribute(Name, Arg),
-	arg(Arg, Ctx, Value).
-
-modify_context(Ctx0, Mahtml_pping, Ctx) :-
-	functor(Ctx0, Name, Arity),
-	functor(Ctx,  Name, Arity),
-	modify_context(0, Arity, Ctx0, Mahtml_pping, Ctx).
-
-modify_context(Arity, Arity, _, _, _) :- !.
-modify_context(I, Arity, Ctx0, Mahtml_pping, Ctx) :-
-	N is I + 1,
-	(   context_attribute(Name, N),
-	    memberchk(Name=Value, Mahtml_pping)
-	->  true
-	;   arg(N, Ctx0, Value)
-	),
-	arg(N, Ctx, Value),
-	modify_context(N, Arity, Ctx0, Mahtml_pping, Ctx).
-
-
-dec_depth(Ctx, Ctx) :-
-	context(Ctx, max_depth, infinite), !.
-dec_depth(ctx(I,D,P,MD0), ctx(I,D,P,MD)) :-
-	MD is MD0 - 1.
-
-
-		 /*******************************
-		 *	        PP		*
-		 *******************************/
-
-html_pp(Primitive, Ctx, Options) :-
-	(   atomic(Primitive)
-	;   var(Primitive)
-	), !,
-	html_pprint(Primitive, Ctx, Options).
-html_pp(Portray, _Ctx, Options) :-
-	option(write_options(WriteOptions), Options),
-	option(portray(true), WriteOptions),
-	option(output(Out), Options),
-	with_output_to(Out, user:portray(Portray)), !.
-html_pp(List, Ctx, Options) :-
-	List = [_|_], !,
-	context(Ctx, indent, Indent),
-	context(Ctx, depth, Depth),
-	option(output(Out), Options),
-	option(indent_arguments(IndentStyle), Options),
-	(   (   IndentStyle == false
-	    ->	true
-	    ;	IndentStyle == auto,
-		html_print_width(List, Width, Options),
-		option(right_margin(RM), Options),
-		Indent + Width < RM
-	    )
-	->  html_pprint(List, Ctx, Options)
-	;   format(Out, '[ ', []),
-	    Nindent is Indent + 2,
-	    NDepth is Depth + 1,
-	    modify_context(Ctx, [indent=Nindent, depth=NDepth], NCtx),
-	    html_html_pp_list_elements(List, NCtx, Options),
-	    indent(Out, Indent, Options),
-	    format(Out, ']', [])
-	).
-:- if(current_predicate(is_dict/1)).
-html_pp(Dict, Ctx, Options) :-
-	is_dict(Dict), !,
-	dict_pairs(Dict, Tag, Pairs),
-	option(output(Out), Options),
-	option(indent_arguments(IndentStyle), Options),
-	context(Ctx, indent, Indent),
-	(   IndentStyle == false ; Pairs == []
-	->  html_pprint(Dict, Ctx, Options)
-	;   IndentStyle == auto,
-	    html_print_width(Dict, Width, Options),
-	    option(right_margin(RM), Options),
-	    Indent + Width < RM		% fits on a line, simply write
-	->  html_pprint(Dict, Ctx, Options)
-	;   format(atom(Buf2), '~q{ ', [Tag]),
-	    write(Out, Buf2),
-	    atom_length(Buf2, FunctorIndent),
-	    (   integer(IndentStyle)
-	    ->	Nindent is Indent + IndentStyle,
-	        (   FunctorIndent > IndentStyle
-		->  indent(Out, Nindent, Options)
-		;   true
-		)
-	    ;   Nindent is Indent + FunctorIndent
-	    ),
-	    context(Ctx, depth, Depth),
-	    NDepth is Depth + 1,
-	    modify_context(Ctx, [indent=Nindent, depth=NDepth], NCtx0),
-	    dec_depth(NCtx0, NCtx),
-	    html_html_pp_dict_args(Pairs, NCtx, Options),
-	    BraceIndent is Nindent - 2,		% '{ '
-	    indent(Out, BraceIndent, Options),
-	    write(Out, '}')
-	).
-:- endif.
-html_pp(Term, Ctx, Options) :-		% handle operators
-	functor(Term, Name, Arity),
-	current_op(Prec, Type, Name),
-	match_op(Type, Arity, Kind, Prec, Left, Right),
-	option(operators(true), Options), !,
-	option(output(Out), Options),
-	context(Ctx, indent, Indent),
-	context(Ctx, depth, Depth),
-	context(Ctx, precedence, CPrec),
-	NDepth is Depth + 1,
-	modify_context(Ctx, [depth=NDepth], Ctx1),
-	dec_depth(Ctx1, Ctx2),
-	(   Kind == prefix
-	->  arg(1, Term, Arg),
-	    (   CPrec >= Prec
-	    ->	format(atom(Buf), '~q ', Name),
-		atom_length(Buf, AL),
-		NIndent is Indent + AL,
-		write(Out, Buf),
-		modify_context(Ctx2, [indent=NIndent, precedence=Right], Ctx3),
-		html_pp(Arg, Ctx3, Options)
-	    ;	format(atom(Buf), '(~q ', Name),
-		atom_length(Buf, AL),
-		NIndent is Indent + AL,
-		write(Out, Buf),
-		modify_context(Ctx2, [indent=NIndent, precedence=Right], Ctx3),
-		html_pp(Arg, Ctx3, Options),
-		format(Out, ')', [])
-	    )
-	;   Kind == postfix
-	->  arg(1, Term, Arg),
-	    (   CPrec >= Prec
-	    ->  modify_context(Ctx2, [precedence=Left], Ctx3),
-	        html_pp(Arg, Ctx3, Options),
-		format(Out, ' ~q', Name)
-	    ;	format(Out, '(', []),
-		NIndent is Indent + 1,
-		modify_context(Ctx2, [indent=NIndent, precedence=Left], Ctx3),
-		html_pp(Arg, Ctx3, Options),
-		format(Out, ' ~q)', [Name])
-	    )
-	;   arg(1, Term, Arg1),
-	    arg(2, Term, Arg2),
-	    (	CPrec >= Prec
-	    ->  modify_context(Ctx2, [precedence=Left], Ctx3),
-		html_pp(Arg1, Ctx3, Options),
-		format(Out, ' ~q ', Name),
-		modify_context(Ctx2, [precedence=Right], Ctx4),
-		html_pp(Arg2, Ctx4, Options)
-	    ;	format(Out, '(', []),
-		NIndent is Indent + 1,
-		modify_context(Ctx2, [indent=NIndent, precedence=Left], Ctx3),
-		html_pp(Arg1, Ctx3, Options),
-		format(Out, ' ~q ', Name),
-		modify_context(Ctx2, [precedence=Right], Ctx4),
-		html_pp(Arg2, Ctx4, Options),
-		format(Out, ')', [])
-	    )
-	).
-html_pp(Term, Ctx, Options) :-		% compound
-	option(output(Out), Options),
-	option(indent_arguments(IndentStyle), Options),
-	context(Ctx, indent, Indent),
-	(   IndentStyle == false
-	->  html_pprint(Term, Ctx, Options)
-	;   IndentStyle == auto,
-	    html_print_width(Term, Width, Options),
-	    option(right_margin(RM), Options),
-	    Indent + Width < RM		% fits on a line, simply write
-	->  html_pprint(Term, Ctx, Options)
-	;   Term =.. [Name|Args],
-	    format(atom(Buf2), '~q(', [Name]),
-	    write(Out, Buf2),
-	    atom_length(Buf2, FunctorIndent),
-	    (   integer(IndentStyle)
-	    ->	Nindent is Indent + IndentStyle,
-	        (   FunctorIndent > IndentStyle
-		->  indent(Out, Nindent, Options)
-		;   true
-		)
-	    ;   Nindent is Indent + FunctorIndent
-	    ),
-	    context(Ctx, depth, Depth),
-	    NDepth is Depth + 1,
-	    modify_context(Ctx, [indent=Nindent, depth=NDepth], NCtx0),
-	    dec_depth(NCtx0, NCtx),
-	    html_html_pp_compound_args(Args, NCtx, Options),
-	    write(Out, ')')
-	).
-
-
-html_html_pp_list_elements(_, Ctx, Options) :-
-	context(Ctx, max_depth, 0), !,
-	option(output(Out), Options),
-	write(Out, '...').
-html_html_pp_list_elements([H|T], Ctx0, Options) :-
-	dec_depth(Ctx0, Ctx),
-	html_pp(H, Ctx, Options),
-	(   T == []
-	->  true
-	;   nonvar(T),
-	    T = [_|_]
-	->  option(output(Out), Options),
-	    write(Out, ','),
-	    context(Ctx, indent, Indent),
-	    indent(Out, Indent, Options),
-	    html_html_pp_list_elements(T, Ctx, Options)
-	;   option(output(Out), Options),
-	    context(Ctx, indent, Indent),
-	    indent(Out, Indent-2, Options),
-	    write(Out, '| '),
-	    html_pp(T, Ctx, Options)
-	).
-
-
-html_html_pp_compound_args([H|T], Ctx, Options) :-
-	html_pp(H, Ctx, Options),
-	(   T == []
-	->  true
-	;   T = [_|_]
-	->  option(output(Out), Options),
-	    write(Out, ','),
-	    context(Ctx, indent, Indent),
-	    indent(Out, Indent, Options),
-	    html_html_pp_compound_args(T, Ctx, Options)
-	;   option(output(Out), Options),
-	    context(Ctx, indent, Indent),
-	    indent(Out, Indent-2, Options),
-	    write(Out, '| '),
-	    html_pp(T, Ctx, Options)
-	).
-
-
-:- if(current_predicate(is_dict/1)).
-html_html_pp_dict_args([Name-Value|T], Ctx, Options) :-
-	option(output(Out), Options),
-	line_position(Out, Pos0),
-	html_pp(Name, Ctx, Options),
-	write(Out, ':'),
-	line_position(Out, Pos1),
-	context(Ctx, indent, Indent),
-	Indent2 is Indent + Pos1-Pos0,
-	modify_context(Ctx, [indent=Indent2], Ctx2),
-	html_pp(Value, Ctx2, Options),
-	(   T == []
-	->  true
-	;   option(output(Out), Options),
-	    write(Out, ','),
-	    indent(Out, Indent, Options),
-	    html_html_pp_dict_args(T, Ctx, Options)
-	).
-:- endif.
-
-%	match_op(+Type, +Arity, +Precedence, -LeftPrec, -RightPrec)
-
-match_op(fx,	1, prefix,  P, _, R) :- R is P - 1.
-match_op(fy,	1, prefix,  P, _, P).
-match_op(xf,	1, postfix, P, _, L) :- L is P - 1.
-match_op(yf,	1, postfix, P, P, _).
-match_op(xfx,	2, infix,   P, A, A) :- A is P - 1.
-match_op(xfy,	2, infix,   P, L, P) :- L is P - 1.
-match_op(yfx,	2, infix,   P, P, R) :- R is P - 1.
-
-
-%%	indent(+Out, +Indent, +Options)
-%
-%	Newline and indent to the indicated  column. Respects the option
-%	=tab_width=.  Default  is  8.  If  the  tab-width  equals  zero,
-%	indentation is emitted using spaces.
-
-indent(Out, Indent, Options) :-
-	option(tab_width(TW), Options, 8),
-	nl(Out),
-	(   TW =:= 0
-	->  tab(Out, Indent)
-	;   Tabs is Indent // TW,
-	    Spaces is Indent mod TW,
-	    forall(between(1, Tabs, _), put(Out, 9)),
-	    tab(Out, Spaces)
-	).
-
-%%	html_print_width(+Term, -W, +Options) is det.
-%
-%	Width required when printing `normally' left-to-right.
-
-html_print_width(Term, W, Options) :-
-	option(right_margin(RM), Options),
-	(   write_length(Term, W, [max_length(RM)|Options])
-	->  true
-	;   W = RM
-	).
-
-%%	html_pprint(+Term, +Context, +Options)
-%
-%	The bottom-line print-routine.
-
-html_pprint(Term, Ctx, Options) :-
-	option(output(Out), Options),
-	html_pprint(Out, Term, Ctx, Options).
-
-html_pprint(Out, Term, Ctx, Options) :-
-	option(write_options(WriteOptions), Options),
-	context(Ctx, max_depth, MaxDepth),
-	(   MaxDepth == infinite
-	->  write_term(Out, Term, WriteOptions)
-	;   MaxDepth =< 0
-	->  format(Out, '...', [])
-	;   write_term(Out, Term, [max_depth(MaxDepth)|WriteOptions])
-	).
-
-
+:- thread_local(thlocal:omit_full_stop).
 
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_error)).
 
+:- include(library(pldoc/hooks)).
 % http_reply_from_files is here
 :- use_module(library(http/http_files)).
 % http_404 is in here
 :- use_module(library(http/http_dispatch)).
+:- use_module(library(pldoc/doc_process)).
+:- reexport(library(pldoc/doc_html)).
+:- use_module(library(pldoc/doc_wiki)).
+:- use_module(library(pldoc/doc_search)).
+:- use_module(library(pldoc/doc_util)).
+:- use_module(library(http/http_dispatch)).
+:- use_module(library(http/html_write)).
+:- use_module(library(http/html_head)).
+:- use_module(library(readutil)).
+:- use_module(library(url)).
+:- use_module(library(option)).
+:- use_module(library(lists)).
+:- use_module(library(doc_http)).
 
-:- multifile http:location/3.
-:- dynamic   http:location/3.
 
+:-  M=pldoc_process,ignore((module_property(M,file(S)),source_file(PI,S),
+   \+ ((predicate_property(M:PI,imported_from(U)),U\==M)),
+   functor(PI,F,A),import(F/A),fail)).
+
+
+:- portray_text(true).  % Enable portray of strings
 :- use_module(library(http/http_parameters)).
+
 % :- use_module(library(http/http_session)).
-:- thread_property(_,alias('http@4002'))->true; http_server(http_dispatch, [port(4002)]).
-:- http_handler(root(.), handler_cyclone, [chunked]).
+%:- thread_property(_,alias('http@3020'))->true; http_server(http_dispatch, [port(3020)]).
 
-%user:hook_one_second_timer_tick:- catch(mmake,_,true).
+:- http_handler('/logicmoo/', handler_logicmoo_cyclone, [chunked,prefix]). %  % 
 
-handler_cyclone(Request):- 
-  format('Content-type: text/html~n~n',[]),
-   print_request(Request),
-  with_assertions(thlocal:print_mode(html),logOnError(handler_cyclone_0(Request))).
-handler_cyclone_0(Request):-
-   flag(matched_assertions,_,0),
-   flag(show_asserions_offered,_,0),
-   retractall(shown_subtype(_)),
-   retractall(shown_clause(_)),
-     http_parameters(Request,[ search(Q,[  optional(true) ] )]),
+:- meta_predicate
+	handler_logicmoo_cyclone(+).
+
+handler_logicmoo_cyclone(Request):-
+     http_parameters(Request,[ search(Q,[  optional(true) ] )]),     
       make_page_for_obj(Q).
 
 print_request([]).
@@ -534,19 +98,64 @@ print_request([H|T]) :-
         format(user_error,'<tr><td>~w<td>~w~n', [Name, Value]),
         print_request(T).
 
-% <meta http-equiv="refresh" content="30;http://prologmoo.com:4002/?search=~q">
-% <link rel="SHORTCUT ICON" href="http://prologmoo.com:3602/cycdoc/img/cb/mini-logo.gif"><meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
-make_page_for_obj(Pred):- ignore(Pred=ttPredType),url_iri(PredURL,Pred), 
- format('<html><head><title>search for ~q</title></head>',[Pred]),
- format('<body class="yui-skin-sam"><strong><font face="verdana,arial,sans-serif"><font size="5">Object : </font></strong><strong><font size="5"><a href="?search=~q" target="_top">~q</a></font></strong><br/><pre>',[PredURL,Pred]),
-    logOnErrorIgnore(make_page_pretext_obj(Pred)),
- format('</pre><hr><span class="copyright"><i>Copyright &copy; 1999 - 2015 <a href="http://prologmoo.com">LogicMOO/PrologMUD</a>.  All rights reserved.</i></span></body></html>~n~n',[]).
 
-html_html_pp_ball(Color,Alt):-format(S,'<img src="http://prologmoo.com:3602/cycdoc/img/cb/~w.gif" alt="~w" align="top" border="0"></img>',[Color,Alt]).
+f_to_mfa(EF,R,F,A):-get_fa(EF,F,A),
+    (((current_predicate(_:F/A),functor(P,F,A),predicate_property(M:P,imported_from(R)))*->true;
+    current_predicate(_:F/A),functor(P,F,A),source_file(R:P,SF))),
+    current_predicate(R:F/A).
 
-make_page_pretext_obj(O):- ignore((catch(mmake,_,true))),
-  ignore((catch(pfc_listing(O),_,true))),
-  ignore((catch(pfc_lsting(O),_,true))),!.
+:-nb_setval(pldoc_options,[ prefer(manual) ]).
+
+
+% 
+% <link rel="SHORTCUT ICON" href="http://prologmoo.com/cycdoc/img/cb/mini-logo.gif"><meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
+make_page_for_obj(Obj):-
+      ignore(Obj=ttPredType),
+      get_functor(Obj,Pred,_),
+      url_iri(PredURL,Pred), 
+      flag(matched_assertions,_,0),
+      flag(show_asserions_offered,_,0),
+      retractall(shown_subtype(_)),
+      retractall(shown_clause(_)),
+      format('Content-type: text/html~n~n',[]),
+      format('<html><head><meta http-equiv="refresh" content="300;http://prologmoo.com:3020/logicmoo/?search=~q"><title>search for ~q</title></head>',[PredURL,Pred]),
+      format('<body class="yui-skin-sam"><strong><font face="verdana,arial,sans-serif"><font size="5">Object : </font></strong><strong><font size="5"><a href="?search=~q" target="_top">~q</a></font></strong><br/><pre>',[PredURL,Pred]),
+      with_assertions([thlocal:print_mode(html)],
+      ignore(( 
+         logOnFailure(make_page_pretext_obj(Obj))))),
+      format('</pre><hr><span class="copyright"><i>Copyright &copy; 1999 - 2015 <a href="http://prologmoo.com">LogicMOO/PrologMUD</a>. 
+        All rights reserved.</i></span></body></html>~n~n'
+        ,[]).
+
+
+make_page_pretext_obj(Obj):- 
+  get_functor(Obj,Pred,AA),((AA==0)->A=_;A=AA),
+   % ignore((catch(mmake,_,true))),
+  forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure(reply_object_sub_page(M:F/A)))),
+  ignore((catch(pfc_listing(Pred),_,true))),
+  forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure(lsting(M:F/A)))),!.
+
+
+reply_object_sub_page(Obj) :- phrase(object_sub_page(Obj, []), HTML), print_html(HTML),!.
+
+object_sub_page(Obj, Options) -->
+	{ doc_process:doc_comment(Obj, File:_Line, _Summary, _Comment)
+	}, !,
+	(   { \+ ( doc_process:doc_comment(Obj, File2:_, _, _),
+		   File2 \== File )
+	    }
+	->  html([ \object_synopsis(Obj, []),
+		   \objects([Obj], Options)
+		 ])
+	;   html([
+		   \objects([Obj], [synopsis(true)|Options])
+		 ])
+	).
+
+
+html_html_pp_ball(Color,Alt):-format(S,'<img src="http://prologmoo.com/cycdoc/img/cb/~w.gif" alt="~w" align="top" border="0"></img>',[Color,Alt]).
+
+
    
 :-thread_local(shown_subtype/1).
 :-thread_local(shown_clause/1).
@@ -557,7 +166,7 @@ section_close(Type):- shown_subtype(Type)->(retractall(shown_subtype(Type)),(thl
 pp_item_html(Type,done):-!,section_close(Type),!.
 pp_item_html(_,H):-shown_clause(H),!.
 pp_item_html(Type,H):- \+ thlocal:print_mode(html), pp_item_html_now(Type,H),!.
-pp_item_html(Type,H):- ignore((flag(matched_assertions,X,X),between(0,400,X),pp_item_html_now(Type,H))).
+pp_item_html(Type,H):- ignore((flag(matched_assertions,X,X),between(0,5000,X),pp_item_html_now(Type,H))).
 
 pp_item_html_now(Type,H):-    
    flag(matched_assertions,X,X+1),!,
@@ -572,98 +181,49 @@ pp_ihtml(done):-!.
 pp_ihtml(T):-string(T),format('"~w"',[T]).
 pp_ihtml((H:-true)):-pp_ihtml(H).
 pp_ihtml(was_chain_rule(H)):- pp_ihtml(H).
-pp_ihtml(is_edited_clause(H,B,A)):- pp_ihtml(proplist([(clause)=H,before=B,after=A])).
+pp_ihtml(is_edited_clause(H,B,A)):- pp_ihtml(proplst([(clause)=H,before=B,after=A])).
 pp_ihtml(is_disabled_clause(H)):- pp_ihtml((disabled)=H).
-pp_ihtml(spft(P,U,U)):- nonvar(U),!,pp_ihtml('u-deduced'=U:P).
-pp_ihtml(spft(P,F,T)):- atom(F),atom(T),!, pp_ihtml('ft-deduced'=(F,T):P).
-pp_ihtml(spft(P,F,T)):- atom(T),!,   pp_ihtml(proplist(['t-deduced'=T:P])),!.
-pp_ihtml(spft(P,F,T)):- atom(F),!,  pp_ihtml(proplist(['f-deduced'=F:P ,  template=T])).
-pp_ihtml(spft(P,F,T)):- !, pp_ihtml(proplist(['z-deduced'=P , format=F,  template=T])).
-pp_ihtml(nt(Trigger,Test,Body)) :- !, pp_ihtml(proplist(['n-trigger'=Trigger , format=Test  ,  body=Body])).
-pp_ihtml(pt(Trigger,Body)):-      pp_ihtml(proplist(['p-trigger'=Trigger ,  body=Body])).
-pp_ihtml(bt(Trigger,Body)):-      pp_ihtml(proplist(['b-trigger'=Trigger ,  body=Body])).
-pp_ihtml(proplist([N=V|Val])):- is_list(Val),!, pp_ihtml(N:-([V|Val])).
-pp_ihtml(proplist(Val)):-!, pp_ihtml(:-(proplist(Val))).
-pp_ihtml(proplist([])):-!.
-pp_ihtml(proplist([H|T])):-format('~N'),pp_ihtml(H),format('~N'),pp_ihtml(proplist(T)).
+pp_ihtml(spft(P,U,U)):- nonvar(U),!, pp_ihtml(U:P).
+pp_ihtml(spft(P,F,T)):- atom(F),atom(T),!, pp_ihtml(F:T:P).
+pp_ihtml(spft(P,F,T)):- atom(T),!,  pp_ihtml(((T:P):-  't-deduced',F)). 
+pp_ihtml(spft(P,F,T)):- atom(F),!,  pp_ihtml(((F:P):-  'f-deduced',T)). 
+pp_ihtml(spft(P,F,T)):- !, pp_ihtml((P:- ( 'deduced-from'=F,  rule_why=T))).
+pp_ihtml(nt(Trigger,Test,Body)) :- !, pp_ihtml(proplst(['n-trigger'=Trigger , format=Test  ,  body=Body])).
+pp_ihtml(pt(Trigger,Body)):-      pp_ihtml(proplst(['p-trigger'=Trigger ,  body=Body])).
+pp_ihtml(bt(Trigger,Body)):-      pp_ihtml(proplst(['b-trigger'=Trigger ,  body=Body])).
+pp_ihtml(proplst([N=V|Val])):- is_list(Val),!, pp_ihtml(N:-([clause=V|Val])).
+pp_ihtml(proplst(Val)):-!, pp_ihtml(:-(proplst(Val))).
+pp_ihtml(C):-!,rok_portray_clause(C),!.
+
+pp_ihtml(proplst([])):-!.
+pp_ihtml(proplst([H|T])):-format('~N'),pp_ihtml(H),format('~N'),pp_ihtml(proplst(T)).
 pp_ihtml(H=T):-format('~N~w = ',[H]),pp_ihtml(T).
 pp_ihtml(M:C):- (M=='';M==""),!,pp_ihtml(C),!.
 pp_ihtml(M:C):- pp_ihtml(M),format(':'),pp_ihtml(C).
-pp_ihtml(C):-  is_list(C),flag(indent,X,X),html_list_term(C),!,flag(indent,_,X).
-pp_ihtml(C):- compound(C),flag(indent,X,X),functor(C,F,A),C=..[F|ARGSZ],html_compound(F,A,ARGSZ),!,flag(indent,_,X).
-pp_ihtml(T):- atom(T),!,write_atom_link(T,T).
-pp_ihtml(T):-format('~q',[T]).
 
+
+pp_ihtml(C):-  is_list(C),flag(indent,X,X),html_lst_term(C),!,flag(indent,_,X).
+pp_ihtml(C):- compound(C),flag(indent,X,X),portray(C),!,flag(indent,_,X).
+pp_ihtml(T):- atom(T),!,write_atom_link(current_output,T,T).
+pp_ihtml(T):-format('~q',[T]).
 
 % ===================================================
 % Pretty Print Formula
 % ===================================================
 
-
-prefixed_html_term(Prefix,Pred):-format(Prefix),pp_ihtml(Pred).
-
+write_atom_link(L,N):-write_atom_link(atom(W),L,N),format('~w',W),!.
 
 % pred_href(Name/Arity, Module, HREF) :-
-write_atom_link(A/_,N):-atom(A),!,write_atom_link(A,N).
-write_atom_link(C,N):-compound(C),get_functor(C,F,A),!,write_atom_link(F/A,N).
-write_atom_link(_,N):- \+ thlocal:print_mode(html),format('~q',[N]),!.
-write_atom_link(A,N):-url_iri(URL,A),format('<a href="?search=~w">~w</a>',[URL,N]).
+write_atom_link(W,A/_,N):-atom(A),!,write_atom_link(W,A,N).
+write_atom_link(W,C,N):-compound(C),get_functor(C,F,A),!,write_atom_link(W,F/A,N).
+write_atom_link(W,_,N):- \+ thlocal:print_mode(html),format(W,'~q',[N]),!.
+write_atom_link(W,A,N):-url_iri(URL,A),format(W,'<a href="?search=~w">~w</a>',[URL,N]).
 
 indent_nbsp(X):-thlocal:print_mode(html),forall(between(0,X,_),format('&nbsp;')),!.
 indent_nbsp(X):-forall(between(0,X,_),format('~t',[])),!.
 
 indent_nl:- fresh_line, flag(indent,X,X), indent_nbsp(X).
 
-
-is_op_type(Functor, Type) :-
-	current_op(_Pri, F, Functor),
-	op_type(F, Type).
-
-op_type(fx,  prefix).
-op_type(fy,  prefix).
-op_type(xf,  postfix).
-op_type(yf,  postfix).
-op_type(xfx, infix).
-op_type(xfy, infix).
-op_type(yfx, infix).
-op_type(yfy, infix).
-
-html_compound(F,A,Args):-  \+ thlocal:print_mode(html), C=..[F|Args],portray_clause(C).
-html_compound(({}),1,[ARG1]):-
-                write_atom_link(({})/1,'{'),  indent_nl, 
-                flag(indent,X,X+1),
-                pp_ihtml(ARG1),               
-                format('}').
-
-
-html_compound(F,2,[ARG1,ARG2|ARGS]):- is_op_type(F,infix),
-                pp_ihtml(ARG1),  indent_nbsp(1), write_atom_link(F/2,F),  
-                 indent_nl, pp_ihtml(ARG2), ignore(maplist(prefixed_html_term(', '), ARGS)),!.
-
-html_compound(F,1,[ARG1|ARGS]):- is_op_type(F,prefix), 
-                 write_atom_link(F/1,F),  indent_nl, 
-                 pp_ihtml(ARG1), indent_nbsp(1),
-                 ignore(maplist(prefixed_html_term(', '), ARGS)),!.
-
-html_compound(F,1,[ARG1]):- is_op_type(F,postfix),
-                 pp_ihtml(ARG1), write_atom_link(F/1,F).
-
-
-html_compound(F,A,[ARG1|ARGS]):-                        
-                write_atom_link(F/A,F),
-                format('('),
-                flag(indent,X,X+1),
-                pp_ihtml(ARG1),               
-                ignore(maplist(prefixed_html_term(', '), ARGS)),!,
-                format(')').
-
-html_list_term([ARG1|ARGS]):-
-                format('['),
-                flag(indent,X,X+1),
-                pp_ihtml(ARG1),               
-                ignore(maplist(prefixed_html_term(', '), ARGS)),!,
-                format(']').
-                
 
 
 
@@ -710,6 +270,9 @@ writeMarkup(Term,Chars):- logOnError(toMarkup(html,Term,_,Chars)).
 % PrologVaraibles list is the equal list as produced by read/3  [=(Name,Val)|...]
 % Output is an CharicterAtom (the difference is this atom is not added the the symbol table)
 % ===================================================================
+
+	
+
 % ===================================================================
 % term_to_leml(-Prolog, +Output)
 %
@@ -791,7 +354,7 @@ isQualifiedAs(Denotation,BaseType,Value,SubType):-
 
 lastImproperMember(Default,Default,List):-isVarProlog(List),!.
 lastImproperMember(Default,Default,[]):-!.
-lastImproperMember(Default,SubType,List):-proper_list(List),last(SubType,List).
+lastImproperMember(Default,SubType,List):-proper_lst(List),last(SubType,List).
 lastImproperMember(Default,SubType,[SubType|End]):-isVarProlog(End),!.
 lastImproperMember(Default,SubType,[_|Rest]):-
 	lastImproperMember(Default,SubType,Rest),!.
@@ -824,7 +387,7 @@ isQualifiedAndVarAndUnifiable(Denotation,BaseType,NValue):-
 isBodyConnective(Funct):-atom_concat(_,'_',Funct),!.
 isBodyConnective(Funct):-atom_concat('t~',_,Funct),!.
 isBodyConnective(Funct):-atom_concat('f~',_,Funct),!.
-isBodyConnective(Funct):-member(Funct,[and,or,until,',',';',':-',unless,xor,holdsDuring]). % Other Propositional Wrahtml_ppers
+isBodyConnective(Funct):-member(Funct,[and,or,until,',',';',':-',unless,xor,holdsDuring]). % Other Propositional Wrhtml_appers
 
 isEntityref(Var,Var):-isSlot(Var),!.
 isEntityref(Term,A):-Term=..[F,A,B],!,atom_concat('$',_,F),!.
@@ -864,9 +427,9 @@ isEntityFunction(Term,FnT,ArgsT):-Term=..[FnT|ArgsT],hlPredicateAttribute(FnT,'F
 
 getPrologVars(Term, Vars, Singletons, Multiples) :-
     ((getPrologVars(Term, VarList, []),
-    close_list(VarList),
+    close_lst(VarList),
     keysort(VarList, KeyList),
-    split_key_list(KeyList, Vars, Singletons, Multiples))).
+    split_key_lst(KeyList, Vars, Singletons, Multiples))).
 
 getPrologVars(Term,  [Term - x|V], V) :-isVarProlog(Term),!.
 getPrologVars(Term, V, V) :-not(compound(Term)),!.
@@ -892,9 +455,9 @@ getPrologVars(I, N, Term, V0, V) :-
 
 getAllPrologVars(Term, Vars, Singletons, Multiples) :-
     ((getAllPrologVars(Term, VarList, []),
-    close_list(VarList),
+    close_lst(VarList),
     keysort(VarList, KeyList),
-    split_key_list(KeyList, Vars, Singletons, Multiples))).
+    split_key_lst(KeyList, Vars, Singletons, Multiples))).
 
 getAllPrologVars(Term,  [Term - x|V], V) :-isVarProlog(Term),!.
 getAllPrologVars(Term, V, V) :-not(compound(Term)),!.
@@ -915,9 +478,9 @@ getAllPrologVars(I, N, Term, V0, V) :-
 
 getSlots(Term, Vars, Singletons, Multiples) :-
     ((getSlots(Term, VarList, []),
-    close_list(VarList),
+    close_lst(VarList),
     keysort(VarList, KeyList),
-    split_key_list(KeyList, Vars, Singletons, Multiples))).
+    split_key_lst(KeyList, Vars, Singletons, Multiples))).
 
 getSlots(Term,  [Term - x|V], V) :-isVarProlog(Term),!.
 getSlots(Term, V, V) :-not(compound(Term)),!.
@@ -967,9 +530,9 @@ to_codes(C,C).
 
 getConstants(Types,Term, Vars, Singletons, Multiples) :-
     ((getConstants(Types,Term, VarList, []),
-    close_list(VarList),
+    close_lst(VarList),
     keysort(VarList, KeyList),
-    split_key_list(KeyList, Vars, Singletons, Multiples))).
+    split_key_lst(KeyList, Vars, Singletons, Multiples))).
 
 getConstants(Types,Term, [Term - x|V], V) :- getConstants(Types,Term),!.
 getConstants(Types,Term, V, V) :- var(Term),!.
@@ -977,8 +540,8 @@ getConstants(Types,Term,  FOUND, V) :-
             Term=..[L,I|ST],
             getConstants(Types,L, VL, []),
             consts_l(Types,[I|ST], FLIST),
-            ahtml_ppend(V,FLIST,UND),
-            ahtml_ppend(VL,UND,FOUND),!.
+            html_append(V,FLIST,UND),
+            html_append(VL,UND,FOUND),!.
 
 getConstants(Types,Term, V, V) :- !.
     
@@ -986,7 +549,7 @@ consts_l(Types,[],[]).
 consts_l(Types,[L|IST], FLIST):-
          getConstants(Types,L, FOUND,[]), 
          consts_l(Types,IST, FOUNDMore), !,
-         ahtml_ppend(FOUND,FOUNDMore,FLIST).
+         html_append(FOUND,FOUNDMore,FLIST).
 
     
 getConstants(_,('.')):-!,fail.
@@ -1039,9 +602,9 @@ toMarkup(_,'deduced',Vars,' ').
 toMarkup(L,[],Vars,Atom):-toMarkup(L,'NullSet',Vars,Atom).
 %toMarkup(html,[Su|Bj],Vars,Chars):-toMarkupList(html,[Su|Bj],Vars,Chars1),sformat(Chars,'<div>(<ul>~w </ul>)</div>',[Chars1]).
 
-close_varlist([]):-!.
-close_varlist('$VAR'(_)):-!.
-close_varlist([V|VV]):-close_varlist(VV),!.
+close_varlst([]):-!.
+close_varlst('$VAR'(_)):-!.
+close_varlst([V|VV]):-close_varlst(VV),!.
 
 
 toMarkup(html,option(Option),Vars,Chars):-sformat(Chars,'<option value="~w">~w</option>',[Option,Option]).
@@ -1119,7 +682,7 @@ toMarkupSlot(L,Slot,VarList,Chars):- isVarProlog(Slot),!,
 toMarkupSlot(L,Slot,VarList,Chars):-isQualifiedAs(Slot,BaseType,Value,Subtype), !,
         toMarkup_makeName(L,VarList,Slot,Subtype,Value,Name),
         close_freeVars(VarList,NVarList),
-        ahtml_ppend(NVarList,[Name=Value],NV),
+        html_append(NVarList,[Name=Value],NV),
         toMarkup(L,Value,NV,VChars),
         sformat(Chars,'<div title="~w">~w</div>',[Subtype,VChars]).
 
@@ -1140,7 +703,7 @@ toMarkup_makeName(L,VarList,Slot,BaseType,Value,Name):-atom_concat('?',BaseType,
 
 
 
-close_freeVars(V,V):-proper_list(V),!.
+close_freeVars(V,V):-proper_lst(V),!.
 close_freeVars(V,[]):-isSlot(V),!. %Closing List if there are no free getPrologVars
 close_freeVars([X|XX],[X|More]):- close_freeVars(XX,More).
 
@@ -1179,11 +742,11 @@ toMarkupFormula(L,string(Atom),Vars,Chars):-!,sformat(Chars,'"~w"',[Atom]).
 toMarkupFormula(L,'$stringCodes'(Atom),Vars,Chars):-!,sformat(Chars,'"~w"',[Atom]).
 toMarkupFormula(L,'$stringSplit'(List),Vars,Chars):-
       toMarkupList(L,List,Vars,Chars1),sformat(Chars,'"~w"',[Chars1]).
-toMarkupFormula(L,Atom,_VS,Chars):-((isCharCodelist(Atom);string(Atom);is_string(Atom))),!,
+toMarkupFormula(L,Atom,_VS,Chars):-((isCharCodelst(Atom);string(Atom);is_string(Atom))),!,
 %        catch(sformat(Chars,'"~s"',[Atom]),_,sformat(Chars,'"~w"',[Atom])).
         catch(sformat(Chars,'~s',[Atom]),_,sformat(Chars,'~w',[Atom])).
 
-isCharCodelist([]).  isCharCodelist([A|T]):-integer(A),A>9,A<128,isCharCodelist(T).
+isCharCodelst([]).  isCharCodelst([A|T]):-integer(A),A>9,A<128,isCharCodelst(T).
 
 
 toMarkupFormula(bach,float(Atom),_VS,Chars):-float(Atom) -> sformat(Chars,'~f',[Atom]);sformat(Chars,'~w',[Atom]).
@@ -1307,11 +870,11 @@ toMarkupFormula(L,'$eval'(Function),Vars,O):-!,
 toMarkupFormula(L,functional(VarName,Domains,Literal),Vars,O):-
         toMarkup(L,Literal,Vars,O),!.
 
-close_list_var(M,[]):-isSlot(M),!.
-close_list_var([[M]|Ms],[M|Ls]):-!,
-        close_list_var(Ms,Ls).
-close_list_var([M|Ms],[M|Ls]):-!,
-        close_list_var(Ms,Ls).
+close_lst_var(M,[]):-isSlot(M),!.
+close_lst_var([[M]|Ms],[M|Ls]):-!,
+        close_lst_var(Ms,Ls).
+close_lst_var([M|Ms],[M|Ls]):-!,
+        close_lst_var(Ms,Ls).
 
 
       
@@ -1367,7 +930,7 @@ toMarkupFormula(bach,[Bj|More],Vars,Chars):-!,
 	 toMarkupFormula(bach,More,Vars,Chars2),
         sformat(Chars,'~w,~w',[Chars1,Chars2]).
 
-%toMarkupFormula(L,[A | B],Vars,Chars):-proper_list([A | B]),ahtml_ppend(['('|[A | B],[')'],TRY),toMarkupList(L,[Su|Bj],Vars,Chars).
+%toMarkupFormula(L,[A | B],Vars,Chars):-proper_lst([A | B]),html_append(['('|[A | B],[')'],TRY),toMarkupList(L,[Su|Bj],Vars,Chars).
 %toMarkupFormula(L,[A | B],Vars,Chars):-catch(TRY=..['',A | B],_,fail),toMarkupFormula(L,TRY,Varsr,Chars),!.
 %toMarkupFormula(L,[A | B],Vars,Chars):-catch(TRY=..[A | B],_,fail),toMarkupFormula(L,TRY,Vars,Chars),!.
 %toMarkupFormula(L,[A | B],Vars,Chars):-catch(TRY=..[A | B],_,fail),toMarkupFormula(L,TRY,Vars,Chars),!.
@@ -1587,5 +1150,1054 @@ toMarkupFormula(L,list(ARGS),Vars,Chars):-
                 make_args_out(L,ARGS,Vars,ArgsOut),!,
                 sformat(Chars,'~w[~w]',[PreOut,ArgsOut]), !,
                 flag(indent,NX,NX-1).
+
+
+
+
+/*
+
+
+
+
+
+
+%   File   : WRITE.PL
+%   Author : Richard A. O'Keefe.
+%   Updated: 22 October 1984
+%   Purpose: Portable definition of write/1 and friends.
+
+:- public
+	portable_display/1,
+	portable_listing/0,
+	portable_listing/1,
+	portable_print/1,
+	portable_write/1,
+	portable_writeq/1,
+	rok_portray_clause/1.
+
+:- meta_predicate
+	classify_name(+, -),
+	classify_alpha_tail(+),
+	classify_other_tail(+),
+	'functor spec'(+, -, -, -),
+	'list clauses'(+, +, +, +),
+	'list magic'(+, +),
+	'list magic'(+, +, +),
+	'list magic'(+, +, +, +),
+	maybe_paren(+, +, +, +, -),
+	maybe_space(+, +),
+	rok_portray_clause(+),
+	put_string(+),
+	put_string(+, +),
+	write_args(+, +, +, +, +),
+	write_atom(+, +, +, -),
+	write_oper(+, +, +, +, -),
+	write_out(+, +, +, +, -),
+	write_out(+, +, +, +, +, +, -),
+	write_tail(+, +),
+	write_VAR(+, +, +, -),
+	write_variable(?).
+*/
+     
+
+/*  WARNING!
+    This file was written to assist portability and to help people
+    get a decent set of output routines off the ground fast.  It is
+    not particularly efficient.  Information about atom names and
+    properties should be precomputed and fetched as directly as
+    possible, and strings should not be created as lists!
+
+    The four output routines differ in the following respects:
+    [a] display doesn't use operator information or handle {X} or
+	[H|T] specially.  The others do.
+    [b] print calls portray/1 to give the user a chance to do
+	something different.  The others don't.
+    [c] writeq puts quotes around atoms that can't be read back.
+	The others don't.
+    Since they have such a lot in common, we just pass around a
+    single Style argument to say what to do.
+
+    In a Prolog which supports strings;
+	write(<string>) should just write the text of the string, this so
+	that write("Beware bandersnatch") can be used.  The other output
+	commands should quote the string.
+
+    listing(Preds) is supposed to write the predicates out so that they
+    can be read back in exactly as they are now, provided the operator
+    declarations haven't changed.  So it has to use writeq.  $VAR(X)
+    will write the atom X without quotes, this so that you can write
+    out a clause in a readable way by binding each input variable to
+    its name.
+*/
+
+
+portable_display(Term) :-
+	write_out(Term, display, 1200, punct, _).
+
+
+portable_print(Term) :-
+	write_out(Term, print, 1200, punct, _).
+
+
+portable_write(Term) :-
+	write_out(Term, write, 1200, punct, _).
+
+
+portable_writeq(Term) :-
+	write_out(Term, writeq, 1200, punct, _).
+
+
+
+%   maybe_paren(P, Prio, Char, Ci, Co)
+%   writes a parenthesis if the context demands it.
+
+maybe_paren(P, Prio, Char, _, punct) :-
+	P > Prio,
+	!,
+	put(Char).
+maybe_paren(_, _, _, C, C).
+
+
+
+%   maybe_space(LeftContext, TypeOfToken)
+%   generates spaces as needed to ensure that two successive
+%   tokens won't run into each other.
+
+maybe_space(punct, _) :- !.
+maybe_space(X, X) :- !,
+	put(32).
+maybe_space(quote, alpha) :- !,
+	put(32).
+maybe_space(_, _).
+
+
+
+%   put_string(S)
+%   writes a list of character codes.
+
+put_string([]).
+put_string([H|T]) :-
+	put(H),
+	put_string(T).
+
+
+%   put_string(S, Q)
+%   writes a quoted list of character codes, where the first
+%   quote has already been written.  Instances of Q in S are doubled.
+
+put_string([], Q) :-
+	put(Q).
+put_string([Q|T], Q) :- !,
+	put(Q), put(Q),
+	put_string(T, Q).
+put_string([H|T], Q) :-
+	put(H),
+	put_string(T, Q).
+
+
+
+%   write_variable(V)
+%   is system dependent.  This just uses whatever Prolog supplies.
+
+write_variable(V) :-
+	write(V).
+
+
+
+%   write_out(Term, Style, Priority, Ci, Co)
+%   writes out a Term in a given Style (display,write,writeq,print)
+%   in a context of priority Priority (that is, operators with
+%   greater priority have to be quoted), where the last token to be
+%   written was of type Ci, and reports that the last token it wrote
+%   was of type Co.
+
+write_out(Term, _, _, Ci, alpha) :-
+	var(Term),
+	!,
+	maybe_space(Ci, alpha),
+	write_variable(Term).
+write_out('$VAR'(N), Style, _, Ci, Co) :- !,
+	write_VAR(N, Style, Ci, Co).
+write_out(N, _, _, Ci, alpha) :-
+	integer(N),
+	(   N < 0, maybe_space(Ci, other)
+	;   maybe_space(Ci, alpha)
+	),  !,
+	name(N, String),
+	put_string(String).
+write_out(Term, print, _, Ci, alpha) :-
+	portray(Term),
+	!.
+write_out(Atom, Style, Prio, _, punct) :-
+	atom(Atom),
+	current_op(P, _, Atom),
+	P > Prio,
+	!,
+	put(40),
+	(   Style = writeq, write_atom(Atom, Style, punct, _)
+	;   name(Atom, String), put_string(String)
+	),  !,
+	put(41).
+write_out(Atom, Style, _, Ci, Co) :-
+	atom(Atom),
+	!,
+	write_atom(Atom, Style, Ci, Co).
+write_out(Term, display, _, Ci, punct) :- !,
+	functor(Term, Fsymbol, Arity),
+	write_atom(Fsymbol, display, Ci, _),
+	write_args(0, Arity, Term, 40, display).
+write_out({Term}, Style, _, _, punct) :- !,
+	put(123),
+	write_out(Term, Style, 1200, punct, _),
+	put(125).
+write_out([Head|Tail], Style, _, _, punct) :- !,
+	put(91),
+	write_out(Head, Style, 999, punct, _),
+	write_tail(Tail, Style).
+write_out((A,B), Style, Prio, Ci, Co) :- !,
+	%  This clause stops writeq quoting commas.
+	maybe_paren(1000, Prio, 40, Ci, C1),
+	write_out(A, Style, 999, C1, _),
+	put(44),
+	write_out(B, Style, 1000, punct, C2),
+	maybe_paren(1000, Prio, 41, C2, Co).
+write_out(Term, Style, Prio, Ci, Co) :-
+	functor(Term, F, N),
+	write_out(N, F, Term, Style, Prio, Ci, Co).
+
+
+write_out(1, F, Term, Style, Prio, Ci, Co) :-
+	(   current_op(O, fx, F), P is O-1
+	;   current_op(O, fy, F), P = O
+	),  !,
+	maybe_paren(O, Prio, 40, Ci, C1),
+	write_atom(F, Style, C1, C2),
+	arg(1, Term, A),
+	write_out(A, Style, P, C2, C3),
+	maybe_paren(O, Prio, 41, C3, Co).
+write_out(1, F, Term, Style, Prio, Ci, Co) :-
+	(   current_op(O, xf, F), P is O-1
+	;   current_op(O, yf, F), P = O
+	),  !,
+	maybe_paren(O, Prio, 40, Ci, C1),
+	arg(1, Term, A),
+	write_out(A, Style, P, C1, C2),
+	write_atom(F, Style, C2, C3),
+	maybe_paren(O, Prio, 41, C3, Co).
+write_out(2, F, Term, Style, Prio, Ci, Co) :-
+	(   current_op(O, xfy, F), P is O-1, Q = O
+	;   current_op(O, xfx, F), P is O-1, Q = P
+	;   current_op(O, yfx, F), Q is O-1, P = O
+	),  !,
+	maybe_paren(O, Prio, 40, Ci, C1),
+	arg(1, Term, A),
+	write_out(A, Style, P, C1, C2),
+	write_oper(F, O, Style, C2, C3),
+	arg(2, Term, B),
+	write_out(B, Style, Q, C3, C4),
+	maybe_paren(O, Prio, 41, C4, Co).
+write_out(N, F, Term, Style, Prio, Ci, punct) :-
+	write_atom(F, Style, Ci, _),
+	write_args(0, N, Term, 40, Style).
+
+
+write_oper(Op, Prio, Style, Ci, Co) :-
+	Prio < 700, !,
+	write_atom(Op, Style, Ci, Co).
+write_oper(Op, _, Style, Ci, punct) :-
+	put(32),
+	write_atom(Op, Style, punct, _),
+	put(32).
+
+
+write_VAR(N, Style, Ci, alpha) :-
+	integer(N), N >= 0, !,
+	maybe_space(Ci, alpha),
+	Letter is N mod 26 + 65,
+	put(Letter),
+	(   N < 26
+	;   Rest is N/26, name(Rest, String),
+	    put_string(String)
+	), !.
+write_VAR(A, Style, Ci, Co) :-
+	atom(A), !,
+	write_atom(A, write, Ci, Co).
+write_VAR(X, Style, Ci, punct) :-
+	write_atom('$VAR', Style, Ci, _),
+	write_args(0, 1, '$VAR'(X), 40, Style).
+
+
+
+write_atom(('!'), _, _, punct) :- !,
+	put(33).
+write_atom((';'), _, _, punct) :- !,
+	put(59).
+write_atom([], _, _, punct) :- !,
+	put(91), put(93).
+write_atom({}, _, _, punct) :- !,
+	put(123), put(125).
+write_atom(A,B,C,D):- write_atom_link(A,A),!.
+write_atom(Atom, Style, Ci, Co) :-
+	name(Atom, String),
+	(   classify_name(String, Co),
+	    maybe_space(Ci, Co),
+	    put_string(String)
+	;   Style = writeq, Co = quote,
+	    maybe_space(Ci, Co),
+	    put(39), put_string(String, 39)
+	;   Co = alpha,
+	    put_string(String)
+	),  !.
+
+%   classify_name(String, Co)
+%   says whether a String is an alphabetic identifier starting
+%   with a lower case letter (Co=alpha) or a string of symbol characters
+%   like ++/=? (Co=other).  If it is neither of these, it fails.  That
+%   means that the name needs quoting.  The special atoms ! ; [] {} are
+%   handled directly in write_atom.  In a basic Prolog system with no
+%   way of changing the character classes this information can be
+%   calculated when an atom is created, and just looked up.  This has to
+%   be as fast as you can make it.
+
+classify_name([H|T], alpha) :-
+	H >= 97, H =< 122,
+	!,
+	classify_alpha_tail(T).
+classify_name([H|T], other) :-
+	memberchk(H, "#$&=-~^\`@+*:<>./?"),
+	classify_other_tail(T).
+
+classify_alpha_tail([]).
+classify_alpha_tail([H|T]) :-
+	(  H >= 97, H =< 122
+	;  H >= 65, H =< 90
+	;  H >= 48, H =< 57
+	;  H =:= 95
+	), !,
+	classify_alpha_tail(T).
+
+classify_other_tail([]).
+classify_other_tail([H|T]) :-
+	memberchk(H, "#$&=-~^\`@+*:<>./?"),
+	classify_other_tail(T).
+
+
+
+%   write_args(DoneSoFar, Arity, Term, Separator, Style)
+%   writes the remaining arguments of a Term with Arity arguments
+%   all told in Style, given that DoneSoFar have already been written.
+%   Separator is 0'( initially and later 0', .
+
+write_args(N, N, _, _, _) :- !,
+	put(41).
+write_args(I, N, Term, C, Style) :-
+	put(C),
+	J is I+1,
+	arg(J, Term, A),
+	write_out(A, Style, 999, punct, _),
+	write_args(J, N, Term, 44, Style).
+
+
+
+%   write_tail(Tail, Style)
+%   writes the tail of a list of a given style.
+
+write_tail(Var, _) :-			%  |var]
+	var(Var),
+	!,
+	put(124),
+	write_variable(Var),
+	put(93).
+write_tail([], _) :- !,			%  ]
+	put(93).
+write_tail([Head|Tail], Style) :- !,	%  ,Head tail
+	put(44),
+	write_out(Head, Style, 999, punct, _),
+	write_tail(Tail, Style).
+write_tail(Other, Style) :-		%  |junk]
+	put(124),
+	write_out(Other, Style, 999, punct, _),
+	put(93).
+
+
+/*  The listing/0 and listing/1 commands are based on the Dec-10
+    commands, but the format they generate is based on the "pp" command.
+    The idea of rok_portray_clause/1 came from PDP-11 Prolog.
+
+    BUG: the arguments of goals are not separated by comma-space but by
+    just comma.  This should be fixed, but I haven't the time right not.
+    Run the output through COMMA.EM if you really care.
+
+    An irritating fact is that we can't guess reliably which clauses
+    were grammar rules, so we can't print them out in grammar rule form.
+
+    We need a proper pretty-printer that takes the line width into
+    acount, but it really isn't all that feasible in Dec-10 Prolog.
+    Perhaps we could use some ideas from NIL?
+*/
+
+portable_listing :-
+	current_predicate(_, Pred),
+	nl,
+	clause(Pred, Body),
+	rok_portray_clause((Pred:-Body)),
+	fail.
+portable_listing.
+
+
+%   listing(PredSpecs)
+
+%   Takes a predicate specifier F/N, a partial specifier F, or a
+%   list of such things, and lists each current_predicate Pred
+%   matching one of these specifications.
+
+portable_listing(V) :-
+	var(V), !.       % ignore variables
+portable_listing([]) :- !.
+portable_listing([X|Rest]) :- !,
+	portable_listing(X),
+	portable_listing(Rest).
+portable_listing(X) :-
+	'functor spec'(X, Name, Low, High),
+	current_predicate(Name, Pred),
+	functor(Pred, _, N),
+	N >= Low, N =< High,
+	nl, 
+	clause(Pred, Body),
+	rok_portray_clause((Pred:-Body)),
+	fail.
+portable_listing(_).
+
+
+'functor spec'(Name/Low-High, Name, Low, High) :- !.
+'functor spec'(Name/Arity, Name, Arity, Arity) :- !.
+'functor spec'(Name, Name, 0, 255).
+
+
+rok_portray_clause(:-(Command)) :-
+	(   Command = public(Body), Key = (public)
+	;   Command = mode(Body),   Key = (mode)
+	;   Command = type(Body),   Key = (type)
+	;   Command = pred(Body),   Key = (pred)
+	;   Command = Body,	    Key = ''
+	),  !,
+	nl,
+	numbervars(Body, 0, _),
+	'list clauses'(Body, Key, 2, 8).
+rok_portray_clause((Pred:-Body)) :-
+	numbervars(Pred+Body, 0, _),
+	portable_writeq(Pred),
+	'list clauses'(Body, 0, 2, 8), !.
+rok_portray_clause((Pred)) :-
+	rok_portray_clause((Pred:-true)).
+
+
+'list clauses'((A,B), L, R, D) :- !,
+	'list clauses'(A, L, 1, D), !,
+	'list clauses'(B, 1, R, D).
+'list clauses'(true, L, 2, D) :- !,
+	put(0'.), nl.
+'list clauses'((A;B), L, R, D) :- !,
+	'list magic'(fail, L, D),
+	'list magic'((A;B), 0, 2, D),
+	'list magic'(R, '.
+').
+'list clauses'((A->B), L, R, D) :- !,
+	'list clauses'(A, L, 5, D), !,
+	'list clauses'(B, 5, R, D).
+'list clauses'(Goal, L, R, D) :-
+	'list magic'(Goal, L, D),
+	portable_writeq(Goal),
+	'list magic'(R, '.
+').
+
+'list magic'(!,    0, D) :- !,
+	write(' :- ').
+'list magic'(!,    1, D) :- !,
+	write(',  ').
+'list magic'(Goal, 0, D) :- !,
+	write(' :- '),
+	nl, tab(D).
+'list magic'(Goal, 1, D) :- !,
+	put(0',),
+	nl, tab(D).
+'list magic'(Goal, 3, D) :- !,
+	write('(   ').
+'list magic'(Goal, 4, D) :- !,
+	write(';   ').
+'list magic'(Goal, 5, D) :- !,
+	write(' ->'),
+	nl, tab(D).
+'list magic'(Goal, Key, D) :-
+	atom(Key),
+	write(':- '), write(Key),
+	nl, tab(D).
+
+
+'list magic'(2, C) :- !, write(C).
+'list magic'(_, _).
+
+
+'list magic'((A;B), L, R, D) :- !,
+	'list magic'(A, L, 1, D), !,
+	'list magic'(B, 1, R, D).
+'list magic'(Conj,  L, R, D) :-
+	E is D+8,
+	M is L+3,
+	'list clauses'(Conj, M, 1, E),
+	nl, tab(D),
+	'list magic'(R, ')').
+
+
+/*	Test code for rok_portray_clause.
+	If it works, test_portray_clause(File) should write out the
+	contents of File in a more or less readable fashion.
+
+test_portray_clause(File) :-
+	see(File),
+	repeat,
+	    read(Clause, Vars),
+	    (   Clause = end_of_file
+	    ;   test_bind(Vars), rok_portray_clause(Clause), fail
+	    ),
+	!,
+	seen.
+
+test_bind([]) :- !.
+test_bind([X='$VAR'(X)|L]) :-
+	test_bind(L).
+:-public test_portray_clause/1.
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%   File   : CLAUSE
+%   Author : R.A.O'Keefe
+%   Updated: 10 March 1984
+%   Purpose: Convert a formula in FOPC to clausal form.
+%   Needs  : ord_union/3 from UTIL:ORDSET.PL.
+
+/*----------------------------------------------------------------------
+
+    This module has three entry points:
+	clausal_form(Formula, Clauses)
+	clausal_form_of_negation(Formula, Clauses)
+	units_separated(Clauses, PosUnits, NegUnits, NonUnits)
+
+    The Formula is an <expr>, where
+	<expr> ::= all(<variable>, <expr>)
+		|  some(<variable>, <expr>)
+		|  <expr> => <expr>
+		|  <expr> <=> <expr>
+		|  if(<expr>,<expr>,<expr>)
+		|  <expr> and <expr>
+		|  <expr> or <expr>
+		|  ~ <expr>
+		|  <atom>
+
+	<atom> ::= <predicate>(<term>,...,<term>)
+
+	<term> ::= <variable>
+		|  <constant>
+		|  <functor>(<term>,...,<term>)
+
+    The Clauses are a sentence, where
+	<sentence> ::= []			(true)
+		|  <clause> . <sentence>	(and)
+
+	<clause> ::= clause(<atoms>, <atoms>)
+	<atoms> ::= [] | <atom> . <atoms>
+
+    Note that this representation of a clause is not quite the
+    usual one.  clause([a,b,c], [d,e,f]) represents
+	a v b v c <- d & e & f
+    or, if you don't like "Kowalski form",
+	a v b v c v ~d v ~e v ~f
+
+    The reason for the two entry points is that the formula may
+    contain free variables, these are to be understood as being
+    universally quantified, and the negation of the universal
+    closure of a formula is not at all the same thing as the
+    universal closure of the negation!
+
+    units_separated takes a list of clauses such as the other two predicates
+    might produce, and separates them into a list of positive unit clauses
+    (represented just by <atom>s), a list of negative unit clauses (also
+    represented by their single <atom>s), and a list of non-unit clauses.
+    Some theorem provers might find this separation advantageous, but it is
+    not buillt into clausal_form becauses some provers would not benefit.
+
+----------------------------------------------------------------------*/
+/*
+:- public
+	clausal_form/2,
+	clausal_form_of_negation/2,
+	units_seaparated/4.
+
+:- mode
+	clausal_form(+, -),
+	clausal_form_of_negation(+, -),
+	    pass_one(+, -),
+		pass_one(+, +, -),
+		pass_one(+, -, +, +, -),
+		term_one(+, +, +, -),
+		    term_one(+, +, +, +, -),
+	    pass_two(+, -),
+		pass_two_pos(+, -),
+		pass_two_pos(+, -, +, +),
+		    term_two(+, -, +),
+			term_var(+, +, -),
+			term_two(+, +, +, +),
+		pass_two_neg(+, -, +, +),
+		    sent_and(+, +, -),
+		    sent_or(+, +, -),
+	units_separated(+, -, -, -),
+	contains(+, ?),
+	literally_contains(+, +),
+	does_not_literally_contain(+, ?).
+*/
+
+:- op(700, xfx, [contains,literally_contains,does_not_literally_contain]).
+:- op(910,  fy, ~).
+:- op(920, xfy, and).
+:- op(930, xfy, or).
+:- op(940, xfx, [=>, <=>]).
+
+
+units_separated([], [], [], []).
+units_separated([clause([],[Neg])|Clauses], PosL, [Neg|NegL], NonL) :- !,
+	units_separated(Clauses, PosL, NegL, NonL).
+units_separated([clause([Pos],[])|Clauses], [Pos|PosL], NegL, NonL) :- !,
+	units_separated(Clauses, PosL, NegL, NonL).
+units_separated([Clause|Clauses], PosL, NegL, [Clause|NonL]) :-
+	units_separated(Clauses, PosL, NegL, NonL).
+
+
+clausal_form(Formula, Clauses) :-
+	pass_one(Formula, ClosedAndImplicationFree),
+	pass_two(ClosedAndImplicationFree, Clauses).
+
+
+clausal_form_of_negation(Formula, Clauses) :-
+	pass_one(Formula, ClosedAndImplicationFree),
+	pass_two(~ClosedAndImplicationFree, Clauses).
+
+
+/*----------------------------------------------------------------------
+
+    The first pass over the formula does two things.
+    1a. It locates the free variables of the formula.
+    2.  It applies the rules
+	    A => B	--> B v ~A
+	    A <=> B	--> (B v ~A) /\ (A v ~B)
+	    if(A,B,C)	--> (B v ~A) /\ (A v C)
+	to eliminate implications.  Even in a non-clausal
+	theorem prover this can be a good idea, eliminating
+	<=> and if is essential if each subformula is to
+	have a definite parity, and that in turn is vital
+	if we are going to replace existential quantifiers
+	by Skolem functions.
+    1b. It adds explicit quantifiers for the free variables.
+    The predicate which does all this is pass_one/5:
+	pass_one(+Formula,		% The original formula
+		 -Translation,		% its implication-free equivalent
+		 +Bound,		% The binding environment
+		 +Free0,		% The variables known to be free
+		 -Free)			% Free0 union Formula's free variables
+    The binding environment just tells us which variables occur in quantifiers
+    dominating this subformula, it doesn't matter yet whether they're
+    universal or existential.
+
+    The translated formula is still an <expr>, although there are practical
+    advantages to be gained by adopting a slightly different representation,
+    but the neatness of being able to say that
+	pass_one(F, G) --> pass_one(G, G)
+    outweighs them.
+
+----------------------------------------------------------------------*/
+
+pass_one(Formula, ClosedAndImplicationFree) :-
+	pass_one(Formula, ImplicationFree, [], [], FreeVariables),
+	pass_one(FreeVariables, ImplicationFree, ClosedAndImplicationFree).
+
+
+pass_one([], Formula, Formula).
+pass_one([Var|Vars], Formula, all(Var,Closure)) :-
+	pass_one(Vars, Formula, Closure).
+
+
+pass_one(all(Var,B), all(Var,D), Bound, Free0, Free) :- !,
+	pass_one(B, D, [Var|Bound], Free0, Free).
+pass_one(some(Var,B), some(Var,D), Bound, Free0, Free) :- !,
+	pass_one(B, D, [Var|Bound], Free0, Free).
+pass_one(A and B, C and D, Bound, Free0, Free) :- !,
+	pass_one(A, C, Bound, Free0, Free1),
+	pass_one(B, D, Bound, Free1, Free).
+pass_one(A or B, C or D, Bound, Free0, Free) :- !,
+	pass_one(A, C, Bound, Free0, Free1),
+	pass_one(B, D, Bound, Free1, Free).
+pass_one(A => B, D or ~C, Bound, Free0, Free) :- !,
+	pass_one(A, C, Bound, Free0, Free1),
+	pass_one(B, D, Bound, Free1, Free).
+pass_one(A <=> B, (D or ~C) and (C or ~D), Bound, Free0, Free) :- !,
+	pass_one(A, C, Bound, Free0, Free1),
+	pass_one(B, D, Bound, Free1, Free).
+pass_one(if(T,A,B), (C or ~U) and (D or U), Bound, Free0, Free) :- !,
+	pass_one(T, U, Bound, Free0, Free1),
+	pass_one(A, C, Bound, Free1, Free2),
+	pass_one(B, D, Bound, Free2, Free).
+pass_one(~A, ~C, Bound, Free0, Free) :- !,
+	pass_one(A, C, Bound, Free0, Free).
+pass_one(Atom, Atom, Bound, Free0, Free) :-
+	%   An Atom is "anything else".  If Atoms were explicitly flagged,
+	%   say by being written as +Atom, we wouldn't need those wretched
+	%   cuts all over the place.  The same is true of pass_two.
+	term_one(Atom, Bound, Free0, Free).
+
+
+%   term_one/4 scans a term which occurs in a context where some
+%   variables are Bound by quantifiers and some free variables (Free0)
+%   have already been discovered.  Free is returned as the union of the
+%   free variables in this term with Free0.  Note that though we call
+%   does_not_literally_contain twice, it is doing two different things.
+%   The first call determines that the variable is free.  The second
+%   call is part of adding an element to a set, which could perhaps have
+%   been a binary tree or some other data structure.
+
+term_one(Term, Bound, Free0, Free) :-
+	nonvar(Term),
+	functor(Term, _, Arity),
+	!,
+	term_one(Arity, Term, Bound, Free0, Free).
+term_one(Var, Bound, Free0, [Var|Free0]) :-
+	Bound does_not_literally_contain Var,
+	Free0 does_not_literally_contain Var,
+	!.
+term_one(_, _, Free0, Free0).
+
+term_one(0, _, _, Free0, Free0) :- !.
+term_one(N, Term, Bound, Free0, Free) :-
+	arg(N, Term, Arg),
+	term_one(Arg, Bound, Free0, Free1),
+	M is N-1, !,
+	term_one(M, Term, Bound, Free1, Free).
+
+
+/*----------------------------------------------------------------------
+
+    pass_two does the following in one grand sweep:
+    1.  The original formula might have used the same variable in any
+	number of quantifiers.  In the output, each quantifier gets a
+	different variable.
+    2.  But existentally quantified variables are replaced by new Skolem
+	functions, not by new variables.  As a result, we can simply drop
+	all the quantifiers, every remaining variable is universally
+	quantified.
+    3.  The rules
+	~ all(V, F)	--> some(V, ~F)
+	~ some(V, F)	--> all(V, ~F)
+	~ (A and B)	--> ~A or ~B
+	~ (A or B)	--> ~A and ~B
+	~ ~ A		--> A
+	are applied to move negations down in front of atoms.
+    4.  The rules
+	A or A		--> A
+	A or ~A		--> true
+	A or true	--> true
+	A or false	--> A
+	(A or B) or C	--> A or (B or C)
+	(A and B) or C	--> (A or C) and (B or C)
+	A or (B and C)	--> (A or B) and (A or C)
+	A and true	--> A
+	A and false	--> false
+	(A and B) and C	--> A and (B and C)
+	are applied to the clauses which we build as we work our
+	way back up the tree.  The rules
+	A and A		--> A
+	A and ~A	--> false
+	A and (~A or B)	--> A and B
+	are NOT applied.  This is best done, if at all, after all the
+	clauses have been generated.  The last two rules are special
+	cases of resolution, so it is doubtful whether it is worth
+	doing them at all.
+
+    The main predicate is pass_two_pos/4:
+	pass_two_pos(+Formula,		% The formula to translate
+		     -Translation,	% its translation
+		     +Univ,		% universal quantifiers in scope
+		     +Rename)		% how to rename variables
+    Rename is var | var(Old,New,Rename), where Old is a source variable,
+    and New is either a new variable (for universal quantifiers) or a
+    Skolem function applied to the preceding new variables (for existential
+    quantifiers).  Univ is those New elements of the Rename argument which
+    are variables.  pass_two_neg produces the translation of its Formula's
+    *negation*, this saves building the negation and then handling it.
+
+----------------------------------------------------------------------*/
+
+pass_two(ClosedAndImplicationFree, ClausalForm) :-
+	pass_two_pos(ClosedAndImplicationFree, PreClausalForm, [], var),
+	pass_two_pos(PreClausalForm, ClausalForm).
+
+
+%   pass_two_pos/2 does two things.  First, if there was only one clause,
+%   pass_two_pos/4 wouldn't have wrapped it up in a list.  This we do here.
+%   Second, if one of the clauses is "false", we return that as the only
+%   clause.  This would be the place to apply A & A --> A.
+
+pass_two_pos(clause(P,N), [clause(P,N)]) :- !.
+pass_two_pos(Sentence, [clause([],[])]) :-
+	Sentence contains clause([],[]),
+	!.
+pass_two_pos(Sentence, Sentence).
+
+
+pass_two_pos(all(Var,B), Translation, Univ, Rename) :- !,
+	pass_two_pos(B, Translation, [New|Univ], var(Var,New,Rename)).
+pass_two_pos(some(Var,B), Translation, Univ, Rename) :- !,
+	gensym('f-', SkolemFunction),
+	SkolemTerm =.. [SkolemFunction|Univ],
+	pass_two_pos(B, Translation, Univ, var(Var,SkolemTerm,Rename)).
+pass_two_pos(A and B, Translation, Univ, Rename) :- !,
+	pass_two_pos(A, C, Univ, Rename),
+	pass_two_pos(B, D, Univ, Rename),
+	sent_and(C, D, Translation).
+pass_two_pos(A or B, Translation, Univ, Rename) :- !,
+	pass_two_pos(A, C, Univ, Rename),
+	pass_two_pos(B, D, Univ, Rename),
+	sent_or(C, D, Translation).
+pass_two_pos(~A, Translation, Univ, Rename) :- !,
+	pass_two_neg(A, Translation, Univ, Rename).
+pass_two_pos(true, [], _, _) :- !.
+pass_two_pos(false, clause([],[]), _, _) :- !.
+pass_two_pos(Atom, clause([Renamed],[]), _, Rename) :-
+	%   An Atom is "anything else", hence the cuts above.
+	term_two(Atom, Renamed, Rename).
+
+
+pass_two_neg(all(Var,B), Translation, Univ, Rename) :- !,
+	gensym('g-', SkolemFunction),
+	SkolemTerm =.. [SkolemFunction|Univ],
+	pass_two_neg(B, Translation, Univ, var(Var,SkolemTerm,Rename)).
+pass_two_neg(some(Var,B), Translation, Univ, Rename) :- !,
+	pass_two_neg(B, Translation, [New|Univ], var(Var,New,Rename)).
+pass_two_neg(A and B, Translation, Univ, Rename) :- !,
+	pass_two_neg(A, C, Univ, Rename),
+	pass_two_neg(B, D, Univ, Rename),
+	sent_or(C, D, Translation).
+pass_two_neg(A or B, Translation, Univ, Rename) :- !,
+	pass_two_neg(A, C, Univ, Rename),
+	pass_two_neg(B, D, Univ, Rename),
+	sent_and(C, D, Translation).
+pass_two_neg(~A, Translation, Univ, Rename) :- !,
+	pass_two_pos(A, Translation, Univ, Rename).
+pass_two_neg(true, clause([],[]), _, _) :- !.
+pass_two_neg(false, [], _, _) :- !.
+pass_two_neg(Atom, clause([],[Renamed]), _, Rename) :-
+	%   An Atom is "anything else", hence the cuts above.
+	term_two(Atom, Renamed, Rename).
+
+
+
+term_two(OldTerm, NewTerm, Rename) :-
+	nonvar(OldTerm),
+	functor(OldTerm, FunctionSymbol, Arity),
+	functor(NewTerm, FunctionSymbol, Arity),
+	!,
+	term_two(Arity, OldTerm, NewTerm, Rename).
+term_two(OldVar, NewTerm, Rename) :-
+	term_var(Rename, OldVar, NewTerm).
+
+
+term_var(var(Old,New,_), Var, New) :-
+	Old == Var,
+	!.
+term_var(var(_,_,Rest), Var, New) :-
+	term_var(Rest, Var, New).
+
+
+term_two(0, _, _, _) :- !.
+term_two(N, OldTerm, NewTerm, Rename) :-
+	arg(N, OldTerm, OldArg),
+	term_two(OldArg, NewArg, Rename),
+	arg(N, NewTerm, NewArg),
+	M is N-1, !,
+	term_two(M, OldTerm, NewTerm, Rename).
+
+
+/*----------------------------------------------------------------------
+
+	sent_and(S1, S2, "S1 and S2")
+	sent_or(S1, S2, "S1 or S2")
+    perform the indicated logical operations on clauses or sets of
+    clauses (sentences), using a fair bit of propositional reasoning
+    (hence our use of "literally" to avoid binding variables) to try
+    to keep the results simple.  There are several rules concerning
+    conjunction which are *not* applied, but even checking for
+	A and A --> A
+    would require us to recognise alphabetic variants of A rather
+    than literal identity.  So far the naivety abount conjunction
+    has not proved to be a practical problem.
+
+----------------------------------------------------------------------*/
+
+sent_or(clause(P1,_), clause(_,N2), []) :-
+	P1 contains Atom,
+	N2 literally_contains Atom,
+	!.
+sent_or(clause(_,N1), clause(P2,_), []) :-
+	N1 contains Atom,
+	P2 literally_contains Atom,
+	!.
+sent_or(clause(P1,N1), clause(P2,N2), clause(P3,N3)) :- !,
+	ord_union(P1, P2, P3),
+	ord_union(N1, N2, N3).
+sent_or([], _, []) :- !.
+sent_or(_, [], []) :- !.
+sent_or([Clause|Clauses], Sentence, Answer) :- !,
+	sent_or(Sentence, Clause, X),
+	sent_or(Clauses, Sentence, Y),
+	sent_and(X, Y, Answer).
+sent_or(Sentence, [Clause|Clauses], Answer) :- !,
+	sent_or(Sentence, Clause, X),
+	sent_or(Clauses, Sentence, Y),
+	sent_and(X, Y, Answer).
+
+
+sent_and([], Sentence, Sentence) :- !.
+sent_and(Sentence, [], Sentence) :- !.
+sent_and([H1|T1], [H2|T2], [H1,H2|T3]) :- !,
+	sent_and(T1, T2, T3).
+sent_and([H1|T1], Clause, [Clause,H1|T1]) :- !.
+sent_and(Clause, [H2|T2], [Clause,H2|T2]) :- !.
+sent_and(Clause1, Clause2, [Clause1,Clause2]).
+
+
+[Head|_] contains Head.
+[_|Tail] contains Something :-
+	Tail contains Something.
+
+
+[Head|_] literally_contains Something :-
+	Head == Something,
+	!.
+[_|Tail] literally_contains Something :-
+	Tail literally_contains Something.
+
+
+[] does_not_literally_contain Anything.
+[Head|Tail] does_not_literally_contain Something :-
+	Head \== Something,
+	Tail does_not_literally_contain Something.
+
+
+/*----------------------------------------------------------------------
+    Debugging kit.
+	portray_sentence(ListOfClauses)
+	    displays a list of clauses, one per line.
+	rok_portray_clause(Clause)
+	    displays a single clause in "Kowalski notation"
+	t(Formula)
+	    translates a formula and prints the result.
+
+:- public
+	t1/0,t9/0,t/1.
+
+
+portray_sentence([Clause]) :- !,
+	rok_portray_clause(Clause),
+	nl.
+portray_sentence([Clause|Clauses]) :-
+	rok_portray_clause(Clause),
+	write(' AND'), nl,
+	portray_sentence(Clauses).
+portray_sentence([]) :-
+	write('TRUE'), nl.
+
+
+rok_portray_clause(clause(PosAtoms, NegAtoms)) :-
+	numbervars(PosAtoms, 0, N),
+	numbervars(NegAtoms, N, _),
+	rok_portray_clause(PosAtoms, ' v '),
+	write(' <- '),
+	rok_portray_clause(NegAtoms, ' & '),
+	fail.
+rok_portray_clause(_).
+
+
+rok_portray_clause([Atom], _) :- !,
+	print(Atom).
+rok_portray_clause([Atom|Atoms], Separator) :-
+	print(Atom), write(Separator),
+	rok_portray_clause(Atoms, Separator).
+rok_portray_clause([], _) :-
+	write([]).
+
+
+t(X) :-
+	clausal_form(X, Y),
+	portray_sentence(Y).
+
+t1 :- t((a=>b) and (b=>c) and (c=>d) and (d=>a) => (a<=>d)).
+
+t2 :- t(continuous(F,X) <=> all(Epsilon, Epsilon > 0 =>
+	    some(Delta, Delta > 0 and all(Y,
+		abs(Y-X) < Delta => abs(val(F,Y)-val(F,X)) < Epsilon
+	)))).
+
+t3 :- clausal_form_of_negation(
+	( subset(S1,S2) <=> all(X, member(X,S1) => member(X,S2) )) =>
+	( subset(T1,T2) and subset(T2,T3) => subset(T1,T3) )	,Y),
+	portray_sentence(Y).
+
+t4 :- t(subset(T1,T2) and subset(T2,T3) => subset(T1,T3)).
+
+
+
+t5 :- t((a=>b) and (b=>c)).
+
+t6 :- t(~(a and b)).
+
+t7 :- t((a and b) or c).
+
+t8 :- t((a and b) or (a and ~b) or (~a and b) or (~a and ~b)).
+
+t9 :- t(
+	(true(P) <=> t(w0,P)) and
+	(t(W1,P1 and P2) <=> t(W1,P1) and t(W1,P2)) and
+	(t(W1,P1 or P2) <=> t(W1,P1) or t(W1,P2)) and
+	(t(W1,P1 => P2) <=> (t(W1,P1) => t(W1,P2))) and
+	(t(W1,P1 <=> P2) <=> (t(W1,P1) <=> t(W1,P2))) and
+	(t(W1,~P1) <=> ~t(W1,P1)) and
+	(t(W1,know(A1,P1)) <=> all(W2,k(A1,W1,W2)=>t(W2,P1))) and
+	k(A1,W1,W1) and
+	(k(A1,W1,W2) => (k(A1,W2,W3) => k(A1,W1,W3))) and
+	(k(A1,W1,W2) => (k(A1,W1,W3) => k(A1,W2,W3))) and
+	(t(W1,know(A,P)) <=> all(W2,k(A,W1,W2) => t(W2,P)))
+	).
+
+----------------------------------------------------------------------*/
 
 

@@ -129,6 +129,7 @@ agent_call_command_now(Agent,CMD):-
       user:agent_call_command(Agent,NewCMD))).
 
 % need to return http sessions as well
+get_session_id(IDIn):-thlocal:session_id(ID),!,ID=IDIn.
 get_session_id(IDIn):-current_input(ID),is_stream(ID),!,ID=IDIn.
 get_session_id(ID):-thread_self(ID).
 
@@ -153,11 +154,11 @@ get_agent_session(P,O):- once(thlocal:session_agent(O,P);thglobal:global_session
 foc_current_player(P):- current_agent(P),nonvar(P),!.
 foc_current_player(P):- nonvar(P),tAgent(P),become_player(P),!.
 foc_current_player(P):- 
-  prolog_must_l([    
+  must_det_l([    
              get_session_id(O),
-             once(get_dettached_npc(P);generate_new_player(P)),
-               retractall(thglobal:global_session_agent(O,P)),
-              asserta(thglobal:global_session_agent(O,P)),assert_isa(P,tHumanPlayer),must_det(create_agent(P))]),!.
+             once((get_dettached_npc(NPC),NPC=P);generate_new_player(P)),
+             become_player(P)]),!.
+               
 
 
 
@@ -165,7 +166,7 @@ foc_current_player(P):-
 my_random_member(LOC,LOCS):- must_det((length(LOCS,Len),Len>0)),random_permutation(LOCS,LOCS2),!,member(LOC,LOCS2).
 
 :-export(random_instance/3).
-random_instance_no_throw(Type,Value,Test):-var(Test),!,random_instance_no_throw(Type,Value,true).
+random_instance_no_throw(Type,Value,Test):-var(Test),!,Test=isa(Test,Type),random_instance_no_throw(Type,Value,Test).
 random_instance_no_throw(Type,Value,Test):- copy_term(ri(Type,Value,Test),ri(RType,RValue,RTest)),
    hooked_random_instance(RType,RValue,RTest),
    checkAnyType(query(_,_),RValue,Type,Value),
@@ -180,19 +181,23 @@ random_instance(Type,Value,Test):- must(random_instance_no_throw(Type,Value,Test
 
 
 
-get_dettached_npc(P):-random_instance_no_throw(tAgent,P,true),\+ isa(P,tHumanPlayer),!.
+get_dettached_npc(P):- random_instance_no_throw(tAgent,P,\+ isa(P,tHumanPlayer)).
 
-% generate_new_player(P):- req(agent(P)),!.
-generate_new_player(P):- prolog_must_l([gensym(iPlayer,N),not((isa_asserted(N,tAgent))),P=N,ensure_new_player(P)]),!.
+generate_new_player(P):- var(P),!,must_det_l([gensym(iPlayer,N),not((isa_asserted(N,tAgent))),P=N,ensure_new_player(P)]),!.
+generate_new_player(P):- ensure_new_player(P),!.
 
-ensure_new_player(P):- prolog_must_l([assert_isa(P,tExplorer),assert_isa(P,tPlayer),assert_isa(P,tAgent)]),!.
+ensure_new_player(P):- must_det_l([assert_isa(P,tExplorer),assert_isa(P,tPlayer),assert_isa(P,tAgent)]),!.
 
 deatch_player(P):- thglobal:global_session_agent(_,P),!,trace_or_throw(deatch_player(P)).
 deatch_player(_).
 
 :-export(become_player/1).
 become_player(NewName):- once(current_agent(Was)),Was=NewName,!.
-become_player(NewName):- get_session_id(O),retractall(thglobal:global_session_agent(O,_)),deatch_player(NewName),asserta(thglobal:global_session_agent(O,NewName)),ensure_player_stream_local(NewName).
+become_player(NewName):- get_session_id(O),retractall(thglobal:global_session_agent(O,_)),
+  assert_isa(NewName,tHumanPlayer),must_det(create_agent(NewName)),
+  deatch_player(NewName),asserta(thglobal:global_session_agent(O,NewName)),   
+  ensure_player_stream_local(NewName).
+
 :-export(become_player/2).
 become_player(_Old,NewName):-become_player(NewName).
 

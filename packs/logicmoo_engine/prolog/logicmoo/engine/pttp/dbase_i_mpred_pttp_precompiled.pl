@@ -1,4 +1,7 @@
 
+
+
+
 :-multifile user:was_pttp_functor/3.
 :-dynamic user:was_pttp_functor/3.
 

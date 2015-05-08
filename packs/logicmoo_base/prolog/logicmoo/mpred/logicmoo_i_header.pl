@@ -47,8 +47,20 @@
 :- dynamic(neg/1).
 :- multifile(neg/1).
 
+:- dynamic(ttUnverifiableType/1).
+:- multifile(ttUnverifiableType/1).
+
+
 :- dynamic(pfcControlled/1).
 :- multifile(pfcControlled/1).
+
+:- dynamic(agent_text_command/4).
+:- multifile(agent_text_command/4).
+
+:- dynamic(arity/2).
+:- multifile(arity/2).
+
+
 
 :- dynamic(('=>')/1).
 :- dynamic(('neg')/1).

@@ -4,7 +4,10 @@
 */
 
 :- exists_directory(runtime)->working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true).
-:-multifile(user:file_search_path/2).
+
+:- dynamic   user:file_search_path/2.
+:- multifile user:file_search_path/2.
+
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
 user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current_prolog_flag(unix,true).
@@ -19,8 +22,10 @@ user:file_search_path(prologmud, '../prolog/prologmud/').
 :- user:ensure_loaded(library(logicmoo/logicmoo_base)).
 
 % [Optionaly] Load an Eggdrop 
-:- if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop/eggdrop.pl')).
+:- if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl')).
 :- current_predicate(egg_go/0)->egg_go;true.
+
+
 
 
 % [Required] load the mud system
@@ -39,14 +44,14 @@ tCol(tLivingRoom).
 genls(tLivingRoom,tRegion).
 genls(tOfficeRoom,tRegion).
 
-tAgent(iCommander_data66).
-isa(iCommander_data66,'tExplorer').
-wearsClothing(iCommander_data66,'iBoots673').
-wearsClothing(iCommander_data66,'iComBadge674').
-wearsClothing(iCommander_data66,'iGoldUniform675').
-mudStowing(iCommander_data66,'iPhaser676').
+tAgent(iCommanderdata66).
+isa(iCommanderdata66,'tExplorer').
+wearsClothing(iCommanderdata66,'iBoots673').
+wearsClothing(iCommanderdata66,'iCommBadge674').
+wearsClothing(iCommanderdata66,'iGoldUniform675').
+mudStowing(iCommanderdata66,'iPhaser676').
 pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
-pddlSomethingIsa('iComBadge674',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
+pddlSomethingIsa('iCommBadge674',['tCommBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
 
@@ -55,26 +60,26 @@ pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','Por
 
 tAgent(iExplorer7).
 wearsClothing(iExplorer7,'iBoots773').
-wearsClothing(iExplorer7,'iComBadge774').
+wearsClothing(iExplorer7,'iCommBadge774').
 wearsClothing(iExplorer7,'iGoldUniform775').
 isa(iExplorer7,'tExplorer').
 mudStowing(iExplorer7,'iPhaser776').
 pddlSomethingIsa('iBoots773',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
-pddlSomethingIsa('iComBadge774',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
+pddlSomethingIsa('iCommBadge774',['tCommBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform775',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
 
-isa(iCommander_data66,'tMonster').
-mudDescription(iCommander_data66,txtFormatFn("Very screy looking monster named ~w",[iCommander_data66])).
-
-
-:-onSpawn(localityOfObject(tExplorer,tLivingRoom)).
-:-onSpawn(localityOfObject(iCommander_data66,tOfficeRoom)).
-:-onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
+isa(iCommanderdata66,'tMonster').
+mudDescription(iCommanderdata66,txtFormatFn("Very screy looking monster named ~w",[iCommanderdata66])).
 
 
 mpred_argtypes(pathConnects(tRegion,tRegion)).
 mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
+
+:-onSpawn(localityOfObject(tExplorer,tLivingRoom)).
+:-onSpawn(localityOfObject(iCommanderdata66,tOfficeRoom)).
+:-onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
+
 
 % arity(do_ensure_some_pathBetween,0).
 ensure_some_pathBetween(R1,R2):- pathBetween(R1,_,R2),!.

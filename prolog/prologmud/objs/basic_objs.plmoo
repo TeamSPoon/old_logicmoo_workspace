@@ -13,6 +13,9 @@
 */
 
 
+((vtActionTemplate(AT)/functor(AT,F,_)=>vtVerb(F))).
+(vtVerb(F)/name_text_now_lc(F,Txt)=>mudKeyword(F,Txt)).
+(tCol(F)/name_text_now_lc(F,Txt)=>mudKeyword(F,Txt)).
 
 end_of_file.
 

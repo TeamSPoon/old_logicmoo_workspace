@@ -4,6 +4,9 @@
 
 :- initialization cp_server.
 
+:- dynamic   user:file_search_path/2.
+:- multifile user:file_search_path/2.
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 This file provides a skeleton startup file.  It can be localized by running
 

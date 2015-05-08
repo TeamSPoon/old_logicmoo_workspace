@@ -100,7 +100,7 @@ pfc_mpred_storage_clauses(equiv,H,B,   equiv(R)):- R=(<=>(LS,RS)),clause(R,true)
 pfcGetExpectedClauseCount(F,A,C):- (pfcExpectedClauseCount_db(F,A,C);C=0).
 pfcGetActualClauseCount(F,A,C):-make_functor(P,F,A),predicate_property(P,number_of_clauses(C)).
 pfcIsClauseCountWrong(F,A):-pfcGetExpectedClauseCount(F,A,E),pfcGetActualClauseCount(F,A,C),!,C\=E.
-pfcCountsClauses(F,A):- arity(F,A),pfcWatches(F/A).
+pfcCountsClauses(F,A):- arity(F,A),pfcWatches_prolog(F/A).
 
 pfcCheckClauseCounts :- forall(pfcCountsClauses(F,A),pfcUpdateClauses(F,A)).
 
@@ -178,7 +178,7 @@ pfc_local(_,_,_).
 % pfc_local(_).
 
 pfcControlled(G):-hotrace(pfcControlled0(G)).
-pfcWatches(G):-hotrace(pfcWatched0(G)).
+pfcWatches_prolog(G):-hotrace(pfcWatched0(G)).
 
 pfcControlled0(Var):-is_ftVar(Var),!.
 pfcControlled0((_:F)/A):-atom(M),!,pfcControlled0(F/A).

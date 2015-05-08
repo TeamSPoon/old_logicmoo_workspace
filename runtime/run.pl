@@ -21,6 +21,10 @@ To run the system, do one of the following:
       See daemon.pl
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+
+:- dynamic   user:file_search_path/2.
+:- multifile user:file_search_path/2.
+
 % Setup search path for cliopatria. We add  both a relative and absolute
 % path. The absolute path allow us to  start in any directory, while the
 % relative one ensures that the system remains working when installed on

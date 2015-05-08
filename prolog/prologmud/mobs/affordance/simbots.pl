@@ -606,11 +606,11 @@ simbots_templates0(Templ):-verb_desc(V,O,_),Templ=..[V,O].
 simbots_templates0(Templ):-verb_affordance(V,O,_,_,_),Templ=..[V,O].
 
 :-forall(defined_affordance(Attrs),must(do_define_affordance(Attrs))).
-:-listing(verb_desc/3).
-:-listing(verb_for_type/2).
-:-listing(verb_affordance_2/2).
-:-listing(can_hold_type/2).
-:-listing(verb_affordance/5).
+:-lsting(verb_desc/3).
+:-lsting(verb_for_type/2).
+:-lsting(verb_affordance_2/2).
+:-lsting(can_hold_type/2).
+:-lsting(verb_affordance/5).
 
 
 /*

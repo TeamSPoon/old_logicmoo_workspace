@@ -13,6 +13,9 @@
 */
 
 
+:- dynamic   user:file_search_path/2.
+:- multifile user:file_search_path/2.
+
 :- set_prolog_flag(verbose_load,true).
 
 :- include(mud_header).
@@ -121,6 +124,10 @@ within_user(Call):- '@'(Call,'user').
 % :- user_use_module('logicmoo_util/logicmoo_util_all.pl').
 % And adds the local directories to file search path of logicmoo(..)
 % ======================================================
+
+
+:- dynamic   user:file_search_path/2.
+:- multifile user:file_search_path/2.
 
 :- user_use_module(library(settings)).
 
@@ -588,6 +595,7 @@ user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term
 
 % when we import new and awefull code base (the previous )this can be helpfull
 % we redfine list_undefined/1 .. this is the old version
+/*
 lundef :- A = [],
        check:( merge_options(A, [module_class([user])], B),
         prolog_walk_code([undefined(trace), on_trace(found_undef)|B]),
@@ -599,7 +607,7 @@ lundef :- A = [],
             group_pairs_by_key(F, G),
             maplist(report_undefined, G)
         )).
-
+*/
 % :- if_flag_true(fullStart,remove_undef_search).
 
 

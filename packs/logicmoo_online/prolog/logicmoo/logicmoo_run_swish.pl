@@ -3,6 +3,9 @@
 % :- module(swish_with_localedit,[]).
 
 
+:- dynamic   user:file_search_path/2.
+:- multifile user:file_search_path/2.
+
 :- multifile(mpred_online:semweb_startup).
 :- '@'(ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),user).
 
@@ -11,7 +14,7 @@ install_bower:- prolog_file_dir(('.'),LPWD),
    process_create(sudo,[bower,install,'--allow-root'],[cwd(LPWD),process(PID)]),
    process_wait(PID,_Status).
 
-:- add_to_search_path(swish, '../swish').
+:- add_to_search_path(swish, '../externals/swish/').
 
 % setup paths to load relevant packages from development environment
 
@@ -41,7 +44,7 @@ install_bower:- prolog_file_dir(('.'),LPWD),
 :- use_module(library(http/http_files)).
 :- use_module(library(http/http_dispatch)).
 
-:- ensure_loaded(swish).
+:- ensure_loaded('../externals/swish/swish').
 
 
 :- pengine_application(swish).
@@ -197,8 +200,8 @@ testml(ML):-phrase(ML,C,[]),testml(C).
    asserta((http:location(pldoc_resource, root('pldoc'), []) :- pldoc_http:http_location_by_id(pldoc_resource, root('pldoc')))),
    asserta((http:location(pldoc_resource, R, []) :- pldoc_http:http_location_by_id(pldoc_resource, R))).
 */
+:- ensure_loaded('../externals/swish/swish').
 
-:- ensure_loaded(swish).
 
 :- catch(on_signal(hup, _, hup),E,warn(E:on_signal(hup, _, hup))).
 

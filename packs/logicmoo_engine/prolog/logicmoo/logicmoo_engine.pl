@@ -56,6 +56,8 @@
           op(500,yfx,'v')
         ]). 
 */
+:- nodebug(_).
+
 % SWI Prolog modules do not export operators by default
 % so they must be explicitly placed in the user namespace
 

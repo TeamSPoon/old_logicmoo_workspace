@@ -12,6 +12,9 @@
 %
 */
 
+:- dynamic   user:file_search_path/2.
+:- multifile user:file_search_path/2.
+
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
 user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current_prolog_flag(unix,true).
@@ -19,8 +22,8 @@ user:file_search_path(cliopatria, '../externals/ClioPatria'). % :- current_prolo
 user:file_search_path(user, '../externals/ClioPatria/user/').
 user:file_search_path(swish, '../externals/swish'):- current_prolog_flag(unix,true).
 user:file_search_path(pack, '../packs').
-file_search_path(logicmoo, '/devel/LogicmooDeveloperFramework/PrologMUD/packs/prologmud/prolog/prologmud/').
-file_search_path(logicmoo, '/devel/LogicmooDeveloperFramework/PrologMUD/packs/logicmoo_base/prolog/logicmoo/').
+user:file_search_path(logicmoo, '/devel/LogicmooDeveloperFramework/PrologMUD/packs/prologmud/prolog/prologmud/').
+user:file_search_path(logicmoo, '/devel/LogicmooDeveloperFramework/PrologMUD/packs/logicmoo_base/prolog/logicmoo/').
 
 :- attach_packs.
 
@@ -213,9 +216,9 @@ pfc_fully_expand_warn(Type,B,A):-pfc_fully_expand(Type,B,A),(B\=@=A->wdmsg(error
 
 % :- ignore((current_predicate(not/1),abolish(system:not/1),abolish(not/1),dynamic(not/1),assert(((not(P):- nonvar(P), \+ P))),meta_predicate(not(0)))).
 :- op(0,fx,'decl_mpred_pfc').
-user:isa(pfcMetaPred,tCol).
+user:isa(pfcDatabaseTerm,tCol).
 user:isa(pfcMustFC,tCol).
-decl_mpred_pfc(F/A):-!,export(F/A),dynamic(F/A),asserta_if_new(user:mpred_prop(F,prologOnly)),asserta_if_new(arity(F,A)),asserta_if_new(user:mpred_prop(F,pfcMetaPred)),
+decl_mpred_pfc(F/A):-!,export(F/A),dynamic(F/A),asserta_if_new(user:mpred_prop(F,prologOnly)),asserta_if_new(arity(F,A)),asserta_if_new(user:mpred_prop(F,pfcDatabaseTerm)),
   asserta_if_new(user:mpred_prop(F,arity(A))).
 decl_mpred_pfc(F):-atom(F),!,decl_mpred_pfc(F/0).
 :- op(1150,fx,'decl_mpred_pfc').
@@ -312,7 +315,7 @@ pfcUpdateClauses(F,A):-make_functor(P,F,A),forall((clause(P,T),is_true(T)),pfc_a
 
 maybe_hybrid(F/_):-pfc_mpred_prop(F,prologOnly),!.
 maybe_hybrid(F/_):-pfc_mpred_prop(F,prologHybrid),!.
-maybe_hybrid(F/_):-pfc_mpred_prop(F,pfcMetaPred),!.
+maybe_hybrid(F/_):-pfc_mpred_prop(F,pfcDatabaseTerm),!.
 maybe_hybrid(F/_):-pfc_mpred_prop(F,X),atom(X),!.
 maybe_hybrid(F/A):-atom(F),debugOnError(current_predicate(F/A)),!.
 % maybe_hybrid(C/1):-ignore((nonvar(C)->decl_mpred_hybrid(C/1);ignore(decl_mpred_hybrid(isa/2))))
@@ -329,13 +332,13 @@ pfc_lambda([A1,A2,A3,A4],Body,A1,A2,A3,A4):-Body.
 
 % :-call(pfc_lambda([E],writeln(E)),hello_lambda).
 
-:-dynamic(pfcMetaPred/1).
+:-dynamic(pfcDatabaseTerm/1).
 :-dynamic(pfcControlled/1).
 :-dynamic(pfcWatched/1).
 :-dynamic(pfcMustFC/1).
 
 pfcPreds:-
-  listing(pfcMetaPred/1),
+  listing(pfcDatabaseTerm/1),
   listing(pfcControlled/1),
   listing(pfcWatched/1),
   listing(pfcMustFC/1),
@@ -375,7 +378,7 @@ pfc_manage_hybrids :- if_defined(thglobal:pfcManageHybrids).
 pfc_local(G):-get_functor(G,F,A),pfc_local(G,F,A).
 
 pfc_local(_,F,A):-pfcDatabaseTerm(F/A),!.
-pfc_local(_,F,_):-pfc_mpred_prop(F,pfcMetaPred),!.
+pfc_local(_,F,_):-pfc_mpred_prop(F,pfcDatabaseTerm),!.
 pfc_local(_,F,_):-pfc_mpred_prop(F,prologOnly).
 pfc_local(G,_,_):-pfc_manage_hybrids,!,pfc_mark_W(G),!.
 % pfc_local(G,_,_):-pfc_manage_hybrids,!,pfc_mark_C(G),!.
@@ -482,7 +485,7 @@ pfc_assert0(G):- pfc_local(G),!,
 
 pfc_assert0(G):- trace,add(G),pfc_mark_C(G).
 
-user:mpred_prop(F,prologOnly):-user:mpred_prop(F,pfcMetaPred).
+user:mpred_prop(F,prologOnly):-user:mpred_prop(F,pfcDatabaseTerm).
 
 add_meta_facts(G):-add_meta_facts(assertz_if_new,G).
 add_meta_facts(How,(H:-True)):-is_true(True),must(nonvar(H)),!,add_meta_facts(How,H).

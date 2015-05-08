@@ -154,7 +154,7 @@ dividesBetween(tAgent,tPlayer,tNpcPlayer).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
 => tCol(ttFormatType).
-=> tCol(vtActionTemplate).
+=> tSpec(vtActionTemplate).
 => tCol(tRegion).
 => tCol(tContainer).
 
@@ -218,6 +218,8 @@ isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 
 % Representations
 vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => meta_argtypes(ArgTypes).
+
+meta_argtypes(ArgTypes)/get_functor(ArgTypes,F),vtVerb(F)=>vtActionTemplate(ArgTypes).
 
 
 
@@ -345,6 +347,7 @@ prologOnly(is_vtActionTemplate/1).
 
 is_vtActionTemplate(C):-nonvar(C),get_functor(C,F),!,atom_concat(act,_,F).
 defnSufficient(ftAction,is_vtActionTemplate).
+defnSufficient(ftAction,vtVerb).
 
 genls('FemaleAnimal',tPlayer).
 genls('MaleAnimal',tPlayer).
@@ -525,7 +528,7 @@ ttAgentType(tMonster).
 % user:instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
 
 
-=> tCol(vtActionTemplate).
+=> tSpec(vtActionTemplate).
 => tCol(tRegion).
 => tCol(tContainer).
 disjointWith(tObj,tRegion).
@@ -677,7 +680,7 @@ dividesBetween(tAgent,tPlayer,tNpcPlayer).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
 => tCol(ttFormatType).
-=> tCol(vtActionTemplate).
+=> tSpec(vtActionTemplate).
 => tCol(tRegion).
 => tCol(tContainer).
 
@@ -723,6 +726,13 @@ mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
 
 genls(tBread, tFood).
 typeProps(tCrackers,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]).
+
+nonvar_must_be(V,G):- (var(V);G),!.
+
+% TODO SPEED THIS UP 
+% mudKeyword(I,Str)<= {(nonvar(I);nonvar(Str)), nonvar_must_be(I,\+tCol(I)), nonvar_must_be(Str,string(Str))}, isa(I,Type),mudKeyword(Type,Str).
+
+mudKeyword(Type,Str),tSet(Type),isa(I,Type)/(atom(I),ftID(I)) => mudKeyword(I,Str).
 
 
 user:action_info(C,_)=>vtActionTemplate(C).

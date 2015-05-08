@@ -238,7 +238,7 @@ argIsa_call_3(subFormat,ttFormatType).
 grab_argsIsa(resultIsa,resultIsa(tFunction,tCol)).
 %grab_argsIsa(P, A):-P=='$was_imported_kb_content$',trace_or_throw(crazy_grab_argsIsa('$was_imported_kb_content$', A)).
 %grab_argsIsa(P, A):-P=={}, trace_or_throw(crazy_grab_argsIsa({}, A)).
-grab_argsIsa(F,Types):- grab_argsIsa_6(Types),get_functor(Types,F0),!,F0==F,assert_predArgTypes_fa(F,Types).
+grab_argsIsa(F,Types):- grab_argsIsa_6(Types),get_functor(Types,F0),F0==F,!,assert_predArgTypes_fa(F,Types).
 
 grab_argsIsa_6(Types):- meta_argtypes(Types).
 grab_argsIsa_6(mudColor(tSpatialThing, vtColor)).

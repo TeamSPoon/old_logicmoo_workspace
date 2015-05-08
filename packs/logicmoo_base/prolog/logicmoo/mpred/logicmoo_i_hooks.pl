@@ -168,6 +168,7 @@ never_mpred_mpred(arity).
 
 :-dynamic t/2.
 % t(C,I):- trace_or_throw(t(C,I)),t(C,I). % ,fail,loop_check_term(isa_backchaing(I,C),t(C,I),fail).
+t(X,Y):-isa(Y,X).
 
 %t([P|LIST]):- !,mpred_plist_t(P,LIST).
 %t(naf(CALL)):-!,not(t(CALL)).
@@ -187,19 +188,20 @@ mpred_plist_t(P,LIST):- CALL=..[t,P|LIST],debugOnError(CALL).
 loop_check_mpred(Call):- !, fail,not(thlocal:infInstanceOnly(_)),loop_check(ireq(Call),loop_check_mpred(Call),fail).
 % loop_check_mpred(Call):-loop_check(mpred_call(t,Call),fail).
 
-t(P,A1,A2):- loop_check_mpred(t(P,A1,A2)).
 t(P,A1,A2):- mpred_pa_call(P,2,call(P,A1,A2)).
-t(P,A1,A2,A3):- loop_check_mpred(t(P,A1,A2,A3)).
+t(P,A1,A2):- loop_check_mpred(t(P,A1,A2)).
 t(P,A1,A2,A3):- mpred_pa_call(P,3,call(P,A1,A2,A3)).
-t(P,A1,A2,A3,A4):- loop_check_mpred(t(P,A1,A2,A3,A4)).
+t(P,A1,A2,A3):- loop_check_mpred(t(P,A1,A2,A3)).
 t(P,A1,A2,A3,A4):- mpred_pa_call(P,4,call(P,A1,A2,A3,A4)).
-t(P,A1,A2,A3,A4,A5):- loop_check_mpred(t(P,A1,A2,A3,A4,A5)).
+t(P,A1,A2,A3,A4):- loop_check_mpred(t(P,A1,A2,A3,A4)).
 t(P,A1,A2,A3,A4,A5):- mpred_pa_call(P,5,call(P,A1,A2,A3,A4,A5)).
-t(P,A1,A2,A3,A4,A5,A6):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6)).
+t(P,A1,A2,A3,A4,A5):- loop_check_mpred(t(P,A1,A2,A3,A4,A5)).
 t(P,A1,A2,A3,A4,A5,A6):- mpred_pa_call(P,6,call(P,A1,A2,A3,A4,A5,A6)).
-t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6,A7)).
+t(P,A1,A2,A3,A4,A5,A6):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6)).
 t(P,A1,A2,A3,A4,A5,A6,A7):- mpred_pa_call(P,7,call(P,A1,A2,A3,A4,A5,A6,A7)).
+t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6,A7)).
 
+mpred_pa_call(F,A,Call):-var(F),!,arity(F,A),\+tNotForUnboundPredicates(F),current_predicate(F/A),call(Call).
 mpred_pa_call(F,A,Call):-arity(F,A),current_predicate(F/A),call(Call).
 
 mpred_fact_arity(F,A):-arity(F,A),once(mpred_prop(F,prologHybrid);mpred_prop(F,pfcControlled);mpred_prop(F,prologPTTP);mpred_prop(F,prologSNARK)).

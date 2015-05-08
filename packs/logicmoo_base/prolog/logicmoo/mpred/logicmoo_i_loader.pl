@@ -18,6 +18,9 @@ is_elist_functor(isAnd).
 as_list(EC,AL):-compound(EC),EC=..[IsEach|List],is_elist_functor(IsEach),as_list(List,AL),!.
 as_list(List,AL):-flatten([List],AL),!.
 
+
+disable_mpreds_in_current_file:- source_file(F,_),show_call(asserta((thlocal:disable_mpred_term_expansions_locally:-source_file(F,_),!))).
+
 :- export(with_no_mpred_expansions/1).
 :- meta_predicate(with_no_mpred_expansions(0)).
 with_no_mpred_expansions(Goal):-
@@ -602,10 +605,10 @@ was_exported_content(I,CALL,Output):-Output='$was_imported_kb_content$'(I,CALL),
 
 :- export(pfc_file_expansion/2).
 %:- module_transparent(pfc_file_expansion/2).
-pfc_file_expansion(I,OO):- compound(I),(I\=(:-(_))), I\= '$was_imported_kb_content$'(_,_),
+pfc_file_expansion(I,OO):- (I\=(:-(_))), I\= '$was_imported_kb_content$'(_,_),
    once(loop_check(pfc_file_expansion_0(I,O))),
    I\=@=O, 
-   ((thlocal:pfc_term_expansion_ok -> nop(wdmsg((pfc_file_expansion(I,O)))) ; print_message(warning,wanted_pfc_term_expansion(I,O))),
+   ((thlocal:pfc_term_expansion_ok -> nop(wdmsg((pfc_file_expansion(I,O)))) ; (wdmsg(warning,wanted_pfc_term_expansion(I,O)),fail)),
    ((O=(:-(CALL))) -> 
       (current_predicate(_,CALL) -> ((must(CALL),was_exported_content(I,CALL,OO))); OO=O);
       (OO = O))).
@@ -617,7 +620,29 @@ system:term_expansion(I,OO):- \+ thlocal:disable_mpred_term_expansions_locally, 
   nop(dmsg(pfc_file_expansion(I,OO))).
 
 
+
 :-assert_if_new(thlocal:pfc_term_expansion_ok).
+
+:-set_prolog_flag(allow_variable_name_as_functor,true).
+
+
+to_var_functors(Outer,In,Out):- 
+   \+ compound(In)->In=Out;
+  (compound_name_arguments(In,Name,Args),
+   (Args==[]->Out=Name;
+      ((Name='@',Args=[JustOne] )-> (to_var_functors('@',JustOne,VOut),(functor(VOut,t,_)->Out=VOut;Out='@'(VOut)));
+      ( maplist(to_var_functors(Name),Args,ArgsO),
+      ((Name\='[|]',Outer='@',atom_codes(Name,[C|_]),code_type(C,prolog_var_start),
+         nb_getval('$variable_names', Vs),trace,(member(Name=Var,Vs)->true;nb_setval('$variable_names', [Name=Var|Vs])))
+           -> Out=..[t,Var|ArgsO];  (Args==ArgsO->(Out=In);compound_name_arguments(In,Name,Args))))))).
+  
+
+system:term_expansion(I,O):- nonvar(I),I='@'(_),current_prolog_flag(allow_variable_name_as_functor,true),
+                     \+ thlocal:disable_mpred_term_expansions_locally,
+                       with_assertions(thlocal:disable_mpred_term_expansions_locally,to_var_functors((:-),I,O)),I\=@=O.
+
+system:goal_expansion(I,O):- nonvar(I),I='@'(_),current_prolog_flag(allow_variable_name_as_functor,true),
+                     \+ thlocal:disable_mpred_term_expansions_locally,to_var_functors((:-),I,O),I\=@=O.
 
 
 :-export(pfc_file_loaded/0).
@@ -632,5 +657,5 @@ user:goal_expansion(ISA,G) :- \+ thlocal:disable_mpred_term_expansions_locally, 
 
 
 
-% :- source_location(S,_),forall(source_file(H,S),( \+predicate_property(H,built_in), functor(H,F,A),module_transparent(F/A),export(F/A))).
+% :- source_location(S,_),forall(source_file(H,S),ignore(( \+predicate_property(M:H,built_in), functor(H,F,A),M:module_transparent(F/A),M:export(F/A)))).
 

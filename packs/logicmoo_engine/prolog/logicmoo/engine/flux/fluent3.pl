@@ -1375,28 +1375,28 @@ cancel___2__2(E, A, F) :-
 cancel___2__2(A, B, C) :-
 	cancel___2__3(A, B, C).
 
-:- dynamic file_search_path/2.
-:- multifile file_search_path/2.
+:- dynamic user:file_search_path/2.
+:- multifile user:file_search_path/2.
 
-file_search_path(library, 'c:/pf/swipl/library/dialect/hprolog') :-
+user:file_search_path(library, 'c:/pf/swipl/library/dialect/hprolog') :-
 	hprolog:prolog_load_context(dialect, hprolog).
-file_search_path(library, A) :-
+user:file_search_path(library, A) :-
 	library_directory(A).
-file_search_path(swi, A) :-
+user:file_search_path(swi, A) :-
 	system:current_prolog_flag(home, A).
-file_search_path(foreign, swi(B)) :-
+user:file_search_path(foreign, swi(B)) :-
     system:
     (   current_prolog_flag(arch, A),
 	atom_concat('lib/', A, B)
     ).
-file_search_path(foreign, swi(A)) :-
+user:file_search_path(foreign, swi(A)) :-
     system:
     (   (   current_prolog_flag(windows, true)
 	->  A=bin
 	;   A=lib
 	)
     ).
-file_search_path(path, C) :-
+user:file_search_path(path, C) :-
     system:
     (   getenv('PATH', A),
 	(   current_prolog_flag(windows, true)
@@ -1405,9 +1405,9 @@ file_search_path(path, C) :-
 	),
 	'$member'(C, B)
     ).
-file_search_path(user_profile, app_preferences('.')).
-file_search_path(app_preferences, app_data('.')).
-file_search_path(app_data, B) :-
+user:file_search_path(user_profile, app_preferences('.')).
+user:file_search_path(app_preferences, app_data('.')).
+user:file_search_path(app_data, B) :-
     '$toplevel':
     (   current_prolog_flag(windows, true),
 	catch(win_folder(appdata, A), _, fail),
@@ -1417,24 +1417,24 @@ file_search_path(app_data, B) :-
 	;   catch(make_directory(B), _, fail)
 	)
     ).
-file_search_path(app_preferences, A) :-
+user:file_search_path(app_preferences, A) :-
 	'$toplevel':catch(expand_file_name(~, [A]), _, fail).
-file_search_path(autoload, library('.')).
-file_search_path(pack, app_data(pack)).
-file_search_path(pack, swi(pack)).
-file_search_path(library, A) :-
+user:file_search_path(autoload, library('.')).
+user:file_search_path(pack, app_data(pack)).
+user:file_search_path(pack, swi(pack)).
+user:file_search_path(library, A) :-
 	'$pack':pack_dir(_, prolog, A).
-file_search_path(foreign, A) :-
+user:file_search_path(foreign, A) :-
 	'$pack':pack_dir(_, foreign, A).
-file_search_path(pce, A) :-
+user:file_search_path(pce, A) :-
 	link_xpce:pcehome_(A).
-file_search_path(library, pce('prolog/lib')).
-file_search_path(foreign, pce(B)) :-
+user:file_search_path(library, pce('prolog/lib')).
+user:file_search_path(foreign, pce(B)) :-
     link_xpce:
     (   current_prolog_flag(arch, A),
 	atom_concat('lib/', A, B)
     ).
-file_search_path(chr, library(chr)).
+user:file_search_path(chr, library(chr)).
 
 inst(A, B) :-
 	\+ ( term_variables(A, D),

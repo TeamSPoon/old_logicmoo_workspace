@@ -183,6 +183,8 @@ db_expand_maplist(FE,List,T,G,O):-findall(M, (member(T,List),call(FE,G,M)), ML),
 %   SIMPLISTIC REWRITE (this is not the PRECANONICALIZER)
 % ================================================
 
+:-export(fully_expand/2).
+fully_expand(X,Y):-fully_expand(_,X,Y).
 
 
 :-moo_hide_childs(fully_expand/3).
@@ -192,7 +194,6 @@ must_expand(props(_,_)).
 must_expand(typeProps(_,_)).
 must_expand(G):-functor(G,_,A),!,A==1.
 
-fully_expand(X,Y):-fully_expand(_,X,Y).
 % fully_expand_warn(_,C,C):-!.
 fully_expand_warn(A,B,O):-must(fully_expand(A,B,C)),!,must(same_terms(B,C)),(O=C;must(same_terms(O,C))),!.
 
@@ -246,8 +247,8 @@ db_expand_term(_,Sent,SentO):-not_ftVar(Sent),copy_term(Sent,NoVary),if_defined(
 
 db_expand_term(Op,Sent,SentO):- Op==callable, quasiQuote(QQuote),subst(Sent,QQuote,isEach,MID),Sent\=@=MID,!,db_expand_term(Op,MID,SentO).
 db_expand_term(Op,Sent,SentO):- db_expand_final(Op ,Sent,SentO),!.
-db_expand_term(Op,Sent,SentO):- is_meta_functor(Sent,F,List),!,maplist(fully_expand_goal(Op),List,ListO),List\=@=ListO,SentO=..[F|ListO].
-db_expand_term(_ ,NC,OUT):-pfc_expand(NC,OUT),NC\=@=OUT,!.
+db_expand_term(Op,Sent,SentO):- is_meta_functor(Sent,F,List),F\=t,!,maplist(fully_expand_goal(Op),List,ListO),List\=@=ListO,SentO=..[F|ListO].
+%db_expand_term(_ ,NC,OUT):-pfc_expand(NC,OUT),NC\=@=OUT,!.
 db_expand_term(_,A,B):- thlocal:infSkipFullExpand,!,A=B.
 db_expand_term(Op,SI,SentO):-
        transitive_lc(db_expand_chain(Op),SI,S0),!,
@@ -301,10 +302,10 @@ db_expand_0(Op ,Sent,SentO):-db_expand_final(Op ,Sent,SentO),!.
 
 db_expand_0(Op,(:-(CALL)),(:-(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
 db_expand_0(Op,isa(I,O),INot):-Not==not,!,INot =.. [Not,I],!,db_expand_term(Op,INot,O).
-
-db_expand_0(Op,RDF,OUT):- RDF=..[SVO,S,V,O],is_svo_functor(SVO),!,must_det(from_univ(t,Op,[V,S,O],OUT)).
+db_expand_0(Op,THOLDS,OUT):- THOLDS=..[t,P|ARGS],atom(P),!,HOLDS=..[P|ARGS],db_expand_0(Op,HOLDS,OUT).
+db_expand_0(Op,RDF,OUT):- RDF=..[SVO,S,V,O],is_svo_functor(SVO),!,must_det(from_univ(_,Op,[V,S,O],OUT)).
 db_expand_0(Op,G,OUT):- G=..[Pred,InstFn,VO],InstFn=isInstFn(Type),nonvar(Type),from_univ(relationMostInstance,Op,[Pred,Type,VO],OUT).
-db_expand_0(Op,G,OUT):- G=..[Pred,InstFn|VO],InstFn=isInstFn(Type),nonvar(Type),GO=..[Pred,Type|VO],db_expand_3(Op,GO,OUT).
+db_expand_0(Op,G,OUT):- G=..[Pred,InstFn|VO],InstFn=isInstFn(Type),nonvar(Type),GO=..[Pred,Type|VO],db_expand_0(Op,GO,OUT).
 
 db_expand_0(Op,(mpred_call(CALL)),(mpred_call(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
 db_expand_0(_ ,include(CALL),(load_data_file_now(CALL))):-!.

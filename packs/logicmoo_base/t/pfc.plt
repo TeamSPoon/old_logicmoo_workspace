@@ -254,7 +254,7 @@ isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
 => tCol(ttFormatType).
-=> tCol(vtActionTemplate).
+=> tSpec(vtActionTemplate).
 => tCol(tRegion).
 => tCol(tContainer).
 

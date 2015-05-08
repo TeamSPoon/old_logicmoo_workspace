@@ -389,27 +389,30 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 =>pfcControlled(name_text_known(ftTerm,ftString)).
 
 name_text(Name,Text):- nonvar(Text),!,name_text(Name,TextS),equals_icase(Text,TextS),!.
-name_text(Name,Name):- !,name_text0(Name,Name).
+name_text(Name,Name):- !,name_text_now(Name,Name).
 name_text(Name,Name):- string(Name),!.
 name_text(Name,Text):- name_text_known_for(Name),!,name_text_known(Name,Text).
 
 
 name_text_known_for(Name)<=name_text_known(Name,_).
 
-name_text_known(Name,Text):- bwc, name_text0(Name,Text).
+name_text_known(Name,Text):- bwc, name_text_now(Name,Text).
 name_text_known(Name,_)=>name_text_known_for(Name).
 
-:-pfc_add((vtActionTemplate(AT)/functor(AT,F,_)=>vtVerb(F))).
-:-pfc_add((vtVerb(F)/(i_name('',F,Txt),toLowercase(Txt,LText))=>mudKeyword(F,LText))).
+name_text_now_lc(I,O):-name_text_now(I,M),toLowercase(M,O).
 
-:-multifile(name_text0/2).
-:-export(name_text0/2).
-name_text0(Name,Text):-nameStrings(Name,Text).
-name_text0(Name,Text):-mudKeyword(Name,Text).
-% name_text0(Name,Text):-argIsa(N,2,ftString),not_asserted((argIsa(N,1,ftString))),t(N,Name,Text).
-name_text0(Name,Text):-atomic(Name),!,name_text_atomic(Name,Text).
-name_text0(Name,Text):-is_list(Name),!,member(N,Name),name_text0(N,Text).
-name_text0(Name,Text):-compound(Name),!,Name=..[F,A|List],!,F\='[|]',name_text0([F,A|List],Text).
+:-pfc_add((vtActionTemplate(AT)/functor(AT,F,_)=>vtVerb(F))).
+:-pfc_add(vtVerb(F)/name_text_now_lc(F,Txt)=>mudKeyword(F,Txt)).
+:-pfc_add(tCol(F)/name_text_now_lc(F,Txt)=>mudKeyword(F,Txt)).
+
+:-multifile(name_text_now/2).
+:-export(name_text_now/2).
+name_text_now(Name,Text):-nameStrings(Name,Text).
+name_text_now(Name,Text):-mudKeyword(Name,Text).
+% name_text_now(Name,Text):-argIsa(N,2,ftString),not_asserted((argIsa(N,1,ftString))),t(N,Name,Text).
+name_text_now(Name,Text):-atomic(Name),!,name_text_atomic(Name,Text).
+name_text_now(Name,Text):-is_list(Name),!,member(N,Name),name_text_now(N,Text).
+name_text_now(Name,Text):-compound(Name),!,Name=..[F,A|List],!,F\='[|]',name_text_now([F,A|List],Text).
 
 name_text_atomic([],_):-!,fail.
 name_text_atomic('',_):-!,fail.
