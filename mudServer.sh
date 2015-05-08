@@ -23,8 +23,9 @@ do
 	echo -ne '\033]50;ClearScrollback\a'
 	echo -en "\ec\e[3J"
 	echo "Hit CTRL+C ${BASH_SOURCE[0]} ";
-        echo ". ./debug_once.sh ${RUNFILE} ";
+        echo ". ./debug_once.sh ${RUNFILE} "a;
         cd $NEWPWD
+        git pull
         if [[ $EUID -eq 0 ]];
           then
 	     sudo su -p -l -s $SHELL -c ". ./debug_once.sh $RUNFILE" prologmud
@@ -32,6 +33,7 @@ do
              . ./debug_once.sh $RUNFILE
         fi
         cd $NEWPWD
+        . ./commit_push.sh 
         sleep 4;
 done
 
