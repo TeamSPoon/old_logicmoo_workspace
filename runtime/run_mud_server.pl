@@ -56,6 +56,12 @@ pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableO
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
 
 
+tExplorer(iPlayer1).
+tExplorer(iPlayer2).
+tExplorer(iPlayer3).
+tExplorer(iPlayer4).
+tExplorer(iPlayer5).
+tExplorer(iPlayer6).
 
 
 tAgent(iExplorer7).
