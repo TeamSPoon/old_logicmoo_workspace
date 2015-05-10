@@ -20,23 +20,30 @@
 % :- register_module_type (mtCommand).
 user:action_rules(_,_,_,_):-fail.
 
-end_of_file.
+to_verb_args(Act,List):-safe_univ(Act,List).
 
-action_adds_states(_Agent,List,Adds):-findall(A,member(_ -> A,List),Adds).
-action_removes_states(_Agent,List,Dels):-findall(A,member(A -> _,List),Dels).
-action_requires_states(_Agent,List,Preconds):-findall(A,(member(A,List),\+ functor(A,(->),_)),Preconds).
+action_adds_states(Agent,Action,A):- user:action_rules(Agent,VERB,SENT,StateRules),to_verb_args(Action,[VERB|SENT]), member(+A,StateRules).
+action_removes_states(Agent,Action,A):- user:action_rules(Agent,VERB,SENT,StateRules),to_verb_args(Action,[VERB|SENT]), member(-A,StateRules).
+action_requires_states(Agent,Action,A):- user:action_rules(Agent,VERB,SENT,StateRules),to_verb_args(Action,[VERB|SENT]),member(?(A),StateRules).
 
+user:action_rules(Agent,actTestWield,[Obj],[?mudPossess(Agent,Obj),?isa(Obj,tUseAble),-mudStowing(Agent,Obj),+mudWielding(Agent,Obj)]).
+user:action_rules(Agent,actTestStow,[Obj],[?mudPossess(Agent,Obj),?isa(Obj,tStowAble),?genlPreds(Using,'mudControls'),- t(Using,Agent,Obj),+mudStowing(Agent,Obj)]).
 
-user:action_rules(Agent,actUse,[Obj],[mudPossess(Agent,Obj),isa(Obj,tUseAble),mudStowing(Agent,Obj)->using(Agent,Obj)]).
-user:action_rules(Agent,actStow,[Obj],[mudPossess(Agent,Obj),isa(Obj,tStowAble),genlPreds(Using,'mudControls'),[Using,Agent,Obj]]->[mudStowing,Agent,Obj]).
+guess_verb_template(Action):-
+       user:action_rules(Agent,Verb,Args,ListA),
+       once((to_verb_args(Action,[Verb|Args]),
+            must(attempt_attribute_args(AndOr,ftAskable,ListA)),
+            must(term_variables(ListA,Vars)),
+            must(attribs_to_atoms(Vars,Vars)))). 
+         
 
 % Use something
 user:agent_call_command(Agent,ACT) :-
    call((user:action_rules(Agent,VERB,SENT,StateRules),safe_univ(ACT,[VERB|SENT]))),
    
-      action_requires_states(Agent,StateRules,REQS),
-      action_removes_states(Agent,StateRules,REMS),
-      action_adds_states(Agent,StateRules,ADDS),
+      action_requires_states(Agent,[VERB|SENT],REQS),
+      action_removes_states(Agent,[VERB|SENT],REMS),
+      action_adds_states(Agent,[VERB|SENT],ADDS),
      call_update_charge(Agent,VERB),
      ((
          req(REQS)) ->

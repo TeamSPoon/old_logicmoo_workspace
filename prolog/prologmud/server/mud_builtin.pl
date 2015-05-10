@@ -43,6 +43,8 @@ tCol(tRelation).
 tCol(meta_argtypes).
 tCol(ttSpatialType).
 tCol(ttTypeType).
+ 
+tCol(ftProlog).
 
 
 => neg(arity(pathConnects,1)).
@@ -68,10 +70,11 @@ typeGenls(ttRegionType,tRegion).
 typeGenls(ttSpatialType,tSpatialThing).
 genls(tSpatialThing,tTemporalThing).
 genls(ttSpatialType,ttTemporalType).
-
+ 
 ttUnverifiableType(ftDice).
 ttUnverifiableType(vtDirection).
 
+((typeGenls(TypeType,Super), genls(Type,Super)) => isa(Type,TypeType)).
 
 /*
 disjointWith(A,B):- A=B,!,fail.
@@ -281,6 +284,10 @@ prologHybrid(isEach((mudLastCmdSuccess/2 ))).
 :- dynamic((mudArmorLevel/2, mudLevelOf/2, mudToHitArmorClass0/2, mudBareHandDamage/2, chargeCapacity/2, mudEnergy/2, tCol/1, tAgent/1, tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, tThinking/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, failure/2, gridValue/4, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, mudWearing/2)).
 prologHybrid(isEach(tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, mudToHitArmorClass0/2, tThinking/1, tDeleted/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, mudCmdFailure/2, mudSpd/2, typeGrid/3, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, wearsClothing/2)).
 prologHybrid(isEach( mudArmorLevel/2, mudLevelOf/2, mudToHitArmorClass0/2, mudBareHandDamage/2, chargeCapacity/2, mudEnergy/2, tCol/1, tAgent/1, tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, tThinking/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, failure/2, gridValue/4, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, mudWearing/2)).
+
+
+:-must(fully_expand(prologHybrid(typeHasGlyph,2),(arity(typeHasGlyph, 2), prologHybrid(typeHasGlyph), tPred(typeHasGlyph)))).
+
 prologHybrid(typeHasGlyph,2).
 prologHybrid(typeHasGlyph(tCol,ftString)).
 prologHybrid(mudActAffect/3).
@@ -595,6 +602,13 @@ arity(pathConnects,2).
 pathConnects(R1,R2):-pathBetween(R1,Dir,R2),nop(Dir).
 pathConnects(R1,R2):-pathBetween(R2,Dir,R1),nop(Dir).
 
+ensure_some_pathBetween(R1,R2):- pathBetween(R1,_,R2),!.
+ensure_some_pathBetween(R1,R2):- pathBetween(R2,_,R1),!.
+ensure_some_pathBetween(R1,R2):- random_path_dir(Dir), not(pathBetween(R1,Dir,_)),must(reverse_dir(Dir,Rev)),not(pathBetween(R2,Rev,_)),!, 
+   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
+ensure_some_pathBetween(R1,R2):- must((add(pathBetween(R1,apathFn(R1,R2),R2)),add(pathBetween(R2,apathFn(R2,R1),R1)))),!.
+
+pathConnects(R1,R2)/ground(R1:R2) => isa(R1,tRegion),isa(R2,tRegion), {ensure_some_pathBetween(R2,R1),ensure_some_pathBetween(R1,R2)}.
 
 
 % ==================================================

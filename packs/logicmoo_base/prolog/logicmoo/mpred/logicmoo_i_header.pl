@@ -353,7 +353,6 @@
 :- thread_local thlocal:assert_op_override/1.
 
 :- dynamic_multifile_exported(thglobal:use_cyc_database/0).
-:- thread_local(thlocal:agenda_slow_op_do_prereqs/0).
 :- thread_local(thlocal:already_in_file_term_expansion/0).
 :- thread_local(thlocal:assert_op_override/1).
 :- thread_local(thlocal:caller_module/2).
@@ -380,7 +379,4 @@
 
 :- thread_local repl_to_string/2.
 :- thread_local repl_writer/2.
-
-
-
 

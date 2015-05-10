@@ -33,7 +33,7 @@ do
              . ./debug_once.sh $RUNFILE
         fi
         cd $NEWPWD
-        . ./commit_push.sh 
+#        . ./commit_push.sh 
         sleep 4;
 done
 

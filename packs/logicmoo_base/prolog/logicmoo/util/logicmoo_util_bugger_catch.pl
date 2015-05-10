@@ -31,7 +31,6 @@ maplist_safe(Pred,LISTIN, LIST):-!, findall(EE, ((member(E,LISTIN),debugOnFailur
 % though this should been fine % maplist_safe(Pred,[A|B],OUT):- copy_term(Pred+A, Pred0+A0), debugOnFailureEach(once(call(Pred0,A0,AA))),  maplist_safe(Pred,B,BB), !, ignore(OUT=[AA|BB]).
 
 
-
 :- export(bad_functor/1).
 bad_functor(L) :- arg(_,v('|','.',[],':','/'),L).
 

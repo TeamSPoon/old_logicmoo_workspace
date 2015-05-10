@@ -129,12 +129,15 @@ run_player_local :-
 
 :-export(set_console_attached/0).
 set_console_attached:-
-  thread_self(Id),current_input(In),current_output(Out), (thread_self(main)->get_main_thread_error_stream(Err); Err=Out),
-  (thread_util:has_console(Id,In, Out,Err)->true;((retractall(thread_util:has_console(Id,_,_,_)),asserta(thread_util:has_console(Id,In,Out,Err))))).
+  thread_self(Id),current_input(In),current_output(Out),
+    (thread_self(main)->get_main_thread_error_stream(Err); Err=Out),
+     (thread_util:has_console(Id,In, Out,Err)->true;
+       ((retractall(thread_util:has_console(Id,_,_,_)),
+          asserta(thread_util:has_console(Id,In,Out,Err))))).
 
 
 set_tty_control:- 
-  ignore((logOnFailure(( 
+  ignore((logOnFailure((
    colormsg(red,"this is red!"),
    set_console_attached,
    set_prolog_flag(color_term,true),

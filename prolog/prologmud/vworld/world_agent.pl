@@ -25,12 +25,14 @@ parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):-
 parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- 
    debugging(parser), trace, parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD).
 
-must_ac(G):- show_call(must(G)).
+must_ac(G):- show_call_failure(must(G)).
 
 
 % =====================================================================================================================
 % call_agent_command_0/2 -->  call_agent_action/2
 % =====================================================================================================================
+
+call_agent_command(C):-foc_current_player(A),!,call_agent_command(A,C).
 
 call_agent_command(A,C):-with_assertions(tlbugger:old_no_repeats, call_agent_command_0(A,C)).
 

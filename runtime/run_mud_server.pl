@@ -55,7 +55,7 @@ pddlSomethingIsa('iCommBadge674',['tCommBadge','ProtectiveAttire','PortableObjec
 pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
 
-
+% create some seats
 tExplorer(iPlayer1).
 tExplorer(iPlayer2).
 tExplorer(iPlayer3).
@@ -87,36 +87,19 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 :-onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
 
 
-% arity(do_ensure_some_pathBetween,0).
-ensure_some_pathBetween(R1,R2):- pathBetween(R1,_,R2),!.
-ensure_some_pathBetween(R1,R2):- pathBetween(R2,_,R1),!.
-ensure_some_pathBetween(R1,R2):- random_path_dir(Dir), not(pathBetween(R1,Dir,_)),must(reverse_dir(Dir,Rev)),not(pathBetween(R2,Rev,_)),!, 
-   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
-ensure_some_pathBetween(R1,R2):- must((add(pathBetween(R1,apathFn(R1,R2),R2)),add(pathBetween(R2,apathFn(R2,R1),R1)))),!.
-
-% isa(user:do_ensure_some_pathBetween,prologOnly).
-
-do_ensure_some_pathBetween:-
-  must((forall(no_repeats((is_asserted(pathConnects(R1,R2)),ground(R1:R2),isa(R1,tRegion),isa(R2,tRegion),dif(R1,R2))),
-    must((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1)))))).
-
 
 % [Optionaly] Start the telent server
 :-at_start(toploop_telnet:start_mud_telnet(4000)).
 
 
-:-onEachLoad(must(do_ensure_some_pathBetween)).
-
 % [Optional] the following game files though can be loaded separate instead
 :- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
 :- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
+:- declare_load_dbase('../games/src_game_nani/*.plmoo').
 
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- (if_startup_script( at_start(finish_processing_world))).
-
-% [Manditory] But soon it will be triggerd by the next block
-:- (((user:do_ensure_some_pathBetween))).
 
 
 % [Optionaly] Run a battery of tests

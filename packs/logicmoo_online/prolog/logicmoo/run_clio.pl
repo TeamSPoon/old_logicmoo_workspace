@@ -55,9 +55,6 @@ load_blog_core:- use_module(library(arouter)),use_module(library(docstore)),use_
 :- use_module(cliopatria('applications/help/load')).
 % :- use_module(cliopatria(components/menu)).
 
-% :- listing((pre_http_location(_, _, _))), retractall((pre_http_location(cliopatria, root('.'), []))), retractall((pre_http_location(_, root('.'), []))),!.
-% doesn't descend from root because that's being moved for cliopatria
-% http:location(cliopatria, root(cliopatria), [priority(100)]).
 
 :-if(not(current_predicate(user_db:grant_openid_server/2))).
 user_db:grant_openid_server(_,_).
@@ -144,7 +141,9 @@ pre_http_location(yui_examples, yui_base(examples), [js(true)]).
 pre_http_location(yui_base, www('yui/2.7.0'), []).
 pre_http_location(pldoc, root('help/source'), [priority(10)]).
 
-
+% :- lsting((pre_http_location(_, _, _))), retractall((pre_http_location(cliopatria, root('.'), []))), retractall((pre_http_location(_, root('.'), []))),!.
+% doesn't descend from root because that's being moved for cliopatria
+% http:location(cliopatria, root(cliopatria), [priority(100)]).
 
 :- retractall((http:location(_, root('.'), []))).
 :- http:asserta((http:location(A,B,C):- pre_http_location(A,B,C))).
@@ -164,7 +163,7 @@ semweb_startup_late:- cp_server:attach_account_info.
 
 % :- asserta((user:file_search_path(A,B):-pre_file_search_path(A,B))).
  
-:-debug(_).
+:- debug(_).
 :- nodebug(syntax_error(illegal_number)).
 :- nodebug(number_codes/2).
 :- nodebug(number_codes(_,_)).

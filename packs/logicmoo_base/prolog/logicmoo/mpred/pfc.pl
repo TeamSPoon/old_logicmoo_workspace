@@ -242,9 +242,9 @@ pfc_rewrap_h(A,not_not(A)):-!.
 fwc:-true.
 bwc:-true.
 wac:-true.
-is_fc_body(P):- (fwc==P ; (compound(P),arg(1,P,E),is_fc_body(E))),!.
-is_bc_body(P):- (bwc==P ; (compound(P),arg(1,P,E),is_bc_body(E))),!.
-is_action_body(P):- (wac==P ; (compound(P),arg(1,P,E),is_action_body(E))),!.
+is_fc_body(P):- notrace(fwc==P ; (compound(P),arg(1,P,E),is_fc_body(E))),!.
+is_bc_body(P):- notrace(bwc==P ; (compound(P),arg(1,P,E),is_bc_body(E))),!.
+is_action_body(P):- notrace(wac==P ; (compound(P),arg(1,P,E),is_action_body(E))),!.
 
 
 :-dynamic(use_presently/0).
@@ -272,7 +272,7 @@ clause_u(H,B,Ref):-clause(H,B,Ref).
 call_u(user:X):-!,no_repeats(call_u_0(X)).
 call_u(X):-!,no_repeats(call_u_0(X)).
 
-call_u_0(X):-var(X),!,show_call(pfc_fact(X)).
+call_u_0(X):-var(X),!,pfc_fact(X).
 call_u_0(call_u(X)):-!,call_u_0(X).
 call_u_0(X):-current_predicate(_,X),!,debugOnError(loop_check(call(X))).
 call_u_0(X):-pfc_call(X).
@@ -1992,7 +1992,7 @@ pfc_fact(P) :- pfc_fact(P,true).
 %=  pfc_fact(X,pfc_user_fact(X))
 %=
 
-pfc_user_fact(X):-spft(X,U,U).
+pfc_user_fact(X):-no_repeats(spft(X,U,U)).
 
 pfc_fact(P,C) :-
   pfc_get_support(P,_),

@@ -193,19 +193,8 @@ pp_ihtml(pt(Trigger,Body)):-      pp_ihtml(proplst(['p-trigger'=Trigger ,  body=
 pp_ihtml(bt(Trigger,Body)):-      pp_ihtml(proplst(['b-trigger'=Trigger ,  body=Body])).
 pp_ihtml(proplst([N=V|Val])):- is_list(Val),!, pp_ihtml(N:-([clause=V|Val])).
 pp_ihtml(proplst(Val)):-!, pp_ihtml(:-(proplst(Val))).
-pp_ihtml(C):-!,rok_portray_clause(C),!.
+pp_ihtml(C):-rok_portray_clause(C),!.
 
-pp_ihtml(proplst([])):-!.
-pp_ihtml(proplst([H|T])):-format('~N'),pp_ihtml(H),format('~N'),pp_ihtml(proplst(T)).
-pp_ihtml(H=T):-format('~N~w = ',[H]),pp_ihtml(T).
-pp_ihtml(M:C):- (M=='';M==""),!,pp_ihtml(C),!.
-pp_ihtml(M:C):- pp_ihtml(M),format(':'),pp_ihtml(C).
-
-
-pp_ihtml(C):-  is_list(C),flag(indent,X,X),html_lst_term(C),!,flag(indent,_,X).
-pp_ihtml(C):- compound(C),flag(indent,X,X),portray(C),!,flag(indent,_,X).
-pp_ihtml(T):- atom(T),!,write_atom_link(current_output,T,T).
-pp_ihtml(T):-format('~q',[T]).
 
 % ===================================================
 % Pretty Print Formula

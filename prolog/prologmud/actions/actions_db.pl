@@ -108,102 +108,102 @@ end_of_file.
 
 %<actions>
 
-% <!-- looking: This frame concerns an Agent (a person or other intelligent being) paying close attention to something, the Theme -->
+% <!-- looking: This frame concerns an Agent (a person or other intelligent being) paying close attention to something, the Something -->
 % <action name="look">
-%	<params>Agent,Theme</params>
+%	<params>Agent,Something</params>
 % <!--
-look(agent(Agent),theme(Theme)) :- % -->
+look(agent(Agent),something(Something)) :- % -->
 %   <preconds>
-	k(here(Theme)),
+	k(here(Something)),
 %	</preconds>
 %	<effects>
-	add(hold(Theme,Agent)),
+	add(contains(Something,Agent)),
 	add(describe(here)).
 %	</effects>
 %</action>
 
-% <!-- looking: This frame concerns an Agent (a person or other intelligent being) paying close attention to something, the Theme -->
+% <!-- looking: This frame concerns an Agent (a person or other intelligent being) paying close attention to something, the Something -->
 % <action name="look">
-%	<params>Agent,Theme</params>
+%	<params>Agent,Something</params>
 % <!--
-look(agent(Agent),theme(Theme)) :- % -->
+look(agent(Agent),something(Something)) :- % -->
 %   <preconds>
-	notk(here(Theme)),
-	k(lookable(Theme)),
+	notk(here(Something)),
+	k(lookable(Something)),
 %	</preconds>
 %	<effects>
-	add(describe(Theme)).
+	add(describe(Something)).
 %	</effects>
 %</action>
 
-% <!-- removing: An Agent causes a Theme to move away from a location, the Source -->
+% <!-- removing: An Agent causes a Something to move away from a location, the Source -->
 % <action name="take">
-%	<params>Agent,Theme,Source</params>
+%	<params>Agent,Something,Source</params>
 % <!--
-take(agent(Agent),theme(Theme),source(Source)) :- % -->
+take(agent(Agent),something(Something),source(Source)) :- % -->
 %       <preconds>
-	k(takeAble(Theme)),
-	k(accessible(Theme)),
-	notk(hold(Agent,Theme)),
-	k(hasdetail(Source,Theme)),
+	k(takeAble(Something)),
+	k(accessible(Something)),
+	notk(contains(Agent,Something)),
+	k(hasdetail(Source,Something)),
 %	</preconds>
 %	<effects>
-	del(hasdetail(Source,Theme)),
-	add(hold(Agent,Theme)).
+	del(hasdetail(Source,Something)),
+	add(contains(Agent,Something)).
 %	</effects>
 %</action>
 
-% <!-- taking: An Agent removes a Theme from a Source so that it is in the Agent's possession -->
+% <!-- taking: An Agent removes a Something from a Source so that it is in the Agent's possession -->
 % <action name="take">
-%	<params>Agent,Theme,Source</params>
+%	<params>Agent,Something,Source</params>
 % <!--
-take(agent(Agent),theme(Theme),source(Source)) :- % -->
+take(agent(Agent),something(Something),source(Source)) :- % -->
 %       <preconds>
-	k(takeAble(Theme)),
-	k(accessible(Theme)),
-	notk(hold(Agent,Theme)),
-	k(hold(Source,Theme)),
+	k(takeAble(Something)),
+	k(accessible(Something)),
+	notk(contains(Agent,Something)),
+	k(contains(Source,Something)),
 %	</preconds>
 %	<effects>
-	del(hold(Source,Theme)),
-	add(hold(Agent,Theme)).
+	del(contains(Source,Something)),
+	add(contains(Agent,Something)).
 %	</effects>
 %</action>
 
 % <!-- unlocking:  -->
 % <action name="unlock">
-%	<params>Agent,Theme,Instrument</params>
+%	<params>Agent,Something,Instrument</params>
 % <!--
-unlock(agent(Agent),theme(Theme),instrument(Instrument)) :- % -->
+unlock(agent(Agent),something(Something),instrument(Instrument)) :- % -->
 %   <preconds>
-	k(accessible(Theme)),
-	k(locked(Theme)),
-	pk(fitsin(Instrument,Theme)),
-	k(hold(Agent,Instrument)),
+	k(accessible(Something)),
+	k(locked(Something)),
+	pk(fitsin(Instrument,Something)),
+	k(contains(Agent,Instrument)),
 %	</preconds>
 %	<effects>
-	del(locked(Theme)),
-	add(unlocked(Theme)),
-	add(fitsin(Instrument,Theme)).
+	del(locked(Something)),
+	add(unlocked(Something)),
+	add(fitsin(Instrument,Something)).
 %	</effects>
 %</action>
 
 
 % <!-- locking:  -->
 % <action name="lock">
-%	<params>Agent,Theme,Instrument</params>
+%	<params>Agent,Something,Instrument</params>
 % <!--
-lock(agent(Agent),theme(Theme),instrument(Instrument)) :- % -->
+lock(agent(Agent),something(Something),instrument(Instrument)) :- % -->
 %   <preconds>
-	k(accessible(Theme)),
-	k(closed(Theme)),
-	k(unlocked(Theme)),
-	k(fitsin(Instrument,Theme)),
-	k(hold(Agent,Instrument)),
+	k(accessible(Something)),
+	k(closed(Something)),
+	k(unlocked(Something)),
+	k(fitsin(Instrument,Something)),
+	k(contains(Agent,Instrument)),
 %	</preconds>
 %	<effects>
-	del(unlocked(Theme)),
-	add(locked(Theme)).
+	del(unlocked(Something)),
+	add(locked(Something)).
 %	</effects>
 %</action>
 
@@ -249,96 +249,96 @@ eat(ingestor(Ingestor),ingestible(Ingestible)) :- % -->
 %   <preconds>
 	k(edible(Ingestible)),
 	notk(disgusting(Ingestible)),
-	k(hold(Ingestor,Ingestible)),
+	k(contains(Ingestor,Ingestible)),
 %	</preconds>
 %	<effects>
-	del(hold(Ingestor,Ingestible)),
+	del(contains(Ingestor,Ingestible)),
 	add(gone(Ingestible)).
 %	</effects>
 %</action>
 
-% <!-- cause_motion: An Agent causes a Theme to undergo directed motion, 
-% the Agent has control of the Theme only at the Source of motion-->
+% <!-- cause_motion: An Agent causes a Something to undergo directed motion, 
+% the Agent has control of the Something only at the Source of motion-->
 % <action name="drop">
-%	<params>Agent,Theme,Goal</params>
+%	<params>Agent,Something,Target</params>
 % <!--
-drop(agent(Agent),theme(Theme),goal(Goal)) :- % -->
+drop(agent(Agent),something(Something),goal(Target)) :- % -->
 %       <preconds>
-	k(hold(Goal,Agent)),
-	k(hold(Agent,Theme)),
+	k(contains(Target,Agent)),
+	k(contains(Agent,Something)),
 %	</preconds>
 %	<effects>
-	del(hold(Agent,Theme)),
-	add(hold(Goal,Theme)).
+	del(contains(Agent,Something)),
+	add(contains(Target,Something)).
 %	</effects>
 %</action>
 
-% <!-- cause_motion: An Agent causes a Theme to undergo directed motion, 
-% the Agent has control of the Theme only at the Source of motion-->
+% <!-- cause_motion: An Agent causes a Something to undergo directed motion, 
+% the Agent has control of the Something only at the Source of motion-->
 % <action name="throw">
-%	<params>Agent,Theme,Goal</params>
+%	<params>Agent,Something,Target</params>
 % <!--
-throw(agent(Agent),theme(Theme),goal(Goal)) :- % -->
+throw(agent(Agent),something(Something),goal(Target)) :- % -->
 %       <preconds>
-	k(hold(Agent,Theme)),
-	k(alive(Theme)),
-	k(genericcontainer(Goal)),
+	k(contains(Agent,Something)),
+	k(alive(Something)),
+	k(genericcontainer(Target)),
 %	</preconds>
 %	<effects>
-	del(hold(Agent,Theme)),
-	del(alive(Theme)),
-	add(hold(Goal,Theme)),
-	add(dead(Theme)).
+	del(contains(Agent,Something)),
+	del(alive(Something)),
+	add(contains(Target,Something)),
+	add(dead(Something)).
 %	</effects>
 %</action>
 
-% <!-- placing: An Agent places a Theme at a location, the Goal, which is 
+% <!-- placing: An Agent places a Something at a location, the Target, which is 
 % profiled -->
 % <action name="put">
-%	<params>Agent,Theme,Goal</params>
+%	<params>Agent,Something,Target</params>
 % <!--
-put(agent(Agent),theme(Theme),goal(Goal)) :- % -->
+put(agent(Agent),something(Something),goal(Target)) :- % -->
 %	<preconds>
-	k(hold(Agent,Theme)),
-	k(genericcontainer(Goal)),
-	k(accessible(Goal)),
+	k(contains(Agent,Something)),
+	k(genericcontainer(Target)),
+	k(accessible(Target)),
 %	</preconds>
 %	<effects>
-	del(hold(Agent,Theme)),
-	add(hold(Goal,Theme)).
+	del(contains(Agent,Something)),
+	add(contains(Target,Something)).
 %	</effects>
 %</action>
 
-% <!-- placing: An Agent places a Theme at a location, the Goal, which is 
+% <!-- placing: An Agent places a Something at a location, the Target, which is 
 % profiled -->
 % <action name="put">
-%	<params>Agent,Theme,Goal</params>
+%	<params>Agent,Something,Target</params>
 % <!--
-put(agent(Agent),theme(Theme),goal(Goal)) :- % -->
+put(agent(Agent),something(Something),goal(Target)) :- % -->
 %	<preconds>
-	k(hold(Agent,Theme)),
-	notk(genericcontainer(Goal)),
-	k(accessible(Goal)),
+	k(contains(Agent,Something)),
+	notk(genericcontainer(Target)),
+	k(accessible(Target)),
 %	</preconds>
 %	<effects>
-	del(hold(Agent,Theme)),
-	add(hasdetail(Goal,Theme)).
+	del(contains(Agent,Something)),
+	add(hasdetail(Target,Something)).
 %	</effects>
 %</action>
 
-% <!-- placing: An Agent places a Theme on himself -->
+% <!-- placing: An Agent places a Something on himself -->
 % <action name="wear">
-%	<params>Agent,Theme</params>
+%	<params>Agent,Something</params>
 % <!--
-wear(agent(Agent),theme(Theme)) :- % -->
+wear(agent(Agent),something(Something)) :- % -->
 %	<preconds>
-	k(hold(Agent,Theme)),
-	k(accessible(Theme)),
-	k(wearable(Theme)),
+	k(contains(Agent,Something)),
+	k(accessible(Something)),
+	k(wearable(Something)),
 %	</preconds>
 %	<effects>
-	del(hold(Agent,Theme)),
-	add(hasdetail(Agent,Theme)).
+	del(contains(Agent,Something)),
+	add(hasdetail(Agent,Something)).
 %	</effects>
 %</action>
 
@@ -416,55 +416,55 @@ kill(killer(Killer),victim(Victim),instrument(Instrument)) :- % -->
 %	</effects>
 %</action>
 
-% <!-- A Protagonist changes the overall postion and posture of the body from a Source to a Goal. -->
+% <!-- A Protagonist changes the overall postion and posture of the body from a Source to a Target. -->
 % <action name="move">
-%	<params>Protagonist,Source,Goal</params>
+%	<params>Protagonist,Source,Target</params>
 % <!--
-standup(protagonist(Protagonist),source(Source),goal(Goal)) :- % -->
+standup(protagonist(Protagonist),source(Source),goal(Target)) :- % -->
 %	<preconds>
-	k(hold(Source,Protagonist)),
+	k(contains(Source,Protagonist)),
 	k(seated(Protagonist)),
-	k(hold(Goal,Source)),
+	k(contains(Target,Source)),
 %	</preconds>
 %	<effects>
-	del(hold(Source,Protagonist)),
-	add(hold(Goal,Protagonist)).
+	del(contains(Source,Protagonist)),
+	add(contains(Target,Protagonist)).
 %	</effects>
 %</action>
 
-% <!-- A Protagonist changes the overall postion and posture of the body from a Source to a Goal. -->
+% <!-- A Protagonist changes the overall postion and posture of the body from a Source to a Target. -->
 % <action name="move">
-%	<params>Protagonist,Source,Goal</params>
+%	<params>Protagonist,Source,Target</params>
 % <!--
-sitdown(protagonist(Protagonist),source(Source),goal(Goal)) :- % -->
+sitdown(protagonist(Protagonist),source(Source),goal(Target)) :- % -->
 %	<preconds>
-	k(hold(Source,Protagonist)),
+	k(contains(Source,Protagonist)),
 	notk(seated(Protagonist)),
-	k(seating(Goal)),
-	k(hold(Source,Goal)),
+	k(seating(Target)),
+	k(contains(Source,Target)),
 %	</preconds>
 %	<effects>
-	del(hold(Source,Protagonist)),
-	add(hold(Goal,Protagonist)).
+	del(contains(Source,Protagonist)),
+	add(contains(Target,Protagonist)).
 %	</effects>
 %</action>
 
-% <!-- A Protagonist changes the overall postion and posture of the body from a Source to a Goal. -->
+% <!-- A Protagonist changes the overall postion and posture of the body from a Source to a Target. -->
 % <action name="move">
-%	<params>Protagonist,Source,Goal</params>
+%	<params>Protagonist,Source,Target</params>
 % <!--
-move(protagonist(Protagonist),exit(Exit),goal(Goal),source(Source)) :- % -->
+move(protagonist(Protagonist),exit(Exit),goal(Target),source(Source)) :- % -->
 %	<preconds>
 	k(here(Source)),
 	% I'd like to add here k(hereroom(Room)), k(hasexit(Room,Exit))
 	notk(seated(Protagonist)),
 	k(hasexit(Source,Exit)),
-	k(leadsto(Exit,Goal)),
+	k(leadsto(Exit,Target)),
 %	</preconds>
 %	<effects>
-	del(hold(Source,Protagonist)),
-	add(hold(Goal,Protagonist)),
-	add(leadsto(Exit,Goal)),
+	del(contains(Source,Protagonist)),
+	add(contains(Target,Protagonist)),
+	add(leadsto(Exit,Target)),
 	add(describe(here)).
 %	</effects>
 %</action>

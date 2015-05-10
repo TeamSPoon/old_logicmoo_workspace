@@ -105,8 +105,6 @@
 
 
 
-%:- dynamic_multifile_exported(do_ensure_some_pathBetween/0).
-%:- dynamic_multifile_exported(ensure_some_pathBetween/2).
 :- dynamic_multifile_exported thglobal:pfcManageHybrids/0.
 :- dynamic_multifile_exported thlocal:infMustArgIsa/0.
 :- thread_local thlocal:into_form_code/0.
@@ -171,3 +169,5 @@
 % :- dynamic_multifile_exported user:ruleBackward/2.
 
 % :-must(not(user:mpred_prop(t,prologHybrid))).
+
+:- retractall(thlocal:disable_mpred_term_expansions_locally/0).

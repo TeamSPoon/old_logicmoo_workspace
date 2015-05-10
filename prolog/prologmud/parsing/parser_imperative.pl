@@ -7,22 +7,24 @@
 %
 */
 
-:-swi_module(parser_imperative, []).
 
+:- include(prologmud(mud_header)).
+
+/*
+
+:-swi_module(parser_imperative, []).
 :-export((
                    parse_agent_text_command/5,            
                    parse_agent_text_command_0/5,            
                    objects_match/3,
                    match_object/2,
                    object_string/2,
-                   coerce/3)).
-:-export((
+                   coerce/3,
                    parseIsa//2,
                    phrase_parseForTypes_9//2,
                    parseForTypes//2)).
 
-:- include(prologmud(mud_header)).
-
+*/
 % :- register_module_type (utility).
 
 % =====================================================================================================================
@@ -226,7 +228,7 @@ match_object_1(A,Obj):-same_ci(A,Obj),!.
 match_object_1(A,Obj):-hotrace((isa(Obj,Type))),same_ci(A,Type),!.
 
 
-dmsg_parserm(D):-dmsg(D),!.
+% dmsg_parserm(D):-dmsg(D),!.
 dmsg_parserm(D):-ignore((debugging(parser),dmsg(D))).
 dmsg_parserm(F,A):-ignore((debugging(parser),dmsg(F,A))).
 

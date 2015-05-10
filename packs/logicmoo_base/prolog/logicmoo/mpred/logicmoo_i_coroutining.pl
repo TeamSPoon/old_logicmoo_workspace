@@ -20,6 +20,94 @@
 % :- use_module(library(lists)).
 
 
+
+attribs_to_atoms(ListA,List):-map_subterms(attribs_to_atoms0,ListA,List).
+
+map_subterms(Pred,I,O):-call(Pred,I,O).
+map_subterms(Pred,I,O):-is_list(I),!,maplist(map_subterms(Pred),I,O).
+map_subterms(Pred,I,O):-compound(I),!,I=..IL,maplist(map_subterms(Pred),IL,OL),O=..OL.
+map_subterms(Pred,IO,IO).
+
+iza_to_isa(Iza,ftTerm):-var(Iza),!.
+iza_to_isa((A,B),isAnd(ListO)):-!,conjuncts_to_list((A,B),List),min_isa_l(List,ListO).
+iza_to_isa((A;B),isOr(List)):-!,conjuncts_to_list((A,B),List).
+iza_to_isa(AA,AB):-must(AA=AB).
+
+
+
+% ?-put_attr(V,argisa,foo),V=good.
+whatnot:attribute_goals(_) --> [true].
+whatnot:attr_unify_hook(_, _).
+
+argisa:attribute_goals(_) --> [true].
+argisa:attr_unify_hook(_, _).
+argisa:attr_unify_hook(Domain, Y) :-
+        (   get_attr(Y, domain, Dom2)
+        ->  ord_intersection(Domain, Dom2, NewDomain),
+            (   NewDomain == []
+            ->  fail
+            ;   NewDomain = [Value]
+            ->  Y = Value
+            ;   put_attr(Y, domain, NewDomain)
+            )
+        ;   var(Y)
+        ->  put_attr( Y, domain, Domain )
+        ;   ord_memberchk(Y, Domain)
+        ).
+
+attribs_to_atoms0(Var,Isa):-get_attr(Var,argisa,Iza),!,must(iza_to_isa(Iza,Isa)).
+attribs_to_atoms0(O,O):-not(compound(O)).
+
+
+min_isa_l(List,ListO):-isa_pred_l(genls,List,ListO).
+
+
+isa_pred_l(Pred,List,ListO):-isa_pred_l(Pred,List,List,ListO).
+
+isa_pred_l(Pred,[],List,[]).
+isa_pred_l(Pred,[X|L],List,O):-member(Y,List),X\=Y,call(Pred,X,Y),!,isa_pred_l(Pred,L,List,O).
+isa_pred_l(Pred,[X|L],List,[X|O]):-isa_pred_l(Pred,L,List,O).
+
+min_isa(HintA,HintA,HintA):-!.
+min_isa(HintA,HintB,HintA):- genls(HintA,HintB),!.
+min_isa(HintB,HintA,HintA):- genls(HintA,HintB),!.
+min_isa((A,B),HintC,HintO):- min_isa(A,HintC,HintA),min_isa(B,HintC,HintB),conjoin(HintA,HintB,HintO).
+min_isa(HintA,HintB,HintO):- conjoin(HintA,HintB,HintO).
+
+max_isa(HintA,HintA,HintA):-!.
+max_isa(HintA,HintB,HintB):- genls(HintA,HintB),!.
+max_isa(HintB,HintA,HintB):- genls(HintA,HintB),!.
+max_isa((A,B),HintC,HintO):- max_isa(A,HintC,HintA),max_isa(B,HintC,HintB),conjoin(HintA,HintB,HintO).
+max_isa(HintA,HintB,HintO):- conjoin(HintA,HintB,HintO).
+
+
+add_iza(Var,HintA):- var(Var),(get_attr(Var,argisa,HintB)->min_isa(HintA,HintB,Hint);Hint=HintA), put_attr(Var,argisa,Hint).
+add_iza(Var,Hint):- ignore(show_call_failure(isa(Var,Hint))).
+
+attempt_attribute_args(AndOr,Hint,Var):- var(Var),add_iza(Var,Hint),!.
+attempt_attribute_args(AndOr,Hint,Grnd):-ground(Grnd),!.
+attempt_attribute_args(AndOr,Hint,Term):-not(compound(Term)),!.
+attempt_attribute_args(AndOr,Hint,+(A)):-!,attempt_attribute_args(AndOr,Hint,A).
+attempt_attribute_args(AndOr,Hint,-(A)):-!,attempt_attribute_args(AndOr,Hint,A).
+attempt_attribute_args(AndOr,Hint,?(A)):-!,attempt_attribute_args(AndOr,Hint,A).
+attempt_attribute_args(AndOr,Hint,(A,B)):-!,attempt_attribute_args(AndOr,Hint,A),attempt_attribute_args(AndOr,Hint,B).
+attempt_attribute_args(AndOr,Hint,[A|B]):-!,attempt_attribute_args(AndOr,Hint,A),attempt_attribute_args(AndOr,Hint,B).
+attempt_attribute_args(AndOr,Hint,(A;B)):-!,attempt_attribute_args(';'(AndOr),Hint,A),attempt_attribute_args(';'(AndOr),Hint,B).
+attempt_attribute_args(AndOr,Hint,Term):- Term=..[F,A],tCol(F),!,attempt_attribute_args(AndOr,F,A).
+attempt_attribute_args(AndOr,Hint,Term):- Term=..[F|ARGS],!,attempt_attribute_args(AndOr,Hint,F,1,ARGS).
+
+attempt_attribute_args(AndOr,_Hint,_F,_N,[]):-!.
+attempt_attribute_args(AndOr,Hint,t,1,[A]):-attempt_attribute_args(AndOr,callable,A).
+attempt_attribute_args(AndOr,Hint,t,N,[A|ARGS]):-atom(A),!,attempt_attribute_args(AndOr,Hint,A,N,ARGS).
+attempt_attribute_args(AndOr,Hint,t,N,[A|ARGS]):-not(atom(A)),!.
+attempt_attribute_args(AndOr,Hint,F,N,[A|ARGS]):-attempt_attribute_one_arg(Hint,F,N,A),N2 is N+1,attempt_attribute_args(AndOr,Hint,F,N2,ARGS).
+
+attempt_attribute_one_arg(Hint,F,N,A):-argIsa(F,N,Type),not(compound(Type)),!,attempt_attribute_args(AndOr,Type,A).
+attempt_attribute_one_arg(Hint,F,N,A).
+    
+
+
+
 % mdif(A,B):- tlbugger:attributedVars,!,dif(A,B).
 mdif(_,_).
 

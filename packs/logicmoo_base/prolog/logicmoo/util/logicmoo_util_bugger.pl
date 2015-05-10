@@ -68,7 +68,8 @@ unused_bugger:-module(bugger,[
      flush_output_safe/0,
      flush_output_safe/1,
 
-     % loop_check/2,
+     loop_check/1,
+     loop_check/2,
      loop_check_term/3,     
      loop_check_term_key/3,
      no_loop_check_term_key/3,
@@ -247,7 +248,8 @@ hotrace(M:X):-  visible(+exception),leash(+exception),restore_trace((notrace,M:c
      flush_output_safe/0,
      flush_output_safe/1,
 
-     %loop_check/2,
+     loop_check/1,
+     loop_check/2,
      loop_check_term/3,
          % loop_check_throw/1,
          %loop_check_fail/1,
@@ -474,7 +476,7 @@ badfood(MCall):- numbervars(MCall,0,_,[functor_name('VAR_______________________x
 %must(C):-is_release,!,C.
 
 %must(C):-  tlbugger:skipMust,!,catch(C,E,(wdmsg(E:C),fail)).
-must(C):- catch(C,E,(wdmsg(E:C),fail)) *-> true ; (wdmsg(failed_must(C)),trace,dtrace(C)).
+must(C):- catch(C,E,(wdmsg(E:C),fail)) *-> true ; (wdmsg(error,failed_must(C)),dtrace(C)).
 %must(MCall):- skipWrapper,!, (MCall *-> true ; ((dmsg(failed(must(MCall))),trace,MCall))).
 %must(C):-  tlbugger:skipMust,!,catch(C,E,(wdmsg(E:C),fail)).
 must(MCall):- hotrace((tlbugger:show_must_go_on,
@@ -977,8 +979,8 @@ make_key(CCI,Key):- hotrace((=(CCI,CC),(ground(CC)->Key=CC ; (copy_term(CC,Key,_
 %no_loop_check(Call):- make_key(Call,Key), with_assertions([-(tlbugger:ilc(_)),tlbugger:ilc(Key)],Call).
 %no_loop_check(Call, TODO):-  with_no_assertions(tlbugger:ilc(_),loop_check(Call,TODO)).
 
-%loop_check(Call):- loop_check(Call,fail).
-%loop_check(Call, TODO):- make_key(Call,Key),!, loop_check_term(Call,Key,TODO).
+loop_check(Call):- loop_check(Call,fail).
+loop_check(Call, TODO):- make_key(Call,Key),!, loop_check_term(Call,Key,TODO).
 
 
 loop_check_term_key(Call,KeyIn,TODO):- make_key(KeyIn,Key),!, loop_check_term(Call,Key,TODO).
@@ -1808,7 +1810,8 @@ set_optimize(TF):- set_prolog_flag(gc,TF),set_prolog_flag(last_call_optimisation
 do_gc:- current_prolog_flag(gc,true),!,do_gc0.
 do_gc:- set_prolog_flag(gc,true), do_gc0, set_prolog_flag(gc,false).
 
-do_gc0:- notrace((garbage_collect, garbage_collect_atoms, statistics)).
+do_gc0:- notrace((garbage_collect, garbage_collect_atoms, garbage_collect_clauses /*, statistics*/
+                    )).
 
 
 failOnError(Call):-catchv(Call,_,fail).
@@ -3541,7 +3544,7 @@ real_list_undefined(A):-
         ).
 
 :-export(mmake/0).
-mmake:- update_changed_files.
+mmake:- update_changed_files , if_defined(load_mpred_files).
 :-export(update_changed_files/0).
 update_changed_files :-
         set_prolog_flag(verbose_load,true),
