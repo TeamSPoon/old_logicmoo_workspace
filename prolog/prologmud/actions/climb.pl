@@ -25,9 +25,9 @@ can_move_into(_LOC,XXYY):-ground(XXYY).
 vtActionTemplate(actClimb(vtDirection)).
 %:- notrace.
 %:-stop_rtrace.
-% Climb
-% If there is nothing there to climb, move to location
-% plus take some damage and loose charge 
+
+
+% Climb - If there is nothing there to climb, move to location plus take some damage and loose charge 
 user:agent_call_command(Agent,actClimb(Dir)) :-	
 	mudAtLoc(Agent,LOC),
 	from_dir_target(LOC,Dir,XXYY),
@@ -35,12 +35,13 @@ user:agent_call_command(Agent,actClimb(Dir)) :-
 	in_world_move(_,Agent,Dir),
 	call_update_stats(Agent,trip),
 	call_update_charge(Agent,actClimb).
+
 % Object is too high to climb, or it is another agent. 
-user:agent_call_command(Agent,actClimb(Dir)) :-
-	
+user:agent_call_command(Agent,actClimb(Dir)) :-	
 	\+ climbable(Agent,Dir),
 	call_update_stats(Agent,pulled),
 	call_update_charge(Agent,actClimb).
+
 % Successful climb
 user:agent_call_command(Agent,actClimb(Dir)) :-	
 	in_world_move(_,Agent,Dir),

@@ -632,23 +632,28 @@ user:term_expansion(I,OO):- is_file_clause(I), \+ thlocal:disable_mpred_term_exp
 
 :-set_prolog_flag(allow_variable_name_as_functor,true).
 
+varFunctorEscape('@').
+varFunctorEscape(':').
+varFunctorEscape('\262\').
+varFunctorEscape(A):-atom(A),atom_codes(A,[C]),C>255.
 
-to_var_functors(Outer,In,Out):- 
+to_var_functors(Outer,In,Out):-  
+ varFunctorEscape(VFE),
    \+ compound(In)->In=Out;
   (compound_name_arguments(In,Name,Args),
    (Args==[]->Out=Name;
-      ((Name='@',Args=[JustOne] )-> (to_var_functors('@',JustOne,VOut),(functor(VOut,t,_)->Out=VOut;Out='@'(VOut)));
+      ((Name=VFE,Args=[JustOne] )-> (to_var_functors(VFE,JustOne,VOut),(functor(VOut,t,_)->Out=VOut;Out=..[VFE,VOut]));
       ( maplist(to_var_functors(Name),Args,ArgsO),
-      ((Name\='[|]',Outer='@',atom_codes(Name,[C|_]),code_type(C,prolog_var_start),
-         nb_getval('$variable_names', Vs),trace,(member(Name=Var,Vs)->true;nb_setval('$variable_names', [Name=Var|Vs])))
-           -> Out=..[t,Var|ArgsO];  (Args==ArgsO->(Out=In);compound_name_arguments(In,Name,Args))))))).
+      ((Name\='[|]',Outer=VFE,atom_codes(Name,[C|_]),code_type(C,prolog_var_start),
+         nb_getval('$variable_names', Vs),(member(Name=Var,Vs)->true;nb_setval('$variable_names', [Name=Var|Vs])))
+           -> Out=..[t,Var|ArgsO];  (Args==ArgsO->(Out=In);compound_name_arguments(Out,Name,ArgsO))))))).
   
 
-user:term_expansion(I,O):- nonvar(I),I='@'(_),current_prolog_flag(allow_variable_name_as_functor,true),
+system:term_expansion(I,O):- compound(I),functor(I,VFE,1),varFunctorEscape(VFE),current_prolog_flag(allow_variable_name_as_functor,true),
                      \+ thlocal:disable_mpred_term_expansions_locally,
                        with_assertions(thlocal:disable_mpred_term_expansions_locally,to_var_functors((:-),I,O)),I\=@=O.
 
-system:goal_expansion(I,O):- nonvar(I),I='@'(_),current_prolog_flag(allow_variable_name_as_functor,true),
+system:goal_expansion(I,O):- compound(I),functor(I,VFE,1),varFunctorEscape(VFE),current_prolog_flag(allow_variable_name_as_functor,true),
                      \+ thlocal:disable_mpred_term_expansions_locally,to_var_functors((:-),I,O),I\=@=O.
 
 

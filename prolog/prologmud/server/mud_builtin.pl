@@ -76,6 +76,8 @@ ttUnverifiableType(vtDirection).
 
 ((typeGenls(TypeType,Super), genls(Type,Super)) => isa(Type,TypeType)).
 
+
+
 /*
 disjointWith(A,B):- A=B,!,fail.
 disjointWith(A,B):- disjointWithT(A,B).
@@ -94,7 +96,7 @@ isa(arity,tBinaryPredicate).
 
 (arity(Pred,2),tPred(Pred)) <=> isa(Pred,tBinaryPredicate).
 prologHybrid(relationMostInstance(tBinaryPredicate,tCol,ftValue)).
-relationMostInstance(BP,_,_)=>tBinaryPredicate(BP).
+relationMostInstance(BP,_,_)=>(tBinaryPredicate(BP),tRolePredciate(BP)).
 prologHybrid(relationAllInstance(tBinaryPredicate,tCol,ftValue)).
 relationAllInstance(BP,_,_)=>tBinaryPredicate(BP).
 
@@ -179,6 +181,8 @@ genlPreds(genls,equals).
 
 
 tCol(tFly).
+
+prologHybrid(localityOfObject(tObj,tSpatialThing)).
 
 
 (tCol(Inst), {isa_from_morphology(Inst,Type)}) => isa(Inst,Type).
@@ -321,6 +325,7 @@ tCol(vtVerb).
 tCol(tMonster).
 %prologOnly(user:action_info(vtActionTemplate,ftText)).
 prologOnly(agent_call_command(tAgent,ftAction)).
+prologSideEffects(agent_call_command(tAgent,ftAction)).
 prologOnly(member(ftTerm,ftTerm)).
 prologOnly(mud_test(ftTerm,ftCallable)).
 prologOnly(use_action_templates(ftTerm)).
@@ -771,6 +776,27 @@ prologOnly(onEachLoad).
 argsQuoted(onEachLoad).
 argsQuoted(must).
 
+normalAgentGoal(Pred,_)=>prologHybrid(Pred),tRolePredicate(Pred),arity(Pred,2),meta_argtypes(t(Pred,tAgent,ftPercent)).
+
+%normalAgentGoal(Pred,Val)=>  (tAgent(A)=>agentGoals(A,Pred,((t(Pred,A,V),V>=Val)))).
+%agentGoals(A,About,State)/State => \+ agentTODO(A,actImprove(About)).
+
+normalAgentGoal(Pred,Val)=>  ( t(Pred,A,V)/(V<Val) => agentTODO(A,actImprove(Pred))).
+
+
+normalAgentGoal(Pred,Val)=>  (tAgent(A)=>pfc_default(t(Pred,A,Val))).
+
+
+normalAgentGoal(mudEnergy,90).
+normalAgentGoal(mudNonHunger,90).
+normalAgentGoal(mudHygiene,90).
+normalAgentGoal(mudBladderEmpty,90).
+normalAgentGoal(mudSecureRoom,90).
+normalAgentGoal(mudFun,90).
+normalAgentGoal(mudNonLonelinessSocial,90).
+normalAgentGoal(mudSadToHappy,90).
+normalAgentGoal(mudComfort,90).
+
 /*
 
  the CycL language extends Prolog's first order logic capabilities with some higher order logics.  
@@ -779,7 +805,7 @@ argsQuoted(must).
   (this is usually best!)).  PrologMUD  implements a new design of the cyc canonicalizer..   
 
  usually in Cyc the rules "(implies (and Axy Byz) (and Cwxyz Dwx))" are converted to DNF (Correct me if I am wrong.. 
- since i have heard it uses ConjectiveNormalForm as well) ... the DNF generates Clausal forms..  The forms choosen 
+ since i have heard it uses ConjuntiveNormalForm as well) ... the DNF generates Clausal forms..  The forms choosen 
 
 
 

@@ -34,32 +34,15 @@ iza_to_isa((A;B),isOr(List)):-!,conjuncts_to_list((A,B),List).
 iza_to_isa(AA,AB):-must(AA=AB).
 
 
-
-% ?-put_attr(V,argisa,foo),V=good.
-whatnot:attribute_goals(_) --> [true].
-whatnot:attr_unify_hook(_, _).
-
 argisa:attribute_goals(_) --> [true].
 argisa:attr_unify_hook(_, _).
-argisa:attr_unify_hook(Domain, Y) :-
-        (   get_attr(Y, domain, Dom2)
-        ->  ord_intersection(Domain, Dom2, NewDomain),
-            (   NewDomain == []
-            ->  fail
-            ;   NewDomain = [Value]
-            ->  Y = Value
-            ;   put_attr(Y, domain, NewDomain)
-            )
-        ;   var(Y)
-        ->  put_attr( Y, domain, Domain )
-        ;   ord_memberchk(Y, Domain)
-        ).
 
 attribs_to_atoms0(Var,Isa):-get_attr(Var,argisa,Iza),!,must(iza_to_isa(Iza,Isa)).
 attribs_to_atoms0(O,O):-not(compound(O)).
 
 
-min_isa_l(List,ListO):-isa_pred_l(genls,List,ListO).
+min_isa_l(List,ListO):-isa_pred_l(pfc_lambda([Y,X],genls(X,Y)),List,ListO).
+max_isa_l(List,ListO):-isa_pred_l(genls,List,ListO).
 
 
 isa_pred_l(Pred,List,ListO):-isa_pred_l(Pred,List,List,ListO).
@@ -68,13 +51,13 @@ isa_pred_l(Pred,[],List,[]).
 isa_pred_l(Pred,[X|L],List,O):-member(Y,List),X\=Y,call(Pred,X,Y),!,isa_pred_l(Pred,L,List,O).
 isa_pred_l(Pred,[X|L],List,[X|O]):-isa_pred_l(Pred,L,List,O).
 
-min_isa(HintA,HintA,HintA):-!.
+min_isa(HintA,HintA,HintA):- !.
 min_isa(HintA,HintB,HintA):- genls(HintA,HintB),!.
 min_isa(HintB,HintA,HintA):- genls(HintA,HintB),!.
 min_isa((A,B),HintC,HintO):- min_isa(A,HintC,HintA),min_isa(B,HintC,HintB),conjoin(HintA,HintB,HintO).
 min_isa(HintA,HintB,HintO):- conjoin(HintA,HintB,HintO).
 
-max_isa(HintA,HintA,HintA):-!.
+max_isa(HintA,HintA,HintA):- !.
 max_isa(HintA,HintB,HintB):- genls(HintA,HintB),!.
 max_isa(HintB,HintA,HintB):- genls(HintA,HintB),!.
 max_isa((A,B),HintC,HintO):- max_isa(A,HintC,HintA),max_isa(B,HintC,HintB),conjoin(HintA,HintB,HintO).
@@ -104,7 +87,6 @@ attempt_attribute_args(AndOr,Hint,F,N,[A|ARGS]):-attempt_attribute_one_arg(Hint,
 
 attempt_attribute_one_arg(Hint,F,N,A):-argIsa(F,N,Type),not(compound(Type)),!,attempt_attribute_args(AndOr,Type,A).
 attempt_attribute_one_arg(Hint,F,N,A).
-    
 
 
 

@@ -71,7 +71,8 @@ agenda_do_prequery:- loop_check(agenda_rescan_mpred_ops,true),!.
 :-export(agenda_slow_op_restart/0).
 
 % agenda_slow_op_restart:-!.
-agenda_slow_op_restart:- loop_check(forall(user:agenda_slow_op_todo(Slow),(must(is_callable(Slow),Slow,ignore(retract(user:agenda_slow_op_todo(Slow)))))),true).
+agenda_slow_op_restart:- loop_check(forall(user:agenda_slow_op_todo(Slow),
+  with_no_assertions(thlocal:side_effect_ok,((must((is_callable(Slow),must(Slow),ignore(retract(user:agenda_slow_op_todo(Slow))))))))),true).
 
 :-export(agenda_rescan_mpred_ops/0).
 agenda_rescan_mpred_ops:- test_tl(agenda_suspend_scans),!.
@@ -239,6 +240,8 @@ finish_processing_dbase:- dmsginfo(saving_finish_processing_dbase),fail.
 finish_processing_dbase:- savedb,fail.
 finish_processing_dbase:- do_gc,dmsginfo(end_finish_processing_dbase),fail.
 finish_processing_dbase.
+
+user:hook_one_minute_timer_tick:-agenda_slow_op_restart.
 
 
 %:-meta_predicate(rescandb/0).

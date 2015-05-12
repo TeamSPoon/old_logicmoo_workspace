@@ -50,6 +50,12 @@
 :- dynamic(ttUnverifiableType/1).
 :- multifile(ttUnverifiableType/1).
 
+:- dynamic(type_prefix/2).
+:- multifile(type_prefix/2).
+
+:- dynamic(type_suffix/2).
+:- multifile(type_suffix/2).
+
 
 :- dynamic(pfcControlled/1).
 :- multifile(pfcControlled/1).
@@ -318,7 +324,7 @@
 :- dynamic_multifile_exported user:tNearestReachableItem/1.
 :- dynamic_multifile_exported user:tFarthestReachableItem/1.
 :- dynamic_multifile_exported deduceFromArgTypes/1.
-
+:- dynamic_multifile_exported prologSideEffects/1.
 % ================================================
 % Thread Locals
 % ================================================
@@ -328,6 +334,7 @@
 :- thread_local thlocal:caller_module/2.
 :- thread_local thlocal:mpred_opcall/2.
 :- thread_local thlocal:deduceArgTypes/1.
+:- thread_local thlocal:side_effect_ok/0.
 :- thread_local thlocal:agenda_slow_op_do_prereqs/0.
 :- thread_local thlocal:enable_src_loop_checking/0.
 :- thread_local thlocal:in_dynamic_reader/1.

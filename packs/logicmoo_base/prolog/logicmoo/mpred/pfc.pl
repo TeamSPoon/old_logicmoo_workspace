@@ -266,16 +266,11 @@ assert_u(X):- assert(X).
 asserta_u(X):-asserta(X).
 assertz_u(X):-assertz(X).
 retract_u(X):-retract(X).
-clause_u(H,B):-clause(H,B).
-clause_u(H,B,Ref):-clause(H,B,Ref).
+clause_u(H,B):- must(H\==true),clause(H,B).
+clause_u(H,B,Ref):-must(H\==true),clause(H,B,Ref).
 
-call_u(user:X):-!,no_repeats(call_u_0(X)).
-call_u(X):-!,no_repeats(call_u_0(X)).
 
-call_u_0(X):-var(X),!,pfc_fact(X).
-call_u_0(call_u(X)):-!,call_u_0(X).
-call_u_0(X):-current_predicate(_,X),!,debugOnError(loop_check(call(X))).
-call_u_0(X):-pfc_call(X).
+call_u(X):-pfc_call(X).
 
 retractall_u(X):-retractall(X).
 
@@ -916,9 +911,38 @@ pfc_tms_supported(P) :-
   fcTmsMode(Mode),
   pfc_tms_supported(Mode,P).
 
-pfc_tms_supported(local,P) :- !, pfc_get_support(P,_).
+pfc_tms_supported(deep,P) :- !, pfc_deep_support(P).
+pfc_tms_supported(local,P) :- !, pfc_get_support(P,S),sanity(pfc_deep_support(S)).
 pfc_tms_supported(cycles,P) :-  !, wellFounded(P).
 pfc_tms_supported(_,_P) :- true.
+
+user:hook_one_minute_timer_tick:- do_gc,statistics.
+
+
+pfc_scan_tms(P):-pfc_get_support(P,(S,SS)),(S\=SS),once((pfc_deep_support(P)->true;dmsg(warn(now_maybe_unsupported(pfc_get_support(P,(S,SS)),fail))))).
+
+user_atom(u).
+user_atom(g).
+user_atom(m).
+user_atom(d).
+
+pfc_deep_support(unbound):-!,fail.
+pfc_deep_support(M):-loop_check(pfc_deep_support0(M),fail).
+
+pfc_deep_support0((U,U)):-user_atom(U),!.
+pfc_deep_support0((A=>_)):-!,pfc_deep_support(A).
+pfc_deep_support0(pt(A,B)):-!,pfc_deep_support(A),pfc_deep_support(B).
+pfc_deep_support0((A->B)):-!,pfc_deep_support(A),pfc_deep_support(B).
+pfc_deep_support0((A/B)):-!,pfc_deep_support(A),pfc_deep_support(B).
+pfc_deep_support0((A,B)):-!,pfc_deep_support(A),pfc_deep_support(B).
+pfc_deep_support0(rhs(P)):-!,maplist(pfc_deep_support,P).
+pfc_deep_support0(\+ call_u(P)):-!,pfc_call(\+ P).
+pfc_deep_support0(call_u(P)):-!,pfc_call(P).
+pfc_deep_support0({P}):-!,pfc_call(P).
+pfc_deep_support0(P):-pfc_get_support(P,S),pfc_deep_support(S),!.
+pfc_deep_support0(\+(P)):-!, pfc_call(\+(P)).
+pfc_deep_support0(P):-user_atom(P),!.
+pfc_deep_support0(P):-pfc_call(P).
 
 
 %=
@@ -1084,28 +1108,29 @@ pfc_define_bc_rule(Sup,Head,Body,Parent_rule) :-
 %= eval something on the LHS of a rule.
 %=
 
+pfc_eval_lhs(P,S):-loop_check(pfc_eval_lhs0(P,S)).
 
-pfc_eval_lhs((Test->Body),Support) :-
+pfc_eval_lhs0((Test->Body),Support) :-
   !,
   (call_prologsys(Test) -> pfc_eval_lhs(Body,Support)),
   !.
 
-pfc_eval_lhs(rhs(X),Support) :-
+pfc_eval_lhs0(rhs(X),Support) :-
   !,
   pfc_eval_rhs_0(X,Support),
   !.
 
-pfc_eval_lhs(X,Support) :-
+pfc_eval_lhs0(X,Support) :-
   pfc_db_type(X,trigger),
   !,
   pfc_add_trigger(X,Support),
   !.
 
-%pfc_eval_lhs(snip(X),Support) :-
+%pfc_eval_lhs0(snip(X),Support) :-
 %  snip(Support),
 %  pfc_eval_lhs(X,Support).
 
-pfc_eval_lhs(_Sup,X,_) :-
+pfc_eval_lhs0(_Sup,X,_) :-
   pfc_warn("Unrecognized item found in trigger body, namely ~w.",[X]).
 
 
@@ -1197,6 +1222,7 @@ lsting(L):-with_assertions(thlocal:pfc_listing_disabled,listing(L)).
 :-lsting(pfc_call/1).
 
 pfc_call_0(Var):-var(Var),!,pfc_call_with_no_triggers(Var).
+pfc_call_0(U:X):-U==user,!,pfc_call_0(X).
 pfc_call_0(t(A,B)):-(atom(A)->true;no_repeats(arity(A,1))),ABC=..[A,B],pfc_call_0(ABC).
 pfc_call_0(isa(B,A)):-(atom(A)->true;no_repeats(tCol(A))),ABC=..[A,B],pfc_call_0(ABC).
 %pfc_call_0(t(A,B)):-!,(atom(A)->true;no_repeats(arity(A,1))),ABC=..[A,B],pfc_call_0(ABC).
@@ -1204,25 +1230,34 @@ pfc_call_0(t(A,B,C)):-!,(atom(A)->true;no_repeats(arity(A,2))),ABC=..[A,B,C],pfc
 pfc_call_0(t(A,B,C,D)):-!,(atom(A)->true;no_repeats(arity(A,3))),ABC=..[A,B,C,D],pfc_call_0(ABC).
 pfc_call_0(t(A,B,C,D,E)):-!,(atom(A)->true;no_repeats(arity(A,4))),ABC=..[A,B,C,D,E],pfc_call_0(ABC).
 pfc_call_0((C1,C2)):-!,pfc_call_0(C1),pfc_call_0(C2).
-pfc_call_0(X):- functor(X,F,A),dynamic(F/A),multifile(F/A),fail.
+pfc_call_0(call(X)):- !, pfc_call_0(X).
+pfc_call_0(\+(X)):- !, \+ pfc_call_0(X).
+pfc_call_0(call_u(X)):- !, pfc_call_0(X).
 pfc_call_0(F):- call_with_bc_triggers(F),maybeSupport(F,(g,g)),fail.
+pfc_call_0(X):- functor(X,F,A), \+ current_predicate(F/A),dynamic(F/A),multifile(F/A),fail.
 pfc_call_0(F):- pfc_call_with_no_triggers(F).
 
 
 
-call_with_bc_triggers(P) :-
+call_with_bc_triggers(P) :- no_side_effects(P),
   % trigger any bc rules.
   bt(P,Trigger),
   pfc_get_support(bt(P,Trigger),S),
      pfc_eval_lhs(Trigger,S).
 
+
+pfc_call_with_no_triggers(U:X):-U==user,!,pfc_call_with_no_triggers(X).
 pfc_call_with_no_triggers(F) :- 
   %= this (var(F)) is probably not advisable due to extreme inefficiency.
-  var(F)    ->  pfc_fact(F) ; 
+  var(F)    ->  pfc_fact(F) ; pfc_call_with_no_triggers_bound(F).
+
+pfc_call_with_no_triggers_bound(F) :- 
+  no_side_effects(F),
   \+ current_predicate(_,F) -> fail;
+  call_prologsys(F).
   %= we check for system predicates as well.
-  \+ has_cl(F) -> call_prologsys(F) ; 
-  clause_u(F,Condition),(Condition==true->true;call_u(Condition)).
+  %has_cl(F) -> (clause_u(F,Condition),(Condition==true->true;call_u(Condition)));
+  %call_prologsys(F).
 
 /*  
 pfc_call_with_no_triggers(F) :-
@@ -1253,7 +1288,7 @@ ruleBackward(F,Condition):-ruleBackward0(F,Condition),Condition\=call_sysprolog(
 ruleBackward0(F,Condition):-'<='(F,Condition),not(is_true(Condition);pfc_is_info(Condition)).
 
 :-dynamic('{}'/1).
-{X}:-dmsg(legacy({X})),trace,call_prologsys(X).
+{X}:-dmsg(legacy({X})),call_prologsys(X).
 
 
 pfcBC_NoFacts_TRY(F) :- no_repeats(ruleBackward(F,Condition)),
@@ -1399,6 +1434,9 @@ build_rhs(_Sup,X,[X]) :-
   var(X),
   !.
 
+build_rhs(Sup,call(A),Rest) :- !, build_rhs(Sup,(A),Rest).
+build_rhs(Sup,call_u(A),Rest) :- !, build_rhs(Sup,(A),Rest).
+
 build_rhs(Sup,(A,B),[A2|Rest]) :-
   !,
   pfc_compile_rhsTerm(Sup,A,A2),
@@ -1494,7 +1532,7 @@ build_trigger(Support,[V|Triggers],Consequent,pt(V,X)) :-
   build_trigger(Support,Triggers,Consequent,X).
 
 build_trigger(Support,[(T1/Test)|Triggers],Consequent,nt(T2,Test2,X)) :-
-  pfc_negation(T1,T2),
+  nonvar(T1),pfc_negation(T1,T2),
   !,
   build_neg_test(Support,T2,Test,Test2),
   build_trigger(Support,Triggers,Consequent,X).
@@ -1980,6 +2018,8 @@ pfc_listing_1(What):-
    !.     
 
 
+no_side_effects(S):- get_functor(S,F), (prologSideEffects(F)->thlocal:side_effect_ok;true).
+
 is_disabled_clause(C):-is_edited_clause(C,_,New),memberchk((disabled),New).
 
 %= pfc_fact(P) is true if fact P was asserted into the database via pfc_assert.
@@ -1995,8 +2035,8 @@ pfc_fact(P) :- pfc_fact(P,true).
 pfc_user_fact(X):-no_repeats(spft(X,U,U)).
 
 pfc_fact(P,C) :-
-  pfc_get_support(P,_),
-  pfc_db_type(P,fact),
+  pfc_get_support(P,_),nonvar(P),
+  once(pfc_db_type(P,F)),F=fact,
   call_prologsys(C).
 
 %= pfc_facts(-ListofPfcFacts) returns a list of facts added.
@@ -2220,7 +2260,7 @@ axiom(F) :-
 %= an assumption is a failed action, i.e. were assuming that our failure to
 %= prove P is a proof of not(P)
 
-assumption(P) :- pfc_negation(P,_).
+assumption(P) :- nonvar(P),pfc_negation(P,_).
 
 %= assumptions(X,As) if As is a set of assumptions which underly X.
 

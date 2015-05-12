@@ -127,8 +127,9 @@ acceptableArg(Arg,Type):-dmsg(acceptableArg(Arg,Type)).
 
 agent_call_command_now(Agent,CMD):-
   with_current_agent(Agent,
+    with_assertions(thlocal:side_effect_ok,
       (must(correctCommand(CMD,NewCMD)),
-      user:agent_call_command(Agent,NewCMD))).
+      user:agent_call_command(Agent,NewCMD)))).
 
 % need to return http sessions as well
 get_session_id(IDIn):-thlocal:session_id(ID),!,ID=IDIn.

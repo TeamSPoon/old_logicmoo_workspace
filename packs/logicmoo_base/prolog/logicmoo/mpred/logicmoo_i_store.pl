@@ -53,9 +53,21 @@ get_pifunctor(Head,PHead,F,A):-var(Head),!,sanity(atom(F)),must(ensure_arity(F,A
 get_pifunctor(Head,PHead,F,A):-get_functor(Head,F,A),functor(PHead,F,A),ignore(PHead=Head),!.
 get_pifunctor(Head,PHead,F,A):-atom(Head),ensure_arity(Head,A),!,get_pifunctor(Head/A,PHead,F,A).
 
+deduceEachArgType(Var):- \+ compound(Var),!.
+deduceEachArgType(M):-functor(M,F,A),deduceEachArgType(F,A,M).
+deduceEachArgType(_,1,_):-!.
+deduceEachArgType(F,A,M):-functor(MT,F,A),clause_asserted(meta_argtypes(MT)),dmsg(deduceEachArgType(M,MT)),doall(deduceEachArg_WithType(M,MT)),!.
+deduceEachArgType(F,A,M):-M =..[F|ARGS],deduceEachArg_WithArgIsa(F,1,ARGS).
 
+deduceEachArg_WithArgIsa(_,_,[]).
+deduceEachArg_WithArgIsa(F,N,[A|RGS]):- ignore((clause_asserted(argIsa(F,N,Type),deduceEachArg_WithType(A,Type)))),
+   N2 is N+1,deduceEachArg_WithArgIsa(F,N2,RGS),!.
 
-side_effect_prone:- \+ thlocal:noDBaseMODs(_).
+deduceEachArg_WithType(M,MT):-var(M),!.
+deduceEachArg_WithType(M,MT):-atom(MT),!,ignore((tSet(MT),show_call(assert_isa_safe(M,MT)))),!.
+deduceEachArg_WithType(M,MT):-compound(M),doall((arg(N,M,MI),arg(N,MT,MTI),deduceEachArg_WithType(MT,MTI))).
+
+side_effect_prone:- \+ thlocal:noDBaseMODs(_), thlocal:side_effect_ok.
 
 
 

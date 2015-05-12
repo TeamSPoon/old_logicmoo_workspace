@@ -17,7 +17,7 @@
 % See the the seemingly white (not dirrectly usable) in some tUsefull way
 defined_affordance([subjType= "Passable",actionVerb= "TravelThru"]).
 
-prologHybrid(mudDescription(ftTerm,ftString),prologHybrid).
+prologHybrid(mudDescription(ftTerm,ftString)).
 prologHybrid(nameStrings(ftTerm,ftString)).
 
 defined_affordance([subjType= "Television",
@@ -56,17 +56,18 @@ defined_affordance([subjType= tFurniture,actionVerb= "BumpIntoBarrier",
 'Fun'= -300 * 0]).
 
 % yet every minute you are alive, God wishes to punish you
-defined_affordance([subjType= isSelfAgent,actionVerb= "LiveAtLeastAMinute",
-   mudActionMaxDistance= 2000,
-   'Energy'= 0 * -1,
-   'NonHunger'= 0 * -1,
-   'BladderEmpty'= 0 * -1,
-   'Hygiene'= 0 * -1,
-   'Secure_Room'= 0 * -1,
-   'NonLoneliness_Social'= 0 * -1,
-   'Fun'= 0 * -1,
-   'Sad_To_Happy'= 0 * -1,
-   'Comfort'= 0 * -1 ]).
+defined_affordance([ subjType=tAgent, actionVerb= "LiveAtLeastAMinute",
+   'Energy'= 0 * -2,
+   'NonHunger'= 0 * -2,
+   'BladderEmpty'= 0 * -2,
+   'Hygiene'= 0 * -2,
+   'Secure_Room'= 0 * -2,
+   'NonLoneliness_Social'= 0 * -2,
+   'Fun'= 0 * -2,
+   'Sad_To_Happy'= 0 * -2,
+   'Comfort'= 0 * -2 ]).
+
+user:hook_one_minute_timer_tick:-forall(isa(X,tPlayer),agent_call_command_now(A,actLiveAtLeastAMinute(A))).
 
 defined_affordance([subjType= "Shower",
 actionVerb= "Operate",
@@ -86,6 +87,7 @@ textName= "wash self with X",
 textName= "Take a Bath",
 slSit= true,
 'Comfort'= 20 * 20,
+'Energy'= -20 * -20,
 'Hygiene'= 100 * 100,
 actionVerb= "Clean"]).
 
@@ -106,6 +108,7 @@ textName= "Dance! Dance!",
 slTouch= true,
 slAnim= anim_DANCE,
 'NonLoneliness_Social'= 10 * 10,
+'Energy'= -10 * -20,
 'Fun'= 10 * 10,
 'Hygiene'= -10 * -10]).
 
@@ -521,15 +524,20 @@ call_clause_last(CLREAL,Goal):-functor(CLREAL,F,A),functor(Goal,GF,GA),functor(C
      (call(EACH) -> ! ; ignore(show_call_failure(Goal))),!.
   
 % this is doing a trick to make sure it gets called very last
-user:agent_call_command(Agent,Templ) :- call((nonvar(Templ),simbots_templates(Templ))),!,call_clause_last(user:agent_call_command(Agent,Templ),agent_call_command_simbots_real(Agent,Templ)).
+user:agent_call_command(Agent,Templ) :- 
+  call((nonvar(Templ),simbots_templates(Templ))),!,
+   call_clause_last(user:agent_call_command(Agent,Templ),agent_call_command_simbots_real(Agent,Templ)).
 
 % args_match_types(ARGS,Type).
 %args_match_types([],_):-!,fail.
-args_match_types([Obj],Type):-!,isa(Obj,Type).
+args_match_types(TemplIn,Templ):-compound(TemplIn),!,TemplIn=..TemplInL, Templ=..TemplL, args_match_types(TemplInL,TemplL).
+args_match_types(Templ,Templ):-!.
+args_match_types([Obj],Type):-nonvar(Obj),!,isa(Obj,Type).
 args_match_types(Obj,Type):-!,isa(Obj,Type).
 
-
-agent_call_command_simbots_real(Agent,Templ):- must(simbots_templates(Templ)),nonvar(Templ),
+agent_call_command_simbots_real(Agent,TemplIn):- nonvar(TemplIn), 
+   simbots_templates(Templ),
+   args_match_types(TemplIn,Templ),
    ignore(affordance_side_effects(Agent,Templ,Template)),
    ignore(affordance_message(Agent,Templ,Template)),
    fmt(agent_call_command_simbots_real(Agent,Templ,Template)),!.

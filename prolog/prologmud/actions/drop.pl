@@ -24,7 +24,7 @@ user:agent_call_command(Agent,actDrop(Obj)) :-
 	mudPossess(Agent,Obj),
         mudAtLoc(Agent,LOC),
         clr(mudPossess(Agent,Obj)),
-        must(not((mudPossess(Agent,Obj)))),
+        must(\+((mudPossess(Agent,Obj)))),
         add(mudAtLoc(Obj,LOC)),
 	must(call_update_charge(Agent,actDrop)).
 

@@ -77,7 +77,7 @@ do_agent_call_plan_command(A,C):-
    with_current_agent(A,with_assertions(thlocal:agent_current_action(A,C), call_agent_command(A,C))).
 
 
-command_actIdea(Who,IdeaS):- 
+command_actIdea(Who,IdeaS):- nonvar(Who),
   findall(Idea,
         (get_world_agent_plan(current,Who,Idea),
              dmsg(get_world_agent_plan(current,Who,Idea))),IdeaS),
