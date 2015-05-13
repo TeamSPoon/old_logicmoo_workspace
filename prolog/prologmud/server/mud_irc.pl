@@ -12,8 +12,8 @@
 :-dynamic(hooks:irc_event_hooks/3).
 :-multifile(hooks:irc_event_hooks/3).
 
-:-dynamic(hooks:deliver_event/2).
-:-multifile(hooks:deliver_event/2).
+:-dynamic(user:deliver_event/2).
+:-multifile(user:deliver_event/2).
 
 :-dynamic(user:irc_user_plays/3).
 :-multifile(user:irc_user_plays/3).
@@ -31,7 +31,7 @@ irc_mud_event_hook(Channel,User,say(TODO)):- user:irc_user_plays(Agent,User,Chan
 
 irc_mud_event_hook(Channel,User,call('?-'(foc_current_agent(Agent)),_Vs)):- foc_current_agent(Agent),add(user:irc_user_plays(Agent,User,Channel)).
 
-hooks:deliver_event(Agent,Event):- user:irc_user_plays(Agent,User,Channel) -> eggdrop:say(Channel,[Agent,': ',NewEvent]) ; nop(eggdrop:say(Agent,Event)).
+user:deliver_event(Agent,Event):- user:irc_user_plays(Agent,User,Channel) -> eggdrop:say(Channel,[Agent,': ',NewEvent]) ; nop(eggdrop:say(Agent,Event)).
 
 user:irc_user_plays(Agent,User,Channel)/
   ( user:irc_user_plays(Agent,User,Other), Other\=Channel )

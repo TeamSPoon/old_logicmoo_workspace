@@ -13,8 +13,8 @@
 :-dynamic(hooks:irc_event_hooks/3).
 :-multifile(hooks:irc_event_hooks/3).
 
-:-dynamic(hooks:deliver_event/2).
-:-multifile(hooks:deliver_event/2).
+:-dynamic(user:deliver_event/2).
+:-multifile(user:deliver_event/2).
 
 :- dynamic_multifile_exported user:irc_user_plays/2.
 

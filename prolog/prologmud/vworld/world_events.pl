@@ -27,10 +27,10 @@ atlocNear0(Whom,Where):-mudNearbyLocs(Where,LOC),is_asserted(mudAtLoc(Whom,LOC))
 
 
 :-export(raise_location_event/2).
-raise_location_event(Where,Event):- forall(no_repeats(Whom,(tAgent(Whom),mudObjNearLoc(Whom,Where))),doall(call_no_cuts(hooks:deliver_event(Whom,Event)))).
+raise_location_event(Where,Event):- forall(no_repeats(Whom,(tAgent(Whom),mudObjNearLoc(Whom,Where))),doall(call_no_cuts(user:deliver_event(Whom,Event)))).
 
 
-hooks:deliver_event(Whom,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,Whom,you,NewEvent),to_agent_io(Whom,NewEvent),!.
+user:deliver_event(Whom,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,Whom,you,NewEvent),to_agent_io(Whom,NewEvent),!.
 
 to_agent_io(Whom,NewEvent):- 
   once(user:provide_agent_delivery_callback(Whom,_)), % anyone listening?
