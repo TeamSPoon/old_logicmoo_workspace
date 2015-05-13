@@ -1,4 +1,3 @@
-
 % ===================================================================
 % File 'cyc.pl'
 % Purpose: Lower-level connection based utilities for interfacing to CYC from SWI-Prolog
@@ -9,10 +8,11 @@
 % Revised At:   $Date: 2002/07/11 21:57:28 $
 % ===================================================================
 
-:-swi_module(cyc,[
+:-module(cyc,[]).
+
+/*
+:-export((
 	 cycInit/0,
-         op(700,xfx,'=^..'),
-         '=^..'/2,
 	 getCycConnection/4,
 	 finishCycConnection/3,
 	 converse/1,
@@ -35,7 +35,6 @@
 	 cycAssert/1,
 	 cycAssert/2,
 	 cycRetract/1,
-	 %is_string/1,
 	 balanceBinding/2,
 	 cycRetract/2,
 	 cycRetractAll/1,
@@ -48,15 +47,13 @@
 	 %%user: termCyclify/2,
          %constant/4,
 	 idGen/1,
-	 %subst/4,
 	 isCycOption/1,
 	 isCycOption/2,
-	 % unnumbervars/2,
-	 % transparent defaultAssertMt/1,
+	 %=  transparent defaultAssertMt/1,
          mtForCycL/2,
          assertIfNew/1,
 	 getMtForPred/2,
-	 % isRegisterCycPred/3,
+	 isRegisterCycPred/3,
 	 registerCycPred/1,
 	 setCycOption/2,
 	 setCycOption/1,
@@ -87,18 +84,13 @@
 	 list_to_conj/2,
 	 testCYC/0,
 
-         /*
-         flush_output_safe/1,
 
          %processRequestHook/1,
 
          loadLispFile/1,
            	 
          badConstant/1,
-         quoteAtomString/2,
-         unquoteAtom/2,
          termCyclifyAtom/2,
-*/
 
 	 createCycServer/1,
 	 xmlPrologServer/1,
@@ -119,8 +111,6 @@
 	 cleanOldProcesses/0,
 	 showCycProcessHTML/0,
 
-         
-
          guessConstant/2,
 
          readUntil/3,
@@ -129,16 +119,13 @@
          atom_to_number/2,
 
 
-         logOnFailure/1,
-
          writeHTMLStdHeader/1,
          writeHTMLStdFooter/0,
 	 
-         debugFmt/1,
-	 debugFmt/2,
 	 debugFmtFast/1,
-
-         writeObject/2,
+	 sendNote/1,
+	 sendNote/4,
+	 writeObject/2,
 	 writeObject/3,
 	 writeObject_conj/2,
          loadCycL/1,
@@ -149,18 +136,37 @@
       writeFmtFlushed/1,
       writeFmtFlushed/2,
       writeFmtFlushed/3,
-      % trim/2,
       pterm_to_sterm/2
-      %canTrace/0, 
-      %ctrace/0,
-      %isConsole/0
-
-	 ]).
+      )).
+*/
+/*
+      quoteAtomString/2,
+      unquoteAtom/2,
+      subst/4,
+      flush_output_safe/1,
+      is_string/1,
+      unnumbervars/2,
+      debugFmt/1,
+      debugFmt/2,
+      logOnFailure/1,
+      logOnFailureIgnore/1,
+      writeFailureLog/2,
+      debugOnFailure/2,
+      debugOnFailure/1,
+      debugOnError/1,
+      dynamic_transparent/1,
+      toUppercase/2,
+      toLowercase/2,
+      toPropercase/2,
+      toCamelcase/2,
+      trim/2,
+      canTrace/0, 
+      ctrace/0,
+      isConsole/0,
+      multi_transparent/1
+*/
 :-module_transparent(user:nart/3).
 
-
-:-dynamic(constant/4).
-:-multifile(constant/4).
 
 cyc:cyc_magic.
 
@@ -232,9 +238,9 @@ withoutCyc(_,[]):-fail.
 
 :- style_check(-singleton).
 :- style_check(-discontiguous).
-% :- style_check(-atom).
-% :- style_check(-string).
-/*
+%:- style_check(-atom).
+%:- style_check(-string).
+
 dynamic_transparent([]):-!.
 dynamic_transparent([X]):-dynamic_transparent(X),!.
 dynamic_transparent([X|Xs]):-!,dynamic_transparent(X),dynamic_transparent(Xs),!.
@@ -248,15 +254,15 @@ multi_transparent([X|Xs]):-!,multi_transparent(X),multi_transparent(Xs),!.
 multi_transparent(M:F/A):-!, module_transparent(M:F/A),dynamic(M:F/A),multifile(M:F/A).
 multi_transparent(F/A):-!,multi_transparent(user:F/A).
 multi_transparent(X):-functor(X,F,A),multi_transparent(F/A),!.
-*/   
-:-multi_transparent(holds/1).
-:-multi_transparent(holds/2).
-:-multi_transparent(holds/3).
-:-multi_transparent(holds/4).
-:-multi_transparent(holds/5).
-:-multi_transparent(holds/6).
-:-multi_transparent(holds/7).
-:-multi_transparent(holds/8).
+   
+:-multi_transparent(cycHolds/1).
+:-multi_transparent(cycHolds/2).
+:-multi_transparent(cycHolds/3).
+:-multi_transparent(cycHolds/4).
+:-multi_transparent(cycHolds/5).
+:-multi_transparent(cycHolds/6).
+:-multi_transparent(cycHolds/7).
+:-multi_transparent(cycHolds/8).
 
 
 
@@ -273,7 +279,7 @@ multi_transparent(X):-functor(X,F,A),multi_transparent(F/A),!.
 %:-set_prolog_flag(verbose,normal).
 :-set_prolog_flag(double_quotes,codes).
 :-set_prolog_flag(float_format,'%.12g').
-% :-set_prolog_flag(gc,false).
+:-set_prolog_flag(gc,false).
 :-dynamic_transparent(cycConnectionAvalable/5).
 :-dynamic_transparent(cycConnectionUsed/5).
 :-dynamic_transparent(cycMutex/2).
@@ -288,7 +294,7 @@ loadLispFile(Filename):-
 
 loadLispStream(Stream,Callback):-
    repeat,
-   % %readUntil(10,Stream,Get),
+   %= %readUntil(10,Stream,Get),
    lisp_read(Stream,_String,Get),
    doSexpLine(Callback,Get),
    at_end_of_stream(Stream).
@@ -408,7 +414,7 @@ cycSync:-!.%%d3Info.
 cycSync(_:end_fo_file):-!.
 cycSync(U):-unusedCycL(U),!.
 cycSync(Out):-cycCache(Out),!,ignore(retract(cycCacheToDo(Out))).
-cycSync(Out):-Out= MT : Assert,!,catch((myCycAssert(MT : Assert),ignore(assertIfNew(cycCache(Out))),ignore(retract(cycCacheToDo(Out)))),E,debugFmt('% % % % % % % ~q',[E])),!.
+cycSync(Out):-Out= MT : Assert,!,catch((myCycAssert(MT : Assert),ignore(assertIfNew(cycCache(Out))),ignore(retract(cycCacheToDo(Out)))),E,debugFmt('%= %= %= %= %= %= % ~q',[E])),!.
 cycSync(Out):-mtForCycL(Out,Mt),!,cycSync(Mt:Out).
 
 % ===================================================================
@@ -416,9 +422,9 @@ cycSync(Out):-mtForCycL(Out,Mt),!,cycSync(Mt:Out).
 % ===================================================================
 
 
-mtForCycL(isa(_,tCol),'UniversalVocabularyMt').
+mtForCycL(isa(_,'Collection'),'UniversalVocabularyMt').
 mtForCycL(isa(_,'Microtheory'),'UniversalVocabularyMt').
-mtForCycL(isa(_,tPred),'UniversalVocabularyMt').
+mtForCycL(isa(_,'Predicate'),'UniversalVocabularyMt').
 mtForCycL(arity(_,_),'UniversalVocabularyMt').
 mtForCycL(Out,Mt):-predOfCycL(Out,Pred),!,getMtForPred(Pred,Mt).
 
@@ -426,7 +432,7 @@ predOfCycL(SENT,Y):-member(OP,[forward,and,':',or,implies,not]),SENT=..[OP|LIST]
 predOfCycL(CX,Y):-functor(CX,Y,_).
 
 
-% :-dynamic_transparent(mtForPred/2).
+:-dynamic_transparent(mtForPred/2).
 
 getMtForPred(X,Y):-mtForPred(X,Y),!.
 getMtForPred(genlMt,'BaseKB').
@@ -521,7 +527,7 @@ setCycOptionDefaults:-
              setCycOption(makeConstant='on'),
              setCycOption(opt_callback='sendNote'),
              setCycOption(cb_consultation='off'),
-             setCycOption(opt_debug='true'),
+             setCycOption(opt_debug='on'),
              setCycOption(cb_error='off'),
              setCycOption(cb_result_each='off'),
 
@@ -535,7 +541,7 @@ setCycOptionDefaults:-
              setCycOption(opt_notation='cycl'),
              setCycOption(opt_timeout=2),
              setCycOption(opt_readonly='off'),
-             setCycOption(opt_debug='false'),
+             setCycOption(opt_debug='off'),
              setCycOption(opt_compiler='Byrd'),
              setCycOption(opt_language = 'pnx_nf'),
 
@@ -589,9 +595,9 @@ cycInit.
    !)).
       
 :-((
-      setCycOption(defaultAssertOptions,[':DIRECTION', ':FORWARD', ':STRENGTH', vStrMon]),
+      setCycOption(defaultAssertOptions,[':DIRECTION', ':FORWARD', ':STRENGTH', ':MONOTONIC']),
       setCycOption(':DIRECTION', ':FORWARD'),
-      setCycOption(':STRENGTH', vStrMon),
+      setCycOption(':STRENGTH', ':MONOTONIC'),
       setCycOption(hookCycPredicates,true),
       setCycOption(makeConstants,true),
    !)).
@@ -605,21 +611,21 @@ getCycConnection3(SocketId,OutStream,InStream):-
       ignore(once(isCycOption(cycServer,Server))),
       getCycConnection(Server,SocketId,OutStream,InStream).
 
-%  Reuse an Available connection
+%=  Reuse an Available connection
 getCycConnection(Server,SocketId,OutStream,InStream):- fail,
       thread_self(Thread),
       ignore((var(Server),throw(no_server(getCycConnection(Server,SocketId,OutStream,InStream))))),
       once(nonvar(SocketId);nonvar(OutStream);nonvar(InStream)),
       once(cyc:cycConnectionAvalable(Thread,Server,SocketId,OutStream,InStream);cyc:cycConnectionUsed(Thread,Server,SocketId,OutStream,InStream)),!.
 
-%  Reuse an Available connection
+%=  Reuse an Available connection
 getCycConnection(Server,SocketId,OutStream,InStream):-
       thread_self(Thread),
       retract(cyc:cycConnectionAvalable(Thread,Server,SocketId,OutStream,InStream)),
       ignore(system:retractall(cyc:cycConnectionUsed(Thread,Server,SocketId,OutStream,InStream))),
       assertz(cyc:cycConnectionUsed(Thread,Server,SocketId,OutStream,InStream)),!.
 
-%  Or Create a new Available connection
+%=  Or Create a new Available connection
 getCycConnection(Server,SocketId,OutStream,InStream):-
       tcp_socket(SocketId),
       tcp_connect(SocketId,Server),
@@ -911,7 +917,7 @@ allowWhiteSpaces --> endOfLine,!.
 allowWhiteSpaces --> oneSpace,!,allowWhiteSpaces.
 allowWhiteSpaces --> [].
 
-oneSpace --> [X],{ X<33 }.% %, !, code_type(X,space),! }.
+oneSpace --> [X],{ X<33 }.%= %, !, code_type(X,space),! }.
 
 spaces0 --> oneSpace,!,spaces0.
 spaces0 --> [].
@@ -939,9 +945,9 @@ symbol0(S) --> symbol1(SC),{atom_concat('',SC,S)}.
 % no upcase
 symbol1(S) --> "|",{!}, charsUpTo(S,"|").
 symbol1(S) --> symbolChars(S), { upcase_atom(S,S)}.
-% symbol1('#$'(S)) --> symbolChars(S).
+%=  symbol1('#$'(S)) --> symbolChars(S).
 symbol1(S) --> symbolChars(S).
-% symbol1(U) --> symbolChars(S), { upcase_atom(S,U)}.
+%=  symbol1(U) --> symbolChars(S), { upcase_atom(S,U)}.
 
 char0(char(S))-->"#\\",char1(S).
 char0(reader_error(char,C))-->"#\\",[C].
@@ -969,13 +975,13 @@ dcgBothC(DCG1,DCG2,S,R) :- append(L,R,S),phrase(DCG1,L,[]),once(phrase(DCG2,L,[]
 dcgNoConsumeStartsC(DCG,SE,SE):-phrase(DCG,SE,_).
 
 
-escapedChar(C)-->[92,C]. % ,{trace}.
+escapedChar(C)-->[92,C]. %= ,{trace}.
 
 meetsCharConstrait(C,[]):-! /*,trace*/,  fail.
 meetsCharConstrait(C,List):- member(LType,List),(LType==C ;( code_type(C,Type), LType=Type)),!.
 
 char0ExceptFor(C,Include,Exclude) --> escapedChar(C),{!,not(member(escape, Exclude))}.
-char0ExceptFor(C,Include,Exclude) --> [C], {hotrace(( meetsCharConstrait(C,Include) , not(meetsCharConstrait(C,Exclude)) ))}.
+char0ExceptFor(C,Include,Exclude) --> [C], {notrace(( meetsCharConstrait(C,Include) , not(meetsCharConstrait(C,Exclude)) ))}.
 
 chars0ExceptFor([C|Cs],Include,Exclude) --> escapedChar(C),{!,not(member(escape, Exclude))},chars0ExceptFor(Cs,Include,Exclude).
 chars0ExceptFor([C|Cs],Include,Exclude) --> char0ExceptFor(C,Include,Exclude), chars0ExceptFor(Cs,Include,Exclude),!.
@@ -1020,7 +1026,7 @@ readCycLTermChars(InStream,Response):-
 
 readCycLTermChars(InStream,Response,ResponseType):-
    debugOnFailure(readCycLTermChars(InStream,[],[sexp],Response,ResponseType)),!.
-   % (validLisp(Response)-> (!) ;(readMoreChars(Chars))).
+   %= (validLisp(Response)-> (!) ;(readMoreChars(Chars))).
 
 subType(_Type,_ExpectedType).
 
@@ -1188,7 +1194,7 @@ readCycLTermCharsUntil(Char,InStream,Trim,atom):-!,
    streamClear(InStream).
 
 
-streamClear(InStream) :- !. %  trace,!.
+streamClear(InStream) :- !. %=  trace,!.
 % needs better solution!  .01 seconds works but .001 seconds don't :(  meaning even .01 might in some circumstances be unreliable
 streamClear(InStream) :- once(catch(wait_for_input([InStream], Inputs, 0.01),E,(trace,debugFmt(E)))),Inputs=[],!.
 %streamClear(InStream) :-get_code(InStream, Was),((Was == -1) -> (true);(debugFmt('FoundMore ~c ~q ~n',[Was,Was]),streamClear(InStream))),!.
@@ -1234,7 +1240,7 @@ toMarkUp(_,Term,Vars,Out):-
 toCycAtom(B,'#$different'):-member(B,[neq,dif,diff,(\=)]).
 %toCycAtom(B,'QUOTE'):-member(B,[('\''),(quote),'QUOTE']).
 toCycAtom(B,'()'):-member(B,[(nil),([]),'NIL']).
-toCycAtom(B,' '):-member(B,[(holds),('#$holds')]).
+toCycAtom(B,' '):-member(B,[(cycHolds),('#$holds')]).
 toCycAtom(B,'#$or'):-member(B,[(;)]).
 %toCycAtom(B,'#$and'):-member(B,[(,)]).
 toCycAtom('=>','#$implies').
@@ -1463,13 +1469,13 @@ cycAssert(adjacentTo(P,A),Mt):-cycSpatial(P),cycSpatial(A),cycAssertNow(adjacent
 cycAssert(pathControl(A,P),Mt):-cycIsa(P,'Path-Simple'),cycIsa(A,'PhysicalDevice'),cycAssertNow(pathControl(A,P),Mt).
 cycAssert(pathBetween(P,A,B),Mt):-cycIsa(P,'Path-Simple'),cycSpatial(A),cycSpatial(B),cycAssertNow(pathBetween(P,A,B),Mt).
 cycAssert('locatedAtPoint-Spatial'(A,B),Mt):-cycSpatial(A),cycAssertNow('locatedAtPoint-Spatial'(A,B),Mt).
-%cycAssert(genlPreds(A,P),Mt):-cycIsa(P,tRelation),cycIsa(A,'PhysicalDevice'),cycAssertNow(pathControl(A,P),Mt).
+%cycAssert(genlPreds(A,P),Mt):-cycIsa(P,'Relation'),cycIsa(A,'PhysicalDevice'),cycAssertNow(pathControl(A,P),Mt).
 
 cycAssert(genls(P,A),Mt):-cycCollection(P),cycCollection(A),cycAssertNow(genls(P,A),Mt).
 cycAssert(CycL,Mt):-cycAssertNow(CycL,Mt).
 
 cycSpatial(A):-cycIsa(A,'SpatialThing-Localized').
-cycCollection(A):-cycIsa(A,tCol).
+cycCollection(A):-cycIsa(A,'Collection').
 cycIsa(A,B):-cycAssertNow(isa(A,B),'doom:VocabularyMt').
 
 cycAssertNow(CycL,Mt):-
@@ -1777,7 +1783,7 @@ quoteAtomString([H|T],Out):-!,append([34,H|T],[34],Quote),name(Out,Quote).
 quoteAtomString(QU,QU):-concat_atom(['"'|_],QU),!.
 quoteAtomString(UQ,QU):-concat_atom(['"',UQ,'"'],QU),!.
 
-unquoteAtom(Atom,New):-concat_atom(LIST,'"',Atom),concat_atom(LIST,New),!.
+unquoteAtom(Atom,New):-concat_atom(LIST,'"',Atom),concat_atom(LIST,'',New),!.
 
 % ============================================
 % Make new CycConstant
@@ -1796,8 +1802,8 @@ user:isCycConstantMade(or).
 user:isCycConstantMade(genls).
 user:isCycConstantMade('UniversalVocabularyMt').
 user:isCycConstantMade('BaseKB').
-user:isCycConstantMade(tCol).
-user:isCycConstantMade(tPred).
+user:isCycConstantMade('Collection').
+user:isCycConstantMade('Predicate').
 user:isCycConstantMade('Microtheory').
 user:isCycConstantMade(X):-constant(X,_,_,_).
 
@@ -1818,10 +1824,10 @@ isCycConstantGuess(_,'Genls').
 isCycConstantGuess(_,'isa').
 isCycConstantGuess(_,'Isa').
 isCycConstantGuess(_,'Type').
-isCycConstantGuess(_,tPred).
-isCycConstantGuess(_,tRelation).
+isCycConstantGuess(_,'Predicate').
+isCycConstantGuess(_,'Relation').
 isCycConstantGuess(_,'Function').
-isCycConstantGuess(_,tCol).
+isCycConstantGuess(_,'Collection').
 isCycConstantGuess(_,'Microtheory').
 %isCycConstantGuess(_,'Mt').
 isCycConstantGuess(object,_).
@@ -1844,7 +1850,7 @@ isCycConstantNever(_,'4').
 isCycConstant(Const):-(var(Const);is_string(Const);number(Const)),!,fail.
 isCycConstant(Const):-user:isCycConstantMade(Const),!.
 isCycConstant(Const):-cyc:constant(Const,_,_,_),!.
-isCycConstant(Const):-holds(isa,Const,_),!.
+isCycConstant(Const):-cycHolds(isa,Const,_),!.
 %isCycConstant(Const):-termCyclify(Const,_),!,fail.
 isCycConstant(Const):-atom(Const),atom_concat('#$',X,Const),!,isCycConstant(X).
 isCycConstant(Const):-sformat(S,'(find-constant "~w")',[Const]),converseRaw(S,R),!,R=[35|_],asserta(user:isCycConstantMade(Const)).
@@ -1893,10 +1899,11 @@ killConstant(Const):-
 
 ensureMt(Mt):-
    makeConstant(Mt),
-   cycAssert('isa'(Mt,'Microtheory'),'BaseKB').
+   cycAssert('BaseKB':'isa'(Mt,'Microtheory')).
 
 ensureGenlMt(Sub,Super):-ensureMt(Sub),ensureMt(Super),
-   cycAssert('genlMt'(Sub,Super),'BaseKB').
+   cycAssert('BaseKB':'genlMt'(Sub,Super)).
+
 
 % ============================================
 % Get An English Paraphrase
@@ -1967,7 +1974,7 @@ registerCycPred(Mt,Pred,Arity):-
 %
 % ============================================
 
-% user:exception(undefined_predicate, Pred ,retry):- isCycOption(hookCycPredicates,true),cycDefineOrFail(Pred).
+user:exception(undefined_predicate, Pred ,retry):- isCycOption(hookCycPredicates,true),cycDefineOrFail(Pred).
 
 cycDefineOrFail(Mod:Pred/Arity):-atom_concat('#$',_,Pred),
       cycDefineOrFail(Mod,Pred,Arity).
@@ -2071,7 +2078,7 @@ retractOnceThrough(ToMt,CycL):-
 % examples
 %:-registerCycPred('BaseKB',isa,2).
 %:-registerCycPred('BaseKB',genls,2).
-%:-registerCycPred('BaseKB',genlMt,2).
+:-registerCycPred('BaseKB',genlMt,2).
 
 
 % ============================================
@@ -2109,7 +2116,7 @@ readCycL(Stream,CHARS)  :-
 		flag('bracket_depth',_,0),
 		retractall(reading_in_comment),
 		retractall(reading_in_string),!,
-		readCycLChars_p0(Stream,CHARS),!. % ,trim(CHARS,Trim).
+		readCycLChars_p0(Stream,CHARS),!. %= ,trim(CHARS,Trim).
 
 readCycLChars_p0(Stream,[]):- really_at_end_of_stream(Stream),!.
 readCycLChars_p0(Stream,[Char|Chars]):-
@@ -2200,8 +2207,8 @@ getSurfaceFromChars(Chars,TERM,VARS):-trim(Chars,CharsClean),catch(
          (once(getSurfaceFromCleanChars(CharsClean,TERMO,VARS)),TERM=TERMO),E,(TERM=[error,E],!,fail)).
 
 getSurfaceFromCleanChars([],[end_of_file],_):-!.
-getSurfaceFromCleanChars([41|_],[end_of_file],_):-!. %  ")"
-getSurfaceFromCleanChars([59|Comment],[file_comment,Atom],VARS):-atom_codes(Atom,Comment),!. %  ";"
+getSurfaceFromCleanChars([41|_],[end_of_file],_):-!. %=  ")"
+getSurfaceFromCleanChars([59|Comment],[file_comment,Atom],VARS):-atom_codes(Atom,Comment),!. %=  ";"
 getSurfaceFromCleanChars(Chars,WFFOut,VARSOut):- 
                once(getWordTokens(Chars,WFFClean)),
                once(getSurfaceFromToks(WFFClean,WFFOut,VARSOut)),
@@ -2368,15 +2375,14 @@ cyclVarNums_list(LIST,[A|RGS],[V|ARARGS],VARLIST):-
             append(VARS1,VARS2,VARLIST).
 
 
-unnumbervars(STUFF,UN):-sformat(S,'~W',[STUFF,[quoted(true),character_escapes(true),module(user),numbervars(true),portray(false),double_quotes(true)]]),
-  string_to_atom(S,Atom),atom_to_term(Atom,UN,NewVars).
+unnumbervars(STUFF,UN):-sformat(S,'~W',[STUFF,[quoted(true),character_escapes(true),module(user),numbervars(true),portray(false),double_quotes(true)]]),string_to_atom(S,Atom),atom_to_term(Atom,UN,_).
 
 open_list(V,V):-var(V).
 open_list(A,B):-append(A,_,B).
 
 unnumbervars_nil(X,Y):-!,unnumbervars(X,Y).
 
-collect_temp_vars(VARS):-!,(findall_nodups(=(Name,Number),numbered_var(Name,Number),VARS);VARS=[]).
+collect_temp_vars(VARS):-!,(setof(=(Name,Number),numbered_var(Name,Number),VARS);VARS=[]).
 
 %================================================================
 % STRING TOKENIZATION                            
@@ -2442,7 +2448,7 @@ get_token(A,List,Token,Rest)  :-
   type_codes(Type,Lchars,Token),!.
 
 
-%  get_chars_until(In,Out,Rest,UntilChar).
+%=  get_chars_until(In,Out,Rest,UntilChar).
 get_chars_until([UNTIL|Rest],[UNTIL],Rest,UNTIL):-!.
 get_chars_until([92,UNTIL|List],Lchars,Rest,UNTIL):-
    get_chars_until(List,[UNTIL|Lchars],Rest,UNTIL).
@@ -2515,7 +2521,7 @@ valid_char(K,C,C1)  :-  K = 0,!, C \= C1; K = 1, valid(C).
 %bracket(quote,39,39).  % single quotes
 bracket(quote,34,34).  % double quotes
 %bracket(list,91,93).  % square brackets []
-%bracket(quote,37,37).  % Literal Percent % 
+%bracket(quote,37,37).  % Literal Percent %= 
 %bracket(quote,35,35).  % Literal Percent ##
 
 quote_found(0,B,B)  :-  member(B,[34]),!.
@@ -2544,7 +2550,7 @@ Pterm = a(b)
 | ?- sterm_to_pterm([a,[b]],Pterm).    %Note:  This is a special Case
 Pterm = a(b)
 
-| ?- sterm_to_pterm([holds,X,Y,Z],Pterm).    %This allows Hilog terms to be Converted
+| ?- sterm_to_pterm([cycHolds,X,Y,Z],Pterm).    %This allows Hilog terms to be Converted
 Pterm = _h76(_h90,_h104)                    
 
 | ?- sterm_to_pterm([X,Y,Z],Pterm).   %But still works in normal places
@@ -2560,7 +2566,7 @@ sterm_to_pterm([X],Y):-!,nonvar(X),sterm_to_pterm(X,Y).
 
 sterm_to_pterm([S|TERM],PTERM):-isSlot(S),
             sterm_to_pterm_list(TERM,PLIST),            
-            PTERM=..[holds,S|PLIST].
+            PTERM=..[cycHolds,S|PLIST].
 
 sterm_to_pterm([S|TERM],PTERM):-number(S),!,
             sterm_to_pterm_list([S|TERM],PTERM).            
@@ -2571,7 +2577,7 @@ sterm_to_pterm([S|TERM],PTERM):-nonvar(S),atomic(S),!,
 
 sterm_to_pterm([S|TERM],PTERM):-!,  atomic(S),
             sterm_to_pterm_list(TERM,PLIST),            
-            PTERM=..[holds,S|PLIST].
+            PTERM=..[cycHolds,S|PLIST].
 
 sterm_to_pterm(VAR,VAR):-!.
 
@@ -2602,11 +2608,10 @@ interleave([Atom],_Space,[Atom]):-!.
 interleave([''|More],Space,[Space|Result]):-interleave(More,Space,Result),!.
 interleave([Atom|More],Space,[Atom,Space|Result]):-interleave(More,Space,Result),!.
 
-pterm_to_sterm(VAR,VAR):- \+ compound(VAR),!.
-pterm_to_sterm([X|L],[Y|Ls]):- !,pterm_to_sterm(X,Y),pterm_to_sterm(L,Ls),!.
-pterm_to_sterm(P,S):-P=..L, pterm_to_sterm(L,S).
-:- op(700,xfx,'=^..').
-P =^.. L :- pterm_to_sterm(P,L).
+pterm_to_sterm(VAR,VAR):-isNonCompound(VAR),!.
+pterm_to_sterm([X|L],[Y|Ls]):-!,pterm_to_sterm(X,Y),pterm_to_sterm(L,Ls),!.
+pterm_to_sterm(X,Y):-compound(X),X=..L,pterm_to_sterm(L,Y),!.
+pterm_to_sterm(X,X).
 
 % ===================================================================
 % Substitution based on ==
@@ -2615,7 +2620,7 @@ P =^.. L :- pterm_to_sterm(P,L).
 % Usage: subst(+Fml,+X,+Sk,?FmlSk)
 
 subst(A,B,C,D):- 
-      catch(hotrace(nd_subst(A,B,C,D)),_,fail),!.
+      catch(notrace(nd_subst(A,B,C,D)),_,fail),!.
 subst(A,B,C,A).
 
 nd_subst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
@@ -2664,7 +2669,7 @@ weak_nd_subst2( X, Sk, L, L ).
 
     
 /*
-:-swi_module(system_dependant,
+:-module(system_dependant,
       [getCputime/1,
       safe_numbervars/1,
       unnumbervars/2,
@@ -2704,7 +2709,7 @@ weak_nd_subst2( X, Sk, L, L ).
 % ========================================================================================
 getCputime(Start):-statistics(cputime,Start).
 prolog_statistics:-statistics.
-prolog_hotrace(G):-hotrace(G).
+prolog_notrace(G):-notrace(G).
 
 % ========================================================================================
 % Threads 
@@ -2721,6 +2726,7 @@ thread_join(Id,X):-thread_join(Id,X).
 % Some prologs have a printf() type predicate.. so I made up fmtString/writeFmt in the Cyc code that calls the per-prolog mechaism
 % in SWI it''s formzat/N and sformat/N
 % ========================================================================================
+:-dynamic_transparent(isConsoleOverwritten/0).
 
 /*
 defined above
@@ -2736,15 +2742,11 @@ writeFmt(X):-format(X,[]).
 fmtString(X,Y,Z):-sformat(X,Y,Z).
 fmtString(Y,Z):-sformat(Y,Z).
 
-/*
-:-dynamic_multifile_exported(isConsoleOverwritten/0).
-:-meta_predicate(isConsoleOverwritten/0).
 saveUserInput:-retractall(isConsoleOverwritten),flush_output.
 writeSavedPrompt:-not(isConsoleOverwritten),!.
 writeSavedPrompt:-flush_output.
 writeOverwritten:-isConsoleOverwritten,!.
 writeOverwritten:-assert(isConsoleOverwritten).
-*/
 
 writeErrMsg(Out,E):- message_to_string(E,S),writeFmtFlushed(Out,'<cycml:error>~s</cycml:error>\n',[S]),!.
 writeErrMsg(Out,E,Goal):- message_to_string(E,S),writeFmtFlushed(Out,'<cycml:error>goal "~q" ~s</cycml:error>\n',[Goal,S]),!.
@@ -2765,8 +2767,8 @@ writeFileToStream(Dest,Filename):-
 % ========================================================================================
 
 safe_numbervars(X):-get_time(T),convert_time(T,A,B,C,D,E,F,G),!,safe_numbervars(X,'$VAR',G,_).
-safe_numbervars(Copy,X,Z):-numbervars(Copy,X,Z,[attvar(bind)]).
-safe_numbervars(Copy,_,X,Z):-numbervars(Copy,X,Z,[attvar(bind)]).
+safe_numbervars(Copy,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
+safe_numbervars(Copy,_,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
 %unnumbervars(X,Y):-term_to_atom(X,A),atom_to_term(A,Y,_).
 
 % ========================================================================================
@@ -2810,7 +2812,7 @@ if_prolog(_,_):-!.  % Dont run SWI Specificd or others
 %  Http, Native or Soap and replies accordingly
 % ===========================================================
 /*
-:-swi_module(cyc_httpd,[
+:-module(cyc_httpd,[
    createCycServer/1,
    xmlPrologServer/1,
    read_line_with_nl/3,
@@ -2824,7 +2826,7 @@ if_prolog(_,_):-!.  % Dont run SWI Specificd or others
 
 
 % :-use_module(cyc_threads).
-%  :-ensure_loaded(system_dependant).
+%=  :-ensure_loaded(system_dependant).
 
 :-dynamic_transparent(isKeepAlive/1).
 
@@ -3086,7 +3088,7 @@ acceptCFaslClient(ServerSocket):-
 		tcp_accept(AcceptFd, ClientSocket, ip(A4,A3,A2,A1)),!,
                 getPrettyDateTime(DateTime),
                 sformat(Name,'Dispatcher for CFASL ~w.~w.~w.~w  started ~w ',[A4,A3,A2,A1,DateTime]),
-                servantProcessCreate(killable,Name,serviceCfaslClient(ClientSocket),_,[global(128000),local(12800),trail(12800),detatched(true)]),!. % 
+                servantProcessCreate(killable,Name,serviceCfaslClient(ClientSocket),_,[global(128000),local(12800),trail(12800),detatched(true)]),!. %= 
 serviceCfaslClient(ClientSocket):-
 	tcp_open_socket(ClientSocket, In, Out),!,
         setCycOption('$socket_in',In),
@@ -3210,7 +3212,7 @@ improperPart([H|T],CDR):-improperPart(T,CDR).
 
 
 
-isWhole(O,W):-number(O),W is round(O),atom_number(A2,W),atom_number(A1,O),(atom_concat(A2,'.0',A1);atom_concat(A2,A1)).
+isWhole(O,W):-number(O),W is round(O),atom_number(A2,W),atom_number(A1,O),(atom_concat(A2,'.0',A1);atom_concat(A2,'',A1)).
 
 encodeIntNumber(Int,[NCode|Rest]):-Int<0, NInt is -1 * Int,encodeIntNumber(NInt,[Code|Rest]),NCode is Code+1,!.
 encodeIntNumber(Int,[0,Int]):-Int<256.
@@ -3254,7 +3256,7 @@ callCycApi(Out,PrologGoal,ToplevelVars):-cycGoal(PrologGoal,ToplevelVars,Result)
 passAlong(X,Y):-toCycApiExpression(X,CycLX),evalSubL(CycLX,Y,Vars),asserta(evalSubLCache(X,Y)).
 
 
-notraceTry(Goal):-hotrace(ignore(catch(Goal,E,debugFmt(Goal-E)))).
+notraceTry(Goal):-notrace(ignore(catch(Goal,E,debugFmt(Goal-E)))).
 
 
 cycGoal(X,Y,Z):-debugFmt('?- ~q.~n',[cycGoal(X,Y,Z)]),fail.
@@ -3306,7 +3308,7 @@ createProcessedGoal((
 
 
 :- dynamic cycAssertionCache/6.
-% :- index(cycAssertionCache(0,1,1,1,1,0)).
+%:- index(cycAssertionCache(0,1,1,1,1,0)).
 cacheAssertionById(Id):-cycAssertionCache(Id,Assertion,Mt,Strength,Direction,Vars),!.
 cacheAssertionById(Id):-getAssertionById(Id,Assertion,Mt,Strength,Direction,Vars),
       asserta(cycAssertionCache(Id,Assertion,Mt,Strength,Direction,Vars)).
@@ -3339,12 +3341,6 @@ noCaseChange([],[]):-!.
 noCaseChange(VAR,VAR):-var(VAR),!.
 noCaseChange(MiXed):-atom(MiXed),atom_concat('#$',_,MiXed),!.
 noCaseChange(c(VAR),c(VAR)):-!.
-
-/*
-         toUppercase/2,
-         toLowercase/2,
-         toPropercase/2,
-         toCamelcase/2,
 
 toUppercase(MiXed,MiXed):-noCaseChange(MiXed),!.
 toUppercase(V,V2):-string(V),!,atom_codes(V,VC),toUppercase(VC,CVC),string_to_atom(V2,CVC),!.
@@ -3394,7 +3390,7 @@ toCamelcase(CX,Y):-atom(CX),name(CX,[S|SS]),char_type(S,to_upper(NA)),name(NA,[N
 toCamelcase(MiXed,UPPER):-compound(MiXed),MiXed=..MList,toCamelcase(MList,UList),!,UPPER=..UList.
 toCamelcase(A,A).
 
-*/      
+      
       
 
 % ===========================================================
@@ -3708,7 +3704,7 @@ ifInteractive(X):-X.
 % ===========================================================
 
 			    
-%:-swi_module(cyc_soap,[]).
+%:-module(cyc_soap,[]).
 
 % :-include('cyc_header.pl').
 
@@ -3770,7 +3766,6 @@ xmlExitTags.
 % ===========================================================
 % Insert
 % ===========================================================
-
 parse_cyc_soap(Options):-memberchk(submit=assert,Options),!,
         getCycOption(opt_ctx_assert='BaseKB',Ctx),
         getCycOption(opt_theory='doom:DataMt',Context),
@@ -3875,10 +3870,9 @@ removalPredicateCodedInProlog(Pred,Prolog).
 prologEval(X,Y):-Y is X + 111.
 prologEval(X,Y):-Y is X + 211.
 
-/*
 :-use_module(library(odbc)).  
 :-odbc_debug(5).
-*/
+
 
 :-dynamic(ensureCycCallsProlog/2).
 
@@ -3911,7 +3905,7 @@ prologProcForCycPred(X,X).
   
 
 dsnForDB('AdventureWorks','AdventureWorks').
-connectionForDB(DB,CON):-odbc_current_connection(CON,mpred_name(DB)),!.
+connectionForDB(DB,CON):-odbc_current_connection(CON,database_name(DB)),!.
 connectionForDB(DB,CON):-dsnForDB(DB,DSN),odbc_connect(DSN, CON,[ /*user('Administrator'),%password(Password),%alias(wordnet),*/open(once)]),!.
 
 databaseForSource('AdventureWorksSource','AdventureWorks').
@@ -4125,7 +4119,7 @@ write_e(C):-put_code(C),!.
 % ===================================================================
 
 			  /*      				   
-:-swi_module(cyc_generation,
+:-module(cyc_generation,
 	 [ 
 	 debugFmt/1,
 	 debugFmt/2,
@@ -4158,7 +4152,7 @@ writeModePop(_Pop):-!.
 
 %debugFmt([-1]).
 %debugFmt([[-1]]).
-%debugFmt(T):- isCycOption(opt_debug=false),!.
+%debugFmt(T):- isCycOption(opt_debug=off),!.
 debugFmt(Stuff):-!,debugFmt('% ~q~n',[Stuff]).
 debugFmt(T):-!,
 	((
@@ -4173,7 +4167,7 @@ debugFmt(T):-!,
 indent_e(X):- catch((X < 2),_,true),write(' '),!.
 indent_e(X):-XX is X -1,!,write(' '), indent_e(XX).
 
-%debugFmt(C,T):- isCycOption(opt_debug=false),!.
+%debugFmt(C,T):- isCycOption(opt_debug=off),!.
 debugFmt(_,F):-F==[-1];F==[[-1]].
 debugFmt(F,A):-
         nl(user_error),
@@ -4187,7 +4181,7 @@ debugFmt(C,T):-!,
 	debugFmt(T),
         writeFmt('</font>',[]))),!.
 
-dumpstack_argument(T):-isCycOption(opt_debug=false),!.  
+dumpstack_argument(T):-isCycOption(opt_debug=off),!.  
 	
 dumpstack_argument(Frame):-
 	write(frame=Frame),write(' '),
@@ -4209,11 +4203,6 @@ dumpstack_argument(N,Frame):-!,write('\n').
 
 write_response_begin:-!.
 write_response_end:-!.
-/*
-:-swi_export((	 logOnFailureIgnore/1,
-	 sendNote/1,
-	 sendNote/4,
-	 writeFailureLog/2)).
 
 sendNote(X):-var(X),!.
 sendNote(X):-mods(X),!.
@@ -4244,7 +4233,7 @@ sendNote_1(canonicalizer,From,Subj,Message,Vars):-
             toMarkUp(cycl,nv(Subj),Vars,SS),
             toMarkUp(cycl,nv(Message),Vars,SA),
             writeFmt('<font color=red>canonicalizer</font>: ~w "~w" (from ~w). \n',[SA,SS,SFrom]),!.
-*/
+
 /*
 
 sendNote_1(debug,From,Subj,Message,Vars):- %isCycOption(disp_notes_nonuser=on),!,
@@ -4257,7 +4246,7 @@ sendNote_1(debug,From,Subj,Message,Vars):-!.
 
             /*
 
-/*
+
 sendNote_1(To,From,Subj,Message,Vars):- isCycOption(client=consultation),  !, 
             toMarkUp(cycl,To,Vars,STo),
             toMarkUp(cycl,From,Vars,SFrom),
@@ -4298,6 +4287,7 @@ sendNote_1(To,From,Subj,Message,Vars):-  % In CYC
 
 sendNote(To,From,Subj,Message,Vars):-!.
                                                                        */
+debugFmtFast(X):-writeq(X),nl.
 
 logOnFailure(assert(X,Y)):- catch(assert(X,Y),_,Y=0),!.
 logOnFailure(assert(X)):- catch(assert(X),_,true),!.
@@ -4305,9 +4295,7 @@ logOnFailure(assert(X)):- catch(assert(X),_,true),!.
 %logOnFailure(X):-catch(X,E,true),!.
 logOnFailure(X):-catch(X,E,(writeFailureLog(E,X),!,catch((true,X),_,fail))),!.
 logOnFailure(X):- writeFailureLog('Predicate Failed',X),!.
-*/
 
-debugFmtFast(X):-writeq(X),nl.
 
 flush_output_safe(X):-catch(flush_output(X),_,true),!.
 flush_output_safe(X).
@@ -4316,12 +4304,7 @@ writeFailureLog(E,X):-
 		writeFmt(user_error,'\n% error:  ~q ~q\n',[E,X]),flush_output_safe(user_error),!,
 		%,true.
 		writeFmt('\n;; error:  ~q ~q\n',[E,X]),!,flush_output. %,writeFmtFlushed([E,X]).
-
-/*
-:-swi_export((	 debugOnFailure/2,
-	 debugOnFailure/1,
-         debugOnError/1)).
-
+		
 debugOnFailure(assert(X,Y)):- catch(assert(X,Y),_,Y=0),!.
 debugOnFailure(assert(X)):- catch(assert(X),_,true),!.
 debugOnFailure(assert(X)):- catch(assert(X),_,true),!.
@@ -4336,7 +4319,7 @@ debugOnError((X,Y)):-!,debugOnError(X),debugOnError(Y).
 debugOnError((X;Y)):-!,(debugOnError(X);debugOnError(Y)).
 debugOnError(call(X)):-!,debugOnError(X).
 debugOnError(X):-catch(X,E,(writeFailureLog(E,X),ctrace,call(X))).
-*/
+
 
 noDebug(CALL):-CALL.
 	
@@ -4505,7 +4488,7 @@ Where <cr> indicates a carriage return or some other suitable delimiter.
 % thread_join(Id,_)
 
 /*
-:-swi_module(cyc_threads,
+:-module(cyc_threads,
       [ 
       	 servantProcessCreate/1,
 	 servantProcessCreate/3,
@@ -4660,7 +4643,7 @@ clauseForVirtual(Predicate,Call):-Call=..[Predicate,_,_,_,_].
 
 getClauseDB(saved(Data,Mt,Vars,List),saved(Data,Mt,Vars,List)):-!.
 getClauseDB(Head,imported_from(X,Head)):-predicate_property(Head,imported_from(X)).
-getClauseDB(Head,implimentedInCode(Head)):-real_builtin_predicate(Head),!.
+getClauseDB(Head,implimentedInCode(Head)):-predicate_property(Head,built_in),!.
 getClauseDB(Head,implimentedInCode(Head)):-predicate_property(Head,foreign),!.
 getClauseDB(Head,entails(VirtualClauses,Head)):-clause(Head,VirtualClauses).
 
@@ -4713,9 +4696,9 @@ valueToCheckMark(Value,'OFF',' ').
 :-set_prolog_flag(double_quotes,string).
 
 
-%  ======================================
-%  lisp_reade_term(Lisp)
-%  ======================================
+%=  ======================================
+%=  lisp_reade_term(Lisp)
+%=  ======================================
 % :-set_prolog_flag(double_quotes,codes).
 
 
@@ -4729,7 +4712,6 @@ valueToCheckMark(Value,'OFF',' ').
 
 %getSurfaceFromTokens(GET,SURF,VARS):-debugOnFailure(s2p(surfFromTokens,GET,SURF,VARS)),!.
 getSurfaceFromTokens(GET,token(GET),_VARS):-!.
-
 
 end_of_file.
 

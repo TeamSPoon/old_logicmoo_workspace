@@ -1,5 +1,5 @@
 
-:- include(logicmoo_i_header).
+:- ensure_loaded(logicmoo(mpred/logicmoo_i_header)).
 
 :-
  %swi_module(logicmoo_i_pttp_statics,[ 
@@ -341,7 +341,7 @@ linearize(TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut) :-
 		               MatchesIn,MatchesOut,1,N);
 	identical_member_special(TermIn,VarsIn) ->
 		VarsOut = VarsIn,
-		conjoin(MatchesIn,unify(TermIn,TermOut),MatchesOut);
+		conjoin_pttp(MatchesIn,unify(TermIn,TermOut),MatchesOut);
 	%true ->
 		TermOut = TermIn,
 		VarsOut = [TermIn|VarsIn],
@@ -517,7 +517,7 @@ make_wrapper0(DefinedPreds,[P,N],Result) :-
 	V2 = (DepthOut = DepthIn,
 		 ProofIn = [Prf,[Red,GoalAtom,PosAncestors,NegAncestors]|PrfEnd],
 		 ProofOut = [Prf|PrfEnd]),
-	conjoin(V1,V2,Reduce),
+	conjoin_pttp(V1,V2,Reduce),
 	Result = (Head :- GoalAtom = PosGoal,
 		  	  (identical_member_special_loop_check(GoalAtom,C1Ancestors) ->
 			   	fail;
@@ -697,7 +697,7 @@ clauses((A , B),L,WffNum1,WffNum2) :-
 	!,
 	clauses(A,L1,WffNum1,W),
 	clauses(B,L2,W,WffNum2),
-	conjoin(L1,L2,L).
+	conjoin_pttp(L1,L2,L).
 
 clauses(PNF,L,WffNum1,WffNum2):- 
    save_wid(WffNum1,pttp_in,PNF),
@@ -716,9 +716,9 @@ clauses2(A,[Lit|Lits],L,WffNum) :-
 	(Body1 == false ->
 		L = true;
 	%true ->
-		conjoin(infer_by(WffNum),Body1,Body),
+		conjoin_pttp(infer_by(WffNum),Body1,Body),
 		clauses2(A,Lits,L1,WffNum),
-		conjoin((Lit :- Body),L1,L)).
+		conjoin_pttp((Lit :- Body),L1,L)).
 clauses2(_,[],true,_).
 
 head_literals(Wff,L) :-
@@ -738,7 +738,7 @@ head_literals(Wff,L) :-
 body_for_head_literal(Head,Wff,Body) :-
 	Wff = (A :- B) ->
 		body_for_head_literal(Head,A,A1),
-		conjoin(A1,B,Body);
+		conjoin_pttp(A1,B,Body);
 	Wff = (A , B) ->
 		body_for_head_literal(Head,A,A1),
 		body_for_head_literal(Head,B,B1),
@@ -746,7 +746,7 @@ body_for_head_literal(Head,Wff,Body) :-
 	Wff = (A ; B) ->
 		body_for_head_literal(Head,A,A1),
 		body_for_head_literal(Head,B,B1),
-		conjoin(A1,B1,Body);
+		conjoin_pttp(A1,B1,Body);
 	Wff == Head ->
 		Body = true;
 	negated_literal(Wff,Head) ->
@@ -821,7 +821,7 @@ procedure(P,N,Clauses,Proc) :-
 	Clauses = (A , B) ->
 		procedure(P,N,A,ProcA),
 		procedure(P,N,B,ProcB),
-		conjoin(ProcA,ProcB,Proc);
+		conjoin_pttp(ProcA,ProcB,Proc);
 	(Clauses = (A :- B) , functor(A,P,N)) ->
 		Proc = Clauses;
 	%true ->
@@ -830,7 +830,7 @@ procedure(P,N,Clauses,Proc) :-
 procedures([[P,N]|Preds],Clauses,Procs) :-
 	procedure(P,N,Clauses,Proc),
 	procedures(Preds,Clauses,Procs2),
-	conjoin(Proc,Procs2,Procs).
+	conjoin_pttp(Proc,Procs2,Procs).
 procedures([],_Clauses,true).
 %%% ***
 
@@ -892,10 +892,10 @@ add_features_hb(Head , Body ,Head1 , Body1) :-
    search_cost(Body,HeadArgs,Cost),       
    test_and_decrement_search_cost_expr(DepthIn,Cost,Depth1,TestExp0),
    argument_type_checking(HF,HeadArgs,TypeCheck),
-   conjoin(TestExp0,TypeCheck,TestExp),
-       conjoin(PushAnc,Body2,Body4),
-       conjoin(Matches,Body4,Body5),
-       conjoin(pretest_call(TestExp),Body5,Body1),
+   conjoin_pttp(TestExp0,TypeCheck,TestExp),
+       conjoin_pttp(PushAnc,Body2,Body4),
+       conjoin_pttp(Matches,Body4,Body5),
+       conjoin_pttp(pretest_call(TestExp),Body5,Body1),
      
      add_head_args(Head2,
           PosGoal,GoalAtom,HeadArgs,
@@ -943,10 +943,10 @@ add_features_hb_normal(Head , Body ,Head1 , Body1) :-
               search_cost(Body,HeadArgs,Cost),       
               test_and_decrement_search_cost_expr(DepthIn,Cost,Depth1,TestExp0),
               argument_type_checking(HF,HeadArgs,TypeCheck),
-              conjoin(TestExp0,TypeCheck,TestExp),
-		conjoin(PushAnc,Body2,Body4),
-		conjoin(Matches,Body4,Body5),
-		conjoin(pretest_call(TestExp),Body5,Body1)                
+              conjoin_pttp(TestExp0,TypeCheck,TestExp),
+		conjoin_pttp(PushAnc,Body2,Body4),
+		conjoin_pttp(Matches,Body4,Body5),
+		conjoin_pttp(pretest_call(TestExp),Body5,Body1)                
                 ),
      
     	Head2 =.. [P|L],
@@ -983,7 +983,7 @@ add_args(INFO,(A , B),PosGoal,GoalAtom,HeadArgs,
 		         Depth1,DepthOut,
 			 Proof1,ProofOut,
                          B1,New),
-		conjoin(A1,B1,Body1),!.
+		conjoin_pttp(A1,B1,Body1),!.
 
 add_args(INFO,(A ; B),PosGoal,GoalAtom,HeadArgs,
          PosAncestors,NegAncestors,
@@ -1011,13 +1011,13 @@ add_args(INFO,(A ; B),PosGoal,GoalAtom,HeadArgs,
 			Cost is CostB - CostA,
 			test_and_decrement_search_cost_expr(DepthIn,Cost,DepthB,TestExp),
 			A1 = A2,
-			conjoin(pretest_call(TestExp),B2,B1);
+			conjoin_pttp(pretest_call(TestExp),B2,B1);
 		CostA > CostB ->
 			DepthB = DepthIn,
 			Cost is CostA - CostB,
 			test_and_decrement_search_cost_expr(DepthIn,Cost,DepthA,TestExp),
 			B1 = B2,
-			conjoin(pretest_call(TestExp),A2,A1);
+			conjoin_pttp(pretest_call(TestExp),A2,A1);
 		%true ->
 		        DepthA = DepthIn,
 			DepthB = DepthIn,
@@ -1152,7 +1152,7 @@ pttp1_wid(ID,X,Y) :-
 	must_det(predicates(X0,Preds0)),
 	list_reverse(Preds0,Preds),
 	apply_to_elements(Preds,make_wrapper(IntPreds1),Procs),
-	conjoin(IntProcs,Procs,Y))))),!.
+	conjoin_pttp(IntProcs,Procs,Y))))),!.
 %%% ***
 %%% ****if* PTTP/pttp2
 %%% SOURCE
@@ -1302,11 +1302,11 @@ max(X,Y,Max) :-
 	%true ->
 		Max = X.
 %%% ***
-%%% ****if* PTTP/conjoin
+%%% ****if* PTTP/conjoin_pttp
 %%% SOURCE
 
-:-export(conjoin/3).
-conjoin(A,B,C) :-
+:-export(conjoin_pttp/3).
+conjoin_pttp(A,B,C) :-
 	A == true ->
 		C = B;
 	B == true ->
@@ -1476,7 +1476,7 @@ apply_to_conjuncts(Wff,P,Wff1) :-
 	Wff = (A , B) ->
 		apply_to_conjuncts(A,P,A1),
 		apply_to_conjuncts(B,P,B1),
-		conjoin(A1,B1,Wff1);
+		conjoin_pttp(A1,B1,Wff1);
 	%true ->
 		P =.. G,
 		list_append(G,[Wff,Wff1],G1),
@@ -1492,7 +1492,7 @@ apply_to_elements([X|L],P,Result) :-
 	T1 =.. G1,
 	call(T1),
 	apply_to_elements(L,P,L1),
-	conjoin(X1,L1,Result).
+	conjoin_pttp(X1,L1,Result).
 apply_to_elements([],_,true).
 
 %%% ***
@@ -1988,7 +1988,7 @@ dalit_make_wrapper(DefinedPreds,[P,N],Result) :-
 	V2 = (
 		 ProofIn = [Prf,[Red,GoalAtom,PosAncestors,NegAncestors]|PrfEnd],
 		 ProofOut = [Prf|PrfEnd]),
-	conjoin(V1,V2,Reduce),
+	conjoin_pttp(V1,V2,Reduce),
 	Result = (Head :- GoalAtom = PosGoal,
 		  	  (identical_member_special_loop_check(GoalAtom,C1Ancestors) ->
 			   	fail;
@@ -2034,9 +2034,9 @@ dalit_add_features((Head :- Body),(Head1 :- Body1)) :-
 			PushAnc = (NewNegAncestors = [GoalAtom|NegAncestors])),
 		dalit_search_cost(Body,HeadArgs,Cost),
 		test_and_decrement_search_cost_expr(DepthIn,Cost,Depth1,TestExp),
-		conjoin(PushAnc,Body2,Body4),
-		conjoin(Matches,Body4,Body5),
-		conjoin(TestExp,Body5,Body1)),
+		conjoin_pttp(PushAnc,Body2,Body4),
+		conjoin_pttp(Matches,Body4,Body5),
+		conjoin_pttp(TestExp,Body5,Body1)),
     	Head2 =.. [P|L],
 	internal_functor(P,IntP),
 	list_append(L,[PosAncestors,NegAncestors,
@@ -2080,7 +2080,7 @@ dalit_add_args(INFO,Body,PosGoal,GoalAtom,HeadArgs,
 			 DepthIn,
 			 Proof1,ProofOut,
                          B1,New),
-		conjoin(A1,B1,Body1);
+		conjoin_pttp(A1,B1,Body1);
 	Body = (A ; B) ->
 		throw(unimplemented);
 	functor(Body,dalit_search_cost,_) ->

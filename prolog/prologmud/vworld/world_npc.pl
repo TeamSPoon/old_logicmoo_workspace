@@ -78,6 +78,7 @@ do_agent_call_plan_command(A,C):-
 
 
 command_actIdea(Who,IdeaS):- nonvar(Who),
+  side_effect_prone,
   findall(Idea,
         (get_world_agent_plan(current,Who,Idea),
              dmsg(get_world_agent_plan(current,Who,Idea))),IdeaS),

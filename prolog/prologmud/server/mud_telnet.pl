@@ -9,7 +9,7 @@
 */
 
 :-module(mud_telnet, [                  
-                  do_player_action/1,
+                  do_agent_action/1,
                   connect_player/2,
                   look_brief/1,
                   cmdShowRoomGrid/1,
@@ -18,11 +18,10 @@
                   telnet_repl_writer/4,
                   telnet_repl_obj_to_string/3,
                   start_mud_telnet/1,
-                  read_and_do_telnet/0,
-                  run_player_telnet_0/0,
-                  run_player_telnet/0,
+                  run_local_tty/0,
                   login_and_run/0,
-                  ensure_player_stream_local/1,
+                  login_and_run_tty/0,
+                  register_player_stream_local/1,
                   login_and_run_nodebug/0]).
 
 :- multifile thlocal:wants_logout/1.
@@ -65,65 +64,60 @@ login_and_run:-
    %setup_streams(In, Out),   
    %threads,
    must(player_connect_menu),
-   % do_player_action(P,'who'),   
-   must(run_player_telnet).
+   % do_agent_action(P,'who'),   
+   must(login_and_run_tty).
 
 player_connect_menu:-
-   prolog_must_l([foc_current_player(WantsPlayer),
+   prolog_must_l([foc_current_agent(WantsPlayer),
    connect_player(WantsPlayer,P),
-   foc_current_player(P),
+   foc_current_agent(P),
    call_agent_command(P,actLook)]),!.
 
 connect_player(Wants,Gets):-
  prolog_must_l([
-   foc_current_player(Wants),
+   foc_current_agent(Wants),
    % sets some IO functions
-   once((ensure_player_stream_local(Wants),
+   once((register_player_stream_local(Wants),
      current_agent(Gets)))]).
 
-run_player_telnet:- 
-      with_assertions(set_prolog_flag(opt_debug,filter),run_player_telnet_0).
-
-run_player_telnet_0:-    
+login_and_run_tty:-    
    must(set_tty_control),!,
-   fmt('~n~n~nHello run_player_telnet!~n',[]),
-   must(foc_current_player(P)),
+   fmt('~n~n~nHello login_and_run_tty!~n',[]),
+   must(foc_current_agent(P)),
    assert_isa(P,tHumanPlayer),
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
    must((colormsg([blink,fg(red)],"this is blinking red!"))),
-   call_cleanup(
+   with_assertions(set_prolog_flag(opt_debug,filter),
+    call_cleanup(
      % runs the Telnet REPL
      (must(set_player_telnet_options),
-     must(run_player_local)),  
-     must(goodbye_player)).
+     must(login_and_run_tty_io)),  
+     must(goodbye_player))).
 
 
 set_player_telnet_options:-
-     foc_current_player(P),
+     foc_current_agent(P),
      add(repl_writer(P,telnet_repl_writer)),
      add(repl_to_string(P,telnet_repl_obj_to_string)),
      set_bugger_flag(opt_debug,false).
 
 goodbye_player:- 
-     foc_current_player(P3),
+     foc_current_agent(P3),
      fmt('~n~nGoodbye ~w! ~n',[P3]),
      retractall(thglobal:global_session_agent(_,P3)).
 
-run_player_local(Wants) :-
-    connect_player(Wants,P),
-    foc_current_player(P),
-    run_player_local.
 
 reset_wants_logout:- get_session_id(O),retractall(thlocal:wants_logout(O)).
 
-run_player_local :-
+login_and_run_tty_io :-
     reset_wants_logout,
-    foc_current_player(P),get_session_id(O),thread_self(Id),
+    start_agent_action_thread,
+    foc_current_agent(P),get_session_id(O),thread_self(Id),
     with_no_assertions(thglobal:use_cyc_database,
      with_no_assertions(thlocal:useOnlyExternalDBs, 
       with_assertions(thlocal:session_agent(O,P),
         ((repeat,
-          once(read_and_do_telnet),
+          once(run_local_tty),
           retract(thlocal:wants_logout(O)),
         retractall(thglobal:agent_message_stream(P,Id,_,_))))))),!.
 
@@ -148,26 +142,27 @@ set_tty_control:-
    colormsg(green,"this is green!"))))),!.
 
 
-ensure_player_stream_local(P):-  
+register_player_stream_local(P):-  
   current_input(In),current_output(Out),
   thread_self(Id),
   set_player_stream(P,Id,In,Out).
 
 set_player_stream(P,Id,In,Out):-
-  % foc_current_player(P),
+  % foc_current_agent(P),
    (thglobal:agent_message_stream(P,Id,In,Out)->true;
       ((retractall(thglobal:agent_message_stream(P,Id,_,_)),
      assert(thglobal:agent_message_stream(P,Id,In,Out))))).
    
 
 
-read_and_do_telnet:-
+run_local_tty:-
   repeat,
-   foc_current_player(P),
-   ensure_player_stream_local(P),
+  start_agent_action_thread,
+   foc_current_agent(P),
+   register_player_stream_local(P),
          must(ignore(look_brief(P))),!,         
            sformat(S,'~w> ',[P]),prompt_read_telnet(S,List),
-            must(once(do_player_action(List))),!.
+            must(once(pfc_add(agent_action_queue(P,List)))),!.
 
 
 :-export(prompt_read/2).
@@ -215,15 +210,15 @@ scan_src_updates:- ignore((thread_self(main),ignore((catch(make,E,dmsg(E)))))).
 % USES PACKRAT PARSER 
 % ===========================================================
 
-:-export(do_player_action/1).
-do_player_action(VA):- debug, foc_current_player(Agent),!, do_player_action(Agent,VA),!.
+:-export(do_agent_action/1).
+do_agent_action(VA):- debug, foc_current_agent(Agent),!, do_agent_action(Agent,VA),!.
 
-:-export(do_player_action/2).
-do_player_action(Agent,CMD):-var(CMD),!,fmt('unknown_var_command(~q,~q).',[Agent,CMD]).
-do_player_action(_,EOF):- end_of_file == EOF, !, tick_tock.
-do_player_action(_,''):-!, tick_tock.
-do_player_action(Agent,CMD):- call_agent_command(Agent, CMD),!.
-do_player_action(Agent,CMD):-fmt('skipping_unknown_player_action(~q,~q).~n',[Agent,CMD]),!,fail.
+:-export(do_agent_action/2).
+do_agent_action(Agent,CMD):-var(CMD),!,fmt('unknown_var_command(~q,~q).',[Agent,CMD]).
+do_agent_action(_,EOF):- end_of_file == EOF, !, tick_tock.
+do_agent_action(_,''):-!, tick_tock.
+do_agent_action(Agent,CMD):- call_agent_command(Agent, CMD),!.
+do_agent_action(Agent,CMD):-fmt('skipping_unknown_player_action(~q,~q).~n',[Agent,CMD]),!,fail.
 
 
 % ===========================================================

@@ -103,9 +103,9 @@ desc_len(S0,Region):- call(term_to_atom(S0,S)),
 
 
 :-export(objects_match_for_agent/3).
-objects_match_for_agent(Agent,Text,ObjList):- objects_match_for_agent(Agent,Text,[mudPossess(Agent,isSelf),isSame(mudAtLoc),isSame(localityOfObject),tAgent,tItem,tRegion],ObjList).  
+objects_match_for_agent(Agent,Text,ObjList):- objects_match_for_agent(Agent,Text,[mudPossess(Agent,isThis),isSame(mudAtLoc),isSame(localityOfObject),tAgent,tItem,tRegion],ObjList).  
 :-export(objects_match_for_agent/4).
-objects_match_for_agent(Agent,Text,Match,ObjList):- objects_for_agent(Agent,isOneOf([text_means(Agent,Text,isSelf),isAnd([isOneOf(Match),match_object(Text,isSelf)])]),ObjList).  
+objects_match_for_agent(Agent,Text,Match,ObjList):- objects_for_agent(Agent,isOneOf([text_means(Agent,Text,isThis),isAnd([isOneOf(Match),match_object(Text,isThis)])]),ObjList).  
 
 
 text_means(Agent,Text,Agent):- equals_icase(Text,"self"),!.
@@ -116,7 +116,7 @@ text_means(_Agent,_Text,_Value):-fail.
 relates(Agent,Relation,Obj):-loop_check(relates_ilc(Agent,Relation,Obj),fail).
 relates_ilc(Agent,Relation,Obj):-text_means(Agent,Relation,Obj),!.
 relates_ilc(_    ,Relation,Obj):- atom(Relation),tCol(Relation),!,isa(Obj,Relation).
-relates_ilc(_    ,Relation,Obj):-contains_var(Relation,isSelf),subst(Relation,isSelf,Obj,Call),!,req(Call).
+relates_ilc(_    ,Relation,Obj):-contains_var(Relation,isThis),subst(Relation,isThis,Obj,Call),!,req(Call).
 relates_ilc(Agent,isSame(Relation),Obj):- !, relates(Agent,Relation,Value),relates(Obj,Relation,Value).
 relates_ilc(Agent,Relation,Obj):- atom(Relation),!, prop(Agent,Relation,Obj).
 relates_ilc(_    ,Relation,Obj):-contains_var(Relation,Obj),!,req(Relation).
@@ -203,7 +203,7 @@ object_print_details0(Print,Agent,O,DescSpecs,Skipped):-
 vtSkippedPrintNames(T):-var(T),!,fail.
 vtSkippedPrintNames(T):-ttFormatType(T).
 %vtSkippedPrintNames(T):-isa(T,ttTypeType).
-vtSkippedPrintNames(E):-member(E,[tObj,isSelf,the,is,tSpatialThing,ttNotSpatialType,ttSpatialType,prologHybrid,t,prologPTTP,prologSNARK,prologOnly,tRelation,tPred,'',[]]).
+vtSkippedPrintNames(E):-member(E,[tObj,isThis,the,is,tSpatialThing,ttNotSpatialType,ttSpatialType,prologHybrid,t,prologPTTP,prologSNARK,prologOnly,tRelation,tPred,'',[]]).
 
 
 must_make_object_string_list(_,Obj,WList):- object_string(Obj,WList),!.
@@ -421,7 +421,7 @@ name_text_atomic('',_):-!,fail.
 name_text_atomic("",_):-!,fail.
 name_text_atomic(Name,Text):-string(Name),Name=Text.
 name_text_atomic(Name,Text):-to_case_breaks(Name,[_|ListN]),member(t(Text,_),ListN).
-name_text_atomic(Name,Text):-i_name('',Name,TextN),atom_string(TextN,Text).
+name_text_atomic(Name,Text):-i_name_lc(Name,TextN),atom_string(TextN,Text).
 name_text_atomic(Name,Text):-atom_string(Name,Text).
 
 
@@ -515,10 +515,11 @@ parseFmt_vp1(Agent, do(NewAgent,Goal),[SVERB|ARGS],[]):- parse_agent_text_comman
 parseFmt_vp2(Agent,GOAL,[SVERB|ARGS],UNPARSED):- parse_vp_real(Agent,SVERB,ARGS,TRANSLATIONS),!,member(UNPARSED-GOAL,TRANSLATIONS).
 
 to_arg_value(Var,Var):-is_ftVar(Var),!.
+to_arg_value(Val,What):-parserVars((Val;isParserVar(Val)),What,_),!. 
 to_arg_value(vHere,Here):-must((current_agent(Who),where_atloc(Who,Here))).
 to_arg_value(isSelfAgent,Who):-must((current_agent(Who))).
 to_arg_value(isRandom(Type),Term):- nonvar(Type),!,must((to_arg_value(Type,TypeR),random_instance(TypeR,Term,true))).
-to_arg_value(Call,TermO):-compound(Call),Call=..[call|CALLARGS],must((subst(CALLARGS,isSelf,Term,CALLARGS2),maplist(to_arg_value,CALLARGS2,CALLARGS3),NewCall=..[call|CALLARGS3],must(req(NewCall)),to_arg_value(Term,TermO))).
+to_arg_value(Call,TermO):-compound(Call),Call=..[call|CALLARGS],must((subst(CALLARGS,isThis,Term,CALLARGS2),maplist(to_arg_value,CALLARGS2,CALLARGS3),NewCall=..[call|CALLARGS3],must(req(NewCall)),to_arg_value(Term,TermO))).
 to_arg_value(Term,TermO):-must((map_term(to_arg_value,Term,TermO))).
 
 map_term(Pred,Term,TermO):-var(Term),!,must(call(Pred,Term,TermO)).
@@ -551,7 +552,7 @@ parseIsa(isNot(Type), Term, C, D) :- !, dcgAnd(dcgNot(parseIsa(Type)), theText(T
 parseIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(isSelfAgent,Goal,Left,Right),parseFmt_vp2(isSelfAgent,Goal,Left,Right)).
 
 parseIsa(t(P,S,O),TermV) -->{!},parseIsa(call(t(P,S,O)),TermV).
-parseIsa(call(Call),TermV) --> {!,subst(Call,isSelf,TermV,NewCall)},theText(TermT), {req(NewCall),match_object(TermT,TermV)}.
+parseIsa(call(Call),TermV) --> {!,subst(Call,isThis,TermV,NewCall)},theText(TermT), {req(NewCall),match_object(TermT,TermV)}.
 parseIsa(exactStr(Str),Str) --> {!},[Atom],{equals_icase(Atom,Str),!}.
 parseIsa(isOptionalStr(Str),Str) --> {not(optional_strings_opt)},[Atom],{equals_icase(Atom,Str),!}.
 parseIsa(isOptionalStr(_),isMissing) --> {!},[].

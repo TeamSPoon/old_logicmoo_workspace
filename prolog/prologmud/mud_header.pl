@@ -10,29 +10,13 @@
 %
 */
 
+:-dynamic(hooks:irc_event_hooks/3).
+:-multifile(hooks:irc_event_hooks/3).
 
+:-dynamic(hooks:deliver_event/2).
+:-multifile(hooks:deliver_event/2).
 
-:- multifile user:term_specifier_text/2.
-:- multifile user:type_action_info/3.
-:- multifile user:update_charge/2.
-:- multifile user:update_stats/2.
-:- multifile user:use_usable/4.
-:- multifile user:verb_alias/2.
-:- multifile user:vtActionTemplate/1.
-:- multifile user:mud_test/0.
-:- multifile user:mud_test/1.
-:- multifile user:mud_test/2.
-:- multifile user:mud_test_local/0.
-:- multifile user:mud_test_local/1.
-:- multifile user:mud_test_local/2.
-:- multifile user:world_agent_plan/3.
-:- multifile user:action_info/2.
-:- multifile user:action_rules/4.
-:- multifile user:action_verb_useable/4.
-:- multifile user:agent_call_command/2.
-:- multifile user:agent_text_command/4.
-:- multifile user:check_permanence/4.
-
+:- dynamic_multifile_exported user:irc_user_plays/2.
 
 :- dynamic_multifile_exported user:term_specifier_text/2.
 :- dynamic_multifile_exported user:type_action_info/3.
@@ -52,6 +36,7 @@
 :- dynamic_multifile_exported user:action_rules/4.
 :- dynamic_multifile_exported user:action_verb_useable/4.
 :- dynamic_multifile_exported user:agent_call_command/2.
+:- dynamic_multifile_exported user:agent_call_command_fallback/2.
 :- dynamic_multifile_exported user:agent_text_command/4.
 :- dynamic_multifile_exported user:check_permanence/4.
 
@@ -171,3 +156,28 @@
 % :-must(not(user:mpred_prop(t,prologHybrid))).
 
 :- retractall(thlocal:disable_mpred_term_expansions_locally/0).
+
+
+
+
+:- multifile user:term_specifier_text/2.
+:- multifile user:type_action_info/3.
+:- multifile user:update_charge/2.
+:- multifile user:update_stats/2.
+:- multifile user:use_usable/4.
+:- multifile user:verb_alias/2.
+:- multifile user:vtActionTemplate/1.
+:- multifile user:mud_test/0.
+:- multifile user:mud_test/1.
+:- multifile user:mud_test/2.
+:- multifile user:mud_test_local/0.
+:- multifile user:mud_test_local/1.
+:- multifile user:mud_test_local/2.
+:- multifile user:world_agent_plan/3.
+:- multifile user:action_info/2.
+:- multifile user:action_rules/4.
+:- multifile user:action_verb_useable/4.
+:- multifile user:agent_call_command/2.
+:- multifile user:agent_text_command/4.
+:- multifile user:check_permanence/4.
+

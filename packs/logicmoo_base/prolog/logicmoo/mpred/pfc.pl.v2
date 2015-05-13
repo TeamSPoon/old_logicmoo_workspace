@@ -22,6 +22,9 @@ user:file_search_path(cliopatria, '../externals/ClioPatria'). % :- current_prolo
 user:file_search_path(user, '../externals/ClioPatria/user/').
 user:file_search_path(swish, '../externals/swish'):- current_prolog_flag(unix,true).
 user:file_search_path(pack, '../packs').
+user:file_search_path(pack, '../externals').
+user:file_search_path(logicmoo_nlu, '../externals/MUD_DeepParsing/prolog/').
+user:file_search_path(logicmoo, '../externals/MUD_DeepParsing/prolog/').
 user:file_search_path(logicmoo, '/devel/LogicmooDeveloperFramework/PrologMUD/packs/prologmud/prolog/prologmud/').
 user:file_search_path(logicmoo, '/devel/LogicmooDeveloperFramework/PrologMUD/packs/logicmoo_base/prolog/logicmoo/').
 

@@ -27,12 +27,21 @@ parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):-
 
 must_ac(G):- show_call_failure(must(G)).
 
+do_agent_action_queues:- repeat,sleep(0.25),forall(tAgent(A),logOnError(do_agent_action_queue(A))),fail.
+
+start_agent_action_thread:- (thread_property(T,alias(agent_action_queue_thread)),thread_property(T,status(running)))->true;thread_create(do_agent_action_queues,_,[alias(agent_action_queue_thread)]).
+
+% restarts if it it died
+user:one_minute_timer_tick:- start_agent_action_thread.
+
+do_agent_action_queue(A):-retract(agent_action_queue(A,TODO)),must(call_agent_command(A,TODO)).
+do_agent_action_queue(_). % was empty already
 
 % =====================================================================================================================
 % call_agent_command_0/2 -->  call_agent_action/2
 % =====================================================================================================================
 
-call_agent_command(C):-foc_current_player(A),!,call_agent_command(A,C).
+call_agent_command(C):-foc_current_agent(A),!,call_agent_command(A,C).
 
 call_agent_command(A,C):-with_assertions(tlbugger:old_no_repeats, call_agent_command_0(A,C)).
 
@@ -129,7 +138,8 @@ agent_call_command_now(Agent,CMD):-
   with_current_agent(Agent,
     with_assertions(thlocal:side_effect_ok,
       (must(correctCommand(CMD,NewCMD)),
-      user:agent_call_command(Agent,NewCMD)))).
+      user:agent_call_command(Agent,NewCMD)*->true;
+       user:agent_call_command_fallback(Agent,NewCMD)))).
 
 % need to return http sessions as well
 get_session_id(IDIn):-thlocal:session_id(ID),!,ID=IDIn.
@@ -154,9 +164,9 @@ with_current_agent(Who,Cmd):- get_session_id(ID),with_assertions(thlocal:session
 
 get_agent_session(P,O):- once(thlocal:session_agent(O,P);thglobal:global_session_agent(O,P)).
 
-foc_current_player(P):- current_agent(P),nonvar(P),!.
-foc_current_player(P):- nonvar(P),tAgent(P),become_player(P),!.
-foc_current_player(P):- 
+foc_current_agent(P):- current_agent(P),nonvar(P),!.
+foc_current_agent(P):- nonvar(P),tAgent(P),become_player(P),!.
+foc_current_agent(P):- 
   must_det_l([    
              get_session_id(O),
              once((get_dettached_npc(NPC),NPC=P);generate_new_player(P)),
@@ -199,7 +209,7 @@ become_player(NewName):- once(current_agent(Was)),Was=NewName,!.
 become_player(NewName):- get_session_id(O),retractall(thglobal:global_session_agent(O,_)),
   assert_isa(NewName,tHumanPlayer),must_det(create_agent(NewName)),
   deatch_player(NewName),asserta(thglobal:global_session_agent(O,NewName)),   
-  ensure_player_stream_local(NewName).
+  register_player_stream_local(NewName).
 
 :-export(become_player/2).
 become_player(_Old,NewName):-become_player(NewName).

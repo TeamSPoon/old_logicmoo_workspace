@@ -183,7 +183,7 @@ thread_work:- thread_create(slow_work,_,[alias(loading_code)]).
 start_servers :- user:if_version_greater(70111,slow_work).
 
 enqueue_player_command(C):-enqueue_player_command(_,C).
-enqueue_player_command(P,C):-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,C)).
+enqueue_player_command(P,C):-foc_current_agent(P),assertz_if_new(thglobal:player_command_stack(P,C)).
 
 
 user:run_setup_now:-
@@ -302,7 +302,7 @@ cmdresult(statistics,true)
 % :- now_run_local_tests_dbg.
 % :- prolog.
 
-% :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,chat80)).
+% :-foc_current_agent(P),assertz_if_new(thglobal:player_command_stack(P,chat80)).
 :- if_flag_true(was_runs_tests_pl, at_start(run)).
 
 
@@ -388,6 +388,7 @@ Proof end.
 
 :- user:ensure_loaded(logicmoo(logicmoo_base)).
 :- user:ensure_loaded(prologmud(server/mud_telnet)).
+:- user:ensure_loaded(prologmud(server/mud_irc)).
 :- user:ensure_loaded(prologmud(vworld/world)).
 
 :- user:ensure_loaded(prologmud(server/mud_testing)).
@@ -487,6 +488,7 @@ download_and_install_el:-
 
 :- user:ensure_loaded(prologmud(vworld/world_agent)).
 :- user:ensure_loaded(prologmud(parsing/parser_imperative)).
+:- user:ensure_loaded(prologmud(parsing/simple_decl_parser)). 
 :- user:ensure_loaded(prologmud(vworld/world)).
 
 /*

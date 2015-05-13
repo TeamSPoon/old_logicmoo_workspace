@@ -78,6 +78,8 @@ cyc_to_pfc_expansion(HOLDS,HOLDSOUT):-HOLDS=..[F|HOLDSL],
   with_assertions(thocal:outer_pred_expansion(F,HOLDSL),cyc_to_pfc_expansion([F|HOLDSL],HOLDSOUTL)),!,
   (is_list(HOLDSOUTL)-> must(HOLDSOUT=..HOLDSOUTL) ; HOLDSOUT=HOLDSOUTL),!.
 
+/*
+
 sterm_to_pterm(VAR,'$VAR'(V)):-atom(VAR),atom_concat('?',_,VAR),clip_qm(VAR,V),!.
 sterm_to_pterm(VAR,kw((V))):-atom(VAR),atom_concat(':',V2,VAR),clip_qm(V2,V),!.
 sterm_to_pterm(VAR,VAR):-is_ftVar(VAR),!.
@@ -108,6 +110,8 @@ sterm_to_pterm_list([S|STERM],[P|PTERM]):-!,
               sterm_to_pterm(S,P),
               sterm_to_pterm_list(STERM,PTERM).
 sterm_to_pterm_list(VAR,[VAR]).
+
+*/
 
 clip_us(A,AO):-concat_atom(L,'-',A),concat_atom(L,'_',AO).
 clip_qm(QA,AO):-atom_concat('??',A1,QA),!,atom_concat('_',A1,A),clip_us(A,AO).

@@ -98,37 +98,40 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 :- declare_load_dbase('../games/src_game_nani/*.plmoo').
 
 
+
 % [Manditory] This loads the game and initializes so test can be ran
 :- (if_startup_script( at_start(finish_processing_world))).
+
+:-forall(parserTest(Where,String),assert_text(Where,String)).
 
 
 % [Optionaly] Run a battery of tests
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 
 
-disabled_sanity_test0a:-enqueue_player_command("hide").
+sanity_test0a:-enqueue_player_command("hide").
 
-disabled_sanity_test0b:- enqueue_player_command(actWho).
+sanity_test0b:- enqueue_player_command(actWho).
 
 
-disabled_sanity_test1:- enqueue_player_command("rez crackers"),
+sanity_test1:- enqueue_player_command("rez crackers"),
    enqueue_player_command("drop crackers"),
    enqueue_player_command('look'),
    enqueue_player_command("take crackers"),
    enqueue_player_command("eat crackers"),
    enqueue_player_command('look').
 
-disabled_sanity_test2:-enqueue_player_command("rez pants"),
+sanity_test2:-enqueue_player_command("rez pants"),
    enqueue_player_command("wear pants"),
    enqueue_player_command("tp to closet"),
    enqueue_player_command("take shirt"),
    enqueue_player_command("inventory").
 
 
-disabled_sanity_test3:-enqueue_player_command(prolog).
+:-enqueue_player_command(prolog).
 
-% [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
-% :- register_timer_thread(npc_ticker,30,npc_tick).
+% [Optionaly] Tell the NPCs to do something every 60 seconds (instead of 90 seconds)
+:- register_timer_thread(npc_ticker,60,npc_tick).
 
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- if_startup_script(at_start(run)).

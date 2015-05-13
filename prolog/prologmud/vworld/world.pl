@@ -55,7 +55,7 @@
          loc_to_xy/4,
          grid_size/4,
          doorLocation/5,
-         foc_current_player/1,
+         foc_current_agent/1,
          locationToRegion/2,
          init_location_grid/2,
          
@@ -226,7 +226,7 @@ reset_values(I):- forall(valueReset(To,From),reset_value(I,To,From)).
 reset_value(I,To,From):- prop(I,From,FromV), padd(I,To,FromV),!.
 reset_value(I,To,From):- prop(I,From,FromV), padd(I,To,FromV),!.
    
-   (contains_var(V,value),get_value(P,V,Result)) -> subst(V,P,isSelf)
+   (contains_var(V,value),get_value(P,V,Result)) -> subst(V,P,isThis)
    argIsa(P,SVArgNum,Type),
    is_term_ft(V,Type),
 

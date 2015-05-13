@@ -67,7 +67,7 @@ defined_affordance([ subjType=tAgent, actionVerb= "LiveAtLeastAMinute",
    'Sad_To_Happy'= 0 * -2,
    'Comfort'= 0 * -2 ]).
 
-user:hook_one_minute_timer_tick:-forall(isa(X,tPlayer),agent_call_command_now(A,actLiveAtLeastAMinute(A))).
+user:hook_one_minute_timer_tick:-forall(isa(X,tAgent),agent_call_command_now(X,actLiveAtLeastAMinute(X))).
 
 defined_affordance([subjType= "Shower",
 actionVerb= "Operate",
@@ -511,22 +511,6 @@ simian_idea(Agent,Act):-
 choose_best(_Agent,CMDS,Act):-random_permutation(CMDS,[Act|_]).
 
 show_call_fmt(Call):-show_call_failure(Call),fmt(Call).
-call_clause_last(CLREAL,Goal):-functor(CLREAL,F,A),functor(Goal,GF,GA),functor(CGoal,GF,GA),
-    functor(CLCOPY2,F,A),functor(CLCOPY3,F,A),functor(CLCOPY4,F,A),functor(CLCOPY5,F,A),functor(CLCOPY6,F,A),
-    FB = (call(_),!,call_clause_last(_,WF)),
-     must_det_l([
-      clause(CLCOPY2,FB,Ref),
-      CGoal = WF,
-       nth_clause(CLCOPY3,NTH,Ref),
-       predicate_property(CLCOPY4,number_of_clauses(NC)),NTHNext is NTH+1]),!,
-     EACH = ((between(NTHNext,NC,NthCL),nth_clause(CLCOPY5,NthCL,NewRef),show_call_failure(clause(CLCOPY6,BODY,NewRef)),CLCOPY6=CLREAL,call(BODY))),
-     !,
-     (call(EACH) -> ! ; ignore(show_call_failure(Goal))),!.
-  
-% this is doing a trick to make sure it gets called very last
-user:agent_call_command(Agent,Templ) :- 
-  call((nonvar(Templ),simbots_templates(Templ))),!,
-   call_clause_last(user:agent_call_command(Agent,Templ),agent_call_command_simbots_real(Agent,Templ)).
 
 % args_match_types(ARGS,Type).
 %args_match_types([],_):-!,fail.
@@ -534,6 +518,8 @@ args_match_types(TemplIn,Templ):-compound(TemplIn),!,TemplIn=..TemplInL, Templ=.
 args_match_types(Templ,Templ):-!.
 args_match_types([Obj],Type):-nonvar(Obj),!,isa(Obj,Type).
 args_match_types(Obj,Type):-!,isa(Obj,Type).
+
+user:agent_call_command_fallback(Agent,TemplIn):-agent_call_command_simbots_real(Agent,TemplIn).
 
 agent_call_command_simbots_real(Agent,TemplIn):- nonvar(TemplIn), 
    simbots_templates(Templ),
@@ -565,9 +551,9 @@ user:agent_call_command(Agent,actDo(A,B,C,D)):- CMD=..[A,B,C,D],!,user:agent_cal
 user:agent_call_command(Agent,actDo(A,B,C,D,E)):- CMD=..[A,B,C,D,E],!,user:agent_call_command(Agent,CMD).
 
 user:action_info(actTextcmd(ftString),"reinterps a term as text").
-user:agent_call_command(Agent,actTextcmd(A)):-sformat(CMD,'~w',[A]),!,do_player_action(Agent,CMD).
-user:agent_call_command(Agent,actTextcmd(A,B)):-sformat(CMD,'~w ~w',[A,B]),!,do_player_action(Agent,CMD).
-user:agent_call_command(Agent,actTextcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,do_player_action(Agent,CMD).
+user:agent_call_command(Agent,actTextcmd(A)):-sformat(CMD,'~w',[A]),!,do_agent_action(Agent,CMD).
+user:agent_call_command(Agent,actTextcmd(A,B)):-sformat(CMD,'~w ~w',[A,B]),!,do_agent_action(Agent,CMD).
+user:agent_call_command(Agent,actTextcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,do_agent_action(Agent,CMD).
 
 
 genls(tShelf,tHasSurface).

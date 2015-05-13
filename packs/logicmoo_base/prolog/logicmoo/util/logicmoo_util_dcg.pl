@@ -49,7 +49,7 @@
 :- meta_predicate suggestVar(2,*,?).
 :- meta_predicate dcgBoth(//,//,*,*).
 :- meta_predicate dcgZeroOrMore(//,?,*).
-:- meta_predicate dcgMid(//,*,//,*,?).
+:- meta_predicate dcgMidLeft(//,*,//,*,?).
 :- meta_predicate dcgOr(//,//,//,//,//,?,?).
 :- meta_predicate dcgNot(//,?,?).
 :- meta_predicate dcgStartsWith(//,?,?).
@@ -179,10 +179,13 @@ leastOne([_CO|_LSS]).
 
 % TODO: when using the DCG to generate instead of test it will move the C before the P
 % dcgReorder(P,C) --> P, C.
+:-export(dcgReorder//2).
 dcgReorder(P, C, B, E):- phrase(P, B, D), phrase(C, D, E).
 
+:-export(dcgSeq//2).
 dcgSeq(X,Y,[S0,S1|SS],E):-phrase((X,Y),[S0,S1|SS],E).
 
+:-export(dcgBoth//2).
 dcgBoth(DCG1,DCG2,S,R) :- append(L,R,S),phrase(DCG1,L,[]),once(phrase(DCG2,L,[])).
 
 dcgAnd(DCG1,DCG2,DCG3,DCG4,S,E) :- phrase(DCG1,S,E),phrase(DCG2,S,E),phrase(DCG3,S,E),phrase(DCG4,S,E).
@@ -226,7 +229,11 @@ dcgZeroOrMore(_True) -->[].
 
 dcgLeftOf(Mid,[Left|T],S,[MidT|RightT]):-append([Left|T],[MidT|RightT],S),phrase(Mid,MidT),phrase([Left|T],_LeftT).
 
-dcgMid(Mid,Left,Right) --> dcgLeftOf(Mid,Left),Right.
+dcgLeftOfMid([Left|T],Mid,S,[MidT|RightT]):-append([Left|T],[MidT|RightT],S),phrase(Mid,MidT),phrase([Left|T],_LeftT).
+
+dcgLeftMidRight(Left,Mid,Right) --> dcgLeftOfMid(LeftL,Mid),{phrase(Left,LeftL,[])},Right.
+
+dcgMidLeft(Mid,Left,Right) --> dcgLeftOf(Mid,Left),Right.
 
 dcgNone --> [].
 

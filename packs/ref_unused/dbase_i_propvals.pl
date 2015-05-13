@@ -255,9 +255,9 @@ get_instance_default_props(Inst,TraitsO):- must_det(nonvar(Inst)),!,
 :-export((get_type_default_props/2)).
 
 % OLD FALLBACK SYSTEM:
-get_type_default_props(Type,TraitsO):- nonvar(Type),!, Inst = isSelf,
+get_type_default_props(Type,TraitsO):- nonvar(Type),!, Inst = isThis,
    findall(Props,((type_w_default_props(DefType),transitive_subclass_or_same(Type,DefType),each_default_inst_type_props(Inst,DefType,Props))),Traits),flatten_set(Traits,TraitsO),!.
-get_type_default_props(DefType,TraitsO):- type_w_default_props(DefType), Inst = isSelf,
+get_type_default_props(DefType,TraitsO):- type_w_default_props(DefType), Inst = isThis,
    findall(Props,((each_default_inst_type_props(Inst,DefType,Props))),Traits),flatten_set(Traits,TraitsO),!.
 
 
@@ -274,8 +274,8 @@ type_w_defaults_asserted(Type):- is_asserted(mudLabelTypeProps(_,Type,_)),nonvar
 /*
 % OLD FALLBACK SYSTEM:
 each_default_inst_type_props(Inst,Type,Props):-dmsg((warn_each_default_inst_type_props(Inst,Type,Props))),fail.
-each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(instTypeProps(Inst,Type,TProps)),subst(TProps,isSelf,Inst,Prop),flatten([Prop],Props).
-each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(typeProps(Type,TProps)),subst(TProps,isSelf,Inst,Prop),flatten([Prop],Props).
+each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(instTypeProps(Inst,Type,TProps)),subst(TProps,isThis,Inst,Prop),flatten([Prop],Props).
+each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(typeProps(Type,TProps)),subst(TProps,isThis,Inst,Prop),flatten([Prop],Props).
 each_default_inst_type_props(_,Type,[typeHasGlyph(Lbl)|Props]):-call_no_cuts(mudLabelTypeProps(Lbl,Type,Props)).
 
 % OLD FALLBACK SYSTEM:

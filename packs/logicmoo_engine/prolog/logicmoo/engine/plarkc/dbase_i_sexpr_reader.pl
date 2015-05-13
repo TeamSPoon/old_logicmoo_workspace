@@ -1,4 +1,7 @@
 
+
+:- user:use_module(dbase_i_cyc_api).
+
 end_of_file.
 end_of_file.
 end_of_file.

@@ -184,9 +184,15 @@ mpred_plist_t(P,[L|IST]):-is_holds_true(P),!,mpred_plist_t(L,IST).
 mpred_plist_t(P,LIST):-is_holds_false(P),!,mpred_f(LIST).
 mpred_plist_t(P,LIST):- CALL=..[t,P|LIST],debugOnError(CALL).
 
+:-meta_predicate(loop_check_mpred(?)).
 % loop_check_mpred(Call):- current_predicate(ireq/1), loop_check_term(ireq(Call),loop_check_mpred(Call),fail).
 loop_check_mpred(Call):- !, fail,not(thlocal:infInstanceOnly(_)),loop_check(ireq(Call),loop_check_mpred(Call),fail).
 % loop_check_mpred(Call):-loop_check(mpred_call(t,Call),fail).
+
+:-meta_predicate(mpred_pa_call(?,?,0)).
+:-meta_predicate(t(?,?,?,?,?)).
+:-meta_predicate(t(?,?,?,?)).
+:-meta_predicate(t(?,?,?)).
 
 t(P,A1,A2):- mpred_pa_call(P,2,call(P,A1,A2)).
 t(P,A1,A2):- loop_check_mpred(t(P,A1,A2)).
@@ -201,8 +207,8 @@ t(P,A1,A2,A3,A4,A5,A6):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6)).
 t(P,A1,A2,A3,A4,A5,A6,A7):- mpred_pa_call(P,7,call(P,A1,A2,A3,A4,A5,A6,A7)).
 t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6,A7)).
 
-mpred_pa_call(F,A,Call):-var(F),!,arity(F,A),\+tNotForUnboundPredicates(F),current_predicate(F/A),call(Call).
-mpred_pa_call(F,A,Call):-arity(F,A),current_predicate(F/A),call(Call).
+mpred_pa_call(F,A,Call):-M=user,var(F),!,arity(F,A),\+tNotForUnboundPredicates(F),M:current_predicate(F/A),M:Call.
+mpred_pa_call(F,A,Call):-M=user,arity(F,A),M:current_predicate(F/A),M:Call.
 
 mpred_fact_arity(F,A):-arity(F,A),once(mpred_prop(F,prologHybrid);mpred_prop(F,pfcControlled);mpred_prop(F,prologPTTP);mpred_prop(F,prologSNARK)).
 
@@ -305,7 +311,7 @@ update_value(OLD,X,NEW):- is_list(OLD),!,list_update_op(OLD,X,NEW),!.
 update_value(OLDI,+X,NEW):- compute_value(OLDI,OLD),number(OLD),catch(NEW is OLD + X,_,fail),!.
 update_value(OLDI,-X,NEW):- compute_value(OLDI,OLD),number(OLD),catch(NEW is OLD - X,_,fail),!.
 update_value(OLDI,X,NEW):- number(X),X<0,compute_value(OLDI,OLD),number(OLD),catch(NEW is OLD + X,_,fail),!.
-update_value(_,NEW,NEWV):-compute_value_no_dice(NEW,NEWV),!.
+update_value(_,NEW,NEWV):- compute_value_no_dice(NEW,NEWV),!.
 
 
 list_update_op(OLDI,+X,NEW):-flatten_append(OLDI,X,NEW),!.

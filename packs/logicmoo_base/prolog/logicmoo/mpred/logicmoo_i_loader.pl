@@ -160,7 +160,7 @@ read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quote
 
 
 /*
-:-ensure_loaded(logicmoo_i_sexpr_reader).
+:-ensure_loaded(plarkc(logicmoo_i_sexpr_reader)).
 
 :- parse_to_source(
   "(documentation instance EnglishLanguage \"An object is an &%instance of a &%SetOrClass if it is included in that &%SetOrClass. 
@@ -611,7 +611,7 @@ pfc_file_expansion(I,OO):- (I\=(:-(_))), I\= '$was_imported_kb_content$'(_,_),
    I\=@=O, 
    ((thlocal:pfc_term_expansion_ok -> nop(wdmsg((pfc_file_expansion(I,O)))) ; (wdmsg(warning,wanted_pfc_term_expansion(I,O)),fail)),
    ((O=(:-(CALL))) -> 
-      (current_predicate(_,CALL) -> ((must(CALL),was_exported_content(I,CALL,OO))); OO=O);
+      (current_predicate(_,CALL) -> ((must(call(CALL)),was_exported_content(I,CALL,OO))); OO=O);
       (OO = O))).
 
 
@@ -632,9 +632,9 @@ user:term_expansion(I,OO):- is_file_clause(I), \+ thlocal:disable_mpred_term_exp
 
 :-set_prolog_flag(allow_variable_name_as_functor,true).
 
-varFunctorEscape('@').
-varFunctorEscape(':').
-varFunctorEscape('\262\').
+varFunctorEscape('?').
+varFunctorEscape('\2323\').
+varFunctorEscape('&').
 varFunctorEscape(A):-atom(A),atom_codes(A,[C]),C>255.
 
 to_var_functors(Outer,In,Out):-  

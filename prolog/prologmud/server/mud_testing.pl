@@ -42,7 +42,7 @@ user:agent_call_command(_Agent,actTests) :- scan_updates, run_mud_tests.
 
 user:action_info(actTest(ftTerm),"run tests containing term").
 
-user:agent_call_command(Agent,actTest(Obj)):-foc_current_player(Agent),run_mud_test(Obj).
+user:agent_call_command(Agent,actTest(Obj)):-foc_current_agent(Agent),run_mud_test(Obj).
 
 
 test_name(String):-fmt(start_moo_test(mudNamed(String))),asserta(was_test_name(String)).
@@ -95,37 +95,37 @@ run_mud_test(Name,Test):-
 
 mud_test(test_movedist,
  (
-  foc_current_player(P),
+  foc_current_agent(P),
    test_name("teleport to main enginering"),
-   do_player_action('tp self to Area1000'),
+   do_agent_action('tp self to Area1000'),
   test_name("now we are really somewhere"),
    test_true(req(mudAtLoc(P,_Somewhere))),
   test_name("in main engineering?"),
    test_true(req(localityOfObject(P,'Area1000'))),
    test_name("set the move dist to 5 meters"),
-   do_player_action('@set mudMoveDist 5'),
+   do_agent_action('@set mudMoveDist 5'),
    test_name("going 5 meters"),
    % gets use out of othre NPC path
-   do_player_action('move e'),
-   do_player_action('move n'),
+   do_agent_action('move e'),
+   do_agent_action('move n'),
    test_name("must be now be in corridor"),
    test_true(req(localityOfObject(P,'Area1002'))),
-   do_player_action('@set mudMoveDist 1'),
-   call_n_times(5, do_player_action('s')),
-   do_player_action('move s'),
+   do_agent_action('@set mudMoveDist 1'),
+   call_n_times(5, do_agent_action('s')),
+   do_agent_action('move s'),
    test_name("must be now be back in engineering"),
    test_true(req(localityOfObject(P,'Area1000'))))).
 
 mud_test_level2(create_gensym_named,
-  with_all_dmsg(((do_player_action('create food999'),
-  foc_current_player(P),
+  with_all_dmsg(((do_agent_action('create food999'),
+  foc_current_agent(P),
   must(( req(( mudPossess(P,Item),isa(Item,food))))))))) .
 
 mud_test_level2(drop_take,
-  with_all_dmsg(((do_player_action('create food'),
-  do_player_action('drop food'),
-  do_player_action('take food'),
-  do_player_action('eat food'))))).
+  with_all_dmsg(((do_agent_action('create food'),
+  do_agent_action('drop food'),
+  do_agent_action('take food'),
+  do_agent_action('eat food'))))).
 
 
 :- catch(noguitracer,_,true).
@@ -138,39 +138,39 @@ mud_test_level2(drop_take,
 
 mud_test_local:-
    test_name("tests to see if we have: player1"),
-   test_true(show_call(foc_current_player(_Agent))).
+   test_true(show_call(foc_current_agent(_Agent))).
 
 mud_test_local:-
    test_name("tests to see if we have: mudAtLoc"),
-   test_true((foc_current_player(Agent),show_call(mudAtLoc(Agent,_Where)))).
+   test_true((foc_current_agent(Agent),show_call(mudAtLoc(Agent,_Where)))).
 
 mud_test_local:- 
    test_name("tests to see if we have: localityOfObject"),
-   test_true((foc_current_player(Agent),show_call(localityOfObject(Agent,_Where)))).
+   test_true((foc_current_agent(Agent),show_call(localityOfObject(Agent,_Where)))).
 
 mud_test_local:- 
    test_name("tests to see if our clothing doesnt: mudAtLoc"),
    test_false(mudAtLoc('iGoldUniform775',_X)).
     
 mud_test_local:- 
-   foc_current_player(Agent),
+   foc_current_agent(Agent),
    test_name("tests to see if we have: argIsas on mudEnergy"),
    test_true(correctArgsIsa(mudEnergy(Agent,_),_)).
 
 mud_test_local:- 
    test_name("tests to see if we have: singleValued on mudMoveDist"),
-   foc_current_player(Agent),
+   foc_current_agent(Agent),
    must(add(mudMoveDist(Agent,3))),
    test_true(must((findall(X,mudMoveDist(Agent,X),L),length(L,1)))).
 
 mud_test_local:- 
       test_name("nudity test"), 
-      foc_current_player(Agent),
+      foc_current_agent(Agent),
        test_true_req(wearsClothing(Agent, 'ArtifactCol1003-Gold-Uniform775')).
 
 mud_test_local:- 
       test_name("genlInverse test"), 
-      foc_current_player(Agent),
+      foc_current_agent(Agent),
        test_true_req(mudPossess(Agent, 'ArtifactCol1003-Gold-Uniform775')).
 
 mud_test_local:- 
@@ -184,7 +184,7 @@ mud_test_local:-mpred_call(cmdShowRoomGrid('Area1000')).
 
 
 % more tests even
-mud_test_local :-do_player_action("look").
+mud_test_local :-do_agent_action("look").
 mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
 
 % ---------------------------------------------------------------------------------------------
@@ -239,13 +239,13 @@ do_mud_test_locals:- forall(clause(mud_test_local,B),must(B)).
 now_run_local_tests_dbg :- doall(mud_test_local).
 
 % nasty way i debug the parser
-% :-repeat, trace, do_player_action('who'),fail.
-mud_test_local :- do_player_action('who').
+% :-repeat, trace, do_agent_action('who'),fail.
+mud_test_local :- do_agent_action('who').
 
-% mud_test_local :-do_player_action("scansrc").
+% mud_test_local :-do_agent_action("scansrc").
 
 % more tests even
-mud_test_local :-do_player_action("look").
+mud_test_local :-do_agent_action("look").
 mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
 
 must_test("tests to see if poorly canonicalized code (unrestricted quantification) will not be -too- inneffienct",

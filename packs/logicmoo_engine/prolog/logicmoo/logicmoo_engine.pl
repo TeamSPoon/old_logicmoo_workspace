@@ -61,8 +61,14 @@
 % SWI Prolog modules do not export operators by default
 % so they must be explicitly placed in the user namespace
 
-:- include(logicmoo_i_header).
-:- ensure_loaded(logicmoo_i_mpred_pttp).
+:- dynamic   user:file_search_path/2.
+:- multifile user:file_search_path/2.
+:- prolog_load_context(directory,Dir),asserta(user:file_search_path(logicmoo,Dir)).
+:- dynamic(user:isa_pred_now_locked/0).
+:- multifile(user:isa_pred_now_locked/0).
+
+:- ensure_loaded(logicmoo(mpred/logicmoo_i_header)).
+:- ensure_loaded(logicmoo(engine/pttp/dbase_i_mpred_pttp)).
 
 %  all(R, room(R) => exists(D, (door(D) & has(R,D))))
 % for any arbitrary R, if R is a room then there exists some object D that is a door, and R has a D.
@@ -156,10 +162,6 @@ mudEquals(X,Y):-X=Y.
 :-export(not_mudEquals/2).
 :-dynamic(not_mudEquals/2).
 not_mudEquals(X,Y):- X \= Y.
-
-to_iname(T,T):-!.
-to_iname(T,TT):-not(current_predicate(i_name/3)),!,T=TT.
-to_iname(T,TT):-is_ftVar(T)->TT=T;(not_log_op(T),i_name(t,T,TT)).
 
 contains_type_lits(Fml,Var,Lits):- findall(T,(contains_t_var(Fml,Var,Lit),get_isa(Lit,O,T),same_var(O,Var)),Lits).
 contains_t_var(Fml,Var,Term):-each_subterm(Fml,Term),compound(Term),arg(_,Term,O),same_var(O,Var).
@@ -772,6 +774,7 @@ defunctionalize(OP,Wff,WffO):- compound(Wff),
   defunctionalize(OP,NextWff,WffO).
 defunctionalize(_,Wff,Wff).
 
+:-if(false).
 conjuncts_to_list(Var,[Var]):-is_ftVar(Var),!.
 conjuncts_to_list(true,[]).
 conjuncts_to_list((A,B),ABL):-!,
@@ -779,6 +782,7 @@ conjuncts_to_list((A,B),ABL):-!,
   conjuncts_to_list(B,BL),
   append(AL,BL,ABL).
 conjuncts_to_list(Lit,[Lit]).
+:-endif.
 
 % kif_to_boxlog('=>'(WffIn,enables(Rule)),'$VAR'('MT2'),complete,Out1), % kif_to_boxlog('=>'(enabled(Rule),WffIn),'$VAR'('KB'),complete,Out).  
 
@@ -827,6 +831,7 @@ kif_to_boxlog(WffInIn,KB,Why,Flattened) :-
    flatten([ListOfLists],Flattened),
    wdmsgl(prolog(Flattened))]),!.
 
+:-if(false).
 list_to_conjuncts([],true).
 list_to_conjuncts([H],HH):-list_to_conjuncts(H,HH).
 list_to_conjuncts([H|T],Body):-!,
@@ -834,7 +839,7 @@ list_to_conjuncts([H|T],Body):-!,
     list_to_conjuncts(T,TT),
     conjoin(HH,TT,Body).
 list_to_conjuncts(H,H).
-
+:-endif.
 
 evidence(_KB,_,A,A):-!.
 evidence(KB,nesc(_,_),mudEquals(X,Y),HeadOut):- !,subevidence(KB,possible_t,mudEquals(X,Y),HeadOut).
@@ -949,7 +954,7 @@ snark_read(In,Wff,Vs):-
       catch(read_term(In,Wff,[module(logicmoo_i_snark),double_quotes(string),variable_names(Vs)]),E,(fmt(E),fail))).
 
 %= --------- to test program -------------
-:-ensure_loaded(logicmoo_i_sexpr_reader).
+:-ensure_loaded(logicmoo(engine/plarkc/dbase_i_sexpr_reader)).
 
 :-export(snark/0).
 snark:- current_input(In),current_output(Out),!,snark(In,Out).

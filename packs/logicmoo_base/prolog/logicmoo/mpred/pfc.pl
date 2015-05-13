@@ -57,13 +57,16 @@ compiled(F/A):- dynamic(F/A),compile_predicates([F/A]).
 */
 
 
+/*
 to_db_assertable([A],B):-nonvar(A),!,to_db_assertable(A,B).
 to_db_assertable((P=>Q),was_chain_rule((P=>Q))):-!.
 to_db_assertable((P<=Q),was_chain_rule((P<=Q))):-!.
 to_db_assertable((P<=>Q),was_chain_rule((P<=>Q))):-!.
 to_db_assertable(P,P).
+*/
 
-pfc_each_literal(P,E):-conjuncts_to_list(P,List),member(E,List).
+pfc_each_literal(P,E):-nonvar(P),P=(P1,P2),!,pfc_each_literal(P1,E);pfc_each_literal(P2,E).
+pfc_each_literal(P,P). %:-conjuncts_to_list(P,List),member(E,List).
 
 to_addable_form_wte(P0,P):- must(to_addable_form(P0,P)),!, (P0\=@=P->pfc_debug_trace(to_addable_form(P0,P));true).
 
@@ -416,7 +419,7 @@ pfc_assert_fast(P0,S):-
        pfc_assert_fast_sp(S,P)).
 
 pfc_assert_fast_sp(S,P) :- must(to_addable_form_wte(P,PC)),must(nonvar(PC)),PC\=@=P,!,pfc_assert_fast_sp0(S,PC),!.
-pfc_assert_fast_sp(S,P) :-pfc_assert_fast_sp0(S,P),!.
+pfc_assert_fast_sp(S,P) :- pfc_assert_fast_sp0(S,P),!.
 %pfc_assert_fast_sp(_,_).
 pfc_assert_fast_sp(P,S) :- pfc_error("pfc_assert_fast(~w,~w) failed",[P,S]).
 
@@ -445,37 +448,38 @@ pfc_post(P,S) :-
 % adds an entry to the pfc queue for subsequent forward chaining.
 % It always succeeds.
 pfc_post1(pfc_assert(P0),S):-!,pfc_post1(P0,S).
-pfc_post1(P0,S):-
+pfc_post1(PI,SI):-copy_term(pfc_post1(PI,SI),pfc_post1(P0,S)),
   to_addable_form_wte(P0,P),
       (is_list(P)
         ->maplist(pfc_post1_sp(S),P);
        pfc_post1_sp(S,P)).
 
-
 pfc_post1_sp(S,(P1,P2)) :- !,pfc_post1_sp(S,(P1)),pfc_post1_sp(S,(P2)).
 pfc_post1_sp(S,[P1]) :- !,pfc_post1_sp(S,(P1)).
 pfc_post1_sp(S,[P1|P2]) :- !,pfc_post1_sp(S,(P1)),pfc_post1_sp(S,(P2)).
-pfc_post1_sp(_S,P) :- pfc_is_tautology(P),!,dmsg(todo(error(pfc_is_tautology(P)))),dtrace.
-pfc_post1_sp(S,P) :-
-  dynamic(P),
-  %= db pfc_add_db_to_head(P,P2),
-  % pfc_remove_old_version(P),
-  pfc_add_support(P,S),
-  to_db_assertable(P,AP),
-  must(pfc_post1_sp_3(S,P,AP)).
+pfc_post1_sp(_S,P) :- pfc_is_tautology(P),!,trace_or_throw(todo(error(pfc_is_tautology(P)))).
 
-
+pfc_post1_sp(S,P) :- must(loop_check(pfc_post1_sp_0(S,P),true)),!.
 % pfc_post1_sp(_,_).
 pfc_post1_sp(S,P) :-  pfc_warn("pfc_post1(~w,~w) failed",[P,S]).
 
-pfc_assert_fast_i(P,S):- pfc_add_support(P,S), pfc_post1_sp_3(S,P,P).
+pfc_post1_sp_0(S,P) :-
+  must(current_predicate(_,P)->true;dynamic(P)),
+  %= db pfc_add_db_to_head(P,P2),
+  % pfc_remove_old_version(P),
+  must(pfc_assert_fast_i(P,S)).
 
-pfc_post1_sp_3(S,P,AP):- \+ pfc_unique_u(AP),!.
-pfc_post1_sp_3(S,P,AP):-
-  assert_u(AP),
-  pfc_trace_add(P,S),
+pfc_assert_fast_i(P,S):- loop_check(pfc_assert_fast_i_0(P,S),true).
+pfc_assert_fast_i_0(P,S):-
+   must(pfc_add_support(P,S)),
+   must(loop_check(pfc_post1_sp_3(S,P),true)),!.
+
+pfc_post1_sp_3(S,P):- \+ pfc_unique_u(P),!.
+pfc_post1_sp_3(S,P):-
+  must(assert_u(P)),
+  must(pfc_trace_add(P,S)),
   !,
-  pfc_enqueue(P,S),
+  must(pfc_enqueue(P,S)),
   !.
 
 
@@ -516,8 +520,8 @@ pfc_unique_i(P) :-
 
 
 pfc_enqueue(P,S) :-
-  pfc_search(Mode)
-    -> (Mode=direct  -> pfc_fwd(P,S) ;
+  must(pfc_search(Mode))
+    -> (Mode=direct  -> must(pfc_fwd(P,S)) ;
 	Mode=depth   -> pfc_asserta_i(pfc_queue(P,S),S) ;
 	Mode=breadth -> pfc_assert_i(pfc_queue(P,S),S) ;
 	% else
@@ -912,11 +916,11 @@ pfc_tms_supported(P) :-
   pfc_tms_supported(Mode,P).
 
 pfc_tms_supported(deep,P) :- !, pfc_deep_support(P).
-pfc_tms_supported(local,P) :- !, pfc_get_support(P,S),sanity(pfc_deep_support(S)).
+pfc_tms_supported(local,P) :- !, pfc_get_support(P,_). % ,sanity(pfc_deep_support(S)).
 pfc_tms_supported(cycles,P) :-  !, wellFounded(P).
 pfc_tms_supported(_,_P) :- true.
 
-user:hook_one_minute_timer_tick:- do_gc,statistics.
+% user:hook_one_minute_timer_tick:- statistics.
 
 
 pfc_scan_tms(P):-pfc_get_support(P,(S,SS)),(S\=SS),once((pfc_deep_support(P)->true;dmsg(warn(now_maybe_unsupported(pfc_get_support(P,(S,SS)),fail))))).
@@ -1028,9 +1032,9 @@ pfc_fwd1(Fact,Sup) :-
   must(pfc_rule_check(Sup,Fact)),
   copy_term(Fact,F),
   % check positive triggers
-  fcpt(Fact,F),
+  must(fcpt(Fact,F)),
   % check negative triggers
-  fcnt(Fact,F).
+  must(fcnt(Fact,F)).
 
 
 %=
@@ -1215,7 +1219,7 @@ trigger_trigger1(Trigger,Body) :-
 %= Note that this has the side effect [maybe] of catching unsupported facts and
 %= assigning them support from God. (g,g)
 %=
-pfc_call(F):- no_repeats(loop_check(pfc_call_0(F),loop_check(pfc_call_0(F)))).
+pfc_call(F):- no_repeats(loop_check(pfc_call_0(F),fail)). % loop_check(pfc_call_0(F)))).
 
 lsting(L):-with_assertions(thlocal:pfc_listing_disabled,listing(L)).
 
@@ -1239,12 +1243,22 @@ pfc_call_0(F):- pfc_call_with_no_triggers(F).
 
 
 
-call_with_bc_triggers(P) :- no_side_effects(P),
-  % trigger any bc rules.
-  bt(P,Trigger),
-  pfc_get_support(bt(P,Trigger),S),
-     pfc_eval_lhs(Trigger,S).
+call_with_bc_triggers_0(P) :- bt(P,Trigger),sanity(pfc_get_support(bt(P,Trigger),_)),fail.
 
+
+call_with_bc_triggers(P) :- !,bt(P,Trigger), pfc_get_support(bt(P,Trigger),S),no_side_effects(P),pfc_eval_lhs(Trigger,S).
+
+
+call_with_bc_triggers(P) :-
+  % sanity(doall(call_with_bc_triggers(P))),
+  % trigger any bc rules.
+  % sanity(copy_term(P,PP)),
+  foreach(bt(P,Trigger),
+  (no_side_effects(P),flag(btc,_,0),
+   foreach(
+    pfc_get_support(bt(P,Trigger),S),
+   (flag(btc,X,X+1),must(X=0),pfc_eval_lhs(Trigger,S))))).
+  
 
 pfc_call_with_no_triggers(U:X):-U==user,!,pfc_call_with_no_triggers(X).
 pfc_call_with_no_triggers(F) :- 

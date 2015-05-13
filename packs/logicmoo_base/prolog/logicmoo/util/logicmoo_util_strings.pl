@@ -649,7 +649,7 @@ string_equal_ci0(L,R):-divide_list(L,L0,LT),divide_list(R,R0,RT),string_equal_ci
 string_equal_ci1(A0,A0):-!.
 string_equal_ci1([],_):-!,fail.
 string_equal_ci1(_,[]):-!,fail.
-string_equal_ci1(A0,B0):-as_nc_str(A0,AR),as_nc_str(B0,BR), AR = BR.
+string_equal_ci1(A0,B0):-as_nc_str(A0,AR),as_nc_str(B0,BR),!, AR = BR.
 
 
 as_nc_str([A0,'\'',B0],AS):-atomic_list_concat_safe([A0,'\'',B0],'',AO),as_nc_str(AO,AS).

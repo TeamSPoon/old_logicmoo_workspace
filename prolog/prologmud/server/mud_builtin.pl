@@ -43,9 +43,15 @@ tCol(tRelation).
 tCol(meta_argtypes).
 tCol(ttSpatialType).
 tCol(ttTypeType).
- 
+
+
+tCol(tWorld).
+tWorld(iWorld7).
+
 tCol(ftProlog).
 
+tCol(tWorld).
+isa(iWorld7,tWorld).
 
 => neg(arity(pathConnects,1)).
 
@@ -95,9 +101,9 @@ disjointWith(ttSpatialType,ttAbstractType).
 isa(arity,tBinaryPredicate).
 
 (arity(Pred,2),tPred(Pred)) <=> isa(Pred,tBinaryPredicate).
-prologHybrid(relationMostInstance(tBinaryPredicate,tCol,ftValue)).
+prologHybrid(relationMostInstance(tBinaryPredicate,tCol,vtValue)).
 relationMostInstance(BP,_,_)=>(tBinaryPredicate(BP),tRolePredciate(BP)).
-prologHybrid(relationAllInstance(tBinaryPredicate,tCol,ftValue)).
+prologHybrid(relationAllInstance(tBinaryPredicate,tCol,vtValue)).
 relationAllInstance(BP,_,_)=>tBinaryPredicate(BP).
 
 ((isa(Inst,ttSpatialType), tCol(Inst)) => genls(Inst,tSpatialThing)).
@@ -281,177 +287,20 @@ prologHybrid(isEach(mudLastCommand/2,mudNamed/2, mudSpd/2,mudStr/2,typeGrid/3)).
 prologHybrid(isEach((mudContains/2))).
 prologHybrid(isEach((mudLastCmdSuccess/2 ))).
 
-:- do_gc.
+
 
 :- dynamic(mudDescription/2).
 :- dynamic((tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, mudToHitArmorClass0/2, tThinking/1, tDeleted/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, mudCmdFailure/2, mudSpd/2, typeGrid/3, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, wearsClothing/2)).
 :- dynamic((mudArmorLevel/2, mudLevelOf/2, mudToHitArmorClass0/2, mudBareHandDamage/2, chargeCapacity/2, mudEnergy/2, tCol/1, tAgent/1, tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, tThinking/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, failure/2, gridValue/4, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, mudWearing/2)).
-prologHybrid(isEach(tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, mudToHitArmorClass0/2, tThinking/1, tDeleted/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, mudCmdFailure/2, mudSpd/2, typeGrid/3, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, wearsClothing/2)).
-prologHybrid(isEach( mudArmorLevel/2, mudLevelOf/2, mudToHitArmorClass0/2, mudBareHandDamage/2, chargeCapacity/2, mudEnergy/2, tCol/1, tAgent/1, tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, tThinking/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, failure/2, gridValue/4, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, mudWearing/2)).
-
-
-:-must(fully_expand(prologHybrid(typeHasGlyph,2),(arity(typeHasGlyph, 2), prologHybrid(typeHasGlyph), tPred(typeHasGlyph)))).
-
-prologHybrid(typeHasGlyph,2).
-prologHybrid(typeHasGlyph(tCol,ftString)).
-prologHybrid(mudActAffect/3).
-prologHybrid(mudAtLoc,2).
-prologHybrid(mudColor/2).
-prologHybrid(mudHealth,2).
-prologHybrid(mudMaterial/2).
-prologHybrid(mudMaxHitPoints(tAgent,ftInt)).
-prologHybrid(mudNeedsLook,2).
-prologHybrid(mudNeedsLook/2,[completeExtentAsserted]).
-prologHybrid(mudShape/2).
-prologHybrid(mudSize/2).
-prologHybrid(mudStowing(tAgent,tItem)).
-prologHybrid(mudTexture/2).
-prologHybrid(pathBetween/3).
-:-dynamic((latitude/2, mudMoveDist/2, longitude/2)).
-prologOnly(mudMoveDist/2).
-:- dynamic(mudMoveDist/2).
-meta_argtypes(mudMoveDist(tAgent,ftInt)).
-prologSingleValued(mudMoveDist,[mpred_module(user),query(call),argSingleValueDefault(2,1)]).
-prologOnly(stat_total/2).
-prologOnly(user:verb_alias(ftString,vtVerb)).
-tCol(tContainer).
-tCol(tRegion).
-tCol(vtBasicDir).
-tCol(vtBasicDirPlusUpDown).
-tCol(vtDirection).
-tCol(vtVerb).
-:- dynamic stat_total/2.
-:- dynamic(spawn_rate/2).
-tCol(tMonster).
-%prologOnly(user:action_info(vtActionTemplate,ftText)).
-prologOnly(agent_call_command(tAgent,ftAction)).
-prologSideEffects(agent_call_command(tAgent,ftAction)).
-prologOnly(member(ftTerm,ftTerm)).
-prologOnly(mud_test(ftTerm,ftCallable)).
-prologOnly(use_action_templates(ftTerm)).
-tPred(isEach(tAgent/1, mudEnergy/2,mudHealth/2, mudAtLoc/2, failure/2, typeGrid/3, gridValue/4, isa/2, tItem/1, mudMemory/2, pathName/3, mudPossess/2, tRegion/1, mudScore/2, mudStm/2, mudFacing/2, localityOfObject/2, tThinking/1, mudWearing/2, mudFacing/2, mudHeight/2, act_term/2, nameStrings/2, mudDescription/2, pathBetween/3, mudAgentTurnnum/2)).
-prologHybrid(mudToHitArmorClass0 / 2).
-prologHybrid(mudAtLoc/2).
-prologOnly((agent_call_command/2)).
-:-decl_mpred_hybrid(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
- pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completeExtentAsserted/1, ttFormatType/1, typeProps/2)).
-prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
- pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
 
 
 
-arity(typeHasGlyph,2).
-arity(mudTermAnglify,2).
-arity(mudMaxHitPoints,2).
-
-
-prologHybrid(instVerbOverride(ftTerm,ftAction,ftAction)).
-%isa(localityOfObject,prologHybrid). 
-%isa(mudActAffect, prologMultiValued).
-%isa(mudMaxHitPoints,prologHybrid).
-isa(vtDirection,ttValueType).
-
-prologMultiValued(agent_text_command(tAgent,ftText,tAgent,ftAction)).
-
-formatted_resultIsa(apathFn(tRegion,vtDirection),tPathway).
-
-prologOnly(is_vtActionTemplate/1).
-
-is_vtActionTemplate(C):-nonvar(C),get_functor(C,F),!,atom_concat(act,_,F).
-defnSufficient(ftAction,is_vtActionTemplate).
-defnSufficient(ftAction,vtVerb).
-
-genls('FemaleAnimal',tPlayer).
-genls('MaleAnimal',tPlayer).
-genls(isEach('PortableObject','ProtectiveAttire','SomethingToWear'),tCarryAble).
-genls(isEach('ProtectiveAttire','SomethingToWear'),tWearAble).
-genls(isEach(tRegion,tAgent),tChannel).
-
-tCol(meta_argtypes).
-meta_argtypes(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
-meta_argtypes(apathFn(tRegion,vtDirection)).
-meta_argtypes(xyzFn(tRegion,ftInt,ftInt,ftInt)).
-
-:- do_gc.
-
-tCol(ttTypeByAction).
-genls(ttTypeByAction,tCol).
-(isa(X,ttTypeByAction) => isa(X,tCol)).
-
-
-% (isa(Inst,Type),isa(Type,ttTypeByAction)) => isa(Inst,tHasAction).
-
-genls(tAgent,tObj).
-genls(tAgent,tSpatialThing).
-genls(tCarryAble,tItem).
-genls(tChargeAble,tItem).
-genls(tContolDevice,tChargeAble).
-genls(tDoor,tFurniture).
-genls(tDoor,tItem).
-genls(tDrinkAble,tItem).
-genls(tEatAble,tItem).
-genls(tFunction,tRelation).
-genls(tFurniture,tObj).
-genls(tFurniture,tPartofObj).
-genls(tHumanPlayer,tPlayer).
-genls(tItem,tObj).
-genls(tItem,tSpatialThing).
-genls(tMonster,ttAgentGeneric).
-genls(tNpcPlayer,tPlayer).
-genls(tObj,tSpatialThing).
-genls(tPathway,tDoor).
-genls(tPlayer,tAgent).
-genls(tPred,tRelation).
-genls(tRegion,tSpatialThing).
-genls(ttObjectType,tCol).
-genls(ttSpatialType,tCol).
-genls(tUseAble,tItem).
-genls(tWearAble,tItem).
-genls(vtBasicDir,vtBasicDirPlusUpDown).
-genls(vtBasicDirPlusUpDown,vtDirection).
-genls(vtDirection,tTypevalue).
-genls(vtPosture,vtVerb).
-
-prologHybrid(typeHasGlyph(tCol,ftString)).
-prologHybrid(mudColor(tSpatialThing,vtColor)).
-
-prologHybrid(mudKnowing(tAgent,ftTerm)).
-prologHybrid(mudLabelTypeProps(ftString,tCol,ftVoprop)).
-prologHybrid(mudListPrice(tItem,ftNumber)).
-:-dynamic(mudOpaqueness/2).
-prologHybrid(mudOpaqueness(ftTerm,ftPercent)).
-prologHybrid(mudPossess(tAgent,tObj)).
-prologHybrid(mudShape(tSpatialThing,vtShape)).
-prologHybrid(mudSize(tSpatialThing,ftTerm)).
-prologHybrid(mudTextSame(ftText,ftText)).
-prologHybrid(mudTexture(tSpatialThing,vtTexture)).
-prologHybrid(typeGrid(tCol,ftInt,ftListFn(ftString))).
-prologListValued(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
-prologListValued(mudGetPrecepts(tAgent,ftListFn(tSpatialThing)),[mpred_module(user)]).
-prologListValued(mudNearFeet(tAgent,ftListFn(tSpatialThing)),[]).
-prologListValued(mudNearReach(tAgent,ftListFn(tSpatialThing)),[mpred_module(user)]).
-prologMultiValued(action_rules(tAgent,vtVerb,ftListFn(ftVar),ftVoprop)).
-prologMultiValued(mudLastCmdSuccess(tAgent,ftAction)).
-prologMultiValued(descriptionHere(ftTerm,ftString)).
-prologMultiValued(descriptionHere(ftTerm,ftString),prologOrdered).
-prologMultiValued(determinerString(ftTerm,ftString)).
-prologMultiValued(typeHasGlyph(ftTerm,ftString)).
-prologMultiValued(gridValue(tRegion,ftInt,ftInt,tObj)).
-prologMultiValued(instVerbOverride(ftTerm,ftAction,ftAction)).
-prologMultiValued(isa(ftTerm,tCol)).
-prologMultiValued(mudActAffect(ftTerm,ftTerm,ftTerm)).
-prologMultiValued(mudActAffect(tItem,vtVerb,ftTerm(ftVoprop))).
-prologMultiValued(mudCmdFailure(tAgent,ftAction)).
-
-:- do_gc.
-
-
-prologMultiValued(mudDescription(ftTerm,ftString),prologOrdered,prologHybrid).
+prologMultiValued(mudDescription(ftTerm,ftString),[prologOrdered,prologHybrid]).
 prologMultiValued(mudDescription(ftTerm,ftText), [predProxyAssert(add_description),predProxyRetract(remove_description),predProxyQuery(query_description)],prologHybrid).
-prologMultiValued(mudDescription(ftTerm,ftText),[predProxyAssert(add_description)],prologHybrid).
+prologMultiValued(mudDescription(ftTerm,ftText),[predProxyAssert(add_description),prologHybrid]).
 prologMultiValued(mudKeyword(ftTerm,ftString),prologHybrid).
 prologMultiValued(mudMemory(tAgent,ftTerm),prologHybrid).
-prologMultiValued(mudNamed(ftTerm,ftTerm),[],prologHybrid).
+prologMultiValued(mudNamed(ftTerm,ftTerm),prologHybrid).
 prologMultiValued(mudPossess(tObj,tObj),prologHybrid).
 prologMultiValued(nameStrings(ftTerm,ftString),prologHybrid).
 prologMultiValued(pathBetween(tRegion,vtDirection,tRegion),prologHybrid).
@@ -506,8 +355,187 @@ resultIsa(apathFn,tPathway).
 % '<=>'(isa(Whom,tNpcPlayer),whenAnd(isa(Whom,tPlayer),naf(isa(Whom,tHumanPlayer)))).
 '<=>'(mudDescription(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 '<=>'(nameStrings(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
-tInferInstanceFromArgType(vtSize).
-tInferInstanceFromArgType(vtTexture).
+
+ttPredAndValueType("size").
+ttPredAndValueType("texture").
+ttPredAndValueType("color").
+ttPredAndValueType("shape").
+ttPredAndValueType("material").
+
+vtValue(Val)/(atom(Val),i_name_lc(Val,KW))=>mudKeyword(Val,KW).
+
+ttPredAndValueType(Str)/(i_name('mud',Str,Pred),i_name('vt',Str,VT)) => (tRolePredicate(Pred),ttValueType(VT),mudKeyword(VT,Str),mudKeyword(Pred,Str),argIsa(Pred,2,VT),argIsa(Pred,1,tTemporalThing)).
+
+relationMostInstance(arg1Isa,tRolePredicate,tTemporaThing).
+relationMostInstance(arg2QuotedIsa,tRolePredicate,ftValue).
+
+mudKeyword(W,R) <= {atom(W),i_name_lc(W,R)}.
+
+ttValueType(vtSize).
+ttValueType(vtTexture).
+ttValueType(vtColor).
+
+ttValueType(VT)=>tInferInstanceFromArgType(VT).
+
+prologOnly(user:verb_alias(ftString,vtVerb)).
+prologHybrid(typeHasGlyph(tCol,ftString)).
+prologHybrid(mudMaxHitPoints(tAgent,ftInt)).
+prologHybrid(mudStowing(tAgent,tItem)).
+:-dynamic((latitude/2, mudMoveDist/2, longitude/2)).
+prologHybrid(typeHasGlyph,2).
+prologHybrid(mudActAffect/3).
+prologHybrid(mudAtLoc,2).
+prologHybrid(mudColor/2).
+prologHybrid(mudHealth,2).
+prologHybrid(mudMaterial/2).
+prologHybrid(mudNeedsLook,2).
+prologHybrid(mudNeedsLook/2,[completeExtentAsserted]).
+prologHybrid(mudShape/2).
+prologHybrid(mudSize/2).
+prologHybrid(mudTexture/2).
+prologHybrid(pathBetween/3).
+prologOnly(mudMoveDist/2).
+:- dynamic(mudMoveDist/2).
+meta_argtypes(mudMoveDist(tAgent,ftInt)).
+prologSingleValued(mudMoveDist,[mpred_module(user),query(call),argSingleValueDefault(2,1)]).
+prologOnly(stat_total/2).
+tCol(tContainer).
+tCol(tRegion).
+tCol(vtBasicDir).
+tCol(vtBasicDirPlusUpDown).
+tCol(vtDirection).
+tCol(vtVerb).
+:- dynamic stat_total/2.
+:- dynamic(spawn_rate/2).
+tCol(tMonster).
+%prologOnly(user:action_info(vtActionTemplate,ftText)).
+prologOnly(agent_call_command(tAgent,ftAction)).
+prologSideEffects(agent_call_command(tAgent,ftAction)).
+prologOnly(member(ftTerm,ftTerm)).
+prologOnly(mud_test(ftTerm,ftCallable)).
+prologOnly(use_action_templates(ftTerm)).
+
+
+prologHybrid(typeHasGlyph(tCol,ftString)).
+prologHybrid(mudColor(tSpatialThing,vtColor)).
+prologHybrid(mudKnowing(tAgent,ftTerm)).
+prologHybrid(mudLabelTypeProps(ftString,tCol,ftVoprop)).
+prologHybrid(mudListPrice(tItem,ftNumber)).
+:-dynamic(mudOpaqueness/2).
+prologHybrid(mudOpaqueness(ftTerm,ftPercent)).
+prologHybrid(mudPossess(tAgent,tObj)).
+prologHybrid(mudShape(tSpatialThing,vtShape)).
+prologHybrid(mudSize(tSpatialThing,ftTerm)).
+prologHybrid(mudTextSame(ftText,ftText)).
+prologHybrid(mudTexture(tSpatialThing,vtTexture)).
+prologHybrid(typeGrid(tCol,ftInt,ftListFn(ftString))).
+prologListValued(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
+prologListValued(mudGetPrecepts(tAgent,ftListFn(tSpatialThing)),[mpred_module(user)]).
+prologListValued(mudNearFeet(tAgent,ftListFn(tSpatialThing)),[]).
+prologListValued(mudNearReach(tAgent,ftListFn(tSpatialThing)),[mpred_module(user)]).
+prologMultiValued(action_rules(tAgent,vtVerb,ftListFn(ftVar),ftVoprop)).
+prologMultiValued(mudLastCmdSuccess(tAgent,ftAction)).
+prologMultiValued(descriptionHere(ftTerm,ftString)).
+prologMultiValued(descriptionHere(ftTerm,ftString),prologOrdered).
+prologMultiValued(determinerString(ftTerm,ftString)).
+prologMultiValued(typeHasGlyph(ftTerm,ftString)).
+prologMultiValued(gridValue(tRegion,ftInt,ftInt,tObj)).
+prologMultiValued(instVerbOverride(ftTerm,ftAction,ftAction)).
+prologMultiValued(isa(ftTerm,tCol)).
+prologMultiValued(mudActAffect(ftTerm,ftTerm,ftTerm)).
+prologMultiValued(mudActAffect(tItem,vtVerb,ftTerm(ftVoprop))).
+prologMultiValued(mudCmdFailure(tAgent,ftAction)).
+
+tPred(isEach(tAgent/1, mudEnergy/2,mudHealth/2, mudAtLoc/2, failure/2, typeGrid/3, gridValue/4, isa/2, tItem/1, mudMemory/2, pathName/3, mudPossess/2, tRegion/1, mudScore/2, mudStm/2, mudFacing/2, localityOfObject/2, tThinking/1, mudWearing/2, mudFacing/2, mudHeight/2, act_term/2, nameStrings/2, mudDescription/2, pathBetween/3, mudAgentTurnnum/2)).
+prologHybrid(mudToHitArmorClass0 / 2).
+prologHybrid(mudAtLoc/2).
+prologOnly((agent_call_command/2)).
+:-decl_mpred_hybrid(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
+ pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completeExtentAsserted/1, ttFormatType/1, typeProps/2)).
+prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
+ pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
+
+prologHybrid(isEach(tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, mudToHitArmorClass0/2, tThinking/1, tDeleted/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, mudCmdFailure/2, mudSpd/2, typeGrid/3, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, wearsClothing/2)).
+prologHybrid(isEach( mudArmorLevel/2, mudLevelOf/2, mudToHitArmorClass0/2, mudBareHandDamage/2, chargeCapacity/2, mudEnergy/2, tCol/1, tAgent/1, tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, tThinking/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, failure/2, gridValue/4, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, mudWearing/2)).
+
+:-must(fully_expand(prologHybrid(typeHasGlyph,2),(arity(typeHasGlyph, 2), prologHybrid(typeHasGlyph), tPred(typeHasGlyph)))).
+
+arity(typeHasGlyph,2).
+arity(mudTermAnglify,2).
+arity(mudMaxHitPoints,2).
+
+
+prologHybrid(instVerbOverride(ftTerm,ftAction,ftAction)).
+%isa(localityOfObject,prologHybrid). 
+%isa(mudActAffect, prologMultiValued).
+%isa(mudMaxHitPoints,prologHybrid).
+isa(vtDirection,ttValueType).
+
+prologMultiValued(agent_text_command(tAgent,ftText,tAgent,ftAction)).
+
+formatted_resultIsa(apathFn(tRegion,vtDirection),tPathway).
+
+prologOnly(is_vtActionTemplate/1).
+
+is_vtActionTemplate(C):-nonvar(C),get_functor(C,F),!,atom_concat(act,_,F).
+defnSufficient(ftAction,is_vtActionTemplate).
+defnSufficient(ftAction,vtVerb).
+defnSufficient(ftTerm,vtValue).
+
+genls('FemaleAnimal',tPlayer).
+genls('MaleAnimal',tPlayer).
+genls(isEach('PortableObject','ProtectiveAttire','SomethingToWear'),tCarryAble).
+genls(isEach('ProtectiveAttire','SomethingToWear'),tWearAble).
+genls(isEach(tRegion,tAgent),tChannel).
+
+tCol(meta_argtypes).
+meta_argtypes(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
+meta_argtypes(apathFn(tRegion,vtDirection)).
+meta_argtypes(xyzFn(tRegion,ftInt,ftInt,ftInt)).
+
+
+
+tCol(ttTypeByAction).
+genls(ttTypeByAction,tCol).
+(isa(X,ttTypeByAction) => isa(X,tCol)).
+
+
+% (isa(Inst,Type),isa(Type,ttTypeByAction)) => isa(Inst,tHasAction).
+
+genls(tAgent,tObj).
+genls(tAgent,tSpatialThing).
+genls(tCarryAble,tItem).
+genls(tChargeAble,tItem).
+genls(tContolDevice,tChargeAble).
+genls(tDoor,tFurniture).
+genls(tDoor,tItem).
+genls(tDrinkAble,tItem).
+genls(tEatAble,tItem).
+genls(tFunction,tRelation).
+genls(tFurniture,tObj).
+genls(tFurniture,tPartofObj).
+genls(tHumanPlayer,tPlayer).
+genls(tItem,tObj).
+genls(tItem,tSpatialThing).
+genls(tMonster,ttAgentGeneric).
+genls(tNpcPlayer,tPlayer).
+genls(tObj,tSpatialThing).
+genls(tPathway,tDoor).
+genls(tPlayer,tAgent).
+genls(tPred,tRelation).
+genls(tRegion,tSpatialThing).
+genls(ttObjectType,tCol).
+genls(ttSpatialType,tCol).
+genls(tUseAble,tItem).
+genls(tWearAble,tItem).
+genls(vtBasicDir,vtBasicDirPlusUpDown).
+genls(vtBasicDirPlusUpDown,vtDirection).
+genls(vtDirection,tTypevalue).
+genls(vtPosture,vtVerb).
+
+
+
+
 
 vtBasicDir(vEast).
 vtBasicDir(vNorth).
@@ -567,7 +595,7 @@ typeGenls(ttAgentType,tAgent).
 typeGenls(ttItemType,tItem).
 typeGenls(ttObjectType,tObj).
 typeGenls(ttRegionType,tRegion).
-cycAssert(A,B):- trace_or_throw(cycAssert(A,B)).
+% cycAssert(A,B):- trace_or_throw(cycAssert(A,B)).
 
 
 
@@ -619,7 +647,7 @@ pathConnects(R1,R2)/ground(R1:R2) => isa(R1,tRegion),isa(R2,tRegion), {ensure_so
 % ==================================================
 % Classes of things
 % ==================================================
-:- do_gc.
+
 
 genls(tAgent,tObj).
 genls(tItem,tObj).
@@ -664,7 +692,7 @@ genls(tFurnature,tItem).
 
 genls(tPartofFurnature,tPartofObj).
 
-:- do_gc.
+
 
 
 
@@ -723,8 +751,11 @@ typeProps(tAgent,[predInstMax(mudHealth,500), predInstMax(mudEnergy,200), mudHea
     mudMemory(aDirectionsFn([vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW,vUp,vDown]))]).
 % typeProps(tAgent,mudLastCommand(actStand)).
 typeProps(tAgent,mudNeedsLook(vFalse)).
+
 typeProps(tFood,[mudHeight(0)]).
+
 typeProps(tItem,mudEnergy(140)).
+
 typeProps(tItem,mudListPrice(0)).
 typeProps(tObj,[mudOpaqueness(100)]).
 typeProps(tRegion,[mudOpaqueness(1)]).
@@ -732,9 +763,9 @@ typeProps(tSpatialThing,mudHeight(0)).
 
 % :-end_module_type(dynamic).
 
-% instTypeProps(isSelf,Type,[mudNamed(isSelf),typeHasGlyph(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
+% instTypeProps(isThis,Type,[mudNamed(isThis),typeHasGlyph(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
 
-:- do_gc.
+
 % Vacuum World example objects........
 mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
 
@@ -763,6 +794,134 @@ cachedPredicate(Goal)=>{forall(Goal,pfc_add(Goal))}.
 tCol(cachedPredicate).
 cachedPredicate(vtActionTemplate(_)).
 
+% from inform7
+prologHybrid(mudRelating(ftID,ftID)).
+prologHybrid(mudProviding(ftID,ftID)).
+prologHybrid(mudContainment(ftID,ftID)).
+prologHybrid(mudSupportsSpatially(ftID,ftID)).
+prologHybrid(mudIncorporates(ftID,ftID)).
+prologHybrid(mudEncloses(ftID,ftID)).
+
+/*
+An object has a text called printed name.
+An object has a text called printed plural name.
+An object has a text called an indefinite article.
+An object can be plural-named or singular-named. An object is usually singular-named.
+An object can be proper-named or improper-named. An object is usually improper-named.
+
+A room can be privately-named or publically-named. A room is usually publically-named.
+A room can be lighted or dark. A room is usually lighted.
+A room can be visited or unvisited. A room is usually unvisited.
+A room has a text called description.
+
+A thing can be lit or unlit. A thing is usually unlit.
+A thing can be edible or inedible. A thing is usually inedible.
+A thing can be fixed in place or portable. A thing is usually portable.
+A thing can be scenery.
+A thing can be wearable.
+A thing can be pushable between rooms.
+
+The north is a direction.
+The northeast is a direction.
+The northwest is a direction.
+The south is a direction.
+The southeast is a direction.
+The southwest is a direction.
+The east is a direction.
+A/sr1 - SR1 - Physical World Model §30 14
+The west is a direction.
+The up is a direction.
+The down is a direction.
+The inside is a direction.
+The outside is a direction.
+The north has opposite south. Understand "n" as north.
+The northeast has opposite southwest. Understand "ne" as northeast.
+The northwest has opposite southeast. Understand "nw" as northwest.
+The south has opposite north. Understand "s" as south.
+The southeast has opposite northwest. Understand "se" as southeast.
+The southwest has opposite northeast. Understand "sw" as southwest.
+The east has opposite west. Understand "e" as east.
+The west has opposite east. Understand "w" as west.
+Up has opposite down. Understand "u" as up.
+Down has opposite up. Understand "d" as down.
+Inside has opposite outside. Understand "in" as inside.
+Outside has opposite inside. Understand "out" as outside.
+The inside object translates into I6 as "in_obj".
+The outside object translates into I6 as "out_obj".
+The verb to be above implies the mapping up relation.
+The verb to be mapped above implies the mapping up relation.
+The verb to be below implies the mapping down relation.
+The verb to be mapped below implies the mapping down relatio
+
+A door has an object called other side.
+The other side property translates into I6 as "door_to".
+Leading-through relates one room (called the other side) to various doors.
+The verb to be through implies the leading-through relation.
+§33. Containers and supporters. The carrying capacity property is the exception to the remarks above
+about the qualitative nature of the world model: here for the first and only time we have a value which can
+be meaningfully compared.
+Section SR1/6 - Containers
+The specification of container is "Represents something into which portable
+things can be put, such as a teachest or a handbag. Something with a really
+large immobile interior, such as the Albert Hall, had better be a room
+instead."
+A container can be enterable.
+A container can be opaque or transparent. A container is usually opaque.
+A container has a number called carrying capacity.
+The carrying capacity of a container is usually 100.
+Include (- has container, -) when defining a container
+
+The specification of supporter is "Represents a surface on which things can be
+placed, such as a table."
+A supporter can be enterable.
+A supporter has a number called carrying capacity.
+The carrying capacity of a supporter is usually 100.
+A supporter is usually fixed in place.
+Include (-
+has transparent supporter
+-) when defining a supporte
+
+A door can be open or closed. A door is usually closed.
+A door can be openable or unopenable. A door is usually openable.
+A container can be open or closed. A container is usually open.
+A container can be openable or unopenable. A container is usually unopenable.
+
+Before rules is a rulebook. [20]
+Instead rules is a rulebook. [21]
+Check rules is a rulebook. [22]
+Carry out rules is a rulebook. [23]
+After rules is a rulebook. [24]
+Report rules is a rulebook. [25]
+
+Action-processing rules is a rulebook. [10]
+The action-processing rulebook has a person called the actor.
+Setting action variables is a rulebook. [11]
+The specific action-processing rules is a rulebook. [12]
+The specific action-processing rulebook has a truth state called action in world.
+The specific action-processing rulebook has a truth state called action keeping silent.
+The specific action-processing rulebook has a rulebook called specific check rulebook.
+The specific action-processing rulebook has a rulebook called specific carry out rulebook.
+The specific action-processing rulebook has a rulebook called specific report rulebook.
+The specific action-processing rulebook has a truth state called within the player’s sight.
+The player’s action awareness rules is a rulebook. [13]
+§16. The rules on accessibility and visibility, which control whether an action is physically possible, have
+named outcomes as a taste of syntactic sugar.
+Accessibility rules is a rulebook. [14]
+Reaching inside rules is an object-based rulebook. [15]
+Reaching inside rules have outcomes allow access (success) and deny access (failure).
+Reaching outside rules is an object-based rulebook. [16]
+Reaching outside rules have outcomes allow access (success) and deny access (failure).
+Visibility rules is a rulebook. [17]
+Visibility rules have outcomes there is sufficient light (failure) and there is
+insufficient light (success).
+§17. Two rulebooks govern the processing of asking other people to carry out actions:
+Persuasion rules is a rulebook. [18]
+Persuasion rules have outcomes persuasion succeeds (success) and persuasion fails (failure).
+Unsuccessful attempt by is a rulebook. [19
+
+*/
+
+
 
 tCol(random_path_dir).
 random_path_dir(Dir):-nonvar(Dir),!,fail.
@@ -770,23 +929,14 @@ random_path_dir(Dir):-random_instance(vtBasicDir,Dir,true).
 random_path_dir(Dir):-random_instance(vtBasicDirPlusUpDown,Dir,true).
 random_path_dir(Dir):-random_instance(vtDirection,Dir,true).
 
-prologOnly(ensure_some_pathBetween/2).
+prologOnly(ensure_some_pathBetween(tRegion,tRegion)).
 
 prologOnly(onEachLoad).
 argsQuoted(onEachLoad).
 argsQuoted(must).
 
-normalAgentGoal(Pred,_)=>prologHybrid(Pred),tRolePredicate(Pred),arity(Pred,2),meta_argtypes(t(Pred,tAgent,ftPercent)).
-
-%normalAgentGoal(Pred,Val)=>  (tAgent(A)=>agentGoals(A,Pred,((t(Pred,A,V),V>=Val)))).
-%agentGoals(A,About,State)/State => \+ agentTODO(A,actImprove(About)).
-
-normalAgentGoal(Pred,Val)=>  ( t(Pred,A,V)/(V<Val) => agentTODO(A,actImprove(Pred))).
-
-
-normalAgentGoal(Pred,Val)=>  (tAgent(A)=>pfc_default(t(Pred,A,Val))).
-
-
+prologHybrid(normalAgentGoal(ftTerm,ftTerm)).
+normalAgentGoal(Pred,_)/atom(Pred)=>{AT=..[Pred,tAgent,ftPercent]},meta_argtypes(AT),prologHybrid(Pred),tRolePredicate(Pred),arity(Pred,2).
 normalAgentGoal(mudEnergy,90).
 normalAgentGoal(mudNonHunger,90).
 normalAgentGoal(mudHygiene,90).
@@ -796,6 +946,15 @@ normalAgentGoal(mudFun,90).
 normalAgentGoal(mudNonLonelinessSocial,90).
 normalAgentGoal(mudSadToHappy,90).
 normalAgentGoal(mudComfort,90).
+
+%normalAgentGoal(Pred,Val)=>  (tAgent(A)=>agentGoals(A,Pred,((t(Pred,A,V),V>=Val)))).
+%agentGoals(A,About,State)/State => \+ agentTODO(A,actImprove(About)).
+
+prologHybrid(agentTODO(tAgent,vtActionType)).
+normalAgentGoal(Pred,Val)=>  ( t(Pred,A,V)/(V<Val) => agentTODO(A,actImprove(Pred))).
+normalAgentGoal(Pred,Val)=>  (tAgent(A)=>pfc_default(t(Pred,A,Val))).
+
+
 
 /*
 

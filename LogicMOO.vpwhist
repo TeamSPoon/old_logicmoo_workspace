@@ -6,7 +6,7 @@ CurrentProject=PrologMUD.vpj
 PrologMUD.vpj=20150503193724685
 [TreeExpansion2]
 - PrologMUD.vpj
-  + externals
+  - externals
     + ClioPatria
       + api
       - applications
@@ -159,32 +159,32 @@ PrologMUD.vpj=20150503193724685
         + images
       + swfobject
         + src
-    - MUD_DB_LeanCOR
+    + MUD_DB_LeanCOR
       + tests
         + ontologies
           + examples
         + scripts
     + MUD_DeepParsing
       - prolog
-        - chat80
-        + CURT
-    - MUD_DLog
+        + chat80
+        - CURT
+    + MUD_DLog
       + CVSROOT
-      + dlog-benchmark
+      - dlog-benchmark
         + LUBM
-        + semintec
-        + vicodi
-        + wine
+        - semintec
+        - vicodi
+        - wine
       + dlog-reasoner
         + doc
-        + examples
+        - examples
           + alcoholic
-          + clever
-          + happy
+          - clever
+          - happy
           + iocaste
           + shi
         + lib
-        + output
+        - output
         + src
         + test
         + xml_reader
@@ -213,7 +213,7 @@ PrologMUD.vpj=20150503193724685
           + test
           + unfold
         + test
-    - MUD_ircbot
+    + MUD_ircbot
       - eggdrop
       - prolog
     + MUD_KnowRob
@@ -605,7 +605,7 @@ PrologMUD.vpj=20150503193724685
           + compare
           + prolog
     + MUD_PDDL
-      + prolog
+      - prolog
         + Blocks_world
         + domains
           + failing_or_too_slow
@@ -648,7 +648,7 @@ PrologMUD.vpj=20150503193724685
               + parcprinter-strips
               + pegsol-strips
     + MUD_ScriptEngines
-      + scheme_in_prolog
+      - scheme_in_prolog
         + r6rs-plt-redex-model
       + test_1000
       + test_1500
@@ -682,10 +682,10 @@ PrologMUD.vpj=20150503193724685
       + util
     + OLD_logicm00
       + btepisode
-      + src_data
-        + pldata
+      - src_data
+        - pldata
       + src_incoming
-        + planner
+        - planner
           + bkwld_pddl_parser
           + Blocks_world
           + domains
@@ -731,37 +731,37 @@ PrologMUD.vpj=20150503193724685
           + Rakiduam07
             + continuos
             + socket_udp
-      + src_modules
+      - src_modules
         + aleph
         + candc
           + working
         + circlemuddata
-        + database
+        - database
           + benchmarks
           + prologTestFiles
-        + indigolog
-          + Doc
-            + source
+        - indigolog
+          - Doc
+            - source
           + Env
           + Eval
-          + Examples
-            + ElevatorSim-BAT\.xpce
-            + CLIMA
-            + Delivery-BAT
-            + Elevator-Vanilla
+          - Examples
+            - ElevatorSim-BAT\.xpce
+            - CLIMA
+            - Delivery-BAT
+            - Elevator-Vanilla
             + ElevatorLego-BAT
             + ElevatorSim-BAT
             + ER1Test-BAT
-            + PMS
-            + Wumpus-FLUX
+            - PMS
+            - Wumpus-FLUX
               + WumpusApplet
-            + Wumpus-KBAT
+            - Wumpus-KBAT
               + Screenshots
-              + WumpusApplet
+              - WumpusApplet
           + flux_WumpusApplet
           + Interpreters
-            + flux
-          + lib
+            - flux
+          - lib
         + MaLARea
           + bin
           + data
@@ -773,7 +773,7 @@ PrologMUD.vpj=20150503193724685
             + iris
             + trains
           + pl
-      + src_natlang_data
+      - src_natlang_data
         + nltk_3.0a3
           + javasrc
             + org
@@ -802,10 +802,10 @@ PrologMUD.vpj=20150503193724685
               + unit
             + tokenize
           + nltk.egg-info
-        + Prolog_FNet
+        - Prolog_FNet
         + SemLink_1.2.2c
           + vn-fn
-          + vn-pb
+          - vn-pb
           + wsjTokens
             + 00
             + 01
@@ -1336,7 +1336,7 @@ PrologMUD.vpj=20150503193724685
         + js
         + prolog
         + snd
-    - src_game_startrek
+    + src_game_startrek
       - holodeck
       - mobs
       + web
@@ -1345,7 +1345,7 @@ PrologMUD.vpj=20150503193724685
         + js
         + prolog
         + snd
-    + src_game_wumpus
+    - src_game_wumpus
   - packs
     + games
       - src_game_nani
@@ -1372,25 +1372,25 @@ PrologMUD.vpj=20150503193724685
           + prolog
           + snd
       - src_game_wumpus
-    - logicmoo_base
+    + logicmoo_base
       - prolog
         - logicmoo
           - mpred
-          - util
+          + util
       + t
     - logicmoo_engine
       - prolog
         - logicmoo
           - engine
-            - flux
-            - plarkc
+            + flux
+            + plarkc
             - pttp
-          - planner
+          + planner
             + Blocks_world
             + domains
-              + failing_or_too_slow
-              + others
-              + sanity
+              - failing_or_too_slow
+              - others
+              - sanity
             + elevators
             + hanoi
             + ipc2008-no-cybersec
@@ -1426,16 +1426,16 @@ PrologMUD.vpj=20150503193724685
               + socket_udp
             + test
               + blocks
-              - gripper
-    + logicmoo_online
+              + gripper
+    - logicmoo_online
       - prolog
         - logicmoo
           - mpred_online
           - swish_lib
             - render
     - prologmud
-      + prolog
-        - prologmud
+      - prolog
+        + prologmud
           + actions
           - mobs
             - affordance
@@ -1454,8 +1454,8 @@ PrologMUD.vpj=20150503193724685
         + config-enabled
         + RDF-store
     - prologmud_web
-      + src_assets
-        - pldata
+      - src_assets
+        + pldata
       + src_webui
         - assetsources
         - http
@@ -1465,12 +1465,12 @@ PrologMUD.vpj=20150503193724685
             + js
         + model
         - mudconsole
-    - ref_unused
+    + ref_unused
   - prolog
     - prologmud
       + actions
       + mobs
-        + affordance
+        - affordance
         + planner
       - objs
       + parsing
@@ -1479,12 +1479,12 @@ PrologMUD.vpj=20150503193724685
   - runtime
     + config-enabled
     + RDF-store
-  - \usr
+  + \usr
     - lib
       - swi-prolog
         - boot
         - demo
-        + library
+        - library
           + chr
           + clp
             + clpq
@@ -1526,17 +1526,203 @@ PrologMUD.vpj=20150503193724685
               + swi
               + trace
               + xref
-scroll:0
+scroll:30
 [State]
-SCREEN: 1920 1080 0 56 1612 948 0 0 M 0 0 0 0 1481 644
-CWD: games\src_game_nani
+SCREEN: 1920 1080 88 88 1440 735 0 0 M 0 0 0 0 1608 644
+CWD: packs\prologmud\prolog\prologmud\parsing
+BUFFER: BN="C:\Users\Administrator\Documents\mike250\v250\ans7-3.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=392 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="prolog\prologmud\server\mud_builtin.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.21215 CL=1 LE=0 CX=0 CY=18 WI=5 BI=405 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.310\trindikit4-0.2alpha\core\prolog\tkit_control.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.290 CL=37 LE=0 CX=36 CY=5 WI=5 BI=403 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.928\trindikit4-0.2alpha\core\prolog\tkit_tis.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=406 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\Administrator\Documents\mike250\v250\int.prm"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=398 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.218\v250\mike250.ini"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=INI	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=258 LE=58 CX=199 CY=0 WI=5 BI=391 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.018\v250\ch7-5-1.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.871 CL=21 LE=0 CX=20 CY=24 WI=5 BI=397 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.766\v250\ch5-2m.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.675 CL=78 LE=0 CX=77 CY=20 WI=5 BI=402 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\planner\misc_planner\popsim.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=404 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.145\trindikit4-0.2alpha\core\prolog\tkit_oaa.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.149 CL=51 LE=0 CX=50 CY=5 WI=5 BI=407 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.677\trindikit4-0.2alpha\core\prolog\tkit_xml_escape.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.43 CL=14 LE=0 CX=13 CY=2 WI=5 BI=408 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.931\trindikit4-0.2alpha\core\prolog\Modules\interpret_gf.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.257 CL=41 LE=0 CX=40 CY=7 WI=5 BI=409 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.714\trindikit4-0.2alpha\core\prolog\Modules\output_simpletext.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.79 CL=37 LE=0 CX=36 CY=4 WI=5 BI=410 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.598\trindikit4-0.2alpha\core\prolog\Datatypes\assoclistXXX.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.78 CL=1 LE=0 CX=0 CY=3 WI=5 BI=411 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.292\trindikit4-0.2alpha\core\prolog\Datatypes\list.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1 CL=2 LE=0 CX=1 CY=1 WI=5 BI=412 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\Administrator\Documents\mike250\v250\ch7-5-1.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=414 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\Administrator\Documents\mike250\v250\ex2-3.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=413 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\Administrator\Documents\mike250\v250\ch5-1.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=415 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.082\esfm.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=416 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.542\MIKEv2.03\mikev203.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=616 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.30026 CL=42 LE=0 CX=41 CY=16 WI=5 BI=417 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\pfc.pl.v5"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.10288 CL=24 LE=0 CX=23 CY=18 WI=5 BI=426 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_hooks.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.12177 CL=28 LE=0 CX=27 CY=33 WI=5 BI=427 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\Administrator\Documents\MIKEv2.03\howto.doc"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=400 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.032\MIKEv2.03\demo2.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.307 CL=38 LE=0 CX=37 CY=10 WI=5 BI=421 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.043\MIKEv2.03\demo3.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=420 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.155\MIKEv2.03\demo5.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.10458 CL=1 LE=0 CX=0 CY=34 WI=5 BI=422 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.194\MIKEv2.03\demo4.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.501 CL=1 LE=0 CX=0 CY=10 WI=5 BI=423 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.536\MIKEv2.03\demo1.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.584 CL=11 LE=0 CX=10 CY=19 WI=5 BI=424 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.243\MIKEv2.03\mikeref.1o2"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=425 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.352\MIKEv2.03\demo5.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.394 CL=1 LE=0 CX=0 CY=14 WI=5 BI=419 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.473\MIKEv2.03\howto.doc"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.25138 CL=1 LE=0 CX=0 CY=34 WI=5 BI=418 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1410 446 -1 -1 N  WF=0 WT=93 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_hooks.pl"
+VIEW: LN=.12177 CL=28 LE=0 CX=27 CY=33 WI=593 BI=427 HT=0 HN=0 HF=0 HC=4
+WINDOW: 198 198 1410 446 -1 -1 N  WF=0 WT=94 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\pfc.pl.v5"
+VIEW: LN=.10288 CL=24 LE=0 CX=23 CY=18 WI=596 BI=426 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1410 446 -1 -1 N  WF=0 WT=84 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.542\MIKEv2.03\mikev203.pl"
+VIEW: LN=.30026 CL=42 LE=0 CX=41 CY=16 WI=590 BI=417 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1410 446 -1 -1 N  WF=0 WT=92 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.243\MIKEv2.03\mikeref.1o2"
+VIEW: LN=.49779 CL=1 LE=0 CX=0 CY=18 WI=544 BI=425 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1410 446 -1 -1 N  WF=0 WT=91 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.536\MIKEv2.03\demo1.pl"
+VIEW: LN=.584 CL=11 LE=0 CX=10 CY=10 WI=562 BI=424 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1410 446 -1 -1 N  WF=0 WT=90 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.194\MIKEv2.03\demo4.pl"
+VIEW: LN=.501 CL=1 LE=0 CX=0 CY=10 WI=539 BI=423 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1410 446 -1 -1 N  WF=0 WT=89 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.155\MIKEv2.03\demo5.pl"
+VIEW: LN=.10458 CL=1 LE=0 CX=0 CY=34 WI=577 BI=422 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1410 446 -1 -1 N  WF=0 WT=88 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.043\MIKEv2.03\demo3.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=535 BI=420 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1410 446 -1 -1 N  WF=0 WT=87 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.032\MIKEv2.03\demo2.pl"
+VIEW: LN=.307 CL=38 LE=0 CX=37 CY=10 WI=575 BI=421 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1410 446 -1 -1 N  WF=0 WT=86 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.473\MIKEv2.03\howto.doc"
+VIEW: LN=.25138 CL=1 LE=0 CX=0 CY=34 WI=559 BI=418 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1410 446 -1 -1 N  WF=0 WT=85 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.352\MIKEv2.03\demo5.pl"
+VIEW: LN=.394 CL=1 LE=0 CX=0 CY=14 WI=573 BI=419 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1410 446 -1 -1 N  WF=0 WT=83 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.082\esfm.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=589 BI=416 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1410 446 -1 -1 N  WF=0 WT=82 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\Administrator\Documents\mike250\v250\ch5-1.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=588 BI=415 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1410 446 -1 -1 N  WF=0 WT=81 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\Administrator\Documents\mike250\v250\ex2-3.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=574 BI=413 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1410 446 -1 -1 N  WF=0 WT=80 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\Administrator\Documents\mike250\v250\ch7-5-1.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=557 BI=414 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1410 446 -1 -1 N  WF=0 WT=79 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.292\trindikit4-0.2alpha\core\prolog\Datatypes\list.pl"
+VIEW: LN=.1 CL=2 LE=0 CX=1 CY=1 WI=572 BI=412 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1410 446 -1 -1 N  WF=0 WT=78 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.598\trindikit4-0.2alpha\core\prolog\Datatypes\assoclistXXX.pl"
+VIEW: LN=.78 CL=1 LE=0 CX=0 CY=3 WI=569 BI=411 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1410 446 -1 -1 N  WF=0 WT=77 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.714\trindikit4-0.2alpha\core\prolog\Modules\output_simpletext.pl"
+VIEW: LN=.79 CL=37 LE=0 CX=36 CY=4 WI=571 BI=410 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1410 446 -1 -1 N  WF=0 WT=76 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.931\trindikit4-0.2alpha\core\prolog\Modules\interpret_gf.pl"
+VIEW: LN=.257 CL=41 LE=0 CX=40 CY=7 WI=570 BI=409 HT=0 HN=0 HF=0 HC=4
+WINDOW: 198 198 1410 446 -1 -1 N  WF=0 WT=75 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.677\trindikit4-0.2alpha\core\prolog\tkit_xml_escape.pl"
+VIEW: LN=.43 CL=14 LE=0 CX=13 CY=2 WI=568 BI=408 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1410 446 -1 -1 N  WF=0 WT=74 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.145\trindikit4-0.2alpha\core\prolog\tkit_oaa.pl"
+VIEW: LN=.149 CL=51 LE=0 CX=50 CY=5 WI=566 BI=407 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1410 446 -1 -1 N  WF=0 WT=73 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.928\trindikit4-0.2alpha\core\prolog\tkit_tis.pl"
+VIEW: LN=.598 CL=32 LE=0 CX=31 CY=22 WI=552 BI=406 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1410 446 -1 -1 N  WF=0 WT=72 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.310\trindikit4-0.2alpha\core\prolog\tkit_control.pl"
+VIEW: LN=.290 CL=37 LE=0 CX=36 CY=5 WI=550 BI=403 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1410 446 -1 -1 N  WF=0 WT=71 "Default Fixed Font,10,0,1"
+BUFFER: BN="prolog\prologmud\server\mud_builtin.pl"
+VIEW: LN=.21215 CL=1 LE=0 CX=0 CY=18 WI=603 BI=405 HT=0 HN=0 HF=0 HC=4
+WINDOW: 198 198 1410 446 -1 -1 N  WF=0 WT=65 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\Administrator\Documents\mike250\v250\ans7-3.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=546 BI=392 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1410 446 -1 -1 N  WF=0 WT=70 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\planner\misc_planner\popsim.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=594 BI=404 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1410 446 -1 -1 N  WF=0 WT=69 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.766\v250\ch5-2m.pl"
+VIEW: LN=.675 CL=78 LE=0 CX=77 CY=20 WI=549 BI=402 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1410 446 -1 -1 N  WF=0 WT=68 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.018\v250\ch7-5-1.pl"
+VIEW: LN=.871 CL=21 LE=0 CX=20 CY=24 WI=548 BI=397 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1410 446 -1 -1 N  WF=0 WT=67 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.218\v250\mike250.ini"
+VIEW: LN=.0 CL=258 LE=84 CX=173 CY=0 WI=547 BI=391 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1410 446 -1 -1 N  WF=0 WT=66 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\Administrator\Documents\mike250\v250\int.prm"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=542 BI=398 HT=0 HN=0 HF=0 HC=4
+WINDOW: 198 198 1410 446 -1 -1 M  WF=0 WT=1 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\Administrator\Documents\MIKEv2.03\howto.doc"
+VIEW: LN=.3328 CL=33 LE=0 CX=32 CY=23 WI=165 BI=400 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_loader.pl
-prolog\prologmud\vworld\world_agent.pl
+packs\prologmud\prolog\prologmud\server\mud_testing.pl
+packs\prologmud\prolog\prologmud\server\mud_telnet.pl
+packs\prologmud\prolog\prologmud\mobs\affordance\simbots.pl
+packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_header.pl
 prolog\prologmud\vworld\world_npc.pl
-prolog\prologmud\vworld\world_2d.pl
-packs\logicmoo_engine\prolog\logicmoo\planner\moo_ext_strips_test.pl
-games\src_game_nani\objs_misc_household.plmoo
-games\src_game_nani\justin_ke.plmoo
-games\src_game_nani\andrew_ke.plmoo
-games\src_game_nani\a_nani_household.plmoo
+prolog\prologmud\vworld\world_agent.pl
+prolog\prologmud\vworld\world.pl
+prolog\prologmud\server\mud_telnet.pl
+C:\Users\Administrator\Documents\MIKEv2.03\howto.doc

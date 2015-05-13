@@ -105,6 +105,9 @@
 :- multifile(pfc_select/2).
 :- multifile(pfc_search/1).
 
+:- dynamic(formatted_resultIsa/2).
+:- multifile(formatted_resultIsa/2).
+
 :- dynamic(user:asserted_argIsa_known/3).
 :- dynamic(user:argQuotedIsa/3).
 :- dynamic(user:resultGenls/2).
@@ -229,6 +232,8 @@
 
 :- dynamic user:genls/2.
 :- dynamic user:isa/2.
+:- dynamic user:mudKeyword/2.
+:- multifile user:mudKeyword/2.
 :- multifile user:genls/2.
 :- multifile user:isa/2.
 
@@ -325,9 +330,14 @@
 :- dynamic_multifile_exported user:tFarthestReachableItem/1.
 :- dynamic_multifile_exported deduceFromArgTypes/1.
 :- dynamic_multifile_exported prologSideEffects/1.
+
+:-dynamic agent_action_queue/2.
+:-multifile agent_action_queue/2.
+
 % ================================================
 % Thread Locals
 % ================================================
+
 :- thread_local thlocal:consulting_sources/0.
 :- thread_local thlocal:already_in_file_term_expansion/0.
 :- thread_local thlocal:agent_current_action/2.

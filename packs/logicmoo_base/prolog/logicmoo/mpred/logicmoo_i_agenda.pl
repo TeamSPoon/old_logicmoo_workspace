@@ -69,10 +69,15 @@ agenda_do_prequery:- loop_check(agenda_rescan_mpred_ops,true),!.
 :- sanity(user:mpred_mod(user)).
 
 :-export(agenda_slow_op_restart/0).
+:-dynamic(doing_agenda_slow_op/0).
 
 % agenda_slow_op_restart:-!.
-agenda_slow_op_restart:- loop_check(forall(user:agenda_slow_op_todo(Slow),
-  with_no_assertions(thlocal:side_effect_ok,((must((is_callable(Slow),must(Slow),ignore(retract(user:agenda_slow_op_todo(Slow))))))))),true).
+agenda_slow_op_restart:-doing_agenda_slow_op,!.
+agenda_slow_op_restart:-
+ asserta(doing_agenda_slow_op),
+ call_cleanup((
+ loop_check(forall(user:agenda_slow_op_todo(Slow),
+  with_no_assertions(thlocal:side_effect_ok,((must((is_callable(Slow),must(Slow),ignore(retract(user:agenda_slow_op_todo(Slow))))))))),true)),retract(doing_agenda_slow_op)),!.
 
 :-export(agenda_rescan_mpred_ops/0).
 agenda_rescan_mpred_ops:- test_tl(agenda_suspend_scans),!.
@@ -166,6 +171,8 @@ run_database_hooks_0(TypeIn,HookIn):-
 % Spawn new instances
 % ========================================
 
+onSpawn(A):-A==true,!.
+onSpawn((A,B)):-!,onSpawn(A),onSpawn(B).
 onSpawn(ClassFact):-fully_expand(ClassFact,ClassFactO),!,onSpawn_0(ClassFactO).
 onSpawn_0(ClassFact):- ClassFact=..[FunctArgType,InstA],
  tCol(FunctArgType),

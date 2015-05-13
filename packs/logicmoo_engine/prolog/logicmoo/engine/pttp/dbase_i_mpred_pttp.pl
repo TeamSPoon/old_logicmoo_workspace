@@ -10,7 +10,7 @@
 %
 */
 
-:- include(logicmoo_i_header).
+:- ensure_loaded(logicmoo(mpred/logicmoo_i_header)).
 
 :- thread_local thlocal:current_pttp_db_oper/1.
 
@@ -212,12 +212,12 @@ clear_pttp:- eraseall(int_query,_),eraseall(int_not_query,_),
 :-dynamic(pttp_test_fails_is_ok/1).
 :-export(do_pttp_test_maybe/2).
 
-do_pttp_test_maybe(TestName):- forall(pttp_test(TestName,Data),do_pttp_test_maybe(TestName,Data)),listing(pttp_test_took).
+do_pttp_test_maybe(TestName):- forall(pttp_test(TestName,Data),do_pttp_test_maybe(TestName,Data)),lsting(pttp_test_took).
 do_pttp_test_maybe(TestName,_) :- pttp_test_fails_is_ok(TestName),!.
 do_pttp_test_maybe(TestName,Data) :- do_pttp_test(TestName,Data).
 
 :-export(do_pttp_test/1).
-do_pttp_test(TestName):- forall(pttp_test(TestName,Data),do_pttp_test(TestName,Data)),listing(pttp_test_took).
+do_pttp_test(TestName):- forall(pttp_test(TestName,Data),do_pttp_test(TestName,Data)),lsting(pttp_test_took).
 :-export(do_pttp_test/2).
 do_pttp_test(TestName,Data) :-   
            call_cleanup((     
@@ -375,9 +375,9 @@ pttp_assert_int_wid04(ID,Y,F,A):- user:wid(_,_,Y),!,asserta(user:wid(ID,F/A,Y)),
 pttp_assert_int_wid04(ID,Y,F,A):- assertz(user:wid(ID,F/A,Y)),add_functor(internal,F/A),!,assertz_unumbered(Y),!.
 
 
-:- ensure_loaded(logicmoo_i_mpred_pttp_statics).
-:- ensure_loaded(logicmoo_i_mpred_pttp_precompiled).
-:- ensure_loaded(logicmoo_i_mpred_pttp_testing).
+:- ensure_loaded(dbase_i_mpred_pttp_statics).
+:- ensure_loaded(dbase_i_mpred_pttp_precompiled).
+:- ensure_loaded(dbase_i_mpred_pttp_testing).
 
 :- if_startup_script(do_pttp_tests).
 

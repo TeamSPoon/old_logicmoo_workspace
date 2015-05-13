@@ -468,7 +468,7 @@ cyc_to_rdf(user:mpred_prop(P,PST),svo(F,StubType,S)):- PST=..[StubType,S],rdf_ob
 cyc_to_rdf(argIsa(P,1,D),domain(P,D)).
 cyc_to_rdf(isa(apathFn(A,Dir),T),isa([apathFn,A,Dir],T)).
 cyc_to_rdf(pathName(A,Dir,String),mudNamed([apathFn,A,Dir],String)).
-cyc_to_rdf(argSingleValueDefault(PAB, 2, V),type_default(A,[P,isSelf,V])):-PAB=[P,A,_].
+cyc_to_rdf(argSingleValueDefault(PAB, 2, V),type_default(A,[P,isThis,V])):-PAB=[P,A,_].
 cyc_to_rdf(argIsa(P,2,D),range(P,D)):-arity(P,2).
 
 :-flag(rdf_assert_hook_max,_,0).
@@ -485,7 +485,7 @@ rdf_assert_hook(PSO):-dmsg(once(skipped(rdf_assert_hook(PSO)))).
 
 rdf_assert_hook0(mudLabelTypeProps(A,Food,Props)):-nonvar(A),atom_string(A,S),!,must((rdf_assert_hook(typeProps(Food,[label(S)|Props])))),!.
 rdf_assert_hook0(typeProps(Food,Props)):-is_list(Props),!,forall(member(P,Props),must(rdf_assert_hook(typeProps(Food,P)))),!.
-rdf_assert_hook0(typeProps(Food,Prop)):-Prop=..[P|ARGS],must(rdf_assert_hook(type_default(Food,[P,isSelf|ARGS]))),!.
+rdf_assert_hook0(typeProps(Food,Prop)):-Prop=..[P|ARGS],must(rdf_assert_hook(type_default(Food,[P,isThis|ARGS]))),!.
 rdf_assert_hook0(genls(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:subClassOf,P),!.
 rdf_assert_hook0(mudDescription(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:comment,P),!.
 rdf_assert_hook0((H:-TRUE)):-is_true(TRUE),!,rdf_assert_hook0(H),!.
