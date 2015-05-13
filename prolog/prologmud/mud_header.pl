@@ -10,13 +10,18 @@
 %
 */
 
-:-dynamic(hooks:irc_event_hooks/3).
-:-multifile(hooks:irc_event_hooks/3).
+:-dynamic(user:irc_event_hooks/3).
+:-multifile(user:irc_event_hooks/3).
 
 :-dynamic(user:deliver_event/2).
 :-multifile(user:deliver_event/2).
 
 :- dynamic_multifile_exported user:irc_user_plays/2.
+
+:- thread_local thlocal:wants_logout/1.
+:- multifile thlocal:wants_logout/1.
+:- dynamic thglobal:agent_message_stream/4, telnet_fmt_shown/3, thglobal:player_command_stack/2.
+:- multifile thglobal:agent_message_stream/4, telnet_fmt_shown/3, thglobal:player_command_stack/2.
 
 :- dynamic_multifile_exported user:term_specifier_text/2.
 :- dynamic_multifile_exported user:type_action_info/3.

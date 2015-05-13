@@ -21,13 +21,10 @@
                   run_local_tty/0,
                   login_and_run/0,
                   login_and_run_tty/0,
+                  set_player_telnet_options/0,
                   register_player_stream_local/1,
                   login_and_run_nodebug/0]).
 
-:- multifile thlocal:wants_logout/1.
-:- thread_local thlocal:wants_logout/1.
-
-:- dynamic thglobal:agent_message_stream/4, telnet_fmt_shown/3, thglobal:player_command_stack/2.
 
 :- meta_predicate toploop_telnet:show_room_grid_single(*,*,0).
 
@@ -96,7 +93,7 @@ login_and_run_tty:-
 
 
 set_player_telnet_options:-
-     foc_current_agent(P),
+     must(foc_current_agent(P)),
      add(repl_writer(P,telnet_repl_writer)),
      add(repl_to_string(P,telnet_repl_obj_to_string)),
      set_bugger_flag(opt_debug,false).
@@ -548,5 +545,6 @@ call_pred(Call, Options) :-
 	).
 
 
-
+:- source_location(S,_),forall(source_file(H,S),( \+predicate_property(H,built_in), functor(H,F,A),module_transparent(F/A),export(F/A))).
+  
 :- include(prologmud(mud_footer)).
