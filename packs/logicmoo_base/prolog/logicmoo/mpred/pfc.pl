@@ -74,10 +74,18 @@ retract_eq_quitely((H:-B)):-ignore((clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@
 retract_eq_quitely((H)):-ignore((clause(H,true,Ref),clause(HH,BB,Ref),H=@=HH,BB==true,!,erase(Ref))).
 assert_eq_quitely(H):-assert_if_new(H).
 
+reduce_clause_from_fwd(H,H):-not(compound(H)),!.
+reduce_clause_from_fwd((H:-B),HH):-B==true,reduce_clause_from_fwd(H,HH).
+reduce_clause_from_fwd((B=>H),HH):-B==true,reduce_clause_from_fwd(H,HH).
+reduce_clause_from_fwd((H<=B),HH):-B==true,reduce_clause_from_fwd(H,HH).
+reduce_clause_from_fwd((B<=>H),HH):-B==true,reduce_clause_from_fwd(H,HH).
+reduce_clause_from_fwd((H<=>B),HH):-B==true,reduce_clause_from_fwd(H,HH).
+reduce_clause_from_fwd((H,B),(HH,BB)):-!,reduce_clause_from_fwd(H,HH),reduce_clause_from_fwd(B,BB).
+reduce_clause_from_fwd(H,H).
 
-to_addable_form(I,OO):-is_list(I),!,maplist(to_addable_form,I,O),flatten(O,OO),!.
-to_addable_form(I,O):- current_predicate(logicmoo_i_term_expansion_file/0),once(fully_expand(_,I,II)),!,
- once((into_mpred_form(II,M),to_predicate_isas_each(M,O))),!.
+to_addable_form(I,OOO):-is_list(I),!,maplist(to_addable_form,I,O),flatten(O,OO),!,reduce_clause_from_fwd(OO,OOO).
+to_addable_form(I,OO):- current_predicate(logicmoo_i_term_expansion_file/0),once(fully_expand(_,I,II)),!,
+ once((into_mpred_form(II,M),to_predicate_isas_each(M,O))),!,reduce_clause_from_fwd(O,OO).
 to_addable_form(I,O):- findall(M,do_expand_args(isEach,I,M),IM),list_to_conjuncts(IM,M),to_predicate_isas_each(M,O),!.
 
 to_predicate_isas_each(I,O):-to_predicate_isas(I,O).
@@ -245,9 +253,9 @@ pfc_rewrap_h(A,not_not(A)):-!.
 fwc:-true.
 bwc:-true.
 wac:-true.
-is_fc_body(P):- notrace(fwc==P ; (compound(P),arg(1,P,E),is_fc_body(E))),!.
-is_bc_body(P):- notrace(bwc==P ; (compound(P),arg(1,P,E),is_bc_body(E))),!.
-is_action_body(P):- notrace(wac==P ; (compound(P),arg(1,P,E),is_action_body(E))),!.
+is_fc_body(P):-cwc, notrace(fwc==P ; (compound(P),arg(1,P,E),is_fc_body(E))),!.
+is_bc_body(P):-cwc, notrace(bwc==P ; (compound(P),arg(1,P,E),is_bc_body(E))),!.
+is_action_body(P):-cwc, notrace(wac==P ; (compound(P),arg(1,P,E),is_action_body(E))),!.
 
 
 :-dynamic(use_presently/0).

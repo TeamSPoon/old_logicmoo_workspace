@@ -9,7 +9,6 @@
 */
 
 :-module(mud_telnet, [                  
-                  do_agent_action/1,
                   connect_player/2,
                   look_brief/1,
                   cmdShowRoomGrid/1,
@@ -18,9 +17,10 @@
                   telnet_repl_writer/4,
                   telnet_repl_obj_to_string/3,
                   start_mud_telnet/1,
-                  run_local_tty/0,
+                  run_local_tty_io/0,
                   login_and_run/0,
                   login_and_run_tty/0,
+                  do_local_tty_io/0,
                   set_player_telnet_options/0,
                   register_player_stream_local/1,
                   login_and_run_nodebug/0]).
@@ -67,15 +67,14 @@ login_and_run:-
 player_connect_menu:-
    prolog_must_l([foc_current_agent(WantsPlayer),
    connect_player(WantsPlayer,P),
-   foc_current_agent(P),
-   call_agent_command(P,actLook)]),!.
+   agent_call_command_now(P,actLook)]),!.
 
 connect_player(Wants,Gets):-
  prolog_must_l([
    foc_current_agent(Wants),
    % sets some IO functions
    once((register_player_stream_local(Wants),
-     current_agent(Gets)))]).
+     current_agent(Gets))),register_player_stream_local(Gets)]).
 
 login_and_run_tty:-    
    must(set_tty_control),!,
@@ -88,7 +87,7 @@ login_and_run_tty:-
     call_cleanup(
      % runs the Telnet REPL
      (must(set_player_telnet_options),
-     must(login_and_run_tty_io)),  
+     must(run_local_tty_io)),
      must(goodbye_player))).
 
 
@@ -100,27 +99,36 @@ set_player_telnet_options:-
 
 goodbye_player:- 
      foc_current_agent(P3),
-     fmt('~n~nGoodbye ~w! ~n',[P3]),
-     retractall(thglobal:global_session_agent(_,P3)).
+     deliver_event(P3,goodBye(P3)).
 
 
 reset_wants_logout:- get_session_id(O),retractall(thlocal:wants_logout(O)).
 
-login_and_run_tty_io :-
+run_local_tty_io :-     
     reset_wants_logout,
-    start_agent_action_thread,
-    foc_current_agent(P),get_session_id(O),thread_self(Id),
-    with_no_assertions(thglobal:use_cyc_database,
-     with_no_assertions(thlocal:useOnlyExternalDBs, 
-      with_assertions(thlocal:session_agent(O,P),
-        ((repeat,
-          once(run_local_tty),
+     repeat,     
+         once(do_local_tty_io),
           retract(thlocal:wants_logout(O)),
-        retractall(thglobal:agent_message_stream(P,Id,_,_))))))),!.
+        retractall(thglobal:session_io(_,_,_,Id)),
+        retractall(thglobal:session_io(O,_,_,_)),!.
 
-:-export(set_console_attached/0).
-set_console_attached:-
-  thread_self(Id),current_input(In),current_output(Out),
+do_local_tty_io:-
+  start_agent_action_thread,
+  get_session_id(O),foc_current_agent(P),
+  register_player_stream_local(P), 
+  must(ignore(look_brief(P))),!,         
+  sformat(S,'~w> ',[P]),prompt_read_telnet(S,List),!,
+  enqueue_agent_action(P,List,O).
+
+
+:-export(register_player_stream_local/1).
+register_player_stream_local(P):-
+   get_session_id(O),current_output(Out),current_input(In),thread_self(Id),
+   retractall(thglobal:session_io(_,_,_,Id)),
+   retractall(thglobal:session_io(O,_,_,_)),
+   asserta_new(thglobal:session_io(O,In,Out,Id)),
+   asserta_new(thglobal:session_agent(O,P)),
+   asserta_new(thglobal:agent_session(P,O)), 
     (thread_self(main)->get_main_thread_error_stream(Err); Err=Out),
      (thread_util:has_console(Id,In, Out,Err)->true;
        ((retractall(thread_util:has_console(Id,_,_,_)),
@@ -130,7 +138,6 @@ set_console_attached:-
 set_tty_control:- 
   ignore((logOnFailure((
    colormsg(red,"this is red!"),
-   set_console_attached,
    set_prolog_flag(color_term,true),
    set_stream(user_output, tty(true)),
    set_stream(user_error, tty(true)),
@@ -139,27 +146,10 @@ set_tty_control:-
    colormsg(green,"this is green!"))))),!.
 
 
-register_player_stream_local(P):-  
-  current_input(In),current_output(Out),
-  thread_self(Id),
-  set_player_stream(P,Id,In,Out).
-
-set_player_stream(P,Id,In,Out):-
-  % foc_current_agent(P),
-   (thglobal:agent_message_stream(P,Id,In,Out)->true;
-      ((retractall(thglobal:agent_message_stream(P,Id,_,_)),
-     assert(thglobal:agent_message_stream(P,Id,In,Out))))).
    
 
-
-run_local_tty:-
-  repeat,
-  start_agent_action_thread,
-   foc_current_agent(P),
-   register_player_stream_local(P),
-         must(ignore(look_brief(P))),!,         
-           sformat(S,'~w> ',[P]),prompt_read_telnet(S,List),
-            must(once(pfc_add(agent_action_queue(P,List)))),!.
+user:deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
+      foreach(get_agent_sessions(A,O),foreach(thglobal:session_io(O,In,Out,Id),fmt(Out,'~N~q.~n',[NewEvent]))).
 
 
 :-export(prompt_read/2).
@@ -175,7 +165,6 @@ prompt_read(Prompt,Atom):-
 
 read_code_list_or_next_command(Atom):-current_input(In),read_code_list_or_next_command(In,Atom),!.
 
-read_code_list_or_next_command(In,Atom):- must(thglobal:agent_message_stream(P,_,In,_)),retract(thglobal:player_command_stack(P,Atom)),fmt(thglobal:player_command_stack(P,Atom)),!.
 read_code_list_or_next_command(In,end_of_file):- at_end_of_stream(In),!.
 read_code_list_or_next_command(In,Atom):- 
  (var(In)->current_input(In);true), catchv(wait_for_input([In], Ready, 1),_,fail),!,  member(In,Ready),
@@ -203,27 +192,10 @@ tick_tock:-
 scan_src_updates:- !.
 scan_src_updates:- ignore((thread_self(main),ignore((catch(make,E,dmsg(E)))))).
 
-% ===========================================================
-% USES PACKRAT PARSER 
-% ===========================================================
-
-:-export(do_agent_action/1).
-do_agent_action(VA):- debug, foc_current_agent(Agent),!, do_agent_action(Agent,VA),!.
-
-:-export(do_agent_action/2).
-do_agent_action(Agent,CMD):-var(CMD),!,fmt('unknown_var_command(~q,~q).',[Agent,CMD]).
-do_agent_action(_,EOF):- end_of_file == EOF, !, tick_tock.
-do_agent_action(_,''):-!, tick_tock.
-do_agent_action(Agent,CMD):- call_agent_command(Agent, CMD),!.
-do_agent_action(Agent,CMD):-fmt('skipping_unknown_player_action(~q,~q).~n',[Agent,CMD]),!,fail.
-
 
 % ===========================================================
 % DEFAULT TELNET "LOOK"
 % ===========================================================
-look_brief(Agent):- prop(Agent,mudLastCommand,X),nonvar(X),functor(X,actLook,_),!.
-look_brief(Agent):- not(prop(Agent,mudNeedsLook,vTrue)),!.
-look_brief(Agent):- must(prop(Agent,mudNeedsLook,vTrue)),look_as(Agent),!.
 
 telnet_repl_writer(_TL,call,ftTerm,Goal):-!,ignore(debugOnError(Goal)).
 telnet_repl_writer( TL,text,Type,[V]):-telnet_repl_writer(TL,text,Type,V).
@@ -234,6 +206,14 @@ telnet_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('~q=
 telnet_repl_obj_to_string(O,_TypeHint,O):-!.
 telnet_repl_obj_to_string(O,_TypeHint,S):- must(object_string(O,S)),!.
 telnet_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=s).
+
+
+% ===========================================================
+% DEFAULT TEXT
+% ===========================================================
+look_brief(Agent):- prop(Agent,mudLastCommand,X),nonvar(X),functor(X,actLook,_),!.
+look_brief(Agent):- not(prop(Agent,mudNeedsLook,vTrue)),!.
+look_brief(Agent):- must(prop(Agent,mudNeedsLook,vTrue)),look_as(Agent),!.
 
 merge_elements(V,V):-not(is_list((V))),!.
 merge_elements([],[]):-!.
@@ -545,6 +525,7 @@ call_pred(Call, Options) :-
 	).
 
 
-:- source_location(S,_),forall(source_file(H,S),( \+predicate_property(H,built_in), functor(H,F,A),module_transparent(F/A),export(F/A))).
+:- source_location(S,_),forall(source_file(H,S),ignore((  \+ (predicate_property(H,PP),member(PP,[(multifile),built_in])),  
+ functor(H,F,A),module_transparent(F/A),export(F/A)))).
   
 :- include(prologmud(mud_footer)).

@@ -27,28 +27,9 @@ atlocNear0(Whom,Where):-mudNearbyLocs(Where,LOC),is_asserted(mudAtLoc(Whom,LOC))
 
 
 :-export(raise_location_event/2).
-raise_location_event(Where,Event):- forall(no_repeats(Whom,(tAgent(Whom),mudObjNearLoc(Whom,Where))),doall(call_no_cuts(user:deliver_event(Whom,Event)))).
+raise_location_event(Where,Event):- forall(no_repeats(Whom,(no_repeats(tAgent(Whom)),mudObjNearLoc(Whom,Where))),deliver_event(Whom,Event)).
+deliver_event(Whom,Event):-doall(call_no_cuts(user:deliver_event_hooks(Whom,Event))).
 
-
-user:deliver_event(Whom,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,Whom,you,NewEvent),to_agent_io(Whom,NewEvent),!.
-
-to_agent_io(Whom,NewEvent):- 
-  once(user:provide_agent_delivery_callback(Whom,_)), % anyone listening?
-   forall(user:provide_agent_delivery_callback(Whom,Pred),call(Pred,Who,NewEvent)).
-to_agent_io(_Whom,_NewEvent):-!.
-%todo allow NPC queuing of ..  
-to_agent_io(Whom,NewEvent):- dmsg(could_not(to_agent_io(Whom,NewEvent))).
-
-
-
-user:provide_agent_delivery_callback(Whom,Pred):- get_agent_stream(Whom,Session,Output),
-    Pred = 
-     pfc_lambda([Whom,NewEvent],with_assertions(thlocal:session_agent(Session,Whom),ignoreOnError((with_output_to_stream(Output,fmt(NewEvent)))))).
-
-
-%%:-export(to_agent_io/2).
-get_agent_stream(Whom,Input,Output):- thglobal:agent_message_stream(Whom,_,Input,Output),is_stream(Input),is_stream(Output),!.
-get_agent_stream(Whom,_Input,_Output):-ignore(retract(thglobal:agent_message_stream(Whom,_,_,_))),!,fail.
 
 :-export(mudDeliverableLocationEvents/3).
 :-dynamic(mudDeliverableLocationEvents/3).

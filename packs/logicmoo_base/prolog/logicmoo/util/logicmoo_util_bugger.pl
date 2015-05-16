@@ -3109,8 +3109,8 @@ call_no_cuts((A,B)):-!,(call_no_cuts(A),call_no_cuts(B)).
 call_no_cuts((A;B)):-!,(call_no_cuts(A);call_no_cuts(B)).
 call_no_cuts((A->B)):-!,(call_no_cuts(A)->call_no_cuts(B)).
 call_no_cuts((A->B;C)):-!,(call_no_cuts(A)->call_no_cuts(B);call_no_cuts(C)).
-call_no_cuts(M:CALL):-atom(M),!,functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(C,_))))),!,clause_safe(CALL,TEST),call(TEST).
-call_no_cuts(CALL):-functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(C,_))))),!,clause_safe(CALL,TEST),call(TEST).
+call_no_cuts(M:CALL):-atom(M),!,functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(C,_))))),!,clause_safe(CALL,TEST),debugOnError(TEST).
+call_no_cuts(CALL):-functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(C,_))))),!,clause_safe(CALL,TEST),debugOnError(TEST).
 
 /*
 :- meta_predicate call_no_cuts_loop_checked(0).

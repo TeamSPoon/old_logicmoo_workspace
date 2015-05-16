@@ -44,7 +44,7 @@ rescan_mpred_loaded_pass2:- ignore((thglobal:after_mpred_load, loop_check(call_a
 % Agenda system - standard database
 % ================================================
 
-time_tick(Time,Pred):- repeat,sleep(Time),doall(logOnError(call_no_cuts(Pred))),fail.
+time_tick(Time,Pred):- repeat,sleep(Time),once(doall(logOnError(call_no_cuts(Pred)))),fail.
 
 user:hook_one_second_timer_tick.
 
@@ -53,7 +53,7 @@ pfc_one_second_timer:- repeat,time_tick(1.0,user:hook_one_second_timer_tick),fai
 
 user:hook_one_minute_timer_tick.
 
-pfc_one_minute_timer:- repeat,time_tick(60.0,user:hook_one_minute_timer_tick),fail.
+pfc_one_minute_timer:- repeat,sleep(600.0),time_tick(60.0,user:hook_one_minute_timer_tick),fail.
 :-thread_property(X,alias(pfc_one_minute_timer))-> true ; thread_create(pfc_one_minute_timer,_,[alias(pfc_one_minute_timer)]).
 
 
@@ -74,10 +74,11 @@ agenda_do_prequery:- loop_check(agenda_rescan_mpred_ops,true),!.
 % agenda_slow_op_restart:-!.
 agenda_slow_op_restart:-doing_agenda_slow_op,!.
 agenda_slow_op_restart:-
- asserta(doing_agenda_slow_op),
- call_cleanup((
- loop_check(forall(user:agenda_slow_op_todo(Slow),
-  with_no_assertions(thlocal:side_effect_ok,((must((is_callable(Slow),must(Slow),ignore(retract(user:agenda_slow_op_todo(Slow))))))))),true)),retract(doing_agenda_slow_op)),!.
+ with_assertions(doing_agenda_slow_op,
+  forall(user:agenda_slow_op_todo(Slow),
+    with_no_assertions(thlocal:side_effect_ok,
+      ((copy_term(Slow,CopySlow),
+          must((is_callable(Slow),must(Slow),ignore(retract(user:agenda_slow_op_todo(CopySlow)))))))))).
 
 :-export(agenda_rescan_mpred_ops/0).
 agenda_rescan_mpred_ops:- test_tl(agenda_suspend_scans),!.
@@ -89,6 +90,7 @@ agenda_rescan_for_module_ready:- with_assertions(thlocal:in_agenda_rescan_for_mo
 
 :-export(agenda_slow_op_todo/1).
 :-dynamic(agenda_slow_op_todo/1).
+user:agenda_slow_op_enqueue(_):-!.
 user:agenda_slow_op_enqueue(Slow):- test_tl(agenda_slow_op_do_prereqs),!,debugOnError(Slow).
 user:agenda_slow_op_enqueue(Slow):- assertz_if_new(agenda_slow_op_todo(Slow)),!.
 

@@ -308,7 +308,7 @@
 % DYN FOR CODE
 :- dynamic_multifile_exported thglobal:after_mpred_load/0.
 :- dynamic_multifile_exported thglobal:use_cyc_database/0.
-:- dynamic_multifile_exported thglobal:global_session_agent/2.
+:- dynamic_multifile_exported thglobal:agent_session/2.
 
 :- dynamic_multifile_exported user:fact_is_false/2.
 :- dynamic_multifile_exported user:kbp_t_list_prehook/2.
@@ -331,8 +331,8 @@
 :- dynamic_multifile_exported deduceFromArgTypes/1.
 :- dynamic_multifile_exported prologSideEffects/1.
 
-:-dynamic agent_action_queue/2.
-:-multifile agent_action_queue/2.
+:-dynamic agent_action_queue/3.
+:-multifile agent_action_queue/3.
 
 % ================================================
 % Thread Locals
@@ -360,7 +360,6 @@
 :- thread_local thlocal:noDBaseHOOKS/1.
 :- thread_local thlocal:noDBaseMODs/1.
 :- thread_local thlocal:noRandomValues/1.
-:- thread_local thlocal:session_agent/2.
 :- thread_local thlocal:agenda_suspend_scans/0.
 :- thread_local thlocal:tracing80/0.
 :- thread_local thlocal:useAltPOS/0.
@@ -368,6 +367,9 @@
 :- thread_local thlocal:usePlTalk/0.
 :- thread_local thlocal:with_callMPred/1.
 :- thread_local thlocal:assert_op_override/1.
+
+:- dynamic   thglobal:session_io/4, thglobal:session_agent/2, thglobal:agent_session/2, user:telnet_fmt_shown/3, user:agent_action_queue/3.
+:- multifile thglobal:session_io/4, thglobal:session_agent/2, thglobal:agent_session/2, user:telnet_fmt_shown/3, user:agent_action_queue/3.
 
 :- dynamic_multifile_exported(thglobal:use_cyc_database/0).
 :- thread_local(thlocal:already_in_file_term_expansion/0).

@@ -122,7 +122,7 @@ disjointWith(ttSpatialType,ttAbstractType).
 
 genls(tPartofObj,tItem).
 
-
+tSet(tPlayer).
 
 % dividesBetween(tItem,tPathway).
 dividesBetween(tObj,tItem,tAgent).
@@ -161,7 +161,7 @@ dividesBetween(tAgent,tPlayer,tNpcPlayer).
 => tCol(ttSpatialType).
 => tCol(ttFormatType).
 => tCol(functorDeclares).
-% tCol(ArgsIsa):-mpred_hooks:mpred_is_trigger(ArgsIsa).
+% tCol(ArgsIsa):-user:mpred_is_trigger(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
 => tCol(ttFormatType).
@@ -205,9 +205,11 @@ genls(completelyAssertedCollection,tCol).
 completelyAssertedCollection(tItem).
 completelyAssertedCollection(tRegion).
 completelyAssertedCollection(tObj).
+% :-rtrace.
 completelyAssertedCollection(tAgent).
 completelyAssertedCollection(tCarryAble).
 completelyAssertedCollection(vtVerb).
+% :-rnotrace.
 
 genls(ttTypeByAction,completelyAssertedCollection).
 
@@ -366,8 +368,8 @@ vtValue(Val)/(atom(Val),i_name_lc(Val,KW))=>mudKeyword(Val,KW).
 
 ttPredAndValueType(Str)/(i_name('mud',Str,Pred),i_name('vt',Str,VT)) => (tRolePredicate(Pred),ttValueType(VT),mudKeyword(VT,Str),mudKeyword(Pred,Str),argIsa(Pred,2,VT),argIsa(Pred,1,tTemporalThing)).
 
-relationMostInstance(arg1Isa,tRolePredicate,tTemporaThing).
-relationMostInstance(arg2QuotedIsa,tRolePredicate,ftValue).
+relationMostInstance(arg1Isa,tRolePredicate,tTemporalThing).
+relationMostInstance(arg2QuotedIsa,tRolePredicate,ftTerm).
 
 mudKeyword(W,R) <= {atom(W),i_name_lc(W,R)}.
 

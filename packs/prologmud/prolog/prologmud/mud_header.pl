@@ -13,15 +13,16 @@
 :-dynamic(user:irc_event_hooks/3).
 :-multifile(user:irc_event_hooks/3).
 
-:-dynamic(user:deliver_event/2).
-:-multifile(user:deliver_event/2).
+:-dynamic(user:deliver_event_hooks/2).
+:-multifile(user:deliver_event_hooks/2).
 
-:- dynamic_multifile_exported user:irc_user_plays/2.
+:- dynamic_multifile_exported user:irc_user_plays/3.
 
 :- thread_local thlocal:wants_logout/1.
 :- multifile thlocal:wants_logout/1.
-:- dynamic thglobal:agent_message_stream/4, telnet_fmt_shown/3, thglobal:player_command_stack/2.
-:- multifile thglobal:agent_message_stream/4, telnet_fmt_shown/3, thglobal:player_command_stack/2.
+
+:- dynamic   thglobal:session_io/4, thglobal:session_agent/2, thglobal:agent_session/2, user:telnet_fmt_shown/3, user:agent_action_queue/3.
+:- multifile thglobal:session_io/4, thglobal:session_agent/2, thglobal:agent_session/2, user:telnet_fmt_shown/3, user:agent_action_queue/3.
 
 :- dynamic_multifile_exported user:term_specifier_text/2.
 :- dynamic_multifile_exported user:type_action_info/3.
@@ -47,10 +48,10 @@
 
 
 
-:-op(0,fx,('disabled')).
-:-op(0,fx,('enabled')).
-:-op(0,fy,('disabled')).
-:-op(0,fy,('enabled')).
+:-op(0,fx,user:('disabled')).
+:-op(0,fx,user:('enabled')).
+:-op(0,fy,user:('disabled')).
+:-op(0,fy,user:('enabled')).
 :- '@'(ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),user).
 
 :-dynamic_multifile_exported(user_db:grant_openid_server/2).
@@ -74,12 +75,12 @@
 :- style_check(-singleton).
 
 
-:-op(1190,fx,(disabled)).
-:-op(1190,fx,(enabled)).
-:-op(1190,fy,(disabled)).
-:-op(1190,fy,(enabled)).
-:-op(1120,fx,(export)).
-:-op(1120,fx,(dynamic_multifile_exported)).
+:-op(1190,fx,user:(disabled)).
+:-op(1190,fx,user:(enabled)).
+:-op(1190,fy,user:(disabled)).
+:-op(1190,fy,user:(enabled)).
+:-op(1120,fx,user:(export)).
+:-op(1120,fx,user:(dynamic_multifile_exported)).
 
 :- set_prolog_flag(double_quotes, atom).
 :- set_prolog_flag(double_quotes, string). 
@@ -90,8 +91,8 @@
 
 :- multifile(mpred_online:semweb_startup).
 
-:-dynamic(tChannel/1).
-:-multifile(tChannel/1).
+:-dynamic(user:tChannel/1).
+:-multifile(user:tChannel/1).
 
 
 
@@ -110,7 +111,7 @@
 
 % HOOKS
 :- multifile user:decl_coerce/3.
-:- multifile mpred_hooks:listen_to_ops/2.
+:- multifile user:listen_to_ops/2.
 :- multifile user:deduce_facts/2.
 :- multifile user:default_type_props/3.
 :- multifile user:fact_always_true/1.
@@ -130,7 +131,7 @@
 :- multifile user:now_unused/1.
 :- multifile user:provide_mpred_read_attributes/3.
 :- multifile user:provide_mpred_setup/4.
-:- multifile mpred_hooks:provide_mpred_clauses/3.
+:- multifile user:provide_mpred_clauses/3.
 :- multifile user:provide_mpred_op/2.
 :- multifile user:provide_mpred_write_attributes/2.
 
@@ -140,7 +141,6 @@
 % DYN FOR CODE
 :- dynamic_multifile_exported thglobal:after_mpred_load/0.
 :- dynamic_multifile_exported thglobal:use_cyc_database/0.
-:- dynamic_multifile_exported thglobal:global_session_agent/2.
 
 :- dynamic_multifile_exported user:fact_is_false/2.
 :- dynamic_multifile_exported user:kbp_t_list_prehook/2.
@@ -152,7 +152,7 @@
 :- dynamic_multifile_exported user:is_mpred_prop/2.
 %:- dynamic_multifile_exported user:hasInstance_dyn/2.
 :- dynamic_multifile_exported user:arity/2.
-:- dynamic_multifile_exported mpred_hooks:mpred_prop/2.
+:- dynamic_multifile_exported user:mpred_prop/2.
 :- dynamic_multifile_exported user:'<=>'/2.
 % :- dynamic_multifile_exported user:ruleForward/2.
 :- dynamic_multifile_exported user:ruleRewrite/2.

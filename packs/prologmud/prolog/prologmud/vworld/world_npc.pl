@@ -38,7 +38,7 @@ npc_tick:-
 join_npcs_long_running.
 
 % skip manually controled agents
-npc_controller(simple_world_agent_plan,Who):- isa(Who,tAgent),not(thglobal:agent_message_stream(Who,_,_,_)).
+npc_controller(simple_world_agent_plan,Who):- no_repeats(tAgent(Who)), \+ has_tty(Who).
 
 tick_controller(simple_world_agent_plan,Who):- command_actTick(Who).
 
@@ -61,7 +61,7 @@ move_or_sit_memory_idea(Agent,actSit,_) :-
 command_actTick(Who):- (side_effect_prone),
    ignore(current_agent(Who)),
    must(nonvar(Who)),
-   with_current_agent(Who,
+   with_agent(Who,
      must_det_l((
       show_call_failure(current_agent(Who)),
       command_actIdea(Who,IdeaS),
@@ -70,11 +70,11 @@ command_actTick(Who):- (side_effect_prone),
 
 
  
-get_world_agent_plan(W,Who,Idea):-with_current_agent(Who,call_no_cuts(world_agent_plan(W,Who,Idea))).
+get_world_agent_plan(W,Who,Idea):-with_agent(Who,call_no_cuts(world_agent_plan(W,Who,Idea))).
 
 do_agent_call_plan_command(A,C):- thlocal:agent_current_action(A,CC),dmsg(too_busy(CC,agent_call_plan_command(A,C))),!.
 do_agent_call_plan_command(A,C):-   
-   with_current_agent(A,with_assertions(thlocal:agent_current_action(A,C), call_agent_command(A,C))).
+   with_agent(A,with_assertions(thlocal:agent_current_action(A,C), agent_call_command_unparsed(A,C))).
 
 
 command_actIdea(Who,IdeaS):- nonvar(Who),

@@ -62,16 +62,14 @@ user:agent_call_command(Agent,actLook("here")):- look_as(Agent),!.
 user:agent_call_command(Agent,actLook(_,"here")):- look_as(Agent),!.
 user:agent_call_command(Agent,actLook(DirS,"self")):- coerce(DirS,vtDirection,Dir),!,
    view_dirs(Agent,[[Dir,vHere],[Dir,Dir],[Dir,Dir,vAdjacent]],Percepts),
-   forall_member(P,Percepts,call_agent_action(Agent,actExamine(P))).
+   forall_member(P,Percepts,agent_call_command_now(Agent,actExamine(P))).
 user:agent_call_command(Agent,actLook(_Dir,SObj)):-
    objects_match_for_agent(Agent,SObj,tObj,Percepts),
-   forall_member(P,Percepts,call_agent_action(Agent,actExamine(P))).
+   forall_member(P,Percepts,agent_call_command_now(Agent,actExamine(P))).
 
 :-export(look_as/1).
-look_as(Agent):-
-   get_session_id(O),
-   with_assertions(thlocal:session_agent(O,Agent),
-        must((mudAtLoc(Agent,LOC),cmdLook(Agent,LOC)))),!.
+look_as(Agent):- mudAtLoc(Agent,LOC),
+   with_agent(Agent, cmdLook(Agent,LOC)),!.
 
 
 :-export(cmdLook/2).

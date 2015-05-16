@@ -475,7 +475,7 @@ pfc_file_module_term_expansion_2(How,INFO,F,M,AA,BBB,BBBO):-
 
 xfile_load_form(How,M,P,O):- with_assertions(thlocal:already_in_file_term_expansion, ((pfc_file_expansion(P,C),P\=@=C,O=(:- user:(C))))),!.
 
-mpred_hooks:provide_mpred_clauses(H,B,(What)):- !.
+user:provide_mpred_clauses(H,B,(What)):- !.
 
 pfc_implode_varnames([]):-!.
 pfc_implode_varnames([N=V|Vs]):-V='$VAR'(N),pfc_implode_varnames(Vs),!.
@@ -591,9 +591,9 @@ make_dynamic(C):- compound(C),get_functor(C,F,A),
   must((predicate_property(P,dynamic))).
 
 
-pfc_file_expansion_1((H:-Chain,B),(H=>{B})):- is_action_body(Chain),must(atom(Chain)),make_dynamic(H).
-pfc_file_expansion_1((H:-Chain,B),(B=>H)):- is_fc_body(Chain),must(atom(Chain)),make_dynamic(H).
-pfc_file_expansion_1((H:-Chain,B),(H<=B)):- is_bc_body(Chain),must(atom(Chain)),make_dynamic(H).
+pfc_file_expansion_1((H:-Chain,B),(H=>{(Chain,B)})):-cwc, is_action_body(Chain),make_dynamic(H).
+pfc_file_expansion_1((H:-Chain,B),((Chain,B)=>H)):-cwc, is_fc_body(Chain),make_dynamic(H).
+pfc_file_expansion_1((H:-Chain,B),(H<=(Chain,B))):-cwc, is_bc_body(Chain),make_dynamic(H).
 
 
 pfc_expand_in_file_anyways(F):- pfc_using_file(F),must(loading_module(M);source_module(M)), (M=user; \+ pfc_skipped_module(M)),!.
@@ -616,7 +616,10 @@ pfc_file_expansion(I,OO):- (I\=(:-(_))), I\= '$was_imported_kb_content$'(_,_),
 
 
 
+is_file_clause(I):-var(I),!,dmsg(var_file_clause(I)).
 is_file_clause(I):-compound(I),!.
+is_file_clause(I):- I== end_of_file,!,fail.
+is_file_clause(I):- I= :-(_),!,fail.
 is_file_clause(I):- dmsg(file_clause(I)).
 
 :- multifile(user:term_expansion/2).

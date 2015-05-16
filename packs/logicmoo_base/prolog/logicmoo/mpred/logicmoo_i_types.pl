@@ -301,6 +301,7 @@ isa(I,T):- cwc, (nonvar(T)->true;((no_repeats(ttTemporalType(T);tSet(T);tCol(T))
 %a(P,F):-loop_check(isa(F,P)).
 %a(T,I):- thglobal:pfcManageHybrids,clause_safe(isa(I,T),true).
 :-export(isa_backchaing/2).
+
 isa_backchaing(I,T):- no_repeats(loop_check(isa_backchaing_0(I,T))).
 
 :-export(isa_backchaing_0/2).

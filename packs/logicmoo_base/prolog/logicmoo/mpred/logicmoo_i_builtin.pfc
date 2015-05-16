@@ -1076,10 +1076,9 @@ makeArgConstraint('SometimesIsa',tCol).
 
 
 
-
 end_of_file.
 
-
+:-trace.
 sane_transitivity(_PredInfo,I,Sub,Super):-  
 % (I=Super->trace_or_throw(sane_transitivity(PredInfo,I,Sub,Super));true),
 %  sanity(I=Sub->trace_or_throw(sane_transitivity(PredInfo,I,Sub,Super));true),

@@ -167,7 +167,7 @@ PrologMUD.vpj=20150503193724685
     + MUD_DeepParsing
       - prolog
         + chat80
-        - CURT
+        + CURT
     + MUD_DLog
       + CVSROOT
       - dlog-benchmark
@@ -213,7 +213,7 @@ PrologMUD.vpj=20150503193724685
           + test
           + unfold
         + test
-    - MUD_ircbot
+    + MUD_ircbot
       - eggdrop
       - prolog
     + MUD_KnowRob
@@ -682,7 +682,7 @@ PrologMUD.vpj=20150503193724685
       + util
     + OLD_logicm00
       + btepisode
-      - src_data
+      + src_data
         - pldata
       + src_incoming
         - planner
@@ -732,7 +732,7 @@ PrologMUD.vpj=20150503193724685
             + continuos
             + socket_udp
       - src_modules
-        + aleph
+        - aleph
         + candc
           + working
         + circlemuddata
@@ -1321,7 +1321,242 @@ PrologMUD.vpj=20150503193724685
             + styles
           + render
           + tutorials
-  - games
+    + www.ling.gu.se
+      - projekt
+        + siridus
+          + About_SIRIDUS
+          + Annual_Report
+          + Contact
+          + Partners
+          + Partners_Pages
+          + Publications
+          + Showcase
+          + updateconsultants
+        - talk
+          + meetings
+            + 040820
+          + presentations
+            + Edinburgh-oct04
+          + reports
+            + internal_reports
+              + code
+              + LaTeX
+              + reports
+              + T1.6s1
+                + LaTeX
+                + xxx
+          - software
+            - code
+              + borg
+              + dbaseAgent
+                + docs
+                  + resources
+                + src
+              + festivalAgent
+                + src
+              + freeTTSAgent
+                + licenses
+                + src
+              + icalAgent
+                + docs
+                  + resources
+                + icsFiles
+                + src
+              + jlGuiAgent
+                + doc
+                + src
+              + jlGuiAgent1.1
+                + doc
+                + lib
+                + src
+                  + se
+                    + gu
+                      + ling
+                        + trindikit
+                          + oaa
+                            + common
+                  + tmp
+                + tmp
+                  + se
+                    + gu
+                      + ling
+                        + trindikit
+                          + oaa
+                            + common
+              + sphinx4Agent
+                + config
+                  + digits
+                  + film
+                  + hello
+                  + hellongram
+                  + video
+                + javadoc
+                  + resources
+                + src
+              + TALK_enhanced_grammar_lib
+                + Agenda
+                + Common
+                + MP3
+                + OWL
+                + Tram
+              - TALK_unimodal_grammar_lib
+                + delux
+                  + Grammars
+                  + Resources
+                - djgodis
+                  + Grammars
+                  + Resources
+                + GF_GoDiS
+                  + Core
+                    + CVS
+                    + Shared
+                      + CVS
+                    + System
+                      + CVS
+                    + User
+                      + CVS
+                  + CVS
+                  + Domain
+                    + AgendaTalk
+                      + CVS
+                      + Shared
+                        + CVS
+                      + System
+                        + CVS
+                      + User
+                        + CVS
+                    + CVS
+                    + deLux
+                      + CVS
+                      + Shared
+                        + CVS
+                      + System
+                        + CVS
+                      + User
+                        + CVS
+                    + DJGoDiS
+                      + CVS
+                      + Shared
+                        + CVS
+                      + System
+                        + CVS
+                      + User
+                        + CVS
+                    + VideoGoDiS
+                      + CVS
+                      + Shared
+                        + CVS
+                      + System
+                        + CVS
+                      + User
+                        + CVS
+                  + Resource
+                    + CVS
+                    + Events_Locations
+                      + CVS
+                    + Home
+                      + CVS
+                      + old
+                        + CVS
+                    + Media
+                      + CVS
+                      + English
+                        + CVS
+                        + old
+                          + CVS
+                      + Swedish
+                        + CVS
+                        + old
+                          + CVS
+                    + Numbers
+                      + CVS
+                    + Time
+                      + CVS
+                + godis
+                  + CVS
+                  + doc
+                    + CVS
+                    + LaTeX
+                      + CVS
+                  + general
+                    + CVS
+                  + godis-all
+                    + CVS
+                    + rule_libs
+                      + CVS
+                  + godis-aod
+                    + CVS
+                  + godis-basic
+                    + CVS
+                  + godis-grounding
+                    + CVS
+                  + godis-iod
+                    + CVS
+                + jars
+                + tkit_inout_nuance
+                  + logs
+                + tkit_inout_text
+                + trindikit4
+                  + core
+                    + CVS
+                    + prolog
+                      + CVS
+                      + Datatypes
+                        + CVS
+                      + DefaultPrinters
+                        + CVS
+                        + latex
+                          + CVS
+                        + text
+                          + CVS
+                        + xml
+                          + CVS
+                      + Modules
+                        + CVS
+                  + CVS
+                  + examples
+                    + CVS
+                    + godis-basic
+                      + Agents
+                        + CVS
+                      + CVS
+                      + datatypes
+                        + CVS
+                      + modules
+                        + CVS
+                      + resource_interfaces
+                        + CVS
+                      + resources
+                        + CVS
+                      + TISdefs
+                        + CVS
+              + tkit_oaa
+              + TkitAlarmAgent
+                + src
+            + reports
+        + trindi
+          + ESSLLI-slides
+          + images
+          + private
+            + deliverables
+              + D1.1
+              + D1.2
+              + D1.3
+              + D2.1
+              + D2.2
+              + D3.1
+              + D3.2
+              + D3.3
+              + D4.1
+              + D4.2
+              + D5.1
+              + D5.2
+          + reports
+            + annual-report98
+            + annual-report99
+          + trindikit
+            + images
+  + games
     - src_game_nani
       + web
         + css
@@ -1346,7 +1581,7 @@ PrologMUD.vpj=20150503193724685
         + prolog
         + snd
     - src_game_wumpus
-  - packs
+  + packs
     + games
       - src_game_nani
         + web
@@ -1372,13 +1607,13 @@ PrologMUD.vpj=20150503193724685
           + prolog
           + snd
       - src_game_wumpus
-    + logicmoo_base
+    - logicmoo_base
       - prolog
         - logicmoo
           - mpred
-          + util
+          - util
       + t
-    - logicmoo_engine
+    + logicmoo_engine
       - prolog
         - logicmoo
           - engine
@@ -1436,7 +1671,7 @@ PrologMUD.vpj=20150503193724685
             - render
     - prologmud
       - prolog
-        + prologmud
+        - prologmud
           + actions
           - mobs
             - affordance
@@ -1467,7 +1702,7 @@ PrologMUD.vpj=20150503193724685
         + model
         - mudconsole
     + ref_unused
-  - prolog
+  + prolog
     - prologmud
       + actions
       + mobs
@@ -1477,7 +1712,7 @@ PrologMUD.vpj=20150503193724685
       + parsing
       - server
       - vworld
-  - runtime
+  + runtime
     + config-enabled
     + RDF-store
   + \usr
@@ -1527,113 +1762,65 @@ PrologMUD.vpj=20150503193724685
               + swi
               + trace
               + xref
-scroll:24
+scroll:0
 [State]
-SCREEN: 1920 1080 88 88 1440 735 0 0 M 0 0 0 0 1608 644
+SCREEN: 1920 1080 486 226 1440 735 0 0 M 0 0 0 0 1351 644
 CWD: packs\logicmoo_engine\prolog\logicmoo\engine\mike
-BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_agent.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1269 CL=35 LE=0 CX=34 CY=36 WI=5 BI=38 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_header.pl"
+BUFFER: BN="externals\www.ling.gu.se\projekt\talk\software\code\TALK_unimodal_grammar_lib\djgodis\player_unimodal.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="prolog\prologmud\mud_header.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.916 CL=1 LE=0 CX=0 CY=22 WI=5 BI=42 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_telnet.pl"
+VIEW: LN=.3448 CL=9 LE=0 CX=8 CY=22 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\www.ling.gu.se\projekt\talk\software\code\TALK_unimodal_grammar_lib\delux\lamps_unimodal.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.931 CL=35 LE=0 CX=34 CY=30 WI=5 BI=32 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="prolog\prologmud\server\mud_irc.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.401 CL=34 LE=0 CX=33 CY=5 WI=5 BI=44 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\mike\howto.doc"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=45 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\mike\mikev203_swi.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=37 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\prologmud\prolog\prologmud\actions\look.pl"
+VIEW: LN=.769 CL=9 LE=0 CX=8 CY=24 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\OLD_logicm00\src_modules\database\logicmoo_pvw_actx_invokes.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2827 CL=17 LE=0 CX=16 CY=16 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="prolog\prologmud\server\mud_telnet.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=33 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="prolog\prologmud\vworld\world_agent.pl"
+VIEW: LN=.149 CL=37 LE=0 CX=36 CY=7 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\mud_header.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.10413 CL=30 LE=0 CX=29 CY=18 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_events.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1238 CL=33 LE=0 CX=32 CY=17 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_irc.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1208 CL=7 LE=0 CX=6 CY=33 WI=5 BI=40 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\prologmud\prolog\prologmud\mud_startup.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=616 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="games\src_game_nani\justin_ke.plmoo"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=39 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_ircbot\eggdrop\eggdrop.conf"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Config	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=41 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.599 CL=31 LE=0 CX=30 CY=18 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="externals\MUD_ircbot\prolog\eggdrop.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.3080 CL=1 LE=0 CX=0 CY=24 WI=5 BI=30 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1410 446 -1 -1 N  WF=0 WT=16 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\mike\howto.doc"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=182 BI=45 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1410 446 -1 -1 N  WF=0 WT=12 "Default Fixed Font,10,0,1"
-BUFFER: BN="prolog\prologmud\server\mud_irc.pl"
-VIEW: LN=.401 CL=34 LE=0 CX=33 CY=5 WI=178 BI=44 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1410 446 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_telnet.pl"
-VIEW: LN=.931 CL=35 LE=0 CX=34 CY=30 WI=148 BI=32 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1410 446 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_events.pl"
-VIEW: LN=.1593 CL=32 LE=0 CX=31 CY=23 WI=121 BI=28 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1410 446 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
-BUFFER: BN="prolog\prologmud\mud_header.pl"
-VIEW: LN=.916 CL=1 LE=0 CX=0 CY=24 WI=172 BI=42 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1410 446 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
-BUFFER: BN="prolog\prologmud\vworld\world_agent.pl"
-VIEW: LN=.10413 CL=30 LE=0 CX=29 CY=18 WI=169 BI=15 HT=0 HN=0 HF=0 HC=4
-WINDOW: 198 198 1410 446 -1 -1 N  WF=0 WT=15 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_irc.pl"
-VIEW: LN=.1208 CL=7 LE=0 CX=6 CY=33 WI=177 BI=40 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1410 446 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_ircbot\prolog\eggdrop.pl"
-VIEW: LN=.18119 CL=39 LE=0 CX=38 CY=28 WI=170 BI=30 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1410 446 -1 -1 N  WF=0 WT=13 "Default Fixed Font,10,0,1"
-BUFFER: BN="prolog\prologmud\server\mud_telnet.pl"
-VIEW: LN=.1004 CL=1 LE=0 CX=0 CY=23 WI=180 BI=33 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1410 446 -1 -1 N  WF=0 WT=14 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\prologmud\prolog\prologmud\mud_startup.pl"
-VIEW: LN=.12725 CL=47 LE=0 CX=46 CY=19 WI=106 BI=31 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1410 446 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_ircbot\eggdrop\eggdrop.conf"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=176 BI=41 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1410 446 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
-BUFFER: BN="games\src_game_nani\justin_ke.plmoo"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=174 BI=39 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1410 446 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\prologmud\prolog\prologmud\actions\look.pl"
-VIEW: LN=.2977 CL=1 LE=0 CX=0 CY=21 WI=120 BI=22 HT=0 HN=0 HF=0 HC=4
-WINDOW: 198 198 1410 446 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_header.pl"
-VIEW: LN=.9479 CL=51 LE=0 CX=50 CY=22 WI=125 BI=21 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1410 446 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.18885 CL=11 LE=0 CX=10 CY=18 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\www.ling.gu.se\projekt\talk\software\code\TALK_unimodal_grammar_lib\trindikit4\core\prolog\tkit_properties.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.822 CL=48 LE=0 CX=47 CY=17 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_agent.pl"
-VIEW: LN=.1269 CL=35 LE=0 CX=34 CY=18 WI=164 BI=38 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1410 446 -1 -1 M  WF=0 WT=1 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\mike\mikev203_swi.pl"
-VIEW: LN=.976 CL=61 LE=0 CX=60 CY=30 WI=184 BI=37 HT=0 HN=0 HF=0 HC=4
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1153 446 -1 -1 N  WF=0 WT=9 ",,,"
+BUFFER: BN="externals\www.ling.gu.se\projekt\talk\software\code\TALK_unimodal_grammar_lib\trindikit4\core\prolog\tkit_properties.pl"
+VIEW: LN=.822 CL=48 LE=0 CX=47 CY=17 WI=120 BI=16 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1153 446 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\www.ling.gu.se\projekt\talk\software\code\TALK_unimodal_grammar_lib\trindikit4\core\prolog\tkit_properties.pl"
+VIEW: LN=.822 CL=48 LE=0 CX=47 CY=17 WI=107 BI=16 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1153 446 -1 -1 N  WF=0 WT=8 ",,,"
+BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_agent.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=116 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1153 446 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\MUD_ircbot\prolog\eggdrop.pl"
+VIEW: LN=.18885 CL=11 LE=0 CX=10 CY=18 WI=115 BI=18 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1153 446 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\mud_header.pl"
+VIEW: LN=.599 CL=31 LE=0 CX=30 CY=18 WI=113 BI=19 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1153 446 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\OLD_logicm00\src_modules\database\logicmoo_pvw_actx_invokes.pl"
+VIEW: LN=.149 CL=37 LE=0 CX=36 CY=7 WI=110 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1153 446 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\www.ling.gu.se\projekt\talk\software\code\TALK_unimodal_grammar_lib\delux\lamps_unimodal.pl"
+VIEW: LN=.769 CL=9 LE=0 CX=8 CY=24 WI=106 BI=15 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1153 446 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\www.ling.gu.se\projekt\talk\software\code\TALK_unimodal_grammar_lib\djgodis\player_unimodal.pl"
+VIEW: LN=.3448 CL=9 LE=0 CX=8 CY=22 WI=108 BI=5 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1153 446 -1 -1 M  WF=0 WT=1 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_agent.pl"
+VIEW: LN=.9136 CL=84 LE=0 CX=83 CY=18 WI=128 BI=23 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-packs\prologmud\prolog\prologmud\server\mud_irc.pl
-prolog\prologmud\vworld\world_agent.pl
-packs\prologmud\prolog\prologmud\server\mud_telnet.pl
+externals\www.ling.gu.se\projekt\talk\software\code\TALK_unimodal_grammar_lib\djgodis\player_unimodal.pl
+externals\www.ling.gu.se\projekt\talk\software\code\TALK_unimodal_grammar_lib\delux\lamps_unimodal.pl
+externals\OLD_logicm00\src_modules\database\logicmoo_pvw_actx_invokes.pl
+externals\MUD_ircbot\prolog\eggdrop.pl
+packs\prologmud\prolog\prologmud\mud_header.pl
+externals\www.ling.gu.se\projekt\talk\software\code\TALK_unimodal_grammar_lib\trindikit4\core\prolog\tkit_properties.pl
 prolog\prologmud\mud_header.pl
-packs\prologmud\prolog\prologmud\vworld\world_events.pl
 prolog\prologmud\server\mud_irc.pl
-packs\logicmoo_engine\prolog\logicmoo\engine\mike\howto.doc
-packs\logicmoo_engine\prolog\logicmoo\engine\mike\mikev203.pl
-packs\logicmoo_engine\prolog\logicmoo\engine\mike\mikev203_swi.pl
+packs\prologmud\prolog\prologmud\vworld\world_agent.pl

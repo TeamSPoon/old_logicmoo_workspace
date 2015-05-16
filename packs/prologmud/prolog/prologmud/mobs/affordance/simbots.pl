@@ -67,7 +67,7 @@ defined_affordance([ subjType=tAgent, actionVerb= "LiveAtLeastAMinute",
    'Sad_To_Happy'= 0 * -2,
    'Comfort'= 0 * -2 ]).
 
-user:hook_one_minute_timer_tick:-forall(isa(X,tAgent),agent_call_command_now(X,actLiveAtLeastAMinute(X))).
+user:hook_one_minute_timer_tick:-forall(no_repeats(tAgent(X)),agent_call_command_now(X,actLiveAtLeastAMinute(X))).
 
 defined_affordance([subjType= "Shower",
 actionVerb= "Operate",
@@ -201,7 +201,7 @@ slAnim= anim_POINT_YOU,
 'Hygiene'= 1 * 4,
 'Fun'= 5 * 4]).
 
-defined_affordance([subjType= "Refrigerator",
+defined_affordance([subjType= "Fridge",
 stringMatch= " * Fridge * ",
 stringMatch= " * Frige * ",
 stringMatch= " * icebox",
@@ -630,7 +630,7 @@ verb_desc(actObserve, tRadio, "Listen to Radio").
 verb_desc(actObserve, tMirror, "Pop your zits").
 verb_desc(actPotty, tToilet, "Go potty").
 verb_desc(actClean, tToilet, "Flush it").
-verb_desc(actSearch, tRefrigerator, "Raid the fridge").
+verb_desc(actSearch, tFridge, "Raid the fridge").
 verb_desc(actOperate, tMicrowave, "see what was forgotten in the microwave").
 verb_desc(actOperate, tTreadmill, "Excersize with X").
 verb_desc(actOperate, tTreadmill, "Tread the mill").
@@ -790,7 +790,7 @@ verb_for_type(actObserve, tRadio).
 verb_for_type(actObserve, tMirror).
 verb_for_type(actPotty, tToilet).
 verb_for_type(actClean, tToilet).
-verb_for_type(actSearch, tRefrigerator).
+verb_for_type(actSearch, tFridge).
 verb_for_type(actOperate, tStove).
 verb_for_type(actOperate, tMicrowave).
 verb_for_type(actOperate, tTreadmill).

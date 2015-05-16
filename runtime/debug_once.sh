@@ -17,11 +17,11 @@ reset -w
 echo -ne '\033]50;ClearScrollback\a'
 echo -en "\ec\e[3J"
 echo `pwd`
-killall -9 swipl
+killall -9 xterm swipl ; killall -9 xterm swipl ; fg
 echo "Hit CTRL+C ${BASH_SOURCE[0]} $RUNFILE ";
 sleep 1;
 cd $NEWPWD
 swipl -L32G -G32G -T32G -f ${RUNFILE}
-killall -9 swipl
+killall -9 xterm swipl ; killall -9 xterm swipl ; fg
 cd $OLDPWD
 echo exit $?

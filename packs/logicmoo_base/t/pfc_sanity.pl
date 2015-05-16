@@ -421,7 +421,7 @@ isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 => tCol(ttSpatialType).
 => tCol(ttFormatType).
 => tCol(functorDeclares).
-% tCol(ArgsIsa):-mpred_hooks:mpred_is_trigger(ArgsIsa).
+% tCol(ArgsIsa):-user:mpred_is_trigger(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
 => tCol(ttFormatType).

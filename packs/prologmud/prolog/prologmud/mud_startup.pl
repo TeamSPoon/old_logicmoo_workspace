@@ -110,6 +110,9 @@ prolog_repl:- with_all_dmsg((nl,fmt("Press Ctrl-D to start the mud!"),nl,'@'(pro
 :- set_prolog_flag(gui,false).
 :- set_prolog_flag(history,1000).
 
+:- prolog_ide(debug_monitor),prolog_ide(open_debug_status). % ,prolog_ide(xref).
+:- debug(wotp).
+
 
 :-export(within_user/1).
 :-export(is_startup_file/1).
@@ -181,10 +184,6 @@ thread_work:- thread_create(slow_work,_,[alias(loading_code)]).
 
 % start_servers :- user:if_version_greater(70111,thread_work).
 start_servers :- user:if_version_greater(70111,slow_work).
-
-enqueue_player_command(C):-enqueue_player_command(_,C).
-enqueue_player_command(P,C):-foc_current_agent(P),assertz_if_new(thglobal:player_command_stack(P,C)).
-
 
 user:run_setup_now:-
    within_user((
@@ -302,7 +301,7 @@ cmdresult(statistics,true)
 % :- now_run_local_tests_dbg.
 % :- prolog.
 
-% :-foc_current_agent(P),assertz_if_new(thglobal:player_command_stack(P,chat80)).
+% :-foc_current_agent(P),assertz_if_new(agent_action_queue(P,chat80)).
 :- if_flag_true(was_runs_tests_pl, at_start(run)).
 
 

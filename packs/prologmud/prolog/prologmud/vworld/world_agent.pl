@@ -13,8 +13,48 @@
 :- include(prologmud(mud_header)).
 /*
 % This file is "included" from world.pl 
-:-swi_module(modr, [ call_agent_command_0/2,  call_agent_action/2 ]).
+:-swi_module(modr, [ agent_call_command_unparsed/1, agent_call_command_unparsed/2,  agent_call_command_now/2 ]).
+
+
+tAgent - Players and Bot Bodies
+
+Sessions - places players control things
+      - irc clients (no threads/consoles)
+      - telnet users
+
+agent->nick
+
+
+
 */
+
+
+immediate_session(_P,_C,_O):-!.
+
+do_agent_action_queue(P):- agent_action_queue(P,C,O),must(with_session(O,agent_call_command_unparsed(P,C))),retract(agent_action_queue(P,C,O)).
+do_agent_action_queue(_). % was empty already
+
+
+:-export(enqueue_agent_action/1).
+enqueue_agent_action(C):-enqueue_agent_action(_,C).
+:-export(enqueue_agent_action/2).
+enqueue_agent_action(P,C):-foc_current_agent(P),get_agent_session(P,O),enqueue_agent_action(P,C,O).
+:-export(enqueue_agent_action/3).
+enqueue_agent_action(P,C,O):- immediate_session(P,C,O),!, do_agent_action(P,C,O).
+enqueue_agent_action(P,C,O):- assertz(agent_action_queue(P,C,O)),must(once(pfc_add(agent_action_queue(P,C,O)))),!.
+
+:-export(do_agent_action/1).
+do_agent_action(C):-enqueue_agent_action(C).
+:-export(do_agent_action/2).
+do_agent_action(P,C):-enqueue_agent_action(P,C).
+:-export(do_agent_action/2).
+do_agent_action(P,C,O):- \+ immediate_session(P,C,O), !, enqueue_agent_action(P,C,O).
+do_agent_action(P,C,_):- var(C),!,fmt('unknown_var_command(~q,~q).',[P,C]).
+do_agent_action(_,EOF,_):- end_of_file == EOF, !, tick_tock.
+do_agent_action(_,'',_):-!, tick_tock.
+do_agent_action(P,C,O):- agent_call_command_unparsed(P, C),!.
+do_agent_action(P,C,O):-fmt('skipping_unknown_player_action(~q,~q).~n',[P,C]),!,fail.
+
 
 :-export(parse_agent_text_command_checked/5).
 parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- 
@@ -27,6 +67,12 @@ parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):-
 
 must_ac(G):- show_call_failure(must(G)).
 
+:-  message_queue_property(Queue, alias(waq)) -> true;message_queue_create(_,[alias(waq)]).
+
+thread_signal_blocked(ID,Goal):- thread_self(ID),!,Goal.
+thread_signal_blocked(ID,Goal):- message_queue_property(Queue, alias(waq)),thread_self(Waiter), thread_signal(ID,(Goal,thread_send_message(Queue,done(Goal,Waiter),[]))),thread_get_message(Queue,done(Goal,Waiter)).
+
+
 do_agent_action_queues:- repeat,sleep(0.25),forall(tAgent(A),logOnError(do_agent_action_queue(A))),fail.
 
 start_agent_action_thread:- (thread_property(T,alias(agent_action_queue_thread)),thread_property(T,status(running)))->true;thread_create(do_agent_action_queues,_,[alias(agent_action_queue_thread)]).
@@ -34,54 +80,44 @@ start_agent_action_thread:- (thread_property(T,alias(agent_action_queue_thread))
 % restarts if it it died
 user:one_minute_timer_tick:- start_agent_action_thread.
 
-do_agent_action_queue(A):-retract(agent_action_queue(A,TODO)),must(call_agent_command(A,TODO)).
-do_agent_action_queue(_). % was empty already
+with_session(ID,CALL):-with_assertions(thlocal:session_id(ID),CALL).
+
 
 % =====================================================================================================================
-% call_agent_command_0/2 -->  call_agent_action/2
+% agent_call_command_unparsed_0/2 -->  agent_call_command_now/2
 % =====================================================================================================================
 
-call_agent_command(C):-foc_current_agent(A),!,call_agent_command(A,C).
+agent_call_command_unparsed(C):-foc_current_agent(A),!,agent_call_command_unparsed(A,C).
 
-call_agent_command(A,C):-with_assertions(tlbugger:old_no_repeats, call_agent_command_0(A,C)).
+agent_call_command_unparsed(A,C):-  with_assertions(tlbugger:old_no_repeats, agent_call_command_unparsed_0(A,C)).
 
 % execute a prolog command including prolog/0
-call_agent_command_0(Agent,Var):-var(Var),trace_or_throw(var_call_agent_command(Agent,Var)).
+agent_call_command_unparsed_0(Agent,Var):-var(Var),trace_or_throw(var_agent_call_command_unparsed(Agent,Var)).
 
-call_agent_command_0(Agent,Text):-string(Text),atom_string(Atom,Text),!,call_agent_command_0(Agent,Atom).
+agent_call_command_unparsed_0(Agent,Text):-string(Text),atom_string(Atom,Text),!,agent_call_command_unparsed_0(Agent,Atom).
 
-call_agent_command_0(Agent,[VERB|ARGS]):-
+agent_call_command_unparsed_0(Agent,[VERB|ARGS]):-
       debugOnError(parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD)),
-      must_ac(call_agent_action(NewAgent,CMD)),!.
+      must_ac(agent_call_command_now(NewAgent,CMD)),!.
 
 % lists
-call_agent_command_0(A,Atom):-atom(Atom),atomSplit(Atom,List),must(is_list(List)),!,call_agent_command_0(A,List).
+agent_call_command_unparsed_0(A,Atom):-atom(Atom),atomSplit(Atom,List),must(is_list(List)),!,agent_call_command_unparsed_0(A,List).
 
 % prolog command
-call_agent_command_0(_Gent,Atom):- atom(Atom), catch((
+agent_call_command_unparsed_0(_Gent,Atom):- atom(Atom), catch((
    (once((read_term_from_atom(Atom,OneCmd,[variables(VARS)]),
       predicate_property(OneCmd,_),
       fmt('doing command ~q~n',[OneCmd]))),!, doall((OneCmd,fmt('Yes: ~w',[VARS]))))),E,(dmsg(E),fail)).
 
 % remove period at end
-call_agent_command_0(A,PeriodAtEnd):-append(New,[(.)],PeriodAtEnd),!,call_agent_command_0(A,New).
+agent_call_command_unparsed_0(A,PeriodAtEnd):-append(New,[(.)],PeriodAtEnd),!,agent_call_command_unparsed_0(A,New).
 
 % concat the '@'
-call_agent_command_0(Ag,[A,B|REST]):- atom(A),atom(B),A=='@',atom_concat(A,B,C),!,call_agent_command_0(Ag,[C|REST]).
+agent_call_command_unparsed_0(Ag,[A,B|REST]):- atom(A),atom(B),A=='@',atom_concat(A,B,C),!,agent_call_command_unparsed_0(Ag,[C|REST]).
 
-call_agent_command_0(A,[L,I|IST]):- atom(L), CMD =.. [L,I|IST],!, must_ac(call_agent_action(A,CMD)).
+agent_call_command_unparsed_0(A,[L,I|IST]):- atom(L), CMD =.. [L,I|IST],!, must_ac(agent_call_command_now(A,CMD)).
 
-call_agent_command_0(A,CMD):- must_ac(call_agent_action(A,CMD)),!.
-
-% All Actions must be called from here!
-call_agent_action(Agent,CMDI):-var(CMDI),trace_or_throw(call_agent_action(Agent,CMDI)).
-call_agent_action(Agent,CMDI):-
-   subst(CMDI,isSelfAgent,Agent,CMD),
-   thread_self(TS),
-   (TS=main -> Wrapper = call ; Wrapper = call),
-   with_assertions(thlocal:session_agent(TS,Agent),
-     with_assertions(thlocal:agent_current_action(Agent,CMD),
-      call(Wrapper, call_agent_action_ilc(Agent,CMD)))).
+agent_call_command_unparsed_0(A,CMD):- must_ac(agent_call_command_now(A,CMD)),!.
 
 :-export(where_atloc/2).
 where_atloc(Agent,Where):-mudAtLoc(Agent,Where).
@@ -89,24 +125,35 @@ where_atloc(Agent,Where):-localityOfObject(Agent,Where).
 where_atloc(Agent,Where):-mudAtLoc(Agent,Loc),!,locationToRegion(Loc,Where).
 where_atloc(Agent,'OffStage'):-fail,nonvar(Agent).
 
-% call_agent_action_ilc(Agent,CMD):- with_no_fallbacksg(with_no_fallbacks(call_agent_action_ilc0(Agent,CMD))).
-call_agent_action_ilc(Agent,CMD):-
+
+% All Actions must be called from here!
+agent_call_command_now(Agent,CMD):- var(CMD),trace_or_throw(var_agent_call_command_now(Agent,CMD)).
+agent_call_command_now(Agent,CMD):- subst(CMD,isSelfAgent,Agent,NewCMD),CMD\=@=NewCMD,!,agent_call_command_now(Agent,NewCMD).
+agent_call_command_now(Agent,CMD):- correctCommand(CMD,NewCMD),CMD\=@=NewCMD,!,agent_call_command_now(Agent,NewCMD).
+agent_call_command_now(Agent,CMD):- \+ where_atloc(Agent,_),!, agent_call_command_now_2(Agent,CMD),!.
+agent_call_command_now(Agent,CMD):- where_atloc(Agent,Where),
    % start event
- ignore((must_det_l([where_atloc(Agent,Where),
-   raise_location_event(Where,actNotice(reciever,begin(Agent,CMD))),   
-   catch(call_agent_where_action_ilc(Agent,Where,CMD),E,(fmt('call_agent_action/2 Error ~q ',[E])))]))),!.
+   must(raise_location_event(Where,actNotice(reciever,begin(Agent,CMD)))),
+   (debugOnError(agent_call_command_now_2(Agent,CMD)) ->
+   % event done
+     send_command_completed_message(Agent,Where,done,CMD);
+   % event fail
+     send_command_completed_message(Agent,Where,failed,CMD)),!.
+
+agent_call_command_now_2(Agent,CMD):- loop_check(agent_call_command_now_3(Agent,CMD),dmsg(looped(agent_call_command_now_2(Agent,CMD)))).
+agent_call_command_now_3(Agent,CMD):-
+   with_agent(Agent,
+     with_assertions(thlocal:side_effect_ok,
+     with_assertions(thlocal:agent_current_action(Agent,CMD),
+  (user:agent_call_command(Agent,CMD)*->true;user:agent_call_command_fallback(Agent,CMD))))),
+  padd(Agent,mudLastCommand(CMD)).
+
 
 :-export(send_command_completed_message/4).
 send_command_completed_message(Agent,Where,Done,CMD):-
      ignore((must_det_l([flush_output,renumbervars(CMD,SCMD),Message =..[Done,Agent,SCMD],
-                raise_location_event(Where,actNotice(reciever,Message)),
-                padd(Agent,mudLastCommand(SCMD)),flush_output]))),!.
+                raise_location_event(Where,actNotice(reciever,Message)),flush_output]))),!.
 
-
-% complete event
-call_agent_where_action_ilc(Agent,Where,CMD):- debugOnError(agent_call_command_now(Agent,CMD)),send_command_completed_message(Agent,Where,done,CMD),!.
-% fail event
-call_agent_where_action_ilc(Agent,Where,CMD):-  send_command_completed_message(Agent,Where,failed,CMD),!. 
 
 correctCommand(CMD,OUT):-compound(CMD),fail,
    must(current_agent(Who)),
@@ -134,18 +181,6 @@ is_ephemeral(isOneOf(_)).
 acceptableArg(Arg,Type):-dmsg(acceptableArg(Arg,Type)).
 
 
-agent_call_command_now(Agent,CMD):-
-  with_current_agent(Agent,
-    with_assertions(thlocal:side_effect_ok,
-      (must(correctCommand(CMD,NewCMD)),
-      user:agent_call_command(Agent,NewCMD)*->true;
-       user:agent_call_command_fallback(Agent,NewCMD)))).
-
-% need to return http sessions as well
-get_session_id(IDIn):-thlocal:session_id(ID),!,ID=IDIn.
-get_session_id(IDIn):-current_input(ID),is_stream(ID),!,ID=IDIn.
-get_session_id(ID):-thread_self(ID).
-
 :-export(current_agent/1).
 current_agent(PIn):- get_session_id(O),get_agent_session(P,O),!,P=PIn.
 
@@ -159,13 +194,26 @@ interesting_to_player(Type,Agent,C):-is_asserted(localityOfObject(Agent,Region))
 
 user:decl_database_hook(Type,C):- current_agent(Agent),interesting_to_player(Type,Agent,C).
 
+get_agent_input_stream(P,In):-no_repeats(P-In,(get_agent_session(P,O),thglobal:session_io(O,In,_,_))).
 
-with_current_agent(Who,Cmd):- get_session_id(ID),with_assertions(thlocal:session_agent(ID,Who),Cmd).
+get_agent_input_thread(P,Id):-no_repeats(P-Id,(get_agent_input_stream(P,O),thglobal:session_io(_,In,_,Id))).
 
-get_agent_session(P,O):- once(thlocal:session_agent(O,P);thglobal:global_session_agent(O,P)).
 
+with_agent(P,CALL):-
+ ((get_agent_session(P,O),thglobal:session_io(O,In,Out,Id))->Wrap=thread_signal_blocked(Id);Wrap=call),
+  call(Wrap, 
+    with_assertions([put_server_no_max,thglobal:session_agent(O,P),thglobal:agent_session(P,O)],
+      with_output_to_pred(deliver_event(P),CALL))).
+
+has_tty(O):-no_repeats(O,thglobal:session_io(O,_,_,_)).
+
+get_agent_session(P,O):-get_session_id(O),get_agent_sessions(P,O),!.
+get_agent_session(P,O):-get_agent_sessions(P,O),has_tty(O).
+get_agent_sessions(P,O):- no_repeats(P-O,(thglobal:session_agent(O,P);thglobal:agent_session(P,O);(irc_user_plays(P,O,C),ground(irc_user_plays(P,O,C))))).
+
+:-export(foc_current_agent/1).
 foc_current_agent(P):- current_agent(P),nonvar(P),!.
-foc_current_agent(P):- nonvar(P),tAgent(P),become_player(P),!.
+foc_current_agent(P):- nonvar(P),tAgent(P),!,become_player(P),!.
 foc_current_agent(P):- 
   must_det_l([    
              get_session_id(O),
@@ -173,6 +221,23 @@ foc_current_agent(P):-
              become_player(P)]),!.
                
 
+:-user:ensure_loaded(library(http/http_session)).
+
+get_session_id(IDIn):-guess_session_ids(ID),!,ID=IDIn.
+% telnet session
+guess_session_ids(ID):-thread_self(TID),thglobal:session_io(ID,_,_,TID).
+% return any thread locally set session
+guess_session_ids(In):-thlocal:session_id(ID).
+% returns http sessions as well
+guess_session_ids(ID):-http_in_session(ID).
+% irc session
+guess_session_ids(ID):-if_defined(thlocal:default_user(ID)).
+% tcp session
+guess_session_ids(ID):-thread_self(TID),thread_property(TID,alias(ID)).
+% anonymous sessions
+guess_session_ids(In):-thread_self(ID),thread_util:has_console(ID,In,Out,Err).
+% anonymous sessions
+guess_session_ids(In):-current_input(In),is_stream(In).
 
 
 :-export(my_random_member/2).
@@ -196,20 +261,19 @@ random_instance(Type,Value,Test):- must(random_instance_no_throw(Type,Value,Test
 
 get_dettached_npc(P):- random_instance_no_throw(tAgent,P,\+ isa(P,tHumanPlayer)).
 
-generate_new_player(P):- var(P),!,must_det_l([gensym(iPlayer,N),not((isa_asserted(N,tAgent))),P=N,ensure_new_player(P)]),!.
+generate_new_player(P):- var(P),!,must_det_l([gensym(iExplorer,N),not((isa_asserted(N,tAgent))),P=N,ensure_new_player(P)]),!.
 generate_new_player(P):- ensure_new_player(P),!.
 
-ensure_new_player(P):- must_det_l([assert_isa(P,tExplorer),assert_isa(P,tPlayer),assert_isa(P,tAgent)]),!.
+ensure_new_player(P):- must_det_l([nonvar(P),assert_isa(P,tExplorer),assert_isa(P,tPlayer),assert_isa(P,tAgent)]),!.
 
-deatch_player(P):- thglobal:global_session_agent(_,P),!,trace_or_throw(deatch_player(P)).
-deatch_player(_).
+detach_player(P):- thglobal:agent_session(P,_),!,trace_or_throw(detach_player(P)).
+detach_player(_).
 
 :-export(become_player/1).
-become_player(NewName):- once(current_agent(Was)),Was=NewName,!.
-become_player(NewName):- get_session_id(O),retractall(thglobal:global_session_agent(O,_)),
-  assert_isa(NewName,tHumanPlayer),must_det(create_agent(NewName)),
-  deatch_player(NewName),asserta(thglobal:global_session_agent(O,NewName)),   
-  register_player_stream_local(NewName).
+become_player(P):- once(current_agent(Was)),Was=P,!.
+become_player(P):- get_session_id(O),retractall(thglobal:agent_session(_,O)),
+  assert_isa(P,tHumanPlayer),must_det(create_agent(P)),
+  detach_player(P),asserta_new(thglobal:agent_session(P,O)).
 
 :-export(become_player/2).
 become_player(_Old,NewName):-become_player(NewName).

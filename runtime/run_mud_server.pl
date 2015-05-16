@@ -15,8 +15,8 @@ user:file_search_path(cliopatria, '../externals/ClioPatria'). % :- current_prolo
 user:file_search_path(user, '../externals/ClioPatria/user/').
 user:file_search_path(swish, '../externals/swish'):- current_prolog_flag(unix,true).
 user:file_search_path(pack, '../packs/').
-user:file_search_path(prologmud, '../prolog/prologmud/').
 :- attach_packs.
+user:file_search_path(prologmud, library(prologmud)).
 
 % [Required] Load the Logicmioo Base System
 :- user:ensure_loaded(library(logicmoo/logicmoo_base)).
@@ -24,8 +24,6 @@ user:file_search_path(prologmud, '../prolog/prologmud/').
 % [Optionaly] Load an Eggdrop 
 :- if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl')).
 :- current_predicate(egg_go/0)->egg_go;true.
-
-
 
 
 % [Required] load the mud system
@@ -44,6 +42,27 @@ tCol(tLivingRoom).
 genls(tLivingRoom,tRegion).
 genls(tOfficeRoom,tRegion).
 
+% create some seats
+tExplorer(iExplorer1).
+tExplorer(iExplorer2).
+tExplorer(iExplorer3).
+tExplorer(iExplorer4).
+tExplorer(iExplorer5).
+tExplorer(iExplorer6).
+
+
+tExplorer(iExplorer7).
+wearsClothing(iExplorer7,'iBoots773').
+wearsClothing(iExplorer7,'iCommBadge774').
+wearsClothing(iExplorer7,'iGoldUniform775').
+mudStowing(iExplorer7,'iPhaser776').
+pddlSomethingIsa('iBoots773',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
+pddlSomethingIsa('iCommBadge774',['tCommBadge','ProtectiveAttire','PortableObject','tNecklace']).
+pddlSomethingIsa('iGoldUniform775',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
+pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
+
+isa(iCommanderdata66,'tMonster').
+mudDescription(iCommanderdata66,txtFormatFn("Very screy looking monster named ~w",[iCommanderdata66])).
 tAgent(iCommanderdata66).
 isa(iCommanderdata66,'tExplorer').
 wearsClothing(iCommanderdata66,'iBoots673').
@@ -54,29 +73,6 @@ pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','tWea
 pddlSomethingIsa('iCommBadge674',['tCommBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
-
-% create some seats
-tExplorer(iPlayer1).
-tExplorer(iPlayer2).
-tExplorer(iPlayer3).
-tExplorer(iPlayer4).
-tExplorer(iPlayer5).
-tExplorer(iPlayer6).
-
-
-tAgent(iExplorer7).
-wearsClothing(iExplorer7,'iBoots773').
-wearsClothing(iExplorer7,'iCommBadge774').
-wearsClothing(iExplorer7,'iGoldUniform775').
-isa(iExplorer7,'tExplorer').
-mudStowing(iExplorer7,'iPhaser776').
-pddlSomethingIsa('iBoots773',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
-pddlSomethingIsa('iCommBadge774',['tCommBadge','ProtectiveAttire','PortableObject','tNecklace']).
-pddlSomethingIsa('iGoldUniform775',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
-pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
-
-isa(iCommanderdata66,'tMonster').
-mudDescription(iCommanderdata66,txtFormatFn("Very screy looking monster named ~w",[iCommanderdata66])).
 
 
 mpred_argtypes(pathConnects(tRegion,tRegion)).
@@ -92,46 +88,47 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 :-at_start(toploop_telnet:start_mud_telnet(4000)).
 
 
+/*
+
 % [Optional] the following game files though can be loaded separate instead
 :- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
 :- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
-:- declare_load_dbase('../games/src_game_nani/*.plmoo').
-
-
+:- declare_load_dbase('../games/src_game_nani/?*.plmoo').
+:- forall(parserTest(Where,String),assert_text(Where,String)).
 
 % [Manditory] This loads the game and initializes so test can be ran
-:- (if_startup_script( at_start(finish_processing_world))).
+:- if_startup_script( at_start(finish_processing_world)).
 
-:-forall(parserTest(Where,String),assert_text(Where,String)).
+:- enqueue_agent_action("rez crackers").
+
+*/
 
 
 % [Optionaly] Run a battery of tests
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 
 
-sanity_test0a:-enqueue_player_command("hide").
+sanity_test0a:- enqueue_agent_action("hide").
 
-sanity_test0b:- enqueue_player_command(actWho).
+sanity_test0b:- enqueue_agent_action(actWho).
 
+sanity_test1:- enqueue_agent_action("rez crackers"),
+   enqueue_agent_action("drop crackers"),
+   enqueue_agent_action('look'),
+   enqueue_agent_action("take crackers"),
+   enqueue_agent_action("eat crackers"),
+   enqueue_agent_action('look').
 
-sanity_test1:- enqueue_player_command("rez crackers"),
-   enqueue_player_command("drop crackers"),
-   enqueue_player_command('look'),
-   enqueue_player_command("take crackers"),
-   enqueue_player_command("eat crackers"),
-   enqueue_player_command('look').
+sanity_test2:- enqueue_agent_action("rez pants"),
+   enqueue_agent_action("wear pants"),
+   enqueue_agent_action("tp to closet"),
+   enqueue_agent_action("take shirt"),
+   enqueue_agent_action("inventory").
 
-sanity_test2:-enqueue_player_command("rez pants"),
-   enqueue_player_command("wear pants"),
-   enqueue_player_command("tp to closet"),
-   enqueue_player_command("take shirt"),
-   enqueue_player_command("inventory").
-
-
-:-enqueue_player_command(prolog).
+% :- enqueue_agent_action(prolog).
 
 % [Optionaly] Tell the NPCs to do something every 60 seconds (instead of 90 seconds)
-:- register_timer_thread(npc_ticker,60,npc_tick).
+% :- register_timer_thread(npc_ticker,60,npc_tick).
 
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- if_startup_script(at_start(run)).

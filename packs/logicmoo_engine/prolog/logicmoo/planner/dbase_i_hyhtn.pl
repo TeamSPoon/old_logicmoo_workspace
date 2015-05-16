@@ -138,7 +138,7 @@ trye(Call):- catch(Call,E,((dmsg(error(E , Call)),trace,Call))).
 :-dynamic(passed_test_try/1).
 :-dynamic(testing_already/0).
 
-check_passed_any:-not(not(passed_test_try(_))),nl,listing(passed_test_try/1).
+check_passed_any:-not(not(passed_test_try(_))),nl,lsting(passed_test_try/1).
 
 ttm:-retractall(passed_test_try(_)),fail.
 ttm:-testing_already,!.
@@ -687,7 +687,7 @@ start_solve(Sol,OPNUM,TNList):- solve_failed(Sol,OPNUM,TNList).
 solve_failed(Sol,OPNUM,TNList):-
     tell(user), write('+++ task FAILED +++'),    
     planner_failure('+++ task FAILED +++',start_solve(Sol,OPNUM,TNList)),
-    listing(in_dyn/2),
+    lsting(in_dyn/2),
     clean.
 
 
