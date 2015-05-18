@@ -2386,7 +2386,7 @@ matches_term0(F/A,Term):- (var(A)->member(A,[0,1,2,3,4]);true), functor_safe(Fil
 matches_term0(Filter,Term):- sub_term(STerm,Term),nonvar(STerm),matches_term0(Filter,STerm),!.
 
 dmsginfo(V):-dmsg(info(V)).
-dmsg(V):- hotrace((dmsg0(V),ignore((prolog_load_context(file,F),prolog_load_context(stream,S),line_count(S,L),format('% ~w~n',[F:L]))))).
+dmsg(V):- hotrace((dmsg0(V))).
 :-'$syspreds':'$hide'(dmsg/1).
 
 :-export(dmsg0/1).
@@ -2405,6 +2405,7 @@ dmsg1(ansi(Ctrl,Msg)):- ansicall(Ctrl,dmsg1(Msg)).
 dmsg1(C):-functor_safe(C,Topic,_),debugging(Topic,_True_or_False),logger_property(Topic,once,true),!,
       (dmsg_log(Topic,_Time,C) -> true ; ((get_time(Time),asserta(dmsg_log(todo,Time,C)),!,dmsg2(C)))).
 
+dmsg1(_):- once((ignore((prolog_load_context(file,F),prolog_load_context(stream,S),line_count(S,L),format('% ~w~n',[F:L]))))),fail.
 dmsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall(Ctrl, dmsg2(Msg)).
 
 dmsg2(C):-not(ground(C)),copy_term(C,Stuff), snumbervars(Stuff),!,dmsg3(Stuff).
@@ -2557,6 +2558,7 @@ mesg_color(T,C):-var(T),!,dumpST,!,C=[blink(slow),fg(red),hbg(black)],!.
 mesg_color(T,C):- string(T),!,must(f_word(T,F)),!,functor_color(F,C).
 mesg_color(T,C):-not(compound(T)),text_to_string(T,S),!,mesg_color(S,C).
 mesg_color(succeed(T),C):-nonvar(T),mesg_color(T,C).
+mesg_color(=(T,_),C):-nonvar(T),mesg_color(T,C).
 mesg_color(debug(T),C):-nonvar(T),mesg_color(T,C).
 mesg_color(_:T,C):-nonvar(T),!,mesg_color(T,C).
 mesg_color(T,C):-functor_safe(T,F,_),member(F,[color,ansi]),compound(T),arg(1,T,C),nonvar(C).
@@ -2781,7 +2783,7 @@ fdmsg1(txt(S)):-'format'(S,[]),!.
 fdmsg1(level=L):-'format'('(~q)',[L]),!.
 fdmsg1(context_module=G):-!,format('[~w] ',[G]),!.
 fdmsg1(has_alternatives=G):- (G==false->true;'format'('*',[G])),!.
-fdmsg1(goal=G):-mesg_color(G,Ctrl),!,ansicall(Ctrl,format(' ~q. ',[G])),!.
+fdmsg1(goal=G):-mesg_color(G,Ctrl),simplify_goal_printed(G,GG),!,ansicall(Ctrl,format(' ~q. ',[GG])),!.
 fdmsg1(clause=[F,L]):- directory_file_path(_,FF,F),'format'('  %  ~w:~w: ',[FF,L]),!.
 fdmsg1(clause=[F,L]):- fresh_line,'format'('%  ~w:~w: ',[F,L]),!.
 fdmsg1(clause=[]):-'format'(' /*DYN*/ ',[]),!.
@@ -2789,6 +2791,12 @@ fdmsg1(G):-mesg_color(G,Ctrl),!,ansicall(Ctrl,format(' ~q ',[G])),!.
 
 fdmsg(fr(List)):-is_list(List),!,fresh_line,ignore(forall(member(E,List),fdmsg1(E))),nl.
 fdmsg(M):-dmsg(M).
+
+simplify_goal_printed(Var,Var):-var(Var),!.
+simplify_goal_printed(true,true).
+simplify_goal_printed(system:catch(G,_,_),G).
+simplify_goal_printed(user:G,G).
+simplify_goal_printed(G,G).
 
 dumpST4(N,Frame,Opts,[nf(max_depth,N,Frame,Opts)]):-get_m_opt(Opts,max_depth,100,MD),N>=MD,!.
 %dumpST4(N,Frame,Opts,[nf(max_depth,N,Frame,Opts)]):-get_m_opt(Opts,skip_depth,100,SD),N=<SD,!,fail.
@@ -2871,7 +2879,10 @@ imploded_copyvars(C,CT):-must((source_variables(Vs),copy_term(C-Vs,CT-VVs),b_imp
 
 :-export(unnumbervars/2).
 
-unnumbervars(In,Out):- contains_term('$VAR'(I),In),atomic(I),!,must(( term_string(In,String),term_string(Out,String))),!.
+
+unnumbervars(X,YY):-!,unnumbervars0(X,Y),!,must(Y=YY).
+
+unnumbervars(In,Out):- contains_term('$VAR'(I),In),atomic(I),!,must(( term_string(In,String,[numbervars(true)]),term_string(Out,String))),!.
 unnumbervars(In,Out):-In=Out,!.
 unnumbervars(X,YY):- fail,
  source_variables(Vs),copy_term(X-Vs,CXVs-CVs),b_implode_varnames(CVs),

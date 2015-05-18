@@ -232,6 +232,7 @@ prologSideEffects(write/1).
 
 ttPredType(pfcDatabaseTerm).
 ttPredType(pfcControlled).
+ttPredType(prologSingleValued).
 
 
 ttPredType(pfcWatched).
@@ -263,6 +264,7 @@ ttPredType(pfcControlled).
 :-pfc_add( pfcControlled(isa)).
 :-pfc_add(pfcControlled(argIsa)).
 
+pfcControlled(P),arity(P,A)=>hybrid_support(P,A).
 
 ttPredType(X)=>tCol(X).
 
@@ -484,18 +486,29 @@ completelyAssertedCollection(tCol).
 % asserting mpred_sv(p,2) causes p/2 to be treated as a mpred_sv, i.e.
 % if p(foo,1)) is a fact and we assert_db p(foo,2), then the forrmer assertion
 % is retracted.
-mpred_sv(Pred,Arity)
-  => hybrid_support(Pred,Arity),
-  {
-   length(AfterList,Arity),
-   append(Left,[A],AfterList),
-   append(Left,[B],BeforeList),
-  After =.. [Pred|AfterList],
-  Before =.. [Pred|BeforeList]},
-  (After,{Before, \==(A , B)} => {pfc_rem2(Before)}).
+mpred_sv(Pred,Arity)=> prologSingleValued(Pred),arity(Pred,Arity),singleValuedInArg(Pred,Arity).
 
-((isa(Pred,prologSingleValued),arity(Pred,Arity)) => mpred_sv(Pred,Arity)).
+prologSingleValued(Pred),arity(Pred,Arity) => hybrid_support(Pred,Arity).
 
+
+(prologSingleValued(Pred),arity(Pred,Arity),singleValuedInArg(Pred,SV),
+  {functor(Before,Pred,Arity),arg(SV,Before,B),replace_arg(Before,SV,A,After)})
+  => 
+   ({dif:dif(B,A)},After,{Before, B\==A} => {pfc_rem2(Before)}).
+
+
+
+singleValuedInArg(Pred,_)=>prologSingleValued(Pred).
+
+{Arity=2},arity(Pred,Arity),argIsa(Pred,Arity,ftInt)=>singleValuedInArg(Pred,Arity).
+{Arity=2},arity(Pred,Arity),argIsa(Pred,Arity,ftPercent)=>singleValuedInArg(Pred,Arity).
+
+
+% prologSingleValued(Pred),arity(Pred,Arity), \+ singleValuedInArg(Pred,_) => singleValuedInArg(Pred,Arity).
+pfc_default((prologSingleValued(Pred),arity(Pred,Arity)) => singleValuedInArg(Pred,Arity)).
+
+
+singleValuedInArg(singleValuedInArg,2).
 
 :- dynamic(isa/2).
 
@@ -777,6 +790,9 @@ prologHybrid(argQuotedIsa(tRelation,ftInt,ttFormatType)).
 prologHybrid(argIsa(tRelation,ftInt,tCol)).
 prologHybrid(argSingleValueDefault(prologSingleValued,ftInt,ftTerm)).
 prologHybrid(formatted_resultIsa(ttFormatType,tCol)).
+
+{FtInt=2},argSingleValueDefault(PrologSingleValued,FtInt,FtTerm),arity(PrologSingleValued,FtInt),
+  argIsa(PrologSingleValued,1,Col)=>relationMostInstance(PrologSingleValued,Col,FtTerm).
 
 prologHybrid(quotedDefnIff(ttFormatType,ftTerm)).
 prologHybrid(defnNecessary(ttFormatType,ftTerm)).

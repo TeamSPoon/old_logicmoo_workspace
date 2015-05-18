@@ -109,10 +109,8 @@ with_no_fallbacksg(CALL):-with_assertions(thlocal:noRandomValues(_),CALL).
 :-meta_predicate(with_no_fallbacks(0)).
 with_no_fallbacks(CALL):-with_assertions(thlocal:infAssertedOnly(_),CALL).
 
-:-thread_local(infSecondOrder/0).
 infSecondOrder :- not(thlocal:infInstanceOnly(_)).
 
-:-thread_local(infThirdOrder/0).
 infThirdOrder :- fail, infSecondOrder, not(thlocal:noRandomValues(_)).
 
 
@@ -276,10 +274,10 @@ clr0(P):-
 
 
 % -  preq(Query) = query with P note
-preq(P,C0):- must(not((atom(C0)))),agenda_do_prequery,no_repeats(mpred_op(query(t,P),C0)).
+preq(P,C0):- must(not((atom(C0)))),agenda_do_prequery,!,no_repeats(C0,mpred_op(query(t,P),C0)).
 
 % -  req(Query) = Normal query
-req(C0):- nop(dmsg(req(C0))), preq(req,/*to_exp*/(C0)).
+req(C0):- nop(dmsg(req(C0))), !,preq(req,/*to_exp*/(C0)).
 
 % -  mreq(Query) = Forced Full query
 mreq(C0):- nop(dmsg(mreq(C0))), agenda_rescan_for_module_ready,
@@ -379,7 +377,10 @@ prop_or(Obj,Prop,Value,OrElse):- one_must(ireq(t(Prop,Obj,Value)),Value=OrElse).
 % assert_with to change(CA1,CB2) singlevalue pred
 :-export((db_assert_sv/4)).
 %db_assert_sv(_Must,C,F,A):- throw_if_true_else_fail(contains_singletons(C),db_assert_sv(C,F,A)).
-db_assert_sv(Must,C,F,A):- trace,ex, ignore(( loop_check(db_assert_sv_ilc(Must,C,F,A),true))).
+
+db_assert_sv(C):- get_functor(C,F,A), db_assert_sv(must,C,F,A),!.
+
+db_assert_sv(Must,C,F,A):- ex, ignore(( loop_check(db_assert_sv_ilc(Must,C,F,A),true))).
 
 :-export((db_assert_sv_ilc/4)).
 db_assert_sv_ilc(Must,C,F,A):- arg(A,C,UPDATE),db_assert_sv_now(Must,C,F,A,UPDATE),!.

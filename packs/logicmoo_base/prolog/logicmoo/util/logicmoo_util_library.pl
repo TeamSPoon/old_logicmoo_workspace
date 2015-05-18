@@ -97,6 +97,10 @@ append_term(Call,E,CallE):-must(compound(Call)), Call=..List, append(List,[E],Li
 conjuncts_to_list(Var,[Var]):-is_ftVar(Var),!.
 conjuncts_to_list(true,[]).
 conjuncts_to_list([],[]).
+conjuncts_to_list('&'(A,B),ABL):-!,
+  conjuncts_to_list(A,AL),
+  conjuncts_to_list(B,BL),
+  append(AL,BL,ABL).
 conjuncts_to_list([A|B],ABL):-!,
   conjuncts_to_list(A,AL),
   conjuncts_to_list(B,BL),

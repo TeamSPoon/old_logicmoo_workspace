@@ -108,8 +108,8 @@ when_debugging(_,_).
 :- ensure_loaded(mpred/logicmoo_i_argtypes).
 % :- with_no_mpred_expansions(autoload).
 
-%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_engine)))).
 :- ensure_loaded(logicmoo('mpred/logicmoo_i_builtin.pfc')).
+:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_engine)))).
 
 %:- with_no_term_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/mpred_online/dbase_i_rdf_store)))).
 :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).

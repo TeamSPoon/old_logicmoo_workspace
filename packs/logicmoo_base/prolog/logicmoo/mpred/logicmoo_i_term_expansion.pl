@@ -409,8 +409,10 @@ demodulize(_ ,HB,HB).
 
 db_expand_1(_,X,X).
 
-db_expand_2(_,X,X):-!.
+
+db_expand_2(_,Sent,SentO):-not_ftVar(Sent),user:ruleRewrite(Sent,SentO),!.
 db_expand_2(change(_,_),Sent,SentO):-not_ftVar(Sent),user:ruleRewrite(Sent,SentO),!.
+db_expand_2(_,X,X):-!.
 db_expand_2(_ ,NC,NC):- as_is_term(NC),!.
 db_expand_2(Op,Sent,SentO):-loop_check(expand_term(Sent,SentO)),Sent\=@=SentO,!.
 

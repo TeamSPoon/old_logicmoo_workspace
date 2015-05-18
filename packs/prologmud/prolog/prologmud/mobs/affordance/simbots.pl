@@ -512,11 +512,11 @@ choose_best(_Agent,CMDS,Act):-random_permutation(CMDS,[Act|_]).
 
 show_call_fmt(Call):-show_call_failure(Call),fmt(Call).
 
-% args_match_types(ARGS,Type).
-%args_match_types([],_):-!,fail.
+% args_match_types(ARGS,Types).
+args_match_types(In,Out):-In==[],!,Out=[].
+args_match_types(TemplIn,Templ):-is_list(TemplIn),!,maplist(args_match_types,TemplIn,Templ).
 args_match_types(TemplIn,Templ):-compound(TemplIn),!,TemplIn=..TemplInL, Templ=..TemplL, args_match_types(TemplInL,TemplL).
 args_match_types(Templ,Templ):-!.
-args_match_types([Obj],Type):-nonvar(Obj),!,isa(Obj,Type).
 args_match_types(Obj,Type):-!,isa(Obj,Type).
 
 user:agent_call_command_fallback(Agent,TemplIn):-agent_call_command_simbots_real(Agent,TemplIn).

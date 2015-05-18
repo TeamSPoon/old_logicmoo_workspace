@@ -370,6 +370,8 @@
 
 :- dynamic   thglobal:session_io/4, thglobal:session_agent/2, thglobal:agent_session/2, user:telnet_fmt_shown/3, user:agent_action_queue/3.
 :- multifile thglobal:session_io/4, thglobal:session_agent/2, thglobal:agent_session/2, user:telnet_fmt_shown/3, user:agent_action_queue/3.
+:- thread_local(infSecondOrder/0).
+:- thread_local(infThirdOrder/0).
 
 :- dynamic_multifile_exported(thglobal:use_cyc_database/0).
 :- thread_local(thlocal:already_in_file_term_expansion/0).

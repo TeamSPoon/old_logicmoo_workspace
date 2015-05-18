@@ -26,11 +26,11 @@ attribs_to_atoms(ListA,List):-map_subterms(attribs_to_atoms0,ListA,List).
 map_subterms(Pred,I,O):-call(Pred,I,O).
 map_subterms(Pred,I,O):-is_list(I),!,maplist(map_subterms(Pred),I,O).
 map_subterms(Pred,I,O):-compound(I),!,I=..IL,maplist(map_subterms(Pred),IL,OL),O=..OL.
-map_subterms(Pred,IO,IO).
+map_subterms(_Pred,IO,IO).
 
 iza_to_isa(Iza,ftTerm):-var(Iza),!.
-iza_to_isa((A,B),isAnd(ListO)):-!,conjuncts_to_list((A,B),List),min_isa_l(List,ListO).
-iza_to_isa((A;B),isOr(List)):-!,conjuncts_to_list((A,B),List).
+iza_to_isa((A,B),isAnd(ListO)):-!,conjuncts_to_list((A,B),List),list_to_set(List,Set),min_isa_l(Set,ListO).
+iza_to_isa((A;B),isOr(Set)):-!,conjuncts_to_list((A,B),List),list_to_set(List,Set).
 iza_to_isa(AA,AB):-must(AA=AB).
 
 
@@ -76,6 +76,7 @@ attempt_attribute_args(AndOr,Hint,?(A)):-!,attempt_attribute_args(AndOr,Hint,A).
 attempt_attribute_args(AndOr,Hint,(A,B)):-!,attempt_attribute_args(AndOr,Hint,A),attempt_attribute_args(AndOr,Hint,B).
 attempt_attribute_args(AndOr,Hint,[A|B]):-!,attempt_attribute_args(AndOr,Hint,A),attempt_attribute_args(AndOr,Hint,B).
 attempt_attribute_args(AndOr,Hint,(A;B)):-!,attempt_attribute_args(';'(AndOr),Hint,A),attempt_attribute_args(';'(AndOr),Hint,B).
+attempt_attribute_args(AndOr,Hint,Term):- use_was_isa(Term,I,C), add_iza(I,C).
 attempt_attribute_args(AndOr,Hint,Term):- Term=..[F,A],tCol(F),!,attempt_attribute_args(AndOr,F,A).
 attempt_attribute_args(AndOr,Hint,Term):- Term=..[F|ARGS],!,attempt_attribute_args(AndOr,Hint,F,1,ARGS).
 
@@ -85,8 +86,10 @@ attempt_attribute_args(AndOr,Hint,t,N,[A|ARGS]):-atom(A),!,attempt_attribute_arg
 attempt_attribute_args(AndOr,Hint,t,N,[A|ARGS]):-not(atom(A)),!.
 attempt_attribute_args(AndOr,Hint,F,N,[A|ARGS]):-attempt_attribute_one_arg(Hint,F,N,A),N2 is N+1,attempt_attribute_args(AndOr,Hint,F,N2,ARGS).
 
-attempt_attribute_one_arg(Hint,F,N,A):-argIsa(F,N,Type),not(compound(Type)),!,attempt_attribute_args(AndOr,Type,A).
-attempt_attribute_one_arg(Hint,F,N,A).
+attempt_attribute_one_arg(Hint,F,N,A):-argIsa(F,N,Type),Type\=ftTerm,not(compound(Type)),!,attempt_attribute_args(AndOr,Type,A).
+attempt_attribute_one_arg(Hint,F,N,A):-argQuotedIsa(F,N,Type),Type\=ftTerm,not(compound(Type)),!,attempt_attribute_args(AndOr,Type,A).
+attempt_attribute_one_arg(Hint,F,N,A):-argIsa(F,N,Type),Type\=ftTerm,!,attempt_attribute_args(AndOr,Type,A).
+attempt_attribute_one_arg(Hint,F,N,A):-attempt_attribute_args(AndOr,argi(F,N),A).
 
 
 

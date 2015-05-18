@@ -938,7 +938,7 @@ argsQuoted(onEachLoad).
 argsQuoted(must).
 
 prologHybrid(normalAgentGoal(ftTerm,ftTerm)).
-normalAgentGoal(Pred,_)/atom(Pred)=>{AT=..[Pred,tAgent,ftPercent]},meta_argtypes(AT),prologHybrid(Pred),tRolePredicate(Pred),arity(Pred,2).
+normalAgentGoal(Pred,_)/atom(Pred)=>{AT=..[Pred,tAgent,ftPercent]},meta_argtypes(AT),prologHybrid(Pred),tRolePredicate(Pred),arity(Pred,2),singleValuedInArg(Pred,2).
 normalAgentGoal(mudEnergy,90).
 normalAgentGoal(mudNonHunger,90).
 normalAgentGoal(mudHygiene,90).
@@ -956,6 +956,7 @@ prologHybrid(agentTODO(tAgent,vtActionType)).
 normalAgentGoal(Pred,Val)=>  ( t(Pred,A,V)/(V<Val) => agentTODO(A,actImprove(Pred))).
 normalAgentGoal(Pred,Val)=>  (tAgent(A)=>pfc_default(t(Pred,A,Val))).
 
+genls(tRoom,tRegion).
 
 
 /*

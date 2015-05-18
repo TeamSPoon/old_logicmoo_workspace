@@ -7,7 +7,7 @@
 %
 */
 
-:-module(mud_irc, [irc_mud_event_hook/3, deliver_to_irc/2 ]).
+% :-module(mud_irc, [irc_mud_event_hook/3, deliver_to_irc/2 ]).
 
 :- include(prologmud(mud_header)).
 
@@ -15,7 +15,7 @@
 :-pfc_add(( prologHybrid(irc_user_plays(tAgent,ftAtom,ftAtom)))).
 :-pfc_add(( prologOrdered(agent_action_queue(tAgent,ftTerm,ftTerm)))).
 
-user:deliver_event_hook(Agent,Event):- ignore(once(deliver_to_irc(Agent,Event))).
+user:deliver_event_hooks(Agent,Event):- ignore(once(deliver_to_irc(Agent,Event))).
 user:irc_event_hooks(Channel,User,Stuff):- ignore(once(irc_mud_event_hook(Channel,User,Stuff))).
 
 invite_to_mud(Nick):-eggdrop:to_egg('.tcl putserv "PRIVMSG ~w :DCC CHAT chat 73.37.100.94 4000"',[Nick]).
@@ -51,27 +51,40 @@ wotp_lambda(A,    Call,A):-Call.
 wotp_lambda(A,B,  Call,A,B):-Call.
 wotp_lambda(A,B,C,Call,A,B,C):-Call.
 
+
+with_output_to_pred(HookPred, Call):- fail,with_output_to(string(Atom),Call),atomic_list_concat(List,'\n',Atom), 
+  forall(member(E,List),call(HookPred,E)).
+
 % Redirect output stream and read_line_to_string to write to a predicate 
 with_output_to_pred(HookPred, Call):- 
    with_output_to_pred(read_line_to_string, HookPred, Call).
+
 
 % Redirect output stream to write to a predicate with ReaderPred line [read_line_to_string,get_char,..]
 with_output_to_pred(ReaderPred, HookPred, Call):- thread_self(ID), 
    wotp_client(ReaderPred, wotp_lambda(Data,thread_signal(ID,call(HookPred,Data))),Call).
 
+
+with_output_to_pred_direct(ReaderPred, HookPred, Call):- 
+   wotp_client(ReaderPred, HookPred, Call).
+
+
 wotp_client(ReaderPred,HookPred, Call):-
+  must_det_l((
     wotp_create_server,
     must(wotp_server_port(Port)),
     tcp_socket(Socket),
     tcp_connect(Socket, localhost:Port),
     tcp_open_socket(Socket, StreamPair),
     stream_pair(StreamPair, In, Out),
-    wotp_io_setup(In, Out),    
+    wotp_io_setup(In, Out),
+    read(In,ServID),
     format(Out,'~N~q.~n~q.~n',[ReaderPred,HookPred]),
-    flush_output(Out),!,
-    setup_call_cleanup(tell(Out),Call,
-     ignore(((format(Out,'~N',[]),told,ignore(catch(close(StreamPair, [force(true)]),_,true)))))).
+    flush_output(Out))),!,
+    setup_call_cleanup(tell(Out),debugOnError(Call),
+     ignore(((format(Out,'~N',[]),signal_done(ServID),told,ignore(catch(close(StreamPair, [force(true)]),_,true)))))).
 
+signal_done(ServID):- call(call,true),thread_signal(ServID,call(call,true)).
 
 wotp_create_server(Port):- thread_property(_T,alias(wotp_server)),!.
 wotp_create_server(Port):-
@@ -92,7 +105,10 @@ wotp_server_loop(ServerSocket) :-
 wotp_service(StreamPair):-
          stream_pair(StreamPair, In, Out),
          wotp_io_setup(In, Out),
-         read(In,ReaderPred),read(In,HookPred), debug(wotp,'~q. => ~q. ~n',[ReaderPred,HookPred]),
+         thread_self(TID),
+         format(Out,'~N~q.~n',TID),
+         flush_output(Out),
+         read(In,ReaderPred),read(In,HookPred), debug(wotp,'~q. => ~q. ~n',[ReaderPred,HookPred]),!,
          repeat,
          call(ReaderPred,In,Data), debug(wotp,'~q => ~q.~n',[read_data(ReaderPred,In,Data),HookPred]),
          ((Data \==end_of_file, Data \== -1 ) -> (once(call(HookPred,Data)),fail) ;
@@ -117,3 +133,6 @@ wotp_create_server:- (wotp_server_port(Port)->wotp_create_server(Port);wotp_crea
 
 % Example  
 :- with_output_to_pred(say(dmiles), format('Hello Worldly~n',[])).
+
+
+
