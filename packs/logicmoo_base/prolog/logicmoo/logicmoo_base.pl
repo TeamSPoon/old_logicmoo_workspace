@@ -95,7 +95,7 @@ when_debugging(_,_).
 :- ensure_loaded(library(logicmoo/mpred_online/logicmoo_i_www)).
 :- ensure_loaded(mpred/pfc).
 :- ensure_loaded(mpred/logicmoo_i_loader).
-:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
+% % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
 :- ensure_loaded(mpred/logicmoo_i_types).
 :- ensure_loaded(mpred/logicmoo_i_term_expansion).
 :- ensure_loaded(mpred/logicmoo_i_mpred_props).
@@ -109,8 +109,8 @@ when_debugging(_,_).
 % :- with_no_mpred_expansions(autoload).
 
 :- ensure_loaded(logicmoo('mpred/logicmoo_i_builtin.pfc')).
-:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_engine)))).
+% % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_engine)))).
 
 %:- with_no_term_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/mpred_online/dbase_i_rdf_store)))).
-:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
+% % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
 

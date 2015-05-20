@@ -11,6 +11,7 @@
  */
 
 :- include(prologmud(mud_header)).
+:- include(improve).
 
 :- discontiguous(defined_affordance/1).
 
@@ -485,7 +486,10 @@ do_define_type_affordance1(Type,actionVerb(2)= SVerb):-i_name(act,SVerb,Verb),nb
 do_define_type_affordance1(Type,acceptsChild= TWhat):-i_name(t,TWhat,ChildType),
   nb_setval(acceptsChild,ChildType),!,assert_if_new(can_hold_type(Type,ChildType)),
  (nb_current(actionVerb,Verb)->assert_if_new(verb_affordance_2(Verb,Type,ChildType));dmsg(warn(verb_affordance_3_no_verb(error(vVerb),Type,ChildType)))),!.
-do_define_type_affordance1(Type,SPred= Wants * Gets):-i_name(mud,SPred,Pred),nb_getval(actionVerb,Verb),to_personal(Pred,APred),assert_if_new(verb_affordance(Verb,Type,APred,Wants,Gets)).
+do_define_type_affordance1(Type,SPred= Wants * Gets):-i_name(mud,SPred,Pred),nb_getval(actionVerb,Verb),to_personal(Pred,APred),
+  to_rel_value(Wants,WantsR),
+  to_rel_value(Gets,GetsR),
+  assert_if_new(verb_affordance(Verb,Type,APred,WantsR,GetsR)).
 do_define_type_affordance1(Type,mudActionMaxDistance= Distance):-nb_getval(actionVerb,Verb),add(mudActionMaxDistance(Verb,Type,Distance)).
 do_define_type_affordance1(Type,textSitName= String):-do_define_type_affordance1(Type,textName= String).
 do_define_type_affordance1(Type,textName= String):-nb_getval(actionVerb,Verb),assert_if_new(verb_desc(Verb,Type,String)).
@@ -495,6 +499,13 @@ do_define_type_affordance1(Type,Skipped):-dmsg(error(skipped(do_define_type_affo
 
 do_define_type_affordance(_,[]).
 do_define_type_affordance(Type,[H|LIST]):-do_define_type_affordance1(Type,H),!,do_define_type_affordance(Type,LIST),!.
+
+
+to_rel_value(Val,- NVal):-number(Val), Val<0, NVal is Val * -1.
+to_rel_value(Val,+ NVal):-number(Val), Val>0, NVal is Val .
+to_rel_value( - Val,- Val):-!.
+to_rel_value( + Val,+ Val):-!.
+to_rel_value(Val,+ Val).
 
 user:world_agent_plan(_World,Agent,Act):-
    (isa(Agent,tSimian);isa(Agent,tAgent)),
@@ -514,25 +525,34 @@ show_call_fmt(Call):-show_call_failure(Call),fmt(Call).
 
 % args_match_types(ARGS,Types).
 args_match_types(In,Out):-In==[],!,Out=[].
-args_match_types(TemplIn,Templ):-is_list(TemplIn),!,maplist(args_match_types,TemplIn,Templ).
+args_match_types(TemplIn,Templ):-is_list(TemplIn),is_list(Templ),!,maplist(args_match_types,TemplIn,Templ).
+args_match_types([X],X):-!.
 args_match_types(TemplIn,Templ):-compound(TemplIn),!,TemplIn=..TemplInL, Templ=..TemplL, args_match_types(TemplInL,TemplL).
 args_match_types(Templ,Templ):-!.
 args_match_types(Obj,Type):-!,isa(Obj,Type).
 
 user:agent_call_command_fallback(Agent,TemplIn):-agent_call_command_simbots_real(Agent,TemplIn).
 
+agent_call_command_simbots_real(Agent,actImprove(Trait)):- nonvar(Trait),
+      findall(agentTODO(Agent,actDo(ActVerb,Types)), (verb_affordance(ActVerb,Types,Trait,+ Think,_Real),Think>0), NewAdds),
+      show_call(forall(member(Add,NewAdds),add(Add))).
+
 agent_call_command_simbots_real(Agent,TemplIn):- nonvar(TemplIn), 
    simbots_templates(Templ),
    args_match_types(TemplIn,Templ),
-   ignore(affordance_side_effects(Agent,Templ,Template)),
-   ignore(affordance_message(Agent,Templ,Template)),
-   fmt(agent_call_command_simbots_real(Agent,Templ,Template)),!.
+    must_det_l((
+    affordance_side_effects(Agent,Templ,Template),
+    fmt(agent_call_command_simbots_real(Agent,Templ,Template)),
+    ignore(affordance_message(Agent,Templ,Template)))),!.
+  
 
 
-affordance_side_effects(Agent,Templ,Template):- Templ=..[ActVerb|ARGS],
+affordance_side_effects(Agent,Templ,Template):-
+  must_det_l((
+      Templ=..[ActVerb|ARGS],
       verb_affordance(ActVerb,Types,_,_,_),args_match_types(ARGS,Types),!,must(Template=..[ActVerb,Types]),
       findall(t(Trait,Agent,Real), verb_affordance(ActVerb,Types,Trait,_Think,Real),NewAdds),
-      forall(member(Add,NewAdds),add(Add)).
+      show_call(forall(member(Add,NewAdds),db_assert_sv(Add))))).
 
 affordance_message(Agent,Templ,Template):- Templ=..[ActVerb|ARGS],
       verb_desc_or_else(ActVerb,Types,Mesg),args_match_types(ARGS,Types),!,must(Template=..[ActVerb,Types]),

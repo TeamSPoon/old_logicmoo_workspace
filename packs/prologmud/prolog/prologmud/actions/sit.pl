@@ -36,6 +36,6 @@ user:agent_call_command(Agent,actOnto(Where,Sit)):-
         padd(Agent,localityOfObject(Where)),
 	call_update_charge(Agent,Sit).
 
-update_charge(Agent,Sit) :- vtPosture(Sit), padd(Agent,[mudEnergy(-1)]).
+update_charge(Agent,Sit) :- vtPosture(Sit), padd(Agent,[mudEnergy(+ -1)]).
 
 :- include(prologmud(mud_footer)).

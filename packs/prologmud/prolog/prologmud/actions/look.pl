@@ -68,9 +68,7 @@ user:agent_call_command(Agent,actLook(_Dir,SObj)):-
    forall_member(P,Percepts,agent_call_command_now(Agent,actExamine(P))).
 
 :-export(look_as/1).
-look_as(Agent):- mudAtLoc(Agent,LOC),
-   with_agent(Agent, cmdLook(Agent,LOC)),!.
-
+look_as(Agent):- mudAtLoc(Agent,LOC),cmdLook(Agent,LOC),!.
 
 :-export(cmdLook/2).
 cmdLook(Agent,LOC):- garbage_collect_atoms, call(cmdLook_proc,Agent,LOC),!.

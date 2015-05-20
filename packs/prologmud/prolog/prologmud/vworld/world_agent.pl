@@ -52,8 +52,8 @@ do_agent_action(P,C,O):- \+ immediate_session(P,C,O), !, enqueue_agent_action(P,
 do_agent_action(P,C,_):- var(C),!,fmt('unknown_var_command(~q,~q).',[P,C]).
 do_agent_action(_,EOF,_):- end_of_file == EOF, !, tick_tock.
 do_agent_action(_,'',_):-!, tick_tock.
-do_agent_action(P,C,O):- agent_call_command_unparsed(P, C),!.
-do_agent_action(P,C,O):-fmt('skipping_unknown_player_action(~q,~q).~n',[P,C]),!,fail.
+do_agent_action(P,C,O):- do_gc,with_session(O,agent_call_command_unparsed(P, C)),!.
+do_agent_action(P,C,O):-wdmsg('skipping_unknown_player_action(~q,~q).~n',[P,C]),!.
 
 
 :-export(parse_agent_text_command_checked/5).
@@ -73,9 +73,16 @@ thread_signal_blocked(ID,Goal):- thread_self(ID),!,Goal.
 thread_signal_blocked(ID,Goal):- message_queue_property(Queue, alias(waq)),thread_self(Waiter), thread_signal(ID,(Goal,thread_send_message(Queue,done(Goal,Waiter),[]))),thread_get_message(Queue,done(Goal,Waiter)).
 
 
-do_agent_action_queues:- repeat,sleep(0.25),forall(tAgent(A),logOnError(do_agent_action_queue(A))),fail.
+do_agent_action_queues:- repeat,sleep(0.25),once(logOnError(do_agent_action_queue(_))),fail.
 
-start_agent_action_thread:- (thread_property(T,alias(agent_action_queue_thread)),thread_property(T,status(running)))->true;thread_create(do_agent_action_queues,_,[alias(agent_action_queue_thread)]).
+start_agent_action_thread:- 
+  (thread_property(T,alias(agent_action_queue_thread)) ->
+   (thread_property(T,status(running))->true;(thread_join(agent_action_queue_thread,_);
+     thread_create(do_agent_action_queues,_,[alias(agent_action_queue_thread)])));
+    thread_create(do_agent_action_queues,_,[alias(agent_action_queue_thread)])).
+
+
+   
 
 % restarts if it it died
 user:one_minute_timer_tick:- start_agent_action_thread.
@@ -200,9 +207,11 @@ get_agent_input_thread(P,Id):-no_repeats(P-Id,(get_agent_input_stream(P,O),thglo
 
 
 with_agent(P,CALL):-
- ((get_agent_session(P,O),thglobal:session_io(O,In,Out,Id))->Wrap=thread_signal_blocked(Id);Wrap=call),
+ get_session_id(TS),must(nonvar(TS)),
+ thread_self(Self),
+ ((get_agent_session(P,O),thglobal:session_io(O,In,Out,Id),Id\=Self)->Wrap=thread_signal_blocked(Id);Wrap=call),!,
   call(Wrap, 
-    with_assertions([put_server_no_max,thglobal:session_agent(O,P),thglobal:agent_session(P,O)],
+    with_assertions([put_server_no_max,thglobal:session_agent(TS,P),thglobal:agent_session(P,TS)],
       with_output_to_pred(deliver_event(P),CALL))).
 
 has_tty(O):-no_repeats(O,thglobal:session_io(O,_,_,_)).
@@ -223,21 +232,22 @@ foc_current_agent(P):-
 
 :-user:ensure_loaded(library(http/http_session)).
 
-get_session_id(IDIn):-guess_session_ids(ID),!,ID=IDIn.
-% telnet session
-guess_session_ids(ID):-thread_self(TID),thglobal:session_io(ID,_,_,TID).
+get_session_id(IDIn):-guess_session_ids(ID),nonvar(ID),!,ID=IDIn.
+
 % return any thread locally set session
-guess_session_ids(In):-thlocal:session_id(ID).
-% returns http sessions as well
-guess_session_ids(ID):-http_in_session(ID).
+guess_session_ids(ID):-thlocal:session_id(ID).
 % irc session
 guess_session_ids(ID):-if_defined(thlocal:default_user(ID)).
+% telnet session
+guess_session_ids(ID):-thread_self(TID),thglobal:session_io(ID,_,_,TID).
+% returns http sessions as well
+guess_session_ids(ID):-if_defined(http_in_session(ID)).
 % tcp session
 guess_session_ids(ID):-thread_self(TID),thread_property(TID,alias(ID)).
 % anonymous sessions
-guess_session_ids(In):-thread_self(ID),thread_util:has_console(ID,In,Out,Err).
+guess_session_ids(ID):-thread_self(ID), \+ thread_property(ID,alias(ID)).
 % anonymous sessions
-guess_session_ids(In):-current_input(In),is_stream(In).
+guess_session_ids(In):-thread_self(ID),thread_util:has_console(ID,In,Out,Err).
 
 
 :-export(my_random_member/2).

@@ -36,9 +36,6 @@ user:agent_call_command(Agent,actEat(Obj)) :-
         must(not(mudPossess(Agent,Obj))),
 	must((call_update_charge(Agent,actEat))).
 
-update_charge(Agent,actEat) :-
-	del(mudEnergy(Agent,Old)),
-	New is Old - 1,
-	add(mudEnergy(Agent,New)).
+update_charge(Agent,actEat) :- padd(Agent,mudEnergy(+ -1)).
 
 :- include(prologmud(mud_footer)).

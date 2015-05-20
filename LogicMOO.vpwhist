@@ -213,7 +213,7 @@ PrologMUD.vpj=20150503193724685
           + test
           + unfold
         + test
-    + MUD_ircbot
+    - MUD_ircbot
       - eggdrop
       - prolog
     + MUD_KnowRob
@@ -680,7 +680,7 @@ PrologMUD.vpj=20150503193724685
       + testfiles
       - tools
       - util
-    - OLD_logicm00
+    + OLD_logicm00
       + btepisode
       + src_data
         - pldata
@@ -1607,20 +1607,21 @@ PrologMUD.vpj=20150503193724685
           + prolog
           + snd
       - src_game_wumpus
-    + logicmoo_base
+    - logicmoo_base
       - prolog
         - logicmoo
           - mpred
-          - util
+          + util
       + t
     - logicmoo_engine
       - prolog
         - logicmoo
           - engine
             + flux
-            - mike
-            + plarkc
-            - pttp
+            + mike
+            - plarkc
+            + pttp
+            - xray
           + planner
             + Blocks_world
             + domains
@@ -1669,18 +1670,18 @@ PrologMUD.vpj=20150503193724685
           - mpred_online
           - swish_lib
             - render
-    + prologmud
+    - prologmud
       - prolog
         - prologmud
-          + actions
+          - actions
           - mobs
             - affordance
             + planner
           - objs
           - parsing
           - server
-          + vworld
-      + runtime
+          - vworld
+      - runtime
         + cache
           + rdf
             + a2
@@ -1752,311 +1753,89 @@ PrologMUD.vpj=20150503193724685
               + swi
               + trace
               + xref
-scroll:217
+scroll:126
 [State]
-SCREEN: 1920 1080 486 226 1440 735 0 0 M 0 0 0 0 1351 644
-CWD: packs\logicmoo_engine\prolog\logicmoo
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\pttp\dbase_i_mpred_pttp.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=46 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\pttp\dbase_i_mpred_pttp_precompiled.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.51354 CL=38 LE=0 CX=37 CY=18 WI=5 BI=34 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\pttp\dbase_i_mpred_pttp_testing.pl"
+SCREEN: 1920 1080 480 226 1440 735 0 0 N 0 0 0 0 863 367
+CWD: packs\prologmud\prolog\prologmud\mobs\affordance
+BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_irc.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=43 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\pttp\dbase_i_mpred_pttp_statics.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.50197 CL=48 LE=0 CX=47 CY=34 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\planner\elevators\elevators-01-0.pddl"
+VIEW: LN=.1585 CL=2 LE=0 CX=1 CY=12 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.995\Unicorn BousiProlog Beta + Ejemplos + Manual\FS_age_persons.bpl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.166 CL=15 LE=0 CX=14 CY=14 WI=5 BI=45 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_DLog\dlog-server\src\dl_translator\old\translator_old.pl"
+VIEW: LN=.251 CL=44 LE=0 CX=43 CY=7 WI=5 BI=42 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_agent.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.953 CL=35 LE=0 CX=34 CY=29 WI=5 BI=39 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_DLog\dlog-server\src\dl_translator\fol\translator_fol.pl"
+VIEW: LN=.1706 CL=32 LE=0 CX=31 CY=29 WI=5 BI=36 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\mobs\prey.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1209 CL=18 LE=0 CX=17 CY=18 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_DLog\dlog-server\src\dl_translator\pure\dl_to_fol_pure.pl"
+VIEW: LN=.575 CL=6 LE=0 CX=5 CY=30 WI=5 BI=40 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\mobs\affordance\improve.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.-1 CL=1 LE=0 CX=0 CY=34 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\mobs\affordance\simbots.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.678 CL=9 LE=0 CX=8 CY=17 WI=5 BI=32 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\database\logicmoo_tap_modlean.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.34327 CL=36 LE=0 CX=35 CY=18 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\database\start_swiprolog_unix.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1254279 CL=9 LE=0 CX=8 CY=18 WI=5 BI=33 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\database\logicmoo_unused.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.387367 CL=29 LE=0 CX=28 CY=18 WI=5 BI=35 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\database\logicmoo_cmp_sentence.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.20744 CL=67 LE=0 CX=66 CY=18 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\yadlr\pl\prodlr.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.27366 CL=40 LE=0 CX=39 CY=18 WI=5 BI=40 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\malecop\tptp2leancop.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.13030 CL=3 LE=0 CX=2 CY=18 WI=5 BI=37 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\fof2graph.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.3040 CL=28 LE=0 CX=27 CY=33 WI=5 BI=83 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\snow2mor.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=84 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_DeepParsing\prolog\CURT\curtDRT.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=33 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\mobs\vacuum.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=85 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_DeepParsing\prolog\CURT\cnfFOL.pl"
+VIEW: LN=.495 CL=6 LE=0 CX=5 CY=22 WI=5 BI=41 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_npc.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.6543 CL=1 LE=0 CX=0 CY=23 WI=5 BI=86 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_DeepParsing\prolog\CURT\callModelBuilder.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=103 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_DeepParsing\prolog\CURT\cnfTestSuite.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=87 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_DeepParsing\prolog\CURT\bindingDRT.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=88 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_DeepParsing\prolog\CURT\callTheoremProver.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=89 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\util\logicmoo_util_library.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.3698 CL=21 LE=0 CX=20 CY=21 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_DB_LeanCOR\leancop_proof.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.5835 CL=1 LE=0 CX=0 CY=18 WI=5 BI=113 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_WebTHEA\util\memoization.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=120 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_WebTHEA\swrl.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=121 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_DeepParsing\prolog\CURT\lambdaDRT.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=111 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_PDDL\prolog\misc_planner\popold2.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.4743 CL=9 LE=0 CX=8 CY=18 WI=5 BI=68 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_DLog\dlog-server\src\unfold\unfold.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.21653 CL=46 LE=0 CX=45 CY=18 WI=5 BI=66 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\logicmoo_engine.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.32999 CL=29 LE=0 CX=28 CY=36 WI=5 BI=44 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\ref_unused\dbase_i_isa_motel.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.257187 CL=42 LE=0 CX=41 CY=25 WI=5 BI=69 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_DLog\dlog-server\src\unfold\ainterp.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2302 CL=26 LE=0 CX=25 CY=18 WI=5 BI=65 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_WebTHEA\examples\enforce_jepd.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=70 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\indigolog\Interpreters\flux\flux.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=71 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\indigolog\Interpreters\flux\flux_swi.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.3928 CL=1 LE=0 CX=0 CY=23 WI=5 BI=72 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\indigolog\lib\alpha_star.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.5096 CL=1 LE=0 CX=0 CY=36 WI=5 BI=73 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\indigolog\flux_wumpus_simulator.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=74 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\hammerize.pl"
+VIEW: LN=.2312 CL=27 LE=0 CX=26 CY=18 WI=5 BI=45 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_events.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=75 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\malecop\dnf2fof"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Bourne Shell	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=76 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\malecop\leancop_dnf.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.21803 CL=39 LE=0 CX=38 CY=18 WI=5 BI=78 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\malecop\leancop_dnf.sh"
-BI: MA=1 74 1  TABS=1 4  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Slick-C	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=79 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\malecop\leancop_proof.pl"
+VIEW: LN=.1462 CL=32 LE=0 CX=31 CY=0 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\actions\actions_conf.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=80 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\malecop\leancop_main.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2728 CL=1 LE=0 CX=0 CY=36 WI=5 BI=81 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\malecop\leancop_tptp2.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\actions\any.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.5176 CL=3 LE=0 CX=2 CY=34 WI=5 BI=82 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\malecop\dnf2fof.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\MUD_ircbot\prolog\eggdrop.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=77 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.931\XRayVer33\model.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.10324 CL=6 LE=0 CX=5 CY=18 WI=5 BI=41 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.160\XRayVer33\herbrand.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.4902 CL=1 LE=0 CX=0 CY=36 WI=5 BI=50 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.232\XRayVer33\lemmaflex.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1921 CL=10 LE=0 CX=9 CY=20 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.940\XRayVer33\xray.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.9025 CL=34 LE=0 CX=33 CY=10 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
-WINDOW: 198 198 1131 456 -1 -1 N  WF=0 WT=109 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_WebTHEA\swrl.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=370 BI=121 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1131 456 -1 -1 N  WF=0 WT=108 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_WebTHEA\util\memoization.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=369 BI=120 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1131 456 -1 -1 N  WF=0 WT=101 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_DB_LeanCOR\leancop_proof.pl"
-VIEW: LN=.5835 CL=1 LE=0 CX=0 CY=18 WI=362 BI=113 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1153 446 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\util\logicmoo_util_library.pl"
-VIEW: LN=.3698 CL=21 LE=0 CX=20 CY=21 WI=146 BI=29 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1153 446 -1 -1 N  WF=0 WT=77 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_DeepParsing\prolog\CURT\callTheoremProver.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=338 BI=89 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1153 446 -1 -1 N  WF=0 WT=99 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_DeepParsing\prolog\CURT\lambdaDRT.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=360 BI=111 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1153 446 -1 -1 N  WF=0 WT=91 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_DeepParsing\prolog\CURT\callModelBuilder.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=352 BI=103 HT=0 HN=0 HF=0 HC=4
-WINDOW: 198 198 1153 446 -1 -1 N  WF=0 WT=74 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_DeepParsing\prolog\CURT\cnfFOL.pl"
-VIEW: LN=.6543 CL=1 LE=0 CX=0 CY=23 WI=335 BI=86 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1153 446 -1 -1 N  WF=0 WT=76 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_DeepParsing\prolog\CURT\bindingDRT.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=337 BI=88 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1153 446 -1 -1 N  WF=0 WT=75 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_DeepParsing\prolog\CURT\cnfTestSuite.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=336 BI=87 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1153 446 -1 -1 N  WF=0 WT=73 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_DeepParsing\prolog\CURT\curtDRT.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=334 BI=85 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1153 446 -1 -1 N  WF=0 WT=72 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\snow2mor.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=333 BI=84 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1153 446 -1 -1 N  WF=0 WT=71 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\fof2graph.pl"
-VIEW: LN=.3040 CL=28 LE=0 CX=27 CY=33 WI=332 BI=83 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1153 446 -1 -1 N  WF=0 WT=18 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\malecop\tptp2leancop.pl"
-VIEW: LN=.13030 CL=3 LE=0 CX=2 CY=18 WI=241 BI=37 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1153 446 -1 -1 N  WF=0 WT=70 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\malecop\leancop_tptp2.pl"
-VIEW: LN=.5176 CL=3 LE=0 CX=2 CY=34 WI=331 BI=82 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1153 446 -1 -1 N  WF=0 WT=69 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\malecop\leancop_main.pl"
-VIEW: LN=.2728 CL=1 LE=0 CX=0 CY=36 WI=330 BI=81 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1153 446 -1 -1 N  WF=0 WT=68 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\malecop\leancop_proof.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=329 BI=80 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1153 446 -1 -1 N  WF=0 WT=67 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\malecop\leancop_dnf.sh"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=328 BI=79 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1153 446 -1 -1 N  WF=0 WT=66 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\malecop\leancop_dnf.pl"
-VIEW: LN=.21803 CL=39 LE=0 CX=38 CY=18 WI=327 BI=78 HT=0 HN=0 HF=0 HC=4
-WINDOW: 198 198 1153 446 -1 -1 N  WF=0 WT=64 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\malecop\dnf2fof"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=143 BI=76 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1153 446 -1 -1 N  WF=0 WT=65 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\malecop\dnf2fof.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=326 BI=77 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1153 446 -1 -1 N  WF=0 WT=63 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\MaLARea\script\hammerize.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=324 BI=75 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1153 446 -1 -1 N  WF=0 WT=62 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\indigolog\flux_wumpus_simulator.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=322 BI=74 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1153 446 -1 -1 N  WF=0 WT=61 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\indigolog\lib\alpha_star.pl"
-VIEW: LN=.5096 CL=1 LE=0 CX=0 CY=36 WI=320 BI=73 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1153 446 -1 -1 N  WF=0 WT=60 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\indigolog\Interpreters\flux\flux_swi.pl"
-VIEW: LN=.3928 CL=1 LE=0 CX=0 CY=23 WI=318 BI=72 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1153 446 -1 -1 N  WF=0 WT=59 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\indigolog\Interpreters\flux\flux.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=316 BI=71 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1153 446 -1 -1 N  WF=0 WT=58 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_WebTHEA\examples\enforce_jepd.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=314 BI=70 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1153 446 -1 -1 N  WF=0 WT=53 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_DLog\dlog-server\src\unfold\ainterp.pl"
-VIEW: LN=.2302 CL=26 LE=0 CX=25 CY=18 WI=215 BI=65 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1153 446 -1 -1 N  WF=0 WT=57 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\ref_unused\dbase_i_isa_motel.pl"
-VIEW: LN=.257187 CL=42 LE=0 CX=41 CY=25 WI=179 BI=69 HT=0 HN=0 HF=0 HC=4
-WINDOW: 198 198 1153 446 -1 -1 N  WF=0 WT=54 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_DLog\dlog-server\src\unfold\unfold.pl"
-VIEW: LN=.21653 CL=46 LE=0 CX=45 CY=18 WI=187 BI=66 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1153 446 -1 -1 N  WF=0 WT=56 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_PDDL\prolog\misc_planner\popold2.pl"
-VIEW: LN=.4743 CL=9 LE=0 CX=8 CY=18 WI=194 BI=68 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1153 446 -1 -1 N  WF=0 WT=27 "Default Fixed Font,10,0,1"
-BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.940\XRayVer33\xray.pl"
-VIEW: LN=.8926 CL=1 LE=0 CX=0 CY=7 WI=152 BI=27 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1153 446 -1 -1 N  WF=0 WT=26 "Default Fixed Font,10,0,1"
-BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.232\XRayVer33\lemmaflex.pl"
-VIEW: LN=.1921 CL=10 LE=0 CX=9 CY=20 WI=113 BI=17 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1153 446 -1 -1 N  WF=0 WT=25 "Default Fixed Font,10,0,1"
-BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.160\XRayVer33\herbrand.pl"
-VIEW: LN=.4902 CL=1 LE=0 CX=0 CY=36 WI=107 BI=50 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1153 446 -1 -1 N  WF=0 WT=24 "Default Fixed Font,10,0,1"
-BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.931\XRayVer33\model.pl"
-VIEW: LN=.10324 CL=6 LE=0 CX=5 CY=18 WI=200 BI=41 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1153 446 -1 -1 N  WF=0 WT=17 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\yadlr\pl\prodlr.pl"
-VIEW: LN=.27366 CL=40 LE=0 CX=39 CY=18 WI=182 BI=40 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1153 446 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\database\logicmoo_cmp_sentence.pl"
-VIEW: LN=.20744 CL=67 LE=0 CX=66 CY=18 WI=254 BI=18 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1153 446 -1 -1 N  WF=0 WT=16 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\database\logicmoo_unused.pl"
-VIEW: LN=.387367 CL=29 LE=0 CX=28 CY=18 WI=148 BI=35 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1153 446 -1 -1 N  WF=0 WT=15 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\database\start_swiprolog_unix.pl"
-VIEW: LN=.1254279 CL=9 LE=0 CX=8 CY=18 WI=129 BI=33 HT=0 HN=0 HF=0 HC=4
-WINDOW: 198 198 1153 446 -1 -1 N  WF=0 WT=13 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\OLD_logicm00\src_modules\database\logicmoo_tap_modlean.pl"
-VIEW: LN=.34327 CL=36 LE=0 CX=35 CY=18 WI=235 BI=24 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1153 446 -1 -1 N  WF=0 WT=12 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_DLog\dlog-server\src\dl_translator\pure\dl_to_fol_pure.pl"
-VIEW: LN=.678 CL=9 LE=0 CX=8 CY=17 WI=244 BI=32 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1153 446 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_DLog\dlog-server\src\dl_translator\fol\translator_fol.pl"
-VIEW: LN=.1209 CL=18 LE=0 CX=17 CY=18 WI=221 BI=26 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1153 446 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_DLog\dlog-server\src\dl_translator\old\translator_old.pl"
-VIEW: LN=.953 CL=35 LE=0 CX=34 CY=29 WI=144 BI=39 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1153 446 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\planner\elevators\elevators-01-0.pddl"
-VIEW: LN=.166 CL=15 LE=0 CX=14 CY=14 WI=266 BI=45 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1153 446 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\pttp\dbase_i_mpred_pttp_statics.pl"
-VIEW: LN=.50197 CL=48 LE=0 CX=47 CY=34 WI=264 BI=28 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1153 446 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\pttp\dbase_i_mpred_pttp_testing.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=262 BI=43 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1153 446 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\pttp\dbase_i_mpred_pttp_precompiled.pl"
-VIEW: LN=.51354 CL=38 LE=0 CX=37 CY=18 WI=260 BI=34 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1153 446 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\engine\pttp\dbase_i_mpred_pttp.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=258 BI=46 HT=0 HN=0 HF=0 HC=4
-WINDOW: 198 198 1153 446 -1 -1 M  WF=0 WT=3 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\logicmoo_engine\prolog\logicmoo\logicmoo_engine.pl"
-VIEW: LN=.16628 CL=45 LE=0 CX=44 CY=20 WI=256 BI=44 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1153 446 -1 -1 N  WF=0 WT=12 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\mobs\affordance\simbots.pl"
+VIEW: LN=.437 CL=16 LE=0 CX=15 CY=13 WI=224 BI=33 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1153 446 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\actions\any.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=222 BI=22 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1153 446 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\actions\actions_conf.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=220 BI=26 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1153 446 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_events.pl"
+VIEW: LN=.1462 CL=32 LE=0 CX=31 CY=0 WI=218 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1153 446 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_npc.pl"
+VIEW: LN=.2312 CL=27 LE=0 CX=26 CY=18 WI=216 BI=45 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1153 446 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\mobs\vacuum.pl"
+VIEW: LN=.495 CL=6 LE=0 CX=5 CY=22 WI=194 BI=41 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1153 446 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\mobs\prey.pl"
+VIEW: LN=.575 CL=6 LE=0 CX=5 CY=30 WI=144 BI=40 HT=0 HN=0 HF=0 HC=4
+WINDOW: 198 198 1153 446 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_agent.pl"
+VIEW: LN=.1706 CL=32 LE=0 CX=31 CY=29 WI=108 BI=36 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1153 446 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.995\Unicorn BousiProlog Beta + Ejemplos + Manual\FS_age_persons.bpl"
+VIEW: LN=.251 CL=44 LE=0 CX=43 CY=7 WI=130 BI=42 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1153 446 -1 -1 N  WF=0 WT=17 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_irc.pl"
+VIEW: LN=.1585 CL=2 LE=0 CX=1 CY=12 WI=135 BI=29 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1153 446 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\MUD_ircbot\prolog\eggdrop.pl"
+VIEW: LN=.12572 CL=39 LE=0 CX=38 CY=22 WI=214 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1153 446 -1 -1 M  WF=0 WT=8 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\mobs\affordance\improve.pl"
+VIEW: LN=.284 CL=29 LE=0 CX=28 CY=6 WI=146 BI=18 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-externals\MUD_DB_LeanCOR\def_mm.pl
-externals\MUD_DB_LeanCOR\owl2_cli.pl
-externals\MUD_DB_LeanCOR\leancop_proof.pl
-externals\MUD_WebTHEA\util\memoization.pl
-externals\MUD_WebTHEA\swrl.pl
-externals\OLD_logicm00\src_modules\candc\parser_boxer.pl
-externals\OLD_logicm00\src_modules\MaLARea\data\MZT1000TrainingData
-packs\logicmoo_engine\prolog\logicmoo\engine\mike\mikev203.pl
-packs\logicmoo_engine\prolog\logicmoo\logicmoo_engine.pl
+packs\prologmud\prolog\prologmud\vworld\world_agent.pl
+packs\prologmud\prolog\prologmud\mobs\vacuum.pl
+packs\prologmud\prolog\prologmud\mobs\prey.pl
+packs\prologmud\prolog\prologmud\vworld\world_npc.pl
+packs\prologmud\prolog\prologmud\vworld\world_events.pl
+packs\prologmud\prolog\prologmud\actions\actions_conf.pl
+packs\prologmud\prolog\prologmud\actions\any.pl
+packs\prologmud\prolog\prologmud\mobs\affordance\simbots.pl
+packs\prologmud\prolog\prologmud\mobs\affordance\improve.pl

@@ -937,7 +937,9 @@ prologOnly(onEachLoad).
 argsQuoted(onEachLoad).
 argsQuoted(must).
 
-prologHybrid(normalAgentGoal(ftTerm,ftTerm)).
+tCol(tStatPred).
+
+prologHybrid(normalAgentGoal(tStatPred,ftTerm)).
 normalAgentGoal(Pred,_)/atom(Pred)=>{AT=..[Pred,tAgent,ftPercent]},meta_argtypes(AT),prologHybrid(Pred),tRolePredicate(Pred),arity(Pred,2),singleValuedInArg(Pred,2).
 normalAgentGoal(mudEnergy,90).
 normalAgentGoal(mudNonHunger,90).
@@ -948,6 +950,28 @@ normalAgentGoal(mudFun,90).
 normalAgentGoal(mudNonLonelinessSocial,90).
 normalAgentGoal(mudSadToHappy,90).
 normalAgentGoal(mudComfort,90).
+
+typeProps(tAgent,[mudStr(2),mudHeight(2),mudStm(2),mudSpd(2)]).
+
+normalAgentGoal(X,_)=>tStatPred(X).
+
+((tStatPred(Pred)/((Val1=(-(_));Val1=( +(_))), Head1=..[Pred,Agent,Val1], Head2=..[Pred,Agent,Val2], Head3=..[Pred,Agent,Val3]))
+ =>
+   ((Head1,Head2/(Val1 \== Val2, catch((Val3 is Val1 + Val2),_,fail))) => 
+     (( \+ Head1, Head3, \+ Head2 )))).
+
+((tStatPred(Pred)/((Val1=(+(_));Val1=( -(_))), Head1=..[Pred,Agent,Val1], Head2=..[Pred,Agent,Val2], Head3=..[Pred,Agent,Val3]))
+ =>
+   ((Head1,Head2/(Val1 \== Val2, catch((Val3 is Val1 + Val2),_,fail))) => 
+     (( \+ Head1, Head3, \+ Head2 )))).
+
+
+(prologSingleValued(Pred),arity(Pred,Arity), singleValuedInArg(Pred,SV),
+  {functor(Before,Pred,Arity),arg(SV,Before,B),replace_arg(Before,SV,A,After)})
+  => 
+   ({dif:dif(B,A)},After,{clause_asserted(Before), B\==A,\+ is_relative(B),\+ is_relative(A)} => {pfc_rem2(Before)}).
+
+
 
 %normalAgentGoal(Pred,Val)=>  (tAgent(A)=>agentGoals(A,Pred,((t(Pred,A,V),V>=Val)))).
 %agentGoals(A,About,State)/State => \+ agentTODO(A,actImprove(About)).

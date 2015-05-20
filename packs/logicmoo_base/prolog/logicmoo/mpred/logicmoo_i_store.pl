@@ -386,10 +386,13 @@ db_assert_sv(Must,C,F,A):- ex, ignore(( loop_check(db_assert_sv_ilc(Must,C,F,A),
 db_assert_sv_ilc(Must,C,F,A):- arg(A,C,UPDATE),db_assert_sv_now(Must,C,F,A,UPDATE),!.
 
 :-export(db_assert_sv_now/5).
+
+db_assert_sv_now(Must,C,F,A,    +UPDATE):-!,  db_assert_sv_update(Must,C,F,A,+UPDATE).
+db_assert_sv_now(Must,C,F,A,    -UPDATE):-!,  db_assert_sv_update(Must,C,F,A,-UPDATE).
+db_assert_sv_now(Must,C,F,A,    V):- is_relative(V),!,  db_assert_sv_update(Must,C,F,A,+V).
 db_assert_sv_now(Must,C,F,A, UPDATE):- has_free_args(db_assert_sv_now(Must,C,F,A, UPDATE)),!,trace_or_throw(var_db_assert_sv_now(Must,C,F,A, UPDATE)).
 db_assert_sv_now(Must,C,F,A, NEGREPLACE):- number(NEGREPLACE),NEGREPLACE<0, !,db_assert_sv_replace(Must,C,F,A,NEGREPLACE).
 db_assert_sv_now(Must,C,F,A, -(+(UPDATE))):-!,db_assert_sv_update(Must,C,F,A,-UPDATE).
-db_assert_sv_now(Must,C,F,A,    +UPDATE):-!,  db_assert_sv_update(Must,C,F,A,+UPDATE).
 db_assert_sv_now(Must,C,F,A, +(-(UPDATE))):-  db_assert_sv_update(Must,C,F,A,-UPDATE).
 db_assert_sv_now(Must,C,F,A, REPLACE):- db_assert_sv_replace(Must,C,F,A, REPLACE).
 
@@ -455,6 +458,7 @@ db_must_asserta_confirmed_sv(CNEW,A,NEW):-
    replace_arg(CNEW,A,NOW,CNOW),
    sanity(not(singletons_throw_else_fail(CNEW))),
    mpred_modify(change(assert,sv),CNEW),!,
+   add(CNEW),
    verify_sanity(confirm_hook(CNEW:NEW=@=CNOW:NOW)),!.
 
 db_must_asserta_confirmed_sv(CNEW,A,NEW):-dmsg(unconfirmed(db_must_asserta_confirmed_sv(CNEW,A,NEW))).

@@ -59,20 +59,11 @@ climbable(Agent,Dir) :-
 	ObjHt > 1.
 
 %Record keeping
-update_charge(Agent,actClimb) :-
-	del(mudEnergy(Agent,Old)),
-	New is Old - 5,
-	add(mudEnergy(Agent,New)).
+update_charge(Agent,actClimb) :- padd(Agent,mudEnergy(+ -5)).
 
-update_stats(Agent,trip) :- 
-        del(mudHealth(Agent,Old)),
-	New is Old - 3,
-	add(mudHealth(Agent,New)).
+update_stats(Agent,trip) :-  padd(Agent,mudHealth(+ -3)).
 
-update_stats(Agent,pulled) :- 
-        del(mudHealth(Agent,Old)),
-	New is Old - 2,
-	add(mudHealth(Agent,New)),
+update_stats(Agent,pulled) :- padd(Agent,mudHealth(+ -2)),
 	(add_cmdfailure(Agent,pulled)).
 
 

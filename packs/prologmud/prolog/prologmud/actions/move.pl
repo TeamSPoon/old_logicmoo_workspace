@@ -99,11 +99,11 @@ move_command_1(Agent,Dir) :-
 
 %Record keeping
 
-update_charge(Agent,actMove) :- padd(Agent,mudEnergy,-4).
+update_charge(Agent,actMove) :- padd(Agent,mudEnergy,+ -4).
 
-update_stats(Agent,collide) :- padd(Agent,mudHealth,-5),(add_cmdfailure(Agent,collide)).
+update_stats(Agent,collide) :- padd(Agent,mudHealth,+ -5),(add_cmdfailure(Agent,collide)).
 
-update_stats(Agent,fall) :- padd(Agent,mudHealth,-10).
+update_stats(Agent,fall) :- padd(Agent,mudHealth,+ -10).
 
 % cheating but to test
 

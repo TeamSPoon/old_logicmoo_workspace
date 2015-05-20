@@ -258,7 +258,7 @@ argIsa_call_7(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa(P
 argIsa_call_7(Prop,N1,Type):- argIsa_call_9(Prop,N1,Type).
 argIsa_call_9(_,_,ftTerm):- argisa_nodebug,!.
 argIsa_call_9(Prop,N1,Type):- arity(Prop,Arity),dmsg(todo(define(argIsa_known_a(Prop,N1,'_TYPE')))),number(Arity),number(N1),must(N1=<Arity),Type=argIsaFn(Prop,N1),!.
-argIsa_call_9(Prop,N1,Type):- dmsg(todo(define(argIsa_known_b(Prop,N1,'_TYPE')))),Type=argIsaFn(Prop,N1),!.
+argIsa_call_9(Prop,N1,Type):- dmsg(todo(define(argIsa_known_b(Prop,N1,'_TYPE')))),trace,Type=argIsaFn(Prop,N1),!.
 argIsa_call_9(_,_,ftTerm).
 
 

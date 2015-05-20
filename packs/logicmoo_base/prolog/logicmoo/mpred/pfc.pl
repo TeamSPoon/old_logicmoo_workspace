@@ -65,7 +65,7 @@ to_db_assertable((P<=>Q),was_chain_rule((P<=>Q))):-!.
 to_db_assertable(P,P).
 */
 
-pfc_each_literal(P,E):-nonvar(P),P=(P1,P2),!,pfc_each_literal(P1,E);pfc_each_literal(P2,E).
+pfc_each_literal(P,E):-nonvar(P),P=(P1,P2),!,(pfc_each_literal(P1,E);pfc_each_literal(P2,E)).
 pfc_each_literal(P,P). %:-conjuncts_to_list(P,List),member(E,List).
 
 to_addable_form_wte(P0,P):- must(to_addable_form(P0,P)),!, (P0\=@=P->pfc_debug_trace(to_addable_form(P0,P));true).
@@ -478,6 +478,10 @@ pfc_post1_sp_0(S,P) :-
   must(pfc_assert_fast_i(P,S)).
 
 pfc_assert_fast_i(P,S):- loop_check(pfc_assert_fast_i_0(P,S),true).
+
+% TOO UNSAFE 
+pfc_assert_fast_i_0(P,_):- functor(P,_,SV),arg(SV,P,V),is_relative(V),!,show_call(db_assert_sv(P)).
+pfc_assert_fast_i_0(P,_):- functor(P,F,_),if_defined(singleValueInArg(F,SV)),arg(SV,P,V),is_relative(V),!,show_call(db_assert_sv(P)).
 pfc_assert_fast_i_0(P,S):-
    must(pfc_add_support(P,S)),
    must(loop_check(pfc_post1_sp_3(S,P),true)),!.
@@ -1245,28 +1249,16 @@ pfc_call_0((C1,C2)):-!,pfc_call_0(C1),pfc_call_0(C2).
 pfc_call_0(call(X)):- !, pfc_call_0(X).
 pfc_call_0(\+(X)):- !, \+ pfc_call_0(X).
 pfc_call_0(call_u(X)):- !, pfc_call_0(X).
-pfc_call_0(F):- call_with_bc_triggers(F),maybeSupport(F,(g,g)),fail.
+pfc_call_0(F):- loop_check(call_with_bc_triggers(F)),maybeSupport(F,(g,g)),fail.
 pfc_call_0(X):- functor(X,F,A), \+ current_predicate(F/A),dynamic(F/A),multifile(F/A),fail.
 pfc_call_0(F):- pfc_call_with_no_triggers(F).
 
 
+:-thread_local thlocal:infBackChainPrevented/1.
 
-call_with_bc_triggers_0(P) :- bt(P,Trigger),sanity(pfc_get_support(bt(P,Trigger),_)),fail.
+call_with_bc_triggers(P) :- functor(P,F,A), \+thlocal:infBackChainPrevented(F/A), bt(P,Trigger), pfc_get_support(bt(P,Trigger),S),no_side_effects(P),
+  with_no_assertions(thlocal:infBackChainPrevented(F/A),pfc_eval_lhs(Trigger,S)).
 
-
-call_with_bc_triggers(P) :- !,bt(P,Trigger), pfc_get_support(bt(P,Trigger),S),no_side_effects(P),pfc_eval_lhs(Trigger,S).
-
-
-call_with_bc_triggers(P) :-
-  % sanity(doall(call_with_bc_triggers(P))),
-  % trigger any bc rules.
-  % sanity(copy_term(P,PP)),
-  foreach(bt(P,Trigger),
-  (no_side_effects(P),flag(btc,_,0),
-   foreach(
-    pfc_get_support(bt(P,Trigger),S),
-   (flag(btc,X,X+1),must(X=0),pfc_eval_lhs(Trigger,S))))).
-  
 
 pfc_call_with_no_triggers(U:X):-U==user,!,pfc_call_with_no_triggers(X).
 pfc_call_with_no_triggers(F) :- 
@@ -1737,6 +1729,13 @@ pfc_make_supports_f_l((P,S1,S2)) :-
   pfc_add_support(P,(S1,S2)),
   (pfc_add_db_type(P); true),
   !.
+
+
+is_relative(V):-not(compound(V)),!,fail.
+is_relative(+(_)).
+is_relative(-(_)).
+is_relative(N):-number(N),N =< 10, N >= -10.
+
 
 % TODO not called yet
 %= pfc_get_trigger_key(+Trigger,-Key)

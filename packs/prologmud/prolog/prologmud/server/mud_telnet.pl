@@ -9,7 +9,7 @@
 */
 
 :-module(mud_telnet, [                  
-                  connect_player/2,
+                  player_connect_menu/4,
                   look_brief/1,
                   cmdShowRoomGrid/1,
                   inst_label/2,
@@ -17,12 +17,14 @@
                   telnet_repl_writer/4,
                   telnet_repl_obj_to_string/3,
                   start_mud_telnet/1,
-                  run_local_tty_io/0,
+                  run_session/0,
+                  run_session/2,
                   login_and_run/0,
-                  login_and_run_tty/0,
-                  do_local_tty_io/0,
-                  set_player_telnet_options/0,
-                  register_player_stream_local/1,
+                  login_and_run/2,
+                  session_loop/2,
+                  get_session_io/2,
+                  set_player_telnet_options/1,
+                  register_player_stream_local/3,
                   login_and_run_nodebug/0]).
 
 
@@ -47,83 +49,78 @@ get_main_thread_error_stream(ES):-main_thread_error_stream(ES),!.
 get_main_thread_error_stream(user_error).
 
 service_client_call(Call, Slave, In, Out, Host, Peer, Options):-
-   get_main_thread_error_stream(Err),
    thread_self(Id),
+   get_main_thread_error_stream(Err),
    'format'(Err,'~n~n~q~n~n',[service_client_call(Call, Id, Slave, In, Out, Host, Peer, Options)]),
    call(Call).
-  
+
+get_session_io(In,Out):-
+   current_input(In),current_output(Out),
+   setup_streams(In, Out),
+   set_tty_control(true).
+
 login_and_run_nodebug:- 
  must(set_no_debug), 
  must(login_and_run).
 
-login_and_run:-
-   % current_input(In),current_output(Out),
-   %setup_streams(In, Out),   
-   %threads,
-   must(player_connect_menu),
-   % do_agent_action(P,'who'),   
-   must(login_and_run_tty).
 
-player_connect_menu:-
-   prolog_must_l([foc_current_agent(WantsPlayer),
-   connect_player(WantsPlayer,P),
-   agent_call_command_now(P,actLook)]),!.
-
-connect_player(Wants,Gets):-
- prolog_must_l([
+player_connect_menu(In,Out,Wants,P):-
+ must_det_l((
+   get_session_id(O),
+   fmt('~N~nHello ~q!~n',[O]),
+   setup_streams(In, Out),set_tty_control(true),
    foc_current_agent(Wants),
-   % sets some IO functions
-   once((register_player_stream_local(Wants),
-     current_agent(Gets))),register_player_stream_local(Gets)]).
-
-login_and_run_tty:-    
-   must(set_tty_control),!,
-   fmt('~n~n~nHello login_and_run_tty!~n',[]),
-   must(foc_current_agent(P)),
+   foc_current_agent(P),
    assert_isa(P,tHumanPlayer),
-   fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
-   must((colormsg([blink,fg(red)],"this is blinking red!"))),
-   with_assertions(set_prolog_flag(opt_debug,filter),
-    call_cleanup(
-     % runs the Telnet REPL
-     (must(set_player_telnet_options),
-     must(run_local_tty_io)),
-     must(goodbye_player))).
+   register_player_stream_local(P,In,Out),
+   fmt('~N~nWelcome to the MUD ~w!~n',[P]),
+   colormsg([blink,fg(red)],"this is blinking red!"))),!.
 
 
-set_player_telnet_options:-
-     must(foc_current_agent(P)),
+login_and_run:-
+   get_session_io(In,Out),
+   login_and_run(In,Out).
+
+login_and_run(In,Out):-
+  player_connect_menu(In,Out,_,_),
+  run_session(In,Out).
+
+set_player_telnet_options(P):-
      add(repl_writer(P,telnet_repl_writer)),
-     add(repl_to_string(P,telnet_repl_obj_to_string)),
-     set_bugger_flag(opt_debug,false).
+     add(repl_to_string(P,telnet_repl_obj_to_string)).
 
 goodbye_player:- 
      foc_current_agent(P3),
      deliver_event(P3,goodBye(P3)).
 
+run_session:-
+   get_session_io(In,Out),
+   run_session(In,Out).
 
-reset_wants_logout:- get_session_id(O),retractall(thlocal:wants_logout(O)).
+run_session(In,Out):-  
+  get_session_id(O),
+  retractall(thlocal:wants_logout(O)),!,
+  repeat,     
+         once(session_loop(In,Out)),
+      retract(thlocal:wants_logout(O)),
+      retractall(thglobal:session_io(_,_,_,Id)),
+      thread_self(Id),
+      retractall(thglobal:session_io(O,_,_,_)),!.
 
-run_local_tty_io :-     
-    reset_wants_logout,
-     repeat,     
-         once(do_local_tty_io),
-          retract(thlocal:wants_logout(O)),
-        retractall(thglobal:session_io(_,_,_,Id)),
-        retractall(thglobal:session_io(O,_,_,_)),!.
-
-do_local_tty_io:-
+session_loop(In,Out):-
+  get_session_id(O),
+  (current_agent(P)->true;player_connect_menu(In,Out,_,_);player_connect_menu(In,Out,_,P)),
   start_agent_action_thread,
-  get_session_id(O),foc_current_agent(P),
-  register_player_stream_local(P), 
-  must(ignore(look_brief(P))),!,         
-  sformat(S,'~w> ',[P]),prompt_read_telnet(S,List),!,
+  ignore(look_brief(P)),!,    
+  sformat(S,'~w> ',[P]),prompt_read_telnet(In,Out,S,List),!,
+  register_player_stream_local(P,In,Out),
   enqueue_agent_action(P,List,O).
 
 
-:-export(register_player_stream_local/1).
-register_player_stream_local(P):-
-   get_session_id(O),current_output(Out),current_input(In),thread_self(Id),
+:-export(register_player_stream_local/3).
+register_player_stream_local(P,In,Out):-
+   set_player_telnet_options(P),
+   get_session_id(O),thread_self(Id),
    retractall(thglobal:session_io(_,_,_,Id)),
    retractall(thglobal:session_io(O,_,_,_)),
    asserta_new(thglobal:session_io(O,In,Out,Id)),
@@ -135,14 +132,13 @@ register_player_stream_local(P):-
           asserta(thread_util:has_console(Id,In,Out,Err))))).
 
 
-set_tty_control:- 
+set_tty_control(TF):- 
   ignore((logOnFailure((
-   colormsg(red,"this is red!"),
-   set_prolog_flag(color_term,true),
-   set_stream(user_output, tty(true)),
-   set_stream(user_error, tty(true)),
-   set_stream(user_input, tty(true)),
-   set_prolog_flag(tty_control, true),
+   set_prolog_flag(color_term,TF),
+   set_stream(user_output, tty(TF)),
+   set_stream(user_error, tty(TF)),
+   set_stream(user_input, tty(TF)),
+   set_prolog_flag(tty_control, TF),
    colormsg(green,"this is green!"))))),!.
 
 
@@ -152,16 +148,15 @@ user:deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(New
       foreach(get_agent_sessions(A,O),foreach(thglobal:session_io(O,In,Out,Id),fmt(Out,'~N~q.~n',[NewEvent]))).
 
 
-:-export(prompt_read/2).
-prompt_read_telnet(Prompt,Atom):-
+:-export(prompt_read/4).
+prompt_read_telnet(In,Out,Prompt,Atom):-
       get_session_id(O),
-      prompt_read(Prompt,IAtom),
+      prompt_read(In,Out,Prompt,IAtom),
       (IAtom==end_of_file -> (hooked_asserta(thlocal:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
 
-:-export(prompt_read/2).
-prompt_read(Prompt,Atom):-        
-        ansi_format([reset,hfg(white),bold],'~w',[Prompt]),flush_output,        
-        repeat,read_code_list_or_next_command(Atom),!.
+prompt_read(In,Out,Prompt,Atom):-        
+        with_output_to(Out,ansi_format([reset,hfg(white),bold],'~w',[Prompt])),flush_output(Out),        
+        repeat,read_code_list_or_next_command(In,Atom),!.
 
 read_code_list_or_next_command(Atom):-current_input(In),read_code_list_or_next_command(In,Atom),!.
 
@@ -485,25 +480,31 @@ close_connection(In, Out) :-
 strm_info(Out,Name,Strm):-nl,write(Out,Name = Strm),forall(stream_property(Strm,P),'format'(Out,', ~q',[P])),nl(Out).
 
 setup_streams(In, Out):-
-     set_prolog_IO(In, Out, Out),
-       % set_stream(In, tty(true)),
-        % set_prolog_flag(tty_control, false),       
-	current_prolog_flag(encoding, Enc),
-	set_stream(user_input, encoding(Enc)),
-	set_stream(user_output, encoding(Enc)),
-	set_stream(user_error, encoding(Enc)),
-	set_stream(user_input, newline(detect)),
-	set_stream(user_output, newline(dos)),
-	set_stream(user_error, newline(dos)),!,
-  set_tty_control.
+      Err=Out,
+      set_prolog_IO(In, Out, Err),
+      thread_self(Id),
+      retractall(thread_util:has_console(Id, _, _, +)),
+      current_prolog_flag(encoding, Enc),
+      assert(thread_util:has_console(Id, In, Out, Err)),
+      set_stream(In,  alias(user_input)),
+      set_stream(Out, alias(user_output)),
+      set_stream(Err, alias(user_error)),
+      set_stream(In,  alias(current_input)),
+      set_stream(Out, alias(current_output)),
+      set_stream(user_input, encoding(Enc)),
+      set_stream(user_output, encoding(Enc)),
+      set_stream(user_error, encoding(Enc)),
+      set_stream(user_input, newline(detect)),
+      set_stream(user_output, newline(dos)),
+      set_stream(user_error, newline(dos)),!.
+  
 
 service_client(Slave, In, Out, Host, Peer, Options) :-
-	allow(Peer, Options), !,
-         call_pred(Call, Options), !,
-         setup_streams(In, Out),
-         thread_self(Id),
-	format(user_error,'% Welcome ~q to the SWI-Prolog LogicMOO server on thread ~w~n~n', [Peer,service_client(Slave, In, Out, Host, Peer, call(Call,Options))]),
-	call_close_and_detatch(In, Out, Id, service_client_call(Call, Slave, In, Out, Host, Peer, Options)).
+   allow(Peer, Options), !,
+   call_pred(Call, Options), !,
+   setup_streams(In, Out),
+   format(user_error,'% Welcome ~q to the SWI-Prolog LogicMOO server on thread ~w~n~n', [Peer,service_client(Slave, In, Out, Host, Peer, call(Call,Options))]),
+   call_close_and_detatch(In, Out, Id, service_client_call(Call, Slave, In, Out, Host, Peer, Options)).
 
 service_client(_Slave, In, Out, Host, Peer, _Options):- 
    thread_self(Id),

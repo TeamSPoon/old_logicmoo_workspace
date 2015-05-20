@@ -39,7 +39,7 @@
 
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(prologmud,Dir)).
 
-xyzFn(R,X,Y,Z):-dmsg(xyzFn(R,X,Y,Z)),trace_or_throw(xyzFn(R,X,Y,Z)).
+% xyzFn(R,X,Y,Z):-dmsg(xyzFn(R,X,Y,Z)),trace_or_throw(xyzFn(R,X,Y,Z)).
 
 :- multifile
 	prolog:message/3.
@@ -110,7 +110,8 @@ prolog_repl:- with_all_dmsg((nl,fmt("Press Ctrl-D to start the mud!"),nl,'@'(pro
 :- set_prolog_flag(gui,false).
 :- set_prolog_flag(history,1000).
 
-:- prolog_ide(debug_monitor),prolog_ide(open_debug_status). % ,prolog_ide(xref).
+% :- prolog_ide(debug_monitor),prolog_ide(open_debug_status). % ,prolog_ide(xref).
+
 :- debug(wotp).
 
 
@@ -192,8 +193,6 @@ user:run_setup_now:-
    )).
 
 run_setup:- within_user(at_start(user:run_setup_now)).
-
-run:- within_user(at_start(login_and_run)).
 
 
 
@@ -302,7 +301,7 @@ cmdresult(statistics,true)
 % :- prolog.
 
 % :-foc_current_agent(P),assertz_if_new(agent_action_queue(P,chat80)).
-:- if_flag_true(was_runs_tests_pl, at_start(run)).
+:- if_flag_true(was_runs_tests_pl, at_start(login_and_run)).
 
 
 % So scripted versions don't just exit

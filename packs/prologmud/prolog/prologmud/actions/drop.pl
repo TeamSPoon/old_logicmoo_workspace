@@ -34,7 +34,7 @@ user:agent_call_command(Agent,actDrop(_)) :-
 	(add_cmdfailure(Agent,actDrop)).
 
 % Record keeping
-update_charge(Agent,actDrop) :- add(mudEnergy(Agent,-1)).
+update_charge(Agent,actDrop) :- add(mudEnergy(Agent, + -1)).
 
 % user:agent_text_command(Agent,[actDrop,X],Agent,actDrop(X)).
 

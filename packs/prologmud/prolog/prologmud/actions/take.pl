@@ -76,6 +76,6 @@ must_post_for_take(Agent,Obj):-
 
 % Record keeping
 update_charge(Agent,actTake) :- 
-        padd(Agent,mudEnergy(-2)).
+        padd(Agent,mudEnergy(+ -2)).
 
 :- include(prologmud(mud_footer)).

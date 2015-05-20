@@ -491,17 +491,8 @@ mpred_sv(Pred,Arity)=> prologSingleValued(Pred),arity(Pred,Arity),singleValuedIn
 prologSingleValued(Pred),arity(Pred,Arity) => hybrid_support(Pred,Arity).
 
 
-(prologSingleValued(Pred),arity(Pred,Arity),singleValuedInArg(Pred,SV),
-  {functor(Before,Pred,Arity),arg(SV,Before,B),replace_arg(Before,SV,A,After)})
-  => 
-   ({dif:dif(B,A)},After,{Before, B\==A} => {pfc_rem2(Before)}).
-
-
-
 singleValuedInArg(Pred,_)=>prologSingleValued(Pred).
 
-{Arity=2},arity(Pred,Arity),argIsa(Pred,Arity,ftInt)=>singleValuedInArg(Pred,Arity).
-{Arity=2},arity(Pred,Arity),argIsa(Pred,Arity,ftPercent)=>singleValuedInArg(Pred,Arity).
 
 
 % prologSingleValued(Pred),arity(Pred,Arity), \+ singleValuedInArg(Pred,_) => singleValuedInArg(Pred,Arity).
@@ -1091,6 +1082,7 @@ makeArgConstraint('Format',ftTerm).
 makeArgConstraint('SometimesIsa',tCol).
 
 
+{Arity=2},arity(Pred,Arity),(argIsa(Pred,Arity,A)/(A=ftInt;A=ftPercent))=>singleValuedInArg(Pred,Arity).
 
 end_of_file.
 

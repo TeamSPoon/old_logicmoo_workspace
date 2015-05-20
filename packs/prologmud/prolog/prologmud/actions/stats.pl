@@ -16,15 +16,22 @@
 % show the stats system
 % ====================================================
 user:action_info(actStats(isOptional(tObj,isSelfAgent)), "Examine MUD stats of something").
-user:agent_call_command(Agent,actStats(What)):-    
-   show_kb_preds(Agent,[
-         mudEnergy(What,value),
-         mudStr(What,value),
-         mudStm(What,value), % stamina
-         mudScore(What,value),
-         mudHealth(What,value),
-         mudHeight(What,value)]),!,
-   term_listing(What),!.
+
+tCol(tStatPred).
+tStatPred(isEach(
+         mudEnergy,
+         mudStr,
+         mudStm, % stamina
+         mudScore,
+         mudHealth,
+         mudHeight)).
+
+
+user:agent_call_command(Agent,actStats(What)):-
+  findall(Pred, (tStatPred(Stat),Pred=..[Stat,Agent,value]),Stats),
+   sort(Stats,StatsS),
+   show_kb_preds(Agent,StatsS),!.
+   %term_listing(What),!.
 
 
 user:action_info(actGrep(ftTerm),"grep for a term").

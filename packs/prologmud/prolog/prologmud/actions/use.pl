@@ -143,7 +143,7 @@ must_post_use(ActUse,Agent,Obj):-
 
 % Record keeping
 update_charge(Agent,_ActWield) :- 
-        padd(Agent,mudEnergy(-2)).
+        padd(Agent,mudEnergy(+ -2)).
 
 :- include(prologmud(mud_footer)).
 

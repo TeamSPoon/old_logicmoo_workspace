@@ -30,7 +30,7 @@
 %= You should have received a copy of the GNU General Public License along
 %= with this program; if not, write to the Free Software Foundation, Inc.,
 %= 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
+%=
 %= FORMULA SYNTAX
 %=
 %= n(Neg,A)
@@ -576,11 +576,12 @@ pnf(_Orig,          PNF, _,       PNF ).
 % Head and Body are lists.
 
 % cf(KB,A,B,C):- convertAndCall(as_dlog,cf(KB,A,B,C)).
-cf(KB, Orig,PNF, SET):- removeQ(KB, Orig,PNF,[], UnQ), cnf(Orig,UnQ,CNF), 
-  once((dnf(Orig,UnQ,DNF), wdmsgl(dnf2(DNF)))),
-  flatten_or_list(Orig,DNF,Flat),wdmsgl(flat(xor(Flat))),
-  make_clause_Vs_each(KB,Flat,EachClause),
-  clausify(KB,CNF,Cla,[]),!,append(Cla,[cl([kbMark(Orig)],[])|EachClause],SO),!,list_to_set(SO,SET),!.
+cf(KB, Orig,PNF, SET):- removeQ(KB, Orig,PNF,[], UnQ), 
+  cnf(Orig,UnQ,CNF),clausify(KB,CNF,Cla,[]),!,
+  dnf(Orig,UnQ,DNF),flatten_or_list(Orig,DNF,Flat),make_clause_Vs_each(KB,Flat,EachClause),!,
+  append(Cla,[cl([kbMark(Orig)],[])|EachClause],SO),!,
+  maplist(correct_cls,SO,SOO),
+  list_to_set(SOO,SET),!.
 
 removeQ(F,  HH):- removeQ(_KB, _, F, _, RQ0),!,RQ0=HH.
 
@@ -1196,27 +1197,22 @@ get_constraints(ListA,Isas):-
             attribs_to_atoms(VarsB,VarsB),
             generate_ante(VarsA,VarsB,true,Isas))).
 
-boxlog_to_prolog(V,V):- leave_as_is(V),!.
-boxlog_to_prolog(impossible_in(_, H), n(neg, HH)):- !,boxlog_to_prolog(H,HH).
-boxlog_to_prolog(proven_in(_, H),  HH):- !,boxlog_to_prolog(H,HH).
-
-boxlog_to_prolog(FSkip1, Conj):- FSkip1=..[when_in,_|ARGS],maplist(boxlog_to_prolog,ARGS,LIST),list_to_conjuncts(LIST,Conj),!.
-boxlog_to_prolog( H, HH):-is_list(H),!,maplist(boxlog_to_prolog,H,HH).
-boxlog_to_prolog(ARGS, Conj):- is_list(ARGS),maplist(boxlog_to_prolog,ARGS,LIST),list_to_conjuncts(LIST,Conj),!.
-boxlog_to_prolog(proven_t(H),  HH):- !,boxlog_to_prolog(H,HH).
 boxlog_to_prolog(IN,OUT):-leave_as_is(IN),!,IN=OUT.
-boxlog_to_prolog(IN,OUT):-demodal(IN,M),IN\=@=M,!,boxlog_to_prolog(M,OUT).
-boxlog_to_prolog(impossible_t(H), n(neg, HH)):- !,boxlog_to_prolog(H,HH).
+boxlog_to_prolog(H, HH):-is_list(H),!,maplist(boxlog_to_prolog,H,HH).
+
 boxlog_to_prolog((V:- TRUE),VE):- is_true(TRUE),boxlog_to_prolog(V,VE),!.
 boxlog_to_prolog((H:- B),(HH:- BB)):- !,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
 boxlog_to_prolog((H & B),(HH , BB)):- !,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
 boxlog_to_prolog((H v B),(HH ; BB)):- !,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
 boxlog_to_prolog((H , B),(HH , BB)):- !,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
 boxlog_to_prolog((H ; B),(HH ; BB)):- !,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
-boxlog_to_prolog(nesc(F),O):- nonvar(F),!,boxlog_to_prolog(F,O).
+boxlog_to_prolog(IN,OUT):-demodal(IN,M),IN\=@=M,!,boxlog_to_prolog(M,OUT).
 boxlog_to_prolog(H,O):- H=..[N,nesc(F)],kb_nlit(_,N),nonvar(F),!,HH=..[N,F],boxlog_to_prolog(HH,O).
-boxlog_to_prolog(not(nesc(F)),O):- nonvar(F),!,boxlog_to_prolog(not(F),O).
+boxlog_to_prolog(nesc(F),O):- nonvar(F),!,boxlog_to_prolog(F,O).
+boxlog_to_prolog(not(nesc(F)),O):- nonvar(F),!,boxlog_to_prolog(naf(F),O).
+boxlog_to_prolog(~poss(F),O):-nonvar(F),!,boxlog_to_prolog(not_poss(F),O).
 boxlog_to_prolog(n(Neg,H),n(Neg,HH)):- !,boxlog_to_prolog(H,HH).
+
 boxlog_to_prolog( H, HH):- H=..[F|ARGS],!,boxlog_to_prolog(ARGS,ARGSO),!,HH=..[F|ARGSO].
 boxlog_to_prolog(BL,PTTP):- thglobal:as_prolog(BL,PTTP).
 

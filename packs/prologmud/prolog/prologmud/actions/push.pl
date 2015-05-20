@@ -94,11 +94,11 @@ squish_behind(_,_).
 % both the agents take damage. 
 % The pusher takes damage as normal (for pushing something
 % unpushable), the pushy takes damage below
-crashbang(Obj) :- padd(Obj,[mudHealth(-5)]).
+crashbang(Obj) :- padd(Obj,[mudHealth(+ -5)]).
 
 % Record keeping
-update_charge(Agent,actPush) :- padd(Agent,[mudEnergy(-6)]).
-update_stats(Agent,strain) :- padd(Agent,[mudHealth(-2)]).
-update_stats(Agent,hernia) :- padd(Agent,[mudHealth(-4),mudCmdFailure(hernia)]).
+update_charge(Agent,actPush) :- padd(Agent,[mudEnergy(+ -6)]).
+update_stats(Agent,strain) :- padd(Agent,[mudHealth(+ -2)]).
+update_stats(Agent,hernia) :- padd(Agent,[mudHealth(+ -4),mudCmdFailure(hernia)]).
 
 :- include(prologmud(mud_footer)).

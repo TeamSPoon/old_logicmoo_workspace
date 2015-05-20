@@ -131,7 +131,7 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 % :- register_timer_thread(npc_ticker,60,npc_tick).
 
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
-:- if_startup_script(at_start(run)).
+:- if_startup_script(at_start(login_and_run)).
 
 % So scripted versions don't just exit
 :- if_startup_script(at_start(prolog)).

@@ -82,8 +82,8 @@ damage_foe(Agent,What,hit) :-
 	add(mudHealth(What,NewDam)).
 
 % Record keeping
-update_charge(Agent,actAttack) :- upprop(Agent,mudEnergy(-5)).
-update_stats(Agent,bash) :-  upprop(Agent,mudHealth(-2)),
+update_charge(Agent,actAttack) :- upprop(Agent,mudEnergy(+ -5)).
+update_stats(Agent,bash) :-  upprop(Agent,mudHealth(+ -2)),
 	(add_cmdfailure(Agent,bash)).
 update_stats(Agent,wiff) :- 
 	del(mudHealth(Agent,Old)),

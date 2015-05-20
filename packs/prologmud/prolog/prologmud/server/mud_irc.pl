@@ -22,7 +22,9 @@ invite_to_mud(Nick):-eggdrop:to_egg('.tcl putserv "PRIVMSG ~w :DCC CHAT chat 73
 
 deliver_to_irc(_,actNotice(_,done(_,AL))):-actLook==AL.
 deliver_to_irc(_,actNotice(_,begin(_,AL))):-actLook==AL.
-deliver_to_irc(Agent,Event):- irc_user_plays(Agent,User,Channel) -> eggdrop:say(Channel,[Agent,': ',Event]) ; nop(eggdrop:say(Agent,Event)).
+deliver_to_irc(Agent,Event):-  irc_user_plays(Agent,User,Channel), Channel=='##prolog',!,dmsg(deliver_to_irc(Agent,User,Channel,Event)),!.
+deliver_to_irc(Agent,Event):-  irc_user_plays(Agent,User,Channel) -> 
+  eggdrop:say(Channel,[Agent,': ',Event]) ; nop(eggdrop:say(Agent,Event)).
 
 
 
@@ -30,17 +32,32 @@ irc_mud_event_hook(Channel,User,Stuff):- string(User),string_to_atom(User,AUser)
 irc_mud_event_hook(Channel,User,Stuff):- string(Channel),string_to_atom(Channel,AChannel),!,irc_mud_event_hook(AChannel,User,Stuff).
 irc_mud_event_hook(Channel,User,ctcp("ACTION", ACT)):-!,irc_mud_event_hook(Channel,User,actDo(ACT)).
 
-irc_mud_event_hook(Channel,User,actDo(TODO)):- foc_current_agent(Agent),add(irc_user_plays(Agent,User,Channel)),add(agent_action_queue(Agent,TODO,Channel)).
-irc_mud_event_hook(Channel,User,say(TODO)):- irc_user_plays(Agent,User,Channel),nonvar(Agent),add(agent_action_queue(Agent,TODO,Channel)).
-irc_mud_event_hook(Channel,User,call('?-'(foc_current_agent(Agent)),_Vs)):- foc_current_agent(Agent),add(irc_user_plays(Agent,User,Channel)).
+irc_mud_event_hook(Channel,User,call('?-'(foc_current_agent(Agent)),_Vs)):- 
+ foc_current_agent(Agent),
+ get_session_id(ID),
+ retractall(thglobal:agent_session(_,ID)),
+ retractall(thglobal:session_agent(ID,_)),
+ add(irc_user_plays(Agent,User,Channel)),
+   asserta_if_new(thglobal:agent_session(Agent,ID)),
+   asserta_if_new(thglobal:session_agent(ID,Agent)),!.
+
+irc_mud_event_hook(Channel,User,actDo(TODO)):- irc_user_plays(Agent,User,Channel),ground(irc_user_plays(Agent,User,Channel)),irc_action_queue(Agent,TODO,Channel).
+irc_mud_event_hook(Channel,User,say(TODO)):- irc_user_plays(Agent,User,Channel),ground(irc_user_plays(Agent,User,Channel)),irc_action_queue(Agent,TODO,Channel).
+
+irc_skipped(W):- catch(clpfd:read_term_from_atom(W,CMD,[double_quotes(string)]),_,fail),!,CMD= ('?-'(_)).
+
+irc_action_queue(_,W,_):-irc_skipped(W),!.
+irc_action_queue(Agent,TODO,Channel):-  get_session_id(ID), show_call(add(agent_action_queue(Agent,TODO,ID))).
+
+
 
 
 :-pfc_add(( (irc_user_plays(Agent,User,Channel)/
-  ( irc_user_plays(Agent,User,Other), Other\=Channel )
-   => \+ irc_user_plays(Agent,User,Other)))).
+  ( irc_user_plays(OAgent,User,Other), (Other\=Channel;OAgent\=Agent) ))
+   => \+ irc_user_plays(OAgent,User,Other))).
 
 
-
+:-pfc_add(( ~irc_user_plays(Agent,User,_) => {retractall(thglobal:agent_session(Agent,User)),retractall(thglobal:session_agent(User,Agent))} )).
 
 
 
@@ -132,7 +149,8 @@ wotp_create_server:- (wotp_server_port(Port)->wotp_create_server(Port);wotp_crea
 :- wotp_create_server.
 
 % Example  
-:- with_output_to_pred(say(dmiles), format('Hello Worldly~n',[])).
+% :- with_output_to_pred(say(dmiles), format('Hello Worldly~n',[])).
 
+:- nodebug(_).
 
 
