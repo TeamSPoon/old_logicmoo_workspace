@@ -476,12 +476,12 @@ phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- debugOnError(phrase_pa
 phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver):- (LeftOver=[];LeftOver=_ /*[_|_]*/), phrase(parseForTypes(TYPEARGS,GOODARGS),ARGS,LeftOver).
 
 parseForTypes([], [], A, A).
-parseForTypes([TYPE|TYPES], [B|E], C, G) :-
+parseForTypes([TYPE|TYPES], [B|E], C, G) :- ground(TYPE:B),
         no_repeats_old(parseIsa_Call(TYPE, B, C, F)),
         parseForTypes(TYPES, E, F, G),!.
 
 
-parseIsa_Call(FT, BO, CIn, D):-ground(CIn), list_tail(CIn,D), to_word_list(CIn,C),!, parseIsa(FT, B, C, D),to_arg_value(B,BO).
+parseIsa_Call(FT, BO, CIn, D):-ground(FT:CIn), list_tail(CIn,D), to_word_list(CIn,C),!, parseIsa(FT, B, C, D),to_arg_value(B,BO).
 
 
 % this parseIsa(T)-->parseIsa(T,_).
