@@ -9,7 +9,13 @@
 
 :- user:use_module(logicmoo(util/logicmoo_util_dcg)).
 
-:-discontiguous(translation_spo/6).
+:-discontiguous((translation_spo/6,parserTest/2,parserTest/3,translation//1)).
+:-dynamic((translation_spo/6,parserTest/2,parserTest/3,translation//1)).
+:-thread_local(loosePass/0).
+:-thread_local(debugPass/0).
+:-dynamic(parserVars/4).
+
+
 
 glue_words(W):- member(W,[is,a,the,in,carries,'An','A','The',was,of,type]).
 
@@ -19,10 +25,7 @@ toCamelAtom0([A],O):-toPropercase(A,O),!.
 toCamelAtom0([A|List],O):-toPropercase(A,AO),toCamelAtom(List,LO),atom_concat(AO,LO,O).
 
 
-:-thread_local(loosePass/0).
-:-thread_local(debugPass/0).
 
-:-dynamic(parserVars/4).
 
 asserta_parserVars(N,V,Type):-foc_current_agent(A),asserta(parserVars(A,N,V,Type)).
 parserVars(N,V,Type):- foc_current_agent(A),
@@ -55,6 +58,7 @@ toCol(Txt,I,TCOL):-member(TCOL,[tCol,tObj,tSpatialThing,vtValue,ttTypeType]),sho
 
 toCol_0(Txt,O,TCOL):-member(Pfx-Sfx-ISACISA, 
          [
+          ''-''-_,
           't'-''-'tSpec',
           'tt'-'Type'-'ttTypeType',
           'vt'-''-'ttValueTypeType',
@@ -97,16 +101,15 @@ collection0(I,Col)--> [A,B,C],{toCamelAtom([A,B,C],O),collection00(O,I,Col)}.
 collection0(I,Col)--> [A,B],{toCamelAtom([A,B],O),collection00(O,I,Col)}.
 collection0(I,Col)--> [O],{collection00(O,I,Col)}.
 
+collection00(A,I,Col):-mudKeyword(I,W),string_equal_ci(A,W),toCol(A,I,Col).
 collection00(M,I,Col):-toCol(M,I,Col).
 collection00(A,I,Col):-toPropercase(A,O),toCol(O,I,Col).
-collection00(A,I,Col):-mudKeyword(M,W),string_equal_ci(A,W),toCol(M,I,Col).
 
 subject(I,More)-->subject(I,_,More).
 subject(I,T,true)-->(['This'];['this']),!,{must((parserVars(isThis,I,T);parserVars(_,I,T)))}.
 subject(I,T,true)--> [IT],{string_equal_ci(IT,ITLC),parserVars(isParserVar(ITLC),I,T)},!.
 subject(I,T,true)--> [IT],{string_equal_ci(IT,ITLC),parserVars((ITLC),I,T)},!.
-subject(I,T,More)--> det(_),!,collection(I,T,More),{(asserta_parserVars(isThis,I,T))}.
-subject(I,T,More)--> collection(I,T,More),{(asserta_parserVars(isThis,I,T))}.
+subject(I,T,More)--> dcgOptional(det(_)),collection(I,T,More),{(asserta_parserVars(isThis,I,T))}.
 
 object(I,More)-->object(I,_,More).
 object(I,T,true)-->([it];['It'];['This'];['this']),!,{must((parserVars(object,I,T);parserVars(_,I,T)))}.
@@ -142,6 +145,9 @@ tCol('tRoom').
 
 % :-ignore(show_call(phrase(collection(I,T,More),[red,room]))).
 
+
+
+parserTest(A,B):-parserTest(A,B,_).
 
 :-assertz_if_new(parserTest(iWorld7,"A television is usually in the living room.")).
 
@@ -220,6 +226,7 @@ modality(possibly,[either]).
 modality(neg,[not]).
 modality(neg,[never]).
 
+
 % somethingCanBe(tFountainDrink,[vSmall,vMedium,vLarge]).
 
 translation(t(M,Prolog),WS,WE):- once((append(LeftSide,RightSide,WS), modality(M,List),append(Left,List,LeftSide),
@@ -235,15 +242,66 @@ translation_dbg_on_fail(Prolog,WS,WE):-with_assertions(debugPass,translation(Pro
 %:-assertz_if_new(parserTest(iWorld7,"Buffy the Labrador retriever is lounging here, shedding hair all over the place.")).
 %:-assertz_if_new(parserTest(iWorld7,"You can also see a sugar candy doll house here.")).
 
+mudKeyword(tItem,"thing").
+mudKeyword(tThing,"object").
 
 user:type_action_info(tHumanPlayer,actAddText(isOptional(tTemporalThing,isThis),ftListFn(ftTerm)),"Development add some Text to a room.  Usage: addtext a sofa is in here").
 
-user:agent_call_command(Agent,actAddText(What,StringM)):- 
+user:agent_call_command(Agent,actAddText(What,StringM)):- ground(What:StringM),
  with_assertions(parserVars(isThis,What,ftTerm),
    with_assertions(parserVars(isSelfAgent,Agent,tAgent),   
        must(assert_text(What,StringM)))).
 
 
+:-assertz_if_new(parserTest(iWorld7,"An emitter has a truth state called action keeping silent.",
+   relationAllExists(mudActionKeepingSilient,tEmitter,ftBool))).
+translation(relationAllExists(mudActionKeepingSilient,tEmitter,ftBoolean))
+  --> ['An',emitter,has,a,truth,state,called,action,keeping,silent].
+
+:-assertz_if_new(parserTest(iWorld7,"An object has a text called printed name.")).
+translation(relationAllExists(P,C,DT)) 
+  --> collection(C),[has,a],datatype(DT),[called],predicate_named(P).
+
+collection(C)-->subject(C,tCol,true).
+datatype(ftBoolean)--> dcgOptional(det(_)),[truth,state].
+datatype(ftText)--> dcgOptional(det(_)),[text].
+datatype(ftTerm)--> dcgOptional(det(_)),[value].
+predicate_named(Pred)-->dcgAnd(theText(Text),dcgLenBetween(1,5)),{toCamelAtom(Text,O),i_name(mud,O,Pred),ignore(assumed_isa(Pred,tPred))}.
+
+
+assumed_isa(I,C):-isa(I,C),!.
+assumed_isa(I,C):-loosePass,assert_isa(I,C),!.
+
+:- must(dcgAnd(dcgLenBetween(5,1),theText(T),[a,b,c],[])).
+:- must(predicate_named(P,[proper,-,named],[])).
+
+
+:-assertz_if_new(parserTest(iWorld7,"An object can be proper-named or improper-named.",partitionedInto(tObj,tProperNamed,tImproperNamed))).
+translation(partitionedInto(C1,C2,C3)) --> collection(C1),[be],collection(C2),[or],collection(C3).
+
+
+:-assertz_if_new(parserTest(iWorld7,"An object is usually improper-named.",relationMostInstance(isa,tObj,tImproperNamed))).
+translation(relationMostInstance(isa,C1,C2)) --> collection(C1),[is,usually],collection(C2).  
+
+:-assertz_if_new(parserTest(iWorld7,"A thing can be scenery.", relationSomeInstance(isa,tItem,tScenery))).
+translation(relationSomeInstance(isa,C1,C2)) --> collection(C1),[be],collection(C2).  
+
+:-assertz_if_new(parserTest(iWorld7,"The outside is a direction.", t(isa,vOutside,vtDirection))).
+translation(isa(C1,C2)) --> det(def),col(v,C1),[is,a],col(vt,C2).  
+
+col(Pfx,C)-->subject(C,_,true),{atom_concat(Pfx,_,C)}.
+col(Pfx,C)-->{loosePass},subject(C,_,true).
+
+% set of small things in the world
+tSet(tSmall).  % I dont like doing this with adjectives.. but it cant be argued to be sane
+tSmall(X) <=> mudSize(X,vSmall).
+
+% set of green things in the world
+tSet(tGreen).
+tGreen(X) <=> mudColor(X,vGreen).
+
+%:-assertz_if_new(parserTest(iWorld7,"All green books are small.", (tGreen(X),tBook(X))=>tSmall(X))).
+%:-assertz_if_new(parserTest(iWorld7,"Most green books are small.", pfc_default((tGreen(X),tBook(X))=>tSmall(X)))).
 
 /*   The litmus
 
@@ -252,7 +310,6 @@ A thing can be lit or unlit. A thing is usually unlit.
 Y [can] be C1 or C2.  
 Y is [usually] C2.
 
-An emitter has a truth state called action keeping silent.  --> mudActionKeepingSilient(tEmittor,ftBool).
 
 An object has a text called printed name.  --> relationAllExists(mudPrintedName,tObj,ftText).
 An object has a text called printed plural name.  --> mudPrintedPluralName(tObj,ftText).
@@ -275,7 +332,7 @@ A room can be visited or unvisited. A room is usually unvisited.
 A room has a text called description.
 
 
-mudKeyword(tItem,"thing").
+
 
 A thing can be edible or inedible. A thing is usually inedible.
 A thing can be fixed in place or portable. A thing is usually portable.

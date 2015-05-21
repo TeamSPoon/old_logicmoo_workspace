@@ -481,7 +481,7 @@ parseForTypes([TYPE|TYPES], [B|E], C, G) :-
         parseForTypes(TYPES, E, F, G),!.
 
 
-parseIsa_Call(FT, BO, CIn, D):- list_tail(CIn,D), to_word_list(CIn,C),!, parseIsa(FT, B, C, D),to_arg_value(B,BO).
+parseIsa_Call(FT, BO, CIn, D):-ground(CIn), list_tail(CIn,D), to_word_list(CIn,C),!, parseIsa(FT, B, C, D),to_arg_value(B,BO).
 
 
 % this parseIsa(T)-->parseIsa(T,_).

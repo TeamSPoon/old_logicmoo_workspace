@@ -148,11 +148,11 @@ set_tty_control(TF):-
    set_prolog_flag(tty_control, TF),
    colormsg(green,"this is green!"))))),!.
 
-
+nr(G):-no_repeats(G).
    
 
 user:deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
-      foreach(req(get_agent_sessions(A,O)),foreach(req(thglobal:session_io(O,In,Out,Id)),fmt(Out,'~N~q.~n',[NewEvent]))).
+      foreach(nr(get_agent_sessions(A,O)),foreach(nr(thglobal:session_io(O,In,Out,Id)),fmt(Out,'~N~q.~n',[NewEvent]))).
 
 
 :-export(prompt_read/4).

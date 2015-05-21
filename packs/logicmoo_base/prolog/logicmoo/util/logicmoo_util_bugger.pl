@@ -2693,6 +2693,13 @@ sformat(Str,Msg,Vs,Opts):- nonvar(Msg),functor_safe(Msg,':-',_),!,with_output_to
 sformat(Str,Msg,Vs,Opts):- with_output_to(chars(Codes),(current_output(CO),portray_clause_w_vars(CO,':-'(Msg),Vs,Opts))),append([_,_,_],PrintCodes,Codes),'sformat'(Str,'   ~s',[PrintCodes]),!.
 portray_clause_w_vars(Out,Msg,Vs,Options):- \+ \+ ((prolog_listing:do_portray_clause(Out,Msg,[variable_names(Vs),numbervars(true),character_escapes(true),quoted(true)|Options]))),!.
 
+:-meta_predicate(gripe_time(+,0)).
+:-export(gripe_time/2).
+gripe_time(TooLong,Goal):-statistics(cputime,Start),(Goal*->Success=true;Success=fail),
+  once((statistics(cputime,End),
+   Elapse is End-Start,
+(Elapse>TooLong -> dmsg(gripe_time(warn(Elapse>TooLong),Goal)); true))),Success.
+
 
 :- meta_predicate show_call0(0).
 show_call0(C):- C. % debugOnError0(C). % dmsg(show_call(C)),C.      

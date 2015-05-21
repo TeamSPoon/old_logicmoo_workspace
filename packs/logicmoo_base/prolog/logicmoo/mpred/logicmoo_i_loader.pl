@@ -480,7 +480,7 @@ user:provide_mpred_clauses(H,B,(What)):- !.
 pfc_implode_varnames([]):-!.
 pfc_implode_varnames([N=V|Vs]):-V='$VAR'(N),pfc_implode_varnames(Vs),!.
 
-
+% mudKeyword("happy","happy") -> mudKeyword(vHappy,"happy").
 
 % must skip already loaded modules (we remember these so make/0 doesnt break)
 pfc_maybe_skip(M):- thlocal:pfc_module_expansion(N),N==M,!.

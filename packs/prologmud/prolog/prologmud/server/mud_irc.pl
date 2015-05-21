@@ -68,7 +68,7 @@ wotp_lambda(A,    Call,A):-Call.
 wotp_lambda(A,B,  Call,A,B):-Call.
 wotp_lambda(A,B,C,Call,A,B,C):-Call.
 
-
+with_output_to_pred(HookPred, Call):- !, call(Call).
 with_output_to_pred(HookPred, Call):- fail,with_output_to(string(Atom),Call),atomic_list_concat(List,'\n',Atom), 
   forall(member(E,List),call(HookPred,E)).
 

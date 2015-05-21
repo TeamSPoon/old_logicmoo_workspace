@@ -534,7 +534,8 @@ args_match_types(Obj,Type):-!,isa(Obj,Type).
 user:agent_call_command_fallback(Agent,TemplIn):-agent_call_command_simbots_real(Agent,TemplIn).
 
 agent_call_command_simbots_real(Agent,actImprove(Trait)):- nonvar(Trait),
-      findall(agentTODO(Agent,actDo(ActVerb,Types)), (verb_affordance(ActVerb,Types,Trait,+ Think,_Real),Think>0), NewAdds),
+      findall(agentTODO(Agent,actDo(ActVerb,Types)),
+        (verb_affordance(ActVerb,Types,Trait,+ Think,_Real),ThinkN is Think,ThinkN>0), NewAdds),
       show_call(forall(member(Add,NewAdds),add(Add))).
 
 agent_call_command_simbots_real(Agent,TemplIn):- nonvar(TemplIn), 
@@ -683,14 +684,14 @@ verb_desc(actThinkAbout, tLookAble, "Think about").
 
 :- dynamic verb_affordance/5.
 
-verb_affordance(actObserve, tTelevision, mudNonLonelinessSocial, 3, + -2).
+verb_affordance(actObserve, tTelevision, mudNonLonelinessSocial, + 3, + -2).
 verb_affordance(actObserve, tTelevision, mudNonHunger, 1, + -1).
 verb_affordance(actObserve, tTelevision, mudBladderEmpty, 0, 0).
 verb_affordance(actObserve, tTelevision, mudHygiene, 0, 0).
 verb_affordance(actObserve, tTelevision, mudSecureRoom, 1, 0).
 verb_affordance(actObserve, tTelevision, mudFun, 2, 1).
 verb_affordance(actObserve, tTelevision, mudSadToHappy, 2, 1).
-verb_affordance(actObserve, tTelevision, mudEnergy, 1, + -1).
+verb_affordance(actObserve, tTelevision, mudEnergy, + 1, + -1).
 verb_affordance(actBumpIntoBarrier, tFurniture, mudNonLonelinessSocial, + -300, 0).
 verb_affordance(actBumpIntoBarrier, tFurniture, mudHygiene, + -300, 0).
 verb_affordance(actBumpIntoBarrier, tFurniture, mudComfort, + -300, 0).

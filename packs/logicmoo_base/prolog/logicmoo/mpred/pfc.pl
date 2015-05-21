@@ -380,7 +380,6 @@ pfcVersion(1.2).
 :- op(1150,xfx,('::::')).
 
 
-
 %=% initialization of global assertons
 
 %= pfc_init_i/1 initialized a global assertion.
@@ -419,8 +418,9 @@ pfc_assert_fast((=>P),S) :- nonvar(P),!,
   pfc_assert_fast(P,S).
 
 
+pfc_assert_fast(P0,S):- gripe_time(0.6,pfc_assert_fast_0(P0,S)).
 
-pfc_assert_fast(P0,S):-
+pfc_assert_fast_0(P0,S):-
   must(to_addable_form_wte(P0,P)),
       (is_list(P)
         ->maplist(pfc_assert_fast_sp(S),P);
@@ -1040,13 +1040,18 @@ pfc_fwd(P,S) :- pfc_fwd1(P,S).
 
 % pfc_fwd1(+P) forward chains for a single fact.
 
-pfc_fwd1(Fact,Sup) :-
+
+
+pfc_fwd1(Fact,Sup) :- gripe_time(0.50,pfc_fwd2(Fact,Sup)).
+
+
+pfc_fwd2(Fact,Sup) :-
   must(pfc_rule_check(Sup,Fact)),
   copy_term(Fact,F),
   % check positive triggers
   must(fcpt(Fact,F)),
   % check negative triggers
-  must(fcnt(Fact,F)).
+  must(fcnt(Fact,F)),!.
 
 
 %=

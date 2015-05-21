@@ -15,6 +15,8 @@
          isQVar/1,
          isVarOrVAR/1,
 
+
+         dcgOptional//1,
          dcgAnd//2,
          dumpList/1,
          dcgOr//2,
@@ -207,10 +209,9 @@ dcgSeqLen(Len, FB, END) :-
         '$append'(CD, END, FB).
 
 
-dcgLenBetween(_,_) --> [_].
-
-% dcgLenBetween(Start,Start) --> dcgSeqLen(Start),{!}.
-% dcgLenBetween(Start,End) --> dcgOnceOr(dcgSeqLen(Start),({(Start>End -> Next is Start-1 ; Next is Start+1)},dcgLenBetween(Next,End))).
+% dcgLenBetween(_,_) --> [_].
+dcgLenBetween(Start,Start) --> dcgSeqLen(Start),{!}.
+dcgLenBetween(Start,End) --> dcgOnceOr(dcgSeqLen(Start),({(Start>End -> Next is Start-1 ; Next is Start+1)},dcgLenBetween(Next,End))).
 dcgLenBetween(Len, Start, End, FB, END) :-
        ( length(CD, Start),
         '$append'(CD, END, FB)) -> ignore(End=Start) ;

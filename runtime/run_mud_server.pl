@@ -103,7 +103,7 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 
 sanity_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
 
-:-sanity_testp1.
+% :-sanity_testp1.
 
 % [Optionaly] Run a battery of tests
 % :- if_startup_script( doall(now_run_local_tests_dbg)).

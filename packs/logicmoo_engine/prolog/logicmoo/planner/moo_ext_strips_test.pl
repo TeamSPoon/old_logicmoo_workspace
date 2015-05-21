@@ -173,6 +173,19 @@ inconsistent(localityOfObject(X,iTable7), localityOfObject(X,_)).
     +-----+      +-----+     +-----+
     |  iA7  |      |  iB7  |     |  iC7  |
 ----+-----+------+-----+-----+-----+------
+
+tMisserbal(X) <= mudHappy(X),X<50.
+
+
+  mudHappy(X),X<50
+
+(action ( doHappyThing ?X)
+ (hint 
+   ( mudHappy(X),X<50 ))
+ (postConds 
+  (not( tMisserbal ?X)))
+ )
+
 */
 % Initilize state
 init_state1a([clear(iA7),clear(iB7),clear(iC7),localityOfObject(iA7,iTable7),localityOfObject(iB7,iTable7),localityOfObject(iC7,iTable7),handempty(Agnt)]).

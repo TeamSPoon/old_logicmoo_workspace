@@ -163,7 +163,7 @@ semweb_startup_late:- cp_server:attach_account_info.
 
 % :- asserta((user:file_search_path(A,B):-pre_file_search_path(A,B))).
  
-:- debug(_).
+% :- debug(_).
 :- nodebug(syntax_error(illegal_number)).
 :- nodebug(number_codes/2).
 :- nodebug(number_codes(_,_)).

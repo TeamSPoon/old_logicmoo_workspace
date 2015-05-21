@@ -164,10 +164,285 @@ PrologMUD.vpj=20150503193724685
         + ontologies
           + examples
         + scripts
-    + MUD_DeepParsing
+    - MUD_DeepParsing
       - prolog
+        + candc
+          + working
         + chat80
-        - CURT
+        + CURT
+        + Parser_SUPPLE
+          + config
+          + docs
+          + lib
+          + prolog
+            + grammar
+          + prolog-impls
+            + plcafe
+              + src
+                + shef
+                  + nlp
+                    + supple
+                      + prolog
+            + sicstus
+              + src
+                + shef
+                  + nlp
+                    + supple
+                      + prolog
+            + swi
+              + src
+                + shef
+                  + nlp
+                    + supple
+                      + prolog
+          + src
+            + shef
+              + nlp
+                + supple
+                  + category
+                  + mapping
+                  + prolog
+                  + utils
+        + pldata
+        + SIRDUS
+          + dbaseAgent
+            + docs
+              + resources
+            + src
+          + icalAgent
+            + docs
+              + resources
+            + icsFiles
+            + src
+          + TALK_enhanced_grammar_lib
+            + Agenda
+            + Common
+            + GrammarLib
+              + Agenda
+              + Common
+              + MP3
+              + OWL
+              + Tram
+            + MP3
+            + OWL
+            + Tram
+          + TALK_unimodal_grammar_lib
+            + delux
+              + Grammars
+              + Resources
+            + djgodis
+              + Grammars
+              + Resources
+            + GF_GoDiS
+              + Core
+                + CVS
+                + Shared
+                  + CVS
+                + System
+                  + CVS
+                + User
+                  + CVS
+              + CVS
+              + Domain
+                + AgendaTalk
+                  + CVS
+                  + Shared
+                    + CVS
+                  + System
+                    + CVS
+                  + User
+                    + CVS
+                + CVS
+                + deLux
+                  + CVS
+                  + Shared
+                    + CVS
+                  + System
+                    + CVS
+                  + User
+                    + CVS
+                + DJGoDiS
+                  + CVS
+                  + Shared
+                    + CVS
+                  + System
+                    + CVS
+                  + User
+                    + CVS
+                + VideoGoDiS
+                  + CVS
+                  + Shared
+                    + CVS
+                  + System
+                    + CVS
+                  + User
+                    + CVS
+              + Resource
+                + CVS
+                + Events_Locations
+                  + CVS
+                + Home
+                  + CVS
+                  + old
+                    + CVS
+                + Media
+                  + CVS
+                  + English
+                    + CVS
+                    + old
+                      + CVS
+                  + Swedish
+                    + CVS
+                    + old
+                      + CVS
+                + Numbers
+                  + CVS
+                + Time
+                  + CVS
+            + godis
+              + CVS
+              + doc
+                + CVS
+                + LaTeX
+                  + CVS
+              + general
+                + CVS
+              + godis-all
+                + CVS
+                + rule_libs
+                  + CVS
+              + godis-aod
+                + CVS
+              + godis-basic
+                + CVS
+              + godis-grounding
+                + CVS
+              + godis-iod
+                + CVS
+            + jars
+            + tkit_inout_nuance
+              + logs
+            + tkit_inout_text
+            + trindikit4
+              + core
+                + CVS
+                + prolog
+                  + CVS
+                  + Datatypes
+                    + CVS
+                  + DefaultPrinters
+                    + CVS
+                    + latex
+                      + CVS
+                    + text
+                      + CVS
+                    + xml
+                      + CVS
+                  + Modules
+                    + CVS
+              + CVS
+              + examples
+                + CVS
+                + godis-basic
+                  + Agents
+                    + CVS
+                  + CVS
+                  + datatypes
+                    + CVS
+                  + modules
+                    + CVS
+                  + resource_interfaces
+                    + CVS
+                  + resources
+                    + CVS
+                  + TISdefs
+                    + CVS
+          + UGOT-D31
+            + godis
+              + doc
+                + LaTeX
+              + general
+              + godis-all
+                + rule_libs
+              + godis-aod
+              + godis-basic
+              + godis-grounding
+              + godis-iod
+            + godis-apps
+              + cellphone
+              + domain-agendatalk
+                + Resources
+                + Speech
+              + domain-icecream
+                + Resources
+              + domain-legoturtle
+                + asrg_legoturtle_english
+                + asrg_vcr_english
+                + logs
+                + OLD
+                + rcxTcl
+              + domain-medical
+                + Database
+                  + org
+                    + mitre
+                      + midiki
+                        + workshop
+                + Experiments
+              + domain-player
+                + DBaseAgent
+                + DJGoDisGram
+                  + DBase
+                    + English
+                    + Swedish
+                  + MultiModal
+                  + Numbers
+                  + Shared
+                  + System
+                  + User
+                + inoutnuance
+                + player-old
+                  + Resources
+                + Resources
+                + Speech
+              + domain-ta
+                + Resources
+              + domain-tel
+              + domain-telvcr
+              + domain-tram
+                + Resources
+              + domain-vcr
+                + Resources
+                + Speech
+                + Trash
+                  + asrg_vcr_english
+              + domain-x10
+                + Resources
+              + ToUpgrade
+                + Autoroute
+                + Cellphone
+                + domain-tel
+                + Home
+                  + OLD
+                + IMDiS
+                + VcrPhone
+                  + OLD
+            + trindikit4-0.1alpha
+              + core
+                + prolog
+                  + Datatypes
+                  + DefaultPrinters
+                    + latex
+                    + text
+                    + xml
+                  + Modules
+              + examples
+                + godis-basic
+                  + Agents
+                  + datatypes
+                  + modules
+                  + resource_interfaces
+                  + resources
+                  + TISdefs
     + MUD_DLog
       + CVSROOT
       + dlog-benchmark
@@ -1396,6 +1671,12 @@ PrologMUD.vpj=20150503193724685
               + TALK_enhanced_grammar_lib
                 + Agenda
                 + Common
+                + GrammarLib
+                  + Agenda
+                  + Common
+                  + MP3
+                  + OWL
+                  + Tram
                 + MP3
                 + OWL
                 + Tram
@@ -1531,8 +1812,103 @@ PrologMUD.vpj=20150503193724685
                       + TISdefs
                         + CVS
               + tkit_oaa
+                + tkit_oaa
+                  + META-INF
+                  + se
+                    + gu
+                      + ling
+                        + trindikit
+                          + oaa
+                            + common
               + TkitAlarmAgent
                 + src
+              + UGOT-D31
+                + UGOT-D31
+                  + godis
+                    + doc
+                      + LaTeX
+                    + general
+                    + godis-all
+                      + rule_libs
+                    + godis-aod
+                    + godis-basic
+                    + godis-grounding
+                    + godis-iod
+                  + godis-apps
+                    + cellphone
+                    + domain-agendatalk
+                      + Resources
+                      + Speech
+                    + domain-icecream
+                      + Resources
+                    + domain-legoturtle
+                      + asrg_legoturtle_english
+                      + asrg_vcr_english
+                      + logs
+                      + OLD
+                      + rcxTcl
+                    + domain-medical
+                      + Database
+                        + org
+                          + mitre
+                            + midiki
+                              + workshop
+                      + Experiments
+                    + domain-player
+                      + DBaseAgent
+                      + DJGoDisGram
+                        + DBase
+                          + English
+                          + Swedish
+                        + MultiModal
+                        + Numbers
+                        + Shared
+                        + System
+                        + User
+                      + inoutnuance
+                      + player-old
+                        + Resources
+                      + Resources
+                      + Speech
+                    + domain-ta
+                      + Resources
+                    + domain-tel
+                    + domain-telvcr
+                    + domain-tram
+                      + Resources
+                    + domain-vcr
+                      + Resources
+                      + Speech
+                      + Trash
+                        + asrg_vcr_english
+                    + domain-x10
+                      + Resources
+                    + ToUpgrade
+                      + Autoroute
+                      + Cellphone
+                      + domain-tel
+                      + Home
+                        + OLD
+                      + IMDiS
+                      + VcrPhone
+                        + OLD
+                  + trindikit4-0.1alpha
+                    + core
+                      + prolog
+                        + Datatypes
+                        + DefaultPrinters
+                          + latex
+                          + text
+                          + xml
+                        + Modules
+                    + examples
+                      + godis-basic
+                        + Agents
+                        + datatypes
+                        + modules
+                        + resource_interfaces
+                        + resources
+                        + TISdefs
             + reports
         + trindi
           + ESSLLI-slides
@@ -1556,7 +1932,7 @@ PrologMUD.vpj=20150503193724685
             + annual-report99
           + trindikit
             + images
-  + games
+  - games
     - src_game_nani
       + web
         + css
@@ -1610,25 +1986,25 @@ PrologMUD.vpj=20150503193724685
     - logicmoo_base
       - prolog
         - logicmoo
-          - mpred
+          + mpred
           + util
       + t
     - logicmoo_engine
       - prolog
         - logicmoo
-          - engine
+          + engine
             + flux
             + mike
-            - plarkc
+            + plarkc
             + pttp
-            - xray
+            + xray
           + planner
             + Blocks_world
             + domains
               - failing_or_too_slow
               - others
               - sanity
-            - elevators
+            + elevators
             + hanoi
             + ipc2008-no-cybersec
               + netben-opt
@@ -1673,10 +2049,10 @@ PrologMUD.vpj=20150503193724685
     - prologmud
       - prolog
         - prologmud
-          - actions
+          + actions
           - mobs
             - affordance
-            + planner
+            - planner
           - objs
           - parsing
           - server
@@ -1692,7 +2068,6 @@ PrologMUD.vpj=20150503193724685
         + RDF-store
     - prologmud_web
       - src_assets
-        + pldata
       + src_webui
         - assetsources
         - http
@@ -1703,7 +2078,7 @@ PrologMUD.vpj=20150503193724685
         + model
         - mudconsole
     - ref_unused
-  + runtime
+  - runtime
     + config-enabled
     + RDF-store
   + \usr
@@ -1753,89 +2128,89 @@ PrologMUD.vpj=20150503193724685
               + swi
               + trace
               + xref
-scroll:126
+scroll:97
 [State]
-SCREEN: 1920 1080 480 226 1440 735 0 0 N 0 0 0 0 863 367
-CWD: packs\prologmud\prolog\prologmud\mobs\affordance
+SCREEN: 1280 768 1 50 1278 642 0 0 N 0 0 0 0 1058 378
+CWD: games\src_game_nani
+BUFFER: BN="externals\MUD_DeepParsing\prolog\parser_e2c.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.124126 CL=37 LE=0 CX=36 CY=19 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\parsing\simple_decl_parser.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.9461 CL=80 LE=0 CX=79 CY=23 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\util\logicmoo_util_bugger.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.100688 CL=56 LE=0 CX=55 CY=21 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_online\prolog\logicmoo\run_clio.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.6655 CL=26 LE=0 CX=25 CY=18 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\runtime\run_mud_server.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.4119 CL=4 LE=0 CX=3 CY=18 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_builtin.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.4854 CL=18 LE=0 CX=17 CY=15 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_irc.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1585 CL=2 LE=0 CX=1 CY=12 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.995\Unicorn BousiProlog Beta + Ejemplos + Manual\FS_age_persons.bpl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.251 CL=44 LE=0 CX=43 CY=7 WI=5 BI=42 HT=0 HN=0 HF=0 HC=4
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1518 CL=2 LE=0 CX=1 CY=34 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_telnet.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.4424 CL=1 LE=0 CX=0 CY=21 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_agent.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.9332 CL=26 LE=0 CX=25 CY=24 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\pfc.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1706 CL=32 LE=0 CX=31 CY=29 WI=5 BI=36 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\prologmud\prolog\prologmud\mobs\prey.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.575 CL=6 LE=0 CX=5 CY=30 WI=5 BI=40 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\prologmud\prolog\prologmud\mobs\affordance\improve.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.-1 CL=1 LE=0 CX=0 CY=34 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\prologmud\prolog\prologmud\mobs\affordance\simbots.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=33 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\prologmud\prolog\prologmud\mobs\vacuum.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.495 CL=6 LE=0 CX=5 CY=22 WI=5 BI=41 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_npc.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2312 CL=27 LE=0 CX=26 CY=18 WI=5 BI=45 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_events.pl"
+VIEW: LN=.17125 CL=1 LE=0 CX=0 CY=22 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\runtime\debug_once.sh"
+BI: MA=1 74 1  TABS=1 4  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Slick-C	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=20 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="runtime\run_mud_server.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1462 CL=32 LE=0 CX=31 CY=0 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\prologmud\prolog\prologmud\actions\actions_conf.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\prologmud\prolog\prologmud\actions\any.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_ircbot\prolog\eggdrop.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1153 446 -1 -1 N  WF=0 WT=12 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\prologmud\prolog\prologmud\mobs\affordance\simbots.pl"
-VIEW: LN=.437 CL=16 LE=0 CX=15 CY=13 WI=224 BI=33 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1153 446 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\prologmud\prolog\prologmud\actions\any.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=222 BI=22 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1153 446 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\prologmud\prolog\prologmud\actions\actions_conf.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=220 BI=26 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1153 446 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_events.pl"
-VIEW: LN=.1462 CL=32 LE=0 CX=31 CY=0 WI=218 BI=17 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1153 446 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_npc.pl"
-VIEW: LN=.2312 CL=27 LE=0 CX=26 CY=18 WI=216 BI=45 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1153 446 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\prologmud\prolog\prologmud\mobs\vacuum.pl"
-VIEW: LN=.495 CL=6 LE=0 CX=5 CY=22 WI=194 BI=41 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1153 446 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\prologmud\prolog\prologmud\mobs\prey.pl"
-VIEW: LN=.575 CL=6 LE=0 CX=5 CY=30 WI=144 BI=40 HT=0 HN=0 HF=0 HC=4
-WINDOW: 198 198 1153 446 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
+VIEW: LN=.4118 CL=1 LE=0 CX=0 CY=18 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 78 1153 446 -1 -1 N  WF=0 WT=1 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_builtin.pl"
+VIEW: LN=.4854 CL=18 LE=0 CX=17 CY=15 WI=167 BI=22 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1153 446 -1 -1 N  WF=0 WT=13 "Default Fixed Font,10,0,1"
 BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_agent.pl"
-VIEW: LN=.1706 CL=32 LE=0 CX=31 CY=29 WI=108 BI=36 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1153 446 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
-BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.995\Unicorn BousiProlog Beta + Ejemplos + Manual\FS_age_persons.bpl"
-VIEW: LN=.251 CL=44 LE=0 CX=43 CY=7 WI=130 BI=42 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1153 446 -1 -1 N  WF=0 WT=17 "Default Fixed Font,10,0,1"
+VIEW: LN=.9332 CL=26 LE=0 CX=25 CY=14 WI=173 BI=25 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1153 446 -1 -1 N  WF=0 WT=12 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_telnet.pl"
+VIEW: LN=.4424 CL=1 LE=0 CX=0 CY=21 WI=171 BI=24 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1153 446 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\runtime\run_mud_server.pl"
+VIEW: LN=.4119 CL=4 LE=0 CX=3 CY=18 WI=161 BI=21 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1153 446 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\pfc.pl"
+VIEW: LN=.17125 CL=1 LE=0 CX=0 CY=22 WI=157 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1153 446 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\util\logicmoo_util_bugger.pl"
+VIEW: LN=.100688 CL=56 LE=0 CX=55 CY=21 WI=159 BI=19 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1153 446 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_online\prolog\logicmoo\run_clio.pl"
+VIEW: LN=.6655 CL=26 LE=0 CX=25 CY=18 WI=112 BI=18 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1153 446 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\runtime\debug_once.sh"
+VIEW: LN=.432 CL=9 LE=0 CX=8 CY=15 WI=165 BI=20 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 753 257 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\parsing\simple_decl_parser.pl"
+VIEW: LN=.9461 CL=80 LE=0 CX=79 CY=23 WI=109 BI=5 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1153 446 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
+BUFFER: BN="runtime\run_mud_server.pl"
+VIEW: LN=.4118 CL=1 LE=0 CX=0 CY=18 WI=155 BI=16 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1153 446 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\MUD_DeepParsing\prolog\parser_e2c.pl"
+VIEW: LN=.124126 CL=37 LE=0 CX=36 CY=19 WI=106 BI=15 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1153 446 -1 -1 M  WF=0 WT=11 "Default Fixed Font,10,0,1"
 BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_irc.pl"
-VIEW: LN=.1585 CL=2 LE=0 CX=1 CY=12 WI=135 BI=29 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1153 446 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_ircbot\prolog\eggdrop.pl"
-VIEW: LN=.12572 CL=39 LE=0 CX=38 CY=22 WI=214 BI=23 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1153 446 -1 -1 M  WF=0 WT=8 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\prologmud\prolog\prologmud\mobs\affordance\improve.pl"
-VIEW: LN=.284 CL=29 LE=0 CX=28 CY=6 WI=146 BI=18 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.2939 CL=42 LE=0 CX=41 CY=7 WI=169 BI=23 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
+packs\logicmoo_base\prolog\logicmoo\util\logicmoo_util_bugger.pl
+packs\logicmoo_online\prolog\logicmoo\run_clio.pl
+packs\prologmud\runtime\debug_once.sh
+packs\logicmoo_base\prolog\logicmoo\mpred\pfc.pl
+packs\prologmud\runtime\run_mud_server.pl
+packs\prologmud\prolog\prologmud\server\mud_builtin.pl
+packs\prologmud\prolog\prologmud\server\mud_telnet.pl
 packs\prologmud\prolog\prologmud\vworld\world_agent.pl
-packs\prologmud\prolog\prologmud\mobs\vacuum.pl
-packs\prologmud\prolog\prologmud\mobs\prey.pl
-packs\prologmud\prolog\prologmud\vworld\world_npc.pl
-packs\prologmud\prolog\prologmud\vworld\world_events.pl
-packs\prologmud\prolog\prologmud\actions\actions_conf.pl
-packs\prologmud\prolog\prologmud\actions\any.pl
-packs\prologmud\prolog\prologmud\mobs\affordance\simbots.pl
-packs\prologmud\prolog\prologmud\mobs\affordance\improve.pl
+packs\prologmud\prolog\prologmud\server\mud_irc.pl
