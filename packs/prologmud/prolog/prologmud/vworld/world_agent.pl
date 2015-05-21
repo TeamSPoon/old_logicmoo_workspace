@@ -63,7 +63,7 @@ parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):-
          ignore((CMD=actTick)),ignore((NewAgent=Agent)).
 
 parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- 
-   debugging(parser), trace, parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD).
+   debugging(parser), parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD).
 
 must_ac(G):- show_call_failure(must(G)).
 
@@ -218,6 +218,7 @@ has_tty(O):-no_repeats(O,thglobal:session_io(O,_,_,_)).
 
 get_agent_session(P,O):-get_session_id(O),get_agent_sessions(P,O),!.
 get_agent_session(P,O):-get_agent_sessions(P,O),has_tty(O).
+:-export(get_agent_sessions/2).
 get_agent_sessions(P,O):- no_repeats(P-O,(thglobal:session_agent(O,P);thglobal:agent_session(P,O);(irc_user_plays(P,O,C),ground(irc_user_plays(P,O,C))))).
 
 :-export(foc_current_agent/1).

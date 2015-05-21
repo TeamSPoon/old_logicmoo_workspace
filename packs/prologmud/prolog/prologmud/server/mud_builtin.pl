@@ -328,9 +328,9 @@ prologSingleValued(mudAtLoc(tObj,xyzFn(tRegion,ftInt,ftInt,ftInt)),prologHybrid)
 prologSingleValued(mudAttack(tObj,ftInt),prologHybrid).
 prologSingleValued(mudBareHandDamage(tAgent,ftInt),prologHybrid).
 % prologSingleValued(mudBareHandDamage(tAgent,ftDice),prologHybrid).
-% prologSingleValued(mudEnergy(tChargeAble,ftInt(500)),prologHybrid).
+% prologSingleValued(mudEnergy(tChargeAble,ftInt(90)),prologHybrid).
 prologSingleValued(mudEnergy(tChargeAble,ftInt),prologHybrid).
-prologSingleValued(mudEnergy(tObj,ftInt),[argSingleValueDefault(2,500)],prologHybrid).
+prologSingleValued(mudEnergy(tObj,ftInt),[argSingleValueDefault(2,90)],prologHybrid).
 prologSingleValued(mudFacing(tObj,vtDirection(vNorth)),prologHybrid).
 prologSingleValued(mudFacing(tObj,vtDirection),[argSingleValueDefault(2,vNorth)],prologHybrid).
 prologSingleValued(mudHealth(tObj,ftInt),prologHybrid).
@@ -749,7 +749,7 @@ genls('IndoorsIsolatedFromOutside',tRegion).
 genls('SpaceInAHOC',tRegion).
 
 typeProps(tAgent,[mudMoveDist(1)]).
-typeProps(tAgent,[predInstMax(mudHealth,500), predInstMax(mudEnergy,200), mudHealth(500), mudEnergy(200),  mudFacing(isRandom(vtBasicDir)), mudAgentTurnnum(0), mudScore(1), 
+typeProps(tAgent,[predInstMax(mudHealth,500), predInstMax(mudEnergy,200), mudHealth(500), mudEnergy(90),  mudFacing(isRandom(vtBasicDir)), mudAgentTurnnum(0), mudScore(1), 
     mudMemory(aDirectionsFn([vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW,vUp,vDown]))]).
 % typeProps(tAgent,mudLastCommand(actStand)).
 typeProps(tAgent,mudNeedsLook(vFalse)).
@@ -815,6 +815,9 @@ A room can be privately-named or publically-named. A room is usually publically-
 A room can be lighted or dark. A room is usually lighted.
 A room can be visited or unvisited. A room is usually unvisited.
 A room has a text called description.
+
+Y [can] be C1 or C2.  
+Y is [usually] C2.
 
 A thing can be lit or unlit. A thing is usually unlit.
 A thing can be edible or inedible. A thing is usually inedible.

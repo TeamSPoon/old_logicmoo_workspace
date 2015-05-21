@@ -175,21 +175,28 @@ run_database_hooks_0(TypeIn,HookIn):-
 
 onSpawn(A):-A==true,!.
 onSpawn((A,B)):-!,onSpawn(A),onSpawn(B).
-onSpawn(ClassFact):-fully_expand(ClassFact,ClassFactO),!,onSpawn_0(ClassFactO).
-onSpawn_0(ClassFact):- ClassFact=..[FunctArgType,InstA],
+onSpawn(ClassFact):-fully_expand(ClassFact,ClassFactO),!,onSpawn_0(t,ClassFactO).
+
+onSpawn_0(Modality,ClassFact):- ClassFact=..[FunctArgType,InstA],modality(FunctArgType,_),!,
+ onSpawn_0(FunctArgType,InstA).
+   
+onSpawn_0(Modality,ClassFact):- ClassFact=..[FunctArgType,InstA],
  tCol(FunctArgType),
  createByNameMangle(InstA,Inst,TypeA),
  assert_isa(TypeA,tCol),
  assert_isa(Inst,FunctArgType),
  assert_isa(Inst,TypeA),
- add(genls(TypeA,FunctArgType)),!.
-onSpawn_0(ClassFact):- ClassFact=..[Funct|InstADeclB],must_det(onSpawn_f_args(Funct,InstADeclB)).
+ fully_expand(t(Modality,genls(TypeA,FunctArgType)),TO),
+ add(TO),!.
 
-onSpawn_f_args(Funct,List):-
+onSpawn_0(Modality,ClassFact):- ClassFact=..[Funct|InstADeclB],
+  must_det(onSpawn_f_args(Modality,Funct,InstADeclB)).
+
+onSpawn_f_args(Modality,Funct,List):-
   must(convertSpawnArgs(Funct,1,List,NewList)),
    Later =.. [Funct|NewList],
-   add(Later),
-  !. 
+   fully_expand(t(Modality,Later),TO),
+   add(TO),!. 
   % call_after_mpred_load_slow(with_assertions(deduceArgTypes(Funct), add(Later))))),!.
 
 convertSpawnArgs(_,_,[],[]).

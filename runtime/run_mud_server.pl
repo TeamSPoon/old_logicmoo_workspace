@@ -88,21 +88,22 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 :-at_start(toploop_telnet:start_mud_telnet(4000)).
 
 
-/*
+
 
 % [Optional] the following game files though can be loaded separate instead
 :- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
 :- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
 :- declare_load_dbase('../games/src_game_nani/?*.plmoo').
-:- forall(parserTest(Where,String),assert_text(Where,String)).
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_startup_script( at_start(finish_processing_world)).
 
 :- enqueue_agent_action("rez crackers").
 
-*/
 
+sanity_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
+
+:-sanity_testp1.
 
 % [Optionaly] Run a battery of tests
 % :- if_startup_script( doall(now_run_local_tests_dbg)).

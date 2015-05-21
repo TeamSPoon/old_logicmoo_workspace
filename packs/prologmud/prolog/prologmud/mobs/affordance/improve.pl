@@ -11,5 +11,8 @@
 */
 
 
-
-
+((agentTODO(Agent,actDo(Something,Obj)),
+   localityOfObject(Obj,LOC),
+   localityOfObject(A,LOC)) => 
+     (~ agentTODO(Agent,actDo(Something,Obj)),
+     enqueue_agent_action(Agent,actDo(Something,Obj)))).

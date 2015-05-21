@@ -224,7 +224,7 @@ no_fallback(P,2):-not(user:mpred_prop(P,prologSingleValued)).
 :-export(defaultArgValue/4).
 defaultArgValue(Fact,F,A,OLD):- stack_check, user:mpred_prop(F,argSingleValueDefault(A,OLD)),!,dmsg(defaultArgValue(fallback_value(Fact,F,argSingleValueDefault(A,OLD)))).
 defaultArgValue(mudFacing(_,_),_,2,vNorth):-!.
-defaultArgValue(mudEnergy(_,_),_,2,200):-!.
+defaultArgValue(mudEnergy(_,_),_,2,90):-!.
 defaultArgValue(mudHealth(_,_),_,2,500):-!.
 defaultArgValue(Fact,F,A,Value):- Fact=..[F,P|Args],is_fact_consistent(Fact),defaultArgValue(Fact,F,A,P,Args,Value).
 

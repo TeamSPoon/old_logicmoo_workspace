@@ -326,8 +326,10 @@ db_expand_0(Op,pddlTypes(EL),O):- listToE(EL,E),db_expand_0(Op,isa(E,tCol),O).
 db_expand_0(Op,pddlPredicates(EL),O):- listToE(EL,E),db_expand_0(Op,isa(E,tPred),O).
 
 db_expand_0(Op,EACH,O):- EACH=..[each|List],db_expand_maplist(fully_expand_now(Op),List,T,T,O).
-db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F/A|Args],integer(A),functor_declares_instance(D,TPRED),is_relation_type(TPRED),expand_props(Prefix,Op,props(F,[D,TPRED|Args]),O),!.
-db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F,A|Args],integer(A),functor_declares_instance(D,TPRED),is_relation_type(TPRED),expand_props(Prefix,Op,props(F,[D,TPRED|Args]),O),!.
+db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F/A|Args],integer(A),functor_declares_instance(D,TPRED),
+  is_relation_type(TPRED),expand_props(_Prefix,Op,props(F,[D,TPRED|Args]),O),!.
+db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F,A|Args],integer(A),functor_declares_instance(D,TPRED),
+  is_relation_type(TPRED),expand_props(Prefix,Op,props(F,[D,TPRED|Args]),O),!.
 db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..  [D,C|Args],compound(C),functor_declares_instance(D,TPRED),get_functor(C,F,A),  
   expand_props(Prefix,Op,props(F,[D,TPRED|Args]),M),!,
   (\+((arg(_,C,Arg),var(Arg))) -> O = (meta_argtypes(C),M) ; (O= (M))).
@@ -432,6 +434,7 @@ db_expand_4(Op,Sent,SentO):-db_quf(Op,Sent,Pretest,Template),(Pretest==true-> Se
 
 is_meta_functor(Sent,F,List):-compound(Sent),Sent=..[F|List],(predicate_property(Sent,meta_predicate(_));is_logical_functor(F);F==pfcDefault),!.
 
+db_expand_5(Op,t(Sent),SentO):- nonvar(Sent),db_expand_5(Op,Sent,SentO).
 db_expand_5(_,A,B):-A=B,!.
 db_expand_5(_Op,Sent,SentO):-once(subst(Sent,user:mpred_prop,isa,SentO)).
 db_expand_5(_Op,Sent,SentO):-once(subst(Sent,mpred_prop,isa,SentO)).

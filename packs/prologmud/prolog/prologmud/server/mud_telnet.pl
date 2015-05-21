@@ -114,7 +114,7 @@ session_loop(In,Out):-
   ignore(look_brief(P)),!,    
   sformat(S,'~w> ',[P]),prompt_read_telnet(In,Out,S,List),!,
   register_player_stream_local(P,In,Out),
-  enqueue_agent_action(P,List,O).
+  enqueue_session_action(P,List,O).
 
 
 :-export(register_player_stream_local/3).
@@ -132,6 +132,13 @@ register_player_stream_local(P,In,Out):-
           asserta(thread_util:has_console(Id,In,Out,Err))))).
 
 
+:-export(enqueue_session_action/3).
+
+enqueue_session_action(A,[+, Text],S):- string(Text), must(assert_text(tWorld,Text)).
+enqueue_session_action(A,[ Text],S):- string(Text),!,enqueue_session_action(A,[actSay,Text],S).
+enqueue_session_action(A,L,S):- show_call(enqueue_agent_action(A,L,S)).
+
+
 set_tty_control(TF):- 
   ignore((logOnFailure((
    set_prolog_flag(color_term,TF),
@@ -145,7 +152,7 @@ set_tty_control(TF):-
    
 
 user:deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
-      foreach(get_agent_sessions(A,O),foreach(thglobal:session_io(O,In,Out,Id),fmt(Out,'~N~q.~n',[NewEvent]))).
+      foreach(req(get_agent_sessions(A,O)),foreach(req(thglobal:session_io(O,In,Out,Id)),fmt(Out,'~N~q.~n',[NewEvent]))).
 
 
 :-export(prompt_read/4).
@@ -156,7 +163,14 @@ prompt_read_telnet(In,Out,Prompt,Atom):-
 
 prompt_read(In,Out,Prompt,Atom):-        
         with_output_to(Out,ansi_format([reset,hfg(white),bold],'~w',[Prompt])),flush_output(Out),        
-        repeat,read_code_list_or_next_command(In,Atom),!.
+        repeat,read_code_list_or_next_command_with_prefix(In,Atom),!.
+
+local_to_words_list(Atom,Words):-var(Atom),!,Words = Atom.
+local_to_words_list(end_of_file,end_of_file):-!.
+local_to_words_list([],[]):-!.
+local_to_words_list(Atom,Words):-to_word_list(Atom,Words),!.
+
+read_code_list_or_next_command_with_prefix(In,Words):-read_code_list_or_next_command(In,Atom),show_call(local_to_words_list(Atom,Words)),!.
 
 read_code_list_or_next_command(Atom):-current_input(In),read_code_list_or_next_command(In,Atom),!.
 
