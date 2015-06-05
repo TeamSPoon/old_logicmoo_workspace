@@ -1,9 +1,0 @@
-
-In Mt: BaseKB.
-
-f: (genlMt RKFParsingMt TemplateParsingMt).
-f: (genlMt RKFParsingMt AllEnglishTemplateMt).
-
-F: (implies 
-  (queryTemplate-Reln ?A ?B ?C ?D)
-  (termTemplate-Reln ?A ?B ?C ?D))

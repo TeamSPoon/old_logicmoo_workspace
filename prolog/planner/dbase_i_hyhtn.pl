@@ -3423,6 +3423,7 @@ slow_sanity(X):-must(X).
 %se/cond == se. state == ss. trans == sc. dif == ne.  operator == operator
 term_expansion_hyhtn(In,Out):-nonvar(In),term_expansion_alias(In,Out).
 
+:-export(term_expansion_alias/2).
 term_expansion_alias(In,Out):-term_expansion_alias([],In,Out).
 term_expansion_alias(Not,In,Out):-term_alias(I,O),not(member(I,Not)),subst_eq(In,I,O,M), In\=@=M,!, term_expansion_alias([I|Not],M,Out).
 term_expansion_alias(_Not,InOut,InOut).
@@ -3438,9 +3439,10 @@ term_alias(neq,dif).*/
 term_alias(startOcl,start).
 term_alias(startOCL,start).
 
+/*
 :- use_module(library(pce)).
 :- use_module(library(gui_tracer)).
-
+*/
 
 :- thread_local tlbugger:inside_loop_check/1.
 :- module_transparent(tlbugger:inside_loop_check/1).
@@ -3453,7 +3455,8 @@ make_key(CC,KeyA):- notrace(ground(CC)->KeyA=CC ;(copy_term(CC,Key,_),numbervars
 loop_check(B):- loop_check(B,fail).
 loop_check(B, TODO):- make_key(B,BC),!, loop_check_term(B,BC,TODO).
 
-loop_check_term(B,BC,TODO):-  ( \+(tlbugger:inside_loop_check(BC)) -> setup_call_cleanup(asserta(tlbugger:inside_loop_check(BC)),B, retract((tlbugger:inside_loop_check(BC)))) ;call(TODO) ).
+loop_check_term(B,BC,TODO):-  ( \+(tlbugger:inside_loop_check(BC)) 
+   -> setup_call_cleanup(asserta(tlbugger:inside_loop_check(BC)),B, retract((tlbugger:inside_loop_check(BC)))) ;call(TODO) ).
 
 
 must(E):-E *-> true ; (trace,E).
