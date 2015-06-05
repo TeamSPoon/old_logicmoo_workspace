@@ -206,9 +206,9 @@ check_consistent(Obj,Scope):-var(Scope),!,check_consistent(Obj,0).
 check_consistent(Obj,Scope):-is_instance_consistent(Obj,Was),!,Was>=Scope.
 check_consistent(Obj,_):- thlocal:is_checking_instance(Obj),!.
 check_consistent(Obj,Scope):- with_assertions(thlocal:is_checking_instance(Obj),doall(check_consistent_0(Obj,Scope))).
-check_consistent_0(Obj,Scope):- once((catchv((doall(((clause(hook:hooked_check_consistent(Obj,AvScope),Body),once(var(AvScope); (AvScope =< Scope) ),Body))),assert_if_new(is_instance_consistent(Obj,Scope))),E,assert_if_new(bad_instance(Obj,E))))),fail.
+check_consistent_0(Obj,Scope):- once((catch((doall(((clause(hook:hooked_check_consistent(Obj,AvScope),Body),once(var(AvScope); (AvScope =< Scope) ),Body))),assert_if_new(is_instance_consistent(Obj,Scope))),E,assert_if_new(bad_instance(Obj,E))))),fail.
 check_consistent_0(Type,Scope):- once(type(Type)),
- catchv((forall(isa(Obj,Type),check_consistent(Obj,Scope)),
+ catch((forall(isa(Obj,Type),check_consistent(Obj,Scope)),
                                                    assert_if_new(is_instance_consistent(Type,Scope))),E,assert_if_new(bad_instance(Type,E))),fail.
 
 hook:hooked_check_consistent(Obj,20):-must(object_string(_,Obj,0-5,String)),dmsg(checked_consistent(object_string(_,Obj,0-5,String))).

@@ -228,7 +228,7 @@ do_semweb_startup:-
 % TODO mpred_online:semweb_startup:-ensure_loaded('run_clio').
 
 % [Optionaly] register/run KnowRob robot services (we use it for the ontology mainly)
-% TODO mpred_online:semweb_startup :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
+% TODO mpred_online:semweb_startup :- with_no_mpred_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
 
 % [Optionaly] register/run MILO robot services (we use it for the ontology mainly)
 % TODO mpred_online:semweb_startup :- register_ros_package(milo).

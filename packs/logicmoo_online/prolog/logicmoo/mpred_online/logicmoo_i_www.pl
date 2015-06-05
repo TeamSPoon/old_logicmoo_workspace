@@ -33,11 +33,27 @@
 :- dynamic   http:location/3.
 :- multifile http:location/3.
 
+:- use_module(library(debug), [debug/3]).
+:- use_module(library(lists), [append/3, member/2, select/3]).
+:- use_module(library(operators), [push_op/3]).
+:- use_module(library(shlib), [current_foreign_library/2]).
+:- use_module(library(prolog_source)).
+:- use_module(library(option)).
+:- use_module(library(error)).
+:- use_module(library(apply)).
+:- use_module(library(debug)).
+:- if(exists_source(library(pldoc))).
+:- use_module(library(pldoc), []).
+	% Must be loaded before doc_process
+:- use_module(library(pldoc/doc_process)).
+:- endif.
+:- use_module(library(prolog_xref)).
+
 :- include(logicmoo(mpred/logicmoo_i_header)).
 % :- ['../logicmoo_run_swish'].
-:- ['../run_clio'].
+:- user:ensure_loaded('../run_clio').
 
-:- doc_collect(true).
+:- initialization(doc_collect(true)).
 %:- use_module(library(pldoc/doc_library)).
 %:- doc_load_library.
 
@@ -45,7 +61,7 @@
 :- style_check(-discontiguous). %  toMarkup/4, toMarkupFormula/4.
 :- style_check(-singleton).
 
-:- debug(_).
+% :- debug(_).
 
 :- thread_local(thlocal:omit_full_stop).
 
@@ -104,7 +120,7 @@ f_to_mfa(EF,R,F,A):-get_fa(EF,F,A),
     current_predicate(_:F/A),functor(P,F,A),source_file(R:P,SF))),
     current_predicate(R:F/A).
 
-:-nb_setval(pldoc_options,[ prefer(manual) ]).
+:- nb_setval(pldoc_options,[ prefer(manual) ]).
 
 
 % 
@@ -120,6 +136,7 @@ make_page_for_obj(Obj):-
       format('Content-type: text/html~n~n',[]),
       format('<html><head><meta http-equiv="refresh" content="300;http://prologmoo.com:3020/logicmoo/?search=~q"><title>search for ~q</title></head>',[PredURL,Pred]),
       format('<body class="yui-skin-sam"><strong><font face="verdana,arial,sans-serif"><font size="5">Object : </font></strong><strong><font size="5"><a href="?search=~q" target="_top">~q</a></font></strong><br/><pre>',[PredURL,Pred]),
+      flush_output,
       with_assertions([thlocal:print_mode(html)],
       ignore(( 
          logOnFailure(make_page_pretext_obj(Obj))))),
@@ -131,10 +148,11 @@ make_page_for_obj(Obj):-
 make_page_pretext_obj(Obj):- 
   get_functor(Obj,Pred,AA),((AA==0)->A=_;A=AA),
    % ignore((catch(mmake,_,true))),
-  forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure(reply_object_sub_page(M:F/A)))),
-  ignore((catch(pfc_listing(Pred),_,true))),
-  forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure(lsting(M:F/A)))),!.
+  forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure(lsting(M:F/A)))),flush_output,
+  forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure(reply_object_sub_page(M:F/A)))),flush_output,
+  ignore((catch(pfc_listing(Pred),_,true))),!.
 
+:- prolog_xref:assert_default_options(register_called(all)).
 
 reply_object_sub_page(Obj) :- phrase(object_sub_page(Obj, []), HTML), print_html(HTML),!.
 
@@ -179,7 +197,7 @@ pp_item_html_if_in_range(Type,H):- section_open(Type),!,pp_ihtml(H),!,nl.
 pp_ihtml(T):-isVarProlog(T),getVarAtom(T,N),format('~w',[N]).
 pp_ihtml(done):-!.
 pp_ihtml(T):-string(T),format('"~w"',[T]).
-pp_ihtml((H:-true)):-pp_ihtml(H).
+pp_ihtml((H:-B)):-B==true, !, pp_ihtml(H).
 pp_ihtml(was_chain_rule(H)):- pp_ihtml(H).
 pp_ihtml(is_edited_clause(H,B,A)):- pp_ihtml(proplst([(clause)=H,before=B,after=A])).
 pp_ihtml(is_disabled_clause(H)):- pp_ihtml((disabled)=H).
@@ -273,140 +291,6 @@ writeMarkup(Term,Chars):- logOnError(toMarkup(html,Term,_,Chars)).
 % So first is loads the proper files and then starts up the system
 % There are no predicates defined in this file (it just uses other files' predicates)
 % ===================================================================
-% ===================================================================
-% EXPORTS
-% ===================================================================
-isNonVar(Denotation):-not(isSlot(Denotation)).
-
-% ===============================================================================================
-% ===============================================================================================
-
-isSlot(Denotation):-((isVarProlog(Denotation);isVarObject(Denotation))),!.
-
-isSlot(Denotation,Denotation):- isVarProlog(Denotation),!.
-isSlot(Denotation,PrologVar):- isVarObject(Denotation,PrologVar),!.
-
-% ===============================================================================================
-% ===============================================================================================
-
-isHiddenSlot(Term):-fail.
-
-% ===============================================================================================
-% ===============================================================================================
-
-isVarProlog(A):-((var(A);A='$VAR'(_))).
-
-% ===============================================================================================
-% ===============================================================================================
-
-isVarObject(Denotation):-((
-		  isObject(Denotation,BaseType),
-		  arg(1,Denotation,Value),!,isSlot(Value))).
-
-isVarObject(Denotation,Value):-((
-		  isObject(Denotation,BaseType),
-		  arg(1,Denotation,Value),!,isSlot(Value))).
-
-% ===============================================================================================
-% ===============================================================================================
-	
-isObject(Denotation,BaseType):-
-	(((atom(BaseType) ->
-		  (atom_concat('$',BaseType,F),functor(Denotation,F,2));
-		  (functor(Denotation,F,2),atom_concat('$',BaseType,F))
-		 ),!)).
-
-% ===============================================================================================
-% ===============================================================================================
-
-isQualifiableAsClass(Atom):-atom(Atom),!.
-isQualifiableAsClass('$Class'(Atom,_)):-atom(Atom),!.
-
-isQualifiableAs(Denotation,BaseType,Value):-
-		  isObject(Denotation,BaseType),
-		  arg(1,Denotation,Value).
-
-% ===============================================================================================
-% ===============================================================================================
-
-isQualifiedAs(Denotation,_,_):-not(compound(Denotation)),!,fail.
-isQualifiedAs(Denotation,BaseType,Value):-
-		  isQualifiedAs(Denotation,BaseType,Value,SubType).
-isQualifiedAs(Denotation,BaseType,Value,SubType):-
-		  isObject(Denotation,BaseType),
-		  arg(1,Denotation,Value),
-		  arg(2,Denotation,List),
-		  lastImproperMember(BaseType,SubType,List).
-
-% ===============================================================================================
-% ===============================================================================================
-
-lastImproperMember(Default,Default,List):-isVarProlog(List),!.
-lastImproperMember(Default,Default,[]):-!.
-lastImproperMember(Default,SubType,List):-proper_lst(List),last(SubType,List).
-lastImproperMember(Default,SubType,[SubType|End]):-isVarProlog(End),!.
-lastImproperMember(Default,SubType,[_|Rest]):-
-	lastImproperMember(Default,SubType,Rest),!.
-	
-% ===============================================================================================
-% ===============================================================================================
-
-isQualifiedAndKnownAs(Denotation,BaseType,Value):-
-		  isQualifiedAs(Denotation,BaseType,Value),!,
-		  not(isVarProlog(Value)).
-
-% ===============================================================================================
-% ===============================================================================================
-
-isQualifiedAndVarAs(Denotation,BaseType,Value):-
-		  isQualifiedAs(Denotation,BaseType,Value),!,
-		  isVarProlog(Value).
-
-% ===============================================================================================
-% ===============================================================================================
-
-isQualifiedAndVarAndUnifiable(Denotation,BaseType,NValue):-
-		  isQualifiedAs(Denotation,BaseType,Value),!,
-		  (isVarProlog(Value);
-		  (\+ \+ NValue=Value)),!.
-
-% ===============================================================================================
-% ===============================================================================================
-
-isBodyConnective(Funct):-atom_concat(_,'_',Funct),!.
-isBodyConnective(Funct):-atom_concat('t~',_,Funct),!.
-isBodyConnective(Funct):-atom_concat('f~',_,Funct),!.
-isBodyConnective(Funct):-member(Funct,[and,or,until,',',';',':-',unless,xor,holdsDuring]). % Other Propositional Wrhtml_appers
-
-isEntityref(Var,Var):-isSlot(Var),!.
-isEntityref(Term,A):-Term=..[F,A,B],!,atom_concat('$',_,F),!.
-
-
-% ===============================================================================================
-% ===============================================================================================
-
-isLiteralTerm(A):-isLiteralTerm_util(A),!.
-isLiteralTerm(not(A)):-isLiteralTerm_util(A),!.
-
-isLiteralTerm_util(A):-var(A),!.
-isLiteralTerm_util('$VAR'(_)):-!.
-isLiteralTerm_util(string(_)):-!.
-isLiteralTerm_util(A):-not(compound(A)),!.
-isLiteralTerm_util(A):-string(A).
-
-% ===============================================================================================
-% ===============================================================================================
-
-isEntitySlot(Term):-isSlot(Term),!.
-isEntitySlot(Term):-not(compound(Term)),!.
-isEntitySlot(Term):-isEntityFunction(Term,FnT,ArgsT),!.
-
-% ===============================================================================================
-% ===============================================================================================
-
-isEntityFunction(Term,FnT,ArgsT):-isSlot(Term),!,fail.
-isEntityFunction(Term,FnT,ArgsT):-atomic(Term),!,fail.
-isEntityFunction(Term,FnT,ArgsT):-Term=..[FnT|ArgsT],hlPredicateAttribute(FnT,'Function'),!.
 
 
 

@@ -19,13 +19,12 @@
 % ====================================================
 
 :-export(rez_to_inventory/3).
-rez_to_inventory(Agent,NameOrType,NewObj):-   
+rez_to_inventory(Agent,NameOrType,NewObj):- 
   must_det_l([
-   create_meta(NameOrType,Clz,tItem,NewObj),
-   add(isa(NewObj,Clz)),
+   show_call(createByNameMangle(NameOrType,NewObj,Clz)),
+   padd(NewObj,authorWas(rez_to_inventory(Agent,NameOrType,NewObj))),
    add(genls(Clz,tItem)),
    padd(Agent,mudStowing(NewObj)),
-   padd(NewObj,authorWas(rez_to_inventory(Agent,NameOrType,NewObj))),
    add_missing_instance_defaults(NewObj),
    mudStowing(Agent,NewObj),
    ireq(t(mudStowing,Agent,NewObj)),
@@ -34,7 +33,8 @@ rez_to_inventory(Agent,NameOrType,NewObj):-
    mudPossess(Agent,NewObj)]).
 
 
-user:action_info(actRez(isOneOf([tCol,ftTerm])),"Rezes a new 'item' of some NameOrType into mudStowing inventory").
+user:action_info(actRez(isOneOf([tCol,ftID,ftTerm])),"Rezes a new subclass of 'item' or clone of tObj of some NameOrType into mudStowing inventory").
+
 user:agent_call_command(Agent,actRez(NameOrType)):- nonvar(NameOrType),
         must(rez_to_inventory(Agent,NameOrType,NewObj)),
         fmt([rezed,NameOrType,NewObj]).

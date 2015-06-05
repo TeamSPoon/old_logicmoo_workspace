@@ -71,7 +71,7 @@ user_db:grant_openid_server(_,_).
 
 :- load_conf_d([ 'config-enabled' ], []).
 
-:-nb_setval(pldoc_options,[ prefer(manual) ]).
+:- nb_setval(pldoc_options,[ prefer(manual) ]).
 
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_dispatch)).
@@ -168,7 +168,7 @@ semweb_startup_late:- cp_server:attach_account_info.
 :- nodebug(number_codes/2).
 :- nodebug(number_codes(_,_)).
 :- nodebug(logicmoo_util_bugger_catch).
-:- nodebug(logicmoo_util_bugger_catch:catchv/3).
+:- nodebug(logicmoo_util_bugger_catch:catch/3).
 :- nodebug(type_error(number,t)).
 % semweb_startup_late:- debug(http_request(_)),debug(cm(_)),debug(swish(_)),debug(storage).
 semweb_startup_late:- listing(pre_http_location/3).
@@ -186,6 +186,6 @@ mpred_online:semweb_startup:- do_semweb_startup_late_once.
 
 :- if_startup_script(do_semweb_startup_late_once).
 
-:- do_semweb_startup_late_once.
+:- initialization(do_semweb_startup_late_once).
 
-:-ensure_webserver.
+:- initialization(ensure_webserver).

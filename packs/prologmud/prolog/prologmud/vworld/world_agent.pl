@@ -13,7 +13,7 @@
 :- include(prologmud(mud_header)).
 /*
 % This file is "included" from world.pl 
-:-swi_module(modr, [ agent_call_command_unparsed/1, agent_call_command_unparsed/2,  agent_call_command_now/2 ]).
+:-swi_module(modr, [ agent_call_unparsed/1, agent_call_unparsed/2,  agent_call_command_now/2 ]).
 
 
 tAgent - Players and Bot Bodies
@@ -31,7 +31,7 @@ agent->nick
 
 immediate_session(_P,_C,_O):-!.
 
-do_agent_action_queue(P):- agent_action_queue(P,C,O),must(with_session(O,agent_call_command_unparsed(P,C))),retract(agent_action_queue(P,C,O)).
+do_agent_action_queue(P):- agent_action_queue(P,C,O),must(with_session(O,agent_call_unparsed(P,C))),retract(agent_action_queue(P,C,O)).
 do_agent_action_queue(_). % was empty already
 
 
@@ -52,7 +52,7 @@ do_agent_action(P,C,O):- \+ immediate_session(P,C,O), !, enqueue_agent_action(P,
 do_agent_action(P,C,_):- var(C),!,fmt('unknown_var_command(~q,~q).',[P,C]).
 do_agent_action(_,EOF,_):- end_of_file == EOF, !, tick_tock.
 do_agent_action(_,'',_):-!, tick_tock.
-do_agent_action(P,C,O):- do_gc,with_session(O,agent_call_command_unparsed(P, C)),!.
+do_agent_action(P,C,O):- do_gc,with_session(O,agent_call_unparsed(P, C)),!.
 do_agent_action(P,C,O):-wdmsg('skipping_unknown_player_action(~q,~q).~n',[P,C]),!.
 
 
@@ -91,40 +91,42 @@ with_session(ID,CALL):-with_assertions(thlocal:session_id(ID),CALL).
 
 
 % =====================================================================================================================
-% agent_call_command_unparsed_0/2 -->  agent_call_command_now/2
+% agent_call_unparsed --> agent_call_words --> agent_call_command_now
 % =====================================================================================================================
 
-agent_call_command_unparsed(C):-foc_current_agent(A),!,agent_call_command_unparsed(A,C).
+agent_call_unparsed(C):-foc_current_agent(A),!,agent_call_unparsed(A,C).
 
-agent_call_command_unparsed(A,C):-  with_assertions(tlbugger:old_no_repeats, agent_call_command_unparsed_0(A,C)).
+agent_call_unparsed(A,C):-  with_assertions(tlbugger:old_no_repeats, agent_call_unparsed_0(A,C)).
+
+agent_call_unparsed_0(Agent,Var):-var(Var),trace_or_throw(var_agent_call_unparsed(Agent,Var)).
 
 % execute a prolog command including prolog/0
-agent_call_command_unparsed_0(Agent,Var):-var(Var),trace_or_throw(var_agent_call_command_unparsed(Agent,Var)).
-
-agent_call_command_unparsed_0(Agent,Text):-string(Text),atom_string(Atom,Text),!,agent_call_command_unparsed_0(Agent,Atom).
-
-agent_call_command_unparsed_0(Agent,[VERB|ARGS]):-
-      debugOnError(parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD)),
-      must_ac(agent_call_command_now(NewAgent,CMD)),!.
-
-% lists
-agent_call_command_unparsed_0(A,Atom):-atom(Atom),atomSplit(Atom,List),must(is_list(List)),!,agent_call_command_unparsed_0(A,List).
-
-% prolog command
-agent_call_command_unparsed_0(_Gent,Atom):- atom(Atom), catch((
-   (once((read_term_from_atom(Atom,OneCmd,[variables(VARS)]),
+agent_call_unparsed_0(_Gent,Atom):- atomic(Atom), catch((
+   (once((catch(read_term_from_atom(Atom,OneCmd,[variables(VARS)]),_,fail),
       predicate_property(OneCmd,_),
       fmt('doing command ~q~n',[OneCmd]))),!, doall((OneCmd,fmt('Yes: ~w',[VARS]))))),E,(dmsg(E),fail)).
 
+
+% lists
+agent_call_unparsed_0(A,Atom):-to_word_list(Atom,List),must(is_list(List)),!,agent_call_words(A,List).
+
+
+agent_call_words(A,Words):- (\+ is_list(Words)),must(agent_call_unparsed(A,Words)),!.
+agent_call_words(Agent,Text):- catch(text_to_string(Text,String),_,fail),Text\=@=String,!,agent_call_unparsed(Agent,String).
+
+
 % remove period at end
-agent_call_command_unparsed_0(A,PeriodAtEnd):-append(New,[(.)],PeriodAtEnd),!,agent_call_command_unparsed_0(A,New).
+agent_call_words(A,PeriodAtEnd):-append(New,[(.)],PeriodAtEnd),!,agent_call_words(A,New).
 
 % concat the '@'
-agent_call_command_unparsed_0(Ag,[A,B|REST]):- atom(A),atom(B),A=='@',atom_concat(A,B,C),!,agent_call_command_unparsed_0(Ag,[C|REST]).
+agent_call_words(Ag,[A,B|REST]):- atom(A),atom(B),A=='@',atom_concat(A,B,C),!,agent_call_words(Ag,[C|REST]).
 
-agent_call_command_unparsed_0(A,[L,I|IST]):- atom(L), CMD =.. [L,I|IST],!, must_ac(agent_call_command_now(A,CMD)).
+agent_call_words(Agent,[VERB|ARGS]):-
+      must(debugOnError(parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD))),
+      must_ac(agent_call_command_now(NewAgent,CMD)),!.
 
-agent_call_command_unparsed_0(A,CMD):- must_ac(agent_call_command_now(A,CMD)),!.
+agent_call_words(A,[CMD]):- !, must_ac(agent_call_command_now(A,CMD)),!.
+agent_call_words(A,CMD):- must_ac(agent_call_command_now(A,CMD)),!.
 
 :-export(where_atloc/2).
 where_atloc(Agent,Where):-mudAtLoc(Agent,Where).
@@ -134,11 +136,13 @@ where_atloc(Agent,'OffStage'):-fail,nonvar(Agent).
 
 
 % All Actions must be called from here!
-agent_call_command_now(Agent,CMD):- var(CMD),trace_or_throw(var_agent_call_command_now(Agent,CMD)).
-agent_call_command_now(Agent,CMD):- subst(CMD,isSelfAgent,Agent,NewCMD),CMD\=@=NewCMD,!,agent_call_command_now(Agent,NewCMD).
-agent_call_command_now(Agent,CMD):- correctCommand(CMD,NewCMD),CMD\=@=NewCMD,!,agent_call_command_now(Agent,NewCMD).
-agent_call_command_now(Agent,CMD):- \+ where_atloc(Agent,_),!, agent_call_command_now_2(Agent,CMD),!.
-agent_call_command_now(Agent,CMD):- where_atloc(Agent,Where),
+agent_call_command_now(Agent,CMD  ):- var(CMD),trace_or_throw(var_agent_call_command_now(Agent,CMD)).
+agent_call_command_now(Agent,Text ):- catch(text_to_string(Text,String),_,fail),show_call(loop_check(agent_call_unparsed(Agent,String))).
+agent_call_command_now(Agent,Words):- is_list(Words),loop_check(agent_call_words(Agent,Words)).
+agent_call_command_now(Agent,CMD  ):- subst(CMD,isSelfAgent,Agent,NewCMD),CMD\=@=NewCMD,!,agent_call_command_now(Agent,NewCMD).
+agent_call_command_now(Agent,CMD  ):- correctCommand(Agent,CMD,NewCMD),CMD\=@=NewCMD,!,agent_call_command_now(Agent,NewCMD).
+agent_call_command_now(Agent,CMD  ):- \+ where_atloc(Agent,_),!, agent_call_command_now_2(Agent,CMD),!.
+agent_call_command_now(Agent,CMD  ):- where_atloc(Agent,Where),
    % start event
    must(raise_location_event(Where,actNotice(reciever,begin(Agent,CMD)))),
    (debugOnError(agent_call_command_now_2(Agent,CMD)) ->
@@ -162,21 +166,26 @@ send_command_completed_message(Agent,Where,Done,CMD):-
                 raise_location_event(Where,actNotice(reciever,Message)),flush_output]))),!.
 
 
-correctCommand(CMD,OUT):-compound(CMD),fail,
+correctCommand_0(Who,CMD,OUT):-
+   compound(CMD),
    must(current_agent(Who)),
    CMD=..[F|ARGS],   
    functor(CMD,F,A),
-   functor(MATCH,F,A),
-   vtActionTemplate(MATCH),compound(MATCH),MATCH=..[F|TYPES],!,
+   functor(MATCH,F,A),!,
+   vtActionTemplate(MATCH),compound(MATCH),MATCH=..[F|TYPES],
    correctEachTypeOrFail(Who,F,query(t, must),ARGS,TYPES,NEWS),!,
-   OUT=..[F|NEWS].
+   OUT=..[F|NEWS],!.
 
-correctCommand(CMD,CMD).
+
+correctCommand(Who,CMD,OUT):-compound(CMD),show_call_failure(correctCommand_0(Who,CMD,OUT)),!.
+correctCommand(_,CMD,CMD).
 
 correctEachTypeOrFail( Who, F, Q,ARGS,TYPES,NEWS):- is_list(TYPES),!,maplist(correctEachTypeOrFail(Who,F,Q),ARGS,TYPES,NEWS).
-correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- fail, not(is_ephemeral(Arg)),not(is_ephemeral(Type)),isa(Arg,Type),!,Inst = Arg.
+correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- not(is_ephemeral(Arg)),not(is_ephemeral(Type)),isa(Arg,Type),!,Inst = Arg.
+correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- not(is_ephemeral(Arg)),not(is_ephemeral(Type)), must(coerce(Arg,Type,Inst)),not(is_ephemeral(Inst)),!.
+correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- not(is_ephemeral(Arg)), show_call_failure(coerce(Arg,Type,Inst)),not(is_ephemeral(Inst)),!.
+correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- (coerce(Arg,Type,Inst)),not(is_ephemeral(Inst)),!.
 correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- !,acceptableArg(Arg,Type),!,Inst = Arg.
-correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):-not(is_ephemeral(Arg)),not(is_ephemeral(Type)), must(coerce(Arg,Type,Inst)),not(is_ephemeral(Inst)).
 
 is_ephemeral(Var):-var(Var),!,fail.
 is_ephemeral(isMissing).

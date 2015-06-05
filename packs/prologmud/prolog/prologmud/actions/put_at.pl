@@ -22,6 +22,7 @@
 % actPut
 user:action_info(actPut(tCarryAble,txtPrepSpatial,tPutTargetAble),"actPut [obj] [onto|inside] [somewhere]").
 
+user:verb_alias(T,V):-vtVerb(V),name_text(V,T).
 user:verb_alias(set,actPut).
 user:verb_alias(place,actPut).
 user:verb_alias(hide,actPut).

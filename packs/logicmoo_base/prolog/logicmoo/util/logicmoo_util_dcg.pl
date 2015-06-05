@@ -112,9 +112,37 @@ getText(S,S).
 % ========================================================================
 :- style_check(-discontiguous).
 
+
+
+equals_text(S,Data):- is_list(Data),member([txt,S0],Data),!,equals_text(S,S0).
+equals_text(S,S):- !.
+%equals_text(S,S0):- var(S),var(S0),!,S=S0.
+equals_text(S,S0):- var(S0),text_to_string(S,S0),!.
+equals_text(S,S0):- var(S),text_to_string(S0,S),!.
+equals_text(S,S0):- text_to_string(S,SS),text_to_string(S0,SS).
+
 decl_dcgTest("this is text",theText([this,is,text])).
-theText([S|Text]) --> [Data],{member([txt|[S|Text]],Data),!}.
-theText([S|Text]) --> [S|Text].
+
+% Text
+
+theText(Text) --> {Text==[],!},[].
+theText([S|Text]) --> {nonvar(S),!},theText0(S),!,theText(Text).
+
+theText([S|Text]) --> theText0(S),theText(Text).
+theText([]) --> [].
+
+%theText([S|Text],[S0|TextData],More):- member([txt,S0|TextData],Data),equals_text(S,S0),append(Text,More,TextData).
+
+%  trace, do_dcgTest_startsWith("this is text", logicmoo_util_dcg:dcgStartsWith1(theText(["this"])), true) .
+
+% Looser text test?
+theText0(_,W,_):- W==[],!,fail.
+theText0(S) --> {atomic(S),atom_concat('"',Right,S),atom_concat(New,'"',Right),!},theText(New).
+theText0(S) --> {atomic(S),concat_atom([W1,W2|List],' ',S),!},theText([W1,W2|List]).
+theText0(S) --> {!}, [Data],{equals_text(S,Data)}.
+
+
+
 
 decl_dcgTest("this is a string",theString("this is a string")).
 theString(String) --> theString(String, " ").
@@ -262,7 +290,7 @@ dcgAndRest(TheType,_TODO,[S|MORE],[]) :- phrase(TheType,[S],[]),phrase(TheType,[
 dcgStartsWith(TheType,SMORE,SMORE) :- phrase(TheType,SMORE,_).
 
 % tests for the above
-decl_dcgTest_startsWith("this is text",dcgStartsWith(theText([this,is]))).
+decl_dcgTest_startsWith("this is text",dcgStartsWith(theText(["this","is"]))).
 
 
 :-export(dcgStartsWith1//1).
@@ -272,7 +300,7 @@ decl_dcgTest_startsWith("this is text",dcgStartsWith(theText([this,is]))).
 dcgStartsWith1(TheType,[S|MORE],[S|MORE]) :- phrase(TheType,[S],[]).
 
 % tests for the above
-decl_dcgTest_startsWith("this is text",dcgStartsWith1(theText([this]))).
+decl_dcgTest_startsWith("this is text",dcgStartsWith1(theText(["this"]))).
 
 
 % 1) must be first in list 
@@ -281,7 +309,7 @@ decl_dcgTest_startsWith("this is text",dcgStartsWith1(theText([this]))).
 dcgStartsWith0(TheType,SMORE,[]) :- phrase(TheType,SMORE,_).
 
 % tests for the above
-decl_dcgTest("this is text",dcgStartsWith0(theText([this,is]))).
+decl_dcgTest("this is text",dcgStartsWith0(theText(["this",is]))).
 
 % =======================================================
 % DCG Tester
@@ -295,12 +323,12 @@ logicmoo_util_dcg:do_dcg_util_tests:-
 
 do_dcgTest(Input,DCG,Call):- to_word_list(Input,List),OTEST=do_dcgTest(Input,DCG,Call),copy_term(DCG:OTEST,CDCG:TEST),
    once((phrase(DCG,List,Slack),Call,(Slack==[]->dmsg(passed(CDCG,TEST,OTEST));dmsg(warn(Slack,OTEST))))).
-do_dcgTest(Input,DCG,Call):- dmsg(failed(DCG, do_dcgTest(Input,DCG,Call))).
+do_dcgTest(Input,DCG,Call):- dmsg(warn(failed(DCG, do_dcgTest(Input,DCG,Call)))).
 
 
 do_dcgTest_startsWith(Input,DCG,Call):- to_word_list(Input,List),OTEST=do_dcgTest(Input,DCG,Call),copy_term(DCG:OTEST,CDCG:TEST),
-   once((phrase(DCG,List,Slack),Call,(Slack==[]->dmsg(warn(CDCG,TEST,OTEST));dmsg(passed(CDCG,TEST,OTEST))))).
-do_dcgTest_startsWith(Input,DCG,Call):- dmsg(failed(DCG, do_dcgTest_startsWith(Input,DCG,Call))).
+   once((phrase(DCG,List,Slack),Call,(Slack==[]->wdmsg(warn(CDCG,TEST,OTEST));dmsg(passed(CDCG,TEST,OTEST))))).
+do_dcgTest_startsWith(Input,DCG,Call):- wdmsg(warn(failed(DCG, do_dcgTest_startsWith(Input,DCG,Call)))).
 
 
 decl_dcgTest(List,Phrase,true):-decl_dcgTest(List,Phrase).

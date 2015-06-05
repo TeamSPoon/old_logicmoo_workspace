@@ -1,6 +1,6 @@
 % =======================================================
 /** <module> 
-% This is mainly used by the moo_loader but also needed everywhere
+% This Agenda System is mainly used by the logicmoo_i_loader but also needed everywhere
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
@@ -43,8 +43,8 @@ rescan_mpred_loaded_pass2:- ignore((thglobal:after_mpred_load, loop_check(call_a
 % ================================================
 % Agenda system - standard database
 % ================================================
-
-time_tick(Time,Pred):- repeat,sleep(Time),once(doall(logOnError(call_no_cuts(Pred)))),fail.
+:-dynamic(suspend_timers/0).
+time_tick(Time,Pred):- repeat,sleep(Time), (suspend_timers->true;(once(doall(logOnError(call_no_cuts(Pred)))))),fail.
 
 user:hook_one_second_timer_tick.
 
@@ -170,68 +170,6 @@ run_database_hooks_0(TypeIn,HookIn):-
    loop_check_term(doall(call_no_cuts(user:decl_database_hook(Type,HookCopy))),run_database_hooks(Hook),true).
 
 % ========================================
-% Spawn new instances
-% ========================================
-
-onSpawn(A):-A==true,!.
-onSpawn((A,B)):-!,onSpawn(A),onSpawn(B).
-onSpawn(ClassFact):-fully_expand(ClassFact,ClassFactO),!,onSpawn_0(t,ClassFactO).
-
-onSpawn_0(Modality,ClassFact):- ClassFact=..[FunctArgType,InstA],modality(FunctArgType,_),!,
- onSpawn_0(FunctArgType,InstA).
-   
-onSpawn_0(Modality,ClassFact):- ClassFact=..[FunctArgType,InstA],
- tCol(FunctArgType),
- createByNameMangle(InstA,Inst,TypeA),
- assert_isa(TypeA,tCol),
- assert_isa(Inst,FunctArgType),
- assert_isa(Inst,TypeA),
- fully_expand(t(Modality,genls(TypeA,FunctArgType)),TO),
- add(TO),!.
-
-onSpawn_0(Modality,ClassFact):- ClassFact=..[Funct|InstADeclB],
-  must_det(onSpawn_f_args(Modality,Funct,InstADeclB)).
-
-onSpawn_f_args(Modality,Funct,List):-
-  must(convertSpawnArgs(Funct,1,List,NewList)),
-   Later =.. [Funct|NewList],
-   fully_expand(t(Modality,Later),TO),
-   add(TO),!. 
-  % call_after_mpred_load_slow(with_assertions(deduceArgTypes(Funct), add(Later))))),!.
-
-convertSpawnArgs(_,_,[],[]).
-convertSpawnArgs(Funct,N,[A|List],[O|NewList]):-
- must(convertOneSpawnArg(Funct,N,A,O)),!,
- N2 is N + 1,
- convertSpawnArgs(Funct,N2,List,NewList),!.
-
-convertOneSpawnArg(_,_,O,O):-string(O),!.
-convertOneSpawnArg(_,_,O,O):-number(O),!.
-convertOneSpawnArg(_,_,nospawn(O),O):-!.
-convertOneSpawnArg(Funct,N,isInstFn(A),O):-spawnOneSpawnArg(Funct,N,A,O).
-convertOneSpawnArg(Funct,N,A,O):-spawnOneSpawnArg(Funct,N,A,O).
-
-spawnOneSpawnArg(Funct,N,InstA,Inst):- 
-    must(argIsa(Funct,N,FunctArgType)),
-    createByNameMangle(InstA,Inst,TypeA),
-    assert_isa(TypeA,tCol),
-    assert_isa(Inst,FunctArgType),
-    assert_isa(Inst,TypeA),
-    add(genls(TypeA,FunctArgType)),!,
-    add(argIsa(Funct,N,TypeA)).
- 
-
-convertOneTypedSpawnArg(Type,A,O):-
- createByNameMangle(A,O,TypeA),assert_isa(TypeA,tCol),
- assert_subclass(TypeA,Type).
-
-
-assert_subclass_on_argIsa(Prop,N,argIsaFn(Prop,N)):-!.
-assert_subclass_on_argIsa(Prop,N,_OType):-argIsa(Prop,N,PropType),PropType=argIsaFn(Prop,N),!. % , assert_argIsa(Prop,N,OType).
-assert_subclass_on_argIsa(Prop,N,OType):-argIsa(Prop,N,PropType),assert_subclass_safe(OType,PropType),!.
-assert_subclass_on_argIsa(Prop,N,OType):-dmsg(assert_subclass_on_argIsa(Prop,N,OType)).
-
-% ========================================
 % Rescan for consistency
 % ========================================
 
@@ -327,32 +265,7 @@ call_after_mpred_load_slow(A):-dmsg(call_after_mpred_load_slow(A)).
 call_OnEachLoad:-forall(call_OnEachLoad(C),doall(C)).
 
 
-createByNameMangle(InstA,IDA,InstAO):-must(createByNameMangle0(InstA,IDA,InstAO)),!.
-
-createByNameMangle0(InstA,InstA,Type):-compound(InstA),InstA=..[Type|Props],assert_isa(InstA,Type),with_assertions(deduceArgTypes(_),padd(InstA,Props)).
-createByNameMangle0(InstA,Inst,Type):- compound(InstA),!,functor_catch(InstA,Type,A),must(A==1),assert_isa(InstA,Type),InstA=Inst.
-createByNameMangle0(InstA,_,_Type):- not(atom(InstA)),!,trace_or_throw(todo(not_atom_createByNameMangle(InstA))).
-createByNameMangle0(OType,InstA,Type):-isa_asserted(OType,tCol),!,create_from_type(OType,InstA,Type).
-createByNameMangle0(Suggest,InstA,Type):- once(split_name_type(Suggest,InstA,Type)),Suggest==InstA,assert_isa(InstA,Type).
-createByNameMangle0(OType,InstA,Type):- create_from_type(OType,InstA,Type),!.
-createByNameMangle0(InstA,IDA,InstA):- gensym(InstA,IDA), englishServerInterface([actCreate,InstA,IDA]).
-
-:-dynamic(thglobal:current_source_suffix/1).
-
-get_source_suffix('7').
-%get_source_suffix(SS):- thglobal:current_source_suffix(SS),!.
-%get_source_suffix(SS):- source_location(F,_),!,file_directory_name(F,DN),file_base_name(DN,SS),concat_atom(['-',SS,'7'],SSM),asserta_if_new(thglobal:current_source_suffix(SSM)).
-
-
-create_from_type(OType,InstA,Type):- sanity(var(InstA)),
-   i_name(OType,TypeWT),
-   atom_concat('t',TypeWT,Type),
-   get_source_suffix(SS),
-   atom_concat(Type,SS,InstA7),!,
-   i_name(i,InstA7,InstA),
-   must_det(assert_isa(InstA,Type)),!. 
- % call_after_mpred_load_slow(isa(InstA,Type)).
-
 wfAssert(X):-add(X). % add_later(X).
+
 
 

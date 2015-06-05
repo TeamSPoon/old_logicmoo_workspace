@@ -37,8 +37,8 @@ dist(_,_,5).
 
 :-decl_mpred(pathBetween_call(tRegion,vtDirection,tRegion)).
 
-% pathBetween_call(From,DirS,To):-string(DirS),!,atom_string(Dir,DirS),!,any_to_dir(Dir,Dir2),pathBetween(From,Dir2,To),same(Dir,Dir2).
-pathBetween_call_0(From,Dir,To):-any_to_dir(Dir,Dir2),is_asserted(pathBetween(From,Dir2,To)),same(Dir,Dir2).
+% pathBetween_call(From,DirS,To):-string(DirS),!,atom_string(Dir,DirS),!,any_to_dir(Dir,Dir2),pathDirLeadsTo(From,Dir2,To),same(Dir,Dir2).
+pathBetween_call_0(From,Dir,To):-any_to_dir(Dir,Dir2),is_asserted(pathDirLeadsTo(From,Dir2,To)),same(Dir,Dir2).
 pathBetween_call(From,Dir,To):-pathBetween_call_0(From,DirS,To),same(Dir,DirS).
    
 % 5x5 rooms are average
@@ -236,7 +236,7 @@ mostSpecificLocalityOfObject(Obj,Where):-
   ~inRegion(Obj,OldLoc)).
 
 % create pathway objects and place them in world
-(pathBetween(Region,Dir,R2)/ground(pathBetween(Region,Dir,R2)),   
+(pathDirLeadsTo(Region,Dir,R2)/ground(pathDirLeadsTo(Region,Dir,R2)),   
     { mudExitAtLoc(Region,Dir,LOC), Obj = apathFn(Region,Dir) }) =>  
                         (tPathway(Obj),localityOfObject(Obj,Region),mudAtLoc(Obj,LOC)).
 
@@ -313,12 +313,12 @@ prologHybrid(mudInsideOf(tObj,tObj)).
 
 % facts that must be true 
 %  suggest a deducable fact that is always defiantely true but not maybe asserted
-user:fact_always_true(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
+user:fact_always_true(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathDirLeadsTo(Region,Dir,_)).
 user:fact_always_true(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
 
 %  suggest a deducable fact that is probably true but not already asserted
 fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
-fact_maybe_deduced(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
+fact_maybe_deduced(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathDirLeadsTo(Region,Dir,_)).
 
 % create_and_assert_random_fact(_):- thlocal:noDBaseHOOKS(_),!.
 create_and_assert_random_fact(Fact):- fail,must(create_random_fact(Fact)),hooked_asserta(Fact).
@@ -455,7 +455,7 @@ any_to_dir(S,D):-string(S),string_to_atom(S,A),any_to_dir(A,D),!.
 any_to_dir(D,D):-dir_offset(D,_,_,_,_),!.
 any_to_dir(A,D):-p2c_dir2(D,A),!.
 any_to_dir(D,O):-atom(D),sub_atom(D, 0, 1, _, S),toLowercase(S,L),p2c_dir2(L,O),!.
-any_to_dir(D,D):-pathBetween(_,D,_),!.
+any_to_dir(D,D):-pathDirLeadsTo(_,D,_),!.
 
 :-export(dir_offset/5).
 

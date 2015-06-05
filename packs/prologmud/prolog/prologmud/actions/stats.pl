@@ -34,9 +34,6 @@ user:agent_call_command(Agent,actStats(What)):-
    %term_listing(What),!.
 
 
-user:action_info(actGrep(ftTerm),"grep for a term").
-
-
 
 /*
 There are 7 aptitudes in Eclipse Phase:

@@ -103,6 +103,17 @@
 					<Folder Name="demo">
 						<F N="/usr/lib/swi-prolog/demo/likes.pl"/>
 					</Folder>
+					<Folder Name="include">
+						<Folder Name="sicstus">
+							<F N="/usr/lib/swi-prolog/include/sicstus/sicstus.h"/>
+						</Folder>
+						<Folder Name="Yap">
+							<F N="/usr/lib/swi-prolog/include/Yap/YapInterface.h"/>
+						</Folder>
+						<F N="/usr/lib/swi-prolog/include/SWI-cpp.h"/>
+						<F N="/usr/lib/swi-prolog/include/SWI-Prolog.h"/>
+						<F N="/usr/lib/swi-prolog/include/SWI-Stream.h"/>
+					</Folder>
 					<Folder Name="library">
 						<Folder Name="chr">
 							<F N="/usr/lib/swi-prolog/library/chr/a_star.pl"/>
@@ -252,6 +263,23 @@
 							<F N="/usr/lib/swi-prolog/library/dialect/yap.pl"/>
 						</Folder>
 						<Folder Name="http">
+							<Folder Name="web">
+								<Folder Name="css">
+									<F N="/usr/lib/swi-prolog/library/http/web/css/dirindex.css"/>
+									<F N="/usr/lib/swi-prolog/library/http/web/css/openid.css"/>
+									<F N="/usr/lib/swi-prolog/library/http/web/css/plterm.css"/>
+								</Folder>
+								<Folder Name="icons">
+									<F N="/usr/lib/swi-prolog/library/http/web/icons/back.png"/>
+									<F N="/usr/lib/swi-prolog/library/http/web/icons/c.png"/>
+									<F N="/usr/lib/swi-prolog/library/http/web/icons/compressed.png"/>
+									<F N="/usr/lib/swi-prolog/library/http/web/icons/folder.png"/>
+									<F N="/usr/lib/swi-prolog/library/http/web/icons/generic.png"/>
+									<F N="/usr/lib/swi-prolog/library/http/web/icons/layout.png"/>
+									<F N="/usr/lib/swi-prolog/library/http/web/icons/openid-logo-square.png"/>
+									<F N="/usr/lib/swi-prolog/library/http/web/icons/openid-logo-tiny.png"/>
+								</Folder>
+							</Folder>
 							<F N="/usr/lib/swi-prolog/library/http/ax.pl"/>
 							<F N="/usr/lib/swi-prolog/library/http/dcg_basics.pl"/>
 							<F N="/usr/lib/swi-prolog/library/http/html_head.pl"/>
@@ -278,6 +306,7 @@
 							<F N="/usr/lib/swi-prolog/library/http/http_openid.pl"/>
 							<F N="/usr/lib/swi-prolog/library/http/http_parameters.pl"/>
 							<F N="/usr/lib/swi-prolog/library/http/http_path.pl"/>
+							<F N="/usr/lib/swi-prolog/library/http/http_proxy.pl"/>
 							<F N="/usr/lib/swi-prolog/library/http/http_pwp.pl"/>
 							<F N="/usr/lib/swi-prolog/library/http/http_server_files.pl"/>
 							<F N="/usr/lib/swi-prolog/library/http/http_session.pl"/>
@@ -316,7 +345,20 @@
 							<F N="/usr/lib/swi-prolog/library/pldoc/doc_search.pl"/>
 							<F N="/usr/lib/swi-prolog/library/pldoc/doc_util.pl"/>
 							<F N="/usr/lib/swi-prolog/library/pldoc/doc_wiki.pl"/>
+							<F N="/usr/lib/swi-prolog/library/pldoc/edit.png"/>
+							<F N="/usr/lib/swi-prolog/library/pldoc/editpred.png"/>
+							<F N="/usr/lib/swi-prolog/library/pldoc/h1-bg.png"/>
+							<F N="/usr/lib/swi-prolog/library/pldoc/h2-bg.png"/>
 							<F N="/usr/lib/swi-prolog/library/pldoc/hooks.pl"/>
+							<F N="/usr/lib/swi-prolog/library/pldoc/multi-bg.png"/>
+							<F N="/usr/lib/swi-prolog/library/pldoc/pldoc.css"/>
+							<F N="/usr/lib/swi-prolog/library/pldoc/pllisting.css"/>
+							<F N="/usr/lib/swi-prolog/library/pldoc/priv-bg.png"/>
+							<F N="/usr/lib/swi-prolog/library/pldoc/private.png"/>
+							<F N="/usr/lib/swi-prolog/library/pldoc/pub-bg.png"/>
+							<F N="/usr/lib/swi-prolog/library/pldoc/public.png"/>
+							<F N="/usr/lib/swi-prolog/library/pldoc/reload.png"/>
+							<F N="/usr/lib/swi-prolog/library/pldoc/source.png"/>
 						</Folder>
 						<Folder Name="semweb">
 							<F N="/usr/lib/swi-prolog/library/semweb/INDEX.pl"/>
@@ -394,6 +436,7 @@
 						<F N="/usr/lib/swi-prolog/library/helpidx.pl"/>
 						<F N="/usr/lib/swi-prolog/library/hotfix.pl"/>
 						<F N="/usr/lib/swi-prolog/library/INDEX.pl"/>
+						<F N="/usr/lib/swi-prolog/library/iostream.pl"/>
 						<F N="/usr/lib/swi-prolog/library/iso_639.pl"/>
 						<F N="/usr/lib/swi-prolog/library/isub.pl"/>
 						<F N="/usr/lib/swi-prolog/library/jpl.pl"/>
@@ -505,6 +548,713 @@
 						<F N="/usr/lib/swi-prolog/library/xpath.pl"/>
 						<F N="/usr/lib/swi-prolog/library/xsdp_types.pl"/>
 						<F N="/usr/lib/swi-prolog/library/zlib.pl"/>
+					</Folder>
+					<Folder Name="src-packs">
+						<Folder Name="rtchecks/.git">
+							<Folder Name="objects">
+								<Folder Name="pack">
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/.git/objects/pack/pack-e35c6bb5ff2f8aaaad49a1c004561c1a259753c9.pack"/>
+								</Folder>
+							</Folder>
+						</Folder>
+						<Folder Name="tidylog/.git">
+							<Folder Name="objects">
+								<Folder Name="pack">
+									<F N="/usr/lib/swi-prolog/src-packs/tidylog/.git/objects/pack/pack-9c8e940030211031dffc4e1a5e80fd55179c096f.pack"/>
+								</Folder>
+							</Folder>
+						</Folder>
+						<Folder Name="trill/.git">
+							<Folder Name="objects">
+								<Folder Name="pack">
+									<F N="/usr/lib/swi-prolog/src-packs/trill/.git/objects/pack/pack-66efe6408b5ea903d9309a19796f6bd9e5def1e0.pack"/>
+								</Folder>
+							</Folder>
+						</Folder>
+						<Folder Name="weblog/.git">
+							<Folder Name="objects">
+								<Folder Name="pack">
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/.git/objects/pack/pack-03bad5defd1a312047368f588e236d8e9e02551f.pack"/>
+								</Folder>
+							</Folder>
+						</Folder>
+						<Folder Name="arouter">
+							<Folder Name="examples">
+								<F N="/usr/lib/swi-prolog/src-packs/arouter/examples/example.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/arouter/examples/fallback.pl"/>
+							</Folder>
+							<Folder Name="prolog">
+								<F N="/usr/lib/swi-prolog/src-packs/arouter/prolog/arouter.pl"/>
+							</Folder>
+							<Folder Name="tests">
+								<F N="/usr/lib/swi-prolog/src-packs/arouter/tests/tests.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/arouter/pack.pl"/>
+						</Folder>
+						<Folder Name="blog_core">
+							<Folder Name="prolog">
+								<Folder Name="bc">
+									<Folder Name="public">
+										<Folder Name="css">
+											<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/public/css/bootstrap.min.css"/>
+										</Folder>
+									</Folder>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_admin.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_api.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_api_auth.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_api_comment.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_api_config.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_api_entry.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_api_error.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_api_file.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_api_io.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_api_user.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_bust.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_data.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_data_comment.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_data_comment_format.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_data_comment_question.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_data_comment_tree.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_data_config.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_data_cur_user.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_data_entry.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_data_migrate.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_data_user.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_data_validate.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_excerpt.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_form.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_mail.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_main.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_router.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_send.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_tag_stat.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_view.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/prolog/bc/bc_walk.pl"/>
+								</Folder>
+							</Folder>
+							<Folder Name="tests">
+								<Folder Name="util">
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/tests/util/util.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/tests/util/util_comment.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/tests/util/util_config.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/tests/util/util_post.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/blog_core/tests/util/util_user.pl"/>
+								</Folder>
+								<F N="/usr/lib/swi-prolog/src-packs/blog_core/tests/api_comment.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/blog_core/tests/api_config.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/blog_core/tests/api_entry.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/blog_core/tests/api_user.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/blog_core/tests/files.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/blog_core/tests/tests.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/blog_core/tests/view.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/blog_core/pack.pl"/>
+						</Folder>
+						<Folder Name="dict_schema">
+							<Folder Name="prolog">
+								<F N="/usr/lib/swi-prolog/src-packs/dict_schema/prolog/dict_schema.pl"/>
+							</Folder>
+							<Folder Name="tests">
+								<F N="/usr/lib/swi-prolog/src-packs/dict_schema/tests/tests.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/dict_schema/pack.pl"/>
+						</Folder>
+						<Folder Name="docstore">
+							<Folder Name="prolog">
+								<F N="/usr/lib/swi-prolog/src-packs/docstore/prolog/docstore.pl"/>
+							</Folder>
+							<Folder Name="tests">
+								<F N="/usr/lib/swi-prolog/src-packs/docstore/tests/benchmark.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/docstore/tests/tests.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/docstore/pack.pl"/>
+						</Folder>
+						<Folder Name="function_expansion">
+							<Folder Name="prolog">
+								<F N="/usr/lib/swi-prolog/src-packs/function_expansion/prolog/function_expansion.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/function_expansion/pack.pl"/>
+						</Folder>
+						<Folder Name="interpolate">
+							<Folder Name="prolog">
+								<F N="/usr/lib/swi-prolog/src-packs/interpolate/prolog/interpolate.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/interpolate/pack.pl"/>
+						</Folder>
+						<Folder Name="lambda">
+							<Folder Name="prolog">
+								<F N="/usr/lib/swi-prolog/src-packs/lambda/prolog/lambda.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/lambda/prolog/rec_lambda.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/lambda/pack.pl"/>
+						</Folder>
+						<Folder Name="list_util">
+							<Folder Name="prolog">
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/prolog/lines.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/prolog/list_util.pl"/>
+							</Folder>
+							<Folder Name="t">
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/drop.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/drop_while.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/group_with.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/iterate.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/keysort_r.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/lazy_include.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/lines.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/map_include.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/maximum.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/minimum.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/msort_r.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/oneof.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/positive_integers.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/sort_r.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/sort_with.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/span.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/split.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/take.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/take_while.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/list_util/t/xfy_list.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/list_util/pack.pl"/>
+						</Folder>
+						<Folder Name="markdown">
+							<Folder Name="prolog">
+								<Folder Name="md">
+									<F N="/usr/lib/swi-prolog/src-packs/markdown/prolog/md/md_blocks.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/markdown/prolog/md/md_escape.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/markdown/prolog/md/md_header.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/markdown/prolog/md/md_hr.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/markdown/prolog/md/md_line.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/markdown/prolog/md/md_links.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/markdown/prolog/md/md_list_item.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/markdown/prolog/md/md_parse.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/markdown/prolog/md/md_span.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/markdown/prolog/md/md_span_decorate.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/markdown/prolog/md/md_span_link.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/markdown/prolog/md/md_trim.pl"/>
+								</Folder>
+							</Folder>
+							<Folder Name="tests">
+								<F N="/usr/lib/swi-prolog/src-packs/markdown/tests/block.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/markdown/tests/file.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/markdown/tests/header.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/markdown/tests/html.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/markdown/tests/link.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/markdown/tests/list_item.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/markdown/tests/span.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/markdown/tests/span_link.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/markdown/tests/tests.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/markdown/pack.pl"/>
+						</Folder>
+						<Folder Name="mavis">
+							<Folder Name="prolog">
+								<F N="/usr/lib/swi-prolog/src-packs/mavis/prolog/mavis.pl"/>
+							</Folder>
+							<Folder Name="t">
+								<F N="/usr/lib/swi-prolog/src-packs/mavis/t/intersection.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/mavis/t/predicates.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/mavis/t/subtypes.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/mavis/pack.pl"/>
+						</Folder>
+						<Folder Name="quickcheck">
+							<Folder Name="prolog">
+								<F N="/usr/lib/swi-prolog/src-packs/quickcheck/prolog/arbitrary.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/quickcheck/prolog/quickcheck.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/quickcheck/prolog/shrink.pl"/>
+							</Folder>
+							<Folder Name="t">
+								<F N="/usr/lib/swi-prolog/src-packs/quickcheck/t/examples.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/quickcheck/t/tutorial.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/quickcheck/pack.pl"/>
+						</Folder>
+						<Folder Name="rtchecks">
+							<Folder Name="examples">
+								<F N="/usr/lib/swi-prolog/src-packs/rtchecks/examples/rtc_external.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/rtchecks/examples/rtchecks_disc.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/rtchecks/examples/rtchecks_example.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/rtchecks/examples/rtchecks_example2.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/rtchecks/examples/rtchecks_example3.pl"/>
+							</Folder>
+							<Folder Name="prolog">
+								<Folder Name="inliner">
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/inliner/inliner_ops.pl"/>
+								</Folder>
+								<Folder Name="rtchecks">
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/rtchecks/compact_list.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/rtchecks/rtchecks_basic.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/rtchecks/rtchecks_flags.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/rtchecks/rtchecks_meta.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/rtchecks/rtchecks_rt.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/rtchecks/rtchecks_send.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/rtchecks/rtchecks_tr.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/rtchecks/rtchecks_utils.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/rtchecks/term_list.pl"/>
+								</Folder>
+								<Folder Name="swi">
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/swi/ctchecks.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/swi/rtchecks.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/swi/rtchecks_lib.pl"/>
+								</Folder>
+								<Folder Name="varnames">
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/varnames/apply_dict.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/varnames/complete_dict.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/varnames/dict_types.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/varnames/pretty_names.pl"/>
+								</Folder>
+								<F N="/usr/lib/swi-prolog/src-packs/rtchecks/prolog/rtchecks.pl"/>
+							</Folder>
+							<Folder Name="tests">
+								<F N="/usr/lib/swi-prolog/src-packs/rtchecks/tests/ctcex.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/rtchecks/tests/ctchecks.plt"/>
+								<F N="/usr/lib/swi-prolog/src-packs/rtchecks/tests/rtchecks.plt"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/rtchecks/pack.pl"/>
+						</Folder>
+						<Folder Name="simple_template">
+							<Folder Name="prolog">
+								<Folder Name="st">
+									<F N="/usr/lib/swi-prolog/src-packs/simple_template/prolog/st/st_escape.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/simple_template/prolog/st/st_expr.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/simple_template/prolog/st/st_file.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/simple_template/prolog/st/st_funs.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/simple_template/prolog/st/st_parse.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/simple_template/prolog/st/st_render.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/simple_template/prolog/st/st_tokens.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/simple_template/prolog/st/st_white.pl"/>
+								</Folder>
+							</Folder>
+							<Folder Name="tests">
+								<F N="/usr/lib/swi-prolog/src-packs/simple_template/tests/blocks.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/simple_template/tests/expr.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/simple_template/tests/file.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/simple_template/tests/funs.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/simple_template/tests/point.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/simple_template/tests/render.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/simple_template/tests/tests.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/simple_template/tests/tokens.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/simple_template/pack.pl"/>
+						</Folder>
+						<Folder Name="smtp">
+							<Folder Name="prolog">
+								<F N="/usr/lib/swi-prolog/src-packs/smtp/prolog/smtp.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/smtp/pack.pl"/>
+						</Folder>
+						<Folder Name="sort_dict">
+							<Folder Name="prolog">
+								<F N="/usr/lib/swi-prolog/src-packs/sort_dict/prolog/sort_dict.pl"/>
+							</Folder>
+							<Folder Name="tests">
+								<F N="/usr/lib/swi-prolog/src-packs/sort_dict/tests/tests.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/sort_dict/pack.pl"/>
+						</Folder>
+						<Folder Name="swicli">
+							<Folder Name="bin">
+								<F N="/usr/lib/swi-prolog/src-packs/swicli/bin/Swicli.Library.dll.config"/>
+							</Folder>
+							<Folder Name="c">
+								<Folder Name="Example4SWICLI">
+									<Folder Name="obj">
+										<Folder Name="Debug">
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Example4SWICLI/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Example4SWICLI/obj/Debug/Example4SWICLI.csproj.FileListAbsolute.txt"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Example4SWICLI/obj/Debug/Example4SWICLI.pdb"/>
+										</Folder>
+										<Folder Name="Release">
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Example4SWICLI/obj/Release/DesignTimeResolveAssemblyReferencesInput.cache"/>
+										</Folder>
+									</Folder>
+									<Folder Name="Properties">
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Example4SWICLI/Properties/AssemblyInfo.cs"/>
+									</Folder>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Example4SWICLI/Example4SWICLI.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Example4SWICLI/Example4SWICLI.csproj"/>
+								</Folder>
+								<Folder Name="SWICFFITests">
+									<Folder Name="obj">
+										<Folder Name="Debug">
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICFFITests/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICFFITests/obj/Debug/ResolveAssemblyReference.cache"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICFFITests/obj/Debug/SWICFFITests.csproj.FileListAbsolute.txt"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICFFITests/obj/Debug/SWICFFITests.pdb"/>
+										</Folder>
+										<Folder Name="Release">
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICFFITests/obj/Release/DesignTimeResolveAssemblyReferencesInput.cache"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICFFITests/obj/Release/SWICFFITests.csproj.FileListAbsolute.txt"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICFFITests/obj/Release/SWICFFITests.csprojResolveAssemblyReference.cache"/>
+										</Folder>
+									</Folder>
+									<Folder Name="Properties">
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICFFITests/Properties/AssemblyInfo.cs"/>
+									</Folder>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICFFITests/SWICFFITests.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICFFITests/SWICFFITests.csproj"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICFFITests/SWICFFITests.csproj.user"/>
+								</Folder>
+								<Folder Name="Swicli.Library">
+									<Folder Name="mindtouch.reflection">
+										<Folder Name="Properties">
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/Properties/AssemblyInfo.cs"/>
+										</Folder>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/IGenericParameterProvider.cs"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/IReflectedInfo.cs"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/IsolatedTypeInspector.cs"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/ITypeInspector.cs"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/MemberAccess.cs"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/mindtouch.reflection.csproj"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/ParameterBuilder.cs"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/ReflectedConstructorInfo.cs"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/ReflectedEventInfo.cs"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/ReflectedFieldInfo.cs"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/ReflectedGenericParameterInfo.cs"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/ReflectedMemberInfo.cs"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/ReflectedMethodInfo.cs"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/ReflectedParameterInfo.cs"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/ReflectedParameterTypeInfo.cs"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/ReflectedPropertyInfo.cs"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/ReflectedTypeInfo.cs"/>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/mindtouch.reflection/TypeInspector.cs"/>
+									</Folder>
+									<Folder Name="obj">
+										<Folder Name="Debug">
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/obj/Debug/DesignTimeResolveAssemblyReferences.cache"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/obj/Debug/Swicli.Library.csproj.FileListAbsolute.txt"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/obj/Debug/Swicli.Library.pdb"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/obj/Debug/TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/obj/Debug/TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/obj/Debug/TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs"/>
+										</Folder>
+										<Folder Name="Release">
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/obj/Release/DesignTimeResolveAssemblyReferencesInput.cache"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/obj/Release/TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/obj/Release/TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/obj/Release/TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs"/>
+										</Folder>
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/obj/Swicli.Library.csproj.FileListAbsolute.txt"/>
+									</Folder>
+									<Folder Name="Properties">
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/Properties/AssemblyInfo.cs"/>
+									</Folder>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/app.config"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/Arrays.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/AssemblyLoader.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/ClassBuilder.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/Coercion.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/CoercionLayout.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/Collections.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/DelegateObjectInProlog.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/DesignByContract.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/EventHandlerInProlog.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/Exceptions.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/ForeignMethod.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/GenericDelegate.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/GetSet.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/IKVMClassLoader.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/Init.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/Instance.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/Invoke.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/LibPl.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/LockInfo.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/NativeMethods.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/NondetContextHandle.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/PInvokeByEmit.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/PInvokeMetaObject.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/PrologBackedDictionary.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/PrologClient.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/PrologCLR.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/PrologCLRExt.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/RuntimeTypeInfo.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/SWI-cs-PlQuery.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/SWI-cs.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/Swicli.Library.csproj"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/Swicli.Library.csproj.user"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/SWIPlCs.cd"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/SwiPlCs.csproj"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/Threads.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/Tracker.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/TypeSystem.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/Swicli.Library/WaitUntilEvent.cs"/>
+								</Folder>
+								<Folder Name="SWICLITestDLL">
+									<Folder Name="obj">
+										<Folder Name="Debug">
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICLITestDLL/obj/Debug/DesignTimeResolveAssemblyReferences.cache"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICLITestDLL/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICLITestDLL/obj/Debug/ResolveAssemblyReference.cache"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICLITestDLL/obj/Debug/SWICLITestDLL.csproj.FileListAbsolute.txt"/>
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICLITestDLL/obj/Debug/SWICLITestDLL.pdb"/>
+										</Folder>
+										<Folder Name="Release">
+											<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICLITestDLL/obj/Release/DesignTimeResolveAssemblyReferencesInput.cache"/>
+										</Folder>
+									</Folder>
+									<Folder Name="Properties">
+										<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICLITestDLL/Properties/AssemblyInfo.cs"/>
+									</Folder>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICLITestDLL/NonDetExamples.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICLITestDLL/SWICLITestClass.cs"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICLITestDLL/SWICLITestDLL.csproj"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/SWICLITestDLL/SWICLITestDLL.csproj.user"/>
+								</Folder>
+								<Folder Name="swicli">
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/swicli/stdafx.h"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/swicli/swicli.c"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/c/swicli/swicli32.c"/>
+								</Folder>
+							</Folder>
+							<Folder Name="cffi-tests">
+								<F N="/usr/lib/swi-prolog/src-packs/swicli/cffi-tests/libcurl.cffi"/>
+								<F N="/usr/lib/swi-prolog/src-packs/swicli/cffi-tests/libpl_so.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/swicli/cffi-tests/swi-prolog.cffi"/>
+								<F N="/usr/lib/swi-prolog/src-packs/swicli/cffi-tests/winapi_dll.pl"/>
+							</Folder>
+							<Folder Name="doc">
+								<Folder Name="api_files">
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/doc/api_files/pldoc.css"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/doc/api_files/public.png"/>
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/doc/api_files/source.png"/>
+								</Folder>
+								<F N="/usr/lib/swi-prolog/src-packs/swicli/doc/Intelligence.png"/>
+								<F N="/usr/lib/swi-prolog/src-packs/swicli/doc/pldoc.css"/>
+								<F N="/usr/lib/swi-prolog/src-packs/swicli/doc/Tooltip.png"/>
+							</Folder>
+							<Folder Name="lib">
+								<Folder Name="amd64">
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/lib/amd64/swicli.dll.config"/>
+								</Folder>
+								<Folder Name="i386-linux">
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/lib/i386-linux/swicli32.dll.config"/>
+								</Folder>
+								<Folder Name="i386-win32">
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/lib/i386-win32/swicli32.pdb"/>
+								</Folder>
+								<Folder Name="x64-win64">
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/lib/x64-win64/swicli.pdb"/>
+								</Folder>
+								<Folder Name="x86_64-linux">
+									<F N="/usr/lib/swi-prolog/src-packs/swicli/lib/x86_64-linux/swicli.dll.config"/>
+								</Folder>
+							</Folder>
+							<Folder Name="prolog">
+								<F N="/usr/lib/swi-prolog/src-packs/swicli/prolog/swicffi.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/swicli/prolog/swicli.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/swicli/pack.pl"/>
+						</Folder>
+						<Folder Name="tidylog">
+							<Folder Name="prolog">
+								<Folder Name="tidylog">
+									<Folder Name="atom">
+										<F N="/usr/lib/swi-prolog/src-packs/tidylog/prolog/tidylog/atom/name.pl"/>
+										<F N="/usr/lib/swi-prolog/src-packs/tidylog/prolog/tidylog/atom/punc.pl"/>
+									</Folder>
+									<Folder Name="comment">
+										<F N="/usr/lib/swi-prolog/src-packs/tidylog/prolog/tidylog/comment/aol.pl"/>
+										<F N="/usr/lib/swi-prolog/src-packs/tidylog/prolog/tidylog/comment/ml.pl"/>
+									</Folder>
+									<Folder Name="number">
+										<F N="/usr/lib/swi-prolog/src-packs/tidylog/prolog/tidylog/number/binary.pl"/>
+										<F N="/usr/lib/swi-prolog/src-packs/tidylog/prolog/tidylog/number/decimal.pl"/>
+										<F N="/usr/lib/swi-prolog/src-packs/tidylog/prolog/tidylog/number/float.pl"/>
+										<F N="/usr/lib/swi-prolog/src-packs/tidylog/prolog/tidylog/number/hex.pl"/>
+										<F N="/usr/lib/swi-prolog/src-packs/tidylog/prolog/tidylog/number/octal.pl"/>
+									</Folder>
+									<F N="/usr/lib/swi-prolog/src-packs/tidylog/prolog/tidylog/char.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/tidylog/prolog/tidylog/common.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/tidylog/prolog/tidylog/dcg.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/tidylog/prolog/tidylog/text.pl"/>
+								</Folder>
+								<F N="/usr/lib/swi-prolog/src-packs/tidylog/prolog/tidylog.pl"/>
+							</Folder>
+							<Folder Name="t">
+								<F N="/usr/lib/swi-prolog/src-packs/tidylog/t/comments.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/tidylog/t/integers.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/tidylog/t/read.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/tidylog/t/text.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/tidylog/t/write.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/tidylog/pack.pl"/>
+						</Folder>
+						<Folder Name="trill">
+							<Folder Name="prolog">
+								<F N="/usr/lib/swi-prolog/src-packs/trill/prolog/bddem.c"/>
+								<F N="/usr/lib/swi-prolog/src-packs/trill/prolog/cancer_hard_1Pr.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/trill/prolog/FML.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/trill/prolog/probsPF.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/trill/prolog/satPF.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/trill/prolog/trill.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/trill/prolog/trill_thea.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/trill/prolog/trillPF.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/trill/prolog/trillProbComputation.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/trill/pack.pl"/>
+						</Folder>
+						<Folder Name="type_check">
+							<Folder Name="prolog">
+								<F N="/usr/lib/swi-prolog/src-packs/type_check/prolog/functor_constraint.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/type_check/prolog/type_check.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/type_check/pack.pl"/>
+						</Folder>
+						<Folder Name="typedef">
+							<Folder Name="prolog">
+								<F N="/usr/lib/swi-prolog/src-packs/typedef/prolog/typedef.pl"/>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/typedef/pack.pl"/>
+						</Folder>
+						<Folder Name="weblog">
+							<Folder Name="demo">
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/accordion_demo.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/ajaxify_demo.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/autocomplete_demo.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/books_demo.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/buttons_demo.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/clippy_demo.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/debug.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/debug_demo.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/geocoding_demo.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/google_map_demo.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/html_form_demo.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/load.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/map_demo.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/menus_demo.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/table_demo.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/weblogdemo.pl"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/demo/wl_windows_demo.pl"/>
+							</Folder>
+							<Folder Name="docs">
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/docs/dsv-is98_springer.pdf"/>
+								<F N="/usr/lib/swi-prolog/src-packs/weblog/docs/surfingowl.png"/>
+							</Folder>
+							<Folder Name="prolog">
+								<Folder Name="assetsources">
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/assetsources/swiplpin.psd"/>
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/assetsources/swiplpinmask.psd"/>
+								</Folder>
+								<Folder Name="debug_page">
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/debug_page/debug_page.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/debug_page/server_stats.pl"/>
+								</Folder>
+								<Folder Name="formatting">
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/formatting/boxes.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/formatting/wl_table.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/formatting/wl_windows.pl"/>
+								</Folder>
+								<Folder Name="html_form">
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/html_form/ajaxify.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/html_form/autocomplete.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/html_form/html_form.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/html_form/radio.pl"/>
+								</Folder>
+								<Folder Name="identity">
+									<Folder Name="login_prototype">
+										<Folder Name="docs">
+											<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/identity/login_prototype/docs/diagram.png"/>
+										</Folder>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/identity/login_prototype/login_box.pl"/>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/identity/login_prototype/testing.pl"/>
+									</Folder>
+									<Folder Name="stormpath">
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/identity/stormpath/stormpath.pl"/>
+									</Folder>
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/identity/identity.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/identity/identity_ui.pl"/>
+								</Folder>
+								<Folder Name="info">
+									<Folder Name="books">
+										<Folder Name="google">
+											<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/info/books/google/books.pl"/>
+										</Folder>
+									</Folder>
+									<Folder Name="buttons">
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/info/buttons/buttons.pl"/>
+									</Folder>
+									<Folder Name="geocoding">
+										<Folder Name="google">
+											<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/info/geocoding/google/glatlong.pl"/>
+										</Folder>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/info/geocoding/gps.pl"/>
+									</Folder>
+									<Folder Name="geohashing">
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/info/geohashing/geohashing.pl"/>
+									</Folder>
+									<Folder Name="html">
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/info/html/html_comments.pl"/>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/info/html/html_data.pl"/>
+									</Folder>
+									<Folder Name="maps">
+										<Folder Name="google">
+											<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/info/maps/google/gmap.pl"/>
+										</Folder>
+										<Folder Name="leaflet">
+											<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/info/maps/leaflet/leafletmap.pl"/>
+										</Folder>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/info/maps/map.pl"/>
+									</Folder>
+									<Folder Name="numbers">
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/info/numbers/wl_numbers.pl"/>
+									</Folder>
+									<Folder Name="stock">
+										<Folder Name="crox">
+											<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/info/stock/crox/croxstock.pl"/>
+										</Folder>
+									</Folder>
+									<Folder Name="weather">
+										<Folder Name="geonames">
+											<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/info/weather/geonames/geonames_weather.pl"/>
+										</Folder>
+									</Folder>
+								</Folder>
+								<Folder Name="keys">
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/keys/cloudmadekey.pl.example"/>
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/keys/geonameskey.pl.example"/>
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/keys/googlekey.pl.example"/>
+								</Folder>
+								<Folder Name="nav">
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/nav/accordion.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/nav/menu.pl"/>
+								</Folder>
+								<Folder Name="resources">
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/resources/resources.pl"/>
+								</Folder>
+								<Folder Name="static">
+									<Folder Name="css">
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/static/css/clippy.css"/>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/static/css/demo.css"/>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/static/css/menu.css"/>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/static/css/stats.css"/>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/static/css/wlwindows.css"/>
+									</Folder>
+									<Folder Name="icons">
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/static/icons/bluedot.png"/>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/static/icons/bluedotsel.png"/>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/static/icons/greendot.png"/>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/static/icons/greendotsel.png"/>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/static/icons/markerM-01.png"/>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/static/icons/reddot.png"/>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/static/icons/reddotsel.png"/>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/static/icons/swiplpin.png"/>
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/static/icons/swiplpinshadow.png"/>
+									</Folder>
+								</Folder>
+								<Folder Name="support">
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/support/javascript_utils.pl"/>
+									<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/support/utils.pl"/>
+								</Folder>
+								<Folder Name="widgets">
+									<Folder Name="agents">
+										<F N="/usr/lib/swi-prolog/src-packs/weblog/prolog/widgets/agents/clippy.pl"/>
+									</Folder>
+								</Folder>
+							</Folder>
+							<F N="/usr/lib/swi-prolog/src-packs/weblog/pack.pl"/>
+						</Folder>
 					</Folder>
 					<Folder Name="xpce">
 						<Folder Name="prolog">
@@ -828,6 +1578,7 @@
 							</Folder>
 						</Folder>
 					</Folder>
+					<F N="/usr/lib/swi-prolog/boot64.prc"/>
 				</Folder>
 			</Folder>
 		</Folder>

@@ -93,6 +93,24 @@ append_term(Call,E,CallE):-var(Call), must(compound(CallE)),CallE=..ListE,append
 append_term(Call,E,CallE):-must(compound(Call)), Call=..List, append(List,[E],ListE), CallE=..ListE.
 
 
+:- export(disjuncts_to_list/3).
+disjuncts_to_list(Var,[Var]):-is_ftVar(Var),!.
+disjuncts_to_list(true,[]).
+disjuncts_to_list([],[]).
+disjuncts_to_list('v'(A,B),ABL):-!,
+  disjuncts_to_list(A,AL),
+  disjuncts_to_list(B,BL),
+  append(AL,BL,ABL).
+disjuncts_to_list([A|B],ABL):-!,
+  disjuncts_to_list(A,AL),
+  disjuncts_to_list(B,BL),
+  append(AL,BL,ABL).
+disjuncts_to_list((A;B),ABL):-!,
+  disjuncts_to_list(A,AL),
+  disjuncts_to_list(B,BL),
+  append(AL,BL,ABL).
+disjuncts_to_list(Lit,[Lit]).
+
 :- export(conjuncts_to_list/3).
 conjuncts_to_list(Var,[Var]):-is_ftVar(Var),!.
 conjuncts_to_list(true,[]).
@@ -200,9 +218,12 @@ as_clause( H,  H,  true).
 
 clause_asserted(C):- as_clause(C,H,B),!,clause_asserted(H,B).
 % clause_asserted(H,B):- predicate_property(H,number_of_clauses(N)),N>0, \+ \+ ((numbervars(H:B),clause(H,B))).
-clause_asserted(_:H,B):-clause_asserted(H,B).
-clause_asserted(H,B):- predicate_property(H,number_of_clauses(N)),N>0,copy_term(H:B,HH:BB),!, clause(HH, BB, Ref),must(clause(Head, Body, Ref)),
-  same_body(B,Body), same_heads(H,Head).
+clause_asserted(_:H,B):-!,clause_asserted(H,B).
+clause_asserted(H,B):- predicate_property(H,number_of_clauses(N)),N>0,
+  clause_asserted_0(H,B).
+
+clause_asserted_0(H,B):-
+  copy_term(H:B,HH:BB),!, clause(HH, BB, Ref),(clause(Head, Body, Ref)),=@=(B,Body), =@=(H,Head),!.
 
 same_body(B,Body):-same_heads(B,Body).
 

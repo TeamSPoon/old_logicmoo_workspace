@@ -24,7 +24,8 @@ disable_mpreds_in_current_file:- source_file(F,_),show_call(asserta((thlocal:dis
 :- export(with_no_mpred_expansions/1).
 :- meta_predicate(with_no_mpred_expansions(0)).
 with_no_mpred_expansions(Goal):-
-  with_assertions(thlocal:disable_mpred_term_expansions_locally,Goal).
+  with_assertions(user:no_buggery,
+    with_assertions(thlocal:disable_mpred_term_expansions_locally,Goal)).
 
 use_was_isa(G,I,C):-call((current_predicate(mpred_types_loaded/0),if_defined(was_isa_syntax(G,I,C)))).
 
@@ -617,23 +618,15 @@ pfc_file_expansion(I,OO):- (I\=(:-(_))), I\= '$was_imported_kb_content$'(_,_),
 
 
 is_file_clause(I):-var(I),!,dmsg(var_file_clause(I)).
-is_file_clause(I):-compound(I),!.
 is_file_clause(I):- I== end_of_file,!,fail.
 is_file_clause(I):- I= :-(_),!,fail.
-is_file_clause(I):- dmsg(file_clause(I)).
-
-:- multifile(user:term_expansion/2).
-%:- module_transparent(user:term_expansion/2).
-user:term_expansion(I,OO):- is_file_clause(I), \+ thlocal:disable_mpred_term_expansions_locally,
-  sanity(\+  thlocal:pfc_already_in_file_expansion(I)), 
-  pfc:with_assertions(thlocal:pfc_already_in_file_expansion(I),pfc_file_expansion(I,OO)),!,
-  nop(dmsg(pfc_file_expansion(I,OO))).
+is_file_clause(I):- compound(I),!.
+is_file_clause(I):- nop(dmsg(file_clause(I))).
 
 
 
 :-assert_if_new(thlocal:pfc_term_expansion_ok).
 
-:-set_prolog_flag(allow_variable_name_as_functor,true).
 
 varFunctorEscape('?').
 varFunctorEscape('\2323\').
@@ -652,25 +645,20 @@ to_var_functors(Outer,In,Out):-
            -> Out=..[t,Var|ArgsO];  (Args==ArgsO->(Out=In);compound_name_arguments(Out,Name,ArgsO))))))).
   
 
-system:term_expansion(I,O):- compound(I),functor(I,VFE,1),varFunctorEscape(VFE),current_prolog_flag(allow_variable_name_as_functor,true),
+%user:goal_expansion(G,OUT):- \+  thlocal:disable_mpred_term_expansions_locally, G\=isa(_,_),(use_was_isa(G,I,C)),!,to_isa_out(I,C,OUT).
+%user:term_expansion(G,OUT):- \+  thlocal:disable_mpred_term_expansions_locally, hotrace(use_was_isa(G,I,C)),!,to_isa_out(I,C,OUT).
+%user:term_expansion(I,O):- \+ thlocal:disable_mpred_term_expansions_locally, thlocal:consulting_sources, with_no_assertions(thlocal:consulting_sources,add(I)),O=true.
+
+system:term_expansion(I,O):- current_prolog_flag(allow_variable_name_as_functor,true), compound(I),functor(I,VFE,1),varFunctorEscape(VFE),
                      \+ thlocal:disable_mpred_term_expansions_locally,
                        with_assertions(thlocal:disable_mpred_term_expansions_locally,to_var_functors((:-),I,O)),I\=@=O.
 
-system:goal_expansion(I,O):- compound(I),functor(I,VFE,1),varFunctorEscape(VFE),current_prolog_flag(allow_variable_name_as_functor,true),
+
+system:goal_expansion(I,O):- current_prolog_flag(allow_variable_name_as_functor,true),
+                     compound(I),functor(I,VFE,1),varFunctorEscape(VFE),current_prolog_flag(allow_variable_name_as_functor,true),
                      \+ thlocal:disable_mpred_term_expansions_locally,to_var_functors((:-),I,O),I\=@=O.
 
-
-:-export(pfc_file_loaded/0).
-pfc_file_loaded.
-
-
-%user:goal_expansion(G,OUT):- \+  thlocal:disable_mpred_term_expansions_locally, G\=isa(_,_),(use_was_isa(G,I,C)),!,to_isa_out(I,C,OUT).
-%user:term_expansion(G,OUT):- \+  thlocal:disable_mpred_term_expansions_locally, hotrace(use_was_isa(G,I,C)),!,to_isa_out(I,C,OUT).
-
-%user:term_expansion(I,O):- \+ thlocal:disable_mpred_term_expansions_locally, thlocal:consulting_sources, with_no_assertions(thlocal:consulting_sources,add(I)),O=true.
-user:goal_expansion(ISA,G) :- \+ thlocal:disable_mpred_term_expansions_locally, compound(ISA),thlocal:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
-
-
+% :-set_prolog_flag(allow_variable_name_as_functor,true).
 
 % :- source_location(S,_),forall(source_file(H,S),ignore(( \+predicate_property(M:H,built_in), functor(H,F,A),M:module_transparent(F/A),M:export(F/A)))).
 

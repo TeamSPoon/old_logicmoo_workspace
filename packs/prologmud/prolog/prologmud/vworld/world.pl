@@ -15,7 +15,7 @@
 
 %:-swi_module(world, [
 :-export((
-        agent_call_command_unparsed/2,
+        agent_call_unparsed/2,
        % call_agent_action/2,
             %mud_isa/2,
             isa_any/2,

@@ -123,39 +123,45 @@ with_fail_is_asserted(Temp,Goal):-ground(Temp),!,Goal.
 with_fail_is_asserted(Temp,Goal):-with_assertions(thlocal:fail_is_asserted(Temp),Goal).
 
 not_asserted(X):- !,(\+ clause(X,true)).
-not_asserted(X):- not(no_loop_check(is_asserted_ilc(X))).
-is_asserted_eq(HB):- ( \+ \+ no_loop_check(is_asserted_ilc(HB))).
+not_asserted(X):- not(no_loop_check(is_asserted_1(X))).
+is_asserted_eq(HB):- ( \+ \+ no_loop_check(is_asserted_1(HB))).
 
-is_asserted(X):- no_repeats(loop_check(is_asserted_ilc(X))).
-is_asserted(X,Y):- no_repeats(loop_check(is_asserted_ilc(X,Y))).
-is_asserted(X,Y,Z):- no_repeats(loop_check(is_asserted_ilc(X,Y,Z))).
+is_asserted(X):- no_repeats(loop_check(mpred_call(X))).
+is_asserted(X,Y):- no_repeats(loop_check(is_asserted_2(X,Y))).
+is_asserted(X,Y,Z):- no_repeats(loop_check(is_asserted_3(X,Y,Z))).
 
-is_asserted_ilc(V):-var(V),!,trace_or_throw(var_is_asserted(V)).
+is_asserted_1(V):-var(V),!,trace_or_throw(var_is_asserted(V)).
 % TODO: test removal
-%is_asserted_ilc(prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
-is_asserted_ilc((H)):- is_static_pred(H),!,show_pred_info(H),dtrace(is_asserted_ilc((H))).
-is_asserted_ilc(HB):-hotrace((fully_expand_warn(is_asserted_1,HB,HHBB))),!,is_asserted_1(HHBB).
+%is_asserted_1(prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
+is_asserted_1((H)):- is_static_pred(H),!,show_pred_info(H),dtrace(is_asserted_1((H))).
+%is_asserted_1(HB):-hotrace((fully_expand_warn(is_asserted_1,HB,HHBB))),!,is_asserted_1(HHBB).
+
+is_asserted_1(H):- !, with_assertions(thlocal:infAssertedOnly(H),mpred_call(H)).
 
 %is_asserted_1(argIsa(mpred_prop,2,mpred_prop/2)):- dtrace,!,fail.
-is_asserted_1(clause(H,B,Ref)):-!,is_asserted_ilc(H,B,Ref).
-is_asserted_1(clause(H,B)):-!,is_asserted_ilc(H,B).
+is_asserted_1(clause(H,B,Ref)):-!,is_asserted_3(H,B,Ref).
+is_asserted_1(clause(H,B)):-!,is_asserted_2(H,B).
 is_asserted_1((H1,H2)):-!,is_asserted_1(H1),is_asserted_1(H2).
 is_asserted_1((H1;H2)):-!,is_asserted_1(H1);is_asserted_1(H2).
 % TODO: test removal
 % is_asserted_1(isa(H,B)):-!,isa_asserted(H,B).
-is_asserted_1(HB):-expand_to_hb(HB,H,B),!,is_asserted_ilc(H,B).
+is_asserted_1(HB):-expand_to_hb(HB,H,B),!,is_asserted_2(H,B).
 
-is_asserted_ilc((H:-BB),B):- is_true(B),!,is_asserted_ilc(H,BB).
-is_asserted_ilc(H,B):-hotrace((fully_expand_warn(is_asserted_2,(H:-B),CL),expand_to_hb(CL,HH,BB))),!,is_asserted_2(HH,BB).
+skip_is_asserted_expansion(_).
 
-is_asserted_2(H,B):-thglobal:pfcManageHybrids,!,pfc_clause_is_asserted(H,B).
-is_asserted_2(H,B):-call_no_cuts(user:provide_mpred_storage_clauses(H,B,_Ref)),not(hotrace(special_wrapper_body(B,_))).
 
-is_asserted_ilc((H:-BB),B,Ref):- is_true(B),!,is_asserted_ilc(H,BB,Ref).
-is_asserted_ilc(H,B,Ref):-hotrace((fully_expand_warn(is_asserted_3,(H:-B),CL),expand_to_hb(CL,HH,BB))),is_asserted_3(HH,BB,Ref).
+is_asserted_2((H:-BB),B):- is_true(B),!,is_asserted_2(H,BB).
+is_asserted_2(H,B):-  skip_is_asserted_expansion(H),!,is_asserted_2a(H,B).
+is_asserted_2(H,B):-hotrace((fully_expand_warn(is_asserted_2,(H:-B),CL),expand_to_hb(CL,HH,BB))),!,is_asserted_2a(HH,BB).
 
-% is_asserted_3(H,B,Ref):-thglobal:pfcManageHybrids,!,pfc_clause_is_asserted(H,B,Ref).
-is_asserted_3(H,B,Ref):-call_no_cuts(user:provide_mpred_storage_clauses(H,B,Ref)),not(hotrace(special_wrapper_body(B,_))).
+is_asserted_2a(H,B):-thglobal:pfcManageHybrids,!,pfc_clause_is_asserted(H,B).
+is_asserted_2a(H,B):-call_no_cuts(user:provide_mpred_storage_clauses(H,B,_Ref)),not(hotrace(special_wrapper_body(B,_))).
+
+is_asserted_3((H:-BB),B,Ref):- is_true(B),!,is_asserted_3(H,BB,Ref).
+is_asserted_3(H,B,Ref):- skip_is_asserted_expansion(H), !,is_asserted_3a(H,B,Ref).
+is_asserted_3(H,B,Ref):-hotrace((fully_expand_warn(is_asserted_3,(H:-B),CL),expand_to_hb(CL,HH,BB))),is_asserted_3a(HH,BB,Ref).
+
+is_asserted_3a(H,B,Ref):-call_no_cuts(user:provide_mpred_storage_clauses(H,B,Ref)),not(hotrace(special_wrapper_body(B,_))).
 
 is_source_proof(_).
 
@@ -274,7 +280,7 @@ clr0(P):-
 
 
 % -  preq(Query) = query with P note
-preq(P,C0):- must(not((atom(C0)))),agenda_do_prequery,!,no_repeats(C0,mpred_op(query(t,P),C0)).
+preq(P,C0):- agenda_do_prequery,!,no_repeats(C0,mpred_op(query(t,P),C0)).
 
 % -  req(Query) = Normal query
 req(C0):- nop(dmsg(req(C0))), !,preq(req,/*to_exp*/(C0)).
@@ -314,7 +320,7 @@ add(A):- var(A),!,trace_or_throw(var_add(A)).
 add(end_of_file):-!.
 add(grid_key(KW=COL)):- !, add(typeHasGlyph(COL,KW)).
 % add(Term):- unnumbervars(Term,TermE), Term \=@= TermE,!,add(TermE).
-add(Term):- expands_on(isEach,Term), !,forall(do_expand_args(isEach,Term,O),add(/*to_exp*/(O))),!.
+% add(Term):-  forall(do_expand_args(isEach,Term,O),add_0(O)),!.
 add(TermIn):- fully_expand(change(assert,add),TermIn,Term),add_0(Term).
 
 add_0(A):- is_ftVar(A),!,trace_or_throw(var_add(A)).
@@ -470,7 +476,7 @@ test_expand_units(IN):-fully_expand(query(t,must),IN,OUT),dmsg(test_expand_units
 
 
 mpred_modify(Op,                 G):- (var(Op);var(G)),!,trace_or_throw(var_database_modify_op(Op,  G )).
-mpred_modify(Op,                 G):- G\=meta_argtypes(_),fully_expand(Op,G,GG),not_variant(G,GG),!,mpred_modify(Op, GG ),!.
+mpred_modify(Op,                 G):- \+ skip_is_asserted_expansion(G),G\=meta_argtypes(_),fully_expand_warn(Op,G,GG),not_variant(G,GG),!,mpred_modify(Op, GG ),!.
 mpred_modify(_,  (:-include(FILE))):- !,must(load_data_file_now(FILE)).
 mpred_modify(Op,  (:-(G))         ):- !,must(with_assert_op_override(Op,debugOnError(G))).
 mpred_modify(P,                  G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).

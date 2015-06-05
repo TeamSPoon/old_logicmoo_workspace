@@ -203,7 +203,7 @@ same_terms((A:-AA),(B:-BB)):-!,same_terms(A,B),same_terms(AA,BB).
 same_terms(M:A,B):-atom(M),!,same_terms(A,B).
 same_terms(A,M:B):-atom(M),!,same_terms(A,B).
 
-fully_expand(_,Sent,SentO):-not(compound(Sent)),!,Sent=SentO.
+fully_expand(_,Sent,SentO):- \+(compound(Sent)),!,Sent=SentO.
 fully_expand(Op,Sent,SentO):-must_expand(Sent),!,fully_expand_now(Op,Sent,SentO),!.
 fully_expand(_,Sent,SentO):-get_functor(Sent,_,A),A\==1,!,Sent=SentO.
 fully_expand(Op,Sent,SentO):-fully_expand_now(Op,Sent,SentO),!.
@@ -232,13 +232,17 @@ fully_expand_head(Op,Sent,SentO):- must(with_assertions(thlocal:into_form_code,t
 fully_expand_goal(Op,Sent,SentO):- must(with_assertions(thlocal:into_form_code,transitive_lc(db_expand_term(Op),Sent,SentO))),!.
 
 
-as_is_term(M:NC):-atom(M),!,compound(NC),functor(NC,Op,2),infix_op(Op,_).
-as_is_term(NC):-var(NC).
-as_is_term('$VAR'(_)).
-as_is_term(true).
+as_is_term(NC):- \+(compound(NC)),!.
+as_is_term('$VAR'(_)):-!.
+
+as_is_term(M:NC):-atom(M),!,as_is_term(NC).
+as_is_term(NC):-functor(NC,Op,2),infix_op(Op,_).
+%as_is_term(NC):-var(NC).
+%as_is_term(true).
 as_is_term('call'(_)).
 as_is_term('{}'(_)).
 as_is_term('ignore'(_)).
+
 /*
 as_is_term(NC):-compound(NC),functor(NC,Op,2),infix_op(Op,_).
 */
@@ -261,7 +265,6 @@ pfc_expand(PfcRule,Out):-compound(PfcRule),functor(PfcRule,F,A),pfc_database_ter
    PfcRule=[F|Args],maplist(fully_expand_goal(is_asserted),Args,ArgsO),!,Out=..[F|ArgsO].
 
 
-db_expand_final(_ ,NC,NC):-not(compound(NC)),!.
 db_expand_final(_ ,NC,NC):-as_is_term(NC),!.
 db_expand_final(_, Sent,true):-is_true(Sent).
 db_expand_final(_,Term,Term):- compound(Term),functor(Term,F,_),argsQuoted(F),!.
@@ -315,7 +318,7 @@ db_expand_0(Op,=>(G),(GG)):-!,db_expand_0(Op,(G),(GG)).
 db_expand_0(Op,(G,B),(GG,BB)):-!,db_expand_0(Op,G,GG),db_expand_0(Op,B,BB).
 db_expand_0(Op,(G;B),(GG;BB)):-!,db_expand_0(Op,G,GG),db_expand_0(Op,B,BB).
 db_expand_0(Op,(G:-B),(GG:-BB)):-!,db_expand_0(Op,G,GG),fully_expand_goal(Op,B,BB).
-db_expand_0(_,Term,CL):- expands_on(isEach,Term),!,findall(O,do_expand_args(isEach,Term,O),L),!,list_to_conjuncts(L,CL).
+db_expand_0(_,Term,CL):- findall(O,do_expand_args(isEach,Term,O),L),L\=@=[Term],!,list_to_conjuncts(L,CL).
 
 
 db_expand_0(Op,pddlSomethingIsa(I,EL),O):- listToE(EL,E),db_expand_0(Op,isa(I,E),O).

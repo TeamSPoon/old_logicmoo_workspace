@@ -122,6 +122,10 @@
 :- dynamic(user:argsQuoted/1).
 :- multifile(user:argsQuoted/1).
 
+:- dynamic(user:disjointWith/2).
+:- multifile(user:disjointWith/2).
+
+
 :- dynamic(was_chain_rule/1).
 :- multifile(was_chain_rule/1).
 

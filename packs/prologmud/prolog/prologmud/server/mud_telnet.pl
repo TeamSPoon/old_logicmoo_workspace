@@ -59,14 +59,13 @@ get_session_io(In,Out):-
    setup_streams(In, Out),
    set_tty_control(true).
 
-login_and_run_nodebug:- 
- must(set_no_debug), 
- must(login_and_run).
+login_and_run_nodebug:- nodebugx(login_and_run).
 
 
 player_connect_menu(In,Out,Wants,P):-
  must_det_l((
    get_session_id(O),
+   get_session_io(In,Out),
    fmt('~N~nHello ~q!~n',[O]),
    setup_streams(In, Out),set_tty_control(true),
    foc_current_agent(Wants),
@@ -99,6 +98,8 @@ run_session:-
 
 run_session(In,Out):-  
   get_session_id(O),
+  get_session_io(In,Out),
+  asserta(thlocal:telnet_prefix([isSelfAgent,wants,to])),
   retractall(thlocal:wants_logout(O)),!,
   repeat,     
          once(session_loop(In,Out)),
@@ -111,8 +112,9 @@ session_loop(In,Out):-
   get_session_id(O),
   (current_agent(P)->true;player_connect_menu(In,Out,_,_);player_connect_menu(In,Out,_,P)),
   start_agent_action_thread,
-  ignore(look_brief(P)),!,    
-  sformat(S,'~w> ',[P]),prompt_read_telnet(In,Out,S,List),!,
+  ignore(look_brief(P)),!,
+  (thlocal:telnet_prefix(Prefix)->(sformat(S,'~w ~w>',[P,Prefix]));sformat(S,'~w> ',[P])),
+  prompt_read_telnet(In,Out,S,List),!,
   register_player_stream_local(P,In,Out),
   enqueue_session_action(P,List,O).
 
@@ -134,8 +136,8 @@ register_player_stream_local(P,In,Out):-
 
 :-export(enqueue_session_action/3).
 
-enqueue_session_action(A,[+, Text],S):- string(Text), must(assert_text(tWorld,Text)).
-enqueue_session_action(A,[ Text],S):- string(Text),!,enqueue_session_action(A,[actSay,Text],S).
+%enqueue_session_action(A,[+, Text],S):- string(Text), must(assert_text(tWorld,Text)).
+%enqueue_session_action(A,[W0,W1|WL],S):- string(Text),!,enqueue_session_action(A,[actSay,[W0,W1|WL]],S).
 enqueue_session_action(A,L,S):- show_call(enqueue_agent_action(A,L,S)).
 
 
@@ -145,24 +147,23 @@ set_tty_control(TF):-
    set_stream(user_output, tty(TF)),
    set_stream(user_error, tty(TF)),
    set_stream(user_input, tty(TF)),
-   set_prolog_flag(tty_control, TF),
-   colormsg(green,"this is green!"))))),!.
-
-nr(G):-no_repeats(G).
-   
+   set_prolog_flag(tty_control, TF))))),!.
 
 user:deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
-      foreach(nr(get_agent_sessions(A,O)),foreach(nr(thglobal:session_io(O,In,Out,Id)),fmt(Out,'~N~q.~n',[NewEvent]))).
+      foreach(no_repeats(get_agent_sessions(A,O)),foreach(no_repeats(thglobal:session_io(O,In,Out,Id)),fmt(Out,'~N~q.~n',[NewEvent]))).
+
+:-thread_local(thlocal:telnet_prefix/1).
 
 
 :-export(prompt_read/4).
 prompt_read_telnet(In,Out,Prompt,Atom):-
-      get_session_id(O),
+      get_session_id(O),      
       prompt_read(In,Out,Prompt,IAtom),
       (IAtom==end_of_file -> (hooked_asserta(thlocal:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
 
-prompt_read(In,Out,Prompt,Atom):-        
-        with_output_to(Out,ansi_format([reset,hfg(white),bold],'~w',[Prompt])),flush_output(Out),        
+prompt_read(In,Out,Prompt,Atom):-         
+        with_output_to(Out,ansi_format([reset,hfg(white),bold],'~w',[Prompt])),flush_output(Out),      
+        get_session_io(In,Out),
         repeat,read_code_list_or_next_command_with_prefix(In,Atom),!.
 
 local_to_words_list(Atom,Words):-var(Atom),!,Words = Atom.
@@ -170,13 +171,15 @@ local_to_words_list(end_of_file,end_of_file):-!.
 local_to_words_list([],[]):-!.
 local_to_words_list(Atom,Words):-to_word_list(Atom,Words),!.
 
-read_code_list_or_next_command_with_prefix(In,Words):-read_code_list_or_next_command(In,Atom),show_call(local_to_words_list(Atom,Words)),!.
+maybe_prepend_prefix(Words,Words).
+
+read_code_list_or_next_command_with_prefix(In,Words):- read_code_list_or_next_command(In,Atom),show_call(local_to_words_list(Atom,WordsM)),!,maybe_prepend_prefix(WordsM,Words).
 
 read_code_list_or_next_command(Atom):-current_input(In),read_code_list_or_next_command(In,Atom),!.
 
 read_code_list_or_next_command(In,end_of_file):- at_end_of_stream(In),!.
 read_code_list_or_next_command(In,Atom):- 
- (var(In)->current_input(In);true), catchv(wait_for_input([In], Ready, 1),_,fail),!,  member(In,Ready),
+ (var(In)->current_input(In);true), catch(wait_for_input([In], Ready, 1),_,fail),!,  member(In,Ready),
   read_pending_input(In,CodesL,[]),!,is_list(CodesL),CodesL\==[],
    ((last(CodesL,EOL),member(EOL,[10,13])) -> code_list_to_next_command(CodesL,Atom); 
     (read_line_to_codes(In,CodesR), (is_list(CodesR)-> (append(CodesL,CodesR,NewCodes),code_list_to_next_command(NewCodes,Atom)); Atom=CodesR))),!.
@@ -190,7 +193,7 @@ code_list_to_next_command(end_of_file,end_of_file).
 code_list_to_next_command(NewCodes,Atom):-append(Left,[EOL],NewCodes),EOL<33,!,code_list_to_next_command(Left,Atom).
 code_list_to_next_command( [EOL|NewCodes],Atom):-EOL<33,!,code_list_to_next_command(NewCodes,Atom).
 code_list_to_next_command( [],actLook).
-code_list_to_next_command( [91|REST],TERM):- catchv((atom_codes(A,[91|REST]),atom_to_term(A,TERM,[])),_,fail),!.
+code_list_to_next_command( [91|REST],TERM):- catch((atom_codes(A,[91|REST]),atom_to_term(A,TERM,[])),_,fail),!.
 code_list_to_next_command(NewCodes,Atom):-atom_codes(Atom,NewCodes),!.
 
 :-export(scan_src_updates/0).
@@ -488,8 +491,8 @@ call_close_and_detatch(In, Out, Id, Call):-
 
 close_connection(In, Out) :-
         retractall(thread_util:has_console(_,In,Out,_)),
-        ignore(catchv(close(In, [force(true)]),_,true)),
-        ignore(catchv(close(Out, [force(true)]),_,true)).
+        ignore(catch(close(In, [force(true)]),_,true)),
+        ignore(catch(close(Out, [force(true)]),_,true)).
 
 strm_info(Out,Name,Strm):-nl,write(Out,Name = Strm),forall(stream_property(Strm,P),'format'(Out,', ~q',[P])),nl(Out).
 

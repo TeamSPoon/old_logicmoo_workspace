@@ -53,11 +53,10 @@ tCol(ftProlog).
 tCol(tWorld).
 isa(iWorld7,tWorld).
 
-=> neg(arity(pathConnects,1)).
+% => neg(arity(bordersOn,1)).
 
 %user:ruleRewrite(isa(isInstFn(Sub),Super),genls(Sub,Super)):-ground(Sub:Super),!.
-user:ruleRewrite(mudLabelTypeProps(Lbl,T,[]),typeHasGlyph(T,Lbl)):-nonvar(T),!.
-user:ruleRewrite(mudLabelTypeProps(Lbl,T,Props),typeProps(T,[typeHasGlyph(Lbl)|Props])):-nonvar(T),!.
+
 
 
 %:-rtrace.
@@ -225,7 +224,7 @@ dividesBetween(tAgent,tPlayer,tNpcPlayer).
 
 isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 
-(neg(isa(I,Super)) <= (disjointWith(Sub, Super),isa(I,Sub))).
+neg(isa(I,Super)) <= {ground(isa(I,Super))}, (isa(I,Sub), disjointWith(Sub, Super)).
 % disjointWith(P1,P2) => {\+(isa(P1,ttNonGenled)),\+(isa(P2,ttNonGenled))},(neg(isa(C,P1)) <=> isa(C,P2)).
 
 
@@ -305,7 +304,7 @@ prologMultiValued(mudMemory(tAgent,ftTerm),prologHybrid).
 prologMultiValued(mudNamed(ftTerm,ftTerm),prologHybrid).
 prologMultiValued(mudPossess(tObj,tObj),prologHybrid).
 prologMultiValued(nameStrings(ftTerm,ftString),prologHybrid).
-prologMultiValued(pathBetween(tRegion,vtDirection,tRegion),prologHybrid).
+prologMultiValued(pathDirLeadsTo(tRegion,vtDirection,tRegion),prologHybrid).
 prologMultiValued(pathName(tRegion,vtDirection,ftString),prologHybrid).
 prologMultiValued(genls(tCol,tCol),prologHybrid).
 prologMultiValued(typeGrid(tCol,ftInt,ftListFn(ftString)),prologHybrid).
@@ -371,7 +370,7 @@ ttPredAndValueType(Str)/(i_name('mud',Str,Pred),i_name('vt',Str,VT)) => (tRolePr
 relationMostInstance(arg1Isa,tRolePredicate,tTemporalThing).
 relationMostInstance(arg2QuotedIsa,tRolePredicate,ftTerm).
 
-mudKeyword(W,R) <= {atom(W),i_name_lc(W,R)}.
+% mudKeyword(W,R) <= {atom(W),i_name_lc(W,R)}.
 
 ttValueType(vtSize).
 ttValueType(vtTexture).
@@ -395,7 +394,7 @@ prologHybrid(mudNeedsLook/2,[completeExtentAsserted]).
 prologHybrid(mudShape/2).
 prologHybrid(mudSize/2).
 prologHybrid(mudTexture/2).
-prologHybrid(pathBetween/3).
+prologHybrid(pathDirLeadsTo/3).
 prologOnly(mudMoveDist/2).
 :- dynamic(mudMoveDist/2).
 meta_argtypes(mudMoveDist(tAgent,ftInt)).
@@ -448,7 +447,7 @@ prologMultiValued(mudActAffect(ftTerm,ftTerm,ftTerm)).
 prologMultiValued(mudActAffect(tItem,vtVerb,ftTerm(ftVoprop))).
 prologMultiValued(mudCmdFailure(tAgent,ftAction)).
 
-tPred(isEach(tAgent/1, mudEnergy/2,mudHealth/2, mudAtLoc/2, failure/2, typeGrid/3, gridValue/4, isa/2, tItem/1, mudMemory/2, pathName/3, mudPossess/2, tRegion/1, mudScore/2, mudStm/2, mudFacing/2, localityOfObject/2, tThinking/1, mudWearing/2, mudFacing/2, mudHeight/2, act_term/2, nameStrings/2, mudDescription/2, pathBetween/3, mudAgentTurnnum/2)).
+tPred(isEach(tAgent/1, mudEnergy/2,mudHealth/2, mudAtLoc/2, failure/2, typeGrid/3, gridValue/4, isa/2, tItem/1, mudMemory/2, pathName/3, mudPossess/2, tRegion/1, mudScore/2, mudStm/2, mudFacing/2, localityOfObject/2, tThinking/1, mudWearing/2, mudFacing/2, mudHeight/2, act_term/2, nameStrings/2, mudDescription/2, pathDirLeadsTo/3, mudAgentTurnnum/2)).
 prologHybrid(mudToHitArmorClass0 / 2).
 prologHybrid(mudAtLoc/2).
 prologOnly((agent_call_command/2)).
@@ -563,8 +562,8 @@ meta_argtypes(type_action_info(tCol,vtActionTemplate,ftText)).
 
 tCol(ttAgentType).
 
-prologHybrid(pathBetween(tRegion,vtDirection,tRegion)).
-prologHybrid(pathConnects(tRegion,tRegion),tSymmetricRelation).
+prologHybrid(pathDirLeadsTo(tRegion,vtDirection,tRegion)).
+prologHybrid(bordersOn(tRegion,tRegion),tSymmetricRelation).
 
 ttAgentType(tMonster).
 % user:instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
@@ -632,18 +631,17 @@ completelyAssertedCollection(tCarryAble).
 completelyAssertedCollection(vtVerb).
 genls(ttTypeByAction,completelyAssertedCollection).
 
-arity(pathConnects,2).
+arity(bordersOn,2).
 
-pathConnects(R1,R2):-pathBetween(R1,Dir,R2),nop(Dir).
-pathConnects(R1,R2):-pathBetween(R2,Dir,R1),nop(Dir).
+bordersOn(R1,R2):-is_asserted(pathDirLeadsTo(R1,Dir,R2)),nop(Dir).
+bordersOn(R1,R2):-is_asserted(pathDirLeadsTo(R2,Dir,R1)),nop(Dir).
 
-ensure_some_pathBetween(R1,R2):- pathBetween(R1,_,R2),!.
-ensure_some_pathBetween(R1,R2):- pathBetween(R2,_,R1),!.
-ensure_some_pathBetween(R1,R2):- random_path_dir(Dir), not(pathBetween(R1,Dir,_)),must(reverse_dir(Dir,Rev)),not(pathBetween(R2,Rev,_)),!, 
-   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
-ensure_some_pathBetween(R1,R2):- must((add(pathBetween(R1,apathFn(R1,R2),R2)),add(pathBetween(R2,apathFn(R2,R1),R1)))),!.
+ensure_some_pathBetween(R1,R2):- bordersOn(R1,R2),!.
+ensure_some_pathBetween(R1,R2):- random_path_dir(Dir), \+(is_asserted(pathDirLeadsTo(R1,Dir,_))),must(reverse_dir(Dir,Rev)),\+(is_asserted(pathDirLeadsTo(R2,Rev,_))),!, 
+   must((add(pathDirLeadsTo(R1,Dir,R2)),add(pathDirLeadsTo(R2,Rev,R1)))),!.
+ensure_some_pathBetween(R1,R2):- trace,must((add(pathDirLeadsTo(R1,aRelatedFn(vtDirection,R2),R2)),add(pathDirLeadsTo(R2,aRelatedFn(vtDirection,R1),R1)))),!.
 
-pathConnects(R1,R2)/ground(R1:R2) => isa(R1,tRegion),isa(R2,tRegion), {ensure_some_pathBetween(R2,R1),ensure_some_pathBetween(R1,R2)}.
+bordersOn(R1,R2)/ground(bordersOn(R1,R2)) => isa(R1,tRegion),isa(R2,tRegion), {ensure_some_pathBetween(R2,R1),ensure_some_pathBetween(R1,R2)}.
 
 
 % ==================================================
@@ -661,6 +659,14 @@ genls(tClothing, tItem).
 
 genls( tCarryAble, tItem).
 genls( tCarryAble, tDropAble).
+
+genlsInheritable(tCol).
+genlsInheritable(ttPredType).
+genls(ttTypeType,genlsInheritable).
+
+(genls(C,SC)/ground(genls(C,SC))=>(tCol(C),tCol(SC))).
+
+(genls(C,SC)/ground(genls(C,SC)),nearestIsa(SC,W),\+ genlsInheritable(W) )=>isa(C,W).
 
 % throw(sane_transitivity (genls( tCarryAble, tThrowAble))).
 % genls( tCarryAble, tCarryAble).
@@ -701,7 +707,6 @@ genls(tPartofFurnature,tPartofObj).
 
 %(isa(I,Sub), disjointWith(Sub, Super)) => neg(isa(I,Super)).
 
-neg(isa(I,Super)) <= (isa(I,Sub), disjointWith(Sub, Super)).
 
 genls(tPartofObj,tItem).
 
@@ -749,7 +754,8 @@ genls('IndoorsIsolatedFromOutside',tRegion).
 genls('SpaceInAHOC',tRegion).
 
 typeProps(tAgent,[mudMoveDist(1)]).
-typeProps(tAgent,[predInstMax(mudHealth,500), predInstMax(mudEnergy,200), mudHealth(500), mudEnergy(90),  mudFacing(isRandom(vtBasicDir)), mudAgentTurnnum(0), mudScore(1), 
+% isRandom(vtBasicDir)
+typeProps(tAgent,[predInstMax(mudHealth,500), predInstMax(mudEnergy,200), mudHealth(500), mudEnergy(90),  mudFacing(vNorth), mudAgentTurnnum(0), mudScore(1), 
     mudMemory(aDirectionsFn([vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW,vUp,vDown]))]).
 % typeProps(tAgent,mudLastCommand(actStand)).
 typeProps(tAgent,mudNeedsLook(vFalse)).
@@ -765,8 +771,7 @@ typeProps(tSpatialThing,mudHeight(0)).
 
 % :-end_module_type(dynamic).
 
-% instTypeProps(isThis,Type,[mudNamed(isThis),typeHasGlyph(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
-
+mudLabelTypeProps(Lbl,Type,Props)/ground(mudLabelTypeProps(Lbl,Type,Props))=> (typeHasGlyph(Type,Lbl) , typeProps(Type,Props)).
 
 % Vacuum World example objects........
 mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
@@ -973,11 +978,12 @@ normalAgentGoal(X,_)=>tStatPred(X).
    ((Head1,Head2/(Val1 \== Val2, catch((Val3 is Val1 + Val2),_,fail))) => 
      (( \+ Head1, Head3, \+ Head2 )))).
 
-
-(prologSingleValued(Pred),arity(Pred,Arity), singleValuedInArg(Pred,SV),
+((arity(Pred,Arity),singleValuedInArg(Pred,SV),
   {functor(Before,Pred,Arity),arg(SV,Before,B),replace_arg(Before,SV,A,After)})
-  => 
-   ({dif:dif(B,A)},After,{clause_asserted(Before), B\==A,\+ is_relative(B),\+ is_relative(A)} => {pfc_rem2(Before)}).
+  =>
+   (({dif:dif(B,A)},After,{clause_asserted(Before), B\==A,\+ is_relative(B),\+ is_relative(A)}) 
+     =>
+      {pfc_rem2(Before)})).
 
 
 

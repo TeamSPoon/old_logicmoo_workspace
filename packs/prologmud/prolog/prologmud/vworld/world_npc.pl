@@ -74,7 +74,7 @@ get_world_agent_plan(W,Who,Idea):-no_repeats(with_agent(Who,call_no_cuts(world_a
 
 do_agent_call_plan_command(A,C):- thlocal:agent_current_action(A,CC),dmsg(too_busy(CC,agent_call_plan_command(A,C))),!.
 do_agent_call_plan_command(A,C):-   
-   with_agent(A,with_assertions(thlocal:agent_current_action(A,C), agent_call_command_unparsed(A,C))).
+   with_agent(A,with_assertions(thlocal:agent_current_action(A,C), do_agent_action(A,C))).
 
 
 command_actIdea(Who,IdeaSO):- (var(Who)->current_agent(Who);true),

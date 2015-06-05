@@ -20,9 +20,12 @@
 :- nb_setval(pldoc_object,pldoc_object_missing).
 
 :- include(mpred/logicmoo_i_header).
+
+/*
 :- meta_predicate user:call_mpred_body(*,0).
 :- meta_predicate user:decl_mpred_hybrid_ilc_0(*,*,0,*).
 :- meta_predicate user:assert_isa_hooked(0,*).
+*/
 :- meta_predicate user:t(7,?,?,?,?,?,?,?).
 :- meta_predicate user:t(6,?,?,?,?,?,?).
 :- meta_predicate user:t(5,?,?,?,?,?).
@@ -92,10 +95,11 @@ when_debugging(_,_).
 % ================================================
 % DBASE_T System
 % ================================================
-:- ensure_loaded(library(logicmoo/mpred_online/logicmoo_i_www)).
+%%% ON TODO :- time(ensure_loaded(library(logicmoo/mpred_online/logicmoo_i_www))).
 :- ensure_loaded(mpred/pfc).
 :- ensure_loaded(mpred/logicmoo_i_loader).
 % % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
+:- ensure_loaded(mpred/logicmoo_i_naming).
 :- ensure_loaded(mpred/logicmoo_i_types).
 :- ensure_loaded(mpred/logicmoo_i_term_expansion).
 :- ensure_loaded(mpred/logicmoo_i_mpred_props).
@@ -106,11 +110,16 @@ when_debugging(_,_).
 :- ensure_loaded(mpred/logicmoo_i_store).
 :- ensure_loaded(mpred/logicmoo_i_mpred_stubs).
 :- ensure_loaded(mpred/logicmoo_i_argtypes).
-% :- with_no_mpred_expansions(autoload).
 
-:- ensure_loaded(logicmoo('mpred/logicmoo_i_builtin.pfc')).
-% % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_engine)))).
+% user:goal_expansion(ISA,G) :- \+ thlocal:disable_mpred_term_expansions_locally, compound(ISA),thlocal:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
+user:term_expansion(I,OO):-  is_file_clause(I), \+ thlocal:disable_mpred_term_expansions_locally,
+  sanity(\+  thlocal:pfc_already_in_file_expansion(I)), 
+  pfc:with_assertions(thlocal:pfc_already_in_file_expansion(I),pfc_file_expansion(I,OO)),!,
+  nop(dmsg(pfc_file_expansion(I,OO))).
 
-%:- with_no_term_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/mpred_online/dbase_i_rdf_store)))).
-% % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
+:-export(pfc_file_loaded/0).
+pfc_file_loaded.
+
+:- ensure_loaded(mpred/logicmoo_i_builtin).
+
 

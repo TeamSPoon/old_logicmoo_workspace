@@ -104,6 +104,7 @@ create_module(M):-context_module(CM),module(M),asserta(M:this_is_a_module(M)),wr
 parser_chat80_module(moo).
 
 
+
 :-export(prolog_repl/0).
 prolog_repl:- with_all_dmsg((nl,fmt("Press Ctrl-D to start the mud!"),nl,'@'(prolog,'user'))).
 
@@ -165,7 +166,7 @@ start_boxer:-
 %  with  ?- start_servers.
 hard_work:-!.
 hard_work:-
-   with_no_term_expansions(with_assertions(op(200,fy,'@'),
+   with_no_mpred_expansions(with_assertions(op(200,fy,'@'),
    ((
  %  use_module('t:/devel/cliopatria/rdfql/sparql_runtime.pl'),
   % ensure_loaded(logicmoo(launchcliopatria)),

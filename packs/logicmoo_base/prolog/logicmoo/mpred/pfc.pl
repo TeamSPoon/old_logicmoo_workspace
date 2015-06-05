@@ -15,13 +15,17 @@
 %                            bug in the recorded database.
 %   Purpose: core Pfc predicates.
 
-/*
+
+/* UNUSED TODAY
+
 :- use_module(library(mavis)).
 :- use_module(library(type_check)).
 :- use_module(library(typedef)).
 */
 
 :- use_module(library(lists)).
+
+/*
 :- use_module(library('pldoc/doc_process')).
 :- use_module(library('pldoc/doc_colour')).
 :- use_module(library('pldoc/doc_html')).
@@ -37,9 +41,8 @@
 :- use_module(library('pldoc/doc_pack')).
 :- use_module(library('pldoc/doc_register')).
 :- use_module(library('pldoc/doc_library')).
+*/
 
-
-:- set_prolog_flag(gc,false).
 
 second_order(_,_):-fail.
 
@@ -57,13 +60,6 @@ compiled(F/A):- dynamic(F/A),compile_predicates([F/A]).
 */
 
 
-/*
-to_db_assertable([A],B):-nonvar(A),!,to_db_assertable(A,B).
-to_db_assertable((P=>Q),was_chain_rule((P=>Q))):-!.
-to_db_assertable((P<=Q),was_chain_rule((P<=Q))):-!.
-to_db_assertable((P<=>Q),was_chain_rule((P<=>Q))):-!.
-to_db_assertable(P,P).
-*/
 
 pfc_each_literal(P,E):-nonvar(P),P=(P1,P2),!,(pfc_each_literal(P1,E);pfc_each_literal(P2,E)).
 pfc_each_literal(P,P). %:-conjuncts_to_list(P,List),member(E,List).
@@ -83,6 +79,7 @@ reduce_clause_from_fwd((H<=>B),HH):-B==true,reduce_clause_from_fwd(H,HH).
 reduce_clause_from_fwd((H,B),(HH,BB)):-!,reduce_clause_from_fwd(H,HH),reduce_clause_from_fwd(B,BB).
 reduce_clause_from_fwd(H,H).
 
+to_addable_form(I,I):-var(I),!.
 to_addable_form(I,OOO):-is_list(I),!,maplist(to_addable_form,I,O),flatten(O,OO),!,reduce_clause_from_fwd(OO,OOO).
 to_addable_form(I,OO):- current_predicate(logicmoo_i_term_expansion_file/0),once(fully_expand(_,I,II)),!,
  once((into_mpred_form(II,M),to_predicate_isas_each(M,O))),!,reduce_clause_from_fwd(O,OO).
@@ -151,8 +148,8 @@ pfc_provide_mpred_storage_op(change(retract,OneOrA),FactOrRule):- is_retract_fir
 pfc_provide_mpred_storage_op(change(retract,all),FactOrRule):- loop_check_nr(pfc_rem2(FactOrRule)),!.
 % pfc_provide_mpred_storage_op(is_asserted,FactOrRule):- nonvar(FactOrRule),!,loop_check_nr(clause_i(FactOrRule)).
 
-pfc_clause_is_asserted_hb_nonunify(H,B):- clause_u( =>( B , H) , true).
-pfc_clause_is_asserted_hb_nonunify(H,B):- clause_u( <=( H , B) , true).
+pfc_clause_is_asserted_hb_nonunify(H,B):- clause( =>( B , H) , true).
+pfc_clause_is_asserted_hb_nonunify(H,B):- clause( <=( H , B) , true).
 pfc_clause_is_asserted_hb_nonunify(_,_):-!,fail.
 pfc_clause_is_asserted_hb_nonunify(G, T   ):- T==true,!,hotrace(pfc_rule_hb(G,H,B)),G\=@=H,!,pfc_clause_is_asserted(H,B).
 pfc_clause_is_asserted_hb_nonunify(H,(T,B)):- T==true,!,pfc_clause_is_asserted_hb_nonunify(H,B).
@@ -161,8 +158,7 @@ pfc_clause_is_asserted_hb_nonunify(H,B):- clause_u( <=( H , B) , true).
 pfc_clause_is_asserted_hb_nonunify(H,B):- pfc_clause_is_asserted(H,B,_).
 
 pfc_clause_is_asserted(H,B):- var(H),nonvar(B),!,fail.
-pfc_clause_is_asserted(H,B):- pfc_clause_is_asserted_hb_nonunify(H,B).
-pfc_clause_is_asserted(H,B):- has_cl(H) , clause_u(H,B).
+pfc_clause_is_asserted(H,B):- has_cl(H) -> clause(H,B) ; pfc_clause_is_asserted_hb_nonunify(H,B).
 %pfc_clause_is_asserted(H,B,Ref):- clause_u(H,B,Ref).
 
 
@@ -281,7 +277,7 @@ clause_u(H,B):- must(H\==true),clause(H,B).
 clause_u(H,B,Ref):-must(H\==true),clause(H,B,Ref).
 
 
-call_u(X):-pfc_call(X).
+call_u(X):- pfc_call(X).
 
 retractall_u(X):-retractall(X).
 
@@ -330,10 +326,7 @@ pfc_maptree(Pred,(H;T),S):-!, pfc_maptree(Pred,H,S) ; pfc_maptree(Pred,T,S).
 pfc_maptree(Pred,[H|T],S):-!, apply(Pred,[H|S]), pfc_maptree(Pred,T,S).
 pfc_maptree(Pred,H,S):-apply(Pred,[H|S]). 
 
-pfc_lambda([A1],Body,A1):-Body.
-pfc_lambda([A1,A2],Body,A1,A2):-Body.
-pfc_lambda([A1,A2,A3],Body,A1,A2,A3):-Body.
-pfc_lambda([A1,A2,A3,A4],Body,A1,A2,A3,A4):-Body.
+:-use_module(library(rec_lambda)).
 
 
 % used to annotate a predciate to indicate PFC support
@@ -482,13 +475,20 @@ pfc_assert_fast_i(P,S):- loop_check(pfc_assert_fast_i_0(P,S),true).
 % TOO UNSAFE 
 pfc_assert_fast_i_0(P,_):- functor(P,_,SV),arg(SV,P,V),is_relative(V),!,show_call(db_assert_sv(P)).
 pfc_assert_fast_i_0(P,_):- functor(P,F,_),if_defined(singleValueInArg(F,SV)),arg(SV,P,V),is_relative(V),!,show_call(db_assert_sv(P)).
+pfc_assert_fast_i_0(P,(S,T)):- clause_asserted(spft(P,S,T)),!.
+pfc_assert_fast_i_0(P,_S):- clause_asserted(spft(P,u,u)),!.
 pfc_assert_fast_i_0(P,S):-
-   must(pfc_add_support(P,S)),
    must(loop_check(pfc_post1_sp_3(S,P),true)),!.
 
-pfc_post1_sp_3(S,P):- \+ pfc_unique_u(P),!.
+
+maybe_did_support.
+
+pfc_post1_sp_3((S,T),P):- maybe_did_support,clause_asserted(spft(P,S,T)),!.
+
+pfc_post1_sp_3(S,P):- \+ pfc_unique_u(P),!,must(pfc_add_support(P,S)),!.
 pfc_post1_sp_3(S,P):-
   must(assert_u(P)),
+  must(pfc_add_support(P,S)),
   must(pfc_trace_add(P,S)),
   !,
   must(pfc_enqueue(P,S)),
@@ -535,7 +535,7 @@ pfc_enqueue(P,S) :-
   must(pfc_search(Mode))
     -> (Mode=direct  -> must(pfc_fwd(P,S)) ;
 	Mode=depth   -> pfc_asserta_i(pfc_queue(P,S),S) ;
-	Mode=breadth -> pfc_assert_i(pfc_queue(P,S),S) ;
+	Mode=breadth -> pfc_assertz_i(pfc_queue(P,S),S) ;
 	% else
           otherwise           -> pfc_warn("Unrecognized pfc_search mode: ~w", Mode))
      ; pfc_warn("No pfc_search mode").
@@ -653,14 +653,15 @@ pfc_halt(Format,Args) :-
 
 pfc_add_trigger(pt(Trigger,Body),Support) :-
   !,
-  pfc_trace_msg('~N%       Adding p-trigger ~q~n',
-		[pt(Trigger,Body)]),
-  pfc_assert_i(pt(Trigger,Body),Support),   
-  must(pfc_mark_as(Support,p,Trigger,pfcPosTrigger)),
-  copy_term(pt(Trigger,Body),Tcopy),
-  call_u(Trigger),
-  pfc_eval_lhs(Body,(Trigger,Tcopy)),
-  fail.
+  pfc_trace_msg('~N%       Adding p-trigger ~q~n', 
+    [pt(Trigger,Body)]),
+  (clause_asserted(pt(Trigger,Body)) -> true ;
+   ( pfc_assert_i(pt(Trigger,Body),Support),   
+     must(pfc_mark_as(Support,p,Trigger,pfcPosTrigger)),
+     copy_term(pt(Trigger,Body),Tcopy),
+     call_u(Trigger),
+     pfc_eval_lhs(Body,(Trigger,Tcopy)),
+     fail)).
 
 
 pfc_add_trigger(nt(Trigger,Test,Body),Support) :-
@@ -1020,7 +1021,7 @@ support_ok_via_clause(H,F,A):- \+ pfcControlled(F),!.
 
 
 pfc_get_support_precanonical(F,Sup):-to_addable_form(F,P),pfc_get_support(P,Sup).
-spft_precanonical(F,SF,ST):-to_addable_form(F,P),spft(P,SF,ST).
+spft_precanonical(F,SF,ST):-to_addable_form(F,P),!,spft(P,SF,ST).
 
 trigger_supports_f_l(u,[]) :- !.
 trigger_supports_f_l(Trigger,[Fact|MoreFacts]) :-
@@ -1254,9 +1255,12 @@ pfc_call_0((C1,C2)):-!,pfc_call_0(C1),pfc_call_0(C2).
 pfc_call_0(call(X)):- !, pfc_call_0(X).
 pfc_call_0(\+(X)):- !, \+ pfc_call_0(X).
 pfc_call_0(call_u(X)):- !, pfc_call_0(X).
-pfc_call_0(F):- loop_check(call_with_bc_triggers(F)),maybeSupport(F,(g,g)),fail.
-pfc_call_0(X):- functor(X,F,A), \+ current_predicate(F/A),dynamic(F/A),multifile(F/A),fail.
-pfc_call_0(F):- pfc_call_with_no_triggers(F).
+pfc_call_0(G):-pfc_call_0(G,F,A).
+
+pfc_call_0(G,F,A):-  (ground(G); \+ current_predicate(F/A) ; \+ (predicate_property(G,clause_count(CC)),CC>1)),  
+                ignore((loop_check(call_with_bc_triggers(G)),maybeSupport(G,(g,g)),fail)),
+                (\+ current_predicate(F/A),dynamic(F/A),multifile(F/A),fail).
+pfc_call_0(G,F,A):- (pfc_call_with_no_triggers(G)).
 
 
 :-thread_local thlocal:infBackChainPrevented/1.
@@ -1350,7 +1354,7 @@ undoable(A) :- pfc_undo_method(A,_).
 
 
 pfc_nf(LHS,List) :-
-  pfc_nf1(LHS,List2),
+  must(pfc_nf1(LHS,List2)),
   pfc_nf_negations(List2,List).
 
 
@@ -1367,6 +1371,8 @@ pfc_nf1(P,[P]) :- var(P), !.
 pfc_nf1(P/Cond,[(\+P)/Cond]) :- pfc_negated_literal(P), !.
 
 pfc_nf1(P/Cond,[P/Cond]) :-  pfc_literal(P), !.
+
+pfc_nf1({P},[{P}]) :-!.
 
 %= handle a negated form
 
@@ -1398,7 +1404,7 @@ pfc_nf1(P,[P]) :-
 
 %=% shouln't we have something to catch the rest as errors?
 pfc_nf1(Term,[Term]) :-
-  pfc_warn("pfc_nf doesn't know how to normalize ~w",[Term]).
+  pfc_warn("pfc_nf doesn't know how to normalize ~w",[Term]),!,fail.
 
 
 %= pfc_nf1_negation(P,NF) is true if NF is the normal form of \+P.
@@ -1639,10 +1645,13 @@ pfc_assert_i(P,Support) :-
   !,
   pfc_add_support(P,Support).
 
+
+
 pfc_asserta_i(P,Support) :-
   (pfc_clause_i(P) ; asserta_i(P)),
   !,
   pfc_add_support(P,Support).
+
 
 pfc_assertz_i(P,Support) :-
   (pfc_clause_i(P) ; assertz_i(P)),
@@ -1696,7 +1705,11 @@ pfc_union([Head|Tail],L,[Head|Tail2]) :-
 
 %= pfc_add_support(+Fact,+Support)
 
-pfc_add_support(tCol(pathConnects),(u,u)) :- trace_or_throw(pfc_add_support(tCol(pathConnects),(u,u))).
+pfc_add_support(tCol(PC),(u,u)) :- PC== pathConnects, trace_or_throw(pfc_add_support(tCol(PC),(u,u))).
+%pfc_add_support(P,(Fact,Trigger)) :-  clause_asserted( spft(P,Fact,Trigger)),!. % ,dmsg(dup(warn(pfc_add_support(P,(Fact,Trigger))))),!.
+pfc_add_support(P,(Fact,Trigger)) :-  once((IS= spft(P,Fact,Trigger), copy_term(IS,WAS),IS)),
+   (IS=@=WAS->show_call_failure(clause_asserted( spft(P,Fact,Trigger)));
+     ( ignore((fail,numbervars(WAS),retract(WAS))),assertz(IS), nop(dmsg(warn([unify,pfc_add_support,WAS,IS]))))),!.
 pfc_add_support(P,(Fact,Trigger)) :- assertz_if_new(spft(P,Fact,Trigger)). % was assert_i
 
 
@@ -1725,6 +1738,7 @@ pfc_collect_supports_f_l(Tripples) :-
   !.
 pfc_collect_supports_f_l([]).
 
+/* UNUSED TODAY
 % TODO not called yet
 pfc_support_relation((P,F,T)) :- spft(P,F,T).
 
@@ -1734,7 +1748,7 @@ pfc_make_supports_f_l((P,S1,S2)) :-
   pfc_add_support(P,(S1,S2)),
   (pfc_add_db_type(P); true),
   !.
-
+*/
 
 is_relative(V):-not(compound(V)),!,fail.
 is_relative(+(_)).
@@ -1868,7 +1882,6 @@ pp_items(Type,H) :- pp_item(Type,H).
 pp_item(M,H):- flag(show_asserions_offered,X,X+1),thlocal:print_mode(html),!,pp_item_html(M,H),!.
 pp_item(M,H):- true,pp_item_html(M,H),!.
 pp_item(M,(H:-true)):-pp_item(M,H).
-pp_item(M,was_chain_rule(H)):-pp_item(M,H).
 pp_item(M,spft(W,U,U)):-!,pp_item(M,U:W).
 pp_item(M,spft(W,F,U)):- atom(U),!, fmt('~N%~n',[]),pp_item(M,U:W), fmt('~N% rule: ~q~n%~n', [F]),!.
 pp_item(M,spft(W,F,U)):-          !,fmt('~N% ~w~n%d:       ~q~n%format:    ~q~n', [M,W,F]),pp_item(M,U).
@@ -1936,12 +1949,12 @@ get_fa(PI,F,A):- compound(PI),!,functor(PI,F,A).
 get_fa(Mask,F,A):-get_functor(Mask,F,A).
 
 
-clause_or_call(M:P,OUT):-var(M),!,no_repeats(M:F/A,(f_to_mfa(P,M,_F,_A))),clause_or_call(M:P,OUT).
-clause_or_call(isa(I,C),true):-!,logOnError(isa(I,C)).
-clause_or_call(genls(I,C),true):-!,logOnError(genls(I,C)).
-clause_or_call(H,B):-predicate_property(H,number_of_clauses(C)),predicate_property(H,number_of_rules(R)),((R*2<C) -> (clause(H,B)*->!;fail) ; clause(H,B)).
-clause_or_call(H,B):-clause(was_chain_rule(H),B).
-clause_or_call(H,true):- should_call_for_facts(H),logOnError(H).
+clause_or_call(M:H,B):-var(M),!,no_repeats(M:F/A,(f_to_mfa(H,M,_F,_A))),M:clause_or_call(H,B).
+clause_or_call(isa(I,C),true):-!,req(isa_asserted(I,C)).
+clause_or_call(genls(I,C),true):-!,logOnError(req(genls(I,C))).
+clause_or_call(H,B):- clause(src_edit(_Before,H),B).
+clause_or_call(H,B):- predicate_property(H,number_of_clauses(C)),predicate_property(H,number_of_rules(R)),((R*2<C) -> (clause(H,B)*->!;fail) ; clause(H,B)).
+clause_or_call(H,true):- should_call_for_facts(H),no_repeats(logOnError(H)).
 
 
 % as opposed to simply using clause(H,true).
@@ -1958,22 +1971,24 @@ print_db_items(Title,Mask,What):-print_db_items(Title,Mask,Mask,What).
 print_db_items(Title,Mask,SHOW,What0):-
      get_pi(Mask,H),get_pi(What0,What),
      format(atom(Showing),'~q for ~q...',[Title,What]),
-     doall((clause_or_call(H,B),
-        notrace(pfc_contains_term(What,(H:-B))),
-        flag(print_db_items,LI,LI+1),
-        notrace(pp_item(Showing,SHOW)))),
+     statistics(cputime,Now),Max is Now + 2,!,
+       gripe_time(1.0,
+         doall((once(statistics(cputime,NewNow)),NewNow<Max,clause_or_call(H,B),
+             notrace(pfc_contains_term(What,(H:-B))),
+             flag(print_db_items,LI,LI+1),
+             notrace(pp_item(Showing,SHOW))))),
      pp_item(Showing,done),!.
 
 pfc_contains_term(What,_):-is_ftVar(What),!.
 pfc_contains_term(What,Inside):-compound(What),!,(\+ \+ ((copy_term_nat(Inside,Inside0),numbervars(Inside0),contains_term(What,Inside0)))),!.
-pfc_contains_term(What,Inside):- (\+ \+ ((subst(Inside,What,foundZadooksy,Diff),Diff \=@= Inside ))),!.
+pfc_contains_term(What,Inside):- (\+ \+ notrace((subst(Inside,What,foundZadooksy,Diff),Diff \=@= Inside ))),!.
 
-user:listing_mpred_hook(What):- debugOnError(pfc_listing(What)).
+% user:listing_mpred_hook(What):- debugOnError(pfc_listing(What)).
 
 :-thread_local thlocal:pfc_listing_disabled.
 
 pfc_listing(_):-thlocal:pfc_listing_disabled,!.
-pfc_listing(M:What):-atom(M),!,pfc_listing(What).
+pfc_listing(M:What):-atom(M),!,M:pfc_listing(What).
 pfc_listing(What):-loop_check(pfc_listing_0(What),true).
 
 pfc_listing_0(What):-get_pi(What,PI),PI\=@=What,!,pfc_listing_0(PI).
@@ -2017,9 +2032,8 @@ pfc_listing_1(What):-
    dif(A,B),print_db_items('Supports Deduced',spft_precanonical(P,A,B),spft(P,A,B),What),
    dif(G,u),print_db_items('Supports Nonuser',spft_precanonical(P,G,G),spft(P,G,G),What),
    print_db_items('Backchaining Rules',(_<=_),What),
-   print_db_items('Edits',is_disabled_clause(_),What),
+   % print_db_items('Edits',is_disabled_clause(_),What),
    print_db_items('Edits',is_edited_clause(_,_,_),What),
-   print_db_items('Edits',was_chain_rule(F),F,What),
    print_db_items('Instances',isa(_,_),What),
    print_db_items('Subclasses',genls(_,_),What),
    print_db_items('Negative Facts',neg(_),What),
@@ -2217,8 +2231,9 @@ pfc_warn(Msg) :-  pfc_warn(Msg,[]).
 pfc_warn(Msg,Args) :-
  % pfc_warnings(true),
   !,
-  fmt("~N% WARNING/Pfc: ",[]),
-  fmt(Msg,Args),fmt("~N",[]).
+  sformat(S, Msg,Args),
+  show_source_location,
+  dmsg(pfc(warn(S))),!.  
 pfc_warn(_,_).
 
 %=
@@ -2495,6 +2510,5 @@ show_pred_info(Head):-
 show_pred_info_0(Head):- 
         doall(show_call(predicate_property(Head,_))),
         (has_cl(Head)->doall((show_call(clause(Head,_))));hotrace((lsting(Head)))),!.
-
 
 

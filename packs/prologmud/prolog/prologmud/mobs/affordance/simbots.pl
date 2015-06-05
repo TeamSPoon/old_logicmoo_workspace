@@ -68,7 +68,7 @@ defined_affordance([ subjType=tAgent, actionVerb= "LiveAtLeastAMinute",
    'Sad_To_Happy'= 0 * -2,
    'Comfort'= 0 * -2 ]).
 
-user:hook_one_minute_timer_tick:-forall(no_repeats(tAgent(X)),agent_call_command_now(X,actLiveAtLeastAMinute(X))).
+% TODO user:hook_one_minute_timer_tick:- \+ suspend_timers, forall(no_repeats(tAgent(X)),agent_call_command_now(X,actLiveAtLeastAMinute(X))).
 
 defined_affordance([subjType= "Shower",
 actionVerb= "Operate",

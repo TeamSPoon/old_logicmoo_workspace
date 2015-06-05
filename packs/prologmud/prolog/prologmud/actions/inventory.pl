@@ -59,12 +59,13 @@ detatch_object(Obj):-
 user:action_info(actInventory(isOptional(tAgent,isSelfAgent)), "Examine an inventory").
 
 user:agent_call_command(Agent,actInventory(Who)):- show_inventory(Agent,Who).
+user:agent_call_command(Agent,actInventory):- show_inventory(Agent,Agent).
 
 show_inventory(Agent,Who):-
         show_kb_preds(Agent,[                                                  
                         % listof(mudInventoryLocation(Who, value, _)),
-                       % listof(mudContains(Who,value)),                 
-                       % listof(mudPossess(Who,value)),
+                        listof(mudContains(Who,value)),                 
+                        listof(mudPossess(Who,value)),
                         listof(mudStowing(Who,value)),                       
                         listof(mudWielding(Who,value)),
                         listof(wearsClothing(Who,value))]).

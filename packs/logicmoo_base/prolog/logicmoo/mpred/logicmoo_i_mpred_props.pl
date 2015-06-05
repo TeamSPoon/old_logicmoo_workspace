@@ -142,7 +142,7 @@ decl_mpred_hybrid_ilc_0(CM,M,PI,F/A):-
 
 :-op(1120,fx,(decl_mpred_hybrid)).
 
-prologHybrid(X,Y):-dtrace(prologHybrid(X,Y)).
+%prologHybrid(X,Y):-dtrace(prologHybrid(X,Y)).
 :-lock_predicate(prologHybrid(X,Y)).
 
 % ========================================

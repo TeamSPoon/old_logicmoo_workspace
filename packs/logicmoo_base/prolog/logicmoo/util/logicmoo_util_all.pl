@@ -90,6 +90,7 @@ concat_paths([ParentIn,Child|MORE],Result):- concat_paths(ParentIn,Child,ResultM
 
 :-export(with_vars/2).
 :-module_transparent(with_vars/2). 
+:- meta_predicate with_vars(*,0).
 with_vars([],Stuff):- !, Stuff.
 with_vars([V|Vs],Stuff):- !,
   b_getval('$variable_names', VsOrig),

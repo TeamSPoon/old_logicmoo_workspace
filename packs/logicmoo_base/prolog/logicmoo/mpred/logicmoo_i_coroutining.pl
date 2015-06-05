@@ -41,7 +41,7 @@ attribs_to_atoms0(Var,Isa):-get_attr(Var,argisa,Iza),!,must(iza_to_isa(Iza,Isa))
 attribs_to_atoms0(O,O):-not(compound(O)).
 
 
-min_isa_l(List,ListO):-isa_pred_l(pfc_lambda([Y,X],genls(X,Y)),List,ListO).
+min_isa_l(List,ListO):-isa_pred_l(lambda(Y,X,genls(X,Y)),List,ListO).
 max_isa_l(List,ListO):-isa_pred_l(genls,List,ListO).
 
 

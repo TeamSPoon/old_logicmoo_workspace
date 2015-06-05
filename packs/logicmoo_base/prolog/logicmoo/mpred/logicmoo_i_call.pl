@@ -69,10 +69,6 @@ mpred_op(_,C):- mpred_call(C).
 whenAnd(A,B):-A,ground(B),once(B).
 
 
-%user:agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
-:-asserta((user:agent_call_command(_Gent,actGrep(Obj)):- term_listing(Obj))).
-
-
 % =======================================
 % Transforming DBASE OPs
 % ========================================
@@ -143,10 +139,11 @@ mpred_call(Call):-
 mpred_call(Call):- mpred_call_0(Call).
 
 mpred_call_0(Call):-predicate_property(Call,foreign),!,Call.
-mpred_call_0(Expand):- fully_expand(query(t,mpred_call),Expand,Call),!, one_must(mpred_call_1(Call),mpred_call_2(Call)).
+mpred_call_0(Expand):- fully_expand(query(t,mpred_call),Expand,Call), Expand\=@=Call, !, loop_check(mpred_call(Call),Call).
+mpred_call_0(Call):- one_must(mpred_call_1(Call),mpred_call_2(Call)).
 
 mpred_call_1(Call):-current_predicate(_,Call),debugOnError(loop_check(Call)).
-mpred_call_1(Call):-clause(prolog_xref:process_directive(D, Q),_),nonvar(D),D=Call,!, trace,show_call((prolog_xref:process_directive(Call,Q),fmt(Q))).
+mpred_call_1(Call):-clause(prolog_xref:process_directive(D, Q),_),nonvar(D),D=Call,!, show_call((prolog_xref:process_directive(Call,Q),must(nonvar(Q)),fmt(Q))).
 mpred_call_2(Call):-predicate_property(Call,dynamic),!,is_asserted(Call).
 mpred_call_2(Call):-debugOnError(loop_check(Call)).
 

@@ -83,7 +83,7 @@ n3_parse(URL,Options) :-
   n3_parse_1(URL,[URL],Options).
   
 
-n3_parse_1(URL,Imported,Options) :- catchv(n3_parse_2(URL,Imported,Options),E,dmsg(E:n3_parse_1(URL,Imported,Options))).
+n3_parse_1(URL,Imported,Options) :- catch(n3_parse_2(URL,Imported,Options),E,dmsg(E:n3_parse_1(URL,Imported,Options))).
 :-multifile(owl_file_loaded/1).
 :-dynamic(owl_file_loaded/1).
 :-export(owl_file_loaded/1).
@@ -128,7 +128,7 @@ mpred_online:semweb_startup:- n3_parse('http://raw.github.com/knowrob/knowrob/ma
 mpred_online:semweb_startup:- n3_parse('http://raw.github.com/knowrob/knowrob/master/knowrob_omics/rdf/roboearth.rdf').
 
 % :- rdf_attach_library((.)).
-% :-  with_no_term_expansions(use_module(cliopatria(cliopatria))).
+% :-  with_no_mpred_expansions(use_module(cliopatria(cliopatria))).
 
 
 
@@ -371,7 +371,7 @@ any_to_rdf_0(DB,S,Sxx):-atom(S),atom_to_qname(S,Sx),Sx\=S,!,any_to_rdf(DB,Sx,Sxx
 any_to_rdf_0(DB,S,URL):-atom(S),rdf_graph_ns(DB,NS),rdf_global_mpred_object(NS:S,URL),!.
 
 any_to_rdf_1(_,literal(W),O):-nonvar(W),!,must(rdf_global_object(literal(W),O)),!,must(compound(O)).
-any_to_rdf_1(_,S,Sx):-catchv((rdf_global_mpred_object(S,Sx),not(compound(Sx))),_,fail),!.
+any_to_rdf_1(_,S,Sx):-catch((rdf_global_mpred_object(S,Sx),not(compound(Sx))),_,fail),!.
 % any_to_rdf_1(DB,literal(type(xsd:string,String)),G):- text_to_string(String,SString),rdf_global_object(literal(type('http://www.w3.org/2001/XMLSchema#string',SString)),O).
 % any_to_rdf_1(mud,literal(S),literal(S)):-!.
 
@@ -483,7 +483,7 @@ rdf_assert_hook(PSO):-flag(rdf_assert_hook_max,W,W+1),must(show_call(rdf_assert_
 rdf_assert_hook(PSO):-dmsg(once(skipped(rdf_assert_hook(PSO)))).
 
 
-rdf_assert_hook0(mudLabelTypeProps(A,Food,Props)):-nonvar(A),atom_string(A,S),!,must((rdf_assert_hook(typeProps(Food,[label(S)|Props])))),!.
+%rdf_assert_hook0(mudLabelTypeProps(A,Food,Props)):-nonvar(A),atom_string(A,S),!,must((rdf_assert_hook(typeProps(Food,[label(S)|Props])))),!.
 rdf_assert_hook0(typeProps(Food,Props)):-is_list(Props),!,forall(member(P,Props),must(rdf_assert_hook(typeProps(Food,P)))),!.
 rdf_assert_hook0(typeProps(Food,Prop)):-Prop=..[P|ARGS],must(rdf_assert_hook(type_default(Food,[P,isThis|ARGS]))),!.
 rdf_assert_hook0(genls(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:subClassOf,P),!.

@@ -171,7 +171,13 @@ suggestedType( _ ,_,Possibles,_ ,FinalType):- member(FinalType,[tPred,tCol,ttFor
 
 deduce_argN(Prop,N,_,ObjectTypes,Type):- suggestedType(Prop,N,ObjectTypes,Type,FinalType),FinalType\=Type,assert_argIsa(Prop,N,FinalType).
 deduce_argN(_ ,_ ,Obj,[],Type):- tCol(Type), assert_isa(Obj,Type),!.
-deduce_argN(Prop,N,_,[OType|_],_Type):-assert_subclass_on_argIsa(Prop,N,OType),!.
+% deduce_argN(Prop,N,_,[OType|_],_Type):-assert_subclass_on_argIsa(Prop,N,OType),!.
+
+
+assert_subclass_on_argIsa(Prop,N,argIsaFn(Prop,N)):-!.
+assert_subclass_on_argIsa(Prop,N,_OType):-argIsa(Prop,N,PropType),PropType=argIsaFn(Prop,N),!. % , assert_argIsa(Prop,N,OType).
+assert_subclass_on_argIsa(Prop,N,OType):-argIsa(Prop,N,PropType),assert_subclass_safe(OType,PropType),!.
+assert_subclass_on_argIsa(Prop,N,OType):-dmsg(assert_subclass_on_argIsa(Prop,N,OType)).
 
 maybe_cache_0(Prop,Obj,Value,_What):- checkNoArgViolation(Prop,Obj,Value), is_asserted(t(Prop,Obj,Value)),!.
 maybe_cache_0(Prop,Obj,Value,What):- padd(Obj,Prop,Value),
@@ -276,7 +282,7 @@ type_w_defaults_asserted(Type):- is_asserted(mudLabelTypeProps(_,Type,_)),nonvar
 each_default_inst_type_props(Inst,Type,Props):-dmsg((warn_each_default_inst_type_props(Inst,Type,Props))),fail.
 each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(instTypeProps(Inst,Type,TProps)),subst(TProps,isThis,Inst,Prop),flatten([Prop],Props).
 each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(typeProps(Type,TProps)),subst(TProps,isThis,Inst,Prop),flatten([Prop],Props).
-each_default_inst_type_props(_,Type,[typeHasGlyph(Lbl)|Props]):-call_no_cuts(mudLabelTypeProps(Lbl,Type,Props)).
+mudLabelTypeProps(Lbl,Type,Props)/ground(mudLabelTypeProps(Lbl,Type,Props))=> (typeHasGlyph(Type,Lbl) , typeProps(Type,Props)).
 
 % OLD FALLBACK SYSTEM:
 :-export((add_missing_instance_defaults/1)).

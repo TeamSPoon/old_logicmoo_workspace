@@ -59,12 +59,161 @@ current_hilog(Dbase_t):- thlocal:override_hilog(Dbase_t),!.
 current_hilog(t).
 
 
+% ===================================================================
+% EXPORTS
+% ===================================================================
+isNonVar(Denotation):-not(isSlot(Denotation)).
+
+% ===============================================================================================
+% ===============================================================================================
+
+:-if(\+ current_predicate(isSlot/1)).
+isSlot(Denotation):-((isVarProlog(Denotation);isVarObject(Denotation))),!.
+:-endif.
+
+isSlot(Denotation,Denotation):- isVarProlog(Denotation),!.
+isSlot(Denotation,PrologVar):- isVarObject(Denotation,PrologVar),!.
+
+% ===============================================================================================
+% ===============================================================================================
+
+isHiddenSlot(Term):-fail.
+
+% ===============================================================================================
+% ===============================================================================================
+
+isVarProlog(A):-((var(A);A='$VAR'(_))).
+
+% ===============================================================================================
+% ===============================================================================================
+
+isVarObject(Denotation):-((
+		  isObject(Denotation,BaseType),
+		  arg(1,Denotation,Value),!,isSlot(Value))).
+
+isVarObject(Denotation,Value):-((
+		  isObject(Denotation,BaseType),
+		  arg(1,Denotation,Value),!,isSlot(Value))).
+
+% ===============================================================================================
+% ===============================================================================================
+	
+isObject(Denotation,BaseType):-
+	(((atom(BaseType) ->
+		  (atom_concat('$',BaseType,F),functor(Denotation,F,2));
+		  (functor(Denotation,F,2),atom_concat('$',BaseType,F))
+		 ),!)).
+
+% ===============================================================================================
+% ===============================================================================================
+
+isQualifiableAsClass(Atom):-atom(Atom),!.
+isQualifiableAsClass('$Class'(Atom,_)):-atom(Atom),!.
+
+isQualifiableAs(Denotation,BaseType,Value):-
+		  isObject(Denotation,BaseType),
+		  arg(1,Denotation,Value).
+
+% ===============================================================================================
+% ===============================================================================================
+
+isQualifiedAs(Denotation,_,_):-not(compound(Denotation)),!,fail.
+isQualifiedAs(Denotation,BaseType,Value):-
+		  isQualifiedAs(Denotation,BaseType,Value,SubType).
+isQualifiedAs(Denotation,BaseType,Value,SubType):-
+		  isObject(Denotation,BaseType),
+		  arg(1,Denotation,Value),
+		  arg(2,Denotation,List),
+		  lastImproperMember(BaseType,SubType,List).
+
+% ===============================================================================================
+% ===============================================================================================
+
+lastImproperMember(Default,Default,List):-isVarProlog(List),!.
+lastImproperMember(Default,Default,[]):-!.
+lastImproperMember(Default,SubType,List):-proper_lst(List),last(SubType,List).
+lastImproperMember(Default,SubType,[SubType|End]):-isVarProlog(End),!.
+lastImproperMember(Default,SubType,[_|Rest]):-
+	lastImproperMember(Default,SubType,Rest),!.
+	
+% ===============================================================================================
+% ===============================================================================================
+
+isQualifiedAndKnownAs(Denotation,BaseType,Value):-
+		  isQualifiedAs(Denotation,BaseType,Value),!,
+		  not(isVarProlog(Value)).
+
+% ===============================================================================================
+% ===============================================================================================
+
+isQualifiedAndVarAs(Denotation,BaseType,Value):-
+		  isQualifiedAs(Denotation,BaseType,Value),!,
+		  isVarProlog(Value).
+
+% ===============================================================================================
+% ===============================================================================================
+
+isQualifiedAndVarAndUnifiable(Denotation,BaseType,NValue):-
+		  isQualifiedAs(Denotation,BaseType,Value),!,
+		  (isVarProlog(Value);
+		  (\+ \+ NValue=Value)),!.
+
+% ===============================================================================================
+% ===============================================================================================
+
+isBodyConnective(Funct):-atom_concat(_,'_',Funct),!.
+isBodyConnective(Funct):-atom_concat('t~',_,Funct),!.
+isBodyConnective(Funct):-atom_concat('f~',_,Funct),!.
+isBodyConnective(Funct):-member(Funct,[and,or,until,',',';',':-',unless,xor,holdsDuring]). % Other Propositional Wrhtml_appers
+
+isEntityref(Var,Var):-isSlot(Var),!.
+isEntityref(Term,A):-Term=..[F,A,B],!,atom_concat('$',_,F),!.
+
+
+% ===============================================================================================
+% ===============================================================================================
+
+isLiteralTerm(A):-isLiteralTerm_util(A),!.
+isLiteralTerm(not(A)):-isLiteralTerm_util(A),!.
+
+isLiteralTerm_util(A):-var(A),!.
+isLiteralTerm_util('$VAR'(_)):-!.
+isLiteralTerm_util(string(_)):-!.
+isLiteralTerm_util(A):-not(compound(A)),!.
+isLiteralTerm_util(A):-string(A).
+
+% ===============================================================================================
+% ===============================================================================================
+
+isEntitySlot(Term):-isSlot(Term),!.
+isEntitySlot(Term):-not(compound(Term)),!.
+isEntitySlot(Term):-isEntityFunction(Term,FnT,ArgsT),!.
+
+% ===============================================================================================
+% ===============================================================================================
+
+isEntityFunction(Term,FnT,ArgsT):-isSlot(Term),!,fail.
+isEntityFunction(Term,FnT,ArgsT):-atomic(Term),!,fail.
+isEntityFunction(Term,FnT,ArgsT):-Term=..[FnT|ArgsT],hlPredicateAttribute(FnT,'Function'),!.
+
+% ===============================================================================================
+% ===============================================================================================
+
+isNonCompound(Var):-isSlot(Var),!.
+isNonCompound(Var):-not(compound(Var)),!.
+isNonCompound(svar(_,_)):-!.
+isNonCompound(Var):-is_string(Var),!.
+isNonCompound(string(Var)):-!.
+
+% ===============================================================================================
+% ===============================================================================================
 
 logical_functor_ft(F):-is_logical_functor(F).
 logical_functor_ft((':-')).
 logical_functor_ft((',')).
 
-
+% ===============================================================================================
+% ===============================================================================================
 
 :- dynamic(non_assertable/1).
 non_assertable(WW,isVar(WW)):- var(WW),!.
@@ -72,11 +221,16 @@ non_assertable(_:WW,Why):- !,non_assertable(WW,Why).
 non_assertable(WW,notAssertable(Why)):- compound(WW),get_functor(WW,F),user:mpred_prop(F,notAssertable(Why)),!.
 % non_assertable(WW,Why):- db_prop_add
 
+% ===============================================================================================
+% ===============================================================================================
+
 is_logical_functor(And):-hotrace(is_logical_functor0(And)).
 is_logical_functor0(X):-atom(X),member(X,[',',';',xor,'\\+',neg]).
 is_logical_functor0(X):-call_if_defined(logical_functor_pttp(X)).
 is_logical_functor0(And):-member(And,[(,),(;),('<='),('=>'),('<=>'),(':-'),(and),nop]).
 
+% ===============================================================================================
+% ===============================================================================================
 
 
 correct_negations(Op,(~({X})),O):-nonvar(X),wrap_in_neg_functor(Op,X,O).
@@ -255,20 +409,6 @@ holds_plist_t(P,LIST):- apply(holds_t,[P|LIST]).
 
 
 
-% ================================================
-% Naming System
-% ================================================
-:-export(create_meta/4).
-% if SuggestedName was 'food666' it'd like the SuggestedClass to be 'food' and the stystem name will remain 'food666'
-% if SuggestedName was 'food' it'd like the SuggestedClass to be 'food' and the stystem name will become a gensym like 'food1'
-create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
-   must_det(split_name_type(SuggestedName,SystemName,NewSuggestedClass)),
-   ignore(SuggestedClass=NewSuggestedClass),   
-   assert_subclass_safe(SuggestedClass,BaseClass),
-   assert_subclass_safe(NewSuggestedClass,BaseClass),
-   assert_isa_safe(SystemName,BaseClass),
-   assert_isa_safe(SystemName,NewSuggestedClass),
-   assert_isa_safe(SystemName,SuggestedClass).
 
 % =======================================================
 % term utils

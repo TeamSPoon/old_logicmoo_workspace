@@ -22,6 +22,7 @@
                    coerce/3,
                    parseIsa//2,
                    phrase_parseForTypes_9//2,
+                   name_text_atomic/2,
                    parseForTypes//2)).
 
 */
@@ -146,7 +147,7 @@ objects_for_agent(Agent,Relation,MatchList):- findall(Obj, relates(Agent,Relatio
 objects_match(Text,Possibles,MatchList):- findall(Obj,(member(Obj,Possibles),match_object(Text,Obj)), MatchList).
 
 :-dynamic(object_string/2).
-object_string(O,String) :- bwc, object_string(_,O,1-4,String),!.
+object_string(O,String) :-  object_string(_,O,1-4,String),!.
 object_string_0_5(O,String):-object_string(_,O,0-5,String),!.
 
 :-export(object_string/4).
@@ -296,6 +297,7 @@ parse_agent_text_command_1(Agent,SVERB,ARGS,Agent,GOAL):-
    dmsg_parserm(parserm("chooseBestGoal"=GOAL)).
 
 
+user:verb_alias('i',actInventory).
 user:verb_alias('l',actLook).
 user:verb_alias('lo',actLook).
 user:verb_alias('s',actMove(vSouth)).
@@ -310,10 +312,9 @@ verb_alias_to_verb(IVERB,SVERB):- coerce(IVERB,vtVerb,SVERB), IVERB \= SVERB.
 subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R):- subst(TYPEARGS,isSelfAgent,Agent,S1),where_atloc(Agent,Here),subst(S1,vHere,Here,TYPEARGS_R).
 
 % verb_matches("go",VERB):-!,VERB=go.
-verb_matches(SVERB,VERB):-samef(VERB,SVERB).
-verb_matches(SVERB,VERB):-name_text_matches(SVERB,VERB).
+verb_matches(SVERB,VERB):- samef(VERB,SVERB)*->true;name_text_matches(SVERB,VERB).
 
-name_text_matches(SVERB,VERB):-name_text(SVERB,SSTR),name_text(VERB,STR),(same_ci(SSTR,STR)),!.
+name_text_matches(SVERB,VERB):-name_text(SVERB,SSTR),name_text(VERB,STR),same_ci(SSTR,STR),!.
 
 
 get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
@@ -388,31 +389,26 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 
 
-=>pfcControlled(name_text_known(ftTerm,ftString)).
+=>pfcControlled(name_text_now(ftTerm,ftString)).
 
-name_text(Name,Text):- nonvar(Text),!,name_text(Name,TextS),equals_icase(Text,TextS),!.
-name_text(Name,Name):- !,name_text_now(Name,Name).
-name_text(Name,Name):- string(Name),!.
-name_text(Name,Text):- name_text_known_for(Name),!,name_text_known(Name,Text).
+name_text(Name,Text):- nonvar(Text),!,name_text_now(Name,TextS),equals_icase(Text,TextS),!.
+name_text(Name,Text):- var(Name),!,mudKeyword(Name,Text).
+name_text(Name,Text):- name_text_now(Name,Text).
 
 
-name_text_known_for(Name)<=name_text_known(Name,_).
-
-name_text_known(Name,Text):- bwc, name_text_now(Name,Text).
-name_text_known(Name,_)=>name_text_known_for(Name).
-
-name_text_now_lc(I,O):-name_text_now(I,M),toLowercase(M,O).
+name_text_now_lc(I,O):-nonvar(I),name_text_now(I,M),!,toLowercase(M,O).
 
 :-pfc_add((vtActionTemplate(AT)/functor(AT,F,_)=>vtVerb(F))).
 :-pfc_add(vtVerb(F)/name_text_now_lc(F,Txt)=>mudKeyword(F,Txt)).
 :-pfc_add(tCol(F)/name_text_now_lc(F,Txt)=>mudKeyword(F,Txt)).
 
+:-dynamic(name_text_now/2).
 :-multifile(name_text_now/2).
 :-export(name_text_now/2).
+name_text_now(Name,Text):-atomic(Name),name_text_atomic(Name,Text).
 name_text_now(Name,Text):-nameStrings(Name,Text).
 name_text_now(Name,Text):-mudKeyword(Name,Text).
 % name_text_now(Name,Text):-argIsa(N,2,ftString),not_asserted((argIsa(N,1,ftString))),t(N,Name,Text).
-name_text_now(Name,Text):-atomic(Name),!,name_text_atomic(Name,Text).
 name_text_now(Name,Text):-is_list(Name),!,member(N,Name),name_text_now(N,Text).
 name_text_now(Name,Text):-compound(Name),!,Name=..[F,A|List],!,F\='[|]',name_text_now([F,A|List],Text).
 
@@ -469,7 +465,7 @@ phrase_parseForTypes_0(TYPEARGS,ARGS,GOODARGS,LeftOver):- optional_strings_opt,
       
 phrase_parseForTypes_0(TYPEARGS,ARGS,GOODARGS,LeftOver):-phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver).
 
-phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- catchv(phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver),_,fail),!.    
+phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- catch(phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver),_,fail),!.    
 phrase_parseForTypes_1(TYPEARGS,In,Out,[]):- length(TYPEARGS,L),between(1,4,L),length(In,L),must(Out=In),!,nop(fmt(fake_phrase_parseForTypes_l(foreach_isa(In,TYPEARGS)))),fail.
 phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- debugOnError(phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver)).    
 
@@ -598,13 +594,15 @@ coerce(A,B,C):-no_repeats(coerce0(A,B,C)),(show_call_failure(isa(C,B))->!;true).
 coerce0(String,Type,Inst):- var(Type),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 coerce0(String,isNot(Type),Inst):-!,not(coerce0(String,Type,Inst)).
 coerce0([String],Type,Inst):- nonvar(String),!,coerce0(String,Type,Inst).
-coerce0(String,Type,Inst):- atomic(String),Type==tCol,i_name('t',String,Inst),t(tCol,Inst),!.
+coerce0(String,Type,Inst):- atomic(String),Type==tCol,i_name('t',String,Inst),is_asserted(tCol(Inst)),!.
 coerce0(Text,Type,Inst):- (no_repeats_old(call_no_cuts(hook_coerce(Text,Type,Inst)))).
 coerce0(String,Type,Inst):- ttFormatType(Type),!,checkAnyType(change(assert,actParse),String,Type,AAA),Inst=AAA.
 %coerce0(String,Type,Longest) :- findall(Inst, (user:hook_coerce(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 coerce0(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
-coerce0(String,Type,Inst):- not(ttFormatType(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
 coerce0(String,Type,Inst):- not(string(String)),!,text_to_string(String,StringS),!,coerce0(StringS,Type,Inst).
+coerce0(String,isOneOf(Types),Inst):-!, member(Type,Types),coerce(String,Type,Inst),!.
+coerce0(String,C,Inst):- compound(C),!,loop_check(parseIsa(C,Inst,[String],[])).
+coerce0(String,Type,Inst):- not(ttFormatType(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
 % coerce0(A,Type,AA):- correctAnyType(change(_,_),A,Type,AA).
 
 instances_of_type(Inst,Type):- no_repeats_old(instances_of_type_0(Inst,Type)).

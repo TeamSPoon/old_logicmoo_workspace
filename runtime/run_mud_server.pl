@@ -8,6 +8,7 @@
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
 
+
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
 user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current_prolog_flag(unix,true).
@@ -15,16 +16,46 @@ user:file_search_path(cliopatria, '../externals/ClioPatria'). % :- current_prolo
 user:file_search_path(user, '../externals/ClioPatria/user/').
 user:file_search_path(swish, '../externals/swish'):- current_prolog_flag(unix,true).
 user:file_search_path(pack, '../packs/').
+
 :- attach_packs.
+:- initialization(attach_packs).
 user:file_search_path(prologmud, library(prologmud)).
 
-% [Required] Load the Logicmioo Base System
-:- user:ensure_loaded(library(logicmoo/logicmoo_base)).
+
+% :- multifile sandbox:safe_primitive/1.
+% :-asserta((sandbox:safe_primitive(Z):-wdmsg(Z))).
+
+%%% ON :- initialization( profiler(_,walltime) ).
+%%% ON :- initialization(user:use_module(library(swi/pce_profile))).
+
+:- user:ensure_loaded(library(ape/get_ape_results)).
+
+:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+% :- qcompile_libraries.
+
+:- if_file_exists(user:ensure_loaded(stanford_parser)).
+% :- get_pos_tagger(I),jpl_set(I,is_DEBUG,'@'(false)).
 
 % [Optionaly] Load an Eggdrop 
 :- if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl')).
-:- current_predicate(egg_go/0)->egg_go;true.
 
+% [Required] Load the Logicmioo Base System
+:- time(user:ensure_loaded(library(logicmoo/logicmoo_base))).
+
+% [Required] Load the Logicmioo WWW System
+:- time(ensure_loaded(library(logicmoo/mpred_online/logicmoo_i_www))).
+
+:- initialization((current_predicate(egg_go/0)->egg_go;true)).
+
+:- time(with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_engine))))).
+
+%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/engine/plarkc/dbase_i_cyc_api)))).
+
+%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/mpred_online/dbase_i_rdf_store)))).
+
+% % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
+
+% % :- set_prolog_flag(gc,true).
 
 % [Required] load the mud system
 :- user:ensure_loaded(prologmud(mud_startup)).
@@ -32,7 +63,7 @@ user:file_search_path(prologmud, library(prologmud)).
 % [Optional] the following worlds are in version control in examples
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
 % :- add_game_dir('../games/src_game_sims',prolog_repl).
-% :- add_game_dir('../games/src_game_startrek',prolog_repl).
+:- add_game_dir('../games/src_game_startrek',prolog_repl).
 % :- add_game_dir('../games/src_game_nani',prolog_repl).       
 
 
@@ -75,12 +106,12 @@ pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableO
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
 
 
-mpred_argtypes(pathConnects(tRegion,tRegion)).
+mpred_argtypes(bordersOn(tRegion,tRegion)).
 mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 
 :-onSpawn(localityOfObject(tExplorer,tLivingRoom)).
 :-onSpawn(localityOfObject(iCommanderdata66,tOfficeRoom)).
-:-onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
+:-onSpawn(bordersOn(tLivingRoom,tOfficeRoom)).
 
 
 
@@ -100,10 +131,11 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 
 :- enqueue_agent_action("rez crackers").
 
+/*
 
 sanity_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
 
-% :-sanity_testp1.
+:-sanity_testp1.
 
 % [Optionaly] Run a battery of tests
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
@@ -112,13 +144,16 @@ sanity_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
 sanity_test0a:- enqueue_agent_action("hide").
 
 sanity_test0b:- enqueue_agent_action(actWho).
+:-sanity_test0b.
 
-sanity_test1:- enqueue_agent_action("rez crackers"),
+sanity_test1:-   
+   enqueue_agent_action("rez crackers"),
    enqueue_agent_action("drop crackers"),
    enqueue_agent_action('look'),
    enqueue_agent_action("take crackers"),
    enqueue_agent_action("eat crackers"),
    enqueue_agent_action('look').
+:-sanity_test1.
 
 sanity_test2:- enqueue_agent_action("rez pants"),
    enqueue_agent_action("wear pants"),
@@ -126,10 +161,17 @@ sanity_test2:- enqueue_agent_action("rez pants"),
    enqueue_agent_action("take shirt"),
    enqueue_agent_action("inventory").
 
+:-sanity_test2.
+
 % :- enqueue_agent_action(prolog).
 
 % [Optionaly] Tell the NPCs to do something every 60 seconds (instead of 90 seconds)
 % :- register_timer_thread(npc_ticker,60,npc_tick).
+
+
+% :- pce_show_profile.
+
+*/
 
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- if_startup_script(at_start(login_and_run)).

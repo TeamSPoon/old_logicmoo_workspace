@@ -46,17 +46,17 @@ strip_f_module(P,FA):- hotrace(string(P);atomic(P)), atom_string(F,P),!,F=FA.
 strip_f_module(P,P).
 
 % use ccatch/3 to replace catch/3 works around SWI specific issues arround using $abort/0 and block/3
-% (catchv/3 allows you to have these exceptions bubble up past your catch block handlers)
-:- meta_predicate((catchv(0, ?, 0))).
+% (catch/3 allows you to have these exceptions bubble up past your catch block handlers)
+:- meta_predicate((catchvv(0, ?, 0))).
 :- meta_predicate((ccatch(0, ?, 0))).
-:- export((ccatch/3,catchv/3)).
+:- export((ccatch/3,catchvv/3)).
 bubbled_ex(block(_,_)).
 bubbled_ex('$aborted').
 bubbled_ex_check(E):- (\+ bubbled_ex(E)),!.
 bubbled_ex_check(E):-throw(E).
 ccatch(Goal,E,Recovery):- nonvar(E) -> catch(Goal,E,Recovery); % normal mode (the user knows what they want)
                          catch(Goal,E,(bubbled_ex_check(E),Recovery)). % prevents promiscous mode
-catchv(Goal,E,Recovery):- catch(Goal,E,(bubbled_ex_check(E),Recovery)). % prevents promiscous mode
+catchvv(Goal,E,Recovery):- catch(Goal,E,(bubbled_ex_check(E),Recovery)). % prevents promiscous mode
 
 
 :- export(functor_catch/3).

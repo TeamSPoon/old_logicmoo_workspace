@@ -9,21 +9,19 @@
 
 :- user:use_module(logicmoo(util/logicmoo_util_dcg)).
 
-:-discontiguous((translation_spo/6,parserTest/2,parserTest/3,translation//1)).
-:-dynamic((translation_spo/6,parserTest/2,parserTest/3,translation//1)).
+:-discontiguous((translation_spo/6,parserTest/2,parserTest/3,translation_w//1)).
+:-dynamic((translation_spo/6,parserTest/2,parserTest/3,translation_w//1)).
 :-thread_local(loosePass/0).
 :-thread_local(debugPass/0).
 :-dynamic(parserVars/4).
 
 
-
 glue_words(W):- member(W,[is,a,the,in,carries,'An','A','The',was,of,type]).
 
-toCamelAtom(List,O):-notrace((not((member(IS,List),glue_words(IS))),toCamelAtom0(List,O))),!.
+toCamelAtom(List,O):-hotrace((not((member(IS,List),glue_words(IS))),toCamelAtom00(List,O))),!.
 
-toCamelAtom0([A],O):-toPropercase(A,O),!.
-toCamelAtom0([A|List],O):-toPropercase(A,AO),toCamelAtom(List,LO),atom_concat(AO,LO,O).
-
+% toCamelAtom00(I,O):-toCamelAtom0(I,O).
+toCamelAtom00(I,O):-toCamelcase(I,O).
 
 
 
@@ -65,7 +63,7 @@ toCol_0(Txt,O,TCOL):-member(Pfx-Sfx-ISACISA,
           'v'-''-'vtValue',
           'i'-'7'-'tSpatialThing',
           'i'-'7'-'ttSpatialType',
-          't'-'Able'-'ttAbilityType',
+          't'-'Able'-'ttTypeByAction',
           'tt'-''-'ttTypeType',
           ''-''-_
            ]),atom_concat(Pfx,Txt,I),atom_concat(I,Sfx,O),isa(O,TCOL),!.
@@ -75,6 +73,8 @@ is_a --> is_was.
 
 is_was --> [is].
 is_was --> [was].
+is_was --> [be].
+is_was --> [are].
 
 is_in --> is_was, [in].
 is_in --> is_was, [inside,of].
@@ -83,9 +83,10 @@ is_in --> is_was, [carried,by].
 is_type_of --> is_a, [type,of].
 is_type_of --> is_a, [type].
 
-det(def) --> [the].
-det(def) --> ['The'].
-det(def) --> [some].
+det(exists) --> [the].
+det(exists) --> ['The'].
+det(exists) --> [some].
+det(all) --> [all].
 det(indef) --> [a].
 det(indef) --> ['A'].
 det(indef) --> [an].
@@ -145,7 +146,9 @@ tCol('tRoom').
 
 % :-ignore(show_call(phrase(collection(I,T,More),[red,room]))).
 
+%TODO "All couches are things."
 
+% assert_text(iWorld7,"couches are hard sometimes").
 
 parserTest(A,B):-parserTest(A,B,_).
 
@@ -189,29 +192,32 @@ tCol('tTvGuide').
 
 :-assertz_if_new(parserTest(iWorld7,"A tv guide is a type of book.")).
 
-toplevel_type(CtxISA):-member(CtxISA,[tWorld,tRegion,tAgent,tItem,tObj,tCol,ftTerm]).
+toplevel_type(CtxISA):-member(CtxISA,[tWorld,tRegion,tAgent,tItem,tObj,tSpec,tCol,ftTerm]).
+% toplevel_type(CtxISA):-tSpec(CtxISA).
 
-assert_text(CtxISA,String):- toplevel_type(CtxISA),
-   must((isa(Ctx,CtxISA))),!,
-   assert_text(Ctx,String).
 
-assert_text(Ctx,String):-  
- must(show_call(once(((toplevel_type(CtxISA),
- isa(Ctx,CtxISA)))))),
- assert_text(Ctx,CtxISA,String).
+get_ctx_isa(CtxISA,Ctx,CtxISA):- toplevel_type(CtxISA),must((isa(Ctx,CtxISA))),!.
+get_ctx_isa(Ctx,Ctx,CtxISA):- must(show_call(once(((toplevel_type(CtxISA),isa(Ctx,CtxISA)))))),!.
+
+assert_text(CtxIn,String):- get_ctx_isa(CtxIn,Ctx,CtxISA),!,assert_text(Ctx,CtxISA,String).
 
 assert_text(Ctx,CtxISA,String):-  
                             % context changed   and not the tWorld?                                                  % v this is for when there was no prior context
   (parserVars(context,Ctx0,_) -> (((Ctx0 \==Ctx),CtxISA\==tWorld) -> (asserta_parserVars(isThis,Ctx,CtxISA)); true) ; (asserta_parserVars(isThis,Ctx,CtxISA))), 
     with_assertions(parserVars(context,Ctx,CtxISA),assert_text_now(Ctx,CtxISA,String)).
 
+assert_text_now(Ctx,CtxISA,String):-  dmsg(assert_text_now(Ctx,CtxISA,String)),!.
 assert_text_now(Ctx,CtxISA,String):-    
   % parse the string to attributed text
- to_word_list(String,WL),!,to_icase_strs(WL,IC),!, 
-  
-   must((phrase(translation_dbg_on_fail(Prolog),IC),
+ to_word_list(String,WL),!,to_icase_strs(WL,IC),!,   
+   ((phrase(translation_dbg_on_fail(Ctx,CtxISA,Prolog),IC),
+   assertz_if_new(asserted_text(Ctx,String,PrologO)),
      fully_expand(Prolog,PrologO),
      show_call(onSpawn(PrologO)))).
+
+:-dynamic(asserted_text/3).
+
+(describedTyped(ISA),isa(Ctx,ISA),mudDescription(Ctx,String)/ ( \+asserted_text(Ctx,String,_), \+assert_text(Ctx,String))) => mudDescriptionHarder(Ctx,String).
 
 to_icase_strs(WL,IC):-maplist(to_icase_str,WL,IC).
 
@@ -219,25 +225,31 @@ to_icase_strs(WL,IC):-maplist(to_icase_str,WL,IC).
 to_icase_str(SL,IC):-string_to_atom(SL,SA),string_to_atom(SS,SA),when(nonvar(IC);?=(IC,IC),(IC=SA;IC=SS)).
 
 
-modality(pfc_default, [usually]).
-modality(neg , [cannot]).
-modality(can,[can]).
-modality(possibly,[either]).
-modality(neg,[not]).
-modality(neg,[never]).
+modality(pfc_default, [usually],[]).
+modality(neg , [cannot],[can]).
+modality(pfc_default,[sometimes],[]).
+modality(can,[can],[be]).
+modality(possibly,[either],[]).
+modality(neg,[not],[]).
+modality(neg,[never],[]).
 
 
 % somethingCanBe(tFountainDrink,[vSmall,vMedium,vLarge]).
 
-translation(t(M,Prolog),WS,WE):- once((append(LeftSide,RightSide,WS), modality(M,List),append(Left,List,LeftSide),
+translation_for(Room,'tRegion',(isa(Room,'tCorridor'),isa(Room,'tWellLit')),WS,[]):-concat_atom(WS,' ',O),tag_pos(O,IO),IO = 
+ ('S'('NP'('PRP'('You')),'VP'('VBP'(find),'NP'('PRP'(yourself)),'PP'('IN'(in),'NP'('NP'('DT'(the),'NN'(middle)),'PP'('IN'(of),
+  'NP'('NP'('DT'(a),'ADJP'('RB'(well),'JJ'(lit)),'NN'(corridor)),'PP'('IN'(on),'NP'('DT'(the),'NN'('Enterprise')))))))))).
+
+translation_for(Ctx,CtxISA,t(M,Prolog),WS,WE):- once((append(LeftSide,RightSide,WS), modality(M,List,Replace),append(LeftL,List,LeftSide),
+  append(LeftL,List,LeftSide),append(LeftL,Replace,Left),
    append(Left,RightSide,NewWS))),
-   translation(Prolog,NewWS,WE),!.
+   translation_w(Prolog,NewWS,WE),!.
+translation_for(Ctx,CtxISA,Prolog) --> translation_w(Prolog).
+translation_for(Ctx,CtxISA,Prolog,WS,WE):-with_assertions(loosePass,translation_w(Prolog,WS,WE)).
 
-translation(Prolog) --> translation_spo(More2,P,S,O),!,{conjoin(More2,t(P,S,O),Prolog)}.
-translation(Prolog,WS,WE):-with_assertions(loosePass,translation_spo(More2,P,S,O,WS,WE)),conjoin(More2,t(P,S,O),Prolog),!.
 
-translation_dbg_on_fail(Prolog)-->translation(Prolog),!.
-translation_dbg_on_fail(Prolog,WS,WE):-with_assertions(debugPass,translation(Prolog,WS,WE)).
+translation_dbg_on_fail(Ctx,CtxISA,Prolog)-->translation_for(Ctx,CtxISA,Prolog),!.
+translation_dbg_on_fail(Ctx,CtxISA,Prolog,WS,WE):-with_assertions(debugPass,translation_for(Ctx,CtxISA,Prolog,WS,WE)).
 
 %:-assertz_if_new(parserTest(iWorld7,"Buffy the Labrador retriever is lounging here, shedding hair all over the place.")).
 %:-assertz_if_new(parserTest(iWorld7,"You can also see a sugar candy doll house here.")).
@@ -253,13 +265,17 @@ user:agent_call_command(Agent,actAddText(What,StringM)):- ground(What:StringM),
        must(assert_text(What,StringM)))).
 
 
+translation_w(t(M,Prolog),WS,WE):- once((append(LeftSide,RightSide,WS), modality(M,List,Replace),append(LeftL,List,LeftSide),append(LeftL,Replace,Left),
+   append(Left,RightSide,NewWS))),translation_w(Prolog,NewWS,WE),!.
+translation_w(Prolog) --> translation_spo(More2,P,S,O),!,{conjoin(More2,t(P,S,O),Prolog)}.
+
 :-assertz_if_new(parserTest(iWorld7,"An emitter has a truth state called action keeping silent.",
    relationAllExists(mudActionKeepingSilient,tEmitter,ftBool))).
-translation(relationAllExists(mudActionKeepingSilient,tEmitter,ftBoolean))
+translation_w(relationAllExists(mudActionKeepingSilient,tEmitter,ftBoolean))
   --> ['An',emitter,has,a,truth,state,called,action,keeping,silent].
 
 :-assertz_if_new(parserTest(iWorld7,"An object has a text called printed name.")).
-translation(relationAllExists(P,C,DT)) 
+translation_w(relationAllExists(P,C,DT))  
   --> collection(C),[has,a],datatype(DT),[called],predicate_named(P).
 
 collection(C)-->subject(C,tCol,true).
@@ -277,17 +293,17 @@ assumed_isa(I,C):-loosePass,assert_isa(I,C),!.
 
 
 :-assertz_if_new(parserTest(iWorld7,"An object can be proper-named or improper-named.",partitionedInto(tObj,tProperNamed,tImproperNamed))).
-translation(partitionedInto(C1,C2,C3)) --> collection(C1),[be],collection(C2),[or],collection(C3).
+translation_w(partitionedInto(C1,C2,C3)) --> collection(C1),[be],collection(C2),[or],collection(C3).
 
 
 :-assertz_if_new(parserTest(iWorld7,"An object is usually improper-named.",relationMostInstance(isa,tObj,tImproperNamed))).
-translation(relationMostInstance(isa,C1,C2)) --> collection(C1),[is,usually],collection(C2).  
+translation_w(relationMostInstance(isa,C1,C2)) --> collection(C1),[is,usually],collection(C2).  
 
 :-assertz_if_new(parserTest(iWorld7,"A thing can be scenery.", relationSomeInstance(isa,tItem,tScenery))).
-translation(relationSomeInstance(isa,C1,C2)) --> collection(C1),[be],collection(C2).  
+translation_w(relationSomeInstance(isa,C1,C2)) --> collection(C1),[be],collection(C2).  
 
 :-assertz_if_new(parserTest(iWorld7,"The outside is a direction.", t(isa,vOutside,vtDirection))).
-translation(isa(C1,C2)) --> det(def),col(v,C1),[is,a],col(vt,C2).  
+translation_w(isa(C1,C2)) --> det(def),col(v,C1),[is,a],col(vt,C2).  
 
 col(Pfx,C)-->subject(C,_,true),{atom_concat(Pfx,_,C)}.
 col(Pfx,C)-->{loosePass},subject(C,_,true).
@@ -307,7 +323,7 @@ tGreen(X) <=> mudColor(X,vGreen).
 
 A thing can be lit or unlit. A thing is usually unlit.
 
-Y [can] be C1 or C2.  
+Y can be C1 or C2.  
 Y is [usually] C2.
 
 
