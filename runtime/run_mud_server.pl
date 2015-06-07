@@ -1,4 +1,4 @@
-#!/usr/local/bin/swipl -L8G -G8G -T8G -f
+#! swipl -L8G -G8G -T8G -f
 /** <module> MUD server startup script in SWI-Prolog
 
 */
@@ -12,9 +12,9 @@
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
 user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current_prolog_flag(unix,true).
-user:file_search_path(cliopatria, '../externals/ClioPatria'). % :- current_prolog_flag(unix,true).
-user:file_search_path(user, '../externals/ClioPatria/user/').
-user:file_search_path(swish, '../externals/swish'):- current_prolog_flag(unix,true).
+user:file_search_path(cliopatria, '../packs/ClioPatria'). % :- current_prolog_flag(unix,true).
+user:file_search_path(user, '../packs/ClioPatria/user/').
+user:file_search_path(swish, '../packs/swish'):- current_prolog_flag(unix,true).
 user:file_search_path(pack, '../packs/').
 
 :- attach_packs.
@@ -33,11 +33,15 @@ user:file_search_path(prologmud, library(prologmud)).
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 % :- qcompile_libraries.
 
+% [Optionaly] Load an Eggdrop 
+:- if_file_exists(ensure_loaded(library(eggdrop))).
+:- initialization((current_predicate(egg_go/0)->egg_go;true),now).
+
+
+
 :- if_file_exists(user:ensure_loaded(stanford_parser)).
 % :- get_pos_tagger(I),jpl_set(I,is_DEBUG,'@'(false)).
 
-% [Optionaly] Load an Eggdrop 
-:- if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl')).
 
 % [Required] Load the Logicmioo Base System
 :- time(user:ensure_loaded(library(logicmoo/logicmoo_base))).
@@ -45,11 +49,10 @@ user:file_search_path(prologmud, library(prologmud)).
 % [Required] Load the Logicmioo WWW System
 :- time(ensure_loaded(library(logicmoo/mpred_online/logicmoo_i_www))).
 
-:- initialization((current_predicate(egg_go/0)->egg_go;true)).
 
 :- time(with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_engine))))).
 
-%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/engine/plarkc/dbase_i_cyc_api)))).
+%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(plarkc/dbase_i_cyc_api)))).
 
 %:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/mpred_online/dbase_i_rdf_store)))).
 

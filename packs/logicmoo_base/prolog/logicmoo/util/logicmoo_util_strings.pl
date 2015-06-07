@@ -715,7 +715,7 @@ to_word_list_0(E,[]):-empty_str(E),!.
 to_word_list_0([A|C],[A|C]):- (compound(A);catch((text_to_string([A|C],_),fail),_,true)),!.
 to_word_list_0(A,WList):-any_to_string(A,String),!,text_to_string(String,Atom),to_word_list_2(Atom,WList),!.
 
-:- user:ensure_loaded(library(logicmoo/engine/plarkc/dbase_i_cyc_api)).
+:- user:ensure_loaded(library(plarkc/dbase_i_cyc_api)).
 
 read_stream_to_arglist(Input,[]):- at_end_of_stream(Input),!.
 read_stream_to_arglist(Input,[]):- catch((once(wait_for_input([Input], Inputs, 0.01)),Inputs=[]),_,fail),!.

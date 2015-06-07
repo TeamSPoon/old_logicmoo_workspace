@@ -2134,7 +2134,11 @@ prolog_must_not(_Call):-!.
 dynamic_if_missing(F/A):-functor_safe(X,F,A),predicate_property(X,_),!.
 dynamic_if_missing(F/A):-dynamic([F/A]).
 
-
+get_pi(PI,PI):-var(PI),!.
+get_pi(F/A,PI):-!,functor(PI,F,A).
+get_pi(PI,PI):- atomic(PI),!.
+get_pi(PI,PI):- compound(PI),!.
+get_pi(Mask,PI):-get_functor(Mask,F,A),functor(PI,F,A),!.
 
 %%%retractall(E):- retractall(E),functor_safe(E,File,A),dynamic(File/A),!.
 

@@ -1936,11 +1936,7 @@ pp_supports :-
   pp_items(Type,L),
   draw_line.
 
-get_pi(PI,PI):-var(PI),!.
-get_pi(F/A,PI):-!,functor(PI,F,A).
-get_pi(PI,PI):- atomic(PI),!.
-get_pi(PI,PI):- compound(PI),!.
-get_pi(Mask,PI):-get_functor(Mask,F,A),functor(PI,F,A),!.
+
 
 get_fa(PI,F,A):-var(PI),!.
 get_fa(F/A,F,A):- !.

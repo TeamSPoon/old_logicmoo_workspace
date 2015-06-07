@@ -7,10 +7,48 @@ PrologMUD.vpj=20150603194402848
 [TreeExpansion2]
 - PrologMUD.vpj
   - externals
+    + hMUD
+      + bridge
+      + flashpolicyd_v0.6
+        + Perl_xinetd
+        + Python_init
+        + Python_xinetd
+        + Standalone
+      + fmud
+        + images
+      + swfobject
+        + src
+  + games
+    + circlemuddata
+    + src_game_nani
+      - web
+        + css
+        + icons
+        + js
+        - prolog
+        + snd
+    - src_game_sims
+      + web
+        + css
+        + icons
+        + js
+        + prolog
+        + snd
+    - src_game_startrek
+      - holodeck
+      - mobs
+      + web
+        + css
+        + icons
+        + js
+        + prolog
+        + snd
+    - src_game_wumpus
+  - packs
     + ClioPatria
       + api
-      - applications
-        - help
+      + applications
+        + help
       + client
         + Java
       + components
@@ -29,7 +67,7 @@ PrologMUD.vpj=20150603194402848
         + base
         + cpack
         + tool
-      - rdfql
+      + rdfql
       + skin
       + test
         + Tests
@@ -148,19 +186,46 @@ PrologMUD.vpj=20150603194402848
                   + img
                     + folders
       + Windows
-    + hMUD
-      + bridge
-      + flashpolicyd_v0.6
-        + Perl_xinetd
-        + Python_init
-        + Python_xinetd
-        + Standalone
-      + fmud
-        + images
-      + swfobject
-        + src
-    + MUD_DeepParsing
+    + games
+      + circlemuddata
+      - src_game_nani
+        + web
+          + css
+          + icons
+          + js
+          + prolog
+          + snd
+      - src_game_sims
+        + web
+          + css
+          + icons
+          + js
+          + prolog
+          + snd
+      - src_game_startrek
+        + holodeck
+        + mobs
+        + web
+          + css
+          + icons
+          + js
+          + prolog
+          + snd
+      - src_game_wumpus
+    + logicmoo_base
+      + prolog
+        - logicmoo
+          + mpred
+          - util
+      + t
+    + logicmoo_online
       - prolog
+        - logicmoo
+          - mpred_online
+          + swish_lib
+            - render
+    + MUD_DeepParsing
+      + prolog
         + candc\.svn
           + pristine
             + 00
@@ -512,6 +577,258 @@ PrologMUD.vpj=20150603194402848
           + tools
           + utils
             + owlswrl
+        + CALL-SLT
+          + Ara
+            + corpora
+            + doc
+            + GeneratedFiles
+            + logfiles
+            + Prolog
+            + recorded_wavfiles
+            + Regulus
+            + scripts
+          + AraInt
+            + scripts
+            + TestResults
+          + Core
+            + Regulus
+          + doc
+            + LiteDoc
+              + img
+            + LiteDocSphinx
+              + build
+                + doctrees
+                + html
+                  + _sources
+                  + _static
+                    + css
+                    + fonts
+                    + js
+              + source
+                + _static
+            + NewCALLSLTWebsite
+              + img
+              + source
+            + Papers
+            + tmp
+          + Eng
+            + corpora
+              + vocab_spreadsheets_nov_2009
+            + doc
+            + GeneratedFiles
+            + GeneratedFilesCompilation
+            + GeneratedFilesStaging
+            + logfiles
+            + Multimedia
+            + Prolog
+            + recorded_wavfiles
+              + permanent
+            + Regulus
+            + scripts
+          + EngEng
+            + scripts
+            + TestResults
+          + EngInt
+            + scripts
+            + TestResults
+          + Eval
+            + Crowdsourcing
+              + Judging
+                + HTML
+                + Prolog
+            + Prolog
+            + wavfiles_for_judging
+          + Fre
+            + corpora
+            + doc
+            + GeneratedFiles
+            + GeneratedFilesCompilation
+            + GeneratedFilesStaging
+            + Prolog
+            + recorded_wavfiles
+              + permanent
+            + Regulus
+            + scripts
+          + FreFre
+            + scripts
+            + TestResults
+          + FreInt
+            + scripts
+            + TestResults
+          + Ger
+            + corpora
+            + doc
+              + images
+                + help
+            + GeneratedFiles
+            + logfiles
+            + Prolog
+            + recorded_wavfiles
+              + permanent
+              + permanent_normalised
+            + Regulus
+            + scripts
+          + GerGer
+            + scripts
+            + TestResults
+          + GerInt
+            + scripts
+            + TestResults
+          + Gre
+            + corpora
+            + doc
+            + GeneratedFiles
+            + Prolog
+            + recorded_wavfiles
+              + permanent
+            + Regulus
+            + scripts
+          + GreInt
+            + scripts
+            + TestResults
+          + GUI
+            + Flash
+              + 2.1
+                + badges
+                + de
+                + en
+                + unige
+                  + holder
+                  + issco
+                  + spectrum
+                + zh-CN
+            + GeneratedFiles
+            + Images
+            + Prolog
+            + PrologBeansJava
+              + PrologBeansCALLSLT
+                + src
+                  + prologBeansCALLSLT
+            + recorded_wavfiles
+            + scripts
+            + session_logfiles
+          + Int
+            + corpora
+            + GeneratedFiles
+            + Prolog
+            + Regulus
+            + scripts
+          + IntInt
+            + scripts
+          + Jap
+            + corpora
+            + doc
+            + GeneratedFiles
+            + logfiles
+            + Prolog
+            + recorded_wavfiles
+              + permanent
+            + Regulus
+            + scripts
+          + JapInt
+            + scripts
+            + TestResults
+          + JapJap
+            + scripts
+            + TestResults
+          + javaGUI
+            + lib
+            + logs
+            + src
+              + gui
+                + transact
+              + img
+              + socket
+            + test
+              + gui
+                + transact
+              + inputFiles
+          + LiteContent
+            + bologna
+              + rendezvous
+                + doc
+                + grammars
+              + se_presenter
+                + doc
+                + grammars
+            + english_course
+              + english_course
+                + grammars
+                + multimedia
+                + scripts
+            + hello
+              + hello_course
+                + grammars
+                + multimedia
+                + scripts
+              + hello_world_course
+                + grammars
+            + pronunciation
+              + pronunciation
+                + doc
+                + grammars
+            + restaurant
+              + restaurant
+                + doc
+                + grammars
+                + multimedia
+                  + helpfiles
+            + toy
+              + toy_english_course
+                + grammars
+                + scripts
+            + visual
+              + arithmetic_french
+                + grammars
+              + pokemon
+                + grammars
+                + multimedia
+              + pokemon_french
+                + grammars
+                + multimedia
+              + sounds
+                + grammars
+                + multimedia
+              + visual1
+                + grammars
+                + multimedia
+              + visual2
+                + grammars
+                + multimedia
+              + visual3
+                + grammars
+                + multimedia
+          + LiteMetadata
+          + Que
+            + corpora
+            + doc
+            + GeneratedFiles
+            + logfiles
+            + Prolog
+            + recorded_wavfiles
+            + scripts
+          + QueContent
+            + evaluation
+              + questionnaires
+            + red_cross
+              + questionnaires
+            + warmup
+              + questionnaires
+          + Swe
+            + corpora
+            + doc
+            + GeneratedFiles
+            + logfiles
+            + Prolog
+            + recorded_wavfiles
+              + permanent
+            + Regulus
+            + scripts
+          + SweInt
+            + scripts
+            + TestResults
+          + tmp
+            + SlateLearning
         + candc
           + gsoap2-code\.svn
             + pristine
@@ -1359,10 +1676,10 @@ PrologMUD.vpj=20150603194402848
               + static
                 + css
                 + js
-          - working
+          + working
         + chart89
         + chat80
-        + curt
+        + CURT
           + bb0
           + bb1
           + bb2
@@ -1375,11 +1692,11 @@ PrologMUD.vpj=20150603194402848
                   + mapping
                   + prolog
                   + utils
-          - config
+          + config
           + docs
           + lib
-          - prolog
-            - grammar
+          + prolog
+            + grammar
           + prolog-impls
             + plcafe
               + classes
@@ -1426,7 +1743,7 @@ PrologMUD.vpj=20150603194402848
                   + utils
         + pldata
         + ProNTo
-          - Brooks
+          + Brooks
           + dparser
           + et
           + ProNTo - Prolog Natural Language Tools_files
@@ -1890,7 +2207,7 @@ PrologMUD.vpj=20150603194402848
           + RegulusTechReports
           + scripts
             + CVS
-        - SIRIDUS
+        + SIRIDUS
           + dbaseAgent
             + docs
               + resources
@@ -1902,9 +2219,9 @@ PrologMUD.vpj=20150603194402848
             + src
           + TALK_enhanced_grammar_lib
             + Agenda
-            - Common
+            + Common
             + MP3
-            - OWL
+            + OWL
             + This-Was-GrammarLib
               + Agenda
               + Common
@@ -1914,8 +2231,8 @@ PrologMUD.vpj=20150603194402848
             + Tram
           + TALK_unimodal_grammar_lib
             + delux
-              - Grammars
-              - Resources
+              + Grammars
+              + Resources
             + djgodis
               + Grammars
               + Resources
@@ -2008,23 +2325,23 @@ PrologMUD.vpj=20150603194402848
             + jars
             + tkit_inout_nuance
               + logs
-            - tkit_inout_text
-            - trindikit4
-              - core
+            + tkit_inout_text
+            + trindikit4
+              + core
                 + CVS
-                - prolog
+                + prolog
                   + CVS
-                  - Datatypes
+                  + Datatypes
                     + CVS
-                  - DefaultPrinters
+                  + DefaultPrinters
                     + CVS
                     + latex
                       + CVS
-                    - text
+                    + text
                       + CVS
                     + xml
                       + CVS
-                  - Modules
+                  + Modules
                     + CVS
               + CVS
               + examples
@@ -2043,24 +2360,24 @@ PrologMUD.vpj=20150603194402848
                     + CVS
                   + TISdefs
                     + CVS
-          - UGOT-D31
-            - godis
+          + UGOT-D31
+            + godis
               + doc
                 + LaTeX
-              - general
-              - godis-all
+              + general
+              + godis-all
                 + rule_libs
               + godis-aod
-              - godis-basic
-              - godis-grounding
+              + godis-basic
+              + godis-grounding
               + godis-iod
-            - godis-apps
+            + godis-apps
               + cellphone
               + domain-agendatalk
                 + Resources
                 + Speech
-              - domain-icecream
-                - Resources
+              + domain-icecream
+                + Resources
               + domain-legoturtle
                 + asrg_legoturtle_english
                 + asrg_vcr_english
@@ -2092,7 +2409,7 @@ PrologMUD.vpj=20150603194402848
                 + Speech
               + domain-ta
                 + Resources
-              - domain-tel
+              + domain-tel
               + domain-telvcr
               + domain-tram
                 + Resources
@@ -2336,10 +2653,10 @@ PrologMUD.vpj=20150603194402848
             + patterns
             + sutime
             + tokensregex
-    + MUD_ircbot
+    - MUD_ircbot
       - eggdrop
       - prolog
-    + MUD_PDDL
+    - MUD_PDDL
       + btepisode
       - prolog
         + aleph
@@ -2349,6 +2666,120 @@ PrologMUD.vpj=20150603194402848
         + cltools
           + bin
           + t
+        - dra
+          + coind
+            + examples
+            - original
+          + doc
+          + general
+          + internal
+            + Bench
+              + aspclp
+              + clpfd
+              + prolog
+              - tabling
+            + doc
+              + dra
+            - tabling
+              + archive
+            + vanilla
+          + tabling
+            + examples
+              + LTL
+              + XSB
+          - tabling3
+            + Bench
+              + aspclp
+              + clpfd
+              + prolog
+              + tabling
+            + examples
+              + LTL
+              + XSB
+        + dra - Copy
+          + coind
+            + examples
+            + original
+          + doc
+          + general
+          + internal
+            + Bench
+              + aspclp
+              + clpfd
+              + prolog
+              + tabling
+            + doc
+              + dra
+            + tabling
+              + archive
+            + vanilla
+          + tabling
+            + examples
+              + LTL
+              + XSB
+        + dra - Copy (2)
+          + coind
+            + examples
+            + original
+          + doc
+          + general
+          + internal
+            + Bench
+              + aspclp
+              + clpfd
+              + prolog
+              + tabling
+            + doc
+              + dra
+            + tabling
+              + archive
+            + vanilla
+          + tabling
+            + examples
+              + LTL
+              + XSB
+        + dra - Copy (3)
+          + coind
+            + examples
+            + original
+          + doc
+          + general
+          + internal
+            + Bench
+              + aspclp
+              + clpfd
+              + prolog
+              + tabling
+            + doc
+              + dra
+            + tabling
+              + archive
+            + vanilla
+          + tabling
+            + examples
+              + LTL
+              + XSB
+        + DRAD
+          + coind
+            + examples
+            + original
+          + doc
+          + general
+          + internal
+            + Bench
+              + aspclp
+              + clpfd
+              + prolog
+              + tabling
+            + doc
+              + dra
+            + tabling
+              + archive
+            + vanilla
+          + tabling
+            + examples
+              + LTL
+              + XSB
         + flux
         + indigolog
           + Doc
@@ -2531,11 +2962,43 @@ PrologMUD.vpj=20150603194402848
             + iris
             + trains
           + pl
+    + prologmud
+      - prolog
+        - prologmud
+          + actions
+          + mobs
+            - affordance
+            - planner
+          + objs
+          - parsing
+          - server
+          - vworld
+      - runtime
+        + cache
+          + rdf
+            + a2
+              + 8e
+            + de
+              + 0f
+        + config-enabled
+        + RDF-store
+    + prologmud_web
+      - src_assets
+      + src_webui
+        - assetsources
+        - http
+          - web
+            + css
+            + icons
+            + js
+        + model
+        - mudconsole
+    + ref_unused
     + swish
       + examples
-      - filesystems
+      + filesystems
       + lib
-        - render
+        + render
       + test
       + web
         + bower_components
@@ -2779,117 +3242,18 @@ PrologMUD.vpj=20150603194402848
             + styles
           + render
           + tutorials
-  + games
-    + circlemuddata
-    + src_game_nani
-      - web
-        + css
-        + icons
-        + js
-        - prolog
-        + snd
-    - src_game_sims
-      + web
-        + css
-        + icons
-        + js
-        + prolog
-        + snd
-    - src_game_startrek
-      - holodeck
-      - mobs
-      + web
-        + css
-        + icons
-        + js
-        + prolog
-        + snd
-    - src_game_wumpus
-  - packs
-    + games
-      + circlemuddata
-      - src_game_nani
-        + web
-          + css
-          + icons
-          + js
-          + prolog
-          + snd
-      - src_game_sims
-        + web
-          + css
-          + icons
-          + js
-          + prolog
-          + snd
-      - src_game_startrek
-        + holodeck
-        + mobs
-        + web
-          + css
-          + icons
-          + js
-          + prolog
-          + snd
-      - src_game_wumpus
-    - logicmoo_base
-      - prolog
-        + logicmoo
-          - mpred
-          - util
-      + t
-    - logicmoo_online
-      - prolog
-        - logicmoo
-          - mpred_online
-          + swish_lib
-            - render
-    + prologmud
-      - prolog
-        - prologmud
-          + actions
-          + mobs
-            - affordance
-            - planner
-          + objs
-          - parsing
-          - server
-          - vworld
-      - runtime
-        + cache
-          + rdf
-            + a2
-              + 8e
-            + de
-              + 0f
-        + config-enabled
-        + RDF-store
-    + prologmud_web
-      - src_assets
-      + src_webui
-        - assetsources
-        - http
-          - web
-            + css
-            + icons
-            + js
-        + model
-        - mudconsole
-    + ref_unused
-      + logicmoo_engine
-      + logicmoo_planner
   - runtime
     + config-enabled
     + RDF-store
-  + \usr
-    - lib
+  - \usr
+    + lib
       - swi-prolog
-        + boot
+        - boot
         + demo
         + include
           + sicstus
           + Yap
-        - library
+        + library
           + chr
           + clp
             - clpq
@@ -3086,17 +3450,23 @@ PrologMUD.vpj=20150603194402848
               + swi
               + trace
               + xref
-scroll:5
+scroll:102
 [State]
-SCREEN: 1920 1080 236 34 1278 642 0 0 M 0 0 0 0 1494 564
-CWD: runtime
+SCREEN: 1920 1080 236 163 1278 513 0 0 M 0 0 0 0 1494 564
+CWD: packs\MUD_PDDL\prolog\dra\tabling3
+BUFFER: BN="runtime\run_mud_server.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=42 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1318 388 -1 -1 M  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="runtime\run_mud_server.pl"
+VIEW: LN=.3034 CL=11 LE=0 CX=10 CY=10 WI=249 BI=42 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
+packs\MUD_PDDL\prolog\dra\tabling3\dra2.pl
+packs\MUD_PDDL\prolog\dra\tabling3\dra2_builtins.pl
+packs\MUD_PDDL\prolog\dra\tabling3\dra3_builtins.pl
+packs\MUD_PDDL\prolog\dra\tabling3\dra3_coinductive_hypotheses.pl
+packs\MUD_PDDL\prolog\dra\tabling3\dra3_common.pl
+packs\MUD_PDDL\prolog\dra\tabling3\dra3_stack.pl
+packs\MUD_PDDL\prolog\dra\tabling3\dra3_transform.pl
+packs\MUD_PDDL\prolog\dra\tabling3\dra3.pl
 runtime\run_mud_server.pl
-packs\prologmud\prolog\prologmud\parsing\parser_imperative.pl
-packs\prologmud\prolog\prologmud\parsing\simple_decl_parser.pl
-packs\bfo-read-only\src\ontology\fol-mungall\fol-src\ro-core-inst-inst-src.clif
-packs\bfo-read-only\src\ontology\fol-mungall\fol-src\README
-packs\logicmoo_base\prolog\regulus\CVS\Repository
-packs\logicmoo_base\prolog\regulus\CVS\Root
-packs\logicmoo_engine\prolog\bfo-read-only\src\tools\temporalized-relations.lisp
-packs\logicmoo_engine\prolog\bfo-read-only\src\tools\build-artifacts\raw-schulz-axioms.lisp

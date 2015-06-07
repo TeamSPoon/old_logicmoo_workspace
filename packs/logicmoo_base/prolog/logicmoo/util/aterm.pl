@@ -166,10 +166,11 @@ mi(Then,S,G,_):- ((\+ predicate_property(G,number_of_clauses(_)));system_pred(G)
 mi(Then,S,H,L):- 
  make_aterm(H,HA),!,
  copy_term_nat(HA,HH),
- clause(HH,G2),
- (G2==true -> HA=HH ;  
-        ((make_aterm(G2,GG2),mi([HH|S],(HA=HH,GG2),CUTTO)),
-           ((var(CUTTO);non_cutted(H,CUTTO,L))->true;(!,fail)))),
+   clause(HH,G2),
+   (G2==true -> HA=HH ;  
+          ((make_aterm(G2,GG2),
+            mi([HH|S],(HA=HH,GG2),CUTTO)),
+             ((var(CUTTO);non_cutted(H,CUTTO,L))->true;(!,fail)))),
  do_then(Then).
 
 do_then(true):-!.
