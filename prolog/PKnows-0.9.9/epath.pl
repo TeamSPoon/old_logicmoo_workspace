@@ -15,7 +15,7 @@
 %
 
 %
-%  epath_poss_values(E,VVIn,VVOut)  -  determine possible var values
+%  epath_not_refuted_values(E,VVIn,VVOut)  -  determine possible var values
 %
 %  If path E is entered with variable bindings from the set VVIn, then
 %  it will terminate with bindings from the set VVOut.
@@ -27,59 +27,59 @@
 %  as a simple fixpoint calculation and be sure it will eventually terminate.
 %
 
-epath_poss_values(A,VV,VV) :-
+epath_not_refuted_values(A,VV,VV) :-
     agent(A).
-epath_poss_values(?(P),VVIn,VVOut) :-
-    epath_poss_values_test(VVIn,[],P,VVOut),
+epath_not_refuted_values(?(P),VVIn,VVOut) :-
+    epath_not_refuted_values_test(VVIn,[],P,VVOut),
     vv_valid(VVOut).
-epath_poss_values(!(X:T),VVIn,VVOut) :-
+epath_not_refuted_values(!(X:T),VVIn,VVOut) :-
     bagof(Val,call(T,Val),Vals),
     vv_update(VVIn,X,Vals,VVOut).
-epath_poss_values(-[],VVIn,VVIn).
-epath_poss_values(-[X:V|Xs],VVIn,VVOut) :-
+epath_not_refuted_values(-[],VVIn,VVIn).
+epath_not_refuted_values(-[X:V|Xs],VVIn,VVOut) :-
     vv_update(VVIn,X,[V],VV2),
-    epath_poss_values(-Xs,VV2,VVOut).
-epath_poss_values(E1 ; E2,VVIn,VVOut) :-
-    epath_poss_values(E1,VVIn,VV2),
-    epath_poss_values(E2,VV2,VVOut).
-epath_poss_values(E1 | E2,VVIn,VVOut) :-
-    ( epath_poss_values(E1,VVIn,VV1) ->
-        ( epath_poss_values(E2,VVIn,VV2) ->
+    epath_not_refuted_values(-Xs,VV2,VVOut).
+epath_not_refuted_values(E1 ; E2,VVIn,VVOut) :-
+    epath_not_refuted_values(E1,VVIn,VV2),
+    epath_not_refuted_values(E2,VV2,VVOut).
+epath_not_refuted_values(E1 | E2,VVIn,VVOut) :-
+    ( epath_not_refuted_values(E1,VVIn,VV1) ->
+        ( epath_not_refuted_values(E2,VVIn,VV2) ->
             vv_merge(VV1,VV2,VVOut)
         ;
             VVOut = VV1
         )
     ;
-        epath_poss_values(E2,VVIn,VVOut)
+        epath_not_refuted_values(E2,VVIn,VVOut)
     ).
-epath_poss_values(E*,VVIn,VVOut) :-
-    epath_poss_values(E,VVIn,VV2),
+epath_not_refuted_values(E*,VVIn,VVOut) :-
+    epath_not_refuted_values(E,VVIn,VV2),
     ( VV2 = VVIn ->
         VVOut = VV2
     ;
-        epath_poss_values(E*,VV2,VVOut)
+        epath_not_refuted_values(E*,VV2,VVOut)
     ).
 
 
-epath_poss_values_test([],_,_,[]).
-epath_poss_values_test([X:Vs|Xs],Sofar,P,VVOut) :-
-    partition(epath_poss_values_allowed(P,X,Xs,Sofar),Vs,Vs1,_),
+epath_not_refuted_values_test([],_,_,[]).
+epath_not_refuted_values_test([X:Vs|Xs],Sofar,P,VVOut) :-
+    partition(epath_not_refuted_values_allowed(P,X,Xs,Sofar),Vs,Vs1,_),
     VVOut = [X:Vs1|VVOut2],
     Sofar2 = [X:Vs1|Sofar],
-    epath_poss_values_test(Xs,Sofar2,P,VVOut2).
+    epath_not_refuted_values_test(Xs,Sofar2,P,VVOut2).
 
-epath_poss_values_allowed(P,X,Others1,Others2,V) :-
-    epath_poss_values_allowed_sub1(P,Others1,P1),
-    epath_poss_values_allowed_sub1(P1,Others2,P2),
+epath_not_refuted_values_allowed(P,X,Others1,Others2,V) :-
+    epath_not_refuted_values_allowed_sub1(P,Others1,P1),
+    epath_not_refuted_values_allowed_sub1(P1,Others2,P2),
     subs(X,V,P2,P3),
     simplify(P3,P4),
     P4 \= false.
 
-epath_poss_values_allowed_sub1(P,[],P).
-epath_poss_values_allowed_sub1(P,[X:Vs|Xs],P2) :-
+epath_not_refuted_values_allowed_sub1(P,[],P).
+epath_not_refuted_values_allowed_sub1(P,[X:Vs|Xs],P2) :-
     member(Val,Vs),
     subs(X,Val,P,P1),
-    epath_poss_values_allowed_sub1(P1,Xs,P2).
+    epath_not_refuted_values_allowed_sub1(P1,Xs,P2).
     
 
 vv_valid([]).
@@ -362,7 +362,7 @@ simplify_epath(!(X:T),!(X:T)).
 epath_elim_impossible_branches(A,_,A) :-
     agent(A).
 epath_elim_impossible_branches(?(P),VVPoss,?(P1)) :-
-    ( epath_poss_values(?(P),VVPoss,_) ->
+    ( epath_not_refuted_values(?(P),VVPoss,_) ->
         P1 = P
     ;
         P1 = false
@@ -370,7 +370,7 @@ epath_elim_impossible_branches(?(P),VVPoss,?(P1)) :-
 epath_elim_impossible_branches(!(X:T),_,!(X:T)).
 epath_elim_impossible_branches(-VA,_,-VA).
 epath_elim_impossible_branches(E1 ; E2,VVPoss,Er) :-
-    ( epath_poss_values(E1,VVPoss,VV2) ->
+    ( epath_not_refuted_values(E1,VVPoss,VV2) ->
         epath_elim_impossible_branches(E1,VVPoss,Er1),
         epath_elim_impossible_branches(E2,VV2,Er2),
         (Er1 = ?false ->
@@ -394,7 +394,7 @@ epath_elim_impossible_branches(E1 | E2,VVPoss,Er) :-
        Er = (Er1 | Er2)
     ).
 epath_elim_impossible_branches(E*,VVPoss,Er) :-
-    ( epath_poss_values(E*,VVPoss,VV2) ->
+    ( epath_not_refuted_values(E*,VVPoss,VV2) ->
         epath_elim_impossible_branches(E,VV2,E2),
         (E2 = ?false ->
             Er = ?false

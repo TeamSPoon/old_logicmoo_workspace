@@ -16,7 +16,7 @@
        % nnf/4,
        !.
 /*
-       ptt_tell_wid/2,
+       pttp_tell_wid/2,
        pttp_test/2,
        search/7,
        do_pttp_test/1,
@@ -26,7 +26,7 @@
         ]).
 */
 
-use_mpred_t.
+user:use_mpred_t.
 
 :- dynamic t/3.
 :- multifile t/3.
@@ -62,12 +62,12 @@ not_int_pred_t(A, B, C, H, I, D, E, F, J, G) :-
    pretest_call((use_mpred_t,not(user:t(A, B, C)), dif(B,C),D=E)),
  F=[K, [not_pred_t(A, B, C), G, H, I]|L], J=[K|L].
 
-:- dynamic int_refuted_t/10.
-:- multifile int_refuted_t/10.
+:- dynamic int_proven_not_t/10.
+:- multifile int_proven_not_t/10.
 
-int_refuted_t(A, B, C, H, I, D, E, F, J, G) :- 
+int_proven_not_t(A, B, C, H, I, D, E, F, J, G) :- 
    pretest_call((is_extent_known(A),use_mpred_t,not(user:t(A, B, C)), dif(B,C),D=E)),
- F=[K, [refuted_t(A, B, C), G, H, I]|L], J=[K|L].
+ F=[K, [proven_not_t(A, B, C), G, H, I]|L], J=[K|L].
 
 is_extent_known(wearsClothing).
 is_extent_known(Pred):-wrapper_for(Pred,pred_t).
@@ -199,7 +199,7 @@ wrapper_for(negationInverse,pred_t).
 %%%   of levels used in the solution of the goal.)
 %%%
 %%%   For clauses with empty bodies or bodies
-%%%   composed only of builtin functions,
+%%%   composed only of pttp_builtin functions,
 %%%   DepthIn = DepthOut.
 %%%
 %%%   For other clauses, the depth bound is
@@ -262,51 +262,6 @@ wrapper_for(negationInverse,pred_t).
 %%% SOURCE
 
 
-
-%%% ***
-%%% ****f* PTTP/prove
-%%% DESCRIPTION
-%%%   prove(Goal) can be used to prove Goal using code compiled by PTTP.
-%%%   It uses depth-first iterative-deepening search and prints the proof.
-%%%
-%%%   Depth-first iterative-deepening search can be controlled
-%%%   by extra paramaters of the prove predicate:
-%%%      prove(Goal,Max,Min,Inc,ProofIn)
-%%%   Max is the maximum depth to search (defaults to a big number),
-%%%   Min is the minimum depth to search (defaults to 0),
-%%%   Inc is the amount to increment the bound each time (defaults to 1).
-%%%   ProofIn specifies initial steps of proof to retrace (defaults to []).
-%%%
-%%%   A query can be compiled along with the axioms by including the
-%%%   clause 'query :- ...'.  The query can then be proved by 'prove(query)'.
-%%% SOURCE
-
-prove(Goal,Max,Min,Inc,ProofIn,ProofOut) :- prove_inc(Goal,Max,Min,Inc,ProofIn,ProofOut).
-
-prove_inc(Goal,Max,Min,Inc,ProofIn,ProofOut) :-
-	expand_input_proof(ProofIn,PrfEnd),
-	PrevInc is Min + 1,
-	add_args(INFO,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],ProofOut1,Goal1,_),
-	!,
-	timed_call(search(Goal1,Max,Min,Inc,PrevInc,DepthIn,DepthOut),'Proof'),
-	contract_output_proof(ProofOut1,ProofOut),
-	must(write_proof(ProofOut1)),
-	nl.
-
-prove(Goal,Max,Min,Inc,ProofIn) :-
-	prove(Goal,Max,Min,Inc,ProofIn,_).
-
-prove(Goal,Max,Min,Inc) :-
-	prove(Goal,Max,Min,Inc,[],_).
-
-prove(Goal,Max,Min) :-
-	prove(Goal,Max,Min,1,[],_).
-
-prove(Goal,Max) :-
-	prove(Goal,Max,2,3).
-
-%prove(Goal) :- prove(Goal,15).
-prove(Goal) :-  prove(Goal,1000000,0,1,[],_).
 
 %%% ***
 
@@ -410,134 +365,8 @@ argument_type_checking(_,_,true).
 
 pretest_call(C):-C.
 
-%%% ****if* PTTP/test_and_decrement_search_cost_expr
-%%% SOURCE
-
-test_and_decrement_search_cost_expr(DepthIn,Cost,Depth1,Expr) :-
-	Cost == 0 ->
-		Depth1 = DepthIn,
-		Expr = true;
-	%true ->
-		Expr = test_and_decrement_search_cost(DepthIn,Cost,Depth1).
-
-test_and_decrement_search_cost(DepthIn,Cost,Depth1):- DepthIn >= Cost , Depth1 is DepthIn - Cost.
-
-%%% ***
-%%% ****if* PTTP/search_cost
-%%% DESCRIPTION
-%%%   Search cost is ordinarily computed by counting literals in the body.
-%%%   It can be given explicitly instead by including a number, as in
-%%%     p :- search_cost(3).     (ordinarily, cost would be 0)
-%%%     p :- search_cost(1),q,r. (ordinarily, cost would be 2)
-%%%     p :- search_cost(0),s.   (ordinarily, cost would be 1)
-%%% SOURCE
-
-search_cost(Body,HeadArgs,N) :-
-	Body = search_cost(M) ->
-		N = M;
-	Body = (A , B) ->
-		(A = search_cost(M) ->	% if first conjunct is search_cost(M),
-			N = M;		% search cost of conjunction is M
-		%true ->
-			search_cost(A,HeadArgs,N1),
-			search_cost(B,HeadArgs,N2),
-			N is N1 + N2);
-	Body = (A ; B) ->
-		search_cost(A,HeadArgs,N1),
-		search_cost(B,HeadArgs,N2),
-		min(N1,N2,N);
-	builtin(Body) ->
-		N = 0;
-	%true ->
-		N = 1.
-%%% ***
-%%% ****if* PTTP/search
-%%% DESCRIPTION
-%%%   Search driver predicate.
-%%%   Note that depth-bounded execution of Goal is enabled by
-%%%   the fact that the DepthIn and DepthOut arguments of
-%%%   search are also the DepthIn and DepthOut arguments of Goal.
-%%% SOURCE
-search(Goal,Max,Min,Inc,PrevInc,DepthIn,DepthOut):-search0(Goal,Max,Min,Inc,PrevInc,DepthIn,DepthOut).
-
-search0(Goal,Max,Min,Inc,PrevInc,DepthIn,DepthOut):- % trace,
-        search1(Goal,Max,Min,Inc,PrevInc,DepthIn,DepthOut).
-
-search1(_Goal,Max,Min,_Inc,_PrevInc,_DepthIn,_DepthOut) :-
-	Min > Max,
-	!,
-	fail.
-search1(Goal,_Max,Min,_Inc,PrevInc,DepthIn,DepthOut) :-
-        write_search_progress(Min),
-	DepthIn = Min,
-	ccatch(call(Goal),E,(wdmsg(E=Goal),trace)),
-	DepthOut < PrevInc.	% fail if solution found previously
-search1(Goal,Max,Min,Inc,_PrevInc,DepthIn,DepthOut) :-
-	Min1 is Min + Inc,
-	search(Goal,Max,Min1,Inc,Inc,DepthIn,DepthOut).
-%%% ***
-
-%%% ****if* PTTP/make_wrapper
-%%% SOURCE
-
-make_wrapper(_DefinedPreds,[query,0],true) :-
-	!.
-make_wrapper(DefinedPreds,[P,N],Result):- must_det(make_wrapper0(DefinedPreds,[P,N],Result)). % ,dmsg(pp(Result)).
-
-make_wrapper0(DefinedPreds,[P,N],Result) :-
-	functor(Goal,P,N),
-	Goal =.. [P|Args],
-	ExtraArgs = [PosAncestors,NegAncestors,DepthIn,DepthOut,ProofIn,ProofOut],
-	list_append(Args,ExtraArgs,Args1),
-	Head =.. [P|Args1],
-	internal_functor(P,IntP),
-	list_length(ExtraArgs,NExtraArgs),
-	NN is N + NExtraArgs + 1,
-	(identical_member_special([IntP,NN],DefinedPreds) ->
-	        list_append(ExtraArgs,[GoalAtom],ExtraArgs2),
-		list_append(Args,ExtraArgs2,Args2),
-		IntHead =.. [IntP|Args2];
-	%true ->
-		IntHead = fail),
-	(is_negative_functor(P) ->
-		negated_literal(Goal,PosGoal),
-		Red = redn,  % atom in proof is negation of actual literal
-		C1Ancestors = NegAncestors,
-		C2Ancestors = PosAncestors;
-	%true ->
-		PosGoal = Goal,
-		Red = red,
-		C1Ancestors = PosAncestors,
-		C2Ancestors = NegAncestors),
-	(N = 0 ->	% special case for propositional calculus
-		V1 = (identical_member_cheaper(GoalAtom,C2Ancestors) , !);
-	%true ->
-		V1 = ((identical_member_cheaper(GoalAtom,C2Ancestors) , !);
-		       unifiable_member_cheaper(GoalAtom,C2Ancestors))),
-	V2 = (DepthOut = DepthIn,
-		 ProofIn = [Prf,[Red,GoalAtom,PosAncestors,NegAncestors]|PrfEnd],
-		 ProofOut = [Prf|PrfEnd]),
-	conjoin_pttp(V1,V2,Reduce),
-	Result = (Head :- GoalAtom = PosGoal,
-		  	  (identical_member_special_loop_check(GoalAtom,C1Ancestors) ->
-			   	fail;
-			  %true ->
-			   	(Reduce;
-				 IntHead))).
-%%% ***
-%%% ****if* PTTP/query
-%%% DESCRIPTION
-%%%   query uses the following definition instead of the more complex one
-%%%   that would be created by make_wrapper
-%%% SOURCE
-
-% 3 = suc(suc(1))
-% 3/67 = div(suc(suc(1)),67)
 
 
-query(PosAncestors,NegAncestors,DepthIn,DepthOut,ProofIn,ProofOut) :- 
-  get_int_query(Int_query),
-	call(Int_query,PosAncestors,NegAncestors,DepthIn,DepthOut,ProofIn,ProofOut,query).
 
 %%% ***
 %%% ****if* PTTP/unifiable_member
@@ -792,7 +621,7 @@ predicates(Wff,L) :-
         functor(Wff,search,_) ->        % list predicates in first argument of search
                 arg(1,Wff,X),
                 predicates(X,L);
-        builtin(Wff) ->
+        pttp_builtin(Wff) ->
                 L = [];
         %true ->
                 functor(Wff,F,N),
@@ -805,7 +634,7 @@ predicates(Wff,L) :- functor(Wff,F,A), predicates(Wff,F,A,L).
 skipped_functor(F):- fail,is_2nd_order_holds_pttp(F).
 
 predicates(Wff,F,___,L):- logical_functor_pttp(F), Wff=..[_|ARGS], predicates(ARGS,L).
-predicates(Wff,F,A,  L):- builtin(F,A), Wff=..[_|ARGS], predicates(ARGS,L).
+predicates(Wff,F,A,  L):- pttp_builtin(F,A), Wff=..[_|ARGS], predicates(ARGS,L).
 % predicates(Wff,F,___,L):- skipped_functor(F), Wff=..[_|ARGS], predicates(ARGS,L).
 predicates(Wff,F,A,[[F,A]|L]):- Wff=..[_|ARGS], predicates(ARGS,L).
 
@@ -836,230 +665,6 @@ procedures([],_Clauses,true).
 
 head_body_was(_,_).
 
-%%% ****if* PTTP/add_features
-%%% SOURCE
-add_features(true,true):- !.
-add_features((Head :- Body),NewHeadBody):- 
-   must_det_l((
-    add_features0((Head :- Body),OUT),
-    OUT=(Head1 :- Body1),
-    new_head_body(Head, Body,Head1 ,Body1,NewHeadBody))).
-
-%new_head_body(Head, Body,Head1 ,Body1,(Head1 :- Body1)):-!.
-% new_head_body(Head, Body,Head1 ,Body1,(Head1 :- head_body_was(Head, Body), Body1)):- arg_checks()
-new_head_body(Head, infer_by(ProofID),Head1 ,Body1,(Head1 :- Body1)):- ground(Head),!.
-new_head_body(Head, Body,Head1 ,Body1,(Head1 :- Body1)):- is_query_lit(Head),!.
-new_head_body(Head, Body,Head1 ,Body1,(Head1 :- Body1)):- 
-   true. 
-   %   dmsg(pp((head_features(Head1) :-head_body_was(Head, Body), Body1))).
-
-call_proof(Call,_):-catch(call(Call),E,(wdmsg(error(E:Call)),fail)).
-
-add_features0((Head :- Body),OUT):-builtin(Head),!, add_features_hb(Head , Body , _Head1 , Body1),!,OUT=(Head :- Body1).
-add_features0(B,A):- add_features1(B,A).
-
-add_features1((Head :- Body),(Head1 :- Body1)) :- (ground(Head);is_query_lit(Head)),!, add_features_hb_normal(Head , Body , Head1 , Body1).
-
-add_features1((Head :- Body),(Head1 :- Body1)) :- add_features_hb(Head , Body , Head1 , Body1).
-
-add_features_hb(Head , Body ,Head1 , Body1) :-
-  
-       linearize(Head,Head2,[],_,true,Matches),
-       (is_negative_literal(Head) ->
-               PosGoal = no;
-       %true ->
-               PosGoal = yes),
-       Head =.. [HF|HeadArgs],
-  
-       add_args(Head,Body,
-          PosGoal,GoalAtom,HeadArgs,
-          PosAncestors,NegAncestors,
-          NewPosAncestors,NewNegAncestors,
-          Depth1,DepthOut,
-          ProofIn,ProofOut,
-                Body2,New),
-
-       (is_ftVar(New) ->
-               PushAnc = true;
-
-       PosGoal = yes ->
-               NewNegAncestors = NegAncestors,
-               PushAnc = (NewPosAncestors = [GoalAtom|PosAncestors]);
-       %true -> ( PosGoal == false)
-               NewPosAncestors = PosAncestors,
-               PushAnc = (NewNegAncestors = [GoalAtom|NegAncestors])),
-
-   search_cost(Body,HeadArgs,Cost),       
-   test_and_decrement_search_cost_expr(DepthIn,Cost,Depth1,TestExp0),
-   argument_type_checking(HF,HeadArgs,TypeCheck),
-   conjoin_pttp(TestExp0,TypeCheck,TestExp),
-       conjoin_pttp(PushAnc,Body2,Body4),
-       conjoin_pttp(Matches,Body4,Body5),
-       conjoin_pttp(pretest_call(TestExp),Body5,Body1),
-     
-     add_head_args(Head2,
-          PosGoal,GoalAtom,HeadArgs,
-          PosAncestors,NegAncestors,
-          NewPosAncestors,NewNegAncestors,
-          DepthIn,DepthOut,
-          ProofIn,ProofOut,Head1,New).
-
-add_features_hb_normal(Head , Body ,Head1 , Body1) :-
-  
-       ( is_query_lit(Head) ->
-		Head2 = Head,
-		add_args(Head2,Body,yes,query,[],
-		         PosAncestors,NegAncestors,
-			 PosAncestors,NegAncestors,
-		         DepthIn,DepthOut,
-			 ProofIn,ProofOut,
-			 Body1,_);
-	%true ->
-		linearize(Head,Head2,[],_,true,Matches),
-		(is_negative_literal(Head) ->
-			PosGoal = no;
-		%true ->
-			PosGoal = yes),
-		Head =.. [HF|HeadArgs],
-            
-		add_args(Head,Body,PosGoal,GoalAtom,HeadArgs,
-                         PosAncestors,NegAncestors,
-			 NewPosAncestors,NewNegAncestors,
-		         Depth1,DepthOut,
-			 ProofIn,ProofOut,
-			 Body2,New),    
-
-		(is_ftVar(New) ->
-			PushAnc = true;
-
-		PosGoal = yes ->
-			NewNegAncestors = NegAncestors,
-			PushAnc = (NewPosAncestors = [GoalAtom|PosAncestors]);
-		%true -> ( PosGoal == false)
-			NewPosAncestors = PosAncestors,
-			PushAnc = (NewNegAncestors = [GoalAtom|NegAncestors])),
-
-
-              search_cost(Body,HeadArgs,Cost),       
-              test_and_decrement_search_cost_expr(DepthIn,Cost,Depth1,TestExp0),
-              argument_type_checking(HF,HeadArgs,TypeCheck),
-              conjoin_pttp(TestExp0,TypeCheck,TestExp),
-		conjoin_pttp(PushAnc,Body2,Body4),
-		conjoin_pttp(Matches,Body4,Body5),
-		conjoin_pttp(pretest_call(TestExp),Body5,Body1)                
-                ),
-     
-    	Head2 =.. [P|L],
-	internal_functor(P,IntP),
-	list_append(L,
-                    [PosAncestors,NegAncestors,
-		       DepthIn,DepthOut,
-		       ProofIn,ProofOut,
-		       GoalAtom],
-		    L1),
-	Head1 =.. [IntP|L1].
-
-%%% ***
-%%% ****if* PTTP/add_args
-%%% SOURCE
-
-:-export(add_args/15).
-
-add_args(INFO,(A , B),PosGoal,GoalAtom,HeadArgs,
-         PosAncestors,NegAncestors,
-	 NewPosAncestors,NewNegAncestors,
-	 DepthIn,DepthOut,
-	 ProofIn,ProofOut,
-	 Body1,New) :-
-		add_args(INFO,A,PosGoal,GoalAtom,HeadArgs,
-                         PosAncestors,NegAncestors,
-			 NewPosAncestors,NewNegAncestors,
-		         DepthIn,Depth1,
-			 ProofIn,Proof1,
-		         A1,New),
-		add_args(INFO,B,PosGoal,GoalAtom,HeadArgs,
-		         PosAncestors,NegAncestors,
-			 NewPosAncestors,NewNegAncestors,
-		         Depth1,DepthOut,
-			 Proof1,ProofOut,
-                         B1,New),
-		conjoin_pttp(A1,B1,Body1),!.
-
-add_args(INFO,(A ; B),PosGoal,GoalAtom,HeadArgs,
-         PosAncestors,NegAncestors,
-	 NewPosAncestors,NewNegAncestors,
-	 DepthIn,DepthOut,
-	 ProofIn,ProofOut,
-	 Body1,New) :-
-               add_args(INFO,A,PosGoal,GoalAtom,HeadArgs,
-		         PosAncestors,NegAncestors,
-			 NewPosAncestors,NewNegAncestors,
-		         DepthA,DepthOut,
-			 ProofIn,ProofOut,
-			 A2,New),
-		add_args(INFO,B,PosGoal,GoalAtom,HeadArgs,
-		         PosAncestors,NegAncestors,
-			 NewPosAncestors,NewNegAncestors,
-		         DepthB,DepthOut,
-			 ProofIn,ProofOut,
-			 B2,New),
-   % trace,
-                search_cost(A,HeadArgs,CostA),
-		search_cost(B,HeadArgs,CostB),
-		(CostA < CostB ->
-			DepthA = DepthIn,
-			Cost is CostB - CostA,
-			test_and_decrement_search_cost_expr(DepthIn,Cost,DepthB,TestExp),
-			A1 = A2,
-			conjoin_pttp(pretest_call(TestExp),B2,B1);
-		CostA > CostB ->
-			DepthB = DepthIn,
-			Cost is CostA - CostB,
-			test_and_decrement_search_cost_expr(DepthIn,Cost,DepthA,TestExp),
-			B1 = B2,
-			conjoin_pttp(pretest_call(TestExp),A2,A1);
-		%true ->
-		        DepthA = DepthIn,
-			DepthB = DepthIn,
-			A1 = A2,
-			B1 = B2),
-		disjoin(A1,B1,Body1).
-
-add_args(INFO,Search_cost,_PosGoal,_GoalAtom,_HeadArgs,_PosAncestors,_NegAncestors,_NewPosAncestors,_NewNegAncestors,Depth,Depth,Proof,Proof,true,_New):- 
-  functor(Search_cost,search_cost,_),!.
-
-add_args(INFO,infer_by(N),PosGoal,GoalAtom,_HeadArgs,
-         PosAncestors,NegAncestors,
-	 _NewPosAncestors,_NewNegAncestors,
-	 Depth,Depth,
-	 ProofIn,ProofOut,
-	 Body1,_New) :-
-    (PosGoal = yes -> 
-			N1 = INFO;
-		%true ->  % atom in proof is negation of actual literal
-			isNegOf(N1,INFO)),
-    Body1 = (ProofIn = [Prf,[N1,GoalAtom,PosAncestors,NegAncestors]|PrfEnd],
-			 ProofOut = [Prf|PrfEnd]).
-
-add_args(INFO,Body,_PosGoal,_GoalAtom,_HeadArgs,_PosAncestors,_NegAncestors,_NewPosAncestors,_NewNegAncestors,Depth,Depth,Proof,Proof,Body,_New):-
-   builtin(Body),!.
-
-% normal lit
-add_args(INFO,BodyIn,
-         _PosGoal,_GoalAtom,_HeadArgs,
-         _PosAncestors,_NegAncestors,
-	 NewPosAncestors,NewNegAncestors,
-	 DepthIn,DepthOut,
-	 ProofIn,ProofOut,
-	 Body1,New) :-
-   correct_pttp_head(asserted_t,BodyIn,Body), 
-    Body =.. L,
-    list_append(L, [NewPosAncestors,NewNegAncestors,DepthIn,DepthOut,ProofIn,ProofOut], L1),
-    Body11 =.. L1,
-    Body1 = call_proof(Body11,Body),
-    New = yes.
-
-
 :-export(is_holds_false_pttp/1).
 is_holds_false_pttp(A):-not(atom(A)),!,fail.
 is_holds_false_pttp(Prop):-member(Prop,[not,nholds,holds_f,mpred_f,aint,assertion_f,asserted_mpred_f,retraction,not_secondOrder,not_firstOrder]).
@@ -1089,12 +694,18 @@ do_not_wrap(F):-arg(_,vv(query),F).
 do_not_wrap(F):-atom_concat('int_',_,F).
 
 :-export(correct_pttp/2).
-:- thread_local user:second_order_wrapper/1.
+%:- thread_local user:second_order_wrapper/1.
+:- dynamic user:second_order_wrapper/1.
+
+user:second_order_wrapper(asserted_t).
+
 correct_pttp_head(Wrapper,B,A):- with_assertions(second_order_wrapper(Wrapper), correct_pttp(B,A)),!.
 
 correct_pttp(B,A):-correct_pttp([],B,A),!.
+
 correct_pttp(LC,B,A):-identical_member(B,LC),A=B.
 correct_pttp(LC,-B,NA):-!,correct_pttp([B|LC],B,A),negated_literal(A,NA).
+correct_pttp(LC,n(_,B),NA):-!,correct_pttp([B|LC],B,A),negated_literal(A,NA).
 correct_pttp(LC,B,A):-once(correct_pttp_0([B|LC],B,A)),B==A,!.
 correct_pttp(LC,B,A):-once(correct_pttp_0([B|LC],B,A)),!. % dmsg(once(correct_pttp_0(LC,B,A))),term_variables(B,BV),term_variables(A,AV),must(AV==BV).
 
@@ -1109,7 +720,7 @@ correct_pttp_1(LC, BodyIn,F,A,L,Body):- is_holds_false_pttp(F),trace_or_throw(co
 correct_pttp_1(LC,_BodyIn,F,_,[L|IST],Body):- correct_pttp_2(LC,F,[L|IST],Body).
 
 correct_pttp_2(LC,F,[L|IST],Body):- do_not_wrap(F),!,Body=..[F,L|IST].
-correct_pttp_2(LC,F,[L|IST],Body):- atom(F),builtin(F,_),!,Body=..[F,L|IST].
+correct_pttp_2(LC,F,[L|IST],Body):- atom(F),pttp_builtin(F,_),!,Body=..[F,L|IST].
 correct_pttp_2(LC,F,L,Body):- is_ftVar(F),!,trace_or_throw(correct_pttp_2(LC,F,L,Body)).
 correct_pttp_2(LC,F,[L|IST],Body):- is_holds_true_pttp(F),!,Body =..[F,L|IST].
 % uncomment (need it) correct_pttp_2(LC,infer_by,[L|IST],Body):- infer_by = F, Body =..[F,L|IST].
@@ -1118,20 +729,6 @@ correct_pttp_2(LC,F,[L|IST],Body):- is_holds_true_pttp(F),!,Body =..[F,L|IST].
 correct_pttp_2(LC,F,[L|IST],Body):- wrapper_for(F,Wrapper),!, Body =..[Wrapper,F,L|IST].
 correct_pttp_2(LC,F,[L|IST],Body):- second_order_wrapper(Wrapper),!, Body =..[Wrapper,F,L|IST].
 correct_pttp_2(LC,F,[L|IST],Body):- Body =..[assumed_t,F,L|IST].
-
-
-add_head_args(HeadIn,
-          _PosGoal,GoalAtom,_HeadArgs,
-          PosAncestors,NegAncestors,
-          _NewPosAncestors,_NewNegAncestors,
-          DepthIn,DepthOut,
-          ProofIn,ProofOut,
-          Head1,_New):-
-     correct_pttp_head(proven_t,HeadIn,Head),
-        Head =.. [P|L],
-	internal_functor(P,IntP),
-	list_append(L, [PosAncestors,NegAncestors, DepthIn,DepthOut, ProofIn,ProofOut, GoalAtom], L1),
-	Head1 =.. [IntP|L1].
 
 
 %%% ***
@@ -1152,13 +749,20 @@ pttp1_wid(ID,X,Y) :-
 	must_det(predicates(X0,Preds0)),
 	list_reverse(Preds0,Preds),
 	apply_to_elements(Preds,make_wrapper(IntPreds1),Procs),
-	conjoin_pttp(IntProcs,Procs,Y))))),!.
+	conjoin_pttp(Procs,IntProcs,Y))))),!.
+ 
+
+
+
+:- user:ensure_loaded(dbase_i_mpred_pttp_compile_stickel_orig).
+
+
 %%% ***
 %%% ****if* PTTP/pttp2
 %%% SOURCE
 
 :-export(pttp2_wid/2).
-pttp2_wid(ID,Y) :- !, apply_to_conjuncts(Y,pttp_assert_int_wid_for_conjuncts(ID),_).
+pttp2_wid(ID,Y) :- !, must(apply_to_conjuncts(Y,pttp_assert_int_wid_for_conjuncts(ID),_)).
 /*
 :-export(pttp2/1).
 pttp2(Y) :- must_pttp_id(ID), pttp2_wid(ID,Y).
@@ -1337,7 +941,7 @@ disjoin(A,B,C) :-
 
 is_builtin_p_to_n('mudEquals','not_mudEquals').
 
-is_p_to_n_2way('answerable_t','unknowable_t').
+is_p_to_n_2way('answerable_t','unknown_t').
 is_p_to_n_2way('askable_t','fallacy_t').
 
 
@@ -1355,7 +959,8 @@ is_p_to_n('proven_t','not_assumed_t').
 
 %is_p_to_n(P,N):-is_p_to_n_2way(P,N).
 is_p_to_n(P,N):-is_p_to_n_2way(N,P).
-is_p_to_n('not_unknowable_t','not_answerable_t').
+is_p_to_n('not_unknown_t','not_answerable_t').
+is_p_to_n('proven_not_t','possible_t').
 is_p_to_n('proven_in','impossible_in').
 is_p_to_n(P,N):-is_builtin_p_to_n(P,N).
 is_p_to_n('isa','not_mudIsa').
@@ -1363,14 +968,14 @@ is_p_to_n(P0,N0):-is_p_to_not(P),atom_concat('not_',P,N),P0=P,N0=N.
 is_p_to_n(P,N):- false,is_p_to_n1(P,N).
 
 is_p_to_not('asserted_t').
-is_p_to_not('assertable_t').
+is_p_to_not('possible_t').
 is_p_to_not('proven_t').
-is_p_to_not('refuted_t').
+is_p_to_not('proven_not_t').
 is_p_to_not('fallacy_t').
 is_p_to_not('answerable_t').
 
 
-is_p_to_not('unknowable_t').
+is_p_to_not('unknown_t').
 is_p_to_not('askable_t').
 
 is_p_to_not('pred_isa_t').
@@ -1379,7 +984,7 @@ is_p_to_not('pred_t').
 
 is_p_or_not(F):-is_p_to_n(P,N),(F=P;F=N).
 
-% assertable_t TODO
+% possible_t TODO
 
 is_p_to_n1(P,N):-atom(P),is_p_to_n0(PF,NF),atom_concat(Root,PF,P),atom_concat(Root,NF,N).
 is_p_to_n1(P,N):-atom(N),is_p_to_n0(PF,NF),atom_concat(Root,NF,N),atom_concat(Root,PF,P).
@@ -1393,15 +998,24 @@ is_p_to_n0('pos_','neg_').
 is_p_to_n0('when_','unless_').
 is_p_to_n0('possible_','impossible_').
 
+
+
+%is_p_simple('not_proven_not_t','possible_t').
+%is_p_simple('not_possible_t','proven_not_t').
+%is_p_simple('not_unknown_t','answerable_t').
+%is_p_simple('not_answerable_t','unknown_t').
+is_p_simple(X,X).
 %%% ***
 %%% ****if* PTTP/negated_functor
 %%% SOURCE
 
+negated_functor0(F,NotF) :- is_p_to_n(F,NotF).
+negated_functor0(F,NotF) :- is_p_to_n(NotF,F).
+
 :-export(negated_functor/2).
 negated_functor(F,NotF) :- is_ftVar(F),!,trace_or_throw(negated_functor(F,NotF)).
 %negated_functor(F,NotF) :- sanity(atom(F)),atom_concat('not_',Now,F),!,must(NotF=Now).
-negated_functor(F,NotF) :- is_p_to_n(F,NotF),!.
-negated_functor(F,NotF) :- is_p_to_n(NotF,F),!.
+negated_functor(F,SNotF) :- negated_functor0(F,NotF),!,is_p_simple(NotF,SNotF).
 negated_functor((-),_):-!,dtrace(negated_functor((-),_)),fail.
 negated_functor((~),_):-!,dtrace(negated_functor((~),_)),fail.
 negated_functor(F,NotF) :- atom_concat('int_',Now,F),!,negated_functor(Now,Then),atom_concat('int_',Then,NotF),!.
@@ -1563,84 +1177,82 @@ write_search_progress(Level) :-
 
 %%% ***
 
-%%% ****if* PTTP/builtin
+%%% ****if* PTTP/pttp_builtin
 %%% DESCRIPTION
-%%%   List of builtin predicates that can appear in clause bodies.
+%%%   List of pttp_builtin predicates that can appear in clause bodies.
 %%%   No extra arguments are added for ancestor goals or depth-first
 %%%   iterative-deepening search.  Also, if a clause body is
-%%%   composed entirely of builtin goals, the head is not saved
+%%%   composed entirely of pttp_builtin goals, the head is not saved
 %%%   as an ancestor for use in reduction or pruning.
 %%%   This list can be added to as required.
 %%% SOURCE
 
-builtin(T) :-
+pttp_builtin(T) :-
 	functor(T,F,N),
-	builtin(F,N).
+	pttp_builtin(F,N).
 
 
-builtin(V,A):-is_ftVar(V),!,trace_or_throw(builtin(V,A)).
-builtin(!,0).
+pttp_builtin(V,A):-is_ftVar(V),!,trace_or_throw(pttp_builtin(V,A)).
+pttp_builtin(!,0).
 
 
-builtin(is_asserted,_).
-builtin(P,_):- current_predicate(resultIsa/2),user:mpred_prop(P,predStub(prologHybrid)),!,fail.
-builtin(isa,2):-!,fail.
-builtin(isa,_):-!,fail.
-builtin(S2,_):-is_p_to_not(S2),!,fail.
+pttp_builtin(is_asserted,_).
+pttp_builtin(P,_):- current_predicate(resultIsa/2),user:mpred_prop(P,predStub(prologHybrid)),!,fail.
+pttp_builtin(isa,2):-!,fail.
+pttp_builtin(isa,_):-!,fail.
+pttp_builtin(S2,_):-is_p_to_not(S2),!,fail.
 
-builtin(call_proof,2).
-builtin(query,0):-!,fail.
-builtin(true,0).
-builtin(false,0).
-builtin(fail,0).
-builtin(succeed,0).
-builtin(trace,0).
-builtin(atom,1).
-builtin(integer,1).
-builtin(number,1).
-builtin(F,_):-is_p_or_not(F),!,fail.
-builtin(not_asserted_t,_):-!,fail.
-builtin(P,2):-t(P,_,_),!,fail.
-builtin(P,3):-t(P,_,_,_),!,fail.
-builtin(atomic,1).
-builtin(constant,1).
-builtin(functor,3).
-builtin(arg,3).
-builtin(var,1).
-%builtin(->,2).
-%builtin(->,3).
-builtin(nonvar,1).
-builtin(call,1).
-builtin(=,2).
-builtin(\=,2).
-builtin(==,2).
-builtin(\==,2).
-builtin(=\=,2).
-builtin(>,2).
-builtin(<,2).
-builtin(>=,2).
-builtin(loop_check,_).
-builtin(=<,2).
-builtin(is,2).
-builtin(display,1).
-builtin(write,1).
-builtin(nl,0).
-builtin(only_if_pttp,0).
-builtin(ANY,0):-atom(ANY).
-builtin(infer_by,_).
-builtin(search_cost,_).
-builtin(F,A):-is_builtin_p_to_n(P,N),member(F,[P,N]),member(A,[2,3,4]).
-builtin(test_and_decrement_search_cost,_).
-builtin(unify,_).
-builtin(identical_member_special,_).
-builtin(identical_member_special_loop_check,_).
-builtin(M:P,A):-atom(M),!,builtin(P,A).
-builtin(F,_):- (user:mpred_prop(F,prologOnly)),!. %,fail.
-builtin(unifiable_member,_).
-builtin(t,_).
-%builtin(F,_):-user:mpred_prop(F,prologPTTP),!,fail.
-%builtin(F,_):-user:mpred_prop(F,prologSNARK),!,fail.
-builtin(F,A):-current_predicate(F/A),functor(P,F,A),builtin_why(P,F,A,Why),!,dmsg(todo(warn(builtin_why(F,A,Why)))).
+pttp_builtin(call_proof,2).
+pttp_builtin(query,0):-!,fail.
+pttp_builtin(true,0).
+pttp_builtin(false,0).
+pttp_builtin(fail,0).
+pttp_builtin(succeed,0).
+pttp_builtin(trace,0).
+pttp_builtin(atom,1).
+pttp_builtin(integer,1).
+pttp_builtin(number,1).
+pttp_builtin(F,_):-is_p_or_not(F),!,fail.
+pttp_builtin(not_asserted_t,_):-!,fail.
+pttp_builtin(atomic,1).
+pttp_builtin(constant,1).
+pttp_builtin(functor,3).
+pttp_builtin(arg,3).
+pttp_builtin(var,1).
+%pttp_builtin(->,2).
+%pttp_builtin(->,3).
+pttp_builtin(nonvar,1).
+pttp_builtin(call,1).
+pttp_builtin(=,2).
+pttp_builtin(\=,2).
+pttp_builtin(==,2).
+pttp_builtin(\==,2).
+pttp_builtin(=\=,2).
+pttp_builtin(>,2).
+pttp_builtin(<,2).
+pttp_builtin(>=,2).
+pttp_builtin(loop_check,_).
+pttp_builtin(=<,2).
+pttp_builtin(is,2).
+pttp_builtin(display,1).
+pttp_builtin(write,1).
+pttp_builtin(nl,0).
+pttp_builtin(only_if_pttp,0).
+pttp_builtin(ANY,0):-atom(ANY).
+pttp_builtin(infer_by,_).
+pttp_builtin(search_cost,_).
+pttp_builtin(F,A):-is_builtin_p_to_n(P,N),member(F,[P,N]),member(A,[2,3,4]).
+pttp_builtin(test_and_decrement_search_cost,_).
+pttp_builtin(unify,_).
+pttp_builtin(identical_member_special,_).
+pttp_builtin(identical_member_special_loop_check,_).
+pttp_builtin(M:P,A):-atom(M),!,pttp_builtin(P,A).
+pttp_builtin(F,_):- (user:mpred_prop(F,prologOnly)),!. %,fail.
+pttp_builtin(unifiable_member,_).
+pttp_builtin(t,_).
+%pttp_builtin(F,_):-user:mpred_prop(F,prologPTTP),!,fail.
+%pttp_builtin(F,_):-user:mpred_prop(F,prologSNARK),!,fail.
+pttp_builtin(F,A):-current_predicate(F/A),functor(P,F,A),builtin_why(P,F,A,Why),!,dmsg(todo(warn(builtin_why(F,A,Why)))).
 %%% ***
 
 builtin_why(_,int_query,_,_):-!,fail.
@@ -1654,6 +1266,9 @@ builtin_why(P,F,A,built_in):- real_builtin_predicate(P).
 builtin_why(P,F,A,transparent):- predicate_property(P,transparent).
 builtin_why(P,F,A,number_of_rules(N)):- predicate_property(P,number_of_rules(N)),N>0.
 builtin_why(X,0):-atom(X).
+%builtin_why(P,2,t(P,2)):-t(P,_,_),!,fail.
+%builtin_why(P,3,t(P,3)):-t(P,_,_,_),!,fail.
+
 
 
 
@@ -1843,270 +1458,4 @@ pttp_nnf_clean((A v B),FreeV,NNF,Paths) :- !,
 
 pttp_nnf_clean(Lit,_,Lit,1).
 
-
-
-end_of_file.
-
-
-%%% ****h* PTTP/PTTP-dalit
-%%% COPYRIGHT
-%%%   Copyright (c) 1988-2003 Mark E. Stickel, SRI International, Menlo Park, CA 94025  USA
-%%% 
-%%%   Permission is hereby granted, free of charge, to any person obtaining a
-%%%   copy of this software and associated documentation files (the "Software"),
-%%%   to deal in the Software without restriction, including without limitation
-%%%   the rights to use, copy, modify, merge, publish, distribute, sublicense,
-%%%   and/or sell copies of the Software, and to permit persons to whom the
-%%%   Software is furnished to do so, subject to the following conditions:
-%%% 
-%%%   The above copyright notice and this permission notice shall be included
-%%%   in all copies or substantial portions of the Software.
-%%% 
-%%%   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-%%%   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-%%%   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-%%%   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-%%%   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-%%%   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-%%%   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-%%% DESCRIPTION
-%%%  
-%%%      A Prolog Technology Theorem Prover
-%%%  
-%%%               Mark E. Stickel
-%%%  
-%%%   This file contains changes to PTTP to use
-%%%   depth-first iterative deepening dalit_search with bound on
-%%%   D_Alit (maximum number of A-literals on a branch)
-%%%   instead of
-%%%   D_Inf (total number of subgoals).
-%%%
-%%%   To use, load pttp and then load this file
-%%%   to replace changed definitions.
-%%% SOURCE
-
-:-abolish(prove,6).
-prove(Goal,Max,Min,Inc,ProofIn,ProofOut):-dalit_prove(Goal,Max,Min,Inc,ProofIn,ProofOut).
-
-dalit_prove(Goal,Max,Min,Inc,ProofIn,ProofOut) :-
-	expand_input_proof(ProofIn,PrfEnd),
-	PrevInc is Min + 1,
-	dalit_add_args(INFO,Goal,_,_,[],_,_,[],[],DepthIn,[PrfEnd|PrfEnd],ProofOut1,Goal1,_),
-	!,
-	timed_call(dalit_search(Goal1,Max,Min,Inc,PrevInc,DepthIn),'Proof'),
-	contract_output_proof(ProofOut1,ProofOut),
-	write_proof(ProofOut1),
-	nl.
-
-dalit_prove(Goal,Max,Min,Inc,ProofIn) :-
-	dalit_prove(Goal,Max,Min,Inc,ProofIn,_).
-
-dalit_prove(Goal,Max,Min,Inc) :-
-	dalit_prove(Goal,Max,Min,Inc,[],_).
-
-dalit_prove(Goal,Max,Min) :-
-	dalit_prove(Goal,Max,Min,1,[],_).
-
-dalit_prove(Goal,Max) :-
-	dalit_prove(Goal,Max,0,1,[],_).
-
-dalit_prove(Goal) :-
-	dalit_prove(Goal,10000,0,1,[],_).
-
-:-abolish(search_cost,3).
-search_cost(Body,HeadArgs,N):-dalit_search_cost(Body,HeadArgs,N).
-dalit_search_cost(Body,HeadArgs,N) :-
-	Body = dalit_search_cost(M) ->
-		N = M;
-	Body = (A , B) ->
-		(A = dalit_search_cost(M) ->	% if first conjunct is dalit_search_cost(M),
-			N = M;		% dalit_search cost of conjunction is M
-		%true ->
-			dalit_search_cost(A,HeadArgs,N1),
-			dalit_search_cost(B,HeadArgs,N2),
-			max(N1,N2,N));
-	Body = (A ; B) ->
-		dalit_search_cost(A,HeadArgs,N1),
-		dalit_search_cost(B,HeadArgs,N2),
-		min(N1,N2,N);
-	builtin(Body) ->
-		N = 0;
-	%true ->
-		N = 1.
-
-:-abolish(search,6).
-search(Goal,Max,Min,Inc,PrevInc,DepthIn):-dalit_search(Goal,Max,Min,Inc,PrevInc,DepthIn).
-
-dalit_search(_Goal,Max,Min,_Inc,_PrevInc,_DepthIn) :-
-	Min > Max,
-	!,
-	fail.
-dalit_search(Goal,_Max,Min,_Inc,PrevInc,DepthIn) :-
-        write_search_progress(Min),
-	DepthIn = Min,
-	call(Goal),
-	true.			% should fail if solution found previously
-dalit_search(Goal,Max,Min,Inc,_PrevInc,DepthIn) :-
-	Min1 is Min + Inc,
-	dalit_search(Goal,Max,Min1,Inc,Inc,DepthIn).
-
-:-abolish(make_wrapper,3).
-make_wrapper(Body,HeadArgs,N):-dalit_make_wrapper(Body,HeadArgs,N).
-
-dalit_make_wrapper(_DefinedPreds,[query,0],true) :-
-	!.
-dalit_make_wrapper(DefinedPreds,[P,N],Result) :-
-	functor(Goal,P,N),
-	Goal =.. [P|Args],
-	ExtraArgs = [PosAncestors,NegAncestors,DepthIn,ProofIn,ProofOut],
-	list_append(Args,ExtraArgs,Args1),
-	Head =.. [P|Args1],
-	internal_functor(P,IntP),
-	list_length(ExtraArgs,NExtraArgs),
-	NN is N + NExtraArgs + 1,
-	(identical_member_special([IntP,NN],DefinedPreds) ->
-	        list_append(ExtraArgs,[GoalAtom],ExtraArgs2),
-		list_append(Args,ExtraArgs2,Args2),
-		IntHead =.. [IntP|Args2];
-	%true ->
-		IntHead = fail),
-	(is_negative_functor(P) ->
-		negated_literal(Goal,PosGoal),
-		Red = redn,  % atom in proof is negation of actual literal
-		C1Ancestors = NegAncestors,
-		C2Ancestors = PosAncestors;
-	%true ->
-		PosGoal = Goal,
-		Red = red,
-		C1Ancestors = PosAncestors,
-		C2Ancestors = NegAncestors),
-	(N = 0 ->	% special case for propositional calculus
-		V1 = (identical_member_special(GoalAtom,C2Ancestors) , !);
-	%true ->
-		V1 = ((identical_member_special(GoalAtom,C2Ancestors) , !);
-		       unifiable_member(GoalAtom,C2Ancestors))),
-	V2 = (
-		 ProofIn = [Prf,[Red,GoalAtom,PosAncestors,NegAncestors]|PrfEnd],
-		 ProofOut = [Prf|PrfEnd]),
-	conjoin_pttp(V1,V2,Reduce),
-	Result = (Head :- GoalAtom = PosGoal,
-		  	  (identical_member_special_loop_check(GoalAtom,C1Ancestors) ->
-			   	fail;
-			  %true ->
-			   	(Reduce;
-				 IntHead))).
-
-query(PosAncestors,NegAncestors,DepthIn,ProofIn,ProofOut) :-
-	int_query(PosAncestors,NegAncestors,DepthIn,ProofIn,ProofOut,query).
-
-:-abolish(add_features,2).
-add_features(A,B):-dalit_add_features(A,B).
-
-dalit_add_features((Head :- Body),(Head1 :- Body1)) :-
-	(functor(Head,query,_) ->
-		Head2 = Head,
-		dalit_add_args(INFO,Body,yes,query,[],
-		         PosAncestors,NegAncestors,
-			 PosAncestors,NegAncestors,
-		         DepthIn,
-			 ProofIn,ProofOut,
-			 Body1,_);
-	%true ->
-		linearize(Head,Head2,[],_,true,Matches),
-		(is_negative_literal(Head) ->
-			PosGoal = no;
-		%true ->
-			PosGoal = yes),
-		Head =.. [_|HeadArgs],
-		dalit_add_args(INFO,Body,PosGoal,GoalAtom,HeadArgs,
-                         PosAncestors,NegAncestors,
-			 NewPosAncestors,NewNegAncestors,
-		         Depth1,
-			 ProofIn,ProofOut,
-			 Body2,New),
-		(is_ftVar(New) ->
-			PushAnc = true;
-		PosGoal = yes ->
-			NewNegAncestors = NegAncestors,
-			PushAnc = (NewPosAncestors = [GoalAtom|PosAncestors]);
-		%true ->
-			NewPosAncestors = PosAncestors,
-			PushAnc = (NewNegAncestors = [GoalAtom|NegAncestors])),
-		dalit_search_cost(Body,HeadArgs,Cost),
-		test_and_decrement_search_cost_expr(DepthIn,Cost,Depth1,TestExp),
-		conjoin_pttp(PushAnc,Body2,Body4),
-		conjoin_pttp(Matches,Body4,Body5),
-		conjoin_pttp(TestExp,Body5,Body1)),
-    	Head2 =.. [P|L],
-	internal_functor(P,IntP),
-	list_append(L,[PosAncestors,NegAncestors,
-		       DepthIn,
-		       ProofIn,ProofOut,
-		       GoalAtom],
-		    L1),
-	Head1 =.. [IntP|L1].
-
-:-abolish(add_args,13).
-
-add_args(INFO,Body,PosGoal,GoalAtom,HeadArgs,
-         PosAncestors,NegAncestors,
-	 NewPosAncestors,NewNegAncestors,
-	 DepthIn,
-	 ProofIn,ProofOut,
-	 Body1,New):- 
-  dalit_add_args(INFO,Body,PosGoal,GoalAtom,HeadArgs,
-         PosAncestors,NegAncestors,
-	 NewPosAncestors,NewNegAncestors,
-	 DepthIn,
-	 ProofIn,ProofOut,
-	 Body1,New).
-
-dalit_add_args(INFO,Body,PosGoal,GoalAtom,HeadArgs,
-         PosAncestors,NegAncestors,
-	 NewPosAncestors,NewNegAncestors,
-	 DepthIn,
-	 ProofIn,ProofOut,
-	 Body1,New) :-
-	Body = (A , B) ->
-		dalit_add_args(INFO,A,PosGoal,GoalAtom,HeadArgs,
-                         PosAncestors,NegAncestors,
-			 NewPosAncestors,NewNegAncestors,
-		         DepthIn,
-			 ProofIn,Proof1,
-		         A1,New),
-		dalit_add_args(INFO,B,PosGoal,GoalAtom,HeadArgs,
-		         PosAncestors,NegAncestors,
-			 NewPosAncestors,NewNegAncestors,
-			 DepthIn,
-			 Proof1,ProofOut,
-                         B1,New),
-		conjoin_pttp(A1,B1,Body1);
-	Body = (A ; B) ->
-		throw(unimplemented);
-	functor(Body,dalit_search_cost,_) ->
-		ProofOut = ProofIn,
-		Body1 = true;
-	Body = infer_by(N) ->
-		(PosGoal = yes -> 
-			N1 = N;
-		%true ->  % atom in proof is negation of actual literal
-			isNegOf(N1,N)),
-		Body1 = (ProofIn = [Prf,[N1,GoalAtom,PosAncestors,NegAncestors]|PrfEnd],
-			 ProofOut = [Prf|PrfEnd]);
-	Body = dalit_search_cost(N) ->
-		ProofOut = ProofIn,
-		Body1 = true;
-	builtin(Body) ->
-		ProofOut = ProofIn,
-		Body1 = Body;
-	%true ->
-		Body =.. L,
-		list_append(L,
-                       [NewPosAncestors,NewNegAncestors,
-			DepthIn,
-			ProofIn,ProofOut],
-		       L1),
-		Body1 =.. L1,
-		New = yes.
-%%% ***
 

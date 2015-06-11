@@ -107,7 +107,7 @@
 :- multifile(user:isa_pred_now_locked/0).
 
 :- ensure_loaded(logicmoo(mpred/logicmoo_i_header)).
-:- ensure_loaded(logicmoo(engine/pttp/dbase_i_mpred_pttp)).
+:- ensure_loaded(library(pttp/dbase_i_mpred_pttp)).
 
 %  all(R, room(R) => exists(D, (door(D) & has(R,D))))
 % for any arbitrary R, if R is a room then there exists some object D that is a door, and R has a D.
@@ -138,9 +138,11 @@
      op(500,yfx,'v')
      ,!.
 
-leave_as_is(V):- not(compound(V)),!.
+leave_as_is(V):- \+ compound(V),!.
 leave_as_is('$VAR'(_)).
 leave_as_is(ignore(_)).
+leave_as_is(constraintExists(_,_)).
+leave_as_is({}).
 leave_as_is(kbMark(_)).
 
 kb_nlit(_KB,Neg):-member(Neg,[-,~,neg,not]).
@@ -287,12 +289,39 @@ nnf(Neg,Fml,NNF):- copy_term(Fml,Orig),
 nnf(Neg,KB,Orig,Fml,NNF):-   
    nnf(Neg,KB,Orig,Fml,[],NNF,_),!.
 
-%skolem_setting(nnf).
+skolem_setting(nnf).
 %skolem_setting(removeQ).
 %skolem_setting(eliminate).
-skolem_setting(label).
 %skolem_setting(ignore).
+% skolem_setting(label).
 %skolem_setting(leavein).
+
+% Converts to syntax that NNF/DNF/CNF/removeQ like
+adjust_kif(V,V):- is_ftVar(V),!.
+adjust_kif(A,A):- \+ compound(A),!.
+adjust_kif(n(N,Kif),n(N,KifO)):- !,adjust_kif(Kif,KifO).
+adjust_kif(nesc(N,Kif),nesc(N,KifO)):- !,adjust_kif(Kif,KifO).
+adjust_kif(poss(N,Kif),poss(N,KifO)):- !,adjust_kif(Kif,KifO).
+adjust_kif(-(Kif),n((-),KifO)):- !,adjust_kif(Kif,KifO).
+adjust_kif(not(Kif),n((-),KifO)):- !,adjust_kif(Kif,KifO).
+adjust_kif(poss_not(Kif),poss(b_d(nesc,poss),n((-),KifO))):- !,adjust_kif(Kif,KifO).
+adjust_kif(nesc_not(Kif),nesc(b_d(nesc,poss),n((-),KifO))):- !,adjust_kif(Kif,KifO).
+adjust_kif(not_poss(Kif),n(-,poss(KifO))):- !,adjust_kif(Kif,KifO).
+adjust_kif(not_nesc(Kif),n(-,nesc(KifO))):- !,adjust_kif(Kif,KifO).
+adjust_kif(poss(Kif),poss(b_d(nesc,poss),KifO)):- !,adjust_kif(Kif,KifO).
+adjust_kif(nesc(Kif),nesc(b_d(nesc,poss),KifO)):- !,adjust_kif(Kif,KifO).
+adjust_kif(exists(L,Expr),               ExprO):-L==[],!,adjust_kif(Expr,ExprO).
+adjust_kif(exists([L|List],Expr),exists(L,ExprO)):-is_list(List),!,adjust_kif(exists(List,Expr),ExprO).
+adjust_kif(exists(L,Expr),               ExprO):- \+ contains_var(L,Expr),!,adjust_kif(Expr,ExprO).
+adjust_kif(exists(L,Expr),exists(L,ExprO)):-!,adjust_kif(Expr,ExprO).
+adjust_kif(all(L,Expr),               ExprO):-L==[],!,adjust_kif(Expr,ExprO).
+adjust_kif(all([L|List],Expr),all(L,ExprO)):-is_list(List),!,adjust_kif(exists(List,Expr),ExprO).
+adjust_kif(all(L,Expr),               ExprO):- \+ contains_var(L,Expr),!,adjust_kif(Expr,ExprO).
+adjust_kif(all(L,Expr),all(L,ExprO)):-!,adjust_kif(Expr,ExprO).
+adjust_kif('&'([L|Ist]),ConjO):- is_list([L|Ist]),list_to_conjuncts('&',[L|Ist],Conj),adjust_kif(Conj,ConjO).
+adjust_kif('v'([L|Ist]),ConjO):- is_list([L|Ist]),list_to_conjuncts('v',[L|Ist],Conj),adjust_kif(Conj,ConjO).
+adjust_kif(([L|Ist]),ConjO):- is_list([L|Ist]),list_to_conjuncts('&',[L|Ist],Conj),adjust_kif(Conj,ConjO).
+adjust_kif(PAB,PABO):- PAB=..[P|AB],maplist(adjust_kif,AB,ABO),PABO=..[P|ABO].
 
 
 
@@ -303,9 +332,10 @@ skolem_setting(label).
 % FreeV:      List of free variables in Fml.
 % Paths:      Number of disjunctive paths in Fml.
 
-nnf(Neg,KB, Orig,Lit,FreeV,Pos,Paths):- is_ftVar(Lit),!,nnf(Neg,KB, Orig,proven_t(Lit),FreeV,Pos,Paths).
+nnf(_Neg,_KB,_Orig,Lit,[Lit],Lit,1):- is_ftVar(Lit),!.
+nnf(Neg,KB, Orig,Lit,FreeV,Pos,Paths):- is_ftVar(Lit),!,nnf(Neg,KB,Orig,proven_t(Lit),FreeV,Pos,Paths).
 
-nnf(_,_, _,Var,_ ,Var,1):- leave_as_is(Var),!.
+nnf(_,_, _,Var, _ ,Var,1):- leave_as_is(Var),!.
 
 nnf(Neg,KB, Orig,Lit,FreeV,Pos,1):- is_ftVar(Lit),!,wdmsg(warn(nnf(Neg,KB, Orig,Lit,FreeV,Pos,1))),Pos=proven_t(Lit).
 
@@ -324,6 +354,11 @@ nnf(Neg,KB, Orig,Fin,FreeV,DIA,Paths):- is_b(poss(BDT),Fin,F), !,
 nnf(Neg,KB, Orig,Fin,FreeV,CIR,Paths):- is_b(cir(CT),Fin,F), !,
 	nnf(Neg,KB, Orig,F,FreeV,NNF,Paths), cirRule(Orig,cir(CT,NNF), CIR).
 
+nnf(Neg,KB, Orig,nesc(BDT,F),FreeV,BOX,Paths):- !,trace, show_call(nnf(Neg,KB, Orig,F,FreeV,NNF,Paths), cnf(Orig,NNF,CNF), boxRule(Orig,nesc(BDT,CNF), BOX)).
+nnf(Neg,KB, Orig,poss(BDT,F),FreeV,DIA,Paths):- !,trace, show_call(nnf(Neg,KB, Orig,F,FreeV,NNF,Paths), dnf(Orig,NNF,DNF), diaRule(Orig,poss(BDT,DNF), DIA)).
+nnf(Neg,KB, Orig,  cir(CT,F),FreeV,CIR,Paths):- !,trace, show_call(nnf(Neg,KB, Orig,F,FreeV,NNF,Paths), cirRule(Orig,cir(CT,NNF), CIR)).
+
+
 nnf(Neg,KB, Orig,until(A,B),FreeV,NNF,Paths):- !,
 	nnf(Neg,KB, Orig,A,FreeV,NNF1,Paths1),
 	nnf(Neg,KB, Orig,B,FreeV,NNF2,Paths2),
@@ -336,13 +371,17 @@ nnf(Neg,KB, Orig,all(X,NNF),FreeV,all(X,NNF2),Paths):-
      list_to_set([X|FreeV],NewVars),
       nnf(Neg,KB, Orig,NNF,NewVars,NNF2,Paths).
 
+nnf(Neg,KB, Orig,exists(X,Fml),FreeV,NNF,Paths):-  \+ contains_var(X,Fml),!,nnf(Neg,KB, Orig,Fml,FreeV,NNF,Paths).
+
 nnf(Neg,KB, Orig,exists(X,Fml),FreeV,NNF,Paths):- skolem_setting(nnf),!, wdmsg(nnf(Neg,skolemizing(exists(X,Fml)))),
    must(skolem(KB,Orig,Fml,X,FreeV,FmlSk)),
    must(nnf(Neg,KB, Orig,FmlSk,FreeV,NNF,Paths)).
 
 nnf(Neg,KB, Orig,exists(X,Fml),FreeV,NNF,Paths):- skolem_setting(label),
    list_to_set([X|FreeV],NewVars),
-	must(nnf(Neg,KB, Orig,(ignore(X =skF(NewVars)/*(Fml)*/) => Fml),NewVars,NNF,Paths)).
+     delete(NewVars,X,NewNewVars),
+     subst(Fml,X,theThis,FmlNoSk),
+	must(nnf(Neg,KB, Orig,(ignore(X =skF(NewNewVars,FmlNoSk)) => Fml),NewVars,NNF,Paths)).
 
 nnf(Neg,KB, Orig,exists(X,Fml),FreeV,NNF,Paths):- skolem_setting(ignore),
    list_to_set([X|FreeV],NewVars),
@@ -417,6 +456,7 @@ nnf(Neg,KB, Orig,Fml,FreeV,NNF,Paths):-
 	),!,
 	nnf(Neg,KB, Orig,Fml1,FreeV,NNF,Paths).
 
+
 /*
 nnf(Neg,KB, _Orig,Fml,_,Fml,1):- Fml=..[F,KB,_],third_order(F),!.
 nnf(Neg,KB,  Orig,Fml,FreeV,Out,Path):- Fml=..[F,A],third_order(F),  
@@ -425,10 +465,23 @@ nnf(Neg,KB,  Orig,Fml,FreeV,Out,Path):- Fml=..[F,A],third_order(F),
 */
 
 nnf(Neg,KB, Orig, IN,FreeV,OUT,Paths):- simplify_cheap(IN,MID),IN\=MID,nnf(Neg,KB, Orig, MID,FreeV,OUT,Paths).
+nnf(Neg,KB, Orig,[F|Fml],FreeV,Out,Paths):- arg(_,v((v),(&),(=>),(<=>)),F),nnf(Neg,KB, Orig,Fml,FreeV,NNF,Paths),Out =..[F| NNF].
+nnf(_ , _, _    , IN,[],OUT,1):- mnf(IN,OUT),IN\=OUT,!.
 nnf(Neg,KB,_Orig,Fml,_,FmlO,1):- nonegate(Neg,KB,Fml,FmlO),!.
+
 
 is_lit_atom(IN):- leave_as_is(IN),!.
 is_lit_atom(IN):- subst(IN,'&','*',M),subst(M,'v','*',O),!,O==IN.
+
+mnf(Var,Var):-leave_as_is(Var),!.
+mnf(Fml,Out):-boxRule(_,Fml,M),Fml\=M,mnf(M,Out).
+mnf(Fml,Out):-diaRule(_,Fml,M),Fml\=M,mnf(M,Out).
+mnf(dia(DBT,A=>B),Out):- diaRule(_,dia(DBT,v( neg(-,B),A)),M),mnf(M,Out).
+mnf(nesc(DBT,A=>B),Out):- mnf(nesc(DBT,v( neg(-, B),A)),M),mnf(M,Out).
+%mnf(nesc(DBT,v(A,B)),Out):-mnf(neg(-,dia(DBT,&(neg(-,A),neg(-, B)))),M),mnf(M,Out).
+mnf([F|Fml],Out):- arg(_,v((v),(&),(=>),(<=>)),F),mnf(Fml,NNF),Out =..[F| NNF].
+mnf(Var,Var):-!.
+
 
 third_order(asserted_t).
 
@@ -498,11 +551,19 @@ dnf1(_Orig,DNF,                  DNF ).
 
 
 simplify_cheap(IN,OUT):- IN = nesc(BDT,OUT),is_modal(OUT,BDT),!.
-simplify_cheap(n(Neg,poss(BDT, poss(BDT, F))), n(Neg,F)):-nonvar(F),!.
+simplify_cheap(poss(BDT,nesc(BDT,IN)),OUT):- simplify_cheap_must(poss(BDT,IN),OUT).
+simplify_cheap(poss(BDT,poss(BDT,IN)),OUT):- simplify_cheap_must(poss(BDT,IN),OUT).
+simplify_cheap(nesc(BDT,poss(BDT,IN)),OUT):- simplify_cheap_must(poss(BDT,IN),OUT).
+simplify_cheap(n(BDT,n(BDT,IN)),OUT):- simplify_cheap_must(IN,OUT).
+simplify_cheap(n(Neg, poss(BDT, poss(BDT, F))), n(Neg,F)):-nonvar(F),!.
+simplify_cheap(n(Neg,poss(_, n(Neg, F))), F):-nonvar(F),!.
 simplify_cheap((poss(BDT, poss(BDT, F))),  poss(BDT, F)):-nonvar(F),!.
 %simplify_cheap(IN,-OUT):- IN = n(Neg,poss(BDT,OUT)), is_modal(OUT,BDT),!.
 %simplify_cheap(IN,-OUT):- IN = n(Neg,nesc(BDT,OUT)), \+is_modal(OUT,BDT),!.
 
+
+simplify_cheap_must(IN,OUT):- simplify_cheap(IN,OUT).
+simplify_cheap_must(IN,IN).
 
 is_sentence_functor(_).
 
@@ -526,6 +587,7 @@ pnf(_, [],  _,           []):- !.
 
 pnf(_, IN,  _,              OUT):- is_list(IN),!, maplist(pnf,IN,OUT).
 
+pnf(Orig, IN, FreeV,              OUT):- once(mnf(IN,MID)),IN\=@=MID,mnf(IN,MID), pnf(Orig,MID,FreeV,OUT).
 pnf(Orig, IN, FreeV,              OUT):- simplify_cheap(IN,MID), pnf(Orig,MID,FreeV,OUT).
 
 pnf(Orig,   all(X,F),Vs,   all(X,PNF)):- list_to_set([X|Vs],VVs), !, pnf(Orig,F, VVs, PNF).
@@ -577,32 +639,36 @@ pnf(_Orig,          PNF, _,       PNF ).
 
 % cf(KB,A,B,C):- convertAndCall(as_dlog,cf(KB,A,B,C)).
 cf(KB, Orig,PNF, SET):- removeQ(KB, Orig,PNF,[], UnQ), 
-  cnf(Orig,UnQ,CNF),clausify(KB,CNF,Cla,[]),!,
-  dnf(Orig,UnQ,DNF),flatten_or_list(Orig,DNF,Flat),make_clause_Vs_each(KB,Flat,EachClause),!,
-  append(Cla,[cl([kbMark(Orig)],[])|EachClause],SO),!,
-  maplist(correct_cls,SO,SOO),
-  list_to_set(SOO,SET),!.
+  cnf(Orig,UnQ,CNF),!,  
+  conjuncts_to_list(CNF,Conj),!,display_form(conj:-Conj),
+  %nnf(-,-CNF,DisjN),dnf(DisjN,DNF),!, %display_form(dnf:-DNF),
+  %disjuncts_to_list(DNF,Disj),!,display_form(disj:-Disj),
+  make_clause_set(KB,Conj,EachClause),!,
+  maplist(correct_cls,EachClause,SOO),
+  expand_cl(SOO,SOOO),
+  list_to_set(SOOO,SET),!.
 
 removeQ(F,  HH):- removeQ(_KB, _, F, _, RQ0),!,RQ0=HH.
 
 % removes quantifiers (also pushes modal operators inside the negations) 
 
 removeQ(_,_,Var,_ ,Var):- leave_as_is(Var),!.
-
 removeQ(_KB, _Orig, F,_, RQ0):- is_list(F),!,maplist(removeQ,F,HH),!,HH=RQ0.
 
 
 removeQ(KB, Orig, IN,FreeV,OUT):-  simplify_cheap(IN,MID), IN\=@=MID, removeQ(KB, Orig, MID,FreeV,OUT).
 
-removeQ(KB, Orig,H, Vars, HH ):- convertAndCall(as_dlog,removeQ(KB, Orig,H, Vars, HH )).
+removeQ(KB, Orig, H, Vars, HH ):- convertAndCall(as_dlog,removeQ(KB, Orig,H, Vars, HH )).
 removeQ(KB, Orig, n(Neg,n(Neg,F)),Vars, XF):- !, removeQ(KB, Orig,  F,Vars, XF) .
 removeQ(KB, Orig, all(X,F),Vars, HH):- !,  removeQ(KB, Orig,F,[X|Vars], RQ0),RQ0=HH.
 
+/*
 removeQ(KB, Orig, n(Neg,nesc(b_d(B,X), n(Neg,F))),Vars, XF):- !,removeQ(KB, Orig, poss(b_d(B,X), F),Vars, XF).
 removeQ(KB, Orig, n(Neg,poss(b_d(B,X), n(Neg,F))),Vars, XF):- !,removeQ(KB, Orig, nesc(b_d(B,X), F),Vars, XF).
 
-%removeQ(KB, Orig, n(Neg,nesc(b_d(B,X), (F))),Vars, XF):- !,removeQ(KB, Orig, poss(b_d(B,X), n(Neg,F)),Vars, XF).
-%removeQ(KB, Orig, n(Neg,poss(b_d(B,X), (F))),Vars, XF):- !,removeQ(KB, Orig, nesc(b_d(B,X), n(Neg,F)),Vars, XF).
+removeQ(KB, Orig, n(Neg,nesc(b_d(B,X), (F))),Vars, XF):- !,removeQ(KB, Orig, poss(b_d(B,X), n(Neg,F)),Vars, XF).
+removeQ(KB, Orig, n(Neg,poss(b_d(B,X), (F))),Vars, XF):- !,removeQ(KB, Orig, nesc(b_d(B,X), n(Neg,F)),Vars, XF).
+*/
 
 removeQ(KB, Orig, nesc(b_d(B,X), n(Neg,F)),Vars, XF):- !,removeQ(KB, Orig, n(Neg,poss(b_d(B,X), F)),Vars, XF).
 removeQ(KB, Orig, poss(b_d(B,X), n(Neg,F)),Vars, XF):- !,removeQ(KB, Orig, n(Neg,nesc(b_d(B,X), F)),Vars, XF).
@@ -624,19 +690,30 @@ removeQ(KB,Orig, H,Vars,HH ):- compound(H),H=..[F|ARGS],!,removeQ(KB,Orig, ARGS,
 
 removeQ(_,_Orig, F,_,F0 ):- F=F0.
 
+display_form(Form):- demodal_sents(Form,Out),portray_clause(Out).
+
+demodal_sents(I,O):-transitive(demodal_sents0,I,O).
+
+demodal_sents0(I,O):-demodal(I,M),modal2sent(M,O),!.
 
 demodal(Var, Var):- leave_as_is(Var),!.
-demodal(n(Neg,H), HHH):- atom(Neg),demodal(H, HH),!,HHH=..[Neg,HH].
-demodal(n(Neg,H), - HH):- nonvar(Neg),!,demodal(H, HH).
+demodal(n(Neg,H), HHH):- must(atom(Neg)),demodal(H, HH),!,HHH=..[Neg,HH].
 demodal(nesc(b_d(X,_),F), XF):- !,demodal(F, HH), XF =..[X,HH].
 demodal(poss(b_d(_,X),F), XF):- !,demodal(F, HH), XF =..[X,HH].
-demodal(H,HH):- is_list(H),!,maplist(demodal,H,HH).
-demodal(neg(H),neg(HH)):- nonvar(H),demodal(H,HH).
-demodal(not(H),not(HH)):- nonvar(H),demodal(H,HH).
-demodal(n(Neg,H),n(Neg,HH)):- nonvar(H),demodal(H,HH).
-demodal(H,HH ):- H=..[F|ARGS],!,demodal(ARGS,ARGSO),!,HH=..[F|ARGSO].
+demodal(neg(H),not(HH)):- nonvar(H),demodal(H,HH).
+demodal(-(H),not(HH)):- nonvar(H),demodal(H,HH).
+demodal([H|T],[HH|TT]):- !, must(( demodal(H,HH),demodal(T,TT))),!.
+demodal(H,HH ):- H=..[F|ARGS],!,maplist(demodal,ARGS,ARGSO),!,HH=..[F|ARGSO].
 
+is_sent_op_modality(not).
+is_sent_op_modality(poss).
+is_sent_op_modality(nesc).
+atom_compat(F,HF,HHF):- F\=HF, is_sent_op_modality(F),is_sent_op_modality(HF), format(atom(HHF),'~w_~w',[F,HF]).
 
+modal2sent(Var, Var):- leave_as_is(Var),!.
+modal2sent(G,O):- G=..[F,H], \+ leave_as_is(H), H=..[HF,HH], atom_compat(F,HF,HHF),!, GG=..[HHF,HH], modal2sent(GG,O).
+modal2sent([H|T],[HH|TT]):- !, must(( modal2sent(H,HH),modal2sent(T,TT))),!.
+modal2sent(H,HH ):- H=..[F|ARGS],!,maplist(modal2sent,ARGS,ARGSO),!,HH=..[F|ARGSO].
 
 
 clausify(KB, &(P,Q), C1, C2 ):- 
@@ -670,12 +747,41 @@ putin(X,[],   [X]   ):- !.
 putin(X,[Y|L],[Y|L] ):- X == Y,!.
 putin(X,[Y|L],[Y|L1]):- putin(X,L,L1).
 
+simplify_atom(H,SH):-simplify_cheap(H,SH),!.
+simplify_atom(H,H).
 
-make_clause_Vs_each(KB,List,Out):- must((findall(E,make_each(KB,List,E),Out),Out=[_|_])).
-make_each(KB,List,E):- member(One,List),  make_1_cl(KB,One,List,E).
+to_regular_cl([(H1 & H2)],[Has],[cl([H1],H1P),cl([H2],H2P)]):- cnf(Has,HasC),  append([HasC],[poss,H2],H1P), append([HasC],[poss,H1],H2P),!.
+to_regular_cl([(H1 & H2)],Has,[cl([H1],H1P),cl([H2],H2P)]):-  append(Has,[poss,H2],H1P), append(Has,[poss,H1],H2P),!.
+to_regular_cl([H],[],[cl([SH],[])]):-is_lit_atom(H),simplify_atom(H,SH).
+to_regular_cl(HL,BL,[cl(HL,BL)]).
 
-make_1_cl(KB,One,List,cl([One],NewBodyListO)):- delete_eq(List,One,Rest),
-  maplist(negate_one(KB),Rest,NewBodyList),
+
+expand_cl([],[]):-!.
+expand_cl([cl(H,B)|O],OOut):- 
+      to_regular_cl(H,B,More),!,
+      expand_cl(O,OO),
+      append(More,OO,OOut).
+
+make_clause_set(_ ,[],[]).
+make_clause_set(KB,[CJ|Conj],CLAUSES):-
+   make_clauses(CJ,CLS),
+   make_clause_set(KB,Conj,CLAUS),
+   append(CLS,CLAUS,CLAUSES).
+
+make_clauses(_,[CJ],cl([CJ],[])):-is_lit_atom(CJ).
+make_clauses(CJ,OOut):- disjuncts_to_list(CJ,Conj),make_clause_from_set(KB,Conj,OOut).
+
+negate_one_maybe(KB,One,Neg):-negate_one(KB,One,Neg).
+   
+make_clause_from_set(KB,Conj,Out):- findall(E,make_each(KB,Conj,E),Out).
+
+make_each(KB,Conj,E):- member(One,Conj), make_1_cl(KB,One,Conj,E).
+
+make_1_cl(KB,One,Conj,cl([One],NewBodyListO)):- 
+  negate_one_maybe(KB,One,NHead),!,
+  One\={_}, NHead\={_},
+  delete_eq(Conj,One,Rest0),delete_eq(Rest0,NHead,Rest),
+  maplist(negate_one_maybe(KB),Rest,NewBodyList),!,
   flattenConjs(KB,NewBodyList,NewBodyListM),
   maplist(thglobal:as_prolog,NewBodyListM,NewBodyListO).
 
@@ -714,12 +820,13 @@ mpred_quf_0(InOut,InOut):- non_compound(InOut),!.
 % mpred_quf_0(In,Out):- current_predicate(db_quf/4),db_quf(change(assert,_Must),In,U,C),conjoin(U,C,Out).
 mpred_quf_0(In,In).
 
-:- export(nonegate/3).
-nonegate(Neg,KB,List,OutZ):- is_list(List),maplist(nonegate(Neg,KB),List,OutZ).
-nonegate(Neg,KB,Fml,OutZ):- simplify_cheap(Fml,Fml2), Fml \=@= Fml2,nonegate(Neg,KB,Fml2,OutZ).
-nonegate(Neg,KB,Fml,OutZ):- unbuiltin_negate(Neg,KB,Fml,Out),defunctionalize(Out,OutY),mpred_quf(OutY,OutZ).
+:- export(nonegate/4).
+nonegate(Neg,KB,List,OutZ):- is_list(List),maplist(nonegate(Neg,KB),List,OutZ),!.
+nonegate(Neg,KB,Fml,OutZ):- simplify_cheap(Fml,Fml2), Fml \=@= Fml2,nonegate(Neg,KB,Fml2,OutZ),!.
+nonegate(Neg,KB,Fml,OutZ):- must((unbuiltin_negate(Neg,KB,Fml,Out),!,defunctionalize(Out,OutY),!,must(mpred_quf(OutY,OutZ)))),!.
 
-unbuiltin_negate(_Neg,_, Fml,Out):- get_functor(Fml,F,A),builtin(F,A),!,must(Out=Fml).
+unbuiltin_negate(_Neg,_, Fml,Fml):- is_ftVar(Fml),!.
+unbuiltin_negate(_Neg,_, Fml,Out):- get_functor(Fml,F,A),pttp_builtin(F,A),!,must(Out=Fml).
 unbuiltin_negate(_Neg,KB,Fml,Out):- once(negate(KB,Fml,Neg)),negate(KB,Neg,Out),!.
 
 %=%  Skolemizing : method 1
@@ -740,9 +847,15 @@ skolem_bad(Fml,X,FreeV,FmlSk):-
 % fN(Vars) N=1,...
 % VARIABLES MAYBE EITHER PROLOG VARIABLES OR TERMS
 
-skolem(KB, Orig, F, X, FreeV, Out):-  
+
+skolem(KB, Orig, F, X, FreeV, Out):-  fail,
    must(skolem_f(KB, Orig, F, X, FreeV, Sk)),
-   must(Out=('=>'(mudEquals(X,Sk),F))),!.
+   subst(F,X,Sk,Out).
+
+skolem(_ , Orig, F, X, FreeV, Out):-  
+   must(skolem_f(KB, Orig, F, X, FreeV, Sk)),
+   must(Out= '=>'({constraintExists(X,Sk)},F)),
+   !,show_call( asserta((constraintRules(X,Sk,F)))).
 
 skolem(KB, Orig, F, X, FreeV, FmlSk):- 
     must(skolem_f(KB, Orig, F, X, FreeV, Sk)), 
@@ -751,12 +864,13 @@ skolem(KB, Orig, F, X, FreeV, FmlSk):-
 
 skolem_f(KB, Orig, F, X, FreeVIn, Sk):- 
        must_det_l([ 
-        delete_eq(FreeVIn,KB,FreeV),
-        list_to_set(FreeV,FreeVSet),
+         delete_eq(FreeVIn,KB,FreeV0),
+         delete_eq(FreeV0,X,FreeV),
+         list_to_set(FreeV,FreeVSet),
 	contains_var_lits(F,X,LitsList),
         mk_skolem_name(Orig,X,LitsList,'',SK),
         concat_atom(['sk',SK,'Fn'],Fun),
-	Sk =..[Fun,KB|FreeVSet]]).
+	Sk =..[Fun|FreeVSet]]).
 /*
 
 
@@ -846,7 +960,8 @@ wdmsgl_3(NAME,F,NF):- copy_term(vv(NAME,F,NF),vv(NAME2,F2,NF2)),
 wdmsgl_4(NAME,F,NF):- is_list(NF),!,list_to_set(NF,NS),maplist(wdmsgl_4(NAME,F),NS).
 wdmsgl_4(NAME,F,NF):- compound(NF),NF=..[FF,A,B],FF=F,not_ftVar(A),not_ftVar(B),!,
   maplist(wdmsgl_4(NAME,F),[A,B]).
-wdmsgl_4(NAME,_,NF):- as_symlog(NF,NF2), with_all_dmsg(wdmsg(NAME=NF2)).
+wdmsgl_4(NAME,_,NF):- as_symlog(NF,NF2), with_all_dmsg(display_form(NAME:-NF2)).
+wdmsgl_4(NAME,_,NF):- as_symlog(NF,NF2), cyc:pterm_to_sterm(NF2,NF3),with_all_dmsg(display_form(NAME:-NF3)).
 
 
 
@@ -881,10 +996,12 @@ is_function(_,F,_):- atom_concat(_Was,'Fn',F).
 is_function(_,F,_):- tFunction(F).
 is_function(_,F,A):- A2 is A+1,current_predicate(F/A2), not(current_predicate(F/A)).
 
-%:- pfc_add(user:mpred_prop(I,C)<=(ttPredType(C),user:isa(I,C))).
+%:- pfc_add(isa(I,C)<=(ttPredType(C),user:isa(I,C))).
 
 is_ftEquality(Term):- is_ftVar(Term),!,fail.
-is_ftEquality(Term):- get_pred(Term,Pred),(user:mpred_prop(Pred,prologEquality);Pred==mudEquals;genlPreds(Pred,equals)).
+%is_ftEquality(Term):- get_pred(Term,Pred),is),!,(Pred==mudEquals;genlPreds(Pred,equals);clause_asserted(prologEquality(Pred))),!.
+is_ftEquality(mudEquals(_,_)).
+is_ftEquality(equals(_,_)).
 
 function_to_predicate(Function,NewVar,PredifiedFunction):- 
   Function=..[F|ARGS],
@@ -916,7 +1033,8 @@ correct_cls(H,HH):-loop_check(correct_cls0(H,HH),H=HH),!.
 correct_cls0(CL0,CL1):- is_list(CL0),!,maplist(correct_cls,CL0,CL1).
 correct_cls0(cl([H],B),O):- delete_sublits(B,H,BB),BB\=@=B,!,correct_cls(cl([H],BB),O).
 correct_cls0(cl(H,B),O):- list_to_set(B,BB),BB\=@=B,!,correct_cls(cl(H,BB),O).
-correct_cls0(cl(H,B),O):- removeQ(H,HH),removeQ(B,BB),!,((H\=@=HH ; B\=@=BB) -> correct_cls(cl(HH,BB),O); O=cl(H,B)),!.
+correct_cls0(CL,O):- demodal_sents(CL,CLM),CL\=@=CLM,!,correct_cls(CLM,O).
+correct_cls0(cl(H,B),O):-removeQ(H,HH),removeQ(B,BB),!,((H\=@=HH ; B\=@=BB) -> correct_cls(cl(HH,BB),O); O=cl(H,B)),!.
 
 % kif_to_boxlog('=>'(WffIn,enables(Rule)),'$VAR'('MT2'),complete,Out1), % kif_to_boxlog('=>'(enabled(Rule),WffIn),'$VAR'('KB'),complete,Out).  
 
@@ -937,6 +1055,7 @@ kif_to_boxlog(WffIn,Why,Out):-  kif_to_boxlog(WffIn,'$VAR'('KB'),Why,Out),!.
 
 kif_to_boxlog(Fml,KB,Why,Flattened):- var(KB),!,kif_to_boxlog(Fml,'$VAR'('KB'),Why,Flattened).
 
+kif_to_boxlog(Wff,KB,Why,Out):- once(adjust_kif(Wff,M)),Wff \=@= M ,!,kif_to_boxlog(M,KB,Why,Out).
 kif_to_boxlog((Wff:- B),KB,Why,Flattened):- is_true(B),!, kif_to_boxlog(Wff,KB,Why,Flattened),!.
 kif_to_boxlog(WffInIn,KB,Why,FlattenedO):-  as_dlog(WffInIn,WffIn),WffInIn\=@=WffIn,!,kif_to_boxlog(WffIn,KB,Why,FlattenedO),!.
 
@@ -968,6 +1087,7 @@ kif_to_boxlog(WffIn,KB,Why,FlattenedO):-
    cf(KB,Orig,PNF,NCFsI),!,
    cf_to_flattened_clauses(KB,Why,NCFsI,FlattenedO))),!.
 
+add_nesc(Wff666,Wff666):-!.
 add_nesc(Wff666,Wff666):-leave_as_is(Wff666),!.
 add_nesc(Wff666,Wff666):-is_modal(Wff666,_),!.
 add_nesc(Wff666,nesc(Wff666)).
@@ -980,7 +1100,7 @@ cf_to_flattened_clauses(KB,Why,NCFsI,FlattenedO):-
    flatten([ListOfLists],Flattened),
    thglobal:as_prolog(Flattened,FlattenedL),
    list_to_set(FlattenedL,FlattenedS),
-   maplist(demodal,FlattenedS,FlattenedO))),!.
+   maplist(demodal_sents,FlattenedS,FlattenedO))),!.
 
 
 
@@ -1028,7 +1148,7 @@ door(What).
 :- snark_tell((p => q)).
 :- snark_tell(~p <=> ~q).
 :- snark_tell(p <=> q).
-:- snark_tell(all(P, person(P) => ~exists(D, dollar(D) & has(P,D)))).
+:- snark_tell(all(P, person(P) => -exists(D, dollar(D) & has(P,D)))).
 
 :- snark_tell(go(sam) & (go(bill) v go(sally) ) & go(nancy)).
 
@@ -1072,7 +1192,7 @@ snark_read(In,Wff,Vs):-
       catch(read_term(In,Wff,[module(logicmoo_i_snark),double_quotes(string),variable_names(Vs)]),E,(fmt(E),fail))).
 
 %= ===== to test program =====-
-:- ensure_loaded(logicmoo(engine/plarkc/dbase_i_sexpr_reader)).
+:- ensure_loaded(library(plarkc/dbase_i_sexpr_reader)).
 
 :- export(snark/0).
 snark:- current_input(In),current_output(Out),!,snark(In,Out).
@@ -1171,7 +1291,7 @@ snark_tell_boxes2(Why,Assert):-
   assert_wfs(Why,PTTP))).
 
 simplify_bodies((H:- B),(H:- BC)):- must_det_l((conjuncts_to_list(B,RB),simplify_list(RB,BB),list_to_conjuncts(BB,BC))).
-simplify_bodies((B),(BC)):- must_det_l((conjuncts_to_list(B,RB),simplify_list(RB,BB),list_to_conjucts(BB,BC))).
+simplify_bodies((B),(BC)):- must_det_l((conjuncts_to_list(B,RB),simplify_list(RB,BB),list_to_conjuncts(BB,BC))).
 
 
 simplify_list(RB,BBO):- list_to_set(RB,BB),maplist(removeQ,BB,BBO).
@@ -1242,17 +1362,19 @@ boxlog_to_prolog(BL,PTTP):- thglobal:as_prolog(BL,PTTP).
 */
 % :- prolog.
 
+:- snark_tell(all(R,room(R) => exists(D, (door(D) & has(R,D))))).
+% :- snark_tell(loves(Child,motherFn(Child))).
 
 :- dynamic(snark_pred_head/1).
 :- style_check(-singleton).
 
-snark_pred_head(P):- var(P),user:mpred_prop(F,prologSNARK),arity(F,A),functor(P,F,A).
-snark_pred_head(P):- get_functor(P,F,_),user:mpred_prop(F,prologPTTP).
+snark_pred_head(P):- var(P),!,isa(F,prologSNARK),arity(F,A),functor(P,F,A).
+snark_pred_head(P):- get_functor(P,F,_),isa(F,prologPTTP).
 
 :- dynamic(pttp_pred_head/1).
 
-pttp_pred_head(P):- var(P),user:mpred_prop(F,prologPTTP),arity(F,A),functor(P,F,A).
-pttp_pred_head(P):- get_functor(P,F,_),user:mpred_prop(F,prologPTTP).
+pttp_pred_head(P):- var(P),isa(F,prologPTTP),arity(F,A),functor(P,F,A).
+pttp_pred_head(P):- get_functor(P,F,_),isa(F,prologPTTP).
 
 :- multifile(snarky_comment/1).
 
@@ -1295,7 +1417,7 @@ user:provide_mpred_storage_clauses(H,true,wid3(IDWhy)):- wid(IDWhy,_,(H)),compou
 % REGISTER HOOK
 user:provide_mpred_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(StubType),!,
    get_pifunctor(HeadIn,Head,F),
-      assert_if_new(user:mpred_prop(F,prologPTTP)),
+      assert_if_new(isa(F,prologPTTP)),
          ensure_universal_stub(Head),
          RESULT = declared(pttp_listens_to_head(OP,Head)).
 
@@ -1303,7 +1425,7 @@ user:provide_mpred_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(Stub
 
 :- if_startup_script(tsnark).
 :- if_startup_script(ensure_loaded(logicmoo_i_mpred_snark_testing)).
-%:- logicmoo_example3.
+:- logicmoo_example3.
 
 end_of_file.
 

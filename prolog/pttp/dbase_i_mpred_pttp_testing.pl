@@ -317,7 +317,7 @@ pttp_test(logicmoo_example3,
           pred_t(genlPreds,mudMother,mudParent),
           pred_isa_t(predIrreflexive,mudChild),         
           asserted_t(mudParent, iSon1, iFather1),
-        (query:- (refuted_t(mudChild, iSon1, iFather1)))
+        (query:- (proven_not_t(mudChild, iSon1, iFather1)))
           
           % Expected true
 	))).
@@ -333,7 +333,7 @@ pttp_test(logicmoo_example4,
           pred_t(genlPreds,mudMother,mudParent),
           pred_isa_t(predIrreflexive,mudChild),         
           asserted_t(mudParent, iSon1, iFather1),
-          (query:- -(assertable_t(mudChild, iSon1, iFather1)))
+          (query:- -(possible_t(mudChild, iSon1, iFather1)))
           % Expected true
 	))).
 
@@ -351,15 +351,15 @@ pttp_logic(logicmoo_kb_logic,
           (( pred_t(disjointWith,C1,C2) =>  isa(I,C1) v isa(I,C2) )),
 
           (( pred_t(genlPreds,P,PSuper) & proven_t(P,A,B) => proven_t(PSuper,A,B) )),
-          (( pred_t(genlPreds,P,PSuper) & refuted_t(PSuper,A,B) => refuted_t(P,A,B) )),
+          (( pred_t(genlPreds,P,PSuper) & proven_not_t(PSuper,A,B) => proven_not_t(P,A,B) )),
           (( pred_t(genlInverse,P,PSuper) & proven_t(P,A,B) => proven_t(PSuper,B,A) )),
-          (( pred_t(negationPreds,P,PSuper) & proven_t(P,A,B) => refuted_t(PSuper,A,B) )),
-          (( pred_t(negationInverse,P,PSuper) & proven_t(P,A,B) => refuted_t(PSuper,B,A) )),
+          (( pred_t(negationPreds,P,PSuper) & proven_t(P,A,B) => proven_not_t(PSuper,A,B) )),
+          (( pred_t(negationInverse,P,PSuper) & proven_t(P,A,B) => proven_not_t(PSuper,B,A) )),
 
       %    (( pred_isa_t(predTransitive,P) & proven_t(P,A,B) & proven_t(P,B,C) => proven_t(P,A,C) )),
       %    (( pred_isa_t(predReflexive,P) & proven_t(P,A,B) => proven_t(P,A,A) & proven_t(P,B,B) )),
       %    (( pred_isa_t(predSymmetric,P) & proven_t(P,A,B) => proven_t(P,B,A)  ))
-          (( pred_isa_t(predIrreflexive,P) &  proven_t(P,A,B) => refuted_t(P,B,A) ))
+          (( pred_isa_t(predIrreflexive,P) &  proven_t(P,A,B) => proven_not_t(P,B,A) ))
        %   (( pred_isa_t(predIrreflexive,PSuper) & pred_t(genlInverse,PSuper,P) => pred_isa_t(predIrreflexive,P) )),
        %   (( pred_isa_t(predIrreflexive,PSuper) & pred_t(genlPreds,P,PSuper) => pred_isa_t(predIrreflexive,P) ))
        ))).
@@ -369,34 +369,82 @@ pttp_logic(logicmoo_kb_logic,
 
 pttp_logic(logicmoo_kb_refution,
           ((
+           % TODO define askable_t
+           (( asserted_t(Sent) => proven_t(Sent) )),
+           (( proven_t(Sent) => assumed_t(Sent) )),
+           (( assumed_t(Sent) => -proven_not_t(Sent) & -fallacy_t(Sent)  )),
+           (( possible_t(Sent) => -proven_not_t(Sent) & -fallacy_t(Sent)  )),            
+
+           (( proven_t(Sent) & proven_not_t(Sent) => fallacy_t(Sent) )),
            
+           (( proven_t(Sent) =>  -proven_not_t(Sent) & possible_t(Sent) & -unknown_t(Sent) )),
+           (( proven_not_t(Sent) => -proven_t(Sent) & -possible_t(Sent) & -unknown_t(Sent) )),
+           (( askable_t(Sent) => proven_t(Sent) v unknown_t(Sent) v proven_not_t(Sent)  )),
+           (( answerable_t(Sent) <=> askable_t(Sent) & -unknown_t(Sent) )),
+           (( askable_t(Sent) <=> -fallacy_t(Sent) )),
+           (( answerable_t(Sent) => proven_t(Sent) v proven_not_t(Sent)  )),
+           (( proven_t(Sent) v unknown_t(Sent) v proven_not_t(Sent)  )),
+
+           % TODO define askable_t
+           (( asserted_t(P,A) => proven_t(P,A) )),
+           (( proven_t(P,A) => assumed_t(P,A) )),
+           (( assumed_t(P,A) => -proven_not_t(P,A) & -fallacy_t(P,A)  )),
+           (( possible_t(P,A) => -proven_not_t(P,A) & -fallacy_t(P,A)  )),            
+
+           (( proven_t(P,A) & proven_not_t(P,A) => fallacy_t(P,A) )),
+
+           (( proven_t(P,A) =>  -proven_not_t(P,A) & possible_t(P,A) & -unknown_t(P,A) )),
+           (( proven_not_t(P,A) => -proven_t(P,A) & -possible_t(P,A) & -unknown_t(P,A) )),
+           (( askable_t(P,A) => proven_t(P,A) v unknown_t(P,A) v proven_not_t(P,A)  )),
+           (( answerable_t(P,A) <=> askable_t(P,A) & -unknown_t(P,A) )),
+           (( askable_t(P,A) <=> -fallacy_t(P,A) )),
+           (( answerable_t(P,A) => proven_t(P,A) v proven_not_t(P,A)  )),
+           (( proven_t(P,A) v unknown_t(P,A) v proven_not_t(P,A)  )),
+
            % TODO define askable_t
            (( asserted_t(P,A,B) => proven_t(P,A,B) )),
            (( proven_t(P,A,B) => assumed_t(P,A,B) )),
-           (( assumed_t(P,A,B) => -refuted_t(P,A,B) & -fallacy_t(P,A,B)  )),
-           (( assertable_t(P,A,B) => -refuted_t(P,A,B) & -fallacy_t(P,A,B)  )),            
+           (( assumed_t(P,A,B) => -proven_not_t(P,A,B) & -fallacy_t(P,A,B)  )),
+           (( possible_t(P,A,B) => -proven_not_t(P,A,B) & -fallacy_t(P,A,B)  )),            
 
-           (( proven_t(P,A,B) & refuted_t(P,A,B) => fallacy_t(P,A,B) )),
+           (( proven_t(P,A,B) & proven_not_t(P,A,B) => fallacy_t(P,A,B) )),
            
-           (( proven_t(P,A,B) =>  -refuted_t(P,A,B) & assertable_t(P,A,B) & -unknowable_t(P,A,B) )),
-           (( refuted_t(P,A,B) => -proven_t(P,A,B) & -assertable_t(P,A,B) & -unknowable_t(P,A,B) )),
-           (( askable_t(P,A,B) => proven_t(P,A,B) v unknowable_t(P,A,B) v refuted_t(P,A,B)  )),
-           (( answerable_t(P,A,B) <=> -unknowable_t(P,A,B) )),
+           (( proven_t(P,A,B) =>  -proven_not_t(P,A,B) & possible_t(P,A,B) & -unknown_t(P,A,B) )),
+           (( proven_not_t(P,A,B) => -proven_t(P,A,B) & -possible_t(P,A,B) & -unknown_t(P,A,B) )),
+           (( askable_t(P,A,B) => proven_t(P,A,B) v unknown_t(P,A,B) v proven_not_t(P,A,B)  )),
+           (( answerable_t(P,A,B) <=> askable_t(P,A,B) & -unknown_t(P,A,B) )),
            (( askable_t(P,A,B) <=> -fallacy_t(P,A,B) )),
-           (( answerable_t(P,A,B) => proven_t(P,A,B) v refuted_t(P,A,B)  )),
-           (( proven_t(P,A,B) v unknowable_t(P,A,B) v refuted_t(P,A,B)  ))
+           (( answerable_t(P,A,B) => proven_t(P,A,B) v proven_not_t(P,A,B)  )),
+           (( proven_t(P,A,B) v unknown_t(P,A,B) v proven_not_t(P,A,B)  )),
 
+           % TODO define askable_t
+           (( asserted_t(P,A,B,C) => proven_t(P,A,B,C) )),
+           (( proven_t(P,A,B,C) => assumed_t(P,A,B,C) )),
+           (( assumed_t(P,A,B,C) => -proven_not_t(P,A,B,C) & -fallacy_t(P,A,B,C)  )),
+           (( possible_t(P,A,B,C) => -proven_not_t(P,A,B,C) & -fallacy_t(P,A,B,C)  )),            
+
+           (( proven_t(P,A,B,C) & proven_not_t(P,A,B,C) => fallacy_t(P,A,B,C) )),
+           
+           (( proven_t(P,A,B,C) =>  -proven_not_t(P,A,B,C) & possible_t(P,A,B,C) & -unknown_t(P,A,B,C) )),
+           (( proven_not_t(P,A,B,C) => -proven_t(P,A,B,C) & -possible_t(P,A,B,C) & -unknown_t(P,A,B,C) )),
+           (( askable_t(P,A,B,C) => proven_t(P,A,B,C) v unknown_t(P,A,B,C) v proven_not_t(P,A,B,C)  )),
+           (( answerable_t(P,A,B,C) <=> askable_t(P,A,B,C) & -unknown_t(P,A,B,C) )),
+           (( askable_t(P,A,B,C) <=> -fallacy_t(P,A,B,C) )),
+           (( answerable_t(P,A,B,C) => proven_t(P,A,B,C) v proven_not_t(P,A,B,C)  )),
+           (( proven_t(P,A,B,C) v unknown_t(P,A,B,C) v proven_not_t(P,A,B,C)  ))
+
+           % TODO define askable_t
 /*
-         (( fallacy_t(P,A,B) => refuted_t(P,A,B) & proven_t(P,A,B) & -unknowable_t(P,A,B) & -assertable_t(P,A,B) )),   
+         (( fallacy_t(P,A,B) => proven_not_t(P,A,B) & proven_t(P,A,B) & -unknown_t(P,A,B) & -possible_t(P,A,B) )),   
          
-           (( unknowable_t(P,A,B) =>  -proven_t(P,A,B) & assertable_t(P,A,B) & -asserted_t(P,A,B) & -refuted_t(P,A,B) )),
+           (( unknown_t(P,A,B) =>  -proven_t(P,A,B) & possible_t(P,A,B) & -asserted_t(P,A,B) & -proven_not_t(P,A,B) )),
          
-            (( -unknowable_t(P,A,B) => proven_t(P,A,B) v refuted_t(P,A,B)  )),
-            (( -asserted_t(P,A,B) => assertable_t(P,A,B) v refuted_t(P,A,B) v fallacy_t(P,A,B) )),
-            (( -proven_t(P,A,B) =>  refuted_t(P,A,B) v fallacy_t(P,A,B) v assertable_t(P,A,B) )),
-            (( -assertable_t(P,A,B) => refuted_t(P,A,B) v fallacy_t(P,A,B) )),
-            (( -refuted_t(P,A,B) => fallacy_t(P,A,B) v unknowable_t(P,A,B) v proven_t(P,A,B) )),
-            (( -fallacy_t(P,A,B) =>  unknowable_t(P,A,B) v refuted_t(P,A,B) v proven_t(P,A,B) ))
+            (( -unknown_t(P,A,B) => proven_t(P,A,B) v proven_not_t(P,A,B)  )),
+            (( -asserted_t(P,A,B) => possible_t(P,A,B) v proven_not_t(P,A,B) v fallacy_t(P,A,B) )),
+            (( -proven_t(P,A,B) =>  proven_not_t(P,A,B) v fallacy_t(P,A,B) v possible_t(P,A,B) )),
+            (( -possible_t(P,A,B) => proven_not_t(P,A,B) v fallacy_t(P,A,B) )),
+            (( -proven_not_t(P,A,B) => fallacy_t(P,A,B) v unknown_t(P,A,B) v proven_t(P,A,B) )),
+            (( -fallacy_t(P,A,B) =>  unknown_t(P,A,B) v proven_not_t(P,A,B) v proven_t(P,A,B) ))
 
             */
 
@@ -555,46 +603,46 @@ proven_t(A, B, C) :-
 %   logicmoo_kb_refution:1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% pttp_in: assertable_t(M29, N29, O29)=> -refuted_t(M29, N29, O29)& -fallacy_t(M29, N29, O29).
+% pttp_in: possible_t(M29, N29, O29)=> -proven_not_t(M29, N29, O29)& -fallacy_t(M29, N29, O29).
 
-not_assertable_t(_, _, _).
+not_possible_t(_, _, _).
 
-not_refuted_t(A, B, C) :-
-        assertable_t(A, B, C).
+poss_t(A, B, C) :-
+        possible_t(A, B, C).
 
 not_fallacy_t(A, B, C) :-
-        assertable_t(A, B, C).
+        possible_t(A, B, C).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   logicmoo_kb_refution:2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% pttp_in: proven_t(M29, N29, O29)&refuted_t(M29, N29, O29)=>fallacy_t(M29, N29, O29).
+% pttp_in: proven_t(M29, N29, O29)&proven_not_t(M29, N29, O29)=>fallacy_t(M29, N29, O29).
 
-not_both_t(proven_t(A, B, C), refuted_t(_, _, _)) :-
+not_both_t(proven_t(A, B, C), proven_not_t(_, _, _)) :-
         not_fallacy_t(A, B, C).
 
 fallacy_t(A, B, C) :-
         proven_t(A, B, C),
-        refuted_t(A, B, C).
+        proven_not_t(A, B, C).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   logicmoo_kb_refution:3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% pttp_in: proven_t(M29, N29, O29)=> -refuted_t(M29, N29, O29)& (assertable_t(M29, N29, O29)& -unknowable_t(M29, N29, O29)).
+% pttp_in: proven_t(M29, N29, O29)=> -proven_not_t(M29, N29, O29)& (possible_t(M29, N29, O29)& -unknown_t(M29, N29, O29)).
 
 not_proven_t(_, _, _).
 
-not_refuted_t(A, B, C) :-
+poss_t(A, B, C) :-
         proven_t(A, B, C).
 
-assertable_t(A, B, C) :-
+possible_t(A, B, C) :-
         proven_t(A, B, C).
 
-not_unknowable_t(A, B, C) :-
+not_unknown_t(A, B, C) :-
         proven_t(A, B, C).
 
 
@@ -602,18 +650,18 @@ not_unknowable_t(A, B, C) :-
 %   logicmoo_kb_refution:4
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% pttp_in: refuted_t(M29, N29, O29)=> -proven_t(M29, N29, O29)& (-assertable_t(M29, N29, O29)& -unknowable_t(M29, N29, O29)).
+% pttp_in: proven_not_t(M29, N29, O29)=> -proven_t(M29, N29, O29)& (-possible_t(M29, N29, O29)& -unknown_t(M29, N29, O29)).
 
-not_refuted_t(_, _, _).
+poss_t(_, _, _).
 
 not_proven_t(A, B, C) :-
-        refuted_t(A, B, C).
+        proven_not_t(A, B, C).
 
-not_assertable_t(A, B, C) :-
-        refuted_t(A, B, C).
+not_possible_t(A, B, C) :-
+        proven_not_t(A, B, C).
 
-not_unknowable_t(A, B, C) :-
-        refuted_t(A, B, C).
+not_unknown_t(A, B, C) :-
+        proven_not_t(A, B, C).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -633,45 +681,45 @@ fallacy_t(A, B, C) :-
 %   logicmoo_kb_refution:6
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% pttp_in: askable_t(M29, N29, O29)=>proven_t(M29, N29, O29)v (unknowable_t(M29, N29, O29)v refuted_t(M29, N29, O29)).
+% pttp_in: askable_t(M29, N29, O29)=>proven_t(M29, N29, O29)v (unknown_t(M29, N29, O29)v proven_not_t(M29, N29, O29)).
 
 not_askable_t(A, B, C) :-
         not_proven_t(A, B, C),
-        not_unknowable_t(A, B, C),
-        not_refuted_t(A, B, C).
+        not_unknown_t(A, B, C),
+        poss_t(A, B, C).
 
 proven_t(A, B, C) :-
         askable_t(A, B, C),
-        not_unknowable_t(A, B, C),
-        not_refuted_t(A, B, C).
+        not_unknown_t(A, B, C),
+        poss_t(A, B, C).
 
-unknowable_t(A, B, C) :-
+unknown_t(A, B, C) :-
         askable_t(A, B, C),
         not_proven_t(A, B, C),
-        not_refuted_t(A, B, C).
+        poss_t(A, B, C).
 
-refuted_t(A, B, C) :-
+proven_not_t(A, B, C) :-
         askable_t(A, B, C),
         not_proven_t(A, B, C),
-        not_unknowable_t(A, B, C).
+        not_unknown_t(A, B, C).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   logicmoo_kb_refution:7
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% pttp_in: answerable_t(M29, N29, O29)<=> -unknowable_t(M29, N29, O29).
+% pttp_in: answerable_t(M29, N29, O29)<=> -unknown_t(M29, N29, O29).
 
 answerable_t(A, B, C) :-
-        not_unknowable_t(A, B, C).
+        not_unknown_t(A, B, C).
 
-not_unknowable_t(A, B, C) :-
+not_unknown_t(A, B, C) :-
         answerable_t(A, B, C).
 
 not_answerable_t(A, B, C) :-
-        unknowable_t(A, B, C).
+        unknown_t(A, B, C).
 
-unknowable_t(A, B, C) :-
+unknown_t(A, B, C) :-
         not_answerable_t(A, B, C).
 
 
@@ -698,17 +746,17 @@ fallacy_t(A, B, C) :-
 %   logicmoo_kb_refution:9
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% pttp_in: answerable_t(M29, N29, O29)=>proven_t(M29, N29, O29)v refuted_t(M29, N29, O29).
+% pttp_in: answerable_t(M29, N29, O29)=>proven_t(M29, N29, O29)v proven_not_t(M29, N29, O29).
 
 not_answerable_t(A, B, C) :-
         not_proven_t(A, B, C),
-        not_refuted_t(A, B, C).
+        poss_t(A, B, C).
 
 proven_t(A, B, C) :-
         answerable_t(A, B, C),
-        not_refuted_t(A, B, C).
+        poss_t(A, B, C).
 
-refuted_t(A, B, C) :-
+proven_not_t(A, B, C) :-
         answerable_t(A, B, C),
         not_proven_t(A, B, C).
 
@@ -717,19 +765,19 @@ refuted_t(A, B, C) :-
 %   logicmoo_kb_refution:10
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% pttp_in: proven_t(M29, N29, O29)v (unknowable_t(M29, N29, O29)v refuted_t(M29, N29, O29)).
+% pttp_in: proven_t(M29, N29, O29)v (unknown_t(M29, N29, O29)v proven_not_t(M29, N29, O29)).
 
 proven_t(A, B, C) :-
-        not_unknowable_t(A, B, C),
-        not_refuted_t(A, B, C).
+        not_unknown_t(A, B, C),
+        poss_t(A, B, C).
 
-unknowable_t(A, B, C) :-
+unknown_t(A, B, C) :-
         not_proven_t(A, B, C),
-        not_refuted_t(A, B, C).
+        poss_t(A, B, C).
 
-refuted_t(A, B, C) :-
+proven_not_t(A, B, C) :-
         not_proven_t(A, B, C),
-        not_unknowable_t(A, B, C).
+        not_unknown_t(A, B, C).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -830,12 +878,12 @@ proven_t(A, D, C) :-
 %   logicmoo_kb_logic:7
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% pttp_in: pred_t(negationPreds, M29, N29)&proven_t(M29, O29, P29)=>refuted_t(N29, O29, P29).
+% pttp_in: pred_t(negationPreds, M29, N29)&proven_t(M29, O29, P29)=>proven_not_t(N29, O29, P29).
 
 not_both_t(pred_t(negationPreds, _, A), proven_t(_, B, C)) :-
-        not_refuted_t(A, B, C).
+        poss_t(A, B, C).
 
-refuted_t(A, C, D) :-
+proven_not_t(A, C, D) :-
         pred_t(negationPreds, B, A),
         proven_t(B, C, D).
 
@@ -844,12 +892,12 @@ refuted_t(A, C, D) :-
 %   logicmoo_kb_logic:8
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% pttp_in: pred_t(negationInverse, M29, N29)&proven_t(M29, O29, P29)=>refuted_t(N29, P29, O29).
+% pttp_in: pred_t(negationInverse, M29, N29)&proven_t(M29, O29, P29)=>proven_not_t(N29, P29, O29).
 
 not_both_t(pred_t(negationInverse, _, A), proven_t(_, C, B)) :-
-        not_refuted_t(A, B, C).
+        poss_t(A, B, C).
 
-refuted_t(A, D, C) :-
+proven_not_t(A, D, C) :-
         pred_t(negationInverse, B, A),
         proven_t(B, C, D).
 
@@ -858,12 +906,12 @@ refuted_t(A, D, C) :-
 %   logicmoo_kb_logic:9
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% pttp_in: pred_isa_t(predIrreflexive, M29)&proven_t(M29, N29, O29)=>refuted_t(M29, O29, N29).
+% pttp_in: pred_isa_t(predIrreflexive, M29)&proven_t(M29, N29, O29)=>proven_not_t(M29, O29, N29).
 
 not_both_t(pred_isa_t(predIrreflexive, A), proven_t(_, C, B)) :-
-        not_refuted_t(A, B, C).
+        poss_t(A, B, C).
 
-refuted_t(A, C, B) :-
+proven_not_t(A, C, B) :-
         pred_isa_t(predIrreflexive, A),
         proven_t(A, B, C).
 

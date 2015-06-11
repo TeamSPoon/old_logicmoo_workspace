@@ -1999,7 +1999,7 @@ registerCycPred(Mt,Pred,Arity):-
 %
 % ============================================
 
-user:exception(undefined_predicate, Pred ,retry):- isCycOption(hookCycPredicates,true),cycDefineOrFail(Pred).
+%%TODO user:exception(undefined_predicate, Pred ,retry):- isCycOption(hookCycPredicates,true),cycDefineOrFail(Pred).
 
 cycDefineOrFail(Mod:Pred/Arity):-atom_concat('#$',_,Pred),
       cycDefineOrFail(Mod,Pred,Arity).
