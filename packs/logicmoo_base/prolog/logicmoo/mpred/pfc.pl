@@ -41,8 +41,9 @@
 :- use_module(library('pldoc/doc_pack')).
 :- use_module(library('pldoc/doc_register')).
 :- use_module(library('pldoc/doc_library')).
-*/
 
+*/
+:- user:ensure_loaded(library(dra/tabling3/swi_toplevel)).
 
 second_order(_,_):-fail.
 

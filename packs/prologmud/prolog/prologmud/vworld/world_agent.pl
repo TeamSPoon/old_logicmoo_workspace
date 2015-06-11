@@ -176,7 +176,7 @@ correctCommand_0(Who,CMD,OUT):-
    correctEachTypeOrFail(Who,F,query(t, must),ARGS,TYPES,NEWS),!,
    OUT=..[F|NEWS],!.
 
-
+correctCommand(_,CMD,CMD):-!.
 correctCommand(Who,CMD,OUT):-compound(CMD),show_call_failure(correctCommand_0(Who,CMD,OUT)),!.
 correctCommand(_,CMD,CMD).
 

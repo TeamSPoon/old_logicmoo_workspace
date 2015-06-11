@@ -355,6 +355,7 @@ compound_isa(_,I,T):- mpred_call(formatted_resultIsa(I,T)).
 isa_asserted(I,C):-call_tabled(no_repeats(loop_check(isa_asserted_0(I,C)))).
 %isa_asserted(I,CC):-no_repeats((isa_asserted_0(I,C),genls(C,CC))).
 
+:-dynamic(isa_asserted_0/2).
 isa_asserted_0(I,T):-is_known_trew(isa(I,T)).
 isa_asserted_0(F,tCol):-isa_from_morphology(F,Col),atom_concat(_,'Type',Col),arity(F,1).
 %isa_asserted_0([I],T):-nonvar(I),!,isa_asserted_0(I,T).

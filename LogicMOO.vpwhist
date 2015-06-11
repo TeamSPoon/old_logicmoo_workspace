@@ -212,11 +212,11 @@ PrologMUD.vpj=20150603194402848
           + prolog
           + snd
       - src_game_wumpus
-    + logicmoo_base
-      + prolog
+    - logicmoo_base
+      - prolog
         - logicmoo
           + mpred
-          - util
+          + util
       + t
     + logicmoo_online
       - prolog
@@ -225,7 +225,7 @@ PrologMUD.vpj=20150603194402848
           + swish_lib
             - render
     + MUD_DeepParsing
-      + prolog
+      - prolog
         + candc\.svn
           + pristine
             + 00
@@ -551,7 +551,7 @@ PrologMUD.vpj=20150603194402848
               + WEB-INF
                 + lib
           + webclient
-        + ape
+        - ape
           + examples
           + java
             + src
@@ -2653,7 +2653,7 @@ PrologMUD.vpj=20150603194402848
             + patterns
             + sutime
             + tokensregex
-    - MUD_ircbot
+    + MUD_ircbot
       - eggdrop
       - prolog
     - MUD_PDDL
@@ -2666,7 +2666,7 @@ PrologMUD.vpj=20150603194402848
         + cltools
           + bin
           + t
-        - dra
+        + dra
           + coind
             + examples
             - original
@@ -2687,99 +2687,79 @@ PrologMUD.vpj=20150603194402848
             + examples
               + LTL
               + XSB
-          - tabling3
+          + tabling3
             + Bench
               + aspclp
               + clpfd
               + prolog
-              + tabling
+              - tabling
             + examples
-              + LTL
-              + XSB
-        + dra - Copy
-          + coind
-            + examples
-            + original
-          + doc
-          + general
-          + internal
-            + Bench
-              + aspclp
-              + clpfd
-              + prolog
-              + tabling
-            + doc
-              + dra
-            + tabling
-              + archive
-            + vanilla
-          + tabling
-            + examples
-              + LTL
-              + XSB
-        + dra - Copy (2)
-          + coind
-            + examples
-            + original
-          + doc
-          + general
-          + internal
-            + Bench
-              + aspclp
-              + clpfd
-              + prolog
-              + tabling
-            + doc
-              + dra
-            + tabling
-              + archive
-            + vanilla
-          + tabling
-            + examples
-              + LTL
-              + XSB
-        + dra - Copy (3)
-          + coind
-            + examples
-            + original
-          + doc
-          + general
-          + internal
-            + Bench
-              + aspclp
-              + clpfd
-              + prolog
-              + tabling
-            + doc
-              + dra
-            + tabling
-              + archive
-            + vanilla
-          + tabling
-            + examples
-              + LTL
-              + XSB
-        + DRAD
-          + coind
-            + examples
-            + original
-          + doc
-          + general
-          + internal
-            + Bench
-              + aspclp
-              + clpfd
-              + prolog
-              + tabling
-            + doc
-              + dra
-            + tabling
-              + archive
-            + vanilla
-          + tabling
-            + examples
-              + LTL
-              + XSB
+              - LTL
+              - XSB
+            + mttests
+              + benches
+                + anssub-benches
+                + answer_completion_benches
+                + petri
+                + prolog_benches
+                  + consttest
+                + shared_benches
+                + synth_benches
+                + tab_benches
+              + negation_tests
+              + table_tests
+            - xsblib
+              + cmplib
+              + lib
+              + syslib
+            + xsbtests
+              + ai_tests
+              + attv_tests
+              + basic_tests
+              - benches
+                + prolog_benches
+                + synth_benches
+                + xmc
+              + cdf_tests
+                + cdftp_testdir
+                + ce_testdir
+                + check_testdir
+                + comp_testdir
+                  + test
+                  + test_0
+                  + test_int
+                  + testo1
+                  + testo1_0
+                + comp_testdir2
+                  + test
+                  + testo1
+                + dl_testdir
+                + io_testdir
+                + type0_testdir
+              + compiler_tests
+              + constraint_tests
+              + delay_tests
+              + float_tests
+              - flora_tests
+                + apptests
+                  + programs
+                - datafiles
+                + general_tests
+                + pending_bugs
+              + incremental_tests
+              + neg_tests
+              + ptq
+              + regmatch_tests
+              + retract_tests
+              + sem_tests
+                + CSH
+                + tests
+              + sub_table_tests
+              + sub_tests
+                + Data
+                + Programs
+              + table_tests
+              - wfs_tests
         + flux
         + indigolog
           + Doc
@@ -2817,7 +2797,7 @@ PrologMUD.vpj=20150603194402848
           + prologTestFiles
         + osnark
         + PKnows-0.9.9
-          + vpdl
+          - vpdl
         + planner
           + bkwld_pddl_parser
           + Blocks_world
@@ -2866,9 +2846,9 @@ PrologMUD.vpj=20150603194402848
             + continuos
             + socket_udp
         + plarkc
-        + pttp
+        - pttp
         + src_data
-          + pldata
+          - pldata
         + src_natlang_data
           + nltk_3.0a3
             + javasrc
@@ -2962,7 +2942,7 @@ PrologMUD.vpj=20150603194402848
             + iris
             + trains
           + pl
-    + prologmud
+    - prologmud
       - prolog
         - prologmud
           + actions
@@ -2982,7 +2962,7 @@ PrologMUD.vpj=20150603194402848
               + 0f
         + config-enabled
         + RDF-store
-    + prologmud_web
+    - prologmud_web
       - src_assets
       + src_webui
         - assetsources
@@ -3450,23 +3430,284 @@ PrologMUD.vpj=20150603194402848
               + swi
               + trace
               + xref
-scroll:102
+scroll:15
 [State]
-SCREEN: 1920 1080 236 163 1278 513 0 0 M 0 0 0 0 1494 564
-CWD: packs\MUD_PDDL\prolog\dra\tabling3
-BUFFER: BN="runtime\run_mud_server.pl"
+SCREEN: 1920 1080 538 217 1278 513 0 0 M 0 0 0 0 1494 492
+CWD: packs\MUD_PDDL\prolog\pttp
+BUFFER: BN="packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=42 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1318 388 -1 -1 M  WF=0 WT=2 "Default Fixed Font,10,0,1"
+VIEW: LN=.4874 CL=1 LE=0 CX=0 CY=13 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp_statics.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.37056 CL=26 LE=0 CX=25 CY=13 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp_precompiled.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.44663 CL=1 LE=0 CX=0 CY=16 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp_testing.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.12774 CL=59 LE=0 CX=58 CY=15 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp_unused.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.9236 CL=9 LE=0 CX=8 CY=14 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\osnark\dbase_rules_testing.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=59 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\osnark\dbase_rules_pttp_precompiled.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=58 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\osnark\dbase_rules_pttp.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=57 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\osnark\dbase_i_bootstrap_dnf.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=56 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\osnark\dbase_i_mpred_pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=55 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\examples\simple1.tlp"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1 CL=19 LE=0 CX=18 CY=1 WI=5 BI=54 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\examples\paper_example.tlp"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.274 CL=35 LE=0 CX=34 CY=17 WI=5 BI=53 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\examples\simple2.tlp"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.80 CL=8 LE=0 CX=7 CY=7 WI=5 BI=52 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\Bench\tabling\peep.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.51803 CL=28 LE=0 CX=27 CY=15 WI=5 BI=51 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\examples\README"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=50 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\dra_common.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.40663 CL=1 LE=0 CX=0 CY=11 WI=5 BI=49 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\mttests\benches\tab_benches\peep_s.P"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.8032 CL=1 LE=0 CX=0 CY=15 WI=5 BI=48 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\compatibility_utilities_swi.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.9161 CL=1 LE=0 CX=0 CY=17 WI=5 BI=47 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\PKnows-0.9.9\fluent.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=46 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\cltools\clif_writer.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=45 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_events.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.963 CL=40 LE=0 CX=39 CY=16 WI=5 BI=44 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_2d.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.4679 CL=100 LE=0 CX=99 CY=15 WI=5 BI=43 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\dra_builtins.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.567 CL=20 LE=0 CX=19 CY=13 WI=5 BI=42 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\PKnows-0.9.9\vpdl\vpdl.ml"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.980 CL=26 LE=0 CX=25 CY=19 WI=5 BI=41 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1254 CL=45 LE=0 CX=44 CY=14 WI=5 BI=40 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\swi_toplevel.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.84 CL=3 LE=0 CX=2 CY=4 WI=5 BI=39 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_header.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1327 CL=27 LE=0 CX=26 CY=16 WI=5 BI=38 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\utilities.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.8629 CL=53 LE=0 CX=52 CY=16 WI=5 BI=37 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\util\logicmoo_util_bugger.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.33848 CL=3 LE=0 CX=2 CY=15 WI=5 BI=36 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="runtime\run_mud_server.pl"
-VIEW: LN=.3034 CL=11 LE=0 CX=10 CY=10 WI=249 BI=42 HT=0 HN=0 HF=0 HC=4
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1908 CL=1 LE=0 CX=0 CY=11 WI=5 BI=35 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\logicmoo_base.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=34 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_types.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.28478 CL=3 LE=0 CX=2 CY=14 WI=5 BI=33 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\actions\where.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.894 CL=18 LE=0 CX=17 CY=14 WI=5 BI=32 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\runtime\run_mud_server.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.5407 CL=14 LE=0 CX=13 CY=14 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_agent.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.7463 CL=30 LE=0 CX=29 CY=4 WI=5 BI=30 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\parsing\parser_imperative.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.9333 CL=125 LE=0 CX=124 CY=14 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_mpred_stubs.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.470 CL=1 LE=0 CX=0 CY=16 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\osnark\snark_in_prolog.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.28729 CL=23 LE=0 CX=22 CY=14 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_builtin.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.39373 CL=27 LE=0 CX=26 CY=13 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\general\utilities.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.8798 CL=24 LE=0 CX=23 CY=14 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_builtin.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.8355 CL=27 LE=0 CX=26 CY=16 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\logicmoo_engine.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.586 CL=10 LE=0 CX=9 CY=16 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\MUD_PDDL\prolog\osnark\snark_ailog2.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1340 338 -1 -1 N  WF=0 WT=47 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp_statics.pl"
+VIEW: LN=.37056 CL=26 LE=0 CX=25 CY=13 WI=241 BI=5 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1340 338 -1 -1 N  WF=0 WT=33 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp.pl"
+VIEW: LN=.4874 CL=1 LE=0 CX=0 CY=13 WI=151 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1340 338 -1 -1 N  WF=0 WT=45 ",,,"
+BUFFER: BN="packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp_precompiled.pl"
+VIEW: LN=.44663 CL=1 LE=0 CX=0 CY=16 WI=153 BI=15 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1340 338 -1 -1 N  WF=0 WT=42 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp_testing.pl"
+VIEW: LN=.212 CL=36 LE=0 CX=35 CY=12 WI=154 BI=16 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1340 338 -1 -1 N  WF=0 WT=46 ",,,"
+BUFFER: BN="packs\MUD_PDDL\prolog\osnark\snark_ailog2.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=194 BI=22 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1318 364 -1 -1 N  WF=0 WT=15 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\osnark\snark_ailog2.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=193 BI=22 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1340 338 -1 -1 N  WF=0 WT=30 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\logicmoo_engine.pl"
+VIEW: LN=.586 CL=10 LE=0 CX=9 CY=16 WI=192 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1340 338 -1 -1 N  WF=0 WT=40 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_builtin.pl"
+VIEW: LN=.8355 CL=27 LE=0 CX=26 CY=16 WI=191 BI=24 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1340 338 -1 -1 N  WF=0 WT=27 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\general\utilities.pl"
+VIEW: LN=.8798 CL=24 LE=0 CX=23 CY=14 WI=190 BI=25 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1340 338 -1 -1 N  WF=0 WT=41 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_builtin.pl"
+VIEW: LN=.39373 CL=27 LE=0 CX=26 CY=13 WI=189 BI=26 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1318 364 -1 -1 N  WF=0 WT=1 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\osnark\snark_in_prolog.pl"
+VIEW: LN=.28729 CL=23 LE=0 CX=22 CY=14 WI=188 BI=27 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1340 338 -1 -1 N  WF=0 WT=38 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_mpred_stubs.pl"
+VIEW: LN=.470 CL=1 LE=0 CX=0 CY=16 WI=187 BI=28 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1340 338 -1 -1 N  WF=0 WT=39 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\parsing\parser_imperative.pl"
+VIEW: LN=.9333 CL=125 LE=0 CX=124 CY=14 WI=186 BI=29 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1340 338 -1 -1 N  WF=0 WT=36 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_agent.pl"
+VIEW: LN=.7463 CL=30 LE=0 CX=29 CY=4 WI=185 BI=30 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1340 338 -1 -1 N  WF=0 WT=35 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\runtime\run_mud_server.pl"
+VIEW: LN=.5407 CL=14 LE=0 CX=14 CY=14 WI=184 BI=31 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1340 338 -1 -1 N  WF=0 WT=34 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\actions\where.pl"
+VIEW: LN=.894 CL=18 LE=0 CX=17 CY=14 WI=183 BI=32 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1340 338 -1 -1 N  WF=0 WT=29 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_types.pl"
+VIEW: LN=.28478 CL=3 LE=0 CX=2 CY=14 WI=182 BI=33 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1340 338 -1 -1 N  WF=0 WT=31 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\logicmoo_base.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=181 BI=34 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1340 338 -1 -1 N  WF=0 WT=32 "Default Fixed Font,10,0,1"
+BUFFER: BN="runtime\run_mud_server.pl"
+VIEW: LN=.1908 CL=1 LE=0 CX=0 CY=11 WI=180 BI=35 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1340 338 -1 -1 N  WF=0 WT=24 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\util\logicmoo_util_bugger.pl"
+VIEW: LN=.33848 CL=3 LE=0 CX=2 CY=15 WI=179 BI=36 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1340 338 -1 -1 N  WF=0 WT=28 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\utilities.pl"
+VIEW: LN=.8629 CL=53 LE=0 CX=52 CY=16 WI=178 BI=37 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1340 338 -1 -1 N  WF=0 WT=26 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_header.pl"
+VIEW: LN=.1327 CL=27 LE=0 CX=26 CY=16 WI=177 BI=38 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1318 364 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\swi_toplevel.pl"
+VIEW: LN=.84 CL=3 LE=0 CX=2 CY=4 WI=176 BI=39 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1252 485 -1 -1 N  WF=0 WT=21 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\pfc.pl"
+VIEW: LN=.1254 CL=45 LE=0 CX=44 CY=14 WI=175 BI=40 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1252 485 -1 -1 N  WF=0 WT=18 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\PKnows-0.9.9\vpdl\vpdl.ml"
+VIEW: LN=.980 CL=26 LE=0 CX=25 CY=19 WI=174 BI=41 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1340 338 -1 -1 N  WF=0 WT=25 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\dra_builtins.pl"
+VIEW: LN=.567 CL=20 LE=0 CX=19 CY=13 WI=173 BI=42 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1340 338 -1 -1 N  WF=0 WT=23 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_2d.pl"
+VIEW: LN=.4679 CL=100 LE=0 CX=99 CY=15 WI=172 BI=43 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1340 338 -1 -1 N  WF=0 WT=22 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\vworld\world_events.pl"
+VIEW: LN=.963 CL=40 LE=0 CX=39 CY=16 WI=171 BI=44 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1252 485 -1 -1 N  WF=0 WT=19 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\cltools\clif_writer.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=170 BI=45 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1252 485 -1 -1 N  WF=0 WT=17 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\PKnows-0.9.9\fluent.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=169 BI=46 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1318 364 -1 -1 N  WF=0 WT=20 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\compatibility_utilities_swi.pl"
+VIEW: LN=.9161 CL=1 LE=0 CX=0 CY=17 WI=168 BI=47 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1318 364 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\mttests\benches\tab_benches\peep_s.P"
+VIEW: LN=.8032 CL=1 LE=0 CX=0 CY=15 WI=167 BI=48 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1318 364 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\dra_common.pl"
+VIEW: LN=.40663 CL=1 LE=0 CX=0 CY=11 WI=166 BI=49 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1318 364 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\examples\README"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=165 BI=50 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1318 364 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\Bench\tabling\peep.pl"
+VIEW: LN=.51803 CL=28 LE=0 CX=27 CY=15 WI=164 BI=51 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1318 364 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\examples\simple2.tlp"
+VIEW: LN=.80 CL=8 LE=0 CX=7 CY=7 WI=163 BI=52 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1318 364 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\examples\paper_example.tlp"
+VIEW: LN=.274 CL=35 LE=0 CX=34 CY=17 WI=162 BI=53 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1318 364 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\dra\tabling3\examples\simple1.tlp"
+VIEW: LN=.1 CL=19 LE=0 CX=18 CY=1 WI=161 BI=54 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1318 364 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\osnark\dbase_i_mpred_pfc.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=160 BI=55 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1318 364 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\osnark\dbase_i_bootstrap_dnf.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=159 BI=56 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1318 364 -1 -1 N  WF=0 WT=12 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\osnark\dbase_rules_pttp.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=158 BI=57 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1318 364 -1 -1 N  WF=0 WT=13 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\osnark\dbase_rules_pttp_precompiled.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=157 BI=58 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1318 364 -1 -1 N  WF=0 WT=14 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\osnark\dbase_rules_testing.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=156 BI=59 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1340 338 -1 -1 N  WF=0 WT=43 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp_unused.pl"
+VIEW: LN=.9236 CL=9 LE=0 CX=8 CY=14 WI=155 BI=21 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1340 338 -1 -1 N  WF=0 WT=44 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp_precompiled.pl"
+VIEW: LN=.44663 CL=1 LE=0 CX=0 CY=16 WI=152 BI=15 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1340 338 -1 -1 M  WF=0 WT=37 ",,,"
+BUFFER: BN="packs\MUD_PDDL\prolog\osnark\snark_ailog2.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=150 BI=22 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-packs\MUD_PDDL\prolog\dra\tabling3\dra2.pl
-packs\MUD_PDDL\prolog\dra\tabling3\dra2_builtins.pl
-packs\MUD_PDDL\prolog\dra\tabling3\dra3_builtins.pl
-packs\MUD_PDDL\prolog\dra\tabling3\dra3_coinductive_hypotheses.pl
-packs\MUD_PDDL\prolog\dra\tabling3\dra3_common.pl
-packs\MUD_PDDL\prolog\dra\tabling3\dra3_stack.pl
-packs\MUD_PDDL\prolog\dra\tabling3\dra3_transform.pl
-packs\MUD_PDDL\prolog\dra\tabling3\dra3.pl
-runtime\run_mud_server.pl
+packs\MUD_PDDL\prolog\logicmoo_engine.pl
+packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp_unused.pl
+packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp_precompiled.pl
+packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp_add_feature_tabling.pl
+packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp.pl
+packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp_testing.pl
+packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp_dalit.pl
+packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp_statics.pl
+packs\MUD_PDDL\prolog\pttp\dbase_i_mpred_pttp_add_feature_args.pl

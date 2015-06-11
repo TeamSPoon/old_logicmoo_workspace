@@ -399,11 +399,11 @@ remove_dupes([],[],_):-!.
 remove_dupes([I|In],Out,Shown):-member(I,Shown),!,remove_dupes(In,Out,Shown).
 remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
 
-functor_h(Obj,F):-hotrace(functor_h(Obj,F,_)).
-get_functor(Obj,FO):-hotrace((must(functor_h(Obj,F,_)),FO=F)).
-get_functor(Obj,FO,AO):-hotrace((must(functor_h(Obj,F,A)),FO=F,AO=A)).
+functor_h(Obj,F):- functor_h(Obj,F,_),!.
+get_functor(Obj,FO):-call((must(functor_h(Obj,F,_)),!,FO=F)).
+get_functor(Obj,FO,AO):-call((must(functor_h(Obj,F,A)),!,FO=F,AO=A)).
 
-functor_h(Obj,F,A):-var(Obj),trace_or_throw(var_functor_h(Obj,F,A)).
+functor_h(Obj,F,A):- var(Obj),trace_or_throw(var_functor_h(Obj,F,A)).
 functor_h(Obj,F,A):- (Obj = '$VAR'(_)),trace_or_throw(var_functor_h(Obj,F,A)).
 functor_h(Obj,F,A):-var(Obj),!,(number(A)->functor(Obj,F,A);((current_predicate(F/A);throw(var_functor_h(Obj,F,A))))).
 functor_h(F//A,F,Ap2):-number(A),!,Ap2 is A+2,( atom(F) ->  true ; current_predicate(F/Ap2)).
@@ -414,7 +414,7 @@ functor_h(':-'(Obj),F,A):-!,functor_h(Obj,F,A).
 functor_h(':-'(Obj,_),F,A):-!,functor_h(Obj,F,A).
 functor_h(Obj,F,0):- string(Obj),!,must_det(atom_string(F,Obj)).
 functor_h(Obj,Obj,0):-not(compound(Obj)),!.
-functor_h(Obj,F,A):-functor_catch(Obj,F,A).
+functor_h(Obj,F,A):-functor(Obj,F,A).
 
 
 :- dynamic_multifile_exported((do_expand_args/3)).

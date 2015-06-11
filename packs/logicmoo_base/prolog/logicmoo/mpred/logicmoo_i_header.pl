@@ -16,6 +16,8 @@
 :- multifile(user:goal_expansion/2).
 
 
+:- multifile(thlocal:current_pttp_db_oper/1).
+:- thread_local(thlocal:current_pttp_db_oper/1).
 
 :- dynamic(new_was_isa/0).
 :- multifile(new_was_isa/0).
@@ -44,8 +46,8 @@
 :- multifile(tRelation/1).
 :- dynamic(arity/2).
 :- multifile(arity/2).
-:- dynamic(neg/1).
-:- multifile(neg/1).
+:- dynamic((neg)/1).
+:- multifile((neg)/1).
 
 :- dynamic(ttUnverifiableType/1).
 :- multifile(ttUnverifiableType/1).

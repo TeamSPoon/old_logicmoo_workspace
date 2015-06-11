@@ -50,7 +50,7 @@ user:file_search_path(prologmud, library(prologmud)).
 :- time(ensure_loaded(library(logicmoo/mpred_online/logicmoo_i_www))).
 
 
-:- time(with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_engine))))).
+:- time(with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo_engine))))).
 
 %:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(plarkc/dbase_i_cyc_api)))).
 
@@ -59,6 +59,14 @@ user:file_search_path(prologmud, library(prologmud)).
 % % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
 
 % % :- set_prolog_flag(gc,true).
+
+?- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
+ 
+% ?- kif_to_boxlog(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D))))),_S),!,disjuncts_to_list(_S,_L),list_to_set(_L,_SET),member(_P,_SET),writeln(_P),!.
+:- snark_tell(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
+?- kif_to_boxlog(-((a , b ,  c , d)),_S),!,disjuncts_to_list(_S,_L),list_to_set(_L,_SET),member(_P,_SET),writeln(_P),!.
+
+% :-prolog.
 
 % [Required] load the mud system
 :- user:ensure_loaded(prologmud(mud_startup)).

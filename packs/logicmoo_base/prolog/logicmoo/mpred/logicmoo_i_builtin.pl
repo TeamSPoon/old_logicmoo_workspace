@@ -222,7 +222,7 @@ tCol(C)/(atom(C),TCI=..[C,I]) => {decl_type(C)},arity(C,1),pfc_univ(C,I,TCI).
 (tCol(C)/(atom(C),TCI=..[C,I],\+ static_predicate(TCI) )) => {dynamic(C/1)}.
 (tCol(C)/(atom(C),TCI=..[C,I],\+ static_predicate(TCI), \+completelyAssertedCollection(C))) => added((TCI:-cwc,isa_backchaing(I,C))).
 
-% (tInferInstanceFromArgType(Col),tCol(Col)/i_name('',Col,ColName),tPred(Prop)/i_name('',Prop,PropName),{ColName=PropName}=> tInferInstanceFromArgType(Prop).
+% (tInferInstanceFromArgType(Col),tCol(Col)/i_name('',Col,ColName),tPred(Prop)/i_name('',Prop,PropName),{ColName=PropName}=> tInferInstanceFromArgType(Prop)).
 
 % (tInferInstanceFromArgType(Prop),tPred(Prop),arity(Prop,N)/(N>1) => ({i_name('vt',Prop,FinalType)},tCol(FinalType),tInferInstanceFromArgType(FinalType),argIsa(Prop,N,FinalType))).
 
@@ -244,14 +244,23 @@ ttPredType(pfcRHS).
 
 ttPredType(pfcMustFC).
 
+
 ttPredType(isEach(meta_argtypes,pfcDatabaseTerm,pfcControlled,pfcWatched,pfcMustFC,predIsFlag,tPred,prologMultiValued,
- prologSingleValued,prologMacroHead,prologOnly,prologOrdered,prologNegByFailure,prologPTTP,prologSNARK,
+ prologSingleValued,prologMacroHead,prologOnly,prologOrdered,prologNegByFailure,prologPTTP,prologSNARK,prologEquality,prologPTTP,
  prologSideEffects,prologHybrid,prologListValued)).
 
 completelyAssertedCollection(isEach(tCol,tPred,pfcControlled)).
 ttPredType(C)=>completelyAssertedCollection(C).
 
 
+neg(ttFormatType(prologEquality)).
+ttPredType(prologEquality).
+tSpec(prologEquality).
+prologEquality(mudEquals).
+prologEquality(('=')).
+prologEquality(('==')).
+
+neg(isa((','), prologEquality)).
 
 tCol(isEach(tCol,tPred,pfcControlled)).
 tCol(meta_argtypes).

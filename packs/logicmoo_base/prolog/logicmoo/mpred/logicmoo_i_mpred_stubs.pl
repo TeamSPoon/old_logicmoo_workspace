@@ -15,9 +15,10 @@
 
 hybrid_tPredStubImpl(prologHybrid).
 hybrid_tPredStubImpl(prologPTTP).
-hybrid_tPredStubImpl(prologPfc).
 hybrid_tPredStubImpl(prologOnly).
 hybrid_tPredStubImpl(prologSNARK).
+hybrid_tPredStubImpl(prologEquality).
+
 
 
 

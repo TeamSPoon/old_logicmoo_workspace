@@ -470,7 +470,7 @@ not_is_release :- 1 is random(4).
 
 
 :-thread_local tlbugger:show_must_go_on/0.
-badfood(MCall):- numbervars(MCall,0,_,[functor_name('VAR_______________________x0BADF00D'),attvar(bind),singletons(true)]).
+badfood(MCall):- numbervars(MCall,0,_,[functor_name('VAR_______________________x0BADF00D'),attvar(bind),singletons(true)]),dumpST.
 
 % -- CODEBLOCK
 :- export(must/1).
@@ -613,7 +613,7 @@ convert_to_dynamic(FA):- get_functor(FA,F,A), convert_to_dynamic(user,F,A).
 convert_to_dynamic(M,F,A):-  functor(C,F,A), M:predicate_property(C,dynamic),!.
 convert_to_dynamic(M,F,A):-  M:functor(C,F,A),\+ predicate_property(C,_),!,M:((dynamic(F/A),multifile(F/A),export(F/A))),!.
 convert_to_dynamic(M,F,A):-  functor(C,F,A),predicate_property(C,number_of_clauses(_)),\+ predicate_property(C,dynamic),
-  findall((C:-B),clause(C,B),List),abolish(C),dynamic(M:F/A),multifile(M:F/A),export(F/A),maplist(assertz,List),!.
+  findall((C:-B),clause(C,B),List),M:abolish(F,A),dynamic(M:F/A),multifile(M:F/A),export(F/A),maplist(assertz,List),!.
 convert_to_dynamic(M,F,A):-  functor(C,F,A),findall((C:-B),clause(C,B),List),abolish(F,A),dynamic(M:F/A),multifile(M:F/A),export(F/A),maplist(assertz,List),!.
 
 dynamic_safe(M,F,A):- functor(C,F,A),predicate_property(C,imported_from(system)),!,dmsg(warn(predicate_property(M:C,imported_from(system)))).
@@ -960,6 +960,11 @@ snumbervars(Term):-numbervars_impl(Term,0,_).
 % Loop checking
 % ===================================================================
 :- thread_local tlbugger:ilc/1.
+
+:-meta_predicate(call_t(0)).
+% call_t(C0):-reduce_make_key(C0,C),!,table(C),!,query(C).
+% call_t(C0):-query(C).
+call_t(C):- call(C).
 
 reduce_make_key(call(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(call_u(C),O):-!,reduce_make_key(C,O).
@@ -3263,7 +3268,7 @@ call_vars_tabled(Vars,C):- call_setof_tabled(Vars,C,Set),!,member(Vars,Set).
 call_setof_tabled(Vars,C,List):- make_key(Vars+C,Key),call_tabled0(Key,Vars,C,List).
 
 findall_nodupes(Vs,C,List):- ground(Vs),!,(C->List=[Vs];List=[]),!.
-findall_nodupes(Vs,C,L):- findall(Vs,no_repeats_old(Vs,C),L).
+findall_nodupes(Vs,C,L):- findall(Vs,no_repeats_old(Vs,call_t(C)),L).
 %findall_nodupes(Vs,C,L):- setof(Vs,no_repeats_old(Vs,C),L).
 
 
