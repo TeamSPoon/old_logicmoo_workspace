@@ -369,37 +369,6 @@ pttp_logic(logicmoo_kb_logic,
 
 pttp_logic(logicmoo_kb_refution,
           ((
-           % TODO define askable_t
-           (( asserted_t(Sent) => proven_t(Sent) )),
-           (( proven_t(Sent) => assumed_t(Sent) )),
-           (( assumed_t(Sent) => -proven_not_t(Sent) & -fallacy_t(Sent)  )),
-           (( possible_t(Sent) => -proven_not_t(Sent) & -fallacy_t(Sent)  )),            
-
-           (( proven_t(Sent) & proven_not_t(Sent) => fallacy_t(Sent) )),
-           
-           (( proven_t(Sent) =>  -proven_not_t(Sent) & possible_t(Sent) & -unknown_t(Sent) )),
-           (( proven_not_t(Sent) => -proven_t(Sent) & -possible_t(Sent) & -unknown_t(Sent) )),
-           (( askable_t(Sent) => proven_t(Sent) v unknown_t(Sent) v proven_not_t(Sent)  )),
-           (( answerable_t(Sent) <=> askable_t(Sent) & -unknown_t(Sent) )),
-           (( askable_t(Sent) <=> -fallacy_t(Sent) )),
-           (( answerable_t(Sent) => proven_t(Sent) v proven_not_t(Sent)  )),
-           (( proven_t(Sent) v unknown_t(Sent) v proven_not_t(Sent)  )),
-
-           % TODO define askable_t
-           (( asserted_t(P,A) => proven_t(P,A) )),
-           (( proven_t(P,A) => assumed_t(P,A) )),
-           (( assumed_t(P,A) => -proven_not_t(P,A) & -fallacy_t(P,A)  )),
-           (( possible_t(P,A) => -proven_not_t(P,A) & -fallacy_t(P,A)  )),            
-
-           (( proven_t(P,A) & proven_not_t(P,A) => fallacy_t(P,A) )),
-
-           (( proven_t(P,A) =>  -proven_not_t(P,A) & possible_t(P,A) & -unknown_t(P,A) )),
-           (( proven_not_t(P,A) => -proven_t(P,A) & -possible_t(P,A) & -unknown_t(P,A) )),
-           (( askable_t(P,A) => proven_t(P,A) v unknown_t(P,A) v proven_not_t(P,A)  )),
-           (( answerable_t(P,A) <=> askable_t(P,A) & -unknown_t(P,A) )),
-           (( askable_t(P,A) <=> -fallacy_t(P,A) )),
-           (( answerable_t(P,A) => proven_t(P,A) v proven_not_t(P,A)  )),
-           (( proven_t(P,A) v unknown_t(P,A) v proven_not_t(P,A)  )),
 
            % TODO define askable_t
            (( asserted_t(P,A,B) => proven_t(P,A,B) )),
@@ -415,23 +384,9 @@ pttp_logic(logicmoo_kb_refution,
            (( answerable_t(P,A,B) <=> askable_t(P,A,B) & -unknown_t(P,A,B) )),
            (( askable_t(P,A,B) <=> -fallacy_t(P,A,B) )),
            (( answerable_t(P,A,B) => proven_t(P,A,B) v proven_not_t(P,A,B)  )),
-           (( proven_t(P,A,B) v unknown_t(P,A,B) v proven_not_t(P,A,B)  )),
+           (( proven_t(P,A,B) v unknown_t(P,A,B) v proven_not_t(P,A,B)  ))
 
-           % TODO define askable_t
-           (( asserted_t(P,A,B,C) => proven_t(P,A,B,C) )),
-           (( proven_t(P,A,B,C) => assumed_t(P,A,B,C) )),
-           (( assumed_t(P,A,B,C) => -proven_not_t(P,A,B,C) & -fallacy_t(P,A,B,C)  )),
-           (( possible_t(P,A,B,C) => -proven_not_t(P,A,B,C) & -fallacy_t(P,A,B,C)  )),            
 
-           (( proven_t(P,A,B,C) & proven_not_t(P,A,B,C) => fallacy_t(P,A,B,C) )),
-           
-           (( proven_t(P,A,B,C) =>  -proven_not_t(P,A,B,C) & possible_t(P,A,B,C) & -unknown_t(P,A,B,C) )),
-           (( proven_not_t(P,A,B,C) => -proven_t(P,A,B,C) & -possible_t(P,A,B,C) & -unknown_t(P,A,B,C) )),
-           (( askable_t(P,A,B,C) => proven_t(P,A,B,C) v unknown_t(P,A,B,C) v proven_not_t(P,A,B,C)  )),
-           (( answerable_t(P,A,B,C) <=> askable_t(P,A,B,C) & -unknown_t(P,A,B,C) )),
-           (( askable_t(P,A,B,C) <=> -fallacy_t(P,A,B,C) )),
-           (( answerable_t(P,A,B,C) => proven_t(P,A,B,C) v proven_not_t(P,A,B,C)  )),
-           (( proven_t(P,A,B,C) v unknown_t(P,A,B,C) v proven_not_t(P,A,B,C)  ))
 
            % TODO define askable_t
 /*

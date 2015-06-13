@@ -640,9 +640,9 @@ pnf(_Orig,          PNF, _,       PNF ).
 % cf(KB,A,B,C):- convertAndCall(as_dlog,cf(KB,A,B,C)).
 cf(KB, Orig,PNF, SET):- removeQ(KB, Orig,PNF,[], UnQ), 
   cnf(Orig,UnQ,CNF),!,  
-  conjuncts_to_list(CNF,Conj),!,display_form(conj:-Conj),
+  conjuncts_to_list(CNF,Conj),!,% display_form(conj:-Conj),
   %nnf(-,-CNF,DisjN),dnf(DisjN,DNF),!, %display_form(dnf:-DNF),
-  %disjuncts_to_list(DNF,Disj),!,display_form(disj:-Disj),
+  %disjuncts_to_list(DNF,Disj),!,% display_form(disj:-Disj),
   make_clause_set(KB,Conj,EachClause),!,
   maplist(correct_cls,EachClause,SOO),
   expand_cl(SOO,SOOO),
@@ -692,7 +692,7 @@ removeQ(_,_Orig, F,_,F0 ):- F=F0.
 
 display_form(Form):- demodal_sents(Form,Out),portray_clause(Out).
 
-demodal_sents(I,O):-transitive(demodal_sents0,I,O).
+demodal_sents(I,O):-transitive_lc(demodal_sents0,I,O).
 
 demodal_sents0(I,O):-demodal(I,M),modal2sent(M,O),!.
 
@@ -769,7 +769,7 @@ make_clause_set(KB,[CJ|Conj],CLAUSES):-
    append(CLS,CLAUS,CLAUSES).
 
 make_clauses(_,[CJ],cl([CJ],[])):-is_lit_atom(CJ).
-make_clauses(CJ,OOut):- disjuncts_to_list(CJ,Conj),make_clause_from_set(KB,Conj,OOut).
+make_clauses(CJ,OOut):- disjuncts_to_list(CJ,Conj),make_clause_from_set(_KB,Conj,OOut).
 
 negate_one_maybe(KB,One,Neg):-negate_one(KB,One,Neg).
    
@@ -852,8 +852,9 @@ skolem(KB, Orig, F, X, FreeV, Out):-  fail,
    must(skolem_f(KB, Orig, F, X, FreeV, Sk)),
    subst(F,X,Sk,Out).
 
-skolem(_ , Orig, F, X, FreeV, Out):-  
+skolem(KB , Orig, F, X, FreeV, Out):-  
    must(skolem_f(KB, Orig, F, X, FreeV, Sk)),
+   %writeq(freev(Sk,FreeV)),
    must(Out= '=>'({constraintExists(X,Sk)},F)),
    !,show_call( asserta((constraintRules(X,Sk,F)))).
 
@@ -863,14 +864,14 @@ skolem(KB, Orig, F, X, FreeV, FmlSk):-
 
 
 skolem_f(KB, Orig, F, X, FreeVIn, Sk):- 
-       must_det_l([ 
+       must_det_l((
          delete_eq(FreeVIn,KB,FreeV0),
          delete_eq(FreeV0,X,FreeV),
          list_to_set(FreeV,FreeVSet),
 	contains_var_lits(F,X,LitsList),
         mk_skolem_name(Orig,X,LitsList,'',SK),
         concat_atom(['sk',SK,'Fn'],Fun),
-	Sk =..[Fun|FreeVSet]]).
+	Sk =..[Fun|FreeVSet])).
 /*
 
 
@@ -1095,7 +1096,7 @@ add_nesc(Wff666,nesc(Wff666)).
 cf_to_flattened_clauses(KB,Why,NCFsI,FlattenedO):- 
  must_det_l((
    maplist(correct_cls,NCFsI,NCFs),
-   wdmsgl(cf(NCFs)),
+   % wdmsgl(cf(NCFs)),
    maplist(clauses_to_boxlog(KB,Why),NCFs,ListOfLists),
    flatten([ListOfLists],Flattened),
    thglobal:as_prolog(Flattened,FlattenedL),
@@ -1326,12 +1327,15 @@ boxlog_to_prolog((H & B),(HH , BB)):- !,boxlog_to_prolog(H,HH),boxlog_to_prolog(
 boxlog_to_prolog((H v B),(HH ; BB)):- !,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
 boxlog_to_prolog((H , B),(HH , BB)):- !,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
 boxlog_to_prolog((H ; B),(HH ; BB)):- !,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
-boxlog_to_prolog(IN,OUT):-demodal(IN,M),IN\=@=M,!,boxlog_to_prolog(M,OUT).
 boxlog_to_prolog(H,O):- H=..[N,nesc(F)],kb_nlit(_,N),nonvar(F),!,HH=..[N,F],boxlog_to_prolog(HH,O).
+boxlog_to_prolog(nesc(not(F)),O):- nonvar(F),!,boxlog_to_prolog(neg(F),O).
 boxlog_to_prolog(nesc(F),O):- nonvar(F),!,boxlog_to_prolog(F,O).
 boxlog_to_prolog(not(nesc(F)),O):- nonvar(F),!,boxlog_to_prolog(naf(F),O).
 boxlog_to_prolog(~poss(F),O):-nonvar(F),!,boxlog_to_prolog(not_poss(F),O).
 boxlog_to_prolog(n(Neg,H),n(Neg,HH)):- !,boxlog_to_prolog(H,HH).
+boxlog_to_prolog(not(F),neg(O)):- nonvar(F),!,boxlog_to_prolog(F,O).
+boxlog_to_prolog(IN,OUT):-demodal_sents(IN,M),IN\=@=M,!,boxlog_to_prolog(M,OUT).
+
 
 boxlog_to_prolog( H, HH):- H=..[F|ARGS],!,boxlog_to_prolog(ARGS,ARGSO),!,HH=..[F|ARGSO].
 boxlog_to_prolog(BL,PTTP):- thglobal:as_prolog(BL,PTTP).

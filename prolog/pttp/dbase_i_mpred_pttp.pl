@@ -87,7 +87,7 @@ pttp_assert_wid(ID,_Mode,call(CALL)):-!, must((save_wid(ID,call,call(CALL)),unnu
 pttp_assert_wid(ID,pttp,X):- must((bugger:with_assertions(thlocal:current_why(ID,X), must(( pttp1_wid(ID,X,Y), pttp2_wid(ID,Y)) )))).
 % pttp_assert_wid(ID,Mode,KIF):- must(snark_tell(ID,KIF)),!.
 pttp_assert_wid(ID,snark,X):- show_call_failure(must(snark_tell(ID,X))).
-pttp_assert_wid(ID,Mode,(X:-Y)):- get_functor(X,F), !,must((save_wid(ID,pttp_in,(X:-Y)), pttp_assert_real_wid(ID,(X:-Y)))).
+pttp_assert_wid(ID,Mode,(X:-Y)):- !,must((save_wid(ID,Mode,(X:-Y)), pttp_assert_real_wid(ID,(X:-Y)))).
 pttp_assert_wid(ID,_Mode,X):-  show_call_failure(must(pttp_assert_real_wid(ID,X))),!.
 pttp_assert_wid(ID,_Mode,PNF):-  must( pttp_nnf(PNF,X)),!,must(must(pttp_assert_real_wid(ID,X))).
 
