@@ -258,6 +258,7 @@ try(_, warning(Type, SentenceID, Subject, Description)) -->
 % This predicate resets the record about how far the parser proceeded in the token list. Furthermore, it
 % initializes the record for the new token list.
 
+:- export(reset_progress_record/1).
 reset_progress_record(TokenList) :-
     retractall(position_backwards(_)),
     record_position(TokenList, TokenList),

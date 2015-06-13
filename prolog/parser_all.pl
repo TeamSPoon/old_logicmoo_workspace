@@ -24,6 +24,32 @@
 :-export(install_converter/1).
 install_converter(CNV):- must(pfc_add(installed_converter(CNV))).
 
+/*
+% Find all "install_converter", Subfolders, "T:\devel\LogicmooDeveloperFramework\PrologMUD\pack\MUD_PDDL\prolog\ape\", "*.*"
+
+File T:\devel\LogicmooDeveloperFramework\PrologMUD\pack\MUD_PDDL\prolog\ape\parser\ace_to_drs.pl
+  64 4::- install_converter(acetext_to_drs(+acetext, -sentences, -syntaxTrees, -drs, -messages)).
+  167 4::- install_converter(call_tokenizer(+acetext, +(guess,on), -sentences, -sentencesToParse)).
+  192 4::- install_converter(call_parser(+sentences, +(startID,99), -syntaxtrees, -(drs,reversed))).
+  198 4::- install_converter(paragraphs_to_drs(paragraphs, +(guess,on), +(catch,on), +(startID,99), -sentences, -syntaxTrees, -drs, -messages, -time)).
+File T:\devel\LogicmooDeveloperFramework\PrologMUD\pack\MUD_PDDL\prolog\ape\parser\tokenizer.pl
+  69 4::- install_converter(tokenize(+acetext, -tokens:list)).
+File T:\devel\LogicmooDeveloperFramework\PrologMUD\pack\MUD_PDDL\prolog\ape\parser\tokens_to_sentences.pl
+  54 4::- install_converter(tokens_to_sentences(+tokens, -sentences:list)).
+  100 4::- install_converter(tokens_to_paragraphs(+tokens, -sentences:list)).
+File T:\devel\LogicmooDeveloperFramework\PrologMUD\pack\MUD_PDDL\prolog\ape\utils\drs_to_sdrs.pl
+  37 4::- install_converter(drs_to_sdrs(+drs, -sdrs)).
+File T:\devel\LogicmooDeveloperFramework\PrologMUD\pack\MUD_PDDL\prolog\ape\utils\drs_to_drslist.pl
+  38 4::- install_converter(drs_to_drslist(+drs, -drs:list)).
+File T:\devel\LogicmooDeveloperFramework\PrologMUD\pack\MUD_PDDL\prolog\ape\utils\drs_to_ace.pl
+  35 4::- install_converter(drs_to_ace(+drs, -acetext:list)).
+  54 4::- install_converter(drs_to_ace(+drs:list, -acetext:list)).
+File T:\devel\LogicmooDeveloperFramework\PrologMUD\pack\MUD_PDDL\prolog\ape\utils\drs_to_fol_to_prenex.pl
+  71 4::- install_converter(drs_fol(+drs, -ke)).
+  93 4::- install_converter(drs_pnf(+drs, -ke)).
+
+ */
+
 :- user:ignore(( Z = ('/'),current_op(X,Y,Z),display(:-(op(X,Y,Z))),nl,fail)).
 :- user:ignore((Z = (':'),current_op(X,Y,Z),display(:-(op(X,Y,Z))),nl,fail)).
 :- user:ignore((Z = ('-'),current_op(X,Y,Z),display(:-(op(X,Y,Z))),nl,fail)).
