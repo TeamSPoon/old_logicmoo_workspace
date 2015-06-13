@@ -12,10 +12,10 @@
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
 user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current_prolog_flag(unix,true).
-user:file_search_path(cliopatria, '../packs/ClioPatria'). % :- current_prolog_flag(unix,true).
-user:file_search_path(user, '../packs/ClioPatria/user/').
-user:file_search_path(swish, '../packs/swish'):- current_prolog_flag(unix,true).
-user:file_search_path(pack, '../packs/').
+user:file_search_path(cliopatria, '../pack/ClioPatria'). % :- current_prolog_flag(unix,true).
+user:file_search_path(user, '../pack/ClioPatria/user/').
+user:file_search_path(swish, '../pack/swish'):- current_prolog_flag(unix,true).
+user:file_search_path(pack, '../pack/').
 
 :- attach_packs.
 :- initialization(attach_packs).
