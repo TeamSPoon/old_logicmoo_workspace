@@ -287,12 +287,9 @@ fol_to_pkif(FOL,PKIF):- transitive(fol_to_kif,FOL,KIF),kif_to_pkif(KIF,PKIF),!.
 
 :-export(ace_to_pkif/2).
 
-ace_to_pnf(ACE,FOL):- 
-  get_ape_term_results(ACE,PROPS),transitive(props_to_pnf,PROPS,PNF),v_pp(PNF,FOL).
+ace_to_pnf(ACE,FOL):-  must_det_l((get_ape_term_results(ACE,PROPS),transitive(props_to_pnf,PROPS,PNF),v_pp(PNF,FOL))).
 
-ace_to_pkif(ACE,PKIF):- 
-  get_ape_term_results(ACE,PROPS),transitive(props_to_pnf,PROPS,PNF),v_pp(PNF,FOL),
-   fol_to_pkif(FOL,PKIF0),fully_expand(PKIF0,PKIF),with_output_to(user_error,portray_clause((fol:-PKIF))).
+ace_to_pkif(ACE,PKIF):-  must_det_l((ace_to_pnf(ACE,FOL),fol_to_pkif(FOL,PKIF0),fully_expand(PKIF0,PKIF))).
 
 props_to_pnf(PROPS,PNF):-member(pnf=PNF,PROPS),!.
 props_to_pnf(PROPS,PNF):-member(fol=PNF,PROPS),!.
