@@ -46,10 +46,10 @@ rel(Rel,Att-[relation:Rel|Att],Rel).
    Thematic Roles introduced by PPs
 --- */
 
-roles(_,((s:X\np)\(s:X\np))/np,Roles,A-A):- option('--roles',verbnet), att(A,verbnet,Roles), \+ Roles=[], !.
-roles(by,((s:X\np)\(s:X\np))/np,Roles,A-[verbnet:Roles|A]):- option('--roles',verbnet), !, Roles = ['Agent'].
-roles(_,((s:X\np)\(s:X\np))/np,Roles,A-[verbnet:Roles|A]):- option('--roles',verbnet), !, Roles = ['Instrument'].
-roles(_,((s:X\np)\(s:X\np))/np,Roles,A-A):- option('--roles',proto), !, Roles = [agent].
+roles(_,((s:X\np)\(s:X\np))/np,Roles,A-A):- candc_option('--roles',verbnet), att(A,verbnet,Roles), \+ Roles=[], !.
+roles(by,((s:X\np)\(s:X\np))/np,Roles,A-[verbnet:Roles|A]):- candc_option('--roles',verbnet), !, Roles = ['Agent'].
+roles(_,((s:X\np)\(s:X\np))/np,Roles,A-[verbnet:Roles|A]):- candc_option('--roles',verbnet), !, Roles = ['Instrument'].
+roles(_,((s:X\np)\(s:X\np))/np,Roles,A-A):- candc_option('--roles',proto), !, Roles = [agent].
 
 
 /* -------------------------------------------------------------------------
@@ -67,9 +67,9 @@ roles(Verb,s:pss\np,[Role],A):- roles(Verb,(s:dcl\np)/np,[Role,_],A), !.
    Thematic Roles: standard case 
 --- */
 
-roles(_,_,Roles,A-A):- option('--roles',verbnet), att(A,verbnet,Roles), \+ Roles=[], !.
-roles(Verb,Cat,Roles,A-[verbnet:Roles|A]):- option('--roles',verbnet), verbnet(Verb,Cat,Roles), !.
-roles(Verb,Cat,Roles,A-A):- option('--roles',proto), proto(Verb,Cat,Roles), !.
+roles(_,_,Roles,A-A):- candc_option('--roles',verbnet), att(A,verbnet,Roles), \+ Roles=[], !.
+roles(Verb,Cat,Roles,A-[verbnet:Roles|A]):- candc_option('--roles',verbnet), verbnet(Verb,Cat,Roles), !.
+roles(Verb,Cat,Roles,A-A):- candc_option('--roles',proto), proto(Verb,Cat,Roles), !.
 
 
 /* -------------------------------------------------------------------------

@@ -6,7 +6,7 @@
           ]).
 
 :- use_module(boxer(slashes)).
-:- use_module(semlib(options),[option/2]).
+:- use_module(semlib(options),[candc_option/2]).
 :- use_module(library(lists),[member/2]).
 :- use_module(lex(tense),[tense/4,aspect/5]).
 :- use_module(boxer(categories),[category/4,
@@ -23,7 +23,7 @@
 --- */
 
 semlex_verb(Cat,do,Index,Att1-Att3,Sem):- 
-   option('--vpe',true),
+   candc_option('--vpe',true),
    member(Cat,[(s:dcl\(s:adj\np))/np]),
    roles(Sym,(s:dcl\np)/np,[Role],Att1-Att2), !,
    DRS = merge(B:drs([B:[]:E],
@@ -38,8 +38,8 @@ semlex_verb(Cat,do,Index,Att1-Att3,Sem):-
 --- */
 
 semlex_verb(Cat,Sym,Index,Att1-Att3,Sem):-
-   option('--vpe',true),
-   option('--modal',true),
+   candc_option('--vpe',true),
+   candc_option('--modal',true),
    modal_verb(pos,Sym),
    member(Cat,[s:Mood\np,s:Mood/np]), 
    roles(Sym,Cat,[Role],Att1-Att2), !,
@@ -51,8 +51,8 @@ semlex_verb(Cat,Sym,Index,Att1-Att3,Sem):-
    Sem = lam(NP,app(TDRS,lam(P,B2:drs([],[B2:[]:pos(app(NP,lam(X,DRS)))])))).
 
 semlex_verb(Cat,Sym,Index,Att1-Att3,Sem):-
-   option('--vpe',true),
-   option('--modal',true),
+   candc_option('--vpe',true),
+   candc_option('--modal',true),
    modal_verb(nec,Sym),
    member(Cat,[s:Mood\np,s:Mood/np]), 
    roles(Sym,Cat,[Role],Att1-Att2), !,
@@ -64,7 +64,7 @@ semlex_verb(Cat,Sym,Index,Att1-Att3,Sem):-
    Sem = lam(NP,app(TDRS,lam(P,B2:drs([],[B2:[]:nec(app(NP,lam(X,DRS)))])))).
 
 semlex_verb(Cat,Sym,Index,Att1-Att3,Sem):- 
-   option('--vpe',true),
+   candc_option('--vpe',true),
    aux_modal_verb(Sym),
    member(Cat,[s:Mood\np,s:Mood/np]), 
    roles(Sym,Cat,[Role],Att1-Att2), !,
@@ -94,13 +94,13 @@ semlex_verb(s:adj\np,Sym,Index,Att-Att,Sem):-
    Adjectival (possible, necessary)
 
 semlex_verb(s:adj\np,possible,Index,Att-Att,Sem):- 
-   option('--modal',true), !,
+   candc_option('--modal',true), !,
    Sem = lam(NP,lam(P,merge(B1:drs([B1:[]:E],
                                    [B1:[]:pos(app(NP,lam(X,B2:drs([],[B2:Index:role(E,X,theme,1)]))))]),
                             app(P,E)))).
 
 semlex_verb(s:adj\np,necessary,Index,Att-Att,Sem):- 
-   option('--modal',true), !,
+   candc_option('--modal',true), !,
    Sem = lam(NP,lam(P,merge(B1:drs([B1:[]:E],
                                    [B1:[]:nec(app(NP,lam(X,B2:drs([],[B2:Index:role(E,X,theme,1)]))))]),
                             app(P,E)))).
@@ -147,8 +147,8 @@ semlex_verb(Cat,Sym,Index,Att-Att,Sem):-
 
 % expriment, giving negation wide scope in 'there is no'
 semlex_verb(Cat,be,Index,Att1-Att2,Sem):- 
-   option('--x',true),
-   option('--copula',true),
+   candc_option('--x',true),
+   candc_option('--copula',true),
    category_type(Cat,_,npVnp,_,Mood), !,
    DRS = merge(B:drs([B:[]:E],
                      [B:[]:prop(E,app(NP2,lam(Y,app(NP1,lam(X,B2:drs([],[B2:Index:eq(X,Y)]))))))]),
@@ -158,7 +158,7 @@ semlex_verb(Cat,be,Index,Att1-Att2,Sem):-
 
 % old version
 semlex_verb(Cat,be,Index,Att1-Att2,Sem):- 
-   option('--copula',true),
+   candc_option('--copula',true),
    category_type(Cat,_,npVnp,_,Mood), !,
    DRS = merge(B:drs([B:[]:E],
                      [B:[]:prop(E,app(NP2,lam(Y,B2:drs([],[B2:Index:eq(X,Y)]))))]),
@@ -167,7 +167,7 @@ semlex_verb(Cat,be,Index,Att1-Att2,Sem):-
    Sem = lam(NP2,lam(NP1,app(TDRS,lam(P,app(NP1,lam(X,DRS)))))).
 
 semlex_verb(Cat,be,Index,Att1-Att2,Sem):-          %%% place holder for IS-A sense
-    option('--copula',true),
+    candc_option('--copula',true),
     category_type(Cat,_,npVnp,_,Mood), !,
     DRS = merge(B:drs([B:[]:E],
                       [B:[]:prop(E,B2:drs([],[B2:[]:imp(merge(B3:drs([B3:[]:X],[]),app(NP1,lam(Y,B4:drs([],[B4:[]:eq(Y,X)])))),
@@ -177,7 +177,7 @@ semlex_verb(Cat,be,Index,Att1-Att2,Sem):-          %%% place holder for IS-A sen
     Sem = lam(NP2,lam(NP1,app(TDRS,lam(P,DRS)))).
 
 semlex_verb(Cat,be,Index,Att1-Att3,Sem):- 
-   option('--semantics',tacitus),
+   candc_option('--semantics',tacitus),
    member(Cat,[(s:Mood\np)/np,(s:Mood/np)/np]),
    roles(be,Cat,[Role],Att1-Att2), !,
    DRS = merge(B:drs([B:[]:E],
@@ -266,7 +266,7 @@ semlex_verb((s:Mood\np_thr)/np,_,Index,Att1-Att2,Sem):- !,
 --- */
 
 semlex_verb(Cat,be,Index,Att1-Att2,Sem):-
-   option('--copula',true),
+   candc_option('--copula',true),
    category_type(Cat,_,npVpp,_,Mood), !, 
    DRS = merge(B:drs([B:[]:E],
                      [B:[]:prop(E,app(PP,Y))]),
@@ -591,7 +591,7 @@ semlex_verb(Cat,Sym,Index,Att1-Att2,Sem):-
 --- */
 
 semlex_verb(Cat,be,Index,Att1-Att2,Sem):-
-   option('--copula',true),
+   candc_option('--copula',true),
    category_type(Cat,_,vpVnp,_,Mood), !,
    closing(CC),
    DRS = merge(B1:drs([B1:[]:E,B1:[]:A],
@@ -726,7 +726,7 @@ semlex_verb(Cat,Sym,Index,Att1-Att2,Sem):-
  */
 
 semlex_verb(Cat,Sym,Index,Att-Att,Sem):-
-   option('--semantics',drgno),
+   candc_option('--semantics',drgno),
    Cat = (s:to\np)/(s:b\np), !,
    CC = lam(F,merge(B2:drs([],[B2:Index:pred(F,Sym,s,1)]),app(E,F))),
 %   Sem = lam(VP,lam(NP,lam(E,B1:drs([B1:[]:P],
@@ -750,7 +750,7 @@ semlex_verb(Cat,_Sym,Index,Att-Att,Sem):-
 --- */
 
 semlex_verb(Cat,Sym,Index,Att1-Att2,Sem):-
-   option('--modal',true), 
+   candc_option('--modal',true), 
    modal_verb(pos,Sym),
    Cat = (s:Mood\np)/(s:Aspect\np), 
    \+ Mood = Aspect, !,
@@ -758,7 +758,7 @@ semlex_verb(Cat,Sym,Index,Att1-Att2,Sem):-
    Sem = lam(VP,lam(NP,lam(E,B:drs([],[B:[]:pos(app(app(TDRS,app(VP,NP)),E))])))).
 
 semlex_verb(Cat,Sym,Index,Att1-Att2,Sem):-
-   option('--modal',true),
+   candc_option('--modal',true),
    modal_verb(nec,Sym),
    Cat = (s:Mood\np)/(s:Aspect\np), 
    \+ Mood = Aspect, !,
@@ -1154,21 +1154,21 @@ semlex_verb(Cat,_,Index,Att1-Att2,Sem):-
    Modal "it may/could/would VP"
 
 semlex_verb(Cat,Sym,Index,Att1-Att2,Sem):-
-   option('--modal',true),
+   candc_option('--modal',true),
    modal_verb(pos,Sym),
    Cat = (s:Mood\np_exp)/(s:Aspect\np), !,
    aspect(Aspect,Mood,[],Att1-Att2,TDRS),
    Sem = lam(VP,lam(NP,lam(E,B:drs([],[B:Index:pos(app(app(TDRS,app(VP,NP)),E))])))).
 
 semlex_verb(Cat,Sym,Index,Att1-Att2,Sem):-
-   option('--modal',true),
+   candc_option('--modal',true),
    modal_verb(nec,Sym),
    Cat = (s:Mood\np_exp)/(s:Aspect\np), !,
    aspect(Aspect,Mood,[],Att1-Att2,TDRS),
    Sem = lam(VP,lam(NP,lam(E,B:drs([],[B:Index:nec(app(app(TDRS,app(VP,NP)),E))])))).
 
 semlex_verb(Cat,_Sym,Index,Att1-Att2,Sem):-
-   option('--modal',false),
+   candc_option('--modal',false),
    Cat = (s:Mood\np_exp)/(s:Aspect\np), !,
    aspect(Aspect,Mood,Index,Att1-Att2,TDRS),
    Sem = lam(VP,lam(NP,lam(E,app(app(TDRS,app(VP,NP)),E)))).

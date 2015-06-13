@@ -196,10 +196,10 @@ etaConversion(_,thing).
 */
 
 interpretFunction(f(noun,_,Sym),Sym):-
-   option('--nn',false), !, Sym = of.
+   candc_option('--nn',false), !, Sym = of.
 
 interpretFunction(f(name,_,Sym),Sym):-
-   option('--nn',false), !, Sym = '='.
+   candc_option('--nn',false), !, Sym = '='.
 
 interpretFunction(f(noun,[A1,B1],Sym),Sym):-
    etaConversion(A1,A2),

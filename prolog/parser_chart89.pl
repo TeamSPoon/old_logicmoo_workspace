@@ -54,8 +54,8 @@
 % ===========================================================
 type_action_info(human_player,chart89(ftListFn(ftTerm)),"Development test CHART-89 Text for a human.  Usage: CHART89 Cant i see the blue backpack?").
 
-agent_call_command(_Gent,chart89([])):- chart89.
-agent_call_command(_Gent,chart89(StringM)):-nonvar(StringM), chart89(StringM).  
+user:agent_call_command(_Gent,chart89([])):- chart89.
+user:agent_call_command(_Gent,chart89(StringM)):-nonvar(StringM), chart89(StringM).  
 
 
 % ===========================================================
@@ -77,7 +77,7 @@ chart89 :- with_assertions(tracing80,
 
 :- ensure_loaded(chart89/buchart2).	% toplevel
 
-%:-swi_export(test_chart89_regressions/0).
+%:-export(test_chart89_regressions/0).
 test_chart89_regressions:- time((test1,test2)).
 :- retract(thlocal:into_form_code).
 

@@ -55,7 +55,7 @@ reportEval:-
    format(user_error,
           'Attempted: ~p. Completed: ~p (~2f%).~n',
           [At,Co,Percentage]),!,
-   ignore((option('--toploop',do),prolog)).
+   ignore((candc_option('--toploop',do),prolog)).
 
 reportEval.
 

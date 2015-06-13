@@ -24,16 +24,16 @@
 
 print_tree(T) :-
    numbervars80(T,1,_),
-   pt(T,0), nl, fail.
+   pt0(T,0), nl, fail.
 print_tree(_).
 
-pt(A,I) :-
+pt0(A,I) :-
    as_is(A), !,
    tab(I), write(A), nl.
-pt([T|Ts],I) :- !,
-   pt(T,I),
+pt0([T|Ts],I) :- !,
+   pt0(T,I),
    pl(Ts,I).
-pt(T,I) :- !,
+pt0(T,I) :- !,
    T=..[F|As],
    tab(I), write(F), nl,
    I0 is I+3,
@@ -41,7 +41,7 @@ pt(T,I) :- !,
 
 pl([],_) :- !.
 pl([A|As],I) :- !,
-   pt(A,I),
+   pt0(A,I),
    pl(As,I).
 
 as_is(V):-var(V).

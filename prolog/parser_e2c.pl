@@ -19,7 +19,7 @@
 % ==============================================================================
 :- dynamic_multifile_exported kbp_t_list_prehook/2.
 
-:-swi_export(reorderClause/2).
+:-export(reorderClause/2).
 :-meta_predicate(reorderClause(?,?)).
 
 :- dynamic_multifile_exported thglobal:use_cyc_database/0.
@@ -207,8 +207,8 @@ get_pl_type(C,compound(F,A)):-functor(C,F,A).
 
 */
 :-dynamic(e2c_result/1).
-:-swi_export(e2c_result/1).
-:-swi_export((dm1/0,dm2/0,dm3/0)).
+:-export(e2c_result/1).
+:-export((dm1/0,dm2/0,dm3/0)).
 
 dm1:-
   mmake,
@@ -314,7 +314,7 @@ posMeans(String,POS,Form,CycL):-
       posMeans(String,POS,Form,CycL).
 
 
-:-swi_export(cache_the_posms/0).
+:-export(cache_the_posms/0).
 cache_the_posms:-!.
 cache_the_posms:- noreorder,
  with_assertions(thglobal:use_cyc_database,
@@ -923,7 +923,7 @@ contains_obliqe(Formula):-flatten(Formula,Flat),member(':OBLIQUE-OBJECT',Flat).
 :- op(100,fx,('`')).
 
 	 
-:-swi_export((fdelete/3)).
+:-export((fdelete/3)).
 
 % ===============================================================================================
 	             	 	
@@ -1305,7 +1305,7 @@ wordageToKif(_Symbol,Words,_Quest,posList(POSList,Words)):-get_pos_list(Words,PO
 % wordageToKif
 % =================================================================
 
-:-swi_export(notPrefixOrSuffix/1).
+:-export(notPrefixOrSuffix/1).
 notPrefixOrSuffix(CycWord):- not(cyckb_t(isa, CycWord, 'LexicalPrefix')),not(cyckb_t(isa, CycWord, 'LexicalSuffix')).
 is_cycWord_chk(CycWord):- cyckb_t(isa,CycWord,'EnglishWord'),!.
 
@@ -1342,7 +1342,7 @@ is_wordage_prop(String,Prop):-is_wordage_cache(String, wordage(_,Props)),!,membe
 is_wordage_prop(String,Prop):-is_wordage_cache(String,Props),!,member(Prop,Props).
 
 :-dynamic(is_wordage_cache/2).
-:-swi_export(is_wordage_cache/2).
+:-export(is_wordage_cache/2).
 get_wordage([of, the],_Props):-!,fail.
 
 get_wordage(A,Props):-atom(A),!,get_wordage([A],Props).
@@ -1496,7 +1496,7 @@ properNames(['Geordi',
 'Klingon',
 'Ferengi']).
 
-:-swi_export(list_wordage/0).
+:-export(list_wordage/0).
 
 list_wordage:- listing(is_wordage_cache),retractall(is_wordage_cache(_,_)).
 
@@ -3587,7 +3587,7 @@ cycPred('genlMt').
 % =======================================================
 % sentence(CycL, [every,man,that,paints,likes,monet],[]) 
 % =======================================================
-:-swi_export((sentence//1)).
+:-export((sentence//1)).
 
 sentence(CycL) --> theVariable(sent).
 sentence(CycL) --> declaritive_sentence(CycL).

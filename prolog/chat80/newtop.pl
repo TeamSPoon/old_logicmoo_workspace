@@ -26,14 +26,14 @@
 
 /* Control loop */
 
-:-swi_export(hi/0).
+:-export(hi/0).
 hi :-
    hi(user).
 
-:-swi_export(hi/1).
+:-export(hi/1).
 hi(File):- hi(report,File).
 
-:-swi_export(hi/2).
+:-export(hi/2).
 hi(Callback,File):-
     absolute_file_name(File,FOpen),
     call_cleanup((
@@ -109,7 +109,7 @@ control80(Callback,[do,not,trace,'.']) :-
 
 control80(Callback,U) :- with_assertions(thlocal:tracing80, call_in_banner(U,(ignore(process_run(Callback,U,_List,_Time))))),fail.
    
-:-swi_export(chat80/1).
+:-export(chat80/1).
 chat80(U):-
  with_assertions(tracing80,
            with_assertions(thlocal:chat80_interactive,
@@ -117,7 +117,7 @@ chat80(U):-
              with_no_assertions(thglobal:use_cyc_database,
               ignore(control80(U)))))).
 
-:-swi_export(test_chat80/1).
+:-export(test_chat80/1).
 test_chat80(U):-
  with_assertions(tracing80,
            with_assertions(thlocal:chat80_interactive,
@@ -174,10 +174,10 @@ words_to_w2([W|WL],[W2|W2L]):-w_to_w2(W,W2),words_to_w2(WL,W2L).
 
 sent_to_parsed(U,E):- deepen_pos(sentence(E,U,[],[],[])).
 
-:-swi_export(deepen_pos/1).
+:-export(deepen_pos/1).
 :-meta_predicate(deepen_pos(0)).
 deepen_pos(Call):- one_must(deepen_pos_0(Call),with_assertions(thlocal:useAltPOS,deepen_pos_0(Call))).
-:-swi_export(deepen_pos_0/1).
+:-export(deepen_pos_0/1).
 :-meta_predicate(deepen_pos_0(0)).
 deepen_pos_0(Call):-one_must(Call,with_assertions(thlocal:usePlTalk,Call)).
 

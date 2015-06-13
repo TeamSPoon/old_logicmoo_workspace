@@ -16,7 +16,7 @@
 */
 
 :- use_module(library(lists),[member/2,append/3,select/3]).
-:- use_module(semlib(options),[option/2]).
+:- use_module(semlib(options),[candc_option/2]).
 :- use_module(semlib(errors),[error/2,warning/2]).
 :- use_module(semlib(drs2fol),[symbol/4,timex/2]).
 
@@ -156,7 +156,7 @@ findSymConds(L1,X1-X2,R1-R2):-
    ; findSymConds(L2,[Y|X1]-X2,[s(Sym,r,Sense)|R1]-R2) ).
 
 findSymConds([_:card(_,N,_)|L],X1-X2,R1-[s(Sym,cardinal,1),s(numeral,n,1)|R2]):- 
-   option('--plural',false),
+   candc_option('--plural',false),
    integer(N), N > 0, !,
    symbol(c,number,N,Sym),
    findSymConds(L,X1-X2,R1-R2).
@@ -421,7 +421,7 @@ getConceptId(1).
 */
 
 axiomsWN(Axioms):-
-   option('--modal',false), !,
+   candc_option('--modal',false), !,
    findall(isa(A,B),(isa(A,B),\+A=B,\+B=0),ISA),
    findall(isnota(A,B),(isa(A,C), concept([s(_,T,_)|_],A),
                         isa(B,C), concept([s(_,T,_)|_],B),
@@ -435,7 +435,7 @@ axiomsWN(Axioms):-
    axiomsWN(Ax2,Axioms).
 
 axiomsWN(Axioms):-
-   option('--modal',true), !,
+   candc_option('--modal',true), !,
    findall(isa(A,B),(isa(A,B),\+A=B,\+B=0),Ax1),
    findall(iseq(A,B),(concept([A|L],Id1),
                       member(B,L),
@@ -455,7 +455,7 @@ axiomsWN([isa(I1,I2)|L1],[Axiom|L2]):- !,
    axiomsWN(L1,L2).
 
 axiomsWN([isnota(I1,I2)|L1],[Axiom|L2]):-
-   option('--contradiction',true), !,
+   candc_option('--contradiction',true), !,
    isnota2fol(I1,I2,Axiom), 
    axiomsWN(L1,L2).
 
@@ -472,7 +472,7 @@ axiomsWN([_|L1],L2):- !,
 */
 
 isa2fol(I1,I2,Axiom):-
-   option('--modal',false), !,
+   candc_option('--modal',false), !,
    concept2sym(I1,B1),
    concept2sym(I2,B2),
    Axiom = all(X,imp(F1,F2)),
@@ -480,7 +480,7 @@ isa2fol(I1,I2,Axiom):-
    F2 =.. [B2,X].
 
 isa2fol(I1,I2,Axiom):-
-   option('--modal',true), !,
+   candc_option('--modal',true), !,
    concept2sym(I1,B1),
    concept2sym(I2,B2),
    Axiom = all(W,imp(possible_world(W),all(X,imp(F1,F2)))),
@@ -493,7 +493,7 @@ isa2fol(I1,I2,Axiom):-
 */
 
 isnota2fol(I1,I2,Axiom):-
-   option('--modal',false), !,
+   candc_option('--modal',false), !,
    concept2sym(I1,B1),
    concept2sym(I2,B2),
    Axiom = all(X,imp(F1,not(F2))),
@@ -501,7 +501,7 @@ isnota2fol(I1,I2,Axiom):-
    F2 =.. [B2,X].
 
 isnota2fol(I1,I2,Axiom):-
-   option('--modal',true), !,
+   candc_option('--modal',true), !,
    concept2sym(I1,B1),
    concept2sym(I2,B2),
    Axiom = all(W,imp(possible_world(W),all(X,imp(F1,not(F2))))),
@@ -514,7 +514,7 @@ isnota2fol(I1,I2,Axiom):-
 */
 
 iseq2fol(s(A1,T1,S1),s(A2,T2,S2),Axiom):-
-   option('--modal',false), !,
+   candc_option('--modal',false), !,
    symbol(T1,A1,S1,B1),
    symbol(T2,A2,S2,B2),
    Axiom = all(X,bimp(F1,F2)),
@@ -522,7 +522,7 @@ iseq2fol(s(A1,T1,S1),s(A2,T2,S2),Axiom):-
    F2 =.. [B2,X].
 
 iseq2fol(s(A1,T1,S1),s(A2,T2,S2),Axiom):-
-   option('--modal',true), !,
+   candc_option('--modal',true), !,
    symbol(T1,A1,S1,B1),
    symbol(T2,A2,S2,B2),
    Axiom = all(W,imp(possible_world(W),all(X,bimp(F1,F2)))),
@@ -550,7 +550,7 @@ concept2sym(I,B):-
 */
 
 graphMWN(Dir,File):-
-   option('--graph',true),
+   candc_option('--graph',true),
    atomic_list_concat([Dir,'/',File,'.mwn','.dot'],DOT),
    atomic_list_concat([Dir,'/',File,'.mwn','.pdf'],PDF),
    open(DOT,write,Stream),

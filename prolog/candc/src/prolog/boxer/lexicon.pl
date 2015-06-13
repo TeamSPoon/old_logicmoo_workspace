@@ -31,7 +31,7 @@
 :- use_module(boxer(slashes)).
 :- use_module(boxer(string2digit),[string2digit/2,string2score/2]).
 :- use_module(boxer(categories),[category/3,att/3,sense/4,roles/4,rel/3]).
-:- use_module(semlib(options),[option/2]).
+:- use_module(semlib(options),[candc_option/2]).
 :- use_module(knowledge(ne),[neClass/2,neClassType/3]).
 :- use_module(knowledge(dates),[month/2,dofm/2,decade/2,year/2]).
 :- use_module(knowledge(punctuation),[punctuation/2]).
@@ -105,7 +105,7 @@ semlex(Cat,_,Index,Att-Att,Sem):-
 
 semlex(conj:n,Sym,Index,Att-Att,Sem):-
    Sym = or,
-   option('--semantics',drg), !,
+   candc_option('--semantics',drg), !,
    Sem = lam(P2,lam(P1,lam(X,B:drs([],[B:Index:pred(X,Sym,s,1),
                                        B:[]:or(app(P1,X),app(P2,X))])))).
 
@@ -127,7 +127,7 @@ semlex(conj:Cat,Lemma,Index,Att-Att,Sem):-
  */
 
 semlex(conj:n,Sym,Index,Att-Att,Sem):- 
-   option('--semantics',drg), !,
+   candc_option('--semantics',drg), !,
    Sem = lam(P2,lam(P1,lam(X,merge(B:drs([B:[]:Y,B:[]:Z],
                                          [B:Index:pred(X,Sym,s,1),
                                           B:[]:rel(Y,X,subset_of,1),
@@ -143,7 +143,7 @@ semlex(conj:n,_Sym,_,Att-Att,Sem):- !,
                                          app(P2,Z)))))).
 
 semlex(conj:(n/n),Sym,Index,Att-Att,Sem):- 
-   option('--semantics',drg), !,
+   candc_option('--semantics',drg), !,
    Sem = lam(A2,lam(A1,lam(P,lam(X,merge(B:drs([B:[]:Y,B:[]:Z],
                                                [B:Index:pred(X,Sym,s,1),
                                                 B:[]:rel(Y,X,subset_of,1),
@@ -170,7 +170,7 @@ semlex(conj:app,_,Index,Att-Att,Sem):- !,
                                              app(P,Y))))))).
 
 semlex(conj:(s:_\np),Sym,Index,Att-Att,Sem):-    
-   option('--theory',sdrt), 
+   candc_option('--theory',sdrt), 
    member(Sym,[but]), !,                        % VP coordination (contrastive)
    Sem = lam(V1,lam(V2,lam(X,lam(E,sdrs([lab(K1,app(app(V2,X),E)),
                                          lab(K2,app(app(V1,X),E))],
@@ -178,14 +178,14 @@ semlex(conj:(s:_\np),Sym,Index,Att-Att,Sem):-
                                          []:rel(K1,K2,contrast)]))))).
 
 semlex(conj:(s:_\np),_Sym,Index,Att-Att,Sem):-    % VP coordination
-   option('--theory',sdrt), !,
+   candc_option('--theory',sdrt), !,
    Sem = lam(V1,lam(V2,lam(X,lam(E,sdrs([lab(K1,app(app(V2,X),E)),
                                          lab(K2,app(app(V1,X),E))],
                                         [Index:rel(K1,K2,continuation),
                                          []:rel(K1,K2,parallel)]))))).
 
 semlex(conj:(s:_),Sym,Index,Att-Att,Sem):- 
-   option('--theory',sdrt),
+   candc_option('--theory',sdrt),
    member(Sym,[but]), !,                        % S coordination (contrastive)
    Sem = lam(S1,lam(S2,lam(E,sdrs([lab(K1,app(S2,E)),
                                    lab(K2,app(S1,E))],
@@ -193,7 +193,7 @@ semlex(conj:(s:_),Sym,Index,Att-Att,Sem):-
                                    []:rel(K1,K2,contrast)])))).
 
 semlex(conj:(s:_),_Sym,Index,Att-Att,Sem):-     % S coordination
-   option('--theory',sdrt), !,
+   candc_option('--theory',sdrt), !,
    Sem = lam(S1,lam(S2,lam(E,sdrs([lab(K1,app(S2,E)),
                                    lab(K2,app(S1,E))],
                                   [Index:rel(K1,K2,continuation),
@@ -284,7 +284,7 @@ semlex(n,'there',Index,Att-Att,Sem):-
 --- */
 
 semlex(n,other,Index,Att-Att,Sem):-       % OTHERS
-   \+ option('--semantics',drg), 
+   \+ candc_option('--semantics',drg), 
    att(Att,pos,'NNS'), !,
    Sem = lam(X,merge(B0:drs([],[B0:Index:pred(X,person,n,1)]),
                      alfa(def,
@@ -348,22 +348,22 @@ semlex(n, most,Index,Att-Att,Sem):-
    Sem = lam(X,B:drs([],[B:Index:pred(X,most,n,Sense)])).
 
 semlex(n,Sym,Index,Att-Att,Sem):- 
-   \+ option('--semantics',drg),
+   \+ candc_option('--semantics',drg),
    att(Att,pos,'JJS'), !,
    Sem = lam(X,B1:drs([],[B1:[]:imp(B2:drs([B2:[]:Y],[B2:[]:not(B3:drs([],[B3:[]:eq(Y,X)]))]),B4:drs([],[B4:Index:rel(X,Y,Sym,0)]))])).
 
 %semlex(n,Sym,_,Index,Att-Att,Sem):- 
-%   option('--x',true),
+%   candc_option('--x',true),
 %   negprefix(_, Sym, Prefix, Core), !,
 %   Sem = lam(X,B1:drs([],[B1:Index:not(B2:drs([],[B2:Index:pred(X,Prefix,n,71),B2:Index:pred(X,Core,n,1)]))])).
 
 %semlex(n,Sym,_,Index,Att-Att,Sem):- 
-%   option('--x',true),
+%   candc_option('--x',true),
 %   negsuffix(_, Sym, Suffix, Core), !,
 %   Sem = lam(X,B1:drs([],[B1:Index:not(B2:drs([],[B2:Index:pred(X,Suffix,n,72),B2:Index:pred(X,Core,n,1)]))])).
 
 semlex(n,Sym,Index,Att-Att,Sem):-
-   option('--plural',true),
+   candc_option('--plural',true),
    att(Att,pos,'NNS'), !,
    att(Att,sense,Sense),
    Sem = lam(X,B:drs([],[B:Index:pred(X,Sym,n,Sense),B:[]:card(X,2,ge)])).
@@ -936,7 +936,7 @@ semlex(Cat,Sym,Index,Att,Sem):- semlex_verb(Cat,Sym,Index,Att,Sem), !.
 
 semlex(n/n,Sym,_Index,Att-Att,Sem):-
    member(Sym,[one,few]),
-   option('--x',true), !,                   
+   candc_option('--x',true), !,                   
    Sem = lam(P,lam(X,app(P,X))).
 
 semlex(Cat,many,Index,Att-Att,Sem):-
@@ -957,14 +957,14 @@ semlex(n/n,only,Index,Att-Att,Sem):- !,
 
 %semlex(Cat,Sym,_,Index,Att-Att,Sem):-
 %   category(adj,Cat,_), 
-%   option('--x',true),
+%   candc_option('--x',true),
 %   negprefix(_, Sym, Prefix, Core), !,
 %   Sem = lam(P,lam(X,B1:drs([],[B1:Index:not(merge(B2:drs([],[B2:Index:pred(X,Prefix,a,71),
 %                                                              B2:Index:pred(X,Core,a,1)]),app(P,X)))]))).
 
 %semlex(Cat,Sym,_,Index,Att-Att,Sem):-
 %   category(adj,Cat,_), 
-%   option('--x',true),
+%   candc_option('--x',true),
 %   negsuffix(_, Sym, Suffix, Core), !,
 %   Sem = lam(P,lam(X,B1:drs([],[B1:Index:not(merge(B2:drs([],[B2:Index:pred(X,Suffix,a,72),
 %                                                              B2:Index:pred(X,Core,a,1)]),app(P,X)))]))).
@@ -975,7 +975,7 @@ semlex(n/n,only,Index,Att-Att,Sem):- !,
 --- */
 
 semlex(Cat,Sym,Index,Att-Att,Sem):-
-   \+ option('--semantics',drg), 
+   \+ candc_option('--semantics',drg), 
    member(Sym,[other,previous,different]),
    category(adj,Cat,_), !,
    Sem = lam(P,lam(X,merge(app(P,X),
@@ -1132,7 +1132,7 @@ semlex(Cat,Sym,Index,Att-Att,Sem):-
 --- */
 
 semlex(Cat,Sym,Index,Att-Att,Sem):-
-   \+ option('--semantics',drg),
+   \+ candc_option('--semantics',drg),
    att(Att,pos,'JJS'),
    category(adj,Cat,_), !,
    Sem = lam(P,lam(X,merge(app(P,X),
@@ -1320,7 +1320,7 @@ semlex(Cat,Sym,Index,Att-Att,Sem):-
 --- */
 
 semlex(Cat,Sym,Index,Att-Att,Sem):-        
-   \+ option('--semantics',drg),
+   \+ candc_option('--semantics',drg),
    att(Att,pos,'JJS'),
    member(Cat,[(n/n)/(n/n),        %%%% Example: ... fastest growing segment
                (n/n)\(n/n)]), !,   %%%% Example: ... third largest bank (incorrect semantics!)
@@ -1517,14 +1517,14 @@ semlex(Cat,Sym,Index,Att1-Att2,Sem):-
 
 semlex(Cat,Sym,Index,Att-Att,Sem):-
    category(vpadv,Cat,_),
-   option('--semantics',drg),
+   candc_option('--semantics',drg),
    notSymbol(Sym), !,
    Sem = lam(X,lam(Q,lam(F,B1:drs([],[B1:[]:not(app(app(X,Q),lam(E,merge(B2:drs([],[B2:Index:pred(E,Sym,s,1)]),app(F,E)))))])))).
 
 semlex(Cat,Sym,Index,Att-Att,Sem):-
    category(vpadv,Cat,_),
    notSymbol(Sym), 
-   option('--x',true), !,
+   candc_option('--x',true), !,
 %  Sem = lam(V,lam(Q,lam(F,app(Q,lam(X,B:drs([],[B:Index:not(app(app(V,lam(P,app(P,X))),F))])))))). %%% subject wide scope (preferred?)
    Sem = lam(X,lam(Q,lam(F,B:drs([],[B:Index:not(app(app(X,Q),F))])))).                             %%% negation wide scope (dispreferred?)
 
@@ -1586,13 +1586,13 @@ semlex(Cat,Sym,Index,Att-Att,Sem):-
 
 %semlex(Cat,Sym,Index,Att-Att,Sem):-
 %   category(vpadv,Cat,_), 
-%   option('--x',true),
+%   candc_option('--x',true),
 %   negprefix(_, Sym, Prefix, Core), !,
 %   Sem = lam(X,lam(Q,lam(F,B1:drs([],[B1:Index:not(app(app(X,Q),lam(E,merge(B2:drs([],[B2:Index:pred(E,Prefix,a,71),B2:Index:pred(E,Core,a,1)]),app(F,E)))))])))).
 
 %semlex(Cat,Sym,Index,Att-Att,Sem):-
 %   category(vpadv,Cat,_), 
-%   option('--x',true), 
+%   candc_option('--x',true), 
 %   negsuffix(_, Sym, Suffix, Core), !,
 %   Sem = lam(X,lam(Q,lam(F,B1:drs([],[B1:Index:not(app(app(X,Q),lam(E,merge(B2:drs([],[B2:Index:pred(E,Suffix,a,72),B2:Index:pred(E,Core,a,1)]),app(F,E)))))])))).
 
@@ -1901,8 +1901,8 @@ semlex(Cat,where,Index,Att1-Att2,Sem):-
 --- */
 
 semlex(Cat,when,Index,Att-Att,Sem):-
-   option('--tense',true),
-   option('--theory',drt),
+   candc_option('--tense',true),
+   candc_option('--theory',drt),
    member(Cat,[((s:X\np)\(s:X\np))/s:dcl]), !,
    Sem = lam(S,lam(V,lam(Q,lam(F,merge(merge(B1:drs([B1:[]:T],[B1:Index:pred(T,time,n,1)]),
                                              app(S,lam(E,B2:drs([],[B2:[]:rel(E,T,temp_included,1)])))),
@@ -1914,14 +1914,14 @@ semlex(Cat,when,Index,Att-Att,Sem):-
 --- */
 
 semlex(Cat,Sym,Index,Att-Att,Sem):-
-   option('--theory',drt),
+   candc_option('--theory',drt),
    Cat = ((s:X\np)\(s:X\np))/s:inv, !,
    att(Att,sense,Sense),
    Sem = lam(S,lam(V,lam(Q,lam(F,merge(app(app(V,Q),lam(E,app(F,E))),
                                        app(S,lam(E,B:drs([],[B:Index:pred(E,Sym,r,Sense)])))))))).
 
 semlex(Cat,Sym,Index,Att-Att,Sem):-
-   option('--theory',sdrt),
+   candc_option('--theory',sdrt),
    Cat = ((s:X\np)\(s:X\np))/s:inv, !,
    closing(CC),
    Sem = lam(S,lam(V,lam(Q,lam(F,sdrs([sub(lab(K1,B1),lab(K2,B2))],[Index:rel(K1,K2,Sym)]))))),
@@ -1934,7 +1934,7 @@ semlex(Cat,Sym,Index,Att-Att,Sem):-
 --- */
 
 semlex(Cat,Sym,Index,Att-Att,Sem):-
-   option('--theory',sdrt),
+   candc_option('--theory',sdrt),
    member(Cat,[((s:X\np)\(s:X\np))/s:_,
                ((s:X\np)/(s:X\np))/s:_]), !,
    closing(CC),
@@ -2212,7 +2212,7 @@ semlex(Cat,Sym,Index,Att-Att,Sem):-
 
 semlex(Cat,Sym,Index,Att-Att,Sem):-
    notSymbol(Sym),
-   option('--semantics',drg),
+   candc_option('--semantics',drg),
    member(Cat,[((s:X\np)/(s:X\np))/((s:X\np)/(s:X\np)),
                ((s:X\np)/(s:X\np))\((s:X\np)/(s:X\np)),
                ((s:X\np)\(s:X\np))\((s:X\np)\(s:X\np)),
@@ -2280,7 +2280,7 @@ semlex(Cat,Sym,Index,Att-Att,Sem):-
 % VP adverb modifier (negation)
 
 semlex(Cat,Sym,Index,Att-Att,Sem):-
-   option('--semantics',drg),
+   candc_option('--semantics',drg),
    member(Cat,[(((s:X\np)\(s:X\np))/((s:X\np)\(s:X\np)))/(((s:X\np)\(s:X\np))/((s:X\np)\(s:X\np))),
                (((s:X\np)\(s:X\np))\((s:X\np)\(s:X\np)))/(((s:X\np)\(s:X\np))\((s:X\np)\(s:X\np))),
                (((s:X\np)/(s:X\np))/((s:X\np)/(s:X\np)))/(((s:X\np)/(s:X\np))/((s:X\np)/(s:X\np)))]), 
@@ -2406,7 +2406,7 @@ semlex(np\np, Sym,Index,Att-Att,Sem):-
 --- */
 
 semlex(Cat,Sym,Index,Att-Att,Sem):-
-   option('--x',false),
+   candc_option('--x',false),
    member(Cat,[np\np, np/np]), 
    member(Sym,[all,each]), !,
    Sem = lam(Q,lam(P,B1:drs([],[B1:[]:imp(merge(B2:drs([B2:Index:X],[]),app(Q,lam(Y,B3:drs([],[B3:[]:eq(X,Y)])))),app(P,X))]))).
@@ -2771,7 +2771,7 @@ semlex(n/np,Sym,Index,Att-Att,Sem):- !,
 --- */
 
 semlex(Cat,Sym,Index,Att-Att,Sem):- 
-   option('--semantics',drg),   
+   candc_option('--semantics',drg),   
    notSymbol(Sym),
    member(Cat,[pp/pp,pp\pp]), !, 
    Sem = lam(P,lam(E,B:drs([],[B:Index:pred(E,Sym,s,1),B:[]:not(app(P,E))]))).
@@ -2839,8 +2839,8 @@ semlex(Cat,Sym,Index,Att-Att,Sem):-
 --- */
 
 semlex(Cat,when,Index,Att-Att,Sem):-
-   option('--tense',true),
-   option('--theory',drt),
+   candc_option('--tense',true),
+   candc_option('--theory',drt),
    member(Cat,[(s:X/s:X)/s:dcl,
                (s:wq/s:wq)/s:dcl]), !, 
    Sem = lam(S1,lam(S2,lam(F,merge(merge(B1:drs([B1:[]:T],[B1:[]:pred(T,time,n,1)]),
@@ -2848,8 +2848,8 @@ semlex(Cat,when,Index,Att-Att,Sem):-
                                    app(S2,lam(E,merge(B3:drs([],[B3:[]:rel(E,T,temp_included,1)]),app(F,E)))))))).
 
 semlex(Cat,when,Index,Att-Att,Sem):-
-   option('--tense',true),
-   option('--theory',drt),
+   candc_option('--tense',true),
+   candc_option('--theory',drt),
    member(Cat,[(s:X\s:X)/s:dcl,
                (s:wq\s:wq)/s:dcl]), !, 
    Sem = lam(S2,lam(S1,lam(F,merge(merge(B1:drs([B1:[]:T],[[]:pred(T,time,n,1)]),
@@ -2879,7 +2879,7 @@ semlex(Cat,if,Index,Att-Att,Sem):-
 --- */
 
 semlex((s:X\s:X)/s:dcl,and,_Index,Att-Att,Sem):-
-   option('--theory',drt), !,
+   candc_option('--theory',drt), !,
    closing(CC),
    Sem = lam(S2,lam(S1,lam(F,merge(app(S1,CC),app(S2,F))))).
 
@@ -2889,7 +2889,7 @@ semlex((s:X\s:X)/s:dcl,and,_Index,Att-Att,Sem):-
 --- */
 
 semlex(Cat,Sym,Index,Att-Att,Sem):-
-   option('--theory',sdrt),
+   candc_option('--theory',sdrt),
    Cat = (s:X/s:X)/s:_, !,
    closing(CC),
 %  Sem = lam(S1,lam(S2,lam(F,sdrs([lab(K1,B1),lab(K2,B2)],[Index:rel(K1,K2,Sym)])))),
@@ -2898,7 +2898,7 @@ semlex(Cat,Sym,Index,Att-Att,Sem):-
    B2 = app(S2,F).
 
 semlex(Cat,Sym,Index,Att-Att,Sem):-
-   option('--theory',sdrt),
+   candc_option('--theory',sdrt),
    Cat = (s:X\s:X)/s:_, !,
    closing(CC),
    Sem = lam(S2,lam(S1,lam(F,sdrs([lab(K1,B1),lab(K2,B2)],[Index:rel(K1,K2,Sym)])))),
@@ -2933,7 +2933,7 @@ semlex(Cat,Sym,Index,Att-Att,Sem):-
 
 semlex(Cat,_Sym,_,Att-Att,Sem):-
    member(Cat,[(np\np)/(s:_\np),(np\np)/(s:_/np)]),
-   option('--elimeq',true), !,
+   candc_option('--elimeq',true), !,
    closing(CC),
    Sem = lam(VP,lam(Q,lam(P,app(Q,lam(X,merge(app(app(VP,
                                                       lam(P,app(P,X))),
@@ -2942,7 +2942,7 @@ semlex(Cat,_Sym,_,Att-Att,Sem):-
 
 semlex(Cat,_Sym,Index,Att-Att,Sem):-
    member(Cat,[(np\np)/(s:_\np), (np\np)/(s:_/np)]),
-   option('--elimeq',false), !,
+   candc_option('--elimeq',false), !,
    closing(CC),
    Sem = lam(VP,lam(Q,lam(P,app(Q,lam(X,merge(app(app(VP,
                                                       lam(P,merge(B:drs([B:Index:Y],[B:[]:eq(X,Y)]),app(P,Y)))),
@@ -3023,7 +3023,7 @@ semlex(Cat,Sym,Index,Att-Att,Sem):-
 --- */
 
 %semlex(Cat,Sym,Index,Att-Att,Sem):-
-%   option('--x',true),
+%   candc_option('--x',true),
 %   member(Sym,[no]),
 %   category(s,Cat,intj), !,
 %   att(Att,sense,Sense),
@@ -3043,5 +3043,5 @@ notSymbol( not    ).
 notSymbol( 'n\'t' ).
 notSymbol( '\'t'  ).
 notSymbol( nor    ).
-notSymbol( never  ):- option('--x',true).
+notSymbol( never  ):- candc_option('--x',true).
 

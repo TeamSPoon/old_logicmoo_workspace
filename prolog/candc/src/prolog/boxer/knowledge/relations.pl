@@ -4117,7 +4117,7 @@ nn('housing','immigrant','with').
 nn('housing','market','for').
 nn('housing','militant','on').
 nn('housing','minister','of').
-nn('housing','option','for').
+nn('housing','candc_option','for').
 nn('housing','price','of').
 nn('housing','sector','of').
 nn('housing','shortage','of').
@@ -5915,7 +5915,7 @@ nn('pay','raise','in').
 nn('payment','agreement','for').
 nn('payment','delay','in').
 nn('payment','dispute','over').
-nn('payment','option','for').
+nn('payment','candc_option','for').
 nn('payment','plan','of').
 nn('payment','procedure','for').
 nn('payment','provision','for').
@@ -8793,7 +8793,7 @@ nn('transportation','infrastructure','for').
 nn('transportation','link','between').
 nn('transportation','network','of').
 nn('transportation','official','in').
-nn('transportation','option','for').
+nn('transportation','candc_option','for').
 nn('transportation','system','of').
 nn('transportation','worker','in').
 nn('transshipment','location','on').

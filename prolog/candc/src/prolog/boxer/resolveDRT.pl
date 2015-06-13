@@ -4,7 +4,7 @@
 :- use_module(boxer(bindingViolation),[noBindingViolationDrs/1]).
 :- use_module(boxer(freeVarCheck),[boundVarCheckContext/2,drsCondition/2]).
 :- use_module(library(lists),[member/2,append/3,select/3]).
-:- use_module(semlib(options),[option/2]).
+:- use_module(semlib(options),[candc_option/2]).
 :- use_module(semlib(errors),[warning/2]).
 :- use_module(boxer(categories),[att/3]).
 
@@ -33,7 +33,7 @@ goldAntecedent(_,_).
    Main predicate: resolveDrs/1
 */
 
-resolveDrs(B):- option('--resolve',true), !, resolveDRS(B,[]-_,[]-_).
+resolveDrs(B):- candc_option('--resolve',true), !, resolveDRS(B,[]-_,[]-_).
 resolveDrs(_).
 
 
@@ -307,15 +307,15 @@ matching(Y^pred(Y,now,a,1),Z^pred(Z,now,a,1),0.99,a:now).
 matching(Y^pred(Y,male,n,2),Z^named(Z,S,per,_),0.9,per:S).
 matching(Y^pred(Y,male,n,2),Z^named(Z,S,_,_),0.1,per:S).
 matching(Y^pred(Y,male,n,2),Z^pred(Z,male,n,2),0.99,n:male).
-matching(Y^pred(Y,male,n,2),Z^pred(Z,S,n,_),0.5,n:S):-  option('--x',false).
-matching(Y^pred(Y,male,n,2),Z^card(Z,_,_),0.1,card):- option('--x',false).
+matching(Y^pred(Y,male,n,2),Z^pred(Z,S,n,_),0.5,n:S):-  candc_option('--x',false).
+matching(Y^pred(Y,male,n,2),Z^card(Z,_,_),0.1,card):- candc_option('--x',false).
 
 % she
 matching(Y^pred(Y,female,n,2),Z^named(Z,S,per,_),0.9,per:S).
 matching(Y^pred(Y,female,n,2),Z^named(Z,S,_,_),0.1,per:S).
 matching(Y^pred(Y,female,n,2),Z^pred(Z,female,n,2),0.99,n:female).
-matching(Y^pred(Y,female,n,2),Z^pred(Z,S,n,_),0.5,n:S):-  option('--x',false).
-matching(Y^pred(Y,female,n,2),Z^card(Z,_,_),0.1,card):- option('--x',false).
+matching(Y^pred(Y,female,n,2),Z^pred(Z,S,n,_),0.5,n:S):-  candc_option('--x',false).
+matching(Y^pred(Y,female,n,2),Z^card(Z,_,_),0.1,card):- candc_option('--x',false).
 
 % it
 matching(Y^pred(Y,neuter,a,_),Z^named(Z,S,per,_),0.1,per:S).
@@ -324,13 +324,13 @@ matching(Y^pred(Y,neuter,a,_),Z^pred(Z,neuter,a,_),0.99,a:neuter).
 matching(Y^pred(Y,neuter,a,_),Z^pred(Z,S,n,_),0.5,n:S).
 
 % they, them, theirs, this, that, those, these
-matching(Y^pred(Y,thing,n,12),Z^pred(Z,S,n,_),0.5,n:S):-  option('--x',false).
-matching(Y^pred(Y,thing,n,12),Z^named(Z,S,_,_),0.1,per:S):- option('--x',false).
+matching(Y^pred(Y,thing,n,12),Z^pred(Z,S,n,_),0.5,n:S):-  candc_option('--x',false).
+matching(Y^pred(Y,thing,n,12),Z^named(Z,S,_,_),0.1,per:S):- candc_option('--x',false).
 
 % I, me, mine, you, yours, we, us, ours, myself, yourself, ourselves
-matching(Y^pred(Y,person,n,1),Z^pred(Z,S,n,_),0.1,n:S):-    option('--x',false).
-matching(Y^pred(Y,person,n,1),Z^named(Z,S,per,_),0.8,per:S):- option('--x',false).
-matching(Y^pred(Y,person,n,1),Z^named(Z,S,_,_),0.5,per:S):-   option('--x',false).
+matching(Y^pred(Y,person,n,1),Z^pred(Z,S,n,_),0.1,n:S):-    candc_option('--x',false).
+matching(Y^pred(Y,person,n,1),Z^named(Z,S,per,_),0.8,per:S):- candc_option('--x',false).
+matching(Y^pred(Y,person,n,1),Z^named(Z,S,_,_),0.5,per:S):-   candc_option('--x',false).
 
 % the
 matching(Y^pred(Y,S,n,_),Z^pred(Z,S,n,_),0.9,n:S).

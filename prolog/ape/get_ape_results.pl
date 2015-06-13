@@ -285,22 +285,23 @@ maybe_name_var(_,_,_).
 :-export(fol_to_pkif/2).
 fol_to_pkif(FOL,PKIF):- transitive(fol_to_kif,FOL,KIF),kif_to_pkif(KIF,PKIF),!.
 
+:-export(ace_to_pnf/2).
+ace_to_pnf(ACE,FOL):-  must_det_l((get_ape_term_results(ACE,PROPS),transitive(props_to_pnf,PROPS,PNF),v_pp(PNF,FOL))),!.
+
 :-export(ace_to_pkif/2).
+ace_to_pkif(ACE,PKIF):-  must_det_l((ace_to_pnf(ACE,FOL),fol_to_pkif(FOL,PKIF0),fully_expand(PKIF0,PKIF))),!.
 
-ace_to_pnf(ACE,FOL):-  must_det_l((get_ape_term_results(ACE,PROPS),transitive(props_to_pnf,PROPS,PNF),v_pp(PNF,FOL))).
-
-ace_to_pkif(ACE,PKIF):-  must_det_l((ace_to_pnf(ACE,FOL),fol_to_pkif(FOL,PKIF0),fully_expand(PKIF0,PKIF))).
-
+props_to_pnf(PROPS,PNF):-member(drs=drs([],[]),PROPS),!,member(tokens=Tokens,PROPS),!,PNF=isEng2KifFn(ftAssertable,Tokens),!.
 props_to_pnf(PROPS,PNF):-member(pnf=PNF,PROPS),!.
 props_to_pnf(PROPS,PNF):-member(fol=PNF,PROPS),!.
 props_to_pnf(PROPS,PNF):-member(drs=PNF,PROPS),!.
 props_to_pnf(PROPS,PNF):-member(tptp=PNF,PROPS),!.
 
-
-
+ace_i_name(A,Plur,AT):-atom(Plur),talk_db(noun1,Sing,Plur),if_defined(i_name(A,Sing,AT)),!.
 ace_i_name(A,T,AT):-atom(T),if_defined(i_name(A,T,AT)),!.
-ace_i_name(A,T,AT):-AT=T.
+ace_i_name(_A,T,AT):-AT=T.
 
+:- user:ensure_loaded(library(pldata/nldata_talk_db_pdat)).
 
 :-export(fol_to_kif/2).
 
@@ -314,7 +315,7 @@ fol_to_kif(predicate(_LOVE_FRAME,LOVE_EVENT,Love,PERSON_OBJ,ANIMAL_OBJ),predicat
 fol_to_kif(property(_LOVE_FRAME, PERSON_OBJ, Person, Pos),property(PERSON_OBJ, Person, Pos)).
 
 fol_to_kif(object(LOVE_FRAME,PERSON_OBJ,Person,countable,na,eq,1),ist(LOVE_FRAME,t(PersonSym,PERSON_OBJ))):-!,ace_i_name(t,Person,PersonSym).
-fol_to_kif(object(LOVE_FRAME,PERSON_OBJ,Person,Countable,Na,Eq,One),(ist(LOVE_FRAME,t(Countable,PERSON_OBJ,Eq,One)),ist(LOVE_FRAME,t(PersonSym,PERSON_OBJ)))):-!,ace_i_name(t,Person,PersonSym).
+fol_to_kif(object(LOVE_FRAME,PERSON_OBJ,Person,Countable,_Na,Eq,One),(ist(LOVE_FRAME,t(Countable,PERSON_OBJ,Eq,One)),ist(LOVE_FRAME,t(PersonSym,PERSON_OBJ)))):-!,ace_i_name(t,Person,PersonSym).
 fol_to_kif(property(LOVE_FRAME, PERSON_OBJ, Person, pos),(ist(LOVE_FRAME,t(PersonSym,PERSON_OBJ)))):-!,ace_i_name(t,Person,PersonSym).
 
 
@@ -325,10 +326,10 @@ fol_to_kif(property(PERSON_OBJ, Person, neg), '-'(t(PersonSym,PERSON_OBJ))):-!,a
 
 
 fol_to_kif(object(ANIMAL_OBJ, Animal, countable, na, eq, 1),t(AnimalSym,ANIMAL_OBJ)):-!,ace_i_name(t,Animal,AnimalSym).
-fol_to_kif(object(PERSON_OBJ,Person,Countable,Na,Eq,One),(t(Countable,PERSON_OBJ,Eq,One),t(PersonSym,PERSON_OBJ))):-!,ace_i_name(t,Person,PersonSym).
+fol_to_kif(object(PERSON_OBJ,Person,Countable,_Na,Eq,One),(t(Countable,PERSON_OBJ,Eq,One),t(PersonSym,PERSON_OBJ))):-!,ace_i_name(t,Person,PersonSym).
 fol_to_kif(predicate(LOVE_FRAME,LOVE_EVENT,Love,PERSON_OBJ,ANIMAL_OBJ),(holdsIn(LOVE_FRAME,LOVE_EVENT),frame(LOVE_FRAME),ist(LOVE_EVENT,t(LoveSym,PERSON_OBJ,ANIMAL_OBJ)))):-!,ace_i_name(mud,Love,LoveSym).
 fol_to_kif(predicate(Love,PERSON_OBJ,ANIMAL_OBJ),(t(LoveSym,PERSON_OBJ,ANIMAL_OBJ))):-!,ace_i_name(mud,Love,LoveSym).
-fol_to_kif(predicate(A, Love, PERSON_OBJ, ANIMAL_OBJ),t(LoveSym, PERSON_OBJ, ANIMAL_OBJ)):-!,ace_i_name(mud,Love,LoveSym).
+fol_to_kif(predicate(_LOVE_FRAME, Love, PERSON_OBJ, ANIMAL_OBJ),t(LoveSym, PERSON_OBJ, ANIMAL_OBJ)):-!,ace_i_name(mud,Love,LoveSym).
 
 fol_to_kif((O - N/M), K):- integer(N),integer(M), !,fol_to_kif(O,K).
 fol_to_kif('=>'(FH,FT),implies(KH,KT)) :- !, fol_to_kif(FH,KH),fol_to_kif(FT,KT).

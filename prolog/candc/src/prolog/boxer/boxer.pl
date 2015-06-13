@@ -4,6 +4,12 @@
 /*========================================================================
    File Search Paths
 */
+:-prolog_load_context(directory,Dir),asserta(user:file_search_path(boxer,Dir)).
+
+user:file_search_path(semlib,     W):- absolute_file_name(boxer('../lib'),W),exists_directory(W).
+user:file_search_path(knowledge,     W):- absolute_file_name(boxer('knowledge'),W),exists_directory(W).
+user:file_search_path(lex,     W):- absolute_file_name(boxer('lex'),W),exists_directory(W).
+
 
 user:file_search_path(semlib,     'src/prolog/lib').
 user:file_search_path(boxer,      'src/prolog/boxer').
@@ -31,7 +37,7 @@ user:file_search_path(lex,        'candc/src/prolog/boxer/lex').
 :- use_module(boxer(output),[printHeader/4,printFooter/1,printSem/4]).
 
 :- use_module(semlib(errors),[error/2,warning/2]).
-:- use_module(semlib(options),[option/2,parseOptions/2,setOption/3,
+:- use_module(semlib(options),[candc_option/2,parseOptions/2,setOption/3,
                                showOptions/1,setDefaultOptions/1]).
 
 
@@ -39,7 +45,7 @@ user:file_search_path(lex,        'candc/src/prolog/boxer/lex').
    Load Knowledge
 
 loadRelations:- 
-   option('--nn',true), !, 
+   candc_option('--nn',true), !, 
    use_module(knowledge(relations),[nn/3]).
 
 loadRelations.
@@ -55,7 +61,7 @@ loadKnowledge:-
 */
 
 box(_,_):-
-   option(Option,do), 
+   candc_option(Option,do), 
    member(Option,['--version','--help']), !, 
    version,
    help.
@@ -73,7 +79,7 @@ box(Command,Options):-
    reportEval.
 
 box(_,_):-
-   option(Option,do), 
+   candc_option(Option,do), 
    member(Option,['--toploop','--loaded']), !, 
    prolog.
 
@@ -100,7 +106,7 @@ box(_):-
 ------------------------------------------------------------------------*/
 
 openOutput(Stream):-
-   option('--output',Output),
+   candc_option('--output',Output),
    atomic(Output), 
    \+ Output=user_output, 
    ( access_file(Output,write), !,
@@ -184,7 +190,7 @@ printCCGs([N|L],Stream):-
 ------------------------------------------------------------------------*/
 
 buildList([id(_,Numbers)|L],Index,Stream):- 
-   option('--ccg',true), !,
+   candc_option('--ccg',true), !,
    sort(Numbers,Sorted),
    printCCGs(Sorted,Stream),
    buildList(L,Index,Stream).
@@ -219,7 +225,7 @@ outputSem(Stream,Id,Index,XDRS0):-
 */
 
 version:-
-   option('--version',do), !,
+   candc_option('--version',do), !,
    version(V),
    format(user_error,'~p~n',[V]).
 
@@ -231,12 +237,12 @@ version.
 */
 
 help:-
-   option('--help',do), !,
+   candc_option('--help',do), !,
    format(user_error,'usage: boxer [options]~n~n',[]),
    showOptions(boxer).
 
 help:-
-   option('--help',dont), !.
+   candc_option('--help',dont), !.
 
 
 /* =======================================================================

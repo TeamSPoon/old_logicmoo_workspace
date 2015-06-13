@@ -1,7 +1,7 @@
 
 :-module(nldata_talk_db_pdat,[]).
 
-:- style_check(-discontiguous).
+:- style_check(-(discontiguous)).
 
 :- dynamic_multifile_exported talk_db/1.
 :- dynamic_multifile_exported talk_db/2.
