@@ -5,7 +5,7 @@ export GITRC="--recursive"
 
 if [ $# -eq 0 ] 
  then
-    export MUDPACK=externals
+    export MUDPACK=pack
  else
     export MUDPACK="$1"
 fi

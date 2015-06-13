@@ -538,6 +538,7 @@ pfc_directive_expansion(pfc_multifile,
 
 pfc_directive_expansion(pfc_module,(asserta(user:mpred_directive_value(pfc,module,M)))):-source_module(M).
 
+
 begin_pfc:-file_begin(pfc).
 pfc_begin:-file_begin(pfc).
 pfc_end:-file_end(pfc).

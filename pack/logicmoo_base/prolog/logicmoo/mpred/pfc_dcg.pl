@@ -88,7 +88,7 @@ parse1([H|T],Id) :-
  parse1(T,Id).
 
 
- :-dynamic(sentences/2).
+:-dynamic(sentences/2).
 
 show_sentences(Id) :- show_sentences(Id,_).
 
@@ -99,6 +99,7 @@ show_sentences(Id,Words) :-
   fail.
 show_sentences(_,_).
 
+:- meta_predicate l_do(0).
 l_do(X) :- call(X) -> true;true.
 
 show(Id,C) :-

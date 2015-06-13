@@ -416,7 +416,7 @@ one_must(MCall,OnFail):- strip_module(MCall,M,Call), '@'(( Call *->  true ;    O
 :-meta_predicate(transitive_lc(2,+,-)).
 :-meta_predicate(transitive_except(+,2,+,-)).
 
-transitive(X,A,B):- once(debugOnError(call(X,A,R)) -> ( R\=@=A -> transitive(X,R,B) ; B=R); B=A),!.
+transitive(X,A,B):- once(debugOnError(call(X,A,R)) -> ( R\=@=A -> transitive_lc(X,R,B) ; B=R); B=A),!.
 
 transitive_lc(X,A,B):-transitive_except([],X,A,B).
 

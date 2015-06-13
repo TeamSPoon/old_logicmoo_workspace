@@ -353,11 +353,10 @@ pfcVersion(1.2).
 :- meta_predicate foreachl_do(0,0).
 :- meta_predicate brake(0).
 :- meta_predicate fc_eval_action(0,*).
-:- meta_predicate prove_by_contradiction(0).
-:- meta_predicate l_do(0).
 :- meta_predicate call_prologsys(0).
 :- meta_predicate call_i(0).
 :- meta_predicate call_u(0).
+% :- meta_predicate prove_by_contradiction(0).
 % :- meta_predicate time(0,*).
 
 % ======================= pfc_file('pfcsyntax').	% operator declarations.

@@ -289,7 +289,6 @@ parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,actProlog(req(PROLOGTERM)))
 % parses a verb phrase and retuns one interpretation (action)
 parse_agent_text_command_1(Agent,SVERB,ARGS,Agent,GOAL):-
 
- 
    parse_vp_real(Agent,SVERB,ARGS,GOALANDLEFTOVERS),
    dmsg_parserm(parserm("GOALANDLEFTOVERS"=GOALANDLEFTOVERS)),
    GOALANDLEFTOVERS \= [],
@@ -463,10 +462,12 @@ phrase_parseForTypes_0(TYPEARGS,ARGS,GOODARGS,LeftOver):- optional_strings_opt,
          phrase_parseForTypes_9(T2,A2,G2,LeftOver),      
          string_append(G1,[Str],G2,GOODARGS)).
       
-phrase_parseForTypes_0(TYPEARGS,ARGS,GOODARGS,LeftOver):-phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver).
+phrase_parseForTypes_0(TYPEARGS,ARGS,GOODARGS,LeftOver):-
+   show_call(phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver)).
 
 phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- catch(phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver),_,fail),!.    
 phrase_parseForTypes_1(TYPEARGS,In,Out,[]):- length(TYPEARGS,L),between(1,4,L),length(In,L),must(Out=In),!,nop(fmt(fake_phrase_parseForTypes_l(foreach_isa(In,TYPEARGS)))),fail.
+phrase_parseForTypes_1([isOptional(_, W)], [], [W], []):-!.
 phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- debugOnError(phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver)).    
 
 phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver):- (LeftOver=[];LeftOver=_ /*[_|_]*/), phrase(parseForTypes(TYPEARGS,GOODARGS),ARGS,LeftOver).

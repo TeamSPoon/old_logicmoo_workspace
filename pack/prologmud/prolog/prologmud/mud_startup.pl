@@ -16,6 +16,8 @@
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
 
+:- op(200,fy,(-)).
+
 :- set_prolog_flag(verbose_load,true).
 
 :- include(mud_header).

@@ -61,10 +61,10 @@ user:file_search_path(prologmud, library(prologmud)).
 % % :- set_prolog_flag(gc,true).
 
 ?- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
- 
-% ?- kif_to_boxlog(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D))))),_S),!,disjuncts_to_list(_S,_L),list_to_set(_L,_SET),member(_P,_SET),writeln(_P),!.
+
 :- snark_tell(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
-?- kif_to_boxlog(-((a , b ,  c , d)),_S),!,disjuncts_to_list(_S,_L),list_to_set(_L,_SET),member(_P,_SET),writeln(_P),!.
+
+?- kif_to_boxlog(-((a , b ,  c , d)),_S),!,disjuncts_to_list(_S,_L),list_to_set(_L,_SET),forall(member(_P,_SET),writeln(_P)),!.
 
 % :-prolog.
 

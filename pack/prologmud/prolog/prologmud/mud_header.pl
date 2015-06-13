@@ -70,9 +70,9 @@
 :- multifile user:genls/2.
 :- dynamic_multifile_exported user:genls/2.
 :- multifile user:isa/2.
-:- dynamic_multifile_exported user:isa/2.
+:- dynamic_multifile_exported(user:isa/2).
 
-:- style_check(-singleton).
+:- style_check((-(singleton))).
 
 
 :-op(1190,fx,user:(disabled)).

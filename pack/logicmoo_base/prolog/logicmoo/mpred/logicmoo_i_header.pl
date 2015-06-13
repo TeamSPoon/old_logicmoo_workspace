@@ -10,6 +10,8 @@
 %
 */
 
+:- if( \+ current_predicate( thlocal:current_pttp_db_oper/1 )).
+
 :- thread_local(thlocal:disable_mpred_term_expansions_locally/0).
 :- multifile(system:term_expansion/2).
 :- multifile(user:term_expansion/2).
@@ -71,8 +73,8 @@
 
 
 :- dynamic(('=>')/1).
-:- dynamic(('neg')/1).
-:- dynamic(('=>')/2).
+:- dynamic((('neg'))/1).
+:- dynamic((('=>'))/2).
 :- dynamic(('<=')/2).
 :- dynamic(('::::')/2).
 :- dynamic(('<=>')/2).
@@ -407,3 +409,4 @@
 :- thread_local repl_to_string/2.
 :- thread_local repl_writer/2.
 
+:- endif.

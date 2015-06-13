@@ -300,9 +300,15 @@ show_room_grid_single(_Room,LOC,_OutsideTest):- asserted_atloc_for_map(Obj,LOC),
 show_room_grid_single(_Room,LOC,_OutsideTest):- asserted_atloc_for_map(_Obj,LOC),write('..'), !.
 show_room_grid_single(_Room,_LOC,_OutsideTest):- write('--'), !.
 
-inst_label(Obj,SLabe2):- call(term_to_atom(Obj,SLabel)),sub_atom(SLabel,1,2,_,SLabe2),!.
-inst_label(Obj,SLabe2):- call(term_to_atom(Obj,SLabel)),sub_atom(SLabel,0,2,_,SLabe2),!.
-inst_label(Obj,Label):- typeHasGlyph(Obj,Label),!.
+atom_label(SLabel,SLab2):- atom_concat('NPC0',L,SLabel),!,atom_label(L,SLab2),!.
+atom_label(SLabel,SLab2):- atom_concat('NPC',L,SLabel),!,atom_label(L,SLab2),!.
+atom_label(SLabel,SLab2):- once(i_name(SLabel,L)),L\=SLabel,atom_label(L,SLab2),!.
+%atom_label(SLabel,SLab2):- sub_atom(SLabel,2,2,_,SLab2),!.
+%atom_label(SLabel,SLab2):- sub_atom(SLabel,1,2,_,SLab2),!.
+atom_label(SLabel,SLab2):- sub_atom(SLabel,0,2,_,SLab2),!.
+
+inst_label(Obj,SLab2):-  term_to_atom(Obj,SLabel),atom_label(SLabel,SLab2).
+inst_label(Obj,Label):-  typeHasGlyph(Obj,Label),!.
 inst_label(Obj,Label):-  iprops(Obj,nameStrings(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  iprops(Obj,mudNamed(Val)),Val\=Obj,!,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  iprops(Obj,isa(Val)),Val\=Obj,inst_label(Val,Label),!.

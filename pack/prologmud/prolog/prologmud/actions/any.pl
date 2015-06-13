@@ -23,7 +23,7 @@ user:action_rules(_,_,_,_):-fail.
 to_verb_args(Act,List):-safe_univ(Act,List).
 
 action_adds_states(Agent,Action,A):- user:action_rules(Agent,VERB,SENT,StateRules),to_verb_args(Action,[VERB|SENT]), member(+A,StateRules).
-action_removes_states(Agent,Action,A):- user:action_rules(Agent,VERB,SENT,StateRules),to_verb_args(Action,[VERB|SENT]), member(-A,StateRules).
+action_removes_states(Agent,Action,A):- user:action_rules(Agent,VERB,SENT,StateRules),to_verb_args(Action,[VERB|SENT]), member( '-'(A),StateRules).
 action_requires_states(Agent,Action,A):- user:action_rules(Agent,VERB,SENT,StateRules),to_verb_args(Action,[VERB|SENT]),member(?(A),StateRules).
 
 :- op(200,fy,'?').
