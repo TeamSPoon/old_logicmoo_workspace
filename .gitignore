@@ -16,13 +16,9 @@ src_data/star_trek/
 core
 src/moo_settings.db
 saved_cached_queries
-t
 wiki/
 logwumpus
-*.out
-*.log
 src_modules/
-src_data/*.*
 src/savedb
 src_incoming/savedb
 hidden_todo/

@@ -1,2 +1,0 @@
-#!/bin/sh
-thea-jpl --jvm-opt -Xmx2048M --shell "$@"

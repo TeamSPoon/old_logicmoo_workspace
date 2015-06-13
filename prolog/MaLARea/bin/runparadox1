@@ -1,3 +1,0 @@
-#!/usr/bin/perl -w
-my $tl = 1 + shift @ARGV;
-exec("ulimit -t $tl; bin/paradox @ARGV");

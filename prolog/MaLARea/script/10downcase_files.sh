@@ -1,1 +1,0 @@
-for i in `ls`; do j=`echo $i | tr [A-Z] [a-z]`; echo $i; mv $i $j; done

@@ -1,2 +1,0 @@
-#!/bin/sh
-thea --load-mod owl2_rl_rules --reasoner rl_rules "$@"
