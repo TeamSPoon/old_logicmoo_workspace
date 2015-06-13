@@ -32,7 +32,7 @@ The result is either in Core ACE or in NP ACE.
 @version 2009-06-03
 */
 
-
+:- install_converter(drs_to_ace(+drs, -acetext:list)).
 %% drs_to_ace(+Drs:drs, -Ace:list) is det.
 %
 % Splits the given DRS into a list of (smaller) DRSs,
@@ -51,6 +51,7 @@ drs_to_ace(Drs, Ace) :-
 %
 drslist_to_ace([], []).
 
+:- install_converter(drs_to_ace(+drs:list, -acetext:list)).
 drslist_to_ace([Drs | DrsList], [Ace | AceList]) :-
 	drs_to_ace_x(Drs, Ace),
 	drslist_to_ace(DrsList, AceList).

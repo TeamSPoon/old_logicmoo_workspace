@@ -13,7 +13,7 @@
          ]).
 
 % ==============================================================================
-:- include('curt/logicmooCURT2').
+:- include('CURT/logicmooCURT2').
 % :- ['CURT/advertentCurt'].
 
 

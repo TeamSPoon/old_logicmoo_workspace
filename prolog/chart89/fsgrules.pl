@@ -11,7 +11,7 @@
 :- multifile((--->)/2).
 
 :- op(1155,xfx,--->).
-:- op(30,xfx,':').
+%:- op(30,xfx,':').
 %
 initial(s).		% used by chart parsers
 %

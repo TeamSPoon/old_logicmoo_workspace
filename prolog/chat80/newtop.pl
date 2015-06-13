@@ -228,8 +228,8 @@ report(_,_,_,_).
 call_with_limits(Copy):- (A=_,call_with_limits0(((call(Copy),A=completed))), (A==completed -> true; (trace,Copy))).
 call_with_limits0(Copy):-call_with_time_limit(10,call_with_depth_limit(call_with_inference_limit(Copy,10000,_),500,_)).
 
-safely_call_ro(Call):-copy_term(Call,Copy),catchv(call_with_limits(Copy),E,(dmsg(error_safely_call(E,in,Copy)),!,fail)).
-safely_call(Call):-copy_term(Call,Copy),catchv((Copy,Call=Copy),E,(dmsg(error_safely_call(E,in,Copy)),!,fail)).
+safely_call_ro(Call):-copy_term(Call,Copy),catchvv(call_with_limits(Copy),E,(dmsg(error_safely_call(E,in,Copy)),!,fail)).
+safely_call(Call):-copy_term(Call,Copy),catchvv((Copy,Call=Copy),E,(dmsg(error_safely_call(E,in,Copy)),!,fail)).
 
 report_item(none,_).
 report_item(_,Var):-var(Var),!,write('FAILED'),nl.

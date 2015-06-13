@@ -34,7 +34,7 @@ where Conds is a list of conditions (with sentence IDs).
 
 */
 
-
+:- install_converter(drs_to_sdrs(+drs, -sdrs)).
 %% drs_to_sdrs(+Drs:drs, -SDrs:sdrs) is det.
 %
 % Removes the domain-argument from all the (non-atomic) DRS conditions,

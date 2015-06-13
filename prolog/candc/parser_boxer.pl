@@ -1,7 +1,5 @@
 
-:-module(user).
-
-
+:-op(500,yfx,user:(-)).
 
 user:file_search_path(semlib,     logicmoo('candc/src/prolog/lib')).
 user:file_search_path(boxer,      logicmoo('candc/src/prolog/boxer')).
@@ -28,7 +26,7 @@ user:file_search_path(lex,        logicmoo('candc/src/prolog/boxer/lex')).
 :- use_module(boxer(tuples)).
 :- use_module(boxer(output)).
 :- use_module(boxer(resolveDRT)).
-:- use_module(boxer(slashes)).
+% :- use_module(boxer(slashes)).
 :- use_module(boxer(transform)).
 :- use_module(knowledge(punctuation)).
 
@@ -598,7 +596,7 @@ old_read_ccg(Stream,TermsIn,TermsOut):-
 
 
 
-:- text2drsWhatnot("You find yourself standing by the door of Captain Picard's quarters").
+%:- text2drsWhatnot("You find yourself standing by the door of Captain Picard's quarters").
 
 end_of_file.
 
@@ -723,6 +721,8 @@ A comfortable looking recliner with a matching footrest sits beside the door, al
 Two large windows offer a great view of space . 
 A small partition at the northern part of the room contains Picard's sleeping area.").
 */
+
+end_of_file.
 
 
 File T:\devel\logicmoo\src_modules\candc\src\prolog\boxer\boxer.pl

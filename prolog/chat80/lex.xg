@@ -93,7 +93,7 @@ rel_pron(Case) ---> theTextC(W,'Pronoun',rel_pron_db(W,Case)).
 
 
 
-human_name(X) ---> ftCapitalized(FN),ftCapitalized(SN),{atomic_list_concat([SN,'_',SN],X)}.
+human_name(X) ---> capitalized(FN),capitalized(SN),{atomic_list_concat([FN,'_',SN],X)}.
 
 verb_form(Verb,Tense,Agmt,_Role) ---> theText1(W), {no_repeats(verb_form_db(W,Verb,Tense,Agmt))}.
 %verb_form(Verb,Tense,Agmt,_Role) ---> theTextC(W,VerbPOS,v_db(W,Verb,Tense,Agmt,VerbPOS)).

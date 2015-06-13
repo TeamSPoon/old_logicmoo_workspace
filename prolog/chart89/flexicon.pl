@@ -13,7 +13,7 @@
 
 
 :- op(1200,xfx,--->).
-:- op(30,xfx,':').
+%:- op(30,xfx,':').
 %
 
 np(person:3,number:singular,sex:_,case:_)  ---> [kim].

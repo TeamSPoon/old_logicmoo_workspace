@@ -26,17 +26,20 @@ new_pred(M,P,F,A) :-
    recordz(P,'xg.pred',_),
    recordz('xg.pred',P,_).
 
+is_file_ext(Ext):-prolog_load_context(file,F),file_name_extension(_,Ext,F).
 :-thread_local tlxgproc:do_xg_process_te/0.
 :-export(xg_process_te_clone/5).
+processing_xg :- (tlxgproc:do_xg_process_te;  is_file_ext(xg)),!.
+
 xg_process_te_clone(L,R,_Mode,P,Q):- expandlhs(L,S0,S,H0,H,P), expandrhs(R,S0,S,H0,H,Q).  %new_pred(P),usurping(Mode,P),!.
 
 :-export(xg_process_te_clone/3).
 xg_process_te_clone((H ... T --> R),Mode,((P :- Q))) :- !, xg_process_te_clone((H ... T),R,Mode,P,Q).
 xg_process_te_clone((L --> R),Mode,((P :- Q))) :- !,xg_process_te_clone(L,R,Mode,P,Q).
 
-user:term_expansion(In,Out):-compound(In),functor(In,'-->',_), tlxgproc:do_xg_process_te, xg_process_te_clone(In,+,Out).
-user:term_expansion((H ... T ---> R),((P :- Q))) :- !, xg_process_te_clone((H ... T),R,+,P,Q).
-user:term_expansion((L ---> R),((P :- Q))) :- !,xg_process_te_clone(L,R,+,P,Q).
+user:term_expansion(In,Out):- compound(In),functor(In,'-->',_), processing_xg,!, must(xg_process_te_clone(In,+,Out)).
+user:term_expansion((H ... T ---> R),((P :- Q))) :- processing_xg,!,must( xg_process_te_clone((H ... T),R,+,P,Q)).
+user:term_expansion((L ---> R),((P :- Q))) :- processing_xg,!,must(xg_process_te_clone(L,R,+,P,Q)).
 
 
 load_plus_xg_file(CM,F) :- with_assertions(xgproc:current_xg_module(CM),with_assertions(tlxgproc:do_xg_process_te,ensure_loaded(F))),!.

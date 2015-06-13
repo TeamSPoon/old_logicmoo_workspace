@@ -1,3 +1,13 @@
+% ===================================================================
+% File 'parser_talk.pl'
+% Purpose: English to KIF conversions from SWI-Prolog  
+% This implementation is incomplete
+% Maintainer: Douglas Miles
+% Contact: $Author: dmiles $@users.sourceforge.net ;
+% Version: 'parser_talk.pl' 1.0.0
+% Revision:  $Revision: 1.3 $
+% Revised At:   $Date: 2012/06/06 15:43:15 $
+% ===================================================================
 
 :-module(parser_talk,[]).
 
@@ -73,7 +83,7 @@ talkpl_parse(Sentence,LF,assertion) :-  s(LF,nogap,Sentence,[]).
 talkpl_clausify(all(X,F0),F,[X|V]) :-  talkpl_clausify(F0,F,V).
 
 % Implications 
-talkpl_clausify(A0=>C0,(C:-A),V) :-  clausify_literal(C0,C),  clausify_antecedent(A0,A,V).
+talkpl_clausify('=>'(A0 , C0) ,(C:-A),V) :-  clausify_literal(C0,C),  clausify_antecedent(A0,A,V).
 
 % Literals
 talkpl_clausify(C0,C,[]):-  clausify_literal(C0,C).
@@ -181,7 +191,7 @@ copula(does).
 
 
 
-det_lf(every, (X^S1)^(X^S2)^ all(X,S1=> S2)).
+det_lf(every, (X^S1)^(X^S2)^ all(X, =>(S1,S2))).
 det_lf(an, (X^S1)^(X^S2)^ exists(X,S1& S2)).
 det_lf(a, (X^S1)^(X^S2)^ exists(X,S1& S2)).
 det_lf(some, (X^S1)^(X^S2)^ exists(X,S1& S2)).

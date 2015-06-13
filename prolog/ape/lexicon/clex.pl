@@ -34,8 +34,8 @@ the executable.
 % change this, you have to edit the source code and recompile.
 
 clex_file(clex_lexicon).
-%clex_file(clex_lexicon_small).
-%clex_file('').
+% clex_file(library(pldata/clex_lexicon_user1)).
+clex_file('').
 
 
 % The predicates for the lexicon entries are declared dynamic. In this way, they don't fail if
@@ -72,7 +72,9 @@ clex_file(clex_lexicon).
 
 % Load the clex-file
 :- style_check(-discontiguous).
-:- clex_file(ClexFile), ( ClexFile == '' ; load_files(ClexFile, [encoding(utf8)]) ).
+:- forall(clex_file(ClexFile), ( ClexFile == '' ; load_files(ClexFile, [encoding(utf8)]) )).
+%:-include(clex_lexicon).
+%:-include(library(pldata/clex_lexicon_user1)).
 :- style_check(+discontiguous).
 
 

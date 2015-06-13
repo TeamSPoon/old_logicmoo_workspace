@@ -80,14 +80,15 @@ member(X,[_|Y]) :-
 */
 
 %
-features :-
-	reconsult('fxamples.pl'),
-	reconsult('flexicon.pl'),
-	consult('fsgrules.pl').
+:- include('fxamples.pl').
+:- include('flexicon.pl').
+:- include('fsgrules.pl').
 %
+/*
 atomic :-
 	reconsult('examples.pl'),
 	reconsult('lexicon.pl'),
 	consult('psgrules.pl').
 
 :-features.
+*/

@@ -137,7 +137,7 @@ acetext(
 		drs!id!ID,
 		[Sentence|SentencesRest]
 	) :-
-    reset_progress_record(Sentence),
+        grammar_words:reset_progress_record(Sentence),
 	complete_sentence(
 		display!tree!TreeSentence &
 		drs!in!DrsIn &

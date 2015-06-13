@@ -157,6 +157,13 @@ tptp(Dom, Cond-_, Dom, Tptp) :-
 	!,
 	cond_to_tptp(Cond, Tptp).
 
+tptp(Dom, Term, Dom2, Tptp) :- options:candc_option('--force',true),
+	functor(Term, Functor, 1),
+	concat_atom(['DRS permissive ONLY supported', Functor], ': ', Message),
+	add_warning_message_once(tptp/4, '', Term, Message),
+        arg(1,Term,Arg1),
+        tptp(Dom, Arg1, Dom2, Tptp).
+
 tptp(_, Term, _, _) :-
 	functor(Term, Functor, _),
 	concat_atom(['DRS condition not supported', Functor], ': ', Message),

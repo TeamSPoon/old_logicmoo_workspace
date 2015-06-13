@@ -17,5 +17,16 @@
 % ==============================================================================
 
 :- user:ensure_loaded(ape/get_ape_results).
-:- user:ensure_loaded('AceRules'/engine/run_testcases).
+:- user:ensure_loaded('AceRules/engine/run_testcases').
+
+
+?- doall(( Z = (/),current_op(X,Y,Z),display(:- op(X,Y,Z)),nl)).
+?- doall((Z = (:),current_op(X,Y,Z),display(:- op(X,Y,Z)),nl)).
+?- doall((Z = (-),current_op(X,Y,Z),display(:- op(X,Y,Z)),nl)).
+
+:- op(0,fx,user:'-').
+:- op(200,fy,user:'-').
+:- op(500,yfx,user:'-').
+% :- op(600,xfy,(:)).
+:- user:(op(400,yfx,/)).
 

@@ -35,7 +35,7 @@ The DRSs in the resulting list do not share discourse referents.
 
 */
 
-
+:- install_converter(drs_to_drslist(+drs, -drs:list)).
 %% drs_to_drslist(+Drs:drs, -DrsList:list) is det.
 %
 % @param Drs is an Attempto DRS

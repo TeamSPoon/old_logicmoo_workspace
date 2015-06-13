@@ -61,6 +61,7 @@
 
 %:- debug(result).
 
+:- install_converter(acetext_to_drs(+acetext, -sentences, -syntaxTrees, -drs, -messages)).
 
 %% acetext_to_drs(+Text, -Sentences, -SyntaxTrees, -Drs, -Messages).
 %% acetext_to_drs(+Text, +Guess, +Catch, -Sentences, -SyntaxTrees, -Drs, -Messages, -Time).
@@ -163,6 +164,7 @@ aceparagraph_to_drs(Text, Guess, Catch, StartID, Sentences, SyntaxTrees, Unresol
 	!.
 
 
+:- install_converter(call_tokenizer(+acetext, +(guess,on), -sentences, -sentencesToParse)).
 % Note: should not fail.
 % If sentence splitting fails then the problem must have been that there
 % was no sentence end symbol. In this case we return the original
@@ -187,11 +189,13 @@ call_tokenizer(Text, GuessOnOff, SentencesOutput, SentencesToParse) :-
 		add_error_message(sentence, '', LastToken, 'Every ACE text must end with . or ? or !.')
 	).
 
+:- install_converter(call_parser(+sentences, +(startID,99), -syntaxtrees, -(drs,reversed))).
 call_parser(Sentences, StartID, Syntaxtrees, DrsReversed) :-
 	ignore(grammar:parse(Sentences, StartID, Syntaxtrees, Drs)),
 	ignore(drs_reverse:drs_reverse(Drs, DrsReversed)).
 
 
+:- install_converter(paragraphs_to_drs(paragraphs, +(guess,on), +(catch,on), +(startID,99), -sentences, -syntaxTrees, -drs, -messages, -time)).
 %% paragraphs_to_drs(+Paragraphs, +Guess, +Catch, +StartID, -Sentences, -Trees, -Drs, -Messages, -Time).
 
 paragraphs_to_drs([], _, _, _, [], [], drs([],[]), [], [0,0,0]) :-

@@ -11,8 +11,8 @@
 % Use 'features' to load up feature-based example files, and 'atomic' to
 % load up the standard atomic CF-PSG example files.
 %
-:- reconsult('library.pl').
-:- reconsult('chrtlib2.pl').
+:- include('library.pl').
+:- include('chrtlib2.pl').
 %
 new_edges(edge(V1,V2,Category1,[]),Chart,Edges) :-
 	findall(edge(V1,V1,Category2,[Category4|Categories1]),

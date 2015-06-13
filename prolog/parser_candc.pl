@@ -9,13 +9,14 @@
 % Revised At:   $Date: 2002/06/06 15:43:15 $
 % ===================================================================
 
-:-module(parser_candc,[
-
-         ]).
-
-
-% ==============================================================================
 
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 :- user:ensure_loaded('candc/src/prolog/boxer/boxer.pl').
+:- user:ensure_loaded('candc/parser_boxer.pl').
 
+:- user:call(op(0,xfx,'/')).
+:- user:call(op(0,fx,'-')).
+:- user:call(op(200,fy,'-')).
+:- user:call(op(500,yfx,'-')).
+:- user:call(op(600,xfy,':')).
+:- user:call(op(400,yfx,'/')).

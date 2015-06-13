@@ -26,10 +26,21 @@
 */
 
 :-module(parser_chat80, [chat80/0,test_chat80_regressions/0]).
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+
+:- '@'(ensure_loaded(library('logicmoo/util/logicmoo_util_all')),'user').
+
+:-multifile(user:type_action_info/3).
+:-multifile(user:agent_call_command/2).
+:-multifile(user:mud_test/2).
+
+
+:- user:ignore(( Z = ('/'),current_op(X,Y,Z),display(:-(op(X,Y,Z))),nl,fail)).
+:- user:ignore((Z = (':'),current_op(X,Y,Z),display(:-(op(X,Y,Z))),nl,fail)).
+:- user:ignore((Z = ('-'),current_op(X,Y,Z),display(:-(op(X,Y,Z))),nl,fail)).
+:- writeq(parser_chat80_start).
 
 :- op(600,xfy,--).
-:- op(450,xfy,((:))).
+% :- op(450,xfy,((:))).
 :- op(400,xfy,((&))).
 :- op(300,fx,(('`'))).
 :- op(200,xfx,((--))).
@@ -86,7 +97,7 @@ t2:- with_assertions(tracing80,with_no_assertions(thlocal:old_text,with_no_asser
 t2_process_run_diff(report,U,R,O):- copy_term80(U,UU),
    process_run_diff(report,U,R,O),!,nop( with_assertions(thlocal:usePlTalk,process_run_diff(report,UU,[],[]))),!.
 
-:- ensure_loaded('pldata/clex_lexicon').
+:- ensure_loaded('pldata/clex_iface').
 
 % ===========================================================
 % CHAT80 command

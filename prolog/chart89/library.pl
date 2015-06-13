@@ -42,9 +42,11 @@ islist([_|_]).
 %
 % append(X,Y,Z) - append Y to X to form Z, C&M 3rd ed. p59
 %
+/*
 append([],List,List).
 append([Head|Tail1],List,[Head|Tail2]) :-
 	append(Tail1,List,Tail2).
+*/
 %
 % retractall(X) - remove all clauses that match X, C&M 3rd ed. p172
 %
