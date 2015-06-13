@@ -1,7 +1,15 @@
 Initial starter Docs https://github.com/TeamSPoon/PrologMUD/wiki
 
-
 Installation see.. https://docs.google.com/document/d/1fkOxnmI1LqxadvZuCRS-fGIEweIKyPn6AVGp5Yjse1I/edit
+
+
+
+
+The MUD_PDDL repository is now both Planning and NLU/NLG code.. The NLTK of Prolog!
+
+
+
+It is very bothersome that with all the cool NLU demos out there there is  that is like GATE or even a Blackboard system 
 
 
 This NLU/NLG ToolKit uses the following projects into a usable pipeline
