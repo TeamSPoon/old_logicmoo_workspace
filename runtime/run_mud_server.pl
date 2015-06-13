@@ -50,9 +50,9 @@ user:file_search_path(prologmud, library(prologmud)).
 :- time(ensure_loaded(library(logicmoo/mpred_online/logicmoo_i_www))).
 
 
-:- time(with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo_engine))))).
+:- time(with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_engine))))).
 
-%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(plarkc/dbase_i_cyc_api)))).
+%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/plarkc/dbase_i_cyc_api)))).
 
 %:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/mpred_online/dbase_i_rdf_store)))).
 

@@ -458,24 +458,26 @@ phrase_parseForTypes_0(TYPEARGS,ARGS,GOODARGS,LeftOver):- optional_strings_opt,
       (StrT =[_] /*;StrT=[_,_]*/),
       string_append(A1,StrT,A2,ARGS),
       equals_icase(Str,StrT)),!,
-      (phrase_parseForTypes_1(T1,A1,G1,[]),
+      show_call((phrase_parseForTypes_1(T1,A1,G1,[]),
          phrase_parseForTypes_9(T2,A2,G2,LeftOver),      
-         string_append(G1,[Str],G2,GOODARGS)).
+         string_append(G1,[Str],G2,GOODARGS))).
       
 phrase_parseForTypes_0(TYPEARGS,ARGS,GOODARGS,LeftOver):-
    show_call(phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver)).
 
 phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- catch(phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver),_,fail),!.    
+phrase_parseForTypes_1([isOptional(_, W)|TYPEARGS], [], [W|GOODARGS], LeftOver):- phrase_parseForTypes_1(TYPEARGS,[],GOODARGS,LeftOver).
+phrase_parseForTypes_1([isOptionalStr(W)|TYPEARGS], [], [W|GOODARGS], LeftOver):- phrase_parseForTypes_1(TYPEARGS,[],GOODARGS,LeftOver).
 phrase_parseForTypes_1(TYPEARGS,In,Out,[]):- length(TYPEARGS,L),between(1,4,L),length(In,L),must(Out=In),!,nop(fmt(fake_phrase_parseForTypes_l(foreach_isa(In,TYPEARGS)))),fail.
-phrase_parseForTypes_1([isOptional(_, W)], [], [W], []):-!.
 phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- debugOnError(phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver)).    
 
-phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver):- (LeftOver=[];LeftOver=_ /*[_|_]*/), phrase(parseForTypes(TYPEARGS,GOODARGS),ARGS,LeftOver).
+phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver):- (LeftOver=[];LeftOver=_ ), phrase(parseForTypes(TYPEARGS,GOODARGS),ARGS,LeftOver).
 
-parseForTypes([], [], A, A).
-parseForTypes([TYPE|TYPES], [B|E], C, G) :- ground(TYPE:B),
-        no_repeats_old(parseIsa_Call(TYPE, B, C, F)),
+parseForTypes([], [], A, A):-!.
+parseForTypes([TYPE|TYPES], [B|E], [C|C1], G) :- ground(TYPE:C),
+        no_repeats_old(parseIsa_Call(TYPE, B, [C|C1], F)),
         parseForTypes(TYPES, E, F, G),!.
+parseForTypes([isOptional(_, W)|TYPEARGS], [W|GOODARGS], A, A):- parseForTypes(TYPEARGS,GOODARGS,A,A).
 
 
 parseIsa_Call(FT, BO, CIn, D):-ground(FT:CIn), list_tail(CIn,D), to_word_list(CIn,C),!, parseIsa(FT, B, C, D),to_arg_value(B,BO).
@@ -595,6 +597,7 @@ coerce(A,B,C):-no_repeats(coerce0(A,B,C)),(show_call_failure(isa(C,B))->!;true).
 coerce0(String,Type,Inst):- var(Type),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 coerce0(String,isNot(Type),Inst):-!,not(coerce0(String,Type,Inst)).
 coerce0([String],Type,Inst):- nonvar(String),!,coerce0(String,Type,Inst).
+coerce0(isRandom(WhatNot),Type,Inst):- !, must((nonvar(WhatNot),to_arg_value(WhatNot,TypeR),random_instance(TypeR,Inst,isa(Inst,Type)))).
 coerce0(String,Type,Inst):- atomic(String),Type==tCol,i_name('t',String,Inst),is_asserted(tCol(Inst)),!.
 coerce0(Text,Type,Inst):- (no_repeats_old(call_no_cuts(hook_coerce(Text,Type,Inst)))).
 coerce0(String,Type,Inst):- ttFormatType(Type),!,checkAnyType(change(assert,actParse),String,Type,AAA),Inst=AAA.

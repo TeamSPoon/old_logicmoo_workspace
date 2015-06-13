@@ -1200,7 +1200,7 @@ snark_read(In,Wff,Vs):-
       catch(read_term(In,Wff,[module(logicmoo_i_snark),double_quotes(string),variable_names(Vs)]),E,(fmt(E),fail))).
 
 %= ===== to test program =====-
-:- ensure_loaded(library(plarkc/dbase_i_sexpr_reader)).
+:- ensure_loaded(library(logicmoo/plarkc/dbase_i_sexpr_reader)).
 
 :- export(snark/0).
 snark:- current_input(In),current_output(Out),!,snark(In,Out).
