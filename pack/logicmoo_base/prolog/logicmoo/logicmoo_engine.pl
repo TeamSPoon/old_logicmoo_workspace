@@ -1028,7 +1028,7 @@ defunctionalize(OP,Wff,WffO):- compound(Wff),
   not(is_ftEquality(SubTerm)),
   arg(_,SubTerm,Function),is_function(Function),
   subst_eq(SubTerm,Function,NewVar,NewSubTerm),
-  must(function_to_predicate(Function,NewVar,PredifiedFunction)),
+  show_call(must(function_to_predicate(Function,NewVar,PredifiedFunction))),
   NEW =..[OP,PredifiedFunction,NewSubTerm],
   subst_eq(Wff,SubTerm,NEW,NextWff),!,
   defunctionalize(OP,NextWff,WffO).

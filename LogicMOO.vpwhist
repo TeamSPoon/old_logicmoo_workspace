@@ -49,7 +49,7 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
   + mike
   + MIndiGolog0
   + mpred
-  + mpred_online
+  - mpred_online
   + osnark
   + PKnows-0.9.9
     + vpdl
@@ -405,8 +405,8 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
       + verbalizer
       + webservice
     + webapp
-      + src
-        + ch
+      - src
+        - ch
           + uzh
             + ifi
               + attempto
@@ -420,11 +420,11 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
       + war
         + WEB-INF
           + lib
-    + webclient
+    - webclient
   - ape
     + examples
     + java
-      + src
+      - src
         + main
           + java
             + ch
@@ -439,15 +439,178 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
                 + ifi
                   + attempto
                     + ape
-    + lexicon
+    - lexicon
     + logger
     + parser
     + tests
       + testruns
     + tools
     + utils
-      + owlswrl
-  - candc
+      - owlswrl
+  + CALL-SLT
+    + Core
+      + Regulus
+    + doc
+      + LiteDoc
+        + img
+      + LiteDocSphinx
+        + build
+          + doctrees
+          + html
+            + _sources
+            + _static
+              + css
+              + fonts
+              + js
+        + source
+          + _static
+      + NewCALLSLTWebsite
+        + img
+        + source
+      + Papers
+      + tmp
+    + Eng
+      + corpora
+        + vocab_spreadsheets_nov_2009
+      + doc
+      + GeneratedFiles
+      + GeneratedFilesCompilation
+      + GeneratedFilesStaging
+      + logfiles
+      + Multimedia
+      + Prolog
+      + recorded_wavfiles
+        + permanent
+      + Regulus
+      + scripts
+    + EngEng
+      + scripts
+      + TestResults
+    + EngInt
+      + scripts
+      + TestResults
+    + Eval
+      + Crowdsourcing
+        + Judging
+          + HTML
+          + Prolog
+      + Prolog
+      + wavfiles_for_judging
+    + GUI
+      + Flash
+        + 2.1
+          + badges
+          + de
+          + en
+          + unige
+            + holder
+            + issco
+            + spectrum
+          + zh-CN
+      + GeneratedFiles
+      + Images
+      + Prolog
+      + PrologBeansJava
+        + PrologBeansCALLSLT
+          + src
+            + prologBeansCALLSLT
+      + recorded_wavfiles
+      + scripts
+      + session_logfiles
+    + Int
+      + corpora
+      + GeneratedFiles
+      + Prolog
+      + Regulus
+      + scripts
+    + IntInt
+      + scripts
+    + javaGUI
+      + lib
+      + logs
+      + src
+        + gui
+          + transact
+        + img
+        + socket
+      + test
+        + gui
+          + transact
+        + inputFiles
+    + LiteContent
+      + bologna
+        + rendezvous
+          + doc
+          + grammars
+        + se_presenter
+          + doc
+          + grammars
+      + english_course
+        + english_course
+          + grammars
+          + multimedia
+          + scripts
+      + hello
+        + hello_course
+          + grammars
+          + multimedia
+          + scripts
+        + hello_world_course
+          + grammars
+      + pronunciation
+        + pronunciation
+          + doc
+          + grammars
+      + restaurant
+        + restaurant
+          + doc
+          + grammars
+          + multimedia
+            + helpfiles
+      + toy
+        + toy_english_course
+          + grammars
+          + scripts
+      + visual
+        + arithmetic_french
+          + grammars
+        + pokemon
+          + grammars
+          + multimedia
+        + pokemon_french
+          + grammars
+          + multimedia
+        + sounds
+          + grammars
+          + multimedia
+        + visual1
+          + grammars
+          + multimedia
+        + visual2
+          + grammars
+          + multimedia
+        + visual3
+          + grammars
+          + multimedia
+    + LiteMetadata
+    + Que
+      + corpora
+      + doc
+      + GeneratedFiles
+      + logfiles
+      + Prolog
+      + recorded_wavfiles
+      + scripts
+    + QueContent
+      + evaluation
+        + questionnaires
+      + red_cross
+        + questionnaires
+      + warmup
+        + questionnaires
+    + tmp
+      + SlateLearning
+  + candc
     + bin
     + bin-old
     + candc-1.00
@@ -504,7 +667,7 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
       + super_noquotes
       + super_questions
       + super_quotes
-    - src
+    + src
       + api
         + ccg
         + nlp
@@ -558,10 +721,10 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
         + utils
       + main
       - prolog
-        - boxer
-          + knowledge
+        + boxer
+          - knowledge
           + lex
-        + lib
+        - lib
         + nutcracker
       + scripts
         + boxer
@@ -1209,7 +1372,7 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
         + src
     + Prolog
       + CVS
-      + Misc
+      - Misc
         + CVS
       + SICStusPatches
         + 4.0.3
@@ -1502,717 +1665,6 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
             + resources
             + TISdefs
   + stanford-corenlp
-    + CALL-SLT
-      + Ara
-        + corpora
-        + doc
-        + GeneratedFiles
-        + logfiles
-        + Prolog
-        + recorded_wavfiles
-        + Regulus
-        + scripts
-      + AraInt
-        + scripts
-        + TestResults
-      + Core
-        + Regulus
-      + doc
-        + LiteDoc
-          + img
-        + LiteDocSphinx
-          + build
-            + doctrees
-            + html
-              + _sources
-              + _static
-                + css
-                + fonts
-                + js
-          + source
-            + _static
-        + NewCALLSLTWebsite
-          + img
-          + source
-        + Papers
-        + tmp
-      + Eng
-        + corpora
-          + vocab_spreadsheets_nov_2009
-        + doc
-        + GeneratedFiles
-        + GeneratedFilesCompilation
-        + GeneratedFilesStaging
-        + logfiles
-        + Multimedia
-        + Prolog
-        + recorded_wavfiles
-          + permanent
-        + Regulus
-        + scripts
-      + EngEng
-        + scripts
-        + TestResults
-      + EngInt
-        + scripts
-        + TestResults
-      + Eval
-        + Crowdsourcing
-          + Judging
-            + HTML
-            + Prolog
-        + Prolog
-        + wavfiles_for_judging
-      + Fre
-        + corpora
-        + doc
-        + GeneratedFiles
-        + GeneratedFilesCompilation
-        + GeneratedFilesStaging
-        + Prolog
-        + recorded_wavfiles
-          + permanent
-        + Regulus
-        + scripts
-      + FreFre
-        + scripts
-        + TestResults
-      + FreInt
-        + scripts
-        + TestResults
-      + Ger
-        + corpora
-        + doc
-          + images
-            + help
-        + GeneratedFiles
-        + logfiles
-        + Prolog
-        + recorded_wavfiles
-          + permanent
-          + permanent_normalised
-        + Regulus
-        + scripts
-      + GerGer
-        + scripts
-        + TestResults
-      + GerInt
-        + scripts
-        + TestResults
-      + Gre
-        + corpora
-        + doc
-        + GeneratedFiles
-        + Prolog
-        + recorded_wavfiles
-          + permanent
-        + Regulus
-        + scripts
-      + GreInt
-        + scripts
-        + TestResults
-      + GUI
-        + Flash
-          + 2.1
-            + badges
-            + de
-            + en
-            + unige
-              + holder
-              + issco
-              + spectrum
-            + zh-CN
-        + GeneratedFiles
-        + Images
-        + Prolog
-        + PrologBeansJava
-          + PrologBeansCALLSLT
-            + src
-              + prologBeansCALLSLT
-        + recorded_wavfiles
-        + scripts
-        + session_logfiles
-      + Int
-        + corpora
-        + GeneratedFiles
-        + Prolog
-        + Regulus
-        + scripts
-      + IntInt
-        + scripts
-      + Jap
-        + corpora
-        + doc
-        + GeneratedFiles
-        + logfiles
-        + Prolog
-        + recorded_wavfiles
-          + permanent
-        + Regulus
-        + scripts
-      + JapInt
-        + scripts
-        + TestResults
-      + JapJap
-        + scripts
-        + TestResults
-      + javaGUI
-        + lib
-        + logs
-        + src
-          + gui
-            + transact
-          + img
-          + socket
-        + test
-          + gui
-            + transact
-          + inputFiles
-      + LiteContent
-        + bologna
-          + rendezvous
-            + doc
-            + grammars
-          + se_presenter
-            + doc
-            + grammars
-        + english_course
-          + english_course
-            + grammars
-            + multimedia
-            + scripts
-        + hello
-          + hello_course
-            + grammars
-            + multimedia
-            + scripts
-          + hello_world_course
-            + grammars
-        + pronunciation
-          + pronunciation
-            + doc
-            + grammars
-        + restaurant
-          + restaurant
-            + doc
-            + grammars
-            + multimedia
-              + helpfiles
-        + toy
-          + toy_english_course
-            + grammars
-            + scripts
-        + visual
-          + arithmetic_french
-            + grammars
-          + pokemon
-            + grammars
-            + multimedia
-          + pokemon_french
-            + grammars
-            + multimedia
-          + sounds
-            + grammars
-            + multimedia
-          + visual1
-            + grammars
-            + multimedia
-          + visual2
-            + grammars
-            + multimedia
-          + visual3
-            + grammars
-            + multimedia
-      + LiteMetadata
-      + Que
-        + corpora
-        + doc
-        + GeneratedFiles
-        + logfiles
-        + Prolog
-        + recorded_wavfiles
-        + scripts
-      + QueContent
-        + evaluation
-          + questionnaires
-        + red_cross
-          + questionnaires
-        + warmup
-          + questionnaires
-      + Swe
-        + corpora
-        + doc
-        + GeneratedFiles
-        + logfiles
-        + Prolog
-        + recorded_wavfiles
-          + permanent
-        + Regulus
-        + scripts
-      + SweInt
-        + scripts
-        + TestResults
-      + tmp
-        + SlateLearning
-    + candc
-      + ~gsoap2-code~\.xpce
-      + ~gsoap2-code~
-        + gsoap\.deps
-        + autom4te.cache
-        + gsoap
-          + src\.deps
-          + wsdl\.deps
-          + bin
-            + linux386
-            + macosx
-            + win32
-          + custom
-          + doc
-            + dom
-              + html
-            + httpda
-              + html
-            + uddi2
-              + html
-            + wsa
-              + html
-            + wsdd
-              + html
-            + wsrm
-              + html
-            + wsse
-              + html
-            + xml-rpc-json
-              + html
-          + extras
-          + import
-          + ios_plugin
-            + examples
-              + Calc
-                + build
-                  + Calc.build
-                    + Calc.pbxindex
-                      + strings.pbxstrings
-                    + Debug-iphonesimulator
-                      + Calc.build
-                        + Objects-normal
-                          + i386
-                  + Debug-iphonesimulator
-                    + Calc.app
-                    + Calc.app.dSYM
-                      + Contents
-                        + Resources
-                          + DWARF
-                + Calc.xcodeproj
-                + Classes
-              + GeoIPService
-                + build
-                  + Debug-iphonesimulator
-                    + GeoIPService.app
-                    + GeoIPService.app.dSYM
-                      + Contents
-                        + Resources
-                          + DWARF
-                  + GeoIPService.build
-                    + Debug-iphonesimulator
-                      + GeoIPService.build
-                        + Objects-normal
-                          + i386
-                    + GeoIPService.pbxindex
-                      + strings.pbxstrings
-                + Classes
-                + GeoIPService.xcodeproj
-            + ios_plugin
-              + docs
-                + html
-          + mod_gsoap
-            + gsoap_win
-              + isapi
-                + Div
-                + gsoap
-                + images
-                + samples
-                  + calc
-                  + dime
-              + wininet
-            + mod_gsoap-0.6
-              + apache_13
-                + ConsoleServer\.deps
-                + ConsoleServer
-                  + foo\.deps
-                  + foo
-                + example
-                  + calculator
-                + mod_gsoap
-                  + config
-              + apache_20
-          + Palm
-          + plugin
-          + samples
-            + chaining++\.deps
-            + chaining\.deps
-            + primes\.deps
-            + xml-rpc-json\.deps
-            + autotest
-              + databinding
-                + examples
-                  + 6
-                    + 09
-                      + AllElement
-                      + AnyAttributeLax
-                      + AnyAttributeOtherLax
-                      + AnyAttributeOtherSkip
-                      + AnyAttributeOtherStrict
-                      + AnyAttributeSkip
-                      + AnyAttributeStrict
-                      + AnySimpleTypeAttribute
-                      + AnySimpleTypeElement
-                      + AnyTypeElement
-                      + AnyURIAttribute
-                      + AnyURIElement
-                      + AppinfoElement
-                      + AttributeDefault
-                      + AttributeElementNameClash
-                      + AttributeFixed
-                      + AttributeFormQualified
-                      + AttributeFormUnqualified
-                      + AttributeGroup
-                      + AttributeOptional
-                      + AttributeReference
-                      + AttributeReferenceUnqualified
-                      + AttributeRequired
-                      + AttributeTypeReference
-                      + AttributeTypeReferenceUnqualified
-                      + BareVector
-                      + Base64BinaryAttribute
-                      + Base64BinaryElement
-                      + BlockDefault
-                      + BooleanAttribute
-                      + BooleanElement
-                      + ByteAttribute
-                      + ByteElement
-                      + ByteSimpleTypePattern
-                      + ChameleonInclude
-                      + ChoiceChoice
-                      + ChoiceElement
-                      + ChoiceMaxOccursFinite
-                      + ChoiceMaxOccursUnbounded
-                      + ChoiceMinOccurs0
-                      + ChoiceMinOccursFinite
-                      + ChoiceSequence
-                      + ComplexTypeAll
-                      + ComplexTypeAnyAttribute
-                      + ComplexTypeAttribute
-                      + ComplexTypeAttributeExtension
-                      + ComplexTypeChoice
-                      + ComplexTypeConcrete
-                      + ComplexTypeOnlyAttributeGroup
-                      + ComplexTypeOnlyAttributes
-                      + ComplexTypeSequence
-                      + ComplexTypeSequenceChoice
-                      + ComplexTypeSequenceExtension
-                      + DateAttribute
-                      + DateElement
-                      + DateSimpleTypePattern
-                      + DateTimeAttribute
-                      + DateTimeElement
-                      + DecimalAttribute
-                      + DecimalElement
-                      + DecimalEnumerationType
-                      + DecimalSimpleTypeFractionDigits
-                      + DecimalSimpleTypePattern
-                      + DecimalSimpleTypeTotalDigits
-                      + DocumentationElement
-                      + DoubleAttribute
-                      + DoubleElement
-                      + DoubleEnumerationType
-                      + DoubleSimpleTypePattern
-                      + DurationAttribute
-                      + DurationElement
-                      + ElementDefault
-                      + ElementEmptyComplexType
-                      + ElementEmptySequence
-                      + ElementFixed
-                      + ElementFormQualified
-                      + ElementFormUnqualified
-                      + ElementGroup
-                      + ElementMaxOccurs1
-                      + ElementMaxOccursFinite
-                      + ElementMaxOccursUnbounded
-                      + ElementMinOccurs0
-                      + ElementMinOccurs0MaxOccursFinite
-                      + ElementMinOccurs0MaxOccursUnbounded
-                      + ElementMinOccurs1
-                      + ElementMinOccurs1MaxOccursUnbounded
-                      + ElementMinOccurs2MaxOccurs2
-                      + ElementMinOccurs2orMore
-                      + ElementMinOccursFinite
-                      + ElementReference
-                      + ElementReferenceUnqualified
-                      + ElementTypeDefaultNamespace
-                      + ElementTypeReference
-                      + ElementTypeReferenceUnqualified
-                      + ENTITIESAttribute
-                      + ENTITIESElement
-                      + ENTITYAttribute
-                      + ENTITYElement
-                      + ExtendedSequenceLax
-                      + ExtendedSequenceLaxAny
-                      + ExtendedSequenceLaxOther
-                      + ExtendedSequenceSkip
-                      + ExtendedSequenceSkipAny
-                      + ExtendedSequenceSkipOther
-                      + ExtendedSequenceStrict
-                      + ExtendedSequenceStrictAny
-                      + ExtendedSequenceStrictOther
-                      + ExtendedSimpleContent
-                      + ExtendedSimpleType
-                      + FinalDefault
-                      + FloatAttribute
-                      + FloatElement
-                      + FloatEnumerationType
-                      + FloatSimpleTypePattern
-                      + GDayAttribute
-                      + GDayElement
-                      + GDaySimpleTypePattern
-                      + GlobalAttribute
-                      + GlobalAttributeSimpleType
-                      + GlobalAttributeUnqualifiedType
-                      + GlobalComplexType
-                      + GlobalComplexTypeAbstract
-                      + GlobalComplexTypeBlock
-                      + GlobalComplexTypeEmptyExtension
-                      + GlobalElement
-                      + GlobalElementAbstract
-                      + GlobalElementAll
-                      + GlobalElementBlock
-                      + GlobalElementChoice
-                      + GlobalElementComplexTypeEmptyExtension
-                      + GlobalElementComplexTypeSequenceExtension
-                      + GlobalElementConcrete
-                      + GlobalElementDefault
-                      + GlobalElementFinal
-                      + GlobalElementSequence
-                      + GlobalElementSequenceAny
-                      + GlobalElementSimpleType
-                      + GlobalElementUnqualifiedType
-                      + GlobalSimpleType
-                      + GMonthAttribute
-                      + GMonthDayAttribute
-                      + GMonthDayElement
-                      + GMonthDaySimpleTypePattern
-                      + GMonthElement
-                      + GMonthSimpleTypePattern
-                      + GYearAttribute
-                      + GYearElement
-                      + GYearMonthAttribute
-                      + GYearMonthElement
-                      + GYearMonthSimpleTypePattern
-                      + GYearSimpleTypePattern
-                      + HexBinaryAttribute
-                      + HexBinaryElement
-                      + IDAttribute
-                      + IDElement
-                      + IdentifierName
-                      + IDREFAttribute
-                      + IDREFElement
-                      + IDREFSAttribute
-                      + IDREFSElement
-                      + Id
-                      + IntAttribute
-                      + IntegerAttribute
-                      + IntegerElement
-                      + IntegerEnumerationType
-                      + IntegerSimpleTypePattern
-                      + IntElement
-                      + IntEnumerationType
-                      + IntSimpleTypePattern
-                      + LanguageAttribute
-                      + LanguageElement
-                      + LanguageEnumerationType
-                      + List
-                      + LocalAttributeSimpleType
-                      + LocalElementComplexType
-                      + LocalElementSimpleType
-                      + LongAttribute
-                      + LongElement
-                      + LongEnumerationType
-                      + LongSimpleTypePattern
-                      + MaxOccurs1
-                      + MinOccurs1
-                      + MixedComplexContent
-                      + MixedContentType
-                      + NameAttribute
-                      + NameElement
-                      + NCNameAttribute
-                      + NCNameElement
-                      + NegativeIntegerAttribute
-                      + NegativeIntegerElement
-                      + NestedSequenceElementList
-                      + NillableElement
-                      + NillableOptionalElement
-                      + NMTOKENAttribute
-                      + NMTOKENElement
-                      + NMTOKENEnumerationType
-                      + NMTOKENSAttribute
-                      + NMTOKENSElement
-                      + NonIdentifierName
-                      + NonNegativeIntegerAttribute
-                      + NonNegativeIntegerElement
-                      + NonNegativeIntegerEnumerationType
-                      + NonNegativeIntegerSimpleTypePattern
-                      + NonPositiveIntegerAttribute
-                      + NonPositiveIntegerElement
-                      + NormalizedStringAttribute
-                      + NormalizedStringElement
-                      + NoTargetNamespace
-                      + NotMixed
-                      + NotNillableElement
-                      + NullEnumerationType
-                      + PositiveIntegerAttribute
-                      + PositiveIntegerElement
-                      + PositiveIntegerEnumerationType
-                      + PositiveIntegerSimpleTypePattern
-                      + PrecisionDecimal
-                      + QNameAttribute
-                      + QNameElement
-                      + QualifiedLocalAttributes
-                      + QualifiedLocalElements
-                      + RestrictedLength
-                      + RestrictedMaxExclusive
-                      + RestrictedMaxInclusive
-                      + RestrictedMaxLength
-                      + RestrictedMinExclusive
-                      + RestrictedMinInclusive
-                      + RestrictedMinLength
-                      + RestrictedStringMaxLength
-                      + RestrictedStringMinLength
-                      + RestrictedStringMinMaxLength
-                      + SchemaVersion
-                      + SequenceAnyStrict
-                      + SequenceChoice
-                      + SequenceElement
-                      + SequenceMaxOccurs1
-                      + SequenceMaxOccursFinite
-                      + SequenceMaxOccursUnbounded
-                      + SequenceMinOccurs0
-                      + SequenceMinOccurs0MaxOccursUnbounded
-                      + SequenceMinOccurs1
-                      + SequenceMinOccurs1MaxOccursUnbounded
-                      + SequenceMinOccursFinite
-                      + SequenceSequenceElement
-                      + SequenceSingleRepeatedElement
-                      + ShortAttribute
-                      + ShortElement
-                      + ShortEnumerationType
-                      + ShortSimpleTypePattern
-                      + SimpleContentAnyAttribute
-                      + SimpleTypeAttributes
-                      + SimpleTypeEnumerationType
-                      + SimpleTypeRenamed
-                      + SOAPEncodedArray
-                      + StringAttribute
-                      + StringElement
-                      + StringEnumerationType
-                      + StringSimpleTypePattern
-                      + SubstitutionGroup
-                      + TargetNamespace
-                      + TimeAttribute
-                      + TimeElement
-                      + TokenAttribute
-                      + TokenElement
-                      + TokenEnumerationType
-                      + TokenSimpleTypePattern
-                      + TypeSubstitutionUsingXsiType
-                      + UnionDateString
-                      + UnionMemberTypes
-                      + UnionSimpleAndMemberTypes
-                      + UnionSimpleDateString
-                      + Unique
-                      + UnqualifiedLocalAttributes
-                      + UnqualifiedLocalElements
-                      + UnsignedByteAttribute
-                      + UnsignedByteElement
-                      + UnsignedIntAttribute
-                      + UnsignedIntElement
-                      + UnsignedIntEnumerationType
-                      + UnsignedIntSimpleTypePattern
-                      + UnsignedLongAttribute
-                      + UnsignedLongElement
-                      + UnsignedLongEnumerationType
-                      + UnsignedLongSimpleTypePattern
-                      + UnsignedShortAttribute
-                      + UnsignedShortElement
-                      + UnsignedShortEnumerationType
-                      + UnsignedShortSimpleTypePattern
-            + calc
-            + calc++
-            + calc_vs2005
-              + calc_vs2005
-            + calc_xcode
-              + build
-                + calc_xcode.build
-                  + calc_xcode.pbxindex
-                    + strings.pbxstrings
-                  + Debug
-                    + calc_xcode.build
-              + calc_xcode.xcodeproj
-            + chaining
-            + chaining++
-            + databinding
-              + html
-            + dime
-            + dom
-            + factory
-            + factorytest
-            + gmt
-            + googleapi
-            + hello
-            + httpcookies
-            + link
-            + link++
-            + lu
-            + magic
-            + mashup
-            + mashup++
-            + mtom
-            + mtom-stream
-            + oneway
-            + oneway++
-            + polytest
-            + primes
-            + rest
-            + roll
-            + router
-            + rss
-            + ssl
-            + template
-            + udp
-            + varparam
-            + wcf
-              + Basic
-                + Http
-                + MessageSecurity
-                + TransportSecurity
-              + WS
-                + DualHttp
-            + webserver
-            + wsa
-            + wsrm
-            + wsse
-            + xml-rpc
-            + xml-rpc-json
-          + src
-          + Symbian
-          + TandemNonStop
-          + uddi2
-          + VisualStudio2005
-            + soapcpp2
-              + soapcpp2
-            + wsdl2h
-              + wsdl2h
-          + WS
-          + wsdl
     + classes
       + com
         + google
@@ -2419,6 +1871,465 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
       + patterns
       + sutime
       + tokensregex
+  + ~candc~build~
+    + ~gsoap2-code~\.xpce
+    + ~gsoap2-code~
+      + gsoap\.deps
+      + autom4te.cache
+      + gsoap
+        + src\.deps
+        + wsdl\.deps
+        + bin
+          + linux386
+          + macosx
+          + win32
+        + custom
+        + doc
+          + dom
+            + html
+          + httpda
+            + html
+          + uddi2
+            + html
+          + wsa
+            + html
+          + wsdd
+            + html
+          + wsrm
+            + html
+          + wsse
+            + html
+          + xml-rpc-json
+            + html
+        + extras
+        + import
+        + ios_plugin
+          + examples
+            + Calc
+              + build
+                + Calc.build
+                  + Calc.pbxindex
+                    + strings.pbxstrings
+                  + Debug-iphonesimulator
+                    + Calc.build
+                      + Objects-normal
+                        + i386
+                + Debug-iphonesimulator
+                  + Calc.app
+                  + Calc.app.dSYM
+                    + Contents
+                      + Resources
+                        + DWARF
+              + Calc.xcodeproj
+              + Classes
+            + GeoIPService
+              + build
+                + Debug-iphonesimulator
+                  + GeoIPService.app
+                  + GeoIPService.app.dSYM
+                    + Contents
+                      + Resources
+                        + DWARF
+                + GeoIPService.build
+                  + Debug-iphonesimulator
+                    + GeoIPService.build
+                      + Objects-normal
+                        + i386
+                  + GeoIPService.pbxindex
+                    + strings.pbxstrings
+              + Classes
+              + GeoIPService.xcodeproj
+          + ios_plugin
+            + docs
+              + html
+        + mod_gsoap
+          + gsoap_win
+            + isapi
+              + Div
+              + gsoap
+              + images
+              + samples
+                + calc
+                + dime
+            + wininet
+          + mod_gsoap-0.6
+            + apache_13
+              + ConsoleServer\.deps
+              + ConsoleServer
+                + foo\.deps
+                + foo
+              + example
+                + calculator
+              + mod_gsoap
+                + config
+            + apache_20
+        + Palm
+        + plugin
+        + samples
+          + chaining++\.deps
+          + chaining\.deps
+          + primes\.deps
+          + xml-rpc-json\.deps
+          + autotest
+            + databinding
+              + examples
+                + 6
+                  + 09
+                    + AllElement
+                    + AnyAttributeLax
+                    + AnyAttributeOtherLax
+                    + AnyAttributeOtherSkip
+                    + AnyAttributeOtherStrict
+                    + AnyAttributeSkip
+                    + AnyAttributeStrict
+                    + AnySimpleTypeAttribute
+                    + AnySimpleTypeElement
+                    + AnyTypeElement
+                    + AnyURIAttribute
+                    + AnyURIElement
+                    + AppinfoElement
+                    + AttributeDefault
+                    + AttributeElementNameClash
+                    + AttributeFixed
+                    + AttributeFormQualified
+                    + AttributeFormUnqualified
+                    + AttributeGroup
+                    + AttributeOptional
+                    + AttributeReference
+                    + AttributeReferenceUnqualified
+                    + AttributeRequired
+                    + AttributeTypeReference
+                    + AttributeTypeReferenceUnqualified
+                    + BareVector
+                    + Base64BinaryAttribute
+                    + Base64BinaryElement
+                    + BlockDefault
+                    + BooleanAttribute
+                    + BooleanElement
+                    + ByteAttribute
+                    + ByteElement
+                    + ByteSimpleTypePattern
+                    + ChameleonInclude
+                    + ChoiceChoice
+                    + ChoiceElement
+                    + ChoiceMaxOccursFinite
+                    + ChoiceMaxOccursUnbounded
+                    + ChoiceMinOccurs0
+                    + ChoiceMinOccursFinite
+                    + ChoiceSequence
+                    + ComplexTypeAll
+                    + ComplexTypeAnyAttribute
+                    + ComplexTypeAttribute
+                    + ComplexTypeAttributeExtension
+                    + ComplexTypeChoice
+                    + ComplexTypeConcrete
+                    + ComplexTypeOnlyAttributeGroup
+                    + ComplexTypeOnlyAttributes
+                    + ComplexTypeSequence
+                    + ComplexTypeSequenceChoice
+                    + ComplexTypeSequenceExtension
+                    + DateAttribute
+                    + DateElement
+                    + DateSimpleTypePattern
+                    + DateTimeAttribute
+                    + DateTimeElement
+                    + DecimalAttribute
+                    + DecimalElement
+                    + DecimalEnumerationType
+                    + DecimalSimpleTypeFractionDigits
+                    + DecimalSimpleTypePattern
+                    + DecimalSimpleTypeTotalDigits
+                    + DocumentationElement
+                    + DoubleAttribute
+                    + DoubleElement
+                    + DoubleEnumerationType
+                    + DoubleSimpleTypePattern
+                    + DurationAttribute
+                    + DurationElement
+                    + ElementDefault
+                    + ElementEmptyComplexType
+                    + ElementEmptySequence
+                    + ElementFixed
+                    + ElementFormQualified
+                    + ElementFormUnqualified
+                    + ElementGroup
+                    + ElementMaxOccurs1
+                    + ElementMaxOccursFinite
+                    + ElementMaxOccursUnbounded
+                    + ElementMinOccurs0
+                    + ElementMinOccurs0MaxOccursFinite
+                    + ElementMinOccurs0MaxOccursUnbounded
+                    + ElementMinOccurs1
+                    + ElementMinOccurs1MaxOccursUnbounded
+                    + ElementMinOccurs2MaxOccurs2
+                    + ElementMinOccurs2orMore
+                    + ElementMinOccursFinite
+                    + ElementReference
+                    + ElementReferenceUnqualified
+                    + ElementTypeDefaultNamespace
+                    + ElementTypeReference
+                    + ElementTypeReferenceUnqualified
+                    + ENTITIESAttribute
+                    + ENTITIESElement
+                    + ENTITYAttribute
+                    + ENTITYElement
+                    + ExtendedSequenceLax
+                    + ExtendedSequenceLaxAny
+                    + ExtendedSequenceLaxOther
+                    + ExtendedSequenceSkip
+                    + ExtendedSequenceSkipAny
+                    + ExtendedSequenceSkipOther
+                    + ExtendedSequenceStrict
+                    + ExtendedSequenceStrictAny
+                    + ExtendedSequenceStrictOther
+                    + ExtendedSimpleContent
+                    + ExtendedSimpleType
+                    + FinalDefault
+                    + FloatAttribute
+                    + FloatElement
+                    + FloatEnumerationType
+                    + FloatSimpleTypePattern
+                    + GDayAttribute
+                    + GDayElement
+                    + GDaySimpleTypePattern
+                    + GlobalAttribute
+                    + GlobalAttributeSimpleType
+                    + GlobalAttributeUnqualifiedType
+                    + GlobalComplexType
+                    + GlobalComplexTypeAbstract
+                    + GlobalComplexTypeBlock
+                    + GlobalComplexTypeEmptyExtension
+                    + GlobalElement
+                    + GlobalElementAbstract
+                    + GlobalElementAll
+                    + GlobalElementBlock
+                    + GlobalElementChoice
+                    + GlobalElementComplexTypeEmptyExtension
+                    + GlobalElementComplexTypeSequenceExtension
+                    + GlobalElementConcrete
+                    + GlobalElementDefault
+                    + GlobalElementFinal
+                    + GlobalElementSequence
+                    + GlobalElementSequenceAny
+                    + GlobalElementSimpleType
+                    + GlobalElementUnqualifiedType
+                    + GlobalSimpleType
+                    + GMonthAttribute
+                    + GMonthDayAttribute
+                    + GMonthDayElement
+                    + GMonthDaySimpleTypePattern
+                    + GMonthElement
+                    + GMonthSimpleTypePattern
+                    + GYearAttribute
+                    + GYearElement
+                    + GYearMonthAttribute
+                    + GYearMonthElement
+                    + GYearMonthSimpleTypePattern
+                    + GYearSimpleTypePattern
+                    + HexBinaryAttribute
+                    + HexBinaryElement
+                    + IDAttribute
+                    + IDElement
+                    + IdentifierName
+                    + IDREFAttribute
+                    + IDREFElement
+                    + IDREFSAttribute
+                    + IDREFSElement
+                    + Id
+                    + IntAttribute
+                    + IntegerAttribute
+                    + IntegerElement
+                    + IntegerEnumerationType
+                    + IntegerSimpleTypePattern
+                    + IntElement
+                    + IntEnumerationType
+                    + IntSimpleTypePattern
+                    + LanguageAttribute
+                    + LanguageElement
+                    + LanguageEnumerationType
+                    + List
+                    + LocalAttributeSimpleType
+                    + LocalElementComplexType
+                    + LocalElementSimpleType
+                    + LongAttribute
+                    + LongElement
+                    + LongEnumerationType
+                    + LongSimpleTypePattern
+                    + MaxOccurs1
+                    + MinOccurs1
+                    + MixedComplexContent
+                    + MixedContentType
+                    + NameAttribute
+                    + NameElement
+                    + NCNameAttribute
+                    + NCNameElement
+                    + NegativeIntegerAttribute
+                    + NegativeIntegerElement
+                    + NestedSequenceElementList
+                    + NillableElement
+                    + NillableOptionalElement
+                    + NMTOKENAttribute
+                    + NMTOKENElement
+                    + NMTOKENEnumerationType
+                    + NMTOKENSAttribute
+                    + NMTOKENSElement
+                    + NonIdentifierName
+                    + NonNegativeIntegerAttribute
+                    + NonNegativeIntegerElement
+                    + NonNegativeIntegerEnumerationType
+                    + NonNegativeIntegerSimpleTypePattern
+                    + NonPositiveIntegerAttribute
+                    + NonPositiveIntegerElement
+                    + NormalizedStringAttribute
+                    + NormalizedStringElement
+                    + NoTargetNamespace
+                    + NotMixed
+                    + NotNillableElement
+                    + NullEnumerationType
+                    + PositiveIntegerAttribute
+                    + PositiveIntegerElement
+                    + PositiveIntegerEnumerationType
+                    + PositiveIntegerSimpleTypePattern
+                    + PrecisionDecimal
+                    + QNameAttribute
+                    + QNameElement
+                    + QualifiedLocalAttributes
+                    + QualifiedLocalElements
+                    + RestrictedLength
+                    + RestrictedMaxExclusive
+                    + RestrictedMaxInclusive
+                    + RestrictedMaxLength
+                    + RestrictedMinExclusive
+                    + RestrictedMinInclusive
+                    + RestrictedMinLength
+                    + RestrictedStringMaxLength
+                    + RestrictedStringMinLength
+                    + RestrictedStringMinMaxLength
+                    + SchemaVersion
+                    + SequenceAnyStrict
+                    + SequenceChoice
+                    + SequenceElement
+                    + SequenceMaxOccurs1
+                    + SequenceMaxOccursFinite
+                    + SequenceMaxOccursUnbounded
+                    + SequenceMinOccurs0
+                    + SequenceMinOccurs0MaxOccursUnbounded
+                    + SequenceMinOccurs1
+                    + SequenceMinOccurs1MaxOccursUnbounded
+                    + SequenceMinOccursFinite
+                    + SequenceSequenceElement
+                    + SequenceSingleRepeatedElement
+                    + ShortAttribute
+                    + ShortElement
+                    + ShortEnumerationType
+                    + ShortSimpleTypePattern
+                    + SimpleContentAnyAttribute
+                    + SimpleTypeAttributes
+                    + SimpleTypeEnumerationType
+                    + SimpleTypeRenamed
+                    + SOAPEncodedArray
+                    + StringAttribute
+                    + StringElement
+                    + StringEnumerationType
+                    + StringSimpleTypePattern
+                    + SubstitutionGroup
+                    + TargetNamespace
+                    + TimeAttribute
+                    + TimeElement
+                    + TokenAttribute
+                    + TokenElement
+                    + TokenEnumerationType
+                    + TokenSimpleTypePattern
+                    + TypeSubstitutionUsingXsiType
+                    + UnionDateString
+                    + UnionMemberTypes
+                    + UnionSimpleAndMemberTypes
+                    + UnionSimpleDateString
+                    + Unique
+                    + UnqualifiedLocalAttributes
+                    + UnqualifiedLocalElements
+                    + UnsignedByteAttribute
+                    + UnsignedByteElement
+                    + UnsignedIntAttribute
+                    + UnsignedIntElement
+                    + UnsignedIntEnumerationType
+                    + UnsignedIntSimpleTypePattern
+                    + UnsignedLongAttribute
+                    + UnsignedLongElement
+                    + UnsignedLongEnumerationType
+                    + UnsignedLongSimpleTypePattern
+                    + UnsignedShortAttribute
+                    + UnsignedShortElement
+                    + UnsignedShortEnumerationType
+                    + UnsignedShortSimpleTypePattern
+          + calc
+          + calc++
+          + calc_vs2005
+            + calc_vs2005
+          + calc_xcode
+            + build
+              + calc_xcode.build
+                + calc_xcode.pbxindex
+                  + strings.pbxstrings
+                + Debug
+                  + calc_xcode.build
+            + calc_xcode.xcodeproj
+          + chaining
+          + chaining++
+          + databinding
+            + html
+          + dime
+          + dom
+          + factory
+          + factorytest
+          + gmt
+          + googleapi
+          + hello
+          + httpcookies
+          + link
+          + link++
+          + lu
+          + magic
+          + mashup
+          + mashup++
+          + mtom
+          + mtom-stream
+          + oneway
+          + oneway++
+          + polytest
+          + primes
+          + rest
+          + roll
+          + router
+          + rss
+          + ssl
+          + template
+          + udp
+          + varparam
+          + wcf
+            + Basic
+              + Http
+              + MessageSecurity
+              + TransportSecurity
+            + WS
+              + DualHttp
+          + webserver
+          + wsa
+          + wsrm
+          + wsse
+          + xml-rpc
+          + xml-rpc-json
+        + src
+        + Symbian
+        + TandemNonStop
+        + uddi2
+        + VisualStudio2005
+          + soapcpp2
+            + soapcpp2
+          + wsdl2h
+            + wsdl2h
+        + WS
+        + wsdl
 - pack\prologmud\PrologMUD.vpj
   - prolog
     - prologmud
@@ -2428,8 +2339,8 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
         + planner
       + objs
       - parsing
-      - server
-      - vworld
+      + server
+      + vworld
     + prologmud_web
       + src_assets
       + src_webui
@@ -2441,7 +2352,7 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
             + js
         + model
         + mudconsole
-  - runtime
+  + runtime
     + cache
       + rdf
         + a2
@@ -2450,252 +2361,199 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
           + 0f
     + config-enabled
     + RDF-store
-+ pack\PrologMUD_RT.vpj
-scroll:149
+- pack\PrologMUD_RT.vpj
+  + games
+    + circlemuddata
+    + src_game_nani
+      + web
+        + css
+        + icons
+        + js
+        + prolog
+        + snd
+    + src_game_sims
+      + web
+        + css
+        + icons
+        + js
+        + prolog
+        + snd
+    + src_game_startrek
+      + holodeck
+      + mobs
+      + web
+        + css
+        + icons
+        + js
+        + prolog
+        + snd
+    + src_game_wumpus
+  + hMUD
+    + bridge
+    + flashpolicyd_v0.6
+      + Perl_xinetd
+      + Python_init
+      + Python_xinetd
+      + Standalone
+    + fmud
+      + images
+    + swfobject
+      + src
+scroll:66
 [State]
 SCREEN: 1920 1080 538 217 1278 513 0 0 M 0 0 0 0 1494 592
 CWD: pack\MUD_PDDL\prolog
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\logicmoo_engine.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2945 CL=22 LE=0 CX=21 CY=16 WI=5 BI=46 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\t\trypfcall.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.227 CL=23 LE=0 CX=22 CY=8 WI=5 BI=45 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_store.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.12424 CL=106 LE=0 CX=105 CY=16 WI=5 BI=44 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\pfc.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.32503 CL=8 LE=0 CX=7 CY=16 WI=5 BI=42 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\stanford-corenlp\CALL-SLT\Fre\Prolog\collocations_for_english_multimedia_interlingua.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.8197 CL=32 LE=0 CX=31 CY=16 WI=5 BI=41 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\stanford-corenlp\CALL-SLT\Eng\Prolog\collocations_for_german_minimal_interlingua.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.39537 CL=23 LE=0 CX=22 CY=16 WI=5 BI=40 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\OLD_logicmoo\logicmoo_cyc_pos_data.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.4496 CL=12 LE=0 CX=11 CY=16 WI=5 BI=39 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\stanford-corenlp\CALL-SLT\Fre\Prolog\lesson_defs_french.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.610 CL=37 LE=0 CX=36 CY=9 WI=5 BI=38 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\stanford-corenlp\CALL-SLT\Eng\Prolog\technical_feedback_lesson.xml"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=1 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=XML	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=70 ESBU2=-1
-VIEW: LN=.553 CL=1 LE=0 CX=0 CY=14 WI=5 BI=37 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\stanford-corenlp\CALL-SLT\Eng\Prolog\lesson_defs_flat.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.318 CL=1 LE=0 CX=0 CY=13 WI=5 BI=36 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\t\pfc_sanity.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.23213 CL=26 LE=0 CX=25 CY=13 WI=5 BI=35 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\prologmud\prolog\prologmud\mud_startup.pl"
+BUFFER: BN="pack\MUD_PDDL\prolog\chart89\flexicon.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=616 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.516 CL=16 LE=0 CX=15 CY=14 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\chart89\library.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=33 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\ape\get_ape_results.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.11244 CL=33 LE=0 CX=32 CY=14 WI=5 BI=32 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\pldata\nldata_talk_db_pdat.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1065 CL=27 LE=0 CX=26 CY=11 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\ape\ape.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=30 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\ace_in_gf\grammars\ace\ACEAce.gf"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\ace_in_gf\grammars\ace\ACEI.gf"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\boxer\sdrt.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\boxer\betaConversionDRT.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\boxer\alphaConversionDRT.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\boxer\lex\determiners.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\boxer\lex\verbs.pl"
+VIEW: LN=.443 CL=4 LE=0 CX=3 CY=8 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\chart89\lexicon.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.3866 CL=12 LE=0 CX=11 CY=14 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\parser_ape.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.638 CL=42 LE=0 CX=41 CY=18 WI=5 BI=47 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\parser_talk.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.6137 CL=59 LE=0 CX=58 CY=20 WI=5 BI=34 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\prologmud\prolog\prologmud_web\src_webui\launchcliopatria.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1455 CL=6 LE=0 CX=5 CY=16 WI=5 BI=48 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\thea2\owl2_shell.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.830 CL=6 LE=0 CX=5 CY=16 WI=5 BI=51 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\yadlr\pl\dllearn.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=50 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\boxer\lexicon.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\lib\der2tex.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\lib\pdrs2drs.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=20 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\lib\lex2tex.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\lib\errors.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\nutcracker\fol2tptp.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\nutcracker\eDRT.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\boxer\boxer.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.501 CL=1 LE=0 CX=0 CY=11 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\parser_chat80.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1082 CL=1 LE=0 CX=0 CY=8 WI=5 BI=53 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\parser_candc.pl"
+VIEW: LN=.450 CL=24 LE=0 CX=23 CY=9 WI=5 BI=55 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\ebl_grammar_probs.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=32 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\ebl_train.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=87 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\check_alterf_patterns.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=66 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\Misc\regulus_to_gemini.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.643 CL=1 LE=0 CX=0 CY=17 WI=5 BI=49 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\prologmud\runtime\run_mud_server.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=78 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\ebl_compile_operationality.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=60 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\ebl_generalise.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.218 CL=24 LE=0 CX=23 CY=10 WI=5 BI=72 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\ignore_def_type_feats.regulus"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=81 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\linear_sem_main.regulus"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.360 CL=2 LE=0 CX=1 CY=15 WI=5 BI=57 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\general_eng.regulus"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=85 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\gen_eng_lex_macros.regulus"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=84 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\ignore_third_person_pronoun_entries.regulus"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=83 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\parser_chart89.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1824 CL=1 LE=0 CX=0 CY=10 WI=5 BI=76 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\parser_all.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1195 CL=37 LE=0 CX=36 CY=18 WI=5 BI=79 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\parser_ProNTo.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.305 CL=30 LE=0 CX=29 CY=7 WI=5 BI=56 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\parser_stanford.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=80 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\compositional_numbers_sem.regulus"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=82 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\chat80\xgproc.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1173 CL=41 LE=0 CX=40 CY=17 WI=5 BI=43 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\dra\tabling3\swi_toplevel.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1318 416 -1 -1 N  WF=0 WT=40 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\parser_chat80.pl"
-VIEW: LN=.28662 CL=1 LE=0 CX=0 CY=18 WI=221 BI=53 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1318 416 -1 -1 N  WF=0 WT=36 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\parser_candc.pl"
-VIEW: LN=.643 CL=1 LE=0 CX=0 CY=17 WI=217 BI=49 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1318 416 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\prologmud\prolog\prologmud\mud_startup.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=151 BI=33 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1318 416 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\prologmud\runtime\run_mud_server.pl"
-VIEW: LN=.1218 CL=1 LE=0 CX=0 CY=26 WI=141 BI=43 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1318 416 -1 -1 N  WF=0 WT=32 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\boxer\boxer.pl"
-VIEW: LN=.501 CL=1 LE=0 CX=0 CY=11 WI=169 BI=15 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1318 416 -1 -1 N  WF=0 WT=38 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\thea2\owl2_shell.pl"
-VIEW: LN=.830 CL=6 LE=0 CX=5 CY=16 WI=177 BI=51 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1318 416 -1 -1 N  WF=0 WT=39 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\yadlr\pl\dllearn.pl"
-VIEW: LN=.1037 CL=80 LE=0 CX=79 CY=25 WI=175 BI=50 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1318 416 -1 -1 N  WF=0 WT=15 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\parser_talk.pl"
-VIEW: LN=.6137 CL=59 LE=0 CX=58 CY=20 WI=150 BI=34 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1318 416 -1 -1 N  WF=0 WT=1 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\parser_ape.pl"
-VIEW: LN=.638 CL=42 LE=0 CX=41 CY=18 WI=170 BI=47 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1318 416 -1 -1 N  WF=0 WT=24 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\boxer\lex\verbs.pl"
-VIEW: LN=.3866 CL=12 LE=0 CX=11 CY=14 WI=161 BI=23 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1318 416 -1 -1 N  WF=0 WT=35 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\dra\tabling3\swi_toplevel.pl"
-VIEW: LN=.1266 CL=1 LE=0 CX=0 CY=15 WI=173 BI=5 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1318 416 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\ape\get_ape_results.pl"
-VIEW: LN=.866 CL=26 LE=0 CX=25 CY=15 WI=152 BI=32 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1318 416 -1 -1 N  WF=0 WT=31 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\nutcracker\eDRT.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=168 BI=16 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1318 416 -1 -1 N  WF=0 WT=30 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\nutcracker\fol2tptp.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=167 BI=17 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1318 416 -1 -1 N  WF=0 WT=29 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\lib\errors.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=166 BI=18 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1318 416 -1 -1 N  WF=0 WT=28 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\lib\lex2tex.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=165 BI=19 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1318 416 -1 -1 N  WF=0 WT=27 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\lib\pdrs2drs.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=164 BI=20 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1318 416 -1 -1 N  WF=0 WT=26 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\lib\der2tex.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=163 BI=21 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.233 CL=1 LE=0 CX=0 CY=10 WI=5 BI=58 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\chart89\fstnpars.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.537 CL=6 LE=0 CX=5 CY=10 WI=5 BI=67 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\chart89\rtrans.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.429 CL=6 LE=0 CX=5 CY=8 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\chart89\inherits.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.456 CL=6 LE=0 CX=5 CY=8 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\chart89\chrtlib2.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.2278 CL=11 LE=0 CX=10 CY=10 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
 WINDOW: 44 44 1318 416 -1 -1 N  WF=0 WT=25 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\boxer\lexicon.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=162 BI=22 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\parser_stanford.pl"
+VIEW: LN=.496 CL=13 LE=0 CX=12 CY=13 WI=350 BI=80 HT=0 HN=0 HF=0 HC=4
 WINDOW: 0 0 1318 416 -1 -1 N  WF=0 WT=23 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\boxer\lex\determiners.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=160 BI=24 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\parser_all.pl"
+VIEW: LN=.1195 CL=37 LE=0 CX=36 CY=18 WI=346 BI=79 HT=0 HN=0 HF=0 HC=4
 WINDOW: 176 176 1318 416 -1 -1 N  WF=0 WT=22 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\boxer\alphaConversionDRT.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=159 BI=25 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\parser_chart89.pl"
+VIEW: LN=.1824 CL=1 LE=0 CX=0 CY=10 WI=344 BI=76 HT=0 HN=0 HF=0 HC=4
 WINDOW: 154 154 1318 416 -1 -1 N  WF=0 WT=21 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\boxer\betaConversionDRT.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=158 BI=26 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1318 416 -1 -1 N  WF=0 WT=20 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\candc\src\prolog\boxer\sdrt.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=157 BI=27 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\ignore_third_person_pronoun_entries.regulus"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=342 BI=83 HT=0 HN=0 HF=0 HC=4
 WINDOW: 110 110 1318 416 -1 -1 N  WF=0 WT=19 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\ace_in_gf\grammars\ace\ACEI.gf"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=156 BI=28 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\gen_eng_lex_macros.regulus"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=338 BI=84 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1318 416 -1 -1 N  WF=0 WT=20 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\compositional_numbers_sem.regulus"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=340 BI=82 HT=0 HN=0 HF=0 HC=4
 WINDOW: 88 88 1318 416 -1 -1 N  WF=0 WT=18 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\ace_in_gf\grammars\ace\ACEAce.gf"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=155 BI=29 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\general_eng.regulus"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=336 BI=85 HT=0 HN=0 HF=0 HC=4
 WINDOW: 66 66 1318 416 -1 -1 N  WF=0 WT=17 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\ape\ape.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=154 BI=30 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\linear_sem_main.regulus"
+VIEW: LN=.360 CL=2 LE=0 CX=1 CY=15 WI=334 BI=57 HT=0 HN=0 HF=0 HC=4
 WINDOW: 44 44 1318 416 -1 -1 N  WF=0 WT=16 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\pldata\nldata_talk_db_pdat.pl"
-VIEW: LN=.1065 CL=27 LE=0 CX=26 CY=11 WI=153 BI=31 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\ignore_def_type_feats.regulus"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=332 BI=81 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1318 416 -1 -1 N  WF=0 WT=15 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\ebl_generalise.pl"
+VIEW: LN=.218 CL=24 LE=0 CX=23 CY=10 WI=330 BI=72 HT=0 HN=0 HF=0 HC=4
 WINDOW: 0 0 1318 416 -1 -1 N  WF=0 WT=14 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\t\pfc_sanity.pl"
-VIEW: LN=.23213 CL=26 LE=0 CX=25 CY=13 WI=149 BI=35 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\ebl_compile_operationality.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=328 BI=60 HT=0 HN=0 HF=0 HC=4
 WINDOW: 176 176 1318 416 -1 -1 N  WF=0 WT=13 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\stanford-corenlp\CALL-SLT\Eng\Prolog\lesson_defs_flat.pl"
-VIEW: LN=.318 CL=1 LE=0 CX=0 CY=13 WI=148 BI=36 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1318 416 -1 -1 N  WF=0 WT=12 "Default Unicode Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\stanford-corenlp\CALL-SLT\Eng\Prolog\technical_feedback_lesson.xml"
-VIEW: LN=.553 CL=1 LE=0 CX=0 CY=14 WI=147 BI=37 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\Misc\regulus_to_gemini.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=326 BI=78 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1318 416 -1 -1 N  WF=0 WT=12 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\check_alterf_patterns.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=324 BI=66 HT=0 HN=0 HF=0 HC=4
 WINDOW: 132 132 1318 416 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\stanford-corenlp\CALL-SLT\Fre\Prolog\lesson_defs_french.pl"
-VIEW: LN=.610 CL=37 LE=0 CX=36 CY=9 WI=146 BI=38 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\ebl_train.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=322 BI=87 HT=0 HN=0 HF=0 HC=4
 WINDOW: 110 110 1318 416 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\OLD_logicmoo\logicmoo_cyc_pos_data.pl"
-VIEW: LN=.4496 CL=12 LE=0 CX=11 CY=16 WI=145 BI=39 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1318 416 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\stanford-corenlp\CALL-SLT\Eng\Prolog\collocations_for_german_minimal_interlingua.pl"
-VIEW: LN=.39537 CL=23 LE=0 CX=22 CY=16 WI=144 BI=40 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\ebl_grammar_probs.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=320 BI=32 HT=0 HN=0 HF=0 HC=4
 WINDOW: 66 66 1318 416 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\stanford-corenlp\CALL-SLT\Fre\Prolog\collocations_for_english_multimedia_interlingua.pl"
-VIEW: LN=.8197 CL=32 LE=0 CX=31 CY=16 WI=143 BI=41 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1318 416 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\pfc.pl"
-VIEW: LN=.32503 CL=8 LE=0 CX=7 CY=16 WI=142 BI=42 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\chart89\lexicon.pl"
+VIEW: LN=.450 CL=24 LE=0 CX=23 CY=9 WI=124 BI=55 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1318 416 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\MUD_PDDL\prolog\chat80\xgproc.pl"
+VIEW: LN=.1659 CL=24 LE=0 CX=23 CY=11 WI=299 BI=58 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1318 416 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\MUD_PDDL\prolog\chart89\library.pl"
+VIEW: LN=.443 CL=4 LE=0 CX=3 CY=8 WI=318 BI=28 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1318 416 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\MUD_PDDL\prolog\chart89\flexicon.pl"
+VIEW: LN=.516 CL=16 LE=0 CX=15 CY=14 WI=319 BI=21 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1318 416 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\MUD_PDDL\prolog\chart89\chrtlib2.pl"
+VIEW: LN=.2278 CL=11 LE=0 CX=10 CY=10 WI=307 BI=31 HT=0 HN=0 HF=0 HC=4
 WINDOW: 22 22 1318 416 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_store.pl"
-VIEW: LN=.12424 CL=106 LE=0 CX=105 CY=16 WI=140 BI=44 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\chart89\inherits.pl"
+VIEW: LN=.456 CL=6 LE=0 CX=5 CY=8 WI=316 BI=29 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1318 416 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\MUD_PDDL\prolog\chart89\rtrans.pl"
+VIEW: LN=.429 CL=6 LE=0 CX=5 CY=8 WI=311 BI=27 HT=0 HN=0 HF=0 HC=4
 WINDOW: 176 176 1318 416 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\t\trypfcall.pl"
-VIEW: LN=.227 CL=23 LE=0 CX=22 CY=8 WI=139 BI=45 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1318 416 -1 -1 N  WF=0 WT=33 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\logicmoo_engine.pl"
-VIEW: LN=.2945 CL=22 LE=0 CX=21 CY=16 WI=138 BI=46 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1318 416 -1 -1 M  WF=0 WT=37 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\prologmud\prolog\prologmud_web\src_webui\launchcliopatria.pl"
-VIEW: LN=.1250 CL=44 LE=0 CX=43 CY=10 WI=172 BI=48 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\chart89\fstnpars.pl"
+VIEW: LN=.537 CL=6 LE=0 CX=5 CY=10 WI=312 BI=67 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1318 416 -1 -1 N  WF=0 WT=24 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\MUD_PDDL\prolog\parser_ProNTo.pl"
+VIEW: LN=.479 CL=13 LE=0 CX=12 CY=13 WI=348 BI=56 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-pack\MUD_PDDL\prolog\dra\tabling3\swi_toplevel.pl
-pack\prologmud\prolog\prologmud_web\src_webui\launchcliopatria.pl
-pack\logicmoo_base\prolog\logicmoo\thea2\owl2_shell.pl
-pack\logicmoo_base\prolog\logicmoo\yadlr\pl\dllearn.pl
-pack\MUD_PDDL\prolog\candc\src\prolog\boxer\boxer.pl
-pack\prologmud\prolog\prologmud\mud_startup.pl
-pack\prologmud\runtime\run_mud_server.pl
-pack\MUD_PDDL\prolog\parser_candc.pl
-pack\MUD_PDDL\prolog\parser_chat80.pl
+pack\MUD_PDDL\prolog\regulus\Grammar\compositional_numbers_sem.regulus
+pack\MUD_PDDL\prolog\regulus\Grammar\gen_eng_lex_macros.regulus
+pack\MUD_PDDL\prolog\regulus\Grammar\ignore_third_person_pronoun_entries.regulus
+pack\MUD_PDDL\prolog\parser_chart89.pl
+pack\MUD_PDDL\prolog\parser_all.pl
+pack\MUD_PDDL\prolog\parser_SUPPLE.pl
+pack\MUD_PDDL\prolog\parser_regulus.pl
+pack\MUD_PDDL\prolog\parser_stanford.pl
+pack\MUD_PDDL\prolog\parser_ProNTo.pl

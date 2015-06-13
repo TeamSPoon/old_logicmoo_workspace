@@ -270,6 +270,7 @@ dcgOptional(A)--> dcgOnce(dcgOr(A,dcgNone)).
 
 dcgTraceOnFailure(X):-once(X;(dtrace,X)).
 
+:- export(capitalized//1).
 capitalized([W|Text]) --> theText([W|Text]),{atom_codes(W,[C|_Odes]),is_upper(C)}.
 
 substAll(B,[],_R,B):-!.

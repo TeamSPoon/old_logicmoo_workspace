@@ -120,6 +120,7 @@ user:term_expansion(I,OO):-  is_file_clause(I), \+ thlocal:disable_mpred_term_ex
 :-export(pfc_file_loaded/0).
 pfc_file_loaded.
 
+:- retractall(thlocal:disable_mpred_term_expansions_locally/0).
 :- ensure_loaded(mpred/logicmoo_i_builtin).
-
+:- asserta(thlocal:disable_mpred_term_expansions_locally/0).
 

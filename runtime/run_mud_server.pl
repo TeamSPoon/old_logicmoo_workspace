@@ -28,8 +28,7 @@ user:file_search_path(prologmud, library(prologmud)).
 %%% ON :- initialization( profiler(_,walltime) ).
 %%% ON :- initialization(user:use_module(library(swi/pce_profile))).
 
-:- user:ensure_loaded(library(parser_all)).
-
+% [Required] Load the Logicmoo Library Utils
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 % :- qcompile_libraries.
 
@@ -38,19 +37,19 @@ user:file_search_path(prologmud, library(prologmud)).
 :- initialization((current_predicate(egg_go/0)->egg_go;true),now).
 
 
-
-:- if_file_exists(user:ensure_loaded(stanford_parser)).
-% :- get_pos_tagger(I),jpl_set(I,is_DEBUG,'@'(false)).
-
-
-% [Required] Load the Logicmioo Base System
+% [Required] Load the Logicmoo Base System
 :- time(user:ensure_loaded(logicmoo(logicmoo_base))).
+:- asserta_if_new(thlocal:disable_mpred_term_expansions_locally/0).
 
-% [Required] Load the Logicmioo WWW System
+% [Required] Load the Logicmoo WWW System
 :- time(ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
 
-
+% [Required] Load the Logicmoo Backchaining Inference System
 :- time(with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
+
+% [Mostly Required] Load the Logicmoo Parser/Generator System
+:- time(user:ensure_loaded(library(parser_all))).
+
 
 %:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(plarkc/dbase_i_cyc_api)))).
 
@@ -60,7 +59,7 @@ user:file_search_path(prologmud, library(prologmud)).
 
 % % :- set_prolog_flag(gc,true).
 
-?- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
+:- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
 
 :- snark_tell(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
 
@@ -68,6 +67,7 @@ user:file_search_path(prologmud, library(prologmud)).
 
 % :-prolog.
 
+:- retractall(thlocal:disable_mpred_term_expansions_locally/0).
 % [Required] load the mud system
 :- user:ensure_loaded(prologmud(mud_startup)).
 

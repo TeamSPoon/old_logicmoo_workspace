@@ -83,16 +83,16 @@ is_in --> is_was, [carried,by].
 is_type_of --> is_a, [type,of].
 is_type_of --> is_a, [type].
 
-det(exists) --> [the].
-det(exists) --> ['The'].
-det(exists) --> [some].
-det(all) --> [all].
-det(indef) --> [a].
-det(indef) --> ['A'].
-det(indef) --> [an].
-det(indef) --> ['An'].
+detn(exists) --> [the].
+detn(exists) --> ['The'].
+detn(exists) --> [some].
+detn(all) --> [all].
+detn(indef) --> [a].
+detn(indef) --> ['A'].
+detn(indef) --> [an].
+detn(indef) --> ['An'].
 
-collection(I,Col,More)--> det(_),!,collection(I,Col,More).
+collection(I,Col,More)--> detn(_),!,collection(I,Col,More).
 collection(I,Col,true)--> collection0(I,Col).
 collection(I,Col,More)--> attribute(Pred,I,Value,More),collection0(I,Col).
 collection(I,Col,More)--> attribute(Pred,I,Value,More),{isa(I,Col)}.
@@ -110,11 +110,11 @@ subject(I,More)-->subject(I,_,More).
 subject(I,T,true)-->(['This'];['this']),!,{must((parserVars(isThis,I,T);parserVars(_,I,T)))}.
 subject(I,T,true)--> [IT],{string_equal_ci(IT,ITLC),parserVars(isParserVar(ITLC),I,T)},!.
 subject(I,T,true)--> [IT],{string_equal_ci(IT,ITLC),parserVars((ITLC),I,T)},!.
-subject(I,T,More)--> dcgOptional(det(_)),collection(I,T,More),{(asserta_parserVars(isThis,I,T))}.
+subject(I,T,More)--> dcgOptional(detn(_)),collection(I,T,More),{(asserta_parserVars(isThis,I,T))}.
 
 object(I,More)-->object(I,_,More).
 object(I,T,true)-->([it];['It'];['This'];['this']),!,{must((parserVars(object,I,T);parserVars(_,I,T)))}.
-object(I,T,More)--> det(_),!,collection(I,T,More),{(asserta_parserVars(object,I,T))}.
+object(I,T,More)--> detn(_),!,collection(I,T,More),{(asserta_parserVars(object,I,T))}.
 object(I,T,More)--> collection(I,T,More),{(asserta_parserVars(object,I,T))}.
 
 % big , red , flat, etc
@@ -279,9 +279,9 @@ translation_w(relationAllExists(P,C,DT))
   --> collection(C),[has,a],datatype(DT),[called],predicate_named(P).
 
 collection(C)-->subject(C,tCol,true).
-datatype(ftBoolean)--> dcgOptional(det(_)),[truth,state].
-datatype(ftText)--> dcgOptional(det(_)),[text].
-datatype(ftTerm)--> dcgOptional(det(_)),[value].
+datatype(ftBoolean)--> dcgOptional(detn(_)),[truth,state].
+datatype(ftText)--> dcgOptional(detn(_)),[text].
+datatype(ftTerm)--> dcgOptional(detn(_)),[value].
 predicate_named(Pred)-->dcgAnd(theText(Text),dcgLenBetween(1,5)),{toCamelAtom(Text,O),i_name(mud,O,Pred),ignore(assumed_isa(Pred,tPred))}.
 
 
@@ -303,7 +303,7 @@ translation_w(relationMostInstance(isa,C1,C2)) --> collection(C1),[is,usually],c
 translation_w(relationSomeInstance(isa,C1,C2)) --> collection(C1),[be],collection(C2).  
 
 :-assertz_if_new(parserTest(iWorld7,"The outside is a direction.", t(isa,vOutside,vtDirection))).
-translation_w(isa(C1,C2)) --> det(def),col(v,C1),[is,a],col(vt,C2).  
+translation_w(isa(C1,C2)) --> detn(def),col(v,C1),[is,a],col(vt,C2).  
 
 col(Pfx,C)-->subject(C,_,true),{atom_concat(Pfx,_,C)}.
 col(Pfx,C)-->{loosePass},subject(C,_,true).
