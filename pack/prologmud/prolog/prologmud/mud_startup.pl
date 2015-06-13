@@ -374,15 +374,6 @@ Proof end.
 % logicmoo utils shared with other systems
 :- set_prolog_flag(double_quotes, atom).
 :- set_prolog_flag(double_quotes, string).
-/*
-:- '@'((ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),
-         ensure_loaded(library(logicmoo/util/logicmoo_util_library)),
-         use_module(library(logicmoo/util/logicmoo_util_ctx_frame)),
-         ensure_loaded(library(logicmoo/util/logicmoo_util_strings)),
-         use_module(library(logicmoo/util/logicmoo_util_terms)),
-         use_module(library(logicmoo/util/logicmoo_util_dcg)),
-         use_module(prologmud(server/mud))),'user').
-*/
 
 
 % logicmoo vworld mud server

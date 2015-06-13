@@ -58,6 +58,8 @@
 */
 :- nodebug(_).
 
+:-dynamic(wid/3).
+
 %=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%
 %=% 
 %=%   snark_in_prolog.P
@@ -107,7 +109,7 @@
 :- multifile(user:isa_pred_now_locked/0).
 
 :- ensure_loaded(logicmoo(mpred/logicmoo_i_header)).
-:- ensure_loaded(library(pttp/dbase_i_mpred_pttp)).
+:- ensure_loaded(logicmoo(pttp/dbase_i_mpred_pttp)).
 
 %  all(R, room(R) => exists(D, (door(D) & has(R,D))))
 % for any arbitrary R, if R is a room then there exists some object D that is a door, and R has a D.
@@ -332,7 +334,7 @@ adjust_kif(PAB,PABO):- PAB=..[P|AB],maplist(adjust_kif,AB,ABO),PABO=..[P|ABO].
 % FreeV:      List of free variables in Fml.
 % Paths:      Number of disjunctive paths in Fml.
 
-nnf(_Neg,_KB,_Orig,Lit,[Lit],Lit,1):- is_ftVar(Lit),!.
+nnf(_Neg,_KB,_Orig,Lit,FreeV,Lit,1):- is_ftVar(Lit),!,ignore(FreeV=[Lit]).
 nnf(Neg,KB, Orig,Lit,FreeV,Pos,Paths):- is_ftVar(Lit),!,nnf(Neg,KB,Orig,proven_t(Lit),FreeV,Pos,Paths).
 
 nnf(_,_, _,Var, _ ,Var,1):- leave_as_is(Var),!.

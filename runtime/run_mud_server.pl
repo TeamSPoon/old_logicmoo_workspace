@@ -28,7 +28,7 @@ user:file_search_path(prologmud, library(prologmud)).
 %%% ON :- initialization( profiler(_,walltime) ).
 %%% ON :- initialization(user:use_module(library(swi/pce_profile))).
 
-:- user:ensure_loaded(library(ape/get_ape_results)).
+:- user:ensure_loaded(library(parser_all)).
 
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 % :- qcompile_libraries.
@@ -44,19 +44,19 @@ user:file_search_path(prologmud, library(prologmud)).
 
 
 % [Required] Load the Logicmioo Base System
-:- time(user:ensure_loaded(library(logicmoo/logicmoo_base))).
+:- time(user:ensure_loaded(logicmoo(logicmoo_base))).
 
 % [Required] Load the Logicmioo WWW System
-:- time(ensure_loaded(library(logicmoo/mpred_online/logicmoo_i_www))).
+:- time(ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
 
 
-:- time(with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_engine))))).
+:- time(with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
 
-%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/plarkc/dbase_i_cyc_api)))).
+%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(plarkc/dbase_i_cyc_api)))).
 
-%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/mpred_online/dbase_i_rdf_store)))).
+%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(mpred_online/dbase_i_rdf_store)))).
 
-% % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
+% % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_planner)))).
 
 % % :- set_prolog_flag(gc,true).
 

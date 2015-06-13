@@ -441,6 +441,14 @@ must_det_lm(M,[C|List]):-!,M:must(C),!,must_det_lm(M,List).
 must_det_lm(M,(C,List)):-!,M:must(C),!,must_det_lm(M,List).
 must_det_lm(M,C):- !,must(M:C).
 
+
+:-module_transparent(must_l/2).
+must_l(C):-var(C),trace_or_throw(var_must_l(C)),!.
+must_l((A,!,B)):-!,must(A),!,must_l(B).
+must_l((A,B)):-!,must((A,(deterministic(true)->(!,must_l(B));B))).
+must_l(C):- must(C).
+
+
 :-thread_local  tlbugger:skip_use_slow_sanity/0.
 
 % thread locals should defaults to false  tlbugger:skip_use_slow_sanity.

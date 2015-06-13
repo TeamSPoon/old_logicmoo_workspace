@@ -361,6 +361,7 @@ isa_asserted_0(F,tCol):-isa_from_morphology(F,Col),atom_concat(_,'Type',Col),ari
 %isa_asserted_0([I],T):-nonvar(I),!,isa_asserted_0(I,T).
 isa_asserted_0(isInstFn(I),T):-nonvar(I),trace,!,T=I.
 isa_asserted_0(aRelatedFn(T,_),I):-nonvar(T),!,T=I.
+isa_asserted_0(aRelatedFn(T,_,_),I):-nonvar(T),!,T=I.
 isa_asserted_0(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([isa,I,T]);kbp_t([T,I])).
 isa_asserted_0(ttPredType, completelyAssertedCollection):-!.
 isa_asserted_0(I,T):- atom(I),isa_from_morphology(I,T).

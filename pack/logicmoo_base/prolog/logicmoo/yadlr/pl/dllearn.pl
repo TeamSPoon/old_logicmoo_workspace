@@ -23,7 +23,7 @@
 
 
 % yadlr alias
-user:file_search_path(yadlr, X) :- getenv('LOGICMOO_HOME',MOO),atom_concat(MOO,'/src_modules/yadlr/pl', X).
+:-prolog_load_context(directory,Dir),asserta(user:file_search_path(yadlr,Dir)).
 
 % aleph alias must resolve to the directory where aleph.pl exists.
 % you can download aleph from http://www.comlab.ox.ac.uk/oucl/research/areas/machlearn/Aleph/aleph.pl

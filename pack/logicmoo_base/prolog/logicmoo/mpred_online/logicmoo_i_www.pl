@@ -38,7 +38,7 @@
 :- use_module(library(operators), [push_op/3]).
 :- use_module(library(shlib), [current_foreign_library/2]).
 :- use_module(library(prolog_source)).
-:- use_module(library(option)).
+:- user:use_module(library(option)).
 :- use_module(library(error)).
 :- use_module(library(apply)).
 :- use_module(library(debug)).
@@ -1647,12 +1647,12 @@ test_bind([X='$VAR'(X)|L]) :-
 		    sent_and(+, +, -),
 		    sent_or(+, +, -),
 	units_separated(+, -, -, -),
-	contains(+, ?),
+	containsCF(+, ?),
 	literally_contains(+, +),
 	does_not_literally_contain(+, ?).
 */
 
-:- op(700, xfx, [contains,literally_contains,does_not_literally_contain]).
+:- op(700, xfx, [containsCF,literally_contains,does_not_literally_contain]).
 :- op(910,  fy, ~).
 :- op(920, xfy, and).
 :- op(930, xfy, or).
@@ -1842,7 +1842,7 @@ pass_two(ClosedAndImplicationFree, ClausalForm) :-
 
 pass_two_pos(clause(P,N), [clause(P,N)]) :- !.
 pass_two_pos(Sentence, [clause([],[])]) :-
-	Sentence contains clause([],[]),
+	Sentence containsCF clause([],[]),
 	!.
 pass_two_pos(Sentence, Sentence).
 
@@ -1937,11 +1937,11 @@ term_two(N, OldTerm, NewTerm, Rename) :-
 ----------------------------------------------------------------------*/
 
 sent_or(clause(P1,_), clause(_,N2), []) :-
-	P1 contains Atom,
+	P1 containsCF Atom,
 	N2 literally_contains Atom,
 	!.
 sent_or(clause(_,N1), clause(P2,_), []) :-
-	N1 contains Atom,
+	N1 containsCF Atom,
 	P2 literally_contains Atom,
 	!.
 sent_or(clause(P1,N1), clause(P2,N2), clause(P3,N3)) :- !,
@@ -1968,9 +1968,9 @@ sent_and(Clause, [H2|T2], [Clause,H2|T2]) :- !.
 sent_and(Clause1, Clause2, [Clause1,Clause2]).
 
 
-[Head|_] contains Head.
-[_|Tail] contains Something :-
-	Tail contains Something.
+[Head|_] containsCF Head.
+[_|Tail] containsCF Something :-
+	Tail containsCF Something.
 
 
 [Head|_] literally_contains Something :-
