@@ -9,24 +9,68 @@
 % Revised At:   $Date: 2002/06/06 15:43:15 $
 % ===================================================================
 
-:-module(parser_ape,[
-
-         ]).
+% :-module(parser_ape,[]).
 
 
 % ==============================================================================
 
-:- user:ensure_loaded(ape/get_ape_results).
-:- user:ensure_loaded('AceRules/engine/run_testcases').
+:- use_module(ape/parser/ace_to_drs).
+:- use_module(ape/get_ape_results).
+:- use_module(ape/utils/drs_to_drslist).
+:- use_module(ape/utils/drs_to_sdrs).
+:- use_module('ape/parser/grammar_plp.pl').
+:- use_module('ape/parser/grammar_words',[reset_progress_record/1]).
+:- use_module(ape/parser/ape_utils).
+:- use_module(ape/parser/tokenizer).
+:- use_module(ape/utils/morphgen, [
+	acesentencelist_pp/2
+	]).
+:- use_module(ape/utils/is_wellformed, [
+	is_wellformed/1
+	]).
+:- use_module(ape/utils/drs_to_ascii).
+:- use_module(ape/utils/trees_to_ascii).
+:- use_module(ape/utils/drs_to_ace, [
+	drs_to_ace/2
+	]).
+:- use_module(ape/logger/error_logger, [
+	clear_messages/0,
+	get_messages/1,
+	is_error_message/4
+	]).
 
+:- set_prolog_flag(float_format, '%.11g').
 
-?- doall(( Z = (/),current_op(X,Y,Z),display(:- op(X,Y,Z)),nl)).
-?- doall((Z = (:),current_op(X,Y,Z),display(:- op(X,Y,Z)),nl)).
-?- doall((Z = (-),current_op(X,Y,Z),display(:- op(X,Y,Z)),nl)).
+% Import the lexicons
+:- style_check(-singleton).
+:- style_check(-discontiguous).
+:- use_module(ape/lexicon/clex).
+:- use_module(ape/lexicon/ulex).
+:- style_check(+discontiguous).
+:- style_check(+singleton).
 
-:- op(0,fx,user:'-').
-:- op(200,fy,user:'-').
-:- op(500,yfx,user:'-').
-% :- op(600,xfy,(:)).
-:- user:(op(400,yfx,/)).
+:- use_module(ape('utils/morphgen')).
 
+:- use_module(ape('utils/ace_niceace')).
+
+:- use_module(ape('utils/drs_to_xml')).
+:- use_module(ape('utils/drs_to_fol_to_prenex')).
+:- use_module(ape('utils/drs_to_ascii')).
+:- use_module(ape('utils/drs_to_ace')).
+:- use_module(ape('utils/drs_to_coreace')).
+:- use_module(ape('utils/drs_to_npace')).
+:- use_module(ape('utils/drs_to_html')).
+:- use_module(ape('utils/drs_to_ruleml')).
+:- use_module(ape('utils/tree_utils')).
+:- use_module(ape('utils/trees_to_ascii')).
+:- use_module(ape('utils/drs_to_tptp')).
+:- use_module(ape('lexicon/clex')).
+:- use_module(ape('lexicon/ulex')).
+:- use_module(ape('parser/ace_to_drs')).
+:- use_module(ape('logger/error_logger')).
+
+:- use_module(ape('utils/xmlterm_to_xmlatom')).
+
+:- use_module(ape('utils/serialize_term')).
+
+:- use_module(ape('utils/owlswrl/get_owl_output')).

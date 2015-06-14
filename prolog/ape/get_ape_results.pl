@@ -18,7 +18,9 @@
 		get_ape_results_timelimit/4,
 		get_ape_results/2,
 		get_ape_results/3,
-                get_ape_term_results/2
+                get_ape_term_results/2,
+                call_ape/1,
+                rename_vars/2
 	]).
 
 
@@ -184,6 +186,8 @@ v_pp(fof(Axiom,V),fof(Axiom,P)):-!,v_pp(V,P).
 v_pp(A:V,exists(A,P)):-!,v_pp(V,P).
 v_pp(V,V):-!.
 
+call_ape(G):- G.
+
 get_ape_term_results(InputTok, RContent) :- is_list(InputTok),flatten(InputTok,InputTokF),!,   
   delete(InputTokF,(^),InputTokS),concat_atom(InputTokS,' ',InputStr),!,get_ape_term_results(InputStr, RContent),!.
 get_ape_term_results(InputStr, RContent) :-
@@ -235,8 +239,10 @@ get_ape_prolog_term_result(Input, TempResult, Type=PrologTerm) :-
 	))).
 
 
+:-export(rename_vars/2).
 rename_vars(Content):-rename_vars(Content,RContent),ignore(Content=RContent).
-rename_vars(Content,RContent):- 
+rename_vars(Content0,RContent):-
+        (ground(Content0)->unnumbervars(Content0,Content);Content=Content0),
         rename_vars(pass1,Content,RContent1),
         rename_vars(pass2,RContent1,RContent2),
         rename_vars(pass3,RContent2,RContent).
@@ -310,6 +316,10 @@ fol_to_kif(FOL, FOL) :- var(FOL),!.
 fol_to_kif($true, is_true) :-!.
 fol_to_kif(FOL, FOL) :- (\+ (compound(FOL))) ,!.
 fol_to_kif('$VAR'(O), '$VAR'(O)):-!.
+fol_to_kif([FH|FT],[KH|KT]) :- !, fol_to_kif(FH,KH),fol_to_kif(FT,KT).
+fol_to_kif([FH|FT],(KH,KT)) :- !, fol_to_kif(FH,KH),fol_to_kif(FT,KT).
+fol_to_kif(t(P,A),C) :- atom(P),!,C=..[P,A],!.
+fol_to_kif(t(P,A,B),C) :- atom(P),!,C=..[P,A,B],!.
 fol_to_kif(object(_LOVE_FRAME,PERSON_OBJ,Person,Countable,Na,Eq,One),object(PERSON_OBJ,Person,Countable,Na,Eq,One)).
 fol_to_kif(predicate(_LOVE_FRAME,LOVE_EVENT,Love,PERSON_OBJ,ANIMAL_OBJ),predicate(LOVE_EVENT,Love,PERSON_OBJ,ANIMAL_OBJ)).
 fol_to_kif(property(_LOVE_FRAME, PERSON_OBJ, Person, Pos),property(PERSON_OBJ, Person, Pos)).
@@ -333,6 +343,7 @@ fol_to_kif(predicate(_LOVE_FRAME, Love, PERSON_OBJ, ANIMAL_OBJ),t(LoveSym, PERSO
 
 fol_to_kif((O - N/M), K):- integer(N),integer(M), !,fol_to_kif(O,K).
 fol_to_kif('=>'(FH,FT),implies(KH,KT)) :- !, fol_to_kif(FH,KH),fol_to_kif(FT,KT).
+fol_to_kif('implies'(FH,FT),implies(KH,KT)) :- !, fol_to_kif(FH,KH),fol_to_kif(FT,KT).
 fol_to_kif('&'(FH,FT),(KH,KT)) :- !, fol_to_kif(FH,KH),fol_to_kif(FT,KT).
 fol_to_kif('v'(FH,FT),(KH;KT)) :- !, fol_to_kif(FH,KH),fol_to_kif(FT,KT).
 fol_to_kif('-'(FT),'-'(KT)) :- !, fol_to_kif(FT,KT).

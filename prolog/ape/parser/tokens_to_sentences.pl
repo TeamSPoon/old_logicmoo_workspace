@@ -51,7 +51,6 @@ is converted into the following list of sentences
 */
 
 
-:- install_converter(tokens_to_sentences(+tokens, -sentences:list)).
 %% tokens_to_sentences(+Tokens:list, -Sentences:list) is semidet.
 %
 % Succeeds if Tokens is a list of ACE sentences, in this case
@@ -97,7 +96,6 @@ first_sentence([Token | RestTokens], [Token | RestSentence], RestTokens2) :-
 	first_sentence(RestTokens, RestSentence, RestTokens2).
 
 
-:- install_converter(tokens_to_paragraphs(+tokens, -sentences:list)).
 %% tokens_to_paragraphs(+Tokens, -Paragraphs).
 
 tokens_to_paragraphs([], []).

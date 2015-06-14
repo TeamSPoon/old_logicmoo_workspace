@@ -295,7 +295,7 @@ write_targetfiles :-
 process_term('*** file ***'(FileName)) :-
     !,
     told,
-    atom_concat(FileName, '.plp', OutFile),
+    atom_concat(FileName, '_plp.pl', OutFile),
     write(user_error, 'Writing "'),
     write(user_error, OutFile),
     write(user_error, '"\n'),

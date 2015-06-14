@@ -102,9 +102,9 @@ call_parser(_, [help]) :-
 call_parser(_, [gr]) :-
 	style_check(-discontiguous),
 	style_check(-singleton),
-	compile('parser/grammar.plp'),
-	compile('parser/grammar_functionwords.plp'),
-	compile('parser/grammar_contentwords.plp'),
+	compile('parser/grammar_plp.pl'),
+	compile('parser/grammar_functionwords_plp.pl'),
+	compile('parser/grammar_contentwords_plp.pl'),
 	style_check(+discontiguous),
 	style_check(+singleton),
 	!,

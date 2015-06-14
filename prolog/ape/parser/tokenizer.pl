@@ -66,7 +66,6 @@ Example:
 
 */
 
-:- install_converter(tokenize(+acetext, -tokens:list)).
 %% tokenize(+ACEText:term, -Tokens:list) is det.
 %
 % Breaks the ACEText (either an atom, or a list of character codes) into

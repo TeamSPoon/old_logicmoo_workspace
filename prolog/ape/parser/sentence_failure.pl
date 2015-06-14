@@ -32,7 +32,7 @@
 
 :- style_check(-singleton).
 :- style_check(-discontiguous).
-:- use_module('grammar.plp').
+:- user:use_module('grammar_plp.pl').
 :- style_check(+discontiguous).
 :- style_check(+singleton).
 

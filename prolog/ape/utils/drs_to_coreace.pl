@@ -135,7 +135,7 @@ drslist_to_coreace([Drs | DrsList], [Ace | AceList]) :-
 %
 drs_to_coreace(drs([], []), []) :- !.
 
-drs_to_coreace(DRS, AceSentenceList) :-
+drs_to_coreace(DRS0, AceSentenceList) :- unnumbervars(DRS0,DRS),
 	retractall(is_rep(_)),
 	clear_vars,
 	% BUG: why do we need the next line?

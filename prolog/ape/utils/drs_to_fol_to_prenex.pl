@@ -68,7 +68,6 @@ conditions for "at most", "less than" and "exactly" are bracketed by [ ] ; unive
 % @param World is a variable
 % @param FOL is FOL formula
 
-:- install_converter(drs_fol(+drs, -ke)).
 drs_fol(DRS, FOL) :-
 	drs_to_fol(DRS, _, FOL),
 	!.
@@ -90,7 +89,6 @@ drs_fol(_, _World, '').
 % @param World is a variable
 % @param PNF is FOL formula in PNF
 
-:- install_converter(drs_pnf(+drs, -ke)).
 drs_pnf(DRS, PNF) :-
 	drs_to_fol(DRS, _, FOL),
 	prenex_normal_form(FOL, PNF),
