@@ -397,7 +397,7 @@ pfc_skipped_module(eggdrop).
 
 :-multifile(thlocal:into_form_code).
 :-thread_local(thlocal:into_form_code).
-:-thread_local(thlocal:disable_mpred_term_expansions_locally/0).
+:-thread_local(thlocal:disable_mpred_term_expansions_locally /0).
 :-dynamic(thglobal:thlocal:disable_mpred_term_expansions_locally_globally/0).
 
 %fwc:-true.

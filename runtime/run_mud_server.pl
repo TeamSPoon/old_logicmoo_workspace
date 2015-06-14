@@ -39,10 +39,14 @@ user:file_search_path(prologmud, library(prologmud)).
 
 % [Required] Load the Logicmoo Base System
 :- time(user:ensure_loaded(logicmoo(logicmoo_base))).
-:- asserta_if_new(thlocal:disable_mpred_term_expansions_locally/0).
+:- asserta(thlocal:disable_mpred_term_expansions_locally).
+
+:- ignore((\+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 
 % [Required] Load the Logicmoo WWW System
 :- time(ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
+:- asserta(thlocal:disable_mpred_term_expansions_locally).
+:- ignore((\+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 
 % [Required] Load the Logicmoo Backchaining Inference System
 :- time(with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
@@ -50,8 +54,10 @@ user:file_search_path(prologmud, library(prologmud)).
 % [Mostly Required] Load the Logicmoo Parser/Generator System
 :- time(user:ensure_loaded(library(parser_all))).
 
+:- ignore((\+(thlocal:disable_mpred_term_expansions_locally),throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 
-%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(plarkc/dbase_i_cyc_api)))).
+:- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api)).
+
 
 %:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(mpred_online/dbase_i_rdf_store)))).
 
@@ -59,7 +65,7 @@ user:file_search_path(prologmud, library(prologmud)).
 
 % % :- set_prolog_flag(gc,true).
 
-:- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
+% :- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
 
 :- snark_tell(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
 
@@ -67,7 +73,7 @@ user:file_search_path(prologmud, library(prologmud)).
 
 % :-prolog.
 
-:- retractall(thlocal:disable_mpred_term_expansions_locally/0).
+:- retractall(thlocal:disable_mpred_term_expansions_locally).
 % [Required] load the mud system
 :- user:ensure_loaded(prologmud(mud_startup)).
 

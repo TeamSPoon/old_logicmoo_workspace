@@ -1,6 +1,7 @@
 
 
-:- user:use_module(dbase_i_cyc_api).
+:- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api)).
+
 
 end_of_file.
 end_of_file.

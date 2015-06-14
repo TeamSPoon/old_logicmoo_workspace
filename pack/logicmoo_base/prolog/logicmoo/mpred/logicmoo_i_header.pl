@@ -12,7 +12,7 @@
 
 :- if( \+ current_predicate( thlocal:current_pttp_db_oper/1 )).
 
-:- thread_local(thlocal:disable_mpred_term_expansions_locally/0).
+:- thread_local(thlocal:disable_mpred_term_expansions_locally /0).
 :- multifile(system:term_expansion/2).
 :- multifile(user:term_expansion/2).
 :- multifile(user:goal_expansion/2).

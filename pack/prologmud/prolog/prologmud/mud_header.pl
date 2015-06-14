@@ -160,7 +160,7 @@
 
 % :-must(not(user:mpred_prop(t,prologHybrid))).
 
-:- retractall(thlocal:disable_mpred_term_expansions_locally/0).
+:- retractall(thlocal:disable_mpred_term_expansions_locally).
 
 
 
