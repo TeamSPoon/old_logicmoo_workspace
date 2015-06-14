@@ -91,6 +91,9 @@ must_test_80([which, countries, with, a, population, exceeding, nb(10), million,
 must_test_80([what, percentage, of, countries, border, each, ocean, ?], [sent([what, percentage, of, countries, border, each, ocean, ?]), parse(whq(A-C, s(np(3+pl, np_head(int_det(A-C), [], percentage), [pp(prep(of), np(3+pl, np_head(generic, [], country), []))]), verb(border, active, pres+fin, [], pos), [arg(dir, np(3+sg, np_head(det(each), [], ocean), []))], []))), sem((answer([B, E]):-ocean(B), [afghanistan, albania, algeria, andorra, angola, argentina, australia, austria, bahamas, bahrain, bangladesh, barbados, belgium, belize, bhutan, bolivia, botswana, brazil, bulgaria, burma, burundi, cambodia, cameroon, canada, central_african_republic, chad, chile, china, colombia, congo, costa_rica, cuba, cyprus, czechoslovakia, dahomey, denmark, djibouti, dominican_republic, east_germany, ecuador, egypt, eire, el_salvador, equatorial_guinea, ethiopia, fiji, finland, france, french_guiana, gabon, gambia, ghana, greece, grenada, guatemala, guinea, guinea_bissau, guyana, haiti, honduras, hungary, iceland, india, indonesia, iran, iraq, israel, italy, ivory_coast, jamaica, japan, jordan, kenya, kuwait, laos, lebanon, lesotho, liberia, libya, liechtenstein, luxembourg, malagasy, malawi, malaysia, maldives, mali, malta, mauritania, mauritius, mexico, monaco, mongolia, morocco, mozambique, nepal, netherlands, new_zealand, nicaragua, niger, nigeria, north_korea, norway, oman, pakistan, panama, papua_new_guinea, paraguay, peru, philippines, poland, portugal, qatar, romania, rwanda, san_marino, saudi_arabia, senegal, seychelles, sierra_leone, singapore, somalia, south_africa, south_korea, south_yemen, soviet_union, spain, sri_lanka, sudan, surinam, swaziland, sweden, switzerland, syria, taiwan, tanzania, thailand, togo, tonga, trinidad_and_tobago, tunisia, turkey, uganda, united_arab_emirates, united_kingdom, united_states, upper_volta, uruguay, venezuela, vietnam, west_germany, western_samoa, yemen, yugoslavia, zaire, zambia, zimbabwe]^ (setof(C, country(C), [afghanistan, albania, algeria, andorra, angola, argentina, australia, austria, bahamas, bahrain, bangladesh, barbados, belgium, belize, bhutan, bolivia, botswana, brazil, bulgaria, burma, burundi, cambodia, cameroon, canada, central_african_republic, chad, chile, china, colombia, congo, costa_rica, cuba, cyprus, czechoslovakia, dahomey, denmark, djibouti, dominican_republic, east_germany, ecuador, egypt, eire, el_salvador, equatorial_guinea, ethiopia, fiji, finland, france, french_guiana, gabon, gambia, ghana, greece, grenada, guatemala, guinea, guinea_bissau, guyana, haiti, honduras, hungary, iceland, india, indonesia, iran, iraq, israel, italy, ivory_coast, jamaica, japan, jordan, kenya, kuwait, laos, lebanon, lesotho, liberia, libya, liechtenstein, luxembourg, malagasy, malawi, malaysia, maldives, mali, malta, mauritania, mauritius, mexico, monaco, mongolia, morocco, mozambique, nepal, netherlands, new_zealand, nicaragua, niger, nigeria, north_korea, norway, oman, pakistan, panama, papua_new_guinea, paraguay, peru, philippines, poland, portugal, qatar, romania, rwanda, san_marino, saudi_arabia, senegal, seychelles, sierra_leone, singapore, somalia, south_africa, south_korea, south_yemen, soviet_union, spain, sri_lanka, sudan, surinam, swaziland, sweden, switzerland, syria, taiwan, tanzania, thailand, togo, tonga, trinidad_and_tobago, tunisia, turkey, uganda, united_arab_emirates, united_kingdom, united_states, upper_volta, uruguay, venezuela, vietnam, west_germany, western_samoa, yemen, yugoslavia, zaire, zambia, zimbabwe]), 4^ (numberof(D, (one_of([afghanistan, albania, algeria, andorra, angola, argentina, australia, austria, bahamas, bahrain, bangladesh, barbados, belgium, belize, bhutan, bolivia, botswana, brazil, bulgaria, burma, burundi, cambodia, cameroon, canada, central_african_republic, chad, chile, china, colombia, congo, costa_rica, cuba, cyprus, czechoslovakia, dahomey, denmark, djibouti, dominican_republic, east_germany, ecuador, egypt, eire, el_salvador, equatorial_guinea, ethiopia, fiji, finland, france, french_guiana, gabon, gambia, ghana, greece, grenada, guatemala, guinea, guinea_bissau, guyana, haiti, honduras, hungary, iceland, india, indonesia, iran, iraq, israel, italy, ivory_coast, jamaica, japan, jordan, kenya, kuwait, laos, lebanon, lesotho, liberia, libya, liechtenstein, luxembourg, malagasy, malawi, malaysia, maldives, mali, malta, mauritania, mauritius, mexico, monaco, mongolia, morocco, mozambique, nepal, netherlands, new_zealand, nicaragua, niger, nigeria, north_korea, norway, oman, pakistan, panama, papua_new_guinea, paraguay, peru, philippines, poland, portugal, qatar, romania, rwanda, san_marino, saudi_arabia, senegal, seychelles, sierra_leone, singapore, somalia, south_africa, south_korea, south_yemen, soviet_union, spain, sri_lanka, sudan, surinam, swaziland, sweden, switzerland, syria, taiwan, tanzania, thailand, togo, tonga, trinidad_and_tobago, tunisia, turkey, uganda, united_arab_emirates, united_kingdom, united_states, upper_volta, uruguay, venezuela, vietnam, west_germany, western_samoa, yemen, yugoslavia, zaire, zambia, zimbabwe], D), borders(D, B)), 4), 156^ (card([afghanistan, albania, algeria, andorra, angola, argentina, australia, austria, bahamas, bahrain, bangladesh, barbados, belgium, belize, bhutan, bolivia, botswana, brazil, bulgaria, burma, burundi, cambodia, cameroon, canada, central_african_republic, chad, chile, china, colombia, congo, costa_rica, cuba, cyprus, czechoslovakia, dahomey, denmark, djibouti, dominican_republic, east_germany, ecuador, egypt, eire, el_salvador, equatorial_guinea, ethiopia, fiji, finland, france, french_guiana, gabon, gambia, ghana, greece, grenada, guatemala, guinea, guinea_bissau, guyana, haiti, honduras, hungary, iceland, india, indonesia, iran, iraq, israel, italy, ivory_coast, jamaica, japan, jordan, kenya, kuwait, laos, lebanon, lesotho, liberia, libya, liechtenstein, luxembourg, malagasy, malawi, malaysia, maldives, mali, malta, mauritania, mauritius, mexico, monaco, mongolia, morocco, mozambique, nepal, netherlands, new_zealand, nicaragua, niger, nigeria, north_korea, norway, oman, pakistan, panama, papua_new_guinea, paraguay, peru, philippines, poland, portugal, qatar, romania, rwanda, san_marino, saudi_arabia, senegal, seychelles, sierra_leone, singapore, somalia, south_africa, south_korea, south_yemen, soviet_union, spain, sri_lanka, sudan, surinam, swaziland, sweden, switzerland, syria, taiwan, tanzania, thailand, togo, tonga, trinidad_and_tobago, tunisia, turkey, uganda, united_arab_emirates, united_kingdom, united_states, upper_volta, uruguay, venezuela, vietnam, west_germany, western_samoa, yemen, yugoslavia, zaire, zambia, zimbabwe], 156), ratio(4, 156, E)))))), qplan((answer([F, L]):-ocean(F), H^ (setof(G, country(G), H), J^ (numberof(I, (one_of(H, I), borders(I, F)), J), K^ (card(H, K), ratio(J, K, L)))))), answers([[arctic_ocean, 2.5641025641025643]])],[time(0.0020000000000000018)]).
 must_test_80([what, countries, are, there, in, europe, ?], [sent([what, countries, are, there, in, europe, ?]), parse(whq(feature&place&country-B, s(np(3+pl, np_head(int_det(feature&place&country-B), [], country), []), verb(be, active, pres+fin, [], pos), [void], [pp(prep(in), np(3+sg, name(europe), []))]))), sem((answer([A]):-country(A), in(A, europe))), qplan((answer([A]):-in(A, europe), {country(A)})), answers([albania, andorra, austria, belgium, bulgaria, cyprus, czechoslovakia, denmark, east_germany, eire, finland, france, greece, hungary, iceland, italy, liechtenstein, luxembourg, malta, monaco, netherlands, norway, poland, portugal, romania, san_marino, spain, sweden, switzerland, united_kingdom, west_germany, yugoslavia])],[time(0.0010000000000000009)]).
 
+:-export(call_in_banner/2).
+call_in_banner(U,Call):- p2(begin:U),call_cleanup(Call,p2(end:U)).
+
 :-export(t2/0).
 t2:- with_assertions(tracing80,with_no_assertions(thlocal:old_text,with_no_assertions(thglobal:use_cyc_database,forall(must_test_80(U,R,O),t2_process_run_diff(report,U,R,O))))).
 
@@ -134,37 +137,38 @@ chat80 :- with_assertions(tracing80,
 % :- decl_mpred_hybrid(person/1).    
 
 % :- list('newg.pl').
-:- ensure_loaded((chat80/xgrun)).	% XG runtimes
-% :- ensure_loaded((chat80/newg)).		% clone + lex
+:- include((chat80/xgrun)).	% XG runtimes
+% :- include((chat80/newg)).		% clone + lex
 
 % :- retract(thlocal:into_form_code).
 
-:- ensure_loaded((chat80/clotab)).	% attachment tables
-:- ensure_loaded((chat80/newdict)).	% syntactic dictionary
-:- ensure_loaded((chat80/slots)).	% fits arguments into predicates
-:- ensure_loaded((chat80/scopes)).	% quantification and scoping
-% :- ensure_loaded((chat80/templa)).	% semantic dictionary
-:- ensure_loaded((chat80/qplan)).	% query planning
-:- ensure_loaded((chat80/talkr)).	% query evaluation
-% :- ensure_loaded((chat80/ndtabl)).	% relation info.
-:- ensure_loaded((chat80/readin)).	% sentence input
-:- ensure_loaded((chat80/ptree)).	% print trees
-:- ensure_loaded((chat80/aggreg)).	% aggregation operators
+:- include((chat80/clotab)).	% attachment tables
+:- include((chat80/newdict)).	% syntactic dictionary
+
+:- include((chat80/slots)).	% fits arguments into predicates
+:- include((chat80/scopes)).	% quantification and scoping
+% :- include((chat80/templa)).	% semantic dictionary
+:- include((chat80/qplan)).	% query planning
+:- include((chat80/talkr)).	% query evaluation
+% :- include((chat80/ndtabl)).	% relation info.
+:- include((chat80/readin)).	% sentence input
+:- include((chat80/ptree)).	% print trees
+:- include((chat80/aggreg)).	% aggregation operators
 
 
-:- ensure_loaded((chat80/world0)).     	% data base
-% :- ensure_loaded((chat80/world0)).     	% data base
+:- include((chat80/world0)).     	% data base
+% :- include((chat80/world0)).     	% data base
 
 /*
-:- ensure_loaded((chat80/rivers)).
-:- ensure_loaded((chat80/cities)).
-:- ensure_loaded((chat80/countries)).
-:- ensure_loaded((chat80/contain)).
-:- ensure_loaded((chat80/borders)).
+:- include((chat80/rivers)).
+:- include((chat80/cities)).
+:- include((chat80/countries)).
+:- include((chat80/contain)).
+:- include((chat80/borders)).
 */
 
 % testing
-:- ensure_loaded((chat80/newtop)).	% top level
+:- include((chat80/newtop)).	% top level
 
 
 :-export(test_chat80_regressions/0).
@@ -176,9 +180,11 @@ test_chat80_regressions:- time((t2,t11)).
 
 user:mud_test(chat80_regressions,test_chat80_regressions).
 
-%:- context_module(CM),module_predicates_are_exported(CM).
+:- context_module(CM),module_predicates_are_exported(CM).
 :- context_module(CM),quiet_all_module_predicates_are_transparent(CM).
 % :- context_module(CM),module_property(CM, exports(List)),moo_hide_show_childs(List).
 
-% :- ensure_loaded(logicmoo('vworld/moo_footer.pl')).
+% :- include(logicmoo('vworld/moo_footer.pl')).
 :-kill_talk_db_bad_verbs.
+
+

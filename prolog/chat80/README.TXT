@@ -33,7 +33,7 @@ lex.xg
 clotab.pl
 	Table of normal form modifier attachments
 
-xgproc.pl
+tlxgproc.pl
 	This is a preprocessor to translate XGs into Prolog.
 	If needed, it should be compiled separately. It defines
 	the following evaluable predicates:-
@@ -51,7 +51,7 @@ newg.pl
 	the following:-
  
 		prolog
-		[xgproc].
+		[tlxgproc].
 		+ 'clone.xg'.
 		+ 'lex.xg'.
 		list('newg.pl').

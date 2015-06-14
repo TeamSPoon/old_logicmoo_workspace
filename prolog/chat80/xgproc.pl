@@ -3,25 +3,25 @@
  :- op(1001,xfy,...).
 :- op(1200,xfx,'--->').
 
-:-thread_local xgproc:current_xg_module/1.
-:-thread_local xgproc:current_xg_filename/1.
+:-thread_local tlxgproc:current_xg_module/1.
+:-thread_local tlxgproc:current_xg_filename/1.
 :-dynamic user:current_xg_pred/4.
 :-multifile user:current_xg_pred/4.
 
 
-abolish_xg(Prop):- ignore(xgproc:current_xg_module(M)),
+abolish_xg(Prop):- ignore(tlxgproc:current_xg_module(M)),
   doall((user:current_xg_pred(M,F,N,Props),member(Prop,Props),member(Prop,Props),
                  ignore((memberchk(xg_pred=P,Props),dmsg(abolising(current_xg_pred(M,F,N,Props))),predicate_property(P,number_of_clauses(NC)),flag(xg_assertions,A,A-NC))),
                  abolish(F,N),retractall(user:current_xg_pred(M,F,N,_)))).
 
-new_pred(P):- must(xgproc:current_xg_module(M)),new_pred(M,P).
+new_pred(P):- must(tlxgproc:current_xg_module(M)),new_pred(M,P).
 new_pred(M,P0):- functor(P0,F,A),functor(P,F,A),new_pred(M,P,F,A),!.
 
 new_pred(M,_,F,A):- user:current_xg_pred(M,F,A,_),!.
 new_pred(_,P,_,_):- recorded(P,'xg.pred',_), !.
 new_pred(M,P,F,A) :-   
    dynamic_multifile_exported(M:F/A),
-   findall(K=V,(((K=xg_source,xgproc:current_xg_filename(V));(prolog_load_context(K,V),not(member(K,[stream,directory,variable_names])));((seeing(S),member(G,[(K=file,P=file_name(V)),(K=position,P=position(V))]),G,stream_property(S,P))))),Props),
+   findall(K=V,(((K=xg_source,tlxgproc:current_xg_filename(V));(prolog_load_context(K,V),not(member(K,[stream,directory,variable_names])));((seeing(S),member(G,[(K=file,P=file_name(V)),(K=position,P=position(V))]),G,stream_property(S,P))))),Props),
    assert_if_new(user:current_xg_pred(M,F,A,[xg_source=F,xg_ctx=M,xg_fa=(F/A),xg_pred=P|Props])),
    recordz(P,'xg.pred',_),
    recordz('xg.pred',P,_).
@@ -29,7 +29,8 @@ new_pred(M,P,F,A) :-
 is_file_ext(Ext):-prolog_load_context(file,F),file_name_extension(_,Ext,F).
 :-thread_local tlxgproc:do_xg_process_te/0.
 :-export(xg_process_te_clone/5).
-processing_xg :- (tlxgproc:do_xg_process_te;  is_file_ext(xg)),!.
+
+processing_xg :- is_file_ext(xg). %% ;tlxgproc:do_xg_process_te,!.
 
 xg_process_te_clone(L,R,_Mode,P,Q):- expandlhs(L,S0,S,H0,H,P), expandrhs(R,S0,S,H0,H,Q).  %new_pred(P),usurping(Mode,P),!.
 
@@ -37,22 +38,24 @@ xg_process_te_clone(L,R,_Mode,P,Q):- expandlhs(L,S0,S,H0,H,P), expandrhs(R,S0,S,
 xg_process_te_clone((H ... T --> R),Mode,((P :- Q))) :- !, xg_process_te_clone((H ... T),R,Mode,P,Q).
 xg_process_te_clone((L --> R),Mode,((P :- Q))) :- !,xg_process_te_clone(L,R,Mode,P,Q).
 
-user:term_expansion(In,Out):- compound(In),functor(In,'-->',_), processing_xg,!, must(xg_process_te_clone(In,+,Out)).
-user:term_expansion((H ... T ---> R),((P :- Q))) :- processing_xg,!,must( xg_process_te_clone((H ... T),R,+,P,Q)).
-user:term_expansion((L ---> R),((P :- Q))) :- processing_xg,!,must(xg_process_te_clone(L,R,+,P,Q)).
+chat80_term_expansion(In,Out):- compound(In),functor(In,'-->',_),  must(xg_process_te_clone(In,+,Out)).
+chat80_term_expansion((H ... T ---> R),((P :- Q))) :- must( xg_process_te_clone((H ... T),R,+,P,Q)).
+chat80_term_expansion((L ---> R),((P :- Q))) :- must(xg_process_te_clone(L,R,+,P,Q)).
+
+system:term_expansion(H,O):- processing_xg,chat80_term_expansion(H,O).
 
 
-load_plus_xg_file(CM,F) :- with_assertions(xgproc:current_xg_module(CM),with_assertions(tlxgproc:do_xg_process_te,ensure_loaded(F))),!.
+load_plus_xg_file(CM,F) :- with_assertions(tlxgproc:current_xg_module(CM),with_assertions(tlxgproc:do_xg_process_te,ensure_loaded(F))),!.
 % was +(F).
 load_plus_xg_file(CM,F) :-
    see(user),
-   with_assertions(xgproc:current_xg_module(CM),consume0(F,+)),
+   with_assertions(tlxgproc:current_xg_module(CM),consume0(F,+)),
    seen.
 
 % was -(F).
 load_minus_xg_file(CM,F) :-
    see(user),
-   with_assertions(xgproc:current_xg_module(CM),consume0(F,-)),
+   with_assertions(tlxgproc:current_xg_module(CM),consume0(F,-)),
    seen.
 
 
@@ -64,7 +67,7 @@ consume0(F0,Mode) :-
     absolute_file_name(F0,F),
    see(F),
    abolish_xg(xg_source=F),
-   with_assertions(xgproc:current_xg_filename(F),tidy_consume(F,Mode)),
+   with_assertions(tlxgproc:current_xg_filename(F),tidy_consume(F,Mode)),
  ( (seeing(User2),User2=user), !; seen ),
    see(Old),
 %   statistics(heap,[H,Hf]),
@@ -114,7 +117,7 @@ xg_process(P,Mode) :-
    new_pred(P),
    xg_assertz(P).
 
-xg_assertz(P):- flag(xg_assertions,A,A+1),xgproc:current_xg_module(M),M:assertz(P).
+xg_assertz(P):- flag(xg_assertions,A,A+1),tlxgproc:current_xg_module(M),M:assertz(P).
 
 xg_complete(_F) :-
    recorded('xg.usurped',P,R0), erase(R0),
@@ -249,12 +252,15 @@ list_clauses :-
 
 list_clauses.
 
+:-export(load_xg/0).
+
 load_xg:-
-  load_plus_xg_file('clone.xg'),
-  load_plus_xg_file('lex.xg'),
+  load_plus_xg_file(parser_chat80,'clone.xg'),
+  load_plus_xg_file(parser_chat80,'lex.xg'),
   compile_xg_clauses.
 
 go_xg :- load_xg, xg_listing('newg.pl').
 
 
 end_of_file.
+

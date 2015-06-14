@@ -40,6 +40,8 @@
 :-discontiguous(noun_form_db_0/3).
 :-discontiguous(loc_pred_prep_db/3).
 
+% :- ensure_loaded(library(dra/tabling3/swi_toplevel)).
+
 
 :- dynamic_multifile_exported((contains0/2,country/8,city/3,borders/2,in_continent/2)).
 %:- dynamic_multifile_exported contains/2.
@@ -91,16 +93,16 @@ plt:- thlocal:usePlTalk,!.
 plt2:- thlocal:useAltPOS,!.
 % plt:- thlocal:chat80_interactive,!.
 
-no_loop_local(Call):-loop_check_module(chat80,Call,fail).
-not_violate(NotCCW,POS):-loop_check_module(chat80,(ccw_db(NotCCW,CC)->CC=POS;true),fail).
+loop_check_chat80(Call):-loop_check(Call,fail).
+not_violate(NotCCW,POS):-loop_check_chat80((ccw_db(NotCCW,CC)->CC=POS;true),fail).
 
 :-meta_predicate(plt_call(+,+,0)).
 :-meta_predicate(plt2_call(+,+,0)).
 % plt_call(Goal):-plt,!,no_repeats(Goal),dmsg(succeed_plt_call(Goal)).
 plt_call(NotCCW,_POS,_Goal):-member(NotCCW,['?','river','borders']),!,fail.
-plt_call(NotCCW,POS,Goal):-plt,!,loop_check_module(chat80,no_repeats(Goal)),not_violate(NotCCW,POS),must(once(not_violate(NotCCW,POS);(dmsg(succeed_plt_call(NotCCW,POS,Goal)),!,fail))).
+plt_call(NotCCW,POS,Goal):-plt,!,loop_check_chat80(no_repeats(Goal)),not_violate(NotCCW,POS),must(once(not_violate(NotCCW,POS);(dmsg(succeed_plt_call(NotCCW,POS,Goal)),!,fail))).
 plt2_call(NotCCW,_POS,_Goal):-member(NotCCW,['?','river','borders']),!,fail.
-plt2_call(NotCCW,POS,Goal):-plt2,!,loop_check_module(chat80,no_repeats(Goal)),not_violate(NotCCW,POS),must(once(not_violate(NotCCW,POS);(dmsg(succeed_plt_call(NotCCW,POS,Goal)),!,fail))).
+plt2_call(NotCCW,POS,Goal):-plt2,!,loop_check_chat80(no_repeats(Goal)),not_violate(NotCCW,POS),must(once(not_violate(NotCCW,POS);(dmsg(succeed_plt_call(NotCCW,POS,Goal)),!,fail))).
 
 adverb_db(Quickly):-plt_call(Quickly,'Adverb',(talk_db(adv,Quickly))).
 
@@ -471,6 +473,13 @@ noun_plu_db(rivers,river).
 noun_plu_db(seas,sea).
 noun_plu_db(seamasses,seamass).
 
+
+% ==========================================================
+% meetsForm(String,CycWord,Form)
+% ==========================================================
+meetsForm80(String,RootString,form80(MainPlusTrans,main+tv)):-!,fail,nop((String,RootString,form80(MainPlusTrans,main+tv))).
+
+
 noun_plu_db(PluralString,SingularString):- meetsForm80(PluralString,SingularString,noun+plural).
 noun_sin_db(Singular):- meetsForm80(Singular,Singular,noun+singular).
 noun_sin_db(Singular):-noun_plu_db(_,Singular).
@@ -575,17 +584,17 @@ country(iran,middle_east,33,-53,636363,32001000,tehran,rial).
 % =================================================================
 
 
-noun_plu_db(types,type).
-subject_LF(thing,type,feature&type&_,X,type(X)).
+noun_plu_db(types,tSet).
+subject_LF(thing,tSet,feature&tSet&_,X,tSet(X)).
 noun_plu_db(formattypes,formattype).
 subject_LF(thing,formattype,feature&formattype&_,X,formattype(X)).
 
-subject_LF(thing,Type,feature&Type&_,X,isa(X,Type)):-plt,type(Type).
+subject_LF(thing,Type,feature&Type&_,X,isa(X,Type)):-plt,tSet(Type).
 
 noun_plu_db(TS,T):- noun_plu_db_via_types(TS,T).
 
-subject_LF(thing,Type,TYPEMASK,X,isa(X,Type)):- atom(Type), plt_call(Type,'Noun',((loop_check_module(chat80,type(Type)),atom(Type),gen_typemask(Type,TYPEMASK)))).
-subject_LF(restriction,Type,TYPEMASK,X,isa(X,Type)):- atom(Type), plt_call(Type,'Noun',((loop_check_module(chat80,type(Type)),atom(Type),gen_typemask(Type,TYPEMASK)))).
+subject_LF(thing,Type,TYPEMASK,X,isa(X,Type)):- atom(Type), plt_call(Type,'Noun',((loop_check_chat80(tSet(Type)),atom(Type),gen_typemask(Type,TYPEMASK)))).
+subject_LF(restriction,Type,TYPEMASK,X,isa(X,Type)):- atom(Type), plt_call(Type,'Noun',((loop_check_chat80(tSet(Type)),atom(Type),gen_typemask(Type,TYPEMASK)))).
 subject_LF(restriction,Type,TYPEMASK,X,isa(X,Type)):- atom(Type), plt2, once(cw_db(Type,Adj)),Adj='Adjective',gen_typemask(Type,TYPEMASK).
 
 
@@ -595,7 +604,7 @@ gen_typemask(Type,feature&Type&_).
 gen_typemask(_,feature&_).
 
 
-noun_plu_db_via_types(TS,T):- maybe_noun_or_adj(T),maybe_noun_or_adj(TS), (atom(TS)->atom_concat(T,'s',TS);true),type(T),atom(T),atom_concat(T,'s',TS).
+noun_plu_db_via_types(TS,T):- maybe_noun_or_adj(T),maybe_noun_or_adj(TS), (atom(TS)->atom_concat(T,'s',TS);true),tSet(T),atom(T),atom_concat(T,'s',TS).
 maybe_noun_or_adj(T):- var(T)->true;(atom(T),not_ccw(T)).
 
 % 
@@ -637,7 +646,7 @@ callDitrans(Verb,Prep,X1,Y1,Z1,verbPrep(subj:X1,Verb,Prep),verbPrep(o:Y1,Verb,Pr
 
 noun_plu_db(properties,property).
 subject_LF(thing,property,feature&mpred,X,objectProperty(X)).
-subj_obj_LF(property,property,feature&mpred,X,feature&type&_,Y, hasPropertyOrValue(Y,X)).
+subj_obj_LF(property,property,feature&mpred,X,feature&tSet&_,Y, hasPropertyOrValue(Y,X)).
 
 /* IS A SPECILIZATION OF A MPRED */
 
@@ -658,7 +667,7 @@ get_1st_order_functor(Pred,P):-functor_h(Pred,F),(is_2nd_order_holds(F)->((arg(1
 
 /* THAT IS HAD */
 /*
-subj_obj_LF(trans,have,feature&mpred,X,feature&type,Y,hasProperty(Y,X)).
+subj_obj_LF(trans,have,feature&mpred,X,feature&tSet,Y,hasProperty(Y,X)).
 verb_root_db(have).
 regular_pres_db(have).
 regular_past_db(had,have).
@@ -678,8 +687,8 @@ typeAssignableTo(Type,SomeType):-subclass_backchaing(Type,SomeType).
 typeAssignableTo(_Type,SomeType):-formattype(SomeType).
 
 
-%fact_always_true(isa(Type,type)):- clause(subject_LF(thing,Type,feature&_,_X,_),true).
-%fact_always_true(isa(Type,type)):- clause(subject_LF(restriction,Type,feature&_,_X,_),true).
+%fact_always_true(isa(Type,tSet)):- clause(subject_LF(thing,Type,feature&_,_X,_),true).
+%fact_always_true(isa(Type,tSet)):- clause(subject_LF(restriction,Type,feature&_,_X,_),true).
 
 
 type_allowed(feature&TYPEMASK,Type):-nonvar(TYPEMASK),!,type_allowed(TYPEMASK,Type),!.
@@ -739,7 +748,7 @@ adj_db(european,restr).
 not_ccw(ok(W)):-must(nonvar(W)),!,not_ccw(W),!.
 not_ccw(W):-not_ccw_db(W),!.
 not_ccw(W):-is_ccw_db(W),!,fail.
-not_ccw(W):-not(is_module_loop_checked(chat80,_)),!,show_call(not((ccw_db0(W,G),!,ground(G))) -> asserta(not_ccw_db(W)) ; ((asserta(is_ccw_db(W)),!,fail))),!.
+not_ccw(W):-not(tlbugger:ilc(_:'new_dict.pl':_)),!,show_call(not((ccw_db0(W,G),!,ground(G))) -> asserta(not_ccw_db(W)) ; ((asserta(is_ccw_db(W)),!,fail))),!.
 not_ccw(W):-not((ccw_db0(W,G),!,ground(G))),!.
 % closed class words
 ccw_db(W,C):-no_repeats(ccw_db0(W,C)).
@@ -754,13 +763,13 @@ ccw_db1(W,'Conjunction'):-no_repeats(W,partOfSpeech(_,'SubordinatingConjunction'
 ccw_db1(W,'Pronoun'):-no_repeats(W,cyckb_t('pronounStrings',_,W)).
 
 ccw_db2(W,'Preposition'):-no_repeats(W,talk_db(preposition,W)).
-ccw_db3(W,C):-ccw_db4(W,C),not(loop_check_module(chat80,adj_db(W,_))),not((ccw_db1(W,OTHER),OTHER\==C)).
+ccw_db3(W,C):-ccw_db4(W,C),not(loop_check_chat80(adj_db(W,_))),not((ccw_db1(W,OTHER),OTHER\==C)).
 
 
-obviously_verb(W,Pres+Part,Num+Plu,VPOS):-part==Part->true;(Pres==pres,Num==3,Plu==sg,VPOS\='Verb',not(loop_check_module(chat80,once(noun_plu_db(W,_)),fail))).
+obviously_verb(W,Pres+Part,Num+Plu,VPOS):-part==Part->true;(Pres==pres,Num==3,Plu==sg,VPOS\='Verb',not(loop_check_chat80(once(noun_plu_db(W,_)),fail))).
 
-ccw_db4(W,VPOS):-nonvar(W),v_db(W,_,PP,NumPlu,VPOS),once((loop_check_module(chat80,obviously_verb(W,PP,NumPlu,VPOS)))),!.
-ccw_db4(W,VPOS):-v_db(W,_,PP,NumPlu,VPOS),once(loop_check_module(chat80,obviously_verb(W,PP,NumPlu,VPOS))).
+ccw_db4(W,VPOS):-nonvar(W),v_db(W,_,PP,NumPlu,VPOS),once((loop_check_chat80(obviously_verb(W,PP,NumPlu,VPOS)))),!.
+ccw_db4(W,VPOS):-v_db(W,_,PP,NumPlu,VPOS),once(loop_check_chat80(obviously_verb(W,PP,NumPlu,VPOS))).
 
 compatible_pos_db(_MostLikley,_Wanted).
 
@@ -1003,11 +1012,11 @@ verb_LF(iv,flow,feature&river,X,flows(X,Y,Z), [slot(prep(into),feature&place&_,Z
 
 
 verb_root_db(Look):- clex_verb(_Formed,Look,_Iv,_Finsg).
-regular_pres_db(Look):-no_loop_local(verb_root_db(Look)).
+regular_pres_db(Look):- no_loop_check(verb_root_db(Look)).
 regular_past_db(Looked,Look):-clex_verb(Looked,Look,_Iv,pp).
 verb_form_db(Looks,Look,pres+fin,3+sg):- clex_verb(Looks,Look,_,finsg).
 verb_form_db(LookPL,Look,pres+fin,3+pl):- clex_verb(LookPL,Look,_,infpl).
-verb_form_db(Looking,Look,pres+part,_):- (atom(Looking)->atom_concat(Look,'ing',Looking);var(Looking)),no_loop_local(verb_root_db(Look)),atom(Look),atom_concat(Look,'ing',Looking).
+verb_form_db(Looking,Look,pres+part,_):- (atom(Looking)->atom_concat(Look,'ing',Looking);var(Looking)),no_loop_check(verb_root_db(Look)),atom(Look),atom_concat(Look,'ing',Looking).
 verb_type_db_0(Look,main+ITDV):- clex_verb(_Formed,Look,ITDV,_Finsg).
 verb_LF(_,Assign,feature&_,X,dbase_t(Assign,X,Y), [slot(prep(To),feature&_,Y,_,free)],_):- clex_verb(_Assigned, Assign, dv(To),_).
 verb_LF(_,Look,feature&_,X,dbase_t(Look,X,Y), [slot(prep(At),feature&_,Y,_,free)],_):- (tv_infpl(S,S);tv_finsg(S,S)),atomic_list_concat([Look,At],'-',S).

@@ -14,7 +14,7 @@
 
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 :- user:ensure_loaded(library(logicmoo/logicmoo_base)).
-:- asserta_if_new(thlocal:disable_mpred_term_expansions_locally/0).
+:- asserta(thlocal:disable_mpred_term_expansions_locally).
 
 :-multifile(user:type_action_info/3).
 :-multifile(user:agent_call_command/2).
@@ -103,9 +103,6 @@ set_pipeline_value(TID,Name:unique,V0):-
         true; flag(TID,OPs,1+OPs)),
         show_call(assertz_if_new(pipeline_value(TID,Name,V))).
 
-renumber_vars_from_0(kif(_),V,UV):-V=UV,!.
-renumber_vars_from_0(Name,V,UV):-unnumbervars(V,UV),rename_vars(UV,UV),numbervars(UV,0,_).
-
 set_pipeline_value(TID,Name,Values):- \+ is_worldlist_list(Values), is_list(Values),!,must(( foreach(member(V,Values),set_pipeline_value(TID,Name:unique,V)))).
 set_pipeline_value(TID,Name,Value):- is_worldlist_list(Value), !,must(set_pipeline_value(TID,Name:unique,Value)).
 
@@ -116,6 +113,11 @@ set_pipeline_value(TID,Name,V0):-
     ((copy_term(V,CV),clause(pipeline_value(TID,Name,V),true,Ref),clause(pipeline_value(TID,NameC,VC),true,Ref),(NameC:VC)=@=(Name:CV)) ->
         true; flag(TID,OPs,1+OPs)),       
         show_call(assertz(pipeline_value(TID,Name,V))).
+
+
+renumber_vars_from_0(kif(_),V,UV):-V=UV,!.
+renumber_vars_from_0(_,V,UV):-unnumbervars(V,UV),rename_vars(UV,UV),numbervars(UV,0,_).
+
 
 
 %% clear_pipeline(+TID:key)
@@ -178,7 +180,7 @@ show_pipeline:-forall(installed_converter(CNV),wdmsg(installed_converter(CNV))).
 :- dmsg(parser_all_start).
 
 % ================================================================================================
-%:- user:ensure_loaded(parser_chat80).
+:- user:ensure_loaded(parser_chat80).
 % ================================================================================================
 
 
@@ -222,7 +224,14 @@ show_pipeline:-forall(installed_converter(CNV),wdmsg(installed_converter(CNV))).
 % :- get_pos_tagger(I),jpl_set(I,is_DEBUG,'@'(false)).
 %:- user:ensure_loaded(parser_chart89).
 
+:- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc)).
+:- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_call_kb)).
+% ================================================================================================
+:- user:ensure_loaded(parser_e2c).
+% ================================================================================================
+
 /*
+
 % ================================================================================================
 :- user:ensure_loaded(parser_CURT).
 % ================================================================================================
@@ -242,3 +251,5 @@ show_pipeline:-forall(installed_converter(CNV),wdmsg(installed_converter(CNV))).
 :- dmsg(parser_all_complete).
 
 :- run_pipleine(acetext='All persons are happy.',[foo=_],O),wdmsg(O).
+
+:- retract(thlocal:disable_mpred_term_expansions_locally).

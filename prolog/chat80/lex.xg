@@ -1,7 +1,7 @@
 :- op(1001,xfy, ... ).
 :- op(1200,xfx,'--->').
 
-:-asserta(txgproc:do_xg_process_te).
+:-asserta(tlxgproc:do_xg_process_te).
 
 /* Parts of speech */
 /*
@@ -21,9 +21,9 @@ theText1(W1)---> {thlocal:old_text,!},[W1].
 theText1(Txt)---> [w(Txt,_)].
 
 theText1(W1,_CYCPOS)--->{thlocal:old_text,!},[W1]. % compatible_pos_db(CW,CYCPOS),cw_db(W1,CW)
-theText1(Txt,_CYCPOS)---> [w(Txt,_)].
+theText1(Txt,_CYCPOS)---> [w(Txt,_)]. 
 
-
+:- export(theText//1).
 theText(Text)---> {is_list(Text),!},theText_cl(Text).
 theText([W1])--->theText1(W1).
 theText([W1,W2])---> {!}, theText1(W1),theText1(W2).
@@ -143,5 +143,4 @@ loc_pred_prep(P,OFPREP) ---> theTextC(W,'Preposition',loc_pred_prep_db(W,P,OFPRE
 
 
 
-:-retract(txgproc:do_xg_process_te).
-
+:-retract(tlxgproc:do_xg_process_te).

@@ -1,14 +1,17 @@
 :- op(1001,xfy, ... ).
 :- op(1200,xfx,'--->').
 
-:-asserta(txgproc:do_xg_process_te).
 
+:- \+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))).
+:-asserta(tlxgproc:do_xg_process_te).
 
 sentence(S) ---> wh_question(S), (terminator(?);[]) .
 sentence(S) ---> yn_question(S), (terminator(?);[]) .
 sentence(S) ---> imperative(S), (terminator(!);[]) .
 % sentence(S) ---> declarative(S), terminator(.) .
 sentence(QS) ---> s(S,_),([Punct];[]),{punct_to_sent_type(Punct,S,QS)}.
+
+:-nortrace.
 
 punct_to_sent_type((.),S,decl(S)).
 punct_to_sent_type((!),S,decl(S)).
@@ -164,6 +167,8 @@ np_compls(common,Agmt,Case,Mods,Set0,Mask) --->
 /* Nuclear noun phrase */
 
 np_head0(nameOf(Name),3+sg,def+proper) ---> name(Name).
+
+:- style_check(-singleton).
 
 np_head0(np_head(Det,Adjs,Head),3+Number,Def+common) --->
    determiner(Det,Number,Def),
@@ -511,6 +516,6 @@ no_args_vt(iv).
 conj(conj(Conj,Ctx0), conj(Conj,Ctx),Left,Right, conj(Conj,Left,Right)) ---> 
    conj_list(Conj,Ctx0,Ctx).
 
-:-retract(txgproc:do_xg_process_te).
+:-retract(tlxgproc:do_xg_process_te).
 
 end_of_file.

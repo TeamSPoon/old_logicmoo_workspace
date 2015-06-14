@@ -90,8 +90,8 @@ control80(U):-with_assertions(thlocal:tracing80,control80(report,U)).
 
 :-dynamic_multifile_exported(control80/2).
 
-control80(Callback,NotList):-not(is_list(NotList)),to_word_list(NotList,List),NotList \=@= List,!,
-   control80(Callback,List).
+control80(Callback,NotList):-not(is_list(NotList)),to_word_list(NotList,List),NotList \=@= List,!,maplist(string_to_atom,List,ListIn),
+   control80(Callback,ListIn).
 
 control80(Callback,[bye,'.']) :- !,
    call(Callback,"Goodbye",'control80',!,call),
@@ -145,7 +145,9 @@ process_run(Callback,U,List,Time):-
   runtime(StartParse),   
   process_run(Callback,StartParse,U,List,Time),!.
 
+:-export(call_in_banner/2).
 call_in_banner(U,Call):- p2(begin:U),call_cleanup(Call,p2(end:U)).
+
 process_run(Callback,StartParse,U,List,Time):-    
     process_run_real(Callback,StartParse,U,List,Time) *-> true; process_run_unreal(Callback,StartParse,U,List,Time).
     
@@ -180,6 +182,9 @@ deepen_pos(Call):- one_must(deepen_pos_0(Call),with_assertions(thlocal:useAltPOS
 :-export(deepen_pos_0/1).
 :-meta_predicate(deepen_pos_0(0)).
 deepen_pos_0(Call):-one_must(Call,with_assertions(thlocal:usePlTalk,Call)).
+
+
+% any_to_string("How many countries are there?",X),splt_words(X,Y,Z),vars_to_ucase(Y,Z),maplist(call,Z)
 
 :-dynamic_multifile_exported(process_run_real/5).
 process_run_real(Callback,StartParse,UIn,[sent=(U),parse=(E),sem=(S),qplan=(QP),answers=(Results)],[time(WholeTime)]) :-
