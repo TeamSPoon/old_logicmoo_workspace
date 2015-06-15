@@ -286,4 +286,12 @@ show_pipeline:-forall(installed_converter(CNV),wdmsg(installed_converter(CNV))).
 
 :- run_pipleine(acetext='All persons are happy.',[foo=_],O),wdmsg(O).
 
+type(SET):-tSet(SET).
+
+:- debug.
+:- test_chat80_regressions.
+:- prolog.
+
 :- retract(thlocal:disable_mpred_term_expansions_locally).
+
+

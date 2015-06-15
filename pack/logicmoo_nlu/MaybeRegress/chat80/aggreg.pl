@@ -21,10 +21,10 @@
 */
 
 
-aggregate80(Fn,Set,Val) :-
+aggregate(Fn,Set,Val) :-
    dimensioned(Set), !,
    u_aggr(Fn,Set,Val).
-aggregate80(Fn,Set,Val) :-
+aggregate(Fn,Set,Val) :-
    i_aggr(Fn,Set,Val).
 
 i_aggr(average,Set,Val) :-

@@ -21,6 +21,8 @@
 |_________________________________________________________________________|
 
 */
+:- dynamic_multifile_exported((contains0/2,country/8,city/3,borders/2,in_continent/2)).
+%:- dynamic_multifile_exported contains/2.
 
 
 
@@ -1917,7 +1919,7 @@ nd(american,19,26).
 nd(area,51,51).
 nd(area,22,22,51).
 nd(asian,21,26).
-nd(aggregate80,103,3,100,51).
+nd(aggregate,103,3,100,51).
 nd(one_of,99,200,-99).
 nd(ratio,99,51,51,3).
 nd(card,99,100,3).

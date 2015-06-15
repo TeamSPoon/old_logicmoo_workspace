@@ -80,7 +80,7 @@ is_compl_case(#(0,_,_)).
 
 :- op(100,fx,?).
 
-portray(#(PP,Pred,Trace,Adv)) :-
+user:portray(#(PP,Pred,Trace,Adv)) :-
    portray_bit(pp,PP,S0,S1),
    portray_bit(pred,Pred,S1,S2),
    portray_bit(trace,Trace,S2,S3),

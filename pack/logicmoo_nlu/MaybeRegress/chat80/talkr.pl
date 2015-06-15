@@ -25,7 +25,7 @@
 :-op(359,xf,ject).
 
 write_tree(T):-
-   numbervars(T,1,_),
+   numbervars80(T,1,_),
    wt(T,0),
    fail.
 write_tree(_).

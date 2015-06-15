@@ -8,11 +8,9 @@ pack\prologmud\PrologMUD.vpj=20150615055723263
 pack\logicmoo_base\prolog\LogicmooBase.vpj=20150615055716059
 pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
 [TreeExpansion2]
-- pack\logicmoo_base\prolog\logicmoo\LogicmooBase.vpj
+- pack\logicmoo_base\prolog\LogicmooBase.vpj
+  + ailog2
   + aleph
-  - candc
-    + working
-  + circlemuddata
   + cltools
     + bin
     + t
@@ -40,6 +38,64 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
     + Interpreters
       + flux
     + lib
+  - logicmoo
+    + candc
+      + working
+    - mpred
+    + mpred_online
+    + osnark
+    + planner
+      + bkwld_pddl_parser
+      + Blocks_world
+      + domains
+        + failing_or_too_slow
+        + others
+        + sanity
+      + ipc2008-no-cybersec
+        + netben-opt
+          + crewplanning-numeric
+          + elevators-numeric
+          + elevators-strips
+          + openstacks-adl
+          + openstacks-numericadl
+          + openstacks-stripsneg
+          + pegsol-strips
+          + transport-numeric
+          + woodworking-numeric
+        + seq-opt
+          + elevators-strips
+          + openstacks-adl
+          + openstacks-strips
+          + parcprinter-strips
+          + pegsol-strips
+          + scanalyzer-strips
+          + sokoban-strips
+          + transport-strips
+          + woodworking-strips
+        + seq-sat
+          + elevators-strips
+          + openstacks-adl
+          + openstacks-strips
+          + parcprinter-strips
+          + pegsol-strips
+      + misc_planner
+      + orig_pddl_parser
+        + charts
+        + docs
+        + output
+        + test
+          + blocks
+          + elevators
+          + gripper
+          + hanoi
+      + Rakiduam07
+        + continuos
+        + socket_udp
+    - plarkc
+    + pttp
+    + swish_lib
+      + render
+    + util
   + MaLARea
     + bin
     + data
@@ -48,62 +104,8 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
       + malecop
   + mike
   + MIndiGolog0
-  - mpred
-  - mpred_online
-  + osnark
   + PKnows-0.9.9
     + vpdl
-  + planner
-    + bkwld_pddl_parser
-    + Blocks_world
-    - domains
-      + failing_or_too_slow
-      + others
-      + sanity
-    + ipc2008-no-cybersec
-      + netben-opt
-        + crewplanning-numeric
-        + elevators-numeric
-        + elevators-strips
-        + openstacks-adl
-        + openstacks-numericadl
-        + openstacks-stripsneg
-        + pegsol-strips
-        + transport-numeric
-        + woodworking-numeric
-      + seq-opt
-        + elevators-strips
-        + openstacks-adl
-        + openstacks-strips
-        + parcprinter-strips
-        + pegsol-strips
-        + scanalyzer-strips
-        + sokoban-strips
-        + transport-strips
-        + woodworking-strips
-      + seq-sat
-        + elevators-strips
-        + openstacks-adl
-        + openstacks-strips
-        + parcprinter-strips
-        + pegsol-strips
-    + misc_planner
-    + orig_pddl_parser
-      + charts
-      + docs
-      + output
-      + test
-        + blocks
-        + elevators
-        + gripper
-        + hanoi
-    + Rakiduam07
-      + continuos
-      + socket_udp
-  + plarkc
-  + pttp
-  + swish_lib
-    + render
   + thea2
     + apps
       + labelgen
@@ -130,233 +132,27 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
     + testfiles
     + tools
     + util
+  + theorist
   + trill
     + probabilistic
-  + ..\..\t
-  + \usr
-    + lib
-      + swi-prolog
-        + boot
-        + demo
-        + include
-          + sicstus
-          + Yap
-        + library
-          + chr
-          + clp
-            + clpq
-            + clpqr
-            + clpr
-          + cql
-          + dcg
-          + dialect
-            + ciao
-              + engine
-              + regtypes
-            + eclipse
-            + hprolog
-            + iso
-            + sicstus
-            + swi
-          + http
-            + web
-              + css
-              + icons
-          + pldoc
-          + semweb
-          + tipc
-          + unicode
-        + src-packs
-          + rtchecks\.git
-            + objects
-              + pack
-          + tidylog\.git
-            + objects
-              + pack
-          + trill\.git
-            + objects
-              + pack
-          + weblog\.git
-            + objects
-              + pack
-          + arouter
-            + examples
-            + prolog
-            + tests
-          + blog_core
-            + prolog
-              + bc
-                + public
-                  + css
-            + tests
-              + util
-          + dict_schema
-            + prolog
-            + tests
-          + docstore
-            + prolog
-            + tests
-          + function_expansion
-            + prolog
-          + interpolate
-            + prolog
-          + lambda
-            + prolog
-          + list_util
-            + prolog
-            + t
-          + markdown
-            + prolog
-              + md
-            + tests
-          + mavis
-            + prolog
-            + t
-          + quickcheck
-            + prolog
-            + t
-          + rtchecks
-            + examples
-            + prolog
-              + inliner
-              + rtchecks
-              + swi
-              + varnames
-            + tests
-          + simple_template
-            + prolog
-              + st
-            + tests
-          + smtp
-            + prolog
-          + sort_dict
-            + prolog
-            + tests
-          + swicli
-            + bin
-            + c
-              + Example4SWICLI
-                + obj
-                  + Debug
-                  + Release
-                + Properties
-              + SWICFFITests
-                + obj
-                  + Debug
-                  + Release
-                + Properties
-              + Swicli.Library
-                + mindtouch.reflection
-                  + Properties
-                + obj
-                  + Debug
-                  + Release
-                + Properties
-              + SWICLITestDLL
-                + obj
-                  + Debug
-                  + Release
-                + Properties
-              + swicli
-            + cffi-tests
-            + doc
-              + api_files
-            + lib
-              + amd64
-              + i386-linux
-              + i386-win32
-              + x64-win64
-              + x86_64-linux
-            + prolog
-          + tidylog
-            + prolog
-              + tidylog
-                + atom
-                + comment
-                + number
-            + t
-          + trill
-            + prolog
-          + type_check
-            + prolog
-          + typedef
-            + prolog
-          + weblog
-            + demo
-            + docs
-            + prolog
-              + assetsources
-              + debug_page
-              + formatting
-              + html_form
-              + identity
-                + login_prototype
-                  + docs
-                + stormpath
-              + info
-                + books
-                  + google
-                + buttons
-                + geocoding
-                  + google
-                + geohashing
-                + html
-                + maps
-                  + google
-                  + leaflet
-                + numbers
-                + stock
-                  + crox
-                + weather
-                  + geonames
-              + keys
-              + nav
-              + resources
-              + static
-                + css
-                + icons
-              + support
-              + widgets
-                + agents
-        + xpce
-          + prolog
-            + boot
-            + contrib
-              + rubik
-            + demo
-            + lib
-              + compatibility
-              + dialog
-              + doc
-              + draw
-              + emacs
-              + english
-              + http
-              + man
-              + math
-              + plot
-              + swi
-              + trace
-              + xref
-  - util
   + xray
   + yadlr
     + examples
       + iris
       + trains
     + pl
-- pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj
+- pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj
   + ace_in_gf
-    - docs
+    + docs
       + bib
       + d11_1
         + images
-    - grammars
-      - ace
+    + grammars
+      + ace
       + acewiki_aceowl
       + attempto
       + exclude
-    - lib
+    + lib
       + src
         + ace
         + api
@@ -405,8 +201,8 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
       + verbalizer
       + webservice
     + webapp
-      - src
-        - ch
+      + src
+        + ch
           + uzh
             + ifi
               + attempto
@@ -420,11 +216,11 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
       + war
         + WEB-INF
           + lib
-    - webclient
-  - ape
+    + webclient
+  + ape
     + examples
     + java
-      - src
+      + src
         + main
           + java
             + ch
@@ -441,175 +237,12 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
                     + ape
     + lexicon
     + logger
-    - parser
+    + parser
     + tests
       + testruns
-    - tools
+    + tools
     + utils
       + owlswrl
-  + CALL-SLT
-    + Core
-      + Regulus
-    + doc
-      + LiteDoc
-        + img
-      + LiteDocSphinx
-        + build
-          + doctrees
-          + html
-            + _sources
-            + _static
-              + css
-              + fonts
-              + js
-        + source
-          + _static
-      + NewCALLSLTWebsite
-        + img
-        + source
-      + Papers
-      + tmp
-    + Eng
-      + corpora
-        + vocab_spreadsheets_nov_2009
-      + doc
-      + GeneratedFiles
-      + GeneratedFilesCompilation
-      + GeneratedFilesStaging
-      + logfiles
-      + Multimedia
-      + Prolog
-      + recorded_wavfiles
-        + permanent
-      + Regulus
-      + scripts
-    + EngEng
-      + scripts
-      + TestResults
-    + EngInt
-      + scripts
-      + TestResults
-    + Eval
-      + Crowdsourcing
-        + Judging
-          + HTML
-          + Prolog
-      + Prolog
-      + wavfiles_for_judging
-    + GUI
-      + Flash
-        + 2.1
-          + badges
-          + de
-          + en
-          + unige
-            + holder
-            + issco
-            + spectrum
-          + zh-CN
-      + GeneratedFiles
-      + Images
-      + Prolog
-      + PrologBeansJava
-        + PrologBeansCALLSLT
-          + src
-            + prologBeansCALLSLT
-      + recorded_wavfiles
-      + scripts
-      + session_logfiles
-    + Int
-      + corpora
-      + GeneratedFiles
-      + Prolog
-      + Regulus
-      + scripts
-    + IntInt
-      + scripts
-    + javaGUI
-      + lib
-      + logs
-      + src
-        + gui
-          + transact
-        + img
-        + socket
-      + test
-        + gui
-          + transact
-        + inputFiles
-    + LiteContent
-      + bologna
-        + rendezvous
-          + doc
-          + grammars
-        + se_presenter
-          + doc
-          + grammars
-      + english_course
-        + english_course
-          + grammars
-          + multimedia
-          + scripts
-      + hello
-        + hello_course
-          + grammars
-          + multimedia
-          + scripts
-        + hello_world_course
-          + grammars
-      + pronunciation
-        + pronunciation
-          + doc
-          + grammars
-      + restaurant
-        + restaurant
-          + doc
-          + grammars
-          + multimedia
-            + helpfiles
-      + toy
-        + toy_english_course
-          + grammars
-          + scripts
-      + visual
-        + arithmetic_french
-          + grammars
-        + pokemon
-          + grammars
-          + multimedia
-        + pokemon_french
-          + grammars
-          + multimedia
-        + sounds
-          + grammars
-          + multimedia
-        + visual1
-          + grammars
-          + multimedia
-        + visual2
-          + grammars
-          + multimedia
-        + visual3
-          + grammars
-          + multimedia
-    + LiteMetadata
-    + Que
-      + corpora
-      + doc
-      + GeneratedFiles
-      + logfiles
-      + Prolog
-      + recorded_wavfiles
-      + scripts
-    + QueContent
-      + evaluation
-        + questionnaires
-      + red_cross
-        + questionnaires
-      + warmup
-        + questionnaires
-    + tmp
-      + SlateLearning
   + candc
     + bin
     + bin-old
@@ -667,7 +300,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
       + super_noquotes
       + super_questions
       + super_quotes
-    - src
+    + src
       + api
         + ccg
         + nlp
@@ -722,9 +355,9 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
       + main
       + prolog
         + boxer
-          - knowledge
+          + knowledge
           + lex
-        - lib
+        + lib
         + nutcracker
       + scripts
         + boxer
@@ -741,108 +374,12 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
           + js
     + working
   + chart89
-  - chat80
+  + chat80
   + CURT
     + bb0
     + bb1
     + bb2
-  + dra
-    + coind
-      + examples
-      + original
-    + doc
-    + general
-    + internal
-      + Bench
-        + aspclp
-        + clpfd
-        + prolog
-        + tabling
-      + doc
-        + dra
-      + tabling
-        + archive
-      + vanilla
-    + tabling
-      + examples
-        + LTL
-        + XSB
-    + tabling3
-      + Bench
-        + aspclp
-        + clpfd
-        + prolog
-        + tabling
-      + examples
-        + LTL
-        + XSB
-      + mttests
-        + benches
-          + anssub-benches
-          + answer_completion_benches
-          + petri
-          + prolog_benches
-            + consttest
-          + shared_benches
-          + synth_benches
-          + tab_benches
-        + negation_tests
-        + table_tests
-      + xsblib
-        + cmplib
-        + lib
-        + syslib
-      + xsbtests
-        + ai_tests
-        + attv_tests
-        + basic_tests
-        + benches
-          + prolog_benches
-          + synth_benches
-          + xmc
-        + cdf_tests
-          + cdftp_testdir
-          + ce_testdir
-          + check_testdir
-          + comp_testdir
-            + test
-            + test_0
-            + test_int
-            + testo1
-            + testo1_0
-          + comp_testdir2
-            + test
-            + testo1
-          + dl_testdir
-          + io_testdir
-          + type0_testdir
-        + compiler_tests
-        + constraint_tests
-        + delay_tests
-        + float_tests
-        + flora_tests
-          + apptests
-            + programs
-          + datafiles
-          + general_tests
-          + pending_bugs
-        + incremental_tests
-        + neg_tests
-        + ptq
-        + regmatch_tests
-        + retract_tests
-        + sem_tests
-          + CSH
-          + tests
-        + sub_table_tests
-        + sub_tests
-          + Data
-          + Programs
-        + table_tests
-        + wfs_tests
-  + OLD_logicmoo
-    + benchmarks
-    + prologTestFiles
+  + el_holds
   + Parser_SUPPLE
     + classes
       + shef
@@ -1372,7 +909,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
         + src
     + Prolog
       + CVS
-      - Misc
+      + Misc
         + CVS
       + SICStusPatches
         + 4.0.3
@@ -1545,22 +1082,6 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
         + logs
       + tkit_inout_text
       + trindikit4
-        + core
-          + CVS
-          + prolog
-            + CVS
-            + Datatypes
-              + CVS
-            + DefaultPrinters
-              + CVS
-              + latex
-                + CVS
-              + text
-                + CVS
-              + xml
-                + CVS
-            + Modules
-              + CVS
         + CVS
         + examples
           + CVS
@@ -1648,14 +1169,6 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
           + VcrPhone
             + OLD
       + trindikit4-0.1alpha
-        + core
-          + prolog
-            + Datatypes
-            + DefaultPrinters
-              + latex
-              + text
-              + xml
-            + Modules
         + examples
           + godis-basic
             + Agents
@@ -1871,465 +1384,6 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
       + patterns
       + sutime
       + tokensregex
-  + ~candc~build~
-    + ~gsoap2-code~\.xpce
-    + ~gsoap2-code~
-      + gsoap\.deps
-      + autom4te.cache
-      + gsoap
-        + src\.deps
-        + wsdl\.deps
-        + bin
-          + linux386
-          + macosx
-          + win32
-        + custom
-        + doc
-          + dom
-            + html
-          + httpda
-            + html
-          + uddi2
-            + html
-          + wsa
-            + html
-          + wsdd
-            + html
-          + wsrm
-            + html
-          + wsse
-            + html
-          + xml-rpc-json
-            + html
-        + extras
-        + import
-        + ios_plugin
-          + examples
-            + Calc
-              + build
-                + Calc.build
-                  + Calc.pbxindex
-                    + strings.pbxstrings
-                  + Debug-iphonesimulator
-                    + Calc.build
-                      + Objects-normal
-                        + i386
-                + Debug-iphonesimulator
-                  + Calc.app
-                  + Calc.app.dSYM
-                    + Contents
-                      + Resources
-                        + DWARF
-              + Calc.xcodeproj
-              + Classes
-            + GeoIPService
-              + build
-                + Debug-iphonesimulator
-                  + GeoIPService.app
-                  + GeoIPService.app.dSYM
-                    + Contents
-                      + Resources
-                        + DWARF
-                + GeoIPService.build
-                  + Debug-iphonesimulator
-                    + GeoIPService.build
-                      + Objects-normal
-                        + i386
-                  + GeoIPService.pbxindex
-                    + strings.pbxstrings
-              + Classes
-              + GeoIPService.xcodeproj
-          + ios_plugin
-            + docs
-              + html
-        + mod_gsoap
-          + gsoap_win
-            + isapi
-              + Div
-              + gsoap
-              + images
-              + samples
-                + calc
-                + dime
-            + wininet
-          + mod_gsoap-0.6
-            + apache_13
-              + ConsoleServer\.deps
-              + ConsoleServer
-                + foo\.deps
-                + foo
-              + example
-                + calculator
-              + mod_gsoap
-                + config
-            + apache_20
-        + Palm
-        + plugin
-        + samples
-          + chaining++\.deps
-          + chaining\.deps
-          + primes\.deps
-          + xml-rpc-json\.deps
-          + autotest
-            + databinding
-              + examples
-                + 6
-                  + 09
-                    + AllElement
-                    + AnyAttributeLax
-                    + AnyAttributeOtherLax
-                    + AnyAttributeOtherSkip
-                    + AnyAttributeOtherStrict
-                    + AnyAttributeSkip
-                    + AnyAttributeStrict
-                    + AnySimpleTypeAttribute
-                    + AnySimpleTypeElement
-                    + AnyTypeElement
-                    + AnyURIAttribute
-                    + AnyURIElement
-                    + AppinfoElement
-                    + AttributeDefault
-                    + AttributeElementNameClash
-                    + AttributeFixed
-                    + AttributeFormQualified
-                    + AttributeFormUnqualified
-                    + AttributeGroup
-                    + AttributeOptional
-                    + AttributeReference
-                    + AttributeReferenceUnqualified
-                    + AttributeRequired
-                    + AttributeTypeReference
-                    + AttributeTypeReferenceUnqualified
-                    + BareVector
-                    + Base64BinaryAttribute
-                    + Base64BinaryElement
-                    + BlockDefault
-                    + BooleanAttribute
-                    + BooleanElement
-                    + ByteAttribute
-                    + ByteElement
-                    + ByteSimpleTypePattern
-                    + ChameleonInclude
-                    + ChoiceChoice
-                    + ChoiceElement
-                    + ChoiceMaxOccursFinite
-                    + ChoiceMaxOccursUnbounded
-                    + ChoiceMinOccurs0
-                    + ChoiceMinOccursFinite
-                    + ChoiceSequence
-                    + ComplexTypeAll
-                    + ComplexTypeAnyAttribute
-                    + ComplexTypeAttribute
-                    + ComplexTypeAttributeExtension
-                    + ComplexTypeChoice
-                    + ComplexTypeConcrete
-                    + ComplexTypeOnlyAttributeGroup
-                    + ComplexTypeOnlyAttributes
-                    + ComplexTypeSequence
-                    + ComplexTypeSequenceChoice
-                    + ComplexTypeSequenceExtension
-                    + DateAttribute
-                    + DateElement
-                    + DateSimpleTypePattern
-                    + DateTimeAttribute
-                    + DateTimeElement
-                    + DecimalAttribute
-                    + DecimalElement
-                    + DecimalEnumerationType
-                    + DecimalSimpleTypeFractionDigits
-                    + DecimalSimpleTypePattern
-                    + DecimalSimpleTypeTotalDigits
-                    + DocumentationElement
-                    + DoubleAttribute
-                    + DoubleElement
-                    + DoubleEnumerationType
-                    + DoubleSimpleTypePattern
-                    + DurationAttribute
-                    + DurationElement
-                    + ElementDefault
-                    + ElementEmptyComplexType
-                    + ElementEmptySequence
-                    + ElementFixed
-                    + ElementFormQualified
-                    + ElementFormUnqualified
-                    + ElementGroup
-                    + ElementMaxOccurs1
-                    + ElementMaxOccursFinite
-                    + ElementMaxOccursUnbounded
-                    + ElementMinOccurs0
-                    + ElementMinOccurs0MaxOccursFinite
-                    + ElementMinOccurs0MaxOccursUnbounded
-                    + ElementMinOccurs1
-                    + ElementMinOccurs1MaxOccursUnbounded
-                    + ElementMinOccurs2MaxOccurs2
-                    + ElementMinOccurs2orMore
-                    + ElementMinOccursFinite
-                    + ElementReference
-                    + ElementReferenceUnqualified
-                    + ElementTypeDefaultNamespace
-                    + ElementTypeReference
-                    + ElementTypeReferenceUnqualified
-                    + ENTITIESAttribute
-                    + ENTITIESElement
-                    + ENTITYAttribute
-                    + ENTITYElement
-                    + ExtendedSequenceLax
-                    + ExtendedSequenceLaxAny
-                    + ExtendedSequenceLaxOther
-                    + ExtendedSequenceSkip
-                    + ExtendedSequenceSkipAny
-                    + ExtendedSequenceSkipOther
-                    + ExtendedSequenceStrict
-                    + ExtendedSequenceStrictAny
-                    + ExtendedSequenceStrictOther
-                    + ExtendedSimpleContent
-                    + ExtendedSimpleType
-                    + FinalDefault
-                    + FloatAttribute
-                    + FloatElement
-                    + FloatEnumerationType
-                    + FloatSimpleTypePattern
-                    + GDayAttribute
-                    + GDayElement
-                    + GDaySimpleTypePattern
-                    + GlobalAttribute
-                    + GlobalAttributeSimpleType
-                    + GlobalAttributeUnqualifiedType
-                    + GlobalComplexType
-                    + GlobalComplexTypeAbstract
-                    + GlobalComplexTypeBlock
-                    + GlobalComplexTypeEmptyExtension
-                    + GlobalElement
-                    + GlobalElementAbstract
-                    + GlobalElementAll
-                    + GlobalElementBlock
-                    + GlobalElementChoice
-                    + GlobalElementComplexTypeEmptyExtension
-                    + GlobalElementComplexTypeSequenceExtension
-                    + GlobalElementConcrete
-                    + GlobalElementDefault
-                    + GlobalElementFinal
-                    + GlobalElementSequence
-                    + GlobalElementSequenceAny
-                    + GlobalElementSimpleType
-                    + GlobalElementUnqualifiedType
-                    + GlobalSimpleType
-                    + GMonthAttribute
-                    + GMonthDayAttribute
-                    + GMonthDayElement
-                    + GMonthDaySimpleTypePattern
-                    + GMonthElement
-                    + GMonthSimpleTypePattern
-                    + GYearAttribute
-                    + GYearElement
-                    + GYearMonthAttribute
-                    + GYearMonthElement
-                    + GYearMonthSimpleTypePattern
-                    + GYearSimpleTypePattern
-                    + HexBinaryAttribute
-                    + HexBinaryElement
-                    + IDAttribute
-                    + IDElement
-                    + IdentifierName
-                    + IDREFAttribute
-                    + IDREFElement
-                    + IDREFSAttribute
-                    + IDREFSElement
-                    + Id
-                    + IntAttribute
-                    + IntegerAttribute
-                    + IntegerElement
-                    + IntegerEnumerationType
-                    + IntegerSimpleTypePattern
-                    + IntElement
-                    + IntEnumerationType
-                    + IntSimpleTypePattern
-                    + LanguageAttribute
-                    + LanguageElement
-                    + LanguageEnumerationType
-                    + List
-                    + LocalAttributeSimpleType
-                    + LocalElementComplexType
-                    + LocalElementSimpleType
-                    + LongAttribute
-                    + LongElement
-                    + LongEnumerationType
-                    + LongSimpleTypePattern
-                    + MaxOccurs1
-                    + MinOccurs1
-                    + MixedComplexContent
-                    + MixedContentType
-                    + NameAttribute
-                    + NameElement
-                    + NCNameAttribute
-                    + NCNameElement
-                    + NegativeIntegerAttribute
-                    + NegativeIntegerElement
-                    + NestedSequenceElementList
-                    + NillableElement
-                    + NillableOptionalElement
-                    + NMTOKENAttribute
-                    + NMTOKENElement
-                    + NMTOKENEnumerationType
-                    + NMTOKENSAttribute
-                    + NMTOKENSElement
-                    + NonIdentifierName
-                    + NonNegativeIntegerAttribute
-                    + NonNegativeIntegerElement
-                    + NonNegativeIntegerEnumerationType
-                    + NonNegativeIntegerSimpleTypePattern
-                    + NonPositiveIntegerAttribute
-                    + NonPositiveIntegerElement
-                    + NormalizedStringAttribute
-                    + NormalizedStringElement
-                    + NoTargetNamespace
-                    + NotMixed
-                    + NotNillableElement
-                    + NullEnumerationType
-                    + PositiveIntegerAttribute
-                    + PositiveIntegerElement
-                    + PositiveIntegerEnumerationType
-                    + PositiveIntegerSimpleTypePattern
-                    + PrecisionDecimal
-                    + QNameAttribute
-                    + QNameElement
-                    + QualifiedLocalAttributes
-                    + QualifiedLocalElements
-                    + RestrictedLength
-                    + RestrictedMaxExclusive
-                    + RestrictedMaxInclusive
-                    + RestrictedMaxLength
-                    + RestrictedMinExclusive
-                    + RestrictedMinInclusive
-                    + RestrictedMinLength
-                    + RestrictedStringMaxLength
-                    + RestrictedStringMinLength
-                    + RestrictedStringMinMaxLength
-                    + SchemaVersion
-                    + SequenceAnyStrict
-                    + SequenceChoice
-                    + SequenceElement
-                    + SequenceMaxOccurs1
-                    + SequenceMaxOccursFinite
-                    + SequenceMaxOccursUnbounded
-                    + SequenceMinOccurs0
-                    + SequenceMinOccurs0MaxOccursUnbounded
-                    + SequenceMinOccurs1
-                    + SequenceMinOccurs1MaxOccursUnbounded
-                    + SequenceMinOccursFinite
-                    + SequenceSequenceElement
-                    + SequenceSingleRepeatedElement
-                    + ShortAttribute
-                    + ShortElement
-                    + ShortEnumerationType
-                    + ShortSimpleTypePattern
-                    + SimpleContentAnyAttribute
-                    + SimpleTypeAttributes
-                    + SimpleTypeEnumerationType
-                    + SimpleTypeRenamed
-                    + SOAPEncodedArray
-                    + StringAttribute
-                    + StringElement
-                    + StringEnumerationType
-                    + StringSimpleTypePattern
-                    + SubstitutionGroup
-                    + TargetNamespace
-                    + TimeAttribute
-                    + TimeElement
-                    + TokenAttribute
-                    + TokenElement
-                    + TokenEnumerationType
-                    + TokenSimpleTypePattern
-                    + TypeSubstitutionUsingXsiType
-                    + UnionDateString
-                    + UnionMemberTypes
-                    + UnionSimpleAndMemberTypes
-                    + UnionSimpleDateString
-                    + Unique
-                    + UnqualifiedLocalAttributes
-                    + UnqualifiedLocalElements
-                    + UnsignedByteAttribute
-                    + UnsignedByteElement
-                    + UnsignedIntAttribute
-                    + UnsignedIntElement
-                    + UnsignedIntEnumerationType
-                    + UnsignedIntSimpleTypePattern
-                    + UnsignedLongAttribute
-                    + UnsignedLongElement
-                    + UnsignedLongEnumerationType
-                    + UnsignedLongSimpleTypePattern
-                    + UnsignedShortAttribute
-                    + UnsignedShortElement
-                    + UnsignedShortEnumerationType
-                    + UnsignedShortSimpleTypePattern
-          + calc
-          + calc++
-          + calc_vs2005
-            + calc_vs2005
-          + calc_xcode
-            + build
-              + calc_xcode.build
-                + calc_xcode.pbxindex
-                  + strings.pbxstrings
-                + Debug
-                  + calc_xcode.build
-            + calc_xcode.xcodeproj
-          + chaining
-          + chaining++
-          + databinding
-            + html
-          + dime
-          + dom
-          + factory
-          + factorytest
-          + gmt
-          + googleapi
-          + hello
-          + httpcookies
-          + link
-          + link++
-          + lu
-          + magic
-          + mashup
-          + mashup++
-          + mtom
-          + mtom-stream
-          + oneway
-          + oneway++
-          + polytest
-          + primes
-          + rest
-          + roll
-          + router
-          + rss
-          + ssl
-          + template
-          + udp
-          + varparam
-          + wcf
-            + Basic
-              + Http
-              + MessageSecurity
-              + TransportSecurity
-            + WS
-              + DualHttp
-          + webserver
-          + wsa
-          + wsrm
-          + wsse
-          + xml-rpc
-          + xml-rpc-json
-        + src
-        + Symbian
-        + TandemNonStop
-        + uddi2
-        + VisualStudio2005
-          + soapcpp2
-            + soapcpp2
-          + wsdl2h
-            + wsdl2h
-        + WS
-        + wsdl
 - pack\prologmud\PrologMUD.vpj
   - prolog
     - prologmud
@@ -2353,16 +1407,11 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
         + model
         + mudconsole
   - runtime
-    + cache
-      + rdf
-        + a2
-          + 8e
-        + de
-          + 0f
     + config-enabled
     + RDF-store
 - pack\PrologMUD_RT.vpj
   + games
+    + btepisode
     + circlemuddata
     + src_game_nani
       + web
@@ -2388,58 +1437,23 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
         + prolog
         + snd
     + src_game_wumpus
-  + hMUD
-    + bridge
-    + flashpolicyd_v0.6
-      + Perl_xinetd
-      + Python_init
-      + Python_xinetd
-      + Standalone
-    + fmud
-      + images
-    + swfobject
-      + src
 scroll:0
 [State]
 SCREEN: 1920 1080 538 217 1278 513 0 0 M 0 0 0 0 1494 592
-CWD: pack\MUD_PDDL\prolog\ape
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_hooks.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\pldata\tt0_00022_cycl.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.19418947 CL=63 LE=0 CX=62 CY=20 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_call.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_argtypes.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\pldata\el_holds.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=1 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=576 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.24849 CL=30 LE=0 CX=29 CY=16 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1318 416 -1 -1 N  WF=0 WT=15 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_call.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=124 BI=28 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1318 416 -1 -1 N  WF=0 WT=16 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\pldata\tt0_00022_cycl.pl"
-VIEW: LN=.19418947 CL=63 LE=0 CX=62 CY=20 WI=123 BI=24 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1318 416 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_hooks.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=122 BI=22 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1318 416 -1 -1 N  WF=0 WT=17 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\pldata\el_holds.pl"
-VIEW: LN=.1124575315 CL=134 LE=0 CX=133 CY=9 WI=121 BI=23 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1318 416 -1 -1 M  WF=0 WT=14 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_argtypes.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=125 BI=27 HT=0 HN=0 HF=0 HC=4
+CWD: pack\logicmoo_nlu\prolog\chat80
+BUFFER: BN="pack\logicmoo_nlu\prolog\parser_chat80.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1318 416 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_nlu\prolog\parser_chat80.pl"
+VIEW: LN=.29981 CL=1 LE=0 CX=0 CY=0 WI=106 BI=18 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_call.pl
-pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_hooks.pl
-pack\MUD_PDDL\prolog\pldata\tt0_00022_cycl.pl
-pack\MUD_PDDL\prolog\pldata\el_holds.pl
-pack\MUD_PDDL\prolog\pldata\el_holds_part_a.pl
-pack\MUD_PDDL\prolog\pldata\el_holds_part_t.pl
-pack\MUD_PDDL\prolog\pldata\el_holds_split.pl_ab
-pack\MUD_PDDL\prolog\pldata\split_el_holds.sh
 pack\MUD_PDDL\prolog\pldata\el_holds_split.pl_ak
+..\..\PrologMUD\.gitmodules
+..\..\PrologMUD\runtime\run_mud_server.pl
+..\..\PrologMUD\pack\logicmoo_nlu\pack.pl
+pack\logicmoo_nlu\prolog\parser_all.pl
+pack\logicmoo_base\prolog\logicmoo\plarkc\logicmoo_i_call_kb.pl
+pack\logicmoo_base\prolog\logicmoo\mpred\pfc.pl
+..\..\PrologMUD\clone_externals.sh
+pack\logicmoo_nlu\prolog\parser_chat80.pl

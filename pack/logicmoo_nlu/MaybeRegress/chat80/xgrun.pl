@@ -20,34 +20,25 @@
 
 */
 
-/* Print term as a tree */
+:- op(1001,xfy,...).
+:- op(1101,xfx,'--->').
+:- op(500,fx,+).
+:- op(500,fx,-).
 
-print_tree(T) :-
-   numbervars(T,1,_),
-   pt(T,0), nl, fail.
-print_tree(_).
 
-pt(A,I) :-
-   as_is(A), !,
-   tab(I), write(A), nl.
-pt([T|Ts],I) :- !,
-   pt(T,I),
-   pl(Ts,I).
-pt(T,I) :- !,
-   T=..[F|As],
-   tab(I), write(F), nl,
-   I0 is I+3,
-   pl(As,I0).
+terminal(T,S,S,x(_,terminal,T,X),X).
+terminal(T,[T|S],S,X,X) :-
+   gap(X).
 
-pl([],_) :- !.
-pl([A|As],I) :- !,
-   pt(A,I),
-   pl(As,I).
+gap(x(gap,_,_,_)).
+gap([]).
 
-as_is(V):-var(V).
-as_is('$VAR'(_)).
-as_is(A) :- atomic(A), !.
-as_is('_'(_)) :- !.
-as_is(X) :-
-   quote(X).
+virtual(NT,x(_,nonterminal,NT,X),X).
+
+phraseXG(P,A1,A2,A3,A4):-
+   safe_univ(P,[F|Args0]),
+   dtrace,
+   conc_gx(Args0,[A1,A2,A3,A4],Args),
+   Q=..[F|Args], 
+   call(Q).
 

@@ -19,25 +19,26 @@
 
 */
 
-clausify(question(V0,P),(answer80(V):-B)) :-
+clausify80(question(V0,P),(answer80(V):-B)) :-
    quantify(P,Quants,[],R0),
    split_quants(question(V0),Quants,HQuants,[],BQuants,[]),
    chain_apply(BQuants,R0,R1),
    head_vars(HQuants,B,R1,V,V0).
 
-clausify(assertion(V0,P),(assertion80(V):-B)) :-
+clausify80(assertion(V0,P),(assertion80(V):-B)) :- nonvar(P),
    quantify(P,Quants,[],R0),
    split_quants(question(V0),Quants,HQuants,[],BQuants,[]),
    chain_apply(BQuants,R0,R1),
    head_vars(HQuants,B,R1,V,V0).
 
+quantify(PQ,Above,Right,PQT):-var(PQ),dmsg(var_quantify(PQ,Above,Right,PQT)),!,fail.
 
-quantify(quant(Det,X,Head,Pred,Args,Y),Above,Right,true) :-
+quantify(quant(Det,X,Head,Pred,Args,Y),Above,Right,true) :- nonvar(Pred),
    close_tree(Pred,P2),
    quantify_args(Args,AQuants,P1),
    split_quants(Det,AQuants,Above,[Q|Right],Below,[]),
    pre_apply(Head,Det,X,P1,P2,Y,Below,Q).
-quantify(conj(Conj,LPred,LArgs,RPred,RArgs),Up,Up,P) :-
+quantify(conj(Conj,LPred,LArgs,RPred,RArgs),Up,Up,P) :-  nonvar(LPred),
    close_tree(LPred,LP0),
    quantify_args(LArgs,LQs,LP1),
    chain_apply(LQs,(LP0,LP1),LP),
@@ -49,7 +50,7 @@ quantify(pred(Subj,Op,Head,Args),Above,Right,P) :-
    quantify(Subj,SQuants,[],P0),
    quantify_args(Args,AQuants,P1),
    split_quants(Op,AQuants,Up,Right,Here,[]),
-   conc80(SQuants,Up,Above),
+   conc(SQuants,Up,Above),
    chain_apply(Here,(P0,Head,P1),P2),
    op_apply(Op,P2,P).
 quantify('`'(P),Q,Q,P).
@@ -66,10 +67,6 @@ head_vars([Quant|Quants],(P,R0),R,[X|V],V0) :-
 strip_types([],[]).
 strip_types([_-X|L0],[X|L]) :-
    strip_types(L0,L).
-
-conc80([],L,L).
-conc80([H|T],L,[H|R]) :- conc80(T,L,R).
-
 
 extract_var(quant(_,_-X,P,_-X),P,X).
 
@@ -102,7 +99,7 @@ pre_apply(apply(F,P0),Det,X,P1,P2,Y,
 pre_apply(aggr(F,Value,L,Head,Pred),Det,X,P1,P2,Y,Quants,
       quant(Det,X,
             (S^(setof(Range:Domain,P,S),
-                aggregate80(F,S,Value)),P2),Y)) :-
+                aggregate(F,S,Value)),P2),Y)) :-
    close_tree(Pred,R),
    complete_aggr(L,Head,(R,P1),Quants,P,Range,Domain).
 
@@ -182,7 +179,7 @@ split_quants(Det0,[Quant|Quants],Above,Above0,Below,Below0) :-
 
 compare_dets(Det0,Q,[quant(Det,X,P,Y)|Above],Above,Below,Below) :-
    open_quant(Q,Det1,X,P,Y),
-   governs(Det1,Det0), !,
+   governs_det(Det1,Det0), !,
    bubble(Det0,Det1,Det).
 compare_dets(Det0,Q0,Above,Above,[Q|Below],Below) :-
    lower(Det0,Q0,Q).
@@ -200,9 +197,9 @@ unit_det(lambda).
 unit_det(quant(_,_)).
 unit_det(det(_)).
 unit_det(question(_)).
-unit_det(id).
-unit_det(void).
-unit_det(not).
+unit_det(id(_Why)).
+unit_det(void(_Meaning)).
+unit_det(not(_Why)).
 unit_det(generic).
 unit_det(int_det(_)).
 unit_det(proportion(_)).
@@ -215,8 +212,8 @@ apply(proportion(_Type-V),_,X,P,Y,Q,
       S^(setof(X,P,S),
          N^(numberof(Y,(one_of(S,Y),Q),N),
             M^(card(S,M),ratio(N,M,V))))).
-apply(id,_,X,P,X,Q,(P,Q)).
-apply(void,_,X,P,X,Q,X^(P,Q)).
+apply(id(_Why),_,X,P,X,Q,(P,Q)).
+apply(void(_Meaning),_,X,P,X,Q,X^(P,Q)).
 apply(set,_,Index:X,P0,S,Q,S^(P,Q)) :-
    apply_set(Index,X,P0,S,P).
 apply(int_det(Type-X),Type,X,P,X,Q,(P,Q)).
@@ -238,8 +235,8 @@ quant_op(same,X,X,P,P).
 quant_op(Op,X,Y,P,X^(P,F)) :-
    quant_op(Op,X,Y,F).
 
-quant_op(not+more,X,Y,X=<Y).
-quant_op(not+less,X,Y,X>=Y).
+quant_op(not(_Why)+more,X,Y,X=<Y).
+quant_op(not(_Why)+less,X,Y,X>=Y).
 quant_op(less,X,Y,X<Y).
 quant_op(more,X,Y,X>Y).
 
@@ -252,31 +249,31 @@ all(each).
 all(any).
 
 some(a).
-some(the(sin)).
+some(the(sg)).
 some(some).
 
 apply_set([],X,true:P,S,setof(X,P,S)).
 apply_set([I|Is],X,Range:P,S,
       setof([I|Is]:V,(Range,setof(X,P,V)),S)).
 
-
-governs(Det,set(J)) :-
+governs_det(Det,_Det0):-must(nonvar(Det)),fail.
+governs_det(Det,set(J)) :-
    index_det(Det,I),
    I \== J.
-governs(Det0,Det) :-
+governs_det(Det0,Det) :-
    index_det(Det0,_),
  ( index_det(Det,_);
    Det=det(_);
    Det=quant(_,_)).
-governs(_,void).
-governs(_,lambda).
-governs(_,id).
-governs(det(each),question([_|_])).
-governs(det(each),det(each)).
-governs(det(any),not).
-governs(quant(same,wh(_)),Det) :-
+governs_det(_,void(_There)).
+governs_det(_,lambda).
+governs_det(_,id(_Why)).
+governs_det(det(each),question([_|_])).
+governs_det(det(each),det(each)).
+governs_det(det(any),not(_Why)).
+governs_det(quant(same,wh(_)),Det) :-
    weak(Det).
-governs(det(Strong),Det) :-
+governs_det(det(Strong),Det) :-
    strong0(Strong),
    weak(Det).
 
@@ -301,7 +298,7 @@ weak0(a).
 weak0(all).
 weak0(some).
 weak0(every).
-weak0(the(sin)).
+weak0(the(sg)).
 weak0(notall).
 
 lower(question(_),Q,quant(det(a),X,P,Y)) :-
@@ -315,10 +312,10 @@ setifiable(det(all)).
 % =================================================================
 % Operators (currently, identity, negation and 'and')
 
-op_apply(id,P,P).
-op_apply(not,P,\+P).
+op_apply(id(_Why),P,P).
+op_apply(not(_Why),P,\+P).
 
-bubble(not,det(any),det(every)) :- !.
+bubble(not(_Why),det(any),det(every)) :- !.
 bubble(_,D,D).
 
 

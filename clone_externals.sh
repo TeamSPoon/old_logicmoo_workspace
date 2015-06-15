@@ -11,7 +11,6 @@ if [ $# -eq 0 ]
 fi
 
 # must have at least
-git clone $GITRC https://github.com/TeamSPoon/MUD_Examples games/
 git clone $GITRC https://github.com/TeamSPoon/hMUD $MUDPACK/hMUD
 if [ ! -d /var/www/html/hmud/ ]; then
  sudo ln -s `pwd`/$MUDPACK/hMUD /var/www/html/hmud/
@@ -21,5 +20,6 @@ sudo adduser --gecos "PrologMUD User" --disabled-login --disabled-password prolo
 # very usefull for seeing what is going on
 git clone $GITRC https://github.com/TeamSPoon/ClioPatria $MUDPACK/ClioPatria
 git clone $GITRC https://github.com/TeamSPoon/swish $MUDPACK/swish
+# git clone $GITRC https://prologmoo.com/TeamSPoon/swish $MUDPACK/swish
 
 
