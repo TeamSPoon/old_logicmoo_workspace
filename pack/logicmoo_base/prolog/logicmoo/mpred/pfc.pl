@@ -43,7 +43,7 @@
 :- use_module(library('pldoc/doc_library')).
 
 */
-:- user:ensure_loaded(library(dra/tabling3/swi_toplevel)).
+% :- user:ensure_loaded(library(dra/tabling3/swi_toplevel)).
 
 second_order(_,_):-fail.
 

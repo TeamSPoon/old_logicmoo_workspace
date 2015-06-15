@@ -99,30 +99,22 @@ link_to_holds_list(Pred,TargetPred):-
          assertz_if_new((A:-B)))).
 
 /*
-cyckb_t(P,A1,A2,A3,A4,A5,A6,A7):- el_holds(P,A1,A2,A3,A4,A5,A6,A7,_,_).
 cyckb_t(P,A1,A2,A3,A4,A5,A6,A7):- t([P,A1,A2,A3,A4,A5,A6,A7]).
-cyckb_t(P,A1,A2,A3,A4,A5,A6):- el_holds(P,A1,A2,A3,A4,A5,A6,_,_).
 cyckb_t(P,A1,A2,A3,A4,A5,A6):- t([P,A1,A2,A3,A4,A5,A6]).
-cyckb_t(P,A1,A2,A3,A4,A5):-el_holds(P,A1,A2,A3,A4,A5,_,_).
 cyckb_t(P,A1,A2,A3,A4,A5):- t([P,A1,A2,A3,A4,A5]).
-cyckb_t(P,A1,A2,A3,A4):- el_holds(P,A1,A2,A3,A4,_,_).
 cyckb_t(P,A1,A2,A3,A4):- t([P,A1,A2,A3,A4]).
-cyckb_t(P,A1,A2,A3):- el_holds(P,A1,A2,A3,_,_).
 cyckb_t(P,A1,A2,A3):- t([P,A1,A2,A3]).
-cyckb_t(P,A1,A2):- el_holds(P,A1,A2,_,_).
 cyckb_t(P,A1,A2):- t([P,A1,A2]).
-cyckb_t(P,A1):- el_holds(P,A1,_,_).
 cyckb_t(P,A1):- t([P,A1]).
 */
 
 :-dynamic(el_holds_DISABLED_KB/0).
 :-export(el_holds_DISABLED_KB/0).
-
 :-asserta(el_holds_DISABLED_KB).
 
-:- meta_predicate(with_el_holds_enabled(o)).
+:- meta_predicate(with_el_holds_enabled(0)).
 with_el_holds_enabled(Goal):-with_no_assertions(el_holds_DISABLED_KB,Goal).
-:- meta_predicate(with_el_holds_disabled(o)).
+:- meta_predicate(with_el_holds_disabled(0)).
 with_el_holds_disabled(Goal):-with_assertions(el_holds_DISABLED_KB,Goal).
 
 %:- link_to_holds_DYNAMIC(cyckb_t,el_holds_DISABLED_KB).
