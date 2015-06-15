@@ -131,7 +131,9 @@ process_run(Callback,U,List,Time):-
   runtime(StartParse),   
   process_run(Callback,StartParse,U,List,Time),!.
 
+:-export(call_in_banner/2).
 call_in_banner(U,Call):- p2(begin:U),call_cleanup(Call,p2(end:U)).
+
 process_run(Callback,StartParse,U,List,Time):-    
     process_run_real(Callback,StartParse,U,List,Time) *-> true; process_run_unreal(Callback,StartParse,U,List,Time).
     
@@ -222,12 +224,14 @@ quote_amp(R) :-
 logic(S0,S) :-
    i_sentence(S0,S1),
    clausify80(S1,S2),
-   simplify(S2,S).
+   once(simplify(S2,S)),!.
 
 simplify(C,(P:-R)) :- !,
    unequalise(C,(P:-Q)),
    simplify(Q,R,true).
 
+simplify(C,C0,C1):-var(C),dmsg(var_simplify(C,C0,C1)),fail.
+simplify(C,C,R):-var(C),!,R=C.
 simplify(setof(X,P0,S),R,R0) :- !,
    simplify(P0,P,true),
    revand(R0,setof(X,P,S),R).

@@ -5,13 +5,13 @@
 :- ignore(( \+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 :-asserta(tlxgproc:do_xg_process_te).
 
+/* Sentences */
+
 sentence(S) ---> wh_question(S), (terminator(?);[]) .
 sentence(S) ---> yn_question(S), (terminator(?);[]) .
 sentence(S) ---> imperative(S), (terminator(!);[]) .
 % sentence(S) ---> declarative(S), terminator(.) .
 sentence(QS) ---> s(S,_),([Punct];[]),{punct_to_sent_type(Punct,S,QS)}.
-
-:-nortrace.
 
 punct_to_sent_type((.),S,decl(S)).
 punct_to_sent_type((!),S,decl(S)).

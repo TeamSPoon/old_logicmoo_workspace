@@ -115,6 +115,7 @@ user:agent_call_command(_Gent,chat80(StringM)):- chat80(StringM).
 % CHAT80 REPL
 % ===========================================================
 :-thread_local thlocal:chat80_interactive/0.
+:-export(chat80/0).
 chat80 :- with_assertions(tracing80,
            with_assertions(thlocal:chat80_interactive,
             with_no_assertions(thlocal:useOnlyExternalDBs,

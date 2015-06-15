@@ -29,7 +29,7 @@
 % :- include(logicmoo('vworld/moo_header.pl')).
 
 :- op(600,xfy,--).
-:- op(450,xfy,((:))).
+% :- op(450,xfy,((:))).
 :- op(400,xfy,((&))).
 :- op(300,fx,(('`'))).
 :- op(200,xfx,((--))).
@@ -37,8 +37,9 @@
 % :- register_module_type(utility).
 
 
-:- dynamic_multifile_exported moo:contains/2.
-:- dynamic_multifile_exported moo:trans/9.
+:- dynamic_multifile_exported((contains0/2,country/8,city/3,borders/2,in_continent/2)).
+:- dynamic_multifile_exported contains/2.
+:- dynamic_multifile_exported trans/9.
 :- dynamic_multifile_exported det/7.
 :- dynamic_multifile_exported sentence/5.
 :- dynamic_multifile_exported noun/6.
@@ -106,48 +107,48 @@ chat80 :- with_assertions(tracing80,
 :- asserta(thlocal:into_form_code).
 
 
-:- include(library(chat80/xgproc)).	% XG generator
+:- include((chat80/xgproc)).	% XG generator
 
-:- context_module(CM),load_plus_xg_file(CM,library(chat80/'clone.xg')).
-:- context_module(CM),load_plus_xg_file(CM,library(chat80/'lex.xg')).
+:- context_module(CM),load_plus_xg_file(CM,(chat80/'clone.xg')).
+:- context_module(CM),load_plus_xg_file(CM,(chat80/'lex.xg')).
 
 :- compile_xg_clauses.
-:- xg_listing('newg.pl').
+% :- xg_listing('newg.pl').
 
 % :- decl_mpred_hybrid(person/1).    
 
 % :- list('newg.pl').
-:- include(library(chat80/xgrun)).	% XG runtimes
-% :- include(library(chat80/newg)).		% clone + lex
+:- include((chat80/xgrun)).	% XG runtimes
+% :- include((chat80/newg)).		% clone + lex
 
 % :- retract(thlocal:into_form_code).
 
-:- include(library(chat80/clotab)).	% attachment tables
-:- include(library(chat80/newdict)).	% syntactic dictionary
-:- include(library(chat80/slots)).	% fits arguments into predicates
-:- include(library(chat80/scopes)).	% quantification and scoping
-% :- include(library(chat80/templa)).	% semantic dictionary
-:- include(library(chat80/qplan)).	% query planning
-:- include(library(chat80/talkr)).	% query evaluation
-% :- include(library(chat80/ndtabl)).	% relation info.
-:- include(library(chat80/readin)).	% sentence input
-:- include(library(chat80/ptree)).	% print trees
-:- include(library(chat80/aggreg)).	% aggregation operators
+:- include((chat80/clotab)).	% attachment tables
+:- include((chat80/newdict)).	% syntactic dictionary
+:- include((chat80/slots)).	% fits arguments into predicates
+:- include((chat80/scopes)).	% quantification and scoping
+% :- include((chat80/templa)).	% semantic dictionary
+:- include((chat80/qplan)).	% query planning
+:- include((chat80/talkr)).	% query evaluation
+% :- include((chat80/ndtabl)).	% relation info.
+:- include((chat80/readin)).	% sentence input
+:- include((chat80/ptree)).	% print trees
+:- include((chat80/aggreg)).	% aggregation operators
 
 
-:- include(library(chat80/world0)).     	% data base
-% :- ensure_loaded(library(chat80/world0)).     	% data base
+:- include((chat80/world0)).     	% data base
+% :- ensure_loaded((chat80/world0)).     	% data base
 
 /*
-:- include(library(chat80/rivers)).
-:- include(library(chat80/cities)).
-:- include(library(chat80/countries)).
-:- include(library(chat80/contain)).
-:- include(library(chat80/borders)).
+:- include((chat80/rivers)).
+:- include((chat80/cities)).
+:- include((chat80/countries)).
+:- include((chat80/contain)).
+:- include((chat80/borders)).
 */
 
 % testing
-:- include(library(chat80/newtop)).	% top level
+:- include((chat80/newtop)).	% top level
 
 
 :-export(test_chat80_regressions/0).
@@ -157,7 +158,7 @@ test_chat80_regressions:- time(t2).
 :- retractall(thlocal:enable_src_loop_checking).
 
 
-moo:mud_test(chat80_regressions,test_chat80_regressions).
+user:mud_test(chat80_regressions,test_chat80_regressions).
 
 :- context_module(CM),module_predicates_are_exported(CM).
 :- context_module(CM),all_module_predicates_are_transparent(CM).

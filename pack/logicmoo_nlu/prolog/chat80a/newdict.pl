@@ -131,7 +131,7 @@ det_db(no,_,no,indef).
 
 det_db(Det):-det_db(Det,_,_,_).
 det_db(W):-det_db0(W),not(det_db(W,_,_,_)),dif(CCW,'Determiner'),not(ccw_db(W,CCW)).
-det_db0(W):- ('determinerString'(_,W);cyckb_t('determinerStrings',_,W)),atom(W).
+det_db0(W):- ('determinerStrings'(_,W);cyckb_t('determinerStrings',_,W)),atom(W).
 
 number_db(W,I,Nb) :-
    tr_number(W,I),
