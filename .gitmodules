@@ -1,9 +1,9 @@
-[submodule "src_modules/swish"]
-	path = src_modules/swish
+[submodule "pack/swish"]
+	path = pack/swish
 	url = https://github.com/TeamSPoon/swish.git
-[submodule "src_modules/hMUD"]
-	path = src_modules/hMUD
+[submodule "pack/hMUD"]
+	path = pack/hMUD
 	url = https://github.com/TeamSPoon/hmud.git
-[submodule "src_modules/ClioPatria"]
-	path = src_modules/ClioPatria
+[submodule "pack/ClioPatria"]
+	path = pack/ClioPatria
 	url = https://github.com/TeamSPoon/ClioPatria.git
