@@ -1,0 +1,50 @@
+/** <module> a_nani_household
+% This file contains the definitions for the room in a household
+% To create a new world, simply change the room definitions as
+% described below (or in manual)
+%
+
+use this file with...
+
+:- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
+
+*/
+
+:- style_check(-singleton).
+:- style_check(-discontiguous).
+% :- style_check(-atom).
+
+:- op(600,fx,onSpawn).
+
+% ==================================================
+% Rooms
+% ==================================================
+
+/* technically the following are not needed due the pathConnects/2s below */
+:-onSpawn tRegion(tKitchen).
+:-onSpawn tRegion(tHall).
+:-onSpawn tRegion(tCellar).
+:-onSpawn tRegion(tOfficeRoom).
+:-onSpawn tRegion(tLivingRoom).
+:-onSpawn tRegion(tDiningRoom).
+:-onSpawn tRegion(tBedRoom).
+:-onSpawn tRegion(tBathRoom).
+:-onSpawn tRegion(tClosetRoom).
+:-onSpawn tRegion(tBackYard).
+
+
+% ==================================================
+% Doors
+% ==================================================
+
+:-decl_mpred_hybrid(pathConnects(tRegion,tRegion),symmetric).
+
+:-onSpawn pathConnects(tLivingRoom,tOfficeRoom).
+:-onSpawn pathConnects(tHall,tDiningRoom).
+:-onSpawn pathConnects(tHall,tBedRoom).
+:-onSpawn pathConnects(tHall,tLivingRoom).
+:-onSpawn pathConnects(tHall,tBathRoom).
+:-onSpawn pathConnects(tKitchen, tCellar).
+:-onSpawn pathConnects(tDiningRoom, tKitchen).
+:-onSpawn pathConnects(tBedRoom, tClosetRoom).
+:-onSpawn pathConnects(tKitchen, tBackYard).
