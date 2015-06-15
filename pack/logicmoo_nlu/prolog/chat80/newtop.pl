@@ -221,7 +221,7 @@ quote_amp(R) :-
 
 logic(S0,S) :-
    i_sentence(S0,S1),
-   clausify(S1,S2),
+   clausify80(S1,S2),
    simplify(S2,S).
 
 simplify(C,(P:-R)) :- !,

@@ -50,7 +50,7 @@ quantify(pred(Subj,Op,Head,Args),Above,Right,P) :-
    quantify(Subj,SQuants,[],P0),
    quantify_args(Args,AQuants,P1),
    split_quants(Op,AQuants,Up,Right,Here,[]),
-   conc(SQuants,Up,Above),
+   conc80(SQuants,Up,Above),
    chain_apply(Here,(P0,Head,P1),P2),
    op_apply(Op,P2,P).
 quantify('`'(P),Q,Q,P).
@@ -67,6 +67,10 @@ head_vars([Quant|Quants],(P,R0),R,[X|V],V0) :-
 strip_types([],[]).
 strip_types([_-X|L0],[X|L]) :-
    strip_types(L0,L).
+
+conc80([],L,L).
+conc80([H|T],L,[H|R]) :- conc80(T,L,R).
+
 
 extract_var(quant(_,_-X,P,_-X),P,X).
 
@@ -99,7 +103,7 @@ pre_apply(apply(F,P0),Det,X,P1,P2,Y,
 pre_apply(aggr(F,Value,L,Head,Pred),Det,X,P1,P2,Y,Quants,
       quant(Det,X,
             (S^(setof(Range:Domain,P,S),
-                aggregate(F,S,Value)),P2),Y)) :-
+                aggregate80(F,S,Value)),P2),Y)) :-
    close_tree(Pred,R),
    complete_aggr(L,Head,(R,P1),Quants,P,Range,Domain).
 

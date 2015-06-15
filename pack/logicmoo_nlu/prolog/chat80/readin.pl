@@ -20,6 +20,7 @@
 
 */
 
+% maybe end_of_file.
 /* Read a sentence */
 
 /* Read sentence */
@@ -35,7 +36,7 @@ readrest(33,[]):-!.
 readrest(K,[K1|U]):-K=<32,!,get(K1),readrest(K1,U).
 readrest(_K1,[K2|U]):-get0(K2),readrest(K2,U).
 
-words([V|U]) --> word(V),!,blanks,words(U).
+words([V|U]) --> word(V),!,blanks80,words(U).
 words([]) --> [].
 
 word(U1) --> [K],{lc(K,K1)},!,alphanums(U2),{name(U1,[K1|U2])}.
@@ -52,8 +53,8 @@ alphanum(K,K):-digit(K).
 digits([K|U]) --> [K],{digit(K)},!,digits(U).
 digits([]) --> [].
 
-blanks--> [K],{K=<32},!,blanks.
-blanks --> [].
+blanks80--> [K],{K=<32},!,blanks80.
+blanks80 --> [].
 
 digit(K):-K>47,K<58.
 

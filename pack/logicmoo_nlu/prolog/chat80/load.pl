@@ -21,32 +21,33 @@
 
 */
 
-:- ensure_loaded(xgproc).	% XG generator
+:- ensure_loaded(tlxgproc).	% XG generator
 
-:- load_plus_xg_file('clone.xg').
-:- load_plus_xg_file('lex.xg').
+
+:- load_plus_xg_file(parser_chat80,'clone.xg').
+:- load_plus_xg_file(parser_chat80,'lex.xg').
 :- compile_xg_clauses.
 % :- list('newg.pl').
-:- ensure_loaded(xgrun).	% XG runtimes
-% :- ensure_loaded(newg).		% clone + lex
-:- ensure_loaded(clotab).	% attachment tables
-:- ensure_loaded(newdict).	% syntactic dictionary
-:- ensure_loaded(slots).	% fits arguments into predicates
-:- ensure_loaded(scopes).	% quantification and scoping
-:- ensure_loaded(templa).	% semantic dictionary
-:- ensure_loaded(qplan).	% query planning
-:- ensure_loaded(talkr).	% query evaluation
-:- ensure_loaded(ndtabl).	% relation info.
-:- ensure_loaded(readin).	% sentence input
-:- ensure_loaded(ptree).	% print trees
-:- ensure_loaded(aggreg).	% aggregation operators
-:- ensure_loaded(world0).     	% data base
-:- ensure_loaded(rivers).
-:- ensure_loaded(cities).
-:- ensure_loaded(countries).
-:- ensure_loaded(contain).
-:- ensure_loaded(borders).
-:- ensure_loaded(newtop).	% top level
+:- include(xgrun).	% XG runtimes
+% :- include(newg).		% clone + lex
+:- include(clotab).	% attachment tables
+:- include(newdict).	% syntactic dictionary
+:- include(slots).	% fits arguments into predicates
+:- include(scopes).	% quantification and scoping
+:- include(templa).	% semantic dictionary
+:- include(qplan).	% query planning
+:- include(talkr).	% query evaluation
+:- include(ndtabl).	% relation info.
+:- include(readin).	% sentence input
+:- include(ptree).	% print trees
+:- include(aggreg).	% aggregation operators
+:- include(world0).     	% data base
+:- include(rivers).
+:- include(cities).
+:- include(countries).
+:- include(contain).
+:- include(borders).
+:- include(newtop).	% top level
 
 
 

@@ -19,13 +19,13 @@
 
 */
 
-clausify(question(V0,P),(answer80(V):-B)) :-
+clausify80(question(V0,P),(answer80(V):-B)) :-
    quantify(P,Quants,[],R0),
    split_quants(question(V0),Quants,HQuants,[],BQuants,[]),
    chain_apply(BQuants,R0,R1),
    head_vars(HQuants,B,R1,V,V0).
 
-clausify(assertion(V0,P),(assertion80(V):-B)) :-
+clausify80(assertion(V0,P),(assertion80(V):-B)) :- nonvar(P),
    quantify(P,Quants,[],R0),
    split_quants(question(V0),Quants,HQuants,[],BQuants,[]),
    chain_apply(BQuants,R0,R1),
