@@ -15,9 +15,8 @@
 */
 %:- module(tiny_kb,['TINYKB-ASSERTION'/5, 'TINYKB-ASSERTION'/6]).
 
-:-if_file_exists(user:ensure_loaded(logicmoo(ext/moo_ext_cyc_new))).
-
 isa_db(I,C):-clause(isa(I,C),true).
+
 
 mpred_to_cyc(tCol,'#$Collection').
 mpred_to_cyc(ttFormatType,'#$CycLExpressionType').

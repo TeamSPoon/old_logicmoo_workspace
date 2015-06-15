@@ -249,6 +249,7 @@ argIsa_call_6(F,N,Type):- grab_argsIsa(F,Types),maybe_argtypes(Types),arg(N,Type
 
 maybe_argtypes(Types):- compound(Types), ground(Types), Types\=(_/_), Types\=(_:_/_), Types\='$VAR'(_).
 
+argIsa_call_7(Prop,N1,Type):- nonvar(Type),!,argIsa_call_7(Prop,N1,WType),!,genls(WType,Type).
 argIsa_call_7(Pred,N,ftVoprop):-number(N),arity(Pred,A),N>A,!.
 argIsa_call_7(_,_,ftTerm):- argisa_nodebug,!.
 argIsa_call_7(F,_,ftTerm):-member(F/_, [argIsa/3,predProxyAssert/2,negate_wrapper0/2,mudFacing/_,registered_module_type/2,       
@@ -256,7 +257,7 @@ argIsa_call_7(F,_,ftTerm):-member(F/_, [argIsa/3,predProxyAssert/2,negate_wrappe
                                 pt/_,rhs/_,nt/_,bt/_,bracket/3]),!.
 argIsa_call_7(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa(Prop,N1,'Second_Order_TYPE')))),dumpST,dtrace,Type=argIsaFn(Prop,N1),!.
 argIsa_call_7(Prop,N1,Type):- argIsa_call_9(Prop,N1,Type).
-argIsa_call_9(_,_,Type):- argisa_nodebug,!,Type=ftTerm.
+argIsa_call_9(_,_,Type):- argisa_nodebug,!,genls(ftTerm,Type).
 argIsa_call_9(Prop,N1,Type):- arity(Prop,Arity),dmsg(todo(define(argIsa_known_a(Prop,N1,'_TYPE')))),number(Arity),number(N1),must(N1=<Arity),Type=argIsaFn(Prop,N1),!.
 argIsa_call_9(Prop,N1,Type):- dmsg(todo(define(argIsa_known_b(Prop,N1,'_TYPE')))),trace,Type=argIsaFn(Prop,N1),!.
 argIsa_call_9(_,_,ftTerm).

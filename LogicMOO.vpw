@@ -3,7 +3,7 @@
 	<Projects>
 		<Project File="pack/PrologMUD_RT.vpj"/>
 		<Project File="pack/prologmud/PrologMUD.vpj"/>
-		<Project File="pack/logicmoo_base/prolog/logicmoo/LogicmooBase.vpj"/>
-		<Project File="pack/MUD_PDDL/prolog/MUD_DeepParsing.vpj"/>
+		<Project File="pack/logicmoo_base/prolog/LogicmooBase.vpj"/>
+		<Project File="pack/logicmoo_nlu/prolog/MUD_DeepParsing.vpj"/>
 	</Projects>
 </Workspace>

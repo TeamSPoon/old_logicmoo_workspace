@@ -401,7 +401,7 @@ not_ftVar(V):-not(is_ftVar(V)).
 
 logOnError(C):-prolog_ecall(0,logOnError0,C).
 :-export(logOnError0/1).
-logOnError0(C):- catch(C,E,dmsg(logOnError(E,C))).
+logOnError0(C):- catch(C,E,dmsg(logOnError(warn(E),C))).
 logOnErrorEach(C):-prolog_ecall(1,logOnError,C).
 logOnErrorIgnore(C):-prolog:ignore(logOnError0(C)).
 

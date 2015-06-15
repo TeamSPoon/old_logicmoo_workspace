@@ -3,14 +3,14 @@ PrologMUD_base.vpj=Release
 [Global]
 CurrentProject=PrologMUD.vpj
 [ProjectDates]
-pack\PrologMUD_RT.vpj=20150612192912167
-pack\prologmud\PrologMUD.vpj=20150612193520753
-pack\logicmoo_base\prolog\logicmoo\LogicmooBase.vpj=20150612193827047
-pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
+pack\PrologMUD_RT.vpj=20150615024009258
+pack\prologmud\PrologMUD.vpj=20150615024017086
+pack\logicmoo_base\prolog\LogicmooBase.vpj=20150615024009390
+pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615024013742
 [TreeExpansion2]
 - pack\logicmoo_base\prolog\logicmoo\LogicmooBase.vpj
   + aleph
-  + candc
+  - candc
     + working
   + circlemuddata
   + cltools
@@ -48,7 +48,7 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
       + malecop
   + mike
   + MIndiGolog0
-  + mpred
+  - mpred
   - mpred_online
   + osnark
   + PKnows-0.9.9
@@ -338,7 +338,7 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
               + swi
               + trace
               + xref
-  + util
+  - util
   + xray
   + yadlr
     + examples
@@ -439,14 +439,14 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
                 + ifi
                   + attempto
                     + ape
-    - lexicon
+    + lexicon
     + logger
-    + parser
+    - parser
     + tests
       + testruns
-    + tools
+    - tools
     + utils
-      - owlswrl
+      + owlswrl
   + CALL-SLT
     + Core
       + Regulus
@@ -667,7 +667,7 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
       + super_noquotes
       + super_questions
       + super_quotes
-    + src
+    - src
       + api
         + ccg
         + nlp
@@ -720,7 +720,7 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
         + tree
         + utils
       + main
-      - prolog
+      + prolog
         + boxer
           - knowledge
           + lex
@@ -741,7 +741,7 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
           + js
     + working
   + chart89
-  + chat80
+  - chat80
   + CURT
     + bb0
     + bb1
@@ -2352,7 +2352,7 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
             + js
         + model
         + mudconsole
-  + runtime
+  - runtime
     + cache
       + rdf
         + a2
@@ -2399,161 +2399,47 @@ pack\MUD_PDDL\prolog\MUD_DeepParsing.vpj=20150612185611033
       + images
     + swfobject
       + src
-scroll:66
+scroll:0
 [State]
 SCREEN: 1920 1080 538 217 1278 513 0 0 M 0 0 0 0 1494 592
-CWD: pack\MUD_PDDL\prolog
-BUFFER: BN="pack\MUD_PDDL\prolog\chart89\flexicon.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=616 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.516 CL=16 LE=0 CX=15 CY=14 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\chart89\library.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.443 CL=4 LE=0 CX=3 CY=8 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\chart89\lexicon.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.450 CL=24 LE=0 CX=23 CY=9 WI=5 BI=55 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\ebl_grammar_probs.pl"
+CWD: pack\MUD_PDDL\prolog\ape
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_hooks.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=32 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\ebl_train.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\pldata\tt0_00022_cycl.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=87 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\check_alterf_patterns.pl"
+VIEW: LN=.19418947 CL=63 LE=0 CX=62 CY=20 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_call.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=66 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\Misc\regulus_to_gemini.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_argtypes.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=78 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\ebl_compile_operationality.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=60 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\ebl_generalise.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.218 CL=24 LE=0 CX=23 CY=10 WI=5 BI=72 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\ignore_def_type_feats.regulus"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=81 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\linear_sem_main.regulus"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.360 CL=2 LE=0 CX=1 CY=15 WI=5 BI=57 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\general_eng.regulus"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=85 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\gen_eng_lex_macros.regulus"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=84 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\ignore_third_person_pronoun_entries.regulus"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=83 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\parser_chart89.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1824 CL=1 LE=0 CX=0 CY=10 WI=5 BI=76 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\parser_all.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1195 CL=37 LE=0 CX=36 CY=18 WI=5 BI=79 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\parser_ProNTo.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.305 CL=30 LE=0 CX=29 CY=7 WI=5 BI=56 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\parser_stanford.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=80 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\compositional_numbers_sem.regulus"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=82 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\chat80\xgproc.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.233 CL=1 LE=0 CX=0 CY=10 WI=5 BI=58 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\chart89\fstnpars.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.537 CL=6 LE=0 CX=5 CY=10 WI=5 BI=67 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\chart89\rtrans.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.429 CL=6 LE=0 CX=5 CY=8 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\chart89\inherits.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.456 CL=6 LE=0 CX=5 CY=8 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\MUD_PDDL\prolog\chart89\chrtlib2.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2278 CL=11 LE=0 CX=10 CY=10 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1318 416 -1 -1 N  WF=0 WT=25 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\parser_stanford.pl"
-VIEW: LN=.496 CL=13 LE=0 CX=12 CY=13 WI=350 BI=80 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1318 416 -1 -1 N  WF=0 WT=23 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\parser_all.pl"
-VIEW: LN=.1195 CL=37 LE=0 CX=36 CY=18 WI=346 BI=79 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1318 416 -1 -1 N  WF=0 WT=22 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\parser_chart89.pl"
-VIEW: LN=.1824 CL=1 LE=0 CX=0 CY=10 WI=344 BI=76 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1318 416 -1 -1 N  WF=0 WT=21 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\ignore_third_person_pronoun_entries.regulus"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=342 BI=83 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1318 416 -1 -1 N  WF=0 WT=19 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\gen_eng_lex_macros.regulus"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=338 BI=84 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1318 416 -1 -1 N  WF=0 WT=20 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\compositional_numbers_sem.regulus"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=340 BI=82 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1318 416 -1 -1 N  WF=0 WT=18 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\general_eng.regulus"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=336 BI=85 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1318 416 -1 -1 N  WF=0 WT=17 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\linear_sem_main.regulus"
-VIEW: LN=.360 CL=2 LE=0 CX=1 CY=15 WI=334 BI=57 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1318 416 -1 -1 N  WF=0 WT=16 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Grammar\ignore_def_type_feats.regulus"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=332 BI=81 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1318 416 -1 -1 N  WF=0 WT=15 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\ebl_generalise.pl"
-VIEW: LN=.218 CL=24 LE=0 CX=23 CY=10 WI=330 BI=72 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1318 416 -1 -1 N  WF=0 WT=14 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\ebl_compile_operationality.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=328 BI=60 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1318 416 -1 -1 N  WF=0 WT=13 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\Misc\regulus_to_gemini.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=326 BI=78 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1318 416 -1 -1 N  WF=0 WT=12 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\check_alterf_patterns.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=324 BI=66 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1318 416 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\ebl_train.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=322 BI=87 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1318 416 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\regulus\Prolog\ebl_grammar_probs.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=320 BI=32 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1318 416 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\chart89\lexicon.pl"
-VIEW: LN=.450 CL=24 LE=0 CX=23 CY=9 WI=124 BI=55 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1318 416 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\chat80\xgproc.pl"
-VIEW: LN=.1659 CL=24 LE=0 CX=23 CY=11 WI=299 BI=58 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1318 416 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\chart89\library.pl"
-VIEW: LN=.443 CL=4 LE=0 CX=3 CY=8 WI=318 BI=28 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1318 416 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\chart89\flexicon.pl"
-VIEW: LN=.516 CL=16 LE=0 CX=15 CY=14 WI=319 BI=21 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1318 416 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\chart89\chrtlib2.pl"
-VIEW: LN=.2278 CL=11 LE=0 CX=10 CY=10 WI=307 BI=31 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1318 416 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\chart89\inherits.pl"
-VIEW: LN=.456 CL=6 LE=0 CX=5 CY=8 WI=316 BI=29 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1318 416 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\chart89\rtrans.pl"
-VIEW: LN=.429 CL=6 LE=0 CX=5 CY=8 WI=311 BI=27 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1318 416 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\chart89\fstnpars.pl"
-VIEW: LN=.537 CL=6 LE=0 CX=5 CY=10 WI=312 BI=67 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1318 416 -1 -1 N  WF=0 WT=24 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\MUD_PDDL\prolog\parser_ProNTo.pl"
-VIEW: LN=.479 CL=13 LE=0 CX=12 CY=13 WI=348 BI=56 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\MUD_PDDL\prolog\pldata\el_holds.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=1 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=576 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.24849 CL=30 LE=0 CX=29 CY=16 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1318 416 -1 -1 N  WF=0 WT=15 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_call.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=124 BI=28 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1318 416 -1 -1 N  WF=0 WT=16 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\MUD_PDDL\prolog\pldata\tt0_00022_cycl.pl"
+VIEW: LN=.19418947 CL=63 LE=0 CX=62 CY=20 WI=123 BI=24 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1318 416 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_hooks.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=122 BI=22 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1318 416 -1 -1 N  WF=0 WT=17 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\MUD_PDDL\prolog\pldata\el_holds.pl"
+VIEW: LN=.1124575315 CL=134 LE=0 CX=133 CY=9 WI=121 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1318 416 -1 -1 M  WF=0 WT=14 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_argtypes.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=125 BI=27 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-pack\MUD_PDDL\prolog\regulus\Grammar\compositional_numbers_sem.regulus
-pack\MUD_PDDL\prolog\regulus\Grammar\gen_eng_lex_macros.regulus
-pack\MUD_PDDL\prolog\regulus\Grammar\ignore_third_person_pronoun_entries.regulus
-pack\MUD_PDDL\prolog\parser_chart89.pl
-pack\MUD_PDDL\prolog\parser_all.pl
-pack\MUD_PDDL\prolog\parser_SUPPLE.pl
-pack\MUD_PDDL\prolog\parser_regulus.pl
-pack\MUD_PDDL\prolog\parser_stanford.pl
-pack\MUD_PDDL\prolog\parser_ProNTo.pl
+pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_call.pl
+pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_hooks.pl
+pack\MUD_PDDL\prolog\pldata\tt0_00022_cycl.pl
+pack\MUD_PDDL\prolog\pldata\el_holds.pl
+pack\MUD_PDDL\prolog\pldata\el_holds_part_a.pl
+pack\MUD_PDDL\prolog\pldata\el_holds_part_t.pl
+pack\MUD_PDDL\prolog\pldata\el_holds_split.pl_ab
+pack\MUD_PDDL\prolog\pldata\split_el_holds.sh
+pack\MUD_PDDL\prolog\pldata\el_holds_split.pl_ak

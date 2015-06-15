@@ -226,11 +226,13 @@ show_pipeline:-forall(installed_converter(CNV),wdmsg(installed_converter(CNV))).
 
 
 % ================================================================================================
-:- ignore((absolute_file_name(library(pldata/'el_assertions.pl.qlf'),AFN),exists_file(AFN)
-:- time(user:ensure_loaded(library(pldata/'el_assertions.pl.qlf'))).
+% :- time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),(exists_file(AFN)->true;qcompile(library(el_holds/'el_assertions.pl.hide')))))).
+:- time(user:ensure_loaded(library(el_holds/'el_assertions.pl.qlf'))).
 :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc)).
 :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_call_kb)).
 :- user:ensure_loaded(parser_e2c).
+:- user:ensure_loaded(library(nldata/nldata_BRN_WSJ_LEXICON)).
+:- user:ensure_loaded(library(nldata/nldata_freq_pdat)).
 
 %:- pfc_add(cyckb_t(A, _, _) => is_cyckb_t_pred(A,2)).
 :- with_el_holds_enabled(gripe_time(2,forall(cyckb_t(A, _, _) , assert_if_new(is_cyckb_t_pred(A,2))))).

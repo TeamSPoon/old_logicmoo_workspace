@@ -117,11 +117,20 @@ cyckb_t(P,A1):- t([P,A1]).
 
 :-dynamic(el_holds_DISABLED_KB/0).
 :-export(el_holds_DISABLED_KB/0).
+
+:-asserta(el_holds_DISABLED_KB).
+
+:- meta_predicate(with_el_holds_enabled(o)).
+with_el_holds_enabled(Goal):-with_no_assertions(el_holds_DISABLED_KB,Goal).
+:- meta_predicate(with_el_holds_disabled(o)).
+with_el_holds_disabled(Goal):-with_assertions(el_holds_DISABLED_KB,Goal).
+
 %:- link_to_holds_DYNAMIC(cyckb_t,el_holds_DISABLED_KB).
 :- link_to_holds2(cyckb_t,el_holds).
 
 :-export(cyckb_t/1).
-cyckb_t(PLIST):- not(el_holds_DISABLED_KB), apply(cyckb_t,PLIST).
+cyckb_t([P|LIST]):-!, \+ (el_holds_DISABLED_KB), apply(cyckb_t,[P|LIST]).
+cyckb_t(Compound):- \+ (el_holds_DISABLED_KB), Compound=..[F,A|List] , apply(cyckb_t,[F,A|List]).
 
 :-export(noGenlPreds/1).
 noGenlPreds(coGenlPreds).
