@@ -1,0 +1,27 @@
+syntax: glob
+temp/*
+.hg/
+.git/
+.svn/
+logicmoo.wiki/
+LogicMOO.vpwhist
+*.vtg
+*.pl~
+*lock
+*.orig
+*.bak
+*~
+hMUD/
+src_data/star_trek/
+core
+src/moo_settings.db
+saved_cached_queries
+wiki/
+logwumpus
+src_modules/
+src/savedb
+src_incoming/savedb
+hidden_todo/
+*.qlf
+withvars_988.*
+

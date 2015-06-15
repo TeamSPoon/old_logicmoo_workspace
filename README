@@ -1,0 +1,42 @@
+Initial starter Docs https://github.com/TeamSPoon/PrologMUD/wiki
+
+Installation see.. https://docs.google.com/document/d/1fkOxnmI1LqxadvZuCRS-fGIEweIKyPn6AVGp5Yjse1I/edit
+
+
+
+
+The MUD_PDDL repository is now both Planning and NLU/NLG code.. The NLTK of Prolog!
+
+
+
+It is very bothersome that with all the cool NLU demos out there there is  that is like GATE or even a Blackboard system 
+
+
+This NLU/NLG ToolKit uses the following projects into a usable pipeline
+
+TALK UGOT WP3 task 3.1 implementation accompanying D3.1
+Extended Information State Modelling  -- Stina Ericsson, 19th January, 2006
+
+The Attempto Parsing Engine (APE) translates ACE texts unambiguously into discourse representation structures (DRS) that use a variant of the language of first-order logic.[2] A DRS can be further translated into other formal languages, for instance AceRules with various semantics,[3] OWL,[4] and SWRL. Translating an ACE text into (a fragment of) first-order logic allows users to reason about the text, for instance to verify, to validate, and to query it.
+
+TALK
+
+GULP 
+
+CHAT80
+
+SIRIDUS
+
+TrindiKit
+
+GoDuS
+
+BOXER
+
+GATE's SUPPLE
+
+BuChart 98
+
+and about 10 more!
+
+
