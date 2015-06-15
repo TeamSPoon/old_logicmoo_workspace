@@ -9,6 +9,10 @@
 % Revised At:   $Date: 2002/06/06 15:43:15 $
 % ===================================================================
 
+end_of_file.
+end_of_file.
+end_of_file.
+
 :-module(parser_CURT,[
          ]).
 

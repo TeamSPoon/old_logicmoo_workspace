@@ -224,24 +224,56 @@ show_pipeline:-forall(installed_converter(CNV),wdmsg(installed_converter(CNV))).
 % :- get_pos_tagger(I),jpl_set(I,is_DEBUG,'@'(false)).
 %:- user:ensure_loaded(parser_chart89).
 
+
+% ================================================================================================
+:- ignore((absolute_file_name(library(pldata/'el_assertions.pl.qlf'),AFN),exists_file(AFN)
+:- time(user:ensure_loaded(library(pldata/'el_assertions.pl.qlf'))).
 :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc)).
 :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_call_kb)).
-% ================================================================================================
 :- user:ensure_loaded(parser_e2c).
+
+%:- pfc_add(cyckb_t(A, _, _) => is_cyckb_t_pred(A,2)).
+:- with_el_holds_enabled(gripe_time(2,forall(cyckb_t(A, _, _) , assert_if_new(is_cyckb_t_pred(A,2))))).
+%:- pfc_add(cyckb_t(A, _, _, _ ) => is_cyckb_t_pred(A,3)).
+:- with_el_holds_enabled(gripe_time(2,forall(cyckb_t(A, _, _, _) , assert_if_new(is_cyckb_t_pred(A,3))))).
+%:- pfc_add(cyckb_t(A, _, _, _, _ ) => is_cyckb_t_pred(A,4)).
+:- with_el_holds_enabled(gripe_time(2,forall(cyckb_t(A, _, _,_ ,_ ) , assert_if_new(is_cyckb_t_pred(A,4))))).
+:- with_el_holds_enabled(gripe_time(2,forall(cyckb_t(A, _, _,_ ,_,_ ) , assert_if_new(is_cyckb_t_pred(A,5))))).
+
+
+% :- pfc_add((is_cyckb_t_pred(F,A) => {functor(H,F,A),H=..[F|ARGS],KB=..[cyckb_t,F|ARGS],assert_if_new((H:-KB))})).
+:- gripe_time(2,forall(is_cyckb_t_pred(F,A) , ignore((atom(F),functor(H,F,A),H=..[F|ARGS],KB=..[cyckb_t,F|ARGS],logOnErrorIgnore(assert_if_new((H:- \+(el_holds_DISABLED_KB), KB))))))).
+
+
+
 % ================================================================================================
 
-/*
 
 % ================================================================================================
+% Not yet started 
 :- user:ensure_loaded(parser_CURT).
 % ================================================================================================
 
+% ================================================================================================
 % Not yet started 
 :- user:ensure_loaded(parser_regulus).
+% ================================================================================================
+
+% ================================================================================================
+% Not yet started 
 :- user:ensure_loaded(parser_SUPPLE).
+% ================================================================================================
+
+% ================================================================================================
+% Not yet started 
 :- user:ensure_loaded(parser_SIRIDUS).
+% ================================================================================================
+
+% ================================================================================================
+% Not yet started 
 :- user:ensure_loaded(parser_ProNTo).
-*/
+% ================================================================================================
+
 
 :- show_pipeline.
 

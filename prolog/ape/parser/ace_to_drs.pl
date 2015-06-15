@@ -59,7 +59,7 @@
 
 :- style_check(-discontiguous).
 :- style_check(-singleton).
-:- use_module('grammar_plp.pl', [parse/4,specification//1]).
+:- use_module('grammar_plp.pl', [parse/4]).
 :- style_check(+discontiguous).
 :- style_check(+singleton).
 

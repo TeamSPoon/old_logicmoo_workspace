@@ -4,7 +4,7 @@
 
 :- style_check(-discontiguous).
 :- style_check(-singleton).
-:- style_check(-atom).
+% :- style_check(-atom).
 
 :- dynamic el_holds_pred/1.
 

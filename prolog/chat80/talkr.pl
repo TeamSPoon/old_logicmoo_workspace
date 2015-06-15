@@ -39,12 +39,12 @@ wt((P,Q),L) :- !, L1 is L-2,
 wt({P},L) :- complex(P), !, L1 is L+2,
    put("{"), tab(1), wt(P,L1), tab(1), put("}").
 wt(E,L) :- decomp(E,H,P), !, L1 is L+2,
-   header(H), nl,
+   header80(H), nl,
    tab(L1), wt(P,L1).
 wt(E,_) :- write(E).
 
-header([]).
-header([X|H]) :- write(X), tab(1), header(H).
+header80([]).
+header80([X|H]) :- write(X), tab(1), header80(H).
 
 decomp(setof(X,P,S),[S,=,setof,X],P).  
 decomp(\+(P),[\+],P) :- complex(P).

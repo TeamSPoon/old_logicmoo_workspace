@@ -17,7 +17,7 @@
 
 
 % ==============================================================================
-:- dynamic_multifile_exported kbp_t_list_prehook/2.
+%:- dynamic_multifile_exported kbp_t_list_prehook/2.
 
 :-export(reorderClause/2).
 :-meta_predicate(reorderClause(?,?)).
@@ -114,7 +114,7 @@ can_reorder:-true.
 noreorder.
 reorder.
 
-:-meta_predicate_transparent(reorderClause(+,+)).
+:-meta_predicate(reorderClause(+,+)).
 reorderClause(_Head,[A]):- !,callClause(A).
 reorderClause(Head,[A|List]):- not(can_reorder),!,callClause(A),reorderClause(Head,List).
 reorderClause(Head, List):- member(Var^Call,List), nonvar(Var), !,delete_eq(List,Var^Call,ListO),!,callClause(Call),reorderClause(Head,ListO).
@@ -124,7 +124,7 @@ reorderClause(Head,C):- dmsg(warn(callClause((Head:-C)))),dtrace,callClause(C).
 vsubst(In,B,A,Out):-var(In),!,(In==B->Out=A;Out=In).
 vsubst(In,B,A,Out):-subst(In,B,A,Out).
 
-:-meta_predicate_transparent(callClause(+)) .
+:-meta_predicate(callClause(+)) .
 callClause(_^C):-!,callClause(C).
 callClause(C):-debugOnError(C).
 callClause((C0->C1;C2)):-!,(callClause(C0)->callClause(C1);callClause(C2)).
@@ -2486,8 +2486,8 @@ atom_junct2([W|S],[W|Words]):-atom_junct2(S,Words).
 
 % :- include(logicmoo(vworld/moo_footer)).
 
-:- module_predicates_are_exported(parser_e2c).
-:- module_meta_predicates_are_transparent(parser_e2c).
+%:- module_predicates_are_exported(parser_e2c).
+%:- module_meta_predicates_are_transparent(parser_e2c).
 
 :-  end_transform_moo_preds.
 % :-module(parser_e2c).

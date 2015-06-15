@@ -2,7 +2,7 @@
 :- op(1200,xfx,'--->').
 
 
-:- \+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))).
+:- ignore(( \+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 :-asserta(tlxgproc:do_xg_process_te).
 
 sentence(S) ---> wh_question(S), (terminator(?);[]) .
