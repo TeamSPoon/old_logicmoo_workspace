@@ -37,13 +37,13 @@ pddlPredicates([
   nameStrings(ftTerm,ftString),
   pathName(tRegion,vtDirection,ftString),
 %  localityOfObject(tObj,tRegion),
-  mudStowing(tAgentGeneric,tClothing),
-  mudStowing(tAgentGeneric,tWeapon),
-  mudStowing(tAgentGeneric,tCarryAble),
-  wearsClothing(tAgentGeneric,tClothing),
+  mudStowing(tAgent,tClothing),
+  mudStowing(tAgent,tWeapon),
+  mudStowing(tAgent,tCarryAble),
+  wearsClothing(tAgent,tClothing),
 
 % static startrek
-  pathBetween(tRegion,vtDirection,tRegion),
+  pathDirLeadsTo(tRegion,vtDirection,tRegion),
   agentRoute(tPathway,tRegion,tRegion) ]).
 
 
@@ -101,36 +101,36 @@ tRegion('iArea1041').
 
  /* found 45 for tRegion(_G1399). */ 
 
-/* Prediate:  tAgentGeneric/1 
+/* Prediate:  tAgent/1 
 interpreted.
 file('c:/development/opensim4opencog/bin/cynd/startrek/mudreader.pl').
 line_count(55).
 number_of_clauses(1).
-Pattern: tAgentGeneric(_G1281). 
+Pattern: tAgent(_G1281). 
  */
-tAgentGeneric('NPC0Geordi684').
-tAgentGeneric(iCommanderData66).
-tAgentGeneric(iExplorer1).
-tAgentGeneric('NPC2Worf720').
-tAgentGeneric('NPC3DrCrusher677').
-tAgentGeneric('NPC4Troi712').
-tAgentGeneric('NPC5Riker707').
-tAgentGeneric('NPC6Picard701').
-tAgentGeneric('NPC7Guinan689').
-tAgentGeneric('NPC8OBrien696').
-tAgentGeneric('NPC9Wesley716').
-tAgentGeneric('NPC1010Livingston726').
-tAgentGeneric('NPC1011Spot727').
-tAgentGeneric('iEnsign732').
-tAgentGeneric('iEnsign728').
-tAgentGeneric('iEnsign736').
-tAgentGeneric('iEnsign740').
-tAgentGeneric('iEnsign744').
-tAgentGeneric('iEnsign748').
-tAgentGeneric('iEnsign752').
-tAgentGeneric('NPC1013Alexander671').
+tAgent('NPC0Geordi684').
+tAgent(iCommanderdata66).
+tAgent(iExplorer1).
+tAgent('NPC2Worf720').
+tAgent('NPC3DrCrusher677').
+tAgent('NPC4Troi712').
+tAgent('NPC5Riker707').
+tAgent('NPC6Picard701').
+tAgent('NPC7Guinan689').
+tAgent('NPC8OBrien696').
+tAgent('NPC9Wesley716').
+tAgent('NPC1010Livingston726').
+tAgent('NPC1011Spot727').
+tAgent('iEnsign732').
+tAgent('iEnsign728').
+tAgent('iEnsign736').
+tAgent('iEnsign740').
+tAgent('iEnsign744').
+tAgent('iEnsign748').
+tAgent('iEnsign752').
+tAgent('NPC1013Alexander671').
 
- /* found 21 for tAgentGeneric(_G1281). */ 
+ /* found 21 for tAgent(_G1281). */ 
 
 /* Prediate:  wearsClothing/2 
 interpreted.
@@ -140,58 +140,58 @@ number_of_clauses(1).
 Pattern: wearsClothing(_G1304,_G1305). 
  */
 pddlSomethingIsa('iBoots673',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
-wearsClothing(iCommanderData66,'iBoots673').
-wearsClothing(iCommanderData66,'iComBadge674').
-wearsClothing(iCommanderData66,'iGoldUniform675').
+wearsClothing(iCommanderdata66,'iBoots673').
+wearsClothing(iCommanderdata66,'iCommBadge674').
+wearsClothing(iCommanderdata66,'iGoldUniform675').
 wearsClothing(iExplorer1,'iBoots773').
-wearsClothing(iExplorer1,'iComBadge774').
+wearsClothing(iExplorer1,'iCommBadge774').
 wearsClothing(iExplorer1,'iGoldUniform775').
 wearsClothing('NPC3DrCrusher677','iBoots678').
-wearsClothing('NPC3DrCrusher677','iComBadge679').
+wearsClothing('NPC3DrCrusher677','iCommBadge679').
 wearsClothing('NPC3DrCrusher677','Item4BlueUniform680').
 wearsClothing('NPC0Geordi684','iBoots685').
-wearsClothing('NPC0Geordi684','iComBadge686').
+wearsClothing('NPC0Geordi684','iCommBadge686').
 wearsClothing('NPC0Geordi684','iGoldUniform687').
 wearsClothing('NPC0Geordi684','Item8VISOR688').
 wearsClothing('NPC8OBrien696','iBoots697').
-wearsClothing('NPC8OBrien696','iComBadge698').
+wearsClothing('NPC8OBrien696','iCommBadge698').
 wearsClothing('NPC8OBrien696','iGoldUniform699').
 wearsClothing('NPC6Picard701','iBoots702').
-wearsClothing('NPC6Picard701','iComBadge703').
+wearsClothing('NPC6Picard701','iCommBadge703').
 wearsClothing('NPC6Picard701','Item2RedUniform704').
 wearsClothing('NPC5Riker707','iBoots708').
-wearsClothing('NPC5Riker707','iComBadge709').
+wearsClothing('NPC5Riker707','iCommBadge709').
 wearsClothing('NPC5Riker707','Item2RedUniform710').
 wearsClothing('NPC4Troi712','iBoots713').
-wearsClothing('NPC4Troi712','iComBadge714').
+wearsClothing('NPC4Troi712','iCommBadge714').
 wearsClothing('NPC4Troi712','Item4BlueUniform715').
 wearsClothing('NPC9Wesley716','iBoots717').
-wearsClothing('NPC9Wesley716','iComBadge718').
+wearsClothing('NPC9Wesley716','iCommBadge718').
 wearsClothing('NPC9Wesley716','Item2RedUniform719').
 wearsClothing('NPC2Worf720','iBoots721').
-wearsClothing('NPC2Worf720','iComBadge722').
+wearsClothing('NPC2Worf720','iCommBadge722').
 wearsClothing('NPC2Worf720','iGoldUniform723').
 wearsClothing('NPC2Worf720','Item7Sash725').
 wearsClothing('iEnsign728','iBoots729').
-wearsClothing('iEnsign728','iComBadge730').
+wearsClothing('iEnsign728','iCommBadge730').
 wearsClothing('iEnsign728','iGoldUniform731').
 wearsClothing('iEnsign732','iBoots733').
-wearsClothing('iEnsign732','iComBadge734').
+wearsClothing('iEnsign732','iCommBadge734').
 wearsClothing('iEnsign732','iGoldUniform735').
 wearsClothing('iEnsign736','iBoots737').
-wearsClothing('iEnsign736','iComBadge738').
+wearsClothing('iEnsign736','iCommBadge738').
 wearsClothing('iEnsign736','Item2RedUniform739').
 wearsClothing('iEnsign740','iBoots741').
-wearsClothing('iEnsign740','iComBadge742').
+wearsClothing('iEnsign740','iCommBadge742').
 wearsClothing('iEnsign740','Item2RedUniform743').
 wearsClothing('iEnsign744','iBoots745').
-wearsClothing('iEnsign744','iComBadge746').
+wearsClothing('iEnsign744','iCommBadge746').
 wearsClothing('iEnsign744','Item4BlueUniform747').
 wearsClothing('iEnsign748','iBoots749').
-wearsClothing('iEnsign748','iComBadge750').
+wearsClothing('iEnsign748','iCommBadge750').
 wearsClothing('iEnsign748','Item4BlueUniform751').
 wearsClothing('iEnsign752','iBoots753').
-wearsClothing('iEnsign752','iComBadge754').
+wearsClothing('iEnsign752','iCommBadge754').
 wearsClothing('iEnsign752','Item4BlueUniform755').
 
  /* found 53 for wearsClothing(_G1304,_G1305). */ 
@@ -203,7 +203,7 @@ line_count(57).
 number_of_clauses(1).
 Pattern: mudStowing(_G1328,_G1329). 
  */
-mudStowing(iCommanderData66,'iPhaser676').
+mudStowing(iCommanderdata66,'iPhaser676').
 mudStowing(iExplorer1,'iPhaser776').
 mudStowing('NPC3DrCrusher677','MedicalTricorder681').
 mudStowing('NPC3DrCrusher677','MedicalTricorder682').
@@ -268,23 +268,23 @@ tItem('iBoots741').
 tItem('iBoots745').
 tItem('iBoots749').
 tItem('iBoots753').
-tItem('iComBadge674').
-tItem('iComBadge774').
-tItem('iComBadge679').
-tItem('iComBadge686').
-tItem('iComBadge698').
-tItem('iComBadge703').
-tItem('iComBadge709').
-tItem('iComBadge714').
-tItem('iComBadge718').
-tItem('iComBadge722').
-tItem('iComBadge730').
-tItem('iComBadge734').
-tItem('iComBadge738').
-tItem('iComBadge742').
-tItem('iComBadge746').
-tItem('iComBadge750').
-tItem('iComBadge754').
+tItem('iCommBadge674').
+tItem('iCommBadge774').
+tItem('iCommBadge679').
+tItem('iCommBadge686').
+tItem('iCommBadge698').
+tItem('iCommBadge703').
+tItem('iCommBadge709').
+tItem('iCommBadge714').
+tItem('iCommBadge718').
+tItem('iCommBadge722').
+tItem('iCommBadge730').
+tItem('iCommBadge734').
+tItem('iCommBadge738').
+tItem('iCommBadge742').
+tItem('iCommBadge746').
+tItem('iCommBadge750').
+tItem('iCommBadge754').
 tItem('Item7Sash725').
 tItem('Item8VISOR688').
 tItem('MedicalTricorder681').
@@ -322,7 +322,7 @@ localityOfObject('iArea1016Object669','iArea1016').
 localityOfObject('iArea1024Object670','iArea1024').
 */
 localityOfObject('NPC1013Alexander671','iArea1025').
-localityOfObject(iCommanderData66,'iArea1010').
+localityOfObject(iCommanderdata66,'iArea1010').
 localityOfObject(iExplorer1,'iArea1000').
 localityOfObject('NPC3DrCrusher677','iArea1015').
 localityOfObject('NPC0Geordi684','iArea1000').
@@ -358,27 +358,27 @@ line_count(50).
 number_of_clauses(1).
 Pattern: pddlSomethingIsa(_G1422,_G1423). 
  */
-pddlSomethingIsa('NPC0Geordi684',['NPC0',tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa(iCommanderData66,['NPC1',tAgentGeneric,'tMaleAnimal']).
-% pddlSomethingIsa(iPlayer1,[['OSimClassFn',mudStr("player_osimmarine_mp")],tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa('NPC2Worf720',['NPC2',tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa('NPC3DrCrusher677',['NPC3',tAgentGeneric,'tFemaleAnimal']).
-pddlSomethingIsa('NPC4Troi712',['NPC4',tAgentGeneric,'tFemaleAnimal']).
-pddlSomethingIsa('NPC5Riker707',['NPC5',tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa('NPC6Picard701',['NPC6',tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa('NPC7Guinan689',['NPC7',tAgentGeneric,'tFemaleAnimal']).
-pddlSomethingIsa('NPC8OBrien696',['NPC8',tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa('NPC9Wesley716',['NPC9',tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa('NPC1010Livingston726',['NPC1010',tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa('NPC1011Spot727',['NPC1011',tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa('iEnsign728',['tEnsign',tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa('iEnsign732',['tEnsign',tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa('iEnsign736',['tEnsign',tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa('iEnsign740',['tEnsign',tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa('iEnsign744',['tEnsign',tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa('iEnsign748',['tEnsign',tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa('iEnsign752',['tEnsign',tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa('NPC1013Alexander671',['NPC1013',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('NPC0Geordi684',['NPC0',tAgent,'tMaleAnimal']).
+pddlSomethingIsa(iCommanderdata66,['NPC1',tAgent,'tMaleAnimal']).
+% pddlSomethingIsa(iPlayer1,[['OSimClassFn',mudStr("player_osimmarine_mp")],tAgent,'tMaleAnimal']).
+pddlSomethingIsa('NPC2Worf720',['NPC2',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('NPC3DrCrusher677',['NPC3',tAgent,'tFemaleAnimal']).
+pddlSomethingIsa('NPC4Troi712',['NPC4',tAgent,'tFemaleAnimal']).
+pddlSomethingIsa('NPC5Riker707',['NPC5',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('NPC6Picard701',['NPC6',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('NPC7Guinan689',['NPC7',tAgent,'tFemaleAnimal']).
+pddlSomethingIsa('NPC8OBrien696',['NPC8',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('NPC9Wesley716',['NPC9',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('NPC1010Livingston726',['NPC1010',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('NPC1011Spot727',['NPC1011',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('iEnsign728',['tEnsign',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('iEnsign732',['tEnsign',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('iEnsign736',['tEnsign',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('iEnsign740',['tEnsign',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('iEnsign744',['tEnsign',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('iEnsign748',['tEnsign',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('iEnsign752',['tEnsign',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('NPC1013Alexander671',['NPC1013',tAgent,'tMaleAnimal']).
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice',tCarryAble,'DeviceSingleUser','tWearAble']).
 pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice',tCarryAble,'DeviceSingleUser','tWearAble']).
 pddlSomethingIsa('iPhaser700',['tPhaser','Handgun',tWeapon,'LightingDevice',tCarryAble,'DeviceSingleUser','tWearAble']).
@@ -418,23 +418,23 @@ pddlSomethingIsa('iBoots741',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
 pddlSomethingIsa('iBoots745',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
 pddlSomethingIsa('iBoots749',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
 pddlSomethingIsa('iBoots753',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
-pddlSomethingIsa('iComBadge674',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
-pddlSomethingIsa('iComBadge774',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
-pddlSomethingIsa('iComBadge679',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
-pddlSomethingIsa('iComBadge686',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
-pddlSomethingIsa('iComBadge698',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
-pddlSomethingIsa('iComBadge703',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
-pddlSomethingIsa('iComBadge709',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
-pddlSomethingIsa('iComBadge714',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
-pddlSomethingIsa('iComBadge718',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
-pddlSomethingIsa('iComBadge722',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
-pddlSomethingIsa('iComBadge730',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
-pddlSomethingIsa('iComBadge734',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
-pddlSomethingIsa('iComBadge738',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
-pddlSomethingIsa('iComBadge742',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
-pddlSomethingIsa('iComBadge746',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
-pddlSomethingIsa('iComBadge750',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
-pddlSomethingIsa('iComBadge754',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge674',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge774',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge679',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge686',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge698',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge703',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge709',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge714',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge718',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge722',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge730',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge734',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge738',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge742',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge746',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge750',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iCommBadge754',['tCommBadge',tClothing,tCarryAble,tOntoNeck]).
 pddlSomethingIsa('Item7Sash725',['Item7',tClothing,tCarryAble,'tWearAble']).
 pddlSomethingIsa('Item8VISOR688',['Item8',tClothing,tCarryAble]).
 pddlSomethingIsa('MedicalTricorder681',['tTricorderMedical','RodShapedObject',tContolDevice,tPortableDevice,tCarryAble]).
@@ -595,29 +595,29 @@ nameStrings('iArea1040',"Outer Space").
 nameStrings('iArea1041',"Outer Space").
 nameStrings('iArea1042',"Transporter Beam").
 nameStrings('NPC1013Alexander671',"Alexander").
-nameStrings(iCommanderData66,"Data").
-nameStrings(iCommanderData66,"CycLBot").
-nameStrings(iCommanderData66,"CycBot").
-nameStrings(iCommanderData66,"CycBot1").
+nameStrings(iCommanderdata66,"Data").
+nameStrings(iCommanderdata66,"CycLBot").
+nameStrings(iCommanderdata66,"CycBot").
+nameStrings(iCommanderdata66,"CycBot1").
 nameStrings('iBoots673',"Boots").
-nameStrings('iComBadge674',"Comm Badge").
+nameStrings('iCommBadge674',"Comm Badge").
 nameStrings('iGoldUniform675',"Gold Uniform").
 nameStrings('iPhaser676',"Phaser").
 nameStrings(iExplorer1,"Player").
 nameStrings('iBoots773',"Boots").
-nameStrings('iComBadge774',"Comm Badge").
+nameStrings('iCommBadge774',"Comm Badge").
 nameStrings('iGoldUniform775',"Gold Uniform").
 nameStrings('iPhaser776',"Phaser").
 nameStrings('NPC3DrCrusher677',"Dr. Crusher").
 nameStrings('iBoots678',"Boots").
-nameStrings('iComBadge679',"Comm Badge").
+nameStrings('iCommBadge679',"Comm Badge").
 nameStrings('Item4BlueUniform680',"Blue Uniform").
 nameStrings('MedicalTricorder681',"Medical Tricorder").
 nameStrings('MedicalTricorder682',"Medical Tricorder").
 nameStrings('MedicalTricorder683',"Medical Tricorder").
 nameStrings('NPC0Geordi684',"Geordi").
 nameStrings('iBoots685',"Boots").
-nameStrings('iComBadge686',"Comm Badge").
+nameStrings('iCommBadge686',"Comm Badge").
 nameStrings('iGoldUniform687',"Gold Uniform").
 nameStrings('Item8VISOR688',"VISOR").
 nameStrings('NPC7Guinan689',"Guinan").
@@ -629,31 +629,31 @@ nameStrings('Item24LemonadePruneJuice694',"Lemonade 'Prune Juice'").
 nameStrings('Item25VulcanBeer695',"Vulcan Beer").
 nameStrings('NPC8OBrien696',"O'Brien").
 nameStrings('iBoots697',"Boots").
-nameStrings('iComBadge698',"Comm Badge").
+nameStrings('iCommBadge698',"Comm Badge").
 nameStrings('iGoldUniform699',"Gold Uniform").
 nameStrings('iPhaser700',"Phaser").
 nameStrings('NPC6Picard701',"Picard").
 nameStrings('iBoots702',"Boots").
-nameStrings('iComBadge703',"Comm Badge").
+nameStrings('iCommBadge703',"Comm Badge").
 nameStrings('Item2RedUniform704',"Red Uniform").
 nameStrings('Item15PhaserRifle705',"5 Phaser Rifle").
 nameStrings('iPicardsFlute',"5 Picard's Flute").
 nameStrings('NPC5Riker707',"Riker").
 nameStrings('iBoots708',"Boots").
-nameStrings('iComBadge709',"Comm Badge").
+nameStrings('iCommBadge709',"Comm Badge").
 nameStrings('Item2RedUniform710',"Red Uniform").
 nameStrings('Item12Trombone711',"Trombone").
 nameStrings('NPC4Troi712',"Troi").
 nameStrings('iBoots713',"Boots").
-nameStrings('iComBadge714',"Comm Badge").
+nameStrings('iCommBadge714',"Comm Badge").
 nameStrings('Item4BlueUniform715',"Blue Uniform").
 nameStrings('NPC9Wesley716',"Wesley").
 nameStrings('iBoots717',"Boots").
-nameStrings('iComBadge718',"Comm Badge").
+nameStrings('iCommBadge718',"Comm Badge").
 nameStrings('Item2RedUniform719',"Red Uniform").
 nameStrings('NPC2Worf720',"Worf").
 nameStrings('iBoots721',"Boots").
-nameStrings('iComBadge722',"Comm Badge").
+nameStrings('iCommBadge722',"Comm Badge").
 nameStrings('iGoldUniform723',"Gold Uniform").
 nameStrings('iPhaser724',"Phaser").
 nameStrings('Item7Sash725',"Sash").
@@ -661,31 +661,31 @@ nameStrings('NPC1010Livingston726',"Livingston").
 nameStrings('NPC1011Spot727',"Spot").
 nameStrings('iEnsign728',"Ensign").
 nameStrings('iBoots729',"Boots").
-nameStrings('iComBadge730',"Comm Badge").
+nameStrings('iCommBadge730',"Comm Badge").
 nameStrings('iGoldUniform731',"Gold Uniform").
 nameStrings('iEnsign732',"Ensign").
 nameStrings('iBoots733',"Boots").
-nameStrings('iComBadge734',"Comm Badge").
+nameStrings('iCommBadge734',"Comm Badge").
 nameStrings('iGoldUniform735',"Gold Uniform").
 nameStrings('iEnsign736',"Ensign").
 nameStrings('iBoots737',"Boots").
-nameStrings('iComBadge738',"Comm Badge").
+nameStrings('iCommBadge738',"Comm Badge").
 nameStrings('Item2RedUniform739',"Red Uniform").
 nameStrings('iEnsign740',"Ensign").
 nameStrings('iBoots741',"Boots").
-nameStrings('iComBadge742',"Comm Badge").
+nameStrings('iCommBadge742',"Comm Badge").
 nameStrings('Item2RedUniform743',"Red Uniform").
 nameStrings('iEnsign744',"Ensign").
 nameStrings('iBoots745',"Boots").
-nameStrings('iComBadge746',"Comm Badge").
+nameStrings('iCommBadge746',"Comm Badge").
 nameStrings('Item4BlueUniform747',"Blue Uniform").
 nameStrings('iEnsign748',"Ensign").
 nameStrings('iBoots749',"Boots").
-nameStrings('iComBadge750',"Comm Badge").
+nameStrings('iCommBadge750',"Comm Badge").
 nameStrings('Item4BlueUniform751',"Blue Uniform").
 nameStrings('iEnsign752',"Ensign").
 nameStrings('iBoots753',"Boots").
-nameStrings('iComBadge754',"Comm Badge").
+nameStrings('iCommBadge754',"Comm Badge").
 nameStrings('Item4BlueUniform755',"Blue Uniform").
 nameStrings('Item10DilithiumCrystal756',"Dilithium Crystal").
 nameStrings('Item10DilithiumCrystal757',"Dilithium Crystal").
@@ -694,7 +694,7 @@ nameStrings('Tricorder759',"Tricorder").
 nameStrings('Tricorder760',"Tricorder").
 nameStrings('Tricorder761',"Tricorder").
 nameStrings('NPC1013Alexander671',"alexander rozhenko").
-nameStrings(iCommanderData66,"Data").
+nameStrings(iCommanderdata66,"Data").
 nameStrings(iExplorer1,"Player").
 nameStrings('NPC3DrCrusher677',"Doctor Crusher").
 nameStrings('NPC0Geordi684',"Geordi LaForge").
@@ -715,21 +715,21 @@ nameStrings('iEnsign744',"the ensign").
 nameStrings('iEnsign748',"the ensign").
 nameStrings('iEnsign752',"the ensign").
 nameStrings('iBoots673',"a pair of Starfleet black boots").
-nameStrings('iComBadge674',"a Starfleet communication badge").
+nameStrings('iCommBadge674',"a Starfleet communication badge").
 nameStrings('iGoldUniform675',"a gold Starfleet engineering uniform").
 nameStrings('iPhaser676',"a standard issue phaser").
 nameStrings('iBoots773',"a pair of Starfleet black boots").
-nameStrings('iComBadge774',"a Starfleet communication badge").
+nameStrings('iCommBadge774',"a Starfleet communication badge").
 nameStrings('iGoldUniform775',"a gold Starfleet engineering uniform").
 nameStrings('iPhaser776',"a standard issue phaser").
 nameStrings('iBoots678',"a pair of Starfleet black boots").
-nameStrings('iComBadge679',"a Starfleet communication badge").
+nameStrings('iCommBadge679',"a Starfleet communication badge").
 nameStrings('Item4BlueUniform680',"a blue Starfleet medical uniform").
 nameStrings('MedicalTricorder681',"a medical Tricorder").
 nameStrings('MedicalTricorder682',"a medical Tricorder").
 nameStrings('MedicalTricorder683',"a medical Tricorder").
 nameStrings('iBoots685',"a pair of Starfleet black boots").
-nameStrings('iComBadge686',"a Starfleet communication badge").
+nameStrings('iCommBadge686',"a Starfleet communication badge").
 nameStrings('iGoldUniform687',"a gold Starfleet engineering uniform").
 nameStrings('Item8VISOR688',"Geordi's VISOR").
 nameStrings('Item20Tea690',"a small cup").
@@ -739,49 +739,49 @@ nameStrings('Item23RomulanWhisky693',"a Romulan bottle").
 nameStrings('Item24LemonadePruneJuice694',"a small glass").
 nameStrings('Item25VulcanBeer695',"a Vulcan bottle").
 nameStrings('iBoots697',"a pair of Starfleet black boots").
-nameStrings('iComBadge698',"a Starfleet communication badge").
+nameStrings('iCommBadge698',"a Starfleet communication badge").
 nameStrings('iGoldUniform699',"a gold Starfleet engineering uniform").
 nameStrings('iPhaser700',"a standard issue phaser").
 nameStrings('iBoots702',"a pair of Starfleet black boots").
-nameStrings('iComBadge703',"a Starfleet communication badge").
+nameStrings('iCommBadge703',"a Starfleet communication badge").
 nameStrings('Item2RedUniform704',"a burgandy Starfleet command uniform").
 nameStrings('Item15PhaserRifle705',"a phaser rifle").
 nameStrings('iPicardsFlute',"Picard's flute").
 nameStrings('iBoots708',"a pair of Starfleet black boots").
-nameStrings('iComBadge709',"a Starfleet communication badge").
+nameStrings('iCommBadge709',"a Starfleet communication badge").
 nameStrings('Item2RedUniform710',"a burgandy Starfleet command uniform").
 nameStrings('Item12Trombone711',"Riker's trombone").
 nameStrings('iBoots713',"a pair of Starfleet black boots").
-nameStrings('iComBadge714',"a Starfleet communication badge").
+nameStrings('iCommBadge714',"a Starfleet communication badge").
 nameStrings('Item4BlueUniform715',"a blue Starfleet medical uniform").
 nameStrings('iBoots717',"a pair of Starfleet black boots").
-nameStrings('iComBadge718',"a Starfleet communication badge").
+nameStrings('iCommBadge718',"a Starfleet communication badge").
 nameStrings('Item2RedUniform719',"a burgandy Starfleet command uniform").
 nameStrings('iBoots721',"a pair of Starfleet black boots").
-nameStrings('iComBadge722',"a Starfleet communication badge").
+nameStrings('iCommBadge722',"a Starfleet communication badge").
 nameStrings('iGoldUniform723',"a gold Starfleet engineering uniform").
 nameStrings('iPhaser724',"a standard issue phaser").
 nameStrings('Item7Sash725',"Worf's sash").
 nameStrings('iBoots729',"a pair of Starfleet black boots").
-nameStrings('iComBadge730',"a Starfleet communication badge").
+nameStrings('iCommBadge730',"a Starfleet communication badge").
 nameStrings('iGoldUniform731',"a gold Starfleet engineering uniform").
 nameStrings('iBoots733',"a pair of Starfleet black boots").
-nameStrings('iComBadge734',"a Starfleet communication badge").
+nameStrings('iCommBadge734',"a Starfleet communication badge").
 nameStrings('iGoldUniform735',"a gold Starfleet engineering uniform").
 nameStrings('iBoots737',"a pair of Starfleet black boots").
-nameStrings('iComBadge738',"a Starfleet communication badge").
+nameStrings('iCommBadge738',"a Starfleet communication badge").
 nameStrings('Item2RedUniform739',"a burgandy Starfleet command uniform").
 nameStrings('iBoots741',"a pair of Starfleet black boots").
-nameStrings('iComBadge742',"a Starfleet communication badge").
+nameStrings('iCommBadge742',"a Starfleet communication badge").
 nameStrings('Item2RedUniform743',"a burgandy Starfleet command uniform").
 nameStrings('iBoots745',"a pair of Starfleet black boots").
-nameStrings('iComBadge746',"a Starfleet communication badge").
+nameStrings('iCommBadge746',"a Starfleet communication badge").
 nameStrings('Item4BlueUniform747',"a blue Starfleet medical uniform").
 nameStrings('iBoots749',"a pair of Starfleet black boots").
-nameStrings('iComBadge750',"a Starfleet communication badge").
+nameStrings('iCommBadge750',"a Starfleet communication badge").
 nameStrings('Item4BlueUniform751',"a blue Starfleet medical uniform").
 nameStrings('iBoots753',"a pair of Starfleet black boots").
-nameStrings('iComBadge754',"a Starfleet communication badge").
+nameStrings('iCommBadge754',"a Starfleet communication badge").
 nameStrings('Item4BlueUniform755',"a blue Starfleet medical uniform").
 nameStrings('Item10DilithiumCrystal756',"a dilithium crystal").
 nameStrings('Item10DilithiumCrystal757',"a dilithium crystal").
@@ -800,7 +800,7 @@ number_of_clauses(1).
 Pattern: pddlDescription(_G1470,_G1471). 
  */
 pddlDescription('NPC0Geordi684',["Lieutenant","Commander","Geordi","LaForge","Geordi LaForge","Lieutenant Commander Geordi LaForge is standing here","Geordi is the Chief Engineer of the Enterprise","He's blind, so he wears a special VISOR that lets him see things","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 3","mudMaxHitPoints: 12d12+3200","#$PunchingSomething mudBareHandDamage: 9d9+42","Geordi","Geordi LaForge","Lieutenant Commander Geordi LaForge is standing here","Geordi is the Chief Engineer of the Enterprise","He's blind, so he wears a special VISOR that lets him see things"]).
-pddlDescription(iCommanderData66,["Lieutenant","Commander","Data","Android","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He mudStowing superhuman strength, and is extremely tough","ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON","NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 1","mudMaxHitPoints: 18d18+4000","#$PunchingSomething mudBareHandDamage: 10d10+75","Data","CycLBot","CycBot","CycBot1","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He mudStowing superhuman strength, and is extremely tough"]).
+pddlDescription(iCommanderdata66,["Lieutenant","Commander","Data","Android","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He mudStowing superhuman strength, and is extremely tough","ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON","NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 1","mudMaxHitPoints: 18d18+4000","#$PunchingSomething mudBareHandDamage: 10d10+75","Data","CycLBot","CycBot","CycBot1","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He mudStowing superhuman strength, and is extremely tough"]).
 pddlDescription(iExplorer1,["Lieutenant","Commander","Human","Player",
             "Explorer Player",
             "ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON",
@@ -865,24 +865,24 @@ pddlDescription('iBoots741',["starfleet","black","boots","a pair of Starfleet bl
 pddlDescription('iBoots745',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
 pddlDescription('iBoots749',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
 pddlDescription('iBoots753',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-pddlDescription('iComBadge674',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-pddlDescription('iComBadge774',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-pddlDescription('iComBadge679',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-pddlDescription('iComBadge686',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1",
+pddlDescription('iCommBadge674',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+pddlDescription('iCommBadge774',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+pddlDescription('iCommBadge679',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+pddlDescription('iCommBadge686',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1",
                      "These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-pddlDescription('iComBadge698',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-pddlDescription('iComBadge703',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-pddlDescription('iComBadge709',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-pddlDescription('iComBadge714',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-pddlDescription('iComBadge718',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-pddlDescription('iComBadge722',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-pddlDescription('iComBadge730',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-pddlDescription('iComBadge734',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-pddlDescription('iComBadge738',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-pddlDescription('iComBadge742',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-pddlDescription('iComBadge746',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-pddlDescription('iComBadge750',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-pddlDescription('iComBadge754',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+pddlDescription('iCommBadge698',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+pddlDescription('iCommBadge703',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+pddlDescription('iCommBadge709',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+pddlDescription('iCommBadge714',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+pddlDescription('iCommBadge718',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+pddlDescription('iCommBadge722',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+pddlDescription('iCommBadge730',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+pddlDescription('iCommBadge734',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+pddlDescription('iCommBadge738',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+pddlDescription('iCommBadge742',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+pddlDescription('iCommBadge746',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+pddlDescription('iCommBadge750',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+pddlDescription('iCommBadge754',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
 pddlDescription('Item7Sash725',["worf's","worf","sash","Worf's sash","Worf's silver chain sash has been left here","mudArmorLevel: 8","Worf's sash is some sort of Klingon clothing. Worf always wears it, which makes you wonder how you managed to get a hold of it..","Sash","Worf's sash"]).
 pddlDescription('Item8VISOR688',["geordi","geordi's","visor","Geordi's VISOR","Geordi's VISOR is lying here","mudArmorLevel: 2","Geordi's VISOR was made specially for him, because he's blind. This piece of equipment allows him to see things, but differently than normal eyes. I wonder how Geordi is managing, now that you've stolen his only way of seeing?","VISOR","Geordi's VISOR"]).
 pddlDescription('MedicalTricorder681',["medical","tricorder","a medical Tricorder","A medical Tricorder is lying here, ready to be used","mudLevelOf: 10","chargeCapacity: 5","mudEnergy: 5","This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it","Medical Tricorder","a medical Tricorder"]).
@@ -1026,101 +1026,101 @@ pddlDescription('iArea1041',["Outer Space","You're floating in outer space right
 
  /* found 141 for pddlDescription(_G1470,_G1471). */ 
 
-/* Prediate:  pathBetween/3 
+/* Prediate:  pathDirLeadsTo/3 
 interpreted.
 file('c:/development/opensim4opencog/bin/cynd/startrek/mudreader.pl').
 line_count(31).
 number_of_clauses(1).
-Pattern: pathBetween(_G1494,_G1495,_G1496). 
+Pattern: pathDirLeadsTo(_G1494,_G1495,_G1496). 
  */
-pathBetween('iArea1000',vNorth,'iArea1002').
-pathBetween('iArea1001',vEast,'iArea1002').
-pathBetween('iArea1002',vNorth,'iArea1005').
-pathBetween('iArea1002',vEast,'iArea1003').
-pathBetween('iArea1002',vSouth,'iArea1000').
-pathBetween('iArea1002',vWest,'iArea1001').
-pathBetween('iArea1003',vWest,'iArea1002').
-pathBetween('iArea1004',vEast,'iArea1005').
-pathBetween('iArea1005',vNorth,'iArea1008').
-pathBetween('iArea1005',vEast,'iArea1006').
-pathBetween('iArea1005',vSouth,'iArea1002').
-pathBetween('iArea1005',vWest,'iArea1004').
-pathBetween('iArea1006',vNorth,'iArea1042').
-pathBetween('iArea1006',vWest,'iArea1005').
-pathBetween('iArea1007',vEast,'iArea1008').
-pathBetween('iArea1008',vNorth,'iArea1010').
-pathBetween('iArea1008',vEast,'iArea1009').
-pathBetween('iArea1008',vSouth,'iArea1005').
-pathBetween('iArea1008',vWest,'iArea1007').
-pathBetween('iArea1009',vWest,'iArea1008').
-pathBetween('iArea1010',vSouth,'iArea1008').
-pathBetween('iArea1010',vUp,'iArea1011').
-pathBetween('iArea1011',vNorth,'iArea1013').
-pathBetween('iArea1011',vUp,'iArea1032').
-pathBetween('iArea1011',vDown,'iArea1010').
-pathBetween('iArea1012',vEast,'iArea1013').
-pathBetween('iArea1013',vNorth,'iArea1016').
-pathBetween('iArea1013',vEast,'iArea1014').
-pathBetween('iArea1013',vSouth,'iArea1011').
-pathBetween('iArea1013',vWest,'iArea1012').
-pathBetween('iArea1014',vWest,'iArea1013').
-pathBetween('iArea1015',vEast,'iArea1016').
-pathBetween('iArea1016',vNorth,'iArea1019').
-pathBetween('iArea1016',vEast,'iArea1017').
-pathBetween('iArea1016',vSouth,'iArea1013').
-pathBetween('iArea1016',vWest,'iArea1015').
-pathBetween('iArea1017',vWest,'iArea1016').
-pathBetween('iArea1018',vEast,'iArea1019').
-pathBetween('iArea1019',vNorth,'iArea1021').
-pathBetween('iArea1019',vEast,'iArea1020').
-pathBetween('iArea1019',vSouth,'iArea1016').
-pathBetween('iArea1019',vWest,'iArea1018').
-pathBetween('iArea1020',vWest,'iArea1019').
-pathBetween('iArea1021',vSouth,'iArea1019').
-pathBetween('iArea1022',vNorth,'iArea1024').
-pathBetween('iArea1022',vSouth,'iArea1039').
-pathBetween('iArea1023',vEast,'iArea1024').
-pathBetween('iArea1024',vNorth,'iArea1027').
-pathBetween('iArea1024',vEast,'iArea1025').
-pathBetween('iArea1024',vSouth,'iArea1022').
-pathBetween('iArea1024',vWest,'iArea1023').
-pathBetween('iArea1025',vWest,'iArea1024').
-pathBetween('iArea1026',vEast,'iArea1027').
-pathBetween('iArea1027',vNorth,'iArea1030').
-pathBetween('iArea1027',vEast,'iArea1028').
-pathBetween('iArea1027',vSouth,'iArea1024').
-pathBetween('iArea1027',vWest,'iArea1026').
-pathBetween('iArea1028',vWest,'iArea1027').
-pathBetween('iArea1029',vEast,'iArea1030').
-pathBetween('iArea1030',vNorth,'iArea1032').
-pathBetween('iArea1030',vEast,'iArea1031').
-pathBetween('iArea1030',vSouth,'iArea1027').
-pathBetween('iArea1030',vWest,'iArea1029').
-pathBetween('iArea1031',vWest,'iArea1030').
-pathBetween('iArea1032',vSouth,'iArea1030').
-pathBetween('iArea1032',vUp,'iArea1033').
-pathBetween('iArea1032',vDown,'iArea1011').
-pathBetween('iArea1033',vUp,'iArea1034').
-pathBetween('iArea1033',vDown,'iArea1032').
-pathBetween('iArea1034',vUp,'iArea1036').
-pathBetween('iArea1034',vDown,'iArea1033').
-pathBetween('iArea1035',vEast,'iArea1038').
-pathBetween('iArea1036',vNorth,'iArea1038').
-pathBetween('iArea1036',vEast,'iArea1037').
-pathBetween('iArea1036',vDown,'iArea1034').
-pathBetween('iArea1037',vWest,'iArea1036').
-pathBetween('iArea1038',vSouth,'iArea1036').
-pathBetween('iArea1038',vWest,'iArea1035').
-pathBetween('iArea1039',vNorth,'iArea1022').
-pathBetween('iArea1039',vUp,'iArea1040').
-pathBetween('iArea1040',vUp,'iArea1041').
-pathBetween('iArea1040',vDown,'iArea1039').
-pathBetween('iArea1041',vUp,'iArea1041').
-pathBetween('iArea1041',vDown,'iArea1040').
-% pathBetween('iArea1042',vNorth,'iArea1004075').
-pathBetween('iArea1042',vSouth,'iArea1006').
+pathDirLeadsTo('iArea1000',vNorth,'iArea1002').
+pathDirLeadsTo('iArea1001',vEast,'iArea1002').
+pathDirLeadsTo('iArea1002',vNorth,'iArea1005').
+pathDirLeadsTo('iArea1002',vEast,'iArea1003').
+pathDirLeadsTo('iArea1002',vSouth,'iArea1000').
+pathDirLeadsTo('iArea1002',vWest,'iArea1001').
+pathDirLeadsTo('iArea1003',vWest,'iArea1002').
+pathDirLeadsTo('iArea1004',vEast,'iArea1005').
+pathDirLeadsTo('iArea1005',vNorth,'iArea1008').
+pathDirLeadsTo('iArea1005',vEast,'iArea1006').
+pathDirLeadsTo('iArea1005',vSouth,'iArea1002').
+pathDirLeadsTo('iArea1005',vWest,'iArea1004').
+pathDirLeadsTo('iArea1006',vNorth,'iArea1042').
+pathDirLeadsTo('iArea1006',vWest,'iArea1005').
+pathDirLeadsTo('iArea1007',vEast,'iArea1008').
+pathDirLeadsTo('iArea1008',vNorth,'iArea1010').
+pathDirLeadsTo('iArea1008',vEast,'iArea1009').
+pathDirLeadsTo('iArea1008',vSouth,'iArea1005').
+pathDirLeadsTo('iArea1008',vWest,'iArea1007').
+pathDirLeadsTo('iArea1009',vWest,'iArea1008').
+pathDirLeadsTo('iArea1010',vSouth,'iArea1008').
+pathDirLeadsTo('iArea1010',vUp,'iArea1011').
+pathDirLeadsTo('iArea1011',vNorth,'iArea1013').
+pathDirLeadsTo('iArea1011',vUp,'iArea1032').
+pathDirLeadsTo('iArea1011',vDown,'iArea1010').
+pathDirLeadsTo('iArea1012',vEast,'iArea1013').
+pathDirLeadsTo('iArea1013',vNorth,'iArea1016').
+pathDirLeadsTo('iArea1013',vEast,'iArea1014').
+pathDirLeadsTo('iArea1013',vSouth,'iArea1011').
+pathDirLeadsTo('iArea1013',vWest,'iArea1012').
+pathDirLeadsTo('iArea1014',vWest,'iArea1013').
+pathDirLeadsTo('iArea1015',vEast,'iArea1016').
+pathDirLeadsTo('iArea1016',vNorth,'iArea1019').
+pathDirLeadsTo('iArea1016',vEast,'iArea1017').
+pathDirLeadsTo('iArea1016',vSouth,'iArea1013').
+pathDirLeadsTo('iArea1016',vWest,'iArea1015').
+pathDirLeadsTo('iArea1017',vWest,'iArea1016').
+pathDirLeadsTo('iArea1018',vEast,'iArea1019').
+pathDirLeadsTo('iArea1019',vNorth,'iArea1021').
+pathDirLeadsTo('iArea1019',vEast,'iArea1020').
+pathDirLeadsTo('iArea1019',vSouth,'iArea1016').
+pathDirLeadsTo('iArea1019',vWest,'iArea1018').
+pathDirLeadsTo('iArea1020',vWest,'iArea1019').
+pathDirLeadsTo('iArea1021',vSouth,'iArea1019').
+pathDirLeadsTo('iArea1022',vNorth,'iArea1024').
+pathDirLeadsTo('iArea1022',vSouth,'iArea1039').
+pathDirLeadsTo('iArea1023',vEast,'iArea1024').
+pathDirLeadsTo('iArea1024',vNorth,'iArea1027').
+pathDirLeadsTo('iArea1024',vEast,'iArea1025').
+pathDirLeadsTo('iArea1024',vSouth,'iArea1022').
+pathDirLeadsTo('iArea1024',vWest,'iArea1023').
+pathDirLeadsTo('iArea1025',vWest,'iArea1024').
+pathDirLeadsTo('iArea1026',vEast,'iArea1027').
+pathDirLeadsTo('iArea1027',vNorth,'iArea1030').
+pathDirLeadsTo('iArea1027',vEast,'iArea1028').
+pathDirLeadsTo('iArea1027',vSouth,'iArea1024').
+pathDirLeadsTo('iArea1027',vWest,'iArea1026').
+pathDirLeadsTo('iArea1028',vWest,'iArea1027').
+pathDirLeadsTo('iArea1029',vEast,'iArea1030').
+pathDirLeadsTo('iArea1030',vNorth,'iArea1032').
+pathDirLeadsTo('iArea1030',vEast,'iArea1031').
+pathDirLeadsTo('iArea1030',vSouth,'iArea1027').
+pathDirLeadsTo('iArea1030',vWest,'iArea1029').
+pathDirLeadsTo('iArea1031',vWest,'iArea1030').
+pathDirLeadsTo('iArea1032',vSouth,'iArea1030').
+pathDirLeadsTo('iArea1032',vUp,'iArea1033').
+pathDirLeadsTo('iArea1032',vDown,'iArea1011').
+pathDirLeadsTo('iArea1033',vUp,'iArea1034').
+pathDirLeadsTo('iArea1033',vDown,'iArea1032').
+pathDirLeadsTo('iArea1034',vUp,'iArea1036').
+pathDirLeadsTo('iArea1034',vDown,'iArea1033').
+pathDirLeadsTo('iArea1035',vEast,'iArea1038').
+pathDirLeadsTo('iArea1036',vNorth,'iArea1038').
+pathDirLeadsTo('iArea1036',vEast,'iArea1037').
+pathDirLeadsTo('iArea1036',vDown,'iArea1034').
+pathDirLeadsTo('iArea1037',vWest,'iArea1036').
+pathDirLeadsTo('iArea1038',vSouth,'iArea1036').
+pathDirLeadsTo('iArea1038',vWest,'iArea1035').
+pathDirLeadsTo('iArea1039',vNorth,'iArea1022').
+pathDirLeadsTo('iArea1039',vUp,'iArea1040').
+pathDirLeadsTo('iArea1040',vUp,'iArea1041').
+pathDirLeadsTo('iArea1040',vDown,'iArea1039').
+pathDirLeadsTo('iArea1041',vUp,'iArea1041').
+pathDirLeadsTo('iArea1041',vDown,'iArea1040').
+% pathDirLeadsTo('iArea1042',vNorth,'iArea1004075').
+pathDirLeadsTo('iArea1042',vSouth,'iArea1006').
 
- /* found 86 for pathBetween(_G1494,_G1495,_G1496). */ 
+ /* found 86 for pathDirLeadsTo(_G1494,_G1495,_G1496). */ 
 
 /* Prediate:  pathName/3 
 interpreted.
@@ -1226,26 +1226,26 @@ pddlSorts(non_primitive_sorts, [
        physical_obj, vehicle, railv, actorNPC, vtDirection]).
 pddlSorts(primitive_sorts, [
         airport, aircraft, train_station, post_office, clocation, city, package, 
-        train, traincar, truck, road_route, rail_route, tRegion,tAgentGeneric]).
+        train, traincar, truck, road_route, rail_route, tRegion,tAgent]).
 
-pddlSorts(physical_obj, [vehicle, package,tCarryAble,tAgentGeneric]).
+pddlSorts(physical_obj, [vehicle, package,tCarryAble,tAgent]).
 pddlSorts(tCarryAble,['tWearAble',tWeapon,tContolDevice,tClothing,'FluidReservoir']).
-pddlSorts(actorNPC, [tAgentGeneric]).
+pddlSorts(actorNPC, [tAgent]).
 */
 
 
-% pddlObjects(SW,List):member(SW,[tWeapon,tContolDevice,tClothing,'FluidReservoir',tRegion,tCarryAble,'tWearAble',tAgentGeneric,'tWearAble']),findall(O,pddlSomethingIsa0(O,SW),ULIST),sort(ULIST,List).
+% pddlObjects(SW,List):member(SW,[tWeapon,tContolDevice,tClothing,'FluidReservoir',tRegion,tCarryAble,'tWearAble',tAgent,'tWearAble']),findall(O,pddlSomethingIsa0(O,SW),ULIST),sort(ULIST,List).
 %SLOW 
 pddlObjects(tWeapon,['iPhaser676','iPhaser700','iPhaser724','iPhaser776','Item15PhaserRifle705']).
 pddlObjects(tContolDevice,['MedicalTricorder681','MedicalTricorder682','MedicalTricorder683','Tricorder759','Tricorder760','Tricorder761']).
-pddlObjects(tClothing,['Item2RedUniform704','Item2RedUniform710','Item2RedUniform719','Item2RedUniform739','Item2RedUniform743','iGoldUniform675','iGoldUniform687','iGoldUniform699','iGoldUniform723','iGoldUniform731','iGoldUniform735','iGoldUniform775','Item4BlueUniform680','Item4BlueUniform715','Item4BlueUniform747','Item4BlueUniform751','Item4BlueUniform755','iBoots673','iBoots678','iBoots685','iBoots697','iBoots702','iBoots708','iBoots713','iBoots717','iBoots721','iBoots729','iBoots733','iBoots737','iBoots741','iBoots745','iBoots749','iBoots753','iBoots773','iComBadge674','iComBadge679','iComBadge686','iComBadge698','iComBadge703','iComBadge709','iComBadge714','iComBadge718','iComBadge722','iComBadge730','iComBadge734','iComBadge738','iComBadge742','iComBadge746','iComBadge750','iComBadge754','iComBadge774','Item7Sash725','Item8VISOR688']).
+pddlObjects(tClothing,['Item2RedUniform704','Item2RedUniform710','Item2RedUniform719','Item2RedUniform739','Item2RedUniform743','iGoldUniform675','iGoldUniform687','iGoldUniform699','iGoldUniform723','iGoldUniform731','iGoldUniform735','iGoldUniform775','Item4BlueUniform680','Item4BlueUniform715','Item4BlueUniform747','Item4BlueUniform751','Item4BlueUniform755','iBoots673','iBoots678','iBoots685','iBoots697','iBoots702','iBoots708','iBoots713','iBoots717','iBoots721','iBoots729','iBoots733','iBoots737','iBoots741','iBoots745','iBoots749','iBoots753','iBoots773','iCommBadge674','iCommBadge679','iCommBadge686','iCommBadge698','iCommBadge703','iCommBadge709','iCommBadge714','iCommBadge718','iCommBadge722','iCommBadge730','iCommBadge734','iCommBadge738','iCommBadge742','iCommBadge746','iCommBadge750','iCommBadge754','iCommBadge774','Item7Sash725','Item8VISOR688']).
 pddlObjects('FluidReservoir',['Item20Tea690','Item21Synthehol691','Item22FerengiAle692','Item23RomulanWhisky693','Item24LemonadePruneJuice694','Item25VulcanBeer695']).
 pddlObjects(tRegion,['iArea1000','iArea1001','iArea1002','iArea1003','iArea1004','iArea1005','iArea1006','iArea1007','iArea1008','iArea1009','iArea1010','iArea1011','iArea1012','iArea1013','iArea1014','iArea1015','iArea1016','iArea1017','iArea1018','iArea1019','iArea1020','iArea1021','iArea1022','iArea1023','iArea1024','iArea1025','iArea1026','iArea1027','iArea1028','iArea1029','iArea1030','iArea1031','iArea1032','iArea1033','iArea1034','iArea1035','iArea1036','iArea1037','iArea1038','iArea1039','iArea1040','iArea1041','iArea1042'
 % ,'iArea1004075'
 ]).
-pddlObjects(tAgentGeneric,['NPC0Geordi684','NPC2Worf720','NPC3DrCrusher677','NPC4Troi712','NPC5Riker707','NPC6Picard701','NPC7Guinan689','NPC8OBrien696','NPC9Wesley716','NPC1010Livingston726','NPC1011Spot727','iEnsign728','iEnsign732','iEnsign736','iEnsign740','iEnsign744','iEnsign748','iEnsign752','NPC1013Alexander671',iCommanderData66,iExplorer1]).
+pddlObjects(tAgent,['NPC0Geordi684','NPC2Worf720','NPC3DrCrusher677','NPC4Troi712','NPC5Riker707','NPC6Picard701','NPC7Guinan689','NPC8OBrien696','NPC9Wesley716','NPC1010Livingston726','NPC1011Spot727','iEnsign728','iEnsign732','iEnsign736','iEnsign740','iEnsign744','iEnsign748','iEnsign752','NPC1013Alexander671',iCommanderdata66,iExplorer1]).
 
-%%pddlObjects(tPathway,List):findall(apath(A,B),pathBetween(A,B,C),List).
+%%pddlObjects(tPathway,List):findall(apath(A,B),pathDirLeadsTo(A,B,C),List).
 pddlObjects(tPathway,[apathFn('iArea1000',vNorth),apathFn('iArea1001',vEast),apathFn('iArea1002',vNorth),apathFn('iArea1002',vEast),apathFn('iArea1002',vSouth),apathFn('iArea1002',vWest),apathFn('iArea1003',vWest),apathFn('iArea1004',vEast),apathFn('iArea1005',vNorth),apathFn('iArea1005',vEast),apathFn('iArea1005',vSouth),apathFn('iArea1005',vWest),apathFn('iArea1006',vNorth),apathFn('iArea1006',vWest),apathFn('iArea1007',vEast),apathFn('iArea1008',vNorth),apathFn('iArea1008',vEast),apathFn('iArea1008',vSouth),apathFn('iArea1008',vWest),apathFn('iArea1009',vWest),apathFn('iArea1010',vSouth),apathFn('iArea1010',vUp),apathFn('iArea1011',vNorth),apathFn('iArea1011',vUp),apathFn('iArea1011',vDown),apathFn('iArea1012',vEast),apathFn('iArea1013',vNorth),apathFn('iArea1013',vEast),apathFn('iArea1013',vSouth),apathFn('iArea1013',vWest),apathFn('iArea1014',vWest),apathFn('iArea1015',vEast),apathFn('iArea1016',vNorth),apathFn('iArea1016',vEast),apathFn('iArea1016',vSouth),apathFn('iArea1016',vWest),apathFn('iArea1017',vWest),apathFn('iArea1018',vEast),apathFn('iArea1019',vNorth),apathFn('iArea1019',vEast),apathFn('iArea1019',vSouth),apathFn('iArea1019',vWest),apathFn('iArea1020',vWest),apathFn('iArea1021',vSouth),apathFn('iArea1022',vNorth),apathFn('iArea1022',vSouth),apathFn('iArea1023',vEast),apathFn('iArea1024',vNorth),apathFn('iArea1024',vEast),apathFn('iArea1024',vSouth),apathFn('iArea1024',vWest),apathFn('iArea1025',vWest),apathFn('iArea1026',vEast),apathFn('iArea1027',vNorth),apathFn('iArea1027',vEast),apathFn('iArea1027',vSouth),apathFn('iArea1027',vWest),apathFn('iArea1028',vWest),apathFn('iArea1029',vEast),apathFn('iArea1030',vNorth),apathFn('iArea1030',vEast),apathFn('iArea1030',vSouth),apathFn('iArea1030',vWest),apathFn('iArea1031',vWest),apathFn('iArea1032',vSouth),apathFn('iArea1032',vUp),apathFn('iArea1032',vDown),apathFn('iArea1033',vUp),apathFn('iArea1033',vDown),apathFn('iArea1034',vUp),apathFn('iArea1034',vDown),apathFn('iArea1035',vEast),apathFn('iArea1036',vNorth),apathFn('iArea1036',vEast),apathFn('iArea1036',vDown),apathFn('iArea1037',vWest),apathFn('iArea1038',vSouth),apathFn('iArea1038',vWest),apathFn('iArea1039',vNorth),apathFn('iArea1039',vUp),apathFn('iArea1040',vUp),apathFn('iArea1040',vDown),apathFn('iArea1041',vUp),apathFn('iArea1041',vDown),apathFn('iArea1042',vNorth),apathFn('iArea1042',vSouth)]).
 
 pddlObjects(vtDirection,[vNorth,vSouth,vEast,vWest,vUp,vDown]).
@@ -1269,94 +1269,94 @@ inconsistent_constraint([certified(P), not_insured(P)]).
 
 %%atomic_invariants([]):!.%%,fail.
 atomic_invariants([
-      pathBetween('iArea1000',vNorth,'iArea1002'),
-      pathBetween('iArea1001',vEast,'iArea1002'),
-      pathBetween('iArea1002',vNorth,'iArea1005'),
-      pathBetween('iArea1002',vEast,'iArea1003'),
-      pathBetween('iArea1002',vSouth,'iArea1000'),
-      pathBetween('iArea1002',vWest,'iArea1001'),
-      pathBetween('iArea1003',vWest,'iArea1002'),
-      pathBetween('iArea1004',vEast,'iArea1005'),
-      pathBetween('iArea1005',vNorth,'iArea1008'),
-      pathBetween('iArea1005',vEast,'iArea1006'),
-      pathBetween('iArea1005',vSouth,'iArea1002'),
-      pathBetween('iArea1005',vWest,'iArea1004'),
-      pathBetween('iArea1006',vNorth,'iArea1042'),
-      pathBetween('iArea1006',vWest,'iArea1005'),
-      pathBetween('iArea1007',vEast,'iArea1008'),
-      pathBetween('iArea1008',vNorth,'iArea1010'),
-      pathBetween('iArea1008',vEast,'iArea1009'),
-      pathBetween('iArea1008',vSouth,'iArea1005'),
-      pathBetween('iArea1008',vWest,'iArea1007'),
-      pathBetween('iArea1009',vWest,'iArea1008'),
-      pathBetween('iArea1010',vSouth,'iArea1008'),
-      pathBetween('iArea1010',vUp,'iArea1011'),
-      pathBetween('iArea1011',vNorth,'iArea1013'),
-      pathBetween('iArea1011',vUp,'iArea1032'),
-      pathBetween('iArea1011',vDown,'iArea1010'),
-      pathBetween('iArea1012',vEast,'iArea1013'),
-      pathBetween('iArea1013',vNorth,'iArea1016'),
-      pathBetween('iArea1013',vEast,'iArea1014'),
-      pathBetween('iArea1013',vSouth,'iArea1011'),
-      pathBetween('iArea1013',vWest,'iArea1012'),
-      pathBetween('iArea1014',vWest,'iArea1013'),
-      pathBetween('iArea1015',vEast,'iArea1016'),
-      pathBetween('iArea1016',vNorth,'iArea1019'),
-      pathBetween('iArea1016',vEast,'iArea1017'),
-      pathBetween('iArea1016',vSouth,'iArea1013'),
-      pathBetween('iArea1016',vWest,'iArea1015'),
-      pathBetween('iArea1017',vWest,'iArea1016'),
-      pathBetween('iArea1018',vEast,'iArea1019'),
-      pathBetween('iArea1019',vNorth,'iArea1021'),
-      pathBetween('iArea1019',vEast,'iArea1020'),
-      pathBetween('iArea1019',vSouth,'iArea1016'),
-      pathBetween('iArea1019',vWest,'iArea1018'),
-      pathBetween('iArea1020',vWest,'iArea1019'),
-      pathBetween('iArea1021',vSouth,'iArea1019'),
-      pathBetween('iArea1022',vNorth,'iArea1024'),
-      pathBetween('iArea1022',vSouth,'iArea1039'),
-      pathBetween('iArea1023',vEast,'iArea1024'),
-      pathBetween('iArea1024',vNorth,'iArea1027'),
-      pathBetween('iArea1024',vEast,'iArea1025'),
-      pathBetween('iArea1024',vSouth,'iArea1022'),
-      pathBetween('iArea1024',vWest,'iArea1023'),
-      pathBetween('iArea1025',vWest,'iArea1024'),
-      pathBetween('iArea1026',vEast,'iArea1027'),
-      pathBetween('iArea1027',vNorth,'iArea1030'),
-      pathBetween('iArea1027',vEast,'iArea1028'),
-      pathBetween('iArea1027',vSouth,'iArea1024'),
-      pathBetween('iArea1027',vWest,'iArea1026'),
-      pathBetween('iArea1028',vWest,'iArea1027'),
-      pathBetween('iArea1029',vEast,'iArea1030'),
-      pathBetween('iArea1030',vNorth,'iArea1032'),
-      pathBetween('iArea1030',vEast,'iArea1031'),
-      pathBetween('iArea1030',vSouth,'iArea1027'),
-      pathBetween('iArea1030',vWest,'iArea1029'),
-      pathBetween('iArea1031',vWest,'iArea1030'),
-      pathBetween('iArea1032',vSouth,'iArea1030'),
-      pathBetween('iArea1032',vUp,'iArea1033'),
-      pathBetween('iArea1032',vDown,'iArea1011'),
-      pathBetween('iArea1033',vUp,'iArea1034'),
-      pathBetween('iArea1033',vDown,'iArea1032'),
-      pathBetween('iArea1034',vUp,'iArea1036'),
-      pathBetween('iArea1034',vDown,'iArea1033'),
-      pathBetween('iArea1035',vEast,'iArea1038'),
-      pathBetween('iArea1036',vNorth,'iArea1038'),
-      pathBetween('iArea1036',vEast,'iArea1037'),
-      pathBetween('iArea1036',vDown,'iArea1034'),
-      pathBetween('iArea1037',vWest,'iArea1036'),
-      pathBetween('iArea1038',vSouth,'iArea1036'),
-      pathBetween('iArea1038',vWest,'iArea1035'),
-      pathBetween('iArea1039',vNorth,'iArea1022'),
-      pathBetween('iArea1039',vUp,'iArea1040'),
-      pathBetween('iArea1040',vUp,'iArea1041'),
-      pathBetween('iArea1040',vDown,'iArea1039'),
-      pathBetween('iArea1041',vUp,'iArea1041'),
-      pathBetween('iArea1041',vDown,'iArea1040'),
-      % pathBetween('iArea1042',vNorth,'iArea1004075'),
-      pathBetween('iArea1042',vSouth,'iArea1006'),
+      pathDirLeadsTo('iArea1000',vNorth,'iArea1002'),
+      pathDirLeadsTo('iArea1001',vEast,'iArea1002'),
+      pathDirLeadsTo('iArea1002',vNorth,'iArea1005'),
+      pathDirLeadsTo('iArea1002',vEast,'iArea1003'),
+      pathDirLeadsTo('iArea1002',vSouth,'iArea1000'),
+      pathDirLeadsTo('iArea1002',vWest,'iArea1001'),
+      pathDirLeadsTo('iArea1003',vWest,'iArea1002'),
+      pathDirLeadsTo('iArea1004',vEast,'iArea1005'),
+      pathDirLeadsTo('iArea1005',vNorth,'iArea1008'),
+      pathDirLeadsTo('iArea1005',vEast,'iArea1006'),
+      pathDirLeadsTo('iArea1005',vSouth,'iArea1002'),
+      pathDirLeadsTo('iArea1005',vWest,'iArea1004'),
+      pathDirLeadsTo('iArea1006',vNorth,'iArea1042'),
+      pathDirLeadsTo('iArea1006',vWest,'iArea1005'),
+      pathDirLeadsTo('iArea1007',vEast,'iArea1008'),
+      pathDirLeadsTo('iArea1008',vNorth,'iArea1010'),
+      pathDirLeadsTo('iArea1008',vEast,'iArea1009'),
+      pathDirLeadsTo('iArea1008',vSouth,'iArea1005'),
+      pathDirLeadsTo('iArea1008',vWest,'iArea1007'),
+      pathDirLeadsTo('iArea1009',vWest,'iArea1008'),
+      pathDirLeadsTo('iArea1010',vSouth,'iArea1008'),
+      pathDirLeadsTo('iArea1010',vUp,'iArea1011'),
+      pathDirLeadsTo('iArea1011',vNorth,'iArea1013'),
+      pathDirLeadsTo('iArea1011',vUp,'iArea1032'),
+      pathDirLeadsTo('iArea1011',vDown,'iArea1010'),
+      pathDirLeadsTo('iArea1012',vEast,'iArea1013'),
+      pathDirLeadsTo('iArea1013',vNorth,'iArea1016'),
+      pathDirLeadsTo('iArea1013',vEast,'iArea1014'),
+      pathDirLeadsTo('iArea1013',vSouth,'iArea1011'),
+      pathDirLeadsTo('iArea1013',vWest,'iArea1012'),
+      pathDirLeadsTo('iArea1014',vWest,'iArea1013'),
+      pathDirLeadsTo('iArea1015',vEast,'iArea1016'),
+      pathDirLeadsTo('iArea1016',vNorth,'iArea1019'),
+      pathDirLeadsTo('iArea1016',vEast,'iArea1017'),
+      pathDirLeadsTo('iArea1016',vSouth,'iArea1013'),
+      pathDirLeadsTo('iArea1016',vWest,'iArea1015'),
+      pathDirLeadsTo('iArea1017',vWest,'iArea1016'),
+      pathDirLeadsTo('iArea1018',vEast,'iArea1019'),
+      pathDirLeadsTo('iArea1019',vNorth,'iArea1021'),
+      pathDirLeadsTo('iArea1019',vEast,'iArea1020'),
+      pathDirLeadsTo('iArea1019',vSouth,'iArea1016'),
+      pathDirLeadsTo('iArea1019',vWest,'iArea1018'),
+      pathDirLeadsTo('iArea1020',vWest,'iArea1019'),
+      pathDirLeadsTo('iArea1021',vSouth,'iArea1019'),
+      pathDirLeadsTo('iArea1022',vNorth,'iArea1024'),
+      pathDirLeadsTo('iArea1022',vSouth,'iArea1039'),
+      pathDirLeadsTo('iArea1023',vEast,'iArea1024'),
+      pathDirLeadsTo('iArea1024',vNorth,'iArea1027'),
+      pathDirLeadsTo('iArea1024',vEast,'iArea1025'),
+      pathDirLeadsTo('iArea1024',vSouth,'iArea1022'),
+      pathDirLeadsTo('iArea1024',vWest,'iArea1023'),
+      pathDirLeadsTo('iArea1025',vWest,'iArea1024'),
+      pathDirLeadsTo('iArea1026',vEast,'iArea1027'),
+      pathDirLeadsTo('iArea1027',vNorth,'iArea1030'),
+      pathDirLeadsTo('iArea1027',vEast,'iArea1028'),
+      pathDirLeadsTo('iArea1027',vSouth,'iArea1024'),
+      pathDirLeadsTo('iArea1027',vWest,'iArea1026'),
+      pathDirLeadsTo('iArea1028',vWest,'iArea1027'),
+      pathDirLeadsTo('iArea1029',vEast,'iArea1030'),
+      pathDirLeadsTo('iArea1030',vNorth,'iArea1032'),
+      pathDirLeadsTo('iArea1030',vEast,'iArea1031'),
+      pathDirLeadsTo('iArea1030',vSouth,'iArea1027'),
+      pathDirLeadsTo('iArea1030',vWest,'iArea1029'),
+      pathDirLeadsTo('iArea1031',vWest,'iArea1030'),
+      pathDirLeadsTo('iArea1032',vSouth,'iArea1030'),
+      pathDirLeadsTo('iArea1032',vUp,'iArea1033'),
+      pathDirLeadsTo('iArea1032',vDown,'iArea1011'),
+      pathDirLeadsTo('iArea1033',vUp,'iArea1034'),
+      pathDirLeadsTo('iArea1033',vDown,'iArea1032'),
+      pathDirLeadsTo('iArea1034',vUp,'iArea1036'),
+      pathDirLeadsTo('iArea1034',vDown,'iArea1033'),
+      pathDirLeadsTo('iArea1035',vEast,'iArea1038'),
+      pathDirLeadsTo('iArea1036',vNorth,'iArea1038'),
+      pathDirLeadsTo('iArea1036',vEast,'iArea1037'),
+      pathDirLeadsTo('iArea1036',vDown,'iArea1034'),
+      pathDirLeadsTo('iArea1037',vWest,'iArea1036'),
+      pathDirLeadsTo('iArea1038',vSouth,'iArea1036'),
+      pathDirLeadsTo('iArea1038',vWest,'iArea1035'),
+      pathDirLeadsTo('iArea1039',vNorth,'iArea1022'),
+      pathDirLeadsTo('iArea1039',vUp,'iArea1040'),
+      pathDirLeadsTo('iArea1040',vUp,'iArea1041'),
+      pathDirLeadsTo('iArea1040',vDown,'iArea1039'),
+      pathDirLeadsTo('iArea1041',vUp,'iArea1041'),
+      pathDirLeadsTo('iArea1041',vDown,'iArea1040'),
+      % pathDirLeadsTo('iArea1042',vNorth,'iArea1004075'),
+      pathDirLeadsTo('iArea1042',vSouth,'iArea1006'),
 
-     %% printAll(pathBetween(X,Y,Z),agentRoute(apath(X,Y),X,Z)).
+     %% printAll(pathDirLeadsTo(X,Y,Z),agentRoute(apath(X,Y),X,Z)).
       agentRoute(apath('iArea1000',vNorth),'iArea1000','iArea1002'),
       agentRoute(apath('iArea1001',vEast),'iArea1001','iArea1002'),
       agentRoute(apath('iArea1002',vNorth),'iArea1002','iArea1005'),
@@ -1454,7 +1454,7 @@ substate_classes(physical_obj, P,
         [at(P,L)]
        ]).
 
-substate_classes(tAgentGeneric, P,
+substate_classes(tAgent, P,
        [
         [localityOfObject(P,L)]
        ]).
@@ -1750,7 +1750,7 @@ docs ready */
 
 % TESTS
 
-actorStartState(tAgentGeneric,X,[localityOfObject(X,Y)|List]):tAgentGeneric(X),localityOfObject(X,Y),findall(mudStowing(X,P),mudStowing(X,P),List1),findall(wearsClothing(X,P),wearsClothing(X,P),List2),flatten([List1,List2],List).
+actorStartState(tAgent,X,[localityOfObject(X,Y)|List]):tAgent(X),localityOfObject(X,Y),findall(mudStowing(X,P),mudStowing(X,P),List1),findall(wearsClothing(X,P),wearsClothing(X,P),List2),flatten([List1,List2],List).
 initialStart([ 
 
 /*
@@ -1766,28 +1766,28 @@ localityOfObject('Tricorder759','iArea1015').
 localityOfObject('Tricorder760','iArea1015').
 localityOfObject('Tricorder761','iArea1015').
 */
-%% printAll(actorStartState(tAgentGeneric,X,List),ss(tAgentGeneric,X,List)).
-   ss(tAgentGeneric,'NPC0Geordi684',[localityOfObject('NPC0Geordi684','iArea1000'),wearsClothing('NPC0Geordi684','iBoots685'),wearsClothing('NPC0Geordi684','iComBadge686'),wearsClothing('NPC0Geordi684','iGoldUniform687'),wearsClothing('NPC0Geordi684','Item8VISOR688')]),
-   ss(tAgentGeneric,vacuum(1),[localityOfObject(vacuum(1),'iArea1010'),mudStowing(vacuum(1),'iPhaser676'),wearsClothing(vacuum(1),'iBoots673'),wearsClothing(vacuum(1),'iComBadge674'),wearsClothing(vacuum(1),'iGoldUniform675')]),
-   ss(tAgentGeneric,iPlayer1,[localityOfObject(iPlayer1,'iArea1000'),mudStowing(iPlayer1,'iPhaser776'),wearsClothing(iPlayer1,'iBoots773'),wearsClothing(iPlayer1,'iComBadge774'),wearsClothing(iPlayer1,'iGoldUniform775')]),
-   ss(tAgentGeneric,'NPC2Worf720',[localityOfObject('NPC2Worf720','iArea1025'),mudStowing('NPC2Worf720','iPhaser724'),wearsClothing('NPC2Worf720','iBoots721'),wearsClothing('NPC2Worf720','iComBadge722'),wearsClothing('NPC2Worf720','iGoldUniform723'),wearsClothing('NPC2Worf720','Item7Sash725')]),
-   ss(tAgentGeneric,'NPC3DrCrusher677',[localityOfObject('NPC3DrCrusher677','iArea1015'),mudStowing('NPC3DrCrusher677','MedicalTricorder681'),mudStowing('NPC3DrCrusher677','MedicalTricorder682'),mudStowing('NPC3DrCrusher677','MedicalTricorder683'),wearsClothing('NPC3DrCrusher677','iBoots678'),wearsClothing('NPC3DrCrusher677','iComBadge679'),wearsClothing('NPC3DrCrusher677','Item4BlueUniform680')]),
-   ss(tAgentGeneric,'NPC4Troi712',[localityOfObject('NPC4Troi712','iArea1007'),wearsClothing('NPC4Troi712','iBoots713'),wearsClothing('NPC4Troi712','iComBadge714'),wearsClothing('NPC4Troi712','Item4BlueUniform715')]),
-   ss(tAgentGeneric,'NPC5Riker707',[localityOfObject('NPC5Riker707','iArea1036'),mudStowing('NPC5Riker707','Item12Trombone711'),wearsClothing('NPC5Riker707','iBoots708'),wearsClothing('NPC5Riker707','iComBadge709'),wearsClothing('NPC5Riker707','Item2RedUniform710')]),
-   ss(tAgentGeneric,'NPC6Picard701',[localityOfObject('NPC6Picard701','iArea1035'),mudStowing('NPC6Picard701','Item15PhaserRifle705'),mudStowing('NPC6Picard701','iPicardsFlute'),wearsClothing('NPC6Picard701','iBoots702'),wearsClothing('NPC6Picard701','iComBadge703'),wearsClothing('NPC6Picard701','Item2RedUniform704')]),
-   ss(tAgentGeneric,'NPC7Guinan689',[localityOfObject('NPC7Guinan689','iArea1021'),mudStowing('NPC7Guinan689','Item20Tea690'),mudStowing('NPC7Guinan689','Item21Synthehol691'),mudStowing('NPC7Guinan689','Item22FerengiAle692'),mudStowing('NPC7Guinan689','Item23RomulanWhisky693'),mudStowing('NPC7Guinan689','Item24LemonadePruneJuice694'),mudStowing('NPC7Guinan689','Item25VulcanBeer695')]),
-   ss(tAgentGeneric,'NPC8OBrien696',[localityOfObject('NPC8OBrien696','iArea1006'),mudStowing('NPC8OBrien696','iPhaser700'),wearsClothing('NPC8OBrien696','iBoots697'),wearsClothing('NPC8OBrien696','iComBadge698'),wearsClothing('NPC8OBrien696','iGoldUniform699')]),
-   ss(tAgentGeneric,'NPC9Wesley716',[localityOfObject('NPC9Wesley716','iArea1016'),wearsClothing('NPC9Wesley716','iBoots717'),wearsClothing('NPC9Wesley716','iComBadge718'),wearsClothing('NPC9Wesley716','Item2RedUniform719')]),
-   ss(tAgentGeneric,'NPC1010Livingston726',[localityOfObject('NPC1010Livingston726','iArea1035')]),
-   ss(tAgentGeneric,'NPC1011Spot727',[localityOfObject('NPC1011Spot727','iArea1003')]),
-   ss(tAgentGeneric,'iEnsign728',[localityOfObject('iEnsign728','iArea1000'),wearsClothing('iEnsign728','iBoots729'),wearsClothing('iEnsign728','iComBadge730'),wearsClothing('iEnsign728','iGoldUniform731')]),
-   ss(tAgentGeneric,'iEnsign732',[localityOfObject('iEnsign732','iArea1004'),wearsClothing('iEnsign732','iBoots733'),wearsClothing('iEnsign732','iComBadge734'),wearsClothing('iEnsign732','iGoldUniform735')]),
-   ss(tAgentGeneric,'iEnsign736',[localityOfObject('iEnsign736','iArea1011'),wearsClothing('iEnsign736','iBoots737'),wearsClothing('iEnsign736','iComBadge738'),wearsClothing('iEnsign736','Item2RedUniform739')]),
-   ss(tAgentGeneric,'iEnsign740',[localityOfObject('iEnsign740','iArea1020'),wearsClothing('iEnsign740','iBoots741'),wearsClothing('iEnsign740','iComBadge742'),wearsClothing('iEnsign740','Item2RedUniform743')]),
-   ss(tAgentGeneric,'iEnsign744',[localityOfObject('iEnsign744','iArea1024'),wearsClothing('iEnsign744','iBoots745'),wearsClothing('iEnsign744','iComBadge746'),wearsClothing('iEnsign744','Item4BlueUniform747')]),
-   ss(tAgentGeneric,'iEnsign748',[localityOfObject('iEnsign748','iArea1022'),wearsClothing('iEnsign748','iBoots749'),wearsClothing('iEnsign748','iComBadge750'),wearsClothing('iEnsign748','Item4BlueUniform751')]),
-   ss(tAgentGeneric,'iEnsign752',[localityOfObject('iEnsign752','iArea1036'),wearsClothing('iEnsign752','iBoots753'),wearsClothing('iEnsign752','iComBadge754'),wearsClothing('iEnsign752','Item4BlueUniform755')]),
-   ss(tAgentGeneric,'NPC1013Alexander671',[localityOfObject('NPC1013Alexander671','iArea1025')])
+%% printAll(actorStartState(tAgent,X,List),ss(tAgent,X,List)).
+   ss(tAgent,'NPC0Geordi684',[localityOfObject('NPC0Geordi684','iArea1000'),wearsClothing('NPC0Geordi684','iBoots685'),wearsClothing('NPC0Geordi684','iCommBadge686'),wearsClothing('NPC0Geordi684','iGoldUniform687'),wearsClothing('NPC0Geordi684','Item8VISOR688')]),
+   ss(tAgent,vacuum(1),[localityOfObject(vacuum(1),'iArea1010'),mudStowing(vacuum(1),'iPhaser676'),wearsClothing(vacuum(1),'iBoots673'),wearsClothing(vacuum(1),'iCommBadge674'),wearsClothing(vacuum(1),'iGoldUniform675')]),
+   ss(tAgent,iPlayer1,[localityOfObject(iPlayer1,'iArea1000'),mudStowing(iPlayer1,'iPhaser776'),wearsClothing(iPlayer1,'iBoots773'),wearsClothing(iPlayer1,'iCommBadge774'),wearsClothing(iPlayer1,'iGoldUniform775')]),
+   ss(tAgent,'NPC2Worf720',[localityOfObject('NPC2Worf720','iArea1025'),mudStowing('NPC2Worf720','iPhaser724'),wearsClothing('NPC2Worf720','iBoots721'),wearsClothing('NPC2Worf720','iCommBadge722'),wearsClothing('NPC2Worf720','iGoldUniform723'),wearsClothing('NPC2Worf720','Item7Sash725')]),
+   ss(tAgent,'NPC3DrCrusher677',[localityOfObject('NPC3DrCrusher677','iArea1015'),mudStowing('NPC3DrCrusher677','MedicalTricorder681'),mudStowing('NPC3DrCrusher677','MedicalTricorder682'),mudStowing('NPC3DrCrusher677','MedicalTricorder683'),wearsClothing('NPC3DrCrusher677','iBoots678'),wearsClothing('NPC3DrCrusher677','iCommBadge679'),wearsClothing('NPC3DrCrusher677','Item4BlueUniform680')]),
+   ss(tAgent,'NPC4Troi712',[localityOfObject('NPC4Troi712','iArea1007'),wearsClothing('NPC4Troi712','iBoots713'),wearsClothing('NPC4Troi712','iCommBadge714'),wearsClothing('NPC4Troi712','Item4BlueUniform715')]),
+   ss(tAgent,'NPC5Riker707',[localityOfObject('NPC5Riker707','iArea1036'),mudStowing('NPC5Riker707','Item12Trombone711'),wearsClothing('NPC5Riker707','iBoots708'),wearsClothing('NPC5Riker707','iCommBadge709'),wearsClothing('NPC5Riker707','Item2RedUniform710')]),
+   ss(tAgent,'NPC6Picard701',[localityOfObject('NPC6Picard701','iArea1035'),mudStowing('NPC6Picard701','Item15PhaserRifle705'),mudStowing('NPC6Picard701','iPicardsFlute'),wearsClothing('NPC6Picard701','iBoots702'),wearsClothing('NPC6Picard701','iCommBadge703'),wearsClothing('NPC6Picard701','Item2RedUniform704')]),
+   ss(tAgent,'NPC7Guinan689',[localityOfObject('NPC7Guinan689','iArea1021'),mudStowing('NPC7Guinan689','Item20Tea690'),mudStowing('NPC7Guinan689','Item21Synthehol691'),mudStowing('NPC7Guinan689','Item22FerengiAle692'),mudStowing('NPC7Guinan689','Item23RomulanWhisky693'),mudStowing('NPC7Guinan689','Item24LemonadePruneJuice694'),mudStowing('NPC7Guinan689','Item25VulcanBeer695')]),
+   ss(tAgent,'NPC8OBrien696',[localityOfObject('NPC8OBrien696','iArea1006'),mudStowing('NPC8OBrien696','iPhaser700'),wearsClothing('NPC8OBrien696','iBoots697'),wearsClothing('NPC8OBrien696','iCommBadge698'),wearsClothing('NPC8OBrien696','iGoldUniform699')]),
+   ss(tAgent,'NPC9Wesley716',[localityOfObject('NPC9Wesley716','iArea1016'),wearsClothing('NPC9Wesley716','iBoots717'),wearsClothing('NPC9Wesley716','iCommBadge718'),wearsClothing('NPC9Wesley716','Item2RedUniform719')]),
+   ss(tAgent,'NPC1010Livingston726',[localityOfObject('NPC1010Livingston726','iArea1035')]),
+   ss(tAgent,'NPC1011Spot727',[localityOfObject('NPC1011Spot727','iArea1003')]),
+   ss(tAgent,'iEnsign728',[localityOfObject('iEnsign728','iArea1000'),wearsClothing('iEnsign728','iBoots729'),wearsClothing('iEnsign728','iCommBadge730'),wearsClothing('iEnsign728','iGoldUniform731')]),
+   ss(tAgent,'iEnsign732',[localityOfObject('iEnsign732','iArea1004'),wearsClothing('iEnsign732','iBoots733'),wearsClothing('iEnsign732','iCommBadge734'),wearsClothing('iEnsign732','iGoldUniform735')]),
+   ss(tAgent,'iEnsign736',[localityOfObject('iEnsign736','iArea1011'),wearsClothing('iEnsign736','iBoots737'),wearsClothing('iEnsign736','iCommBadge738'),wearsClothing('iEnsign736','Item2RedUniform739')]),
+   ss(tAgent,'iEnsign740',[localityOfObject('iEnsign740','iArea1020'),wearsClothing('iEnsign740','iBoots741'),wearsClothing('iEnsign740','iCommBadge742'),wearsClothing('iEnsign740','Item2RedUniform743')]),
+   ss(tAgent,'iEnsign744',[localityOfObject('iEnsign744','iArea1024'),wearsClothing('iEnsign744','iBoots745'),wearsClothing('iEnsign744','iCommBadge746'),wearsClothing('iEnsign744','Item4BlueUniform747')]),
+   ss(tAgent,'iEnsign748',[localityOfObject('iEnsign748','iArea1022'),wearsClothing('iEnsign748','iBoots749'),wearsClothing('iEnsign748','iCommBadge750'),wearsClothing('iEnsign748','Item4BlueUniform751')]),
+   ss(tAgent,'iEnsign752',[localityOfObject('iEnsign752','iArea1036'),wearsClothing('iEnsign752','iBoots753'),wearsClothing('iEnsign752','iCommBadge754'),wearsClothing('iEnsign752','Item4BlueUniform755')]),
+   ss(tAgent,'NPC1013Alexander671',[localityOfObject('NPC1013Alexander671','iArea1025')])
    ]).
 
 

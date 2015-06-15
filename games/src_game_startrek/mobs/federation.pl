@@ -31,12 +31,12 @@ vette_federation_idea(Agent,Act,Act):-dmsg(vette_federation_idea(Agent,Act)).
 mudLabelTypeProps('Px',tFederation,[]).
 
 user:world_agent_plan(_World,Agent,ActV):-
-   tAgentGeneric(Agent),
+   tAgent(Agent),
   % instance(Agent,federation),
    federation_idea(Agent,Act),
    vette_federation_idea(Agent,Act,ActV).
 
-% Possible tAgentGeneric actions.
+% Possible tAgent actions.
 federation_idea(Agent,actEat(Elixer)) :-
 	mudHealth(Agent,Damage),
 	Damage < 15,
@@ -75,7 +75,7 @@ federation_idea(Agent,actMove(1,Dir)) :-
 
 federation_idea(Agent,actMove(1,Dir)) :-
 	mudGetPrecepts(Agent,List),
-	list_object_dir_sensed(_,List,tAgentGeneric,Dir).
+	list_object_dir_sensed(_,List,tAgent,Dir).
 
 federation_idea(Agent,actMove(5,Dir)) :-
 	mudMemory(Agent,aDirectionsFn([Dir|_])),

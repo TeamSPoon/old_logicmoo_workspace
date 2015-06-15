@@ -20,7 +20,7 @@ use this file with...
 % Rooms
 % ==================================================
 
-/* technically the following are not needed due the pathConnects/2s below */
+/* technically the following are not needed due the bordersOn/2s below */
 :-onSpawn tRegion(tKitchen).
 :-onSpawn tRegion(tHall).
 :-onSpawn tRegion(tCellar).
@@ -37,14 +37,14 @@ use this file with...
 % Doors
 % ==================================================
 
-:-decl_mpred_hybrid(pathConnects(tRegion,tRegion),symmetric).
+:-decl_mpred_hybrid(bordersOn(tRegion,tRegion),symmetric).
 
-:-onSpawn pathConnects(tLivingRoom,tOfficeRoom).
-:-onSpawn pathConnects(tHall,tDiningRoom).
-:-onSpawn pathConnects(tHall,tBedRoom).
-:-onSpawn pathConnects(tHall,tLivingRoom).
-:-onSpawn pathConnects(tHall,tBathRoom).
-:-onSpawn pathConnects(tKitchen, tCellar).
-:-onSpawn pathConnects(tDiningRoom, tKitchen).
-:-onSpawn pathConnects(tBedRoom, tClosetRoom).
-:-onSpawn pathConnects(tKitchen, tBackYard).
+:-onSpawn bordersOn(tLivingRoom,tOfficeRoom).
+:-onSpawn bordersOn(tHall,tDiningRoom).
+:-onSpawn bordersOn(tHall,tBedRoom).
+:-onSpawn bordersOn(tHall,tLivingRoom).
+:-onSpawn bordersOn(tHall,tBathRoom).
+:-onSpawn bordersOn(tKitchen, tCellar).
+:-onSpawn bordersOn(tDiningRoom, tKitchen).
+:-onSpawn bordersOn(tBedRoom, tClosetRoom).
+:-onSpawn bordersOn(tKitchen, tBackYard).

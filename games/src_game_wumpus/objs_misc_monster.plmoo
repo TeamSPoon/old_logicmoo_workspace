@@ -32,15 +32,15 @@
 % ---> 4 = structure, cannot be moved. 
 %
 % # act_energy(Action,N) where N is any positive or negative integer (not 0)
-% ---> N is the amount of mudEnergy tAgentGeneric receives or loses 
+% ---> N is the amount of mudEnergy tAgent receives or loses 
 %      from doing that Action on the tObj defined.
 %
 % # act_score(Action,N) where N is any positive or negative integer (not 0)
-% ---> N is the mudScore the tAgentGeneric recieves from doing Action on the
+% ---> N is the mudScore the tAgent recieves from doing Action on the
 %      obect defined.
 %
 % # act_heal(Action,N) where N is any positive or negative integer
-% --->N is the amount of mudHealth the tAgentGeneric heals (or takes) from
+% --->N is the amount of mudHealth the tAgent heals (or takes) from
 %        doing Action on tObj defined.
 %
 % # mudPermanence(take,N) where N ranges from 0-3.
@@ -51,7 +51,7 @@
 % ---> 3/vTakenCopyFn(Something) = tObj stays where it is but copies:  type_props(tLeaf,mudPermanence(takeAct,vTakenCopyFn(tLeaf)))
 %
 % # attack(N) where N is some positive or negative interger.
-% ---> when held by tAgentGeneric-1 and agnet-1 attacks tAgentGeneric-2. tAgentGeneric-2 takes N
+% ---> when held by tAgent-1 and agnet-1 attacks tAgent-2. tAgent-2 takes N
 %      amount of mudHealth.(negative mudHealth or healing is possible)
 %
 % # mudArmor(N) where N is some positive or negative integer.
@@ -227,18 +227,16 @@ Object applies:
 
 :-register_module_type([world_types,parser]).
 
-user:typeHasGlyph(Label,Type):- mudLabelTypeProps(Label,Type,_).
-
 % :-register_module_type(dynamic).
 
-predTypeMax(mudEnergy,tAgentGeneric,120).
+predTypeMax(mudEnergy,tAgent,120).
 
-typeProps(tAgentGeneric,[predInstMax(mudHealth,500)]).
+typeProps(tAgent,[predInstMax(mudHealth,500)]).
 
 
 % :-end_module_type(dynamic).
 
-typeProps(isSelf,Type,[mudNamed(isSelf),typeHasGlyph(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
+mudLabelTypeProps(Lbl,Type,Props)/ground(mudLabelTypeProps(Lbl,Type,Props))=> (typeHasGlyph(Type,Lbl) , typeProps(Type,Props)).
 
 % Vacuum World example objects........
 mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
