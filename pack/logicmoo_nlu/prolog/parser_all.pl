@@ -231,8 +231,11 @@ show_pipeline:-forall(installed_converter(CNV),wdmsg(installed_converter(CNV))).
 :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc)).
 :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_call_kb)).
 :- user:ensure_loaded(parser_e2c).
-:- user:ensure_loaded(library(pldata/nldata_BRN_WSJ_LEXICON)).
-:- user:ensure_loaded(library(pldata/nldata_freq_pdat)).
+:- user:ensure_loaded(pldata/nldata_BRN_WSJ_LEXICON).
+:- user:ensure_loaded(pldata/nldata_freq_pdat).
+:- user:ensure_loaded(pldata/clex_iface).
+
+
 
 %:- pfc_add(cyckb_t(A, _, _) => is_cyckb_t_pred(A,2)).
 :- with_el_holds_enabled(gripe_time(2,forall(cyckb_t(A, _, _) , assert_if_new(is_cyckb_t_pred(A,2))))).

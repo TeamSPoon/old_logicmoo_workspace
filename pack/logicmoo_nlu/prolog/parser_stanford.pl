@@ -21,7 +21,7 @@
 
 atomic_subst(Before,Find,Replace,After):- atomic_list_concat(Atoms,Find,Before),atomic_list_concat(Atoms,Replace,After).
 
-%:- setenv('CLASSPATH','/devel/LogicmooDeveloperFramework/PrologMUD/runtime/stanford-corenlp/*:/devel/LogicmooDeveloperFramework/PrologMUD/runtime/stanford-corenlp/classes:.').
+%:- setenv('CLASSPATH','/devel/PrologMUD/runtime/stanford-corenlp/*:/devel/PrologMUD/runtime/stanford-corenlp/classes:.').
 %:- setenv('CLASSPATH','.:/opt/PrologMUD/runtime/stanford-parser-full-2014-08-27:/opt/PrologMUD/runtime/stanford-parser-full-2014-08-27/stanford-postagger.jar:/opt/PrologMUD/runtime/stanford-parser-full-2014-08-27/stanford-srpser-2014-08-28-models.jar:/opt/PrologMUD/runtime/stanford-parser-full-2014-08-27/stanford-parser-3.4.1-models.jar:/opt/PrologMUD/runtime/stanford-parser-full-2014-08-27/stanford-parser.jar').
 :- use_module(library(jpl)).
 :- jpl_set_default_jvm_opts(['-Xmx5G']).

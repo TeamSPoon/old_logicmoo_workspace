@@ -55,12 +55,13 @@ whq(X,Agmt,NP,undef) --->
    int_det(X,Agmt),
    {is_s_all(SAll)},
    np(NP,Agmt,_,_,subj,SAll,_).
+whq(X,3+No,np(3+No,wh(X),[adj(lf(Case))]),Case) ---> {thlocal:useAltPOS}, int_pron(Case).
 whq(X,3+No,np(3+No,wh(X),[]),Case) ---> int_pron(Case).
 
 int_det(X,3+Agmt) ---> whose(X,Agmt).
 int_det(X,3+Agmt) ---> int_art(X,Agmt).
 
-whose(X,Agmt), np_head0(wh(X),Agmt,proper), gen_marker ---> [whose].
+whose(X,Agmt), np_head0(wh(X),Agmt,proper), gen_marker ---> theText1(whose).
 
 question(QCase,NPCase,S) --->
    {subj_qustion_db(QCase), is_to_role_case(subj,_,NPCase)},
@@ -102,29 +103,50 @@ imperative_verb,
 
 s(s(Subj,Verb,Args,Mods),Mask) --->
    subj(Subj,Agmt,Type),
+   s_vp(Subj,Agmt,Type,Verb,Args,Mods,Mask).
+
+s_vp(_Subj,Agmt,Type,Verb,Args,Mods,Mask) --->
    verb(Verb,Agmt,Type,Voice),
    {is_empty(Nil), is_s_all(SAll)},
    verb_args(Type,Voice,Args,Nil,Mask0),
    {minus_mask(SAll,Mask0,Set), plus_mask(SAll,Mask0,Mask1)},
    verb_mods(Mods,Set,Mask1,Mask).
 
-subj(there,Agmt,_+be) ---> theText1(there).
-subj(Subj,Agmt,_) --->
+s_vp(_Subj,Agmt,Type,Verb,Args,Mods,Mask) --->
+   verb_lc(Verb,Agmt,Type,Voice),
+   {is_empty(Nil), is_s_all(SAll)},
+   verb_args(Type,Voice,Args,Nil,Mask0),
+   {minus_mask(SAll,Mask0,Set), plus_mask(SAll,Mask0,Mask1)},
+   verb_mods(Mods,Set,Mask1,Mask).
+
+verb_lc(verb(Root,Voice,Time+fin,Aspect,Neg,Kind),Agmt,Type,Voice) --->
+   verb_form(Root0,Time+fin,Agmt,Role),
+   {must(verb_type_db(Root0,Type0))},
+   neg_opt(Type0,Neg),
+   rest_verb(Role,Root0,Root,Voice,Aspect),
+   {must(verb_type_db(Root,Type)),!,verb_type_to_kind(Type,Kind)}.
+
+
+subj(Subj,Agmt,O) ---> subj0(Subj,Agmt,O).
+subj0(there,_Agmt,_+be) ---> theText1(There),{txt_there_db(There,_Meaning)}.
+subj0(Subj,Agmt,_) --->
    {is_s_all(SAll), is_subj_case(Case)},
    np(Subj,Agmt,Case,_,subj,SAll,_).
 
 /* Noun Phrase */
+np(AgmtKernelMods,Agmt,Case,Def,Role,Set,Mask) ---> np0(AgmtKernelMods,Agmt,Case,Def,Role,Set,Mask).
 
-np(np(Agmt,Pronoun,[]),Agmt,NPCase,def,_,Set,Nil) --->
+np0(np(Agmt,Pronoun,[]),Agmt,NPCase,def,_,Set,Nil) --->
    {is_pp(Set)},
    pers_pron(Pronoun,Agmt,Case),
    {is_empty(Nil), is_to_role_case(Case,decl,NPCase)}.
-np(np(Agmt,Kernel,Mods),Agmt,Case,Def,Role,Set,Mask) --->
+np0(np(Agmt,Kernel,Mods),Agmt,_Case,Def,Role,Set,Mask) --->
    {is_pp(Set)},
    np_head(Kernel,Agmt,Def+Type,PostMods,Mods),
    {is_np_all(NPAll)},
    np_compls(Type,Agmt,Role,PostMods,NPAll,Mask).
-np(part(Det,NP),3+Number,_,indef,Role,Set,Mask) --->
+% many of, one of
+np0(part(Det,NP),3+Number,_,indef,Role,Set,Mask) --->
    {is_pp(Set)},
    determiner(Det,Number,indef),
    theText1(of),
@@ -144,7 +166,10 @@ np_compls(common,Agmt,Case,Mods,Set0,Mask) --->
 
 /* Nuclear noun phrase */
 
-np_head0(name(Name),3+sg,def+proper) ---> name(Name).
+np_head0(nameOf(Name),3+sg,def+proper) ---> name(Name).
+
+:- style_check(-singleton).
+
 np_head0(np_head(Det,Adjs,Head),3+Number,Def+common) --->
    determiner(Det,Number,Def),
    adjs_opt(Adjs),
@@ -164,15 +189,15 @@ possessive(Kernel0,Agmt0,_,[],Mods0,
               [pp(poss,np(Agmt0,Kernel0,Mods0))|PostMods1],
               Kernel,Agmt,Type,PostMods,Mods).
 possessive(Kernel,Agmt,Type,PostMods,Mods,
-           Kernel,Agmt,Type,PostMods,Mods) ---> [].
+           Kernel,Agmt,Type,PostMods,Mods) ---> noText.
 
 % this next "[the]" cannot be replaced with theText1(the)!
-gen_case, [the] ---> gen_marker.
+gen_case, [the] ---> {thlocal:old_text},gen_marker.
+gen_case, [w(the,_)] ---> gen_marker.
 
-gen_marker ---> [''''], an_s.
+gen_marker ---> theText1(''''), an_s.
 
-an_s ---> [s].
-an_s ---> [].
+an_s ---> textOpt([s]).
 
 /* Determiners */
 
@@ -199,12 +224,11 @@ quant_opt(Op,indef) --->
 quant_opt(the,def) ---> theText1(the).
 quant_opt(same,indef) ---> noText.
 
-neg_adv_opt(Adv,not+Adv) ---> theText1(not).
-neg_adv_opt(Adv,not+Adv) ---> theText1(no).
+neg_adv_opt(Adv,not(Why)+Adv) ---> theText1(Not),{txt_not_db(Not,Why)}.
 neg_adv_opt(Adv,Adv) ---> noText.
 
-sup_op(least,not+less).
-sup_op(most,not+more).
+sup_op(least,not(_Why)+less).
+sup_op(most,not(_Why)+more).
 
 /* Noun phrase modifiers */
 
@@ -216,7 +240,7 @@ np_mods(Agmt,Case,Mods0,[Mod|Mods],Set0,Set,_,Mask) --->
 np_mods(_,_,Mods,Mods,Set,Set,Mask,Mask) ---> noText.
 
 np_mod(_,Case,PP,Set,Mask) ---> pp(PP,Case,Set,Mask).
-np_mod(Agmt,Case,WH,Set,Mask) --->
+np_mod(Agmt,_Case,WH,Set,Mask) --->
    reduced_relative(Agmt,WH,Set,Mask).
 
 /* Verb modifiers */
@@ -228,12 +252,16 @@ verb_mods([Mod|Mods],Set0,_,Mask) --->
    verb_mods(Mods,Set1,Mask2,Mask).
 verb_mods([],_,Mask,Mask) ---> noText.
 
-verb_mod(Adv,Set,Mask) ---> adv_phrase(Adv,Set,Mask).
-verb_mod(Adv,Set,Nil) --->
-   {is_adv(Set)},
-   adverb(Adv),
-   {is_empty(Nil)}.
+% verb_mod(_,_,_) ---> theText1(WordVerb),{cw_db(WordVerb,V),member(V,['Verb','Symbol-SP']),!,fail}.
+verb_mod(Adv,Set,Nil) ---> {is_adv(Set)}, adverb(Adv), {is_empty(Nil)}.
 verb_mod(PP,Set,Mask) ---> pp(PP,compl,Set,Mask).
+verb_mod(Adv,Set,Mask) ---> adv_phrase(Adv,Set,Mask).
+verb_mod(PP,Set,Mask) ---> verb_mod_single_prep(PP,Set,Mask).
+
+verb_mod_single_prep(pp(Prep,nameOf(Prep)),Set,Mask) ---> prep(Prep),{is_pp(Set), is_trace82(Set,Mask)}.
+verb_mod_single_prep(Adv,Set,Nil) ---> {is_adv(Set)}, prep(Adv), {is_empty(Nil)}.
+
+
 
 adv_phrase(pp(Prep,NP),Set,Mask) --->
    loc_pred_prep(Prep,OFPREP),
@@ -247,11 +275,12 @@ adjs_opt([Adj|Adjs]) --->
 adjs_opt([]) ---> noText.
 
 pre_adj(Adj) ---> adj(_,Adj).
+pre_adj(poss(Pronoun,Agreement)) ---> poss_pron(Pronoun,Agreement).
 pre_adj(Adj) --->  sup_phrase(Adj).
 
 sup_phrase(sup(most,Adj)) ---> sup_adj(Adj).
 sup_phrase(sup(Op,Adj)) --->
-   sup_adv(Adv),
+   sup_adv(Op),
    adj(quant,Adj).
 
 comp_phrase(comp(Comp,Adj,Arg),Mask) --->
@@ -270,7 +299,7 @@ comp(more,Adj) --->
    rel_adj(Adj),
    theText1(than).
 
-% Measure is same
+% Measure is same = "as big as"  ?
 comp(same,Adj) --->
    theText1(as),
    adj(quant,Adj),
@@ -313,7 +342,7 @@ variable(Agmt0,X) ... np(NP,Agmt,NPCase,_,_,Set,Mask) --->
    wh(X,Agmt0,NP,Agmt,NPCase),
    {is_trace82(Set,Mask)}.
 variable(Agmt0,X) ... pp(pp(Prep,NP),compl,Set,Mask) --->
-   prep(Prep),
+   prep(Prep), 
    wh(X,Agmt0,NP,_Agmt,Case),
    {is_trace82(Set,Mask), is_compl_case(Case)}.
 
@@ -373,15 +402,15 @@ reduced_wh(AgmtX,X),
 
 /* Verb phrase (less the complements) */
 
-verb(verb(Root,Voice,Time+fin,Aspect,Neg),Agmt,Type,Voice) --->
+verb(verb(Root,Voice,Time+fin,Aspect,Neg,Kind),Agmt,Type,Voice) --->
    verb_form(Root0,Time+fin,Agmt,Role),
-   {verb_type_db(Root0,Type0)},
+   {must(verb_type_db(Root0,Type0))},
    neg_opt(Type0,Neg),
    rest_verb(Role,Root0,Root,Voice,Aspect),
-   {verb_type_db(Root,Type)}.
+   {must(verb_type_db(Root,Type)),!,verb_type_to_kind(Type,Kind)}.
 
-neg_opt(aux+_,neg) ---> theText1(not).
-neg_opt(_,pos) ---> noText.
+neg_opt(aux+_,neg(WhyNot)) ---> theText1(Not),{txt_not_db(Not,WhyNot)}.
+neg_opt(_,pos(_)) ---> noText.
 
 rest_verb(aux,have,Root,Voice,[perf|Aspect]) --->
    verb_form(Root0,past+part,_,_),
@@ -407,13 +436,13 @@ passive_active(be,Root,passive) --->
    {verb_type_db(Root,Type), passive_vt(Type)}.
 passive_active(Root,Root,active) ---> noText.
 
-participle(verb(Root,Voice,inf,Aspect,Neg),Type,Voice) --->
+participle(verb(Root,Voice,inf,Aspect,Neg,Kind),Type,Voice) --->
    neg_opt(_,Neg),
    verb_form(Root,Tense,_,_),
-   {participle_vt(Tense,Voice,Aspect), verb_type_db(Root,Type)}.
+   {participle_vt(Tense,Voice,Aspect), verb_type_db(Root,Type), verb_type_to_kind(Type,Kind)}.
 
-passive_vt(_+trans).
-passive_vt(_+ditrans).
+passive_vt(_+tv).
+passive_vt(_+ditrans(_)).
 
 participle_vt(pres+part,active,[prog]).
 participle_vt(past+part,passive,[]).
@@ -429,15 +458,13 @@ verb_args(_+Type,Voice,AdvArgs,Mask0,Mask) --->
    verb_args(Type,Voice,Args,Mask0,Mask).
 
 % prefers to leave off obj
-verb_args(trans,active,[arg(dir,Dir)],_,Mask) --->
-   verb_arg(np,Dir,Mask).
-verb_args(ditrans,_,[arg(Case,NP)|Obj],_,Mask) --->
+verb_args(tv,active,[arg(dir,Dir)],_,Mask) ---> verb_arg(np,Dir,Mask).
+verb_args(ditrans(Prep),_,[arg(Case,Prep,NP)|Obj],_,Mask) --->
    verb_arg(np,NP,Mask0),
    object_opt(Case,Obj,Mask0,Mask).
 
-verb_args(be,_,[void],Mask,Mask) ---> theText1(there).
-verb_args(be,_,[arg(pred,P)],_,Mask) --->
-   pred_conj(_,P,Mask).
+verb_args(be,_,[void(Meaning)],Mask,Mask) ---> theText1(There),{txt_there_db(There,Meaning)}.
+verb_args(be,_,[arg(pred,P)],_,Mask) ---> pred_conj(_,P,Mask).
 verb_args(be,_,[arg(dir,P)],_,Mask) ---> verb_arg(np,P,Mask).
 verb_args(have,active,[arg(dir,P)],_,Mask) ---> verb_arg(np,P,Mask).
 verb_args(Type,_,[],Mask,Mask) ---> {no_args_vt(Type)}.
@@ -464,7 +491,7 @@ verb_arg(np,NP,Mask) --->
    np(NP,_,VCase,_,compl,SAll,Mask).
 
 pred(_,Adj,Mask) ---> adj_phrase(Adj,Mask).
-pred(neg,PP,Mask) ---> 
+pred(neg(_V),PP,Mask) ---> 
    {is_s_all(SAll)},
    pp(PP,compl,SAll,Mask).
 pred(_,Adv,Mask) --->
@@ -480,9 +507,9 @@ advs_opt(R,R,_) ---> noText.
 adj_phrase(P,Nil) ---> adj(_,P), { is_empty(Nil) }.
 adj_phrase(P,Mask) --->  comp_phrase(P,Mask).
 
-no_args_vt(trans).
-no_args_vt(ditrans).
-no_args_vt(intrans).
+no_args_vt(tv).
+no_args_vt(ditrans(_Prep)).
+no_args_vt(iv).
 
 /* Conjunctions */
 

@@ -39,7 +39,7 @@ liftconfig:_M1L1P2
 @prefix         dc: <http://purl.org/dc/elements/1.1/> .
 @prefix    knowrob: <http://ias.cs.tum.edu/kb/knowrob.owl#> .
 @prefix computable: <http://ias.cs.tum.edu/kb/computable.owl#> .
-@prefix        mud: <file:///opt/LogicmooDeveloperFramework/PrologMUD/xperimental/knowrob_addons/comp_missingobj/owl/comp_missingobj.owl#> .
+@prefix        mud: <file:///opt/PrologMUD/xperimental/knowrob_addons/comp_missingobj/owl/comp_missingobj.owl#> .
 
 # Named toplevel resources (665).
 actionInvolves rdf:type owl:ObjectProperty.

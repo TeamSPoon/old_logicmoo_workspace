@@ -3,13 +3,14 @@
 
 :- style_check(-(discontiguous)).
 
-:- dynamic_multifile_exported talk_db/1.
-:- dynamic_multifile_exported talk_db/2.
-:- dynamic_multifile_exported talk_db/3.
-:- dynamic_multifile_exported talk_db/4.
-:- dynamic_multifile_exported talk_db/5.
-:- dynamic_multifile_exported talk_db/6.
-:- dynamic_multifile_exported talk_db/7.
+dynamic_multifile_exported(F/A):-dynamic(F/A),multifile(F/A),export(F/A).
+:- dynamic_multifile_exported(talk_db/1).
+:- dynamic_multifile_exported(talk_db/2).
+:- dynamic_multifile_exported(talk_db/3).
+:- dynamic_multifile_exported(talk_db/4).
+:- dynamic_multifile_exported(talk_db/5).
+:- dynamic_multifile_exported(talk_db/6).
+:- dynamic_multifile_exported(talk_db/7).
 
  /*
 
@@ -85,7 +86,7 @@ talk_db_pos_trans(ingform,particple).
 talk_db_pos_trans(ingform,adjectival).
 talk_db_pos_trans(A,A).
 
-:- dynamic_multifile_exported talk_db_pos/2.
+:- dynamic_multifile_exported(talk_db_pos/2).
 talk_db_pos(POS,String):-nonvar(POS),nonvar(String),!,talk_db_t_0(POS,String),!.
 talk_db_pos(POS,String):-talk_db_t_0(POS,String).
 

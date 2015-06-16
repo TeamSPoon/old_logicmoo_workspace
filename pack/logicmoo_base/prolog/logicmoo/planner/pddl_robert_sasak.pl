@@ -34,14 +34,14 @@ command_line:-
 
 command_line:- test_blocks, test_all.
 
-test_all:- expand_file_name('/devel/LogicmooDeveloperFramework/PrologMUD/packs/logicmoo_engine/prolog/logicmoo/planner/test/*/domain*.pddl',RList),reverse(RList,List),
+test_all:- expand_file_name('/devel/PrologMUD/pack/logicmoo_base/prolog/logicmoo/planner/test/*/domain*.pddl',RList),reverse(RList,List),
   forall(member(E,List),once(test_domain(E))).
 
 test_domain(DP):-
    format('~q.~n',[test_domain(DP)]),
   directory_file_path(D,_,DP),directory_files(D,RList),reverse(RList,List),forall(member(T,List),ignore((directory_file_path(D,T,TP),exists_file(TP),not(same_file(DP,TP)),solve_files(DP,TP)))).
 
-test_blocks:- solve_files('/devel/LogicmooDeveloperFramework/PrologMUD/packs/logicmoo_engine/prolog/logicmoo/planner/test/blocks/domain-blocks.pddl', '/devel/LogicmooDeveloperFramework/PrologMUD/packs/logicmoo_engine/prolog/logicmoo/planner/test/blocks/blocks-03-0.pddl').
+test_blocks:- solve_files('/devel/PrologMUD/pack/logicmoo_base/prolog/logicmoo/planner/test/blocks/domain-blocks.pddl', '/devel/PrologMUD/pack/logicmoo_base/prolog/logicmoo/planner/test/blocks/blocks-03-0.pddl').
 
 % solve_files(+DomainFile, +ProblemFile)
 %
@@ -1248,7 +1248,7 @@ parse_file(F):- absolute_file_name(F,A),
 
 test_dir(DirIn):-
   working_directory(WAS,WAS),
-  atom_concat('/devel/LogicmooDeveloperFramework/PrologMUD/packs/logicmoo_engine/prolog/logicmoo/planner/test/',DirIn,DIR),
+  atom_concat('/devel/PrologMUD/pack/logicmoo_base/prolog/logicmoo/planner/test/',DirIn,DIR),
      call_cleanup(( 
         cd(DIR),
 	write('Testing ':DIR), nl,

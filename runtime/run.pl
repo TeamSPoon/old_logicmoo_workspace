@@ -38,8 +38,8 @@ add_relative_search_path(Alias, Abs) :-
 add_relative_search_path(Alias, Rel) :-
 	assertz(user:file_search_path(Alias, Rel)).
 
-file_search_path(cliopatria, '/devel/LogicmooDeveloperFramework/PrologMUD/externals/ClioPatria').
-:- add_relative_search_path(cliopatria, '/devel/LogicmooDeveloperFramework/PrologMUD/externals/ClioPatria').
+file_search_path(cliopatria, '/devel/PrologMUD/pack/ClioPatria').
+:- add_relative_search_path(cliopatria, '/devel/PrologMUD/pack/ClioPatria').
 
 % Make loading files silent. Comment if you want verbose loading.
 

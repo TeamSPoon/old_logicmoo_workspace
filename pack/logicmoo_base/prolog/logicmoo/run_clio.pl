@@ -34,10 +34,10 @@ load_blog_core:- use_module(library(arouter)),use_module(library(docstore)),use_
 %:- has_gui_debug -> true ; remove_pred(pce_principal,send,2).
 %:- has_gui_debug -> true ; remove_pred(pce_principal,new,2).
 
-% :- if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish.pl')).
+% :- if_file_exists(ensure_loaded('../pack/swish/logicmoo_run_swish.pl')).
 
-:- add_to_search_path_first(cliopatria, '../externals/ClioPatria').
-:- add_to_search_path_first(user, '../externals/ClioPatria/user').
+:- add_to_search_path_first(cliopatria, '../pack/ClioPatria').
+:- add_to_search_path_first(user, '../pack/ClioPatria/user').
 :- use_module(user(user_db)).
 
 :- dynamic http:location/3.

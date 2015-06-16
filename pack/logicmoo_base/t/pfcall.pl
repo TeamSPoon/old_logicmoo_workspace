@@ -3,7 +3,7 @@
 %   Updated: 10/11/87, ...
 %   Purpose: consult system file for ensure
 
-user:file_search_path(pack,'/devel/LogicmooDeveloperFramework/PrologMUD/packs').
+user:file_search_path(pack,'/devel/PrologMUD/packs').
 :- attach_packs.
 
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
