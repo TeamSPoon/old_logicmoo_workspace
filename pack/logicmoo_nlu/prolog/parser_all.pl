@@ -293,7 +293,6 @@ type(SET):-tSet(SET).
 
 :- debug.
 :- test_chat80_regressions.
-:- prolog.
 
 :- retract(thlocal:disable_mpred_term_expansions_locally).
 

@@ -3,7 +3,7 @@ PrologMUD_base.vpj=Release
 [Global]
 CurrentProject=PrologMUD.vpj
 [ProjectDates]
-pack\PrologMUD_RT.vpj=20150615055716059
+pack\PrologMUD_RT.vpj=20150615202540888
 pack\prologmud\PrologMUD.vpj=20150615055723263
 pack\logicmoo_base\prolog\LogicmooBase.vpj=20150615055716059
 pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527

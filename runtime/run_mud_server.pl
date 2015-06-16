@@ -8,6 +8,7 @@
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
 
+:- multifile(mpred_online:semweb_startup).
 
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
@@ -73,9 +74,27 @@ user:file_search_path(prologmud, library(prologmud)).
 
 % :-prolog.
 
+
+% ==============================
+% MUD SERVER CODE LOADS
+% ==============================
+
 :- retractall(thlocal:disable_mpred_term_expansions_locally).
 % [Required] load the mud system
 :- user:ensure_loaded(prologmud(mud_startup)).
+
+
+
+
+
+
+
+% ==============================
+% MUD SERVER CODE STARTS
+% ==============================
+
+
+
 
 % [Optional] the following worlds are in version control in examples
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
