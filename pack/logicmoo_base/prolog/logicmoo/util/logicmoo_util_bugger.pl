@@ -1030,6 +1030,7 @@ lco_goal_expansion(no_loop_check(G,TODO),no_loop_check_term_key(G,G:W,TODO)):-mu
 
 
 
+
 % ===================================================================
 % Bugger Term Expansions
 % ===================================================================
@@ -1262,12 +1263,16 @@ print_clause_properties(REF, Out) :-
 
 thread_local_leaks:-!.
 
+in_pengines:- relative_frame(context_module,pengines,_).
 
+% ?- relative_frame(context_module,X,Y).
+:- export(relative_frame/3).
+relative_frame(Attrib,Term,Nth):- parent_frame_attribute(Attrib,Term,Nth,_RealNth,_FrameNum).
 
 :- export(parent_goal/2).
 parent_goal(Term,Nth):- parent_frame_attribute(goal,Term,Nth,_RealNth,_FrameNum).
 :- export(parent_frame_attribute/5).
-parent_frame_attribute(Attrib,Term,Nth,RealNth,FrameNum):-hotrace((ignore(Attrib=goal),prolog_current_frame(Frame),
+parent_frame_attribute(Attrib,Term,Nth,RealNth,FrameNum):-hotrace((ignore(Attrib=goal),ignore(prolog_current_frame(Frame)),
                                                 current_frames(Frame,Attrib,5,NextList))),!,nth1(Nth,NextList,RealNth-FrameNum-Term).
 
 
@@ -2565,6 +2570,7 @@ ansi_control_conv(Ctrl,CtrlO):-flatten([Ctrl],CtrlO),!.
 
 is_tty(Out):- not(tlbugger:no_colors), is_stream(Out),stream_property(Out,tty(true)).
 
+ansicall(Out,_,Call):- in_pengines,!,Call.
 ansicall(Out,_,Call):- \+ is_tty(Out),!,Call.
 ansicall(Out,CtrlIn,Call):- once(ansi_control_conv(CtrlIn,Ctrl)),  CtrlIn\=Ctrl,!,ansicall(Out,Ctrl,Call).
 ansicall(Out,Ctrl,Call):-
@@ -3027,6 +3033,23 @@ loading_module(M,source(F)):- prolog_load_context(source,F),source_file_property
 loading_module(M,prolog_load_context):- prolog_load_context(module,M).
 loading_module(M,stream_property(F)):- stream_property(_X,file_name(F)),source_file_property(F,module(M)).
 loading_module(M,context_module):- context_module(M).
+
+
+user:prolog_current_frames(Each):- prolog_current_frame(Frame),prolog_current_frame_or_parent(Frame,Each).
+prolog_current_frame_or_parent(Frame,Each):- Each=Frame; 
+  (prolog_frame_attribute(Frame,parent,Parent),prolog_current_frame_or_parent(Parent,Each)).
+
+:-module_transparent(user:caller_module(-)).
+user:caller_module(Module):-user:caller_module(Module,v(function_expansion,func,user,'$toplevel','$apply','$expand')).
+user:caller_module(Module,Skipped):- module_stack(Module,_), \+ arg(_,Skipped,Module).
+
+:-module_transparent(user:module_stack(-,-)).
+user:module_stack(M,prolog_load_context):- prolog_load_context(module, M).
+user:module_stack(M,'$module'):- '$module'(M,M).
+user:module_stack(M,'$set_source_module'):- '$set_source_module'(M,M).
+user:module_stack(M,of):- predicate_property(M:of(_,_),imported_from(func)).
+user:module_stack(M,frame):- prolog_current_frames(Each), prolog_frame_attribute(Each,context_module,M).
+
 
 loading_module(M):- ((loading_module(M,_),M\=user));M=user.
 

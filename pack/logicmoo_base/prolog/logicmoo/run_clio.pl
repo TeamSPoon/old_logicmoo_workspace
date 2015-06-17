@@ -179,9 +179,7 @@ ensure_webserver :- http_server(http_dispatch,[ port(3020), workers(16) ]).
 
 mpred_online:semweb_startup:- do_semweb_startup_late_once.
 
-:- ['../pack/swish/lib/authenticate'].
-
-:- swish_add_user(guru, 'top secret', []).
+% :- ['../pack/swish/lib/authenticate'],swish_add_user(guru, 'top secret', []).
 
 :- if_startup_script(do_semweb_startup_late_once).
 

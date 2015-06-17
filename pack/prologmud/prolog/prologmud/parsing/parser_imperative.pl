@@ -242,6 +242,11 @@ dmsg_parserm(F,A):-ignore((debugging(parser),dmsg(F,A))).
 
 must_atomic(A):-must(atomic(A)).
 
+
+parse_agent_text_command(Agent,SVERB,Args,NewAgent,GOAL):- destringify(SVERB,AVERB),SVERB \=@= AVERB,!,
+   parse_agent_text_command(Agent,AVERB,Args,NewAgent,GOAL).
+parse_agent_text_command(Agent,SVERB,Args,NewAgent,GOAL):- is_list(Args),maplist(destringify,Args,AArgs),AArgs \=@= Args,!,
+   parse_agent_text_command(Agent,SVERB,AArgs,NewAgent,GOAL).
 parse_agent_text_command(Agent,SVERB,[],NewAgent,GOAL):-compound(SVERB),!,must((NewAgent=Agent,GOAL=SVERB)),!.
 parse_agent_text_command(_Agent,SVERB,ARGS,_,_):-slow_sanity((must(atomic(SVERB)),maplist(must_atomic,ARGS))),fail.
 

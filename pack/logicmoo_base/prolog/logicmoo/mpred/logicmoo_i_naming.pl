@@ -93,8 +93,8 @@ createByNameMangle0(Name,IDA,Name):- gensym(Name,IDA), englishServerInterface([a
 
 :-dynamic(thglobal:current_source_suffix/1).
 
+get_source_suffix(SS):- thglobal:current_source_suffix(SS),!.
 get_source_suffix('7').
-%get_source_suffix(SS):- thglobal:current_source_suffix(SS),!.
 %get_source_suffix(SS):- source_location(F,_),!,file_directory_name(F,DN),file_base_name(DN,SS),concat_atom(['-',SS,'7'],SSM),asserta_if_new(thglobal:current_source_suffix(SSM)).
 
 

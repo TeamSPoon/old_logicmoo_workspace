@@ -224,7 +224,7 @@ verb_form_db(being,be,pres+part,_).
 
 :-thread_local thlocal:old_text/0.
 
-thlocal:old_text.
+% thlocal:old_text.
 
 w_to_w2(W,W):-thlocal:old_text,!.
 
@@ -234,10 +234,13 @@ w_to_w2(U,w(U,open)):-compound(U),!.
 w_to_w2(S,w(A,open)):-atom_string(A,S),!.
 w_to_w2(X,w(X,open)):-!.
 
+w2_to_w(w(Txt,_),Txt):-!.
+w2_to_w(Txt,Txt).
+
 %theTextC(W1,CYCPOS,Y=W1)  ---> {thlocal:old_text,!},[W1],{W1=Y}.
 theTextC(A,_,F=A,B,C,D,E) :-thlocal:old_text, !,terminal(A, B, C, D, E),A=F,is_sane_nv(A).
-%theTextC(W1,CYCPOS,Y=W1)  ---> {!},[w(W1,_)],{W1=Y}.
 theTextC(A,_,F=A,B,C,D,E) :- !,terminal(w(A, _), B, C, D, E),A=F,is_sane_nv(A).
+%theTextC(W1,CYCPOS,Y=W1)  ---> {!},[w(W1,_)],{W1=Y}.
 %theTextC(W1,CYCPOS,WHY) ---> [W2],{memoize_pos_to_db(WHY,CYCPOS,W2,W1)}.
 theTextC(H,F,E,A,B,C,D) :- fail, is_sane(C), terminal(G, A, B, C, D),memoize_pos_to_db(E, F, G, H),is_sane_nv(H).
 

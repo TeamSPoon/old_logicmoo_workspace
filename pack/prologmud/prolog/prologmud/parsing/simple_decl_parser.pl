@@ -255,9 +255,11 @@ translation_dbg_on_fail(Ctx,CtxISA,Prolog,WS,WE):-with_assertions(debugPass,tran
 %:-assertz_if_new(parserTest(iWorld7,"You can also see a sugar candy doll house here.")).
 
 mudKeyword(tItem,"thing").
+mudKeyword(isSelfRegion,"here").
 mudKeyword(tThing,"object").
 
-user:type_action_info(tHumanPlayer,actAddText(isOptional(tTemporalThing,isThis),ftListFn(ftTerm)),"Development add some Text to a room.  Usage: addtext a sofa is in here").
+user:type_action_info(tHumanPlayer,actAddText(isOptional(tTemporalThing,isThis),ftText),"Development add some Text to a room.  Usage: addtext a sofa is in here").
+
 
 user:agent_call_command(Agent,actAddText(What,StringM)):- ground(What:StringM),
  with_assertions(parserVars(isThis,What,ftTerm),

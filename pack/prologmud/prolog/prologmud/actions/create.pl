@@ -19,9 +19,10 @@
 % ====================================================
 
 :-export(rez_to_inventory/3).
-rez_to_inventory(Agent,NameOrType,NewObj):- 
+rez_to_inventory(Agent,NameOrType,NewObj):-
+  gensym('_rez',SS),
   must_det_l([
-   show_call(createByNameMangle(NameOrType,NewObj,Clz)),
+  with_assertions(thglobal:current_source_suffix(SS),show_call(createByNameMangle(NameOrType,NewObj,Clz))),
    padd(NewObj,authorWas(rez_to_inventory(Agent,NameOrType,NewObj))),
    add(genls(Clz,tItem)),
    padd(Agent,mudStowing(NewObj)),

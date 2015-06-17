@@ -282,6 +282,7 @@ rejoined(Rejoin,V,VV):-ignore(Rejoin=VV),ignore(V=VV),!.
 empty_str(E):-ground(E),memberchk(E,[``,[],"",'']).
 
 
+
 % ===========================================================
 % CHECK CASE
 % ===========================================================
@@ -389,14 +390,15 @@ escapeCodes(Escaped,EscapeChar,[Skipped|Source],[Skipped|New]):-
 % [d|r]estringify/Codes/Chars
 % ===========================================================
 
+
 destringify(X,X):-var(X);number(X),!.
-destringify(X,S):-is_string(X),stringToCodelist(X,CL),name(S,CL),!.
+destringify('$VAR'(S),'$VAR'(S)):-!.
 destringify([],[]):-!.
+destringify(T,A):-catch((text_to_string(T,S),atom_string(A,S)),_,fail),!.
+destringify(X,S):-is_string(X),stringToCodelist(X,CL),name(S,CL),!.
 destringify([H|T],[HH|TT]):-!,destringify(H,HH),destringify(T,TT),!.
-destringify(X,P):-compound(X),X=..LIST,destringify(LIST,DL),P=..DL,!.
-destringify(X,X):-not(atom(X)),!.
-destringify(B,A):-atom_concat('#$',A,B),!.
-destringify(B,B):-!.
+destringify(X,P):-compound(X),X=..LIST,maplist(destringify,LIST,DL),P=..DL,!.
+destringify(B,A):- (atom(X),atom_concat('#$',A,B))->true;A=B.
 
 %stringToList(X,Y):-writeq(string_to_list(X,Y)),nl,fail.
 stringToList(X,Y):-var(X),!,string_to_list(X,Y).
@@ -523,7 +525,7 @@ vars_to_ucase_0([N=V|Vars],List):-
    ignore(N=V),
    vars_to_ucase_0(Vars,List).
 
-atomSplit(In,List):- trace,hotrace(( ground(In),
+atomSplit(In,List):- hotrace(( ground(In),
  any_to_string(In,String),
     splt_words(String,List,Vars),vars_to_ucase(Vars,List))),!.
 

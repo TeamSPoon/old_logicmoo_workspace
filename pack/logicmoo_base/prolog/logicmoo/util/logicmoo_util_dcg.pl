@@ -237,8 +237,10 @@ dcgSeqLen(Len, FB, END) :-
         '$append'(CD, END, FB).
 
 
+% addtext a sofa is in here
 % dcgLenBetween(_,_) --> [_].
-dcgLenBetween(Start,Start) --> dcgSeqLen(Start),{!}.
+dcgLenBetween(Start,Start) --> {!}, dcgSeqLen(Start),{!}.
+dcgLenBetween(Start,End, FB, END) :- FB==[],!, (Start>End -> between(End,Start,0) ; between(Start,End,0)).
 dcgLenBetween(Start,End) --> dcgOnceOr(dcgSeqLen(Start),({(Start>End -> Next is Start-1 ; Next is Start+1)},dcgLenBetween(Next,End))).
 dcgLenBetween(Len, Start, End, FB, END) :-
        ( length(CD, Start),

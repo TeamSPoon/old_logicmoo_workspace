@@ -915,6 +915,7 @@ disjointWith(ttTemporalType,ttAbstractType).
 
 prologHybrid(dividesBetween(tCol,tCol,tCol)).
 
+quotedDefnIff(X,_)=>ttFormatType(X).
 
 quotedDefnIff(ftInt,integer).
 quotedDefnIff(ftFloat,float).

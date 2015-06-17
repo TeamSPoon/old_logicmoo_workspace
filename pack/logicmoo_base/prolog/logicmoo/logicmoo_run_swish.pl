@@ -247,6 +247,19 @@ do_semweb_startup:-
 
 % user:pre_file_search_path(_,_):-!,fail.
 
+:- multifile
+	sandbox:safe_primitive/1,		% Goal
+	sandbox:safe_meta_predicate/1,		% Name/Arity
+	sandbox:safe_meta/2,			% Goal, Calls
+	sandbox:safe_global_variable/1,		% Name
+	sandbox:safe_directive/1.		% Module:Goal
+
+
+sandbox:safe_primitive(V):-nonvar(V).
+sandbox:safe_meta_predicate(V):-nonvar(V).
+sandbox:safe_meta(V,O):-nonvar(V),nonvar(O).
+sandbox:safe_global_variable(V):-nonvar(V).
+sandbox:safe_directive(V):-nonvar(V).
 
 end_of_file.
 

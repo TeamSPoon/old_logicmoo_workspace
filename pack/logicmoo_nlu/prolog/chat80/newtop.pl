@@ -201,7 +201,7 @@ process_run_real(Callback,StartParse,UIn,[sent=(U),parse=(E),sem=(S),qplan=(QP),
    call(Callback,E,'Parse',ParseTime,portray),  
    (flag(sentenceTrial,TZ2,TZ2+1), TZ2>5 -> (!,fail) ; true),
    runtime(StartSem))),
-   once((if_try(nonvar(E),deepen_pos(logic(E,S))))),
+   once((if_try(nonvar(E),deepen_pos(sent_to_prelogic(E,S))))),
    runtime(StopSem),
    SemTime is StopSem - StartSem,
    call(Callback,S,'Semantics',SemTime,expr),
@@ -265,12 +265,12 @@ quote_amp('$VAR'(_)) :- !.
 quote_amp(R) :-
    quote(R).
 
-logic(S0,S) :-
+sent_to_prelogic(S0,S) :-
    i_sentence(S0,S1),
    clausify80(S1,S2),
    once(simplify(S2,S)),!.
 
-logic(S0,S) :- 
+sent_to_prelogic(S0,S) :- 
   thlocal:chat80_interactive,plt,
    must((i_sentence(S0,S1),
    clausify80(S1,S2),

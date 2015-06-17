@@ -148,9 +148,15 @@ make_page_for_obj(Obj):-
 make_page_pretext_obj(Obj):- 
   get_functor(Obj,Pred,AA),((AA==0)->A=_;A=AA),
    % ignore((catch(mmake,_,true))),
-  forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure(lsting(M:F/A)))),flush_output,
-  forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure(reply_object_sub_page(M:F/A)))),flush_output,
-  ignore((catch(pfc_listing(Pred),_,true))),!.
+  forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((this_listing(M:F/A),flush_output)))),
+  forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((reply_object_sub_page(M:F/A),flush_output)))),
+  ignore((catch(pfc_listing(Pred),_,true))),!,dumpST.
+
+
+this_listing(M:F/A):-functor(H,F,A),predicate_property(M:H,number_of_causes(_)),!, forall(clause(M:H,Body),pp_ihtml((M:H :- Body))).
+this_listing(M:F/A):-functor(H,F,A),predicate_property(H,number_of_causes(_)),!, forall(clause(H,Body),pp_ihtml((M:H :- Body))).
+this_listing(M:F/A):-listing(M:F/A),!.
+this_listing(MFA):-listing(MFA).
 
 :- prolog_xref:assert_default_options(register_called(all)).
 

@@ -352,6 +352,8 @@ or_list([H|T], (H;OT)) :-
 
 
 
+
+
 % :-swi_module(domain, [ domain/2  ]). % Var, ?Domain
 :- use_module(library(ordsets)).
 :-export(domain/2).
@@ -386,7 +388,7 @@ domain:attr_unify_hook(Domain, Y) :-
    )
    ; var(Y)
    -> put_attr( Y, domain, Domain )
-   ; ord_memberchk(Y, Domain)
+   ; (\+ \+ (cmp_memberchk(Y, Domain)))
 ).
 
 
@@ -396,6 +398,27 @@ domain:attribute_goals(X) -->
       { get_attr(X, domain, List) },
       [domain(X, List)].
 
+
+cmp_memberchk(X,Y):-numbervars(X,0,_,[attvars(skip)]),member(X,Y),!.
+cmp_memberchk0(Item, [X1,X2,X3,X4|Xs]) :- !,
+	compare(R4, Item, X4),
+	(   R4 = (>) -> cmp_memberchk0(Item, Xs)
+	;   R4 = (<) ->
+	    compare(R2, Item, X2),
+	    (   R2 = (>) -> Item = X3
+	    ;   R2 = (<) -> Item = X1
+	    ;/* R2 = (=),   Item = X2 */ true
+	    )
+	;/* R4 = (=) */ true
+	).
+cmp_memberchk0(Item, [X1,X2|Xs]) :- !,
+	compare(R2, Item, X2),
+	(   R2 = (>) -> cmp_memberchk0(Item, Xs)
+	;   R2 = (<) -> Item = X1
+	;/* R2 = (=) */ true
+	).
+cmp_memberchk0(Item, [X1]) :-
+	Item = X1.
 
 
 

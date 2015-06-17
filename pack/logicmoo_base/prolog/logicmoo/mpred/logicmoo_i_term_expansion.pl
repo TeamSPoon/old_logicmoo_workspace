@@ -328,6 +328,8 @@ db_expand_0(Op,pddlSorts(I,EL),O):- listToE(EL,E),db_expand_0(Op,genls(E,I),O).
 db_expand_0(Op,pddlTypes(EL),O):- listToE(EL,E),db_expand_0(Op,isa(E,tCol),O).
 db_expand_0(Op,pddlPredicates(EL),O):- listToE(EL,E),db_expand_0(Op,isa(E,tPred),O).
 
+db_expand_0(Op,DECL,O):- arg(_,DECL,S),string(S),DECL=..[F|Args],maplist(destringify,Args,ArgsO),ArgsO\=@=Args,!,DECLM=..[F|ArgsO],db_expand_0(Op,DECLM,O).
+
 db_expand_0(Op,EACH,O):- EACH=..[each|List],db_expand_maplist(fully_expand_now(Op),List,T,T,O).
 db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F/A|Args],integer(A),functor_declares_instance(D,TPRED),
   is_relation_type(TPRED),expand_props(_Prefix,Op,props(F,[D,TPRED|Args]),O),!.
@@ -341,7 +343,7 @@ db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..  [D,C|Args],compound(C),functor_dec
 db_expand_0(Op,DECL,O):-DECL=..[D,F,A1|Args],functor_declares_instance(D,DType),not((arity(D,N),N>1)),expand_props(Prefix,Op,props(F,[DType,D,A1|Args]),O),!.
 db_expand_0(Op,DECL,O):-DECL=..[D,F|Args],functor_declares_instance(D,DType),not((arity(D,N),N>1)),expand_props(Prefix,Op,props(F,[DType,D|Args]),O),!.
 
-   
+
 %  room_template(iLivingRoom7,.....).
 db_expand_0(Op,ClassTemplate,OUT):- ClassTemplate=..[TypePropsFunctor,Inst|Props],
    functor_declares_instance(TypePropsFunctor,PropsIsa),
