@@ -188,7 +188,7 @@ show_pipeline:-forall(installed_converter(CNV),wdmsg(installed_converter(CNV))).
 
 was_punct(Remove):-domain(WRemove,[(,),(.),(?),(!)]),(domain(Remove,[w(_,punc),w(WRemove,_)]);Remove=WRemove).
 remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)  -> remove_punctuation(W3,NP) ; NP=W2.
-% :- install_converter(parser_chat80:words_to_w2(+acetext,-pos_sents_pre)).
+:- install_converter(parser_chat80:words_to_w2(+acetext,-pos_sents_pre)).
 :- install_converter(remove_punctuation(+pos_sents_pre,-text_no_punct)).
 :- install_converter(parser_chat80:sent_to_parsed(+text_no_punct,-syntaxTree80)).
 :- install_converter(parser_chat80:i_sentence(+syntaxTree80,-sem_pre80)).
@@ -299,7 +299,7 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 :- dmsg(parser_all_complete).
 
 :- run_pipleine(acetext='All persons are happy.',[foo=_],O),wdmsg(O).
-% :- run_pipleine(acetext='What is the ocean that borders african countries and that borders asian countries?',[foo=_],O),wdmsg(O).
+:- run_pipleine(acetext='What is the ocean that borders african countries and, that borders asian countries?',[foo=_],O),wdmsg(O).
 
 
 type(SET):-tSet(SET).

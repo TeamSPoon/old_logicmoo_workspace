@@ -712,7 +712,7 @@ name_db([black,sea],black_sea).
 name_db([upper,volta],upper_volta).
 name_db([Name],Name) :-
    name_template_db(Name,_), !.
-name_db([Name],Name) :- thlocal:useAltPOS, loop_check(not(cw_db_code(Name,_))).
+name_db([Name],Name) :- thlocal:useAltPOS,downcase_atom(Name,DCName),loop_check(not(cw_db_code(DCName,_))).
 
 name_template_db(X,feature&circle) :- circle_of_latitude(X).
 name_template_db(X,feature&city) :- city(X).

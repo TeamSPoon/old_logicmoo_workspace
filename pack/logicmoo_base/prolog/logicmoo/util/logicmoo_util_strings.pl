@@ -495,7 +495,7 @@ catch_read_term_from_atom(Sub,Term,NewOnes):-
 splt_words(Atom,Terms,Var):- catch((hotrace(once(splt_words_0(Atom,Terms,Var)))),_,fail),!.
 splt_words(Atom,Words1,[]):- catch(atomic_list_concat_safe(Words1,' ',Atom),_,fail),!.
 
-splt_words_0(S,Terms,Var):-any_to_atom(S,Atom),splt_words_0_atom(Atom,Terms,Var).
+splt_words_0(S,Terms,Var):-any_to_atom(S,Atom),!,splt_words_0_atom(Atom,Terms,Var),!.
 
 splt_words_0_atom('',[],[]):-!.
 splt_words_0_atom(Atom,[Term|List],Vars):- atom_length(Atom,To),between(0,To,X), 

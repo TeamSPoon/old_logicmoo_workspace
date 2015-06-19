@@ -20,6 +20,18 @@ sudo adduser --gecos "PrologMUD User" --disabled-login --disabled-password prolo
 # very usefull for seeing what is going on
 git clone $GITRC https://github.com/TeamSPoon/ClioPatria $MUDPACK/ClioPatria
 git clone $GITRC https://github.com/TeamSPoon/swish $MUDPACK/swish
+git clone $GITRC https://github.com/TeamSPoon/trill_on_swish $MUDPACK/trill_on_swish
+git clone $GITRC  https://gitlab.prologmoo.com/prologmud_data/pldata_larkc.git $MUDPACK/pldata_larkc
+
+exit 0
+
 # git clone $GITRC https://prologmoo.com/TeamSPoon/swish $MUDPACK/swish
 
+EXTERNAL PACKAGES
+=========
+Initial starter Docs https://github.com/TeamSPoon/PrologMUD/wiki
+
+Installation see.. https://docs.google.com/document/d/1fkOxnmI1LqxadvZuCRS-fGIEweIKyPn6AVGp5Yjse1I/edit
+
+![AdoptedFromKnowRob](http://www.prologmoo.com/downloads/screenshots/KnowRobOnto.png)
 
