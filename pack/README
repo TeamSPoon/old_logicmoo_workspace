@@ -5,7 +5,7 @@ export GITRC="--recursive"
 
 if [ $# -eq 0 ] 
  then
-    export MUDPACK=pack
+    export MUDPACK=.
  else
     export MUDPACK="$1"
 fi
@@ -21,7 +21,7 @@ sudo adduser --gecos "PrologMUD User" --disabled-login --disabled-password prolo
 git clone $GITRC https://github.com/TeamSPoon/ClioPatria $MUDPACK/ClioPatria
 git clone $GITRC https://github.com/TeamSPoon/swish $MUDPACK/swish
 git clone $GITRC https://github.com/TeamSPoon/trill_on_swish $MUDPACK/trill_on_swish
-git clone $GITRC  https://gitlab.prologmoo.com/prologmud_data/pldata_larkc.git $MUDPACK/pldata_larkc
+git clone $GITRC https://gitlab.prologmoo.com/prologmud_data/pldata_larkc.git $MUDPACK/pldata_larkc
 
 exit 0
 
