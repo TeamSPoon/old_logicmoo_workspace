@@ -7,9 +7,6 @@
 [submodule "pack/hMUD"]
 	path = pack/hMUD
 	url = https://github.com/TeamSPoon/hmud.git
-[submodule "pack/ClioPatria"]
-	path = pack/ClioPatria
-	url = https://github.com/TeamSPoon/ClioPatria.git
 [submodule "pack/MUD_ircbot"]
 	path = pack/MUD_ircbot
 	url = https://github.com/TeamSPoon/MUD_ircbot.git
