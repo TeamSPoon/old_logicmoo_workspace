@@ -10,6 +10,7 @@
 :- use_module(owl2_model).
 :- use_module(owl2_metamodel).
 
+
 :- rdf_register_ns(swrl,'http://www.w3.org/2003/11/swrl#',[force(true)]).
 :- rdf_register_ns(swrlb,'http://www.w3.org/2003/11/swrlb#',[force(true)]).
 

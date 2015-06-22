@@ -95,7 +95,6 @@
 :-multifile(user:tChannel/1).
 
 
-
 :- dynamic_multifile_exported thglobal:pfcManageHybrids/0.
 :- dynamic_multifile_exported thlocal:infMustArgIsa/0.
 :- thread_local thlocal:into_form_code/0.

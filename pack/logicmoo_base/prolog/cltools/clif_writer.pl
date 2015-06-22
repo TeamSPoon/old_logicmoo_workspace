@@ -1,4 +1,3 @@
-
 /* -*- Mode: Prolog -*- */
 
 :- module(clif_writer,

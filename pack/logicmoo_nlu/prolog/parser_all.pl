@@ -22,10 +22,14 @@
 
 
 % ==============================================================================
-%    Converter Pipeline
+%   
+% APE: Converter Pipeline
+%   acetext, sentences, syntaxTrees, drs, drs0, sdrs, fol, pnf, tokens, 
+%        sentencesToParse, paraphrase
 % 
-% APE:  acetext, sentences, syntaxTrees, drs, drs0, sdrs, fol, pnf, tokens, sentencesToParse, paraphrase
 % CHAT80:  acetext, acetext_no_punct, pos_sents_pre,  syntaxTree80, query80
+%
+%  needConverter(syntaxTree,syntaxTree80).
 % 
 % =============================================================================
 
@@ -79,7 +83,7 @@ get_pipeline_value(TID,Name,Value,_ ):- pipeline_value(TID,Name,Value),!.
 get_pipeline_value(TID,(N1;Name),ValueOut, Else):- get_pipeline_value(TID,N1,Value,missing),
    (Value==missing ->  get_pipeline_value(TID,Name,ValueOut, Else) ; ValueOut= Value),!.
 get_pipeline_value(TID,Name,Value,Else):- pipeline_value(TID,Name,Value) -> true;  Value=Else.
-get_pipeline_value(TID,Name,Value,Else):- pipeline_value(TID,Name&_,Value) -> true;  Value=Else.
+get_pipeline_value(TID,Name,Value,Else):- pipeline_value(TID,'&'(Name ,_),Value) -> true;  Value=Else.
 
 is_word_atomic(Value):-atomic(Value),!.
 is_word_atomic(Value):-functor(Value,w,2).
@@ -90,7 +94,7 @@ is_worldlist_list([Value|_]):-!, is_word_atomic(Value),!.
 %
 % Set a variable in the Transaction ID 
 %
-set_pipeline_value(TID,(N1&Name),Value):-!,set_pipeline_value(TID,N1,Value),set_pipeline_value(TID,Name,Value).
+set_pipeline_value(TID,'&'(N1,Name),Value):-!,set_pipeline_value(TID,N1,Value),set_pipeline_value(TID,Name,Value).
 set_pipeline_value(TID,Name,Value):-var(Value),var(Name),!,trace_or_throw(var_set_pipeline_value(TID,Name,Value)).
 set_pipeline_value(TID,Name:set,Values):- \+ is_worldlist_list(Values), is_list(Values),!,must(( foreach(member(V,Values),set_pipeline_value(TID,Name:unique,V)))).
 set_pipeline_value(TID,Name:set,Value):- is_worldlist_list(Value), !,must(set_pipeline_value(TID,Name:unique,Value)).
@@ -186,7 +190,8 @@ show_pipeline:-forall(installed_converter(CNV),wdmsg(installed_converter(CNV))).
 :- user:ensure_loaded(parser_chat80).
 % ================================================================================================
 
-was_punct(Remove):-domain(WRemove,[(,),(.),(?),(!)]),(domain(Remove,[w(_,punc),w(WRemove,_)]);Remove=WRemove).
+was_punct(Remove):-domain(WRemove,[(,),(.),(?),(!)]),
+  (domain(Remove,[w(_,punc),w(WRemove,_)]);Remove=WRemove).
 remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)  -> remove_punctuation(W3,NP) ; NP=W2.
 :- install_converter(parser_chat80:words_to_w2(+acetext,-pos_sents_pre)).
 :- install_converter(remove_punctuation(+pos_sents_pre,-text_no_punct)).
@@ -224,6 +229,9 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 %:- user:ensure_loaded(parser_candc).
 % ================================================================================================
 
+% ================================================================================================
+:- user:ensure_loaded(parser_stanford).
+% ================================================================================================
 
 % ================================================================================================
 %:- user:ensure_loaded(parser_talk).
@@ -237,19 +245,30 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 
 
 % ================================================================================================
-% :- time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),(exists_file(AFN)->true;qcompile(library(el_holds/'el_assertions.pl.hide')))))).
-:- time(user:ensure_loaded(library(el_holds/'el_assertions.pl.qlf'))).
+%:- time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),(exists_file(AFN)->true;qcompile(library(el_holds/'el_assertions.pl.hide')))))).
+%:- time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),(exists_file(AFN)->true;qcompile(library(el_holds/'el_assertions.pl.hide')))))).
+
+get_it:- 
+ time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),   
+  (exists_file(AFN)->true;(
+    (absolute_file_name(library(el_holds),AFND),sformat( S, 'curl --compressed http://prologmoo.com/devel/LogicmooDeveloperFramework/PrologMUD/pack/pldata_larkc/prolog/el_holds/el_assertions.pl.qlf > ~w/el_assertions.pl.qlf',[AFND]),
+    shell(S))))))).
+
+:- dmsg("Loading el_assertions.pl (This may take 10-30 seconds)").
+:- gripe_time(30,user:ensure_loaded(library(el_holds/'el_assertions.pl.qlf'))).
 :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc)).
 :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_call_kb)).
 :- user:ensure_loaded(parser_e2c).
 :- user:ensure_loaded(pldata/nldata_BRN_WSJ_LEXICON).
 :- user:ensure_loaded(pldata/nldata_freq_pdat).
+:- user:ensure_loaded(pldata/nldata_cycl_pos0).
 :- user:ensure_loaded(pldata/clex_iface).
 
 
 
+:- dmsg("Scanning el_assertions.pl for programatic definations (This may take 10-30 seconds)").
 %:- pfc_add(cyckb_t(A, _, _) => is_cyckb_t_pred(A,2)).
-:- with_el_holds_enabled(gripe_time(2,forall(cyckb_t(A, _, _) , assert_if_new(is_cyckb_t_pred(A,2))))).
+:- with_el_holds_enabled(gripe_time(10,forall(cyckb_t(A, _, _) , assert_if_new(is_cyckb_t_pred(A,2))))).
 %:- pfc_add(cyckb_t(A, _, _, _ ) => is_cyckb_t_pred(A,3)).
 :- with_el_holds_enabled(gripe_time(2,forall(cyckb_t(A, _, _, _) , assert_if_new(is_cyckb_t_pred(A,3))))).
 %:- pfc_add(cyckb_t(A, _, _, _, _ ) => is_cyckb_t_pred(A,4)).
@@ -257,6 +276,7 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 :- with_el_holds_enabled(gripe_time(2,forall(cyckb_t(A, _, _,_ ,_,_ ) , assert_if_new(is_cyckb_t_pred(A,5))))).
 
 
+:- dmsg("Implementing programatic definations (This shoiuld take less than 2 seconds)").
 % :- pfc_add((is_cyckb_t_pred(F,A) => {functor(H,F,A),H=..[F|ARGS],KB=..[cyckb_t,F|ARGS],assert_if_new((H:-KB))})).
 :- gripe_time(2,forall(is_cyckb_t_pred(F,A) , ignore((atom(F),functor(H,F,A),H=..[F|ARGS],KB=..[cyckb_t,F|ARGS],logOnErrorIgnore(assert_if_new((H:- \+(el_holds_DISABLED_KB), KB))))))).
 
@@ -266,47 +286,49 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 
 
 % ================================================================================================
-% Not yet started 
+% TODO Not yet started 
 :- user:ensure_loaded(parser_CURT).
 % ================================================================================================
 
 % ================================================================================================
-% Not yet started 
+% TODO - grovel the API
 :- user:ensure_loaded(parser_regulus).
 % ================================================================================================
 
 % ================================================================================================
-% Not yet started 
+% TODO - grovel the API
 :- user:ensure_loaded(parser_SUPPLE).
 % ================================================================================================
 
 % ================================================================================================
-% Not yet started 
+% TODO - grovel the API
 :- user:ensure_loaded(parser_SIRIDUS).
 % ================================================================================================
 
 % ================================================================================================
-% Not yet started 
+% TODO - grovel the API
 :- user:ensure_loaded(parser_ProNTo).
 % ================================================================================================
 
-
+:- dmsg("List of possible data transformations").
 :- show_pipeline.
 
-:- user:ignore(( Z = ('/'),current_op(X,Y,Z),display(:-(op(X,Y,Z))),nl,fail)).
-:- user:ignore((Z = (':'),current_op(X,Y,Z),display(:-(op(X,Y,Z))),nl,fail)).
-:- user:ignore((Z = ('-'),current_op(X,Y,Z),display(:-(op(X,Y,Z))),nl,fail)).
 :- dmsg(parser_all_complete).
 
-:- run_pipleine(acetext='All persons are happy.',[foo=_],O),wdmsg(O).
-:- run_pipleine(acetext='What is the ocean that borders african countries and, that borders asian countries?',[foo=_],O),wdmsg(O).
+:-multifile(user:regression_test/0).
+user:regression_test:- run_pipleine(acetext='All persons are happy.',[foo=_],O),wdmsg(O).
+user:regression_test:- run_pipleine(acetext='What is the ocean that borders african countries and, that borders asian countries?',[foo=_],O),wdmsg(O).
+user:regression_test:- run_pipleine(acetext='A person who loves all animals is loved by someone.',[foo=_],O),wdmsg(O).
+
+user:regression_test:- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
 
 
-type(SET):-tSet(SET).
+:-asserta((type(SET):-tSet(SET))).
 
 :- debug.
-:- test_chat80_regressions.
 
-:- retract(thlocal:disable_mpred_term_expansions_locally).
+user:regression_test:- test_chat80_regressions.
+
+:- must(retract(thlocal:disable_mpred_term_expansions_locally)).
 
 

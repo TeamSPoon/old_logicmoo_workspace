@@ -102,7 +102,7 @@ end_of_file.
  :-set_prolog_flag(debugger_show_context,true).
 % :-set_prolog_flag(trace_gc,true).
 :-set_prolog_flag(debug,true).
-:-set_prolog_flag(gc,false).
+%:-set_prolog_flag(gc,false).
 %:-set_prolog_flag(debug_term_position, true).
 
 % pfc_sanity:neg(A):-neg(A).

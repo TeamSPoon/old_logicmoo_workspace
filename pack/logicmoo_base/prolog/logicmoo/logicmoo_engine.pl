@@ -1184,8 +1184,8 @@ tsn:- with_all_dmsg(forall(clause(snark,C),must(C))).
 % snark:- make.
 tsnark:- snark_test_string(TODO),snark(string(TODO),current_output).
 
-:- multifile(user:mud_regression_test/0).
-user:mud_regression_test:- tsn.
+:- multifile(user:mud_test_sanity/0).
+user:mud_test_sanity:- tsn.
 
 :- thread_local(snark_action_mode/1).
 :- asserta_if_new(snark_action_mode(tell)).

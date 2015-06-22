@@ -394,11 +394,12 @@ escapeCodes(Escaped,EscapeChar,[Skipped|Source],[Skipped|New]):-
 destringify(X,X):-var(X);number(X),!.
 destringify('$VAR'(S),'$VAR'(S)):-!.
 destringify([],[]):-!.
+destringify('[]','[]'):-!.
 destringify(T,A):-catch((text_to_string(T,S),atom_string(A,S)),_,fail),!.
 destringify(X,S):-is_string(X),stringToCodelist(X,CL),name(S,CL),!.
 destringify([H|T],[HH|TT]):-!,destringify(H,HH),destringify(T,TT),!.
 destringify(X,P):-compound(X),X=..LIST,maplist(destringify,LIST,DL),P=..DL,!.
-destringify(B,A):- (atom(X),atom_concat('#$',A,B))->true;A=B.
+destringify(B,A):- (atom(A),atom_concat('#$',A,B))->true;A=B.
 
 %stringToList(X,Y):-writeq(string_to_list(X,Y)),nl,fail.
 stringToList(X,Y):-var(X),!,string_to_list(X,Y).
@@ -468,6 +469,7 @@ any_to_string1("",String):- !,""=String.
 any_to_string1(``,String):- !,""=String.
 any_to_string1('',String):- !,""=String.
 any_to_string1([],String):- !,""=String.
+any_to_string1('[]',String):- !,""=String.
 any_to_string1(fmt(Fmt,Args),String):-!,sformat(String,Fmt,Args).
 any_to_string1(txtFormatFn(Fmt,Args),String):-!,sformat(String,Fmt,Args).
 any_to_string1(Atom,String):-atom(Atom),!,atom_string(Atom,String).

@@ -30,7 +30,7 @@
 :-set_prolog_flag(double_quotes,string).
 :-set_prolog_flag(double_quotes,codes).
 :-set_prolog_flag(float_format,'%.12g').
-:-set_prolog_flag(gc,false).
+%:-set_prolog_flag(gc,false).
 %:-set_prolog_flag(optimise,true).
 %:-set_prolog_flag(file_name_variables,false).
 %:-set_prolog_flag(agc_margin,0).

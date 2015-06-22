@@ -257,8 +257,8 @@ gripe_pttp_failure(Test):- pttp_test_fails_is_ok(Test),!.
 gripe_pttp_failure(Test):- dmsg(gripe_pttp_failure(Test)),!.
 gripe_pttp_failure(Test):- ignore(pttp_test_took(Test, failure, Time)),trace_or_throw(pttp_test_took(Test, failure, Time)).
 
-:-multifile(user:mud_regression_test/0).
-% user:mud_regression_test :- do_pttp_tests.
+:-multifile(user:mud_test_sanity/0).
+% user:mud_test_sanity :- do_pttp_tests.
 
 
 :-export(isNegOf/2).

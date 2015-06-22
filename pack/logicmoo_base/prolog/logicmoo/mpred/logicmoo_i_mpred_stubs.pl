@@ -335,7 +335,8 @@ ensure_universal_stub5(HeadIn,Head,F,A,HBLIST):- user:mpred_prop(F,prologOnly), 
             public(F/A),
             lock_predicate(Head),
             retractall(user:mpred_prop(F,prologOnly)),
-            set_prolog_flag(gc,true), garbage_collect_atoms,
+           % Stop turning GC on/off
+           % set_prolog_flag(gc,true), garbage_collect_atoms,
             dmsg(compiled_new_predicate(HeadIn)));
        ((wdmsg(error(cannot_absorb_all_clauses((Head))))),!,fail)).
 

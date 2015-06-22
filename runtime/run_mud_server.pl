@@ -33,15 +33,15 @@ user:file_search_path(prologmud, library(prologmud)).
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 % :- qcompile_libraries.
 
-% [Optionaly] Load an Eggdrop 
+% [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/
 :- if_file_exists(ensure_loaded(library(eggdrop))).
 :- initialization((current_predicate(egg_go/0)->egg_go;true),now).
-
 
 % [Required] Load the Logicmoo Base System
 :- time(user:ensure_loaded(logicmoo(logicmoo_base))).
 :- asserta(thlocal:disable_mpred_term_expansions_locally).
 
+% [Required] most of the Library system should not be loaded with mpred expansion on
 :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 
 % [Required] Load the Logicmoo WWW System
@@ -55,22 +55,38 @@ user:file_search_path(prologmud, library(prologmud)).
 % [Mostly Required] Load the Logicmoo Parser/Generator System
 :- time(user:ensure_loaded(library(parser_all))).
 
+% [Required] most of the Library system should not be loaded with mpred expansion on
 :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 
-:- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api)).
+% [Required] Load the Logicmoo Backchaining Inference System
+:- with_no_mpred_expansions(user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api))).
 
-
+% [Optional] Load the Logicmoo RDF/OWL Browser System
 %:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(mpred_online/dbase_i_rdf_store)))).
 
-% % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_planner)))).
+% [Mostly Required] Load the Logicmoo Planner/AI System
+:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_planner)))).
 
-% % :- set_prolog_flag(gc,true).
+% [Debugging] Normarily this set as 'true' can interfere with debugging
+% :- set_prolog_flag(gc,true).
+% Yet turning it off we cant even startup without crashing
 
-% :- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
+:- doall(show_call(current_prolog_flag(_N,_V))).
 
-:- snark_tell(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
 
-?- kif_to_boxlog(-((a , b ,  c , d)),_S),!,disjuncts_to_list(_S,_L),list_to_set(_L,_SET),forall(member(_P,_SET),writeln(_P)),!.
+% ==========================================================
+% Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
+% ==========================================================
+:-multifile(user:regression_test/0).
+
+user:regression_test:- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
+
+user:regression_test:- snark_tell(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
+
+user:regression_test:- kif_to_boxlog(-((a , b ,  c , d)),_S),!,disjuncts_to_list(_S,_L),list_to_set(_L,_SET),forall(member(_P,_SET),writeln(_P)),!.
+
+
+:- doall(call_no_cuts(user:regression_test)).
 
 % :-prolog.
 
@@ -86,25 +102,14 @@ user:file_search_path(prologmud, library(prologmud)).
 
 
 
-
-
-
 % ==============================
 % MUD SERVER CODE STARTS
 % ==============================
 
 
-
-
-% [Optional] the following worlds are in version control in examples
-% :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
-% :- add_game_dir('../games/src_game_sims',prolog_repl).
-:- add_game_dir('../games/src_game_startrek',prolog_repl).
-% :- add_game_dir('../games/src_game_nani',prolog_repl).       
-
-
 % [Optional] Creates or suppliments a world
 
+tCol(tRegion).
 tCol(tLivingRoom).
 genls(tLivingRoom,tRegion).
 genls(tOfficeRoom,tRegion).
@@ -154,27 +159,47 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 % [Optionaly] Start the telent server
 :-at_start(toploop_telnet:start_mud_telnet(4000)).
 
+% ==============================
+% MUD GAME CODE LOADS
+% ==============================
 
+% [Manditory] This loads the game and initializes so test can be ran
+:- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
+
+:- if_startup_script( finish_processing_world).
+
+:- enqueue_agent_action("rez crackers").
+
+% [Never] saves about a 3 minute compilation time (for when not runing mud)
+% :- prolog.
 
 
 % [Optional] the following game files though can be loaded separate instead
-:- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
 :- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
 :- declare_load_dbase('../games/src_game_nani/?*.plmoo').
+% [Optional] the following worlds are in version control in examples
+% :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
+% :- add_game_dir('../games/src_game_sims',prolog_repl).
+% :- add_game_dir('../games/src_game_nani',prolog_repl).       
+:- add_game_dir('../games/src_game_startrek',prolog_repl).
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_startup_script( at_start(finish_processing_world)).
 
-:- enqueue_agent_action("rez crackers").
-
-/*
 
 sanity_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
+
+
+
+/*
 
 :-sanity_testp1.
 
 % [Optionaly] Run a battery of tests
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
+
+% [Optionaly] Run a battery of tests
+:- if_startup_script( doall(user:regression_test)).
 
 
 sanity_test0a:- enqueue_agent_action("hide").
@@ -209,6 +234,9 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 
 */
 
+% ==============================
+% MUD GAME REPL 
+% ==============================
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- if_startup_script(at_start(login_and_run)).
 

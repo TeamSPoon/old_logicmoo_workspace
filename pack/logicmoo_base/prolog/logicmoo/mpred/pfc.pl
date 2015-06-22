@@ -2486,7 +2486,6 @@ compute_resolve(NewerP,OlderQ,Resolve):-
 :-export(resolverConflict_robot/1).
 resolveConflict(C) :- forall(must(pfc_nf1_negation(C,N)),must(pp_why(N))),must(pp_why(C)), if_defined(resolverConflict_robot(C)),!.
 resolveConflict(C) :- forall(must(pfc_nf1_negation(C,N)),forall(compute_resolve(C,N,TODO),debugOnError(TODO))),!.
-resolveConflict(C) :- forall(must(pfc_nf1_negation(C,N)),forall(compute_resolve(C,N,TODO),debugOnError((TODO)))),!.
 resolveConflict(C) :- must((pfc_remove3(C),fmt("~nRem-3 with conflict ~w~n", [C]),pfc_run)).
 resolveConflict(C) :-
   fmt("~NHalting with conflict ~w~n", [C]),   

@@ -275,7 +275,8 @@ multi_transparent(X):-functor(X,F,A),multi_transparent(F/A),!.
 %:-set_prolog_flag(verbose,normal).
 :-set_prolog_flag(double_quotes,codes).
 :-set_prolog_flag(float_format,'%.12g').
-:-set_prolog_flag(gc,false).
+% Stop turning GC on/off
+%:-set_prolog_flag(gc,false).
 :-dynamic_transparent(cycConnectionAvalable/5).
 :-dynamic_transparent(cycConnectionUsed/5).
 :-dynamic_transparent(cycMutex/2).

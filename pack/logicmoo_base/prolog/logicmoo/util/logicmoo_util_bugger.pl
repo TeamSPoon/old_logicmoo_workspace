@@ -483,18 +483,25 @@ badfood(MCall):- numbervars(MCall,0,_,[functor_name('VAR_______________________x
 % -- CODEBLOCK
 :- export(must/1).
 :-meta_predicate (must(0)).
-%must(C):-is_release,!,C.
 
 %must(C):-  tlbugger:skipMust,!,catch(C,E,(wdmsg(E:C),fail)).
-must(C):- catch(C,E,(wdmsg(E:C),fail)) *-> true ; (wdmsg(error,failed_must(C)),dtrace(C)).
 %must(MCall):- skipWrapper,!, (MCall *-> true ; ((dmsg(failed(must(MCall))),trace,MCall))).
 %must(C):-  tlbugger:skipMust,!,catch(C,E,(wdmsg(E:C),fail)).
-must(MCall):- hotrace((tlbugger:show_must_go_on,
+
+%must(C):- is_release,!,C.
+
+must(C):- fail, !,
+  (catch(C,E,(wdmsg(E:C),fail)) *-> true ;   
+   (wdmsg(error,failed_must(C)),dtrace(C),fail)).
+
+must(MCall):- 
+ hotrace((tlbugger:show_must_go_on,
  strip_module(MCall,M,Call))),!,
  (
   '@'(catch(Call,E,(dumpST,print_dmessage(error,must_ex(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
   *-> true ; 
   '@'((hotrace((print_dmessage(warning,must_failed(Call)),print_dmessage(error,must_failed(Call)))),badfood(Call)),M)).
+
 
 must(MCall):- 
  strip_module(MCall,M,Call),
@@ -503,7 +510,7 @@ must(MCall):-
   *-> true ; 
   '@'((hotrace((print_dmessage(warning,must_failed(Call)),ignore(ftrace(Call)),debug,leash(+all),repeat,print_dmessage(error,must_failed(Call)))),dtrace(Call)),M)).
 
- 
+
 :- meta_predicate(motrace(0)).
 motrace(O):-one_must(hotrace(must(O)),(trace,O)).
 
@@ -1851,6 +1858,7 @@ buggeroo:-hideTrace,traceAll,atom_concat(guit,racer,TRACER), catch(call(TRACER),
 singletons(_).
 
 /*
+ Stop turning GC on/off
 :- set_prolog_flag(backtrace_depth,   200).
 :- set_prolog_flag(backtrace_goal_depth, 2000).
 :- set_prolog_flag(backtrace_show_lines, true).
@@ -2570,9 +2578,9 @@ ansi_control_conv(Ctrl,CtrlO):-flatten([Ctrl],CtrlO),!.
 
 is_tty(Out):- not(tlbugger:no_colors), is_stream(Out),stream_property(Out,tty(true)).
 
-ansicall(Out,_,Call):- in_pengines,!,Call.
 ansicall(Out,_,Call):- \+ is_tty(Out),!,Call.
 ansicall(Out,CtrlIn,Call):- once(ansi_control_conv(CtrlIn,Ctrl)),  CtrlIn\=Ctrl,!,ansicall(Out,Ctrl,Call).
+ansicall(_,_,Call):- in_pengines,!,Call.
 ansicall(Out,Ctrl,Call):-
    retractall(last_used_color(_)),asserta(last_used_color(Ctrl)),ansicall0(Out,Ctrl,Call),!.
 
@@ -2759,10 +2767,12 @@ portray_clause_w_vars(Out,Msg,Vs,Options):- \+ \+ ((prolog_listing:do_portray_cl
 
 :-meta_predicate(gripe_time(+,0)).
 :-export(gripe_time/2).
-gripe_time(TooLong,Goal):-statistics(cputime,Start),(Goal*->Success=true;Success=fail),
+gripe_time(TooLong,Goal):-statistics(cputime,Start),
+  (Goal*->Success=true;Success=fail),
   once((statistics(cputime,End),
    Elapse is End-Start,
-(Elapse>TooLong -> dmsg(gripe_time(warn(Elapse>TooLong),Goal)); true))),Success.
+(Elapse>TooLong -> dmsg(gripe_time(warn(Elapse>TooLong),Goal)); true))),!,
+   Success.
 
 
 :- meta_predicate show_call0(0).
@@ -2805,7 +2815,6 @@ loggerFmtReal(S,F,A):-
     flush_output_safe(S),!.
 
 
- 
 
 :-moo_hide_childs(stack_depth/1).
 :-moo_hide_childs(stack_check/0).

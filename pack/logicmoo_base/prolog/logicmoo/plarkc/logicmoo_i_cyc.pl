@@ -271,7 +271,7 @@ cycLToMpred0(V,CP):-cyc_to_pfc_expansion(V,VE),V\=@=VE,!,cycLToMpred0(VE,CP).
 cycLToMpred0((TRUE=>V),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
 cycLToMpred0((V<=TRUE),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
 cycLToMpred0((V :- TRUE),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
-cycLToMpred0((V :- A),CP):- show_call(cycLToMpred0((A => V))).
+cycLToMpred0((V :- A),CP):- show_call(cycLToMpred0((A => V),CP)),!.
 cycLToMpred0((A => (V1 , V2)),CP):-not(is_ftVar(V1)),!,cycLToMpred0((A=> (V1/consistent(V2))),V1P),cycLToMpred0((A=> (V2/consistent(V1))),V2P) ,!,conjoin(V1P,V2P,CP).
 cycLToMpred0((V1 , V2),CP):-!,cycLToMpred0(V1,V1P),cycLToMpred0(V2,V2P),!,conjoin(V1P,V2P,CP).
 cycLToMpred0([V1 | V2],CP):-!,cycLToMpred0(V1,V1P),cycLToMpred0(V2,V2P),!,conjoin(V1P,V2P,CP).

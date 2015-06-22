@@ -194,6 +194,9 @@ mpred_online:semweb_startup:- do_semweb_startup_late_once.
 :- debugOnError(shell('wget http://localhost:3020/help/source/doc_for?object=cliopatria:context_graph/3')).
 :- debugOnError(shell('wget http://localhost:3020/help/source/doc/devel/PrologMUD/pack/ClioPatria/hooks.pl')).
 */
-:- logOnError(eggdrop:deregister_unsafe_preds).
+
+:- user:ensure_loaded(library(semweb/rdf_http_plugin)).
+:- debugOnError(rdf_load('http://prologmoo.com/downloads/mud.ttl')).
+%:- logOnError(eggdrop:deregister_unsafe_preds).
 
 

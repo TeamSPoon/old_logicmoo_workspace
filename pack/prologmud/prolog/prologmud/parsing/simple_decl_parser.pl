@@ -42,7 +42,7 @@ completelyAssertedCollection(vtValue).
 
 
 isa(vtColor,ttValueType).
-isa(X,ttValueType)=> (genls(X,vtValue),completelyAssertedCollection(X)).
+:- pfc_add('=>'(isa(X,ttValueType),(genls(X,vtValue),completelyAssertedCollection(X)))).
 
 isa(vtValue,ttValueType).
 
@@ -154,6 +154,8 @@ parserTest(A,B):-parserTest(A,B,_).
 
 :-assertz_if_new(parserTest(iWorld7,"A television is usually in the living room.")).
 
+% :-assert_text_now(iWorld7,"You are in a well kept garden.").
+
 
 translation_spo(Prolog,localityOfObject,I,C) --> dcgParse213(subject(I,More1),is_in,object(C,More2)),{conjoin(More1,More2,Prolog)}.
 
@@ -206,14 +208,14 @@ assert_text(Ctx,CtxISA,String):-
   (parserVars(context,Ctx0,_) -> (((Ctx0 \==Ctx),CtxISA\==tWorld) -> (asserta_parserVars(isThis,Ctx,CtxISA)); true) ; (asserta_parserVars(isThis,Ctx,CtxISA))), 
     with_assertions(parserVars(context,Ctx,CtxISA),assert_text_now(Ctx,CtxISA,String)).
 
-assert_text_now(Ctx,CtxISA,String):-  dmsg(assert_text_now(Ctx,CtxISA,String)),!.
-assert_text_now(Ctx,CtxISA,String):-    
+assert_text_now(Ctx,CtxISA,String):-   
+ logOnFailureIgnore(( 
   % parse the string to attributed text
  to_word_list(String,WL),!,to_icase_strs(WL,IC),!,   
    ((phrase(translation_dbg_on_fail(Ctx,CtxISA,Prolog),IC),
    assertz_if_new(asserted_text(Ctx,String,PrologO)),
      fully_expand(Prolog,PrologO),
-     show_call(onSpawn(PrologO)))).
+     show_call(onSpawn(PrologO)))))).
 
 :-dynamic(asserted_text/3).
 

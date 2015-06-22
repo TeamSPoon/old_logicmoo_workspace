@@ -229,6 +229,7 @@ verb_form_db(being,be,pres+part,_).
 w_to_w2(W,W):-thlocal:old_text,!.
 
 w_to_w2(w(Txt,Props),w(Txt,Props)):-!.
+w_to_w2([Props,Txt],w(Txt,Props)):-!.
 w_to_w2(w(X),w(X,open)):-!.
 w_to_w2(U,w(U,open)):-compound(U),!.
 w_to_w2(S,w(A,open)):-atom_string(A,S),!.

@@ -60,7 +60,7 @@ sentenceBreakerUncontract([W|BrokenA],[W|BrokenB]):-!,sentenceBreakerUncontract(
 sentenceBreakerUncontract(Broken0,Broken0).
 
 sentenceBreakerDenoter(Words,Tagged):-evalSubL('MAPCAR'('#\'CAR','DENOTATION-MAPPER'(string(Words),
-    quote(['#$middleName','#$middleNameInitial','#$nicknames','#$givenNames','#$firstName','#$abbreviationString-PN','#$alias','#$initialismString']),':greedy')),List,_),reformatStrings(List,Tagged),!.
+    quote(['#$middleName','#$middleNameInitial','#$nicknames','#$givenNames','#$firstName','#$abbreviationString-PN','#$alias','#$initialismString']),':GREEDY',':greedy')),List,_),reformatStrings(List,Tagged),!.
 %sentenceBreaker0(Words,Tagged):-evalSubL('denotation-mapper'(string(Words),'NIL',':greedy'),List:_),reformatStrings(List,Tagged),!.
 
 %sentenceBreaker1(['\'',[A]|BrokenA],[[W]|BrokenB]):- atom(A),atom_concat('\'',A,W),!,sentenceBreaker1(BrokenA,BrokenB).
@@ -239,6 +239,7 @@ keymax([Num1-Val1|Tail], Num2, Val2, Max, MaxPath) :-
 % ================================================================================
 % sentenceS/2
 % ================================================================================
+/*
 sentenceS(Broken,Types):- sentenceSS(Broken,Types).
 sentenceS(Broken,Broken).
 
@@ -257,7 +258,9 @@ expandM(How,[M|Match],Expanded,HowMS):-
 expandS(How,M,Expanded,Hows):-not(member(M,How)),dcg_rewrite(_,M,Expand),intersection(How,Expand,[]),expandM([M|How],Expand,Expanded,Hows).
 expandS(H,M,[M],H):-not(dcg_rewrite(_,M,Expand)).
       
-      
+dcg_rewrite(Type,SPos):-dcg_rewrite_simple(Type,SPos).
+dcg_rewrite(Type,SPos):-dcg_rewrite_complex(Type,SPos).
+*/      
 % ================================================================================
 % sentenceSegs/2
 % ================================================================================
@@ -483,11 +486,6 @@ applyBCR(BCR,[TAG1,TAG2,'wdnexttag',WORD,TAG3],[A,B|In],Out):-
       substPos(BCR,A,TAG1,TAG2,X),applyBCR(BCR,[TAG1,TAG2,'wdnexttag',WORD,TAG3],[X,B|In],Out).
 
 applyBCR(BCR,R,[I|In],[I|Mid]):-applyBCR(BCR,R,In,Mid).
-
-
-dcg_rewrite(Type,SPos):-dcg_rewrite_simple(Type,SPos).
-dcg_rewrite(Type,SPos):-dcg_rewrite_complex(Type,SPos).
-
 
 
 %bposToCPos(X,X):-not(bposToCPos(X,Y)),true.
@@ -761,4 +759,4 @@ bposToCPos(X,Y):-concat_atom([P,L],'-',X),!,(bposToCPos(P,Y);X=Y).
 bposToCPos(X,Y):-concat_atom([P,L],'|',X),!,(bposToCPos(P,Y);bposToCPos(P,L);X=Y).
 bposToCPos(H,M):-brillPos([H|L]),member(M,L),atom_codes(M,[C|_]),is_upper(C).
 
-:- ['cyc_pos_data.pl'].
+:- ['nldata_cyc_pos0'].

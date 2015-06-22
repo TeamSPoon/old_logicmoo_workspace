@@ -269,6 +269,7 @@ predPredicateToFunction(Pred,SubjT,ObjT,FullNameFnO):-
   is_asserted(predPredicateToFunction(Pred,SubjT,ObjT,FullNameFn)) *-> FullNameFnO=FullNameFn ; 
   (i_name('i',ObjT,Obj),i_name(Obj,Pred,ObjPred),i_name('Of',SubjT,OfSubj),concat_atom([ObjPred,OfSubj,'Fn'],FullNameFn)),simplifyFullName(FullNameFn,FullNameFnO).
 
+
 simplifyFullName(FullNameFn,FullNameFn).
 
 find_instance_of(Pred,Subj,Obj):- relationAllExists(Pred,SubjT,ObjT), isa(Subj,SubjT), 

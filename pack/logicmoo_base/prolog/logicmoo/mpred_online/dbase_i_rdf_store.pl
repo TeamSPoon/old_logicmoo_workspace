@@ -20,6 +20,8 @@ end_of_file.
 
 :-module(mpred_rdf_store, [mpred_rdf/3,atom_to_qname/2,rdf_object/1,rdf_assert_hook/1,expire_rdf_caches/0 ]).
 
+
+
 :-multifile(user:expire_one_rdf_cache/0).
 
 
@@ -141,7 +143,9 @@ mpred_online:semweb_startup:- n3_parse('http://raw.github.com/knowrob/knowrob/ma
 :- rdf_register_prefix(skosxl,  'http://www.w3.org/2008/05/skos-xl#',[force(true)]).
 :- rdf_register_prefix(knowrob_objects, 'http://ias.cs.tum.edu/kb/knowrob_objects.owl#',[force(true)]).
 :- rdf_register_prefix(knowrob, 'http://ias.cs.tum.edu/kb/knowrob.owl#',[force(true)]).
-:- rdf_register_prefix(mud,'http://www.prologmoo.com/onto/mud.owl#',[force(true)]).
+:- rdf_register_prefix(mud,'http://prologmoo.com/onto/mud.owl#',[force(true)]).
+:- rdf_register_ns(mud,'http://prologmoo.com/downloads/mud.ttl#',[force(true)]).
+
 
 :- public(rdf/3).
 rdf(S,P,O):- show_call(mpred_rdf(S,P,O)).

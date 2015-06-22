@@ -1,5 +1,6 @@
 /** <module> 
 % A MUD testing API is defined here
+% 
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
@@ -18,6 +19,8 @@
 
 :- thread_local was_test_name/1.
 :- multifile(user:mud_regression_test/0).
+:- multifile(user:mud_test_local/0).
+:- multifile(user:mud_test_full/0).
 
 :- meta_predicate test_call(+).
 :- meta_predicate run_mud_test(+,+).

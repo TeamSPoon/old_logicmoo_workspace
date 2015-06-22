@@ -2,7 +2,9 @@
 <Project
 	Version="10.0"
 	VendorName="SlickEdit"
-	WorkingDir=".">
+	WorkingDir="."
+	BuildSystem="automakefile"
+	BuildMakeFile="Makefile.mk">
 	<Config
 		Name="Release"
 		OutputFile=""
@@ -17,7 +19,7 @@
 				ClearProcessBuffer="1"
 				Verbose="1"
 				Beep="1">
-				<Exec CmdLine="StartMUDServer.bat build"/>
+				<Exec CmdLine='make -f "Makefile.mk" CFG=%b'/>
 			</Target>
 		</Menu>
 		<PreBuildCommands StopOnError="1"/>
@@ -40,5 +42,8 @@
 				Refilter="0"
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
+		<F
+			N="Makefile.mk"
+			Type="Makefile"/>
 	</Files>
 </Project>

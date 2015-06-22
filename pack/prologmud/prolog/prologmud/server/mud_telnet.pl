@@ -23,9 +23,33 @@
                   login_and_run/2,
                   session_loop/2,
                   get_session_io/2,
+                  kill_naughty_threads/0,
                   set_player_telnet_options/1,
                   register_player_stream_local/3,
                   login_and_run_nodebug/0]).
+
+
+
+% learnLaterWhenToCallProceedure(What):- ... code ...
+
+%:-add(learnLaterWhenToCallProceedure(kill_naughty_threads)).
+
+%:-add(unimpledTODO(learnLaterWhenToCallProceedure)).
+%:-add(unimpledTODO(codeWithTODONextToIt)).
+
+% instanceRecognizedBy(codeWithTODONextToIt,grovelSourceCodeLookingForComment).
+
+
+
+kill_naughty_threads:-forall(thread_property(_,alias(ID)),sanify_thread(ID)).
+% ignore main thread
+sanify_thread(main):-!.
+sanify_thread(ID):- ( \+ atom_concat('httpd',_,ID)),!,
+   ignore(( thread_statistics(ID,local,Size),MSize is 200 * 1024, Size>MSize, dmsg(big_thread(ID,local,Size)))).
+sanify_thread(ID):- 
+   ignore(( thread_statistics(ID,local,Size),MSize is 200 * 1024, Size>MSize, 
+     % thread_signal(ID,abort) maybe
+     dmsg(killing_big_thread(ID,local,Size)), thread_exit(ID) )).
 
 
 :- meta_predicate toploop_telnet:show_room_grid_single(*,*,0).

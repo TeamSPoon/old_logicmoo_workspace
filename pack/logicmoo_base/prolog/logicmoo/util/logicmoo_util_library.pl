@@ -93,6 +93,25 @@ append_term(Call,E,CallE):-var(Call), must(compound(CallE)),CallE=..ListE,append
 append_term(Call,E,CallE):-must(compound(Call)), Call=..List, append(List,[E],ListE), CallE=..ListE.
 
 
+
+% What would be a good way to describe the manipulations?
+% Function: maptree func expr many
+% Try applying Lisp function func to various sub-expressions of expr. 
+% Initially, call func with expr itself as an argument. 
+% If this returns an expression which is not equal to expr, apply func again 
+% until eventually it does return expr with no changes. Then, if expr is a function call, 
+% recursively apply func to each of the arguments. This keeps going until no 
+% changes occur anywhere in the expression; this final expression is returned by maptree. 
+% Note that, unlike simplification rules, func functions may not make destructive changes to expr. 
+% If a third argument many is provided, it is an integer which says how many times func may be applied; 
+% the default, as described above, is infinitely many times.
+:- meta_predicate(maptree(2,+,-)).
+:-export(maptree/3).
+maptree(Pred,I,O):- logOnError(call(Pred,I,O)),!.
+maptree(_ ,I,O):- ( \+ compound(I) ),!, must(I=O).
+maptree(Pred,I,O):- I=..IL, must(maplist(maptree(Pred),IL,[FO|OL])),
+   (atom(FO)-> O=..[FO|OL] ; must((nop(maptree(I)),O=..[FO|OL]))).
+
 :- export(disjuncts_to_list/3).
 disjuncts_to_list(Var,[Var]):-is_ftVar(Var),!.
 disjuncts_to_list(true,[]).

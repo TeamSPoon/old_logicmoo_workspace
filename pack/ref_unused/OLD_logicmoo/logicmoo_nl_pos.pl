@@ -60,7 +60,7 @@ sentenceBreakerUncontract([W|BrokenA],[W|BrokenB]):-!,sentenceBreakerUncontract(
 sentenceBreakerUncontract(Broken0,Broken0).
 
 sentenceBreakerDenoter(Words,Tagged):-evalSubL('MAPCAR'('#\'CAR','DENOTATION-MAPPER'(string(Words),
-    quote(['#$middleName','#$middleNameInitial','#$nicknames','#$givenNames','#$firstName','#$abbreviationString-PN','#$alias','#$initialismString']),':GREEDY')),List,_),reformatStrings(List,Tagged),!.
+    quote(['#$middleName','#$middleNameInitial','#$nicknames','#$givenNames','#$firstName','#$abbreviationString-PN','#$alias','#$initialismString']),':GREEDY',':greedy')),List,_),reformatStrings(List,Tagged),!.
 %sentenceBreaker0(Words,Tagged):-evalSubL('denotation-mapper'(string(Words),'NIL',':greedy'),List:_),reformatStrings(List,Tagged),!.
 
 %sentenceBreaker1(['\'',[A]|BrokenA],[[W]|BrokenB]):- atom(A),atom_concat('\'',A,W),!,sentenceBreaker1(BrokenA,BrokenB).
@@ -762,4 +762,4 @@ bposToCPos(X,Y):-concat_atom([P,L],'-',X),!,(bposToCPos(P,Y);X=Y).
 bposToCPos(X,Y):-concat_atom([P,L],'|',X),!,(bposToCPos(P,Y);bposToCPos(P,L);X=Y).
 bposToCPos(H,M):-brillPos([H|L]),member(M,L),atom_codes(M,[C|_]),is_upper(C).
 
-:- ['cyc_pos_data.pl'].
+:- ['nldata_cyc_pos0'].
