@@ -591,8 +591,8 @@ country(iran,middle_east,33,-53,636363,32001000,tehran,rial).
 
 noun_plu_db(types,tSet).
 subject_LF(thing,tSet,feature&tSet&_,X,tSet(X)).
-noun_plu_db(formattypes,formattype).
-subject_LF(thing,formattype,feature&formattype&_,X,formattype(X)).
+noun_plu_db(datatypes,datatype).
+subject_LF(thing,datatype,feature&datatype&_,X,ttFormatType(X)).
 
 subject_LF(thing,Type,feature&Type&_,X,isa(X,Type)):-plt,tSet(Type).
 
@@ -604,7 +604,7 @@ subject_LF(restriction,Type,TYPEMASK,X,isa(X,Type)):- atom(Type), plt2, once(cw_
 
 
 
-gen_typemask(Type,measure&Type&_):-formattype(Type),!.
+gen_typemask(Type,measure&Type&_):-ttFormatType(Type),!.
 gen_typemask(Type,feature&Type&_).
 gen_typemask(_,feature&_).
 
@@ -614,7 +614,7 @@ maybe_noun_or_adj(T):- var(T)->true;(atom(T),not_ccw(T)).
 
 % 
 % chat80("how many types are there?").
-% chat80("what formattypes are types?").
+% chat80("what datatypes are types?").
 % test_chat80( [which,is,the,largest,african,country,?]).
 %  chat80("how are you?").
 % test_chat80("you flow").
@@ -626,8 +626,8 @@ t11:-
    %test_chat80("how many oceans are seas?"),
    %test_chat80("how many oceans are seasmasses?"),
    test_chat80("how many types are there?"),
-   test_chat80("how many formattypes are there?"),
-   test_chat80("what formattypes are there?"),
+   test_chat80("how many datatypes are there?"),
+   test_chat80("what datatypes are there?"),
    !.
 
 t22 :-
@@ -689,7 +689,7 @@ deepestType(_&LIST,Type):-!,deepestType(LIST,Type).
 deepestType(TYPE,Type):-Type=TYPE.
 
 typeAssignableTo(Type,SomeType):-subclass_backchaing(Type,SomeType).
-typeAssignableTo(_Type,SomeType):-formattype(SomeType).
+typeAssignableTo(_Type,SomeType):-ttFormatType(SomeType).
 
 
 %fact_always_true(isa(Type,tSet)):- clause(subject_LF(thing,Type,feature&_,_X,_),true).
@@ -819,8 +819,9 @@ verb_type_db_0(Verb,main+ditrans(Prep)):- plt_call(Verb,'Verb',  subj_obj_indire
 verb_type_db_0(Verb,main+TIV):-plt_call(Verb,'Verb', talk_db(TIV,Verb,_,_,_,_)).
 
 
+:- dmsg(warn(error(remove_falure_next_line))).
 
-verb_root_db(Govern):-plt_call(Govern,'Verb',(nop(verb_root_db),talk_db(_Verb_i,Govern,_Governs,_GovernedImperfect,_Governing,_Governed))).
+verb_root_db(Govern):-plt_call(Govern,'Verb',(nop(verb_root_db),fail,talk_db(_Verb_i,Govern,_Governs,_GovernedImperfect,_Governing,_Governed))).
 regular_pres_db(Govern):-plt_call(Govern,'Verb',(nop(regular_pres_db),talk_db(_,Govern,_Governs,_GovernedImperfect,_Governing,_Governed))).
 regular_past_db(Governed,Govern):-plt_call(Governed,'Verb',(nop(regular_past_db),talk_db(_,Govern,_Governs,_GovernedImperfect,_Governing,Governed))).
 verb_form_db(Active,Verb,pres+part,_):-plt_call((Active),'Verb',((nop(active),talk_db(_,Verb,_VerbPL,_Imperfect,Active,_PastPart)))).

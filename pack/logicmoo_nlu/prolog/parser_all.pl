@@ -318,7 +318,7 @@ get_it:-
 :-multifile(user:regression_test/0).
 user:regression_test:- run_pipleine(acetext='All persons are happy.',[foo=_],O),wdmsg(O).
 user:regression_test:- run_pipleine(acetext='What is the ocean that borders african countries and, that borders asian countries?',[foo=_],O),wdmsg(O).
-user:regression_test:- run_pipleine(acetext='A person who loves all animals is loved by someone.',[foo=_],O),wdmsg(O).
+user:regression_test_TODO:- run_pipleine(acetext='A person who loves all animals is loved by someone.',[foo=_],O),wdmsg(O).
 
 user:regression_test:- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
 

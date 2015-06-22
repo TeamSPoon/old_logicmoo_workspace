@@ -83,7 +83,8 @@ user:regression_test:- ace_to_pkif('A person who loves all animals is loved by s
 
 user:regression_test:- snark_tell(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
 
-user:regression_test:- kif_to_boxlog(-((a , b ,  c , d)),_S),!,disjuncts_to_list(_S,_L),list_to_set(_L,_SET),forall(member(_P,_SET),writeln(_P)),!.
+user:regression_test:- kif_to_boxlog(-((a , b ,  c , d)),S),!,disjuncts_to_list(S,L),
+  list_to_set(L,SET),forall(member(P,SET),writeln(P)),!.
 
 
 :- doall(call_no_cuts(user:regression_test)).
