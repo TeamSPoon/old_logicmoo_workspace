@@ -3842,9 +3842,8 @@ removalPredicateCodedInProlog(Pred,Prolog).
 prologEval(X,Y):-Y is X + 111.
 prologEval(X,Y):-Y is X + 211.
 
-:-use_module(library(odbc)).  
-:-odbc_debug(5).
-
+%:-use_module(library(odbc)).  
+%:-odbc_debug(5).
 
 :-dynamic(ensureCycCallsProlog/2).
 

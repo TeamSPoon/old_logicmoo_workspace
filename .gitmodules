@@ -14,3 +14,6 @@
 	path = pack/pldata_larkc
 	url = https://gitlab.prologmoo.com/prologmud_data/pldata_larkc.git
 
+[submodule "pack/ClioPatria"]
+	path = pack/ClioPatria
+	url = https://github.com/TeamSPoon/ClioPatria
