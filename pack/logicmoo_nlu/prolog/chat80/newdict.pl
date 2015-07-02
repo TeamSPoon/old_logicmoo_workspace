@@ -459,8 +459,11 @@ type_allowed0(TypeM&_,Type):- Type==TypeM,!.
 % Having Referant Proper nouns
 % =================================================================
 :-export(name_template_db/2).
-name_db(Name) :-
+name_db([black,sea],black_sea).
+name_db([upper,volta],upper_volta).
+name_db([Name],Name) :-
    name_template_db(Name,_), !.
+%name_db([Name],Name) :- thlocal:useAltPOS,downcase_atom(Name,DCName),loop_check(not(cw_db(DCName,_))).
 
 name_template_db(X,feature&circle) :- circle_of_latitude(X).
 name_template_db(X,feature&city) :- city(X).
