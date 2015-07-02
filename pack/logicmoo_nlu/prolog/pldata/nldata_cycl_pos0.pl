@@ -12,7 +12,7 @@
 
 % assumes loaded in  this order: ['freq.pdat.txt'],['colloc.pdat.txt'],['BRN_WSJ_LEXICON.txt'].
 % TODO use %:- ['pt-grammar.prul2.txt'].
-% exports sentencePos/2,bposToCPos0/2
+% exports sentencePos/2,bposToCPos1/2
 % imports learnText(Words),learnTexts(Words) from cyc_nl
 
 % :-[cyc_nl_rosetta].
@@ -379,16 +379,16 @@ isCycTag(Data,TAG):-nth1(N,Data, _-TAGGED ),atom_codes(TAGGED,[C|_]),char_type(C
 isTagAtAll(Data,TAG):-nth1(N,Data, _-TAGGED ),once(tagEquiv(TAG,TAGGED,_)),!.
 
 tagEquiv(X,X,1.0).
-tagEquiv(X,Y,0.6):-bposToCPos(X,Y).
-%tagEquiv(X,Y,0.3):-bposToCPos(Y,X).
-tagEquiv(X,Y,0.2):-bposToCPos(X,M1),bposToCPos(Y,M2),M1=M2,!.
+tagEquiv(X,Y,0.6):-bposToCPos0(X,Y),X\=Y.
+%tagEquiv(X,Y,0.3):-bposToCPos0(Y,X).
+tagEquiv(X,Y,0.2):-bposToCPos0(X,M1),bposToCPos0(Y,M2),X\=Y,M1=M2,!.
 
 isTagSimply(Data,Pos):-isTagSimply(Data,Pos,Num),Num>0.4.
 %isTagSimply(Data,'staart',1.0):-memberchk(1:_,Data).
 isTagSimply(Data,Pos,Prob):-member(Prob-Pos,Data).
 
 substPos(BCR,A,OTAG,NTAG,X):-
-         findall(MPOS,bposToCPos(OTAG,MPOS),SusbtList),         
+         findall(MPOS,bposToCPos0(OTAG,MPOS),SusbtList),         
          substAll(A,[OTAG|SusbtList],NTAG,X),
          cyc:fmt(substPos(BCR,A,OTAG,NTAG,X)),!.
 
@@ -493,160 +493,160 @@ applyBCR(BCR,[TAG1,TAG2,'wdnexttag',WORD,TAG3],[A,B|In],Out):-
 applyBCR(BCR,R,[I|In],[I|Mid]):-applyBCR(BCR,R,In,Mid).
 
 
-:-export(bposToCPos0/2).
+:-export(bposToCPos1/2).
 
-%bposToCPos0(X,X):-not(bposToCPos0(X,Y)),true.
+%bposToCPos1(X,X):-not(bposToCPos1(X,Y)),true.
 
-bposToCPos0(n,'Noun').
-bposToCPos0(v,'Verb').
-bposToCPos0(dt,'Determiner').
+bposToCPos1(n,'Noun').
+bposToCPos1(v,'Verb').
+bposToCPos1(dt,'Determiner').
 
-bposToCPos0(pron,'Pronoun').
-bposToCPos0(aux,'Modal').
-bposToCPos0(aux,'AuxVerb').
-bposToCPos0('AuxVerb','Aux-Negated').
+bposToCPos1(pron,'Pronoun').
+bposToCPos1(aux,'Modal').
+bposToCPos1(aux,'AuxVerb').
+bposToCPos1('AuxVerb','Aux-Negated').
 
 %ConjunctAdverb
 
-bposToCPos0(bedz,'AuxVerb').
-bposToCPos0(bedz,'BeAux').
-bposToCPos0(('.'),('.')).
-bposToCPos0(('?'),('?')).
-bposToCPos0(('.'),('punc')).
-bposToCPos0(('?'),('punc')).
+bposToCPos1(bedz,'AuxVerb').
+bposToCPos1(bedz,'BeAux').
+bposToCPos1(('.'),('.')).
+bposToCPos1(('?'),('?')).
+bposToCPos1(('.'),('punc')).
+bposToCPos1(('?'),('punc')).
 %NN are common nouns, NP proper nouns, JJ adjectives, VBG gerunds, VBD past participles and CD numeral determiners.
 %RP are particles, PREP prepositions, ART articles, and V verbs.
-bposToCPos0(W,W):-atom(W),atom_codes(W,[C|_]),char_type(C,M),member(M,[punct,white]),!. %text_lit(W).
+bposToCPos1(W,W):-atom(W),atom_codes(W,[C|_]),char_type(C,M),member(M,[punct,white]),!. %text_lit(W).
 %1.   CC     Coordinating conjunction
-bposToCPos0(cc,'CoordinatingConjunction').
+bposToCPos1(cc,'CoordinatingConjunction').
 %2.   CD     Cardinal number
-bposToCPos0(cd,'Number-SP').
-bposToCPos0(cd,'Determiner').
+bposToCPos1(cd,'Number-SP').
+bposToCPos1(cd,'Determiner').
 %3.   DT     Determiner
-%covered above bposToCPos0(dt,'Determiner').
+%covered above bposToCPos1(dt,'Determiner').
 %4.   EXAMPLE     Existential there
-bposToCPos0(example,'Existential').
-bposToCPos0(ex,'Existential').
+bposToCPos1(example,'Existential').
+bposToCPos1(ex,'Existential').
 %EX existential there EX0
 
 %5.   FW     Foreign word
-bposToCPos0(fw,'ForeignWord').
+bposToCPos1(fw,'ForeignWord').
 %6.   IN     Preposition or subordinating conjunction
-bposToCPos0(in,'SubordinatingConjunction').
-bposToCPos0(in,'Preposition').
+bposToCPos1(in,'SubordinatingConjunction').
+bposToCPos1(in,'Preposition').
 %7.   JJ     Adjective
-bposToCPos0(a,'Adjective').
-bposToCPos0(jj,'Adjective').
+bposToCPos1(a,'Adjective').
+bposToCPos1(jj,'Adjective').
 %8.   JJR    Adjective, comparative
-bposToCPos0(jjr,'Adjective','ComparativeAdjective').
+bposToCPos1(jjr,'Adjective','ComparativeAdjective').
 %9.   JJS    Adjective, superlative
-bposToCPos0(jjs,'Adjective','SuperlativeAdjective').
+bposToCPos1(jjs,'Adjective','SuperlativeAdjective').
 %10.  LS     List item marker
-bposToCPos0('ls','OrdinalAdjective').
-bposToCPos0('ls','Pronoun').
+bposToCPos1('ls','OrdinalAdjective').
+bposToCPos1('ls','Pronoun').
 %11.  MD     Modal
-bposToCPos0(md,'Modal').
+bposToCPos1(md,'Modal').
 %12.  NN     Noun, singular or mass
-bposToCPos0(nn,'Noun').
-bposToCPos0(nn,'MassNoun').
-bposToCPos0(nn,'CountNoun').
-bposToCPos0(nn,'CommonNoun').
+bposToCPos1(nn,'Noun').
+bposToCPos1(nn,'MassNoun').
+bposToCPos1(nn,'CountNoun').
+bposToCPos1(nn,'CommonNoun').
 bposToCPosForm(nn,'singular').
 bposToCPosForm(nn,'mass').
 %13.  NNS    Noun, plural
-bposToCPos0(nns,'Noun').
+bposToCPos1(nns,'Noun').
 bposToCPosForm(nns,'plural').
 %14.  NP     Proper noun, singular
-bposToCPos0(np,'ProperNoun').
+bposToCPos1(np,'ProperNoun').
 bposToCPosForm(np,'singular').
 %15.  NPS    Proper noun, plural
-bposToCPos0(nps,'ProperNoun').
+bposToCPos1(nps,'ProperNoun').
 bposToCPosForm(nps,'plural').
 
 
 
 %NNPS proper noun, plural NP0..
-bposToCPos0(nnps,'ProperNoun').
+bposToCPos1(nnps,'ProperNoun').
 bposToCPosForm(nnps,'plural').
 
-bposToCPos0('nn$','Possessive').
-bposToCPos0('nn$','Noun').
+bposToCPos1('nn$','Possessive').
+bposToCPos1('nn$','Noun').
 
 
 %16.  PDT    Predeterminer
-bposToCPos0(pdt,'Determiner').
-bposToCPos0(pdt,'Determiner-Pre').
-%bposToCPos0(pdt,'Preposition').
+bposToCPos1(pdt,'Determiner').
+bposToCPos1(pdt,'Determiner-Pre').
+%bposToCPos1(pdt,'Preposition').
 %17.  POS    Possessive ending
-bposToCPos0(pos,'Possessive').
+bposToCPos1(pos,'Possessive').
 %18.  PP     Personal pronoun
-bposToCPos0(pp,'Personal').
-bposToCPos0(pp,'Pronoun').
+bposToCPos1(pp,'Personal').
+bposToCPos1(pp,'Pronoun').
 %19.  PP$    Possessive pronoun
-bposToCPos0('pp$','Possessive').
-bposToCPos0('pp$','Pronoun').
+bposToCPos1('pp$','Possessive').
+bposToCPos1('pp$','Pronoun').
 
 %PRP$ possessive pronoun PNP..
-bposToCPos0('prp$','Possessive').
-bposToCPos0('prp$','Pronoun').
+bposToCPos1('prp$','Possessive').
+bposToCPos1('prp$','Pronoun').
 
 
 %20.  RB     Adverb
-bposToCPos0(rb,'Adverb').
+bposToCPos1(rb,'Adverb').
 %21.  RBR    Adverb, comparative
-bposToCPos0(rbr,'Adverb').
+bposToCPos1(rbr,'Adverb').
 bposToCPosForm(rbr,'comparative').
 %22.  RBS    Adverb, superlative
-bposToCPos0(rbs,'Adverb').
+bposToCPos1(rbs,'Adverb').
 bposToCPosForm(rbs,'superlative').
 %23.  RP     Particle
-bposToCPos0(rp,'Particle').
+bposToCPos1(rp,'Particle').
 %24.  SYM    Symbol
-bposToCPos0(sym,'Symbol').
+bposToCPos1(sym,'Symbol').
 %25.  TO     to
 bposToCPosForm(to,'to').
-bposToCPos0(to,'Preposition').
+bposToCPos1(to,'Preposition').
 %26.  UH     Interjection
-bposToCPos0(uh,'Interjection').
+bposToCPos1(uh,'Interjection').
 %27.  VERBATIM     Verb, base form
-bposToCPos0(verbatim,'Verb').
+bposToCPos1(verbatim,'Verb').
 bposToCPosForm(verbatim,'baseForms').
-bposToCPos0(vb,'Verb').
+bposToCPos1(vb,'Verb').
 bposToCPosForm(vb,'baseForms').
 %28.  VBD    Verb, past tense
-bposToCPos0(vbd,'Verb').
+bposToCPos1(vbd,'Verb').
 bposToCPosForm(vbd,'past').
 %29.  VBG    Verb, gerund or present participle
-bposToCPos0(vbg,'Verb').
+bposToCPos1(vbg,'Verb').
 bposToCPosForm(vbg,'gerund').
 bposToCPosForm(vbg,'present').
 %30.  VBN    Verb, past participle
-bposToCPos0(vbn,'Verb').
+bposToCPos1(vbn,'Verb').
 bposToCPosForm(vbn,'gerund').
 bposToCPosForm(vbn,'past').
 %31.  VBP    Verb, non-3rd person singular present
-bposToCPos0(vbp,'Verb').
+bposToCPos1(vbp,'Verb').
 bposToCPosForm(vbp,'singular').
 bposToCPosForm(vbp,'present').
 bposToCPosForm(vbp,'no3rd').
 %32.  VBZ    Verb, 3rd person singular present
-bposToCPos0(vbz,'Verb').
+bposToCPos1(vbz,'Verb').
 bposToCPosForm(vbz,'singular').
 bposToCPosForm(vbz,'present').
 bposToCPosForm(vbz,'Third').
 %33.  WDT    Wh-determiner
-bposToCPos0(wdt,'Determiner').
-bposToCPos0(wdt,'WHDeterminer').
+bposToCPos1(wdt,'Determiner').
+bposToCPos1(wdt,'WHDeterminer').
 %34.  WP     Wh-pronoun
-bposToCPos0(wp,'Pronoun').
-bposToCPos0(wp,'WHPronoun').
+bposToCPos1(wp,'Pronoun').
+bposToCPos1(wp,'WHPronoun').
 %35.  WP$    Possessive wh-pronoun
-bposToCPos0('wp$','Pronoun').
-bposToCPos0('wp$','WHPronoun').
-bposToCPos0('wp$','Possessive').
+bposToCPos1('wp$','Pronoun').
+bposToCPos1('wp$','WHPronoun').
+bposToCPos1('wp$','Possessive').
 %36.  WRB    Wh-adverb
-bposToCPos0(r,'Adverb').
-bposToCPos0(wrb,'WHAdverb').
+bposToCPos1(r,'Adverb').
+bposToCPos1(wrb,'WHAdverb').
 
 /*
 ## %37.  "      Simple double quote
@@ -662,37 +662,37 @@ bposToCPos0(wrb,'WHAdverb').
 %47.  .      SentencE-final punctuation
 %48.  :      Mid-sentence punctuation
 */
-%covered above bposToCPos0(dt,'Determiner').
-bposToCPos0(n,'Noun').
-bposToCPos0(nnp,'ProperNoun').
-bposToCPos0(nnp,'ProperNoun').
-bposToCPos0(nnp,'Noun').
-bposToCPos0(np,'ProperNoun').
-bposToCPos0(np,'Noun').
-bposToCPos0(prep,'Preposition').
-bposToCPos0(uh,'Interjection-SpeechPart').
-bposToCPos0(v,'Verb').
-bposToCPos0(vbd,'Verb').
-bposToCPos0(vbg,'gerund').
-bposToCPos0(vbp,'Verb').
-bposToCPos0(ppl,'Pronoun').
+%covered above bposToCPos1(dt,'Determiner').
+bposToCPos1(n,'Noun').
+bposToCPos1(nnp,'ProperNoun').
+bposToCPos1(nnp,'ProperNoun').
+bposToCPos1(nnp,'Noun').
+bposToCPos1(np,'ProperNoun').
+bposToCPos1(np,'Noun').
+bposToCPos1(prep,'Preposition').
+bposToCPos1(uh,'Interjection-SpeechPart').
+bposToCPos1(v,'Verb').
+bposToCPos1(vbd,'Verb').
+bposToCPos1(vbg,'gerund').
+bposToCPos1(vbp,'Verb').
+bposToCPos1(ppl,'Pronoun').
 
 
 
-bposToCPos0(at,'Article').
-bposToCPos0(at,'Determiner').
+bposToCPos1(at,'Article').
+bposToCPos1(at,'Determiner').
 
 % ppss  pronoun, personal, nominative, not 3rd person singular  they we I you ye thou you uns  
-bposToCPos0(ppss,'PersonalPronoun').
-bposToCPos0(ppss,'Pronoun').
-bposToCPos0(ppss,'no3rd').
+bposToCPos1(ppss,'PersonalPronoun').
+bposToCPos1(ppss,'Pronoun').
+bposToCPos1(ppss,'no3rd').
 
 %PPO objective personal pro
-bposToCPos0(ppo,'PersonalPronoun').
-bposToCPos0(ppo,'Pronoun').
+bposToCPos1(ppo,'PersonalPronoun').
+bposToCPos1(ppo,'Pronoun').
 
-bposToCPos0(prp,'PersonalPronoun').
-bposToCPos0(prp,'Pronoun').
+bposToCPos1(prp,'PersonalPronoun').
+bposToCPos1(prp,'Pronoun').
 
 /*
 
@@ -756,41 +756,43 @@ wps  WH-pronoun, nominative  that who whoever whosoever what whatsoever
 */
 
 
-bposToCPos0('pos','Possessive').
-bposToCPos0('pp$','Possessive').
-bposToCPos0('wps','WHPronoun').
-bposToCPos0('pp','Punctuation').
-bposToCPos0('\'s','Possessive').
+bposToCPos1('pos','Possessive').
+bposToCPos1('pp$','Possessive').
+bposToCPos1('wps','WHPronoun').
+bposToCPos1('pp','Punctuation').
+bposToCPos1('\'s','Possessive').
 
-bposToCPos(Atom,_):-not(atom(Atom)),!,fail.
-bposToCPos(HASDOLLAR,'Possessive'):-concat_atom([_,_|_],'$',HASDOLLAR).
+bposToCPos(W,L):-no_repeats(bposToCPos0(W,L)).
 
-bposToCPos(BEDZ,POS):-
+bposToCPos0(Atom,_):-not(atom(Atom)),!,fail.
+bposToCPos0(HASDOLLAR,'Possessive'):-concat_atom([_,_|_],'$',HASDOLLAR).
+
+bposToCPos0(BEDZ,POS):-
    atom_concat('be',Whatnot,BEDZ),
    ((member(POS,['BeAux','AuxVerb']));
-   ((atom_concat('vb',Whatnot,VBZ),bposToCPos0(VBZ,POS)))).
+   ((atom_concat('vb',Whatnot,VBZ),bposToCPos1(VBZ,POS)))).
 
-bposToCPos(BEDZ,POS):-
+bposToCPos0(BEDZ,POS):-
    atom_concat('do',Whatnot,BEDZ),
    ((member(POS,['DoAux','AuxVerb']));
-   ((atom_concat('vb',Whatnot,VBZ),bposToCPos0(VBZ,POS)))).
+   ((atom_concat('vb',Whatnot,VBZ),bposToCPos1(VBZ,POS)))).
 
-bposToCPos(BEDZ,POS):-
+bposToCPos0(BEDZ,POS):-
    atom_concat('hv',Whatnot,BEDZ),
    ((member(POS,['HaveAux','AuxVerb']));
-   ((atom_concat('vb',Whatnot,VBZ),bposToCPos0(VBZ,POS)))).
+   ((atom_concat('vb',Whatnot,VBZ),bposToCPos1(VBZ,POS)))).
 
 
-bposToCPos(X,Y):-concat_atom([P,L],'-',X),!,(bposToCPos(P,Y);X=Y).
-bposToCPos(X,Y):-concat_atom([P,L],'|',X),!,(bposToCPos(P,Y);bposToCPos(P,L);X=Y).
-bposToCPos(H0,M):- (upcase_atom(H0,H);downcase_atom(H0,H)),
+bposToCPos0(X,Y):-concat_atom([P,L],'-',X),!,(bposToCPos0(P,Y);X=Y).
+bposToCPos0(X,Y):-concat_atom([P,L],'|',X),!,(bposToCPos0(P,Y);bposToCPos0(P,L);X=Y).
+bposToCPos0(H0,M):- (upcase_atom(H0,H);downcase_atom(H0,H)),
    brillPos([H|L]),member(M,L),nop((atom_codes(M,[C|_]),is_upper(C))).
 
-bposToCPos(LC,CATE):- atom(LC),upcase_atom(LC,UC),atom_concat(UC,'-PennTag',UCPENTAG),
+bposToCPos0(LC,CATE):- atom(LC),upcase_atom(LC,UC),atom_concat(UC,'-PennTag',UCPENTAG),
   el_holds(syntacticCategoryTags,CATE,UCPENTAG,_PennTagDataMt,_).
-bposToCPos(LC,E):- atom(LC),upcase_atom(LC,DC),LC\=DC,bposToCPos0(DC,E),E\=LC.
-bposToCPos(LC,E):- atom(LC),downcase_atom(LC,DC),LC\=DC,bposToCPos0(DC,E),E\=LC.
-bposToCPos(ULC,ULC).
+bposToCPos0(LC,E):- atom(LC),upcase_atom(LC,DC),LC\=DC,bposToCPos1(DC,E),E\=LC.
+bposToCPos0(LC,E):- atom(LC),downcase_atom(LC,DC),LC\=DC,bposToCPos1(DC,E),E\=LC.
+bposToCPos0(ULC,ULC).
 
 brillPos(['pp$$','Pronoun','Possessive',' ours mine his hers theirs yours  ']).
 brillPos(['abl','PrE-Qualifier']). %,'quite','rather']).

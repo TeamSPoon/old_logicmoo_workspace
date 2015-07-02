@@ -327,7 +327,7 @@ pfc_maptree(Pred,(H;T),S):-!, pfc_maptree(Pred,H,S) ; pfc_maptree(Pred,T,S).
 pfc_maptree(Pred,[H|T],S):-!, apply(Pred,[H|S]), pfc_maptree(Pred,T,S).
 pfc_maptree(Pred,H,S):-apply(Pred,[H|S]). 
 
-:-use_module(library(rec_lambda)).
+:-use_module(library(logicmoo/util/rec_lambda)).
 
 
 % used to annotate a predciate to indicate PFC support

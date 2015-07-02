@@ -1117,7 +1117,10 @@ makeArgConstraint('SometimesIsa',tCol).
 ((arity(Pred,2),argIsa(Pred,2,ftInt))=>singleValuedInArg(Pred,2)).
 ((arity(Pred,2),argIsa(Pred,2,ftPercent))=>singleValuedInArg(Pred,2)).
 
+
 end_of_file.
+
+
 
 :-trace.
 sane_transitivity(_PredInfo,I,Sub,Super):-  

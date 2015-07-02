@@ -6,6 +6,7 @@
 :- multifile user:file_search_path/2.
 :- multifile
 	prolog:message/3.
+% I WISH I COULD DO :- dynamic prolog:message/3.
 
 prolog:message(git(update_versions),A,A):-!.
 

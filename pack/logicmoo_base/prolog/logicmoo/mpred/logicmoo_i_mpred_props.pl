@@ -269,4 +269,4 @@ add_mpred_prop_gleaned_4(Arg1,_F,_,FRGS):-decl_mpred(Arg1,FRGS).
 
 
 
-% user:term_expansion(G,_):- \+ thlocal:disable_mpred_term_expansions_locally, not(thlocal:into_form_code),hotrace((once(glean_pred_props_maybe(G)),fail)).
+% user:term_expansion(G,_):- current_predicate(logicmoo_bugger_loaded/0),\+ thlocal:disable_mpred_term_expansions_locally, not(thlocal:into_form_code),hotrace((once(glean_pred_props_maybe(G)),fail)).

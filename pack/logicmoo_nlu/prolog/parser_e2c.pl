@@ -154,7 +154,7 @@ stringArgUC2([User],Cyc,CallWithCyc):- Cyc=User,!,CallWithCyc,atom(Cyc).
 
 cycStringToString(Cyc,User):- (atom(Cyc)->User=[Cyc];User=Cyc),!.
 
-user:term_expansion(I,O):- not(thlocal:into_form_code),e2c_term_expansion(I,O).
+user:term_expansion(I,O):- current_predicate(logicmoo_bugger_loaded/0),not(thlocal:into_form_code),e2c_term_expansion(I,O).
 
 % ===================================================================
 

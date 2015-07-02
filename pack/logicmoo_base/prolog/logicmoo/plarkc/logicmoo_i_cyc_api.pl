@@ -205,7 +205,7 @@ hideTrace:-
    trace(system:message_to_string/2, +all).
 
 ctrace:-willTrace->trace;notrace.
-:-hideTrace.
+% :-hideTrace.
 
 withoutCyc(_,[]):-fail.
 

@@ -12,6 +12,7 @@
 :- set_prolog_flag(double_quotes,string).
 
 
+
 :- meta_predicate if_flag_true(0,0).
 :- multifile user:file_search_path/2.
 :- dynamic   user:file_search_path/2.
@@ -193,6 +194,7 @@ user:file_search_path(logicmoo,Dir):-
 locally_to_dir(Locally,Dir):-logicmoo_runtime_dir(RunDir), join_path33(RunDir,Locally,Directory),my_absolute_file_name(Directory,Dir),exists_directory(Dir),!.
 locally_to_dir(Directory,Dir):-my_absolute_file_name(Directory,Dir),exists_directory(Dir),!.
 
+
 :- '@'( ensure_loaded((logicmoo_util_bugger_new)), 'user').
 :- '@'( ensure_loaded((logicmoo_util_bugger_catch)), 'user').
 :- '@'( ensure_loaded((logicmoo_util_bugger)), 'user').
@@ -203,6 +205,7 @@ locally_to_dir(Directory,Dir):-my_absolute_file_name(Directory,Dir),exists_direc
 :- '@'( use_module((logicmoo_util_dcg)), 'user').
 :- '@'( use_module((logicmoo_util_coroutining_was)), 'user').
 :- '@'( use_module((logicmoo_util_coroutining_iz)), 'user').
+
 
 /*
 win_fork(G,SERVIO,PID):-atom_concat('swipl-win.exe ',G,AC),writeq(win_fork(AC,SERVIO)),nl,

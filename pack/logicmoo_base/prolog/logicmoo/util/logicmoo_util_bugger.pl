@@ -490,13 +490,15 @@ badfood(MCall):- numbervars(MCall,0,_,[functor_name('VAR_______________________x
 
 %must(C):- is_release,!,C.
 
+
 must(C):- fail, !,
   (catch(C,E,(wdmsg(E:C),fail)) *-> true ;   
    (wdmsg(error,failed_must(C)),dtrace(C),fail)).
 
+must(MCall):- tracing,!,setup_call_cleanup(notrace,must(MCall),trace).
+
 must(MCall):- 
- hotrace((tlbugger:show_must_go_on,
- strip_module(MCall,M,Call))),!,
+ hotrace((tlbugger:show_must_go_on, strip_module(MCall,M,Call))),!,
  (
   '@'(catch(Call,E,(dumpST,print_dmessage(error,must_ex(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
   *-> true ; 
@@ -508,7 +510,8 @@ must(MCall):-
  (
   '@'(catch(Call,E,(dumpST,print_dmessage(error,must_ex(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
   *-> true ; 
-  '@'((hotrace((print_dmessage(warning,must_failed(Call)),ignore(ftrace(Call)),debug,leash(+all),repeat,print_dmessage(error,must_failed(Call)))),dtrace(Call)),M)).
+  '@'((hotrace((print_dmessage(warning,must_failed(Call)),ignore(ftrace(Call)),debug,leash(+all),
+      print_dmessage(error,must_failed(Call)))),dtrace(Call)),M)).
 
 
 :- meta_predicate(motrace(0)).
@@ -1571,7 +1574,7 @@ no_repeats_old(Call):- no_repeats_old(Call,Call).
 :- export(no_repeats_old/2).
 :- meta_predicate no_repeats_old(+,0).
 
-:-use_module(library(rec_lambda)).
+:-use_module(library(logicmoo/util/rec_lambda)).
 
 memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),memberchk_same(X, Ys) )). 
 
@@ -1758,6 +1761,7 @@ willTrace:-tlbugger:ifWontTrace,!,fail.
 willTrace:-not(isConsole),!,fail.
 willTrace:-tlbugger:ifCanTrace.
 
+
 hideTrace:-
   hideTrace([hotrace/1], -all),
   %%hideTrace(computeInnerEach/4, -all),
@@ -1790,10 +1794,10 @@ hideTrace:-
 
   hideTrace(user:setup_call_catcher_cleanup/4,-all),
 
-  hideTrace(system:throw/1, +all),
+  %hideTrace(system:throw/1, +all),
   %%hideTrace(system:print_dmessage/2, +all),
-  hideTrace(user:message_hook/3 , +all),
-  hideTrace(system:message_to_string/2, +all),
+  %hideTrace(user:message_hook/3 , +all),
+  %hideTrace(system:message_to_string/2, +all),
   !,hideRest,!.
   %%findall(File-F/A,(functor_source_file(M,P,F,A,File),M==user),List),sort(List,Sort),dmsg(Sort),!.
 
@@ -1818,6 +1822,7 @@ predicate_module(M:_,M):-!. %strip_module(P,M,_F),!.
 predicate_module(_P,user):-!. %strip_module(P,M,_F),!.
 %%predicate_module(P,M):- strip_module(P,M,_F),!.
 
+hideTrace(_, _):- !. %  \+ buggery_ok.
 hideTrace(_:A, _) :-
     var(A), !, trace, fail,
     throw(error(instantiation_error, _)).
@@ -3451,20 +3456,21 @@ dtrace(MSG,G):-wdmsg(MSG),dtrace(G).
 
 :-meta_predicate(dtrace(0)).
 dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,hotrace(dumpST).
-dtrace(G):-has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G).
+dtrace(G):-has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G). 
 dtrace(G):-tracing,notrace,!,wdmsg(tracing_dtrace(G)),(dumptrace(G)*->trace;trace).
 dtrace(G):-current_predicate(logicmoo_bugger_loaded/0),!,dumptrace(G).
-dtrace(G):-G.
+dtrace(G):-G. 
 
 :-meta_predicate(dumptrace(0)).
-%dumptrace(G):- tracing,!,leash(+call),wdmsg(tracing_dumptrace(G)),with_all_dmsg(G).
 
+dumptrace(G):- tracing,!,setup_call_cleanup(notrace,(leash(+call),dumptrace(MCall)),trace).
 dumptrace(G):- ignore((debug,
  % catch(attach_console,_,true),
  leash(+exception),visible(+exception))),fresh_line,
- repeat, hotrace((fmt(in_dumptrace(G)),
+ (repeat,(tracing -> (!,fail) ; true)),
+ hotrace((fmt(in_dumptrace(G)),
   show_call_failure(get_single_char(C)))),
-  with_all_dmsg(dumptrace(G,C)).
+  with_all_dmsg(dumptrace(G,C)),!.
 
 :-meta_predicate(dumptrace(0,+)).
 dumptrace(_,0'g):-hotrace(dumpST2(_,500000000)),!,fail.
@@ -3798,9 +3804,9 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
 
 
 % show the warnings origins
-:-multifile(user:message_hook/3). 
-:-dynamic(user:message_hook/3).
-:- asserta((user:message_hook(Term, Kind, Lines):-  buggery_ok, (Kind= warning;Kind= error),Term\=syntax_error(_), 
+%:-multifile(user:message_hook/3). 
+%:-dynamic(user:message_hook/3).
+disabled_this_to:- asserta((user:message_hook(Term, Kind, Lines):-  buggery_ok, (Kind= warning;Kind= error),Term\=syntax_error(_), 
  current_predicate(logicmoo_bugger_loaded/0), no_buggery,
   dmsg(user:message_hook(Term, Kind, Lines)),hotrace(dumpST(20)),dmsg(user:message_hook(Term, Kind, Lines)),
 
@@ -3833,7 +3839,7 @@ user:prolog_exception_hook(A,B,C,D):- fail,
 :-'$set_predicate_attribute'(with_assertions(_,_), hide_childs, 0).
 
 logicmoo_bugger_loaded.
-user:goal_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
-user:term_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
+user:goal_expansion(LC,LCOO):-nonvar(LC),current_predicate(logicmoo_bugger_loaded/0),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
+user:term_expansion(LC,LCOO):-nonvar(LC),current_predicate(logicmoo_bugger_loaded/0),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
 %user:term_expansion(LC,LCOO):-nonvar(LC),(LC=(H:-B)),expand_goal(B,BE),B\=@=BE,must((H:-BE)=LCOO).
 

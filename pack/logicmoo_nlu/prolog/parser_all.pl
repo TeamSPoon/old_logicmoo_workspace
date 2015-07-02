@@ -185,20 +185,29 @@ show_pipeline:-forall(installed_converter(CNV),wdmsg(installed_converter(CNV))).
 :- user:ignore((Z = ('-'),current_op(X,Y,Z),display(:-(op(X,Y,Z))),nl,fail)).
 :- dmsg(parser_all_start).
 
+
+
 % ================================================================================================
-% CHAT80:  acetext,  text_no_punct, pos_sents_pre,  syntaxTree80,  sem80, query80
-:- user:ensure_loaded(parser_chat80).
+% PLDATA: LOAD ENGLISH CORE FILES
 % ================================================================================================
 
-was_punct(Remove):-domain(WRemove,[(,),(.),(?),(!)]),
-  (domain(Remove,[w(_,punc),w(WRemove,_)]);Remove=WRemove).
-remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)  -> remove_punctuation(W3,NP) ; NP=W2.
-:- install_converter(parser_chat80:words_to_w2(+acetext,-pos_sents_pre)).
-:- install_converter(remove_punctuation(+pos_sents_pre,-text_no_punct)).
-:- install_converter(parser_chat80:sent_to_parsed(+text_no_punct,-syntaxTree80)).
-:- install_converter(parser_chat80:i_sentence(+syntaxTree80,-sem_pre80)).
-:- install_converter(parser_chat80:clausify80(+sem_pre80,-sem80)).
-:- install_converter(parser_chat80:qplan(+sem80,-query80)).
+%:- time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),(exists_file(AFN)->true;qcompile(library(el_holds/'el_assertions.pl.hide')))))).
+%:- time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),(exists_file(AFN)->true;qcompile(library(el_holds/'el_assertions.pl.hide')))))).
+
+get_it:- 
+ time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),   
+  (exists_file(AFN)->true;(
+    (absolute_file_name(library(el_holds),AFND),sformat( S, 'curl --compressed http://prologmoo.com/devel/LogicmooDeveloperFramework/PrologMUD/pack/pldata_larkc/prolog/el_holds/el_assertions.pl.qlf > ~w/el_assertions.pl.qlf',[AFND]),
+    shell(S))))))).
+:- dmsg("Loading loading language data (This may take 10-15 seconds)").
+:- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc)).
+:- gripe_time(7,time(user:ensure_loaded(library(el_holds/'el_assertions.pl.qlf')))).
+:- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_call_kb)).
+:- user:ensure_loaded(pldata/clex_iface).
+:- user:ensure_loaded(pldata/nldata_BRN_WSJ_LEXICON).
+:- user:ensure_loaded(pldata/nldata_freq_pdat).
+:- user:ensure_loaded(pldata/nldata_cycl_pos0).
+
 
 % ================================================================================================
 :- include(parser_ape).
@@ -225,6 +234,40 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 :- install_converter(drs_to_drslist:drs_to_drslist(+drs0, -drs:set)).
 :- install_converter(drs_to_sdrs:drs_to_sdrs(+drs, -sdrs)).
 
+
+% ================================================================================================
+% CHAT80:  acetext,  text_no_punct, pos_sents_pre,  syntaxTree80,  sem80, query80
+:- user:ensure_loaded(parser_chat80).
+% ================================================================================================
+
+was_punct(Remove):-domain(WRemove,[(,),(.),(?),(!)]),
+  (domain(Remove,[w(_,punc),w(WRemove,_)]);Remove=WRemove).
+remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)  -> remove_punctuation(W3,NP) ; NP=W2.
+:- install_converter(parser_chat80:words_to_w2(+acetext,-pos_sents_pre)).
+:- install_converter(remove_punctuation(+pos_sents_pre,-text_no_punct)).
+:- install_converter(parser_chat80:sent_to_parsed(+text_no_punct,-syntaxTree80)).
+:- install_converter(parser_chat80:i_sentence(+syntaxTree80,-sem_pre80)).
+:- install_converter(parser_chat80:clausify80(+sem_pre80,-sem80)).
+:- install_converter(parser_chat80:qplan(+sem80,-query80)).
+
+user:regression_test:- test_chat80_regressions.
+
+:-dynamic(formattype/1).
+:-dynamic(partOfSpeech/3).
+:-dynamic(determinerStrings/2).
+:-dynamic(prefixString/2).
+:-dynamic(suffixString/2).
+
+:- user:ensure_loaded(parser_e2c).
+
+
+:-asserta((type(SET):-tSet(SET))).
+
+:- debug.
+:- gripe_time(5,test_chat80_regressions).
+:- prolog.
+
+
 % ================================================================================================
 %:- user:ensure_loaded(parser_candc).
 % ================================================================================================
@@ -237,32 +280,13 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 %:- user:ensure_loaded(parser_talk).
 % ================================================================================================
 
+
 % ================================================================================================
 %:- if_file_exists(user:ensure_loaded(stanford_parser)).
 % ================================================================================================
 % :- get_pos_tagger(I),jpl_set(I,is_DEBUG,'@'(false)).
 %:- user:ensure_loaded(parser_chart89).
 
-
-% ================================================================================================
-%:- time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),(exists_file(AFN)->true;qcompile(library(el_holds/'el_assertions.pl.hide')))))).
-%:- time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),(exists_file(AFN)->true;qcompile(library(el_holds/'el_assertions.pl.hide')))))).
-
-get_it:- 
- time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),   
-  (exists_file(AFN)->true;(
-    (absolute_file_name(library(el_holds),AFND),sformat( S, 'curl --compressed http://prologmoo.com/devel/LogicmooDeveloperFramework/PrologMUD/pack/pldata_larkc/prolog/el_holds/el_assertions.pl.qlf > ~w/el_assertions.pl.qlf',[AFND]),
-    shell(S))))))).
-
-:- dmsg("Loading el_assertions.pl (This may take 10-30 seconds)").
-:- gripe_time(30,user:ensure_loaded(library(el_holds/'el_assertions.pl.qlf'))).
-:- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc)).
-:- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_call_kb)).
-:- user:ensure_loaded(parser_e2c).
-:- user:ensure_loaded(pldata/nldata_BRN_WSJ_LEXICON).
-:- user:ensure_loaded(pldata/nldata_freq_pdat).
-:- user:ensure_loaded(pldata/nldata_cycl_pos0).
-:- user:ensure_loaded(pldata/clex_iface).
 
 
 
@@ -283,6 +307,7 @@ get_it:-
 
 
 % ================================================================================================
+
 
 
 % ================================================================================================
@@ -323,11 +348,6 @@ user:regression_test_TODO:- run_pipleine(acetext='A person who loves all animals
 user:regression_test:- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
 
 
-:-asserta((type(SET):-tSet(SET))).
-
-:- debug.
-
-user:regression_test:- test_chat80_regressions.
 
 :- must(retract(thlocal:disable_mpred_term_expansions_locally)).
 

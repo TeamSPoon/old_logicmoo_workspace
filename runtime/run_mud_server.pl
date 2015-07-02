@@ -33,9 +33,12 @@ user:file_search_path(prologmud, library(prologmud)).
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 % :- qcompile_libraries.
 
+
+
 % [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/
 :- if_file_exists(ensure_loaded(library(eggdrop))).
 :- initialization((current_predicate(egg_go/0)->egg_go;true),now).
+
 
 % [Required] Load the Logicmoo Base System
 :- time(user:ensure_loaded(logicmoo(logicmoo_base))).
@@ -65,7 +68,7 @@ user:file_search_path(prologmud, library(prologmud)).
 %:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(mpred_online/dbase_i_rdf_store)))).
 
 % [Mostly Required] Load the Logicmoo Planner/AI System
-:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_planner)))).
+%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_planner)))).
 
 % [Debugging] Normarily this set as 'true' can interfere with debugging
 % :- set_prolog_flag(gc,true).
@@ -87,9 +90,10 @@ user:regression_test:- kif_to_boxlog(-((a , b ,  c , d)),S),!,disjuncts_to_list(
   list_to_set(L,SET),forall(member(P,SET),writeln(P)),!.
 
 
-:- doall(call_no_cuts(user:regression_test)).
 
-% :-prolog.
+:- doall(user:regression_test).
+
+
 
 
 % ==============================
@@ -171,8 +175,9 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 
 :- enqueue_agent_action("rez crackers").
 
+
 % [Never] saves about a 3 minute compilation time (for when not runing mud)
-% :- prolog.
+:- show_call(gethostname(titan)-> prolog ; true).
 
 
 % [Optional] the following game files though can be loaded separate instead
@@ -185,7 +190,7 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 :- add_game_dir('../games/src_game_startrek',prolog_repl).
 
 % [Manditory] This loads the game and initializes so test can be ran
-:- if_startup_script( at_start(finish_processing_world)).
+:- if_startup_script(finish_processing_world).
 
 
 sanity_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).

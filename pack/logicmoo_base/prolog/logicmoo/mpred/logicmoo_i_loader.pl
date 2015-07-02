@@ -514,6 +514,8 @@ system:goal_expansion(N,pfc_prove_neg(P)):-fail,pfc_from_negation_plus_holder(N,
 
 :-thread_local(mpred_pfc_add_loaded).
 
+% TODO DISABLE THIS NEXT CLAUSE LATER
+pfc_directive_expansion(_,_):- (\+ current_predicate(logicmoo_bugger_loaded/0)),!,fail.
 pfc_directive_expansion(_,_):- thlocal:disable_mpred_term_expansions_locally,!,fail.
 
 pfc_directive_expansion(pfc_ops, 
@@ -650,12 +652,17 @@ to_var_functors(Outer,In,Out):-
 %user:term_expansion(G,OUT):- \+  thlocal:disable_mpred_term_expansions_locally, hotrace(use_was_isa(G,I,C)),!,to_isa_out(I,C,OUT).
 %user:term_expansion(I,O):- \+ thlocal:disable_mpred_term_expansions_locally, thlocal:consulting_sources, with_no_assertions(thlocal:consulting_sources,add(I)),O=true.
 
-system:term_expansion(I,O):- current_prolog_flag(allow_variable_name_as_functor,true), compound(I),functor(I,VFE,1),varFunctorEscape(VFE),
+
+system:term_expansion(I,O):- 
+   current_predicate(logicmoo_bugger_loaded/0),
+   current_prolog_flag(allow_variable_name_as_functor,true), compound(I),functor(I,VFE,1),varFunctorEscape(VFE),
                      \+ thlocal:disable_mpred_term_expansions_locally,
                        with_assertions(thlocal:disable_mpred_term_expansions_locally,to_var_functors((:-),I,O)),I\=@=O.
 
 
-system:goal_expansion(I,O):- current_prolog_flag(allow_variable_name_as_functor,true),
+system:goal_expansion(I,O):- 
+   current_predicate(logicmoo_bugger_loaded/0),
+   current_prolog_flag(allow_variable_name_as_functor,true),
                      compound(I),functor(I,VFE,1),varFunctorEscape(VFE),current_prolog_flag(allow_variable_name_as_functor,true),
                      \+ thlocal:disable_mpred_term_expansions_locally,to_var_functors((:-),I,O),I\=@=O.
 

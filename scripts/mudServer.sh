@@ -1,8 +1,7 @@
 #!/bin/bash
-#sudo apt-get install swi-prolog
 
-#./clone_externals.sh 2>/dev/null
-#./pack/hMUD/policyd
+./clone_externals.sh 2>/dev/null
+./pack/hMUD/policyd
 
 export OLDPWD="`pwd`"
 export NEWPWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/runtime && pwd )"

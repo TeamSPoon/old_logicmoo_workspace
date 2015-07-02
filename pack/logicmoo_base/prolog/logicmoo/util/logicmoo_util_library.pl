@@ -107,10 +107,11 @@ append_term(Call,E,CallE):-must(compound(Call)), Call=..List, append(List,[E],Li
 % the default, as described above, is infinitely many times.
 :- meta_predicate(maptree(2,+,-)).
 :-export(maptree/3).
-maptree(Pred,I,O):- logOnError(call(Pred,I,O)),!.
+maptree(Pred,I,O):- call(Pred,I,O),!.
 maptree(_ ,I,O):- ( \+ compound(I) ),!, must(I=O).
-maptree(Pred,I,O):- I=..IL, must(maplist(maptree(Pred),IL,[FO|OL])),
-   (atom(FO)-> O=..[FO|OL] ; must((nop(maptree(I)),O=..[FO|OL]))).
+maptree(Pred,[F|IL],LIST):- is_list([F|IL]), (maplist(maptree(Pred),[F|IL],LIST)),!.
+maptree(Pred,I,O):- I=..[F|IL], (maplist(maptree(Pred),[F|IL],[FO|OL])),
+   (atom(FO)-> O=..[FO|OL] ; must((nop(maptree(I)),O=..[F,FO|OL]))).
 
 :- export(disjuncts_to_list/3).
 disjuncts_to_list(Var,[Var]):-is_ftVar(Var),!.
@@ -588,3 +589,4 @@ contains_singletons(Term):- not(ground(Term)),not(not((term_variables(Term,Vs),
 :- module_predicates_are_exported.
 :- all_module_predicates_are_transparent(logicmoo_util_library).
 
+logicmoo_library_file_loaded.

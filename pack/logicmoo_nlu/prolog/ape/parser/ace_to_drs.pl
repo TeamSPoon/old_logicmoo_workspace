@@ -75,8 +75,8 @@
 % Examples:
 %
 %==
-% acetext_to_drs('Every man waits.', Sentences, SyntaxTrees, Drs, Messages)
-% acetext_to_drs('Every man waits.', on, off, Sentences, SyntaxTrees, Drs, Messages, Time)
+% ?- acetext_to_drs('Every man waits.', Sentences, SyntaxTrees, Drs, Messages)
+% ?- acetext_to_drs('Every man waits.', on, off, Sentences, SyntaxTrees, Drs, Messages, Time)
 %==
 %
 % @param Text is an ACE text

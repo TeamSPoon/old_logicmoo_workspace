@@ -23,12 +23,12 @@ export_preds_term_expansion((MH:-_)):- !, export_preds_term_expansion((MH)).
 export_preds_term_expansion((MH)):- strip_module(MH,M,H),
    functor(H,F,A),F\=(:-),M:export(F/A),!.
 
-parser_stanford:term_expansion(HB,_):-export_preds_term_expansion(HB),fail.
+parser_stanford:term_expansion(HB,_):- export_preds_term_expansion(HB),fail.
 
 atomic_subst(Before,Find,Replace,After):- atomic_list_concat(Atoms,Find,Before),atomic_list_concat(Atoms,Replace,After).
 
-%:- setenv('CLASSPATH','/devel/PrologMUD/runtime/stanford-corenlp/*:/devel/PrologMUD/runtime/stanford-corenlp/classes:.').
-%:- setenv('CLASSPATH','.:/opt/PrologMUD/runtime/stanford-parser-full-2014-08-27:/opt/PrologMUD/pack/stanford-parser-full-2014-08-27/stanford-postagger.jar:/opt/PrologMUD/runtime/stanford-parser-full-2014-08-27/stanford-srpser-2014-08-28-models.jar:/opt/PrologMUD/runtime/stanford-parser-full-2014-08-27/stanford-parser-3.4.1-models.jar:/opt/PrologMUD/runtime/stanford-parser-full-2014-08-27/stanford-parser.jar').
+%:- setenv('CLASSPATH','/devel/PrologMUD/runtime/stanford-corenlp/*:-devel/PrologMUD/runtime/stanford-corenlp/classes:.').
+%:- setenv('CLASSPATH','.:-opt/PrologMUD/runtime/stanford-parser-full-2014-08-27:-opt/PrologMUD/pack/stanford-parser-full-2014-08-27/stanford-postagger.jar:-opt/PrologMUD/runtime/stanford-parser-full-2014-08-27/stanford-srpser-2014-08-28-models.jar:-opt/PrologMUD/runtime/stanford-parser-full-2014-08-27/stanford-parser-3.4.1-models.jar:-opt/PrologMUD/runtime/stanford-parser-full-2014-08-27/stanford-parser.jar').
 
 :- (prolog_load_context(directory,D),
   format(atom(Atom),'~w:~w/stanford-corenlp3.5.2-ALL.jar',[D,D]), 
@@ -152,7 +152,7 @@ j_get(IO,[],IO):-!.
 j_get(I,-(E),(E=O)):-!,must((j_get(I,E,M),j_to_term_until_done(M,O))).
 j_get(I,+(E),O):-!,must((j_get(I,E,M),j_to_term_until_done(M,O))).
 j_get(I,+,O):-!,must(j_to_term_until_done(I,O)).
-j_get(I,[E|L],O):-!,must((j_get(I,E,M),j_get(M,L,O))),!.
+j_get(I,[E|L],O):- !,must(j_get(I,E,M)),!,must(j_get(M,L,O)),!.
 j_get(I,E,O):- compound(E),compound_name_arguments(E,fa,Args),!,must((maplist(j_get(I),Args,ArgsO),O=..ArgsO)).
 j_get(I,E,O):- compound(E),compound_name_arguments(E,pa,[F|Args]),!,must((maplist(j_get(I),Args,ArgsO),O=..[F|ArgsO])).
 j_get(I,pl(FunctorGet,ArgsGet,ArgFormat),O):- !, must(j_get(I,FunctorGet,Atom)),must(j_get(I,ArgsGet,List)),must(maplist(j_get_l(ArgFormat),List,ListO)),O=..[Atom|ListO],!.
@@ -229,13 +229,16 @@ TODO  FIX THE CONVERTERS!
 :- install_converter(parser_stanford:w2pos_to_aacetext_w_pos(+w2pos, -acetext_w_pos)).
 
 :- install_converter(parser_stanford:acetext_to_stanfordTree(+acetext, -stanfordTree)).
-:- install_converter(parser_stanford:typedDependencies_to_stanfordTree(+acetext_to_typedDependencies, -stanfordTree)).
+:- install_converter(parser_stanford:typedDependencies_to_stanfordTree(+typedDependencies, -stanfordTree)).
 */
+:- install_converter(parser_stanford:stanfordTree_to_simpleParseTree(+stanfordTree, -simpleParseTree)).
 
 show_tree(H:-Tree):- !, nl,portray_clause((H:-Tree)),nl.
 show_tree(Tree):-nl,portray_clause((t1:-Tree)),nl.
 
-tc0:- acetext_to_stanfordTree('OK, so you want a concrete example, not a general rule?',Tree),show_tree(Tree).
+tc0:- j_get('OK, so you want a concrete example, not a general rule?',
+   [acetext_to_stanfordTree,stanfordTree_to_simpleParseTree],
+   Tree),show_tree(Tree).
 tc1:- acetext_to_stanfordTree('I had never seen something like that in any language.',Tree),show_tree(Tree).
 tc2:- acetext_to_stanfordTree('Can the can do the Can Can dance?',Tree),show_tree(Tree).
 
@@ -269,7 +272,7 @@ pos_penn_pos0(POSL,PennPOS):-
 % pennTagString,'EX-PennTag','EX', 
 w2_to_pos_slash_word(Text,open,Text):-!.
 w2_to_pos_slash_word(Text,POS,Atom):-
- get_word_from_hyphen(Text,W,_),
+ must(get_word_from_hyphen(Text,W,_)),
  pos_penn_pos(POS,PennPOS),must(atom(PennPOS)),
  ( PennPOS==open -> Atom = W ; format(atom(Atom),'~w/~w',[W,PennPOS]) ).
 
@@ -301,8 +304,10 @@ typedDependencies_to_w2pos(I,O):-  must(j_get(I,[0,p2s,
   must(maplist(w2stanford_to_w2cyc,M,O)).
 
 :-export(typedDependencies_to_stanfordTree/2).
-typedDependencies_to_stanfordTree(I,O):- j_get(I,[1,p2s,
-  (maptree(call(simplified_tree_element)))],O).
+typedDependencies_to_stanfordTree(I,O):- j_get(I,1,M),maptree(simplified_tree_element,M,O).  
+
+stanfordTree_to_simpleParseTree(I,O):- maptree(simplified_tree_element,I,O).
+
 
 stanfordTree_to_syntaxTrees(I,O):- transform_language(lang_stanfordTree_to_syntaxTrees,I,O).
 % :- add_example_value(stanfordTree , ['ROOT'('S'('NP'('DT'('All-1'),'NNS'('persons-2')),'VP'('VBP'('are-3'), 'ADJP'('JJ'('happy-4'))),'.'('.-5')))]).
@@ -359,19 +364,35 @@ is_node_unlistifiable('nbar').
 :-maptree(rec_lambda:lambda(I,O,(atom(I),upcase_atom(I,O))),a(b),X),assertion(X='A'('B')).
 
 
-simplified_tree_element(w(Text,POS),O):- !,
-  must(w2stanford_to_w2cyc(w(Text,POS),O)),!.
-simplified_tree_element([POS,Text],O):- is_word_tag(POS),!,
-  must(w2stanford_to_w2cyc(w(Text,POS),O)),!.
-simplified_tree_element([ROOT,LIST],O):- is_node_unwrappable(ROOT), !,
-  must(simplified_tree_element_or_pass(LIST,O)),!.
-simplified_tree_element([ROOT,LIST],O):- is_node_unlistifiable(ROOT), !,
-  simplified_tree_element_or_pass(LIST,O),!.
-simplified_tree_element([ROOT|LIST],valueWithComment(O,warn(ROOT))):- is_node_unwrappable(ROOT), !,
-  simplified_tree_element_or_pass(LIST,O),!.
+simplified_tree_element(C,O):- compound(C),C=..[ROOT,LIST],simplified_tree_element0([ROOT,LIST],O),[ROOT,LIST]\=@=O,!.
+simplified_tree_element([ROOT|LIST],O):- atom(ROOT),C=..[ROOT,LIST],simplified_tree_element0(C,O),[ROOT,LIST]\=@=O,!.
+simplified_tree_element(C,O):-  simplified_tree_element0(C,O),!.
 
 simplified_tree_element_or_pass(I , O):-simplified_tree_element(I,O),!.
 simplified_tree_element_or_pass(IO,IO).
+
+simplified_tree_element0(Var,Var):-var(Var),!.
+simplified_tree_element0([ROOT,LIST],O):- is_node_unwrappable(ROOT), !,
+  must(simplified_tree_element_or_pass(LIST,O)),!.
+simplified_tree_element0([ROOT,LIST],O):- is_node_unlistifiable(ROOT), !,
+  simplified_tree_element_or_pass(LIST,O),!.
+
+
+simplified_tree_element0(wi(Text,POS,Index),w(Text,[penn(POS),index(Index)])).
+simplified_tree_element0('VBP'('are-3'),w(are,[penn('VBP'),index(3)])):-!.
+simplified_tree_element0(POSHWORD,w(TEXT,[penn(POS),index(INDEX)])):- compound(POSHWORD),POSHWORD=..[POS,HWORD],
+    atom(HWORD),atomic_list_concat([TEXT,INDEX],'-',HWORD),!.
+simplified_tree_element0('are/VBP',w(are,[penn('VBP')])):-!.
+simplified_tree_element0(SWORD,w(TEXT,[index(INDEX)])):- 
+    atom(SWORD),atomic_list_concat([TEXT,INDEX],'/',SWORD),!.
+simplified_tree_element0('are-3',w(are,[index(3)])):-!.
+simplified_tree_element0(w(Text,POS),O):- !,must(w2stanford_to_w2cyc(w(Text,POS),O)),!.
+simplified_tree_element0(Var,O):-atom(Var),atomic_list_concat([_,_],'/',Var),!,get_word_from_slash(Var,Text,POS),
+            simplified_tree_element0(w(Text,POS),O).
+simplified_tree_element0([POS,Text],O):- is_word_tag(POS),!,simplified_tree_element0(w(Text,POS),O),!.
+simplified_tree_element0([ROOT|LIST],valueWithComment(O,warn(ROOT))):- is_node_unwrappable(ROOT), !,
+  simplified_tree_element_or_pass(LIST,O),!.
+
 
 :-export(acetext_to_w2pos/2).
 acetext_to_stanfordTree(I,O):-acetext_to_typedDependencies(I,M),
@@ -379,7 +400,8 @@ acetext_to_stanfordTree(I,O):-acetext_to_typedDependencies(I,M),
 
 :-export(w2stanford_to_w2cyc/2).
 w2stanford_to_w2cyc(I,O):-  must(I = w(_,_)), copy_term(I,O),
-  arg(1,I,WWP),get_word_from_hyphen(WWP,W,N),
+  arg(1,I,WWP),
+   must(get_word_from_hyphen(WWP,W,N)),
   arg(2,I,SPOS),
   findall(E,bposToCPos(SPOS,E),List),
   list_to_set([SPOS,wordnum(N)|List],Set),
@@ -390,6 +412,9 @@ w2stanford_to_w2cyc(I,O):-  must(I = w(_,_)), copy_term(I,O),
 %'All-1' => 'All'
 %'persons-2' => 'persons'
 :-export(get_word_from_hyphen/3).
+get_word_from_hyphen(w(Text,POSL),Text,Index):- (member(index(Index),POSL);Index= -1),!.
+get_word_from_hyphen(wi(Text,_,Index),Text,Index):-!.
+get_word_from_hyphen(SP,_,_):- (\+ atomic(SP)),!,fail.
 get_word_from_hyphen(SP,W,1):-atom_concat(W,'-1',SP),!.
 get_word_from_hyphen(SP,W,2):-atom_concat(W,'-2',SP),!.
 get_word_from_hyphen(SP,W,Num):-concat_atom([W,N],'-',SP),atom_number(N,Num),!.
@@ -397,6 +422,19 @@ get_word_from_hyphen(SP,W,Num):-concat_atom([W1,W2,N],'-',SP),atom_number(N,Num)
 get_word_from_hyphen(SP,W,Num):-concat_atom(List,'-',SP),reverse(List,[N|Rev]),atom_number(N,Num),!,
    reverse(Rev,UnRev),concat_atom(UnRev,'-',W).
 get_word_from_hyphen(W,W,-1).
+
+
+%'Pretty/JJ' => 'Pretty'/'JJ'
+%'persons' => 'persons'/open
+:-export(get_word_from_slash/3).
+get_word_from_slash(w(Text,POS),Text,POS):-!.
+get_word_from_slash(wi(Text,POS,_Index),Text,POS):-!.
+get_word_from_slash(SP,_,_):- (\+ atomic(SP)),!,fail.
+get_word_from_slash(SP,W,POS):-concat_atom([W,N],'/',SP),=(N,POS),!.
+get_word_from_slash(SP,W,POS):-concat_atom([W1,W2,N],'/',SP),=(N,POS),!,concat_atom([W1,W2],'/',W).
+get_word_from_slash(SP,W,POS):-concat_atom(List,'/',SP),reverse(List,[N|Rev]),=(N,POS),!,
+   reverse(Rev,UnRev),concat_atom(UnRev,'/',W).
+get_word_from_slash(W,W,open).
 
 
 % syntaxTrees=[[specification, [s, [np, [det, all], [nbar, [n, persons]]], [vp, [], [aux, are, []], [ap_coord, [ap, [adj, happy]]], []]], '.']],

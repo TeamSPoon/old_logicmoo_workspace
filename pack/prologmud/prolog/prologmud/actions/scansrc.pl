@@ -92,7 +92,7 @@ update_changed_files :-
 	),
 	print_message(silent, make(reload(Reload))),
 	maplist(make:reload_file, Reload),
-	print_message(silent, make(done(Reload))),
+	print_message(silent, make(done_mud(Reload))),
 	(   prolog:make_hook(after, Reload)
 	->  true
 	;   

@@ -42,7 +42,7 @@ chat80_term_expansion(In,Out):- compound(In),functor(In,'-->',_),  must(xg_proce
 chat80_term_expansion((H ... T ---> R),((P :- Q))) :- must( xg_process_te_clone((H ... T),R,+,P,Q)).
 chat80_term_expansion((L ---> R),((P :- Q))) :- must(xg_process_te_clone(L,R,+,P,Q)).
 
-system:term_expansion(H,O):- processing_xg,chat80_term_expansion(H,O).
+system:term_expansion(H,O):- processing_xg,current_predicate(logicmoo_bugger_loaded/0),chat80_term_expansion(H,O).
 
 
 load_plus_xg_file(CM,F) :- with_assertions(tlxgproc:current_xg_module(CM),with_assertions(tlxgproc:do_xg_process_te,ensure_loaded(F))),!.

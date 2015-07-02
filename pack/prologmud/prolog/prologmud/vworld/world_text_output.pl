@@ -29,7 +29,7 @@ canUseEnglish:-true.
 
 
 :-export(show_kb_preds/2).
-show_kb_preds(Agent,List):- mmake,
+show_kb_preds(Agent,List):-
       show_kb_preds(Agent,_,List).
 
 :-export(show_kb_preds/3).
