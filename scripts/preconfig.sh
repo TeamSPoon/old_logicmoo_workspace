@@ -1,6 +1,6 @@
 #!/bin/bash
 export OLDPWD="`pwd`"
-export NEWPWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )"   
+export NEWPWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/ && pwd )"   
 
 sudo apt-get install python-software-properties
 sudo apt-add-repository -y ppa:swi-prolog/devel
@@ -9,8 +9,11 @@ sudo apt-get update
 sudo apt-get install swi-prolog oracle-java8-installer
 echo select java 8
 sudo update-alternatives --config java
-export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre
-export LD_LIBRARY_PATH="${JAVA_HOME}/lib/amd64/server:${JAVA_HOME}/lib/amd64:${JAVA_HOME}/bin:${PATH}:${LD_LIBRARY_PATH}"
+
+rm -f start_mud_server.sh
+find /usr -name java-8-oracle -printf "export JAVA_HOME=%p/jre\n" > start_mud_server.sh
+echo 'export LD_LIBRARY_PATH="${JAVA_HOME}/lib/amd64/server:${JAVA_HOME}/lib/amd64:${JAVA_HOME}/bin:${PATH}:${LD_LIBRARY_PATH}"' >>  start_mud_server.sh
+
 if ! [ -f ../pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar]
  wget -N http://prologmoo.com/downloads/stanford-corenlp3.5.2-ALL.jar -O ../pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar
 fi
@@ -18,6 +21,9 @@ fi
 % 3,625 inferences, 6.003 CPU in 6.014 seconds (100% CPU, 604 Lips)
 % 1,828,987,011 inferences, 316.932 CPU in 319.418 seconds (99% CPU, 5770916 Lips)
 swipl -g "time(load_files(['../pack/pldata_larkc/prolog/el_holds/el_assertions'],[qcompile(auto),if_needed(true)])),halt."
+
+return 0
+
 
 
 git clone --recurse-submodules
