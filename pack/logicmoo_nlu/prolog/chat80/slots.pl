@@ -314,12 +314,12 @@ slot_verb_template(Verb,Pred,
 
 slot_verb_kind(be,_,TypeS,S,S=A,[slot(dir,TypeS,A,_,free)]).
 slot_verb_kind(be,_,TypeS,S,true,[slot(pred,TypeS,S,_,free)]).
-slot_verb_kind(intrans,Verb,TypeS,S,Pred,Slots) :-
+slot_verb_kind(iv,Verb,TypeS,S,Pred,Slots) :-
    intrans_LF(Verb,TypeS,S,Pred,Slots,_).
 slot_verb_kind(tv,Verb,TypeS,S,Pred,
       [slot(dir,TypeD,D,SlotD,free)|Slots]) :-
    no_repeats(trans_LF(Verb,TypeS,S,TypeD,D,Pred,Slots,SlotD,_)).
-slot_verb_kind(ditrans,Verb,TypeS,S,Pred,
+slot_verb_kind(ditrans(_Prep),Verb,TypeS,S,Pred,
       [slot(dir,TypeD,D,SlotD,free),
        slot(ind,TypeI,I,SlotI,free)|Slots]) :-
    ditrans_LF(Verb,TypeS,S,TypeD,D,TypeI,I,Pred,Slots,SlotD,SlotI,_).

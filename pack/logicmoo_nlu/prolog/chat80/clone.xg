@@ -418,7 +418,7 @@ participle(verb(Root,Voice,inf,Aspect,Neg),Type,Voice) --->
    {participle_vt(Tense,Voice,Aspect), verb_type_db(Root,Type)}.
 
 passive_vt(_+tv).
-passive_vt(_+ditrans).
+passive_vt(_+ditrans(_Prep)).
 
 participle_vt(pres+part,active,[prog]).
 participle_vt(past+part,passive,[]).
@@ -436,7 +436,7 @@ verb_args(_+Type,Voice,AdvArgs,Mask0,Mask) --->
 % prefers to leave off obj
 verb_args(tv,active,[arg(dir,Dir)],_,Mask) --->
    verb_arg(np,Dir,Mask).
-verb_args(ditrans,_,[arg(Case,NP)|Obj],_,Mask) --->
+verb_args(ditrans(_Prep),_,[arg(Case,NP)|Obj],_,Mask) --->
    verb_arg(np,NP,Mask0),
    object_opt(Case,Obj,Mask0,Mask).
 
@@ -486,8 +486,8 @@ adj_phrase(P,Nil) ---> adj(_,P), { is_empty(Nil) }.
 adj_phrase(P,Mask) --->  comp_phrase(P,Mask).
 
 no_args_vt(tv).
-no_args_vt(ditrans).
-no_args_vt(intrans).
+no_args_vt(ditrans(_Prep)).
+no_args_vt(iv).
 
 /* Conjunctions */
 

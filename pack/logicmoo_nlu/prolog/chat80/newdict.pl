@@ -194,7 +194,7 @@ verb_form_db(did,do,past+fin,_).
 verb_form_db(doing,do,pres+part,_).
 verb_form_db(done,do,past+part,_).
 
-verb_type_db_0(do,aux+ditrans).
+verb_type_db_0(do,aux+ditrans(_Prep)).
 
 % =================================================================
 % PRONOUN DB
@@ -548,11 +548,11 @@ adj_db(AdjRestr,restr):-meetsForm80(AdjRestr,AdjRestr,form80(adj+restr)).
 
 
 verb_type_db_0(Verb,main+tv)  :-plt, trans_LF(Verb,_,_,_,_,_,_,_,_).
-verb_type_db_0(Verb,main+intrans):-plt,  intrans_LF(Verb,_,_,_,_,_).
-verb_type_db_0(Verb,main+ditrans):- plt, ditrans_LF(Verb,_,_,_,_,_,_,_,_,_,_,_).
+verb_type_db_0(Verb,main+iv):-plt,  intrans_LF(Verb,_,_,_,_,_).
+verb_type_db_0(Verb,main+ditrans(_Prep)):- plt, ditrans_LF(Verb,_,_,_,_,_,_,_,_,_,_,_).
 
 verb_type_db_0(Verb,main+tv):- plt,   talk_db(transitive,Verb,_,_,_,_).
-verb_type_db_0(Verb,main+intrans):-plt,  talk_db(intransitive,Verb,_,_,_,_).
+verb_type_db_0(Verb,main+iv):-plt,  talk_db(intransitive,Verb,_,_,_,_).
 
 :-style_check(-singleton).
 
@@ -718,7 +718,7 @@ regular_pres_db(rise).
 verb_form_db(rises,rise,pres+fin,3+sg).
 verb_form_db(rose,rise,past+fin,_).
 verb_form_db(risen,rise,past+part,_).
-verb_type_db_0(rise,main+intrans).
+verb_type_db_0(rise,main+iv).
 intrans_LF(rise,feature&river,X,rises(X,Y), [slot(prep(in),feature&place&_,Y,_,free)],_).
 
 rises(R,C) :- river_pathlist(R,L), last(L,C).
@@ -729,7 +729,7 @@ regular_pres_db(drain).
 regular_past_db(drained,drain).
 verb_form_db(drains,drain,pres+fin,3+sg).
 verb_form_db(draining,drain,pres+part,_).
-verb_type_db_0(drain,main+intrans).
+verb_type_db_0(drain,main+iv).
 intrans_LF(drain,feature&river,X,drains(X,Y), [slot(prep(into),feature&place&_,Y,_,free)],_).
 
 drains(R,S) :- river_pathlist(R,L), first(L,S).
@@ -741,7 +741,7 @@ regular_pres_db(flow).
 regular_past_db(flowed,flow).
 verb_form_db(flows,flow,pres+fin,3+sg).
 verb_form_db(flowing,flow,pres+part,_).
-verb_type_db_0(flow,main+intrans).
+verb_type_db_0(flow,main+iv).
 intrans_LF(flow,feature&river,X,flows(X,Y), [slot(prep(through),feature&place&_,Y,_,free)],_).
 intrans_LF(flow,feature&river,X,flows(X,Y,Z), [slot(prep(into),feature&place&_,Z,_,free), slot(prep(from),feature&place&_,Y,_,free)],_). 
 
