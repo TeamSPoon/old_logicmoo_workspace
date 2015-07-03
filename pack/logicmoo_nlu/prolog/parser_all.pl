@@ -16,10 +16,12 @@
 :- user:ensure_loaded(library(logicmoo/logicmoo_base)).
 :- asserta(thlocal:disable_mpred_term_expansions_locally).
 
-:-multifile(user:type_action_info/3).
-:-multifile(user:agent_call_command/2).
-:-multifile(user:mud_test/2).
-
+:- multifile(user:type_action_info/3).
+:- multifile(user:agent_call_command/2).
+:- multifile(user:mud_test/2).
+:- multifile(user:sanity_test/0).
+:- multifile(user:regression_test/0).
+:- multifile(user:feature_test/0).
 
 % ==============================================================================
 %   
@@ -201,7 +203,13 @@ get_it:-
     shell(S))))))).
 :- dmsg("Loading loading language data (This may take 10-15 seconds)").
 :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc)).
-:- gripe_time(7,time(user:ensure_loaded(library(el_holds/'el_assertions.pl.qlf')))).
+
+% 
+% gripe_time(warn(12.246577455>7),        user:time(user:ensure_loaded(library(el_holds/'el_assertions.pl.qlf')))).
+% OLD :- gripe_time(7,time(user:ensure_loaded(library(el_holds/'el_assertions.pl.qlf')))).
+
+% 6.052 CPU on VMWare I7
+:- gripe_time(7,time(user:ensure_loaded(library(el_holds/'el_assertions')))).
 :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_call_kb)).
 :- user:ensure_loaded(pldata/clex_iface).
 :- user:ensure_loaded(pldata/nldata_BRN_WSJ_LEXICON).
@@ -250,13 +258,17 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 :- install_converter(parser_chat80:clausify80(+sem_pre80,-sem80)).
 :- install_converter(parser_chat80:qplan(+sem80,-query80)).
 
-user:regression_test:- test_chat80_regressions.
 
 
-:- user:ensure_loaded(parser_e2c).
+
 
 
 :-asserta((type(SET):-tSet(SET))).
+
+% ================================================================================================
+% CHAT80:  
+:- user:ensure_loaded(parser_e2c). % TODO confirm CHAT80 runs without E2C
+% ================================================================================================
 
 :- debug.
 
@@ -333,15 +345,14 @@ user:regression_test:- test_chat80_regressions.
 
 :- dmsg(parser_all_complete).
 
-:-multifile(user:regression_test/0).
-user:regression_test:- run_pipleine(acetext='All persons are happy.',[foo=_],O),wdmsg(O).
+
+user:sanity_test:- run_pipleine(acetext='All persons are happy.',[foo=_],O),wdmsg(O).
 user:regression_test:- run_pipleine(acetext='What is the ocean that borders african countries and, that borders asian countries?',[foo=_],O),wdmsg(O).
 user:regression_test_TODO:- run_pipleine(acetext='A person who loves all animals is loved by someone.',[foo=_],O),wdmsg(O).
 
 user:regression_test:- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
 
-
-:- gripe_time(5,test_chat80_regressions).
+:- gripe_time(5,test_chat80_sanity).
 
 
 :- must(retract(thlocal:disable_mpred_term_expansions_locally)).

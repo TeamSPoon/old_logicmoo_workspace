@@ -3439,6 +3439,15 @@ gftrace(Trace):-
 grtrace:- default_dumptrace(DDT), grtrace(DDT).
 grtrace(Trace):- hotrace(( visible(+all),leash(+all))), Trace.
 
+:- thread_local(is_pushed_def/3).
+
+:- meta_predicate(push_def(:)).
+push_def(Pred):-must((get_functor(Pred,F,A),prolog_load_context(file,CurrentFile),
+   functor_safe(Proto,F,A))),must(forall(clause(Proto,Body),is_pushed_def(CurrentFile,Proto,Body))),!.
+
+: -meta_predicate(pop_def(:)).
+pop_def(Pred):-must((get_functor(Pred,F,A),prolog_load_context(file,CurrentFile),
+   functor_safe(Proto,F,A))),forall(retract(is_pushed_def(CurrentFile,Proto,Body)),assertz((Proto:-Body))),!.
 
 
 show_and_do(C):-wdmsg(show_and_do(C)),!,traceok(C).
@@ -3463,7 +3472,7 @@ dtrace(G):-G.
 
 :-meta_predicate(dumptrace(0)).
 
-dumptrace(G):- tracing,!,setup_call_cleanup(notrace,(leash(+call),dumptrace(MCall)),trace).
+dumptrace(G):- tracing,!,setup_call_cleanup(notrace,(leash(+call),dumptrace(G)),trace).
 dumptrace(G):- ignore((debug,
  % catch(attach_console,_,true),
  leash(+exception),visible(+exception))),fresh_line,

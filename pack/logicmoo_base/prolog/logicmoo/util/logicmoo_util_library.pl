@@ -59,7 +59,7 @@ logicmoo_util_library:-module(logicmoo_util_library,
 :- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was_lib(WAS)).
 :- set_prolog_flag(double_quotes,string).
 
-:- meta_predicate(if_file_exists(0)).
+:- meta_predicate(if_file_exists(:)).
 if_file_exists(M:Call):- arg(1,Call,File),(filematch(File,_)-> must((filematch(File,X),exists_file(X),call(M:Call)));fmt(not_installing(M,Call))),!.
 
 

@@ -58,7 +58,7 @@
 */
 :- nodebug(_).
 
-:-dynamic(wid/3).
+:- dynamic(wid/3).
 
 %=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%
 %=% 
@@ -107,6 +107,12 @@
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(logicmoo,Dir)).
 :- dynamic(user:isa_pred_now_locked/0).
 :- multifile(user:isa_pred_now_locked/0).
+:- multifile(user:type_action_info/3).
+:- multifile(user:agent_call_command/2).
+:- multifile(user:mud_test/2).
+:- multifile(user:sanity_test/0).
+:- multifile(user:regression_test/0).
+:- multifile(user:feature_test/0).
 
 :- ensure_loaded(logicmoo(mpred/logicmoo_i_header)).
 :- ensure_loaded(logicmoo(pttp/dbase_i_mpred_pttp)).
@@ -1184,8 +1190,8 @@ tsn:- with_all_dmsg(forall(clause(snark,C),must(C))).
 % snark:- make.
 tsnark:- snark_test_string(TODO),snark(string(TODO),current_output).
 
-:- multifile(user:mud_test_sanity/0).
-user:mud_test_sanity:- tsn.
+:- multifile(user:sanity_test/0).
+user:sanity_test:- tsn.
 
 :- thread_local(snark_action_mode/1).
 :- asserta_if_new(snark_action_mode(tell)).
@@ -1434,11 +1440,21 @@ user:provide_mpred_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(Stub
          ensure_universal_stub(Head),
          RESULT = declared(pttp_listens_to_head(OP,Head)).
 
-:- uses_logic(logicmoo_kb_refution).
+:- initialization(uses_logic(logicmoo_kb_refution)).
+
+
+user:sanity_test:- snark_tell(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
+
+user:sanity_test:- kif_to_boxlog(-((a , b ,  c , d)),S),!,disjuncts_to_list(S,L),
+  list_to_set(L,SET),forall(member(P,SET),writeln(P)),!.
+
 
 :- if_startup_script(tsnark).
 :- if_startup_script(ensure_loaded(logicmoo_i_mpred_snark_testing)).
-:- logicmoo_example3.
+
+user:sanity_test:- logicmoo_example3.
+
+user:regression_test:- logicmoo_example3.
 
 end_of_file.
 

@@ -36,12 +36,14 @@ official policies, either expressed or implied, of Ulrich Neumerkel.
 
 :- module(rec_lambda, [
 		   (^)/3, (^)/4, (^)/5, (^)/6, (^)/7, (^)/8, (^)/9,
-		   (\)/1, (\)/2, (\)/3, (\)/4, (\)/5, (\)/6, (\)/7,
+		 %  (\)/1, (\)/2, (\)/3, (\)/4, (\)/5, (\)/6, (\)/7,
 		   (+\)/2, (+\)/3, (+\)/4, (+\)/5, (+\)/6, (+\)/7,
                    (reenter_lambda)/0, (reenter_lambda)/1, (reenter_lambda)/2, (reenter_lambda)/3, (reenter_lambda)/4, (reenter_lambda)/5, (reenter_lambda)/6,
                    (lambda)/3,(lambda)/5,(lambda)/7,(lambda)/9,
                    ctn/2,
 		   op(201,xfx,+\)]).
+
+:- abolish( cyc: (/)/2).
 
 /** <module> Lambda expressions
 

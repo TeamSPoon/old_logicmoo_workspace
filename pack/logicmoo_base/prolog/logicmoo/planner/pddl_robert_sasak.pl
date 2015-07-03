@@ -1,3 +1,6 @@
+
+:- module(pddl_robert_sasak,[test_blocks/0,test_domain/1]).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FILENAME:  common.pl 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -7,7 +10,7 @@
 :- dynamic(pairfrom/4).
 
 
-end_of_file.
+% end_of_file.
 
 :- expects_dialect(sicstus).
 :- use_module(library(timeout)).
@@ -34,14 +37,21 @@ command_line:-
 
 command_line:- test_blocks, test_all.
 
-test_all:- expand_file_name('/devel/PrologMUD/pack/logicmoo_base/prolog/logicmoo/planner/test/*/domain*.pddl',RList),reverse(RList,List),
+test_all:- expand_file_name('/devel/PrologMUD/pack/logicmoo_base/prolog/logicmoo/planner/orig_pddl_parser/test/*/domain*.pddl',RList),reverse(RList,List),
   forall(member(E,List),once(test_domain(E))).
 
 test_domain(DP):-
    format('~q.~n',[test_domain(DP)]),
-  directory_file_path(D,_,DP),directory_files(D,RList),reverse(RList,List),forall(member(T,List),ignore((directory_file_path(D,T,TP),exists_file(TP),not(same_file(DP,TP)),solve_files(DP,TP)))).
+  directory_file_path(D,_,DP),directory_files(D,RList),reverse(RList,List),forall(member(T,List),ignore((directory_file_path(D,T,TP),exists_file(TP),not(same_file(DP,TP)),
+  solve_files(DP,TP)))).
 
-test_blocks:- solve_files('/devel/PrologMUD/pack/logicmoo_base/prolog/logicmoo/planner/test/blocks/domain-blocks.pddl', '/devel/PrologMUD/pack/logicmoo_base/prolog/logicmoo/planner/test/blocks/blocks-03-0.pddl').
+test_blocks:- fail, expand_file_name('/devel/PrologMUD/pack/logicmoo_base/prolog/logicmoo/planner/orig_pddl_parser/test/blocks/domain*.pddl',RList),reverse(RList,List),
+  forall(member(E,List),once(test_domain(E))).
+
+test_blocks:- solve_files('/devel/PrologMUD/pack/logicmoo_base/prolog/logicmoo/planner/orig_pddl_parser/test/blocks/domain-blocks.pddl', 
+  '/devel/PrologMUD/pack/logicmoo_base/prolog/logicmoo/planner/orig_pddl_parser/test/blocks/blocks-03-0.pddl').
+
+user:sanity_test:- test_blocks.
 
 % solve_files(+DomainFile, +ProblemFile)
 %
@@ -289,14 +299,14 @@ solution_to_lisp([H|T]):-
     H =.. [F|P],
     write(' ('),
     write(F),
-    write_list(P),
+    write_list_sas(P),
     write(')'),
     solution_to_lisp(T).
 
-write_list([]).
-write_list([H|T]):-
+write_list_sas([]).
+write_list_sas([H|T]):-
     write(' '), write(H),
-    write_list(T).
+    write_list_sas(T).
 
 
 stat_node:-
@@ -823,7 +833,7 @@ init_heuristics(_).
 %%               clear(block(?x)),
 %%               handempty,
 %%               holding(block(?x)) ],
-%%        [number(f('total-cost', []))],
+%%        [number_is_dcg(f('total-cost', []))],
 %%        _G4108,
 %%        [ action('pick-up', [block(?x)],       %parameters
 %%                    [clear(?x), ontable(?x), handempty], %preconditions
@@ -928,7 +938,7 @@ function_typed_list(W, [F|Ls])
                                 --> oneOrMore(W, L), ['-'], !, function_type(T), function_typed_list(W, Ls), {F =.. [T|L]}.    %:typing
 function_typed_list(W, L)       --> zeroOrMore(W, L).
 
-function_type(number)           --> [number].
+function_type(number_is_dcg)           --> [number_is_dcg].
 emptyOr(_)                      --> ['(',')'].
 emptyOr(W)                      --> W.
 
@@ -966,7 +976,7 @@ atomic_formula(_, F)            --> ['('], predicate(P), zeroOrMore(term, T), ['
 
 term(N)                         --> name(N).
 term(V)                         --> variable(V).
-f_exp(N)                        --> number(N).
+f_exp(N)                        --> number_is_dcg(N).
 f_exp(op(O, E1, E2))            --> ['('],binary_op(O), f_exp(E1), f_exp(E2), [')'].
 f_exp('-'(E))                   --> ['(','-'], f_exp(E), [')'].
 f_exp(H)                        --> f_head(H).
@@ -982,8 +992,8 @@ binary_comp('<')                --> ['<'].
 binary_comp('=')                --> ['='].
 binary_comp('>=')               --> ['>='].
 binary_comp('<=')               --> ['<='].
-number(N)                       --> [N], {integer(N)}.
-number(N)                       --> [N], {float(N)}.
+number_is_dcg(N)                       --> [N], {integer(N)}.
+number_is_dcg(N)                       --> [N], {float(N)}.
 effect(P, N, A)                 --> ['(',and], c_effect(P, N, A), [')'].
 effect(P, N, A)                 --> c_effect(P, N, A).
 %c_effect(forall(E))            --> ['(',forall,'('], typed-list(variable)∗) effect(E), ')'.    %:conditional-effects
@@ -1014,7 +1024,7 @@ oneOrMore(W, [R|Rs], A, C) :- F =.. [W, R, A, B], F, (
 zeroOrMore(W, R)                --> oneOrMore(W, R).
 zeroOrMore(_, [])               --> [].
 
-% Name is everything that is not number, bracket or question mark.
+% Name is everything that is not number_is_dcg, bracket or question mark.
 % Those rules are not necessary, but rapidly speed up parsing process.
 name(N)                         --> [N], {integer(N), !, fail}.
 name(N)                         --> [N], {float(N), !, fail}.
@@ -1099,8 +1109,8 @@ typed_list_as_list(W, N)        --> zeroOrMore(W, N).
 init(I)                         --> ['(',':',init], zeroOrMore(init_el, I), [')'].
 
 init_el(I)                      --> literal(name, I).
-init_el(set(H,N))               --> ['(','='], f_head(H), number(N), [')'].                                     % fluents
-init_el(at(N, L))               --> ['(',at], number(N), literal(name, L), [')'].                               % timed-initial literal
+init_el(set(H,N))               --> ['(','='], f_head(H), number_is_dcg(N), [')'].                                     % fluents
+init_el(at(N, L))               --> ['(',at], number_is_dcg(N), literal(name, L), [')'].                               % timed-initial literal
 goal(G)                         --> ['(',':',goal], pre_GD(G),[')'].
 %constraints(C)                 --> ['(',':',constraints], pref_con_GD(C), [')'].                               % constraints
 pref_con_GD(and(P))             --> ['(',and], zeroOrMore(pref_con_GD, P), [')'].
@@ -1113,14 +1123,14 @@ con_GD(forall(L, P))            --> ['(',forall,'('], typed_list(variable, L),['
 con_GD(at_end(P))               --> ['(',at,end],   gd(P), [')'].
 con_GD(always(P))               --> ['(',always],   gd(P), [')'].
 con_GD(sometime(P))             --> ['(',sometime], gd(P), [')'].
-con_GD(within(N, P))            --> ['(',within], number(N), gd(P), [')'].
+con_GD(within(N, P))            --> ['(',within], number_is_dcg(N), gd(P), [')'].
 
 con_GD(at_most_once(P))         --> ['(','at-most-once'], gd(P),[')'].
 con_GD(some_time_after(P1, P2)) --> ['(','sometime-after'], gd(P1), gd(P2), [')'].
 con_GD(some_time_before(P1, P2))--> ['(','sometime-before'], gd(P1), gd(P2), [')'].
-con_GD(always_within(N, P1, P2))--> ['(','always-within'], number(N), gd(P1), gd(P2), [')'].
-con_GD(hold_during(N1, N2, P))  --> ['(','hold-during'], number(N1), number(N2), gd(P), [')'].
-con_GD(hold_after(N, P))        --> ['(','hold-after'], number(N), gd(P),[')'].
+con_GD(always_within(N, P1, P2))--> ['(','always-within'], number_is_dcg(N), gd(P1), gd(P2), [')'].
+con_GD(hold_during(N1, N2, P))  --> ['(','hold-during'], number_is_dcg(N1), number_is_dcg(N2), gd(P), [')'].
+con_GD(hold_after(N, P))        --> ['(','hold-after'], number_is_dcg(N), gd(P),[')'].
 
 metric_spec(metric(O, E))       --> ['(',':',metric], optimization(O), metric_f_exp(E), [')'].
 
@@ -1130,14 +1140,14 @@ optimization(maximize)          --> [maximize].
 metric_f_exp(E)                 --> ['('], binary_op(O), metric_f_exp(E1), metric_f_exp(E2), [')'], {E =..[O, E1, E2]}.
 metric_f_exp(multi_op(O,[E1|E]))--> ['('], multi_op(O), metric_f_exp(E1), oneOrMore(metric_f_exp, E), [')']. % I dont see meanful of this rule, in additional is missing in f-exp
 metric_f_exp(E)                 --> ['(','-'], metric_f_exp(E1), [')'], {E=..[-, E1]}.
-metric_f_exp(N)                 --> number(N).
+metric_f_exp(N)                 --> number_is_dcg(N).
 metric_f_exp(F)                 --> ['('], function_symbol(S), zeroOrMore(name, Ns), [')'], { F=..[S|Ns]}.%concat_atom_iio([S|Ns], '-', F) }.
 metric_f_exp(function(S))       --> function_symbol(S).
 metric_f_exp(total_time)        --> ['total-time'].
 metric_f_exp(is_violated(N))    --> ['(','is-violated'], pref_name(N), [')'].
 
 % Work arround
-metric_f_exp(is_violated(N,V))    --> ['(','*','(','is-violated'], pref_name(N), [')'],number(V),[')'].
+metric_f_exp(is_violated(N,V))    --> ['(','*','(','is-violated'], pref_name(N), [')'],number_is_dcg(V),[')'].
 
 % Work arround
 length_spec([])                 --> [not_defined].      % there is no definition???
@@ -1436,7 +1446,7 @@ my_ord_member(S, [_|T]):-
     my_ord_member(S, T).
 
 
-
+%:- test_blocks.
 
 /*
                     GNU GENERAL PUBLIC LICENSE
@@ -2008,12 +2018,12 @@ the GNU General Public License from time to time.  Such new versions will
 be similar in spirit to the present version, but may differ in detail to
 address new problems or concerns.
 
-  Each version is given a distinguishing version number.  If the
+  Each version is given a distinguishing version number_is_dcg.  If the
 Program specifies that a certain numbered version of the GNU General
 Public License "or any later version" applies to it, you have the
 option of following the terms and conditions either of that numbered
 version or of any later version published by the Free Software
-Foundation.  If the Program does not specify a version number of the
+Foundation.  If the Program does not specify a version number_is_dcg of the
 GNU General Public License, you may choose any version ever published
 by the Free Software Foundation.
 
@@ -2115,4 +2125,5 @@ Public License instead of this License.  But first, please read
 <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 */
+
 

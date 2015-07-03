@@ -583,7 +583,7 @@ display_hold_condition(Cond) :- % Execute uppon backtracking
 display_regression( Op, X , V, Op1) :- 
 	writel( [ 'Applying  operator ', Op, ' violates ', V, ';' ] ),
 	tab(2), writel( [ 'regressing ', X, ' through ' , Op1] ).
-display\_regression( \un, X , \un, Op1) :- % Execute upon backtracking
+display_regression( _OP, X , V, Op1) :- % Execute upon backtracking
 	write('** Backtracking: '), nl, tab(2), 
 	writel( [ 'regressing ', X, ' through ', V, 
                   ' did not lead to a solution' ] ), 

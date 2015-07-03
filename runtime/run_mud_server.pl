@@ -68,7 +68,7 @@ user:file_search_path(prologmud, library(prologmud)).
 %:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(mpred_online/dbase_i_rdf_store)))).
 
 % [Mostly Required] Load the Logicmoo Planner/AI System
-%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_planner)))).
+:- time(with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner))))).
 
 % [Debugging] Normarily this set as 'true' can interfere with debugging
 % :- set_prolog_flag(gc,true).
@@ -80,19 +80,20 @@ user:file_search_path(prologmud, library(prologmud)).
 % ==========================================================
 % Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
 % ==========================================================
+:-multifile(user:sanity_test/0).
 :-multifile(user:regression_test/0).
-
-user:regression_test:- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
-
-user:regression_test:- snark_tell(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
-
-user:regression_test:- kif_to_boxlog(-((a , b ,  c , d)),S),!,disjuncts_to_list(S,L),
-  list_to_set(L,SET),forall(member(P,SET),writeln(P)),!.
+:-multifile(user:feature_test/0).
 
 
+:- if_startup_script(doall(user:sanity_test)).
 
+% ==========================================================
+% Regression tests that first run whenever a person stats the MUD on the public server
+% ==========================================================
+
+:- if((hostname(titan),fail)). % INFO this fail is so we can start faster
 :- doall(user:regression_test).
-
+:- endif.
 
 
 
@@ -171,13 +172,13 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 % [Manditory] This loads the game and initializes so test can be ran
 :- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
 
-:- if_startup_script( finish_processing_world).
-
-:- enqueue_agent_action("rez crackers").
-
 
 % [Never] saves about a 3 minute compilation time (for when not runing mud)
-:- show_call(gethostname(titan)-> prolog ; true).
+:- if((gethostname(titan),fail)).
+:- if_startup_script( finish_processing_world).
+:- enqueue_agent_action("rez crackers").
+:- prolog.
+:- endif.
 
 
 % [Optional] the following game files though can be loaded separate instead
@@ -230,7 +231,6 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 
 :-sanity_test2.
 
-% :- enqueue_agent_action(prolog).
 
 % [Optionaly] Tell the NPCs to do something every 60 seconds (instead of 90 seconds)
 % :- register_timer_thread(npc_ticker,60,npc_tick).
@@ -239,6 +239,7 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 % :- pce_show_profile.
 
 */
+:- enqueue_agent_action(prolog).
 
 % ==============================
 % MUD GAME REPL 

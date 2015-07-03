@@ -147,7 +147,8 @@ jconvert(class([java,lang],['Integer']),[m(intValue)]).
 jconvert(class([java,util],['Collection']),[toArray,+call(jpl_array_to_list)]).
 
 
-:-export(j_get/3).
+:- export(j_get/3).
+:- meta_predicate(j_get(?,?,?)).
 j_get(IO,[],IO):-!.
 j_get(I,-(E),(E=O)):-!,must((j_get(I,E,M),j_to_term_until_done(M,O))).
 j_get(I,+(E),O):-!,must((j_get(I,E,M),j_to_term_until_done(M,O))).

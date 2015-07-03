@@ -3,7 +3,7 @@ PrologMUD_base.vpj=Release
 [Global]
 CurrentProject=pack\prologmud\PrologMUD.vpj
 [ProjectDates]
-pack\PrologMUD_RT.vpj=20150619193750632
+pack\PrologMUD_RT.vpj=20150703001743238
 pack\prologmud\PrologMUD.vpj=20150621005316026
 pack\logicmoo_base\prolog\LogicmooBase.vpj=20150615055716059
 pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
@@ -38,16 +38,16 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
     + Interpreters
       + flux
     + lib
-  - logicmoo
+  + logicmoo
     + candc
       + working
     - mpred
     + mpred_online
     + osnark
-    + planner
+    - planner
       + bkwld_pddl_parser
       + Blocks_world
-      + domains
+      - domains
         + failing_or_too_slow
         + others
         + sanity
@@ -83,17 +83,17 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
         + charts
         + docs
         + output
-        + test
-          + blocks
+        - test
+          - blocks
           + elevators
           + gripper
           + hanoi
       + Rakiduam07
         + continuos
         + socket_udp
-    - plarkc
+    + plarkc
     + pttp
-    - swish_lib
+    + swish_lib
       + render
     - util
   + MaLARea
@@ -146,7 +146,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
       + iris
       + trains
     + pl
-- pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj
++ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj
   + ace_in_gf
     + docs
       + bib
@@ -380,6 +380,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
     + working
   + chart89
   + chat80
+  + chat80_regress
   + CURT
     + bb0
     + bb1
@@ -442,7 +443,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
             + mapping
             + prolog
             + utils
-  - pldata
+  + pldata
     + nltk_3.0a3
       + javasrc
         + org
@@ -510,7 +511,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
       + prolog
     + WNprolog-3.0
       + prolog
-  - ProNTo
+  + ProNTo
     + Brooks
     + dparser
     + et
@@ -1206,6 +1207,14 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
   - runtime
     + cache
       + rdf
+        + 0a
+          + be
+        + 13
+          + 72
+        + 40
+          + c5
+        + 81
+          + 20
         + 9c
           + c0
         + a4
@@ -2534,17 +2543,37 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
       + help
       + icons
       + js
-  + \usr
+  - \usr
     + lib
       + swi-prolog
         + boot
         + demo
+        + doc
+          + packages
+            + examples
+              + chr
+              + cql
+              + http
+                + pwp
+              + jpl
+                + java
+                  + Family
+                  + Test
+                  + Test2
+                  + Time
+                  + Zahed
+                + prolog
+              + pengines
+              + pldoc
+              + plunit
+              + protobufs
+              + ssl
+        + include
+          + sicstus
+          + Yap
         + library
           + chr
           + clp
-            + clpq
-            + clpqr
-            + clpr
           + cql
           + dcg
           + dialect
@@ -2558,114 +2587,9 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
             + swi
           + http
           + pldoc
-          + pldoc - Copy
-          + pldoc - Copy (2)
           + semweb
           + tipc
           + unicode
-        + src-packs
-          + arouter
-            + examples
-            + prolog
-            + tests
-          + blog_core
-            + prolog
-              + bc
-            + tests
-              + util
-          + dict_schema
-            + prolog
-            + tests
-          + docstore
-            + prolog
-            + tests
-          + func
-            + prolog
-            + t
-          + function_expansion
-            + prolog
-          + interpolate
-            + prolog
-          + lambda
-            + prolog
-          + list_util
-            + prolog
-            + t
-          + markdown
-            + prolog
-              + md
-            + tests
-          + mavis
-            + prolog
-            + t
-          + memo
-            + prolog
-          + quickcheck
-            + prolog
-            + t
-          + rtchecks
-            + examples
-            + prolog
-              + inliner
-              + rtchecks
-              + swi
-              + varnames
-            + tests
-          + simple_template
-            + prolog
-              + st
-            + tests
-          + smtp
-            + prolog
-          + sort_dict
-            + prolog
-            + tests
-          + swicli
-            + cffi-tests
-            + prolog
-          + tidylog
-            + prolog
-              + tidylog
-                + atom
-                + comment
-                + number
-            + t
-          + trill
-            + prolog
-          + type_check
-            + prolog
-          + typedef
-            + prolog
-          + weblog
-            + demo
-            + prolog
-              + debug_page
-              + formatting
-              + html_form
-              + identity
-                + login_prototype
-                + stormpath
-              + info
-                + books
-                  + google
-                + buttons
-                + geocoding
-                  + google
-                + geohashing
-                + html
-                + maps
-                  + google
-                  + leaflet
-                + numbers
-                + stock
-                  + crox
-                + weather
-                  + geonames
-              + nav
-              + resources
-              + support
-              + widgets
-                + agents
         + xpce
           + prolog
             + boot
@@ -2686,95 +2610,194 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
               + swi
               + trace
               + xref
-scroll:132
+      + swi-prolog-packs
+        + rtchecks\.git
+          + objects
+            + pack
+        + tidylog\.git
+          + objects
+            + pack
+        + trill\.git
+          + objects
+            + pack
+        + weblog\.git
+          + objects
+            + pack
+        + arouter
+          + examples
+          + prolog
+          + tests
+        + blog_core
+          + prolog
+            + bc
+          + tests
+            + util
+        + dict_schema
+          + prolog
+          + tests
+        + docstore
+          + prolog
+          + tests
+        + func
+          + prolog
+          + t
+        + function_expansion
+          + prolog
+        + interpolate
+          + prolog
+        + lambda
+          + prolog
+        + list_util
+          + prolog
+          + t
+        + markdown
+          + prolog
+            + md
+          + tests
+        + mavis
+          + prolog
+          + t
+        + memo
+          + prolog
+        + quickcheck
+          + prolog
+          + t
+        + rtchecks
+          + examples
+          + prolog
+            + inliner
+            + rtchecks
+            + swi
+            + varnames
+          + tests
+        + simple_template
+          + prolog
+            + st
+          + tests
+        + smtp
+          + prolog
+        + sort_dict
+          + prolog
+          + tests
+        + swicli
+          + c
+            + swicli
+          + cffi-tests
+          + prolog
+        + tidylog
+          + prolog
+            + tidylog
+              + atom
+              + comment
+              + number
+          + t
+        + trill
+          + prolog
+        + type_check
+          + prolog
+        + typedef
+          + prolog
+        + weblog
+          + demo
+          + prolog
+            + debug_page
+            + formatting
+            + html_form
+            + identity
+              + login_prototype
+              + stormpath
+            + info
+              + books
+                + google
+              + buttons
+              + geocoding
+                + google
+              + geohashing
+              + html
+              + maps
+                + google
+                + leaflet
+              + numbers
+              + stock
+                + crox
+              + weather
+                + geonames
+            + nav
+            + resources
+            + support
+            + widgets
+              + agents
+scroll:0
 [State]
-SCREEN: 1440 900 499 163 1080 618 0 0 N 0 0 0 0 885 150
+SCREEN: 1920 1080 81 47 1919 1004 0 0 M 0 0 0 0 1676 622
 CWD: pack\logicmoo_nlu\prolog\chat80
-BUFFER: BN="pack\logicmoo_nlu\prolog\Parser_SUPPLE\prolog\grammar\s_rules.pl"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\logicmoo_engine.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1324 CL=18 LE=0 CX=17 CY=14 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\pldata_larkc\prolog\el_holds\el_holds.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=584 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.383377867 CL=33 LE=0 CX=32 CY=9 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_nlu\prolog\parser_e2c.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\prologmud\runtime\run_mud_server.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.3434 CL=1 LE=0 CX=0 CY=4 WI=5 BI=41 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_nlu\prolog\parser_chat80.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.5280 CL=83 LE=0 CX=82 CY=15 WI=5 BI=34 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_nlu\prolog\chat80\newdict.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.3443 CL=1 LE=0 CX=0 CY=6 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.53740 CL=71 LE=0 CX=70 CY=26 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="pack\logicmoo_nlu\prolog\parser_all.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.17324 CL=1 LE=0 CX=0 CY=13 WI=5 BI=39 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_argtypes.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.505 CL=12 LE=0 CX=11 CY=19 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\prologmud\prolog\prologmud\vworld\world.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.3660 CL=32 LE=0 CX=31 CY=10 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_nlu\prolog\pldata\nldata_cycl_pos0.pl"
+VIEW: LN=.10533 CL=23 LE=0 CX=22 CY=33 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="\etc\exports"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\prologmud\prolog\prologmud\mud_header.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.25985 CL=12 LE=0 CX=11 CY=19 WI=5 BI=30 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_nlu\prolog\parser_stanford.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.14481 CL=1 LE=0 CX=0 CY=18 WI=5 BI=40 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\ref_unused\OLD_logicmoo\logicmoo_cyc_nl_sem.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.71375 CL=49 LE=0 CX=48 CY=16 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_nlu\prolog\regulus\Prolog\lite_read_flat_file.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.986 CL=1 LE=0 CX=0 CY=20 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1143 278 -1 -1 N  WF=0 WT=14 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_nlu\prolog\parser_chat80.pl"
-VIEW: LN=.5280 CL=83 LE=0 CX=82 CY=15 WI=231 BI=34 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1077 393 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+VIEW: LN=.5990 CL=23 LE=0 CX=22 CY=17 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_nlu\prolog\chat80\clone.xg.bak"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="pack\prologmud\runtime\run_mud_server.pl"
-VIEW: LN=.3434 CL=1 LE=0 CX=0 CY=4 WI=223 BI=41 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1143 278 -1 -1 N  WF=0 WT=12 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\prologmud\prolog\prologmud\vworld\world.pl"
-VIEW: LN=.3660 CL=32 LE=0 CX=31 CY=10 WI=170 BI=17 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1143 278 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_argtypes.pl"
-VIEW: LN=.505 CL=12 LE=0 CX=11 CY=19 WI=154 BI=16 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1099 352 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_nlu\prolog\parser_all.pl"
-VIEW: LN=.17324 CL=1 LE=0 CX=0 CY=13 WI=227 BI=39 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 983 363 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.2631 CL=62 LE=0 CX=61 CY=26 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_nlu\prolog\chat80_regress\clone.xg"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.15443 CL=10 LE=0 CX=9 CY=31 WI=5 BI=20 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="pack\logicmoo_nlu\prolog\parser_stanford.pl"
-VIEW: LN=.14481 CL=1 LE=0 CX=0 CY=18 WI=203 BI=40 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1077 393 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\pldata_larkc\prolog\el_holds\el_holds.pl"
-VIEW: LN=.383379302 CL=29 LE=0 CX=28 CY=7 WI=222 BI=21 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1121 280 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_nlu\prolog\parser_e2c.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=229 BI=28 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1099 352 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_nlu\prolog\pldata\nldata_cycl_pos0.pl"
-VIEW: LN=.25985 CL=12 LE=0 CX=11 CY=17 WI=225 BI=30 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1099 352 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_nlu\prolog\Parser_SUPPLE\prolog\grammar\s_rules.pl"
-VIEW: LN=.1324 CL=18 LE=0 CX=17 CY=14 WI=160 BI=31 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1077 393 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_nlu\prolog\regulus\Prolog\lite_read_flat_file.pl"
-VIEW: LN=.986 CL=1 LE=0 CX=0 CY=20 WI=217 BI=19 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1077 393 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\ref_unused\OLD_logicmoo\logicmoo_cyc_nl_sem.pl"
-VIEW: LN=.71375 CL=49 LE=0 CX=48 CY=16 WI=216 BI=27 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1143 278 -1 -1 M  WF=0 WT=13 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_nlu\prolog\chat80\newdict.pl"
-VIEW: LN=.31239 CL=8 LE=0 CX=7 CY=6 WI=167 BI=22 HT=0 HN=0 HF=0 HC=4
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.17496 CL=47 LE=0 CX=46 CY=17 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_nlu\prolog\chat80\clone.xg"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.168 CL=69 LE=0 CX=68 CY=4 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\util\logicmoo_util_bugger.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.131494 CL=36 LE=0 CX=35 CY=22 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1478 424 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_nlu\prolog\parser_all.pl"
+VIEW: LN=.10533 CL=23 LE=0 CX=22 CY=33 WI=123 BI=18 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1478 424 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\util\logicmoo_util_bugger.pl"
+VIEW: LN=.131494 CL=36 LE=0 CX=35 CY=22 WI=267 BI=29 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1478 424 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_nlu\prolog\chat80_regress\clone.xg"
+VIEW: LN=.15231 CL=28 LE=0 CX=27 CY=21 WI=107 BI=20 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1478 424 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_nlu\prolog\parser_stanford.pl"
+VIEW: LN=.7363 CL=32 LE=0 CX=31 CY=19 WI=269 BI=16 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1478 424 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_nlu\prolog\chat80\clone.xg"
+VIEW: LN=.14530 CL=1 LE=0 CX=0 CY=33 WI=86 BI=21 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1478 424 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\prologmud\runtime\run_mud_server.pl"
+VIEW: LN=.2631 CL=62 LE=0 CX=61 CY=26 WI=265 BI=27 HT=0 HN=0 HF=0 HC=4
+WINDOW: 198 198 1478 424 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_nlu\prolog\chat80\clone.xg.bak"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=144 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1478 424 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\prologmud\prolog\prologmud\mud_header.pl"
+VIEW: LN=.5990 CL=23 LE=0 CX=22 CY=17 WI=157 BI=15 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1478 424 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\logicmoo_engine.pl"
+VIEW: LN=.2945 CL=1 LE=0 CX=0 CY=16 WI=154 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1478 424 -1 -1 M  WF=0 WT=1 "Default Fixed Font,10,0,1"
+BUFFER: BN="\etc\exports"
+VIEW: LN=.389 CL=101 LE=0 CX=100 CY=10 WI=173 BI=5 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-pack\logicmoo_nlu\prolog\pldata\nldata_cycl_pos0.pl
-pack\logicmoo_nlu\prolog\parser_e2c.pl
-pack\logicmoo_nlu\prolog\parser_stanford.pl
-pack\logicmoo_nlu\prolog\parser_all.pl
-pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_argtypes.pl
-pack\prologmud\prolog\prologmud\vworld\world.pl
+pack\prologmud\prolog\prologmud\mud_header.pl
 pack\prologmud\runtime\run_mud_server.pl
-pack\logicmoo_nlu\prolog\parser_chat80.pl
-pack\logicmoo_nlu\prolog\chat80\newdict.pl
+pack\logicmoo_nlu\prolog\chat80\clone.xg.bak
+pack\logicmoo_nlu\prolog\chat80_regress\clone.xg
+pack\logicmoo_nlu\prolog\chat80\clone.xg
+pack\logicmoo_nlu\prolog\parser_stanford.pl
+pack\logicmoo_base\prolog\logicmoo\util\logicmoo_util_bugger.pl
+\etc\exports
+pack\logicmoo_nlu\prolog\parser_all.pl

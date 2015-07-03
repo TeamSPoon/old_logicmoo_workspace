@@ -391,15 +391,15 @@ country(iran,middle_east,33,-53,636363,32001000,tehran,rial).
 
 
 noun_plu_db(types,type).
-subject_LF(thing,type,feature&type&_,X,type(X)).
+subject_LF(thing,type,feature&type&_,X,tSet(X)).
 noun_plu_db(formattypes,formattype).
 noun_plu_db(datatypes,datatype).
 subject_LF(thing,formattype,feature&formattype&_,X,ttFormatType(X)).
 
 noun_plu_db(TS,T):- noun_plu_db_via_types(TS,T).
 
-subject_LF(thing,Type,TYPEMASK,X,isa(X,Type)):- plt,loop_check(type(Type)),atom(Type),gen_typemask(Type,TYPEMASK).
-subject_LF(restriction,Type,TYPEMASK,X,isa(X,Type)):- plt,loop_check(type(Type)),atom(Type),gen_typemask(Type,TYPEMASK).
+subject_LF(thing,Type,TYPEMASK,X,isa(X,Type)):- plt,loop_check(tSet(Type)),atom(Type),gen_typemask(Type,TYPEMASK).
+subject_LF(restriction,Type,TYPEMASK,X,isa(X,Type)):- plt,loop_check(tSet(Type)),atom(Type),gen_typemask(Type,TYPEMASK).
 
 
 gen_typemask(Type,measure&Type&_):-ttFormatType(Type),!.
@@ -407,7 +407,7 @@ gen_typemask(Type,feature&Type&_).
 gen_typemask(_,feature&_).
 
 
-noun_plu_db_via_types(TS,T):- maybe_noun_or_adj(T),maybe_noun_or_adj(TS), (atom(TS)->atom_concat(T,'s',TS);true),type(T),atom(T),atom_concat(T,'s',TS).
+noun_plu_db_via_types(TS,T):- maybe_noun_or_adj(T),maybe_noun_or_adj(TS), (atom(TS)->atom_concat(T,'s',TS);true),tSet(T),atom(T),atom_concat(T,'s',TS).
 maybe_noun_or_adj(T):- var(T)->true;(atom(T),not_ccw(T)).
 
 % 
@@ -433,22 +433,24 @@ t11:-
 
 
 noun_plu_db(properties,property).
-subject_LF(thing,property,feature&mpred,X,objectProperty(X)).
-subj_obj_LF(property,property,feature&mpred,X,feature&type&_,Y, hasPropertyOrValue(Y,X)).
+subject_LF(thing,property,feature&mpred,X,isa_objectProperty(X)).
+
+subj_obj_LF(property,property,feature&mpred,X,feature&type&_,Y, hasPropertyOrValueISA(Y,X)).
 
 /* IS A SPECILIZATION OF A MPRED */
 
 noun_plu_db(mpreds,mpred).
 subject_LF(thing,mpred,feature&mpred,X,mpred(X)).
 
-objectProperty(P) :- hasProperty(_,P).
+isa_objectProperty(P) :- hasProperty(_,P).
 
-hasPropertyOrValue(T,PorV):- (PorV=P;PorV=V), hasPropertyValue(T,P,V),(PorV=P;PorV=V).
+hasPropertyOrValueISA(T,PorV):- (PorV=P;PorV=V), hasPropertyValueSVO(T,P,V),(PorV=P;PorV=V).
+hasPropertyOrValueISA(T,PorV):- isa(PorV,T).
 
-hasProperty(Type,P):-hasPropertyValue(Type,P,_).
+hasProperty(Type,P):-no_repeats((Type-P),hasPropertyValueSVO(Type,P,_)).
 
-hasPropertyValue(SomeType,P,SomeVType):-mpred_arity(P,A),A>=2,argIsa_call(P,1,SomeType),argIsa_call(P,A,SomeVType).
-hasPropertyValue(Type,P,Area) :- subj_obj_LF(property,Area,_Measure&Area,_X,feature&TYPELIST,_Y,Pred),deepestType(TYPELIST,Type),get_1st_order_functor(Pred,P),deepestType(TYPELIST,Type).
+hasPropertyValueSVO(SomeType,P,SomeVType):-mpred_arity(P,A),A>=2,argIsa_call(P,1,SomeType),argIsa_call(P,A,SomeVType).
+hasPropertyValueSVO(Type,P,Area) :- subj_obj_LF(property,Area,_Measure&Area,_X,feature&TYPELIST,_Y,Pred),deepestType(TYPELIST,Type),get_1st_order_functor(Pred,P),deepestType(TYPELIST,Type).
 
 get_1st_order_functor(Pred,P):-not(compound(Pred)),!,P=Pred.
 get_1st_order_functor(Pred,P):-get_functor(Pred,F),(is_2nd_order_holds(F)->((arg(1,Pred,A),!,get_1st_order_functor(A,P)));P=F).
@@ -475,8 +477,8 @@ typeAssignableTo(Type,SomeType):-transitive_subclass(Type,SomeType).
 typeAssignableTo(_Type,SomeType):-ttFormatType(SomeType).
 
 
-%hook:fact_always_true(isa(Type,type)):- clause(subject_LF(thing,Type,feature&_,_X,_),true).
-%hook:fact_always_true(isa(Type,type)):- clause(subject_LF(restriction,Type,feature&_,_X,_),true).
+% TODO DECIDE IF UNEEDED hook:fact_always_true(isa(Type,type)):- clause(subject_LF(thing,Type,feature&_,_X,_),true).
+% TODO DECIDE IF UNEEDED hook:fact_always_true(isa(Type,type)):- clause(subject_LF(restriction,Type,feature&_,_X,_),true).
 
 
 type_allowed(feature&TYPEMASK,Type):-nonvar(TYPEMASK),!,type_allowed(TYPEMASK,Type),!.
