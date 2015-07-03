@@ -22,7 +22,7 @@ do
 	echo -ne '\033]50;ClearScrollback\a'
 	echo -en "\ec\e[3J"
 	echo "Hit CTRL+C ${BASH_SOURCE[0]} ";
-        echo ". ./debug_once.sh ${RUNFILE} "a;
+        echo ". ./debug_once.sh ${RUNFILE} ";
         cd $NEWPWD
         git pull
         if [[ $EUID -eq 0 ]];
