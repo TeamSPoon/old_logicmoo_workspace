@@ -1,7 +1,7 @@
 #!/bin/bash
 export OLDPWD="`pwd`"
 export NEWPWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/ && pwd )"
-export LD_LIBRARY_PATH=/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/server
+#export LD_LIBRARY_PATH=/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/server
 #export SWIPL=/usr/local/lib/swipl-7.1.11/bin/x86_64-linux/swipl
 export RUNFILE=$NEWPWD/run_mud_server.pl --debug=debug_once
 if [ $# -eq 0 ] 
@@ -17,11 +17,11 @@ reset -w
 echo -ne '\033]50;ClearScrollback\a'
 echo -en "\ec\e[3J"
 echo `pwd`
-killall -9 xterm swipl ; killall -9 xterm swipl ; fg
+#killall -9 xterm swipl ; killall -9 xterm swipl ; fg
 echo "Hit CTRL+C ${BASH_SOURCE[0]} $RUNFILE ";
 sleep 1;
 cd $NEWPWD
 swipl -L32G -G32G -T32G -f ${RUNFILE}
-killall -9 xterm swipl ; killall -9 xterm swipl ; fg
+#killall -9 xterm swipl ; killall -9 xterm swipl ; fg
 cd $OLDPWD
 echo exit $?
