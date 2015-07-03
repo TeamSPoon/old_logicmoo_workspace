@@ -35,6 +35,7 @@ fi
 # safe to run more than once
 sudo adduser --gecos "PrologMUD User" --disabled-login --disabled-password prologmud
 
+echo "to start the MUD type: source start_mud_server.sh"
 
 return 0
 
