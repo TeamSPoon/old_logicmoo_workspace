@@ -393,7 +393,8 @@ country(iran,middle_east,33,-53,636363,32001000,tehran,rial).
 noun_plu_db(types,type).
 subject_LF(thing,type,feature&type&_,X,type(X)).
 noun_plu_db(formattypes,formattype).
-subject_LF(thing,formattype,feature&formattype&_,X,formattype(X)).
+noun_plu_db(datatypes,datatype).
+subject_LF(thing,formattype,feature&formattype&_,X,ttFormatType(X)).
 
 noun_plu_db(TS,T):- noun_plu_db_via_types(TS,T).
 
@@ -401,7 +402,7 @@ subject_LF(thing,Type,TYPEMASK,X,isa(X,Type)):- plt,loop_check(type(Type)),atom(
 subject_LF(restriction,Type,TYPEMASK,X,isa(X,Type)):- plt,loop_check(type(Type)),atom(Type),gen_typemask(Type,TYPEMASK).
 
 
-gen_typemask(Type,measure&Type&_):-formattype(Type),!.
+gen_typemask(Type,measure&Type&_):-ttFormatType(Type),!.
 gen_typemask(Type,feature&Type&_).
 gen_typemask(_,feature&_).
 
@@ -471,7 +472,7 @@ deepestType(_&LIST,Type):-!,deepestType(LIST,Type).
 deepestType(TYPE,Type):-Type=TYPE.
 
 typeAssignableTo(Type,SomeType):-transitive_subclass(Type,SomeType).
-typeAssignableTo(_Type,SomeType):-formattype(SomeType).
+typeAssignableTo(_Type,SomeType):-ttFormatType(SomeType).
 
 
 %hook:fact_always_true(isa(Type,type)):- clause(subject_LF(thing,Type,feature&_,_X,_),true).

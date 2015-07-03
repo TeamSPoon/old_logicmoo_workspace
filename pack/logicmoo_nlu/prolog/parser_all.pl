@@ -252,11 +252,6 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 
 user:regression_test:- test_chat80_regressions.
 
-:-dynamic(formattype/1).
-:-dynamic(partOfSpeech/3).
-:-dynamic(determinerStrings/2).
-:-dynamic(prefixString/2).
-:-dynamic(suffixString/2).
 
 :- user:ensure_loaded(parser_e2c).
 
@@ -264,8 +259,6 @@ user:regression_test:- test_chat80_regressions.
 :-asserta((type(SET):-tSet(SET))).
 
 :- debug.
-:- gripe_time(5,test_chat80_regressions).
-:- prolog.
 
 
 % ================================================================================================
@@ -347,6 +340,8 @@ user:regression_test_TODO:- run_pipleine(acetext='A person who loves all animals
 
 user:regression_test:- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
 
+
+:- gripe_time(5,test_chat80_regressions).
 
 
 :- must(retract(thlocal:disable_mpred_term_expansions_locally)).

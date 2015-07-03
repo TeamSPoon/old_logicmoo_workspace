@@ -149,7 +149,7 @@ process_run(Callback,U,List,Time):-
 call_in_banner(U,Call):- p2(begin:U),call_cleanup(Call,p2(end:U)).
 
 process_run(Callback,StartParse,U,List,Time):-    
-    process_run_real(Callback,StartParse,U,List,Time) *-> true; process_run_unreal(Callback,StartParse,U,List,Time).
+    show_call_failure(process_run_real(Callback,StartParse,U,List,Time)) *-> true; process_run_unreal(Callback,StartParse,U,List,Time).
     
    
 process_run_unreal(Callback,Start,U,[sent=(U),parse=(E),sem=(error),qplan=(error),answers=(failed)],[time(WholeTime)]):-   
