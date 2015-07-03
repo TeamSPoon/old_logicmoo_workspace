@@ -12,9 +12,11 @@ sudo update-alternatives --config java
 
 rm -f start_mud_server.sh
 echo "searching for java-8-oracle"
-find /usr -name java-8-oracle -printf "export JAVA_HOME=%p/jre\n" > start_mud_server.sh
+echo '#!/bin/bash'> start_mud_server.sh
+find /usr -name java-8-oracle -printf "export JAVA_HOME=%p/jre\n" >> start_mud_server.sh
 echo 'export LD_LIBRARY_PATH="${JAVA_HOME}/lib/amd64/server:${JAVA_HOME}/lib/amd64:${JAVA_HOME}/bin:${PATH}:${LD_LIBRARY_PATH}"' >>  start_mud_server.sh
 echo 'swipl -f runtime/run_mud_server.pl' >>  start_mud_server.sh
+chmod +x start_mud_server.sh
 
 if ! [ -f pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar]
 then
