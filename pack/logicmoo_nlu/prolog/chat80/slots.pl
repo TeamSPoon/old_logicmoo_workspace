@@ -132,14 +132,14 @@ i_np_mod(Mod,X,Slots,Slots,Pred0,Pred,QMods0,QMods,Up,Id,_) :-
 i_noun(Noun,Type-X,P,Slots) :-
    no_repeats_must(noun_template(Noun,Type,X,P,Slots)).
 
-i_bind(Prep,Slots0,Slots,_,X,Id,arg,P,[],[]) :-
+i_bind(Prep,Slots0,Slots,_,X,Id,varg,P,[],[]) :-
    in_slot(Slots0,Case,X,Id,Slots,P),
    deepen_case(Prep,Case).
 i_bind(prep(Prep),Slots,Slots,X,Y,_,adjoin,'`'(P),PSlots,XArg) :-
    i_adjoin(Prep,X,Y,PSlots,XArg,P).
 
 i_np_modify(adjoin,P,N,N & P,_,unit).
-i_np_modify(arg,F,N,N,Index0,Index) :-
+i_np_modify(varg,F,N,N,Index0,Index) :-
    index_slot(F,Index0,Index).
 
 in_slot([Slot|Slots],Case,X,Id,Slots,F) :-
@@ -202,7 +202,7 @@ i_neg(neg(V),not(V)).
 
 i_subj(Voice,Subj,Slots0,Slots,Quant,Up,Id) :-
    active_passive_subjcase(Voice,Case),
-   verb_slot(arg(Case,Subj),[],[],Slots0,Slots,[Quant],[],Up,Id).
+   verb_slot(varg(Case,Subj),[],[],Slots0,Slots,[Quant],[],Up,Id).
 
 i_verb_args(VArgs,XA0,XA,Slots0,Slots,Args0,Args,Up,Id) :-
    fill_verb(VArgs,XA0,XA,Slots0,Slots,Args0,Args,Up,Id).
@@ -231,7 +231,7 @@ verb_slot(pp(prep(Prep),NP),
    held_arg(XArg,[],LSlots0,LSlots,Id0,Id),
    i_np_rest(NP,LDet,LDet0,LX,LPred,LQMods,LSlots,Up,Id,free),
    conc80(PSlots,Slots1,Slots).
-verb_slot(arg(SCase,NP),
+verb_slot(varg(SCase,NP),
       XArg0,XArg,Slots0,Slots,[Q|Args],Args,Up,Id) :-
    i_np(NP,X,Q,Up,Id,unit,XArg0,XArg),
    in_slot(Slots0,Case,X,Id,Slots,_),
@@ -239,7 +239,7 @@ verb_slot(arg(SCase,NP),
 verb_slot(adverb(Adv),XA,XA,Slots0,Slots,['`'(P)|Args],Args,[],Id) :-
    no_repeats(adv_template_db(Adv,Case,X,P)),
    in_slot(Slots0,Case,X,Id,Slots,_).
-verb_slot(arg(pred,AP),XA,XA,Slots0,Slots,Args0,Args,Up,Id) :-
+verb_slot(varg(pred,AP),XA,XA,Slots0,Slots,Args0,Args,Up,Id) :-
    in_slot(Slots0,pred,X,Id,Slots,_),
    i_pred(AP,X,Args0,Args,Up,Id).
 

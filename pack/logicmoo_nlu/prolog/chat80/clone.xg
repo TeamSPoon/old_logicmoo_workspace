@@ -436,16 +436,16 @@ verb_args(_+Type,Voice,AdvArgs,Mask0,Mask) --->
    verb_args(Type,Voice,Args,Mask0,Mask).
 
 % prefers to leave off obj
-verb_args(tv,active,[arg(dir,Dir)],_,Mask) --->
+verb_args(tv,active,[varg(dir,Dir)],_,Mask) --->
    verb_arg(np,Dir,Mask).
-verb_args(ditrans(_Prep),_,[arg(Case,NP)|Obj],_,Mask) --->
+verb_args(ditrans(_Prep),_,[varg(Case,NP)|Obj],_,Mask) --->
    verb_arg(np,NP,Mask0),
    object_opt(Case,Obj,Mask0,Mask).
 
 verb_args(be,_,[void(Meaning)],Mask,Mask) ---> theText1(There),{txt_there_db(There,Meaning)}.
-verb_args(be,_,[arg(pred,P)],_,Mask) ---> pred_conj(_,P,Mask).
-verb_args(be,_,[arg(dir,P)],_,Mask) ---> verb_arg(np,P,Mask).
-verb_args(have,active,[arg(dir,P)],_,Mask) ---> verb_arg(np,P,Mask).
+verb_args(be,_,[varg(pred,P)],_,Mask) ---> pred_conj(_,P,Mask).
+verb_args(be,_,[varg(dir,P)],_,Mask) ---> verb_arg(np,P,Mask).
+verb_args(have,active,[varg(dir,P)],_,Mask) ---> verb_arg(np,P,Mask).
 verb_args(Type,_,[],Mask,Mask) ---> {no_args_vt(Type)}.
 
 object_opt(Case,AdvArg,Mask0,Mask) --->
@@ -453,7 +453,7 @@ object_opt(Case,AdvArg,Mask0,Mask) --->
    advs_opt(AdvArg,Obj,Mask1),
    obj_opt(Case,Obj,Mask0,Mask).
 
-obj_opt(ind,[arg(dir,NP)],_,Mask) ---> verb_arg(np,NP,Mask).
+obj_opt(ind,[varg(dir,NP)],_,Mask) ---> verb_arg(np,NP,Mask).
 obj_opt(dir,[],Mask,Mask) ---> noText.
 
 pred_conj(Conj,Arg,Mask) --->
