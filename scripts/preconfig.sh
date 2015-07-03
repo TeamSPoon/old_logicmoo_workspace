@@ -17,6 +17,7 @@ echo 'export LD_LIBRARY_PATH="${JAVA_HOME}/lib/amd64/server:${JAVA_HOME}/lib/amd
 echo 'swipl -f runtime/run_mud_server.pl' >>  start_mud_server.sh
 
 if ! [ -f pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar]
+then
  wget -N http://prologmoo.com/downloads/stanford-corenlp3.5.2-ALL.jar -O pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar
 fi
 
