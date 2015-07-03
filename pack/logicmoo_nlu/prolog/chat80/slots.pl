@@ -38,7 +38,7 @@ i_sentence(decl(S),assertion([],P)) :- !,
    i_s(S,P,[],0).
 
 i_sentence(imp(s(_,Verb,VArgs,VMods)),imp(V,Args)) :- !,
-   i_verb(Verb,V,_,active,pos,Slots0,[],transparent),
+   i_verb(Verb,V,_,active,pos(_TFScope),Slots0,[],transparent),
    i_verb_args(VArgs,[],[],Slots0,Slots,Args,Args0,Up,-0),
    conc80(Up,VMods,Mods),
    i_verb_mods(Mods,_,[],Slots,Args0,Up,+0).
@@ -197,8 +197,8 @@ have_pred(Head,Verb,Head,Verb) :-
 meta_head(apply(_,_)).
 meta_head(aggr(_,_,_,_,_)).
 
-i_neg(pos,id(_Why)).
-i_neg(neg,not(_Why)).
+i_neg(pos(V),id(V)).
+i_neg(neg(V),not(V)).
 
 i_subj(Voice,Subj,Slots0,Slots,Quant,Up,Id) :-
    active_passive_subjcase(Voice,Case),
@@ -251,7 +251,7 @@ i_pred(conj(Conj,Left,Right),X,
 i_pred(AP,T,['`'(Head)&Pred|As],As,[],_) :-
    i_adj(AP,T,_,_,Head,true,Pred,'`'(true)).
 i_pred(value(adj(Adj),wh(TypeY-Y)),Type-X,['`'(H)|As],As,[],_) :-
-   deduce_subj_obj_LF(attribute,Adj,Type,X,TypeY,Y,H).
+   no_repeats(deduce_subj_obj_LF(attribute,Adj,Type,X,TypeY,Y,H)).
 i_pred(comp(Op0,adj(Adj),NP),X,[P1 & P2 & '`'(P3),Q|As],As,Up,Id) :-
    i_np(NP,Y,Q,Up,Id,unit,[],[]),
    adj_sign_db(Adj,Sign),

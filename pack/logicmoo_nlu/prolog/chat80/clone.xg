@@ -115,17 +115,19 @@ subj(Subj,Agmt,_) --->
    np(Subj,Agmt,Case,_,subj,SAll,_).
 
 /* Noun Phrase */
+np(AgmtKernelMods,Agmt,Case,Def,Role,Set,Mask) ---> np0(AgmtKernelMods,Agmt,Case,Def,Role,Set,Mask).
 
-np(np(Agmt,Pronoun,[]),Agmt,NPCase,def,_,Set,Nil) --->
+np0(np(Agmt,Pronoun,[]),Agmt,NPCase,def,_,Set,Nil) --->
    {is_pp(Set)},
    pers_pron(Pronoun,Agmt,Case),
    {is_empty(Nil), is_to_role_case(Case,decl,NPCase)}.
-np(np(Agmt,Kernel,Mods),Agmt,Case,Def,Role,Set,Mask) --->
+np0(np(Agmt,Kernel,Mods),Agmt,_Case,Def,Role,Set,Mask) --->
    {is_pp(Set)},
    np_head(Kernel,Agmt,Def+Type,PostMods,Mods),
    {is_np_all(NPAll)},
    np_compls(Type,Agmt,Role,PostMods,NPAll,Mask).
-np(part(Det,NP),3+Number,_,indef,Role,Set,Mask) --->
+% many of, one of
+np0(part(Det,NP),3+Number,_,indef,Role,Set,Mask) --->
    {is_pp(Set)},
    determiner(Det,Number,indef),
    theText1(of),
@@ -385,8 +387,8 @@ verb(verb(Root,Voice,Time+fin,Aspect,Neg),Agmt,Type,Voice) --->
    rest_verb(Role,Root0,Root,Voice,Aspect),
    {verb_type_db(Root,Type)}.
 
-neg_opt(aux+_,neg) ---> theText1(not).
-neg_opt(_,pos) ---> noText.
+neg_opt(aux+_,neg(_TFScope)) ---> theText1(not).
+neg_opt(_,pos(_TFScope)) ---> noText.
 
 rest_verb(aux,have,Root,Voice,[perf|Aspect]) --->
    verb_form(Root0,past+part,_,_),
@@ -440,9 +442,8 @@ verb_args(ditrans(_Prep),_,[arg(Case,NP)|Obj],_,Mask) --->
    verb_arg(np,NP,Mask0),
    object_opt(Case,Obj,Mask0,Mask).
 
-verb_args(be,_,[void(_Why)],Mask,Mask) ---> theText1(there).
-verb_args(be,_,[arg(pred,P)],_,Mask) --->
-   pred_conj(_,P,Mask).
+verb_args(be,_,[void(Meaning)],Mask,Mask) ---> theText1(There),{txt_there_db(There,Meaning)}.
+verb_args(be,_,[arg(pred,P)],_,Mask) ---> pred_conj(_,P,Mask).
 verb_args(be,_,[arg(dir,P)],_,Mask) ---> verb_arg(np,P,Mask).
 verb_args(have,active,[arg(dir,P)],_,Mask) ---> verb_arg(np,P,Mask).
 verb_args(Type,_,[],Mask,Mask) ---> {no_args_vt(Type)}.
@@ -469,7 +470,7 @@ verb_arg(np,NP,Mask) --->
    np(NP,_,VCase,_,compl,SAll,Mask).
 
 pred(_,Adj,Mask) ---> adj_phrase(Adj,Mask).
-pred(neg,PP,Mask) ---> 
+pred(neg(_TFScope),PP,Mask) ---> 
    {is_s_all(SAll)},
    pp(PP,compl,SAll,Mask).
 pred(_,Adv,Mask) --->
