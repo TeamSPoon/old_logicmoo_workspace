@@ -220,7 +220,7 @@ np_mods(Agmt,Case,Mods0,[Mod|Mods],Set0,Set,_,Mask) --->
 np_mods(_,_,Mods,Mods,Set,Set,Mask,Mask) ---> noText.
 
 np_mod(_,Case,PP,Set,Mask) ---> pp(PP,Case,Set,Mask).
-np_mod(Agmt,Case,WH,Set,Mask) --->
+np_mod(Agmt,_Case,WH,Set,Mask) --->
    reduced_relative(Agmt,WH,Set,Mask).
 
 /* Verb modifiers */

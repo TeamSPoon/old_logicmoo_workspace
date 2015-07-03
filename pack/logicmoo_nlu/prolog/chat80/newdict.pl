@@ -57,6 +57,8 @@
 :- asserta((thlocal:enable_src_loop_checking)).
 
 
+deduce_subj_obj_LF(PropAttrib,Adj,Type,X,TypeY,Y,H):-subj_obj_LF(PropAttrib,Adj,Type,X,TypeY,Y,H).
+deduce_subject_LF(RS,Adj,Type,X,P):-subject_LF(RS,Adj,Type,X,P).
 
 verb_type_db(Verb,Type):-no_repeats(verb_type_db_0(Verb,Type)).
 
@@ -74,7 +76,7 @@ terminator_db(.,_).
 terminator_db(?,?).
 terminator_db(!,!).
 
-plt:-! ,fail.
+% plt:-! ,fail.
 plt:- thlocal:usePlTalk,!.
 plt2:- thlocal:useAltPOS,!.
 % plt:- thlocal:chat80_interactive,!.
@@ -876,7 +878,7 @@ regular_past_db(exceeded,exceed).
 verb_form_db(exceeds,exceed,pres+fin,3+sg).
 verb_form_db(exceeding,exceed,pres+part,_).
 trans_LF(exceed,measure&Type,X,measure&Type,Y,exceeds(X,Y),[], _,_).
-attribute_db(great,measure&Type,X,measure&Type,Y,exceeds(X,Y)).
+subj_obj_LF(attribute,great,measure&Type,X,measure&Type,Y,exceeds(X,Y)).
 
 
 measure_op_db(id(_Why),X,X,true).
@@ -898,13 +900,14 @@ exceeds(X1--U1,X2--U2) :- ratio_db(U1,U2,M1,M2), X1*M1 > X2*M2.
 
 sup_adj_db(Biggest,Big):-plt,talk_db(superl,Big,Biggest).
 
+
 % /* Comparative */
 rel_adj_db(Bigger,Big):-plt,talk_db(comp,Big,Bigger).
-attribute_db(small,feature&place&_,X,measure&area,Y,areaOf(X,Y)).
-attribute_db(large,feature&place&_,X,measure&area,Y,areaOf(X,Y)).
+subj_obj_LF(attribute,small,feature&place&_,X,measure&area,Y,areaOf(X,Y)).
+subj_obj_LF(attribute,large,feature&place&_,X,measure&area,Y,areaOf(X,Y)).
 
-attribute_db(small,feature&Place&_,X,measure&Area,Y,holds_t(AreaPred,X,Y)):-type_measured_by_pred_db(Place,Area,AreaPred).
-attribute_db(large,feature&Place&_,X,measure&Area,Y,holds_t(AreaPred,X,Y)):-type_measured_by_pred_db(Place,Area,AreaPred).
+subj_obj_LF(attribute,small,feature&Place&_,X,measure&Area,Y,holds_t(AreaPred,X,Y)):-type_measured_by_pred_db(Place,Area,AreaPred).
+subj_obj_LF(attribute,large,feature&Place&_,X,measure&Area,Y,holds_t(AreaPred,X,Y)):-type_measured_by_pred_db(Place,Area,AreaPred).
 
 type_measured_by_pred_db(human,feet,height).
 

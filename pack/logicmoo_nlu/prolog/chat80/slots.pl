@@ -28,6 +28,8 @@
 :- op(300,fx,(('`'))).
 :- op(200,xfx,((--))).
 
+no_repeats_must(Call):-one_must(gripe_time(0.5,no_repeats(Call)),(fail,(dmsg(warn(show_call_failure(Call))),!,fail))).
+
 i_sentence(q(S),question([],P)) :- !,
    i_s(S,P,[],0).
 i_sentence(whq(X,S),question([X],P)) :- !,
@@ -53,7 +55,7 @@ i_np(NP,Y,Q,Up,Id0,Index,XA0,XA) :-
 i_np_head(np(_,Kernel,_),Y,
       quant(Det,T,Head,Pred0,QMods,Y),
       Det,Det0,X,Pred,QMods,Slots,_Id) :-
-   no_repeats(i_np_head0(Kernel,X,T,Det0,Head,Pred0,Pred,Slots)),
+   no_repeats_must(i_np_head0(Kernel,X,T,Det0,Head,Pred0,Pred,Slots)),
    Type-_=Y, Type-_=T,!.
 
 i_np_head(np(Argree2B,C,MoreIn),Y,Quant,Det,Det0,X,Pred,QMods,Slots0,Id0):- thlocal:chat80_interactive,!,
@@ -128,7 +130,7 @@ i_np_mod(Mod,X,Slots,Slots,Pred0,Pred,QMods0,QMods,Up,Id,_) :-
    i_rel(Mod,X,Pred0,Pred,QMods0,QMods,Up,Id).
 
 i_noun(Noun,Type-X,P,Slots) :-
-   noun_template(Noun,Type,X,P,Slots).
+   no_repeats_must(noun_template(Noun,Type,X,P,Slots)).
 
 i_bind(Prep,Slots0,Slots,_,X,Id,arg,P,[],[]) :-
    in_slot(Slots0,Case,X,Id,Slots,P),
@@ -153,7 +155,7 @@ i_adjs([Adj|Adjs],X,T,T0,Head0,Head,Pred0,Pred) :-
    i_adjs(Adjs,X,T1,T0,Head1,Head,Pred1,Pred).
 
 i_adj(adj(Adj),Type-X,T,T,Head,Head,'`'(P)&Pred,Pred) :-
-   no_repeats(subject_LF(restriction,Adj,Type,X,P)).
+   no_repeats_must(deduce_subject_LF(restriction,Adj,Type,X,P)).
 i_adj(adj(Adj),TypeX-X,TypeV-V,_,
    aggr(F,V,[X],Head,Pred),Head,'`'(true),Pred) :-
    aggr_adj_db(Adj,TypeV,TypeX,F).
@@ -162,10 +164,10 @@ i_adj(sup(Op0,adj(Adj)),Type-X,Type-V,_,
    adj_sign_db(Adj,Sign),
    inverse_db(Op0,Sign,Op),
    i_sup_op(Op,F),
-   no_repeats(attribute_db(Adj,Type,X,_,Y,P)).
+   no_repeats_must(deduce_subj_obj_LF(attribute,Adj,Type,X,_,Y,P)).
 i_adj(adj(Adj),TypeX-X,T,T,_,
       Head,Head,quant(void(_Meaning),TypeX-Y,'`'(P),'`'(Q)&Pred,[],_),Pred) :-
-   attribute_db(Adj,TypeX,X,_,Y,P),
+   no_repeats_must(deduce_subj_obj_LF(attribute,Adj,TypeX,X,_,Y,P)),
    standard_adj_db(Adj,TypeX,Y,Q).
 
 i_s('s'(Subj,Verb,VArgs,VMods),Pred,Up,Id) :-
@@ -249,7 +251,7 @@ i_pred(conj(Conj,Left,Right),X,
 i_pred(AP,T,['`'(Head)&Pred|As],As,[],_) :-
    i_adj(AP,T,_,_,Head,true,Pred,'`'(true)).
 i_pred(value(adj(Adj),wh(TypeY-Y)),Type-X,['`'(H)|As],As,[],_) :-
-   attribute_db(Adj,Type,X,TypeY,Y,H).
+   deduce_subj_obj_LF(attribute,Adj,Type,X,TypeY,Y,H).
 i_pred(comp(Op0,adj(Adj),NP),X,[P1 & P2 & '`'(P3),Q|As],As,Up,Id) :-
    i_np(NP,Y,Q,Up,Id,unit,[],[]),
    adj_sign_db(Adj,Sign),
@@ -269,8 +271,8 @@ i_adjoin(Prep,X,Y,[],[],P) :-
 
 i_measure(Type-X,Adj,Type,X,'`'(true)) :-
    no_repeats(units_db(Adj,Type)).
-i_measure(TypeX-X,Adj,TypeY,Y,quant(void(_Meaning),TypeY-Y,'`'(P),'`'(true),[],_)) :-
-   no_repeats(attribute_db(Adj,TypeX,X,TypeY,Y,P)).
+i_measure(TypeX-X,Adj,TypeY,Y,quant(void(_There),TypeY-Y,'`'(P),'`'(true),[],_)) :-
+   no_repeats_must(deduce_subj_obj_LF(attribute,Adj,TypeX,X,TypeY,Y,P)).
 
 i_verb_mods(Mods,_,XA,Slots0,Args0,Up,Id) :-
    fill_verb(Mods,XA,[],Slots0,Slots,Args0,Args,Up,-Id),
@@ -287,12 +289,12 @@ pos_conversion_db(nb(N),Op,_,N,Op).
 
 noun_template(Noun,TypeV,V,'`'(P),
       [slot(poss,TypeO,O,Os,index)|Slots]) :-
-   no_repeats(subj_obj_LF(property,Noun,TypeV,V,TypeO,O,P)),Slots=[],Os=_.
+   no_repeats_must(deduce_subj_obj_LF(property,Noun,TypeV,V,TypeO,O,P)),Slots=[],Os=_.
 noun_template(Noun,TypeV,V,aggr(F,V,[],'`'(true),'`'(true)),
    [slot(prep(of),TypeS,_,_,free)]) :-
    aggr_noun_db(Noun,TypeV,TypeS,F).
 noun_template(Noun,Type,X,'`'(P),Slots) :-
-   no_repeats(subject_LF(thing,Noun,Type,X,P)),Slots=[].
+   no_repeats_must(deduce_subject_LF(thing,Noun,Type,X,P)),Slots=[].
 noun_template(Noun,TypeV,V,apply(F,P),
       [slot(prep(of),TypeX,X,_,apply)]) :-
    meta_noun_db(Noun,TypeV,V,TypeX,X,P,F).
@@ -309,7 +311,7 @@ slot_verb_template(have,Y=Z,
 	held_arg(poss,-(-(-(+Id))),TypeS-S), have).
 slot_verb_template(Verb,Pred,
       [slot(subj,TypeS,S,_,free)|Slots],[],transparent) :-
-   no_repeats(verb_type_db(Verb,_+Kind)),!,
+   no_repeats_must(verb_type_db(Verb,_+Kind)),!,
    slot_verb_kind(Kind,Verb,TypeS,S,Pred,Slots).
 
 slot_verb_kind(be,_,TypeS,S,S=A,[slot(dir,TypeS,A,_,free)]).
@@ -318,7 +320,7 @@ slot_verb_kind(iv,Verb,TypeS,S,Pred,Slots) :-
    intrans_LF(Verb,TypeS,S,Pred,Slots,_).
 slot_verb_kind(tv,Verb,TypeS,S,Pred,
       [slot(dir,TypeD,D,SlotD,free)|Slots]) :-
-   no_repeats(trans_LF(Verb,TypeS,S,TypeD,D,Pred,Slots,SlotD,_)).
+   no_repeats_must(trans_LF(Verb,TypeS,S,TypeD,D,Pred,Slots,SlotD,_)).
 slot_verb_kind(ditrans(_Prep),Verb,TypeS,S,Pred,
       [slot(dir,TypeD,D,SlotD,free),
        slot(ind,TypeI,I,SlotI,free)|Slots]) :-
