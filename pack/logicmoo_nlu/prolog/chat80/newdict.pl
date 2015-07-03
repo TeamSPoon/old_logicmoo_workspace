@@ -51,11 +51,20 @@
 
 :- dynamic_multifile_exported((trans_LF/9)).
 
+:-retractall(nldata_BRN_WSJ_LEXICON:text_bpos(the,nn)).
+
 % :- begin_dynamic_reader.
 :- asserta((thlocal:enable_src_loop_checking)).
 
 
+
 verb_type_db(Verb,Type):-no_repeats(verb_type_db_0(Verb,Type)).
+
+txt_there_db(there,there).
+txt_not_db(not,not).
+% txt_not_db(never,never).
+txt_no_db(not,not).
+txt_no_db(no,no).
 
 % =================================================================
 % General Dictionary
@@ -66,7 +75,24 @@ terminator_db(?,?).
 terminator_db(!,!).
 
 plt:-! ,fail.
-plt :- thlocal:usePlTalk.
+plt:- thlocal:usePlTalk,!.
+plt2:- thlocal:useAltPOS,!.
+% plt:- thlocal:chat80_interactive,!.
+
+loop_check_chat80(Call):-loop_check_chat80(Call,fail).
+loop_check_chat80(Call,Else):-loop_check(Call,Else).
+
+not_violate(NotCCW,POS):-loop_check(not_violate0(NotCCW,POS)).
+not_violate0(NotCCW,POS):-loop_check_chat80((ccw_db(NotCCW,CC)->CC=POS;true),fail).
+
+:-meta_predicate(plt_call(+,+,0)).
+:-meta_predicate(plt2_call(+,+,0)).
+% plt_call(Goal):-plt,!,no_repeats(Goal),dmsg(succeed_plt_call(Goal)).
+plt_call(NotCCW,_POS,_Goal):-member(NotCCW,['?','river','borders']),!,fail.
+plt_call(NotCCW,POS,Goal):-plt,!,loop_check_chat80(no_repeats(Goal)),not_violate(NotCCW,POS),must(once(not_violate(NotCCW,POS);(dmsg(succeed_plt_call(NotCCW,POS,Goal)),!,fail))).
+plt2_call(NotCCW,_POS,_Goal):-member(NotCCW,['?','river','borders']),!,fail.
+plt2_call(NotCCW,POS,Goal):-plt2,!,loop_check_chat80(no_repeats(Goal)),not_violate(NotCCW,POS),must(once(not_violate(NotCCW,POS);(dmsg(succeed_plt_call(NotCCW,POS,Goal)),!,fail))).
+
 
 adverb_db(Quickly):-plt,talk_db(adv,Quickly),not_ccw(Quickly).
 
@@ -131,6 +157,7 @@ quantifier_pron_db(nothing,no,thing).
 prep_db(as).
 prep_db(at).
 noun_plu_db(times,time).
+%noun_plu_db(Liaisons, Liaison):- plt, lexicon_interface:noun_pl(Liaisons, Liaison, _Human).
 adverb_db(yesterday).
 adverb_db(tomorrow).
 
@@ -258,17 +285,17 @@ noun_plu_db(PluralString,SingularString):- meetsForm80(PluralString,SingularStri
 noun_sin_db(Singular):- meetsForm80(Singular,Singular,noun+singular).
 noun_sin_db(Singular):-noun_plu_db(_,Singular).
 
-thing_LF(continent,feature&place&continent,X,continent(X),[],_).
-thing_LF(ocean,feature&place&seamass,X,ocean(X),[],_).
-thing_LF(river,feature&river,X,river(X),[],_).
-thing_LF(sea,feature&place&seamass,X,sea(X),[],_).
-thing_LF(seamass,feature&place&seamass,X,seamass(X),[],_).
-thing_LF(region,feature&place&_,X,region80(X),[],_).
+subject_LF(thing,continent,feature&place&continent,X,continent(X)).
+subject_LF(thing,ocean,feature&place&seamass,X,ocean(X)).
+subject_LF(thing,river,feature&river,X,river(X)).
+subject_LF(thing,sea,feature&place&seamass,X,sea(X)).
+subject_LF(thing,seamass,feature&place&seamass,X,seamass(X)).
+subject_LF(thing,region,feature&place&_,X,region80(X)).
 
 
 /* WHICH WHICH DENOTES A  */
 
-thing_LF(place,feature&place&_,X,place(X),[],_).
+subject_LF(thing,place,feature&place&_,X,place(X)).
 
 /* WHICH EXISTENCE STEMS FROM A  */
 
@@ -314,7 +341,7 @@ in_continent(north_america, america).
 % "Whoable Count Nouns" 
 % ------------------------------
 noun_plu_db(persons,person).  noun_plu_db(people,person).
-thing_LF(person,_,X,person(X),[],_).
+subject_LF(thing,person,_,X,person(X)).
 
 
 
@@ -323,21 +350,21 @@ thing_LF(person,_,X,person(X),[],_).
 
 
 noun_plu_db(capitals,capital).
-thing_LF(capital,feature&city,X,capital(X),[],_).
-property_LF(capital,feature&city,X,feature&place&country,Y, capital(Y,X),[],_,_).
+subject_LF(thing,capital,feature&city,X,capital(X)).
+subj_obj_LF(property,capital,feature&city,X,feature&place&country,Y, capital(Y,X)).
 capital(C,Cap) :- country(C,_,_,_,_,_,Cap,_).
 capital(C) :- capital(_X,C).
 
 /* IS A SPECILIZATION OF A CITY */
 
 noun_plu_db(cities,city).
-thing_LF(city,feature&city,X,city(X),[],_).
+subject_LF(thing,city,feature&city,X,city(X)).
 city(C) :- city(C,_,_).
 city(tehran,iran,1010).
 
 /* THAT INVOKES ACTION */
 
-trans_LF(govern,feature&_,X,feature&place&country,Y,capital(Y,X),[],_,_).
+trans_LF(govern,feature&_,X,feature&place&country,Y,capital(Y,X),[], _,_).
 verb_root_db(govern).
 regular_pres_db(govern).
 regular_past_db(governed,govern).
@@ -348,7 +375,7 @@ verb_type_db_0(govern,main+tv).
 /* UPON A  */
 
 noun_plu_db(countries,country).
-thing_LF(country,feature&place&country,X,country(X),[],_).
+subject_LF(thing,country,feature&place&country,X,country(X)).
 country(C) :- country(C,_,_,_,_,_,_,_).
 country(iran,middle_east,33,-53,636363,32001000,tehran,rial).
 
@@ -359,14 +386,14 @@ country(iran,middle_east,33,-53,636363,32001000,tehran,rial).
 
 
 noun_plu_db(types,type).
-thing_LF(type,feature&type&_,X,type(X),[],_).
+subject_LF(thing,type,feature&type&_,X,type(X)).
 noun_plu_db(formattypes,formattype).
-thing_LF(formattype,feature&formattype&_,X,formattype(X),[],_).
+subject_LF(thing,formattype,feature&formattype&_,X,formattype(X)).
 
 noun_plu_db(TS,T):- noun_plu_db_via_types(TS,T).
 
-thing_LF(Type,TYPEMASK,X,isa(X,Type),[],_):- plt,loop_check(type(Type)),atom(Type),gen_typemask(Type,TYPEMASK).
-restriction_LF(Type,TYPEMASK,X,isa(X,Type)):- plt,loop_check(type(Type)),atom(Type),gen_typemask(Type,TYPEMASK).
+subject_LF(thing,Type,TYPEMASK,X,isa(X,Type)):- plt,loop_check(type(Type)),atom(Type),gen_typemask(Type,TYPEMASK).
+subject_LF(restriction,Type,TYPEMASK,X,isa(X,Type)):- plt,loop_check(type(Type)),atom(Type),gen_typemask(Type,TYPEMASK).
 
 
 gen_typemask(Type,measure&Type&_):-formattype(Type),!.
@@ -400,13 +427,13 @@ t11:-
 
 
 noun_plu_db(properties,property).
-thing_LF(property,feature&mpred,X,objectProperty(X),[],_).
-property_LF(property,feature&mpred,X,feature&type&_,Y, hasPropertyOrValue(Y,X),[],_,_).
+subject_LF(thing,property,feature&mpred,X,objectProperty(X)).
+subj_obj_LF(property,property,feature&mpred,X,feature&type&_,Y, hasPropertyOrValue(Y,X)).
 
 /* IS A SPECILIZATION OF A MPRED */
 
 noun_plu_db(mpreds,mpred).
-thing_LF(mpred,feature&mpred,X,mpred(X),[],_).
+subject_LF(thing,mpred,feature&mpred,X,mpred(X)).
 
 objectProperty(P) :- hasProperty(_,P).
 
@@ -415,14 +442,14 @@ hasPropertyOrValue(T,PorV):- (PorV=P;PorV=V), hasPropertyValue(T,P,V),(PorV=P;Po
 hasProperty(Type,P):-hasPropertyValue(Type,P,_).
 
 hasPropertyValue(SomeType,P,SomeVType):-mpred_arity(P,A),A>=2,argIsa_call(P,1,SomeType),argIsa_call(P,A,SomeVType).
-hasPropertyValue(Type,P,Area) :- property_LF(Area,_Measure&Area,_X,feature&TYPELIST,_Y,Pred,[],_,_),deepestType(TYPELIST,Type),get_1st_order_functor(Pred,P),deepestType(TYPELIST,Type).
+hasPropertyValue(Type,P,Area) :- subj_obj_LF(property,Area,_Measure&Area,_X,feature&TYPELIST,_Y,Pred),deepestType(TYPELIST,Type),get_1st_order_functor(Pred,P),deepestType(TYPELIST,Type).
 
 get_1st_order_functor(Pred,P):-not(compound(Pred)),!,P=Pred.
 get_1st_order_functor(Pred,P):-get_functor(Pred,F),(is_2nd_order_holds(F)->((arg(1,Pred,A),!,get_1st_order_functor(A,P)));P=F).
 
 /* THAT IS HAD */
 /*
-trans_LF(has,feature&mpred,X,feature&type,Y,hasProperty(Y,X),[],_,_).
+trans_LF(has,feature&mpred,X,feature&type,Y,hasProperty(Y,X),[], _,_).
 verb_root_db(has).
 regular_pres_db(has).
 regular_past_db(had,has).
@@ -442,8 +469,8 @@ typeAssignableTo(Type,SomeType):-transitive_subclass(Type,SomeType).
 typeAssignableTo(_Type,SomeType):-formattype(SomeType).
 
 
-%hook:fact_always_true(isa(Type,type)):- clause(thing_LF(Type,feature&_,_X,_,[],_),true).
-%hook:fact_always_true(isa(Type,type)):- clause(restriction_LF(Type,feature&_,_X,_),true).
+%hook:fact_always_true(isa(Type,type)):- clause(subject_LF(thing,Type,feature&_,_X,_),true).
+%hook:fact_always_true(isa(Type,type)):- clause(subject_LF(restriction,Type,feature&_,_X,_),true).
 
 
 type_allowed(feature&TYPEMASK,Type):-nonvar(TYPEMASK),!,type_allowed(TYPEMASK,Type),!.
@@ -482,10 +509,10 @@ name_template_db(X,feature& _ & ISA ) :- plt,  nonvar(ISA), isa(X,ISA).
 % FACETS (Adjectives) 
 % =================================================================
 
-restriction_LF(african,feature&_,X,african(X)).
-restriction_LF(american,feature&_,X,american(X)).
-restriction_LF(asian,feature&_,X,asian(X)).
-restriction_LF(european,feature&_,X,european(X)).
+subject_LF(restriction,african,feature&_,X,african(X)).
+subject_LF(restriction,american,feature&_,X,american(X)).
+subject_LF(restriction,asian,feature&_,X,asian(X)).
+subject_LF(restriction,european,feature&_,X,european(X)).
 
 african(X) :- in_ploc(X,africa).
 american(X) :- in_ploc(X,america).
@@ -540,7 +567,7 @@ ocw_db3(W,SPOS):- 'suffixString'(CycWord,String),String\='',atom_concat(_First,S
 simplePOS(POS,SIMP):-posName(SIMP),atom_concat(_,SIMP,POS).
 
 
-restriction_LF(AdjNounEan,feature&_,X,adjIsa(X,AdjNounEan)):- plt, adj_db(AdjNounEan,restr),not_ccw(AdjNounEan).
+subject_LF(restriction,AdjNounEan,feature&_,X,adjIsa(X,AdjNounEan)):- plt, adj_db(AdjNounEan,restr),not_ccw(AdjNounEan).
 adjIsa(E,C):- call_mpred(isa_backchaing(E,C)).
 adj_db(AdjNounEan,restr):- plt,talk_db(adj,AdjNounEan),talk_db(noun1,AdjNounEan,_).
 adj_db(AdjRestr,restr):-plt,talk_db(adj,AdjRestr),not(adj_db(AdjRestr,quant)),not(adverb_db(AdjRestr)).
@@ -583,7 +610,7 @@ regular_past_db(bordered,border).
 verb_form_db(borders,border,pres+fin,3+sg).
 verb_form_db(bordering,border,pres+part,_).
 verb_type_db_0(border,main+tv).
-trans_LF(border, feature&place&_,X,feature&place&_,Y,borders(X,Y),[],_,_).
+trans_LF(border, feature&place&_,X,feature&place&_,Y,borders(X,Y),[], _,_).
 
 borders(X,C) :- var(X), nonvar(C), !, borders(C,X).
 borders(afghanistan,iran).
@@ -592,10 +619,10 @@ borders(iran,afghanistan).
 
 /* THAT HAS COUNTABLE ATTRIBUTES SUCH AS.. */
 
-thing_LF(longitude,measure&position,X,longitude80(X),[],_).
-thing_LF(latitude,measure&position,X,latitude80(X),[],_).
-property_LF(longitude,measure&position,X,feature&_,Y,longitude80(Y,X),[],_,_).
-property_LF(latitude, measure&position,X,feature&_,Y,latitude80(Y,X),[],_,_).
+subject_LF(thing,longitude,measure&position,X,longitude80(X)).
+subject_LF(thing,latitude,measure&position,X,latitude80(X)).
+subj_obj_LF(property,longitude,measure&position,X,feature&_,Y,longitude80(Y,X)).
+subj_obj_LF(property,latitude, measure&position,X,feature&_,Y,latitude80(Y,X)).
 noun_plu_db(longitudes,longitude). noun_plu_db(latitudes,latitude).
 
 longitude80(C,L--degrees) :- country(C,_,_,L,_,_,_,_).
@@ -636,9 +663,9 @@ westof(X1,X2) :- longitude(X1,L1), longitude(X2,L2), exceeds(L1,L2).
 % ------------------------------
 noun_plu_db(populations,population).
 
-thing_LF(population,measure&countables,X,population(X),[],_).
+subject_LF(thing,population,measure&countables,X,population(X)).
 
-property_LF(population, measure&countables,X,feature&_,Y,population(Y,X),[],_,_).
+subj_obj_LF(property,population, measure&countables,X,feature&_,Y,population(Y,X)).
 
 population(C,P--thousand) :- city(C,_,P).
 population(C,P--million) :- country(C,_,_,_,_,P0,_,_), P is integer(P0/1.0E6).
@@ -656,8 +683,8 @@ measure_unit_type_db(million,measure&countables,[],million).
 
 noun_sin_db(QuantProp):- quantity_props_db(_OfType,QuantProp).
 
-thing_LF(QuantProp,measure&OfType,X,denotesQuantity(X,OfType),[],_):- quantity_props_db(OfType,QuantProp).
-property_LF(QuantProp, measure&OfType,X,feature&_,Y,holds_t(QuantProp,Y,X),[],_,_):- quantity_props_db(OfType,QuantProp).
+subject_LF(thing,QuantProp,measure&OfType,X,denotesQuantity(X,OfType)):- quantity_props_db(OfType,QuantProp).
+subj_obj_LF(property,QuantProp, measure&OfType,X,feature&_,Y,holds_t(QuantProp,Y,X)):- quantity_props_db(OfType,QuantProp).
 
 quantity_props_db(inches,height).
 
@@ -676,7 +703,7 @@ regular_pres_db(contain).
 regular_past_db(contained,contain).
 verb_form_db(contains,contain,pres+fin,3+sg).
 verb_form_db(containing,contain,pres+part,_).
-trans_LF(contain,feature&place&_,X,feature&_,Y,in_ploc(Y,X),[],_,_).
+trans_LF(contain,feature&place&_,X,feature&_,Y,in_ploc(Y,X),[], _,_).
 
 contains80(X,Y) :- contains0(X,Y).
 contains80(X,Y) :- contains0(X,W), contains80(W,Y).
@@ -689,16 +716,19 @@ contains0(america,north_america).
 % ------------------------------
 context_pron_db(in,place,where).
 context_pron_db(at,time,when).
+% TODO context_pron_db(for,reason,why).
+% TODO context_pron_db(by,method,how).
 
 adjunction_lf(in,feature&_-X,feature&place&_-Y,in_ploc(X,Y)).
 
+:-export(in_ploc/2).
 in_ploc(X,Y) :- var(X), nonvar(Y), !, contains80(Y,X).
-in_ploc(X,Y) :- in0(X,W), ( W=Y ; in_ploc(W,Y) ).
+in_ploc(X,Y) :- in_01(X,W), ( W=Y ; in_ploc(W,Y) ).
 
-in0(X,Y) :- in_continent(X,Y).
-in0(X,Y) :- city(X,Y,_).
-in0(X,Y) :- country(X,Y,_,_,_,_,_,_).
-in0(X,Y) :- flows(X,Y).
+in_01(X,Y) :- in_continent(X,Y).
+in_01(X,Y) :- city(X,Y,_).
+in_01(X,Y) :- country(X,Y,_,_,_,_,_,_).
+in_01(X,Y) :- flows(X,Y).
 
 in_continent(middle_east,  asia).
 
@@ -757,8 +787,8 @@ flow_links([_|L],X1,X2) :- flow_links(L,X1,X2).
 % ------------------------------
 
 noun_plu_db(areas,area).
-thing_LF(area,measure&area,X,isa_area(X),[],_).
-property_LF(area,measure&area,X,feature&place&_,Y,areaOf(Y,X),[],_,_).
+subject_LF(thing,area,measure&area,X,isa_area(X)).
+subj_obj_LF(property,area,measure&area,X,feature&place&_,Y,areaOf(Y,X)).
 areaOf(C,A--ksqmiles) :- country(C,_,_,_,A0,_,_,_), A is A0/1000.
 isa_area(_X--ksqmiles).
 
@@ -775,13 +805,13 @@ noun_plu_db(sqmiles,sqmile).
 
 property_measured_in_db(area,sqmile,sqmiles).
 +
-property_LF(area,measure&area,X,feature&place&_,Y,areaOf(Y,X),[],_,_).
+subj_obj_LF(property,area,measure&area,X,feature&place&_,Y,areaOf(Y,X)).
 
 ->
 
 noun_plu_db(areas,area).
-thing_LF(area,measure&area,X,isa_area(X),[],_).
-property_LF(area,measure&area,X,feature&place&_,Y,areaOf(Y,X),[],_,_).
+subject_LF(thing,area,measure&area,X,isa_area(X)).
+subj_obj_LF(property,area,measure&area,X,feature&place&_,Y,areaOf(Y,X)).
 areaOf(C,A--ksqmiles) :- country(C,_,_,_,A0,_,_,_), A is integer(A0/1000).
 isa_area(_X--ksqmiles).
 
@@ -796,6 +826,10 @@ noun_plu_db(sqmiles,sqmile).
 
 
 */
+
+subject_LF(thing,CountNoun,feature&_,X,isa(X,RootNoun)):-  plt, clex_noun(CountNoun, RootNoun,_,_,_),not(ratio_db(RootNoun,_,_,_)).
+subject_LF(thing,CountNoun,feature&_,X,adjIsa2(X,RootNoun)):- plt, clex_adj(CountNoun, RootNoun,_),not(ratio_db(RootNoun,_,_,_)).
+
 
 
 /* Measure of Proportions and the like */
@@ -841,7 +875,7 @@ regular_pres_db(exceed).
 regular_past_db(exceeded,exceed).
 verb_form_db(exceeds,exceed,pres+fin,3+sg).
 verb_form_db(exceeding,exceed,pres+part,_).
-trans_LF(exceed,measure&Type,X,measure&Type,Y,exceeds(X,Y),[],_,_).
+trans_LF(exceed,measure&Type,X,measure&Type,Y,exceeds(X,Y),[], _,_).
 attribute_db(great,measure&Type,X,measure&Type,Y,exceeds(X,Y)).
 
 

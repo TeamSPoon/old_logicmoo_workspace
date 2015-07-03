@@ -153,7 +153,7 @@ i_adjs([Adj|Adjs],X,T,T0,Head0,Head,Pred0,Pred) :-
    i_adjs(Adjs,X,T1,T0,Head1,Head,Pred1,Pred).
 
 i_adj(adj(Adj),Type-X,T,T,Head,Head,'`'(P)&Pred,Pred) :-
-   no_repeats(restriction_LF(Adj,Type,X,P)).
+   no_repeats(subject_LF(restriction,Adj,Type,X,P)).
 i_adj(adj(Adj),TypeX-X,TypeV-V,_,
    aggr(F,V,[X],Head,Pred),Head,'`'(true),Pred) :-
    aggr_adj_db(Adj,TypeV,TypeX,F).
@@ -287,12 +287,12 @@ pos_conversion_db(nb(N),Op,_,N,Op).
 
 noun_template(Noun,TypeV,V,'`'(P),
       [slot(poss,TypeO,O,Os,index)|Slots]) :-
-   no_repeats(property_LF(Noun,TypeV,V,TypeO,O,P,Slots,Os,_)).
+   no_repeats(subj_obj_LF(property,Noun,TypeV,V,TypeO,O,P)),Slots=[],Os=_.
 noun_template(Noun,TypeV,V,aggr(F,V,[],'`'(true),'`'(true)),
    [slot(prep(of),TypeS,_,_,free)]) :-
    aggr_noun_db(Noun,TypeV,TypeS,F).
 noun_template(Noun,Type,X,'`'(P),Slots) :-
-   no_repeats(thing_LF(Noun,Type,X,P,Slots,_)).
+   no_repeats(subject_LF(thing,Noun,Type,X,P)),Slots=[].
 noun_template(Noun,TypeV,V,apply(F,P),
       [slot(prep(of),TypeX,X,_,apply)]) :-
    meta_noun_db(Noun,TypeV,V,TypeX,X,P,F).
