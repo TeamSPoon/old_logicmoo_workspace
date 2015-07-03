@@ -1,4 +1,5 @@
 syntax: glob
+pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar
 *.bak
 *.ori
 *.pl~
