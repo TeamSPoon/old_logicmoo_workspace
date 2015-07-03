@@ -17,7 +17,7 @@ echo "searching for java-8-oracle"
 echo '#!/bin/bash'> start_mud_server.sh
 find /usr -name java-8-oracle -printf "export JAVA_HOME=%p/jre\n" >> start_mud_server.sh
 echo 'export LD_LIBRARY_PATH="${JAVA_HOME}/lib/amd64/server:${JAVA_HOME}/lib/amd64:${JAVA_HOME}/bin:${PATH}:${LD_LIBRARY_PATH}"' >>  start_mud_server.sh
-echo 'swipl -f runtime/run_mud_server.pl' >>  start_mud_server.sh
+echo '(source scripts/mudServer.sh)' >>  start_mud_server.sh
 chmod +x start_mud_server.sh
 
 if [! -f $STANFORD_JAR]; then 
