@@ -142,6 +142,11 @@ pre_http_location(yui_examples, yui_base(examples), [js(true)]).
 pre_http_location(yui_base, www('yui/2.7.0'), []).
 pre_http_location(pldoc, root('help/source'), [priority(10)]).
 
+
+%pre_http_location(hmud_files, '/hmud', [prefix,js(true)]).
+:- http_handler('/hmud/', http_reply_from_files('../pack/hMUD/', []), [prefix]).
+%user:file_search_path(hmud_files, '../pack/hMUD')).
+
 % :- lsting((pre_http_location(_, _, _))), retractall((pre_http_location(cliopatria, root('.'), []))), retractall((pre_http_location(_, root('.'), []))),!.
 % doesn't descend from root because that's being moved for cliopatria
 % http:location(cliopatria, root(cliopatria), [priority(100)]).

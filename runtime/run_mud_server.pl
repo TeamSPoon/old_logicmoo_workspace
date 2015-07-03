@@ -91,7 +91,7 @@ user:file_search_path(prologmud, library(prologmud)).
 % Regression tests that first run whenever a person stats the MUD on the public server
 % ==========================================================
 
-:- if((hostname(titan),fail)). % INFO this fail is so we can start faster
+:- if((gethostname(titan),fail)). % INFO this fail is so we can start faster
 :- doall(user:regression_test).
 :- endif.
 
@@ -239,7 +239,7 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 % :- pce_show_profile.
 
 */
-:- enqueue_agent_action(prolog).
+% :- enqueue_agent_action(prolog).
 
 % ==============================
 % MUD GAME REPL 

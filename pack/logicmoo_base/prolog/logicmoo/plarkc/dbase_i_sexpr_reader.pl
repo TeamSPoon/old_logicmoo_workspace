@@ -1,5 +1,8 @@
 
 
+
+
+
 :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api)).
 
 
@@ -9,13 +12,14 @@ end_of_file.
 end_of_file.
 end_of_file.
 
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     Lisprolog -- Interpreter for a simple Lisp. Written in Prolog.
     Written Nov. 26th, 2006 by Markus Triska (triska@gmx.at).
     Public domain code.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+:-module(logicmoo_i_sexp_reader,[codelist_to_forms/2,parse_to_source/2,get_source/1,lisp_read/2,l_open_input/2]).
 
-%:-module(logicmoo_i_sexp_reader,[codelist_to_forms/2,parse_to_source/2,get_source/1,lisp_read/2,l_open_input/2]).
 :- style_check(-singleton).
 :- style_check(-discontiguous).
 % :- style_check(-atom).
@@ -104,13 +108,13 @@ sexpr(E,C,X,Z) :- swhite([C|X],Y), sexpr(E,Y,Z).
 % dquote semicolon parens  hash qquote comma, backquote
 sym_char(C) :- C > 32, not(member(C,[34,59,40,41,35,39,44,96])).  
 
-
+:- if( \+ current_predicate(l_open_input/2)).
 l_open_input(InS,InS):-is_stream(InS),!.
 l_open_input((InS),In):-string(InS),!,l_open_input(string(InS),In).
 l_open_input(string(InS),In):-text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
 l_open_input(Filename,In) :- catch(see(Filename),_,fail),current_input(In),!.
 l_open_input(InS,In):-text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
-
+:- endif.
 
 to_untyped(s(S),O):-!,to_untyped(S,O).
 to_untyped(comma(S),comma(O)):-!,to_untyped(S,O).

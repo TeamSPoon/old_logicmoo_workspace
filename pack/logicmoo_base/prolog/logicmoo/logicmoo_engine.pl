@@ -1191,7 +1191,7 @@ tsn:- with_all_dmsg(forall(clause(snark,C),must(C))).
 tsnark:- snark_test_string(TODO),snark(string(TODO),current_output).
 
 :- multifile(user:sanity_test/0).
-user:sanity_test:- tsn.
+user:regression_test:- tsn.
 
 :- thread_local(snark_action_mode/1).
 :- asserta_if_new(snark_action_mode(tell)).
@@ -1199,12 +1199,14 @@ user:sanity_test:- tsn.
 :- thread_local(snark_reader_mode/1).
 :- asserta_if_new(snark_reader_mode(lisp)).
 
+:- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api)).
 
 snark_read(In,Wff,Vs):- 
   (snark_reader_mode(lisp) -> 
-    catch((lisp_read(In,WffIn),with_output_to(atom(A),write_term(WffIn,
+    catch((lisp_read(In,_,WffIn),with_output_to(atom(A),write_term(WffIn,
       [module(logicmoo_i_snark),numbervars(true),quoted(true)])),
      read_term_from_atom(A,Wff,[module(logicmoo_i_snark),double_quotes(string),variable_names(Vs)])),E,(fmt(E),fail));
+
       catch(read_term(In,Wff,[module(logicmoo_i_snark),double_quotes(string),variable_names(Vs)]),E,(fmt(E),fail))).
 
 %= ===== to test program =====-
@@ -1213,8 +1215,17 @@ snark_read(In,Wff,Vs):-
 :- export(snark/0).
 snark:- current_input(In),current_output(Out),!,snark(In,Out).
 
-open_input(InS,InS):- is_stream(InS),!.
-open_input(string(InS),In):- text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
+%open_input(InS,InS):- is_stream(InS),!.
+%open_input(string(InS),In):- text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
+
+:- if( \+ current_predicate(l_open_input/2)).
+l_open_input(InS,InS):-is_stream(InS),!.
+l_open_input((InS),In):-string(InS),!,l_open_input(string(InS),In).
+l_open_input(string(InS),In):-text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
+l_open_input(Filename,In) :- catch(see(Filename),_,fail),current_input(In),!.
+l_open_input(InS,In):-text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
+:- endif.
+
 
 :- export(snark/2).
 snark(InS,Out):- 
