@@ -1,6 +1,7 @@
 #!/bin/bash
 export OLDPWD="`pwd`"
 export NEWPWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )"   
+export STANFORD_JAR="pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar"
 
 sudo apt-get install python-software-properties
 sudo apt-add-repository -y ppa:swi-prolog/devel
@@ -10,6 +11,7 @@ sudo apt-get install swi-prolog oracle-java8-installer
 echo select java 8
 sudo update-alternatives --config java
 
+
 rm -f start_mud_server.sh
 echo "searching for java-8-oracle"
 echo '#!/bin/bash'> start_mud_server.sh
@@ -18,9 +20,8 @@ echo 'export LD_LIBRARY_PATH="${JAVA_HOME}/lib/amd64/server:${JAVA_HOME}/lib/amd
 echo 'swipl -f runtime/run_mud_server.pl' >>  start_mud_server.sh
 chmod +x start_mud_server.sh
 
-if ! [ -f pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar]
-then
- wget -N http://prologmoo.com/downloads/stanford-corenlp3.5.2-ALL.jar -O pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar
+if ![-f $STANFORD_JAR]; then 
+wget http://prologmoo.com/downloads/stanford-corenlp3.5.2-ALL.jar -O $STANFORD_JAR
 fi
 
 # 3,625 inferences, 6.003 CPU in 6.014 seconds (100% CPU, 604 Lips)
