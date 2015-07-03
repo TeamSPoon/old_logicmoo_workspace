@@ -9,8 +9,11 @@ git fetch --recurse-submodules
 git submodule init
 git submodule update
 
-# return 0
-[ $PS1 ]&&return||exit;
+
+( source ./scripts/preconfig.sh )
+
+
+return 0
 
 ---------------------------------------------------------------------
 Example output
