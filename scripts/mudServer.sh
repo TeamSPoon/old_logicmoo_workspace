@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./clone_externals.sh 2>/dev/null
+#./clone_externals.sh 2>/dev/null
 ./pack/hMUD/policyd
 
 export OLDPWD="`pwd`"
