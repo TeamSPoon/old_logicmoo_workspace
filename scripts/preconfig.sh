@@ -1,6 +1,6 @@
 #!/bin/bash
 export OLDPWD="`pwd`"
-export NEWPWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/ && pwd )"   
+export NEWPWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )"   
 
 sudo apt-get install python-software-properties
 sudo apt-add-repository -y ppa:swi-prolog/devel
@@ -11,16 +11,27 @@ echo select java 8
 sudo update-alternatives --config java
 
 rm -f start_mud_server.sh
+echo "searching for java-8-oracle"
 find /usr -name java-8-oracle -printf "export JAVA_HOME=%p/jre\n" > start_mud_server.sh
 echo 'export LD_LIBRARY_PATH="${JAVA_HOME}/lib/amd64/server:${JAVA_HOME}/lib/amd64:${JAVA_HOME}/bin:${PATH}:${LD_LIBRARY_PATH}"' >>  start_mud_server.sh
+echo 'swipl -f runtime/run_mud_server.pl' >>  start_mud_server.sh
 
-if ! [ -f ../pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar]
- wget -N http://prologmoo.com/downloads/stanford-corenlp3.5.2-ALL.jar -O ../pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar
+if ! [ -f pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar]
+ wget -N http://prologmoo.com/downloads/stanford-corenlp3.5.2-ALL.jar -O pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar
 fi
 
-% 3,625 inferences, 6.003 CPU in 6.014 seconds (100% CPU, 604 Lips)
-% 1,828,987,011 inferences, 316.932 CPU in 319.418 seconds (99% CPU, 5770916 Lips)
-swipl -g "time(load_files(['../pack/pldata_larkc/prolog/el_holds/el_assertions'],[qcompile(auto),if_needed(true)])),halt."
+# 3,625 inferences, 6.003 CPU in 6.014 seconds (100% CPU, 604 Lips)
+# 1,828,987,011 inferences, 316.932 CPU in 319.418 seconds (99% CPU, 5770916 Lips)
+echo "Compiling a 1gb file this might take about 5 minutes after this it will only take 6 seconds to load"
+swipl -g "time(load_files(['pack/pldata_larkc/prolog/el_holds/el_assertions'],[qcompile(auto),if_needed(true)])),halt."
+
+if [ ! -d /var/www/html/hmud/ ]; then
+ sudo ln -s `pwd`/pack/hMUD /var/www/html/hmud/
+fi
+
+# safe to run more than once
+sudo adduser --gecos "PrologMUD User" --disabled-login --disabled-password prologmud
+
 
 return 0
 
