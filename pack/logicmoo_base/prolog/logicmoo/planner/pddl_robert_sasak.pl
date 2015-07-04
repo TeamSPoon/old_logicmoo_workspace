@@ -961,7 +961,7 @@ constraints(C)                  --> pddl_3_0, ['(',':',constraints], con_GD(C), 
 structure_def(A)                --> action_def(A).
 %structure_def(D)               --> durative_action_def(D).                                                                    %:durativeactions
 %structure_def(D)               --> derived_def(D).                                                                            %:derivedpredicates
-%typed_list(W, G)               --> oneOrMore(W, N), ['-'], type(T), {G =.. [T, N]}.
+%typed_list(W, G)               --> oneOrMore(W, N), ['-'], type(T), {(atom(T)-> G =.. [T,N] ; G = isa(N,T))}.
 typed_list(W, [G|Ns])           --> oneOrMore(W, N), ['-'], type(T), !, typed_list(W, Ns), {G =.. [T,N]}.
 typed_list(W, N)                --> zeroOrMore(W, N).
 
@@ -986,10 +986,20 @@ action_def(action(S, L, Precon, Pos, Neg, Assign))
                                     dcgMust(([':',parameters,'('], typed_list(variable, L), [')'])),
                                     dcgMust((action_def_body(Precon, Pos, Neg, Assign))),
                                     [')'].
+
 action_symbol(N)                --> name(N).
+
+% % 2 ?- phrase(emptyOr(pre_GD(P)),['(',accessible,?,x,')','(','no-inventory-object',?,x,')','(','has-location',?,x,?,y,')'],X).
+% % P = accessible(?x),
+% % X = ['(', 'no-inventory-object', ?, x, ')', '(', 'has-location', ?, x|...] .
+
 action_def_body(P, Pos, Neg, Assign)
-                                --> (([':',precondition], emptyOr(pre_GD(P)))                ; []),
+                                -->  (([':',precondition], emptyOr(pre_GD(P)))                ; []),
                                     (([':',effect],       emptyOr(effect(Pos, Neg, Assign))) ; []).
+
+%% [1] 2 ?- pre_GD(X,['(',accessible,?,x,')'],[]).
+%% X = accessible(?x) .
+% pre_GD(_)			--> [:,effect],{!,fail}.
 pre_GD([F])                     --> atomic_formula(term, F), !.
 pre_GD(P)                       --> pref_GD(P).
 pre_GD(and(P))                  --> ['(',and],   zeroOrMore(pre_GD ,P), [')'].       
@@ -1024,7 +1034,8 @@ f_exp(H)                        --> f_head(H).
 f_head(F)                       --> ['('], function_symbol(S), zeroOrMore(term, T), [')'], { F =.. [S|T] }.
 f_head(S)                       --> function_symbol(S).
 binary_op(O)                    --> multi_op(O).
-binary_op(45)                   --> [45]. % 45 = minus = '-'  (TODO - WHY IS THIS HERE?)
+% binary_op(45)                   --> [45]. % 45 = minus = '-'  (TODO - WHY IS THIS HERE?)
+% binary_op('-')			--> ['−'].
 binary_op('-')                  --> ['-'].
 binary_op('/')                  --> ['/'].
 multi_op('*')                   --> ['*'].
@@ -1067,7 +1078,7 @@ oneOrMore(W, [R|Rs], A, C) :- F =.. [W, R, A, B], F, (
 zeroOrMore(W, R)                --> oneOrMore(W, R).
 zeroOrMore(_, [])               --> [].
 
-% Name is everything that is not number_sas, bracket or question mark.
+% Name is everything that is not number, bracket or question mark.
 % Those rules are not necessary, but rapidly speed up parsing process.
 name(N,S,E):-notrace(name0(N,S,E)).
 name0(N)                         --> [N], {number(N), !, fail}.
@@ -1122,7 +1133,7 @@ parseProblem(F, O, R) :-
 
 
 
-% DCG rules describing structure of problem file in language PDDL.
+% List of DCG rules describing structure of problem file in language PDDL.
 %
 %   BNF description was obtain from http://www.cs.yale.edu/homes/dvm/papers/pddl-bnf.pdf
 %   This parser do not fully NOT support PDDL 3.0
@@ -1151,8 +1162,6 @@ object_declaration(L)           --> ['(',':',objects], typed_list_as_list(name, 
 typed_list_as_list(W, OUT)   --> oneOrMore(W, N), ['-'],!, dcgMust(( type(T), typed_list_as_list(W, Ns), {
  (atom(T)-> G =.. [T,N] ; G = isa(N,T)), OUT = [G|Ns]})).
 typed_list_as_list(W, N)        --> zeroOrMore(W, N).
-
-
 
 init(I)                         --> ['(',':',init], zeroOrMore(init_el, I), [')'].
 
