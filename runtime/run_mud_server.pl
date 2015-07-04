@@ -47,42 +47,35 @@ user:file_search_path(prologmud, library(prologmud)).
 % [Required] most of the Library system should not be loaded with mpred expansion on
 :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 
-% [Mostly Required] Load the Logicmoo Planner/AI System
-:- time(with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner))))).
-
-% for debugging the planner
-:- if((gethostname(titan),fail)).
-:- module(pddl_robert_sasak).
-:- prolog.
-:- endif.
-
 % [Required] Load the Logicmoo WWW System
 :- time(ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
 :- asserta(thlocal:disable_mpred_term_expansions_locally).
 :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 
-
 % [Required] Load the Logicmoo Backchaining Inference System
 :- time(with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
+
+% [Mostly Required] Load the Logicmoo Parser/Generator System
+:- time(user:ensure_loaded(library(parser_all))).
 
 % [Required] most of the Library system should not be loaded with mpred expansion on
 :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 
-% [Required] Load the CYC Network Client and Logicmoo CycServer Emulator (currently server is disabled)
+% [Required] Load the Logicmoo Backchaining Inference System
 :- with_no_mpred_expansions(user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api))).
 
 % [Optional] Load the Logicmoo RDF/OWL Browser System
 %:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(mpred_online/dbase_i_rdf_store)))).
 
-% [Mostly Required] Load the Logicmoo Parser/Generator System
-:- time(user:ensure_loaded(library(parser_all))).
-
+% [Mostly Required] Load the Logicmoo Planner/AI System
+%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_planner)))).
 
 % [Debugging] Normarily this set as 'true' can interfere with debugging
 % :- set_prolog_flag(gc,true).
 % Yet turning it off we cant even startup without crashing
 
 :- doall(show_call(current_prolog_flag(_N,_V))).
+
 
 
 % ==========================================================
@@ -180,13 +173,13 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 % [Manditory] This loads the game and initializes so test can be ran
 :- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
 
+:- if_startup_script( finish_processing_world).
+
+:- enqueue_agent_action("rez crackers").
+
 
 % [Never] saves about a 3 minute compilation time (for when not runing mud)
-:- if((gethostname(titan),fail)).
-:- if_startup_script( finish_processing_world).
-:- enqueue_agent_action("rez crackers").
-:- prolog.
-:- endif.
+:- show_call(gethostname(titan)-> prolog ; true).
 
 
 % [Optional] the following game files though can be loaded separate instead
@@ -202,17 +195,19 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 :- if_startup_script(finish_processing_world).
 
 
-feature_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
+sanity_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
 
-:- if((gethostname(titan);true)).
 
-% :-feature_testp1.
+
+/*
+
+:-sanity_testp1.
 
 % [Optionaly] Run a battery of tests
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 
 % [Optionaly] Run a battery of tests
-% :- if_startup_script( doall(user:regression_test)).
+:- if_startup_script( doall(user:regression_test)).
 
 
 sanity_test0a:- enqueue_agent_action("hide").
@@ -237,6 +232,7 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 
 :-sanity_test2.
 
+% :- enqueue_agent_action(prolog).
 
 % [Optionaly] Tell the NPCs to do something every 60 seconds (instead of 90 seconds)
 % :- register_timer_thread(npc_ticker,60,npc_tick).
@@ -244,8 +240,7 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 
 % :- pce_show_profile.
 
-:-endif.  % MUD TESTS
-% :- enqueue_agent_action(prolog).
+*/
 
 % ==============================
 % MUD GAME REPL 
@@ -255,4 +250,4 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 
 % So scripted versions don't just exit
 :- if_startup_script(at_start(prolog)).
-
+   

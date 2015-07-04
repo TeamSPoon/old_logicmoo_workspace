@@ -1,5 +1,7 @@
 
-:- module(pddl_robert_sasak,[test_blocks/0,test_domain/1,test_all/0,test_rest/0,test_sas/0,test_dir_files_sas/1,test_dir_files_sas/3]).
+:- module(pddl_robert_sasak,[test_blocks/0,test_domain/1,test_all/0,test_rest/0,test_sas/0,
+   test_dir_files_sas/1,test_dir_files_sas/3,
+   solve_files/2]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FILENAME:  common.pl 
@@ -83,7 +85,7 @@ user:sanity_test:- test_blocks.
 solve_files(DomainFile, ProblemFile):- 
  forall(must(filematch_sas(DomainFile,DomainFile0)),
    forall(must(filematch_sas(ProblemFile,ProblemFile0)),
-     must(time(solve_files_0(DomainFile0, ProblemFile0))))).
+     time(must(solve_files_0(DomainFile0, ProblemFile0))))),!.
 
 solve_files_0(DomainFile, ProblemFile):-
   format('~q.~n',[solve_files(DomainFile, ProblemFile)]),
@@ -93,7 +95,7 @@ solve_files_0(DomainFile, ProblemFile):-
     term_to_ord_term(PP, P),
     reset_statistic)),
     !,
-    gripe_time(45,time_out(solve(D, P, S), 90000, _Result)), % time limit for a planner (was 500000)
+    gripe_time(45,time_out(solve(D, P, S), 50000, _Result)), % time limit for a planner (was 500000)
     show_statistic(P, S),
     !.
 
@@ -895,32 +897,32 @@ pddl_3_0_e(_Feature) --> {fail, can_pddl_30}, [],!.
 % Support for reading file as a list.
 % :- [readFile].
 
-
 % Defining operator ?. It is a syntax sugar for marking variables: ?x
 :- op(300, fy, ?).
 
 
-% domainBNF(domain(N, R, T, C, P, F, C, S))
+% domainBNF(domain(N, R, T, C, P, F, C, S, Slack))
 %
 %   DCG rules describing structure of domain file in language PDDL.
 %   BNF description was obtain from http://www.cs.yale.edu/homes/dvm/papers/pddl-bnf.pdf
 %   This parser do not fully NOT support PDDL 3.0
 %   However you will find comment out lines ready for futher development.
 %
-domainBNF(domain(N, R, T, C, P, F, C, S))
+domainBNF(domain(N, R, T, C, P, F, C, S /*, Slack*/))
                         --> ['(','define', '(','domain'], name(N), [')'],
-                        dcgMust(domainBNF_rest( R, T, C, P, F, C, S)).
-domainBNF_rest( R, T, C, P, F, C, S) --> 
-                            dcgMust(require_def(R)    ; []),
-                             dcgMust(types_def(T)      ; []), %:typing
+g                        dcgMust(domainBNF_rest( R, T, C, P, F, C, S, Slack)).
+domainBNF_rest( R, T, C, P, F, C, S, Slack) --> 
+                             dcgMust(dcgOptionalGreedy(require_def(R))),
+                             dcgMust(dcgOptionalGreedy(types_def(T))),!, %:typing
                              dcgMust(constants_def(C)  ; []),
                              dcgMust(predicates_def(P) ; []),
                              dcgMust(functions_def(F)  ; []), %:fluents
-%                            dcgMust (constraints(C)   ; []),    %:constraints
-                             dcgMust(zeroOrMore(structure_def, S)),
-                             [')'].
+%                            dcgMust(constraints(C)   ; []),    %:constraints
+                             dcgMust(oneOrMore(structure_def, S)),
+   						     zeroOrMore(anythings, Slack),
+                             dcgMust([')']).
 
-require_def(R)          --> ['(',':','requirements'], oneOrMore(require_key, R), [')'].
+require_def(R)          --> ['(',':','requirements'], dcgMust((oneOrMore(require_key, R), [')'])).
 require_key(strips)                             --> [':strips'].
 require_key(typing)                             --> [':typing'].
 require_key('action-costs')                             --> [':action-costs'].
@@ -941,6 +943,11 @@ require_key(preferences)                        --> [':preferences'].
 require_key(constraints)                        --> [':constraints'].
 % Universal requirements
 require_key(R)                  --> [':', R].
+require_key(A)		--> [R],{atom_concat(':',A,R)}.
+require_key(_)		--> [')'],!,{fail}.
+require_key(R)		--> [R],{R\=')',trace}.
+
+anythings(R)		--> [R],{R\=')',trace}.
 
 types_def(L)                    --> ['(',':',types],      typed_list(name, L), [')'].
 constants_def(L)                --> ['(',':',constants],  typed_list(name, L), [')'].
@@ -955,19 +962,18 @@ atomic_function_skeleton(f(S, L))
                                 --> ['('], function_symbol(S), typed_list(variable, L), [')'].
 function_symbol(S)              --> name(S).
 functions_def(F)                --> ['(',':',functions], function_typed_list(atomic_function_skeleton, F), [')'].              %:fluents
-%constraints(C)                 --> ['(',':',constraints], con_GD(C), [')'].                                                   %:constraints
+constraints(C)                  --> pddl_3_0, ['(',':',constraints], con_GD(C), [')'].                                         %:constraints
 structure_def(A)                --> action_def(A).
 %structure_def(D)               --> durative_action_def(D).                                                                    %:durativeactions
 %structure_def(D)               --> derived_def(D).                                                                            %:derivedpredicates
-%typed_list(W, G)               --> oneOrMore(W, N), ['-'], type(T), {G =.. [T, N]}.
-typed_list(W, [G|Ns])           --> oneOrMore(W, N), ['-'], type(T), !, typed_list(W, Ns), {G =.. [T,N]}.
+typed_list(W, [G|Ns])           --> oneOrMore(W, N), ['-'], type(T), !, typed_list(W, Ns), {(atom(T)-> G =.. [T,N] ; G = isa(N,T))}.
 typed_list(W, N)                --> zeroOrMore(W, N).
 
 effected_typed_list(W, [G|Ns])           --> oneOrMore(W, N), ['-'], effect(T), !, effected_typed_list(W, Ns), {G =.. [T,N]}.
 effected_typed_list(W, N)                --> zeroOrMore(W, N).
 
 primitive_type(N)               --> name(N).
-type(either(PT))                --> ['(',either], !, oneOrMore(primitive_type, PT), [')'].
+type(either(PT))                --> ['(',either], !, dcgMust(( oneOrMore(primitive_type, PT), [')'])).
 type(PT)                        --> primitive_type(PT).
 function_typed_list(W, [F|Ls])
                                 --> oneOrMore(W, L), ['-'], !, function_type(T), function_typed_list(W, Ls), {F =.. [T|L]}.    %:typing
@@ -979,9 +985,10 @@ emptyOr(W)                      --> W.
 
 % Actions definitons
 action_def(action(S, L, Precon, Pos, Neg, Assign))
-                                --> ['(',':',action], action_symbol(S),
-                                    [':',parameters,'('], typed_list(variable, L), [')'], 
-                                    action_def_body(Precon, Pos, Neg, Assign),
+                                --> ['(',':',action],
+                                    dcgMust(action_symbol(S)),
+                                    dcgMust(([':',parameters,'('], typed_list(variable, L), [')'])),{!},
+                                    dcgMust((action_def_body(Precon, Pos, Neg, Assign))),
                                     [')'].
 action_symbol(N)                --> name(N).
 
@@ -989,31 +996,43 @@ action_symbol(N)                --> name(N).
 % % P = accessible(?x),
 % % X = ['(', 'no-inventory-object', ?, x, ')', '(', 'has-location', ?, x|...] .
 
+
+%% [1] 2 ?- pre_GD(X,['(',accessible,?,x,')'],[]).
+%% X = accessible(?x) .
+
+
+% PDDL 2.x Way?
 action_def_body(P, Pos, Neg, Assign)
                                 --> (([':',precondition], emptyOr(pre_GD(P)))                ; []),
                                     (([':',effect],       emptyOr(effect(Pos, Neg, Assign))) ; []).
 
-% % [1] 2 ?- pre_GD(X,['(',accessible,?,x,')'],[]).
-% % X = accessible(?x) .
-% pre_GD(_)			--> [:,effect],{!,fail}.
-pre_GD([F])                     --> atomic_formula(term, F), !.
+% PDDL 3.0 Way?
+action_def_body(P, Pos, Neg, Assign)
+				--> (([':',precondition], zeroOrMore(pre_GD,P)) /*	; []*/),
+				    (([':',effect],      (emptyOr(effect(Pos, Neg, Assign))))	; []).
+
+
+pre_GD(_)			--> [:,effect],{!,fail}.
+% PDDL 2.x 
+% pre_GD([F])                     --> atomic_formula(term, F), !.
 pre_GD(P)                       --> pref_GD(P).
-pre_GD(and(P))                  --> ['(',and],   zeroOrMore(pre_GD ,P), [')'].       
-% pre_GD(P)                       --> ['(',and], dcgMust((pre_GD(P), [')'])).
-% pre_GD(forall(L, P))           --> pddl_3_0, ['(',forall,'('],  dcgMust(((typed_list(variable, L), [')'], pre_GD(P), [')']))).         %:universal-preconditions
-pref_GD(preference(N, P))      --> pddl_3_0, ['(', preference], dcgOptionalGreedy(pref_name(N)),  dcgMust(gd(P)), dcgMust([')']).                         %:preferences
+% PDDL 2.x
+% pre_GD(and(P))                  --> ['(',and],   zeroOrMore(pre_GD ,P), [')'].       
+% PDDL 3.0 Way
+pre_GD(P)                       --> ['(',and], dcgMust((pre_GD(P), [')'])).
+pre_GD(forall(L, P))           -->  ['(',forall,'('],  dcgMust(((typed_list(variable, L), [')'], pre_GD(P), [')']))).         %:universal-preconditions
+pref_GD(preference(N, P))      -->  ['(', preference], dcgOptionalGreedy(pref_name(N)),  dcgMust(gd(P)), dcgMust([')']).                         %:preferences
 pref_GD(P)                      --> gd(P).
 pref_name(N)                    --> name(N).
+gd(L)				--> literal(term, L).								%:negative-preconditions
 
-% gd(and(P))                  --> pddl_3_0_e(gd), ['(',and],   zeroOrMore(gd ,P), [')'].       
 gd(F)                           --> atomic_formula(term, F).                                                    %:this option is covered by gd(L)
-gd(L)                          --> pddl_3_0_e(gd), literal(term, L).                                                           %:negative-preconditions
 gd(P)                           --> ['(',and],  zeroOrMore(gd, P), [')'].
-gd(or(P))                      --> pddl_3_0_e(gd), ['(',or],   zeroOrMore(gd ,P), [')'].                                       %:disjuctive-preconditions
-gd(not(P))                     --> pddl_3_0_e(gd), ['(',not],  gd(P), [')'].                                                   %:disjuctive-preconditions
-gd(imply(P1, P2))              --> pddl_3_0_e(gd), ['(',imply], gd(P1), gd(P2), [')'].                                         %:disjuctive-preconditions
-gd(exists(L, P))               --> pddl_3_0_e(gd), ['(',exists,'('], typed_list(variable, L), [')'], gd(P), [')'].             %:existential-preconditions
-gd(forall(L, P))               --> pddl_3_0_e(gd), ['(',forall,'('], typed_list(variable, L), [')'], gd(P), [')'].             %:universal-preconditions
+%gd(or(P))                      --> pddl_3_0_e(gd), ['(',or],   zeroOrMore(gd ,P), [')'].                                       %:disjuctive-preconditions
+%gd(not(P))                     --> pddl_3_0, ['(',not],  gd(P), [')'].                                                   %:disjuctive-preconditions
+%gd(imply(P1, P2))              --> pddl_3_0_e(gd), ['(',imply], gd(P1), gd(P2), [')'].                                         %:disjuctive-preconditions
+%gd(exists(L, P))               --> pddl_3_0_e(gd), ['(',exists,'('], typed_list(variable, L), [')'], gd(P), [')'].             %:existential-preconditions
+%gd(forall(L, P))               --> pddl_3_0_e(gd), ['(',forall,'('], typed_list(variable, L), [')'], gd(P), [')'].             %:universal-preconditions
 gd(F)                           --> f_comp(F).                                                                  %:fluents
 f_comp(compare(C, E1, E2))      --> ['('], binary_comp(C), f_exp(E1), f_exp(E2), [')'].
 literal(T, F)                   --> atomic_formula(T, F).
@@ -1030,7 +1049,8 @@ f_exp(H)                        --> f_head(H).
 f_head(F)                       --> ['('], function_symbol(S), zeroOrMore(term, T), [')'], { F =.. [S|T] }.
 f_head(S)                       --> function_symbol(S).
 binary_op(O)                    --> multi_op(O).
-binary_op(45)                   --> [45]. % 45 = minus = '-'  (TODO - WHY IS THIS HERE?)
+% binary_op(45)                   --> [45]. % 45 = minus = '-'  (TODO - WHY IS THIS HERE?)
+% binary_op('-')			--> ['−'].
 binary_op('-')                  --> ['-'].
 binary_op('/')                  --> ['/'].
 multi_op('*')                   --> ['*'].
@@ -1049,7 +1069,8 @@ effect(P, N, A)                 --> c_effect(P, N, A).
 %c_effect(when(P, E))           --> pddl_3_0, ['(',when], gd(P), cond_effect(E), [')'].                   %:conditional-effects
 c_effect(P, N, A)               --> p_effect(P, N, A).
 p_effect([], [], [])            --> [].
-p_effect(Ps, Ns, [F|As])        --> ['('], assign_op(O), f_head(H), f_exp(E), [')'], p_effect(Ps, Ns, As), {F =.. [O, H, E]}.
+p_effect(Ps, Ns, [F|As])
+				--> ['('], assign_op(O), f_head(H), f_exp(E), [')'], p_effect(Ps, Ns, As), {F =.. [O, H, E]}.
 p_effect(Ps, [F|Ns], As)        --> ['(',not], atomic_formula(term,F), [')'], p_effect(Ps, Ns, As).
 p_effect([F|Ps], Ns, As)        --> atomic_formula(term, F), p_effect(Ps, Ns, As).
 %p_effect(op(O, H, E))          --> pddl_3_0(op/3), ['('], assign_op(O), dcgMust((f_head(H), f_exp(E), [')'])).            %:fluents , What is difference between rule 3 lines above???
@@ -1073,7 +1094,7 @@ oneOrMore(W, [R|Rs], A, C) :- F =.. [W, R, A, B], F, (
 zeroOrMore(W, R)                --> oneOrMore(W, R).
 zeroOrMore(_, [])               --> [].
 
-% Name is everything that is not number_sas, bracket or question mark.
+% Name is everything that is not number, bracket or question mark.
 % Those rules are not necessary, but rapidly speed up parsing process.
 name(N,S,E):-notrace(name0(N,S,E)).
 name0(N)                         --> [N], {number(N), !, fail}.
@@ -1128,7 +1149,7 @@ parseProblem(F, O, R) :-
 
 
 
-% DCG rules describing structure of problem file in language PDDL.
+% List of DCG rules describing structure of problem file in language PDDL.
 %
 %   BNF description was obtain from http://www.cs.yale.edu/homes/dvm/papers/pddl-bnf.pdf
 %   This parser do not fully NOT support PDDL 3.0
@@ -1152,12 +1173,12 @@ problem_rest(R, OD, I, G, _, MS, LS) -->
    dcgMust(length_spec(LS)  ; []),
    dcgMust([')']),!.
 
+object_declaration(L)		--> ['(',':',objects], typed_list(name, L),[')'].
 object_declaration(L)           --> ['(',':',objects], typed_list_as_list(name, L),[')'].
 
-typed_list_as_list(W, OUT)   --> oneOrMore(W, N), ['-'],!, dcgMust(( type(T), typed_list_as_list(W, Ns), {G =.. [T,N], OUT = [G|Ns]})).
+typed_list_as_list(W, OUT)   --> oneOrMore(W, N), ['-'],!, dcgMust(( type(T), typed_list_as_list(W, Ns), {
+ (atom(T)-> G =.. [T,N] ; G = isa(N,T)), OUT = [G|Ns]})).
 typed_list_as_list(W, N)        --> zeroOrMore(W, N).
-
-
 
 init(I)                         --> ['(',':',init], zeroOrMore(init_el, I), [')'].
 
@@ -1194,6 +1215,9 @@ metric_f_exp(E)                 --> ['('], binary_op(O), metric_f_exp(E1), metri
 metric_f_exp(multi_op(O,[E1|E]))--> ['('], multi_op(O), metric_f_exp(E1), oneOrMore(metric_f_exp, E), [')']. % I dont see meanful of this rule, in additional is missing in f-exp
 metric_f_exp(E)                 --> ['(','-'], metric_f_exp(E1), [')'], {E=..[-, E1]}.
 metric_f_exp(N)                 --> number_sas(N).
+% 3.0 
+metric_f_exp(F)			        --> ['('], function_symbol(S), zeroOrMore(name, Ns), [')'], { concat_atom([S|Ns], '-', F) }.
+% 2.x
 metric_f_exp(F)                 --> ['('], function_symbol(S), zeroOrMore(name, Ns), [')'], { F=..[S|Ns]}.%concat_atom_iio([S|Ns], '-', F) }.
 metric_f_exp(function(S))       --> function_symbol(S).
 metric_f_exp(total_time)        --> ['total-time'].
@@ -1478,9 +1502,8 @@ my_ord_member(S, [SR|_]):-
 my_ord_member(S, [_|T]):-
     my_ord_member(S, T).
 
-:- module(pddl_robert_sasak).
+
 :- test_blocks.
-% :- test_all.
-%:- test_primaryobjects.
-%:- time(test_frolog).
-%:- prolog.
+:- test_primaryobjects.
+:- time(test_tpddla).
+:- prolog.
