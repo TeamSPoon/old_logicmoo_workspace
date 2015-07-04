@@ -34,20 +34,25 @@ current_filesource(F):-seeing(X),is_stream(X),stream_property(X,file_name(F)).
 current_filesource(F):-stream_property(_,file_name(F)).
 
 :- export(filematch/2).
-filematch(Spec,Result):-no_repeats_old([Result],((enumerate_files0(Spec,NResult),normalize_path(NResult,Result)))),exists_file_or_dir(Result).
+filematch(Spec,Result):-  enumerate_files(Spec,Result).
 :- export(enumerate_files/2).
 
-enumerate_files(Spec,Result):-no_repeats_old([Result],((enumerate_files0(Spec,NResult),normalize_path(NResult,Result)))),exists_file_or_dir(Result).
+enumerate_files(Spec,Result):-
+   no_repeats_old([Result],((enumerate_files0(Spec,NResult),normalize_path(NResult,Result)))),exists_file_or_dir(Result).
 
 enumerate_files0(Mask,File1):- absolute_file_name(Mask,X,[expand(true),file_errors(fail),solutions(all)]),expand_file_name(X,Y),member(File1,Y).
-enumerate_files0(Mask,File1):- one_must(filematch('./',Mask,File1),(current_filedir(D),filematch(D,Mask,File1))).
-enumerate_files0(Spec,Result):- expand_file_name_safe(Spec,ResultList),ResultList\=[],!,member(NResult,ResultList),enumerate_files2(NResult,Result).
-enumerate_files0(Spec,Result):- enumerate_files1(Spec,M),enumerate_files2(M,Result).
+enumerate_files0(Mask,File1):- one_must(filematch3('./',Mask,File1),(current_filedir(D),filematch3(D,Mask,File1))).
+enumerate_files0(Spec,Result):- enumerate_files00(Spec,Result).
+enumerate_files0(Spec,Result):- to_filename(Spec,Result).
+enumerate_files0(Mask,File1):-  (current_dirs(D),filematch3(D,Mask,File1)).
 
-:- export(filematch/3).
-filematch(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1Matched,[expand(true),extensions(['',plmoo,pl,'pl.in']),
+enumerate_files00(Spec,Result):- expand_file_name_safe(Spec,ResultList),ResultList\=[],!,member(NResult,ResultList),enumerate_files2(NResult,Result).
+enumerate_files00(Spec,Result):- enumerate_files1(Spec,M),enumerate_files2(M,Result).
+
+:- export(filematch3/3).
+filematch3(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1Matched,[expand(true),extensions(['',plmoo,pl,'pl.in']),
    file_errors(fail),solutions(all),relative_to(RelativeTo),access(read)]),expand_file_name(File1Matched,File1S),member(File1,File1S).
-filematch(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1Matched,[expand(true),file_type(directory),
+filematch3(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1Matched,[expand(true),file_type(directory),
    file_errors(fail),solutions(all),relative_to(RelativeTo),access(read)]),expand_file_name(File1Matched,File1S),member(File1,File1S).
 
 :- export(enumerate_files2/2).
@@ -86,6 +91,28 @@ concat_paths(ParentIn,Child,Result):- filematch(ParentIn,Parent),
 concat_paths([Joined],Result):- !,filematch(Joined,Result).
 concat_paths([ParentIn,Child|MORE],Result):- concat_paths(ParentIn,Child,ResultM),concat_paths([ResultM|MORE],Result).
 
+
+
+
+current_dirs(DO):- no_repeats(DO,(current_dirs0(D),(atom_concat(DO,'/',D)->true;DO=D))).
+current_dirs0(D):- prolog_load_context(directory,D).
+current_dirs0(D):- working_directory(D,D).
+current_dirs0(D):- current_stream(_,read,Y), stream_property(Y,file_name(FN)), file_directory_name(FN,D).
+current_dirs0(D):- stream_property(_,file_name(FN)), file_directory_name(FN,D).
+current_dirs0(D):- expand_file_name('*/',X),member(E,X),absolute_file_name(E,D),exists_directory(D).
+current_dirs0(D):- expand_file_name('*/*/',X),member(E,X),absolute_file_name(E,D),exists_directory(D).
+current_dirs0(D):- expand_file_name('*/*/*/',X),member(E,X),absolute_file_name(E,D),exists_directory(D).
+current_dirs0(D):- source_file_property(FN, modified(_)), file_directory_name(FN,D).
+current_dirs0('.').
+
+:-export(to_filename/2).
+to_filename( FileName, FileName ) :- atomic(FileName),exists_file(FileName),!.
+to_filename( FileName, AFN ) :-
+ (((if_defined(default_extension( Ext ));Ext='.tlp';Ext='';Ext='.pl'), 
+     current_dirs(D),
+     member(TF,[false,true]),
+        absolute_file_name(FileName,AFN,[solutions(all),expand(TF),access(read),relative_to(D),file_errors(fail),extensions(['',Ext,'.pl','.tlp','.clp','.P'])]),
+        exists_file(AFN))),!.
 
 
 

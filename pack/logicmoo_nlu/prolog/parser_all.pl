@@ -209,12 +209,12 @@ get_it:-
 % OLD :- gripe_time(7,time(user:ensure_loaded(library(el_holds/'el_assertions.pl.qlf')))).
 
 % 6.052 CPU on VMWare I7
-:- gripe_time(7,time(user:ensure_loaded(library(el_holds/'el_assertions')))).
+:- gripe_time(7,time(user:load_files([library(el_holds/'el_assertions')],[qcompile(auto),if(changed )]))).
 :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_call_kb)).
-:- user:ensure_loaded(pldata/clex_iface).
-:- user:ensure_loaded(pldata/nldata_BRN_WSJ_LEXICON).
-:- user:ensure_loaded(pldata/nldata_freq_pdat).
-:- user:ensure_loaded(pldata/nldata_cycl_pos0).
+:- gripe_time(1,user:load_files([pldata/clex_iface],[qcompile(auto),if(changed  )])).
+:- gripe_time(1,user:load_files([pldata/nldata_BRN_WSJ_LEXICON],[qcompile(auto),if(changed  )])).
+:- gripe_time(1,user:load_files([pldata/nldata_freq_pdat],[qcompile(auto),if(changed  )])).
+:- gripe_time(1,user:load_files([pldata/nldata_cycl_pos0],[qcompile(auto),if(changed  )])).
 
 
 % ================================================================================================

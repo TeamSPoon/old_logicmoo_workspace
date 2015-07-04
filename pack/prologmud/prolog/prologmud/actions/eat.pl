@@ -32,7 +32,7 @@ user:agent_call_command(Agent,actEat(Obj)) :-
 	mudPossess(Agent,Obj),
 	must((do_act_affect(Agent,actEat,Obj))),
         dmsg_show(_),
-	must((clr(mudPossess(Agent,Obj)))),
+	must((clr(mudStowing(Agent,Obj)))),
         must(not(mudPossess(Agent,Obj))),
 	must((call_update_charge(Agent,actEat))).
 

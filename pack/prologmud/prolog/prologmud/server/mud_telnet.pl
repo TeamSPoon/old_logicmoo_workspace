@@ -178,6 +178,7 @@ user:deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(New
 
 :-thread_local(thlocal:telnet_prefix/1).
 
+:-set_tty_control(true).
 
 :-export(prompt_read/4).
 prompt_read_telnet(In,Out,Prompt,Atom):-
@@ -531,9 +532,13 @@ setup_streams(In, Out):-
       Err=Out,
       set_prolog_IO(In, Out, Err),
       thread_self(Id),
-      retractall(thread_util:has_console(Id, _, _, +)),
+%       retractall(thread_util:has_console(Id, _, _, +)),
       current_prolog_flag(encoding, Enc),
       assert(thread_util:has_console(Id, In, Out, Err)),
+
+      set_stream(In, close_on_abort(false)),
+      set_stream(Out, close_on_abort(false)),
+
       set_stream(In,  alias(user_input)),
       set_stream(Out, alias(user_output)),
       set_stream(Err, alias(user_error)),

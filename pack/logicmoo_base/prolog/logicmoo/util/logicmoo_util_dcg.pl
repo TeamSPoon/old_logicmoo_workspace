@@ -17,7 +17,11 @@
 
 
          dcgOptional//1,
+         dcgOptionalGreedy//1,
          dcgAnd//2,
+         dcgAnd//3,
+         dcgAnd//4,
+         dcgMust//1,
          dumpList/1,
          dcgOr//2,
          dcgNot//1,
@@ -36,38 +40,41 @@
 	 ]).
 
  
-:- meta_predicate dcgOnce(//,?,?).
-:- meta_predicate dcgOr(//,//,?,?).
-:- meta_predicate dcgOr(//,//,//,?,?).
-:- meta_predicate dcgTraceOnFailure(0).
+
 :- meta_predicate dcgAnd(//,//,//,//,?,?).
-:- meta_predicate theAll(//,?,?).
-:- meta_predicate dcgLeftOf(//,*,*,*).
-:- meta_predicate dcgIgnore(//,?,?).
-:- meta_predicate dcgAndRest(//,*,*,*).
-:- meta_predicate do_dcgTest(*,//,0).
-:- meta_predicate dcgOr(//,//,//,//,?,?).
-:- meta_predicate dcgStartsWith0(//,?,*).
-:- meta_predicate suggestVar(2,*,?).
-:- meta_predicate dcgBoth(//,//,*,*).
-:- meta_predicate dcgZeroOrMore(//,?,*).
-:- meta_predicate dcgMidLeft(//,*,//,*,?).
-:- meta_predicate dcgOr(//,//,//,//,//,?,?).
-:- meta_predicate dcgNot(//,?,?).
-:- meta_predicate dcgStartsWith(//,?,?).
-:- meta_predicate dcgOneOrMore(//,?,*).
-:- meta_predicate dcgOnceOr(//,//,?,?).
-:- meta_predicate dcgReorder(//,//,?,?).
 :- meta_predicate dcgAnd(//,//,//,?,?).
 :- meta_predicate dcgAnd(//,//,?,?).
+:- meta_predicate dcgAndRest(//,*,*,*).
+:- meta_predicate dcgBoth(//,//,*,*).
+:- meta_predicate dcgIgnore(//,?,?).
+:- meta_predicate dcgLeftOf(//,*,*,*).
+:- meta_predicate dcgMust(//,?,?).
+:- meta_predicate dcgMidLeft(//,*,//,*,?).
+:- meta_predicate dcgNot(//,?,?).
+:- meta_predicate dcgOnce(//,?,?).
+:- meta_predicate dcgOnceOr(//,//,?,?).
+:- meta_predicate dcgOneOrMore(//,?,*).
+:- meta_predicate dcgOptional(//,?,?).
+:- meta_predicate dcgOptionalGreedy(//,?,?).
+:- meta_predicate dcgOr(//,//,//,//,//,?,?).
+:- meta_predicate dcgOr(//,//,//,//,?,?).
+:- meta_predicate dcgOr(//,//,//,?,?).
+:- meta_predicate dcgOr(//,//,?,?).
+:- meta_predicate dcgReorder(//,//,?,?).
+:- meta_predicate dcgStartsWith(//,?,?).
+:- meta_predicate dcgStartsWith0(//,?,*).
 :- meta_predicate dcgStartsWith1(//,?,?).
-:- meta_predicate do_dcgTest_startsWith(?,//,?).
-:- meta_predicate theCode(?,?,?).
-:- meta_predicate decl_dcgTest_startsWith(?,?,?).
+:- meta_predicate dcgTraceOnFailure(0).
 :- meta_predicate dcgWhile(?,//,?,?).
+:- meta_predicate dcgZeroOrMore(//,?,*).
 :- meta_predicate decl_dcgTest(?,?).
 :- meta_predicate decl_dcgTest(?,?,?).
-
+:- meta_predicate decl_dcgTest_startsWith(?,?,?).
+:- meta_predicate do_dcgTest(*,//,0).
+:- meta_predicate do_dcgTest_startsWith(?,//,?).
+:- meta_predicate suggestVar(2,*,?).
+:- meta_predicate theAll(//,?,?).
+:- meta_predicate theCode(?,?,?).
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 :- dynamic(double_quotes_was/1).
 :- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
@@ -232,6 +239,9 @@ dcgOnce(DCG2,S,E) :- once(phrase(DCG2,S,E)).
 
 dcgWhile(True,Frag)-->dcgAnd(dcgOneOrMore(True),Frag).
 
+dcgMust((DCG1,List),S,E) :- is_list(List),!,must((phrase(DCG1,S,SE),phrase(List,SE,E))).
+dcgMust(DCG1,S,E) :- must(phrase(DCG1,S,E)).
+
 dcgSeqLen(Len, FB, END) :-
         length(CD, Len),
         '$append'(CD, END, FB).
@@ -269,6 +279,8 @@ dcgMidLeft(Mid,Left,Right) --> dcgLeftOf(Mid,Left),Right.
 dcgNone --> [].
 
 dcgOptional(A)--> dcgOnce(dcgOr(A,dcgNone)).
+
+dcgOptionalGreedy(A)--> dcgOnce(dcgOr(A,dcgNone)).
 
 dcgTraceOnFailure(X):-once(X;(dtrace,X)).
 

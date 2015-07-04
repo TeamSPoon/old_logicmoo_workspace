@@ -3,8 +3,8 @@ PrologMUD_base.vpj=Release
 [Global]
 CurrentProject=pack\prologmud\PrologMUD.vpj
 [ProjectDates]
-pack\PrologMUD_RT.vpj=20150703041346159
-pack\prologmud\PrologMUD.vpj=20150703052859548
+pack\PrologMUD_RT.vpj=20150703092141621
+pack\prologmud\PrologMUD.vpj=20150703092124796
 pack\logicmoo_base\prolog\LogicmooBase.vpj=20150703025341697
 pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
 [TreeExpansion2]
@@ -144,7 +144,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
 + pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj
 - pack\prologmud\PrologMUD.vpj
   - prolog
-    + prologmud
+    - prologmud
       + actions
       + mobs
         + affordance
@@ -153,17 +153,18 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
       - parsing
       - server
       - vworld
-    + prologmud_web
-      + src_assets
+    - prologmud_web
+      - src_assets
       - src_webui
-        + assetsources
-        + http
+        - assetsources
+        - http
           + web
             + css
             + icons
             + js
         + model
         - mudconsole
+  - ..\..\
   - runtime
     + cache
       + rdf
@@ -313,7 +314,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
                 + img
                   + folders
     - Windows
-  + hMUD
+  - hMUD
     + bridge
     + flashpolicyd_v0.6
       + Perl_xinetd
@@ -832,7 +833,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
       + help
       + icons
       + js
-  - \usr
+  + \usr
     + lib
       + swi-prolog
         + boot
@@ -1016,104 +1017,74 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
             + support
             + widgets
               + agents
-scroll:0
+scroll:107
 [State]
 SCREEN: 1920 1080 81 47 1919 1004 0 0 M 0 0 0 0 1676 622
 CWD: pack\prologmud
-BUFFER: BN="pack\logicmoo_nlu\prolog\parser_all.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.10533 CL=23 LE=0 CX=22 CY=21 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\util\logicmoo_util_bugger.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.131494 CL=36 LE=0 CX=35 CY=22 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_nlu\prolog\chat80_regress\clone.xg"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.15231 CL=28 LE=0 CX=27 CY=21 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="runtime\debug_once.sh"
-BI: MA=1 74 1  TABS=1 4  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Slick-C	HM=0 MF=608 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_nlu\prolog\parser_stanford.pl"
+BUFFER: BN="pack\logicmoo_base\prolog\LogicmooBase.vpj"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=1 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=VPJ	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=70 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\prologmud\runtime\debug_once.sh"
+BI: MA=1 74 1  TABS=1 4  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Slick-C	HM=0 MF=616 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1086 CL=57 LE=0 CX=56 CY=16 WI=5 BI=20 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\prologmud\prolog\prologmud_web\src_webui\http\user_page.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.7363 CL=32 LE=0 CX=31 CY=19 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_nlu\prolog\chat80\clone.xg"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.14530 CL=1 LE=0 CX=0 CY=21 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\prologmud\prolog\prologmud\mud_header.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\prologmud\prolog\prologmud_web\src_webui\assetsources\favicon.psd"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.397 CL=38 LE=0 CX=37 CY=5 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\logicmoo_run_swish.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.9472 CL=13 LE=0 CX=12 CY=11 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\run_clio.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.5776 CL=24 LE=0 CX=23 CY=13 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\hMUD\config.js"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=1 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=JavaScript	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="startMUDServer.sh"
+BI: MA=1 74 1  TABS=1 4  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Slick-C	HM=0 MF=616 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1360 CL=36 LE=0 CX=35 CY=9 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\util\rec_lambda.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.5990 CL=23 LE=0 CX=22 CY=17 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\logicmoo_engine.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.45997 CL=36 LE=0 CX=35 CY=24 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\prologmud\runtime\run_mud_server.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.4654 CL=23 LE=0 CX=22 CY=20 WI=5 BI=20 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="scripts\preconfig.sh"
-BI: MA=1 74 1  TABS=1 4  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Slick-C	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.969 CL=1 LE=0 CX=0 CY=24 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\prologmud\prolog\prologmud\server\mud_telnet.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.6088 CL=54 LE=0 CX=53 CY=17 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\plarkc\dbase_i_sexpr_reader.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.5345 CL=16 LE=0 CX=15 CY=7 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\plarkc\logicmoo_i_cyc_api.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.27553 CL=49 LE=0 CX=48 CY=10 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1478 424 -1 -1 N  WF=0 WT=17 "Default Fixed Font,10,0,1"
-BUFFER: BN="runtime\debug_once.sh"
-VIEW: LN=.34 CL=67 LE=0 CX=66 CY=2 WI=160 BI=28 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1478 424 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\prologmud\runtime\run_mud_server.pl"
-VIEW: LN=.4654 CL=23 LE=0 CX=22 CY=20 WI=120 BI=20 HT=0 HN=0 HF=0 HC=4
-WINDOW: 198 198 1478 424 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\logicmoo_engine.pl"
-VIEW: LN=.45997 CL=36 LE=0 CX=35 CY=24 WI=121 BI=5 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1478 424 -1 -1 N  WF=0 WT=16 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\prologmud\prolog\prologmud\server\mud_telnet.pl"
-VIEW: LN=.6088 CL=54 LE=0 CX=53 CY=17 WI=153 BI=29 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1478 424 -1 -1 N  WF=0 WT=15 "Default Fixed Font,10,0,1"
-BUFFER: BN="scripts\preconfig.sh"
-VIEW: LN=.969 CL=1 LE=0 CX=0 CY=24 WI=142 BI=25 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1478 424 -1 -1 N  WF=0 WT=13 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\plarkc\logicmoo_i_cyc_api.pl"
-VIEW: LN=.109928 CL=20 LE=0 CX=19 CY=18 WI=135 BI=26 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1478 424 -1 -1 N  WF=0 WT=12 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\plarkc\dbase_i_sexpr_reader.pl"
-VIEW: LN=.5 CL=1 LE=0 CX=0 CY=5 WI=128 BI=15 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1478 424 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_nlu\prolog\chat80_regress\clone.xg"
-VIEW: LN=.15231 CL=28 LE=0 CX=27 CY=21 WI=117 BI=21 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1478 424 -1 -1 N  WF=0 WT=1 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\logicmoo_engine.pl"
-VIEW: LN=.2945 CL=1 LE=0 CX=0 CY=16 WI=124 BI=5 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1478 424 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\logicmoo_engine.pl"
-VIEW: LN=.2945 CL=1 LE=0 CX=0 CY=16 WI=123 BI=5 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1478 424 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\prologmud\prolog\prologmud\mud_header.pl"
-VIEW: LN=.5990 CL=23 LE=0 CX=22 CY=17 WI=122 BI=18 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1478 424 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_nlu\prolog\chat80\clone.xg"
-VIEW: LN=.14530 CL=1 LE=0 CX=0 CY=21 WI=119 BI=23 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1478 424 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_nlu\prolog\parser_stanford.pl"
-VIEW: LN=.7363 CL=32 LE=0 CX=31 CY=19 WI=118 BI=22 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1478 424 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\util\logicmoo_util_bugger.pl"
-VIEW: LN=.131494 CL=36 LE=0 CX=35 CY=21 WI=116 BI=24 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1478 424 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_nlu\prolog\parser_all.pl"
-VIEW: LN=.10533 CL=23 LE=0 CX=22 CY=21 WI=115 BI=16 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1478 424 -1 -1 M  WF=0 WT=14 ",,,"
-BUFFER: BN="pack\logicmoo_nlu\prolog\chat80_regress\clone.xg"
-VIEW: LN=.15231 CL=28 LE=0 CX=27 CY=21 WI=141 BI=21 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.7746 CL=1 LE=0 CX=0 CY=11 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1478 424 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\run_clio.pl"
+VIEW: LN=.5776 CL=24 LE=0 CX=23 CY=13 WI=291 BI=21 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1478 424 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\prologmud\runtime\debug_once.sh"
+VIEW: LN=.286 CL=65 LE=0 CX=64 CY=6 WI=281 BI=20 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1478 424 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
+BUFFER: BN="startMUDServer.sh"
+VIEW: LN=.13 CL=35 LE=0 CX=34 CY=2 WI=283 BI=18 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1478 424 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\logicmoo_run_swish.pl"
+VIEW: LN=.9472 CL=13 LE=0 CX=12 CY=11 WI=289 BI=16 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1478 424 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\prologmud\prolog\prologmud_web\src_webui\assetsources\favicon.psd"
+VIEW: LN=.397 CL=38 LE=0 CX=37 CY=5 WI=287 BI=27 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1478 424 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\prologmud\prolog\prologmud_web\src_webui\http\user_page.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=285 BI=22 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1478 424 -1 -1 N  WF=0 WT=4 "Verdana,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\LogicmooBase.vpj"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=277 BI=26 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1478 424 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\util\rec_lambda.pl"
+VIEW: LN=.7746 CL=1 LE=0 CX=0 CY=11 WI=275 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1478 424 -1 -1 N  WF=0 WT=2 ",,,"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\util\rec_lambda.pl"
+VIEW: LN=.7746 CL=1 LE=0 CX=0 CY=11 WI=274 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 198 198 1478 424 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\hMUD\config.js"
+VIEW: LN=.708 CL=1 LE=0 CX=0 CY=13 WI=293 BI=25 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-pack\logicmoo_base\prolog\logicmoo\plarkc\dbase_i_sexpr_reader.pl
-pack\logicmoo_base\prolog\logicmoo\plarkc\logicmoo_i_cyc_api.pl
-pack\logicmoo_base\prolog\logicmoo\logicmoo_engine.pl
-scripts\preconfig.sh
-pack\prologmud\prolog\prologmud\server\mud_telnet.pl
-pack\prologmud\runtime\run_mud_server.pl
-start_mud_server_back.sh
-runtime\debug_once.sh
-start_mud_server.sh
+pack\logicmoo_base\prolog\rec_lambda.pl
+pack\logicmoo_base\prolog\LogicmooBase.vpj
+pack\prologmud\prolog\prologmud_web\src_webui\http\user_page.pl
+pack\prologmud\prolog\prologmud_web\src_webui\assetsources\favicon.psd
+pack\logicmoo_base\prolog\logicmoo\logicmoo_run_swish.pl
+startMUDServer.sh
+pack\prologmud\runtime\debug_once.sh
+pack\logicmoo_base\prolog\logicmoo\run_clio.pl
+pack\hMUD\config.js

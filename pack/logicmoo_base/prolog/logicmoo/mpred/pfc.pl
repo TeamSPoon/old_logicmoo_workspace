@@ -411,7 +411,7 @@ pfc_assert_fast((=>P),S) :- nonvar(P),!,
   pfc_assert_fast(P,S).
 
 
-pfc_assert_fast(P0,S):- gripe_time(0.6,pfc_assert_fast_0(P0,S)).
+pfc_assert_fast(P0,S):- gripe_time(1.1,pfc_assert_fast_0(P0,S)).
 
 pfc_assert_fast_0(P0,S):-
   must(to_addable_form_wte(P0,P)),
@@ -1043,7 +1043,7 @@ pfc_fwd(P,S) :- pfc_fwd1(P,S).
 
 
 
-pfc_fwd1(Fact,Sup) :- gripe_time(0.50,pfc_fwd2(Fact,Sup)).
+pfc_fwd1(Fact,Sup) :- gripe_time(1.0,pfc_fwd2(Fact,Sup)).
 
 
 pfc_fwd2(Fact,Sup) :-
@@ -2486,7 +2486,7 @@ compute_resolve(NewerP,OlderQ,Resolve):-
 :-export(resolverConflict_robot/1).
 resolveConflict(C) :- forall(must(pfc_nf1_negation(C,N)),must(pp_why(N))),must(pp_why(C)), if_defined(resolverConflict_robot(C)),!.
 resolveConflict(C) :- forall(must(pfc_nf1_negation(C,N)),forall(compute_resolve(C,N,TODO),debugOnError(TODO))),!.
-resolveConflict(C) :- must((pfc_remove3(C),fmt("~nRem-3 with conflict ~w~n", [C]),pfc_run)).
+resolveConflict(C) :- must((pfc_remove3(C),fmt("~nRem-3 with conflict ~w~n", [C]),pfc_run,sanity(\+C))),\+C,!.
 resolveConflict(C) :-
   fmt("~NHalting with conflict ~w~n", [C]),   
   must(pfc_halt(conflict(C))).
