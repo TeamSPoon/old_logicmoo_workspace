@@ -17,7 +17,8 @@ if [! -f $STANFORD_JAR]; then
   wget http://prologmoo.com/downloads/stanford-corenlp3.5.2-ALL.jar -O $STANFORD_JAR
 fi
 
-./pack/hMUD/policyd
+($DIR/pack/hMUD/policyd)
+
 
 if [ $# -eq 0 ] 
  then
@@ -46,9 +47,9 @@ do
         if [[ $EUID -eq 0 ]];
           then
              exit 0
-	          (sudo su -l -s $SHELL -c "(swipl ${RUNFILE})" prologmud )
+	          (sudo su -l -s $SHELL -c "(cd $DIR ; swipl ${RUNFILE})" prologmud )
           else             
-             (exec swipl $RUNFILE)
+             (cd $DIR ; exec swipl $RUNFILE)
          fi
 #        cd $NEWPWD
 #        . ./commit_push.sh 

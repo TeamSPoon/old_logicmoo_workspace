@@ -1,5 +1,7 @@
 
-:- module(pddl_robert_sasak,[test_blocks/0,test_domain/1,test_all/0,test_rest/0,test_sas/0,test_dir_files_sas/1,test_dir_files_sas/3]).
+:- module(pddl_robert_sasak,[test_blocks/0,test_domain/1,test_all/0,test_rest/0,test_sas/0,
+   test_dir_files_sas/1,test_dir_files_sas/3,
+   solve_files/2]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FILENAME:  common.pl 
@@ -50,6 +52,9 @@ test_all:-
 test_all:- expand_file_name('./orig_pddl_parser/test/*/domain*.pddl',RList),RList\=[],!,reverse(RList,List),
   forall(member(E,List),once(test_domain(E))).
 
+test_primaryobjects:- 
+  must(forall(filematch_sas('./primaryobjects_strips/*/domain*.*',E),once(test_domain(E)))). 
+
 min_sas(A,B,A):-A =< B,!.
 min_sas(_,A,A).
 
@@ -60,6 +65,10 @@ test_domain(DP,Num):-
    sort(ListR,ListS),length(ListR,PosNum),min_sas(PosNum,Num,MinNum),length(List,MinNum),append(List,_,ListS),!,
    forall(member(T,List),ignore((directory_file_path(D,T,TP),exists_file(TP),not(same_file(DP,TP)),
   solve_files(DP,TP)))).
+
+test_frolog:- test_dir_files_sas('frolog','p02-domain.pddl','p02.pddl'),
+    test_dir_files_sas('frolog','tPddlAgent01-domain.pddl','tPddlAgent01.pddl'),
+    !. % test_dir_files_sas('frolog','tPddlAgent02-domain.pddl','tPddlAgent02.pddl').
 
 test_blocks:- solve_files('./orig_pddl_parser/test/blocks/domain-blocks.pddl', 
   './orig_pddl_parser/test/blocks/blocks-03-0.pddl'), fail.
@@ -76,7 +85,7 @@ user:sanity_test:- test_blocks.
 solve_files(DomainFile, ProblemFile):- 
  forall(must(filematch_sas(DomainFile,DomainFile0)),
    forall(must(filematch_sas(ProblemFile,ProblemFile0)),
-     must(time(solve_files_0(DomainFile0, ProblemFile0))))).
+     time(must(solve_files_0(DomainFile0, ProblemFile0))))),!.
 
 solve_files_0(DomainFile, ProblemFile):-
   format('~q.~n',[solve_files(DomainFile, ProblemFile)]),
@@ -86,7 +95,7 @@ solve_files_0(DomainFile, ProblemFile):-
     term_to_ord_term(PP, P),
     reset_statistic)),
     !,
-    time_out(solve(D, P, S), 500000, _Result), % time limit for a planner
+    gripe_time(45,time_out(solve(D, P, S), 50000, _Result)), % time limit for a planner (was 500000)
     show_statistic(P, S),
     !.
 
@@ -904,16 +913,16 @@ domainBNF(domain(N, R, T, C, P, F, C, S))
                         --> ['(','define', '(','domain'], name(N), [')'],
                         dcgMust(domainBNF_rest( R, T, C, P, F, C, S)).
 domainBNF_rest( R, T, C, P, F, C, S) --> 
-                            dcgMust(require_def(R)    ; []),
-                             dcgMust(types_def(T)      ; []), %:typing
+                             dcgMust(dcgOptionalGreedy(require_def(R))),
+                             dcgMust(dcgOptionalGreedy(types_def(T))),!, %:typing
                              dcgMust(constants_def(C)  ; []),
                              dcgMust(predicates_def(P) ; []),
                              dcgMust(functions_def(F)  ; []), %:fluents
-%                            dcgMust (constraints(C)   ; []),    %:constraints
+%                            dcgMust(constraints(C)   ; []),    %:constraints
                              dcgMust(zeroOrMore(structure_def, S)),
-                             [')'].
+                             dcgMust([')']).
 
-require_def(R)          --> ['(',':','requirements'], oneOrMore(require_key, R), [')'].
+require_def(R)          --> ['(',':','requirements'], dcgMust((oneOrMore(require_key, R), [')'])).
 require_key(strips)                             --> [':strips'].
 require_key(typing)                             --> [':typing'].
 require_key('action-costs')                             --> [':action-costs'].
@@ -948,7 +957,7 @@ atomic_function_skeleton(f(S, L))
                                 --> ['('], function_symbol(S), typed_list(variable, L), [')'].
 function_symbol(S)              --> name(S).
 functions_def(F)                --> ['(',':',functions], function_typed_list(atomic_function_skeleton, F), [')'].              %:fluents
-%constraints(C)                 --> ['(',':',constraints], con_GD(C), [')'].                                                   %:constraints
+constraints(C)                  --> pddl_3_0, ['(',':',constraints], con_GD(C), [')'].                                                   %:constraints
 structure_def(A)                --> action_def(A).
 %structure_def(D)               --> durative_action_def(D).                                                                    %:durativeactions
 %structure_def(D)               --> derived_def(D).                                                                            %:derivedpredicates
@@ -960,7 +969,7 @@ effected_typed_list(W, [G|Ns])           --> oneOrMore(W, N), ['-'], effect(T), 
 effected_typed_list(W, N)                --> zeroOrMore(W, N).
 
 primitive_type(N)               --> name(N).
-type(either(PT))                --> ['(',either], !, oneOrMore(primitive_type, PT), [')'].
+type(either(PT))                --> ['(',either], !, dcgMust(( oneOrMore(primitive_type, PT), [')'])).
 type(PT)                        --> primitive_type(PT).
 function_typed_list(W, [F|Ls])
                                 --> oneOrMore(W, L), ['-'], !, function_type(T), function_typed_list(W, Ls), {F =.. [T|L]}.    %:typing
@@ -972,9 +981,10 @@ emptyOr(W)                      --> W.
 
 % Actions definitons
 action_def(action(S, L, Precon, Pos, Neg, Assign))
-                                --> ['(',':',action], action_symbol(S),
-                                    [':',parameters,'('], typed_list(variable, L), [')'], 
-                                    action_def_body(Precon, Pos, Neg, Assign),
+                                --> ['(',':',action],
+                                    dcgMust(action_symbol(S)),
+                                    dcgMust(([':',parameters,'('], typed_list(variable, L), [')'])),
+                                    dcgMust((action_def_body(Precon, Pos, Neg, Assign))),
                                     [')'].
 action_symbol(N)                --> name(N).
 action_def_body(P, Pos, Neg, Assign)
@@ -994,7 +1004,7 @@ gd(F)                           --> atomic_formula(term, F).                    
 gd(L)                          --> pddl_3_0_e(gd), literal(term, L).                                                           %:negative-preconditions
 gd(P)                           --> ['(',and],  zeroOrMore(gd, P), [')'].
 gd(or(P))                      --> pddl_3_0_e(gd), ['(',or],   zeroOrMore(gd ,P), [')'].                                       %:disjuctive-preconditions
-gd(not(P))                     --> pddl_3_0_e(gd), ['(',not],  gd(P), [')'].                                                   %:disjuctive-preconditions
+% gd(not(P))                     --> pddl_3_0, ['(',not],  gd(P), [')'].                                                   %:disjuctive-preconditions
 gd(imply(P1, P2))              --> pddl_3_0_e(gd), ['(',imply], gd(P1), gd(P2), [')'].                                         %:disjuctive-preconditions
 gd(exists(L, P))               --> pddl_3_0_e(gd), ['(',exists,'('], typed_list(variable, L), [')'], gd(P), [')'].             %:existential-preconditions
 gd(forall(L, P))               --> pddl_3_0_e(gd), ['(',forall,'('], typed_list(variable, L), [')'], gd(P), [')'].             %:universal-preconditions
@@ -1138,7 +1148,8 @@ problem_rest(R, OD, I, G, _, MS, LS) -->
 
 object_declaration(L)           --> ['(',':',objects], typed_list_as_list(name, L),[')'].
 
-typed_list_as_list(W, OUT)   --> oneOrMore(W, N), ['-'],!, dcgMust(( type(T), typed_list_as_list(W, Ns), {G =.. [T,N], OUT = [G|Ns]})).
+typed_list_as_list(W, OUT)   --> oneOrMore(W, N), ['-'],!, dcgMust(( type(T), typed_list_as_list(W, Ns), {
+ (atom(T)-> G =.. [T,N] ; G = isa(N,T)), OUT = [G|Ns]})).
 typed_list_as_list(W, N)        --> zeroOrMore(W, N).
 
 
@@ -1464,5 +1475,6 @@ my_ord_member(S, [_|T]):-
 
 
 :- test_blocks.
-
-
+:- test_primaryobjects.
+:- time(test_tpddla).
+:- prolog.

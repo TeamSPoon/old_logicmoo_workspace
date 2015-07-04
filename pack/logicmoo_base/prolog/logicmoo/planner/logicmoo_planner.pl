@@ -7,8 +7,6 @@
 % TODO 
 %:- with_no_mpred_expansions(ensure_loaded(dbase_i_hyhtn)).
 
-:- if((gethostname(titan),true)).
-:- prolog.
-:- endif.
+
 
 

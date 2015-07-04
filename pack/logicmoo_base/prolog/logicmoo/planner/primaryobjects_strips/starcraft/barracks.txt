@@ -1,0 +1,11 @@
+(define (problem build-barracks)
+  (:domain starcraft)
+  (:objects
+    scv - builder
+    sectorA sectorB mineralFieldA mineralFieldB - area)  
+  (:init (and (scv scv) (location sectorA) (location sectorB)
+         (location mineralFieldA) (location mineralFieldB) 
+         (minerals mineralFieldA) (minerals mineralFieldB) 
+         (at scv sectorA)))
+  (:goal (and (barracks sectorA)))
+)
