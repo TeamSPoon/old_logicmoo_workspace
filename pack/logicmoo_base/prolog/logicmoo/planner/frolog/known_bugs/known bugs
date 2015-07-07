@@ -1,0 +1,64 @@
+I would like to add the following construction to the grammar: 
+NP small clause. E.g. "Yossarian is a bombardier". Valuation n0N1
+The problem is that the adjunction of the determiner is not mandatory, 
+so I have to send Geni indef(b) bombardier(b) to make sure that I get it. 
+I think that it would be easier for me to treat the copula as a transitive verb. 
+
+----------------------------
+
+Styled texts can contain controls like buttons: 
+http://www.java2s.com/Tutorial/Java/0280__SWT/StyledTextembedcontrols.htm
+
+-----------------------------
+
+change south-exit noun to south adj and exit noun
+do the same for all other exits
+
+-----------------------------
+
+add hereroom 
+change special concepts
+
+----------------------------
+
+Player: look at the green frog
+Frolog: the frog is green and alive and ugly
+Frolog: the green frog hasdetail a silver crown and a sword
+					   ^
+I FIXED this manually. 
+The conjunction in this last sentence is done outside geni, see whether it can be done inside now.
+
+----------------------------
+
+see in the action database the disctinction between pk and k, use pk as often as possible, 
+assert the preconditions of the executed actions when it makes sense.
+
+---------------------------
+
+drop green frog 
+Se rompe en reference resolution module
+
+FIXED ---------------------------
+
+There is a red and a green apple
+Take a apple
+you have the red apple
+take a apple
+you have the green apple
+Take a apple
+BREAKS DOWN
+
+Sin activar accommodation
+
+DONE ----------------------------
+
+There is more than one green object: ADD -> the green wall and the green frog
+
+FIXED---------------------------
+Player: look at you
+Frolog: you are seated and alive and not-so-easy-to-kill
+Player: stand-up
+Frolog: RACER error occurred.
+
+You are seated is not an assertion, it's an inferred fact. The interaction above asserts seated in the player KB, 
+when the player stands up, "seated" is not removed from the player KB and it becomes inconsistent.

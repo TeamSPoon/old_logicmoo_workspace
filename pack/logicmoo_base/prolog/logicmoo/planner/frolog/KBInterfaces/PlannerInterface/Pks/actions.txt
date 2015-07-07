@@ -1,0 +1,201 @@
+      </constants>
+    </symbols>
+
+    <actions>
+      <action name="take=patient">
+        <params>?o, ?l</params>
+        <preconds>
+	  K(takeable(?o)) ^
+          K(accessible(?o)) ^
+	  notK(inventory_object(?o))
+        </preconds>
+        <effects>
+	  K(has_location (?o, ?l)) => del(Kf, has_location (?o, ?l)) ^ add(Kf, has_location (?o, myself))^add(Kf, inventory_object(?o));
+	  K(part_of (?o, ?l)) => del(Kf, part_of (?o, ?l)) ^ add(Kf, has_location (?o, myself))^add(Kf, inventory_object(?o));
+        </effects>
+      </action>
+
+      <action name="drop=patient">
+        <params>?o</params>
+        <preconds>
+	  K(inventory_object(?o))
+        </preconds>
+        <effects>
+	  forallK(?x)
+		K(here_is=?x) => add(Kf, has_location(?o, ?x));
+	  del(Kf, has_location(?o, myself));
+	  del(Kf, inventory_object(?o));
+        </effects>
+      </action>
+
+      <action name="put=patient">
+        <params>?o, ?l</params>
+        <preconds>
+	  K(takeable(?o)) ^
+	  K(accessible(?o)) ^
+	  K(inventory_object(?o)) ^
+	  K(generic_container(?l)) ^
+	  K(accessible(?l))
+        </preconds>
+        <effects>
+	  add(Kf, has_location(?o, ?l));
+	  del(Kf, has_location(?o, myself));
+	  del(Kf, inventory_object(?o));
+        </effects>
+      </action>
+
+      <action name="throw=patient=target">
+        <params>?o, ?l</params>
+        <preconds>
+	  K(takeable(?o)) ^
+	  K(accessible(?o)) ^
+	  K(inventory_object(?o)) ^
+	  K(alive(?o))
+        </preconds>
+        <effects>
+	  add(Kf, !alive (?o));
+	  add(Kf, has_location (?o, ?l));
+        </effects>
+      </action>
+
+      <action name="kiss=patient">
+        <params>?o</params>
+        <preconds>
+	  K(alive(?o)) ^
+	  K(accessible(?o))
+        </preconds>
+        <effects>
+	  notK(ugly(?o)) => add(Kf, happy(?o));
+	  K(ugly(?o)) => add(Kf,!happy(?o));
+        </effects>
+      </action>
+
+      <action name="kill=patient">
+        <params>?o</params>
+        <preconds>
+	  K(easy_to_kill(?o)) ^
+	  K(accessible(?o)) ^
+	  K(alive(?o))
+        </preconds>
+        <effects>
+	  add(Kf, !alive(?o));
+        </effects>
+      </action>
+
+      <action name="kill=patient=instr">
+        <params>?o, ?w</params>
+        <preconds>
+	  K(!easy_to_kill(?o)) ^
+	  K(accessible(?o)) ^
+	  K(alive(?o)) ^
+	  K(inventory_object(?w)) ^
+	  K(weapon(?w))
+        </preconds>
+        <effects>
+	  add(Kf, !alive(?o));
+        </effects>
+      </action>
+
+      <action name="open=patient">
+        <params>?o</params>
+        <preconds>
+	  K(!open(?o)) ^
+	  K(accessible(?o)) ^
+	  K(!locked(?o)) ^
+	  K(open_closed(?o))
+        </preconds>
+        <effects>
+	  add(Kf, open(?o));
+        </effects>
+      </action>
+
+      <action name="close=patient">
+        <params>?o</params>
+        <preconds>
+	  K(open(?o)) ^
+	  K(accessible(?o)) ^
+	  K(open_closed(?o))
+        </preconds>
+        <effects>
+	  add(Kf, !open(?o));
+        </effects>
+      </action>
+
+      <action name="unlock=patient=instr">
+        <params>?k, ?c</params>
+        <preconds>
+	  K(!open(?c)) ^
+	  K(accessible(?c)) ^
+	  K(locked(?c)) ^
+	  K(key(?k)) ^
+	  K(inventory_object(?k)) ^
+	  K(fits_in(?k, ?c))
+        </preconds>
+        <effects>
+	  add(Kf, !locked(?c));
+        </effects>
+      </action>
+
+      <action name="lock=patient=instr">
+        <params>?k, ?c</params>
+        <preconds>
+	  K(!open(?c)) ^
+	  K(accessible(?c)) ^
+	  K(!locked(?c)) ^
+	  K(key(?k)) ^
+	  K(inventory_object(?k)) ^
+	  K(fits_in(?k, ?c))
+        </preconds>
+        <effects>
+	  add(Kf, locked(?c));
+        </effects>
+      </action>
+
+      <action name="eat=patient">
+        <params>?o</params>
+        <preconds>
+	  K(edible(?o)) ^
+	  K(inventory_object(?o))
+        </preconds>
+        <effects>
+	  forallK(?x)
+	    notK(worm(?x))^notK(has_detail(?o, ?x)) => add(Kf, has_location(?o, nirvana));
+	  forallK(?x)
+	    notK(worm(?x))^notK(has_detail(?o, ?x)) => del(Kf, inventory_object(?o));
+        </effects>
+      </action>
+
+      <action name="sit_down=target">
+        <params>?o</params>
+        <preconds>
+	  K(seating(?o)) ^
+	  K(accessible(?o)) ^
+	  notK(has_location(myself, ?o))
+        </preconds>
+        <effects>
+	  add(Kf, has_location(myself, ?o));
+	  forallK(?x)
+		K(here_is = ?x) => del(Kf, has_location(myself, ?x));
+        </effects>
+      </action>
+
+      <action name="stand-up=patient">
+        <params>?o</params>
+        <preconds>
+	  K(seating(?o)) ^
+	  K(has_location(myself, ?o))
+        </preconds>
+        <effects>
+	  del(Kf, has_location(myself, ?o));
+          add(Kf, !has_location(myself, ?o));
+	  forallK(?x)	  
+		K(here_is = ?x) => add(Kf, has_location(myself, ?x));
+        </effects>
+      </action>
+
+    </actions>
+
+  </domain>
+
+  <problem name="FTC" domain="FairyTaleCastle">
+    <init>

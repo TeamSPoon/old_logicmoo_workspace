@@ -1,0 +1,38 @@
+/**
+ *  All rights reserved. Use of this software is permitted for non-commercial
+ *  research purposes, and it may be copied only for that use.  All copies must
+ *  include this copyright message.  This software is made available AS IS, and
+ *  neither the GIPO team nor the University of Huddersfield make any warranty
+ *  about the software or its performance.
+ *
+ *  Automatically generated OCL Domain from  GIPO Version 3.0
+ *
+ *  Author: Administrator
+ *  Institution: University of Huddersfield
+ *  Date created: Tue Jul 07 08:39:00 PDT 2015
+ *  Date last modified: 2015/07/07 at 08:39:40 AM PDT
+ *  Description:
+ *    
+ */
+
+domain_name(noneer).
+
+% Sorts
+
+% Objects
+
+% Predicates
+
+% Object Class Definitions
+
+% Atomic Invariants
+
+% Implied Invariants
+
+% Inconsistent Constraints
+
+% Operators
+
+% Methods
+
+% Domain Tasks

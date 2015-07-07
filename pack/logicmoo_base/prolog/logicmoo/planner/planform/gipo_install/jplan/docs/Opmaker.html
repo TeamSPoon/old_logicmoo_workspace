@@ -1,0 +1,201 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.78 [en] (X11; U; Linux 2.4.10-4GB i686) [Netscape]">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#59188E" alink="#FF0000">
+
+<h1>
+<a NAME="OpMaker"></a><b><u>Op Maker</u></b></h1>
+
+<blockquote><a href="#Example">Example</a>
+<br><a href="#Prerequisites">Prerequisites</a>
+<br><a href="#Using Opmaker">Inducing Operators</a>
+<br><a href="#Testing">Testing</a>
+<br><a href="#Failure To Induce an Operator">Problems</a></blockquote>
+
+<p><br>The <i>opmaker</i> tool in the current version of GIPO is capable
+of generating operators for non-hierarchical domains.
+<p><a NAME="Example"></a><b><u>Example</u></b>
+<p>As an illustrative example we describe&nbsp; the <i>Hiking Domain, a</i>
+new planning domain with documentation and description on the GIPO resource
+page.
+<p>Two people (hikers) want to walk together a long clockwise circular
+route (over several days) around the Lake District of NW England. They
+do one ``leg" each day, as they get tired and have to sleep in their tent
+to recover for the next leg. Their equipment is heavy, so they have two
+cars which can be used to carry their tent and themselves to the start/end
+of a leg.
+<p><a NAME="Prerequisites"></a><b><u>Prerequisites</u></b>
+<p>We assume that we have been constructing our domain model and have reached
+the stage where we have&nbsp; a partial model with a valid sort tree, predicate
+definitions and substate definitions. In addition to run&nbsp; <i>opmaker</i>
+the user must specify, using the task editor, a well understood problem
+in the domain. A task specification allocates an initial state to every
+object in the problem and the desired state of a subset of these object
+as the goal state to be achieved.
+<p>The domain definition is shown below using snapshots from the GIPO environment.
+<br>First the defined sort and object tree for the domain:
+<blockquote><img SRC="hSorts.jpeg" height=314 width=192 align=LEFT></blockquote>
+
+<p><br>The predicates defined for the domain are:
+<br>&nbsp;
+<blockquote><img SRC="hPreds.gif" height=182 width=295 align=BOTTOM></blockquote>
+
+<p><br>The states defined for the dynamic sorts are:
+<p>for car - at(Car,Place) [1 state]
+<br>for person - tired(Person,Place)&nbsp; <i><font color="#FF0000">or</font></i>
+fit(Person,Place)
+<i><font color="#FF0000">or</font></i> in(Person,Car,Place)
+[3 states]
+<br>for tent - up(Tent,Place) <font color="#FF0000">or</font> down(Tent,Place)
+<font color="#FF0000">or</font>
+loaded(Tent,Car,Place) [3 States]
+<br>for couple - walked(Couple,Place) &amp; partners(Couple,Person1,Person2)
+&amp; ne(Person1,Person2) [1 state]
+<p>In addition there are static predicates, that is predicates that are
+always true, at least in the planning process. These are defined in the
+Atomic Invariants Editor
+<br>&nbsp;
+<blockquote><img SRC="hStatic.gif" height=129 width=178 align=BOTTOM></blockquote>
+
+<p><br>The final part of the domain that must be defined prior to using
+Opmaker is at least one problem. Defined in the Task Editor
+<br>&nbsp;
+<blockquote><img SRC="hTask.gif" height=390 width=204 align=BOTTOM></blockquote>
+
+<p><br>This task represents one leg of the tour. The couple have started
+in Keswick with the tent up and they are rested and fit. At the beginning
+of the next day they must be in the same state but at Helvelyn which is
+next on the tour to Keswick.
+<h2>
+<a NAME="Using Opmaker"></a><u>Using Opmaker</u></h2>
+In opmaker you define a sequence of actions that can start form the selected
+task's initial state.&nbsp; In doing this you should aim at choosing tasks
+that require as wide a range of actions within the domain as possible.
+If this is difficult without lots of repeats of the same action then an
+alternative strategy may be to define a number of separate tasks that together
+cover the range of actions in the domain, but remember to commit changes
+after each run of opmaker otherwise the defined operators will not be added
+to the domain. In the hiking problem a single leg gives complete coverage
+of the envisaged actions.
+<p>First the action name is entered, then the user drags the objects effected
+by this action on to the predicate/action tree at the right of the Opmaker
+window. For example the first action of the day may be to take the tent
+down so we enter the name tent_down and press new, then we need to drag
+the objects involved on to the action tree. In our example the tent can
+be taken down by one person so we drag <b><i>fred</i></b>, <b><i>tent1</i></b>,
+and <b><i>keswick</i></b>. (We need the place Keswick, because in the defined
+predicates we always keep track of where everything is.) We can now continue
+in this way until we have a complete sequence of actions for our task or
+we may decide to generate the the actions incrementally, but remember and
+commit after generation operators unless something has gone wrong. In the
+example shown in the Opmaker window below we have entered a complete sequence
+for the first leg of the walk.
+<p><img SRC="hOpmaker.gif" height=497 width=925 align=BOTTOM>
+<p>When objects are dragged on to the action definition/tree the order
+of the arguments is important in two respects. First if an action is repeated
+such as <b><i>get_in </i></b>in the hiking sequence the order of object
+sorts must be the same in all occurrences. We should mentally associate
+a sentence such "Fred gets in to car1 in Keswick"&nbsp; with the action
+description, then any use of <b><i>get_in</i></b> must fit the same sentence
+pattern. Secondly in some actions such as the <b><i>drive</i></b> action
+there are some elements of the action that must always be present such
+as the driver, the car, and the to and from locations, but there may be
+other things optionally involved such as the tent in the first occurrence
+of drive in the above sequence and fred in the drive action that brings
+both sue and fred back to Keswick. In the drive action these are the things
+that may or may not be carried/passengers on the trip. These things that
+"conditionally" change in an action should appear in the current version
+of Opmaker at the end of the object list, though otherwise their order
+is not important, nor is it required that these things that optionally
+are involved must always be presented in the same order.
+<p><font color="#FF0000">Note:</font> that in practice we would recommend
+that you initially use Op Maker with much shorter lists of actions than
+illustrated above in the hiking domain. The definitions can be built up
+incrementally. If you commit the operators afrter inducing some sucessfully
+these operators will be used in later sequences along with the descriptions
+of new action to be induced.
+<p>Once the action sequence has been defined press the Generate Operators
+button which will start a question answer dialogue to clarify what happens
+to the mentioned objects when the action is performed.
+<br>For the above sequence the first popup dialog box is shown below:
+<br>&nbsp;
+<blockquote><img SRC="hDiag1.gif" height=222 width=560 align=BOTTOM></blockquote>
+
+<p><br>Here we are being asked if <b><i>fred</i></b> changes to one of
+the other defined states for sort "person" as a result of taking the tent
+down. The possible resulting states are in the drop down combo box. We
+are told what state <b><i>fred</i></b> is in when the action starts. Fred
+however remains in state "fit in keswick" so we have ticked the check box
+indicating that fred does not change state then we press OK.
+<p>The next question relates to the tent:
+<br>&nbsp;
+<blockquote><img SRC="hDiag2.gif" height=222 width=560 align=BOTTOM></blockquote>
+
+<p><br>This time we choose the down state and press OK. The dialogue with
+the user continues in this way whenever Opmaker cannot determine the resulting
+state by itself. The next interesting part of the dialogue occurs during
+dealing with the first drive action where to clarify the resulting state
+of fred a dialog box is presented asking the user to choose the resulting
+location for fred, only places mentioned in the action are presented.
+<br>&nbsp;
+<blockquote><img SRC="hDiag3.gif" height=166 width=351 align=BOTTOM></blockquote>
+
+<p><br>After answering this question Opmaker detects that <b><i>helvelyn</i></b>
+is next to <b><i>keswick</i></b> in the list of static predicates hence
+opmaker asks if this is a requirement before every application of the drive
+action occurs. In this case it is not fred could drive to any of the locations.
+<br>&nbsp;
+<blockquote><img SRC="hDiag4.gif" height=125 width=372 align=BOTTOM></blockquote>
+
+<p><br>We are not yet finished with the drive action we are next queried
+about the tent
+<br>&nbsp;
+<blockquote><img SRC="hDiag5.gif" height=222 width=560 align=BOTTOM></blockquote>
+
+<p><br>Here we choose that the tent is still in the loaded state but this
+will be a new state as the Place value will change, but this time the tent
+is one of the things that only optionally change state when the drive operation
+takes place, hence we check the second check box. This indicates that any
+(and any number of tents) loaded in the car at keswick would make the same
+change.
+<p>The next interesting part of the dialogue occurs when Opmaker tries
+to figure out what is happening on the drive action for returning both
+sue and fred to keswick: (3rd application of drive)
+<br>&nbsp;
+<blockquote><img SRC="hDiag6.gif" height=182 width=522 align=BOTTOM></blockquote>
+
+<p><br>Opmaker can accommodate a change to fred's state only if it is correct
+that this is an optional change of state which it is. We therefore select
+the in(Person,Car,Place) state and press OK. In this situation Opmaker
+will revise the definition of "drive" previously deduced and add a new
+conditional transition.
+<p>All that is left is to follow the dialogue through to the end in a similar
+manner and then commit the resulting definitions. Note we cannot look at
+the deduced operators without committing them first.
+<p><a NAME="Testing"></a><font size=+1>Testing</font>
+<p>To test our deduced operators we can now try the stepper or preferably
+try a planner. If we have an external planner integrated into GIPO we can
+use that.
+<p>Here are our results using FF
+<p><img SRC="hRes.gif" height=821 width=565 align=BOTTOM>
+<br>&nbsp;
+<h2>
+<a NAME="Failure To Induce an Operator"></a><u>Failure To Induce an Operator</u></h2>
+
+<p><br><font color="#FF0000">Note:</font> The most common reason for Op
+Maker to fail to induce an operator definition is that you have failed
+to provide initial values of all the variables referenced in the state
+descriptions of dynamic objects referenced in the action sentence provided.
+For example to define the <b><i>get_out</i></b> action the primary objects
+involved in the action are the car and the person but the precondition
+of getting out of the car is that the person is in the state described
+by the predicate <b><i>in(Person,Car,Place)</i></b> therefore to be able
+to use this prior states values must be provided for both the car and the
+place even though the place will not change as a result of the person getting
+out of the car. An example would be <b><i>get_out(fred,car1,helvelyn)</i></b>.
+<p>Back To <a href="#OpMaker">Top</a>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+        
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+        
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+        
+  <meta name="GENERATOR" content="Mozilla/4.78 [en] (X11; U; Linux 2.4.10-4GB i686) [Netscape]">
+  <title>Tutorial of GIPO</title>
+</head>
+  <body text="#000000" bgcolor="#ffffff" link="#0000ff" vlink="#ff0000" alink="#000088">
+  &nbsp;&nbsp;  
+<center> <br>
+ </center>
+ 
+<h2> 
+<center><img src="gipo_gear.gif" alt="GIPO logo" height="150" width="200">
+ </center>
+ </h2>
+ 
+<h2> 
+<center><b><font color="#003300">The GIPO Tutorial</font></b></center>
+ </h2>
+ 
+<h2> 
+<center><b><font color="#003300">GIPO-II - Version 1.0</font></b></center>
+ </h2>
+ 
+<center> 
+<hr width="100%" size="2"><br>
+ </center>
+    
+<h3> <font color="#003300">GIPO Tutorial</font></h3>
+  This tutorial is divided into two main sections. If you are new to GIPO
+then we suggest that you work through the tutorial for non hierarchical planning 
+first. The tutorial for hierarchical domains presuposes familiarity with flat
+domain model definition. &nbsp;<br>
+<br>
+Flat domains are distingushed from hierarchical domains on two criteria.<br>
+<ol>
+  <li>State definitions in hierarchical domains may be defined relative to
+different levels in the sort tree. For example all <i>physical_objects</i>
+ may be defined as being <i>at</i> a <i>location</i> but <i>packages</i>
+which are a sub sort of <i>physical_object</i> may be defined as being either
+in the state of being <i>delivered</i> or as <i>waiting</i>. For hierarchical
+models the full state for an object is defined in terms of the product of
+the states defined for the sort of object plus the states from the states
+defined further up the sort tree. In flat domains all states must be defined
+relative to a sort occuring at a leaf node of the sort tree.</li>
+  <li>Heirarchical domains may have compound operators, called <b>methods</b>
+, which are composed from the primitive operators of the type defined in
+standard flat domains. <b>Methods</b> are little sub plan.</li>
+</ol>
+<h3><big><b><a href="ftutorial.html">For flat domain</a>
+   </b></big></h3>
+  
+<h3><big> </big><big><b><a href="htutorial.html">For hierarchical domains</a>
+   </b></big></h3>
+      
+</body>
+</html>

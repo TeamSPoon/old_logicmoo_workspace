@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+       
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  <title>Tutorial of Hierarchical Stepper</title>
+</head>
+  <body text="#000000" bgcolor="#ffffff" link="#0000ee" vlink="#551a8b" alink="#0000ee">
+   
+<div align="center">  
+<div align="center"><big><big><b>Tutorial of Hierarchical Stepper<br>
+  <br>
+  <br>
+  </b></big></big>  
+<div align="left">  
+<ul>
+    <li>Select task</li>
+   
+</ul>
+<blockquote>Select oclHTNTask1 from the combo box.<br>
+  </blockquote>
+&nbsp;  <img src="hstepper1.gif" alt="Choose a task" width="299" height="196">
+  <br>
+   <br>
+  <ul>
+    <li>Stepping<br>
+    </li>
+  </ul>
+  <blockquote>Start stepping by pressing button "Next" on the toolbox at
+the bottom of the window or select menu item "Next" from the menu. A Method
+Instantiation Window will appear. As all variables have already been instantiated,
+so choose ok to continue.<br>
+    </blockquote>
+    <br>
+    <img src="hstepper2.gif" alt="method window" width="655" height="501">
+    <br>
+  </div>
+   
+    <div align="left"><br>
+    <ul>
+      <li>Developed graph<br>
+      </li>
+    </ul>
+    <blockquote>The graph on the canvas will develop as showed at the following
+picture. Method <i>transport</i> is instantiated and decomposed containing
+3 parts. The highlighted box "Achieve" indicates that currently the state
+      <i>waiting(pkg_5) certified(pkg_5)</i> is required to be achieved.
+      <br>
+      </blockquote>
+      <br>
+      <img src="hstepper12.gif" alt="updated graph" width="347" height="253">
+      <br>
+      <br>
+      <ul>
+        <li>Automatic popup window</li>
+      </ul>
+      <blockquote>A Stepper Instantiation Window is actived automaticaly
+for the user to choose a suitable method/operator to achieve the required
+state. The current state is listed.<br>
+        </blockquote>
+        <img src="hstepper3.gif" alt="method and operator window" width="500" height="650">
+        <br>
+        <br>
+        <ul>
+          <li>Choosing operator and instantiate it.<br>
+          </li>
+        </ul>
+        <blockquote>Choose the <i>Primitive Operator</i> tab, then click
+          <i>pay_fees_normal(P)</i>. Its content will be displayed. Mouse
+right click on the variable <i>P</i>, a pull popup menu will appear with
+all possible objects ready for the user to choose. Select <i>pkg_5</i>. Operator
+          <i>pay_fees_normal</i> will be instantiated. Click button "Run".<br>
+          </blockquote>
+          <img src="hstepper4.gif" alt="instantiated method operator window" width="500" height="650">
+          <br>
+          <br>
+          <ul>
+            <li>Developed graph<br>
+            </li>
+          </ul>
+          <blockquote>As a result of running operator <i>pay_fees_normal</i>
+ the current state window is updated and the graphs is as following picture
+shows.<br>
+            </blockquote>
+            <img src="hstepper5.gif" alt="graphics development" width="347" height="353">
+            <br>
+            <blockquote>GIPO then moves on the next step. All possible method
+with the name of "carry" will be collected and popup in the Method Instantiation
+Window. Method descriptions can be accessed by mouse right click on the method
+in the list. Click the first method <i>carry</i>, then choose "OK" button
+to continue.<br>
+              </blockquote>
+              <br>
+              <img src="hstepper6.gif" alt="method selection window" width="510" height="561">
+              <br>
+              <br>
+              <ul>
+                <li>Final graph</li>
+              </ul>
+              <blockquote>Follow the previous procedure, always instantiate
+all the required variables before choose "OK" or "Run" to proceed.<br>
+                <br>
+Finally when operator deliver is executed successfully, a message box should
+appear to inform the user the goal state has been reached.<br>
+                <br>
+The final graph should be as the following picture.<br>
+                </blockquote>
+                <img src="hstepper7.gif" alt="final graphics" width="581" height="749">
+                <br>
+                <br>
+                <ul>
+                  <li>Presenting data</li>
+                </ul>
+                <blockquote>Mouse right click a shape, a popup menu will
+appear. Select "Property" to view the content of the current selected method/operator/chieve.&nbsp;
+ <br>
+                  </blockquote>
+                  <img src="hstepper8.gif" alt="popup menu" width="368" height="219">
+                  <br>
+                  <br>
+                  <blockquote>Select "States before &amp; after action ..."
+to view states, a States Window will show. Objects and its states can be
+highlighted by select the row.<br>
+                    <br>
+                    </blockquote>
+                    <img src="hstepper9.gif" alt="states before and after action" width="600" height="400">
+                    <br>
+                    <br>
+                    <ul>
+                      <li>Print graphical result</li>
+                    </ul>
+                    <blockquote>The result graph can be print previewed and
+printed.<br>
+                      </blockquote>
+                      <img src="hstepper10.gif" alt="print preview" width="662" height="500">
+                      <br>
+                      <br>
+                      <ul>
+                        <li>View/print action sesquence</li>
+                      </ul>
+                      <blockquote>The action sequence can be displayed or
+printed.<br>
+                        </blockquote>
+                        <img src="hstepper11.gif" alt="action list" width="400" height="300">
+                        <br>
+                        <br>
+                        <ul>
+                          <li>Other import functions</li>
+                          <ul>
+                            <li>Undo function is available by choosing "Pre"
+button.</li>
+                          </ul>
+                          <ul>
+                            <li>Stepping can be saved in a seperate file
+"*.vm", and can be reloaded afterwards with information of steppings and
+graphics.<br>
+                            </li>
+                          </ul>
+                        </ul>
+                        <p><a href="tutorial.html"><img src="walkback.gif" height="50" width="21">
+                        </a>
+                        <b><font face="Arial,Helvetica"><font size="-2"><a href="tutorial.html">
+back to the tutorial main page</a>
+                        </font></font></b></p>
+                        <br>
+  </div>
+  </div>
+  </div>
+   
+                        </body>
+                        </html>

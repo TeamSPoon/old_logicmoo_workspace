@@ -1,0 +1,38 @@
+Player: look
+Frolog: a brown couch hold you
+Frolog: the couch hold a red apple, a green apple, a brown frog, a green frog and you
+Frolog: a drawing-room hold the couch
+Frolog: the drawing-room hold a red table and the couch
+Frolog: the drawing-room has a green wall
+Frolog: the drawing-room has a south-exit
+Player: look at the green frog
+Frolog: the frog is green and alive and ugly
+Frolog: the green frog hasdetail a silver crown and a sword
+Player: take the sword
+Frolog: you hold the sword
+Player: take the crown
+Frolog: you hold the crown
+Player: put the crown
+Frolog: You can't do that! You don't know what is accessible
+Player: look at the green frog
+Frolog: the frog is green and alive and ugly
+Player: throw the frog
+Frolog: There is more than one frog.
+Player: throw the green frog
+Frolog: You can't do that! It is not the case that you hold the green frog
+Player: take the green frog
+Frolog: you hold the green frog
+Player: throw the green frog
+Frolog: I cannot express what I want to say.
+Player: take the red thing
+Frolog: There is more than one red object.
+Player: take the brown thing
+Frolog: There is more than one brown object.
+Player: take the red one
+Frolog: I don't know the word Unknown: one.
+Player: take the brown thing
+Frolog: There is more than one brown object.
+Player: take the green thing
+Frolog: There is more than one green object.
+Player: take the green wall
+Frolog: You can't do that! It is not the case that the wall is takeable

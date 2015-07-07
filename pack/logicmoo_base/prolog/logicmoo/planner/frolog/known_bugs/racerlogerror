@@ -1,0 +1,20 @@
+Bug in RacerPro 1.9.2 beta, solved in 1.9.3 beta
+
+(in-tbox fairytalecastle)
+(signature :atomic-concepts (castle)
+           :individuals (chest1)
+)
+ 
+(in-abox gameinitial fairytalecastle)
+
+;(instance chest1 *top*)
+(add-concept-assertion gameinitial chest1 *top*)
+
+(add-concept-assertion gameinitial chest1 castle)
+
+;(forget-concept-assertion gameinitial chest1 castle)
+(forget (:abox gameinitial) (instance chest1 castle))
+
+(instance chest1 castle)
+
+(individual-instance? chest1 castle gameinitial)

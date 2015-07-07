@@ -1,0 +1,55 @@
+# LINUX version of install
+# EDIT GIPOHOME to reflect path to gipo distribution directory
+# This should be the directory containing gipo.jar
+GIPOHOME=<distribution directory>
+# Edit this if the correct Java jre exists locally
+# Developed using 1.4.2_04 if java is not on your path edit this
+JAVA=java
+#SICBASE path to sprt.sav the sicstus run time \bin added automatically
+SICBASE=${GIPOHOME}/lib/sicstus3.11.1/
+#JASPERLIB path to libjasper.so (dll on win32)
+JASPERLIB=${GIPOHOME}/lib
+CLASSPATH=.:${GIPOHOME}/java_cup.jar:${GIPOHOME}/lib/sicstus3.11.1/bin/jasper.jar:${GIPOHOME}/jgraph.jar:${GIPOHOME}/jgraphaddons.jar
+export CLASSPATH
+PATH=${SICBASE}/bin:${PATH}
+if [ -d ${HOME}/gipo ]
+then
+	${JAVA} -Djava.library.path="${JASPERLIB}"\
+     		-Dsicstus.path="${SICBASE}"\
+     		-Docled.path="${HOME}/gipo"\
+		-Docled.codebase="${GIPOHOME}"\
+     		jplan.top.OclEd &
+else
+	echo "Install local copy of domains in ${HOME}/gipo (y/n)"
+	read ans
+	if [ $ans = "y" ]
+	then
+		mkdir ${HOME}/gipo
+		mkdir ${HOME}/gipo/domains
+		mkdir ${HOME}/gipo/domains/library
+		mkdir ${HOME}/gipo/domains/icons
+		mkdir ${HOME}/gipo/tmp
+		DIR=`pwd`
+		cd ${HOME}/gipo
+		cp ${GIPOHOME}/jplan/domains/*.* domains
+		cp ${GIPOHOME}/jplan/domains/icons/*.* domains/icons
+		cp ${GIPOHOME}/jplan/domains/library/*.* domains/library	
+		cd ${DIR}
+		${JAVA} -Djava.library.path="${JASPERLIB}"\
+     			-Dsicstus.path="${SICBASE}"\
+     			-Docled.path="${HOME}/gipo"\
+			-Docled.codebase="${GIPOHOME}"\
+     			jplan.top.OclEd &
+
+	else
+		echo "You will not be able to save edited domains to the domains directory"
+		echo "Press return to continue."
+		read ans2
+		${JAVA} -Djava.library.path="${JASPERLIB}"\
+     			-Dsicstus.path="${SICBASE}"\
+     			-Docled.path="${GIPOHOME}/jplan"\
+			-Docled.codebase="${GIPOHOME}"\
+     			jplan.top.OclEd &
+	fi
+	
+fi

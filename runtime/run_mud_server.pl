@@ -53,6 +53,7 @@ user:file_search_path(prologmud, library(prologmud)).
 % [Mostly Required] Load the Logicmoo Planner/AI System
 :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner)))).
 
+end_of_file.
 
 % [Required] Load the Logicmoo WWW System
 :- time(ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).

@@ -119,4 +119,4 @@ mval(F,V,[o(A,R)|H]) :-
        (mval(F,V,H), \+ (rejects(A,R,F,V,C), kTrue(C,H))).
 
 % failure
-false :- fail.
+% false :- fail.

@@ -1,0 +1,631 @@
+<html>
+<body>
+
+<p align="center">
+<img src="gipo_gear.gif"
+width="200" height="150">
+</p>
+
+<p>
+<h1 align="center">GIPO Domain Model</h1>
+</p>
+
+<p>
+<h2 align="center">Domain Details</h2>
+</p>
+
+<table width="91%">
+<tr>
+  <td align="center"><b>Author:</b> Ms. Pervez
+                     </td>
+  <td align="center"><b>Name:</b> Warming Food
+                     </td>
+  <td align="center"><b>Favourite:</b> no
+                     </td>
+</tr>
+</table>
+
+<p>
+<h2 align="center">Index</h2>
+</p>
+
+<table width="100%">
+<tr>
+  <td align="center"><a href="#C1">
+		     Life History</a></td>
+  <td align="center"><a href="#C2">
+		     Diagram Nodes' Properties and Constraints</a></td>
+  <td align="center"><a href="#C3">
+                     OCL Domain Plain Text</a></td>
+  <td align="center"><a href="#C4">
+		     PDDL Domain Plain Text</a></td>
+  <td align="center"><a href="#C5">
+		     Files Download Links</a></td>
+</tr>
+</table>
+
+<p>
+<h2 align="center"><a name="C1">Life History</a></h2>
+</p>
+
+<p align="center">
+<img src="warmingfoodlh.jpg"
+width="640" height="480">
+</p>
+
+<p>
+<h2 align="center"><a name="C2">Diagram Nodes' Properties and Constraints</a></h2>
+<h2 align="center">(alphabetical order)</a></h2>
+</p>
+
+<p align="center">
+<img src="warmingfoodp&c.jpg"
+width="640" height="480">
+</p>
+
+<p align="center">
+<img src="warmingfoodp&c2.jpg"
+width="640" height="480">
+</p>
+
+<p>
+<h2 align="center"><a name="C3">OCL Domain Plain Text</a></h2>
+</p>
+
+<p>
+<pre>
+/**
+ *  All rights reserved. Use of this software is permitted for non-commercial
+ *  research purposes, and it may be copied only for that use.  All copies must
+ *  include this copyright message.  This software is made available AS IS, and
+ *  neither the GIPO team nor the University of Huddersfield make any warranty
+ *  about the software or its performance.
+ *
+ *  Automatically generated OCL Domain from  GIPO Version 3.0
+ *
+ *  Author: c0362248
+ *  Institution: University of Huddersfield
+ *  Date created: Tue Nov 21 12:43:07 GMT 2006
+ *  Date last modified: 2006/12/13 at 06:03:09 PM GMT
+ *  Description:
+ *    
+ *    Object Life History : warming_food5.gfx
+ *    Object Life History : warming_food5.gfx
+ *    Object Life History : warming_food6.gfx
+ *    Object Life History : warming_food6.gfx
+ *    Object Life History : warming_food6.gfx
+ *    Object Life History : warming_food7.gfx
+ *    Object Life History : warming_food7.gfx
+ * Object Life History : warming_food7.gfx
+ */
+
+domain_name(warmingfood).
+
+% Sorts
+sorts(primitive_sorts,[object,status,food,warming_type]).
+
+% Objects
+objects(object,[microwave]).
+objects(status,[on,off]).
+objects(food,[curry,soup]).
+objects(warming_type,[very_hot,hot,mild,cold]).
+objects(doorStat,[open,close]).
+
+% Predicates
+predicates([
+    close(object),
+    statustype(object,status),
+    open(object),
+    onTable(food),
+    heatType(food,warming_type),
+    inMicrowave(food,object),
+    next(warming_type,warming_type),
+    statusType(status,status)]).
+
+% Object Class Definitions
+substate_classes(object,Object,[
+    [close(Object),statustype(Object,Status)],
+    [open(Object),statustype(Object,Status)]]).
+substate_classes(food,Food,[
+    [onTable(Food),heatType(Food,Warming_type)],
+    [inMicrowave(Food,Object),heatType(Food,Warming_type)]]).
+
+% Atomic Invariants
+atomic_invariants([
+    next(cold,mild),
+    next(mild,hot),
+    next(hot,very_hot),
+    statusType(on,off),
+    statusType(off,on)]).
+
+% Implied Invariants
+
+% Inconsistent Constraints
+
+% Operators
+operator(putIn(Object,Status,Food,Warming_type),
+    % prevail
+    [     se(object,Object,[open(Object),statustype(Object,Status)])],
+    % necessary
+    [     sc(food,Food,[onTable(Food),heatType(Food,Warming_type)]=>[inMicrowave(Food,Object),heatType(Food,Warming_type)])],
+    % conditional
+    []).
+operator(takeOut(Object,Status,Food,Warming_type),
+    % prevail
+    [     se(object,Object,[open(Object),statustype(Object,Status)])],
+    % necessary
+    [     sc(food,Food,[inMicrowave(Food,Object),heatType(Food,Warming_type)]=>[onTable(Food),heatType(Food,Warming_type)])],
+    % conditional
+    []).
+operator(opendoor(Object,Status),
+    % prevail
+    [],
+    % necessary
+    [     sc(object,Object,[close(Object),statustype(Object,Status)]=>[open(Object),statustype(Object,Status)])],
+    % conditional
+    []).
+operator(closedoor(Object,Status),
+    % prevail
+    [],
+    % necessary
+    [     sc(object,Object,[open(Object),statustype(Object,Status)]=>[close(Object),statustype(Object,Status)])],
+    % conditional
+    []).
+operator(warm(Object,Food,Warming_typeA,Warming_typeB),
+    % prevail
+    [     se(object,Object,[close(Object),statustype(Object,on)])],
+    % necessary
+    [     sc(food,Food,[inMicrowave(Food,Object),heatType(Food,Warming_typeA),next(Warming_typeA,Warming_typeB)]=>[inMicrowave(Food,Object),heatType(Food,Warming_typeB)])],
+    % conditional
+    []).
+operator(switch(Object,StatusA,StatusB),
+    % prevail
+    [],
+    % necessary
+    [     sc(object,Object,[close(Object),statustype(Object,StatusA),statusType(StatusA,StatusB)]=>[close(Object),statustype(Object,StatusB)])],
+    % conditional
+    []).
+
+% Methods
+
+% Domain Tasks
+planner_task(1,
+    % Goals
+    [
+     se(food,curry,[inMicrowave(curry,microwave),heatType(curry,mild)])],
+    % INIT States
+    [
+     ss(food,curry,[onTable(curry),heatType(curry,cold)]),
+     ss(food,soup,[onTable(soup),heatType(soup,cold)]),
+     ss(object,microwave,[close(microwave),statustype(microwave,off)])]).
+planner_task(2,
+    % Goals
+    [
+     se(food,curry,[onTable(curry),heatType(curry,mild)]),
+     se(food,soup,[onTable(soup),heatType(soup,mild)])],
+    % INIT States
+    [
+     ss(food,curry,[onTable(curry),heatType(curry,cold)]),
+     ss(food,soup,[onTable(soup),heatType(soup,cold)]),
+     ss(object,microwave,[close(microwave),statustype(microwave,off)])]).
+planner_task(3,
+    % Goals
+    [
+     se(food,curry,[onTable(curry),heatType(curry,very_hot)]),
+     se(object,microwave,[close(microwave),statustype(microwave,off)])],
+    % INIT States
+    [
+     ss(food,curry,[onTable(curry),heatType(curry,cold)]),
+     ss(object,microwave,[close(microwave),statustype(microwave,off)])]).
+planner_task(4,
+    % Goals
+    [
+     se(food,curry,[onTable(curry),heatType(curry,very_hot)])],
+    % INIT States
+    [
+     ss(food,curry,[inMicrowave(curry,microwave),heatType(curry,mild)]),
+     ss(object,microwave,[close(microwave),statustype(microwave,off)])]).
+planner_task(5,
+    % Goals
+    [
+     se(food,soup,[onTable(soup),heatType(soup,very_hot)]),
+     se(food,curry,[onTable(curry),heatType(curry,very_hot)]),
+     se(object,microwave,[close(microwave),statustype(microwave,off)])],
+    % INIT States
+    [
+     ss(food,curry,[onTable(curry),heatType(curry,cold)]),
+     ss(food,soup,[onTable(soup),heatType(soup,cold)]),
+     ss(object,microwave,[close(microwave),statustype(microwave,off)])]).
+planner_task(6,
+    % Goals
+    [
+     se(object,microwave,[close(microwave),statustype(microwave,off)]),
+     se(food,curry,[onTable(curry),heatType(curry,very_hot)])],
+    % INIT States
+    [
+     ss(object,microwave,[open(microwave),statustype(microwave,on)]),
+     ss(food,curry,[onTable(curry),heatType(curry,cold)])]).
+planner_task(7,
+    % Goals
+    [
+     se(food,curry,[onTable(curry),heatType(curry,mild)])],
+    % INIT States
+    [
+     ss(object,microwave,[open(microwave),statustype(microwave,on)]),
+     ss(food,curry,[inMicrowave(curry,microwave),heatType(curry,cold)])]).
+planner_task(8,
+    % Goals
+    [
+     se(food,curry,[onTable(curry),heatType(curry,very_hot)])],
+    % INIT States
+    [
+     ss(food,curry,[onTable(curry),heatType(curry,cold)]),
+     ss(object,microwave,[open(microwave),statustype(microwave,on)])]).
+</pre>
+</p>
+
+<p>
+<h2 align="center"><a name="C4">PDDL Domain Plain Text</a></h2>
+</p>
+
+<p>
+<pre>
+; ***************************************************************************
+; *  All rights reserved. Use of this software is permitted for non-commercial
+; *  research purposes, and it may be copied only for that use.  All copies must
+; *  include this copyright message.  This software is made available AS IS, and
+; *  neither the GIPO team nor the University of Huddersfield make any warranty
+; *  about the software or its performance.
+; *
+; *  Automatically generated PDDL Domain from  GIPO Version 3.0
+; *
+; *  Author: c0362248
+; *  Institution: University of Huddersfield
+; *  Date created: Tue Nov 21 12:43:07 GMT 2006
+; *  Date last modified: 2006/12/13 at 06:03:09 PM GMT
+; *  Description:
+; *    
+; *    Object Life History : warming_food5.gfx
+; *    Object Life History : warming_food5.gfx
+; *    Object Life History : warming_food6.gfx
+; *    Object Life History : warming_food6.gfx
+; *    Object Life History : warming_food6.gfx
+; *    Object Life History : warming_food7.gfx
+; *    Object Life History : warming_food7.gfx
+; * OCL File name : WarmingFoodLH7.ocl
+; * Object Life History : warming_food7.gfx
+; *************************************************************************
+
+(define (domain warmingfood)
+  (:requirements :strips :equality :typing)
+
+  (:types  object status food warming_type)
+
+
+  (:predicates
+    (close ?object1 - object)
+    (statustype ?object1 - object ?status1 - status)
+    (open ?object1 - object)
+    (onTable ?food1 - food)
+    (heatType ?food1 - food ?warming_type1 - warming_type)
+    (inMicrowave ?food1 - food ?object1 - object)
+    (next ?warming_type1 - warming_type ?warming_type2 - warming_type)
+    (statusType ?status1 - status ?status2 - status)
+  )
+  (:action putIn
+       :parameters ( ?Object - object ?Status - status ?Food - food ?Warming_type - warming_type)
+       :precondition (and 
+            (open ?Object)
+            (statustype ?Object ?Status)
+            (onTable ?Food)
+            (heatType ?Food ?Warming_type)
+       )
+       :effect (and 
+            (not (onTable ?Food))
+            (inMicrowave ?Food ?Object)
+        )
+    )
+  (:action takeOut
+       :parameters ( ?Object - object ?Status - status ?Food - food ?Warming_type - warming_type)
+       :precondition (and 
+            (open ?Object)
+            (statustype ?Object ?Status)
+            (inMicrowave ?Food ?Object)
+            (heatType ?Food ?Warming_type)
+       )
+       :effect (and 
+            (not (inMicrowave ?Food ?Object))
+            (onTable ?Food)
+        )
+    )
+  (:action opendoor
+       :parameters ( ?Object - object ?Status - status)
+       :precondition (and 
+            (close ?Object)
+            (statustype ?Object ?Status)
+       )
+       :effect (and 
+            (not (close ?Object))
+            (open ?Object)
+        )
+    )
+  (:action closedoor
+       :parameters ( ?Object - object ?Status - status)
+       :precondition (and 
+            (open ?Object)
+            (statustype ?Object ?Status)
+       )
+       :effect (and 
+            (not (open ?Object))
+            (close ?Object)
+        )
+    )
+  (:action warm
+       :parameters ( ?Object - object ?Food - food ?Warming_typeA - warming_type ?Warming_typeB - warming_type)
+       :precondition (and 
+            (close ?Object)
+            (statustype ?Object on)
+            (inMicrowave ?Food ?Object)
+            (heatType ?Food ?Warming_typeA)
+            (next ?Warming_typeA ?Warming_typeB)
+       )
+       :effect (and 
+            (not (heatType ?Food ?Warming_typeA))
+            (heatType ?Food ?Warming_typeB)
+        )
+    )
+  (:action switch
+       :parameters ( ?Object - object ?StatusA - status ?StatusB - status)
+       :precondition (and 
+            (close ?Object)
+            (statustype ?Object ?StatusA)
+            (statusType ?StatusA ?StatusB)
+       )
+       :effect (and 
+            (not (statustype ?Object ?StatusA))
+            (statustype ?Object ?StatusB)
+        )
+    )
+  )
+(define (problem task1)
+   (:domain warmingfood)
+   (:objects
+         microwave - object
+         on off - status
+         curry soup - food
+         very_hot hot mild cold - warming_type
+         open close - doorStat
+        )
+    (:init
+        (onTable curry)
+        (heatType curry cold)
+        (onTable soup)
+        (heatType soup cold)
+        (close microwave)
+        (statustype microwave off)
+        (next cold mild)
+        (next mild hot)
+        (next hot very_hot)
+        (statusType on off)
+        (statusType off on)
+        )
+    (:goal
+      (and
+        (inMicrowave curry microwave)
+        (heatType curry mild)
+       ))
+)
+(define (problem task2)
+   (:domain warmingfood)
+   (:objects
+         microwave - object
+         on off - status
+         curry soup - food
+         very_hot hot mild cold - warming_type
+         open close - doorStat
+        )
+    (:init
+        (onTable curry)
+        (heatType curry cold)
+        (onTable soup)
+        (heatType soup cold)
+        (close microwave)
+        (statustype microwave off)
+        (next cold mild)
+        (next mild hot)
+        (next hot very_hot)
+        (statusType on off)
+        (statusType off on)
+        )
+    (:goal
+      (and
+        (onTable curry)
+        (heatType curry mild)
+        (onTable soup)
+        (heatType soup mild)
+       ))
+)
+(define (problem task3)
+   (:domain warmingfood)
+   (:objects
+         microwave - object
+         on off - status
+         curry soup - food
+         very_hot hot mild cold - warming_type
+         open close - doorStat
+        )
+    (:init
+        (onTable curry)
+        (heatType curry cold)
+        (close microwave)
+        (statustype microwave off)
+        (next cold mild)
+        (next mild hot)
+        (next hot very_hot)
+        (statusType on off)
+        (statusType off on)
+        )
+    (:goal
+      (and
+        (onTable curry)
+        (heatType curry very_hot)
+        (close microwave)
+        (statustype microwave off)
+       ))
+)
+(define (problem task4)
+   (:domain warmingfood)
+   (:objects
+         microwave - object
+         on off - status
+         curry soup - food
+         very_hot hot mild cold - warming_type
+         open close - doorStat
+        )
+    (:init
+        (inMicrowave curry microwave)
+        (heatType curry mild)
+        (close microwave)
+        (statustype microwave off)
+        (next cold mild)
+        (next mild hot)
+        (next hot very_hot)
+        (statusType on off)
+        (statusType off on)
+        )
+    (:goal
+      (and
+        (onTable curry)
+        (heatType curry very_hot)
+       ))
+)
+(define (problem task5)
+   (:domain warmingfood)
+   (:objects
+         microwave - object
+         on off - status
+         curry soup - food
+         very_hot hot mild cold - warming_type
+         open close - doorStat
+        )
+    (:init
+        (onTable curry)
+        (heatType curry cold)
+        (onTable soup)
+        (heatType soup cold)
+        (close microwave)
+        (statustype microwave off)
+        (next cold mild)
+        (next mild hot)
+        (next hot very_hot)
+        (statusType on off)
+        (statusType off on)
+        )
+    (:goal
+      (and
+        (onTable soup)
+        (heatType soup very_hot)
+        (onTable curry)
+        (heatType curry very_hot)
+        (close microwave)
+        (statustype microwave off)
+       ))
+)
+(define (problem task6)
+   (:domain warmingfood)
+   (:objects
+         microwave - object
+         on off - status
+         curry soup - food
+         very_hot hot mild cold - warming_type
+         open close - doorStat
+        )
+    (:init
+        (open microwave)
+        (statustype microwave on)
+        (onTable curry)
+        (heatType curry cold)
+        (next cold mild)
+        (next mild hot)
+        (next hot very_hot)
+        (statusType on off)
+        (statusType off on)
+        )
+    (:goal
+      (and
+        (close microwave)
+        (statustype microwave off)
+        (onTable curry)
+        (heatType curry very_hot)
+       ))
+)
+(define (problem task7)
+   (:domain warmingfood)
+   (:objects
+         microwave - object
+         on off - status
+         curry soup - food
+         very_hot hot mild cold - warming_type
+         open close - doorStat
+        )
+    (:init
+        (open microwave)
+        (statustype microwave on)
+        (inMicrowave curry microwave)
+        (heatType curry cold)
+        (next cold mild)
+        (next mild hot)
+        (next hot very_hot)
+        (statusType on off)
+        (statusType off on)
+        )
+    (:goal
+      (and
+        (onTable curry)
+        (heatType curry mild)
+       ))
+)
+(define (problem task8)
+   (:domain warmingfood)
+   (:objects
+         microwave - object
+         on off - status
+         curry soup - food
+         very_hot hot mild cold - warming_type
+         open close - doorStat
+        )
+    (:init
+        (onTable curry)
+        (heatType curry cold)
+        (open microwave)
+        (statustype microwave on)
+        (next cold mild)
+        (next mild hot)
+        (next hot very_hot)
+        (statusType on off)
+        (statusType off on)
+        )
+    (:goal
+      (and
+        (onTable curry)
+        (heatType curry very_hot)
+       ))
+)
+</pre>
+<p>
+
+<p>
+<h2 align="center"><a name="C5">Files Download Links</a></h2>
+</p>
+
+<table width="100%">
+<tr>
+  <td align="center"><a href="WarmingFoodLH7.ocl">
+                     OCL file</a></td>
+  <td align="center"><a href="warming_food7.gfx">
+                     GFX file</a></td>
+</tr>
+</table>
+
+</body>
+</html>

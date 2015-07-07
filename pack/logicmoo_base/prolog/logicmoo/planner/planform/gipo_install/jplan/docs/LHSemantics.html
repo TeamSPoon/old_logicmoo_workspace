@@ -1,0 +1,296 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>LHSemantics</title>
+  <style>
+	<!--
+		H1 { color: #003300; text-align: center }
+		H3 { color: #003300 }
+		H2 { color: #003300 }
+	-->
+	</style>
+</head>
+<body>
+<h1>Informal Semantics of Life History Diagrams</h1>
+<h3>States</h3>
+A state is defined by a label name and is associated with an object
+type which we call a <b>sort</b>. These are determined at creation
+time. State labels must be unique throughout the diagram.
+The state name and <b>sort</b> are used to define right and left hand
+sides to an <b>Ocl</b> state transition
+and define a one place predicate of the form <br>
+&lt;state name &gt;(&lt;object sort&gt;).<br>
+Additional arguments to this predicate which we will call the <b>state
+predicate</b> may be added by other diagram features.<br>
+The
+state node <br>
+<img src="person1.jpg" alt="" border="0" height="46" width="42"><br>
+which has the defined object <b>sort</b>
+<i>person</i> will generate the predicate definition <b>tired(person)</b>
+<h3>Properties</h3>
+Properties are added to individual state nodes on the diagram but apply
+to all state nodes having the same
+object sort. A property defines a property name, which must be unique
+to the current object sort, and
+a property value which may be shared by properties from distinct <b>sorts</b>.
+The property value itself
+defines an object <b>sort</b>. This object <b>sort</b> may be static,
+the norm, or may be dynamic, in which case it will be the name of an
+object type depicted on the life history diagram. Each property
+defines a two place predicate of the form <br>
+&lt;property name&gt;(&lt;object sort&gt;,&lt;value sort&gt;).<br>
+We will refer to this as a <b>property predicate</b>. A <b><i>state
+definition clause</i></b> is formed from
+the state predicate and a conjunction of all property predicates
+applying to the object sort. The properties referring to the object
+sort <b>person</b> <br>
+<img src="properties3.jpg" alt="" border="0" height="187" width="305"><br>
+will produce the following state definition clause for the <i>tired</i>
+state.<br>
+<b>[tired(Person),personAt(Person,Loc),walked(Person,Stage)]</b>
+<h3>Transitions</h3>
+Transitions are identified by label names. Transition label names are
+associated with <b>operator names</b> and may
+be shared with other transition nodes as long as the transitions all
+refer to the same action and that the
+transition nodes are connected by either a single headed red arrow or a
+double headed red arrow. The effect of
+connecting transition nodes with red arrows is explained below. The
+black connecting arrows connect transition
+nodes to state nodes, one as source and one as target. There can only
+be two such connections. The transition
+node in conjunction with its connecting state nodes form part of an
+operator definition such that the operator
+will have the transition label name and the body of the operator will
+have a necessary state change clause
+with the source state definition clause forming the left hand side and
+the target state definition clause forming
+the right hand side.
+The transition <br>
+<img src="person2.jpg" alt="" align="bottom" border="0" height="42"
+ width="163"><br>
+will generate the following operator specification
+<b>
+<pre>operator(sleep(Person,Stage,Loc),<br>    % prevail<br>    [],<br>    % necessary<br>    [     sc(person,Person,[tired(Person),walked(Person,Stage),personAt(Person,Loc)]=&gt;<br>                           [fit(Person),walked(Person,Stage),personAt(Person,Loc)])],<br>    % conditional<br>    []).<br>    </pre>
+</b>Translated to <b>PDDL</b> this would be
+<b>
+<pre>  <br>(:action sleep<br>         :parameters ( ?person - person ?stage - stage ?loc - loc)<br>         :precondition (and <br>              (tired ?person)<br>              (walked ?person ?stage)<br>              (personAt ?person ?loc)<br>              )<br>         :effect (and <br>              (fit ?person)<br>              (not (tired ?person))<br>              )   )</pre>
+</b>
+<h4>Transitions with Property Changes</h4>
+Transition nodes may have property changing predicates. These define a
+constraint name and a constraint value <b>sort</b>. The constraint
+name will define a two place predicate that is normally static that
+limits the range of property value changes. The predicate has the form<br>
+&lt;constraint name&gt;(&lt;constraint value sort&gt;,&lt;constraint
+value sort&gt;).<br>
+The actual instances of the constraint predicate are defined outside
+the Life History editor in the <i>Static Invariants Editor</i>. If the
+is no constraint on how the property values may change then the
+distinguished constraint name "none" is used. In the an example of a
+domain with a state <b>car</b> having a property <b><i>carAt</i></b>
+and property value sort <b><i>loc</i></b> as shown in <br>
+<img src="properties5.jpg" alt="" border="0" height="44" width="157"><br>
+and the constraint as defined in<br>
+<img src="properties4.jpg" alt="" border="0" height="145" width="316"><br>
+the property change dialog the constraint predicate will be added to
+the left hand side of the state transition clause within the operator
+with appropriate variable bindings, giving the operator below. <b>
+<pre> operator(drive(Car,LocA,LocB),<br>    % prevail<br>    [],<br>    % necessary<br>    [     sc(car,Car,[car(Car),carAt(Car,LocA),next(LocA,LocB)]=&gt;[car(Car),carAt(Car,LocB)])],<br>    % conditional<br>    []).</pre>
+</b> In <b>PDDL</b> this is <b>
+<pre> <br>  (:action drive<br>         :parameters ( ?car - car ?locA - loc ?locB - loc)<br>         :precondition (and <br>              (parked ?car)<br>              (carAt ?car ?locA)<br>              (next ?locA ?locB)<br>              )<br>         :effect (and <br>              (carAt ?car ?locB)<br>              (not (carAt ?car ?locA))<br>              )   )</pre>
+</b> When no constraint is placed on the property change <br>
+<img src="properties6.jpg" alt="" border="0" height="151" width="296"><br>
+no static constraint predicate is created. The resulting operators are
+defined as follows.
+<b>
+<pre>operator(drive(Car,LocA,LocB),<br>    % prevail<br>    [],<br>    % necessary<br>    [     sc(car,Car,[parked(Car),carAt(Car,LocA)]=&gt;[parked(Car),carAt(Car,LocB)])],<br>    % conditional<br>    []).</pre>
+</b>In <b>PDDL</b>
+<b>
+<pre>  <br>  (:action drive<br>         :parameters ( ?car - car ?locA - loc ?locB - loc)<br>         :precondition (and <br>              (parked ?car)<br>              (carAt ?car ?locA)<br>              )<br>         :effect (and <br>              (carAt ?car ?locB)<br>              (not (carAt ?car ?locA))<br>              )   )</pre>
+</b>
+<h2>Coordination Connections</h2>
+The coordination between the transition diagrams belonging to discreet <b>sorts</b>
+is shown in the
+Life History Diagrams by red arrows connecting elements from the
+distinct transition diagrams. The coordination can be further modified
+constraints specified as properties of the connecting arrows.
+These properties are specified in the popup dialogs defined for the
+connection.
+<h3>Prevail Conditions</h3>
+Prevail conditions are created by single headed red arrows connecting a
+state from one <b>sorts</b>
+transition diagram, the state forms the source of the arrow, to a
+transition node of the other <b>sorts</b> transition diagram. The
+meaning of such a connection is that there must be an instance of the
+source object sort in the referenced state and it must persist in that
+state during the operation specified by the transition that forms the
+target of the arrow.
+In the diagram<br>
+<img src="coord1.jpg" alt="" border="0" height="120" width="248"><br>
+the load operator requires that there be a parked car during the
+operation. In <b>Ocl</b> this is defined
+in the prevail section of the operator as follows.<br>
+<b>
+<pre>operator(load(Car,Loc,Tent),<br>    % prevail<br>    [     se(car,Car,[parked(Car),carAt(Car,Loc)])],<br>    % necessary<br>    [     sc(tent,Tent,[available(Tent)]=&gt;[loaded(Tent)])],<br>    % conditional<br>    []).</pre>
+</b> In <b>PDDL</b> this is <b>
+<pre> <br> (:action load<br>         :parameters ( ?car - car ?loc - loc ?tent - tent)<br>         :precondition (and <br>              (parked ?car)<br>              (carAt ?car ?loc)<br>              (available ?tent)<br>              )<br>         :effect (and <br>              (loaded ?tent)<br>              (not (available ?tent))<br>              )   )</pre>
+</b> As an operator the <b>load</b> operator is not very sensible as
+it only requires a car to be somewhere while the tent is loaded but no
+association is formed between the car and tent that would guarantee
+that in an domain with multiple cars the tent is unloaded from the same
+car.
+<h4>Prevail Constraints with Common Properties</h4>
+When prevail coordinations are formed when the two object <b>sorts</b>
+share properties with the same property value sort the default will be
+that the property values must be the same. In the above example if a
+property "tentAt" with property value sort "loc" is added to the tent
+the following operators are generated:<br>
+<b>
+<pre> operator(load(Car,Loc,Tent),<br>    % prevail<br>    [     se(car,Car,[parked(Car),carAt(Car,Loc)])],<br>    % necessary<br>    [     sc(tent,Tent,[available(Tent),tentAt(Tent,Loc)]=&gt;[loaded(Tent),tentAt(Tent,Loc)])],<br>    % conditional<br>    []).</pre>
+</b> In this version of <b>load</b> the <i>Loc</i> variable defining
+the location of the car and the tent must be the same. In <b>PDDL</b>
+this looks as follows:<br>
+<b>
+<pre>  (:action load<br>         :parameters ( ?car - car ?loc - loc ?tent - tent)<br>         :precondition (and <br>              (parked ?car)<br>              (carAt ?car ?loc)<br>              (available ?tent)<br>              (tentAt ?tent ?loc)<br>              )<br>         :effect (and <br>              (loaded ?tent)<br>              (not (available ?tent))<br>              )   )</pre>
+</b>
+<h4>Prevail Constraints with Associations</h4>
+A prevail constraint can form an association between the source and
+target object sorts that is capable
+of enduring through multiple state transitions of the participating
+object instances. The creation of an association is depicted by the
+presence of a "+" symbol decorating the red arrow. The removal of an
+established association is indicated by presence of a "-" symbol
+decorating the connecting prevail arrow. Associations are recorded by
+the object sort that forms the target of the prevail constraint arrow.
+Associations are maintained once formed throughout all transitions of
+the target object until such time as a transition is made that removes
+the association. Associations are a way of objects remembering
+connections. For example in the example discussed above of the tent
+"loaded" into a car, when there are multiple cars then the information
+of which car the tent is loaded into must be recorded and remembered
+through any instances of the "drive" operator until such time as the
+tent may be "unloaded" from the car at which point the association is
+removed. The creation and removal of the association is shown below: <br>
+<img src="coord2.jpg" alt="" border="0" height="119" width="243"><br>
+This produces the pair of Ocl operators "load" <b>
+<pre> operator(load(Car,Loc,Tent),<br>    % prevail<br>    [     se(car,Car,[parked(Car),carAt(Car,Loc)])],<br>    % necessary<br>    [     sc(tent,Tent,[available(Tent),tentAt(Tent,Loc)]=&gt;<br>                       [loaded(Tent,Car),tentAt(Tent,Loc)])],<br>    % conditional<br>    []).<br>operator(unload(Car,Loc,Tent),<br>    % prevail<br>    [     se(car,Car,[parked(Car),carAt(Car,Loc)])],<br>    % necessary<br>    [     sc(tent,Tent,[loaded(Tent,Car),tentAt(Tent,Loc)]=&gt;<br>                       [available(Tent),tentAt(Tent,Loc)])],<br>    % conditional<br>    []).</pre>
+</b>We see in these operators that the state predicate <i>loaded</i>
+has an additional variable <i>Car</i> which is instantiated to the
+same value as the <i>Car</i> that forms the prevail condition. In PDDL
+this translates to:
+<b>
+<pre>  (:action load<br>         :parameters ( ?car - car ?loc - loc ?tent - tent)<br>         :precondition (and <br>              (parked ?car)<br>              (carAt ?car ?loc)<br>              (available ?tent)<br>              (tentAt ?tent ?loc)<br>              )<br>         :effect (and <br>              (loaded ?tent ?car)<br>              (not (available ?tent))<br>              )   )<br><br><br>  (:action unload<br>         :parameters ( ?car - car ?loc - loc ?tent - tent)<br>         :precondition (and <br>              (parked ?car)<br>              (carAt ?car ?loc)<br>              (loaded ?tent ?car)<br>              (tentAt ?tent ?loc)<br>              )<br>         :effect (and <br>              (available ?tent)<br>              (not (loaded ?tent ?car))<br>              )   )</pre>
+</b>Though not shown in this example if the tent undergoes transition
+to other states from the "loaded"
+state without traversing the "Unload" transition then each of these
+states will also have the additional variable added to the state
+predicate.
+<h4>Necessary Constraints</h4>
+Necessary constraints are depicted by a form of double headed red arrow
+connecting two transition
+nodes. The meaning of a necessary constraint is that the state
+transitions of both object <b>sorts</b>
+must occur together as part of the <b>same operator</b>. The circled
+end of the arrow forms the source of the connection and the defined
+operator will take on the name of this transition node. In the process
+of connecting transition
+nodes the name of the source node is propagated to the target node. In
+the Hiking domain example the <br>
+<img src="coord3.jpg" alt="" border="0" height="129" width="307"><br>
+the connection between the two drive transitions, that of the car and
+that of the person indicates that they
+both must occur together and is informally the requirement that the car
+have a driver. In <b>Ocl</b>
+this is shown as follows:<br>
+<b>
+<pre>operator(drive(Car,LocA,LocB,Person),<br>    % prevail<br>    [],<br>    % necessary<br>    [sc(car,Car,[parked(Car),carAt(Car,LocA)]=&gt;<br>                [parked(Car),carAt(Car,LocB)]),<br>     sc(person,Person,[inCar(Person,Car),personAt(Person,LocA)]=&gt;<br>                      [inCar(Person,Car),personAt(Person,LocB)])],<br>    % conditional<br>    []).</pre>
+</b>In this example the property changes referring to the location of
+the person and the car were both defined and we see the two transitions
+occurring together. In <b>PDDL</b> this is<br>
+<b>
+<pre>(:action drive<br>         :parameters ( ?car - car ?locA - loc ?locB - loc ?person - person)<br>         :precondition (and <br>              (parked ?car)<br>              (carAt ?car ?locA)<br>              (inCar ?person ?car)<br>              (personAt ?person ?locA)<br>              )<br>         :effect (and <br>              (carAt ?car ?locB)<br>              (not (carAt ?car ?locA))<br>              (personAt ?person ?locB)<br>              (not (personAt ?person ?locA))<br>              )   )</pre>
+</b>
+<h4>Conditional Constraints</h4>
+Conditional constraints are depicted by a single headed red arrow
+connecting two transition
+nodes. The meaning of a conditional constraint is that the state
+transitions of the target object <b>sort</b>
+must occur together as part of the <b>same operator</b> with the
+transition for the source object sort, but that the
+source object sort's transition may occur without that of the target's
+transition. In this way
+a <i>conditional effect</i> of the operator is defined. In the process
+of connecting transition
+nodes the name of the source node is propagated to the target node. In
+the Hiking domain example the <br>
+<img src="coord4.jpg" alt="" border="0" height="123" width="329"><br
+ clear="all">
+connection between the "drive" transitions of the tent and the car is
+conditional. In conjunction
+with the property changing constraints of both transitions the
+conditional constraint ensures that the tent only changes location when
+the car changes location but that the car can make a drive transition
+without a tent doing so. In <b>Ocl</b> this is shown by the presence
+of the tent's transition in the
+conditional section of the operator, as follows:<br>
+<b>
+<pre>operator(drive(Car,LocA,LocB),<br>    % prevail<br>    [],<br>    % necessary<br>    [     sc(car,Car,[parked(Car),carAt(Car,LocA)]=&gt;<br>                     [parked(Car),carAt(Car,LocB)])],<br>    % conditional<br>    [     sc(tent,Tent,[loaded(Tent,Car),tentAt(Tent,LocA)]=&gt;<br>                       [loaded(Tent,Car),tentAt(Tent,LocB)])]).<br></pre>
+</b>In <b>PDDL</b> this is
+<b>
+<pre>(:action drive<br>         :parameters ( ?car - car ?locA - loc ?locB - loc)<br>         :precondition (and <br>              (parked ?car)<br>              (carAt ?car ?locA)<br>              )<br>         :effect (and <br>              (carAt ?car ?locB)<br>              (not (carAt ?car ?locA))<br>              (forall ( ?tent - tent) <br>                      (when <br>                        (and<br>                         (loaded ?tent ?car)<br>                         (tentAt ?tent ?locA))<br>                        (and                   <br>                         (tentAt ?tent ?locB)<br>                         (not (tentAt ?tent ?locA)))))<br>              )   )</pre>
+</b>
+<h4>Necessary and Conditional Constraints with Associations</h4>
+Both necessary and conditional constraints may start or end
+associations in a manner identical to that of Prevail constraints.
+<h4>Property Coordination Constraints</h4>
+In the three types of constraints, Prevail, Necessary and Conditional
+the default assumption is that when objects from the source and
+destination object sorts share properties with the same value sort then
+these values must be
+identical when the connected transitions are made. Property
+Coordination Constraints allow this default to be changed. The
+alternative constraint is defined in the popup associated with the
+constraint arrow. This allows you to choose properties from the related
+object sorts and define a predicate name to form a constraint on the
+allowed
+values. Such Property Coordination Constraints though typically will
+act on arguments of the same <b>sort</b> need
+not do so and could relate argument sorts of diverse sorts. The
+Property Constraint popup is shown below:<br>
+<img src="coord6.jpg" alt="" border="0" height="161" width="363"><br>
+In this example drawn from the Dock Workers Robots domain the
+constraint could be defined relative to the <i>load</i> and <i>unload</i>
+transitions requiring that the locations of the container and robot are
+<i>adjacent</i> to one another rather than the default of being at the
+same location when the transitions are made.
+<h3>Number Constraints</h3>
+Number constraints are used to define when more than one instance of an
+object, of the same <b>sort</b> is required to make a transition at
+the same time. Examples of this occurs in the Hiking domain where
+walkers are required to walk the stages of the walk in pairs, each pair
+forming a couple. Number constraints are defined in the popup
+associated with transition nodes. The popup with the constraint for
+couples is shown below:<br>
+<img src="coord5.jpg" alt="" border="0" height="143" width="329"><br>
+When a number constraint has been added to a transition node this is
+visually indicated by a red border to the transition node. The
+constraint "couple" will form an <i>n-placed</i> predicate where <b><i>n</i></b>
+is the number specified as required to participate in the transition.
+In the Hiking domain <i>couple</i> will be a two place predicate where
+each argument is of the type of the object sort making the transition,
+i.e. <i>person</i>. Instances of the constraint predicate must be
+defined in the Atomic Invariants editor. In <b>Ocl</b> the "walk"
+operator is defined with two person transitions as below: <b>
+<pre> operator(walk(Person1,StageA,LocA,LocB,StageB,Person2),<br>    % prevail<br>    [],<br>    % necessary<br>    [sc(person,Person1,[fit(Person1),walked(Person1,StageA),personAt(Person1,LocA),next(LocA,LocB),<br>                             nextLeg(StageA,StageB),couple(Person1,Person2)]=&gt;<br>                            [tired(Person1),walked(Person1,StageB),pAt(Person1,LocB)]),<br>     sc(person,Person2,[fit(Person2),walked(Person2,StageA),pAt(Person2,LocA),next(LocA,LocB),<br>                        nextLeg(StageA,StageB)]=&gt;<br>                       [tired(Person2),walked(Person2,StageB),personAt(Person2,LocB)])],<br>    % conditional<br>    []).</pre>
+</b> note that the <i>couple</i> predicate occurs in the left hand
+side of the first transition. In <b>PDDL</b> this is as follows: <b>
+<pre> <br> (:action walk<br>         :parameters ( ?personA - person ?stageA - stage ?locA - loc ?locB - loc <br>                       ?stageB - stage ?personB - person)<br>         :precondition (and <br>              (fit ?personA)<br>              (walked ?personA ?stageA)<br>              (personAt ?personA ?locA)<br>              (couple ?personA ?personB)<br>              (fit ?personB)<br>              (walked ?personB ?stageA)<br>              (personAt ?personB ?locA)<br>              (next ?locA ?locB)<br>              (nextLeg ?stageA ?stageB)<br>              )<br>         :effect (and <br>              (tired ?personA)<br>              (walked ?personA ?stageB)<br>              (personAt ?personA ?locB)<br>              (not (fit ?personA))<br>              (not (walked ?personA ?stageA))<br>              (not (personAt ?personA ?locA))<br>              (tired ?personB)<br>              (walked ?personB ?stageB)<br>              (personAt ?personB ?locB)<br>              (not (fit ?personB))<br>              (not (walked ?personB ?stageA))<br>              (not (personAt ?personB ?locA))<br>              )   )<br></pre>
+</b>
+<br>
+<hr align="center" size="4" width="100%"> <a href="GIPODocs.html"><img
+ src="docs.png" height="40" width="40"></a> <b><font
+ face="Arial,Helvetica"><font size="-2"> <a href="GIPODocs.html">GIPO
+Document Set</a>
+</font></font></b>
+</body>
+</html>

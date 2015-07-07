@@ -1,0 +1,16 @@
+<?xml version="1.0"?> 
+<pks> 
+  <domain name="FairyTaleCastle"> 
+    <symbols> 
+      <predicates> 
+        open_close_container/1, not_so_easy_to_kill/1, here/1, closed/1, unlocked/1, here_object/1, container_object/1, open_container/1, top/1, takeable/1, accessible/1, inventory_object/1, open/1, alive/1, locked/1, player/1, easy_to_kill/1, dragon/1, frog/1, weapon/1, sword/1, object/1, room/1, oder/1, 
+ edible/1, climbable/1, wooden/1, empty/1, generic_container/1, visible/1, wall/1, treasury/1, drawing_room/1, exit/1, north_exit/1, south_exit/1, east_exit/1, west_exit/1, 
+ open_closed/1, locked_unlocked/1, green/1, silver/1, white/1, yellow/1, golden/1, brown/1, red/1, black/1, happy/1, couch/1, couchleg/1, seat/1, seating/1, castle/1, crown/1, 
+ necklace/1, key/1, apple/1, worm/1, chest/1, table/1, property/1, colour/1, ugly/1, small/1, retina_scanner/1, foodpaste/1, has_counterpart/1, has_location/2, has_exit/2,  
+ has_detail/2, fits_in/2, controls/2, part_of/2, leads_to/3, cargo_room/1, control_room/1, rabbitlike_alien/1, alien/1, ladder/1, aft_exit/1, crate/1, button/1, dead/1  
+      </predicates> 
+      <functions> 
+	here_is/0 
+      </functions> 
+      <constants> 
+        nirvana

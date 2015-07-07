@@ -1,0 +1,510 @@
+**** test 1
+
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_3,city1_cl1)
+deliver(pk_1,city1_cl1)
+
+TIME TAKEN = 0.03 SECONDS
+SIZE = 6
+NODE VARIATIONS = 12
+**** test 2
+
+attach_traincar(train2,traincar1,city2_ts1)
+pull_traincar(train2,traincar1,city2_ts1,city1_ts1,rail_route_2)
+detach_traincar(train2,traincar1,city1_ts1)
+
+TIME TAKEN = 0.02 SECONDS
+SIZE = 3
+NODE VARIATIONS = 10
+**** test 3
+
+pay_fees(pk_2)
+commission(truck_3)
+load_package(pk_2,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city2_cl1,road_route_32)
+unload_package(pk_2,truck_3,city2_cl1)
+deliver(pk_2,city2_cl1)
+pay_fees(pk_1)
+commission(truck_33)
+load_package(pk_1,truck_33,city3_cl1)
+move(truck_33,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_33,city1_cl1)
+deliver(pk_1,city1_cl1)
+
+TIME TAKEN = 0.1 SECONDS
+SIZE = 12
+NODE VARIATIONS = 24
+**** test 4
+
+pay_fees(pk_2)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_2,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city3_ts1,local_roads)
+unload_package(pk_2,truck_1,city3_ts1)
+deliver(pk_2,city3_ts1)
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_3,city1_cl1)
+deliver(pk_1,city1_cl1)
+
+TIME TAKEN = 0.47 SECONDS
+SIZE = 13
+NODE VARIATIONS = 28
+**** test 5
+
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city3_ts1,local_roads)
+unload_package(pk_1,truck_3,city3_ts1)
+deliver(pk_1,city3_ts1)
+pay_fees(pk_2)
+commission(truck_33)
+load_package(pk_2,truck_33,city3_cl1)
+move(truck_33,city3_cl1,city3_ts1,local_roads)
+unload_package(pk_2,truck_33,city3_ts1)
+deliver(pk_2,city3_ts1)
+
+TIME TAKEN = 0.42 SECONDS
+SIZE = 12
+NODE VARIATIONS = 32
+**** test 6
+
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_3,city1_cl1)
+deliver(pk_1,city1_cl1)
+pay_fees(pk_2)
+commission(truck_33)
+load_package(pk_2,truck_33,city3_cl1)
+move(truck_33,city3_cl1,city3_ts1,local_roads)
+unload_package(pk_2,truck_33,city3_ts1)
+deliver(pk_2,city3_ts1)
+
+TIME TAKEN = 0.74 SECONDS
+SIZE = 12
+NODE VARIATIONS = 28
+**** test 7
+
+pay_fees(pk_6)
+commission(traincar1)
+attach_traincar(train2,traincar1,city2_ts1)
+pull_traincar(train2,traincar1,city2_ts1,city1_ts1,rail_route_2)
+load_package(pk_6,traincar1,city1_ts1)
+pull_traincar(train2,traincar1,city1_ts1,city2_ts1,rail_route_2)
+detach_traincar(train2,traincar1,city2_ts1)
+unload_package(pk_6,traincar1,city2_ts1)
+deliver(pk_6,city2_ts1)
+attach_traincar(train2,traincar1,city2_ts1)
+pull_traincar(train2,traincar1,city2_ts1,city1_ts1,rail_route_2)
+detach_traincar(train2,traincar1,city1_ts1)
+
+TIME TAKEN = 0.12 SECONDS
+SIZE = 12
+NODE VARIATIONS = 30
+**** test 8
+
+pay_fees(pk_6)
+commission(traincar1)
+attach_traincar(train2,traincar1,city2_ts1)
+pull_traincar(train2,traincar1,city2_ts1,city1_ts1,rail_route_2)
+load_package(pk_6,traincar1,city1_ts1)
+pull_traincar(train2,traincar1,city1_ts1,city2_ts1,rail_route_2)
+detach_traincar(train2,traincar1,city2_ts1)
+unload_package(pk_6,traincar1,city2_ts1)
+deliver(pk_6,city2_ts1)
+
+TIME TAKEN = 0.07 SECONDS
+SIZE = 9
+NODE VARIATIONS = 16
+**** test 9
+
+pay_fees(pk_1)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_1,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_1,city1_cl1)
+deliver(pk_1,city1_cl1)
+pay_fees(pk_4)
+commission(truck_1)
+load_package(pk_4,truck_1,city1_cl1)
+move(truck_1,city1_cl1,city2_cl1,road_route_21)
+unload_package(pk_4,truck_1,city2_cl1)
+deliver(pk_4,city2_cl1)
+pay_fees(pk_2)
+commission(truck_3)
+load_package(pk_2,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_2,truck_3,city1_cl1)
+deliver(pk_2,city1_cl1)
+
+TIME TAKEN = 0.35 SECONDS
+SIZE = 19
+NODE VARIATIONS = 36
+**** test 10
+
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city2_cl1,road_route_32)
+unload_package(pk_1,truck_3,city2_cl1)
+deliver(pk_1,city2_cl1)
+attach_traincar(train2,traincar1,city2_ts1)
+pull_traincar(train2,traincar1,city2_ts1,city1_ts1,rail_route_2)
+detach_traincar(train2,traincar1,city1_ts1)
+pay_fees(pk_5)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_5,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city3_ts1,local_roads)
+unload_package(pk_5,truck_1,city3_ts1)
+deliver(pk_5,city3_ts1)
+
+TIME TAKEN = 0.33 SECONDS
+SIZE = 16
+NODE VARIATIONS = 41
+**** test 11
+
+pay_fees(pk_5)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_5,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city3_ts1,local_roads)
+unload_package(pk_5,truck_1,city3_ts1)
+deliver(pk_5,city3_ts1)
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city2_cl1,road_route_32)
+unload_package(pk_1,truck_3,city2_cl1)
+deliver(pk_1,city2_cl1)
+attach_traincar(train2,traincar1,city2_ts1)
+pull_traincar(train2,traincar1,city2_ts1,city1_ts1,rail_route_2)
+detach_traincar(train2,traincar1,city1_ts1)
+pay_fees(pk_3)
+commission(truck_33)
+load_package(pk_3,truck_33,city3_cl1)
+move(truck_33,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_3,truck_33,city1_cl1)
+deliver(pk_3,city1_cl1)
+
+TIME TAKEN = 0.56 SECONDS
+SIZE = 22
+NODE VARIATIONS = 53
+**** test 12
+
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city2_cl1,road_route_32)
+unload_package(pk_1,truck_3,city2_cl1)
+deliver(pk_1,city2_cl1)
+pay_fees(pk_6)
+commission(traincar1)
+attach_traincar(train2,traincar1,city2_ts1)
+pull_traincar(train2,traincar1,city2_ts1,city1_ts1,rail_route_2)
+load_package(pk_6,traincar1,city1_ts1)
+pull_traincar(train2,traincar1,city1_ts1,city2_ts1,rail_route_2)
+detach_traincar(train2,traincar1,city2_ts1)
+unload_package(pk_6,traincar1,city2_ts1)
+deliver(pk_6,city2_ts1)
+attach_traincar(train2,traincar1,city2_ts1)
+pull_traincar(train2,traincar1,city2_ts1,city1_ts1,rail_route_2)
+detach_traincar(train2,traincar1,city1_ts1)
+
+TIME TAKEN = 0.24 SECONDS
+SIZE = 18
+NODE VARIATIONS = 42
+**** test 13
+
+pay_fees(pk_4)
+commission(truck_2)
+move(truck_2,city2_cl1,city1_cl1,road_route_21)
+load_package(pk_4,truck_2,city1_cl1)
+move(truck_2,city1_cl1,city3_cl1,road_route_31)
+unload_package(pk_4,truck_2,city3_cl1)
+deliver(pk_4,city3_cl1)
+pay_fees(pk_2)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_2,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city2_cl1,road_route_32)
+unload_package(pk_2,truck_1,city2_cl1)
+deliver(pk_2,city2_cl1)
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_3,city1_cl1)
+deliver(pk_1,city1_cl1)
+pay_fees(pk_3)
+commission(truck_33)
+load_package(pk_3,truck_33,city3_cl1)
+move(truck_33,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_3,truck_33,city1_cl1)
+deliver(pk_3,city1_cl1)
+
+TIME TAKEN = 0.53 SECONDS
+SIZE = 26
+NODE VARIATIONS = 48
+**** test 14
+
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city2_cl1,road_route_32)
+unload_package(pk_1,truck_3,city2_cl1)
+deliver(pk_1,city2_cl1)
+pay_fees(pk_2)
+commission(truck_33)
+load_package(pk_2,truck_33,city3_cl1)
+move(truck_33,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_2,truck_33,city1_cl1)
+deliver(pk_2,city1_cl1)
+
+TIME TAKEN = 0.11 SECONDS
+SIZE = 12
+NODE VARIATIONS = 24
+**** test 15
+
+pay_fees(pk_2)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_2,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_2,truck_1,city1_cl1)
+deliver(pk_2,city1_cl1)
+pay_fees(pk_3)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_3,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_3,truck_1,city1_cl1)
+deliver(pk_3,city1_cl1)
+pay_fees(pk_4)
+commission(truck_1)
+load_package(pk_4,truck_1,city1_cl1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+unload_package(pk_4,truck_1,city3_cl1)
+deliver(pk_4,city3_cl1)
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_3,city1_cl1)
+deliver(pk_1,city1_cl1)
+
+TIME TAKEN = 3.56 SECONDS
+SIZE = 26
+NODE VARIATIONS = 52
+**** test 16
+
+pay_fees(pk_4)
+commission(truck_2)
+move(truck_2,city2_cl1,city1_cl1,road_route_21)
+load_package(pk_4,truck_2,city1_cl1)
+move(truck_2,city1_cl1,city3_cl1,road_route_31)
+unload_package(pk_4,truck_2,city3_cl1)
+deliver(pk_4,city3_cl1)
+pay_fees(pk_3)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_3,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_3,truck_1,city1_cl1)
+deliver(pk_3,city1_cl1)
+pay_fees(pk_2)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_2,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city2_cl1,road_route_32)
+unload_package(pk_2,truck_1,city2_cl1)
+deliver(pk_2,city2_cl1)
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_3,city1_cl1)
+deliver(pk_1,city1_cl1)
+
+TIME TAKEN = 0.67 SECONDS
+SIZE = 27
+NODE VARIATIONS = 48
+**** test 17
+
+pay_fees(pk_5)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_5,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_5,truck_1,city1_cl1)
+deliver(pk_5,city1_cl1)
+pay_fees(pk_4)
+commission(truck_2)
+move(truck_2,city2_cl1,city1_cl1,road_route_21)
+load_package(pk_4,truck_2,city1_cl1)
+move(truck_2,city1_cl1,city3_cl1,road_route_31)
+unload_package(pk_4,truck_2,city3_cl1)
+deliver(pk_4,city3_cl1)
+pay_fees(pk_3)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_3,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_3,truck_1,city1_cl1)
+deliver(pk_3,city1_cl1)
+pay_fees(pk_2)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_2,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city2_cl1,road_route_32)
+unload_package(pk_2,truck_1,city2_cl1)
+deliver(pk_2,city2_cl1)
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_3,city1_cl1)
+deliver(pk_1,city1_cl1)
+
+TIME TAKEN = 1.26 SECONDS
+SIZE = 34
+NODE VARIATIONS = 60
+**** test 18
+
+pay_fees(pk_5)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_5,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_5,truck_1,city1_cl1)
+deliver(pk_5,city1_cl1)
+pay_fees(pk_3)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_3,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_3,truck_1,city1_cl1)
+deliver(pk_3,city1_cl1)
+pay_fees(pk_4)
+commission(truck_1)
+load_package(pk_4,truck_1,city1_cl1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+unload_package(pk_4,truck_1,city3_cl1)
+deliver(pk_4,city3_cl1)
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_3,city1_cl1)
+deliver(pk_1,city1_cl1)
+pay_fees(pk_2)
+commission(truck_33)
+load_package(pk_2,truck_33,city3_cl1)
+move(truck_33,city3_cl1,city2_cl1,road_route_32)
+unload_package(pk_2,truck_33,city2_cl1)
+deliver(pk_2,city2_cl1)
+
+TIME TAKEN = 0.92 SECONDS
+SIZE = 32
+NODE VARIATIONS = 60
+**** test 19
+
+pay_fees(pk_5)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_5,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_5,truck_1,city1_cl1)
+deliver(pk_5,city1_cl1)
+attach_traincar(train2,traincar1,city2_ts1)
+pull_traincar(train2,traincar1,city2_ts1,city1_ts1,rail_route_2)
+detach_traincar(train2,traincar1,city1_ts1)
+pay_fees(pk_3)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_3,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_3,truck_1,city1_cl1)
+deliver(pk_3,city1_cl1)
+pay_fees(pk_4)
+commission(truck_1)
+load_package(pk_4,truck_1,city1_cl1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+unload_package(pk_4,truck_1,city3_cl1)
+deliver(pk_4,city3_cl1)
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_3,city1_cl1)
+deliver(pk_1,city1_cl1)
+pay_fees(pk_2)
+commission(truck_33)
+load_package(pk_2,truck_33,city3_cl1)
+move(truck_33,city3_cl1,city2_cl1,road_route_32)
+unload_package(pk_2,truck_33,city2_cl1)
+deliver(pk_2,city2_cl1)
+
+TIME TAKEN = 1.14 SECONDS
+SIZE = 35
+NODE VARIATIONS = 70
+**** test 20
+
+pay_fees(pk_5)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_5,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_5,truck_1,city1_cl1)
+deliver(pk_5,city1_cl1)
+pay_fees(pk_6)
+commission(traincar1)
+attach_traincar(train2,traincar1,city2_ts1)
+pull_traincar(train2,traincar1,city2_ts1,city1_ts1,rail_route_2)
+load_package(pk_6,traincar1,city1_ts1)
+pull_traincar(train2,traincar1,city1_ts1,city3_ts1,rail_route_3)
+detach_traincar(train2,traincar1,city3_ts1)
+unload_package(pk_6,traincar1,city3_ts1)
+deliver(pk_6,city3_ts1)
+pay_fees(pk_4)
+commission(truck_2)
+move(truck_2,city2_cl1,city1_cl1,road_route_21)
+load_package(pk_4,truck_2,city1_cl1)
+move(truck_2,city1_cl1,city3_cl1,road_route_31)
+unload_package(pk_4,truck_2,city3_cl1)
+deliver(pk_4,city3_cl1)
+pay_fees(pk_3)
+commission(truck_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+load_package(pk_3,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city1_ts1,road_route_31)
+unload_package(pk_3,truck_1,city1_ts1)
+deliver(pk_3,city1_ts1)
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_3,city1_cl1)
+deliver(pk_1,city1_cl1)
+pay_fees(pk_2)
+commission(truck_33)
+load_package(pk_2,truck_33,city3_cl1)
+move(truck_33,city3_cl1,city2_cl1,road_route_32)
+unload_package(pk_2,truck_33,city2_cl1)
+deliver(pk_2,city2_cl1)
+
+TIME TAKEN = 1.77 SECONDS
+SIZE = 42
+NODE VARIATIONS = 76
+**** test 21
+++++++++++++++++++++++++++++++++++++++++++++

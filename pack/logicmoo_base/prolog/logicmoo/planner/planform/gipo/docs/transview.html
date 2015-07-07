@@ -1,0 +1,129 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.78 [en] (X11; U; Linux 2.4.10-4GB i686) [Netscape]">
+   <title>GIPO User Manual - Transition View</title>
+</head>
+<body>
+
+<center>
+<h2>
+GIPO User Manual</h2></center>
+
+<hr>
+<table WIDTH="100%" >
+<tr>
+<td>
+<center>
+<h3>
+TRANSITION EDIT</h3></center>
+</td>
+
+<td ALIGN=CENTER VALIGN=TOP WIDTH="20%"><a href="sort.html">Sort Edit</a>
+<br><a href="predicate.html">Predicate Edit</a>
+<br><a href="state.html">State Edit</a>
+<br><a href="taskview.html">Task Edit</a>
+<br><a href="stepper.html">Stepper</a>
+<br><a href="animator.html">Animator</a></td>
+</tr>
+</table>
+
+<dl>
+<dt>
+<b>TO CREATE A NEW OPERATOR</b></dt>
+
+<br>&nbsp;
+<p>&nbsp;
+<dd>
+1. click on the "New" button on the top toolbar or the menu bar (Operator),
+a green circle (labeled as "Action ID") will appear on the editing canvas
+to represent the head (name) of the operator.</dd>
+
+<p><br>&nbsp;2. double click on this circle object to bring up a dialog
+box to rename the operator to the user's desire.
+<p>&nbsp;3. click on the radio button "Add Prevail" from buttom toolbar
+to set the editing mode to "Adding a prevail condition for this new operator",
+then select the right state by clicking on it from the Substate List window
+on the left.
+<p>&nbsp;4. click on the radio button "Add Necessary", then select a state
+from the substate list window, the left hand side statement of the necessary
+condition will appear on the canvas as a gray round rectangle, in the meantime,
+the right hand side statement appears as an empty round rectangle with
+flashing edges waiting for the user's input. The content of "Substate List"
+window has been updated to the states related to the same sort user just
+picked. Clicking on one of the state in the substate list window will specify
+the right hand side of the necessary condition and stop the flashing effect.
+<p>&nbsp;5. to build a conditional change require the same operation as
+above NO 4 after the function mode is set to "Add Conditional" (bottom
+toolbar).
+<p>&nbsp;6. click on the "Add" button on the top toolbar to save this operator
+to the "Operators list". Be noticed that to save the operator to the domain
+for the other tools to use, "Commit" button needs to be clicked before
+leave this transition window.
+<br>&nbsp;
+<br>&nbsp;
+<dt>
+<b>TO VIEW/EDIT AN EXISTING OPERATOR</b></dt>
+
+<br>&nbsp;
+<p>&nbsp;
+<dd>
+7. double click on the new operator from the "Operators List", the newly
+created operator will be reorganised on the canvas.</dd>
+
+<p><br>&nbsp;8. right click on any rectangles (not the operator head/name
+- the circle) to bring up a popup menu with all the static predicates.
+To add the necessary static predicate, just click on right item on the
+popup menu.
+<p>&nbsp;9. click on the "Edit Mode" on the top toolbar to freeze the all
+the shapes on the canvas. The system reaches a situation that all the varibles
+of this operator can now be edited. "Zoom In" and "Zoom Out" function will
+help user to adjust the viewing scale.
+<p>&nbsp;10. click the varible which needs to be renamed. It will be highlighted
+with green underline, all other related (with same sort) varibles will
+also be highlighted but with red underline. Right click on the green underlined
+varible will allow user to rename it. Right click on the red underlined
+varible will allow user to specify the relationship between the current
+red underlined varible and the green underlined varible. Right click on
+the begining part of a predicate will allow user to remove this predicate
+from the condition/shape.
+<p>&nbsp;11. click on the "Update" button (not the "Add" button) to update
+current edited operator.
+<br>&nbsp;
+<br>&nbsp;
+<dt>
+<b>TO DELETE AN OPERATOR</b></dt>
+
+<br>&nbsp;
+<p>&nbsp;
+<dd>
+12. click on the right operator from the "Operators List" window, then
+click on the button "Delete" on TOP toolbar. The button "Delete" on the
+bottom toolbar is for deleting a sigle shape on the canvas.</dd>
+
+<br>&nbsp;
+<p>&nbsp;
+<dt>
+<b>OTHER FUNCTIONS</b></dt>
+
+<p><br>&nbsp;13. All shapes and link lines support the common functions
+such as click select, drag select, delete, drag/move, resize, reshape,
+undo/redo etc.
+<p>&nbsp;14. Any small windows, toolbars can be hidden by selecting the
+right mode in "View" functions of the menu bar.
+<p>&nbsp;15. The graphics of the operator can be saved as pure graphical
+file and can be printed out to a ps file or a printer.
+<br>&nbsp;
+<br>&nbsp;</dl>
+
+<hr><script language="JavaScript">
+<!---//hide script from old browsers
+    document.write( "Last updated "+ document.lastModified );
+//end hiding contents --->
+</script>
+
+<p><a href="user.html"><img SRC="walkback.gif" height=50 width=21></a><b><font face="Arial,Helvetica"><font size=-2><a href="user.html">back
+to the user manual front page</a></font></font></b>
+</body>
+</html>

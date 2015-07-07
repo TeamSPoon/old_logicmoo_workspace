@@ -1,0 +1,4285 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE grammar SYSTEM "xmg-mctag.dtd,xml">
+<mcgrammar>
+  <entry name="Tbetan1CONJn2-1">
+    <family>betan1CONJn2</family>
+    <trace>
+      <class>betan1CONJn2</class>
+      <class>propertySem</class>
+      <class>betax1CONJx2</class>
+      <class>footProj1</class>
+      <class>basicProperty</class>
+    </trace>
+    <tree id="Tbetan1CONJn2-1">
+      <node type="std">
+        <narg>
+          <fs>
+            <f name="bot">
+              <fs coref="@F">
+                <f name="case">
+                  <vAlt coref="@A">
+                    <sym value="nom"/>
+                    <sym value="acc"/>
+                  </vAlt>
+                </f>
+                <f name="definite">
+                  <sym varname="@B"/>
+                </f>
+                <f name="idx">
+                  <sym varname="@C"/>
+                </f>
+                <f name="label">
+                  <sym varname="@D"/>
+                </f>
+                <f name="wh">
+                  <sym varname="@E"/>
+                </f>
+              </fs>
+            </f>
+            <f name="cat">
+              <sym value="np"/>
+            </f>
+            <f name="top">
+              <fs coref="@I">
+                <f name="idx">
+                  <sym varname="@G"/>
+                </f>
+                <f name="label">
+                  <sym varname="@H"/>
+                </f>
+              </fs>
+            </f>
+          </fs>
+        </narg>
+        <node type="foot">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="np"/>
+              </f>
+              <f name="top">
+                <fs coref="@J">
+                  <f name="case">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="definite">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="wh">
+                    <sym varname="@E"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+        <node type="anchor">
+          <narg>
+            <fs>
+              <f name="bot">
+                <fs coref="@M">
+                  <f name="idx">
+                    <sym varname="@K"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@L"/>
+                  </f>
+                </fs>
+              </f>
+              <f name="cat">
+                <sym value="conj"/>
+              </f>
+              <f name="top">
+                <fs coref="@N">
+                  <f name="idx">
+                    <sym varname="@K"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@L"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+        <node type="subst">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="np"/>
+              </f>
+              <f name="top">
+                <fs coref="@O">
+                  <f name="case">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="definite">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="wh">
+                    <sym varname="@E"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+      </node>
+    </tree>
+    <semantics>
+      <literal negated="no">
+        <label>
+          <sym varname="@L"/>
+        </label>
+        <predicate>
+          <sym varname="@P"/>
+        </predicate>
+        <arg>
+          <sym varname="@K"/>
+        </arg>
+      </literal>
+    </semantics>
+    <interface>
+      <fs>
+        <f name="arg0">
+          <sym varname="@K"/>
+        </f>
+        <f name="label0">
+          <sym varname="@L"/>
+        </f>
+        <f name="rel">
+          <sym varname="@P"/>
+        </f>
+      </fs>
+    </interface>
+  </entry>
+  <entry name="TbetavPn-2">
+    <family>betavPn</family>
+    <trace>
+      <class>VerbArg1Linking</class>
+      <class>betavPn</class>
+      <class>betaxPn</class>
+      <class>binaryState</class>
+      <class>PrepCaseAssigner</class>
+      <class>AdjunctSem</class>
+      <class>AdjunctArg2Linking</class>
+      <class>footProj1</class>
+      <class>PrepSem</class>
+      <class>anchorProj1</class>
+    </trace>
+    <tree id="TbetavPn-2">
+      <node type="std">
+        <narg>
+          <fs>
+            <f name="bot">
+              <fs coref="@J">
+                <f name="assign-case">
+                  <sym varname="@A"/>
+                </f>
+                <f name="assign-comp">
+                  <sym varname="@B"/>
+                </f>
+                <f name="idx">
+                  <sym varname="@C"/>
+                </f>
+                <f name="label">
+                  <sym varname="@D"/>
+                </f>
+                <f name="mode">
+                  <sym varname="@E"/>
+                </f>
+                <f name="num">
+                  <sym varname="@F"/>
+                </f>
+                <f name="pass">
+                  <sym varname="@G"/>
+                </f>
+                <f name="pers">
+                  <sym varname="@H"/>
+                </f>
+                <f name="tense">
+                  <sym varname="@I"/>
+                </f>
+              </fs>
+            </f>
+            <f name="cat">
+              <sym value="vp"/>
+            </f>
+            <f name="top">
+              <fs coref="@M">
+                <f name="idx">
+                  <sym varname="@K"/>
+                </f>
+                <f name="label">
+                  <sym varname="@L"/>
+                </f>
+              </fs>
+            </f>
+          </fs>
+        </narg>
+        <node type="foot">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="vp"/>
+              </f>
+              <f name="top">
+                <fs coref="@N">
+                  <f name="assign-case">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="mode">
+                    <sym varname="@E"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@F"/>
+                  </f>
+                  <f name="pass">
+                    <sym varname="@G"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@H"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@I"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+        <node type="std">
+          <narg>
+            <fs>
+              <f name="bot">
+                <fs coref="@R">
+                  <f name="assign-case">
+                    <sym value="acc"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@O"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@P"/>
+                  </f>
+                  <f name="wh">
+                    <sym varname="@Q"/>
+                  </f>
+                </fs>
+              </f>
+              <f name="cat">
+                <sym value="pp"/>
+              </f>
+              <f name="top">
+                <fs coref="@S">
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+          <node type="anchor">
+            <narg>
+              <fs>
+                <f name="cat">
+                  <sym value="prep"/>
+                </f>
+                <f name="top">
+                  <fs coref="@T">
+                    <f name="assign-case">
+                      <sym value="acc"/>
+                    </f>
+                    <f name="idx">
+                      <sym varname="@O"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@P"/>
+                    </f>
+                  </fs>
+                </f>
+              </fs>
+            </narg>
+          </node>
+          <node type="subst">
+            <narg>
+              <fs>
+                <f name="cat">
+                  <sym value="np"/>
+                </f>
+                <f name="top">
+                  <fs coref="@W">
+                    <f name="case">
+                      <sym value="acc"/>
+                    </f>
+                    <f name="idx">
+                      <sym varname="@U"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@V"/>
+                    </f>
+                    <f name="wh">
+                      <sym varname="@Q"/>
+                    </f>
+                  </fs>
+                </f>
+              </fs>
+            </narg>
+          </node>
+        </node>
+      </node>
+    </tree>
+    <semantics>
+      <literal negated="no">
+        <label>
+          <sym varname="@P"/>
+        </label>
+        <predicate>
+          <sym varname="@X"/>
+        </predicate>
+        <arg>
+          <sym varname="@O"/>
+        </arg>
+        <arg>
+          <sym varname="@U"/>
+        </arg>
+      </literal>
+    </semantics>
+    <interface>
+      <fs>
+        <f name="adjunctI">
+          <sym varname="@U"/>
+        </f>
+        <f name="adjunctL">
+          <sym varname="@V"/>
+        </f>
+        <f name="arg1">
+          <sym varname="@O"/>
+        </f>
+        <f name="arg2">
+          <sym varname="@U"/>
+        </f>
+        <f name="label0">
+          <sym varname="@P"/>
+        </f>
+        <f name="prepI">
+          <sym varname="@O"/>
+        </f>
+        <f name="prepL">
+          <sym varname="@P"/>
+        </f>
+        <f name="rel">
+          <sym varname="@X"/>
+        </f>
+      </fs>
+    </interface>
+  </entry>
+  <entry name="Tn0Vn1rel-3">
+    <family>n0Vn1rel</family>
+    <trace>
+      <class>VerbSem</class>
+      <class>anchorProj2</class>
+      <class>SubjectArgumentTop</class>
+      <class>VerbCaseAssigner</class>
+      <class>TopLevelClass</class>
+      <class>SubjectArg1Linking</class>
+      <class>ObjectArg2Linking</class>
+      <class>Subject</class>
+      <class>VerbalNonInverted</class>
+      <class>SubjectArgument</class>
+      <class>RealisedSubject</class>
+      <class>dian0Vn1active</class>
+      <class>VerbalArgument</class>
+      <class>binaryRel</class>
+      <class>SubjectSem</class>
+      <class>Dian0Vn1</class>
+      <class>n0Vn1rel</class>
+      <class>CanonicalSubject</class>
+      <class>ArgumentNodeSemantics</class>
+      <class>CanObject</class>
+      <class>ObjectSem</class>
+      <class>CanComplement</class>
+      <class>anchorProj1</class>
+      <class>active</class>
+      <class>Object</class>
+      <class>SubjectAgreement</class>
+      <class>VerbalTop</class>
+    </trace>
+    <tree id="Tn0Vn1rel-3">
+      <node type="std">
+        <narg>
+          <fs>
+            <f name="bot">
+              <fs coref="@M">
+                <f name="assign-case">
+                  <sym value="nom"/>
+                </f>
+                <f name="assign-comp">
+                  <sym varname="@A"/>
+                </f>
+                <f name="control">
+                  <sym varname="@B"/>
+                </f>
+                <f name="extracted">
+                  <sym value="-"/>
+                </f>
+                <f name="idx">
+                  <sym varname="@C"/>
+                </f>
+                <f name="inv">
+                  <sym value="-"/>
+                </f>
+                <f name="label">
+                  <sym varname="@D"/>
+                </f>
+                <f name="mainv">
+                  <sym varname="@E"/>
+                </f>
+                <f name="mode">
+                  <sym varname="@F"/>
+                </f>
+                <f name="num">
+                  <sym varname="@G"/>
+                </f>
+                <f name="pass">
+                  <sym varname="@H"/>
+                </f>
+                <f name="perf">
+                  <sym varname="@I"/>
+                </f>
+                <f name="pers">
+                  <sym varname="@J"/>
+                </f>
+                <f name="progress">
+                  <sym varname="@K"/>
+                </f>
+                <f name="tense">
+                  <sym varname="@L"/>
+                </f>
+                <f name="wh">
+                  <sym value="-"/>
+                </f>
+              </fs>
+            </f>
+            <f name="cat">
+              <sym value="s"/>
+            </f>
+            <f name="top">
+              <fs coref="@P">
+                <f name="idx">
+                  <sym varname="@N"/>
+                </f>
+                <f name="label">
+                  <sym varname="@O"/>
+                </f>
+              </fs>
+            </f>
+          </fs>
+        </narg>
+        <node type="subst">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="np"/>
+              </f>
+              <f name="top">
+                <fs coref="@T">
+                  <f name="case">
+                    <sym value="nom"/>
+                  </f>
+                  <f name="control">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@Q"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@R"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@G"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@J"/>
+                  </f>
+                  <f name="scopeL">
+                    <sym varname="@S"/>
+                  </f>
+                  <f name="wh">
+                    <sym value="-"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+        <node type="std">
+          <narg>
+            <fs>
+              <f name="bot">
+                <fs coref="@B1">
+                  <f name="assign-case">
+                    <sym varname="@U"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@V"/>
+                  </f>
+                  <f name="compar">
+                    <sym value="-"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@W"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@S"/>
+                  </f>
+                  <f name="mainv">
+                    <sym varname="@X"/>
+                  </f>
+                  <f name="mode">
+                    <sym varname="@F"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@Y"/>
+                  </f>
+                  <f name="pass">
+                    <sym value="-"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@Z"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@A1"/>
+                  </f>
+                </fs>
+              </f>
+              <f name="cat">
+                <sym value="vp"/>
+              </f>
+              <f name="top">
+                <fs coref="@D1">
+                  <f name="assign-case">
+                    <sym value="nom"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="mainv">
+                    <sym varname="@E"/>
+                  </f>
+                  <f name="mode">
+                    <vAlt coref="@C1">
+                      <sym value="ind"/>
+                      <sym value="imp"/>
+                    </vAlt>
+                  </f>
+                  <f name="num">
+                    <sym varname="@G"/>
+                  </f>
+                  <f name="pass">
+                    <sym varname="@H"/>
+                  </f>
+                  <f name="perf">
+                    <sym varname="@I"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@J"/>
+                  </f>
+                  <f name="progress">
+                    <sym varname="@K"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@L"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+          <node type="anchor">
+            <narg>
+              <fs>
+                <f name="cat">
+                  <sym value="v"/>
+                </f>
+                <f name="top">
+                  <fs coref="@E1">
+                    <f name="assign-case">
+                      <sym varname="@U"/>
+                    </f>
+                    <f name="assign-comp">
+                      <sym varname="@V"/>
+                    </f>
+                    <f name="idx">
+                      <sym varname="@W"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@S"/>
+                    </f>
+                    <f name="mainv">
+                      <sym varname="@X"/>
+                    </f>
+                    <f name="mode">
+                      <sym varname="@F"/>
+                    </f>
+                    <f name="num">
+                      <sym varname="@Y"/>
+                    </f>
+                    <f name="pass">
+                      <sym value="-"/>
+                    </f>
+                    <f name="pers">
+                      <sym varname="@Z"/>
+                    </f>
+                    <f name="tense">
+                      <sym varname="@A1"/>
+                    </f>
+                  </fs>
+                </f>
+              </fs>
+            </narg>
+          </node>
+          <node type="subst">
+            <narg>
+              <fs>
+                <f name="cat">
+                  <sym value="np"/>
+                </f>
+                <f name="top">
+                  <fs coref="@H1">
+                    <f name="case">
+                      <sym value="acc"/>
+                    </f>
+                    <f name="idx">
+                      <sym varname="@F1"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@G1"/>
+                    </f>
+                    <f name="scopeL">
+                      <sym varname="@S"/>
+                    </f>
+                    <f name="wh">
+                      <sym value="-"/>
+                    </f>
+                  </fs>
+                </f>
+              </fs>
+            </narg>
+          </node>
+        </node>
+      </node>
+    </tree>
+    <semantics>
+      <literal negated="no">
+        <label>
+          <sym varname="@S"/>
+        </label>
+        <predicate>
+          <sym varname="@I1"/>
+        </predicate>
+        <arg>
+          <sym value="event"/>
+        </arg>
+        <arg>
+          <sym varname="@W"/>
+        </arg>
+      </literal>
+      <literal negated="no">
+        <label>
+          <sym varname="@S"/>
+        </label>
+        <predicate>
+          <sym varname="@J1"/>
+        </predicate>
+        <arg>
+          <sym varname="@W"/>
+        </arg>
+        <arg>
+          <sym varname="@Q"/>
+        </arg>
+      </literal>
+      <literal negated="no">
+        <label>
+          <sym varname="@S"/>
+        </label>
+        <predicate>
+          <sym varname="@K1"/>
+        </predicate>
+        <arg>
+          <sym varname="@W"/>
+        </arg>
+        <arg>
+          <sym varname="@F1"/>
+        </arg>
+      </literal>
+    </semantics>
+    <interface>
+      <fs>
+        <f name="arg0">
+          <sym varname="@W"/>
+        </f>
+        <f name="arg1">
+          <sym varname="@Q"/>
+        </f>
+        <f name="arg1L">
+          <sym varname="@R"/>
+        </f>
+        <f name="arg2">
+          <sym varname="@F1"/>
+        </f>
+        <f name="arg2L">
+          <sym varname="@G1"/>
+        </f>
+        <f name="label0">
+          <sym varname="@S"/>
+        </f>
+        <f name="objectI">
+          <sym varname="@F1"/>
+        </f>
+        <f name="objectL">
+          <sym varname="@G1"/>
+        </f>
+        <f name="rel">
+          <sym varname="@I1"/>
+        </f>
+        <f name="subjectI">
+          <sym varname="@Q"/>
+        </f>
+        <f name="subjectL">
+          <sym varname="@R"/>
+        </f>
+        <f name="theta1">
+          <sym varname="@J1"/>
+        </f>
+        <f name="theta2">
+          <sym varname="@K1"/>
+        </f>
+        <f name="topL">
+          <sym varname="@S"/>
+        </f>
+        <f name="vbI">
+          <sym varname="@W"/>
+        </f>
+      </fs>
+    </interface>
+  </entry>
+  <entry name="Tn0Vn1rel-4">
+    <family>n0Vn1rel</family>
+    <trace>
+      <class>VerbSem</class>
+      <class>anchorProj2</class>
+      <class>SubjectArgumentTop</class>
+      <class>VerbCaseAssigner</class>
+      <class>TopLevelClass</class>
+      <class>SubjectArg1Linking</class>
+      <class>ObjectArg2Linking</class>
+      <class>Subject</class>
+      <class>VerbalNonInverted</class>
+      <class>SubjectArgument</class>
+      <class>dian0Vn1active</class>
+      <class>VerbalArgument</class>
+      <class>ImperativeSubject</class>
+      <class>NonRealisedSubject</class>
+      <class>binaryRel</class>
+      <class>Dian0Vn1</class>
+      <class>n0Vn1rel</class>
+      <class>PROSem</class>
+      <class>ArgumentNodeSemantics</class>
+      <class>CanObject</class>
+      <class>ObjectSem</class>
+      <class>CanComplement</class>
+      <class>anchorProj1</class>
+      <class>active</class>
+      <class>Object</class>
+      <class>SubjectAgreement</class>
+      <class>VerbalTop</class>
+    </trace>
+    <tree id="Tn0Vn1rel-4">
+      <node type="std">
+        <narg>
+          <fs>
+            <f name="bot">
+              <fs coref="@K">
+                <f name="assign-case">
+                  <sym value="nom"/>
+                </f>
+                <f name="assign-comp">
+                  <sym varname="@A"/>
+                </f>
+                <f name="control">
+                  <sym varname="@B"/>
+                </f>
+                <f name="extracted">
+                  <sym value="-"/>
+                </f>
+                <f name="idx">
+                  <sym varname="@C"/>
+                </f>
+                <f name="inv">
+                  <sym value="-"/>
+                </f>
+                <f name="label">
+                  <sym varname="@D"/>
+                </f>
+                <f name="mainv">
+                  <sym varname="@E"/>
+                </f>
+                <f name="mode">
+                  <sym value="imp"/>
+                </f>
+                <f name="num">
+                  <sym varname="@F"/>
+                </f>
+                <f name="pass">
+                  <sym varname="@G"/>
+                </f>
+                <f name="perf">
+                  <sym varname="@H"/>
+                </f>
+                <f name="pers">
+                  <sym value="2"/>
+                </f>
+                <f name="progress">
+                  <sym varname="@I"/>
+                </f>
+                <f name="tense">
+                  <sym varname="@J"/>
+                </f>
+                <f name="wh">
+                  <sym value="-"/>
+                </f>
+              </fs>
+            </f>
+            <f name="cat">
+              <sym value="s"/>
+            </f>
+            <f name="top">
+              <fs coref="@N">
+                <f name="idx">
+                  <sym varname="@L"/>
+                </f>
+                <f name="inv">
+                  <sym value="-"/>
+                </f>
+                <f name="label">
+                  <sym varname="@M"/>
+                </f>
+              </fs>
+            </f>
+          </fs>
+        </narg>
+        <node type="nadj">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="np"/>
+              </f>
+              <f name="top">
+                <fs coref="@Q">
+                  <f name="case">
+                    <sym value="nom"/>
+                  </f>
+                  <f name="control">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@O"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@P"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@F"/>
+                  </f>
+                  <f name="pers">
+                    <sym value="2"/>
+                  </f>
+                  <f name="wh">
+                    <sym value="-"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+          <node type="lex">
+            <narg>
+              <fs>
+                <f name="phon">
+                  <sym value="e"/>
+                </f>
+              </fs>
+            </narg>
+          </node>
+        </node>
+        <node type="std">
+          <narg>
+            <fs>
+              <f name="bot">
+                <fs coref="@Z">
+                  <f name="assign-case">
+                    <sym varname="@R"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@S"/>
+                  </f>
+                  <f name="compar">
+                    <sym value="-"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@T"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@U"/>
+                  </f>
+                  <f name="mainv">
+                    <sym varname="@V"/>
+                  </f>
+                  <f name="mode">
+                    <sym value="imp"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@W"/>
+                  </f>
+                  <f name="pass">
+                    <sym value="-"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@X"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@Y"/>
+                  </f>
+                </fs>
+              </f>
+              <f name="cat">
+                <sym value="vp"/>
+              </f>
+              <f name="top">
+                <fs coref="@A1">
+                  <f name="assign-case">
+                    <sym value="nom"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="mainv">
+                    <sym varname="@E"/>
+                  </f>
+                  <f name="mode">
+                    <sym value="imp"/>
+                  </f>
+                  <f name="num">
+                    <vAlt coref="@F">
+                      <sym value="sing"/>
+                      <sym value="plur"/>
+                    </vAlt>
+                  </f>
+                  <f name="pass">
+                    <sym varname="@G"/>
+                  </f>
+                  <f name="perf">
+                    <sym varname="@H"/>
+                  </f>
+                  <f name="pers">
+                    <sym value="2"/>
+                  </f>
+                  <f name="progress">
+                    <sym varname="@I"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@J"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+          <node type="anchor">
+            <narg>
+              <fs>
+                <f name="cat">
+                  <sym value="v"/>
+                </f>
+                <f name="top">
+                  <fs coref="@B1">
+                    <f name="assign-case">
+                      <sym varname="@R"/>
+                    </f>
+                    <f name="assign-comp">
+                      <sym varname="@S"/>
+                    </f>
+                    <f name="idx">
+                      <sym varname="@T"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@U"/>
+                    </f>
+                    <f name="mainv">
+                      <sym varname="@V"/>
+                    </f>
+                    <f name="mode">
+                      <sym value="imp"/>
+                    </f>
+                    <f name="num">
+                      <sym varname="@W"/>
+                    </f>
+                    <f name="pass">
+                      <sym value="-"/>
+                    </f>
+                    <f name="pers">
+                      <sym varname="@X"/>
+                    </f>
+                    <f name="tense">
+                      <sym varname="@Y"/>
+                    </f>
+                  </fs>
+                </f>
+              </fs>
+            </narg>
+          </node>
+          <node type="subst">
+            <narg>
+              <fs>
+                <f name="cat">
+                  <sym value="np"/>
+                </f>
+                <f name="top">
+                  <fs coref="@E1">
+                    <f name="case">
+                      <sym value="acc"/>
+                    </f>
+                    <f name="idx">
+                      <sym varname="@C1"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@D1"/>
+                    </f>
+                    <f name="scopeL">
+                      <sym varname="@U"/>
+                    </f>
+                    <f name="wh">
+                      <sym value="-"/>
+                    </f>
+                  </fs>
+                </f>
+              </fs>
+            </narg>
+          </node>
+        </node>
+      </node>
+    </tree>
+    <semantics>
+      <literal negated="no">
+        <label>
+          <sym varname="@U"/>
+        </label>
+        <predicate>
+          <sym varname="@F1"/>
+        </predicate>
+        <arg>
+          <sym value="event"/>
+        </arg>
+        <arg>
+          <sym varname="@T"/>
+        </arg>
+      </literal>
+      <literal negated="no">
+        <label>
+          <sym varname="@U"/>
+        </label>
+        <predicate>
+          <sym varname="@G1"/>
+        </predicate>
+        <arg>
+          <sym varname="@T"/>
+        </arg>
+        <arg>
+          <sym varname="@O"/>
+        </arg>
+      </literal>
+      <literal negated="no">
+        <label>
+          <sym varname="@U"/>
+        </label>
+        <predicate>
+          <sym varname="@H1"/>
+        </predicate>
+        <arg>
+          <sym varname="@T"/>
+        </arg>
+        <arg>
+          <sym varname="@C1"/>
+        </arg>
+      </literal>
+      <literal negated="no">
+        <label>
+          <sym varname="@P"/>
+        </label>
+        <predicate>
+          <sym value="you"/>
+        </predicate>
+        <arg>
+          <sym varname="@O"/>
+        </arg>
+      </literal>
+    </semantics>
+    <interface>
+      <fs>
+        <f name="arg0">
+          <sym varname="@T"/>
+        </f>
+        <f name="arg1">
+          <sym varname="@O"/>
+        </f>
+        <f name="arg1L">
+          <sym varname="@I1"/>
+        </f>
+        <f name="arg2">
+          <sym varname="@C1"/>
+        </f>
+        <f name="arg2L">
+          <sym varname="@D1"/>
+        </f>
+        <f name="label0">
+          <sym varname="@U"/>
+        </f>
+        <f name="label1">
+          <sym varname="@P"/>
+        </f>
+        <f name="objectI">
+          <sym varname="@C1"/>
+        </f>
+        <f name="objectL">
+          <sym varname="@D1"/>
+        </f>
+        <f name="rel">
+          <sym varname="@F1"/>
+        </f>
+        <f name="subjectI">
+          <sym varname="@O"/>
+        </f>
+        <f name="subjectL">
+          <sym varname="@I1"/>
+        </f>
+        <f name="theta1">
+          <sym varname="@G1"/>
+        </f>
+        <f name="theta2">
+          <sym varname="@H1"/>
+        </f>
+        <f name="topL">
+          <sym varname="@U"/>
+        </f>
+        <f name="vbI">
+          <sym varname="@T"/>
+        </f>
+      </fs>
+    </interface>
+  </entry>
+  <entry name="Tnoun-5">
+    <family>noun</family>
+    <trace>
+      <class>nounSem</class>
+      <class>noun</class>
+      <class>anchorProj1</class>
+      <class>basicProperty</class>
+    </trace>
+    <tree id="Tnoun-5">
+      <node type="std">
+        <narg>
+          <fs>
+            <f name="bot">
+              <fs coref="@H">
+                <f name="case">
+                  <sym varname="@A"/>
+                </f>
+                <f name="definite">
+                  <sym varname="@B"/>
+                </f>
+                <f name="idx">
+                  <sym varname="@C"/>
+                </f>
+                <f name="label">
+                  <sym varname="@D"/>
+                </f>
+                <f name="num">
+                  <sym varname="@E"/>
+                </f>
+                <f name="pers">
+                  <sym varname="@F"/>
+                </f>
+                <f name="wh">
+                  <sym varname="@G"/>
+                </f>
+              </fs>
+            </f>
+            <f name="cat">
+              <sym value="np"/>
+            </f>
+            <f name="top">
+              <fs coref="@K">
+                <f name="idx">
+                  <sym varname="@I"/>
+                </f>
+                <f name="label">
+                  <sym varname="@J"/>
+                </f>
+              </fs>
+            </f>
+          </fs>
+        </narg>
+        <node type="anchor">
+          <narg>
+            <fs>
+              <f name="bot">
+                <fs coref="@L">
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                </fs>
+              </f>
+              <f name="cat">
+                <sym value="n"/>
+              </f>
+              <f name="top">
+                <fs coref="@M">
+                  <f name="definite">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@E"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@F"/>
+                  </f>
+                  <f name="wh">
+                    <sym varname="@G"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+      </node>
+    </tree>
+    <semantics>
+      <literal negated="no">
+        <label>
+          <sym varname="@D"/>
+        </label>
+        <predicate>
+          <sym varname="@N"/>
+        </predicate>
+        <arg>
+          <sym varname="@C"/>
+        </arg>
+      </literal>
+    </semantics>
+    <interface>
+      <fs>
+        <f name="arg0">
+          <sym varname="@C"/>
+        </f>
+        <f name="label0">
+          <sym varname="@D"/>
+        </f>
+        <f name="rel">
+          <sym varname="@N"/>
+        </f>
+      </fs>
+    </interface>
+  </entry>
+  <entry name="Tn0Vn1state-6">
+    <family>n0Vn1state</family>
+    <trace>
+      <class>VerbSem</class>
+      <class>anchorProj2</class>
+      <class>SubjectArgumentTop</class>
+      <class>VerbCaseAssigner</class>
+      <class>TopLevelClass</class>
+      <class>SubjectArg1Linking</class>
+      <class>ObjectArg2Linking</class>
+      <class>Subject</class>
+      <class>VerbalNonInverted</class>
+      <class>SubjectArgument</class>
+      <class>RealisedSubject</class>
+      <class>dian0Vn1active</class>
+      <class>VerbalArgument</class>
+      <class>SubjectSem</class>
+      <class>Dian0Vn1</class>
+      <class>CanonicalSubject</class>
+      <class>ArgumentNodeSemantics</class>
+      <class>n0Vn1state</class>
+      <class>CanObject</class>
+      <class>ObjectSem</class>
+      <class>binaryState</class>
+      <class>CanComplement</class>
+      <class>anchorProj1</class>
+      <class>active</class>
+      <class>Object</class>
+      <class>SubjectAgreement</class>
+      <class>VerbalTop</class>
+    </trace>
+    <tree id="Tn0Vn1state-6">
+      <node type="std">
+        <narg>
+          <fs>
+            <f name="bot">
+              <fs coref="@M">
+                <f name="assign-case">
+                  <sym value="nom"/>
+                </f>
+                <f name="assign-comp">
+                  <sym varname="@A"/>
+                </f>
+                <f name="control">
+                  <sym varname="@B"/>
+                </f>
+                <f name="extracted">
+                  <sym value="-"/>
+                </f>
+                <f name="idx">
+                  <sym varname="@C"/>
+                </f>
+                <f name="inv">
+                  <sym value="-"/>
+                </f>
+                <f name="label">
+                  <sym varname="@D"/>
+                </f>
+                <f name="mainv">
+                  <sym varname="@E"/>
+                </f>
+                <f name="mode">
+                  <sym varname="@F"/>
+                </f>
+                <f name="num">
+                  <sym varname="@G"/>
+                </f>
+                <f name="pass">
+                  <sym varname="@H"/>
+                </f>
+                <f name="perf">
+                  <sym varname="@I"/>
+                </f>
+                <f name="pers">
+                  <sym varname="@J"/>
+                </f>
+                <f name="progress">
+                  <sym varname="@K"/>
+                </f>
+                <f name="tense">
+                  <sym varname="@L"/>
+                </f>
+                <f name="wh">
+                  <sym value="-"/>
+                </f>
+              </fs>
+            </f>
+            <f name="cat">
+              <sym value="s"/>
+            </f>
+            <f name="top">
+              <fs coref="@P">
+                <f name="idx">
+                  <sym varname="@N"/>
+                </f>
+                <f name="label">
+                  <sym varname="@O"/>
+                </f>
+              </fs>
+            </f>
+          </fs>
+        </narg>
+        <node type="subst">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="np"/>
+              </f>
+              <f name="top">
+                <fs coref="@T">
+                  <f name="case">
+                    <sym value="nom"/>
+                  </f>
+                  <f name="control">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@Q"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@R"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@G"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@J"/>
+                  </f>
+                  <f name="scopeL">
+                    <sym varname="@S"/>
+                  </f>
+                  <f name="wh">
+                    <sym value="-"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+        <node type="std">
+          <narg>
+            <fs>
+              <f name="bot">
+                <fs coref="@B1">
+                  <f name="assign-case">
+                    <sym varname="@U"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@V"/>
+                  </f>
+                  <f name="compar">
+                    <sym value="-"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@W"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@S"/>
+                  </f>
+                  <f name="mainv">
+                    <sym varname="@X"/>
+                  </f>
+                  <f name="mode">
+                    <sym varname="@F"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@Y"/>
+                  </f>
+                  <f name="pass">
+                    <sym value="-"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@Z"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@A1"/>
+                  </f>
+                </fs>
+              </f>
+              <f name="cat">
+                <sym value="vp"/>
+              </f>
+              <f name="top">
+                <fs coref="@D1">
+                  <f name="assign-case">
+                    <sym value="nom"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="mainv">
+                    <sym varname="@E"/>
+                  </f>
+                  <f name="mode">
+                    <vAlt coref="@C1">
+                      <sym value="ind"/>
+                      <sym value="imp"/>
+                    </vAlt>
+                  </f>
+                  <f name="num">
+                    <sym varname="@G"/>
+                  </f>
+                  <f name="pass">
+                    <sym varname="@H"/>
+                  </f>
+                  <f name="perf">
+                    <sym varname="@I"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@J"/>
+                  </f>
+                  <f name="progress">
+                    <sym varname="@K"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@L"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+          <node type="anchor">
+            <narg>
+              <fs>
+                <f name="cat">
+                  <sym value="v"/>
+                </f>
+                <f name="top">
+                  <fs coref="@E1">
+                    <f name="assign-case">
+                      <sym varname="@U"/>
+                    </f>
+                    <f name="assign-comp">
+                      <sym varname="@V"/>
+                    </f>
+                    <f name="idx">
+                      <sym varname="@W"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@S"/>
+                    </f>
+                    <f name="mainv">
+                      <sym varname="@X"/>
+                    </f>
+                    <f name="mode">
+                      <sym varname="@F"/>
+                    </f>
+                    <f name="num">
+                      <sym varname="@Y"/>
+                    </f>
+                    <f name="pass">
+                      <sym value="-"/>
+                    </f>
+                    <f name="pers">
+                      <sym varname="@Z"/>
+                    </f>
+                    <f name="tense">
+                      <sym varname="@A1"/>
+                    </f>
+                  </fs>
+                </f>
+              </fs>
+            </narg>
+          </node>
+          <node type="subst">
+            <narg>
+              <fs>
+                <f name="cat">
+                  <sym value="np"/>
+                </f>
+                <f name="top">
+                  <fs coref="@H1">
+                    <f name="case">
+                      <sym value="acc"/>
+                    </f>
+                    <f name="idx">
+                      <sym varname="@F1"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@G1"/>
+                    </f>
+                    <f name="scopeL">
+                      <sym varname="@S"/>
+                    </f>
+                    <f name="wh">
+                      <sym value="-"/>
+                    </f>
+                  </fs>
+                </f>
+              </fs>
+            </narg>
+          </node>
+        </node>
+      </node>
+    </tree>
+    <semantics>
+      <literal negated="no">
+        <label>
+          <sym varname="@S"/>
+        </label>
+        <predicate>
+          <sym varname="@I1"/>
+        </predicate>
+        <arg>
+          <sym varname="@Q"/>
+        </arg>
+        <arg>
+          <sym varname="@F1"/>
+        </arg>
+      </literal>
+    </semantics>
+    <interface>
+      <fs>
+        <f name="arg0">
+          <sym varname="@W"/>
+        </f>
+        <f name="arg1">
+          <sym varname="@Q"/>
+        </f>
+        <f name="arg1L">
+          <sym varname="@R"/>
+        </f>
+        <f name="arg2">
+          <sym varname="@F1"/>
+        </f>
+        <f name="arg2L">
+          <sym varname="@G1"/>
+        </f>
+        <f name="label0">
+          <sym varname="@S"/>
+        </f>
+        <f name="objectI">
+          <sym varname="@F1"/>
+        </f>
+        <f name="objectL">
+          <sym varname="@G1"/>
+        </f>
+        <f name="rel">
+          <sym varname="@I1"/>
+        </f>
+        <f name="subjectI">
+          <sym varname="@Q"/>
+        </f>
+        <f name="subjectL">
+          <sym varname="@R"/>
+        </f>
+        <f name="topL">
+          <sym varname="@S"/>
+        </f>
+        <f name="vbI">
+          <sym varname="@W"/>
+        </f>
+      </fs>
+    </interface>
+  </entry>
+  <entry name="Tn0Vn1state-7">
+    <family>n0Vn1state</family>
+    <trace>
+      <class>VerbSem</class>
+      <class>anchorProj2</class>
+      <class>SubjectArgumentTop</class>
+      <class>VerbCaseAssigner</class>
+      <class>TopLevelClass</class>
+      <class>SubjectArg1Linking</class>
+      <class>ObjectArg2Linking</class>
+      <class>Subject</class>
+      <class>VerbalNonInverted</class>
+      <class>SubjectArgument</class>
+      <class>dian0Vn1active</class>
+      <class>VerbalArgument</class>
+      <class>ImperativeSubject</class>
+      <class>NonRealisedSubject</class>
+      <class>Dian0Vn1</class>
+      <class>PROSem</class>
+      <class>ArgumentNodeSemantics</class>
+      <class>n0Vn1state</class>
+      <class>CanObject</class>
+      <class>ObjectSem</class>
+      <class>binaryState</class>
+      <class>CanComplement</class>
+      <class>anchorProj1</class>
+      <class>active</class>
+      <class>Object</class>
+      <class>SubjectAgreement</class>
+      <class>VerbalTop</class>
+    </trace>
+    <tree id="Tn0Vn1state-7">
+      <node type="std">
+        <narg>
+          <fs>
+            <f name="bot">
+              <fs coref="@K">
+                <f name="assign-case">
+                  <sym value="nom"/>
+                </f>
+                <f name="assign-comp">
+                  <sym varname="@A"/>
+                </f>
+                <f name="control">
+                  <sym varname="@B"/>
+                </f>
+                <f name="extracted">
+                  <sym value="-"/>
+                </f>
+                <f name="idx">
+                  <sym varname="@C"/>
+                </f>
+                <f name="inv">
+                  <sym value="-"/>
+                </f>
+                <f name="label">
+                  <sym varname="@D"/>
+                </f>
+                <f name="mainv">
+                  <sym varname="@E"/>
+                </f>
+                <f name="mode">
+                  <sym value="imp"/>
+                </f>
+                <f name="num">
+                  <sym varname="@F"/>
+                </f>
+                <f name="pass">
+                  <sym varname="@G"/>
+                </f>
+                <f name="perf">
+                  <sym varname="@H"/>
+                </f>
+                <f name="pers">
+                  <sym value="2"/>
+                </f>
+                <f name="progress">
+                  <sym varname="@I"/>
+                </f>
+                <f name="tense">
+                  <sym varname="@J"/>
+                </f>
+                <f name="wh">
+                  <sym value="-"/>
+                </f>
+              </fs>
+            </f>
+            <f name="cat">
+              <sym value="s"/>
+            </f>
+            <f name="top">
+              <fs coref="@N">
+                <f name="idx">
+                  <sym varname="@L"/>
+                </f>
+                <f name="inv">
+                  <sym value="-"/>
+                </f>
+                <f name="label">
+                  <sym varname="@M"/>
+                </f>
+              </fs>
+            </f>
+          </fs>
+        </narg>
+        <node type="nadj">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="np"/>
+              </f>
+              <f name="top">
+                <fs coref="@Q">
+                  <f name="case">
+                    <sym value="nom"/>
+                  </f>
+                  <f name="control">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@O"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@P"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@F"/>
+                  </f>
+                  <f name="pers">
+                    <sym value="2"/>
+                  </f>
+                  <f name="wh">
+                    <sym value="-"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+          <node type="lex">
+            <narg>
+              <fs>
+                <f name="phon">
+                  <sym value="e"/>
+                </f>
+              </fs>
+            </narg>
+          </node>
+        </node>
+        <node type="std">
+          <narg>
+            <fs>
+              <f name="bot">
+                <fs coref="@Z">
+                  <f name="assign-case">
+                    <sym varname="@R"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@S"/>
+                  </f>
+                  <f name="compar">
+                    <sym value="-"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@T"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@U"/>
+                  </f>
+                  <f name="mainv">
+                    <sym varname="@V"/>
+                  </f>
+                  <f name="mode">
+                    <sym value="imp"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@W"/>
+                  </f>
+                  <f name="pass">
+                    <sym value="-"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@X"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@Y"/>
+                  </f>
+                </fs>
+              </f>
+              <f name="cat">
+                <sym value="vp"/>
+              </f>
+              <f name="top">
+                <fs coref="@A1">
+                  <f name="assign-case">
+                    <sym value="nom"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="mainv">
+                    <sym varname="@E"/>
+                  </f>
+                  <f name="mode">
+                    <sym value="imp"/>
+                  </f>
+                  <f name="num">
+                    <vAlt coref="@F">
+                      <sym value="sing"/>
+                      <sym value="plur"/>
+                    </vAlt>
+                  </f>
+                  <f name="pass">
+                    <sym varname="@G"/>
+                  </f>
+                  <f name="perf">
+                    <sym varname="@H"/>
+                  </f>
+                  <f name="pers">
+                    <sym value="2"/>
+                  </f>
+                  <f name="progress">
+                    <sym varname="@I"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@J"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+          <node type="anchor">
+            <narg>
+              <fs>
+                <f name="cat">
+                  <sym value="v"/>
+                </f>
+                <f name="top">
+                  <fs coref="@B1">
+                    <f name="assign-case">
+                      <sym varname="@R"/>
+                    </f>
+                    <f name="assign-comp">
+                      <sym varname="@S"/>
+                    </f>
+                    <f name="idx">
+                      <sym varname="@T"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@U"/>
+                    </f>
+                    <f name="mainv">
+                      <sym varname="@V"/>
+                    </f>
+                    <f name="mode">
+                      <sym value="imp"/>
+                    </f>
+                    <f name="num">
+                      <sym varname="@W"/>
+                    </f>
+                    <f name="pass">
+                      <sym value="-"/>
+                    </f>
+                    <f name="pers">
+                      <sym varname="@X"/>
+                    </f>
+                    <f name="tense">
+                      <sym varname="@Y"/>
+                    </f>
+                  </fs>
+                </f>
+              </fs>
+            </narg>
+          </node>
+          <node type="subst">
+            <narg>
+              <fs>
+                <f name="cat">
+                  <sym value="np"/>
+                </f>
+                <f name="top">
+                  <fs coref="@E1">
+                    <f name="case">
+                      <sym value="acc"/>
+                    </f>
+                    <f name="idx">
+                      <sym varname="@C1"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@D1"/>
+                    </f>
+                    <f name="scopeL">
+                      <sym varname="@U"/>
+                    </f>
+                    <f name="wh">
+                      <sym value="-"/>
+                    </f>
+                  </fs>
+                </f>
+              </fs>
+            </narg>
+          </node>
+        </node>
+      </node>
+    </tree>
+    <semantics>
+      <literal negated="no">
+        <label>
+          <sym varname="@U"/>
+        </label>
+        <predicate>
+          <sym varname="@F1"/>
+        </predicate>
+        <arg>
+          <sym varname="@O"/>
+        </arg>
+        <arg>
+          <sym varname="@C1"/>
+        </arg>
+      </literal>
+      <literal negated="no">
+        <label>
+          <sym varname="@P"/>
+        </label>
+        <predicate>
+          <sym value="you"/>
+        </predicate>
+        <arg>
+          <sym varname="@O"/>
+        </arg>
+      </literal>
+    </semantics>
+    <interface>
+      <fs>
+        <f name="arg0">
+          <sym varname="@T"/>
+        </f>
+        <f name="arg1">
+          <sym varname="@O"/>
+        </f>
+        <f name="arg1L">
+          <sym varname="@G1"/>
+        </f>
+        <f name="arg2">
+          <sym varname="@C1"/>
+        </f>
+        <f name="arg2L">
+          <sym varname="@D1"/>
+        </f>
+        <f name="label0">
+          <sym varname="@U"/>
+        </f>
+        <f name="label1">
+          <sym varname="@P"/>
+        </f>
+        <f name="objectI">
+          <sym varname="@C1"/>
+        </f>
+        <f name="objectL">
+          <sym varname="@D1"/>
+        </f>
+        <f name="rel">
+          <sym varname="@F1"/>
+        </f>
+        <f name="subjectI">
+          <sym varname="@O"/>
+        </f>
+        <f name="subjectL">
+          <sym varname="@G1"/>
+        </f>
+        <f name="topL">
+          <sym varname="@U"/>
+        </f>
+        <f name="vbI">
+          <sym varname="@T"/>
+        </f>
+      </fs>
+    </interface>
+  </entry>
+  <entry name="Tn0V-9">
+    <family>n0V</family>
+    <trace>
+      <class>VerbSem</class>
+      <class>Dian0V</class>
+      <class>anchorProj2</class>
+      <class>dian0Vactive</class>
+      <class>SubjectArgumentTop</class>
+      <class>TopLevelClass</class>
+      <class>SubjectArg1Linking</class>
+      <class>Subject</class>
+      <class>VerbalNonInverted</class>
+      <class>SubjectArgument</class>
+      <class>RealisedSubject</class>
+      <class>VerbalArgument</class>
+      <class>SubjectSem</class>
+      <class>CanonicalSubject</class>
+      <class>ArgumentNodeSemantics</class>
+      <class>n0V</class>
+      <class>anchorProj1</class>
+      <class>unaryRel</class>
+      <class>active</class>
+      <class>SubjectAgreement</class>
+      <class>VerbalTop</class>
+    </trace>
+    <tree id="Tn0V-9">
+      <node type="std">
+        <narg>
+          <fs>
+            <f name="bot">
+              <fs coref="@M">
+                <f name="assign-case">
+                  <sym value="nom"/>
+                </f>
+                <f name="assign-comp">
+                  <sym varname="@A"/>
+                </f>
+                <f name="control">
+                  <sym varname="@B"/>
+                </f>
+                <f name="extracted">
+                  <sym value="-"/>
+                </f>
+                <f name="idx">
+                  <sym varname="@C"/>
+                </f>
+                <f name="inv">
+                  <sym value="-"/>
+                </f>
+                <f name="label">
+                  <sym varname="@D"/>
+                </f>
+                <f name="mainv">
+                  <sym varname="@E"/>
+                </f>
+                <f name="mode">
+                  <sym varname="@F"/>
+                </f>
+                <f name="num">
+                  <sym varname="@G"/>
+                </f>
+                <f name="pass">
+                  <sym varname="@H"/>
+                </f>
+                <f name="perf">
+                  <sym varname="@I"/>
+                </f>
+                <f name="pers">
+                  <sym varname="@J"/>
+                </f>
+                <f name="progress">
+                  <sym varname="@K"/>
+                </f>
+                <f name="tense">
+                  <sym varname="@L"/>
+                </f>
+                <f name="wh">
+                  <sym value="-"/>
+                </f>
+              </fs>
+            </f>
+            <f name="cat">
+              <sym value="s"/>
+            </f>
+            <f name="top">
+              <fs coref="@P">
+                <f name="idx">
+                  <sym varname="@N"/>
+                </f>
+                <f name="label">
+                  <sym varname="@O"/>
+                </f>
+              </fs>
+            </f>
+          </fs>
+        </narg>
+        <node type="subst">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="np"/>
+              </f>
+              <f name="top">
+                <fs coref="@T">
+                  <f name="case">
+                    <sym value="nom"/>
+                  </f>
+                  <f name="control">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@Q"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@R"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@G"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@J"/>
+                  </f>
+                  <f name="scopeL">
+                    <sym varname="@S"/>
+                  </f>
+                  <f name="wh">
+                    <sym value="-"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+        <node type="std">
+          <narg>
+            <fs>
+              <f name="bot">
+                <fs coref="@B1">
+                  <f name="assign-case">
+                    <sym varname="@U"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@V"/>
+                  </f>
+                  <f name="compar">
+                    <sym value="-"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@W"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@S"/>
+                  </f>
+                  <f name="mainv">
+                    <sym varname="@X"/>
+                  </f>
+                  <f name="mode">
+                    <sym varname="@F"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@Y"/>
+                  </f>
+                  <f name="pass">
+                    <sym value="-"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@Z"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@A1"/>
+                  </f>
+                </fs>
+              </f>
+              <f name="cat">
+                <sym value="vp"/>
+              </f>
+              <f name="top">
+                <fs coref="@D1">
+                  <f name="assign-case">
+                    <sym value="nom"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="mainv">
+                    <sym varname="@E"/>
+                  </f>
+                  <f name="mode">
+                    <vAlt coref="@C1">
+                      <sym value="ind"/>
+                      <sym value="imp"/>
+                    </vAlt>
+                  </f>
+                  <f name="num">
+                    <sym varname="@G"/>
+                  </f>
+                  <f name="pass">
+                    <sym varname="@H"/>
+                  </f>
+                  <f name="perf">
+                    <sym varname="@I"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@J"/>
+                  </f>
+                  <f name="progress">
+                    <sym varname="@K"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@L"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+          <node type="anchor">
+            <narg>
+              <fs>
+                <f name="cat">
+                  <sym value="v"/>
+                </f>
+                <f name="top">
+                  <fs coref="@E1">
+                    <f name="assign-case">
+                      <sym varname="@U"/>
+                    </f>
+                    <f name="assign-comp">
+                      <sym varname="@V"/>
+                    </f>
+                    <f name="idx">
+                      <sym varname="@W"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@S"/>
+                    </f>
+                    <f name="mainv">
+                      <sym varname="@X"/>
+                    </f>
+                    <f name="mode">
+                      <sym varname="@F"/>
+                    </f>
+                    <f name="num">
+                      <sym varname="@Y"/>
+                    </f>
+                    <f name="pass">
+                      <sym value="-"/>
+                    </f>
+                    <f name="pers">
+                      <sym varname="@Z"/>
+                    </f>
+                    <f name="tense">
+                      <sym varname="@A1"/>
+                    </f>
+                  </fs>
+                </f>
+              </fs>
+            </narg>
+          </node>
+        </node>
+      </node>
+    </tree>
+    <semantics>
+      <literal negated="no">
+        <label>
+          <sym varname="@S"/>
+        </label>
+        <predicate>
+          <sym varname="@F1"/>
+        </predicate>
+        <arg>
+          <sym value="event"/>
+        </arg>
+        <arg>
+          <sym varname="@W"/>
+        </arg>
+      </literal>
+      <literal negated="no">
+        <label>
+          <sym varname="@S"/>
+        </label>
+        <predicate>
+          <sym varname="@G1"/>
+        </predicate>
+        <arg>
+          <sym varname="@W"/>
+        </arg>
+        <arg>
+          <sym varname="@Q"/>
+        </arg>
+      </literal>
+    </semantics>
+    <interface>
+      <fs>
+        <f name="arg0">
+          <sym varname="@W"/>
+        </f>
+        <f name="arg1">
+          <sym varname="@Q"/>
+        </f>
+        <f name="arg1L">
+          <sym varname="@R"/>
+        </f>
+        <f name="label0">
+          <sym varname="@S"/>
+        </f>
+        <f name="rel">
+          <sym varname="@F1"/>
+        </f>
+        <f name="subjectI">
+          <sym varname="@Q"/>
+        </f>
+        <f name="subjectL">
+          <sym varname="@R"/>
+        </f>
+        <f name="theta1">
+          <sym varname="@G1"/>
+        </f>
+        <f name="topL">
+          <sym varname="@S"/>
+        </f>
+        <f name="vbI">
+          <sym varname="@W"/>
+        </f>
+      </fs>
+    </interface>
+  </entry>
+  <entry name="Tn0V-10">
+    <family>n0V</family>
+    <trace>
+      <class>VerbSem</class>
+      <class>Dian0V</class>
+      <class>anchorProj2</class>
+      <class>dian0Vactive</class>
+      <class>SubjectArgumentTop</class>
+      <class>TopLevelClass</class>
+      <class>SubjectArg1Linking</class>
+      <class>Subject</class>
+      <class>VerbalNonInverted</class>
+      <class>SubjectArgument</class>
+      <class>VerbalArgument</class>
+      <class>ImperativeSubject</class>
+      <class>NonRealisedSubject</class>
+      <class>PROSem</class>
+      <class>n0V</class>
+      <class>anchorProj1</class>
+      <class>unaryRel</class>
+      <class>active</class>
+      <class>SubjectAgreement</class>
+      <class>VerbalTop</class>
+    </trace>
+    <tree id="Tn0V-10">
+      <node type="std">
+        <narg>
+          <fs>
+            <f name="bot">
+              <fs coref="@K">
+                <f name="assign-case">
+                  <sym value="nom"/>
+                </f>
+                <f name="assign-comp">
+                  <sym varname="@A"/>
+                </f>
+                <f name="control">
+                  <sym varname="@B"/>
+                </f>
+                <f name="extracted">
+                  <sym value="-"/>
+                </f>
+                <f name="idx">
+                  <sym varname="@C"/>
+                </f>
+                <f name="inv">
+                  <sym value="-"/>
+                </f>
+                <f name="label">
+                  <sym varname="@D"/>
+                </f>
+                <f name="mainv">
+                  <sym varname="@E"/>
+                </f>
+                <f name="mode">
+                  <sym value="imp"/>
+                </f>
+                <f name="num">
+                  <sym varname="@F"/>
+                </f>
+                <f name="pass">
+                  <sym varname="@G"/>
+                </f>
+                <f name="perf">
+                  <sym varname="@H"/>
+                </f>
+                <f name="pers">
+                  <sym value="2"/>
+                </f>
+                <f name="progress">
+                  <sym varname="@I"/>
+                </f>
+                <f name="tense">
+                  <sym varname="@J"/>
+                </f>
+                <f name="wh">
+                  <sym value="-"/>
+                </f>
+              </fs>
+            </f>
+            <f name="cat">
+              <sym value="s"/>
+            </f>
+            <f name="top">
+              <fs coref="@N">
+                <f name="idx">
+                  <sym varname="@L"/>
+                </f>
+                <f name="inv">
+                  <sym value="-"/>
+                </f>
+                <f name="label">
+                  <sym varname="@M"/>
+                </f>
+              </fs>
+            </f>
+          </fs>
+        </narg>
+        <node type="nadj">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="np"/>
+              </f>
+              <f name="top">
+                <fs coref="@Q">
+                  <f name="case">
+                    <sym value="nom"/>
+                  </f>
+                  <f name="control">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@O"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@P"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@F"/>
+                  </f>
+                  <f name="pers">
+                    <sym value="2"/>
+                  </f>
+                  <f name="wh">
+                    <sym value="-"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+          <node type="lex">
+            <narg>
+              <fs>
+                <f name="phon">
+                  <sym value="e"/>
+                </f>
+              </fs>
+            </narg>
+          </node>
+        </node>
+        <node type="std">
+          <narg>
+            <fs>
+              <f name="bot">
+                <fs coref="@Z">
+                  <f name="assign-case">
+                    <sym varname="@R"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@S"/>
+                  </f>
+                  <f name="compar">
+                    <sym value="-"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@T"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@U"/>
+                  </f>
+                  <f name="mainv">
+                    <sym varname="@V"/>
+                  </f>
+                  <f name="mode">
+                    <sym value="imp"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@W"/>
+                  </f>
+                  <f name="pass">
+                    <sym value="-"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@X"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@Y"/>
+                  </f>
+                </fs>
+              </f>
+              <f name="cat">
+                <sym value="vp"/>
+              </f>
+              <f name="top">
+                <fs coref="@A1">
+                  <f name="assign-case">
+                    <sym value="nom"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="mainv">
+                    <sym varname="@E"/>
+                  </f>
+                  <f name="mode">
+                    <sym value="imp"/>
+                  </f>
+                  <f name="num">
+                    <vAlt coref="@F">
+                      <sym value="sing"/>
+                      <sym value="plur"/>
+                    </vAlt>
+                  </f>
+                  <f name="pass">
+                    <sym varname="@G"/>
+                  </f>
+                  <f name="perf">
+                    <sym varname="@H"/>
+                  </f>
+                  <f name="pers">
+                    <sym value="2"/>
+                  </f>
+                  <f name="progress">
+                    <sym varname="@I"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@J"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+          <node type="anchor">
+            <narg>
+              <fs>
+                <f name="cat">
+                  <sym value="v"/>
+                </f>
+                <f name="top">
+                  <fs coref="@B1">
+                    <f name="assign-case">
+                      <sym varname="@R"/>
+                    </f>
+                    <f name="assign-comp">
+                      <sym varname="@S"/>
+                    </f>
+                    <f name="idx">
+                      <sym varname="@T"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@U"/>
+                    </f>
+                    <f name="mainv">
+                      <sym varname="@V"/>
+                    </f>
+                    <f name="mode">
+                      <sym value="imp"/>
+                    </f>
+                    <f name="num">
+                      <sym varname="@W"/>
+                    </f>
+                    <f name="pass">
+                      <sym value="-"/>
+                    </f>
+                    <f name="pers">
+                      <sym varname="@X"/>
+                    </f>
+                    <f name="tense">
+                      <sym varname="@Y"/>
+                    </f>
+                  </fs>
+                </f>
+              </fs>
+            </narg>
+          </node>
+        </node>
+      </node>
+    </tree>
+    <semantics>
+      <literal negated="no">
+        <label>
+          <sym varname="@U"/>
+        </label>
+        <predicate>
+          <sym varname="@C1"/>
+        </predicate>
+        <arg>
+          <sym value="event"/>
+        </arg>
+        <arg>
+          <sym varname="@T"/>
+        </arg>
+      </literal>
+      <literal negated="no">
+        <label>
+          <sym varname="@U"/>
+        </label>
+        <predicate>
+          <sym varname="@D1"/>
+        </predicate>
+        <arg>
+          <sym varname="@T"/>
+        </arg>
+        <arg>
+          <sym varname="@O"/>
+        </arg>
+      </literal>
+      <literal negated="no">
+        <label>
+          <sym varname="@P"/>
+        </label>
+        <predicate>
+          <sym value="you"/>
+        </predicate>
+        <arg>
+          <sym varname="@O"/>
+        </arg>
+      </literal>
+    </semantics>
+    <interface>
+      <fs>
+        <f name="arg0">
+          <sym varname="@T"/>
+        </f>
+        <f name="arg1">
+          <sym varname="@O"/>
+        </f>
+        <f name="arg1L">
+          <sym varname="@E1"/>
+        </f>
+        <f name="label0">
+          <sym varname="@U"/>
+        </f>
+        <f name="label1">
+          <sym varname="@P"/>
+        </f>
+        <f name="rel">
+          <sym varname="@C1"/>
+        </f>
+        <f name="subjectI">
+          <sym varname="@O"/>
+        </f>
+        <f name="subjectL">
+          <sym varname="@E1"/>
+        </f>
+        <f name="theta1">
+          <sym varname="@D1"/>
+        </f>
+        <f name="topL">
+          <sym varname="@U"/>
+        </f>
+        <f name="vbI">
+          <sym varname="@T"/>
+        </f>
+      </fs>
+    </interface>
+  </entry>
+  <entry name="Tbetas1CONJs2-8">
+    <family>betas1CONJs2</family>
+    <trace>
+      <class>betas1CONJs2</class>
+      <class>propertySem</class>
+      <class>betax1CONJx2</class>
+      <class>footProj1</class>
+      <class>basicProperty</class>
+    </trace>
+    <tree id="Tbetas1CONJs2-8">
+      <node type="std">
+        <narg>
+          <fs>
+            <f name="bot">
+              <fs coref="@E">
+                <f name="idx">
+                  <sym varname="@A"/>
+                </f>
+                <f name="label">
+                  <sym varname="@B"/>
+                </f>
+                <f name="mode">
+                  <vAlt coref="@C">
+                    <sym value="ind"/>
+                    <sym value="inf"/>
+                    <sym value="ger"/>
+                    <sym value="imp"/>
+                  </vAlt>
+                </f>
+                <f name="wh">
+                  <sym varname="@D"/>
+                </f>
+              </fs>
+            </f>
+            <f name="cat">
+              <sym value="s"/>
+            </f>
+            <f name="top">
+              <fs coref="@H">
+                <f name="idx">
+                  <sym varname="@F"/>
+                </f>
+                <f name="label">
+                  <sym varname="@G"/>
+                </f>
+              </fs>
+            </f>
+          </fs>
+        </narg>
+        <node type="foot">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="s"/>
+              </f>
+              <f name="top">
+                <fs coref="@I">
+                  <f name="idx">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="mode">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="wh">
+                    <sym varname="@D"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+        <node type="anchor">
+          <narg>
+            <fs>
+              <f name="bot">
+                <fs coref="@L">
+                  <f name="idx">
+                    <sym varname="@J"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@K"/>
+                  </f>
+                </fs>
+              </f>
+              <f name="cat">
+                <sym value="conj"/>
+              </f>
+              <f name="top">
+                <fs coref="@M">
+                  <f name="idx">
+                    <sym varname="@J"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@K"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+        <node type="subst">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="s"/>
+              </f>
+              <f name="top">
+                <fs coref="@N">
+                  <f name="idx">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="mode">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="wh">
+                    <sym varname="@D"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+      </node>
+    </tree>
+    <semantics>
+      <literal negated="no">
+        <label>
+          <sym varname="@K"/>
+        </label>
+        <predicate>
+          <sym varname="@O"/>
+        </predicate>
+        <arg>
+          <sym varname="@J"/>
+        </arg>
+      </literal>
+    </semantics>
+    <interface>
+      <fs>
+        <f name="arg0">
+          <sym varname="@J"/>
+        </f>
+        <f name="label0">
+          <sym varname="@K"/>
+        </f>
+        <f name="rel">
+          <sym varname="@O"/>
+        </f>
+      </fs>
+    </interface>
+  </entry>
+  <entry name="TbetaDn-11">
+    <family>betaDn</family>
+    <trace>
+      <class>betaDn</class>
+      <class>anchorProj1</class>
+      <class>basicProperty</class>
+      <class>propertySem</class>
+    </trace>
+    <tree id="TbetaDn-11">
+      <node type="std">
+        <narg>
+          <fs>
+            <f name="bot">
+              <fs coref="@H">
+                <f name="case">
+                  <sym varname="@A"/>
+                </f>
+                <f name="definite">
+                  <sym varname="@B"/>
+                </f>
+                <f name="idx">
+                  <sym varname="@C"/>
+                </f>
+                <f name="label">
+                  <sym varname="@D"/>
+                </f>
+                <f name="num">
+                  <sym varname="@E"/>
+                </f>
+                <f name="pers">
+                  <sym varname="@F"/>
+                </f>
+                <f name="wh">
+                  <sym varname="@G"/>
+                </f>
+              </fs>
+            </f>
+            <f name="cat">
+              <sym value="np"/>
+            </f>
+            <f name="top">
+              <fs coref="@K">
+                <f name="idx">
+                  <sym varname="@I"/>
+                </f>
+                <f name="label">
+                  <sym varname="@J"/>
+                </f>
+              </fs>
+            </f>
+          </fs>
+        </narg>
+        <node type="anchor">
+          <narg>
+            <fs>
+              <f name="bot">
+                <fs coref="@N">
+                  <f name="definite">
+                    <sym varname="@L"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="wh">
+                    <sym varname="@M"/>
+                  </f>
+                </fs>
+              </f>
+              <f name="cat">
+                <sym value="det"/>
+              </f>
+              <f name="top">
+                <fs coref="@O">
+                  <f name="definite">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@E"/>
+                  </f>
+                  <f name="wh">
+                    <sym varname="@G"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+        <node type="foot">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="np"/>
+              </f>
+              <f name="top">
+                <fs coref="@P">
+                  <f name="case">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@E"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@F"/>
+                  </f>
+                  <f name="rel-clause">
+                    <sym value="-"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+      </node>
+    </tree>
+    <semantics>
+      <literal negated="no">
+        <label>
+          <sym varname="@D"/>
+        </label>
+        <predicate>
+          <sym varname="@Q"/>
+        </predicate>
+        <arg>
+          <sym varname="@C"/>
+        </arg>
+      </literal>
+    </semantics>
+    <interface>
+      <fs>
+        <f name="arg0">
+          <sym varname="@C"/>
+        </f>
+        <f name="label0">
+          <sym varname="@D"/>
+        </f>
+        <f name="rel">
+          <sym varname="@Q"/>
+        </f>
+      </fs>
+    </interface>
+  </entry>
+  <entry name="Tn0A1-13">
+    <family>n0A1</family>
+    <trace>
+      <class>VerbSem</class>
+      <class>anchorProj2</class>
+      <class>propertySem</class>
+      <class>SubjectArgumentTop</class>
+      <class>TopLevelClass</class>
+      <class>Dian0A1</class>
+      <class>SubjectArg0Linking</class>
+      <class>SubjectArgument</class>
+      <class>RealisedSubject</class>
+      <class>verbless</class>
+      <class>VerbalArgument</class>
+      <class>SubjectSem</class>
+      <class>CanonicalSubject</class>
+      <class>ArgumentNodeSemantics</class>
+      <class>CanXAnchor</class>
+      <class>CanComplement</class>
+      <class>basicProperty</class>
+      <class>anchorProj1</class>
+      <class>n0A1</class>
+      <class>SubjectAgreement</class>
+      <class>AdjComplementAnchor</class>
+      <class>CanAdjAnchor</class>
+      <class>VerbalTop</class>
+    </trace>
+    <tree id="Tn0A1-13">
+      <node type="std">
+        <narg>
+          <fs>
+            <f name="bot">
+              <fs coref="@M">
+                <f name="assign-case">
+                  <sym value="nom"/>
+                </f>
+                <f name="assign-comp">
+                  <sym varname="@A"/>
+                </f>
+                <f name="control">
+                  <sym varname="@B"/>
+                </f>
+                <f name="extracted">
+                  <sym value="-"/>
+                </f>
+                <f name="idx">
+                  <sym varname="@C"/>
+                </f>
+                <f name="inv">
+                  <sym value="-"/>
+                </f>
+                <f name="label">
+                  <sym varname="@D"/>
+                </f>
+                <f name="mainv">
+                  <sym varname="@E"/>
+                </f>
+                <f name="mode">
+                  <sym varname="@F"/>
+                </f>
+                <f name="num">
+                  <sym varname="@G"/>
+                </f>
+                <f name="pass">
+                  <sym varname="@H"/>
+                </f>
+                <f name="perf">
+                  <sym varname="@I"/>
+                </f>
+                <f name="pers">
+                  <sym varname="@J"/>
+                </f>
+                <f name="progress">
+                  <sym varname="@K"/>
+                </f>
+                <f name="tense">
+                  <sym varname="@L"/>
+                </f>
+                <f name="wh">
+                  <sym value="-"/>
+                </f>
+              </fs>
+            </f>
+            <f name="cat">
+              <sym value="s"/>
+            </f>
+            <f name="top">
+              <fs coref="@P">
+                <f name="idx">
+                  <sym varname="@N"/>
+                </f>
+                <f name="label">
+                  <sym varname="@O"/>
+                </f>
+              </fs>
+            </f>
+          </fs>
+        </narg>
+        <node type="subst">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="np"/>
+              </f>
+              <f name="top">
+                <fs coref="@S">
+                  <f name="case">
+                    <sym value="nom"/>
+                  </f>
+                  <f name="control">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@Q"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@R"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@G"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@J"/>
+                  </f>
+                  <f name="scopeL">
+                    <sym varname="@R"/>
+                  </f>
+                  <f name="wh">
+                    <sym value="-"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+        <node type="std">
+          <narg>
+            <fs>
+              <f name="bot">
+                <fs coref="@B1">
+                  <f name="assign-case">
+                    <sym varname="@T"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@U"/>
+                  </f>
+                  <f name="compar">
+                    <sym value="-"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@V"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@R"/>
+                  </f>
+                  <f name="mainv">
+                    <sym varname="@W"/>
+                  </f>
+                  <f name="mode">
+                    <sym varname="@F"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@X"/>
+                  </f>
+                  <f name="pass">
+                    <sym varname="@Y"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@Z"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@A1"/>
+                  </f>
+                </fs>
+              </f>
+              <f name="cat">
+                <sym value="vp"/>
+              </f>
+              <f name="top">
+                <fs coref="@D1">
+                  <f name="assign-case">
+                    <sym value="nom"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="mainv">
+                    <sym varname="@E"/>
+                  </f>
+                  <f name="mode">
+                    <vAlt coref="@C1">
+                      <sym value="ind"/>
+                      <sym value="imp"/>
+                    </vAlt>
+                  </f>
+                  <f name="num">
+                    <sym varname="@G"/>
+                  </f>
+                  <f name="pass">
+                    <sym varname="@H"/>
+                  </f>
+                  <f name="perf">
+                    <sym varname="@I"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@J"/>
+                  </f>
+                  <f name="progress">
+                    <sym varname="@K"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@L"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+          <node type="std">
+            <narg>
+              <fs>
+                <f name="cat">
+                  <sym value="v"/>
+                </f>
+                <f name="top">
+                  <fs coref="@E1">
+                    <f name="assign-case">
+                      <sym varname="@T"/>
+                    </f>
+                    <f name="assign-comp">
+                      <sym varname="@U"/>
+                    </f>
+                    <f name="idx">
+                      <sym varname="@V"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@R"/>
+                    </f>
+                    <f name="mainv">
+                      <sym varname="@W"/>
+                    </f>
+                    <f name="mode">
+                      <sym varname="@F"/>
+                    </f>
+                    <f name="num">
+                      <sym varname="@X"/>
+                    </f>
+                    <f name="pass">
+                      <sym varname="@Y"/>
+                    </f>
+                    <f name="pers">
+                      <sym varname="@Z"/>
+                    </f>
+                    <f name="phon">
+                      <sym value="COPULA"/>
+                    </f>
+                    <f name="tense">
+                      <sym varname="@A1"/>
+                    </f>
+                  </fs>
+                </f>
+              </fs>
+            </narg>
+          </node>
+          <node type="std">
+            <narg>
+              <fs>
+                <f name="bot">
+                  <fs coref="@H1">
+                    <f name="compar">
+                      <sym varname="@F1"/>
+                    </f>
+                    <f name="idx">
+                      <sym varname="@Q"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@R"/>
+                    </f>
+                    <f name="wh">
+                      <sym varname="@G1"/>
+                    </f>
+                  </fs>
+                </f>
+                <f name="cat">
+                  <sym value="ap"/>
+                </f>
+                <f name="top">
+                  <fs coref="@I1">
+                    <f name="idx">
+                      <sym varname="@V"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@R"/>
+                    </f>
+                    <f name="wh">
+                      <sym value="-"/>
+                    </f>
+                  </fs>
+                </f>
+              </fs>
+            </narg>
+            <node type="anchor">
+              <narg>
+                <fs>
+                  <f name="bot">
+                    <fs coref="@J1">
+                      <f name="idx">
+                        <sym varname="@Q"/>
+                      </f>
+                      <f name="label">
+                        <sym varname="@R"/>
+                      </f>
+                    </fs>
+                  </f>
+                  <f name="cat">
+                    <sym value="a"/>
+                  </f>
+                  <f name="top">
+                    <fs coref="@K1">
+                      <f name="compar">
+                        <sym varname="@F1"/>
+                      </f>
+                      <f name="idx">
+                        <sym varname="@Q"/>
+                      </f>
+                      <f name="label">
+                        <sym varname="@R"/>
+                      </f>
+                      <f name="wh">
+                        <sym varname="@G1"/>
+                      </f>
+                    </fs>
+                  </f>
+                </fs>
+              </narg>
+            </node>
+          </node>
+        </node>
+      </node>
+    </tree>
+    <semantics>
+      <literal negated="no">
+        <label>
+          <sym varname="@R"/>
+        </label>
+        <predicate>
+          <sym varname="@L1"/>
+        </predicate>
+        <arg>
+          <sym varname="@Q"/>
+        </arg>
+      </literal>
+    </semantics>
+    <interface>
+      <fs>
+        <f name="arg0">
+          <sym varname="@Q"/>
+        </f>
+        <f name="label0">
+          <sym varname="@R"/>
+        </f>
+        <f name="rel">
+          <sym varname="@L1"/>
+        </f>
+        <f name="subjectI">
+          <sym varname="@Q"/>
+        </f>
+        <f name="subjectL">
+          <sym varname="@R"/>
+        </f>
+        <f name="topL">
+          <sym varname="@R"/>
+        </f>
+        <f name="vbI">
+          <sym varname="@V"/>
+        </f>
+      </fs>
+    </interface>
+  </entry>
+  <entry name="Tbetaa1CONJa2-12">
+    <family>betaa1CONJa2</family>
+    <trace>
+      <class>propertySem</class>
+      <class>betaa1CONJa2</class>
+      <class>betax1CONJx2</class>
+      <class>footProj1</class>
+      <class>basicProperty</class>
+    </trace>
+    <tree id="Tbetaa1CONJa2-12">
+      <node type="std">
+        <narg>
+          <fs>
+            <f name="bot">
+              <fs coref="@E">
+                <f name="case">
+                  <sym varname="@A"/>
+                </f>
+                <f name="idx">
+                  <sym varname="@B"/>
+                </f>
+                <f name="label">
+                  <sym varname="@C"/>
+                </f>
+                <f name="wh">
+                  <sym varname="@D"/>
+                </f>
+              </fs>
+            </f>
+            <f name="cat">
+              <sym value="ap"/>
+            </f>
+            <f name="top">
+              <fs coref="@H">
+                <f name="idx">
+                  <sym varname="@F"/>
+                </f>
+                <f name="label">
+                  <sym varname="@G"/>
+                </f>
+              </fs>
+            </f>
+          </fs>
+        </narg>
+        <node type="foot">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="ap"/>
+              </f>
+              <f name="top">
+                <fs coref="@I">
+                  <f name="case">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="wh">
+                    <sym varname="@D"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+        <node type="anchor">
+          <narg>
+            <fs>
+              <f name="bot">
+                <fs coref="@L">
+                  <f name="idx">
+                    <sym varname="@J"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@K"/>
+                  </f>
+                </fs>
+              </f>
+              <f name="cat">
+                <sym value="conj"/>
+              </f>
+              <f name="top">
+                <fs coref="@M">
+                  <f name="idx">
+                    <sym varname="@J"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@K"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+        <node type="subst">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="ap"/>
+              </f>
+              <f name="top">
+                <fs coref="@N">
+                  <f name="case">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="wh">
+                    <sym varname="@D"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+      </node>
+    </tree>
+    <semantics>
+      <literal negated="no">
+        <label>
+          <sym varname="@K"/>
+        </label>
+        <predicate>
+          <sym varname="@O"/>
+        </predicate>
+        <arg>
+          <sym varname="@J"/>
+        </arg>
+      </literal>
+    </semantics>
+    <interface>
+      <fs>
+        <f name="arg0">
+          <sym varname="@J"/>
+        </f>
+        <f name="label0">
+          <sym varname="@K"/>
+        </f>
+        <f name="rel">
+          <sym varname="@O"/>
+        </f>
+      </fs>
+    </interface>
+  </entry>
+  <entry name="Tadjective-14">
+    <family>adjective</family>
+    <trace>
+      <class>adjective</class>
+      <class>anchorProj1</class>
+      <class>basicProperty</class>
+      <class>propertySem</class>
+    </trace>
+    <tree id="Tadjective-14">
+      <node type="std">
+        <narg>
+          <fs>
+            <f name="bot">
+              <fs coref="@D">
+                <f name="idx">
+                  <sym varname="@A"/>
+                </f>
+                <f name="label">
+                  <sym varname="@B"/>
+                </f>
+                <f name="wh">
+                  <sym varname="@C"/>
+                </f>
+              </fs>
+            </f>
+            <f name="cat">
+              <sym value="ap"/>
+            </f>
+            <f name="top">
+              <fs coref="@G">
+                <f name="idx">
+                  <sym varname="@E"/>
+                </f>
+                <f name="label">
+                  <sym varname="@F"/>
+                </f>
+              </fs>
+            </f>
+          </fs>
+        </narg>
+        <node type="anchor">
+          <narg>
+            <fs>
+              <f name="bot">
+                <fs coref="@H">
+                  <f name="idx">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@B"/>
+                  </f>
+                </fs>
+              </f>
+              <f name="cat">
+                <sym value="a"/>
+              </f>
+              <f name="top">
+                <fs coref="@I">
+                  <f name="idx">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="wh">
+                    <sym varname="@C"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+      </node>
+    </tree>
+    <semantics>
+      <literal negated="no">
+        <label>
+          <sym varname="@B"/>
+        </label>
+        <predicate>
+          <sym varname="@J"/>
+        </predicate>
+        <arg>
+          <sym varname="@A"/>
+        </arg>
+      </literal>
+    </semantics>
+    <interface>
+      <fs>
+        <f name="arg0">
+          <sym varname="@A"/>
+        </f>
+        <f name="label0">
+          <sym varname="@B"/>
+        </f>
+        <f name="rel">
+          <sym varname="@J"/>
+        </f>
+      </fs>
+    </interface>
+  </entry>
+  <entry name="Tn0Pn1-15">
+    <family>n0Pn1</family>
+    <trace>
+      <class>PPAnchorArgument</class>
+      <class>PPAnchorArgumentNP</class>
+      <class>PPAnchorTop</class>
+      <class>VerbSem</class>
+      <class>anchorProj2</class>
+      <class>SubjectArgumentTop</class>
+      <class>Dian0Pn1</class>
+      <class>PPAnchorArgumentNPCan</class>
+      <class>TopLevelClass</class>
+      <class>SubjectArg1Linking</class>
+      <class>ObjectArg2Linking</class>
+      <class>SubjectArgument</class>
+      <class>RealisedSubject</class>
+      <class>verbless</class>
+      <class>VerbalArgument</class>
+      <class>SubjectSem</class>
+      <class>CanonicalSubject</class>
+      <class>ArgumentNodeSemantics</class>
+      <class>ObjectSem</class>
+      <class>binaryState</class>
+      <class>CanComplement</class>
+      <class>anchorProj1</class>
+      <class>n0Pn1</class>
+      <class>SubjectAgreement</class>
+      <class>VerbalTop</class>
+      <class>PrepCaseAssigner</class>
+    </trace>
+    <tree id="Tn0Pn1-15">
+      <node type="std">
+        <narg>
+          <fs>
+            <f name="bot">
+              <fs coref="@M">
+                <f name="assign-case">
+                  <sym value="nom"/>
+                </f>
+                <f name="assign-comp">
+                  <sym varname="@A"/>
+                </f>
+                <f name="control">
+                  <sym varname="@B"/>
+                </f>
+                <f name="extracted">
+                  <sym value="-"/>
+                </f>
+                <f name="idx">
+                  <sym varname="@C"/>
+                </f>
+                <f name="inv">
+                  <sym value="-"/>
+                </f>
+                <f name="label">
+                  <sym varname="@D"/>
+                </f>
+                <f name="mainv">
+                  <sym varname="@E"/>
+                </f>
+                <f name="mode">
+                  <sym varname="@F"/>
+                </f>
+                <f name="num">
+                  <sym varname="@G"/>
+                </f>
+                <f name="pass">
+                  <sym varname="@H"/>
+                </f>
+                <f name="perf">
+                  <sym varname="@I"/>
+                </f>
+                <f name="pers">
+                  <sym varname="@J"/>
+                </f>
+                <f name="progress">
+                  <sym varname="@K"/>
+                </f>
+                <f name="tense">
+                  <sym varname="@L"/>
+                </f>
+                <f name="wh">
+                  <sym value="-"/>
+                </f>
+              </fs>
+            </f>
+            <f name="cat">
+              <sym value="s"/>
+            </f>
+            <f name="top">
+              <fs coref="@P">
+                <f name="idx">
+                  <sym varname="@N"/>
+                </f>
+                <f name="label">
+                  <sym varname="@O"/>
+                </f>
+              </fs>
+            </f>
+          </fs>
+        </narg>
+        <node type="subst">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="np"/>
+              </f>
+              <f name="top">
+                <fs coref="@T">
+                  <f name="case">
+                    <sym value="nom"/>
+                  </f>
+                  <f name="control">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@Q"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@R"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@G"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@J"/>
+                  </f>
+                  <f name="scopeL">
+                    <sym varname="@S"/>
+                  </f>
+                  <f name="wh">
+                    <sym value="-"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+        <node type="std">
+          <narg>
+            <fs>
+              <f name="bot">
+                <fs coref="@C1">
+                  <f name="assign-case">
+                    <sym varname="@U"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@V"/>
+                  </f>
+                  <f name="compar">
+                    <sym value="-"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@W"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@S"/>
+                  </f>
+                  <f name="mainv">
+                    <sym varname="@X"/>
+                  </f>
+                  <f name="mode">
+                    <sym varname="@F"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@Y"/>
+                  </f>
+                  <f name="pass">
+                    <sym varname="@Z"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@A1"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@B1"/>
+                  </f>
+                </fs>
+              </f>
+              <f name="cat">
+                <sym value="vp"/>
+              </f>
+              <f name="top">
+                <fs coref="@E1">
+                  <f name="assign-case">
+                    <sym value="nom"/>
+                  </f>
+                  <f name="assign-comp">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="mainv">
+                    <sym varname="@E"/>
+                  </f>
+                  <f name="mode">
+                    <vAlt coref="@D1">
+                      <sym value="ind"/>
+                      <sym value="imp"/>
+                    </vAlt>
+                  </f>
+                  <f name="num">
+                    <sym varname="@G"/>
+                  </f>
+                  <f name="pass">
+                    <sym varname="@H"/>
+                  </f>
+                  <f name="perf">
+                    <sym varname="@I"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@J"/>
+                  </f>
+                  <f name="progress">
+                    <sym varname="@K"/>
+                  </f>
+                  <f name="tense">
+                    <sym varname="@L"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+          <node type="std">
+            <narg>
+              <fs>
+                <f name="cat">
+                  <sym value="v"/>
+                </f>
+                <f name="top">
+                  <fs coref="@F1">
+                    <f name="assign-case">
+                      <sym varname="@U"/>
+                    </f>
+                    <f name="assign-comp">
+                      <sym varname="@V"/>
+                    </f>
+                    <f name="idx">
+                      <sym varname="@W"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@S"/>
+                    </f>
+                    <f name="mainv">
+                      <sym varname="@X"/>
+                    </f>
+                    <f name="mode">
+                      <sym varname="@F"/>
+                    </f>
+                    <f name="num">
+                      <sym varname="@Y"/>
+                    </f>
+                    <f name="pass">
+                      <sym varname="@Z"/>
+                    </f>
+                    <f name="pers">
+                      <sym varname="@A1"/>
+                    </f>
+                    <f name="phon">
+                      <sym value="COPULA"/>
+                    </f>
+                    <f name="tense">
+                      <sym varname="@B1"/>
+                    </f>
+                  </fs>
+                </f>
+              </fs>
+            </narg>
+          </node>
+          <node type="std">
+            <narg>
+              <fs>
+                <f name="bot">
+                  <fs coref="@J1">
+                    <f name="assign-case">
+                      <sym value="acc"/>
+                    </f>
+                    <f name="idx">
+                      <sym varname="@G1"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@H1"/>
+                    </f>
+                    <f name="wh">
+                      <sym varname="@I1"/>
+                    </f>
+                  </fs>
+                </f>
+                <f name="cat">
+                  <sym value="pp"/>
+                </f>
+                <f name="top">
+                  <fs coref="@K1">
+                    <f name="idx">
+                      <sym varname="@W"/>
+                    </f>
+                    <f name="label">
+                      <sym varname="@S"/>
+                    </f>
+                    <f name="wh">
+                      <sym value="-"/>
+                    </f>
+                  </fs>
+                </f>
+              </fs>
+            </narg>
+            <node type="anchor">
+              <narg>
+                <fs>
+                  <f name="cat">
+                    <sym value="prep"/>
+                  </f>
+                  <f name="top">
+                    <fs coref="@L1">
+                      <f name="assign-case">
+                        <sym value="acc"/>
+                      </f>
+                    </fs>
+                  </f>
+                </fs>
+              </narg>
+            </node>
+            <node type="subst">
+              <narg>
+                <fs>
+                  <f name="cat">
+                    <sym value="np"/>
+                  </f>
+                  <f name="top">
+                    <fs coref="@M1">
+                      <f name="case">
+                        <sym value="acc"/>
+                      </f>
+                      <f name="idx">
+                        <sym varname="@G1"/>
+                      </f>
+                      <f name="label">
+                        <sym varname="@H1"/>
+                      </f>
+                      <f name="scopeL">
+                        <sym varname="@S"/>
+                      </f>
+                      <f name="wh">
+                        <sym varname="@I1"/>
+                      </f>
+                    </fs>
+                  </f>
+                </fs>
+              </narg>
+            </node>
+          </node>
+        </node>
+      </node>
+    </tree>
+    <semantics>
+      <literal negated="no">
+        <label>
+          <sym varname="@S"/>
+        </label>
+        <predicate>
+          <sym varname="@N1"/>
+        </predicate>
+        <arg>
+          <sym varname="@Q"/>
+        </arg>
+        <arg>
+          <sym varname="@G1"/>
+        </arg>
+      </literal>
+    </semantics>
+    <interface>
+      <fs>
+        <f name="arg0">
+          <sym varname="@W"/>
+        </f>
+        <f name="arg1">
+          <sym varname="@Q"/>
+        </f>
+        <f name="arg1L">
+          <sym varname="@R"/>
+        </f>
+        <f name="arg2">
+          <sym varname="@G1"/>
+        </f>
+        <f name="arg2L">
+          <sym varname="@H1"/>
+        </f>
+        <f name="label0">
+          <sym varname="@S"/>
+        </f>
+        <f name="objectI">
+          <sym varname="@G1"/>
+        </f>
+        <f name="objectL">
+          <sym varname="@H1"/>
+        </f>
+        <f name="rel">
+          <sym varname="@N1"/>
+        </f>
+        <f name="subjectI">
+          <sym varname="@Q"/>
+        </f>
+        <f name="subjectL">
+          <sym varname="@R"/>
+        </f>
+        <f name="topL">
+          <sym varname="@S"/>
+        </f>
+        <f name="vbI">
+          <sym varname="@W"/>
+        </f>
+      </fs>
+    </interface>
+  </entry>
+  <entry name="TbetaAn-16">
+    <family>betaAn</family>
+    <trace>
+      <class>anchorProj1</class>
+      <class>betaAn</class>
+      <class>propertySem</class>
+      <class>betaXn</class>
+      <class>basicProperty</class>
+    </trace>
+    <tree id="TbetaAn-16">
+      <node type="std">
+        <narg>
+          <fs>
+            <f name="bot">
+              <fs coref="@I">
+                <f name="assign-comp">
+                  <sym varname="@A"/>
+                </f>
+                <f name="case">
+                  <sym varname="@B"/>
+                </f>
+                <f name="definite">
+                  <sym varname="@C"/>
+                </f>
+                <f name="idx">
+                  <sym varname="@D"/>
+                </f>
+                <f name="label">
+                  <sym varname="@E"/>
+                </f>
+                <f name="num">
+                  <sym varname="@F"/>
+                </f>
+                <f name="pers">
+                  <sym varname="@G"/>
+                </f>
+                <f name="wh">
+                  <sym varname="@H"/>
+                </f>
+              </fs>
+            </f>
+            <f name="cat">
+              <sym value="n"/>
+            </f>
+            <f name="top">
+              <fs coref="@L">
+                <f name="idx">
+                  <sym varname="@J"/>
+                </f>
+                <f name="label">
+                  <sym varname="@K"/>
+                </f>
+              </fs>
+            </f>
+          </fs>
+        </narg>
+        <node type="anchor">
+          <narg>
+            <fs>
+              <f name="bot">
+                <fs coref="@M">
+                  <f name="idx">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@E"/>
+                  </f>
+                </fs>
+              </f>
+              <f name="cat">
+                <sym value="a"/>
+              </f>
+              <f name="top">
+                <fs coref="@N">
+                  <f name="idx">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@E"/>
+                  </f>
+                  <f name="wh">
+                    <sym varname="@H"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+        <node type="foot">
+          <narg>
+            <fs>
+              <f name="cat">
+                <sym value="n"/>
+              </f>
+              <f name="top">
+                <fs coref="@O">
+                  <f name="assign-comp">
+                    <sym varname="@A"/>
+                  </f>
+                  <f name="case">
+                    <sym varname="@B"/>
+                  </f>
+                  <f name="definite">
+                    <sym varname="@C"/>
+                  </f>
+                  <f name="idx">
+                    <sym varname="@D"/>
+                  </f>
+                  <f name="label">
+                    <sym varname="@E"/>
+                  </f>
+                  <f name="num">
+                    <sym varname="@F"/>
+                  </f>
+                  <f name="pers">
+                    <sym varname="@G"/>
+                  </f>
+                </fs>
+              </f>
+            </fs>
+          </narg>
+        </node>
+      </node>
+    </tree>
+    <semantics>
+      <literal negated="no">
+        <label>
+          <sym varname="@E"/>
+        </label>
+        <predicate>
+          <sym varname="@P"/>
+        </predicate>
+        <arg>
+          <sym varname="@D"/>
+        </arg>
+      </literal>
+    </semantics>
+    <interface>
+      <fs>
+        <f name="arg0">
+          <sym varname="@D"/>
+        </f>
+        <f name="label0">
+          <sym varname="@E"/>
+        </f>
+        <f name="rel">
+          <sym varname="@P"/>
+        </f>
+      </fs>
+    </interface>
+  </entry>
+</mcgrammar>

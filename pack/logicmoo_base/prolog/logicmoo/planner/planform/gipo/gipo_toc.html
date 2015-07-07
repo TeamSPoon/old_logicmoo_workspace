@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>Table of Contents for GIPO</title>
+                              
+  <script language="JavaScript">
+<!--
+useScript = 0
+if (navigator.appName == null) {
+   event = null
+} else {
+   oldpp = new Array
+   oldppC = new Array
+   useScript = 1
+}
+
+function mon(statusText, ppC) {
+  if (useScript == 1) {
+      oldppC = ppC
+      ppC.src = 'bullet.gif'
+      window.status = statusText
+  }
+}
+
+function monO(ppC) {
+  if (useScript == 1) {
+     if (oldppC != null && oldpp != null) {
+         if (oldppC == oldpp) {
+             oldppC.src = 'redball.gif'
+         } else {
+             oldppC.src = 'blueball.gif'
+         }
+     }
+     window.status = ''
+  }
+}
+
+
+function dot(pp) {
+  if (useScript == 1) {
+     if (oldpp != null) {
+         oldpp.src = 'blueball.gif' 
+     }
+     oldpp = pp
+     pp.src = 'redball.gif'
+  }
+}
+//-->
+</script>
+<STYLE>
+	<!--
+		H1 { color: #003300; text-align: center }
+		H3 { color: #003300 }
+		H2 { color: #003300 }
+	-->
+	</STYLE>
+</head>
+  <body bgcolor="#ffffff" vlink="#4682b4">
+<h2>GIPO III</h2>
+<h3>Contents</h3>
+<table border="0">
+  <tbody>
+    <tr>
+      <td valign="center"><img src="blueball.gif" vspace="0" name="pp1">
+      </td>
+      <td><font face="Arial, Helvetica"><a target="main" href="gipo_home.html" onmouseout="monO(pp1)" onmouseover="mon('GIPO Main Page', pp1)" onclick="dot(pp1)">
+    GIPO Home</a>
+      </font></td>
+    </tr>
+    <tr>
+      <td valign="center"><img src="blueball.gif" vspace="0" name="pp2">
+      </td>
+      <td><font face="Arial, Helvetica"><a target="main" href="docs/overview/gipoTalk.html" onmouseout="monO(pp2)" onmouseover="mon('Overview', pp2)" onclick="dot(pp2)">
+    Overview Slide Show&nbsp;</a>
+      </font></td>
+    </tr>
+    <tr>
+      <td valign="center"><img src="blueball.gif" vspace="0" name="pp3">
+      </td>
+      <td><font face="Arial, Helvetica"><a target="main" href="howto.html" onmouseout="monO(pp3)" onmouseover="mon('Download GIPO', pp3)" onclick="dot(pp3)">
+    Download GIPO&nbsp;</a>
+      </font></td>
+    </tr>
+    <tr>
+      <td valign="center"><img src="blueball.gif" vspace="0" name="pp4">
+      </td>
+      <td><font face="Arial, Helvetica"><a target="main" href="docs/user.html" onmouseout="monO(pp4)" onmouseover="mon('GIPO Manual', pp4)" onclick="dot(pp4)">
+    GIPO Manual</a>
+      </font></td>
+    </tr>
+    <tr>
+      <td valign="center"><img src="blueball.gif" vspace="0" name="pp5">
+      </td>
+      <td><font face="Arial, Helvetica"><a target="main" href="docs/tutorial.html" onmouseout="monO(pp5)" onmouseover="mon('GIPO Tutorial', pp5)" onclick="dot(pp5)">
+    GIPO Tutorials<br>
+      </a>
+      </font></td>
+    </tr>
+    <tr>
+      <td valign="center"><img src="blueball.gif" vspace="0" name="pp6">
+      </td>
+      <td><font face="Arial, Helvetica"><a target="blank" href="http://planform.hud.ac.uk" onmouseout="monO(pp6)" onmouseover="mon('Planform Home', pp6)" onclick="dot(pp6)">
+    Planform Home</a>
+      </font></td>
+    </tr>
+    <tr>
+      <td valign="center"><img src="blueball.gif" vspace="0" name="pp7">
+      </td>
+      <td><font face="Arial, Helvetica"><a target="main" href="http://planform.hud.ac.uk/resources.html" onmouseout="monO(pp7)" onmouseover="mon('Resources', pp7)" onclick="dot(pp7)">
+    Resources</a>
+      </font></td>
+    </tr>
+    <tr>
+      <td valign="center"><img src="blueball.gif" vspace="0" name="pp8">
+      </td>
+      <td><font face="Arial, Helvetica"><a target="main" href="http://planform.hud.ac.uk/gipo/student_domains" onmouseout="monO(pp8)" onmouseover="mon('Student Domains', pp8)" onclick="dot(pp8)">
+    Student-Generated Domains</a>
+      </font></td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

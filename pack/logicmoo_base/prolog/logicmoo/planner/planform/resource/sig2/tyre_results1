@@ -1,0 +1,566 @@
+INDUCED OPERATORS IN TYRE WORLD 
+
+This document shows the results of applying the implementation of the
+opmaker algorithm to generate operators.  For ease of reference a list
+of the original 'hand-crafted' operators from the OCL domain has been 
+included (see below). 
+
+HAND-CRAFTED OCL OPERATORS FROM TYRE WORLD DOMAIN
+
+% Operators
+operator(open_container(C),
+    % prevail
+    [],
+    % necessary
+    [     sc(container,C,[closed(C)]=>[open(C)])],
+    % conditional
+    []).
+operator(close_container(C),
+    % prevail
+    [],
+    % necessary
+    [     sc(container,C,[open(C)]=>[closed(C)])],
+    % conditional
+    []).
+operator(fetch_jack(C,J),
+    % prevail
+    [     se(container,C,[open(C)])],
+    % necessary
+    [     sc(jack,J,[jack_in(J,C)]=>[have_jack(J)])],
+    % conditional
+    []).
+operator(fetch_wheel(C,W),
+    % prevail
+    [     se(container,C,[open(C)])],
+    % necessary
+    [     sc(wheel,W,[wheel_in(W,C)]=>[have_wheel(W)])],
+    % conditional
+    []).
+operator(fetch_wrench(C,W),
+    % prevail
+    [     se(container,C,[open(C)])],
+    % necessary
+    [     sc(wheel,W,[wrench_in(W,C)]=>[have_wrench(W)])],
+    % conditional
+    []).
+operator(fetch_pump(C,P),
+    % prevail
+    [     se(container,C,[open(C)])],
+    % necessary
+    [     sc(pump,P,[pump_in(P,C)]=>[have_pump(P)])],
+    % conditional
+    []).
+operator(putaway_wheel(C,W),
+    % prevail
+    [     se(container,C,[open(C)])],
+    % necessary
+    [     sc(wheel,W,[have_wheel(W)]=>[wheel_in(W,C)])],
+    % conditional
+    []).
+operator(putaway_wrench(C,W),
+    % prevail
+    [     se(container,C,[open(C)])],
+    % necessary
+    [     sc(wrench,W,[have_wrench(W)]=>[wrench_in(W,C)])],
+    % conditional
+    []).
+operator(putaway_jack(C,J),
+    % prevail
+    [     se(container,C,[open(C)])],
+    % necessary
+    [     sc(jack,J,[have_jack(J)]=>[jack_in(J,C)])],
+    % conditional
+    []).
+operator(putaway_pump(C,P),
+    % prevail
+    [     se(container,C,[open(C)])],
+    % necessary
+    [     sc(pump,P,[have_pump(P)]=>[pump_in(P,C)])],
+    % conditional
+    []).
+operator(loosen(W,H,N),
+    % prevail
+    [     se(wrench,W,[have_wrench(W)]),
+     se(hub,H,[on_ground(H),fastened(H)])],
+    % necessary
+    [     sc(nuts,N,[tight(N,H)]=>[loose(N,H)])],
+    % conditional
+    []).
+operator(tighten(W,H,N),
+    % prevail
+    [     se(wrench,W,[have_wrench(W)]),
+     se(hub,H,[on_ground(H),fastened(H)])],
+    % necessary
+    [     sc(nuts,N,[loose(N,H)]=>[tight(N,H)])],
+    % conditional
+    []).
+operator(jack_up(H,J),
+    % prevail
+    [],
+    % necessary
+    [     sc(hub,H,[on_ground(H),fastened(H)]=>[jacked_up(H,J),fastened(H)]),
+     sc(jack,J,[have_jack(J)]=>[jack_in_use(J,H)])],
+    % conditional
+    []).
+operator(jack_down(H,J),
+    % prevail
+    [],
+    % necessary
+    [     sc(hub,H,[jacked_up(H,J),fastened(H)]=>[on_ground(H),fastened(H)]),
+     sc(jack,J,[jack_in_use(J,H)]=>[have_jack(J)])],
+    % conditional
+    []).
+operator(do_up(W,H,J,N),
+    % prevail
+    [     se(wrench,W,[have_wrench(W)])],
+    % necessary
+    [     sc(hub,H,[unfastened(H),jacked_up(H,J)]=>[jacked_up(H,J),fastened(H)]),
+     sc(nuts,N,[have_nuts(N)]=>[loose(N,H)])],
+    % conditional
+    []).
+operator(remove_wheel(W,H,J),
+    % prevail
+    [],
+    % necessary
+    [     sc(wheel,W,[wheel_on(W,H)]=>[have_wheel(W)]),
+     sc(hub,H,[unfastened(H),jacked_up(H,J)]=>[free(H),jacked_up(H,J),unfastened(H)])],
+    % conditional
+    []).
+operator(put_on_wheel(W,H,J),
+    % prevail
+    [],
+    % necessary
+    [     sc(wheel,W,[have_wheel(W)]=>[wheel_on(W,H)]),
+     sc(hub,H,[free(H),jacked_up(H,J),unfastened(H)]=>[unfastened(H),jacked_up(H,J)])],
+    % conditional
+    []).
+operator(undo(W,H,J,N),
+    % prevail
+    [     se(wrench,W,[have_wrench(W)])],
+    % necessary
+    [     sc(hub,H,[jacked_up(H,J),fastened(H)]=>[unfastened(H),jacked_up(H,J)]),
+     sc(nuts,N,[loose(N,H)]=>[have_nuts(N)])],
+    % conditional
+    []).
+
+
+ We now show two user given sequences which include a set of desirable 
+operators and some example inputs.
+
+SEQUENCE 1
+
+USER INPUT
+
+	open_container(boot),
+	fetch_wrench(boot,wrench0),
+	loosen(wrench0,hub0,nuts_1),
+	fetch_jack(boot,jack0),
+	fetch_wheel(boot,wheel1),
+	fetch_pump(boot,pump0),
+	jack_up(hub0,jack0),
+	undo(wrench0,hub0,jack0,nuts_1),
+	remove_wheel(wheel2,hub0,jack0),
+	putaway_wheel(boot,wheel2),
+	put_on_wheel(wheel1,hub0,jack0),
+	do_up(wrench0,hub0,jack0,nuts_1),
+	jack_down(hub0,jack0),	
+	tighten(wrench0,hub0,nuts_1),
+	putaway_wrench(boot,wrench0),
+	putaway_jack(boot,jack0),
+	putaway_pump(boot,pump0),
+	close_container(boot)
+
+
+
+OPERATORS INDUCED
+
+operator(open_container(Boot),
+[],
+[sc(container,Boot,[closed(Boot)] => [open(Boot)])],
+[]
+).
+
+operator(fetch_wrench(Boot,Wrench0),
+[se(container,Boot,[open(Boot)])],
+[sc(wrench,Wrench0,[wrench_in(Wrench0,Boot)] => [have_wrench(Wrench0)])],
+[]
+).
+
+operator(loosen(Wrench0,Hub0,Nuts_1),
+[se(wrench,Wrench0,[have_wrench(Wrench0)]),
+se(hub,Hub0,[on_ground(Hub0),fastened(Hub0)])],
+[sc(nuts,Nuts_1,[tight(Nuts_1,Hub0)] => [loose(Nuts_1,Hub0)])],
+[]
+).
+
+operator(fetch_jack(Boot,Jack0),
+[se(container,Boot,[open(Boot)])],
+[sc(jack,Jack0,[jack_in(Jack0,Boot)] => [have_jack(Jack0)])],
+[]
+).
+
+operator(fetch_wheel(Boot,Wheel1),
+[se(container,Boot,[open(Boot)])],
+[sc(wheel,Wheel1,[wheel_in(Wheel1,Boot)] => [have_wheel(Wheel1)])],
+[]
+).
+
+operator(fetch_pump(Boot,Pump0),
+[se(container,Boot,[open(Boot)])],
+[sc(pump,Pump0,[pump_in(Pump0,Boot)] => [have_pump(Pump0)])],
+[]
+).
+
+operator(jack_up(Hub0,Jack0),
+[],
+[sc(hub,Hub0,[on_ground(Hub0),fastened(Hub0)] => [jacked_up(Hub0,Jack0),fastened(Hub0)]),
+sc(jack,Jack0,[have_jack(Jack0)] => [jack_in_use(Jack0,Hub0)])],
+[]
+).
+
+operator(undo(Wrench0,Hub0,Jack0,Nuts_1),
+[se(wrench,Wrench0,[have_wrench(Wrench0)]),
+se(jack,Jack0,[jack_in_use(Jack0,Hub0)])],
+[sc(hub,Hub0,[jacked_up(Hub0,Jack0),fastened(Hub0)] => [jacked_up(Hub0,Jack0),unfastened(Hub0)]),
+sc(nuts,Nuts_1,[loose(Nuts_1,Hub0)] => [have_nuts(Nuts_1)])],
+[]
+).
+
+operator(remove_wheel(Wheel2,Hub0,Jack0),
+[se(jack,Jack0,[jack_in_use(Jack0,Hub0)])],
+[sc(wheel,Wheel2,[wheel_on(Wheel2,Hub0)] => [have_wheel(Wheel2)]),
+sc(hub,Hub0,[jacked_up(Hub0,Jack0),unfastened(Hub0)] => [free(Hub0),jacked_up(Hub0,Jack0),unfastened(Hub0)])],
+[]
+).
+
+operator(putaway_wheel(Boot,Wheel2),
+[se(container,Boot,[open(Boot)])],
+[sc(wheel,Wheel2,[have_wheel(Wheel2)] => [wheel_in(Wheel2,Boot)])],
+[]
+).
+
+operator(put_on_wheel(Wheel1,Hub0,Jack0),
+[se(jack,Jack0,[jack_in_use(Jack0,Hub0)])],
+[sc(wheel,Wheel1,[have_wheel(Wheel1)] => [wheel_on(Wheel1,Hub0)]),
+sc(hub,Hub0,[free(Hub0),jacked_up(Hub0,Jack0),unfastened(Hub0)] => [jacked_up(Hub0,Jack0),unfastened(Hub0)])],
+[]
+).
+
+operator(do_up(Wrench0,Hub0,Jack0,Nuts_1),
+[se(wrench,Wrench0,[have_wrench(Wrench0)]),
+se(jack,Jack0,[jack_in_use(Jack0,Hub0)])],
+[sc(hub,Hub0,[jacked_up(Hub0,Jack0),unfastened(Hub0)] => [jacked_up(Hub0,Jack0),fastened(Hub0)]),
+sc(nuts,Nuts_1,[have_nuts(Nuts_1)] => [loose(Nuts_1,Hub0)])],
+[]
+).
+
+operator(jack_down(Hub0,Jack0),
+[],
+[sc(hub,Hub0,[jacked_up(Hub0,Jack0),fastened(Hub0)] => [on_ground(Hub0),fastened(Hub0)]),
+sc(jack,Jack0,[jack_in_use(Jack0,Hub0)] => [have_jack(Jack0)])],
+[]
+).
+
+operator(tighten(Wrench0,Hub0,Nuts_1),
+[se(wrench,Wrench0,[have_wrench(Wrench0)]),
+se(hub,Hub0,[on_ground(Hub0),fastened(Hub0)])],
+[sc(nuts,Nuts_1,[loose(Nuts_1,Hub0)] => [tight(Nuts_1,Hub0)])],
+[]
+).
+
+operator(putaway_wrench(Boot,Wrench0),
+[se(container,Boot,[open(Boot)])],
+[sc(wrench,Wrench0,[have_wrench(Wrench0)] => [wrench_in(Wrench0,Boot)])],
+[]
+).
+
+operator(putaway_jack(Boot,Jack0),
+[se(container,Boot,[open(Boot)])],
+[sc(jack,Jack0,[have_jack(Jack0)] => [jack_in(Jack0,Boot)])],
+[]
+).
+
+operator(putaway_pump(Boot,Pump0),
+[se(container,Boot,[open(Boot)])],
+[sc(pump,Pump0,[have_pump(Pump0)] => [pump_in(Pump0,Boot)])],
+[]
+).
+
+operator(close_container(Boot),
+[],
+[sc(container,Boot,[open(Boot)] => [closed(Boot)])],
+[]
+).
+
+
+
+SEQUENCE 2
+
+USER INPUT
+
+	open_container(boot),
+	fetch_jack(boot,jack0),
+	fetch_wrench(boot,wrench0),
+	loosen(wrench0,hub0,nuts_1),
+	jack_up(hub0,jack0),
+	undo(wrench0,hub0,jack0,nuts_1),
+	remove_wheel(wheel1,hub0,jack0),
+	fetch_wheel(boot,wheel2),
+	putaway_wheel(boot,wheel1),
+	put_on_wheel(wheel2,hub0,jack0),
+	do_up(wrench0,hub0,jack0,nuts_1),
+	jack_down(hub0,jack0),	
+	tighten(wrench0,hub0,nuts_1),
+	fetch_pump(boot,pump0),
+	putaway_pump(boot,pump0),
+	putaway_jack(boot,jack0),
+	putaway_wrench(boot,wrench0),
+	close_container(boot)
+
+
+% EXAMPLE INPUTS
+
+% open_container(boot)
+input(1,sclass(Container,container,[closed(Container)])).
+input(1,sclass(Container,container,[open(Container)])).
+
+% fetch_jack(boot,jack0)
+input(2,sclass(Container,container,[open(Container)])).
+input(2,null).
+input(2,sclass(Jack,jack,[jack_in(Jack,Container)])).
+input(2,sclass(Jack,jack,[have_jack(Jack)])).	
+
+% fetch_wrench(boot,wrench0)
+input(3,sclass(Container,container,[open(Container)])).
+input(3,null).
+input(3,sclass(Wrench,wrench,[wrench_in(Wrench,Container)])).
+input(3,sclass(Wrench,wrench,[have_wrench(Wrench)])).
+
+% loosen(wrench0,hub0,nuts_1)
+input(4,sclass(Wrench,wrench,[have_wrench(Wrench)])).
+input(4,null).
+input(4,sclass(Hub,hub,[on_ground(Hub),fastened(Hub)])).	
+input(4,null).
+input(4,sclass(Nuts,nuts,[tight(Nuts,Hub)])).
+input(4,sclass(Nuts,nuts,[loose(Nuts,Hub)])).
+
+% jack_up(hub0,jack0)
+input(5,sclass(Hub,hub,[on_ground(Hub),fastened(Hub)])).
+input(5,sclass(Hub,hub,[jacked_up(Hub,Jack),fastened(Hub)])).
+input(5,sclass(Jack,jack,[have_jack(Jack)])).
+input(5,sclass(Jack,jack,[jack_in_use(Jack,Hub)])).
+
+% undo(wrench0,hub0,jack0,nuts_1)
+input(6,sclass(Wrench,wrench,[have_wrench(Wrench)])).
+input(6,null).
+input(6,sclass(Hub,hub,[jacked_up(Hub,Jack),fastened(Hub)])).
+input(6,sclass(Hub,hub,[jacked_up(Hub,Jack),unfastened(Hub)])).
+input(6,sclass(Jack,jack,[jack_in_use(Jack,Hub)])).
+input(6,null).
+input(6,sclass(Nuts,nuts,[loose(Nuts,Hub)])).
+input(6,sclass(Nuts,nuts,[have_nuts(Nuts)])).
+
+% remove_wheel(wheel1,hub0,jack0)
+input(7,sclass(Wheel,wheel,[wheel_on(Wheel,Hub)])).
+input(7,sclass(Wheel,wheel,[have_wheel(Wheel)])).
+input(7,sclass(Hub,hub,[jacked_up(Hub,Jack),unfastened(Hub)])).
+input(7,sclass(Hub,hub,[free(Hub),jacked_up(Hub,Jack),unfastened(Hub)])).
+input(7,sclass(Jack,jack,[jack_in_use(Jack,Hub)])).
+input(7,null).
+
+% fetch_wheel(boot,wheel2)
+input(8,sclass(Container,container,[open(Container)])).
+input(8,null).
+input(8,sclass(Wheel,wheel,[wheel_in(Wheel,Container)])).
+input(8,sclass(Wheel,wheel,[have_wheel(Wheel)])).
+
+
+% putaway_wheel(boot,wheel1)
+input(9,sclass(Container,container,[open(Container)])).
+input(9,null).
+input(9,sclass(Wheel,wheel,[have_wheel(Wheel)])).
+input(9,sclass(Wheel,wheel,[wheel_in(Wheel,Container)])).
+
+% put_on_wheel(wheel2,hub0,jack0)
+input(10,sclass(Wheel,wheel,[have_wheel(Wheel)])).
+input(10,sclass(Wheel,wheel,[wheel_on(Wheel,Hub)])).
+input(10,sclass(Hub,hub,[free(Hub),jacked_up(Hub,Jack),unfastened(Hub)])).
+input(10,sclass(Hub,hub,[jacked_up(Hub,Jack),unfastened(Hub)])).
+input(10,sclass(Jack,jack,[jack_in_use(Jack,Hub)])).
+input(10,null).
+
+% do_up(wrench0,hub0,jack0,nuts_1)
+input(11,sclass(Wrench,wrench,[have_wrench(Wrench)])).
+input(11,null).
+input(11,sclass(Hub,hub,[jacked_up(Hub,Jack),unfastened(Hub)])).
+input(11,sclass(Hub,hub,[jacked_up(Hub,Jack),fastened(Hub)])).
+input(11,sclass(Jack,jack,[jack_in_use(Jack,Hub)])).
+input(11,null).
+input(11,sclass(Nuts,nuts,[have_nuts(Nuts)])).
+input(11,sclass(Nuts,nuts,[loose(Nuts,Hub)])).
+
+% jack_down(hub0,jack0)	
+input(12,sclass(Hub,hub,[jacked_up(Hub,Jack),fastened(Hub)])).
+input(12,sclass(Hub,hub,[on_ground(Hub),fastened(Hub)])).
+input(12,sclass(Jack,jack,[jack_in_use(Jack,Hub)])).	
+input(12,sclass(Jack,jack,[have_jack(Jack)])).
+
+% tighten(wrench0,hub0,nuts_1)
+input(13,sclass(Wrench,wrench,[have_wrench(Wrench)])).
+input(13,null).
+input(13,sclass(Hub,hub,[on_ground(Hub),fastened(Hub)])).	
+input(13,null).
+input(13,sclass(Nuts,nuts,[loose(Nuts,Hub)])).
+input(13,sclass(Nuts,nuts,[tight(Nuts,Hub)])).
+
+% fetch_pump(boot,pump0)
+input(14,sclass(Container,container,[open(Container)])).
+input(14,null).
+input(14,sclass(Pump,pump,[pump_in(Pump,Container)])).
+input(14,sclass(Pump,pump,[have_pump(Pump)])).	
+
+% putaway_pump(boot,pump0)
+input(15,sclass(Container,container,[open(Container)])).
+input(15,null).
+input(15,sclass(Pump,pump,[have_pump(Pump)])).
+input(15,sclass(Pump,pump,[pump_in(Pump,Container)])).	
+
+% putaway_jack(boot,jack0)
+input(16,sclass(Container,container,[open(Container)])).
+input(16,null).
+input(16,sclass(Jack,jack,[have_jack(Jack)])).	
+input(16,sclass(Jack,jack,[jack_in(Jack,Container)])).
+
+% putaway_wrench(boot,wrench0)
+input(17,sclass(Container,container,[open(Container)])).
+input(17,null).
+input(17,sclass(Wrench,wrench,[have_wrench(Wrench)])).
+input(17,sclass(Wrench,wrench,[wrench_in(Wrench,Container)])).
+
+% close_container(boot)
+input(18,sclass(Container,container,[open(Container)])).	
+input(18,sclass(Container,container,[closed(Container)])).
+
+
+OPERATORS INDUCED
+
+
+
+
+operator(open_container(Boot),
+[],
+[sc(container,Boot,[closed(Boot)] => [open(Boot)])],
+[]
+).
+
+operator(fetch_jack(Boot,Jack0),
+[se(container,Boot,[open(Boot)])],
+[sc(jack,Jack0,[jack_in(Jack0,Boot)] => [have_jack(Jack0)])],
+[]
+).
+
+operator(fetch_wrench(Boot,Wrench0),
+[se(container,Boot,[open(Boot)])],
+[sc(wrench,Wrench0,[wrench_in(Wrench0,Boot)] => [have_wrench(Wrench0)])],
+[]
+).
+
+operator(loosen(Wrench0,Hub0,Nuts_1),
+[se(wrench,Wrench0,[have_wrench(Wrench0)]),
+se(hub,Hub0,[on_ground(Hub0),fastened(Hub0)])],
+[sc(nuts,Nuts_1,[tight(Nuts_1,Hub0)] => [loose(Nuts_1,Hub0)])],
+[]
+).
+
+operator(jack_up(Hub0,Jack0),
+[],
+[sc(hub,Hub0,[on_ground(Hub0),fastened(Hub0)] => [jacked_up(Hub0,Jack0),fastened(Hub0)]),
+sc(jack,Jack0,[have_jack(Jack0)] => [jack_in_use(Jack0,Hub0)])],
+[]
+).
+
+operator(undo(Wrench0,Hub0,Jack0,Nuts_1),
+[se(wrench,Wrench0,[have_wrench(Wrench0)]),
+se(jack,Jack0,[jack_in_use(Jack0,Hub0)])],
+[sc(hub,Hub0,[jacked_up(Hub0,Jack0),fastened(Hub0)] => [jacked_up(Hub0,Jack0),unfastened(Hub0)]),
+sc(nuts,Nuts_1,[loose(Nuts_1,Hub0)] => [have_nuts(Nuts_1)])],
+[]
+).
+
+operator(remove_wheel(Wheel1,Hub0,Jack0),
+[se(jack,Jack0,[jack_in_use(Jack0,Hub0)])],
+[sc(wheel,Wheel1,[wheel_on(Wheel1,Hub0)] => [have_wheel(Wheel1)]),
+sc(hub,Hub0,[jacked_up(Hub0,Jack0),unfastened(Hub0)] => [free(Hub0),jacked_up(Hub0,Jack0),unfastened(Hub0)])],
+[]
+).
+
+operator(fetch_wheel(Boot,Wheel2),
+[se(container,Boot,[open(Boot)])],
+[sc(wheel,Wheel2,[wheel_in(Wheel2,Boot)] => [have_wheel(Wheel2)])],
+[]
+).
+
+operator(putaway_wheel(Boot,Wheel1),
+[se(container,Boot,[open(Boot)])],
+[sc(wheel,Wheel1,[have_wheel(Wheel1)] => [wheel_in(Wheel1,Boot)])],
+[]
+).
+
+operator(put_on_wheel(Wheel2,Hub0,Jack0),
+[se(jack,Jack0,[jack_in_use(Jack0,Hub0)])],
+[sc(wheel,Wheel2,[have_wheel(Wheel2)] => [wheel_on(Wheel2,Hub0)]),
+sc(hub,Hub0,[free(Hub0),jacked_up(Hub0,Jack0),unfastened(Hub0)] => [jacked_up(Hub0,Jack0),unfastened(Hub0)])],
+[]
+).
+
+operator(do_up(Wrench0,Hub0,Jack0,Nuts_1),
+[se(wrench,Wrench0,[have_wrench(Wrench0)]),
+se(jack,Jack0,[jack_in_use(Jack0,Hub0)])],
+[sc(hub,Hub0,[jacked_up(Hub0,Jack0),unfastened(Hub0)] => [jacked_up(Hub0,Jack0),fastened(Hub0)]),
+sc(nuts,Nuts_1,[have_nuts(Nuts_1)] => [loose(Nuts_1,Hub0)])],
+[]
+).
+
+operator(jack_down(Hub0,Jack0),
+[],
+[sc(hub,Hub0,[jacked_up(Hub0,Jack0),fastened(Hub0)] => [on_ground(Hub0),fastened(Hub0)]),
+sc(jack,Jack0,[jack_in_use(Jack0,Hub0)] => [have_jack(Jack0)])],
+[]
+).
+
+operator(tighten(Wrench0,Hub0,Nuts_1),
+[se(wrench,Wrench0,[have_wrench(Wrench0)]),
+se(hub,Hub0,[on_ground(Hub0),fastened(Hub0)])],
+[sc(nuts,Nuts_1,[loose(Nuts_1,Hub0)] => [tight(Nuts_1,Hub0)])],
+[]
+).
+
+operator(fetch_pump(Boot,Pump0),
+[se(container,Boot,[open(Boot)])],
+[sc(pump,Pump0,[pump_in(Pump0,Boot)] => [have_pump(Pump0)])],
+[]
+).
+
+operator(putaway_pump(Boot,Pump0),
+[se(container,Boot,[open(Boot)])],
+[sc(pump,Pump0,[have_pump(Pump0)] => [pump_in(Pump0,Boot)])],
+[]
+).
+
+operator(putaway_jack(Boot,Jack0),
+[se(container,Boot,[open(Boot)])],
+[sc(jack,Jack0,[have_jack(Jack0)] => [jack_in(Jack0,Boot)])],
+[]
+).
+
+operator(putaway_wrench(Boot,Wrench0),
+[se(container,Boot,[open(Boot)])],
+[sc(wrench,Wrench0,[have_wrench(Wrench0)] => [wrench_in(Wrench0,Boot)])],
+[]
+).
+
+operator(close_container(Boot),
+[],
+[sc(container,Boot,[open(Boot)] => [closed(Boot)])],
+[]
+).

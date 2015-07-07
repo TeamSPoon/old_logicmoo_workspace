@@ -1,0 +1,284 @@
+<html>
+<head>
+<title>The Object Centred Language Manual (Version1.2) - Guidelines for Writing OCL</title>
+</head>
+<body bgcolor="#FFFFFF">
+<a NAME="top">
+<table width="100%"><tr>
+<td align=left valign=top><a href="sec2.html"><img SRC="prev.gif" ALT="prev" BORDER=0 ></a><a href="content.html"><img SRC="index.gif" ALT="content" BORDER=0 ></a><a href="sec4.html"><img SRC="next.gif" ALT="next" BORDER=0 ></a>
+</td>
+<td align=center><h2 align=center>The Object Centered Language Manual<br>
+<b>OCL<font valign=bottom size=-1>h</font></b> - Version1.2</h2>
+<td align=right><a href="http://helios.hud.ac.uk/planform/main.html">
+<img src="planform_logo2.gif" height="30" width="140" border=0 alt="Planform Home"></a>
+</td>
+</tr></table>
+<hr>
+
+<h2 align=center>3. Guidelines for Writing OCL</h2>
+
+We suggest writing a domain specification in OCL<font valign=bottom size=-1>h</font> using the following 
+steps. However, domain modelling is not usually a linear process, the
+discovery of errors or new insights into the nature of the domain may
+mean that the modeller needs to backtrack to an earlier step.
+There are opportunities to use
+consistency and cross-checking tools both during and after
+the process. Note that in this section we introduce an example that
+uses the basic constructs of OCL. The more advanced features will
+be dealt with in <a href="sec4.html">section 4</a>. For guidelines,see also
+<a href="ref.html">[3,2.1]</a>.<p>
+
+<h4><a name="Sec31">3.1. Natural Language Description</h4>
+
+Write down a simple description of the world you want to model.  The
+description should outline the main features of the domain as well as
+typical problems and ways of solving them.
+
+<p>For example, a description of a blocks world (all examples are in "<code>blocks world</code>" unless specified), might be:<p>
+
+<blockquote>
+<i>This domain contains blocks, a table and a gripper. One block can be on a table, be gripped by the gripper, or on another block. 
+A block can have either zero or one blocks ontop of it. If it
+has no other block on it, it has a clear top. 
+The blocks can only be moved by the gripper. The gripper can only move one 
+block at one time, and it can only move a block which has a clear top.
+It can put the block it is gripping on the table or on a block 
+with a clear top. 
+The table is big enough to put all the blocks on. </i></blockquote>
+
+<a href="#top">Back to Top</a> 
+
+<h4><a name="Sec32">3.2. Identifying Sorts and Objects</h4>
+
+From the above description the <b>sorts</b> or classes of objects in the domain can be identified, and we can give names to objects in a particular world.
+For example: <p>
+ 
+<pre>
+   objects(block, [b1,b2,b3]).
+   objects(gripper, [g]).
+</pre>
+
+<a href="#top">Back to Top</a> 
+
+<h4><a name="Sec33">3.3. Relationships and Properties</h4>
+
+Relationships between sorts in the domain are described by predicates. The use of the sort name gives a `type' to the slots of predicates, meaning they must be filled by object instances of the specified sort. <p>
+
+For the above example, the predicates we choose are <code>on_block(block, block)</code>, <code>on_table(block)</code>, <code>clear(block)</code>, <code>gripped(block,gripper)</code>, <code>free(gripper)</code> and <code>busy(gripper)</code>. These predicates must be chosen to match the kinds of goals that a user of the planner might want to pose.<p>
+
+At this point we must make a decision as to which sorts are dynamic and which are static. Naturally, if the description, status or position etc of
+an object may change during plan execution,
+then it is dynamic. Since we have not chosen to describe the state of the <i>table</i> with dynamic predicates,
+it sensible to define it a static sort. The sorts <i>block</i> and <i>gripper</i> have several different predicates, that means they can have different state, so they are both dynamic sorts (note, however,
+that choice of dynamic/static status for sorts may not always be obvious).<p>
+
+<a href="#top">Back to Top</a> 
+
+<h4><a name="Sec34">3.4. Substate Class Definitions</h4>
+
+The substate class definition of a sort implicitly
+defines all the possible substates for an object of that sort. 
+In <code>blocks world</code>, they could be defined (as already
+stated above in <a href="sec2.html">section 2</a>):<p>
+
+The substate class expressions for an object of sort block could be:
+<pre>
+   substate_classes(block, B,[
+      [gripped(B,G)],
+      [on_block(B,B1), clear(B),ne(B,B1)],
+      [on_block(B,B1),ne(B,B1)],
+      [on_table(B), clear(B)],
+      [on_table(B)] ]).
+</pre>
+
+To validate these classes, we check that <b>every</b> legal instantiation
+of each of the lists of predicates is a valid substate,
+and every required substate is  some instantiation of a predicate
+list. Note that the development of these classes should happen
+in parallel with operator definition - since objects are
+assumed to change state from one class to another under the
+execution of an operator.<p>
+
+<a href="#top">Back to Top</a> 
+
+<h4><a name="Sec35">3.5. State Invariants</h4>
+
+The domain modeller writes various inconsistency constraints, rules and
+atomic facts, to further define and restrict the domain.  The intention
+here is to make explicit the assumptions of the modeller. <p> 
+
+<ol>
+<li>The set of <b>atomic invariants</b> contains the instances of static predicates which are always true. <p>
+
+There is no need for atomic invariants in the usual versions of the 
+"<code>blocks world</code>", so we describe it as an empty list.
+
+<pre>
+   atomic_invariants([]).
+</pre>
+
+There are static facts however, such as "<code>ne(b1,b2)</code>",
+that are true implicitly.
+If the world was elaborated further by the
+introduction of new objects,
+then atomic invariants would be needed e.g.:
+
+<pre>
+   objects(colour,[blue,red]).
+
+   predicates([
+               ......
+               has_colour(block, colour),
+               smaller(block,block)]).
+
+   atomic_invariants([has_colour(b1,red),
+                      has_colour(b2,blue),
+		      smaller(b1,b2),
+                      smaller(b2,b3) ]).
+</pre>
+</li>
+
+<li><b>Inconsistency constraints</b> are negative invariants 
+consisting of a set of
+predicates <code>S</code>, such that no grounding of <code>S</code> can be 
+satisfied by a valid planning state.<p>
+
+For example:
+<pre>
+   inconsistent_constraint([on_block(B1,B2),on_block(B1,B3),ne(B2,B3)]).
+</pre>
+
+expresses the constraint that a block cannot be on top of two different
+blocks at the same time. Sometimes, as in this example, 
+constraints are implicit in the substate class definitions and are therefore 
+redundant. Constraints that are not redundant generally involve more
+than one sort; for example, in a robot domain one might have:
+
+<pre>
+   inconsistent_constraint([grips(Robot1,Key1),in(Key1,Room),
+                   in(Robot1,Room1),ne(Room1,Room)])
+</pre>
+
+This restricts the legal world states so that robots cannot grip keys which 
+are in a separate room. Currently, the only use made of inconsistent constraints
+is in some of OCL's preprocessing tools, such as the automatic task
+generator and the goal order generator.<p>
+</li>
+</ol>
+
+<a href="#top">Back to Top</a> 
+
+<h4><a name="Sec36">3.6. Operator Specification</h4>
+
+An operator is defined via its object transitions,
+i.e. by specifying how typical objects change as a 
+result of operator execution. One can construct state transition diagrams 
+for each primitive sort as shown in references <a href="ref.html">[3,2]</a>, 
+in the usual style of object-oriented design. 
+Here arcs of the diagram would be operators, and nodes
+substate classes.<p>
+
+For example, in the "<code>robot world</code>" with more than one robot 
+let us represent the action "push a box to a door":<p>
+<center>
+<img src="robot.gif" alt="push box to the door"><br>
+Figure 2: Object changes when operator `push box to the door' is executed
+</center><p>
+
+<ul>
+<li><i>Prevail</i> Condition:</li>
+<blockquote>
+There must be a robot <code>T</code> in room <code>Room1</code>, 
+it next to a box <code>B</code>, and after the action, 
+<code>T</code> will stay in the <code>Room1</code> 
+and still be next to <code>B</code>.
+</blockquote>
+
+So the prevail condition is:
+<pre>
+   [se(robot,T,[robot_in(T,Room1),robot_next_box(T,B)])]
+</pre>
+
+<li><i>Necessary</i> Changes:</li>
+ 
+<blockquote>
+Before this action, the required state of box <code>B</code> is that it must 
+in <code>Room1</code>.
+
+<p>After the action, <code>B</code> is in <code>Room1</code> and near some 
+door <code>Door1</code>, such that <code>Door1</code> must satisfy the 
+constraint that it connects <code>Room1</code>
+to some other room <code>R</code> (hence <code>Door1</code>'s instantiation 
+is restricted to sensible values). 
+</blockquote>
+
+So the necessary change is: 
+ 
+<pre>
+   [sc(box,B,[box_in(B,Room1)] =>
+             [box_in(B,Room1),box_near_door(B,Door1,Room1),
+                              connect(Room1,R,Door1)])]
+</pre>
+
+<li><i>Conditional</i> Change:</li>
+
+<blockquote>
+For all the other objects, if they are next to box $B$ before the 
+operator executes, then after
+execution of the operator they will not be next to the box any longer.
+</blockquote>
+
+So the conditional changes are:  
+
+<pre>
+   [sc(robot,D,[robot_in(D,Room1),robot_next_box(D,B)]
+                =>[robot_in(D,Room1)]),
+    sc(box,B1,[box_in(B1,Room1),box_next_box(B1,B)]
+                =>[box_in(B1,Room1)]),
+    sc(key,Key1,[key_on_floor(Key1,Room1),key_next_box(Key1,B)]
+                =>[key_on_floor(Key1,Room1)])]
+</pre>
+
+Conditional changes are <b>universally</b> quantified over all objects
+in the sorts affected, with the exception that objects affected by the 
+necessary changes are exempt from the conditional changes. Hence, the first 
+condition above would change the substate of <b>all</b> robots <code>D</code>
+such that <code>D <img src="not.gif"> T</code>.
+</ul>
+
+As a whole, the format is:
+<pre>
+    operator(pushtodoor(T,B,Door1,Room1), 
+        % prevail
+        [se(robot,T,[robot_in(T,Room1),robot_next_box(T,B)])],
+        % necessary
+        [sc(box,B,[box_in(B,Room1)] => 
+                  [box_in(B,Room1),box_near_door(B,Door1,Room1),
+                        connect(Room1,R,Door1)])],
+        % conditional
+        [sc(robot,D, [robot_in(D,Room1),robot_next_box(D,B)]
+                        => [robot_in(D,Room1)]),
+         sc(box,B1,[box_in(B1,Room1),box_next_box(B1,B)]
+                        => [box_in(B1,Room1)]),
+         sc(key,Key1,[key_on_floor(Key1,Room1),key_next_box(Key1,B)]
+    	    	        => [key_on_floor(Key1,Room1)])
+        ]) .
+</pre>
+
+<a href="#top">Back to Top</a> 
+
+<hr><table width="100%"><tr><td align=left>
+<a href="sec2.html"><img src="prev.gif" border=0 alt="prev"></a>
+<a href="content.html"><img src="index.gif" border=0 alt="content"></a>
+<a href="sec4.html"><img src="next.gif" border=0 alt="next"></a>
+</td>
+<td align=center><script language="JavaScript">
+<!---//hide script from old browsers
+    document.write( "Last updated "+ document.lastModified );
+//end hiding contents --->
+</script>
+</td>
+</tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<html>
+<head>
+<title>Table of Contents for Planform</title>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+useScript = 0
+if (navigator.appName == null) {
+   event = null
+} else {
+   oldpp = new Array
+   oldppC = new Array
+   useScript = 1
+}
+
+function mon(statusText, ppC) {
+  if (useScript == 1) {
+      oldppC = ppC
+      ppC.src = 'http://planet.hud.ac.uk/resource/bullet.gif'
+      window.status = statusText
+  }
+}
+
+function monO(ppC) {
+  if (useScript == 1) {
+     if (oldppC != null && oldpp != null) {
+         if (oldppC == oldpp) {
+             oldppC.src = 'http://planet.hud.ac.uk/resource/redball.gif'
+         } else {
+             oldppC.src = 'http://planet.hud.ac.uk/resource/blueball.gif'
+         }
+     }
+     window.status = ''
+  }
+}
+
+
+function dot(pp) {
+  if (useScript == 1) {
+     if (oldpp != null) {
+         oldpp.src = 'http://planet.hud.ac.uk/resource/blueball.gif' 
+     }
+     oldpp = pp
+     pp.src = 'http://planet.hud.ac.uk/resource/redball.gif'
+  }
+}
+//-->
+</SCRIPT>
+
+</head>
+<body  bgcolor="#ffffff" vlink="#4682b4">
+<a href="home.html" target="main"><img src="planform_logo2.gif" height="40" width="140" border=0 alt="Planform Home"><br>
+<img src="open_env.gif" height="40" width="140" border=0 alt="Planform Home"></a>
+
+<table border=0>
+
+<tr><td valign="center"><img src="http://planet.hud.ac.uk/resource/blueball.gif" vspace=0 name="pp1"></td>      
+<td><font FACE="Arial, Helvetica"><a target="main" href="main.html" onMouseOut="monO(pp1)" 
+onMouseOver="mon('Planform Main Page', pp1)" onClick="dot(pp1)">Main</a></font></td></tr>
+
+<tr><td valign="center"><img src="http://planet.hud.ac.uk/resource/blueball.gif" vspace=0 name="pp2"></td>      
+<td><font FACE="Arial, Helvetica"><a target="main" href="events.html" onMouseOut="monO(pp2)" 
+onMouseOver="mon('Events', pp2)" onClick="dot(pp2)">Events</a></font></td></tr>
+
+<tr><td valign="center"><img src="http://planet.hud.ac.uk/resource/blueball.gif" vspace=0 name="pp3"></td>      
+<td><font FACE="Arial, Helvetica"><a target="main" href="resources.html" onMouseOut="monO(pp3)" 
+onMouseOver="mon('Resources', pp3)" onClick="dot(pp3)">Resource</a></font></td></tr>
+
+<tr><td valign="center"><img src="http://planet.hud.ac.uk/resource/blueball.gif" vspace=0 name="pp4"></td>
+<td><font FACE="Arial, Helvetica"><a target="blank" href="http://planform.hud.ac.uk/gipo" onMouseOut="monO(pp4)"
+onMouseOver="mon('GIPO', pp4)" onClick="dot(pp4)">GIPO<img src="newred1.gif" border=0></a></font></td></tr>
+
+<tr><td valign="center"><img src="http://planet.hud.ac.uk/resource/blueball.gif" vspace=0 name="pp5"></td>
+<td><font FACE="Arial, Helvetica"><a target="main" href="http://planform.hud.ac.uk/publishing.html" onMouseOut="monO(pp5)"
+onMouseOver="mon('Publishing', pp5)" onClick="dot(pp5)">Publishing</a></font></td></tr>
+
+<tr><td valign="center"><img src="http://planet.hud.ac.uk/resource/blueball.gif" vspace=0 name="pp6"></td>      
+<td><font FACE="Arial, Helvetica"><a target="main" href="people.html" onMouseOut="monO(pp6)" 
+onMouseOver="mon('People', pp6)" onClick="dot(pp6)">People</a></font></td></tr>
+
+<tr><td valign="center"><img src="http://planet.hud.ac.uk/resource/blueball.gif" vspace=0 name="pp7"></td>      
+<td><font FACE="Arial, Helvetica"><a target="main" href="links.html" onMouseOut="monO(pp7)" 
+onMouseOver="mon('Links', pp7)" onClick="dot(pp7)">Links</a></font></td></tr>
+
+</table>
+</body> 
+</html>
+

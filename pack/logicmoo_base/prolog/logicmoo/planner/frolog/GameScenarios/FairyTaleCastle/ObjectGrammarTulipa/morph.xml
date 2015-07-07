@@ -1,0 +1,2151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE mcgrammar SYSTEM "xmg-mctag.dtd,xml">
+
+<mcgrammar>
+    <morphs>
+        <morph lex="a" >
+            <lemmaref cat="det"  name="a" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="accessible" >
+            <lemmaref cat="a"  name="accessible" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="alive" >
+            <lemmaref cat="a"  name="alive" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="and" >
+            <lemmaref cat="conj"  name="and" >
+                <fs/>
+            </lemmaref>
+        </morph>
+        <morph lex="apple" >
+            <lemmaref cat="n"  name="apple" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="at" >
+            <lemmaref cat="prep"  name="at" >
+                <fs>
+                    <f name="assign-case" >
+                        <sym value="acc" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="ate" >
+            <lemmaref cat="v"  name="eat" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="tense" >
+                        <sym value="past" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="beautiful" >
+            <lemmaref cat="a"  name="beautiful" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="being" >
+            <lemmaref cat="n"  name="being" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="black" >
+            <lemmaref cat="a"  name="black" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="blue" >
+            <lemmaref cat="a"  name="blue" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="bored" >
+            <lemmaref cat="a"  name="bored" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="brown" >
+            <lemmaref cat="a"  name="brown" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="castle" >
+            <lemmaref cat="n"  name="castle" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="chest" >
+            <lemmaref cat="n"  name="chest" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="climbable" >
+            <lemmaref cat="a"  name="climbable" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="close" >
+            <lemmaref cat="v"  name="close" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="close" >
+            <lemmaref cat="v"  name="close" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="base" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="closed" >
+            <lemmaref cat="v"  name="close" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="tense" >
+                        <sym value="past" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="closed" >
+            <lemmaref cat="v"  name="close" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ppart" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="closed" >
+            <lemmaref cat="a"  name="closed" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="closes" >
+            <lemmaref cat="v"  name="close" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="closing" >
+            <lemmaref cat="v"  name="close" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ger" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="container" >
+            <lemmaref cat="n"  name="container" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="couch" >
+            <lemmaref cat="n"  name="couch" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="crown" >
+            <lemmaref cat="n"  name="crown" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="dead" >
+            <lemmaref cat="a"  name="dead" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="disgusting" >
+            <lemmaref cat="a"  name="disgusting" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="dragon" >
+            <lemmaref cat="n"  name="dragon" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="drawing-room" >
+            <lemmaref cat="n"  name="drawing-room" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="drop" >
+            <lemmaref cat="v"  name="drop" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="drop" >
+            <lemmaref cat="v"  name="drop" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="base" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="droping" >
+            <lemmaref cat="v"  name="drop" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ger" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="dropped" >
+            <lemmaref cat="v"  name="drop" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ppart" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="drops" >
+            <lemmaref cat="v"  name="drop" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="easy-to-kill" >
+            <lemmaref cat="a"  name="easy-to-kill" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="eat" >
+            <lemmaref cat="v"  name="eat" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="base" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="eat" >
+            <lemmaref cat="v"  name="eat" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="eaten" >
+            <lemmaref cat="v"  name="eat" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ppart" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="eats" >
+            <lemmaref cat="v"  name="eat" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="edible" >
+            <lemmaref cat="a"  name="edible" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="empty" >
+            <lemmaref cat="a"  name="empty" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="exit" >
+            <lemmaref cat="n"  name="exit" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="fits-into" >
+            <lemmaref cat="v"  name="fits-into" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="foodpaste" >
+            <lemmaref cat="n"  name="foodpaste" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="frog" >
+            <lemmaref cat="n"  name="frog" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="from" >
+            <lemmaref cat="prep"  name="from" >
+                <fs>
+                    <f name="assign-case" >
+                        <sym value="acc" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="go" >
+            <lemmaref cat="v"  name="go" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="go" >
+            <lemmaref cat="v"  name="go" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="base" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="golden" >
+            <lemmaref cat="a"  name="golden" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="gone" >
+            <lemmaref cat="a"  name="gone" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="green" >
+            <lemmaref cat="a"  name="green" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="happy" >
+            <lemmaref cat="a"  name="happy" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="has" >
+            <lemmaref cat="v"  name="has" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="here" >
+            <lemmaref cat="a"  name="here" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="hold" >
+            <lemmaref cat="v"  name="hold" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="holds" >
+            <lemmaref cat="v"  name="hold" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="in" >
+            <lemmaref cat="prep"  name="in" >
+                <fs>
+                    <f name="assign-case" >
+                        <sym value="acc" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="into" >
+            <lemmaref cat="prep"  name="into" >
+                <fs>
+                    <f name="assign-case" >
+                        <sym value="acc" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="is" >
+            <lemmaref cat="v"  name="be" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                    <f name="pass" >
+                        <vAlt>
+                            <sym value="+" />
+                            <sym value="-" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="it" >
+            <lemmaref cat="n"  name="it" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="key" >
+            <lemmaref cat="n"  name="key" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="keys" >
+            <lemmaref cat="n"  name="key" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="plur" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="kill" >
+            <lemmaref cat="v"  name="kill" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="base" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="kill" >
+            <lemmaref cat="v"  name="kill" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="kiss" >
+            <lemmaref cat="v"  name="kiss" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="leads-to" >
+            <lemmaref cat="v"  name="leads-to" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                    <f name="pass" >
+                        <vAlt>
+                            <sym value="+" />
+                            <sym value="-" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="leg" >
+            <lemmaref cat="n"  name="leg" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="location" >
+            <lemmaref cat="a"  name="location" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="lock" >
+            <lemmaref cat="v"  name="lock" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="lock" >
+            <lemmaref cat="v"  name="lock" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="base" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="locked" >
+            <lemmaref cat="a"  name="locked" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="look" >
+            <lemmaref cat="v"  name="look" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="base" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="look" >
+            <lemmaref cat="v"  name="look" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="looked" >
+            <lemmaref cat="v"  name="look" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="tense" >
+                        <sym value="past" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="looked" >
+            <lemmaref cat="v"  name="look" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ppart" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="looking" >
+            <lemmaref cat="v"  name="look" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ger" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="looks" >
+            <lemmaref cat="v"  name="look" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="necklace" >
+            <lemmaref cat="n"  name="necklace" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="north-exit" >
+            <lemmaref cat="n"  name="north-exit" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="not-so-easy-to-kill" >
+            <lemmaref cat="a"  name="not-so-easy-to-kill" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="object" >
+            <lemmaref cat="n"  name="object" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="object" >
+            <lemmaref cat="n"  name="object" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="on" >
+            <lemmaref cat="prep"  name="on" >
+                <fs>
+                    <f name="assign-case" >
+                        <sym value="acc" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="open" >
+            <lemmaref cat="v"  name="open" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="base" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="open" >
+            <lemmaref cat="v"  name="open" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="open" >
+            <lemmaref cat="a"  name="open" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="openable" >
+            <lemmaref cat="n"  name="openable" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="opened" >
+            <lemmaref cat="v"  name="open" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="tense" >
+                        <sym value="past" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="opened" >
+            <lemmaref cat="v"  name="open" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ppart" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="opening" >
+            <lemmaref cat="v"  name="open" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ger" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="opens" >
+            <lemmaref cat="v"  name="open" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="pizza" >
+            <lemmaref cat="n"  name="pizza" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="player" >
+            <lemmaref cat="n"  name="player" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="put" >
+            <lemmaref cat="v"  name="put" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="red" >
+            <lemmaref cat="a"  name="red" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="room" >
+            <lemmaref cat="n"  name="room" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="seat" >
+            <lemmaref cat="n"  name="seat" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="seated" >
+            <lemmaref cat="a"  name="seated" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="seating" >
+            <lemmaref cat="a"  name="seating" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="silver" >
+            <lemmaref cat="a"  name="silver" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="sit" >
+            <lemmaref cat="v"  name="sit" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="sit" >
+            <lemmaref cat="v"  name="sit" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="base" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="small" >
+            <lemmaref cat="a"  name="small" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="south-exit" >
+            <lemmaref cat="n"  name="south-exit" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="stand-up" >
+            <lemmaref cat="v"  name="stand-up" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="stand-up" >
+            <lemmaref cat="v"  name="stand-up" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="base" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="start" >
+            <lemmaref cat="v"  name="start" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="base" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="start" >
+            <lemmaref cat="v"  name="start" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="sword" >
+            <lemmaref cat="n"  name="sword" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="table" >
+            <lemmaref cat="n"  name="table" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="take" >
+            <lemmaref cat="v"  name="take" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="take" >
+            <lemmaref cat="v"  name="take" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="base" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="takeable" >
+            <lemmaref cat="a"  name="takeable" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="taken" >
+            <lemmaref cat="v"  name="take" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ppart" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="takes" >
+            <lemmaref cat="v"  name="take" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="taking" >
+            <lemmaref cat="v"  name="take" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ger" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="the" >
+            <lemmaref cat="det"  name="the" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="+" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="thing" >
+            <lemmaref cat="n"  name="thing" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="through" >
+            <lemmaref cat="prep"  name="through" >
+                <fs>
+                    <f name="assign-case" >
+                        <sym value="acc" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="throw" >
+            <lemmaref cat="v"  name="throw" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="to" >
+            <lemmaref cat="prep"  name="to" >
+                <fs>
+                    <f name="assign-case" >
+                        <sym value="acc" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="took" >
+            <lemmaref cat="v"  name="take" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="ind" />
+                    </f>
+                    <f name="tense" >
+                        <sym value="past" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="treasury" >
+            <lemmaref cat="n"  name="treasury" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="ugly" >
+            <lemmaref cat="a"  name="ugly" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="unlock" >
+            <lemmaref cat="v"  name="unlock" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="unlock" >
+            <lemmaref cat="v"  name="unlock" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="base" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="unlocked" >
+            <lemmaref cat="a"  name="unlocked" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="victorious" >
+            <lemmaref cat="a"  name="victorious" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="visible" >
+            <lemmaref cat="a"  name="visible" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="wall" >
+            <lemmaref cat="n"  name="wall" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="weapon" >
+            <lemmaref cat="n"  name="weapon" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="wear" >
+            <lemmaref cat="v"  name="wear" >
+                <fs>
+                    <f name="mode" >
+                        <sym value="imp" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <vAlt>
+                            <sym value="sing" />
+                            <sym value="plur" />
+                        </vAlt>
+                    </f>
+                    <f name="tense" >
+                        <sym value="pres" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="wearable" >
+            <lemmaref cat="a"  name="wearable" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="what" >
+            <lemmaref cat="n"  name="what" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="+" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="white" >
+            <lemmaref cat="a"  name="white" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="with" >
+            <lemmaref cat="prep"  name="with" >
+                <fs>
+                    <f name="assign-case" >
+                        <sym value="acc" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="wooden" >
+            <lemmaref cat="a"  name="wooden" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="worm" >
+            <lemmaref cat="n"  name="worm" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="3" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="yellow" >
+            <lemmaref cat="a"  name="yellow" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="you" >
+            <lemmaref cat="n"  name="you" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                    <f name="definite" >
+                        <sym value="-" />
+                    </f>
+                    <f name="pers" >
+                        <sym value="2" />
+                    </f>
+                    <f name="num" >
+                        <sym value="sing" />
+                    </f>
+                    <f name="case" >
+                        <vAlt>
+                            <sym value="nom" />
+                            <sym value="acc" />
+                        </vAlt>
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+        <morph lex="yummy" >
+            <lemmaref cat="a"  name="yummy" >
+                <fs>
+                    <f name="wh" >
+                        <sym value="-" />
+                    </f>
+                </fs>
+            </lemmaref>
+        </morph>
+    </morphs>
+</mcgrammar>

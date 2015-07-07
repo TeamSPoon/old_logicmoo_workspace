@@ -1,0 +1,181 @@
+
+% ------------------------- Tn0A1-1
+n0A1:Tn0A1-1 ( ! arg0:?Q label0:?R rel:?L1 subjectI:?Q subjectL:?R topL:?R vbI:?V) initial
+n0 [cat:s idx:?N label:?O]![assign-case:nom assign-comp:?A cat:s control:?B extracted:- idx:?C inv:- label:?D mainv:?E mode:?F num:?G pass:?H perf:?I pers:?J progress:?K tense:?L wh:-]{
+ n1 type:subst [case:nom cat:np control:?B idx:?Q label:?R num:?G pers:?J scopeL:?R wh:-]![cat:np]
+ n2 [assign-case:nom assign-comp:?A cat:vp idx:?C label:?D mainv:?E mode:ind|imp num:?G pass:?H perf:?I pers:?J progress:?K tense:?L]![assign-case:?T assign-comp:?U cat:vp compar:- idx:?V label:?R mainv:?W mode:?F num:?X pass:?Y pers:?Z tense:?A1]{
+  n3 [assign-case:?T assign-comp:?U cat:v idx:?V label:?R mainv:?W mode:?F num:?X pass:?Y pers:?Z phon:COPULA tense:?A1]![cat:v]
+  n4 [cat:ap idx:?V label:?R wh:-]![cat:ap compar:?F1 idx:?Q label:?R wh:?G1]{
+   n5 type:anchor [cat:a compar:?F1 idx:?Q label:?R wh:?G1]![cat:a idx:?Q label:?R]
+  }
+ }
+}
+semantics:[?R:?L1(?Q)]
+trace:[n0A1 anchorProj1 AdjComplementAnchor CanAdjAnchor SubjectAgreement basicProperty SubjectArgumentTop VerbalTop ArgumentNodeSemantics VerbSem propertySem Dian0A1 RealisedSubject SubjectArg0Linking SubjectArgument VerbalArgument anchorProj2 SubjectSem TopLevelClass CanonicalSubject CanXAnchor verbless CanComplement]
+
+% ------------------------- Tn0Pn1-2
+n0Pn1:Tn0Pn1-2 ( ! arg0:?W arg1:?Q arg1L:?R arg2:?G1 arg2L:?H1 label0:?S objectI:?G1 objectL:?H1 rel:?N1 subjectI:?Q subjectL:?R topL:?S vbI:?W) initial
+n0 [cat:s idx:?N label:?O]![assign-case:nom assign-comp:?A cat:s control:?B extracted:- idx:?C inv:- label:?D mainv:?E mode:?F num:?G pass:?H perf:?I pers:?J progress:?K tense:?L wh:-]{
+ n1 type:subst [case:nom cat:np control:?B idx:?Q label:?R num:?G pers:?J scopeL:?S wh:-]![cat:np]
+ n2 [assign-case:nom assign-comp:?A cat:vp idx:?C label:?D mainv:?E mode:ind|imp num:?G pass:?H perf:?I pers:?J progress:?K tense:?L]![assign-case:?U assign-comp:?V cat:vp compar:- idx:?W label:?S mainv:?X mode:?F num:?Y pass:?Z pers:?A1 tense:?B1]{
+  n3 [assign-case:?U assign-comp:?V cat:v idx:?W label:?S mainv:?X mode:?F num:?Y pass:?Z pers:?A1 phon:COPULA tense:?B1]![cat:v]
+  n4 [cat:pp idx:?W label:?S wh:-]![assign-case:acc cat:pp idx:?G1 label:?H1 wh:?I1]{
+   n5 type:anchor [assign-case:acc cat:prep]![cat:prep]
+   n6 type:subst [case:acc cat:np idx:?G1 label:?H1 scopeL:?S wh:?I1]![cat:np]
+  }
+ }
+}
+semantics:[?S:?N1(?Q ?G1)]
+trace:[anchorProj1 n0Pn1 SubjectAgreement binaryState PrepCaseAssigner PPAnchorArgument PPAnchorArgumentNP PPAnchorTop SubjectArgumentTop VerbalTop Dian0Pn1 PPAnchorArgumentNPCan ArgumentNodeSemantics SubjectArg1Linking VerbSem ObjectArg2Linking RealisedSubject SubjectArgument VerbalArgument anchorProj2 SubjectSem TopLevelClass CanonicalSubject verbless ObjectSem CanComplement]
+
+% ------------------------- Tbetas1CONJs2-3
+betas1CONJs2:Tbetas1CONJs2-3 ( ! arg0:?J label0:?K rel:?O) auxiliary
+n0 [cat:s idx:?F label:?G]![cat:s idx:?A label:?B mode:ger|ind|inf|imp wh:?D]{
+ n1 type:foot [cat:s idx:?A label:?B mode:?C wh:?D]![cat:s]
+ n2 type:anchor [cat:conj idx:?J label:?K]![cat:conj idx:?J label:?K]
+ n3 type:subst [cat:s idx:?A label:?B mode:?C wh:?D]![cat:s]
+}
+semantics:[?K:?O(?J)]
+trace:[basicProperty betas1CONJs2 propertySem betax1CONJx2 footProj1]
+
+% ------------------------- TbetaAn-4
+betaAn:TbetaAn-4 ( ! arg0:?D label0:?E rel:?P) auxiliary
+n0 [cat:n idx:?J label:?K]![assign-comp:?A case:?B cat:n definite:?C idx:?D label:?E num:?F pers:?G wh:?H]{
+ n1 type:anchor [cat:a idx:?D label:?E wh:?H]![cat:a idx:?D label:?E]
+ n2 type:foot [assign-comp:?A case:?B cat:n definite:?C idx:?D label:?E num:?F pers:?G]![cat:n]
+}
+semantics:[?E:?P(?D)]
+trace:[basicProperty betaAn betaXn propertySem anchorProj1]
+
+% ------------------------- Tbetaa1CONJa2-5
+betaa1CONJa2:Tbetaa1CONJa2-5 ( ! arg0:?J label0:?K rel:?O) auxiliary
+n0 [cat:ap idx:?F label:?G]![case:?A cat:ap idx:?B label:?C wh:?D]{
+ n1 type:foot [case:?A cat:ap idx:?B label:?C wh:?D]![cat:ap]
+ n2 type:anchor [cat:conj idx:?J label:?K]![cat:conj idx:?J label:?K]
+ n3 type:subst [case:?A cat:ap idx:?B label:?C wh:?D]![cat:ap]
+}
+semantics:[?K:?O(?J)]
+trace:[basicProperty betaa1CONJa2 propertySem betax1CONJx2 footProj1]
+
+% ------------------------- TbetavPn-6
+betavPn:TbetavPn-6 ( ! adjunctI:?U adjunctL:?V arg1:?O arg2:?U label0:?P prepI:?O prepL:?P rel:?X) auxiliary
+n0 [cat:vp idx:?K label:?L]![assign-case:?A assign-comp:?B cat:vp idx:?C label:?D mode:?E num:?F pass:?G pers:?H tense:?I]{
+ n1 type:foot [assign-case:?A assign-comp:?B cat:vp idx:?C label:?D mode:?E num:?F pass:?G pers:?H tense:?I]![cat:vp]
+ n2 [cat:pp idx:?C label:?D]![assign-case:acc cat:pp idx:?O label:?P wh:?Q]{
+  n3 type:anchor [assign-case:acc cat:prep idx:?O label:?P]![cat:prep]
+  n4 type:subst [case:acc cat:np idx:?U label:?V wh:?Q]![cat:np]
+ }
+}
+semantics:[?P:?X(?O ?U)]
+trace:[AdjunctSem AdjunctArg2Linking binaryState PrepSem anchorProj1 VerbArg1Linking betavPn footProj1 betaxPn PrepCaseAssigner]
+
+% ------------------------- Tadjective-7
+adjective:Tadjective-7 ( ! arg0:?A label0:?B rel:?J) initial
+n0 [cat:ap idx:?E label:?F]![cat:ap idx:?A label:?B wh:?C]{
+ n1 type:anchor [cat:a idx:?A label:?B wh:?C]![cat:a idx:?A label:?B]
+}
+semantics:[?B:?J(?A)]
+trace:[anchorProj1 propertySem adjective basicProperty]
+
+% ------------------------- Tn0Vn1rel-8
+n0Vn1rel:Tn0Vn1rel-8 ( ! arg0:?W arg1:?Q arg1L:?R arg2:?F1 arg2L:?G1 label0:?S objectI:?F1 objectL:?G1 rel:?I1 subjectI:?Q subjectL:?R theta1:?J1 theta2:?K1 topL:?S vbI:?W) initial
+n0 [cat:s idx:?N label:?O]![assign-case:nom assign-comp:?A cat:s control:?B extracted:- idx:?C inv:- label:?D mainv:?E mode:?F num:?G pass:?H perf:?I pers:?J progress:?K tense:?L wh:-]{
+ n1 type:subst [case:nom cat:np control:?B idx:?Q label:?R num:?G pers:?J scopeL:?S wh:-]![cat:np]
+ n2 [assign-case:nom assign-comp:?A cat:vp idx:?C label:?D mainv:?E mode:ind|imp num:?G pass:?H perf:?I pers:?J progress:?K tense:?L]![assign-case:?U assign-comp:?V cat:vp compar:- idx:?W label:?S mainv:?X mode:?F num:?Y pass:- pers:?Z tense:?A1]{
+  n3 type:anchor [assign-case:?U assign-comp:?V cat:v idx:?W label:?S mainv:?X mode:?F num:?Y pass:- pers:?Z tense:?A1]![cat:v]
+  n4 type:subst [case:acc cat:np idx:?F1 label:?G1 scopeL:?S wh:-]![cat:np]
+ }
+}
+semantics:[?S:?I1(event ?W) ?S:?J1(?W ?Q) ?S:?K1(?W ?F1)]
+trace:[anchorProj1 SubjectAgreement SubjectArgumentTop VerbalTop ArgumentNodeSemantics VerbCaseAssigner SubjectArg1Linking VerbSem ObjectArg2Linking Subject RealisedSubject SubjectArgument dian0Vn1active VerbalArgument anchorProj2 Dian0Vn1 SubjectSem VerbalNonInverted n0Vn1rel TopLevelClass CanonicalSubject CanObject active ObjectSem Object CanComplement binaryRel]
+
+% ------------------------- Tn0Vn1rel-9
+n0Vn1rel:Tn0Vn1rel-9 ( ! arg0:?T arg1:?O arg1L:?I1 arg2:?C1 arg2L:?D1 label0:?U label1:?P objectI:?C1 objectL:?D1 rel:?F1 subjectI:?O subjectL:?I1 theta1:?G1 theta2:?H1 topL:?U vbI:?T) initial
+n0 [cat:s idx:?L inv:- label:?M]![assign-case:nom assign-comp:?A cat:s control:?B extracted:- idx:?C inv:- label:?D mainv:?E mode:imp num:?F pass:?G perf:?H pers:2 progress:?I tense:?J wh:-]{
+ n1 aconstr:noadj [case:nom cat:np control:?B idx:?O label:?P num:?F pers:2 wh:-]![cat:np]{
+  n2 type:lex "e" [phon:e]![phon:e]
+ }
+ n3 [assign-case:nom assign-comp:?A cat:vp idx:?C label:?D mainv:?E mode:imp num:sing|plur pass:?G perf:?H pers:2 progress:?I tense:?J]![assign-case:?R assign-comp:?S cat:vp compar:- idx:?T label:?U mainv:?V mode:imp num:?W pass:- pers:?X tense:?Y]{
+  n4 type:anchor [assign-case:?R assign-comp:?S cat:v idx:?T label:?U mainv:?V mode:imp num:?W pass:- pers:?X tense:?Y]![cat:v]
+  n5 type:subst [case:acc cat:np idx:?C1 label:?D1 scopeL:?U wh:-]![cat:np]
+ }
+}
+semantics:[?U:?F1(event ?T) ?U:?G1(?T ?O) ?U:?H1(?T ?C1) ?P:you(?O)]
+trace:[anchorProj1 PROSem SubjectAgreement SubjectArgumentTop VerbalTop ArgumentNodeSemantics VerbCaseAssigner SubjectArg1Linking VerbSem ObjectArg2Linking Subject SubjectArgument ImperativeSubject NonRealisedSubject dian0Vn1active VerbalArgument anchorProj2 Dian0Vn1 VerbalNonInverted n0Vn1rel TopLevelClass CanObject active ObjectSem Object CanComplement binaryRel]
+
+% ------------------------- Tnoun-10
+noun:Tnoun-10 ( ! arg0:?C label0:?D rel:?N) initial
+n0 [cat:np idx:?I label:?J]![case:?A cat:np definite:?B idx:?C label:?D num:?E pers:?F wh:?G]{
+ n1 type:anchor [cat:n definite:?B idx:?C label:?D num:?E pers:?F wh:?G]![cat:n idx:?C label:?D]
+}
+semantics:[?D:?N(?C)]
+trace:[nounSem noun anchorProj1 basicProperty]
+
+% ------------------------- Tn0Vn1state-11
+n0Vn1state:Tn0Vn1state-11 ( ! arg0:?W arg1:?Q arg1L:?R arg2:?F1 arg2L:?G1 label0:?S objectI:?F1 objectL:?G1 rel:?I1 subjectI:?Q subjectL:?R topL:?S vbI:?W) initial
+n0 [cat:s idx:?N label:?O]![assign-case:nom assign-comp:?A cat:s control:?B extracted:- idx:?C inv:- label:?D mainv:?E mode:?F num:?G pass:?H perf:?I pers:?J progress:?K tense:?L wh:-]{
+ n1 type:subst [case:nom cat:np control:?B idx:?Q label:?R num:?G pers:?J scopeL:?S wh:-]![cat:np]
+ n2 [assign-case:nom assign-comp:?A cat:vp idx:?C label:?D mainv:?E mode:ind|imp num:?G pass:?H perf:?I pers:?J progress:?K tense:?L]![assign-case:?U assign-comp:?V cat:vp compar:- idx:?W label:?S mainv:?X mode:?F num:?Y pass:- pers:?Z tense:?A1]{
+  n3 type:anchor [assign-case:?U assign-comp:?V cat:v idx:?W label:?S mainv:?X mode:?F num:?Y pass:- pers:?Z tense:?A1]![cat:v]
+  n4 type:subst [case:acc cat:np idx:?F1 label:?G1 scopeL:?S wh:-]![cat:np]
+ }
+}
+semantics:[?S:?I1(?Q ?F1)]
+trace:[anchorProj1 SubjectAgreement binaryState SubjectArgumentTop VerbalTop ArgumentNodeSemantics VerbCaseAssigner SubjectArg1Linking VerbSem ObjectArg2Linking Subject RealisedSubject SubjectArgument dian0Vn1active VerbalArgument anchorProj2 Dian0Vn1 SubjectSem VerbalNonInverted TopLevelClass CanonicalSubject n0Vn1state CanObject active ObjectSem Object CanComplement]
+
+% ------------------------- Tn0Vn1state-12
+n0Vn1state:Tn0Vn1state-12 ( ! arg0:?T arg1:?O arg1L:?G1 arg2:?C1 arg2L:?D1 label0:?U label1:?P objectI:?C1 objectL:?D1 rel:?F1 subjectI:?O subjectL:?G1 topL:?U vbI:?T) initial
+n0 [cat:s idx:?L inv:- label:?M]![assign-case:nom assign-comp:?A cat:s control:?B extracted:- idx:?C inv:- label:?D mainv:?E mode:imp num:?F pass:?G perf:?H pers:2 progress:?I tense:?J wh:-]{
+ n1 aconstr:noadj [case:nom cat:np control:?B idx:?O label:?P num:?F pers:2 wh:-]![cat:np]{
+  n2 type:lex "e" [phon:e]![phon:e]
+ }
+ n3 [assign-case:nom assign-comp:?A cat:vp idx:?C label:?D mainv:?E mode:imp num:sing|plur pass:?G perf:?H pers:2 progress:?I tense:?J]![assign-case:?R assign-comp:?S cat:vp compar:- idx:?T label:?U mainv:?V mode:imp num:?W pass:- pers:?X tense:?Y]{
+  n4 type:anchor [assign-case:?R assign-comp:?S cat:v idx:?T label:?U mainv:?V mode:imp num:?W pass:- pers:?X tense:?Y]![cat:v]
+  n5 type:subst [case:acc cat:np idx:?C1 label:?D1 scopeL:?U wh:-]![cat:np]
+ }
+}
+semantics:[?U:?F1(?O ?C1) ?P:you(?O)]
+trace:[anchorProj1 PROSem SubjectAgreement binaryState SubjectArgumentTop VerbalTop ArgumentNodeSemantics VerbCaseAssigner SubjectArg1Linking VerbSem ObjectArg2Linking Subject SubjectArgument ImperativeSubject NonRealisedSubject dian0Vn1active VerbalArgument anchorProj2 Dian0Vn1 VerbalNonInverted TopLevelClass n0Vn1state CanObject active ObjectSem Object CanComplement]
+
+% ------------------------- Tbetan1CONJn2-13
+betan1CONJn2:Tbetan1CONJn2-13 ( ! arg0:?K label0:?L rel:?P) auxiliary
+n0 [cat:np idx:?G label:?H]![case:nom|acc cat:np definite:?B idx:?C label:?D wh:?E]{
+ n1 type:foot [case:?A cat:np definite:?B idx:?C label:?D wh:?E]![cat:np]
+ n2 type:anchor [cat:conj idx:?K label:?L]![cat:conj idx:?K label:?L]
+ n3 type:subst [case:?A cat:np definite:?B idx:?C label:?D wh:?E]![cat:np]
+}
+semantics:[?L:?P(?K)]
+trace:[basicProperty betan1CONJn2 propertySem betax1CONJx2 footProj1]
+
+% ------------------------- Tn0V-14
+n0V:Tn0V-14 ( ! arg0:?W arg1:?Q arg1L:?R label0:?S rel:?F1 subjectI:?Q subjectL:?R theta1:?G1 topL:?S vbI:?W) initial
+n0 [cat:s idx:?N label:?O]![assign-case:nom assign-comp:?A cat:s control:?B extracted:- idx:?C inv:- label:?D mainv:?E mode:?F num:?G pass:?H perf:?I pers:?J progress:?K tense:?L wh:-]{
+ n1 type:subst [case:nom cat:np control:?B idx:?Q label:?R num:?G pers:?J scopeL:?S wh:-]![cat:np]
+ n2 [assign-case:nom assign-comp:?A cat:vp idx:?C label:?D mainv:?E mode:ind|imp num:?G pass:?H perf:?I pers:?J progress:?K tense:?L]![assign-case:?U assign-comp:?V cat:vp compar:- idx:?W label:?S mainv:?X mode:?F num:?Y pass:- pers:?Z tense:?A1]{
+  n3 type:anchor [assign-case:?U assign-comp:?V cat:v idx:?W label:?S mainv:?X mode:?F num:?Y pass:- pers:?Z tense:?A1]![cat:v]
+ }
+}
+semantics:[?S:?F1(event ?W) ?S:?G1(?W ?Q)]
+trace:[anchorProj1 SubjectAgreement Dian0V unaryRel dian0Vactive SubjectArgumentTop VerbalTop ArgumentNodeSemantics SubjectArg1Linking VerbSem Subject RealisedSubject SubjectArgument VerbalArgument anchorProj2 SubjectSem VerbalNonInverted TopLevelClass CanonicalSubject active n0V]
+
+% ------------------------- Tn0V-15
+n0V:Tn0V-15 ( ! arg0:?T arg1:?O arg1L:?E1 label0:?U label1:?P rel:?C1 subjectI:?O subjectL:?E1 theta1:?D1 topL:?U vbI:?T) initial
+n0 [cat:s idx:?L inv:- label:?M]![assign-case:nom assign-comp:?A cat:s control:?B extracted:- idx:?C inv:- label:?D mainv:?E mode:imp num:?F pass:?G perf:?H pers:2 progress:?I tense:?J wh:-]{
+ n1 aconstr:noadj [case:nom cat:np control:?B idx:?O label:?P num:?F pers:2 wh:-]![cat:np]{
+  n2 type:lex "e" [phon:e]![phon:e]
+ }
+ n3 [assign-case:nom assign-comp:?A cat:vp idx:?C label:?D mainv:?E mode:imp num:sing|plur pass:?G perf:?H pers:2 progress:?I tense:?J]![assign-case:?R assign-comp:?S cat:vp compar:- idx:?T label:?U mainv:?V mode:imp num:?W pass:- pers:?X tense:?Y]{
+  n4 type:anchor [assign-case:?R assign-comp:?S cat:v idx:?T label:?U mainv:?V mode:imp num:?W pass:- pers:?X tense:?Y]![cat:v]
+ }
+}
+semantics:[?U:?C1(event ?T) ?U:?D1(?T ?O) ?P:you(?O)]
+trace:[anchorProj1 PROSem SubjectAgreement Dian0V unaryRel SubjectArgumentTop dian0Vactive VerbalTop SubjectArg1Linking VerbSem Subject SubjectArgument ImperativeSubject NonRealisedSubject VerbalArgument anchorProj2 VerbalNonInverted TopLevelClass active n0V]
+
+% ------------------------- TbetaDn-16
+betaDn:TbetaDn-16 ( ! arg0:?C label0:?D rel:?Q) auxiliary
+n0 [cat:np idx:?I label:?J]![case:?A cat:np definite:?B idx:?C label:?D num:?E pers:?F wh:?G]{
+ n1 type:anchor [cat:det definite:?B idx:?C label:?D num:?E wh:?G]![cat:det definite:?L idx:?C label:?D wh:?M]
+ n2 type:foot [case:?A cat:np idx:?C label:?D num:?E pers:?F rel-clause:-]![cat:np]
+}
+semantics:[?D:?Q(?C)]
+trace:[anchorProj1 propertySem betaDn basicProperty]

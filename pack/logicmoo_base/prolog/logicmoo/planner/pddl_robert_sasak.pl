@@ -41,13 +41,15 @@ slow_on('blocks-08-0.pddl').
 slow_on('blocks-09-0.pddl').
 
 filematch_sas(A,B):-must((filematch(A,B))).
- 
-test_all:- 
-  filematch_sas('./orig_pddl_parser/test/?*?/domain*.pddl',_),!,
-  (forall(filematch_sas('./orig_pddl_parser/test/?*?/domain*.pddl',E),once(test_domain(E)))).
 
-test_all:- expand_file_name('./orig_pddl_parser/test/?*?/domain*.pddl',RList),RList\=[],!,reverse(RList,List),
-  forall(member(E,List),once(test_domain(E))).
+
+test_all:-test_all(7).
+test_all(N):- 
+  filematch_sas('./orig_pddl_parser/test/?*?/domain*.pddl',_),!,
+  (forall(filematch_sas('./orig_pddl_parser/test/?*?/domain*.pddl',E),once(test_domain(E,N)))).
+
+test_all(N):- expand_file_name('./orig_pddl_parser/test/?*?/domain*.pddl',RList),RList\=[],!,reverse(RList,List),
+  forall(member(E,List),once(test_domain(E,N))).
 
 test_primaryobjects:- 
   (forall(filematch_sas('./primaryobjects_strips/?*?/domain*.*',E),once(test_domain(E)))). 
@@ -60,7 +62,8 @@ first_n_elements(ListR,Num,List):-length(ListR,PosNum),min_sas(PosNum,Num,MinNum
 
 test_domain(DP):- thlocal:loading_files,!,must(load_domain(DP)).
 test_domain(DP):- test_domain(DP,12).
-test_domain(DP,Num):- \+ exists_file(DP),!, forall(filematch(DP,MATCH),((exists_file(MATCH),test_domain(MATCH,Num)))).
+
+test_domain(DP,Num):- \+ exists_file(DP),!, forall(filematch(DP,MATCH),(exists_file(MATCH),test_domain(MATCH,Num))).
 test_domain(DP,Num):-
    format('~q.~n',[test_domain(DP)]),
   directory_file_path(D,_,DP),directory_files(D,RList),reverse(RList,ListR),
@@ -122,22 +125,25 @@ solve_files_0(DomainFile, ProblemFile):-
     !.
 
 
+
 %try_solve(D,P,S):- once(time_out(solve(D, P, S), 3000, Result)), Result == time_out, portray_clause(hard_working:-try_solve(D,P,S)),fail.
 try_solve(D,P,S):- gripe_time(14,time_out((solve(D, P, S)), 15000, Result)),!, % time limit for a planner (was 500000)
    ((\+ is_list(S)
      -> portray_clause('failed'(Result):-try_solve(D,P,S)) ;
        ((Result=time_out)->portray_clause('failed'(Result):-try_solve(D,P,S));true))),!.
 
-try_solve(D,P,S):-portray_clause('utter_failed'():-try_solve(D,P,S)),!,fail.
+% try_solve(D,P,S):-portray_clause('utter_failed'():-try_solve(D,P,S)),!,fail.
 
 
-my_bb_put(CA, vannot(_Ano,V)):-!, bb_put(CA, V).
+% my_bb_put(CA, vannot(_Ano,V)):-!, bb_put(CA, V).
 my_bb_put(CA, V):- bb_put(CA, V).
 
 % solve(+Domain, +Problem, -Solution).
 %
 %   Set domain and problem on blackboard
 %
+:-thread_local(thlocal:other_planner/1).
+solve(D,P,S):- thlocal:other_planner(C),logOnError(call(C,D,P,S)),!.
 solve(D, P, Solution):-
     get_init(P, I),    my_bb_put(initState, I),
     get_goal(P, G),    my_bb_put(goalState, G),
@@ -1010,7 +1016,7 @@ pddl_3_0_e(_Feature) --> {fail, can_pddl_30}, [],!.
 %   However you will find comment out lines ready for futher development.
 %
 domainBNF_dcg(Struct, Struct)
-                        --> ['(','define', '(','domain'], name(N), [')'],
+                        --> ['(','define'],([':'];[]),['(','domain'], name(N), [')'],
                         {must(Struct = domain(N, R, T, C, P, F, C, S)),(var(OptionsDict)-> rb_new(OptionsDict) ; true)},
                         dcgMust(domainBNF_rest( Struct, R, T, C, P, F, C, S)),
                         {set_nb_propval(Struct,domain_name,N)}.
@@ -1029,7 +1035,7 @@ domainBNF_rest( Struct, R, T, C, P, F, C, S ) -->
                             set_nb_propval(PROPS,constants,C) ,
                             set_nb_propval(PROPS,predicates,P) ,
                             set_nb_propval(PROPS,functions_def,F), %:fluents
-%                           set_nb_propval(PROPS,constraints,C)   ,    %:constraints
+                            set_nb_propval(PROPS,dconstraints,C)   ,    %:constraints
                             set_nb_propval(PROPS,actions, S),
                              !}.
 
@@ -1070,9 +1076,9 @@ atomic_function_skeleton(f(S, L))
                                 --> ['('], function_symbol(S), typed_list(variable, L), [')'].
 function_symbol(S)              --> name(S).
 functions_def(F)                --> ['(',':',functions], function_typed_list(atomic_function_skeleton, F), [')'].              %:fluents
-%constraints(C)                 --> ['(',':',constraints], con_GD(C), [')'].                                                   %:constraints
+dconstraints_def(C)                 --> ['(',':',constraints], con_GD(C), [')'].                                                   %:constraints
 structure_def(A)                --> action_def(A).
-%structure_def(D)               --> durative_action_def(D).                                                                    %:durativeactions
+structure_def(D)               --> durative_action_def(D).                                                                    %:durativeactions
 %structure_def(D)               --> derived_def(D).                                                                            %:derivedpredicates
 structure_def(D)         --> allowed_sterm(structure_def,D).
 %typed_list(W, G)               --> oneOrMore(W, N), ['-'], type(T), {G =.. [T, N]}.
@@ -1104,12 +1110,27 @@ action_def(action(S, L, Precon, Pos, Neg, Assign))
                                     [')'].
 action_symbol(N)                --> name(N).
 
+% Actions definitons
+durative_action_def(action(S, L, Precon, Pos, Neg, Assign))
+                                --> ['(',':',action], action_symbol(S),
+                                    [':',parameters,'('], typed_list(variable, L), [')'], 
+                                    da_def_body(Precon, Pos, Neg, Assign),
+                                    [')'].
+action_symbol(N)                --> name(N).
+
 % % 2 ?- phrase(emptyOr(pre_GD(P)),['(',accessible,?,x,')','(','no-inventory-object',?,x,')','(','has-location',?,x,?,y,')'],X).
 % % P = accessible(?x),
 % % X = ['(', 'no-inventory-object', ?, x, ')', '(', 'has-location', ?, x|...] .
 
+da_def_body([P1,P2], Pos, Neg, Assign)
+                                -->  
+                                    (([':',duration], emptyOr(con_GD(P1)))                ; []),
+                                    (([':',condition], emptyOr(pre_GD(P2)))                ; []),
+                                    (([':',effect],       emptyOr(effect(Pos, Neg, Assign))) ; []).
+
 action_def_body(P, Pos, Neg, Assign)
-                                --> (([':',precondition], emptyOr(pre_GD(P)))                ; []),
+                                -->  
+                                    (([':',precondition], emptyOr(pre_GD(P)))                ; []),
                                     (([':',effect],       emptyOr(effect(Pos, Neg, Assign))) ; []).
 
 
@@ -1270,7 +1291,7 @@ problem(Output, List, R):- trace,problem_dcg(Output, List, R),!.
 % :-[parseDomain]. % make sure that it is loaded.
 
 problem_dcg(Struct)   
-                                --> ['(',define,'(',problem,Name,')',
+                                --> ['(',define],([':'];[]),['(',problem,Name,')',
                                      '(',':',domain, Domain,')'],
    {must((Struct = problem(Name, Domain, R, OD, I, G, UNK, MS, LS))),
            (var(OptionsDict)-> rb_new(OptionsDict) ; true)},
@@ -1626,20 +1647,33 @@ my_ord_member(S, [_|T]):-
 
 :-thread_local(thlocal:loading_files).
 
-:- debug,must(test_blocks).
-:- test_all.
+% thlocal:other_planner(hyhtn_solve).
 
-% :- solve_files('/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/planner/DIRNAME/benchmarks/mystery/domain.pddl','/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/planner/DIRNAME/benchmarks/mystery/prob01.pddl').
-% :- solve_files('/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/planner/DIRNAME/benchmarks/nomystery-sat11-strips/domain.pddl','/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/planner/DIRNAME/benchmarks/nomystery-sat11-strips/p01.pddl').
-% :- test_domain('./DIRNAME/benchmarks/nomystery-sat11-strips/domain.pddl').
-% :- test_domain('./DIRNAME/benchmarks/mystery/domain.pddl').
+:- debug,must(test_blocks).
+:- solve_files('benchmarks/mystery/domain.pddl','benchmarks/mystery/prob01.pddl').
+:- test_domain('benchmarks/driverlog/domain.pddl',4).
+:- solve_files('hsp-planners-master/hsp2-1.0/examples/parcprinter-strips/p02-domain-woac.pddl','hsp-planners-master/hsp2-1.0/examples/parcprinter-strips/p01-woac.pddl').
+
+:- test_all(6).
+
+
+
+% BAD :- test_domain('./elearning/domain.pddl').
+% :- test_all.
+
+% 
+% :- solve_files('benchmarks/nomystery-sat11-strips/domain.pddl','benchmarks/nomystery-sat11-strips/p01.pddl').
+% :- test_domain('./benchmarks/nomystery-sat11-strips/domain.pddl').
+
 
 /*
-
+:- solve_files('regression-tests/issue58-domain.pddl','regression-tests/issue58-problem.pddl').
+:- forall(filematch_sas('./hsp-planners-master/?*?/pddl/?*?/?*domain*.*',E),once(test_domain(E,4))).
+:- forall(filematch_sas('./hsp-planners-master/?*?/examples/?*?/?*domain*.*',E),once(test_domain(E,5))).
 
 :- test_domain('./benchmarks/nomystery-sat11-strips/domain.pddl').
 
-test_blocks:- fail, test_domain('./DIRNAME/benchmarks/nomystery-sat11-strips/domain.pddl',RList),reverse(RList,List),
+test_blocks:- fail, test_domain('./benchmarks/nomystery-sat11-strips/domain.pddl',RList),reverse(RList,List),
   forall(member(E,List),once(test_domain(E))).
 
 % :-asserta(thlocal:loading_files).
@@ -1648,14 +1682,15 @@ test_blocks:- fail, test_domain('./DIRNAME/benchmarks/nomystery-sat11-strips/dom
 :- forall(filematch_sas('./hsp-planners-master/?*?/pddl/?*?/?*domain*.*',E),once(load_domain(E))).
 :- forall(filematch_sas('./hsp-planners-master/?*?/examples/?*?/?*domain*.*',E),once(load_domain(E))).
 :- forall(filematch_sas('./hsp-planners-master/?*?/examples/?*?/?*domain*.*',E),once(load_domain(E))).
-:- forall(filematch_sas('./primaryobjects_strips/?*?/?*domain*.*',E),once(load_domain(E))).
+:- forall(filematch_sas('./primaryobjects_strips/?*?/?*domain*.*',E),once(test_domain(E))).
+:- solve_files('hakank-pddl/monkey-domain.pddl','hakank-pddl/monkey-prob01.pddl').
 
 */
 
 %:- debug,must(test_primaryobjects).
  
 %:- time(test_frolog).
-:- prolog.
+
 
 :- endif.
 

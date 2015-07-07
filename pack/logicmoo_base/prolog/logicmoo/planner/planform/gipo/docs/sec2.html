@@ -1,0 +1,437 @@
+<html>
+<head>
+   <title>The Object Centred Language Manual (Version1.2) - Domain Model Components</title>
+</head>
+<body bgcolor="#FFFFFF">
+
+<a NAME="top"><table width="100%"><tr>
+<td align=left valign=top><a href="intro.html"><img SRC="prev.gif" ALT="prev" BORDER=0 ></a><a href="content.html"><img SRC="index.gif" ALT="content" BORDER=0 ></a><a href="sec3.html"><img SRC="next.gif" ALT="next" BORDER=0 ></a>
+</td>
+<td align=center><h2 align=center>The Object Centered Language Manual<br>
+<b>OCL<font valign=bottom size=-1>h</font></b> - Version1.2</h2>
+<td align=right><a href="http://helios.hud.ac.uk/planform/main.html">
+<img src="planform_logo2.gif" height="30" width="140" border=0 alt="Planform Home"></a>
+</td>
+</tr></table>
+<hr>
+
+<h2 align=center>2. Domain Model Components</h2>
+
+An object-centred domain model contains definitions of <b>objects</b>,
+<b>sorts</b>, <b>predicates</b>, <b>invariants</b>, <b>substate classes</b> and <b>operators</b>. The definitions are given below,
+and a full example model is in <a href="http://helios.hud.ac.uk/planform/resources.html">here</a>.
+
+<p>The components in OCL<font valign=bottom size=-1>h</font> are to a certain extent independent, their order is 
+not important, but a complete set of the components is required. 
+If any component is not available in a specified planning world, 
+an empty entry is needed to define it.
+
+<p><b>Comments</b> can be included anywhere in OCL<font valign=bottom size=-1>h</font>. They are introduced
+by "%". Everything following it in the line is treated as comment and ignored
+by the OCL<font valign=bottom size=-1>h</font> compiling and planning tools. Presently, the concrete syntax of OCL<font valign=bottom size=-1>h</font> is interpretable as a set of Prolog terms.
+
+<h4>
+<a NAME="Sec21"></a>2.1. A Brief Description of the Components of OCL<font valign=bottom size=-1>h</font></h4>
+
+The abstract syntax of OCL<font valign=bottom size=-1>h</font> is summarised below,
+(some concrete syntax is used). This is not precise but is meant to be used as
+ a guide in the rest of the manual.
+
+<pre><font size=-1>
+     basic classes: object id, sort id, predicate, variable, 
+     operator id, method id, method body,
+
+     substate ::= list of ground dynamic predicates
+     substate expression ::= list of predicates
+     object term ::= object id OR variable
+     object description ::= ss(sort id, object id, substate)
+     object expression ::= se(sort id, object term, substate expression)
+     class expression ::= ce(sort id, object term, substate expression) 
+     object transition ::= sc(sort id, object term, substate expression => substate expression) 
+
+     sort definition ::= sorts(sort id, list of sort ids).
+     object definition ::= objects(sort id, list of object ids).
+     predicate definitions ::= predicates(list of typed predicates).
+     non-atomic invariant ::= inconsistent OR implied
+     inconsistent ::= inconsistent_constraint(list of predicates).
+     implied ::= implied_invariant(list of predicates,list of predicates).
+     atomic invariants ::= atomic_invariants(list of static predicates).
+     substate class definition ::= substate_classes(sort id,object id,list of substate expressions)
+     hierarchical method ::= method(method id, 
+                          list of object expressions,
+                          list of necessary object transitions,
+                          list of static predicates,
+                          list of temporal predicates,
+                          method body).
+     primitive operator ::= operator(operator id, 
+                          list of object expressions,
+                          list of necessary object transitions,
+                          list of conditional  object transitions).
+
+     OCL MODEL ::= list of sort definitions 
+              list of object definitions
+              predicate definitions
+              [list of non-atomic invariants]
+              atomic invariants
+              list of substate class definitions
+              list of hierarchical methods
+              list of primitive operators
+</font></pre>
+<p>      
+
+A <b>sort</b> (or object class) is a set of object identifiers representing
+objects that share a common set of characteristics and behaviours.
+An object description (or simply object) is an 
+object identifier together with a description of the identifier's
+current "local state" - called its <b>substate </b>. A substate is 
+written in terms of properties and relations between its
+identifier and other object identifiers.
+
+<p>Sorts may be hierarchical, with primitive sorts at the lowest level.
+
+<p> <b>Dynamic</b> (<b>static</b>): A <b>sort</b> is dynamic (static)  
+if its <b>objects</b> are defined as being dynamic (static). <b>objects</b>
+are dynamic if their substates are affected as a result of actions, otherwise
+they are static.
+
+<p> A <b>predicate</b> represents a property of an object or a relation
+between objects. The set of all syntactically correct predicate structures 
+in a domain model is referred to as 
+<img src="math_p.gif">.
+
+
+<p> <b>Invariants</b> include <b>atomic invariants</b>, <b>inconsistent constraints</b> (Negative invariants) and <b>implied constraints</b>. They help to further define and restrict the domain model.
+
+<ul>
+<li>
+<b>Atomic invariants</b> are declarations of ground,
+static predicates which are always true. All other instances
+of static predicates not listed in the atomic invariants are always false.
+If a predicate is declared in the domain model, and an instance of
+it does not appear in the atomic invariants, then it is a dynamic predicate and
+must appear in one of the substate class definitions defined below.</li>
+
+<li>
+<b>Inconsistent constraints</b> are an
+optional component of OCL<font valign=bottom size=-1>h</font>. They
+contain a set of predicates which can never be all true in a 
+valid state of the world. </li>
+
+<li> 
+<b>Implied constraints</b> are also
+optional. They relate the truth values of dynamic predicates.
+These kinds of invariants have been added to OCL in the past because of
+the needs of particular pre-processing tools.</li>
+
+</ul>
+An <b>primitive operator</b> represents an action or event that changes 
+the object's substates. It contains a name, a prevail condition, a set 
+of necessary changes and a set of conditional changes.
+<ol>
+<li>
+<b>Prevail Conditions: </b>these are conditions on objects which must
+be true before an action can take place and which remain true after execution.</li>
+
+<li>
+<b>Necessary Changes: </b>these show the conditions that must be true before
+an action can take place, and specify the new state of
+an object after the action has been executed.</li>
+
+<li>
+<b>Conditional Changes: </b> Each conditional change
+has the following meaning: if a condition on objects is true 
+before an action takes place, then the objects change to a 
+new specified state.</li>
+</ol>
+<font color="#cc3299">NB: The main difference between OCL operators and traditional STRIPS-style
+operators is as follows: there is no default persistence in the
+substate changes, i.e. the lhs of a change (or <i>transition</i>) is not a
+list of effects, where predicates not mentioned in these effects
+persist. No predicate that describes the object being defined
+persists, as the rhs has to describe the whole new substate (an
+exception to this is when predicate hierarchies are used, as explained later)</font>.<p>
+
+<a href="#top">Back to Top</a>
+<h4>
+<a NAME="Sec22"></a>2.2. Some Key Concepts</h4>
+
+<ol>
+<li>Objects and Sorts</li>
+
+<p>Each <b>object identifier</b> belongs to a single primitive
+object class called a <b>sort</b>. For example:
+
+<pre>
+   objects(block, [b1, b2, b3]).
+   objects(gripper, [g]).
+</pre>
+
+Additionally, objects are members of sorts further up the ``sort hierarchy''.
+A sort hierarchy can be stated in OCL<font valign=bottom size=-1>h</font> as 
+in the following examples:
+
+<pre>
+   sorts(physical_object, [block,gripper]).
+</pre>
+
+The name of the sort is followed by a list of its object identifiers.<p> 
+
+<li>Object Descriptions</li>
+
+<p>Each dynamic object's <b>substate</b> is defined by the use of one or more of
+a well defined set of predicate names with well defined arguments.
+
+<p>In the above example:
+
+<p>The set of predicate names for <code>block</code> could be <code>"on_block"</code>,
+<code>"on_table"</code>, <code>"clear"</code> and <code>"gripped"</code>. The set of predicate
+names for <code>gripper</code> could be <code>"free"</code> and <code>"busy"</code>. 
+
+<p>These sets of predicates for each sort need not be mutually exclusive
+as will be shown later in the section on hierarchical models. 
+Also, these predicates are all classed as dynamic because their truth value 
+may change as a result of plan execution.
+
+<p>Predicate arguments are "typed" by sort names:
+
+<pre>
+   on_block(block,block), on_table(block), clear(block), ...
+</pre>
+
+<P>An object description is an
+object identifier <code>i</code> of sort <code>s</code> written 
+together with a substate comprising of ground predicates. Examples in
+the block's world could be:
+
+<pre>
+   ss(block,b1, [on_table(b1),clear(b1)])
+   ss(block,b2, [on_block(b1,b2),clear(b1)])
+</pre>
+
+<li>Defining Legal Substates</li>
+
+<p>An important part of OCL<font valign=bottom size=-1>h</font> is to specify 
+all the "legal" substates that an
+object may occupy. For example, one can define the following as all seven
+legal substates for block "<code>b1</code>" in the above <i>blocks world</i>:
+
+<pre>
+   [on_table(b1),clear(b1)],  [on_block(b1,b2),clear(b1)],
+   [on_block(b1,b3),clear(b1)], [on_block(b1,b2)],
+   [on_block(b1,b3)], [on_table(b1)], [gripped(b1,g)]
+</pre>
+
+(Note that there are always alternative formulations!)<p>
+
+In the same way, the following may be the substates for the gripper:
+ 
+<pre>
+   [free(g)], [busy(g)]
+</pre>
+
+The set of substates that an object identifier <code>i</code> can occupy are referred
+to as <code>substates(i)</code>. In an OCL<font valign=bottom size=-1>h</font> 
+specification the designer constructs a set of substate class definitions 
+which define <code>substates(i)</code> precisely but
+in a more compact fashion than enumeration. 
+For example (to distinguish  object names 
+from object parameters, we use the convention that
+parameters start with one or more upper-case letters):
+
+<pre>
+  substate_classes(block, B,
+                   [on_table(B),clear(B)],
+                   [on_block(B,B1),clear(B),ne(B1,B)],
+                   [on_block(B,B1), ne(B1,B)],
+                   [gripped(B,G)])
+                   [on_table(B)]) 
+</pre>
+
+Every instance of one of the lists of dynamic predicates 
+in the 3rd component of <code>substate_class</code> that obeys 
+the predicate type definitions, and that instantiates any static predicates
+occurring to be true,
+should be a member of <code>substates(i)</code>,
+and vice-versa. There are a collection of ``built-in'' static predicates which are defined in all
+OCL<font valign=bottom size=-1>h</font> tools, they are <code>ne(i,j)</code>, <code>is_of_primitive_sort(i,S)</code>
+and <code>is_of_sort(i,S)</code>.
+
+<ul>
+<li><code>ne(i,j)</code> means <code>i</code> cannot be equal to <code>j</code>.</li>
+
+<li><code>is_of_primitive_sort(i,S)</code> means object <code>i</code> is of primitive 
+sort <code>S</code>.</li>
+
+<li><code>is_of_sort(i,S)</code> means object <code>i</code> is of sort <code>S</code>.</li>
+</ul>
+
+<p>For simplicity, it is sometimes assumed that all true instances of these 
+predicates are members of the atomic invariants.
+
+<p>A dynamic predicate <code>P</code> <b>describes</b> an object <code>i</code> if <code>P</code> 
+is used to define substates of <code>i</code> - i.e. <code>P</code> appears in the substate
+class definition. 
+Often, <code>i</code> is positioned in the first argument of <code>P</code> to make
+this association obvious.
+<p>
+
+<li>The Semantics of Object Expressions</li>
+
+<p>Another important part of OCL<font valign=bottom size=-1>h</font> is that 
+of an <b>object expression</b>. Goals and operator preconditions are written as 
+sets of object expressions.
+An object expression is a generalisation of a object description,
+and is specified using dynamic and possibly static
+predicates.
+
+<p>Extra notation needs to be introduced to define object expressions.
+
+<ul>
+<li>A legal substitution is a sequence of replacements, where each
+replacement substitutes a variable of sort <code>s</code> 
+by an object term which has <code>s</code> as either its primitive sort or
+its supersort.</li>
+
+<li>A set of static predicates are <code>consistent</code> if there
+is a legal substitution that  
+instantiates them to facts asserted as true in the atomic invariants.</li>
+
+<li>If <code>p</code> 
+<img src="subseteq.gif">
+<img src="math_p.gif"> 
+then let <code>dynamic(p)</code> and <code>static(p)</code> be 
+the dynamic and static predicates in <code>p</code>, respectively.</li>
+</ul>
+
+<p>If <code>g</code> <img src="subset.gif"><img src="math_p.gif">,
+then <code>se(s,i,g)</code> is called an <b>object expression</b> if 
+there is an  <code>h</code> <img src="belong.gif">
+<code>substates(j)</code>
+for some object identifier <code>j</code> of primitive sort <code>s'</code>, 
+and a legal substitution <code>t</code> 
+such that 
+
+<ul>
+<li> <code>i<font size=-3>t</font> = j</code> </li> 
+<li> <code>dynamic(g)<font size=-3>t</font></code> 
+<img src="subseteq.gif" valign=bottom> <code>h</code></li>
+<li> <code>s'= s</code> or <code>s'</code> is a subsort of <code>s</code></li> 
+<li> <code>static(g)<font size=-3>t</font></code> is consistent </li>
+</ul>
+
+<p>In this case object <code>ss(j,s',h)</code> is said to <i>satisfy</i> <code>se(i,s,g)</code>.
+Since <code>i</code> could be a dynamic object identifier or variable, we
+refer to it as an <i>object term</i>.
+
+<p>For example, the object description 
+<code>ss(block,b1, [on_table(b1),clear(b1)])</code>
+satisfies <code>se(block,B, [clear(B)])</code> with substitution 
+<code>[B/b1]</code>.<p>
+
+<li>World States</li>
+
+<p>A <b>world state</b> is a mapping from dynamic object identifiers 
+to substates - this associates each object with a unique substate in its 
+class. It is written as a list of object descriptions
+as shown in the following example.
+
+<pre>
+  [ss(gripper,g, [free(g)]), 
+   ss(block, b1, [clear(b1), on_block(b1,b2)]),
+   ss(block, b2, [on_table(b2)]),
+   ss(block, b3, [clear(b3),on_table(b3)])]
+</pre>
+
+<li>A Class Expressions</li>
+
+<p>A <b>class expression</b> <code>ce(s,i,g)</code> is defined
+in much the same way as an object expression except that when ground
+<code>g</code> must equate to an exact object's substate.
+Class expressions are important because one needs to specify 
+deterministically how classes of objects change using a
+parameterised notation. Hence the output of a parameterised 
+operator (defined below) will be in terms of class expressions,
+which when instantiated will specify a
+an object description uniquely (<font color="#cc3299">later, when we introduce 
+hierarchy, a class expression when instantiated will specify
+one or more hierarchical components of an object description uniquely</font>).
+
+<p>In a sense, an object description is a class expression that  
+is fully ground.
+Hence class expressions may <code>satisfy</code> object expressions
+under the same conditions that an object description satisfies an
+object expression.<p>
+
+<li>Object Transitions</li>
+
+<p>If <code>se(s,i,g)</code> and <code>ce(s,i,h)</code> are an object 
+expression and a class expression respectively, then <code>g</code>
+<img src="rarrow.gif"><code>h</code>
+is called an object <b>transition</b> (this is sometime written adorned with
+sort and object identifiers as <code>(s,i,g<img src="rarrow.gif">h</code>). 
+A transition of <code>i</code> is applicable to a
+class expression <code>ce(s',i', h')</code> if under a legal substitution 
+<code>t</code>, <code>h'</code> satisfies <code>g</code>.
+The transition changes <code>ce(s',i',h')</code> to 
+<code>ce(s',i',h<font size=-3>t</font>)</code>.<p>
+
+<li>Primitive Operators</li>
+
+<p>An action in a domain is represented by either a primitive or
+method operator. Primitive operators specify under what
+conditions objects may go through single transitions; compound
+operators specify under what conditions
+objects go through whole transition sequences.
+A <b>primitive operator</b> schema <code>O</code> has
+components 
+
+<p><code>operator(Nm,Prev,Index,Cond,Cons)</code>, 
+
+<p>such that <code>Nm</code> is the
+operator's name followed by its
+parameters, <code>Prev</code> is the prevail condition
+consisting of a set of object expressions,
+<code>Index</code> is a set of necessary object
+and transitions, <code>Cond</code> is a set of conditional transitions.
+If any object referred to in the operator changes its substate then
+the new substate must be unique (i.e. the operator is `deterministic').
+
+<p>Let <code>statics(O)</code> be the set of static predicates 
+occurring anywhere in operator<code>O</code>. 
+Then primitive operator <code>O</code> can be applied to a world state 
+<code>S</code> if there is a grounding substitution <code>t</code> for 
+<code>Index</code> and <code>Prev</code> such that each
+transition in <code>Index<font size=-3>t</font></code> can be applied to an 
+object description
+in <code>S</code>, and each object expression in
+<code>Prev<font size=-3>t</font></code> is satisfied in <code>S</code>.
+Further, <code>statics(O)<font size=-3>t</font></code> must be consistent.
+The new world state is <code>S</code> with<p>
+
+<ul>
+<li> the changes
+made to a set of objects as specified in the
+necessary transitions</li>
+<li> all <i>other</i> objects not affected by the
+necessary transitions, but which satisfy the <code>LHS</code> of a
+transition in <code>Cond<font size=-3>t</font></code>, changed according 
+to that transition.</li>
+</ul>
+</ol>
+
+<a href="#top">Back to Top</a>
+<hr>
+<table WIDTH="100%" >
+<tr>
+<td ALIGN=LEFT><a href="intro.html"><img SRC="prev.gif" ALT="prev" BORDER=0 ></a><a href="content.html"><img SRC="index.gif" ALT="content" BORDER=0 ></a><a href="sec3.html"><img SRC="next.gif" ALT="next" BORDER=0 ></a></td>
+<td align=center><script language="JavaScript">
+<!---//hide script from old browsers
+    document.write( "Last updated "+ document.lastModified );
+//end hiding contents --->
+</script>
+</td>
+</tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.78 [en] (X11; U; Linux 2.4.10-4GB i686) [Netscape]">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EE" vlink="#551A8B" alink="#FF0000">
+&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<center>
+<dt>
+<b><u><font size=+4>To Create A Compound Operator</font></u></b></dt></center>
+
+<p><br>
+<ol>
+<li>
+Click the "Compound Transitions" button on the toolbar to bring up the
+"Compound Transitions" window (Figure 1).</li>
+
+<li>
+Click on the "New" button on the top toolbar or the menu bar (Operator),
+a pale blue circle (labeled as "Action ID") will appear on the editing
+canvas to represent the head (name) of the compound operator.</li>
+
+<li>
+Double click on this circle object to bring up a dialog box to rename the
+compound operator.</li>
+
+<li>
+Click on the radio button "Add Pre-conditions", then select the proper
+state from the substate list window. Click on the canvas to bring up a
+brown square standing for Pre-conditions.</li>
+
+<li>
+Click on the radio button "Add Index", then select the proper state from
+the substate list window. Click on the canvas, the left hand side statement
+of the condition will appear on the canvas as a gray blue round rectangle,
+in the meantime, the right hand side statement appears as an empty round
+rectangle with flashing edges waiting for the user's input (Figure 1).
+The content of "Substate List" window has been updated to the states related
+to the same sort user just picked. Clicking on the proper state in the
+substate list window will specify the right hand side of the necessary
+condition and stop the flashing effect.</li>
+
+<li>
+Click on the radio button "Add Statics", then select one or more statics
+from the static list window on the left hand side of the window. Note that
+'CONTROL' key with mouse click will allow user to multi-select, 'SHIFT'
+key with mouse click will allow user to select a range (Figure 2). After
+specify all proper statics, click on the canvas, a light gray round square
+containing all selected static predicates will appear on the canvas.</li>
+
+<li>
+Change to edit mode by selecting the check box "Edit Mode". Drawing canvas
+will change to dark blue. The system reaches a situation that all the variables
+of this operator can now be edited. "Zoom In" and "Zoom Out" function will
+help user to adjust the viewing scale.</li>
+
+<li>
+Click on the variable which needs to be edited. It will be highlighted
+with green underline, all other related (with same sort) variables will
+also be highlighted but with red underline. Right click on the green underlined
+variable to rename. Right click on the red underlined variable will allow
+user to specify the relationship between the current red underlined variable
+and the green underlined variable (Figure 3).</li>
+
+<li>
+Right click on the head shape of the compound operator. A popup menu will
+appear (Figure 4). Click 'Show decomposition', the head shape will grow
+to the window size, then inside the head shape a decomposition window/canvas
+will be opened with animation (Figure 5). Note that the statics list window
+is replace by the operators list window (Figure 5).</li>
+
+<li>
+Right click on the decomposition canvas, all possible functions are listed
+in a menu (Figure 5).</li>
+
+<li>
+To put a existing compound operator in the decomposition canvas, just simply
+drag the desired compound operator from the compound operators list window
+(Figure 6). In the same way, drag an existing operator from the operators
+list window on the left hand side. The special 'achieve' state (oclSS)
+can also be formed by dragging the appropriate states from the states list
+window. Right click on the decomposition canvas, then select the 'temporal
+constraints' from the popup menu(Figure 7).</li>
+
+<li>
+Select the shapes which has a precedent relationship to form the temporal
+constraint (Figure 8).</li>
+
+<li>
+Right click on the shapes, object property menu is shown (Figure 9). Click
+the menu, the property of the selected object (compound operator/operator/oclSS)
+will be displayed at another canvas registered as another tab pane (Figure
+10). At this level, the shapes are not editable but viewing contents only.
+Zoom in/out button on the toolbar is active to help adjusting the view
+port size. This compound operator can be decomposed as well (Figure 10),
+but compound operators/operators can not be dragged onto the lever level
+decomposition canvas to form the shape, i.e. apart from the first level,
+any other levels of decomposition are not editable.</li>
+
+<li>
+In the achieve clause property window, editing is allowed to change the
+variables' name, etc (Figure 11).</li>
+
+<li>
+To go back the undecomposed mode, right click on the head shape (not inside
+the decomposition canvas), a menu will appear (Figure 12). Select the menu,
+the decomposition window will close, then the head shape will shrink to
+its normal size as in Figure 1.</li>
+
+<li>
+Click on the "Add" button on the top toolbar to save this operator to the
+"Compound operators list".</li>
+
+<li>
+Be noticed that to save the compound operator to the domain for the other
+tools to use, "Commit" button needs to be clicked before leave this compound
+transition window.</li>
+
+<li>
+To view an existing compound operator, double click on the compound operator
+from the "Compound operators list" on the right hand side of the window.
+Follow the same procedure discussed above to edit.</li>
+</ol>
+
+<center><img SRC="method1.gif" height=471 width=966>
+<p><b><tt><font color="#000066"><font size=-1>Figure 1 Compound transition
+window</font></font></tt></b>
+<p><img SRC="method3.gif" height=223 width=263>
+<p><b><tt><font color="#000066"><font size=-1>Figure 2 Multiple selection
+of the statics</font></font></tt></b>
+<p><img SRC="method2.gif" height=277 width=648>
+<p><b><tt><font color="#000066"><font size=-1>Figure 3 Editing mode</font></font></tt></b>
+<p><img SRC="method4.gif" height=145 width=281>
+<p><b><tt><font color="#000066"><font size=-1>Figure 4 Popup menu for the
+decomposition of the compound operator</font></font></tt></b>
+<p><img SRC="method5.gif" height=377 width=917>
+<p><b><tt><font color="#000066"><font size=-1>Figure 5 Decomposition canvas</font></font></tt></b>
+<p><img SRC="method6.gif" height=349 width=603>
+<p><b><tt><font color="#000066"><font size=-1>Figure 6 Forming decomposition
+by mouse drag and drop</font></font></tt></b>
+<p><img SRC="method7.gif" height=220 width=388>
+<p><b><tt><font color="#000066"><font size=-1>Figure 7 Function popup menu</font></font></tt></b>
+<p><img SRC="method8.gif" height=220 width=390>
+<p><b><tt><font color="#000066"><font size=-1>Figure 8 Finished decomposition</font></font></tt></b>
+<p><img SRC="method9.gif" height=71 width=230><img SRC="method10.gif" height=71 width=211><img SRC="method11.gif" height=71 width=234>
+<p><b><tt><font color="#000066"><font size=-1>Figure 9 Property menu</font></font></tt></b>
+<p><img SRC="method13.gif" height=409 width=608>
+<p><b><tt><font color="#000066"><font size=-1>Figure 10 Property menu</font></font></tt></b>
+<p><img SRC="method12.gif" height=245 width=337>
+<p><b><tt><font color="#000066"><font size=-1>Figure 11 Property window
+of achieve clause also available for editing</font></font></tt></b>
+<p><img SRC="method14.gif" height=166 width=625>
+<p><b><tt><font color="#000066"><font size=-1>Figure 12 From decomposition
+mode back to the normal mode</font></font></tt></b></center>
+
+<p><br>
+<br>
+<p><a href="tutorial.html"><img SRC="walkback.gif" height=50 width=21></a><font face="Arial,Helvetica"><font size=-1><a href="tutorial.html">
+<b>back to the tutorial main page</b></a></font></font>
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+</body>
+</html>

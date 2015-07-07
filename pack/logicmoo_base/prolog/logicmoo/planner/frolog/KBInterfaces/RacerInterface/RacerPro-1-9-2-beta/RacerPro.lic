@@ -1,0 +1,7 @@
+;;; This is a license file. Do not edit.
+
+
+
+(:standard 170927733692069663676732585963883571149
+ (:standard (8 1 :final) :linux86 "[TC10704] Racer Systems" nil nil
+  "b0f025a29aed97135a8cac08246a49ae"))

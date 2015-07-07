@@ -1,0 +1,24 @@
+binaryState[rel=?B]
+	 semantics:[?A:?B(?C,?D) ]
+	 interface:[arg1=?C,arg2=?D,label0=?A,rel=?B]
+
+basicProperty[rel=?B]
+	 semantics:[?A:?B(?C) ]
+	 interface:[arg0=?C,label0=?A,rel=?B]
+
+binaryRel[rel=?G,theta1=?E,theta2=?B]
+	 semantics:[?A:?B(?C,?D) ?A:?E(?C,?F) ?A:?G(event,?C) ]
+	 interface:[arg0=?C,arg1=?F,arg2=?D,label0=?A,rel=?G,theta1=?E,theta2=?B]
+
+unaryRel[rel=?E,theta1=?B]
+	 semantics:[?A:?B(?C,?D) ?A:?E(event,?C) ]
+	 interface:[arg0=?C,arg1=?D,label0=?A,rel=?E,theta1=?B]
+
+nounSem[rel=?B]
+	 semantics:[?A:?B(?C) ]
+	 interface:[arg0=?C,label0=?A,rel=?B]
+
+PROSem[]
+	 semantics:[?A:you(?B) ]
+	 interface:[arg1=?B,label1=?A,subjectI=?B]
+

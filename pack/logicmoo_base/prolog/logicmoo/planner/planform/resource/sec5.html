@@ -1,0 +1,368 @@
+<html>
+<head>
+<title>The Object Centred Language Manual (Version1.2) - Development of an Hierarchical Domain Model</title>
+</head>
+<body bgcolor="#FFFFFF">
+<a NAME="top">
+<table width="100%"><tr>
+<td align=left valign=top><td align=left valign=top><a href="sec4.html"><img SRC="http://planform.hud.ac.uk/resource/prev.gif" ALT="prev" BORDER=0></a>
+<a href="content.html"><img SRC="http://planform.hud.ac.uk/resource/index.gif" ALT="content" BORDER=0> </a></td>
+<td align=center><h2 align=center>The Object Centered Language Manual<br>
+<b>OCL<font valign=bottom size=-1>h</font></b> - Version1.2</h2>
+<td align=right><a href="http://planform.hud.ac.uk/main.html">
+<img src="http://planform.hud.ac.uk/planform_logo2.gif" height="30" width="140" border=0 alt="Planform Home"></a>
+</td>
+</tr></table>
+<hr>
+
+<h2 align=center>5. Development of an Hierarchical Domain Model</h2>
+
+<h4><a name="Sec51">5.1. Sort Hierarchy</h4>
+
+As a larger example, we will use a transport logistics model based on 
+Translog <a href="ref.html">[4]</a>. This is a nice example of a domain 
+needing hierarchy and hierarchical operators.
+A sort hierarchy for Translog is shown in Example 1, containing 4 
+dynamic primitive sorts <i>truck, package, train, traincar</i> and 
+hence 15 dynamic objects. In <a href="http://scom.hud.ac.uk/scomdl2/palnform/resource/domains/translog_spec">here</a> we give a full specification of our 
+version ofTranslog.
+ 
+<pre>
+   sorts(physical-obj, [vehicle, package])
+   sorts(vehicle, [railv,roadv])
+   sorts(roadv, [truck])
+   sorts(railv, [train, traincar])
+   sorts(location, [city-location,city])
+   sorts(city-location, [tcentre,not-tcentre])
+   sorts(tcentre, [train-station])
+   sorts(not-tcentre, [clocation,post-office])
+   sorts(route, [road-route, rail-route])
+   objects(train-station, [city1-ts1,city2-ts1,city3-ts1])
+   objects(clocation, [city1-cl1,city1-cl2,city2-cl1,city3-cl1])
+   objects(post-office, [post_1])
+   objects(city, [city_1, city_2, city_3])
+   objects(train,[train_1,train_2])
+   objects(traincar,[traincar_1])
+   objects(road-route, [road-route_1,road-route_2,road-route_3]) 
+   objects(rail-route,[rail-route_2,rail-route_3,rail-route_4 ]) 
+   objects(truck, [truck_1, truck_2, truck_3, truck_11, truck_22, truck_33]) 
+   objects(package,[pk_1, pk_2, pk_3, pk_4, pk_5, pk_6])
+</pre>
+
+<h5 align=right>Example 1</h5>
+
+Let the predicates that
+describe a train be <code>at(train,location)</code>,
+ <code>attached(train,traincar)</code>,
+<code>unattached(train)</code>, 
+<code>in-service(train)</code>, <code>available(train)</code>.
+An example of an object description is:
+
+<pre>
+   (train,train_1,[at(train_1,city1-ts1), in-service(train_1), attached(train_1,traincar_1)])
+</pre>
+
+<h5 align=right>Example 2</h5>
+
+Here the local closed world assumption tells us that, for example,
+the train is not available, and it
+is not attached to other traincars apart from <code>traincar_1</code>.
+Example 3 is an object expression as it is satisfied by an least
+one object description - that of Example 2.
+In this case <code>train</code> is a subsort of <code>railv</code>,
+<code>t = [train_1/T, city1-ts1/Y]</code> and
+<code>in-city(city1-ts1,city1)</code> is consistent with the domain
+model.
+
+<pre>
+   (railv,T,[at(T,Y),in-service(T),in-city(Y,city1)])
+</pre>
+
+<h5 align=right>Example 3</h5>
+
+The substate in Example 2 has three hierarchical components -
+<code>at</code>, relating to physical objects, <code>attached</code> 
+relating to rail vehicles, and <code>in-service</code>, relating 
+specifically to trains.
+Objects of sort <code>train</code> are described by
+predicates through their primitive sort
+but they also inherit the dynamic predicates from supersorts 
+<code>railv</code> and <code>physical_obj</code>.
+
+<pre>
+   substate_classes(physical_obj, P, [ [at(P,L), is-of-sort(L,train-station) ])
+   substate_classes(railv, V,  [ [unattached(V)] ,
+            [attached(V,V1),is-of-sort(V1,traincar)] ])
+   substate_classes(train, T, [ [out-of-service(T)], [in-service(T)], 
+            [in-service(T),available(T)] ])
+</pre>
+
+<h5 align=right>Example 4: hierarchical substate specification for trains</h5>
+
+Example 4 implicitly specifies the substates of the train.  If there
+are <code>n</code> stations, <code>m</code> traincars, and <code>t</code> 
+trains then this
+implicitly defines all <code>t*(n*(m+1)*3)</code> substates.
+Static predicates are used to capture the exact set required.
+
+<h4><a name="Sec52">5.2. Special Rules Relating to Hierarchical Transitions</h4>
+
+When object transitions appear in hierarchical domain operators
+and methods, the idea of specifying a (many - to - one) change from
+substates  to substates is more complex. 
+It is possible that only one or some of the 
+hierarchical levels of a sort may change on transition.
+To reflect this we use the following rule:<p>
+
+<center><table width=80%><tr><td>
+<quote><i> if NO predicates from level N in the  hierarchy 
+appear in the right hand side of a transition, then the
+state at that level persists. If predicates from level N in the  hierarchy 
+appear in the right hand side of a transition, then they
+must specify a unique substate class at that level}.
+</i></td></tr></table></center>
+
+<p>For example, the transition of package <code>P</code>
+<pre>
+   [waiting(P),certified(P)]<img src="http://planform.hud.ac.uk/resource/rarrow.gif">[loaded(P,V),certified(P)]
+</pre>
+
+changes the class expression:
+
+<pre>
+    (package,pk_1,[at(pk_1,L),waiting(pk_1),certified(pk_1)]
+</pre>
+
+to:
+
+<pre>
+    (package,pk_1,[at(pk_1,L),loaded(pk_1,V),certified(pk_1)]
+</pre>
+
+when this transition is applied. Here <code>t = [pk_1/P]</code>,
+and the predicate <code>at(pk_1,L)</code> persists as it is specified
+at a higher level in package's hierarchy than the other predicates.
+
+<h4><a name="Sec53">5.3. Compound and Method Operators</h4>
+
+A <b>compound operator</b> <code>C</code> has components:
+
+<pre>
+   (Nm,Pre,Index, 
+     [(Cons<font size=-2>1</font>,Temps<font size=-2>1</font>,Body<font size=-2>1</font>),
+      ..., 
+     (Cons<font size=-2>n</font>,Temps<font size=-2>n</font>,Body<font size=-2>n</font>)])
+</pre>
+
+<code>Nm</code> is the operator's name followed by its
+parameters, and <code>Pre</code> is a set of
+object expressions that must be true before <code>C</code>
+(unlike the prevail in a primitive operator
+objects in <code>Pre</code> may be affected by the operators in the
+expansion of <code>C</code>).
+<b>Index</b> is a set of necessary
+state transitions (possibly null) similar to <b>Index</b> in the
+primitive operator case.
+The <code>(Cons<font size=-2>i</font>,Temps<font size=-2>i</font>,Body<font size=-2>i</font>)</code> are conditional expansions, where
+<code>Cons<font size=-2>i</font></code> and <code>Temps<font size=-2>i</font></code> are static conditions on the
+parameters in the operator, and temporal constraints on the nodes
+in the <code>Body<font size=-2>i</font></code>, respectively.
+If a <code>Cons<font size=-2>i</font></code> can be satisfied, the
+compound operator can be expanded into the network
+as specified in <code>Body<font size=-2>i</font></code> (the <code>Cons<font size=-2>i</font></code> need not be mutually
+exclusive).
+<code>Body<font size=-2>i</font></code> contains nodes in the
+usual HTN fashion: a node is either
+the name of a primitive operator, the name of a compound operator,
+or an expression of the form `achieve-goal(<code>G</code>)', where <code>G</code> is
+a class expression.
+<p>
+Compound operators can be split into  <code>n</code> <i>methods</i>
+of the form
+ <pre>
+   (Nn,Pre,Index,Cons<font size=-2>i</font>,Temps<font size=-2>i</font>,Body<font size=-2>i</font>)
+</pre>
+ 
+The example shows 
+a method for carrying a package from one location to
+another within the same city.
+
+<pre>
+   method( carry-direct(P,O,D), [], 
+           [ sc(package, P, [at(P,O),waiting(P),certified(P)]<img src="http://planform.hud.ac.uk/resource/rarrow.gif"> 
+                      [at(P,D),waiting(P),certified(P)])] 
+           [is-of-sort(P,package), is-of-sort(V,truck), 
+                       in-city(O,CY), in-city(D,CY) ],
+           [before(1,2), before(2,3), before(3,4),before(4,5) ], 
+           [comission(V,P), move(V,OL,O,R), 
+                       load-package(P,V,O), move(V,O,D,R1),
+                       unload-package(P,V,D) ]). 
+</pre>
+ 
+<h5 align=right>Example 5: a `carry-direct' method</h5>
+
+An OCL<font valign=bottom size=-1>h</font> compound operator  has
+no achievable conditions on intermediate nodes in its
+body.
+This is because constraints on the persistence of facts
+(e.g. using a `between' constraint)
+throughout a sequence of nodes in compound operator bodies
+can be represented within the substate
+specification of each sort, making the
+constraints implicit as discussed in reference <a href="ref.html">[2]</a>. 
+
+<p>Whenever a method has been fully expanded to primitive operators,
+the resulting plan must effect the transitions
+given in the <b>Index</b>.
+<code>C</code> may, however, change other objects
+in ways conditional on its expansion into more detailed task
+networks (such as the vehicle <code>V</code> in the
+example above). The property that methods decompose into
+networks that guarantee the transitions specified in a
+method's index we have called<b>transparency</b>. 
+
+<h4><a name="Sec54">5.4. The Transparency Property</h4>
+
+Hierarchical domain models in OCL<font valign=bottom size=-1>h</font> 
+are  regulated by the semantic property of transparency - this
+ensures the methods are structured in a coherent manner
+This property should be true for every method in a
+model. The technical details of this are given elsewhere 
+<a href="ref.html">[2]</a>.
+Key to the property is the
+idea that the method's decomposition into
+a task network will necessarily
+achieve the method's post-conditions (the <b>RHS</b>s of
+the necessary transitions indexing the method) -- if this is the case,
+the method is called <b>sound</b>.
+The <b>transparency property</b> is then as follows: 
+A method <b>m</b> is transparent if it and every expansion of <b>m</b>, 
+consistent with its static constraints, is 
+sound.
+
+<p>To check that a method  is transparent,
+we first check that its decomposition necessarily
+achieves the post-condition and the pre-conditions
+of operators/methods in the method's body (task network).
+This is done by examining each of the nodes in the
+task network and proving that the conditions are
+necessarily achieved, using the post-conditions of
+the nodes as achievers. An `achieve-goal(<b>G</b>)' is
+treated as a transition with an unspecified <b>LHS</b>,
+where the post-condition (<b>RHS</b>) is <b>G</b>. After this is proved,
+we must study the consistent decompositions of the task network and
+re-check this property for each
+such decomposition. 
+
+<p>A method or operator's statement of transitions
+can be turned into pre- and post conditions -
+conditions that must be true initially and those that
+are true after execution. Note that, of course,
+the statement of transitions contains more
+information than this (eg conditions that
+persist through the duration an action).
+
+<p>The transparency property is checked for each method.
+Essentially, a partially ordered
+task network is created where the
+start is the preconditions of the method, the end
+is the post-condition of the method.
+Transparency means that
+the post-condition of the method and
+the pre-condition of all the operators
+are necessarily achieved for all sorts
+in the pre- and post-conditions. Any conditions
+relating to objects <b>not</b> in the
+pre- and post-conditions are ignored.
+
+<p><b>Example</b>
+
+<p>Consider the DRUM world in the resource page. An example method is as
+follows:
+<pre>
+     method(navigate_method_dock(Rob,REF1,REF),
+     % dynamic constraints 
+     [ ],
+     % necessary substate changes
+     [sc(robot,Rob,[position(Rob,REF1)]<img src="http://planform.hud.ac.uk/resource/rarrow.gif"> [position(Rob,REF),at(Rob,REF)])],
+     % static constraints 
+     [in_range(REF2,REF), is_of_primitive_sort(REF,RFT),
+                is_of_primitive_sort(Rob,RT),allowed_position(RT,RFT)],
+     % temporal constraints 
+     [before(1,2), before(2,3)],
+     % decomp 
+     [navigate_method(Rob, REF1 ,REF2),
+      navigate(Rob,REF2,REF),
+      dock(Rob,REF)]).
+
+</pre>
+
+<p>The proof of transparency can be shown by
+inspecting the following presentation:
+
+<pre>
+
+PRE: position(Rob,REF1)
+
+PRE: position(Rob,REF1)
+navigate_method(Rob, REF1 ,REF2)
+POST: position(Rob,REF2),at(Rob,REF)
+
+PRE: position(Rob,REF2)
+navigate(Rob,REF2,REF),
+POST: position(Rob,REF),near(Rob,REF)
+
+PRE: position(Rob,REF),near(Rob,REF)
+dock(Rob,REF)
+POST: position(Rob,REF),at(Rob,REF)
+
+
+POST: position(Rob,REF),at(Rob,REF)
+
+</pre>
+
+<h4><a name="Sec55">5.5. Task Specification</h4>
+
+A <b>task specification</b> in <b>OCL<font valign=bottom size=-1>h</font></b> has three components:
+
+<p>(i) a task network, where a task is the name of a method <b>or</b>
+a condition on an object to be achieved 
+<br>(ii) an initial world state
+<br>(iii) a set of constraints on the task network.
+
+<p>The first component is thus similar to that used in Estlin et al's 
+integrated planner framework <a href="ref.html">[5]</a>. Their `activity-goals'
+are the same as method tasks, and their `state-goals' are  like
+our `achieve goals'.
+An example task comprising a task network containing two achieve goals
+and a method, is as follows:
+
+<pre>
+( [ achieve(ss(traincar,traincar1,
+              [at(traincar1,city1-ts1)])),
+   transport(pk-5-z,city3-cl1-z,city2-cl1),
+   achieve(ss(package,pk-5,
+              [at(pk-5,X),delivered(pk-5)] )) ],
+ [before(1,3)],
+ [serves(X,city3-x)])
+</pre>
+
+Use of parameter <code>X</code> means the third node in the network can be paraphrased as `deliver pk-5 to any destination X where X is a town
+centre location serving city3-x'.
+
+<hr>
+<table width="100%"><tr><td align=left>
+<a href="sec4.html"><img src="http://planform.hud.ac.uk/resource/prev.gif" border=0 alt="prev"></a>
+<a href="content.html"><img src="http://planform.hud.ac.uk/resource/index.gif" border=0 alt="content"></a>
+</td>
+<td align=center><script language="JavaScript">
+<!---//hide script from old browsers
+    document.write( "Last updated "+ document.lastModified );
+//end hiding contents --->
+</script>
+</td>
+<td ALIGN=RIGHT><b>Feedback:</b><a href="mailto:t.l.mccluskey@hud.ac.uk"><img src="http://planform.hud.ac.uk/resource/mail3.gif" border=0 alt="t.l.mccluskey@hud.ac.uk"></a></td>
+</tr>
+</table>
+</body>
+</html>

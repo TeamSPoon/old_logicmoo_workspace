@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+        
+  <meta name="GENERATOR" content="Mozilla/4.7 [en] (X11; I; SunOS 5.8 sun4u) [Netscape]">
+  <title>GIPO - Graphical Interface for Planning with Objects</title>
+   
+</head>
+  <body bgcolor="#ffffff">
+<center><img src="gipo_02.gif">
+</center>
+<hr>
+<img src="Diploma.gif" width="100" height="50" border="0" alt=""> <font color="#FF0000"><b>GIPO III Competition Version.</b> GIPO III won the IKEPS competition in the class of general Knowledge Engineering Tools for AI Planning at ICAPS 2005.</font> For details see link below.
+<h2>Introduction</h2>
+GIPO (Graphical Interface for Planning with Objects) is an experimental
+ GUI and tools environment for building planning domain models. Versions I and II were written
+ by Ron Simpson, Weihong Zhao and Donghong Liu who provided the planning engines.
+ GIPO was developed at the Univ of Huddersfield as one output
+ of the <a href="http://planform.hud.ac.uk" target="blank">PLANFORM</a>.
+ project from the Univ of Huddersfield, UK, with partners at the Univ of
+Salford and Univ of Durham.  
+<p>The PLANFORM project is now complete but GIPO continues to be developed by Ron Simpson
+at the University of Huddersfield. The project has no external funding consequently 
+development continues on a <i>when time permits basis</i>.<br>
+ </p>
+ 
+ <p><font color="#ff0000">June 2005</font> GIPO-III (GIPO version 3) won the IKEPS competition in the class of general Knowledge Engineering Tools for AI Planning.<br>
+ <div align="center"><a href="http://icaps05.icaps-conference.org/"><img src="i05-logo-small-no-text.jpg" align="middle" width="88" height="68" border="0" alt=""></a>&nbsp; see ICAPS05 Home for competition details.</div></p>
+ 
+ <h2> Rationale</h2>
+<ol>
+  <li> Planning Domain Models are hard to design, write, debug, maintain
+- even for experts. The process of encoding is laborious. Bugs are of various
+ types and can lurk in models for a long time. Presently, many domain model
+ authors use only planning engines to try to develop and debug a domain model. 
+Planners have not generally been designed for this purpose.</li>
+  <li> A notation that is good for encoding and validation may not be good 
+for use with a particular class of planners. There is a need for translators
+ from the encoding language to the input language for a target planner. Further, 
+with an increase in the number of useful tools and techniques surrounding 
+planning, there is a need to integrate these into a tools environment.</li>
+  <li> As planners and planning applications become larger, the problems of
+engineering planning domain models become more acute. There is a need to
+research into engineering environments and explore their synergy with general
+purpose planners.</li>
+  <br>
+</ol>
+
+<h2> Basic Functions of GIPO Version 3</h2>
+  GIPO Version 3 allows a user to create new domain models or import and
+change old ones. &nbsp;Domains are characterised as being either classical
+or hierarchical or requiring Durative Actions. The tool set presented to the user is automatically selected
+to fit this characterisation. All domain types are
+supported by tools having similar functionality.<br>
+<br>
+They feature: <br>
+<ol>
+  <li>  Syntax and semantic checks for individual components of a domain
+model</li>
+  <li> Semantic cross checking between components</li>
+  <li> Graphical construction of domain operators&nbsp;</li>
+  <li> Export/import facilities for PDDL models (classical domains only)</li>
+  <li> An open PDDL port for plugging in third party planning systems (classical
+domains only)</li>
+  <li> A planner stepper for debugging operators</li>
+  <li> A plan animator / solution checker (not yet for Durative Actions)</li>
+  <li> A random task generator (classical domains only)</li>
+  <li>User manuals and a help tutorial</li>
+</ol>
+<ol>
+  <br>
+ 
+</ol>
+ <p>GIPO-III (GIPO version 3)
+ builds on previous releases by adding a major new editor for classical domains. The new editor allows domains to be defined in terms of <b>state machines</b> which are used to define the <b>life histories</b> of the domain's dynamic object classes. The new editor
+ helps rationalise design decisions at a higher level of abstraction and makes better use of the object metaphor that underpins the object centric approach of GIPO. The editor also supports a library mechanism by which commonly re-occurring segments of domains may be stored in a library and then customised for re-used in other domain definitions. The fastest way to get an overview of the <b>life history editor</b> is to check out the early sections of the supporting tutorial. With the introduction of version 3 GIPO has experimental 
+  support for domains requiring durative actions and numeric fluents, with roughly the expressive
+  power of PDDL level 5.
+ </p>
+<p>GIPO-II 
+(GIPO Version 2) built on the previous release by adding support for Hierarchical 
+planning Domains. In particular: <br>
+</p>
+<ul>
+  <li>It supports defining state at the appropriate level of generality and 
+the inheritance of state. </li>
+  <li>It supports the definition of operators to change object state at any 
+level of generality required. </li>
+  <li>It allows the definition of compound operators (mini canned plans) to
+perform common tasks.&nbsp;</li>
+  <li>It allows the definition of tasks at any appropriate level of generality.</li>
+  <li>It has many semantic test it applies to the defined domain to help prevent
+error.</li>
+  <li>It has a manual stepper for constructing plans and dynamically testing 
+domain definitions.</li>
+  <li>It is integrated with HyHtn a hierarchical planner.</li>
+  <li>It has an animator to graphically view the output of HyHtn.</li>
+  <li>It incorporates all the features of the previous versions of GIPO including 
+"Opmaker" - an operator induction method. Sample results from Opmaker runs 
+are available on the Resources page.
+  </li>
+</ul>
+
+
+<h2></h2>
+<hr>
+<script language="JavaScript">
+<!---//hide script from old browsers
+    document.write( "Last updated "+ document.lastModified );
+//end hiding contents --->
+</script>
+</body>
+</html>

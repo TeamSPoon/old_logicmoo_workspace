@@ -1,0 +1,435 @@
+<html>
+<body>
+
+<p align="center">
+<img src="gipo_gear.gif"
+width="200" height="150">
+</p>
+
+<p>
+<h1 align="center">GIPO Domain Model</h1>
+</p>
+
+<p>
+<h2 align="center">Domain Details</h2>
+</p>
+
+<table width="86%">
+<tr>
+  <td align="center"><b>Author:</b> Ms. H. Shizard
+                     </td>
+  <td align="center"><b>Name:</b> Baking Cake
+                     </td>
+  <td align="right"><b>Favourite:</b> no
+                     </td>
+</tr>
+</table>
+
+<p>
+<h2 align="center">Index</h2>
+</p>
+
+<table width="100%">
+<tr>
+  <td align="center"><a href="#C1">
+		     Life History</a></td>
+  <td align="center"><a href="#C2">
+		     Diagram Nodes' Properties and Constraints</a></td>
+  <td align="center"><a href="#C3">
+                     OCL Domain Plain Text</a></td>
+  <td align="center"><a href="#C4">
+		     PDDL Domain Plain Text</a></td>
+  <td align="center"><a href="#C5">
+		     Files Download Links</a></td>
+</tr>
+</table>
+
+<p>
+<h2 align="center"><a name="C1">Life History</a></h2>
+</p>
+
+<p align="center">
+<img src="bakingcakelh.jpg"
+width="640" height="480">
+</p>
+
+<p>
+<h2 align="center"><a name="C2">Diagram Nodes' Properties and Constraints</a></h2>
+<h2 align="center">(alphabetical order)</a></h2>
+</p>
+
+<p align="center">
+<img src="bakingcakep&c.jpg"
+width="640" height="480">
+</p>
+
+<p align="center">
+<img src="bakingcakep&c2.jpg"
+width="640" height="480">
+</p>
+
+<p align="center">
+<img src="bakingcakep&c3.jpg"
+width="640" height="480">
+</p>
+
+<p>
+<h2 align="center"><a name="C3">OCL Domain Plain Text</a></h2>
+</p>
+
+<p>
+<pre>
+/**
+ *  All rights reserved. Use of this software is permitted for non-commercial
+ *  research purposes, and it may be copied only for that use.  All copies must
+ *  include this copyright message.  This software is made available AS IS, and
+ *  neither the GIPO team nor the University of Huddersfield make any warranty
+ *  about the software or its performance.
+ *
+ *  Automatically generated OCL Domain from  GIPO Version 3.0
+ *
+ *  Author: c0360946
+ *  Institution: University of Huddersfield
+ *  Date created: Tue Nov 28 13:11:21 GMT 2006
+ *  Date last modified: 2006/12/13 at 05:55:44 PM GMT
+ *  Description:
+ *    
+ * Object Life History : bakingCake.gfx
+ */
+
+domain_name(bakingCake).
+
+% Sorts
+sorts(primitive_sorts,[oven,decorator,cake]).
+
+% Objects
+objects(oven,[ovenA,ovenB]).
+objects(decorator,[hoda]).
+objects(cake,[cake1,cake2,cake3]).
+
+% Predicates
+predicates([
+    open(oven),
+    closed(oven),
+    full(oven),
+    empty(oven),
+    decorating(decorator),
+    available(decorator),
+    raw(cake),
+    cooked(cake),
+    decorated(cake),
+    inOven(cake),
+    withDecorator(cake),
+    unDecorated(cake)]).
+
+% Object Class Definitions
+substate_classes(oven,Oven,[
+    [open(Oven)],
+    [closed(Oven)],
+    [full(Oven)],
+    [empty(Oven)]]).
+substate_classes(decorator,Decorator,[
+    [decorating(Decorator)],
+    [available(Decorator)]]).
+substate_classes(cake,Cake,[
+    [raw(Cake)],
+    [cooked(Cake)],
+    [decorated(Cake)],
+    [inOven(Cake)],
+    [withDecorator(Cake)],
+    [unDecorated(Cake)]]).
+
+% Atomic Invariants
+
+% Implied Invariants
+
+% Inconsistent Constraints
+
+% Operators
+operator(passToDecorater(Decorator,Cake),
+    % prevail
+    [],
+    % necessary
+    [     sc(decorator,Decorator,[available(Decorator)]=>[decorating(Decorator)]),
+     sc(cake,Cake,[unDecorated(Cake)]=>[withDecorator(Cake)])],
+    % conditional
+    []).
+operator(takeOut(Oven,Cake),
+    % prevail
+    [     se(oven,Oven,[open(Oven)])],
+    % necessary
+    [     sc(cake,Cake,[cooked(Cake)]=>[unDecorated(Cake)]),
+     sc(oven,Oven,[full(Oven)]=>[empty(Oven)])],
+    % conditional
+    []).
+operator(decorate(Cake,Decorator),
+    % prevail
+    [],
+    % necessary
+    [     sc(cake,Cake,[withDecorator(Cake)]=>[decorated(Cake)]),
+     sc(decorator,Decorator,[decorating(Decorator)]=>[available(Decorator)])],
+    % conditional
+    []).
+operator(cook(Oven,Cake),
+    % prevail
+    [     se(oven,Oven,[closed(Oven)])],
+    % necessary
+    [     sc(cake,Cake,[inOven(Cake)]=>[cooked(Cake)])],
+    % conditional
+    []).
+operator(closeOven(Oven),
+    % prevail
+    [],
+    % necessary
+    [     sc(oven,Oven,[open(Oven)]=>[closed(Oven)])],
+    % conditional
+    []).
+operator(openOven(Oven),
+    % prevail
+    [],
+    % necessary
+    [     sc(oven,Oven,[closed(Oven)]=>[open(Oven)])],
+    % conditional
+    []).
+operator(putInOven(Oven,Cake),
+    % prevail
+    [     se(oven,Oven,[open(Oven)])],
+    % necessary
+    [     sc(oven,Oven,[empty(Oven)]=>[full(Oven)]),
+     sc(cake,Cake,[raw(Cake)]=>[inOven(Cake)])],
+    % conditional
+    []).
+
+% Methods
+
+% Domain Tasks
+planner_task(1,
+    % Goals
+    [
+     se(decorator,hoda,[available(hoda)]),
+     se(cake,cake1,[decorated(cake1)]),
+     se(oven,ovenA,[closed(ovenA)]),
+     se(oven,ovenA,[empty(ovenA)]),
+     se(oven,ovenB,[full(ovenB)]),
+     se(oven,ovenB,[closed(ovenB)]),
+     se(cake,cake2,[inOven(cake2)])],
+    % INIT States
+    [
+     ss(oven,ovenA,[closed(ovenA)]),
+     ss(oven,ovenA,[empty(ovenA)]),
+     ss(oven,ovenB,[closed(ovenB)]),
+     ss(oven,ovenB,[empty(ovenB)]),
+     ss(decorator,hoda,[available(hoda)]),
+     ss(cake,cake1,[raw(cake1)]),
+     ss(cake,cake2,[raw(cake2)])]).
+planner_task(2,
+    % Goals
+    [
+     se(cake,cake1,[decorated(cake1)]),
+     se(decorator,hoda,[available(hoda)]),
+     se(oven,ovenA,[empty(ovenA)]),
+     se(oven,ovenA,[closed(ovenA)])],
+    % INIT States
+    [
+     ss(oven,ovenA,[closed(ovenA)]),
+     ss(oven,ovenA,[empty(ovenA)]),
+     ss(decorator,hoda,[available(hoda)]),
+     ss(cake,cake1,[raw(cake1)])]).
+</pre>
+</p>
+
+<p>
+<h2 align="center"><a name="C4">PDDL Domain Plain Text</a></h2>
+</p>
+
+<p>
+<pre>
+; ***************************************************************************
+; *  All rights reserved. Use of this software is permitted for non-commercial
+; *  research purposes, and it may be copied only for that use.  All copies must
+; *  include this copyright message.  This software is made available AS IS, and
+; *  neither the GIPO team nor the University of Huddersfield make any warranty
+; *  about the software or its performance.
+; *
+; *  Automatically generated PDDL Domain from  GIPO Version 3.0
+; *
+; *  Author: c0360946
+; *  Institution: University of Huddersfield
+; *  Date created: Tue Nov 28 13:11:21 GMT 2006
+; *  Date last modified: 2006/12/13 at 05:55:44 PM GMT
+; *  Description:
+; *    
+; * OCL File name : bakingCake.ocl
+; * Object Life History : bakingCake.gfx
+; *************************************************************************
+
+(define (domain bakingCake)
+  (:requirements :strips :equality :typing)
+
+  (:types  oven decorator cake)
+
+
+  (:predicates
+    (open ?oven1 - oven)
+    (closed ?oven1 - oven)
+    (full ?oven1 - oven)
+    (empty ?oven1 - oven)
+    (decorating ?decorator1 - decorator)
+    (available ?decorator1 - decorator)
+    (raw ?cake1 - cake)
+    (cooked ?cake1 - cake)
+    (decorated ?cake1 - cake)
+    (inOven ?cake1 - cake)
+    (withDecorator ?cake1 - cake)
+    (unDecorated ?cake1 - cake)
+  )
+  (:action passToDecorater
+       :parameters ( ?Decorator - decorator ?Cake - cake)
+       :precondition (and 
+            (available ?Decorator)
+            (unDecorated ?Cake)
+       )
+       :effect (and 
+            (not (available ?Decorator))
+            (not (unDecorated ?Cake))
+            (decorating ?Decorator)
+            (withDecorator ?Cake)
+        )
+    )
+  (:action takeOut
+       :parameters ( ?Oven - oven ?Cake - cake)
+       :precondition (and 
+            (open ?Oven)
+            (cooked ?Cake)
+            (full ?Oven)
+       )
+       :effect (and 
+            (not (cooked ?Cake))
+            (not (full ?Oven))
+            (unDecorated ?Cake)
+            (empty ?Oven)
+        )
+    )
+  (:action decorate
+       :parameters ( ?Cake - cake ?Decorator - decorator)
+       :precondition (and 
+            (withDecorator ?Cake)
+            (decorating ?Decorator)
+       )
+       :effect (and 
+            (not (withDecorator ?Cake))
+            (not (decorating ?Decorator))
+            (decorated ?Cake)
+            (available ?Decorator)
+        )
+    )
+  (:action cook
+       :parameters ( ?Oven - oven ?Cake - cake)
+       :precondition (and 
+            (closed ?Oven)
+            (inOven ?Cake)
+       )
+       :effect (and 
+            (not (inOven ?Cake))
+            (cooked ?Cake)
+        )
+    )
+  (:action closeOven
+       :parameters ( ?Oven - oven)
+       :precondition 
+            (open ?Oven)
+       :effect (and 
+            (not (open ?Oven))
+            (closed ?Oven)
+        )
+    )
+  (:action openOven
+       :parameters ( ?Oven - oven)
+       :precondition 
+            (closed ?Oven)
+       :effect (and 
+            (not (closed ?Oven))
+            (open ?Oven)
+        )
+    )
+  (:action putInOven
+       :parameters ( ?Oven - oven ?Cake - cake)
+       :precondition (and 
+            (open ?Oven)
+            (empty ?Oven)
+            (raw ?Cake)
+       )
+       :effect (and 
+            (not (empty ?Oven))
+            (not (raw ?Cake))
+            (full ?Oven)
+            (inOven ?Cake)
+        )
+    )
+  )
+(define (problem task1)
+   (:domain bakingCake)
+   (:objects
+         ovenA ovenB - oven
+         hoda - decorator
+         cake1 cake2 cake3 - cake
+        )
+    (:init
+        (closed ovenA)
+        (empty ovenA)
+        (closed ovenB)
+        (empty ovenB)
+        (available hoda)
+        (raw cake1)
+        (raw cake2)
+        )
+    (:goal
+      (and
+        (available hoda)
+        (decorated cake1)
+        (closed ovenA)
+        (empty ovenA)
+        (full ovenB)
+        (closed ovenB)
+        (inOven cake2)
+       ))
+)
+(define (problem task2)
+   (:domain bakingCake)
+   (:objects
+         ovenA ovenB - oven
+         hoda - decorator
+         cake1 cake2 cake3 - cake
+        )
+    (:init
+        (closed ovenA)
+        (empty ovenA)
+        (available hoda)
+        (raw cake1)
+        )
+    (:goal
+      (and
+        (decorated cake1)
+        (available hoda)
+        (empty ovenA)
+        (closed ovenA)
+       ))
+)
+</pre>
+<p>
+
+<p>
+<h2 align="center"><a name="C5">Files Download Links</a></h2>
+</p>
+
+<table width="100%">
+<tr>
+  <td align="center"><a href="bakingCake.ocl">
+                     OCL file</a></td>
+  <td align="center"><a href="bakingCake.gfx">
+                     GFX file</a></td>
+</tr>
+</table>
+
+</body>
+</html>

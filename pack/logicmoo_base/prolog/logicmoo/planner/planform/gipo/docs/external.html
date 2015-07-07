@@ -1,0 +1,147 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.78 [en] (X11; U; Linux 2.4.10-4GB i686) [Netscape]">
+   <title>GIPO User Manual</title>
+</head>
+<body bgcolor="#FFFFFF">
+
+<center>
+<h2>
+GIPO User Manual</h2></center>
+
+<hr>
+<table WIDTH="100%" >
+<tr>
+<td>
+<center>
+<h3>
+External Planners</h3></center>
+</td>
+
+<td ALIGN=CENTER VALIGN=TOP WIDTH="20%"><a href="sort.html">Sort Edit</a>
+<br><a href="predicate.html">Predicate Edit</a>
+<br><a href="state.html">State Edit</a>
+<br><a href="transview.html">Transition Edit</a>
+<br><a href="taskview.html">Task Edit</a>
+<br><a href="stepper.html">Stepper</a>
+<br><a href="animator.html">Animator</a></td>
+</tr>
+</table>
+
+<dl>
+<dt>
+<b>PURPOSES:</b></dt>
+
+<br>&nbsp;
+<p>&nbsp;
+<dd>
+GIPO allows for the integration of third party planning systems.</dd>
+
+<br>&nbsp;
+<p>&nbsp;
+<dt>
+<b>BASIC REQUIREMENTS:</b></dt>
+
+<br>&nbsp;
+<p>&nbsp;
+<dd>
+1. The planner should process PDDL and be capable of dealing with the following
+requirements :strips :equality :typing and for domains expressed in gipo
+with conditional tansitions :conditional-effects.</dd>
+
+<p><br>&nbsp;2. The planner should be capable of being run from the command
+line. It should accept command line parameters to specify the two files
+containing the domain definition and the task to be processed. The planner
+should write its output to the standard output stream.
+<dt>
+<b>PROCEDURE FOR INTEGRATING THE PLANNER:</b></dt>
+
+<br>&nbsp;
+<p>&nbsp;
+<dd>
+Edit the file <b>gipo.properties</b> in the <b>jplan</b> directory of the
+GIPO distribution. Add the name of the planner (single symbol) to the end
+of the line beginning:</dd>
+
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ocled.planner.algs
+<br>Using the symbol you have choosen for the planner name add an entry
+for each of the folowing property lines:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ocled.description.&lt;planner
+name>=&lt;text description of the planner system>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ocled.condeffects.&lt;planner
+name>=&lt;yes or no>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ocled.hierarchical.&lt;planner
+name>=no
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ocled.hierarchicalsorts.&lt;planner
+name>=yes
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ocled.callmethod.&lt;planner
+name>=shell
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ocled.command.&lt;planner
+name>=&lt;command line>
+<br>In the above the
+<br>(1) text dscription may be a single line of text of any length describing
+the planning sysyem.
+<br>(2) the line for condeffects shoud be set to yes if the planner supports
+conditional effects otherwise set it to no.
+<br>(3) The command line should be the command line, including the command
+name, required to run the planner. Two escape sequences should appear in
+this line %d to mark the position where the name of the domain definition
+file occurs in the command line and %t to mark where the name of the task
+file occurs. In the command line the planner command must be preceded with
+a full path name except where the command exists on the PATH defined for
+the user of GIPO.
+<br>&nbsp;
+<dt>
+<b>INTEGRATING THE PLANNER OUTPUT WITH THE ANIMATOR:</b></dt>
+
+<br>&nbsp;
+<p>&nbsp;
+<dd>
+The <b>animator</b> can display the output of an external planner if it
+conforms to one of two formats. In bothe case to planner must output a
+fully ordered plan as a list, one per line, of operator names followed
+by the instantiated values of the operator parameters in the order given
+in the operator definition.</dd>
+
+<p><br>Standard form
+<p>TASK &lt;task number>
+<br>SOLUTION
+<br>&lt;list of steps, first to last.>
+<br>END FILE
+<p>In this form any text can appear before the first processed line beginning
+<b>TEXT</b>. Each step must have the form
+<br>&lt;operator name>(&lt;comma seperated list of instantiated parameters>)
+<p>Alternative form
+<p>step 0: &lt;plan step 0>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1: &lt;plan step 1>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; n: &lt;plan step n>
+<p>In the above any text not containing the word <b>step</b> can appear
+befort the line containing the key word. <b>step</b>. Any text can follow
+the list of stems except that the line following cannot start with the
+consequetive step number. Each step has the form
+<br>&lt;operator name>&lt;space seperated list of instantiated parameters>
+<br>&nbsp;
+<dt>
+<b>TO RUN THE PLANNER:</b></dt>
+
+<br>&nbsp;
+<p>&nbsp;
+<dd>
+Simply select the planner name from the <b>Algorithm</b> dialog box of
+GIPO in the same way as you run an internal planner.</dd>
+
+<p><br>
+<hr><script language="JavaScript">
+<!---//hide script from old browsers
+    document.write( "Last updated "+ document.lastModified );
+//end hiding contents --->
+</script>
+
+<p><a href="user.html"><img SRC="walkback.gif" height=50 width=21></a><b><font face="Arial,Helvetica"><font size=-2><a href="user.html">back
+to the user manual front page</a></font></font></b></dl>
+
+</body>
+</html>

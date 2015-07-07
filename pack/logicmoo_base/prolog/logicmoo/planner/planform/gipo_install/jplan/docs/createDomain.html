@@ -1,0 +1,395 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE></TITLE>
+	<STYLE TYPE="text/css">
+	h1 {
+	color: #003300;
+}
+	h2 {
+	color: #003300;
+}
+  h3 {
+	color: #003300;
+}
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" TEXT="#000000" LINK="#0000ee" VLINK="#551a8b" BGCOLOR="#ffffff">
+
+<div align="center"><h1>Create A Classical Domain Specification</h1></div>
+<h2>Steps</h2>
+<ol>
+<li><A HREF="#name">define domain properties</A></li>
+<li><A HREF="#sort">define object sorts</A></li>
+<li><A HREF="#state">define legal state definitions</A></li>
+<li><A HREF="#predicate">define predicates</A></li>
+<li><A HREF="#operator">define operators</A></li>
+<li><A HREF="#task">define tasks</A></li></ol>
+
+	<H3><A NAME="name"></A>Create The Domain Name</H3>
+	<P>Select the &quot;new Domain&quot; function under the menu
+	&quot;File&quot;. The domain properties box will appear. You must
+	provide a domain name at this time, though you may edit the details
+	provided again at a later stage. The domain name should be a single
+	word beginning with a lowercase letter. For standard non
+	hierarchical domains leave the &quot;Domain is Hierarchical&quot;
+	check box unchecked.</P>
+	
+Type a name for the new domain, for example,
+&quot;briefcase&quot;.
+<P ALIGN=CENTER><IMG SRC="properties.gif" NAME="Graphic1" ALIGN=BOTTOM WIDTH=471 HEIGHT=506 BORDER=0>
+</P>
+<P ALIGN=CENTER><TT><B><FONT SIZE=2><FONT COLOR="#000066">Figure 1
+Create a new domain</FONT></FONT></B></TT></P>
+
+<H3><A NAME="sort"></A>Create the Sort Tree</H3>
+<UL>
+	<LI><P>Select &quot;Sorts&quot; button on the toolbar to
+	bring up the object sort editor window. &quot;Sort&quot; refers to the type of an object.
+		</P>
+</UL>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Click on the tree node in
+	order to create it's sub level sort/object.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Type string text into the text
+	box &quot;Sort name&quot;, then click add button to add the new sort
+	to the sort tree.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>After clicking on the tree
+	node, type an object name in the text box &quot;Object Name&quot;,
+	the click on the button &quot;Add Object&quot; to add this new
+	object to the sort tree.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Repeat above procedure to
+	create 3 sorts: bag, thing, place. Under sort &quot;bag&quot;, there
+	are two objects defined as &quot;briefcase&quot; and &quot;suitcase&quot;.
+	Define 3 objects for sort &quot;thing&quot;: &quot;cheque&quot;,
+	&quot;suit&quot;, and &quot;dictionary&quot;. Two objects &quot;home&quot;
+	and &quot;office&quot; for sort &quot;place&quot;.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>sorts/objects can be moved to
+	the other branches in the tree window by drag and drop.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>When everything is ready,
+	click &quot;Verify&quot; button to verify sorts. If all sorts are
+	valid then click &quot;Commit&quot; button to add these sorts to the
+	&quot;briefcase&quot; domain.</TT> 
+	</P>
+	<LI><P><TT>FinallycClose the &quot;Sort View&quot; window.</TT> 
+	</P>
+</OL>
+<P ALIGN=CENTER><BR><IMG SRC="Sort1.gif" NAME="Graphic2" ALIGN=BOTTOM WIDTH=463 HEIGHT=412 BORDER=0>
+</P>
+<P ALIGN=CENTER><TT><B><FONT SIZE=2><FONT COLOR="#000066">Figure 2
+Editing sorts</FONT></FONT></B></TT></P>
+<H3><A NAME="predicate"></A>Create the Predicates</H3>
+<UL>
+	<LI><P><FONT SIZE=4>Click &quot;Predicates&quot; button on the
+	toolbar.</FONT> 
+	</P>
+</UL>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Type &quot;at_bag&quot; as a
+	new predicate's name in the text field labelled &quot;Name&quot;.
+	Click button &quot;New&quot;, then this predicate will appear in the
+	&quot;Predicates ... &quot; window, and also appears in the &quot;Edit
+	Predicate&quot; window.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>To build members of the
+	predicate, drag &quot;bag&quot; then &quot;place&quot; from the sort
+	tree window to the new created predicate in the &quot;Edit
+	Predicate&quot; window. The order of the members will depend on
+	where it's been dropped.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>When editing an existing
+	predicate, select the predicate from the predicate list, then it's
+	content will appear in the edit window. Repeat previous procedure to
+	edit.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Repeat previous procedure to
+	built 5 predicates, at_bag(bag,place), at_thing(thing,place),
+	inside(thing,bag), fits_in(thing,bag), outside_at(thing,place),
+	shown in the following figure. Select the predicate
+	&quot;fits_in(thing,bag)&quot;, click the check box &quot;Is Static&quot;
+	to make it static.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>To delete a predicate, first
+	select it from the list, then click on the &quot;Delete&quot;
+	button.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>To rename a predicate, first
+	select the proper predicate to bring it's content to the edit
+	window. Gently left click on the node once, the predicate name node
+	will be changed to the editable mode. Press return when the edit is
+	complete to update the predicate.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>To delete a predicate
+	argument/member select the predicate to bring it's content to the
+	edit window. Select the member to be deleted then right click to
+	show the edit popup menu. Click on &quot;cut&quot; to confirm.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>To reorder a predicates
+	members/arguments, first select the proper predicate to bring it's
+	content to the edit window. Use drag and drop to reposition the
+	arguments.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>When all editing procedures
+	are finished, click &quot;Verify&quot; button to verify predicates.
+	If all predicates are valid then click &quot;Commit&quot; button to
+	add these predicates to the &quot;briefcase&quot; domain.</TT> 
+	</P>
+	<LI><P><TT>Close the &quot;Predicate View&quot; window.</TT> 
+	</P>
+</OL>
+<P ALIGN=CENTER><IMG SRC="Predicate1.jpg" NAME="Graphic3" ALIGN=BOTTOM BORDER=0>
+</P>
+<P ALIGN=CENTER><TT><B><FONT SIZE=2><FONT COLOR="#000066">Figure 3
+Editing predicates</FONT></FONT></B></TT></P>
+<H3><A NAME="state"></A>Create the State Definitions</H3>
+<UL>
+	<LI><P><FONT SIZE=4>Click &quot;States&quot; button on the toolbar
+	to bring up the &quot;State Edit&quot; window (Figure 4).</FONT> 
+	</P>
+</UL>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>From the &quot;Sort Tree&quot;
+	select a sort of a kind of object where the objects will change
+	state as a result of applying actions during plan execution. Select
+	&quot;thing&quot;.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>From the predicate list,
+	select a predicate &quot;at_thing(thing,place), click &quot;Add&quot;
+	button to add it to the &quot;Edit State ...&quot; window (edit
+	window). <I>The selected predicate must refer to the selected sort.</I></TT>
+		</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Repeat the previous procedure
+	to add all essential predicates to the edit window to form a
+	definition of a legal state for the kinds of objects selected,
+	“Thing”. For this case add the predicate &quot;inside(thing,bag)&quot;
+	and fits_in(thing,bag) to the edit window.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Clicking on the variables of a
+	predicate in the edit window will highlight this variable with a
+	green underline, other associated variables (with same sort) will be
+	also highlighted but with a red underline.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Right click on the green
+	underlined variable will bring up a menu to rename this variable
+	(Figure 5).</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Cumberland">When the
+	variable selected refers to the primary instance of the kind of
+	thing for which we are defining the state attempting to rename this
+	variable will produce an error message and the user will be
+	instructed to use the “Change” state id button to change all
+	instances of this variable name, in all legal states for this kind
+	of object. (Figure 6)</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Right clicking on the red
+	underlined variable will allow the user to choose from three
+	options: same, different, optional (Figure 7). Choosing &quot;same&quot;
+	will set the red underlined variable to be the same as the green
+	underlined variable; Choosing &quot;different&quot;, an input box
+	will appear to ask for a new name if the red underlined variable is
+	currently the same as the green underlined variable, and a &quot;ne(red
+	underlined variable, green underlined variable)&quot; clause will be
+	added automatically; Choosing &quot;optional&quot;, an input box
+	will appear to allow the user to type in a new name, but no &quot;ne&quot;
+	clause will be added.</TT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>To remove a predicate from the
+	edit window, click on a variable of the predicate, then click on the
+	&quot;Remove&quot; button.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>For for the tutorial example ,
+	no extra editing is required; so click the &quot;Add&quot; button to
+	add the new state to the state list on the right hand side of the
+	window.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Repeat the previous procedure,
+	to create another state which only contains one predicate
+	&quot;outside_at(thing,place)&quot; (see figure 4).</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>When all editing procedures
+	are finished, click the &quot;Verify States&quot; button to verify
+	the elgality of all states defined. If all states are valid then
+	click the &quot;Commit&quot; button to add these states to the
+	&quot;briefcase&quot; domain.</TT> 
+	</P>
+	<LI><P><TT>Close the &quot;States View&quot; window.</TT> 
+	</P>
+</OL>
+<P ALIGN=CENTER><IMG SRC="State1.gif" NAME="Graphic4" ALIGN=BOTTOM WIDTH=825 HEIGHT=526 BORDER=0>
+</P>
+<P ALIGN=CENTER><TT><B><FONT SIZE=2><FONT COLOR="#000066">Figure 4
+Editing states</FONT></FONT></B></TT> 
+</P>
+<P ALIGN=CENTER><IMG SRC="State2.gif" NAME="Graphic5" ALIGN=BOTTOM WIDTH=661 HEIGHT=207 BORDER=0>
+</P>
+<P ALIGN=CENTER><TT><B><FONT SIZE=2><FONT COLOR="#000066">Figure 5
+Rename function</FONT></FONT></B></TT> 
+</P>
+<P ALIGN=CENTER><BR><BR>
+</P>
+<P ALIGN=CENTER><IMG SRC="UnifyDiag3.jpg" NAME="Graphic18" ALIGN=LEFT WIDTH=371 HEIGHT=207 BORDER=0><BR CLEAR=LEFT><BR><BR>
+</P>
+<P ALIGN=CENTER><FONT FACE="Cumberland"><FONT SIZE=2><B>Figure 6
+Rename State ID</B></FONT></FONT></P>
+<P ALIGN=CENTER><BR><BR>
+</P>
+<P ALIGN=CENTER><IMG SRC="UnifyDiag.jpg" NAME="Graphic19" ALIGN=LEFT WIDTH=267 HEIGHT=155 BORDER=0><BR CLEAR=LEFT>
+<BR><BR>
+</P>
+<P ALIGN=CENTER><TT><B><FONT SIZE=2><FONT COLOR="#000066">Figure 7
+Other editing options</FONT></FONT></B></TT></P>
+<H3><A NAME="operator"></A>Create the Operator Definitions</H3>
+<UL>
+	<LI><P><FONT SIZE=4>Click &quot;Transitions&quot; button on the
+	toolbar to bring up the &quot;Transitions&quot; window (Figure 7).</FONT>
+		</P>
+</UL>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Click on the &quot;New&quot;
+	button on the top toolbar or the menu bar (Operator), a green circle
+	(labeled as &quot;Action ID&quot;) will appear on the editing canvas
+	to represent the head (name) of the operator.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Double click on this circle
+	object to bring up a dialog box to rename the operator to &quot;move&quot;.</TT>
+		</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Click on the radio button &quot;Add
+	Necessary&quot;, then select the state &quot;at_bag(Bag,Place)&quot;
+	from the substate list window. Click on the canvas, the left hand
+	side statement of the necessary condition will appear on the canvas
+	as a gray round rectangle, in the meantime, the right hand side
+	statement appears as an empty round rectangle with flashing edges
+	waiting for the user's input (Figure 7). The content of &quot;Substate
+	List&quot; window has been updated to the states related to the same
+	sort user just picked. Clicking on the state &quot;at_bag(Bag,Place)&quot;
+	in the substate list window will specify the right hand side of the
+	necessary condition and stop the flashing effect.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Change to edit mode by
+	selecting the check box &quot;Edit Mode&quot;. Drawing canvas will
+	change to dark green. The system reaches a situation that all the
+	variables of this operator can now be edited. &quot;Zoom In&quot;
+	and &quot;Zoom Out&quot; function will help user to adjust the
+	viewing scale.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Click on the click the
+	variable &quot;Place&quot; (Figure 8). It will be highlighted with
+	green underline, all other related (with same sort) variables will
+	also be highlighted but with red underline. Right click on the green
+	underlined variable to rename &quot;Place&quot; to &quot;A&quot;.
+	Right click on the red underlined variable will allow user to
+	specify the relationship between the current red underlined variable
+	and the green underlined variable (Figure 9). Choose option
+	&quot;Different&quot;, then type &quot;B&quot; in the popped input
+	box. The finished transition is shown in Figure 10.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Click on the radio button &quot;Add
+	Conditional&quot;, then select the state &quot;at_thing(Thing,Place),
+	inside(Thing,Bag), fits_in(Thing,Bag)&quot;. Repeat previous
+	procedure to build the operator &quot;move&quot; as shown in figure
+	11.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Click on the &quot;Add&quot;
+	button on the top toolbar to save this operator to the &quot;Operators
+	list&quot;.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Repeat previous procedure to
+	build the operator &quot;put_in&quot; (Figure 12) and &quot;take_out&quot;
+	(Figure 13).</TT> 
+	</P>
+	<LI><P><TT>Be noticed that to save the operator to the domain for
+	the other tools to use, &quot;Commit&quot; button needs to be
+	clicked before leave this transition window.</TT> 
+	</P>
+</OL>
+<P ALIGN=CENTER><IMG SRC="Transition3.gif" NAME="Graphic7" ALIGN=BOTTOM WIDTH=925 HEIGHT=536 BORDER=0>
+</P>
+<P ALIGN=CENTER><TT><B><FONT SIZE=2><FONT COLOR="#000066">Figure 7
+Creating a necessary transition</FONT></FONT></B></TT> 
+</P>
+<P ALIGN=CENTER><IMG SRC="Transition1.gif" NAME="Graphic8" ALIGN=BOTTOM WIDTH=562 HEIGHT=344 BORDER=0>
+<BR><TT><B><FONT SIZE=2><FONT COLOR="#000066">Figure 8 Editing mode:
+rename variable &quot;Place&quot; to &quot;A&quot;</FONT></FONT></B></TT>
+<BR><IMG SRC="Transition2.gif" NAME="Graphic9" ALIGN=BOTTOM WIDTH=561 HEIGHT=345 BORDER=0>
+</P>
+<P ALIGN=CENTER><TT><B><FONT SIZE=2><FONT COLOR="#000066">Figure 9
+Editing mode: specify right-hand side variable is different from
+left-hand side</FONT></FONT></B></TT> 
+</P>
+<P ALIGN=CENTER><IMG SRC="Transition4.gif" NAME="Graphic10" ALIGN=BOTTOM WIDTH=418 HEIGHT=188 BORDER=0>
+</P>
+<P ALIGN=CENTER><TT><B><FONT SIZE=2><FONT COLOR="#000066">Figure 10
+Editing mode: finished editing one transition</FONT></FONT></B></TT> 
+</P>
+<P ALIGN=CENTER><IMG SRC="Transition5.gif" NAME="Graphic11" ALIGN=BOTTOM WIDTH=471 HEIGHT=175 BORDER=0>
+</P>
+<P ALIGN=CENTER><TT><B><FONT SIZE=2><FONT COLOR="#000066">Figure 11
+move operator</FONT></FONT></B></TT> 
+</P>
+<P ALIGN=CENTER><IMG SRC="Transition6.gif" NAME="Graphic12" ALIGN=BOTTOM WIDTH=475 HEIGHT=136 BORDER=0>
+</P>
+<P ALIGN=CENTER><TT><B><FONT SIZE=2><FONT COLOR="#000066">Figure 12
+put_in operator</FONT></FONT></B></TT> 
+</P>
+<P ALIGN=CENTER><IMG SRC="Transition7.gif" NAME="Graphic13" ALIGN=BOTTOM WIDTH=481 HEIGHT=168 BORDER=0>
+</P>
+<P ALIGN=CENTER><TT><B><FONT SIZE=2><FONT COLOR="#000066">Figure 13
+take_out operator</FONT></FONT></B></TT></P>
+
+<H3><A NAME="task"></A>Create Task Definitions</H3>
+<UL>
+	<LI><P><FONT SIZE=4>Click &quot;Tasks&quot; button on the toolbar to
+	bring up the &quot;Tasks&quot; window (Figure 14).</FONT> 
+	</P>
+</UL>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Click on the button &quot;New
+	Task&quot;, an input dialog box will appear. Type in a name &quot;1&quot;
+	to represent the new task. then a new task named &quot;oclTask_1&quot;
+	will appear in the &quot;Task...&quot; combo box.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Expand the tree to find the
+	object &quot;briefcase&quot;, click on the object, all related sub
+	states for this object will be partially instantiated and displayed
+	on the &quot;states..&quot; window (Figure 14).</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Click the state to bring it to
+	the editing window(Figure 15). Click on the variable &quot;Place&quot;
+	to highlight the variable with green underline, in the mean time any
+	associated variables (with same sort) will be highlighted with red
+	underline (not in this case). Right click on the green underlined
+	variable, a popup list will appear with two options: &quot;home&quot;
+	and &quot;office&quot;. Instantiate the variable by selecting &quot;home&quot;
+	from the popup list. Be noticed that right click on a predicate
+	(rather than any green underlined variables) will allow user to
+	delete the predicate;</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Click button &quot;Add
+	Initial&quot; to add the current edited state as one of the initial
+	states.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>Repeat previous procedure to
+	build initial and goal state as shown in Figure 16.</TT> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><TT>When all editing procedures
+	are finished, click &quot;Verify Tasks&quot; button to verify tasks.
+	If all states are valid then click &quot;Commit&quot; button to add
+	this task to the &quot;briefcase&quot; domain.</TT> 
+	</P>
+	<LI><P><TT>Close the &quot;Tasks View&quot; window.</TT> 
+	</P>
+</OL>
+<P ALIGN=CENTER><IMG SRC="Task1.jpg" NAME="Graphic14" ALIGN=BOTTOM BORDER=0>
+<BR><TT><B><FONT SIZE=2><FONT COLOR="#000066">Figure 14 Task Dialog with completed Task Definition</FONT></FONT></B></TT> <BR><IMG SRC="Task2.gif" NAME="Graphic15" ALIGN=BOTTOM WIDTH=386 HEIGHT=271 BORDER=0>
+</P>
+<P ALIGN=CENTER><TT><B><FONT SIZE=2><FONT COLOR="#000066">Figure 15
+Instantiate states</FONT></FONT></B></TT> 
+</P>
+<P><A HREF="tutorial.html"><FONT COLOR="#0000ee"><IMG SRC="walkback.gif" NAME="Graphic17" ALIGN=BOTTOM WIDTH=21 HEIGHT=50 BORDER=1></FONT></A><A HREF="ftutorial.html"><B><FONT SIZE=1><FONT FACE="Arial, Helvetica">back</FONT></FONT></B></A> 
+</P>
+</BODY>
+</HTML>

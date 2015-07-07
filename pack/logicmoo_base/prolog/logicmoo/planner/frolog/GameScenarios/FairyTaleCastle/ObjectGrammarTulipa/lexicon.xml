@@ -1,0 +1,2690 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE mcgrammar SYSTEM "xmg-mctag.dtd,xml">
+
+<mcgrammar>
+    <lemmas>
+        <lemma name="a"  cat="det" >
+            <anchor tree_id="family[@name=betaDn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="indef" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="accessible"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="accessible" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="accessible" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="accessible" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="alive"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="alive" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="alive" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="alive" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="and"  cat="conj" >
+            <anchor tree_id="family[@name=betaa1CONJa2]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="and" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="apple"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="apple" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="at"  cat="prep" >
+            <anchor tree_id="family[@name=betavPn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryState" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="theme" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="be"  cat="v" >
+            <anchor tree_id="family[@name=betaVv]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem/>
+            </anchor>
+        </lemma>
+        <lemma name="beautiful"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="beautiful" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="beautiful" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="beautiful" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="being"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="being" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="black"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="black" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="black" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="black" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="bored"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="bored" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="bored" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="bored" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="brown"  cat="a" >
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="brown" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="brown" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="brown" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="castle"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="castle" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="chest"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="chest" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="climbable"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="climbable" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="climbable" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="close"  cat="v" >
+            <anchor tree_id="family[@name=n0Vn1rel]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="agent" />
+                            </f>
+                            <f name="theta2" >
+                                <sym value="object" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="shut" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="closed"  cat="a" >
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="closed" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="closed" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="closed" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="container"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="genericcontainer" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="couch"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="couch" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="crown"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="crown" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="dead"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="dead" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="dead" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="dead" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="disgusting"  cat="a" >
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="disgusting" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="disgusting" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="disgusting" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="dragon"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="dragon" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="drawing-room"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="drawingroom" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="drop"  cat="v" >
+            <anchor tree_id="family[@name=n0Vn1rel]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="agent" />
+                            </f>
+                            <f name="theta2" >
+                                <sym value="theme" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="drop" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="easy-to-kill"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="easytokill" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="easytokill" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="eat"  cat="v" >
+            <anchor tree_id="family[@name=n0Vn1rel]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="ingestor" />
+                            </f>
+                            <f name="theta2" >
+                                <sym value="ingestible" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="eat" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="edible"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="edible" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="edible" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="empty"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="empty" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="empty" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="empty" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="exit"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="exit" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="fits-into"  cat="v" >
+            <anchor tree_id="family[@name=n0Vn1state]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryState" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="fitsin" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="foodpaste"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="foodpaste" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="frog"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="frog" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="from"  cat="prep" >
+            <anchor tree_id="family[@name=betavPn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryState" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="source" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="go"  cat="v" >
+            <anchor tree_id="family[@name=n0V]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="unaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="protagonist" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="move" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="golden"  cat="a" >
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="golden" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="golden" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="golden" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="gone"  cat="a" >
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="gone" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="gone" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="green"  cat="a" >
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="green" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="green" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="green" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="happy"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="happy" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="happy" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="happy" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="has"  cat="v" >
+            <anchor tree_id="family[@name=n0Vn1state]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryState" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="hasexit" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0Vn1state]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryState" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="hasdetail" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="here"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="here" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="here"  cat="a" >
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="here" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="here" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="hold"  cat="v" >
+            <anchor tree_id="family[@name=n0Vn1state]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryState" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="hold" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="in"  cat="prep" >
+            <anchor tree_id="family[@name=n0Pn1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryState" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="haslocation" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="into"  cat="prep" >
+            <anchor tree_id="family[@name=betavPn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryState" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="goal" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="it"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="it" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="key"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="key" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="kill"  cat="v" >
+            <anchor tree_id="family[@name=n0Vn1rel]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="killer" />
+                            </f>
+                            <f name="theta2" >
+                                <sym value="victim" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="kill" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="kiss"  cat="v" >
+            <anchor tree_id="family[@name=n0Vn1rel]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="agent" />
+                            </f>
+                            <f name="theta2" >
+                                <sym value="entity" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="kiss" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="leads-to"  cat="v" >
+            <anchor tree_id="family[@name=n0Vn1state]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryState" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="leadsto" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="leg"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="couchleg" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="location"  cat="a" >
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="genericcontainer" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="lock"  cat="v" >
+            <anchor tree_id="family[@name=n0Vn1rel]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="agent" />
+                            </f>
+                            <f name="theta2" >
+                                <sym value="theme" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="lock" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="locked"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="locked" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="locked" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="locked" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="look"  cat="v" >
+            <anchor tree_id="family[@name=n0V]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="unaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="agent" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="look" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="necklace"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="necklace" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="north-exit"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="northexit" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="not-so-easy-to-kill"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="notsoeasytokill" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="notsoeasytokill" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="object"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="object" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="object" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="on"  cat="prep" >
+            <anchor tree_id="family[@name=betavPn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryState" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="goal" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="one"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="top" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="open"  cat="a" >
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="open" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="open" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="open" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="open"  cat="v" >
+            <anchor tree_id="family[@name=n0Vn1rel]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="agent" />
+                            </f>
+                            <f name="theta2" >
+                                <sym value="object" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="open" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="openable"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="openclosecontainer" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="pizza"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="pizza" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="player"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="player" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="put"  cat="v" >
+            <anchor tree_id="family[@name=n0Vn1rel]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="agent" />
+                            </f>
+                            <f name="theta2" >
+                                <sym value="theme" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="put" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="red"  cat="a" >
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="red" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="red" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="red" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="room"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="room" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="seat"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="seat" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="seated"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="seated" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="seated" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="seated" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="seating"  cat="a" >
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="seating" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="seating" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="silver"  cat="a" >
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="silver" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="silver" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="silver" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="sit"  cat="v" >
+            <anchor tree_id="family[@name=n0V]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="unaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="protagonist" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="sitdown" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="small"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="small" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="small" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="small" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="south-exit"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="southexit" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="stand-up"  cat="v" >
+            <anchor tree_id="family[@name=n0V]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="unaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="protagonist" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="standup" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="start"  cat="v" >
+            <anchor tree_id="family[@name=n0V]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="unaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="protagonist" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="start" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="sword"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="sword" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="table"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="table" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="take"  cat="v" >
+            <anchor tree_id="family[@name=n0Vn1rel]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="agent" />
+                            </f>
+                            <f name="theta2" >
+                                <sym value="theme" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="take" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="takeable"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="takeable" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="takeable" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="the"  cat="det" >
+            <anchor tree_id="family[@name=betaDn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="def" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="thing"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="object" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="through"  cat="prep" >
+            <anchor tree_id="family[@name=betavPn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryState" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="exit" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="throw"  cat="v" >
+            <anchor tree_id="family[@name=n0Vn1rel]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="agent" />
+                            </f>
+                            <f name="theta2" >
+                                <sym value="theme" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="throw" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="to"  cat="prep" >
+            <anchor tree_id="family[@name=betavPn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryState" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="goal" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="treasury"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="treasury" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="ugly"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="ugly" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="ugly" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="ugly" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="unlock"  cat="v" >
+            <anchor tree_id="family[@name=n0Vn1rel]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="agent" />
+                            </f>
+                            <f name="theta2" >
+                                <sym value="theme" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="unlock" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="unlocked"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="unlocked" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="unlocked" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="unlocked" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="victorious"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="victorious" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="victorious" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="victorious" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="visible"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="visible" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="visible" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="visible" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="wall"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="wall" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="weapon"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="weapon" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="wear"  cat="v" >
+            <anchor tree_id="family[@name=n0Vn1rel]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryRel" >
+                        <args>
+                            <f name="theta1" >
+                                <sym value="agent" />
+                            </f>
+                            <f name="theta2" >
+                                <sym value="theme" />
+                            </f>
+                            <f name="rel" >
+                                <sym value="wear" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="wearable"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="wearable" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="wearable" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="wearable" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="what"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="what" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="white"  cat="a" >
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="white" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="white" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="white" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="with"  cat="prep" >
+            <anchor tree_id="family[@name=betavPn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="binaryState" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="instrument" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="wooden"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="wooden" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="wooden" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="wooden" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="worm"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="worm" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="yellow"  cat="a" >
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="yellow" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="yellow" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="yellow" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="you"  cat="n" >
+            <anchor tree_id="family[@name=noun]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="nounSem" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="you" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+        <lemma name="yummy"  cat="a" >
+            <anchor tree_id="family[@name=adjective]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="yummy" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=betaAn]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="yummy" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+            <anchor tree_id="family[@name=n0A1]" >
+                <filter>
+                    <fs/>
+                </filter>
+                <sem>
+                    <semclass name="basicProperty" >
+                        <args>
+                            <f name="rel" >
+                                <sym value="yummy" />
+                            </f>
+                        </args>
+                    </semclass>
+                </sem>
+            </anchor>
+        </lemma>
+    </lemmas>
+</mcgrammar>

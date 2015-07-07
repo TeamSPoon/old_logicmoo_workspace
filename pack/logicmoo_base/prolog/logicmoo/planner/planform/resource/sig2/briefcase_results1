@@ -1,0 +1,190 @@
+INDUCED OPERATORS IN BRIEFCASE WORLD 
+
+This document shows the results of applying the implementation of the
+opmaker algorithm to generate operators.  For ease of reference a list
+of the original 'hand-crafted' operators from the OCL domain has been 
+included (see below). 
+
+HAND-CRAFTED OCL OPERATORS FROM BRIEFCASE WORLD DOMAIN
+
+operator(move(X,A,B),
+    % prevail
+    [],
+    % necessary
+    [     sc(bag,X,[at_bag(X,A),ne(A,B)]=>[at_bag(X,B)])],
+    % conditional
+    [     sc(thing,T,[at_thing(T,A),inside(T,X),fits_in(T,X)]=>
+	[at_thing(T,B),inside(T,X),fits_in(T,X)])]).
+operator(put_in(X,A,T),
+    % prevail
+    [     se(bag,X,[at_bag(X,A)])],
+    % necessary
+    [     sc(thing,T,[at_thing(T,A)]=>
+	[at_thing(T,A),inside(T,X),fits_in(T,X)])],
+    % conditional
+    []).
+operator(take_out(X,A,T),
+    % prevail
+    [     se(bag,X,[at_bag(X,A)])],
+    % necessary
+    [     sc(thing,T,[at_thing(T,A),inside(T,X)]=>[at_thing(T,A)])],
+    % conditional
+    []).
+
+
+ We now show three user given sequences which include a set of desirable 
+operators and some example inputs.
+
+SEQUENCE 1
+
+USER INPUT
+
+	take_out(briefcase,office,cheque),
+	move(briefcase,office,home),
+	put_in(briefcase,home,dictionary),
+	pack(suitcase,home,suit),
+	move_both(suitcase,briefcase,home,office)
+
+
+
+OPERATORS INDUCED
+
+operator(take_out(Briefcase,Office,Cheque),
+[],
+[sc(bag,Briefcase,[at_bag(Briefcase,Office)] => [at_bag(Briefcase,Office)]),
+sc(thing,Cheque,[at_thing(Cheque,Office),inside(Cheque,Briefcase)] => [at_thing(Cheque,Office)])],
+[]
+).
+
+operator(move(Briefcase,Office,Home),
+[],
+[sc(bag,Briefcase,[at_bag(Briefcase,Office)] => [at_bag(Briefcase,Home)])],
+[]
+).
+
+operator(put_in(Briefcase,Home,Dictionary),
+[],
+[sc(bag,Briefcase,[at_bag(Briefcase,Home)] => [at_bag(Briefcase,Home)]),
+sc(thing,Dictionary,[at_thing(Dictionary,Home),fits_in(Dictionary,Briefcase)] => [at_thing(Dictionary,Home),inside(Dictionary,Briefcase)])],
+[]
+).
+
+operator(pack(Suitcase,Home,Suit),
+[],
+[sc(bag,Suitcase,[at_bag(Suitcase,Home)] => [at_bag(Suitcase,Home)]),
+sc(thing,Suit,[at_thing(Suit,Home),fits_in(Suit,Suitcase)] => [at_thing(Suit,Home),inside(Suit,Suitcase)])],
+[]
+).
+
+operator(move_both(Suitcase,Briefcase,Home,Office),
+[],
+[sc(bag,Suitcase,[at_bag(Suitcase,Home)] => [at_bag(Suitcase,Office)]),
+sc(bag,Briefcase,[at_bag(Briefcase,Home)] => [at_bag(Briefcase,Office)])],
+[]
+).
+
+
+SEQUENCE 2
+
+USER INPUT
+
+	move(briefcase,office,home),
+	put_in(briefcase,home,cheque),
+	add_item(briefcase,home,dictionary,cheque),
+	move(briefcase,home,office),
+	take_out(briefcase,office,cheque)
+
+
+
+OPERATORS INDUCED
+
+
+operator(move(Briefcase,Office,Home),
+[],
+[sc(bag,Briefcase,[at_bag(Briefcase,Office)] => [at_bag(Briefcase,Home)])],
+[]
+).
+
+operator(put_in(Briefcase,Home,Cheque),
+[],
+[sc(bag,Briefcase,[at_bag(Briefcase,Home)] => [at_bag(Briefcase,Home)]),
+sc(thing,Cheque,[at_thing(Cheque,Home),fits_in(Cheque,Briefcase)] => [at_thing(Cheque,Home),inside(Cheque,Briefcase)])],
+[]
+).
+
+operator(add_item(Briefcase,Home,Dictionary,Cheque),
+[],
+[sc(bag,Briefcase,[at_bag(Briefcase,Home)] => [at_bag(Briefcase,Home)]),
+sc(thing,Dictionary,[at_thing(Dictionary,Home),fits_in(Dictionary,Briefcase)] => [at_thing(Dictionary,Home),inside(Dictionary,Briefcase)]),
+sc(thing,Cheque,[inside(Cheque,Briefcase)] => [inside(Cheque,Briefcase)])],
+[]
+).
+
+operator(take_out(Briefcase,Office,Cheque),
+[],
+[sc(bag,Briefcase,[at_bag(Briefcase,Office)] => [at_bag(Briefcase,Office)]),
+sc(thing,Cheque,[at_thing(Cheque,Office),inside(Cheque,Briefcase)] => [at_thing(Cheque,Office)])],
+[]
+).
+
+
+
+SEQUENCE 3
+
+USER INPUT
+
+	put_in(briefcase,home,cheque),
+	move(briefcase,home,office),
+	take_out(briefcase,office,cheque),
+	move(briefcase,office,home),
+	put_in(briefcase,home,dictionary),
+	pack(suitcase,home,suit),
+	move_both(suitcase,briefcase,home,office),
+	unpack(suitcase,office,suit),
+	move(briefcase,home,office)
+
+
+
+OPERATORS INDUCED
+
+operator(put_in(Briefcase,Home,Cheque),
+[],
+[sc(bag,Briefcase,[at_bag(Briefcase,Home)] => [at_bag(Briefcase,Home)]),
+sc(thing,Cheque,[at_thing(Cheque,Home),fits_in(Cheque,Briefcase)] => [at_thing(Cheque,Home),inside(Cheque,Briefcase)])],
+[]
+).
+
+operator(move(Briefcase,Home,Office),
+[],
+[sc(bag,Briefcase,[at_bag(Briefcase,Home)] => [at_bag(Briefcase,Office)])],
+[]
+).
+
+operator(take_out(Briefcase,Office,Cheque),
+[],
+[sc(bag,Briefcase,[at_bag(Briefcase,Office)] => [at_bag(Briefcase,Office)]),
+sc(thing,Cheque,[at_thing(Cheque,Office),inside(Cheque,Briefcase)] => [at_thing(Cheque,Office)])],
+[]
+).
+
+operator(pack(Suitcase,Home,Suit),
+[],
+[sc(bag,Suitcase,[at_bag(Suitcase,Home)] => [at_bag(Suitcase,Home)]),
+sc(thing,Suit,[at_thing(Suit,Home),fits_in(Suit,Suitcase)] => [at_thing(Suit,Home),inside(Suit,Suitcase)])],
+[]
+).
+
+operator(move_both(Suitcase,Briefcase,Home,Office),
+[],
+[sc(bag,Suitcase,[at_bag(Suitcase,Home)] => [at_bag(Suitcase,Office)]),
+sc(bag,Briefcase,[at_bag(Briefcase,Home)] => [at_bag(Briefcase,Office)])],
+[]
+).
+
+operator(unpack(Suitcase,Office,Suit),
+[],
+[sc(bag,Suitcase,[at_bag(Suitcase,Office)] => [at_bag(Suitcase,Office)]),
+sc(thing,Suit,[at_thing(Suit,Office),inside(Suit,Suitcase)] => [at_thing(Suit,Office)])],
+[]
+).
+

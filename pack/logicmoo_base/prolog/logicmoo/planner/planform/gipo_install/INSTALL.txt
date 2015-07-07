@@ -1,0 +1,31 @@
+GIPO Source Installation Instructions
+
+The source is distributed with the assumption that you will be compiling 
+using Linux, but the instructions should work with other platforms though 
+you will need the relevant binaries for the Sicstus Prolog run time system 
+and you may need to adjust the classpath for java.
+
+The code should compile with versions 1.4.2_(any) of the Java SDK it will not 
+compile with Java 1.5
+
+The distribution uses JGraph, JGraphAddons Java_cup and Sicstus Prolog
+Java/Prolog interface classes. Look at the 
+relevant licenses, in the docs directory and in README.html
+
+To change the Ocl parser wou will need to download full versions of 
+java_cup and JLex.
+
+To compile uncompress the source distribution and from the gipo directory
+give the command
+ 
+javac -classpath .:jgraph.jar:jgraphaddons.jar:java_cup.jar:lib/sicstus3.11.1/bin/jasper.jar jplan/top/OclEd.java
+
+To run the created executable edit the gipo-src shell script to reflect
+the location of the distribution in your file system.
+
+Enjoy
+
+Bug Reports
+    If they are repeatable report with as much detail as practible to:
+    r.m.simpson@hud.ac.uk
+

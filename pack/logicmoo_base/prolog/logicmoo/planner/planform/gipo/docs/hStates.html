@@ -1,0 +1,51 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.78 [en] (X11; U; Linux 2.4.10-4GB i686) [Netscape]">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#59188E" alink="#FF0000">
+
+<center>
+<h3>
+To Define Hierarchical States</h3></center>
+In a hierarchical domain the state editor is modified relative to the state
+editor for "flat" domains. The hierarchical version will be displayed if
+the domain is recorded as being hierarchical in the momain properties dialog.
+<p><img SRC="hState1.gif" height=487 width=881>
+<center>Figure 1 - The Hierarchical State Editor</center>
+
+<p>In heirarchical domains state is defined relative to the sort of an
+object as it is for flat domains but for hierarchical domains the description
+is partitioned against the sorts forming a path from a leaf sort to the
+root sort. You can therefore define states at different levels of generality.
+In figure 1 we see the state being defined for a vehicle which is in the
+right hand <b><i>State Definitions </i></b>pane defined as being either
+"<i>moveable </i>and<i> available</i>" or as being "<i>moveable </i>and<i>
+busy</i>" but a complete characterisation of the state would also include
+the inherited predicate "at(Vehicle,Location)" as shown in the <b><i>Inherited
+State</i></b> pane. Legal states for objects which only occur at leaf nodes
+in the sort tree are formed from the cross products of the state definitions
+in the path from the leaf node to the root node.
+<p><img SRC="hstates3.jpg" height=486 width=901>
+<center>Figure 2 - Controlling State Definition Variables</center>
+
+<p>In the process of defining such hierarchical states it may be necessary
+to control the nature of the bindings of the variables appearing in the
+predicates defining the current level state relative to the variables in
+the inherited state. This is done by selecting a variable in the <b><i>Editable
+State</i></b> and the right clicking to bring up a popup menu to allow
+the appropriate controlling actions to take place. In the example in Figure
+2 we see that this process has already been completed once in order to
+restrict the sort of <b><i>V1</i></b> to be a <b><i>traincar</i></b> and
+the process being carried out a second time perhaps to restrict the sort
+of <b><i>RailV</i></b> to be a <b><i>train</i></b>. In a similar manner
+if variables in the inheritaed state are selected then matching variables
+in the <b><i>Editable State</i></b> are selected it is possible to ensure
+that the relative bindings are controlled.
+<p><a href="tutorial.html"><img SRC="walkback.gif" height=50 width=21></a>&nbsp;<font face="Arial,Helvetica"><font size=-1><a href="tutorial.html">
+<b>back to the tutorial main page</b></a></font></font>
+<br><b><font face="Arial,Helvetica"><font size=-2><a href="tutorial.html"></a></font></font></b>&nbsp;
+<br>&nbsp;
+</body>
+</html>

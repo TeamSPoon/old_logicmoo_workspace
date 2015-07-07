@@ -1,0 +1,277 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>OclPlus Intro</title>
+  <style type="text/css">
+	<!-- h1 {
+	color: #003300;
+}
+	h2 {
+	color: #003300;
+}
+  h3 {
+	color: #003300;
+} h4 {
+	color: #003300;
+}-->
+  </style>
+</head>
+<body>
+<h2>Durative Actions</h2>
+<b>GIPO</b> supports durative actions approximately equivalent to those
+defined in <b>PDDL+</b>. This support is still being developed and is
+only made available to allow researchers to experiment with
+this type of domain specification. The editing and support facilities
+are still far from robust but are made available to give an indication
+of what might be done. The principal method for creating such
+domains which we call <b><i>OclPlus</i></b> is by use of the History
+Editor. There is at this time no
+built in planner for OclPlus nor yet a translation to PDDL+. There is
+however an experimental stepper for OclPlus. Other editors are aware of
+OclPlus and allow editing of Fluent properties. This is true of the
+basic GIPO editors with the exception of the Operator Editor but it is
+not needed if the History Editor is used to create the domain
+specification.
+<h3>Creating an OclPlus Domain Specification</h3>
+When a new domain is created using the domain properties editor the
+domain is defined as being an OclPlus domain if the <b>Domain has
+Durative Actions</b> check box is selected. If this is done the History
+Editor should be started to allow the creation of the specification.
+The features of OclPlus that the History Editor is required to support
+are:<br>
+<ul>
+  <li>to allow objects to have numeric properties,(<i>fluents</i>)</li>
+  <li>to allow fluents to be tested and updated when transitions are
+made</li>
+  <li>to allow some transitions to be designated as <b><i>Events</i></b></li>
+  <li>to determine how fluent properties can trigger Events</li>
+  <li>to allow for the creation of <b><i>Processes</i></b></li>
+  <li>to provide means of specifying how Processes are triggered by
+Properties/States and Fluents of objects</li>
+  <li>to allow processes to reference / test and update fluents in a
+time dependant way.</li>
+</ul>
+<h3>OclPlus in the History Editor</h3>
+This description assumes that the reader is already familiar with the
+basic operation of the History Editor.
+<h4>Numeric Properties</h4>
+<b>Fluents</b> are properties of objects and can be defined relative
+any state node for an object sort.
+Right clicking on a selected state node will give in addition to the
+normal options the option <b>Fluents</b> which if selected will bring
+up the following dialog box<br>
+<img src="plusFluents.jpg" alt="" border="0" height="210" width="320"><br>
+In the edit combo box the names of new fluents can be added and the
+check box <i>static</i> allows the designer to specify whether or not
+the number property being define is subject to change during planning.
+In the example above we see that the fluent <b><i>fuel</i></b> is not
+static and may change <b><i>fuelConsumption</i></b> is static and will
+not change during the course of a plan. All fluents have the implicit
+type <i>real</i>. Fluent property names must be unique to each object
+sort.
+<h4>Transition Manipulating Fluents</h4>
+Transitions are allowed both to test the value of fluents belonging to
+the object sort for which the transition is defined and to update them.
+Right clicking on a transition node will give the option to define <b><i>Fluent
+Constraints</i></b> which if selected will bring up the following
+dialog box:<br>
+<img src="plusFluents1.jpg" alt="" border="0" height="220" width="305"><br>
+The drop down boxes provide information
+<ol>
+  <li>The actions to be taken relative to fluents,
+test,assign,increase,decrease,scaleup and scaledown</li>
+  <li>The objects that may be reference in this transition</li>
+  <li>The dynamic fluents accessible from this transition</li>
+</ol>
+The designer must enter in the edit box an expression composed from
+those elements along with references to static fluents and the numeric
+operators +,-,*,/ and the relational operators &lt; &gt; = &lt;= &gt;=
+The syntax for referring to a fluent value is to use the fluent
+property name and as argument a variable formed from the name of the
+object sort to which this fluent refers. When a complete expression is
+added to the list of expressions the syntax will be checked.
+<h4>Events</h4>
+<b>Events</b> are transitions that are brought about by the change in
+numeric properties and are not directly invoked by the planner. To
+create an <b>Event</b> a normal state transition is created and on the
+popup menu associated with the transition node is the option <b>Make
+Event</b> selecting this categorises the transition node as an event
+node and this is indicated by the node changing colour. Event
+rountangles are coloured pink. To complete the event definition the
+transition must be defined
+to manipulate the numeric properties of the connected objects as
+described above. As a minimum there must be a <b><i>test</i></b>
+clause that refers to a numeric property and is associated with a <b>process</b>.
+There should also be a process link <img src="icons/plink.png" alt=""
+ border="0" height="16" width="16"> that connects from a <b>process
+node</b> <img src="icons/clock.png" alt="" border="0" height="16"
+ width="16"> to the <b>Event node</b>. This link provides a visual
+indication of which processes trigger which events.
+<h4>Processes</h4>
+Processes are created using the <b>process</b> tool <img
+ src="icons/clock.png" alt="" border="0" height="16" width="16"> and
+positioning and naming the process in a manner similar to creating a
+state node.
+The testing and manipulating of fluent values is done as described
+above for transition nodes using an identical dialog box. The only
+difference is the the symbol <b>#t</b> is available to be used in
+expressions and refers to elapsed time since the process starts
+running. <b>Processes</b> must be connected as target by one or more
+process links <img src="icons/plink.png" alt="" border="0" height="16"
+ width="16">. The sources for such links must be either <b>state nodes</b>,
+in which case it becomes a precondition of the process running that an
+object of the appropriate sort is in that state,
+or a <b>transition node</b>, in which case the process link must be
+associated with a <b>boolean</b> property of the connected object sort
+and the process will have as part of its precondition that the boolean
+property be set to <b>true</b>.
+<h4>Boolean Properties</h4>
+In the property dialog associated with object states properties may be
+defined as having a <i>boolean</i> value sort. Transition defined as
+property changing transitions may then <i>negate</i> these values.
+<h4>Transforming Property</h4>
+When processes are running some of the non numeric properties of an
+object may be regarded as transforming from one value to another and
+hence be inaccessible. For example in a logistics style domain a truck
+while the process of <b>travelling</b> is running may transforming its
+location property and that property may not be available for inspection
+while the process is running. A state node connected
+to a process as source of a process link <img src="icons/plink.png"
+ alt="" border="0" height="16" width="16"> may by right clicking and
+using the <b>Transforming Property</b> dialog have any of its defined
+non-numeric properties declared as transforming. This notion
+presupposes that an object prior to entering this state had a valid
+value for the property and will again have a valid value when the
+object leaves this state as a result of an event marking the end of the
+connected process.
+<h4>Property Preconditions</h4>
+<b>Property Preconditions</b> as mention above are <i>boolean</i>
+properties of objects that can form
+preconditions to <b>Processes</b>. Property preconditions are set by
+right clicking on the process link <img src="icons/plink.png" alt=""
+ border="0" height="16" width="16"> connecting the triggering
+transition node and the process. Right clicking provides a menu item to
+provide the <b>Property Precondition</b> dialog box in which the
+available possibly relevant boolean properties are listed. The required
+properties must be selected to form a precondition for the activation
+of the process. The corresponding transition node <b><i>must</i></b>
+have defined a property change for the selected boolean properties.
+negating the current value of the property.
+<h3>OclPlus in the Predicate Editor</h3>
+The Predicate editor allows a predicate to be defined as a fluent.<br>
+<img src="plusFluents2.jpg" alt="" border="0" height="497" width="760"><br>
+In the above screen shot we see the predicate editor in use after that
+of the History Editor where most predicates have been automatically
+created including most fluents. Additional fluents that need adding are
+static fluents that provide values for relationships holding between
+objects rather than properties of objects. An example of such a
+predicate is the <b><i>distance(loc,loc)</i></b> predicate defined in
+a logistics type domain where the numeric distance between two
+locations must be provided. These static predicates may be referenced
+in the fluent expressions used in transitions and processes. We see the
+<b><i>distance</i></b> predicate being referenced in the following <b>Fluent
+Constraint</b> dialog of a travel process.<br>
+<img src="plusFluents3.jpg" alt="" border="0" height="220" width="311"><br>
+<h3>OclPlus in the Atomic Invariants Editor</h3>
+In addition to defining the structure of fluent properties and
+relations done in the History Editor and the Predicate editors actual
+instance values must be provided in the <b>Atomic Invariants Editor</b><br>
+<img src="plusFluents4.jpg" alt="" border="0" height="376" width="740"><br>
+In the above screen shot the Atomic invariants edit is being used to
+provide values for different instants of the <b><i>distance</i></b>
+predicate in a logistics being given a value. The relationship
+arguments <i>base</i> and <i>output</i> have been dragged on the the
+instance of the predicate and the value for this instance entered into
+the <i>Functor Value</i> edit box which will accept a simple <b><i>real</i></b>
+value.
+<h3>OclPlus in the Task Editor</h3>
+The task editor works as in classical domains with the exception than
+in defining initial states form
+objects in problems numeric predicates <b>Fluents</b> must have their
+values set. When an object state has been selected the predicate
+arguments must be supplied as in classical domains but fluents when
+right clicked allow a dialog box to be displayed to enable a value for
+the fluent to be supplied. This
+is shown in the following screen shot.<br>
+<img src="plusFluents5.jpg" alt="" border="0" height="690" width="993"><br>
+In the Goal state fluents can only currently be set to specific values
+in a manner identical to that described above. This will be changed in
+future releases to allow
+<b><i>test</i></b> statements to allow a fluents value to be specified
+in a relational statement.
+<h2>OclPlus Stepper</h2>
+GIPO contains an experimental stepper for <b>OclPlus</b> domains. The
+stepper allows the planner to select actions to perform set against an
+advancing time line that the the designer controls. The
+stepper is described relative to a simple <b><i>tank</i></b> domain
+where a tank can travel from
+its base to an output, using fuel as it advances, if it has sufficient
+fuel it may also rotate
+its turret. The task is shown above in the Task Editor. All that is
+required in the task is that the tank
+reach the outpost but we can test if the turret can be rotated one
+before the output is reached.
+The static information<br>
+<img src="plusTank2.jpg" alt="" border="0" height="111" width="215"><br>
+shows that the distance to the outpost is 40 units and that fuel
+consumption is 2 units per time unit,
+but in the task the initial fuel is only 40units, clearly the tank
+cannot make it. The time taken
+to rotate the turret is 5 time units and consumes 1.2 units of fuel per
+time unit. WE will try to set of on the trip and start rotating the
+turret at time 2 and see what happens.
+The Life History diagram for the domain is shown below:<br>
+<img src="plusTank.jpg" alt="" border="0" height="282" width="279"><br>
+When the stepper is opened up we see the following graphic tool which
+has been annotated to show the
+editor elements:<br>
+<img src="plusTank3a.jpg" alt="" border="0" height="701" width="996"><br>
+To add actions to the plan the action is selected from the comboo box
+and the <i>Add Action</i> button pressed this opens a dialog box to
+allow the action parameters to be instantiated.<br>
+<img src="plusTank4.jpg" alt="" border="0" height="200" width="399"><br>
+When the action is added to the canvas we are shown an icon on the time
+line for the effected dynamic objects and if processes are started as a
+result of adding the action to the plan a time line for the process is
+added to the process canvas as shown below:<br>
+<img src="plusTank5.jpg" alt="" border="0" height="205" width="186"><br>
+To start rotating the turret we firs drag the time slider to the
+correct time which will simulate running any started processes and if
+necessary fire any triggered events. below we drag the time slider to
+time 2.<br>
+<img src="plusTank6.jpg" alt="" border="0" height="196" width="165"> we
+see the process bar for the travelling event being stretched out to
+time 2. If we now add a rotate action as described above the action is
+added to the object canvas and a new process time line is created for
+the rotate process. In the following snapshot we have also clicked on
+the rotate action icon to inspect the tank state after applying the
+action but before advancing the time beyond point 2.
+<br>
+<img src="plusTank7.jpg" alt="" border="0" height="221" width="670"><br>
+We see in OclPlus notation the state but can make out that fuel has
+dropped to 35 units. We now stretch out the time line to time 8. We see
+that the process of rotating is shown as completed and the end rotate
+event has been fired, shown by the cross icon. Inspecting the state
+after the event reveals
+fuel dropped to 20 units after travelling for 7 time units.<br>
+<img src="plusTank9.jpg" alt="" border="0" height="233" width="706"><br>
+We might now complete our test by dragging the time slider for another
+10 or so time units to see what happens.<br>
+<img src="plusTank10.jpg" alt="" border="0" height="278" width="373"><br>
+We see at time 17 the travel process has terminated, the tank has run
+out of fuel but no arrival event has been fired. Our tank is stuck in a
+planning limbo there are no transitions out of the <b>moving</b>
+state other than arriving and we cannot arrive if the process has
+terminated. We essentially have a modelling problem we should have
+defined an event for running out of fuel that would have occasioned a
+transition of the tank to some other state, even if that was just an
+error state.
+<br>
+<br>
+<hr align="center" size="4" width="100%"> <a href="GIPODocs.html"><img
+ src="docs.png" height="40" width="40"></a> <b><font
+ face="Arial,Helvetica"><font size="-2"> <a href="GIPODocs.html">GIPO
+Document Set</a>
+</font></font></b>
+</body>
+</html>

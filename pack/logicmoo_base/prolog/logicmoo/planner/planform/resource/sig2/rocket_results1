@@ -1,0 +1,184 @@
+INDUCED OPERATORS IN ROCKET WORLD 
+
+This document shows the results of applying the implementation of the
+opmaker algorithm to generate operators.  For ease of reference a list
+of the original 'hand-crafted' operators from the OCL domain has been 
+included (see below). 
+
+HAND-CRAFTED OCL OPERATORS FROM ROCKET WORLD DOMAIN
+
+% Operators
+operator(move(R,A,B),
+    % prevail
+    [],
+    % necessary
+    [     sc(rocket,R,[position(R,A),fuel_full(R),ne(A,B)]=>[position(R,B),fuel_empty(R)])],
+    % conditional
+    []).
+operator(load(R,A,C),
+    % prevail
+    [     se(rocket,R,[position(R,A)])],
+    % necessary
+    [     sc(cargo,C,[at(C,A)]=>[in(C,R)])],
+    % conditional
+    []).
+operator(unload(R,A,C),
+    % prevail
+    [     se(rocket,R,[position(R,A)])],
+    % necessary
+    [     sc(cargo,C,[in(C,R)]=>[at(C,A)])],
+    % conditional
+    []).
+operator(re_fuel(R,paris),
+    % prevail
+    [],
+    % necessary
+    [     sc(rocket,R,[position(R,paris),fuel_empty(R)]=>[position(R,paris),fuel_full(R)])],
+    % conditional
+    []).
+
+
+ We now show three user given sequences which include a set of desirable 
+operators and some example inputs.
+clicking.
+
+SEQUENCE 1
+
+USER INPUT
+	load(r1,jfk,c4),
+	refuel(r1,jfk),
+	move(r1,jfk,paris),
+	unload(r1,paris,c4),
+	load(r1,paris,c2),
+	refuel(r1,paris),
+	move_cargo(c2,r1,paris,london),
+	unload(r1,london,c2),
+	load(r1,london,c1)
+
+
+OPERATORS INDUCED
+
+operator(load(R1,Jfk,C4),
+[se(rocket,R1,[position(R1,Jfk)])],
+[sc(cargo,C4,[at(C4,Jfk)] => [in(C4,rocket)])],
+[]
+).
+
+operator(refuel(R1,Jfk),
+[],
+[sc(rocket,R1,[position(R1,Jfk),fuel_empty(rocket)] => [position(R1,Jfk),fuel_full(rocket)])],
+[]
+).
+
+operator(move(R1,Jfk,Paris),
+[],
+[sc(rocket,R1,[position(R1,Jfk),fuel_full(rocket)] => [position(R1,Paris),fuel_empty(rocket)])],
+[]
+).
+
+operator(unload(R1,Paris,C4),
+[se(rocket,R1,[position(R1,Paris)])],
+[sc(cargo,C4,[in(C4,rocket)] => [at(C4,Paris)])],
+[]
+).
+
+operator(move_cargo(C2,R1,Paris,London),
+[se(cargo,C2,[in(C2,rocket)])],
+[sc(rocket,R1,[position(R1,Paris),fuel_full(rocket)] => [position(R1,London),fuel_empty(rocket)])],
+[]
+).
+
+SEQUENCE 2
+
+USER INPUT
+
+	move(r2,paris,jfk),
+	refuel(r2,jfk),
+	load(r2,jfk,c1),
+	move_cargo(c1,r2,jfk,paris),
+	unload(r2,paris,c1)
+
+
+
+OPERATORS INDUCED
+
+operator(move(R2,Paris,Jfk),
+[],
+[sc(rocket,R2,[position(R2,Paris),fuel_full(rocket)] => [position(R2,Jfk),fuel_empty(rocket)])],
+[]
+).
+
+operator(refuel(R2,Jfk),
+[],
+[sc(rocket,R2,[position(R2,Jfk),fuel_empty(rocket)] => [position(R2,Jfk),fuel_full(rocket)])],
+[]
+).
+
+operator(load(R2,Jfk,C1),
+[],
+[sc(rocket,R2,[position(R2,Jfk)] => [position(R2,Jfk)]),
+sc(cargo,C1,[at(C1,Jfk)] => [in(C1,rocket)])],
+[]
+).
+
+operator(move_cargo(C1,R2,Jfk,Paris),
+[se(cargo,C1,[in(C1,rocket)])],
+[sc(rocket,R2,[position(R2,Jfk),fuel_full(rocket)] => [position(R2,Paris),fuel_empty(rocket)])],
+[]
+).
+
+operator(unload(R2,Paris,C1),
+[se(rocket,R2,[position(R2,Paris)])],
+[sc(cargo,C1,[in(C1,rocket)] => [at(C1,Paris)])],
+[]
+).
+
+
+SEQUENCE 3
+
+USER INPUT
+
+	refuel(r2,paris),
+	load(r2,paris,c3),
+	move_cargo(c3,r2,paris,jfk),
+	refuel(r2,jfk),
+	unload(r2,jfk,c3),
+	move(r2,jfk,london)
+
+
+
+
+OPERATORS INDUCED
+
+
+operator(refuel(R2,Paris),
+[],
+[sc(rocket,R2,[position(R2,Paris),fuel_empty(rocket)] => [position(R2,Paris),fuel_full(rocket)])],
+[]
+).
+
+operator(load(R2,Paris,C3),
+[],
+[sc(rocket,R2,[position(R2,Paris)] => [position(R2,Paris)]),
+sc(cargo,C3,[at(C3,Paris)] => [in(C3,rocket)])],
+[]
+).
+
+operator(move_cargo(C3,R2,Paris,Jfk),
+[se(cargo,C3,[in(C3,rocket)])],
+[sc(rocket,R2,[position(R2,Paris),fuel_full(rocket)] => [position(R2,Jfk),fuel_empty(rocket)])],
+[]
+).
+
+operator(unload(R2,Jfk,C3),
+[se(rocket,R2,[position(R2,Jfk)])],
+[sc(cargo,C3,[in(C3,rocket)] => [at(C3,Jfk)])],
+[]
+).
+
+operator(move(R2,Jfk,London),
+[],
+[sc(rocket,R2,[position(R2,Jfk),fuel_full(rocket)] => [position(R2,London),fuel_empty(rocket)])],
+[]
+).
+

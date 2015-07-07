@@ -1,0 +1,40 @@
+Player: look
+Frolog: a brown couch hold you
+Frolog: the couch hold a red apple, a green apple, a brown frog, a green frog and you
+Frolog: a drawing-room hold the couch
+Frolog: the drawing-room hold a red table and the couch
+Frolog: the drawing-room has a green wall
+Frolog: the drawing-room has a south-exit
+Player: look at the table
+Frolog: the table is red
+Frolog: the table hold a silver key and a golden key
+Player: take the golden key
+Frolog: You can't do that! It is not the case that the golden key is accessible
+Player: stand-up
+Frolog: the drawing-room hold you
+Player: take the golden key
+Frolog: you hold the golden key
+Player: go 
+Frolog: a treasury hold you
+Frolog: the treasury hold you, a chest and a dragon
+Frolog: the treasury has a white wall
+Frolog: the treasury has a north-exit
+Player: unlock the chest 
+Frolog: You can't do that! You don't know what fits-into the chest
+Player: unlock the chest with the key
+Frolog: the chest is unlocked
+Frolog: the golden key fits-into the chest
+Player: lock the chest
+Frolog: the chest is locked
+Player: unlock the chest
+Frolog: the chest is unlocked
+Frolog: the golden key fits-into the chest
+Player: open the chest
+Frolog: the chest is open
+Frolog: the chest hold a silver sword and a golden crown
+Player: lock the chest
+Frolog: It is not the case that the chest is closed
+Frolog: I accommodate that you close the chest
+Frolog: the chest is closed
+Frolog: and then you lock the chest
+Frolog: the chest is locked

@@ -19,7 +19,7 @@ planner_failure(Why,Info):-dmsg(error,Why-Info),banner_party(error,'FAILURE_PLAN
 :-retractall(canDoTermExp).
 :-dynamic(env_kb/1).
 
-statistics_runtime(CP):-statistics(process_cputime,[_,CP0]), CP is CP0 + 0.0000000000001 .
+statistics_runtime(CP):-statistics(runtime,[_,CP0]), (CP0==0 -> CP= 0.0000000000001 ; CP is (CP0/1000)) .  % runtime WAS process_cputime
 
 /*********************** initialisation**************/
 :-dynamic( in_dyn/2).
@@ -28,11 +28,16 @@ in_dyn(_DB,Call):- functor(Call,F,A), mpred_arity(F,A), predicate_property(Call,
 in_dyn_pred(_DB,Call):- var(Call),!,mpred_arity(F,A),functor(Call,F,A),( predicate_property(Call,_) -> loop_check(Call)).
 in_dyn_pred(_DB,Call):- functor(Call,F,A), mpred_arity(F,A), predicate_property(Call,_), !, loop_check(Call).
 
+:-dynamic(user:mpred_prop/2).
+:-multifile(user:mpred_prop/2).
 
-env_mpred(Prop,F,A):- mpred_prop(F,Prop),ignore(mpred_arity(F,A)).
+mpred_arity(F,A):-user:arity(F,A).
+
+env_mpred(Prop,F,A):- user:mpred_prop(F,Prop),ignore(mpred_arity(F,A)).
 
 get_mpred_stubType(F,A,StubIn):- env_mpred(stubType(Stub),F,A),!,must(StubIn=Stub).
 get_mpred_stubType(F,A,dyn):-env_mpred(dyn,F,A).
+get_mpred_stubType(_,_,dyn).
 
 :-assert_if_new(env_kb(l)).
 :-assert_if_new(env_kb(g)).
@@ -155,6 +160,23 @@ banner_party(E,BANNER):-
       dmsg(E,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx':E),
       dmsg(E,BANNER),!.
 
+:-export(term_expansion_alias/2).
+term_expansion_alias(In,Out):-term_expansion_alias([],In,Out).
+term_expansion_alias(Not,In,Out):-term_alias(I,O),not(member(I,Not)),subst_eq(In,I,O,M), In\=@=M,!, term_expansion_alias([I|Not],M,Out).
+term_expansion_alias(_Not,InOut,InOut).
+term_alias(cond,se).
+term_alias(se,se).
+term_alias(state,ss).
+term_alias(trans,sc).
+term_alias(ne,dif).
+term_alias(neq,dif).
+% term_alias(htn_task,planner_task).
+term_alias(startOcl,start).
+term_alias(startOCL,start).
+
+subst_eq(A,B,C,D):- nd_subst(A,B,C,D),!.
+subst_eq(A,B,C,D):- trace, nd_subst(A,B,C,D),!.
+
 
 tasks:- 
  Call = get_tasks(N,Goal,State),
@@ -211,7 +233,7 @@ tdom1(F):- tdom2(F),!.
 tdom1(FIn):- atom(FIn),tdom2(FIn).
 
 tdom2(FIn):- tdom3(FIn),!.
-tdom2(FIn):- atom_concat('domains/',FIn,F), tdom3(F),!.
+tdom2(FIn):- atom_concat('domains_ocl/',FIn,F), tdom3(F),!.
 
 tdom3(FIn):- tdom4(FIn).
 tdom3(FIn):- atom_concat(FIn,'htn',F),tdom4(F).
@@ -281,15 +303,14 @@ run_tests(Call) :-
 
 run_header_tests :- run_tests(forall(clause(header_tests,G),run_tests(G))).
 
+consultfilematch(File):-forall(filematch(File,FM),consult(FM)).
 
-
-
+retest_domfile(F):- filematch(F,FMT),FMT\==F,!,forall(filematch(F,FM),retest_domfile(FM)).
 retest_domfile(F):- expand_file_name(F,List),List\=[],!,forall(member(E,List),retest_domfile0(E)).
 retest_domfile(F):- retest_domfile0(F),!. 
-retest_domfile0(File):- time(with_assertions(thlocal:doing(retest_domfile(File)), once((env_clear_doms_and_tasks,clean,consult(File),tasks)))).
+retest_domfile0(File):- time(with_assertions(thlocal:doing(retest_domfile(File)), once((env_clear_doms_and_tasks,clean,consultfilematch(File),tasks)))).
 
-header_tests :-retest_domfile('domains/*.ocl').
-header_tests :-retest_domfile('../src_included/planner/domains/*.ocl').
+header_tests :-retest_domfile('domains_ocl/*.ocl').
 
 
 :- style_check(-singleton).
@@ -3321,10 +3342,6 @@ xprod([X|Y],[A|E],D,(F,G)) :-
 
 
 
-
-
-
-
 end_of_file.
 
 
@@ -3358,8 +3375,6 @@ fresh_line(_).
 
 % Usage: subst(+Fml,+X,+Sk,?FmlSk)
 
-subst_eq(A,B,C,D):- nd_subst(A,B,C,D),!.
-subst_eq(A,B,C,D):- trace, nd_subst(A,B,C,D),!.
 
 nd_subst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
 nd_subst(  Var, _,_,Var ) :- var(Var),!.
@@ -3423,21 +3438,6 @@ slow_sanity(X):-must(X).
 %se/cond == se. state == ss. trans == sc. dif == ne.  operator == operator
 term_expansion_hyhtn(In,Out):-nonvar(In),term_expansion_alias(In,Out).
 
-:-export(term_expansion_alias/2).
-term_expansion_alias(In,Out):-term_expansion_alias([],In,Out).
-term_expansion_alias(Not,In,Out):-term_alias(I,O),not(member(I,Not)),subst_eq(In,I,O,M), In\=@=M,!, term_expansion_alias([I|Not],M,Out).
-term_expansion_alias(_Not,InOut,InOut).
-
-/*
-term_alias(cond,se).
-term_alias(se,se).
-term_alias(state,ss).
-term_alias(trans,sc).
-term_alias(ne,dif).
-term_alias(neq,dif).*/
-% term_alias(htn_task,planner_task).
-term_alias(startOcl,start).
-term_alias(startOCL,start).
 
 /*
 :- use_module(library(pce)).

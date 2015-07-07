@@ -1,0 +1,629 @@
+<html>
+<body>
+
+<p align="center">
+<img src="gipo_gear.gif"
+width="200" height="150">
+</p>
+
+<p>
+<h1 align="center">GIPO Domain Model</h1>
+</p>
+
+<p>
+<h2 align="center">Domain Details</h2>
+</p>
+
+<table width="88%">
+<tr>
+  <td align="center"><b>Author:</b> Mr. Gaz Marsh
+                     </td>
+  <td align="center"><b>Name:</b> Washing Machine
+                     </td>
+  <td align="right"><b>Favourite:</b> yes
+                     </td>
+</tr>
+</table>
+
+<p>
+<h2 align="center">Index</h2>
+</p>
+
+<table width="100%">
+<tr>
+  <td align="center"><a href="#C1">
+		     Life History</a></td>
+  <td align="center"><a href="#C2">
+		     Diagram Nodes' Properties and Constraints</a></td>
+  <td align="center"><a href="#C3">
+                     OCL Domain Plain Text</a></td>
+  <td align="center"><a href="#C4">
+		     PDDL Domain Plain Text</a></td>
+  <td align="center"><a href="#C5">
+		     Files Download Links</a></td>
+</tr>
+</table>
+
+<p>
+<h2 align="center"><a name="C1">Life History</a></h2>
+</p>
+
+<p align="center">
+<img src="washingmachinelh.jpg"
+width="640" height="480">
+</p>
+
+<p>
+<h2 align="center"><a name="C2">Diagram Nodes' Properties and Constraints</a></h2>
+<h2 align="center">(alphabetical order)</a></h2>
+</p>
+
+<p align="center">
+<img src="washingmachinep&c.jpg"
+width="640" height="480">
+</p>
+
+<p align="center">
+<img src="washingmachinep&c2.jpg"
+width="640" height="480">
+</p>
+
+<p align="center">
+<img src="washingmachinep&c3.jpg"
+width="640" height="480">
+</p>
+
+<p align="center">
+<img src="washingmachinep&c4.jpg"
+width="640" height="480">
+</p>
+
+<p>
+<h2 align="center"><a name="C3">OCL Domain Plain Text</a></h2>
+</p>
+
+<p>
+<pre>
+/**
+ *  All rights reserved. Use of this software is permitted for non-commercial
+ *  research purposes, and it may be copied only for that use.  All copies must
+ *  include this copyright message.  This software is made available AS IS, and
+ *  neither the GIPO team nor the University of Huddersfield make any warranty
+ *  about the software or its performance.
+ *
+ *  Automatically generated OCL Domain from  GIPO Version 3.0
+ *
+ *  Author: Gaz
+ *  Institution: University of Huddersfield
+ *  Date created: Wed Dec 13 23:50:18 GMT 2006
+ *  Date last modified: 2006/12/14 at 12:52:12 AM GMT
+ *  Description:
+ *    
+ * Object Life History : c0251943_WashingMachine.gfx
+ */
+
+domain_name(washing).
+
+% Sorts
+sorts(primitive_sorts,[door,power,machine,clothes]).
+
+% Objects
+objects(door,[door1,door2]).
+objects(power,[plug1,plug2]).
+objects(machine,[myMachine,yourMachine]).
+objects(clothes,[lights,darks,cotton,silk]).
+
+% Predicates
+predicates([
+    doorOpen(door),
+    doorClosed(door),
+    locked(door),
+    unplugged(power),
+    pluggedIn(power),
+    turnedOn(power),
+    empty(machine,door,power),
+    washing(machine,door,clothes,power),
+    fullDirty(machine,door,clothes,power),
+    fullClean(machine,door,clothes,power),
+    dirty(clothes),
+    clean(clothes),
+    beingWashed(clothes)]).
+
+% Object Class Definitions
+substate_classes(door,Door,[
+    [doorOpen(Door)],
+    [doorClosed(Door)],
+    [locked(Door)]]).
+substate_classes(power,Power,[
+    [unplugged(Power)],
+    [pluggedIn(Power)],
+    [turnedOn(Power)]]).
+substate_classes(machine,Machine,[
+    [empty(Machine,Door,Power)],
+    [washing(Machine,Door,Clothes,Power)],
+    [fullDirty(Machine,Door,Clothes,Power)],
+    [fullClean(Machine,Door,Clothes,Power)]]).
+substate_classes(clothes,Clothes,[
+    [dirty(Clothes)],
+    [clean(Clothes)],
+    [beingWashed(Clothes)]]).
+
+% Atomic Invariants
+
+% Implied Invariants
+
+% Inconsistent Constraints
+
+% Operators
+operator(close(Door),
+    % prevail
+    [],
+    % necessary
+    [     sc(door,Door,[doorOpen(Door)]=>[doorClosed(Door)])],
+    % conditional
+    []).
+operator(finishedWash(Door,Clothes,Machine,Power),
+    % prevail
+    [],
+    % necessary
+    [     sc(door,Door,[locked(Door)]=>[doorClosed(Door)]),
+     sc(clothes,Clothes,[beingWashed(Clothes)]=>[clean(Clothes)]),
+     sc(machine,Machine,[washing(Machine,Door,Clothes,Power)]=>[fullClean(Machine,Door,Clothes,Power)])],
+    % conditional
+    []).
+operator(open(Door),
+    % prevail
+    [],
+    % necessary
+    [     sc(door,Door,[doorClosed(Door)]=>[doorOpen(Door)])],
+    % conditional
+    []).
+operator(unplug(Power),
+    % prevail
+    [],
+    % necessary
+    [     sc(power,Power,[pluggedIn(Power)]=>[unplugged(Power)])],
+    % conditional
+    []).
+operator(plugIn(Power),
+    % prevail
+    [],
+    % necessary
+    [     sc(power,Power,[unplugged(Power)]=>[pluggedIn(Power)])],
+    % conditional
+    []).
+operator(turnOff(Machine,Door,Power),
+    % prevail
+    [     se(machine,Machine,[empty(Machine,Door,Power)])],
+    % necessary
+    [     sc(power,Power,[turnedOn(Power)]=>[pluggedIn(Power)])],
+    % conditional
+    []).
+operator(turnOn(Power),
+    % prevail
+    [],
+    % necessary
+    [     sc(power,Power,[pluggedIn(Power)]=>[turnedOn(Power)])],
+    % conditional
+    []).
+operator(add(Clothes,Door,Machine,Power),
+    % prevail
+    [     se(clothes,Clothes,[dirty(Clothes)]),
+     se(door,Door,[doorOpen(Door)])],
+    % necessary
+    [     sc(machine,Machine,[empty(Machine,Door,Power)]=>[fullDirty(Machine,Door,Clothes,Power)])],
+    % conditional
+    []).
+operator(remove(Clothes,Door,Machine,Power),
+    % prevail
+    [     se(clothes,Clothes,[clean(Clothes)]),
+     se(door,Door,[doorOpen(Door)])],
+    % necessary
+    [     sc(machine,Machine,[fullClean(Machine,Door,Clothes,Power)]=>[empty(Machine,Door,Power)])],
+    % conditional
+    []).
+operator(startWash(Power,Clothes,Machine,Door),
+    % prevail
+    [     se(power,Power,[turnedOn(Power)])],
+    % necessary
+    [     sc(clothes,Clothes,[dirty(Clothes)]=>[beingWashed(Clothes)]),
+     sc(machine,Machine,[fullDirty(Machine,Door,Clothes,Power)]=>[washing(Machine,Door,Clothes,Power)]),
+     sc(door,Door,[doorClosed(Door)]=>[locked(Door)])],
+    % conditional
+    []).
+operator(time(Clothes),
+    % prevail
+    [],
+    % necessary
+    [     sc(clothes,Clothes,[clean(Clothes)]=>[dirty(Clothes)])],
+    % conditional
+    []).
+
+% Methods
+
+% Domain Tasks
+planner_task(1,
+    % Goals
+    [
+     se(power,plug1,[unplugged(plug1)])],
+    % INIT States
+    [
+     ss(power,plug1,[pluggedIn(plug1)])]).
+planner_task(2,
+    % Goals
+    [
+     se(door,door1,[doorOpen(door1)]),
+     se(power,plug1,[unplugged(plug1)]),
+     se(machine,myMachine,[empty(myMachine,door1,plug1)]),
+     se(clothes,darks,[clean(darks)])],
+    % INIT States
+    [
+     ss(door,door1,[doorClosed(door1)]),
+     ss(power,plug1,[unplugged(plug1)]),
+     ss(machine,myMachine,[empty(myMachine,door1,plug1)]),
+     ss(clothes,darks,[dirty(darks)])]).
+planner_task(3,
+    % Goals
+    [
+     se(machine,myMachine,[empty(myMachine,door1,plug1)]),
+     se(machine,yourMachine,[empty(yourMachine,door2,plug2)]),
+     se(door,door1,[doorOpen(door1)]),
+     se(clothes,lights,[clean(lights)]),
+     se(power,plug1,[unplugged(plug1)]),
+     se(clothes,darks,[clean(darks)]),
+     se(power,plug2,[unplugged(plug2)]),
+     se(door,door2,[doorOpen(door2)])],
+    % INIT States
+    [
+     ss(machine,myMachine,[empty(myMachine,door1,plug1)]),
+     ss(machine,yourMachine,[empty(yourMachine,door2,plug2)]),
+     ss(door,door1,[doorClosed(door1)]),
+     ss(clothes,darks,[dirty(darks)]),
+     ss(clothes,lights,[dirty(lights)]),
+     ss(power,plug1,[unplugged(plug1)]),
+     ss(power,plug2,[pluggedIn(plug2)]),
+     ss(door,door2,[doorClosed(door2)])]).
+planner_task(4,
+    % Goals
+    [
+     se(machine,myMachine,[empty(myMachine,door1,plug1)]),
+     se(machine,yourMachine,[empty(yourMachine,door2,plug2)]),
+     se(door,door1,[doorOpen(door1)]),
+     se(clothes,lights,[clean(lights)]),
+     se(power,plug1,[unplugged(plug1)]),
+     se(clothes,darks,[clean(darks)]),
+     se(power,plug2,[unplugged(plug2)]),
+     se(door,door2,[doorOpen(door2)])],
+    % INIT States
+    [
+     ss(machine,yourMachine,[empty(yourMachine,door2,plug2)]),
+     ss(door,door1,[doorClosed(door1)]),
+     ss(clothes,darks,[dirty(darks)]),
+     ss(clothes,lights,[dirty(lights)]),
+     ss(power,plug1,[unplugged(plug1)]),
+     ss(power,plug2,[pluggedIn(plug2)]),
+     ss(door,door2,[doorClosed(door2)]),
+     ss(machine,myMachine,[fullDirty(myMachine,door1,darks,plug1)])]).
+planner_task(5,
+    % Goals
+    [
+     se(machine,myMachine,[washing(myMachine,door1,lights,plug1)]),
+     se(door,door1,[locked(door1)]),
+     se(clothes,lights,[beingWashed(lights)]),
+     se(power,plug1,[turnedOn(plug1)])],
+    % INIT States
+    [
+     ss(machine,myMachine,[fullDirty(myMachine,door1,lights,plug1)]),
+     ss(door,door1,[doorOpen(door1)]),
+     ss(clothes,lights,[dirty(lights)]),
+     ss(power,plug1,[unplugged(plug1)])]).
+</pre>
+</p>
+
+<p>
+<h2 align="center"><a name="C4">PDDL Domain Plain Text</a></h2>
+</p>
+
+<p>
+<pre>
+; ***************************************************************************
+; *  All rights reserved. Use of this software is permitted for non-commercial
+; *  research purposes, and it may be copied only for that use.  All copies must
+; *  include this copyright message.  This software is made available AS IS, and
+; *  neither the GIPO team nor the University of Huddersfield make any warranty
+; *  about the software or its performance.
+; *
+; *  Automatically generated PDDL Domain from  GIPO Version 3.0
+; *
+; *  Author: Gaz
+; *  Institution: University of Huddersfield
+; *  Date created: Wed Dec 13 23:50:18 GMT 2006
+; *  Date last modified: 2006/12/14 at 12:52:12 AM GMT
+; *  Description:
+; *    
+; * OCL File name : c0251943_WashingMachine.ocl
+; * Object Life History : c0251943_WashingMachine.gfx
+; *************************************************************************
+
+(define (domain washing)
+  (:requirements :strips :equality :typing)
+
+  (:types  door power machine clothes)
+
+
+  (:predicates
+    (doorOpen ?door1 - door)
+    (doorClosed ?door1 - door)
+    (locked ?door1 - door)
+    (unplugged ?power1 - power)
+    (pluggedIn ?power1 - power)
+    (turnedOn ?power1 - power)
+    (empty ?machine1 - machine ?door1 - door ?power1 - power)
+    (washing ?machine1 - machine ?door1 - door ?clothes1 - clothes ?power1 - power)
+    (fullDirty ?machine1 - machine ?door1 - door ?clothes1 - clothes ?power1 - power)
+    (fullClean ?machine1 - machine ?door1 - door ?clothes1 - clothes ?power1 - power)
+    (dirty ?clothes1 - clothes)
+    (clean ?clothes1 - clothes)
+    (beingWashed ?clothes1 - clothes)
+  )
+  (:action close
+       :parameters ( ?Door - door)
+       :precondition 
+            (doorOpen ?Door)
+       :effect (and 
+            (not (doorOpen ?Door))
+            (doorClosed ?Door)
+        )
+    )
+  (:action finishedWash
+       :parameters ( ?Door - door ?Clothes - clothes ?Machine - machine ?Power - power)
+       :precondition (and 
+            (locked ?Door)
+            (beingWashed ?Clothes)
+            (washing ?Machine ?Door ?Clothes ?Power)
+       )
+       :effect (and 
+            (not (locked ?Door))
+            (not (beingWashed ?Clothes))
+            (not (washing ?Machine ?Door ?Clothes ?Power))
+            (doorClosed ?Door)
+            (clean ?Clothes)
+            (fullClean ?Machine ?Door ?Clothes ?Power)
+        )
+    )
+  (:action open
+       :parameters ( ?Door - door)
+       :precondition 
+            (doorClosed ?Door)
+       :effect (and 
+            (not (doorClosed ?Door))
+            (doorOpen ?Door)
+        )
+    )
+  (:action unplug
+       :parameters ( ?Power - power)
+       :precondition 
+            (pluggedIn ?Power)
+       :effect (and 
+            (not (pluggedIn ?Power))
+            (unplugged ?Power)
+        )
+    )
+  (:action plugIn
+       :parameters ( ?Power - power)
+       :precondition 
+            (unplugged ?Power)
+       :effect (and 
+            (not (unplugged ?Power))
+            (pluggedIn ?Power)
+        )
+    )
+  (:action turnOff
+       :parameters ( ?Machine - machine ?Door - door ?Power - power)
+       :precondition (and 
+            (empty ?Machine ?Door ?Power)
+            (turnedOn ?Power)
+       )
+       :effect (and 
+            (not (turnedOn ?Power))
+            (pluggedIn ?Power)
+        )
+    )
+  (:action turnOn
+       :parameters ( ?Power - power)
+       :precondition 
+            (pluggedIn ?Power)
+       :effect (and 
+            (not (pluggedIn ?Power))
+            (turnedOn ?Power)
+        )
+    )
+  (:action add
+       :parameters ( ?Clothes - clothes ?Door - door ?Machine - machine ?Power - power)
+       :precondition (and 
+            (dirty ?Clothes)
+            (doorOpen ?Door)
+            (empty ?Machine ?Door ?Power)
+       )
+       :effect (and 
+            (not (empty ?Machine ?Door ?Power))
+            (fullDirty ?Machine ?Door ?Clothes ?Power)
+        )
+    )
+  (:action remove
+       :parameters ( ?Clothes - clothes ?Door - door ?Machine - machine ?Power - power)
+       :precondition (and 
+            (clean ?Clothes)
+            (doorOpen ?Door)
+            (fullClean ?Machine ?Door ?Clothes ?Power)
+       )
+       :effect (and 
+            (not (fullClean ?Machine ?Door ?Clothes ?Power))
+            (empty ?Machine ?Door ?Power)
+        )
+    )
+  (:action startWash
+       :parameters ( ?Power - power ?Clothes - clothes ?Machine - machine ?Door - door)
+       :precondition (and 
+            (turnedOn ?Power)
+            (dirty ?Clothes)
+            (fullDirty ?Machine ?Door ?Clothes ?Power)
+            (doorClosed ?Door)
+       )
+       :effect (and 
+            (not (dirty ?Clothes))
+            (not (fullDirty ?Machine ?Door ?Clothes ?Power))
+            (not (doorClosed ?Door))
+            (beingWashed ?Clothes)
+            (washing ?Machine ?Door ?Clothes ?Power)
+            (locked ?Door)
+        )
+    )
+  (:action time
+       :parameters ( ?Clothes - clothes)
+       :precondition 
+            (clean ?Clothes)
+       :effect (and 
+            (not (clean ?Clothes))
+            (dirty ?Clothes)
+        )
+    )
+  )
+(define (problem task1)
+   (:domain washing)
+   (:objects
+         door1 door2 - door
+         plug1 plug2 - power
+         myMachine yourMachine - machine
+         lights darks cotton silk - clothes
+        )
+    (:init
+        (pluggedIn plug1)
+        )
+    (:goal
+      (and
+        (unplugged plug1)
+       ))
+)
+(define (problem task2)
+   (:domain washing)
+   (:objects
+         door1 door2 - door
+         plug1 plug2 - power
+         myMachine yourMachine - machine
+         lights darks cotton silk - clothes
+        )
+    (:init
+        (doorClosed door1)
+        (unplugged plug1)
+        (empty myMachine door1 plug1)
+        (dirty darks)
+        )
+    (:goal
+      (and
+        (doorOpen door1)
+        (unplugged plug1)
+        (empty myMachine door1 plug1)
+        (clean darks)
+       ))
+)
+(define (problem task3)
+   (:domain washing)
+   (:objects
+         door1 door2 - door
+         plug1 plug2 - power
+         myMachine yourMachine - machine
+         lights darks cotton silk - clothes
+        )
+    (:init
+        (empty myMachine door1 plug1)
+        (empty yourMachine door2 plug2)
+        (doorClosed door1)
+        (dirty darks)
+        (dirty lights)
+        (unplugged plug1)
+        (pluggedIn plug2)
+        (doorClosed door2)
+        )
+    (:goal
+      (and
+        (empty myMachine door1 plug1)
+        (empty yourMachine door2 plug2)
+        (doorOpen door1)
+        (clean lights)
+        (unplugged plug1)
+        (clean darks)
+        (unplugged plug2)
+        (doorOpen door2)
+       ))
+)
+(define (problem task4)
+   (:domain washing)
+   (:objects
+         door1 door2 - door
+         plug1 plug2 - power
+         myMachine yourMachine - machine
+         lights darks cotton silk - clothes
+        )
+    (:init
+        (empty yourMachine door2 plug2)
+        (doorClosed door1)
+        (dirty darks)
+        (dirty lights)
+        (unplugged plug1)
+        (pluggedIn plug2)
+        (doorClosed door2)
+        (fullDirty myMachine door1 darks plug1)
+        )
+    (:goal
+      (and
+        (empty myMachine door1 plug1)
+        (empty yourMachine door2 plug2)
+        (doorOpen door1)
+        (clean lights)
+        (unplugged plug1)
+        (clean darks)
+        (unplugged plug2)
+        (doorOpen door2)
+       ))
+)
+(define (problem task5)
+   (:domain washing)
+   (:objects
+         door1 door2 - door
+         plug1 plug2 - power
+         myMachine yourMachine - machine
+         lights darks cotton silk - clothes
+        )
+    (:init
+        (fullDirty myMachine door1 lights plug1)
+        (doorOpen door1)
+        (dirty lights)
+        (unplugged plug1)
+        )
+    (:goal
+      (and
+        (washing myMachine door1 lights plug1)
+        (locked door1)
+        (beingWashed lights)
+        (turnedOn plug1)
+       ))
+)
+</pre>
+<p>
+
+<p>
+<h2 align="center"><a name="C5">Files Download Links</a></h2>
+</p>
+
+<table width="100%">
+<tr>
+  <td align="center"><a href="c0251943_WashingMachine.ocl">
+                     OCL file</a></td>
+  <td align="center"><a href="c0251943_WashingMachine.gfx">
+                     GFX file</a></td>
+</tr>
+</table>
+
+</body>
+</html>

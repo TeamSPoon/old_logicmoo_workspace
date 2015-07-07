@@ -1,0 +1,739 @@
+
+| ?- solve(1,20).
+
+task 1: 
+
+
+CPU Time = 200
+TIME TAKEN = 0.2 SECONDS
+Solution SIZE = 15
+Operator Used = 21
+***************************************TASK 1
+SOLUTION
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,ap1,road_route_31)
+unload_package(pk_1,truck_3,ap1)
+commission(ac5)
+load_package(pk_1,ac5,ap1)
+fly(ac5,ap1,ap2)
+unload_package(pk_1,ac5,ap2)
+move(truck_2_x,city2_cl1_x,ap2,road_route_21_x)
+commission(truck_2_x)
+load_package(pk_1,truck_2_x,ap2)
+move(truck_2_x,ap2,city1_cl1_x,local_roads)
+unload_package(pk_1,truck_2_x,city1_cl1_x)
+deliver(pk_1,city1_cl1_x)
+END FILE
+
+task 2: 
+
+
+CPU Time = 830
+TIME TAKEN = 0.83 SECONDS
+Solution SIZE = 4
+Operator Used = 6
+***************************************TASK 2
+SOLUTION
+attach_traincar(train2,traincar1,city2_ts1)
+pull_traincar(train2,traincar1,city2_ts1,city1_ts1,rail_route_2)
+attach_traincar(train2_x,traincar1_x,city2_ts1_x)
+pull_traincar(train2_x,traincar1_x,city2_ts1_x,city1_ts1_x,rail_route_2_x)
+END FILE
+
+task 3: 
+
+
+CPU Time = 260
+TIME TAKEN = 0.26 SECONDS
+Solution SIZE = 29
+Operator Used = 42
+***************************************TASK 3
+SOLUTION
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,ap1,road_route_31)
+unload_package(pk_1,truck_3,ap1)
+commission(ac5)
+load_package(pk_1,ac5,ap1)
+fly(ac5,ap1,ap2)
+unload_package(pk_1,ac5,ap2)
+move(truck_2_x,city2_cl1_x,ap2,road_route_21_x)
+commission(truck_2_x)
+load_package(pk_1,truck_2_x,ap2)
+move(truck_2_x,ap2,city1_cl1_x,local_roads)
+unload_package(pk_1,truck_2_x,city1_cl1_x)
+deliver(pk_1,city1_cl1_x)
+pay_fees(pk_2_x)
+commission(truck_3_x)
+load_package(pk_2_x,truck_3_x,city3_cl1_x)
+move(truck_3_x,city3_cl1_x,ap2,road_route_31_x)
+unload_package(pk_2_x,truck_3_x,ap2)
+commission(ac1)
+load_package(pk_2_x,ac1,ap2)
+fly(ac1,ap2,ap1)
+unload_package(pk_2_x,ac1,ap1)
+commission(truck_3)
+load_package(pk_2_x,truck_3,ap1)
+move(truck_3,ap1,city2_cl1,road_route_21)
+unload_package(pk_2_x,truck_3,city2_cl1)
+deliver(pk_2_x,city2_cl1)
+END FILE
+
+task 4: 
+
+
+CPU Time = 3390
+TIME TAKEN = 3.39 SECONDS
+Solution SIZE = 21
+Operator Used = 212
+***************************************TASK 4
+SOLUTION
+pay_fees(pk_2)
+commission(truck_3)
+load_package(pk_2,truck_3,city3_cl1)
+move(truck_3,city3_cl1,ap1,road_route_31)
+unload_package(pk_2,truck_3,ap1)
+commission(ac5)
+load_package(pk_2,ac5,ap1)
+fly(ac5,ap1,ap2)
+unload_package(pk_2,ac5,ap2)
+move(truck_2_x,city2_cl1_x,ap2,road_route_21_x)
+commission(truck_2_x)
+load_package(pk_2,truck_2_x,ap2)
+move(truck_2_x,ap2,ap2,local_roads)
+unload_package(pk_2,truck_2_x,ap2)
+deliver(pk_2,ap2)
+pay_fees(pk_1)
+commission(truck_33)
+load_package(pk_1,truck_33,city3_cl1)
+move(truck_33,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_33,city1_cl1)
+deliver(pk_1,city1_cl1)
+END FILE
+
+task 5: 
+
+
+CPU Time = 140
+TIME TAKEN = 0.14 SECONDS
+Solution SIZE = 12
+Operator Used = 26
+***************************************TASK 5
+SOLUTION
+pay_fees(pk_2)
+commission(truck_3)
+load_package(pk_2,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city3_ts1,local_roads)
+unload_package(pk_2,truck_3,city3_ts1)
+deliver(pk_2,city3_ts1)
+pay_fees(pk_1)
+commission(truck_33)
+load_package(pk_1,truck_33,city3_cl1)
+move(truck_33,city3_cl1,city2_cl1,road_route_32)
+unload_package(pk_1,truck_33,city2_cl1)
+deliver(pk_1,city2_cl1)
+END FILE
+
+task 6: 
+
+
+CPU Time = 450
+TIME TAKEN = 0.45 SECONDS
+Solution SIZE = 12
+Operator Used = 41
+***************************************TASK 6
+SOLUTION
+pay_fees(pk_2)
+commission(truck_3)
+load_package(pk_2,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city2_cl1,road_route_32)
+unload_package(pk_2,truck_3,city2_cl1)
+deliver(pk_2,city2_cl1)
+pay_fees(pk_1)
+commission(truck_33)
+load_package(pk_1,truck_33,city3_cl1)
+move(truck_33,city3_cl1,ap1,road_route_31)
+unload_package(pk_1,truck_33,ap1)
+deliver(pk_1,ap1)
+END FILE
+
+task 7: 
+
+
+CPU Time = 1160
+TIME TAKEN = 1.16 SECONDS
+Solution SIZE = 9
+Operator Used = 18
+***************************************TASK 7
+SOLUTION
+attach_traincar(train2,traincar1,city2_ts1)
+pull_traincar(train2,traincar1,city2_ts1,city1_ts1,rail_route_2)
+pay_fees(pk_6_x)
+move(truck_2_x,city2_cl1_x,city1_ts1_x,road_route_21_x)
+commission(truck_2_x)
+load_package(pk_6_x,truck_2_x,city1_ts1_x)
+move(truck_2_x,city1_ts1_x,ap2,local_roads)
+unload_package(pk_6_x,truck_2_x,ap2)
+deliver(pk_6_x,ap2)
+END FILE
+
+task 8: 
+
+
+CPU Time = 450
+TIME TAKEN = 0.45 SECONDS
+Solution SIZE = 16
+Operator Used = 21
+***************************************TASK 8
+SOLUTION
+pay_fees(pk_6_x)
+move(truck_2_x,city2_cl1_x,city1_ts1_x,road_route_21_x)
+commission(truck_2_x)
+load_package(pk_6_x,truck_2_x,city1_ts1_x)
+move(truck_2_x,city1_ts1_x,ap2,local_roads)
+unload_package(pk_6_x,truck_2_x,ap2)
+commission(ac1)
+load_package(pk_6_x,ac1,ap2)
+fly(ac1,ap2,ap1)
+unload_package(pk_6_x,ac1,ap1)
+move(truck_2,city2_cl1,ap1,road_route_21)
+commission(truck_2)
+load_package(pk_6_x,truck_2,ap1)
+move(truck_2,ap1,city2_ts1,road_route_21)
+unload_package(pk_6_x,truck_2,city2_ts1)
+deliver(pk_6_x,city2_ts1)
+END FILE
+
+task 9: 
+
+
+CPU Time = 350
+TIME TAKEN = 0.35 SECONDS
+Solution SIZE = 27
+Operator Used = 39
+***************************************TASK 9
+SOLUTION
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_3,city1_cl1)
+deliver(pk_1,city1_cl1)
+pay_fees(pk_4_x)
+commission(truck_1_x)
+load_package(pk_4_x,truck_1_x,city1_cl1_x)
+move(truck_1_x,city1_cl1_x,ap2,local_roads)
+unload_package(pk_4_x,truck_1_x,ap2)
+commission(ac1)
+load_package(pk_4_x,ac1,ap2)
+fly(ac1,ap2,ap1)
+unload_package(pk_4_x,ac1,ap1)
+move(truck_2,city2_cl1,ap1,road_route_21)
+commission(truck_2)
+load_package(pk_4_x,truck_2,ap1)
+move(truck_2,ap1,city2_cl1,road_route_21)
+unload_package(pk_4_x,truck_2,city2_cl1)
+deliver(pk_4_x,city2_cl1)
+pay_fees(pk_2)
+commission(truck_33)
+load_package(pk_2,truck_33,city3_cl1)
+move(truck_33,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_2,truck_33,city1_cl1)
+deliver(pk_2,city1_cl1)
+END FILE
+
+task 10: 
+
+
+CPU Time = 1190
+TIME TAKEN = 1.19 SECONDS
+Solution SIZE = 23
+Operator Used = 33
+***************************************TASK 10
+SOLUTION
+attach_traincar(train2,traincar1,city2_ts1)
+pull_traincar(train2,traincar1,city2_ts1,city1_ts1,rail_route_2)
+pay_fees(pk_5)
+commission(truck_3)
+load_package(pk_5,truck_3,city3_cl1)
+move(truck_3,city3_cl1,ap1,road_route_31)
+unload_package(pk_5,truck_3,ap1)
+commission(ac5)
+load_package(pk_5,ac5,ap1)
+fly(ac5,ap1,ap2)
+unload_package(pk_5,ac5,ap2)
+move(truck_2_x,city2_cl1_x,ap2,road_route_21_x)
+commission(truck_2_x)
+load_package(pk_5,truck_2_x,ap2)
+move(truck_2_x,ap2,city3_ts1_x,road_route_31_x)
+unload_package(pk_5,truck_2_x,city3_ts1_x)
+deliver(pk_5,city3_ts1_x)
+pay_fees(pk_1)
+commission(truck_33)
+load_package(pk_1,truck_33,city3_cl1)
+move(truck_33,city3_cl1,city2_cl1,road_route_32)
+unload_package(pk_1,truck_33,city2_cl1)
+deliver(pk_1,city2_cl1)
+END FILE
+
+task 11: 
+
+
+CPU Time = 380
+TIME TAKEN = 0.38 SECONDS
+Solution SIZE = 41
+Operator Used = 60
+***************************************TASK 11
+SOLUTION
+pay_fees(pk_4)
+commission(truck_1)
+load_package(pk_4,truck_1,city1_cl1)
+move(truck_1,city1_cl1,ap1,local_roads)
+unload_package(pk_4,truck_1,ap1)
+commission(ac5)
+load_package(pk_4,ac5,ap1)
+fly(ac5,ap1,ap2)
+unload_package(pk_4,ac5,ap2)
+move(truck_2_x,city2_cl1_x,ap2,road_route_21_x)
+commission(truck_2_x)
+load_package(pk_4,truck_2_x,ap2)
+move(truck_2_x,ap2,city3_cl1_x,road_route_31_x)
+unload_package(pk_4,truck_2_x,city3_cl1_x)
+deliver(pk_4,city3_cl1_x)
+pay_fees(pk_3)
+commission(truck_3)
+load_package(pk_3,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_3,truck_3,city1_cl1)
+deliver(pk_3,city1_cl1)
+pay_fees(pk_2_x)
+commission(truck_2_x)
+load_package(pk_2_x,truck_2_x,city3_cl1_x)
+move(truck_2_x,city3_cl1_x,ap2,road_route_31_x)
+unload_package(pk_2_x,truck_2_x,ap2)
+commission(ac1)
+load_package(pk_2_x,ac1,ap2)
+fly(ac1,ap2,ap1)
+unload_package(pk_2_x,ac1,ap1)
+commission(truck_1)
+load_package(pk_2_x,truck_1,ap1)
+move(truck_1,ap1,city2_cl1,road_route_21)
+unload_package(pk_2_x,truck_1,city2_cl1)
+deliver(pk_2_x,city2_cl1)
+pay_fees(pk_1)
+commission(truck_33)
+load_package(pk_1,truck_33,city3_cl1)
+move(truck_33,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_33,city1_cl1)
+deliver(pk_1,city1_cl1)
+END FILE
+
+task 12: 
+
+
+CPU Time = 360
+TIME TAKEN = 0.36 SECONDS
+Solution SIZE = 31
+Operator Used = 45
+***************************************TASK 12
+SOLUTION
+pay_fees(pk_5)
+commission(truck_3)
+load_package(pk_5,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_5,truck_3,city1_cl1)
+deliver(pk_5,city1_cl1)
+pay_fees(pk_4)
+commission(truck_1)
+load_package(pk_4,truck_1,city1_cl1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+unload_package(pk_4,truck_1,city3_cl1)
+deliver(pk_4,city3_cl1)
+pay_fees(pk_3)
+commission(truck_1)
+load_package(pk_3,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_3,truck_1,city1_cl1)
+deliver(pk_3,city1_cl1)
+pay_fees(pk_2)
+commission(truck_33)
+load_package(pk_2,truck_33,city3_cl1)
+move(truck_33,city3_cl1,city2_cl1,road_route_32)
+unload_package(pk_2,truck_33,city2_cl1)
+deliver(pk_2,city2_cl1)
+pay_fees(pk_1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+commission(truck_1)
+load_package(pk_1,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_1,city1_cl1)
+deliver(pk_1,city1_cl1)
+END FILE
+
+task 13: 
+
+
+CPU Time = 580
+TIME TAKEN = 0.58 SECONDS
+Solution SIZE = 48
+Operator Used = 69
+***************************************TASK 13
+SOLUTION
+pay_fees(pk_5)
+commission(truck_3)
+load_package(pk_5,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_5,truck_3,city1_cl1)
+deliver(pk_5,city1_cl1)
+pay_fees(pk_4)
+commission(truck_1)
+load_package(pk_4,truck_1,city1_cl1)
+move(truck_1,city1_cl1,ap1,local_roads)
+unload_package(pk_4,truck_1,ap1)
+commission(ac5)
+load_package(pk_4,ac5,ap1)
+fly(ac5,ap1,ap2)
+unload_package(pk_4,ac5,ap2)
+move(truck_2_x,city2_cl1_x,ap2,road_route_21_x)
+commission(truck_2_x)
+load_package(pk_4,truck_2_x,ap2)
+move(truck_2_x,ap2,city3_cl1_x,road_route_31_x)
+unload_package(pk_4,truck_2_x,city3_cl1_x)
+deliver(pk_4,city3_cl1_x)
+pay_fees(pk_3)
+commission(truck_33)
+load_package(pk_3,truck_33,city3_cl1)
+move(truck_33,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_3,truck_33,city1_cl1)
+deliver(pk_3,city1_cl1)
+pay_fees(pk_2_x)
+commission(truck_2_x)
+load_package(pk_2_x,truck_2_x,city3_cl1_x)
+move(truck_2_x,city3_cl1_x,ap2,road_route_31_x)
+unload_package(pk_2_x,truck_2_x,ap2)
+commission(ac1)
+load_package(pk_2_x,ac1,ap2)
+fly(ac1,ap2,ap1)
+unload_package(pk_2_x,ac1,ap1)
+commission(truck_1)
+load_package(pk_2_x,truck_1,ap1)
+move(truck_1,ap1,city2_cl1,road_route_21)
+unload_package(pk_2_x,truck_1,city2_cl1)
+deliver(pk_2_x,city2_cl1)
+pay_fees(pk_1)
+move(truck_1,city2_cl1,city3_cl1,road_route_32)
+commission(truck_1)
+load_package(pk_1,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_1,truck_1,city1_cl1)
+deliver(pk_1,city1_cl1)
+END FILE
+
+task 14: 
+
+
+CPU Time = 880
+TIME TAKEN = 0.88 SECONDS
+Solution SIZE = 49
+Operator Used = 72
+***************************************TASK 14
+SOLUTION
+attach_traincar(train2,traincar1,city2_ts1)
+pull_traincar(train2,traincar1,city2_ts1,city1_ts1,rail_route_2)
+pay_fees(pk_5_x)
+commission(truck_3_x)
+load_package(pk_5_x,truck_3_x,city3_cl1_x)
+move(truck_3_x,city3_cl1_x,city1_cl1_x,road_route_31_x)
+unload_package(pk_5_x,truck_3_x,city1_cl1_x)
+deliver(pk_5_x,city1_cl1_x)
+pay_fees(pk_4)
+commission(truck_1)
+load_package(pk_4,truck_1,city1_cl1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+unload_package(pk_4,truck_1,city3_cl1)
+deliver(pk_4,city3_cl1)
+pay_fees(pk_3)
+commission(truck_1)
+load_package(pk_3,truck_1,city3_cl1)
+move(truck_1,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_3,truck_1,city1_cl1)
+deliver(pk_3,city1_cl1)
+pay_fees(pk_2_x)
+commission(truck_33_x)
+load_package(pk_2_x,truck_33_x,city3_cl1_x)
+move(truck_33_x,city3_cl1_x,ap2,road_route_31_x)
+unload_package(pk_2_x,truck_33_x,ap2)
+commission(ac1)
+load_package(pk_2_x,ac1,ap2)
+fly(ac1,ap2,ap1)
+unload_package(pk_2_x,ac1,ap1)
+move(truck_2,city2_cl1,ap1,road_route_21)
+commission(truck_2)
+load_package(pk_2_x,truck_2,ap1)
+move(truck_2,ap1,city2_cl1,road_route_21)
+unload_package(pk_2_x,truck_2,city2_cl1)
+deliver(pk_2_x,city2_cl1)
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,ap1,road_route_31)
+unload_package(pk_1,truck_3,ap1)
+commission(ac1)
+load_package(pk_1,ac1,ap1)
+fly(ac1,ap1,ap2)
+unload_package(pk_1,ac1,ap2)
+commission(truck_33_x)
+load_package(pk_1,truck_33_x,ap2)
+move(truck_33_x,ap2,city1_cl1_x,local_roads)
+unload_package(pk_1,truck_33_x,city1_cl1_x)
+deliver(pk_1,city1_cl1_x)
+END FILE
+
+task 15: 
+
+
+CPU Time = 610
+TIME TAKEN = 0.61 SECONDS
+Solution SIZE = 56
+Operator Used = 81
+***************************************TASK 15
+SOLUTION
+pay_fees(pk_5)
+commission(truck_3)
+load_package(pk_5,truck_3,city3_cl1)
+move(truck_3,city3_cl1,city1_cl1,road_route_31)
+unload_package(pk_5,truck_3,city1_cl1)
+deliver(pk_5,city1_cl1)
+pay_fees(pk_6)
+move(truck_2,city2_cl1,city1_ts1,road_route_21)
+commission(truck_2)
+load_package(pk_6,truck_2,city1_ts1)
+move(truck_2,city1_ts1,ap1,local_roads)
+unload_package(pk_6,truck_2,ap1)
+commission(ac5)
+load_package(pk_6,ac5,ap1)
+fly(ac5,ap1,ap2)
+unload_package(pk_6,ac5,ap2)
+move(truck_2_x,city2_cl1_x,ap2,road_route_21_x)
+commission(truck_2_x)
+load_package(pk_6,truck_2_x,ap2)
+move(truck_2_x,ap2,city3_ts1_x,road_route_31_x)
+unload_package(pk_6,truck_2_x,city3_ts1_x)
+deliver(pk_6,city3_ts1_x)
+pay_fees(pk_4)
+commission(truck_1)
+load_package(pk_4,truck_1,city1_cl1)
+move(truck_1,city1_cl1,city3_cl1,road_route_31)
+unload_package(pk_4,truck_1,city3_cl1)
+deliver(pk_4,city3_cl1)
+pay_fees(pk_3_x)
+commission(truck_3_x)
+load_package(pk_3_x,truck_3_x,city3_cl1_x)
+move(truck_3_x,city3_cl1_x,ap2,road_route_31_x)
+unload_package(pk_3_x,truck_3_x,ap2)
+commission(ac1)
+load_package(pk_3_x,ac1,ap2)
+fly(ac1,ap2,ap1)
+unload_package(pk_3_x,ac1,ap1)
+commission(truck_2)
+load_package(pk_3_x,truck_2,ap1)
+move(truck_2,ap1,city1_ts1,local_roads)
+unload_package(pk_3_x,truck_2,city1_ts1)
+deliver(pk_3_x,city1_ts1)
+pay_fees(pk_2)
+commission(truck_1)
+load_package(pk_2,truck_1,city3_cl1)
+move(truck_1,city3_cl1,ap1,road_route_31)
+unload_package(pk_2,truck_1,ap1)
+commission(ac1)
+load_package(pk_2,ac1,ap1)
+fly(ac1,ap1,ap2)
+unload_package(pk_2,ac1,ap2)
+commission(truck_3_x)
+load_package(pk_2,truck_3_x,ap2)
+move(truck_3_x,ap2,city2_cl1_x,road_route_21_x)
+unload_package(pk_2,truck_3_x,city2_cl1_x)
+deliver(pk_2,city2_cl1_x)
+END FILE
+
+task 16: 
+
+
+CPU Time = 30
+TIME TAKEN = 0.03 SECONDS
+Solution SIZE = 6
+Operator Used = 9
+***************************************TASK 16
+SOLUTION
+pay_fees(pk_1)
+commission(truck_3)
+load_package(pk_1,truck_3,city3_cl1)
+move(truck_3,city3_cl1,ap1,road_route_31)
+unload_package(pk_1,truck_3,ap1)
+deliver(pk_1,ap1)
+END FILE
+
+task 17: 
+
+
+CPU Time = 180
+TIME TAKEN = 0.18 SECONDS
+Solution SIZE = 7
+Operator Used = 9
+***************************************TASK 17
+SOLUTION
+pay_fees(pk_1_x)
+move(truck_2_x,city2_cl1_x,ap2,road_route_21_x)
+commission(truck_2_x)
+load_package(pk_1_x,truck_2_x,ap2)
+move(truck_2_x,ap2,city1_cl1_x,local_roads)
+unload_package(pk_1_x,truck_2_x,city1_cl1_x)
+deliver(pk_1_x,city1_cl1_x)
+END FILE
+
+task 18: 
+
+
+CPU Time = 10
+TIME TAKEN = 0.01 SECONDS
+Solution SIZE = 5
+Operator Used = 7
+***************************************TASK 18
+SOLUTION
+pay_fees(pk_1_x)
+commission(ac1)
+load_package(pk_1_x,ac1,ap2)
+fly(ac1,ap2,ap1)
+unload_package(pk_1_x,ac1,ap1)
+END FILE
+
+task 19: 
+
+
+CPU Time = 320
+TIME TAKEN = 0.32 SECONDS
+Solution SIZE = 43
+Operator Used = 63
+***************************************TASK 19
+SOLUTION
+pay_fees(pk_5)
+commission(truck_3)
+load_package(pk_5,truck_3,city3_cl1)
+move(truck_3,city3_cl1,ap1,road_route_31)
+unload_package(pk_5,truck_3,ap1)
+commission(ac5)
+load_package(pk_5,ac5,ap1)
+fly(ac5,ap1,ap2)
+unload_package(pk_5,ac5,ap2)
+move(truck_2_x,city2_cl1_x,ap2,road_route_21_x)
+commission(truck_2_x)
+load_package(pk_5,truck_2_x,ap2)
+move(truck_2_x,ap2,city1_cl1_x,local_roads)
+unload_package(pk_5,truck_2_x,city1_cl1_x)
+deliver(pk_5,city1_cl1_x)
+pay_fees(pk_2_x)
+commission(truck_3_x)
+load_package(pk_2_x,truck_3_x,city3_cl1_x)
+move(truck_3_x,city3_cl1_x,ap2,road_route_31_x)
+unload_package(pk_2_x,truck_3_x,ap2)
+commission(ac1)
+load_package(pk_2_x,ac1,ap2)
+fly(ac1,ap2,ap1)
+unload_package(pk_2_x,ac1,ap1)
+commission(truck_3)
+load_package(pk_2_x,truck_3,ap1)
+move(truck_3,ap1,city2_cl1,road_route_21)
+unload_package(pk_2_x,truck_3,city2_cl1)
+deliver(pk_2_x,city2_cl1)
+pay_fees(pk_1)
+commission(truck_33)
+load_package(pk_1,truck_33,city3_cl1)
+move(truck_33,city3_cl1,ap1,road_route_31)
+unload_package(pk_1,truck_33,ap1)
+commission(ac1)
+load_package(pk_1,ac1,ap1)
+fly(ac1,ap1,ap2)
+unload_package(pk_1,ac1,ap2)
+commission(truck_3_x)
+load_package(pk_1,truck_3_x,ap2)
+move(truck_3_x,ap2,city1_cl1_x,local_roads)
+unload_package(pk_1,truck_3_x,city1_cl1_x)
+deliver(pk_1,city1_cl1_x)
+END FILE
+
+task 20: 
+
+
+CPU Time = 510
+TIME TAKEN = 0.51 SECONDS
+Solution SIZE = 58
+Operator Used = 84
+***************************************TASK 20
+SOLUTION
+pay_fees(pk_4)
+commission(truck_1)
+load_package(pk_4,truck_1,city1_cl1)
+move(truck_1,city1_cl1,ap1,local_roads)
+unload_package(pk_4,truck_1,ap1)
+commission(ac5)
+load_package(pk_4,ac5,ap1)
+fly(ac5,ap1,ap2)
+unload_package(pk_4,ac5,ap2)
+move(truck_2_x,city2_cl1_x,ap2,road_route_21_x)
+commission(truck_2_x)
+load_package(pk_4,truck_2_x,ap2)
+move(truck_2_x,ap2,city3_cl1_x,road_route_31_x)
+unload_package(pk_4,truck_2_x,city3_cl1_x)
+deliver(pk_4,city3_cl1_x)
+pay_fees(pk_3_x)
+commission(truck_2_x)
+load_package(pk_3_x,truck_2_x,city3_cl1_x)
+move(truck_2_x,city3_cl1_x,ap2,road_route_31_x)
+unload_package(pk_3_x,truck_2_x,ap2)
+commission(ac1)
+load_package(pk_3_x,ac1,ap2)
+fly(ac1,ap2,ap1)
+unload_package(pk_3_x,ac1,ap1)
+commission(truck_1)
+load_package(pk_3_x,truck_1,ap1)
+move(truck_1,ap1,city1_ts1,local_roads)
+unload_package(pk_3_x,truck_1,city1_ts1)
+deliver(pk_3_x,city1_ts1)
+pay_fees(pk_2)
+commission(truck_3)
+load_package(pk_2,truck_3,city3_cl1)
+move(truck_3,city3_cl1,ap1,road_route_31)
+unload_package(pk_2,truck_3,ap1)
+commission(ac1)
+load_package(pk_2,ac1,ap1)
+fly(ac1,ap1,ap2)
+unload_package(pk_2,ac1,ap2)
+commission(truck_2_x)
+load_package(pk_2,truck_2_x,ap2)
+move(truck_2_x,ap2,city2_cl1_x,road_route_21_x)
+unload_package(pk_2,truck_2_x,city2_cl1_x)
+deliver(pk_2,city2_cl1_x)
+pay_fees(pk_1)
+commission(truck_33)
+load_package(pk_1,truck_33,city3_cl1)
+move(truck_33,city3_cl1,ap1,road_route_31)
+unload_package(pk_1,truck_33,ap1)
+commission(ac6)
+load_package(pk_1,ac6,ap1)
+fly(ac6,ap1,ap2)
+unload_package(pk_1,ac6,ap2)
+move(truck_2_x,city2_cl1_x,ap2,road_route_21_x)
+commission(truck_2_x)
+load_package(pk_1,truck_2_x,ap2)
+move(truck_2_x,ap2,city1_cl1_x,local_roads)
+unload_package(pk_1,truck_2_x,city1_cl1_x)
+deliver(pk_1,city1_cl1_x)
+END FILE
+
+total time 12.28 seconds
+total size 512
+
+yes

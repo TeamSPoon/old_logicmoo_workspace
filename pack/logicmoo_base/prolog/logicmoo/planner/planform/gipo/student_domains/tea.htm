@@ -1,0 +1,451 @@
+<html>
+<body>
+
+<p align="center">
+<img src="gipo_gear.gif"
+width="200" height="150">
+</p>
+
+<p>
+<h1 align="center">GIPO Domain Model</h1>
+</p>
+
+<p>
+<h2 align="center">Domain Details</h2>
+</p>
+
+<table width="90%">
+<tr>
+  <td align="center"><b>Author:</b> Mr. Larner
+                     </td>
+  <td align="center"><b>Name:</b> Tea
+                     </td>
+  <td align="center"><b>Favourite:</b> no
+                     </td>
+</tr>
+</table>
+
+<p>
+<h2 align="center">Index</h2>
+</p>
+
+<table width="100%">
+<tr>
+  <td align="center"><a href="#C2">
+                     OCL Domain Plain Text</a></td>
+  <td align="center"><a href="#C3">
+		     PDDL Domain Plain Text</a></td>
+  <td align="center"><a href="#C4">
+		     File Download Link</a></td>
+</tr>
+</table>
+
+<p>
+<h2 align="center"><a name="C2">OCL Domain Plain Text</a></h2>
+</p>
+
+<p>
+<pre>
+/**
+ *  All rights reserved. Use of this software is permitted for non-commercial
+ *  research purposes, and it may be copied only for that use.  All copies must
+ *  include this copyright message.  This software is made available AS IS, and
+ *  neither the GIPO team nor the University of Huddersfield make any warranty
+ *  about the software or its performance.
+ *
+ *  Automatically generated OCL Domain from  GIPO Version 3.0
+ *
+ *  Author: c0360494
+ *  Institution: University of Huddersfield
+ *  Date created: Mon Dec 18 12:48:09 GMT 2006
+ *  Date last modified: 2006/12/18 at 01:39:45 PM GMT
+ *  Description:
+ *    
+ *    Object Life History : tea
+ *    Object Life History : tea
+ */
+
+domain_name(makingTea).
+
+% Sorts
+sorts(primitive_sorts,[cup,kettle]).
+
+% Objects
+objects(cup,[cup1,cup2,cup3,cup4,cup5,bigMug]).
+objects(kettle,[electricKettle]).
+
+% Predicates
+predicates([
+    dirty(cup),
+    clean(cup),
+    withTea(cup),
+    withWater(cup),
+    blackTea(cup),
+    milkyTea(cup),
+    blackTeaSugar(cup),
+    milkyTeaSugar(cup),
+    empty(kettle),
+    full(kettle),
+    boiled(kettle)]).
+
+% Object Class Definitions
+substate_classes(cup,Cup,[
+    [dirty(Cup)],
+    [clean(Cup)],
+    [withTea(Cup)],
+    [withWater(Cup)],
+    [blackTea(Cup)],
+    [milkyTea(Cup)],
+    [blackTeaSugar(Cup)],
+    [milkyTeaSugar(Cup)]]).
+substate_classes(kettle,Kettle,[
+    [empty(Kettle)],
+    [full(Kettle)],
+    [boiled(Kettle)]]).
+
+% Atomic Invariants
+
+% Implied Invariants
+
+% Inconsistent Constraints
+
+% Operators
+operator(fillUp(Kettle),
+    % prevail
+    [],
+    % necessary
+    [     sc(kettle,Kettle,[empty(Kettle)]=>[full(Kettle)])],
+    % conditional
+    []).
+operator(boil(Kettle),
+    % prevail
+    [],
+    % necessary
+    [     sc(kettle,Kettle,[full(Kettle)]=>[boiled(Kettle)])],
+    % conditional
+    []).
+operator(wash(Cup),
+    % prevail
+    [],
+    % necessary
+    [     sc(cup,Cup,[dirty(Cup)]=>[clean(Cup)])],
+    % conditional
+    []).
+operator(addBag(Cup),
+    % prevail
+    [],
+    % necessary
+    [     sc(cup,Cup,[clean(Cup)]=>[withTea(Cup)])],
+    % conditional
+    []).
+operator(addWater(Kettle,Cup),
+    % prevail
+    [     se(kettle,Kettle,[boiled(Kettle)])],
+    % necessary
+    [     sc(cup,Cup,[withTea(Cup)]=>[withWater(Cup)])],
+    % conditional
+    []).
+operator(brew(Cup),
+    % prevail
+    [],
+    % necessary
+    [     sc(cup,Cup,[withWater(Cup)]=>[blackTea(Cup)])],
+    % conditional
+    []).
+operator(addMilk(Cup),
+    % prevail
+    [],
+    % necessary
+    [     sc(cup,Cup,[blackTea(Cup)]=>[milkyTea(Cup)])],
+    % conditional
+    []).
+operator(addSugar(Cup),
+    % prevail
+    [],
+    % necessary
+    [     sc(cup,Cup,[blackTea(Cup)]=>[blackTeaSugar(Cup)])],
+    % conditional
+    []).
+operator(addSugarMilk(Cup),
+    % prevail
+    [],
+    % necessary
+    [     sc(cup,Cup,[milkyTea(Cup)]=>[milkyTeaSugar(Cup)])],
+    % conditional
+    []).
+
+% Methods
+
+% Domain Tasks
+planner_task(1,
+    % Goals
+    [
+     se(cup,cup1,[blackTea(cup1)])],
+    % INIT States
+    [
+     ss(cup,cup1,[clean(cup1)]),
+     ss(kettle,electricKettle,[boiled(electricKettle)])]).
+planner_task(2,
+    % Goals
+    [
+     se(cup,cup2,[milkyTea(cup2)])],
+    % INIT States
+    [
+     ss(cup,cup2,[dirty(cup2)]),
+     ss(kettle,electricKettle,[full(electricKettle)])]).
+planner_task(3,
+    % Goals
+    [
+     se(cup,cup1,[milkyTea(cup1)]),
+     se(cup,cup2,[milkyTea(cup2)]),
+     se(cup,cup3,[milkyTea(cup3)]),
+     se(cup,cup4,[milkyTeaSugar(cup4)])],
+    % INIT States
+    [
+     ss(cup,cup1,[clean(cup1)]),
+     ss(cup,cup2,[clean(cup2)]),
+     ss(cup,cup3,[clean(cup3)]),
+     ss(cup,cup4,[clean(cup4)]),
+     ss(kettle,electricKettle,[empty(electricKettle)])]).
+planner_task(4,
+    % Goals
+    [
+     se(cup,cup1,[blackTea(cup1)]),
+     se(cup,cup2,[milkyTea(cup2)]),
+     se(cup,cup3,[milkyTea(cup3)]),
+     se(cup,cup4,[blackTeaSugar(cup4)]),
+     se(cup,cup5,[milkyTea(cup5)]),
+     se(cup,bigMug,[milkyTeaSugar(bigMug)])],
+    % INIT States
+    [
+     ss(cup,cup1,[dirty(cup1)]),
+     ss(cup,cup2,[clean(cup2)]),
+     ss(cup,cup3,[dirty(cup3)]),
+     ss(cup,cup4,[clean(cup4)]),
+     ss(cup,cup5,[dirty(cup5)]),
+     ss(cup,bigMug,[dirty(bigMug)]),
+     ss(kettle,electricKettle,[empty(electricKettle)])]).
+</pre>
+</p>
+
+<p>
+<h2 align="center"><a name="C3">PDDL Domain Plain Text</a></h2>
+</p>
+
+<p>
+<pre>
+; ***************************************************************************
+; *  All rights reserved. Use of this software is permitted for non-commercial
+; *  research purposes, and it may be copied only for that use.  All copies must
+; *  include this copyright message.  This software is made available AS IS, and
+; *  neither the GIPO team nor the University of Huddersfield make any warranty
+; *  about the software or its performance.
+; *
+; *  Automatically generated PDDL Domain from  GIPO Version 3.0
+; *
+; *  Author: c0360494
+; *  Institution: University of Huddersfield
+; *  Date created: Mon Dec 18 12:48:09 GMT 2006
+; *  Date last modified: 2006/12/18 at 01:39:45 PM GMT
+; *  Description:
+; *    
+; *    Object Life History : tea
+; *    Object Life History : tea
+; * OCL File name : tea.ocl
+; *************************************************************************
+
+(define (domain makingTea)
+  (:requirements :strips :equality :typing)
+
+  (:types  cup kettle)
+
+
+  (:predicates
+    (dirty ?cup1 - cup)
+    (clean ?cup1 - cup)
+    (withTea ?cup1 - cup)
+    (withWater ?cup1 - cup)
+    (blackTea ?cup1 - cup)
+    (milkyTea ?cup1 - cup)
+    (blackTeaSugar ?cup1 - cup)
+    (milkyTeaSugar ?cup1 - cup)
+    (empty ?kettle1 - kettle)
+    (full ?kettle1 - kettle)
+    (boiled ?kettle1 - kettle)
+  )
+  (:action fillUp
+       :parameters ( ?Kettle - kettle)
+       :precondition 
+            (empty ?Kettle)
+       :effect (and 
+            (not (empty ?Kettle))
+            (full ?Kettle)
+        )
+    )
+  (:action boil
+       :parameters ( ?Kettle - kettle)
+       :precondition 
+            (full ?Kettle)
+       :effect (and 
+            (not (full ?Kettle))
+            (boiled ?Kettle)
+        )
+    )
+  (:action wash
+       :parameters ( ?Cup - cup)
+       :precondition 
+            (dirty ?Cup)
+       :effect (and 
+            (not (dirty ?Cup))
+            (clean ?Cup)
+        )
+    )
+  (:action addBag
+       :parameters ( ?Cup - cup)
+       :precondition 
+            (clean ?Cup)
+       :effect (and 
+            (not (clean ?Cup))
+            (withTea ?Cup)
+        )
+    )
+  (:action addWater
+       :parameters ( ?Kettle - kettle ?Cup - cup)
+       :precondition (and 
+            (boiled ?Kettle)
+            (withTea ?Cup)
+       )
+       :effect (and 
+            (not (withTea ?Cup))
+            (withWater ?Cup)
+        )
+    )
+  (:action brew
+       :parameters ( ?Cup - cup)
+       :precondition 
+            (withWater ?Cup)
+       :effect (and 
+            (not (withWater ?Cup))
+            (blackTea ?Cup)
+        )
+    )
+  (:action addMilk
+       :parameters ( ?Cup - cup)
+       :precondition 
+            (blackTea ?Cup)
+       :effect (and 
+            (not (blackTea ?Cup))
+            (milkyTea ?Cup)
+        )
+    )
+  (:action addSugar
+       :parameters ( ?Cup - cup)
+       :precondition 
+            (blackTea ?Cup)
+       :effect (and 
+            (not (blackTea ?Cup))
+            (blackTeaSugar ?Cup)
+        )
+    )
+  (:action addSugarMilk
+       :parameters ( ?Cup - cup)
+       :precondition 
+            (milkyTea ?Cup)
+       :effect (and 
+            (not (milkyTea ?Cup))
+            (milkyTeaSugar ?Cup)
+        )
+    )
+  )
+(define (problem task1)
+   (:domain makingTea)
+   (:objects
+         cup1 cup2 cup3 cup4 cup5 bigMug - cup
+         electricKettle - kettle
+        )
+    (:init
+        (clean cup1)
+        (boiled electricKettle)
+        )
+    (:goal
+      (and
+        (blackTea cup1)
+       ))
+)
+(define (problem task2)
+   (:domain makingTea)
+   (:objects
+         cup1 cup2 cup3 cup4 cup5 bigMug - cup
+         electricKettle - kettle
+        )
+    (:init
+        (dirty cup2)
+        (full electricKettle)
+        )
+    (:goal
+      (and
+        (milkyTea cup2)
+       ))
+)
+(define (problem task3)
+   (:domain makingTea)
+   (:objects
+         cup1 cup2 cup3 cup4 cup5 bigMug - cup
+         electricKettle - kettle
+        )
+    (:init
+        (clean cup1)
+        (clean cup2)
+        (clean cup3)
+        (clean cup4)
+        (empty electricKettle)
+        )
+    (:goal
+      (and
+        (milkyTea cup1)
+        (milkyTea cup2)
+        (milkyTea cup3)
+        (milkyTeaSugar cup4)
+       ))
+)
+(define (problem task4)
+   (:domain makingTea)
+   (:objects
+         cup1 cup2 cup3 cup4 cup5 bigMug - cup
+         electricKettle - kettle
+        )
+    (:init
+        (dirty cup1)
+        (clean cup2)
+        (dirty cup3)
+        (clean cup4)
+        (dirty cup5)
+        (dirty bigMug)
+        (empty electricKettle)
+        )
+    (:goal
+      (and
+        (blackTea cup1)
+        (milkyTea cup2)
+        (milkyTea cup3)
+        (blackTeaSugar cup4)
+        (milkyTea cup5)
+        (milkyTeaSugar bigMug)
+       ))
+)
+</pre>
+<p>
+
+<p>
+<h2 align="center"><a name="C4">File Download Link</a></h2>
+</p>
+
+<table width="100%">
+<tr>
+  <td align="center"><a href="tea.ocl">
+                     OCL file</a></td>
+</tr>
+</table>
+
+</body>
+</html>

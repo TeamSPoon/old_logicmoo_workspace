@@ -1,0 +1,189 @@
+INDUCED OPERATORS IN HIKING WORLD 
+
+This document shows the results of applying the implementation of the
+opmaker algorithm to generate operators.  For ease of reference a list
+of the original 'hand-crafted' operators from the OCL domain has been 
+included (see below). 
+
+HAND-CRAFTED OCL OPERATORS FROM HIKING WORLD DOMAIN
+
+operator(load(Person,Tent,Place,Car),
+   % prevail
+    [se(person,Person,[out(Person,Place)]) ],
+    % necessary
+    [
+     sc(tent,Tent,[down(Tent,Place) ] =>
+             [loaded(Tent,Car,Place) ])
+     ],
+    % conditional
+    []).
+operator(unload(Person,Tent,Place,Car),
+   % prevail
+    [se(person,Person,[out(Person,Place)]) ],
+    % necessary
+    [
+     sc(tent,Tent,[loaded(Tent,Car,Place) ] =>
+             [down(Tent,Place) ])
+     ],
+    % conditional
+    []).
+
+operator(getin(Person,Place,Car),
+   % prevail
+    [se(car,Car,[at(Car,Place)]) ],
+    % necessary
+    [    
+     sc(person,Person,[out(Person,Place)]=>[in(Person,Car,Place)])
+     ],
+    % conditional
+    []).
+operator(getout(Person,Place,Car),
+   % prevail
+    [se(car,Car,[at(Car,Place)]) ],
+    % necessary
+    [    
+     sc(person,Person,[in(Person,Car,Place)]=>[out(Person,Place)])
+     ],
+    % conditional
+    []).
+
+
+ We now show two user given sequences which include a set of desirable 
+operators and some example inputs.
+
+SEQUENCE 1
+
+USER INPUT
+
+ put_down(tent1,fred,keswick), 
+    load(fred,tent1,car1,keswick), 
+    getin(sue,keswick,car1),
+    drive(sue,car1,keswick,helvelyn),
+    getout(sue,helvelyn,car1),
+    unload(sue,tent1,car1,helvelyn),
+    put_up(tent1,sue,helvelyn),
+    getin(sue,helvelyn,car1),
+    drive(sue,car1,helvelyn,keswick),
+    getout(sue,keswick,car1),
+    walk_together(sue,fred,couple1,keswick,helvelyn),
+    sleep_in_tent(sue,fred,tent1,helvelyn)
+
+
+
+OPERATORS INDUCED
+
+operator(put_down(Tent1,Fred,Keswick),
+[se(person,Fred,[fit(Fred,Keswick)])],
+[sc(tent,Tent1,[up(Tent1,Keswick)] => [down(Tent1,Keswick)])],
+[]
+).
+
+operator(load(Fred,Tent1,Car1,Keswick),
+[se(person,Fred,[fit(Fred,Keswick)]),
+se(car,Car1,[at(Car1,Keswick)])],
+[sc(tent,Tent1,[down(Tent1,Keswick)] => [loaded(Tent1,Car1,Keswick)])],
+[]
+).
+
+operator(getin(Sue,Keswick,Car1),
+[se(car,Car1,[at(Car1,Keswick)])],
+[sc(person,Sue,[fit(Sue,Keswick)] => [in(Sue,Car1,Keswick)])],
+[]
+).
+
+operator(drive(Sue,Car1,Keswick,Helvelyn),
+[],
+[sc(person,Sue,[in(Sue,Car1,Keswick)] => [in(Sue,Car1,Helvelyn)]),
+sc(car,Car1,[at(Car1,Keswick)] => [at(Car1,Helvelyn)])],
+[sc(person,_11550,[in(_11550,Car1,Keswick)] => [in(_11550,Car1,Helvelyn)]),
+sc(tent,_12583,[loaded(_12583,Car1,Keswick)] => [loaded(_12583,Car1,Helvelyn)])]
+).
+
+operator(getout(Sue,Helvelyn,Car1),
+[se(car,Car1,[at(Car1,Helvelyn)])],
+[sc(person,Sue,[in(Sue,Car1,Helvelyn)] => [fit(Sue,Helvelyn)])],
+[]
+).
+
+operator(unload(Sue,Tent1,Car1,Helvelyn),
+[se(person,Sue,[fit(Sue,Helvelyn)]),
+se(car,Car1,[at(Car1,Helvelyn)])],
+[sc(tent,Tent1,[loaded(Tent1,Car1,Helvelyn)] => [down(Tent1,Helvelyn)])],
+[]
+).
+
+operator(put_up(Tent1,Sue,Helvelyn),
+[se(person,Sue,[fit(Sue,Helvelyn)])],
+[sc(tent,Tent1,[down(Tent1,Helvelyn)] => [up(Tent1,Helvelyn)])],
+[]
+).
+
+operator(walk_together(Sue,Fred,Couple1,Keswick,Helvelyn),
+[],
+[sc(person,Sue,[fit(Sue,Keswick)] => [tired(Sue,Helvelyn)]),
+sc(person,Fred,[fit(Fred,Keswick)] => [tired(Fred,Helvelyn)]),
+sc(couple,Couple1,[walked(Couple1,Keswick),partners(Couple1,Sue,Fred)] => [walked(Couple1,Helvelyn),partners(Couple1,Sue,Fred)])],
+[]
+).
+
+operator(sleep_in_tent(Sue,Fred,Tent1,Helvelyn),
+[se(tent,Tent1,[up(Tent1,Helvelyn)])],
+[sc(person,Sue,[tired(Sue,Helvelyn)] => [fit(Sue,Helvelyn)]),
+sc(person,Fred,[tired(Fred,Helvelyn)] => [fit(Fred,Helvelyn)])],
+[]
+).
+
+
+
+SEQUENCE 2
+
+USER INPUT
+
+ getout(sue,helvelyn,car1),
+    unload(sue,tent1,car1,helvelyn),
+    put_up(tent1,sue,helvelyn),
+    getin(sue,helvelyn,car1),
+    drive(sue,car1,helvelyn,keswick),
+    getout(sue,keswick,car1)
+
+
+
+
+OPERATORS INDUCED
+
+
+operator(getout(Sue,Helvelyn,Car1),
+[se(car,Car1,[at(Car1,Helvelyn)])],
+[sc(person,Sue,[in(Sue,Car1,Helvelyn)] => [fit(Sue,Helvelyn)])],
+[]
+).
+
+operator(unload(Sue,Tent1,Car1,Helvelyn),
+[se(person,Sue,[fit(Sue,Helvelyn)]),
+se(car,Car1,[at(Car1,Helvelyn)])],
+[sc(tent,Tent1,[loaded(Tent1,Car1,Helvelyn)] => [down(Tent1,Helvelyn)])],
+[]
+).
+
+operator(put_up(Tent1,Sue,Helvelyn),
+[se(person,Sue,[fit(Sue,Helvelyn)])],
+[sc(tent,Tent1,[down(Tent1,Helvelyn)] => [up(Tent1,Helvelyn)])],
+[]
+).
+
+operator(getin(Sue,Helvelyn,Car1),
+[se(car,Car1,[at(Car1,Helvelyn)])],
+[sc(person,Sue,[fit(Sue,Helvelyn)] => [in(Sue,Car1,Helvelyn)])],
+[]
+).
+
+operator(drive(Sue,Car1,Helvelyn,Keswick),
+[se(car,Car1,[at(Car1,Helvelyn)])],
+[sc(person,Sue,[in(Sue,Car1,Helvelyn)] => [fit(Sue,Keswick)])],
+[]
+).
+
+
+
+
+

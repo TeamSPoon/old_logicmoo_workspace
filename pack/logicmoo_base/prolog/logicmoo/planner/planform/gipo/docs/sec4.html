@@ -1,0 +1,53 @@
+<html>
+<head>
+<title>The Object Centred Language Manual (Version1.2) - Task Specification </title>
+</head>
+<body bgcolor="#FFFFFF">
+<a NAME="top">
+<table width="100%"><tr>
+<td align=left valign=top> </td>
+<td align=center><h2 align=center>The Object Centered Language Manual<br>
+<b>OCL<font valign=bottom size=-1>h</font></b> - Version1.2</h2>
+<td align=right><a href="http://helios.hud.ac.uk/planform/main.html">
+<img src="planform_logo2.gif" height="30" width="140" border=0 alt="Planform Home"></a>
+</td>
+</tr></table>
+<hr>
+
+<h2 align=center>4. Task Specification</h2>
+
+After a domain model has been built up, we can compose  
+task specifications for a planner to solve.
+The form of a task specification depends on the planner 
+used. Normally it is an initial state together with some goals
+to achieve and/or some high level tasks to perform.<p>
+
+For example, it could have the form <code>planner_task(goal, initial-state)</code>,
+where a goal is a list of object expressions, as in the following
+task:
+
+<pre>
+  planner_task(
+          [se(gripper,g, [free(g)]),
+           se(block,b1,[on_block(b1,b3)]) ],
+          [ss(gripper, g,[free(g)]),
+           ss(block,b1,[on_table(b1),clear(b1)]),
+           ss(block,b2,[on_block(b2,b3),clear(b2)]),
+           ss(block,b3,[on_table(b3)])]).
+</pre>
+
+<hr><table width="100%"><tr><td align=left>
+<a href="sec3.html"><img src="prev.gif" border=0 alt="prev"></a>
+<a href="content.html"><img src="index.gif" border=0 alt="content"></a>
+<a href="sec5.html"><img src="next.gif" border=0 alt="next"></a>
+</td>
+<td align=center><script language="JavaScript">
+<!---//hide script from old browsers
+    document.write( "Last updated "+ document.lastModified );
+//end hiding contents --->
+</script>
+</td>
+</tr>
+</table>
+</body>
+</html>

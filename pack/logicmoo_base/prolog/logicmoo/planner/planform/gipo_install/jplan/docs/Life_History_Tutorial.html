@@ -1,0 +1,490 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=utf-8">
+  <title>Life History Tutorial</title>
+  <meta name="GENERATOR" content="OpenOffice.org 2.0-pre  (Linux)">
+  <meta name="CREATED" content="20050612;4234000">
+  <meta name="CHANGED" content="20050612;4475000">
+  <style type="text/css">
+	<!-- h1 {
+	color: #003300;
+}
+	h2 {
+	color: #003300;
+}
+  h3 {
+	color: #003300;
+} -->
+  </style>
+</head>
+<body dir="ltr" lang="en-US">
+<h1>Life History Editor Tutorial</h1>
+<h3>Creating Domain Specifications from Object Life Histories</h3>
+<p><br>
+The life History Editor of GIPO can be used to describe the
+changes instances of object classes may undergo during planning and
+to show how the life histories of different sorts and instances of
+objects may interrelate. The created life histories are then
+sufficient to build the bulk of the full domain specification. This
+tutorial should be read in conjunction with the&nbsp;<a
+ href="UsingLifeHistoryEditor.html">Life History User manual</a>. The
+tutorial focuses on the meaning of life history drawings more than on
+the mechanics of drawing the life histories themselves. </p>
+<h3>First Example - Espresso Coffee Maker.</h3>
+<p>To make espresso coffee or cappuccino coffee the home barista has
+to manage the process of filling the machine with fresh ground
+coffee, ensuring that the boiler is at the correct temperature for
+the task in hand, either brewing espresso or frothing the milk, used
+in cappuccino, and performing these task in the correct order to
+successfully make the desired coffee for visiting friends.
+<br>
+<br>
+<b>Some
+Assumptions</b>: We will assume that there is an adequate supply of
+freshly ground coffee available and endless supplies of water and
+milk.
+<br>
+<br>
+How do we make espresso? The coffee machine has a
+filter head capable of holding enough coffee to make one shot of
+espresso. The use of the filter and coffee holder follows a cycle for
+each cup of espresso made.
+<br>
+<br>
+<b>First</b> the filter &nbsp;<img src="icoFilter.png" name="graphics1"
+ alt="Filter image" align="bottom" border="0" height="16" width="16">
+must be <font color="#ff0000"><i>filled</i> </font>with fresh coffee,
+assuming that it started off <i><font color="#ff0000">empty</font></i>,
+after having filled the filter we need to wait until we are in a
+position to <font color="#ff0000">brew</font> the coffee and then
+finally <font color="#ff0000">empty</font> the<font color="#ff0000">
+used </font>filter coffee to allow the process to repeat. In
+describing what we need to do with the filter we have identified
+three actions that apply to the filter i.e. fill the filter, brew the
+coffee and empty the filter. There are also three states that the
+filter may be in, <font color="#ff0000">empty</font>, <font
+ color="#ff0000">full</font>
+and<font color="#ff0000"> used</font>. We can easily picture this
+cycle in a "transition graph".<br>
+<img src="coffeeFilterLH.jpg" name="graphics2"
+ alt="coffee filter cycle image" align="left" border="0" height="316"
+ width="183"><br>
+<br>
+<br>
+<br>
+<br>
+In
+this graph the states of the coffee filter are represented by
+rectangles with an appropriate icon embedded within the state
+rectangle along with a name for the state. The green rountangles are
+the named actions that need to be performed to change state with the
+connected arrows indicating which state changes are brought about. To
+change the name of a state simply double click on the graph node and
+edit in place. On the top row of the tool bar you can select an
+appropriate Icon for the type of object you are defining. This is
+done most easily if you enter the type name and choose the icon
+before creating the first object state. If you need to do this later
+then
+select the state node and use the replace tool from the top toolbar <img
+ src="replace.png" alt="" border="0" height="16" width="16">.
+Make sure the correct state name and Icon are displayed.<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<b>Second</b> the cups go through a
+number of stages in the coffee making process. We need to <font
+ color="#ff0000">fetch</font>
+a clean cup and place it below the filter.<br>
+<img src="coffeeCupLH.jpg" name="graphics3"
+ alt="coffee cup transition diagram" align="left" border="0"
+ height="266" width="153"><br>
+<br>
+When
+the cup is in position we may <font color="#ff0000">brew</font> the
+coffee which pours into the cup. We now have, we hope, a perfect cup
+of <font color="#ff0000">espresso</font> coffee. If we want a
+<font color="#ff0000">cappuccino</font> we need to perform another
+action and add hot frothed milk. For the perfect cup one third hot
+milk and one third milk froth, the other third being of course the
+espresso, but we can model all this just as the action of <font
+ color="#ff0000">adding
+froth</font>. There is of course now the pleasure of drinking the
+coffee with our friends and ultimately the chore of washing up but
+all that is beyond the scope of our coffee making model. </p>
+<p><br>
+<img src="coffeeMilkLH.jpg" name="graphics4"
+ alt="milk transition diagram" align="left" border="0" height="127"
+ width="106"><br>
+<br>
+We
+have not yet finished modelling the coffee making process there is
+still the milk to think about if we are going to have cappuccino's.
+But given our assumption of adequate supply and no constraints on the
+size of our milk jug we just model this as one action of <font
+ color="#ff0000">frothing</font>
+the milk in which case it simply changes from <font color="#ff0000">cold</font>
+to <font color="#ff0000">frothed</font>.</p>
+<p><br>
+<br>
+<br>
+<br>
+In modelling the process of producing the perfect
+cup of coffee we must not forget the boiler or heater which we need
+at the correct temperature before we are able to perform many of the
+actions described above.<br>
+<img src="coffeeHeaterLH.jpg" name="graphics5"
+ alt="the boiler or heater transition diagram" align="left" border="0"
+ height="188" width="139"><br>
+<br>
+<br>
+For
+the purposes of modelling the heater there are three states or
+temperatures that are relevant to us. First before we can make any
+coffee we must <font color="#ff0000">heat</font> up the boiler and
+get the temperature to the state we will simply call<font
+ color="#ff0000">
+high</font>, this is the temperature at which we can make espresso.
+If we want to froth the milk however we must heat the boiler to a
+higher temperature to produce <font color="#ff0000">steam</font> to
+enable us to froth the milk. The steam temperature is however too
+high to make further espresso hence if we need to make another cup of
+espresso the boiler must be <font color="#ff0000">cooled </font>to
+get it back to the correct temperature for brewing espresso. <br>
+<br>
+<br>
+<br>
+<br>
+Our
+model built so far is an over simplification in a number of ways.
+Some of these over simplifications arise from the assumptions of
+"Classical Planning" which we are limiting ourselves to in
+this tutorial. These Classical Planning assumptions restrict us to
+ignore durations of actions and to model changes of state as discreet
+steps and not continuous change as may be the case in reality as for
+example when we heat the boiler it does not instantly go from its
+high temperature to the boiling temperature required to produce
+steam, this is a continuous process of change taking time. These
+omissions in our model are however deliberate. What we need to capture
+even for Classical Planning and have not yet done so is the
+dependencies between the states of objects of different kinds. We
+have not for example captured in the images, the fact that the boiler
+needs to be in the<font color="#ff0000"> high</font> state before we
+<font color="#ff0000">brew</font> the coffee, nor that it must be in
+the <font color="#ff0000">steam </font>state before we can <font
+ color="#ff0000">froth</font>
+the milk. <br>
+<br>
+To capture the dependence between the state of one
+type of object and an action performed on another we connect the
+state rectangle with the corresponding transition rountangle by a red
+arrow.<br>
+<img src="coffeeHeaterMilk.jpg" name="graphics6"
+ alt="heater milk prevail connection" align="left" border="0"
+ height="183" width="290"><br>
+The
+single headed red arrow establishes what we call a "<b><i>prevail</i></b>"
+condition. It shows that an instance of the heater must be in the
+<font color="#ff0000">steam </font>state at the point at which the
+milk changes state from <font color="#ff0000">cold</font> to <font
+ color="#ff0000">frothed</font>.
+A consequence of this is that the heater could not change state at
+the same instant that the<font color="#ff0000"> froth</font> action
+is performed.<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+A second type of
+dependency that occurs in the coffee making example is that the
+action of brewing the coffee is mentioned both with respect to the
+filter and with respect to the cup. What we need to model here is
+that these are not independent actions. Brewing the coffee in the cup
+is the same action as brewing the coffee in the filter. To put it
+another way the change in state of the filter must take place at the
+same time as the corresponding change in the cup. <br>
+<img src="coffeeCupFilter.jpg" name="graphics7"
+ alt="common necessary transition" align="left" border="0" height="289"
+ width="367"><br>
+<br>
+In
+this diagram we show by the use of a form of double headed red arrow
+what we call a <b><i>common necessary transition</i></b>. The
+dependency is also indicated by the use of the same name, <font
+ color="#ff0000">brew</font>,
+to describe the actions that bring about changes of state in both the
+relevant instances of the cup and the filter of the coffee
+machine.<br>
+<br>
+The significance of the circle arrow head is that it
+marks the "source" action node when the arrow was drawn and
+the name of this node is automatically propagated to the connecting
+"target" node.<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+The
+complete diagram for the life history of the Espresso Coffee machine
+is shown below as drawn in GIPO's Life History Editor.<br>
+<br>
+<img src="coffeeAllEditor.jpg" name="graphics8"
+ alt="Life History Editor - Coffee Example" align="bottom" border="0"
+ height="468" width="831"><br>
+<br>
+Once drawn the diagram can be checked <img src="check16.png"
+ name="graphics9" align="bottom" border="0" height="16" width="16">
+for low level consistency and the specification produced <img
+ src="oclTrans.png" name="graphics10" align="bottom" border="0"
+ height="16" width="16">
+in GIPO's internal language OCL.</p>
+Do not forget some explanatory text. Add text notes
+using the text tool <img src="textNote.png" alt="" border="0"
+ height="16" width="16">. As a minimum
+you should at least name the types of objects used it all makes the
+diagram easier to understand.
+Also remember you need to save the graphic image of your domain and the
+specification separately.
+You need to do both once you are satisfied with your model.
+<p>To validate our model we would now try and dynamically test it. We
+can do this within GIPO by first defining a task to be formed. This
+will involve both ensuring that we have defined example instances of
+the object sorts introduced in out model, do this using the <b>Sort</b>
+editor, and defining the task in the
+<b>Task Editor</b>. Once we have a defined task we can either try and
+manually construct a plan using the <b>Stepper</b> or we can use one
+of GIPO's built in planners to try and construct a plan to solve the
+task. If you cannot construct a plan then the <b>Stepper</b> should
+help you identify at what point your expected plan to solve the task
+fails. You may be able then to identify flaws in your model.</p>
+<h3>A More Complex Example</h3>
+As an illustrative example we describe the Hiking Domain, a planning
+domain with documentation and description on the GIPO resource page.
+Two people (hikers) want to walk together a long clockwise circular
+route (over several days) around the Lake District of NW England. They
+do one ``leg" each day, as they get tired and have to sleep in their
+tent to recover for the next leg. Their equipment is heavy, so they
+have two cars which can be used to carry their tent and themselves to
+the start/end of a leg.
+<h4>Using Properties</h4>
+In the Hiking domain in addition to charting simple state changes we
+must keep track of where the tent car and
+people currently are. In addition with the people, the walkers, we need
+to keep track of which stages
+of the walk they have completed. We can accomplish this using the
+notion of properties. The tent, cars, and people all have a property of
+being located. For each type of object we choose a name for the
+property, for example with the tent we might call the property
+"tentAt", for the car "carAt", for the person "personAt" but though
+names of
+properties must be unique to types of object they all share the same
+value type which we might call "location"
+or simply "loc". To add properties to object we select one state node
+for the object and right click to
+bring up the editor popup menu and select "Properties". We see the
+empty editor. <br>
+<br>
+<img src="properties1.jpg" alt="" border="0" height="168" width="302"><br>
+We should enter the property name "tentAt"
+and value type "loc" in the respective edit combo boxes and press Add.
+We now see the result after pressing "Add" and as this is the only
+property for the tent press "OK" to record the properties and dismiss
+the dialog box. <br>
+<img src="properties2.jpg" alt="" border="0" height="171" width="305"><br>
+The locatedness property will now be associated with all states of the
+tent, not just the state we selected when
+we added the property. To confirm this look at the properties of any of
+the other states.
+The same task now needs to be repeated for the car giving it the
+"carAt" property and for the person but give the
+person the two properties as shown in the property editor for "person".
+<br>
+<img src="properties3.jpg" alt="" border="0" height="187" width="305"><br>
+The Hiking domain with the life histories and properties described
+above are captured in the following diagram:<br>
+<img src="hiking.jpg" alt="" border="0" height="577" width="815"><br>
+At this point we still have not shown how the actions affecting the
+different object sorts interact nor have we described how the <b><i>drive</i></b>
+and <b><i>walk</i></b> actions brings about change in the
+<i>locations</i> of the objects concerned.
+Clearly as described above each of our object sorts have a location
+property but that is present in every state of each object, and the
+value of that property is not constrained by the states. Properties <b>only</b>
+change when a transition is defined as bringing about a "Property
+Change".
+Right clicking on a transition bring up a popup menu with the option <b>Property
+Change</b> selecting this will generate a dialog box as shown below:<br>
+<img src="hiking1.jpg" alt="" border="0" height="158" width="311"><br>
+This dialog will show any defined "property changes" and provide the
+opportunity to edit and add new
+rules for changing properties. The right hand combo box is populated
+with the names of properties
+applying to the object sort undergoing this transition. The left hand
+combo box will contain the value
+"none" but any new name starting with a lower-case letter can be
+entered into this combo box. If we press <b>Add</b> with the current
+options chosen, as shown above, we are committing to allow the value of
+the <i>carAt</i> property to change between any two locations when the
+drive operation takes place.
+If we had provided a constraint name such as "next" we would be
+committed to defining instances of the
+predicate <b>next(&lt;loc&gt;,&lt;loc&gt;)</b> to define relationships
+between locations. The set of
+such relationships could form a route from location to location. [This
+is precisely what we do
+with
+the <b>walk</b> action to define the changes of location along the
+route that the walkers must take.]
+With driving the car no constraints are placed on where the car can be
+driven to, hence accepting the "none" option is adequate. After
+pressing the <b>add</b> button the changes can be committed by
+pressing <b>OK</b>. Just as we have defined a property change for the <b>drive</b>
+action of the <b>car</b> we must do the same for the <b>tent</b> and
+the <b>person</b> as their changes must conform to that of the car.
+But before considering fully how the <b>drive</b> action property
+co-ordinate there is still the aspect of our informal specification of
+the problem that walkers do so as couples to capture. Again if you
+right click on a transition node in the diagram the popup menu allows
+you to specify a "number" constraint. A number constraint allows you to
+require that multiple individuals of the same sort all make the
+transition at the same time. It also allows you to specify any
+relationship that must hold between those making the transition. For
+the couples making the walk together the number constraint dialog box,
+after entering the constraint looks as follows:<br>
+<img src="hiking2.jpg" alt="" border="0" height="152" width="294"><br>
+This requires that we provide entries for the "2" place predicate <b><i>couple(&lt;person&gt;,&lt;person&gt;)</i></b>.
+This can be done in the <b>Atomic Invariants</b> editor. <br>
+<b>Finally</b> We can specify the co-ordination between the transitions
+of the distinct object state machines. Some of the transitions are of
+the sort that we used in the "Coffee making" example. We require, for
+example that the "tent" be in the "up" state before a person can make
+the "sleep" transition, but even here there is an additional
+complication. It is not only the case that the tent be "up" to allow
+our walkers to sleep but it must also be at the same location. This
+requirement will, however, be met as a default. When two state machines
+must coordinate, if both possess a property with the same value type
+then these properties <b>must</b> take on the same value. This default
+behaviour can be overridden by using the "coordination constraints"
+available when right clicking on the selected arrow linking the
+elements of the state machines. <br>
+The coordinations described so far all simply last for the duration of
+one transition of, one or both state machines, but in some cases an
+element of co-ordination must last for multiple transitions. This
+happens between the "car" and the "person" who drives the car about.
+Not only must the person "car" make a "drive" transition whenever the
+"person" does it must be the same "car" that the person got into <b>getIn
+and</b> eventually leaves <b>getOut</b>. This is specified by setting
+up an association between the person and the car when the person gets
+in <b>getIn</b> to the car. We see the result of this in the following
+diagram fragment<br>
+<img src="hiking3.jpg" alt="" border="0" height="148" width="303"><br>
+In this fragment the single headed red arrow between the "car" in the <b>carParked</b>
+state and the <b>getIn</b> transition of the person form a <b><i>prevail</i></b>
+condition which requires the car to be in the state <b>carParked</b>
+and also to share the "location" value for its locatedness property
+with the locatedness property of the person. The "+" annotating the
+arrow, created by selecting the arrow and right clicking to bring up
+the popup and then selecting the option "Start Association", means that
+the particular car that fulfilled this role will be associated with the
+person making the transition until such time that the association is
+broken. In the same diagram above we also see how the association is
+broken, indicated by the "-" annotation the red arrow linking the <b>carParked</b>
+state with the <b>getOut</b> transition. Without such associations in
+an example with multiple "cars" and multiple "persons" there would be
+no guarantee that the person needs to get out of the same car that they
+previously got into. Association one started last throughout all
+transitions of the receiving object [destination object of the
+connecting arrow] until a transition is made the breaks the
+association. In this example there is only one relevant state of the
+person <b>inCar</b> but that state may be visited multiple times by
+the driver driving to multiple locations before getting out. In other
+cases there could be transitions to other states while the association
+is maintained. Clearly creating and breaking associations will normally
+happen in pairs.<br>
+In the "coffee" example we saw coordination constraints formed between
+transitions of different state machines, formed using a kind of double
+headed red arrow, where both transitions take on the same name. In the
+last diagram above we see such an arrow linking the <b>drive</b> of
+the car to the <b>drive</b> of the person. This as before requires
+that whenever the person makes this transition the car must also. We in
+a sense are specifying that the car has a driver. In this diagram we
+also see a single headed red arrow connecting the drive of the car, the
+"source" to the drive of the person, the "destination". This form a <b><i>conditional</i></b>
+coordination. What this means is that any person may make this
+transition, if <b>inCar</b> when the car does but there is no
+requirement, other than that already specified for the driver, for
+there to be such a person in order for the car to make its <b>drive</b>
+transition. This is more obvious when we look at the connection between
+the "tent" and the "car" state machines<br>
+<img src="hiking4.jpg" alt="" border="0" height="348" width="321"><br>
+where it is clear that the only way the "tent" can make its <b>drive</b>
+transition is when the car does but it is not a requirement for the car
+that a tent be loaded into it and be driven around to allow it, the
+car, to be driven from place to place. <br>
+The complete hiking domain life history diagram is shown below<br>
+<img src="hiking5.jpg" alt="" border="0" height="637" width="777">
+<h3>Completing The Domain Specification</h3>
+To produce the textual domain specification the <img src="check16.png"
+ alt="" border="0" height="16" width="16"> button needs to be pressed.
+This will produce a complete specification but without any instance
+data or task specifications. The instance data is added by naming
+object instances using the <b>Sorts</b> editor, the sorts themselves
+are already created.<br>
+<img src="hikingSorts.jpg" alt="" border="0" height="504" width="494"><br>
+Shown above is the Hiking domain populated with two cars two people a
+tent and four locations. <br>
+In addition to the object instances the various static constrains must
+be given instance data. This is done in the <b>Atomic Invariants</b>
+editor shown below with data for the Hiking domain, again the static
+predicates are already defined only instance must be created.<br>
+<img src="hikingInvarients.jpg" alt="" border="0" height="320"
+ width="712"><br>
+The only remaining element is defining some tasks in the task editor. A
+one leg walk task for the hiking domain is shown below.<br>
+<img src="hikingTask.jpg" alt="" border="0" height="630" width="779">
+<h3>Some Diagramming Rules</h3>
+<ul>
+  <li>Identifiers i.e. names of states and transitions must start with
+lower-case letters and be followed only by letters, digits or the
+underscore character. This is checked by the <img
+ src="icons/check16.png" alt="" border="0" height="16" width="16">
+check command but is not enforced during in-line editing of nodes.</li>
+  <li>Transition nodes linked by merge arrows <img
+ src="icons/merge.png" alt="" border="0" height="16" width="16"> or <img
+ src="icons/mergeNec.png" alt="" border="0" height="16" width="16">
+must also have the same name unless the target node forms a disjunction
+(See below)</li>
+  <li>Property names must be unique to each object sort. For example if
+multiple object sorts all have a <i>location</i> then a locatedness
+predicate has to be created for each distinct object sort, though the
+may share the same argument type.</li>
+</ul>
+<h3>Features not used in the examples</h3>
+In the <b>coffee</b> and <b>hiking</b> domains there are no examples
+of transitions forming <b><i>disjunctions</i></b>. Disjunctions are
+allowed when a transition node has two or more merge arrows connected
+to it as target. In this case if the node is made a disjunction then
+one version of the transition implicitly exists for each merge
+connection. The default is that the multiple merge connections modify
+the same transition. This feature is used in the blocks work to
+simplify the diagram. <b><i>Warning</i></b> this feature is not
+currently robust in that chaining of actions merged with disjunctions
+is not fully general. This limitation may be removed in a future
+release.
+<p><a href="tutorial.html"><img src="walkback.gif" height="50"
+ width="21"></a><b><font face="Arial,Helvetica"><font size="-2"><a
+ href="tutorial.html">back
+to the tutorial front page</a></font></font></b>
+</p>
+</body>
+</html>

@@ -1,0 +1,392 @@
+
+% TESTS
+
+
+test(1) :- 
+      initial_state(1,I), 
+      solve(I, 
+        p([ transport(pk_2_z,city3_cl1_z,city1_cl1_x) ] ,[],[]) 
+            ).
+
+test(2) :- 
+      initial_state(1,I), 
+      solve(I, 
+        p([ achieve(ss(traincar,traincar1_z,[at(traincar1_z,city1_ts1_z)])),
+            achieve(ss(traincar,traincar1_y,[at(traincar1_y,city1_ts1_y)]))
+                    ] ,[],[]) 
+            ).
+test(3) :- 
+      initial_state(1,I), 
+      solve(I, 
+           p([ transport(pk_2_x,city3_cl1_x,city2_cl1), % hp1
+             transport(pk_6_y,city1_ts1_y,city1_cl1_x)],  % hp2
+             [before(hp1,hp2)],
+             [ ])  
+            ).
+
+test(4) :-  
+      initial_state(1,I), 
+      solve(I, 
+        p([ transport(pk_3_z,city3_cl1_z,city1_cl1_x), 
+            transport(pk_2,city3_cl1,CL) ],
+            [],
+            [in_region(CL,west)])  
+            ).
+
+% transport to two different cities..
+test(5) :-  
+      initial_state(1,I), 
+      solve(I, 
+        p([ transport(pk_6_y,city1_ts1_y,X), 
+            transport(pk_2_y,city3_cl1_y,Y) ],
+            [before(hp1,hp2)],
+            [in_city(X,CT1),in_city(Y,CT2),ne(CT1,CT2)])  
+            ).
+
+test(6) :-  
+      initial_state(1,I), 
+      solve(I, 
+        p([ transport(pk_1,city3_cl1,X), 
+            transport(pk_2,city3_cl1,Y) ],
+            [before(hp1,hp2)],
+            [in_city(X,CT1),in_city(Y,CT2),ne(CT1,CT2),ne(CT1,city3),ne(CT2,city3)])  
+            ).
+
+
+test(7) :- 
+      initial_state(1,I), 
+      solve(I, 
+        p([ achieve(
+              ss(traincar,traincar1,[at(traincar1,city1_ts1)])
+                    ),
+             transport(pk_6_x,city1_ts1_x,C) ],[],[ne(C,city2_ts1_x)]) 
+            ).
+
+test(8) :- 
+      initial_state(1,I), 
+      solve(I, 
+        p([ transport(pk_6_x,city1_ts1_x,city2_ts1_z) ],[],[]) ).
+
+test(9) :- 
+      initial_state(1,I), 
+      solve(I, 
+        p([ transport(pk_2_y,city3_cl1_y,city1_cl1), 
+            transport(pk_4_z,city1_cl1_z,city2_cl1_y), 
+            transport(pk_1,city3_cl1,city1_cl1)],[],[])  
+            ).
+
+
+test(10) :- 
+      initial_state(1,I), 
+      solve(I, 
+        p([ achieve(ss(traincar,traincar1,[at(traincar1,city1_ts1)])),
+            transport(pk_5_z,city3_cl1_z,city2_cl1),
+            achieve(ss(package,pk_5,[at(pk_5,X),delivered(pk_5)] )) ],
+          [before(hp1,hp3)],
+          [serves(X,city3_x)])  
+            ).
+
+test(11) :-
+      initial_state(1,I), 
+      solve(I, 
+        p([ transport(pk_1,city3_cl1,city1_cl1),
+            transport(pk_2_z,city3_cl1_z,city2_cl1_y),
+            transport(pk_3_y,city3_cl1_y,city1_cl1),
+            transport(pk_4,city1_cl1,city3_cl1_x)],
+            [ ],[ ])     
+             ).
+
+test(12) :-
+      initial_state(1,I), 
+      solve(I, 
+        p([ transport(pk_1,city3_cl1,city1_cl1),
+            transport(pk_2,city3_cl1,city2_cl1),
+            transport(pk_3,city3_cl1,city1_cl1),
+            transport(pk_4,city1_cl1,city3_cl1),
+            transport(pk_5,city3_cl1,city1_cl1) ],
+            [ ],[ ])     
+             ).
+
+test(13) :-
+      initial_state(1,I), 
+      solve(I, 
+        p([ transport(pk_3_x,city3_cl1_x,city1_cl1_z),
+            transport(pk_2_x,city3_cl1_x,city2_cl1),
+            transport(pk_3_z,city3_cl1_z,city1_cl1_z),
+            transport(pk_4,city1_cl1,city3_cl1_x),
+            transport(pk_5_y,city3_cl1_y,city1_cl1_y) ],
+            [before(hp1,hp2),before(hp3,hp2)],[])     
+           ).
+
+test(14) :-
+      initial_state(1,I),
+      solve(I,
+        p([ transport(pk_1,city3_cl1,city1_cl1_x),
+            transport(pk_2_x,city3_cl1_x,city2_cl1_z),
+            transport(pk_3,city3_cl1,city1_cl1),
+            achieve(ss(traincar,traincar1,[at(traincar1,city1_ts1)])),
+            transport(pk_4,city1_cl1,city3_cl1),
+            transport(pk_5_x,city3_cl1_x,city1_cl1_x) ],
+            [before(hp1,hp2),before(hp3,hp2)],[])
+           ).
+ test(15) :-
+       initial_state(1,I),
+       solve(I,
+         p([ 
+             transport(pk_2,city3_cl1,city2_cl1_x),
+             transport(pk_3_x,city3_cl1_x,city1_ts1),
+             transport(pk_4_y,city1_cl1_y,city3_cl1_x),
+             transport(pk_6_z,city1_ts1_z,city3_ts1_x),
+             transport(pk_5,city3_cl1,city1_cl1) ],
+             [before(hp1,hp2),before(hp3,hp2)],[])
+            ).
+test(16) :-
+      initial_state(1,I),
+       solve(I,
+         p([ transport(pk_1,city3_cl1,ap1)],
+             [],[])
+            ).
+
+test(17) :-
+      initial_state(1,I),
+       solve(I,
+         p([ transport(pk_1_y,ap3,city1_cl1_y)],
+             [],[])
+            ).
+test(18) :-
+      initial_state(1,I),
+       solve(I,
+         p([ achieve( ss(package, pk_1_x,[waiting(pk_1_x),certified(pk_1_x)])),
+             carry_via_ap(ap2,ap1,pk_1_x)],
+             [],[])
+            ).
+test(19) :-
+       initial_state(1,I),
+       solve(I,
+         p([
+             transport(pk_1,city3_cl1,city1_cl1_y),
+             transport(pk_2_x,city3_cl1_x,city2_cl1_y),
+               transport(pk_5,city3_cl1,city1_cl1_x)
+            ],
+             [],[])
+         ).
+
+test(20) :-
+       initial_state(1,I),
+       solve(I,
+         p([ transport(pk_2_y,city3_cl1_y,city1_cl1_x),
+             transport(pk_2,city3_cl1,city2_cl1_x),
+             transport(pk_3_x,city3_cl1_x,city1_ts1),
+              transport(pk_4,city1_cl1,city3_cl1_x)
+            ],
+             [before(hp1,hp2),before(hp3,hp2)],[])
+            ).
+
+
+% 
+/**************************************************************/
+
+initial_state(1, [ 
+                  ss(package,pk_1, [at(pk_1,city3_cl1),
+                                    uncertified(pk_1)]),
+                  ss(package,pk_2, [at(pk_2,city3_cl1),
+                                    uncertified(pk_2)]),
+                  ss(package,pk_3, [at(pk_3,city3_cl1),
+                                    uncertified(pk_3)]),
+                  ss(package,pk_4, [at(pk_4,city1_cl1),
+                                    uncertified(pk_4)]),
+                  ss(package,pk_5, [at(pk_5,city3_cl1),
+                                    uncertified(pk_5)]),
+                  ss(package,pk_6, [at(pk_6,city1_ts1),
+                                    uncertified(pk_6)]),
+                  ss(truck,truck_1, [at(truck_1,city1_cl1),
+                                     unattached(truck_1),
+                                     moveable(truck_1),
+                                     available(truck_1)]),
+                  ss(truck,truck_11, [at(truck_11,city1_cl1),
+                                     unattached(truck_11),
+                                     moveable(truck_11),
+                                     available(truck_11)]),
+                  ss(truck,truck_2, [at(truck_2,city2_cl1),
+                                     unattached(truck_2),
+                                     moveable(truck_2),
+                                     available(truck_2)]),
+                  ss(truck,truck_22, [at(truck_22,city2_cl1),
+                                     unattached(truck_22),
+                                     moveable(truck_22),
+                                     available(truck_22)]),
+                  ss(truck,truck_3, [at(truck_3,city3_cl1),
+                                     unattached(truck_3),
+                                     moveable(truck_3),
+                                     available(truck_3)]),
+                  ss(truck,truck_33, [at(truck_33,city3_cl1),
+                                     unattached(truck_33),
+                                     moveable(truck_33),
+                                     available(truck_33)]),
+                  ss(traincar,traincar1, [at(traincar1,city2_ts1),
+                                     unattached(traincar1),
+                                     moveable(traincar1),available(traincar1)]),
+                  ss(train,train2, [at(train2,city2_ts1),
+                                     unattached(train2),
+                                    moveable(train2),available(train2)]),
+                  ss(train,train1, [at(train1,city1_ts1),
+                                     unattached(train1),
+                                    moveable(train1),available(train1)]), 
+
+                  ss(aircraft,ac1, [at(ac1,ap2)]),
+                  ss(aircraft,ac2, [at(ac2,ap2)]),
+                  ss(aircraft,ac3, [at(ac3,ap2)]),
+                  ss(aircraft,ac4, [at(ac4,ap2)]),
+                  ss(aircraft,ac5, [at(ac5,ap1)]),
+                  ss(aircraft,ac6, [at(ac6,ap1)]),
+                  ss(aircraft,ac7, [at(ac7,ap1)]),
+                  ss(aircraft,ac8, [at(ac8,ap1)]),
+                  ss(aircraft,ac9, [at(ac9,ap3)]),
+                  ss(aircraft,ac10, [at(ac10,ap3)]),
+                  ss(aircraft,ac11, [at(ac11,ap3)]),
+                  ss(aircraft,ac12, [at(ac12,ap3)]),
+                  ss(aircraft,ac13, [at(ac13,ap4)]),
+                  ss(aircraft,ac14, [at(ac14,ap4)]),
+                  ss(aircraft,ac15, [at(ac15,ap4)]),
+                  ss(aircraft,ac16, [at(ac16,ap4)]),
+  
+                  ss(package,pk_1_x, [at(pk_1_x,ap2),
+                                    uncertified(pk_1_x)]),
+                  ss(package,pk_2_x, [at(pk_2_x,city3_cl1_x),
+                                    uncertified(pk_2_x)]),
+                  ss(package,pk_3_x, [at(pk_3_x,city3_cl1_x),
+                                    uncertified(pk_3_x)]),
+                  ss(package,pk_4_x, [at(pk_4_x,city1_cl1_x),
+                                    uncertified(pk_4_x)]),
+                  ss(package,pk_5_x, [at(pk_5_x,city3_cl1_x),
+                                    uncertified(pk_5_x)]),
+                  ss(package,pk_6_x, [at(pk_6_x,city1_ts1_x),
+                                    uncertified(pk_6_x)]),
+                  ss(truck,truck_1_x, [at(truck_1_x,city1_cl1_x),
+                                     unattached(truck_1_x),
+                                     moveable(truck_1_x),
+                                     available(truck_1_x)]),
+                  ss(truck,truck_11_x, [at(truck_11_x,city1_cl1_x),
+                                     unattached(truck_11_x),
+                                     moveable(truck_11_x),
+                                     available(truck_11_x)]),
+                  ss(truck,truck_2_x, [at(truck_2_x,city2_cl1_x),
+                                     unattached(truck_2_x),
+                                     moveable(truck_2_x),
+                                     available(truck_2_x)]),
+                  ss(truck,truck_22_x, [at(truck_22_x,city2_cl1_x),
+                                     unattached(truck_22_x),
+                                     moveable(truck_22_x),
+                                     available(truck_22_x)]),
+                  ss(truck,truck_3_x, [at(truck_3_x,city3_cl1_x),
+                                     unattached(truck_3_x),
+                                     moveable(truck_3_x),
+                                     available(truck_3_x)]),
+                  ss(truck,truck_33_x, [at(truck_33_x,city3_cl1_x),
+                                     unattached(truck_33_x),
+                                     moveable(truck_33_x),
+                                     available(truck_33_x)]),
+                  ss(traincar,traincar1_x, [at(traincar1_x,city2_ts1_x),
+                                     unattached(traincar1_x),
+                                     moveable(traincar1_x),available(traincar1_x)]),
+                  ss(train,train2_x, [at(train2_x,city2_ts1_x),
+                                     unattached(train2_x),
+                                    moveable(train2_x),available(train2_x)]),
+                  ss(train,train1_x, [at(train1_x,city1_ts1_x),
+                                     unattached(train1_x),
+                                    moveable(train1_x),available(train1_x)]), 
+
+  
+                  ss(package,pk_1_y, [at(pk_1_y,ap3),
+                                    uncertified(pk_1_y)]),
+                  ss(package,pk_2_y, [at(pk_2_y,city3_cl1_y),
+                                    uncertified(pk_2_y)]),
+                  ss(package,pk_3_y, [at(pk_3_y,city3_cl1_y),
+                                    uncertified(pk_3_y)]),
+                  ss(package,pk_4_y, [at(pk_4_y,city1_cl1_y),
+                                    uncertified(pk_4_y)]),
+                  ss(package,pk_5_y, [at(pk_5_y,city3_cl1_y),
+                                    uncertified(pk_5_y)]),
+                  ss(package,pk_6_y, [at(pk_6_y,city1_ts1_y),
+                                    uncertified(pk_6_y)]),
+                  ss(truck,truck_1_y, [at(truck_1_y,city1_cl1_y),
+                                     unattached(truck_1_y),
+                                     moveable(truck_1_y),
+                                     available(truck_1_y)]),
+                  ss(truck,truck_11_y, [at(truck_11_y,city1_cl1_y),
+                                     unattached(truck_11_y),
+                                     moveable(truck_11_y),
+                                     available(truck_11_y)]),
+                  ss(truck,truck_2_y, [at(truck_2_y,city2_cl1_y),
+                                     unattached(truck_2_y),
+                                     moveable(truck_2_y),
+                                     available(truck_2_y)]),
+                  ss(truck,truck_22_y, [at(truck_22_y,city2_cl1_y),
+                                     unattached(truck_22_y),
+                                     moveable(truck_22_y),
+                                     available(truck_22_y)]),
+                  ss(truck,truck_3_y, [at(truck_3_y,city3_cl1_y),
+                                     unattached(truck_3_y),
+                                     moveable(truck_3_y),
+                                     available(truck_3_y)]),
+                  ss(truck,truck_33_y, [at(truck_33_y,city3_cl1_y),
+                                     unattached(truck_33_y),
+                                     moveable(truck_33_y),
+                                     available(truck_33_y)]),
+                  ss(traincar,traincar1_y, [at(traincar1_y,city2_ts1_y),
+                                     unattached(traincar1_y),
+                                     moveable(traincar1_y),available(traincar1_y)]),
+                  ss(train,train2_y, [at(train2_y,city2_ts1_y),
+                                     unattached(train2_y),
+                                    moveable(train2_y),available(train2_y)]),
+                  ss(train,train1_y, [at(train1_y,city1_ts1_y),
+                                     unattached(train1_y),
+                                    moveable(train1_y),available(train1_y)]), 
+
+                  ss(package,pk_1_z, [at(pk_1_z,ap3),
+                                    uncertified(pk_1_z)]),
+                  ss(package,pk_2_z, [at(pk_2_z,city3_cl1_z),
+                                    uncertified(pk_2_z)]),
+                  ss(package,pk_3_z, [at(pk_3_z,city3_cl1_z),
+                                    uncertified(pk_3_z)]),
+                  ss(package,pk_4_z, [at(pk_4_z,city1_cl1_z),
+                                    uncertified(pk_4_z)]),
+                  ss(package,pk_5_z, [at(pk_5_z,city3_cl1_z),
+                                    uncertified(pk_5_z)]),
+                  ss(package,pk_6_z, [at(pk_6_z,city1_ts1_z),
+                                    uncertified(pk_6_z)]),
+                  ss(truck,truck_1_z, [at(truck_1_z,city1_cl1_z),
+                                     unattached(truck_1_z),
+                                     moveable(truck_1_z),
+                                     available(truck_1_z)]),
+                  ss(truck,truck_11_z, [at(truck_11_z,city1_cl1_z),
+                                     unattached(truck_11_z),
+                                     moveable(truck_11_z),
+                                     available(truck_11_z)]),
+                  ss(truck,truck_2_z, [at(truck_2_z,city2_cl1_z),
+                                     unattached(truck_2_z),
+                                     moveable(truck_2_z),
+                                     available(truck_2_z)]),
+                  ss(truck,truck_22_z, [at(truck_22_z,city2_cl1_z),
+                                     unattached(truck_22_z),
+                                     moveable(truck_22_z),
+                                     available(truck_22_z)]),
+                  ss(truck,truck_3_z, [at(truck_3_z,city3_cl1_z),
+                                     unattached(truck_3_z),
+                                     moveable(truck_3_z),
+                                     available(truck_3_z)]),
+                  ss(truck,truck_33_z, [at(truck_33_z,city3_cl1_z),
+                                     unattached(truck_33_z),
+                                     moveable(truck_33_z),
+                                     available(truck_33_z)]),
+                  ss(traincar,traincar1_z, [at(traincar1_z,city2_ts1_z),
+                                     unattached(traincar1_z),
+                                     moveable(traincar1_z),available(traincar1_z)]),
+                  ss(train,train2_z, [at(train2_z,city2_ts1_z),
+                                     unattached(train2_z),
+                                    moveable(train2_z),available(train2_z)]),
+                  ss(train,train1_z, [at(train1_z,city1_ts1_z),
+                                     unattached(train1_z),
+                                    moveable(train1_z),available(train1_z)]) 
+   ]).
+
