@@ -126,13 +126,13 @@ solve_files_0(DomainFile, ProblemFile):-
 
 
 
-%try_solve(D,P,S):- once(time_out(solve(D, P, S), 3000, Result)), Result == time_out, portray_clause(hard_working:-try_solve(D,P,S)),fail.
-try_solve(D,P,S):- gripe_time(14,time_out((solve(D, P, S)), 15000, Result)),!, % time limit for a planner (was 500000)
+% try_solve(D,P,S):- once(time_out(solve(D, P, S), 3000, Result)), Result == time_out, portray_clause(hard_working:-try_solve(D,P,S)),fail.
+try_solve(D,P,S):- gripe_time(14,time_out((solve(D, P, S)), 500000, Result)),!, % time limit for a planner (was 500000)
    ((\+ is_list(S)
      -> portray_clause('failed'(Result):-try_solve(D,P,S)) ;
        ((Result=time_out)->portray_clause('failed'(Result):-try_solve(D,P,S));true))),!.
 
-% try_solve(D,P,S):-portray_clause('utter_failed'():-try_solve(D,P,S)),!,fail.
+try_solve(D,P,S):-dmsg('utter_failed'(warn):-try_solve(D,P,S)),!,fail.
 
 
 % my_bb_put(CA, vannot(_Ano,V)):-!, bb_put(CA, V).
@@ -926,7 +926,7 @@ init_heuristics(_).
 %
 %   Parse PDDL domain File and return it rewritten prolog syntax.   
 %
-parseDomain(F, O):- parseDomain(F, O, _).
+parseDomain(F, O):- parseDomain(F, O, R), load_file_rest(R),!.
 
 
 % parseDomain(+File, -Output, -RestOfFile)
@@ -1116,7 +1116,7 @@ durative_action_def(action(S, L, Precon, Pos, Neg, Assign))
                                     [':',parameters,'('], typed_list(variable, L), [')'], 
                                     da_def_body(Precon, Pos, Neg, Assign),
                                     [')'].
-action_symbol(N)                --> name(N).
+
 
 % % 2 ?- phrase(emptyOr(pre_GD(P)),['(',accessible,?,x,')','(','no-inventory-object',?,x,')','(','has-location',?,x,?,y,')'],X).
 % % P = accessible(?x),
@@ -1196,16 +1196,16 @@ number_sas(N)                       --> [N], {number(N),!}.
 effect(P, N, A)                 --> ['(',and], c_effect(P, N, A), [')'].
 effect(P, [M|N], A)                 --> ['(',not], c_effect([M|P], N, A), [')'].
 effect(P, N, A)                 --> c_effect(P, N, A).
-%c_effect(forall(E))            --> pddl_3_0, ['(',forall,'('], effected_typed_list(variable,Es), [')', ')'].    %:conditional-effects
-%c_effect(when(P, E))           --> pddl_3_0, ['(',when], gd(P), cond_effect(E), [')'].                   %:conditional-effects
+c_effect(forall(Es))            --> pddl_3_0, ['(',forall,'('], effected_typed_list(variable,Es), [')', ')'].    %:conditional-effects
+c_effect(when(P, E))           --> pddl_3_0, ['(',when], gd(P), cond_effect(E), [')'].                   %:conditional-effects
 c_effect(P, N, A)               --> p_effect(P, N, A).
 p_effect([], [], [])            --> [].
 p_effect(Ps, Ns, [F|As])        --> ['('], assign_op(O), f_head(H), f_exp(E), [')'], p_effect(Ps, Ns, As), {F =.. [O, H, E]}.
 p_effect(Ps, [F|Ns], As)        --> neg_atomic_formula(term,F), p_effect(Ps, Ns, As).
 p_effect([F|Ps], Ns, As)        --> atomic_formula(term, F), p_effect(Ps, Ns, As).
 %p_effect(op(O, H, E))          --> pddl_3_0(op/3), ['('], assign_op(O), dcgMust((f_head(H), f_exp(E), [')'])).            %:fluents , What is difference between rule 3 lines above???
-%cond_effect(E)                 --> ['(',and], zeroOrMore(p_effect, E), [')'].                  %:conditional-effects
-%cond_effect(E)                 --> p_effect(E).                                                %:conditional-effects
+cond_effect(E)                 --> ['(',and], zeroOrMore(p_effect, E), [')'].                  %:conditional-effects
+cond_effect(E)                 --> p_effect(E).                                                %:conditional-effects
 assign_op(assign)               --> [assign].
 assign_op(scale_up)             --> [scale_up].
 assign_op(scale_down)           --> [scale_down].
@@ -1261,7 +1261,7 @@ bad_name(N):-arg(_,v('(',')',?,(-)),N).
 %
 %   Parse PDDL problem File and return rewritten prolog syntax. 
 %
-parseProblem(F, O):-parseProblem(F, O, _).
+parseProblem(F, O):-parseProblem(F, O, R), load_file_rest(R),!.
 
 
 % parseProblem(+File, -Output, -RestOfFile).
@@ -1270,7 +1270,7 @@ parseProblem(F, O):-parseProblem(F, O, _).
 %
 parseProblem(F, O, R) :-
     read_file(F, L),!,
-    problem(O, L, R),!.
+    problem(O, L, R),!.    
 
 % Support for reading file as a list.
 % :- [readFile].

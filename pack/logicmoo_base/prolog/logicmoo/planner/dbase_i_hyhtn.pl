@@ -76,6 +76,7 @@ env_clear(Dom):- forall(env_mpred(Dom,F,A),env_op(retractall(F/A))).
 
 env_op(OP_P):- OP_P=..[OP,P],env_lg_op(OP,P).
 
+env_lg_op(OP,P):-!,call(OP,P).
 env_lg_op(OP,P):-functor_h(P,F,A),must(get_mpred_stubType(F,A,ENV)),!,env_op(ENV,OP,P).
 
 env_shadow(OP,P):-call(OP,P).
@@ -90,7 +91,7 @@ env_op(ENV,OP_P):- OP_P=..[OP,P], env_op(ENV,OP,P).
 
 
 env_op(_,_,[]):-!.
-env_op(ENV,OP,F/A):- var(A),!, forall(env_mpred(ENV,F,A),((functor(P,F,A),env_op(ENV,OP,P)))).
+env_op(ENV,OP,F/A):- trace,var(A),!, forall(env_mpred(ENV,F,A),((functor(P,F,A),env_op(ENV,OP,P)))).
 env_op(ENV,retractall,F/A):-functor(P,F,A),!,env_op(ENV,retractall,P).
 % env_op(ENV,OP,Dom):- env_kb(Dom),!,forall(env_mpred(Dom,F,A),env_op(ENV,OP,F/A)).
 % env_op(ENV,OP,F/A):-!, functor(P,F,A), (((get_mpred_stubType(F,A,LG2),LG2\==ENV)  -> env_op(LG2,OP,P) ; env_op(ENV,OP,P) )).
@@ -125,8 +126,8 @@ env_op2(g,retractall,P):-foreach(env_op2(g,call,P),retractall(P)).
 env_op2(ENV,OP,P):-env_learn_pred(ENV,P),lg_op2(ENV,OP,OP2),!,call(OP2,P).
 env_op2(_,OP,P):-call(OP,P).
 
-ppi(P):-functor(P,tp_node,_),!.
-ppi(P):-predicate_property(P,number_of_clauses(NC)),!,(NC<200->true;(dmsg((number_of_clauses(NC):-P)))),!.
+%ppi(P):-functor(P,tp_node,_),!.
+%ppi(P):-predicate_property(P,number_of_clauses(NC)),!,(NC<2000->true;(dmsg((number_of_clauses(NC):-P)))),!.
 ppi(_).
 
 env_call(P):- env_lg_op(call,P),ppi(P).
@@ -979,22 +980,22 @@ fwsearch(TN,State):- fwsearch0(fwsearch,800, TN,State).
 
 fwsearch0(_,_, TN,State):-
    env_retract(solved_node(_,step(HP,Name,Pre,State,exp(TN)))).
-fwsearch0(Caller, D, TN,State):- 
+fwsearch0(_Caller, D, TN,State):- 
    var(TN),var(State),!,
    D > 2, D2 is D-2,
    fwsearch1(var_fwsearch0, D2, TN,State).
-fwsearch0(Caller, D, TN,State):- 
+fwsearch0(_Caller, D, TN,State):- 
    D > 0, D2 is D-1,
    fwsearch1(fwsearch0, D2, TN,State).
 
-fwsearch1(Caller, D, TN,State):-
+fwsearch1(_Caller, D, TN,State):-
    select_tnode(tp_node(TP,Pre,Statics,from(PR),Score,Steps)),
    env_assert(closed_node(TP,Pre,Statics,from(PR),Score,Steps)),
    expand_node(TP,OP,Statics,Statics1,Pre,Post,from(PR),Steps,Steps1),
    assert_tnode(TP,OP,PR,Score1,Post,Statics1,Steps1),
    solved_node(_,_),%expand every possible way until find solution
    fwsearch0(fwsearch1, D, TN,State).
-fwsearch1(Caller, D ,TN,State):-
+fwsearch1(_Caller, D ,TN,State):-
    env_call(tp_node(TP,Pre,Statics,from(PR),Score,Steps)),
    fwsearch0(tp_node, D ,TN,State).
 
@@ -1335,7 +1336,7 @@ filterInvars([Pred|State],[Pred|InVars],IsOfSorts,NEs,FState):-
     functor(Pred,FF,NN),
     functor(Pred1,FF,NN),
     atomic_invariantsC(Atom),
-    member_cut(Pred1,Atom),!,
+    member(Pred1,Atom),!,
     filterInvars(State,InVars,IsOfSorts,NEs,FState).
 filterInvars([Pred|State],InVars,IsOfSorts,NEs,[Pred|FState]):-
     filterInvars(State,InVars,IsOfSorts,NEs,FState).
@@ -1618,7 +1619,7 @@ is_statics(Pred):-
     functor(Pred,FF,NN),
     functor(Pred1,FF,NN),
     atomic_invariantsC(Atom),
-    member_cut(Pred1,Atom),!.
+    member(Pred1,Atom),!.
 
 /************ state changes by actions ********/
 % on the condition that:
@@ -2807,7 +2808,7 @@ ground_op :-
 	enumerateOps,
 	instOps,
 	flag(opCounter,Top,Top),
-	write(opCounter = Top),nl.
+	write(opCounter = Top),nl,!.
 
 enumerateOps :-
 	flag(opCounter,_,1),

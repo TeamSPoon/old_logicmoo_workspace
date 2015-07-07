@@ -188,8 +188,7 @@ planner_task(5,
     % Goals
     [
      se(robot,tom,[robot_in(tom,room5)]),
-     se(box,box2,[in_room(box2,room6)]),
-     se(box,box2,[at_door(box2,door56,room6)]),
+     se(box,box2,[in_room(box2,room6),at_door(box2,door56,room6)]),
      se(box,big_box,[in_room(big_box,room1)])],
     % INIT States
     [
@@ -197,4 +196,3 @@ planner_task(5,
      ss(box,box1,[in_room(box1,room2),at_door(box1,door25,room2)]),
      ss(box,box2,[in_room(box2,room6)]),
      ss(box,big_box,[in_room(big_box,room4),at_door(big_box,door24,room4)])]).
-
