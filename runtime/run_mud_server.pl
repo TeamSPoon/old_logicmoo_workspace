@@ -53,7 +53,7 @@ user:file_search_path(prologmud, library(prologmud)).
 % [Mostly Required] Load the Logicmoo Planner/AI System
 :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner)))).
 
-end_of_file.
+:-if( \+ gethostname(c3po )).
 
 % [Required] Load the Logicmoo WWW System
 :- time(ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
@@ -251,4 +251,5 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 
 % So scripted versions don't just exit
 :- if_startup_script(at_start(prolog)).
-   
+
+:- endif.
