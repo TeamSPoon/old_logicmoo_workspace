@@ -1,0 +1,43 @@
+FSAPLANNER Version 1.0: repleased October 2008. The changes are
+
+   - instead of robot programs, plans are represented with edge-labeled finite
+     state automata, where the initial state is state 1 and the final state 0.
+     Due to this change, the plan generation phase does not first search for
+     unwound plans and then wind them, as done in the old KPLANNER, but instead
+     searches directly in the space of finite state automata.
+   - added a new directive "max_state" to indicate the maximum number of states
+   - removed directives for the robot-program representation
+   - split plan generation and output into different predicates
+      . kplan(G):  generate and store a (possibly) loopy plan for goal G
+      . print:     print the stored plan as a table of transitions
+      . save(F):   save the graphical representation of the stored plan
+                   to GNU dot file F.dot and postscript file F.ps
+      . draw:      visualize the stored plan as an edge-labeled DFSA
+      . run(N):    run and print the trace of the stored plan
+                   with planning parameter set to N
+
+KPLANNER Version 1.2:  released May 2008.  The changes are
+
+   - two new directives (replacing "only_one_simple_loop" from 1.1)
+            allow_nested_loops        plans that may have nested loops
+            no_pre_post_actions       plans will consist of just a loop
+   - unwind predicate is completely rewritten and called only after a plan
+        without loops is found for the lower bound
+   - trplan also prints out a number indicating depth during execution
+
+KPLANNER Version 1.1:  released May 2008.  The changes are
+   - conversion to SWI Prolog (from Eclipse Prolog in 1.0)
+   - trplan (which traces plans) now uses okAct, okState to check search hints
+   - new directive only_one_simple_loop to restrict search for a plan
+        consisting of just a single loop, with no actions before or after
+   - impSense redefined not to include the following clause
+        impSense(A,R,H) :- causes(A,R,_,_,C), kTrue(neg(C),H).
+   - trivAct changed to test for actions that sense and cause change
+        trivAct(A,[o(A,R)|_]) :- prim_action(A,[_,_|_]), 
+                                  \+ causes(A,R,_,_,_).
+   - small optimization to this clause in the unwind predicate:
+        replNoExit(next,X,_,Q) :- \+ X=loop(next,_), (X=Q ; unwind(X,Q)).
+   - small optimization to repl predicate:
+        changed the order of two clauses.
+
+KPLANNER Version 1.0:  original release, Dec 2004. 

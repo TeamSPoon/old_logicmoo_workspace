@@ -1,0 +1,250 @@
+(define (state0)
+    (= (tick) 0)
+    (opened corridor)
+    (connects d1 c1 r1)
+    (connects d1 r1 c1)
+    (connects d12 r1 r2)
+    (connects d12 r2 r1)
+    (connects d23 r2 r3)
+    (connects d23 r3 r2)
+    (connects d34 r3 r4)
+    (connects d34 r4 r3)
+    (connects d4 c4 r4)
+    (connects d4 r4 c4)
+    (connects corridor c1 c4)
+    (connects corridor c4 c1)
+    (door d1)
+    (door d12)
+    (door d23)
+    (door d34)
+    (door d4)
+    (object o1)
+    (object o2)
+    (object o3)
+    (object o4)
+    (at o1 r1)
+    (at o2 r2)
+    (at o3 r1)
+    (at o4 r1)
+    (at robot c1)
+    (handempty)
+    (opened d1)
+    (opened d12)
+    (opened d23)
+    (opened d34)
+    (opened d4)
+)
+
+(define (state1)
+    (= (tick) 0)
+    (opened corridor)
+    (connects d1 c1 r1)
+    (connects d1 r1 c1)
+    (connects d12 r1 r2)
+    (connects d12 r2 r1)
+    (connects d23 r2 r3)
+    (connects d23 r3 r2)
+    (connects d34 r3 r4)
+    (connects d34 r4 r3)
+    (connects d4 c4 r4)
+    (connects d4 r4 c4)
+    (connects corridor c1 c4)
+    (connects corridor c4 c1)
+    (door d1)
+    (door d12)
+    (door d23)
+    (door d34)
+    (door d4)
+    (object o1)
+    (object o2)
+    (object o3)
+    (object o4)
+    (at o1 r1)
+    (at o2 r2)
+    (at o3 r1)
+    (at o4 r1)
+    (at robot c1)
+    (handempty)
+    (closed d1)
+    (closed d12)
+    (closed d23)
+    (closed d34)
+    (closed d4)
+)
+
+
+
+(set-goal-type extended)
+
+(define goal0 (eventually (always (at robot r4))))
+(define goal1 (eventually (always (at o1 r4)))) 
+(define goal2 (eventually 
+		 (and (at o1 r2) 
+		      (next 
+		       (eventually (at o1 r4))))))
+
+(define goal3 (eventually 
+		 (and (at o1 r2) 
+		      (next 
+		       (eventually (and (at o1 r4)
+					(next (eventually (at o1 c1)))))))))
+
+(define c3 (always (and (forall (?o) (object ?o) (implies (holding ?o) (= ?o o1)))
+			(forall (?d) (door ?d) (opened ?d)))))
+
+(define c4 (always (implies (handempty)
+			    (not (exists (?d ?x ?y) 
+					(connects ?d ?x ?y) 
+					(and (at robot ?x) (next (at robot ?y)) (next (next (at robot ?x)))))))))
+	
+;(define c4 (true))				
+
+(define c5 (and c3 c4))
+
+(define c6 (always (and (forall (?o) (object ?o) (implies (holding ?o) (= ?o o1)))
+			(forall (?d) (door ?d) (opened ?d)))))
+
+
+
+
+(define g4 (eventually 
+		 (and (at o1 r2) 
+		      (next 
+		       (eventually (and (at o1 r4)
+					(next (eventually (and (at o1 c1)
+						   (next (eventually (at o1
+		 r3))))))))))))
+
+(define goal4 (and (g4) (c3)))
+
+(define g5 (eventually 
+		 (and (at o1 r2) 
+		      (next 
+		       (eventually (and (at o1 r4)
+					(next (eventually (and (at o1 c1)
+						   (next (eventually (and (at o1 r3)
+							      (next (eventually (at o1 c4)))))))))))))))
+
+(define goal5 (and (g5) (c3)))
+
+(define g6 (eventually 
+		 (and (at o1 r2) 
+		      (next 
+		       (eventually (and (at o1 r4)
+					(next (eventually (and (at o1 c1)
+						   (next (eventually (and (at o1 r3)
+							      (next (eventually (and (at o1 c4)
+									 (next
+		 (eventually (at o1 r2))))))))))))))))))
+
+(define goal6 (and (g6) (c3)))
+
+
+(define c7 (always (and (forall (?o) (object ?o) (implies (holding ?o) (or (= ?o o1) (= ?o o2))))
+			(forall (?d) (door ?d) (opened ?d)))))
+
+
+(define g7 (eventually 
+		 (and (at o1 r2) 
+		      (next 
+		       (eventually (and (at o1 r4)
+					(next (eventually (and (at o1 c1)
+						   (next (eventually (and (at o2 r3)
+							      (next (eventually (and (at o2 c2)
+									 (next (eventually (at o2 r2))))))))))))))))))
+
+(define goal7 (and (g7) (c7)))
+
+
+(define c8 (always (forall (?d) (door ?d) (opened ?d))))
+
+
+(define g8 (eventually 
+		 (and (at o1 r2) 
+		      (next 
+		       (eventually (and (at o1 r4)
+					(next (eventually (and (at o2 c1)
+						   (next (eventually (and (at o3 r3)
+							      (next (eventually (and (at o4 c4)
+									 (next
+		 (eventually (at o1 r2))))))))))))))))))
+
+(define goal8 (and (g8) (c8)))
+
+
+(define g9 (eventually (and (at o1 r2) (next 
+	(eventually (and (and (at o1 r4) (at o2 r4)) 
+			 (next (eventually (and
+					    (and (at o1 c1) (at o2 c1))
+					    (next (eventually (and  (at o3 r3) (next (eventually (and (at o4 c2) (next (eventually (at o1 r2))))))))))))))))))
+
+
+(define goal9 (and (g9) (c8)))
+
+; 10 ((at o1 r2) (and (at o1 r4) (at o2 r4)) (and (at o1 c1) (at o2 c1)) (and (at o1 r3) (at o3 r3)) (at o4 c2) (at o1 r2))))
+
+(define g10 (eventually (and (at o1 r2) (next 
+	(eventually (and (and (at o1 r4) (at o2 r4)) 
+			 (next (eventually (and (and (at o1 c1) (at o2 c1)) 
+						(next (eventually (and (and (at o1 r3) (at o3 r3)) 
+								       (next (eventually (and (at o4 c2) 
+											      (next (eventually (at o1 r2))))))))))))))))))
+
+(define goal10 (and (g10) (c8)))
+
+; 11 ((at o1 r2) (and (at o1 r4) (at o2 r4)) (and (at o1 c1) (at o2 c1)) (and (at o1 r3) (at o3 r3)) (and (at o1 c2) (at o4 c2)) (at o1 r2))))
+
+(define g11 (eventually (and (at o1 r2) (next 
+	(eventually (and (and (at o1 r4) (at o2 r4)) 
+			 (next (eventually (and (and (at o1 c1) (at o2 c1)) 
+						(next (eventually (and (and (at o1 r3) (at o3 r3))
+								       (next (eventually (and (and (at o1 c2) (at o4 c2))
+											      (next (eventually (and (at o4 c2) 
+														     (next (eventually (at o1 r2)))))))))))))))))))))
+
+
+(define goal11 (and (g11) (c8)))
+
+
+; 12 ((at o1 r2) (and (at o1 r4) (at o2 r4) (at o3 r4) (at o4 r4)) (and (at o1 c1) (at o2 c1) (at o3 c1) (at o4 c1)))))
+
+(define g12 (eventually (and (at o1 r2) (next 
+	(eventually (and (and (at o1 r4) (at o2 r4)) 
+			 (next (eventually (and (and (at o1 r4) (at o2 r4) (at o3 r4) (at o4 r4))
+						(next (eventually (and (at o1 c1) (at o2 c1) (at o3 c1) (at o4 c1)))))))))))))
+
+
+(define goal12 (and (g12) (c8)))
+
+; 13 ((at o1 r2) (and (at o1 r4) (at o2 r4) (at o3 r4) (at o4 r4)) (and (at o1 c1) (at o2 c1) (at o3 c1) (at o4 c1))  (and (at o1 r1) (at o2 r1) (at o3 r1) (at o4 r1)))))
+
+(define g13 (eventually (and (at o1 r2) (next 
+	(eventually (and (and (at o1 r4) (at o2 r4)) 
+			 (next (eventually (and (and (at o1 r4) (at o2 r4) (at o3 r4) (at o4 r4))
+						(next (eventually (and (and (at o1 c1) (at o2 c1) (at o3 c1) (at o4 c1))
+								       (next (eventually (and (at o1 r1) (at o2 r1) (at o3 r1) (at o4 r1))))))))))))))))
+
+(define goal13 (and (g13) (c8)))
+
+; 14 ((at o1 r2) (and (at o1 r4) (at o2 r4) (at o3 r4) (at o4 r4)) (and (at o1 c1) (at o2 c1) (at o3 c1) (at o4 c1))  (and (at o1 r1) (at o2 r1) (at o3 r1) (at o4 r1))  (and (at o1 r3) (at o2 r3) (at o3 r3) (at o4 r3)))
+
+(define g14 (eventually (and (at o1 r2) (next 
+	(eventually (and (and (at o1 r4) (at o2 r4)) 
+			 (next (eventually (and (and (at o1 r4) (at o2 r4) (at o3 r4) (at o4 r4))
+						(next (eventually (and (and (at o1 c1) (at o2 c1) (at o3 c1) (at o4 c1))
+								       (next (eventually (and (and (at o1 r1) (at o2 r1) (at o3 r1) (at o4 r1))
+											      (next (eventually (and (at o1 r3) (at o2 r3) (at o3 r3) (at o4 r3)))))))))))))))))))
+
+(define goal14 (and (g14) (c8)))
+
+
+(define c1-2 (always (forall (?o) (object ?o) (implies (holding ?o) (= ?o o1)))))
+(define (goal1-2)
+   (and (always 
+	 (forall (?d) (door ?d)		 
+		 (implies 
+		  (and (closed ?d)	
+		       (next (opened ?d)))
+		  (next (next (next (closed ?d)))))))
+	(eventually (always (and (at robot c1) (at obj2 r4))))))
+

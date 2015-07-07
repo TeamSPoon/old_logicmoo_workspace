@@ -382,11 +382,11 @@ errx:-debugOnError((assert_if_new(tlbugger:dont_skip_bugger),do_gc,dumpST(10))),
 
 % false = use this wrapper, true = code is good and avoid using this wrapper
 :- export(skipWrapper/0).
-skipWrapper:-!,fail.
+%skipWrapper:-!,fail.
 skipWrapper:- tracing,\+tlbugger:rtracing.
 skipWrapper:- tlbugger:dont_skip_bugger,!,fail.
-skipWrapper:- 0 is random(5),!.
-skipWrapper:- tlbugger:skipMust,!.
+% skipWrapper:- 0 is random(5),!.
+% skipWrapper:- tlbugger:skipMust,!.
 skipWrapper:- tlbugger:skip_bugger,!.
 
 % false = hide this wrapper
@@ -481,10 +481,16 @@ not_is_release :- 1 is random(4).
 badfood(MCall):- numbervars(MCall,0,_,[functor_name('VAR_______________________x0BADF00D'),attvar(bind),singletons(true)]),dumpST.
 
 % -- CODEBLOCK
+:- export(without_must/1).
+:-meta_predicate(without_must(0)).
+
+without_must(G):- with_assertions(tlbugger:skipMust,G).
+
+% -- CODEBLOCK
 :- export(must/1).
 :-meta_predicate (must(0)).
 
-%must(C):-  tlbugger:skipMust,!,catch(C,E,(wdmsg(E:C),fail)).
+must(C):-  tlbugger:skipMust,!,debugOnError0(C).
 %must(MCall):- skipWrapper,!, (MCall *-> true ; ((dmsg(failed(must(MCall))),trace,MCall))).
 %must(C):-  tlbugger:skipMust,!,catch(C,E,(wdmsg(E:C),fail)).
 

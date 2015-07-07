@@ -1,0 +1,11 @@
+These files were used to evaluate the performance of our approach+FF/FFx
+against tlplan. In both Logistics and ZenoTravel domains problems have
+names p*.pl. 
+
+However, in the Robots domains, there are three types of
+problems. Some of these where used in the comparison agains Kabanza's
+& Thiebaux  extension of tlplan (pkt*.pl). Not all problems were actually
+included in the ICAPS/AAAI papers. The file exps.xls contains more
+details.
+
+

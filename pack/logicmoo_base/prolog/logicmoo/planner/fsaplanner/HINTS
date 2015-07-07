@@ -1,0 +1,58 @@
+To help in constructing new planning examples, here are some guidelines:
+
+1. Encode the action theory you are interested in in terms of prim_fluent,
+   prim_action, init, causes, senses and rejects (as described in TUTORIAL)
+   and in the case of loops, parm_fluent and init_parm.  Try "kplan(aGoal)".
+   If this just works (which is somewhat unlikely), you're done.
+
+2. Type in the solution plan that you were hoping to see generated as a list
+   of transitions of the form
+     trans(S,A,R,S1)
+   meaning "after executing action A in state S and obtaining sensing result R,
+   the current state becomes S1." For convenience, put it in the file, e.g.,
+     myplan(P) :- P=[trans(1,look,up,2),trans(1,look,down,0),trans(...),...].
+   Note: state 1 is always the initial state and 0 the only final state.
+   You can print a plan with "pp(somePlan)", so the goal "myplan(P), pp(P)"
+   should now work.  Now try the goal "myplan(P),tstLarge(someGoal,P)."
+   If this succeeds, then the action theory is likely correct, but you cannot
+   generate the program you hoped for.  Go to Step 5.
+
+3. If your program does not test correctly on the large values of the
+   parameter fluents, you need to debug your theory.  For convenience, do
+   "iniSet(test)" to initialize fluents to their large values, and do the goal
+   "myplan(P), trplan(someGoal,P)" which will execute the plan, printing out
+   as it goes.  You will be able to see where it stops. If this does not give
+   enough information, try "myplan(P), trace(tplan(someGoal,P))" which will
+   execute the plan using the Prolog debugger.  This is quite tedious.
+
+4. At some point, you will likely see that some action that was supposed to
+   execute could not, or that some fluent that was supposed to have some value
+   did not.  Either way, you need to be able to track down the values of
+   fluents and the truth values of conditions.  You can evaluate
+   "mval(fluent,value,history)" or "mTrue(condition,history)".  Remember that
+   fluents have multiple possible values.  Histories should be a list of items
+   of the form "o(primAction,sensingResult)".  A pain to type in by hand. Only
+   go on to Step 5 when the goal "myplan(P), tstLarge(someGoal,P)" works.
+
+5. There are two main ways a theory can fail to generate the winning plan. In
+   the first case, the theory generates too many plans, but none of them pass
+   the test; this is indicated by many "x"s in the output. To confirm this,
+   put in some filtering directives "good_action", "good_state" or "max_state"
+   to get the numbers down.  With strong enough hints like this,
+   "kplan(someGoal)" should now eventually work.  Play with the hints to find
+   an acceptable compromise.
+
+6. The second possibility is that the theory fails to generate anything that
+   passes the grade even for the small values of the fluents.  Check the
+   settings of the small values of the fluent by doing "iniSet(generate)" and
+   then do "myplan(P), trplan(someGoal,P)" as in Step 3, until this succeeds.
+
+7. If this all works, then you have to trace the plan generation itself.
+   First do "iniSet(generate)" to use the small values.  Then assuming the
+   plan has depth k, evaluate
+     trace(dfplan(someGoal,k,[],[],P,1,2,_)), pp(P).
+   Watch for "okAction" goals since these are the actions proposed by the
+   plan generator for the plans.  Anytime a goal like this appears but
+   succeeds with an action that is not what is expected in P, cause it to fail
+   and generate another alternative.  Stick with this until the plan generator
+   deviates from what it should do.  Fix.

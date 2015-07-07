@@ -1,0 +1,90 @@
+(clear-world-symbols)			;Remove old domain symbols
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 1. The world symbols.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(declare-described-symbols
+ (predicate at 2)
+ (predicate connects 3)
+ (predicate opened 1)
+ (predicate closed 1)
+ (predicate door 1)
+ (predicate holding 1)
+ (predicate object 1)
+ (predicate handempty 0)
+ (function tick 0))
+
+;;
+;; Control formulae
+
+(define (control-1)  
+  (always
+   (forall (?x) (clear ?x)
+	   (implies (goodtower ?x) (next (goodtowerabove ?x))))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 4. The Operators
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+  
+(def-adl-operator (open ?x0)  
+  (pre (?x0) 
+       (door ?x0) 
+       (?x1 ?x2) 
+       (connects ?x0 ?x1 ?x2)
+       (and (closed ?x0)
+	    (at robot ?x1))) 
+		     
+  (add (opened ?x0))
+  (del (closed ?x0)))
+
+(def-adl-operator (close ?x0)
+  (pre (?x0) (door ?x0)
+       (?x1 ?x2) (connects ?x0 ?x1 ?x2)
+       (and (at robot ?x1)
+	    (opened ?x0)))
+  
+  (add (closed ?x0))
+  (del (opened ?x0)))
+
+(def-adl-operator (grasp ?x0)
+  (pre (?x0) 
+       (object ?x0)
+       (and (handempty)
+	    (exists (?x1)
+		    (at robot ?x1)
+		    (at ?x0 ?x1))))
+		    
+  (add (+= (tick) 1))  
+  (add (holding ?x0))
+  (del (handempty)))
+
+(def-adl-operator (release ?x0)
+  (pre (?x0) (holding ?x0))
+	    
+  (del (holding ?x0))
+  (add (handempty)))
+
+
+(def-adl-operator (move ?x0 ?x1) 
+  (pre (?x0) (at robot ?x0) 
+       (?x2) (opened ?x2)
+       (?x1) (connects ?x2 ?x0 ?x1))
+  
+  (add (at robot ?x1))
+  (del (at robot ?x0))
+
+  (forall (?x2)
+	  (holding ?x2)
+	  (add (at ?x2 ?x1)))
+  
+  (forall (?x2)
+	  (holding ?x2)
+	  (del (at ?x2 ?x0)))
+  )
+
+;;; functions
+

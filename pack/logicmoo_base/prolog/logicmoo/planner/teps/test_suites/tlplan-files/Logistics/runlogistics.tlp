@@ -1,0 +1,80 @@
+(load-file "logisticsworld.tlp")
+(load-file "logisticsproblems.tlp")
+(set-initial-world (init1))
+(set-search-strategy breadth-first)
+(set-goal (and (goal1) (control0) (control-only6) (control2)))
+(plan)   ; yes
+(set-goal (and (goal2) (control0) (control-only6) (control2)))
+(plan)   ; yes
+(set-goal (and (goal3) (control0) (control-only6) (control2)))
+(plan)   ; yes
+(set-goal (and (goal4) (control0) (control-only6) (control2)))
+(plan)   ; no
+(set-goal (and (goal5) (control0) (control-only6) (control2)))
+(plan)    ; no
+
+(set-goal (and (goal5) (control0) (control-only6) (control2)))
+(plan)    ; no
+
+(set-goal (and (goal6) (control0) (control-only36) (control2)))
+(plan)    ; yes
+
+(set-goal (and (goal6a) (control0) (control-only36) (control2)))
+(plan)    ; yes
+
+(set-goal (and (goal6b) (control0) (control-only236) (control2)))
+(plan)   ;no
+
+
+; plane 2 must visit every airport
+
+(set-goal (and (goal7) (control0) (control2)))
+(plan)    ;yes
+
+(set-goal (and (goal7a) (control0) (control-only236) (control2)))
+(plan)     ;no
+
+
+(set-goal (and (goal8) (control0) (control2)))
+(plan)    ;yes (a lot of time)
+
+
+(set-goal (and (goal9) (control0) (control2)))
+(plan)    ; yes 
+
+
+(set-goal (and (goal10) (control0) (control-only6) (control2)))
+(plan)    ; yes
+
+
+(set-goal (and (goal11) (control0) (control-only6) (control2)))
+(plan) ; yes 
+
+(set-goal (and (goal12) (control0) (control-only6) (control2)))
+(plan) ; yes  
+
+(set-goal (and (goal12a) (control0) (control-only6) (control2)))
+(plan) ; no 
+
+
+(set-goal (and (goal13) (control0) (control-only6) (control2)))
+(plan) ; no
+
+
+(set-goal (and (goal14) (control0) (control-only6) (control2)))
+(plan) ; yes
+
+(set-goal (and (goal15) (control0) (control-only6) (control2)))
+(plan) ; yes
+
+(set-goal (and (goal16) (control0) (control2)))
+(plan) ; no
+
+(set-goal (and (goal17) (control0) (control-only6) (control2)))
+(plan) ; yes
+
+(set-goal (and (goal18) (control0) (control-only6) (control2)))
+(plan) ; yes
+
+(set-goal (and (goal19) (control0) (control-only6) (control2)))
+(plan) ; yes

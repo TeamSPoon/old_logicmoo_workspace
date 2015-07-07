@@ -41,21 +41,182 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
   - logicmoo
     + candc
       + working
-    - mpred
+    + mpred
     + mpred_online
     + osnark
     - planner
+      + benchmarks
+        + airport
+        + airport-adl
+        + assembly
+        + barman-opt11-strips
+        + barman-sat11-strips
+        + blocks
+        + depot
+        + driverlog
+        + elevators-opt08-strips
+        + elevators-opt11-strips
+        + elevators-sat08-strips
+        + elevators-sat11-strips
+        + floortile-opt11-strips
+        + floortile-sat11-strips
+        + freecell
+        + grid
+        + gripper
+        + logistics00
+        + logistics98
+        + miconic
+        + miconic-fulladl
+        + miconic-simpleadl
+        + movie
+        + mprime
+        + mystery
+        + no-mprime
+        + no-mystery
+        + nomystery-opt11-strips
+        + nomystery-sat11-strips
+        + openstacks
+        + openstacks-opt08-adl
+        + openstacks-opt08-strips
+        + openstacks-opt11-strips
+        + openstacks-sat08-adl
+        + openstacks-sat08-strips
+        + openstacks-sat11-strips
+        + openstacks-strips
+        + optical-telegraphs
+        + parcprinter-08-strips
+        + parcprinter-opt11-strips
+        + parcprinter-sat11-strips
+        + parking-opt11-strips
+        + parking-sat11-strips
+        + pathways
+        + pathways-noneg
+        + pegsol-08-strips
+        + pegsol-opt11-strips
+        + pegsol-sat11-strips
+        + philosophers
+        + pipesworld-notankage
+        + pipesworld-tankage
+        + psr-large
+        + psr-middle
+        + psr-small
+        + rovers
+        + satellite
+        + scanalyzer-08-strips
+        + scanalyzer-opt11-strips
+        + scanalyzer-sat11-strips
+        + schedule
+        + sokoban-opt08-strips
+        + sokoban-opt11-strips
+        + sokoban-sat08-strips
+        + sokoban-sat11-strips
+        + storage
+        + tidybot-opt11-strips
+        + tidybot-sat11-strips
+        + tpp
+        + transport-opt08-strips
+        + transport-opt11-strips
+        + transport-sat08-strips
+        + transport-sat11-strips
+        + trucks
+        + trucks-strips
+        + visitall-opt11-strips
+        + visitall-sat11-strips
+        + woodworking-opt08-strips
+        + woodworking-opt11-strips
+        + woodworking-sat08-strips
+        + woodworking-sat11-strips
+        + zenotravel
       + bkwld_pddl_parser
       + Blocks_world
       + domains
         + failing_or_too_slow
         + others
-        - sanity
-      - frolog
+        + sanity
+      + domains_ocl
+        + icons
+        + library
+      + elearning
+      + frolog
+      + fsaplanner
+      + gipo
+      + golog
+        + Delivery
+        - Main
+      + hakank-pddl
+      + hsp-planners-master
+        + hsp-1.12
+          + docs
+          + parser
+          + pddl
+            + aips98
+              + round1
+                + gripper
+                + logistics
+                + movie
+                + mprime
+                + mystery
+              + round2
+                + grid
+                + logistics
+                + mprime
+            + blocks-world
+            + blocks-world2
+            + briefcase
+            + ferry
+            + gripper
+            + hanoi
+            + logistics
+            + logistics2
+            + meet-pass
+            + monkey
+            + morris
+            + movie
+            + rockets
+            + tire-world
+            + tire-world2
+            + travel
+          + planner
+          + utils
+        + hsp2-1.0
+          + bin
+          + examples
+            + blocks
+            + driverlog
+            + elevators
+            + freecell
+            + grid
+            + logistics00
+            + logistics98
+            + mprime
+            + openstacks
+            + parcprinter-strips
+            + pegsolitaire
+            + pipesworld-notankage
+            + pipesworld-tankage
+            + rovers
+            + satellite
+            + scananalyzer
+            + sokoban
+            + tpp
+            + transport
+            + woodworking-strips
+            + zenotravel
+          + planner
+        + hspr-1.02
+          + docs
+          + parser
+          + pddl
+            + blocks-world
+            + logistics
+            + logistics-round2-aips98
+            + others
+          + planner
+          + utils
       + hyhtn
       + ipc2008-no-cybersec
-        - netben-opt
-          - crewplanning-numeric
+        + netben-opt
+          + crewplanning-numeric
           + elevators-numeric
           + elevators-strips
           + openstacks-adl
@@ -64,8 +225,8 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
           + pegsol-strips
           + transport-numeric
           + woodworking-numeric
-        - seq-opt
-          - elevators-strips
+        + seq-opt
+          + elevators-strips
           + openstacks-adl
           + openstacks-strips
           + parcprinter-strips
@@ -77,22 +238,56 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
         + seq-sat
           + elevators-strips
           + openstacks-adl
-          - openstacks-strips
+          + openstacks-strips
           + parcprinter-strips
-          - pegsol-strips
+          + pegsol-strips
       + misc_planner
       + orig_pddl_parser
         + charts
         + docs
         + output
         + test
-          - blocks
+          + blocks
           + elevators
-          - gripper
-          - hanoi
+          + gripper
+          + hanoi
+      + primaryobjects_strips
+        + aircargo
+        + blocksworld1
+        + blocksworld2
+        + blocksworld3
+        + blocksworld4
+        + blocksworld5
+        + cake
+        + dinner
+          + images
+        + dockworkerrobot
+        + problem1
+        + problem2
+        + rubikscube
+        + starcraft
+          + images
       + Rakiduam07
         + continuos
         + socket_udp
+      + regression-tests
+      - teps
+        - foTranslator
+          - domains
+            + robot
+            + zenotravel
+        + propTranslator
+          - domains
+            - robot
+        + test_suites
+          + tlplan-files
+            - Logistics
+            + Robot
+            + ZenoTravel
+          - translator-files
+            + Logistics
+            + Robot
+            + ZenoTravel
     + plarkc
     + pttp
     + swish_lib
@@ -135,6 +330,8 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
     + tools
     + util
   + theorist
+  + toychr-3.1
+    + examples
   + trill
     + probabilistic
   + xray
@@ -1181,7 +1378,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
             + TISdefs
 - pack\prologmud\PrologMUD.vpj
   - prolog
-    + prologmud
+    - prologmud
       - actions
       - mobs
         - affordance
@@ -1919,29 +2116,77 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
               + swi
               + trace
               + xref
-scroll:27
+scroll:0
 [State]
-SCREEN: 1920 1080 -100 66 1919 1004 0 0 M 0 0 0 0 1352 622
-CWD: X:\devel\LogicmooDeveloperFramework\PrologMUD\NARITIVE
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\pddl_robert_sasak.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.23019 CL=76 LE=0 CX=75 CY=28 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.605\strips-mutex\strips\grammar\grammar-problem.txt"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1154 424 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
-BUFFER: BN="C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.605\strips-mutex\strips\grammar\grammar-problem.txt"
-VIEW: LN=.597 CL=35 LE=0 CX=34 CY=13 WI=116 BI=16 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1154 424 -1 -1 M  WF=0 WT=9 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\pddl_robert_sasak.pl"
-VIEW: LN=.23808 CL=33 LE=0 CX=32 CY=26 WI=121 BI=5 HT=0 HN=0 HF=0 HC=4
+SCREEN: 1920 1080 1 0 1919 1004 0 0 N 0 0 0 0 1475 614
+CWD: D:\Office\SlickEdit\win
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\gipo\ocl2pddl.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\gipo\onprecede"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.604 CL=25 LE=0 CX=24 CY=25 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\gipo\Forward.swi"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\gipo\ob_utils.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.436 CL=2 LE=0 CX=1 CY=19 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\fsaplanner\fsaplanner.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.520 CL=73 LE=0 CX=72 CY=17 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\regression-tests\issue34-problem.pddl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\regression-tests\issue49-orig-domain.pddl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.86426 CL=2 LE=0 CX=1 CY=33 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\fsaplanner\ktrue.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.330 CL=87 LE=0 CX=86 CY=9 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\fsaplanner\TUTORIAL"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.3471 CL=79 LE=0 CX=78 CY=23 WI=5 BI=20 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\regression-tests\issue7-problem.pddl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1277 416 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\fsaplanner\TUTORIAL"
+VIEW: LN=.3471 CL=79 LE=0 CX=78 CY=23 WI=115 BI=20 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1277 416 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\fsaplanner\ktrue.pl"
+VIEW: LN=.330 CL=87 LE=0 CX=86 CY=9 WI=116 BI=19 HT=0 HN=0 HF=0 HC=4
+WINDOW: 198 198 1277 416 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\regression-tests\issue49-orig-domain.pddl"
+VIEW: LN=.86426 CL=2 LE=0 CX=1 CY=33 WI=132 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1277 416 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\regression-tests\issue34-problem.pddl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=130 BI=18 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1277 416 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\fsaplanner\fsaplanner.pl"
+VIEW: LN=.520 CL=73 LE=0 CX=72 CY=17 WI=128 BI=24 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1277 416 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\gipo\ob_utils.pl"
+VIEW: LN=.436 CL=2 LE=0 CX=1 CY=19 WI=122 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1277 416 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\gipo\Forward.swi"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=124 BI=22 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1277 416 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\gipo\onprecede"
+VIEW: LN=.604 CL=25 LE=0 CX=24 CY=25 WI=126 BI=5 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1277 416 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\gipo\ocl2pddl.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=118 BI=15 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1277 416 -1 -1 M  WF=0 WT=1 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\regression-tests\issue7-problem.pddl"
+VIEW: LN=.1023 CL=15 LE=0 CX=14 CY=24 WI=134 BI=21 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-pack\logicmoo_base\prolog\logicmoo\planner\frolog\hintproblem.PDDL
-pack\logicmoo_base\prolog\logicmoo\planner\frolog\tPddlAgent01-domain.pddl
-pack\logicmoo_base\prolog\logicmoo\planner\frolog\tPddlAgent02-domain.pddl
-pack\logicmoo_base\prolog\logicmoo\planner\frolog\parseDomain.pl
-pack\logicmoo_base\prolog\logicmoo\planner\frolog\README.txt
-pack\logicmoo_base\prolog\logicmoo\planner\frolog\tPddlAgent02.pddl
-pack\logicmoo_base\prolog\logicmoo\planner\frolog\tPddlAgent01.pddl
-C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.605\strips-mutex\strips\grammar\grammar-problem.txt
-pack\logicmoo_base\prolog\logicmoo\planner\pddl_robert_sasak.pl
+pack\logicmoo_base\prolog\logicmoo\planner\gipo\onprecede
+pack\logicmoo_base\prolog\logicmoo\planner\gipo\Forward.swi
+pack\logicmoo_base\prolog\logicmoo\planner\gipo\ob_utils.pl
+pack\logicmoo_base\prolog\logicmoo\planner\fsaplanner\fsaplanner.pl
+pack\logicmoo_base\prolog\logicmoo\planner\regression-tests\issue34-problem.pddl
+pack\logicmoo_base\prolog\logicmoo\planner\regression-tests\issue49-orig-domain.pddl
+pack\logicmoo_base\prolog\logicmoo\planner\fsaplanner\ktrue.pl
+pack\logicmoo_base\prolog\logicmoo\planner\fsaplanner\TUTORIAL
+pack\logicmoo_base\prolog\logicmoo\planner\regression-tests\issue7-problem.pddl

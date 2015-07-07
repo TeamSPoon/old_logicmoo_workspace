@@ -173,7 +173,7 @@ semweb_startup_late:- cp_server:attach_account_info.
 
 % semweb_startup_late:- debug(http_request(_)),debug(cm(_)),debug(swish(_)),debug(storage).
 semweb_startup_late:- listing(pre_http_location/3).
-semweb_startup_late:- listing(location/3).
+semweb_startup_late:- listing(http:location/3).
 semweb_startup_late:- ensure_webserver.
 
 ensure_webserver :- thread_property(_,alias('httpd@3020_1')),!.

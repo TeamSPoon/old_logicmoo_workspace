@@ -1,0 +1,83 @@
+(clear-world-symbols)			;Remove old domain symbols
+
+
+(declare-described-symbols
+ (predicate aircraft 1)
+ (predicate person 1)
+ (predicate city 1)
+ (predicate flevel 1)
+ (predicate at 2)
+ (predicate in 2)
+ (predicate fuel-level 2)
+ (predicate thenext 2)
+)
+
+
+(declare-defined-symbols
+ (predicate empty 1))
+
+(def-defined-predicate (empty ?t)
+  (not (exists (?x) (in ?x ?t))))
+
+(def-adl-operator (board ?p ?a ?c)
+  (pre (?a ?c) (at ?a ?c)
+       (?p) (at ?p ?c)
+       (and (aircraft ?a) (person ?p) (city ?c)))
+
+  (del (at ?p ?c))
+  (add (in ?p ?a))
+)
+
+(def-adl-operator (debark ?p ?a ?c)
+  (pre (?a ?c) (at ?a ?c)
+       (?p) (in ?p ?a)
+       (and (aircraft ?a) (person ?p) (city ?c)))
+  (del (in ?p ?a))
+  (add (at ?p ?c))
+)
+
+(def-adl-operator (fly ?a ?c1 ?c2 ?l1 ?l2)
+  (pre (?a) (aircraft ?a)
+       (?c1) (city ?c1)
+       (?l1) (flevel ?l1)
+       (?l2) (flevel ?l2)
+       (?c2) (city ?c2)
+       (and (at ?a ?c1) (fuel-level ?a ?l1) 
+	    (thenext ?l2 ?l1) (aircraft ?a)))
+  (del (at ?a ?c1))
+  (del (fuel-level ?a ?l1))
+  (add (at ?a ?c2))
+  (add (fuel-level ?a ?l2))
+)
+
+; (def-adl-operator (zoom ?a ?c1 ?c2 ?l1 ?l2 ?l3)
+;    (pre (?a ?c1) (at ?a ?c1)
+;         (?l1) (fuel-level ?a ?l1)
+;         (?l2) (thenext ?l2 ?l1)
+;         (?l3) (thenext ?l3 ?l2)
+;         (?c2) (city ?c2)
+;         (aircraft ?a))
+;    (del (at ?a ?c1) (fuel-level ?a ?l1))
+;    (add (at ?a ?c2) (fuel-level ?a ?l3))
+;  ) 
+
+
+ (def-adl-operator (refuel ?a ?c ?l ?l1)
+   (pre (?a) (aircraft ?a)
+	(?l) (flevel ?l)
+	(?l1) (flevel ?l1)
+	(?c) (city ?c)
+	(and (fuel-level ?a ?l) (thenext ?l ?l1) (at ?a ?c)))
+   
+   (del (fuel-level ?a ?l))
+   (add (fuel-level ?a ?l1))
+ 
+ )
+
+
+
+
+
+
+
+

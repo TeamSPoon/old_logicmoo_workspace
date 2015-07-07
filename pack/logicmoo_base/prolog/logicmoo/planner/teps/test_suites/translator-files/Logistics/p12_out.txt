@@ -1,0 +1,59 @@
+
+ff: parsing domain file
+domain 'LOGISTICS' defined
+ ... done.
+ff: parsing problem file
+problem 'P12' defined
+ ... done.
+
+
+
+Cueing down from goal distance:   16 into depth [1]
+                                  15            [1]
+                                  14            [1]
+                                  13            [1]
+                                  12            [1]
+                                  11            [1]
+                                  10            [1][2][3][4][5][6]
+                                   9            [1]
+                                   8            [1]
+                                   7            [1]
+                                   6            [1]
+                                   5            [1]
+                                   4            [1][2]
+                                   3            [1]
+                                   2            [1]
+                                   0            
+
+ff: found legal plan as follows
+
+step    0: LOAD PACKAGE6 TRUCK3 CITY3_1
+        1: DRIVE_TRUCK TRUCK3 CITY3_1 CITY3_2 CITY3
+        2: FLY_AIRPLANE PLANE1 CITY4_2 CITY3_2
+        3: UNLOAD PACKAGE6 TRUCK3 CITY3_2
+        4: LOAD PACKAGE6 PLANE1 CITY3_2
+        5: FLY_AIRPLANE PLANE1 CITY3_2 CITY2_2
+        6: DRIVE_TRUCK TRUCK2 CITY2_1 CITY2_2 CITY2
+        7: UNLOAD PACKAGE6 PLANE1 CITY2_2
+        8: LOAD PACKAGE6 TRUCK2 CITY2_2
+        9: DRIVE_TRUCK TRUCK2 CITY2_2 CITY2_1 CITY2
+       10: UNLOAD PACKAGE6 TRUCK2 CITY2_1
+       11: LOAD PACKAGE6 TRUCK2 CITY2_1
+       12: DRIVE_TRUCK TRUCK2 CITY2_1 CITY2_2 CITY2
+       13: UNLOAD PACKAGE6 TRUCK2 CITY2_2
+       14: LOAD PACKAGE6 PLANE1 CITY2_2
+       15: FLY_AIRPLANE PLANE1 CITY2_2 CITY1_2
+       16: UNLOAD PACKAGE6 PLANE1 CITY1_2
+       17: DRIVE_TRUCK TRUCK1 CITY1_1 CITY1_2 CITY1
+       18: LOAD PACKAGE6 TRUCK1 CITY1_2
+       19: DRIVE_TRUCK TRUCK1 CITY1_2 CITY1_1 CITY1
+       20: UNLOAD PACKAGE6 TRUCK1 CITY1_1
+     
+
+time spent:    0.09 seconds instantiating 108 easy, 1152 hard action templates
+               0.00 seconds reachability analysis, yielding 121 facts and 252 actions
+               0.00 seconds creating final representation with 121 relevant facts
+               0.01 seconds building connectivity graph
+               0.02 seconds searching, evaluating 64 states, to a max depth of 6
+               0.12 seconds total time
+

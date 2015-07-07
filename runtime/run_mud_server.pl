@@ -47,6 +47,13 @@ user:file_search_path(prologmud, library(prologmud)).
 % [Required] most of the Library system should not be loaded with mpred expansion on
 :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 
+% [Required] Load the CYC Network Client and Logicmoo CycServer Emulator (currently server is disabled)
+:- with_no_mpred_expansions(user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api))).
+
+% [Mostly Required] Load the Logicmoo Planner/AI System
+:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner)))).
+
+
 % [Required] Load the Logicmoo WWW System
 :- time(ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
 :- asserta(thlocal:disable_mpred_term_expansions_locally).
@@ -61,14 +68,10 @@ user:file_search_path(prologmud, library(prologmud)).
 % [Required] most of the Library system should not be loaded with mpred expansion on
 :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 
-% [Required] Load the Logicmoo Backchaining Inference System
-:- with_no_mpred_expansions(user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api))).
 
 % [Optional] Load the Logicmoo RDF/OWL Browser System
 %:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(mpred_online/dbase_i_rdf_store)))).
 
-% [Mostly Required] Load the Logicmoo Planner/AI System
-%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_planner)))).
 
 % [Debugging] Normarily this set as 'true' can interfere with debugging
 % :- set_prolog_flag(gc,true).

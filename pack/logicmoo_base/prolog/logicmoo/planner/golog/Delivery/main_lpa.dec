@@ -1,0 +1,130 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FILE: Delivery/main_lpa.dec
+%
+% Legolog delivery robot program
+%
+% This file contains system dependent predicates
+% It is written for LPA DOS-Prolog (http://www.lpa.com/)
+% running under DOS on a HP200LX
+% 
+% WRITTEN BY: Maurice Pagnucco and Hector J. Levesque
+% REVISED: June 15, 2000
+% TESTED: LPA DOS-Prolog 3.83 under DOS on HP200LX
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%                             June 15, 2000
+%
+% This software was developed by the Cognitive Robotics Group under the
+% direction of Hector Levesque and Ray Reiter.
+%
+%        Do not distribute without permission.
+%        Include this notice in any copy made.
+%
+%
+%         Copyright (c) 2000 by The University of Toronto,
+%                        Toronto, Ontario, Canada.
+%
+%                          All Rights Reserved
+%
+% Permission to use, copy, and modify, this software and its
+% documentation for non-commercial research purpose is hereby granted
+% without fee, provided that the above copyright notice appears in all
+% copies and that both the copyright notice and this permission notice
+% appear in supporting documentation, and that the name of The University
+% of Toronto not be used in advertising or publicity pertaining to
+% distribution of the software without specific, written prior
+% permission.  The University of Toronto makes no representations about
+% the suitability of this software for any purpose.  It is provided "as
+% is" without express or implied warranty.
+% 
+% THE UNIVERSITY OF TORONTO DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+% SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+% FITNESS, IN NO EVENT SHALL THE UNIVERSITY OF TORONTO BE LIABLE FOR ANY
+% SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
+% RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+% CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+% CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This is the top-level file for a Legolog program.
+% It consults the necessary Legolog prolog files and
+% defines any additional system-dependent predicates that are required.
+%
+% For this example this file defines the following predicates:
+% -- initializeExog: perform any initialization of other sources of
+%      exogenous actions that is required
+% -- finalizeExog: things to do for other sources of exogenous actions
+%      at end of program
+% -- checkOtherExog(-ExogList): check whether a request has been
+%      entered via keyboard
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CONSULT NECESSARY FILES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Consult Lego subsystem plus IndiGolog interpreter
+
+:- reconsult(..\Main\lego_lpa). % System dependent Prolog/RCX communication
+                                %     predicates
+:- reconsult(..\Main\legorcx).  % Generic Prolog/RCX communication predicates
+:- reconsult(..\Main\golog).    % IndiGolog interpreter
+:- reconsult(delivery).         % Golog delivery program
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MAIN PREDICATE - evaluate this to run demo
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%main: Gets IndiGolog to evaluate main control procedure
+main :- indigolog(control).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PREDICATES WITH SYSTEM DEPENDENT CODE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EXOGENOUS ACTIONS - sources other than RCX
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% initializeExog: Initialization for sources of exogenous actions other
+%     than the RCX
+initializeExog :-
+    crwind('----Golog Status', 8, 0, 15, 78),
+    crwind('----Main', 0, 0, 6, 78),
+    write('WND:', 'Enter exogenous delivery command: +/-(From, To). '),
+    tell('----Golog Status').
+
+% finalizeExog: Things to do for sources of exogenous actions other
+%      than the RCX at end of program
+finalizeExog.                % Nothing to do
+
+% checkOtherExog(-ExogList): Check whether exogenous actions have occurred
+%     other than those detected by the RCX
+checkOtherExog(ExogList) :-
+    checkKeyboardExog(ExogList).
+
+checkKeyboardExog([KbExog]) :-
+    \+ eof('TRM:'),
+    read(Term),
+    ((Term = +(From, To), KbExog = request_delivery(From, To));
+        (Term = -(From, To), KbExog = cancel_request(From, To))),
+    write('WND:', 'Enter exogenous delivery command: +/-(From, To). ').
+   
+checkKeyboardExog([]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MISCELLANEOUS PREDICATES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% LPA doesn't define append
+% append(?A, ?B, ?C): Append lists A and B giving list C
+append([], X, X).
+append([C|X], Y, [C|Z]) :- append(X, Y, Z).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EOF: Delivery/main_lpa.dec
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

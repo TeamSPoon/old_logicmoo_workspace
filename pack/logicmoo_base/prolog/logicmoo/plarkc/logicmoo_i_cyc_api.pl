@@ -2118,6 +2118,7 @@ testCYC:-!.
 isSlot(Var):-var(Var),!.
 isSlot('$VAR'(Var)):-number(Var).
 
+
 isNonCompound(Var):-isSlot(Var),!.
 isNonCompound(Var):-not(compound(Var)),!.
 isNonCompound(svar(_,_)):-!.
@@ -2595,16 +2596,12 @@ sterm_to_pterm([S|TERM],PTERM):-isSlot(S),
             sterm_to_pterm_list(TERM,PLIST),            
             PTERM=..[cycHolds,S|PLIST].
 
-sterm_to_pterm([S|TERM],PTERM):-number(S),!,
-            sterm_to_pterm_list([S|TERM],PTERM).            
-	    
-sterm_to_pterm([S|TERM],PTERM):-nonvar(S),atomic(S),!,
+sterm_to_pterm([S|TERM],PTERM):-atom(S),!,
             sterm_to_pterm_list(TERM,PLIST),            
             PTERM=..[S|PLIST].
 
-sterm_to_pterm([S|TERM],PTERM):-!,  atomic(S),
-            sterm_to_pterm_list(TERM,PLIST),            
-            PTERM=..[cycHolds,S|PLIST].
+sterm_to_pterm(SLIST,PTERM):- is_list(SLIST),!,
+            sterm_to_pterm_list(SLIST,PTERM),!.
 
 sterm_to_pterm(VAR,VAR):-!.
 

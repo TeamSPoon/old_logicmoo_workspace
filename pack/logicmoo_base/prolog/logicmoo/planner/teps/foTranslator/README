@@ -1,0 +1,179 @@
+1. This File
+============
+
+This file describes the use of the translator described in [1]. See file
+LICENSE (included in this bundle) for terms and conditions of use and
+modification.
+
+
+2. System Requirements
+======================
+
+The program requires:
+
+- SWI-Prolog. Available at http://www.swi-prolog.org/
+- Optionally, Graphviz, to visualize the automata. Available at:
+  http://www.graphviz.org/
+
+The program may work with other Prologs but has only been tested with SWI
+prolog.
+
+
+3. Domain Description Language
+==============================
+
+The current version of the translator only handles domains described by
+causal rules in prolog syntax. We hope that future versions will receive PDDL
+files directly as input. 
+
+Domains are defined in a way that resembles PDDL specifications, though. An
+example domain is included in the package. 
+
+The definition of the domains follows the following structure.
+
+3.1. Declaration of fluents and actions
+---------------------------------------
+
+Use the fluent/1 and action/1 predicates to declare fluents (dynamic
+predicates) and actions, respectively. The input to these predicates must be
+terms with uninstantiated arguments. E.g.,
+
+fluent(at(_,_)).     % binary fluent at
+action(move(_,_,_)). % ternary action move 
+fluent(cold).        % propositional fluent cold
+
+
+3.2. Action precondition specification
+--------------------------------------
+
+Use the poss/2 predicate to define preconditions. The first argument should
+be the action term and the second the precondition. The precondition formula
+can be any boolean combination of fluents. (See "Boolean Expressions" section
+below for more details)
+
+Examples:
+	
+poss(close(D),and(door(D),
+                  and(at(robot,X),
+                      and(connects(D,X,Y),
+                          opened(D))))).
+
+expresses it is possible to close D if D is a door that is opened, and there
+exists a location X where the robot is at, which is connected through door D to
+another location Y.
+
+All variables that appear in the condition but that do not appear in the
+action term are implicitly assumed as *existentially* quantified.
+
+
+3.3 Causal rules
+----------------
+
+Causal rules come in two flavours: positive and negative. For any fluent F and
+action A you may want to write a causal rule. 
+
+causes_true(F,A,Cond) specifies that fluent F becomes true after performing
+action A when condition Cond holds in the current state.
+
+causes_false(F,A,Cond) specifies that fluent F becomes false after performing
+action A when condition Cond holds in the current state.
+
+The condition Cond is a boolean expression. (See below for details).
+
+All variables that appear in the condition but that do not appear in the
+action term are implicitly assumed as *existentially* quantified.
+
+All variables that appear in the fluent term but that do not appear in the
+action term are implicitly asssumed as *universally* quantified.
+
+
+3.4 Initial state description
+-----------------------------
+
+Facts that are true in the initial state are specified using the
+intially_true/1 fluent. E.g.
+
+initially_true(at(obj3,r1)).
+
+To generate succinct files you can use prolog routines. E.g.
+
+initially_true(object(X)) :- member(X,[obj1,obj2,obj3,obj4]).
+
+There should not be free varibles in the terms that are arguments to
+initially_true/1.
+
+3.5. Goal description
+---------------------
+
+Use the unary predicate goal to define the goal. The goal expression can be
+any temporal formua. (See below for details.)
+
+
+4. Using the translator
+=======================
+
+The first-order translator generates PDDL outputs. In the output program, the
+automata updates are encoded both in the action's effects and by "derived
+predicates", as described in [1]. The propositional version of this translator
+also generates a PDDL output in which automata updates are encoded only in
+actions effects (i.e., ADL updates only). This type of translation is not
+currently supported by this translator.
+
+To use the translator, run Prolog, and consult the topddl file. (I.e. run
+query "consult(topddl).")
+
+Then, execute query
+
+topddl_dp(<<path>>,<<domain_file>>,<<problem_file>>).
+
+to generate the desired output. <<path>> must be replaced by the path of the
+domain and problem files. <<domain_file>> and <<problem_files>> are the names
+of the output files (with no path). The PDDL output files for the domain and
+the problem will be located at <<path>>.
+
+If you want to visualize the automata that are being generated for your
+goals, just run query "verbose" before invoking "topddl_<<type>>". This needs
+graphviz to be installed and 
+
+
+Example: The following commands generate a derived predicates output for
+problem p1 of the robot domain included in the package.
+
+?- [topddl].
+
+?- topddl_dp('domains/robot/',robot,p1).
+
+
+Appendix
+========
+
+Boolean Expressions
+-------------------
+
+A BNF grammar for boolean expresions (BEXPR) is the following:
+
+BEXPR ::= <fluent-term> | true | false
+BEXPR ::= or(BEXPR,BEXPR) | and(BEXPR,BEXPR) | not(BEXPR)
+BEXPR ::= all(VAR,BEXPR) | exists(VAR,BEXPR)
+
+VAR ::= <lowercase string>
+
+
+Temporal Boolean Expressions (in extended prenex normal form (EPNF))
+----------------------------
+
+EPNF formulae are described by the following grammar
+
+EPNF ::= all(VAR,EPNF) | exists(VAR,EPNF) | TBE
+
+TBE ::= BEXPR | final
+TBE ::= always(TBE) | eventually(TBE) | until(TBE,TBE) | 
+        release(TBE,TBE) | next(TBE)
+
+
+References
+==========
+
+[1] Planning with First-Order Temporally Extended Goals Using Heuristic
+    Search, Baier, J. and McIlraith, S., 2006. Proceedings of the 21st
+    National Conference on Artificial Intelligence (AAAI06), July, Boston, MA 

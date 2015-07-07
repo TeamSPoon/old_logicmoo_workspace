@@ -1,0 +1,217 @@
+       ACTION THEORIES AND FORMULAS:  A TUTORIAL
+       Hector Levesque, 2005
+
+In this document, we will briefly describe a version of action theories and
+formula evaluation.  This is the version used by Indigolog, Kplanner and
+fsaplanner.  See the Indigolog and Kplanner papers for more details.  We use
+Prolog notation: variables are capitalized, "[X|Y]" means the list whose head
+is X and tail is Y, and "_" is used for anonymous variables.
+
+1.  Fluents and Actions
+
+An application domain is described in terms of fluents and actions.  Fluents
+are properties of the world that change as the result of actions.  Here
+fluents are taken to be functional, meaning they are understood to have a
+single value.  So we can have a fluent "temperature", "location(_)" or
+"mother(_)", but not "parent(_)" (which has two values) or "oldest_brother(_)"
+(which may have no values).  To encode relational properties, we use boolean
+fluents (whose values are "true" or "false"), for example, "parent(_,_)".  As
+a matter of terminology, instead of saying something like 'the current value
+of the fluent "location(johnny)"', we simply say 'the current location of
+Johnny'.
+
+Like fluents, actions always have a name, and may include arguments.  So we
+can have an action "carry_to(X,Y)" one of whose preconditions is that X not be
+too heavy, and one of whose effects is to change the location of X to be Y.
+In addition to having preconditions and effects, actions return a sensing
+result.  Some actions have no effects and are only used for the information
+provided by that sensing result.  For example, the "check_weather" action
+might return the value "rainy", "sunny" or "cloudy", but leave the world
+unaffected.  Actions, like "carry_to(_,_)", might provide no useful sensing
+result, and just return some nominal value like "ok" or "true" as the result.
+Most actions will be used either for their physical effects or their sensing
+results but not both.
+
+2. Formulas
+
+In describing an application, we use logical formulas that talk about the
+fluents. For example, "and(location(robot) = outside, temperature > 20)" is a
+formula that is true if the current location of the robot is outside and the
+current temperature exceeds 20.  Formulas are made out of atomic formulas
+using "and", "or", "neg" (for negation), and "some" and "all" (bounded
+quantifiers).  Atomic formulas are arbitrary Prolog goals except that they may
+mention fluents.  They are considered to be true if, after the fluents are
+replaced by their values, Prolog succeeds on the resulting goal.
+
+So to confirm that the formula "temperature > 20" is true where the current
+temperature is 25, we first replace the fluent to get "25 > 20", and then call
+Prolog with the goal, which succeeds.  Similarly, there can be a user-defined
+Prolog predicate "good_temperature(_)" which succeeds on certain temperatures.
+So "good_temperature(temperature)" will be true if the current temperature is
+a good one.  A boolean fluent can be used directly as an atomic formula.
+
+Variables are introduced into formulas using the "all" or "some".  For
+example, "some(x,safe_location(x),close_to(location(robot),x))" is a formula
+that uses two user-defined predicates, "safe_location(_)" and "close_to(_,_)".
+This formula is true if there is a safe location that is close to the current
+location of the robot.  Similarly, "all(x,toy(x), location(x)=outside)" uses a
+user-defined predicate "toy(_)".  This formula is true if all the toys are
+currently located outside.  Note that "some" and "all" take three arguments: a
+variable name, (which is a Prolog atom, and not an uppercase Prolog variable),
+a domain restriction, and a formula.  The domain restriction is not a formula
+(in that it cannot use the logical operators or fluents); instead, once the
+variable name is replaced by a Prolog variable, it should be a legal Prolog
+goal that is used to generate values for the third argument formula.
+
+3. Knowledge and Possibility
+
+While fluents only have single values, in many cases that value will not be
+known.  Instead of introducing a general (but expensive) mechanism for
+reasoning with incomplete knowledge, we make the assumption that what is known
+about a fluent is that its value is one of a certain finite non-empty set of
+possibilities.  For example, according to what is known, the current
+temperature might be 19, 20 or 21.  We say that these are possible values for
+the temperature.  In this case, we say that "temperature > 20" is possibly
+true, but that "temperature > 17" is known to be true.  So a formula is
+possibly true if it is true for some possible values of its fluents, and a
+formula is known to be true if it is true for all possible values of its
+fluents.  When there is a single possible value for a fluent, we say that its
+value is known.
+
+To keep the combinatorics manageable we make a "Cartesian" assumption [cf.
+Petrick]: according to what is known, each fluent may take on a possible value
+independently of the others.  So, the formula "and(temperature > 20,
+location(johnny) = outside)" is possibly true iff the temperature is possibly
+above 20 and Johnny is possibly located outside.  We do not attempt to handle
+a state of knowledge where we somehow know that the conjunction is false
+without knowing what the temperature is or where Johnny is.
+
+Actions are are still viewed as changing the world, but in the absence of
+complete knowledge, we need to deal with each possible value of the fluents
+involved.  For example, we might have an action "apply_heat" that adds one to
+the current temperature.  So, if the current temperature might be 19, 20 or
+21, then after "apply_heat", the current temperature might be 20, 21, or 22.
+Sensing, on the other hand, is used to reduce the number of possibilities.
+For example, the "read_thermometer" action might return a sensing result of
+21, from which we conclude that 20 and 22 should no longer be considered
+possible.  Or perhaps the action "check_heat" returns the sensing result of
+"hot" from which we conclude only that 20 is not a possible value.  In this
+case, we have rejected a possible value without settling on the true value.
+
+4. Basic Action Theories
+
+We are now ready to describe how application domains are specified.  These
+specifications are called basic action theories, and consist of the Prolog
+definitions of the following seven predicates, for fluent F, action A, sensing
+result R, formula W, and arbitrary value V:
+
+  -  prim_fluent(F), is used to declare a fluent.
+           e.g.  prim_fluent(temperature).
+                 prim_fluent(location(X)) :- object(X).
+
+  -  prim_action(A,[R1,...Rn]), is used to declare an action and its 
+     possible sensing results.
+           e.g.  prim_action(check_weather,[rainy,sunny,cloudy]).
+                 prim_action(walk_to(X),[ok]) :- destination(X).
+     
+  -  poss(A,W), is used to state the precondition of an action.
+           e.g.  poss(open_safe,safe=unlocked).
+                 poss(walk_to(X),close_to(mylocation,X)).
+
+  -  init(F,V), is used to state that V is a possible value for F initially.
+           e.g. init(hungry,false).
+                init(mystack,[]).
+                init(location(johnny),X) :- X=inside ; X=outside.
+
+  -  causes(A,R,F,V,W), is used to state that action A changes the value of F.
+     Specifically, if A returns result R, then the possible values for F are 
+     any value V for which W is true.
+           e.g. causes(walk_to(X),_,mylocation,X,true).
+                causes(apply_heat,_,temperature,X,X is temperature+1).
+
+  -  settles(A,R,F,V,W), is used to state that action A provides sensing 
+     information on F: if A returns result R and W is known to be true, then
+     F is known to have value V. (All other possibilities are eliminated.)
+           e.g. settles(read_thermometer,X,temperature,X,true).
+                settles(compare,equal,fluent1,X,X=fluent2).
+
+  -  rejects(A,R,F,V,W), is used to state that action A provides sensing 
+     information on F: if A returns result R and W is known to be true, then
+     F is known not to have value V.  (The other possibilities are unaffected.)
+           e.g. rejects(check_heat,hot,temperature,X,X < 21).
+                rejects(compare,different,fluent1,X,X=fluent2).
+
+These definitions must ensure that each fluent always has at least one
+possible value and at most one known value.  So for example, an action theory
+where there is a fluent with no "init" clause is considered incorrect.
+
+5. The Evaluation of Formulas
+
+Every application needs to evaluate formulas to see what values are possible
+for fluents, and what conditions are known.  For example, a planner needs to
+find a plan where among other things, the goal is known to hold after its
+execution.  It would be much less interesting to have a plan where the goal
+was only possibly true.
+
+In general the evaluation of formulas is relative to a history of actions and
+sensing results.  These can be represented by a list of elements o(A,R), where
+A is an action and R is a sensing result.  Given a history H and a formula W,
+the predicate "kTrue(W,H)" is used to see if W is known in history H.  It is
+defined by
+
+   kTrue(W,H) :- mTrue(W,H), not mTrue(neg(W),H).
+
+The predicate "mTrue" is what is used to see if W is possibly true in history
+H.  It works its way through "and", "or", "neg", "some" and "all" until it
+gets to an atomic formula.  At this point, it replaces each fluent in the
+formula by one of its possible values in history H, and then calls Prolog on
+the result.
+
+The predicate "mval(F,V,H)" is the heart of the evaluator.  It returns true if
+V is a possible value for fluent F in history H.  It is defined as follows:
+
+   mval(F,V,[]) :- init(F,V).
+   mval(F,V,[o(A,R)|H]) :-
+      causes(A,R,F,_,_) -> (causes(A,R,F,V,C), mTrue(C,H)) ;
+        (settles(A,R,F,V1,C), kTrue(C,H)) ->  V=V1 ;
+          (mval(F,V,H), not (rejects(A,R,F,V,C), kTrue(C,H))).
+ 
+So, for empty histories, we just use the initial possible values for F.
+Otherwise for histories whose last action is A with result R, if F is changed
+by A with result R, we return any value V for which the condition W is
+possibly true; if A with result R senses the value of F, we return the value V
+for which the condition is known; otherwise, we return any value V that was a
+possible value in the previous history H and that is not rejected by action A
+with result R.  This provides a solution to the frame problem: if A is an
+action that does not affect or sense for fluent F, then the possible values
+for F after doing A are the same as before.
+
+6. Soundness and Completeness
+
+Although we will not try to state a theorem here, we believe that this formula
+evaluation is sound but incomplete: if kTrue succeeds, then the formula is
+intuitively known, but as we will see, there are formulas that are intuitively
+known, but for which kTrue fails.  For many applications, this incompleteness
+is not a problem.
+
+Suppose, for example, that fluent "f" is not known, and has two possible
+values, 0 and 1.  Then kTrue will fail on "or(f=1,neg(f=1))", since it is
+possible that f=1 and it is possible that f=0.  This effect can be mitigated
+somewhat by ensuring that formulas only mention a fluent once.  Instead of
+writing
+
+   or(...f... , ...f...), 
+
+for example, we write
+
+   some(x,true,and(x=f,or(...x... , ...x...))).
+
+This way of writing formulas will guarantee that the formula evaluator is
+complete, but only in the initial state.  Guaranteeing completeness in the
+presence of actions remains a problem.  Suppose we have another fluent "g" and
+an action "e", where we have "causes(e,_,g,X,X is 1-f)".  Since "f" was
+unknown initially, after doing "e", the fluent "g" will also be unknown.
+However "neg(f=g)" should be known after doing "e", but it is not since there
+is a possible value for "f" and for "g" where "f=g" is true.  To avoid this
+type of incompleteness after actions, it would be necessary to ensure that for
+any "causes(A,R,F,V,W)", the fluents in W are all known.

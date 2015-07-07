@@ -1,0 +1,1232 @@
+(define (domain rooms)
+  (:predicates
+    (at ?x0 ?x1)
+    (connects ?x0 ?x1 ?x2)
+    (opened ?x0)
+    (closed ?x0)
+    (door ?x0)
+    (holding ?x0)
+    (object ?x0)
+    (handempty)
+    (autstate_1_2)
+    (autstate_1_4)
+    (autstate_1_5)
+    (autstate_1_1)
+    (prev_autstate_1_2)
+    (prev_autstate_1_4)
+    (prev_autstate_1_5)
+    (prev_autstate_1_1)
+    (autstate_2_2)
+    (autstate_2_4)
+    (autstate_2_5)
+    (autstate_2_1)
+    (prev_autstate_2_2)
+    (prev_autstate_2_4)
+    (prev_autstate_2_5)
+    (prev_autstate_2_1)
+    (autstate_3_2)
+    (autstate_3_4)
+    (autstate_3_5)
+    (autstate_3_1)
+    (prev_autstate_3_2)
+    (prev_autstate_3_4)
+    (prev_autstate_3_5)
+    (prev_autstate_3_1)
+    (autstate_4_2)
+    (autstate_4_4)
+    (autstate_4_5)
+    (autstate_4_1)
+    (prev_autstate_4_2)
+    (prev_autstate_4_4)
+    (prev_autstate_4_5)
+    (prev_autstate_4_1)
+    (autstate_5_2)
+    (autstate_5_4)
+    (autstate_5_5)
+    (autstate_5_1)
+    (prev_autstate_5_2)
+    (prev_autstate_5_4)
+    (prev_autstate_5_5)
+    (prev_autstate_5_1)
+    (autstate_6_2)
+    (autstate_6_1)
+    (prev_autstate_6_2)
+    (prev_autstate_6_1)
+  )
+  (:action open
+    :parameters (?x0)
+    :precondition 
+      (exists (?x1 ?x2)
+        (and
+          (door ?x0)
+          (and
+            (at robot ?x1)
+            (and
+              (connects ?x0 ?x1 ?x2)
+              (closed ?x0)))))
+
+    :effect
+      (and
+        (opened ?x0)
+        (when
+          (autstate_1_2)
+          (prev_autstate_1_2))
+        (when
+          (autstate_1_4)
+          (prev_autstate_1_4))
+        (when
+          (autstate_1_5)
+          (prev_autstate_1_5))
+        (when
+          (autstate_1_1)
+          (prev_autstate_1_1))
+        (when
+          (autstate_2_2)
+          (prev_autstate_2_2))
+        (when
+          (autstate_2_4)
+          (prev_autstate_2_4))
+        (when
+          (autstate_2_5)
+          (prev_autstate_2_5))
+        (when
+          (autstate_2_1)
+          (prev_autstate_2_1))
+        (when
+          (autstate_3_2)
+          (prev_autstate_3_2))
+        (when
+          (autstate_3_4)
+          (prev_autstate_3_4))
+        (when
+          (autstate_3_5)
+          (prev_autstate_3_5))
+        (when
+          (autstate_3_1)
+          (prev_autstate_3_1))
+        (when
+          (autstate_4_2)
+          (prev_autstate_4_2))
+        (when
+          (autstate_4_4)
+          (prev_autstate_4_4))
+        (when
+          (autstate_4_5)
+          (prev_autstate_4_5))
+        (when
+          (autstate_4_1)
+          (prev_autstate_4_1))
+        (when
+          (autstate_5_2)
+          (prev_autstate_5_2))
+        (when
+          (autstate_5_4)
+          (prev_autstate_5_4))
+        (when
+          (autstate_5_5)
+          (prev_autstate_5_5))
+        (when
+          (autstate_5_1)
+          (prev_autstate_5_1))
+        (when
+          (autstate_6_2)
+          (prev_autstate_6_2))
+        (when
+          (autstate_6_1)
+          (prev_autstate_6_1))
+        (not 
+          (closed ?x0))
+        (when
+          (not 
+            (autstate_1_2))
+          (not 
+            (prev_autstate_1_2)))
+        (when
+          (not 
+            (autstate_1_4))
+          (not 
+            (prev_autstate_1_4)))
+        (when
+          (not 
+            (autstate_1_5))
+          (not 
+            (prev_autstate_1_5)))
+        (when
+          (not 
+            (autstate_1_1))
+          (not 
+            (prev_autstate_1_1)))
+        (when
+          (not 
+            (autstate_2_2))
+          (not 
+            (prev_autstate_2_2)))
+        (when
+          (not 
+            (autstate_2_4))
+          (not 
+            (prev_autstate_2_4)))
+        (when
+          (not 
+            (autstate_2_5))
+          (not 
+            (prev_autstate_2_5)))
+        (when
+          (not 
+            (autstate_2_1))
+          (not 
+            (prev_autstate_2_1)))
+        (when
+          (not 
+            (autstate_3_2))
+          (not 
+            (prev_autstate_3_2)))
+        (when
+          (not 
+            (autstate_3_4))
+          (not 
+            (prev_autstate_3_4)))
+        (when
+          (not 
+            (autstate_3_5))
+          (not 
+            (prev_autstate_3_5)))
+        (when
+          (not 
+            (autstate_3_1))
+          (not 
+            (prev_autstate_3_1)))
+        (when
+          (not 
+            (autstate_4_2))
+          (not 
+            (prev_autstate_4_2)))
+        (when
+          (not 
+            (autstate_4_4))
+          (not 
+            (prev_autstate_4_4)))
+        (when
+          (not 
+            (autstate_4_5))
+          (not 
+            (prev_autstate_4_5)))
+        (when
+          (not 
+            (autstate_4_1))
+          (not 
+            (prev_autstate_4_1)))
+        (when
+          (not 
+            (autstate_5_2))
+          (not 
+            (prev_autstate_5_2)))
+        (when
+          (not 
+            (autstate_5_4))
+          (not 
+            (prev_autstate_5_4)))
+        (when
+          (not 
+            (autstate_5_5))
+          (not 
+            (prev_autstate_5_5)))
+        (when
+          (not 
+            (autstate_5_1))
+          (not 
+            (prev_autstate_5_1)))
+        (when
+          (not 
+            (autstate_6_2))
+          (not 
+            (prev_autstate_6_2)))
+        (when
+          (not 
+            (autstate_6_1))
+          (not 
+            (prev_autstate_6_1)))
+      )
+    )
+  (:action close
+    :parameters (?x0)
+    :precondition 
+      (exists (?x1 ?x2)
+        (and
+          (door ?x0)
+          (and
+            (at robot ?x1)
+            (and
+              (connects ?x0 ?x1 ?x2)
+              (opened ?x0)))))
+
+    :effect
+      (and
+        (closed ?x0)
+        (when
+          (autstate_1_2)
+          (prev_autstate_1_2))
+        (when
+          (autstate_1_4)
+          (prev_autstate_1_4))
+        (when
+          (autstate_1_5)
+          (prev_autstate_1_5))
+        (when
+          (autstate_1_1)
+          (prev_autstate_1_1))
+        (when
+          (autstate_2_2)
+          (prev_autstate_2_2))
+        (when
+          (autstate_2_4)
+          (prev_autstate_2_4))
+        (when
+          (autstate_2_5)
+          (prev_autstate_2_5))
+        (when
+          (autstate_2_1)
+          (prev_autstate_2_1))
+        (when
+          (autstate_3_2)
+          (prev_autstate_3_2))
+        (when
+          (autstate_3_4)
+          (prev_autstate_3_4))
+        (when
+          (autstate_3_5)
+          (prev_autstate_3_5))
+        (when
+          (autstate_3_1)
+          (prev_autstate_3_1))
+        (when
+          (autstate_4_2)
+          (prev_autstate_4_2))
+        (when
+          (autstate_4_4)
+          (prev_autstate_4_4))
+        (when
+          (autstate_4_5)
+          (prev_autstate_4_5))
+        (when
+          (autstate_4_1)
+          (prev_autstate_4_1))
+        (when
+          (autstate_5_2)
+          (prev_autstate_5_2))
+        (when
+          (autstate_5_4)
+          (prev_autstate_5_4))
+        (when
+          (autstate_5_5)
+          (prev_autstate_5_5))
+        (when
+          (autstate_5_1)
+          (prev_autstate_5_1))
+        (when
+          (autstate_6_2)
+          (prev_autstate_6_2))
+        (when
+          (autstate_6_1)
+          (prev_autstate_6_1))
+        (not 
+          (opened ?x0))
+        (when
+          (not 
+            (autstate_1_2))
+          (not 
+            (prev_autstate_1_2)))
+        (when
+          (not 
+            (autstate_1_4))
+          (not 
+            (prev_autstate_1_4)))
+        (when
+          (not 
+            (autstate_1_5))
+          (not 
+            (prev_autstate_1_5)))
+        (when
+          (not 
+            (autstate_1_1))
+          (not 
+            (prev_autstate_1_1)))
+        (when
+          (not 
+            (autstate_2_2))
+          (not 
+            (prev_autstate_2_2)))
+        (when
+          (not 
+            (autstate_2_4))
+          (not 
+            (prev_autstate_2_4)))
+        (when
+          (not 
+            (autstate_2_5))
+          (not 
+            (prev_autstate_2_5)))
+        (when
+          (not 
+            (autstate_2_1))
+          (not 
+            (prev_autstate_2_1)))
+        (when
+          (not 
+            (autstate_3_2))
+          (not 
+            (prev_autstate_3_2)))
+        (when
+          (not 
+            (autstate_3_4))
+          (not 
+            (prev_autstate_3_4)))
+        (when
+          (not 
+            (autstate_3_5))
+          (not 
+            (prev_autstate_3_5)))
+        (when
+          (not 
+            (autstate_3_1))
+          (not 
+            (prev_autstate_3_1)))
+        (when
+          (not 
+            (autstate_4_2))
+          (not 
+            (prev_autstate_4_2)))
+        (when
+          (not 
+            (autstate_4_4))
+          (not 
+            (prev_autstate_4_4)))
+        (when
+          (not 
+            (autstate_4_5))
+          (not 
+            (prev_autstate_4_5)))
+        (when
+          (not 
+            (autstate_4_1))
+          (not 
+            (prev_autstate_4_1)))
+        (when
+          (not 
+            (autstate_5_2))
+          (not 
+            (prev_autstate_5_2)))
+        (when
+          (not 
+            (autstate_5_4))
+          (not 
+            (prev_autstate_5_4)))
+        (when
+          (not 
+            (autstate_5_5))
+          (not 
+            (prev_autstate_5_5)))
+        (when
+          (not 
+            (autstate_5_1))
+          (not 
+            (prev_autstate_5_1)))
+        (when
+          (not 
+            (autstate_6_2))
+          (not 
+            (prev_autstate_6_2)))
+        (when
+          (not 
+            (autstate_6_1))
+          (not 
+            (prev_autstate_6_1)))
+      )
+    )
+  (:action grasp
+    :parameters (?x0)
+    :precondition 
+      (exists (?x1)
+        (and
+          (object ?x0)
+          (and
+            (at robot ?x1)
+            (and
+              (at ?x0 ?x1)
+              (handempty)))))
+
+    :effect
+      (and
+        (holding ?x0)
+        (when
+          (autstate_1_2)
+          (prev_autstate_1_2))
+        (when
+          (autstate_1_4)
+          (prev_autstate_1_4))
+        (when
+          (autstate_1_5)
+          (prev_autstate_1_5))
+        (when
+          (autstate_1_1)
+          (prev_autstate_1_1))
+        (when
+          (autstate_2_2)
+          (prev_autstate_2_2))
+        (when
+          (autstate_2_4)
+          (prev_autstate_2_4))
+        (when
+          (autstate_2_5)
+          (prev_autstate_2_5))
+        (when
+          (autstate_2_1)
+          (prev_autstate_2_1))
+        (when
+          (autstate_3_2)
+          (prev_autstate_3_2))
+        (when
+          (autstate_3_4)
+          (prev_autstate_3_4))
+        (when
+          (autstate_3_5)
+          (prev_autstate_3_5))
+        (when
+          (autstate_3_1)
+          (prev_autstate_3_1))
+        (when
+          (autstate_4_2)
+          (prev_autstate_4_2))
+        (when
+          (autstate_4_4)
+          (prev_autstate_4_4))
+        (when
+          (autstate_4_5)
+          (prev_autstate_4_5))
+        (when
+          (autstate_4_1)
+          (prev_autstate_4_1))
+        (when
+          (autstate_5_2)
+          (prev_autstate_5_2))
+        (when
+          (autstate_5_4)
+          (prev_autstate_5_4))
+        (when
+          (autstate_5_5)
+          (prev_autstate_5_5))
+        (when
+          (autstate_5_1)
+          (prev_autstate_5_1))
+        (when
+          (autstate_6_2)
+          (prev_autstate_6_2))
+        (when
+          (autstate_6_1)
+          (prev_autstate_6_1))
+        (not 
+          (handempty))
+        (when
+          (not 
+            (autstate_1_2))
+          (not 
+            (prev_autstate_1_2)))
+        (when
+          (not 
+            (autstate_1_4))
+          (not 
+            (prev_autstate_1_4)))
+        (when
+          (not 
+            (autstate_1_5))
+          (not 
+            (prev_autstate_1_5)))
+        (when
+          (not 
+            (autstate_1_1))
+          (not 
+            (prev_autstate_1_1)))
+        (when
+          (not 
+            (autstate_2_2))
+          (not 
+            (prev_autstate_2_2)))
+        (when
+          (not 
+            (autstate_2_4))
+          (not 
+            (prev_autstate_2_4)))
+        (when
+          (not 
+            (autstate_2_5))
+          (not 
+            (prev_autstate_2_5)))
+        (when
+          (not 
+            (autstate_2_1))
+          (not 
+            (prev_autstate_2_1)))
+        (when
+          (not 
+            (autstate_3_2))
+          (not 
+            (prev_autstate_3_2)))
+        (when
+          (not 
+            (autstate_3_4))
+          (not 
+            (prev_autstate_3_4)))
+        (when
+          (not 
+            (autstate_3_5))
+          (not 
+            (prev_autstate_3_5)))
+        (when
+          (not 
+            (autstate_3_1))
+          (not 
+            (prev_autstate_3_1)))
+        (when
+          (not 
+            (autstate_4_2))
+          (not 
+            (prev_autstate_4_2)))
+        (when
+          (not 
+            (autstate_4_4))
+          (not 
+            (prev_autstate_4_4)))
+        (when
+          (not 
+            (autstate_4_5))
+          (not 
+            (prev_autstate_4_5)))
+        (when
+          (not 
+            (autstate_4_1))
+          (not 
+            (prev_autstate_4_1)))
+        (when
+          (not 
+            (autstate_5_2))
+          (not 
+            (prev_autstate_5_2)))
+        (when
+          (not 
+            (autstate_5_4))
+          (not 
+            (prev_autstate_5_4)))
+        (when
+          (not 
+            (autstate_5_5))
+          (not 
+            (prev_autstate_5_5)))
+        (when
+          (not 
+            (autstate_5_1))
+          (not 
+            (prev_autstate_5_1)))
+        (when
+          (not 
+            (autstate_6_2))
+          (not 
+            (prev_autstate_6_2)))
+        (when
+          (not 
+            (autstate_6_1))
+          (not 
+            (prev_autstate_6_1)))
+      )
+    )
+  (:action release
+    :parameters (?x0)
+    :precondition 
+      (holding ?x0)
+    :effect
+      (and
+        (handempty)
+        (when
+          (autstate_1_2)
+          (prev_autstate_1_2))
+        (when
+          (autstate_1_4)
+          (prev_autstate_1_4))
+        (when
+          (autstate_1_5)
+          (prev_autstate_1_5))
+        (when
+          (autstate_1_1)
+          (prev_autstate_1_1))
+        (when
+          (autstate_2_2)
+          (prev_autstate_2_2))
+        (when
+          (autstate_2_4)
+          (prev_autstate_2_4))
+        (when
+          (autstate_2_5)
+          (prev_autstate_2_5))
+        (when
+          (autstate_2_1)
+          (prev_autstate_2_1))
+        (when
+          (autstate_3_2)
+          (prev_autstate_3_2))
+        (when
+          (autstate_3_4)
+          (prev_autstate_3_4))
+        (when
+          (autstate_3_5)
+          (prev_autstate_3_5))
+        (when
+          (autstate_3_1)
+          (prev_autstate_3_1))
+        (when
+          (autstate_4_2)
+          (prev_autstate_4_2))
+        (when
+          (autstate_4_4)
+          (prev_autstate_4_4))
+        (when
+          (autstate_4_5)
+          (prev_autstate_4_5))
+        (when
+          (autstate_4_1)
+          (prev_autstate_4_1))
+        (when
+          (autstate_5_2)
+          (prev_autstate_5_2))
+        (when
+          (autstate_5_4)
+          (prev_autstate_5_4))
+        (when
+          (autstate_5_5)
+          (prev_autstate_5_5))
+        (when
+          (autstate_5_1)
+          (prev_autstate_5_1))
+        (when
+          (autstate_6_2)
+          (prev_autstate_6_2))
+        (when
+          (autstate_6_1)
+          (prev_autstate_6_1))
+        (not 
+          (holding ?x0))
+        (when
+          (not 
+            (autstate_1_2))
+          (not 
+            (prev_autstate_1_2)))
+        (when
+          (not 
+            (autstate_1_4))
+          (not 
+            (prev_autstate_1_4)))
+        (when
+          (not 
+            (autstate_1_5))
+          (not 
+            (prev_autstate_1_5)))
+        (when
+          (not 
+            (autstate_1_1))
+          (not 
+            (prev_autstate_1_1)))
+        (when
+          (not 
+            (autstate_2_2))
+          (not 
+            (prev_autstate_2_2)))
+        (when
+          (not 
+            (autstate_2_4))
+          (not 
+            (prev_autstate_2_4)))
+        (when
+          (not 
+            (autstate_2_5))
+          (not 
+            (prev_autstate_2_5)))
+        (when
+          (not 
+            (autstate_2_1))
+          (not 
+            (prev_autstate_2_1)))
+        (when
+          (not 
+            (autstate_3_2))
+          (not 
+            (prev_autstate_3_2)))
+        (when
+          (not 
+            (autstate_3_4))
+          (not 
+            (prev_autstate_3_4)))
+        (when
+          (not 
+            (autstate_3_5))
+          (not 
+            (prev_autstate_3_5)))
+        (when
+          (not 
+            (autstate_3_1))
+          (not 
+            (prev_autstate_3_1)))
+        (when
+          (not 
+            (autstate_4_2))
+          (not 
+            (prev_autstate_4_2)))
+        (when
+          (not 
+            (autstate_4_4))
+          (not 
+            (prev_autstate_4_4)))
+        (when
+          (not 
+            (autstate_4_5))
+          (not 
+            (prev_autstate_4_5)))
+        (when
+          (not 
+            (autstate_4_1))
+          (not 
+            (prev_autstate_4_1)))
+        (when
+          (not 
+            (autstate_5_2))
+          (not 
+            (prev_autstate_5_2)))
+        (when
+          (not 
+            (autstate_5_4))
+          (not 
+            (prev_autstate_5_4)))
+        (when
+          (not 
+            (autstate_5_5))
+          (not 
+            (prev_autstate_5_5)))
+        (when
+          (not 
+            (autstate_5_1))
+          (not 
+            (prev_autstate_5_1)))
+        (when
+          (not 
+            (autstate_6_2))
+          (not 
+            (prev_autstate_6_2)))
+        (when
+          (not 
+            (autstate_6_1))
+          (not 
+            (prev_autstate_6_1)))
+      )
+    )
+  (:action move
+    :parameters (?x0 ?x1)
+    :precondition 
+      (exists (?x2)
+        (and
+          (at robot ?x0)
+          (and
+            (connects ?x2 ?x0 ?x1)
+            (opened ?x2))))
+
+    :effect
+      (and
+        (forall (?x2)
+          (when
+            (or
+              (= ?x2 robot)
+              (holding ?x2))
+            (at ?x2 ?x1)))
+
+        (when
+          (autstate_1_2)
+          (prev_autstate_1_2))
+        (when
+          (autstate_1_4)
+          (prev_autstate_1_4))
+        (when
+          (autstate_1_5)
+          (prev_autstate_1_5))
+        (when
+          (autstate_1_1)
+          (prev_autstate_1_1))
+        (when
+          (autstate_2_2)
+          (prev_autstate_2_2))
+        (when
+          (autstate_2_4)
+          (prev_autstate_2_4))
+        (when
+          (autstate_2_5)
+          (prev_autstate_2_5))
+        (when
+          (autstate_2_1)
+          (prev_autstate_2_1))
+        (when
+          (autstate_3_2)
+          (prev_autstate_3_2))
+        (when
+          (autstate_3_4)
+          (prev_autstate_3_4))
+        (when
+          (autstate_3_5)
+          (prev_autstate_3_5))
+        (when
+          (autstate_3_1)
+          (prev_autstate_3_1))
+        (when
+          (autstate_4_2)
+          (prev_autstate_4_2))
+        (when
+          (autstate_4_4)
+          (prev_autstate_4_4))
+        (when
+          (autstate_4_5)
+          (prev_autstate_4_5))
+        (when
+          (autstate_4_1)
+          (prev_autstate_4_1))
+        (when
+          (autstate_5_2)
+          (prev_autstate_5_2))
+        (when
+          (autstate_5_4)
+          (prev_autstate_5_4))
+        (when
+          (autstate_5_5)
+          (prev_autstate_5_5))
+        (when
+          (autstate_5_1)
+          (prev_autstate_5_1))
+        (when
+          (autstate_6_2)
+          (prev_autstate_6_2))
+        (when
+          (autstate_6_1)
+          (prev_autstate_6_1))
+        (forall (?x2)
+          (when
+            (or
+              (= ?x2 robot)
+              (holding ?x2))
+            (not 
+              (at ?x2 ?x0))))
+
+        (when
+          (not 
+            (autstate_1_2))
+          (not 
+            (prev_autstate_1_2)))
+        (when
+          (not 
+            (autstate_1_4))
+          (not 
+            (prev_autstate_1_4)))
+        (when
+          (not 
+            (autstate_1_5))
+          (not 
+            (prev_autstate_1_5)))
+        (when
+          (not 
+            (autstate_1_1))
+          (not 
+            (prev_autstate_1_1)))
+        (when
+          (not 
+            (autstate_2_2))
+          (not 
+            (prev_autstate_2_2)))
+        (when
+          (not 
+            (autstate_2_4))
+          (not 
+            (prev_autstate_2_4)))
+        (when
+          (not 
+            (autstate_2_5))
+          (not 
+            (prev_autstate_2_5)))
+        (when
+          (not 
+            (autstate_2_1))
+          (not 
+            (prev_autstate_2_1)))
+        (when
+          (not 
+            (autstate_3_2))
+          (not 
+            (prev_autstate_3_2)))
+        (when
+          (not 
+            (autstate_3_4))
+          (not 
+            (prev_autstate_3_4)))
+        (when
+          (not 
+            (autstate_3_5))
+          (not 
+            (prev_autstate_3_5)))
+        (when
+          (not 
+            (autstate_3_1))
+          (not 
+            (prev_autstate_3_1)))
+        (when
+          (not 
+            (autstate_4_2))
+          (not 
+            (prev_autstate_4_2)))
+        (when
+          (not 
+            (autstate_4_4))
+          (not 
+            (prev_autstate_4_4)))
+        (when
+          (not 
+            (autstate_4_5))
+          (not 
+            (prev_autstate_4_5)))
+        (when
+          (not 
+            (autstate_4_1))
+          (not 
+            (prev_autstate_4_1)))
+        (when
+          (not 
+            (autstate_5_2))
+          (not 
+            (prev_autstate_5_2)))
+        (when
+          (not 
+            (autstate_5_4))
+          (not 
+            (prev_autstate_5_4)))
+        (when
+          (not 
+            (autstate_5_5))
+          (not 
+            (prev_autstate_5_5)))
+        (when
+          (not 
+            (autstate_5_1))
+          (not 
+            (prev_autstate_5_1)))
+        (when
+          (not 
+            (autstate_6_2))
+          (not 
+            (prev_autstate_6_2)))
+        (when
+          (not 
+            (autstate_6_1))
+          (not 
+            (prev_autstate_6_1)))
+      )
+    )
+(:derived 
+    (autstate_1_2)
+    (and
+      (prev_autstate_1_2)
+      (not 
+        (closed d1)))
+)
+
+(:derived 
+    (autstate_1_4)
+    (or
+      (prev_autstate_1_2)
+      (or
+        (and
+          (prev_autstate_1_4)
+          (closed d1))
+        (prev_autstate_1_5)))
+)
+
+(:derived 
+    (autstate_1_5)
+    (or
+      (prev_autstate_1_2)
+      (and
+        (prev_autstate_1_4)
+        (closed d1)))
+)
+
+(:derived 
+    (autstate_1_1)
+    (or
+      (prev_autstate_1_2)
+      (and
+        (prev_autstate_1_4)
+        (closed d1)))
+)
+
+(:derived 
+    (autstate_2_2)
+    (and
+      (prev_autstate_2_2)
+      (not 
+        (closed d12)))
+)
+
+(:derived 
+    (autstate_2_4)
+    (or
+      (prev_autstate_2_2)
+      (or
+        (and
+          (prev_autstate_2_4)
+          (closed d12))
+        (prev_autstate_2_5)))
+)
+
+(:derived 
+    (autstate_2_5)
+    (or
+      (prev_autstate_2_2)
+      (and
+        (prev_autstate_2_4)
+        (closed d12)))
+)
+
+(:derived 
+    (autstate_2_1)
+    (or
+      (prev_autstate_2_2)
+      (and
+        (prev_autstate_2_4)
+        (closed d12)))
+)
+
+(:derived 
+    (autstate_3_2)
+    (and
+      (prev_autstate_3_2)
+      (not 
+        (closed d23)))
+)
+
+(:derived 
+    (autstate_3_4)
+    (or
+      (prev_autstate_3_2)
+      (or
+        (and
+          (prev_autstate_3_4)
+          (closed d23))
+        (prev_autstate_3_5)))
+)
+
+(:derived 
+    (autstate_3_5)
+    (or
+      (prev_autstate_3_2)
+      (and
+        (prev_autstate_3_4)
+        (closed d23)))
+)
+
+(:derived 
+    (autstate_3_1)
+    (or
+      (prev_autstate_3_2)
+      (and
+        (prev_autstate_3_4)
+        (closed d23)))
+)
+
+(:derived 
+    (autstate_4_2)
+    (and
+      (prev_autstate_4_2)
+      (not 
+        (closed d34)))
+)
+
+(:derived 
+    (autstate_4_4)
+    (or
+      (prev_autstate_4_2)
+      (or
+        (and
+          (prev_autstate_4_4)
+          (closed d34))
+        (prev_autstate_4_5)))
+)
+
+(:derived 
+    (autstate_4_5)
+    (or
+      (prev_autstate_4_2)
+      (and
+        (prev_autstate_4_4)
+        (closed d34)))
+)
+
+(:derived 
+    (autstate_4_1)
+    (or
+      (prev_autstate_4_2)
+      (and
+        (prev_autstate_4_4)
+        (closed d34)))
+)
+
+(:derived 
+    (autstate_5_2)
+    (and
+      (prev_autstate_5_2)
+      (not 
+        (closed d4)))
+)
+
+(:derived 
+    (autstate_5_4)
+    (or
+      (prev_autstate_5_2)
+      (or
+        (and
+          (prev_autstate_5_4)
+          (closed d4))
+        (prev_autstate_5_5)))
+)
+
+(:derived 
+    (autstate_5_5)
+    (or
+      (prev_autstate_5_2)
+      (and
+        (prev_autstate_5_4)
+        (closed d4)))
+)
+
+(:derived 
+    (autstate_5_1)
+    (or
+      (prev_autstate_5_2)
+      (and
+        (prev_autstate_5_4)
+        (closed d4)))
+)
+
+(:derived 
+    (autstate_6_2)
+    (prev_autstate_6_2)
+)
+
+(:derived 
+    (autstate_6_1)
+    (and
+      (prev_autstate_6_2)
+      (and
+        (at robot c1)
+        (at obj1 r4)))
+)
+
+)

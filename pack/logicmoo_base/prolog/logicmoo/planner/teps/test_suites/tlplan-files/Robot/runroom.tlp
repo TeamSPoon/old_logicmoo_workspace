@@ -1,0 +1,6 @@
+(load-file "roomworld.tlp")
+(load-file "roomproblems2.tlp")
+(set-initial-world (state1))
+(set-search-strategy breadth-first)
+(set-goal (and (goal1-2) (c1-2)))
+(plan)

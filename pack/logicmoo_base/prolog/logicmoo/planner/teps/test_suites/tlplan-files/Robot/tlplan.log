@@ -1,0 +1,201 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++  Welcome to TLPlan                                                               +
++  Copyright (c) 1997, 2003, F. Bacchus & Michael Ady                              +
++  This copy can be used only for non-commercial research purposes.                +
++  You may not reverse engineer, decompile, translate or disassemble the Software. +
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Loading file: runroom.tlp
+Loading file: roomworld.tlp
+"open" operator successor formula:
+(forall
+  (?x0) 
+  (door ?x0) 
+  (implies 
+    (closed ?x0) 
+    (forall
+      (?x1 ?x2) 
+      (connects ?x0 ?x1 ?x2) 
+      (implies 
+        (at robot ?x1) 
+        (modify-world 
+          (open ?x0) 
+          (and 
+            (del 
+              (closed ?x0)) 
+            (add 
+              (opened ?x0))))))))
+
+"close" operator successor formula:
+(forall
+  (?x0) 
+  (door ?x0) 
+  (implies 
+    (opened ?x0) 
+    (forall
+      (?x1 ?x2) 
+      (connects ?x0 ?x1 ?x2) 
+      (implies 
+        (at robot ?x1) 
+        (modify-world 
+          (close ?x0) 
+          (and 
+            (del 
+              (opened ?x0)) 
+            (add 
+              (closed ?x0))))))))
+
+"grasp" operator successor formula:
+(and handempty 
+  (forall
+    (?x0) 
+    (object ?x0) 
+    (implies 
+      (exists
+        (?x1) 
+        (at robot ?x1) 
+        (at ?x0 ?x1)) 
+      (modify-world 
+        (grasp ?x0) 
+        (and 
+          (del handempty) 
+          (add 
+            (holding ?x0)) 
+          (add 
+            (+= tick 1)))))))
+
+"release" operator successor formula:
+(forall
+  (?x0) 
+  (holding ?x0) 
+  (modify-world 
+    (release ?x0) 
+    (and 
+      (add handempty) 
+      (del 
+        (holding ?x0)))))
+
+"move" operator successor formula:
+(forall
+  (?x0) 
+  (at robot ?x0) 
+  (forall
+    (?x2) 
+    (opened ?x2) 
+    (forall
+      (?x1) 
+      (connects ?x2 ?x0 ?x1) 
+      (modify-world 
+        (move ?x0 ?x1) 
+        (and 
+          (forall
+            (?x2) 
+            (holding ?x2) 
+            (del 
+              (at ?x2 ?x0))) 
+          (forall
+            (?x2) 
+            (holding ?x2) 
+            (add 
+              (at ?x2 ?x1))) 
+          (del 
+            (at robot ?x0)) 
+          (add 
+            (at robot ?x1)))))))
+
+Loading file: roomproblems2.tlp
+Planning ""
+--------------------------------------------------------------------------------
+Initial world: 
+[at, 5 entries]
+(at o1 r1) 
+(at o2 r2) 
+(at o3 r1) 
+(at o4 r1) 
+(at robot c1)
+
+[connects, 12 entries]
+(connects corridor c1 c4) 
+(connects corridor c4 c1) 
+(connects d1 c1 r1) 
+(connects d1 r1 c1) 
+(connects d12 r1 r2) 
+(connects d12 r2 r1) 
+(connects d23 r2 r3) 
+(connects d23 r3 r2) 
+(connects d34 r3 r4) 
+(connects d34 r4 r3) 
+(connects d4 c4 r4) 
+(connects d4 r4 c4)
+
+[opened, 1 entry]
+(opened corridor)
+
+[closed, 5 entries]
+(closed d1) 
+(closed d12) 
+(closed d23) 
+(closed d34) 
+(closed d4)
+
+[door, 5 entries]
+(door d1) 
+(door d12) 
+(door d23) 
+(door d34) 
+(door d4)
+
+[holding, 0 entries]
+
+[object, 4 entries]
+(object o1) 
+(object o2) 
+(object o3) 
+(object o4)
+
+[handempty, 1 entry]
+(handempty)
+
+[tick, 1 entry]
+(= 
+  (tick) 0)
+
+
+Goal formula is: 
+(and 
+  (and 
+    (always 
+      (forall
+        (?d) 
+        (door ?d) 
+        (implies 
+          (and 
+            (closed ?d) 
+            (next 
+              (opened ?d))) 
+          (next 
+            (next 
+              (next 
+                (closed ?d))))))) 
+    (eventually 
+      (always 
+        (and 
+          (at robot c1) 
+          (at obj2 r4))))) 
+  (always 
+    (forall
+      (?o) 
+      (object ?o) 
+      (implies 
+        (holding ?o) 
+        (= ?o o1)))))
+
+--------------------------------------------------------------------------------
+Planning terminated.  No plan found.  Elapsed CPU time 11.980 sec.
+Resource bounds exhausted.
+
+Worlds generated = 168629
+Worlds searched = 47718
+Worlds pruned by temporal control = 52282
+Worlds discarded by cycle check = 68090
+Worlds unexamined = 537

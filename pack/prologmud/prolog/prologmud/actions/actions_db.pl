@@ -24,11 +24,11 @@
     59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *************************************************************************/
-:-swi_module(modionDatabase, []).
+:-swi_module(modActionDatabase, []).
 
 end_of_file.
 
-:-swi_module(modionDatabase,[take/3,
+:-swi_module(modActionDatabase,[take/3,
 			  eat/2,
 			  drop/3,
 			  throw/3,

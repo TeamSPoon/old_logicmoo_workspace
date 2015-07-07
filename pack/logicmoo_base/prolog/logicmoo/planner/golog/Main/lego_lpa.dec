@@ -1,0 +1,111 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FILE: Main/lego_lpa.dec
+%
+% Prolog code to establish communication with LEGO Mindstorms RCX
+%
+% This file contains system dependent predicates
+% It is written for LPA DOS-Prolog (http://www.lpa.com/)
+% running under DOS on a HP200LX
+% 
+% WRITTEN BY: Maurice Pagnucco and Hector J. Levesque
+% REVISED: June 15, 2000
+% TESTED: LPA DOS-Prolog 3.83 under DOS on HP200LX
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%                             June 15, 2000
+%
+% This software was developed by the Cognitive Robotics Group under the
+% direction of Hector Levesque and Ray Reiter.
+%
+%        Do not distribute without permission.
+%        Include this notice in any copy made.
+%
+%
+%         Copyright (c) 2000 by The University of Toronto,
+%                        Toronto, Ontario, Canada.
+%
+%                          All Rights Reserved
+%
+% Permission to use, copy, and modify, this software and its
+% documentation for non-commercial research purpose is hereby granted
+% without fee, provided that the above copyright notice appears in all
+% copies and that both the copyright notice and this permission notice
+% appear in supporting documentation, and that the name of The University
+% of Toronto not be used in advertising or publicity pertaining to
+% distribution of the software without specific, written prior
+% permission.  The University of Toronto makes no representations about
+% the suitability of this software for any purpose.  It is provided "as
+% is" without express or implied warranty.
+% 
+% THE UNIVERSITY OF TORONTO DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+% SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+% FITNESS, IN NO EVENT SHALL THE UNIVERSITY OF TORONTO BE LIABLE FOR ANY
+% SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
+% RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+% CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+% CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% The following system dependent predicates need to be defined here:
+% -- initRcx: initialize serial port, baud, parity etc. for RCX
+% -- openRcxRead: open RCX serial port for reading
+% -- openRcxWrite: open RCX serial port for writing 
+% -- closeRcx: close RCX serial port
+% -- getRcxByte(-Ascii): get a character from RCX
+% -- eofRcx: succeed if there is a character from RCX to read
+% -- putRcxByte(+Ascii): write a character to RCX
+% -- currentTime(-Time): current system time measured in seconds
+% -- waitUntilRcx(+End): optionally wait (busy or suspend) until End
+%      system time or until RCX input arrives. Fail if End is passed
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% currentTime(-Time): Returns the current system Time in hundredths of seconds
+currentTime(Now) :-
+    time(Hours,Mins,Secs,Huns), 
+    Now is Huns + (100*Secs) + (6000*Mins) + (360000*Hours).
+
+% initRcx: Initialise the serial port, setting baud rate, etc.
+%    You may need to modify the location of the mode.com file for your system
+initRcx :- 
+    exec('d:\dos\mode.com', ['com1:', 2400, o, 8, 1], S), % HP200XL
+    %exec('c:\Windows\command\mode.com', ['com1:', 2400, o, 8, 1], S), % Win98
+    S=0 -> true ; (write('InitRcx: Cannot set port'), nl, abort).
+
+% openRcxRead: Opens infrared tower (connected to serial port) for reading
+%     data from RCX
+openRcxRead. % Serial port is open for reading and writing so nothing to do
+
+% openRcxWrite: Opens infrared tower (connected to serial port) for sending
+%     data to RCX
+openRcxWrite. % Serial port is open for reading and writing so nothing to do
+
+% closeRcx: Closes infrared tower (connected to serial port) if it is
+%     currently open. This predicate always succeeds
+closeRcx. % Serial port is open for reading and writing so nothing to do
+
+% eofRcx: Checks whether there is any input data waiting on infrared tower
+eofRcx :-
+    eof('AUX:').
+
+% waitUntilRcx(+End): Optionally wait (busy or suspend) until End system time
+%     or until RCX input arrives. Fail if End passed
+waitUntilRcx(Time) :-
+    currentTime(Now),
+    Now < Time.
+
+% getRcxByte(-Ascii): Returns the first Ascii character read from infrared
+%     tower. Blocks if there is no input
+getRcxByte(Ascii) :-
+    get0('AUX:',Ascii).
+
+% putRcxByte(+Ascii): Sends Ascii character to Rcx using infrared tower
+putRcxByte(Ascii) :-
+    put('AUX:',Ascii).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EOF: Main/lego_lpa.dec
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

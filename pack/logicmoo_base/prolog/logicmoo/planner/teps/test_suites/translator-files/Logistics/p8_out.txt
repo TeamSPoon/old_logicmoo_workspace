@@ -1,0 +1,30 @@
+
+ff: parsing domain file
+domain 'LOGISTICS' defined
+ ... done.
+ff: parsing problem file
+problem 'P8' defined
+ ... done.
+
+
+
+Cueing down from goal distance:    4 into depth [1][2]
+                                   3            [1]
+                                   2            [1]
+                                   0            
+
+ff: found legal plan as follows
+
+step    0: FLY_AIRPLANE PLANE2 CITY4_2 CITY1_2
+        1: FLY_AIRPLANE PLANE2 CITY1_2 CITY2_2
+        2: FLY_AIRPLANE PLANE2 CITY2_2 CITY3_2
+        3: FLY_AIRPLANE PLANE2 CITY3_2 CITY4_2
+     
+
+time spent:    0.25 seconds instantiating 263 easy, 1152 hard action templates
+               0.01 seconds reachability analysis, yielding 299 facts and 367 actions
+               0.01 seconds creating final representation with 299 relevant facts
+               0.20 seconds building connectivity graph
+               0.03 seconds searching, evaluating 7 states, to a max depth of 2
+               0.50 seconds total time
+

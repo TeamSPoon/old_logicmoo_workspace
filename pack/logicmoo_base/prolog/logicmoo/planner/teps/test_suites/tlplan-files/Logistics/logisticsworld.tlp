@@ -1,0 +1,64 @@
+(clear-world-symbols)			;Remove old domain symbols
+
+
+(declare-described-symbols
+
+ (predicate obj 1)
+ (predicate truck 1)
+ (predicate location 1)
+ (predicate airplane 1)
+ (predicate city 1)
+ (predicate airport 1)
+ (predicate at 2)
+ (predicate in 2)
+ (predicate in_city 2))
+
+
+(declare-defined-symbols
+ (predicate empty 1))
+
+(def-defined-predicate (empty ?t)
+  (not (exists (?x) (in ?x ?t))))
+
+(def-adl-operator (load ?x0 ?x1 ?x2)
+  (pre (?x0) (obj ?x0)
+       (?x1 ?x2) (at ?x1 ?x2)
+       (and
+	(or (airplane ?x1) (truck ?x1))
+	(at ?x0 ?x2)))
+
+  (add (in ?x0 ?x1))
+  (del (at ?x0 ?x2))
+
+)
+
+(def-adl-operator (unload ?x0 ?x1 ?x2)
+  (pre (?x0) (obj ?x0)
+       (?x1 ?x2) (at ?x1 ?x2)
+       (and
+	(or (airplane ?x1) (truck ?x1))
+	(in ?x0 ?x1))
+       )
+  (add (at ?x0 ?x2))
+  (del (in ?x0 ?x1)))
+  
+            
+(def-adl-operator (drive_truck ?x0 ?x1 ?x2 ?x3)
+  (pre (?x0) (truck ?x0)
+       (?x1) (location ?x1)
+       (?x2) (location ?x2)
+       (?x3) (city ?x3)
+       (and  (at ?x0 ?x1)
+	     (in_city ?x1 ?x3)
+	     (in_city ?x2 ?x3)))
+  (add (at ?x0 ?x2))
+  (del (at ?x0 ?x1)))
+
+(def-adl-operator (fly_airplane ?x0 ?x1 ?x2)
+  (pre (?x0) (airplane ?x0)
+       (?x1) (airport ?x1)
+       (?x2) (airport ?x2)
+       (at ?x0 ?x1))
+
+  (add (at ?x0 ?x2))
+  (del (at ?x0 ?x1)))

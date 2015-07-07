@@ -1,0 +1,83 @@
+This is an implementation in SWI Prolog of a planner that generates loops.
+See "Planning with Loops" in IJCAI-05 by Hector Levesque for background,
+  and the HISTORY file for a rough idea of the new finite-state-automaton
+  representation of plans.
+
+This package contains the following files:
+
+   - README:         this file
+   - HISTORY:        changes in the versions implemented
+   - TUTORIAL:       how to write action theories
+   - HINTS:          how to get the planner working
+   - fsaplanner.pl:  Prolog code for the planner (loaded by each example)
+   - ktrue.pl:       Prolog code for the formula evaluator
+                     (loaded by fsaplanner)
+   - *.pl:           example action theories
+
+A number of examples are included here, some of which do not need loops.
+In order of increasing complexity, the examples are:
+
+   - simport:  airport where the gate to board the plane is known
+   - airport:  airport where the gate to board the plane must be sensed
+   - bars:     locate odd bar of 12 and its weight using only 3 weighings
+   - simchop:  get the tree down when a bound is known on how many chops
+   - treechop: get the tree down when no bound is known on how many chops
+   - safe:     open a safe using a combination written on a piece of paper
+   - fixedegg: get a fixed number of good eggs into a bowl without knowing 
+               a bound on how many bad eggs will be encountered
+   - variegg:  get a variable number of good eggs into a bowl without knowing 
+               a bound on how many good or bad eggs will be encountered
+   - arith:    increment counters to do some simple counting
+   - fact:     increment counters to calculate factorial of input
+   - bintree:  search a binary tree for a target node
+   - blocks:   build a color-alternating stack of blocks (This example is
+               a difficult one, and may take minutes to find the plan.)
+
+All these examples can be run the same way.  For example, to do treechop, run
+SWI Prolog and then type "[treechop]."  This loads treechop.pl (the example),
+which loads fsaplanner.pl (the planner), which loads ktrue.pl (the evaluator).
+Then type "top."  This calls the top-level predicate kplan/1 with a suitable
+goal.  For treechop, this is defined as "kplan(and(tree=down,axe=stored))".
+The output it produces is:
+
+ ?- top.
+ The goal:  and(tree = down, axe = stored)
+
+  0 1 2 3 4
+
+ A plan is found after 0.01 seconds.
+
+This indicates that a plan has been found for the problem. At this point,
+there are three ways to visualize the plan:
+
+1. Print the transition table of the DFSA using "print."
+
+ ?- print.
+ ------------------------------------------------------------------------------
+   State  1  ---------------------- look : down ------------------>  State  3
+   State  1  ---------------------- look : up -------------------->  State  2
+   State  2  ---------------------- chop : ok -------------------->  State  1
+   State  3  --------------------- store : ok -------------------->  State  0
+
+2. Save the transition graph in .dot and .ps files with "save(Filename)" and/or
+   view the graph with "draw."
+
+3. Execute and print the trace of the program with
+   "run"    when the problem has no planning parameter or
+   "run(N)" to set the planning parameter to N.
+
+ ?- run(3).
+     001. look:up
+     002. chop:ok
+     003. look:up
+     004. chop:ok
+     005. look:up
+     006. chop:ok
+     007. look:down
+     008. store:ok
+     009. DONE
+
+To generate your own examples, you will need to produce a file like
+treechop.pl. Read the TUTORIAL and HINTS for help.
+
+Happy looping!

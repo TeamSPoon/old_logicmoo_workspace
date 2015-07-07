@@ -1,0 +1,75 @@
+
+ff: parsing domain file
+domain 'LOGISTICS' defined
+ ... done.
+ff: parsing problem file
+problem 'P13' defined
+ ... done.
+
+
+
+Cueing down from goal distance:   20 into depth [1]
+                                  19            [1]
+                                  18            [1]
+                                  17            [1][2]
+                                  16            [1]
+                                  15            [1][2][3][4][5][6][7]
+                                  14            [1]
+                                  13            [1]
+                                  12            [1][2]
+                                  11            [1]
+                                  10            [1][2][3][4][5][6]
+                                   9            [1]
+                                   8            [1]
+                                   7            [1]
+                                   6            [1]
+                                   5            [1]
+                                   4            [1][2]
+                                   3            [1]
+                                   2            [1]
+                                   0            
+
+ff: found legal plan as follows
+
+step    0: LOAD PACKAGE6 TRUCK3 CITY3_1
+        1: DRIVE_TRUCK TRUCK3 CITY3_1 CITY3_2 CITY3
+        2: UNLOAD PACKAGE6 TRUCK3 CITY3_2
+        3: FLY_AIRPLANE PLANE1 CITY4_2 CITY3_2
+        4: LOAD PACKAGE6 PLANE1 CITY3_2
+        5: FLY_AIRPLANE PLANE1 CITY3_2 CITY1_2
+        6: DRIVE_TRUCK TRUCK1 CITY1_1 CITY1_2 CITY1
+        7: UNLOAD PACKAGE6 PLANE1 CITY1_2
+        8: FLY_AIRPLANE PLANE1 CITY1_2 CITY4_2
+        9: LOAD PACKAGE6 TRUCK1 CITY1_2
+       10: DRIVE_TRUCK TRUCK1 CITY1_2 CITY1_1 CITY1
+       11: UNLOAD PACKAGE6 TRUCK1 CITY1_1
+       12: LOAD PACKAGE6 TRUCK1 CITY1_1
+       13: DRIVE_TRUCK TRUCK1 CITY1_1 CITY1_2 CITY1
+       14: UNLOAD PACKAGE6 TRUCK1 CITY1_2
+       15: FLY_AIRPLANE PLANE1 CITY4_2 CITY1_2
+       16: LOAD PACKAGE6 PLANE1 CITY1_2
+       17: FLY_AIRPLANE PLANE1 CITY1_2 CITY2_2
+       18: DRIVE_TRUCK TRUCK2 CITY2_1 CITY2_2 CITY2
+       19: UNLOAD PACKAGE6 PLANE1 CITY2_2
+       20: LOAD PACKAGE6 TRUCK2 CITY2_2
+       21: DRIVE_TRUCK TRUCK2 CITY2_2 CITY2_1 CITY2
+       22: UNLOAD PACKAGE6 TRUCK2 CITY2_1
+       23: LOAD PACKAGE6 TRUCK2 CITY2_1
+       24: DRIVE_TRUCK TRUCK2 CITY2_1 CITY2_2 CITY2
+       25: UNLOAD PACKAGE6 TRUCK2 CITY2_2
+       26: LOAD PACKAGE6 PLANE1 CITY2_2
+       27: FLY_AIRPLANE PLANE1 CITY2_2 CITY4_2
+       28: UNLOAD PACKAGE6 PLANE1 CITY4_2
+       29: DRIVE_TRUCK TRUCK4 CITY4_1 CITY4_2 CITY4
+       30: LOAD PACKAGE6 TRUCK4 CITY4_2
+       31: DRIVE_TRUCK TRUCK4 CITY4_2 CITY4_1 CITY4
+       32: UNLOAD PACKAGE6 TRUCK4 CITY4_1
+     
+
+time spent:    0.22 seconds instantiating 256 easy, 1152 hard action templates
+               0.01 seconds reachability analysis, yielding 292 facts and 368 actions
+               0.02 seconds creating final representation with 292 relevant facts
+               0.18 seconds building connectivity graph
+               5.33 seconds searching, evaluating 788 states, to a max depth of 7
+               5.76 seconds total time
+
