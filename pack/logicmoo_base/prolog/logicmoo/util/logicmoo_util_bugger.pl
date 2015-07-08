@@ -487,11 +487,16 @@ badfood(MCall):- numbervars(MCall,0,_,[functor_name('VAR_______________________x
 without_must(G):- with_assertions(tlbugger:skipMust,G).
 
 % -- CODEBLOCK
+:- export(y_must/2).
+:-meta_predicate (y_must(?,0)).
+y_must(Y,C):- catch(C,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,C)),fail)) *-> true ; dtrace(y_must(Y,C)).
+
+% -- CODEBLOCK
 :- export(must/1).
 :-meta_predicate (must(0)).
 
 must(C):-  tlbugger:skipMust,!,debugOnError0(C).
-%must(MCall):- skipWrapper,!, (MCall *-> true ; ((dmsg(failed(must(MCall))),trace,MCall))).
+%must(MCall):- skipWrapper,!, (MCall *-> true ; ((dmsg(failed(must_failed_xxxxxxxx_(MCall))),trace,MCall))).
 %must(C):-  tlbugger:skipMust,!,catch(C,E,(wdmsg(E:C),fail)).
 
 %must(C):- is_release,!,C.
@@ -506,9 +511,9 @@ must(MCall):- tracing,!,setup_call_cleanup(notrace,must(MCall),trace).
 must(MCall):- 
  hotrace((tlbugger:show_must_go_on, strip_module(MCall,M,Call))),!,
  (
-  '@'(catch(Call,E,(dumpST,print_dmessage(error,must_ex(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
+  '@'(catch(Call,E,(dumpST,print_dmessage(error,must_xI__xI__xI__xI__xI_(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
   *-> true ; 
-  '@'((hotrace((print_dmessage(warning,must_failed(Call)),print_dmessage(error,must_failed(Call)))),badfood(Call)),M)).
+  '@'((hotrace((wdmsg(warn(must_failed_E_E_E_E_E_E_E_E_E(Call))),print_dmessage(error,must_failed(Call)))),badfood(Call)),M)).
 
 
 must(MCall):- 
@@ -516,8 +521,8 @@ must(MCall):-
  (
   '@'(catch(Call,E,(dumpST,print_dmessage(error,must_ex(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
   *-> true ; 
-  '@'((hotrace((print_dmessage(warning,must_failed(Call)),ignore(ftrace(Call)),debug,leash(+all),
-      print_dmessage(error,must_failed(Call)))),dtrace(Call)),M)).
+  '@'((hotrace((print_dmessage(warning,must_xI__xI__xI__xI__xI_(Call)),ignore(ftrace(Call)),debug,leash(+all),
+      wdmsg(warn(must_failed_E_E_E_E_E_E_E_E_E(Call))))),dtrace(Call)),M)).
 
 
 :- meta_predicate(motrace(0)).
@@ -2523,7 +2528,8 @@ dmsg5(Stuff):-!,dmsg('% ~q~n',[Stuff]).
 dmsg(_,F):-F==[-1];F==[[-1]].
 dmsg(F,A):-is_list(A),!,nl(user_error),fmt0(user_error,F,A),nl(user_error),flush_output_safe(user_error),!.
 dmsg(_,_):- is_hiding_dmsgs,!.
-dmsg(C,T):-!, (( fmt('<font size=+1 color=~w>',[C]), fmt(T), fmt('</font>',[]))),!.
+
+dmsg(C,T):-!, ((msg_to_string(T,S), fmt0('~N<font size=+1 color=~w>~s</font>',[C,S]))),!.
 
 dmsg(L,F,A):-loggerReFmt(L,LR),loggerFmtReal(LR,F,A).
 

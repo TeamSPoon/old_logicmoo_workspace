@@ -62,6 +62,14 @@ logicmoo_util_library:-module(logicmoo_util_library,
 :- meta_predicate(if_file_exists(:)).
 if_file_exists(M:Call):- arg(1,Call,File),(filematch(File,_)-> must((filematch(File,X),exists_file(X),call(M:Call)));fmt(not_installing(M,Call))),!.
 
+:- meta_predicate(with_filematch(0)).
+with_filematch(G):- expand_wfm(G,GG),!,GG.
+with_filematches(G):- forall(expand_wfm(G,GG),GG).
+
+expand_wfm(G,GG):- must((sub_term(Sub, G),compound(Sub),Sub=wfm(F))),
+   (filematch(F,M),subst(G,wfm(F),M,GG),y_must(with_filematch(G), (G\=@=GG))).
+
+
 
 :- ensure_loaded(logicmoo_util_bugger_new).
 :- ensure_loaded(logicmoo_util_bugger_catch).
@@ -512,6 +520,7 @@ multi_transparent(F/A):-!,multi_transparent(user:F/A).
 multi_transparent(X):-functor_catch(X,F,A),multi_transparent(F/A),!.
 
 
+exists_dirf(X):-atomic(X),(exists_file(X);exists_directory(X)).
 atom_concat_safe(L,R,A):- ((atom(A),(atom(L);atom(R))) ; ((atom(L),atom(R)))), !, atom_concat(L,R,A),!.
 exists_file_safe(File):-bugger:must(atomic(File)),exists_file(File).
 exists_directory_safe(File):-bugger:must(atomic(File)),exists_directory(File).

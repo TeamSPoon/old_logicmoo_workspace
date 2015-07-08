@@ -134,8 +134,12 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
         + others
         + sanity
       + domains_ocl
+        - assTaxi
+        - chameleonWorld
         + icons
         + library
+        - robot
+        + toasterWorldv2
       + elearning
       + frolog
         + GameScenarios
@@ -164,44 +168,6 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
         + Tools
         + UserInterface
       + fsaplanner
-      + gipo
-      + gipo_install
-        + jplan
-          + docs
-            + icons
-            + overview
-          + domains
-            + icons
-            + library
-          + edexpt
-          + general
-          + graphics
-            + gTool
-              + Graphics
-              + Windows
-            + transition
-          + images
-          + ocl
-          + pddl
-          + ptools
-          + tmp
-          + tools
-            + animator
-            + lifeHist
-              + resources
-            + opmaker
-            + sketch
-            + stepper
-          + top
-        + lib
-          + sicstus3.11.1
-            + bin
-            + library
-              + x86-linux-glibc2.2
-        + sp311
-          + bin
-          + library
-            + x86-win32-nt-4
       + golog
         - Delivery
         - Main
@@ -275,7 +241,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
             + others
           + planner
           + utils
-      + hyhtn
+      - hyhtn
       + ipc2008-no-cybersec
         + netben-opt
           + crewplanning-numeric
@@ -304,30 +270,67 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
           + parcprinter-strips
           + pegsol-strips
       + misc_planner
-      + orig_pddl_parser
-        - charts
+      - orig_pddl_parser
+        + charts
         + docs
         + output
         + test
-          + blocks
+          - blocks
           + elevators
-          + gripper
-          + hanoi
-      + planform.hud.ac.uk
-        + gipo
+          - gripper
+          - hanoi
+      + planform
+        - gipo
           + docs
             + icons
             + overview
           - student_domains
+        + gipo_install
+          - jplan
+            + docs
+              + icons
+              + overview
+            + domains
+              + icons
+              + library
+            + edexpt
+            + general
+            + graphics
+              + gTool
+                + Graphics
+                + Windows
+              + transition
+            + images
+            + ocl
+            + pddl
+            + ptools
+            - tmp
+            + tools
+              + animator
+              + lifeHist
+                + resources
+              + opmaker
+              + sketch
+              + stepper
+            + top
+          + lib
+            + sicstus3.11.1
+              + bin
+              + library
+                + x86-linux-glibc2.2
+          + sp311
+            + bin
+            + library
+              + x86-win32-nt-4
         + icons
-        - resource
-          + domains
+        + resource
+          - domains
           + htn
             + T1
             + T4
-          - HyHTN
-          - sig2
-          - tools
+          + HyHTN
+          + sig2
+          + tools
       + primaryobjects_strips
         + aircargo
         + blocksworld1
@@ -365,7 +368,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
             + Logistics
             + Robot
             + ZenoTravel
-      + uw-pddl
+      - uw-yale-pddl
         + doc
         + domains
           + transplan
@@ -400,7 +403,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
           + safety-domain
           + tire-world
           + trains
-          - transplan
+          + transplan
           + travel
           + truckworld
           + woodshop
@@ -2232,77 +2235,47 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
               + swi
               + trace
               + xref
-scroll:16
+scroll:69
 [State]
-SCREEN: 1920 1080 -2 16 1919 1004 0 0 M 0 0 0 0 1484 622
-CWD: pack\logicmoo_base\prolog\logicmoo\planner\orig_pddl_parser\test
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\gipo\student_domains\warming_food7.gfx"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=81 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\HyHTN\tasks_sd1.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=80 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\HyHTN\tasks_sd4.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=79 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\sig2\hiking_results1"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=83 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\tools\ocl2pddl.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=78 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\tools\fmacgr"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.78 CL=53 LE=0 CX=52 CY=6 WI=5 BI=53 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\domains\rb_pddl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.423 CL=1 LE=0 CX=0 CY=10 WI=5 BI=82 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\domains\rb_pddl_problem"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2043 CL=9 LE=0 CX=8 CY=9 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\pddl_robert_sasak.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.43335 CL=60 LE=0 CX=59 CY=11 WI=5 BI=54 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\gipo_install\jplan\gipo.properties"
+SCREEN: 1920 1080 0 16 1919 1004 0 0 M 0 0 0 0 1484 646
+CWD: pack\logicmoo_base\prolog\logicmoo\planner
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\domains_ocl\assTaxi\task2.pddl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=33 HT=0 HN=0 HF=0 HC=4
-WINDOW: 198 198 1286 424 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\pddl_robert_sasak.pl"
-VIEW: LN=.43335 CL=60 LE=0 CX=59 CY=11 WI=250 BI=54 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1286 424 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\domains\rb_pddl_problem"
-VIEW: LN=.2043 CL=9 LE=0 CX=8 CY=9 WI=172 BI=29 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1286 424 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\domains\rb_pddl"
-VIEW: LN=.423 CL=1 LE=0 CX=0 CY=10 WI=170 BI=82 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1286 424 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\tools\fmacgr"
-VIEW: LN=.78 CL=53 LE=0 CX=52 CY=6 WI=169 BI=53 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1286 424 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\tools\ocl2pddl.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=248 BI=78 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1286 424 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\sig2\hiking_results1"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=246 BI=83 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1286 424 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\HyHTN\tasks_sd4.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=244 BI=79 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1286 424 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\HyHTN\tasks_sd1.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=242 BI=80 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1286 424 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\gipo\student_domains\warming_food7.gfx"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=241 BI=81 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1286 424 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\gipo_install\jplan\gipo.properties"
-VIEW: LN=.267 CL=28 LE=0 CX=27 CY=9 WI=197 BI=33 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\domains_ocl\assTaxi\task3.pddl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=30 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\golog\Main\golog.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\hyhtn\htncode.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.69073 CL=1 LE=0 CX=0 CY=22 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\dbase_i_hyhtn.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=34 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1286 448 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\hyhtn\htncode.pl"
+VIEW: LN=.69073 CL=1 LE=0 CX=0 CY=22 WI=152 BI=28 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1286 448 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\golog\Main\golog.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=150 BI=29 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1286 448 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\domains_ocl\assTaxi\task3.pddl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=148 BI=30 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1286 448 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\domains_ocl\assTaxi\task2.pddl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=147 BI=31 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1286 448 -1 -1 M  WF=0 WT=1 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\dbase_i_hyhtn.pl"
+VIEW: LN=.3609 CL=28 LE=0 CX=27 CY=18 WI=154 BI=34 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\HyHTN\tasks_sd1.pl
-pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\HyHTN\tasks_sd4.pl
-pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\sig2\hiking_results1
-pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\tools\ocl2pddl.pl
-pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\tools\fmacgr
-pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\domains\rb_pddl
-pack\logicmoo_base\prolog\logicmoo\planner\planform.hud.ac.uk\resource\domains\rb_pddl_problem
+pack\logicmoo_base\prolog\logicmoo\planner\domains_ocl\assTaxi\domain.pddl
 pack\logicmoo_base\prolog\logicmoo\planner\pddl_robert_sasak.pl
-pack\logicmoo_base\prolog\logicmoo\planner\gipo_install\jplan\gipo.properties
+X:\devel\LogicmooDeveloperFramework\PrologMUD\runtime\run_mud_server.pl
+pack\logicmoo_base\prolog\logicmoo\planner\domains_ocl\robot2.ocl
+pack\logicmoo_base\prolog\logicmoo\planner\domains_ocl\assTaxi\task2.pddl
+pack\logicmoo_base\prolog\logicmoo\planner\domains_ocl\assTaxi\task3.pddl
+pack\logicmoo_base\prolog\logicmoo\planner\golog\Main\golog.pl
+pack\logicmoo_base\prolog\logicmoo\planner\hyhtn\htncode.pl
+pack\logicmoo_base\prolog\logicmoo\planner\dbase_i_hyhtn.pl

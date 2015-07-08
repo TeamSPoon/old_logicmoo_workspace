@@ -211,7 +211,8 @@ fully_expand(Op,Sent,SentO):-fully_expand_now(Op,Sent,SentO),!.
 fully_expand_now(_,Sent,SentO):-not(compound(Sent)),!,Sent=SentO.
 fully_expand_now(_,Sent,SentO):-thlocal:infSkipFullExpand,!,must(Sent=SentO).
 fully_expand_now(_,(:-(Sent)),(:-(Sent))):-!.
-fully_expand_now(Op,Sent,SentO):- copy_term(Sent,NoVary),with_assertions(thlocal:disable_mpred_term_expansions_locally,
+fully_expand_now(Op,Sent,SentO):- copy_term(Sent,NoVary),
+ with_assertions(thlocal:disable_mpred_term_expansions_locally,
    must(fully_expand_clause(Op,Sent,BO))),!,must(notrace((SentO=BO))),
     must(Sent=@=NoVary),
 
@@ -858,7 +859,7 @@ force_clause_expansion0(((H:-B)),R):- mud_rule_expansion(H,B,R),!.
 force_clause_expansion0(H,HR):- try_mud_asserted_expansion(H,HR),!.
 force_clause_expansion0(B,BR):- force_head_expansion(B,BR).
 
-force_expand(Goal):-thread_self(ID),with_assertions(always_expand_on_thread(ID),Goal),!.
+force_expand(Goal):-thread_self(ID),with_assertions(user:always_expand_on_thread(ID),Goal),!.
 
 
 force_head_expansion(H,HR):- try_mud_head_expansion(H,HR),!.

@@ -1017,26 +1017,26 @@ pddl_3_0_e(_Feature) --> {fail, can_pddl_30}, [],!.
 %
 domainBNF_dcg(Struct, Struct)
                         --> ['(','define'],([':'];[]),['(','domain'], name(N), [')'],
-                        {must(Struct = domain(N, R, T, C, P, F, C, S)),(var(OptionsDict)-> rb_new(OptionsDict) ; true)},
+                        {must(Struct = domain(N, R, T, C, P, F, C, S)), nop((var(OptionsDict)-> rb_new(OptionsDict) ; true))},
                         dcgMust(domainBNF_rest( Struct, R, T, C, P, F, C, S)),
                         {set_nb_propval(Struct,domain_name,N)}.
-                        
-domainBNF_rest( Struct, R, T, C, P, F, C, S ) --> 
+
+domainBNF_rest(Struct, R, T, C, P, F, C, S ) --> 
                             dcgMust(require_def(R)    ; []),
                              dcgMust(types_def(T)      ; []), %:typing
                              dcgMust(constants_def(C)  ; []),
                              dcgMust(predicates_def(P) ; []),
                              dcgMust(functions_def(F)  ; []), %:fluents
-%                            dcgMust (constraints(C)   ; []),    %:constraints
+%                            dcgMust (dconstraints_def(C)   ; []),    %:constraints
                              dcgMust(zeroOrMore(structure_def, S)),
                              [')'],{
-                            set_nb_propval(PROPS,requires,R)  ,  
-                            set_nb_propval(PROPS,types,T)    ,   %:typing
-                            set_nb_propval(PROPS,constants,C) ,
-                            set_nb_propval(PROPS,predicates,P) ,
-                            set_nb_propval(PROPS,functions_def,F), %:fluents
-                            set_nb_propval(PROPS,dconstraints,C)   ,    %:constraints
-                            set_nb_propval(PROPS,actions, S),
+                            set_nb_propval(Struct,requires,R)  ,  
+                            set_nb_propval(Struct,types,T)    ,   %:typing
+                            set_nb_propval(Struct,constants,C) ,
+                            set_nb_propval(Struct,predicates,P) ,
+                            set_nb_propval(Struct,functions_def,F), %:fluents
+                            set_nb_propval(Struct,dconstraints,C)   ,    %:constraints
+                            set_nb_propval(Struct,actions, S),
                              !}.
 
 require_def(R)          --> ['(',':','requirements'], oneOrMore(require_key, R), [')'].
@@ -1293,8 +1293,7 @@ problem(Output, List, R):- trace,problem_dcg(Output, List, R),!.
 problem_dcg(Struct)   
                                 --> ['(',define],([':'];[]),['(',problem,Name,')',
                                      '(',':',domain, Domain,')'],
-   {must((Struct = problem(Name, Domain, R, OD, I, G, UNK, MS, LS))),
-           (var(OptionsDict)-> rb_new(OptionsDict) ; true)},
+   {must((Struct = problem(Name, Domain, R, OD, I, G, UNK, MS, LS))), nop((var(OptionsDict)-> rb_new(OptionsDict) ; true))},
                                      dcgMust(problem_rest(R, OD, I, G, UNK, MS, LS)).
 
 problem_rest(R, OD, I, G, _, MS, LS) --> 

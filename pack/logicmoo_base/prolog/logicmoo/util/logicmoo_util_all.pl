@@ -35,8 +35,17 @@ current_filesource(F):-stream_property(_,file_name(F)).
 
 :- export(filematch/2).
 filematch(Spec,Result):-  enumerate_files(Spec,Result).
-:- export(enumerate_files/2).
 
+:- thread_local(thlocal:file_ext/1).
+:- export(filematch_ext/3).
+filematch_ext(Ext,FileIn,File):-
+  with_assertions(thlocal:file_ext(Ext),filematch(FileIn,File)).
+
+  must((stream_property(_,file_name(F)),
+    absolute_file_name(FileIn,File,
+         [file_errors(fail),relative_to(F),expand(true),access(read),extensions()]))),!.
+
+:- export(enumerate_files/2).
 enumerate_files(Spec,Result):-
    no_repeats_old([Result],((enumerate_files0(Spec,NResult),normalize_path(NResult,Result)))),exists_file_or_dir(Result).
 
@@ -49,11 +58,14 @@ enumerate_files0(Mask,File1):-  (current_dirs(D),filematch3(D,Mask,File1)).
 enumerate_files00(Spec,Result):- expand_file_name_safe(Spec,ResultList),ResultList\=[],!,member(NResult,ResultList),enumerate_files2(NResult,Result).
 enumerate_files00(Spec,Result):- enumerate_files1(Spec,M),enumerate_files2(M,Result).
 
+
 :- export(filematch3/3).
-filematch3(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1Matched,[expand(true),extensions(['',plmoo,pl,'pl.in']),
-   file_errors(fail),solutions(all),relative_to(RelativeTo),access(read)]),expand_file_name(File1Matched,File1S),member(File1,File1S).
-filematch3(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1Matched,[expand(true),file_type(directory),
-   file_errors(fail),solutions(all),relative_to(RelativeTo),access(read)]),expand_file_name(File1Matched,File1S),member(File1,File1S).
+filematch3(RelativeTo,Mask,File1):-
+   findall(Ext,thlocal:file_ext(Ext),EXTs),flatten(['',EXTs,'pl.in'],Flat),
+   absolute_file_name(Mask,File1Matched,[extensions(Flat),
+   expand(true),file_errors(fail),solutions(all),relative_to(RelativeTo),access(read)]),expand_file_name(File1Matched,File1S),member(File1,File1S).
+filematch3(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1Matched,[file_type(directory),
+   expand(true),file_errors(fail),solutions(all),relative_to(RelativeTo),access(read)]),expand_file_name(File1Matched,File1S),member(File1,File1S).
 
 :- export(enumerate_files2/2).
 enumerate_files2(Spec,Result):-sub_atom(Spec,_,1,_,'*') -> enumerate_files1(Spec,Result);Spec=Result.

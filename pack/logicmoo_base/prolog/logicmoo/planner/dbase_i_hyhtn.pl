@@ -2,6 +2,36 @@
 /* Douglas Miles 2005, 2010, 2014 */
 /* Denton, TX */
 /* ***********************************/
+
+:- dynamic   user:file_search_path/2.
+:- multifile user:file_search_path/2.
+user:file_search_path(pack, '../../../../').
+:- attach_packs.
+:- initialization(attach_packs).
+
+%%% ON :- initialization( profiler(_,walltime) ).
+%%% ON :- initialization(user:use_module(library(swi/pce_profile))).
+% [Required] Load the Logicmoo Library Utils
+:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+% :- qcompile_libraries.
+
+:- discontiguous((env_call/1,env_assert/1,env_asserta/1,env_retract/1,env_retractall/1)).
+
+:- meta_predicate(env_call(0)).
+:- meta_predicate(maybe_show_env_op(0)).
+
+:- thread_local(thlocal:db_spy/0).
+
+maybe_show_env_op(G):- !,G.
+maybe_show_env_op(G):- thlocal:db_spy -> show_call(G); G.
+
+env_call(F):-!,call(F).
+env_asserta(F):-!,maybe_show_env_op(asserta(F)).
+env_assert(F):-!,maybe_show_env_op(assert(F)).
+env_retract(F):-!,maybe_show_env_op(retract(F)).
+env_retractall(F):-!,maybe_show_env_op(retractall(F)).
+
+
 /* Donghong Liu */
 /* University of Huddersfield */
 /* September 2002 */
@@ -31,7 +61,7 @@ in_dyn_pred(_DB,Call):- functor(Call,F,A), mpred_arity(F,A), predicate_property(
 :-dynamic(user:mpred_prop/2).
 :-multifile(user:mpred_prop/2).
 
-mpred_arity(F,A):-user:arity(F,A).
+mpred_arity(F,A):-if_defined(user:arity(F,A)).
 
 env_mpred(Prop,F,A):- user:mpred_prop(F,Prop),ignore(mpred_arity(F,A)).
 
@@ -53,7 +83,8 @@ decl_mpred_env(kb(KB),_):- assert_if_new(env_kb(KB)),fail.
 decl_mpred_env(stubType(dyn),Pred):-!, decl_mpred_env(dyn,Pred).
 decl_mpred_env(Prop,Pred):- functor_h(Pred,F,A),decl_mpred_env(Prop,Pred,F,A).
 
-decl_mpred_env(Prop,Pred,F,A):- !,export(F/A),dynamic(F/A),multifile(F/A), decl_mpred(Pred,Prop),!.
+
+decl_mpred_env(Prop,Pred,F,A):- !,export(F/A),dynamic(F/A),multifile(F/A), if_defined(decl_mpred(Pred,Prop),asserta_if_new(user:mpred_prop(F,Prop))).
 
 env_learn_pred(_,_):-nb_getval(disabled_env_learn_pred,true),!.
 env_learn_pred(ENV,P):-decl_mpred_env(ENV,P).
@@ -151,15 +182,17 @@ ttm:-testing_already,!.
 ttm:-asserta(testing_already), make, retractall(testing_already),fail.
 
 
-get_tasks(N,Goal,State):-htn_task(N,Goal,State).
-get_tasks(N,Goal,State):-planner_task(N,Goal,State).
+get_tasks(N,Goal,State):-user:htn_task(N,Goal,State).
+get_tasks(N,Goal,State):-user:planner_task(N,Goal,State).
 
 banner_party(E,BANNER):- 
-      dmsg(E,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx':E),
-      dmsg(E,BANNER),
+  ansicall(yellow,(
+      format("% xxxxxxxxxxxxxxx ~w xxxxxxxxxxxxxxxxxxx~n",[E]),            
       forall(thlocal:doing(X),dmsg(E,doing(X))),
-      dmsg(E,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx':E),
-      dmsg(E,BANNER),!.
+      dmsg5(E,BANNER), 
+       format("% xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx~n",[]))).
+      
+      
 
 :-export(term_expansion_alias/2).
 term_expansion_alias(In,Out):-term_expansion_alias([],In,Out).
@@ -304,14 +337,15 @@ run_tests(Call) :-
 
 run_header_tests :- run_tests(forall(clause(header_tests,G),run_tests(G))).
 
-consultfilematch(File):-forall(filematch(File,FM),consult(FM)).
+consultfilematch(File):-forall(filematch(File,FM),reload_mpred_file(FM)).
+% % consultfilematch(File):-forall(filematch(File,FM),with_mpred_consult(FM)).
 
-retest_domfile(F):- filematch(F,FMT),FMT\==F,!,forall(filematch(F,FM),retest_domfile(FM)).
-retest_domfile(F):- expand_file_name(F,List),List\=[],!,forall(member(E,List),retest_domfile0(E)).
-retest_domfile(F):- retest_domfile0(F),!. 
-retest_domfile0(File):- time(with_assertions(thlocal:doing(retest_domfile(File)), once((env_clear_doms_and_tasks,clean,consultfilematch(File),tasks)))).
 
-header_tests :-retest_domfile('domains_ocl/*.ocl').
+
+test_ocl(F):- forall(filematch(F,File),test_ocl0(File)).
+test_ocl0(File):- time(with_assertions(thlocal:doing(test_ocl(File)), once((env_clear_doms_and_tasks,clean,consultfilematch(File),tasks)))).
+
+header_tests :-test_ocl('domains_ocl/*.ocl').
 
 
 :- style_check(-singleton).
@@ -559,13 +593,9 @@ current_op_num(X):- flag(op_num,X,X).
 :- set_op_num(0).
 % my_stats(0).
 
+solve:- with_filematch(reload_mpred_file(wfm(test_hyhtn))), doall(solve(_)).
 solve(Id) :-
-	htn_task(Id,Goal,Init),
-	planner_interface(Goal,Init,Sol,_,TNLst),
-        show_result_and_clean(user,Id,Sol,TNLst).
-
-solve(Id) :-
-	planner_task(Id,Goal,Init),
+	no_repeats(get_tasks(Id,Goal,Init)),
 	planner_interface(Goal,Init,Sol,_,TNLst),
         show_result_and_clean(user,Id,Sol,TNLst).
 
@@ -639,27 +669,40 @@ clean:-
 	% retractall(my_stats(_)),assert(my_stats(0)),
 	set_op_num(0).
 
+
+
 init_locl_planner_interface(G,I,Node):-   
-	change_obj_list(I),
-	ground_op,
-	assert_is_of_sort,
-	change_op_representation,
-	prim_substate_class,
-        set_op_num(0),
-        statistics_runtime(Time),
+  with_assertions(thlocal:db_spy,
+     init_locl_planner_interface0(G,I,Node)).
+
+init_locl_planner_interface0(G,I,Node):-    
+        change_obj_list(I),!,
+	ground_op,!,
+	assert_is_of_sort,!,
+	change_op_representation,!,
+	prim_substate_class,!,
+        set_op_num(0),!,
+        statistics_runtime(Time),!,
         ignore(retract(my_stats(_))),
         assert(my_stats(Time)),
         make_problem_into_node(I, G, Node),!.
         
 
-planner_interface(G,I, SOLN,OPNUM,TNList):-
-	init_locl_planner_interface(G,I,Node),
-        env_assert(Node),
+show_time(must(Call)):-!, functor(Call,F,A), time(must(Call)),format('~N% ~q~n',[previous_statistics_for(F/A)]).
+show_time(Call):- functor(Call,F,A), time(Call),format('~N% ~q~n',[previous_statistics_for(F/A)]).
+
+planner_interface0(G,I, SOLN,OPNUM,TNList):-
+	gripe_time(2.0,show_time(must(init_locl_planner_interface(G,I,Node)))),
+        env_assert(Node),!,
+        dmsg(solving_for(G)),!,
 	start_solve(SOLN,OPNUM,TNList).
-planner_interface(G,I, SOLN,OPNUM,TNList):-
-	tell(user),nl,write('failure in initial node'),
-     planner_failure('failure in initial node',planner_interface(G,I, SOLN,NODES,TNList)),
- !.
+
+
+planner_interface(G,I, SOLN,OPNUM,TNList):-  
+   (planner_interface0(G,I, SOLN,OPNUM,TNList)
+      *-> true ;   
+	(tell(user),nl,write('failure in initial node'),
+     planner_failure('failure in initial node',planner_interface(G,I, SOLN,NODES,TNList)),!)).
 
 /******************** Nodes *******************/
 % node(Name, Precond ,Decomps, Temp, Statics)
@@ -697,14 +740,16 @@ start_solve(Sol,OPNUM,TNList):-
    assert(soln_size(SIZE)),
    env_retractall(tn(_,_,_,_,_,_)),
    !.
-start_solve(Sol,OPNUM,TNList):-
+start_solve(Sol,OPNUM,TNList):-start_solve0(Sol,OPNUM,TNList)*->true;start_solve1(Sol,OPNUM,TNList).
+
+start_solve0(Sol,OPNUM,TNList):-
    select_node(Node),
 %   nl,write('processing '),write(Node),nl,
             % expand/prove its hps
    process_node(Node),
    start_solve(Sol,OPNUM,TNList).
 
-start_solve(Sol,OPNUM,TNList):- solve_failed(Sol,OPNUM,TNList).
+start_solve1(Sol,OPNUM,TNList):- solve_failed(Sol,OPNUM,TNList).
 
 solve_failed(Sol,OPNUM,TNList):-
     tell(user), write('+++ task FAILED +++'),    
@@ -974,15 +1019,18 @@ make_tpnodes(Pre,Post, Statics):-
    env_assert(tp_node(init,Pre,Statics,from(init),0,[])),!.
 
 %tp_node(TP,Pre,Statics,from(Parent),Score,Steps)
+
+
+
 % forward search for operators can't directly solved
 
-fwsearch(TN,State):- fwsearch0(fwsearch,800, TN,State).
+fwsearch(TN,State):- fwsearch0(fwsearch,1000, TN,State).
 
 fwsearch0(_,_, TN,State):-
    env_retract(solved_node(_,step(HP,Name,Pre,State,exp(TN)))).
 fwsearch0(_Caller, D, TN,State):- 
    var(TN),var(State),!,
-   D > 2, D2 is D-2,
+   D > 4, D2 is D-4,
    fwsearch1(var_fwsearch0, D2, TN,State).
 fwsearch0(_Caller, D, TN,State):- 
    D > 0, D2 is D-1,
@@ -998,6 +1046,8 @@ fwsearch1(_Caller, D, TN,State):-
 fwsearch1(_Caller, D ,TN,State):-
    env_call(tp_node(TP,Pre,Statics,from(PR),Score,Steps)),
    fwsearch0(tp_node, D ,TN,State).
+
+
 
 clean_temp_nodes_was_wrong:-
    % env_retractall(related_op(_)),
@@ -1880,17 +1930,17 @@ statics_consist_instance(Invs,[Pred|Atom]):-
 % static slot
 
 make_problem_into_node(I,goal(L,TM,STATS),  NN) :-
-     make_problem_up(L, STEPS),
+    must_det_l(( make_problem_up(L, STEPS),
      make_num_hp(TM,Temp),
      sort_steps(STEPS,Temp,STEPS1),
      make_ss_to_se(I,I_Pre),
-     NN = node(root,I_Pre,STEPS1 ,Temp, STATS),!.
+     NN = node(root,I_Pre,STEPS1 ,Temp, STATS))),!.
 make_problem_into_node(I,L,  NN) :-
-     make_problem_up([achieve(L)], STEPS),
+    must_det_l((  make_problem_up([achieve(L)], STEPS),
      make_num_hp(TM,Temp),
      sort_steps(STEPS,Temp,STEPS1),
      make_ss_to_se(I,I_Pre),
-     NN = node(root,I_Pre,STEPS1 ,Temp, STATS),!.
+     NN = node(root,I_Pre,STEPS1 ,Temp, STATS))),!.
 
 % make problem to steps
 make_problem_up([],[]):-!.

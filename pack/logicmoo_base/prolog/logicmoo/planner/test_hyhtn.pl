@@ -1,5 +1,5 @@
 
-end_of_file.
+% end_of_file.
 
 % robot world - OCL1.1
 
@@ -207,7 +207,7 @@ planner_task(4,
 planner_task(5,
 [se(robot,tom,[robot_in(tom,room5)]),
 se(box,box2,[in_room(box2,room6),at_door(box2,door56,room6)]),
-se(box,big_box,[in_room(big_box,room1)]]],
+se(box,big_box,[in_room(big_box,room1)])],
 
 [ss(robot,tom,[robot_in(tom,room2),robot_near(tom,box1)]),
  ss(box,box1,[in_room(box1,room2),at_door(box1,door25,room2)]),
