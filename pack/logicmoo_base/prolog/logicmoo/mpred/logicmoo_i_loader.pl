@@ -344,6 +344,7 @@ begin_transform_mpreds:- retractall(ended_transform_mpreds),context_module(CM),a
 end_transform_mpreds:- retractall(ended_transform_mpreds),asserta(ended_transform_mpreds).
 
 begin_transform_moo_preds:-begin_transform_mpreds.
+end_transform_moo_preds:-end_transform_preds.
 
 :- style_check(+discontiguous).
 :- style_check(-discontiguous).
