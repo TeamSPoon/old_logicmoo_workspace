@@ -41,7 +41,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
   - logicmoo
     + candc
       + working
-    + mpred
+    - mpred
     + mpred_online
     + osnark
     - planner
@@ -270,7 +270,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
           + parcprinter-strips
           + pegsol-strips
       + misc_planner
-      - orig_pddl_parser
+      + orig_pddl_parser
         + charts
         + docs
         + output
@@ -285,7 +285,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
             + icons
             + overview
           - student_domains
-        + gipo_install
+        - gipo_install
           - jplan
             + docs
               + icons
@@ -368,8 +368,8 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
             + Logistics
             + Robot
             + ZenoTravel
-      - uw-yale-pddl
-        + doc
+      + uw-yale-pddl
+        - doc
         + domains
           + transplan
           + washington
@@ -411,7 +411,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
     + pttp
     + swish_lib
       + render
-    + util
+    - util
   + MaLARea
     + bin
     + data
@@ -419,7 +419,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
     + script
       + malecop
   + mike
-  + MIndiGolog0
+  - MIndiGolog0
   + PKnows-0.9.9
     + vpdl
   + thea2
@@ -2235,47 +2235,71 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
               + swi
               + trace
               + xref
-scroll:69
+scroll:54
 [State]
 SCREEN: 1920 1080 0 16 1919 1004 0 0 M 0 0 0 0 1484 646
-CWD: pack\logicmoo_base\prolog\logicmoo\planner
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\domains_ocl\assTaxi\task2.pddl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\domains_ocl\assTaxi\task3.pddl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=30 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\golog\Main\golog.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\hyhtn\htncode.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.69073 CL=1 LE=0 CX=0 CY=22 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
+CWD: pack
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\pddl_robert_sasak.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.2109 CL=31 LE=0 CX=30 CY=26 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
 BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\dbase_i_hyhtn.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=34 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1286 448 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\hyhtn\htncode.pl"
-VIEW: LN=.69073 CL=1 LE=0 CX=0 CY=22 WI=152 BI=28 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1286 448 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\golog\Main\golog.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=150 BI=29 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1286 448 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\domains_ocl\assTaxi\task3.pddl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=148 BI=30 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1286 448 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\domains_ocl\assTaxi\task2.pddl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=147 BI=31 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1286 448 -1 -1 M  WF=0 WT=1 "Default Fixed Font,10,0,1"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.7752 CL=11 LE=0 CX=10 CY=8 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_loader.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.8271 CL=1 LE=0 CX=0 CY=26 WI=5 BI=36 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\util\logicmoo_util_all.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1796 CL=1 LE=0 CX=0 CY=25 WI=5 BI=37 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_hyhtn.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\logicmoo_engine.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.5839 CL=54 LE=0 CX=53 CY=27 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\dbase_i_hyhtn.pl.bak"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=40 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\pttp\dbase_i_mpred_pttp.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.660 CL=10 LE=0 CX=9 CY=30 WI=5 BI=32 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Users\Administrator\Documents\gipo-Win32-v2.1-06-06-2003\gipo_2.1\runGIPO.bat"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=1 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Batch	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1286 448 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\dbase_i_hyhtn.pl.bak"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=140 BI=40 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1286 448 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\logicmoo_engine.pl"
+VIEW: LN=.5839 CL=54 LE=0 CX=53 CY=27 WI=146 BI=19 HT=0 HN=0 HF=0 HC=4
+WINDOW: 198 198 1277 416 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_hyhtn.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=241 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1277 416 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_loader.pl"
+VIEW: LN=.12736 CL=1 LE=0 CX=0 CY=20 WI=233 BI=36 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1277 416 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
 BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\dbase_i_hyhtn.pl"
-VIEW: LN=.3609 CL=28 LE=0 CX=27 CY=18 WI=154 BI=34 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.7752 CL=11 LE=0 CX=10 CY=8 WI=243 BI=18 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1286 448 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\util\logicmoo_util_all.pl"
+VIEW: LN=.1796 CL=1 LE=0 CX=0 CY=25 WI=245 BI=37 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1277 416 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
+BUFFER: BN="C:\Users\Administrator\Documents\gipo-Win32-v2.1-06-06-2003\gipo_2.1\runGIPO.bat"
+VIEW: LN=.296 CL=1 LE=0 CX=0 CY=3 WI=227 BI=28 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1277 416 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\pddl_robert_sasak.pl"
+VIEW: LN=.2109 CL=31 LE=0 CX=30 CY=26 WI=161 BI=25 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1286 448 -1 -1 M  WF=0 WT=10 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\pttp\dbase_i_mpred_pttp.pl"
+VIEW: LN=.367 CL=25 LE=0 CX=24 CY=18 WI=116 BI=32 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-pack\logicmoo_base\prolog\logicmoo\planner\domains_ocl\assTaxi\domain.pddl
 pack\logicmoo_base\prolog\logicmoo\planner\pddl_robert_sasak.pl
-X:\devel\LogicmooDeveloperFramework\PrologMUD\runtime\run_mud_server.pl
-pack\logicmoo_base\prolog\logicmoo\planner\domains_ocl\robot2.ocl
-pack\logicmoo_base\prolog\logicmoo\planner\domains_ocl\assTaxi\task2.pddl
-pack\logicmoo_base\prolog\logicmoo\planner\domains_ocl\assTaxi\task3.pddl
-pack\logicmoo_base\prolog\logicmoo\planner\golog\Main\golog.pl
-pack\logicmoo_base\prolog\logicmoo\planner\hyhtn\htncode.pl
+pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_hyhtn.pl
+C:\Users\Administrator\Documents\gipo-Win32-v2.1-06-06-2003\gipo_2.1\runGIPO.bat
+pack\logicmoo_base\prolog\logicmoo\util\logicmoo_util_all.pl
 pack\logicmoo_base\prolog\logicmoo\planner\dbase_i_hyhtn.pl
+pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_loader.pl
+pack\logicmoo_base\prolog\logicmoo\logicmoo_engine.pl
+pack\logicmoo_base\prolog\logicmoo\pttp\dbase_i_mpred_pttp.pl
+pack\logicmoo_base\prolog\logicmoo\planner\dbase_i_hyhtn.pl.bak
