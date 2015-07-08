@@ -477,7 +477,7 @@ test_expand_units(IN):-fully_expand(query(t,must),IN,OUT),dmsg(test_expand_units
 
 mpred_modify(Op,                 G):- (var(Op);var(G)),!,trace_or_throw(var_database_modify_op(Op,  G )).
 mpred_modify(Op,                 G):- \+ skip_is_asserted_expansion(G),G\=meta_argtypes(_),fully_expand_warn(Op,G,GG),not_variant(G,GG),!,mpred_modify(Op, GG ),!.
-mpred_modify(_,  (:-include(FILE))):- !,must(load_data_file_now(FILE)).
+mpred_modify(_,  (:-include(FILE))):- !,must(load_mpred_file_now(FILE)).
 mpred_modify(Op,  (:-(G))         ):- !,must(with_assert_op_override(Op,debugOnError(G))).
 mpred_modify(P,                  G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
 %mpred_modify(Op,                 G):- mpred_head_expansion(clause,G,GG),not_variant(G,GG),database_modify_0(Op, GG ),!.

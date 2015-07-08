@@ -35,7 +35,7 @@ user:file_search_path(prologmud, library(prologmud)).
 
 
 
-% [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/
+% [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/)
 :- if_file_exists(ensure_loaded(library(eggdrop))).
 :- initialization((current_predicate(egg_go/0)->egg_go;true),now).
 
@@ -53,7 +53,7 @@ user:file_search_path(prologmud, library(prologmud)).
 % [Mostly Required] Load the Logicmoo Planner/AI System
 :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner)))).
 
-:-if( \+ gethostname(c3po )).
+:-if( (true ; \+ gethostname(c3po ))).
 
 % [Required] Load the Logicmoo WWW System
 :- time(ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).

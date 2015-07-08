@@ -41,7 +41,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
   - logicmoo
     + candc
       + working
-    - mpred
+    + mpred
     + mpred_online
     + osnark
     - planner
@@ -407,6 +407,441 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
           + travel
           + truckworld
           + woodshop
+      + www.hud.ac.uk
+        + about
+          + academicschools
+          + accessagreements
+          + annualreview
+          + choosing-our-new-chancellor
+          + constitutionalandlegalmatters
+          + corporate-social-responsibility
+          + councilprofiles
+          + environmentandsustainability
+          + financialstatements
+          + history-of-huddersfield
+          + information-for-media
+          + keyfacts
+          + maps
+          + our-awards
+            + awards-history
+            + guardian-inspiring-leader
+            + qs-four-star
+            + the-entrepreneurial-award
+            + the-university-of-the-year
+          + quality-assurance-agency
+          + seniorstaff
+          + services
+          + social-media-directory
+          + workingtogether
+        + about-huddersfield
+        + alumni
+          + alumnicareerpaths
+          + contactus
+          + emailforlife
+          + eventsandreunions
+          + global-alumni-network
+          + graduation
+          + linkedinseminars
+          + onlinecommunity
+          + recentgraduates
+          + registeryourkeyfobhere
+          + yourbusiness
+            + developyourstaff
+            + employagraduate
+            + meetourgraduates
+            + promoteyourbusiness
+            + provideaplacement
+            + startabusiness
+          + yourcareer
+            + alumniaccesstothelibrary
+            + beauniversityambassador
+            + careersadvice
+            + certificatesandtranscripts
+            + furtherstudy
+            + jobshopvacancies
+            + yourcareerprofile
+        + business
+        + ce
+          + accreditation
+          + business
+          + contact
+          + departments
+          + events
+            + contactus
+            + lecture
+          + expertise
+          + news
+            + 2
+            + 3
+            + schoolnews2010
+            + schoolnews2011
+              + 2
+              + 3
+            + schoolnews2012
+              + 2
+              + 3
+            + schoolnews2013
+              + 2
+              + 3
+              + 4
+              + 5
+            + schoolnews2014
+              + 2
+              + 3
+              + 4
+            + schoolnews2015
+              + 2
+              + 3
+          + ourstudents
+          + placements
+            + business
+              + contactus
+            + contactus
+            + students
+              + benefitsofplacements
+              + contactus
+              + placementcompanies
+              + placementprofiles
+              + theenterpriseplacementyear
+              + whatwecanofferyou
+          + profiles
+            + academicdepartments
+              + engineering
+              + informatics
+            + admissionsandmarketing
+            + alphabetical
+            + finance
+            + miscellaneous
+            + researchandenterprise
+            + researchstudents
+            + schoolmanagement
+            + studentsupport
+            + technicalsupport
+          + research
+            + conference
+              + registration
+          + scholarships
+          + scl
+            + activitiesforstudents
+            + discoverlectures
+            + tasterdayscalendar
+              + computergames
+              + computing
+              + electronicengineering
+              + mechanicalandautomotiveengineering
+              + musictechnologyandproduction
+              + webtechnologyanddesign
+              + womeninscienceandengineeringwise
+            + upcomingevents
+            + workingwithteachersandadvisers
+          + seniorstaff
+            + videos
+              + julie
+              + rupert
+              + steve
+        + cgi-bin
+        + contact
+        + courses
+          + 2016-17
+            + full-time
+              + postgraduate
+                + accelerator-science-msc
+                + accounting-msc
+                + advanced-architectural-design-ma
+                + advanced-computer-science-msc
+                + advanced-metrology-msc
+                + advanced-project-management-in-construction-msc
+                + advanced-safeguarding-msc
+                + analytical-bioscience-msc
+                + analytical-chemistry-msc
+                + applied-linguistics-doctor-of
+                + architecture-and-the-built-environment-ma-by-research
+                + architecture-and-the-built-environment-phd
+                + architecture-architecture-international-riba-part-2-master-of
+                + art--design-ma-by-research
+                + art--design-phd
+                + automotive-engineering-msc
+                + banking-and-finance-msc
+                + biological-sciences-msc-by-research
+                + biological-sciences-phd
+                + business-and-management-studies-msc-by-research
+                + business-and-management-studies-phd
+                + business-economics-msc
+                + business-english-and-intercultural-communication-ma
+                + business-msc
+                + business-with-finance-msc
+                + business-with-human-resource-management-msc
+                + business-with-international-law-msc
+                + chemical-engineering-msc-by-research
+                + chemical-engineering-phd
+                + chemistry-msc-by-research
+                + chemistry-phd
+                + commercial-law-distance-learning-llm
+                + commercial-law-llm
+                + communication-cultural-and-media-studies-phd
+                + communication-culture-and-media-studies-ma-by-research
+                + community-nursing-practice-district-nursing-msc
+                + computer-science-and-informatics-msc-by-research
+                + computer-science-and-informatics-phd
+                + criminology-criminal-justice-msc-by-research
+                + criminology-criminal-justice-phd
+                + design-integration-and-building-information-modelling-bim-msc
+                + digital-media-ma
+                + doctor-of-enterprise
+              + undergraduate
+                + accountancy-and-finance-ba-hons
+                + accountancy-ba-hons
+                + accountancy-with-financial-services-ba-hons
+                + advertising-and-marketing-communications-ba-hons
+                + air-transport-and-logistics-management-bsc-hons
+                + animation-ba-hons
+                + applied-computing-top-up-bsc-hons
+                + architecture-architecture-international-riba-part-1-ba-hons
+                + automotive-and-motorsport-engineering-bengh-meng
+                + behavioural-sciences-bsc-hons
+                + biochemistry-bsc-hons
+                + biology-molecular-and-cellular-bsc-hons
+                + broadcast-journalism-ba-hons
+                + business-administration-and-management-top-up-ba-hons
+                + business-and-human-resource-management-ba-hons
+                + business-and-journalism-ba-hons
+                + business-and-marketing-ba-hons
+                + business-information-management-ba-hons
+                + business-management-and-leadership-ba-hons
+                + business-management-ba-hons
+                + business-management-with-finance-ba-hons
+                + business-operations-management-ba-hons
+                + business-studies-ba-hons
+                + business-studies-with-environmental-management-ba-hons
+                + business-studies-with-financial-services-ba-hons
+                + business-with-financial-services-top-up-ba-hons
+                + business-with-supply-chain-management-ba-hons
+                + chemical-engineering-and-chemistry-bsc-hons
+                + chemical-engineering-beng-hons
+                + chemical-engineering-meng
+                + chemistry-bsc-hons
+                + chemistry-mchem
+                + chemistry-with-chemical-engineering-bsc-hons
+                + chemistry-with-forensic-science-bsc-hons
+                + chemistry-with-industrial-experience-mchem
+                + childhood-studies-ba-hons
+                + combined-honours-ba-bsc-hons
+                + computer-games-design-ba-hons
+                + computer-games-programming-bsc-hons
+                + computer-systems-engineering-beng-hons
+                + computing-bsc-hons
+                + computing-in-business-ba-hons
+                + computing-meng
+                + computing-science-bsc-hons
+                + computing-science-meng
+                + construction-project-management-bsc-hons
+                + contemporary-art-and-illustration-ba-hons
+                + contemporary-art-ba-hons
+                + costume-with-textiles-ba-hons
+                + counselling-studies-bsc-hons
+                + creative-music-technology-bmus-hons
+                + criminology-bsc-hons
+                + digital-entrepreneurship-top-up-ba-bsc-hons
+            + S514TS~W
+          + distance-learning
+          + full-time
+          + modern-language
+          + part-time
+          + postgraduate-research
+          + postgraduate-taught
+          + subjectlist
+          + undergraduate
+        + enterprise
+        + enterpriseandentrepreneurship
+        + estates
+          + supportservices
+            + securityandcarparking
+        + events
+        + helios.hud.ac.uk
+          + scomtlm
+            + Artform
+              + inaug
+            + seminars
+        + hr
+          + jobs
+          + staffdevelopment
+            + latestopps
+        + ihud-sign-up-form
+        + informationgovernance
+          + cookiepolicy
+          + copyrightanddisclaimer
+          + freedomofinformation
+        + international
+          + society
+        + library
+          + finding-info
+            + theuniversityofhuddersfieldrepository
+        + media
+          + universityofhuddersfield
+            + content
+              + files
+                + undergraduate
+                  + studentlife
+              + image
+                + computingandengineering
+                + icons
+                + news
+                  + newsstories
+                    + 1202-february2012
+                      + thumbnailimage
+                    + 1309-september2013
+                      + thumbnailimage
+                    + 1310-october2013
+                      + thumbnailimage
+                    + 1312-december2013
+                      + thumbnailimage
+                    + 1412-december2014
+                      + thumbnail-image
+                    + 1506-june2015
+                      + thumbnail-image
+                    + 1507-july2015
+                      + thumbnail-image
+            + content2013
+              + central
+                + alumni
+                  + landingpage
+                + international
+                  + newlanding
+                + socialmediahub
+                  + images
+                + staff
+              + schools
+                + computingandengineering
+                  + schoolexternalpages
+              + studentslandingpage
+                + macosx
+                + stuuuff
+            + styleassets
+              + css
+              + fonts
+              + images
+                + 2014hpimages
+                  + carousel
+                    + autumn2014
+                  + coursefinder
+                  + icons
+                + concerts
+                + footer
+              + js
+              + tn3
+                + css
+                + js
+        + news
+          + 2015
+            + july
+            + june
+          + visitors
+            + honorarygraduates
+            + royalvisits
+        + open-days
+        + order-a-prospectus
+        + ourstaff
+          + researchstaffbooklet
+            + researchstaff2015
+        + planet.hud.ac.uk
+          + aips02kett
+          + archive
+            + papers
+          + ecp01_workshop
+          + home
+            + images
+          + ke_talk1
+          + repository
+            + images
+          + roaddir
+        + postgraduate
+        + registry
+          + regulationsandpolicies
+            + studentregs
+        + regs
+        + research
+        + schools
+        + scom.hud.ac.uk
+          + planet
+        + services
+          + studentsupport
+          + vco
+            + policiesandprocedures
+        + social-media-hub
+        + sport-fitness-health
+        + staff
+          + 10
+          + 11
+          + 12
+          + 13
+          + 14
+          + 15
+          + 16
+          + 17
+          + 18
+          + 19
+          + 2
+          + 20
+          + 21
+          + 22
+          + 23
+          + 24
+          + 25
+          + 26
+          + 27
+          + 28
+          + 29
+          + 3
+          + 30
+          + 31
+          + 32
+          + 33
+          + 34
+          + 35
+          + 36
+          + 37
+          + 38
+          + 39
+          + 4
+          + 40
+          + 41
+          + 42
+          + 43
+          + 44
+          + 45
+          + 46
+          + 47
+          + 48
+          + 49
+          + 5
+          + 6
+          + 7
+          + 8
+          + 9
+          + academiccalendar
+          + brand-manager
+          + campuslife
+            + employeebenefits
+            + staff-news-archive
+          + it
+            + affiliates
+          + strategymap
+        + start
+        + student-news
+        + students
+          + finance
+          + it
+            + uniappforsmartphones
+          + keydates
+          + studentservicesa-z
+          + studyresources
+          + unilife
+        + undergraduate
+          + parentsandcarers
+          + schools-and-colleges-liaison-service
+          + student-life
+        + uni-life
+        + wellbeing-disability-services
     + plarkc
     + pttp
     + swish_lib
@@ -419,7 +854,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
     + script
       + malecop
   + mike
-  - MIndiGolog0
+  + MIndiGolog0
   + PKnows-0.9.9
     + vpdl
   + thea2
@@ -2235,71 +2670,35 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
               + swi
               + trace
               + xref
-scroll:54
+scroll:225
 [State]
 SCREEN: 1920 1080 0 16 1919 1004 0 0 M 0 0 0 0 1484 646
-CWD: pack
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\pddl_robert_sasak.pl"
+CWD: pack\prologmud
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\hyhtn\ob_utils.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\hyhtn\ocl2pddl_1_2.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2109 CL=31 LE=0 CX=30 CY=26 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\dbase_i_hyhtn.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\prologmud\runtime\run_mud_server.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.7752 CL=11 LE=0 CX=10 CY=8 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_loader.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.8271 CL=1 LE=0 CX=0 CY=26 WI=5 BI=36 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\util\logicmoo_util_all.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1796 CL=1 LE=0 CX=0 CY=25 WI=5 BI=37 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_hyhtn.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\logicmoo_engine.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.5839 CL=54 LE=0 CX=53 CY=27 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\dbase_i_hyhtn.pl.bak"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=40 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\pttp\dbase_i_mpred_pttp.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.660 CL=10 LE=0 CX=9 CY=30 WI=5 BI=32 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="C:\Users\Administrator\Documents\gipo-Win32-v2.1-06-06-2003\gipo_2.1\runGIPO.bat"
-BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=1 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Batch	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1286 448 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\dbase_i_hyhtn.pl.bak"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=140 BI=40 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1286 448 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\logicmoo_engine.pl"
-VIEW: LN=.5839 CL=54 LE=0 CX=53 CY=27 WI=146 BI=19 HT=0 HN=0 HF=0 HC=4
-WINDOW: 198 198 1277 416 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_hyhtn.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=241 BI=17 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1277 416 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_loader.pl"
-VIEW: LN=.12736 CL=1 LE=0 CX=0 CY=20 WI=233 BI=36 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1277 416 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\dbase_i_hyhtn.pl"
-VIEW: LN=.7752 CL=11 LE=0 CX=10 CY=8 WI=243 BI=18 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1286 448 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\util\logicmoo_util_all.pl"
-VIEW: LN=.1796 CL=1 LE=0 CX=0 CY=25 WI=245 BI=37 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1277 416 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
-BUFFER: BN="C:\Users\Administrator\Documents\gipo-Win32-v2.1-06-06-2003\gipo_2.1\runGIPO.bat"
-VIEW: LN=.296 CL=1 LE=0 CX=0 CY=3 WI=227 BI=28 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1277 416 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\pddl_robert_sasak.pl"
-VIEW: LN=.2109 CL=31 LE=0 CX=30 CY=26 WI=161 BI=25 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1286 448 -1 -1 M  WF=0 WT=10 "Default Fixed Font,10,0,1"
-BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\pttp\dbase_i_mpred_pttp.pl"
-VIEW: LN=.367 CL=25 LE=0 CX=24 CY=18 WI=116 BI=32 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.1651 CL=47 LE=0 CX=46 CY=11 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1286 448 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\hyhtn\ocl2pddl_1_2.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=107 BI=15 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1286 448 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\hyhtn\ob_utils.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=106 BI=5 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1286 448 -1 -1 M  WF=0 WT=4 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\prologmud\runtime\run_mud_server.pl"
+VIEW: LN=.1354 CL=133 LE=0 CX=132 CY=5 WI=109 BI=16 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-pack\logicmoo_base\prolog\logicmoo\planner\pddl_robert_sasak.pl
-pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_hyhtn.pl
-C:\Users\Administrator\Documents\gipo-Win32-v2.1-06-06-2003\gipo_2.1\runGIPO.bat
-pack\logicmoo_base\prolog\logicmoo\util\logicmoo_util_all.pl
-pack\logicmoo_base\prolog\logicmoo\planner\dbase_i_hyhtn.pl
-pack\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_loader.pl
-pack\logicmoo_base\prolog\logicmoo\logicmoo_engine.pl
-pack\logicmoo_base\prolog\logicmoo\pttp\dbase_i_mpred_pttp.pl
-pack\logicmoo_base\prolog\logicmoo\planner\dbase_i_hyhtn.pl.bak
+X:\mnt\mint-oldsys\devel\LogicmooDeveloperFramework\MORELM\LogicmooDeveloperFramework~\logicmoo~\src_modules\planner_resources\OCL\gipoSRC--v2.1-06-06-2003\jplan\README
+X:\mnt\mint-oldsys\devel\LogicmooDeveloperFramework\MORELM\LogicmooDeveloperFramework~\logicmoo~\src_modules\eden2\search.p
+X:\mnt\mint-oldsys\devel\LogicmooDeveloperFramework\MORELM\LogicmooDeveloperFramework~\logicmoo~\src_modules\planner_resources\trunk\Tesis\traductor.dia
+X:\mnt\mint-oldsys\devel\LogicmooDeveloperFramework\MORELM\LogicmooDeveloperFramework~\logicmoo~\src_modules\pddl_parser~\trunk\module_lists.pl
+pack\logicmoo_base\prolog\logicmoo\planner\oclPlan\compile1.2\olprecede
+pack\logicmoo_base\prolog\logicmoo\planner\oclPlan\compile1.2\onprecede
+pack\logicmoo_base\prolog\logicmoo\planner\hyhtn\ob_utils.pl
+pack\logicmoo_base\prolog\logicmoo\planner\hyhtn\ocl2pddl_1_2.pl
+pack\prologmud\runtime\run_mud_server.pl

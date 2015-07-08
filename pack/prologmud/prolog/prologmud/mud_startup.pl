@@ -211,7 +211,7 @@ debug_repl_w_cyc(Module,CallFirst):- !,
           with_assertions(thlocal:useOnlyExternalDBs,
             with_assertions(thglobal:use_cyc_database,
                ((decl_type(person),          
-                ensure_plmoo_loaded(logicmoo('rooms/startrek.all.plmoo')),
+                ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.plmoo')),
                 module(Module),
                 show_call(CallFirst), 
                 prolog_repl)))).
@@ -220,7 +220,7 @@ debug_repl_wo_cyc(Module,CallFirst):- !,
           with_no_assertions(thlocal:useOnlyExternalDBs,
             with_assertions(thglobal:use_cyc_database,
                ((decl_type(person),          
-                ensure_plmoo_loaded(logicmoo('rooms/startrek.all.plmoo')),
+                ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.plmoo')),
                 module(Module),
                 show_call(CallFirst), 
                 prolog_repl)))).
@@ -449,7 +449,7 @@ make_qlfs:-
 
 % done in 'user' to avoid reloading when we reload dbase
 
-:- include_moo_files('../src_asserts/pldata/?*.pl').
+:- include_mpred_files('../src_asserts/pldata/?*.pl').
 
 */
 :-export(user_ensure_nl_loaded/1).
@@ -497,20 +497,20 @@ download_and_install_el:-
 
 
 % NPC planners
-:- include_moo_files(prologmud(mobs/'?*.pl')).
-:- include_moo_files('../src_assets/mobs/?*.pl').
-:- xperimental->include_moo_files('../external/XperiMental/src_incoming/mobs/?*.pl');true.
+:- include_mpred_files(prologmud(mobs/'?*.pl')).
+:- include_mpred_files('../src_assets/mobs/?*.pl').
+:- xperimental->include_mpred_files('../external/XperiMental/src_incoming/mobs/?*.pl');true.
 
 
 % Action/Commands implementation
-:- include_moo_files(prologmud(actions/'?*.pl')).
-:- include_moo_files('../src_assets/actions/?*.pl').
-:- xperimental->include_moo_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
+:- include_mpred_files(prologmud(actions/'?*.pl')).
+:- include_mpred_files('../src_assets/actions/?*.pl').
+:- xperimental->include_mpred_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
 
 % New Objects
-:- include_moo_files(prologmud(objs/'?*.pl')).
-:- include_moo_files('../src_assets/objs/?*.pl').
-:- xperimental->include_moo_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
+:- include_mpred_files(prologmud(objs/'?*.pl')).
+:- include_mpred_files('../src_assets/objs/?*.pl').
+:- xperimental->include_mpred_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
 
 
 % Define the agents traits, both for your agent and the world inhabitants. 
@@ -538,9 +538,9 @@ user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term
 %:-forall(make_tabled_perm(grab_argsIsa(F,Types)),dmsg(grab_argsIsa(F,Types))).
 
 
-:- ensure_plmoo_loaded(prologmud(server/builtin)).
+:- ensure_mpred_file_loaded(prologmud(server/builtin)).
 
-:- forall(filematch('*/*.plmoo', X),(dmsg(ensure_plmoo_loaded(X)),ensure_plmoo_loaded(X))).
+:- forall(filematch('*/*.plmoo', X),(dmsg(ensure_mpred_file_loaded(X)),ensure_mpred_file_loaded(X))).
 
 
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
@@ -550,9 +550,9 @@ user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term
 % Load the map file appropriate for the world being used.
 % Load the mud files appropriate for the mobs being used.
 :- forall(filematch(prologmud('*/?*.plmoo'), X),dmsg(X)).
-:- ensure_plmoo_loaded(prologmud('*/?*.plmoo')).
+:- ensure_mpred_file_loaded(prologmud('*/?*.plmoo')).
 :- forall(filematch(prologmud('*/*/?*.plmoo'), X),dmsg(X)).
-:- ensure_plmoo_loaded(prologmud('*/*/?*.plmoo')).
+:- ensure_mpred_file_loaded(prologmud('*/*/?*.plmoo')).
 
 % puts world into running state
 % :- must(old_setup).

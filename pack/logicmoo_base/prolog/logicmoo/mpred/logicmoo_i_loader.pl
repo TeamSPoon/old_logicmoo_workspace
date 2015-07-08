@@ -80,7 +80,10 @@ load_dbase(World,File):-
 
 
 :- meta_predicate(ensure_mpred_loaded(0)).
-ensure_mpred_loaded(A) :- 
+ensure_mpred_loaded(A) :- ensure_mpred_file_loaded(A).
+
+:- meta_predicate(ensure_mpred_file_loaded(0)).
+ensure_mpred_file_loaded(A) :-
   forall(filematch(A,F), 
     (asserta_if_new(must_compile_special_clause_file(F)),
       ensure_mpred_loaded_each(F))).
@@ -93,6 +96,7 @@ get_last_time_file(FileIn,World,LastTime):- absolute_file_name(FileIn,File),thgl
 get_last_time_file(_,_,0).
 
 :-meta_predicate(ensure_mpred_loaded_each(?)).
+ensure_mpred_loaded_each(FileIn):-!,ensure_loaded(FileIn).
 ensure_mpred_loaded_each(FileIn):-
    must_locate_file(FileIn,File),
    must(thglobal:current_world(World)),
@@ -122,6 +126,7 @@ must_locate_file(FileIn,File):-
 load_mpred_file(FileIn):- must(load_mpred_file_now(FileIn)).
 
 
+load_mpred_file_now(FileIn):- !, must(ensure_loaded(FileIn)).
 load_mpred_file_now(FileIn):-
    must(must_locate_file(FileIn,File)),
    must(thglobal:current_world(World)),
@@ -298,7 +303,7 @@ term_expand_local_each(CM,X,F,A,X):-registered_module_type(CM,dynamic),dynamic(F
 % include_mpred_file(MASK)
 % ========================================
 
-include_mpred_file(Mask):- 
+include_mpred_files(Mask):- 
      forall(filematch(Mask,E),ensure_mpred_loaded(E)).
 /*
 module(M,Preds):-

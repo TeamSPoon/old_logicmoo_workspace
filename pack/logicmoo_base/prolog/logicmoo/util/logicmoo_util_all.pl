@@ -42,9 +42,11 @@ filematch_ext(Ext,FileIn,File):-
   with_assertions(thlocal:file_ext(Ext),filematch(FileIn,File)).
 
 :- export(enumerate_files/2).
-enumerate_files(Spec,Result):-
-   no_repeats_old([Result],((enumerate_files0(Spec,NResult),normalize_path(NResult,Result)))),exists_file_or_dir(Result).
+:- meta_predicate(enumerate_files(:,-)).
+enumerate_files(M:Spec,Result):-
+   '@'((no_repeats_old([Result],((enumerate_files0(Spec,NResult),normalize_path(NResult,Result),exists_file_or_dir(Result))))),M).
 
+:- export(enumerate_files0/2).
 enumerate_files0(Mask,File1):- absolute_file_name(Mask,X,[expand(true),file_errors(fail),solutions(all)]),expand_file_name(X,Y),member(File1,Y).
 enumerate_files0(Mask,File1):- one_must(filematch3('./',Mask,File1),(current_filedir(D),filematch3(D,Mask,File1))).
 enumerate_files0(Spec,Result):- enumerate_files00(Spec,Result).
