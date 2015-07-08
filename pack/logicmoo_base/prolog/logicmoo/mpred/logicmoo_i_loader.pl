@@ -343,8 +343,8 @@ is_compiling:-is_compiling_clause;compiling.
 begin_transform_mpreds:- retractall(ended_transform_mpreds),context_module(CM),asserta(must_compile_special_clause_file(CM)).
 end_transform_mpreds:- retractall(ended_transform_mpreds),asserta(ended_transform_mpreds).
 
-begin_transform_moo_preds:-begin_transform_mpreds.
-end_transform_moo_preds:-end_transform_preds.
+begin_transform_moo_preds:- begin_transform_mpreds.
+end_transform_moo_preds:- end_transform_mpreds.
 
 :- style_check(+discontiguous).
 :- style_check(-discontiguous).
