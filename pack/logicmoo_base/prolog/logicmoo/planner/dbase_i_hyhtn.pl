@@ -193,10 +193,13 @@ banner_party(E,BANNER):-
        format("% xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx~n",[]))).
       
       
+subst_eq_h(A,B,C,D):- nd_subst(A,B,C,D),!.
+subst_eq_h(A,B,C,D):- trace, nd_subst(A,B,C,D),!.
+
 
 :-export(term_expansion_alias/2).
 term_expansion_alias(In,Out):-term_expansion_alias([],In,Out).
-term_expansion_alias(Not,In,Out):-term_alias(I,O),not(member(I,Not)),subst_eq(In,I,O,M), In\=@=M,!, term_expansion_alias([I|Not],M,Out).
+term_expansion_alias(Not,In,Out):-term_alias(I,O),not(member(I,Not)),subst_eq_h(In,I,O,M), In\=@=M,!, term_expansion_alias([I|Not],M,Out).
 term_expansion_alias(_Not,InOut,InOut).
 term_alias(cond,se).
 term_alias(se,se).
@@ -207,9 +210,6 @@ term_alias(neq,dif).
 % term_alias(htn_task,planner_task).
 term_alias(startOcl,start).
 term_alias(startOCL,start).
-
-subst_eq(A,B,C,D):- nd_subst(A,B,C,D),!.
-subst_eq(A,B,C,D):- trace, nd_subst(A,B,C,D),!.
 
 
 tasks:- 
