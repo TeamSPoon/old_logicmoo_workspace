@@ -203,7 +203,7 @@ assert_kif_dolce(String):-from_kif_string(String,Forms),dmsg(warn(assert_kif_dol
 
 :-meta_predicate(doall_and_fail(0)).
 
-finish_processing_world :- load_mpred_file, loop_check(with_assertions(thlocal:agenda_slow_op_do_prereqs,doall(finish_processing_dbase)),true).
+finish_processing_world :- load_mpred_files, loop_check(with_assertions(thlocal:agenda_slow_op_do_prereqs,doall(finish_processing_dbase)),true).
 
 doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 
