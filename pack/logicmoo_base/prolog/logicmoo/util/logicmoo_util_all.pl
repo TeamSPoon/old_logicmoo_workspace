@@ -41,10 +41,6 @@ filematch(Spec,Result):-  enumerate_files(Spec,Result).
 filematch_ext(Ext,FileIn,File):-
   with_assertions(thlocal:file_ext(Ext),filematch(FileIn,File)).
 
-  must((stream_property(_,file_name(F)),
-    absolute_file_name(FileIn,File,
-         [file_errors(fail),relative_to(F),expand(true),access(read),extensions()]))),!.
-
 :- export(enumerate_files/2).
 enumerate_files(Spec,Result):-
    no_repeats_old([Result],((enumerate_files0(Spec,NResult),normalize_path(NResult,Result)))),exists_file_or_dir(Result).
