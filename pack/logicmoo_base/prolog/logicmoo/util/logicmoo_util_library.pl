@@ -294,7 +294,8 @@ nd_predsubst1( _,  P, 0, P  ).
 nd_predsubst1( Pred,  P, N, P1 ) :- N > 0, P =.. [F|Args], 
             nd_predsubst2( Pred,  Args, ArgS ),
             nd_predsubst2( Pred, [F], [FS] ),  
-            P1 =.. [FS|ArgS].
+            univ_term(P1 , [FS|ArgS]).
+
 
 nd_predsubst2( _, [], [] ).
 nd_predsubst2( Pred, [A|As], [Sk|AS] ) :- call(Pred,A,Sk), !, nd_predsubst2( Pred, As, AS).
@@ -318,10 +319,10 @@ nd_pred_subst(_Pred,  Var, _,_,Var ) :- var(Var),!.
 nd_pred_subst(Pred,  P, X,Sk, P1 ) :- functor(P,_,N),nd_pred_subst1(Pred, X, Sk, P, N, P1 ).
 
 nd_pred_subst1(_Pred, _,  _, P, 0, P  ).
-nd_pred_subst1(Pred, X, Sk, P, N, P1 ) :- N > 0, univ_safe(P , [F|Args]), 
+nd_pred_subst1(Pred, X, Sk, P, N, P1 ) :- N > 0, univ_term(P , [F|Args]), 
             nd_pred_subst2(Pred, X, Sk, Args, ArgS ),
-            nd_pred_subst2(Pred, X, Sk, [F], [FS] ),  
-            univ_safe(P1 , [FS|ArgS]).
+            nd_pred_subst2(Pred, X, Sk, [F], [FS] ),
+            univ_term(P1 , [FS|ArgS]).
 
 nd_pred_subst2(_, _,  _, [], [] ).
 nd_pred_subst2(Pred, X, Sk, [A|As], [Sk|AS] ) :- call(Pred, X , A), !, nd_pred_subst2(Pred, X, Sk, As, AS).
@@ -363,16 +364,19 @@ nd_subst(  Var, _,_,Var ) :- var(Var),!.
 nd_subst(  P, X,Sk, P1 ) :- functor(P,_,N),nd_subst1( X, Sk, P, N, P1 ).
 
 nd_subst1( _,  _, P, 0, P  ).
-nd_subst1( X, Sk, P, N, P1 ) :- N > 0, univ_safe(P , [F|Args]), 
+nd_subst1( X, Sk, P, N, P1 ) :- N > 0, univ_term(P , [F|Args]), 
             nd_subst2( X, Sk, Args, ArgS ),
             nd_subst2( X, Sk, [F], [FS] ),  
-            univ_safe(P1 , [FS|ArgS]).
+            univ_term(P1 , [FS|ArgS]).
 
 nd_subst2( _,  _, [], [] ).
 nd_subst2( X, Sk, [A|As], [Sk|AS] ) :- X == A, !, nd_subst2( X, Sk, As, AS).
 nd_subst2( X, Sk, [A|As], [A|AS]  ) :- var(A), !, nd_subst2( X, Sk, As, AS).
 nd_subst2( X, Sk, [A|As], [Ap|AS] ) :- nd_subst( A,X,Sk,Ap ),nd_subst2( X, Sk, As, AS).
 nd_subst2( _X, _Sk, L, L ).
+
+univ_term(P1,[FS|ArgS]):- compound(FS),!,append_term(FS,ArgS,P1).
+univ_term(P1,[FS|ArgS]):- univ_safe(P1 , [FS|ArgS]).
 
 
 wsubst(A,B,C,D):- 
@@ -386,7 +390,7 @@ weak_nd_subst1( _,  _, P, 0, P  ).
 
 weak_nd_subst1( X, Sk, P, N, P1 ) :- N > 0, P =.. [F|Args], weak_nd_subst2( X, Sk, Args, ArgS ),
             weak_nd_subst2( X, Sk, [F], [FS] ),
-            P1 =.. [FS|ArgS].
+            univ_term(P1 , [FS|ArgS]).
 
 weak_nd_subst2( _,  _, [], [] ).
 weak_nd_subst2( X, Sk, [A|As], [Sk|AS] ) :- nonvar(A), X = A, !, weak_nd_subst2( X, Sk, As, AS).

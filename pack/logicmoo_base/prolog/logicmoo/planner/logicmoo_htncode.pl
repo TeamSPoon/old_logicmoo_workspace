@@ -1,6 +1,12 @@
 % :- include('d:/dev/oaa2_inc.pl').
 /* htncode.pl */
-
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
 /* ***********************************/
 /* Donghong Liu */
 /* University of Huddersfield */

@@ -53,7 +53,8 @@ user:file_search_path(prologmud, library(prologmud)).
 % [Mostly Required] Load the Logicmoo Planner/AI System
 :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner)))).
 
-:-if( (true ; \+ gethostname(c3po ))).
+:- if(\+ if_defined(debugging_planner)).
+
 
 % [Required] Load the Logicmoo WWW System
 :- time(ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
@@ -200,7 +201,7 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 
 feature_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
 
-:- if((gethostname(titan);true)).
+:- if((gethostname(titan))).
 
 % :-feature_testp1.
 
@@ -238,7 +239,7 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 % :- register_timer_thread(npc_ticker,60,npc_tick).
 
 
-% :- pce_show_profile.
+:- pce_show_profile.
 
 :-endif.  % MUD TESTS
 % :- enqueue_agent_action(prolog).

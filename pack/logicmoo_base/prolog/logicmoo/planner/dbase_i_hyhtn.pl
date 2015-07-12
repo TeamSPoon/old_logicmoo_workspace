@@ -3,6 +3,14 @@
 /* Denton, TX */
 /* ***********************************/
 
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
 user:file_search_path(pack, '../../../../').
@@ -593,7 +601,10 @@ current_op_num(X):- flag(op_num,X,X).
 :- set_op_num(0).
 % my_stats(0).
 
-solve:- with_filematch(reload_mpred_file(wfm(test_hyhtn))), doall(solve(_)).
+l_file(F):-if_defined(reload_mpred_file(F),consult(F)).
+
+solve_file(F):-with_filematch(l_file(wfm(F))), doall(solve(_)).
+solve:- solve_file(test_hyhtn).
 solve(Id) :-
 	no_repeats(get_tasks(Id,Goal,Init)),
 	planner_interface(Goal,Init,Sol,_,TNLst),
@@ -3610,7 +3621,5 @@ doall(G):-ignore((G,fail)).
 one_must(Call,Else):- trye(Call)*->true;Else.
 
 :-dynamic((env_mpred/3, mpred_arity/2, env_kb/1)).
-
-:-include(dbase_i_hyhtn).
 
 

@@ -3,10 +3,10 @@ PrologMUD_base.vpj=Release
 [Global]
 CurrentProject=pack\prologmud\PrologMUD.vpj
 [ProjectDates]
-pack\PrologMUD_RT.vpj=20150703092141621
-pack\prologmud\PrologMUD.vpj=20150703092124796
-pack\logicmoo_base\prolog\LogicmooBase.vpj=20150703025341697
-pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150703025342049
+pack\PrologMUD_RT.vpj=20150705021316319
+pack\prologmud\PrologMUD.vpj=20150705021316331
+pack\logicmoo_base\prolog\LogicmooBase.vpj=20150615055716059
+pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
 [TreeExpansion2]
 - pack\logicmoo_base\prolog\LogicmooBase.vpj
   + ailog2

@@ -432,6 +432,7 @@ must_det(Call,_OnFail):-Call,!.
 must_det(_Call,OnFail):-OnFail.
 
 :-module_transparent(must_det_l/1).
+must_det_l(MC):- tlbugger:skipMust,!, strip_module(MC,M,C),!, '@'(det_lm(M,C),M).
 must_det_l(MC):- strip_module(MC,M,C),!, '@'(must_det_lm(M,C),M).
 
 :-module_transparent(must_det_lm/2).
@@ -439,8 +440,11 @@ must_det_lm(_,C):-var(C),trace_or_throw(var_must_det_l(C)),!.
 must_det_lm(_,[]):-!.
 must_det_lm(M,[C|List]):-!,M:must(C),!,must_det_lm(M,List).
 must_det_lm(M,(C,List)):-!,M:must(C),!,must_det_lm(M,List).
-must_det_lm(M,C):- !,must(M:C).
+must_det_lm(M,C):- must(M:C),!.
 
+:-module_transparent(det_lm/2).
+det_lm(M,(C,List)):- !,C,!,det_lm(M,List).
+det_lm(M,C):-M:C,!.
 
 :-module_transparent(must_l/2).
 must_l(C):-var(C),trace_or_throw(var_must_l(C)),!.
