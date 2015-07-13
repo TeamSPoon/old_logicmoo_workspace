@@ -1,4 +1,6 @@
-:- module(lp,[test_blocks/0,test_domain/1,test_all/0,test_rest/0,test_sas/0,test_dir_files_sas/1,test_dir_files_sas/3]).
+% :- module(lp,[test_blocks/0,test_domain/1,test_all/0,test_rest/0,test_sas/0,test_dir_files_sas/1,test_dir_files_sas/3]).
+
+:- op(100,xfy,'=>').
 
 
 % :- set_prolog_flag(gc,true).
@@ -12,6 +14,7 @@ user:file_search_path(pack, '../../../../').
 % [Required] Load the Logicmoo Library Utils
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 
+:- dynamic(use_local_pddl/0).
 
 :- if(gethostname(c3po);gethostname(titan)).
 
@@ -24,7 +27,6 @@ user:file_search_path(pack, '../../../../').
 
 :- use_module(library(dif)).
 
-:- user:ensure_loaded(logicmoo_hyhtn).
 
 % :- qcompile_libraries.
 
@@ -37,6 +39,12 @@ user:file_search_path(pack, '../../../../').
 % :- dynamic(pairfrom/4).
 
 :- dynamic(is_saved_type/3).
+
+
+:- if(\+current_predicate(init_locl_planner_interface0/4)).
+%:- ensure_loaded(logicmoo_hyhtn).
+:- endif.
+
 
 :- expects_dialect(sicstus).
 :- use_module(library(timeout)).
@@ -125,9 +133,10 @@ load_file_rest(F,L):- first_n_elements(L,10,ES),
     must((ensure_struct(sexpr_file,O),prop_set(filename,O,F),sterm(SO, L, R1),prop_set(sterm_value,O,SO)))),
    load_file_rest(F,R1).
 
+:-export(z2p/2).
 z2p(A,A).
 
-save_type_named(Type,Named,O):- doall(retract((is_saved_type(Type,Named,A):-z2p(_,A)))),ain((is_saved_type(Type,Named,A):-z2p(O,A))).
+save_type_named(Type,Named,O):- doall(retract((is_saved_type(Type,Named,_):-_))),ain((is_saved_type(Type,Named,A):-z2p(O,A))).
 save_sterm(O):-gensym(sterm,Named),save_type_named(sterm,Named,O).
 
 test_frolog:- test_dir_files_sas('frolog','p02-domain.pddl','p02.pddl'),
@@ -174,7 +183,7 @@ record_time(G,TimeUsed):- record_time(G,runtime,TimeUsed).
 record_time(G,Runtime,TimeUsed):- statistics(Runtime, [B,_]),G,statistics(Runtime, [E,_]),TimeUsed is E - B.
 
 
-% try_solve(PN,D,P,S):-portray_clause(solve:-try_solve(PN,D,P,S)),fail.
+try_solve(PN,D,P,S):- thlocal:loading_files,!,pmsg((loading_files(PN):-try_solve(D,P,S))),!.
 % try_solve(PN,D,P,S):- once(time_out(solve(PN,D, P, S), 3000, Result)), Result == time_out, portray_clause(hard_working:-try_solve(PN,D,P,S)),fail.
 try_solve(PN,D,P,S):- gripe_time(14,time_out((solve(PN,D, P, S)), 30000, Result)),!, % time limit for a planner (was 500000)
    ((\+ is_list(S)
@@ -183,7 +192,13 @@ try_solve(PN,D,P,S):- gripe_time(14,time_out((solve(PN,D, P, S)), 30000, Result)
 
 try_solve(PN,D,P,S):-dmsg('utter_failed'(warn):-try_solve(PN,D,P,S)),!.
 
-pdmsg(D):-subst((pdmsg:-D),=,kv,PINFO),wdmsg(PINFO).
+sdmsg(B,B):- \+ compound(B),!.
+sdmsg((D:-B),SS):-B==true,!,sdmsg(D,SS).
+sdmsg(B,SS):-B=..[F|A],maplist(sdmsg,A,AA),SS=..[F|AA].
+
+pmsg(D):- sdmsg(D,SS),D \=@= SS, !,pmsg(SS).
+pmsg(D):- compound(D),functor(D,(:-),_),!,subst(D,=,'k_===_v',SS),wdmsg(SS).
+pmsg(D):- subst(D,=,'k_===_v',SS),wdmsg(SS),wdmsg((:-SS)).
 
 
 % solve(PN,+Domain, +Problem, -Solution).
@@ -235,7 +250,7 @@ to_action5(Struct,Term):-
   prop_get_nvlist(Struct,[parameters=UT,preconditions=Precon,positiv_effect=Pos,negativ_effect=Neg,assign_effect=Af]),
   Term=action5(UT, Precon, Pos, Neg, Af).
      
-save_action(CD,A):- ain(actn(CD,A)).
+save_action(Mt,A):- ain(actn(Mt,A)).
 
 
 % mysubset(+Subset, +Set)
@@ -259,14 +274,14 @@ mysubset([X|R], S):-
   nop((checkConstraints(C),record_var_names(Vars))).
 */
 
-get_action_info(CD,A):- actn(CD,A).
+get_action_info(Mt,A):- actn(Mt,A).
 
 % DMILES
-get_constrained_action(CD,A):- =(CD,CC),!,member(A,CC).
+get_constrained_action(Mt,A):- =(Mt,CC),!,member(A,CC).
 
 
 % DMILES
-get_constrained_action_bb(CD,A):- copy_term(CD,CC),!,member(A,CC).
+get_constrained_action_bb(Mt,A):- copy_term(Mt,CC),!,member(A,CC).
 
 all_dif(_):-!.
 all_dif([A,B]):-!,dif(A,B),!.
@@ -797,7 +812,7 @@ solvable([H|T], FV, [M|S]):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% This file must implements following predicates:
 %%
-%% step(CD,+State, -ActionDef, -NewState)
+%% step(Mt,+State, -ActionDef, -NewState)
 %%   Return descendant of State and ActionDefinition that was used.
 %%
 %% is_goal(State) - is true when State is a goal state.  
@@ -811,15 +826,15 @@ solvable([H|T], FV, [M|S]):-
 
 make_solution(S, S).
     
-% step(CD,+State, -ActionDef, -NewState)
+% step(Mt,+State, -ActionDef, -NewState)
 %
 %   Return descendant of State and ActionDefinition that was used.
 %
-step(CD,State, ActionDef, NewState):-  
+step(Mt,State, ActionDef, NewState):-  
   %  get_a ction(A, ActionDef),
   %  get_precondition(A, P),    
 % DMILES 
-  get_constrained_action_bb(CD,action5(ActionDef, P, PE, NE,_)),
+  get_constrained_action_bb(Mt,action5(ActionDef, P, PE, NE,_)),
   
   mysubset(P, State),  % choose suitable action
  %   get_negativ_effect(A, NE),
@@ -828,7 +843,7 @@ step(CD,State, ActionDef, NewState):-
   ord_union(State2, PE, NewState).
 
 
-is_goal(_CD,S):-
+is_goal(_Mt,S):-
     bb_get(goalState, G),
     ord_subset(G, S).
 
@@ -854,31 +869,31 @@ repeating(S1, S2):-
 % :-use_module(library(sets)).
 
 % h(+State, -EstimatedValue)
-h(CD,S, H):- h_add(CD,S, H).
+h(Mt,S, H):- h_add(Mt,S, H).
 % h(S, H):- h_diff(S, H).
 
 
 %
 %   Estimated distance to achieve Goal.
 %
-h_add(CD,S, E):-
+h_add(Mt,S, E):-
     bb_get(fictiveGoal, G),
-    relax(CD,S, G, E).
+    relax(Mt,S, G, E).
 %    write(G-S-E),nl.
 
-relax(_CD,_, [], 0):-!.
-relax(CD,S, G, E):-
+relax(_Mt,_, [], 0):-!.
+relax(Mt,S, G, E):-
     subtract(G, S, Delta),
-    setof(P, relax_step(CD,S, P), RS),
+    setof(P, relax_step(Mt,S, P), RS),
     ord_union([S|RS], NS),
-    relax(CD,NS, Delta, NE),
+    relax(Mt,NS, Delta, NE),
     length(Delta, LD),
     E is LD+NE.
 
-relax_step(CD,State, PE):-    
+relax_step(Mt,State, PE):-    
     % get_a ction(A),
 % DMILES
-    get_constrained_action_bb(CD,action5(_,P,PE,_,_)),
+    get_constrained_action_bb(Mt,action5(_,P,PE,_,_)),
     mysubset(P, State).
 
 % FILENAME:  h_diff.pl 
@@ -944,8 +959,8 @@ parseDomain(File, Output, R) :-
 
 :-thread_local(thlocal:allow_sterm).
 
-domainBNF(Output, List, R):- with_assertions(tlbugger:skipMust, debugOnError0(lp:domainBNF_dcg(Output, List, R))),!.
-domainBNF(Output, List, R):- with_assertions(thlocal:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(lp:domainBNF_dcg(Output, List, R)))),!,
+domainBNF(Output, List, R):- with_assertions(tlbugger:skipMust, debugOnError0(domainBNF_dcg(Output, List, R))),!.
+domainBNF(Output, List, R):- with_assertions(thlocal:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(domainBNF_dcg(Output, List, R)))),!,
    portray_clause((domainBNF:-thlocal:allow_sterm,Output)).
 domainBNF(P     , List, R):- must(sterm(O, List, R)),!,must(sterm2pterm(O,P)),!,portray_clause((ed:-P)).
 domainBNF(Output, List, R):- trace,domainBNF_dcg(Output, List, R),!.
@@ -1302,8 +1317,8 @@ parseProblem(F, O, R) :-
 % Support for reading file as a list.
 % :- [readFile].
 
-problem(Output, List, R):- with_assertions(tlbugger:skipMust, debugOnError0(lp:problem_dcg(Output, List, R))),!.
-problem(Output, List, R):- with_assertions(thlocal:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(lp:problem_dcg(Output, List, R)))),!,
+problem(Output, List, R):- with_assertions(tlbugger:skipMust, debugOnError0(problem_dcg(Output, List, R))),!.
+problem(Output, List, R):- with_assertions(thlocal:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(problem_dcg(Output, List, R)))),!,
    portray_clause((problem:-thlocal:allow_sterm,Output)).
 % problem(P     , List, R):- dtrace,trace,must(sterm(O, List, R)),!,must(sterm2pterm(O,P)),!,portray_clause((ed:-P)).
 problem(Output, List, R):- must(problem_dcg(Output, List, R)),!.
@@ -1572,7 +1587,7 @@ test_dir_files_sas(Dir):-
 % FILENAME:  wa-star.pl 
 % Interface:
 %
-% step(CD,+State, -NewState)
+% step(Mt,+State, -NewState)
 % is_goal(State)
 % h(State, Value) 
 % repeating(+State, +AnotherState)
@@ -1584,38 +1599,38 @@ test_dir_files_sas(Dir):-
 
 % search(+InitState, +GoalState, -Solution)
 %
-search(CD,I, _, Solution):-
+search(Mt,I, _, Solution):-
    term_to_ord_term(I,II),!,
-    a_star(CD, II, Solution, _).
+    a_star(Mt, II, Solution, _).
     
     
-% a_star(CD,+InitState, -Actions, -Cost).
+% a_star(Mt,+InitState, -Actions, -Cost).
 %
-a_star(CD,S, A, C):-
+a_star(Mt,S, A, C):-
     state_record(S, nil, nil, 0, SR),
     list_to_heap([0-SR], PQ),
-    a_star(CD,PQ, [], A, C).
+    a_star(Mt,PQ, [], A, C).
 
 
-% a_star(CD,+Queue, +Visited, -Solution, -Cost)
+% a_star(Mt,+Queue, +Visited, -Solution, -Cost)
 %
-a_star(_CD,PQ, _, 'NO SOLUTION', _):-
+a_star(_Mt,PQ, _, 'NO SOLUTION', _):-
   %  write('NO SOLUTION'),nl,
     empty_heap(PQ),
     !.
-a_star(CD,PQ, V, Solution, C):-
+a_star(Mt,PQ, V, Solution, C):-
     get_from_heap(PQ, C, SR, _),
     state_record(S, _, _, _, SR),
-    is_goal(CD,S),
+    is_goal(Mt,S),
 %    write('FOUND SOLUTION'),nl,
 %    state_record(S, _, _, D, SR), write(C-D), write('   '),write(S),nl,
 %    writel(V),nl,halt,
     solution(SR, V, Solution).
 
-a_star(CD,PQ, V, Solution, C):-
+a_star(Mt,PQ, V, Solution, C):-
     get_from_heap(PQ, _K, SR, RPQ),
     ord_add_element(V, SR, NV),
-    (    bagof(K-NS, next_node(CD,SR, PQ, NV, K, NS), NextNodes) 
+    (    bagof(K-NS, next_node(Mt,SR, PQ, NV, K, NS), NextNodes) 
          ;
          NextNodes=[]
     ),
@@ -1623,20 +1638,20 @@ a_star(CD,PQ, V, Solution, C):-
 %    write(NextNodes),nl,
     add_list_to_heap(RPQ, NextNodes, NPQ),
     stat_node,
-    a_star(CD,NPQ, NV, Solution, C).
+    a_star(Mt,NPQ, NV, Solution, C).
 
 
 
-% next_node(CD,+StateRecord, +Queue, +Visited, -EstimateDeep, -NewStateRecord)
+% next_node(Mt,+StateRecord, +Queue, +Visited, -EstimateDeep, -NewStateRecord)
 %
-next_node(CD,SR, Q, V, E, NewSR):-
+next_node(Mt,SR, Q, V, E, NewSR):-
     state_record(S, _, _, D, SR),
-    step(CD,S, A, NewS),
+    step(Mt,S, A, NewS),
     state_record(NewS, _, _, _, Temp),
     \+ my_ord_member(NewS, V),
     heap_to_list(Q, PQL),
     \+ member(Temp, PQL),
-    h(CD,S, H),
+    h(Mt,S, H),
     E is H+D,
     ND is D+1,
     state_record(NewS, S, A, ND, NewSR).
@@ -1660,18 +1675,29 @@ my_ord_member(S, [_|T]):-
 
 
 % :- module(lp).
+domain_name(Name):- use_local_pddl, no_repeats(domain_name0(Name)).
+domain_name0(Name):- bb_get(currentDomain, D),prop_get(domain_name,D,Name).
+domain_name0(Name):- bb_get(currentProblem, P),prop_get(domain_name,P,Name).
+domain_name0(Name):- user:is_saved_type(domain,Name,_).
+domain_name0(Name):- user:is_saved_type(problem,X,P),prop_get(domain_name,P,Name).
 
-domain_name(Name):- bb_get(currentProblem, P),!,must(arg(2,P,Name)).
-domain_name(Name):- bb_get(currentDomain, D),!,must(arg(1,D,Name)).
+problem_name(Name):- use_local_pddl, no_repeats(problem_name0(Name)).
+problem_name0(Name):- bb_get(currentProblem, P),prop_get(problem_name,P,Name).
+problem_name0(Name):- user:is_saved_type(problem,Name,_).
 
+
+/* EXAMPLE OCLh
 
 % Sorts
 sorts(chameleonWorld,primitive_sorts,[door,flexarium,chameleon,box,substrate]).
-sorts(DName,primitive_sorts,TypesList):-bb_get(currentDomain, D),arg(1,D,DName),!,prop_get(types,D,TypesList).
-sorts(DName,primitive_sorts,List):-nonvar(DName),findall(S,is_a_type(DName,S),List).
+*/ 
+
+sorts(DName,primitive_sorts,TypesList):-  use_local_pddl, pddl_sorts(DName,primitive_sorts,TypesList).
+pddl_sorts(DName,primitive_sorts,TypesList):- bb_get(currentDomain, D),prop_get(domain_name,D,DName),!,prop_get(types,D,TypesList).
+pddl_sorts(DName,primitive_sorts,List):-nonvar(DName),findall(S,is_a_type(DName,S),List).
 
 
-is_a_type(D,S):-loop_check(is_a_type0(D,S)).
+is_a_type(D,S):- use_local_pddl, loop_check(is_a_type0(D,S)).
 is_a_type0(D,S):-sorts(D,_,L),member(S,L).
 is_a_type0(Name,S):-bb_get(currentProblem,P),prop_get(domain_name,P,Name),objects(P,S,_).
 
@@ -1681,22 +1707,23 @@ pname_to_dname(PName,DName):-name_to_problem_struct(PName,P),!,prop_get(domain_n
 pname_to_dname(_,DName):-domain_name(DName).
 
 % Objects
-
-objects(Name,Type,List):- name_to_problem_struct(Name,P),
+objects(Name,Type,List):- use_local_pddl, name_to_problem_struct(Name,P),
    prop_get(objects,P,ObjsDef),
    member(Objs,ObjsDef),Objs=..[Type,List].
 
+/* EXAMPLE OCLh
 objects(t7,door,[door1]).
 objects(t7,flexarium,[flexarium1]).
 objects(t7,chameleon,[veiledChameleon]).
 objects(t7,box,[box1,box2]).
 objects(t7,substrate,[newsPaper1,newsPaper2]).
-
-predicates(Name,List):- name_to_domain_struct(Name,D),   
-   prop_get(predicates,D,List).
-
+*/
 
 % Predicates
+predicates(Name,List):- use_local_pddl, name_to_domain_struct(Name,D),   
+   prop_get(predicates,D,List).
+
+/* EXAMPLE OCLh
 predicates(chameleonWorld,[
     doorOpen(door),
     doorClosed(door),
@@ -1838,12 +1865,12 @@ operator(chameleonWorld,removeDirtyNewspaper(Flexarium,Door,Chameleon,Box,Substr
     [     sc(substrate,Substrate,[insideFlexarium(Substrate)]=>[outsideFlexarium(Substrate)])],
     % conditional
     []).
-
+*/
 
 :- style_check(+singleton).
 
-op_action(CD, S, PTs, NPrecon, Pos, Neg, Af, UT , True):- 
-   loop_check(operator(CD,UT,SE,SC,SS)),
+op_action(Mt, S, PTs, NPrecon, Pos, Neg, Af, UT , True):- use_local_pddl,
+   loop_check(operator(Mt,UT,SE,SC,SS)),
    must_det_l((
       True = true,
       UT=..[S|ARGS],
@@ -1854,7 +1881,7 @@ op_action(CD, S, PTs, NPrecon, Pos, Neg, Af, UT , True):-
       unss_ify(=,Hints2,sc,SC,NEGPOS,Hints),
       divide_neg_pos(NEGPOS,[],[],Neg,Pos),   
       append(Precon,Neg,NPrecon),
-      maplist(get_type_of(CD,top,Hints),ARGS,PTs))).
+      maplist(get_type_of(Mt,top,Hints),ARGS,PTs))).
 
 lock_var(X):-when((?=(X,Y);nonvar(X)),X==Y).
 unlock_var(V):-del_attrs(V).
@@ -1862,7 +1889,7 @@ unlock_var(V):-del_attrs(V).
 
 add_wrapper(W,In , Out):-Out=..[W,In].
 
-actn_operator(CD,UT,SE,SC,SS):- actn(CD,A),
+actn_operator(Mt,UT,SE,SC,SS):- use_local_pddl, actn(Mt,A),
  must_det_l(( 
     prop_get_nvlist(A,
        [(preconditions)=Precon,positiv_effect=Pos,negativ_effect=Neg, assign_effect=Af, (parameters)= UT, 
@@ -1880,12 +1907,12 @@ actn_operator(CD,UT,SE,SC,SS):- actn(CD,A),
    unss_ify(add_wrapper(del),[],HintsSS,Neg,ss,NOTS,HintsNEG),
    unss_ify(add_wrapper(add),NOTS,HintsNEG,Pos,ss,NOTSPOSC,HintsPOS),
    mylist_to_set(HintsPOS,Hints),
-   maplist(ress_ify(CD,Def,Hints,se),SEPs,SE),
-   maplist(ress_ify(CD,Def,Hints,ss),ASEPs,SS),   
-   maplist(make_rem_adds(CD,Hints),NOTSPOSC,SC))).
+   maplist(ress_ify(Mt,Def,Hints,se),SEPs,SE),
+   maplist(ress_ify(Mt,Def,Hints,ss),ASEPs,SS),   
+   maplist(make_rem_adds(Mt,Hints),NOTSPOSC,SC))).
 
-make_rem_adds(CD,Hints,A1-LIST,sc(Type,A1,(NEG=>POS))):-findall(N,member(del(N),LIST),NEG),findall(N,member(add(N),LIST),POS),
-  must(get_type_of(CD,top,Hints,A1,Type)).
+make_rem_adds(Mt,Hints,A1-LIST,sc(Type,A1,(NEG=>POS))):-findall(N,member(del(N),LIST),NEG),findall(N,member(add(N),LIST),POS),
+  must(get_type_of(Mt,top,Hints,A1,Type)).
 
 create_hint(K,V,kt(K,V)).
 
@@ -1906,8 +1933,9 @@ garg_hints(HintsIn,_,_,[],HintsIn).
 garg_hints(HintsIn,F,N,[A|ARGS],[kta(F,N,A)|Hints]):- 
   N2 is N + 1, garg_hints(HintsIn,F,N2,ARGS,Hints).
 
-unss_ify(_ ,WAS,Hints,G,_,WAS,Hints):-G==['Uninitialized'],!.
-unss_ify(GT,WAS,HintsIn,G,SS,OUTS,Hints):-dess_ify(GT,WAS,HintsIn,G,SS,OUT,HintsM),mygroup_pairs_by_key(OUT,OUTS),mylist_to_set(HintsM,Hints).
+unss_ify(_ ,WAS,Hints,G,_,WAS,Hints):- (nonvar(G);G==['Uninitialized']),!.
+unss_ify(GT,WAS,HintsIn,G,SS,OUTS,Hints):-
+  must((dess_ify(GT,WAS,HintsIn,G,SS,OUT,HintsM),!,mygroup_pairs_by_key(OUT,OUTS),!,mylist_to_set(HintsM,Hints))).
 
 dess_ify(GT,WAS,HintsIn,G,SS,OUT,Hints):-mylist_to_set(HintsIn,HintsM),HintsIn\=@=HintsM,!,
   dess_ify(GT,WAS,HintsM,G,SS,OUT,Hints).
@@ -1932,21 +1960,21 @@ dess_ify(GT,WAS,HintsIn,A1-G,_ ,[A1-GO|WAS],HintsOut):- ghints(HintsIn,G,HintsOu
 
 dess_ify(GT,WAS,HintsIn,G,SS,OUT,Hints):- arg(1,G,A1), dess_ify(GT,WAS,HintsIn,A1-G,SS,OUT,Hints).
 
-ress_ify(CD, Def, Hints,SS,A1-Gs,GO):-GO=..[SS,Type,A1,Gs],must(get_type_of(CD,Def,Hints,A1,Type)),!.
-ress_ify(_CD,Def,_Hints,SS,A1-Gs,GO):-GO=..[SS,Def,A1,Gs],!.
+ress_ify(Mt, Def, Hints,SS,A1-Gs,GO):-GO=..[SS,Type,A1,Gs],must(get_type_of(Mt,Def,Hints,A1,Type)),!.
+ress_ify(_Mt,Def,_Hints,SS,A1-Gs,GO):-GO=..[SS,Def,A1,Gs],!.
 
 
 
 
 get_type_of(_ , Def, Hints,A1,Type):-member(kt(K,V),Hints),A1==V,K\==Def,!,Type=K,record_var_type(A1,Type).
-get_type_of(CD, Def, Hints,A1,Type):-atom(A1),get_type_of_atom(CD,Def,Hints,A1,Type),!.
-get_type_of(CD,_Def,_Hints,A1,Type):-nonvar(A1),loop_check(objects(CD,Type,List)),member(A1,List).
+get_type_of(Mt, Def, Hints,A1,Type):-atom(A1),get_type_of_atom(Mt,Def,Hints,A1,Type),!.
+get_type_of(Mt,_Def,_Hints,A1,Type):-nonvar(A1),loop_check(objects(Mt,Type,List)),member(A1,List).
 
 :- style_check(-singleton).
-get_type_of_atom(CD,Def,Hints,veiledChameleon,chameleon).
-get_type_of_atom(CD,Def,Hints,veiledchameleon,chameleon).
-get_type_of_atom(CD,Def,Hints,A1,Type):-pname_to_dname(P,D),is_a_type(D,Type),atom_concat(Type,Num,A1),Num=_.
-get_type_of_atom(CD,Def,Hints,A1,Type):-pname_to_dname(P,D),is_a_type(D,Type),atom_concat(_,Type,A1).
+get_type_of_atom(Mt,Def,Hints,veiledChameleon,chameleon).
+get_type_of_atom(Mt,Def,Hints,veiledchameleon,chameleon).
+get_type_of_atom(Mt,Def,Hints,A1,Type):-pname_to_dname(P,D),is_a_type(D,Type),atom_concat(Type,Num,A1),Num=_.
+get_type_of_atom(Mt,Def,Hints,A1,Type):-pname_to_dname(P,D),is_a_type(D,Type),atom_concat(_,Type,A1).
 :- style_check(+singleton).
 
 
@@ -1954,6 +1982,8 @@ get_type_of_atom(CD,Def,Hints,A1,Type):-pname_to_dname(P,D),is_a_type(D,Type),at
 divide_neg_pos([],Neg,Pos,Neg,Pos).
 divide_neg_pos([A|MORE],NL2,PL2,Neg,Pos):-divide_neg_pos(A,NL2,PL2,NegM,PosM),divide_neg_pos(MORE,NegM,PosM,Neg,Pos).
 divide_neg_pos(NL1=>PL1,NL2,PL2,Neg,Pos):-append(NL1,NL2,Neg),append(PL1,PL2,Pos).
+
+/* EXAMPLE OCLh
 
 % Methods
 
@@ -1977,31 +2007,34 @@ planner_task(chameleonWorld,t7,
      ss(box,box2,[boxOpen(box2)]),
      ss(substrate,newsPaper1,[insideFlexarium(newsPaper1)]),
      ss(substrate,newsPaper2,[outsideFlexarium(newsPaper2)])]).
+*/
 
-planner_task(Domain,Name,
+planner_task_from_pddl(Domain,PName,
   % Goals
-    SEs,SSs):-
-     name_to_problem_struct(Name,P),prop_get(domain_name,P,Domain),
+    SEs,SSs):-  use_local_pddl,
+     name_to_problem_struct(PName,P),prop_get(domain_name,P,Domain),
      must_det_l((
         prop_get(init,P, UCI),
         prop_get(goal,P, UCG),    
         copy_term_for_solve((UCI,UCG),(I,G)),       
         unss_ify(=,[],[],I,ss,SSK,HintsSS),
         unss_ify(=,[],HintsSS,G,se,SEK,Hints),
-        maplist(ress_ify(CD,Def,Hints,ss),SSK,SSs),
-        maplist(ress_ify(CD,Def,Hints,se),SEK,SEs))).
+        maplist(ress_ify(Mt,Def,Hints,ss),SSK,SSs),
+        maplist(ress_ify(Mt,Def,Hints,se),SEK,SEs))).
 
-name_to_problem_struct(Name,P):-Name==current,!,bb_get(currentProblem,P).
-name_to_problem_struct(Name,P):-is_saved_type(problem,Name,P).
-name_to_problem_struct(Name,P):-bb_get(currentProblem,P),prop_get(problem_name,P,NameO),Name=NameO.
-name_to_problem_struct(Name,P):-loop_check(ocl_problem_struct(Name,P)).
+name_to_problem_struct(Name,P):- use_local_pddl, problem_name(Name),name_to_problem_struct0(Name,P).
+name_to_problem_struct0(Name,P):-Name==current,!,bb_get(currentProblem,P).
+name_to_problem_struct0(Name,P):-is_saved_type(problem,Name,P).
+name_to_problem_struct0(Name,P):-bb_get(currentProblem,P),prop_get(problem_name,P,NameO),Name=NameO.
+name_to_problem_struct0(Name,P):-loop_check(ocl_problem_struct(Name,P)).
 
 kv_to_pddl([], []).
 kv_to_pddl([_-N|T0], OUT) :- 
  	kv_to_pddl(T0,VALUES),
         append(N,VALUES,OUT).
 
-ocl_problem_struct(Name,P):- no_repeats(Name,planner_task(DomainName,Name,SE,SS)),
+%TODO work on later        
+ocl_problem_struct(Name,P):- use_local_pddl, no_repeats(Name,planner_task(DomainName,Name,SE,SS)),
    must_det_l((
       unss_ify(=,[],[],ss,SS,OUTI,HintsM),mygroup_pairs_by_key(OUTI,IOUT),kv_to_pddl(IOUT,I),
       unss_ify(=,[],HintsM,se,SE,OUTG,Hints),mygroup_pairs_by_key(OUTG,GOUT),kv_to_pddl(GOUT,G),
@@ -2014,14 +2047,15 @@ name_to_domain_struct(Name,P):-bb_get(currentDomain,P),prop_get(domain_name,P,Na
 name_to_domain_struct(Name,P):-is_saved_type(domain,Name,P).
 name_to_domain_struct(Name,P):-loop_check(ocl_domain_struct(Name,P)).
 
+%TODO work on later
 % sorts % consts % preds
-ocl_domain_struct(Name,D):- no_repeats(Name,loop_check(predicates(Name,PredsList))),
+ocl_domain_struct(Name,D):- use_local_pddl, no_repeats(Name,loop_check(predicates(Name,PredsList))),
    % once((not((bb_get(currentDomain,D),once(Name==current;prop_get(domain_name,D,Name)))))),   
    must_det_l((
       findall(S,is_a_type(Name,S),Types),
       D = domain(Name, [ocl], Types, /*Consts*/ [] , PredsList, /*Fuents*/[]  ,/*Constrs*/ [], /*Dconstraints*/[], Actions),
-      CD=Name,
-      findall(A,actn(CD,A),Actions))).
+      Mt=Name,
+      findall(A,actn(Mt,A),Actions))).
 
 mygroup_pairs_by_key([], []).
 mygroup_pairs_by_key([M-N|T0], [M-ORDERED|T]) :-
@@ -2043,20 +2077,34 @@ mysame_key(_, L, [], L).
 
 :- flag(time_used,_,0).
 
-:- debug,must(test_blocks).
+:- debug,nop(must(test_blocks)).
 
+/*
 :- solve_files('benchmarks/mystery/domain.pddl','benchmarks/mystery/prob01.pddl').
 :- test_domain('benchmarks/driverlog/domain.pddl',4).
 :- solve_files('hsp-planners-master/hsp2-1.0/examples/parcprinter-strips/p01-domain-woac.pddl','hsp-planners-master/hsp2-1.0/examples/parcprinter-strips/p01-woac.pddl').
+*/
+% :-doall(on_call_decl_hyhtn).
+:- if((if_startup_script)).
+/*
 
 
-:- if(if_startup_script).
+:- test_ocl('domains_ocl/chameleonWorld.ocl').
+
+%:- asserta(thlocal:loading_files).
+
+%:- test_ocl('domains_ocl/?*WashingMachine.ocl').
+*/
+/*
 
 :- test_domain('domains_ocl/chameleonWorld/domain*').
 :- test_all(7).
 
 :- pce_show_profile.
+*/
 
+
+:- retractall(thlocal:loading_files).
 :- endif.
 
 twhy
@@ -2102,5 +2150,11 @@ test_blocks:- fail, test_domain('./benchmarks/nomystery-sat11-strips/domain.pddl
 
 :- endif.
 
-:- show_call(flag(time_used,W,W)).
+:-multifile(user:push_env_ctx/0).
+:-dynamic(user:push_env_ctx/0).
+% push_env_ctx:-!,fail.
+push_env_ctx:-!.
 
+:- ensure_loaded(logicmoo_hyhtn).
+:- show_call(flag(time_used,W,W)).
+:- test_ocl('domains_ocl/chameleonWorld.ocl').

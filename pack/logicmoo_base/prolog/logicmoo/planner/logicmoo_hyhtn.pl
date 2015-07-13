@@ -1,3 +1,21 @@
+/** <module> logicmoo_hyhtn
+% Provides a prolog database *env*
+%
+%  
+%
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Denton, TX 2005, 2010, 2014 
+% Dec 13, 2035
+%
+*/
+
+:- if(((\+ current_predicate(init_locl_planner_interface0/3)))).
+
+:- current_predicate(is_saved_type/3).
+
+:-multifile(user:push_env_ctx/0).
+:-dynamic(user:push_env_ctx/0).
 
 /* ***********************************/
 /* Douglas Miles 2005, 2010, 2014 */
@@ -16,157 +34,25 @@ user:file_search_path(pack, '../../../../').
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 % :- qcompile_libraries.
 
-:- discontiguous((env_call/1,env_assert/1,env_asserta/1,env_retract/1,env_retractall/1)).
-
-:- meta_predicate(env_call(0)).
-:- meta_predicate(maybe_show_env_op(0)).
-
-:- thread_local(thlocal:db_spy/0).
-
-maybe_show_env_op(G):- !,G.
-maybe_show_env_op(G):- thlocal:db_spy -> show_call(G); G.
-
-env_call(F):-!,call(F).
-env_asserta(F):-!,maybe_show_env_op(asserta(F)).
-env_assert(F):-!,maybe_show_env_op(assert(F)).
-env_retract(F):-!,maybe_show_env_op(retract(F)).
-env_retractall(F):-!,maybe_show_env_op(retractall(F)).
+:- use_module(logicmoo_util_structs).
 
 
-/* Donghong Liu */
-/* University of Huddersfield */
-/* September 2002 */
-/* **********************************/
-/* gipohyhtn.pl */
-/* HyHTN planning: do preprocess first  */
-/* make all method and operators primitive */
-/* htncode.pl */
-
-planner_failure(Why,Info):-dmsg(error,Why-Info),banner_party(error,'FAILURE_PLANNER'),print_message(error,'FAILURE_PLANNER'(Why,Info)),!. %sleep(2).
-
-:- discontiguous(post_header_hook/0).
-:- thread_local((canDoTermExp/0)).
-:-thread_local thlocal:doing/1.
-:-retractall(canDoTermExp).
-:-dynamic(env_kb/1).
-
-statistics_runtime(CP):-statistics(runtime,[_,CP0]), (CP0==0 -> CP= 0.0000000000001 ; CP is (CP0/1000)) .  % runtime WAS process_cputime
-
-/*********************** initialisation**************/
-:-dynamic( in_dyn/2).
-in_dyn(_DB,Call):- var(Call),!,mpred_arity(F,A),functor(Call,F,A),( predicate_property(Call,_) -> loop_check(Call)).
-in_dyn(_DB,Call):- functor(Call,F,A), mpred_arity(F,A), predicate_property(Call,_), !, loop_check(Call).
-in_dyn_pred(_DB,Call):- var(Call),!,mpred_arity(F,A),functor(Call,F,A),( predicate_property(Call,_) -> loop_check(Call)).
-in_dyn_pred(_DB,Call):- functor(Call,F,A), mpred_arity(F,A), predicate_property(Call,_), !, loop_check(Call).
-
-:-dynamic(user:mpred_prop/2).
-:-multifile(user:mpred_prop/2).
-
-mpred_arity(F,A):-if_defined(user:arity(F,A)).
-
-env_mpred(Prop,F,A):- user:mpred_prop(F,Prop),ignore(mpred_arity(F,A)).
-
-get_mpred_stubType(F,A,StubIn):- env_mpred(stubType(Stub),F,A),!,must(StubIn=Stub).
-get_mpred_stubType(F,A,dyn):-env_mpred(dyn,F,A).
-get_mpred_stubType(_,_,dyn).
-
-:-assert_if_new(env_kb(l)).
-:-assert_if_new(env_kb(g)).
-:-assert_if_new(env_kb(dyn)).
-:-nb_setval(disabled_env_learn_pred,false).
-
-decl_mpred_env(_,[]):-!.
-decl_mpred_env(Props,[H|T]):-!,decl_mpred_env(Props,H),decl_mpred_env(Props,T).
-decl_mpred_env(Props,(H,T)):-!,decl_mpred_env(Props,H),decl_mpred_env(Props,T).
-decl_mpred_env([H|T],Pred):-!,decl_mpred_env(H,Pred),decl_mpred_env(T,Pred).
-decl_mpred_env((H,T),Pred):-!,decl_mpred_env(H,Pred),decl_mpred_env(T,Pred).
-decl_mpred_env(kb(KB),_):- assert_if_new(env_kb(KB)),fail.
-decl_mpred_env(stubType(dyn),Pred):-!, decl_mpred_env(dyn,Pred).
-decl_mpred_env(Prop,Pred):- functor_h(Pred,F,A),decl_mpred_env(Prop,Pred,F,A).
+:- dynamic htn_task/3.
+:- dynamic htn_task/4.
+:- dynamic planner_task/3.
+:- dynamic planner_task/4.
+:- dynamic planner_task_slow/3.
+:- dynamic planner_task_slow/4.
+:- multifile htn_task/3.
+:- multifile htn_task/4.
+:- multifile planner_task/3.
+:- multifile planner_task/4.
+:- multifile planner_task_slow/3.
+:- multifile planner_task_slow/4.
 
 
-decl_mpred_env(Prop,Pred,F,A):- !,export(F/A),dynamic(F/A),multifile(F/A), if_defined(decl_mpred(Pred,Prop),asserta_if_new(user:mpred_prop(F,Prop))).
+:- ensure_loaded(logicmoo_util_bb_env).
 
-env_learn_pred(_,_):-nb_getval(disabled_env_learn_pred,true),!.
-env_learn_pred(ENV,P):-decl_mpred_env(ENV,P).
-
-env_recorded(call,Val) :- recorded(Val,Val).
-env_recorded(assert, Val) :- recordz(Val,Val).
-env_recorded(asserta, Val) :- recorda(Val,Val).
-env_recorded(retract, Val) :- recorded(Val,Val,Ref), erase(Ref).
-env_recorded(retractall, Val) :- foreach( recorded(Val,Val,Ref), erase(Ref) ).
-
-lg_op2(rec_db,OP,env_recorded(OP)).
-lg_op2(g,OP,OP).
-
-lg_op2(_,OP,OP).
-
-simplest(_LG):-!.
-
-env_clear(kb(Dom)):-nonvar(Dom),!,env_clear(Dom).
-env_clear(Dom):- forall(env_mpred(Dom,F,A),env_op(retractall(F/A))).
-
-env_op(OP_P):- OP_P=..[OP,P],env_lg_op(OP,P).
-
-env_lg_op(OP,P):-!,call(OP,P).
-env_lg_op(OP,P):-functor_h(P,F,A),must(get_mpred_stubType(F,A,ENV)),!,env_op(ENV,OP,P).
-
-env_shadow(OP,P):-call(OP,P).
-
-env_op(ENV,OP_P):- simplest(ENV),!,OP_P.
-env_op(ENV,call(P)):-env_op(ENV,call,P).
-env_op(ENV,assert(P)):-env_op(ENV,assert,P).
-env_op(ENV,asserta(P)):-env_op(ENV,asserta,P).
-env_op(ENV,retract(P)):-env_op(ENV,retract,P).
-env_op(ENV,retractall(P)):-env_op(ENV,retractall,P).
-env_op(ENV,OP_P):- OP_P=..[OP,P], env_op(ENV,OP,P).
-
-
-env_op(_,_,[]):-!.
-env_op(ENV,OP,F/A):- trace,var(A),!, forall(env_mpred(ENV,F,A),((functor(P,F,A),env_op(ENV,OP,P)))).
-env_op(ENV,retractall,F/A):-functor(P,F,A),!,env_op(ENV,retractall,P).
-% env_op(ENV,OP,Dom):- env_kb(Dom),!,forall(env_mpred(Dom,F,A),env_op(ENV,OP,F/A)).
-% env_op(ENV,OP,F/A):-!, functor(P,F,A), (((get_mpred_stubType(F,A,LG2),LG2\==ENV)  -> env_op(LG2,OP,P) ; env_op(ENV,OP,P) )).
-% env_op(_,retractall,P):-functor_h(P,F,A),must(get_mpred_stubType(F,A,_)),fail.
-% env_op(ENV,OP,P):- functor_h(P,F,A),  (((get_mpred_stubType(F,A,LG2),LG2\==ENV)  -> env_op(LG2,OP,P) ; fail )).
-env_op(ENV,OP,P):- functor_h(P,F,A),  (((get_mpred_stubType(F,A,LG2),LG2\==ENV)  -> env_op2(LG2,OP,P) ; env_op2(ENV,OP,P) )).
-
-
-env_op2(dyn,OP,P):- !,call(OP,P).
-env_op2(ENV,OP,(A,B)):-!, env_op(OP,A), env_op(ENV,OP,B).
-env_op2(ENV,OP,[A|B]):-!, env_op(ENV,OP,A), env_op(ENV,OP,B).
-
-env_op2(in_dyn(DB),OP,P):- !, call(OP,in_dyn(DB,P)).
-env_op2(in_pred(DB),OP,P):-!, DBPRED=..[DB,P], call(OP,DBPRED).
-env_op2(with_pred(Pred),OP,P):-!, call(Pred,OP,P).
-% env_op2(ENV,OP,P):- dmsg(env_op2(ENV,OP,P)),fail.
-env_op2(ENV,OP,P):- lg_op2(ENV,OP,OP2),!,call(OP2,P).
-env_op2(ENV,OP,P):- trace,simplest(ENV),!,call(OP,P).
-env_op2(stubType(ENV),OP,P):-!,env_op(ENV,OP,P).
-% !,env_op2(in_dyn(DB),OP,P).
-env_op2(_,OP,P):-!,env_op2(in_dyn(db),OP,P).
-env_op2(_,_,_):-trace,fail.
-env_op2(l,OP,P):-!,call(OP,P).
-env_op2(g,OP,P):-!,call(OP,P).
-env_op2(l,OP,P):-!,env_op2(dyn,OP,P).
-env_op2(l,OP,P):-!,env_op2(in_dyn(db),OP,P).
-env_op2(l,OP,P):-!,env_op2(rec_db,OP,P).
-env_op2(g,asserta,P):-retractall(P),asserta(P).
-env_op2(g,assert,P):-assert_if_new(P).
-env_op2(g,retract,P):-env_op2(g,call,P),retract(P).
-env_op2(g,retractall,P):-foreach(env_op2(g,call,P),retractall(P)).
-env_op2(ENV,OP,P):-env_learn_pred(ENV,P),lg_op2(ENV,OP,OP2),!,call(OP2,P).
-env_op2(_,OP,P):-call(OP,P).
-
-%ppi(P):-functor(P,tp_node,_),!.
-%ppi(P):-predicate_property(P,number_of_clauses(NC)),!,(NC<2000->true;(dmsg((number_of_clauses(NC):-P)))),!.
-ppi(_).
-
-env_call(P):- env_lg_op(call,P),ppi(P).
-env_assert(P):- env_lg_op(assert,P).
-env_asserta(P):- env_lg_op(asserta,P).
-env_retract(P):- env_lg_op(retract,P).
-env_retractall(P):-env_lg_op(retractall,P).
 
 
 tryff(Call):- predicate_property(Call,_),!,once(tryf((Call,assert(passed_test_try(Call))))),fail.
@@ -183,9 +69,7 @@ ttm:-testing_already,!.
 ttm:-asserta(testing_already), make, retractall(testing_already),fail.
 
 
-get_tasks(N,Goal,State):-user:htn_task(N,Goal,State).
-get_tasks(N,Goal,State):-user:planner_task(N,Goal,State).
-
+:-export(banner_party/2).
 banner_party(E,BANNER):- 
   ansicall(yellow,(
       format("% xxxxxxxxxxxxxxx ~w xxxxxxxxxxxxxxxxxxx~n",[E]),            
@@ -211,6 +95,11 @@ term_alias(neq,dif).
 % term_alias(htn_task,planner_task).
 term_alias(startOcl,start).
 term_alias(startOCL,start).
+
+
+get_tasks(B, C, D) :-
+        get_env_ctx(A),
+        if_defined(get_tasks(A, B, C, D)).
 
 
 tasks:- 
@@ -277,6 +166,7 @@ tdom3(FIn):- atom_concat(FIn,'ocl',F),tdom4(F).
 tdom4(F):- exists_file(F),!,tdomfile(F).
 
 
+:- discontiguous(post_header_hook/0).
 post_header_hook:-retractall(canDoTermExp).
 % user:term_expansion(In,Out):- canDoTermExp,term_expansion_hyhtn(In,M),In\=@=M,expand_term(M,Out).
 % user:goal_expansion(In,Out):- canDoTermExp,term_expansion_hyhtn(In,M),In\=@=M,expand_goal(M,Out).
@@ -287,31 +177,6 @@ env_clear_doms_and_tasks:- env_clear(kb(domfile)),env_clear(kb(domtasks)),env_cl
 
 :- op(100,xfy,'=>').
 
-env_info(O):- forall(env_info(O,Info),portray_clause(env_info(O):-Info)).
-
-env_info(Type,Infos):- env_kb(Type),atom(Type),!,findall(Info,env_1_info(Type,Info),Infos),!.
-env_info(Pred,Infos):- (nonvar(Pred)-> env_predinfo(Pred,Infos) ; (mpred_arity(F,A),Pred=F/A,env_predinfo(Pred,Infos))),!.
-
-
-harvest_preds(Type,Functors):-
- findall(functor(P,F,A),((mpred_arity(F,A),(env_mpred(Type,F,A);Type=F),functor(P,F,A))),Functors).
-
-env_1_info(Type,[predcount(NC)|Infos]):- 
- gensym(env_1_info,Sym),flag(Sym,_,0),
-   harvest_preds(Type,PFAs),
-    findall(F/A - PredInf,
-      (member(functor(P,F,A),PFAs),
-        predicate_property(P,number_of_clauses(NC)),
-        env_predinfo(P,PredInf),
-        flag(Sym,X,X+NC)),
-    Infos),flag(Sym,NC,0).
-
-env_predinfo(PIn,Infos):- functor_h(PIn,F,A),mpred_arity(F,A),functor(P,F,A),findall(Info,pred_1_info(P,F,A,Info),Infos).
-
-pred_1_info(P,_,_,Info):- member(Info:Prop,[count(NC):number_of_clauses(NC),mf:multifile,dyn:dynamic,vol:volitile,local:local]),predicate_property(P,Prop).
-pred_1_info(_,F,A,Info):- env_mpred(Info,F,A).
-pred_1_info(_,F,A,F/A).
-
 
 % :-set_prolog_flag(verbose_file_search,true).
 post_header_hook:-set_prolog_flag(verbose_load,full).
@@ -319,7 +184,7 @@ post_header_hook:-use_module(library(lists)).
 :- style_check(-singleton).
 :- style_check(+discontiguous).
 
-post_header_hook:-use_module(library(system)).
+%post_header_hook:-use_module(library(system)).
 post_header_hook:-catch(guitracer,_,true).
 post_header:- !.
 post_header:- dmsg(post_header),fail, forall(clause(post_header_hook,G),G). 
@@ -335,24 +200,24 @@ run_tests(Call) :-
  statistics_runtime(OutTime),
   Time is OutTime - InTime,
   banner_party(informational,runtests(Call) = time(Time)))))).
-
+ 
 run_header_tests :- run_tests(forall(clause(header_tests,G),run_tests(G))).
 
-consultfilematch(File):-forall(filematch(File,FM),reload_mpred_file(FM)).
-% % consultfilematch(File):-forall(filematch(File,FM),with_mpred_consult(FM)).
 
 
-
-test_ocl(F):- forall(filematch(F,File),test_ocl0(File)).
-test_ocl0(File):- time(with_assertions(thlocal:doing(test_ocl(File)), once((env_clear_doms_and_tasks,clean,consultfilematch(File),tasks)))).
+test_ocl(File):- \+ exists_file(File),!,forall(filematch(File,FM),test_ocl(FM)).
+test_ocl(File):- time(with_assertions(thlocal:doing(test_ocl(File)), 
+   once((env_clear_doms_and_tasks,clean,l_file(File),tasks)))).
 
 header_tests :-test_ocl('domains_ocl/*.ocl').
 
 
 :- style_check(-singleton).
 :- style_check(-discontiguous).
-:-use_module(library(system)).
+%:-use_module(library(system)).
 
+% :- time(user:ensure_loaded(logicmoo(logicmoo_base))).
+%:- asserta(thlocal:disable_mpred_term_expansions_locally).
 
 /*
  * GIPO COPYRIGHT NOTICE, LICENSE AND DISCLAIMER.
@@ -379,142 +244,44 @@ header_tests :-test_ocl('domains_ocl/*.ocl').
  /* gipohyhtn.pl */
 /* HyHTN planning: do preprocess first  */
 /* make all method and operators primitive */
-:-use_module(library(system)).
+%:-use_module(library(system)).
 /*********************** initialisation**************/
 :-dynamic my_stats/1. 
 
-
-:- use_module(library(rbtrees)).
-:- use_module(library(nb_rbtrees)).
-
-p_e(P,ENV):-functor(P,ENV,_),!. % ,functor(ENV,F,A).
-p_e(P,test123).
-
-pe_get(P,ENV,Q):-p_e(P,ENV), nb_getval(ENV,Q),!.
-pe_set(P,ENV,Q):-p_e(P,ENV), nb_setval(ENV,Q),!.
-
-pe_get_key(P,_,Q):-p_e(P,Q).
-
-:-dynamic(in_bb/2).
-
-gvar_update_value(Before,After):-p_e(Before,BB),nb_current(BB,Before),!,nb_setval(BB,After).
-gvar_update_value(Before,After):-retract(Before),assert(After),!.
-gvar_update_value(Before,After):-env_retract(Before),env_assert(After).
-
-gvar_value(BB,OP,Value):-must(gvar_value0(BB,OP,Value)).
-gvar_value0(BB,call,Value):-!,nb_current(BB,Value),!.
-gvar_value0(BB,assert,Value):-!,nb_setval(BB,Value).
-gvar_value0(BB,asserta,Value):-!,nb_setval(BB,Value),!.
-gvar_value0(BB,retract,Value):-nb_getval(BB,Value),!,nb_setval(BB,[]).
-gvar_value0(BB,retractall,_):-nb_setval(BB,[]).
-
-
-gvar_list(BB,call,Value):-!,must(nb_current(BB,List)),!,dmsg(member(Value,List)),!,member(Value,List).
-gvar_list(BB,OP,Value):-must(gvar_list0(BB,OP,Value)).
-gvar_list0(BB,assert,Value):-!,must(nb_current(BB,List)), (List=[] ->  nb_setval(BB,[Value]); append_el_via_setarg(List,Value)).
-gvar_list0(BB,asserta,Value):-!,must(nb_current(BB,List)),nb_setval(BB,[Value|List]).
-gvar_list0(BB,retract,Value):-!,must(nb_current(BB,List)), ( List=[Value|Rest]-> nb_setval(BB,Rest); remove_el_via_setarg(List,Value) ).
-gvar_list0(BB,retractall,F/A):- !,nb_setval(BB,[]).
-gvar_list0(BB,retractall,Value):- args_all_vars(Value)-> nb_setval(BB,[]) ;  
-  ((   must(nb_current(BB,List)) , gvar_remove_all_list_matches(BB,List,Value) )).
-
-
-args_all_vars(Value):- not((arg(_,Value,Nv),nonvar(Nv))).
-
-gvar_remove_all_list_matches(BB,List,Value) :-
-  ( List ==[] -> true ; 
-    ((List \= [Value|Rest] ->  gvar_remove_all_list_matches(BB, Rest,Value) ;
-       ((nb_setval(BB,Rest),gvar_remove_all_list_matches(BB,Rest,Value)))))).
-
-remove_el_via_setarg(List,Value):- ([Value|T] = List -> nb_setarg(2,List,T) ; remove_el_via_setarg(T,Value)).
-append_el_via_setarg(List,Value):- List = [_|T], (T==[] -> setarg(2,List,[Value]) ; append_el_via_setarg(T,Value)).
-
-
-
-bnb_current(BB,LIST):-!,fail.
-bnb_current(BB,LIST):-nb_current(BB,LIST),!.
-bnb_current(BB,LIST):-nb_setval(BB,[]),nb_current(BB,LIST),!.
-
-bb_lookup(BB,P):-bnb_current(BB,LIST),!,member(P,LIST).
-bb_lookup(BB,P):-in_bb(BB,P).
-
-bb_add(BB,P):-bnb_current(BB,LIST),!,nb_setval(BB,[P|LIST]).
-bb_add(BB,P):-asserta(in_bb(BB,P)).
-
-bb_rem(BB,P):-bnb_current(BB,LIST),!,remove_el(LIST,P,NLIST),nb_setval(BB,NLIST).
-bb_rem(BB,P):-retract(in_bb(BB,P)).
-
-bb_op(ENV,call,P):-pe_get_key(P,ENV,BB),bb_lookup(BB,P).
-bb_op(ENV,assert,P):-pe_get_key(P,ENV,BB),bb_add(BB,P).
-bb_op(ENV,asserta,P):-pe_get_key(P,ENV,BB),bb_add(BB,P).
-bb_op(ENV,retract,P):-pe_get_key(P,ENV,BB),bb_rem(BB,P).
-bb_op(ENV,retractall,P):-pe_get_key(P,ENV,BB),forall(bb_lookup(BB,P),bb_rem(BB,P)).
-
-bb_op_rb(ENV,call,P):-pe_get(P,ENV,BB),rb_lookup(P,P,BB).
-bb_op_rb(ENV,assert,P):-pe_get(P,ENV,BB),nb_rb_insert(P,P,BB).
-bb_op_rb(ENV,asserta,P):-pe_get(P,ENV,BB),nb_rb_insert(P,P,BB).
-bb_op_rb(ENV,retract,P):-pe_get(P,ENV,BB),nb_rb_get_node(P,P,BB).
-bb_op_rb(ENV,retractall,P):-rb_new(BB),pe_set(P,ENV,BB).
-
-bb_op_qu(ENV,call,P):-pe_get(P,ENV,Q),inside_queue(Q,P).
-bb_op_qu(ENV,assert,P):-pe_get(P,ENV,Q),push_slow_queue(Q,P).
-bb_op_qu(ENV,asserta,P):-pe_get(P,ENV,Q),push_fast_queue(Q,P).
-bb_op_qu(ENV,retract,P):-pe_get(P,ENV,Q),pop_queue(Q,P).
-bb_op_qu(ENV,retractall,P):-make_queue(Q),pe_set(P,ENV,Q).
-
-% FIFO queue
-
-make_queue(Q) :- nb_setval(Q, fast_slow(QU-QU, L-L)).
-
-push_fast_queue(Q,E) :-
-        b_getval(Q, fast_slow(H-[E|T], L)),
-        b_setval(Q, fast_slow(H-T, L)).
-
-push_slow_queue(Q,E) :-
-        b_getval(Q, fast_slow(L, H-[E|T])),
-        b_setval(Q, fast_slow(L, H-T)).
-
-pop_queue(Q,E) :-
-        b_getval(Q, fast_slow(H-T, I-U)),
-        (   nonvar(H) ->
-            H = [E|NH],
-            b_setval(Q, fast_slow(NH-T, I-U))
-        ;   nonvar(I) ->
-            I = [E|NI],
-            b_setval(Q, fast_slow(H-T, NI-U))
-        ;   false
-        ).
-
-inside_queue(Q,E) :-
-        b_getval(Q, fast_slow(H-T, I-U)),(   nonvar(H) , member(E,H)  ;   nonvar(I) , member(E,H)).
-
-
+:-multifile(on_call_decl_hyhtn/0).
 :-export(on_call_decl_hyhtn/0).
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(domcache)],(temp_assertIndivConds/1)). % Used for grounding operators
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(domcache)],(is_of_primitive_sort/2, is_of_sort/2)).
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(domcache)],(methodC/7, opParent/6,operatorC/5,gOperator/3)).
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(domcache)],(objectsC/2,objectsD/2,atomic_invariantsC/1)).% Used only dynamic objects
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(domcache)],(objectsOfSort/2)).      % Used to store all objects of a sort
-
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(domcache) /*stubType(with_pred(bb_op(_)))*/],(related_op/2, gsubstate_classes/3, gsstates/3)).  
-
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(nodecache) /*stubType(with_pred(bb_op(_)))*/],(op_score/2)). 
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(nodecache)/*stubType(rec_db)*/],(node/5,final_node/1)).
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(nodecache)],(tp_goal/3,closed_node/6,solved_node/2, goal_related_search/1)). 
-on_call_decl_hyhtn :- decl_mpred_env([stubType(rec_db),kb(nodecache)],(goal_related/3)).
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(nodecache)],(current_num/2)).
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(nodecache)],(tn/6)). % Used to store full expanded steps
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(nodecache)],(tp_node/6)).
-% on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(nodecache)],(tp_node_cached/6)).
-% on_call_decl_hyhtn :- decl_mpred_env([stubType(with_pred(gvar_list(tnodeSORTED))),kb(nodecache)],tp_node/6).
-
 % Tasks
 on_call_decl_hyhtn :- decl_mpred_env([kb(domtasks),stubType(dyn)], ( htn_task/3, planner_task/3, planner_task_slow/3 )).
+
+% decl_mpred_env_dom(A,B):-decl_mpred_env(A,B).
+% decl_mpred_env_task(A,B):-decl_mpred_env(A,B).
+
+on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(temp_assertIndivConds/1)). % Used for grounding operators
+on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(is_of_primitive_sort/2, is_of_sort/2)).
+on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(methodC/7, opParent/6,operatorC/5,gOperator/3)).
+on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(objectsC/3,objectsD/2,atomic_invariantsC/1)).% Used only dynamic objects
+on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(objectsOfSort/2)).      % Used to store all objects of a sort
+on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache) /*stubType(with_pred(bb_op(_)))*/],(related_op/2, gsubstate_classes/3, gsstates/3)).  
+
+on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache) /*stubType(with_pred(bb_op(_)))*/],(op_score/2)). 
+on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)/*stubType(rec_db)*/],(node/5,final_node/1)).
+on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)],(tp_goal/3,closed_node/6,solved_node/2, goal_related_search/1)). 
+on_call_decl_hyhtn :- decl_mpred_env_task([stubType(rec_db),kb(node,cache)],(goal_related/3)).
+on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)],(current_num/2)).
+on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)],(tn/6)). % Used to store full expanded steps
+on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)],(tp_node/6)).
+% on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)],(tp_node_cached/6)).
+% on_call_decl_hyhtn :- decl_mpred_env_task([stubType(with_pred(gvar_list(tnodeSORTED))),kb(node,cache)],tp_node/6).
+
+% Tasks
+on_call_decl_hyhtn :- decl_mpred_env_dom([kb(dom,tasks),stubType(dyn)], ( htn_task/3, planner_task/3, planner_task_slow/3 )).
+
+
 
 % Contents of a OCLh Domain
 on_call_decl_hyhtn :- 
  decl_mpred_env([kb(domfile),stubType(dyn)],[
-  domain_name/1,
+  domain_name/0,
   sorts/2,
   substate_classes/3,
   objects/2,
@@ -526,7 +293,26 @@ on_call_decl_hyhtn :-
   % oper/4,
   method/6]).
 
+
 :-doall(on_call_decl_hyhtn).
+
+
+/* Donghong Liu */
+/* University of Huddersfield */
+/* September 2002 */
+/* **********************************/
+/* gipohyhtn.pl */
+/* HyHTN planning: do preprocess first  */
+/* make all method and operators primitive */
+/* htncode.pl */
+
+planner_failure(Why,Info):-dmsg(error,Why-Info),banner_party(error,'FAILURE_PLANNER'),print_message(error,'FAILURE_PLANNER'(Why,Info)),!. %sleep(2).
+
+:-thread_local thlocal:doing/1.
+
+statistics_runtime(CP):-statistics(runtime,[_,CP0]), (CP0==0 -> CP= 0.0000000000001 ; CP is (CP0/1000)) .  % runtime WAS process_cputime
+
+:- prolog_load_context(file,File),ain(user:env_source_file(File)).
 
 
 % The following elements are expected in the sort engineered domain model
@@ -591,10 +377,14 @@ incr_op_num:- flag(op_num,X,X+1).
 set_op_num(X):-flag(op_num,_,X).
 current_op_num(X):- flag(op_num,X,X).
 
+get_tasks(N,Goal,State):- (htn_task(N,Goal,State)).
+get_tasks(N,Goal,State):- (user:planner_task(N,Goal,State)).
+
 :- set_op_num(0).
 % my_stats(0).
 
-l_file(F):-if_defined(reload_mpred_file(F),consult(F)).
+l_file(File):- \+ exists_file(File),!,forall(filematch(File,FM),l_file(FM)).
+l_file(F):-if_defined(reload_mpred_file(F),if_defined(with_mpred_consult(consult(F)),consult(F))).
 
 solve_file(F):-with_filematch(l_file(wfm(F))), doall(solve(_)).
 solve:- solve_file(test_hyhtn).
@@ -609,12 +399,21 @@ show_result_and_clean(F,Id,Sol,TNLst):-
 	write('TASK '),write(Id),nl,
 	write('SOLUTION'),nl,
 	display_sol(Sol),
+        write_out_test_data('.preClean',Id),
 	write('END FILE'),nl,nl,
 	nop((reverse(TNLst,TNForward),
 	display_details(TNForward),
 	write('END PLANNER RESULT'))),
-	told,
+	told,        
 	clean.
+
+write_out_test_data(MoreID,Id):-
+  must((
+    
+    (var(Id)->statistics(walltime,[Id,_]);true),
+    (push_env_ctx-> A= pushed_ ; A=nonpushed_ ),
+    atom_concat(A,Id,TN),atom_concat(TN,MoreID,TTN),
+      lws(TTN))),!.
 
 display_sol([]).
 display_sol([H|T]) :-
@@ -683,13 +482,14 @@ init_locl_planner_interface(G,I,Node):-
 
 init_locl_planner_interface0(G,I,Node):-
   must_det_l((
-        change_obj_list(I),!,
-	ground_op,!,
-	assert_is_of_sort,!,
-	change_op_representation,!,
-	prim_substate_class,!,
-        set_op_num(0),!,
-        statistics_runtime(Time),!,
+        change_obj_list(I),
+	ground_op,
+	assert_is_of_sort,
+	change_op_representation,
+	prim_substate_class,
+        set_op_num(0),
+        statistics_runtime(Time),
+        write_out_test_data('.setup',Id),       
         ignore(retract(my_stats(_))),
         assert(my_stats(Time)),
         make_problem_into_node(I, G, Node))),!.
@@ -2271,6 +2071,7 @@ get_objects1([PS1|RS],[Objls1|Objls]):-
    get_objects1(RS,Objls),!.
 
 % find subsorts of a sort(exclude).
+%TODO
 subsortse(Sort,Subsorts):-
   subsorts(Sort,Subsorts1),
   subtract(Subsorts1,[Sort],Subsorts),!.
@@ -2627,6 +2428,8 @@ remove_el([A|B],C,[A|D]) :-
 /* generate symbol predicate  (from file futile)*/
 
 gensym_special(Root,Atom) :-
+
+gensym_special(Root,Atom) :-
                         getnum(Root,Num),
                         name(Root,Name1),
                         name(Num,Name2),
@@ -2640,6 +2443,7 @@ getnum(Root,Num) :-
 
 getnum(Root,1) :- env_asserta(current_num(Root,1)).
 
+gensym_num(Root,Num,Atom):-atom_concat(Root,Num,Atom),!.
 gensym_num(Root,Num,Atom):-
      name(Root,Name),
      name(Num,Name1),
@@ -3395,229 +3199,12 @@ xprod([X|Y],[A|E],D,(F,G)) :-
 
 
 
+lws:- listing([method,
+operator,implied_invariant,atomic_invariants,inconsistent_constraint,predicates,objects,substate_classes,sorts,domain_name,planner_task_slow,planner_task,
+htn_task,tp_node,tn,current_num,goal_related,goal_related_search,solved_node,closed_node,tp_goal,final_node,node,op_score,gsstates,gsubstate_classes,related_op,
+objectsOfSort,atomic_invariantsC,objectsD,objectsC,gOperator,operatorC,opParent,methodC,is_of_sort,is_of_primitive_sort,temp_assertIndivConds]).
 
+lws(F):-tell(F),lws,told.
 
-
-
-
-end_of_file.
-
-
-%:-expects_dialect(ifprolog).
-
-% :-ifprolog_term_expansion(assign_alias(debug,user_error),Call),Call.
-
-clause_asserted(C):- as_clause(C,H,B),!,clause_asserted(H,B).
-clause_asserted(H,B):- predicate_property(H,number_of_clauses(N)),N>0,copy_term(H:B,HH:BB),!, clause(HH, BB, Ref),clause(Head, Body, Ref),H=@=Head,Body=@=B,!.
-as_clause( ((H :- B)),H,B):-!.
-as_clause( H,  H,  true).
-
-assert_if_new(C):-notrace(clause_asserted(C)->true;assert(C)).
-:- dynamic((time_taken/1,sum/1,soln_size/1)).
-:- assert_if_new(time_taken(0)).
-:- assert_if_new(sum(0)).
-:- assert_if_new(soln_size(0)).
-
-
-
-failOnError(Call):-catch(Call,_,fail).
-
-fresh_line:-current_output(Strm),fresh_line(Strm),!.
-fresh_line(Strm):-failOnError((stream_property(Strm,position('$stream_position'(_,_,POS,_))),(POS>0 ->nl(Strm);true))),!.
-fresh_line(Strm):-failOnError(nl(Strm)),!.
-fresh_line(_).
-
-% ===================================================================
-% Substitution based on ==
-% ===================================================================
-
-% Usage: subst(+Fml,+X,+Sk,?FmlSk)
-
-
-nd_subst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
-nd_subst(  Var, _,_,Var ) :- var(Var),!.
-nd_subst(  P, X,Sk, P1 ) :- functor(P,_,N),nd_subst1( X, Sk, P, N, P1 ).
-
-nd_subst1( _,  _, P, 0, P  ).
-nd_subst1( X, Sk, P, N, P1 ) :- N > 0,
-            P =.. [F|Args], 
-            nd_subst2( X, Sk, Args, ArgS ),
-            nd_subst2( X, Sk, [F], [FS] ),  
-            P1 =.. [FS|ArgS].
-
-nd_subst2( _,  _, [], [] ).
-nd_subst2( X, Sk, [A|As], [Sk|AS] ) :- X == A, !, nd_subst2( X, Sk, As, AS).
-nd_subst2( X, Sk, [A|As], [A|AS]  ) :- var(A), !, nd_subst2( X, Sk, As, AS).
-nd_subst2( X, Sk, [A|As], [Ap|AS] ) :- nd_subst( A,X,Sk,Ap ),nd_subst2( X, Sk, As, AS).
-nd_subst2( _X, _Sk, L, L ).
-
-:- meta_predicate(with_assertions(+,0)).
-with_assertions( [],Call):- !,Call.
-with_assertions( [With|MORE],Call):- !,with_assertions(With,with_assertions(MORE,Call)).
-with_assertions( (With,MORE),Call):- !,with_assertions(With,with_assertions(MORE,Call)).
-with_assertions( (With;MORE),Call):- !,with_assertions(With,Call);with_assertions(MORE,Call).
-with_assertions( -TL:With,Call):- !,with_no_assertions(TL:With,Call).
-with_assertions( +TL:With,Call):- !,with_assertions(TL:With,Call).
-with_assertions( not(With),Call):- !,with_no_assertions(With,Call).
-with_assertions( -With,Call):- !,with_no_assertions(With,Call).
-with_assertions( +With,Call):- !,with_assertions(With,Call).
-
-% with_assertions(THead,Call):- functor(THead,F,_),b_setval(F,THead).
-with_assertions(THead,Call):- 
- must(to_thread_head(THead,M,_Head,H)),
-   copy_term(H,  WithA), !,
-   ( M:WithA -> Call ; setup_call_cleanup(M:asserta(WithA),Call,must(M:retract(WithA)))).
-
-with_assertions(THead,Call):- 
- must(to_thread_head(THead,M,_Head,H)),
-   copy_term(H,  WithA), !,
-   with_assertions(M,WithA,Call).
-   
-:- meta_predicate(with_assertions(+,+,0)).
-with_assertions(M,WithA,Call):- M:WithA,!,Call.
-with_assertions(M,WithA,Call):-
-   setup_call_cleanup(M:asserta(WithA),Call,must(M:retract(WithA))).
-
-:-meta_predicate(with_no_assertions(+,0)).
-with_no_assertions(THead,Call):-
- must(to_thread_head((THead:-!,fail),M,_Head,H)),
-   copy_term(H,  WithA), !, setup_call_cleanup(M:asserta(WithA),Call,must(M:retract(WithA))).
-
-
-to_thread_head((H:-B),TL,(HO:-B),(HH:-B)):-!,to_thread_head(H,TL,HO,HH),!.
-to_thread_head(thglobal:Head,thglobal,thglobal:Head,Head):- slow_sanity((predicate_property(thglobal:Head,(dynamic)),not(predicate_property(thglobal:Head,(thread_local))))).
-to_thread_head(TL:Head,TL,TL:Head,Head):-!, slow_sanity(( predicate_property(TL:Head,(dynamic)),must(predicate_property(TL:Head,(thread_local))))).
-to_thread_head(Head,thlocal,thlocal:Head,Head):-!, slow_sanity(( predicate_property(thlocal:Head,(dynamic)),must(predicate_property(thlocal:Head,(thread_local))))).
-to_thread_head(Head,tlbugger,tlbugger:Head,Head):- slow_sanity(( predicate_property(tlbugger:Head,(dynamic)),predicate_property(tlbugger:Head,(thread_local)))).
-
-slow_sanity(X):-must(X).
-
-
-%se/cond == se. state == ss. trans == sc. dif == ne.  operator == operator
-term_expansion_hyhtn(In,Out):-nonvar(In),term_expansion_alias(In,Out).
-
-
-/*
-:- use_module(library(pce)).
-:- use_module(library(gui_tracer)).
-*/
-
-:- thread_local tlbugger:inside_loop_check/1.
-:- module_transparent(tlbugger:inside_loop_check/1).
-
-:- thread_local tlbugger:inside_loop_check_local/2.
-:- module_transparent(tlbugger:inside_loop_check_local/2).
-
-
-make_key(CC,KeyA):- notrace(ground(CC)->KeyA=CC ;(copy_term(CC,Key,_),numbervars(Key,0,_))),!,KeyA=Key. % ,term_to_atom(Key,KeyA).
-loop_check(B):- loop_check(B,fail).
-loop_check(B, TODO):- make_key(B,BC),!, loop_check_term(B,BC,TODO).
-
-loop_check_term(B,BC,TODO):-  ( \+(tlbugger:inside_loop_check(BC)) 
-   -> setup_call_cleanup(asserta(tlbugger:inside_loop_check(BC)),B, retract((tlbugger:inside_loop_check(BC)))) ;call(TODO) ).
-
-
-must(E):-E *-> true ; (trace,E).
-
-functor_h(P,F,A):-var(P),!,(number(A)->functor(P,F,A);((mpred_arity(F,A);throw(var_functor_h(P,F,A))))).
-functor_h(F/A,F,A):-number(A),!,( atom(F) ->  true ; mpred_arity(F,A)).
-functor_h(':'(_,P),F,A):-nonvar(P),!,functor_h(P,F,A).
-functor_h(':-'(P),F,A):-!,functor_h(P,F,A).
-functor_h(':-'(P,_),F,A):-!,functor_h(P,F,A).
-functor_h(kb(P),F,A):- atom(P),!, ( P=F -> mpred_arity(F,A) ; env_mpred(P,F,A)).
-functor_h(P,F,A):-functor(P,F,A).
-
-decl_mpred(ENV,Var):- (var(ENV);var(Var)),!, trace,throw(var_env_learn_pred(ENV,Var)).
-decl_mpred(ENV,(A,B)):-!, decl_mpred(ENV,A), decl_mpred(ENV,B).
-decl_mpred(ENV,[A|B]):-!, decl_mpred(ENV,A), decl_mpred(ENV,B).
-decl_mpred([],_):- !.
-decl_mpred(_,[]):- !.
-decl_mpred([H|T],P):- !, decl_mpred(H,P),decl_mpred(T,P).
-decl_mpred((H,T),P):- !, decl_mpred(H,P),decl_mpred(T,P).
-decl_mpred(call(ENV),P):- functor_h(P,F,A),call(ENV,F/A),!.
-decl_mpred(ENV,P):- functor_h(P,F,A),!,decl_mpred_fa(ENV,F,A).
-
-decl_mpred_fa(ENV,F,A):- env_mpred(ENV,F,A),!.
-decl_mpred_fa(ENV,F,A):- assert_if_new(mpred_arity(F,A)),assert_if_new(env_kb(ENV)),assert(env_mpred(ENV,F,A)), doall(decl_mpred_fa_hooks(ENV,F,A)).
-
-
-
- 
-count(1_000_000).
- 
-my_asserta(N) :- asserta(asserted_a(N)).
-my_assertz(N) :- assertz(asserted_z(N)).
-my_recorda(N) :- recorda(recorded_a, N).
-my_recordz(N) :- recordz(recorded_z, N).
-my_flag(N) :- flag(some_flag, _, N).
- 
-my_setval(N) :-
-    b_getval(global_variable, Old),
-    b_setval(global_variable, [N|Old]).
- 
-bench :-
-    count(Count),
-    ns_op(many(Count, my_asserta)),
-    ns_op(many(Count, my_assertz)),
-    ns_op(many(Count, my_recorda)),
-    ns_op(many(Count, my_recordz)),
-    ns_op(many(Count, my_flag)),
-    ns_op(many(Count, my_setval)),
-    clear.
- 
-ns_op(Goal) :-
-    get_time(Start),
-    call(Goal),
-    get_time(Done),
-    count(Count),
-    Ns is (Done - Start) / Count * 1_000_000_000,
-    'format'("~w: ~1f ns/op~n", [Goal, Ns]).
- 
-many(N, Goal) :-
-    ( N > 0 ->
-        call(Goal, N),
-        succ(N0, N),
-        many(N0, Goal)
-    ; true
-    ).
- 
-clear :-
-    ns_op(retractall(asserted_a(_))),
-    ns_op(retractall(asserted_z(_))),
-    ns_op(eraseall(recorded_a)),
-    ns_op(eraseall(recorded_z)),
-    ns_op(b_setval(global_variable, [])).
- 
-eraseall(Key) :-
-    foreach( recorded(Key,_,Ref), erase(Ref) ).
-
-
-dmsg(Term):-dmsg(debug,Term).
-dmsg(Color,Term):-   tell(user),fresh_line, sformat(S,Term,[],[]),print_message_lines(user_output,kind(Color),[S-[]]),fresh_line,told,!.
-/*
-dmsg(Color,Term):- current_prolog_flag(tty_control, true),!,  tell(user),fresh_line,to_petty_color(Color,Type),
-   call_cleanup(((sformat(S,Term,[],[]),print_message(Type,if_tty([S-[]])))),told).
-*/
-
-sformat(O,T,_Vs,_Opts):- (true;functor(T,':-',_)),with_output_to(chars(Codes),portray_clause(':-'(T))),
-  append([_,_,_],PrintCodes,Codes),'sformat'(O,'~s',[PrintCodes]),!.
-sformat(O,T,Vs,Opts):- with_output_to(chars(Codes),(current_output(CO),pp_termclause(CO,':-'(T),Vs,Opts))),
-  append([_,_,_],PrintCodes,Codes),'sformat'(O,'~s',[PrintCodes]),!.
-
-pp_termclause(O,T,Vs,Options):- prolog_listing:do_portray_clause(O,T,[variable_names(Vs),numbervars(true),character_escapes(true),quoted(true)|Options]),!.
-
-to_petty_clause(V,('VARIABLE':-V)):-var(V),!.
-to_petty_clause((H:-B),(H:-B)):-!.
-to_petty_clause((':-'(B)),(':-'(B))):-!.
-to_petty_clause(((B)),(':-'(B))):-!.
-to_petty_color(X,X).
-
-nop(_P).
-doall(G):-ignore((G,fail)).
-one_must(Call,Else):- trye(Call)*->true;Else.
-
-:-dynamic((env_mpred/3, mpred_arity/2, env_kb/1)).
-
-
-
+:- endif.
 

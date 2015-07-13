@@ -12,39 +12,41 @@
 
 :- expects_dialect(sicstus).
 
+
+
 pfc_ain(X):-if_defined(pfc_add(X),assert_if_new(X)).
 ain(X):-if_defined(pfc_add(X),assert_if_new(X)).
 
-:-export(struct_decl/1).
-:-multifile(struct_decl/1).
-:-dynamic(struct_decl/1).
+:-export(user:struct_decl/1).
+:-multifile(user:struct_decl/1).
+:-dynamic(user:struct_decl/1).
 
-:-export(struct_names/2).
-:-multifile(struct_names/2).
-:-dynamic(struct_names/2).
+:-export(user:struct_names/2).
+:-multifile(user:struct_names/2).
+:-dynamic(user:struct_names/2).
 
-:-export(struct_datatype/2).
-:-multifile(struct_datatype/2).
-:-dynamic(struct_datatype/2).
+:-export(user:struct_datatype/2).
+:-multifile(user:struct_datatype/2).
+:-dynamic(user:struct_datatype/2).
 
-:-export(struct_prototype/2).
-:-multifile(struct_prototype/2).
-:-dynamic(struct_prototype/2).
-
-
-:-export(member_datatype/3).
-:-multifile(member_datatype/3).
-:-dynamic(member_datatype/3).
-
-:-export(member_loc/3).
-:-multifile(member_loc/3).
-:-dynamic(member_loc/3).
-
-:-export(member_init/3).
-:-multifile(member_init/3).
-:-dynamic(member_init/3).
+:-export(user:struct_prototype/2).
+:-multifile(user:struct_prototype/2).
+:-dynamic(user:struct_prototype/2).
 
 
+:-export(user:member_datatype/3).
+:-multifile(user:member_datatype/3).
+:-dynamic(user:member_datatype/3).
+
+:-export(user:member_loc/3).
+:-multifile(user:member_loc/3).
+:-dynamic(user:member_loc/3).
+
+:-export(user:member_init/3).
+:-multifile(user:member_init/3).
+:-dynamic(user:member_init/3).
+
+:- struct_datatype(_,_) -> true; true.
 
 record_onto_var(AttribName,AV,Value):-
  ignore((
@@ -105,6 +107,7 @@ prop_get(Name,mutable(Dict),Value):-!,nonvar(Dict),prop_get(Name,Dict,Value).
 prop_get(Call):- Call=..[P,A,B],prop_get(P,A,B).
 
 prop_get(Name,Dict,Value):- (var(Name);var(Dict)),!,trace_or_throw(var_prop_get(Name,Dict,Value)).
+prop_get(Name,Dict,Value):- nonvar(Value),!,must(prop_get(Name,Dict,ValueVar)),!,Value=ValueVar.
 prop_get(_,     Dict, _ ):- (\+ \+ Dict=[] ),!, fail.
 prop_get(Name, Struct,  Value):- prop_get_try(Name, Struct,  Value, _),!.
 prop_get(Name, Struct,  Value):- Name \= extraprops, prop_get(extraprops, Struct,  Extra),
@@ -342,7 +345,7 @@ extract_struct_parameter(_Def,Decl,Name,Type):-Decl=..[K1,K2,Name],!,Type=..[K1,
 extract_struct_parameter(_Def,Decl,Name,Type):-Decl=..[Type,Name],!.
 extract_struct_parameter(Def,Name,Name,Def).
    
-:-ain(struct_decl(StructDecl)=>decl_struct(StructDecl)).
+:-ain(=>(struct_decl(StructDecl),decl_struct(StructDecl))).
 
 
 ensure_instance(Type,Struct):-ensure_struct(Type,Struct).

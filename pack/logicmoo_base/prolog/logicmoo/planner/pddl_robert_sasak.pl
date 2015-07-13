@@ -184,21 +184,21 @@ solve(D, P, Solution):-
     get_problem_init(P, UCI),
     get_problem_goal(P, UCG),
     copy_term_for_solve((UCI,UCG),(I,G)),
-    prop_get(domain_name,D,CD),    
-    must(prop_get(domain_name,P,CD)),
+    prop_get(domain_name,D,Mt),    
+    must(prop_get(domain_name,P,Mt)),
     % abolish(actn,2),
 
     get_domain_actions(D, A),
     maplist(save_varnames_in_action,A,CA),
-    bb_put(actions, CA), maplist(save_actions(CD), CA),
+    bb_put(actions, CA), maplist(save_actions(Mt), CA),
 
     bb_put(goalState, G),        
     bb_put(fictiveGoal, G))),!,    
-    search(CD,I, G, Solution).
+    search(Mt,I, G, Solution).
 
 save_varnames_in_action(A,CA):-varnames_for_assert(A,C,Vars),append_term(C,Vars,CA).
 
-save_actions(CD,A):- asserta_if_new(actn(CD,A)).
+save_actions(Mt,A):- asserta_if_new(actn(Mt,A)).
 
 % term_to_ord_term(+Term, -OrdTerm)
 %
@@ -289,25 +289,25 @@ record_var_names(ATTVAR,Value):-record_onto_var(varname,ATTVAR,Value).
 
 record_var_type(ATTVAR,Type):-record_onto_var(type,ATTVAR,Type).
 
-get_action_info(CD,A):- actn(CD,A).
+get_action_info(Mt,A):- actn(Mt,A).
 
-get_constrained_action(CD,action(S, Ts, Precon, Pos, Neg, Assign, UT )):-get_action_copy(CD,action(S, Ts, Precon, Pos, Neg, Assign, UT , C, Vars)),
+get_constrained_action(Mt,action(S, PTs, Precon, Pos, Neg, Assign, UT )):-get_action_copy(Mt,action(S, PTs, Precon, Pos, Neg, Assign, UT , C, Vars)),
   nop((call(C),record_var_names(Vars))).
 
 
-% get_constrained_action_bb(CD,action(S, Ts, Precon, Pos, Neg, Assign, UT )):-!,actn(CD,action(S, Ts, Precon, Pos, Neg, Assign, UT , _C, _Vars)).
-get_constrained_action_bb(CD,action(S, Ts, Precon, Pos, Neg, Assign, UT )):-get_action_bb(CD,action(S, Ts, Precon, Pos, Neg, Assign, UT , C, Vars)),
+% get_constrained_action_bb(Mt,action(S, PTs, Precon, Pos, Neg, Assign, UT )):-!,actn(Mt,action(S, PTs, Precon, Pos, Neg, Assign, UT , _C, _Vars)).
+get_constrained_action_bb(Mt,action(S, PTs, Precon, Pos, Neg, Assign, UT )):-get_action_bb(Mt,action(S, PTs, Precon, Pos, Neg, Assign, UT , C, Vars)),
   nop((call(C),record_var_names(Vars))).
 
 
 % get_action(-Action, -ActionDef)
 %
-get_action_copy(CD,A):- actn(CD,A).
+get_action_copy(Mt,A):- actn(Mt,A).
 
-% get_action_copy(_CD,A):- bb_get(actions, As),copy_term(As, Ass),!, member(A, Ass).
-%get_action(CD,A):- actn(CD,A).
+% get_action_copy(_Mt,A):- bb_get(actions, As),copy_term(As, Ass),!, member(A, Ass).
+%get_action(Mt,A):- actn(Mt,A).
 
-get_action_bb(_CD,A):- bb_get(actions, As),copy_term(As, Ass),!, member(A, Ass).
+get_action_bb(_Mt,A):- bb_get(actions, As),copy_term(As, Ass),!, member(A, Ass).
 
 
 
@@ -378,9 +378,9 @@ concat_atom_iio([E1, E2], D, O):-
     atom_concat(E1, D, Temp),
     atom_concat(Temp, E2, O).
 concat_atom_iio([H|T], D, O):-
-    concat_atom_iio(T, D, Ts),
+    concat_atom_iio(T, D, PTs),
     atom_concat(H, D, Temp),
-    atom_concat(Temp, Ts, O).
+    atom_concat(Temp, PTs, O).
 
 
 % copy_term_spec(+Term, -Term)
@@ -797,7 +797,7 @@ solvable([H|T], FV, [M|S]):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% This file must implements following predicates:
 %%
-%% step(CD,+State, -ActionDef, -NewState)
+%% step(Mt,+State, -ActionDef, -NewState)
 %%   Return descendant of State and ActionDefinition that was used.
 %%
 %% is_goal(State) - is true when State is a goal state.  
@@ -811,14 +811,14 @@ solvable([H|T], FV, [M|S]):-
 
 make_solution(S, S).
     
-% step(CD,+State, -ActionDef, -NewState)
+% step(Mt,+State, -ActionDef, -NewState)
 %
 %   Return descendant of State and ActionDefinition that was used.
 %
-step(CD,State, ActionDef, NewState):-
+step(Mt,State, ActionDef, NewState):-
   %  get_a ction(A, ActionDef),
   %  get_precondition(A, P),    
-  get_constrained_action_bb(CD,action(_S, _L, P, PE, NE, _Assign, ActionDef)),
+  get_constrained_action_bb(Mt,action(_S, _L, P, PE, NE, _Assign, ActionDef)),
   
     mysubset(P, State),  % choose suitable action
  %   get_negativ_effect(A, NE),
@@ -827,7 +827,7 @@ step(CD,State, ActionDef, NewState):-
     ord_union(State2, PE, NewState).
 
 
-is_goal(_CD,S):-
+is_goal(_Mt,S):-
     bb_get(goalState, G),
     ord_subset(G, S).
 
@@ -853,30 +853,30 @@ repeating(S1, S2):-
 % :-use_module(library(sets)).
 
 % h(+State, -EstimatedValue)
-h(CD,S, H):- h_add(CD,S, H).
+h(Mt,S, H):- h_add(Mt,S, H).
 % h(S, H):- h_diff(S, H).
 
 
 %
 %   Estimated distance to achieve Goal.
 %
-h_add(CD,S, E):-
+h_add(Mt,S, E):-
     bb_get(fictiveGoal, G),
-    relax(CD,S, G, E).
+    relax(Mt,S, G, E).
 %    write(G-S-E),nl.
 
-relax(_CD,_, [], 0):-!.
-relax(CD,S, G, E):-
+relax(_Mt,_, [], 0):-!.
+relax(Mt,S, G, E):-
     subtract(G, S, Delta),
-    setof(P, relax_step(CD,S, P), RS),
+    setof(P, relax_step(Mt,S, P), RS),
     ord_union([S|RS], NS),
-    relax(CD,NS, Delta, NE),
+    relax(Mt,NS, Delta, NE),
     length(Delta, LD),
     E is LD+NE.
 
-relax_step(CD,State, PE):-
+relax_step(Mt,State, PE):-
     % get_a ction(A),
-    get_constrained_action(CD,action(_S, _L, P, PE0, _Neg, _Assign, _UT)),
+    get_constrained_action(Mt,action(_S, _L, P, PE0, _Neg, _Assign, _UT)),
     %get_precondition(A, P),
     
     mysubset(P, State),
@@ -1118,20 +1118,20 @@ emptyOr(_)                      --> ['(',')'].
 emptyOr(W)                      --> W.
 
 % Actions definitons
-action_def(action(S, vv(Ts), Precon, Pos, Neg, Assign, UT , []))
+action_def(action(S, vv(PTs), Precon, Pos, Neg, Assign, UT , []))
                                 --> ['(',':',action], action_symbol(S),
                                     [':',parameters,'('], typed_list(variable, L), [')'],
-                                    {get_param_types(s(var,type),L,UL,Ts),UT=..[S|UL],!},
+                                    {get_param_types(s(var,type),L,UL,PTs),UT=..[S|UL],!},
                                     action_def_body(Precon, Pos, Neg, Assign),
                                     [')'].
 action_symbol(N)                --> name(N).
 
 % Actions definitons
-durative_action_def(action(S, vv(Ts), Precon, Pos, Neg, Assign, UT, []))
+durative_action_def(action(S, vv(PTs), Precon, Pos, Neg, Assign, UT, []))
                                 --> ['(',':',daction], action_symbol(S),
                                     [':',parameters,'('], typed_list(variable, L), [')'], 
                                     da_def_body(Precon, Pos, Neg, Assign),
-                                    [')'], {get_param_types(s(var,type),L,UL,Ts),UT=..[S|UL],!}.
+                                    [')'], {get_param_types(s(var,type),L,UL,PTs),UT=..[S|UL],!}.
 
 
 % % 2 ?- phrase(emptyOr(pre_GD(P)),['(',accessible,?,x,')','(','no-inventory-object',?,x,')','(','has-location',?,x,?,y,')'],X).
@@ -1566,7 +1566,7 @@ test_dir_files_sas(Dir):-
 % FILENAME:  wa-star.pl 
 % Interface:
 %
-% step(CD,+State, -NewState)
+% step(Mt,+State, -NewState)
 % is_goal(State)
 % h(State, Value) 
 % repeating(+State, +AnotherState)
@@ -1578,37 +1578,37 @@ test_dir_files_sas(Dir):-
 
 % search(+InitState, +GoalState, -Solution)
 %
-search(CD,I, _, Solution):-
-    a_star(CD,I, Solution, _).
+search(Mt,I, _, Solution):-
+    a_star(Mt,I, Solution, _).
     
     
-% a_star(CD,+InitState, -Actions, -Cost).
+% a_star(Mt,+InitState, -Actions, -Cost).
 %
-a_star(CD,S, A, C):-
+a_star(Mt,S, A, C):-
     state_record(S, nil, nil, 0, SR),
     list_to_heap([0-SR], PQ),
-    a_star(CD,PQ, [], A, C).
+    a_star(Mt,PQ, [], A, C).
 
 
-% a_star(CD,+Queue, +Visited, -Solution, -Cost)
+% a_star(Mt,+Queue, +Visited, -Solution, -Cost)
 %
-a_star(_CD,PQ, _, 'NO SOLUTION', _):-
+a_star(_Mt,PQ, _, 'NO SOLUTION', _):-
   %  write('NO SOLUTION'),nl,
     empty_heap(PQ),
     !.
-a_star(CD,PQ, V, Solution, C):-
+a_star(Mt,PQ, V, Solution, C):-
     get_from_heap(PQ, C, SR, _),
     state_record(S, _, _, _, SR),
-    is_goal(CD,S),
+    is_goal(Mt,S),
 %    write('FOUND SOLUTION'),nl,
 %    state_record(S, _, _, D, SR), write(C-D), write('   '),write(S),nl,
 %    writel(V),nl,halt,
     solution(SR, V, Solution).
 
-a_star(CD,PQ, V, Solution, C):-
+a_star(Mt,PQ, V, Solution, C):-
     get_from_heap(PQ, _K, SR, RPQ),
     ord_add_element(V, SR, NV),
-    (    bagof(K-NS, next_node(CD,SR, PQ, NV, K, NS), NextNodes) 
+    (    bagof(K-NS, next_node(Mt,SR, PQ, NV, K, NS), NextNodes) 
          ;
          NextNodes=[]
     ),
@@ -1616,20 +1616,20 @@ a_star(CD,PQ, V, Solution, C):-
 %    write(NextNodes),nl,
     add_list_to_heap(RPQ, NextNodes, NPQ),
     stat_node,
-    a_star(CD,NPQ, NV, Solution, C).
+    a_star(Mt,NPQ, NV, Solution, C).
 
 
 
-% next_node(CD,+StateRecord, +Queue, +Visited, -EstimateDeep, -NewStateRecord)
+% next_node(Mt,+StateRecord, +Queue, +Visited, -EstimateDeep, -NewStateRecord)
 %
-next_node(CD,SR, Q, V, E, NewSR):-
+next_node(Mt,SR, Q, V, E, NewSR):-
     state_record(S, _, _, D, SR),
-    step(CD,S, A, NewS),
+    step(Mt,S, A, NewS),
     state_record(NewS, _, _, _, Temp),
     \+ my_ord_member(NewS, V),
     heap_to_list(Q, PQL),
     \+ member(Temp, PQL),
-    h(CD,S, H),
+    h(Mt,S, H),
     E is H+D,
     ND is D+1,
     state_record(NewS, S, A, ND, NewSR).
@@ -1963,8 +1963,8 @@ operator(chameleonWorld,removeDirtyNewspaper(Flexarium,Door,Chameleon,Box,Substr
 
 :- style_check(+singleton).
 
-op_action(CD, S, Ts, NPrecon, Pos, Neg, Af, UT , True):- 
-   loop_check(operator(CD,UT,SE,SC,SS)),
+op_action(Mt, S, PTs, NPrecon, Pos, Neg, Af, UT , True):- 
+   loop_check(operator(Mt,UT,SE,SC,SS)),
    must_det_l((
       True = true,
       UT=..[S|ARGS],
@@ -1975,7 +1975,7 @@ op_action(CD, S, Ts, NPrecon, Pos, Neg, Af, UT , True):-
       unss_ify(=,Hints2,sc,SC,NEGPOS,Hints),
       divide_neg_pos(NEGPOS,[],[],Neg,Pos),   
       append(Precon,Neg,NPrecon),
-      maplist(get_type_of(CD,top,Hints),ARGS,Ts))).
+      maplist(get_type_of(Mt,top,Hints),ARGS,PTs))).
 
 lock_var(X):-when((?=(X,Y);nonvar(X)),X==Y).
 unlock_var(V):-del_attrs(V).
@@ -1983,13 +1983,13 @@ unlock_var(V):-del_attrs(V).
 
 add_wrapper(W,In , Out):-Out=..[W,In].
 
-actn_operator(CD,UT,SE,SC,SS):- 
- get_action_info(CD,action(_S, Ts, Precon, Pos, Neg, Af, UT , Call, Vars)),
+actn_operator(Mt,UT,SE,SC,SS):- 
+ get_action_info(Mt,action(_S, PTs, Precon, Pos, Neg, Af, UT , Call, Vars)),
  must_det_l(( 
    UT=..[_|ARGS],
    show_call(Call),   
    maplist(record_var_names,Vars),
-   maplist(create_hint,Ts,ARGS,ARGHints),
+   maplist(create_hint,PTs,ARGS,ARGHints),
    conjuncts_to_list(Call,MORE),
    append(ARGHints,MORE,MOREARGHints),
    unss_ify(=,[],MOREARGHints,Precon,se,SEPs,HintsSE),
@@ -1997,12 +1997,12 @@ actn_operator(CD,UT,SE,SC,SS):-
    unss_ify(add_wrapper(del),[],HintsSS,Neg,ss,NOTS,HintsNEG),
    unss_ify(add_wrapper(add),NOTS,HintsNEG,Pos,ss,NOTSPOSC,HintsPOS),
    mylist_to_set(HintsPOS,Hints),
-   maplist(ress_ify(CD,Def,Hints,se),SEPs,SE),
-   maplist(ress_ify(CD,Def,Hints,ss),ASEPs,SS),   
-   maplist(make_rem_adds(CD,Hints),NOTSPOSC,SC))).
+   maplist(ress_ify(Mt,Def,Hints,se),SEPs,SE),
+   maplist(ress_ify(Mt,Def,Hints,ss),ASEPs,SS),   
+   maplist(make_rem_adds(Mt,Hints),NOTSPOSC,SC))).
 
-make_rem_adds(CD,Hints,A1-LIST,sc(Type,A1,(NEG=>POS))):-findall(N,member(del(N),LIST),NEG),findall(N,member(add(N),LIST),POS),
-  must(get_type_of(CD,top,Hints,A1,Type)).
+make_rem_adds(Mt,Hints,A1-LIST,sc(Type,A1,(NEG=>POS))):-findall(N,member(del(N),LIST),NEG),findall(N,member(add(N),LIST),POS),
+  must(get_type_of(Mt,top,Hints,A1,Type)).
 
 create_hint(K,V,kt(K,V)).
 
@@ -2049,21 +2049,21 @@ dess_ify(GT,WAS,HintsIn,A1-G,_ ,[A1-GO|WAS],HintsOut):- ghints(HintsIn,G,HintsOu
 
 dess_ify(GT,WAS,HintsIn,G,SS,OUT,Hints):- arg(1,G,A1), dess_ify(GT,WAS,HintsIn,A1-G,SS,OUT,Hints).
 
-ress_ify(CD, Def, Hints,SS,A1-Gs,GO):-GO=..[SS,Type,A1,Gs],must(get_type_of(CD,Def,Hints,A1,Type)),!.
-ress_ify(_CD,Def,_Hints,SS,A1-Gs,GO):-GO=..[SS,Def,A1,Gs],!.
+ress_ify(Mt, Def, Hints,SS,A1-Gs,GO):-GO=..[SS,Type,A1,Gs],must(get_type_of(Mt,Def,Hints,A1,Type)),!.
+ress_ify(_Mt,Def,_Hints,SS,A1-Gs,GO):-GO=..[SS,Def,A1,Gs],!.
 
 
 
 
 get_type_of(_ , Def, Hints,A1,Type):-member(kt(K,V),Hints),A1==V,K\==Def,!,Type=K,record_var_type(A1,Type).
-get_type_of(CD, Def, Hints,A1,Type):-atom(A1),get_type_of_atom(CD,Def,Hints,A1,Type),!.
-get_type_of(CD,_Def,_Hints,A1,Type):-nonvar(A1),loop_check(objects(CD,Type,List)),member(A1,List).
+get_type_of(Mt, Def, Hints,A1,Type):-atom(A1),get_type_of_atom(Mt,Def,Hints,A1,Type),!.
+get_type_of(Mt,_Def,_Hints,A1,Type):-nonvar(A1),loop_check(objects(Mt,Type,List)),member(A1,List).
 
 :- style_check(-singleton).
-get_type_of_atom(CD,Def,Hints,veiledChameleon,chameleon).
-get_type_of_atom(CD,Def,Hints,veiledchameleon,chameleon).
-get_type_of_atom(CD,Def,Hints,A1,Type):-pname_to_dname(P,D),is_a_type(D,Type),atom_concat(Type,Num,A1),Num=_.
-get_type_of_atom(CD,Def,Hints,A1,Type):-pname_to_dname(P,D),is_a_type(D,Type),atom_concat(_,Type,A1).
+get_type_of_atom(Mt,Def,Hints,veiledChameleon,chameleon).
+get_type_of_atom(Mt,Def,Hints,veiledchameleon,chameleon).
+get_type_of_atom(Mt,Def,Hints,A1,Type):-pname_to_dname(P,D),is_a_type(D,Type),atom_concat(Type,Num,A1),Num=_.
+get_type_of_atom(Mt,Def,Hints,A1,Type):-pname_to_dname(P,D),is_a_type(D,Type),atom_concat(_,Type,A1).
 :- style_check(+singleton).
 
 
@@ -2106,8 +2106,8 @@ planner_task(Domain,Name,
         copy_term_for_solve((UCI,UCG),(I,G)),       
         unss_ify(=,[],[],I,ss,SSK,HintsSS),
         unss_ify(=,[],HintsSS,G,se,SEK,Hints),
-        maplist(ress_ify(CD,Def,Hints,ss),SSK,SSs),
-        maplist(ress_ify(CD,Def,Hints,se),SEK,SEs))).
+        maplist(ress_ify(Mt,Def,Hints,ss),SSK,SSs),
+        maplist(ress_ify(Mt,Def,Hints,se),SEK,SEs))).
 
 name_to_problem_struct(Name,P):-Name==current,!,bb_get(currentProblem,P).
 name_to_problem_struct(Name,P):-is_saved_type(problem,Name,P).
@@ -2138,7 +2138,7 @@ ocl_domain_struct(Name,D):- no_repeats(Name,loop_check(predicates(Name,PredsList
    must_det_l((
       findall(S,is_a_type(Name,S),Types),
       D = domain(Name, [ocl], Types, /*Consts*/ [] , PredsList, /*Fuents*/[]  ,/*Constrs*/ [], /*Dconstraints*/[], Actions),
-      findall(action(CD, S, Ts, Precon, Pos, Neg, Af, UT , True),op_action(CD, S, Ts, Precon, Pos, Neg, Af, UT , True),Actions))).
+      findall(action(Mt, S, PTs, Precon, Pos, Neg, Af, UT , True),op_action(Mt, S, PTs, Precon, Pos, Neg, Af, UT , True),Actions))).
 
 mygroup_pairs_by_key([], []).
 mygroup_pairs_by_key([M-N|T0], [M-ORDERED|T]) :-
@@ -2174,7 +2174,7 @@ new_struct(Name,mutable(O)):- dict_create(O,Name,[]),!.
 :- test_domain('domains_ocl/chameleonWorld/*domain*').
 
 
-:- test_all(6).
+:- test_all(7).
 
 
 :- show_call(flag(time_used,W,W)).
@@ -2210,7 +2210,7 @@ twhy
 test_blocks:- fail, test_domain('./benchmarks/nomystery-sat11-strips/domain.pddl',RList),reverse(RList,List),
   forall(member(E,List),once(test_domain(E))).
 
-% :-asserta(thlocal:loading_files).
+:-asserta(thlocal:loading_files).
 
 :- forall(must_filematch('./rover/?*?/?*domain*.*',E),once(load_domain(E))).
 :- forall(must_filematch('./hsp-planners-master/?*?/pddl/?*?/?*domain*.*',E),once(load_domain(E))).

@@ -177,7 +177,7 @@ hotrace:-notrace.
 % Unlike notrace/1, it allows traceing when excpetions are raised during Goal.
 % %hotrace(X):- visible(+exception),leash(+exception), ( tracing -> with_assertions( tlbugger:wastracing,call_cleanup((notrace,restore_trace((visible(-all),visible(+exception),call(X)))),trace)) ; call(X) ).
 hotrace(M:X):-  visible(+exception),leash(+exception),restore_trace((notrace,M:call(X))).
-% hotrace(C):-current_predicate(logicmoo_bugger_loaded/0)->catch((C),E,((writeq(E=C),rtrace(C),trace_or_throw(E=C))));C.
+% hotrace(C):-current_predicate(logicmoo_bugger_loaded/0)->catchvv((C),E,((writeq(E=C),rtrace(C),trace_or_throw(E=C))));C.
 :-'$syspreds':'$hide'(hotrace/1).
 
 :-
@@ -401,7 +401,7 @@ not_ftVar(V):-not(is_ftVar(V)).
 
 logOnError(C):-prolog_ecall(0,logOnError0,C).
 :-export(logOnError0/1).
-logOnError0(C):- catch(C,E,dmsg(logOnError(warn(E),C))).
+logOnError0(C):- catchvv(C,E,dmsg(logOnError(warn(E),C))).
 logOnErrorEach(C):-prolog_ecall(1,logOnError,C).
 logOnErrorIgnore(C):-prolog:ignore(logOnError0(C)).
 
@@ -438,8 +438,8 @@ must_det_l(MC):- strip_module(MC,M,C),!, '@'(must_det_lm(M,C),M).
 :-module_transparent(must_det_lm/2).
 must_det_lm(_,C):-var(C),trace_or_throw(var_must_det_l(C)),!.
 must_det_lm(_,[]):-!.
-must_det_lm(M,[C|List]):-!,M:must(C),!,must_det_lm(M,List).
-must_det_lm(M,(C,List)):-!,M:must(C),!,must_det_lm(M,List).
+must_det_lm(M,[C|List]):-!,must(M:C),!,must_det_lm(M,List).
+must_det_lm(M,(C,List)):-!,must(M:C),!,must_det_lm(M,List).
 must_det_lm(M,C):- must(M:C),!.
 
 :-module_transparent(det_lm/2).
@@ -482,7 +482,7 @@ not_is_release :- 1 is random(4).
 
 
 :-thread_local tlbugger:show_must_go_on/0.
-badfood(MCall):- numbervars(MCall,0,_,[functor_name('VAR_______________________x0BADF00D'),attvar(bind),singletons(true)]),dumpST.
+badfood(MCall):- numbervars(MCall,0,_,[functor_name('VAR_______________________x0BADF00D'),attvar(bind),singletons(false)]),dumpST.
 
 % -- CODEBLOCK
 :- export(without_must/1).
@@ -493,37 +493,37 @@ without_must(G):- with_assertions(tlbugger:skipMust,G).
 % -- CODEBLOCK
 :- export(y_must/2).
 :-meta_predicate (y_must(?,0)).
-y_must(Y,C):- catch(C,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,C)),fail)) *-> true ; dtrace(y_must(Y,C)).
+y_must(Y,C):- catchvv(C,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,C)),fail)) *-> true ; dtrace(y_must(Y,C)).
 
 % -- CODEBLOCK
 :- export(must/1).
 :-meta_predicate (must(0)).
 
-must(C):-  tlbugger:skipMust,!,debugOnError0(C).
+
 %must(MCall):- skipWrapper,!, (MCall *-> true ; ((dmsg(failed(must_failed_xxxxxxxx_(MCall))),trace,MCall))).
-%must(C):-  tlbugger:skipMust,!,catch(C,E,(wdmsg(E:C),fail)).
 
-%must(C):- is_release,!,C.
+/*
+must(C):- 
+  (catchvv(C,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(C)),fail)) *-> true ;   
+   (wdmsg(error,must_failed_E_E_E_E_E_E_E_E_E(C)),dtrace(C),tlbugger:show_must_go_on)).
 
+must(C):-  tlbugger:skipMust,!,debugOnError0(C).
 
-must(C):- fail, !,
-  (catch(C,E,(wdmsg(E:C),fail)) *-> true ;   
-   (wdmsg(error,failed_must(C)),dtrace(C),fail)).
+*/
 
-must(MCall):- tracing,!,setup_call_cleanup(notrace,must(MCall),trace).
-
-must(MCall):- 
+must(C):- tlbugger:skipMust,!,show_call(catchvv(C,E,(wdmsg(E:C),fail))).
+must(C):- tracing,!,debugOnFailure0(C).
+must(MCall):-
  hotrace((tlbugger:show_must_go_on, strip_module(MCall,M,Call))),!,
  (
-  '@'(catch(Call,E,(dumpST,print_dmessage(error,must_xI__xI__xI__xI__xI_(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
+  '@'(catchvv(Call,E,(wdmsg(must_xI__xI__xI__xI__xI_(E:Call)),dumpST,wdmsg(must_xI__xI__xI__xI__xI_(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
   *-> true ; 
-  '@'((hotrace((wdmsg(warn(must_failed_E_E_E_E_E_E_E_E_E(Call))),print_dmessage(error,must_failed(Call)))),badfood(Call)),M)).
-
+  '@'((hotrace((wdmsg(warn(must_failed_E_E_E_E_E_E_E_E_E(Call))),wdmsg(must_failed(Call)))),badfood(Call)),M)).
 
 must(MCall):- 
  strip_module(MCall,M,Call),
  (
-  '@'(catch(Call,E,(dumpST,print_dmessage(error,must_ex(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
+  '@'(catchvv(Call,E,(dumpST,wdmsg(must_ex(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
   *-> true ; 
   '@'((hotrace((print_dmessage(warning,must_xI__xI__xI__xI__xI_(Call)),ignore(ftrace(Call)),debug,leash(+all),
       wdmsg(warn(must_failed_E_E_E_E_E_E_E_E_E(Call))))),dtrace(Call)),M)).
@@ -558,7 +558,7 @@ addLibraryDir :- buggerDir(Here),atom_concat(Here,'/..',UpOne), absolute_file_na
 nop(_).
 :- export(dumpST/0).
 
-% functor_safe(P,F,A):- catch(compound_name_arity(P,F,A),_,functor(P,F,A)).
+% functor_safe(P,F,A):- catchvv(compound_name_arity(P,F,A),_,functor(P,F,A)).
 
 erase_safe(Which,REF):- hotrace((var(REF)-> ddmsg(var_erase_safe(Which,REF)) ; erase(REF))).
 
@@ -602,7 +602,7 @@ dbgsubst(A,B,C,D):-var(A),!,dmsg(dbgsubst(A,B,C,D)),dumpST,dtrace,dbgsubst0(A,B,
 dbgsubst(A,B,C,D):-dbgsubst0(A,B,C,D).
 
 dbgsubst0(A,B,C,D):- 
-      catch(hotrace(nd_dbgsubst(A,B,C,D)),E,(dumpST,dmsg(E:nd_dbgsubst(A,B,C,D)),fail)),!.
+      catchvv(hotrace(nd_dbgsubst(A,B,C,D)),E,(dumpST,dmsg(E:nd_dbgsubst(A,B,C,D)),fail)),!.
 dbgsubst0(A,_B,_C,A).
 
 nd_dbgsubst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
@@ -941,7 +941,7 @@ define_if_missing(system:atomics_to_string/3, [
 define_if_missing(system:atomics_to_string/2, [
   ( system:atomics_to_string(List, String):- new_a2s(List, '', String) ) ]).
 
-new_a2s(List, Separator, String):-catch(new_a2s0(List, Separator, String),_,((trace,new_a2s0(List, Separator, String)))).
+new_a2s(List, Separator, String):-catchvv(new_a2s0(List, Separator, String),_,((trace,new_a2s0(List, Separator, String)))).
 new_a2s0(List, Separator, String):- debug,
  (atomic(String) -> (string_to_atom(String,Atom),concat_atom(List, Separator, Atom));
      (concat_atom(List, Separator, Atom),string_to_atom(String,Atom))).
@@ -962,7 +962,7 @@ static_predicate(FA):-once(predicate_property(FA,_)),not(predicate_property(FA,d
 % Safely number vars
 % ===================================================================
 bugger_numbervars_with_names(Term):-
-   term_variables(Term,Vars),bugger_name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(true)]),!.
+   term_variables(Term,Vars),bugger_name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(false)]),!.
 
 bugger_name_variables([]).
 bugger_name_variables([Var|Vars]):-
@@ -976,8 +976,8 @@ numbervars_impl(Term,Functor,List):- is_list(List),atom(Functor),!, term_variabl
 
 numbervars_impl(Term,Start,End,List):-number(Start),is_list(List),!,must(( numbervars(Term,Start,End,List) )).
 numbervars_impl(Term,Functor,Start,List):- is_list(List),sanity(integer(Start)),!,must(( numbervars(Term,Start,_End,[functor_name(Functor)|List]))).
-numbervars_impl(Term,Functor,Start,End):- !,debugOnError((numbervars(Term,Start,End,[attvar(skip),functor_name(Functor),singletons(true)]))).
-numbervars_impl(Term,Functor,Start,End):- sanity((must(var(End);integer(End)),numbervars(Term,Start,End,[attvar(skip),functor_name(Functor),singletons(true)]))).
+numbervars_impl(Term,Functor,Start,End):- !,debugOnError((numbervars(Term,Start,End,[attvar(skip),functor_name(Functor),singletons(false)]))).
+numbervars_impl(Term,Functor,Start,End):- sanity((must(var(End);integer(End)),numbervars(Term,Start,End,[attvar(skip),functor_name(Functor),singletons(false)]))).
 
 numbervars_impl(Term,Functor,Start,End,List):-must(( must(var(End);number(End)),numbervars(Term,Start,End,[functor_name(Functor)|List]))).
 
@@ -987,7 +987,7 @@ snumbervars(Term,Start,End):- integer(Start),!,numbervars_impl(Term,'$VAR',Start
 :- export(snumbervars/4).
 snumbervars(Term,Functor,Start,List):-numbervars_impl(Term,Functor,Start,List).
 :- export(snumbervars/1).
-snumbervars(Term):-numbervars_impl(Term,0,_).
+snumbervars(Term):- must(numbervars_impl(Term,0,_)).
 
 % ===================================================================
 % Loop checking
@@ -1094,7 +1094,7 @@ prolog_call(Call):-call(Call).
 remove_pred(_,_,_):-!.
 remove_pred(_,F,A):-member(_:F/A,[_:delete_common_prefix/4]),!.
 remove_pred(M,F,A):- functor(P,F,A),
-  (current_predicate(M:F/A) -> ignore((catch(redefine_system_predicate(M:P),_,true),abolish(M:F,A)));true),
+  (current_predicate(M:F/A) -> ignore((catchvv(redefine_system_predicate(M:P),_,true),abolish(M:F,A)));true),
   M:asserta((P:-bugger:wdmsg(error(P)),throw(permission_error(M:F/A)))).
 
 :- export(fixhotrace/1).
@@ -1187,7 +1187,7 @@ differnt_modules(User2,User1):- User1 \== User2.
 :-meta_predicate(bugger_goal_expansion(:,-)).
 bugger_goal_expansion(CM:T,TT):-  tlbugger:use_bugger_expansion,!,bugger_goal_expansion(CM,T,TT).
 :-meta_predicate(bugger_goal_expansion(+,+,-)).
-bugger_goal_expansion(CM,T,T3):- once(bugger_t_expansion(CM,T,T2)),T\==T2,!,catch(expand_term(T2,T3),_,fail).
+bugger_goal_expansion(CM,T,T3):- once(bugger_t_expansion(CM,T,T2)),T\==T2,!,catchvv(expand_term(T2,T3),_,fail).
 
 :-meta_predicate(bugger_expand_goal(0,-)).
 bugger_expand_goal(T,_):- fail,ddmsg(bugger_expand_goal(T)),fail.
@@ -1196,12 +1196,12 @@ bugger_expand_goal(T,_):- fail,ddmsg(bugger_expand_goal(T)),fail.
 bugger_expand_term(T,_):- fail, ddmsg(bugger_expand_term(T)),fail.
 
 :- export(format_safe/2).
-format_safe(A,B):-catch(format(A,B),E,(dumpST,dtrace(E:format(A,B)))).
+format_safe(A,B):-catchvv(format(A,B),E,(dumpST,dtrace(E:format(A,B)))).
 
 :-meta_predicate(bugger_term_expansion(:,-)).
 bugger_term_expansion(CM:T,TT):- compound(T),  tlbugger:use_bugger_expansion,!,bugger_term_expansion(CM,T,TT).
 :-meta_predicate(bugger_term_expansion(+,+,-)).
-bugger_term_expansion(CM,T,T3):- once(bugger_t_expansion(CM,T,T2)),T\==T2,!,nop(ddmsg(T\==T2)),catch(expand_term(T2,T3),_,fail).
+bugger_term_expansion(CM,T,T3):- once(bugger_t_expansion(CM,T,T2)),T\==T2,!,nop(ddmsg(T\==T2)),catchvv(expand_term(T2,T3),_,fail).
 
 % user:     expand_goal(G,G2):- compound(G),bugger_expand_goal(G,G2),!.
 
@@ -1740,7 +1740,7 @@ set_no_debug_thread:-
    retractall(tlbugger:ifWontTrace),
    asserta(tlbugger:ifWontTrace))),!.
 
-set_gui_debug(TF):-ignore((catch(guitracer,_,true))),
+set_gui_debug(TF):-ignore((catchvv(guitracer,_,true))),
    ((TF,has_gui_debug)-> set_prolog_flag(gui_tracer, true) ; set_prolog_flag(gui_tracer, false)).
 
 
@@ -1802,9 +1802,9 @@ hideTrace:-
    '$bags':findall/4,
    once/1,
    ','/2,
-   catch/3,
-   catch/3,
-   catch/3,
+   catchvv/3,
+   catchvv/3,
+   catchvv/3,
    member/2], -all),
 
   hideTrace(user:setup_call_catcher_cleanup/4,-all),
@@ -1853,7 +1853,7 @@ hideTraceMP(M,F/A,T):-!,hideTraceMFA(M,F,A,T),!.
 hideTraceMP(M,P,T):-functor_safe(P,F,0),trace,hideTraceMFA(M,F,_A,T),!.
 hideTraceMP(M,P,T):-functor_safe(P,F,A),hideTraceMFA(M,F,A,T),!.
 
-tryCatchIgnore(MFA):- catch(MFA,_E,true). %%dmsg(tryCatchIgnoreError(MFA:E))),!.
+tryCatchIgnore(MFA):- catchvv(MFA,_E,true). %%dmsg(tryCatchIgnoreError(MFA:E))),!.
 tryCatchIgnore(_MFA):- !. %%dmsg(tryCatchIgnoreFailed(MFA)).
 
 tryHide(_MFA):-showHiddens,!.
@@ -1873,7 +1873,7 @@ doHideTrace(M,F,A,ATTRIB):- tryHide(M:F/A),!,
 
 ctrace:-willTrace->trace;notrace.
 
-buggeroo:-hideTrace,traceAll,atom_concat(guit,racer,TRACER), catch(call(TRACER),_,true),debug,list_undefined.
+buggeroo:-hideTrace,traceAll,atom_concat(guit,racer,TRACER), catchvv(call(TRACER),_,true),debug,list_undefined.
 
 singletons(_).
 
@@ -1896,7 +1896,7 @@ do_gc0:- notrace((garbage_collect, garbage_collect_atoms, garbage_collect_clause
                     )).
 
 
-failOnError(Call):-catch(Call,_,fail).
+failOnError(Call):-catchvv(Call,_,fail).
 
 fresh_line:-current_output(Strm),fresh_line(Strm),!.
 fresh_line(Strm):-failOnError(format(Strm,'~N',[])),!.
@@ -1931,12 +1931,12 @@ prolog_must(Call):-must(Call).
 
 
 % gmust is must with sanity
-gmust(True,Call):-catch((Call,(True->true;throw(retry(gmust(True,Call))))),retry(gmust(True,_)),(trace,Call,True)).
+gmust(True,Call):-catchvv((Call,(True->true;throw(retry(gmust(True,Call))))),retry(gmust(True,_)),(trace,Call,True)).
 
 % must is used declaring the predicate must suceeed
 
 throwOnFailure(Call):-one_must(Call,throw(throwOnFailure(Call))).
-ignoreOnError(CX):-ignore(catch(CX,_,true)).
+ignoreOnError(CX):-ignore(catchvv(CX,_,true)).
 
 % pause_trace(_):- hotrace(((debug,visible(+all),leash(+exception),leash(+call)))),trace.
 
@@ -1947,18 +1947,19 @@ debugCallWhy(Why, C):- hotrace((notrace,wdmsg(Why))),dtrace(C).
 
 :- export(rtraceOnError/1).
 rtraceOnError(C):-
-  catch(
-  with_skip_bugger( C ),E,(dmsg(rtraceOnError(E=C)),dtrace,leash(+call),trace,leash(+exception),leash(+all),rtrace(with_skip_bugger( C )),dmsg(E=C),leash(+call),dtrace)).
+  catchvv(
+  ( C ),E,(dmsg(rtraceOnError(E=C)),dtrace,leash(+call),trace,leash(+exception),
+    leash(+all),rtrace(with_skip_bugger( C )),dmsg(E=C),leash(+call),dtrace)).
 
 
 with_skip_bugger(C):-setup_call_cleanup(asserta( tlbugger:skip_bugger),C,retract( tlbugger:skip_bugger)).
 
-%debugOnError(C):- tlbugger:rtracing,!, catch(C,E,call_cleanup(debugCallWhy(thrown(E),C),throw(E))).
+%debugOnError(C):- tlbugger:rtracing,!, catchvv(C,E,call_cleanup(debugCallWhy(thrown(E),C),throw(E))).
 %debugOnError(C):- skipWrapper,!,C.
 debugOnError(C):- !,debugOnError0(C).
 debugOnError(C):-prolog_ecall(0,debugOnError0,C).
 debugOnError0(C):- tlbugger:rtracing,!,C.
-debugOnError0(C):- catch(C,E,call_cleanup(debugCallWhy(thrown(E),C),throw(E))).
+debugOnError0(C):- catchvv(C,E,call_cleanup(debugCallWhy(thrown(E),C),throw(E))).
 debugOnErrorEach(C):-prolog_ecall(1,debugOnError0,C).
 debugOnErrorIgnore(C):-ignore(debugOnError0(C)).
 
@@ -1973,7 +1974,7 @@ logOnFailureIgnore(C):-ignore(logOnFailure0(logOnError0(C))).
 
 
 %debugOnFailure0(X):-ctrace,X.
-%debugOnFailure0(X):-catch(X,E,(writeFailureLog(E,X),throw(E))).
+%debugOnFailure0(X):-catchvv(X,E,(writeFailureLog(E,X),throw(E))).
 %throwOnFailure/1 is like Java/C's assert/1
 %debugOnFailure1(Module,CALL):-trace,debugOnFailure(Module:CALL),!.
 %debugOnFailure1(arg_domains,CALL):-!,logOnFailure(CALL),!.
@@ -1981,7 +1982,7 @@ logOnFailureIgnore(C):-ignore(logOnFailure0(logOnError0(C))).
 beenCaught(must(Call)):- !, beenCaught(Call).
 beenCaught((A,B)):- !,beenCaught(A),beenCaught(B).
 beenCaught(Call):- fail, predicate_property(Call,number_of_clauses(_Count)), clause(Call,(_A,_B)),!,clause(Call,Body),beenCaught(Body).
-beenCaught(Call):- catch(once(Call),E,(dmsg(caugth(Call,E)),beenCaught(Call))),!.
+beenCaught(Call):- catchvv(once(Call),E,(dmsg(caugth(Call,E)),beenCaught(Call))),!.
 beenCaught(Call):- traceAll,dmsg(tracing(Call)),debug,trace,Call.
 
 
@@ -2130,7 +2131,7 @@ programmer_error(E):-trace, randomVars(E),dmsg('~q~n',[error(E)]),trace,randomVa
 % must(C):- ( 1 is random(4)) -> rmust_det(C) ; C.
 
 rmust_det(C):- C *-> true ; dtrace(C).
-% rmust_det(C)-  catch((C *-> true ; debugCallWhy(failed(must(C)),C)),E,debugCallWhy(thrown(E),C)).
+% rmust_det(C)-  catchvv((C *-> true ; debugCallWhy(failed(must(C)),C)),E,debugCallWhy(thrown(E),C)).
 
 must_each(List):-var(List),trace_or_throw(var_must_each(List)).
 must_each([List]):-!,must(List).
@@ -2301,13 +2302,13 @@ dynamic_load_pl(PLNAME):- % unload_file(PLNAME),
    line_count(In,Lineno),
    % double_quotes(_DQBool)
    Options = [variables(_Vars),variable_names(_VarNames),singletons(_Singletons),comment(_Comment)],
-   catch((read_term(In,Term,[syntax_errors(error)|Options])),E,(dmsg(E),fail)),
+   catchvv((read_term(In,Term,[syntax_errors(error)|Options])),E,(dmsg(E),fail)),
    load_term(Term,[line_count(Lineno),file(PLNAME),stream(In)|Options]),
    Term==end_of_file,
    close(In).
 
 load_term(E,_Options):- E == end_of_file, !.
-load_term(Term,Options):-catch(load_term2(Term,Options),E,(dmsg(error(load_term(Term,Options,E))),throw_safe(E))).
+load_term(Term,Options):-catchvv(load_term2(Term,Options),E,(dmsg(error(load_term(Term,Options,E))),throw_safe(E))).
 
 load_term2(':-'(Term),Options):-!,load_dirrective(Term,Options),!.
 load_term2(:-(H,B),Options):-!,load_assert(H,B,Options).
@@ -2385,7 +2386,7 @@ if_prolog(_,_):-!. % Dont run SWI Specificd or others
 
 indent_e(0):-!.
 indent_e(X):- X > 20, XX is X-20,!,indent_e(XX).
-indent_e(X):- catch((X < 2),_,true),write(' '),!.
+indent_e(X):- catchvv((X < 2),_,true),write(' '),!.
 indent_e(X):-XX is X -1,!,write(' '), indent_e(XX).
 
 % ===================================================================
@@ -2393,10 +2394,10 @@ indent_e(X):-XX is X -1,!,write(' '), indent_e(XX).
 % ===================================================================
 
 
-fmt0(X,Y,Z):-catch((format(X,Y,Z),flush_output_safe(X)),E,dmsg(E)).
-fmt0(X,Y):-catch((format(X,Y),flush_output_safe),E,dmsg(E)).
-fmt0(X):-catch(text_to_string(X,S),_,fail),'format'('~w',[S]),!.
-fmt0(X):- (atom(X) -> catch((format(X,[]),flush_output_safe),E,dmsg(E)) ; (term_to_message_string(X,M) -> 'format'('~q~n',[M]);fmt_or_pp(X))).
+fmt0(X,Y,Z):-catchvv((format(X,Y,Z),flush_output_safe(X)),E,dmsg(E)).
+fmt0(X,Y):-catchvv((format(X,Y),flush_output_safe),E,dmsg(E)).
+fmt0(X):-catchvv(text_to_string(X,S),_,fail),'format'('~w',[S]),!.
+fmt0(X):- (atom(X) -> catchvv((format(X,[]),flush_output_safe),E,dmsg(E)) ; (term_to_message_string(X,M) -> 'format'('~q~n',[M]);fmt_or_pp(X))).
 fmt(X):-fresh_line,fmt_ansi(fmt0(X)).
 fmt(X,Y):- fresh_line,fmt_ansi(fmt0(X,Y)),!.
 fmt(X,Y,Z):- fmt_ansi(fmt0(X,Y,Z)),!.
@@ -2648,7 +2649,7 @@ term_color0(db_op,hfg(blue)).
 
 mesg_color(T,C):-var(T),!,dumpST,!,C=[blink(slow),fg(red),hbg(black)],!.
 mesg_color(T,C):- string(T),!,must(f_word(T,F)),!,functor_color(F,C).
-mesg_color(T,C):-not(compound(T)),catch(text_to_string(T,S),_,fail),!,mesg_color(S,C).
+mesg_color(T,C):-not(compound(T)),catchvv(text_to_string(T,S),_,fail),!,mesg_color(S,C).
 mesg_color(T,C):-not(compound(T)),term_to_atom(T,A),!,mesg_color(A,C).
 mesg_color(succeed(T),C):-nonvar(T),mesg_color(T,C).
 mesg_color(=(T,_),C):-nonvar(T),mesg_color(T,C).
@@ -2766,7 +2767,7 @@ sgr_code_on_off(Ctrl,OnCode,OffCode):-sgr_on_code(Ctrl,OnCode),sgr_off_code(Ctrl
 sgr_code_on_off(Ctrl,OnCode,OffCode):-sgr_on_code(Ctrl,OnCode),sgr_off_code(Ctrl,OffCode),!.
 
 
-% ansicall(Ctrl,Msg):- msg_to_string(Msg,S),fresh_line,catch(ansifmt(Ctrl,'~w~n',[S]),_,catch(ansifmt(fg(Ctrl),'~w',[S]),_,'format'('~q (~w)~n',[ansicall(Ctrl,Msg),S]))),fresh_line.
+% ansicall(Ctrl,Msg):- msg_to_string(Msg,S),fresh_line,catchvv(ansifmt(Ctrl,'~w~n',[S]),_,catchvv(ansifmt(fg(Ctrl),'~w',[S]),_,'format'('~q (~w)~n',[ansicall(Ctrl,Msg),S]))),fresh_line.
 /*
 dmsg(Color,Term):- current_prolog_flag(tty_control, true),!,  tell(user),fresh_line,to_petty_color(Color,Type),
    call_cleanup(((sformat(Str,Term,[],[]),print_dmessage(Type,if_tty([Str-[]])))),told).
@@ -2837,6 +2838,10 @@ loggerFmtReal(S,F,A):-
 
 
 
+dump_st:- must_det_l((prolog_current_frame(Frame),get_prolog_backtrace(1000, Trace,[frame(Frame),goal_depth(10-0)]),
+   dmsg(Trace),
+   print_prolog_backtrace(user_error, Trace,[subgoal_positions(true)]))).
+
 :-moo_hide_childs(stack_depth/1).
 :-moo_hide_childs(stack_check/0).
 :-moo_hide_childs(stack_check/1).
@@ -2850,14 +2855,16 @@ stack_check(BreakIfOver,Error):- stack_check_else(BreakIfOver, trace_or_throw(st
 stack_check_else(BreakIfOver,Call):- stack_depth(Level) ,  ( Level < BreakIfOver -> true ; (dbgsubst(Call,stack_lvl,Level,NewCall),NewCall)).
 
 % dumpstack_arguments.
-dumpST:- tlbugger:ifHideTrace,!.
-dumpST:- hotrace((prolog_current_frame(Frame),dumpST2(Frame,5000))).
-% dumpST(_):-is_hiding_dmsgs,!.
+%dumpST:- tlbugger:ifHideTrace,!.
+dumpST:- loop_check(dumpST0,dumpST1).
 
-dumpST(_):- tlbugger:ifHideTrace,!.
+dumpST0:- prolog_current_frame(Frame), dumpST2(Frame,5000).
+dumpST1:- prolog_current_frame(Frame), start_rtrace,dumpST(Frame,5000).
+
+%dumpST(_):- tlbugger:ifHideTrace,!.
 dumpST(Opts):- dumpST(_,Opts).
 
-dumpST(_,_):- tlbugger:ifHideTrace,!.
+%dumpST(_,_):- tlbugger:ifHideTrace,!.
 dumpST(Frame,Opts):-var(Opts),!,dumpST(Frame,5000).
 dumpST(Frame,MaxDepth):-integer(MaxDepth),Term = dumpST(MaxDepth),
    (var(Frame)->prolog_current_frame(Frame);true),
@@ -2869,21 +2876,33 @@ dumpST(Frame,Opts):-is_list(Opts),!,dumpST(1,Frame,Opts).
 dumpST(Frame,Opts):-show_call(dumpST(1,Frame,[Opts])).
 
 dumpST2(_,_):- tlbugger:ifHideTrace,!.
-dumpST2(Frame,From-MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[skip_depth(From),max_depth(MaxDepth),numbervars(safe),show([has_alternatives,level,context_module,goal,clause])]).
-dumpST2(Frame,MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[max_depth(MaxDepth),numbervars(safe),show([has_alternatives,level,context_module,goal,clause])]).
+dumpST2(Frame,From-MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[skip_depth(From),max_depth(MaxDepth),numbervars(true),show([has_alternatives,level,context_module,goal,clause])]).
+dumpST2(Frame,MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[max_depth(MaxDepth),numbervars(true),show([has_alternatives,level,context_module,goal,clause])]).
 
 get_m_opt(Opts,Max_depth,D100,RetVal):-E=..[Max_depth,V],(((member(E,Opts),nonvar(V)))->RetVal=V;RetVal=D100).
 
-dumpST(_,_,_):- tlbugger:ifHideTrace,!.
+%dumpST(_,_,_):- tlbugger:ifHideTrace,!.
 dumpST(N,Frame,Opts):-
-  ignore(prolog_current_frame(Frame)),
-  must(( dumpST4(N,Frame,Opts,Out))),
-   must((get_m_opt(Opts,numbervars,-1,Start),
-   neg1_numbervars(Out,Start,ROut),
+ must_det_l((
+  once(number(Frame);prolog_current_frame(Frame)),  
+   dumpST4(N,Frame,Opts,Out),
+   call((get_m_opt(Opts,numbervars,-1,Start),neg1_numbervars(Out,Start,ROut))),
    reverse(ROut,RROut),
-   ignore((forall(member(E,RROut),fdmsg(E)))))).
+   fmsg_rout(RROut))).
+
+end_dump(true):-!,fail.
+end_dump(_:GG):-!,end_dump(GG).
+end_dump(GG):-compound(GG),functor(GG,F,_),atom_concat(dump,_,F).
+ 
+
+fmsg_rout([]):-!.
+fmsg_rout([fr(E)|_]):- member(goal=GG,E),end_dump(GG),!,ignore(fdmsg(fr(E))),!.
+fmsg_rout([E|RROut]):- ignore(fdmsg(E)),!,fmsg_rout(RROut).
+fmsg_rout(RROut):- show_call(forall(member(E,RROut),fdmsg(E))),!.
 
 neg1_numbervars(T,-1,T):-!.
+neg1_numbervars(Out,false,Out):-!.
+neg1_numbervars(Out,true,ROut):-copy_term(Out,ROut),!,snumbervars(ROut,777,_).
 neg1_numbervars(Out,Start,ROut):-copy_term(Out,ROut),integer(Start),!,snumbervars(ROut,Start,_).
 neg1_numbervars(Out,safe,ROut):-copy_term(Out,ROut),safe_numbervars(ROut).
 
@@ -2895,24 +2914,32 @@ fdmsg1(goal=G):-mesg_color(G,Ctrl),simplify_goal_printed(G,GG),!,ansicall(Ctrl,f
 fdmsg1(clause=[F,L]):- directory_file_path(_,FF,F),'format'('  %  ~w:~w: ',[FF,L]),!.
 fdmsg1(clause=[F,L]):- fresh_line,'format'('%  ~w:~w: ',[F,L]),!.
 fdmsg1(clause=[]):-'format'(' /*DYN*/ ',[]),!.
-fdmsg1(G):-mesg_color(G,Ctrl),!,ansicall(Ctrl,format(' ~q ',[G])),!.
+fdmsg1(G):-mesg_color(G,Ctrl),ansicall(Ctrl,format(' ~q ',[G])),!.
+fdmsg1(M):-dmsg(failed_fdmsg1(M)).
 
-fdmsg(fr(List)):-is_list(List),!,fresh_line,ignore(forall(member(E,List),fdmsg1(E))),nl.
-fdmsg(M):-dmsg(M).
+fdmsg(fr(List)):-is_list(List),!,must((fresh_line,ignore(forall(member(E,List),fdmsg1(E))),nl)).
+fdmsg(M):-dmsg(failed_fdmsg(M)).
 
-simplify_goal_printed(Var,Var):-var(Var),!.
-simplify_goal_printed(true,true).
-simplify_goal_printed(system:catch(G,_,_),G).
-simplify_goal_printed(user:G,G).
-simplify_goal_printed(G,G).
+simplify_goal_printed(G,O):- must(transitive(simplify_goal_printed0,G,O)),!.
+simplify_goal_printed(O,O):-!.
+
+:-export(simplify_goal_printed0/2).
+simplify_goal_printed0(Var,Var):- \+ compound(Var),!.
+simplify_goal_printed0(user:G,G).
+simplify_goal_printed0(system:G,G).
+simplify_goal_printed0(catchvv(G,_,_),G).
+simplify_goal_printed0(call(G),G).
+simplify_goal_printed0(G,O):- G=..[F|A],maplist(simplify_goal_printed,A,AA),!,A\==AA,O=..[F|AA].
 
 dumpST4(N,Frame,Opts,[nf(max_depth,N,Frame,Opts)]):-get_m_opt(Opts,max_depth,100,MD),N>=MD,!.
 %dumpST4(N,Frame,Opts,[nf(max_depth,N,Frame,Opts)]):-get_m_opt(Opts,skip_depth,100,SD),N=<SD,!,fail.
-dumpST4(N,Frame,Opts,[fr(Goal)|MORE]):- get_m_opt(Opts,show,goal,Ctrl),getPFA(Frame,Ctrl,Goal),!,dumpST_Parent(N,Frame,Opts,MORE).
-dumpST4(N,Frame,Opts,[nf(no(Ctrl),N,Frame,Opts)|MORE]):- get_m_opt(Opts,show,goal,Ctrl),!,dumpST_Parent(N,Frame,Opts,MORE).
+dumpST4(N,Frame,Opts,[fr(Goal)|MORE]):- get_m_opt(Opts,show,goal,Ctrl),getPFA(Frame,Ctrl,Goal),!,must(dumpST_Parent(N,Frame,Opts,MORE)).
+dumpST4(N,Frame,Opts,[nf(no(Ctrl),N,Frame,Opts)|MORE]):- get_m_opt(Opts,show,goal,Ctrl),!,must(dumpST_Parent(N,Frame,Opts,MORE)).
 dumpST4(N,Frame,Opts,[nf(noFrame(N,Frame,Opts))]).
 
+dumpST_Parent(N,Frame,Opts,More):-nonvar(More),must_det_l((dumpST_Parent(N,Frame,Opts,MoreM),!,More=MoreM)).
 dumpST_Parent(N,Frame,Opts,More):- prolog_frame_attribute(Frame,parent,ParentFrame), NN is N +1,dumpST4(NN,ParentFrame,Opts,More),!.
+dumpST_Parent(N,Frame,_,[nf(p(N,Frame))]).
 dumpST_Parent(N,Frame,Opts,[nf(noParent(N,Frame,Opts))]).
 
 
@@ -2925,7 +2952,7 @@ getPFA1(Frame,clause,Goal):-getPFA2(Frame,clause,ClRef),clauseST(ClRef,Goal),!.
 getPFA1(Frame,Ctrl,Ctrl=Goal):-getPFA2(Frame,Ctrl,Goal),!.
 getPFA1(_,Ctrl,no(Ctrl)).
 
-getPFA2(Frame,Ctrl,Goal):- catch((prolog_frame_attribute(Frame,Ctrl,Goal)),E,Goal=[error(Ctrl,E)]),!.
+getPFA2(Frame,Ctrl,Goal):- catchvv((prolog_frame_attribute(Frame,Ctrl,Goal)),E,Goal=[error(Ctrl,E)]),!.
 
 clauseST(ClRef,clause=Goal):- findall(V,(member(Prop,[file(V),line_count(V)]),clause_property(ClRef,Prop)),Goal).
 
@@ -2940,15 +2967,15 @@ clauseST(ClRef,Goal = HB):- ignore(((clause(Head, Body, ClRef),copy_term(((Head 
 % ========================================================================================
 % 7676767
 safe_numbervars(E,EE):-duplicate_term(E,EE),
-  get_gtime(G),numbervars(EE,G,End,[attvar(skip),functor_name('$VAR'),singletons(true)]),
+  get_gtime(G),numbervars(EE,G,End,[attvar(skip),functor_name('$VAR'),singletons(false)]),
   term_variables(EE,AttVars),
-  numbervars(EE,End,_,[attvar(skip),functor_name('$VAR'),singletons(true)]),
+  numbervars(EE,End,_,[attvar(skip),functor_name('$VAR'),singletons(false)]),
   forall(member(V,AttVars),(copy_term(V,VC,Gs),V='$VAR'(VC=Gs))).
    
 
 get_gtime(G):- get_time(T),convert_time(T,_A,_B,_C,_D,_E,_F,G).
 
-safe_numbervars(EE):-get_gtime(G),numbervars(EE,G,_End,[attvar(skip),functor_name('$VAR'),singletons(true)]).
+safe_numbervars(EE):-get_gtime(G),numbervars(EE,G,_End,[attvar(skip),functor_name('$VAR'),singletons(false)]).
 
 %safe_numbervars(Copy,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
 %safe_numbervars(Copy,_,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
@@ -2975,8 +3002,17 @@ source_file(F):-seeing(X),is_stream(X),stream_property(X,file_name(F)).
 source_file(F):-prolog_load_context(stream, S),stream_property(S,file_name(F)),!.
 
 
+source_variables_l(All):- 
+  (prolog_load_context(variable_names,Vs1);Vs1=[]),
+  (b_getval('$variable_names', Vs2);Vs2=[]),
+  (parent_goal('$toplevel':'$execute_goal2'(_, Vs3),_);Vs3=[]),
+  append(Vs1,Vs2,Vs12),append(Vs12,Vs3,All),!,
+  b_setval('$variable_names', All).
 
-source_variables(Vs):- ((prolog_load_context(variable_names,Vs);b_getval('$variable_names', Vs))),!.
+
+source_variables(Vs):- (((prolog_load_context(variable_names,Vs),Vs\==[]);
+   (b_getval('$variable_names', Vs),Vs\==[]))),!.
+source_variables(Vars):-var(Vars),parent_goal('$toplevel':'$execute_goal2'(_, Vars),_),!.
 source_variables([]).
 
 b_implode_varnames(_):-!.
@@ -3031,8 +3067,8 @@ renumbervars(Y,Z):-safe_numbervars(Y,Z),!.
 withFormatter(Lang,From,Vars,SForm):-formatter_hook(Lang,From,Vars,SForm),!.
 withFormatter(_Lang,From,_Vars,SForm):-sformat(SForm,'~w',[From]).
 
-flush_output_safe:-ignore(catch(flush_output,_,true)).
-flush_output_safe(X):-ignore(catch(flush_output(X),_,true)).
+flush_output_safe:-ignore(catchvv(flush_output,_,true)).
+flush_output_safe(X):-ignore(catchvv(flush_output(X),_,true)).
 
 writeFailureLog(E,X):-
 		fmt(user_error,'\n% error: ~q ~q\n',[E,X]),flush_output_safe(user_error),!,
@@ -3054,8 +3090,8 @@ writeFailureLog(E,X):-
 :-export(show_module/1).
 :-module_transparent(show_module/1).
 
-loading_module(M,use_module(U)):- parent_goal(_:catch(M:use_module(U),_,_),_).
-loading_module(M,use_module(U)):- parent_goal(_:catch(M:ensure_loaded(U),_,_),_).
+loading_module(M,use_module(U)):- parent_goal(_:catchvv(M:use_module(U),_,_),_).
+loading_module(M,use_module(U)):- parent_goal(_:catchvv(M:ensure_loaded(U),_,_),_).
 loading_module(M,consult(F)):- parent_goal(_:'$consult_file_2'(F,M,_,_,_),_).
 loading_module(M,source_location(F)):- source_location(F,_),source_file_property(F,module(M)).
 loading_module(M,file(F)):- prolog_load_context(file,F),source_file_property(F,module(M)).
@@ -3121,7 +3157,7 @@ writeOverwritten:-assert(isConsoleOverwritten).
 writeErrMsg(Out,E):- message_to_string(E,S),fmt(Out,'<cycml:error>~s</cycml:error>\n',[S]),!.
 writeErrMsg(Out,E,Goal):- message_to_string(E,S),fmt(Out,'<cycml:error>goal "~q" ~s</cycml:error>\n',[Goal,S]),!.
 writeFileToStream(Dest,Filename):-
-    catch((
+    catchvv((
     open(Filename,'r',Input),
     repeat,
         get_code(Input,Char),
@@ -3163,7 +3199,7 @@ os_to_prolog_filename(OS,PL):-absolute_file_name(OS,OSP),OS \== OSP,!,os_to_prol
 % =================================================================================
 % Utils
 % =================================================================================
-% test_call(G):-writeln(G),ignore(once(catch(G,E,writeln(E)))).
+% test_call(G):-writeln(G),ignore(once(catchvv(G,E,writeln(E)))).
 
 debugFmtList(ListI):-hotrace((copy_term(ListI,List),debugFmtList0(List,List0),randomVars(List0),dmsg(List0))),!.
 debugFmtList0([],[]):-!.
@@ -3289,8 +3325,8 @@ retract_can_table :- retractall(maybe_table_key(_)).
 :- meta_predicate(make_key(?,-)).
 
 :-module_transparent(ex/0).
-lex:-listing(tlbugger:ilc(_)),forall(current_predicate(table_bugger:F/A),listing(table_bugger:F/A)),catch(listing(user:already_added_this_round),_,true).
-ex:-expire_tabled_list(_),retractall(tlbugger:ilc(_)),dmsg_showall(_),forall(current_predicate(table_bugger:F/A),(functor(RA,F,A),retractall(RA))),catch(expire_dont_add,_,true).
+lex:-listing(tlbugger:ilc(_)),forall(current_predicate(table_bugger:F/A),listing(table_bugger:F/A)),catchvv(listing(user:already_added_this_round),_,true).
+ex:-expire_tabled_list(_),retractall(tlbugger:ilc(_)),dmsg_showall(_),forall(current_predicate(table_bugger:F/A),(functor(RA,F,A),retractall(RA))),catchvv(expire_dont_add,_,true).
 
 expire_tabled_list(V):-var(V),!,retractall(table_bugger:call_tabled_cached_results(_,_)).
 expire_tabled_list(_):-!,retractall(table_bugger:call_tabled_cached_results(_,_)).
@@ -3490,7 +3526,7 @@ dtrace(G):-G.
 
 dumptrace(G):- tracing,!,setup_call_cleanup(notrace,(leash(+call),dumptrace(G)),trace).
 dumptrace(G):- ignore((debug,
- % catch(attach_console,_,true),
+ % catchvv(attach_console,_,true),
  leash(+exception),visible(+exception))),fresh_line,
  (repeat,(tracing -> (!,fail) ; true)),
  hotrace((fmt(in_dumptrace(G)),
@@ -3588,7 +3624,7 @@ quiet_all_module_predicates_are_transparent(ModuleName):-
 :-export((term_listing/1)).
 term_listing([]):-!.
 term_listing(Match):- 
-  '@'(ignore((catch(listing(Match),E,wdmsg(E)))),'user'),
+  '@'(ignore((catchvv(listing(Match),E,wdmsg(E)))),'user'),
   term_non_listing(Match),!.
 
 user:listing_mpred_hook(_):-fail.
@@ -3746,6 +3782,7 @@ portray_hb(H,B):- portray_one_line((H:-B)).
 :-export(portray_one_line/1).
 portray_one_line(H):- current_predicate(wdmsg/1),wdmsg(H),!.
 portray_one_line(H):- not(not((snumbervars(H),writeq(H),write('.'),nl))),!.
+portray_one_line(H):- writeq(H),write('.'),nl,!.
 
 
 
@@ -3843,7 +3880,7 @@ disabled_this_to:- asserta((user:message_hook(Term, Kind, Lines):-  buggery_ok, 
 :- user_use_module(library(prolog_stack)).
 
 user:prolog_exception_hook(A,B,C,D):- fail,
-   once(copy_term(A,AA)),catch(( once(bugger_prolog_exception_hook(AA,B,C,D))),_,fail),fail.
+   once(copy_term(A,AA)),catchvv(( once(bugger_prolog_exception_hook(AA,B,C,D))),_,fail),fail.
 
 :-'$syspreds':'$hide'('$syspreds':leash/1).
 :-'$syspreds':'$hide'(leash/1).

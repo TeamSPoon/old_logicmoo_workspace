@@ -9,6 +9,8 @@
 % :-swi_module(logicmoo_i_loader, []).
 
 :- include(logicmoo_i_header).
+:- multifile(user:xfile_load_form/4).
+:- dynamic(user:xfile_load_form/4).
 
 is_elist_functor(isList).
 is_elist_functor(ftListfn).
@@ -470,7 +472,7 @@ pfc_may_expand_module(_):-thlocal:pfc_module_expansion(*),!.
 
 
 :-module_transparent(pfc_file_module_term_expansion/4).
-pfc_file_module_term_expansion(F,M,A,BBBO):-compile_this(M,F,A,How),   
+pfc_file_module_term_expansion(F,M,A,BBBO):-compile_this(M,F,A,How),
    user:xfile_load_form(How,M,A,B),must(source_location(F,L)),b_getval('$variable_names', Vs),
    pfc_file_module_term_expansion_1(How,M,A,Vs,F,L,B,BBBO).
 
@@ -485,7 +487,7 @@ pfc_file_module_term_expansion_2(How,INFO,F,M,AA,BBB,BBBO):-
       (How == code -> BBBO = BBB ;
         (add_from_file(BBB), BBBO = '$was_imported_kb_content$'(AA,INFO)))),!.      
 
-xfile_load_form(How,M,P,O):- with_assertions(thlocal:already_in_file_term_expansion, ((pfc_file_expansion(P,C),P\=@=C,O=(:- user:(C))))),!.
+user:xfile_load_form(How,M,P,O):- with_assertions(thlocal:already_in_file_term_expansion, ((pfc_file_expansion(P,C),P\=@=C,O=(:- user:(C))))),!.
 
 user:provide_mpred_clauses(H,B,(What)):- !.
 
