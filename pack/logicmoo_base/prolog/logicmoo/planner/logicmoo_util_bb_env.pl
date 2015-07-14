@@ -17,7 +17,6 @@
 :- multifile(user:env_mpred/3).
 
 :- meta_predicate(env_call(0)).
-:- meta_predicate(maybe_show_env_op(0)).
 :- dynamic(env_kb/1).
 
 :- dynamic(user:mpred_prop/2).
@@ -117,10 +116,21 @@ decl_mpred_env(CMPD,Pred):-  fail, compound(CMPD),CMPD=..[_|CMPDL],
 decl_mpred_env(Prop,Pred):- get_functor(Pred,F,A),
    decl_mpred_env_fa(Prop,Pred,F,A).
 
-decl_mpred_env_fa(Prop,Pred,F,A):- push_env_ctx, 
+
+abolish_and_make_static(F,A):-abolish(F,A),
+  retractall(mpred_arity(F,A)),
+   retractall(arity(F,A)),
+   retractall(env_mpred(_,F,A)),
+  functor(H,F,A),asserta(H:-trace_or_throw(H)),compile_predicates([F/A]),lock_predicate(H).
+
+decl_mpred_env_fa(Prop,_Pred,F,A):- push_env_ctx,    
    thlocal:env_ctx(Type,Prefix),A1 is A+1,!,
+   functor(Pred1,F,A1),functor(Pred,F,A1),
    add_push_prefix_arg(Pred,Type,Prefix,Pred1),
-   decl_mpred_env_real(Prop,Pred1,F,A1),!.
+   decl_mpred_env_real(Prop,Pred1,F,A1),!,
+   abolish_and_make_static(F,A),!,
+   arity(F,AA),
+   must(arity(F,A1)==arity(F,AA)).
 decl_mpred_env_fa(Prop,Pred,F,A):-
    decl_mpred_env_real(Prop,Pred,F,A).
 
@@ -249,16 +259,19 @@ term_expansion_add_context( NeedIt, Ctx,_,B,BB):- B=..[F|A], maplist(term_expans
 
 :-dynamic(user:env_source_file/1).
 
-hb_to_clause(H,T,H):- T==true.
-hb_to_clause(T,B,(:-B)):- T==true.
-hb_to_clause(H,B,(H:-B)).
+hb_to_clause(H,B,HB):- hb_to_clause0(H,B,HB0),!,HB=HB0.
+hb_to_clause0(H,T,H):- T==true.
+hb_to_clause0(T,B,(:-B)):- T==true.
+hb_to_clause0(H,B,(H:-B)).
 
-clause_to_hb((C:-T),H,B):- T==true,!,clause_to_hb(C,H,B).
-clause_to_hb((H:-B),H,B).
-clause_to_hb((:-B),true,B).
-clause_to_hb((H),H,true).
 
-env_term_expansion(HB,OUT):- push_env_ctx,
+clause_to_hb(HB,H,B):-clause_to_hb0(HB,H0,B0),!,H=H0,B=B0.
+clause_to_hb0((C:-T),H,B):- T==true,clause_to_hb0(C,H,B).
+clause_to_hb0((H:-B),H,B).
+clause_to_hb0((:-B),true,B).
+clause_to_hb0((H),H,true).
+
+env_term_expansion(HB,OUT):- push_env_ctx,!,
   must_det_l((
    clause_to_hb(HB,H,B),
    term_expansion_add_context(BNeedIt,Ctx,(:-),B,BB),
@@ -269,6 +282,10 @@ env_term_expansion(HB,OUT):- push_env_ctx,
    ((dmsg((old(H):-old,(B))),dmsg((HH:-BBB)))),
    hb_to_clause(HH,BBB,OUT),!.
 
+
+env_term_expansion(HB,'$env_info'(OUT)):-  HB\=(:-_), end_of_file\==HB, clause_to_hb(HB,H,B),
+  is_ocl_expanded_file,must(ain((H:-B))),
+  hb_to_clause(H,B,OUT),!.
 
 
 get_env_expected_ctx(Current):- 
@@ -292,7 +309,11 @@ get_env_ctx(_ChameleonWorld).
 is_env_expanded_file:- (prolog_load_context(file,File);prolog_load_context(source,File)),
    once(file_name_extension(_,ocl,File);user:env_source_file(File)),!.
 
-user:term_expansion(A,B):-nonvar(A),
+is_ocl_expanded_file:- (prolog_load_context(file,File);prolog_load_context(source,File)),file_name_extension(_,ocl,File).
+   
+
+
+user:term_expansion(A,B):-nonvar(A), A\==end_of_file,
   is_env_expanded_file,
   env_term_expansion(A,B),
   must(nonvar(B)),A\=@=B.
@@ -324,6 +345,8 @@ env_retract(F):-!,maybe_show_env_op(retract(F)).
 env_retractall(F):-!,maybe_show_env_op(retractall(F)).
 maybe_show_env_op(G):- !,G.
 maybe_show_env_op(G):- thlocal:db_spy -> show_call(G); G.
+
+:- meta_predicate(maybe_show_env_op(0)).
 
 
 */

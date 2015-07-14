@@ -55,6 +55,7 @@ bubbled_ex(block(_,_)).
 bubbled_ex('$aborted').
 bubbled_ex_check(E):- (\+ bubbled_ex(E)),!.
 bubbled_ex_check(E):-throw(E).
+
 ccatch(Goal,E,Recovery):- nonvar(E) -> catch(Goal,E,Recovery); % normal mode (the user knows what they want)
                          catch(Goal,E,(bubbled_ex_check(E),Recovery)). % prevents promiscous mode
 

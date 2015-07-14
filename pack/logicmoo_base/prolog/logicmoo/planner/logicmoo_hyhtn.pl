@@ -259,14 +259,15 @@ on_call_decl_hyhtn :- decl_mpred_env([kb(domtasks),stubType(dyn)], ( htn_task/3,
 on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(temp_assertIndivConds/1)). % Used for grounding operators
 on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(is_of_primitive_sort/2, is_of_sort/2)).
 on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(methodC/7, opParent/6,operatorC/5,gOperator/3)).
-on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(objectsC/3,objectsD/2,atomic_invariantsC/1)).% Used only dynamic objects
+on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(objectsC/2,objectsD/2,atomic_invariantsC/1)).% Used only dynamic objects
 on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(objectsOfSort/2)).      % Used to store all objects of a sort
 on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache) /*stubType(with_pred(bb_op(_)))*/],(related_op/2, gsubstate_classes/3, gsstates/3)).  
 
 on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache) /*stubType(with_pred(bb_op(_)))*/],(op_score/2)). 
 on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)/*stubType(rec_db)*/],(node/5,final_node/1)).
 on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)],(tp_goal/3,closed_node/6,solved_node/2, goal_related_search/1)). 
-on_call_decl_hyhtn :- decl_mpred_env_task([stubType(rec_db),kb(node,cache)],(goal_related/3)).
+%on_call_decl_hyhtn :- decl_mpred_env_task([stubType(rec_db),kb(node,cache)],(goal_related/3)).
+on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)],(goal_related/3)).
 on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)],(current_num/2)).
 on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)],(tn/6)). % Used to store full expanded steps
 on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)],(tp_node/6)).
@@ -281,7 +282,7 @@ on_call_decl_hyhtn :- decl_mpred_env_dom([kb(dom,tasks),stubType(dyn)], ( htn_ta
 % Contents of a OCLh Domain
 on_call_decl_hyhtn :- 
  decl_mpred_env([kb(domfile),stubType(dyn)],[
-  domain_name/0,
+  domain_name/1,
   sorts/2,
   substate_classes/3,
   objects/2,
@@ -332,23 +333,6 @@ startOCL(Goal,Init):-
 	must(planner_interface(Goal,Init,Sol,_,TNLst)),
         show_result_and_clean(F,Id,Sol,TNLst).
 
-/*
-:-dynamic 
-      
-      sorts/2,
-      objects/2,
-      predicates/1,
-      atomic_invariants/1,  
-      substate_classes/3,
-      method/6,
-      operator/4,
-      implied_invariant/2, oper/4,
-      domain_name/1,
-      inconsistent_constraint/1.
-*/
-  
-
-
 
 
 % for boot..
@@ -384,7 +368,9 @@ get_tasks(N,Goal,State):- (user:planner_task(N,Goal,State)).
 % my_stats(0).
 
 l_file(File):- \+ exists_file(File),!,forall(filematch(File,FM),l_file(FM)).
-l_file(F):-if_defined(reload_mpred_file(F),if_defined(with_mpred_consult(consult(F)),consult(F))).
+l_file(F):-
+   if_defined(reload_mpred_file(F),
+              if_defined(with_mpred_consult(consult(F)),consult(F))).
 
 solve_file(F):-with_filematch(l_file(wfm(F))), doall(solve(_)).
 solve:- solve_file(test_hyhtn).
@@ -443,7 +429,7 @@ clean:-
       env_retractall(operatorC(_,_,_,_,_)),
       env_retractall(objectsOfSort(_,_)),
       env_retractall(objectsD(_,_)),
-      env_retractall(objectsC(DP,_,_)),
+      env_retractall(objectsC(_,_)),
       env_retractall(methodC(_,_,_,_,_,_,_)),
       env_retractall(is_of_sort(_,_)),
       env_retractall(is_of_primitive_sort(_,_)),
@@ -463,7 +449,7 @@ clean:-
          env_retractall(tn(_,_,_,_,_,_)),         
          env_retractall(closed_node(_,_,_,_,_,_)),
          % env_retractall(score_list(_)),
-         % env_retractall(related_op(_)),
+         % env_retractall(related_op(_,_)),
          env_retractall(op_score(_,_)),
          env_retractall(goal_related(_,_,_)),
          env_retractall(goal_related_search(_)),	
@@ -514,6 +500,7 @@ planner_interface(G,I, SOLN,OPNUM,TNList):-
 /******************** Nodes *******************/
 % node(Name, Precond ,Decomps, Temp, Statics)
 % Initial Node: node(root, Init, Decomps, Temp, Statics)
+
 
 getN_name(node(Name, _, _, _,_),  Name).
 getN_pre(node(_,Pre, _, _, _),  Pre).
@@ -1413,14 +1400,14 @@ state_match(Sort,Obj,ST,ST1):-
 % for example [on_block(a,b)] and [on_block(a,b),clear(a)]
 state_match(Sort,Obj,ST,ST1):-
     is_achieved(ST,ST1),
-    gsubstate_classes(Sort,Obj,Substateclasses),
+    env_call(gsubstate_classes(Sort,Obj,Substateclasses)),
     not(in_different_states(ST,ST1,Substateclasses)),!.
 % when ST is not the subset of ST1,
 % in hierarchical domain, maybe one is inhiered by the upperlevel
 state_match(Sort,Obj,ST,ST1):-
     not(is_achieved(ST,ST1)),    
     set_append(ST,ST1,ST0),
-    gsubstate_classes(Sort,Obj,Substateclasses),
+    env_call(gsubstate_classes(Sort,Obj,Substateclasses)),
     in_same_sub_states(ST0,Substateclasses),!.
 
 % in_same_sub_states: check if ST1+ST2 in one states
@@ -1664,7 +1651,7 @@ post_instant(Post0,Cond,Statics,[se(Sort,Obj,SE)|Post]):-
     statics_consist(Statics).
 post_instant(Post0,Cond,Statics,[se(Sort,Obj,SE)|Post]):-
     member(sc(Sort0,Obj,SE1=>SS),Cond),
-    not(objectsC(DP,Sort0,_)),
+    not(objectsC(Sort0,_)),
     subsorts(Sort0,Sortls),
     not(not(member(Sort,Sortls))),
     statics_consist(Statics).
@@ -1839,7 +1826,7 @@ extract_solution(Node,PHPs,SIZE1,TNList) :-
 % make pre and post explicit
 % filter out statics and put in a new slot
 change_op_representation :-    
-    method(A,B,C,Stat,T,Dec),
+    env_call(method(A,B,C,Stat,T,Dec)),
     make_ss_to_se(B,B0),
     make_se_primitive(B0,B1),
     make_sc_primitive(C,C1),
@@ -1853,7 +1840,7 @@ change_op_representation :-
     env_assert(methodC(A,PreR,PostR,Statics2,T1,achieve(ACH),Dec1)),
     fail.
 change_op_representation :-
-    operator(A,B,C,D),
+    env_call(operator(A,B,C,D)),
     make_ss_to_se(B,B0),
     make_se_primitive(B0,B1),
     make_sc_primitive(C,C1),
@@ -1952,7 +1939,7 @@ change_laters([before(Num1,Num2)|Temp],Num,[before(Num1,Num2)|Temp0]):-
 % change the states to primitive states
 make_se_primitive([],[]).
 make_se_primitive([se(Sort,Obj,ST)|SE],[se(Sort,Obj,ST)|SE0]):-
-    objectsC(DP,Sort,Objls),!,
+    objectsC(Sort,Objls),!,
     make_se_primitive(SE,SE0).
 make_se_primitive([se(Sort,Obj,ST)|SE],[se(PSort,Obj,ST)|SE0]):-
     find_prim_sort(Sort,PSorts),
@@ -1962,7 +1949,7 @@ make_se_primitive([se(Sort,Obj,ST)|SE],[se(PSort,Obj,ST)|SE0]):-
 % change the state changes to primitive states
 make_sc_primitive([],[]).
 make_sc_primitive([sc(Sort,Obj,SE1=>SE2)|ST],[sc(Sort,Obj,SE1=>SE2)|ST0]):-
-    objectsC(DP,Sort,Objls),!,
+    objectsC(Sort,Objls),!,
     make_sc_primitive(ST,ST0).
 make_sc_primitive([sc(Sort,Obj,SE1=>SE2)|ST],[sc(PSort,Obj,SE1=>SE2)|ST0]):-
     find_prim_sort(Sort,PSorts),
@@ -2042,7 +2029,7 @@ get_obj_prim_sort([HSort|TV],[HObj|TS]):-
      get_obj_prim_sort(TV,TS),!.
 /*
 is_of_primitive_sort(X,Y) :-
-    objectsC(DP,Y,L),member(X,L).
+    objectsC(Y,L),member(X,L).
 is_of_sort(X,Y) :-
     is_of_primitive_sort(X,Y).
 is_of_sort(X,Y) :-
@@ -2067,7 +2054,7 @@ get_sort_objects(Sort,Objs):-
 
 get_objects1([],[]):-!.
 get_objects1([PS1|RS],[Objls1|Objls]):-
-   objectsC(DP,PS1,Objls1),
+   objectsC(PS1,Objls1),
    get_objects1(RS,Objls),!.
 
 % find subsorts of a sort(exclude).
@@ -2081,7 +2068,7 @@ subsorts(Sort,Subsorts):-
 
 sort_down([],Subsorts,Subsorts):-!.
 sort_down([HOpen|TOpen],List,Subsorts):-
-  objectsC(DP,HOpen,Objls),
+  objectsC(HOpen,Objls),
   append_dcut(List,[HOpen],List1),
   sort_down(TOpen,List1,Subsorts),!.
 sort_down([HOpen|TOpen],List,Sortslist):-
@@ -2097,13 +2084,13 @@ uppersortse(Sort,Uppersorts):-
   subtract(Uppersortsf,[Sort],Uppersorts),!.  
 % find uppersorts of a sort or object(include).
 uppersorts(Sort,Uppersorts):-
-  objectsC(DP,Sort,Objls),
+  objectsC(Sort,Objls),
   sort_up(Sort,[Sort],Uppersorts),!.
 uppersorts(Sort,Uppersorts):-
   sorts(Sort,Sortls),
   sort_up(Sort,[Sort],Uppersorts),!.
 uppersorts(Obj,Sortls):-
-  objectsC(DP,Sort,Objls),
+  objectsC(Sort,Objls),
   member(Obj, Objls),
   sort_up(Sort,[Sort],Sortls),!.
 
@@ -2135,7 +2122,7 @@ sametree(Sort1,Sort2):-
 % split a sortlist to  primitive sorts and non-primitive sorts.
 split_prim_noprim([],[],[]):-!.
 split_prim_noprim([HS|TS],[HS|TP],NP):-
-     objectsC(DP,HS,Obj),
+     objectsC(HS,Obj),
      split_prim_noprim(TS,TP,NP),!.		
 split_prim_noprim([HS|TS],PS,[HS|NP]):-
      split_prim_noprim(TS,PS,NP),!.
@@ -2427,7 +2414,6 @@ remove_el([A|B],C,[A|D]) :-
 
 /* generate symbol predicate  (from file futile)*/
 
-gensym_special(Root,Atom) :-
 
 gensym_special(Root,Atom) :-
                         getnum(Root,Num),
@@ -2614,11 +2600,11 @@ change_obj_list1.
 
 % only keep the dynamic objects that used in tasks
 change_obj_list2(Sort):-
-    objectsC(DP,Sort,Objls),!.
+    objectsC(Sort,Objls),!.
 % statics objects: keep
 change_obj_list2(Sort):-
     objects(Sort,Objls),
-    env_assert(objectsC(DP,Sort,Objls)),!.
+    env_assert(objectsC(Sort,Objls)),!.
 
 % only keep the dynamic objects in atomic_invariants
 change_atomic_inv:-
@@ -2637,7 +2623,7 @@ change_atomic_inv1([Pred|Atom],Atom1):-
 
 just_dynamic_objects([]).
 just_dynamic_objects([Head|Objs]):-
-    objectsC(DP,Sort,Objls),
+    objectsC(Sort,Objls),
     member(Head,Objls),!,
     just_dynamic_objects(Objs).
 
@@ -2652,7 +2638,7 @@ collect_dynamic_obj:-
     objectsD(Sort,_),
     setof(Obj, objectsD(Sort,Obj), Objls),
     env_retractall(objectsD(Sort,_)),
-    env_assert(objectsC(DP,Sort,Objls)),
+    env_assert(objectsC(Sort,Objls)),
     fail.
 collect_dynamic_obj.
 
@@ -2665,7 +2651,7 @@ get_preconditions_g([sc(S,X,From =>To)|Rest],Prev,[se(S,X,From)|Pre],[se(S,X,To)
 % ground all operators% enumerateOps
 
 ground_op :-
-	assert_sort_objects(DP),
+	assert_sort_objects,
 	enumerateOps,
 	instOps,
 	flag(opCounter,Top,Top),
@@ -2954,22 +2940,22 @@ chooseVals([Type,Var|TypeVars],NEs,InVars,[Var|Vals]) :-
 %% For hierarchical domains assert the objects that belong to every sort 
 %% including hierarchical sorts.
 
-assert_sort_objects(DP) :-
-	objectsC(DP,Type,Objects),
+assert_sort_objects :-
+	objectsC(Type,Objects),
 	env_assert(objectsOfSort(Type,Objects)),
 	fail.
 
-assert_sort_objects(DP) :-
+assert_sort_objects :-
 	sorts(Type,SubTypes),
         not((special_sorts(PS), Type == PS )),
 	all_objects(Type,Objs),
 	env_assert(objectsOfSort(Type,Objs)),
 	fail.
 
-assert_sort_objects(_).
+assert_sort_objects.
 
 all_objects(Type,Objs) :-
-	objectsC(DP,Type,Objs),
+	objectsC(Type,Objs),
 	!.
 all_objects(Type,Objs) :-
 	sorts(Type,SubSorts),
@@ -3126,7 +3112,7 @@ assert_is_of_sort :-
 	assert_is_of_sort1(Type,Obj),
 	fail.
 assert_is_of_sort :-
-	objectsC(DP,Type,Objects),
+	objectsC(Type,Objects),
 	member(Obj,Objects),
 	assert_is_of_primitive_sort(Type,Obj),
 	fail.

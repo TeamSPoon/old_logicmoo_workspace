@@ -141,7 +141,7 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
         - robot
         + toasterWorldv2
       + elearning
-      + frolog
+      - frolog
         + GameScenarios
           + FairyTaleCastle
             + ObjectGrammarGeni
@@ -157,16 +157,16 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
             + RacerPro-Linux32-1-9-3-Beta
               + locales
         + known_bugs
-        + Main
-        + NLPModules
+        - Main
+        - NLPModules
           + Actions
-          + ContentDetermination
-          + Parsing
+          - ContentDetermination
+          - Parsing
           + Realization
           + ReferenceGeneration
           + ReferenceResolution
         + Tools
-        + UserInterface
+        - UserInterface
       + fsaplanner
       + golog
         - Delivery
@@ -2907,17 +2907,41 @@ pack\logicmoo_nlu\prolog\MUD_DeepParsing.vpj=20150615055716527
               + swi
               + trace
               + xref
-scroll:6
+scroll:96
 [State]
 SCREEN: 1920 1080 0 16 1919 1004 0 0 M 0 0 0 0 1484 646
-CWD: pack\logicmoo_base\prolog\logicmoo\planner
+CWD: pack\prologmud
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\frolog\hintproblem.PDDL"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\frolog\tPddlAgent01.pddl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_hyhtn.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_util_bb_env.pl_broke"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1286 448 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_hyhtn.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=115 BI=5 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1286 448 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\frolog\tPddlAgent01.pddl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=113 BI=15 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1286 448 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\frolog\hintproblem.PDDL"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=112 BI=16 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1286 448 -1 -1 M  WF=0 WT=1 "Default Fixed Font,10,0,1"
+BUFFER: BN="pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_util_bb_env.pl_broke"
+VIEW: LN=.439 CL=1 LE=0 CX=0 CY=21 WI=117 BI=19 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-pack\logicmoo_base\prolog\logicmoo\planner\pddl_robert_sasak.pl
-pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_htncode.pl
-pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_util_bb_gvar.pl
-pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_util_bb_env,pl
-pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_util_bb_env.pl
-pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_util_structs.pl
 pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_ocl_and_pddl.pl.bak
 pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_ocl_and_pddl.pl
+pack\logicmoo_base\prolog\logicmoo\planner\frolog\Main\frolog.java
+pack\logicmoo_base\prolog\logicmoo\planner\frolog\NLPModules\Realization\geniserver
+pack\logicmoo_base\prolog\logicmoo\planner\frolog\NLPModules\ContentDetermination\describe.pl
+pack\logicmoo_base\prolog\logicmoo\planner\frolog\hintproblem.PDDL
+pack\logicmoo_base\prolog\logicmoo\planner\frolog\tPddlAgent01.pddl
 pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_hyhtn.pl
+pack\logicmoo_base\prolog\logicmoo\planner\logicmoo_util_bb_env.pl_broke

@@ -16,6 +16,8 @@ user:file_search_path(pack, '../../../../').
 
 :- dynamic(use_local_pddl/0).
 
+use_local_pddl:-throw(uses_local_pddl).
+
 :- if(gethostname(c3po);gethostname(titan)).
 
 :- initialization(user:use_module(library(swi/pce_profile))).
@@ -1675,11 +1677,11 @@ my_ord_member(S, [_|T]):-
 
 
 % :- module(lp).
-domain_name(Name):- use_local_pddl, no_repeats(domain_name0(Name)).
+domain_name_for_ocl(Name):- use_local_pddl, no_repeats(domain_name0(Name)).
 domain_name0(Name):- bb_get(currentDomain, D),prop_get(domain_name,D,Name).
 domain_name0(Name):- bb_get(currentProblem, P),prop_get(domain_name,P,Name).
 domain_name0(Name):- user:is_saved_type(domain,Name,_).
-domain_name0(Name):- user:is_saved_type(problem,X,P),prop_get(domain_name,P,Name).
+domain_name0(Name):- user:is_saved_type(problem,_,P),prop_get(domain_name,P,Name).
 
 problem_name(Name):- use_local_pddl, no_repeats(problem_name0(Name)).
 problem_name0(Name):- bb_get(currentProblem, P),prop_get(problem_name,P,Name).
@@ -1692,7 +1694,7 @@ problem_name0(Name):- user:is_saved_type(problem,Name,_).
 sorts(chameleonWorld,primitive_sorts,[door,flexarium,chameleon,box,substrate]).
 */ 
 
-sorts(DName,primitive_sorts,TypesList):-  use_local_pddl, pddl_sorts(DName,primitive_sorts,TypesList).
+sorts_for_ocl(DName,primitive_sorts,TypesList):-  use_local_pddl, pddl_sorts(DName,primitive_sorts,TypesList).
 pddl_sorts(DName,primitive_sorts,TypesList):- bb_get(currentDomain, D),prop_get(domain_name,D,DName),!,prop_get(types,D,TypesList).
 pddl_sorts(DName,primitive_sorts,List):-nonvar(DName),findall(S,is_a_type(DName,S),List).
 
@@ -1707,7 +1709,7 @@ pname_to_dname(PName,DName):-name_to_problem_struct(PName,P),!,prop_get(domain_n
 pname_to_dname(_,DName):-domain_name(DName).
 
 % Objects
-objects(Name,Type,List):- use_local_pddl, name_to_problem_struct(Name,P),
+objects_for_ocl(Name,Type,List):- use_local_pddl, name_to_problem_struct(Name,P),
    prop_get(objects,P,ObjsDef),
    member(Objs,ObjsDef),Objs=..[Type,List].
 
@@ -1720,8 +1722,9 @@ objects(t7,substrate,[newsPaper1,newsPaper2]).
 */
 
 % Predicates
-predicates(Name,List):- use_local_pddl, name_to_domain_struct(Name,D),   
+predicates_for_ocl(Name,List):- use_local_pddl, name_to_domain_struct(Name,D),   
    prop_get(predicates,D,List).
+
 
 /* EXAMPLE OCLh
 predicates(chameleonWorld,[
@@ -2009,7 +2012,7 @@ planner_task(chameleonWorld,t7,
      ss(substrate,newsPaper2,[outsideFlexarium(newsPaper2)])]).
 */
 
-planner_task_from_pddl(Domain,PName,
+planner_task_for_ocl(Domain,PName,
   % Goals
     SEs,SSs):-  use_local_pddl,
      name_to_problem_struct(PName,P),prop_get(domain_name,P,Domain),
@@ -2152,9 +2155,9 @@ test_blocks:- fail, test_domain('./benchmarks/nomystery-sat11-strips/domain.pddl
 
 :-multifile(user:push_env_ctx/0).
 :-dynamic(user:push_env_ctx/0).
-% push_env_ctx:-!,fail.
+push_env_ctx:-!,fail.
 push_env_ctx:-!.
 
 :- ensure_loaded(logicmoo_hyhtn).
 :- show_call(flag(time_used,W,W)).
-:- test_ocl('domains_ocl/chameleonWorld.ocl').
+rr:- trace,test_ocl('domains_ocl/chameleonWorld.ocl').
