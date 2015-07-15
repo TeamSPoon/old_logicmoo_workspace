@@ -1,12 +1,14 @@
 #!/bin/bash
 export OLDPWD="`pwd`"
 export NEWPWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )"   
+export APTGET="sudo apt-get -o Acquire::ForceIPv4=true "
 
-sudo apt-get install python-software-properties
+$APTGET install python-software-properties
 sudo apt-add-repository -y ppa:swi-prolog/devel
 sudo add-apt-repository -y ppa:webupd8team/java
-sudo apt-get update
-sudo apt-get install swi-prolog oracle-java8-installer
+$APTGET update
+$APTGET install swi-prolog oracle-java8-installer
+
 echo select java 8
 sudo update-alternatives --config java
 
@@ -29,9 +31,9 @@ chmod 777 /opt/PrologMUD/runtime
 
 echo "to start the MUD type: source start_mud_server.sh"
 
-return 0
+exit 0
 
-
+if [0]; then
 
 git clone --recurse-submodules
 ./clone_externals.sh 2>/dev/null
@@ -77,3 +79,5 @@ echo hopfully some files are between this message and
 find . -name "*.qlf"
 echo this message
 cd $OLDPWD
+
+fi 

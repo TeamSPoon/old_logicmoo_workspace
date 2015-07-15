@@ -1,4 +1,5 @@
-
+:- expects_dialect(sicstus).
+:- discontiguous buildRules/4.
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   -----------------------------------------------------------------------
                   Check Type  - Milner / Mycroft algorithm

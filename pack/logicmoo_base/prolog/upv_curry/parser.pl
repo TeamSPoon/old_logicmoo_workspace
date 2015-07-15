@@ -1,3 +1,26 @@
+
+% =========================================================================
+%  Add this directory and the pack files (also Logicmoo Library Utils)
+% =========================================================================
+:- dynamic   user:file_search_path/2.
+:- multifile user:file_search_path/2.
+:- prolog_load_context(directory,Dir), DirFor = upv_curry,
+   absolute_file_name('../../..',Y,[relative_to(Dir),file_type(directory)]),
+   (user:file_search_path(DirFor,Dir);asserta(user:file_search_path(DirFor,Dir))) ->
+   (user:file_search_path(pack,Y);asserta(user:file_search_path(pack,Y))) -> attach_packs.
+:- initialization(attach_packs).
+:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+% =========================================================================
+:- expects_dialect(sicstus).
+:- set_prolog_flag(double_quotes, codes).
+
+:- style_check(-discontiguous).
+:- expects_dialect(sicstus).
+:- discontiguous constrTerm/3. 
+:- discontiguous constrTermNested1/3.
+:- discontiguous constrTermNested2/3.
+:- discontiguous bexpr/3.
+
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   ---------------------------------------------------------------------
                      Parser for Haskell syntax
@@ -128,15 +151,20 @@ cleanFuncConsTypes :-
 % Get file and parse it
 % ----------------------------------------
 
+parser( File1, FinalResult ) :- \+ file_exists(File1),
+    filematch_ext(['','.curry','.cur'],File1,Match),
+    file_exists(Match),!,
+    parser( Match, FinalResult ).
+
 parser( File1, FinalResult ) :-
         (  file_exists(File1),!,File=File1
-         ; atom_chars( File1, Str1 ),
+         ; sicstus_atom_chars( File1, Str1 ),
            append(Str1,".curry",Str2),
-           atom_chars( File2, Str2 ),
+           sicstus_atom_chars( File2, Str2 ),
            file_exists(File2),!,File=File2
-         ; atom_chars( File1, Str1 ),
+         ; sicstus_atom_chars( File1, Str1 ),
            append(Str1,".cur",Str2),
-           atom_chars( File2, Str2 ),
+           sicstus_atom_chars( File2, Str2 ),
            file_exists(File2),!,File=File2
          ; write('Parsing error, file doesn\'t exist '), write(File1),nl,fail ),
         (  open( File, read, Stream ),
@@ -439,9 +467,9 @@ treatD3(X,X).
 program( Program ) -->
         {cleanFuncConsTypes,prelude_parser},
         {write('Parsing...'),nl},
-        block( Program ).
+        pblock( Program ).
 
-block( Block ) -->
+pblock( Block ) -->
         (  pragmaDeclarationL(Pragmas)
          ; \+(pragmaDeclarationL(_)),{Pragmas=[]} ),!,
         (  fixityDeclarationL
@@ -534,7 +562,7 @@ typeDeclaration(type(TypeName,N,TypeVars),Consts) -->
         (  constrDeclarationL(Consts),!
          ; {retract(type(TypeName,N))} ).
 
-typeConstrID( TypeName ) --> id(ID), {atom_chars(TypeName,ID)}.
+typeConstrID( TypeName ) --> id(ID), {sicstus_atom_chars(TypeName,ID)}.
 
 typeVarIDL( [Var|Vars] ) --> 
         typeVarID( Var ), 
@@ -554,7 +582,7 @@ constrDeclaration( const(ConstrID,N,TypeExprs) ) -->
          ; {N=0,TypeExprs=[]} ),
         {assert(constructor(ConstrID,N))}.
 
-dataConstrID( TypeName ) --> id(ID), {atom_chars(TypeName,ID)},
+dataConstrID( TypeName ) --> id(ID), {sicstus_atom_chars(TypeName,ID)},
         {\+(type(TypeName,_)),\+(function(TypeName,_)),
          \+(constructor(TypeName,_))}.
 
@@ -568,7 +596,7 @@ basictypeExpr( elem(type('List',1,[elem(type('Char',0,[]))])) ) -->
         "String ",!.
 
 basictypeExpr( TypeExpr ) --> 
-        id(ID), {atom_chars(Type,ID), type(Type,N)},!,
+        id(ID), {sicstus_atom_chars(Type,ID), type(Type,N)},!,
         ( {N=0},!, % Type with 0-arity
           {TypeExpr=elem(type(Type,0,[]))}
          ;{N>0},!, % Type with N-arity
@@ -590,7 +618,7 @@ basictypeExpr( elem(typevar(N)) ) --> {ini},variableID(N),!.
 
 % Forward expression
 basictypeExpr( TypeExpr ) -->
-        id(ID), {atom_chars(Type,ID), \+(type(Type,N))},!,
+        id(ID), {sicstus_atom_chars(Type,ID), \+(type(Type,N))},!,
         ( typeExprL(Vars), !, {length(Vars,N)},
           {TypeExpr=elem(forward(Type,N,Vars))}
         ; {N=0},!, % Type with 0-arity
@@ -964,9 +992,9 @@ functionInfixID( F, Prec, Asso ) -->
         ("`";[26,96]),
         id(ID),
         ("`";[26,96]),!,
-        {atom_chars(F,ID), infix(F,Prec,Asso)}.
+        {sicstus_atom_chars(F,ID), infix(F,Prec,Asso)}.
 functionInfixID( F, Prec, Asso ) --> opSim(ID),!,
-        {atom_chars(F,ID), infix(F,Prec,Asso)}.
+        {sicstus_atom_chars(F,ID), infix(F,Prec,Asso)}.
 
 exprInfixL( Resul ) --> 
         eexpr( Expr1 ),
@@ -995,7 +1023,7 @@ associative( ExprL, Expr ) :-
         getExpr( ExprL, Expr, _ ),!.
 
 % get root operator (op, 1st, and 2nd arg)
-getExpr( [Expr], Expr, inf ) :- !.  % inf is the greatest integer of SICStus
+getExpr( [Expr], Expr, Inf ) :- current_prolog_flag(max_tagged_integer,Inf), !.  % inf is the greatest integer of SICStus
 getExpr( [Expr1,op(F,Prec,_)], f(F,2,[Expr1]), Prec ) :- !.
 getExpr( ExprL, ExprR, Prec ) :-
        %---first find correct ordered combination
@@ -1213,7 +1241,7 @@ exprIni( Termino ) -->
 % IDENTIFIERS ----------------------------------------------------
 % new variable (without underscore)
 variableID( N ) --> id(ID), 
-        {atom_chars(F,ID), \+(var_seen(F,_)), 
+        {sicstus_atom_chars(F,ID), \+(var_seen(F,_)), 
          var_int(F,N),
          ( \+(constructor(F,_)),
            \+(function(F,_)),
@@ -1224,7 +1252,7 @@ variableID( N ) --> id(ID),
 % new free variable with underscore
 variableNew( N ) --> 
         "_",id(IDx),{ID=[95|IDx],
-        atom_chars(F,ID), \+(var_seen(F,_)), 
+        sicstus_atom_chars(F,ID), \+(var_seen(F,_)), 
         var_int(F,N),
          ( \+(constructor(F,_)),
            \+(function(F,_)),
@@ -1236,7 +1264,7 @@ variableNew( N ) -->
 variableAnt( N ) --> 
         ( "_",id(IDx),{ID=[95|IDx]}
          ;id(ID) ),
-        { atom_chars(F,ID), var_seen(F,N) }.
+        { sicstus_atom_chars(F,ID), var_seen(F,N) }.
 
 % void variable (only underscore)
 variableVoid( N ) --> 
@@ -1251,8 +1279,8 @@ variableIDL( [N|Vars] ) -->
         (  ",",!,variableIDL(Vars)
          ; {Vars=[]} ).
 
-functionID( F, N ) --> id(ID), {atom_chars(F,ID), function(F,N)}.
-constructorID( C, N ) --> id(ID), {atom_chars(C,ID), constructor(C,N)}.
+functionID( F, N ) --> id(ID), {sicstus_atom_chars(F,ID), function(F,N)}.
+constructorID( C, N ) --> id(ID), {sicstus_atom_chars(C,ID), constructor(C,N)}.
 
 number( Num ) --> 
         numberS(SNum),

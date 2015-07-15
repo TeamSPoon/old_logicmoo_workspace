@@ -4,13 +4,47 @@
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
+:-module(curry,[process_curry/1]).
+
+
+% =========================================================================
+%  Add this directory and the pack files (also Logicmoo Library Utils)
+% =========================================================================
+:- dynamic   user:file_search_path/2.
+:- multifile user:file_search_path/2.
+:- prolog_load_context(directory,Dir), DirFor = upv_curry,
+   absolute_file_name('../../..',Y,[relative_to(Dir),file_type(directory)]),
+   (user:file_search_path(DirFor,Dir);asserta(user:file_search_path(DirFor,Dir))) ->
+   (user:file_search_path(pack,Y);asserta(user:file_search_path(pack,Y))) -> attach_packs.
+:- initialization(attach_packs).
+:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+% =========================================================================
+:- expects_dialect(sicstus).
+:- thread_local(current_prolog_flag_double_quotes/1).
+:- current_prolog_flag(double_quotes, ResetTo),asserta(current_prolog_flag_double_quotes(ResetTo)).
+:- set_prolog_flag(double_quotes, codes).
+
+
+
 % ---------------------------------------------------------------------------
 % Global Control -----------------------------------------------------
 % ---------------------------------------------------------------------------
 
 :- use_module(library(system)), use_module(library(lists)).
-:- compile(['common.pl','parser.pl','typecheck.pl','gendtree.pl',
+
+sicstus_compile:- user:compile(['common.pl','parser.pl','typecheck.pl','gendtree.pl',
             'write2.pl','eval.pl','menu.pl']).
+
+
+:-include('common.pl').
+:-include('parser.pl').
+:-include('typecheck.pl').
+:-include('gendtree.pl').
+:-include('gendtree.pl').
+:-include('write2.pl').
+:-include('eval.pl').
+:-include('menu.pl').
+
 :- dynamic 
      prelude/3. %Parser,TypeChecker,DefTree
 
@@ -68,21 +102,43 @@ load_prelude :-
    write('Loading prelude...'),nl,
    name(':load "prelude"',Command), %--needed to allow "
    on_exception(_,
-     ( command_read(Command),! ;halt ),
-     (write('Internal error processing prelude file'),nl,halt) ),
+     ( must(command_read(Command)),! ;halt ),
+     (write('Internal error processing prelude file'),nl,halt(-1))),
    nl.
 
-:- 
+:- use_module(library(check)).
+% :- check:list_strings.
+
+sicstus_atom_chars(N,S):-atom_codes(N,S).
+
+curry_toplevel:- 
+  must_det_l((
    nl,nl,
    write('***********UPV-Curry interpreter (Version 14 Apr 2000)*******************'),
    nl,nl,
+   % already done the curry_init,
+   % Help
+   command_help(":help "),   
+   main)).
+
+curry_init:-
+  must_det_l((
    % Save state with basic info
    save_state,
    % Load Prelude
    load_prelude,
    % Save state with prelude info
-   save_state,
-   % Help
-   command_help(":help "),
-   % Interacting Prompt
-   !,main.
+   save_state)).
+
+:- curry_init.
+
+:- if_startup_script(curry_toplevel).
+
+process_curry(Input):-
+  must_det_l((
+    any_to_string(Input,InputS),
+    string_codes(InputS,InputS1))),
+    process_then(InputS1,true),!.
+
+:-retract(current_prolog_flag_double_quotes(ResetTo)),
+  set_prolog_flag(double_quotes, ResetTo).

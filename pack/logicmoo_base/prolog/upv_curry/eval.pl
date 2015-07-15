@@ -1,3 +1,7 @@
+:- expects_dialect(sicstus).
+:- discontiguous evalBuiltIn/4.
+:- discontiguous evalTree/5.
+:- style_check(+discontiguous).
 % ---------------------------------------------------------------------------
 % Evaluation of States ------------------------------------------------------
 % ---------------------------------------------------------------------------

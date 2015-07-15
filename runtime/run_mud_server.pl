@@ -67,6 +67,9 @@ user:file_search_path(prologmud, library(prologmud)).
 % [Mostly Required] Load the Logicmoo Parser/Generator System
 :- time(user:ensure_loaded(library(parser_all))).
 
+% [Mostly Required] Load the Logicmoo Cury System
+:- time(user:ensure_loaded(library(upv_curry/main))).
+
 % [Required] most of the Library system should not be loaded with mpred expansion on
 :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 

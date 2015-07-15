@@ -1,7 +1,7 @@
 :- op(1001,xfy, ... ).
 :- op(1200,xfx,'--->').
 
-:- push_def(thlocal:disable_mpred_term_expansions_locally).
+%:- push_def(thlocal:disable_mpred_term_expansions_locally).
 
 :-asserta(thlocal:disable_mpred_term_expansions_locally).
 
@@ -504,6 +504,6 @@ conj(conj(Conj,Ctx0), conj(Conj,Ctx),Left,Right, conj(Conj,Left,Right)) --->
 
 :-retract(tlxgproc:do_xg_process_te).
 
-:-pop_def(thlocal:disable_mpred_term_expansions_locally).
+:-retract(thlocal:disable_mpred_term_expansions_locally).
 
 end_of_file.

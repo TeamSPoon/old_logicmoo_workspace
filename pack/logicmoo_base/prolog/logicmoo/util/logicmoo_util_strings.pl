@@ -69,6 +69,10 @@
    ]).
 
 
+:- use_module(library(check)).
+% :- use_module(library(check),[check:string_predicate/1]).
+:- multifile(check:string_predicate/1).
+
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 :- multifile(double_quotes_was_strings/1).
 :- dynamic(double_quotes_was_strings/1).
@@ -600,8 +604,11 @@ ends_with_icase(A,B):- string_ci(A,UA),string_ci(B,UB),non_empty(UB),atom_concat
 
 string_dedupe(StringI,StringO):- to_word_list(StringI,Words),remove_predupes(Words,StringO).
 
+:- multifile(check:string_predicate/1).
+check:string_predicate(remove_predupes/2).
+
 remove_predupes([],[]).
-remove_predupes(ListI,ListO):- member(L0,["",''," ",' ']),member(L0,ListI),delete(ListI,L0,ListM),!,remove_predupes(ListM,ListO),!.
+remove_predupes(ListI,ListO):- member(L0,["",[],"",'',[32],' ']),member(L0,ListI),delete(ListI,L0,ListM),!,remove_predupes(ListM,ListO),!.
 remove_predupes([L|ListI], ListO):- (member_ci(L,ListI) -> remove_predupes(ListI,ListO) ; (remove_predupes(ListI,ListM),[L|ListM]=ListO)),!.
 
 member_ci(L,[List|I]):-!,member(LL2,[List|I]),string_equal_ci(LL2,L).
@@ -732,6 +739,8 @@ read_stream_to_arglist(Input,[H|T]):-show_call(cyc:lisp_read(Input,_,H)),!,(is_e
 
 is_ending(List):-nonvar(List),(is_list(List)->last(List,whitepace("\n"));List==whitepace("\n")).
 
+
+check:string_predicate(is_simple_split/1).
 is_simple_split(S):-text_to_string(S,SS),split_string(SS,"().!\"\'","()",O),!,O=[SS].
 
 to_word_list_2(Input,WList):-is_simple_split(Input),split_string(Input," "," ",WList),!.

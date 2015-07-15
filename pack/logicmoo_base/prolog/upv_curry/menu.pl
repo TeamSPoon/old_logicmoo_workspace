@@ -8,10 +8,13 @@
 main :- haltSystem,halt.
 main :- 
         \+(haltSystem),
-        on_exception(_,
-         (prompt(_,'> '), prompt( InputS1 ),
-          process( InputS1, InputS2 ), 
-          (  InputS2=[], Input=[], main
+         must_det((prompt(_,'> '), prompt( InputS1 ),
+          process_then(InputS1,main))).
+
+process_then(InputS1, Main):-
+      on_exception(_,
+          (process( InputS1, InputS2 ), 
+          (  InputS2=[], Input=[], Main
            ; append( Input, [10], InputS2 ),
              (  command_read( Input )
               ; command_debug( Input )
@@ -22,8 +25,8 @@ main :-
               ; command_pwd( Input )
               ; command_exit( Input )
               ; nopass,command_solve( Input ) ), 
-             !,main ))
-        ,main)
+             !,Main ))
+        ,Main)
         .
 
 prompt( Input ) :-
@@ -65,7 +68,7 @@ command_read( Input ) :-
          ;append( ":l ",    Str, Input ) ), !,
         Str = [34|Rest],
         get_ToQuote( Rest, Name, [] ),
-        atom_chars( File, Name ),
+        sicstus_atom_chars( File, Name ),
         parser( File, Source ),
         checkType( Source, Rules ),
         deftrees(Rules).
@@ -120,7 +123,7 @@ command_cd( Input ) :-
          ;append( ":c ",  Str, Input ) ), !,
         Str = [34|Rest],
         get_ToQuote( Rest, Name, [] ),
-        atom_chars( Dir, Name ),
+        sicstus_atom_chars( Dir, Name ),
         working_directory(_,Dir).
 
 command_pwd( Input ) :-

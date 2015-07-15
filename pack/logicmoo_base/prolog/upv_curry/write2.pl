@@ -1,3 +1,11 @@
+:- style_check(+discontiguous).
+:- expects_dialect(sicstus).
+:- discontiguous show/2.
+:- discontiguous write2/1.
+:- discontiguous write2/1.
+:- discontiguous write2/1.
+:- discontiguous write2/1.
+
 % ---------------------------------------------------------------------------
 % Modified Write ------------------------------------------------------------
 % ---------------------------------------------------------------------------
@@ -70,7 +78,7 @@ show( c(F,_,Terms), Str ) :-
 % Special Functions
 show( f('\\@',_,[f(F,N,Args)|Terms]), Str ) :- !,
         show(f(F,N,Args),StrF), showL(Terms,StrTerms),
-        append(StrF," \@ ",Str2), append(Str2,StrTerms,Str).
+        append(StrF," \\@ ",Str2), append(Str2,StrTerms,Str).
         
 
 show( f('IfThenElse',3,[EBool,ETrue,EFalse]), Str ) :- !,
