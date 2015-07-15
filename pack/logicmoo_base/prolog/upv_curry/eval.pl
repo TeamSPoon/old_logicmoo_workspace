@@ -1,7 +1,6 @@
 :- expects_dialect(sicstus).
-:- discontiguous evalBuiltIn/4.
-:- discontiguous evalTree/5.
-:- style_check(+discontiguous).
+:- set_prolog_flag(double_quotes, codes).
+:- style_check(-discontiguous).
 % ---------------------------------------------------------------------------
 % Evaluation of States ------------------------------------------------------
 % ---------------------------------------------------------------------------
@@ -77,7 +76,7 @@ narrowing( [er(Susts,Exp,C)|States], ResultStates ) :- % general
         maxvar( Exp, Max ), retractall(maxVar(_)), assert(maxVar(Max)),
         evalInc( C, Exp, StatesE ),!,
         narrowing_join( StatesE, Susts, RStates ),
-        append( RStates, States, ResultStates ).
+        sappend( RStates, States, ResultStates ).
 narrowing( [er(Susts,Exp,C)|States], ResultStates ) :-
         normal_form( Exp ),!, 
         assert(solution),
@@ -106,7 +105,7 @@ narrowing_join( [], _, [] ).
 narrowing_join( [er( Susts1, Exp, C )|States1], Susts,
                 [er( Susts4, Exp, C )|States2] ) :-
         applys( Susts1, Susts, Susts2 ),
-        append( Susts2, Susts1, Susts3 ),
+        sappend( Susts2, Susts1, Susts3 ),
         maxVarIni(Max), restrict( Susts3, Max, Susts4 ),
         narrowing_join( States1, Susts, States2 ).
 
@@ -146,14 +145,14 @@ replace([],_,[]).
 
 %- Add initial occurrence and list of inc. info to evaluated position
 addOccInc([exp(Ox1,Sust,Exp,C1)|LEval1],Ox,C,[exp(Ox2,Sust,Exp,C2)|LEval2]) :-
-       append(Ox,Ox1,Ox2),
+       sappend(Ox,Ox1,Ox2),
        addOccInc2(C1,Ox,C,C2),
        !,addOccInc(LEval1,Ox,LEval2).
 addOccInc([],_,[]).
 
 %- Add initial occurrence to list of incremental info
 addOccInc2([(Ox1,T)|C1],Ox,C,[(Ox2,T)|C2]) :-
-       append(Ox,Ox1,Ox2),
+       sappend(Ox,Ox1,Ox2),
        !,addOccInc2(C1,Ox,C,C2).
 addOccInc2([],_,C,C).
 
@@ -222,7 +221,7 @@ evalTree( trule(TermL,TermR), Expression, Ox, C, LEval ) :- !,      % -- Rule
 evalTree( tor(Tree1,Tree2), Expression, Ox, C, LEval ) :- !,     % -- OR
         evalTree( Tree1, Expression, Ox, C, LEval1 ),
         evalTree( Tree2, Expression, Ox, C, LEval2 ),
-        append( LEval1, LEval2, LEval ).
+        sappend( LEval1, LEval2, LEval ).
 
 evalTree( tbranch(IOx,_,Trees), Expression, Ox, C, LEval ) :- % -- Constructor
         pos( Expression, IOx, c(F,_,_) ),!,
@@ -259,7 +258,7 @@ evalTree_instantiate( [(F,_)|Trees], Var, CurrentTree, Ox, C, LEval ) :-
 
 evalTree( tbranch(IOx,M,Trees), Expression, Ox, C, LEval) :- % -- Function call
         pos( Expression, IOx, f(F,N,Terms) ),!,
-        append(Ox,IOx,Ox1),
+        sappend(Ox,IOx,Ox1),
         evalExp(f(F,N,Terms),Ox1,[(Ox,tbranch(IOx,M,Trees))|C],LEval).
 
 % evalBuiltIn ------------
@@ -269,18 +268,18 @@ evalBuiltIn( f('\\=>',2,[Constraint,Exp]), Ox, C, LEval ) :-
       Constraint=f('success',0,[]),!,
       LEval=[ exp(Ox,[],Exp,C) ]
      ;%--Evaluation of Constraint
-      append(Ox,[1],Ox1),
+      sappend(Ox,[1],Ox1),
       evalExp( Constraint, Ox1, [(Ox,noTree)|C], LEval ) ).
 
 % -- Special: partial function application
 evalBuiltIn( f('\\@',_,[ Expr| TermsAdd ]), Ox, C, LEval ) :- !,
       ( %-Evaluable Expression
-        append(Ox,[1],Ox1),
+        sappend(Ox,[1],Ox1),
         evalExp( Expr, Ox1, [(Ox,noTree)|C], LEval ),!
       ; %-Function to add arguments
         %%Expr cannot be evaluated, so needs extra args
         Expr = f(F,N,Terms),
-        append( Terms, TermsAdd, TermsR ),
+        sappend( Terms, TermsAdd, TermsR ),
         LEval = [ exp(Ox,[],f(F,N,TermsR),C) ] ).
 
 % -- Constraint Evaluation
@@ -288,10 +287,10 @@ evalBuiltIn( f('&',2,[f('success',0,[]),Ct2]), Ox, C, LEval ) :- !,
         LEval = [exp(Ox,[],Ct2,C)].
 
 evalBuiltIn( f('&',2,[Ct1,Ct2]), Ox, C, LEval ) :- !,
-        (  append(Ox,[1],Ox1),
+        (  sappend(Ox,[1],Ox1),
            evalExp( Ct1, Ox1, [(Ox,noTree)|C], LEval ),!
         ; %%%%% To achieve correctness new incremental info should be removed
-           append(Ox,[2],Ox2),
+           sappend(Ox,[2],Ox2),
            evalExp( Ct2, Ox2, [], LEvalX ),!,
            removeInc(LEvalX,[(Ox,noTree)|C],LEval)
         ).
@@ -307,12 +306,12 @@ evalBuiltIn( f('=:=',2,[Ct1,Ct2]), Ox, C, LEval ) :- !,
 
 %Function
 evalCT( f(F,N,Terms), _, Ox, C, LEval ) :- !,
-        append(Ox,[1],Ox1),
+        sappend(Ox,[1],Ox1),
         evalExp( f(F,N,Terms), Ox1, [(Ox,noTree)|C], LEval ).
 
 %Function
 evalCT( _, f(F,N,Terms), Ox, C, LEval ) :- !,
-        append(Ox,[2],Ox1),
+        sappend(Ox,[2],Ox1),
         evalExp( f(F,N,Terms), Ox1, [(Ox,noTree)|C], LEval ).
 
 %Same Constructor
@@ -357,7 +356,7 @@ eval_join( [Exp1,Exp11|Exps1], [Exp2,Exp22|Exps2], Constraint ) :-
 eval_freshvars( [], _, Vars, Vars ).
 eval_freshvars( [_|Terms], Max, Vars1, Vars3 ) :-
         Max1 is Max + 1,
-        append( Vars1, [v(Max1)], Vars2 ),
+        sappend( Vars1, [v(Max1)], Vars2 ),
         eval_freshvars( Terms, Max1, Vars2, Vars3 ).
 
 occur_check( M, v(M) ).
@@ -379,8 +378,8 @@ evalBuiltIn( f('==',2,[ Term1, Term2 ]), Ox, C, LEval ) :- !,
            LEval = [ exp(Ox, [], Term3, C ) ]
 
          ; % Case Function
-           ( Term1 = f(F,N,Terms), append(Ox,[1],Ox1)
-            ;Term2 = f(F,N,Terms), append(Ox,[2],Ox1) ), !,
+           ( Term1 = f(F,N,Terms), sappend(Ox,[1],Ox1)
+            ;Term2 = f(F,N,Terms), sappend(Ox,[2],Ox1) ), !,
            evalExp( f(F,N,Terms), Ox1, [(Ox,noTree)|C], LEval )
         ).
 
@@ -415,8 +414,8 @@ eval_Op( Op, Term1, Term2, Ox, C, LEval ) :-
            eval_OpValue( Op, ANum1, ANum2, ANum3 ),
            LEval = [ exp( Ox, [], c(ANum3,0,[]), C ) ]
 
-         ; (  Term1 = f(F,N,Terms), append(Ox,[1],Ox1)
-            ; Term2 = f(F,N,Terms), append(Ox,[2],Ox1) ), !,
+         ; (  Term1 = f(F,N,Terms), sappend(Ox,[1],Ox1)
+            ; Term2 = f(F,N,Terms), sappend(Ox,[2],Ox1) ), !,
            evalExp( f(F,N,Terms), Ox1, [(Ox,noTree)|C], LEval )
         ).
 
@@ -443,16 +442,16 @@ eval_OpValue( '=<', Num1, Num2, Num3 ) :-
 evalBuiltIn( f('>>',2,[Exp1,Exp2]), Ox, C, LEval ) :- !,
         ( normal_form(Exp1),!,
           LEval = [ exp(Ox, [], Exp2, C) ] 
-        ; append(Ox,[1],Ox1),
+        ; sappend(Ox,[1],Ox1),
           evalExp( Exp1, Ox1, [(Ox,noTree)|C], LEval )
         ).
 
 evalBuiltIn( f('>>=',2,[Exp1,Exp2]), Ox, C, LEval ) :- !,
         ( normal_form(Exp1),
           Exp1 = c('IO',1,[ExpIO]), 
-          Exp2 = f(F,N,Args), append(Args,[ExpIO],Exps),
+          Exp2 = f(F,N,Args), sappend(Args,[ExpIO],Exps),
           LEval = [ exp( Ox, [], f(F,N,Exps), C ) ] 
-        ; append(Ox,[1],Ox1),
+        ; sappend(Ox,[1],Ox1),
           evalExp( Exp1, Ox1, [(Ox,noTree)|C], LEval )
         ).
 
@@ -461,7 +460,7 @@ evalBuiltIn( f('putChar',1,[Exp]), Ox, C, LEval ) :- !,
           Exp = c([Ch],0,[]), 
           name(S,[Ch]), write(S),
           LEval = [ exp( Ox, [], c('IO',1,[ c('Tuple0',0,[]) ]), C ) ] 
-        ; append(Ox,[1],Ox1),
+        ; sappend(Ox,[1],Ox1),
           evalExp( Exp, Ox1, [(Ox,noTree)|C], LEval )
         ).
 
@@ -477,7 +476,7 @@ evalBuiltIn( f('return',1,[Exp]), Ox, C, LEval ) :- !,
         ( normal_form(Exp),
           Exp = c(Const,N,Exps), 
           LEval = [ exp( Ox, [], c('IO',1,[ c(Const,N,Exps) ]), C ) ] 
-        ; append(Ox,[1],Ox1),
+        ; sappend(Ox,[1],Ox1),
           evalExp( Exp, Ox1, [(Ox,noTree)|C], LEval )
         ).
 
@@ -493,7 +492,7 @@ evalBuiltIn( f('readFile',1,[Exp]), Ox, C, LEval ) :- !,
            toString(IntStr,FileStr),
            LEval = [ exp( Ox, [], c('IO',1,[IntStr]), C ) ]
           ;LEval=[] )
-        ; append(Ox,[1],Ox1),
+        ; sappend(Ox,[1],Ox1),
           evalExp( Exp, Ox1, [(Ox,noTree)|C], LEval )
         ).
 
@@ -508,9 +507,9 @@ evalBuiltIn( f('writeFile',2,[Exp1,Exp2]), Ox, C, LEval ) :- !,
             LEval = [ exp( [], [], c('IO',1,[ c('Tuple0',0,[]) ]), [] ) ]
            ;LEval=[] ) 
          ;normal_form(Exp1),!,
-          append(Ox,[2],Ox1),
+          sappend(Ox,[2],Ox1),
           evalExp( Exp2, Ox1, [(Ox,noTree)|C], LEval )
-         ;append(Ox,[1],Ox1),
+         ;sappend(Ox,[1],Ox1),
           evalExp( Exp1, Ox1, [(Ox,noTree)|C], LEval )
          ).
 
@@ -535,13 +534,13 @@ evalBuiltIn( f('ord',1,[Exp]), Ox, C, LEval ) :- !,
          (normal_form(Exp),!,
           Exp = c([Ch],0,[]), 
           LEval = [ exp( Ox, [], c(Ch,0,[]), C ) ]
-         ;append(Ox,[1],Ox1),
+         ;sappend(Ox,[1],Ox1),
           evalExp( Exp, Ox1, [(Ox,noTree)|C], LEval )).
 evalBuiltIn( f('chr',1,[Exp]), Ox, C, LEval ) :- !,
          (normal_form(Exp),!,
           Exp = c(Ch,0,[]), 
           LEval = [ exp( Ox, [], c([Ch],0,[]), C ) ]
-         ;append(Ox,[1],Ox1),
+         ;sappend(Ox,[1],Ox1),
           evalExp( Exp, Ox1, [(Ox,noTree)|C], LEval )).
 
 % -- Show function
@@ -550,7 +549,7 @@ evalBuiltIn( f('show',1,[Exp]), Ox, C, LEval ) :- !,
           show(Exp,Str),
           toString(ResultExpr,Str),
           LEval = [ exp( Ox, [], ResultExpr, C) ]
-         ;append(Ox,[1],Ox1),
+         ;sappend(Ox,[1],Ox1),
           evalExp( Exp, Ox1, [(Ox,noTree)|C], LEval )).
 
 % -- Undefined function

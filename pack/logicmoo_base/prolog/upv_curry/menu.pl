@@ -1,8 +1,11 @@
+:- expects_dialect(sicstus).
+:- set_prolog_flag(double_quotes, codes).
+:- style_check(-discontiguous).
 % ---------------------------------------------------------------------------
 % Menu 
 % ---------------------------------------------------------------------------
 
-:- dynamic 
+:- thread_local 
      haltSystem/0.
 
 main :- haltSystem,halt.
@@ -15,7 +18,7 @@ process_then(InputS1, Main):-
       on_exception(_,
           (process( InputS1, InputS2 ), 
           (  InputS2=[], Input=[], Main
-           ; append( Input, [10], InputS2 ),
+           ; sappend( Input, [10], InputS2 ),
              (  command_read( Input )
               ; command_debug( Input )
               ; command_deftree( Input )
@@ -34,24 +37,24 @@ prompt( Input ) :-
         ( (X =:= 10 ; X =:= 13), !, Input = []
          ;Input = [X|Input2], prompt(Input2) ).
 
-command_solve( "" ) :- !.
+command_solve( `` ) :- !.
 command_solve( Input ) :- %No known command accepted
-        ( append( ":load ",  _, Input )
-         ;append( ":l ",     _, Input )
-         ;append( ":debug ", _, Input )
-         ;append( ":d ",     _, Input )
-         ;append( ":deftree ", _, Input )
-         ;append( ":e ", _, Input )
-         ;append( ":type ", _, Input )
-         ;append( ":t ", _, Input )
-         ;append( ":help ", _, Input )
-         ;append( ":h ", _, Input )
-         ;append( ":cd ", _, Input )
-         ;append( ":c ", _, Input )
-         ;append( ":type ", _, Input )
-         ;append( ":t ", _, Input )
-         ;append( ":quit ", _, Input )
-         ;append( ":q ", _, Input )      ),
+        ( sappend( `:load `,  _, Input )
+         ;sappend( `:l `,     _, Input )
+         ;sappend( `:debug `, _, Input )
+         ;sappend( `:d `,     _, Input )
+         ;sappend( `:deftree `, _, Input )
+         ;sappend( `:e `, _, Input )
+         ;sappend( `:type `, _, Input )
+         ;sappend( `:t `, _, Input )
+         ;sappend( `:help `, _, Input )
+         ;sappend( `:h `, _, Input )
+         ;sappend( `:cd `, _, Input )
+         ;sappend( `:c `, _, Input )
+         ;sappend( `:type `, _, Input )
+         ;sappend( `:t `, _, Input )
+         ;sappend( `:quit `, _, Input )
+         ;sappend( `:q `, _, Input )      ),
         !.
 command_solve( Input ) :-
         cleanVars,
@@ -61,11 +64,11 @@ command_solve( Input ) :-
          ;write('') ).
 command_solve( Text ) :- 
         name( Atom, Text ),
-        write('ERROR: Incorrect expression '), write(Atom), write(' found'),nl.
+        write('ERROR: Unknown (maybe Incorrect) expression "'), write(Atom), write('" found'),nl.
 
 command_read( Input ) :-
-        ( append( ":load ", Str, Input )
-         ;append( ":l ",    Str, Input ) ), !,
+        ( sappend( `:load `, Str, Input )
+         ;sappend( `:l `,    Str, Input ) ), !,
         Str = [34|Rest],
         get_ToQuote( Rest, Name, [] ),
         sicstus_atom_chars( File, Name ),
@@ -74,25 +77,25 @@ command_read( Input ) :-
         deftrees(Rules).
 
 command_debug( Input ) :-
-        ( append( ":debug ", Expression, Input )
-         ;append( ":d ",     Expression, Input ) ),!,
+        ( sappend( `:debug `, Expression, Input )
+         ;sappend( `:d `,     Expression, Input ) ),!,
         ( pass,
           command_solve( Expression ),
           nopass
          ;nopass).
 
 command_deftree( Input ) :-
-        ( append( ":deftree ", Function, Input )
-         ;append( ":e ",       Function, Input ) ),!,
-        ( append( Name, [32], Function )
+        ( sappend( `:deftree `, Function, Input )
+         ;sappend( `:e `,       Function, Input ) ),!,
+        ( sappend( Name, [32], Function )
          ;Name=Function ),
         name(F,Name),
-        (  dt(F,_,DT),!, format("~a:\n",[F]), write2(DT), nl
-         ; \+(dt(F,_,DT)), format("There is no definitional tree\n",[]) ).
+        (  dt(F,_,DT),!, format(`~a:\n`,[F]), write2(DT), nl
+         ; \+(dt(F,_,DT)), format(`There is no definitional tree\n`,[]) ).
 
 command_type( Input ) :-
-        ( append( ":type ", ExpS, Input )
-         ;append( ":t ",    ExpS, Input ) ),!,
+        ( sappend( `:type `, ExpS, Input )
+         ;sappend( `:t `,    ExpS, Input ) ),!,
         ( exprIni(Exp,ExpS,[])
         ; functionInfixID(F,_,_,ExpS,[]), Exp=f(F,2,[]) ),
         sCheckExpr( Exp, TypeExpr, [], Susts ),
@@ -100,16 +103,16 @@ command_type( Input ) :-
         write2(ShowType),nl.
 
 command_help( Input ) :- 
-        ( Input = ":help "
-         ;Input = ":h "   ),!,
+        ( Input = `:help `
+         ;Input = `:h `   ),!,
         nl,
         write('Commands:'),nl,
-        write('   :load "<File>"      - Load Curry file in interpreter [:l]'),nl,
+        write('   :load `<File>`      - Load Curry file in interpreter [:l]'),nl,
         write('   <Expression>        - Evaluate expression'),nl,
         write('   :debug <Expression> - Debug expression evaluation    [:d]'),nl,
         write('   :deftree <Function> - Show function deftree          [:e]'),nl,
         write('   :type <Expression>  - Show expression type           [:t]'),nl,
-        write('   :cd "<Directory>"   - Change working directory       [:c]'),nl,
+        write('   :cd `<Directory>`   - Change working directory       [:c]'),nl,
         write('   :pwd                - Show working directory         [:p]'),nl,
         write('   :help               - This help menu                 [:h]'),nl,
         write('   :quit               - Exit interpreter               [:q]'),nl,
@@ -119,21 +122,21 @@ command_help( Input ) :-
         nl.
 
 command_cd( Input ) :-
-        ( append( ":cd ", Str, Input )
-         ;append( ":c ",  Str, Input ) ), !,
+        ( sappend( `:cd `, Str, Input )
+         ;sappend( `:c `,  Str, Input ) ), !,
         Str = [34|Rest],
         get_ToQuote( Rest, Name, [] ),
         sicstus_atom_chars( Dir, Name ),
         working_directory(_,Dir).
 
 command_pwd( Input ) :-
-        ( Input = ":pwd "
-         ;Input = ":p "   ),!,
+        ( Input = `:pwd `
+         ;Input = `:p `   ),!,
         working_directory(Dir,Dir),
         write(Dir),nl.
 
 command_exit( Input ) :-
-        ( Input = ":quit "
-         ;Input = ":q "   ),!,
+        ( Input = `:quit `
+         ;Input = `:q `   ),!,
         assert(haltSystem).
 

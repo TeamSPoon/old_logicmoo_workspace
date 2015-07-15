@@ -1,4 +1,6 @@
 :- expects_dialect(sicstus).
+:- set_prolog_flag(double_quotes, codes).
+:- style_check(-discontiguous).
 :- discontiguous gt/5.
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   ------------------------------------------------------------------------

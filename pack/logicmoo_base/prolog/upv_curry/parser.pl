@@ -1,19 +1,4 @@
-
-% =========================================================================
-%  Add this directory and the pack files (also Logicmoo Library Utils)
-% =========================================================================
-:- dynamic   user:file_search_path/2.
-:- multifile user:file_search_path/2.
-:- prolog_load_context(directory,Dir), DirFor = upv_curry,
-   absolute_file_name('../../..',Y,[relative_to(Dir),file_type(directory)]),
-   (user:file_search_path(DirFor,Dir);asserta(user:file_search_path(DirFor,Dir))) ->
-   (user:file_search_path(pack,Y);asserta(user:file_search_path(pack,Y))) -> attach_packs.
-:- initialization(attach_packs).
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
-% =========================================================================
-:- expects_dialect(sicstus).
 :- set_prolog_flag(double_quotes, codes).
-
 :- style_check(-discontiguous).
 :- expects_dialect(sicstus).
 :- discontiguous constrTerm/3. 
@@ -48,11 +33,11 @@
 
  Notes:
   - Conditional rules expressed with constructor symbol f('\=>',2,[...])
-   where " l | c = r " is written as "rule( l, f('\=>',2,[c,r]) )"
-  - High Order (partial application of functions) using "f('\@',N,[...])" 
+   where ` l | c = r ` is written as `rule( l, f('\=>',2,[c,r]) )`
+  - High Order (partial application of functions) using `f('\@',N,[...])` 
    with function symbol in the first argument and 
    the argument expressions in the other arguments.
-  - Lambda Expressions using "f('\',N1,[c('\Var',N2,Pattern),Expr|Args])" 
+  - Lambda Expressions using `f('\',N1,[c('\Var',N2,Pattern),Expr|Args])` 
    where Pattern is the arguments of the lambda expression, 
    Expr is the right expression of the lambda expression and
    Args is the set of expressions passed as arguments 
@@ -60,7 +45,7 @@
   - Sharing implemented as f('\#',2,[Variable,Expresion])
   - In SICSTus Prolog the symbol '\' is treated as special, 
    so '\=>' has to be '\\=>' and so on.
-  - "forward" node denotes a reference to a function not passed yet.
+  - `forward` node denotes a reference to a function not passed yet.
 */
 
 :- dynamic 
@@ -84,8 +69,8 @@
         pragma/1      - pragmas included in program
         data/2        - data type
            const/3    - constructor found
-           curried/2  - "->" operator 
-           elem/1     - each element in a "->" application
+           curried/2  - `->` operator 
+           elem/1     - each element in a `->` application
            type/3     - type found
            typevar/1  - type variable passed
 */
@@ -159,11 +144,11 @@ parser( File1, FinalResult ) :- \+ file_exists(File1),
 parser( File1, FinalResult ) :-
         (  file_exists(File1),!,File=File1
          ; sicstus_atom_chars( File1, Str1 ),
-           append(Str1,".curry",Str2),
+           sappend(Str1,`.curry`,Str2),
            sicstus_atom_chars( File2, Str2 ),
            file_exists(File2),!,File=File2
          ; sicstus_atom_chars( File1, Str1 ),
-           append(Str1,".cur",Str2),
+           sappend(Str1,`.cur`,Str2),
            sicstus_atom_chars( File2, Str2 ),
            file_exists(File2),!,File=File2
          ; write('Parsing error, file doesn\'t exist '), write(File1),nl,fail ),
@@ -232,10 +217,10 @@ clean_enters( Text1, Text5 ) :-
         (
            Text1x1 = [],                       % a blank line
            clean_enters( Text2, Text5 )
-         ; append( Text1x1, Text1x3, Text1x ), % normal case
+         ; sappend( Text1x1, Text1x3, Text1x ), % normal case
            clean_Declaration( Text2, Text1x2, Text3, 0 ),
-           append( Text1x2, [10], Text1x3 ),
-           append( Text1x, Text4, Text5 ),!,
+           sappend( Text1x2, [10], Text1x3 ),
+           sappend( Text1x, Text4, Text5 ),!,
            clean_enters( Text3, Text4 ) 
         ).
 
@@ -247,7 +232,7 @@ clean_Declaration( Text1, Text1X, Text3, Tab ) :-
         get_tab( Text1, 0, TabT ),
         (  TabT > Tab,
            get_ToEnter( Text1, Text1x1, Text2 ),
-           append( Text1x1, Text1x2, Text1X ),
+           sappend( Text1x1, Text1x2, Text1X ),
            clean_Declaration( Text2, Text1x2, Text3, Tab )
          ; TabT =< Tab,
            Text1X = [],
@@ -282,21 +267,21 @@ clean_blanks( [X|Text1], Text4 ) :-
          ; clean_string( [X|Text1], Text1x, Text2 ),!
          ; clean_id(     [X|Text1], Text1x, Text2 ),!
          ; clean_sym(    [X|Text1], Text1x, Text2 ) ),
-        append( Text1x, Text3, Text4 ),
+        sappend( Text1x, Text3, Text4 ),
         clean_blanks( Text2, Text3 ).
 
 clean_id( [C|Cs1], [C|Cs2], Cs3 ) :-
-        ( C >= "0", C =< "9"
-         ;C >= "A", C =< "Z"
-         ;C >= "a", C =< "z"
-         ;[C] == "_" ),!,
+        ( C >= `0`, C =< `9`
+         ;C >= `A`, C =< `Z`
+         ;C >= `a`, C =< `z`
+         ;[C] == `_` ),!,
         clean_id2(Cs1,Cs2,Cs3).
 
 clean_id2( [C|Cs1], [C|Cs2], Cs3 ) :-
-        ( C >= "0", C =< "9"
-         ;C >= "A", C =< "Z"
-         ;C >= "a", C =< "z"
-         ;[C] == "_" ),!,
+        ( C >= `0`, C =< `9`
+         ;C >= `A`, C =< `Z`
+         ;C >= `a`, C =< `z`
+         ;[C] == `_` ),!,
         clean_id2(Cs1,Cs2,Cs3).
 clean_id2( [32|Cs], [32], Cs ).
 clean_id2( [9|Cs],  [32], Cs ).
@@ -311,7 +296,7 @@ clean_char( [39,C1,C2,39|Text], [39,C1,C2,39], Text ). % '\n','\t',...
 
 clean_string( [34|Text1], [34|Text4], Text3 ) :-
         get_ToQuote( Text1, Text2, Text3 ),
-        append(Text2,[34],Text4).
+        sappend(Text2,[34],Text4).
 
 get_ToQuote( [34|Text], [], Text ).
 get_ToQuote( [X|Text1], [X|Text2], Text3 ) :- !,
@@ -325,15 +310,15 @@ process_where( S1, S2 ) :- pwhere1(S1,S2,0).
 %- process whole string looking for where expressions
 pwhere1( S1, S2, Tab ) :-
         S1 = [119,104,101,114,101,C|Xs],
-         \+((C >= "0", C =< "9"
-            ;C >= "A", C =< "Z"
-            ;C >= "a", C =< "z"
-            ;[C] == "_"        )),
+         \+((C >= `0`, C =< `9`
+            ;C >= `A`, C =< `Z`
+            ;C >= `a`, C =< `z`
+            ;[C] == `_`        )),
         S2 = [119,104,101,114,101,32,10,C|Ys],!,
         TabIni is Tab+5,
-        build_blank_line(TabIni,IniS),append(IniS,[C|Xs],Ys0),
+        build_blank_line(TabIni,IniS),sappend(IniS,[C|Xs],Ys0),
         pwhere2(Ys0,Ys1,S3,TabIni),
-        append(Ys1,S4,Ys),
+        sappend(Ys1,S4,Ys),
         !,pwhere1(S3,S4,0).
 pwhere1( [10|Xs], [10|Ys], _ ) :- pwhere1(Xs,Ys,0).
 pwhere1( [13|Xs], [13|Ys], _ ) :- pwhere1(Xs,Ys,0).
@@ -353,10 +338,10 @@ pwhere2( S1, Xs2, S2, _ ) :-
         clean_blanks(Xs,Xs1),
         Xs1=[123|_],
         !, % the where expression is correctly introduced
-        append(Xs,[10],Xs2).
+        sappend(Xs,[10],Xs2).
 
 pwhere2( S1, Ys0, S3, TabIni ) :-
-        build_blank_line(TabIni,Ini),append(Ini,[123,10|Ys],Ys0),
+        build_blank_line(TabIni,Ini),sappend(Ini,[123,10|Ys],Ys0),
         get_ToEnter( S1, Xs, S2 ),
         % check if Xs (rest of line) is only blanks
         ( clean_blanks(Xs,[]),  % only blanks
@@ -367,8 +352,8 @@ pwhere2( S1, Ys0, S3, TabIni ) :-
         %--add final char
         %-build blank line
         build_blank_line(TabItems,Blank),
-        append(Blank,[125,10],EndLine),
-        append(Ys1,EndLine,Ys4),
+        sappend(Blank,[125,10],EndLine),
+        sappend(Ys1,EndLine,Ys4),
         %process where of taken text
         process_where(Ys4,Ys).
 
@@ -378,7 +363,7 @@ pwhereItems(S1,Xs,S3,Tab) :-
         get_ToEnter( S1, Xs1, S2 ),
         % check if it is a blank line
         (clean_blanks(Xs1,[]), % blank line
-         append(Xs1,[10|Ys],Xs),
+         sappend(Xs1,[10|Ys],Xs),
          !,pwhereItems(S2,Ys,S3,Tab)
         ;( TabT >= Tab,
            %-check to put ';' (yes if next tab=Tab)
@@ -386,14 +371,14 @@ pwhereItems(S1,Xs,S3,Tab) :-
            get_tab(S4,0,Tab2),
            (Tab2=:=Tab,
             build_blank_line(Tab,Blank),
-            append(Blank,[59,10|Ys],Blank2),
-            append([10],Blank2,EndLine),
-            append(Xs1,EndLine,Xs)
+            sappend(Blank,[59,10|Ys],Blank2),
+            sappend([10],Blank2,EndLine),
+            sappend(Xs1,EndLine,Xs)
            ;Tab2=\=Tab,
             build_blank_line(Tab,Blank),
-            append(Blank,[10|Ys],Blank2),
-            append([10],Blank2,EndLine),
-            append(Xs1,EndLine,Xs) ),
+            sappend(Blank,[10|Ys],Blank2),
+            sappend([10],Blank2,EndLine),
+            sappend(Xs1,EndLine,Xs) ),
            !,pwhereItems(S2,Ys,S3,Tab)
          ; TabT  < Tab,
            Xs=[],S3=S1   )).
@@ -474,7 +459,7 @@ pblock( Block ) -->
          ; \+(pragmaDeclarationL(_)),{Pragmas=[]} ),!,
         (  fixityDeclarationL
          ; \+(fixityDeclarationL) ),!,
-        {append(Pragmas,BlockL,Block)},
+        {sappend(Pragmas,BlockL,Block)},
         blockDeclarationL(BlockL).
 
 % Fixity Declaration ---------------------------------------------------------
@@ -486,22 +471,22 @@ fixityDeclarationL -->
         ).
 
 fixityDeclaration -->
-        ( "infixc ", {Associ=c}
-         ;"infixl ",{Associ=l}
-         ;"infixr ",{Associ=r} ),
+        ( `infixc `, {Associ=c}
+         ;`infixl `,{Associ=l}
+         ;`infixr `,{Associ=r} ),
         natural(Nat),{number_chars(Num,Nat)},
         infixOpL(Associ,Num),
-        "\n".
+        `\n`.
 
 infixOpL( Associ, Num ) -->
         infixOp(Associ,Num),
         (
-          ",",infixOpL(Associ,Num)
-         ;\+(",")
+          `,`,infixOpL(Associ,Num)
+         ;\+(`,`)
         ).
 
 infixOp(Associ,Num) -->
-        ( "`",id(ID),"`"
+        ( ````,id(ID),````
          ;opSim(ID) ),
         {name(F,ID)},
         {(  \+(infix(F,_,_)),!,
@@ -515,7 +500,7 @@ infixOp(Associ,Num) -->
 natural(Nat) --> 
         digit(Digit),{Nat=[Digit|Nat1]},
         (  natural(Nat1),!
-         ; " ",{Nat1=[]} ).
+         ; ` `,{Nat1=[]} ).
 digit( C ) --> [C],{ C >= 48, C =< 57 }.
 
 % Pragmas Delcaration --------------------------------------------------------
@@ -527,18 +512,18 @@ pragmaDeclarationL( [Pragma|Pragmas] ) -->
         ).
 
 pragmaDeclaration( pragma(Pragma) ) -->
-        "pragma ",
-        ( "flex ",{Pragma=flex}
-         ;"rigid ",{Pragma=rigid}
-         ;"optmatch ",{Pragma=optmatch} ),
-        "\n".
+        `pragma `,
+        ( `flex `,{Pragma=flex}
+         ;`rigid `,{Pragma=rigid}
+         ;`optmatch `,{Pragma=optmatch} ),
+        `\n`.
 
 % Block Declaration ---------------------------------------------------------
 blockDeclarationL( Result ) -->
         blockDeclaration(Block),!,
         (
            blockDeclarationL(Rest),!,
-           {append(Block,Rest,Result)}
+           {sappend(Block,Rest,Result)}
          ; {Result = Block} 
         ).
 blockDeclaration( [Data] ) --> dataDeclaration( Data ).
@@ -546,7 +531,7 @@ blockDeclaration( DeclFunction ) --> functionDeclaration( DeclFunction ).
 
 % types ---------------------------------------------------------------------
 dataDeclaration(data(Type,Constructors)) --> 
-        "data ", typeDeclaration(Type,Constructors), "\n".
+        `data `, typeDeclaration(Type,Constructors), `\n`.
 
 typeDeclaration(type(TypeName,N,TypeVars),Consts) --> 
         {cleanVars}, 
@@ -556,7 +541,7 @@ typeDeclaration(type(TypeName,N,TypeVars),Consts) -->
            format('Sorry, ~a type just exists',[TypeName]) },
         (  typeVarIDL(TypeVars), !, {length(TypeVars,N)}
          ; {N=0,TypeVars=[]} ),
-        (  "=",!
+        (  `=`,!
          ; {write('Expected ='),nl,!} ),
         {assert(type(TypeName,N))},
         (  constrDeclarationL(Consts),!
@@ -573,8 +558,8 @@ typeVarID( elem(typevar(N)) ) --> variableID(N).
 
 constrDeclarationL([Type|Types]) -->
         constrDeclaration(Type), 
-        (  "|", constrDeclarationL(Types) 
-         ; \+("|"),{Types=[]} ).
+        (  `|`, constrDeclarationL(Types) 
+         ; \+(`|`),{Types=[]} ).
 
 constrDeclaration( const(ConstrID,N,TypeExprs) ) --> 
         dataConstrID( ConstrID ), 
@@ -588,12 +573,12 @@ dataConstrID( TypeName ) --> id(ID), {sicstus_atom_chars(TypeName,ID)},
 
 typeExpr( TypeExpr ) --> 
         basictypeExpr(Type1),
-        ( "->", !,typeExpr(Type2), 
+        ( `->`, !,typeExpr(Type2), 
           {TypeExpr=curried(Type1,Type2)}
          ;{TypeExpr=Type1} ).
 
 basictypeExpr( elem(type('List',1,[elem(type('Char',0,[]))])) ) --> 
-        "String ",!.
+        `String `,!.
 
 basictypeExpr( TypeExpr ) --> 
         id(ID), {sicstus_atom_chars(Type,ID), type(Type,N)},!,
@@ -602,17 +587,17 @@ basictypeExpr( TypeExpr ) -->
          ;{N>0},!, % Type with N-arity
           typeExprL(Vars), {length(Vars,N)},
           {TypeExpr=elem(type(Type,N,Vars))}  ).
-basictypeExpr( elem(type('Tuples',0,[])) ) --> "()".
+basictypeExpr( elem(type('Tuples',0,[])) ) --> `()`.
 basictypeExpr( Type ) --> 
-        "(",!, 
+        `(`,!, 
         typeExpr( Type1 ),
-        ( ",",!,   %--Tuple expression
-          typeExprs(TypeExprs),")",
+        ( `,`,!,   %--Tuple expression
+          typeExprs(TypeExprs),`)`,
           {length([Type1|TypeExprs],N)},
           {Type=elem(type('Tuples',N,[Type1|TypeExprs]))}
-         ;")",!,   %--Parenthesized type expression 
+         ;`)`,!,   %--Parenthesized type expression 
           ( {Type1=elem(_), !, Type=Type1} ; {Type=elem(Type1)} ) ).
-basictypeExpr( elem(type('List',1,[TypeExpr])) ) --> "[",!,typeExpr(TypeExpr),"]".
+basictypeExpr( elem(type('List',1,[TypeExpr])) ) --> `[`,!,typeExpr(TypeExpr),`]`.
 basictypeExpr( elem(typevar(N)) ) --> variableAnt(N),!.
 basictypeExpr( elem(typevar(N)) ) --> {ini},variableID(N),!.
 
@@ -631,33 +616,33 @@ typeExprL( [TypeExpr|TypeExprs] ) -->
 
 typeExprs( [TypeExpr|TypeExprs] ) -->
         typeExpr(TypeExpr),
-        (  ",",typeExprs(TypeExprs),!
+        (  `,`,typeExprs(TypeExprs),!
          ; {TypeExprs=[]} ).
 
 % Functions -------------------------------------------------------------------
 functionDeclaration(Decl) -->
          evalAnn(Decl),!
        ; functionType(Decl),!
-       ; {cleanVars},equation(Dect,R),!,{append(Dect,R,Decl),clean_nomfun},"\n".
+       ; {cleanVars},equation(Dect,R),!,{sappend(Dect,R,Decl),clean_nomfun},`\n`.
 
 % --- Function Evaluation Annotation
 evalAnn([annotation(F,Type)]) --> 
         (  functionName(F)
-         ; "(",functionOp(F),")"
-         ; "`",functionOp(F),"`" ), 
-        "eval ",
-        (  "flex ", {Type = flex},!
-         ; "rigid ", {Type = rigid},!
+         ; `(`,functionOp(F),`)`
+         ; ````,functionOp(F),```` ), 
+        `eval `,
+        (  `flex `, {Type = flex},!
+         ; `rigid `, {Type = rigid},!
          ; {write('Evaluation annotation can only be flex or rigid'),
             nl,fail} ),
-        "\n".
+        `\n`.
 
 % --- Function Type Declaration
 functionType([function(F,N,TypeFunction)]) --> 
         (  functionName(F)
-         ; "(",functionOp(F),")"
-        ; "`",functionOp(F),"`" ), 
-        "::",!, 
+         ; `(`,functionOp(F),`)`
+        ; ````,functionOp(F),```` ), 
+        `::`,!, 
         {assert(ini)},
         ( typeExpr(TypeFunction), {retract(ini)}
          ;{retract(ini)} ),
@@ -665,7 +650,7 @@ functionType([function(F,N,TypeFunction)]) -->
         {( \+(function(F,N)),
            assert(function(F,N))
           ;function(F,N) )},
-        "\n".
+        `\n`.
 
 findArity( curried(_,E), N, N2 ) :-
         N1 is N + 1,
@@ -678,7 +663,7 @@ equation([ rule( f(F,N,P), Exp )], Nrule ) -->
         %{cleanVars}, 
 
         (
-           "data ",!,{fail} % control no data decl get as function
+           `data `,!,{fail} % control no data decl get as function
          ; functionName(F), pattern(P), !,{length(P,N), Infix=no} 
          ; functionName(F), \+(functionOp(_)), {N=0, P=[], Infix=no}
          ; constrTerm(Term1),functionOp(F),constrTerm(Term2),!,
@@ -687,7 +672,7 @@ equation([ rule( f(F,N,P), Exp )], Nrule ) -->
 
         ( {\+(builtin(F))}
          ;{builtin(F), 
-          format("Parsing error, function ~a cannot be redefined\n",[F]),fail}),
+          format(`Parsing error, function ~a cannot be redefined\n`,[F]),fail}),
 
         {( \+(function(F,N)),
            ( assert(function(F,N)) ; retract(function(F,N)) )
@@ -701,30 +686,30 @@ equation([ rule( f(F,N,P), Exp )], Nrule ) -->
         !, % ensure no backtracking
 
         (  %Right Expression
-           "=", expr(Expi)
+           `=`, expr(Expi)
          ; %Conditional Expression
            constExpr(Exps),
            {Expi=multiple(Exps)}
          ; %Error 
            getchars(Text),
-           {format("Syntactic error, incorrect expression <~a> found\n",[Text]),
+           {format(`Syntactic error, incorrect expression <~a> found\n`,[Text]),
             retract(function(F,N)),fail} ),
         !,awhereL(F,N,P,Expi,Exp,Nrule).
-           % "\n".
+           % `\n`.
 
 functionDeclaration2(Decl) -->
           evalAnn(Decl),!
         ; functionType(Decl),!
         ; equation(Dect,R),!,{[C|_]=Dect,rule(f(F,N,_),_)=C},
           % functions with arity 0 aren't allowed inside where
-          (({N>0,!,append(Dect,R,Decl)});
+          (({N>0,!,sappend(Dect,R,Decl)});
            {retract(function(F,_)),fail}).
 
 %awhereL(F,N,P,Eent,Esa,Rest) --> 
-%        (("where ",!,"{",awhereN(F,N,P,Eent,Esa,Rest));
+%        ((`where `,!,`{`,awhereN(F,N,P,Eent,Esa,Rest));
 %        ({Rest=[],Esa=Eent})).
 awhereL(F,N,P,Eent,Esa,Rest) --> 
-   (("where ",!,"{",awhereN(F,N,P,Eent,Esa,RestAux),
+   ((`where `,!,`{`,awhereN(F,N,P,Eent,Esa,RestAux),
   {write('RestAux:'),write(RestAux),nl},
  {treatAllL(RestAux,Rest)},
   {write('Rest:'),write(Rest),nl}
@@ -732,12 +717,12 @@ awhereL(F,N,P,Eent,Esa,Rest) -->
    ({Rest=[],Esa=Eent})).
 
 awhereN(F,N,P,Eent,Esa,Rest) -->  awhere(F,N,P,Eent,Esa1,Rest1),
-             ((";",!, awhereN(F,N,P,Esa1,Esa,Rest2),{append(Rest1,Rest2,Rest)});
-	     ("}",{Rest=Rest1,Esa=Esa1})).
+             ((`;`,!, awhereN(F,N,P,Esa1,Esa,Rest2),{sappend(Rest1,Rest2,Rest)});
+	     (`}`,{Rest=Rest1,Esa=Esa1})).
 
 
 awhere(F,N,P,Eent,Esa,Rest) -->
-               ((variableIDL(_),"free ",!,{treatE3(Eent,Esa), Rest=[]}); 
+               ((variableIDL(_),`free `,!,{treatE3(Eent,Esa), Rest=[]}); 
                ({lastvar(Nv)},
                 ((functionDeclaration2(R),
                  {treat4(R,Nv,Ls),remove_duplicates(Ls,Ln),app_par(R,Ro,Ln),
@@ -745,9 +730,9 @@ awhere(F,N,P,Eent,Esa,Rest) -->
                  Rest=Ro});
                 %function declaration fails, remove the asserted variables
                 ({lastvar(Nd),removeVars2(Nv,Nd),fail}))); 
-               (pattern(R), "=",expr(D),!, {
+               (pattern(R), `=`,expr(D),!, {
                 make_proj(R,R,Rest0),treatE7(Eent,Esa0,D)},
-                awhereL(F,N,P,Esa0,Esa,Rest1),{append(Rest0,Rest1,Rest)})).
+                awhereL(F,N,P,Esa0,Esa,Rest1),{sappend(Rest0,Rest1,Rest)})).
 
 % changes the name, arity and parametres of local functions (Definition). 
 app_par([D|A], [F|A], Ln) :- reverse(Ln,Lrn),app_par2(D,F,Lrn).
@@ -763,12 +748,12 @@ treat5( f(F,N,P), f(Fn,Nn,Pn), Lp) :- treat25(N,P,Nn,Pn,Lp),(
 % increments the arity with no local variables, and put them in the parameters
 treat25(N,P,N,P,[]).  
 treat25(N,P,Nn,Pn,[E|Er]) :- treat25(N,P,Na,Pa,Er),
-                             Nn is Na+1,append(Pa,[E],Pn).
+                             Nn is Na+1,sappend(Pa,[E],Pn).
 
 new_namefun(F,Fn) :-     retract(nomfun([(H1,W1,W2)|J])),
     	 		 H is H1 +1,name(H,Hi),
-                         append([64|"fun"],Hi,Fn1),name(Fn,Fn1),
-                         append([(H,Fn,F)],[(H1,W1,W2)|J],T),
+                         sappend([64|`fun`],Hi,Fn1),name(Fn,Fn1),
+                         sappend([(H,Fn,F)],[(H1,W1,W2)|J],T),
 			 assert(nomfun(T)).
 
 % controls no incorrect forward node could be returned, 
@@ -790,7 +775,7 @@ treatEL3( [X|Xs], [Y|Ys] ) :-
 
 %introduces in a list the variables that  aren't parametres.   
 treat4( [], _, []).
-treat4( [X|Xs], N,L ) :- treat24(X,N,Le),treat4(Xs,N,Ls),append(Le,Ls,L).
+treat4( [X|Xs], N,L ) :- treat24(X,N,Le),treat4(Xs,N,Ls),sappend(Le,Ls,L).
 
 treat24( rule(_,R), N,Ls ) :- !,
         treatE4(R,N,Ls).
@@ -809,12 +794,12 @@ treatE4( _, _, [] ).
 treatEL4( [], _,[] ).
 treatEL4( [X|Xs],N,L ) :-
         treatE4(X,N,D),
-        treatEL4(Xs,N,Ls),(append(Ls,D,L),!);true.
+        treatEL4(Xs,N,Ls),(sappend(Ls,D,L),!);true.
 
 % Changes the name, arity and parametres of the local functions 
 treatE6( forward(F,_,Exprs), forward(Fn,N,Exprsl), L ) :-
         function(F,N),nomfun(J),\+(member((_,F,_),J)),!,
-        treatEL6(Exprs,Exprsi, L), append(Exprsi,L,Exprsl),
+        treatEL6(Exprs,Exprsi, L), sappend(Exprsi,L,Exprsl),
         member((_,Fn,F),J).
 treatE6( forward(F,N,Exp), forward(F,N,Expn) ,_) :-
         \+(function(F,_)),!,
@@ -822,7 +807,7 @@ treatE6( forward(F,N,Exp), forward(F,N,Expn) ,_) :-
 treatE6( c(C,N,Args), c(C,N,ArgsX), L ) :- !,treatEL6(Args,ArgsX,L).
 treatE6( f(F,_,Exprs), f(Fn,N,Exprsl), L ) :-
         function(F,N),nomfun(J),member((_,Fn,F),J),!,
-        treatEL6(Exprs,Exprsi, L), append(Exprsi,L,Exprsl).
+        treatEL6(Exprs,Exprsi, L), sappend(Exprsi,L,Exprsl).
 treatE6( f(F,N,Args), f(F,N,ArgsX), L ) :- !,treatEL6(Args,ArgsX,L).
 treatE6( multiple(Cts), multiple(CtsX), L ) :- !,treatEL6(Cts,CtsX,L).
 treatE6( X, X, _ ).
@@ -866,16 +851,16 @@ clean_nomfun2([(_,_,F)|R]):- ((retract(function(F,_)),!);true),
 make_proj(_,[],[]):-!.
 make_proj(R,[v(Nv)|L],Rs):-!,make_proj(R,L,R1),var_seen(Vv,Nv),
                     new_namefun(Vv,Fn),J=rule(f(Fn,1,R),v(Nv)),
-                    assert(function(Fn,1)),append(R1,[J],Rs).
+                    assert(function(Fn,1)),sappend(R1,[J],Rs).
 
 make_proj(R,[c(_,N,L1)|L2],Rs):-  (N=0,!,make_proj(R,L2,Rs));
                                  (make_proj(R,L1,R1),make_proj(R,L2,R2),
-                                 append(R1,R2,Rs)).
+                                 sappend(R1,R2,Rs)).
 %%--End of where managing
 
 functionName(F) --> id(C), { name(F,C), \+(constructor(F,_)) }.
 functionOp(F) --> opSim(C), {name(F,C)}.
-functionOp(F) --> "`", id(C), "`", {name(F,C)}.
+functionOp(F) --> ````, id(C), ````, {name(F,C)}.
 
 pattern([C|Cs]) -->
         constrTerm(C),
@@ -884,7 +869,7 @@ pattern([C|Cs]) -->
 
 % Parse a correct left hand side term
 % (only constructors and non repeated variables)
-constrTerm( Expr ) --> "'",!,char(Expr),"'".
+constrTerm( Expr ) --> `'`,!,char(Expr),`'`.
 constrTerm( Expr ) --> string(Expr),!.
 constrTerm( c(Num,0,[]) ) --> number(Num),!.
 
@@ -892,40 +877,40 @@ constrTerm( v(Var) ) --> variableID(Var).
 constrTerm( v(Var) ) --> variableVoid(Var).
 constrTerm( v(Var) ) --> variableAnt(Var),
         {var_seen(F,Var),
-         format("Syntactic error, no left linear, repeated variable ~a\n",[F]),
+         format(`Syntactic error, no left linear, repeated variable ~a\n`,[F]),
          fail}.
 
-constrTerm( c('Tuple0',0,[]) ) --> "()",!.
+constrTerm( c('Tuple0',0,[]) ) --> `()`,!.
 constrTerm( Expr ) --> % possibilities: tuple of cTerms of cTerm inside ()
-        "(",constrTermNested1(Expr1),!,
-        (",",!,
+        `(`,constrTermNested1(Expr1),!,
+        (`,`,!,
          constrTermS( Exprs ),
          {length([Expr1|Exprs],N)},
          {arity2tuple(N,TupleName)},
          {Expr=c(TupleName,N,[Expr1|Exprs])}
         ;{Expr=Expr1} ),
-        ")".
+        `)`.
 
 constrTerm( c(F,N,[]) ) --> constructorID(F,N),!.
 constrTermNested2( c(F,N,Terms) ) --> 
         constructorID(F,NF),{NF>0},!, constrTermL( Terms ),
         {length(Terms,N),N=<NF}.
 
-constrTerm( c('Nil',0,[]) ) --> "[]",!.
+constrTerm( c('Nil',0,[]) ) --> `[]`,!.
 constrTermNested1( Expr ) -->
         constrTermNested2(Expr1),!,
-        (":",!,
+        (`:`,!,
          constrTermCons( Exprs ),
          {Expr=c('Cons',2,[Expr1,Exprs])}
         ;{Expr=Expr1} ).
 constrTerm( Expr ) --> 
-        "[",
+        `[`,
         constrTerm_list(Expr), 
-        "]",!.
+        `]`,!.
 
 constrTerm_list( c('Cons',2,[Term,List]) ) --> % list of constTerms separated by ',' but inside []
         constrTerm(Term),
-        (  ",",!,constrTerm_list(List)
+        (  `,`,!,constrTerm_list(List)
          ; {List = c('Nil',0,[])} ).
 
 constrTermL( [Exp|Exps] ) --> % list of constrTerms separated by ' '
@@ -935,12 +920,12 @@ constrTermL( [Exp|Exps] ) --> % list of constrTerms separated by ' '
 
 constrTermS( [Exp|Exps] ) --> % list of constTerms separated by ','
         constrTerm( Exp ), 
-        (  ",",constrTermS( Exps ),!
+        (  `,`,constrTermS( Exps ),!
          ; {Exps=[]} ).
 
 constrTermCons( Expr ) -->  % list of constTerms separated by ':'
         constrTerm( Exp ), 
-        (  ":",constrTermCons( Exps ),!,
+        (  `:`,constrTermCons( Exps ),!,
            {Expr=c('Cons',2,[Exp,Exps])}
          ; {Expr=Exp} ).
 
@@ -950,7 +935,7 @@ constrTermNested2(Expr) --> constrTerm(Expr).
 
 % Conditional rule (constrained expression)--------------------------
 constExpr( [Exp|Exps] ) -->
-         "|", expr(ExpCond), "=", expr( ExpR ),
+         `|`, expr(ExpCond), `=`, expr( ExpR ),
          {Exp=f('\\=>',2,[ExpCond,ExpR])},!,
          ( constExpr(Exps),!
           ;{Exps=[]} ).
@@ -968,9 +953,9 @@ constExpr( [Exp|Exps] ) -->
 
 % --- conditional expression (syntactic sugar)
 expr( Expr ) --> 
-        "if ", !,expr(ExpBool),
-        "then ", expr(ExpT),
-        "else ", expr(ExpF),
+        `if `, !,expr(ExpBool),
+        `then `, expr(ExpT),
+        `else `, expr(ExpF),
         {Expr=f('IfThenElse',3,[ExpBool,ExpT,ExpF])}.
 
 % --- a extended expression OR 
@@ -989,9 +974,9 @@ expr( Expr, S1, S3 ) :-   % no DCG form (more efficient)
      
 % Get associative for operator
 functionInfixID( F, Prec, Asso ) --> 
-        ("`";[26,96]),
+        (````;[26,96]),
         id(ID),
-        ("`";[26,96]),!,
+        (````;[26,96]),!,
         {sicstus_atom_chars(F,ID), infix(F,Prec,Asso)}.
 functionInfixID( F, Prec, Asso ) --> opSim(ID),!,
         {sicstus_atom_chars(F,ID), infix(F,Prec,Asso)}.
@@ -1002,7 +987,7 @@ exprInfixL( Resul ) -->
         (
            functionInfixID(F,Prec,Asso),!,
            {Resul=[Expr1,op(F,Prec,Asso)|ExprL]} 
-        ; ":",!,
+        ; `:`,!,
            {infix(':',Prec,Asso)},
            {Resul=[Expr1,op(':',Prec,Asso)|ExprL]} % Same precedence as ++
         ),
@@ -1074,7 +1059,7 @@ memberExpr( [Expr1,Op1,Expr2,Op2|ExprS], [Expr1,Op1|ExprS1], Op, ExprS2 ) :-
 % --- Negative expressions 
 % Sections (-x) are avoided. However, sections (x-) not.
 eexpr( f('-',2,[c(0,0,[]),Expr]) ) -->
-       "-",eexpr(Expr),!. 
+       `-`,eexpr(Expr),!. 
 
 % --- constructors N-arity (N>0)
 eexpr( c(F,N,Terms) ) --> 
@@ -1095,22 +1080,22 @@ eexpr( forward(F,N,Terms) ) --> {\+(ini)},   % function not passed yet
         {length(Terms,N)}.
 
 % --- Special Case for sections (operator with only 2nd arg)
-%     translated to "\x -> x op e"
+%     translated to `\x -> x op e`
 eexpr( Expr ) -->
       functionInfixID(F,_,_), expr(Expr2),!,
       {inc_var(NVar)},
       {Expr=f('\\',3,[ c('\\Vars',1,[v(NVar)]), f(F,2,[v(NVar),Expr2]) ])}.
 
 % --- Lambda Abstraction
-%     Standard form "\ x,y,z -> expr"
+%     Standard form `\ x,y,z -> expr`
 %     Arguments to lambda function are added at list.
 %     Number of expected arguments are increases by two to include
 %          pattern expression and expression
 eexpr( f('\\',N,[Vars,Expr]) ) -->
-       "\\",!,             % we are in a lambda abstraction
+       `\\`,!,             % we are in a lambda abstraction
        {lastvar(LVar1)},   % first know the current last variable 
        pattern(Pattern),   % get pattern 
-       "->",               % check literal
+       `->`,               % check literal
        expr(Expr),         % get result expression
        !,
        % now we have to remove all new variables created in pattern
@@ -1127,7 +1112,7 @@ eexpr( Expr, S1, S3 ) :-   % no DCG form (more efficient)
       ;Expr1=f(_,_,_)  % a expression that will become a function
       ),
       exprL(Terms,S2,S3),!,
-      append([Expr1],Terms,Args), length(Args,N),
+      sappend([Expr1],Terms,Args), length(Args,N),
       Expr = f('\\@',N,Args)
      ;%--simple basic expression
       Expr=Expr1, S3=S2
@@ -1165,7 +1150,7 @@ bexpr( v(Var) ) --> {ini}, variableID(Var). % new free variable (-underscore)
 bexpr( v(Var) ) --> variableVoid(Var).      % void free variable
 
 % - character
-bexpr( Exp ) --> "'",char(Exp),"'",!.
+bexpr( Exp ) --> `'`,char(Exp),`'`,!.
 
 % - string
 bexpr( ExpStr ) --> string(ExpStr),!.
@@ -1175,35 +1160,35 @@ bexpr( c(Num,0,[]) ) --> number(Num),!.
 
 % - lists
 bexpr( c('Nil',0,[]) ) --> 
-        "[]",!.
+        `[]`,!.
 bexpr( Expr ) --> 
-        "[",!, expr_list(Expr), "]".
+        `[`,!, expr_list(Expr), `]`.
 
 expr_list( c('Cons',2,[Term,List]) ) --> 
         expr(Term),
-        ( ",",!, expr_list(List)
+        ( `,`,!, expr_list(List)
          ;{List = c('Nil',0,[])} ),!.
 
 % - empty tuple
-bexpr( c('Tuple0',0,[]) ) --> "()",!.
+bexpr( c('Tuple0',0,[]) ) --> `()`,!.
 
 % - operator without args
 % should be together with TUPLES and parenthesized exp
 % to join cases in the same functor
 bexpr( f(F,2,[]) ) -->
-        "(",functionInfixID(F,_,_),")",!,
+        `(`,functionInfixID(F,_,_),`)`,!,
         {function(F,2)}.
 
 bexpr( forward(F,2,[]) ) -->
-        "(",functionInfixID(F,_,_),")",!,
+        `(`,functionInfixID(F,_,_),`)`,!,
         {\+(function(F,2))}.
 
 % - tuples OR expression into parenthesis
 bexpr( Expr ) --> 
-     "(",
+     `(`,
      expr( Expr1 ),
      (  %--tuples (first exp parsed)
-        ",",!,                    
+        `,`,!,                    
         expr_tuples( Exprs ),
         {length([Expr1|Exprs],N)},
         {arity2tuple(N,TupleName)},
@@ -1211,11 +1196,11 @@ bexpr( Expr ) -->
       ; %--expr between parenthesis
         {Expr=Expr1}               
      ),
-     ")",!.
+     `)`,!.
 
 expr_tuples( [Exp|Exps] ) -->
      expr( Exp ),
-     ( ",",!,expr_tuples(Exps)
+     ( `,`,!,expr_tuples(Exps)
       ;{Exps=[]} ).
 
 % - constructor 0-arity
@@ -1251,7 +1236,7 @@ variableID( N ) --> id(ID),
 
 % new free variable with underscore
 variableNew( N ) --> 
-        "_",id(IDx),{ID=[95|IDx],
+        `_`,id(IDx),{ID=[95|IDx],
         sicstus_atom_chars(F,ID), \+(var_seen(F,_)), 
         var_int(F,N),
          ( \+(constructor(F,_)),
@@ -1262,13 +1247,13 @@ variableNew( N ) -->
 
 % previous seen variable
 variableAnt( N ) --> 
-        ( "_",id(IDx),{ID=[95|IDx]}
+        ( `_`,id(IDx),{ID=[95|IDx]}
          ;id(ID) ),
         { sicstus_atom_chars(F,ID), var_seen(F,N) }.
 
 % void variable (only underscore)
 variableVoid( N ) --> 
-        "_ ",
+        `_ `,
         {inc_var(N),
          ( assert(var_seen('_',N)) 
           ;del_var(N) )}.
@@ -1276,7 +1261,7 @@ variableVoid( N ) -->
 % list of variables
 variableIDL( [N|Vars] ) -->
         variableID(N),
-        (  ",",!,variableIDL(Vars)
+        (  `,`,!,variableIDL(Vars)
          ; {Vars=[]} ).
 
 functionID( F, N ) --> id(ID), {sicstus_atom_chars(F,ID), function(F,N)}.
@@ -1287,85 +1272,85 @@ number( Num ) -->
         {number_chars(Num,SNum)}.
 
 numberS( [C|Cs] ) --> [C], 
-        { C >= "0", C =< "9" }, 
+        { C >= `0`, C =< `9` }, 
         numberS( Cs ).
-numberS( [] ) --> " ".
+numberS( [] ) --> ` `.
 
 id([C|Cs]) --> [C],
-        { C >= "A", C =< "Z"
-         ;C >= "a", C =< "z" },!,
+        { C >= `A`, C =< `Z`
+         ;C >= `a`, C =< `z` },!,
         restoid(Cs),!,
-        ( {[C|Cs]=="data",!,fail} %this is not a valid id
-         ;{[C|Cs]=="eval",!,fail} %this is not a valid id
-         ;{[C|Cs]=="flex",!,fail} %this is not a valid id
-         ;{[C|Cs]=="rigid",!,fail} %this is not a valid id
-         ;{[C|Cs]=="choice",!,fail} %this is not a valid id
-         ;{[C|Cs]=="let",!,fail} %this is not a valid id
-         ;{[C|Cs]=="in",!,fail} %this is not a valid id
-         ;{[C|Cs]=="if",!,fail} %this is not a valid id
-         ;{[C|Cs]=="then",!,fail} %this is not a valid id
-         ;{[C|Cs]=="else",!,fail} %this is not a valid id
-         ;{[C|Cs]=="where",!,fail} %this is not a valid id
-         ;{[C|Cs]=="free",!,fail} %this is not a valid id
-         ;{[C|Cs]=="infix",!,fail} %this is not a valid id
-         ;{[C|Cs]=="infixl",!,fail} %this is not a valid id
-         ;{[C|Cs]=="infixr",!,fail} %this is not a valid id
-         ;{[C|Cs]=="pragma",!,fail} %this is not a valid id
-         ;{[C|Cs]=="optmatch",!,fail} %this is not a valid id
+        ( {[C|Cs]==`data`,!,fail} %this is not a valid id
+         ;{[C|Cs]==`eval`,!,fail} %this is not a valid id
+         ;{[C|Cs]==`flex`,!,fail} %this is not a valid id
+         ;{[C|Cs]==`rigid`,!,fail} %this is not a valid id
+         ;{[C|Cs]==`choice`,!,fail} %this is not a valid id
+         ;{[C|Cs]==`let`,!,fail} %this is not a valid id
+         ;{[C|Cs]==`in`,!,fail} %this is not a valid id
+         ;{[C|Cs]==`if`,!,fail} %this is not a valid id
+         ;{[C|Cs]==`then`,!,fail} %this is not a valid id
+         ;{[C|Cs]==`else`,!,fail} %this is not a valid id
+         ;{[C|Cs]==`where`,!,fail} %this is not a valid id
+         ;{[C|Cs]==`free`,!,fail} %this is not a valid id
+         ;{[C|Cs]==`infix`,!,fail} %this is not a valid id
+         ;{[C|Cs]==`infixl`,!,fail} %this is not a valid id
+         ;{[C|Cs]==`infixr`,!,fail} %this is not a valid id
+         ;{[C|Cs]==`pragma`,!,fail} %this is not a valid id
+         ;{[C|Cs]==`optmatch`,!,fail} %this is not a valid id
          ;{true} ).
 
 restoid([C|Cs]) --> [C],
-        { C >= "0", C =< "9"
-         ;C >= "A", C =< "Z"
-         ;C >= "a", C =< "z"
-         ;[C] == "_" },!,
+        { C >= `0`, C =< `9`
+         ;C >= `A`, C =< `Z`
+         ;C >= `a`, C =< `z`
+         ;[C] == `_` },!,
         restoid(Cs).
-restoid([]) --> " ".
+restoid([]) --> ` `.
 
 opSim( Cs ) --> opSim2(Cs1),
-        {( Cs1 = "=>",!, Cs = ">="
-          ;Cs1 = "<=",!, Cs = "=<"
-          ;Cs1 = "=",!,fail %this is not a valid op
-          ;Cs1 = "|",!,fail %this is not a valid op
+        {( Cs1 = `=>`,!, Cs = `>=`
+          ;Cs1 = `<=`,!, Cs = `=<`
+          ;Cs1 = `=`,!,fail %this is not a valid op
+          ;Cs1 = `|`,!,fail %this is not a valid op
           ;Cs = Cs1 )}.
 
 opSim2([C|Cs]) --> sym([C]), opSim2(Cs).
 opSim2([C]) --> sym([C]).
 
-sym("~") --> "~".
-sym("!") --> "!".
-sym("@") --> "@".
-sym("#") --> "#".
-sym("$") --> "$".
-sym("%") --> "%".
-sym("^") --> "^".
-sym("&") --> "&".
-sym("*") --> "*".
-sym("+") --> "+".
-sym("-") --> "-".
-sym("=") --> "=".
-sym("<") --> "<".
-sym(">") --> ">".
-sym("?") --> "?".
-sym(".") --> ".".
-sym("/") --> "/".
-sym("|") --> "|".
-sym(":") --> ":".
+sym(`~`) --> `~`.
+sym(`!`) --> `!`.
+sym(`@`) --> `@`.
+sym(`#`) --> `#`.
+sym(`$`) --> `$`.
+sym(`%`) --> `%`.
+sym(`^`) --> `^`.
+sym(`&`) --> `&`.
+sym(`*`) --> `*`.
+sym(`+`) --> `+`.
+sym(`-`) --> `-`.
+sym(`=`) --> `=`.
+sym(`<`) --> `<`.
+sym(`>`) --> `>`.
+sym(`?`) --> `?`.
+sym(`.`) --> `.`.
+sym(`/`) --> `/`.
+sym(`|`) --> `|`.
+sym(`:`) --> `:`.
 
 string( Expr ) --> [34],stringS(Expr).
 stringS( c('Nil',0,[]) ) --> [34],!.
 stringS( c('Cons',2,[Ch,Expr]) ) --> % List of chars
         char(Ch),stringS(Expr).
 
-char( c([7],0,[]) )   --> "\\a".
-char( c([8],0,[]) )   --> "\\b".
-char( c([9],0,[]) )   --> "\\t".
-char( c([10],0,[]) )  --> "\\n".
-char( c([11],0,[]) )  --> "\\v".
-char( c([12],0,[]) )  --> "\\f".
-char( c([13],0,[]) )  --> "\\r".
-char( c([27],0,[]) )  --> "\\e".
-char( c([127],0,[]) ) --> "\\d".
+char( c([7],0,[]) )   --> `\\a`.
+char( c([8],0,[]) )   --> `\\b`.
+char( c([9],0,[]) )   --> `\\t`.
+char( c([10],0,[]) )  --> `\\n`.
+char( c([11],0,[]) )  --> `\\v`.
+char( c([12],0,[]) )  --> `\\f`.
+char( c([13],0,[]) )  --> `\\r`.
+char( c([27],0,[]) )  --> `\\e`.
+char( c([127],0,[]) ) --> `\\d`.
 char( c([C],0,[]) )   --> [C].
 
 /* ------------------------------------

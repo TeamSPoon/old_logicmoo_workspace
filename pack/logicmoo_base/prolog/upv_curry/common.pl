@@ -1,17 +1,5 @@
-% =========================================================================
-%  Add this directory and the pack files (also Logicmoo Library Utils)
-% =========================================================================
-:- dynamic   user:file_search_path/2.
-:- multifile user:file_search_path/2.
-:- prolog_load_context(directory,Dir), DirFor = upv_curry,
-   absolute_file_name('../../..',Y,[relative_to(Dir),file_type(directory)]),
-   (user:file_search_path(DirFor,Dir);asserta(user:file_search_path(DirFor,Dir))) ->
-   (user:file_search_path(pack,Y);asserta(user:file_search_path(pack,Y))) -> attach_packs.
-:- initialization(attach_packs).
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
-% =========================================================================
-:- expects_dialect(sicstus).
 :- set_prolog_flag(double_quotes, codes).
+:- expects_dialect(sicstus).
 
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -19,7 +7,7 @@
           Curry's Kernel - Needed narrowing and Residuation.    
   ----------------------------------------------------------------------
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-:- dynamic debugmode/0, solution/0, time/1,
+:- thread_local debugmode/0, solution/0, time/1,
    maxVar/1. % Stores the last variable identifier for current
              % expression in evaluation process
 
@@ -32,7 +20,7 @@ susts( v(N),      Term,      [s(N,Term)] ). % this isn't unification,
 susts_terms( [], [], S, S ).
 susts_terms( [Term1|Tx1], [Term2|Tx2], S1, S3 ) :-
         susts( Term1, Term2, Susts ),
-        append( S1, Susts, S2),
+        sappend( S1, Susts, S2),
         susts_terms( Tx1, Tx2, S2, S3 ).
 
 % apply substitution-------------------------------------------------
@@ -132,11 +120,11 @@ renameL( [Term1|Terms1], Inc, [Term2|Terms2] ) :-
 tuple2arity(Name,Arity) :-
         atom(Name),
         name(Name,Chars),
-        append("Tuple",ArityChars,Chars),
+        sappend(`Tuple`,ArityChars,Chars),
         number_chars(Arity,ArityChars).
    
 arity2tuple(Arity,Name) :-
         number_codes(Arity,ArityChars),
-        append("Tuple",ArityChars,Chars),
+        sappend(`Tuple`,ArityChars,Chars),
         sicstus_atom_chars(Name,Chars).
 

@@ -1,5 +1,7 @@
-:- expects_dialect(sicstus).
+:- set_prolog_flag(double_quotes, codes).
+:- style_check(-discontiguous).
 :- discontiguous buildRules/4.
+:- expects_dialect(sicstus).
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   -----------------------------------------------------------------------
                   Check Type  - Milner / Mycroft algorithm
@@ -85,7 +87,7 @@ checkType2( [rule(L,R)|Xs], Zs ) :-
         clean_forward(R,R1),
         (checkRule(L,R1,Rules)
         ;write('Type Error processing '),write2(trule(L,R)),nl,fail),
-        append(Rules,Ys,Zs),
+        sappend(Rules,Ys,Zs),
         !,checkType2(Xs,Ys).
 
 % -- Data Types Control -------------------------------------------
@@ -516,7 +518,7 @@ unifyEType( Type, typevar(N), [s(N,Type)] ) :-
 
 unifyTypeL( [], [], Susts, Susts ).
 unifyTypeL( [X1|Xs1], [X2|Xs2], Susts1, Susts3 ) :-
-        unifyType(X1,X2,Susts), append(Susts1,Susts,Susts2),
+        unifyType(X1,X2,Susts), sappend(Susts1,Susts,Susts2),
         unifyTypeL(Xs1,Xs2,Susts2,Susts3).
 
 % case for the args of a function is not included in this ocurrence check

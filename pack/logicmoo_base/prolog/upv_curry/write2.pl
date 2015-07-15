@@ -1,10 +1,11 @@
-:- style_check(+discontiguous).
-:- expects_dialect(sicstus).
+:- set_prolog_flag(double_quotes, codes).
+:- style_check(-discontiguous).
 :- discontiguous show/2.
 :- discontiguous write2/1.
 :- discontiguous write2/1.
 :- discontiguous write2/1.
 :- discontiguous write2/1.
+:- expects_dialect(sicstus).
 
 % ---------------------------------------------------------------------------
 % Modified Write ------------------------------------------------------------
@@ -14,31 +15,31 @@
 write2( X ) :- show( X, Str ),name(Output,Str),write(Output).
 
 % Characters 
-show( c([7],0,[]), Str ) :- !,append([39],"\\a",S1),append(S1,[39],Str).
-show( c([8],0,[]), Str ) :- !,append([39],"\\b",S1),append(S1,[39],Str).
-show( c([9],0,[]), Str ) :- !,append([39],"\\t",S1),append(S1,[39],Str).
-show( c([10],0,[]), Str ) :- !,append([39],"\\n",S1),append(S1,[39],Str).
-show( c([11],0,[]), Str ) :- !,append([39],"\\v",S1),append(S1,[39],Str).
-show( c([12],0,[]), Str ) :- !,append([39],"\\f",S1),append(S1,[39],Str).
-show( c([13],0,[]), Str ) :- !,append([39],"\\r",S1),append(S1,[39],Str).
-show( c([27],0,[]), Str ) :- !,append([39],"\\e",S1),append(S1,[39],Str).
-show( c([127],0,[]), Str ) :- !,append([39],"\\d",S1),append(S1,[39],Str).
-show( c([C],0,[]), Str ) :- !,append([39],[C],S1),append(S1,[39],Str).
+show( c([7],0,[]), Str ) :- !,sappend([39],"\\a",S1),sappend(S1,[39],Str).
+show( c([8],0,[]), Str ) :- !,sappend([39],"\\b",S1),sappend(S1,[39],Str).
+show( c([9],0,[]), Str ) :- !,sappend([39],"\\t",S1),sappend(S1,[39],Str).
+show( c([10],0,[]), Str ) :- !,sappend([39],"\\n",S1),sappend(S1,[39],Str).
+show( c([11],0,[]), Str ) :- !,sappend([39],"\\v",S1),sappend(S1,[39],Str).
+show( c([12],0,[]), Str ) :- !,sappend([39],"\\f",S1),sappend(S1,[39],Str).
+show( c([13],0,[]), Str ) :- !,sappend([39],"\\r",S1),sappend(S1,[39],Str).
+show( c([27],0,[]), Str ) :- !,sappend([39],"\\e",S1),sappend(S1,[39],Str).
+show( c([127],0,[]), Str ) :- !,sappend([39],"\\d",S1),sappend(S1,[39],Str).
+show( c([C],0,[]), Str ) :- !,sappend([39],[C],S1),sappend(S1,[39],Str).
 
 % Lists
 show( List, Str ) :- check_string(List),!,
         show_string(List,StrL),
-        append([34],StrL,S1), append(S1,[34],Str).
+        sappend([34],StrL,S1), sappend(S1,[34],Str).
 show( c('Nil',0,[]), Str ) :- !, Str="[]".
 show( c('Cons',2,[Term,List]), Str ) :-  
         checkGround(c('Cons',2,[Term,List])), !,
         show(Term,StrTerm),
         show_list(List,StrList),
-        append("[",StrTerm,S1), append(S1,StrList,S2), append(S2,"]",Str).
+        sappend("[",StrTerm,S1), sappend(S1,StrList,S2), sappend(S2,"]",Str).
 show( c('Cons',2,[Term,List]), Str ) :-  !,
         show(Term,StrTerm), show(List,StrList),
-        append("(",StrTerm,S1), append(S1,":",S2), 
-        append(S2,StrList,S3), append(S3,")",Str).
+        sappend("(",StrTerm,S1), sappend(S1,":",S2), 
+        sappend(S2,StrList,S3), sappend(S3,")",Str).
 
 check_string( c('Cons',2,[ c([_],0,[]), c('Nil',0,[]) ]) ).
 check_string( c('Cons',2,[ c([_],0,[]), Str ]) ) :- 
@@ -49,7 +50,7 @@ show_string( c('Cons',2,[ Char, List ]), Str ) :-
         show(Char,StrChar), 
         ( StrChar=[39,C,39],     Ch=[C]
          ;StrChar=[39,C1,C2,39], Ch=[C1,C2] ),
-        append(Ch,StrList,Str),
+        sappend(Ch,StrList,Str),
         !,show_string(List,StrList).
 
 checkGround( c('Nil',0,[]) ).
@@ -58,86 +59,86 @@ checkGround( c('Cons',2,[_,List]) ) :- checkGround(List).
 show_list( c('Nil',0,[]), [] ).
 show_list( c('Cons',2,[Term,List]), Str ) :- 
         show(Term,StrTerm),
-        append(",",StrTerm,S1),
-        append(S1,StrList,Str),
+        sappend(",",StrTerm,S1),
+        sappend(S1,StrList,Str),
         !,show_list(List,StrList).
 
 % Tuples
 show( c(TupleName,N,Exprs), Str ) :-
         tuple2arity(TupleName,N),!,length(Exprs,N),
         showS(Exprs,StrExprs),
-        append("(",StrExprs,S1), append(S1,")",Str).
+        sappend("(",StrExprs,S1), sappend(S1,")",Str).
 
 % Constructors
 show( c(F,0,[]), Str ) :- !, name(F,Str).
 show( c(F,_,Terms), Str ) :- 
         name(F,StrF), showL(Terms,StrTerms),
-        append("(",StrF,S1), append(S1," ",S2), 
-        append(S2,StrTerms,S3), append(S3,")",Str).
+        sappend("(",StrF,S1), sappend(S1," ",S2), 
+        sappend(S2,StrTerms,S3), sappend(S3,")",Str).
 
 % Special Functions
 show( f('\\@',_,[f(F,N,Args)|Terms]), Str ) :- !,
         show(f(F,N,Args),StrF), showL(Terms,StrTerms),
-        append(StrF," \\@ ",Str2), append(Str2,StrTerms,Str).
+        sappend(StrF," \\@ ",Str2), sappend(Str2,StrTerms,Str).
         
 
 show( f('IfThenElse',3,[EBool,ETrue,EFalse]), Str ) :- !,
         show(EBool,StrBool), show(ETrue,StrTrue), show(EFalse,StrFalse),
-        append("if ",StrBool,S1), 
-        append(S1," then ",S2), append(S2,StrTrue,S3),
-        append(S3," else ",S4), append(S4,StrFalse,Str).
+        sappend("if ",StrBool,S1), 
+        sappend(S1," then ",S2), sappend(S2,StrTrue,S3),
+        sappend(S3," else ",S4), sappend(S4,StrFalse,Str).
 
 show( f('\\',_,[c('\\Vars',_,Pattern),Expr|Exprs] ), Str ) :- !,
         showL(Pattern,StrPattern), show(Expr,StrExpr), showL(Exprs,StrExprs),
-        append("(\\ ",StrPattern,S1), append(S1," -> ",S2),
-        append(S2,StrExpr,S3), append(S3,") ",S4),
-        append(S4,StrExprs,Str).
+        sappend("(\\ ",StrPattern,S1), sappend(S1," -> ",S2),
+        sappend(S2,StrExpr,S3), sappend(S3,") ",S4),
+        sappend(S4,StrExprs,Str).
 
 show( f('\\=>',_,[Constraint,Expr]), Str ) :- !,
         show(Constraint,StrConstraint), show(Expr,StrExpr),
-        append(StrConstraint," \\=> ",S1), append(S1,StrExpr,Str).
+        sappend(StrConstraint," \\=> ",S1), sappend(S1,StrExpr,Str).
 
 % Infix Functions
 show( f(F,2,[Term1,Term2]), Str ) :- infix(F,_,_),!, 
         show(Term1,StrTerm1), show(Term2,StrTerm2), name(F,StrF),
-        append("(",StrTerm1,S1), append(S1," ",S2), 
-        append(S2,StrF,S3), append(S3," ",S4), 
-        append(S4,StrTerm2,S5), append(S5,")",Str).
+        sappend("(",StrTerm1,S1), sappend(S1," ",S2), 
+        sappend(S2,StrF,S3), sappend(S3," ",S4), 
+        sappend(S4,StrTerm2,S5), sappend(S5,")",Str).
 show( f(F,2,[Term1]), Str ) :- infix(F,_,_), !, 
         show(Term1,StrTerm1), name(F,StrF),
-        append("(",StrTerm1,S1), append(S1," ",S2), 
-        append(S2,StrF,S3), append(S3,")",Str).
+        sappend("(",StrTerm1,S1), sappend(S1," ",S2), 
+        sappend(S2,StrF,S3), sappend(S3,")",Str).
 show( f(F,2,[]), Str ) :- infix(F,_,_), !, 
         name(F,StrF),
-        append("(",StrF,S1), append(S1,")",Str).
+        sappend("(",StrF,S1), sappend(S1,")",Str).
 
 % Functions
 show( f(F,_,Terms), Str ) :- 
         showL(Terms,StrTerms), name(F,StrF),
-        append("(",StrF,S1), append(S1," ",S2),
-        append(S2,StrTerms,S3), append(S3,")",Str).
+        sappend("(",StrF,S1), sappend(S1," ",S2),
+        sappend(S2,StrTerms,S3), sappend(S3,")",Str).
 show( forward(F,_,Terms), Str ) :- 
         showL(Terms,StrTerms), name(F,StrF),
-        append("(",StrF,S1), append(S1," ",S2),
-        append(S2,StrTerms,S3), append(S3,")",Str).
+        sappend("(",StrF,S1), sappend(S1," ",S2),
+        sappend(S2,StrTerms,S3), sappend(S3,")",Str).
 
 % Variables
 show( v(N), Str ) :- var_seen(Name,N), !, name(Name,Str).
-show( v(N), Str ) :- name(N,StrN), append("var",StrN,Str).
+show( v(N), Str ) :- name(N,StrN), sappend("var",StrN,Str).
 
 % List of expressions
 showL( [], "" ).
 showL( [X], Str ) :- show(X,Str).
 showL( [X,Y|Xs], Str ) :- 
         show(X,StrX),
-        append(StrX," ",S1), append(S1,StrRest,Str),
+        sappend(StrX," ",S1), sappend(S1,StrRest,Str),
         !,showL([Y|Xs],StrRest).
 
 showS( [], "" ).
 showS( [X], Str ) :- show(X,Str).
 showS( [X,Y|Xs], Str ) :- 
         show(X,StrX),
-        append(StrX,", ",S1), append(S1,StrRest,Str),
+        sappend(StrX,", ",S1), sappend(S1,StrRest,Str),
         !,showS([Y|Xs],StrRest).
 
 % STATES ----

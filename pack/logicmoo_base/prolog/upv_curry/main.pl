@@ -24,6 +24,12 @@
 :- current_prolog_flag(double_quotes, ResetTo),asserta(current_prolog_flag_double_quotes(ResetTo)).
 :- set_prolog_flag(double_quotes, codes).
 
+is_cdl(A,A):-var(A),!.
+is_cdl(A,B):-string(A),!,show_call(string_codes(A,B)).
+is_cdl(A,A):-must(is_list(A)),!.
+
+sappend(A0,B0,C0):- must(is_cdl(A0,A)),must(is_cdl(B0,B)),must(is_cdl(C0,C)),append(A,B,C).
+sicstus_atom_chars(N,S):-name(N,S).
 
 
 % ---------------------------------------------------------------------------
@@ -109,8 +115,6 @@ load_prelude :-
 :- use_module(library(check)).
 % :- check:list_strings.
 
-sicstus_atom_chars(N,S):-atom_codes(N,S).
-
 curry_toplevel:- 
   must_det_l((
    nl,nl,
@@ -140,5 +144,5 @@ process_curry(Input):-
     string_codes(InputS,InputS1))),
     process_then(InputS1,true),!.
 
-:-retract(current_prolog_flag_double_quotes(ResetTo)),
-  set_prolog_flag(double_quotes, ResetTo).
+:-must_det_l((retract(current_prolog_flag_double_quotes(ResetTo)),
+  set_prolog_flag(double_quotes, ResetTo))).

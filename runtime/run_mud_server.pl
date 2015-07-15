@@ -39,6 +39,8 @@ user:file_search_path(prologmud, library(prologmud)).
 :- if_file_exists(ensure_loaded(library(eggdrop))).
 :- initialization((current_predicate(egg_go/0)->egg_go;true),now).
 
+% [Mostly Required] Load the UPV Curry System
+:- time(user:ensure_loaded(library(upv_curry/main))).
 
 % [Required] Load the Logicmoo Base System
 :- time(user:ensure_loaded(logicmoo(logicmoo_base))).
@@ -66,9 +68,6 @@ user:file_search_path(prologmud, library(prologmud)).
 
 % [Mostly Required] Load the Logicmoo Parser/Generator System
 :- time(user:ensure_loaded(library(parser_all))).
-
-% [Mostly Required] Load the Logicmoo Cury System
-:- time(user:ensure_loaded(library(upv_curry/main))).
 
 % [Required] most of the Library system should not be loaded with mpred expansion on
 :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
@@ -257,3 +256,4 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 :- if_startup_script(at_start(prolog)).
 
 :- endif.
+
