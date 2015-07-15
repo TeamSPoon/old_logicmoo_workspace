@@ -2,6 +2,8 @@ This archive contains the UPV-Curry system,
 a novel Curry implementation developed at the 
 Technical University of Valencia (UPV).
 
+It may (at least on 7/14/2015) be found at http://users.dsic.upv.es/grupos/elp/upv-curry/upv-curry.html)
+
 Here you can find the following files:
 
 *.pl:                 The source code of the UPV-Curry interpreter.
