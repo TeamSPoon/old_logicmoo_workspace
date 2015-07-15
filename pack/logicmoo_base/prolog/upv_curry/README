@@ -6,7 +6,7 @@ Here you can find the following files:
 
 *.pl:                 The source code of the UPV-Curry interpreter.
             
-prelude:              The UPV-Curry prelude file, which contains
+prelude.curry         The UPV-Curry prelude file, which contains
                       the main data types and function declarations.
 
 upv-curry_manual.tex: The LaTeX source for the UPV-Curry User's Manual.
