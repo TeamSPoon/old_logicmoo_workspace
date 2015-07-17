@@ -49,9 +49,13 @@ do
              exit 0
 	          (sudo su -l -s $SHELL -c "(cd $DIR ; swipl ${RUNFILE})" prologmud )
           else             
-             (cd $DIR ; exec swipl $RUNFILE)
-         fi
+             (cd $DIR ; exec swipl $RUNFILE)             
+         fi   
 #        cd $NEWPWD
-#        . ./commit_push.sh 
+if [ $# -eq 0 ]
+    then
+  exit 0
+fi
+#        . ./commit_push.sh   
 done
 

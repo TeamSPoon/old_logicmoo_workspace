@@ -12,8 +12,8 @@
 
 % ==============================================================================
 
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
-:- user:ensure_loaded(library(logicmoo/logicmoo_base)).
+:- user:ensure_loaded_no_mpreds(library(logicmoo/util/logicmoo_util_all)).
+:- user:ensure_loaded_no_mpreds(library(logicmoo/logicmoo_base)).
 :- asserta(thlocal:disable_mpred_term_expansions_locally).
 
 :- multifile(user:type_action_info/3).
@@ -194,7 +194,6 @@ show_pipeline:-forall(installed_converter(CNV),wdmsg(installed_converter(CNV))).
 % ================================================================================================
 
 %:- time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),(exists_file(AFN)->true;qcompile(library(el_holds/'el_assertions.pl.hide')))))).
-%:- time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),(exists_file(AFN)->true;qcompile(library(el_holds/'el_assertions.pl.hide')))))).
 
 get_it:- 
  time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),   
@@ -202,15 +201,15 @@ get_it:-
     (absolute_file_name(library(el_holds),AFND),sformat( S, 'curl --compressed http://prologmoo.com/devel/LogicmooDeveloperFramework/PrologMUD/pack/pldata_larkc/prolog/el_holds/el_assertions.pl.qlf > ~w/el_assertions.pl.qlf',[AFND]),
     shell(S))))))).
 :- dmsg("Loading loading language data (This may take 10-15 seconds)").
-:- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc)).
+:- user:ensure_loaded_no_mpreds(library(logicmoo/plarkc/logicmoo_i_cyc)).
 
 % 
-% gripe_time(warn(12.246577455>7),        user:time(user:ensure_loaded(library(el_holds/'el_assertions.pl.qlf')))).
-% OLD :- gripe_time(7,time(user:ensure_loaded(library(el_holds/'el_assertions.pl.qlf')))).
+% gripe_time(warn(12.246577455>7),        user:time(user:ensure_loaded_no_mpreds(library(el_holds/'el_assertions.pl.qlf')))).
+% OLD :- gripe_time(7,time(user:ensure_loaded_no_mpreds(library(el_holds/'el_assertions.pl.qlf')))).
 
 % 6.052 CPU on VMWare I7
 :- gripe_time(7,time(user:load_files([library(el_holds/'el_assertions')],[qcompile(auto),if(changed )]))).
-:- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_call_kb)).
+:- user:ensure_loaded_no_mpreds(library(logicmoo/plarkc/logicmoo_i_call_kb)).
 :- gripe_time(1,user:load_files([pldata/clex_iface],[qcompile(auto),if(changed  )])).
 :- gripe_time(1,user:load_files([pldata/nldata_BRN_WSJ_LEXICON],[qcompile(auto),if(changed  )])).
 :- gripe_time(1,user:load_files([pldata/nldata_freq_pdat],[qcompile(auto),if(changed  )])).
@@ -219,7 +218,7 @@ get_it:-
 
 % ================================================================================================
 :- include(parser_ape).
-%:- user:ensure_loaded('AceRules/engine/run_testcases').
+%:- user:ensure_loaded_no_mpreds('AceRules/engine/run_testcases').
 % ================================================================================================
 
 :- install_converter(ace_to_drs:call_tokenizer(+acetext, +(guess,on), -sentences:set, -sentencesToParse)).
@@ -245,7 +244,7 @@ get_it:-
 
 % ================================================================================================
 % CHAT80:  acetext,  text_no_punct, pos_sents_pre,  syntaxTree80,  sem80, query80
-:- user:ensure_loaded(parser_chat80).
+:- user:ensure_loaded_no_mpreds(parser_chat80).
 % ================================================================================================
 
 was_punct(Remove):-domain(WRemove,[(,),(.),(?),(!)]),
@@ -267,30 +266,30 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 
 % ================================================================================================
 % CHAT80:  
-:- user:ensure_loaded(parser_e2c). % TODO confirm CHAT80 runs without E2C
+:- user:ensure_loaded_no_mpreds(parser_e2c). % TODO confirm CHAT80 runs without E2C
 % ================================================================================================
 
 :- debug.
 
 
 % ================================================================================================
-%:- user:ensure_loaded(parser_candc).
+%:- user:ensure_loaded_no_mpreds(parser_candc).
 % ================================================================================================
 
 % ================================================================================================
-:- user:ensure_loaded(parser_stanford).
+:- user:ensure_loaded_no_mpreds(parser_stanford).
 % ================================================================================================
 
 % ================================================================================================
-%:- user:ensure_loaded(parser_talk).
+%:- user:ensure_loaded_no_mpreds(parser_talk).
 % ================================================================================================
 
 
 % ================================================================================================
-%:- if_file_exists(user:ensure_loaded(stanford_parser)).
+%:- if_file_exists(user:ensure_loaded_no_mpreds(stanford_parser)).
 % ================================================================================================
 % :- get_pos_tagger(I),jpl_set(I,is_DEBUG,'@'(false)).
-%:- user:ensure_loaded(parser_chart89).
+%:- user:ensure_loaded_no_mpreds(parser_chart89).
 
 
 
@@ -317,27 +316,27 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 
 % ================================================================================================
 % TODO Not yet started 
-:- user:ensure_loaded(parser_CURT).
+:- user:ensure_loaded_no_mpreds(parser_CURT).
 % ================================================================================================
 
 % ================================================================================================
 % TODO - grovel the API
-:- user:ensure_loaded(parser_regulus).
+:- user:ensure_loaded_no_mpreds(parser_regulus).
 % ================================================================================================
 
 % ================================================================================================
 % TODO - grovel the API
-:- user:ensure_loaded(parser_SUPPLE).
+:- user:ensure_loaded_no_mpreds(parser_SUPPLE).
 % ================================================================================================
 
 % ================================================================================================
 % TODO - grovel the API
-:- user:ensure_loaded(parser_SIRIDUS).
+:- user:ensure_loaded_no_mpreds(parser_SIRIDUS).
 % ================================================================================================
 
 % ================================================================================================
 % TODO - grovel the API
-:- user:ensure_loaded(parser_ProNTo).
+:- user:ensure_loaded_no_mpreds(parser_ProNTo).
 % ================================================================================================
 
 :- dmsg("List of possible data transformations").

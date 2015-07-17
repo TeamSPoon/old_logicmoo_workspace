@@ -15,7 +15,7 @@ use this file with...
 
 :- op(600,fx,onSpawn).
 
-:- begin_pfc.
+:- file_begin(pfc).
 
 tRegion(dmiles_room).
 bordersOn(dmiles_room,iHall7).
@@ -28,7 +28,5 @@ tOakDesk(iOakDesk7).
 tOakDesk(iOakDesk8).
 localityOfObject(iOakDesk7,dmiles_room).
 localityOfObject(iOakDesk8,dmiles_room).
-
-
 
 

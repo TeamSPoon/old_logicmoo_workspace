@@ -8,6 +8,46 @@
 */
 % :-swi_module(logicmoo_i_loader, []).
 
+
+% filetypes 
+%
+%  pfc - all terms are sent to pfc_add/1 (the the execeptions previously defined)
+%  code - all terms are sent to compile_clause/1 (the the execeptions previously defined)
+%  prolog - all terms are sent to compile_clause/1 (even ones defined conflictingly)
+%  dyn - all terms are sent to pfc_add/1 (even ones defined conflictingly)
+
+user:prolog_load_file(Module:Spec, Options):- \+ exists_file_safe(Spec),!,
+ foreach(user:filematch(Module:Spec,FileName),
+    (loop_check((user:prolog_load_file(Module:FileName, Options))),TF=true)),!,
+  nonvar(TF).
+
+user:prolog_load_file(Module:DirName, Options):- is_directory(DirName)->
+  current_predicate('load_file_dir'/2)->loop_check(show_call(call(load_file_dir,Module:DirName, Options))).
+
+user:prolog_load_file(Module:FileName, Options):- 
+  file_name_extension(Base,Ext,FileName),
+  guess_file_type_loader(Ext,Loader)-> loop_check(call(Loader,Module:FileName, Options)).
+
+guess_file_type_loader(Ext,Loader):-use_file_type_loader(Ext,Loader).
+guess_file_type_loader(Ext,Loader):- atom(Ext),
+   (Ext==''->Pred='load_file_some_type';system:atom_concat('load_file_type_,',Ext,Pred)),
+   current_predicate(Pred/2).
+
+load_file_dir(Module:DirName, Options):- fail,
+  directory_files(DirName,FileName),
+  foreach((member(F,Files),file_name_extension(_,Ext,F),file_type_loader(Ext,Loader),
+       directory_file_path(DirName,F,FileName)),
+      (user:prolog_load_file(Module:FileName, Options),TF=true)),
+     nonvar(TF).
+
+use_file_type_loader(pfc,ensure_mpred_file_consulted).
+use_file_type_loader(pl,ensure_prolog_file_consulted).
+use_file_type_loader(pddl,ensure_mpred_file_consulted).
+use_file_type_loader(plmoo,ensure_mpred_file_consulted).
+ensure_prolog_file_consulted(M:Files,Options):-must(load_files(M:Files,Options)),!.
+ensure_mpred_file_consulted(M:Files,Options):-must(load_files(M:Files,Options)),!.
+load_file_some_type(M:Files,Options):-must(load_files(M:Files,Options)),!.
+
 :- include(logicmoo_i_header).
 :- multifile(user:xfile_load_form/4).
 :- dynamic(user:xfile_load_form/4).
@@ -21,13 +61,24 @@ as_list(EC,AL):-compound(EC),EC=..[IsEach|List],is_elist_functor(IsEach),as_list
 as_list(List,AL):-flatten([List],AL),!.
 
 
-disable_mpreds_in_current_file:- source_file(F,_),show_call(asserta((thlocal:disable_mpred_term_expansions_locally:-source_file(F,_),!))).
+
+disable_mpreds_in_current_file:- source_file(F),show_call(asserta((thlocal:disable_mpred_term_expansions_locally:-source_file(F),!))).
 
 :- export(with_no_mpred_expansions/1).
 :- meta_predicate(with_no_mpred_expansions(0)).
 with_no_mpred_expansions(Goal):-
   with_assertions(user:no_buggery,
     with_assertions(thlocal:disable_mpred_term_expansions_locally,Goal)).
+
+:- export(with_mpred_expansions/1).
+:- meta_predicate(with_mpred_expansions(0)).
+with_mpred_expansions(Goal):-
+  with_assertions(user:buggery,
+    with_no_assertions(thlocal:disable_mpred_term_expansions_locally,Goal)).
+
+:- export(ensure_loaded_no_mpreds/1).
+:- meta_predicate(ensure_loaded_no_mpreds(0)).
+ensure_loaded_no_mpreds(F):-with_no_mpred_expansions(forall(must_locate_file(F,L),ensure_loaded(L))).
 
 use_was_isa(G,I,C):-call((current_predicate(mpred_types_loaded/0),if_defined(was_isa_syntax(G,I,C)))).
 
@@ -48,11 +99,28 @@ register_module_type(CM,Type):-asserta_new(registered_module_type(CM,Type)).
 end_module_type(Type):-current_context_module(CM),end_module_type(CM,Type).
 end_module_type(CM,Type):-retractall(registered_module_type(CM,Type)).
 
+/******
 
+% :- meta_predicate(ensure_mpred_file_loaded(0)).
+
+:- meta_predicate ensure_mpred_file_loaded(:,+).
+
+
+ensure_mpred_file_loaded(M:F0,List):-!,
+  must_locate_file(M:F0,F),  % scope_settings  expand(true),register(false),
+  % 'format'(user_output /*e*/,'%  ~q + ~q -> ~q.~n',[M,F0,F]),
+  load_files([F],[if(not_loaded), must_be_module(true)|List]).
+   %load_files(F,[redefine_module(false),if(not_loaded),silent(false),redynamic_multifile_exported(true),must_be_module(true)|List]).   
+ensure_mpred_file_loaded(M:F0,List):-
+  must_locate_file(M:F0,F),  % scope_settings
+  'format'(user_output /*e*/,'% load_mpred_file_M ~q.~n',[M=must_locate_file(F0,F)]),
+   load_files([F],[redefine_module(false),module(M),expand(true),if(not_loaded),redynamic_multifile_exported(true),register(false),silent(false),must_be_module(true)|List]).
+
+******/
 
 :-dynamic(registered_mpred_file/1).
 :-export(declare_load_dbase/1).
-declare_load_dbase(Spec):- forall(no_repeats_old(File,filematch(Spec,File)),show_call(asserta_if_new(registered_mpred_file(File)))).
+declare_load_dbase(Spec):- forall(no_repeats_old(File,must_locate_file(Spec,File)),show_call(asserta_if_new(registered_mpred_file(File)))).
 
 % :-export((is_compiling_sourcecode/1)).
 is_compiling_sourcecode:-is_compiling,!.
@@ -60,7 +128,7 @@ is_compiling_sourcecode:-compiling, current_input(X),not((stream_property(X,file
 is_compiling_sourcecode:-compiling,dmsg(system_compiling),!.
 
 :-export(load_mpred_files/0).
-load_mpred_files :- forall(registered_mpred_file(File),ensure_mpred_loaded(File)).
+load_mpred_files :- forall(registered_mpred_file(File),ensure_mpred_file_loaded(File)).
 
 :-dynamic thglobal:current_world/1.
 thglobal:current_world(current).
@@ -70,26 +138,6 @@ thglobal:current_world(current).
 % show_load_call(C):- logOnFailure(debugOnError(show_call(C))).
 
 
-:-meta_predicate(load_dbase(?)).
-
-load_dbase(File):-thglobal:current_world(World), load_dbase(World,File),!.
-load_dbase(World,File):- 
- with_no_assertions(thglobal:use_cyc_database,
-    ( world_clear(World),
-      retractall(thglobal:loaded_file_world_time(_,_,_)),
-      time_call(ensure_mpred_loaded(File)),!,
-      time_call(finish_processing_world))).
-
-
-:- meta_predicate(ensure_mpred_loaded(0)).
-ensure_mpred_loaded(A) :- ensure_mpred_file_loaded(A).
-
-:- meta_predicate(ensure_mpred_file_loaded(0)).
-ensure_mpred_file_loaded(A) :-
-  forall(filematch(A,F), 
-    (asserta_if_new(must_compile_special_clause_file(F)),
-      ensure_mpred_loaded_each(F))).
-
 
 :-dynamic(thglobal:loaded_file_world_time/3).
 :-meta_predicate(thglobal:loaded_file_world_time(+,+,+)).
@@ -97,51 +145,62 @@ ensure_mpred_file_loaded(A) :-
 get_last_time_file(FileIn,World,LastTime):- absolute_file_name(FileIn,File),thglobal:loaded_file_world_time(File,World,LastTime),!.
 get_last_time_file(_,_,0).
 
-:-meta_predicate(ensure_mpred_loaded_each(?)).
-ensure_mpred_loaded_each(FileIn):-!,ensure_loaded(FileIn).
-ensure_mpred_loaded_each(FileIn):-
-   must_locate_file(FileIn,File),
-   must(thglobal:current_world(World)),
+
+
+:- meta_predicate(load_init_world(+,:)).
+load_init_world(World,File):- 
+ with_no_assertions(thglobal:use_cyc_database,
+    ( world_clear(World),
+      retractall(thglobal:loaded_file_world_time(_,_,_)),
+      time_call(ensure_mpred_file_loaded(File)),!,
+      time_call(finish_processing_world))).
+
+
+:-meta_predicate(ensure_mpred_file_loaded(:)).
+
+ensure_mpred_file_loaded(_M:FileIn):- \+exists_file_safe(FileIn),
+  forall(must_locate_file(FileIn,File),ensure_mpred_file_loaded(File)).
+ensure_mpred_file_loaded(_M:File):-
    time_file_safe(File,NewTime),!,
    get_last_time_file(File,World,LastTime),
-   (LastTime<NewTime -> reload_mpred_file(File) ; true).
+   (LastTime<NewTime -> force_reload_mpred_file(File) ; true).
 
-:-meta_predicate(reload_mpred_file(?)).
+:-meta_predicate(force_reload_mpred_file(?)).
 
-reload_mpred_file(FileIn):-
-   must_locate_file(FileIn,File),
-   thglobal:current_world(World),
-   retractall(thglobal:loaded_file_world_time(File,World,_)),   
-   user:mpred_mod(DBASE),'@'(load_mpred_file(World,File),DBASE).
-
-:-meta_predicate(load_mpred_file(+,+)).
-load_mpred_file(World,FileIn):- with_assertions(thglobal:current_world(World),load_mpred_file(FileIn)).
-
-
+:-meta_predicate(ensure_mpred_file_loaded(+,:)).
+ensure_mpred_file_loaded(World,FileIn):- 
+  with_assertions(thglobal:current_world(World),ensure_mpred_file_loaded(FileIn)).
 
 must_locate_file(FileIn,File):-
   filematch_ext(['','mpred','ocl','moo','plmoo','pl','plt','pro','p','pl.in'],FileIn,File).
 
 
 :-thread_local(thlocal:onEndOfFile/2).
-:-meta_predicate(load_mpred_file(?)).
-load_mpred_file(FileIn):- must(load_mpred_file_now(FileIn)).
 
+force_reload_mpred_file(FileIn):- \+ exists_file_safe(FileIn),
+   forall(force_reload_mpred_file(FileIn,File),must_locate_file(File)).
 
-load_mpred_file_now(FileIn):- !, must(ensure_loaded(FileIn)).
-load_mpred_file_now(FileIn):-
-   must(must_locate_file(FileIn,File)),
-   must(thglobal:current_world(World)),
-  time_file_safe(File,NewTime),
-  assert(thglobal:loaded_file_world_time(File,World,NewTime)), 
+force_reload_mpred_file(_:File):- atomic(File),!,force_reload_mpred_file(File).
+force_reload_mpred_file(File):-
+   assert_if_new(registered_mpred_file(File)),
+   thglobal:current_world(World),
+   time_file_safe(File,NewTime),
+   retractall(thglobal:loaded_file_world_time(File,World,_)),
+   assert(thglobal:loaded_file_world_time(File,World,NewTime)), 
    dmsginfo(loading_mpred_file(File,World,NewTime)),!,
+   user:mpred_mod(DBASE),'@'(force_reload_mpred_file(World,File),DBASE).
 
-  catch((with_assertions(thglobal:loading_mpred_file(World,File),
-      must(setup_call_cleanup(see(File),load_mpred_name_stream(World),seen))),
+force_reload_mpred_file(World,_:File):- atomic(File),!,force_reload_mpred_file(World,File).
+force_reload_mpred_file(World, File):-
+ assert_if_new(registered_mpred_file(File)),
+ must(thglobal:current_world(World)),  
+ with_no_assertions(thlocal:disable_mpred_term_expansions_locally,
+  catch((with_assertions(thglobal:loading_mpred_file(World,File),     
+      ensure_loaded(File)),      
       load_mpred_file_end(World,File)),
    Error,
     (wdmsg(error(Error,File)),retractall(thglobal:loaded_mpred_file(World,File)),
-     retractall(thglobal:loaded_file_world_time(File,World,NewTime)))).
+     retractall(thglobal:loaded_file_world_time(File,World,NewTime))))).
 
 :-export(load_mpred_file_end/2).
 load_mpred_file_end(World,File):-
@@ -149,29 +208,18 @@ load_mpred_file_end(World,File):-
    dmsginfo(info(load_mpred_file_complete(File))),
    forall(onEndOfFile(File,Call),must((mpred_call(Call),retractall(onEndOfFile(File,Call))))).
 
-/******
-
-% :- meta_predicate(load_mpred_file(0)).
-% load_mpred_file(F0):- user:ensure_loaded(F0).
-
-:- meta_predicate load_mpred_file(:,+).
-
-
-load_mpred_file(M:F0,List):-!,
-  locate_mpred_file(M:F0,F),  % scope_settings  expand(true),register(false),
-  % 'format'(user_output /*e*/,'%  ~q + ~q -> ~q.~n',[M,F0,F]),
-  load_files(F,[if(not_loaded), must_be_module(true)|List]).
-   %load_files(F,[redefine_module(false),if(not_loaded),silent(false),redynamic_multifile_exported(true),must_be_module(true)|List]).   
-load_mpred_file(M:F0,List):-
-  locate_mpred_file(M:F0,F),  % scope_settings
-  'format'(user_output /*e*/,'% load_mpred_file_M ~q.~n',[M=locate_mpred_file(F0,F)]),
-   load_files(F,[redefine_module(false),module(M),expand(true),if(not_loaded),redynamic_multifile_exported(true),register(false),silent(false),must_be_module(true)|List]).
-
-******/
+show_load_context:- 
+  listing(registered_mpred_file),
+  show_call(inside_file(W)),
+  show_call(pfc_may_expand),
+  show_call(pfc_expand_inside_file_anyways),
+  show_call(thlocal:pfc_term_expansion_ok),
+  show_call(source_file(F)).
 
 
-load_mpred_name_stream(_Name):- do_gc,repeat,read_one_term(Term,Vs),myDebugOnError(add_term(Term,Vs)),Term == end_of_file,!.
-load_mpred_name_stream(_Name,Stream):- do_gc,repeat,read_one_term(Stream,Term,Vs),myDebugOnError(add_term(Term,Vs)),Term == end_of_file,!.
+
+%load_mpred_name_stream(_Name):- do_gc,repeat,read_one_term(Term,Vs),myDebugOnError(add_term(Term,Vs)),Term == end_of_file,!.
+%load_mpred_name_stream(_Name,Stream):- do_gc,repeat,read_one_term(Stream,Term,Vs),myDebugOnError(add_term(Term,Vs)),Term == end_of_file,!.
 
 
 add_term(end_of_file,_):-!.
@@ -181,7 +229,7 @@ add_term(Term,Vs):-
 
 
 add_from_file(Term):-  
-  with_assertions(thlocal:already_in_file_term_expansion,must(add(Term))).
+  with_assertions(thlocal:pfc_already_in_file_expansion(Term),must(add(Term))).
 
 myDebugOnError(Term):-catch(once(must((Term))),E,(dmsg(error(E,start_myDebugOnError(Term))),trace,rtrace((Term)),dmsginfo(stop_myDebugOnError(E=Term)),trace,Term)).
          
@@ -229,8 +277,8 @@ assert_until_end_of_file(Fact):-must_det_l((thread_local(Fact),asserta(Fact),((o
 :- style_check(-discontiguous).
 % :- style_check(-atom).
 
-% gload:- load_dbase(savedb),!.
-gload:- load_dbase(logicmoo('rooms/startrek.all.mpred')).
+% gload:- ensure_mpred_file_loaded(savedb),!.
+gload:- ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.mpred')).
 
 %:-meta_predicate(savedb/0).
 savedb:-!.
@@ -255,28 +303,6 @@ make_db_listing:-
      listing(moo_loader:_),
      listing(world :_),
      listing(_),!.
-
-
-
-
-
-:- meta_predicate locate_mpred_file(:,-).
-locate_mpred_file(I,O):-locate_mpred_file0(I,O),!.
-locate_mpred_file(_:O,O):-!.
-locate_mpred_file(O,O).
-
-
-:- meta_predicate locate_mpred_file0(:,-).
-locate_mpred_file0(user:SpecPre, Path):-!,locate_mpred_file0(SpecPre, Path).
-locate_mpred_file0(_:SpecPre, Path):-!,locate_mpred_file0(SpecPre, Path).
-locate_mpred_file0(SpecPre, Path) :-
-        catch((expand_file_search_path(SpecPre,Spec)),_,fail),
-        catch(absolute_file_name(Spec,
-                           [ file_type(prolog),
-                             access(read)
-                           ],
-                           Path),_,fail),
-        exists_file(Path),!.
 
 
 
@@ -306,7 +332,7 @@ term_expand_local_each(CM,X,F,A,X):-registered_module_type(CM,dynamic),dynamic(F
 % ========================================
 
 include_mpred_files(Mask):- 
-     forall(filematch(Mask,E),ensure_mpred_loaded(E)).
+     forall(must_locate_file(Mask,E),ensure_mpred_file_loaded(E)).
 /*
 module(M,Preds):-
     'format'(user_output /*e*/,'% visting module ~w.~n',[M]),
@@ -322,7 +348,7 @@ do_term_expansions:- context_module(CM), (do_term_expansions(CM)).
 do_term_expansions(_):- thread_self(ID),user:always_expand_on_thread(ID),!.
 do_term_expansions(_):- always_transform_heads,not(prevent_transform_mpreds),!.
 do_term_expansions(_):- is_compiling_clause.
-do_term_expansions(CM):- must_compile_special_clause_file(CM),!, not(ended_transform_mpreds), not(prevent_transform_mpreds).
+do_term_expansions(CM):- registered_mpred_file(CM),!, not(ended_transform_mpreds), not(prevent_transform_mpreds).
 
 check_term_expansions:- not(do_term_expansions).
 
@@ -337,44 +363,15 @@ check_term_expansions:- not(do_term_expansions).
          end_module_type/1))).
 
 
-% ========================================
-% begin/end_transform_mpreds
-% ========================================
-
-:-dynamic(always_expand_on_thread/1).
-:-thread_local is_compiling_clause/0.
-is_compiling:-is_compiling_clause;compiling.
-:-thread_local ended_transform_mpreds/0, prevent_transform_mpreds/0, always_transform_heads/0.
-:-module_transparent begin_transform_mpreds/0, end_transform_mpreds/0.
-:-export(((begin_transform_mpreds/0,end_transform_mpreds/0))).
-begin_transform_mpreds:- retractall(ended_transform_mpreds),context_module(CM),asserta(must_compile_special_clause_file(CM)).
-end_transform_mpreds:- retractall(ended_transform_mpreds),asserta(ended_transform_mpreds).
-
-begin_transform_moo_preds:- begin_transform_mpreds.
-end_transform_moo_preds:- end_transform_mpreds.
-
-:- style_check(+discontiguous).
-:- style_check(-discontiguous).
-
-:-export(thlocal:in_dynamic_reader/1).
-
-:-export(begin_dynamic_reader/0).
-begin_dynamic_reader:- must_det(( prolog_load_context(file,Source),asserta(thlocal:in_dynamic_reader(Source)))).
-:-export(end_dynamic_reader/0).
-end_dynamic_reader:- must_det(( prolog_load_context(file,Source),retract(thlocal:in_dynamic_reader(Source)))).
-
-
-inside_dynamic_reader :- prolog_load_context(file,Source),test_tl(thlocal:in_dynamic_reader(Source)),!.
-inside_dynamic_reader :- prolog_load_context(source,Source),test_tl(thlocal:in_dynamic_reader(Source)),!.
 
 
 loader_term_expansion(CL,EXP):- 
  % ==== why we assert
-  inside_dynamic_reader,!,
+  inside_file(pfc),!,
 % ==== do it
-  WHY = '$was_imported_kb_content$'(inside_dynamic_reader,CL),
+  WHY = '$was_imported_kb_content$'(inside_file(pfc),CL),
   %dmsg(WHY),
-  add_from_file(CL),
+  pfc_add(CL),
   must(EXP=user:WHY).
 
 loader_term_expansion(CL,WHY):- 
@@ -386,6 +383,14 @@ loader_term_expansion(CL,WHY):-
   add_from_file(CL),!.
 
 
+loader_term_expansion(CL,EXP):- 
+ % ==== why we assert
+  inside_file(dyn),!,
+% ==== do it
+  WHY = '$was_imported_kb_content$'(inside_file(dyn),CL),
+  %dmsg(WHY),
+  add_from_file(CL),
+  must(EXP=user:WHY).
 
 
 
@@ -428,17 +433,18 @@ with_source_module(M,CALL):- setup_call_cleanup('$set_source_module'(Old, M),CAL
 
 
 
-pfc_using_file(F):- var(F),!,source_file(F), pfc_using_file(F),!.
-pfc_using_file(F):- inside_file(pfc),!.
-pfc_using_file(F):- file_name_extension(_,pfc,F),!.
-pfc_using_file(F):- file_name_extension(_,mpred,F),!.
-pfc_using_file(F):- file_name_extension(_,WAS,F),WAS\=pl,WAS\= '',WAS\=chr,!.
+is_pfc_file(F):- var(F),!,source_file(F), is_pfc_file(F),!.
+is_pfc_file(F):- file_name_extension(_,pfc,F),!.
+is_pfc_file(F):- file_name_extension(_,mpred,F),!.
+is_pfc_file(F):- registered_mpred_file(F).
+is_pfc_file(F):- inside_file(pfc),!,source_file(F).
+is_pfc_file(F):- file_name_extension(_,WAS,F),WAS\=pl,WAS\= '',WAS\=chr,!.
 
 must_compile_special_clause(:- (_) ):-!,fail.
-%must_compile_special_clause(CL):- sanity(nonvar(CL)),not(thlocal:into_form_code),not(thlocal:already_in_file_term_expansion),not((get_functor(CL,F),expanded_already_functor(F))).
+%must_compile_special_clause(CL):- sanity(nonvar(CL)),not(thlocal:into_form_code),not(thlocal:pfc_already_in_file_expansion(CL)),not((get_functor(CL,F),expanded_already_functor(F))).
 must_compile_special_clause(CL):- \+ thlocal:disable_mpred_term_expansions_locally, 
    sanity(nonvar(CL)), \+(thlocal:into_form_code),
-    \+(thlocal:already_in_file_term_expansion),
+    \+(thlocal:pfc_already_in_file_expansion(CL)),
     \+((get_functor(CL,F),expanded_already_functor(F))),
    pfc_db_type(CL,_),!.
 
@@ -452,28 +458,47 @@ pfc_use_module(M):- must(atom(M)),retractall(pfc_skipped_module(M)),show_call(as
 % ================================================================================
 compile_this(_,_,_,_):- thlocal:disable_mpred_term_expansions_locally,!,fail.
 compile_this(_,F,M:C,O):-atom(M),!,compile_this(M,F,C,O).
+
 compile_this(M,F,'$was_imported_kb_content$'(_,_),code):-!.
-compile_this(M,F,C,pfc_add):- pfc_using_file(F), \+ pfc_skipped_module(M),!.
+compile_this(M,F,C,pfc_add):- is_pfc_file(F), \+ pfc_skipped_module(M),!.
+compile_this(M,F,C,dyn):- inside_file(dyn),!.
 compile_this(M,F,C,O):- (var(M);var(F);var(C)),trace_or_throw(var_compile_this(M,F,C,O)).
 compile_this(M,F,C,requires_storage(WHY)):- requires_storage(C,WHY),!.
-compile_this(M,F,C,dynamic_reader):- inside_file(dynamic_reader),!.
-compile_this(M,F,C,must_compile_special):- must_compile_special_clause(C),in_file_expansion.
+compile_this(M,F,C,must_compile_special):- must_compile_special_clause(C),inside_file_expansion.
 compile_this(_,_,_,code).
 
 :- module_transparent(pfc_may_expand).
-pfc_may_expand:-source_location(F,_),inside_file(pfc).
-pfc_may_expand:-must(loading_module(M)),pfc_may_expand_module(M),!.
+pfc_may_expand:-source_file(F),inside_file(pfc).
+pfc_may_expand:-source_file(F),inside_file(mpred).
+pfc_may_expand:-must(loading_module(M)),pfc_may_expand_module(M),!,pfc_expand_inside_file_anyways.
 
 pfc_may_expand_module(M):-pfc_skipped_module(M),!,fail.
 pfc_may_expand_module(M):-user:mpred_directive_value(pfc,module,M),!.
-pfc_may_expand_module(M):-module_property(M,file(F)),pfc_using_file(F).
+pfc_may_expand_module(M):-module_property(M,file(F)),is_pfc_file(F).
 pfc_may_expand_module(M):-thlocal:pfc_module_expansion(M),!.
 pfc_may_expand_module(_):-thlocal:pfc_module_expansion(*),!.
 
 
-:-module_transparent(pfc_file_module_term_expansion/4).
-pfc_file_module_term_expansion(F,M,A,BBBO):-compile_this(M,F,A,How),
-   user:xfile_load_form(How,M,A,B),must(source_location(F,L)),b_getval('$variable_names', Vs),
+pfc_expand_inside_file_anyways:- source_file(F),!,pfc_expand_inside_file_anyways(F).
+
+pfc_expand_inside_file_anyways(F):- var(F),!,source_file(F),nonvar(F),pfc_expand_inside_file_anyways(F).
+pfc_expand_inside_file_anyways(F):- thglobal:loading_mpred_file(_,F),!.
+pfc_expand_inside_file_anyways(F):- registered_mpred_file(F).
+pfc_expand_inside_file_anyways(F):- is_pfc_file(F),must(loading_module(M);source_module(M)), (M=user; \+ pfc_skipped_module(M)),!.
+
+was_exported_content(I,CALL,Output):-Output='$was_imported_kb_content$'(I,CALL),!.
+
+:- thread_local(thlocal:pfc_term_expansion_ok/0).
+:- thread_local(thlocal:pfc_already_inside_file_expansion/1).
+
+
+
+:-assert_if_new(thlocal:pfc_term_expansion_ok).
+
+
+:-module_transparent(pfc_file_module_term_expansion_4/4).
+pfc_file_module_term_expansion_4(F,M,A,BBBO):-compile_this(M,F,A,How),
+   must(source_location(F,L)),user:xfile_load_form(How,M,A,B),b_getval('$variable_names', Vs),
    pfc_file_module_term_expansion_1(How,M,A,Vs,F,L,B,BBBO).
 
 :-module_transparent(pfc_file_module_term_expansion_1/7).
@@ -487,9 +512,35 @@ pfc_file_module_term_expansion_2(How,INFO,F,M,AA,BBB,BBBO):-
       (How == code -> BBBO = BBB ;
         (add_from_file(BBB), BBBO = '$was_imported_kb_content$'(AA,INFO)))),!.      
 
-user:xfile_load_form(How,M,P,O):- with_assertions(thlocal:already_in_file_term_expansion, ((pfc_file_expansion(P,C),P\=@=C,O=(:- user:(C))))),!.
+user:xfile_load_form(How,M,P,O):- 
+  with_assertions(thlocal:pfc_already_in_file_expansion(P), 
+   ((pfc_file_expansion(P,C),P\=@=C,O=(:- user:(C))))),!.
 
 user:provide_mpred_clauses(H,B,(What)):- !.
+
+:-meta_predicate(cl_assert(?,?)).
+cl_assert(code,P):-!, show_call(must_det_l((source_location(F,_L), '$compile_aux_clauses'(P,F)))).
+cl_assert(mpred,P):-!, pfc_assert(P).
+cl_assert(dyn,P):- !, pfc_assert(P).
+cl_assert(_Dir,P):- pfc_assert(P),!.
+
+:- meta_predicate(pfc_file_expansion_cl_assert(?,?)).
+pfc_file_expansion_cl_assert(_,cl_assert(code,OO),OO,_):-!,dmsg(cl_assert(code,OO)).
+pfc_file_expansion_cl_assert(I,CALL,OO,O):- (current_predicate(_,CALL) -> ((must(call(CALL)),was_exported_content(I,CALL,OO))); OO=O).
+
+:- export(pfc_file_expansion/2).
+:- meta_predicate(pfc_file_expansion(?,?)).
+pfc_file_expansion(I,OO):- var(I),!,I=OO.
+pfc_file_expansion(end_of_file,end_of_file):-!,must(source_file(F)),GETTER=thlocal:pfc_on_end_of_file(F,TODO),forall(GETTER,((doall(show_call_failure(TODO))),ignore(retract(GETTER)))).
+pfc_file_expansion(I,OO):- (I\=(:-(_))), I\= '$was_imported_kb_content$'(_,_),
+   once(loop_check(pfc_file_expansion_0(I,O))),
+   I\=@=O, 
+   (((thlocal:pfc_term_expansion_ok;pfc_expand_inside_file_anyways)-> nop(wdmsg((pfc_file_expansion(I,O)))) ; ((show_load_context,wdmsg(warning,wanted_pfc_term_expansion(I,O))),fail)),
+   ((O=(:-(CALL))) -> 
+     pfc_file_expansion_cl_assert(I,CALL,OO,O);      
+      (OO = O))).
+
+
 
 pfc_implode_varnames([]):-!.
 pfc_implode_varnames([N=V|Vs]):-V='$VAR'(N),pfc_implode_varnames(Vs),!.
@@ -518,8 +569,8 @@ expanded_already_functor(_:NV):-nonvar(NV),!,expanded_already_functor(NV).
 
 :- multifile(user:term_expansion/2).
 :- multifile(system:goal_expansion/2).
-system:goal_expansion(A,_B):-fail,hotrace((source_module(M),(M=pfc_sanity;M=user;M=system),if_defined(pmsg(M:goal_expansion(A)),format(user_output /*e*/,'~N% ~q~n',M:goal_expansion(A))))),fail.
-user:term_expansion(A,_B):-fail,hotrace((source_module(M),(M=pfc_sanity;M=user;M=system),if_defined(pmsg(M:term_expansion(A)),format(user_output /*e*/,'~N% ~q~n',M:term_expansion(A))))),fail.
+% system:goal_expansion(A,_B):-fail,hotrace((source_module(M),(M=pfc_sanity;M=user;M=system),if_defined(pmsg(M:goal_expansion(A)),format(user_output /*e*/,'~N% ~q~n',M:goal_expansion(A))))),fail.
+% user:term_expansion(A,_B):-fail,hotrace((source_module(M),(M=pfc_sanity;M=user;M=system),if_defined(pmsg(M:term_expansion(A)),format(user_output /*e*/,'~N% ~q~n',M:term_expansion(A))))),fail.
 
 system:goal_expansion(N,pfc_prove_neg(P)):-fail,pfc_from_negation_plus_holder(N,P),show_call_failure(mpred_prop(P,pfcControlled)).
 
@@ -554,50 +605,82 @@ pfc_directive_expansion(pfc_multifile,
 pfc_directive_expansion(pfc_module,(asserta(user:mpred_directive_value(pfc,module,M)))):-source_module(M).
 
 
+% ========================================
+% begin/end_transform_mpreds
+% ========================================
+
+:-dynamic(always_expand_on_thread/1).
+:-thread_local is_compiling_clause/0.
+is_compiling:-is_compiling_clause;compiling.
+
+:- style_check(+discontiguous).
+:- style_check(-discontiguous).
+
 begin_pfc:-file_begin(pfc).
 pfc_begin:-file_begin(pfc).
-pfc_end:-file_end(pfc).
-dyn_begin:-file_begin(dynamic_reader).
-dyn_end:-file_end(dynamic_reader).
+dyn_begin:-file_begin(dyn).
+dyn_end:-file_end(dyn).
 
-file_begin(W):- must_det(( prolog_load_context(file,ISource),asserta(user:mpred_directive_value(W,file,ISource)))),must_det(( prolog_load_context(source,Source),asserta(user:mpred_directive_value(W,file,Source)))).
-file_end(W):- must_det(( prolog_load_context(file,ISource),ignore(retract(user:mpred_directive_value(W,file,ISource))))),must_det(( prolog_load_context(source,Source),ignore(retract(user:mpred_directive_value(W,file,Source))))).
+:- thread_local(thlocal:pfc_on_end_of_file/2).
+
+
+
+assert_until_eof(F):- must_det_l((source_file(File),asserta(F),asserta((thlocal:pfc_on_end_of_file(File,retract(F)))))).
+
+file_begin(W):- must_det(( source_file(ISource),assert_until_eof(user:mpred_directive_value(W,file,ISource)))),
+   must_det(( prolog_load_context(source,Source),asserta(user:mpred_directive_value(W,file,Source)))).
+file_end(W):- must_det(( source_file(ISource),ignore(retract(user:mpred_directive_value(W,file,ISource))))),
+  must_det(( prolog_load_context(source,Source),ignore(retract(user:mpred_directive_value(W,file,Source))))).
+
 inside_file(W) :- prolog_load_context(file,Source),user:mpred_directive_value(W,_,Source),!.
 inside_file(W) :- prolog_load_context(source,Source),user:mpred_directive_value(W,_,Source),!.
-
-
+inside_file(W) :- source_file(Source),!,user:mpred_directive_value(W,_,Source),!.
 
 
 user:term_expansion((:- (M:DIR)),O):-atom(M),atom(DIR),with_source_module(M, ((pfc_directive_expansion(DIR,OO),!, must(O=(:- OO))))).
 user:term_expansion((:- DIR),O):- atom(DIR), pfc_directive_expansion(DIR,OO),!,must(O=(:- OO)).
 
+:-meta_predicate(pfc_file_expansion_0(?,?)).
 
-user:term_expansion(A,BO):- fail, hotrace((A\=(:-_),A\=end_of_file,current_predicate(pfc_file_loaded/0))), 
-   hotrace((\+ thlocal:disable_mpred_term_expansions_locally, \+ thlocal:already_in_file_term_expansion,
-    \+ (get_functor(A,F),expanded_already_functor(F)))),
-   ((source_file(I),must(loading_module(M);source_module(M)))),
-   with_no_assertions(thlocal:consulting_sources, 
-   with_source_module(M, loop_check(pfc_file_module_term_expansion(I,M,A,B)))),
-   must(nonvar(B)),BO=B.
-
-
-
-pfc_file_expansion_0((P=>Q),(:- pfc_assert((P=>Q)))).
+% Specific "*SYNTAX*" based default
+pfc_file_expansion_0((P=>Q),(:- cl_assert(fw,(P=>Q)))).
 % maybe reverse some rules?
-%pfc_file_expansion_0((P=>Q),(:- pfc_assert(('<='(Q,P))))).  % speed-up attempt
-pfc_file_expansion_0(('<='(P,Q)),(:- pfc_assert(('<='(P,Q))))).
-pfc_file_expansion_0((P<=>Q),(:- pfc_assert((P<=>Q)))).
-pfc_file_expansion_0((RuleName :::: Rule),(:- pfc_assert((RuleName :::: Rule)))).
-pfc_file_expansion_0((=>P),(:- pfc_assert((=>P)))).
-pfc_file_expansion_0(Fact,Output):- pfc_file_expansion_1(Fact,C),must(pfc_file_expansion_0(C,Output)),!.
-pfc_file_expansion_0((H:-Chain,B),(H:-(B))):- is_code_body(Chain),!,fail,must(atom(Chain)),make_dynamic(H).
-pfc_file_expansion_0(Fact,(:- ((pfc_assert(Fact))))):- pfc_file_expansion_2(Fact,_Output),!.
+%pfc_file_expansion_0((P=>Q),(:- cl_assert(fw,('<='(Q,P))))).  % speed-up attempt
+pfc_file_expansion_0(('<='(P,Q)),(:- cl_assert(bw,('<='(P,Q))))).
+pfc_file_expansion_0((P<=>Q),(:- cl_assert(bw,(P<=>Q)))).
+pfc_file_expansion_0((RuleName :::: Rule),(:- cl_assert(named_rule,(RuleName :::: Rule)))).
+pfc_file_expansion_0((=>P),(:- cl_assert(fw,(=>P)))).
+pfc_file_expansion_0(Fact,(:- cl_assert(code,Fact))):- get_functor(Fact,F,_A),if_defined(prologOnly(F)).
+pfc_file_expansion_0(Fact,Output):- pfc_file_expansion_1(_Dir,Fact,C),must(pfc_file_expansion_0(C,Output)),!.
 
-pfc_file_expansion_2(Fact,Output):- get_functor(Fact,F,A),if_defined(ttPredType(F)),Output='$was_imported_kb_content$'(Fact,ttPredType(F)),!.
-pfc_file_expansion_2(Fact,Output):- get_functor(Fact,F,A),if_defined(functorDeclares(F)),Output='$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
-pfc_file_expansion_2(Fact,Output):- get_functor(Fact,F,A),if_defined(prologMacroHead(F)),Output='$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
-pfc_file_expansion_2(Fact,Output):- get_functor(Fact,F,A),if_defined(pfcControlled(F)),Output='$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
-pfc_file_expansion_2(Fact,Output):- notrace(pfc_expand_in_file_anyways(F)),!,Output='$was_imported_kb_content$'(Fact,pfc_expand_in_file_anyways(F)),!.
+      pfc_file_expansion_1(act,(H:-Chain,B),(H=>{(Chain,B)})):-cwc, is_action_body(Chain),make_dynamic(H).
+      pfc_file_expansion_1(fc,(H:-Chain,B),((Chain,B)=>H)):-cwc, is_fc_body(Chain),make_dynamic(H).
+      pfc_file_expansion_1(bw,(H:-Chain,B),(H<=(Chain,B))):-cwc, is_bc_body(Chain),make_dynamic(H).
+      
+
+pfc_file_expansion_0((H:-Chain,B),(H:-(B))):- is_code_body(Chain),!,fail,must(atom(Chain)),make_dynamic(H).
+
+
+% Specific "*PREDICATE CLASS*" based default
+pfc_file_expansion_0(Fact,Fact):- get_functor(Fact,F,A),prologOnly(F),!.
+pfc_file_expansion_0(Fact,(:- ((cl_assert(Dir,Fact))))):- pfc_file_expansion_2(Dir,Fact,_Output),!.
+
+      % Specific "*PREDICATE CLASS*" based default
+      pfc_file_expansion_2(pred_type,Fact,Output):- get_functor(Fact,F,A),if_defined(ttPredType(F)),Output='$was_imported_kb_content$'(Fact,ttPredType(F)),!.
+      pfc_file_expansion_2(func_decl,Fact,Output):- get_functor(Fact,F,A),if_defined(functorDeclares(F)),Output='$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
+      pfc_file_expansion_2(macro_head,Fact,Output):- get_functor(Fact,F,A),if_defined(prologMacroHead(F)),Output='$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
+      pfc_file_expansion_2(pfc_ctrl,Fact,Output):- get_functor(Fact,F,A),if_defined(pfcControlled(F)),Output='$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
+      pfc_file_expansion_2(hybrid,Fact,Output):- get_functor(Fact,F,A),if_defined(prologHybrid(F)),Output='$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
+      pfc_file_expansion_2(code,Fact,Output):- get_functor(Fact,F,A),if_defined(prologOnly(F)),Output='$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
+
+
+% Specific "*FILE*" based default
+pfc_file_expansion_0(Fact,Fact):- inside_file(code),!.
+pfc_file_expansion_0(Fact,(:- ((cl_assert(pfc_file,Fact))))):- inside_file(pfc),!.
+pfc_file_expansion_0(Fact,(:- ((cl_assert(dyn,Fact))))):- inside_file(dyn),!.
+pfc_file_expansion_0(Fact,(:- ((cl_assert(mpreds,Fact))))):- inside_file(mpreds),!.
+pfc_file_expansion_0(Fact,(:- ((cl_assert(expand_file,Fact))))):- notrace(pfc_expand_inside_file_anyways(F)),!,_Output='$was_imported_kb_content$'(Fact,pfc_expand_inside_file_anyways(F)),!.
+
 
 stream_pos(File:C):-source_file(File),current_input_stream(S),line_count(S,C).
 compile_clause(CL):- make_dynamic(CL),must((assertz_if_new(CL),clause_asserted(CL))).
@@ -608,40 +691,6 @@ make_dynamic(C):- compound(C),get_functor(C,F,A),
   must((predicate_property(P,dynamic))).
 
 
-pfc_file_expansion_1((H:-Chain,B),(H=>{(Chain,B)})):-cwc, is_action_body(Chain),make_dynamic(H).
-pfc_file_expansion_1((H:-Chain,B),((Chain,B)=>H)):-cwc, is_fc_body(Chain),make_dynamic(H).
-pfc_file_expansion_1((H:-Chain,B),(H<=(Chain,B))):-cwc, is_bc_body(Chain),make_dynamic(H).
-
-
-pfc_expand_in_file_anyways(F):- pfc_using_file(F),must(loading_module(M);source_module(M)), (M=user; \+ pfc_skipped_module(M)),!.
-
-was_exported_content(I,CALL,Output):-Output='$was_imported_kb_content$'(I,CALL),!.
-
-:- thread_local(thlocal:pfc_term_expansion_ok/0).
-:- thread_local(thlocal:pfc_already_in_file_expansion/1).
-
-
-:- export(pfc_file_expansion/2).
-%:- module_transparent(pfc_file_expansion/2).
-pfc_file_expansion(I,OO):- (I\=(:-(_))), I\= '$was_imported_kb_content$'(_,_),
-   once(loop_check(pfc_file_expansion_0(I,O))),
-   I\=@=O, 
-   ((thlocal:pfc_term_expansion_ok -> nop(wdmsg((pfc_file_expansion(I,O)))) ; (wdmsg(warning,wanted_pfc_term_expansion(I,O)),fail)),
-   ((O=(:-(CALL))) -> 
-      (current_predicate(_,CALL) -> ((must(call(CALL)),was_exported_content(I,CALL,OO))); OO=O);
-      (OO = O))).
-
-
-
-is_file_clause(I):-var(I),!,dmsg(var_file_clause(I)).
-is_file_clause(I):- I== end_of_file,!,fail.
-is_file_clause(I):- I= :-(_),!,fail.
-is_file_clause(I):- compound(I),!.
-is_file_clause(I):- nop(dmsg(file_clause(I))).
-
-
-
-:-assert_if_new(thlocal:pfc_term_expansion_ok).
 
 
 varFunctorEscape('?').
@@ -682,4 +731,51 @@ system:goal_expansion(I,O):-
 % :-set_prolog_flag(allow_variable_name_as_functor,true).
 
 % :- source_location(S,_),forall(source_file(H,S),ignore(( \+predicate_property(M:H,built_in), functor(H,F,A),M:module_transparent(F/A),M:export(F/A)))).
+
+
+pfc_loader_file.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

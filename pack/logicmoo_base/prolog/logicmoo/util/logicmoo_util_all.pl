@@ -34,17 +34,28 @@ current_filesource(F):-seeing(X),is_stream(X),stream_property(X,file_name(F)).
 current_filesource(F):-stream_property(_,file_name(F)).
 
 :- export(filematch/2).
+:- meta_predicate(filematch(:,-)).
 filematch(Spec,Result):-  enumerate_files(Spec,Result).
 
+
 :- thread_local(thlocal:file_ext/1).
+:- meta_predicate(filematch_ext(+,:,-)).
 :- export(filematch_ext/3).
 filematch_ext(Ext,FileIn,File):-
   with_assertions(thlocal:file_ext(Ext),filematch(FileIn,File)).
 
-:- export(enumerate_files/2).
 :- meta_predicate(enumerate_files(:,-)).
+:- export(enumerate_files/2).
 enumerate_files(M:Spec,Result):-
-   '@'((no_repeats_old([Result],((enumerate_files0(Spec,NResult),normalize_path(NResult,Result),exists_file_or_dir(Result))))),M).
+   user:no_repeats_old([Result],((user:enumerate_m_files(M,Spec,NResult),user:normalize_path(NResult,Result),exists_file_or_dir(Result)))).
+
+:- meta_predicate(enumerate_files(:,-)).
+:- export(enumerate_m_files/3).
+enumerate_m_files(user, Mask,File1):-!,enumerate_files0(Mask,File1).
+enumerate_m_files(M, Mask,File1):- 
+  findall(thlocal:search_first_dir(Dir),
+   (((M\=user,file_search_path(M,SP),expand_file_search_path(SP,Dir));((module_property(M, file(File)),directory_file_path(Dir,_,File)))),
+   exists_directory(Dir)),List),list_to_set(List,Set),with_assertions(Set,enumerate_files0(Mask,File1)).
 
 :- export(enumerate_files0/2).
 enumerate_files0(Mask,File1):- absolute_file_name(Mask,X,[expand(true),file_errors(fail),solutions(all)]),expand_file_name(X,Y),member(File1,Y).
@@ -59,7 +70,7 @@ enumerate_files00(Spec,Result):- enumerate_files1(Spec,M),enumerate_files2(M,Res
 
 :- export(filematch3/3).
 filematch3(RelativeTo,Mask,File1):-
-   findall(Ext,thlocal:file_ext(Ext),EXTs),flatten(['',EXTs,'pl.in'],Flat),
+   findall(Ext,thlocal:file_ext(Ext),EXTs),flatten([EXTs,'','pl.in'],Flat),
    absolute_file_name(Mask,File1Matched,[extensions(Flat),
    expand(true),file_errors(fail),solutions(all),relative_to(RelativeTo),access(read)]),expand_file_name(File1Matched,File1S),member(File1,File1S).
 filematch3(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1Matched,[file_type(directory),
@@ -85,14 +96,14 @@ expand_file_name_safe(I,L):- findall(O,absolute_file_name(I,O,[expand(true),solu
  absolute_file_name(I,O,[expand(true),solutions(all),file_type(directory)]),L),!.
 
 :- export(exists_file_or_dir/1).
-exists_file_or_dir(X):-atomic(X),once((catch(exists_file(X),E,(fmt(E:X),fail));is_directory(X))).
+exists_file_or_dir(X):- nonvar(X),( X=(_:F)->exists_file_or_dir(F); (atomic(X),once((catch(exists_file(X),E,(fmt(E:X),fail));is_directory(X))))).
 :- export(is_directory/1).
 is_directory(X):-exists_directory(X).
 
 :- export(concat_paths/3).
 concat_paths(A,'',A).
 concat_paths(A,'/',A).
-concat_paths(ParentIn,'**',Result):-!, member(Child,['./','./*/','./*/*/','./*/*/*','./*/*/*/*','./*/*/*/*/*']),concat_paths(ParentIn,Child,Result).
+concat_paths(ParentIn,'**',Result):-!, member(Child,['./','./*/','./*/*/','./*/*/*/','./*/*/*/*/','./*/*/*/*/*/']),concat_paths(ParentIn,Child,Result).
 concat_paths(ParentIn,Child,Result):- filematch(ParentIn,Parent),
    once(is_directory(Parent) -> directory_file_path(Parent,Child,Joined) ; atom_concat(Parent,Child,Joined)),
    filematch(Joined,Result).
@@ -102,16 +113,18 @@ concat_paths([Joined],Result):- !,filematch(Joined,Result).
 concat_paths([ParentIn,Child|MORE],Result):- concat_paths(ParentIn,Child,ResultM),concat_paths([ResultM|MORE],Result).
 
 
-
+:-thread_local(thlocal:search_first_dir/1).
 
 current_dirs(DO):- no_repeats(DO,(current_dirs0(D),(atom_concat(DO,'/',D)->true;DO=D))).
+current_dirs0(D):- thlocal:search_first_dir(D).
 current_dirs0(D):- prolog_load_context(directory,D).
 current_dirs0(D):- working_directory(D,D).
 current_dirs0(D):- current_stream(_,read,Y), stream_property(Y,file_name(FN)), file_directory_name(FN,D).
 current_dirs0(D):- stream_property(_,file_name(FN)), file_directory_name(FN,D).
-current_dirs0(D):- expand_file_name('*/',X),member(E,X),absolute_file_name(E,D),exists_directory(D).
-current_dirs0(D):- expand_file_name('*/*/',X),member(E,X),absolute_file_name(E,D),exists_directory(D).
-current_dirs0(D):- expand_file_name('*/*/*/',X),member(E,X),absolute_file_name(E,D),exists_directory(D).
+
+%current_dirs0(D):- expand_file_name('*/',X),member(E,X),absolute_file_name(E,D),exists_directory(D).
+%current_dirs0(D):- expand_file_name('*/*/',X),member(E,X),absolute_file_name(E,D),exists_directory(D).
+%current_dirs0(D):- expand_file_name('*/*/*/',X),member(E,X),absolute_file_name(E,D),exists_directory(D).
 current_dirs0(D):- source_file_property(FN, modified(_)), file_directory_name(FN,D).
 current_dirs0('.').
 

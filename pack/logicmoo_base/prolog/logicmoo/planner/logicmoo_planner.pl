@@ -4,7 +4,7 @@
 :- prolog_load_context(directory,Dir),
    DirFor = planner,
    (( \+ user:file_search_path(DirFor,Dir)) ->asserta(user:file_search_path(DirFor,Dir));true),
-   absolute_file_name('../../../..',Y,[relative_to(Dir),file_type(directory)]),
+   absolute_file_name('../../../../',Y,[relative_to(Dir),file_type(directory)]),
    (( \+ user:file_search_path(pack,Y)) ->asserta(user:file_search_path(pack,Y));true).
 :- attach_packs.
 :- initialization(attach_packs).
@@ -15,7 +15,7 @@
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(planner,Dir)).
 
 :- with_no_mpred_expansions(ensure_loaded(logicmoo_ocl_and_pddl)).
-:- with_no_mpred_expansions(ensure_loaded(moo_ext_strips)).
+% :- with_no_mpred_expansions(ensure_loaded(moo_ext_strips)).
 
 
 

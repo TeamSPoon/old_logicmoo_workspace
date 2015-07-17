@@ -190,12 +190,23 @@ b_moo_hide(F/A):-!,'$find_predicate'(F/A,List),forall(member(M:F/A,List),moo_hid
 
 hotrace:-notrace.
 :- export(hotrace/1).
-:- meta_predicate(hotrace(:)).
+:- meta_predicate(hotrace(0)).
 % Unlike notrace/1, it allows traceing when excpetions are raised during Goal.
-% %hotrace(X):- visible(+exception),leash(+exception), ( tracing -> with_assertions( tlbugger:wastracing,call_cleanup((notrace,restore_trace((visible(-all),visible(+exception),call(X)))),trace)) ; call(X) ).
-hotrace(M:X):-  visible(+exception),leash(+exception),restore_trace((notrace,M:call(X))).
-% hotrace(C):-current_predicate(logicmoo_bugger_loaded/0)->catchvv((C),E,((writeq(E=C),rtrace(C),trace_or_throw(E=C))));C.
+
+
+% ((tracing, notrace) -> CC=trace;CC=true), '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,(('$leash'(_, Old),'$visible'(_, OldV),CC),CC)).
+get_hotrace(X,Y):- tracing,!,'$visible'(OldV, OldV),notrace,visible(-all),visible(+exception),Y = call_cleanup(X,('$visible'(_, OldV),trace)).
+get_hotrace(X,Y):- !,'$visible'(OldV, OldV),notrace,visible(-all),visible(+exception),Y = call_cleanup(X,('$visible'(_, OldV))).
+
+hotrace(X):-!,X.
+hotrace(X):-notrace(get_hotrace(X,Y)),Y.
 :-moo_hide(hotrace/1).
+:-'$set_predicate_attribute'(hotrace(_), hide_childs, 1).
+:-'$set_predicate_attribute'(hotrace(_), trace, 0).
+
+%get_hotrace(X):-  visible(+exception),leash(+exception),restore_trace((notrace,X)).
+% hotrace(C):-current_predicate(logicmoo_bugger_loaded/0)->catchvv((C),E,((writeq(E=C),rtrace(C),trace_or_throw(E=C))));C.
+
 
 :-
       op(1150,fx,(user:dynamic_multifile_exported)),
@@ -371,25 +382,39 @@ hotrace(M:X):-  visible(+exception),leash(+exception),restore_trace((notrace,M:c
 
 
 :-meta_predicate restore_trace(0).
-restore_trace(Goal):-  tracing, notrace,!,'$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,(('$leash'(_, Old),'$visible'(_, OldV),trace),trace)).
-restore_trace(Goal):-  '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,((notrace,'$leash'(_, Old),'$visible'(_, OldV)))).
+restore_trace(Goal):-  ((tracing, notrace) -> CC=trace;CC=true), 
+   '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,(('$leash'(_, Old),'$visible'(_, OldV),CC),CC)).
 
 
-start_rtrace:-notrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception),assert(tlbugger:rtracing))).
-:-moo_hide(start_rtrace/0).
-stop_rtrace:-notrace((visible(+all),visible(+unify),visible(+exception),leash(+all),leash(+exception),notrace,ignore(retract(tlbugger:rtracing)))).
-:-moo_hide(stop_rtrace/0).
-nortrace:-stop_rtrace.
-:-moo_hide(nortrace/0).
-rtrace:-start_rtrace,trace.
-:-moo_hide(rtrace/0).
+
+
+nortrace:-stop_rtrace,notrace.
 rnotrace:-stop_rtrace,trace.
+rtrace:-notrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception),assert(tlbugger:rtracing))).
+start_rtrace:-rtrace,trace.
+stop_rtrace:-notrace((visible(+all),visible(+unify),visible(+exception),leash(+all),leash(+exception),notrace,ignore(retract(tlbugger:rtracing)))).
+:-moo_hide(nortrace/0).
 :-moo_hide(rnotrace/0).
+:-moo_hide(rtrace/0).
+:-moo_hide(start_rtrace/0).
+:-moo_hide(stop_rtrace/0).
 
 :-moo_hide(true/0).
+:-unlock_predicate(system:notrace/1).
+:-moo_hide(system:notrace/1).
+:-'$set_predicate_attribute'(notrace(_), hide_childs, 1).
+:-'$set_predicate_attribute'(notrace(_), trace, 0).
+:-'$set_predicate_attribute'(system:notrace(_), hide_childs, 1).
+:-'$set_predicate_attribute'(system:notrace(_), trace, 0).
+:-lock_predicate(system:notrace/1).
+
+
+get_rtrace(X,Y):- tlbugger:rtracing,!,X=Y.
+get_rtrace(X,Y):- tracing,'$leash'(Old, Old),'$visible'(OldV, OldV),rtrace, Y= call_cleanup(X,(('$leash'(_, Old),'$visible'(_, OldV),stop_rtrace))).
 
 :-meta_predicate rtrace(0).
-rtrace(Goal):- restore_trace(call_cleanup((start_rtrace,Goal),stop_rtrace)).
+rtrace(Goal):- notrace(get_rtrace(Goal,C)),C.
+
 :-moo_hide(rtrace/1).
 
 :-meta_predicate ftrace(0).
@@ -407,7 +432,7 @@ errx:-debugOnError((assert_if_new(tlbugger:dont_skip_bugger),do_gc,dumpST(10))),
 
 % false = use this wrapper, true = code is good and avoid using this wrapper
 :- export(skipWrapper/0).
-skipWrapper:-!,fail.
+%skipWrapper:-!,fail.
 skipWrapper:- tracing,\+tlbugger:rtracing.
 skipWrapper:- tlbugger:dont_skip_bugger,!,fail.
 % skipWrapper:- 0 is random(5),!.
@@ -491,8 +516,6 @@ must_l(C):- must(C).
 slow_sanity(C):-  sanity(C),!. %  ( tlbugger:skip_use_slow_sanity ; must_det(C)),!.
 
 
-print_dmessage(_,M):- writeq(M),nl.
-
 % -- CODEBLOCK
 :- export(sanity/1).
 :-meta_predicate(sanity(0)).
@@ -529,27 +552,51 @@ y_must(Y,C):- catchvv(C,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,C)),fail)) *-> tru
 % -- CODEBLOCK
 :- export(must/1).
 :-meta_predicate (must(0)).
-%must(C):-is_release,!,C.
+:-set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(200), attributes(portray)]).
+:-set_prolog_flag(debugger_show_context,true).
 
-must(C):-  tlbugger:skipMust,!,catchvv(C,E,(wdmsg(E:C),fail)).
-%must(C):- catchvv(C,E,(wdmsg(E:C),fail)) *-> true ; (wdmsg(error,failed_must(C)),dtrace(C)).
-%must(MCall):- skipWrapper,!, (MCall *-> true ; ((dmsg(failed(must(MCall))),trace,MCall))).
-%must(C):-  tlbugger:skipMust,!,catchvv(C,E,(wdmsg(E:C),fail)).
-must(MCall):- hotrace((tlbugger:show_must_go_on,
- strip_module(MCall,M,Call))),!,
- (
-  '@'(catchvv(Call,E,(dumpST,print_dmessage(error,must_ex(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
-  *-> true ; 
-  '@'((hotrace((print_dmessage(warning,must_failed(Call)),print_dmessage(error,must_failed(Call)))),badfood(Call)),M)).
+must(C):-notrace(get_must(C,CALL)),CALL.
 
-must(MCall):- 
- strip_module(MCall,M,Call),
- (
-  '@'(catchvv(Call,E,(dumpST,print_dmessage(error,must_ex(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
-  *-> true ; 
-  '@'((hotrace((print_dmessage(warning,must_failed(Call)),ignore(ftrace(Call)),debug,leash(+all),repeat,print_dmessage(error,must_failed(Call)))),dtrace(Call)),M)).
+get_must(C,C):- fail,is_release,!.
+get_must(C,DO):-  tlbugger:skipMust,!,DO = catchvv(C,E,(debug,wdmsg(E:C),fail)).
+get_must(Call,DO):- skipWrapper,!, DO = (Call *-> true ; ((dmsg(failed(must(Call))),trace,Call))).
+get_must(Call,DO):- tlbugger:show_must_go_on,!,
+ DO = ((catchvv(Call,E,
+     notrace(((dumpST,dmsg(error,sHOW_MUST_go_on_xI__xI__xI__xI__xI_(E,Call))),badfood(Call))))
+            *-> true ; notrace((dumpST,dmsg(error,sHOW_MUST_go_on_failed_F__A__I__L_(Call)),badfood(Call))))).
 
- 
+get_must(Call,DO):-  
+   DO = (catchvv(Call,E,
+     (dumpST,dmsg(error,must_xI__xI__xI__xI__xI_(E,Call)),
+         ignore(rtrace(Call)),badfood(Call)))
+         *-> true ; (dumpST,ignore(dtrace(must_failed_F__A__I__L_(Call),Call)),badfood(Call))).
+
+
+:- meta_predicate
+	must_maplist(1, ?),
+	must_maplist(2, ?, ?).
+
+%%	must_maplist(:Goal, ?List)
+%
+%	True if Goal can successfully  be   applied  on  all elements of
+%	List. Arguments are reordered to gain  performance as well as to
+%	make the predicate deterministic under normal circumstances.
+
+must_maplist(_, []).
+must_maplist(Goal, [Elem|Tail]) :-
+	must(call(Goal, Elem)),
+	must_maplist(Goal, Tail).
+
+%%	must_maplist(:Goal, ?List1, ?List2)
+%
+%	As must_maplist/2, operating on pairs of elements from two lists.
+must_maplist(_, [], []).
+must_maplist( Goal, [Elem1|Tail1], [Elem2|Tail2]) :-
+	must(call(Goal, Elem1, Elem2)),
+	must_maplist( Goal, Tail1, Tail2).
+
+
+
 :- meta_predicate(motrace(0)).
 motrace(O):-one_must(hotrace(must(O)),(trace,O)).
 
@@ -1840,7 +1887,7 @@ hideTrace:-
   hideTrace(user:setup_call_catcher_cleanup/4,-all),
 
   hideTrace(system:throw/1, +all),
-  %%hideTrace(system:print_dmessage/2, +all),
+  %%hideTrace(system:dmsg/2, +all),
   hideTrace(user:message_hook/3 , +all),
   hideTrace(system:message_to_string/2, +all),
   !,hideRest,!.
@@ -2221,7 +2268,7 @@ get_pi(Mask,PI):-get_functor(Mask,F,A),functor(PI,F,A),!.
 
 pp_listing(Pred):- functor_safe(Pred,File,A),functor_safe(FA,File,A),listing(File),nl,findall(NV,predicate_property(FA,NV),LIST),writeq(LIST),nl,!.
 
-:- meta_predicate(with_assertions(+,0)).
+:- meta_predicate(with_assertions(?,0)).
 with_assertions( [],Call):- !,Call.
 with_assertions( [With|MORE],Call):- !,with_assertions(With,with_assertions(MORE,Call)).
 with_assertions( (With,MORE),Call):- !,with_assertions(With,with_assertions(MORE,Call)).
@@ -2243,19 +2290,19 @@ with_assertions(set_prolog_flag(N,XFY),MCall):- !,
      (XFY==WAS -> Call ; 
      (setup_call_cleanup(set_prolog_flag(N,XFY),'@'(Call,M),(WAS=unUSED->true;set_prolog_flag(N,WAS))))).
 
-with_assertions(before_after(Before,After),MCall):-!,strip_module(MCall,M,Call),
-     (Before -> setup_call_cleanup(true,'@'(Call,M),After);Call).
+with_assertions(before_after(Before,After),Call):-
+     (Before -> setup_call_cleanup(Call,After);Call).
 
-with_assertions(THead,MMCall):- 
- hotrace(( strip_module(MMCall,MM,Call),
+with_assertions(THead,Call):- 
+ notrace(( 
      to_thread_head(THead,M,_Head,HAssert) -> true ; throw(failed(to_thread_head(THead,M,_,HAssert))))),
-     setup_call_cleanup(hotrace(M:asserta(HAssert,REF)),'@'(Call,MM),erase_safe(asserta(M:HAssert,REF),REF)).
+     setup_call_cleanup(hotrace(asserta(M:HAssert,REF)),Call,erase_safe(asserta(M:HAssert,REF),REF)).
 
 :-meta_predicate(with_no_assertions(+,0)).
-with_no_assertions(UHead,MMCall):- 
-  hotrace((THead = (UHead:- (!,fail)),strip_module(MMCall,MM,Call),
+with_no_assertions(UHead,Call):- 
+  hotrace((THead = (UHead:- (!,fail)),
    (to_thread_head(THead,M,Head,HAssert) -> true; throw(to_thread_head(THead,M,Head,HAssert))))),
-       setup_call_cleanup(hotrace(M:asserta(HAssert,REF)),'@'(Call,MM),erase_safe(asserta(M:HAssert,REF),REF)).
+       setup_call_cleanup(hotrace(M:asserta(HAssert,REF)),Call,erase_safe(asserta(M:HAssert,REF),REF)).
 
 /*
 old version
@@ -2508,7 +2555,7 @@ show_source_location :- once((ignore((prolog_load_context(file,F),prolog_load_co
 dmsginfo(V):-dmsg(info(V)).
 dmsg(V):- hotrace((dmsg0(V))).
 :-moo_hide(dmsg/1).
-:-moo_hide(system:notrace/1).
+%:-moo_hide(system:notrace/1). 
 
 :-export(dmsg0/1).
 :-export(dmsg1/1).
@@ -2517,9 +2564,9 @@ dmsg0(_):- \+ always_show_dmsg, is_hiding_dmsgs,!.
 
 dmsg0(V):- var(V),!,dmsg0(dmsg_var(V)).
 dmsg0(V):- once(dmsg1(V)), ignore((hook:dmsg_hook(V),fail)).
-%dmsg1(trace_or_throw(V)):- dumpST(350),print_dmessage(warning,V),fail.
-%dmsg1(error(V)):- dumpST(250),print_dmessage(warning,V),fail.
-%dmsg1(warn(V)):- dumpST(150),print_dmessage(warning,V),fail.
+%dmsg1(trace_or_throw(V)):- dumpST(350),dmsg(warning,V),fail.
+%dmsg1(error(V)):- dumpST(250),dmsg(warning,V),fail.
+%dmsg1(warn(V)):- dumpST(150),dmsg(warning,V),fail.
 dmsg1(skip_dmsg(_)):-!.
 %dmsg1(C):- \+ always_show_dmsg, dmsg_hides_message(C),!.
 dmsg1(ansi(Ctrl,Msg)):- ansicall(Ctrl,dmsg1(Msg)).
@@ -2801,7 +2848,7 @@ sgr_code_on_off(Ctrl,OnCode,OffCode):-sgr_on_code(Ctrl,OnCode),sgr_off_code(Ctrl
 % ansicall(Ctrl,Msg):- msg_to_string(Msg,S),fresh_line,catchvv(ansifmt(Ctrl,'~w~n',[S]),_,catchvv(ansifmt(fg(Ctrl),'~w',[S]),_,'format'('~q (~w)~n',[ansicall(Ctrl,Msg),S]))),fresh_line.
 /*
 dmsg(Color,Term):- current_prolog_flag(tty_control, true),!,  tell(user),fresh_line,to_petty_color(Color,Type),
-   call_cleanup(((sformat(Str,Term,[],[]),print_dmessage(Type,if_tty([Str-[]])))),told).
+   call_cleanup(((sformat(Str,Term,[],[]),dmsg(Type,if_tty([Str-[]])))),told).
 */
 
 msg_to_string(Var,Str):-var(Var),!,sformat(Str,'~q',[Var]),!.
@@ -3010,11 +3057,14 @@ source_module(M):-loading_module(M),!.
 source_module(M):-'$set_source_module'(M,   M),!.
 
 
-source_file(F):-source_location(F,_).
-source_file(F):-prolog_load_context(file, F).
-source_file(F):-prolog_load_context(source, F).
-source_file(F):-seeing(X),is_stream(X),stream_property(X,file_name(F)).
-source_file(F):-prolog_load_context(stream, S),stream_property(S,file_name(F)),!.
+:-thread_local(thlocal:last_source_file/1).
+source_file(FIn):- ((source_file0(F) *-> (retractall(thlocal:last_source_file(_)),asserta(thlocal:last_source_file(F))) ; (fail,thlocal:last_source_file(F)))),!,F=FIn.
+source_file0(F):-source_location(F,_).
+source_file0(F):-prolog_load_context(file, F).
+source_file0(F):-prolog_load_context(source, F).
+source_file0(F):-seeing(X),is_stream(X),stream_property(X,file_name(F)),exists_file(F).
+source_file0(F):-prolog_load_context(stream, S),stream_property(S,file_name(F)),exists_file(F).
+source_file0(F):-findall(E,(stream_property( S,mode(read)),stream_property(S,file_name(E)),exists_file(E),line_count(S,C),C>1),L),last(L,F).
 
 
 source_variables_l(All):- 
@@ -3528,7 +3578,7 @@ dtrace:- dtrace(ignore(show_call_failure(trace))).
 % esa Michele Murer 360-750-7500 ext_135
 
 :-meta_predicate(dtrace(+,0)).
-dtrace(MSG,G):-wdmsg(MSG),dtrace(G).
+dtrace(MSG,G):-wdmsg(error,MSG),dtrace(G).
 
 :-meta_predicate(dtrace(0)).
 dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,hotrace(dumpST).

@@ -48,6 +48,13 @@
 			<F N="../../StartMUDServer.bat"/>
 			<F N="../../startMUDServer.sh"/>
 		</Folder>
+		<Folder Name="../../games">
+			<F
+				N="../../games/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes=""/>
+		</Folder>
 		<Folder Name="runtime">
 			<F
 				N="runtime/*.*"

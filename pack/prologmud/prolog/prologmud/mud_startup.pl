@@ -379,7 +379,7 @@ Proof end.
 % logicmoo vworld mud server
 
 :- user:ensure_loaded(logicmoo(logicmoo_base)).
-:- user:ensure_loaded(prologmud(server/mud_telnet)).
+:- user:ensure_loaded_no_mpreds(prologmud(server/mud_telnet)).
 :- user:ensure_loaded(prologmud(server/mud_irc)).
 :- user:ensure_loaded(prologmud(vworld/world)).
 
@@ -530,7 +530,7 @@ download_and_install_el:-
 :-create_agent(explorer(2),[]).
 */
 
-:- begin_transform_moo_preds.
+:- file_begin(mudcode).
 
 user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term=someCode).
 

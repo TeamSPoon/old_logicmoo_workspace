@@ -203,10 +203,11 @@ same_terms((A:-AA),(B:-BB)):-!,same_terms(A,B),same_terms(AA,BB).
 same_terms(M:A,B):-atom(M),!,same_terms(A,B).
 same_terms(A,M:B):-atom(M),!,same_terms(A,B).
 
-fully_expand(_,Sent,SentO):- \+(compound(Sent)),!,Sent=SentO.
-fully_expand(Op,Sent,SentO):-must_expand(Sent),!,fully_expand_now(Op,Sent,SentO),!.
-fully_expand(_,Sent,SentO):-get_functor(Sent,_,A),A\==1,!,Sent=SentO.
-fully_expand(Op,Sent,SentO):-fully_expand_now(Op,Sent,SentO),!.
+fully_expand(Op,Sent,SentO):- hotrace(fully_expand0(Op,Sent,SentO)).
+fully_expand0(_,Sent,SentO):- \+(compound(Sent)),!,Sent=SentO.
+fully_expand0(Op,Sent,SentO):-must_expand(Sent),!,fully_expand_now(Op,Sent,SentO),!.
+fully_expand0(_,Sent,SentO):-get_functor(Sent,_,A),A\==1,!,Sent=SentO.
+fully_expand0(Op,Sent,SentO):-fully_expand_now(Op,Sent,SentO),!.
 
 fully_expand_now(_,Sent,SentO):-not(compound(Sent)),!,Sent=SentO.
 fully_expand_now(_,Sent,SentO):-thlocal:infSkipFullExpand,!,must(Sent=SentO).
@@ -466,20 +467,25 @@ db_expand_up(_,Op,Mid,Out):- db_expand_a_noloop(Op,Mid,Out).
 expand_props(Op,Term,OUT):-expand_props(_,Op,Term,OUT).
 
 expand_props(Prefix,_,Sent,OUT):-not(compound(Sent)),!,OUT=Sent.
-%expand_props(Prefix,Op,Term,OUT):- stack_check,(var(Op);var(Term)),!,trace_or_throw(var_expand_units(Op,Term,OUT)).
-expand_props(Prefix,Op,Sent,OUT):-Sent=..[And|C12],is_logical_functor(And),!,maplist(expand_props(Prefix,Op),C12,O12),OUT=..[And|O12].
-expand_props(Prefix,Op,props(Obj,Open),props(Obj,Open)):- var(Open),!. % ,trace_or_throw(expand_props(Prefix,Op,props(Obj,Open))->OUT).
+%expand_props(Prefix,PLOP,Term,OUT):- stack_check,(var(Op);var(Term)),!,trace_or_throw(var_expand_units(Op,Term,OUT)).
+expand_props(Prefix,PLOP,Sent,OUT):-Sent=..[And|C12],is_logical_functor(And),!,maplist(expand_props(Prefix,Op),C12,O12),OUT=..[And|O12].
+expand_props(Prefix,PLOP,props(Obj,Open),props(Obj,Open)):- var(Open),!. % ,trace_or_throw(expand_props(Prefix,PLOP,props(Obj,Open))->OUT).
 expand_props(Prefix,_ ,props(Obj,List),ftID(Obj)):- List==[],!.
-expand_props(Prefix,Op,props(Obj,[P]),OUT):- nonvar(P),!,expand_props(Prefix,Op,props(Obj,P),OUT).
-expand_props(Prefix,Op,props(Obj,[P|ROPS]),OUT):- !,expand_props(Prefix,Op,props(Obj,P),OUT1),expand_props(Prefix,Op,props(Obj,ROPS),OUT2),conjoin(OUT1,OUT2,OUT).
-expand_props(Prefix,Op,props(Obj,PropVal),OUT):- atom(PropVal),!,from_univ(Prefix,Op,[PropVal,Obj],OUT).
-expand_props(Prefix,Op,props(Obj,PropVal),OUT):- safe_univ(PropVal,[Prop,NonVar|Val]),Obj==NonVar,!,from_univ(Prefix,Op,[Prop,Obj|Val],OUT).
-expand_props(Prefix,Op,props(Obj,PropVal),OUT):- PropVal=..[Op,Pred|Val],comparitiveOp(Op),
+expand_props(Prefix,PLOP,props(Obj,[P]),OUT):- nonvar(P),!,expand_props(Prefix,PLOP,props(Obj,P),OUT).
+expand_props(Prefix,PLOP,props(Obj,[P|ROPS]),OUT):- !,expand_props(Prefix,PLOP,props(Obj,P),OUT1),expand_props(Prefix,PLOP,props(Obj,ROPS),OUT2),conjoin(OUT1,OUT2,OUT).
+expand_props(Prefix,PLOP,props(Obj,PropVal),OUT):- atom(PropVal),!,from_univ(Prefix,PLOP,[PropVal,Obj],OUT).
+
+expand_props(Prefix,PLOP,props(Obj,PropVal),(PropVal2,{OPVAL})):- PropVal=..[Op,Pred|Val],comparitiveOp(Op),
+   not(comparitiveOp(Pred)),!,OPVAL=..[Op,NewVar|Val],PropVal2=..[Pred,Obj,NewVar],!.    
+
+
+expand_props(Prefix,PLOP,props(Obj,PropVal),OUT):- safe_univ(PropVal,[Prop,NonVar|Val]),Obj==NonVar,!,from_univ(Prefix,PLOP,[Prop,Obj|Val],OUT).
+expand_props(Prefix,PLOP,props(Obj,PropVal),OUT):- PropVal=..[Op,Pred|Val],comparitiveOp(Op),
    not(comparitiveOp(Pred)),!,OPVAL=..[Op|Val],PropVal2=..[Pred,OPVAL],
     expand_props(Op,props(Obj,PropVal2),OUT),!.
-expand_props(Prefix,Op,props(Obj,PropVal),OUT):- PropVal=..[Prop|Val],not(infix_op(Prop,_)),!,from_univ(Prefix,Op,[Prop,Obj|Val],OUT).
-expand_props(Prefix,Op,props(Obj,PropVal),OUT):- PropVal=..[Prop|Val],!,dtrace(from_univ(Prefix,Op,[Prop,Obj|Val],OUT)).
-expand_props(Prefix,Op,props(Obj,Open),props(Obj,Open)):- trace_or_throw(expand_props(Prefix,Op,props(Obj,Open))->OUT).
+expand_props(Prefix,PLOP,props(Obj,PropVal),OUT):- PropVal=..[Prop|Val],not(infix_op(Prop,_)),!,from_univ(Prefix,PLOP,[Prop,Obj|Val],OUT).
+expand_props(Prefix,PLOP,props(Obj,PropVal),OUT):- PropVal=..[Prop|Val],!,dtrace(from_univ(Prefix,PLOP,[Prop,Obj|Val],OUT)).
+expand_props(Prefix,PLOP,props(Obj,Open),props(Obj,Open)):- trace_or_throw(expand_props(Prefix,PLOP,props(Obj,Open))->OUT).
 
 expand_props(Prefix,Op,ClassTemplate,OUT):- ClassTemplate=..[props,Inst,Second,Third|Props],!,
    expand_props(Prefix,Op,props(Inst,[Second,Third|Props]),OUT),!.

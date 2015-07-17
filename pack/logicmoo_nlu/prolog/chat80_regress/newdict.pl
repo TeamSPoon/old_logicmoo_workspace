@@ -61,7 +61,6 @@
 
 :-retractall(nldata_BRN_WSJ_LEXICON:text_bpos(the,nn)).
 
-% :- begin_dynamic_reader.
 :- asserta((thlocal:enable_src_loop_checking)).
 
 verb_type_to_kind(Var,Var2):-(var(Var);nonvar(Var2)),!,trace_or_throw(var_verb_type_to_kind(Var,Var2)).

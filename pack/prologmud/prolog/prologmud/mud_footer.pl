@@ -11,8 +11,7 @@
 
 %:- loading_module_h(CM), (registered_module_type(utility,CM)->export_all_preds;true).
 
-
-:- end_transform_moo_preds.
+% :- file_end(moo).
 
 % :- loading_module_h(CM), (context_module(CM) -> retract(loading_module_h(CM)) ; true).
 % :- context_module(CM),(registered_module_type(utility,CM))->module_predicates_are_exported(CM);module_predicates_are_exported(CM).

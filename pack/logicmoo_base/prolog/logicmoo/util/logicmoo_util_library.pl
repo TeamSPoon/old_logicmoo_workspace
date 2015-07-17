@@ -526,7 +526,7 @@ multi_transparent(X):-functor_catch(X,F,A),multi_transparent(F/A),!.
 
 exists_dirf(X):-atomic(X),(exists_file(X);exists_directory(X)).
 atom_concat_safe(L,R,A):- ((atom(A),(atom(L);atom(R))) ; ((atom(L),atom(R)))), !, atom_concat(L,R,A),!.
-exists_file_safe(File):-bugger:must(atomic(File)),exists_file(File).
+exists_file_safe(File):-nonvar(File),(File=(_:F)->exists_file_safe(F);(atomic(File),exists_file(File))).
 exists_directory_safe(File):-bugger:must(atomic(File)),exists_directory(File).
 /*
 concat_atom_safe(List,Sep,[Atom]):-atom(Atom),!,concat_atom(List,Sep,Atom),!.
@@ -534,6 +534,7 @@ concat_atom_safe(List,Sep,Atom):-atom(Atom),!,concat_atom(ListM,Sep,Atom),!,List
 concat_atom_safe(List,Sep,Atom):- concat_atom(List,Sep,Atom),!.
 */
 upcase_atom_safe(A,B):-atom(A),upcase_atom(A,B),!.
+time_file_safe(_:F,INNER_XML):-!,exists_file_safe(F),time_file(F,INNER_XML).
 time_file_safe(F,INNER_XML):-exists_file_safe(F),time_file(F,INNER_XML).
 
 :- export(list_to_set_safe/2).

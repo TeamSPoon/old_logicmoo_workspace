@@ -10,6 +10,8 @@
 %
 */
 
+:- file_begin(code).
+
 :-dynamic(user:irc_event_hooks/3).
 :-multifile(user:irc_event_hooks/3).
 
@@ -118,6 +120,7 @@
 :- multifile user:fact_maybe_deduced/1.
 :- multifile user:tms_reject_why/2.
 :- multifile user:hook_coerce/3.
+:- dynamic user:hook_coerce/3.
 
 :- multifile user:create_random_fact/1.
 :- multifile user:local_term_anglify/2.
@@ -184,4 +187,5 @@
 :- multifile user:agent_call_command/2.
 :- multifile user:agent_text_command/4.
 :- multifile user:check_permanence/4.
+
 

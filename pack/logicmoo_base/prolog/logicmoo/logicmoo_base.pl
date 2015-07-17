@@ -111,12 +111,16 @@ when_debugging(_,_).
 :- ensure_loaded(mpred/logicmoo_i_mpred_stubs).
 :- ensure_loaded(mpred/logicmoo_i_argtypes).
 
+:-dynamic(thlocal:pfc_already_in_file_expansion/1).
 
 % user:goal_expansion(ISA,G) :- compound(ISA),thlocal:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
-user:term_expansion(I,OO):- current_predicate(logicmoo_bugger_loaded/0), \+ thlocal:disable_mpred_term_expansions_locally,  is_file_clause(I), 
-  sanity(\+  thlocal:pfc_already_in_file_expansion(I)), 
-  pfc:with_assertions(thlocal:pfc_already_in_file_expansion(I),pfc_file_expansion(I,OO)),!,
+:-meta_predicate(lmbase_user_term_expansion(?,?)).
+lmbase_user_term_expansion(I,OO):- current_predicate(pfc_loader_file/0),current_predicate(logicmoo_bugger_loaded/0), 
+  nonvar(I), \+  thlocal:pfc_already_in_file_expansion(I), 
+  with_assertions(thlocal:pfc_already_in_file_expansion(I),if_defined(pfc_file_expansion(I,OO))),!,
   nop(dmsg(pfc_file_expansion(I,OO))).
+
+user:term_expansion(I,OO):- \+ thlocal:disable_mpred_term_expansions_locally, if_defined(lmbase_user_term_expansion(I,OO)),I\=@=OO.
 
 :-export(pfc_file_loaded/0).
 pfc_file_loaded.
@@ -126,7 +130,7 @@ pfc_file_loaded.
 :- retractall(thlocal:disable_mpred_term_expansions_locally).
 
 
-:- ensure_loaded(mpred/logicmoo_i_builtin).
+:- ensure_mpred_file_loaded(mpred/logicmoo_i_builtin).
 
 :- asserta(thlocal:disable_mpred_term_expansions_locally).
 

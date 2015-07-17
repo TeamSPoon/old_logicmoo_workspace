@@ -368,7 +368,7 @@ get_tasks(N,Goal,State):- (user:planner_task(N,Goal,State)).
 % my_stats(0).
 
 l_file(File):- \+ exists_file(File),!,forall(filematch(File,FM),l_file(FM)).
-l_file(F):-if_defined(reload_mpred_file(F),if_defined(with_mpred_consult(consult(F)),consult(F))).
+l_file(F):-if_defined(force_reload_mpred_file(F),if_defined(with_mpred_consult(consult(F)),consult(F))).
 
 solve_file(F):-with_filematch(l_file(wfm(F))), doall(solve(_)).
 solve:- solve_file(test_hyhtn).

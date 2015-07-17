@@ -10,10 +10,6 @@
 %
 */
 
-:- if(((\+ current_predicate(init_locl_planner_interface0/3)))).
-
-:- current_predicate(is_saved_type/3).
-
 :-multifile(user:push_env_ctx/0).
 :-dynamic(user:push_env_ctx/0).
 
@@ -27,7 +23,7 @@
 :- prolog_load_context(directory,Dir),
    DirFor = planner,
    (( \+ user:file_search_path(DirFor,Dir)) ->asserta(user:file_search_path(DirFor,Dir));true),
-   absolute_file_name('../../../..',Y,[relative_to(Dir),file_type(directory)]),
+   absolute_file_name('../../../../',Y,[relative_to(Dir),file_type(directory)]),
    (( \+ user:file_search_path(pack,Y)) ->asserta(user:file_search_path(pack,Y));true).
 :- attach_packs.
 :- initialization(attach_packs).
@@ -35,31 +31,29 @@
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 
 
-
 %%% ON :- initialization( profiler(_,walltime) ).
 %%% ON :- initialization(user:use_module(library(swi/pce_profile))).
-% [Required] Load the Logicmoo Library Utils
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 % :- qcompile_libraries.
 
 :- use_module(logicmoo_util_structs).
 
+/*
+:- dynamic user:htn_task/3.
+:- dynamic user:planner_task/3.
+:- dynamic user:planner_task_slow/3.
+:- multifile user:htn_task/3.
+:- multifile user:planner_task/3.
+:- multifile user:planner_task_slow/3.
 
-:- dynamic htn_task/3.
-:- dynamic htn_task/4.
-:- dynamic planner_task/3.
-:- dynamic planner_task/4.
-:- dynamic planner_task_slow/3.
-:- dynamic planner_task_slow/4.
-:- multifile htn_task/3.
-:- multifile htn_task/4.
-:- multifile planner_task/3.
-:- multifile planner_task/4.
-:- multifile planner_task_slow/3.
-:- multifile planner_task_slow/4.
+:- dynamic user:htn_task/4.
+:- dynamic user:planner_task/4.
+:- dynamic user:planner_task_slow/4.
+:- multifile user:htn_task/4.
+:- multifile user:planner_task/4.
+:- multifile user:planner_task_slow/4.
+*/
 
-
-:- ensure_loaded(logicmoo_util_bb_env).
+:- include(logicmoo_util_bb_env).
 
 
 
@@ -180,7 +174,7 @@ post_header_hook:-retractall(canDoTermExp).
 % user:goal_expansion(In,Out):- canDoTermExp,term_expansion_hyhtn(In,M),In\=@=M,expand_goal(M,Out).
 post_header_hook:-asserta(canDoTermExp).
 
-env_clear_doms_and_tasks:- env_clear(kb(domfile)),env_clear(kb(domtasks)),env_clear(kb(domcache)),!.
+env_clear_doms_and_tasks:- env_clear(kb(dom,file)),env_clear(kb(dom,tasks)),env_clear(kb(dom,cache)),!.
    
 
 :- op(100,xfy,'=>').
@@ -224,7 +218,8 @@ header_tests :-test_ocl('domains_ocl/*.ocl').
 :- style_check(-discontiguous).
 %:-use_module(library(system)).
 
-% :- time(user:ensure_loaded(logicmoo(logicmoo_base))).
+% [Required] Load the Logicmoo Base Library
+:- time(user:ensure_loaded(logicmoo(logicmoo_base))).
 %:- asserta(thlocal:disable_mpred_term_expansions_locally).
 
 /*
@@ -259,10 +254,7 @@ header_tests :-test_ocl('domains_ocl/*.ocl').
 :-multifile(on_call_decl_hyhtn/0).
 :-export(on_call_decl_hyhtn/0).
 % Tasks
-on_call_decl_hyhtn :- decl_mpred_env([kb(domtasks),stubType(dyn)], ( htn_task/3, planner_task/3, planner_task_slow/3 )).
-
-% decl_mpred_env_dom(A,B):-decl_mpred_env(A,B).
-% decl_mpred_env_task(A,B):-decl_mpred_env(A,B).
+on_call_decl_hyhtn :- decl_mpred_env_dom([kb(dom,tasks),stubType(dyn)], ( htn_task/3, planner_task/3, planner_task_slow/3 )).
 
 on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(temp_assertIndivConds/1)). % Used for grounding operators
 on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(is_of_primitive_sort/2, is_of_sort/2)).
@@ -285,11 +277,9 @@ on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)],(tp_nod
 % Tasks
 on_call_decl_hyhtn :- decl_mpred_env_dom([kb(dom,tasks),stubType(dyn)], ( htn_task/3, planner_task/3, planner_task_slow/3 )).
 
-
-
 % Contents of a OCLh Domain
 on_call_decl_hyhtn :- 
- decl_mpred_env([kb(domfile),stubType(dyn)],[
+  decl_mpred_env_dom([kb(dom,file),stubType(dyn)],[
   domain_name/1,
   sorts/2,
   substate_classes/3,
@@ -302,8 +292,7 @@ on_call_decl_hyhtn :-
   % oper/4,
   method/6]).
 
-
-:-doall(on_call_decl_hyhtn).
+:-must(doall(on_call_decl_hyhtn)).
 
 
 /* Donghong Liu */
@@ -369,15 +358,15 @@ incr_op_num:- flag(op_num,X,X+1).
 set_op_num(X):-flag(op_num,_,X).
 current_op_num(X):- flag(op_num,X,X).
 
-get_tasks(N,Goal,State):- (htn_task(N,Goal,State)).
-get_tasks(N,Goal,State):- (user:planner_task(N,Goal,State)).
+get_tasks(N,Goal,State):- env_call(htn_task(N,Goal,State)).
+get_tasks(N,Goal,State):- env_call(planner_task(N,Goal,State)).
 
 :- set_op_num(0).
 % my_stats(0).
 
 l_file(File):- \+ exists_file(File),!,forall(filematch(File,FM),l_file(FM)).
 l_file(F):-
-   if_defined(reload_mpred_file(F),
+   if_defined(force_reload_mpred_file(F),
               if_defined(with_mpred_consult(consult(F)),consult(F))).
 
 solve_file(F):-with_filematch(l_file(wfm(F))), doall(solve(_)).
@@ -3193,12 +3182,11 @@ xprod([X|Y],[A|E],D,(F,G)) :-
 
 
 
-lws:- listing([method,
+lws:- listing(user:[method,
 operator,implied_invariant,atomic_invariants,inconsistent_constraint,predicates,objects,substate_classes,sorts,domain_name,planner_task_slow,planner_task,
 htn_task,tp_node,tn,current_num,goal_related,goal_related_search,solved_node,closed_node,tp_goal,final_node,node,op_score,gsstates,gsubstate_classes,related_op,
 objectsOfSort,atomic_invariantsC,objectsD,objectsC,gOperator,operatorC,opParent,methodC,is_of_sort,is_of_primitive_sort,temp_assertIndivConds]).
 
 lws(F):-tell(F),lws,told.
 
-:- endif.
 

@@ -41,7 +41,7 @@
 
 % idGen(X):-flag(idGen,X,X+1).
 
-:- begin_transform_moo_preds.
+:- file_begin(mudcode).
 
 % :- retractall(prevent_transform_moo_preds).
 

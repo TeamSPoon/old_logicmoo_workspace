@@ -21,7 +21,7 @@
 
 
 :- include(prologmud(mud_header)).
-% :- begin_transform_moo_preds.
+% :- file_begin(mudcode).
 :- dynamic(npc_tick_tock_time/1).
 npc_tick_tock_time(60).
 

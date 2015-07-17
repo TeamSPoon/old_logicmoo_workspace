@@ -141,6 +141,8 @@ prop_get_map(Name, Struct,  Value):- member_loc(StructName,Name,N), functor(Stru
 
 
 
+prop_put_extra_extra(Struct,More):- must_det_l((prop_get(extraprops,Struct,Extras),prop_set(extraprops,Extras,More))).
+  
 
 
 prop_set(Call):- Call=..[P,A,B],prop_set(P,A,B).

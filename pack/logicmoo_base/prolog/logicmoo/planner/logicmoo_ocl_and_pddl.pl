@@ -1,16 +1,16 @@
-% :- module(lp,[test_blocks/0,test_domain/1,test_all/0,test_rest/0,test_sas/0,test_dir_files_sas/1,test_dir_files_sas/3]).
-
+:- module(lp,[test_blocks/0,test_domain/1,test_all/0,test_rest/0,test_sas/0,test_dir_files_sas/1,test_dir_files_sas/3,decl_mpred_env/2]).
+%:- set_prolog_flag(gc,true).
 :- op(100,xfy,'=>').
-
-
-% :- set_prolog_flag(gc,true).
-
+:- debug.
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
-user:file_search_path(pack, '../../../../').
+:- prolog_load_context(directory,Dir),
+   DirFor = planner,
+   (( \+ user:file_search_path(DirFor,Dir)) ->asserta(user:file_search_path(DirFor,Dir));true),
+   absolute_file_name('../../../../',Y,[relative_to(Dir),file_type(directory)]),
+   (( \+ user:file_search_path(pack,Y)) ->asserta(user:file_search_path(pack,Y));true).
 :- attach_packs.
 :- initialization(attach_packs).
-
 % [Required] Load the Logicmoo Library Utils
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 
@@ -18,16 +18,18 @@ user:file_search_path(pack, '../../../../').
 
 use_local_pddl:-throw(uses_local_pddl).
 
-:- if(gethostname(c3po);gethostname(titan)).
+
+:- if((false,(gethostname(c3po);gethostname(titan)))).
 
 :- initialization(user:use_module(library(swi/pce_profile))).
 :- initialization( profiler(_,walltime) ).
 
-% :- if_startup_script->true;throw(not_startup_script_PDDL).
-
 :- endif.
 
+% :- use_module(library(clpfd)).
 :- use_module(library(dif)).
+:-export(user:my_pfc_add/1).
+user:my_pfc_add(A):-if_defined(pfc_add(A),assert_if_new(A)).
 
 
 % :- qcompile_libraries.
@@ -43,9 +45,15 @@ use_local_pddl:-throw(uses_local_pddl).
 :- dynamic(is_saved_type/3).
 
 
+
 :- if(\+current_predicate(init_locl_planner_interface0/4)).
 %:- ensure_loaded(logicmoo_hyhtn).
 :- endif.
+% :- set_prolog_flag(gc,true).
+
+:- initialization( profiler(_,cputime) ).
+:- initialization(user:use_module(library(swi/pce_profile))).
+
 
 
 :- expects_dialect(sicstus).
@@ -53,16 +61,18 @@ use_local_pddl:-throw(uses_local_pddl).
 :- use_module(library(lists)).
 :- use_module(logicmoo_util_structs).
 
-% user:struct_decl(domain(domain_name, requires, types, constants, predicates, functions, constraints, actions)).
-% user:struct_decl(problem(problem_name, domain_name, requires, objects, init, goal, constraints, metric, length)).
+:- decl_struct(domain(domain_name, requires, types, constants, predicates, functions, constraints, actions, dict(extraprops))).
+:- decl_struct(problem(problem_name, domain_name, requires, objects, init, goal, constraints, metric, length, dict(extraprops))).
 
 
-:- decl_struct(action(parameters=unk,sorted(preconditions),sorted(positiv_effect),sorted(negativ_effect),dict(extraprops))).
+:- decl_struct(action5(parameters=unk,sorted(preconditions),sorted(positiv_effect),sorted(negativ_effect),dict(extraprops))).
 
-:- decl_argtypes(
-   action(string(action_name),parameters,sorted(preconditions),sorted(positiv_effect),sorted(negativ_effect),sorted(assign_effect),
-        parameters_decl,parameter_types,string(domain_name),varnames,
-        callable(constraints),dict(extraprops))).
+:- decl_argtypes(action(parameters=unk,sorted(preconditions),sorted(positiv_effect),sorted(negativ_effect),
+    assign_effect,list(parameter_types),string(domain_name),list(varnames),
+     dict(extraprops))).
+:- decl_struct(
+   action(string(action_name),list(parameter_types),sorted(preconditions),sorted(positiv_effect),sorted(negativ_effect),sorted(assign_effect),
+        callable(parameters),callable(constraints),dict(extraprops))).
 
 
 
@@ -130,8 +140,8 @@ load_file(F):- must(read_file(F, L)),load_file_rest(F,L).
 load_file_rest(_,[]):-!.
 load_file_rest(F,L):- first_n_elements(L,10,ES),
    (
-   (append(_,['define','(','domain',Named|_],ES),must((ensure_struct(domain,O),prop_set(filename,O,F),domainBNF(O, L, R1)))) ->  save_type_named(domain,Named,O);
-   (append(_,['(','problem',Named|_],ES),ensure_struct(problem,O),must((prop_set(filename,O,F),problem(O, L, R1)))) ->  save_type_named(problem,Named,O);
+   (append(_,['define','(','domain',Named|_],ES),must_det_l((domainBNF(O, L, R1),prop_set(filename,O,F)))) ->  save_type_named(domain,Named,O);
+   (append(_,['(','problem',Named|_],ES),must_det_l((problem(O, L, R1),prop_set(filename,O,F)))) ->  save_type_named(problem,Named,O);
     must((ensure_struct(sexpr_file,O),prop_set(filename,O,F),sterm(SO, L, R1),prop_set(sterm_value,O,SO)))),
    load_file_rest(F,R1).
 
@@ -165,6 +175,20 @@ solve_files(DomainFile, ProblemFile):-
 solve_files_0(DomainFile, ProblemFile):-
    must_det_l(( 
       format('~q.~n',[solve_files(DomainFile, ProblemFile)]),
+   parseDomain(DomainFile, DD),
+    parseProblem(ProblemFile, PP),
+    term_to_ord_term(DD, D),prop_get(domain_name,D,DName),save_type_named(domain,DName,D),
+    term_to_ord_term(PP, P),prop_get(problem_name,P,PName),save_type_named(problem,PName,P),    
+    reset_statistic)),
+    !,
+    record_time(try_solve(PName, D,P,S),SolverTime),
+    flag(time_used,X,X + SolverTime),
+    show_statistic(P, S),
+    !.
+
+solve_files_0(DomainFile, ProblemFile):-
+   must_det_l(( 
+  format('~q.~n',[solve_files(DomainFile, ProblemFile)]),
       parseDomain(DomainFile, D),
       prop_get(domain_name,D,DName),
       save_type_named(domain,DName,D),
@@ -179,6 +203,44 @@ solve_files_0(DomainFile, ProblemFile):-
     flag(time_used,X,X + SolverTime),
     show_statistic(P, S),
     !.
+
+
+
+compile_problem(Pu,P):-
+ must_det_l((
+ replc_structure_vars(Pu,Pu0),
+  term_to_ord_term(Pu0,P),
+  prop_get(init,P, UCI),
+  prop_get(goal,P, UCG),
+  term_to_ord_term((UCI,UCG),OT),
+  copy_term_for_assert(OT,(I,G)),
+  prop_set(init,P, I),
+  prop_set(goal,P, G),
+  prop_get(problem_name,P,PName),
+  save_type_named(problem,PName,P))).
+
+compile_domain(D,Dc):-
+ must_det_l((
+    prop_get(domain_name,D, DName),
+    prop_get(actions,D,A),
+    must_maplist(copy_term_spec,A,AC),
+    prop_set(actions,D,AC),
+    must_maplist(to_action5,AC,A5),
+    prop_set(actions5,D,A5),
+    must_maplist(save_action(DName), A5),    
+    D = Dc,  % replc_structure_vars2(D,Dc),
+    save_type_named(domain,DName,Dc))).
+
+save_varnames_in_action(A,CA):-varnames_for_assert(A,CA,Vars),prop_set(varnames,CA,Vars).
+
+% DMILES
+to_action5(action(_S, _L, P, PE, NE, Assign, ActionDef,_,_),action5(ActionDef, P, PE, NE,Assign)):-!.
+to_action5(Struct,Term):-
+  prop_get_nvlist(Struct,[parameters=UT,preconditions=Precon,positiv_effect=Pos,negativ_effect=Neg,assign_effect=Af]),
+  Term=action5(UT, Precon, Pos, Neg, Af).
+     
+save_action(Mt,A):- ain(actn(Mt,A)).
+
 
 
 record_time(G,TimeUsed):- record_time(G,runtime,TimeUsed).
@@ -196,7 +258,7 @@ try_solve(PN,D,P,S):-dmsg('utter_failed'(warn):-try_solve(PN,D,P,S)),!.
 
 sdmsg(B,B):- \+ compound(B),!.
 sdmsg((D:-B),SS):-B==true,!,sdmsg(D,SS).
-sdmsg(B,SS):-B=..[F|A],maplist(sdmsg,A,AA),SS=..[F|AA].
+sdmsg(B,SS):-B=..[F|A],must_maplist(sdmsg,A,AA),SS=..[F|AA].
 
 pmsg(D):- sdmsg(D,SS),D \=@= SS, !,pmsg(SS).
 pmsg(D):- compound(D),functor(D,(:-),_),!,subst(D,=,'k_===_v',SS),wdmsg(SS).
@@ -209,50 +271,41 @@ pmsg(D):- subst(D,=,'k_===_v',SS),wdmsg(SS),wdmsg((:-SS)).
 %
 :-thread_local(thlocal:other_planner/1).
 solve(PN,D,P,S):- thlocal:other_planner(C),logOnError(call(PN,C,D,P,S)),!.
+
+solve(_,D, P, Solution):-
+  must_det_l((
+    bb_put(currentProblem, P),
+    bb_put(currentDomain, D),
+    prop_get(init,P, UCI),
+    prop_get(goal,P, UCG),
+    copy_term_for_assert((UCI,UCG),(I,G)),
+    prop_get(domain_name,D,Mt),    
+    must(prop_get(domain_name,P,Mt)),
+    % abolish(actn,2),
+
+    prop_get(actions,D, A),
+    must_maplist(save_varnames_in_action,A,CA),
+    bb_put(actions, CA), must_maplist(save_action(Mt), CA),
+
+    bb_put(goalState, G),        
+    bb_put(fictiveGoal, G))),!,    
+    search(da(Mt,A,A5),I, G, Solution).
+
 solve(_PN,D,P,Solution):-
   must_det_l((
-    bb_put(currentDomain, D),
     bb_put(currentProblem, P), 
-    prop_get(actions5,D,A4),
-    prop_get(goal,P, G),
+    bb_put(currentDomain, D),    
     prop_get(init,P, I),
+    prop_get(goal,P, G),
+    copy_term_for_assert((I,G),(Ic,Gc)),
+    prop_get(domain_name,D,Mt),
+    must(prop_get(domain_name,P,Mt)),
+    prop_get(actions,D, A),
+    prop_get(actions5,D, A5),
     bb_put(goalState, G), 
     bb_put(fictiveGoal, G))),    
-    search(A4, I, G, Solution).
+    search(da(Mt,A,A5),Ic, Gc, Solution).
     
-
-compile_problem(Pu,P):-
- must_det_l((
- replc_structure_vars(Pu,Pu0),
-  term_to_ord_term(Pu0,P),
-  prop_get(init,P, UCI),
-  prop_get(goal,P, UCG),
-  term_to_ord_term((UCI,UCG),OT),
-  copy_term_for_solve(OT,(I,G)),
-  prop_set(init,P, I),
-  prop_set(goal,P, G),
-  prop_get(problem_name,P,PName),
-  save_type_named(problem,PName,P))).
-
-compile_domain(D,Dc):-
- must_det_l((
-    prop_get(domain_name,D, DName),
-    prop_get(actions,D,A),
-    maplist(replc_structure_vars2,A,AC),
-    prop_set(actions,D,AC),
-    maplist(to_action5,AC,A5),
-    prop_set(actions5,D,A5),
-    maplist(save_action(DName), A5),    
-    D = Dc,  % replc_structure_vars2(D,Dc),
-    save_type_named(domain,DName,Dc))).
-
-
-% DMILES
-to_action5(Struct,Term):-
-  prop_get_nvlist(Struct,[parameters=UT,preconditions=Precon,positiv_effect=Pos,negativ_effect=Neg,assign_effect=Af]),
-  Term=action5(UT, Precon, Pos, Neg, Af).
-     
-save_action(Mt,A):- ain(actn(Mt,A)).
 
 
 % mysubset(+Subset, +Set)
@@ -274,16 +327,39 @@ mysubset([X|R], S):-
   nop( prop_get(constraints(A,C))),
   nop((  prop_get(varnames(A,Vars)))),
   nop((checkConstraints(C),record_var_names(Vars))).
+
+
+get_action_copy(Mt,A):- actn(Mt,A).
+
+get_constrained_action(Mt,action(S, PTs, Precon, Pos, Neg, Assign, UT )):-
+  get_action_copy(Mt,action(S, PTs, Precon, Pos, Neg, Assign, UT , C, Vars)),
+  nop((call(C),record_var_names(Vars))).
+
+
+get_action_bb(_Mt,A):- bb_get(actions, As),copy_term(As, Ass),!, member(A, Ass).
+
+get_constrained_action_bb(Mt,action(S, PTs, Precon, Pos, Neg, Assign, UT )):-
+  get_action_bb(Mt,action(S, PTs, Precon, Pos, Neg, Assign, UT , C, Vars)),
+  nop((call(C),record_var_names(Vars))).
+
 */
-
-get_action_info(Mt,A):- actn(Mt,A).
-
 % DMILES
-get_constrained_action(Mt,A):- =(Mt,CC),!,member(A,CC).
+
+get_constrained_action(da(Mt,AS,AS5),action(S, PTs, Precon, Pos, Neg, Assign, UT )):- !, actn(Mt,action(S, PTs, Precon, Pos, Neg, Assign, UT, _,_)).
+get_constrained_action(da(Mt,AS,AS5),action(S, PTs, Precon, Pos, Neg, Assign, UT )):-
+  copy_term(AS,ASC),
+  member(action(S, PTs, Precon, Pos, Neg, Assign, UT , C, Vars),ASC),
+  nop((call(C),record_var_names(Vars))).
 
 
-% DMILES
-get_constrained_action_bb(Mt,A):- copy_term(Mt,CC),!,member(A,CC).
+get_constrained_action_bb(_Mt,action(S, PTs, Precon, Pos, Neg, Assign, UT )):- bb_get(actions, As),As \= [],!, copy_term(As, Ass),!, member(action(S, PTs, Precon, Pos, Neg, Assign, UT, _,_), Ass).
+get_constrained_action_bb(da(Mt,AS,AS5),action(S, PTs, Precon, Pos, Neg, Assign, UT )):-
+  copy_term(AS,ASC),
+  member(action(S, PTs, Precon, Pos, Neg, Assign, UT , C, Vars),ASC),
+  nop((call(C),record_var_names(Vars))).
+
+
+
 
 all_dif(_):-!.
 all_dif([A,B]):-!,dif(A,B),!.
@@ -411,7 +487,11 @@ replc_structure_vars(A,AA):- copy_term(A,AC),
 %   Modified version of code published by Bartak: http://kti.mff.cuni.cz/~bartak/prolog/data_struct.html
 %
 
-copy_term_for_solve(A,B):-
+varnames_for_assert(A,B,After):-
+     b_getval('$variable_names',Before),
+     cp(A,Before,B,After).
+
+copy_term_for_assert(A,B):-
     cp(A,[],B,After),
     b_setval('$variable_names',After).
 
@@ -420,7 +500,6 @@ cp(  VAR,Vars,NV,NVars):- svar(VAR,_),!,must((svar_fixvarname(VAR,Name),atom(Nam
 cp([H|T],Vars,[NH|NT],NVars):-!,cp_args([H|T],Vars,[NH|NT],NVars).
 cp( Term,Vars,Term,Vars):- \+compound(Term),!.
 cp( Term,Vars,NTerm,NVars):-    
-    Term \= ?(_),
     Term=..[F|Args],    % decompose term
     cp_args(Args,Vars,NArgs,NVars),
     NTerm=..[F|NArgs].  % construct copy term
@@ -835,9 +914,9 @@ make_solution(S, S).
 step(Mt,State, ActionDef, NewState):-  
   %  get_a ction(A, ActionDef),
   %  get_precondition(A, P),    
+  must(get_constrained_action_bb(Mt,action(_S, _L, P, PE, NE, _Assign, ActionDef))),
 % DMILES 
-  get_constrained_action_bb(Mt,action5(ActionDef, P, PE, NE,_)),
-  
+%  get_constrained_action_bb(Mt,action5(ActionDef, P, PE, NE,_)),
   mysubset(P, State),  % choose suitable action
  %   get_negativ_effect(A, NE),
   ord_subtract(State, NE, State2),
@@ -894,9 +973,14 @@ relax(Mt,S, G, E):-
 
 relax_step(Mt,State, PE):-    
     % get_a ction(A),
-% DMILES
-    get_constrained_action_bb(Mt,action5(_,P,PE,_,_)),
-    mysubset(P, State).
+    must(get_constrained_action(Mt,action(_S, _L, P, PE0, _Neg, _Assign, _UT))),
+    %get_precondition(A, P),
+    % DMILES
+    %get_constrained_action_bb(Mt,action5(_,P,PE,_,_)),
+  
+    mysubset(P, State),
+    PE0 = PE.
+    %get_positiv_effect(A, PE).
 
 % FILENAME:  h_diff.pl 
 % h(+State, -EstimatedValue)
@@ -964,8 +1048,8 @@ parseDomain(File, Output, R) :-
 domainBNF(Output, List, R):- with_assertions(tlbugger:skipMust, debugOnError0(domainBNF_dcg(Output, List, R))),!.
 domainBNF(Output, List, R):- with_assertions(thlocal:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(domainBNF_dcg(Output, List, R)))),!,
    portray_clause((domainBNF:-thlocal:allow_sterm,Output)).
-domainBNF(P     , List, R):- must(sterm(O, List, R)),!,must(sterm2pterm(O,P)),!,portray_clause((ed:-P)).
-domainBNF(Output, List, R):- trace,domainBNF_dcg(Output, List, R),!.
+domainBNF(Output, List, R):-  sterm(O, List, R), must_det_l((sterm2pterm(O,P),prop_put_extra_extra(Output,P),portray_clause((ed(Output):-P)))).
+domainBNF(Output, List, R):- trace,with_no_assertions(tlbugger:skipMust, debugOnError0(domainBNF_dcg(Output, List, R))),!.
 
 :-export(domainBNF_dcg//1).
 
@@ -973,21 +1057,22 @@ svar(Var,Var):-var(Var),!.
 svar('$VAR'(Var),Name):-number(Var),format(atom(Name),'~w',['$VAR'(Var)]),!.
 svar('$VAR'(Name),Name):-!.
 svar('?'(Name),Name):-!.
-svar(VAR,Name):-atom(VAR),atom_concat('??',Name,VAR).
+svar(VAR,Name):-atom(VAR),atom_concat('??',Name,VAR),!.
 svar(VAR,Name):-atom(VAR),atom_concat('?',Name,VAR).
 
 svar_fixvarname(VAR,UP):-svar(VAR,SVAR),!,must(atom(SVAR)->fix_varcase(SVAR,UP);UP=SVAR).
 
 sterm2pterm(VAR,VAR):-var(VAR),!.
-sterm2pterm(VAR,'?'(UP)):-svar_fixvarname(VAR,UP).
-sterm2pterm([S],S):-atom(S). % ,atom_concat(':',_,S),!.
+sterm2pterm(In,Out):-nonvar(Out),!,sterm2pterm(In,OutM),must(Out=OutM).
+sterm2pterm(VAR,'?'(UP)):-svar_fixvarname(VAR,UP),!.
+sterm2pterm([S],S):-atom(S),!. % ,atom_concat(':',_,S),!.
 sterm2pterm([S|SLIST],PTERM):-atom(S),atom_concat(':',_,S),
-            maplist(sterm2pterm,SLIST,PLIST),           
+            must_maplist(sterm2pterm,SLIST,PLIST),           
             PTERM=..[S,PLIST].
 sterm2pterm([S|SLIST],PTERM):-atom(S),\+ svar(S,_),!,
-            maplist(sterm2pterm,SLIST,PLIST),           
+            must_maplist(sterm2pterm,SLIST,PLIST),           
             PTERM=..[S|PLIST].
-sterm2pterm(SLIST,PLIST):- is_list(SLIST),!,maplist(sterm2pterm,SLIST,PLIST).
+sterm2pterm(SLIST,PLIST):- is_list(SLIST),!,must_maplist(sterm2pterm,SLIST,PLIST).
 sterm2pterm(VAR,VAR):-!.
 
 sterm(_) --> [')'],{!,fail}.
@@ -1108,7 +1193,7 @@ dconstraints_def(C)                 --> ['(',':',constraints], con_GD(C), [')'].
 structure_def(A)                --> action_def(A).
 structure_def(D)               --> durative_action_def(D).                                                                    %:durativeactions
 %structure_def(D)               --> derived_def(D).                                                                            %:derivedpredicates
-% structure_def(D)         --> allowed_sterm(structure_def,D).
+structure_def(D)         --> allowed_sterm(structure_def,D).
 %typed_list(W, G)               --> oneOrMore(W, N), ['-'], type(T), {G =.. [T, N]}.
 
 
@@ -1137,20 +1222,22 @@ emptyOr(W)                      --> W.
 
 % Actions definitons
 action_def(Struct)
-                                --> ['(',':',action], action_symbol(S),                                    
-                                    [':',parameters],
+                                --> 
+           % action(S, PTs,  Precon, Pos, Neg, Assign, UT , C, Vars)
+   {must((Struct = action(_, [], [],      [], [],  [],     [] , [],   mutable([sclass=dict]))))},
+                                    ['(',':',action], action_symbol(S),
+                                   dcgMust(( [':',parameters],
 
                                     ['('], typed_list_exact(variable, L), [')'],
-                                    {
- must_det_l((get_param_types(top,L,PIs,PTs), 
-     SPI=..[S|PIs],SPT=..[S|PTs],SPDL=..[action,S|L],
-     ensure_struct(action,[action_name=S,parameters=SPI, parameter_types=SPT, parameters_decl=SPDL],Struct)))},
+                                    {must_det_l((get_param_types(top,L,PIs,PTs),
+                                    SPI=..[S|PIs],
+                                    prop_set_nvlist(Struct,[action_name=S,parameters=SPI, parameter_types=PTs, parameters_decl=L])))},
                                     dcgMust((action_def_body(Struct))),
-                                    [')'],!.
+                                    [')'])),!.
 action_symbol(N)                --> name(N).
 
 % Actions definitons
-durative_action_def(action(S, (PTs), Precon, Pos, Neg, Assign, UT, []))
+durative_action_def(action(S, vv(PTs), Precon, Pos, Neg, Assign, UT, []))
                                 --> ['(',':',daction], action_symbol(S),
                                     [':',parameters,'('], typed_list(variable, L), [')'], 
                                     {get_param_types(s(val),L,PIs,PTs),UT=..[S|PIs],!},
@@ -1436,6 +1523,7 @@ length_spec([])                 --> [not_defined].      % there is no definition
 fix_wordcase(Word,WordC):-upcase_atom(Word,UC),UC=Word,!,downcase_atom(Word,WordC).
 fix_wordcase(Word,Word).
 
+
 fix_varcase(Word,WordC):-!,name(Word,[F|R]),to_upper(F,U),name(WordC,[U|R]).
 % the cut above stops the rest 
 fix_varcase(Word,Word):-upcase_atom(Word,UC),UC=Word,!.
@@ -1674,9 +1762,9 @@ my_ord_member(S, [_|T]):-
     my_ord_member(S, T).
 
 
+prop_merge_svo(Struct,Name,Value):-prop_merge(Name,Struct,Value).
 
 
-% :- module(lp).
 domain_name_for_ocl(Name):- use_local_pddl, no_repeats(domain_name0(Name)).
 domain_name0(Name):- bb_get(currentDomain, D),prop_get(domain_name,D,Name).
 domain_name0(Name):- bb_get(currentProblem, P),prop_get(domain_name,P,Name).
@@ -1877,14 +1965,14 @@ op_action(Mt, S, PTs, NPrecon, Pos, Neg, Af, UT , True):- use_local_pddl,
    must_det_l((
       True = true,
       UT=..[S|ARGS],
-      maplist(lock_var,ARGS),
+      must_maplist(lock_var,ARGS),
       HintsIn=[],
       unss_ify(=,HintsIn,ss,SS,Af,Hints1),
       unss_ify(=,Hints1,se,SE,Precon,Hints2),
       unss_ify(=,Hints2,sc,SC,NEGPOS,Hints),
       divide_neg_pos(NEGPOS,[],[],Neg,Pos),   
       append(Precon,Neg,NPrecon),
-      maplist(get_type_of(Mt,top,Hints),ARGS,PTs))).
+      must_maplist(get_type_of(Mt,top,Hints),ARGS,PTs))).
 
 lock_var(X):-when((?=(X,Y);nonvar(X)),X==Y).
 unlock_var(V):-del_attrs(V).
@@ -1901,8 +1989,8 @@ actn_operator(Mt,UT,SE,SC,SS):- use_local_pddl, actn(Mt,A),
                (varnames)=Vars]),
    UT=..[_|ARGS],
    show_call(Call),   
-   maplist(record_var_names,Vars),
-   maplist(create_hint,PTs,ARGS,ARGHints),
+   must_maplist(record_var_names,Vars),
+   must_maplist(create_hint,PTs,ARGS,ARGHints),
    conjuncts_to_list(Call,MORE),
    append(ARGHints,MORE,MOREARGHints),
    unss_ify(=,[],MOREARGHints,Precon,se,SEPs,HintsSE),
@@ -1910,9 +1998,9 @@ actn_operator(Mt,UT,SE,SC,SS):- use_local_pddl, actn(Mt,A),
    unss_ify(add_wrapper(del),[],HintsSS,Neg,ss,NOTS,HintsNEG),
    unss_ify(add_wrapper(add),NOTS,HintsNEG,Pos,ss,NOTSPOSC,HintsPOS),
    mylist_to_set(HintsPOS,Hints),
-   maplist(ress_ify(Mt,Def,Hints,se),SEPs,SE),
-   maplist(ress_ify(Mt,Def,Hints,ss),ASEPs,SS),   
-   maplist(make_rem_adds(Mt,Hints),NOTSPOSC,SC))).
+   must_maplist(ress_ify(Mt,Def,Hints,se),SEPs,SE),
+   must_maplist(ress_ify(Mt,Def,Hints,ss),ASEPs,SS),   
+   must_maplist(make_rem_adds(Mt,Hints),NOTSPOSC,SC))).
 
 make_rem_adds(Mt,Hints,A1-LIST,sc(Type,A1,(NEG=>POS))):-findall(N,member(del(N),LIST),NEG),findall(N,member(add(N),LIST),POS),
   must(get_type_of(Mt,top,Hints,A1,Type)).
@@ -2019,11 +2107,11 @@ planner_task_for_ocl(Domain,PName,
      must_det_l((
         prop_get(init,P, UCI),
         prop_get(goal,P, UCG),    
-        copy_term_for_solve((UCI,UCG),(I,G)),       
+        copy_term_for_assert((UCI,UCG),(I,G)),       
         unss_ify(=,[],[],I,ss,SSK,HintsSS),
         unss_ify(=,[],HintsSS,G,se,SEK,Hints),
-        maplist(ress_ify(Mt,Def,Hints,ss),SSK,SSs),
-        maplist(ress_ify(Mt,Def,Hints,se),SEK,SEs))).
+        must_maplist(ress_ify(Mt,Def,Hints,ss),SSK,SSs),
+        must_maplist(ress_ify(Mt,Def,Hints,se),SEK,SEs))).
 
 name_to_problem_struct(Name,P):- use_local_pddl, problem_name(Name),name_to_problem_struct0(Name,P).
 name_to_problem_struct0(Name,P):-Name==current,!,bb_get(currentProblem,P).
@@ -2080,32 +2168,31 @@ mysame_key(_, L, [], L).
 
 :- flag(time_used,_,0).
 
-:- debug,nop(must(test_blocks)).
+:- debug,(must(test_blocks)).
 
-/*
+
 :- solve_files('benchmarks/mystery/domain.pddl','benchmarks/mystery/prob01.pddl').
 :- test_domain('benchmarks/driverlog/domain.pddl',4).
 :- solve_files('hsp-planners-master/hsp2-1.0/examples/parcprinter-strips/p01-domain-woac.pddl','hsp-planners-master/hsp2-1.0/examples/parcprinter-strips/p01-woac.pddl').
-*/
+
 % :-doall(on_call_decl_hyhtn).
-:- if((if_startup_script)).
+:- if((fail,if_startup_script)).
 /*
 
 
-:- test_ocl('domains_ocl/chameleonWorld.ocl').
 
 %:- asserta(thlocal:loading_files).
 
 %:- test_ocl('domains_ocl/?*WashingMachine.ocl').
 */
-/*
+
 
 :- test_domain('domains_ocl/chameleonWorld/domain*').
 :- test_all(7).
 
+:- if(current_predicate(pce_show_profile/0)).
 :- pce_show_profile.
-*/
-
+:- endif.
 
 :- retractall(thlocal:loading_files).
 :- endif.
@@ -2126,6 +2213,7 @@ twhy
 
 
 :- if(gethostname(c3po);gethostname(titan)).
+
 
 /*
 
@@ -2158,6 +2246,6 @@ test_blocks:- fail, test_domain('./benchmarks/nomystery-sat11-strips/domain.pddl
 push_env_ctx:-!,fail.
 push_env_ctx:-!.
 
-:- ensure_loaded(logicmoo_hyhtn).
+:- include(logicmoo_hyhtn).
 :- show_call(flag(time_used,W,W)).
-rr:- trace,test_ocl('domains_ocl/chameleonWorld.ocl').
+rr:- test_ocl('domains_ocl/chameleonWorld.ocl').

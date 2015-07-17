@@ -13,9 +13,7 @@
 
 % :-export(eng_fully_expand/2).
 
-% :- begin_prolog_source.
-
-% :- begin_transform_moo_preds.
+:- file_begin(prolog).
 
 
 % ===========================================
@@ -289,7 +287,7 @@ anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameStrings,Obj,S
 %anglify_noun_known(Obj,_Hint,String):-
 %nameStrings(X,Y,_,_)
 
-:-  end_transform_moo_preds.
+:- file_begin(prolog).
 
 
 

@@ -36,9 +36,9 @@
 :- include((logicmoo_i_header)).
 
 
+:- file_begin(pfc).
 
-:- pfc_begin.
-
+a(z).
 
 :- if(if_defined(pfc_testing)).
 
@@ -103,10 +103,14 @@ pfc_select(conflict(X),W) :- pfc_queue(conflict(X),W).
 
 % a pretty basic conflict.
 (neg(P), P) => conflict(P).
+(P, neg(P)) => conflict(P).
 
+% remove conflicts early 
+neg(P) => (\+P ).
+(P => (\+neg(P))).
 
 % is this how to define constraints?
-(either(P,Q) => (neg(P) => Q), (neg(Q) => P)).
+(either(P,Q) => ((neg(P) <=> Q), (neg(Q) <=> P))).
 % ((P,Q => false) => (P => neg(Q)), (Q => neg(P))).
 
 type_prefix(_Prefix,Type)=>tCol(Type).
@@ -510,6 +514,8 @@ pfc_default((prologSingleValued(Pred),arity(Pred,Arity)) => singleValuedInArg(Pr
 
 singleValuedInArg(singleValuedInArg,2).
 
+
+
 :- dynamic(isa/2).
 
 ttPredType(Prop)=>tCol(Prop).
@@ -655,7 +661,7 @@ prologHybrid(isEach( tCol/1, disjointWith/2, genls/2,genlPreds/2, meta_argtypes/
 :- add((isa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,prologHybrid,predCanHaveSingletons,prologOnly,prologOnly,prologMacroHead,prologListValued,prologSingleValued),functorDeclares))).
 :- add((genls(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,prologOnly,prologMacroHead,prologListValued,prologSingleValued),tPred))).
 :- assert_hasInstance(tCol,tCol).
-:- begin_transform_moo_preds.
+:- file_begin(mpreds).
 :- debug.
 %TODO FIX :- decl_mpred(tDeleted(ftID),[predIsFlag]).
 prologHybrid(isEach( ttNotTemporalType/1,ttTemporalType/1 )).
@@ -725,8 +731,19 @@ argQuotedIsa(Prop,N,Type) <= {number(N)},argIsa(Prop,N,Type),ttFormatType(Type).
 :-multifile(mudLabelTypeProps/3).
 :- forall(ttPredType(F),must((decl_type(F),add(isa(F,functorDeclares)),add(genls(F,tPred))))).
 :- export(mtForPred/2).
-:- decl_mpred_hybrid((argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, isa/2,  genls/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
-prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, isa/2, genls/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
+
+:- set_prolog_flag(report_error,true).
+:- set_prolog_flag(debug_on_error,true).
+
+:- debug,(decl_mpred_hybrid((argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, 
+    isa/2,  genls/2, pddlSomethingIsa/2, 
+    resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, 
+    ttFormatType/1, typeProps/2))).
+
+prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, isa/2, 
+   genls/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, 
+   completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
+
 :-add(isa(ttFormatType,ttAbstractType)).
 :-discontiguous(subFormat/2).
 :-dynamic(tChannel/1).
@@ -1117,6 +1134,48 @@ makeArgConstraint('SometimesIsa',tCol).
 ((arity(Pred,2),argIsa(Pred,2,ftInt))=>singleValuedInArg(Pred,2)).
 ((arity(Pred,2),argIsa(Pred,2,ftPercent))=>singleValuedInArg(Pred,2)).
 
+:-ensure_loaded('zenls.pfct').
+
+dif_in_arg(P,N,Q):- cwc, ground(P),P=..[F|ARGS],arg(N,P,B),Q=..[F|ARGS],nb_setarg(N,Q,A),dif(A,B).
+
+/*
+(  (P/ground(P),
+   {get_functor(P,F,A)},
+   singleValuedInArg(F,N),
+   {dif_in_arg(P,N,Q)},
+   Q)
+   => \+ Q ).
+
+*/
+
+/*
+(singleValuedInArg(F,N),arity(F,A),{integer(A),integer(N),atom(F),functor(P,F,A),functor(Q,F,A)} => 
+ ( (P/dif_in_arg(P,N,Q),Q) => \+ Q )).
+
+
+((arity(Pred,Arity),singleValuedInArg(Pred,SV),
+  {functor(Before,Pred,Arity),arg(SV,Before,B),replace_arg(Before,SV,A,After)})
+  =>
+   ((After,{dif:dif(B,A),clause_asserted(Before), B\==A,\+ is_relative(B),\+ is_relative(A)}) 
+     =>
+      {pfc_rem2a(Before)})).
+
+
+(singleValuedInArg(F,N),arity(F,A),{ground(F+N+A),functor(P,F,A),arg(N,P,B),replace_arg(P,N,E,Q)} => 
+  (P => {pfc_add_fire_once(Q=>({pfc_rem2a(P)} , Q)))).
+
+ (singleValuedInArg(F,N),arity(F,A),{ground(F+N+A),functor(P,F,A),arg(N,P,B),replace_arg(P,N,E,Q)} => 
+  ((P/(dif(E,B),\+ is_relative(B),Q))=> ({pfc_rem2a(Q)},P))).
+
+*/
+
+(singleValuedInArg(F,N),arity(F,A),{ground(F+N+A),functor(P,F,A),arg(N,P,B),replace_arg(P,N,E,Q)} => 
+ ((P/(\+ is_relative(B)))=> ({dif(E,B),forall(Q,pfc_rem2a(Q))},\+Q,P))).
+
+:-include('singleValued.pfct').
+
+:- listing(_=>_).
+
 
 end_of_file.
 
@@ -1461,4 +1520,8 @@ trueSentence(CycL) => ({ sent_to_conseq(CycL,Consequent) }, Consequent).
 
 
 % props(I,Props)/(ground(I:Props),as_list(Props,PList))=>pfc_assert(props(I,isEach(PList))).
+
+))).
+
+.
 

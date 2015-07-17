@@ -1,0 +1,40 @@
+
+
+tCol(tFly).
+tCol(tCanary).
+tCol(tPenguin).
+tCol(tBird).
+
+genls(tCanary,tBird).
+genls(tPenguin,tBird).
+
+
+% chilly is a penguin.
+tPenguin(iChilly).
+
+:-show_call((tBird(iChilly))).
+
+
+% tweety is a canary.
+tCanary(iTweety).
+
+:-show_call((tBird(iTweety))).
+
+
+% birds fly by default.
+(pfc_default(( tBird(X) => tFly(X)))).
+
+
+:-show_call(must(tFly(iTweety))).
+:-show_call(must(tFly(iChilly))).
+
+
+% penguins do neg tFly.
+tPenguin(X) => neg(tFly(X)).
+
+:-show_call(must(\+ tFly(iChilly))).
+:-show_call(must(neg(tFly(iChilly)))).
+
+
+
+end_of_file.

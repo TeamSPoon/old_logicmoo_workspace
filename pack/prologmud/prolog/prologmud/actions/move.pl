@@ -17,7 +17,7 @@
 
 % :- register_module_type (mtCommand).
 
-% :- begin_transform_moo_preds.
+% :- file_begin(mudcode).
 
 
 user:agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), to_case_breaks(DirSS,[t(DirS,_),t(Dist,digit)]),show_call(coerce(DirS,vtDirection,Dir)),OUT=actMove(Dist,Dir).

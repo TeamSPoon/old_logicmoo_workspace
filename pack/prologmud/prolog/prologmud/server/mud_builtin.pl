@@ -23,7 +23,11 @@
 
 :-assert_until_end_of_file(infSupertypeName).
 :-onEndOfFile(dmsg(infSupertypeName)).
-:- pfc_begin.
+
+:- file_begin(pfc).
+
+
+baseKB:isa(iPerson99,tPerson).
 
 :- op(500,fx,'~').
 :- op(1050,xfx,('=>')).
@@ -59,9 +63,7 @@ isa(iWorld7,tWorld).
 
 
 
-%:-rtrace.
 typeGenls(tAgent,ttAgentType).
-%:-nortrace.
 typeGenls(tItem,ttItemType).
 typeGenls(tObj,ttObjectType).
 typeGenls(tPred,ttPredType).
@@ -660,9 +662,11 @@ genls(tClothing, tItem).
 genls( tCarryAble, tItem).
 genls( tCarryAble, tDropAble).
 
+tCol(genlsInheritable).
+
 genlsInheritable(tCol).
 genlsInheritable(ttPredType).
-genls(ttTypeType,genlsInheritable).
+:-must(pfc_assert((genls(ttTypeType,genlsInheritable)))).
 
 (genls(C,SC)/ground(genls(C,SC))=>(tCol(C),tCol(SC))).
 
@@ -978,12 +982,6 @@ normalAgentGoal(X,_)=>tStatPred(X).
    ((Head1,Head2/(Val1 \== Val2, catch((Val3 is Val1 + Val2),_,fail))) => 
      (( \+ Head1, Head3, \+ Head2 )))).
 
-((arity(Pred,Arity),singleValuedInArg(Pred,SV),
-  {functor(Before,Pred,Arity),arg(SV,Before,B),replace_arg(Before,SV,A,After)})
-  =>
-   (({dif:dif(B,A)},After,{clause_asserted(Before), B\==A,\+ is_relative(B),\+ is_relative(A)}) 
-     =>
-      {pfc_rem2(Before)})).
 
 
 

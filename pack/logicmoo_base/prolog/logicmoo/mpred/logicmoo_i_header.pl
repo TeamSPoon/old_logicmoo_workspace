@@ -34,8 +34,8 @@
 
 :- dynamic(completelyAssertedCollection/1).
 :- multifile(completelyAssertedCollection/1).
-:- dynamic(((tCol/1,tSet/1,mpred_module/2))).
-:- multifile(tCol/1).
+:- dynamic(((tCol/1,tFunction/1,tSet/1,mpred_module/2))).
+:- multifile(((tCol/1,tFunction/1,tSet/1,mpred_module/2))).
 :- dynamic(ttPredType/1).
 :- multifile(ttPredType/1).
 :- dynamic(functorDeclares/1).
@@ -282,7 +282,7 @@
 :- dynamic_multifile_exported user:loading_module_h/1.
 :- dynamic_multifile_exported user:registered_module_type/2.
 :- dynamic_multifile_exported user:already_added_this_round/1.
-:- dynamic_multifile_exported user:must_compile_special_clause_file/1.
+:- dynamic_multifile_exported user:is_mpred_file/1.
 
 :- multifile user:local_term_anglify/2.
 :- multifile user:term_anglify_last/2.
@@ -301,6 +301,7 @@
 :- multifile user:tms_reject_why/2.
 :- multifile user:fskel/7.
 :- multifile user:hook_coerce/3.
+:- dynamic user:hook_coerce/3.
 :- multifile user:hooked_random_instance/3.
 
 :- multifile user:now_unused/1.

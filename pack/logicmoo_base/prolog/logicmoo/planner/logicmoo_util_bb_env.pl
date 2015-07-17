@@ -48,6 +48,7 @@ env_clear(kb(Dom)):-nonvar(Dom),!,env_clear(Dom).
 env_clear(Dom):- forall(env_mpred(Dom,F,A),env_op(retractall(F/A))).
 env_op(OP_P):- OP_P=..[OP,P],env_op(OP,P).
 
+:- module_transparent(env_op/2).
 env_op(OP,P):- var(OP),!,P.
 env_op(OP,P):- env_mpred(P,_,_),!,forall(env_mpred(P,F,A),env_op(OP,F/A)).
 env_op(OP,F):- env_mpred(_,F,_),!,forall(env_mpred(_,F,A),env_op(OP,F/A)).
@@ -57,7 +58,7 @@ env_op(OP,P):- functor_h(P,F,A),must(get_mpred_stubType(F,A,ENV)),!,env_op(ENV,O
 env_op(OP,P):- append_term(OP,P,CALL),current_predicate(_,CALL),!,show_call(CALL).
 env_op(OP,P):- trace,trace_or_throw(unk_env_op(OP,P)).
 
-env_shadow(OP,P):-call(OP,P).
+env_shadow(OP,P):-user:call(OP,P).
 
 /*********************** initialisation**************/
 :-dynamic( in_dyn/2).
@@ -87,14 +88,10 @@ get_mpred_stubType(_,_,dyn).
 :-ain(env_kb(dyn)).
 :-nb_setval(disabled_env_learn_pred,false).
 
-decl_mpred_env_dom(Props,Preds):-
- with_assertions(env_ctx(dom,_CurrentDomain), 
-    decl_mpred_env([dom,Props],Preds)).
-decl_mpred_env_task(Props,Preds):-
- with_assertions(env_ctx(task,_CurrentTask), 
-    decl_mpred_env([task,Props],Preds)).
-
 :-thread_local(thlocal:env_ctx/2).
+
+:-export(decl_mpred_env/2).
+:-module_transparent(decl_mpred_env/2).
 
 decl_mpred_env(_,[]):-!.
 decl_mpred_env([],_):-!.
@@ -116,33 +113,41 @@ decl_mpred_env(CMPD,Pred):-  fail, compound(CMPD),CMPD=..[_|CMPDL],
 decl_mpred_env(Prop,Pred):- get_functor(Pred,F,A),
    decl_mpred_env_fa(Prop,Pred,F,A).
 
+decl_mpred_env_dom(Props,Preds):-
+ must(with_assertions(thlocal:env_ctx(dom,_CurrentDomain), 
+    decl_mpred_env([dom,Props],Preds))).
+decl_mpred_env_task(Props,Preds):-
+ must(with_assertions(thlocal:env_ctx(task,_CurrentTask), 
+    decl_mpred_env([task,Props],Preds))).
 
-abolish_and_make_static(F,A):-abolish(F,A),
+
+abolish_and_make_static(F,A):-
+  must_det_l((abolish(F,A),
   retractall(mpred_arity(F,A)),
    retractall(arity(F,A)),
    retractall(env_mpred(_,F,A)),
-  functor(H,F,A),asserta(H:-trace_or_throw(H)),compile_predicates([F/A]),lock_predicate(H).
+  functor(H,F,A),asserta((H:-trace_or_throw(H))),compile_predicates([F/A]),lock_predicate(H))).
 
 decl_mpred_env_fa(Prop,_Pred,F,A):- push_env_ctx,    
    thlocal:env_ctx(Type,Prefix),A1 is A+1,!,
-   functor(Pred1,F,A1),functor(Pred,F,A1),
+   must_det_l((functor(Pred1,F,A1),functor(Pred,F,A1),
    add_push_prefix_arg(Pred,Type,Prefix,Pred1),
    decl_mpred_env_real(Prop,Pred1,F,A1),!,
    abolish_and_make_static(F,A),!,
    arity(F,AA),
-   must(arity(F,A1)==arity(F,AA)).
+   must(arity(F,A1)==arity(F,AA)))).
 decl_mpred_env_fa(Prop,Pred,F,A):-
    decl_mpred_env_real(Prop,Pred,F,A).
 
 decl_mpred_env_real(Prop,Pred,F,A):- 
-  export(F/A),dynamic(F/A),multifile(F/A), 
+  ((user:((export(F/A),dynamic(F/A),multifile(F/A))))), 
   if_defined(decl_mpred(Pred,Prop),ain(user:mpred_prop(F,Prop))),
   ain(env_kb(Prop)), ain(mpred_arity(F,A)),ain(arity(F,A)),!,  
-  ain(env_mpred(Prop,F,A)),!.
+  ain(env_mpred(Prop,F,A)).
 
 
 env_learn_pred(_,_):-nb_getval(disabled_env_learn_pred,true),!.
-env_learn_pred(ENV,P):-decl_mpred_env(ENV,P).
+env_learn_pred(ENV,P):-user:decl_mpred_env(ENV,P).
 
 env_recorded(call,Val) :- recorded(Val,Val).
 env_recorded(assert, Val) :- recordz(Val,Val).
@@ -347,6 +352,5 @@ maybe_show_env_op(G):- !,G.
 maybe_show_env_op(G):- thlocal:db_spy -> show_call(G); G.
 
 :- meta_predicate(maybe_show_env_op(0)).
-
 
 */

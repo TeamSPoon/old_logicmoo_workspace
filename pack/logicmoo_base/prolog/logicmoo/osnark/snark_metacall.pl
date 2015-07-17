@@ -124,3 +124,5 @@ user:goal_expansion(true,writeq(true)):-!.
 %user:goal_expansion(V,V):-not(compound(V)),!.
 %user:goal_expansion(G,O):-source_file(G,File),add_mi(file(File),G,O).
 
+
+

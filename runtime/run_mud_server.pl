@@ -40,7 +40,7 @@ user:file_search_path(prologmud, library(prologmud)).
 :- initialization((current_predicate(egg_go/0)->egg_go;true),now).
 
 % [Mostly Required] Load the UPV Curry System
-:- time(user:ensure_loaded(library(upv_curry/main))).
+%:- time(user:ensure_loaded(library(upv_curry/main))).
 
 % [Required] Load the Logicmoo Base System
 :- time(user:ensure_loaded(logicmoo(logicmoo_base))).
@@ -53,7 +53,7 @@ user:file_search_path(prologmud, library(prologmud)).
 :- with_no_mpred_expansions(user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api))).
 
 % [Mostly Required] Load the Logicmoo Planner/AI System
-:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner)))).
+%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner)))).
 
 :- if(\+ if_defined(debugging_planner)).
 
@@ -64,17 +64,17 @@ user:file_search_path(prologmud, library(prologmud)).
 :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 
 % [Required] Load the Logicmoo Backchaining Inference System
-:- time(with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
+%:- time(with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
 
 % [Mostly Required] Load the Logicmoo Parser/Generator System
-:- time(user:ensure_loaded(library(parser_all))).
+%:- time(user:ensure_loaded(library(parser_all))).
 
 % [Required] most of the Library system should not be loaded with mpred expansion on
 :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 
 
 % [Optional] Load the Logicmoo RDF/OWL Browser System
-%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(mpred_online/dbase_i_rdf_store)))).
+%%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(mpred_online/dbase_i_rdf_store)))).
 
 
 % [Debugging] Normarily this set as 'true' can interfere with debugging

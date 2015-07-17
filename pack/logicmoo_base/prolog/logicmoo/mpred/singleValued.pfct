@@ -1,0 +1,13 @@
+
+
+prologSingleValued(idForString/2).
+
+idForString("foo man",foo1).
+idForString("foo woman",foo2).
+:-listing(idForString).
+idForString("foo man",foo3).
+:-listing(idForString).
+
+
+
+end_of_file.
