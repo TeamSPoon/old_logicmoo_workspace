@@ -85,7 +85,7 @@ never_type_why(C,noncol_type(T)):- noncol_type(T),a(T,C),!.
 never_type_why(F,decided_not_was_isa(F,W)):-decided_not_was_isa(F,W),!.
 %never_type_why(C):- compound(C),functor(C,F,1),isa_asserted(F,tCol).
 never_type_why(F,Why):-atom(F),functor(G,F,1),real_builtin_predicate(G),!,Why=(whynot( real_builtin_predicate(G) )).
-% never_type_why(F):-dmsg(never_type_why(F)),!,asserta_if_new(isa(F,prologOnly)).
+% never_type_why(F):-dmsg(never_type_why(F)),!,asserta_if_new(isa(F,prologDynamic)).
 never_type_why(F,Why):-never_type_f(F),Why=is_never_type(F).
 never_type_why(F,Why):-prologSideEffects(F),Why=prologSideEffects(F).
 never_type_why(F,Why):- atom(F), arity(F,A),!,F\==isa, isa(F,_), A > 1,Why=(whynot( arity(F,A) )).
@@ -599,7 +599,7 @@ assert_isa_hooked(T,tCol):-!,decl_type(T),!.
 assert_isa_hooked(T,ttFormatType):-!,define_ft(T),!.
 assert_isa_hooked(Term,tPred):-!,decl_mpred(Term).
 assert_isa_hooked(Term,prologHybrid):-!,decl_mpred_hybrid(Term).
-assert_isa_hooked(Term,prologOnly):-!,export(Term).
+assert_isa_hooked(Term,prologDynamic):-!,export(Term).
 assert_isa_hooked(Term,prologPTTP):-!,decl_mpred_hybrid(Term,prologPTTP).
 assert_isa_hooked(Term,prologSNARK):-!,decl_mpred_hybrid(Term,prologSNARK).
 assert_isa_hooked(I,_):- I\=prologHybrid(_),glean_pred_props_maybe(I),fail.

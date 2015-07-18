@@ -132,7 +132,8 @@ is_relation_type(P):-is_pred_declarer(P).
 functor_declares_instance(F,C):-functor_declares_instance_0(F,C0),!,C=C0.
 functor_declares_instance_0(decl_mpred,tPred).
 functor_declares_instance_0(decl_mpred_hybrid,prologHybrid).
-functor_declares_instance_0(decl_mpred_prolog,prologOnly).
+functor_declares_instance_0(decl_mpred_prolog,prologBuiltin).
+functor_declares_instance_0(decl_mpred_prolog,prologDynamic).
 
 functor_declares_instance_0(prologSideEffects,tPred).
 functor_declares_instance_0(tPred,tPred).
@@ -140,7 +141,7 @@ functor_declares_instance_0(meta_argtypes,tRelation).
 functor_declares_instance_0(prologMacroHead,tRelation).
 functor_declares_instance_0(tFunction,tFunction).
 functor_declares_instance_0(P,tPred):- arg(_,s(tPred,prologMultiValued,mpred_prop,user:mpred_prop,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,
-       predCanHaveSingletons,prologOnly,prologMacroHead,prologListValued,prologSingleValued),P).
+       predCanHaveSingletons,prologBuiltin,prologSNARK,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),P).
 
 functor_declares_instance_0(P,tCol):- arg(_,s(tCol,tSpec,ttFormatType),P).
 %functor_declares_instance_0(P,tPred):-isa_asserted(P,ttPredType),!.
@@ -646,7 +647,7 @@ into_mpred_form6(G,F,C,1,_,O):-real_builtin_predicate(G),!,into_mpred_form(C,OO)
 into_mpred_form6(_X,H,P,_N,A,O):-is_holds_false(H),(atom(P)->(G=..[P|A],O=not(G));O=..[holds_f,P|A]).
 into_mpred_form6(_X,H,P,_N,A,O):-is_holds_true(H),(atom(P)->O=..[P|A];O=..[t,P|A]).
 into_mpred_form6(G,F,_,_,_,G):-user:mpred_prop(F,prologHybrid),!.
-into_mpred_form6(G,F,_,_,_,G):-user:mpred_prop(F,prologOnly),!.
+into_mpred_form6(G,F,_,_,_,G):-user:mpred_prop(F,prologDynamic),!.
 into_mpred_form6(G,F,_,_,_,G):-nop(dmsg(warn(unknown_mpred_type(F,G)))).
 
 % ========================================
@@ -777,9 +778,9 @@ set_list_len(List,A,NewList):-length(List,LL),A>LL,length(NewList,A),append(List
 set_list_len(List,A,NewList):-length(NewList,A),append(NewList,_,List),!.
 
 
-is_mpred_prolog(F,_):-get_mpred_prop(F,prologOnly).
+is_mpred_prolog(F,_):-get_mpred_prop(F,prologDynamic).
 
-declare_as_code(F,A):-findall(n(File,Line),source_location(File,Line),SL),ignore(inside_clause_expansion(CE)),decl_mpred(F,prologOnly),decl_mpred(F,info(discoveredInCode(F/A,SL,CE))),!.
+declare_as_code(F,A):-findall(n(File,Line),source_location(File,Line),SL),ignore(inside_clause_expansion(CE)),decl_mpred(F,prologDynamic),decl_mpred(F,info(discoveredInCode(F/A,SL,CE))),!.
 if_mud_asserted(F,A2,_,_Why):-is_mpred_prolog(F,A2),!,fail.
 if_mud_asserted(F,A2,A,Why):-using_holds_db(F,A2,A,Why).
 

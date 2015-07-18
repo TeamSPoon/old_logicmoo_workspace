@@ -102,6 +102,7 @@ decl_mpred_env(Props,(H,T)):-!,decl_mpred_env(Props,H),decl_mpred_env(Props,T).
 decl_mpred_env([H],Pred):-!,decl_mpred_env(H,Pred).
 decl_mpred_env([H|T],Pred):-!,decl_mpred_env(H,Pred),decl_mpred_env(T,Pred).
 decl_mpred_env((H,T),Pred):-!,decl_mpred_env(H,Pred),decl_mpred_env(T,Pred).
+
 decl_mpred_env(kb(KB),_):- ain(env_kb(KB)),fail.
 decl_mpred_env(stubType(dyn),Pred):-!, decl_mpred_env(dyn,Pred).
 
@@ -311,18 +312,18 @@ get_env_ctx(_ChameleonWorld).
 :- add_push_prefix_arg(get_tasks/3,dom,_,_).
 :- add_push_prefix_arg(domain_name/1,dom,_,_).
 
-is_env_expanded_file:- (prolog_load_context(file,File);prolog_load_context(source,File)),
-   once(file_name_extension(_,ocl,File);user:env_source_file(File)),!.
+is_env_expanded_file:- loading_file(File),!,once(file_name_extension(_,ocl,File);user:env_source_file(File)),!.
 
-is_ocl_expanded_file:- (prolog_load_context(file,File);prolog_load_context(source,File)),file_name_extension(_,ocl,File).
+is_ocl_expanded_file:- loading_file(File),file_name_extension(_,ocl,File).
    
+/*
 
-
-user:term_expansion(A,B):-nonvar(A), A\==end_of_file,
+user:term_expansion(A,B):- fail,nonvar(A), A\==end_of_file,
   is_env_expanded_file,
   env_term_expansion(A,B),
   must(nonvar(B)),A\=@=B.
 
+*/
 
 
 /*

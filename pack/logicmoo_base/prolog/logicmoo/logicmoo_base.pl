@@ -95,7 +95,7 @@ when_debugging(_,_).
 % ================================================
 % DBASE_T System
 % ================================================
-%%% ON TODO :- time(ensure_loaded(library(logicmoo/mpred_online/logicmoo_i_www))).
+:- gripe_time(40,user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
 :- ensure_loaded(mpred/pfc).
 :- ensure_loaded(mpred/logicmoo_i_loader).
 % % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
@@ -116,11 +116,13 @@ when_debugging(_,_).
 % user:goal_expansion(ISA,G) :- compound(ISA),thlocal:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
 :-meta_predicate(lmbase_user_term_expansion(?,?)).
 lmbase_user_term_expansion(I,OO):- current_predicate(pfc_loader_file/0),current_predicate(logicmoo_bugger_loaded/0), 
-  nonvar(I), \+  thlocal:pfc_already_in_file_expansion(I), 
+  nonvar(I), \+ thlocal:pfc_already_in_file_expansion(I), 
   with_assertions(thlocal:pfc_already_in_file_expansion(I),if_defined(pfc_file_expansion(I,OO))),!,
   nop(dmsg(pfc_file_expansion(I,OO))).
 
-user:term_expansion(I,OO):- \+ thlocal:disable_mpred_term_expansions_locally, if_defined(lmbase_user_term_expansion(I,OO)),I\=@=OO.
+user:term_expansion(I,OO):- (I==end_of_file->(do_end_of_file_actions,fail);
+                                 (\+ thlocal:disable_mpred_term_expansions_locally, 
+                                     if_defined(lmbase_user_term_expansion(I,OO)),I\=@=OO)).
 
 :-export(pfc_file_loaded/0).
 pfc_file_loaded.

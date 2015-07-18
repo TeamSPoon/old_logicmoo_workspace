@@ -193,10 +193,6 @@ clip_dir_sep(Where,Where):-!.
 
 
 
-source_file(F):-source_location(F,_).
-source_file(F):-prolog_load_context(file, F).
-source_file(F):-prolog_load_context(source, F).
-source_file(F):-prolog_load_context(stream, S),stream_property(S,file_name(F)),!.
 
 
 

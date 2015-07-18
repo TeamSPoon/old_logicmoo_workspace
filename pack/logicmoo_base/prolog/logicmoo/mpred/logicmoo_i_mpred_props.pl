@@ -97,7 +97,7 @@ decl_mpred_prolog_ilc(CM,M,PI,F/A):-loop_check_term(decl_mpred_prolog_ilc_0(CM,M
 decl_mpred_prolog_ilc_0(CM,M,PI,F/A):-
       assert_arity(F,A),
       add(mpred_module(PI,M)),
-      add(user:mpred_prop(PI,prologOnly)),
+      add(user:mpred_prop(PI,prologDynamic)),
       add(user:mpred_prop(PI,predCanHaveSingletons)),!.
 
 
@@ -153,7 +153,7 @@ decl_mpred_hybrid_ilc_0(CM,M,PI,F/A):-
 
 
 
-% user:mpred_prop(F,prologOnly):- not(user:mpred_prop(F,prologHybrid)),(F=ttPredType;(current_predicate(F/1);not(t(F,tCol)))).
+% user:mpred_prop(F,prologDynamic):- not(user:mpred_prop(F,prologHybrid)),(F=ttPredType;(current_predicate(F/1);not(t(F,tCol)))).
 user:mpred_prop(G,predProxyAssert(add)):- atom(G),prologMacroHead(G).
 user:mpred_prop(G,predProxyQuery(ireq)):- atom(G),prologMacroHead(G).
 user:mpred_prop(G,predProxyRetract(del)):- atom(G),prologMacroHead(G).
@@ -165,7 +165,7 @@ get_mpred_prop(F,_A,P):-get_mpred_prop(F,P).
 get_mpred_prop(F,P):- user:mpred_prop(F,P).
 
 :- export(listprolog/0).
-listprolog:-listing(user:mpred_prop(_,prologOnly)).
+listprolog:-listing(user:mpred_prop(_,prologDynamic)).
 
 
 get_arity(Term,F,A):- atom(Term),F=Term,!,ensure_arity(F,A).

@@ -168,11 +168,15 @@ for obvious reasons.
      export_all_preds/1 ]).
 
 
+:-module_transparent(if_may_hide/1).
+if_may_hide(_G):-!.
+if_may_hide(G):-G.
+
 :-thread_local(thlocal:session_id/1).
 :-multifile(thlocal:session_id/1).
 
-user:moo_hide(M):-b_moo_hide(M).
-user:moo_hide(M,F,A):-b_moo_hide(M,F,A).
+user:moo_hide(M):-if_may_hide(b_moo_hide(M)).
+user:moo_hide(M,F,A):-if_may_hide(b_moo_hide(M,F,A)).
 
 b_moo_hide(M,F,A):-
     functor(Pred,F,A),   
@@ -201,8 +205,8 @@ get_hotrace(X,Y):- !,'$visible'(OldV, OldV),notrace,visible(-all),visible(+excep
 hotrace(X):-!,X.
 hotrace(X):-notrace(get_hotrace(X,Y)),Y.
 :-moo_hide(hotrace/1).
-:-'$set_predicate_attribute'(hotrace(_), hide_childs, 1).
-:-'$set_predicate_attribute'(hotrace(_), trace, 0).
+:-if_may_hide('$set_predicate_attribute'(hotrace(_), hide_childs, 1)).
+:-if_may_hide('$set_predicate_attribute'(hotrace(_), trace, 0)).
 
 %get_hotrace(X):-  visible(+exception),leash(+exception),restore_trace((notrace,X)).
 % hotrace(C):-current_predicate(logicmoo_bugger_loaded/0)->catchvv((C),E,((writeq(E=C),rtrace(C),trace_or_throw(E=C))));C.
@@ -402,10 +406,10 @@ stop_rtrace:-notrace((visible(+all),visible(+unify),visible(+exception),leash(+a
 :-moo_hide(true/0).
 :-unlock_predicate(system:notrace/1).
 :-moo_hide(system:notrace/1).
-:-'$set_predicate_attribute'(notrace(_), hide_childs, 1).
-:-'$set_predicate_attribute'(notrace(_), trace, 0).
-:-'$set_predicate_attribute'(system:notrace(_), hide_childs, 1).
-:-'$set_predicate_attribute'(system:notrace(_), trace, 0).
+:-if_may_hide('$set_predicate_attribute'(notrace(_), hide_childs, 1)).
+:-if_may_hide('$set_predicate_attribute'(notrace(_), trace, 0)).
+:-if_may_hide('$set_predicate_attribute'(system:notrace(_), hide_childs, 1)).
+:-if_may_hide('$set_predicate_attribute'(system:notrace(_), trace, 0)).
 :-lock_predicate(system:notrace/1).
 
 
@@ -441,8 +445,8 @@ skipWrapper:- tlbugger:skip_bugger,!.
 
 :-moo_hide(skipWrapper/0).
 :-moo_hide(tracing/0).
-:-'$set_predicate_attribute'(tlbugger:skipMust,hide_childs,1).
-:-'$set_predicate_attribute'(tlbugger:skipWrapper,hide_childs,1).
+:-if_may_hide('$set_predicate_attribute'(tlbugger:skipMust,hide_childs,1)).
+:-if_may_hide('$set_predicate_attribute'(tlbugger:skipWrapper,hide_childs,1)).
 
 
 % false = hide this wrapper
@@ -568,7 +572,7 @@ get_must(Call,DO):- tlbugger:show_must_go_on,!,
 get_must(Call,DO):-  
    DO = (catchvv(Call,E,
      (dumpST,dmsg(error,must_xI__xI__xI__xI__xI_(E,Call)),
-         ignore(rtrace(Call)),badfood(Call)))
+         ignore(rtrace(Call)),dtrace(Call),badfood(Call)))
          *-> true ; (dumpST,ignore(dtrace(must_failed_F__A__I__L_(Call),Call)),badfood(Call))).
 
 
@@ -1125,12 +1129,15 @@ get_where0(A:0):-current_input(S),stream_property(S,alias(A)),!.
 get_where0(M:0):-context_module(M),!.
 get_where0(user:0):-!.
 
-lco_goal_expansion(loop_check(G),loop_check(G,fail)).
+lco_goal_expansion(V,V):- \+ compound(V),!.
+lco_goal_expansion(loop_check(G),O):-!,lco_goal_expansion(loop_check(G,fail),O).
 lco_goal_expansion(loop_check(G,TODO),loop_check_term_key(G,G:W,TODO)):-must(get_where(W)).
-lco_goal_expansion(no_loop_check(G),no_loop_check(G,fail)).
+lco_goal_expansion(no_loop_check(G),O):-!,lco_goal_expansion(no_loop_check(G,fail),O).
 lco_goal_expansion(no_loop_check(G,TODO),no_loop_check_term_key(G,G:W,TODO)):-must(get_where(W)).
+lco_goal_expansion(B,A):- compound_name_arguments(B,F,ARGS),maplist(lco_goal_expansion,ARGS,AARGS),compound_name_arguments(A,F,AARGS).
 
-
+:-meta_predicate(show_call_entry(0)).
+show_call_entry(Call):-wdmsg(show_call_entry(Call)),show_call(Call).
 
 % ===================================================================
 % Bugger Term Expansions
@@ -1162,8 +1169,8 @@ prolog_call(Call):-call(Call).
 :-moo_hide_all(system:tracing/0).
 
 %:-user: ( listing(notrace/1),redefine_system_predicate(system:hotrace(_)), user:moo_hide_all(hotrace(0)) ).
-:-'$set_predicate_attribute'(hotrace(_), trace, 0).
-:-'$set_predicate_attribute'(hotrace(_), hide_childs, 1).
+:-if_may_hide('$set_predicate_attribute'(hotrace(_), trace, 0)).
+:-if_may_hide('$set_predicate_attribute'(hotrace(_), hide_childs, 1)).
 
 
 :- export(remove_pred/3).
@@ -3058,7 +3065,7 @@ source_module(M):-'$set_source_module'(M,   M),!.
 
 
 :-thread_local(thlocal:last_source_file/1).
-source_file(FIn):- ((source_file0(F) *-> (retractall(thlocal:last_source_file(_)),asserta(thlocal:last_source_file(F))) ; (fail,thlocal:last_source_file(F)))),!,F=FIn.
+loading_file(FIn):- ((source_file0(F) *-> (retractall(thlocal:last_source_file(_)),asserta(thlocal:last_source_file(F))) ; (fail,thlocal:last_source_file(F)))),!,F=FIn.
 source_file0(F):-source_location(F,_).
 source_file0(F):-prolog_load_context(file, F).
 source_file0(F):-prolog_load_context(source, F).
@@ -3701,13 +3708,16 @@ user:term_mpred_listing(Match):-
 :-export(term_non_listing/1).
 term_non_listing(Match):- 
    format('/* term_non_listing(~q) => ~n',[Match]),
+      term_listing_inner(portray_hbr,Match),
+   format(' <= term_non_listing(~q) */ ~n',[Match]).
+
+term_listing_inner(Pred,Match):-
    '@'(ignore((doall((
-      synth_clause_for(H,B,_Ref),
+      synth_clause_for(H,B,Ref),
       once(ok_show(H)),
       once(slow_term_matches_hb(Match,H,B)),
-      portray_hb(H,B),
-      fail)))),'user'),
-   format(' <= term_non_listing(~q) */ ~n',[Match]).
+      once(call(Pred,H,B,Ref)),
+      fail)))),'user').
 
 :- multifile user:prolog_list_goal/1.
 % user:prolog_list_goal(Goal):- writeq(hello(prolog_list_goal(Goal))),nl.
@@ -3839,11 +3849,13 @@ bad_pred(P):-predicate_property(P,foreign).
 :-export(pred_info/2).
 pred_info(H,Props):- get_functor(H,F,_),findall(PP,user:mpred_prop(F,PP),Props).
 
-:-export(portray_hb/2).
-portray_hb(H,B):- B==true, !, portray_one_line(H).
-portray_hb(H,B):- portray_one_line((H:-B)).
+:-export(portray_hbr/3).
+portray_hbr(H,B,_):- B==true, !, portray_one_line(H).
+portray_hbr(H,B,_):- portray_one_line((H:-B)).
 
 :-export(portray_one_line/1).
+:-thread_local(portray_one_line_hook/1).
+portray_one_line(H):- portray_one_line_hook(H),!.
 portray_one_line(H):- current_predicate(wdmsg/1),wdmsg(H),!.
 portray_one_line(H):- not(not((snumbervars(H),writeq(H),write('.'),nl))),!.
 portray_one_line(H):- writeq(H),write('.'),nl,!.
@@ -3968,8 +3980,9 @@ user:prolog_exception_hook(A,B,C,D):- fail,
 :-'$set_predicate_attribute'(with_assertions(_,_), hide_childs, 0).
 
 logicmoo_bugger_loaded.
-system:goal_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
-system:term_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
-system:term_expansion(LC,LCOO):-nonvar(LC),(LC=(H:-B)),expand_goal(B,BE),B\=@=BE,must((H:-BE)=LCOO).
+%system:goal_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
+%system:term_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
+% user:term_expansion(LC,LCOO):-nonvar(LC),(LC=(H:-B)),lco_goal_expansion(B,BE),B\=@=BE,((H:-BE)=LCOO).
+user:goal_expansion(LC,LCOO):- once(lco_goal_expansion(LC,LCOO)),LC\=@=LCOO.
 
 :- '$find_predicate'(tlbugger:A/0,O),forall(member(M:F/A,O),moo_hide(M,F,A)).

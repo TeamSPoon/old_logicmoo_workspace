@@ -35,8 +35,6 @@
 %%% ON :- initialization(user:use_module(library(swi/pce_profile))).
 % :- qcompile_libraries.
 
-:- use_module(logicmoo_util_structs).
-
 /*
 :- dynamic user:htn_task/3.
 :- dynamic user:planner_task/3.
@@ -53,7 +51,6 @@
 :- multifile user:planner_task_slow/4.
 */
 
-:- include(logicmoo_util_bb_env).
 
 
 
@@ -218,8 +215,6 @@ header_tests :-test_ocl('domains_ocl/*.ocl').
 :- style_check(-discontiguous).
 %:-use_module(library(system)).
 
-% [Required] Load the Logicmoo Base Library
-:- time(user:ensure_loaded(logicmoo(logicmoo_base))).
 %:- asserta(thlocal:disable_mpred_term_expansions_locally).
 
 /*

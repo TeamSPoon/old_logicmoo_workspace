@@ -208,12 +208,14 @@ get_it:-
 % OLD :- gripe_time(7,time(user:ensure_loaded_no_mpreds(library(el_holds/'el_assertions.pl.qlf')))).
 
 % 6.052 CPU on VMWare I7
-:- gripe_time(7,time(user:load_files([library(el_holds/'el_assertions')],[qcompile(auto),if(changed )]))).
-:- user:ensure_loaded_no_mpreds(library(logicmoo/plarkc/logicmoo_i_call_kb)).
-:- gripe_time(1,user:load_files([pldata/clex_iface],[qcompile(auto),if(changed  )])).
-:- gripe_time(1,user:load_files([pldata/nldata_BRN_WSJ_LEXICON],[qcompile(auto),if(changed  )])).
-:- gripe_time(1,user:load_files([pldata/nldata_freq_pdat],[qcompile(auto),if(changed  )])).
-:- gripe_time(1,user:load_files([pldata/nldata_cycl_pos0],[qcompile(auto),if(changed  )])).
+%:- gripe_time(7,time(user:load_files([library(el_holds/'el_assertions')],[qcompile(auto),if(changed )]))).
+
+:- with_assertions([(user:term_expansion(_,_):-!,fail),(user:goal_expansion(_,_):-!,fail),(system:term_expansion(_,_):-!,fail),(system:goal_expansion(_,_):-!,fail)],
+  (user:ensure_loaded_no_mpreds(library(logicmoo/plarkc/logicmoo_i_call_kb)),
+   gripe_time(1,user:load_files([pldata/clex_iface],[qcompile(auto),if(changed  )])),
+   gripe_time(1,user:load_files([pldata/nldata_BRN_WSJ_LEXICON],[qcompile(auto),if(changed  )])),
+   gripe_time(1,user:load_files([pldata/nldata_freq_pdat],[qcompile(auto),if(changed  )])),
+   gripe_time(1,user:load_files([pldata/nldata_cycl_pos0],[qcompile(auto),if(changed  )])))).
 
 
 % ================================================================================================
@@ -277,7 +279,7 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 % ================================================================================================
 
 % ================================================================================================
-:- user:ensure_loaded_no_mpreds(parser_stanford).
+%:- user:ensure_loaded_no_mpreds(parser_chart89).
 % ================================================================================================
 
 % ================================================================================================
@@ -289,7 +291,6 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 %:- if_file_exists(user:ensure_loaded_no_mpreds(stanford_parser)).
 % ================================================================================================
 % :- get_pos_tagger(I),jpl_set(I,is_DEBUG,'@'(false)).
-%:- user:ensure_loaded_no_mpreds(parser_chart89).
 
 
 
@@ -355,5 +356,4 @@ user:regression_test:- ace_to_pkif('A person who loves all animals is loved by s
 
 
 :- must(retract(thlocal:disable_mpred_term_expansions_locally)).
-
 

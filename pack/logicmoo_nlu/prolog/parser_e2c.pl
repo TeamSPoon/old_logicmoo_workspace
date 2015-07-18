@@ -9,7 +9,7 @@
 % Revised At:   $Date: 2002/06/06 15:43:15 $
 % ===================================================================
 
-:-module(parser_e2c,[
+must_be_in_user:-module(parser_e2c,[
          e2c/1,
          e2c/2
          % idGen/1
@@ -41,7 +41,7 @@
 
 % idGen(X):-flag(idGen,X,X+1).
 
-:- file_begin(mudcode).
+:- file_begin(pl).
 
 % :- retractall(prevent_transform_moo_preds).
 
@@ -65,9 +65,11 @@
 :-thread_local(stringmatcher_term_expansion/0).
 :-dynamic(e2c_term_expansion/3).
 
+/*
 delete_eq([],Item,[]):-!,dmsg(warn(delete_eq([],Item,[]))).
 delete_eq([L|List],Item,List):-Item==L,!.
 delete_eq([L|List],Item,[L|ListO]):-delete_eq(List,Item,ListO),!.
+*/
 
 :-meta_predicate(makeStringMatcher(+,+,-)).
 
@@ -649,6 +651,11 @@ pos_0(String,CycWord,Form,POS):- speechPartPreds_transitive(POS, Form), meetsFor
 % ==========================================================
 % speechPartPreds HACKS
 % ==========================================================
+is_speechPartPred_tt_ever(Form):- atom(Form),atom_concat(infl,_,Form),
+  call_tabled_can(findall_nodupes(F,((el_holds(isa,F,'Predicate','ThoughtTreasureMt',[amt('ThoughtTreasureMt')|_]),atom(F),atom_concat(infl,_,F))),Forms)),!,member(Form,Forms).
+
+:-export(is_speechPartPred_tt/1).
+is_speechPartPred_tt(Form):- thlocal:allowTT,!,is_speechPartPred_tt_ever(Form).
 
 speechPartPreds_transitive(POS,Form):-speechPartPreds_asserted(POS,Form).
 speechPartPreds_asserted(POS, Form):- is_speechPartPred_tt(Form),posName(POS),atom_contains(Form,POS).
@@ -670,10 +677,6 @@ is_speechPartPred(Form):-is_speechPartPred_tt(Form).
 is_speechPartPred_any(Form):-is_speechPartPred_nontt_ever(Form).
 is_speechPartPred_any(Form):-is_speechPartPred_tt_ever(Form).
 
-is_speechPartPred_tt(Form):- thlocal:allowTT,!,is_speechPartPred_tt_ever(Form).
-is_speechPartPred_tt_ever(Form):- atom(Form),atom_concat(infl,_,Form),
-  call_tabled_can(findall_nodupes(F,((el_holds(isa,F,'Predicate','ThoughtTreasureMt',[amt('ThoughtTreasureMt')|_]),atom(F),atom_concat(infl,_,F))),Forms)),!,member(Form,Forms).
-
 is_speechPartPred_nontt(Form):- not(thlocal:omitCycWordForms),!,is_speechPartPred_nontt_ever(Form).
 is_speechPartPred_nontt_ever(Form):- call_tabled_can(no_repeats(Form,(is_speechPartPred_0(Form),not(is_speechPartPred_tt_ever(Form))))).
 
@@ -693,7 +696,7 @@ argIsa(Form,2, 'CharacterString'):-is_speechPartPred_tt(Form).
 % ==========================================================
 % meetsForm(String,CycWord,Form)
 % ==========================================================
-meetsForm80(String,RootString,form80(MainPlusTrans,main+tv)):-!,fail,nop((String,RootString,form80(MainPlusTrans,main+tv))).
+meetsForm80(String,RootString,form80(MainPlusTrans,main+tv)):-fail,nop((String,RootString,form80(MainPlusTrans,main+tv))).
 
 % ==========================================================
 % meetsForm(String,CycWord,Form)
@@ -1725,30 +1728,30 @@ noun_phrase(List, In, Out, [M,N,O|More], F):-
    noun_phrase_list(Loc,List, In, Out, [M,N,O|More], F).
 
 % a man that walks
-noun_phrase(S,A,B)-->subject(S,A,B). 
+noun_phrase(S,A,B)-->subject5(S,A,B). 
 
-noun_phrase_list(_  ,[H],In,Out) --> subject(H,In,Out).
+noun_phrase_list(_  ,[H],In,Out) --> subject5(H,In,Out).
 noun_phrase_list(Loc,[H|T],In,Out) --> ([and];[(',')];[]),
-      subject(H,In,Mid),([and];[(',')];[]),
+      subject5(H,In,Mid),([and];[(',')];[]),
       noun_phrase_list(Loc,T,Mid,Out),{!}. 
 
 
 %rel_clause(Subj,HowDoes) -->isPOS('Complementizer',Modal,String),verb_phrase(Subj,Event,HowDoes),{varnameIdea(String,Event)}.
 noun_phrase_rel_clause(_Loc,Subj,In,rel_clause(In,Out)) -->  % {stack_depth(SD), SD<600},
-	 subject(Subj,HowDoes,Out), 
+	 subject5(Subj,HowDoes,Out), 
 	 (isPOS('Complementizer',_ModalWord,_String);[]),
 	 verb_phrase(Subj,_Event,HowDoes).
 
 % =======================================================
-subject_isa(_SubjectIsa,Subj,Template,TemplateO) --> subject(Subj,Template,TemplateO).
+subject_isa(_SubjectIsa,Subj,Template,TemplateO) --> subject5(Subj,Template,TemplateO).
 
 
 % =======================================================
 
-%subject(_ , _ , _ ) --> isPOS('Verb', _),{!,fail}, _.
+%subject5(_ , _ , _ ) --> isPOS('Verb', _),{!,fail}, _.
 
 % a man that walks
-subject(List, In, Out, [M,N,O|More], F) :-
+subject5(List, In, Out, [M,N,O|More], F) :-
       nonvar(More),
       (nth1(Loc,[M,N,O],'who');nth1(Loc,[M,N,O],'that')),
       noun_phrase_rel_clause(Loc,List, In, Out, [M,N,O|More], F).
@@ -1759,33 +1762,33 @@ subject(List, In, Out, [M,N,O|More], F) :-
 %'determinerAgreement'('A-Half-Dozen-MWW', 'plural-Generic', ..)
 
 % all dog
-subject(Subj,In,'forAll'(Subj,AttribIsa)) --> 
+subject5(Subj,In,'forAll'(Subj,AttribIsa)) --> 
     ([every];[all];[forall];[each];[for,all]),
     det_object(Subj,In,AttribIsa).
 
 
 % the happy dog
-%subject(X,In,referant(X,isa(X,Subj),AttribIsa)) --> [the],      det_object(Subj,In,AttribIsa),{varnameIdea('Thing',X),!}.
-subject(Subj,In,AttribIsa) --> [the],det_object(Subj,In,AttribIsa).
+%subject5(X,In,referant(X,isa(X,Subj),AttribIsa)) --> [the],      det_object(Subj,In,AttribIsa),{varnameIdea('Thing',X),!}.
+subject5(Subj,In,AttribIsa) --> [the],det_object(Subj,In,AttribIsa).
 
 % a dog
-subject(Subj,In,'thereExists'(Subj,AttribIsa)) --> 
+subject5(Subj,In,'thereExists'(Subj,AttribIsa)) --> 
     ([a];[an];[some];[there,is];[there,are];[there,exists]),
     det_object(Subj,In,AttribIsa).
 
 % your rainbow
-subject(X,A,and(ownedBy(X,Agent),isa(X,Thing),B)) --> possessive(Agent),noun_phrase(Thing,A,B),{varnameIdea('Thing',X),!}.
+subject5(X,A,and(ownedBy(X,Agent),isa(X,Thing),B)) --> possessive(Agent),noun_phrase(Thing,A,B),{varnameIdea('Thing',X),!}.
 
 % he
-subject(PN,CycL,CycL) --> pronoun(PN),{!}.
+subject5(PN,CycL,CycL) --> pronoun(PN),{!}.
 
 % Joe blow
-subject(named(Name),CycL,CycL) --> human_name(Name),{!}.
+subject5(named(Name),CycL,CycL) --> human_name(Name),{!}.
 
 % a man
 
 % dog
-subject(Subj,In,AttribIsa) --> det_object(Subj,In,AttribIsa).
+subject5(Subj,In,AttribIsa) --> det_object(Subj,In,AttribIsa).
 
 :- style_check(-singleton).
 
@@ -1825,13 +1828,13 @@ det_object_adj(CycAdj,Subj,In,and(Isa,hasTrait(Subj,CycL))) -->
        det_object(Subj,In,Isa),{cvtWordPosCycL(CycAdj,'Adjective',CycL),!}.
 
 % =======================================================
-det_object(Subj,In,Isa) --> object(Subj,In,Isa).
+det_object(Subj,In,Isa) --> object5(Subj,In,Isa).
 
 % =======================================================
 det_object(PN,CycL,CycL) --> proper_object(PN).
 
 %'multiWordSemTrans'([intended, recipient, of], 'Communicate-TheWord', 'SimpleNoun', 'RegularNounFrame', 'communicationTarget'(A, ':NOUN'), 'EnglishMt', v(v('Communicate-TheWord', 'RegularNounFrame', 'SimpleNoun', 'communicationTarget', ':NOUN', intended, of, recipient), ['?X'=A|B])).
-object(Subj,In,'and'(In,Out)) --> [S],
+object5(Subj,In,'and'(In,Out)) --> [S],
    {'multiWordSemTrans'([S|String],CycWord,POS, NextFrame,Template),POS \=@= 'Adjective'},
      String,isCycWord(CycWord), frame_template(NextFrame,Subj,Result,Extras),
     {apply_frame(Template,Subj,Event,Obj,Result,Out)}.
@@ -1843,13 +1846,13 @@ object(Subj,In,'and'(In,Out)) --> [S],
 %'nounPrep'('Start-TheWord', 'Of-TheWord', ['startingPoint', ':OBLIQUE-OBJECT', ':NOUN']).
 %'nounPrep'('City-TheWord', 'Of-TheWord', 'equals'(':OBLIQUE-OBJECT', ':NOUN'), 'EnglishMt', v(v('City-TheWord', 'Of-TheWord', 'equals', ':NOUN', ':OBLIQUE-OBJECT'), A)).
 %'nounPrep'('Victim-TheWord', 'Of-TheWord', 'victim'(':OBLIQUE-OBJECT', ':NOUN'), 'EnglishMt', v(v('Of-TheWord', 'Victim-TheWord', 'victim', ':NOUN', ':OBLIQUE-OBJECT'), A)).
-object(Subject,In,and(CycL,Out)) --> isPOS('Noun',CycWord), 
+object5(Subject,In,and(CycL,Out)) --> isPOS('Noun',CycWord), 
       {'nounPrep'(CycWord,CycWordPrep, Template)},
-      isCycWord(CycWordPrep),subject(Result,In,CycL),
+      isCycWord(CycWordPrep),subject5(Result,In,CycL),
     {apply_frame(Template,Subject,Event,Object,Result,Out)}.
 
 % the happy dog
-object(Subj,CycL,and(CycL,Isa)) --> colection(Subj,Isa).
+object5(Subj,CycL,and(CycL,Isa)) --> colection(Subj,Isa).
 
 %% of what the product is
 %'team-mate'
@@ -1878,7 +1881,7 @@ proper_object(CycL) --> theText([S,S2]),{poStr(CycL,[S,S2|String])},theText(Stri
 proper_object(CycL) --> theText([String]),{poStr(CycL,[String])}.
 proper_object(multFn(Multiply,Collection)) --> [String],
 	 {'unitOfMeasurePrefixString'(Multiply, Affix),
-	 words_concat(Affix,Rest,String),!,phrase(collection(Collection),[Rest])}.
+	 words_concat(Affix,Rest,String),!,phrase(collection3(Collection),[Rest])}.
 proper_object(CycL) --> pos_cycl(Noun,CycL), { goodStart(noun_phrase,Noun) } .
 
 
@@ -1936,17 +1939,17 @@ collection_noun(Subj,CycLCollection) --> [A,B],{phraseNoun([A,B],Form,Subj,CycLC
 collection_noun(Subj,CycLCollection) --> [A],{phraseNoun([A],Form,Subj,CycLCollection)}.
 collection_noun(Subj,'AdultMalePerson') --> [man].
 
-collection(M)--> collection_noun('?Subj',CycLCollection).
+collection3(M)--> collection_noun('?Subj',CycLCollection).
 
 phraseNoun(Eng,Form,Subj,CycLCollection):-
       phraseNoun_each(Eng,Form,CycLCollction),
       eng_subj(Eng,Subj).
 
-eng_subj(Eng,Subj):-var(Subj),getVarAtom(Subj,Atom),concat_atom([?|Eng],'',T),atom_concat(T,Atom,Subj).
+eng_subj(Eng,Subj):-var(Subj),getVarAtomName(Subj,Atom),concat_atom([?|Eng],'',T),atom_concat(T,Atom,Subj).
 eng_subj(Eng,Subj):-!.
 
-getVarAtom(Value,Name):-var(Value),!,term_to_atom(Value,Vname),atom_codes(Vname,[95, _|CODES]),atom_codes(Name,CODES),!.
-getVarAtom('$VAR'(VNUM),Name):-concat_atom([VNUM],Name),!.
+getVarAtomName(Value,Name):-var(Value),!,term_to_atom(Value,Vname),atom_codes(Vname,[95, _|CODES]),atom_codes(Name,CODES),!.
+getVarAtomName('$VAR'(VNUM),Name):-concat_atom([VNUM],Name),!.
 
 
 phraseNoun_each(Eng,Form,CycL):-posMeans(Eng,'SimpleNoun',Form,CycL).
@@ -1996,14 +1999,14 @@ aux_phrase('Do-TheWord',Subj,Event,(CycL)) -->
 %'verbPrep-Passive'('Make-TheWord', 'Of-TheWord', 'mainConstituent'(':OBJECT', ':OBLIQUE-OBJECT'), 'EnglishMt', v(v('Make-TheWord', 'Of-TheWord', 'mainConstituent', ':OBJECT', ':OBLIQUE-OBJECT'), A)).
 aux_phrase(CycWord,Subj,Event,CycLO) --> 
       {'verbPrep-Passive'(CycWord, CycWord2, Template)},
-       isCycWord(CycWord2),subject(Result,Out,CycLO),
+       isCycWord(CycWord2),subject5(Result,Out,CycLO),
       {apply_frame(Template,Subj,Event,Obj,Result,Out)}.
 
 % =======================================================
 %'prepSemTrans'('Above-TheWord', 0, 'Post-NounPhraseModifyingFrame', 'above-Generally'(':NOUN', ':OBJECT'), 'GeneralEnglishMt', v(v('Above-TheWord', 'Post-NounPhraseModifyingFrame', 'above-Generally', ':NOUN', ':OBJECT'), A)).
 aux_phrase(CycAuxWord,Subj,Event,Out) -->
       {'prepSemTrans'(CycWordPrep, _ , NextFrame, Template)},
-      isCycWord(CycWordPrep),subject(Obj,Out,CycLO),
+      isCycWord(CycWordPrep),subject5(Obj,Out,CycLO),
     {apply_frame(Template,Subj,Event,Obj,Result,Out)}.
 
 % =======================================================
@@ -2060,13 +2063,13 @@ verb_phrase(Subj,Event,'and_adverbal'(Event,AdvCycL,CycL))  -->
 	    verb_phrase(Subj,Event,CycL),
 	    {cvtWordPosCycL(CycWord,'Adverb',AdvCycL)}.
 
-% unknown phrase has arity CycL + object %TODO rename subject/3 to noun_phrase/3
+% unknown phrase has arity CycL + object5 %TODO rename subject5/3 to noun_phrase/3
 verb_phrase(Subj,Event,and_concat(CycL)) --> [Verb],
 	 {atom(Verb),((words_concat('',Verb,Predicate),cyckb_t('arity',Predicate,N));(cyckb_t('arity',Verb,N),Predicate=Verb)),!},
 	 verb_phrase_arity(N,Predicate,Subj,Event,CycL).
 
 % :-index(verb_phrase_arity(0,0,0,0,0,0,0)).
-%TODO rename subject/3 to noun_phrase/3
+%TODO rename subject5/3 to noun_phrase/3
 verb_phrase_arity(2,Predicate,Subj,Event,CycL) --> 
 	       best_subject(Obj,ACT,Mid),
 	       colect_noun_list(List,Mid,CycL),
@@ -2074,7 +2077,7 @@ verb_phrase_arity(2,Predicate,Subj,Event,CycL) -->
 %and
 verb_phrase_arity(3,Predicate,Subj,Event,CycL) --> 
 	 best_subject(Obj,Event,Mid),
-	 best_subject_constituant(RES,Event,Mid,CycL).
+	 best_subject_constituant(RES,Event,Mid,CycL),
 	{ACT=..[Predicate,Subj,Obj,RES]}.
 
 colect_noun_list([],In,In) --> [].
@@ -2100,7 +2103,7 @@ verb_phrase(Subj,Event,gen_phrase1(Call,Result)) --> [S],
 
 
 
-% unkown phrase	+ object %TODO rename subject/3 to noun_phrase/3
+% unkown phrase	+ object5 %TODO rename subject5/3 to noun_phrase/3
 verb_phrase(Subj,Event,and(isaAction(Event,Action),'doneBy'(Event,Subj),'constituentInSituation'(Event,Obj),CycLO)) --> 
 	 isPOS('Verb',CycVerb,String),
 	 best_subject(Obj,true,CycL),
@@ -2202,7 +2205,7 @@ verb_phrase_known(CycWord,Subj,Event,'lightVerb-TransitiveSemTrans'(Out)) -->
 verb_phrase_known(CycWord,Subj,Event,'prepReln-Action'(CycLO,Out)) -->
       {'prepReln-Action'(EventIsa, SubjIsa, CycWordPrep, Template),cycQueryIsa(Subj,SubjIsa)},
 	verb_phrase_event_isa(CycWord,EventIsa,Subj,Object,Event,EventMid),
-      isCycWord(CycWordPrep),subject(Result,EventMid,CycLO),
+      isCycWord(CycWordPrep),subject5(Result,EventMid,CycLO),
     {apply_frame(Template,Subject,Event,Object,Result,Out)}.
 
 % =======================================================
@@ -2214,7 +2217,7 @@ verb_phrase_known(CycWord,Subj,Event,'prepReln-Action'(CycLO,Out)) -->
 verb_phrase_known(CycWord,Subj,Event,'prepReln-Object'(Out)) -->
       {'prepReln-Object'(SubjIsa, ObjectIsa, CycWordPrep, Template),cycQueryIsa(Subj,SubjIsa)},
 	subject_isa(ObjectIsa,Object,Template,TemplateO),
-      isCycWord(CycWordPrep),subject(Result,TemplateO,CycLO),
+      isCycWord(CycWordPrep),subject5(Result,TemplateO,CycLO),
     {apply_frame(CycLO,Subject,Event,Object,Result,Out)}.
 
 % =======================================================
@@ -2228,7 +2231,7 @@ verb_phrase_known(CycWord,Subj,Event,verbSemTrans(Out,Extras)) -->
 %'verbPrep-Transitive'('Ablate-TheWord', 'From-TheWord', 'and'('isa'(':ACTION', 'Ablation'), 'objectOfStateChange'(':ACTION', ':OBLIQUE-OBJECT'), 'doneBy'(':ACTION', ':SUBJECT'), 'objectRemoved'(':ACTION', ':OBJECT')), 'EnglishMt', v(v('Ablate-TheWord', 'Ablation', 'From-TheWord', 'and', 'doneBy', 'isa', 'objectOfStateChange', 'objectRemoved', ':ACTION', ':OBJECT', ':OBLIQUE-OBJECT', ':SUBJECT'), A)).
 verb_phrase_known(CycWord,Subj,Event,'verbPrep-Transitive'(Out,Extras)) -->
    {'verbPrep-Transitive'(CycWord, CycWord2, Template)},
-	 isCycWord(CycWord2),{!},subject(Result,Out,CycLO),
+	 isCycWord(CycWord2),{!},subject5(Result,Out,CycLO),
    {apply_frame(Template,Subj,Event,Obj,Result,Out)}.
    
 % =======================================================
@@ -2263,7 +2266,7 @@ verb_phrase_known(CycWord,Subj,Event,nonCompositionalVerbSemTrans(Out)) -->
 verb_phrase_known(CycWord,Subj,Event,'verbPrep-TransitiveTemplate'(Out,EventMidO)) -->
 	 {'verbPrep-TransitiveTemplate'(EventIsa, CycWordPrep, Template)},
       verb_phrase_event_isa(CycWord,EventIsa,Subj,Object,Event,EventMid),
-      isCycWord(CycWordPrep),subject(Result,EventMid,EventMidO),
+      isCycWord(CycWordPrep),subject5(Result,EventMid,EventMidO),
    {apply_frame(Template,Subj,Event,Object,Result,OutD),vsubst(OutD,':DENOT',EventIsa,Out)}.
   
 % =======================================================
@@ -2489,7 +2492,6 @@ atom_junct2([W|S],[W|Words]):-atom_junct2(S,Words).
 %:- module_predicates_are_exported(parser_e2c).
 %:- module_meta_predicates_are_transparent(parser_e2c).
 
-:-  end_transform_moo_preds.
 % :-module(parser_e2c).
 
 %:- debug, make:list_undefined. 
@@ -3182,7 +3184,7 @@ cycPred('TTPred-apolitical').
 cycPred('TTPred-event20-of').
 cycPred('TTPred-wife-of').
 cycPred('TTPred-composer-of').
-cycPred('TTPred-fixed-object').
+cycPred('TTPred-fixed-object5').
 cycPred('TTPred-white-wine').
 cycPred('TTPred-neurosis').
 cycPred('TTPred-small-squares').

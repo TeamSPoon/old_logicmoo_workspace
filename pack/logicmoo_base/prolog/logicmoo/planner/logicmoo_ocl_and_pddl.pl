@@ -1,4 +1,4 @@
-:- module(lp,[test_blocks/0,test_domain/1,test_all/0,test_rest/0,test_sas/0,test_dir_files_sas/1,test_dir_files_sas/3,decl_mpred_env/2]).
+%:- module(lp,[test_blocks/0,test_domain/1,test_all/0,test_rest/0,test_sas/0,test_dir_files_sas/1,test_dir_files_sas/3,decl_mpred_env/2]).
 %:- set_prolog_flag(gc,true).
 :- op(100,xfy,'=>').
 :- debug.
@@ -2170,13 +2170,14 @@ mysame_key(_, L, [], L).
 
 :- debug,(must(test_blocks)).
 
-
 :- solve_files('benchmarks/mystery/domain.pddl','benchmarks/mystery/prob01.pddl').
 :- test_domain('benchmarks/driverlog/domain.pddl',4).
 :- solve_files('hsp-planners-master/hsp2-1.0/examples/parcprinter-strips/p01-domain-woac.pddl','hsp-planners-master/hsp2-1.0/examples/parcprinter-strips/p01-woac.pddl').
 
+
 % :-doall(on_call_decl_hyhtn).
 :- if((fail,if_startup_script)).
+
 /*
 
 
@@ -2190,18 +2191,16 @@ mysame_key(_, L, [], L).
 :- test_domain('domains_ocl/chameleonWorld/domain*').
 :- test_all(7).
 
+/*
 :- if(current_predicate(pce_show_profile/0)).
 :- pce_show_profile.
 :- endif.
+*/
 
 :- retractall(thlocal:loading_files).
 :- endif.
 
-twhy
-  :- show_call(record_time(forall(between(1,1000000,_),forall(get_action_bb(_),true)),_Time1)),
-   show_call(record_time(forall(between(1,1000000,_),forall(actn(_,_),true)),_Time2)).
 
-% :- twhy.
 
 % BAD :- test_domain('./elearning/domain.pddl').
 % :- test_all.
@@ -2237,15 +2236,19 @@ test_blocks:- fail, test_domain('./benchmarks/nomystery-sat11-strips/domain.pddl
 :- forall(must_filematch('./primaryobjects_strips/?*?/?*domain*.*',E),once(test_domain(E))).
 :- solve_files('hakank-pddl/monkey-domain.pddl','hakank-pddl/monkey-prob01.pddl').
 
-*/
+*/ 
 
 :- endif.
 
-:-multifile(user:push_env_ctx/0).
+
+:- show_call(flag(time_used,W,W)).
+
+-multifile(user:push_env_ctx/0).
 :-dynamic(user:push_env_ctx/0).
 push_env_ctx:-!,fail.
 push_env_ctx:-!.
 
-:- include(logicmoo_hyhtn).
 :- show_call(flag(time_used,W,W)).
 rr:- test_ocl('domains_ocl/chameleonWorld.ocl').
+
+

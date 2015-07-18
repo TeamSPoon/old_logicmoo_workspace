@@ -229,7 +229,7 @@ make_body_clause(_Head,Body,Body):-atomic(Body),!.
 make_body_clause(_Head,Body,Body):-special_wrapper_body(Body,_Why),!.
 make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 
-special_head(_,F,Why):-special_head0(F,Why),!,show_call_failure(not(isa(F,prologOnly))).
+special_head(_,F,Why):-special_head0(F,Why),!,show_call_failure(not(isa(F,prologDynamic))).
 special_head0(F,ttPredType):-ttPredType(F),!.
 special_head0(F,functorDeclares):-t(functorDeclares,F),!.
 special_head0(F,prologMacroHead):-t(prologMacroHead,F),!.
@@ -379,6 +379,17 @@ prop_or(Obj,Prop,Value,OrElse):- one_must(ireq(t(Prop,Obj,Value)),Value=OrElse).
 :-dmsg_hide(into_mpred_form).
 
 
+/*
+update_single_valued_arg(P,N):- arg(N,P,UPDATE),replace_arg(P,N,OLD,Q),
+  (is_relative(UPDATE)->
+     must_det_l((Q,update_value(OLD,UPDATE,NEW),\+ is_relative(NEW), replace_arg(Q,N,NEW,R),enqueue(\+Q),enqueue(R)));
+     forall((Q,UPDATE\=OLD),enqueue(\+Q))),!.
+*/
+
+update_single_valued_arg(P,N):- arg(N,P,UPDATE),replace_arg(P,N,OLD,Q),
+  (is_relative(UPDATE)->
+     must_det_l((Q,update_value(OLD,UPDATE,NEW),\+ is_relative(NEW), replace_arg(Q,N,NEW,R),retract(Q),retract(P),pfc_add(R)));
+     forall((Q,UPDATE\=OLD),retract(Q))),!.
 
 % assert_with to change(CA1,CB2) singlevalue pred
 :-export((db_assert_sv/4)).
@@ -389,7 +400,7 @@ db_assert_sv(C):- get_functor(C,F,A), db_assert_sv(must,C,F,A),!.
 db_assert_sv(Must,C,F,A):- ex, ignore(( loop_check(db_assert_sv_ilc(Must,C,F,A),true))).
 
 :-export((db_assert_sv_ilc/4)).
-db_assert_sv_ilc(Must,C,F,A):- arg(A,C,UPDATE),db_assert_sv_now(Must,C,F,A,UPDATE),!.
+db_assert_sv_ilc(Must,C,F,A):- arg(A,C,UPDATE),is_relative(UPDATE),db_assert_sv_now(Must,C,F,A,UPDATE),!.
 
 :-export(db_assert_sv_now/5).
 
@@ -420,7 +431,7 @@ db_assert_sv_replace(_Must,C,_,A,NEW):- fail,
    replace_arg(C,A,NEW,CNEW),
    db_must_asserta_confirmed_sv(CNEW,A,NEW),!.
 
-db_assert_sv_replace(Must,C,F,A,NEW):-
+db_assert_sv_replace(Must,C,F,A,NEW):- 
    replace_arg(C,A,OLD,COLD),
    replace_arg(C,A,NEW,CNEW),
    hotrace(ignore(ireq(COLD))),
@@ -460,7 +471,7 @@ confirm_hook(CNEW:NEW=@=CNOW:NOW):-
 
 
 % Expect CNEW to be what is found
-db_must_asserta_confirmed_sv(CNEW,A,NEW):-
+db_must_asserta_confirmed_sv(CNEW,A,NEW):- 
    replace_arg(CNEW,A,NOW,CNOW),
    sanity(not(singletons_throw_else_fail(CNEW))),
    mpred_modify(change(assert,sv),CNEW),!,
@@ -512,7 +523,7 @@ database_modify_assert(change(assert,AZ),       _G,GG):- expire_pre_change(AZ,GG
 database_modify_assert(change(assert,_),_, GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfc_add_fast(GGG)),!,show_call_failure(variant(GG,GGG)),!.
 
 database_modify_assert(change(assert,AorZ),      G,GG):- G \= (_:-_), get_functor(G,F,A),
-   (isa(F,prologSingleValued) -> (AorZ \== sv -> db_assert_sv(AorZ,G,F,A); fail); 
+   (isa(F,prologSingleValued) -> ((AorZ \== sv , db_assert_sv(AorZ,G,F,A) )-> true; fail); 
        isa(F,prologOrdered) -> (AorZ\==z -> database_modify_assert_must(change(assert,z),G,GG);true)).
 database_modify_assert(change(assert,AorZ),      G,GG):-database_modify_assert_must(change(assert,AorZ),G,GG).
 
@@ -560,7 +571,7 @@ hooked_retractall(G):- Op = change(retract,all),
 user:provide_mpred_storage_op(Op,G):- get_functor(G,F,A),user:provide_mpred_storage_op(Op,G,F,A).
 
 user:provide_mpred_storage_op(Op,G, F,_A):- t(pfcControlled,F),!,loop_check(prolog_provide_mpred_storage_op(Op,G)).
-user:provide_mpred_storage_op(Op,G, F,_A):- t(prologOnly,F),!,loop_check(pfc_provide_mpred_storage_op(Op,G)).
+user:provide_mpred_storage_op(Op,G, F,_A):- t(prologDynamic,F),!,loop_check(pfc_provide_mpred_storage_op(Op,G)).
 user:provide_mpred_storage_op(Op,G,_F,_A):- loop_check(prolog_provide_mpred_storage_op(Op,G)).
 
 %user:provide_mpred_storage_op(Op,G):- (loop_check(isa_provide_mpred_storage_op(Op,G))).
@@ -589,7 +600,7 @@ retract_all(HB) :- ignore((retract(HB),fail)).
 is_static_pred(Head:-_):-!,predicate_property(Head,_),not(predicate_property(Head,dynamic)).
 is_static_pred(Head):-predicate_property(Head,_),not(predicate_property(Head,dynamic)).
 
-prolog_provide_mpred_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),user:mpred_prop(F,prologOnly),!, prolog_op(Op,G).
+prolog_provide_mpred_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),user:mpred_prop(F,prologDynamic),!, prolog_op(Op,G).
 prolog_provide_mpred_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),not(user:mpred_prop(F,prologHybrid)),!,current_predicate(_,G), prolog_op(Op,G).
 use_if_modify_new:- current_predicate(assert_if_new/1).
 prolog_op(change(AR,Op), G):-ensure_dynamic(G),!,prolog_modify(change(AR,Op), G).

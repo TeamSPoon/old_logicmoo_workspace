@@ -1,4 +1,5 @@
 
+:-file_begin(pfc).
 
 tCol(tFly).
 tCol(tCanary).

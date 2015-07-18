@@ -152,20 +152,20 @@ expandlhs(T,S0,S,H0,H1,Q) :-
    tag(P,S0,S,H0,H,Q).
 
 flatten0(X,L0,L) :- nonvar(X),!,
-   flatten(X,L0,L).
+   flatten_xg(X,L0,L).
 flatten0(_,_,_) :-
    nl,
    display('! Variable as a non-terminal in the lhs of a grammar rule'),
    nl,
    fail.
 
-flatten((X...Y),L0,L) :- !,
+flatten_xg((X...Y),L0,L) :- !,
    flatten0(X,L0,[gap|L1]),
    flatten0(Y,L1,L).
-flatten((X,Y),L0,L) :- !,
+flatten_xg((X,Y),L0,L) :- !,
    flatten0(X,L0,[nogap|L1]),
    flatten0(Y,L1,L).
-flatten(X,[X|L],L).
+flatten_xg(X,[X|L],L).
 
 front([],H,H).
 front([K,X|L],H0,H) :-

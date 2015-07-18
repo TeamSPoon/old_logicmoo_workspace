@@ -21,13 +21,12 @@
 % Douglas Miles
 */
 
-:-assert_until_end_of_file(infSupertypeName).
-:-onEndOfFile(dmsg(infSupertypeName)).
+:- assert_until_eof(infSupertypeName).
+:- onEndOfFile(dmsg(infSupertypeName)).
 
 :- file_begin(pfc).
 
-
-baseKB:isa(iPerson99,tPerson).
+% baseKB:isa(iPerson99,tPerson).
 
 :- op(500,fx,'~').
 :- op(1050,xfx,('=>')).
@@ -48,11 +47,12 @@ tCol(meta_argtypes).
 tCol(ttSpatialType).
 tCol(ttTypeType).
 
-
 tCol(tWorld).
+
 tWorld(iWorld7).
 
 tCol(ftProlog).
+
 
 tCol(tWorld).
 isa(iWorld7,tWorld).
@@ -268,7 +268,7 @@ tCol(tItem).
 tCol(vtVerb).
 
 % predIsFlag(tAgent(ftID),[predIsFlag]).
-% prologOnly(createableSubclassType/2).
+% prologDynamic(createableSubclassType/2).
 % alt_forms1(none_AR,localityOfObject(P,R),mudAtLoc(P,L)):-ground(localityOfObject(P,R)),is_asserted(mudAtLoc(P,L)),nonvar(L),once(locationToRegion(L,R)).
 % alt_forms1(none_AR,mudAtLoc(P,L),localityOfObject(P,R)):-ground(mudAtLoc(P,L)),once(locationToRegion(L,R)),nonvar(R).
 % argsIsa(mudFacing,ftTerm).
@@ -380,7 +380,7 @@ ttValueType(vtColor).
 
 ttValueType(VT)=>tInferInstanceFromArgType(VT).
 
-prologOnly(user:verb_alias(ftString,vtVerb)).
+prologDynamic(user:verb_alias(ftString,vtVerb)).
 prologHybrid(typeHasGlyph(tCol,ftString)).
 prologHybrid(mudMaxHitPoints(tAgent,ftInt)).
 prologHybrid(mudStowing(tAgent,tItem)).
@@ -397,11 +397,11 @@ prologHybrid(mudShape/2).
 prologHybrid(mudSize/2).
 prologHybrid(mudTexture/2).
 prologHybrid(pathDirLeadsTo/3).
-prologOnly(mudMoveDist/2).
+prologDynamic(mudMoveDist/2).
 :- dynamic(mudMoveDist/2).
 meta_argtypes(mudMoveDist(tAgent,ftInt)).
 prologSingleValued(mudMoveDist,[mpred_module(user),query(call),argSingleValueDefault(2,1)]).
-prologOnly(stat_total/2).
+prologDynamic(stat_total/2).
 tCol(tContainer).
 tCol(tRegion).
 tCol(vtBasicDir).
@@ -411,12 +411,12 @@ tCol(vtVerb).
 :- dynamic stat_total/2.
 :- dynamic(spawn_rate/2).
 tCol(tMonster).
-%prologOnly(user:action_info(vtActionTemplate,ftText)).
-prologOnly(agent_call_command(tAgent,ftAction)).
+%prologDynamic(user:action_info(vtActionTemplate,ftText)).
+prologDynamic(agent_call_command(tAgent,ftAction)).
 prologSideEffects(agent_call_command(tAgent,ftAction)).
-prologOnly(member(ftTerm,ftTerm)).
-prologOnly(mud_test(ftTerm,ftCallable)).
-prologOnly(use_action_templates(ftTerm)).
+prologBuiltin(member(ftTerm,ftTerm)).
+prologDynamic(mud_test(ftTerm,ftCallable)).
+prologDynamic(use_action_templates(ftTerm)).
 
 
 prologHybrid(typeHasGlyph(tCol,ftString)).
@@ -452,7 +452,7 @@ prologMultiValued(mudCmdFailure(tAgent,ftAction)).
 tPred(isEach(tAgent/1, mudEnergy/2,mudHealth/2, mudAtLoc/2, failure/2, typeGrid/3, gridValue/4, isa/2, tItem/1, mudMemory/2, pathName/3, mudPossess/2, tRegion/1, mudScore/2, mudStm/2, mudFacing/2, localityOfObject/2, tThinking/1, mudWearing/2, mudFacing/2, mudHeight/2, act_term/2, nameStrings/2, mudDescription/2, pathDirLeadsTo/3, mudAgentTurnnum/2)).
 prologHybrid(mudToHitArmorClass0 / 2).
 prologHybrid(mudAtLoc/2).
-prologOnly((agent_call_command/2)).
+prologBuiltin((agent_call_command/2)).
 :-decl_mpred_hybrid(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
  pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completeExtentAsserted/1, ttFormatType/1, typeProps/2)).
 prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
@@ -478,7 +478,7 @@ prologMultiValued(agent_text_command(tAgent,ftText,tAgent,ftAction)).
 
 formatted_resultIsa(apathFn(tRegion,vtDirection),tPathway).
 
-prologOnly(is_vtActionTemplate/1).
+prologBuiltin(is_vtActionTemplate/1).
 
 is_vtActionTemplate(C):-nonvar(C),get_functor(C,F),!,atom_concat(act,_,F).
 defnSufficient(ftAction,is_vtActionTemplate).
@@ -943,9 +943,9 @@ random_path_dir(Dir):-random_instance(vtBasicDir,Dir,true).
 random_path_dir(Dir):-random_instance(vtBasicDirPlusUpDown,Dir,true).
 random_path_dir(Dir):-random_instance(vtDirection,Dir,true).
 
-prologOnly(ensure_some_pathBetween(tRegion,tRegion)).
+prologBuiltin(ensure_some_pathBetween(tRegion,tRegion)).
 
-prologOnly(onEachLoad).
+prologBuiltin(onEachLoad).
 argsQuoted(onEachLoad).
 argsQuoted(must).
 
@@ -953,10 +953,10 @@ tCol(tStatPred).
 
 prologHybrid(normalAgentGoal(tStatPred,ftTerm)).
 
-normalAgentGoal(Pred,_)/atom(Pred) =>
- {AT=..[Pred,tAgent,ftPercent]},
-  meta_argtypes(AT),prologHybrid(Pred),tRolePredicate(Pred),arity(Pred,2),
-  singleValuedInArg(Pred,2).
+(tStatPred(Pred)=>(tRolePredicate(Pred),arity(Pred,2),singleValuedInArg(Pred,2))).
+
+(normalAgentGoal(Pred,_)/atom(Pred) =>
+ ({AT=..[Pred,tAgent,ftPercent]},meta_argtypes(AT),prologHybrid(Pred),tStatPred(Pred))).
 
 normalAgentGoal(mudEnergy,90).
 normalAgentGoal(mudNonHunger,90).
@@ -969,20 +969,6 @@ normalAgentGoal(mudSadToHappy,90).
 normalAgentGoal(mudComfort,90).
 
 typeProps(tAgent,[mudStr(2),mudHeight(2),mudStm(2),mudSpd(2)]).
-
-normalAgentGoal(X,_)=>tStatPred(X).
-
-((tStatPred(Pred)/((Val1=(-(_));Val1=( +(_))), Head1=..[Pred,Agent,Val1], Head2=..[Pred,Agent,Val2], Head3=..[Pred,Agent,Val3]))
- =>
-   ((Head1,Head2/(Val1 \== Val2, catch((Val3 is Val1 + Val2),_,fail))) => 
-     (( \+ Head1, Head3, \+ Head2 )))).
-
-((tStatPred(Pred)/((Val1=(+(_));Val1=( -(_))), Head1=..[Pred,Agent,Val1], Head2=..[Pred,Agent,Val2], Head3=..[Pred,Agent,Val3]))
- =>
-   ((Head1,Head2/(Val1 \== Val2, catch((Val3 is Val1 + Val2),_,fail))) => 
-     (( \+ Head1, Head3, \+ Head2 )))).
-
-
 
 
 %normalAgentGoal(Pred,Val)=>  (tAgent(A)=>agentGoals(A,Pred,((t(Pred,A,V),V>=Val)))).

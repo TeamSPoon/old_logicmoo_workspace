@@ -457,7 +457,7 @@ rdf_assert_ignored(isa(tCol,tCol)).
 %rdf_assert_ignored(isa(_,_)).
 %rdf_assert_ignored(genls(_,_)).
 rdf_assert_ignored((_:-INFOC)):-is_meta_info(INFOC),!.
-rdf_assert_ignored(svo(_,prologOnly,_)).
+rdf_assert_ignored(svo(_,prologDynamic,_)).
 rdf_assert_ignored(mpred_prop(_,_)).
 rdf_assert_ignored(_:mpred_prop(_,_)).
 rdf_assert_ignored(user:mpred_prop(_,arity(1))).

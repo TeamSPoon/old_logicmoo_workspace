@@ -162,10 +162,6 @@
 
 % :-must(not(user:mpred_prop(t,prologHybrid))).
 
-:- retractall(thlocal:disable_mpred_term_expansions_locally).
-
-
-
 
 :- multifile user:term_specifier_text/2.
 :- multifile user:type_action_info/3.
@@ -187,5 +183,7 @@
 :- multifile user:agent_call_command/2.
 :- multifile user:agent_text_command/4.
 :- multifile user:check_permanence/4.
+
+:- enable_mpred_expansion.
 
 

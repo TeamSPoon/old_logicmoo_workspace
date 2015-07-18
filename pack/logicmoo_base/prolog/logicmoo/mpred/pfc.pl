@@ -71,7 +71,7 @@ retract_eq_quitely((H:-B)):-ignore((clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@
 retract_eq_quitely((H)):-ignore((clause(H,true,Ref),clause(HH,BB,Ref),H=@=HH,BB==true,!,erase(Ref))).
 assert_eq_quitely(H):-assert_if_new(H).
 
-reduce_clause_from_fwd(H,H):-not(compound(H)),!.
+reduce_clause_from_fwd(H,H):- (\+compound(H)),!.
 reduce_clause_from_fwd((H:-B),HH):-B==true,reduce_clause_from_fwd(H,HH).
 reduce_clause_from_fwd((B=>H),HH):-B==true,reduce_clause_from_fwd(H,HH).
 reduce_clause_from_fwd((H<=B),HH):-B==true,reduce_clause_from_fwd(H,HH).
@@ -88,15 +88,15 @@ to_addable_form(I,O):- findall(M,do_expand_args(isEach,I,M),IM),list_to_conjunct
 
 to_predicate_isas_each(I,O):-to_predicate_isas(I,O).
 
-to_predicate_isas(V,V):-not(compound(V)),!.
+to_predicate_isas(V,V):- (\+compound(V)),!.
 to_predicate_isas([H|T],[HH|TT]):-!,to_predicate_isas(H,HH),to_predicate_isas(T,TT),!.
 to_predicate_isas((H,T),(HH,TT)):-!,to_predicate_isas(H,HH),to_predicate_isas(T,TT),!.
 %to_predicate_isas(I,I):-contains_term(S,I),nonvar(S),exact_args(S),!.
-to_predicate_isas(I,O):-to_predicate_isas0(I,O).
+to_predicate_isas(I,O):-must(to_predicate_isas0(I,O)),!.
 
 append_as_first_arg(C,I,V):-C=..[F|ARGS],V=..[F,I|ARGS].
 
-to_predicate_isas0(V,V):-not(compound(V)),!.
+to_predicate_isas0(V,V):- (\+compound(V)),!.
 to_predicate_isas0({V},{V}):-!.
 to_predicate_isas0(eXact(V),V):-!.
 to_predicate_isas0(t(C,I),V):-atom(C)->V=..[C,I];(var(C)->V=t(C,I);append_as_first_arg(C,I,V)).
@@ -245,7 +245,7 @@ pfc_is_info(infoF(C)):-nonvar(C),!.
 :-dynamic(not_not/1).
 pfc_rewrap_h(A,A):-nonvar(A),\+ is_static_pred(A).
 pfc_rewrap_h(A,F):- functor(A,F,_),\+ is_static_pred(F),!.
-pfc_rewrap_h(A,not_not(A)):-!.
+pfc_rewrap_h(A,not_get(A)):-!.
 
 fwc:-true.
 bwc:-true.
@@ -254,6 +254,7 @@ is_fc_body(P):-cwc, notrace(fwc==P ; (compound(P),arg(1,P,E),is_fc_body(E))),!.
 is_bc_body(P):-cwc, notrace(bwc==P ; (compound(P),arg(1,P,E),is_bc_body(E))),!.
 is_action_body(P):-cwc, notrace(wac==P ; (compound(P),arg(1,P,E),is_action_body(E))),!.
 
+has_functor(P):-compound(P).
 
 :-dynamic(use_presently/0).
 :-multifile(pfc_default/1).
@@ -450,7 +451,7 @@ pfc_post(P,S) :-
 % It always succeeds.
 pfc_post1(pfc_assert(P0),S):-!,pfc_post1(P0,S).
 pfc_post1(PI,SI):-copy_term(pfc_post1(PI,SI),pfc_post1(P0,S)),
-  hotrace(to_addable_form_wte(P0,P)),
+  to_addable_form_wte(P0,P),
       (is_list(P)
         ->maplist(pfc_post1_sp(S),P);
        pfc_post1_sp(S,P)).
@@ -1011,11 +1012,12 @@ pfc_get_support_via_clause_db(P,(Sup,g)):-  predicate_property(P,number_of_claus
 
 
 support_ok_via_clause(H):- get_functor(H,F,A),support_ok_via_clause(H,F,A).
+support_ok_via_clause(_,(\+),1):-!,fail.
 support_ok_via_clause(H,F,A):- prologSideEffects(F),!,fail.
 support_ok_via_clause(H,F,A):- \+ predicate_property(H,number_of_clauses(_)),!,fail.
 support_ok_via_clause(H,F,A):- pfcMark(pfcRHS,_,F,A),!,fail.
 support_ok_via_clause(H,F,A):- pfcMark(pfcMustFC,_,F,A),!,fail.
-support_ok_via_clause(H,F,A):- prologOnly(F),!.
+support_ok_via_clause(H,F,A):- prologDynamic(F),!.
 support_ok_via_clause(H,F,A):- argsQuoted(F),!,fail.
 support_ok_via_clause(H,F,A):- \+ pfcControlled(F),!.
 
@@ -1241,21 +1243,21 @@ pfc_call(F):- no_repeats(loop_check(pfc_call_0(F),fail)). % loop_check(pfc_call_
 
 lsting(L):-with_assertions(thlocal:pfc_listing_disabled,listing(L)).
 
-:-lsting(pfc_call/1).
+%:-lsting(pfc_call/1).
 
-pfc_call_0(Var):-var(Var),!,pfc_call_with_no_triggers(Var).
-pfc_call_0(U:X):-U==user,!,pfc_call_0(X).
-pfc_call_0(t(A,B)):-(atom(A)->true;no_repeats(arity(A,1))),ABC=..[A,B],pfc_call_0(ABC).
-pfc_call_0(isa(B,A)):-(atom(A)->true;no_repeats(tCol(A))),ABC=..[A,B],pfc_call_0(ABC).
-%pfc_call_0(t(A,B)):-!,(atom(A)->true;no_repeats(arity(A,1))),ABC=..[A,B],pfc_call_0(ABC).
-pfc_call_0(t(A,B,C)):-!,(atom(A)->true;no_repeats(arity(A,2))),ABC=..[A,B,C],pfc_call_0(ABC).
-pfc_call_0(t(A,B,C,D)):-!,(atom(A)->true;no_repeats(arity(A,3))),ABC=..[A,B,C,D],pfc_call_0(ABC).
-pfc_call_0(t(A,B,C,D,E)):-!,(atom(A)->true;no_repeats(arity(A,4))),ABC=..[A,B,C,D,E],pfc_call_0(ABC).
-pfc_call_0((C1,C2)):-!,pfc_call_0(C1),pfc_call_0(C2).
-pfc_call_0(call(X)):- !, pfc_call_0(X).
-pfc_call_0(\+(X)):- !, \+ pfc_call_0(X).
-pfc_call_0(call_u(X)):- !, pfc_call_0(X).
-pfc_call_0(G):-pfc_call_0(G,F,A).
+pfc_call_0(Var):-var(Var),!,dmsg(pfc_call_0(Var)),pfc_call_with_no_triggers(Var).
+pfc_call_0(U:X):-U==user,!,pfc_call(X).
+pfc_call_0(t(A,B)):-(atom(A)->true;no_repeats(arity(A,1))),ABC=..[A,B],pfc_call(ABC).
+pfc_call_0(isa(B,A)):-(atom(A)->true;no_repeats(tCol(A))),ABC=..[A,B],pfc_call(ABC).
+%pfc_call_0(t(A,B)):-!,(atom(A)->true;no_repeats(arity(A,1))),ABC=..[A,B],pfc_call(ABC).
+pfc_call_0(t(A,B,C)):-!,(atom(A)->true;no_repeats(arity(A,2))),ABC=..[A,B,C],pfc_call(ABC).
+pfc_call_0(t(A,B,C,D)):-!,(atom(A)->true;no_repeats(arity(A,3))),ABC=..[A,B,C,D],pfc_call(ABC).
+pfc_call_0(t(A,B,C,D,E)):-!,(atom(A)->true;no_repeats(arity(A,4))),ABC=..[A,B,C,D,E],pfc_call(ABC).
+pfc_call_0((C1,C2)):-!,pfc_call(C1),pfc_call(C2).
+pfc_call_0(call(X)):- !, pfc_call(X).
+pfc_call_0(\+(X)):- !, \+ pfc_call(X).
+pfc_call_0(call_u(X)):- !, pfc_call(X).
+pfc_call_0(G):-functor(G,F,A),pfc_call_0(G,F,A).
 
 pfc_call_0(G,F,A):-  (ground(G); \+ current_predicate(F/A) ; \+ (predicate_property(G,clause_count(CC)),CC>1)),  
                 ignore((loop_check(call_with_bc_triggers(G)),maybeSupport(G,(g,g)),fail)),
@@ -1286,7 +1288,7 @@ pfc_call_with_no_triggers_bound(F) :-
 pfc_call_with_no_triggers(F) :-
   %= this (var(F)) is probably not advisable due to extreme inefficiency.
   var(F)    ->  pfc_fact(F) ; 
-  has_cl(F) ->  (clause_prologsys(F,Condition),(Condition==true->true;not(pfc_is_info(Condition)),call_prologsys(Condition)));
+  has_cl(F) ->  (clause_prologsys(F,Condition),(Condition==true->true; (\+pfc_is_info(Condition)),call_prologsys(Condition)));
   %= we check for system predicates as well.
   current_predicate(_,F) -> call_u(F) ; ((expand_goal(F,FE),F\=@=FE)->(trace,pfc_call_with_no_triggers(FE));(get_functor(F,FF,AA),show_call(dynamic(FF/AA)),!,pfcBC_Cache(F))).
 */
@@ -1307,8 +1309,8 @@ pfc_slow_search.
 
 
 ruleBackward(F,Condition):-ruleBackward0(F,Condition),Condition\=call_sysprolog(F).
-%ruleBackward0(F,Condition):-clause_u(F,Condition),not(is_true(Condition);pfc_is_info(Condition)).
-ruleBackward0(F,Condition):-'<='(F,Condition),not(is_true(Condition);pfc_is_info(Condition)).
+%ruleBackward0(F,Condition):-clause_u(F,Condition), (\+is_true(Condition);pfc_is_info(Condition)).
+ruleBackward0(F,Condition):-'<='(F,Condition), (\+is_true(Condition);pfc_is_info(Condition)).
 
 :-dynamic('{}'/1).
 {X}:-dmsg(legacy({X})),call_prologsys(X).
@@ -1321,7 +1323,7 @@ pfcBC_NoFacts_TRY(F) :- no_repeats(ruleBackward(F,Condition)),
 
 
 pfcBC_Cache(F) :- pfc_call(F),
-   ignore((ground(F),(not(is_asserted_1(F)), maybeSupport(F,(g,g))))).
+   ignore((ground(F),( (\+is_asserted_1(F)), maybeSupport(F,(g,g))))).
 
 
 maybeSupport(P,_):-pfc_ignored(P),!.
@@ -1716,11 +1718,14 @@ pfc_add_support(P,(Fact,Trigger)):- thlocal:pfc_add_support_suspended(P,Fact,Tri
 pfc_add_support(P,(Fact,Trigger)) :- !,assertz_if_new(spft(P,Fact,Trigger)). % was assert_i
 
 
-pfc_get_support(P,(Fact,Trigger)) :- spft(P,Fact,Trigger)*->true;(nonvar(P),pfc_get_support_neg(P,(Fact,Trigger))).
+pfc_get_support(P,(Fact,Trigger)) :- var(P),var(Fact),!,spft(P,Fact,Trigger).
+pfc_get_support(P,(Fact,Trigger)) :- copy_term(P,PC),
+  (spft(PC,Fact,Trigger)*->must_det(((ground(PC);P=@=PC),P=PC));
+   (nonvar(P),pfc_get_support_neg(P,(Fact,Trigger)))).
 
 % dont pfc_get_support_neg(\+ neg(P),(Fact,Trigger)) :- spft((P),Fact,Trigger).
-pfc_get_support_neg(\+ (P),S) :- !,pfc_get_support(neg(P),S).
-pfc_get_support_neg(~ (P),S) :- !,pfc_get_support(neg(P),S).
+pfc_get_support_neg(\+ (P),S) :- !, nonvar(P), pfc_get_support(neg(P),S).
+pfc_get_support_neg(~ (P),S) :- !, nonvar(P), pfc_get_support(neg(P),S).
 
 
 % There are three of these to try to efficiently handle the cases
@@ -1752,7 +1757,7 @@ pfc_make_supports_f_l((P,S1,S2)) :-
   !.
 */
 
-is_relative(V):-not(compound(V)),!,fail.
+is_relative(V):- (\+compound(V)),!,fail.
 is_relative(+(_)).
 is_relative(-(_)).
 is_relative(N):-number(N),N =< 10, N >= -10.
@@ -1961,7 +1966,7 @@ should_call_for_facts(H,F,A):- prologSideEffects(F),!,fail.
 should_call_for_facts(H,F,A):- \+ predicate_property(H,number_of_clauses(_)),!.
 should_call_for_facts(H,F,A):- pfcMark(pfcRHS,_,F,A),!,fail.
 should_call_for_facts(H,F,A):- pfcMark(pfcMustFC,_,F,A),!,fail.
-should_call_for_facts(H,F,A):- prologOnly(F),!.
+should_call_for_facts(H,F,A):- prologDynamic(F),!.
 should_call_for_facts(H,F,A):- \+ pfcControlled(F),!.
 
 
@@ -2300,7 +2305,7 @@ axiom(F) :-
 % axiom(F) :-  pfc_get_support(F,(U,U)).
 
 %= an assumption is a failed action, i.e. were assuming that our failure to
-%= prove P is a proof of not(P)
+%= prove P is a proof of  (\+P)
 
 assumption(P) :- nonvar(P),pfc_negation(P,_).
 

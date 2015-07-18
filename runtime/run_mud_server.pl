@@ -22,6 +22,7 @@ user:file_search_path(pack, '../pack/').
 :- initialization(attach_packs).
 user:file_search_path(prologmud, library(prologmud)).
 
+:- ((current_prolog_flag(readline, true))->expand_file_name("~/.pl-history", [File|_]),(exists_file(File) -> rl_read_history(File); true),at_halt(rl_write_history(File));true).
 
 % :- multifile sandbox:safe_primitive/1.
 % :-asserta((sandbox:safe_primitive(Z):-wdmsg(Z))).
@@ -36,15 +37,39 @@ user:file_search_path(prologmud, library(prologmud)).
 
 
 % [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/)
-:- if_file_exists(ensure_loaded(library(eggdrop))).
+:- if_file_exists(user:ensure_loaded(library(eggdrop))).
 :- initialization((current_predicate(egg_go/0)->egg_go;true),now).
 
 % [Mostly Required] Load the UPV Curry System
 %:- time(user:ensure_loaded(library(upv_curry/main))).
 
+
 % [Required] Load the Logicmoo Base System
 :- time(user:ensure_loaded(logicmoo(logicmoo_base))).
 :- asserta(thlocal:disable_mpred_term_expansions_locally).
+
+:- multifile(user:push_env_ctx/0).
+:- dynamic(user:push_env_ctx/0).
+
+push_env_ctx:-!,fail.
+push_env_ctx:-!.
+
+:- if(if_defined(debugging_planner)).
+
+% [Mostly Required] Load the Logicmoo Planner/AI System
+:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner)))).
+
+:- else.
+
+% [Mostly Required] Load the Logicmoo Planner/AI System
+:- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner))))).
+
+:- show_call_entry(user:ensure_loaded(planner(logicmoo_util_bb_env))).
+:- show_call_entry(user:use_module(planner(logicmoo_util_structs))).
+:- show_call_entry(with_no_mpred_expansions(user:ensure_loaded(planner((logicmoo_hyhtn))))).
+
+:- wdmsg("Done with loading logicmoo_planner").
+
 
 % [Required] most of the Library system should not be loaded with mpred expansion on
 :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
@@ -52,25 +77,24 @@ user:file_search_path(prologmud, library(prologmud)).
 % [Required] Load the CYC Network Client and Logicmoo CycServer Emulator (currently server is disabled)
 :- with_no_mpred_expansions(user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api))).
 
-% [Mostly Required] Load the Logicmoo Planner/AI System
-%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner)))).
 
-:- if(\+ if_defined(debugging_planner)).
+:- with_assertions((user:term_expansion(_,_):-!,fail),
+    gripe_time(7,time(user:load_files([library(el_holds/'el_assertions.qlf')],[if(not_loaded )])))).
 
+% [Mostly Required] Load the Logicmoo Parser/Generator System
+:- gripe_time(40,user:ensure_loaded(library(parser_all))).
+
+% [Required] Load the Logicmoo Backchaining Inference System
+:- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
 
 % [Required] Load the Logicmoo WWW System
-:- time(ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
+:- gripe_time(40,user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
+
 :- asserta(thlocal:disable_mpred_term_expansions_locally).
 :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 
-% [Required] Load the Logicmoo Backchaining Inference System
-%:- time(with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
-
-% [Mostly Required] Load the Logicmoo Parser/Generator System
-%:- time(user:ensure_loaded(library(parser_all))).
-
 % [Required] most of the Library system should not be loaded with mpred expansion on
-:- ignore((\+(thlocal:disable_mpred_term_expansions_locally),throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
+% :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 
 
 % [Optional] Load the Logicmoo RDF/OWL Browser System
@@ -84,7 +108,6 @@ user:file_search_path(prologmud, library(prologmud)).
 :- doall(show_call(current_prolog_flag(_N,_V))).
 
 
-
 % ==========================================================
 % Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
 % ==========================================================
@@ -92,15 +115,16 @@ user:file_search_path(prologmud, library(prologmud)).
 :-multifile(user:regression_test/0).
 :-multifile(user:feature_test/0).
 
+:-dmsg("About to run Sanity").
 
-:- if_startup_script(doall(user:sanity_test)).
+:- show_call_entry(gripe_time(40,if_startup_script(doall(user:sanity_test)))).
 
 % ==========================================================
 % Regression tests that first run whenever a person stats the MUD on the public server
 % ==========================================================
 
 :- if((gethostname(titan),fail)). % INFO this fail is so we can start faster
-:- doall(user:regression_test).
+:- show_call_entry(gripe_time(40, doall(user:regression_test))).
 :- endif.
 
 
@@ -110,7 +134,7 @@ user:file_search_path(prologmud, library(prologmud)).
 
 :- retractall(thlocal:disable_mpred_term_expansions_locally).
 % [Required] load the mud system
-:- user:ensure_loaded(prologmud(mud_startup)).
+:- show_call_entry(gripe_time(40,user:ensure_loaded(prologmud(mud_startup)))).
 
 
 
@@ -119,6 +143,7 @@ user:file_search_path(prologmud, library(prologmud)).
 % MUD SERVER CODE STARTS
 % ==============================
 
+:- file_begin(pfc).
 
 % [Optional] Creates or suppliments a world
 
@@ -167,7 +192,7 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 :-onSpawn(localityOfObject(iCommanderdata66,tOfficeRoom)).
 :-onSpawn(bordersOn(tLivingRoom,tOfficeRoom)).
 
-
+:- file_begin(pl).
 
 % [Optionaly] Start the telent server
 :-at_start(toploop_telnet:start_mud_telnet(4000)).

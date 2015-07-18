@@ -24,16 +24,16 @@
 
 :- set_prolog_flag(generate_debug_info, true).
 % [Optionaly] Set the Prolog optimize/debug flags
-:- set_prolog_flag(verbose_load,true).
+%:- set_prolog_flag(verbose_load,true).
 %:- use_module(library(gui_tracer)).
-:- set_prolog_flag(gui_tracer, false).
-:- set_prolog_flag(answer_write_options, [quoted(true), portray(true), max_depth(1000), spacing(next_argument)]).
-:- catch(noguitracer,_,true).
+%:- set_prolog_flag(gui_tracer, false).
+%:- set_prolog_flag(answer_write_options, [quoted(true), portray(true), max_depth(1000), spacing(next_argument)]).
+%:- catch(noguitracer,_,true).
 
 
 % [Optionaly] Set up the Prolog optimize/debug flags
 %:- set_prolog_flag(debug,false).
-:- set_optimize(true).
+%:- set_optimize(true).
 
 
 % [Optionaly] load the mpred_online system
@@ -51,13 +51,11 @@ prolog:message(git(update_versions),A,A):-!.
 :- use_module(library(settings)).
 % :- use_module(library(check)).
 % :- make.
-:- portray_text(true).
+%:- portray_text(true).
 
 :-set_prolog_stack(global, limit(64*10**9)).
 :-set_prolog_stack(local, limit(64*10**9)).
 :-set_prolog_stack(trail, limit(64*10**9)).
-
-:- ((current_prolog_flag(readline, true))->expand_file_name("~/.pl-history", [File|_]),(exists_file(File) -> rl_read_history(File); true),at_halt(rl_write_history(File));true).
 
 
 :- multifile( entailment:rdf /3 ).
@@ -92,7 +90,7 @@ now_try_game_dir(Else):-  enumerate_files(game('.'), GAMEDIR) *->
 
 
 :-context_module(CM),assert(user:loading_from_cm(CM)).
-create_module(M):-context_module(CM),module(M),asserta(M:this_is_a_module(M)),writeq(switching_back_to_module(CM)),module(CM).
+create_module(M):-context_module(CM),module(M),asserta(M:this_is_a_module(M)),writeq(switching_back_to_module(M,CM)),module(CM).
 :-create_module(user).
 :-create_module(hook).
 :-create_module(thlocal).
@@ -110,12 +108,12 @@ parser_chat80_module(moo).
 :-export(prolog_repl/0).
 prolog_repl:- with_all_dmsg((nl,fmt("Press Ctrl-D to start the mud!"),nl,'@'(prolog,'user'))).
 
-:- set_prolog_flag(gui,false).
-:- set_prolog_flag(history,1000).
+%:- set_prolog_flag(gui,false).
+%:- set_prolog_flag(history,1000).
 
 % :- prolog_ide(debug_monitor),prolog_ide(open_debug_status). % ,prolog_ide(xref).
 
-:- debug(wotp).
+%:- debug(wotp).
 
 
 :-export(within_user/1).
@@ -139,7 +137,7 @@ within_user(Call):- '@'(Call,'user').
 :- user_use_module(library(settings)).
 
 :- user:file_search_path(cliopatria,SP),
-   exists_directory(SP),
+   exists_directory(SP),!,
    writeq(user:file_search_path(cliopatria,SP)),nl.
    %set_setting_default(cliopatria_binding:path, SP).
    %save_settings('moo_settings.db').
@@ -178,7 +176,7 @@ hard_work:-
    )))),!.
 
 % [Required] load the mud PFCs
-:- user:ensure_loaded(prologmud(server/mud_builtin)).
+:- show_call_entry(gripe_time(40,user:ensure_loaded(prologmud(server/mud_builtin)))).
 
 
 slow_work:- with_assertions( prevent_transform_moo_preds , within_user(at_start(hard_work))).
@@ -494,13 +492,14 @@ download_and_install_el:-
 %:- user:ensure_loaded(logicmoo(dbase/mpred_ext_chr)).
 
 
-
+:-wdmsg(loading_mobs).
 
 % NPC planners
 :- include_mpred_files(prologmud(mobs/'?*.pl')).
 :- include_mpred_files('../src_assets/mobs/?*.pl').
 :- xperimental->include_mpred_files('../external/XperiMental/src_incoming/mobs/?*.pl');true.
 
+:-wdmsg(loading_actions).
 
 % Action/Commands implementation
 :- include_mpred_files(prologmud(actions/'?*.pl')).
@@ -530,7 +529,7 @@ download_and_install_el:-
 :-create_agent(explorer(2),[]).
 */
 
-:- file_begin(mudcode).
+:- file_begin(pl).
 
 user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term=someCode).
 
@@ -538,9 +537,9 @@ user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term
 %:-forall(make_tabled_perm(grab_argsIsa(F,Types)),dmsg(grab_argsIsa(F,Types))).
 
 
-:- ensure_mpred_file_loaded(prologmud(server/builtin)).
+:- show_call_entry(ensure_mpred_file_loaded(prologmud(server/builtin))).
 
-:- forall(filematch('*/*.plmoo', X),(dmsg(ensure_mpred_file_loaded(X)),ensure_mpred_file_loaded(X))).
+:- show_call_entry(forall(filematch('*/*.plmoo', X),(dmsg(ensure_mpred_file_loaded(X)),ensure_mpred_file_loaded(X)))).
 
 
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
@@ -549,10 +548,11 @@ user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term
 % These contain the definition of the object cols.
 % Load the map file appropriate for the world being used.
 % Load the mud files appropriate for the mobs being used.
-:- forall(filematch(prologmud('*/?*.plmoo'), X),dmsg(X)).
-:- ensure_mpred_file_loaded(prologmud('*/?*.plmoo')).
-:- forall(filematch(prologmud('*/*/?*.plmoo'), X),dmsg(X)).
-:- ensure_mpred_file_loaded(prologmud('*/*/?*.plmoo')).
+
+:- show_call_entry(forall(filematch(prologmud('*/?*.plmoo'), X),dmsg(X))).
+:- show_call_entry(ensure_mpred_file_loaded(prologmud('*/?*.plmoo'))).
+:- show_call_entry(forall(filematch(prologmud('*/*/?*.plmoo'), X),dmsg(X))).
+:- show_call_entry(ensure_mpred_file_loaded(prologmud('*/*/?*.plmoo'))).
 
 % puts world into running state
 % :- must(old_setup).

@@ -1247,7 +1247,8 @@ pttp_builtin(unify,_).
 pttp_builtin(identical_member_special,_).
 pttp_builtin(identical_member_special_loop_check,_).
 pttp_builtin(M:P,A):-atom(M),!,pttp_builtin(P,A).
-pttp_builtin(F,_):- (user:mpred_prop(F,prologOnly)),!. %,fail.
+pttp_builtin(F,_):- (user:mpred_prop(F,prologDynamic)),!. %,fail.
+pttp_builtin(F,_):- (user:mpred_prop(F,prologBuiltin)),!. %,fail.
 pttp_builtin(unifiable_member,_).
 pttp_builtin(t,_).
 %pttp_builtin(F,_):-user:mpred_prop(F,prologPTTP),!,fail.

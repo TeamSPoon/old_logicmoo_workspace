@@ -15,7 +15,8 @@
 
 hybrid_tPredStubImpl(prologHybrid).
 hybrid_tPredStubImpl(prologPTTP).
-hybrid_tPredStubImpl(prologOnly).
+hybrid_tPredStubImpl(prologDynamic).
+hybrid_tPredStubImpl(prologBuiltin).
 hybrid_tPredStubImpl(prologSNARK).
 hybrid_tPredStubImpl(prologEquality).
 
@@ -49,7 +50,7 @@ db_redir_op_if_needed(Op,_C0,Prop,ARGS):- database_modify_units(Op,Unit).
 % INSTALL STORAGE STUBS
 % ================================================================================
 
-maybe_storage_stub(F,StubType):- hybrid_tPredStubImpl(StubType),not((StubType==prologOnly)),arity(F,A),must(ensure_universal_stub(F/A)).
+maybe_storage_stub(F,StubType):- hybrid_tPredStubImpl(StubType),not((StubType==prologDynamic)),arity(F,A),must(ensure_universal_stub(F/A)).
 
 
 %OLD user:decl_database_hook(change(assert,_),user:mpred_prop(F,StubType)):- maybe_storage_stub(F,StubType).
@@ -200,8 +201,8 @@ call_wdmsg(P,DB):- get_functor(DB,F,A), call_wdmsg(P,DB,F,A).
 
 call_wdmsg(P,DB,t,_A):-!, append_term(P,DB,CALL),dmsg((CALL)),mpred_call(CALL).
 call_wdmsg(P,MP,F,A):- user:mpred_prop(F,prologHybrid),must(A>1),into_functor_form(t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,mpred_call(CALL).
-call_wdmsg(P,MP,F,A):- not(user:mpred_prop(F,prologOnly)),decl_mpred_hybrid(F/A), into_functor_form(t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,mpred_call(CALL).
-call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(user:mpred_prop(F,prologOnly)),!,mpred_call(CALL).
+call_wdmsg(P,MP,F,A):-  (\+ user:mpred_prop(F,prologDynamic)), (\+ user:mpred_prop(F,prologBuiltin)),decl_mpred_hybrid(F/A), into_functor_form(t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,mpred_call(CALL).
+call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(user:mpred_prop(F,prologDynamic);user:mpred_prop(F,prologBuiltin)),!,mpred_call(CALL).
 %call_wdmsg(P,DB,S,_):-  dtrace((append_term(P,DB,CALL),dmsg((CALL)),mpred_call(CALL))).
 
 
@@ -240,8 +241,8 @@ rescan_mpred_props_ilc.
 
 first_mpred_props(meta_argtypes(_)).
 
-mpred_prop_ordered(Pred,Prop):-first_mpred_props(Prop),user:mpred_prop(Pred,Prop),not(user:mpred_prop(Pred,prologOnly)).
-mpred_prop_ordered(Pred,Prop):-user:mpred_prop(Pred,Prop),not(first_mpred_props(Prop)),not(user:mpred_prop(Pred,prologOnly)).
+mpred_prop_ordered(Pred,Prop):-first_mpred_props(Prop),user:mpred_prop(Pred,Prop),\+ (user:mpred_prop(Pred,prologDynamic)).
+mpred_prop_ordered(Pred,Prop):-user:mpred_prop(Pred,Prop),not(first_mpred_props(Prop)),not(user:mpred_prop(Pred,prologDynamic)).
 
 
 % ================================================================================
@@ -261,7 +262,7 @@ get_cc(PI,NC):-provide_clauses_list(PI,HBLISTO),length(HBLISTO,NC).
 % ==============================
 % SETUP HYBRID HOOK
 % ==============================
-user:provide_mpred_setup(Op,HeadIn,StubType,OUT):- StubType \== prologOnly,
+user:provide_mpred_setup(Op,HeadIn,StubType,OUT):- StubType \== prologDynamic,
  sanity(var(OUT)),
  must(ensure_universal_stub(HeadIn)),
  must((StubType = prologHybrid)),
@@ -300,7 +301,7 @@ ensure_universal_stub5(HeadIn,Head,F,A,_HBLIST):- thglobal:pfcManageHybrids,!,
    % public(F/A),
    % lock_predicate(Head),
    discontiguous(Head),
-   retractall(user:mpred_prop(F,prologOnly)),   
+   retractall(user:mpred_prop(F,prologDynamic)),   
    add(isa(Head,pfcControlled)),
    dmsg(pfcManageHybrids(HeadIn)),!.
 
@@ -316,10 +317,10 @@ ensure_universal_stub5(HeadIn,Head,F,A,[]):-!,
    (WasDynamic-> (dynamic_safe(F/A),(if_result(WasMulifile,multifile(F/A)))) ; compile_predicates([F/A])),   
    % public(F/A),
    lock_predicate(Head),
-   retractall(user:mpred_prop(F,prologOnly)),
+   retractall(user:mpred_prop(F,prologDynamic)),
    dmsg(compiled_new_predicate(HeadIn)),!.
 
-ensure_universal_stub5(HeadIn,Head,F,A,HBLIST):- user:mpred_prop(F,prologOnly), must((StubType = prologHybrid)), !,
+ensure_universal_stub5(HeadIn,Head,F,A,HBLIST):- user:mpred_prop(F,prologDynamic), must((StubType = prologHybrid)), !,
    forall(member(HB,HBLIST),must(show_call(assert_mpred_t(HB)))),!,
    expire_dont_add,ex,
   (is_same_clauses(Head,HBLIST)
@@ -334,7 +335,7 @@ ensure_universal_stub5(HeadIn,Head,F,A,HBLIST):- user:mpred_prop(F,prologOnly), 
             (WasDynamic-> (dynamic_safe(F/A),(if_result(WasMulifile,multifile(F/A)))) ; compile_predicates([F/A])),
             public(F/A),
             lock_predicate(Head),
-            retractall(user:mpred_prop(F,prologOnly)),
+            retractall(user:mpred_prop(F,prologDynamic)),
            % Stop turning GC on/off
            % set_prolog_flag(gc,true), garbage_collect_atoms,
             dmsg(compiled_new_predicate(HeadIn)));
@@ -358,7 +359,7 @@ ensure_universal_stub5(HeadIn,Head,F,A,HBLIST):-  must((StubType = prologHybrid)
           compile_predicates([F/A]),
           public(F/A),
           lock_predicate(Head),
-          retractall(user:mpred_prop(F,prologOnly)),
+          retractall(user:mpred_prop(F,prologDynamic)),
           dmsg(merging_prolog_predicate(HeadIn)));
      ((wdmsg(error(cannot_absorb_all_clauses((Head))))),!,fail)).
 
@@ -547,7 +548,7 @@ body_req(HEAD,HEAD_T):- (hook_body_req(HEAD,HEAD_T)).
 
 :-export(body_req_normal/4).
 %hook_body_req(HEAD,HEAD_T):- user:mpred_prop(F,prologPTTP),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
-%hook_body_req(HEAD,HEAD_T):- user:mpred_prop(F,prologOnly),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
+%hook_body_req(HEAD,HEAD_T):- user:mpred_prop(F,prologDynamic),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
 hook_body_req(_,_,isa(I,C),_):- !, body_req_isa(I,C).
 hook_body_req(_,_,_,t(C,I)):- !, body_req_isa(I,C).
 hook_body_req(_,_,_,t(C,I)):- !, body_req_isa(I,C).

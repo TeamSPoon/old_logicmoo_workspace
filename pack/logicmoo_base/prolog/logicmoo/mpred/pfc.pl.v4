@@ -206,7 +206,7 @@ pfc_fully_expand_warn(Type,B,A):-pfc_fully_expand(Type,B,A),(B\=@=A->wdmsg(error
 :- op(0,fx,'decl_mpred_pfc').
 isa(pfcDatabaseTerm,tCol).
 isa(pfcMustFC,tCol).
-decl_mpred_pfc(F/A):-!,export(F/A),dynamic(F/A),asserta_if_new(user:mpred_prop(F,prologOnly)),asserta_if_new(arity(F,A)),asserta_if_new(user:mpred_prop(F,pfcDatabaseTerm)).
+decl_mpred_pfc(F/A):-!,export(F/A),dynamic(F/A),asserta_if_new(user:mpred_prop(F,prologDynamic)),asserta_if_new(arity(F,A)),asserta_if_new(user:mpred_prop(F,pfcDatabaseTerm)).
 decl_mpred_pfc(F):-atom(F),!,decl_mpred_pfc(F/0).
 :- op(1150,fx,'decl_mpred_pfc').
 
@@ -301,7 +301,7 @@ pfcUpdateClauses(F,A):-make_functor(P,F,A),forall((clause(P,T),is_true(T)),hooke
 :- thread_local thlocal:pfcExpansion/0.
 :- dynamic thlocal:pfcExpansionWas.
 
-maybe_hybrid(F/_):-isa(F,prologOnly),!.
+maybe_hybrid(F/_):-isa(F,prologDynamic),!.
 maybe_hybrid(F/_):-isa(F,prologHybrid),!.
 maybe_hybrid(F/_):-isa(F,pfcDatabaseTerm),!.
 maybe_hybrid(F/_):-isa(F,X),atom(X),!.
@@ -368,7 +368,7 @@ pfc_local(G):-get_functor(G,F,A),pfc_local(G,F,A).
 
 pfc_local(_,F,A):-pfcDatabaseTerm(F/A),!.
 pfc_local(_,F,_):-pfc_mpred_prop(F,pfcDatabaseTerm),!.
-pfc_local(_,F,_):-pfc_mpred_prop(F,prologOnly).
+pfc_local(_,F,_):-pfc_mpred_prop(F,prologDynamic).
 pfc_local(G,_,_):-pfc_manage_hybrids,!,pfc_mark_C(G),!.
 pfc_local(G,_,_):-pfc_manage_hybrids,!,pfc_mark_W(G),!.
 pfc_local(G,_,_):- not(current_predicate(hooked_assertz/1)),!,pfc_mark_C(G).
@@ -402,7 +402,7 @@ pfc_mark_As(_, _):-thlocal:pfc_no_mark,!.
 pfc_mark_As(G,_):-is_true(G),!.
 pfc_mark_As(G,As):-must(pfc_maptree(pfc_mark_As1,G,[As])),!.
 
-pfc_mark_As1(F,As):-atom(F),clause(isa(F,prologOnly),true),!,pmsg(todo(warn(wont_pfc_mark_As1(F,As)))).
+pfc_mark_As1(F,As):-atom(F),clause(isa(F,prologDynamic),true),!,pmsg(todo(warn(wont_pfc_mark_As1(F,As)))).
 pfc_mark_As1(F,As):-atom(F),!,assert_if_new(user:mpred_prop(F,As)).
 pfc_mark_As1(G,_):- \+(compound(G)),!.
 pfc_mark_As1(u,_):-!.
@@ -474,7 +474,7 @@ pfc_assert0(G):- pfc_local(G),!,
 
 pfc_assert0(G):- trace,add(G),pfc_mark_C(G).
 
-user:mpred_prop(F,prologOnly):-user:mpred_prop(F,pfcDatabaseTerm).
+user:mpred_prop(F,prologDynamic):-user:mpred_prop(F,pfcDatabaseTerm).
 
 pfc_add_minfo(G):-pfc_add_minfo(assertz_if_new,G).
 pfc_add_minfo(How,(H:-True)):-is_true(True),must(nonvar(H)),!,pfc_add_minfo(How,H).
@@ -640,7 +640,7 @@ pfc_file_expansion_each(P,O):- pfc_transform_neck(P,H), H \=@= P, pfc_file_expan
 pfc_file_expansion_each(P,(:- CALL)):- pfc_get_setting(add,P,How),!,How\==prolog,CALL=..[How,P].
 
 pfcMustUseFC(G):- once(pfcRuleOutcomeHeadBody(G,H,_)),H\=@=G,!,pfcMustUseFC(H).
-pfcMustUseFC(G):- get_functor(G,F),not(isa(F,prologOnly)),isa(F,pfcMustFC).
+pfcMustUseFC(G):- get_functor(G,F),not(isa(F,prologDynamic)),isa(F,pfcMustFC).
 
 pfcUseAllBC(((Q:-P))):-may_use_head(Q),no_head_singletons_hb(Q,P).
 pfcUseAllFact(Q):-may_use_head(Q),no_head_singletons_hb(Q,true).
@@ -658,7 +658,7 @@ may_use_head(Q):-var(Q),!,fail.
 may_use_head(_:_):-!,fail.
 may_use_head(Q):-Q \= (F/A),!, get_functor(Q,F,A),!,may_use_head(F/A).
 may_use_head(F/_):- atom_contains(F,'_'),!,fail.
-may_use_head(F/_):- isa(F,prologOnly),!,fail.
+may_use_head(F/_):- isa(F,prologDynamic),!,fail.
 may_use_head(F/_):- current_predicate(F/A),make_functor(G,F,A),real_builtin_predicate(G),!,fail.
 may_use_head(F/A):- make_functor(G,F,A),real_builtin_predicate(G),!,fail.
 may_use_head(_/1):-!,fail.

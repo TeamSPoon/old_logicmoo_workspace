@@ -442,7 +442,7 @@ nnf(Neg,KB, Orig,v(A,B),FreeV,NNF,Paths):- !,
 		            NNF = v(NNF1,NNF2)).
 
 nnf(Neg,KB, Orig,Fml,FreeV,NNF,Paths):- 
-	(Fml = n(Neg,n(Neg,A)) -> Fml1 = A;
+	(Fml = n(Neg,n(Neg,A)) -> invert_modal(A,Fml1);
 	 Fml = n(Neg,nesc(BDT,F)) -> Fml1 = poss(BDT,n(Neg,F));
 	 Fml = n(Neg,poss(BDT,F)) -> Fml1 = nesc(BDT,n(Neg,F));
 	 Fml = n(Neg,cir(CT,F)) -> Fml1 = cir(CT,n(Neg,F));
@@ -663,6 +663,10 @@ cf(KB, Orig,PNF, SET):- removeQ(KB, Orig,PNF,[], UnQ),
   expand_cl(SOO,SOOO),
   list_to_set(SOOO,SET),!.
 
+invert_modal(nesc(BD,A),poss(BD,A)):-!.
+invert_modal(poss(BD,A),nesc(BD,A)):-!.
+invert_modal(A,poss(b_d(nesc,poss),A)).
+
 removeQ(F,  HH):- removeQ(_KB, _, F, _, RQ0),!,RQ0=HH.
 
 % removes quantifiers (also pushes modal operators inside the negations) 
@@ -674,7 +678,7 @@ removeQ(_KB, _Orig, F,_, RQ0):- is_list(F),!,maplist(removeQ,F,HH),!,HH=RQ0.
 removeQ(KB, Orig, IN,FreeV,OUT):-  simplify_cheap(IN,MID), IN\=@=MID, removeQ(KB, Orig, MID,FreeV,OUT).
 
 removeQ(KB, Orig, H, Vars, HH ):- convertAndCall(as_dlog,removeQ(KB, Orig,H, Vars, HH )).
-removeQ(KB, Orig, n(Neg,n(Neg,F)),Vars, XF):- !, removeQ(KB, Orig,  F,Vars, XF) .
+removeQ(KB, Orig, n(Neg,n(Neg,F)),Vars, XF):- invert_modal(F,FI),!, removeQ(KB, Orig,  FI,Vars, XF) .
 removeQ(KB, Orig, all(X,F),Vars, HH):- !,  removeQ(KB, Orig,F,[X|Vars], RQ0),RQ0=HH.
 
 /*

@@ -129,8 +129,8 @@ rez_loc_object(XY,Type):-
            add_missing_instance_defaults(Name).
 
 
-%prologOnly(mudNearbyObjs(tObj,tObj)).
-%prologOnly(mudNearbyObjs(tObj,tObj)).
+%prologDynamic(mudNearbyObjs(tObj,tObj)).
+%prologDynamic(mudNearbyObjs(tObj,tObj)).
 %mpred_module(mudNearbyObjs(tObj,tObj),user).
 mudNearbyObjs(X,Y):-mudAtLoc(X,L1),mudAtLoc(Y,L2),mudNearbyLocs(L1,L2).
 
@@ -511,7 +511,8 @@ can_world_move(LOC,_Agent,Dir) :- check_behind_for_ground(LOC),move_dir_target(L
 
 in_world_move0(LOC,Agent,Dir) :-
       any_to_dir(Dir,DirS),
-        padd(Agent,mudFacing(DirS)),  
+        % rtrace(padd(Agent,mudFacing(DirS))),
+        pfc_assert(mudFacing(Agent,DirS)),
         check_behind_for_ground(LOC),
 	move_dir_target(LOC,Dir,XXYY),!,
    must_det_l([

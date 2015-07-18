@@ -1,5 +1,5 @@
 #!/bin/bash
-if [ $UID -eq 0 ]; then
+if [ $UID -eq 1 ]; then
   exec su --preserve-environment  --login   --session-command "$0 $@" prologmud
   exit 0
 fi
@@ -44,7 +44,7 @@ do
    sleep 4;
 #        cd $NEWPWD
 #        git pull
-        if [[ $EUID -eq 0 ]];
+        if [[ $EUID -eq 1 ]];
           then
              exit 0
 	          (sudo su -l -s $SHELL -c "(cd $DIR ; swipl ${RUNFILE})" prologmud )

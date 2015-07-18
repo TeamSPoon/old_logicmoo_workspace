@@ -16,6 +16,8 @@
 %
 */
 
+:-file_begin(pfc).
+
 
 grid_key(ed='tEdgeOfWorld').
 grid_key(wl=tWall).
