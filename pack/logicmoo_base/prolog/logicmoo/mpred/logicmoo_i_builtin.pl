@@ -195,7 +195,7 @@ completelyAssertedCollection(ttPredType).  % Or they might be a predciate declar
 completelyAssertedCollection(functorDeclares).  % or they might declare other things
 
 :-time((pfc_add((completelyAssertedCollection(isEach(tPred,prologMultiValued,prologOrdered,predIsFlag,ttNonGenled,
- prologNegByFailure,meta_argtypes,prologHybrid,prologPTTP,prologDynamic,prologSNARK,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued)))))).
+ prologNegByFailure,meta_argtypes,prologHybrid,prologPTTP,prologDynamic,prologKIF,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued)))))).
 
 completelyAssertedCollection(ftTerm).
 completelyAssertedCollection(meta_argtypes).
@@ -251,7 +251,7 @@ ttPredType(pfcMustFC).
 
 
 ttPredType(isEach(meta_argtypes,pfcDatabaseTerm,pfcControlled,pfcWatched,pfcMustFC,predIsFlag,tPred,prologMultiValued,
- prologSingleValued,prologMacroHead,prologBuiltin,prologDynamic,prologOrdered,prologNegByFailure,prologPTTP,prologSNARK,prologEquality,prologPTTP,
+ prologSingleValued,prologMacroHead,prologBuiltin,prologDynamic,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,prologEquality,prologPTTP,
  prologSideEffects,prologHybrid,prologListValued)).
 
 completelyAssertedCollection(isEach(tCol,tPred,pfcControlled)).
@@ -274,7 +274,7 @@ ttPredType(predIsFlag).
 ttPredType(prologDynamic).
 ttPredType(prologHybrid).
 ttPredType(pfcControlled).
-ttPredType(prologSNARK).
+ttPredType(prologKIF).
 ttPredType(prologBuiltin).
 ttPredType(prologPTTP).
 :-pfc_add( pfcControlled(genlPreds)).
@@ -663,7 +663,7 @@ prologHybrid(isEach( tCol/1, disjointWith/2, genls/2,genlPreds/2, meta_argtypes/
 :- add((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologHybrid,prologPTTP,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),2,ftListFn(ftVoprop)))).
 :-dmsg("line 427").
 :- add((isa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),functorDeclares))).
-:- add((genls(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,prologDynamic,prologBuiltin,prologSNARK,prologMacroHead,prologListValued,prologSingleValued),tPred))).
+:- add((genls(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,prologDynamic,prologBuiltin,prologKIF,prologMacroHead,prologListValued,prologSingleValued),tPred))).
 :- assert_hasInstance(tCol,tCol).
 :- file_begin(pfc).
 :- debug.

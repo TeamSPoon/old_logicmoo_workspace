@@ -32,7 +32,7 @@
 %=    atmost(X,N,A)
 
 
-:- module(dbase_i_snark, 
+:- module(dbase_i_kif, 
           [ % nnf/2, pnf/3,pnf/2, cf/3,
           tsn/0,
           op(300,fx,'~'),
@@ -43,29 +43,29 @@
           op(500,yfx,'v')
         ]). 
 
-:-multifile(use_snark_expansion/0).
-:-thread_local(use_snark_expansion/0).
-%user:term_expansion(H ,CE):-snark_term_expansion(H,CE),((H)\=@=CE,dmsg(snark_term_expansion(H,CE))).
-%user:goal_expansion(H ,CE):-snark_goal_expansion(H,CE),((H)\=@=CE,dmsg(snark_goal_expansion(H,CE))).
+:-multifile(use_kif_expansion/0).
+:-thread_local(use_kif_expansion/0).
+%user:term_expansion(H ,CE):-kif_term_expansion(H,CE),((H)\=@=CE,dmsg(kif_term_expansion(H,CE))).
+%user:goal_expansion(H ,CE):-kif_goal_expansion(H,CE),((H)\=@=CE,dmsg(kif_goal_expansion(H,CE))).
 
 
-use_snark_term(B):- use_snark_expansion;snark_hook(B);snark_pred_head(B).
+use_kif_term(B):- use_kif_expansion;kif_hook(B);kif_pred_head(B).
 
-snark_head_expansion(B,CE):- use_snark_term(B),snark_term_expansion(B,CE).
+kif_head_expansion(B,CE):- use_kif_term(B),kif_term_expansion(B,CE).
 
-:-export(snark_clause_expansion/3).
-snark_clause_expansion(H,B,OUT):- snark_head_expansion(H,HH),
-  must(snark_goal_expansion(B,BB)),!,OUT=(HH:-BB).
+:-export(kif_clause_expansion/3).
+kif_clause_expansion(H,B,OUT):- kif_head_expansion(H,HH),
+  must(kif_goal_expansion(B,BB)),!,OUT=(HH:-BB).
 
-snark_term_expansion(H,H):-not(compound(H)),!.
-snark_term_expansion(M:H,M:HH):-!,snark_goal_expansion(H,HH).
-snark_term_expansion((H:-B),CE):- (use_snark_expansion;snark_hook(H)), !,snark_clause_expansion(H,B,CE),((H:-B)\=@=CE,dmsg(snark_clause_expansion(H,B,CE))).
-snark_term_expansion((:-B),(:-CE)):- !,snark_goal_expansion(B,CE).
-snark_term_expansion([CA|RGS],CEARGS):-!,maplist(snark_arg_expansion,[CA|RGS],CEARGS).
-snark_term_expansion(B,CE):-snark_goal_expansion(B,CE).
+kif_term_expansion(H,H):-not(compound(H)),!.
+kif_term_expansion(M:H,M:HH):-!,kif_goal_expansion(H,HH).
+kif_term_expansion((H:-B),CE):- (use_kif_expansion;kif_hook(H)), !,kif_clause_expansion(H,B,CE),((H:-B)\=@=CE,dmsg(kif_clause_expansion(H,B,CE))).
+kif_term_expansion((:-B),(:-CE)):- !,kif_goal_expansion(B,CE).
+kif_term_expansion([CA|RGS],CEARGS):-!,maplist(kif_arg_expansion,[CA|RGS],CEARGS).
+kif_term_expansion(B,CE):-kif_goal_expansion(B,CE).
 
-snark_arg_expansion(H,H):-not(compound(H)),!.
-snark_arg_expansion(H,H):-!.
+kif_arg_expansion(H,H):-not(compound(H)),!.
+kif_arg_expansion(H,H):-!.
 
 get_meta_args(C,MP):- predicate_property(C,meta_predicate(MP)),!.
 get_meta_args(C,MP):- C=..[F|ARGS],functor(C,F,A),get_meta_args(C,F,A,ARGS,MPARGS),MP=..[F|MPARGS].
@@ -74,25 +74,25 @@ get_meta_args(_,module,_,_ARGS,_MPARGS):-!,fail.
 get_meta_args(_,_,A,_ARGS,MPARGS):- A>2,!,length(MPARGS,A).
 
 meta_term_expansion(_,B,B):-not(compound(B)),!.
-meta_term_expansion(M,B,C):-member(M,[+,-,?]),!,snark_arg_expansion(B,C),!.
+meta_term_expansion(M,B,C):-member(M,[+,-,?]),!,kif_arg_expansion(B,C),!.
 % [^,:] 
-meta_term_expansion(_,B,C):-arg(1,B,IsVar),is_ftVar(IsVar),snark_arg_expansion(B,C),!.
-meta_term_expansion(M,B,C):-number(M),!,snark_goal_expansion(B,C),!.
-meta_term_expansion(_,B,C):-snark_term_expansion(B,C),!.
+meta_term_expansion(_,B,C):-arg(1,B,IsVar),is_ftVar(IsVar),kif_arg_expansion(B,C),!.
+meta_term_expansion(M,B,C):-number(M),!,kif_goal_expansion(B,C),!.
+meta_term_expansion(_,B,C):-kif_term_expansion(B,C),!.
 
-snark_goal_expansion(H,H):-not(compound(H)),!.
-snark_goal_expansion(not(B),not(CE)):- !,snark_goal_expansion(B,CE).
-snark_goal_expansion(M:(B),M:(CE)):- !,snark_goal_expansion(B,CE).
-snark_goal_expansion('@'(B , M),'@'(CE , M)):- !,snark_goal_expansion(B,CE).
-snark_goal_expansion((H , B),(HH , BB)):-!,snark_goal_expansion(H,HH),snark_goal_expansion(B,BB).
-snark_goal_expansion((H ; B),(HH ; BB)):-!,snark_goal_expansion(H,HH),snark_goal_expansion(B,BB).
-snark_goal_expansion((H -> B ; C),(HH -> BB ; CC)):-!,snark_goal_expansion(H,HH),snark_goal_expansion(B,BB),snark_goal_expansion(C,CC).
-snark_goal_expansion(C,CEO):- C =..[F|ARGS],
-   snark_goal_args_expansion(C,F,ARGS,CEO),!.
+kif_goal_expansion(H,H):-not(compound(H)),!.
+kif_goal_expansion(not(B),not(CE)):- !,kif_goal_expansion(B,CE).
+kif_goal_expansion(M:(B),M:(CE)):- !,kif_goal_expansion(B,CE).
+kif_goal_expansion('@'(B , M),'@'(CE , M)):- !,kif_goal_expansion(B,CE).
+kif_goal_expansion((H , B),(HH , BB)):-!,kif_goal_expansion(H,HH),kif_goal_expansion(B,BB).
+kif_goal_expansion((H ; B),(HH ; BB)):-!,kif_goal_expansion(H,HH),kif_goal_expansion(B,BB).
+kif_goal_expansion((H -> B ; C),(HH -> BB ; CC)):-!,kif_goal_expansion(H,HH),kif_goal_expansion(B,BB),kif_goal_expansion(C,CC).
+kif_goal_expansion(C,CEO):- C =..[F|ARGS],
+   kif_goal_args_expansion(C,F,ARGS,CEO),!.
    
 
-snark_goal_args_expansion(C,F,ARGS,CEO):- get_meta_args(C,MP),!,MP=..[F|MARGS],maplist(meta_term_expansion,MARGS,ARGS,CEARGS),!,CEO=..[F|CEARGS].
-snark_goal_args_expansion(_,F,ARGS,CEO):- maplist(snark_arg_expansion,ARGS,CEARGS),
+kif_goal_args_expansion(C,F,ARGS,CEO):- get_meta_args(C,MP),!,MP=..[F|MARGS],maplist(meta_term_expansion,MARGS,ARGS,CEARGS),!,CEO=..[F|CEARGS].
+kif_goal_args_expansion(_,F,ARGS,CEO):- maplist(kif_arg_expansion,ARGS,CEARGS),
                          CE=..[F|CEARGS],
                           logical_pos_maybe(F,CE,CEO).
 

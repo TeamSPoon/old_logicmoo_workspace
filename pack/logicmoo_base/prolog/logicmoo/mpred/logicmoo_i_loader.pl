@@ -542,12 +542,14 @@ show_interesting_cl(Dir,P):- loading_source_file(File),get_file_type(File,Type),
   ((nonvar(Dir),functor(Dir,Type,_))->true;dmsg(Type:cl_assert(Dir,P))).
 
 :-meta_predicate(cl_assert(?,?)).
+cl_assert(kif(Dir),P):-show_call(must_det_l(( show_interesting_cl(kif(Dir),P),kif_process(P)))),!.
 cl_assert(Dir,P):- show_interesting_cl(Dir,P),pfc_assert(P).
 cl_assert(pl,P):-!, show_call(must_det_l((source_location(F,_L), '$compile_aux_clauses'(P,F)))).
 cl_assert(_Code,P):- !, show_call(pfc_assert(P)).
 
 :- meta_predicate(pfc_file_expansion_cl_assert(?,?)).
 pfc_file_expansion_cl_assert(_,cl_assert(pl,OO),OO,_):-!,show_interesting_cl(pl,OO).
+pfc_file_expansion_cl_assert(I,cl_assert(OTHER,OO),OO,I):- inside_file(kif),is_kif_rule(OO),!,pfc_file_expansion_cl_assert(I,cl_assert(kif(OTHER),OO),OO,I).
 pfc_file_expansion_cl_assert(I,CALL,OO,O):- (current_predicate(_,CALL) -> ((must(call(CALL)),was_exported_content(I,CALL,OO))); OO=O).
 
 do_end_of_file_actions:- must(loading_source_file(F)),GETTER=onEndOfFile(F,TODO),forall(GETTER,((doall(show_call_failure(TODO))),ignore(retract(GETTER)))).
@@ -611,23 +613,28 @@ pfc_directive_expansion(pfc_ops,
 pfc_directive_expansion(pfc_dcg,( file_begin(pfc), op(400,yfx,('\\\\')),op(1200,xfx,('-->>')),op(1200,xfx,('--*>>')), op(1200,xfx,('<<--')))).
 pfc_directive_expansion(pfc_multifile,
            ( asserta(user:mpred_directive_value(pfc,multifile,M)),
-                 multifile(('<=')/2),
-                 multifile(('<=>'/2)),
-                 multifile((('=>')/2)),
-                 multifile(('=>')/1),
-                 multifile(('~')/1),
-                 multifile(('neg')/1),
-                 export(('<=')/2),
-                 export(('<=>'/2)),
-                 export((('=>')/2)),
-                 export(('=>')/1),
-                 export(('~')/1),
-                 export(('neg')/1),
+                 decl_pfc_multifile(user),
                  include(logicmoo(mpred/logicmoo_i_header)))):- source_module(M).
 
 
 pfc_directive_expansion(pfc_module,(asserta(user:mpred_directive_value(pfc,module,M)))):-source_module(M).
 
+
+decl_pfc_multifile(M):-
+                 multifile(M:('<=')/2),
+                    multifile(M:('::::')/2),
+                 multifile(M:('<=>'/2)),
+                 multifile(M:(('=>')/2)),
+                 multifile(M:('=>')/1),
+                 multifile(M:('~')/1),
+                 multifile(M:('neg')/1),
+                 export(M:('<=')/2),
+                    export(M:('::::')/2),
+                 export(M:('<=>'/2)),
+                 export(M:(('=>')/2)),
+                 export(M:('=>')/1),
+                 export(M:('~')/1),
+                 export(M:('neg')/1).
 
 % ========================================
 % begin/end_transform_mpreds

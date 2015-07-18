@@ -601,7 +601,7 @@ assert_isa_hooked(Term,tPred):-!,decl_mpred(Term).
 assert_isa_hooked(Term,prologHybrid):-!,decl_mpred_hybrid(Term).
 assert_isa_hooked(Term,prologDynamic):-!,export(Term).
 assert_isa_hooked(Term,prologPTTP):-!,decl_mpred_hybrid(Term,prologPTTP).
-assert_isa_hooked(Term,prologSNARK):-!,decl_mpred_hybrid(Term,prologSNARK).
+assert_isa_hooked(Term,prologKIF):-!,decl_mpred_hybrid(Term,prologKIF).
 assert_isa_hooked(I,_):- I\=prologHybrid(_),glean_pred_props_maybe(I),fail.
 assert_isa_hooked(food5,tWeapon):-trace_or_throw(assert_isa(food5,tWeapon)).
 

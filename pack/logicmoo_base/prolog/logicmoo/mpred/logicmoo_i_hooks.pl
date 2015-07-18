@@ -364,7 +364,7 @@ t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6,A7)).
 mpred_pa_call(F,A,Call):-M=user,var(F),!,arity(F,A),\+tNotForUnboundPredicates(F),M:current_predicate(F/A),debugOnError(M:Call).
 mpred_pa_call(F,A,Call):-M=user,arity(F,A),M:current_predicate(F/A),M:Call.
 
-mpred_fact_arity(F,A):-arity(F,A),once(mpred_prop(F,prologHybrid);mpred_prop(F,pfcControlled);mpred_prop(F,prologPTTP);mpred_prop(F,prologSNARK)).
+mpred_fact_arity(F,A):-arity(F,A),once(mpred_prop(F,prologHybrid);mpred_prop(F,pfcControlled);mpred_prop(F,prologPTTP);mpred_prop(F,prologKIF)).
 
 prologHybridFact(G):- (var(G)->(mpred_fact_arity(F,A),functor(G,F,A));true),into_mpred_form(G,M),!,no_repeats(mpred_call(M)).
 

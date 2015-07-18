@@ -93,12 +93,12 @@ default_te(IF,VAR,VAL):-assertz(te_setting(IF,VAR,VAL)).
 %
 %  
 % :- directive:  process_directive, call
-% fact:  fwc(pfc), bwc(pfc), *cwc(prolog), bwc(pttp), implies(snark), other
-% :- rule:  fwc(pfc), bwc(pfc), *cwc(prolog), bwc(pttp), implies(snark), other
-% <= rule:   fwc(pfc), *bwc(pfc), cwc(prolog), bwc(pttp), implies(snark), other
-% => rule:   *fwc(pfc), bwc(pfc), cwc(prolog), bwc(pttp), implies(snark), other
-% <= fact:   fwc(pfc), *bwc(pfc), cwc(prolog), bwc(pttp), implies(snark), other
-% => fact:   *fwc(pfc), bwc(pfc), cwc(prolog), bwc(pttp), implies(snark), other
+% fact:  fwc(pfc), bwc(pfc), *cwc(prolog), bwc(pttp), implies(kif), other
+% :- rule:  fwc(pfc), bwc(pfc), *cwc(prolog), bwc(pttp), implies(kif), other
+% <= rule:   fwc(pfc), *bwc(pfc), cwc(prolog), bwc(pttp), implies(kif), other
+% => rule:   *fwc(pfc), bwc(pfc), cwc(prolog), bwc(pttp), implies(kif), other
+% <= fact:   fwc(pfc), *bwc(pfc), cwc(prolog), bwc(pttp), implies(kif), other
+% => fact:   *fwc(pfc), bwc(pfc), cwc(prolog), bwc(pttp), implies(kif), other
 % loading:  compile_clause, process_directive, assertz, 
 % head types: code, *hybrid, functor(outer), holds(outer)
 % body types: code, *hybrid, functor(outer), holds(outer)
@@ -141,7 +141,7 @@ functor_declares_instance_0(meta_argtypes,tRelation).
 functor_declares_instance_0(prologMacroHead,tRelation).
 functor_declares_instance_0(tFunction,tFunction).
 functor_declares_instance_0(P,tPred):- arg(_,s(tPred,prologMultiValued,mpred_prop,user:mpred_prop,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,
-       predCanHaveSingletons,prologBuiltin,prologSNARK,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),P).
+       predCanHaveSingletons,prologBuiltin,prologKIF,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),P).
 
 functor_declares_instance_0(P,tCol):- arg(_,s(tCol,tSpec,ttFormatType),P).
 %functor_declares_instance_0(P,tPred):-isa_asserted(P,ttPredType),!.

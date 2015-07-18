@@ -245,7 +245,7 @@ mudDoorwayDir(Region,apathFn(Region,Dir),Dir) :- tPathway(apathFn(Region,Dir)).
 
 mudExitAtLoc(Region,Dir,xyzFn(Region,X,Y,Z)):-calc_from_center_xyz(Region,Dir,2,X,Y,Z).
 
-% :-snark_tell(localityOfObject(A,B) &  localityOfObject(B,C) => localityOfObject(A,C)).
+% :-kif_tell(localityOfObject(A,B) &  localityOfObject(B,C) => localityOfObject(A,C)).
 
 :- decl_mpred_hybrid(mudSubPart/2).
 :- decl_mpred_hybrid(predInnerArgIsa/1).

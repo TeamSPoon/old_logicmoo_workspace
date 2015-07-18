@@ -1252,7 +1252,7 @@ pttp_builtin(F,_):- (user:mpred_prop(F,prologBuiltin)),!. %,fail.
 pttp_builtin(unifiable_member,_).
 pttp_builtin(t,_).
 %pttp_builtin(F,_):-user:mpred_prop(F,prologPTTP),!,fail.
-%pttp_builtin(F,_):-user:mpred_prop(F,prologSNARK),!,fail.
+%pttp_builtin(F,_):-user:mpred_prop(F,prologKIF),!,fail.
 pttp_builtin(F,A):-current_predicate(F/A),functor(P,F,A),builtin_why(P,F,A,Why),!,dmsg(todo(warn(builtin_why(F,A,Why)))).
 %%% ***
 

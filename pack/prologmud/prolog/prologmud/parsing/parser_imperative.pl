@@ -204,7 +204,7 @@ object_print_details0(Print,Agent,O,DescSpecs,Skipped):-
 vtSkippedPrintNames(T):-var(T),!,fail.
 vtSkippedPrintNames(T):-ttFormatType(T).
 %vtSkippedPrintNames(T):-isa(T,ttTypeType).
-vtSkippedPrintNames(E):-member(E,[tObj,isThis,the,is,tSpatialThing,ttNotSpatialType,ttSpatialType,prologHybrid,t,prologPTTP,prologSNARK,prologDynamic,tRelation,tPred,'',[]]).
+vtSkippedPrintNames(E):-member(E,[tObj,isThis,the,is,tSpatialThing,ttNotSpatialType,ttSpatialType,prologHybrid,t,prologPTTP,prologKIF,prologDynamic,tRelation,tPred,'',[]]).
 
 
 must_make_object_string_list(_,Obj,WList):- object_string(Obj,WList),!.

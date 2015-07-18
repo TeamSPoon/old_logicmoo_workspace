@@ -17,7 +17,7 @@ hybrid_tPredStubImpl(prologHybrid).
 hybrid_tPredStubImpl(prologPTTP).
 hybrid_tPredStubImpl(prologDynamic).
 hybrid_tPredStubImpl(prologBuiltin).
-hybrid_tPredStubImpl(prologSNARK).
+hybrid_tPredStubImpl(prologKIF).
 hybrid_tPredStubImpl(prologEquality).
 
 
@@ -424,21 +424,21 @@ mpred_t_storage_op(Op,(Head:-Body)):-
    (mud_call_store_op(Op2,(Head:-Body))).  
 
 % OLD RULE HOOK (but we are using it in parallel)
-mpred_t_storage_op(Op,(Head:-Body)):- \+ use_snark(Head,Body),
+mpred_t_storage_op(Op,(Head:-Body)):- \+ use_kif(Head,Body),
   wdmsg(saved_clause_in_hybridRule(Op,Head,Body)),!,
       (mud_call_store_op(Op,ruleBackward(Head,Body))).  
 
 % PTTP RULE HOOK   
 mpred_t_storage_op(Op,(Head:-Body)):- 
-   mpred_call(use_snark(Head,Body)),!, 
+   mpred_call(use_kif(Head,Body)),!, 
    reduce_mpred_op(Op,Op2), 
-   CALL0 = (call(Op2,ruleBackward(Head,Body))), % remember outside of SNARK just in case
-   must(((CALL0,mpred_t_tell_snark(Op2,(Head:-Body))))),!.
+   CALL0 = (call(Op2,ruleBackward(Head,Body))), % remember outside of KIF just in case
+   must(((CALL0,mpred_t_tell_kif(Op2,(Head:-Body))))),!.
 
-% SNARK RULE HOOK   
-mpred_t_storage_op(Op,RULE):- mpred_call(is_snark_rule(RULE)),!,
+% KIF RULE HOOK   
+mpred_t_storage_op(Op,RULE):- mpred_call(is_kif_rule(RULE)),!,
   reduce_mpred_op(Op,Op2),
-  mpred_t_tell_snark(Op2,RULE),!.
+  mpred_t_tell_kif(Op2,RULE),!.
 
 % REOP HOOK mpred_t_storage_op(Op1,HeadBody):- reduce_mpred_op(Op1,Op2), Op1\==Op2, mpred_t_storage_op(Op2,HeadBody).
 % FACT:-true HOOK   
@@ -475,7 +475,7 @@ mpred_t_call_op(_,FACT):- get_functor(FACT, F,A), !,
 % ====================================================
 % call_for_literal/3
 % ====================================================
-call_for_literal(_,_,HEAD):- use_snark(HEAD,true),!,snark_ask(HEAD).
+call_for_literal(_,_,HEAD):- use_kif(HEAD,true),!,kif_ask(HEAD).
 call_for_literal(_,_,HEAD):- use_ideep_swi,!,  call_for_literal_ideep_ilc(HEAD),!,loop_check_term(cwdl(CALL,7),HEAD,(CALL)).
 call_for_literal(F,A,HEAD):- call_for_literal_db(F,A,HEAD).
 
@@ -495,7 +495,7 @@ call_for_literal_db0(F,A,HEAD):-no_repeats(HEAD,call_for_literal_db00(F,A,HEAD))
 call_for_literal_db00(_,_,HEAD):- is_asserted_mpred_t(HEAD).
 call_for_literal_db00(F,_,   _):- (isa(F,completelyAssertedCollection);t(completeExtentAsserted,F)),!,fail.
 call_for_literal_db00(F,A,HEAD):- loop_check(call_rule_db(F,A,HEAD)).
-call_for_literal_db00(F,A,HEAD):- not(use_snark(HEAD,true)),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(is_asserted_mpred_t(genlPreds(P2,P1)),gp(P1),fail),
+call_for_literal_db00(F,A,HEAD):- not(use_kif(HEAD,true)),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(is_asserted_mpred_t(genlPreds(P2,P1)),gp(P1),fail),
    call(t,P2,A1,A2).
 
 is_asserted_mpred_t(HEAD):-t(HEAD)*->true;((show_call_success(out_of_mpred_t(HEAD)))).
@@ -503,7 +503,7 @@ out_of_mpred_t(HEAD):-clause_safe(HEAD,true)*->true;show_call_success(user:fact_
 
 
 call_rule_db(F,A,HEAD):- isa(F,completelyAssertedCollection),!,fail.
-call_rule_db(F,A,HEAD):- use_snark(HEAD,_),!,snark_ask(HEAD).
+call_rule_db(F,A,HEAD):- use_kif(HEAD,_),!,kif_ask(HEAD).
 call_rule_db(F,A,HEAD):- ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
 
 :- style_check(+singleton).

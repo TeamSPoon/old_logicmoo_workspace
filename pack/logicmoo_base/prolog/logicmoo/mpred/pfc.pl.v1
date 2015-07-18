@@ -392,10 +392,10 @@ pfc_file_expansion_each((P,Q), :- pttp_tell( (P,Q) )):- !.
 pfc_file_expansion_each((P;Q), :- pttp_tell( (P;Q) )):- !.
 pfc_file_expansion_each((P:-Is_pttp,Q), :- pttp_tell((P:-Q))):- Is_pttp==is_pttp.
 
-pfc_file_expansion_each(all(Q,P), :-snark_tell(all(Q,P))):- !.
-pfc_file_expansion_each(exists(Q,P), :-snark_tell(exists(Q,P))):- !.
-pfc_file_expansion_each(~(P), :- snark_tell( (P) )):- !.
-pfc_file_expansion_each(implies(P,Q), :- snark_tell( =>(P,Q) )):- !.
+pfc_file_expansion_each(all(Q,P), :-kif_tell(all(Q,P))):- !.
+pfc_file_expansion_each(exists(Q,P), :-kif_tell(exists(Q,P))):- !.
+pfc_file_expansion_each(~(P), :- kif_tell( (P) )):- !.
+pfc_file_expansion_each(implies(P,Q), :- kif_tell( =>(P,Q) )):- !.
 */
 
 pfc_file_expansion_each((P -->> Q),(:- pfc_add(Rule))) :-

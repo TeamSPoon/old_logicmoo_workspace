@@ -81,12 +81,12 @@ pttp_assert_wid(ID,Mode,(X,Y)):- !, pttp_assert_wid(ID,Mode,X),kb_incr(ID,ID2), 
 pttp_assert_wid(ID,Mode,[X|Y]):- !, pttp_assert_wid(ID,Mode,X),kb_incr(ID,ID2), pttp_assert_wid(ID2,Mode,Y).
 pttp_assert_wid(ID,Mode,(call:-CALL)):-!,pttp_assert_wid(ID,Mode,(call(CALL))).
 pttp_assert_wid(_, _Mode,uses_logic(Name)):-!,must(pttp_logic(Name,Data)),!,must(pttp_load_wid(Name,Data)).
-pttp_assert_wid(ID,_Mode,snark(YY)):-!, must((numbervars(YY,'$VAR',7567,_),must(pttp_assert_wid(ID,snark,YY)))).
+pttp_assert_wid(ID,_Mode,kif(YY)):-!, must((numbervars(YY,'$VAR',7567,_),must(pttp_assert_wid(ID,kif,YY)))).
 pttp_assert_wid(ID,_Mode,call(CALL)):-!, must((save_wid(ID,call,call(CALL)),unnumbervars(CALL,RCALL),show_call_failure(must(RCALL)))).
 %pttp_assert_wid(ID,Mode,(query:-B)):- must(assertz_unumbered((query:-B))),PNF =(query:-B), must( pttp_nnf(PNF,X)),!,must(must(pttp_assert_real_wid(ID,X))).
 pttp_assert_wid(ID,pttp,X):- must((bugger:with_assertions(thlocal:current_why(ID,X), must(( pttp1_wid(ID,X,Y), pttp2_wid(ID,Y)) )))).
-% pttp_assert_wid(ID,Mode,KIF):- must(snark_tell(ID,KIF)),!.
-pttp_assert_wid(ID,snark,X):- show_call_failure(must(snark_tell(ID,X))).
+% pttp_assert_wid(ID,Mode,KIF):- must(kif_tell(ID,KIF)),!.
+pttp_assert_wid(ID,kif,X):- show_call_failure(must(kif_tell(ID,X))).
 pttp_assert_wid(ID,Mode,(X:-Y)):- !,must((save_wid(ID,Mode,(X:-Y)), pttp_assert_real_wid(ID,(X:-Y)))).
 pttp_assert_wid(ID,_Mode,X):-  show_call_failure(must(pttp_assert_real_wid(ID,X))),!.
 pttp_assert_wid(ID,_Mode,PNF):-  must( pttp_nnf(PNF,X)),!,must(must(pttp_assert_real_wid(ID,X))).

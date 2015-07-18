@@ -150,7 +150,7 @@
 
 % DYN KB
 :- dynamic_multifile_exported user:only_if_pttp/0.
-:- dynamic_multifile_exported user:use_snark/2.
+:- dynamic_multifile_exported user:use_kif/2.
 :- dynamic_multifile_exported user:is_mpred_prop/2.
 %:- dynamic_multifile_exported user:hasInstance_dyn/2.
 :- dynamic_multifile_exported user:arity/2.

@@ -1,5 +1,5 @@
 /** <module> logicmoo_i_mpred_pttp
-% Provides a prolog database replacement that uses an interpretation of SNARK
+% Provides a prolog database replacement that uses an interpretation of KIF
 %
 %  t/N
 %  hybridRule/2
@@ -43,7 +43,7 @@
 %=    atleast(X,N,A)
 %=    atmost(X,N,A)
 /*
-:- module(logicmoo_i_snark, 
+:- module(logicmoo_i_kif, 
           [ 
            nnf/4, 
            pnf/3, pnf/2, cf/4,
@@ -62,7 +62,7 @@
 
 %=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%
 %=% 
-%=%   snark_in_prolog.P
+%=%   kif_in_prolog.P
 %=%      SWI-Prolog version
 %=%   Convert wffs to list of normal logic clauses
 %=%
@@ -157,25 +157,27 @@ kb_nlit(_KB,Neg):-member(Neg,[-,~,neg,not]).
 
 non_compound(InOut):- once(not(compound(InOut));is_ftVar(InOut)).
 
-is_gaf(Gaf):- not(is_snark_rule(Gaf)).
+is_gaf(Gaf):- not(is_kif_rule(Gaf)).
 
-:- export(is_snark_rule/1).
-is_snark_rule(Var):- is_ftVar(Var),!,fail.
-% is_snark_rule(_:- _):- !.
-is_snark_rule(R):- get_functor(R,F,A),functor(P,F,A),snark_hook(P),!.
+:- export(is_kif_rule/1).
+is_kif_rule(Var):- is_ftVar(Var),!,fail.
+% is_kif_rule(_:- _):- !.
+is_kif_rule(R):- get_functor(R,F,A),functor(P,F,A),kif_hook(P),!.
 
-snark_hook(0=>0).
-snark_hook(0<=>0).
-snark_hook((0 & 0)).
-snark_hook((0 v 0)).
-snark_hook(0 <- 0).
-snark_hook(~(0)).
-snark_hook(-(0)).
-snark_hook(n(?,0)).
-snark_hook(all(+,0)).
-snark_hook(exists(+,0)).
-snark_hook(C):- non_compound(C),!,fail.
-snark_hook(H:- _):- !,nonvar(H),!,snark_hook(H).
+kif_hook(0=>0).
+kif_hook(0<=>0).
+kif_hook((0 & 0)).
+kif_hook((0 v 0)).
+kif_hook(0 <- 0).
+kif_hook(~(0)).
+kif_hook(-(0)).
+kif_hook(n(?,0)).
+kif_hook(all(+,0)).
+kif_hook(exists(+,0)).
+kif_hook(if(0,0)).
+kif_hook(iff(0,0)).
+kif_hook(C):- non_compound(C),!,fail.
+kif_hook(H:- _):- !,nonvar(H),!,kif_hook(H).
 
 
 :- style_check(+singleton).
@@ -1136,19 +1138,19 @@ clauses_to_boxlog(KB,Why,cl([H,Head|List],BodyIn),Prolog):-
     clauses_to_boxlog(KB,Why,cl([E],Body),Answer))),Prolog),!.
 
 
-mpred_t_tell_snark(OP2,RULE):- 
+mpred_t_tell_kif(OP2,RULE):- 
  with_assertions(thlocal:current_pttp_db_oper(mud_call_store_op(OP2)),
-   (show_call(call((must(snark_tell(RULE))))))).
+   (show_call(call((must(kif_tell(RULE))))))).
 
 
 fix_input_vars(AIn,A):- copy_term(AIn,A),numbervars(A,672,_).
 
 %:- export(show_boxlog/1).
-%assert_boxlog(AIn):- fix_input_vars(AIn,A), as_dlog(A,AA),kif_to_boxlog(AA,B),!,maplist(snark_tell_boxes(Why),B),!,nl,nl.
+%assert_boxlog(AIn):- fix_input_vars(AIn,A), as_dlog(A,AA),kif_to_boxlog(AA,B),!,maplist(kif_tell_boxes(Why),B),!,nl,nl.
 %:- export(show_boxlog2/2).
-%assert_boxlog2(AIn):- fix_input_vars(AIn,A), with_all_dmsg((kif_to_boxlog(A,B),!,maplist(snark_tell_boxes(Why),B),!,nl,nl)).
+%assert_boxlog2(AIn):- fix_input_vars(AIn,A), with_all_dmsg((kif_to_boxlog(A,B),!,maplist(kif_tell_boxes(Why),B),!,nl,nl)).
 
-snark_test_string(
+kif_test_string(
 "
 % )
 tell.
@@ -1162,62 +1164,62 @@ room(What).
 
 door(What).
 
-:- snark_tell(a(XX) & b(XX) => c(XX)).
-:- snark_tell(all(R,room(R) => exists(D, (door(D) & has(R,D))))).
-:- snark_tell(loves(Child,motherFn(Child))).
-:- snark_tell((p => q)).
-:- snark_tell(~p <=> ~q).
-:- snark_tell(p <=> q).
-:- snark_tell(all(P, person(P) => -exists(D, dollar(D) & has(P,D)))).
+:- kif_tell(a(XX) & b(XX) => c(XX)).
+:- kif_tell(all(R,room(R) => exists(D, (door(D) & has(R,D))))).
+:- kif_tell(loves(Child,fatehrFn(Child))).
+:- kif_tell((p => q)).
+:- kif_tell(~p <=> ~q).
+:- kif_tell(p <=> q).
+:- kif_tell(all(P, person(P) => -exists(D, dollar(D) & has(P,D)))).
 
-:- snark_tell(go(sam) & (go(bill) v go(sally) ) & go(nancy)).
+:- kif_tell(go(sam) & (go(bill) v go(sally) ) & go(nancy)).
 
-:- snark_tell(rains_tuesday => wear_rain_gear xor carry_umbrella).
-:- snark_tell(exists(P, (person(P) & all(C, car(C) => ~has(P,C))))).
+:- kif_tell(rains_tuesday => wear_rain_gear xor carry_umbrella).
+:- kif_tell(exists(P, (person(P) & all(C, car(C) => ~has(P,C))))).
 
-:- snark_tell(room(R) => exists(D, (door(D) & has(R,D)))).
-:- snark_tell((goes(jane) xor goes(sandra) => goes(bill))).
-:- snark_tell(exists(P, exists(C, (person(P) & car(C) & has(P,C))))).
-:- snark_tell(~all(P,person(P) => exists(C, car(C) & has(P,C)))).
-:- snark_tell((go(sam) & go(bill)) v (go(sally) & go(nancy))).
-:- snark_tell(go(sam) & (go(bill) v go(sally) ) & go(nancy)).
-:- snark_tell(exists(C, course(C) & exists(MT1, midterm(C,MT1) & exists(MT2, midterm(C,MT2) & different(MT1,MT2))))).
-:- snark_tell(exists(C, course(C) & ~exists(MT3, midterm(C,MT3)))).
+:- kif_tell(room(R) => exists(D, (door(D) & has(R,D)))).
+:- kif_tell((goes(jane) xor goes(sandra) => goes(bill))).
+:- kif_tell(exists(P, exists(C, (person(P) & car(C) & has(P,C))))).
+:- kif_tell(~all(P,person(P) => exists(C, car(C) & has(P,C)))).
+:- kif_tell((go(sam) & go(bill)) v (go(sally) & go(nancy))).
+:- kif_tell(go(sam) & (go(bill) v go(sally) ) & go(nancy)).
+:- kif_tell(exists(C, course(C) & exists(MT1, midterm(C,MT1) & exists(MT2, midterm(C,MT2) & different(MT1,MT2))))).
+:- kif_tell(exists(C, course(C) & ~exists(MT3, midterm(C,MT3)))).
 
 "
 ).
 
 
 %:- export(tsn/0).
-tsn:- with_all_dmsg(forall(clause(snark,C),must(C))).
+tsn:- with_all_dmsg(forall(clause(kif,C),must(C))).
 
-% snark:- make.
-tsnark:- snark_test_string(TODO),snark(string(TODO),current_output).
+% kif:- make.
+tkif:- kif_test_string(TODO),kif(string(TODO),current_output).
 
 :- multifile(user:sanity_test/0).
 user:regression_test:- tsn.
 
-:- thread_local(snark_action_mode/1).
-:- asserta_if_new(snark_action_mode(tell)).
+:- thread_local(kif_action_mode/1).
+:- asserta_if_new(kif_action_mode(tell)).
 
-:- thread_local(snark_reader_mode/1).
-:- asserta_if_new(snark_reader_mode(lisp)).
+:- thread_local(kif_reader_mode/1).
+:- asserta_if_new(kif_reader_mode(lisp)).
 
 :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api)).
 
-snark_read(In,Wff,Vs):- 
-  (snark_reader_mode(lisp) -> 
+kif_read(In,Wff,Vs):- 
+  (kif_reader_mode(lisp) -> 
     catch((lisp_read(In,_,WffIn),with_output_to(atom(A),write_term(WffIn,
-      [module(logicmoo_i_snark),numbervars(true),quoted(true)])),
-     read_term_from_atom(A,Wff,[module(logicmoo_i_snark),double_quotes(string),variable_names(Vs)])),E,(fmt(E),fail));
+      [module(logicmoo_i_kif),numbervars(true),quoted(true)])),
+     read_term_from_atom(A,Wff,[module(logicmoo_i_kif),double_quotes(string),variable_names(Vs)])),E,(fmt(E),fail));
 
-      catch(read_term(In,Wff,[module(logicmoo_i_snark),double_quotes(string),variable_names(Vs)]),E,(fmt(E),fail))).
+      catch(read_term(In,Wff,[module(logicmoo_i_kif),double_quotes(string),variable_names(Vs)]),E,(fmt(E),fail))).
 
 %= ===== to test program =====-
 :- ensure_loaded(library(logicmoo/plarkc/dbase_i_sexpr_reader)).
 
-:- export(snark/0).
-snark:- current_input(In),current_output(Out),!,snark(In,Out).
+:- export(kif/0).
+kif:- current_input(In),current_output(Out),!,kif(In,Out).
 
 %open_input(InS,InS):- is_stream(InS),!.
 %open_input(string(InS),In):- text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
@@ -1231,15 +1233,15 @@ l_open_input(InS,In):-text_to_string(InS,Str),string_codes(Str,Codes),open_chars
 :- endif.
 
 
-:- export(snark/2).
-snark(InS,Out):- 
+:- export(kif/2).
+kif(InS,Out):- 
   l_open_input(InS,In),
    repeat,             
-      debugOnError((once((snark_action_mode(Mode),write(Out,Mode),write(Out,'> '))),
-        snark_read(In,Wff,Vs),
+      debugOnError((once((kif_action_mode(Mode),write(Out,Mode),write(Out,'> '))),
+        kif_read(In,Wff,Vs),
          b_setval('$variable_names', Vs),
            portray_clause(Out,Wff,[variable_names(Vs),quoted(true)]),
-           once(snark_process(Wff)),
+           once(kif_process(Wff)),
            Wff == end_of_file)),!.
 
 :- export(id_to_why/3).
@@ -1247,75 +1249,75 @@ why_to_id(Term,Wff,IDWhy):- not(atom(Term)),term_to_atom(Term,Atom),!,why_to_id(
 why_to_id(Atom,Wff,IDWhy):- wid(IDWhy,Atom,Wff),!.
 why_to_id(Atom,Wff,IDWhy):- must(atomic(Atom)),gensym(Atom,IDWhyI),kb_incr(IDWhyI,IDWhy),assertz_if_new(user:wid(IDWhy,Atom,Wff)).
 
-:- export(snark_process/1).
-snark_process(end_of_file):- !.
-snark_process(prolog):- prolog_repl,!.
-snark_process(Assert):- atom(Assert),retractall(snark_action_mode(_)),asserta(snark_action_mode(Assert)),fmtl(snark_action_mode(Assert)),!.
-snark_process(Wff):- snark_action_mode(Mode),snark_process(Mode,Wff),!.
+:- export(kif_process/1).
+kif_process(end_of_file):- !.
+kif_process(prolog):- prolog_repl,!.
+kif_process(Assert):- atom(Assert),retractall(kif_action_mode(_)),asserta(kif_action_mode(Assert)),fmtl(kif_action_mode(Assert)),!.
+kif_process(Wff):- kif_action_mode(Mode),kif_process(Mode,Wff),!.
 
-snark_process(_,':-'(Wff)):- !, snark_process(call,Wff).
-snark_process(_,'?-'(Wff)):- !, snark_ask(Wff).
-snark_process(_,'ask'(Wff)):- !, snark_ask(Wff).
-snark_process(_,'tell'(Wff)):- !, snark_tell(Wff).
-snark_process(call,Call):- !,call(Call).
-snark_process(tell,Wff):- !, snark_tell(Wff).
-snark_process(ask,Wff):- !, snark_ask(Wff).
-snark_process(Other,Wff):- !, wdmsg(error(missing_snark_process(Other,Wff))),!,fail.
+kif_process(_,':-'(Wff)):- !, kif_process(call,Wff).
+kif_process(_,'?-'(Wff)):- !, kif_ask(Wff).
+kif_process(_,'ask'(Wff)):- !, kif_ask(Wff).
+kif_process(_,'tell'(Wff)):- !, kif_tell(Wff).
+kif_process(call,Call):- !,call(Call).
+kif_process(tell,Wff):- !, kif_tell(Wff).
+kif_process(ask,Wff):- !, kif_ask(Wff).
+kif_process(Other,Wff):- !, wdmsg(error(missing_kif_process(Other,Wff))),!,fail.
 
-:- export(snark_ask_sent/1).
-snark_ask_sent(Wff):- 
+:- export(kif_ask_sent/1).
+kif_ask_sent(Wff):- 
    why_to_id(ask,Wff,Why),
    term_variables(Wff,Vars),
    gensym(z_q,ZQ),
    Query=..[ZQ,666|Vars],
    kif_to_boxlog('=>'(Wff,Query),Why,Asserts),!,
-   snark_tell_boxes(Why,Asserts),!,
+   kif_tell_boxes(Why,Asserts),!,
    call_cleanup(
-     snark_ask(Query),
+     kif_ask(Query),
      pttp_retractall_wid(Why)).
 
 
-:- export(snark_ask/1).
-snark_ask(P <=> Q):- snark_ask_sent(P <=> Q).
-snark_ask(P => Q):- snark_ask_sent(P => Q).
-snark_ask((P v Q)):- snark_ask_sent(((P v Q))).
-snark_ask((P & Q)):- snark_ask_sent((P & Q)).
-snark_ask(Goal0):-  logical_pos(_KB,Goal0,Goal),
+:- export(kif_ask/1).
+kif_ask(P <=> Q):- kif_ask_sent(P <=> Q).
+kif_ask(P => Q):- kif_ask_sent(P => Q).
+kif_ask((P v Q)):- kif_ask_sent(((P v Q))).
+kif_ask((P & Q)):- kif_ask_sent((P & Q)).
+kif_ask(Goal0):-  logical_pos(_KB,Goal0,Goal),
     no_repeats(user:(
 	add_args(Goal0,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],_ProofOut1,Goal1,_),!,
         search(Goal1,60,0,1,3,DepthIn,DepthOut))).
 
-:- export(snark_ask/2).
-snark_ask(Goal0,ProofOut):- logical_pos(_KB,Goal0,Goal),
+:- export(kif_ask/2).
+kif_ask(Goal0,ProofOut):- logical_pos(_KB,Goal0,Goal),
     no_repeats(user:(
 	add_args(Goal0,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],ProofOut1,Goal1,_),!,
         search(Goal1,60,0,1,3,DepthIn,DepthOut),
         contract_output_proof(ProofOut1,ProofOut))).
 
-snark_tell(Wff):- why_to_id(tell,Wff,Why),snark_tell(Why,Wff).
+kif_tell(Wff):- why_to_id(tell,Wff,Why),kif_tell(Why,Wff).
 
-:- export(snark_tell/2).
+:- export(kif_tell/2).
 
-snark_tell(_,[]).
-snark_tell(Why,[H|T]):- !,snark_tell(Why,H),kb_incr(Why,Why2),snark_tell(Why2,T).
-snark_tell(Why,Wff):-  must(kif_to_boxlog(Wff,Why,Asserts)),must(snark_tell_boxes(Why,Wff,Asserts)),!.
+kif_tell(_,[]).
+kif_tell(Why,[H|T]):- !,kif_tell(Why,H),kb_incr(Why,Why2),kif_tell(Why2,T).
+kif_tell(Why,Wff):-  must(kif_to_boxlog(Wff,Why,Asserts)),must(kif_tell_boxes(Why,Wff,Asserts)),!.
 
-snark_tell_boxes(Why,Wff0,Asserts0):- must_det_l((unnumbervars(Asserts0+Wff0,Asserts+Wff),
+kif_tell_boxes(Why,Wff0,Asserts0):- must_det_l((unnumbervars(Asserts0+Wff0,Asserts+Wff),
   %fully_expand(Get1,Get),
-  get_constraints(Wff,Isas), snark_add_constraints(Why,Isas,Asserts))).
+  get_constraints(Wff,Isas), kif_add_constraints(Why,Isas,Asserts))).
 
-snark_add_constraints(Why,Isas,Get1Get2):- var(Get1Get2),!,trace_or_throw(var_snark_tell_isa_boxes(Why,Isas,Get1Get2)).
-snark_add_constraints(Why,Isas,(Get1,Get2)):- !,snark_add_constraints(Why,Isas,Get1),kb_incr(Why,Why2),snark_add_constraints(Why2,Isas,Get2).
-snark_add_constraints(Why,Isas,[Get1|Get2]):- !,snark_add_constraints(Why,Isas,Get1),kb_incr(Why,Why2),snark_add_constraints(Why2,Isas,Get2).
-snark_add_constraints(_,_,[]).
-snark_add_constraints(Why,Isas,((H:- B))):- conjoin(Isas,B,BB), snark_tell_boxes1(Why,(H:- BB)).
-snark_add_constraints(Why,Isas,((H))):- snark_tell_boxes1(Why,(H:- Isas)).
+kif_add_constraints(Why,Isas,Get1Get2):- var(Get1Get2),!,trace_or_throw(var_kif_tell_isa_boxes(Why,Isas,Get1Get2)).
+kif_add_constraints(Why,Isas,(Get1,Get2)):- !,kif_add_constraints(Why,Isas,Get1),kb_incr(Why,Why2),kif_add_constraints(Why2,Isas,Get2).
+kif_add_constraints(Why,Isas,[Get1|Get2]):- !,kif_add_constraints(Why,Isas,Get1),kb_incr(Why,Why2),kif_add_constraints(Why2,Isas,Get2).
+kif_add_constraints(_,_,[]).
+kif_add_constraints(Why,Isas,((H:- B))):- conjoin(Isas,B,BB), kif_tell_boxes1(Why,(H:- BB)).
+kif_add_constraints(Why,Isas,((H))):- kif_tell_boxes1(Why,(H:- Isas)).
 
-snark_tell_boxes1(_,[]).
-snark_tell_boxes1(Why,[H|T]):- !,must_det_l((snark_tell_boxes1(Why,H),kb_incr(Why,Why2),snark_tell_boxes1(Why2,T))).
-snark_tell_boxes1(Why,AssertI):- must_det_l((simplify_bodies(AssertI,AssertO),snark_tell_boxes2(Why,AssertO))).
+kif_tell_boxes1(_,[]).
+kif_tell_boxes1(Why,[H|T]):- !,must_det_l((kif_tell_boxes1(Why,H),kb_incr(Why,Why2),kif_tell_boxes1(Why2,T))).
+kif_tell_boxes1(Why,AssertI):- must_det_l((simplify_bodies(AssertI,AssertO),kif_tell_boxes2(Why,AssertO))).
 
-snark_tell_boxes2(Why,Assert):- 
+kif_tell_boxes2(Why,Assert):- 
   must_det_l((
   boxlog_to_prolog(Assert,Prolog),  
   unnumbervars(Prolog,PTTP), 
@@ -1375,8 +1377,8 @@ boxlog_to_prolog(BL,PTTP):- thglobal:as_prolog(BL,PTTP).
 :- told.
 :- dmsg_show(_).
 :- dmsg('i see this').
-:- snark_tell(exists(C, course(C) & ~exists(MT3, midterm(C,MT3)))).
-:- snark_test_string(TODO),snark(string(TODO),current_output).
+:- kif_tell(exists(C, course(C) & ~exists(MT3, midterm(C,MT3)))).
+:- kif_test_string(TODO),kif(string(TODO),current_output).
 :- set_no_debug.
 */
 /*
@@ -1385,62 +1387,66 @@ boxlog_to_prolog(BL,PTTP):- thglobal:as_prolog(BL,PTTP).
 
 :- wdmsg('we see this').
 
-:- lsting(snark_tell/1).
-:- snark_tell((p => q)).
-:- snark_tell(~p <=> ~q).
-:- snark_tell(tRoom(R) => exists(D, (tDoor(D) & has(R,D)))).
-:- snark_tell(isa(R,tPred) => exists(D, (isa(D,ftInt) & arity(R,D)))).
-:- snark_tell(all(P, person(P) => ~(exists(D, dollar(D) & has(P,D))))).
-:- snark_tell(p <=> q).
-:- snark_tell(all(P, person(P) => exists(D, dollar(D) & has(P,D)))).
+:- lsting(kif_tell/1).
+:- kif_tell((p => q)).
+:- kif_tell(~p <=> ~q).
+:- kif_tell(tRoom(R) => exists(D, (tDoor(D) & has(R,D)))).
+:- kif_tell(all(P, person(P) => ~(exists(D, dollar(D) & has(P,D))))).
+:- kif_tell(p <=> q).
+:- kif_tell(all(P, person(P) => exists(D, dollar(D) & has(P,D)))).
 */
 % :- prolog.
+:- kif_tell(isa(R,tPred) => exists(D, (isa(D,ftInt) & arity(R,D)))).
 
-:- snark_tell(all(R,room(R) => exists(D, (door(D) & has(R,D))))).
-% :- snark_tell(loves(Child,motherFn(Child))).
+:- kif_tell(all(R,room(R) => exists(D, (door(D) & has(R,D))))).
+:- kif_tell(loves(Child,fatherFn(Child))).
 
-:- dynamic(snark_pred_head/1).
+:- kif_tell(isa(R,tAgent) => exists(D, (isa(D,tNose) & mudContains(R,D)))).
+
+:- dynamic(kif_pred_head/1).
 :- style_check(-singleton).
 
-snark_pred_head(P):- var(P),!,isa(F,prologSNARK),arity(F,A),functor(P,F,A).
-snark_pred_head(P):- get_functor(P,F,_),isa(F,prologPTTP).
+kif_pred_head(P):- var(P),!,isa(F,prologKIF),arity(F,A),functor(P,F,A).
+kif_pred_head(P):- get_functor(P,F,_),isa(F,prologKIF).
+kif_pred_head(P):- get_functor(P,F,_),isa(F,prologPTTP).
+
 
 :- dynamic(pttp_pred_head/1).
 
 pttp_pred_head(P):- var(P),isa(F,prologPTTP),arity(F,A),functor(P,F,A).
 pttp_pred_head(P):- get_functor(P,F,_),isa(F,prologPTTP).
 
-:- multifile(snarky_comment/1).
+:- multifile(kify_comment/1).
 
 
 pttp_listens_to_head(_OP,P):- pttp_pred_head(P).
 
 pttp_listens_to_stub(prologPTTP).
-pttp_listens_to_stub(prologSNARK).
+pttp_listens_to_stub(prologKIF).
 
 
-user:provide_mpred_setup(Op,H):- provide_snark_op(Op,H).
+user:provide_mpred_setup(Op,H):- provide_kif_op(Op,H).
 
 % OPHOOK ASSERT
-provide_snark_op(change(assert,How),(HeadBody)):- 
+provide_kif_op(change(assert,How),(HeadBody)):- 
    pttp_listens_to_head(change(assert,How),HeadBody),
-   why_to_id(provide_snark_op,(HeadBody),ID),
-   snark_tell(ID,(HeadBody)).
+   why_to_id(provide_kif_op,(HeadBody),ID),
+   kif_tell(ID,(HeadBody)).
 
 % OPHOOK CALL
-provide_snark_op(call(How),Head):- 
+provide_kif_op(call(How),Head):- 
   pttp_listens_to_head(call(How),Head),
   pttp_call(Head).
 
 % OPHOOK CLAUSES
-provide_snark_op(clauses(How),(Head:- Body)):- 
+provide_kif_op(clauses(How),(Head:- Body)):- 
    pttp_listens_to_head(clauses(How),Head),
    provide_mpred_storage_clauses(Head,Body,_Why).
 
 % OPHOOK 
-provide_snark_op(OP,(HeadBody)):- 
+provide_kif_op(OP,(HeadBody)):- 
    pttp_listens_to_head(OP,HeadBody),
-   snark_process(OP,HeadBody).
+   kif_process(OP,HeadBody).
 
 
 % CLAUSES HOOK 
@@ -1458,14 +1464,14 @@ user:provide_mpred_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(Stub
 :- initialization(uses_logic(logicmoo_kb_refution)).
 
 
-user:sanity_test:- snark_tell(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
+user:sanity_test:- kif_tell(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
 
 user:sanity_test:- kif_to_boxlog(-((a , b ,  c , d)),S),!,disjuncts_to_list(S,L),
   list_to_set(L,SET),forall(member(P,SET),writeln(P)),!.
 
 
-:- if_startup_script(tsnark).
-:- if_startup_script(ensure_loaded(logicmoo_i_mpred_snark_testing)).
+:- if_startup_script(tkif).
+:- if_startup_script(ensure_loaded(logicmoo_i_mpred_kif_testing)).
 
 user:sanity_test:- logicmoo_example3.
 
