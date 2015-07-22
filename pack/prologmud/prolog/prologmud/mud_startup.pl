@@ -529,8 +529,6 @@ download_and_install_el:-
 :-create_agent(explorer(2),[]).
 */
 
-:- file_begin(pl).
-
 user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term=someCode).
 
 %:-forall(make_tabled_perm(get_all_templates(TEMPL)),dmsg(TEMPL)).

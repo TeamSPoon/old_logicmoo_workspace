@@ -386,10 +386,15 @@ update_single_valued_arg(P,N):- arg(N,P,UPDATE),replace_arg(P,N,OLD,Q),
      forall((Q,UPDATE\=OLD),enqueue(\+Q))),!.
 */
 
-update_single_valued_arg(P,N):- arg(N,P,UPDATE),replace_arg(P,N,OLD,Q),
+update_single_valued_arg(P,N):- 
+ must_det_l((arg(N,P,UPDATE),replace_arg(P,N,OLD,Q),
   (is_relative(UPDATE)->
      must_det_l((Q,update_value(OLD,UPDATE,NEW),\+ is_relative(NEW), replace_arg(Q,N,NEW,R),retract(Q),retract(P),pfc_add(R)));
-     forall((Q,UPDATE\=OLD),retract(Q))),!.
+     forall((Q,UPDATE\=OLD),retract(Q))))).
+
+single_valued_skel(F,A,N,DEFAULT,P,Q):- functor(P,F,A),
+ must_det_l((arg(N,P,MISSING),replace_arg(P,N,DEFAULT,Q))).
+ 
 
 % assert_with to change(CA1,CB2) singlevalue pred
 :-export((db_assert_sv/4)).

@@ -1,13 +1,25 @@
 
-
-prologSingleValued(idForString/2).
-
-idForString("foo man",foo1).
-idForString("foo woman",foo2).
-:-listing(idForString).
-idForString("foo man",foo3).
-:-listing(idForString).
+:-file_begin(pfc).
 
 
+meta_argtypes(idForTest(tBird,ftTerm)).
+
+singleValuedInArgDefault(idForTest,2,unknown).
+
+:-show_call(listing(idForTest)).
+
+% :-rtrace(idForTest(tTweety,foo1)).
+
+% :-show_call(listing(idForTest)).
+
+:-prolog.
+
+
+
+
+:-pfc_rem(idForTest("foo man",foo3)).
+:-listing(idForTest).
+
+:-prolog.
 
 end_of_file.

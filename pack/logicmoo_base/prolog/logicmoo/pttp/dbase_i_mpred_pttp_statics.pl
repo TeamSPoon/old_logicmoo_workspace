@@ -738,19 +738,36 @@ correct_pttp_2(LC,F,[L|IST],Body):- Body =..[assumed_t,F,L|IST].
 %:-export(pttp1/2).
 %pttp1(X,Y) :- must_pttp_id(ID), !, pttp1_wid(ID, X,Y).
 :-export(pttp1_wid/3).
-pttp1_wid(ID,X,Y) :-	
+pttp1_wid(ID,X,Y) :-    
+ must_det_l((   
+   pttp1a_wid(ID,X,X0),
+   pttp1b_wid(ID,X0,X8),
+   pttp1c_wid(ID,X8,IntProcs,Procs),
+   conjoin_pttp(Procs,IntProcs,Y))).
+
+
+
+:-export(pttp1a_wid/3).
+pttp1a_wid(ID,X,X0) :-    
  must_det_l((
+        subst(X , neg,-,XX1),
+        subst(XX1,~,-,XX2),
+        subst(XX2,not,-,XX3),
 	% write('PTTP input formulas:'),        
-	clauses(X,X0,ID,_),		% prints and transforms input clauses
-	must(apply_to_conjuncts(X0,add_features,X8)),
-	must_det(predicates(X8,IntPreds0)),
-	must_det((list_reverse(IntPreds0,IntPreds1),
+	clauses(XX3,X0,ID,_))).
+
+pttp1b_wid(ID,X0,X8) :- must(apply_to_conjuncts(X0,add_features,X8)).
+
+
+pttp1c_wid(ID,X8,IntProcs,Procs) :-    
+ must_det_l((
+	predicates(X8,IntPreds0),
+	list_reverse(IntPreds0,IntPreds1),
 	procedures(IntPreds1,X8,IntProcs),
-	must_det(predicates(X0,Preds0)),
+	predicates(X0,Preds0),
 	list_reverse(Preds0,Preds),
-	apply_to_elements(Preds,make_wrapper(IntPreds1),Procs),
-	conjoin_pttp(Procs,IntProcs,Y))))),!.
- 
+	apply_to_elements(Preds,make_wrapper(IntPreds1),Procs))).
+
 
 
 
@@ -1403,6 +1420,7 @@ pttp_nnf_pre_clean_functor(or,(;),[]).
 % pttp_nnf_pre_clean_functor('::',(:),[]).
 pttp_nnf_pre_clean_functor(~,(-),[]).
 pttp_nnf_pre_clean_functor(not,(-),[]).
+pttp_nnf_pre_clean_functor(neg,(-),[]).
 pttp_nnf_pre_clean_functor(implies,(=>),[]).
 pttp_nnf_pre_clean_functor(imp,(=>),[]).
 pttp_nnf_pre_clean_functor(equiv,(<=>),[]).

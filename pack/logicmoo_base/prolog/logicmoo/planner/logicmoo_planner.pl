@@ -1,3 +1,4 @@
+end_of_file.
 
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
@@ -17,6 +18,12 @@
 :- show_call_entry(with_no_mpred_expansions(ensure_loaded(logicmoo_ocl_and_pddl))).
 
 
+:- show_call_entry(user:ensure_loaded(planner(logicmoo_util_bb_env))).
+:- show_call_entry(user:use_module(planner(logicmoo_util_structs))).
+:- show_call_entry(with_no_mpred_expansions(user:ensure_loaded(planner((logicmoo_hyhtn))))).
+
+:- with_assertions((user:term_expansion(_,_):-!,fail),
+    gripe_time(7,time(user:load_files([library(el_holds/'el_assertions.qlf')],[if(not_loaded )])))).
 
 
 

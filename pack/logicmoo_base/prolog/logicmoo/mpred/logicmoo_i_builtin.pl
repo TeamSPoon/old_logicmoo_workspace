@@ -1,5 +1,3 @@
-
-
 /** <module>
 % ===================================================================
 % File 'logicmoo_i_builtin.pfc'
@@ -10,8 +8,9 @@
 % Revision: $Revision: 1.9 $
 % Revised At: $Date: 2002/06/27 14:13:20 $
 % ===================================================================
-% File used as storage place for all predicates which change as
-% the world is run.
+%
+% PFC is a language extension for prolog.. there is so much that can be done in the language for exmaple.. 
+%
 %
 % props(Obj,height(ObjHt)) == holds(height,Obj,ObjHt) == rdf(Obj,height,ObjHt) == height(Obj,ObjHt)
 % padd(Obj,height(ObjHt)) == padd(height,Obj,ObjHt,...) == moo(QueryForm)
@@ -30,13 +29,17 @@
 :- op(1100,fx,('=>')).
 :- op(1150,xfx,('::::')).
 :- dynamic(tCol/1).
+
 :- dynamic(subFormat/2).
 :- dynamic(pfc_undo_sys/3).
 
 :- include((logicmoo_i_header)).
 
+% :- dynamic(added/1).
+added(Added):-cwc,spft(Added,U,U).
 
 :- file_begin(pfc).
+:- op(1050,xfx,('=>')).
 
 a(z).
 
@@ -57,7 +60,6 @@ prologHybrid(arity/2).
 
 
 % this mean to leave terms at EL:  foo('QuoteFn'([cant,touch,me])).
-
 
 argsQuoted('loop_check_term').
 argsQuoted('loop_check_term_key').
@@ -82,7 +84,6 @@ argsQuoted({}).
 argsQuoted(second_order).
 % argsQuoted((':-')).
 
-
 % neg(tCol({})).
 
 :-dynamic(pfc_default/1).
@@ -94,9 +95,14 @@ argsQuoted(second_order).
 
 %(pfc_default(P)/pfc_each_literal(P,E))  =>  pfc_default(E).
 
+prologBuiltin(resolveConflict/1).
+prologBuiltin(pfc_select/2).
+
 :-dynamic(conflict/1).
 % a conflict triggers a Prolog action to resolve it.
 conflict(C) => {must(resolveConflict(C))}.
+
+
 
 % meta rules to schedule inferencing.
 % resolve conflicts asap
@@ -129,7 +135,8 @@ comment(isa,"Instance of").
 
 neg(tCol(genlPreds)).
 
-% PFC is a language extension for prolog.. there is so much that can be done in the language for exmaple.. 
+neg(singleValuedInArg(arity,2)).
+neg(prologSingleValued(arity)).
 
 neg(arity(argIsa,1)).
 arity(pddlObjects,2).
@@ -158,11 +165,21 @@ prologHybrid(F),arity(F,A)=>hybrid_support(F,A).
 
 arity(genlPreds,2).
 
-prologBuiltin(resolveConflict,mpred_module(user)).
-prologBuiltin(pfc_select,mpred_module(user)).
+prologBuiltin(resolveConflict/1,mpred_module(user)).
+prologBuiltin(pfc_select/2,mpred_module(user)).
+%:-start_rtrace.
 prologBuiltin(agent_text_command/4,prologDynamic).
 %tPred(t,prologDynamic).
+
 tPred(member/2,prologBuiltin).
+
+tCol(tNotForUnboundPredicates).
+
+tNotForUnboundPredicates(member).
+
+isa(member,tNotForUnboundPredicates).
+
+
 tPred(arity/2,prologHybrid).
 tPred(is_never_type/1,prologDynamic).
 tPred(term_expansion/2,prologDynamic).
@@ -234,6 +251,7 @@ tCol(C)/(atom(C),TCI=..[C,I]) => {decl_type(C)},arity(C,1),pfc_univ(C,I,TCI).
 ttPredType(predCanHaveSingletons).
 ttPredType(prologSideEffects).
 prologSideEffects(write/1).
+prologSideEffects(resolveConflict/1).
 
 ttPredType(pfcDatabaseTerm).
 ttPredType(pfcControlled).
@@ -251,7 +269,7 @@ ttPredType(pfcMustFC).
 
 
 ttPredType(isEach(meta_argtypes,pfcDatabaseTerm,pfcControlled,pfcWatched,pfcMustFC,predIsFlag,tPred,prologMultiValued,
- prologSingleValued,prologMacroHead,prologBuiltin,prologDynamic,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,prologEquality,prologPTTP,
+ prologSingleValued,prologMacroHead,notAssertable,prologBuiltin,prologDynamic,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,prologEquality,prologPTTP,
  prologSideEffects,prologHybrid,prologListValued)).
 
 completelyAssertedCollection(isEach(tCol,tPred,pfcControlled)).
@@ -371,6 +389,8 @@ tFunction(ArgTypes)/is_declarations(ArgTypes) => meta_argtypes(ArgTypes).
 ttFormatType(ArgTypes)/is_declarations(ArgTypes) => meta_argtypes(ArgTypes).
 
 
+meta_argtypes(ArgTypes)/compound(ArgTypes) => {get_functor(ArgTypes,F,A)},arity(F,A).
+
 
 prologMacroHead(tCol).
 
@@ -421,8 +441,6 @@ tCol(tNotForUnboundPredicates).
 
 prologSideEffects(P)=>tNotForUnboundPredicates(P).
 
-isa(member,tNotForUnboundPredicates).
-
 isa(tRelation,ttAbstractType).
 
 
@@ -435,7 +453,7 @@ isa(tRelation,ttAbstractType).
 
 
 
-
+%:-start_rtrace.
 (tCol(Inst), {isa_from_morphology(Inst,Type)}) => added(isa(Inst,Type)).
 
 % HOW TO MAKE THIS FAST?  isa(Inst,Type) <= {isa_from_morphology(Inst,Type)}.
@@ -525,10 +543,14 @@ singleValuedInArg(singleValuedInArg,2).
 ttPredType(Prop)=>tCol(Prop).
 
 
+
 %:-user:agenda_slow_op_enqueue(add(((arity(Pred,2),argIsa(Pred,1,Col)/(nonvar(Pred),Col\=ftTerm,tSet(Col)), \+prologSideEffects(Pred), t(Pred,Arg,_)/nonvar(Arg)) => t(Col,Arg)))).
 %:-user:agenda_slow_op_enqueue(add(((arity(Pred,2),argIsa(Pred,2,Col)/(nonvar(Pred),Col\=ftTerm,tSet(Col)), \+prologSideEffects(Pred), t(Pred,_,Arg)/nonvar(Arg)) => t(Col,Arg)))).
 %:-add_slow(((arity(Pred,2),argIsa(Pred,2,Col)/(nonvar(Pred),Col\=ftTerm,tSet(Col)),t(Pred,_,Arg)/nonvar(Arg)) => t(Col,Arg))).
 %(((P/(has_functor(P),get_functor(P,F,A),A\=2,\+prologSideEffects(F),pfc_literal(P)) => {user:agenda_slow_op_enqueue(deduceEachArgType(P))}))).
+
+% :-start_rtrace.
+
 (P/pfc_literal(P) => {user:agenda_slow_op_enqueue(must(ignore(deduceEachArgType(P))))}).
 % tCol(Col) <=> isa(Col,tCol).
 
@@ -548,8 +570,6 @@ typeGenls(ttPredType,tPred).
 prologHybrid(argIsa/3).
 
 :-asserta(thlocal:pfcExpansion).
-prologBuiltin(resolveConflict/1).
-prologBuiltin(pfc_select/2).
 
 
 /*
@@ -671,7 +691,7 @@ prologHybrid(isEach( tCol/1, disjointWith/2, genls/2,genlPreds/2, meta_argtypes/
 prologHybrid(isEach( ttNotTemporalType/1,ttTemporalType/1 )).
 prologHybrid(isEach(genlInverse/2,genlPreds/2)).
 prologHybrid(argIsa/3).
-prologHybrid(argSingleValueDefault, 3).
+prologHybrid(singleValuedInArgDefault, 3).
 prologHybrid(disjointWith/2).
 prologHybrid(instTypeProps/3).
 prologHybrid(predProxyAssert,2).
@@ -828,10 +848,13 @@ ttFormatType(ftVoprop).
 
 prologHybrid(argQuotedIsa(tRelation,ftInt,ttFormatType)).
 prologHybrid(argIsa(tRelation,ftInt,tCol)).
-prologHybrid(argSingleValueDefault(prologSingleValued,ftInt,ftTerm)).
+prologHybrid(singleValuedInArgDefault(prologSingleValued,ftInt,ftTerm)).
 prologHybrid(formatted_resultIsa(ttFormatType,tCol)).
 
-{FtInt=2},argSingleValueDefault(PrologSingleValued,FtInt,FtTerm),arity(PrologSingleValued,FtInt),
+
+(singleValuedInArgDefault(SingleValued,ArgN,_) => singleValuedInArg(SingleValued,ArgN)).
+
+{FtInt=2},singleValuedInArgDefault(PrologSingleValued,FtInt,FtTerm),arity(PrologSingleValued,FtInt),
   argIsa(PrologSingleValued,1,Col)=>relationMostInstance(PrologSingleValued,Col,FtTerm).
 
 prologHybrid(quotedDefnIff(ttFormatType,ftTerm)).
@@ -971,7 +994,7 @@ isa(arity,tBinaryPredicate).
 :-must(pfc_add(tCol('UnaryPredicate'))).
 
 
-pfcMark(_Type,_,F,A)/(A>1,F\==arity)=>arity(F,A),pfcControlled(F).
+pfcMark(_Type,_,F,A)/(integer(A),A>1,F\==arity)=>arity(F,A),pfcControlled(F).
 
 pfc_mark_C(G) => {pfc_mark_C(G)}.
 pfc_mark_C(G) :-  map_literals(lambda(P,(get_functor(P,F,A),pfc_add([isa(F,pfcControlled),arity(F,A)]))),G).
@@ -986,7 +1009,7 @@ isa(F,pfcMustFC) => pfcControlled(F).
 prologHybrid(X)/has_functor(X)=>{decl_mpred_hybrid(X)}.
 prologDynamic(X)/has_functor(X)=>{decl_mpred_prolog(X)}.
 prologBuiltin(X)/has_functor(X)=>{decl_mpred_prolog(X)}.
-pfcControlled(X)/has_functor(X)=>{once(X=(F/A);get_functor(X,F,A)),dynamic(F/A),multifile(F/A),decl_mpred_hybrid(X)}.
+pfcControlled(X)/compound(X)=>{once(X=(F/A);get_functor(X,F,A)),dynamic(F/A),multifile(F/A),decl_mpred_hybrid(X)}.
 
 
 pfcControlled(C)=>prologHybrid(C).
@@ -1100,17 +1123,18 @@ vtTestType(vTest2).
 
 
 
-
-
 %((relationMostInstance(Pred,Type,Value),{G=..[Pred,Inst,Value],GI=..[Pred,Inst,_]})) => (({GI=..[Pred,Inst,_]},isa(Inst,Type), ~GI) => G ).
 ((relationAllInstance(Pred,Type,Value),{G=..[Pred,Inst,Value]})) =>  ((isa(Inst,Type), {G=..[Pred,Inst,Value]} => G )).
 relationMostInstance(Pred,Type,Value),{G=..[Pred,Inst,Value]} => pfc_default(isa(Inst,Type) => G).
 % relationMostInstance(Pred,Type,Value) => pfc_default( isa(Inst,Type) => ?Pred(Inst,Value) ).
 
+notAssertable(isFact/1).
+prologHybrid(isFact/1).
+
+isFact(A):- cwc, nonvar(A), ( added(A) ; clause_asserted(A)).
 
 
-
-pfc_default(((clause_asserted(argIsa(Pred,N,FT))/ground(argIsa(Pred,N,FT)),ttFormatType(FT))=>argQuotedIsa(Pred,N,FT))).
+pfc_default(((ttFormatType(FT),isFact(argIsa(Pred,N,FT))/ground(argIsa(Pred,N,FT)))=>argQuotedIsa(Pred,N,FT))).
 pfc_default(((genlPreds(Child,Parent),argIsa(Parent,N,FT))=>argIsa(Child,N,FT))).
 pfc_default(((genlPreds(Child,Parent),argQuotedIsa(Parent,N,FT)/ground(argIsa(Parent,N,FT)))=>argQuotedIsa(Child,N,FT))).
 
@@ -1134,421 +1158,25 @@ makeArgConstraint('QuotedIsa',ttFormatType).
 makeArgConstraint('Format',ftTerm).
 makeArgConstraint('SometimesIsa',tCol).
 
+argFormat(arity,2,vSetTheFormat).
 
 % {Arity=2},arity(Pred,Arity),(argIsa(Pred,Arity,ftInt)/(A=ftInt;A=ftPercent))=>singleValuedInArg(Pred,Arity).
-((arity(Pred,2),argIsa(Pred,2,ftInt))=>singleValuedInArg(Pred,2)).
+pfc_default((arity(Pred,2),argIsa(Pred,2,ftInt))=>singleValuedInArg(Pred,2)).
+
+argFormat(P,S,vSingleEntry)<=>singleValuedInArg(P,S).
+argFormat(P,S,vSetTheFormat)<=> ~singleValuedInArg(P,S).
+
 ((arity(Pred,2),argIsa(Pred,2,ftPercent))=>singleValuedInArg(Pred,2)).
 
 :-ensure_loaded('zenls.pfct').
 
 dif_in_arg(P,N,Q):- cwc, ground(P),P=..[F|ARGS],arg(N,P,B),Q=..[F|ARGS],nb_setarg(N,Q,A),dif(A,B).
 
-/*
-(  (P/ground(P),
-   {get_functor(P,F,A)},
-   singleValuedInArg(F,N),
-   {dif_in_arg(P,N,Q)},
-   Q)
-   => \+ Q ).
 
-*/
-
-/*
-(singleValuedInArg(F,N),arity(F,A),{integer(A),integer(N),atom(F),functor(P,F,A),functor(Q,F,A)} => 
- ( (P/dif_in_arg(P,N,Q),Q) => \+ Q )).
-
-
-((arity(Pred,Arity),singleValuedInArg(Pred,SV),
-  {functor(Before,Pred,Arity),arg(SV,Before,B),replace_arg(Before,SV,A,After)})
-  =>
-   ((After,{dif:dif(B,A),clause_asserted(Before), B\==A,\+ is_relative(B),\+ is_relative(A)}) 
-     =>
-      {pfc_rem2a(Before)})).
-
-
-(singleValuedInArg(F,N),arity(F,A),{ground(F+N+A),functor(P,F,A),arg(N,P,B),replace_arg(P,N,E,Q)} => 
-  (P => {pfc_add_fire_once(Q=>({pfc_rem2a(P)} , Q)))).
-
- (singleValuedInArg(F,N),arity(F,A),{ground(F+N+A),functor(P,F,A),arg(N,P,B),replace_arg(P,N,E,Q)} => 
-  ((P/(dif(E,B),\+ is_relative(B),Q))=> ({pfc_rem2a(Q)},P))).
-
-((singleValuedInArg(F,N),arity(F,A),{ground(F+N+A),functor(P,F,A),arg(N,P,B),replace_arg(P,N,E,Q)}) => 
- (((P/(\+ is_relative(B)))=> ({dif(E,B),forall(Q,pfc_rem2a(Q))}, (\+ Q) ,P)))).
-
-
-:-pfc_add((((singleValuedInArg(F,N),arity(F,A),{ground(F+N+A),functor(P,F,A),functor(Q,F,A),arg(N,P,B),P=Q,nb_setarg(N,Q,E)})
- => 
- {show_call(pfc_add(((P/(\+ is_relative(B)) => {forall((Q,B\=E),retract(Q))}))))}))).
-
-
-
-:-pfc_add((((singleValuedInArg(F,N),arity(F,A),{ground(F+N+A),functor(P,F,A),functor(Q,F,A),arg(N,P,B),P=Q,nb_setarg(N,Q,E)})
- => 
- {show_call(pfc_add(((P/(\+ is_relative(B)) => {forall((Q,B\=E),retract(Q))}))))}))).
-
-
-:-pfc_add((((singleValuedInArg(F,N),arity(F,A),{ground(F+N+A),functor(P,F,A),arg(N,P,UPDATE),replace_arg(P,N,OLD,Q)})
- => 
- {show_call(pfc_add((P => {(is_relative(UPDATE)->
-     must_det_l((Q,update_value(OLD,UPDATE,NEW),\+ is_relative(NEW), replace_arg(Q,N,NEW,R),retract(Q),retract(P),pfc_add(R)));
-     forall((Q,UPDATE\=OLD),retract(Q)))})))}))).
-
-
-*/
-
-:-pfc_add((((singleValuedInArg(F,N),arity(F,A),{ground(F+N+A),functor(P,F,A)})
- => (P => {update_single_valued_arg(P,N)})))).
+((singleValuedInArg(F,N),arity(F,A),{atom(F),integer(N),integer(A),functor(P,F,A)}) => (P => {update_single_valued_arg(P,N)})).
 
 
 :-include('singleValued.pfct').
 
-:- listing(_=>_).
 
-
-end_of_file.
-
-
-
-sane_transitivity(_PredInfo,I,Sub,Super):-  
-% (I=Super->trace_or_throw(sane_transitivity(PredInfo,I,Sub,Super));true),
-%  sanity(I=Sub->trace_or_throw(sane_transitivity(PredInfo,I,Sub,Super));true),
-%  sanity(Sub=Super->trace_or_throw(sane_transitivity(PredInfo,I,Sub,Super));true),
-  \=(I,Super),\=(Sub,Super),\=(I,Sub),
-  \+(isa(Super,ttNonGenled)),
-  \+(isa(I,ttNonGenled)).
-
-(genls(I,Sub),genls(Sub, Super),{sane_transitivity((genls(I,Sub),genls(Sub, Super)),I,Sub,Super)}) => genls(I,Super).
-
-
-
-
-
-
-
-
-
-
-tCol(tFly).
-
-(mpred_prop(_,meta_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) =>  meta_argtypes(ArgTypes).
-
-
-
-a=>b.
-b=>c.
-c=>a.
-
-
-jj=>jj.
-
-
-% completeExtentAsserted(genls)
-
-
-
-implies(and(resultIsaArg('$VAR'('FUNC'), 5), arg5Genl('$VAR'('FUNC'), '$VAR'('COL'))), resultIsa('$VAR'('FUNC'), '$VAR'('COL'))).
-
-
-
-
-dividesBetween(tTemporalThing,tMassfull,tMassless).
-dividesBetween(tObj,tMassfull,tMassless).
-
-((dividesBetween(S,C1,C2),{ground(S:C1:C2)}) => ({ground(S:C1:C2)},(disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)))).
-
-isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
-
-(neg(isa(I,Super)) <= (disjointWith(Sub, Super),isa(I,Sub))).
-% disjointWith(P1,P2) => {\+(isa(P1,ttNonGenled)),\+(isa(P2,ttNonGenled))},(neg(isa(C,P1)) <=> isa(C,P2)).
-
-tCol(tCol).
-tCol(tPred).
-tCol(tFunction).
-tCol(tRelation).
-tCol(ttTemporalType).
-tCol(ttFormatType).
-/*
-
-% this isn't written yet.
-resolveConflict(C) :- dtrace,
-  format("~NHalting with conflict ~w", [C]),
-  pfc_halt.
-
-
-% a conflict triggers a Prolog action to resolve it.
-conflict(C) => {resolveConflict(C)}.
-
-% meta rules to schedule inferencing.
-
-% resolve conflicts asap
-pfc_select(conflict(X),S) :- pfc_queue(conflict(X),S).
-  
-% a pretty basic conflict.
-((neg(P), P ) => conflict(P)).
-
-*/
-
-tCol(tFly).
-tCol(tCanary).
-tCol(tPenguin).
-tCol(tBird).
-genls(tCanary,tBird).
-genls(tPenguin,tBird).
-%(isa(A, tBird) =>isa(A, tFly)).
-%(isa(A, tBird), ~neg(isa(A, tFly))=>isa(A, tFly)).
-
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
-% % % These next two have been comnbined with the two following % % %
-(((pfc_default(P)/pfc_literal(P))  =>  (~neg(P) => P))).
-((pfc_default((P => Q))/pfc_literal(Q) => (P, ~neg(Q) => Q))).
-
-
-%((pfc_default(P)/pfc_literal(P), {pfcVerifyMissing(P,F)})) =>  ((F, ~neg(P)) => P).
-%((pfc_default((P => Q))/pfc_literal(Q), {pfcVerifyMissing(Q,F)})) => ((P, F, ~neg(Q)) => Q).
-% % % 
-(pfc_default((Q <= P))/pfc_literal(Q)) => (Q <=(P, ~neg(Q))).
-%(pfc_default((P => Q))/pfc_literal(Q)) => (Q <=(P, ~neg(Q))).
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
-
-neg(P) <= {pfcVerifyMissing(P,F,Test)},Test,{F\=P}.
-
-% is this how to define constraints?
-either(P,Q) => (neg(P) => Q), (neg(Q) => P).
-% (P,Q => false) => (P => neg(Q)), (Q => neg(P)).
-
-% rembmer the tCol rule points to isa/2
-% tCol(C)=>{atom(C),P=..[C,I],assertz_if_new((P:-infoF(isa(I,C)))),assertz_if_new((P:-isa(I,C)))}.
-
-tCol(C)=> {atom(C),P=..[C,I],assertz_if_new((P:-infoF(isa(I,C)))),assertz_if_new((isa(I,C):-no_repeats(P)))}.
-% isa(I,C):- tCol(C),{append_term(C,I,G)},(G/current_predicate(_,G)).
-% isa(I,C):- no_repeats((no_repeats(tCol(C)),append_term(C,I,G),current_predicate(_,G),G)).
-
-prologHybrid((zDefault/1,tPenguin/1,tFly/1,tBird/1,tCanary/1)).
-
-'UnaryPredicate'(Pred)<=>(arity(Pred,1),tPred(Pred)).
-
-'UnaryPredicate'(zDefault).
-((zDefault(P/pfc_literal(P)))  =>  (~neg(P) => P)).
-zDefault((P => Q))/pfc_literal(Q) => ((P, ~neg(Q) => Q)).
-%zDefault((P => Q))/pfc_literal(Q) => (Q <=(P, ~neg(Q))).
-%zDefault((Q <= P))/pfc_literal(Q) => (Q <=(P, ~neg(Q))).
-
-% birds fly by default.
-zDefault((tBird(X) => tFly(X))).
-
-% here's one way to do an isa hierarchy.
-% genlPreds = subclass.
-
-/*
-(genlPreds(C1,C2),arity(C1,2)) =>
-  {P1 =.. [C1,X,Y],
-    P2 =.. [C2,X,Y]},
-  (P1 => P2).
-
-(genlPreds(C1,C2),arity(C1,3)) =>
-  {P1 =.. [C1,X,Y,Z],
-    P2 =.. [C2,X,Y,Z]},
-  (P1 => P2).
-*/
-
-
-
-(zenlPreds(C1,C2)) =>
-  {P1 =.. [C1,X],
-    P2 =.. [C2,X]},
-  (P1 => P2).
-
-
-zenlPreds(tCanary,tBird).
-zenlPreds(tPenguin,tBird).
-
-% penguins do neg fly.
-tPenguin(X) => neg(tFly(X)).
-
-% chilly is a penguin.
-tPenguin(iChilly).
-
-% tweety is a canary.
-tCanary(iTweety).
-
-
-% birds fly by default.
-(pfc_default(( tBird(X) => tFly(X)))).
-
-
-tCol(tFly).
-tCol(tCanary).
-tCol(tPenguin).
-tCol(tBird).
-
-% => genls(tBird,tFly).
-
-
-% penguins do neg tFly.
-tPenguin(X) => neg(tFly(X)).
-
-% iChilly is a tPenguin.
-((=> tPenguin(iChilly))).
-
-% iTweety is a tCanary.
-((=> tCanary(iTweety))).
-
-:-must(in_file_expansion;in_file_directive).
-
-:-listing(tBird).
-:-listing(tFly).
-
-
-
-end_of_file.
-
-
-:-dynamic((fly/1,bird/1,penguin/1,canary/1)).
-
-
-% birds fly by default.
-(pfc_default((bird(X) => fly(X)))).
-
-% heres one way to do an subclass hierarchy.
-
-(((genls_test(C1,C2) =>
-  {P1 =.. [C1,X],
-    P2 =.. [C2,X]},
-  (P1 => P2)))).
-
-(genls_test(canary,bird)).
-(genls_test(penguin,bird)).
-
-% penguins do neg fly.
-(penguin(X) => neg(fly(X))).
-
-% chilly is a penguin.
-(penguin(chilly)).
-
-% tweety is a canary.
-(canary(tweety)).
-
-:-listing([fly/1,bird/1,penguin/1,canary/1]).
-
-:-ignore(show_call_failure(fly(tweety))).
-
-/*
-
- the CycL language extends Prolog's first order logic capabilities with some higher order logics.  
- It also extrends prolog to show proofs.. one issue is the CycL language never signed up for cuts or other execution  orders.    
- PrologMUD extends the CycL language to allow preset program flow (unless a predicate is declared to not honor order of execution 
-  (this is usually best!)).  PrologMUD  implements a new design of the cyc canonicalizer..   
-
- usually in Cyc the rules "(implies (and Axy Byz) (and Cwxyz Dwx))" are converted to DNF (Correct me if I am wrong.. 
- since i have heard it uses ConjectiveNormalForm as well) ... the DNF generates Clausal forms..  The forms choosen 
-
-
-
-?-  kif_to_boxlog(((parent('$VAR'('G'),'$VAR'('P')) & parent('$VAR'('P'),'$VAR'('C'))) => grandparent('$VAR'('G'),'$VAR'('C'))),O). 
-
-O = [ (-parent(G, P):- -grandparent(G, C), parent(P, C)), 
-      (-parent(P, C):- -grandparent(G, C), parent(G, P)), 
-      (grandparent(G, C):-parent(G, P), parent(P, C))].
-
-
-?- kif_to_boxlog( (grandparent('$VAR'('G'),'$VAR'('C')) => exists('$VAR'('P'), (parent('$VAR'('G'),'$VAR'('P')) & parent('$VAR'('P'),'$VAR'('C'))))),O).
-
-    (-grandparent(G, C):- mudEquals(P, skUnkArg2OfParentArg1OfFn(KB, C, G)), (-parent(G, P) ; -parent(P, C))),   % You have proven G is not the grandparent of C when you have proven tha G has no children or that C has no parents
-    (-mudEquals(P, skUnkArg2OfParentArg1OfFn(KB, C, G)):- grandparent(G, C), (-parent(G, P) ; -parent(P, C))), 
-    (parent(G, P):-grandparent(G, C), mudEquals(P, skUnkArg2OfParentArg1OfFn(KB, C, G))), % if you prove G is grandparent of P somehow, you will have proved that G is parent to  parentOf P
-    (parent(P, C):-grandparent(G, C), mudEquals(P, skUnkArg2OfParentArg1OfFn(KB, C, G))),
-    (mudEquals(P, skUnkArg2OfParentArg1OfFn(KB, C, G)):- grandparent(G, C),  \+ (parent(G, P) , parent(P, C)))]  % We failed to find a true P
-
-
-O = [ 
-      (-grandparent(G, P):- -parent(G, _P) ; -parent(_P, P)),    
-      parent(G, P):- grandparent(G, C), parent(P,C),   % if you prove G is grandparent of P somehow, you will have proved that G is parent to  parentOf P
-      parent(P, C):- grandparent(G, C), parent(G,P))].   % if you prove G is grandparent of P somehow, you will have proved that G is parent to  parentOf P
-
-*/
-
-
-
-/*
-
-genls(_Sub, Super) => tCol(Super).
-genls(Sub, _Super) => tCol(Sub).
-% use backchain instead (isa(I,Sub), disjointWith(Sub, Super)) => neg(isa(I,Super)).
-
-*/
-
-:- must_det(argIsa(genlPreds,2,_Type)).
-
-
-% Hook a predicate up!
-/*
-(tinyInstallToAssertedEL(F,A) => ({current_predicate(make_el_stub/4),functor(H,F,A),make_el_stub(H,_,_,B)},(H<=B))).
-
-((tinyPredTypeActive(PREDTYPE),isa(F,PREDTYPE)) => tinyPredActive(F)).
-
-((tinyPredActive(F),arity(F,A))=>tinyInstallToAssertedEL(F,A)).
-
-=>tinyPredActive(isa).
-=>tinyPredActive(genls).
-=>tinyPredActive(arity).
-=>tinyInstallToAssertedEL(afterAdding,2).
-
-=>tinyPredTypeActive('WFFConstraintSatisfactionPredicate').
-=>tinyPredTypeActive('WFFConstraintPredicate').
-=>tinyPredTypeActive('WFFSupportedPredicate').
-
-=>tinyPredActive(afterRemoving).
-=>tinyPredActive(afterAdding).
-
-% argQuotedIsa(Pred, N, FT) <=  (argIsa(Pred, N, Type),genls(Type,FT),ttFormatType(FT)).
-
-% consistent(CycL) <= cycLToMpred(neg(CycL),Consequent),not(pfcCall(Consequent)). 
-
-=>tinyPredTypeActive('expansion').
-=>tinyPredTypeActive('collectionExpansion').
-(isa(F,tPred),arity(F,A),{once((tinyAssertion0(DB,MT,STR),arg(1,DB,F),atom(F)))})=>tinyInstallToAssertedEL(F,A).
-*/
-
-argQuotedIsa(sentenceTruth,1,'CycLSentence-Assertible').
-:- pfc_add(((collectionExpansion(COL,RULE),isa(PRED,COL),{subst(RULE,':ARG1',PRED,NEWRULE)}) => trueSentence(NEWRULE))).
-:- pfc_add(((expansion(F,RULE),arity(F,A),{make_kw_functor(F,A,CYCL),kw_to_vars((CYCL<=>RULE),NEWRULE)}) => trueSentence(NEWRULE))).
-
-nearestIsa(I,C) <= is_user_supported(isa(I,C)).
-nearestGenls(I,C) <= is_user_supported(genls(I,C)).
-
-
-% meta_argtypes(ArgTypes)/is_declarations(ArgTypes) => {wdmsg(in_loop(meta_argtypes))},meta_argtypes(ArgTypes).
-tRelation(ArgTypes)/is_declarations(ArgTypes) => meta_argtypes(ArgTypes).
-:- pfc_add(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
-(ttFormatType(FT)/is_declarations(FT))=>meta_argtypes(FT).
-
-:- show_call(source_location(_,_)).
-
-:- must(in_file_expansion;in_file_directive).
-
-
-end_of_file.
-
-%(exactlyAssertedSentence(CycL), is_simple_gaf(CycL)) => ({cycAdd(CycL)},CycL).
-%(exactlyAssertedSentence(CycL), needs_indexing(CycL)) => assertedSentence(CycL).
-%(exactlyAssertedSentence(CycL), needs_canoncalization(CycL)) => trueSentence(CycL).
-%:- prolog.
-assertedSentence(CycL) => ({ sent_to_conseq(CycL,Consequent) }, Consequent).
-trueSentence(CycL) => ({ sent_to_conseq(CycL,Consequent) }, Consequent).
-
-
-% :- pfc_add(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
-% :- rtrace,pfc_add((isa(_,ArgsIsa)=>tCol(ArgsIsa))).
-
-
-
-
-% (typeProps(Type,Props)=>(tSet(Type),((isa(I,Type)=>props(I,Props))))).
-
-
-% props(I,Props)/(ground(I:Props),as_list(Props,PList))=>pfc_assert(props(I,isEach(PList))).
-
-))).
-
-.
 

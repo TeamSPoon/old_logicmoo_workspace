@@ -427,7 +427,7 @@ pfc_skipped_module(eggdrop).
 :-retractall(pfc_skipped_module(pfc)).
 % :-show_call(loading_module(X)),retractall(X).
 
-:-lsting(pfc_skipped_module/1).
+%:-lsting(pfc_skipped_module/1).
 
 
 :-multifile(thlocal:into_form_code).

@@ -21,6 +21,7 @@ user:file_search_path(pack, '../pack/').
 :- attach_packs.
 :- initialization(attach_packs).
 user:file_search_path(prologmud, library(prologmud)).
+:- user:use_module(library(persistency)).
 
 :- ((current_prolog_flag(readline, true))->expand_file_name("~/.pl-history", [File|_]),(exists_file(File) -> rl_read_history(File); true),at_halt(rl_write_history(File));true).
 
@@ -64,9 +65,6 @@ push_env_ctx:-!.
 % [Mostly Required] Load the Logicmoo Planner/AI System
 :- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner))))).
 
-:- show_call_entry(user:ensure_loaded(planner(logicmoo_util_bb_env))).
-:- show_call_entry(user:use_module(planner(logicmoo_util_structs))).
-:- show_call_entry(with_no_mpred_expansions(user:ensure_loaded(planner((logicmoo_hyhtn))))).
 
 :- wdmsg("Done with loading logicmoo_planner").
 
@@ -77,9 +75,6 @@ push_env_ctx:-!.
 % [Required] Load the CYC Network Client and Logicmoo CycServer Emulator (currently server is disabled)
 :- with_no_mpred_expansions(user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api))).
 
-
-:- with_assertions((user:term_expansion(_,_):-!,fail),
-    gripe_time(7,time(user:load_files([library(el_holds/'el_assertions.qlf')],[if(not_loaded )])))).
 
 % [Mostly Required] Load the Logicmoo Parser/Generator System
 :- gripe_time(40,user:ensure_loaded(library(parser_all))).
@@ -275,6 +270,14 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 % MUD GAME REPL 
 % ==============================
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
+:- if_startup_script(at_start(login_and_run)).
+
+% So scripted versions don't just exit
+:- if_startup_script(at_start(prolog)).
+
+:- endif.
+
+aly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- if_startup_script(at_start(login_and_run)).
 
 % So scripted versions don't just exit

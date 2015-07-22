@@ -237,6 +237,7 @@ fully_expand_goal(Op,Sent,SentO):- must(with_assertions(thlocal:into_form_code,t
 
 as_is_term(NC):- \+(compound(NC)),!.
 as_is_term('$VAR'(_)):-!.
+as_is_term(NC):-cyclic_term(NC),!,dmsg(cyclic_term(NC)),!.
 
 as_is_term(M:NC):-atom(M),!,as_is_term(NC).
 as_is_term(NC):-functor(NC,Op,2),infix_op(Op,_).
@@ -290,7 +291,7 @@ db_expand_final(_, MArg1User, NewMArg1User):- compound(MArg1User), fail,
    NewMArg1User=..[M,F/A,Arg2|User],!.
 
 
-listToE(EL,E):-as_list(EL,List),E=..[isEach|List].
+listToE(EL,E):-nonvar(EL),must((ground(EL),as_list(EL,List))),E=..[isEach|List].
 
 
 db_expand_chain(_,M:PO,PO) :- atom(M),!.
@@ -413,8 +414,9 @@ db_expand_0(Op,KB:Term,KB:O):- atom(KB),!,with_assertions(thlocal:caller_module(
 
 % db_expand_0(query(HLDS,Must),props(Obj,Props)):- nonvar(Obj),var(Props),!,gather_props_for(query(HLDS,Must),Obj,Props).
 
+demodulize(Op,H,HH):-as_is_term(H),!,HH=H.
 demodulize(Op,H,HHH):-once(strip_module(H,_,HH)),H\==HH,!,demodulize(Op,HH,HHH).
-demodulize(Op,H,HH):-compound(H),H=..[F|HL],!,maplist(demodulize(Op),HL,HHL),HH=..[F|HHL],!.
+demodulize(Op,H,HH):-compound(H),H=..[F|HL],!,must_maplist(demodulize(Op),HL,HHL),HH=..[F|HHL],!.
 demodulize(_ ,HB,HB).
 
 db_expand_1(_,X,X).

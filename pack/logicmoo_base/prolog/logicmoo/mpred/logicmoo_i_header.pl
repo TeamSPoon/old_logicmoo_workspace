@@ -231,8 +231,8 @@
 
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 
-:-foreach(arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,
- prologHybrid,predCanHaveSingletons,prologDynamic,tCol,prologMacroHead,prologListValued,prologSingleValued,functorDeclares),P),
+:-foreach(arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,prologKIF,pfcControlled,tSet,tPredType,
+ prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,tCol,prologMacroHead,prologListValued,prologSingleValued,functorDeclares),P),
    ((dynamic(P/1),multifile(P/1)))).
 
 :- multifile user:listing_mpred_hook/1.

@@ -238,7 +238,7 @@ pp_ihtml('$was_imported_kb_content$'(_,_)):- hide_source_meta,!.
 pp_ihtml(pfcMark(_,_,_,_)):- hide_source_meta,!.
 
 
-pp_ihtml(FET):-fully_expand_term(assert,FET,NEWFET),FET\=@=NEWFET,!,pp_ihtml(NEWFET).
+pp_ihtml(FET):-fully_expand(assert,FET,NEWFET),FET\=@=NEWFET,!,pp_ihtml(NEWFET).
 pp_ihtml(spft(P,U,U)):- nonvar(U),!, pp_ihtml(P:-asserted_by(U)).
 pp_ihtml(spft(P,F,T)):- atom(F),atom(T),!, pp_ihtml(P:-asserted_in(F:T)).
 pp_ihtml(spft(P,F,T)):- atom(T),!,  pp_ihtml(((P):-  T:'t-deduced',F)). 
@@ -250,10 +250,10 @@ pp_ihtml(bt(Trigger,Body)):-      pp_ihtml(proplst(['b-trigger'=Trigger ,  ( bod
 pp_ihtml(proplst([N=V|Val])):- is_list(Val),!, pp_ihtml(N:-([clause=V|Val])).
 pp_ihtml(proplst(Val)):-!, pp_ihtml(:-(proplst(Val))).
 
-pp_ihtml(C):-thlocal:pp_ihtml_hook(C),!.
-pp_ihtml(C):-rok_portray_clause(C),!.
+pp_ihtml(C):- ((\+ \+ thlocal:pp_ihtml_hook(C))),!.
+pp_ihtml(C):- ((\+ \+ rok_portray_clause(C))),!.
 
-p
+
 % ===================================================
 % Pretty Print Formula
 % ===================================================

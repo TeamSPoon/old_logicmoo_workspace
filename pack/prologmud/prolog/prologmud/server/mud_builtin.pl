@@ -982,7 +982,6 @@ normalAgentGoal(Pred,Val)=>  (tAgent(A)=>pfc_default(t(Pred,A,Val))).
 
 genls(tRoom,tRegion).
 
-
 /*
 
  the CycL language extends Prolog's first order logic capabilities with some higher order logics.  
@@ -1028,3 +1027,18 @@ O = [
 ((argQuotedIsa(Pred, _, 'CycLSentence') => 'SententialOperator'(Pred))).
 
 */
+
+:-pfc_add(tAgent(iPlayer1)).
+
+:- must(rescan_pfc).
+
+:-must(mudFacing(iPlayer1,vNorth)).
+:-pfc_add(mudFacing(iPlayer1,vSouth)).
+:-must(\+ mudFacing(iPlayer1,vNorth)).
+:-must(mudFacing(iPlayer1,vSouth)).
+
+:-pfc_rem(mudFacing(iPlayer1,vSouth)).
+:-must(mudFacing(iPlayer1,vNorth)).
+
+
+
