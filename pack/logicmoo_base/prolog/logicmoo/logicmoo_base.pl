@@ -96,7 +96,7 @@ when_debugging(_,_).
 % DBASE_T System
 % ================================================
 :- gripe_time(40,user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
-:- ensure_loaded(mpred/pfc).
+:- ensure_loaded(mpred/logicmoo_i_pfc).
 :- ensure_loaded(mpred/logicmoo_i_loader).
 % % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
 :- ensure_loaded(mpred/logicmoo_i_naming).
