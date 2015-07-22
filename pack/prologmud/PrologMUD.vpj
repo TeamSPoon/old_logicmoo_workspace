@@ -28,13 +28,6 @@
 	<CustomFolders>
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
-		<Folder Name="prolog">
-			<F
-				N="prolog/*.*"
-				Recurse="1"
-				Refilter="0"
-				Excludes=".git/;*.*~;*~/"/>
-		</Folder>
 		<Folder Name="../../">
 			<F N="../../.gitattributes"/>
 			<F N="../../.gitignore"/>
@@ -67,15 +60,23 @@
 						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_term_expansion.pl"/>
 					</Folder>
 					<Folder Name="util">
+						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_all.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_bb_env.pl"/>
 						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_bugger.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_library.pl"/>
 						<F N="../logicmoo_base/prolog/logicmoo/util/rec_lambda.pl"/>
 					</Folder>
 					<F N="../logicmoo_base/prolog/logicmoo/logicmoo_base.pl"/>
 					<F N="../logicmoo_base/prolog/logicmoo/logicmoo_engine.pl"/>
-					<F N="../logicmoo_base/prolog/logicmoo/logicmoo_run_clio.pl"/>
-					<F N="../logicmoo_base/prolog/logicmoo/logicmoo_run_swish.pl"/>
 				</Folder>
 			</Folder>
+		</Folder>
+		<Folder Name="prolog">
+			<F
+				N="prolog/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
 		<Folder Name="runtime">
 			<F

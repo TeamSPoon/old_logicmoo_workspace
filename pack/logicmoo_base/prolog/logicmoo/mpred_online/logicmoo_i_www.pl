@@ -51,7 +51,7 @@
 
 :- include(logicmoo(mpred/logicmoo_i_header)).
 % :- ['../logicmoo_run_swish'].
-:- user:ensure_loaded('../run_clio').
+:- user:ensure_loaded('../logicmoo_run_clio').
 
 :- initialization(doc_collect(true)).
 %:- use_module(library(pldoc/doc_library)).
