@@ -383,14 +383,14 @@ prop_or(Obj,Prop,Value,OrElse):- one_must(ireq(t(Prop,Obj,Value)),Value=OrElse).
 update_single_valued_arg(P,N):- arg(N,P,UPDATE),replace_arg(P,N,OLD,Q),
   (is_relative(UPDATE)->
      must_det_l((Q,update_value(OLD,UPDATE,NEW),\+ is_relative(NEW), replace_arg(Q,N,NEW,R),enqueue(\+Q),enqueue(R)));
-     forall((Q,UPDATE\=OLD),enqueue(\+Q))),!.
+     forall((Q,UPDATE\=OLD),pfc_enqueue(\+Q))),!.
 */
 
 update_single_valued_arg(P,N):- 
- must_det_l((arg(N,P,UPDATE),replace_arg(P,N,OLD,Q),
+ must_det_l((arg(N,P,UPDATE),notrace(replace_arg(P,N,OLD,Q)),
   (is_relative(UPDATE)->
-     must_det_l((Q,update_value(OLD,UPDATE,NEW),\+ is_relative(NEW), replace_arg(Q,N,NEW,R),retract(Q),retract(P),pfc_add(R)));
-     forall((Q,UPDATE\=OLD),retract(Q))))).
+     must_det_l((Q,update_value(OLD,UPDATE,NEW),\+ is_relative(NEW), replace_arg(Q,N,NEW,R),pfc_rem(Q),pfc_rem(P),pfc_add(R)));
+     forall(must(clause(Q,true)),must(UPDATE=@=OLD->true;show_call(pfc_rem2(Q))))))).
 
 single_valued_skel(F,A,N,DEFAULT,P,Q):- functor(P,F,A),
  must_det_l((arg(N,P,MISSING),replace_arg(P,N,DEFAULT,Q))).

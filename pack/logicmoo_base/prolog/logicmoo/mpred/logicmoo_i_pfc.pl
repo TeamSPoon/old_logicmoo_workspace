@@ -2546,6 +2546,7 @@ meta_wrapper(P):- functor(P,F,_),
 
 meta_wrapper_rule((_=>_)).
 meta_wrapper_rule((_<=>_)).
+meta_wrapper_rule((_=>_)).
 meta_wrapper_rule((_:-_)).
 
 
@@ -2553,11 +2554,15 @@ pred_all(P):-pred_u0(P).
 pred_all(P):-pred_t0(P).
 pred_all(P):-pred_r0(P).
 
+pred_u0(P):-pred_u1(P),has_db_clauses(P).
+pred_u0(P):-pred_u2(P).
+pred_u1(P):-pfcControlled(F),arity(F,A),functor(P,F,A).
+pred_u1(P):-prologHybrid(F),arity(F,A),functor(P,F,A).
+pred_u1(P):-prologDynamic(F),arity(F,A),functor(P,F,A).
+pred_u2(P):-support_hilog(F,A),functor(P,F,A),has_db_clauses(P).
+pred_u2(P):-clause(arity(F,A),true),functor(P,F,A),has_db_clauses(P).
 
-pred_u0(P):-pfcControlled(F),arity(F,A),functor(P,F,A).
-pred_u0(P):-prologHybrid(F),arity(F,A),functor(P,F,A).
-pred_u0(P):-prologDynamic(F),arity(F,A),functor(P,F,A).
-pred_u0(P):-arity(F,A),functor(P,F,A).
+has_db_clauses(P):- predicate_property(P,number_of_clauses(NC)),\+ predicate_property(P,number_of_rules(NC)), \+ \+ clause(P,true).
 
 pred_t0(P):-pt(P,_).
 pred_t0(P):-bt(P,_).
@@ -2570,9 +2575,9 @@ pred_r0(P<=>Q):- (P<=>Q).
 
 rescan_pfc:-forall(clause(user:rescan_pfc_hook,Body),show_call_entry(Body)).
 
-pfc_facts_and_universe(P):- (var(P)->((pred_head_all(P), \+ meta_wrapper_rule(P)));true),call(no_repeats(debugOnError(P))).
+pfc_facts_and_universe(P):- (var(P)->((pred_head_all(P) /* , \+ meta_wrapper_rule(P) */ ));true),call(no_repeats(debugOnError(P))).
 
-user:rescan_pfc_hook:- forall(pfc_facts_and_universe(P),show_call(pfc_fwd(P))).
+user:rescan_pfc_hook:- forall(pfc_facts_and_universe(P),with_assertions(pfc_debug_local,pfc_fwd(P))).
 /*
 user:rescan_pfc_hook:- forall(pred_head(pred_u0,P), 
                           forall(no_repeats(P,call(P)),

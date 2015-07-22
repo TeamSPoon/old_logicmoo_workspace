@@ -6,14 +6,16 @@ meta_argtypes(idForTest(tBird,ftTerm)).
 
 singleValuedInArgDefault(idForTest,2,unknown).
 
+idForTest(iTweety,foo1).
+
+:-must(\+ idForTest(iTweety,unknown)).
+
+=> ~idForTest(iTweety,foo1).
+
+
 :-show_call(listing(idForTest)).
 
-% :-rtrace(idForTest(tTweety,foo1)).
-
-% :-show_call(listing(idForTest)).
-
-:-prolog.
-
+end_of_file.
 
 
 
@@ -22,4 +24,3 @@ singleValuedInArgDefault(idForTest,2,unknown).
 
 :-prolog.
 
-end_of_file.

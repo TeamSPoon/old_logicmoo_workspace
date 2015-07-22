@@ -47,7 +47,7 @@ user:my_pfc_add(A):-if_defined(pfc_add(A),assert_if_new(A)).
 
 
 :- if(\+current_predicate(init_locl_planner_interface0/4)).
-%:- ensure_loaded(logicmoo_hyhtn).
+% :- show_call_entry(with_no_mpred_expansions(user:ensure_loaded(planner((logicmoo_hyhtn))))).
 :- endif.
 % :- set_prolog_flag(gc,true).
 
@@ -59,7 +59,7 @@ user:my_pfc_add(A):-if_defined(pfc_add(A),assert_if_new(A)).
 :- expects_dialect(sicstus).
 :- use_module(library(timeout)).
 :- use_module(library(lists)).
-:- use_module(logicmoo_util_structs).
+:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_structs)).
 
 :- decl_struct(domain(domain_name, requires, types, constants, predicates, functions, constraints, actions, dict(extraprops))).
 :- decl_struct(problem(problem_name, domain_name, requires, objects, init, goal, constraints, metric, length, dict(extraprops))).
@@ -675,7 +675,7 @@ solution(SR, V, R, L):-
 % FILENAME:  domain.pl 
 % :- module(pdd_domain, [pdd_domain/2, pdd_domain/3, pddl_not_equal/2, pddl_bind/1]).
 
-:- expects_dialect(sicstus).
+% :- expects_dialect(sicstus).
 
 :- use_module(library(when)).
 % :- use_module(library(atts)).
@@ -901,7 +901,7 @@ solvable([H|T], FV, [M|S]):-
 %% repeating(Goal1, Goal2):-  Goal1 is the same as Goal2.
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-:- expects_dialect(sicstus).
+% :- expects_dialect(sicstus).
 :-use_module(library(ordsets)).
 
 
@@ -945,7 +945,7 @@ repeating(S1, S2):-
 
 % FILENAME:  h_add.pl 
 
-:- expects_dialect(sicstus).
+% :- expects_dialect(sicstus).
 
 % :-use_module(library(sets)).
 
@@ -987,7 +987,7 @@ relax_step(Mt,State, PE):-
 %
 %   Estimated distance to achive Goal.
 %
-:- expects_dialect(sicstus).
+% :- expects_dialect(sicstus).
 
 h_diff(S, E):-
     bb_get(fictiveGoal, G),
@@ -1023,7 +1023,7 @@ init_heuristics(_).
 %%         ...],
 %%       ...)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-:- expects_dialect(sicstus).
+% :- expects_dialect(sicstus).
 
 
 % parseDomain(+File, -Output).
@@ -1384,7 +1384,7 @@ bad_name(N):-arg(_,v('(',')',?,(-)),N).
 %%              )
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- expects_dialect(sicstus).
+% :- expects_dialect(sicstus).
 
 % parseProblem(+File, -Output).
 %
@@ -1518,7 +1518,7 @@ length_spec([])                 --> [not_defined].      % there is no definition
 %%%           ...))
 %%%           L = ['(', define, '(', domain, blocks, ')', '(', :, requirements|...].
 
-:- expects_dialect(sicstus).
+% :- expects_dialect(sicstus).
 
 fix_wordcase(Word,WordC):-upcase_atom(Word,UC),UC=Word,!,downcase_atom(Word,WordC).
 fix_wordcase(Word,Word).
@@ -1592,7 +1592,7 @@ question_mark(63).
 
 
 % FILENAME:  test_validate_input_2009.pl 
-:- expects_dialect(sicstus).
+% :- expects_dialect(sicstus).
 % :-[parseProblem, parseDomain].
 
 %nop(_).
@@ -1681,7 +1681,7 @@ test_dir_files_sas(Dir):-
 % is_goal(State)
 % h(State, Value) 
 % repeating(+State, +AnotherState)
-:- expects_dialect(sicstus).
+% :- expects_dialect(sicstus).
 
 :-use_module(library(ordsets)).
 :-use_module(library(heaps)).

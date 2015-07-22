@@ -45,7 +45,7 @@
 /*
 :- module(logicmoo_i_kif, 
           [ 
-           nnf/4, 
+           nnf/3, 
            pnf/3, pnf/2, cf/4,
           tsn/0,
           op(300,fx,'-'),
@@ -368,7 +368,7 @@ nnf(Neg,KB, Orig,Fin,FreeV,NNF,Paths):- Fin\=nesc(_,_),is_b(nesc(BDT),Fin,F),!,n
 nnf(Neg,KB, Orig,Fin,FreeV,NNF,Paths):- Fin\=poss(_,_),is_b(poss(BDT),Fin,F),!,nnf(Neg,KB, Orig,poss(BDT,F),FreeV,NNF,Paths).
 nnf(Neg,KB, Orig,-(Fin),FreeV,NNF,Paths):- nnf(Neg,KB, Orig,n(Neg,Fin),FreeV,NNF,Paths).
 
-nnf(_  ,_ , Orig,n(Neg,Fml),FreeV,n(Neg,Fml),1):- is_ftVar(Fml),!.
+nnf(_  ,_ , _Orig,n(Neg,Fml),_FreeV,n(Neg,Fml),1):- is_ftVar(Fml),!.
 
 nnf(Neg,KB, Orig,n(NegM,Fin),FreeV,NNF,Paths):- NegM\==Neg,!, nnf(NegM,KB, Orig,n(NegM,Fin),FreeV,NNF,Paths).
 
@@ -410,16 +410,6 @@ nnf(Neg,KB, Orig,exists(X,Fml),FreeV,NNF,Paths):- skolem_setting(nnf),!, wdmsg(n
 nnf(Neg,KB, Orig,exists(X,Fml),FreeV,NNF,Paths):- skolem_setting(label),
    nnf_label(Neg,KB, Orig,exists(X,Fml),FreeV,NNF,Paths),!.
 
-
-nnf(Neg,KB, Orig,exists(X,Fml),FreeV,NNF,Paths):- skolem_setting(label),
-   must_det_l((
-      skolem_fn(KB, Orig, Fml, X, FreeV, Fun, SkVars),
-      SKF =.. [Fun|SkVars],
-      list_to_set([X|FreeV],NewVars),
-      delete(NewVars,X,NewNewVars),
-      copy_term(Fml,Fml2),
-      subst_eq(Fml2,X,SKF,FmlSk),
-      nnf(Neg,KB, Orig,((mudEquals(X,skF(SKF,Fml)),Fml2) => Fml),NewVars,NNF,Paths))).
 
 nnf(Neg,KB, Orig,exists(X,Fml),FreeV,NNF,Paths):- skolem_setting(ignore),
    list_to_set([X|FreeV],NewVars),
@@ -753,7 +743,7 @@ removeQ(KB, Orig,     [ H|B ],Vars, [ HH|BB ] ):- !,removeQ(KB, Orig,H, Vars, HH
 %removeQ(KB, Orig, H, Vars, HH ):- functor(H,F,1),adjust_kif(H,MM),H\=@=MM,!, removeQ(KB, Orig, MM, Vars, HH ).
 
 %removeQ(KB,Orig, H, Vars,HH ):- functor(H,F,1),kb_nlit(KB,F),once(nnf(Neg,H,MM)),H\=@=MM,  removeQ_LC(KB, Orig, MM, Vars, HH ).
-removeQ(KB,Orig, H,  Vars,HH ):- H = n(_, _), once(nnf(Neg,H,MM)),H\=@=MM,  removeQ_LC(KB, Orig, MM, Vars, HH ).
+removeQ(KB,Orig, H,  Vars,HH ):- H = n(Neg, _), once(nnf(Neg,H,MM)),H\=@=MM,  removeQ_LC(KB, Orig, MM, Vars, HH ).
 
 removeQ(KB, Orig, H, Vars, HH ):- convertAndCall(as_dlog,removeQ(KB, Orig,H, Vars, HH )).
 
@@ -833,7 +823,7 @@ expand_cl([cl(H,B)|O],OOut):-
       expand_cl(O,OO),
       append(More,OO,OOut).
 
-make_clause_set(Extras ,[],[]).
+make_clause_set(_Extras ,[],[]).
 make_clause_set(Extras,[CJ|Conj],CLAUSES):-
    make_clauses(Extras,CJ,CLS),
    make_clause_set(Extras,Conj,CLAUS),
@@ -1019,11 +1009,6 @@ fmtl(X):- thglobal:as_prolog(X,XX), fmt(XX).
 write_list([F|R]):- write(F), write('.'), nl, write_list(R).
 write_list([]).
 
-remove_grounds([],[]).
-remove_grounds([N=V|NewCNamedVarsS],NewCNamedVarsSG):-
-   (N==V;ground(V)),remove_grounds(NewCNamedVarsS,NewCNamedVarsSG).
-remove_grounds([NV|NewCNamedVarsS],[NV|NewCNamedVarsSG]):-
-   remove_grounds(NewCNamedVarsS,NewCNamedVarsSG).
 
 numbervars_with_names(Term,CTerm):- 
  must_det_l((
@@ -1253,7 +1238,7 @@ add_poss(IN,OUT):-IN=..[F|INL],logical_functor_pttp(F),!,must_maplist(add_poss,I
 add_poss(IN,poss(IN)).
 
 
-get_lits(PQ,QQ):- PQ=..[F,V,Q],pttp_quantifier(F),get_lits(Q,QQ).
+get_lits(PQ,QQ):- PQ=..[F,_Vs,Q],pttp_quantifier(F),get_lits(Q,QQ).
 get_lits(Wff666,Wff666):-leave_as_is(Wff666),!.
 get_lits(not(IN),not(OUT)):-get_lits(IN,OUT).
 get_lits(IN,OUT):-IN=..[F|INL],logical_functor_pttp(F),!,must_maplist(get_lits,INL,OUTL),OUT=..[&|OUTL].
@@ -1429,13 +1414,13 @@ kif_add_constraints(Why,Isas,Get1Get2):- var(Get1Get2),!,trace_or_throw(var_kif_
 kif_add_constraints(Why,Isas,(Get1,Get2)):- !,kif_add_constraints(Why,Isas,Get1),kb_incr(Why,Why2),kif_add_constraints(Why2,Isas,Get2).
 kif_add_constraints(Why,Isas,[Get1|Get2]):- !,kif_add_constraints(Why,Isas,Get1),kb_incr(Why,Why2),kif_add_constraints(Why2,Isas,Get2).
 kif_add_constraints(_,_,[]).
-kif_add_constraints(Why,_,z_unused(_)):-!.
+kif_add_constraints(_,_,z_unused(_)):-!.
 kif_add_constraints(Why,Isas,((H:- B))):- conjoin(Isas,B,BB), kif_tell_boxes1(Why,(H:- BB)).
 kif_add_constraints(Why,Isas,((H))):- kif_tell_boxes1(Why,(H:- Isas)).
 
 kif_tell_boxes1(_,[]).
 kif_tell_boxes1(Why,[H|T]):- !,must_det_l((kif_tell_boxes1(Why,H),kb_incr(Why,Why2),kif_tell_boxes1(Why2,T))).
-kif_tell_boxes1(Why,z_unused(_)):-!.
+kif_tell_boxes1(_,z_unused(_)):-!.
 kif_tell_boxes1(Why,AssertI):- must_det_l((simplify_bodies(AssertI,AssertO),kif_tell_boxes2(Why,AssertO))).
 
 kif_tell_boxes2(Why,Assert):- 

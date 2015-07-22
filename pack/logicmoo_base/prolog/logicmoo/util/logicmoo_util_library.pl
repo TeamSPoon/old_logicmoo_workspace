@@ -188,6 +188,18 @@ conjoin_op(OP,C1,C2,C):-C =..[OP,C1,C2].
 % =================================================================================
 
 
+read_each_term(S,CMD,Vs):- atom_string(W,S),atom_to_memory_file(W,MF),
+ call_cleanup((open_memory_file(MF,read,Stream,[free_on_close(true)]),     
+      findall(CMD-Vs,(
+       repeat,
+       catch((clpfd:read_term(Stream,CMD,[double_quotes(string),variable_names(Vs)])),_,CMD=end_of_file),
+       (CMD==end_of_file->!;true)),Results)),
+  free_memory_file(MF)),!,
+  ((member(CMD-Vs,Results),CMD\==end_of_file)*->true;catch((clpfd:read_term_from_atom(W,CMD,[double_quotes(string),variable_names(Vs)])),_,fail)).
+
+
+
+
 :- export(each_subterm/2).
 each_subterm(B, A):- (compound(B), arg(_, B, C), each_subterm(C, A));A=B.
 

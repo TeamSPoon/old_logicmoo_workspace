@@ -1033,11 +1033,17 @@ O = [
 :- must(rescan_pfc).
 
 :-must(mudFacing(iPlayer1,vNorth)).
+
 :-pfc_add(mudFacing(iPlayer1,vSouth)).
+
 :-must(\+ mudFacing(iPlayer1,vNorth)).
+
 :-must(mudFacing(iPlayer1,vSouth)).
 
+end_of_file.
+
 :-pfc_rem(mudFacing(iPlayer1,vSouth)).
+
 :-must(mudFacing(iPlayer1,vNorth)).
 
 

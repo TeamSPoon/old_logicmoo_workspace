@@ -9,7 +9,7 @@
 % Revised At:   $Date: 2002/06/06 15:43:15 $
 % ===================================================================
 
-end_of_file.
+% end_of_file.
 
 % ==============================================================================
 
@@ -204,6 +204,10 @@ get_it:-
 :- dmsg("Loading loading language data (This may take 10-15 seconds)").
 :- user:ensure_loaded_no_mpreds(library(logicmoo/plarkc/logicmoo_i_cyc)).
 
+:- with_assertions((user:term_expansion(_,_):-!,fail),
+    gripe_time(7,time(user:load_files([library(el_holds/'el_assertions.qlf')],[if(not_loaded )])))).
+
+
 % 
 % gripe_time(warn(12.246577455>7),        user:time(user:ensure_loaded_no_mpreds(library(el_holds/'el_assertions.pl.qlf')))).
 % OLD :- gripe_time(7,time(user:ensure_loaded_no_mpreds(library(el_holds/'el_assertions.pl.qlf')))).
@@ -289,7 +293,7 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 
 
 % ================================================================================================
-%:- if_file_exists(user:ensure_loaded_no_mpreds(stanford_parser)).
+:- user:ensure_loaded_no_mpreds(stanford_parser).
 % ================================================================================================
 % :- get_pos_tagger(I),jpl_set(I,is_DEBUG,'@'(false)).
 

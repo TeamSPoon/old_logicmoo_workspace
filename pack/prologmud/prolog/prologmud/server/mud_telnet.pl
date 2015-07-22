@@ -9,6 +9,8 @@
 */
 
 :-module(mud_telnet, [                  
+                  telnet_server/2,
+                  setup_streams/2,
                   player_connect_menu/4,
                   look_brief/1,
                   cmdShowRoomGrid/1,
@@ -27,7 +29,6 @@
                   set_player_telnet_options/1,
                   register_player_stream_local/3,
                   login_and_run_nodebug/0]).
-
 
 
 % learnLaterWhenToCallProceedure(What):- ... code ...
@@ -65,7 +66,8 @@ sanify_thread(ID):-
 % ===========================================================
 % TELNET REPL + READER
 % ===========================================================
-start_mud_telnet(Port):- telnet_server(Port, [allow(_ALL),call_pred(login_and_run_nodebug)]),!.
+start_mud_telnet(Port):- 
+  must(telnet_server(Port, [allow(_ALL),call_pred(login_and_run_nodebug)])),!.
 
 :- dynamic(main_thread_error_stream/1).
 
@@ -405,37 +407,10 @@ display_grid_labels :-
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+:- source_location(S,_),forall(source_file(H,S),ignore((  \+ (predicate_property(H,PP),member(PP,[(multifile),built_in])),  
+ functor(H,F,A),module_transparent(F/A),export(F/A)))).
+  
+:- include(prologmud(mud_footer)).
 
 
 
@@ -476,11 +451,13 @@ display_grid_labels :-
 
 telnet_server(_Port, _Options) :- thread_property(X, status(running)),X=telnet_server,!.
 
-telnet_server(Port, Options) :-
-	tcp_socket(ServerSocket),
+telnet_server(Port, Options) :-  
+	tcp_socket(ServerSocket),        
 	tcp_setopt(ServerSocket, reuseaddr),
-	tcp_bind(ServerSocket, Port),
-	tcp_listen(ServerSocket, 5),
+        tcp_setopt(ServerSocket, nodelay),
+        tcp_setopt(ServerSocket, dispatch(false)),        
+	must((tcp_bind(ServerSocket, Port),
+	tcp_listen(ServerSocket, 5))),
 	thread_create(server_loop(ServerSocket, Options), _,
 		      [ alias(telnet_server)
 		      ]).
@@ -548,13 +525,14 @@ setup_streams(In, Out):-
       set_stream(Err, alias(user_error)),
       set_stream(In,  alias(current_input)),
       set_stream(Out, alias(current_output)),
-      set_stream(user_input, encoding(Enc)),
-      set_stream(user_output, encoding(Enc)),
-      set_stream(user_error, encoding(Enc)),
-      set_stream(user_input, newline(detect)),
-      set_stream(user_output, newline(dos)),
-      set_stream(user_error, newline(dos)),!.
+      set_stream_ice(In, user_input, encoding(Enc)),
+      set_stream_ice(Out, user_output, encoding(Enc)),
+      set_stream_ice(Err, user_error, encoding(Enc)),
+      set_stream_ice(In, user_input, newline(detect)),
+      set_stream_ice(Out, user_output, newline(dos)),
+      set_stream_ice(Err, user_error, newline(dos)),!.
   
+set_stream_ice(Stream, Alias, NV):- catch(set_stream(Alias,NV),_,catch(set_stream(Stream,NV),E,nop(dmsg(E)))).
 
 service_client(Slave, In, Out, Host, Peer, Options) :-
    allow(Peer, Options), !,
@@ -583,7 +561,3 @@ call_pred(Call, Options) :-
 	).
 
 
-:- source_location(S,_),forall(source_file(H,S),ignore((  \+ (predicate_property(H,PP),member(PP,[(multifile),built_in])),  
- functor(H,F,A),module_transparent(F/A),export(F/A)))).
-  
-:- include(prologmud(mud_footer)).

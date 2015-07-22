@@ -1168,15 +1168,15 @@ argFormat(P,S,vSetTheFormat)<=> ~singleValuedInArg(P,S).
 
 ((arity(Pred,2),argIsa(Pred,2,ftPercent))=>singleValuedInArg(Pred,2)).
 
-:-ensure_loaded('zenls.pfct').
+:-ensure_loaded('../pfc/zenls.pfct').
 
 dif_in_arg(P,N,Q):- cwc, ground(P),P=..[F|ARGS],arg(N,P,B),Q=..[F|ARGS],nb_setarg(N,Q,A),dif(A,B).
 
 
-((singleValuedInArg(F,N),arity(F,A),{atom(F),integer(N),integer(A),functor(P,F,A)}) => (P => {update_single_valued_arg(P,N)})).
+((singleValuedInArg(F,N),arity(F,A),{atom(F),integer(N),integer(A),functor(P,F,A)}) => (made_update_single_valued_arg(P,N),(P => {update_single_valued_arg(P,N)}))).
 
 
-:-include('singleValued.pfct').
+:-ensure_loaded('../pfc/singleValued.pfct').
 
 
 

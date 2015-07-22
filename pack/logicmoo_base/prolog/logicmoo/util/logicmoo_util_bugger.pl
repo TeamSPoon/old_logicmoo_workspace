@@ -3188,6 +3188,8 @@ add_newvar(N,V):-
 
 remove_grounds(Vs,Vs):-var(Vs),!.
 remove_grounds([],[]):-!.
+remove_grounds([N=V|NewCNamedVarsS],NewCNamedVarsSG):-
+   (N==V;ground(V)),remove_grounds(NewCNamedVarsS,NewCNamedVarsSG).
 remove_grounds([N=V|V0s],[N=NV|Vs]):-
    (var(V) -> NV=V ; NV=_ ),
    remove_grounds(V0s,Vs).
@@ -3783,10 +3785,10 @@ term_listing_inner(Pred,Match):-
 % user:prolog_list_goal(Goal):- writeq(hello(prolog_list_goal(Goal))),nl.
 
 :- dynamic(user:no_buggery/0).
-user:buggery_ok :- \+ compiling, \+ user:no_buggery.
+user:buggery_ok :- \+ compiling, current_predicate(logicmoo_bugger_loaded/0), \+ user:no_buggery.
 
 :- multifile prolog:locate_clauses/2.
-prolog:locate_clauses(A, _) :- buggery_ok ,current_predicate(user:term_mpred_listing/1),call_no_cuts(user:term_mpred_listing(A)),fail.
+prolog:locate_clauses(A, _) :- current_predicate(logicmoo_bugger_loaded/0),buggery_ok ,current_predicate(user:term_mpred_listing/1),call_no_cuts(user:term_mpred_listing(A)),fail.
 
 
 
@@ -4069,12 +4071,11 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
 % show the warnings origins
 :-multifile(user:message_hook/3). 
 :-dynamic(user:message_hook/3).
-:- asserta((user:message_hook(Term, Kind, Lines):-  buggery_ok, (Kind= warning;Kind= error),Term\=syntax_error(_), 
+:- asserta((user:message_hook(Term, Kind, Lines):-  if_defined(buggery_ok), (Kind= warning;Kind= error),Term\=syntax_error(_), 
  current_predicate(logicmoo_bugger_loaded/0), no_buggery,
   dmsg(user:message_hook(Term, Kind, Lines)),hotrace(dumpST(20)),dmsg(user:message_hook(Term, Kind, Lines)),
 
   % (repeat,get_single_char(C),dumptrace(true,C),!),
-
 
    fail)).
 
@@ -4104,10 +4105,12 @@ user:prolog_exception_hook(A,B,C,D):- fail,
 :-moo_hide_all(with_assertions/2).
 :-'$set_predicate_attribute'(with_assertions(_,_), hide_childs, 0).
 
-logicmoo_bugger_loaded.
 %system:goal_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
 %system:term_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
 % user:term_expansion(LC,LCOO):-nonvar(LC),(LC=(H:-B)),lco_goal_expansion(B,BE),B\=@=BE,((H:-BE)=LCOO).
-user:goal_expansion(LC,LCOO):- once(lco_goal_expansion(LC,LCOO)),LC\=@=LCOO.
+user:goal_expansion(LC,LCOO):- current_predicate(logicmoo_bugger_loaded/0),once(lco_goal_expansion(LC,LCOO)),LC\=@=LCOO.
 
 :- '$find_predicate'(tlbugger:A/0,O),forall(member(M:F/A,O),moo_hide(M,F,A)).
+
+logicmoo_bugger_loaded.
+

@@ -203,7 +203,7 @@ testml(ML):-phrase(ML,C,[]),testml(C).
 :- ensure_loaded('../pack/swish/swish').
 
 
-:- catch(on_signal(hup, _, hup),E,warn(E:on_signal(hup, _, hup))).
+:- catch(on_signal(hup, _, hup),E,dmsg(warn(E:on_signal(hup, _, hup)))).
 
 hup(_Signal) :-
         thread_send_message(main, stop).

@@ -71,6 +71,11 @@
 				</Folder>
 			</Folder>
 		</Folder>
+		<Folder Name="../MUD_ircbot">
+			<Folder Name="prolog">
+				<F N="../MUD_ircbot/prolog/eggdrop.pl"/>
+			</Folder>
+		</Folder>
 		<Folder Name="prolog">
 			<F
 				N="prolog/*.*"

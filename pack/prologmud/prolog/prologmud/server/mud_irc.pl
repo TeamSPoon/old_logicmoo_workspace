@@ -62,11 +62,11 @@ irc_action_queue(Agent,TODO,Channel):-  get_session_id(ID), enqueue_session_acti
 
 
 :-dynamic(wotp_server_port/1).
-wotp_server_port(16996).
+wotp_server_port(61996).
 
-wotp_lambda(A,    Call,A):-Call.
-wotp_lambda(A,B,  Call,A,B):-Call.
-wotp_lambda(A,B,C,Call,A,B,C):-Call.
+wotp_lambda(A,    Call,A0):- copy_term(Call+A0,CCall+A),CCall.
+wotp_lambda(A,B,  Call,A0,B0):- copy_term(Call+A0+B0,CCall+A+B),CCall.
+wotp_lambda(A,B,C,Call,A0,B0,C0):- copy_term(Call+A0+B0+C0,CCall+A+B+C),CCall.
 
 with_output_to_pred(HookPred, Call):- !, call(Call).
 with_output_to_pred(HookPred, Call):- fail,with_output_to(string(Atom),Call),atomic_list_concat(List,'\n',Atom), 
@@ -141,7 +141,7 @@ wotp_io_setup(In, Out):-
       set_stream(In, close_on_abort(false)),
       set_stream(Out, close_on_abort(false)).
 
-wotp_create_server:- (wotp_server_port(Port)->wotp_create_server(Port);wotp_create_server(16996)).
+wotp_create_server:- (wotp_server_port(Port)->wotp_create_server(Port);wotp_create_server(61996)).
 
 :- source_location(S,_),forall(source_file(H,S),ignore((  \+ (predicate_property(H,PP),member(PP,[(multifile),built_in])),  
  functor(H,F,A),module_transparent(F/A),export(F/A)))).
@@ -151,6 +151,6 @@ wotp_create_server:- (wotp_server_port(Port)->wotp_create_server(Port);wotp_crea
 % Example  
 % :- with_output_to_pred(say(dmiles), format('Hello Worldly~n',[])).
 
-:- nodebug(_).
+
 
 

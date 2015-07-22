@@ -36,7 +36,6 @@ user:file_search_path(prologmud, library(prologmud)).
 % :- qcompile_libraries.
 
 
-
 % [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/)
 :- if_file_exists(user:ensure_loaded(library(eggdrop))).
 :- initialization((current_predicate(egg_go/0)->egg_go;true),now).
@@ -190,7 +189,7 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 :- file_begin(pl).
 
 % [Optionaly] Start the telent server
-:-at_start(toploop_telnet:start_mud_telnet(4000)).
+:-at_start(toploop_telnet:start_mud_telnet(4400)).
 
 % ==============================
 % MUD GAME CODE LOADS
