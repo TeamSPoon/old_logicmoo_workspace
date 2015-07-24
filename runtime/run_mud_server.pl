@@ -40,6 +40,7 @@ user:file_search_path(prologmud, library(prologmud)).
 :- if_file_exists(user:ensure_loaded(library(eggdrop))).
 :- initialization((current_predicate(egg_go/0)->egg_go;true),now).
 
+
 % [Mostly Required] Load the UPV Curry System
 %:- time(user:ensure_loaded(library(upv_curry/main))).
 
@@ -189,7 +190,7 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 :- file_begin(pl).
 
 % [Optionaly] Start the telent server
-:-at_start(toploop_telnet:start_mud_telnet(4400)).
+:-at_start(toploop_telnet:start_mud_telnet(4000)).
 
 % ==============================
 % MUD GAME CODE LOADS

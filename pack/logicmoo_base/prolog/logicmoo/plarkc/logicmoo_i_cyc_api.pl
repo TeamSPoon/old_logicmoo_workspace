@@ -8,8 +8,8 @@
 % Revised At:   $Date: 2002/07/11 21:57:28 $
 % ===================================================================
 
-:-module(cyc,[]).
-
+:-module(cyc,[lisp_read_codes/2,lisp_read/1,lisp_read/2,getSurface/2,getSurface/3,getSurfaceFromChars/3,getSurfaceFromStream/3]).
+:-set_prolog_flag(double_quotes,codes).
 /*
 :-export((
 	 cycInit/0,
@@ -753,7 +753,7 @@ formatCyc(OutStream,Format,Args):-
       debugFmt(Format,Args),
       flush_output_safe(OutStream),!.
 
-readSubL(InStream0,[G,E,T,Space|Response]):- to_input(InStream0,InStream),
+readSubL(InStream0,[G,E,T,Space|Response]):- l_open_input(InStream0,InStream),
       get_code(InStream,G),
       get_code(InStream,E),
       get_code(InStream,T),
@@ -767,9 +767,10 @@ readSubL(InStream0,[G,E,T,Space|Response]):- to_input(InStream0,InStream),
 % ===================================================================
 
 getSurface(Surf,Vars):-getSurface(user_input,Surf,Vars).
-getSurface(InStream,Surf,Vars):-
+getSurface(InStream0,Surf,Vars):-
+   must_det_l((l_open_input(InStream0,InStream),
     readCycLTermChars(InStream,Response),
-    getSurfaceFromChars(Response,Surf,Vars).
+    getSurfaceFromChars(Response,Surf,Vars))).
 
 getSurface(Response):- readCycLTermChars(user_input,Response).
 
@@ -830,24 +831,26 @@ charGoodForInput1(_Stream,N,C):-code_type(C,space),!.
 
 % "fully" means at least one whitespace character was there
 lisp_read_fully(String,SexpO):-lisp_read_fully(user_input,String,SexpO).
-lisp_read_fully(InStream0,String,SexpO):- to_input(InStream0,InStream), phrase_codes(read_sexp_fully0(Sexp), String, []),!,
+lisp_read_fully(InStream0,String,SexpO):- l_open_input(InStream0,InStream), phrase_codes(read_sexp_fully0(Sexp), String, []),!,
    set_stream_buffer(InStream,[]),!,processEachReadResult(InStream,Sexp,SexpO).
-lisp_read_fully(InStream0,String,SexpO):- to_input(InStream0,InStream),
+lisp_read_fully(InStream0,String,SexpO):- l_open_input(InStream0,InStream),
     phrase_codes(read_sexp_fully0(Sexp), String, More),set_stream_buffer(InStream,More),
     reportLeftInBuffer(InStream),!,
     processEachReadResult(InStream,Sexp,SexpO). 
 
-processEachReadResult(InStream0,T,SexpO):-to_input(InStream0,InStream),InStream0\=InStream,!,processEachReadResult(InStream,T,SexpO).
+processEachReadResult(InStream0,T,SexpO):-l_open_input(InStream0,InStream),InStream0\=InStream,!,processEachReadResult(InStream,T,SexpO).
 %processEachReadResult(InStream,whitespace(String),SexpO):-!,whitespace(String)=SexpO.
 processEachReadResult(InStream,iterateEach(List),SexpO):-!,member(E,List),processEachReadResult(InStream,E,SexpO).
 processEachReadResult(InStream,read_from_string(String),SexpO):-!,lisp_read_fully(InStream,String,SexpO).
 %processEachReadResult(InStream,reader_error(Error,String),_SexpO):-!,throw(reader_error(Error,String)).
 processEachReadResult(InStream,SexpO,SexpO).
 
-lisp_read_codes(String,Sexp):-phrase_codes(sexp0(Sexp), String),!.
+lisp_read_codes(String0,Sexp):-any_to_string(String0,String),string_codes(String,Codes), phrase_codes(sexp0(Sexp), Codes),!.
 
-lisp_read(Sexp) :- current_input(I),lisp_read(I,_,Sexp),!.
-lisp_read(InStream0,String,Sexp) :- to_input(InStream0,InStream),
+
+lisp_read(Sexp) :- current_input(I),lisp_read(I,Sexp),!.
+lisp_read(InStream0,Sexp):-lisp_read(InStream0,_,Sexp).
+lisp_read(InStream0,String,Sexp) :- l_open_input(InStream0,InStream),
         repeat,
         read_line_to_codes_one_at_a_time_util(InStream,String,IsDone),        
         lisp_read_fully(InStream,String,Sexp),
@@ -1027,9 +1030,6 @@ digits0([]) --> [].
 digit0(D) --> [D], { code_type(D, digit) }.
 
 
-to_input(InStream,InStream):-is_stream(InStream),!.
-to_input(String,InStream):-string(String),!,open_string(String,InStream).
-to_input(Text,InStream):-(atomic(Text);is_list(Text)),text_to_string(Text,String),!,open_string(String,InStream).
 
 % ===================================================================
 % Lowlevel readCycLTermChars
@@ -1037,7 +1037,7 @@ to_input(Text,InStream):-(atomic(Text);is_list(Text)),text_to_string(Text,String
 readCycLTermChars(InStream,Response):- 
   readCycLTermChars(InStream,Response,_ResponseType).
 
-readCycLTermChars(InStream0,Response,ResponseType):- to_input(InStream0,InStream),
+readCycLTermChars(InStream0,Response,ResponseType):- l_open_input(InStream0,InStream),
    debugOnFailure(readCycLTermChars(InStream,[],[sexp],Response,ResponseType)),!.
    %= (validLisp(Response)-> (!) ;(readMoreChars(Chars))).
 
@@ -1046,7 +1046,7 @@ subType(_Type,_ExpectedType).
 :-set_prolog_flag(double_quotes,codes).
 
 
-getTypeHintFromChar(InStream0,T,SexpO):-to_input(InStream0,InStream),InStream0\=InStream,!,getTypeHintFromChar(InStream,T,SexpO).
+getTypeHintFromChar(InStream0,T,SexpO):-l_open_input(InStream0,InStream),InStream0\=InStream,!,getTypeHintFromChar(InStream,T,SexpO).
 
 
 getTypeHintFromChar(InStream,"\"",double_quotes).
@@ -1071,7 +1071,7 @@ getTypeHintFromChar_hash(InStream,"#\\d",lisp_char_dec).
 getTypeHintFromChar_hash(InStream,"#\\",lisp_char).
 
 
-readCycLTermChars(InStream0,T,SexpO,A,B):-to_input(InStream0,InStream),InStream0\=InStream,!,readCycLTermChars(InStream,T,SexpO,A,B).
+readCycLTermChars(InStream0,T,SexpO,A,B):-l_open_input(InStream0,InStream),InStream0\=InStream,!,readCycLTermChars(InStream,T,SexpO,A,B).
 
 % "whitepace reader is first"
 readCycLTermChars(InStream,Sofar,[whitespace|OuterType],Response,ResponseType):-
@@ -1232,7 +1232,7 @@ readUntilUnless(Chars,Unless,InStream,Response):-
       readUntilUnless([C],Chars,Unless,InStream,Response).
 
 
-readUntilUnless(A,B,C,InStream0,E):-to_input(InStream0,InStream),InStream0\=InStream,!,readUntilUnless(A,B,C,InStream,E).
+readUntilUnless(A,B,C,InStream0,E):-l_open_input(InStream0,InStream),InStream0\=InStream,!,readUntilUnless(A,B,C,InStream,E).
 
 % Hit termination
 readUntilUnless(Prevs,Chars,Unless,InStream,Response):-at_end_of_stream(InStream),!,append(Response,Chars,Prevs),!.
@@ -1331,6 +1331,8 @@ stringToList(X,Y):-atom(X),atom_codes(X,Codes),!,stringToList(Codes,Y),!.
 stringToList(X,Y):-string(X),string_to_atom(X,M),!,stringToList(M,Y).
 stringToList(X,Y):-string(X),!,string_to_list(X,Y).
 stringToList(X,Y):-is_string(X),!,string_to_list(X,Y).
+stringToList([string(X)],Y):-!,stringToList(X,Y).
+stringToList(string(X),Y):-!,stringToList(X,Y).
 stringToList([X|XX],Y):-concat_atom([X|XX],' ',XXX),!,string_to_list(XXX,Y).
 %prologPredToCyc(Predicate):-arity(PredicateHead)
 
@@ -1962,9 +1964,10 @@ genParaphrase(CycL,English):-
 %  Query into BaseKB for (isa ?X ?Y) 
 %
 % ============================================
-:-dynamic_transparent(isRegisterCycPred_lc/3).
-
+:-if(\+ current_predicate(isRegisterCycPred_lc/3)).
+:-dynamic(isRegisterCycPred_lc/3).
 :-module_transparent(isRegisterCycPred_lc/3).
+:-endif.
 
 % ?- registerCycPred('BaseKB':isa/2). 
 registerCycPred(Mt:Pred/Arity):-!,
@@ -2140,7 +2143,7 @@ really_at_end_of_stream(Stream):- once(wait_for_input([Stream], Inputs,0.3)),Inp
 
 %readCycL(Stream,[])  :-at_end_of_stream(Stream).     
 readCycL(Stream0,CHARS)  :-
-  to_input(Stream0,Stream),
+  l_open_input(Stream0,Stream),
 		flag('bracket_depth',_,0),
 		retractall(reading_in_comment),
 		retractall(reading_in_string),!,
@@ -2222,12 +2225,14 @@ Vars = [=(CITIZEN,_h2866)|_h3347]
            (NLPattern-Template NPTemplate :THING) 
            (OptionalOne \"is\") 
            (OptionalOne TemplateQuestionMarkMarker)) 
-       (definitionalDisplaySentence :THING ?SENTENCE))",Clause,Vars).
+       (definitionalDisplaySentence :THING ?SENTENCE))",
+ Clause,Vars).
 
 | ?- getSurfaceFromChars("(#$STemplate #$bioForProposal-short (#$NLPatternList (#$NLPattern-Template #$NPTemplate :ARG1) (#$NLPattern-Exact \"short bio for use in proposals\") (#$NLPattern-Word #$Be-TheWord #$Verb) (#$NLPattern-Exact \"\\\"\") (#$NLPattern-Template #$NPTemplate :ARG2)) (#$bioForProposal-short :ARG1 :ARG2))",Clause,Vars).
 
 // ==================================================================== */
-getSurfaceFromChars(V,Term,Vars):-var(V),!,throw(error(getSurfaceFromChars/3,'Arguments are not sufficiently instantiated')).
+
+getSurfaceFromChars([V|_],Term,Vars):-var(V),!,throw(error(getSurfaceFromChars/3,'Arguments are not sufficiently instantiated')).
 getSurfaceFromChars([],[],VARS).
 getSurfaceFromChars(C,TERM,VARS):-atom(C),atom_codes(C,Chars),!,getSurfaceFromChars(Chars,TERM,VARS).
 getSurfaceFromChars(C,TERM,VARS):-string(C),stringToList(C,List),not(C=List),!,getSurfaceFromChars(List,TERM,VARS),!.
@@ -2258,6 +2263,7 @@ getSurfaceFromToks(WFFClean,WFFOut,VARSOut):-
 %getSurfaceFromToks(['('|WFFClean],WFFOut,VARSOut):-getSurfaceFromToks(WFFClean,WFFOut,VARSOut),!.
 getSurfaceFromToks(WFFClean,OUT,VARSOut):- OUT=[unk_comment,WFFClean], debugFmt('getSurfaceFromToks: ~q ~n',[OUT]),sleep(2),!.
 
+getSurfaceFromStream(Stream0,Term,Vars):- any_to_lazy_list(Stream0,Chars),getSurfaceFromChars(Chars,Term,Term).
 
 %===================================================================
 % Removes Leading and Trailing whitespaces and non ANSI charsets.

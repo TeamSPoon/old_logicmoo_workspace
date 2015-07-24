@@ -1294,7 +1294,7 @@ fix_input_vars(AIn,A):- copy_term(AIn,A),numbervars(A,672,_).
 tsn:- with_all_dmsg(forall(clause(kif,C),must(C))).
 
 % kif:- make.
-tkif:- kif_test_string(TODO),kif(string(TODO),current_output).
+tkif:- kif_test_string(TODO),kif_io(string(TODO),current_output).
 
 :- multifile(user:sanity_test/0).
 user:regression_test:- tsn.
@@ -1306,35 +1306,22 @@ user:regression_test:- tsn.
 :- asserta_if_new(kif_reader_mode(lisp)).
 
 :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api)).
-
-kif_read(In,Wff,Vs):- 
-  (kif_reader_mode(lisp) -> 
-    catch((lisp_read(In,_,WffIn),with_output_to(atom(A),write_term(WffIn,
-      [module(logicmoo_i_kif),numbervars(true),quoted(true)])),
-     read_term_from_atom(A,Wff,[module(logicmoo_i_kif),double_quotes(string),variable_names(Vs)])),E,(fmt(E),fail));
-
-      catch(read_term(In,Wff,[module(logicmoo_i_kif),double_quotes(string),variable_names(Vs)]),E,(fmt(E),fail))).
+kif_read(InS,Wff,Vs):- must(l_open_input(InS,In)),
+  must(((kif_reader_mode(lisp) ,without_must( catch(input_to_forms(In,Wff,Vs),E,(dmsg(E:kif_read_input_to_forms(In,Wff,Vs)),fail)))) *-> true ;
+      catch(read_term(In,Wff,[module(user),double_quotes(string),variable_names(Vs)]),E,(dmsg(E:kif_read_term_to_forms(In,Wff,Vs)),fail)))).
 
 %= ===== to test program =====-
 :- ensure_loaded(library(logicmoo/plarkc/dbase_i_sexpr_reader)).
 
 :- export(kif/0).
-kif:- current_input(In),current_output(Out),!,kif(In,Out).
+kif:- current_input(In),current_output(Out),!,kif_io(In,Out).
 
 %open_input(InS,InS):- is_stream(InS),!.
 %open_input(string(InS),In):- text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
 
-:- if( \+ current_predicate(l_open_input/2)).
-l_open_input(InS,InS):-is_stream(InS),!.
-l_open_input((InS),In):-string(InS),!,l_open_input(string(InS),In).
-l_open_input(string(InS),In):-text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
-l_open_input(Filename,In) :- catch(see(Filename),_,fail),current_input(In),!.
-l_open_input(InS,In):-text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
-:- endif.
 
-
-:- export(kif/2).
-kif(InS,Out):- 
+:- export(kif_io/2).
+kif_io(InS,Out):- 
   l_open_input(InS,In),
    repeat,             
       debugOnError((once((kif_action_mode(Mode),write(Out,Mode),write(Out,'> '))),
@@ -1638,7 +1625,7 @@ nnf_label(Neg,KB, Orig,exists(X,Fml),FreeV,NNF,Paths):-
 :- dmsg_show(_).
 :- dmsg('i see this').
 :- kif_tell(exists(C, course(C) & ~exists(MT3, midterm(C,MT3)))).
-:- kif_test_string(TODO),kif(string(TODO),current_output).
+:- kif_test_string(TODO),kif_io(string(TODO),current_output).
 :- set_no_debug.
 :- notrace.
 :- nodebug.

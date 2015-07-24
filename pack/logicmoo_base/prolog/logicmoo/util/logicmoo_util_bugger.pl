@@ -204,6 +204,10 @@ hotrace:-notrace.
 % Unlike notrace/1, it allows traceing when excpetions are raised during Goal.
 
 
+thread_leash(+Some):-!, (thread_self(main)->leash(+Some);thread_leash(-Some)).
+thread_leash(-Some):-!, (thread_self(main)->leash(-Some);thread_leash(-Some)).
+thread_leash(Some):-!, (thread_self(main)->leash(+Some);thread_leash(-Some)).
+
 % ((tracing, notrace) -> CC=trace;CC=true), '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,(('$leash'(_, Old),'$visible'(_, OldV),CC),CC)).
 get_hotrace(X,Y):- tracing,!,'$visible'(OldV, OldV),notrace,visible(-all),visible(+exception),Y = call_cleanup(X,('$visible'(_, OldV),trace)).
 get_hotrace(X,Y):- !,'$visible'(OldV, OldV),notrace,visible(-all),visible(+exception),Y = call_cleanup(X,('$visible'(_, OldV))).
@@ -213,7 +217,7 @@ hotrace(X):- notrace(get_hotrace(X,Y)),Y.
 :-if_may_hide('$set_predicate_attribute'(hotrace(_), hide_childs, 1)).
 :-if_may_hide('$set_predicate_attribute'(hotrace(_), trace, 0)).
 
-%get_hotrace(X):-  visible(+exception),leash(+exception),restore_trace((notrace,X)).
+%get_hotrace(X):-  visible(+exception),thread_leash(+exception),restore_trace((notrace,X)).
 % hotrace(C):-current_predicate(logicmoo_bugger_loaded/0)->catchvv((C),E,((writeq(E=C),rtrace(C),trace_or_throw(E=C))));C.
 
 
@@ -399,9 +403,9 @@ restore_trace(Goal):-  ((tracing, notrace) -> CC=trace;CC=true),
 
 nortrace:-stop_rtrace,notrace.
 rnotrace:-stop_rtrace,trace.
-rtrace:-notrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception),assert(tlbugger:rtracing))).
+rtrace:-notrace((visible(+all),visible(+unify),visible(+exception),thread_leash(-all),thread_leash(+exception),assert(tlbugger:rtracing))).
 start_rtrace:-rtrace,trace.
-stop_rtrace:-notrace((visible(+all),visible(+unify),visible(+exception),leash(+all),leash(+exception),notrace,ignore(retract(tlbugger:rtracing)))).
+stop_rtrace:-notrace((visible(+all),visible(+unify),visible(+exception),thread_leash(+all),thread_leash(+exception),notrace,ignore(retract(tlbugger:rtracing)))).
 :-moo_hide(nortrace/0).
 :-moo_hide(rnotrace/0).
 :-moo_hide(rtrace/0).
@@ -431,7 +435,7 @@ rtrace(Goal):- (tracing -> (notrace(get_rtrace(Goal,C)),C) ; (trace,cnotrace(get
 ftrace(Goal):- restore_trace((
    visible(-all),visible(+unify),
    visible(+fail),visible(+exception),
-   leash(-all),leash(+exception),trace,Goal)).
+   thread_leash(-all),thread_leash(+exception),trace,Goal)).
 
 
 
@@ -568,7 +572,7 @@ y_must(Y,C):- catchvv(C,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,C)),fail)) *-> tru
 must(C):-cnotrace(get_must(C,CALL)),CALL.
 
 get_must(C,C):- fail,is_release,!.
-get_must(C,DO):-  tlbugger:skipMust,!,DO = catchvv(C,E,(debug,wdmsg(E:C),fail)).
+get_must(C,DO):-  tlbugger:skipMust,!,DO = C.
 get_must(Call,DO):- skipWrapper,!, DO = (Call *-> true ; ((dmsg(failed(must(Call))),trace,Call))).
 get_must(Call,DO):- tlbugger:show_must_go_on,!,
  DO = ((catchvv(Call,E,
@@ -1499,7 +1503,7 @@ meta_interp_signal(_:meta_callable(_,_)).
 
 :- export(meta_interp/2).
 meta_interp(CE,A):- hotrace((var(A);not(stack_check))),!, throw(meta_interp(CE,A)).
-meta_interp(_CE,A):- leash(+all),meta_interp_signal(A),!,fail.
+meta_interp(_CE,A):- thread_leash(+all),meta_interp_signal(A),!,fail.
 meta_interp(CE,M:X):- atom(M),!,meta_interp(CE,X).
 meta_interp(_,true):-!.
 meta_interp(CE,A):- call(CE, meta_callable(A,NewA)),!,NewA.
@@ -1847,8 +1851,8 @@ set_no_debug:-
    set_prolog_flag(debug, false),   
    set_prolog_flag(query_debug_settings, debug(false, false)),
    set_gui_debug(fail),
-   leash(-all),
-   leash(+exception),
+   thread_leash(-all),
+   thread_leash(+exception),
    visible(-cut_call),!,
    notrace, nodebug)),!.
 
@@ -1876,8 +1880,8 @@ set_yes_debug:-
    set_prolog_flag(debug, true),   
    set_prolog_flag(query_debug_settings, debug(true, true)),
    % set_gui_debug(true),
-   leash(+all),
-   leash(+exception),
+   thread_leash(+all),
+   thread_leash(+exception),
    visible(+cut_call),
    notrace, debug]),!.
 
@@ -2056,7 +2060,7 @@ gmust(True,Call):-catchvv((Call,(True->true;throw(retry(gmust(True,Call))))),ret
 throwOnFailure(Call):-one_must(Call,throw(throwOnFailure(Call))).
 ignoreOnError(CX):-ignore(catchvv(CX,_,true)).
 
-% pause_trace(_):- hotrace(((debug,visible(+all),leash(+exception),leash(+call)))),trace.
+% pause_trace(_):- hotrace(((debug,visible(+all),thread_leash(+exception),thread_leash(+call)))),trace.
 
 %debugCall(C):-hotrace,dmsg(debugCall(C)),dumpST, pause_trace(errored(C)),ggtrace,C.
 %debugCallF(C):-hotrace,dmsg(debugCallF(C)),dumpST, pause_trace(failed(C)),gftrace,C.
@@ -2066,7 +2070,7 @@ debugCallWhy(Why, C):- hotrace((notrace,wdmsg(Why))),dtrace(C).
 :- export(rtraceOnError/1).
 rtraceOnError(C):-
   catchvv(
-  with_skip_bugger( C ),E,(dmsg(rtraceOnError(E=C)),dtrace,leash(+call),trace,leash(+exception),leash(+all),rtrace(with_skip_bugger( C )),dmsg(E=C),leash(+call),dtrace)).
+  with_skip_bugger( C ),E,(dmsg(rtraceOnError(E=C)),dtrace,thread_leash(+call),trace,thread_leash(+exception),thread_leash(+all),rtrace(with_skip_bugger( C )),dmsg(E=C),thread_leash(+call),dtrace)).
 
 
 with_skip_bugger(C):-setup_call_cleanup(asserta( tlbugger:skip_bugger),C,retract( tlbugger:skip_bugger)).
@@ -3360,7 +3364,7 @@ listify(OUT,[OUT]).
 traceIf(_Call):-!.
 traceIf(Call):-ignore((Call,trace)).
 
-traceafter_call(X):- call_cleanup(restore_trace((leash(-all),visible(-all),X)),(leash(+call), trace)).
+traceafter_call(X):- call_cleanup(restore_trace((thread_leash(-all),visible(-all),X)),(thread_leash(+call), trace)).
 
 %getWordTokens(WORDS,TOKENS):-concat_atom(TOKENS,' ',WORDS).
 %is_string(S):- string(S).
@@ -3612,18 +3616,18 @@ default_dumptrace(trace).
 
 ggtrace:- default_dumptrace(DDT), ggtrace(DDT).
 ggtrace(Trace):- 
-   leash(-call),((visible(+all),visible(-unify),visible(+exception),
-   leash(-all),leash(+exception),
-   leash(+call))),Trace,leash(-call).
+   thread_leash(-call),((visible(+all),visible(-unify),visible(+exception),
+   thread_leash(-all),thread_leash(+exception),
+   thread_leash(+call))),Trace,thread_leash(-call).
 
 gftrace:- default_dumptrace(DDT), gftrace(DDT).
 gftrace(Trace):- 
-   leash(-call),((visible(-all), visible(+fail),visible(+call),visible(+exception),
-   leash(-all),leash(+exception),
-   leash(+call))),Trace,leash(-call).
+   thread_leash(-call),((visible(-all), visible(+fail),visible(+call),visible(+exception),
+   thread_leash(-all),thread_leash(+exception),
+   thread_leash(+call))),Trace,thread_leash(-call).
 
 grtrace:- default_dumptrace(DDT), grtrace(DDT).
-grtrace(Trace):- hotrace(( visible(+all),leash(+all))), Trace.
+grtrace(Trace):- hotrace(( visible(+all),thread_leash(+all))), Trace.
 
 :- thread_local(is_pushed_def/3).
 
@@ -3657,11 +3661,11 @@ dtrace(G):-current_predicate(logicmoo_bugger_loaded/0),!,dumptrace(G).
 dtrace(G):-G.
 
 :-meta_predicate(dumptrace(0)).
-%dumptrace(G):- tracing,!,leash(+call),wdmsg(tracing_dumptrace(G)),with_all_dmsg(G).
+%dumptrace(G):- tracing,!,thread_leash(+call),wdmsg(tracing_dumptrace(G)),with_all_dmsg(G).
 
 dumptrace(G):- ignore((debug,
  % catchvv(attach_console,_,true),
- leash(+exception),visible(+exception))),fresh_line,
+ thread_leash(+exception),visible(+exception))),fresh_line,
  repeat, hotrace((fmt(in_dumptrace(G)),
   show_call_failure(get_single_char(C)))),
   with_all_dmsg(dumptrace(G,C)).
@@ -3680,12 +3684,12 @@ dumptrace(G,0'l):-visible(+all),show_and_do(rtrace(G)).
 dumptrace(G,0'c):-!, show_and_do((G))*->true;true.
 dumptrace(G,0'r):-show_and_do(rtrace(G)),!,fail.
 dumptrace(G,0'f):-show_and_do(ftrace(G)),!,fail.
-dumptrace(G,0't):-visible(+all),leash(+all),trace,!,G.
+dumptrace(G,0't):-visible(+all),thread_leash(+all),trace,!,G.
 dumptrace(G,10):-!,dumptrace_ret(G).
 dumptrace(G,13):-!,dumptrace_ret(G).
 dumptrace(_,C):-fmt(unused_keypress(C)),!,fail.
 % )))))))))))))) %
-dumptrace_ret(G):-leash(+all),visible(+all),visible(+unify),trace,G.
+dumptrace_ret(G):-thread_leash(+all),visible(+all),visible(+unify),trace,G.
 
 
 module_predicate(ModuleName,F,A):-current_predicate(ModuleName:F/A),functor_safe(P,F,A),
@@ -4085,8 +4089,8 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
 user:prolog_exception_hook(A,B,C,D):- fail,
    once(copy_term(A,AA)),catchvv(( once(bugger_prolog_exception_hook(AA,B,C,D))),_,fail),fail.
 
-:-moo_hide('$syspreds':leash/1).
-%:-moo_hide(leash/1).
+:-moo_hide('$syspreds':thread_leash/1).
+%:-moo_hide(thread_leash/1).
 :-moo_hide('$syspreds':visible/1).
 %:-moo_hide(visible/1).
 :-moo_hide(notrace/0).

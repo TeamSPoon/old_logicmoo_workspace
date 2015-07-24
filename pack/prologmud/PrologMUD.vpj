@@ -57,7 +57,11 @@
 						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_header.pl"/>
 						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_loader.pl"/>
 						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_pfc.pl"/>
+						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_store.pl"/>
 						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_term_expansion.pl"/>
+					</Folder>
+					<Folder Name="mpred_online">
+						<F N="../logicmoo_base/prolog/logicmoo/mpred_online/logicmoo_i_www.pl"/>
 					</Folder>
 					<Folder Name="util">
 						<F N="../logicmoo_base/prolog/logicmoo/util/logicmoo_util_all.pl"/>

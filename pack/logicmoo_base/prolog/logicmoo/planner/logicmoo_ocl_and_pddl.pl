@@ -489,24 +489,23 @@ replc_structure_vars(A,AA):- copy_term(A,AC),
 
 varnames_for_assert(A,B,After):-
      b_getval('$variable_names',Before),
-     cp(A,Before,B,After).
+     must(cp(A,Before,B,After)).
 
 copy_term_for_assert(A,B):-
-    cp(A,[],B,After),
+    must(cp(A,[],B,After)),
     b_setval('$variable_names',After).
 
 cp( VAR,Vars,VAR,Vars):- var(VAR),!.
-cp(  VAR,Vars,NV,NVars):- svar(VAR,_),!,must((svar_fixvarname(VAR,Name),atom(Name))),!, must(register_var(Name=NV,Vars,NVars)).
-cp([H|T],Vars,[NH|NT],NVars):-!,cp_args([H|T],Vars,[NH|NT],NVars).
+cp( VAR,Vars,NV,NVars):- svar(VAR,_),!,must((svar_fixvarname(VAR,Name),atom(Name))),!, must(register_var(Name=NV,Vars,NVars)).
+cp([],Vars,[],Vars).
 cp( Term,Vars,Term,Vars):- \+compound(Term),!.
+cp([H|T],Vars,[NH|NT],NVars):- !, cp(H,Vars,NH,SVars), cp(T,SVars,NT,NVars).
 cp( Term,Vars,NTerm,NVars):-    
     Term=..[F|Args],    % decompose term
-    cp_args(Args,Vars,NArgs,NVars),
-    NTerm=..[F|NArgs].  % construct copy term
+    (svar(F,_)-> cp( [F|Args],Vars,NTerm,NVars);
+    % construct copy term
+    (cp(Args,Vars,NArgs,NVars), NTerm=..[F|NArgs])).  
 
-cp_args([H|T],Vars,[NH|NT],NVars):-
-    cp(H,Vars,NH,SVars), cp_args(T,SVars,NT,NVars).
-cp_args([],Vars,[],Vars).
 
 
 % register_var(?, ?, ?)

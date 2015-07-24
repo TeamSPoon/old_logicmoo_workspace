@@ -243,7 +243,7 @@ first_char_to_upper(CX,Y):- name(CX,[S|SS]),char_type(S,to_lower(NA)),name(NA,[N
 first_char_to_lower(CX,Y):- name(CX,[S|SS]),char_type(S,to_upper(NA)),name(NA,[N]),name(Y,[N|SS]),!.
 to_titlecase(CX,Y):- sub_string(CX,1,_,0,Z),string_lower(Z,L), name(CX,[S|_]),char_type(S,to_lower(NA)),atom_concat(NA,L,Y).
 
-text_to_string_safe(T,S):-catch(text_to_string(T,S),_,fail),!.
+text_to_string_safe(Expr,Forms):-notrace(catch(text_to_string(Expr,Forms),_,fail)).
 
 
 toLowercase(I,O):-integer(I),!,to_lower(I,O).

@@ -1,16 +1,102 @@
+:-module(logicmoo_i_sexp_reader,[codelist_to_forms/2,input_to_forms/3,lisp_read_from_input/2,parse_sexpr/2]).
 
 
 
+:-dynamic(user:mpred_prop/2).
+:-multifile(user:mpred_prop/2).
 
+:- dynamic   user:file_search_path/2.
+:- multifile user:file_search_path/2.
+:- prolog_load_context(directory,Dir),
+   DirFor = plarkc,
+   (( \+ user:file_search_path(DirFor,Dir)) ->asserta(user:file_search_path(DirFor,Dir));true),
+   absolute_file_name('../../../../',Y,[relative_to(Dir),file_type(directory)]),
+   (( \+ user:file_search_path(pack,Y)) ->asserta(user:file_search_path(pack,Y));true).
+:- attach_packs.
+:- initialization(attach_packs).
+% [Required] Load the Logicmoo Library Utils
+:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 
 :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api)).
 
 
-end_of_file.
-end_of_file.
-end_of_file.
-end_of_file.
-end_of_file.
+
+/*===================================================================
+% input_to_forms/3 does less consistancy checking then conv_to_sterm
+
+Always a S-Expression: 'WFFOut' placing variables in 'VARSOut'
+
+|?-input_to_forms("(isa a b)",Clause,Vars).
+Clause = [isa,a,b]
+Vars = _h70
+
+| ?- input_to_forms("(isa a (b))",Clause,Vars).
+Clause = [isa,a,[b]]
+Vars = _h70
+
+|?-input_to_forms("(list a b )",Clause,Vars)
+Clause = [list,a,b]
+Vars = _h70
+
+| ?- input_to_forms("(genlMt A ?B)",Clause,Vars).
+Clause = [genlMt,'A',_h998]
+Vars = [=('B',_h998)|_h1101]
+
+| ?- input_to_forms("(goals Iran  (not   (exists   (?CITIZEN)   (and    (citizens Iran ?CITIZEN)    (relationExistsInstance maleficiary ViolentAction ?CITIZEN)))))",Clause,Vars).
+
+Clause = [goals,Iran,[not,[exists,[_h2866],[and,[citizens,Iran,_h2866],[relationExistsInstance,maleficiary,ViolentAction,_h2866]]]]]
+Vars = [=(CITIZEN,_h2866)|_h3347]
+
+| ?- input_to_forms("
+(queryTemplate-Reln QuestionTemplate definitionalDisplaySentence 
+       (NLPatternList 
+           (NLPattern-Exact \"can you\") 
+           (RequireOne 
+               (NLPattern-Word Acquaint-TheWord Verb) 
+               (NLPattern-Word Tell-TheWord Verb)) 
+           (RequireOne 
+               (NLPattern-Exact \"me with\") 
+               (NLPattern-Exact \"me what\")) 
+           (OptionalOne 
+               (WordSequence \"the term\") \"a\" \"an\") 
+           (NLPattern-Template NPTemplate :THING) 
+           (OptionalOne \"is\") 
+           (OptionalOne TemplateQuestionMarkMarker)) 
+       (definitionalDisplaySentence :THING ?SENTENCE)) ",
+ Clause,Vars).
+
+| ?- input_to_forms("
+ (#$STemplate #$bioForProposal-short 
+  (#$NLPatternList (#$NLPattern-Template #$NPTemplate :ARG1) 
+   (#$NLPattern-Exact \"short bio for use in proposals\") (#$NLPattern-Word #$Be-TheWord #$Verb) 
+      (#$NLPattern-Exact \"\\\"\") (#$NLPattern-Template #$NPTemplate :ARG2)) (#$bioForProposal-short :ARG1 :ARG2)) ",
+      Clause,Vars).
+
+
+input_to_forms("
+ (#$STemplate #$bioForProposal-short 
+  (#$NLPatternList (#$NLPattern-Template #$NPTemplate :ARG1) 
+   (#$NLPattern-Exact \"short bio for use in proposals\") (#$NLPattern-Word #$Be-TheWord #$Verb) 
+      (#$NLPattern-Exact \"\") (#$NLPattern-Template #$NPTemplate :ARG2)) (#$bioForProposal-short :ARG1 :ARG2)) ",
+      Clause,Vars).
+
+// ==================================================================== */
+:-export(input_to_forms/2).
+input_to_forms(FormsOut,Vars):- 
+    current_input(In),
+    input_to_forms(In, FormsOut,Vars).
+
+:-export(input_to_forms/3).
+input_to_forms(In,FormsOut,Vars):-
+ must_det_l((
+    parse_sexpr(In, Forms0),
+    to_untyped(Forms0, Forms1),
+    extract_lvars(Forms1,FormsOut,Vars))).
+
+
+:-export(any_to_lazy_list/2).
+any_to_lazy_list(Stream0,Chars):-l_open_input(Stream0,Stream),stream_to_lazy_list(Stream,CharsM),!,Chars=CharsM.
+
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -18,7 +104,6 @@ end_of_file.
     Written Nov. 26th, 2006 by Markus Triska (triska@gmx.at).
     Public domain code.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-:-module(logicmoo_i_sexp_reader,[codelist_to_forms/2,parse_to_source/2,get_source/1,lisp_read/2,l_open_input/2]).
 
 :- style_check(-singleton).
 :- style_check(-discontiguous).
@@ -27,30 +112,32 @@ end_of_file.
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    Parsing
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-:-dynamic(user:mpred_prop/2).
-:-multifile(user:mpred_prop/2).
-:- use_module('../../src_lib/logicmoo_util/logicmoo_util_all.pl').
+parse_sexpr(String, Expr) :- is_stream(S),stream_to_lazy_list(S,LList),!,LList=[E|List],parse_sexpr_codes([E|List], Expr).
+parse_sexpr(Any, Expr) :- Any\=[_|_],any_to_lazy_list(Any,[E|List]),!,parse_sexpr_codes([E|List], Expr).
+parse_sexpr([SC|Codes], Expr) :- integer(SC),!,parse_sexpr_codes([SC|Codes], Expr).
+parse_sexpr([SC|Codes], Expr) :- atom(SC),!,string_chars(String,[SC|Codes]),!,parse_sexpr(String, Expr).
+parse_sexpr(String, Expr) :- string(String),!,string_codes(String,Codes),parse_sexpr_codes(Codes, Expr).
 
-parse_sexpr(String, Expr) :- string(String),!,string_codes(String,Codes),phrase(sexpr(Expr), Codes).
-parse_sexpr(String, Expr) :- phrase(sexpr(Expr), String).
+parse_sexpr_codes(Codes, Expr) :- phrase(sexpr(Expr), Codes).
 
 :-export(sexpr//1).
 
 % Use DCG for parser.
 
 
+sexpr(L)                      --> sblank,sexpr(L).
 sexpr(L)                      --> "(", !, swhite, sexpr_list(L), swhite.
-sexpr(vec(V))                 --> "#(", !, sexpr_vector(V), swhite.
-sexpr(s(t))                 --> "#t", !, swhite.
-sexpr(s(f))                 --> "#f", !, swhite.
-sexpr(s(E))              --> "#$", !, swhite, sexpr(E).
-sexpr(chr(N))                 --> "#\\", [C], !, {N is C}, swhite.
-sexpr(str(S))                 --> """", !, sexpr_string(S), swhite.
-sexpr([s(quote),E])              --> "'", !, swhite, sexpr(E).
-sexpr([s(backquote),E])         --> "`", !, swhite, sexpr(E).
-sexpr(['unquote-splicing',E]) --> ",@", !, swhite, sexpr(E).
-sexpr(comma(E))            --> ",", !, swhite, sexpr(E).
-sexpr(s(E))                      --> sym_or_num(E),!, swhite.
+sexpr('$VECT'(V))                 --> "#(", !, sexpr_vector(V), swhite.
+sexpr('$SYM'(t))                 --> "#t", !, swhite.
+sexpr('$SYM'(f))                 --> "#f", !, swhite.
+sexpr('$SYM'(E))              --> "#$", !, swhite, sexpr(E).
+sexpr('$CHAR'(C))                 --> "#\\", rsymbol(C), !, swhite.
+sexpr('$STR'(S))                 --> """", !, sexpr_string(S), swhite.
+sexpr(['$SYM'(quote),E])              --> "'", !, swhite, sexpr(E).
+sexpr(['$SYM'(backquote),E])         --> "`", !, swhite, sexpr(E).
+sexpr(['$BQ-COMMA-ELIPSE',E]) --> ",@", !, swhite, sexpr(E).
+sexpr('$COMMA'(E))            --> ",", !, swhite, sexpr(E).
+sexpr('$SYM'(E))                      --> sym_or_num(E),!, swhite.
 
 sblank --> [C], {C =< 32}, swhite.
 sblank --> ";", line_comment, swhite.
@@ -78,15 +165,18 @@ sexpr_rest([Car|Cdr]) --> sexpr(Car), !, sexpr_rest(Cdr).
 sexpr_vector([]) --> ")", !.
 sexpr_vector([First|Rest]) --> sexpr(First), !, sexpr_vector(Rest).
 
+sexpr_string([C|S]) --> "\\", lchar(C),!, sexpr_string(S).
 sexpr_string([]) --> """", !.
-sexpr_string([C|S]) --> chr(C), sexpr_string(S).
+sexpr_string([C|S]) --> lchar(C), sexpr_string(S).
 
-chr(92) --> "\\", !.
-chr(34) --> "\"", !.
-chr(N)  --> [C], {C >= 32, N is C}.
+lchar(92) --> "\\", !.
+lchar(34) --> "\"", !.
+lchar(N)  --> [C], {C >= 32, N is C}.
 
-sym_or_num(s(E)) --> [C], {sym_char(C)}, sym_string(S), {string_to_atom([C|S],E)}.
-sym_or_num(n(E)) --> snumber(E).
+rsymbol(E) --> [C], {sym_char(C)}, sym_string(S), {string_to_atom([C|S],E)}.
+
+sym_or_num('$SYM'(E)) --> rsymbol(E).
+sym_or_num('$NUMBER'(E)) --> snumber(E).
 
 sym_string([H|T]) --> [H], {sym_char(H)}, sym_string(T).
 sym_string([]) --> [].
@@ -105,39 +195,88 @@ cdigit(N) --> [C], {C >= 48, C =<57, N is C-48}.
 
 sexpr(E,C,X,Z) :- swhite([C|X],Y), sexpr(E,Y,Z).
 
-% dquote semicolon parens  hash qquote comma, backquote
+% dquote semicolon parens  hash qquote  comma backquote
 sym_char(C) :- C > 32, not(member(C,[34,59,40,41,35,39,44,96])).  
 
-:- if( \+ current_predicate(l_open_input/2)).
-l_open_input(InS,InS):-is_stream(InS),!.
-l_open_input((InS),In):-string(InS),!,l_open_input(string(InS),In).
-l_open_input(string(InS),In):-text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
-l_open_input(Filename,In) :- catch(see(Filename),_,fail),current_input(In),!.
-l_open_input(InS,In):-text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
-:- endif.
 
-to_untyped(s(S),O):-!,to_untyped(S,O).
-to_untyped(comma(S),comma(O)):-!,to_untyped(S,O).
-to_untyped(vect(S),vect(O)):-!,to_untyped(S,O).
-to_untyped(n(S),O):-!,to_untyped(S,O).
+
+:-thread_local(thlocal:s2p/1).
+
+
+to_unbackquote(I,O):-to_untyped(I,O).
+
+:-export(to_untyped/2).
+to_untyped(Var,'$VAR'(Name)):-lvar(Var,Name),!.
+to_untyped(S,S):- string(S).
+to_untyped(S,S):- number(S).
+to_untyped(S,O):- atom(S),catch(atom_number(S,O),_,fail),!.
+to_untyped(Atom,Atom):- \+ compound(Atom),!.
+to_untyped('$BQ'(VarName),'$BQ'(VarName)):-!.
+to_untyped('$SYM'(S),O):-nonvar(S),!,to_untyped(S,O),!.
+to_untyped('$CHAR'(S),'$CHAR'(S)):-!.
+to_untyped('$COMMA'(S),'$COMMA'(O)):-to_untyped(S,O),!.
+to_untyped('$VECT'(S),'$VECT'(O)):-to_untyped(S,O),!.
+to_untyped('$NUMBER'(S),O):-to_untyped(S,O),!.
 to_untyped([[]],[]):-!.
-to_untyped([s(quote),Rest],Out):-!,maplist(to_untyped,Rest,Out).
-to_untyped([s(backquote),Rest],Out):-!,to_untyped(Rest,Out).
-to_untyped([s(S)|Rest],Out):-is_list(Rest),!,maplist(to_untyped,[S|Rest],Mid),Out=..Mid,!.
-to_untyped([H|T],[HH|TT]):-!,to_untyped(H,HH),to_untyped(T,TT).
-to_untyped(str(S),O):-atom_string(S,O),!.
-to_untyped(char(S),char(S)):-!.
-to_untyped(S,O):- string(S),atom_string(A,S),!,to_untyped(A,O).
-to_untyped(S,O):- catch((atom_codes(S,C), number_codes(O,C),!),_,fail),!.
-to_untyped(H,O):- compound(H),!,H=..HL,maplist(to_untyped,HL,OL),O=..OL.
-to_untyped(S,'$VAR'(VarName)):-atom_concat('??',VarNameI,S),atom_concat('_',VarNameI,VarName).
-to_untyped(S,'$VAR'(VarNameU)):-atom_concat('?',VarName,S),atom_upper(VarName,VarNameU).
-to_untyped(S,S):-!.
+to_untyped('$STR'(Expr),Forms):- (text_to_string_safe(Expr,Forms);to_untyped(Expr,Forms)),!.
+to_untyped(['$SYM'(backquote),Rest],Out):- !,to_untyped(['$SYM'('$BQ'),Rest],Out).
+to_untyped(['$SYM'(S)|Rest],Out):-is_list(Rest),maplist(to_untyped,[S|Rest],[F|Mid]), 
+          ((atom(F),thlocal:s2p(F))-> Out=..[F|Mid];Out=[F|Mid]),
+          to_untyped(Out,OOut).
+to_untyped([H|T],Forms):-is_list([H|T]),must(text_to_string_safe([H|T],Forms);maplist(to_untyped,[H|T],Forms)).
+to_untyped([H|T],[HH|TT]):-!,must_det_l((to_untyped(H,HH),to_untyped(T,TT))).
+to_untyped(ExprI,ExprO):- ExprI=..Expr,
+  maplist(to_untyped,Expr,[HH|TT]),(atom(HH)-> ExprO=..[HH|TT] ; ExprO=[HH|TT]).
+% to_untyped(Expr,Forms):-compile_all(Expr,Forms),!.
+
+
+:-export(extract_lvars/3).
+extract_lvars(A,B,After):-
+     b_getval('$variable_names',Before),
+     copy_lvars(A,Before,B,After).
+
+% copy_lvars( VAR,Vars,VAR,Vars):- var(VAR),!.
+copy_lvars( VAR,Vars,NV,NVars):- lvar(VAR,Name),must(atom(Name)),!,must(register_var(Name=NV,Vars,NVars)).
+copy_lvars([],Vars,[],Vars).
+copy_lvars(Term,Vars,Term,Vars):- \+compound(Term),!.
+copy_lvars('?'(Inner),Vars,Out,NVars):- !,
+    copy_lvars((Inner),Vars,(NInner),NVars),
+    (atom(NInner) -> atom_concat('?',NInner,Out) ; Out = '?'(NInner)),!.
+
+copy_lvars([H|T],Vars,[NH|NT],NVars):- !, copy_lvars(H,Vars,NH,SVars), copy_lvars(T,SVars,NT,NVars).
+copy_lvars(Term,Vars,NTerm,NVars):-    
+    Term=..[F|Args],    % decompose term
+    (lvar(F,_)-> copy_lvars( [F|Args],Vars,NTerm,NVars);
+    % construct copy term
+    (copy_lvars(Args,Vars,NArgs,NVars), NTerm=..[F|NArgs])).  
+
+lvar(Var,NameU):-var(Var),!,format(atom(Name),'~w',[(Var)]),!,atom_concat('_',NameU,Name).
+lvar('$VAR'(Var),Name):-number(Var),format(atom(Name),'~w',['$VAR'(Var)]),!.
+lvar('$VAR'(VarName),VarNameU):-lvar_fixvarname(VarName,VarNameU),!.
+lvar('$VAR'(Name),Name):-!.
+lvar('?'(Name),NameU):-lvar_fixvarname(Name,NameU),!.
+lvar(VAR,NameU):-atom(VAR),atom_concat('??',Name,VAR),!,lvar_fixvarname(Name,NameI),atom_concat('_',NameI,NameU).
+lvar(VAR,NameU):-atom(VAR),atom_concat('?',Name,VAR),lvar_fixvarname(Name,NameU).
+
+:-export(ok_varname/1).
+ok_varname(Name):- number(Name).
+ok_varname(Name):- atom(Name),atom_codes(Name,[C|_List]),char_type(C,csym).
+
+%:-export(ok_codes_in_varname/1).
+%ok_codes_in_varname([]).
+%ok_codes_in_varname([C|List]):-!,ok_in_varname(C),ok_codes_in_varname(List).
+
+%:-export(ok_in_varname/1).
+%ok_in_varname(C):-sym_char(C),\+member(C,`!@#$%^&*?()`).
+
+:-export(lvar_fixvarname/2).
+lvar_fixvarname(SVAR,UP):- atom(SVAR)->(ok_varname(SVAR),upcase_atom(SVAR,UP));UP=SVAR.
 
 atom_upper(A,U):-string_upper(A,S),atom_string(U,S).
 
-lisp_read(Forms):-lisp_read(current_input,Forms),!.
-lisp_read(I,Forms):-stream_source_typed(I,Type),!,must(to_untyped(Type,Forms)).
+lisp_read_from_input(Forms):-lisp_read_from_input(current_input,Forms),!.
+lisp_read_from_input(I,Forms):-stream_source_typed(I,Type),!,must(to_untyped(Type,Forms)).
+
 stream_source_typed(I,Expr):-   l_open_input(I,In),
   see(In),
    read_line_to_codes(current_input,AsciiCodes),(parse_sexpr(AsciiCodes,Expr);read_term_from_codes(AsciiCodes,Expr,[])),!,seen.
@@ -177,14 +316,14 @@ run(Program, Values) :-
     phrase(eval_all(Forms, Values0), [E-E], _),
     maplist(unfunc, Values0, Values).
 
-unfunc(s(S), S).
+unfunc('$SYM'(S), S).
 unfunc(t, t).
-unfunc(n(N), N).
+unfunc('$NUMBER'(N), N).
 unfunc([], []).
 unfunc([Q0|Qs0], [Q|Qs]) :- unfunc(Q0, Q), unfunc(Qs0, Qs).
 
-fold([], _, V, n(V)).
-fold([n(F)|Fs], Op, V0, V) :- E =.. [Op,V0,F], V1 is E, fold(Fs, Op, V1, V).
+fold([], _, V, '$NUMBER'(V)).
+fold(['$NUMBER'(F)|Fs], Op, V0, V) :- E =.. [Op,V0,F], V1 is E, fold(Fs, Op, V1, V).
 
 compile_all(Fs0, Fs) :- maplist(compile, Fs0, Fs).
 
@@ -195,45 +334,45 @@ compile_all(Fs0, Fs) :- maplist(compile, Fs0, Fs).
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 compile(F0, F) :-
-    (   F0 = n(_)   -> F = F0
-    ;   F0 = s(t)   -> F = t
-    ;   F0 = s(nil) -> F = []
-    ;   F0 = s(_)   -> F = F0
+    (   F0 = '$NUMBER'(_)   -> F = F0
+    ;   F0 = '$SYM'(t)   -> F = t
+    ;   F0 = '$SYM'(nil) -> F = []
+    ;   F0 = '$SYM'(_)   -> F = F0
     ;   F0 = [] -> F = []
-    ;   F0 = [s(quote),Arg] -> F = [quote,Arg]
-    ;   F0 = [s(setq),s(Var),Val0] -> compile(Val0, Val), F = [setq,Var,Val]
-    ;   F0 = [s(Op)|Args0],
+    ;   F0 = ['$SYM'(quote),Arg] -> F = [quote,Arg]
+    ;   F0 = ['$SYM'(setq),'$SYM'(Var),Val0] -> compile(Val0, Val), F = [setq,Var,Val]
+    ;   F0 = ['$SYM'(Op)|Args0],
         memberchk(Op, [+,-,*,equal,if,>,<,=,progn,eval,list,car,cons,
                        cdr,while,not]) ->
         compile_all(Args0, Args),
         F = [Op|Args]
-    ;   F0 = [s(defun),s(Name),Args0|Body0] ->
+    ;   F0 = ['$SYM'(defun),'$SYM'(Name),Args0|Body0] ->
         compile_all(Body0, Body),
         maplist(arg(1), Args0, Args),
         F = [defun,Name,Args|Body]
-    ;   F0 = [s(Op)|Args0] -> compile_all(Args0, Args), F = [user(Op)|Args]
+    ;   F0 = ['$SYM'(Op)|Args0] -> compile_all(Args0, Args), F = [user(Op)|Args]
     ).
 
 eval_all([], [])         --> [].
 eval_all([A|As], [B|Bs]) --> eval(A, B), eval_all(As, Bs).
 
-eval(n(N), n(N))       --> [].
+eval('$NUMBER'(N), '$NUMBER'(N))       --> [].
 eval(t, t)             --> [].
 eval([], [])           --> [].
-eval(s(A), V), [Fs-Vs] --> [Fs-Vs], { get_assoc(A, Vs, V) }.
+eval('$SYM'(A), V), [Fs-Vs] --> [Fs-Vs], { get_assoc(A, Vs, V) }.
 eval([L|Ls], Value)    --> eval(L, Ls, Value).
 
 eval(quote, [Q], Q) --> [].
 eval(+, As0, V)     --> eval_all(As0, As), { fold(As, +, 0, V) }.
-eval(-, As0, V)     --> eval_all(As0, [n(V0)|Vs0]), { fold(Vs0, -, V0, V) }.
+eval(-, As0, V)     --> eval_all(As0, ['$NUMBER'(V0)|Vs0]), { fold(Vs0, -, V0, V) }.
 eval(*, As0, V)     --> eval_all(As0, Vs), { fold(Vs, *, 1, V) }.
 eval(car, [A], C)   --> eval(A, V), { V == [] -> C = [] ; V = [C|_] }.
 eval(cdr, [A], C)   --> eval(A, V), { V == [] -> C = [] ; V = [_|C] }.
 eval(list, Ls0, Ls) --> eval_all(Ls0, Ls).
 eval(not, [A], V)   --> eval(A, V0), goal_truth(V0=[], V).
-eval(>, [A,B], V)   --> eval(A, n(V1)), eval(B, n(V2)), goal_truth(V1>V2, V).
+eval(>, [A,B], V)   --> eval(A, '$NUMBER'(V1)), eval(B, '$NUMBER'(V2)), goal_truth(V1>V2, V).
 eval(<, [A,B], V)   --> eval(>, [B,A], V).
-eval(=, [A,B], V)   --> eval(A, n(V1)), eval(B, n(V2)), goal_truth(V1=:=V2, V).
+eval(=, [A,B], V)   --> eval(A, '$NUMBER'(V1)), eval(B, '$NUMBER'(V2)), goal_truth(V1=:=V2, V).
 eval(progn, Ps, V)  --> eval_all(Ps, Vs), { last(Vs, V) }.
 eval(eval, [A], V)  --> eval(A, F0), { compile(F0, F1) }, eval(F1, V).
 eval(equal, [A,B], V) --> eval(A, V1), eval(B, V2), goal_truth(V1=V2, V).
@@ -243,7 +382,7 @@ eval(while, [Cond|Bs], [])  -->
     ;   eval_all(Bs, _),
         eval(while, [Cond|Bs], _)
     ).
-eval(defun, [F,As|Body], s(F)), [Fs-Vs0] -->
+eval(defun, [F,As|Body], '$SYM'(F)), [Fs-Vs0] -->
     [Fs0-Vs0],
     { put_assoc(F, Fs0, As-Body, Fs) }.
 eval(user(F), As0, V), [Fs-Vs] -->

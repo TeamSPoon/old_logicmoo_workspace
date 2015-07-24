@@ -73,6 +73,7 @@ start_mud_telnet(Port):-
 
 :-  ignore((thread_self(main),(quintus:current_stream(2, write, Err),asserta(main_thread_error_stream(Err))))).
 
+get_main_thread_error_stream(user_error):-!.
 get_main_thread_error_stream(ES):-main_thread_error_stream(ES),!.
 get_main_thread_error_stream(user_error).
 
@@ -105,11 +106,11 @@ player_connect_menu(In,Out,Wants,P):-
 
 
 login_and_run:-
-   get_session_io(In,Out),
+   get_session_io(In,Out),!,
    login_and_run(In,Out).
 
 login_and_run(In,Out):-
-  player_connect_menu(In,Out,_,_),
+  player_connect_menu(In,Out,_,_),!,
   run_session(In,Out).
 
 set_player_telnet_options(P):-
@@ -125,15 +126,15 @@ run_session:-
    run_session(In,Out).
 
 run_session(In,Out):-  
-  get_session_id(O),
+  must_det_l((get_session_id(O),
   get_session_io(In,Out),
   asserta(thlocal:telnet_prefix([isSelfAgent,wants,to])),
-  retractall(thlocal:wants_logout(O)),!,
+  retractall(thlocal:wants_logout(O)))),!,
   repeat,     
          once(session_loop(In,Out)),
-      retract(thlocal:wants_logout(O)),
-      retractall(thglobal:session_io(_,_,_,Id)),
+      retract(thlocal:wants_logout(O)),!,
       thread_self(Id),
+      retractall(thglobal:session_io(_,_,_,Id)),      
       retractall(thglobal:session_io(O,_,_,_)),!.
 
 session_loop(In,Out):-
@@ -454,8 +455,8 @@ telnet_server(_Port, _Options) :- thread_property(X, status(running)),X=telnet_s
 telnet_server(Port, Options) :-  
 	tcp_socket(ServerSocket),        
 	tcp_setopt(ServerSocket, reuseaddr),
-        tcp_setopt(ServerSocket, nodelay),
-        tcp_setopt(ServerSocket, dispatch(false)),        
+        % tcp_setopt(ServerSocket, nodelay),
+        % tcp_setopt(ServerSocket, dispatch(false)),        
 	must((tcp_bind(ServerSocket, Port),
 	tcp_listen(ServerSocket, 5))),
 	thread_create(server_loop(ServerSocket, Options), _,
@@ -512,22 +513,24 @@ strm_info(Out,Name,Strm):-nl,write(Out,Name = Strm),forall(stream_property(Strm,
 setup_streams(In, Out):-
       Err=Out,
       set_prolog_IO(In, Out, Err),
-      thread_self(Id),
-%       retractall(thread_util:has_console(Id, _, _, +)),
-      current_prolog_flag(encoding, Enc),
-      assert(thread_util:has_console(Id, In, Out, Err)),
-
       set_stream(In, close_on_abort(false)),
-      set_stream(Out, close_on_abort(false)),
+      set_stream(Out, close_on_abort(false)),!.
 
+setup_streams_pt2(In, Out):-
       set_stream(In,  alias(user_input)),
       set_stream(Out, alias(user_output)),
       set_stream(Err, alias(user_error)),
       set_stream(In,  alias(current_input)),
-      set_stream(Out, alias(current_output)),
-      set_stream_ice(In, user_input, encoding(Enc)),
-      set_stream_ice(Out, user_output, encoding(Enc)),
-      set_stream_ice(Err, user_error, encoding(Enc)),
+      set_stream(Out, alias(current_output)),!.
+
+setup_streams_pt3(In, Out):-
+      thread_self(Id),
+     % retractall(thread_util:has_console(Id, _, _, _)),
+      assert(thread_util:has_console(Id, In, Out, Err)),
+     % current_prolog_flag(encoding, Enc),
+     % set_stream_ice(In, user_input, encoding(Enc)),
+     % set_stream_ice(Out, user_output, encoding(Enc)),
+     % set_stream_ice(Err, user_error, encoding(Enc)),
       set_stream_ice(In, user_input, newline(detect)),
       set_stream_ice(Out, user_output, newline(dos)),
       set_stream_ice(Err, user_error, newline(dos)),!.
