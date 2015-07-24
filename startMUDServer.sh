@@ -1,6 +1,6 @@
 #!/bin/bash
 if [ $UID -eq 0 ]; then
-  exec su --preserve-environment  --login  "$0 $@" prologmud
+  exec su --preserve-environment "$0 $@" prologmud
   exit 0
 fi
 
