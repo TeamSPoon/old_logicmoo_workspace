@@ -17,7 +17,6 @@ if [ $# -eq 0 ]
    echo "No arguments supplied"
    exec sudo -u prologmud /bin/bash -c "$0 runtime/run_mud_server.pl"
    exit 0
-fi
  else
     export RUNFILE="$1"
 fi
