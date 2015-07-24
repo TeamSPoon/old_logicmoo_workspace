@@ -1,6 +1,10 @@
 #!/bin/bash
 
-command -v git >/dev/null 2>&1 || { echo >&2 "I require git but it's not installed.  Aborting."; exit 1; }
+command -v git >/dev/null 2>&1 || { echo >&2 "Require git but it's not installed.  Aborting."; exit 1; }
+if ![ $UID != 0 ]; 
+then
+  echo "This script can only be run or configured by root."
+fi
 
 mkdir -p /opt
 cd /opt
