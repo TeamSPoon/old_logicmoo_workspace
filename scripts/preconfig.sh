@@ -29,7 +29,7 @@ mkdir -p /opt/PrologMUD/runtime/cache
 chmod 777 /opt/PrologMUD/runtime/cache
 chmod 777 /opt/PrologMUD/runtime
 
-echo "to start the MUD type: source start_mud_server.sh"
+echo "to start the MUD type: ./startMUDServer.sh
 
 exit 0
 
