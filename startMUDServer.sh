@@ -1,8 +1,4 @@
 #!/bin/bash
-if [ $UID -eq 0 ]; then
-  exec sudo -u prologmud /bin/bash -c "$0 $@" 
-  exit 0
-fi
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
@@ -18,8 +14,10 @@ fi
 
 if [ $# -eq 0 ] 
  then
-    echo "No arguments supplied"
-    export RUNFILE="runtime/run_mud_server.pl"
+   echo "No arguments supplied"
+   exec sudo -u prologmud /bin/bash -c "$0 runtime/run_mud_server.pl"
+   exit 0
+fi
  else
     export RUNFILE="$1"
 fi
@@ -33,11 +31,11 @@ do
    reset -w
    echo "JAVA_HOME='$JAVA_HOME'"
    echo "LD_LIBRARY_PATH='$LD_LIBRARY_PATH'"
-   echo "STANFORD_JAR='$STANFORD_JAR'"      
+   echo "STANFORD_JAR='$STANFORD_JAR'"
    echo "This ($0 $@) will be run from user $UID"
    echo "Hit CTRL+C ${BASH_SOURCE[0]} ";
    sleep 4;
-   (cd $DIR ; exec swipl $RUNFILE)            
+   (cd $DIR ; exec swipl $RUNFILE)         
 if [ $# -eq 0 ]
 then
   exit 0
