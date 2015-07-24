@@ -12,7 +12,7 @@ $APTGET install swi-prolog oracle-java8-installer
 echo select java 8
 sudo update-alternatives --config java
 
-cd /opt/PrologMUD/ 
+cd /opt/PrologMUD/
 git pull
 
 # 3,625 inferences, 6.003 CPU in 6.014 seconds (100% CPU, 604 Lips)
@@ -30,4 +30,3 @@ chmod 777 /opt/PrologMUD/runtime
 
 echo "to start the MUD type: ./startMUDServer.sh
 
-exit 0
