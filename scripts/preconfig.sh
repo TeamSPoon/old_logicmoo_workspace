@@ -19,6 +19,10 @@ git pull
 # 1,828,987,011 inferences, 316.932 CPU in 319.418 seconds (99% CPU, 5770916 Lips)
 echo "Compiling a 1gb file this might take about 5 minutes after this it will only take 6 seconds to load"
 swipl -g "time(load_files(['pack/pldata_larkc/prolog/el_holds/el_assertions'],[qcompile(auto),if_needed(true)])),halt."
+swipl -g "time(load_files(['pack/logicmoo_nlu/prolog/pldata/nldata_talk_db_pdat'],[qcompile(auto),if_needed(true)])),halt."
+swipl -g "time(load_files(['pack/logicmoo_nlu/prolog/pldata/nldata_freq_pdat'],[qcompile(auto),if_needed(true)])),halt."
+swipl -g "time(load_files(['pack/logicmoo_nlu/prolog/pldata/nldata_BRN_WSJ_LEXICON'],[qcompile(auto),if_needed(true)])),halt."
+swipl -g "time(load_files(['pack/logicmoo_nlu/prolog/pldata/nldata_colloc_pdat'],[qcompile(auto),if_needed(true)])),halt."
 
 
 # safe to run more than once
