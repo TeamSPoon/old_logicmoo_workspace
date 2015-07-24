@@ -1,6 +1,6 @@
 #!/bin/bash
 if [ $UID -eq 0 ]; then
-  exec su --preserve-environment "$0 $@" prologmud
+  exec sudo -u prologmud "$0 $@" 
   exit 0
 fi
 
