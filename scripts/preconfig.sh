@@ -18,9 +18,6 @@ sudo update-alternatives --config java
 echo "Compiling a 1gb file this might take about 5 minutes after this it will only take 6 seconds to load"
 swipl -g "time(load_files(['pack/pldata_larkc/prolog/el_holds/el_assertions'],[qcompile(auto),if_needed(true)])),halt."
 
-if [ ! -d /var/www/html/hmud/ ]; then
- sudo ln -s `pwd`/pack/hMUD /var/www/html/hmud/
-fi
 
 # safe to run more than once
 sudo adduser --gecos "PrologMUD User" --disabled-login --disabled-password prologmud
