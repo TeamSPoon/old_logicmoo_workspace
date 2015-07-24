@@ -10,6 +10,8 @@ idForTest(iTweety,foo1).
 
 :-must(\+ idForTest(iTweety,unknown)).
 
+end_of_file.
+
 :-start_rtrace.
 => \+ idForTest(iTweety,foo1).
 :-stop_rtrace.
