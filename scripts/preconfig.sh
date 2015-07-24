@@ -24,6 +24,10 @@ swipl -g "time(load_files(['pack/logicmoo_nlu/prolog/pldata/nldata_freq_pdat'],[
 swipl -g "time(load_files(['pack/logicmoo_nlu/prolog/pldata/nldata_BRN_WSJ_LEXICON'],[qcompile(auto),if_needed(true)])),halt."
 swipl -g "time(load_files(['pack/logicmoo_nlu/prolog/pldata/nldata_colloc_pdat'],[qcompile(auto),if_needed(true)])),halt."
 
+if [!-f $STANFORD_JAR]; then 
+    echo "Downloading $STANFORD_JAR ...";
+    wget http://prologmoo.com/downloads/stanford-corenlp3.5.2-ALL.jar -O $STANFORD_JAR
+fi
 
 # safe to run more than once
 sudo adduser --gecos "PrologMUD User" --disabled-login --disabled-password prologmud

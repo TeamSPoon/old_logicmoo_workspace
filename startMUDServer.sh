@@ -1,6 +1,6 @@
 #!/bin/bash
 if [ $UID -eq 0 ]; then
-  exec sudo -u prologmud "$0 $@" 
+  exec sudo -u prologmud /bin/bash -c "$0 $@" 
   exit 0
 fi
 
@@ -34,10 +34,6 @@ do
    echo "JAVA_HOME='$JAVA_HOME'"
    echo "LD_LIBRARY_PATH='$LD_LIBRARY_PATH'"
    echo "STANFORD_JAR='$STANFORD_JAR'"      
-   if [! -f $STANFORD_JAR]; then 
-     echo "Downloading $STANFORD_JAR ...";
-     wget http://prologmoo.com/downloads/stanford-corenlp3.5.2-ALL.jar -O $STANFORD_JAR
-   fi
    echo "This ($0 $@) will be run from user $UID"
    echo "Hit CTRL+C ${BASH_SOURCE[0]} ";
    sleep 4;
