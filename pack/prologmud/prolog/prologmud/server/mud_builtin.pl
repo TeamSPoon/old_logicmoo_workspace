@@ -1040,8 +1040,6 @@ O = [
 
 :-must(mudFacing(iPlayer1,vSouth)).
 
-end_of_file.
-
 :-pfc_rem(mudFacing(iPlayer1,vSouth)).
 
 :-must(mudFacing(iPlayer1,vNorth)).

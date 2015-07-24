@@ -9,7 +9,7 @@
 % Revised At: $Date: 2002/06/27 14:13:20 $
 % ===================================================================
 %
-% PFC is a language extension for prolog.. there is so much that can be done in the language for exmaple.. 
+%  PFC is a language extension for prolog.. there is so much that can be done in this language extension to Prolog
 %
 %
 % props(Obj,[height(ObjHt)]) == t(height,Obj,ObjHt) == rdf(Obj,height,ObjHt) == t(height(Obj,ObjHt)).
@@ -17,10 +17,20 @@
 % [pdel/pclr](Obj,[height(ObjHt)]) == [del/clr](height,Obj,ObjHt) == [del/clr]svo(Obj,height,ObjHt) == [del/clr](height(Obj,ObjHt))
 % keraseall(AnyTerm).
 %
+%         ANTECEEDANT                                   CONSEQUENT
+%
+%         P = test nesc_true                         assert(P),retract(neg(P))
+%       ~ P = test not_nesc_true                     disable(P), assert(neg(P)),retract(P)
+%    neg(P) = test false/impossible                  make_impossible(P), assert(neg(P))
+%   ~neg(P) = test possible (via not impossible)     enable(P),make_possible(P),retract(neg(P))
+%  \+neg(P) = test impossiblity is unknown           remove_neg(P),retract(neg(P))
+%     \+(P) = test naf(P)                            retract(P)
 %
 % Dec 13, 2035
 % Douglas Miles
 */
+
+:- file_begin(pfc).
 
 :- op(500,fx,'~').
 :- op(1050,xfx,('=>')).
@@ -39,10 +49,19 @@
 % :- dynamic(added/1).
 added(Added):-cwc,spft(Added,U,U).
 
-:- file_begin(pfc).
-:- op(1050,xfx,('=>')).
 
-a(z).
+:- if(if_defined(pfc_testing)).
+
+=> a(z).
+
+:-must(a(_)).
+
+=> ~a(z).
+
+:-must(\+neg(a(_))).
+
+:- endif.
+
 
 :- if(if_defined(pfc_testing)).
 
@@ -57,16 +76,14 @@ a.
 
 prologHybrid(arity/2).
 
-% argsQuoted(P) => {assert_into_someplace(argsQuoted(P))}.
-
 
 % this mean to leave terms at EL:  foo('QuoteFn'([cant,touch,me])).
+
+quasiQuote('QuoteFn').
 
 argsQuoted('loop_check_term').
 argsQuoted('loop_check_term_key').
 argsQuoted('QuoteFn').
-
-quasiQuote('QuoteFn').
 
 argsQuoted(pfc_add).
 argsQuoted(meta_argtypes).
@@ -85,16 +102,31 @@ argsQuoted({}).
 argsQuoted(second_order).
 % argsQuoted((':-')).
 
+meta_argtypes(pfc_default(ftAssertable)).
+
 % neg(tCol({})).
 
 prologSingleValued(C):-cwc,compound(C),functor(C,F,_),!,prologSingleValued(F).
 
 :-dynamic(pfc_default/1).
+
 % here is an example which defines pfc_default facts and rules.  Will it work?
 (pfc_default(P)/pfc_literal(P))  =>  (~neg(P) => P).
 
-(pfc_default(P => Q),{pfc_literal_nv(Q),functor(Q,F,A),once(singleValuedInArg(F,N);(arg(N,Q,DEF),nonvar(DEF),\+arg(_,P,DEF));(arg(N,Q,DEF),nonvar(DEF));N=A),replace_arg(Q,N,NEW,R)} => (P, ~R/(NEW\==DEF), ~neg(Q) => Q)).
-(pfc_default((P => Q)/pfc_literal_nv(Q),~prologSingleValued(Q)) => (P, ~neg(Q) => Q)).
+(pfc_default(P => Q),
+  {nonvar(P),pfc_literal_nv(Q),functor(Q,F,A), 
+    once(
+    (singleValuedInArg(F,N));                    % We have evidence already asserted
+    (compound(P),arg(N,Q,DEF),                   % Else we guess...
+                  nonvar(DEF),\+arg(_,P,DEF));   %  find the first nonvar not in P
+    (N=A,arg(N,Q,DEF),nonvar(DEF));              %  try arity if nonvar
+    (arg(N,Q,DEF),nonvar(DEF));                  %  find the first nonvar
+    (N=A)),                                      %  lastly, use the arity
+    replace_arg(Q,N,NEW,R)} 
+         => (P, ~R/(NEW\==DEF), ~neg(Q) => Q)).
+
+
+% (pfc_default((P => Q)/pfc_literal_nv(Q),~prologSingleValued(Q)) => (P, ~neg(Q) => Q)).
 (pfc_default((P => Q)/pfc_literal_nv(Q),~prologSingleValued(Q)) => (P,  ~Q, ~neg(Q) => Q)).
 (pfc_default((P => Q))/pfc_literal_nv(Q)),{functor(Q,_,1)} => (P, ~neg(Q) => Q).
 (pfc_default((P => Q))/(pfc_literal(P),\+ pfc_literal(Q))) => (P => pfc_default(Q)).
@@ -1043,7 +1075,7 @@ pfcControlled(X)/compound(X)=>{once(X=(F/A);get_functor(X,F,A)),dynamic(F/A),mul
 pfcControlled(C)=>prologHybrid(C).
 
 
-pfcMark(pfcRHS,_,F,A)/(atom(F),integer(A),F\==arity)=>tPred(F).
+pfcMark(pfcRHS,_,F,A)/(atom(F),integer(A),F\==arity)=>tPred(F),arity(F,A).
 
 /*
 pfcMark(pfcRHS,_,F,1)/(fail,atom(F),functor(Head,F,1), 

@@ -13,334 +13,6 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-%:- module(tiny_kb,['TINYKB-ASSERTION'/5, 'TINYKB-ASSERTION'/6]).
-
-isa_db(I,C):-clause(isa(I,C),true).
-
-
-mpred_to_cyc(tCol,'#$Collection').
-mpred_to_cyc(ttFormatType,'#$CycLExpressionType').
-mpred_to_cyc(tPred,'#$Predicate').
-mpred_to_cyc(tFunction,'#$Function-Denotational').
-mpred_to_cyc(ftVar,'#$CycLVariable').
-
-
-mpred_to_cyc(D,C):-var(D),mpred_t_type(C),atom_concat('t',C,D).
-mpred_to_cyc(D,C):-nonvar(D),atom_concat('t',C,D),mpred_t_type(C).
-
-mpred_t_type('#$Relation').
-
-%cyc_to_pfc_idiom(different,dif).
-cyc_to_pfc_idiom(equiv,(<=>)).
-cyc_to_pfc_idiom(implies,(=>)).
-cyc_to_pfc_idiom('CycLTerm','CycLExpression').
-cyc_to_pfc_idiom(not,(neg)).
-
-cyc_to_pfc_idiom([Conj|MORE],Out):-fail, not(is_ftVar(Conj)),!,cyc_to_pfc_sent_idiom_2(Conj,Pred,_),
-  with_assertions(thocal:outer_pred_expansion(Conj,MORE),
-    ( maplist(cyc_to_pfc_expansion,MORE,MOREL), 
-       with_assertions(thocal:outer_pred_expansion(Pred,MOREL),       
-         list_to_ops(Pred,MOREL,Out)))),!.
-
-cyc_to_pfc_sent_idiom_2(and,(','),trueSentence).
-
-list_to_ops(_,V,V):-is_ftVar(V),!.
-list_to_ops(Pred,[],Out):-cyc_to_pfc_sent_idiom_2(_,Pred,Out),!.
-list_to_ops(Pred,In,Out):-not(is_list(In)),!,cyc_to_pfc_expansion(In,Mid),cyc_to_pfc_sent_idiom_2(_,Pred,ArityOne),Out=..[ArityOne,Mid].
-list_to_ops(_,[In],Out):-!,cyc_to_pfc_expansion(In,Out).
-list_to_ops(Pred,[H,T],Body):-!,
-    cyc_to_pfc_expansion(H,HH),
-    cyc_to_pfc_expansion(T,TT),
-    (is_list(TT)-> Body=..[Pred,HH|TT]; Body=..[Pred,HH,TT]).
-
-list_to_ops(Pred,[H|T],Body):-!,
-    list_to_ops(Pred,H,HH),
-    list_to_ops(Pred,T,TT),
-    (is_list(TT)-> Body=..[Pred,HH|TT]; Body=..[Pred,HH,TT]).
-
-kw_to_vars(KW,VARS):-subsT_each(KW,[':ARG1'=_ARG1,':ARG2'=_ARG2,':ARG3'=_ARG3,':ARG4'=_ARG4,':ARG5'=_ARG5,':ARG6'=_ARG6],VARS).
-make_kw_functor(F,A,CYCL):-make_kw_functor(F,A,CYCL,':ARG'),!.
-make_kw_functor(F,A,CYCL,PREFIX):-make_functor_h(CYCL,F,A),CYCL=..[F|ARGS],label_args(PREFIX,1,ARGS).
-
-label_args(_PREFIX,_,[]).
-label_args(PREFIX,N,[ARG|ARGS]):-atom_concat(PREFIX,N,TOARG),ignore(TOARG=ARG),!,N2 is N+1,label_args(PREFIX,N2,ARGS).
-
-:-thread_local thocal:outer_pred_expansion/2.
-
-cyc_to_pfc_expansion_entry(I,O):-fail,cyc_to_pfc_expansion(I,M),!,must((functor(I,FI,_),functor(M,MF,_),FI==MF)),O=M.
-
-cyc_to_pfc_expansion(V,V):-is_ftVar(V),!.
-cyc_to_pfc_expansion(I,O):-cyc_to_pfc_idiom(I,O),!.
-cyc_to_pfc_expansion(V,V):-not(compound(V)),!.
-cyc_to_pfc_expansion([H|T],[HH|TT]):-!,cyc_to_pfc_expansion(H,HH),cyc_to_pfc_expansion(T,TT),!.
-cyc_to_pfc_expansion(HOLDS,HOLDSOUT):-HOLDS=..[F|HOLDSL],
-  with_assertions(thocal:outer_pred_expansion(F,HOLDSL),cyc_to_pfc_expansion([F|HOLDSL],HOLDSOUTL)),!,
-  (is_list(HOLDSOUTL)-> must(HOLDSOUT=..HOLDSOUTL) ; HOLDSOUT=HOLDSOUTL),!.
-
-/*
-
-sterm_to_pterm(VAR,'$VAR'(V)):-atom(VAR),atom_concat('?',_,VAR),clip_qm(VAR,V),!.
-sterm_to_pterm(VAR,kw((V))):-atom(VAR),atom_concat(':',V2,VAR),clip_qm(V2,V),!.
-sterm_to_pterm(VAR,VAR):-is_ftVar(VAR),!.
-sterm_to_pterm([VAR],VAR):-is_ftVar(VAR),!.
-sterm_to_pterm([X],Y):-!,nonvar(X),sterm_to_pterm(X,Y).
-
-sterm_to_pterm([S|TERM],dot_holds(PTERM)):- not(is_list(TERM)),!,sterm_to_pterm_list([S|TERM],(PTERM)),!.
-sterm_to_pterm([S|TERM],PTERM):-is_ftVar(S),
-            sterm_to_pterm_list(TERM,PLIST),            
-            PTERM=..[holds,S|PLIST].
-
-sterm_to_pterm([S|TERM],PTERM):-number(S),!,
-            sterm_to_pterm_list([S|TERM],PTERM).            
-	    
-sterm_to_pterm([S|TERM],PTERM):-nonvar(S),atomic(S),!,
-            sterm_to_pterm_list(TERM,PLIST),            
-            PTERM=..[S|PLIST].
-
-sterm_to_pterm([S|TERM],PTERM):-!,  atomic(S),
-            sterm_to_pterm_list(TERM,PLIST),            
-            PTERM=..[holds,S|PLIST].
-
-sterm_to_pterm(VAR,VAR):-!.
-
-sterm_to_pterm_list(VAR,VAR):-is_ftVar(VAR),!.
-sterm_to_pterm_list([],[]):-!.
-sterm_to_pterm_list([S|STERM],[P|PTERM]):-!,
-              sterm_to_pterm(S,P),
-              sterm_to_pterm_list(STERM,PTERM).
-sterm_to_pterm_list(VAR,[VAR]).
-
-*/
-
-clip_us(A,AO):-concat_atom(L,'-',A),concat_atom(L,'_',AO).
-clip_qm(QA,AO):-atom_concat('??',A1,QA),!,atom_concat('_',A1,A),clip_us(A,AO).
-clip_qm(QA,AO):-atom_concat('?',A,QA),!,clip_us(A,AO).
-clip_qm(A,AO):-clip_us(A,AO).
-
-fixvars(P,_,[],P):-!.
-fixvars(P,N,[V|VARS],PO):-  
-     atom_string(Name,V),clip_qm(Name,NB),Var = '$VAR'(NB),
-     subst(P,'$VAR'(N),Var,PM0),
-     subst(PM0,'$VAR'(Name),Var,PM),
-   %  nb_getval('$variable_names', Vs),
-  %   append(Vs,[Name=Var],NVs),
-  %   nb_setval('$variable_names', NVs),
-     N2 is N + 1,fixvars(PM,N2,VARS,PO).
-
-
-:-dynamic(argIsa/3).
-:-multifile(argIsa/3).
-:-dynamic(argGenl/3).
-:-multifile(argGenl/3).
-:-dynamic(argQuotedIsa/3).
-:-multifile(argQuotedIsa/3).
-/*
-isa(I,C):-exactlyAssertedEL(isa,I,C,_,_).
-genls(I,C):-exactlyAssertedEL(genls,I,C,_,_).
-arity(I,C):-exactlyAssertedEL(arity,I,C,_,_).
-argIsa(P,N,C):-exactlyAssertedEL(argIsa,P,N,C,_,_).
-argGenl(P,N,C):-exactlyAssertedEL(argGenl,P,N,C,_,_).
-argQuotedIsa(P,N,C):-exactlyAssertedEL(argQuotedIsa,P,N,C,_,_).
-*/
-% queuedTinyKB(CycL,MT):- (tUndressedMt(MT);tDressedMt(MT)),(STR=vStrMon;STR=vStrDef),  tinyKB_All(CycL,MT,STR),\+ clause(exactlyAssertedEL(CycL,_,_,_),true).
-% queuedTinyKB(CycL):-tUndressedMt(MT),queuedTinyKB(CycL,MT).
-% queuedTinyKB(ist(MT,CycL)):-tDressedMt(MT),queuedTinyKB(CycL,MT).
-
-
-ist(MT,P):-tinyKB(P,MT,vStrMon).
-ist(MT,P):-tinyKB(P,MT,vStrDef).
-
-tinyKB(P):-tUndressedMt(MT),tinyKB(P,MT,_).
-tinyKB(ist(MT,P)):-tDressedMt(MT),tinyKB(P,MT,_).
-
-
-tinyKB(PO,MT,STR):- %fwc,  
-  (tUndressedMt(MT);tDressedMt(MT)),(STR=vStrMon;STR=vStrDef), 
-  tinyKB_All(PO,MT,STR).
-
-tinyKB_All(V,MT,STR):- tinyAssertion(V,MT,STR).
-tinyKB_All(PO,MT,STR):- current_predicate('TINYKB-ASSERTION'/5),!,
-    tiny_kb_ASSERTION(PLISTIn,PROPS),
-        once((sterm_to_pterm(PLISTIn,P),
-               memberchk(amt(MT),PROPS),
-               memberchk(str(STR),PROPS), 
-              (member(vars(VARS),PROPS)->(nb_setval('$variable_names', []),fixvars(P,0,VARS,PO));PO=P ))).
-
-tinyKB:-forall(tinyKB(P,MT,STR),((print_assertion(P,MT,STR),pfc_add(P)))).
-
-print_assertion(P,MT,STR):- P=..PL,append([exactlyAssertedEL|PL],[MT,STR],PPL),PP=..PPL, portray_clause(current_output,PP,[numbervars(false)]).
-
-
-tUndressedMt('UniversalVocabularyImplementationMt').
-tUndressedMt('LogicalTruthImplementationMt').
-tUndressedMt('CoreCycLImplementationMt').
-tUndressedMt('UniversalVocabularyMt').
-tUndressedMt('LogicalTruthMt').
-tUndressedMt('CoreCycLMt').
-tUndressedMt('BaseKB').
-tDressedMt('BookkeepingMt').
-tDressedMt('EnglishParaphraseMt').
-tDressedMt('TemporaryEnglishParaphraseMt').
-
-call_el_stub(V,MT,STR):-into_mpred_form(V,M),!,M=..ML,((ML=[t|ARGS]-> true; ARGS=ML)),CALL=..[exactlyAssertedEL|ARGS],!,call(CALL,MT,STR).
-make_el_stub(V,MT,STR,CALL):-into_mpred_form(V,M),!,M=..ML,((ML=[t|ARGS]-> true; ARGS=ML)),append(ARGS,[MT,STR],CARGS),CALL=..[exactlyAssertedEL|CARGS],!.
-
-tinyAssertion(V,MT,STR):- 
- nonvar(V) -> call_el_stub(V,MT,STR);
-  (tinyAssertion0(W,MT,STR),once(into_mpred_form(W,V))).
-
-tinyAssertion0(t(A,B,C,D,E),MT,STR):-exactlyAssertedEL(A,B,C,D,E,MT,STR).
-tinyAssertion0(t(A,B,C,D),MT,STR):-exactlyAssertedEL(A,B,C,D,MT,STR).
-tinyAssertion0(t(A,B,C),MT,STR):-exactlyAssertedEL(A,B,C,MT,STR).
-tinyAssertion0(t(A,B),MT,STR):-exactlyAssertedEL(A,B,MT,STR).
-
-
-addTinyCycL(CycLIn):- into_mpred_form(CycLIn,CycL),
-  ignore((tiny_support(CycL,_MT,CALL),retract(CALL))),!,
-  addCycL(CycL),!.
-
-
-% tiny_support(CycL,MT,CALL):- CycL=..[F|Args], append(Args,[MT,_STR],WMT),CCALL=..[exactlyAssertedEL,F|WMT],!,((clause(CCALL,true), CCALL=CALL) ; clause(CCALL,(CALL,_))).
-
-make_functor_h(CycL,F,A):- length(Args,A),CycL=..[F|Args].
-
-is_simple_gaf(V):-not(compound(V)),!.
-is_simple_gaf(V):-needs_canoncalization(V),!,fail.
-is_simple_gaf(V):-functor(V,F,A),member(F/A,[isa/2,genls/2,argQuotedIsa/3,afterAdding/2,afterRemoving/2]),!.
-is_simple_gaf(V):-needs_indexing(V),!,fail.
-is_simple_gaf(_).
-
-needs_indexing(V):-compound(V),arg(_,V,A),not(is_simple_arg(A)),!,fail.
-
-is_simple_arg(A):-not(compound(A)),!.
-is_simple_arg(A):-functor(A,Simple,_),tEscapeFunction(Simple).
-
-'tEscapeFunction'('TINYKB-ASSERTION').
-'tEscapeFunction'('SubLQuoteFn').
-'tEscapeFunction'(X):- 'UnreifiableFunction'(X).
-
-needs_canoncalization(CycL):-is_ftVar(CycL),!,fail.
-needs_canoncalization(CycL):-functor(CycL,F,_),isa_db(F,'SentenceOperator').
-needs_canoncalization(CycL):-needs_indexing(CycL).
-
-is_better_backchained(CycL):-is_ftVar(CycL),!,fail.
-is_better_backchained(CycL):-functor(CycL,F,_),isa_db(F,'SentenceOperator').
-is_better_backchained(V):-unnumbervars(V,FOO),(((each_subterm(FOO,SubTerm),nonvar(SubTerm),isa_db(SubTerm,tAvoidForwardChain)))),!.
-
-
-as_cycl(VP,VE):-subst(VP,('-'),(neg),V0),subst(V0,('v'),(or),V1),subst(V1,('exists'),(thereExists),V2),subst(V2,('&'),(and),VE),!.
-
-
-:-dynamic(addTiny_added/1).
-addCycL(V):-addTiny_added(V),!.
-addCycL(V):-into_mpred_form(V,M),V\=@=M,!,addCycL(M),!.
-addCycL(V):-defunctionalize('implies',V,VE),V\=@=VE,!,addCycL(VE).
-addCycL(V):-cyc_to_pfc_expansion(V,VE),V\=@=VE,!,addCycL(VE).
-addCycL(V):-is_simple_gaf(V),!,addCycL0(V),!.
-addCycL(V):-kif_to_boxlog(V,VB),boxlog_to_prolog(VB,VP),V\=@=VP,!,as_cycl(VP,VE),show_call(addCycL0(VE)).
-addCycL(V):-addCycL0(V),!.
-
-addCycL0(V):-addCycL1(V).
-
-addCycL1(V):-into_mpred_form(V,M),V\=@=M,!,addCycL0(M),!.
-addCycL1(V):-cyc_to_pfc_expansion(V,VE),V\=@=VE,!,addCycL0(VE).
-addCycL1((TRUE=>V)):-is_true(TRUE),addCycL0(V),!.
-addCycL1((V<=TRUE)):-is_true(TRUE),addCycL0(V),!.
-addCycL1((V :- TRUE)):-is_true(TRUE),addCycL0(V),!.
-addCycL1((V :- A)):- show_call(addCycL0((A => V))).
-addCycL1((A => (V1 , V2))):-not(is_ftVar(V1)),!,show_call(addCycL0((A => V1))) , show_call(addCycL0((A => V2))).
-addCycL1((V1 , V2)):-!,addCycL0(V1),addCycL0(V2),!.
-addCycL1([V1 | V2]):-!,addCycL0(V1),addCycL0(V2),!.
-addCycL1(V):-addTiny_added(V),!.
-addCycL1(V):-asserta(addTiny_added(V)),unnumbervars(V,VE),pfc_add(VE),remQueuedTinyKB(VE).
-
-
-sent_to_conseq(CycLIn,Consequent):- into_mpred_form(CycLIn,CycL), ignore((tiny_support(CycL,_MT,CALL),retract(CALL))),must(cycLToMpred(CycL,Consequent)),!.
-
-:-dynamic(addTiny_added/1).
-
-cycLToMpred(V,CP):-into_mpred_form(V,M),V\=@=M,!,cycLToMpred(M,CP),!.
-cycLToMpred(V,CP):-cyc_to_pfc_expansion(V,VE),V\=@=VE,!,cycLToMpred(VE,CP).
-cycLToMpred(V,CP):-is_simple_gaf(V),!,cycLToMpred0(V,CP),!.
-cycLToMpred(V,CP):-defunctionalize('implies',V,VE),V\=@=VE,!,cycLToMpred(VE,CP).
-cycLToMpred(V,CP):-kif_to_boxlog(V,VB),boxlog_to_prolog(VB,VP),V\=@=VP,!,as_cycl(VP,VE),show_call(cycLToMpred0(VE,CP)).
-cycLToMpred(V,CP):-cycLToMpred0(V,CP),!.
-
-cycLToMpred0(V,CP):-into_mpred_form(V,M),V\=@=M,!,cycLToMpred0(M,CP),!.
-cycLToMpred0(V,CP):-cyc_to_pfc_expansion(V,VE),V\=@=VE,!,cycLToMpred0(VE,CP).
-cycLToMpred0((TRUE=>V),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
-cycLToMpred0((V<=TRUE),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
-cycLToMpred0((V :- TRUE),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
-cycLToMpred0((V :- A),CP):- show_call(cycLToMpred0((A => V),CP)),!.
-cycLToMpred0((A => (V1 , V2)),CP):-not(is_ftVar(V1)),!,cycLToMpred0((A=> (V1/consistent(V2))),V1P),cycLToMpred0((A=> (V2/consistent(V1))),V2P) ,!,conjoin(V1P,V2P,CP).
-cycLToMpred0((V1 , V2),CP):-!,cycLToMpred0(V1,V1P),cycLToMpred0(V2,V2P),!,conjoin(V1P,V2P,CP).
-cycLToMpred0([V1 | V2],CP):-!,cycLToMpred0(V1,V1P),cycLToMpred0(V2,V2P),!,conjoin(V1P,V2P,CP).
-cycLToMpred0(V,V).
-
-%  cycLToMpred( (grandparent('$VAR'('G'),'$VAR'('C')) => thereExists('$VAR'('P'), and(parent('$VAR'('G'),'$VAR'('P')),parent('$VAR'('P'),'$VAR'('C'))))),O).
-
-
-
-% :-onEachLoad(loadTinyAssertions2).
-
-% ============================================
-% DBASE to Cyc Predicate Mapping
-% ============================================
-/*
-arity('abbreviationString-PN', 2).
-
-typical_mtvars([_,_]).
-
-% arity 1 person
-make_functorskel(Person,1,fskel(Person,t(Person,A),Call,A,[],MtVars,Call2)):-typical_mtvars(MtVars),Call=..[Person,A],Call2=..[Person,A|MtVars]. 
-% arity 2 likes
-make_functorskel(Likes,2,fskel(Likes,t(Likes,A,B),Call,A,B,MtVars,Call2)):- typical_mtvars(MtVars),Call=..[Likes,A,B],Call2=..[Likes,A,B|MtVars]. 
-% arity 3 between
-make_functorskel(Between,3,fskel(Between,t(Between,A,B,C),Call,A,[B,C],MtVars,Call2)):- typical_mtvars(MtVars),Call=..[Between,A,B,C],Call2=..[Between,A,B,C|MtVars]. 
-% arity 4 xyz
-make_functorskel(Xyz,4,fskel(Xyz,t(Xyz,I,X,Y,Z),Call,I,[X,Y,Z],MtVars,Call2)):- typical_mtvars(MtVars),Call=..[Xyz,I,X,Y,Z],Call2=..[Xyz,I,X,Y,Z|MtVars]. 
-% arity 5 rxyz
-make_functorskel(RXyz,5,fskel(RXyz,t(RXyz,I,R,X,Y,Z),Call,I,[R,X,Y,Z],MtVars,Call2)):-typical_mtvars(MtVars),Call=..[RXyz,I,R,X,Y,Z],Call2=..[RXyz,I,R,X,Y,Z|MtVars]. 
-% arity >6 
-make_functorskel(F,N,fskel(F,DBASE,Call,I,NList,MtVars,Call2)):-typical_mtvars(MtVars),functor(Call,F,N),Call=..[F,I|NList],DBASE=..[t,F,I|NList],append([F,I|NList],MtVars,CALL2List),Call2=..CALL2List.
-
-*/
-
-% ============================================
-% Prolog to Cyc Predicate Mapping
-%
-%  the following will all do the same things:
-%
-% :- decl_mpred('BaseKB':isa/2). 
-% :- decl_mpred('BaseKB':isa(_,_)). 
-% :- decl_mpred(isa(_,_),'BaseKB'). 
-% :- decl_mpred('BaseKB',isa,2). 
-%
-%  Will make calls 
-% :- isa(X,Y)
-%  Query into #$BaseKB for (#$isa ?X ?Y) 
-%
-% decl_mpred/N
-%
-% ============================================
-
-:-dynamic(isCycUnavailable_known/1).
-:-dynamic(isCycAvailable_known/0).
-
-:-export(isCycAvailable/0).
-isCycAvailable:-isCycUnavailable_known(_),!,fail.
-isCycAvailable:-isCycAvailable_known,!.
-isCycAvailable:-checkCycAvailablity,isCycAvailable.
-
-:-export(isCycUnavailable/0).
-isCycUnavailable:-isCycUnavailable_known(_),!.
-isCycUnavailable:-isCycAvailable_known,!,fail.
-isCycUnavailable:-checkCycAvailablity,isCycUnavailable.
-
-:-export(checkCycAvailablity/0).
-checkCycAvailablity:- (isCycAvailable_known;isCycUnavailable_known(_)),!.
-checkCycAvailablity:- ccatch((ignore((invokeSubL("(+ 1 1)",R))),(R==2->assert_if_new(isCycAvailable_known);assert_if_new(isCycUnavailable_known(R)))),E,assert_if_new(isCycUnavailable_known(E))),!.
-
 % ===================================================================
 % OPERATOR PRECEDANCE
 % ===================================================================
@@ -369,9 +41,6 @@ exactlyAssertedEL(isa, trueSubL, 'EvaluatablePredicate', 'UniversalVocabularyMt'
 exactlyAssertedEL(isa, trueSubL, 'DefaultMonotonicPredicate', 'UniversalVocabularyMt', vStrDef).
 exactlyAssertedEL(isa, trueSentence, 'UnaryPredicate', 'UniversalVocabularyMt', vStrDef).
 exactlyAssertedEL(isa, trueRule, 'BinaryPredicate', 'UniversalVocabularyMt', vStrDef).
-
-end_of_file.
-
 
 exactlyAssertedEL(isa, transitiveViaArgInverse, 'TernaryPredicate', 'UniversalVocabularyMt', vStrDef).
 exactlyAssertedEL(isa, transitiveViaArgInverse, 'DefaultMonotonicPredicate', 'UniversalVocabularyMt', vStrDef).
@@ -8377,23 +8046,263 @@ exactlyAssertedEL(collectionConventionMt, 'ArgConstraintPredicate', 'UniversalVo
 exactlyAssertedEL(collectionConventionMt, 'AntiTransitiveBinaryPredicate', 'UniversalVocabularyMt', 'BaseKB', vStrDef).
 exactlyAssertedEL(collectionConventionMt, 'AntiSymmetricBinaryPredicate', 'UniversalVocabularyMt', 'BaseKB', vStrDef).
 
-exactlyAssertedEL(canonicalizerDirectiveForArg, trueRule, 2, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
-exactlyAssertedEL(canonicalizerDirectiveForArg, reformulatorRule, 2, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
-exactlyAssertedEL(canonicalizerDirectiveForArg, reformulatorRule, 1, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
-exactlyAssertedEL(canonicalizerDirectiveForArg, reformulatorEquiv, 2, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
-exactlyAssertedEL(canonicalizerDirectiveForArg, reformulatorEquiv, 1, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
-exactlyAssertedEL(canonicalizerDirectiveForArg, reformulatorEquals, 2, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
-exactlyAssertedEL(canonicalizerDirectiveForArg, reformulatorEquals, 1, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
-exactlyAssertedEL(canonicalizerDirectiveForArg, reformulationPrecondition, 2, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
-exactlyAssertedEL(canonicalizerDirectiveForArg, formulaArity, 1, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrDef).
-exactlyAssertedEL(canonicalizerDirectiveForArg, expansion, 2, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
-exactlyAssertedEL(canonicalizerDirectiveForArg, expansion, 2, 'AllowGenericArgVariables', 'UniversalVocabularyImplementationMt', vStrMon).
-exactlyAssertedEL(canonicalizerDirectiveForArg, collectionExpansion, 2, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrDef).
-exactlyAssertedEL(canonicalizerDirectiveForArg, collectionExpansion, 2, 'AllowGenericArgVariables', 'UniversalVocabularyImplementationMt', vStrDef).
-exactlyAssertedEL(canonicalizerDirectiveForArg, 'FormulaArityFn', 1, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
 exactlyAssertedEL(canonicalizerDirectiveForArg, 'FormulaArgSetFn', 1, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
+exactlyAssertedEL(canonicalizerDirectiveForArg, 'FormulaArityFn', 1, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
+exactlyAssertedEL(canonicalizerDirectiveForArg, collectionExpansion, 2, 'AllowGenericArgVariables', 'UniversalVocabularyImplementationMt', vStrDef).
+exactlyAssertedEL(canonicalizerDirectiveForArg, collectionExpansion, 2, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrDef).
+exactlyAssertedEL(canonicalizerDirectiveForArg, expansion, 2, 'AllowGenericArgVariables', 'UniversalVocabularyImplementationMt', vStrMon).
+exactlyAssertedEL(canonicalizerDirectiveForArg, expansion, 2, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
+exactlyAssertedEL(canonicalizerDirectiveForArg, formulaArity, 1, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrDef).
+exactlyAssertedEL(canonicalizerDirectiveForArg, reformulationPrecondition, 2, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
+exactlyAssertedEL(canonicalizerDirectiveForArg, reformulatorEquals, 1, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
+exactlyAssertedEL(canonicalizerDirectiveForArg, reformulatorEquals, 2, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
+exactlyAssertedEL(canonicalizerDirectiveForArg, reformulatorEquiv, 1, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
+exactlyAssertedEL(canonicalizerDirectiveForArg, reformulatorEquiv, 2, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
+exactlyAssertedEL(canonicalizerDirectiveForArg, reformulatorRule, 1, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
+exactlyAssertedEL(canonicalizerDirectiveForArg, reformulatorRule, 2, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
+exactlyAssertedEL(canonicalizerDirectiveForArg, trueRule, 2, 'LeaveSomeTermsAtEL', 'UniversalVocabularyImplementationMt', vStrMon).
+exactlyAssertedEL(relationAll, assertedSentence, 'CycLAssertion', 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(relationAll, decontextualizedCollection, 'AtemporalNecessarilyEssentialCollectionType', 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(relationAll, minimizeExtent, 'BookkeepingPredicate', 'BaseKB', vStrDef).
+exactlyAssertedEL(relationAllExists, arity, tPred, 'PositiveInteger', 'BaseKB', vStrDef).
+exactlyAssertedEL(relationAllExists, constantID, 'CycLConstant', 'NonNegativeInteger', 'BaseKB', vStrMon).
+exactlyAssertedEL(relationAllExists, cycProblemStoreID, 'CycProblemStore', 'NonNegativeInteger', 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(relationAllExists, cycProblemStoreInferences, 'CycProblemStore', 'CycInference', 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(relationAllExists, natFunction, 'CycLNonAtomicTerm-ClosedFunctor', 'ReifiableFunction', 'BaseKB', vStrMon).
+exactlyAssertedEL(relationAllInstance, arg1Isa, 'ArgTypeBinaryPredicate', tRelation, 'BaseKB', vStrDef).
+exactlyAssertedEL(relationAllInstance, arg1Isa, 'ArgTypeTernaryPredicate', tRelation, 'BaseKB', vStrDef).
+exactlyAssertedEL(relationAllInstance, arg2Isa, 'ArgGenlBinaryPredicate', tCol, 'BaseKB', vStrDef).
+exactlyAssertedEL(relationAllInstance, arg2Isa, 'ArgIsaBinaryPredicate', tCol, 'BaseKB', vStrDef).
+exactlyAssertedEL(relationAllInstance, arg2Isa, 'ArgTypeTernaryPredicate', 'NonNegativeInteger', 'BaseKB', vStrDef).
+exactlyAssertedEL(relationAllInstance, arg3Isa, 'ArgGenlTernaryPredicate', tCol, 'BaseKB', vStrDef).
+exactlyAssertedEL(relationAllInstance, arg3Isa, 'ArgIsaTernaryPredicate', tCol, 'BaseKB', vStrDef).
+exactlyAssertedEL(relationAllInstance, arity, 'BinaryRelation', 2, 'CoreCycLMt', vStrMon).
+exactlyAssertedEL(relationAllInstance, arity, 'QuaternaryRelation', 4, 'BaseKB', vStrMon).
+exactlyAssertedEL(relationAllInstance, arity, 'QuintaryRelation', 5, 'BaseKB', vStrMon).
+exactlyAssertedEL(relationAllInstance, arity, 'TernaryRelation', 3, 'BaseKB', vStrMon).
+exactlyAssertedEL(relationAllInstance, arity, 'UnaryRelation', 1, 'BaseKB', vStrMon).
+exactlyAssertedEL(relationAllInstance, arityMax, 'UnitOfMeasure', 2, 'BaseKB', vStrDef).
+exactlyAssertedEL(relationAllInstance, arityMin, 'UnitOfMeasure', 1, 'BaseKB', vStrDef).
+exactlyAssertedEL(relationAllInstance, assertionDirection, 'CycLGAFAssertion', 'Forward-AssertionDirection', 'BaseKB', vStrDef).
+exactlyAssertedEL(relationAllInstance, assertionDirection, 'CycLRuleAssertion', 'Backward-AssertionDirection', 'BaseKB', vStrDef).
+exactlyAssertedEL(relationAllInstance, collectionConventionMt, 'AtemporalNecessarilyEssentialCollectionType', 'UniversalVocabularyMt', 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(relationAllInstance, definingMt, 'Microtheory', 'BaseKB', 'BaseKB', vStrDef).
+exactlyAssertedEL(relationAllInstance, genlMt, 'Microtheory', 'BaseKB', 'BaseKB', vStrDef).
+exactlyAssertedEL(relationAllInstance, genlPreds, 'IrreflexiveBinaryPredicate', different, 'BaseKB', vStrMon).
+exactlyAssertedEL(relationAllInstance, genls, tCol, 'Thing', 'BaseKB', vStrMon).
+exactlyAssertedEL(relationAllInstance, resultIsa, 'CollectionDenotingFunction', tCol, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(relationInstanceAll, subsetOf, 'TheEmptySet', 'SetOrCollection', 'BaseKB', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa1-2', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa1-3', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa1-4', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa1-5', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa2-1', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa2-3', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa2-4', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa2-5', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa3-1', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa3-2', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa3-4', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa3-5', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa4-1', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa4-2', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa4-3', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa4-5', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa5-1', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa5-2', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa5-3', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, 'interArgIsa5-4', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, admittedAllArgument, genlPreds, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg1Genl, genls, 2, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg1Genl, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg1Isa, genls, 2, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg1Isa, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg1SometimesIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg2Genl, genls, 2, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg2Genl, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg2Isa, genls, 2, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg2Isa, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg2SometimesIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg3Genl, genls, 2, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg3Genl, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg3Isa, genls, 2, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg3Isa, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg3SometimesIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg4Genl, genls, 2, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg4Genl, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg4Isa, genls, 2, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg4Isa, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg4SometimesIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg5Genl, genls, 2, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg5Genl, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg5Isa, genls, 2, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg5Isa, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg5SometimesIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg6Genl, genls, 2, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg6Genl, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg6Isa, genls, 2, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg6Isa, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, arg6SometimesIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, argAndRestGenl, genls, 3, 'BaseKB', vStrDef).
+exactlyAssertedEL(transitiveViaArg, argAndRestIsa, genls, 3, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, argIsa, genls, 3, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, argsGenl, genls, 2, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, argsGenl, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, argsIsa, genls, 2, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, argsIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, canonicalizerDirectiveForAllArgs, genlCanonicalizerDirectives, 2, 'CoreCycLImplementationMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, canonicalizerDirectiveForArg, genlCanonicalizerDirectives, 3, 'CoreCycLImplementationMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, canonicalizerDirectiveForArgAndRest, genlCanonicalizerDirectives, 3, 'CoreCycLImplementationMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, defnSufficient, genls, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, genlInverse, genlPreds, 2, 'BaseKB', vStrDef).
+exactlyAssertedEL(transitiveViaArg, genls, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, greaterThan, quantitySubsumes, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, holdsIn, sentenceImplies, 2, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, isa, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, quotedIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, relationAll, genlPreds, 1, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, relationAllExists, genlPreds, 1, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, relationAllExists, genls, 3, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, relationAllExistsMin, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, relationAllExistsMin, genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, relationAllInstance, genlPreds, 1, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, relationExistsAll, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, relationExistsAll, genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, relationExistsCountAll, genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, relationExistsInstance, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, relationExistsInstance, genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, relationExistsMinAll, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, relationExistsMinAll, genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, relationInstanceAll, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, relationInstanceExists, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, relationInstanceExists, genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, relationInstanceMember, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, relationMemberInstance, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, requiredArg1Pred, genlPreds, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, requiredArg2Pred, genlPreds, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArg, resultGenl, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, resultIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArg, subsetOf, subsetOf, 2, 'BaseKB', vStrMon).
+exactlyAssertedEL(transitiveViaArg, subsetOf, subsetOf, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-2', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-2', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-3', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-3', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-3', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-4', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-4', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-4', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-5', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-5', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-5', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-1', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-1', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-3', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-3', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-3', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-4', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-4', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-4', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-5', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-5', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-5', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-1', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-1', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-1', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-2', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-2', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-2', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-4', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-4', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-4', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-5', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-5', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-5', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-1', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-1', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-1', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-2', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-2', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-2', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-3', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-3', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-3', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-5', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-5', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-5', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-1', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-1', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-1', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-2', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-2', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-2', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-3', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-3', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-3', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-4', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-4', genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-4', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, admittedAllArgument, genls, 1, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArgInverse, defnNecessary, genls, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, disjointWith, genls, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, disjointWith, genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, genlInverse, genlPreds, 1, 'BaseKB', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, genls, genls, 1, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArgInverse, interArgResultIsa, genls, 3, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArgInverse, ist, genlMt, 1, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArgInverse, microtheoryDesignationArgnum, genlPreds, 1, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArgInverse, negationPreds, genlPreds, 1, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArgInverse, negationPreds, genlPreds, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArgInverse, relationAll, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArgInverse, relationAllExists, genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, relationAllExistsCount, genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, relationAllExistsMax, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, relationAllExistsMax, genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, relationAllExistsMax, genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, relationAllExistsMin, genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, relationAllInstance, genls, 2, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArgInverse, relationAllInstance, quantitySubsumes, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, relationExistsAll, genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, relationExistsMaxAll, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, relationExistsMaxAll, genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, relationExistsMaxAll, genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, relationExistsMinAll, genls, 2, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, relationInstanceAll, genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, requiredArg1Pred, genls, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, requiredArg2Pred, genls, 1, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL(transitiveViaArgInverse, sentenceDesignationArgnum, genlPreds, 1, 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL(transitiveViaArgInverse, subsetOf, subsetOf, 1, 'BaseKB', vStrMon).
 
 
+% ================================
+% ================================
+% ================================
+% ================================
+% ================================
+% ================================
+% ================================
+% ================================
+% ================================
+% ================================
+
+exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies_first(A,C,MT,STR).
+exactlyAssertedEL(not,What,MT,STR):- assertedTinyKB_not_first(What,MT,STR),true.
+exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies(A,C,MT,STR),not(is_better_backchained(=>(A,C))).
+exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies(A,C,MT,STR),is_better_backchained(=>(A,C)).
+exactlyAssertedEL(not,What,MT,STR):- assertedTinyKB_not(What,MT,STR),true.
+exactlyAssertedEL(Pred,A,C,MT,STR):- exactlyAssertedEL_with_vars(Pred,A,C,MT,STR).
+
+
+% ================================
+% ================================
+% ================================
+% ================================
+% ================================
+% ================================
+% ================================
+% ================================
+% ================================
+% ================================
 
 assertedTinyKB_implies_first( isa('$VAR'('UNIT'), 'UnitOfMeasure'), arityMin('$VAR'('UNIT'), 1), 'BaseKB', vStrMon).
 assertedTinyKB_implies_first( isa('$VAR'('UNIT'), 'UnitOfMeasure'), arityMax('$VAR'('UNIT'), 2), 'BaseKB', vStrMon).
@@ -8476,23 +8385,6 @@ assertedTinyKB_implies_Already( arg1QuotedIsa('$VAR'('RELN'), '$VAR'('COL')), ar
 assertedTinyKB_implies_Already( arg2Isa('$VAR'('PRED'), '$VAR'('TYPE')), resultIsa('FunctionToArg'(2, '$VAR'('PRED')), '$VAR'('TYPE')), 'BaseKB', vStrDef).
 assertedTinyKB_implies_Already( arg1Isa('$VAR'('RELN'), '$VAR'('COL')), argIsa('$VAR'('RELN'), 1, '$VAR'('COL')), 'UniversalVocabularyMt', vStrDef).
 
-
-exactlyAssertedEL(relationAllInstance, resultIsa, 'CollectionDenotingFunction', tCol, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(relationAllInstance, arityMin, 'UnitOfMeasure', 1, 'BaseKB', vStrDef).
-exactlyAssertedEL(relationAllInstance, arityMax, 'UnitOfMeasure', 2, 'BaseKB', vStrDef).
-exactlyAssertedEL(relationAllInstance, arity, 'UnaryRelation', 1, 'BaseKB', vStrMon).
-exactlyAssertedEL(relationAllInstance, arity, 'TernaryRelation', 3, 'BaseKB', vStrMon).
-exactlyAssertedEL(relationAllInstance, arity, 'QuintaryRelation', 5, 'BaseKB', vStrMon).
-exactlyAssertedEL(relationAllInstance, arity, 'QuaternaryRelation', 4, 'BaseKB', vStrMon).
-exactlyAssertedEL(relationAllInstance, arity, 'BinaryRelation', 2, 'CoreCycLMt', vStrMon).
-exactlyAssertedEL(relationAllInstance, arg3Isa, 'ArgIsaTernaryPredicate', tCol, 'BaseKB', vStrDef).
-exactlyAssertedEL(relationAllInstance, arg3Isa, 'ArgGenlTernaryPredicate', tCol, 'BaseKB', vStrDef).
-exactlyAssertedEL(relationAllInstance, arg2Isa, 'ArgTypeTernaryPredicate', 'NonNegativeInteger', 'BaseKB', vStrDef).
-exactlyAssertedEL(relationAllInstance, arg2Isa, 'ArgIsaBinaryPredicate', tCol, 'BaseKB', vStrDef).
-exactlyAssertedEL(relationAllInstance, arg2Isa, 'ArgGenlBinaryPredicate', tCol, 'BaseKB', vStrDef).
-exactlyAssertedEL(relationAllInstance, arg1Isa, 'ArgTypeTernaryPredicate', tRelation, 'BaseKB', vStrDef).
-exactlyAssertedEL(relationAllInstance, arg1Isa, 'ArgTypeBinaryPredicate', tRelation, 'BaseKB', vStrDef).
-exactlyAssertedEL(relationAllExists, natFunction, 'CycLNonAtomicTerm-ClosedFunctor', 'ReifiableFunction', 'BaseKB', vStrMon).
 
 
 assertedTinyKB_implies_first( arg6Isa('$VAR'('PRED'), '$VAR'('TYPE')), resultIsa('FunctionToArg'(6, '$VAR'('PRED')), '$VAR'('TYPE')), 'BaseKB', vStrDef).
@@ -8591,8 +8483,6 @@ assertedTinyKB_implies_first( genlInverse('$VAR'('SPEC_INVERSE'), genlMt), after
 assertedTinyKB_implies_first( genlInverse('$VAR'('SPEC_INVERSE'), genlInverse), afterAdding('$VAR'('SPEC_INVERSE'), 'SubLQuoteFn'('PROPAGATE-INVERSE-TO-GENLINVERSE')), 'BaseKB', vStrMon).
 
 
-exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies_first(A,C,MT,STR).
-exactlyAssertedEL(not,What,MT,STR):- assertedTinyKB_not_first(What,MT,STR),true.
 
 assertedTinyKB_not_first(quotedIsa(thereExistExactly, 'InferenceSupportedTerm'), 'UniversalVocabularyMt', vStrDef).
 assertedTinyKB_not_first(quotedIsa(thereExistAtMost, 'InferenceSupportedTerm'), 'UniversalVocabularyMt', vStrDef).
@@ -8707,7 +8597,7 @@ assertedTinyKB_implies( quotedIsa('$VAR'('ASSERTION'), 'CycLRuleAssertion'), ass
 assertedTinyKB_implies( quotedIsa('$VAR'('ASSERTION'), 'CycLGAFAssertion'), assertionDirection('$VAR'('ASSERTION'), 'Forward-AssertionDirection'), 'BaseKB', vStrDef).
 
 
-exactlyAssertedEL(implies_bc, quotedIsa('$VAR'('X'), '$VAR'('COL')), isa('Quote'('EscapeQuote'('$VAR'('X'))), '$VAR'('COL')), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(implies_bc, quotedIsa('$VAR'('X'), '$VAR'('COL')), isa('Quote'('EscapeQuote'('$VAR'('X'))), '$VAR'('COL')), 'BaseKB', vStrDef).
 assertedTinyKB_implies( quotedIsa('$VAR'('EXPR'), 'CycLClosedExpression'), equals('Quote'('$VAR'('EXPR')), 'Quote'('EscapeQuote'('$VAR'('EXPR')))), 'BaseKB', vStrMon).
 assertedTinyKB_implies( quantitySubsumes('$VAR'('NUM2'), '$VAR'('SUBNUM2')), quantitySubsumes('Unity'('$VAR'('_NUM1'), '$VAR'('NUM2')), '$VAR'('SUBNUM2')), 'BaseKB', vStrDef).
 assertedTinyKB_implies( quantitySubsumes('$VAR'('NUM1'), '$VAR'('SUBNUM1')), quantitySubsumes('Unity'('$VAR'('NUM1'), '$VAR'('_NUM2')), '$VAR'('SUBNUM1')), 'BaseKB', vStrDef).
@@ -8755,17 +8645,17 @@ assertedTinyKB_implies( and(unitMultiplicationFactor('$VAR'('UNIT_TWO'), '$VAR'(
 assertedTinyKB_implies( and(unitMultiplicationFactor('$VAR'('UNIT_ONE'), '$VAR'('UNIT_TWO'), '$VAR'('FACTOR1')), termOfUnit('$VAR'('PERFN_1'), 'PerFn'('$VAR'('UNIT_ONE'), '$VAR'('UNIT_THREE'))), termOfUnit('$VAR'('PERFN'), 'PerFn'('$VAR'('UNIT_TWO'), '$VAR'('UNIT_THREE')))), unitMultiplicationFactor('$VAR'('PERFN_1'), '$VAR'('PERFN'), '$VAR'('FACTOR1')), 'BaseKB', vStrDef).
 assertedTinyKB_implies( and(unitMultiplicationFactor('$VAR'('SMALL'), '$VAR'('BIG'), '$VAR'('FACTOR')), evaluate('$VAR'('TIMESFN'), 'TimesFn'('$VAR'('FACTOR'), '$VAR'('N')))), equals(holds('$VAR'('BIG'), '$VAR'('N')), holds('$VAR'('SMALL'), '$VAR'('TIMESFN'))), 'BaseKB', vStrMon).
 
-exactlyAssertedEL(evaluationDefn, 'FunctionToArg'('$VAR'('N'), '$VAR'('PREDICATE')), 'SubLQuoteFn'('CYC-FUNCTION-TO-ARG'), 'BaseKB', vStrMon).
-exactlyAssertedEL(evaluationDefn, 'FormulaArityFn', 'SubLQuoteFn'('CYC-RELATION-EXPRESSION-ARITY'), 'BaseKB', vStrMon).
-exactlyAssertedEL(evaluationDefn, 'FormulaArgSetFn', 'SubLQuoteFn'('CYC-RELATION-ARG-SET'), 'BaseKB', vStrMon).
-exactlyAssertedEL(evaluationDefn, 'FormulaArgListFn', 'SubLQuoteFn'('CYC-RELATION-ARGS-LIST'), 'BaseKB', vStrMon).
-exactlyAssertedEL(evaluationDefn, 'FormulaArgFn', 'SubLQuoteFn'('CYC-RELATION-ARG'), 'BaseKB', vStrMon).
-exactlyAssertedEL(evaluationDefn, 'EvaluateSubLFn', 'SubLQuoteFn'('CYC-EVALUATE-SUBL'), 'BaseKB', vStrMon).
-exactlyAssertedEL(evaluationDefn, 'DifferenceFn', 'SubLQuoteFn'('CYC-DIFFERENCE'), 'BaseKB', vStrMon).
-exactlyAssertedEL(evaluationDefn, 'DateEncodeStringFn', 'SubLQuoteFn'('CYC-DATE-ENCODE-STRING'), 'BaseKB', vStrMon).
-exactlyAssertedEL(evaluationDefn, 'DateDecodeStringFn', 'SubLQuoteFn'('CYC-DATE-DECODE-STRING'), 'BaseKB', vStrMon).
-exactlyAssertedEL(evaluationDefn, 'Average', 'SubLQuoteFn'('CYC-AVERAGE'), 'BaseKB', vStrMon).
-exactlyAssertedEL(evaluationDefn, 'AbsoluteValueFn', 'SubLQuoteFn'('CYC-ABSOLUTE-VALUE'), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(evaluationDefn, 'FunctionToArg'('$VAR'('N'), '$VAR'('PREDICATE')), 'SubLQuoteFn'('CYC-FUNCTION-TO-ARG'), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(evaluationDefn, 'FormulaArityFn', 'SubLQuoteFn'('CYC-RELATION-EXPRESSION-ARITY'), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(evaluationDefn, 'FormulaArgSetFn', 'SubLQuoteFn'('CYC-RELATION-ARG-SET'), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(evaluationDefn, 'FormulaArgListFn', 'SubLQuoteFn'('CYC-RELATION-ARGS-LIST'), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(evaluationDefn, 'FormulaArgFn', 'SubLQuoteFn'('CYC-RELATION-ARG'), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(evaluationDefn, 'EvaluateSubLFn', 'SubLQuoteFn'('CYC-EVALUATE-SUBL'), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(evaluationDefn, 'DifferenceFn', 'SubLQuoteFn'('CYC-DIFFERENCE'), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(evaluationDefn, 'DateEncodeStringFn', 'SubLQuoteFn'('CYC-DATE-ENCODE-STRING'), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(evaluationDefn, 'DateDecodeStringFn', 'SubLQuoteFn'('CYC-DATE-DECODE-STRING'), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(evaluationDefn, 'Average', 'SubLQuoteFn'('CYC-AVERAGE'), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(evaluationDefn, 'AbsoluteValueFn', 'SubLQuoteFn'('CYC-ABSOLUTE-VALUE'), 'BaseKB', vStrMon).
 
 
 
@@ -8953,16 +8843,16 @@ assertedTinyKB_not_first(and(notAssertible('$VAR'('PRED')), isa('$VAR'('PRED'), 
 assertedTinyKB_not_first(and(backchainForbiddenWhenUnboundInArg('$VAR'('PRED'), '$VAR'('N')), arity('$VAR'('PRED'), '$VAR'('M')), greaterThan('$VAR'('N'), '$VAR'('M'))), 'UniversalVocabularyMt', vStrDef).
 assertedTinyKB_not_first(and(arity('$VAR'('REL'), 1), commutativeInArgsAndRest('$VAR'('REL'), '$VAR'('M'), '$VAR'('N'))), 'BaseKB', vStrDef).
 assertedTinyKB_not_first(and(arity('$VAR'('REL'), 1), commutativeInArgs('$VAR'('REL'), '$VAR'('M'), '$VAR'('N'))), 'BaseKB', vStrDef).
-exactlyAssertedEL(relationAllInstance, resultIsa, 'UnitOfMeasure', 'ScalarInterval', 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL_with_vars(relationAllInstance, resultIsa, 'UnitOfMeasure', 'ScalarInterval', 'UniversalVocabularyMt', vStrMon).
 
-exactlyAssertedEL(equiv, arity('$VAR'('REL'), 4), isa('$VAR'('REL'), 'QuaternaryRelation'), 'BaseKB', vStrMon).
-exactlyAssertedEL(equiv, arity('$VAR'('REL'), 3), isa('$VAR'('REL'), 'TernaryRelation'), 'BaseKB', vStrDef).
-exactlyAssertedEL(equiv, arity('$VAR'('REL'), 2), isa('$VAR'('REL'), 'BinaryRelation'), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(equiv, arity('$VAR'('REL'), 4), isa('$VAR'('REL'), 'QuaternaryRelation'), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(equiv, arity('$VAR'('REL'), 3), isa('$VAR'('REL'), 'TernaryRelation'), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(equiv, arity('$VAR'('REL'), 2), isa('$VAR'('REL'), 'BinaryRelation'), 'BaseKB', vStrMon).
 assertedTinyKB_implies_first( and(resultIsa('$VAR'('F'), '$VAR'('COL')), termOfUnit('$VAR'('U'), '$VAR'('F'))), isa('$VAR'('U'), '$VAR'('COL')), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, genls, implies(isa('$VAR'('OBJ'), (':ARG1')), isa('$VAR'('OBJ'), (':ARG2'))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, resultIsa, implies(equals('$VAR'('VALUE'), 'NART'([(':ARG1'), '?ARGS'])), isa('$VAR'('VALUE'), (':ARG2'))), 'BaseKB', vStrMon).
-exactlyAssertedEL(expansion, resultGenl, implies(equals('$VAR'('VALUE'), 'NART'([(':ARG1'), '?ARGS'])), genls('$VAR'('VALUE'), (':ARG2'))), 'BaseKB', vStrMon).
-exactlyAssertedEL(relationAllInstance, resultIsa, 'UnitOfMeasure', 'ScalarInterval', 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL_with_vars(expansion, genls, implies(isa('$VAR'('OBJ'), (':ARG1')), isa('$VAR'('OBJ'), (':ARG2'))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, resultIsa, implies(equals('$VAR'('VALUE'), 'NART'([(':ARG1'), '?ARGS'])), isa('$VAR'('VALUE'), (':ARG2'))), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(expansion, resultGenl, implies(equals('$VAR'('VALUE'), 'NART'([(':ARG1'), '?ARGS'])), genls('$VAR'('VALUE'), (':ARG2'))), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(relationAllInstance, resultIsa, 'UnitOfMeasure', 'ScalarInterval', 'UniversalVocabularyMt', vStrMon).
 
 
 
@@ -9209,222 +9099,39 @@ assertedTinyKB_not(and(arg2Genl('$VAR'('PRED'), '$VAR'('ARG2TYPE')), disjointWit
 assertedTinyKB_not(and(arg1Isa('$VAR'('PRED'), '$VAR'('ARG1ISA')), disjointWith('$VAR'('ARG1ISA'), '$VAR'('ARG1TYPE')), relationAllExists('$VAR'('PRED'), '$VAR'('ARG1TYPE'), '$VAR'('ARG2TYPE'))), 'BaseKB', vStrMon).
 
 
-exactlyAssertedEL(transitiveViaArgInverse, subsetOf, subsetOf, 1, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArgInverse, sentenceDesignationArgnum, genlPreds, 1, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArgInverse, requiredArg2Pred, genls, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, requiredArg1Pred, genls, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, relationInstanceAll, genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, relationExistsMinAll, genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, relationExistsMaxAll, genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, relationExistsMaxAll, genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, relationExistsMaxAll, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, relationExistsAll, genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, relationAllInstance, quantitySubsumes, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, relationAllInstance, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArgInverse, relationAllExistsMin, genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, relationAllExistsMax, genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, relationAllExistsMax, genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, relationAllExistsMax, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, relationAllExistsCount, genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, relationAllExists, genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, relationAll, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArgInverse, negationPreds, genlPreds, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArgInverse, negationPreds, genlPreds, 1, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArgInverse, microtheoryDesignationArgnum, genlPreds, 1, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArgInverse, ist, genlMt, 1, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArgInverse, interArgResultIsa, genls, 3, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArgInverse, genls, genls, 1, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArgInverse, genlInverse, genlPreds, 1, 'BaseKB', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, disjointWith, genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, disjointWith, genls, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, defnNecessary, genls, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, admittedAllArgument, genls, 1, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-4', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-4', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-4', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-3', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-3', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-3', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-2', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-2', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-2', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-1', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-1', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa5-1', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-5', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-5', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-5', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-3', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-3', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-3', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-2', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-2', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-2', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-1', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-1', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa4-1', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-5', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-5', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-5', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-4', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-4', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-4', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-2', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-2', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-2', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-1', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-1', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa3-1', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-5', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-5', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-5', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-4', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-4', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-4', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-3', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-3', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-3', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-1', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa2-1', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-5', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-5', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-5', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-4', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-4', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-4', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-3', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-3', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-3', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-2', genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArgInverse, 'interArgIsa1-2', genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
 
-exactlyAssertedEL(transitiveViaArg, subsetOf, subsetOf, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, subsetOf, subsetOf, 2, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, resultIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, resultGenl, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, requiredArg2Pred, genlPreds, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, requiredArg1Pred, genlPreds, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, relationMemberInstance, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, relationInstanceMember, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, relationInstanceExists, genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, relationInstanceExists, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, relationInstanceAll, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, relationExistsMinAll, genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, relationExistsMinAll, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, relationExistsInstance, genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, relationExistsInstance, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, relationExistsCountAll, genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, relationExistsAll, genls, 2, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, relationExistsAll, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, relationAllInstance, genlPreds, 1, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, relationAllExistsMin, genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, relationAllExistsMin, genlPreds, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, relationAllExists, genls, 3, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, relationAllExists, genlPreds, 1, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, relationAll, genlPreds, 1, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, quotedIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, isa, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, holdsIn, sentenceImplies, 2, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, greaterThan, quantitySubsumes, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, genls, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, genlInverse, genlPreds, 2, 'BaseKB', vStrDef).
-exactlyAssertedEL(transitiveViaArg, defnSufficient, genls, 1, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, canonicalizerDirectiveForArgAndRest, genlCanonicalizerDirectives, 3, 'CoreCycLImplementationMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, canonicalizerDirectiveForArg, genlCanonicalizerDirectives, 3, 'CoreCycLImplementationMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, canonicalizerDirectiveForAllArgs, genlCanonicalizerDirectives, 2, 'CoreCycLImplementationMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, argsIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, argsIsa, genls, 2, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, argsGenl, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, argsGenl, genls, 2, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, argIsa, genls, 3, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, argAndRestIsa, genls, 3, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, argAndRestGenl, genls, 3, 'BaseKB', vStrDef).
-exactlyAssertedEL(transitiveViaArg, arg6SometimesIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg6Isa, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg6Isa, genls, 2, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg6Genl, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg6Genl, genls, 2, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg5SometimesIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg5Isa, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg5Isa, genls, 2, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg5Genl, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg5Genl, genls, 2, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg4SometimesIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg4Isa, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg4Isa, genls, 2, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg4Genl, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg4Genl, genls, 2, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg3SometimesIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg3Isa, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg3Isa, genls, 2, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg3Genl, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg3Genl, genls, 2, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg2SometimesIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg2Isa, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg2Isa, genls, 2, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg2Genl, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg2Genl, genls, 2, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg1SometimesIsa, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg1Isa, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg1Isa, genls, 2, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg1Genl, genls, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, arg1Genl, genls, 2, 'BaseKB', vStrMon).
-exactlyAssertedEL(transitiveViaArg, admittedAllArgument, genlPreds, 2, 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa5-4', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa5-3', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa5-2', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa5-1', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa4-5', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa4-3', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa4-2', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa4-1', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa3-5', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa3-4', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa3-2', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa3-1', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa2-5', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa2-4', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa2-3', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa2-1', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa1-5', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa1-4', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa1-3', genls, 3, 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(transitiveViaArg, 'interArgIsa1-2', genls, 3, 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL_with_vars(collectionExpansion, 'TransitiveBinaryPredicate', implies(and(holds((':ARG1'), '$VAR'('X'), '$VAR'('Y')), holds((':ARG1'), '$VAR'('Y'), '$VAR'('Z'))), holds((':ARG1'), '$VAR'('X'), '$VAR'('Z'))), 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL_with_vars(collectionExpansion, 'SymmetricBinaryPredicate', implies(holds((':ARG1'), '$VAR'('X'), '$VAR'('Y')), holds((':ARG1'), '$VAR'('Y'), '$VAR'('Z'))), 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL_with_vars(collectionExpansion, 'ReflexiveBinaryPredicate', holds((':ARG1'), '$VAR'('X'), '$VAR'('X')), 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL_with_vars(collectionExpansion, 'IrreflexiveBinaryPredicate', not(holds((':ARG1'), '$VAR'('X'), '$VAR'('X'))), 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL_with_vars(collectionExpansion, 'AsymmetricBinaryPredicate', implies(holds((':ARG1'), '$VAR'('X'), '$VAR'('Y')), not(holds((':ARG1'), '$VAR'('Y'), '$VAR'('Z')))), 'UniversalVocabularyMt', vStrDef).
 
 
-
-exactlyAssertedEL(collectionExpansion, 'TransitiveBinaryPredicate', implies(and(holds((':ARG1'), '$VAR'('X'), '$VAR'('Y')), holds((':ARG1'), '$VAR'('Y'), '$VAR'('Z'))), holds((':ARG1'), '$VAR'('X'), '$VAR'('Z'))), 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(collectionExpansion, 'SymmetricBinaryPredicate', implies(holds((':ARG1'), '$VAR'('X'), '$VAR'('Y')), holds((':ARG1'), '$VAR'('Y'), '$VAR'('Z'))), 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(collectionExpansion, 'ReflexiveBinaryPredicate', holds((':ARG1'), '$VAR'('X'), '$VAR'('X')), 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(collectionExpansion, 'IrreflexiveBinaryPredicate', not(holds((':ARG1'), '$VAR'('X'), '$VAR'('X'))), 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(collectionExpansion, 'AsymmetricBinaryPredicate', implies(holds((':ARG1'), '$VAR'('X'), '$VAR'('Y')), not(holds((':ARG1'), '$VAR'('Y'), '$VAR'('Z')))), 'UniversalVocabularyMt', vStrDef).
-
-
-exactlyAssertedEL(expansion, requiredArg2Pred, implies(and(isa((':ARG2'), 'BinaryPredicate'), isa('$VAR'('INS_1'), (':ARG1'))), thereExists('$VAR'('INS'), holds((':ARG2'), '$VAR'('INS'), '$VAR'('INS_1')))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, requiredArg1Pred, implies(and(isa((':ARG2'), 'BinaryPredicate'), isa('$VAR'('INS_1'), (':ARG1'))), thereExists('$VAR'('INS'), holds((':ARG2'), '$VAR'('INS_1'), '$VAR'('INS')))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, relationInstanceExists, thereExists('$VAR'('ARG'), and(isa('$VAR'('ARG'), (':ARG3')), holds((':ARG1'), (':ARG2'), '$VAR'('ARG')))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, relationInstanceAll, implies(isa('$VAR'('INS'), (':ARG3')), holds((':ARG1'), (':ARG2'), '$VAR'('INS'))), 'BaseKB', vStrMon).
-exactlyAssertedEL(expansion, relationExistsMinAll, implies(isa('$VAR'('ARG2'), (':ARG3')), thereExistAtLeast((':ARG4'), '$VAR'('ARG'), and(isa('$VAR'('ARG'), (':ARG2')), holds((':ARG1'), '$VAR'('ARG'), '$VAR'('ARG2'))))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, relationExistsMaxAll, implies(isa('$VAR'('ARG2'), (':ARG3')), thereExistAtMost((':ARG4'), '$VAR'('ARG'), and(isa('$VAR'('ARG'), (':ARG2')), holds((':ARG1'), '$VAR'('ARG'), '$VAR'('ARG2'))))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, relationExistsInstance, thereExists('$VAR'('OBJ'), and(isa('$VAR'('OBJ'), (':ARG2')), holds((':ARG1'), '$VAR'('OBJ'), (':ARG3')))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, relationExistsCountAll, implies(isa('$VAR'('ARG2'), (':ARG3')), thereExistExactly((':ARG4'), '$VAR'('ARG1'), and(isa('$VAR'('ARG1'), (':ARG2')), holds((':ARG1'), '$VAR'('ARG1'), '$VAR'('ARG2'))))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, relationExistsAll, implies(isa('$VAR'('TERM'), (':ARG3')), holds((':ARG1'), 'RelationExistsAllFn'('$VAR'('TERM'), (':ARG1'), (':ARG2'), (':ARG3')), '$VAR'('TERM'))), 'BaseKB', vStrMon).
-exactlyAssertedEL(expansion, relationAllInstance, implies(isa('$VAR'('INS'), (':ARG2')), holds((':ARG1'), '$VAR'('INS'), (':ARG3'))), 'BaseKB', vStrMon).
-exactlyAssertedEL(expansion, relationAllExistsMin, implies(isa('$VAR'('ARG1'), (':ARG2')), thereExistAtLeast((':ARG4'), '$VAR'('ARG'), and(isa('$VAR'('ARG'), (':ARG3')), holds((':ARG1'), '$VAR'('ARG1'), '$VAR'('ARG'))))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, relationAllExistsMax, implies(isa('$VAR'('ARG1'), (':ARG2')), thereExistAtMost((':ARG4'), '$VAR'('ARG'), and(isa('$VAR'('ARG'), (':ARG3')), holds((':ARG1'), '$VAR'('ARG1'), '$VAR'('ARG'))))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, relationAllExistsCount, implies(isa('$VAR'('TERM'), (':ARG2')), thereExistExactly((':ARG4'), '$VAR'('OTHER'), and(isa('$VAR'('OTHER'), (':ARG3')), holds((':ARG1'), '$VAR'('TERM'), '$VAR'('OTHER'))))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, relationAllExists, implies(isa('$VAR'('TERM'), (':ARG2')), holds((':ARG1'), '$VAR'('TERM'), 'RelationAllExistsFn'('$VAR'('TERM'), (':ARG1'), (':ARG2'), (':ARG3')))), 'BaseKB', vStrMon).
-exactlyAssertedEL(expansion, relationAll, implies(isa('$VAR'('OBJ'), (':ARG2')), holds((':ARG1'), '$VAR'('OBJ'))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, negationInverse, not(and(holds((':ARG1'), '$VAR'('ARG1'), '$VAR'('ARG2')), holds((':ARG2'), '$VAR'('ARG2'), '$VAR'('ARG1')))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, mtVisible, trueSubL('ExpandSubLFn'((':ARG1'), 'RELEVANT-MT?'('QUOTE'((':ARG1'))))), 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(expansion, genlMt, implies(ist((':ARG2'), '$VAR'('ASSERTION')), ist((':ARG1'), '$VAR'('ASSERTION'))), 'BaseKB', vStrMon).
-exactlyAssertedEL(expansion, genlInverse, implies(holds((':ARG1'), '$VAR'('ARG1'), '$VAR'('ARG2')), holds((':ARG2'), '$VAR'('ARG2'), '$VAR'('ARG1'))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, equiv, and(implies((':ARG1'), (':ARG2')), implies((':ARG2'), (':ARG1'))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, disjointWith, not(and(isa('$VAR'('OBJ'), (':ARG1')), isa('$VAR'('OBJ'), (':ARG2')))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, 'Percent', 'QuotientFn'((':ARG1'), 100), 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(expansion, 'interArgGenl1-2', implies(and(genls('$VAR'('INDEP_SPEC'), (':ARG2')), holds((':ARG1'), '$VAR'('INDEP_SPEC'), '$VAR'('DEP_SPEC'))), genls('$VAR'('DEP_SPEC'), (':ARG3'))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, 'genls-SpecDenotesGenlInstances', implies(quotedIsa('$VAR'('OBJ'), (':ARG1')), isa('$VAR'('OBJ'), (':ARG2'))), 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(expansion, 'genls-GenlDenotesSpecInstances', implies(isa('$VAR'('OBJ'), (':ARG1')), quotedIsa('$VAR'('OBJ'), (':ARG2'))), 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL_with_vars(expansion, requiredArg2Pred, implies(and(isa((':ARG2'), 'BinaryPredicate'), isa('$VAR'('INS_1'), (':ARG1'))), thereExists('$VAR'('INS'), holds((':ARG2'), '$VAR'('INS'), '$VAR'('INS_1')))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, requiredArg1Pred, implies(and(isa((':ARG2'), 'BinaryPredicate'), isa('$VAR'('INS_1'), (':ARG1'))), thereExists('$VAR'('INS'), holds((':ARG2'), '$VAR'('INS_1'), '$VAR'('INS')))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, relationInstanceExists, thereExists('$VAR'('ARG'), and(isa('$VAR'('ARG'), (':ARG3')), holds((':ARG1'), (':ARG2'), '$VAR'('ARG')))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, relationInstanceAll, implies(isa('$VAR'('INS'), (':ARG3')), holds((':ARG1'), (':ARG2'), '$VAR'('INS'))), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(expansion, relationExistsMinAll, implies(isa('$VAR'('ARG2'), (':ARG3')), thereExistAtLeast((':ARG4'), '$VAR'('ARG'), and(isa('$VAR'('ARG'), (':ARG2')), holds((':ARG1'), '$VAR'('ARG'), '$VAR'('ARG2'))))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, relationExistsMaxAll, implies(isa('$VAR'('ARG2'), (':ARG3')), thereExistAtMost((':ARG4'), '$VAR'('ARG'), and(isa('$VAR'('ARG'), (':ARG2')), holds((':ARG1'), '$VAR'('ARG'), '$VAR'('ARG2'))))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, relationExistsInstance, thereExists('$VAR'('OBJ'), and(isa('$VAR'('OBJ'), (':ARG2')), holds((':ARG1'), '$VAR'('OBJ'), (':ARG3')))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, relationExistsCountAll, implies(isa('$VAR'('ARG2'), (':ARG3')), thereExistExactly((':ARG4'), '$VAR'('ARG1'), and(isa('$VAR'('ARG1'), (':ARG2')), holds((':ARG1'), '$VAR'('ARG1'), '$VAR'('ARG2'))))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, relationExistsAll, implies(isa('$VAR'('TERM'), (':ARG3')), holds((':ARG1'), 'RelationExistsAllFn'('$VAR'('TERM'), (':ARG1'), (':ARG2'), (':ARG3')), '$VAR'('TERM'))), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(expansion, relationAllInstance, implies(isa('$VAR'('INS'), (':ARG2')), holds((':ARG1'), '$VAR'('INS'), (':ARG3'))), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(expansion, relationAllExistsMin, implies(isa('$VAR'('ARG1'), (':ARG2')), thereExistAtLeast((':ARG4'), '$VAR'('ARG'), and(isa('$VAR'('ARG'), (':ARG3')), holds((':ARG1'), '$VAR'('ARG1'), '$VAR'('ARG'))))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, relationAllExistsMax, implies(isa('$VAR'('ARG1'), (':ARG2')), thereExistAtMost((':ARG4'), '$VAR'('ARG'), and(isa('$VAR'('ARG'), (':ARG3')), holds((':ARG1'), '$VAR'('ARG1'), '$VAR'('ARG'))))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, relationAllExistsCount, implies(isa('$VAR'('TERM'), (':ARG2')), thereExistExactly((':ARG4'), '$VAR'('OTHER'), and(isa('$VAR'('OTHER'), (':ARG3')), holds((':ARG1'), '$VAR'('TERM'), '$VAR'('OTHER'))))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, relationAllExists, implies(isa('$VAR'('TERM'), (':ARG2')), holds((':ARG1'), '$VAR'('TERM'), 'RelationAllExistsFn'('$VAR'('TERM'), (':ARG1'), (':ARG2'), (':ARG3')))), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(expansion, relationAll, implies(isa('$VAR'('OBJ'), (':ARG2')), holds((':ARG1'), '$VAR'('OBJ'))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, negationInverse, not(and(holds((':ARG1'), '$VAR'('ARG1'), '$VAR'('ARG2')), holds((':ARG2'), '$VAR'('ARG2'), '$VAR'('ARG1')))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, mtVisible, trueSubL('ExpandSubLFn'((':ARG1'), 'RELEVANT-MT?'('QUOTE'((':ARG1'))))), 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL_with_vars(expansion, genlMt, implies(ist((':ARG2'), '$VAR'('ASSERTION')), ist((':ARG1'), '$VAR'('ASSERTION'))), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(expansion, genlInverse, implies(holds((':ARG1'), '$VAR'('ARG1'), '$VAR'('ARG2')), holds((':ARG2'), '$VAR'('ARG2'), '$VAR'('ARG1'))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, equiv, and(implies((':ARG1'), (':ARG2')), implies((':ARG2'), (':ARG1'))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, disjointWith, not(and(isa('$VAR'('OBJ'), (':ARG1')), isa('$VAR'('OBJ'), (':ARG2')))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, 'Percent', 'QuotientFn'((':ARG1'), 100), 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL_with_vars(expansion, 'interArgGenl1-2', implies(and(genls('$VAR'('INDEP_SPEC'), (':ARG2')), holds((':ARG1'), '$VAR'('INDEP_SPEC'), '$VAR'('DEP_SPEC'))), genls('$VAR'('DEP_SPEC'), (':ARG3'))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, 'genls-SpecDenotesGenlInstances', implies(quotedIsa('$VAR'('OBJ'), (':ARG1')), isa('$VAR'('OBJ'), (':ARG2'))), 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL_with_vars(expansion, 'genls-GenlDenotesSpecInstances', implies(isa('$VAR'('OBJ'), (':ARG1')), quotedIsa('$VAR'('OBJ'), (':ARG2'))), 'UniversalVocabularyMt', vStrDef).
 
 assertedTinyKB_implies( and(isa('$VAR'('INDEP_INS'), '$VAR'('INDEP_COL')), 'interArgIsa1-3'('$VAR'('PRED'), '$VAR'('INDEP_COL'), '$VAR'('DEP_COL')), dot_holds(['$VAR'('PRED'), '$VAR'('INDEP_INS'), '$VAR'('_ANY_ARG_2'), '$VAR'('DEP_INS')|'$VAR'('_ARGS')])), isa('$VAR'('DEP_INS'), '$VAR'('DEP_COL')), 'BaseKB', vStrDef).
 assertedTinyKB_implies( and(isa('$VAR'('INDEP_INS'), '$VAR'('INDEP_COL')), 'interArgIsa1-2'('$VAR'('PRED'), '$VAR'('INDEP_COL'), '$VAR'('DEP_COL')), dot_holds(['$VAR'('PRED'), '$VAR'('INDEP_INS'), '$VAR'('DEP_INS')|'$VAR'('_ARGS')])), isa('$VAR'('DEP_INS'), '$VAR'('DEP_COL')), 'BaseKB', vStrDef).
@@ -9435,55 +9142,37 @@ assertedTinyKB_implies( elementOf('$VAR'('A'), '$VAR'('B')), isa('$VAR'('A'), '$
 assertedTinyKB_implies( dot_holds([commutativeInArgs, '$VAR'('_PRED')|'$VAR'('ARGS')]), dot_holds([different|'$VAR'('ARGS')]), 'BaseKB', vStrMon).
 assertedTinyKB_implies( and(resultIsa('$VAR'('FUNC'), '$VAR'('COL')), equals('$VAR'('VALUE'), 'NART'(['$VAR'('FUNC')|'$VAR'('ARGS')]))), isa('$VAR'('VALUE'), '$VAR'('COL')), 'BaseKB', vStrMon).
 assertedTinyKB_implies( isa('$VAR'('UNIT'), 'UnitOfMeasure'), equals('NART'(['$VAR'('UNIT')|'$VAR'('ARGS')]), 'NART'(['$VAR'('UNIT'), 'NART'(['Unity'|'$VAR'('ARGS')])])), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, implies, or((':ARG2'), not((':ARG1'))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, implies, or((':ARG2'), not((':ARG1'))), 'BaseKB', vStrDef).
 
 
-exactlyAssertedEL(expansion, genlPreds, implies(dot_holds([(':ARG1'), '?ARGS']), dot_holds([(':ARG2'), '?ARGS'])), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, quotedIsa, isa('QuasiQuote'((':ARG1')), (':ARG2')), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, negationPreds, not(and(dot_holds([(':ARG1'), '?ARGS']), dot_holds([(':ARG2'), '?ARGS']))), 'BaseKB', vStrDef).
-exactlyAssertedEL(expansion, xor, or(and((':ARG1'), not((':ARG2'))), and((':ARG2'), not((':ARG1')))), 'BaseKB', vStrDef).
-exactlyAssertedEL(genlMt, 'NART'(['MtSpace'|'$VAR'('_MT_DIMS')]), 'UniversalVocabularyMt', 'UniversalVocabularyMt', vStrMon).
+exactlyAssertedEL_with_vars(expansion, genlPreds, implies(dot_holds([(':ARG1'), '?ARGS']), dot_holds([(':ARG2'), '?ARGS'])), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, quotedIsa, isa('QuasiQuote'((':ARG1')), (':ARG2')), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, negationPreds, not(and(dot_holds([(':ARG1'), '?ARGS']), dot_holds([(':ARG2'), '?ARGS']))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(expansion, xor, or(and((':ARG1'), not((':ARG2'))), and((':ARG2'), not((':ARG1')))), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(genlMt, 'NART'(['MtSpace'|'$VAR'('_MT_DIMS')]), 'UniversalVocabularyMt', 'UniversalVocabularyMt', vStrMon).
 assertedTinyKB_implies( ist('NART'(['MtSpace'|'$VAR'('OTHER_MT_DIMS')]), '$VAR'('SENTENCE')), ist('NART'(['MtSpace', '$VAR'('MT_DIM')|'$VAR'('OTHER_MT_DIMS')]), '$VAR'('SENTENCE')), 'UniversalVocabularyMt', vStrDef).
 assertedTinyKB_implies( ist('NART'(['MtSpace', '$VAR'('MT_DIM')|'$VAR'('OTHER_MT_DIMS')]), '$VAR'('SENTENCE')), ist('NART'(['MtSpace'|'$VAR'('OTHER_MT_DIMS')]), '$VAR'('SENTENCE')), 'UniversalVocabularyMt', vStrDef).
 assertedTinyKB_implies( and(evaluate('$VAR'('QUOTIENTFN'), 'QuotientFn'('NART'(['$VAR'('UNIT1')|'$VAR'('ARGS')]), 'NART'(['$VAR'('UNIT2'), 1]))), termOfUnit('$VAR'('PERFN'), 'PerFn'('$VAR'('UNIT1'), '$VAR'('UNIT2')))), equals('$VAR'('QUOTIENTFN'), 'NART'(['$VAR'('PERFN')|'$VAR'('ARGS')])), 'UniversalVocabularyMt', vStrMon).
 assertedTinyKB_implies( and(dot_holds(['$VAR'('SPEC')|'$VAR'('ARGS')]), genlPreds('$VAR'('SPEC'), '$VAR'('GENL'))), dot_holds(['$VAR'('GENL')|'$VAR'('ARGS')]), 'BaseKB', vStrDef).
 
-exactlyAssertedEL(equals, 'TheEmptyList', 'TheList', 'BaseKB', vStrMon).
-exactlyAssertedEL(equals, '$VAR'('X'), '$VAR'('X'), 'LogicalTruthMt', vStrDef).
-exactlyAssertedEL(equals, '$VAR'('X'), '$VAR'('X'), 'BaseKB', vStrMon).
-exactlyAssertedEL(equals, '$VAR'('NUM'), 'Unity'('$VAR'('NUM')), 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(equals, 'TheEmptyList', 'TheList', 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(equals, '$VAR'('X'), '$VAR'('X'), 'LogicalTruthMt', vStrDef).
+exactlyAssertedEL_with_vars(equals, '$VAR'('X'), '$VAR'('X'), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(equals, '$VAR'('NUM'), 'Unity'('$VAR'('NUM')), 'BaseKB', vStrDef).
 
 
-exactlyAssertedEL(unitMultiplicationFactor, '$VAR'('UNIT'), '$VAR'('UNIT'), 1, 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(unitMultiplicationFactor, '$VAR'('UNIT'), '$VAR'('UNIT'), 1, 'BaseKB', vStrMon).
 
-exactlyAssertedEL(trueRule, 'NART'(['CollectionRuleTemplateFn', 'ArgIsaPredicate']), and(implies(arg6Isa('$VAR'('RELN'), '$VAR'('COL')), argIsa('$VAR'('RELN'), 6, '$VAR'('COL'))), implies(argIsa('$VAR'('RELN'), 6, '$VAR'('COL')), arg6Isa('$VAR'('RELN'), '$VAR'('COL')))), 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(trueRule, 'NART'(['CollectionRuleTemplateFn', 'ArgIsaPredicate']), and(implies(arg5Isa('$VAR'('RELN'), '$VAR'('COL')), argIsa('$VAR'('RELN'), 5, '$VAR'('COL'))), implies(argIsa('$VAR'('RELN'), 5, '$VAR'('COL')), arg5Isa('$VAR'('RELN'), '$VAR'('COL')))), 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(trueRule, 'NART'(['CollectionRuleTemplateFn', 'ArgIsaPredicate']), and(implies(arg4Isa('$VAR'('RELN'), '$VAR'('COL')), argIsa('$VAR'('RELN'), 4, '$VAR'('COL'))), implies(argIsa('$VAR'('RELN'), 4, '$VAR'('COL')), arg4Isa('$VAR'('RELN'), '$VAR'('COL')))), 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(trueRule, 'NART'(['CollectionRuleTemplateFn', 'ArgIsaPredicate']), and(implies(arg3Isa('$VAR'('RELN'), '$VAR'('COL')), argIsa('$VAR'('RELN'), 3, '$VAR'('COL'))), implies(argIsa('$VAR'('RELN'), 3, '$VAR'('COL')), arg3Isa('$VAR'('RELN'), '$VAR'('COL')))), 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(trueRule, 'NART'(['CollectionRuleTemplateFn', 'ArgIsaPredicate']), and(implies(arg2Isa('$VAR'('RELN'), '$VAR'('COL')), argIsa('$VAR'('RELN'), 2, '$VAR'('COL'))), implies(argIsa('$VAR'('RELN'), 2, '$VAR'('COL')), arg2Isa('$VAR'('RELN'), '$VAR'('COL')))), 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL_with_vars(trueRule, 'NART'(['CollectionRuleTemplateFn', 'ArgIsaPredicate']), and(implies(arg6Isa('$VAR'('RELN'), '$VAR'('COL')), argIsa('$VAR'('RELN'), 6, '$VAR'('COL'))), implies(argIsa('$VAR'('RELN'), 6, '$VAR'('COL')), arg6Isa('$VAR'('RELN'), '$VAR'('COL')))), 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL_with_vars(trueRule, 'NART'(['CollectionRuleTemplateFn', 'ArgIsaPredicate']), and(implies(arg5Isa('$VAR'('RELN'), '$VAR'('COL')), argIsa('$VAR'('RELN'), 5, '$VAR'('COL'))), implies(argIsa('$VAR'('RELN'), 5, '$VAR'('COL')), arg5Isa('$VAR'('RELN'), '$VAR'('COL')))), 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL_with_vars(trueRule, 'NART'(['CollectionRuleTemplateFn', 'ArgIsaPredicate']), and(implies(arg4Isa('$VAR'('RELN'), '$VAR'('COL')), argIsa('$VAR'('RELN'), 4, '$VAR'('COL'))), implies(argIsa('$VAR'('RELN'), 4, '$VAR'('COL')), arg4Isa('$VAR'('RELN'), '$VAR'('COL')))), 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL_with_vars(trueRule, 'NART'(['CollectionRuleTemplateFn', 'ArgIsaPredicate']), and(implies(arg3Isa('$VAR'('RELN'), '$VAR'('COL')), argIsa('$VAR'('RELN'), 3, '$VAR'('COL'))), implies(argIsa('$VAR'('RELN'), 3, '$VAR'('COL')), arg3Isa('$VAR'('RELN'), '$VAR'('COL')))), 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL_with_vars(trueRule, 'NART'(['CollectionRuleTemplateFn', 'ArgIsaPredicate']), and(implies(arg2Isa('$VAR'('RELN'), '$VAR'('COL')), argIsa('$VAR'('RELN'), 2, '$VAR'('COL'))), implies(argIsa('$VAR'('RELN'), 2, '$VAR'('COL')), arg2Isa('$VAR'('RELN'), '$VAR'('COL')))), 'UniversalVocabularyMt', vStrDef).
 
-exactlyAssertedEL(trueRule, 'NART'(['CollectionRuleTemplateFn', 'ArgIsaPredicate']), and(implies(arg1Isa('$VAR'('RELN'), '$VAR'('COL')), argIsa('$VAR'('RELN'), 1, '$VAR'('COL'))), implies(argIsa('$VAR'('RELN'), 1, '$VAR'('COL')), arg1Isa('$VAR'('RELN'), '$VAR'('COL')))), 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(termOfUnit, 'NART'(['CollectionRuleTemplateFn', 'HypotheticalContext']), 'CollectionRuleTemplateFn'('HypotheticalContext'), 'BaseKB', vStrMon).
-exactlyAssertedEL(termOfUnit, 'NART'(['CollectionRuleTemplateFn', 'ArgIsaPredicate']), 'CollectionRuleTemplateFn'('ArgIsaPredicate'), 'BaseKB', vStrMon).
-exactlyAssertedEL(subsetOf, 'TheEmptySet', '$VAR'('SET'), 'BaseKB', vStrMon).
-exactlyAssertedEL(relationAll, minimizeExtent, 'BookkeepingPredicate', 'BaseKB', vStrDef).
-exactlyAssertedEL(relationAll, decontextualizedCollection, 'AtemporalNecessarilyEssentialCollectionType', 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(relationAll, assertedSentence, 'CycLAssertion', 'UniversalVocabularyMt', vStrMon).
-
-exactlyAssertedEL(relationInstanceAll, subsetOf, 'TheEmptySet', 'SetOrCollection', 'BaseKB', vStrDef).
-
-exactlyAssertedEL(relationAllInstance, genls, tCol, 'Thing', 'BaseKB', vStrMon).
-
-exactlyAssertedEL(relationAllInstance, genlPreds, 'IrreflexiveBinaryPredicate', different, 'BaseKB', vStrMon).
-exactlyAssertedEL(relationAllInstance, genlMt, 'Microtheory', 'BaseKB', 'BaseKB', vStrDef).
-exactlyAssertedEL(relationAllInstance, definingMt, 'Microtheory', 'BaseKB', 'BaseKB', vStrDef).
-exactlyAssertedEL(relationAllInstance, collectionConventionMt, 'AtemporalNecessarilyEssentialCollectionType', 'UniversalVocabularyMt', 'UniversalVocabularyMt', vStrMon).
-exactlyAssertedEL(relationAllInstance, assertionDirection, 'CycLRuleAssertion', 'Backward-AssertionDirection', 'BaseKB', vStrDef).
-exactlyAssertedEL(relationAllInstance, assertionDirection, 'CycLGAFAssertion', 'Forward-AssertionDirection', 'BaseKB', vStrDef).
-exactlyAssertedEL(relationAllExists, cycProblemStoreInferences, 'CycProblemStore', 'CycInference', 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(relationAllExists, cycProblemStoreID, 'CycProblemStore', 'NonNegativeInteger', 'UniversalVocabularyMt', vStrDef).
-exactlyAssertedEL(relationAllExists, constantID, 'CycLConstant', 'NonNegativeInteger', 'BaseKB', vStrMon).
-exactlyAssertedEL(relationAllExists, arity, tPred, 'PositiveInteger', 'BaseKB', vStrDef).
+exactlyAssertedEL_with_vars(trueRule, 'NART'(['CollectionRuleTemplateFn', 'ArgIsaPredicate']), and(implies(arg1Isa('$VAR'('RELN'), '$VAR'('COL')), argIsa('$VAR'('RELN'), 1, '$VAR'('COL'))), implies(argIsa('$VAR'('RELN'), 1, '$VAR'('COL')), arg1Isa('$VAR'('RELN'), '$VAR'('COL')))), 'UniversalVocabularyMt', vStrDef).
+exactlyAssertedEL_with_vars(termOfUnit, 'NART'(['CollectionRuleTemplateFn', 'HypotheticalContext']), 'CollectionRuleTemplateFn'('HypotheticalContext'), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(termOfUnit, 'NART'(['CollectionRuleTemplateFn', 'ArgIsaPredicate']), 'CollectionRuleTemplateFn'('ArgIsaPredicate'), 'BaseKB', vStrMon).
+exactlyAssertedEL_with_vars(subsetOf, 'TheEmptySet', '$VAR'('SET'), 'BaseKB', vStrMon).
 
 
 assertedTinyKB_TODO(genls, '$VAR'('X'), '$VAR'('X'), 'LogicalTruthMt', vStrMon).
@@ -9508,9 +9197,5 @@ assertedTinyKB_NEVER(coExtensional, 'List', 'List', 'UniversalVocabularyMt', vSt
 assertedTinyKB_NEVER(genls, 'SubLSExpression', 'CharacterString', 'UniversalVocabularyMt', vStrDef).
 assertedTinyKB_NEVER(genls, 'CycLExpression', 'CycLTerm', 'UniversalVocabularyMt', vStrDef).
 assertedTinyKB_NEVER(genls, 'CycLExpression', 'CycLTerm', 'CoreCycLMt', vStrDef).
-
-exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies(A,C,MT,STR),not(is_better_backchained((A=>C))).
-exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies(A,C,MT,STR),is_better_backchained((A=>C)).
-exactlyAssertedEL(not,What,MT,STR):- assertedTinyKB_not(What,MT,STR),true.
 
 
