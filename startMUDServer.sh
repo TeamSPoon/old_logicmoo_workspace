@@ -1,5 +1,5 @@
 #!/bin/bash
-if [ $UID -eq 1 ]; then
+if [ $UID -eq 0 ]; then
   exec su --preserve-environment  --login   --session-command "$0 $@" prologmud
   exit 0
 fi
@@ -13,12 +13,8 @@ if [ -z `echo $LD_LIBRARY_PATH | grep 'java'` ]; then
   export LD_LIBRARY_PATH="${JAVA_HOME}/lib/amd64/server:${JAVA_HOME}/lib/amd64:${JAVA_HOME}/bin:${PATH}:${LD_LIBRARY_PATH}"
 fi
 
-if [! -f $STANFORD_JAR]; then 
-  wget http://prologmoo.com/downloads/stanford-corenlp3.5.2-ALL.jar -O $STANFORD_JAR
-fi
 
 ($DIR/pack/hMUD/policyd)
-
 
 if [ $# -eq 0 ] 
  then
@@ -30,8 +26,7 @@ fi
 
 while [ 1 ]
 do
-  echo "You should not see this ever";
-# cd $OLDPWD
+   echo "You should not see this ever";
    reset -w
 	echo -ne '\033]50;ClearScrollback\a'
 	echo -en "\ec\e[3J"
@@ -39,23 +34,18 @@ do
    echo "JAVA_HOME='$JAVA_HOME'"
    echo "LD_LIBRARY_PATH='$LD_LIBRARY_PATH'"
    echo "STANFORD_JAR='$STANFORD_JAR'"      
+   if [! -f $STANFORD_JAR]; then 
+     echo "Downloading $STANFORD_JAR ...";
+     wget http://prologmoo.com/downloads/stanford-corenlp3.5.2-ALL.jar -O $STANFORD_JAR
+   fi
    echo "This ($0 $@) will be run from user $UID"
    echo "Hit CTRL+C ${BASH_SOURCE[0]} ";
    sleep 4;
-#        cd $NEWPWD
-#        git pull
-        if [[ $EUID -eq 1 ]];
-          then
-             exit 0
-	          (sudo su -l -s $SHELL -c "(cd $DIR ; swipl ${RUNFILE})" prologmud )
-          else             
-             (cd $DIR ; exec swipl $RUNFILE)             
-         fi   
-#        cd $NEWPWD
+   (cd $DIR ; exec swipl $RUNFILE)            
 if [ $# -eq 0 ]
-    then
+then
   exit 0
 fi
-#        . ./commit_push.sh   
+#        . ./commit_push.sh
 done
 
