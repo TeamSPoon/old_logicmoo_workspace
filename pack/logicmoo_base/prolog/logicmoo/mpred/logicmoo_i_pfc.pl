@@ -496,7 +496,12 @@ is_already_supported(P,_S,(u,u)):- clause_asserted(spft(P,u,u)),!.
 maybe_did_support.
 
 
-different_litteral(Q,R):- acyclic_term(Q),acyclic_term(R),functor(Q,F,_),singleValuedInArg(F,N),arg(N,Q,Was),dif(Was,NEW),replace_arg(Q,N,NEW,R),!.
+different_literal(Q,N,R):- 
+ nonvar(Q),acyclic_term(Q),acyclic_term(R),functor(Q,F,A),functor(R,F,A),
+  (singleValuedInArg(F,N) -> 
+    (arg(N,Q,Was),dif(Was,NEW),replace_arg(Q,N,NEW,R));
+    ((arg(N,Q,Was),nonvar(Q)) -> (dif(Was,NEW),replace_arg(Q,N,NEW,R));
+        (N=A,arg(N,Q,Was),dif(Was,NEW),replace_arg(Q,N,NEW,R)))).
 
 
 pfc_unpost1_sp_3(S,P):- doall(pfc_rem2a(P,S)),!,pfc_unfwc(P).

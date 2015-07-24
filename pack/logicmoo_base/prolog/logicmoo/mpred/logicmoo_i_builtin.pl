@@ -87,16 +87,21 @@ argsQuoted(second_order).
 
 % neg(tCol({})).
 
+prologSingleValued(C):-cwc,compound(C),functor(C,F,_),!,prologSingleValued(F).
 
 :-dynamic(pfc_default/1).
 % here is an example which defines pfc_default facts and rules.  Will it work?
 (pfc_default(P)/pfc_literal(P))  =>  (~neg(P) => P).
-(pfc_default((P => Q))/pfc_literal(Q)) => (P, ~neg(Q) => Q).
+
+(pfc_default(P => Q),{pfc_literal_nv(Q),functor(Q,F,A),once(singleValuedInArg(F,N);(arg(N,Q,DEF),nonvar(DEF),\+arg(_,P,DEF));(arg(N,Q,DEF),nonvar(DEF));N=A),replace_arg(Q,N,NEW,R)} => (P, ~R/(NEW\==DEF), ~neg(Q) => Q)).
+(pfc_default((P => Q)/pfc_literal_nv(Q),~prologSingleValued(Q)) => (P, ~neg(Q) => Q)).
+(pfc_default((P => Q)/pfc_literal_nv(Q),~prologSingleValued(Q)) => (P,  ~Q, ~neg(Q) => Q)).
+(pfc_default((P => Q))/pfc_literal_nv(Q)),{functor(Q,_,1)} => (P, ~neg(Q) => Q).
 (pfc_default((P => Q))/(pfc_literal(P),\+ pfc_literal(Q))) => (P => pfc_default(Q)).
 
 %(pfc_default(P)/pfc_each_literal(P,E))  =>  pfc_default(E).
 
-((pfc_default(P)/pfc_literal(P))  => ((~Q/different_litteral(P,Q), ~neg(P)) => P)).
+((pfc_default(P)/pfc_literal(P))  => ((~Q/different_literal(P,_,Q), ~neg(P)) => P)).
 
 
 
