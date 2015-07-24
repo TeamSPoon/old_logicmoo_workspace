@@ -10,10 +10,15 @@ idForTest(iTweety,foo1).
 
 :-must(\+ idForTest(iTweety,unknown)).
 
-=> ~idForTest(iTweety,foo1).
+:-start_rtrace.
+=> \+ idForTest(iTweety,foo1).
+:-stop_rtrace.
 
 
 :-show_call(listing(idForTest)).
+
+:- prolog.
+
 
 end_of_file.
 

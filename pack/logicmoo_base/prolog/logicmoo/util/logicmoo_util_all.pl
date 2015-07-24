@@ -12,6 +12,15 @@
 :- set_prolog_flag(double_quotes,string).
 
 
+:- export(with_stream_pos/2).
+:- meta_predicate(with_stream_pos(+,0)).
+with_stream_pos(In,Call):-
+    stream_property(In, position(InitalPos)),
+    PS = position(InitalPos),
+    (Call *-> 
+       (stream_property(In, position(NewPos)),nb_setarg(1,PS,NewPos)) ; 
+       ((arg(1,PS,Pos),set_stream_position(In, Pos)),!,fail)).
+
 
 :-export(l_open_input/2).
 :-export(l_open_input0/2).

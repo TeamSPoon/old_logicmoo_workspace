@@ -2265,6 +2265,9 @@ getSurfaceFromToks(WFFClean,OUT,VARSOut):- OUT=[unk_comment,WFFClean], debugFmt(
 
 getSurfaceFromStream(Stream0,Term,Vars):- any_to_lazy_list(Stream0,Chars),getSurfaceFromChars(Chars,Term,Term).
 
+:-export(any_to_lazy_list/2).
+any_to_lazy_list(Stream0,Chars):-l_open_input(Stream0,Stream),stream_to_lazy_list_pushback(Stream,CharsM),!,Chars=CharsM.
+
 %===================================================================
 % Removes Leading and Trailing whitespaces and non ANSI charsets.
 %====================================================================

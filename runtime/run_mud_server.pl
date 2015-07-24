@@ -38,7 +38,9 @@ user:file_search_path(prologmud, library(prologmud)).
 
 % [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/)
 :- if_file_exists(user:ensure_loaded(library(eggdrop))).
+:-eggdrop:egg_go.
 :- initialization((current_predicate(egg_go/0)->egg_go;true),now).
+
 
 
 % [Mostly Required] Load the UPV Curry System

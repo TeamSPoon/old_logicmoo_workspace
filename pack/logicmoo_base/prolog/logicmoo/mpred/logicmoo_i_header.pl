@@ -12,6 +12,8 @@
 
 :- if( \+ current_predicate( thlocal:current_pttp_db_oper/1 )).
 
+:- must(context_module(user)).
+
 :- thread_local(thlocal:disable_mpred_term_expansions_locally /0).
 :- multifile(system:term_expansion/2).
 :- multifile(user:term_expansion/2).
@@ -26,6 +28,8 @@
 
 :- dynamic(pfc_univ/3).
 :- multifile(pfc_univ/3).
+
+load_time_sanity.
 
 :-dynamic(user:hook_one_second_timer_tick/0).
 :-multifile(user:hook_one_second_timer_tick/0).

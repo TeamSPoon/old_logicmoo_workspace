@@ -2596,6 +2596,8 @@ matches_term0(Filter,Term):- sub_term(STerm,Term),nonvar(STerm),matches_term0(Fi
 
 show_source_location :- once((ignore((prolog_load_context(file,F),prolog_load_context(stream,S),line_count(S,L),format('~N% ~w~n',[F:L]))))).
 
+:-thread_local(tlbugger:skipDmsg/0).
+
 dmsginfo(V):-dmsg(info(V)).
 dmsg(V):- cnotrace((dmsg0(V))).
 :-moo_hide(dmsg/1).
@@ -2608,6 +2610,7 @@ dmsg0(_):- \+ always_show_dmsg, is_hiding_dmsgs,!.
 
 dmsg0(V):- var(V),!,dmsg0(dmsg_var(V)).
 dmsg0(NC):- cyclic_term(NC),!,fresh_line,write(dmsg_cyclic_term(NC)),fresh_line.
+dmsg0(NC):- tlbugger:skipDmsg,!,fresh_line,write(dmsg_cyclic_term(NC)),fresh_line.
 
 dmsg0(V):- once(dmsg1(V)), ignore((hook:dmsg_hook(V),fail)).
 %dmsg1(trace_or_throw(V)):- dumpST(350),dmsg(warning,V),fail.
@@ -2709,7 +2712,11 @@ ansifmt(Ctrl,Fmt):- colormsg(Ctrl,Fmt).
 ansifmt(Ctrl,F,A):- colormsg(Ctrl,(format(F,A))).
 
 
+
 :- export(colormsg/2).
+
+
+
 colormsg(d,Msg):- mesg_color(Msg,Ctrl),!,colormsg(Ctrl,Msg).
 colormsg(Ctrl,Msg):- fresh_line,ansicall(Ctrl,fmt0(Msg)),fresh_line.
 
@@ -2726,6 +2733,8 @@ ansi_control_conv(Ctrl,CtrlO):-flatten([Ctrl],CtrlO),!.
 is_tty(Out):- not(tlbugger:no_colors), is_stream(Out),stream_property(Out,tty(true)).
 
 ansicall(Out,_,Call):- \+ is_tty(Out),!,Call.
+ansicall(Out,_,Call):- tlbugger:skipDmsg,!,Call.
+
 ansicall(Out,CtrlIn,Call):- once(ansi_control_conv(CtrlIn,Ctrl)),  CtrlIn\=Ctrl,!,ansicall(Out,Ctrl,Call).
 ansicall(_,_,Call):- in_pengines,!,Call.
 ansicall(Out,Ctrl,Call):-
@@ -2772,6 +2781,7 @@ term_color0(asserta_new,hfg(green)).
 term_color0(db_op,hfg(blue)).
 
 
+mesg_color(T,C):-cyclic_term(T),!,C=reset.
 mesg_color(T,C):-var(T),!,dumpST,!,C=[blink(slow),fg(red),hbg(black)],!.
 mesg_color(T,C):- string(T),!,must(f_word(T,F)),!,functor_color(F,C).
 mesg_color(T,C):-not(compound(T)),catchvv(text_to_string(T,S),_,fail),!,mesg_color(S,C).
@@ -2962,6 +2972,13 @@ loggerFmtReal(S,F,A):-
     flush_output_safe(S),!.
 
 
+dumpSTC0:- MaxDepth=200,integer(MaxDepth),Term = dumpST(MaxDepth),
+   (var(Frame)->prolog_current_frame(Frame);true),
+   ignore(( get_prolog_backtrace(MaxDepth, Trace,[frame(Frame),goal_depth(5)]),
+    format(user_error, '% dumpST ~p', [Term]), nl(user_error),
+    print_prolog_backtrace(user_error, Trace,[subgoal_positions(true)]), nl(user_error), fail)),!.
+
+
  
 dump_st:- must_det_l((prolog_current_frame(Frame),get_prolog_backtrace(1000, Trace,[frame(Frame),goal_depth(10-0)]),
    dmsg(Trace),
@@ -2979,8 +2996,12 @@ stack_check(BreakIfOver):- stack_check_else(BreakIfOver, trace_or_throw(stack_ch
 stack_check(BreakIfOver,Error):- stack_check_else(BreakIfOver, trace_or_throw(stack_check(BreakIfOver,Error))).
 stack_check_else(BreakIfOver,Call):- stack_depth(Level) ,  ( Level < BreakIfOver -> true ; (dbgsubst(Call,stack_lvl,Level,NewCall),NewCall)).
 
+
 % dumpstack_arguments.
-dumpST:-cnotrace(dumpST0).
+dumpST:- tlbugger:skipDmsg-> dumpSTC ; cnotrace(dumpST0).
+dumpSTC:-
+   with_assertions(tlbugger:skipDmsg,dumpST0).
+
 dumpST0:- tlbugger:ifHideTrace,!.
 dumpST0:- hotrace((prolog_current_frame(Frame),dumpST2(Frame,5000))).
 % dumpST(_):-is_hiding_dmsgs,!.

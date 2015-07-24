@@ -14,7 +14,7 @@
 %
 % props(Obj,[height(ObjHt)]) == t(height,Obj,ObjHt) == rdf(Obj,height,ObjHt) == t(height(Obj,ObjHt)).
 % padd(Obj,[height(ObjHt)]) == prop_set(height,Obj,ObjHt,...) == ain(height(Obj,ObjHt))
-% [pdel/pclr](Obj,[height(ObjHt)]) == [del/clr](height,Obj,ObjHt) == [del/clr]svo(Obj,height,ObjHt == [del/clr](height(Obj,ObjHt))
+% [pdel/pclr](Obj,[height(ObjHt)]) == [del/clr](height,Obj,ObjHt) == [del/clr]svo(Obj,height,ObjHt) == [del/clr](height(Obj,ObjHt))
 % keraseall(AnyTerm).
 %
 %
@@ -29,6 +29,7 @@
 :- op(1100,fx,('=>')).
 :- op(1150,xfx,('::::')).
 :- dynamic(tCol/1).
+
 
 :- dynamic(subFormat/2).
 :- dynamic(pfc_undo_sys/3).
@@ -86,7 +87,7 @@ argsQuoted(second_order).
 
 % neg(tCol({})).
 
-:-dynamic(pfc_default/1).
+
 :-dynamic(pfc_default/1).
 % here is an example which defines pfc_default facts and rules.  Will it work?
 (pfc_default(P)/pfc_literal(P))  =>  (~neg(P) => P).
@@ -94,6 +95,10 @@ argsQuoted(second_order).
 (pfc_default((P => Q))/(pfc_literal(P),\+ pfc_literal(Q))) => (P => pfc_default(Q)).
 
 %(pfc_default(P)/pfc_each_literal(P,E))  =>  pfc_default(E).
+
+((pfc_default(P)/pfc_literal(P))  => ((~Q/different_litteral(P,Q), ~neg(P)) => P)).
+
+
 
 prologBuiltin(resolveConflict/1).
 prologBuiltin(pfc_select/2).
@@ -109,12 +114,9 @@ conflict(C) => {must(resolveConflict(C))}.
 pfc_select(conflict(X),W) :- pfc_queue(conflict(X),W).
 
 % a pretty basic conflict.
-(neg(P), P) => conflict(P).
-(P, neg(P)) => conflict(P).
+(neg(P)/pfc_literal_nv(P), P) => conflict(P).
+(P/pfc_literal_nv(P), neg(P)) => conflict(P).
 
-% remove conflicts early 
-neg(P) => (\+P ).
-(P => (\+neg(P))).
 
 % is this how to define constraints?
 (either(P,Q) => ((neg(P) <=> Q), (neg(Q) <=> P))).
@@ -176,8 +178,6 @@ tPred(member/2,prologBuiltin).
 tCol(tNotForUnboundPredicates).
 
 tNotForUnboundPredicates(member).
-
-isa(member,tNotForUnboundPredicates).
 
 
 tPred(arity/2,prologHybrid).
@@ -324,10 +324,10 @@ tSet(P)=>
   Head=..[C,_],
  (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
    functorDeclares(C),
-   isa(C,pfcControlled),
+   pfcControlled(C),
    arity(C,1),
    % (isa(I,C)/ground(I:C)=>Head),
-   isa(C,tCol).
+   tCol(C).
 
 ttFormatType(P) => {get_functor(P,C), functor(Head,C,1),
   (\+(predicate_property(Head,_))->dynamic(C/1);true),  
@@ -443,6 +443,29 @@ prologSideEffects(P)=>tNotForUnboundPredicates(P).
 
 isa(tRelation,ttAbstractType).
 
+% remove conflicts early 
+(neg(P)/pfc_literal(P) => (\+P )).
+(P/pfc_literal_nv(P) => (\+neg(P))).
+
+:-if(load_time_sanity).
+
+neg(fooBar).
+
+fooBar.
+
+\+ fooBar.
+
+:-must(\+fooBar).
+
+fooBar.
+
+:-must(fooBar).
+
+neg(fooBar).
+
+:-must(\+fooBar).
+
+:-endif. % load_time_sanity
 
 
 %P/(nonvar(P),get_functor(P,F)),afterAdding(F,Do)/nonvar(Do)=>{call(Do,P)}.

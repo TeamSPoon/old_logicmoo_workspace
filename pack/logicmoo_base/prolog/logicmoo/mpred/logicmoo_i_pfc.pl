@@ -420,7 +420,6 @@ pfc_assert_fast(P0):-pfc_assert_fast(P0,(u,u)).
 pfc_assert_fast((=>P),S) :- nonvar(P),!,
   pfc_assert_fast(P,S).
 
-
 pfc_assert_fast(P0,S):- gripe_time(0.6,pfc_assert_fast_0(P0,S)).
 
 pfc_assert_fast_0(P0,S):-
@@ -495,6 +494,16 @@ is_already_supported(P,_S,(u,u)):- clause_asserted(spft(P,u,u)),!.
 
 
 maybe_did_support.
+
+
+different_litteral(Q,R):- acyclic_term(Q),acyclic_term(R),functor(Q,F,_),singleValuedInArg(F,N),arg(N,Q,Was),dif(Was,NEW),replace_arg(Q,N,NEW,R),!.
+
+
+pfc_unpost1_sp_3(S,P):- doall(pfc_rem2a(P,S)),!,pfc_unfwc(P).
+
+
+pfc_post1_sp_3(ST, \+ P) :-!, pfc_unpost1_sp_3(ST,P).
+pfc_post1_sp_3(ST, ~ P) :-!, pfc_unpost1_sp_3(ST,P).
 
 pfc_post1_sp_3(ST,P):- maybe_did_support,is_already_supported(P,ST,_HOW),!.
 pfc_post1_sp_3(S,P):- \+ pfc_unique_u(P),!,must(pfc_add_support(P,S)),!.
@@ -1018,8 +1027,11 @@ pfc_get_support_via_sentence(Var,_):-var(Var),!,fail.
 pfc_get_support_via_sentence((A,B),(FC,TC)):-!, pfc_get_support_precanonical_plus_more(A,(FA,TA)),pfc_get_support_precanonical_plus_more(B,(FB,TB)),conjoin(FA,FB,FC),conjoin(TA,TB,TC).
 pfc_get_support_via_sentence(true,g):-!.
 
-pfc_get_support_via_clause_db(P,(Sup,g)):-  predicate_property(P,number_of_clauses(N)),N>0,
-   clause(P,Body),(Body==true->Sup=(g);(support_ok_via_clause(P),pfc_get_support_precanonical_plus_more(Body,Sup))).
+pfc_get_support_via_clause_db(\+ P,OUT):- pfc_get_support_via_clause_db(neg(P),OUT).
+pfc_get_support_via_clause_db(\+ P,(naf(g),g)):- !, predicate_property(P,number_of_clauses(_)),\+ clause(P,Body).
+pfc_get_support_via_clause_db(P,OUT):- (( predicate_property(P,number_of_clauses(N)),N>0,
+   clause(P,Body),(Body==true->Sup=(g);(support_ok_via_clause(P),pfc_get_support_precanonical_plus_more(Body,Sup))))),
+   OUT=(Sup,g).
 
 
 support_ok_via_clause(H):- get_functor(H,F,A),support_ok_via_clause(H,F,A).
@@ -1072,7 +1084,10 @@ pfc_fwd2(Fact,Sup) :-
 %= pfc_add_rule(Sup,P) does some special, built in forward chaining if P is
 %= a rule.
 %=
-pfc_add_rule(Sup,Fact):- copy_term(Sup+Fact,SupC+FactC), pfc_add_rule0(SupC,FactC).
+pfc_add_rule(Sup,Fact):- 
+  copy_term(Sup+Fact,SupC+FactC),
+  cyclic_break((SupC+FactC)),
+  pfc_add_rule0(SupC,FactC).
 
 pfc_add_rule0(Sup,(P=>Q)) :-
   !,
@@ -1155,11 +1170,14 @@ pfc_eval_lhs0((Test->Body),Support) :-
   !.
 
 pfc_eval_lhs0(rhs(X),Support) :-
+   cyclic_break((X)),
+
   !,
   debugOnError(pfc_eval_rhs_0(X,Support)),
   !.
 
 pfc_eval_lhs0(X,Support) :-
+  cyclic_break((X)),
   debugOnError(pfc_db_type(X,trigger)),
   !,
   debugOnError(pfc_add_trigger(X,Support)),
@@ -1531,6 +1549,8 @@ pfc_negated_literal(P) :- nonvar(P),
   pfc_negation(P,Q),
   pfc_literal(Q).
 
+pfc_literal_nv(X):-nonvar(X),pfc_literal(X).
+pfc_literal(X) :- cyclic_term(X),!,fail.
 pfc_literal(X) :- pfc_negated_literal(X),!.
 pfc_literal(X) :- pfc_positive_literal(X),!.
 pfc_literal(X) :- var(X),!.
@@ -1551,13 +1571,19 @@ pfc_connective('-').
 pfc_connective('~').
 pfc_connective('\\+').
 
-process_rule(Sup,Lhs,Rhs,Parent_rule) :-
+cyclic_break(Cyclic):-cyclic_term(Cyclic)->(writeq(Cyclic),nl,prolog);true.
+
+process_rule(Sup,Lhs,Rhs,Parent_rule) :- 
   copy_term(Parent_rule,Parent_ruleCopy),
   build_rhs((Parent_ruleCopy),Rhs,Rhs2),
+   cyclic_break((Lhs)),
+   cyclic_break((Rhs)),
   foreachl_do(pfc_nf(Lhs,Lhs2),
    build_rule(Lhs2,rhs(Rhs2),(Parent_ruleCopy,u))).
 
 build_rule(Lhs,Rhs,Support) :-
+  cyclic_break((Lhs)),
+  cyclic_break((Rhs)),
   build_trigger(Support,Lhs,Rhs,Trigger),
   pfc_eval_lhs(Trigger,Support).
 
@@ -2507,7 +2533,7 @@ compute_resolve(NewerP,OlderQ,Resolve):-
 :-multifile(resolverConflict_robot/1).
 :-dynamic(resolverConflict_robot/1).
 :-export(resolverConflict_robot/1).
-resolveConflict(C) :- forall(must(pfc_nf1_negation(C,N)),must(pp_why(N))),must(pp_why(C)), if_defined(resolverConflict_robot(C)),!.
+resolveConflict(C) :- forall(must(pfc_nf1_negation(C,N)),ignore(show_call_failure((nop(resolveConflict(C)),pp_why(N))))),ignore(show_call_failure((nop(resolveConflict(C)),pp_why(C)))), if_defined(resolverConflict_robot(C)),!.
 resolveConflict(C) :- forall(must(pfc_nf1_negation(C,N)),forall(compute_resolve(C,N,TODO),debugOnError(TODO))),!.
 resolveConflict(C) :- must((pfc_remove3(C),fmt("~nRem-3 with conflict ~w~n", [C]),pfc_run,sanity(\+C))),\+C,!.
 resolveConflict(C) :-

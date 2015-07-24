@@ -746,18 +746,16 @@ to_var_functors(Outer,In,Out):-
          nb_getval('$variable_names', Vs),(member(Name=Var,Vs)->true;nb_setval('$variable_names', [Name=Var|Vs])))
            -> Out=..[t,Var|ArgsO];  (Args==ArgsO->(Out=In);compound_name_arguments(Out,Name,ArgsO))))))).
 
-system:term_expansion(I,O):- 
-   current_predicate(logicmoo_bugger_loaded/0),
-   current_prolog_flag(allow_variable_name_as_functor,true), compound(I),functor(I,VFE,1),varFunctorEscape(VFE),
+system:term_expansion(I,O):- current_prolog_flag(allow_variable_name_as_functor,true),
+   current_predicate(logicmoo_bugger_loaded/0),compound(I),functor(I,VFE,1),varFunctorEscape(VFE),
                      \+ thlocal:disable_mpred_term_expansions_locally,
                        with_assertions(thlocal:disable_mpred_term_expansions_locally,to_var_functors((:-),I,O)),I\=@=O.
 
 
-system:goal_expansion(I,O):- 
-   current_predicate(logicmoo_bugger_loaded/0),
-   current_prolog_flag(allow_variable_name_as_functor,true),
-                     compound(I),functor(I,VFE,1),varFunctorEscape(VFE),current_prolog_flag(allow_variable_name_as_functor,true),
-                     \+ thlocal:disable_mpred_term_expansions_locally,to_var_functors((:-),I,O),I\=@=O.
+system:goal_expansion(I,O):- current_prolog_flag(allow_variable_name_as_functor,true),
+   current_predicate(logicmoo_bugger_loaded/0),compound(I),functor(I,VFE,1),varFunctorEscape(VFE),
+                     \+ thlocal:disable_mpred_term_expansions_locally,
+                       to_var_functors((:-),I,O),I\=@=O.
 
 
 %user:goal_expansion(G,OUT):- \+  thlocal:disable_mpred_term_expansions_locally, G\=isa(_,_),(use_was_isa(G,I,C)),!,to_isa_out(I,C,OUT).

@@ -88,14 +88,16 @@ input_to_forms(FormsOut,Vars):-
 
 :-export(input_to_forms/3).
 input_to_forms(In,FormsOut,Vars):-
- must_det_l((
-    parse_sexpr(In, Forms0),
-    to_untyped(Forms0, Forms1),
-    extract_lvars(Forms1,FormsOut,Vars))).
+    (is_stream(In) ->
+       with_stream_pos(In,get_input_to_forms(In,FormsOut,Vars));
+       get_input_to_forms(In,FormsOut,Vars)).
 
 
-:-export(any_to_lazy_list/2).
-any_to_lazy_list(Stream0,Chars):-l_open_input(Stream0,Stream),stream_to_lazy_list(Stream,CharsM),!,Chars=CharsM.
+:-export(get_input_to_forms/3).
+get_input_to_forms(In,FormsOut,Vars):-
+    parse_sexpr(In, Forms0)->
+    to_untyped(Forms0, Forms1)->
+    extract_lvars(Forms1,FormsOut,Vars)-> true.
 
 
 
@@ -112,8 +114,7 @@ any_to_lazy_list(Stream0,Chars):-l_open_input(Stream0,Stream),stream_to_lazy_lis
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    Parsing
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-parse_sexpr(String, Expr) :- is_stream(S),stream_to_lazy_list(S,LList),!,LList=[E|List],parse_sexpr_codes([E|List], Expr).
-parse_sexpr(Any, Expr) :- Any\=[_|_],any_to_lazy_list(Any,[E|List]),!,parse_sexpr_codes([E|List], Expr).
+parse_sexpr(S, Expr) :- is_stream(S),!,stream_to_lazy_list(S,LList),with_stream_pos(S,parse_sexpr_codes(LList, Expr)).
 parse_sexpr([SC|Codes], Expr) :- integer(SC),!,parse_sexpr_codes([SC|Codes], Expr).
 parse_sexpr([SC|Codes], Expr) :- atom(SC),!,string_chars(String,[SC|Codes]),!,parse_sexpr(String, Expr).
 parse_sexpr(String, Expr) :- string(String),!,string_codes(String,Codes),parse_sexpr_codes(Codes, Expr).
@@ -491,4 +492,29 @@ if_script_file_time(X):-if_startup_script(time(X)).
 
     %@ V = [map, plus1, [2, 3, 4]].
 
+/*
 
+:-export(user:rff/0).
+
+user:rff:-user:rff(wdmsg(n(first)),wdmsg(n(retry)),wdmsg(n(success)),wdmsg(n(failure))).
+
+:-export(user:rff/4).
+user:rff(OnFirst,OnRetry,OnSuccess,OnFailure) :- CU = was(never,first),
+  call_cleanup((
+    process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure),
+    (nb_setarg(1,CU,first));((nb_setarg(1,CU,second)),!,fail)),
+    (nb_setarg(2,CU,second),process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure),wdmsg(cleanup(CU)))),
+  once((
+    process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure),
+    CU \= was(second, _))).
+
+:-export(process_rff/5).
+process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure):-
+   wdmsg(next(CU)),
+   once(((CU==was(first,first)->OnFirst;true),
+   (CU==was(second,first)->OnRetry;true),
+   (CU==was(second,second)->OnFailure;true),
+   (CU==was(first,second)->OnSuccess;true))).
+
+
+*/
