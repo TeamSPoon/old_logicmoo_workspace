@@ -7,8 +7,8 @@ git clone --recursive  https://github.com/TeamSPoon/PrologMUD
 cd PrologMUD
 git fetch --recurse-submodules
 git submodule init
-git submodule update
-
+git submodule pull
+git pull
 
 ( source ./scripts/preconfig.sh )
 
