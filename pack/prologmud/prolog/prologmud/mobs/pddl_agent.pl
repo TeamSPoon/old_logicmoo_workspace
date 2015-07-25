@@ -27,12 +27,6 @@ pddl_vette_idea(_,actSit,actSit):-!.
 pddl_vette_idea(Agent,Act,Act):-dmsg(pddl_vette_idea(Agent,Act)).
 
 
-prologHybrid(mudLabelTypeProps/3).
-:- show_pred_info(mudLabelTypeProps/3).
-:- sleep(2.0).
-:- must(arity(mudLabelTypeProps,3)).
-
-prologHybrid(typeHasGlyph(tCol,ftString)).
 mudLabelTypeProps('oP',tPddlAgent,[]).
 
 user:world_agent_plan(_World,Agent,ActV):-

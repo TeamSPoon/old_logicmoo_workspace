@@ -1,5 +1,5 @@
 % <?xml version="1.0"?>
-% <!--
+actionDef(
 /*************************************************************************
 
     File: actionDatabase.pl
@@ -26,8 +26,7 @@
 *************************************************************************/
 :-swi_module(modActionDatabase, []).
 
-end_of_file.
-
+/*
 :-swi_module(modActionDatabase,[take/3,
 			  eat/2,
 			  drop/3,
@@ -45,7 +44,7 @@ end_of_file.
 			  sitdown/3,
 			  wear/2 
 ]).  
- 
+*/
 
 /*************************************************************************
 
@@ -80,7 +79,7 @@ end_of_file.
 
 *************************************************************************/
 
-:- use_module('NLPModules/Actions/execute',[k/1,notk/1,add/1,del/1]).
+:- use_module('NLPModules/Actions/execute',[k/1,notk/1,add/1,del/1)]).
 
 % TODO: Design the addition and deletion of the player effects.  
 % TODO: Translate into PKS syntax:
@@ -111,80 +110,81 @@ end_of_file.
 % <!-- looking: This frame concerns an Agent (a person or other intelligent being) paying close attention to something, the Something -->
 % <action name="look">
 %	<params>Agent,Something</params>
-% <!--
-look(agent(Agent),something(Something)) :- % -->
+actionDef(
+look(agent(Agent),something(Something)) , [
 %   <preconds>
-	k(here(Something)),
+        k(inRegion(Agent,Something)),
+	k(tRegion(Something)),
 %	</preconds>
 %	<effects>
 	add(contains(Something,Agent)),
-	add(describe(here)).
+	add(knowAllAbout(Agent,Something)]).
 %	</effects>
 %</action>
 
 % <!-- looking: This frame concerns an Agent (a person or other intelligent being) paying close attention to something, the Something -->
 % <action name="look">
 %	<params>Agent,Something</params>
-% <!--
-look(agent(Agent),something(Something)) :- % -->
+actionDef(
+look(agent(Agent),something(Something)) , [
 %   <preconds>
-	notk(here(Something)),
-	k(lookable(Something)),
+	notk(inRegion(Agent,Something)),
+	k(canSee(Agent,Something)),
 %	</preconds>
 %	<effects>
-	add(describe(Something)).
+	add(knowAllAbout(Agent,Something)]).
 %	</effects>
 %</action>
 
 % <!-- removing: An Agent causes a Something to move away from a location, the Source -->
 % <action name="take">
 %	<params>Agent,Something,Source</params>
-% <!--
-take(agent(Agent),something(Something),source(Source)) :- % -->
+actionDef(
+take(agent(Agent),something(Something),source(Source)) , [
 %       <preconds>
 	k(takeAble(Something)),
-	k(accessible(Something)),
-	notk(contains(Agent,Something)),
-	k(hasdetail(Source,Something)),
+	k(canAccess(Agent,Something)),
+	notk(possess(Agent,Something)),
+	k(supports(Source,Something)),
 %	</preconds>
 %	<effects>
-	del(hasdetail(Source,Something)),
-	add(contains(Agent,Something)).
+	del(supports(Source,Something)),
+	add(possess(Agent,Something)]).
 %	</effects>
 %</action>
 
 % <!-- taking: An Agent removes a Something from a Source so that it is in the Agent's possession -->
 % <action name="take">
 %	<params>Agent,Something,Source</params>
-% <!--
-take(agent(Agent),something(Something),source(Source)) :- % -->
+actionDef(
+take(agent(Agent),something(Something),source(Source)) , [
 %       <preconds>
 	k(takeAble(Something)),
-	k(accessible(Something)),
-	notk(contains(Agent,Something)),
+	k(canAccess(Agent,Something)),
+	notk(possess(Agent,Something)),
 	k(contains(Source,Something)),
 %	</preconds>
 %	<effects>
 	del(contains(Source,Something)),
-	add(contains(Agent,Something)).
+	add(possess(Agent,Something)]).
 %	</effects>
 %</action>
 
 % <!-- unlocking:  -->
 % <action name="unlock">
 %	<params>Agent,Something,Instrument</params>
-% <!--
-unlock(agent(Agent),something(Something),instrument(Instrument)) :- % -->
+actionDef(
+unlock(agent(Agent),something(Something),instrument(Instrument)) , [
 %   <preconds>
-	k(accessible(Something)),
+	k(canAccess(Agent,Something)),
 	k(locked(Something)),
 	pk(fitsin(Instrument,Something)),
-	k(contains(Agent,Instrument)),
+	k(possess(Agent,Instrument)),
 %	</preconds>
 %	<effects>
 	del(locked(Something)),
 	add(unlocked(Something)),
-	add(fitsin(Instrument,Something)).
+	add(fitsin(Instrument,Something)]).
 %	</effects>
 %</action>
 
@@ -192,68 +192,70 @@ unlock(agent(Agent),something(Something),instrument(Instrument)) :- % -->
 % <!-- locking:  -->
 % <action name="lock">
 %	<params>Agent,Something,Instrument</params>
-% <!--
-lock(agent(Agent),something(Something),instrument(Instrument)) :- % -->
+actionDef(
+lock(agent(Agent),something(Something),instrument(Instrument)) , [
 %   <preconds>
-	k(accessible(Something)),
+	k(canAccess(Agent,Something)),
 	k(closed(Something)),
 	k(unlocked(Something)),
 	k(fitsin(Instrument,Something)),
-	k(contains(Agent,Instrument)),
+	k(possess(Agent,Instrument)),
 %	</preconds>
 %	<effects>
 	del(unlocked(Something)),
-	add(locked(Something)).
+	add(locked(Something)]).
 %	</effects>
 %</action>
 
 % <!-- closure: The Agent opens/closes the Containing-object -->
 % <action name="open">
 %	<params>Agent,Object</params>
-% <!--
-open(agent(Agent),item(Object)) :- % -->
+actionDef(
+open(agent(Agent),item(Object)) , [
 %   <preconds>
-	k(openclosecontainer(Object)),
+	k(tOpenCloseable(Object)),
+        k(tContainer(Object)),
 	k(closed(Object)),
 	k(unlocked(Object)),
-	k(accessible(Object)),
+	k(canAccess(Agent,Object)),
 %	</preconds>
 %	<effects>
 	del(closed(Object)),
 	add(open(Object)),
-	add(describe(contents,Object)).
+	add(describe(contentsFn(Object))]).
 %	</effects>
 %</action>
 
 % <!-- closure: The Agent opens/closes the Containing-object -->
 % <action name="shut">
 %	<params>Agent,Object</params>
-% <!--
-shut(agent(Agent),item(Object)) :- % -->
+actionDef(
+shut(agent(Agent),item(Object)) , [
 %   <preconds>
-	k(openclosecontainer(Object)),
+	k(tOpenCloseable(Object)),
+        k(tContainer(Object)),
 	k(open(Object)),
-	k(accessible(Object)),
+	k(canAccess(Agent,Object)),
 %	</preconds>
 %	<effects>
 	del(open(Object)),
-	add(closed(Object)).
+	add(closed(Object)]).
 %	</effects>
 %</action>
 
 % <!-- ingestion: An Ingestor consumes food, drink, or smoke (Ingestibles) 
 % <action name="eat">
 %	<params>Ingestor,Ingestible</params>
-% <!--
-eat(ingestor(Ingestor),ingestible(Ingestible)) :- % -->
+actionDef(
+eat(ingestor(Ingestor),ingestible(Ingestible)) , [
 %   <preconds>
-	k(edible(Ingestible)),
-	notk(disgusting(Ingestible)),
+	k(findsEdible(Ingestor,Ingestible)),
+	notk(findsDisgusting(Ingestor,Ingestible)),
 	k(contains(Ingestor,Ingestible)),
 %	</preconds>
 %	<effects>
 	del(contains(Ingestor,Ingestible)),
-	add(gone(Ingestible)).
+	add(tDeleted(Ingestible)]).
 %	</effects>
 %</action>
 
@@ -261,15 +263,15 @@ eat(ingestor(Ingestor),ingestible(Ingestible)) :- % -->
 % the Agent has control of the Something only at the Source of motion-->
 % <action name="drop">
 %	<params>Agent,Something,Target</params>
-% <!--
-drop(agent(Agent),something(Something),goal(Target)) :- % -->
+actionDef(
+drop(agent(Agent),something(Something),goal(Target)) , [
 %       <preconds>
 	k(contains(Target,Agent)),
-	k(contains(Agent,Something)),
+	k(possess(Agent,Something)),
 %	</preconds>
 %	<effects>
-	del(contains(Agent,Something)),
-	add(contains(Target,Something)).
+	del(possess(Agent,Something)),
+	add(contains(Target,Something)]).
 %	</effects>
 %</action>
 
@@ -277,18 +279,18 @@ drop(agent(Agent),something(Something),goal(Target)) :- % -->
 % the Agent has control of the Something only at the Source of motion-->
 % <action name="throw">
 %	<params>Agent,Something,Target</params>
-% <!--
-throw(agent(Agent),something(Something),goal(Target)) :- % -->
+actionDef(
+throw(agent(Agent),something(Something),goal(Target)) , [
 %       <preconds>
-	k(contains(Agent,Something)),
-	k(alive(Something)),
-	k(genericcontainer(Target)),
+	k(possess(Agent,Something)),
+	k(tThinking(Something)),
+	k(tContainer(Target)),
 %	</preconds>
 %	<effects>
-	del(contains(Agent,Something)),
-	del(alive(Something)),
+	del(possess(Agent,Something)),
+	del(tThinking(Something)),
 	add(contains(Target,Something)),
-	add(dead(Something)).
+	add(tCorpse(Something)]).
 %	</effects>
 %</action>
 
@@ -296,16 +298,16 @@ throw(agent(Agent),something(Something),goal(Target)) :- % -->
 % profiled -->
 % <action name="put">
 %	<params>Agent,Something,Target</params>
-% <!--
-put(agent(Agent),something(Something),goal(Target)) :- % -->
+actionDef(
+put(agent(Agent),something(Something),goal(Target)) , [
 %	<preconds>
-	k(contains(Agent,Something)),
-	k(genericcontainer(Target)),
-	k(accessible(Target)),
+	k(possess(Agent,Something)),
+	k(tContainer(Target)),
+	k(canAccess(Agent,Target)),
 %	</preconds>
 %	<effects>
-	del(contains(Agent,Something)),
-	add(contains(Target,Something)).
+	del(possess(Agent,Something)),
+	add(contains(Target,Something)]).
 %	</effects>
 %</action>
 
@@ -313,32 +315,32 @@ put(agent(Agent),something(Something),goal(Target)) :- % -->
 % profiled -->
 % <action name="put">
 %	<params>Agent,Something,Target</params>
-% <!--
-put(agent(Agent),something(Something),goal(Target)) :- % -->
+actionDef(
+put(agent(Agent),something(Something),goal(Target)) , [
 %	<preconds>
-	k(contains(Agent,Something)),
-	notk(genericcontainer(Target)),
-	k(accessible(Target)),
+	k(possess(Agent,Something)),
+	notk(tContainer(Target)),
+	k(canAccess(Agent,Target)),
 %	</preconds>
 %	<effects>
-	del(contains(Agent,Something)),
-	add(hasdetail(Target,Something)).
+	del(possess(Agent,Something)),
+	add(supports(Target,Something)]).
 %	</effects>
 %</action>
 
 % <!-- placing: An Agent places a Something on himself -->
 % <action name="wear">
 %	<params>Agent,Something</params>
-% <!--
-wear(agent(Agent),something(Something)) :- % -->
+actionDef(
+wear(agent(Agent),something(Something)) , [
 %	<preconds>
-	k(contains(Agent,Something)),
-	k(accessible(Something)),
+	k(possess(Agent,Something)),
+	k(canAccess(Agent,Something)),
 	k(wearable(Something)),
 %	</preconds>
 %	<effects>
-	del(contains(Agent,Something)),
-	add(hasdetail(Agent,Something)).
+	del(possess(Agent,Something)),
+	add(supports(Agent,Something)]).
 %	</effects>
 %</action>
 
@@ -346,16 +348,16 @@ wear(agent(Agent),something(Something)) :- % -->
 % or greeting. -->
 % <action name="kiss">
 %	<params>Agent,Entity</params>
-% <!--
-kiss(agent(Agent),entity(Entity)) :- % -->
+actionDef(
+kiss(agent(Agent),entity(Entity)) , [
 %	<preconds>
-	k(alive(Entity)),
-	k(accessible(Entity)),
-	k(beautiful(Agent)),
+	k(tThinking(Entity)),
+	k(canAccess(Agent,Entity)),
+	k(findsBeautiful(Entity,Agent)),
 %	</preconds>
 %	<effects>
 	add(happy(Entity)),
-	add(victorious(Agent)).
+	add(victorious(Agent)]).
 %	</effects>
 %</action>
 
@@ -363,19 +365,19 @@ kiss(agent(Agent),entity(Entity)) :- % -->
 % or greeting. -->
 % <action name="kiss">
 %	<params>Agent,Entity</params>
-% <!--
-kiss(agent(Agent),entity(Entity)) :- % -->
+actionDef(
+kiss(agent(Agent),entity(Entity)) , [
 %	<preconds>
-	k(alive(Entity)),
-	k(accessible(Entity)),
-	notk(beautiful(Agent)),
+	k(tThinking(Entity)),
+	k(canAccess(Agent,Entity)),
+	notk(findsBeautiful(Entity,Agent)),
 %	</preconds>
 %	<effects>
-	add(bored(Entity)).
+	add(bored(Entity)]).
 %	</effects>
 %</action>
 
-% <!--
+actionDef(
 % TODO: We could define only one action kill with 3 parameters. 
 % Replacing the concepts easytokill and notsoeasytokill with a role like
 % kills(knife1,dragon1), for example. In order to have the default use of
@@ -386,16 +388,16 @@ kiss(agent(Agent),entity(Entity)) :- % -->
 % <!-- A Killer causes the death of the Victim. -->
 % <action name="kill">
 %	<params>Killer,Victim</params>
-% <!--
-kill(killer(Killer),victim(Victim),instrument(Instrument)) :- % -->
+actionDef(
+kill(killer(Killer),victim(Victim),instrument(Instrument)) , [
 %	<preconds>
-	k(alive(Victim)),
-	k(easytokill(Victim)),
-	k(accessible(Victim)),
+	k(tThinking(Victim)),
+	k(easytokill(Killer,Victim)),
+	k(canAccess(Killer,Victim)),
 %	</preconds>
 %	<effects>
-	del(alive(Victim)),
-	add(dead(Victim)). % TODO Here dead is verbalized but not asserted because it's not a primitive concept
+	del(tThinking(Victim)),
+	add(tCorpse(Victim)]). % TODO Here tCorpse is verbalized but not asserted because it's not a primitive concept
 					   % This treatment might be useful for other cases, keep it in mind.  
 %	</effects>
 %</action>
@@ -403,24 +405,25 @@ kill(killer(Killer),victim(Victim),instrument(Instrument)) :- % -->
 % <!-- A Killer causes the death of the Victim. -->
 % <action name="kill">
 %	<params>Killer,Victim,Instrument</params>
-% <!--
-kill(killer(Killer),victim(Victim),instrument(Instrument)) :- % -->
+actionDef(
+kill(killer(Killer),victim(Victim),instrument(Instrument)) , [
 %	<preconds>
-	k(alive(Victim)),
-	k(accessible(Victim)),
+	k(tThinking(Victim)),
+	k(canAccess(Killer,Victim)),
+        k(canAccess(Killer,Instrument)),
 	k(weapon(Instrument)),
 %	</preconds>
 %	<effects>
-	del(alive(Victim)),
-	add(dead(Victim)). % TODO Here dead is verbalized but not asserted because it's not a primitive concept
+	del(tThinking(Victim)),
+	add(tCorpse(Victim)]). % TODO Here tCorpse is verbalized but not asserted because it's not a primitive concept
 %	</effects>
 %</action>
 
 % <!-- A Protagonist changes the overall postion and posture of the body from a Source to a Target. -->
 % <action name="move">
 %	<params>Protagonist,Source,Target</params>
-% <!--
-standup(protagonist(Protagonist),source(Source),goal(Target)) :- % -->
+actionDef(
+standup(protagonist(Protagonist),source(Source),goal(Target)) , [
 %	<preconds>
 	k(contains(Source,Protagonist)),
 	k(seated(Protagonist)),
@@ -428,15 +431,15 @@ standup(protagonist(Protagonist),source(Source),goal(Target)) :- % -->
 %	</preconds>
 %	<effects>
 	del(contains(Source,Protagonist)),
-	add(contains(Target,Protagonist)).
+	add(contains(Target,Protagonist)]).
 %	</effects>
 %</action>
 
 % <!-- A Protagonist changes the overall postion and posture of the body from a Source to a Target. -->
 % <action name="move">
 %	<params>Protagonist,Source,Target</params>
-% <!--
-sitdown(protagonist(Protagonist),source(Source),goal(Target)) :- % -->
+actionDef(
+sitdown(protagonist(Protagonist),source(Source),goal(Target)) , [
 %	<preconds>
 	k(contains(Source,Protagonist)),
 	notk(seated(Protagonist)),
@@ -445,17 +448,17 @@ sitdown(protagonist(Protagonist),source(Source),goal(Target)) :- % -->
 %	</preconds>
 %	<effects>
 	del(contains(Source,Protagonist)),
-	add(contains(Target,Protagonist)).
+	add(contains(Target,Protagonist)]).
 %	</effects>
 %</action>
 
 % <!-- A Protagonist changes the overall postion and posture of the body from a Source to a Target. -->
 % <action name="move">
 %	<params>Protagonist,Source,Target</params>
-% <!--
-move(protagonist(Protagonist),exit(Exit),goal(Target),source(Source)) :- % -->
+actionDef(
+move(protagonist(Protagonist),exit(Exit),goal(Target),source(Source)) , [
 %	<preconds>
-	k(here(Source)),
+	k(inRegion(Protagonist, Source)),
 	% I'd like to add here k(hereroom(Room)), k(hasexit(Room,Exit))
 	notk(seated(Protagonist)),
 	k(hasexit(Source,Exit)),
@@ -465,7 +468,7 @@ move(protagonist(Protagonist),exit(Exit),goal(Target),source(Source)) :- % -->
 	del(contains(Source,Protagonist)),
 	add(contains(Target,Protagonist)),
 	add(leadsto(Exit,Target)),
-	add(describe(here)).
+	add(knowAllAbout(Protagonist,Source)]).
 %	</effects>
 %</action>
 

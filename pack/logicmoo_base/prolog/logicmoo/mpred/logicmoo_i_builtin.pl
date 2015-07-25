@@ -42,12 +42,14 @@
 
 
 :- dynamic(subFormat/2).
+:- dynamic(support_hilog/2).
 :- dynamic(pfc_undo_sys/3).
 
 :- include((logicmoo_i_header)).
 
 % :- dynamic(added/1).
 added(Added):-cwc,spft(Added,U,U).
+
 
 
 :- if(if_defined(pfc_testing)).
@@ -133,7 +135,7 @@ prologSingleValued(C):-cwc,compound(C),functor(C,F,_),!,prologSingleValued(F).
 
 %(pfc_default(P)/pfc_each_literal(P,E))  =>  pfc_default(E).
 
-((pfc_default(P)/pfc_literal(P))  => ((~Q/different_literal(P,_,Q), ~neg(P)) => P)).
+((pfc_default(P)/(pfc_literal(P),nonvar(P),functor(P,F,A),functor(Q,F,A)))  => ((~Q/different_literal(P,_,Q), ~neg(P)) => P)).
 
 
 
@@ -180,11 +182,14 @@ neg(prologSingleValued(arity)).
 neg(arity(argIsa,1)).
 arity(pddlObjects,2).
 
+meta_argtypes(support_hilog(tRelation,ftInt)).
+
+
 prologHybrid(genls/2).
 
-tPred(F),arity(F,A)/(integer(A),A>1) => (not_col(F),support_hilog(F,A)).
+(tPred(F),arity(F,A)/(integer(A),A>1) => (neg(tCol(F)),support_hilog(F,A))).
 
-(not_col(C) => ( \+ tCol(C), \+ completelyAssertedCollection(C),  neg(tCol(C)))).
+neg(tCol(C))=> \+ completelyAssertedCollection(C).
 
 (((support_hilog(F,A)/(atom(F),integer(A),\+ static_predicate(F/A), \+ prologDynamic(F)))) =>
    (hybrid_support(F,A), 
@@ -342,7 +347,6 @@ ttPredType(X)=>tCol(X).
 
 tSet(ttFormatType).
 
-isa(I,C):- cwc, pfc_univ(C,I,CI),atom(C),current_predicate(C/1,CI)->call(CI).
 
 
 
@@ -566,6 +570,12 @@ isa('CycLTerm',ttNonGenled).
 =>prologHybrid(quotedIsa(ftTerm,ttFormatType)).
 :-dynamic(quotedIsa/2).
 
+isFact(A):- cwc, nonvar(A), ( added(A) ; clause_asserted(A)).
+isa(I,C):- cwc, pfc_univ(C,I,CI),atom(C),current_predicate(C/1,CI)->call(CI).
+isa(I,C):- cwc, is_asserted(ttFormatType(C)),!, quotedIsa(I,C).
+quotedIsa(I,C):- cwc, term_is_ft(I,C).
+dif_in_arg(P,N,Q):- cwc, ground(P),P=..[F|ARGS],arg(N,P,B),Q=..[F|ARGS],nb_setarg(N,Q,A),dif(A,B).
+
 tCol(ttSpatialType).
 tCol(tSpatialThing).
 completelyAssertedCollection(ttTypeType).
@@ -611,7 +621,7 @@ ttPredType(Prop)=>tCol(Prop).
 
 % :-start_rtrace.
 
-(P/pfc_literal(P) => {user:agenda_slow_op_enqueue(must(ignore(deduceEachArgType(P))))}).
+((P/nonvar(P),{functor(P,F,A),\+ pfc_connective(F), A>1}) => {user:agenda_slow_op_enqueue(must(ignore(deduceEachArgType(P))))}).
 % tCol(Col) <=> isa(Col,tCol).
 
 :-dynamic((disjointWith/2,genls/2,isa/2)).
@@ -1090,8 +1100,6 @@ specialFunctor('\\+').
 specialFunctor('/').
 
 
-isa(I,C):- cwc, is_asserted(ttFormatType(C)), quotedIsa(I,C).
-quotedIsa(I,C):- cwc, term_is_ft(I,C).
 
 :-time(expand_props(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O)),time(pfc_add(pfc_default(O))).
 
@@ -1108,8 +1116,8 @@ completelyAssertedCollection(tBinaryPredicate).
 
 prologHybrid(relationMostInstance(tBinaryPredicate,tCol,vtValue)).
 
-(relationMostInstance(Pred,_,Value),argIsa(Pred,2,Type)=>(isa(Value,Type),isa(Pred,tRolePredicate))).
-(relationAllInstance(Pred,_,Value),argIsa(Pred,2,Type)=>(isa(Value,Type),isa(Pred,tRolePredicate))).
+(relationMostInstance(Pred,_,Value),{\+number(Value)},argIsa(Pred,2,Type)=>(isa(Value,Type),isa(Pred,tRolePredicate))).
+(relationAllInstance(Pred,_,Value),{\+number(Value)},argIsa(Pred,2,Type)=>(isa(Value,Type),isa(Pred,tRolePredicate))).
 
 
 relationMostInstance(BP,_,_)=>tBinaryPredicate(BP).
@@ -1191,7 +1199,6 @@ relationMostInstance(Pred,Type,Value),{G=..[Pred,Inst,Value]} => pfc_default(isa
 notAssertable(isFact/1).
 prologHybrid(isFact/1).
 
-isFact(A):- cwc, nonvar(A), ( added(A) ; clause_asserted(A)).
 
 
 pfc_default(((ttFormatType(FT),isFact(argIsa(Pred,N,FT))/ground(argIsa(Pred,N,FT)))=>argQuotedIsa(Pred,N,FT))).
@@ -1230,8 +1237,6 @@ argFormat(P,S,vSetTheFormat)<=> ~singleValuedInArg(P,S).
 
 :-ensure_loaded('../pfc/zenls.pfct').
 
-dif_in_arg(P,N,Q):- cwc, ground(P),P=..[F|ARGS],arg(N,P,B),Q=..[F|ARGS],nb_setarg(N,Q,A),dif(A,B).
-
 
 ((singleValuedInArg(F,N),arity(F,A),{atom(F),integer(N),integer(A),functor(P,F,A)}) => (made_update_single_valued_arg(P,N),(P => {update_single_valued_arg(P,N)}))).
 
@@ -1239,4 +1244,4 @@ dif_in_arg(P,N,Q):- cwc, ground(P),P=..[F|ARGS],arg(N,P,B),Q=..[F|ARGS],nb_setar
 :-ensure_loaded('../pfc/singleValued.pfct').
 
 
-
+:- rescan_pfc.

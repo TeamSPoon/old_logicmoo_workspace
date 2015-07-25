@@ -40,6 +40,7 @@ enqueue_agent_action(C):-enqueue_agent_action(_,C).
 :-export(enqueue_agent_action/2).
 enqueue_agent_action(P,C):-foc_current_agent(P),get_agent_session(P,O),enqueue_agent_action(P,C,O).
 :-export(enqueue_agent_action/3).
+:-dynamic(enqueue_agent_action/3).
 enqueue_agent_action(P,C,O):- immediate_session(P,C,O),!, do_agent_action(P,C,O).
 enqueue_agent_action(P,C,O):- assertz(agent_action_queue(P,C,O)),must(once(pfc_add(agent_action_queue(P,C,O)))),!.
 
@@ -156,9 +157,11 @@ agent_call_command_now_3(Agent,CMD):-
    with_agent(Agent,
      with_assertions(thlocal:side_effect_ok,
      with_assertions(thlocal:agent_current_action(Agent,CMD),
-  (user:agent_call_command(Agent,CMD)*->true;user:agent_call_command_fallback(Agent,CMD))))),
+  (user:agent_call_command(Agent,CMD)*->true;user:agent_call_command_all_fallback(Agent,CMD))))),
   padd(Agent,mudLastCommand(CMD)).
 
+user:agent_call_command_all_fallback(Agent,CMD):- user:agent_call_command_fallback(Agent,CMD),!.
+user:agent_call_command_all_fallback(Agent,CMD):-term_listing(CMD).
 
 :-export(send_command_completed_message/4).
 send_command_completed_message(Agent,Where,Done,CMD):-

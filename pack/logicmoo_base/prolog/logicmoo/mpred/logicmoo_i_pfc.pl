@@ -493,7 +493,7 @@ is_already_supported(P,_S,(u,u)):- clause_asserted(spft(P,u,u)),!.
 % is_already_supported(P,_S):- copy_term(P,PC),spft(PC,_,_),P=@=PC,!.
 
 
-maybe_did_support.
+maybe_did_support :- fail.
 
 
 different_literal(Q,N,R):- 
@@ -507,12 +507,14 @@ different_literal(Q,N,R):-
 pfc_unpost1_sp_3(S,P):- doall(pfc_rem2a(P,S)),!,pfc_unfwc(P).
 
 
-pfc_post1_sp_3(ST, \+ P) :-!, pfc_unpost1_sp_3(ST,P).
+pfc_post1_sp_3(ST, \+ P) :-!,must(nonvar(P)), pfc_unpost1_sp_3(ST,P).
 pfc_post1_sp_3(ST, ~ P) :-!, pfc_unpost1_sp_3(ST,P).
+pfc_post1_sp_3(ST,P):- loop_check(pfc_post1_sp_3_0(ST,P)).
 
-pfc_post1_sp_3(ST,P):- maybe_did_support,is_already_supported(P,ST,_HOW),!.
-pfc_post1_sp_3(S,P):- \+ pfc_unique_u(P),!,must(pfc_add_support(P,S)),!.
-pfc_post1_sp_3(S,P):-
+pfc_post1_sp_3_0(S,P):- 
+  \+ pfc_unique_u(P), 
+     (is_already_supported(P,ST,_HOW)->true;must(pfc_add_support(P,S))),!.
+pfc_post1_sp_3_0(S,P):- 
   must(assert_u(P)),
   must(pfc_add_support(P,S)),
   must(pfc_trace_add(P,S)),
@@ -520,6 +522,19 @@ pfc_post1_sp_3(S,P):-
   must(pfc_enqueue(P,S)),
   !.
 
+
+/*
+pfc_post1_sp_3(ST,P):- loop_check(pfc_post1_sp_3_0(ST,P)).
+pfc_post1_sp_3_0(ST,P):- is_already_supported(P,ST,_HOW),!,must(assert_u(P)).
+pfc_post1_sp_3_0(S,P):- \+ pfc_unique_u(P)->must(pfc_add_support(P,S)),!.
+pfc_post1_sp_3_0(S,P):- 
+  must(assert_u(P)),
+  must(pfc_add_support(P,S)),
+  must(pfc_trace_add(P,S)),
+  !,
+  must(pfc_enqueue(P,S)),
+  !.
+*/
 
 
 % was nothing  pfc_current_db/1.
@@ -2600,13 +2615,22 @@ pred_t0(P):-bt(P,_).
 pred_t0(P):-nt(P,_,_).
 pred_t0(P):-spft(P,_,_).
 pred_t0(P):- '=>'(P).
+%pred_r0(~(P)):- if_defined(~(P)).
+%pred_r0(neg(P)):- (neg(P)).
 
 pred_r0(P=>Q):- (P=>Q).
 pred_r0(P<=>Q):- (P<=>Q).
+pred_r0(P<=Q):- (P<=Q).
+
+
 
 rescan_pfc:-forall(clause(user:rescan_pfc_hook,Body),show_call_entry(Body)).
 
-pfc_facts_and_universe(P):- (var(P)->((pred_head_all(P) /* , \+ meta_wrapper_rule(P) */ ));true),call(no_repeats(debugOnError(P))).
+pfc_facts_and_universe(P):- (var(P)->pred_head_all(P);true),
+  (meta_wrapper_rule(P)->show_call(no_repeats(debugOnError(P))) ; (no_repeats(debugOnError(P)))).
+
+pfc_facts_only(P):- (var(P)->(pred_head_all(P),\+ meta_wrapper_rule(P));true),(no_repeats(debugOnError(P))).
+
 
 user:rescan_pfc_hook:- forall(pfc_facts_and_universe(P),with_assertions(pfc_debug_local,pfc_fwd(P))).
 /*

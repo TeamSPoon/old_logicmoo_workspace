@@ -15,6 +15,11 @@
 
 :- file_begin(prolog).
 
+when_command_show(Agent,ActionType):- 
+  findall(Show,user:on_command_show(Agent,ActionType,Show),MORELOOK),
+  (MORELOOK==[] -> true;
+ (must(mudAtLoc(Agent,LOC)),show_kb_preds(Agent,LOC,MORELOOK))).
+ 
 
 % ===========================================
 % generatePhrase_local(+Term,-English).

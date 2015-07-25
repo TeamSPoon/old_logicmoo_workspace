@@ -24,20 +24,23 @@ with_stream_pos(In,Call):-
 
 :-export(l_open_input/2).
 :-export(l_open_input0/2).
+:-export(l_open_input1/2).
 l_open_input(InS,In):-once(must(l_open_input0(InS,In))).
-l_open_input0([V|_],_):-var(V),V=zzzzzzzzzzzzz,!,throw(error(l_open_input/2,'Arguments are not sufficiently instantiated (l_open_input)')).
-l_open_input0(string(string(InS)),In):-!,text_to_string_safe(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In).
-l_open_input0(string(InS),In):-!,open_string(InS,In).
-l_open_input0(atom(InS),In):-!,open_string(InS,In).
-l_open_input0(codes(InS),In):-!,open_string(InS,In).
-l_open_input0(chars(InS),In):-!,open_string(InS,In).
-l_open_input0(file(Filename),In) :- filematch(Filename,File), catch(see(File),_,fail),current_input(In).
-l_open_input0(alias(Filename),In) :-  catch(see(Filename),_,fail),current_input(In).
-l_open_input0(InS,In):-is_stream(InS),!,In=InS.
+
+l_open_input0(In,InS):-l_open_input1(In,InS),!.
 l_open_input0(InS,In):-string(InS),!,open_string(InS,In).
 l_open_input0(Filename,In) :- \+ is_list(Filename),nonvar(Filename),filematch(Filename,File), catch(see(File),_,fail),current_input(In).
 l_open_input0(InS,In):-!,open_string(InS,In).
 
+l_open_input1([V|_],_):-var(V),V=zzzzzzzzzzzzz,!,throw(error(l_open_input/2,'Arguments are not sufficiently instantiated (l_open_input)')).
+l_open_input1(InS,In):-is_stream(InS),!,In=InS.
+l_open_input1(file(Filename),In) :- filematch(Filename,File), catch(see(File),_,fail),current_input(In).
+l_open_input1(alias(Filename),In) :-  catch(see(Filename),_,fail),current_input(In).
+l_open_input1(string(string(InS)),In):-!,text_to_string_safe(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In).
+l_open_input1(string(InS),In):-!,open_string(InS,In).
+l_open_input1(atom(InS),In):-!,open_string(InS,In).
+l_open_input1(codes(InS),In):-!,open_string(InS,In).
+l_open_input1(chars(InS),In):-!,open_string(InS,In).
 
 
 :- meta_predicate if_flag_true(0,0).

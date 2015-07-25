@@ -974,9 +974,12 @@ typeProps(tAgent,[mudStr(2),mudHeight(2),mudStm(2),mudSpd(2)]).
 %normalAgentGoal(Pred,Val)=>  (tAgent(A)=>agentGoals(A,Pred,((t(Pred,A,V),V>=Val)))).
 %agentGoals(A,About,State)/State => \+ agentTODO(A,actImprove(About)).
 
+prologHybrid(on_command_show(tAgent,vtActionType,ftTerm)).
 prologHybrid(agentTODO(tAgent,vtActionType)).
+prologHybrid(agentGOAL(tAgent,ftAssertable)).
 
 normalAgentGoal(Pred,Val)=>  ( t(Pred,A,V)/(V<Val) => agentTODO(A,actImprove(Pred))).
+normalAgentGoal(Pred,Val)=>  ( t(Pred,A,V)/(V<Val) => agentGOAL(A,t(Pred,A,Val))).
 
 normalAgentGoal(Pred,Val)=>  (tAgent(A)=>pfc_default(t(Pred,A,Val))).
 
@@ -1030,7 +1033,7 @@ O = [
 
 :-pfc_add(tAgent(iPlayer1)).
 
-:- must(rescan_pfc).
+
 
 :-must(mudFacing(iPlayer1,vNorth)).
 

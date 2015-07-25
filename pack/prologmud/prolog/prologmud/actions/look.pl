@@ -77,6 +77,7 @@ cmdLook(Agent,LOC):- garbage_collect_atoms, call(cmdLook_proc,Agent,LOC),!.
 cmdLook_proc(Agent,LOC):- 
    with_no_modifications(with_assertions(user:mpred_prop(nameStrings,prologListValued),cmdLook_proc_0(Agent,LOC))).
 cmdLook_proc_0(Agent,LOC):-
+ findall(Show,user:on_command_show(Agent,actLook,Show),MORELOOK),
   % implicit in next command clr(props(Agent,mudNeedsLook(_))),
    add(props(Agent,mudNeedsLook(vFalse))),
      show_kb_preds(Agent,LOC,
@@ -104,7 +105,7 @@ cmdLook_proc_0(Agent,LOC):-
          mudMoveDist(Agent,value),
          mudHeightOnObj(Agent,value),
          mudLastCmdSuccess=wasSuccess(Agent,value)
-       ]),
+         |MORELOOK]),
     must(show_inventory(Agent,Agent)),!.
 
 

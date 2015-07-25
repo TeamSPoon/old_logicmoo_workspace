@@ -536,7 +536,7 @@ user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term
 
 
 :- show_call_entry(ensure_mpred_file_loaded(prologmud(server/builtin))).
-
+% :- must(rescan_pfc).
 :- show_call_entry(forall(filematch('*/*.plmoo', X),(dmsg(ensure_mpred_file_loaded(X)),ensure_mpred_file_loaded(X)))).
 
 

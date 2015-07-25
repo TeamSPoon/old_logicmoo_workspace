@@ -99,6 +99,7 @@ slow_on('blocks-07-0.pddl').
 slow_on('blocks-08-0.pddl').
 slow_on('blocks-09-0.pddl').
 
+must_filematch(string(A),string(B)):-!.
 must_filematch(A,B):-must((filematch(A,B))).
 
 
@@ -130,13 +131,14 @@ test_domain(DP,Num):-
    forall(member(T,List),ignore((directory_file_path(D,T,TP),exists_file(TP),not(same_file(DP,TP)),
   solve_files(DP,TP)))).
 
+load_domain(string(DP)):-!,load_file(string(DP)).
 load_domain(DP):- \+ exists_file(DP),!, forall(filematch(DP,MATCH),((exists_file(MATCH),load_domain(MATCH)))).
 load_domain(DP):-
    format('~q.~n',[load_domain(DP)]),
   directory_file_path(D,_,DP),directory_files(D,RList),   
    forall(member(T,RList),ignore((directory_file_path(D,T,TP),exists_file(TP),load_file(TP)))).
 
-load_file(F):- must(read_file(F, L)),load_file_rest(F,L).
+load_file(F):- must(read_file(F, L, Filename)),load_file_rest(Filename,L).
 load_file_rest(_,[]):-!.
 load_file_rest(F,L):- first_n_elements(L,10,ES),
    (
@@ -174,17 +176,10 @@ solve_files(DomainFile, ProblemFile):-
 
 solve_files_0(DomainFile, ProblemFile):-
    must_det_l(( 
-      format('~q.~n',[solve_files(DomainFile, ProblemFile)]),
+      format('~q.~n',[solve_files(DomainFile, ProblemFile)]))),
    parseDomain(DomainFile, DD),
     parseProblem(ProblemFile, PP),
-    term_to_ord_term(DD, D),prop_get(domain_name,D,DName),save_type_named(domain,DName,D),
-    term_to_ord_term(PP, P),prop_get(problem_name,P,PName),save_type_named(problem,PName,P),    
-    reset_statistic)),
-    !,
-    record_time(try_solve(PName, D,P,S),SolverTime),
-    flag(time_used,X,X + SolverTime),
-    show_statistic(P, S),
-    !.
+    solve_files_ddpp(DD, PP).
 
 solve_files_0(DomainFile, ProblemFile):-
    must_det_l(( 
@@ -204,6 +199,17 @@ solve_files_0(DomainFile, ProblemFile):-
     show_statistic(P, S),
     !.
 
+
+solve_files_ddpp(DD, PP):-
+   must_det_l(( 
+    term_to_ord_term(DD, D),prop_get(domain_name,D,DName),save_type_named(domain,DName,D),
+    term_to_ord_term(PP, P),prop_get(problem_name,P,PName),save_type_named(problem,PName,P),    
+    reset_statistic)),
+    !,
+    record_time(try_solve(PName, D,P,S),SolverTime),
+    flag(time_used,X,X + SolverTime),
+    show_statistic(P, S),
+    !.
 
 
 compile_problem(Pu,P):-
@@ -1037,8 +1043,10 @@ parseDomain(F, O):- parseDomain(F, O, R), load_file_rest(F,R),!.
 %   The same as above and also return rest of file. Can be useful when domain and problem are in one file.
 %
 parseDomain(File, Output, R) :-  
-    read_file(File, List),!,
-    ensure_struct(domain,Output),prop_set(filename,Output,File),
+    read_file(File, List, Filename),!,
+    ensure_struct(domain,Output),
+     prop_set(filename,Output,Filename),
+     bb_put(filename,Filename),
     domainBNF(Output, List, R),!.
 
 
@@ -1397,9 +1405,9 @@ parseProblem(F, O):-parseProblem(F, O, R), load_file_rest(F,R),!.
 %   The same as above and also return rest of file. Can be useful when domain and problem are in one file.
 %
 parseProblem(F, O, R) :-
-   read_file(F, L),!,
+   read_file(F, L , Filename),!,
    ensure_struct(problem,O),
-   prop_set(filename,O,F),  
+   prop_set(filename,O,Filename),  
    problem(O, L, R),!.    
 
 % Support for reading file as a list.
@@ -1532,8 +1540,9 @@ fix_varcase(Word,Word). % mixed case
 %
 % read_file(+File, -List).
 %
-read_file( File, Words) :-  exists_file(File), !, seeing(Old),call_cleanup(( see(File), get_code(C), (read_rest(C, Words))),( seen, see(Old))),!.
-read_file(File0, Words) :-  must((must_filematch(File0,File),exists_file(File),read_file( File, Words))),!.
+read_file(string(String), Words, textDoc) :- must(open_string(String,In)),!, current_input(Old),call_cleanup(( set_input(In), get_code(C), (read_rest(C, Words))),( set_input(Old))),!.
+read_file( File, Words , File) :-  exists_file(File), !, seeing(Old),call_cleanup(( see(File), get_code(C), (read_rest(C, Words))),( seen, see(Old))),!.
+read_file(File0, Words,FinalName) :-  must((must_filematch(File0,File),exists_file(File),read_file( File, Words, FinalName))),!.
 
 /* Ends the input. */
 read_rest(-1,[]) :- !.
@@ -1597,7 +1606,7 @@ question_mark(63).
 %nop(_).
 
 %parse_file(+File).
-test_parse_file(F,O):- must(read_file(F, L)),!,((domainBNF(O, L, _R1); must(((problem(O, L, _R2)))))),!.
+test_parse_file(F,O):- must(read_file(F, L, _Filename)),!,((domainBNF(O, L, _R1); must(((problem(O, L, _R2)))))),!.
 
 test_parse_file(F):- test_parse_file(F,L),arg(2,L,List),!,
  (not(member('(',List))->true;
@@ -2247,7 +2256,7 @@ test_blocks:- fail, test_domain('./benchmarks/nomystery-sat11-strips/domain.pddl
 push_env_ctx:-!,fail.
 push_env_ctx:-!.
 
-:- show_call(flag(time_used,W,W)).
 rr:- test_ocl('domains_ocl/chameleonWorld.ocl').
+:- show_call(flag(time_used,W,W)).
 
 
