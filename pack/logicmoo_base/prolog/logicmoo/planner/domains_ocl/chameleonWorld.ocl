@@ -64,6 +64,7 @@ substate_classes(substrate,Substrate,[
 
 % Implied Invariants
 
+
 % Inconsistent Constraints
 
 % Operators
@@ -180,6 +181,7 @@ planner_task(1,
      ss(box,box1,[boxClosed(box1)]),
      ss(substrate,newsPaper1,[insideFlexarium(newsPaper1)]),
      ss(substrate,newsPaper2,[outsideFlexarium(newsPaper2)])]).
+
 planner_task(2,
     % Goals
     [
@@ -278,3 +280,27 @@ planner_task(7,
      ss(box,box2,[boxOpen(box2)]),
      ss(substrate,newsPaper1,[insideFlexarium(newsPaper1)]),
      ss(substrate,newsPaper2,[outsideFlexarium(newsPaper2)])]).
+
+
+
+planner_task(8,
+    % Goals
+    [
+     doorClosed(door1),
+     clean(flexarium1),
+     inHands(veiledChameleon),
+     boxClosed(box1),
+     boxClosed(box2),
+     outsideFlexarium(newsPaper1),
+     insideFlexarium(newsPaper2)],
+    % INIT States
+    [
+     doorClosed(door1),
+     dirty(flexarium1),
+     inFlexarium(veiledChameleon),
+     boxOpen(box1),
+     boxOpen(box2),
+     insideFlexarium(newsPaper1),
+     outsideFlexarium(newsPaper2)]).
+
+

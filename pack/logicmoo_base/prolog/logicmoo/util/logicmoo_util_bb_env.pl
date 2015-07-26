@@ -10,6 +10,7 @@
 %
 */
 
+:- thread_local(thlocal:push_env_ctx).
 :- dynamic(user:'$env_info'/1).
 :- multifile(user:'$env_info'/1).
 
@@ -35,14 +36,23 @@
 
 % :- discontiguous((env_call/1,env_assert/1,env_asserta/1,env_retract/1,env_retractall/1)).
 
+% 401,809,449 inferences, 52.592 CPU in 53.088 seconds (99% CPU, 7640071 Lips)
 
+env_call(P):- call(ocl:P),ppi(P).
+env_assert(P):- call(assert,ocl:P),!.
+env_asserta(P):- call(asserta,ocl:P),!.
+env_retract(P):-  call(retract,ocl:P).
+env_retractall(F/A):- functor(P,F,A),!,retractall(ocl:P),!.
+env_retractall(P):- call(retractall,ocl:P),!.
+
+/*
 env_call(P):- env_op(call,P),ppi(P).
 env_assert(P):- must_det(env_op(assert,P)),!.
 env_asserta(P):- must_det(env_op(asserta,P)),!.
 env_retract(P):- env_op(retract,P).
 env_retractall(F/A):- functor(P,F,A),!,env_retractall(P),!.
 env_retractall(P):- must(env_op(retractall,P)),!.
-
+*/
 
 env_clear(kb(Dom)):-nonvar(Dom),!,env_clear(Dom).
 env_clear(Dom):- forall(env_mpred(Dom,F,A),env_op(retractall(F/A))).
@@ -50,12 +60,12 @@ env_op(OP_P):- OP_P=..[OP,P],env_op(OP,P).
 
 % :- module_transparent(env_op/2).
 env_op(OP,P):- var(OP),!,P.
-env_op(OP,P):- env_mpred(P,_,_),!,forall(env_mpred(P,F,A),env_op(OP,F/A)).
-env_op(OP,F):- env_mpred(_,F,_),!,forall(env_mpred(_,F,A),env_op(OP,F/A)).
+env_op(OP,P):- env_mpred(P,_,_),!,forall(env_mpred(P,F,A),(throw(trace),env_op(OP,F / A) )).
+env_op(OP,F):- env_mpred(_,F,_),!,forall(env_mpred(_,F,A),(throw(trace),env_op(OP,F/A) )).
 env_op(OP,F/A):-integer(A),atom(F),!,functor(P,F,A),!,env_op(OP,P).
-env_op(OP,P):- push_env_ctx, do_prefix_arg(P, ZZ, PP, _Type),P\==PP,!,get_env_ctx(ZZ),call(OP,ocl:PP).
+env_op(OP,P):- thlocal:push_env_ctx, do_prefix_arg(P, ZZ, PP, _Type),P\==PP,!,get_env_ctx(ZZ),call(OP,/*ocluser*/ocl:PP).
 env_op(OP,P):- functor_h(P,F,A),must(get_mpred_stubType(F,A,ENV)),!,env_op(ENV,OP,P).
-env_op(OP,P):- append_term(OP,P,CALL),current_predicate(_,CALL),!,show_call(ocl:CALL).
+env_op(OP,P):- append_term(OP,P,CALL),current_predicate(_,CALL),!,show_call(/*ocluser*/ocl:CALL).
 env_op(OP,P):- trace,trace_or_throw(unk_env_op(OP,P)).
 
 env_shadow(OP,P):-user:call(OP,P).
@@ -129,7 +139,7 @@ abolish_and_make_static(F,A):-
    retractall(env_mpred(_,F,A)),
   functor(H,F,A),asserta((H:-trace_or_throw(H))),compile_predicates([F/A]),lock_predicate(H))).
 
-decl_mpred_env_fa(Prop,_Pred,F,A):- push_env_ctx,    
+decl_mpred_env_fa(Prop,_Pred,F,A):- thlocal:push_env_ctx,    
    thlocal:env_ctx(Type,Prefix),A1 is A+1,!,
    must_det_l((functor(Pred1,F,A1),functor(Pred,F,A1),
    add_push_prefix_arg(Pred,Type,Prefix,Pred1),
@@ -141,7 +151,11 @@ decl_mpred_env_fa(Prop,Pred,F,A):-
    decl_mpred_env_real(Prop,Pred,F,A).
 
 decl_mpred_env_real(Prop,Pred,F,A):- 
-  ((user:((export(ocl:F/A),dynamic(ocl:F/A),multifile(ocl:F/A))))), 
+  (Prop==task->(thread_local(/*ocluser*/ocl:F/A));true),
+  (Prop==dyn->(dynamic(/*ocluser*/ocl:F/A));true),
+  (Prop==cache->(transient(/*ocluser*/ocl:F/A));true),
+  (Prop==dom->(multifile(/*ocluser*/ocl:F/A));true),
+  user:export(/*ocluser*/ocl:F/A),
   if_defined(decl_mpred(Pred,Prop),ain(user:mpred_prop(F,Prop))),
   ain(env_kb(Prop)), ain(mpred_arity(F,A)),ain(arity(F,A)),!,  
   ain(env_mpred(Prop,F,A)).
@@ -171,7 +185,7 @@ env_op(ENV,retractall,F/A):-functor(P,F,A),!,env_op(ENV,retractall,P).
 env_op(ENV,OP,P):- functor_h(P,F,A),  (((get_mpred_stubType(F,A,LG2),LG2\==ENV)  -> env_op2(LG2,OP,P) ; env_op2(ENV,OP,P) )).
 
 
-env_op2(dyn,OP,P):- !,call(OP,ocl:P).
+env_op2(dyn,OP,P):- !,call(OP,/*ocluser*/ocl:P).
 env_op2(ENV,OP,(A,B)):-!, env_op(OP,A), env_op(ENV,OP,B).
 env_op2(ENV,OP,[A|B]):-!, env_op(ENV,OP,A), env_op(ENV,OP,B).
 
@@ -180,19 +194,19 @@ env_op2(in_pred(DB),OP,P):-!, DBPRED=..[DB,P], call(OP,DBPRED).
 env_op2(with_pred(Pred),OP,P):-!, call(Pred,OP,P).
 % env_op2(ENV,OP,P):- dmsg(env_op2(ENV,OP,P)),fail.
 env_op2(ENV,OP,P):- lg_op2(ENV,OP,OP2),!,call(OP2,P).
-env_op2(ENV,OP,P):- trace,simplest(ENV),!,call(OP,P).
+env_op2(ENV,OP,P):- throw(trace),simplest(ENV),!,call(OP,P).
 env_op2(stubType(ENV),OP,P):-!,env_op(ENV,OP,P).
 % !,env_op2(in_dyn(DB),OP,P).
 env_op2(_,OP,P):-!,env_op2(in_dyn(db),OP,P).
 env_op2(_,_,_):-trace,fail.
-env_op2(l,OP,P):-!,call(OP,ocl:P).
-env_op2(g,OP,P):-!,call(OP,ocl:P).
+env_op2(l,OP,P):-!,call(OP,/*ocluser*/ocl:P).
+env_op2(g,OP,P):-!,call(OP,/*ocluser*/ocl:P).
 env_op2(l,OP,P):-!,env_op2(dyn,OP,P).
 env_op2(l,OP,P):-!,env_op2(in_dyn(db),OP,P).
 env_op2(l,OP,P):-!,env_op2(rec_db,OP,P).
-env_op2(g,asserta,P):-retractall(ocl:P),asserta(ocl:P).
+env_op2(g,asserta,P):-retractall(/*ocluser*/ocl:P),asserta(/*ocluser*/ocl:P).
 env_op2(g,assert,P):-ain(P).
-env_op2(g,retract,P):-env_op2(g,call,P),retract(ocl:P).
+env_op2(g,retract,P):-env_op2(g,call,P),retract(/*ocluser*/ocl:P).
 env_op2(g,retractall,P):-foreach(env_op2(g,call,P),retractall(P)).
 env_op2(ENV,OP,P):-env_learn_pred(ENV,P),lg_op2(ENV,OP,OP2),!,call(OP2,P).
 env_op2(_,OP,P):-call(OP,P).
@@ -228,10 +242,10 @@ pred_1_info(_,F,A,Info):- env_mpred(Info,F,A).
 pred_1_info(_,F,A,F/A).
 
 
-
-env_consult(File):- \+ exists_file(File),!,forall(filematch(File,FM),env_consult(FM)).
-env_consult(File):- ain(user:env_source_file(File)),
-   with_assertions((user:term_expansion(A,B):-env_term_expansion(A,B)),consult(File)).
+:-meta_predicate(env_consult(:)).
+env_consult(M:File):- \+ exists_file(File),!,forall(filematch(File,FM),env_consult(M:FM)).
+env_consult(M:File):- ain(user:env_source_file(File)),
+   with_assertions((M:term_expansion(A,B):-env_term_expansion(A,B)),M:consult(File)).
 
 
 env_set(Call):-Call=..[P,V],!,bb_put(P,V).
@@ -241,7 +255,7 @@ env_get(Call):-Call=..[P,V],!,bb_get(P,V).
 env_meta_term(t(env_call,env_assert,env_asserta,env_retract,env_retractall)).
 
 
-env_push_argsA(Pred, Type,Prefix,Pred1 ):-push_env_ctx, env_push_args(Pred, Type,Prefix,Pred1 ).
+env_push_argsA(Pred, Type,Prefix,Pred1 ):-thlocal:push_env_ctx, env_push_args(Pred, Type,Prefix,Pred1 ).
 
 do_prefix_arg(Pred,Prefix,Pred ,Type ) :-env_push_argsA(_,  Type,Prefix,Pred ),!.
 do_prefix_arg(Pred,Prefix,Pred1 ,Type ) :-env_push_argsA(Pred, Type,Prefix,Pred1 ),!.
@@ -277,7 +291,8 @@ clause_to_hb0((H:-B),H,B).
 clause_to_hb0((:-B),true,B).
 clause_to_hb0((H),H,true).
 
-env_term_expansion(HB,OUT):- push_env_ctx,!,
+:- export(env_term_expansion/2).
+env_term_expansion(HB,OUT):- thlocal:push_env_ctx,!,
   must_det_l((
    clause_to_hb(HB,H,B),
    term_expansion_add_context(BNeedIt,Ctx,(:-),B,BB),
@@ -301,13 +316,13 @@ get_env_source_ctx(A,Active):-
     clause(domain_name(A),true,Ref),
     (clause_property(Ref,file(From)) -> (env_source_file(From) -> Active = loaded(From) ;  Active = loading(From)) ; Active = memory).
 
-get_env_ctx(chameleonWorld):-!.
 get_env_ctx(A):- bb_get(domain_name,A),!.
 get_env_ctx(A):- 
     get_env_expected_ctx(Current),
     get_env_source_ctx(A, Active),
     ( Current=Active -> true ; fail).
 get_env_ctx(_ChameleonWorld).
+% get_env_ctx(chameleonWorld):-!.
 
 :- add_push_prefix_arg(get_tasks/3,dom,_,_).
 :- add_push_prefix_arg(domain_name/1,dom,_,_).
@@ -317,17 +332,15 @@ is_env_expanded_file:- loading_file(File),!,once(file_name_extension(_,ocl,File)
 is_ocl_expanded_file:- loading_file(File),file_name_extension(_,ocl,File).
    
 /*
-
-user:term_expansion(A,B):- fail,nonvar(A), A\==end_of_file,
-  is_env_expanded_file,
+user:term_expansion(A,B):- nonvar(A), A\==end_of_file, is_env_expanded_file,
   env_term_expansion(A,B),
   must(nonvar(B)),A\=@=B.
-
 */
 
 
+
 /*
-env_op(ENV,OP_P):- simplest(ENV),!,OP_P.
+env_op(ENV,OP_P):- throw(trace),simplest(ENV),!,OP_P.
 env_op(ENV,call(P)):-env_op(ENV,call,P).
 env_op(ENV,assert(P)):-env_op(ENV,assert,P).
 env_op(ENV,asserta(P)):-env_op(ENV,asserta,P).

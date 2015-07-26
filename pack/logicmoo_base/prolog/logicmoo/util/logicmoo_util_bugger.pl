@@ -593,7 +593,8 @@ ignore_each(A):-ignore(A).
 
 :- meta_predicate
 	must_maplist(1, ?),
-	must_maplist(2, ?, ?).
+	must_maplist(2, ?, ?),
+        must_maplist(3, ?, ?, ?).
 
 %%	must_maplist(:Goal, ?List)
 %
@@ -613,6 +614,11 @@ must_maplist(_, [], []).
 must_maplist( Goal, [Elem1|Tail1], [Elem2|Tail2]) :-
 	must(call(Goal, Elem1, Elem2)),
 	must_maplist( Goal, Tail1, Tail2).
+
+must_maplist(_, [], [],[]).
+must_maplist( Goal, [Elem1|Tail1], [Elem2|Tail2], [Elem3|Tail3]) :-
+	must(call(Goal, Elem1, Elem2, Elem3)),
+	must_maplist( Goal, Tail1, Tail2, Tail3).
 
 
 
@@ -3983,7 +3989,7 @@ remove_undef_search:- ((
  assert((check:list_undefined(A):- reload_library_index,  update_changed_files,call(thread_self(main)),!, ignore(A=[]))),
  assert((check:list_undefined(A):- ignore(A=[]),scansrc_list_undefined(A))))).
 
-:- remove_undef_search.
+% :- remove_undef_search.
 
 
 mp(M,P,MP):-atom(M),!,(MP=M:P ; MP=P).

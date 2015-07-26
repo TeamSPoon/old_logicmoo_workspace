@@ -105,6 +105,8 @@ call_decl_hyhtn:-must(doall(on_call_decl_hyhtn)).
 
 
 
+
+
 %%% ON :- initialization( profiler(_,walltime) ).
 %%% ON :- initialization(user:use_module(library(swi/pce_profile))).
 % :- qcompile_libraries.
@@ -444,10 +446,10 @@ to_ssify(_,goal(S,X,L),goal(S,X,L)):-!.
 to_ssify(_,sc(S,X,L),sc(S,X,L)):-!.
 to_ssify(_,se(S,X,L),se(S,X,L)):-!.
 to_ssify(SS,G,GGG):-must_det_l((get_one_isa(S,X,[G]),GG=..[SS,S,X,[G]],do_ss(GG,GGG))).
-   
+
 
 init_locl_planner_interface(G,I,Node):-   
-   with_assertions(thlocal:db_spy,
+  with_assertions(thlocal:db_spy,
      init_locl_planner_interface0(G,I,Node)).
 
 :-export(init_locl_planner_interface0/3).
@@ -1207,7 +1209,6 @@ find_related_goal_cond(ID,Name,Prev,Nec,Cond,Statics,I1,I):- do_non_ss_in_file,
     obeysNEs(RNEs),
 %    assert_op_score(ID,OPs),
     assert_goal_related(Prev,[sc(Sort,Obj,FLHS=>FRHS)|Nec],ID,I).
-
 
 % filter out invars, is_of_sorts and nes from a state list
 filterInvars([],[],[],[],[]):-!.
