@@ -1,5 +1,4 @@
 % <?xml version="1.0"?>
-actionDef(
 /*************************************************************************
 
     File: actionDatabase.pl
@@ -118,7 +117,7 @@ look(agent(Agent),something(Something)) , [
 %	</preconds>
 %	<effects>
 	add(contains(Something,Agent)),
-	add(knowAllAbout(Agent,Something)]).
+	add(knowAllAbout(Agent,Something))]).
 %	</effects>
 %</action>
 
@@ -132,7 +131,7 @@ look(agent(Agent),something(Something)) , [
 	k(canSee(Agent,Something)),
 %	</preconds>
 %	<effects>
-	add(knowAllAbout(Agent,Something)]).
+	add(knowAllAbout(Agent,Something))]).
 %	</effects>
 %</action>
 
@@ -149,7 +148,7 @@ take(agent(Agent),something(Something),source(Source)) , [
 %	</preconds>
 %	<effects>
 	del(supports(Source,Something)),
-	add(possess(Agent,Something)]).
+	add(possess(Agent,Something))]).
 %	</effects>
 %</action>
 
@@ -166,7 +165,7 @@ take(agent(Agent),something(Something),source(Source)) , [
 %	</preconds>
 %	<effects>
 	del(contains(Source,Something)),
-	add(possess(Agent,Something)]).
+	add(possess(Agent,Something))]).
 %	</effects>
 %</action>
 
@@ -184,7 +183,7 @@ unlock(agent(Agent),something(Something),instrument(Instrument)) , [
 %	<effects>
 	del(locked(Something)),
 	add(unlocked(Something)),
-	add(fitsin(Instrument,Something)]).
+	add(fitsin(Instrument,Something))]).
 %	</effects>
 %</action>
 
@@ -203,7 +202,7 @@ lock(agent(Agent),something(Something),instrument(Instrument)) , [
 %	</preconds>
 %	<effects>
 	del(unlocked(Something)),
-	add(locked(Something)]).
+	add(locked(Something))]).
 %	</effects>
 %</action>
 
@@ -222,7 +221,7 @@ open(agent(Agent),item(Object)) , [
 %	<effects>
 	del(closed(Object)),
 	add(open(Object)),
-	add(describe(contentsFn(Object))]).
+	add(describe(contentsFn(Object)))]).
 %	</effects>
 %</action>
 
@@ -239,7 +238,7 @@ shut(agent(Agent),item(Object)) , [
 %	</preconds>
 %	<effects>
 	del(open(Object)),
-	add(closed(Object)]).
+	add(closed(Object))]).
 %	</effects>
 %</action>
 
@@ -255,7 +254,7 @@ eat(ingestor(Ingestor),ingestible(Ingestible)) , [
 %	</preconds>
 %	<effects>
 	del(contains(Ingestor,Ingestible)),
-	add(tDeleted(Ingestible)]).
+	add(tDeleted(Ingestible))]).
 %	</effects>
 %</action>
 
@@ -271,7 +270,7 @@ drop(agent(Agent),something(Something),goal(Target)) , [
 %	</preconds>
 %	<effects>
 	del(possess(Agent,Something)),
-	add(contains(Target,Something)]).
+	add(contains(Target,Something))]).
 %	</effects>
 %</action>
 
@@ -290,7 +289,7 @@ throw(agent(Agent),something(Something),goal(Target)) , [
 	del(possess(Agent,Something)),
 	del(tThinking(Something)),
 	add(contains(Target,Something)),
-	add(tCorpse(Something)]).
+	add(tCorpse(Something))]).
 %	</effects>
 %</action>
 
@@ -307,7 +306,7 @@ put(agent(Agent),something(Something),goal(Target)) , [
 %	</preconds>
 %	<effects>
 	del(possess(Agent,Something)),
-	add(contains(Target,Something)]).
+	add(contains(Target,Something))]).
 %	</effects>
 %</action>
 
@@ -324,7 +323,7 @@ put(agent(Agent),something(Something),goal(Target)) , [
 %	</preconds>
 %	<effects>
 	del(possess(Agent,Something)),
-	add(supports(Target,Something)]).
+	add(supports(Target,Something))]).
 %	</effects>
 %</action>
 
@@ -340,7 +339,7 @@ wear(agent(Agent),something(Something)) , [
 %	</preconds>
 %	<effects>
 	del(possess(Agent,Something)),
-	add(supports(Agent,Something)]).
+	add(supports(Agent,Something))]).
 %	</effects>
 %</action>
 
@@ -357,7 +356,7 @@ kiss(agent(Agent),entity(Entity)) , [
 %	</preconds>
 %	<effects>
 	add(happy(Entity)),
-	add(victorious(Agent)]).
+	add(victorious(Agent))]).
 %	</effects>
 %</action>
 
@@ -373,7 +372,7 @@ kiss(agent(Agent),entity(Entity)) , [
 	notk(findsBeautiful(Entity,Agent)),
 %	</preconds>
 %	<effects>
-	add(bored(Entity)]).
+	add(bored(Entity))]).
 %	</effects>
 %</action>
 
@@ -397,7 +396,7 @@ kill(killer(Killer),victim(Victim),instrument(Instrument)) , [
 %	</preconds>
 %	<effects>
 	del(tThinking(Victim)),
-	add(tCorpse(Victim)]). % TODO Here tCorpse is verbalized but not asserted because it's not a primitive concept
+	add(tCorpse(Victim))]). % TODO Here tCorpse is verbalized but not asserted because it's not a primitive concept
 					   % This treatment might be useful for other cases, keep it in mind.  
 %	</effects>
 %</action>
@@ -415,7 +414,7 @@ kill(killer(Killer),victim(Victim),instrument(Instrument)) , [
 %	</preconds>
 %	<effects>
 	del(tThinking(Victim)),
-	add(tCorpse(Victim)]). % TODO Here tCorpse is verbalized but not asserted because it's not a primitive concept
+	add(tCorpse(Victim))]). % TODO Here tCorpse is verbalized but not asserted because it's not a primitive concept
 %	</effects>
 %</action>
 
@@ -431,7 +430,7 @@ standup(protagonist(Protagonist),source(Source),goal(Target)) , [
 %	</preconds>
 %	<effects>
 	del(contains(Source,Protagonist)),
-	add(contains(Target,Protagonist)]).
+	add(contains(Target,Protagonist))]).
 %	</effects>
 %</action>
 
@@ -448,7 +447,7 @@ sitdown(protagonist(Protagonist),source(Source),goal(Target)) , [
 %	</preconds>
 %	<effects>
 	del(contains(Source,Protagonist)),
-	add(contains(Target,Protagonist)]).
+	add(contains(Target,Protagonist))]).
 %	</effects>
 %</action>
 
@@ -468,7 +467,7 @@ move(protagonist(Protagonist),exit(Exit),goal(Target),source(Source)) , [
 	del(contains(Source,Protagonist)),
 	add(contains(Target,Protagonist)),
 	add(leadsto(Exit,Target)),
-	add(knowAllAbout(Protagonist,Source)]).
+	add(knowAllAbout(Protagonist,Source))]).
 %	</effects>
 %</action>
 

@@ -679,6 +679,9 @@ user:term_expansion((:- DIR),O):- atom(DIR), pfc_directive_expansion(DIR,OO),!,m
 
 % Specific "*SYNTAX*" based default
 pfc_file_expansion_0((P=>Q),(:- cl_assert(pfc(fwc),(P=>Q)))).
+pfc_file_expansion_0(if(P,Q),(:- cl_assert(kif(fwc),if(P,Q)))).
+pfc_file_expansion_0(iff(P,Q),(:- cl_assert(kif(fwc),iff(P,Q)))).
+pfc_file_expansion_0(-(P,Q),(:- cl_assert(kif(fwc),-(P,Q)))).
 % maybe reverse some rules?
 %pfc_file_expansion_0((P=>Q),(:- cl_assert(pfc(fwc),('<='(Q,P))))).  % speed-up attempt
 pfc_file_expansion_0(('<='(P,Q)),(:- cl_assert(pfc(bwc),('<='(P,Q))))).
@@ -770,48 +773,6 @@ system:goal_expansion(I,O):- current_prolog_flag(allow_variable_name_as_functor,
 
 
 pfc_loader_file.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

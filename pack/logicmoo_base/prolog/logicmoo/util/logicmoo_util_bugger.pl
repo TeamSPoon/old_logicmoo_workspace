@@ -3953,7 +3953,7 @@ real_list_undefined(A):-
         ).
 
 :-export(mmake/0).
-mmake:- update_changed_files , if_defined(load_mpred_files).
+mmake:- ignore(update_changed_files), ignore(if_defined(load_mpred_files,true)).
 :-export(update_changed_files/0).
 update_changed_files :-
         set_prolog_flag(verbose_load,true),

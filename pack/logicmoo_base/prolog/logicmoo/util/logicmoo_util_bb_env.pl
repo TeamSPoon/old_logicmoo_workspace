@@ -116,10 +116,10 @@ decl_mpred_env(Prop,Pred):- get_functor(Pred,F,A),
 
 decl_mpred_env_dom(Props,Preds):-
  must(with_assertions(thlocal:env_ctx(dom,_CurrentDomain), 
-    decl_mpred_env([dom,Props],Preds))).
+    decl_mpred_env([dom|Props],Preds))).
 decl_mpred_env_task(Props,Preds):-
  must(with_assertions(thlocal:env_ctx(task,_CurrentTask), 
-    decl_mpred_env([task,Props],Preds))).
+    decl_mpred_env([task|Props],Preds))).
 
 
 abolish_and_make_static(F,A):-
@@ -141,7 +141,7 @@ decl_mpred_env_fa(Prop,Pred,F,A):-
    decl_mpred_env_real(Prop,Pred,F,A).
 
 decl_mpred_env_real(Prop,Pred,F,A):- 
-  ((user:((export(F/A),dynamic(F/A),multifile(F/A))))), 
+  ((user:((export(user:F/A),dynamic(user:F/A),multifile(user:F/A))))), 
   if_defined(decl_mpred(Pred,Prop),ain(user:mpred_prop(F,Prop))),
   ain(env_kb(Prop)), ain(mpred_arity(F,A)),ain(arity(F,A)),!,  
   ain(env_mpred(Prop,F,A)).

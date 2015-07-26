@@ -1,4 +1,4 @@
-%:- module(lp,[test_blocks/0,test_domain/1,test_all/0,test_rest/0,test_sas/0,test_dir_files_sas/1,test_dir_files_sas/3,decl_mpred_env/2]).
+%:- module(lp,[test_blocks/0,test_domain/1,test_all/0,test_rest/0,test_sas/0,test_dir_files_sas/1,test_dir_files_sas/3]).
 %:- set_prolog_flag(gc,true).
 :- op(100,xfy,'=>').
 :- debug.
@@ -2256,7 +2256,6 @@ test_blocks:- fail, test_domain('./benchmarks/nomystery-sat11-strips/domain.pddl
 push_env_ctx:-!,fail.
 push_env_ctx:-!.
 
-rr:- test_ocl('domains_ocl/chameleonWorld.ocl').
 :- show_call(flag(time_used,W,W)).
 
 
