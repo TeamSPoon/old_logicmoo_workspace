@@ -16,7 +16,7 @@
 :- dynamic(user:env_mpred/3).
 :- multifile(user:env_mpred/3).
 
-:- meta_predicate(env_call(0)).
+:- meta_predicate(env_call(+)).
 :- dynamic(env_kb/1).
 
 :- dynamic(user:mpred_prop/2).
@@ -48,14 +48,14 @@ env_clear(kb(Dom)):-nonvar(Dom),!,env_clear(Dom).
 env_clear(Dom):- forall(env_mpred(Dom,F,A),env_op(retractall(F/A))).
 env_op(OP_P):- OP_P=..[OP,P],env_op(OP,P).
 
-:- module_transparent(env_op/2).
+% :- module_transparent(env_op/2).
 env_op(OP,P):- var(OP),!,P.
 env_op(OP,P):- env_mpred(P,_,_),!,forall(env_mpred(P,F,A),env_op(OP,F/A)).
 env_op(OP,F):- env_mpred(_,F,_),!,forall(env_mpred(_,F,A),env_op(OP,F/A)).
 env_op(OP,F/A):-integer(A),atom(F),!,functor(P,F,A),!,env_op(OP,P).
-env_op(OP,P):- push_env_ctx, do_prefix_arg(P, ZZ, PP, _Type),P\==PP,!,get_env_ctx(ZZ),call(OP,PP).
+env_op(OP,P):- push_env_ctx, do_prefix_arg(P, ZZ, PP, _Type),P\==PP,!,get_env_ctx(ZZ),call(OP,ocl:PP).
 env_op(OP,P):- functor_h(P,F,A),must(get_mpred_stubType(F,A,ENV)),!,env_op(ENV,OP,P).
-env_op(OP,P):- append_term(OP,P,CALL),current_predicate(_,CALL),!,show_call(CALL).
+env_op(OP,P):- append_term(OP,P,CALL),current_predicate(_,CALL),!,show_call(ocl:CALL).
 env_op(OP,P):- trace,trace_or_throw(unk_env_op(OP,P)).
 
 env_shadow(OP,P):-user:call(OP,P).
@@ -91,7 +91,7 @@ get_mpred_stubType(_,_,dyn).
 :-thread_local(thlocal:env_ctx/2).
 
 :-export(decl_mpred_env/2).
-:-module_transparent(decl_mpred_env/2).
+%:-module_transparent(decl_mpred_env/2).
 
 decl_mpred_env(_,[]):-!.
 decl_mpred_env([],_):-!.
@@ -141,7 +141,7 @@ decl_mpred_env_fa(Prop,Pred,F,A):-
    decl_mpred_env_real(Prop,Pred,F,A).
 
 decl_mpred_env_real(Prop,Pred,F,A):- 
-  ((user:((export(user:F/A),dynamic(user:F/A),multifile(user:F/A))))), 
+  ((user:((export(ocl:F/A),dynamic(ocl:F/A),multifile(ocl:F/A))))), 
   if_defined(decl_mpred(Pred,Prop),ain(user:mpred_prop(F,Prop))),
   ain(env_kb(Prop)), ain(mpred_arity(F,A)),ain(arity(F,A)),!,  
   ain(env_mpred(Prop,F,A)).
@@ -171,7 +171,7 @@ env_op(ENV,retractall,F/A):-functor(P,F,A),!,env_op(ENV,retractall,P).
 env_op(ENV,OP,P):- functor_h(P,F,A),  (((get_mpred_stubType(F,A,LG2),LG2\==ENV)  -> env_op2(LG2,OP,P) ; env_op2(ENV,OP,P) )).
 
 
-env_op2(dyn,OP,P):- !,call(OP,P).
+env_op2(dyn,OP,P):- !,call(OP,ocl:P).
 env_op2(ENV,OP,(A,B)):-!, env_op(OP,A), env_op(ENV,OP,B).
 env_op2(ENV,OP,[A|B]):-!, env_op(ENV,OP,A), env_op(ENV,OP,B).
 
@@ -185,14 +185,14 @@ env_op2(stubType(ENV),OP,P):-!,env_op(ENV,OP,P).
 % !,env_op2(in_dyn(DB),OP,P).
 env_op2(_,OP,P):-!,env_op2(in_dyn(db),OP,P).
 env_op2(_,_,_):-trace,fail.
-env_op2(l,OP,P):-!,call(OP,P).
-env_op2(g,OP,P):-!,call(OP,P).
+env_op2(l,OP,P):-!,call(OP,ocl:P).
+env_op2(g,OP,P):-!,call(OP,ocl:P).
 env_op2(l,OP,P):-!,env_op2(dyn,OP,P).
 env_op2(l,OP,P):-!,env_op2(in_dyn(db),OP,P).
 env_op2(l,OP,P):-!,env_op2(rec_db,OP,P).
-env_op2(g,asserta,P):-retractall(P),asserta(P).
+env_op2(g,asserta,P):-retractall(ocl:P),asserta(ocl:P).
 env_op2(g,assert,P):-ain(P).
-env_op2(g,retract,P):-env_op2(g,call,P),retract(P).
+env_op2(g,retract,P):-env_op2(g,call,P),retract(ocl:P).
 env_op2(g,retractall,P):-foreach(env_op2(g,call,P),retractall(P)).
 env_op2(ENV,OP,P):-env_learn_pred(ENV,P),lg_op2(ENV,OP,OP2),!,call(OP2,P).
 env_op2(_,OP,P):-call(OP,P).
