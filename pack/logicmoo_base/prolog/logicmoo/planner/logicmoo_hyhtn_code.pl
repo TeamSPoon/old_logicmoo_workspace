@@ -79,6 +79,7 @@ on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(objectsC
 on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(objectsOfSort/2)).      % Used to store all objects of a sort
 on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache) /*stubType(with_pred(bb_op(_)))*/],(related_op/2, gsubstate_classes/3, gsstates/3)).  
 
+on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)],(initial_state/1)). 
 on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache) /*stubType(with_pred(bb_op(_)))*/],(op_score/2)). 
 on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)/*stubType(rec_db)*/],(node/5,final_node/1)).
 on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)],(tp_goal/3,closed_node/6,solved_node/2, goal_related_search/1)). 
@@ -406,6 +407,7 @@ clean_problem:-
       env_retractall(temp_assertIndivConds(_)),
       env_retractall(opParent(_,_,_,_,_,_)),
       env_retractall(operatorC(_,_,_,_,_)),
+      env_retractall(initial_state(_)),
       env_retractall(objectsOfSort(_,_)),
       env_retractall(objectsD(_,_)),
       env_retractall(objectsC(_,_)),
@@ -437,25 +439,60 @@ clean_problem:-
 	% retractall(my_stats(_)),assert(my_stats(0)),
 	set_op_num(0).
 
-to_ssify(_,G,G):- ( \+ compound(G)),!.
-to_ssify(SS,G,GG):- is_list(G),!,must_maplist(to_ssify(SS),G,GG),!.
-to_ssify(_,ss(S,X,L),ss(S,X,L)):-!.
+
+compare_on_arg(N,Comp,A1,A2):-arg(N,A1,Obj1),arg(N,A2,Obj2),compare(Comp1,Obj1,Obj2),
+   (Comp1== (=) -> compare(Comp,A1,A2) ; Comp=Comp1).
+
 to_ssify(_,goal(S,X,L),goal(S,X,L)):-!.
-to_ssify(_,sc(S,X,L),sc(S,X,L)):-!.
-to_ssify(_,se(S,X,L),se(S,X,L)):-!.
-to_ssify(SS,G,GGG):-must_det_l((get_one_isa(S,X,[G]),GG=..[SS,S,X,[G]],do_ss(GG,GGG))).
-   
+to_ssify(SS,G,GGG):-must(is_list(G)),!,must_maplist(to_ssify0(SS),G,GG),predsort(compare_on_arg(2),GG,GGS),must(merge_ss2s(GGS,GGG)),!.
+
+to_ssify0(_,G,G):- ( \+ compound(G)),!.
+to_ssify0(SS,G,GG):- is_list(G),!,must_maplist(to_ssify0(SS),G,GG),!.
+to_ssify0(_,ss(S,X,L),ss(S,X,L)):-!.
+to_ssify0(_,goal(S,X,L),goal(S,X,L)):-!.
+to_ssify0(_,sc(S,X,L),sc(S,X,L)):-!.
+to_ssify0(_,se(S,X,L),se(S,X,L)):-!.
+to_ssify0(SS,G,GGG):-must_det_l((get_one_isa(S,X,[G]),GG=..[SS,S,X,[G]],do_ss(GG,GGG))).
+
+merge_ss2s([],[]).
+% merge_ss2s([G1,G2|GG],GGG):- do_ss, G1=..[SS,L1],G2=..[SS,L2],get_one_isa(_,Obj,L1),get_one_isa(_,Obj1,L2),Obj==Obj1, must_det_l((append(L1,L2,LL),list_to_set(LL,LS),G=..[SS,LS], merge_ss2s([GG|GG],GGG))).
+
+merge_ss2s([G1,G2|GG],GGG):- must(\+ is_list(G1)),
+  once(must_det_l((G1=..[SS,S,Obj,L1],arg(2,G2,Obj1)))),Obj==Obj1,!,
+  must_det_l((arg(3,G2,L2),append(L1,L2,LL),list_to_set(LL,LS),G=..[SS,S,Obj,LS],
+  merge_ss2s([G|GG],GGG))).
+merge_ss2s([G|GG],[G|GGG]):-
+  merge_ss2s(GG,GGG).
+
 
 init_locl_planner_interface(G,I,Node):-   
    with_assertions(thlocal:db_spy,
      init_locl_planner_interface0(G,I,Node)).
 
+assert_itital_state(I0):- is_list(I0),!, must_maplist(assert_itital_state,I0),!.
+assert_itital_state(sc(S,X,List)):- !,must(assert_itital_state(List)),must(assert_itital_state(is_of_sort(X,S))),!.
+assert_itital_state(ss(S,X,List)):- !,must(assert_itital_state(List)),must(assert_itital_state(is_of_sort(X,S))),!.
+assert_itital_state(is_of_sort(X,S)):- ground(X:S),env_assert(is_of_sort(X,S)).
+assert_itital_state(I0):- env_assert(initial_state(I0)).
+
+get_inital_state(I0):-
+   findall(E,env_call(initial_state(E)),EL),
+   must(to_ssify(ss,EL,I0)).
+   
+
 :-export(init_locl_planner_interface0/3).
 
-init_locl_planner_interface0(G0,I0,Node):-
+init_locl_planner_interface0(G0,I0,Node):- must_maplist(assert_itital_state,I0),
+   must(init_locl_planner_interface1(G0,Node)).
+
+init_locl_planner_interface1(G0,Node):-
+    must_det_l((get_inital_state(I0),init_locl_planner_interface2(G0,I0,Node))).
+  
+init_locl_planner_interface2(G0,I0,Node):-
   must_det_l((
-              show_call(to_ssify(se,G0,G)),
-              show_call(to_ssify(ss,I0,I)),
+              to_ssify(se,G0,G),
+              to_ssify(ss,I0,I),
+              wdmsg((input:-I)),
         change_obj_list(I),
 	ground_op,
 	assert_is_of_sort,
@@ -2180,18 +2217,27 @@ split_prim_noprim([HS|TS],PS,[HS|NP]):-
 get_invariants(Invs) :-
     env_call(atomic_invariantsC(Invs)),!.
 
-get_one_isa(S,X,Preds):-member(is_of_sort(S,X),Preds).
-get_one_isa(S,X,Preds):-member(Pred,Preds),Pred=..[F|Args],functor(Pred,F,A),get_one_isa_fa(S,X,F,A,Args).
+get_one_isa(S,X,Preds):- \+ is_list(Preds),!,get_one_isa(S,X,[Preds]).
+get_one_isa(S,X,Preds):-member(is_of_sort(X,S),Preds).
+get_one_isa(S,X,Preds):-member(ss(S,X,_),Preds).
+get_one_isa(S,X,Preds):-member(se(S,X,_),Preds).
+get_one_isa(S,X,Preds):- member(Pred,Preds),Pred=..[F|Args],functor(Pred,F,A),get_one_isa_fa(S,X,F,A,Args).
+
+get_one_isa_fa(S,X,S,1,[X]):- is_sort(S).
+get_one_isa_fa(S,X,_,_,[X|_]):- nonvar(X), is_decl_of_sort(X,S),!.
+get_one_isa_fa(S,X,F,N,[X|_]):- functor(P,F,N),(env_call predicates(SS)),member(P,SS),arg(1,P,S),S\== physical_obj, nonvar(S).
+
+is_decl_of_sort(X,S):- env_call is_of_sort(X,S).
+is_decl_of_sort(X,S):- env_call objects(S,L),member(X,L).
+
+is_sort(S):- (env_call sorts(_,SS)),member(S,SS).
+
+/*
 
 ensure_predR(S,X,[is_of_sort(S,X)|PredR],[is_of_sort(S,X)|PredR]):-!.
 ensure_predR(S,X,PredR,[is_of_sort(S,X)|PredR]):-!.
 
 
-get_one_isa_fa(S,X,S,1,[X]):- is_sort(S).
-get_one_isa_fa(S,X,F,N,[X|_]):- functor(P,F,N),(env_call predicates(SS)),member(P,SS),arg(1,P,S),nonvar(S).
-
-is_sort(S):- (env_call sorts(_,SS)),member(S,SS).
-/*
 Why does this break it?
 rem_statics([sc(Lhs=>Rhs)|ST], [sc(LhsR=>RhsR)|STR],Rt1) :- do_ss_in_file, must(get_one_isa(S,X,Rhs);get_one_isa(S,X,Lhs)),!,
     split_st_dy(Lhs,[],LR, [],LhsR),

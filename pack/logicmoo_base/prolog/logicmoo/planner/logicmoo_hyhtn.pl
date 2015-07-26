@@ -23,7 +23,8 @@
 % [Required] Load the Logicmoo Library Utils
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 
-do_ss(A,B):-do_ss, must(do_ss0(A,B)).
+do_ss(A,B):-do_ss,!, must(do_ss0(A,B)).
+do_ss(A,A).
 
 do_ss0(A,B):- \+ compound(A), !, B=A.
 do_ss0(is_of_sort(I,C),isa(I,C)).
@@ -40,8 +41,8 @@ system:goal_expansion(A,B):- do_ss, loop_check(do_ss(A,B)).
 
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_structs)).
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_bb_env)).
-:-asserta(do_ss).
-do_ss_in_file.
+%:-asserta(do_ss).
+%do_ss_in_file.
 do_non_ss_in_file.
 term_expansion(A,B):-env_term_expansion(A,B).
 :-include(logicmoo_hyhtn_code).
