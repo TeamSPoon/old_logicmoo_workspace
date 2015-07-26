@@ -1,3 +1,4 @@
+
 (define (problem task1)
    (:domain mytaxi)
    (:objects
@@ -72,3 +73,4 @@
         (pLocation peter water_bridge)
        ))
 )
+

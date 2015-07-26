@@ -193,7 +193,7 @@ planner_task(1,
      ss(kitchenware,smallKnife,[dirty(smallKnife)]),
      ss(kitchenware,bigKnife,[clean(bigKnife)]),
      ss(toaster,blueToaster,[pluggedIn(blueToaster)])]).
-planner_task(2,
+hide_planner_task(2,
     % Goals
     [
      se(item,bread,[isToasted(bread),location(bread,side)])],
@@ -207,7 +207,7 @@ planner_task(2,
      ss(kitchenware,smallKnife,[dirty(smallKnife)]),
      ss(kitchenware,bigKnife,[clean(bigKnife)]),
      ss(toaster,blueToaster,[pluggedIn(blueToaster)])]).
-planner_task(3,
+hide_planner_task(3,
     % Goals
     [
      se(item,pita,[isToasted(pita),location(pita,side)])],

@@ -46,3 +46,5 @@ system:goal_expansion(A,B):- do_ss, loop_check(do_ss(A,B)).
 do_non_ss_in_file.
 term_expansion(A,B):-env_term_expansion(A,B).
 :-include(logicmoo_hyhtn_code).
+:-user:ensure_loaded(logicmoo_ocl_and_pddl).
+% :-include(logicmoo_hyhtn_works).

@@ -70,7 +70,8 @@
             (connects ?LocationA ?LocationB)
             (usefuel ?FuelA ?FuelB)
        )
-       :effect (and 
+       :effect 
+        (and 
             (not (tLocation ?Taxi ?LocationA))
             (not (tFuel ?Taxi ?FuelA))
             (tLocation ?Taxi ?LocationB)
@@ -81,9 +82,9 @@
                 (pLocation ?Person ?LocationA)
                 (connects ?LocationA ?LocationB)
                )
-              (and
-                (not (pLocation ?Person ?LocationA))
-                (pLocation ?Person ?LocationB)
+                 (and
+                   (not (pLocation ?Person ?LocationA))
+                   (pLocation ?Person ?LocationB)
                )))
         )
     )
@@ -100,4 +101,5 @@
             (tFuel ?Taxi ?FuelB)
         )
     )
-  )
+ )
+  

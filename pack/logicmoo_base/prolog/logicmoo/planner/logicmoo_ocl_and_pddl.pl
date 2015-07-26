@@ -172,7 +172,8 @@ user:sanity_test:- test_blocks.
 solve_files(DomainFile, ProblemFile):- 
  forall(must(must_filematch(DomainFile,DomainFile0)),
    forall(must(must_filematch(ProblemFile,ProblemFile0)),
-     (time(solve_files_0(DomainFile0, ProblemFile0))))).
+     (time(show_call(solve_files_0(DomainFile0, ProblemFile0))),
+      time(show_call(solve_files_w_ocl(DomainFile0, ProblemFile0)))))).
 
 solve_files_0(DomainFile, ProblemFile):-
    must_det_l(( 
@@ -180,6 +181,7 @@ solve_files_0(DomainFile, ProblemFile):-
    parseDomain(DomainFile, DD),
     parseProblem(ProblemFile, PP),
     solve_files_ddpp(DD, PP).
+
 
 solve_files_0(DomainFile, ProblemFile):-
    must_det_l(( 
@@ -210,6 +212,26 @@ solve_files_ddpp(DD, PP):-
     flag(time_used,X,X + SolverTime),
     show_statistic(P, S),
     !.
+
+
+solve_files_w_ocl(DomainFile, ProblemFile):-
+   must_det_l(( 
+      format('~q.~n',[solve_files(DomainFile, ProblemFile)]))),
+   parseDomain(DomainFile, DD),
+    parseProblem(ProblemFile, PP),
+    solve_files_w_ocl_pt2(DD, PP).
+
+solve_files_w_ocl_pt2(DD, PP):-
+   must_det_l(( 
+    term_to_ord_term(DD, D),prop_get(domain_name,D,DName),save_type_named(domain,DName,D),
+    term_to_ord_term(PP, P),prop_get(problem_name,P,PName),save_type_named(problem,PName,P),    
+    reset_statistic)),
+    !,
+   with_assertions(thlocal:other_planner(hyhtn_solve), record_time(try_solve(PName, D,P,S),SolverTime)),
+    flag(time_used_other,X,X + SolverTime),
+    show_statistic(P, S),
+    !.
+
 
 
 compile_problem(Pu,P):-
@@ -255,7 +277,7 @@ record_time(G,Runtime,TimeUsed):- statistics(Runtime, [B,_]),G,statistics(Runtim
 
 try_solve(PN,D,P,S):- thlocal:loading_files,!,pmsg((loading_files(PN):-try_solve(D,P,S))),!.
 % try_solve(PN,D,P,S):- once(time_out(solve(PN,D, P, S), 3000, Result)), Result == time_out, portray_clause(hard_working:-try_solve(PN,D,P,S)),fail.
-try_solve(PN,D,P,S):- gripe_time(14,time_out((solve(PN,D, P, S)), 30000, Result)),!, % time limit for a planner (was 500000)
+try_solve(PN,D,P,S):- gripe_time(14,time_out((solve(PN,D, P, S)), 300000, Result)),!, % time limit for a planner (was 500000)
    ((\+ is_list(S)
      -> portray_clause('failed'(Result):-try_solve(PN,D,P,S)) ;
        ((Result=time_out)->portray_clause('failed'(Result):-try_solve(PN,D,P,S));true))),!.
@@ -276,7 +298,7 @@ pmsg(D):- subst(D,=,'k_===_v',SS),wdmsg(SS),wdmsg((:-SS)).
 %   Set domain and problem on blackboard
 %
 :-thread_local(thlocal:other_planner/1).
-solve(PN,D,P,S):- thlocal:other_planner(C),logOnError(call(PN,C,D,P,S)),!.
+solve(PN,D,P,S):- thlocal:other_planner(C),!,logOnError(call(C,PN,D,P,S)),!.
 
 solve(_,D, P, Solution):-
   must_det_l((
@@ -312,6 +334,79 @@ solve(_PN,D,P,Solution):-
     bb_put(fictiveGoal, G))),    
     search(da(Mt,A,A5),Ic, Gc, Solution).
     
+
+
+hyhtn_solve(_,D, P, Solution):-
+  must_det_l((
+    logicmoo_hyhtn:env_clear_doms_and_tasks,
+    logicmoo_hyhtn:clean_problem,
+    bb_put(currentProblem, P),
+    bb_put(currentDomain, D),
+    prop_get(init,P, UCI),
+    prop_get(goal,P, UCG),
+
+
+    copy_term_for_assert((UCI,UCG),(I,G)),
+    prop_get(domain_name,D,Mt),    
+    must(prop_get(domain_name,P,Mt)),
+    must(prop_get(types,D,Types)),
+    must(prop_get(predicates,D,Preds)),
+    must(prop_get(objects,P,Objects)),
+    must_maplist(save_ocl_objects,Objects),
+    must_maplist(save_ocl_predicates,Preds),
+    must_maplist(save_ocl_types,Types),
+    wdmsg(dtpo(Mt,Types,Preds,Objects)),
+    prop_get(actions,D, A),
+    must_maplist(save_ocl_operators,A),
+    bb_put(goalState, G),        
+    bb_put(fictiveGoal, G))),!,    
+    ignore(logicmoo_hyhtn:init_locol_planner_interface0(G,I,Solution)).
+
+save_ocl_operators(A):-dmsg(save_ocl_operators(A)), % varnames_for_assert(A,CA,Vars),
+   must(( 
+      prop_get_nvlist(A,
+         [(preconditions)=Precon,positiv_effect=Pos,negativ_effect=Neg, assign_effect=Af, (parameters)= UT, 
+                 parameter_types=SPT,parameters_decl=PDs]),
+     UT=..[_|ARGS],     
+     SPT=..[_|PTs], 
+     nop(must_maplist(record_var_names,Vars)),
+     must_maplist(create_hint,PTs,ARGS,ARGHints),
+     %conjuncts_to_list(Call,MORE),
+     append(ARGHints,Precon,M0),
+     append(M0,Af,PrecondHints),
+     append(Pos,Neg,POSNEG),
+     append(PrecondHints,POSNEG,ALLHINTS),
+     append(POSNEG,PrecondHints,REVALLHINTS),
+     logicmoo_hyhtn:to_ssify(ALLHINTS,se,PrecondHints,SE),
+     logicmoo_hyhtn:get_one_isa(S,X,REVALLHINTS),
+     SC = sc(S,X,Neg=>Pos),
+     OP = operator(UT,SE,SC,[]),
+     varnames_for_assert(OP,COP,_Vars),
+     env_aif(COP))).
+
+env_aif(G):-functor(G,F,_),wdmsg(F:-G), assertz_new(ocl:G).
+
+save_ocl_predicates(Decl):-dmsg(save_ocl_predicates(Decl)),prop_get(parameter_types,Decl,PTDecl),   
+   env_aif(predicates([PTDecl])),PTDecl=..[F|PTypes],must_maplist(save_ocl_types,PTypes).
+
+save_ocl_types(Atom):- atom( Atom ),!, save_ocl_types([Atom]-type).
+save_ocl_types(Obj):- Obj=..[Type,List],!,save_ocl_types(List-Type).
+save_ocl_types(Type-Type):-!.
+save_ocl_types([Type]-Type):-!.
+save_ocl_types(List-Type):- atom(List),!,save_ocl_types([List]-Type).
+save_ocl_types(List-Type):- Type==type-> save_ocl_objects(type(List))->save_ocl_types(List-top)->save_ocl_types(List-primitive_sorts).
+save_ocl_types(List-Type):-  env_aif(sorts(Type,List)),  
+    (Type==non_primitive_sorts;true;save_ocl_types(Type-non_primitive_sorts)).
+
+save_ocl_objects(Atom):- atom( Atom ),!, save_ocl_objects([Atom]-top).
+save_ocl_objects(Type-Type):-!.
+save_ocl_objects(_-top):-!.
+save_ocl_objects(_-type):-!.
+save_ocl_objects([Type]-Type):-!.
+save_ocl_objects(List-Type):- atom(List),!,save_ocl_objects([List]-Type).
+% save_ocl_objects(List-Type):- Type==top-> !.
+save_ocl_objects(Obj):- Obj=..[Type,List],!,save_ocl_objects(List-Type).
+save_ocl_objects(List-Type):- env_aif(objects(Type,List)).
 
 
 % mysubset(+Subset, +Set)
@@ -1238,7 +1333,8 @@ action_def(Struct)
                                     ['('], typed_list_exact(variable, L), [')'],
                                     {must_det_l((get_param_types(top,L,PIs,PTs),
                                     SPI=..[S|PIs],
-                                    prop_set_nvlist(Struct,[action_name=S,parameters=SPI, parameter_types=PTs, parameters_decl=L])))},
+                                    SPT=..[S|PTs],
+                                    prop_set_nvlist(Struct,[action_name=S,parameters=SPI, parameter_types=SPT, parameters_decl=L])))},
                                     dcgMust((action_def_body(Struct))),
                                     [')'])),!.
 action_symbol(N)                --> name(N).
@@ -1266,7 +1362,9 @@ action_def_body(Struct)
                                 -->  
                                     (([':',precondition], emptyOr(pre_GD(P)))                ; []),
                                     (([':',effect],       emptyOr(effect(Pos, Neg, Assign))) ; []),
-                                    {must(prop_set_nvlist(Struct,[preconditions=P,positiv_effect=Pos,negativ_effect=Neg,assign_effect=Assign]))}.
+                                    {
+                                      ignore(Pos=[]),
+                                      must(prop_set_nvlist(Struct,[preconditions=P,positiv_effect=Pos,negativ_effect=Neg,assign_effect=Assign]))}.
 
 
 
@@ -1797,7 +1895,7 @@ pddl_sorts(DName,primitive_sorts,List):-nonvar(DName),findall(S,is_a_type(DName,
 
 is_a_type(D,S):- use_local_pddl, loop_check(is_a_type0(D,S)).
 is_a_type0(D,S):-sorts(D,_,L),member(S,L).
-is_a_type0(Name,S):-bb_get(currentProblem,P),prop_get(domain_name,P,Name),objects(P,S,_).
+is_a_type0(Name,S):-bb_get(currentProblem,P),prop_get(domain_name,P,Name),objects_3(P,S,_).
 
 
 pname_to_dname(t7,chameleonWorld).
@@ -1969,7 +2067,7 @@ operator(chameleonWorld,removeDirtyNewspaper(Flexarium,Door,Chameleon,Box,Substr
 :- style_check(+singleton).
 
 op_action(Mt, S, PTs, NPrecon, Pos, Neg, Af, UT , True):- use_local_pddl,
-   loop_check(operator(Mt,UT,SE,SC,SS)),
+   loop_check(env_call(operator(Mt,UT,SE,SC,SS))),
    must_det_l((
       True = true,
       UT=..[S|ARGS],
@@ -2000,8 +2098,8 @@ actn_operator(Mt,UT,SE,SC,SS):- use_local_pddl, actn(Mt,A),
    must_maplist(record_var_names,Vars),
    must_maplist(create_hint,PTs,ARGS,ARGHints),
    conjuncts_to_list(Call,MORE),
-   append(ARGHints,MORE,MOREARGHints),
-   unss_ify(=,[],MOREARGHints,Precon,se,SEPs,HintsSE),
+   append(ARGHints,MORE,PrecondHints),
+   unss_ify(=,[],PrecondHints,Precon,se,SEPs,HintsSE),
    unss_ify(=,[],HintsSE,Af,ss,ASEPs,HintsSS),
    unss_ify(add_wrapper(del),[],HintsSS,Neg,ss,NOTS,HintsNEG),
    unss_ify(add_wrapper(add),NOTS,HintsNEG,Pos,ss,NOTSPOSC,HintsPOS),
@@ -2009,11 +2107,12 @@ actn_operator(Mt,UT,SE,SC,SS):- use_local_pddl, actn(Mt,A),
    must_maplist(ress_ify(Mt,Def,Hints,se),SEPs,SE),
    must_maplist(ress_ify(Mt,Def,Hints,ss),ASEPs,SS),   
    must_maplist(make_rem_adds(Mt,Hints),NOTSPOSC,SC))).
+  
 
 make_rem_adds(Mt,Hints,A1-LIST,sc(Type,A1,(NEG=>POS))):-findall(N,member(del(N),LIST),NEG),findall(N,member(add(N),LIST),POS),
   must(get_type_of(Mt,top,Hints,A1,Type)).
 
-create_hint(K,V,kt(K,V)).
+create_hint(S,X,is_of_sort(X,S)).
 
 mylist_to_set(HintsIn,HintsM):-must(list_to_set(HintsIn,HintsM)).
 
@@ -2067,7 +2166,7 @@ ress_ify(_Mt,Def,_Hints,SS,A1-Gs,GO):-GO=..[SS,Def,A1,Gs],!.
 
 get_type_of(_ , Def, Hints,A1,Type):-member(kt(K,V),Hints),A1==V,K\==Def,!,Type=K,record_var_type(A1,Type).
 get_type_of(Mt, Def, Hints,A1,Type):-atom(A1),get_type_of_atom(Mt,Def,Hints,A1,Type),!.
-get_type_of(Mt,_Def,_Hints,A1,Type):-nonvar(A1),loop_check(objects(Mt,Type,List)),member(A1,List).
+get_type_of(Mt,_Def,_Hints,A1,Type):-nonvar(A1),loop_check(objects_3(Mt,Type,List)),member(A1,List).
 
 :- style_check(-singleton).
 get_type_of_atom(Mt,Def,Hints,veiledChameleon,chameleon).
@@ -2175,6 +2274,7 @@ mysame_key(_, L, [], L).
 
 
 :- flag(time_used,_,0).
+:- flag(time_used_other,_,0).
 
 :- debug,(must(test_blocks)).
 
@@ -2248,14 +2348,9 @@ test_blocks:- fail, test_domain('./benchmarks/nomystery-sat11-strips/domain.pddl
 
 :- endif.
 
+:- test_all(7).
 
-:- show_call(flag(time_used,W,W)).
-
--multifile(user:push_env_ctx/0).
-:-dynamic(user:push_env_ctx/0).
-push_env_ctx:-!,fail.
-push_env_ctx:-!.
-
+:- show_call(flag(time_used_other,W,W)).
 :- show_call(flag(time_used,W,W)).
 
 

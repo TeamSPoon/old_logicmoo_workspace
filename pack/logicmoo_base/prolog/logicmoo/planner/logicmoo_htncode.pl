@@ -228,7 +228,7 @@ expand_decomp([step(HPid,Name,undefd,undefd,unexp)|Decomp],Pre,Post,Temp,Temp1,S
 % find all the state changes
 expand_decomp([step(HPid,Name,undefd,undefd,unexp)|Decomp],Pre,Post,Temp,Temp1,Statics,Statics1,[step(HPid,Name,Pre0,Post0,exp(TN))|Decomp1]):-
    methodC(Name,Pre0,Post0,Statics0,Temp0,achieve(ACH),Dec0),
-   append_cut(Statics0,Statics,Statics2),
+   append_dcut(Statics0,Statics,Statics2),
    statics_consist(Statics2),
    remove_unneed(Statics2,[],Statics3),
    state_achieved(Pre0,Pre,State1),
@@ -245,10 +245,14 @@ expand_decomp([step(HPid,Name,undefd,undefd,unexp)|Decomp],Pre,Post,Temp,Temp1,S
 %   write('can be expand by method '),write(Name),nl,
    expand_decomp(Decomp,State,Post,Temp,Temp1,Statics2,Statics1,Decomp1),!.
 
+% 6666666666666666666666666666
+% 6666666666666666666666666666
+% 6666666666666666666666666666
+% 6666666666666666666666666666
 % 3. if HP's name and it's Pre meet an operator, return operator's name
 expand_decomp([step(HPid,Name,undefd,undefd,unexp)|Decomp],Pre,Post,Temp,Temp1,Statics,Statics1,[step(HPid,Name,Pre0,Post0,exp(Name))|Decomp1]):-
    operatorC(Name,Pre0,Post0,Cond,Statics0),
-   append_cut(Statics0,Statics,Statics2),
+   append_dcut(Statics0,Statics,Statics2),
    statics_consist(Statics2),
    remove_unneed(Statics2,[],Statics21),
    state_achieved(Pre0,Pre,State1),
@@ -275,7 +279,7 @@ expand_decomp([step(HP,N,Pre0,Post0,unexp)|Decomp],Pre,Post,Temp,Temp1,Statics,S
 % expand it and make it to that TNs
 expand_decomp([step(HPid,Name,undefd,undefd,unexp)|Decomp],Pre,Post,Temp,Temp1,Statics,Statics1,[step(HPid,Name,Pre0,Post0,exp(TN))|Decomp1]):-
    methodC(Name,Pre0,Post0,Statics0,Temp0,achieve(ACH),Dec0),
-   append_cut(Statics0,Statics,Statics2),
+   append_dcut(Statics0,Statics,Statics2),
    statics_consist(Statics2),
    remove_unneed(Statics2,[],Statics3),
    state_achieved(Pre0,Pre,State1),
@@ -283,7 +287,10 @@ expand_decomp([step(HPid,Name,undefd,undefd,unexp)|Decomp],Pre,Post,Temp,Temp1,S
    apply_method1(HPid,TN,Name,State1,Pre0,ACH,Post0,State,Statics3,Temp0,Dec0),
    % need to expand achieve goals first
    expand_decomp(Decomp,State,Post,Temp,Temp1,Statics3,Statics1,Decomp1),!.
-
+% 6666666666666666666666666666
+% 6666666666666666666666666666
+% 6666666666666666666666666666
+% 6666666666666666666666666666
 % 6. if all above failed
 % get another step which matchs and not after it before it to give a try
 expand_decomp([step(HP,N,Pre0,Post0,unexp)|Decomp],Pre,Post,Temp,Temp1,Statics,Statics1,Decomp1):-  
@@ -408,7 +415,7 @@ take_out_achieved(Pre,[],Post,Post):-!.
 % only Post conditions have variables
 take_out_achieved(Pre,[se(Sort,Obj,ST)|Post],Post0,Post1):-
     var(Obj),
-    append(Post0,[se(Sort,Obj,ST)],Post2),
+    append_dcut(Post0,[se(Sort,Obj,ST)],Post2),
     take_out_achieved(Pre,Post,Post2,Post1),!.
 take_out_achieved(Pre,[se(Sort,Obj,ST)|Post],Post0,Post1):-
     member(se(Sort,Obj,ST1),Pre),
@@ -416,11 +423,11 @@ take_out_achieved(Pre,[se(Sort,Obj,ST)|Post],Post0,Post1):-
     list_take(Pre,[se(Sort,Obj,ST1)],Pre2),
     take_out_achieved(Pre2,Post,Post2,Post1),!.
  
-% append only the different one
+% append_dcut only the different one
 append_diff(Sort,Obj,ST,ST1,Post0,Post0):-
     not_conflict(Sort,Obj,ST,ST1,STN),!.
 append_diff(Sort,Obj,ST,ST1,Post0,Post1):-
-    append(Post0,[se(Sort,Obj,ST)],Post1),!.
+    append_dcut(Post0,[se(Sort,Obj,ST)],Post1),!.
 % ---------------------------------------------------
  
 %1. if an achieve action meets an TN Pre and post meet
@@ -440,7 +447,7 @@ direct_expand_hp(HPid,Tn0,ACH,Pre,Post,Pre1,Statics,Statics):-
 %    return 
 direct_expand_hp(HPid,Name,Name,Pre,Post,State,Statics,Statics1):-
    operatorC(Name,Pre0,Post0,Cond,Statics0),
-   append_cut(Statics0,Statics,Statics1),
+   append_dcut(Statics0,Statics,Statics1),
    statics_consist(Statics11),
    remove_unneed(Statics11,[],Statics1),
    post_instant(Post0,Cond,Statics1,Post),
@@ -459,7 +466,7 @@ direct_expand_hp(HPid,Name,Name,Pre,Post,State,Statics,Statics1):-
 %    return 
 direct_expand_hp(HPid,Name,ACH,Pre,Post,State,Statics,Statics1):-
    operatorC(Name,Pre0,Post0,Cond,Statics0),
-   append_cut(Statics0,Statics,Statics2),
+   append_dcut(Statics0,Statics,Statics2),
    statics_consist(Statics2),
    remove_unneed(Statics2,[],Statics1),
    post_instant(Post0,Cond,Statics1,Post),
@@ -478,7 +485,7 @@ direct_expand_hp(HPid,Name,ACH,Pre,Post,State,Statics,Statics1):-
 %    expand it and make it to that TNs
 direct_expand_hp(HPid,TN,ACH,Pre,Post,State1,Statics,Statics1):-
    methodC(Name,Pre0,Post0,Statics0,Temp0,achieve(ACH0),Dec0),
-   append_cut(Statics0,Statics,Statics2),
+   append_dcut(Statics0,Statics,Statics2),
    statics_consist(Statics2),
    remove_unneed(Statics2,[],Statics1),
    post_instant(Post0,[],Statics1,Post),
@@ -540,7 +547,7 @@ expand_method([step(HPid,Name,undefd,undefd,unexp)|Decomp],Pre,Post,Temp,Temp1,S
    expand_method(Decomp,State,Post,Temp,Temp1,Statics,Statics1,Decomp1).
 expand_method([step(HPid,Name,undefd,undefd,unexp)|Decomp],Pre,Post,Temp,Temp1,Statics,Statics1,[step(HPid,Name,Pre0,Post0,exp(Name))|Decomp1]):-
    operatorC(Name,Pre0,Post0,Cond,Statics0),
-   append_cut(Statics0,Statics,Statics2),
+   append_dcut(Statics0,Statics,Statics2),
    statics_consist(Statics2),
    remove_unneed(Statics2,[],Statics21),
    post_instant(Post0,Cond,Statics21,Post0),
@@ -557,7 +564,7 @@ expand_method([step(HPid,Name,undefd,undefd,unexp)|Decomp],Pre,Post,Temp,Temp1,S
    expand_method(Decomp,State,Post,Temp,Temp1,Statics21,Statics1,Decomp1).
 expand_method([step(HPid,Name,undefd,undefd,unexp)|Decomp],Pre,Post,Temp,Temp1,Statics,Statics1,[step(HPid,Name,Pre0,Post0,exp(TN))|Decomp1]):-
    methodC(Name,Pre0,Post0,Statics0,Temp0,ACH,Dec0),
-   append_cut(Statics0,Statics,Statics2),
+   append_dcut(Statics0,Statics,Statics2),
    statics_consist(Statics2),
    remove_unneed(Statics2,[],Statics21),
    post_instant(Post0,[],Statics21,Post0),
@@ -619,15 +626,15 @@ expand_node(Statics,Statics1,Pre,Post,[step(HP,Name,_,Post0,unexp)|Rest],List,De
    expand_node(Statics,Statics1,Pre,Post,Rest,List,Dec1),!.
 expand_node(Statics,Statics1,Pre,Post,[step(HP,Name,_,Post0,unexp)|Rest],List,Dec1):-
    direct_expand_hp(HP,TN,Name,Pre,Post0,State,Statics,Statics2),
-   append(List,[step(HP,Name,Pre,State,exp(TN))],List2),
+   append_dcut(List,[step(HP,Name,Pre,State,exp(TN))],List2),
    remove_achieved_rest(State,Statics2,Rest,Rest1),
    make_to_steps(State,Post,Steps,Rest1),
-   append(Rest1,Steps,Rest2),
+   append_dcut(Rest1,Steps,Rest2),
    expand_node(Statics2,Statics1,State,Post,Rest2,List2,Dec1).
 expand_node(Statics,Statics1,Pre,Post,[step(HP,Name,_,Post0,unexp)|Rest],List,Dec1):-
    apply_op(Statics,Statics1,[step(HP,Name,Pre,Post0,unexp)|Rest],List,Dec1).
 expand_node(Statics,Statics1,Pre,Post,[step(HP,Name,Pre0,Post0,exp(TN))|TDec],List,Dec1):-
-   append(List,[step(HP,Name,Pre0,Post0,exp(TN))],List2),
+   append_dcut(List,[step(HP,Name,Pre0,Post0,exp(TN))],List2),
    expand_node(Statics,Statics1,Post0,Post,TDec,List2,Dec1),!.
 
 remove_achieved_rest(State,Statics,[],[]):-!.
@@ -641,7 +648,7 @@ remove_achieved_rest(State,Statics,[HP|Rest],[HP|Rest1]):-
 % This is only applied when it can't be directly achieved
 apply_op(Statics,Statics1,[step(HP,Name,Pre,[se(Sort,Obj,SE)],unexp)|Rest],List,Dec):-
     produce(se(Sort,Obj,SE1),OP,OPre,ST),
-    append_cut(Statics,ST,Statics2),
+    append_dcut(Statics,ST,Statics2),
     statics_consist(Statics2),
     remove_unneed(Statics2,[],Statics1),
     state_achieved([se(Sort,Obj,SE)],[se(Sort,Obj,SE1)],_),
@@ -649,14 +656,14 @@ apply_op(Statics,Statics1,[step(HP,Name,Pre,[se(Sort,Obj,SE)],unexp)|Rest],List,
     not(member(step(_,OP,_,_,_),Rest)),
     make_to_steps(Pre,OPre,Steps,Rest),
     change_head_state(Pre,Steps,Steps1),
-    append(List,Steps1,List2),
-    append(List2,[step(HP,OP,undefd,[se(Sort,Obj,SE)],unexp)|Rest],Dec).
+    append_dcut(List,Steps1,List2),
+    append_dcut(List2,[step(HP,OP,undefd,[se(Sort,Obj,SE)],unexp)|Rest],Dec).
 %    tell(user),write('+'),told.
 apply_op(Statics,Statics1,[step(HP,Name,Pre,[se(SortN,Obj,SE)],unexp)|Rest],List,Dec):-
     find_prim_sort(SortN,PSortls),
     member(Sort,PSortls),
     produce(se(Sort,Obj,SE1),OP,OPre,ST),
-    append_cut(Statics,ST,Statics2),
+    append_dcut(Statics,ST,Statics2),
     statics_consist(Statics2),
     remove_unneed(Statics2,[],Statics1),
     state_achieved([se(Sort,Obj,SE)],[se(Sort,Obj,SE1)],_),
@@ -664,8 +671,8 @@ apply_op(Statics,Statics1,[step(HP,Name,Pre,[se(SortN,Obj,SE)],unexp)|Rest],List
     not(member(step(_,OP,_,_,_),Rest)),
     make_to_steps(Pre,OPre,Steps,Rest),
     change_head_state(Pre,Steps,Steps1),
-    append(List,Steps1,List2),
-    append(List2,[step(HP,OP,undefd,[se(Sort,Obj,SE)],unexp)|Rest],Dec).
+    append_dcut(List,Steps1,List2),
+    append_dcut(List2,[step(HP,OP,undefd,[se(Sort,Obj,SE)],unexp)|Rest],Dec).
 %    tell(user),write('+'),told.
 
 % make the achieve goal states [se(..),se(..),..] to separate steps
@@ -743,7 +750,7 @@ assert_tnode1(TP,Pre,Post,Statics,Score,ExpDec,UnexpDec):-
 assert_tnode1(TP,Pre,Post,Statics,Score,ExpDec,UnexpDec):-
    get_score(Score,ExpDec,UnexpDec,Score1),
    gensym_special(tp,TP1),
-   append(ExpDec,UnexpDec,Dec),
+   append_dcut(ExpDec,UnexpDec,Dec),
    assert(tp_node(TP1,Pre,Post,Statics,Score1,Dec)),!.
 
 % combine the expanded steps to one
@@ -849,10 +856,10 @@ assert_related_states21(A,Pre,[],ST):-!.
 assert_related_states21(A,Pre,[sc(Sort,Obj,SE=>SS)|Trans],ST):-
    rem_statics([se(Sort,Obj,SE)],[se(Sort,Obj,SER)],St1),
    rem_statics([se(Sort,Obj,SS)],[se(Sort,Obj,SSR)],St2),
-   append_cut(ST,St1,ST1),
-   append_cut(ST1,St2,ST21),
+   append_dcut(ST,St1,ST1),
+   append_dcut(ST1,St2,ST21),
    remove_unneed(ST21,[],ST2),
-   append_cut(Pre,[se(Sort,Obj,SER)],Pre1),
+   append_dcut(Pre,[se(Sort,Obj,SER)],Pre1),
    assert(produce(se(Sort,Obj,SSR),A,Pre1,ST2)),
    assert_related_states21(A,Pre,Trans,ST),!.
 
@@ -1075,12 +1082,12 @@ make_problem_up([achieve(L)|R],[step(HP,achieve(L1),undefd,L1,unexp)|RS]):-
     gensym_special(hp,HP),
     make_problem_up(R, RS),!.
 make_problem_up([O|R],[step(HP,O,undefd,undefd,unexp)|RS]):-
-    methodC(O,Pre,Post,Statics1,Temp,ACH,Dec),
+    env_call  methodC(O,Pre,Post,Statics1,Temp,ACH,Dec),
     gensym_special(hp,HP),
     make_problem_up(R, RS),!.
 make_problem_up([O|R],     
            [step(HP,O,undefd,undefd,unexp)|RS]):-
-    operatorC(O,Pre,Post,Cond,Statics1),
+    env_call operatorC(O,Pre,Post,Cond,Statics1),
     gensym_special(hp,HP),
     make_problem_up(R, RS),!.
 
@@ -1120,10 +1127,10 @@ earliest_step(HP1,HPF,Temp,[HP2|TST],[HP2|TST1]):-
 
 % sort the steps, put the unordered steps in the front
 sort_steps2(OtherST,[],OrderedST1,OrderedST):-
-   append(OrderedST1,OtherST,OrderedST),!.
+   append_dcut(OrderedST1,OtherST,OrderedST),!.
 sort_steps2(Steps,[HP|THPS],List,OrderedST):-
    member(step(HP,N,Pre,Post,F),Steps),
-   append(List,[step(HP,N,Pre,Post,F)],List1),
+   append_dcut(List,[step(HP,N,Pre,Post,F)],List1),
    list_take(Steps,[step(HP,N,Pre,Post,F)],Steps1),
    sort_steps2(Steps1,THPS,List1,OrderedST),!.
 sort_steps2(Steps,[HP|THPS],List,OrderedST):-
@@ -1148,35 +1155,191 @@ extract_solution(Node,PHPs,SIZE1) :-
    pprint(PHPs,1,SIZE),
    SIZE1 is SIZE -1,!.
 
+
+
+
+/************ change_op_representation ***********/
+% make pre and post explicit
+% filter out statics and put in a new slot
+change_op_representation :-    
+    env_call(method(A,B,C,Stat,T,Dec)),
+    make_ss_to_se(B,B0),
+    make_se_primitive(B0,B1),
+    make_sc_primitive(C,C1),
+    get_preconditions(C1,B1,Pre,Post),
+    rem_statics(Post, PostR,St1),
+    rem_statics(Pre, PreR,St2),
+    append_dcut(St1,St2,Statics),
+    append_dcut(Stat,Statics,Statics1),
+    remove_unneed(Statics1,[],Statics2),
+    get_achieval(A,Dec,T,Dec1,T1,ACH),
+    env_assert(methodC(A,PreR,PostR,Statics2,T1,achieve(ACH),Dec1)),
+    fail.
+change_op_representation :-
+    env_call(operator(A,B,C,D)),
+    make_ss_to_se(B,B0),
+    make_se_primitive(B0,B1),
+    make_sc_primitive(C,C1),
+%    make_sc_primitive(D,D1),
+	%can't do that because it narrow the conditional change 
+    get_preconditions(C1,B1,Pre,Post),
+    rem_statics(Post, PostR,St1),
+    rem_statics(Pre, PreR,St2),
+    append_dcut(St1,St2,Statics1),
+    remove_unneed(Statics1,[],Statics),
+    statics_consist(Statics),
+    env_assert(operatorC(A,PreR,PostR,D,Statics)),
+    fail.
+change_op_representation:-
+    env_retractall(current_num(sm,_)),!.
+
+get_preconditions([],Prev,Prev,Prev) :-!.
+get_preconditions([sc(S,X,From =>To)|Rest],Prev,[se(S,X,From1)|Pre],[se(S,X,To1)|Post]):-
+     member_e(se(S,X,PSE),Prev),
+     append_dcut(PSE,From,From1),
+     append_dcut(PSE,To,To1),
+     list_take(Prev,[se(S,X,PSE)],Prev1),
+     get_preconditions(Rest,Prev1, Pre,Post),!.
+get_preconditions([sc(S,X,From =>To)|Rest],Prev,[se(S,X,From)|Pre],[se(S,X,To)|Post]):-
+     get_preconditions(Rest,Prev, Pre,Post),!.
+get_preconditions([],Prev,Prev,Prev) :-!.
+
+% get all achieve goals out
+get_achieval(A,Dec,T,Dec1,T1,Achieval):-
+     env_retractall(current_num(sm,_)),
+     make_dec(A,Dec,Dec1,T,T1,[],Achieval),!.
+make_dec(A,[],[],Temp,Temp,Achieval,Achieval):-!.
+make_dec(A,[HD|TD],TD1,Temp,Temp1,Achieval,Achieval1):-
+     HD=..[achieve|Goal],
+     env_call current_num(sm,Num),
+     replace_achieval_temp(Temp,Temp0,Num),
+     make_ss_to_se(Goal,Goal0),
+     append_dcut(Achieval,Goal0,Achieval0),
+     make_dec(A,TD,TD1,Temp0,Temp1,Achieval0,Achieval1),!.
+make_dec(A,[HD|TD],TD1,Temp,Temp1,Achieval,Achieval1):-
+     HD=..[achieve|Goal],
+     not(env_call current_num(sm,_)),
+     replace_achieval_temp(Temp,Temp0,1),
+     make_ss_to_se(Goal,Goal0),
+     append_dcut(Achieval,Goal0,Achieval0),
+     make_dec(A,TD,TD1,Temp0,Temp1,Achieval0,Achieval1).
+make_dec(A,[HD|TD],[HD|TD1],Temp,Temp1,Achieval,Achieval1):-
+     HD=..[DecName|Goal],
+     DecName\==achieve,
+     gensym_special(sm,SM),
+     env_call current_num(sm,Num),
+     make_dec(A,TD,TD1,Temp,Temp1,Achieval,Achieval1),!.
+
+% get rid of the achievals in temp orders
+replace_achieval_temp(Temp,Temp1,Num):-
+     change_all_numbers(Temp,Num,Temp00),
+     tidy_temp(Temp00,Temp1).
+
+change_all_numbers([],Num,[]):-!.
+change_all_numbers([HTemp|TTemp],Num,[HTemp00|TTemp00]):-
+     HTemp=..[before|Nums],
+     change_nums(Nums,Num,Nums1),
+     HTemp00=..[before|Nums1],
+     change_all_numbers(TTemp,Num,TTemp00).
+
+change_nums([],Num,[]):-!.
+change_nums([Num1|TN],Num,[Num1|TN1]):-
+    Num1<Num,
+    change_nums(TN,Num,TN1),!.
+change_nums([Num1|TN],Num,[Num2|TN1]):-
+    Num1>Num,
+    Num2 is Num1-1,
+    change_nums(TN,Num,TN1),!.
+change_nums([Num|TN],Num,[0|TN1]):-
+    change_nums(TN,Num,TN1),!.
+
+% since assumed achieval only happen at first, so only change the after ones
+tidy_temp(Temp,Temp1):-
+     member(before(Num,0),Temp),
+     list_take(Temp,[before(Num,0)],Temp0),
+     change_laters(Temp0,Num,Temp01),
+     tidy_temp(Temp01,Temp1).
+tidy_temp([],[]):-!.
+tidy_temp([before(0,Num)|Temp],Temp0):-
+     tidy_temp(Temp,Temp0),!.
+tidy_temp([before(Num1,Num2)|Temp],[before(Num1,Num2)|Temp0]):-
+     tidy_temp(Temp,Temp0),!.
+
+change_laters([before(0,Num2)|Temp],Num,[before(Num,Num2)|Temp0]):-
+     change_laters(Temp,Num,Temp0).
+change_laters([before(Num1,0)|Temp],Num,[before(Num1,0)|Temp0]):-
+     change_laters(Temp,Num,Temp0).
+change_laters([before(Num1,Num2)|Temp],Num,[before(Num1,Num2)|Temp0]):-
+     change_laters(Temp,Num,Temp0).
+
+% change the states to primitive states
+make_se_primitive([],[]).
+make_se_primitive([se(Sort,Obj,ST)|SE],[se(Sort,Obj,ST)|SE0]):-
+    find_prim_sort(Sort,[Sort]),!,
+    make_se_primitive(SE,SE0).
+make_se_primitive([se(Sort,Obj,ST)|SE],[se(PSort,Obj,ST)|SE0]):-
+    find_prim_sort(Sort,PSorts),
+    member(PSort,PSorts),
+    make_se_primitive(SE,SE0).
+
+% change the state changes to primitive states
+make_sc_primitive([],[]).
+make_sc_primitive([sc(Sort,Obj,SE1=>SE2)|ST],[sc(Sort,Obj,SE1=>SE2)|ST0]):-
+    find_prim_sort(Sort,[Sort]),!,
+    make_sc_primitive(ST,ST0).
+make_sc_primitive([sc(Sort,Obj,SE1=>SE2)|ST],[sc(PSort,Obj,SE1=>SE2)|ST0]):-
+    find_prim_sort(Sort,PSorts),
+    member(PSort,PSorts),
+    make_sc_primitive(ST,ST0).
+
+
+% ------------ end of change operator ----------------------
+make_tn(TN,Name,Pre,Post,Temp,Dec):-
+    gensym_special(tn,TN),
+    find_only_changed(Pre,Post,[],Pre1,[],Post1),
+%    tell(user),nl,write(tn(TN,Name,Pre1,Post1,Temp,Dec)),nl,told,
+    assert(tn(TN,Name,Pre1,Post1,Temp,Dec)),!.
+
+find_only_changed([],[],Pre,Pre,Post,Post):-!.
+% just a lazy check if they are in exactly same sequence
+find_only_changed([se(Sort,Obj,ST)|Pre],[se(Sort,Obj,ST)|Post],Pre0,Pre1,Post0,Post1):-
+    find_only_changed(Pre,Post,Pre0,Pre1,Post0,Post1),!.
+find_only_changed([se(Sort,Obj,ST)|Pre],Post,Pre0,Pre1,Post0,Post1):-
+    member(se(Sort,Obj,ST1),Post),
+    list_take(Post,[se(Sort,Obj,ST1)],Post2),
+    append_changed(se(Sort,Obj,ST),se(Sort,Obj,ST1),Pre0,Pre3,Post0,Post3),
+    find_only_changed(Pre,Post2,Pre3,Pre1,Post3,Post1),!.
+find_only_changed([se(Sort,Obj,ST)|Pre],Post,Pre0,Pre1,Post0,Post1):-
+    member(se(SortN,Obj,ST1),Post),
+    list_take(Post,[se(SortN,Obj,ST1)],Post2),
+    append_changed(se(Sort,Obj,ST),se(SortN,Obj,ST1),Pre0,Pre3,Post0,Post3),
+    find_only_changed(Pre,Post2,Pre3,Pre1,Post3,Post1),!.
+% other fail. 
+
+% append_dcut  only changed states
+% not_conflict here means not changed
+append_changed(se(Sort,Obj,ST),se(Sort1,Obj,ST1),Pre0,Pre0,Post0,Post0):-
+    not_conflict(Sort,Obj,ST,ST1,_),!.
+append_changed(se(Sort,Obj,ST),se(Sort1,Obj,ST1),Pre0,Pre3,Post0,Post3):-
+    append_dcut(Pre0,[se(Sort,Obj,ST)],Pre3),
+    append_dcut(Post0,[se(Sort,Obj,ST1)],Post3),!.
+
+
 %***********print out solution**************************   
+%***********print out solution**************************   
+%***********print out solution**************************   
+%***********print out solution**************************
+
 push_to_primitive([],PHPs,PHPs) :-!.
 push_to_primitive([step(HPID,_,_,_,exp(TN))|HPs],List,PHPs) :-
    tn(TN,Name,Pre,Post,Temp,Dec),
    push_to_primitive(Dec,List,Dec1),
    push_to_primitive(HPs,Dec1,PHPs),!.
 push_to_primitive([step(HPID,_,_,_,exp(Name))|HPs],List,PHPs):-
-   append(List,[Name],List1),
+   append_dcut(List,[Name],List1),
    push_to_primitive(HPs,List1,PHPs),!.
 
-%*******************************************************   
-pprint([],SIZE,SIZE):-!.
-pprint([HS|TS],Size0,SIZE):-
-    list(HS),
-    pprint(HS,Size0,Size1),
-    pprint(TS,Size1,SIZE),!.
-pprint([HS|TS],Size0,SIZE):-
-%    write('step '),write(Size0),write(': '),
-%    write(HS),nl,
-    Size1 is Size0+1,
-    pprint(TS,Size1,SIZE),!.
 
-delete_all_nodes :-
-	retractall(node(_,_,_,_,_)),
-	retractall(final_node(_)),
-	retractall(tp_node(_,_,_,_,_,_)),
-	retractall(closed_node(_,_,_,_,_,_)),
-	retractall(solved_node(_,_,_)).
-delete_all_nodes :- !.
 
 /*********** TEMPORAL AND DECLOBBERING ************/
 
@@ -1200,6 +1363,76 @@ select_node(node(Name,Pre,Temp,Decomp,Statics)) :-
 %   tell(FF),
     !.
 
+
+find_all_upper([],[]).
+find_all_upper([HVars|TV],[HSorts|TS]):-
+     uppersorts(HSorts,Upsorts),
+     member(HVars,Upsorts),
+     find_all_upper(TV,TS).
+     
+% find out primitive sorts of a sort.
+find_prim_sort(Sort,PS):-
+  subsorts(Sort,Subsorts),
+  split_prim_noprim(Subsorts,PS,NP),!.
+
+% find out the objects of a sort
+get_sort_objects(Sort,Objs):-
+   find_prim_sort(Sort,PSorts),
+   get_objects1(PSorts,Objls),
+   flatten(Objls,[],Objs),!.
+
+get_objects1([],[]):-!.
+get_objects1([PS1|RS],[Objls1|Objls]):-
+   objects(PS1,Objls1),
+   get_objects1(RS,Objls),!.
+
+% find subsorts of a sort(include).
+subsorts(Sort,Subsorts):-
+  sort_down([Sort],[Sort],Subsorts),!.
+
+sort_down([],Subsorts,Subsorts):-!.
+sort_down([HOpen|TOpen],List,Sortslist):-
+  sorts(HOpen,Sorts),
+  append_dcut(List,Sorts,List1),
+  append_dcut(TOpen,Sorts,Open1),
+  sort_down(Open1,List1,Sortslist),!.
+sort_down([HOpen|TOpen],List,Sortslist):-
+  sort_down(TOpen,List,Sortslist),!.
+  
+% find uppersorts of a sort or object(include).
+uppersorts(Sort,Uppersorts):-
+  objects(Sort,Objls),
+  sort_up(Sort,[Sort],Uppersorts),!.
+uppersorts(Sort,Uppersorts):-
+  sorts(Sort,Sortls),
+  sort_up(Sort,[Sort],Uppersorts),!.
+uppersorts(Obj,Sortls):-
+  objects(Sort,Objls),
+  member(Obj, Objls),
+  sort_up(Sort,[Sort],Sortls),!.
+
+sort_up(Sort, List,Sortslist):-
+  sorts(non_primitive_sorts,NPSorts),
+  sort_up1(Sort,NPSorts,NPSorts,List,Sortslist),!.
+
+sort_up1(Sort,[],NPSorts,Sortslist,Sortslist):-!.
+sort_up1(Sort,[HNPSorts|TNPSorts],NPSorts,List,Sortslist):-
+  sorts(HNPSorts,Sorts),
+  member(Sort,Sorts),
+  append_dcut(List, [HNPSorts], List1),
+  sort_up(HNPSorts,List1,Sortslist),!. 
+sort_up1(Sort,[HNPSorts|TNPSorts],NPSorts,List,Sortslist):-
+  sort_up1(Sort,TNPSorts,NPSorts,List,Sortslist),!.
+
+% find out primitive sorts from a sorts list.
+split_prim_noprim([],[],[]):-!.
+split_prim_noprim([HS|TS],[HS|TP],NP):-
+     objects(HS,Obj),
+     split_prim_noprim(TS,TP,NP),!.		
+split_prim_noprim([HS|TS],PS,[HS|NP]):-
+     split_prim_noprim(TS,PS,NP),!.
+
+
 all_HP_expanded([]):-!.
 all_HP_expanded([step(HPid,Name,_,_,exp(TN))|THPS]):-
    all_HP_expanded(THPS),!.
@@ -1216,7 +1449,7 @@ statics_consist_instance0(Invs,[ne_back(A,B)|TStatics]):-
    not(A==B),
    statics_consist_instance0(Invs,TStatics).
 statics_consist_instance0(Invs,[ne(A,B)|TStatics]):-
-   append(TStatics,[ne_back(A,B)],TStatics1),
+   append_dcut(TStatics,[ne_back(A,B)],TStatics1),
    statics_consist_instance0(Invs,TStatics1),!.
 statics_consist_instance0(Invs,[is_of_sort(Obj,Sort)|TStatics]):-
    is_of_sort(Obj,Sort),
@@ -1240,7 +1473,7 @@ statics_consist1(Invs,[ne_back(A,B)|TStatics]):-
    not(A==B),
    statics_consist1(Invs,TStatics),!.
 statics_consist1(Invs,[ne(A,B)|TStatics]):-
-   append(TStatics,[ne_back(A,B)],TStatics1),
+   append_dcut(TStatics,[ne_back(A,B)],TStatics1),
    statics_consist1(Invs,TStatics1),!.
 statics_consist1(Invs,[is_of_sort(Obj,Sort)|TStatics]):-
    get_sort_objects(Sort,Objs),
@@ -1264,12 +1497,12 @@ rem_statics([ss(S,X,Preds)|Post], [ss(S,X,PredR)|PostR],Rt1) :-
     filter_list(Preds, is_a_dynamic_pred,PredR),
     filter_list(Preds, is_a_static_pred, R),
     rem_statics(Post, PostR,Rt),
-    append(Rt,[is_of_sort(X,S)|R],Rt1),!.
+    append_dcut(Rt,[is_of_sort(X,S)|R],Rt1),!.
 rem_statics([se(S,X,Preds)|Post], [se(S,X,PredR)|PostR],Rt1) :-
     filter_list(Preds, is_a_dynamic_pred,PredR),
     filter_list(Preds, is_a_static_pred, R),
     rem_statics(Post, PostR,Rt),
-    append(Rt,[is_of_sort(X,S)|R],Rt1),!.
+    append_dcut(Rt,[is_of_sort(X,S)|R],Rt1),!.
 rem_statics([], [],[]) :-!.
 
 % check if a predicate is statics or not
@@ -1290,16 +1523,6 @@ u_mem_cut(_,[]):-!,fail.
 u_mem_cut(X,[Y|_]) :- X == Y,!.
 u_mem_cut(X,[_|L]) :- u_mem_cut(X,L),!.
 
-
-is_of_primitive_sort(X,Y) :-
-    objects(Y,L),member(X,L).
-is_of_sort(X,Y) :-
-    is_of_primitive_sort(X,Y).
-is_of_sort(X,Y) :-
-    sorts(Y,SL),member(Z,SL),is_of_sort(X,Z).
-
-member_cut(X,[X|_]) :- !.
-member_cut(X,[_|Y]) :- member_cut(X,Y),!.
 
 % check if object X is a member of a objects list
 % 1. if it is not a variable, check if it is in the list
@@ -1349,174 +1572,9 @@ vequal([X|XLs],[Y|YLs]):-
     X==Y,	
     vequal(XLs,YLs),!.
 
-append_cut([],L,L) :- !.
-append_cut([H|T],L,[H|Z]) :- append_cut(T,L,Z),!.
+append_dcut([],L,L) :- !.
+append_dcut([H|T],L,[H|Z]) :- append_dcut(T,L,Z),!.
 
-
-/************ change_op_representation ***********/
-% make pre and post explicit
-% filter out statics and put in a new slot
-change_op_representation :-    
-    method(A,B,C,Stat,T,Dec),
-    make_ss_to_se(B,B0),
-    make_se_primitive(B0,B1),
-    make_sc_primitive(C,C1),
-    get_preconditions(C1,B1,Pre,Post),
-    rem_statics(Post, PostR,St1),
-    rem_statics(Pre, PreR,St2),
-    append_cut(St1,St2,Statics),
-    append_cut(Stat,Statics,Statics1),
-    remove_unneed(Statics1,[],Statics2),
-    get_achieval(A,Dec,T,Dec1,T1,ACH),
-    assert(methodC(A,PreR,PostR,Statics2,T1,achieve(ACH),Dec1)),
-    fail.
-change_op_representation :-
-    operator(A,B,C,D),
-    make_ss_to_se(B,B0),
-    make_se_primitive(B0,B1),
-    make_sc_primitive(C,C1),
-%    make_sc_primitive(D,D1),
-	%can't do that because it narrow the conditional change 
-    get_preconditions(C1,B1,Pre,Post),
-    rem_statics(Post, PostR,St1),
-    rem_statics(Pre, PreR,St2),
-    append_cut(St1,St2,Statics1),
-    remove_unneed(Statics1,[],Statics),
-    statics_consist(Statics),
-    assert(operatorC(A,PreR,PostR,D,Statics)),
-    fail.
-change_op_representation:-
-    retractall(current_num(sm,_)),!.
-
-get_preconditions([],Prev,Prev,Prev) :-!.
-get_preconditions([sc(S,X,From =>To)|Rest],Prev,[se(S,X,From1)|Pre],[se(S,X,To1)|Post]):-
-     member_e(se(S,X,PSE),Prev),
-     append(PSE,From,From1),
-     append(PSE,To,To1),
-     list_take(Prev,[se(S,X,PSE)],Prev1),
-     get_preconditions(Rest,Prev1, Pre,Post),!.
-get_preconditions([sc(S,X,From =>To)|Rest],Prev,[se(S,X,From)|Pre],[se(S,X,To)|Post]):-
-     get_preconditions(Rest,Prev, Pre,Post),!.
-get_preconditions([],Prev,Prev,Prev) :-!.
-
-% get all achieve goals out
-get_achieval(A,Dec,T,Dec1,T1,Achieval):-
-     retractall(current_num(sm,_)),
-     make_dec(A,Dec,Dec1,T,T1,[],Achieval),!.
-make_dec(A,[],[],Temp,Temp,Achieval,Achieval):-!.
-make_dec(A,[HD|TD],TD1,Temp,Temp1,Achieval,Achieval1):-
-     HD=..[achieve|Goal],
-     current_num(sm,Num),
-     replace_achieval_temp(Temp,Temp0,Num),
-     make_ss_to_se(Goal,Goal0),
-     append(Achieval,Goal0,Achieval0),
-     make_dec(A,TD,TD1,Temp0,Temp1,Achieval0,Achieval1),!.
-make_dec(A,[HD|TD],TD1,Temp,Temp1,Achieval,Achieval1):-
-     HD=..[achieve|Goal],
-     not(current_num(sm,Num)),
-     replace_achieval_temp(Temp,Temp0,1),
-     make_ss_to_se(Goal,Goal0),
-     append(Achieval,Goal0,Achieval0),
-     make_dec(A,TD,TD1,Temp0,Temp1,Achieval0,Achieval1).
-make_dec(A,[HD|TD],[HD|TD1],Temp,Temp1,Achieval,Achieval1):-
-     HD=..[DecName|Goal],
-     DecName\==achieve,
-     gensym_special(sm,SM),
-     current_num(sm,Num),
-     make_dec(A,TD,TD1,Temp,Temp1,Achieval,Achieval1),!.
-
-% get rid of the achievals in temp orders
-replace_achieval_temp(Temp,Temp1,Num):-
-     change_all_numbers(Temp,Num,Temp00),
-     tidy_temp(Temp00,Temp1).
-
-change_all_numbers([],Num,[]):-!.
-change_all_numbers([HTemp|TTemp],Num,[HTemp00|TTemp00]):-
-     HTemp=..[before|Nums],
-     change_nums(Nums,Num,Nums1),
-     HTemp00=..[before|Nums1],
-     change_all_numbers(TTemp,Num,TTemp00).
-
-change_nums([],Num,[]):-!.
-change_nums([Num1|TN],Num,[Num1|TN1]):-
-    Num1<Num,
-    change_nums(TN,Num,TN1),!.
-change_nums([Num1|TN],Num,[Num2|TN1]):-
-    Num1>Num,
-    Num2 is Num1-1,
-    change_nums(TN,Num,TN1),!.
-change_nums([Num|TN],Num,[0|TN1]):-
-    change_nums(TN,Num,TN1),!.
-
-% since assumed achieval only happen at first, so only change the after ones
-tidy_temp(Temp,Temp1):-
-     member(before(Num,0),Temp),
-     list_take(Temp,[before(Num,0)],Temp0),
-     change_laters(Temp0,Num,Temp01),
-     tidy_temp(Temp01,Temp1).
-tidy_temp([],[]):-!.
-tidy_temp([before(0,Num)|Temp],Temp0):-
-     tidy_temp(Temp,Temp0),!.
-tidy_temp([before(Num1,Num2)|Temp],[before(Num1,Num2)|Temp0]):-
-     tidy_temp(Temp,Temp0),!.
-
-change_laters([before(0,Num2)|Temp],Num,[before(Num,Num2)|Temp0]):-
-     change_laters(Temp,Num,Temp0).
-change_laters([before(Num1,0)|Temp],Num,[before(Num1,0)|Temp0]):-
-     change_laters(Temp,Num,Temp0).
-change_laters([before(Num1,Num2)|Temp],Num,[before(Num1,Num2)|Temp0]):-
-     change_laters(Temp,Num,Temp0).
-
-% ------------ end of change operator ----------------------
-make_tn(TN,Name,Pre,Post,Temp,Dec):-
-    gensym_special(tn,TN),
-    find_only_changed(Pre,Post,[],Pre1,[],Post1),
-%    tell(user),nl,write(tn(TN,Name,Pre1,Post1,Temp,Dec)),nl,told,
-    assert(tn(TN,Name,Pre1,Post1,Temp,Dec)),!.
-
-find_only_changed([],[],Pre,Pre,Post,Post):-!.
-% just a lazy check if they are in exactly same sequence
-find_only_changed([se(Sort,Obj,ST)|Pre],[se(Sort,Obj,ST)|Post],Pre0,Pre1,Post0,Post1):-
-    find_only_changed(Pre,Post,Pre0,Pre1,Post0,Post1),!.
-find_only_changed([se(Sort,Obj,ST)|Pre],Post,Pre0,Pre1,Post0,Post1):-
-    member(se(Sort,Obj,ST1),Post),
-    list_take(Post,[se(Sort,Obj,ST1)],Post2),
-    append_changed(se(Sort,Obj,ST),se(Sort,Obj,ST1),Pre0,Pre3,Post0,Post3),
-    find_only_changed(Pre,Post2,Pre3,Pre1,Post3,Post1),!.
-find_only_changed([se(Sort,Obj,ST)|Pre],Post,Pre0,Pre1,Post0,Post1):-
-    member(se(SortN,Obj,ST1),Post),
-    list_take(Post,[se(SortN,Obj,ST1)],Post2),
-    append_changed(se(Sort,Obj,ST),se(SortN,Obj,ST1),Pre0,Pre3,Post0,Post3),
-    find_only_changed(Pre,Post2,Pre3,Pre1,Post3,Post1),!.
-% other fail. 
-
-% append  only changed states
-% not_conflict here means not changed
-append_changed(se(Sort,Obj,ST),se(Sort1,Obj,ST1),Pre0,Pre0,Post0,Post0):-
-    not_conflict(Sort,Obj,ST,ST1,_),!.
-append_changed(se(Sort,Obj,ST),se(Sort1,Obj,ST1),Pre0,Pre3,Post0,Post3):-
-    append(Pre0,[se(Sort,Obj,ST)],Pre3),
-    append(Post0,[se(Sort,Obj,ST1)],Post3),!.
-
-% change the states to primitive states
-make_se_primitive([],[]).
-make_se_primitive([se(Sort,Obj,ST)|SE],[se(Sort,Obj,ST)|SE0]):-
-    find_prim_sort(Sort,[Sort]),!,
-    make_se_primitive(SE,SE0).
-make_se_primitive([se(Sort,Obj,ST)|SE],[se(PSort,Obj,ST)|SE0]):-
-    find_prim_sort(Sort,PSorts),
-    member(PSort,PSorts),
-    make_se_primitive(SE,SE0).
-
-% change the state changes to primitive states
-make_sc_primitive([],[]).
-make_sc_primitive([sc(Sort,Obj,SE1=>SE2)|ST],[sc(Sort,Obj,SE1=>SE2)|ST0]):-
-    find_prim_sort(Sort,[Sort]),!,
-    make_sc_primitive(ST,ST0).
-make_sc_primitive([sc(Sort,Obj,SE1=>SE2)|ST],[sc(PSort,Obj,SE1=>SE2)|ST0]):-
-    find_prim_sort(Sort,PSorts),
-    member(PSort,PSorts),
-    make_sc_primitive(ST,ST0).
 
 /************ end of change_op_representation ***********/
 
@@ -1525,14 +1583,14 @@ isemptylist([]):-!.
 gensym_num(Root,Num,Atom):-
      name(Root,Name),
      name(Num,Name1),
-     append(Name,Name1,Name2),
+     append_dcut(Name,Name1,Name2),
      name(Atom,Name2),!.
 
 % set_append_e: list1 + list2 -> list
 % no duplicate, no instanciation
 % ------------------------------------------
 set_append_e(A,B,C):-
-    append_cut(A,B,D),
+    append_dcut(A,B,D),
     remove_dup(D,[],C),!.
 
 % remove duplicate
@@ -1541,9 +1599,21 @@ remove_dup([A|B],Z,C) :-
     member_e(A, Z),
     remove_dup(B, Z, C),! .
 remove_dup([A|B], Z, C):-
-    append(Z,[A],D),
+    append_dcut(Z,[A],D),
     remove_dup(B, D, C),!.
 
+
+is_of_primitive_sort(X,Y) :-
+    objects(Y,L),member(X,L).
+is_of_sort(X,Y) :-
+    is_of_primitive_sort(X,Y).
+is_of_sort(X,Y) :-
+    sorts(Y,SL),member(Z,SL),is_of_sort(X,Z).
+
+member_cut(X,[X|_]) :- !.
+member_cut(X,[_|Y]) :- member_cut(X,Y),!.
+
+% member_e: X is the exact memeber of List
 member_e(X,[Y|_]):-
      X==Y,!.
 member_e(X,[Y|L]):-
@@ -1557,12 +1627,12 @@ member_e(sc(Sort,Obj,SE1=>SE2),[sc(Sort,Obj1,SE1=>SE2)|_]):-
      Obj==Obj1,!.
 member_e(X,[Y|L]):- member_e(X,L),!.
 
-% append_st: append two statics
+% append_st: append_dcut two statics
 % remove the constants that no need
 % instanciate the viables that all ready been bind
 % ------------------------------------------
 append_st(ST1,ST2,ST):-
-    append_cut(ST1,ST2,ST0),
+    append_dcut(ST1,ST2,ST0),
     remove_unneed(ST0,[],ST),!.
 
 % remove the constants that no need
@@ -1574,21 +1644,21 @@ remove_unneed([A|B], Z, C):-
     remove_unneed(B, Z, C),! .
 remove_unneed([A|B], Z, C):-
     var(A),
-    append(Z,[A],D),
+    append_dcut(Z,[A],D),
     remove_unneed(B, D, C),!.
 remove_unneed([A|B], Z, C):-
     ground(A),
     remove_unneed(B, Z, C),!.
 remove_unneed([A|B], Z, C):-
     A=..[ne|Paras],
-    append(Z,[A],D),
+    append_dcut(Z,[A],D),
     remove_unneed(B, D, C),!.
 remove_unneed([A|B], Z, C):-
     A=..[Pred|Paras],
     same_var_member(A,Z),
     remove_unneed(B, Z, C),!.
 remove_unneed([A|B], Z, C):-
-    append(Z,[A],D),
+    append_dcut(Z,[A],D),
     remove_unneed(B, D, C),!.
 
 same_var_member(Pred,[Pred1|List]):-
@@ -1754,83 +1824,8 @@ get_obj_sort([HVars|TV],[HObj|TS]):-
      member(HObj,Objls),
      get_obj_sort(TV,TS),!.
 
-find_all_upper([],[]).
-find_all_upper([HVars|TV],[HSorts|TS]):-
-     uppersorts(HSorts,Upsorts),
-     member(HVars,Upsorts),
-     find_all_upper(TV,TS).
-     
-% find out primitive sorts of a sort.
-find_prim_sort(Sort,PS):-
-  subsorts(Sort,Subsorts),
-  split_prim_noprim(Subsorts,PS,NP),!.
-
-% find out the objects of a sort
-get_sort_objects(Sort,Objs):-
-   find_prim_sort(Sort,PSorts),
-   get_objects1(PSorts,Objls),
-   flatten(Objls,[],Objs),!.
-
-get_objects1([],[]):-!.
-get_objects1([PS1|RS],[Objls1|Objls]):-
-   objects(PS1,Objls1),
-   get_objects1(RS,Objls),!.
-
-% find subsorts of a sort(include).
-subsorts(Sort,Subsorts):-
-  sort_down([Sort],[Sort],Subsorts),!.
-
-sort_down([],Subsorts,Subsorts):-!.
-sort_down([HOpen|TOpen],List,Sortslist):-
-  sorts(HOpen,Sorts),
-  append(List,Sorts,List1),
-  append(TOpen,Sorts,Open1),
-  sort_down(Open1,List1,Sortslist),!.
-sort_down([HOpen|TOpen],List,Sortslist):-
-  sort_down(TOpen,List,Sortslist),!.
-  
-% find uppersorts of a sort or object(include).
-uppersorts(Sort,Uppersorts):-
-  objects(Sort,Objls),
-  sort_up(Sort,[Sort],Uppersorts),!.
-uppersorts(Sort,Uppersorts):-
-  sorts(Sort,Sortls),
-  sort_up(Sort,[Sort],Uppersorts),!.
-uppersorts(Obj,Sortls):-
-  objects(Sort,Objls),
-  member(Obj, Objls),
-  sort_up(Sort,[Sort],Sortls),!.
-
-sort_up(Sort, List,Sortslist):-
-  sorts(non_primitive_sorts,NPSorts),
-  sort_up1(Sort,NPSorts,NPSorts,List,Sortslist),!.
-
-sort_up1(Sort,[],NPSorts,Sortslist,Sortslist):-!.
-sort_up1(Sort,[HNPSorts|TNPSorts],NPSorts,List,Sortslist):-
-  sorts(HNPSorts,Sorts),
-  member(Sort,Sorts),
-  append(List, [HNPSorts], List1),
-  sort_up(HNPSorts,List1,Sortslist),!. 
-sort_up1(Sort,[HNPSorts|TNPSorts],NPSorts,List,Sortslist):-
-  sort_up1(Sort,TNPSorts,NPSorts,List,Sortslist),!.
-
-% find out primitive sorts from a sorts list.
-split_prim_noprim([],[],[]):-!.
-split_prim_noprim([HS|TS],[HS|TP],NP):-
-     objects(HS,Obj),
-     split_prim_noprim(TS,TP,NP),!.		
-split_prim_noprim([HS|TS],PS,[HS|NP]):-
-     split_prim_noprim(TS,PS,NP),!.
-
 
 % ----------------------utilities---------------------
-/*
-not(X):- \+X.
-member(X,[X|_]).
-member(X,[_|L]) :- member(X,L).
-append([],L,L):-!.
-append([H|T],L,[H|Z]) :- append(T,L,Z),!.
- */
 
 file_exists(Filename):-exists_file(Filename).
 
@@ -1865,7 +1860,7 @@ gensym_special(Root,Atom) :-
                         getnum(Root,Num),
                         name(Root,Name1),
                         name(Num,Name2),
-                        append(Name1,Name2,Name),
+                        append_dcut(Name1,Name2,Name),
                         name(Atom,Name).
 
 getnum(Root,Num) :-
@@ -1891,7 +1886,7 @@ is_a_dynamic_pred(X) :-
 
 filter_list([X|Rest],Op,[X|Rest1]) :-
         Op =.. OL,
-        append(OL,[X],OL1),
+        append_dcut(OL,[X],OL1),
         Pred =.. OL1,
         call(Pred),
         filter_list(Rest,Op,Rest1),!.
@@ -1919,13 +1914,35 @@ xprod([X|Y],[A|E],D,(F,G)) :-
         D =..[^,A,C] ,
         F =..[member,A,X] ,
         xprod(Y,E,C,G).
+
+
+%*******************************************************   
+pprint([],SIZE,SIZE):-!.
+pprint([HS|TS],Size0,SIZE):-
+    list(HS),
+    pprint(HS,Size0,Size1),
+    pprint(TS,Size1,SIZE),!.
+pprint([HS|TS],Size0,SIZE):-
+%    write('step '),write(Size0),write(': '),
+%    write(HS),nl,
+    Size1 is Size0+1,
+    pprint(TS,Size1,SIZE),!.
+
+delete_all_nodes :-
+	retractall(node(_,_,_,_,_)),
+	retractall(final_node(_)),
+	retractall(tp_node(_,_,_,_,_,_)),
+	retractall(closed_node(_,_,_,_,_,_)),
+	retractall(solved_node(_,_,_)).
+delete_all_nodes :- !.
+
 % list of lists -> list
 
 flatten([HO|TO], List, O_List):-
-	append(HO, List, List_tmp),
+	append_dcut(HO, List, List_tmp),
 	flatten(TO, List_tmp, O_List),!.
 flatten([H|TO], List,O_List):-
-	append([H], List, List_tmp),
+	append_dcut([H], List, List_tmp),
 	flatten(TO, List_tmp, O_List).
 flatten([], [HList|T], O_List):-
 	HList = [],
@@ -2050,6 +2067,12 @@ end_of_file.
 
 
 
+
+
+
+
+
+% 
 
 
 
@@ -6610,7 +6633,4 @@ htn_task(20,goal([ transport(pk(n2y),city3_cl1_y,city1_cl1_x),
                                      unattached(train1_z),
                                     moveable(train1_z),available(train1_z)]) 
    ]).
-
-
-% 
 

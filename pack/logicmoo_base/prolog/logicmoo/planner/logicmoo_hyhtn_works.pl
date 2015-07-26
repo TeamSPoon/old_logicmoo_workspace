@@ -79,6 +79,7 @@ on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(objectsC
 on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache)],(objectsOfSort/2)).      % Used to store all objects of a sort
 on_call_decl_hyhtn :- decl_mpred_env_dom([stubType(dyn),kb(dom,cache) /*stubType(with_pred(bb_op(_)))*/],(related_op/2, gsubstate_classes/3, gsstates/3)).  
 
+on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)],(initial_state/1)). 
 on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache) /*stubType(with_pred(bb_op(_)))*/],(op_score/2)). 
 on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)/*stubType(rec_db)*/],(node/5,final_node/1)).
 on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)],(tp_goal/3,closed_node/6,solved_node/2, goal_related_search/1)). 
@@ -156,8 +157,8 @@ term_alias(startOCL,start).
 
 
 get_tasks(B, C, D) :-
-        show_call(get_env_ctx(A)),
-        if_defined(get_tasks(A, B, C, D)).
+        % show_call(get_env_ctx(A)),!,
+        if_defined(get_tasks(_A, B, C, D)).
 
 
 tasks:- 
@@ -263,7 +264,7 @@ run_tests(Call) :-
 run_header_tests :- run_tests(forall(clause(header_tests,G),run_tests(G))).
 
 
-
+:-export(test_ocl/1).
 test_ocl(File):- forall(filematch(File,FM),test_ocl0(FM)).
 test_ocl0(File):- time(with_assertions(thlocal:doing(test_ocl(File)), 
    once((env_clear_doms_and_tasks,clean_problem,l_file(File),tasks)))).
@@ -292,6 +293,7 @@ planner_failure(Why,Info):-dmsg(error,Why-Info),banner_party(error,'FAILURE_PLAN
 :-thread_local thlocal:doing/1.
 
 statistics_runtime(CP):-statistics(runtime,[_,CP0]), (CP0==0 -> CP= 0.0000000000001 ; CP is (CP0/1000)) .  % runtime WAS process_cputime
+statistics_walltime(CP):-statistics(walltime,[_,CP0]), (CP0==0 -> CP= 0.0000000000001 ; CP is (CP0/1000)) .  % runtime WAS process_cputime
 
 
 
@@ -340,8 +342,10 @@ incr_op_num:- flag(op_num,X,X+1).
 set_op_num(X):-flag(op_num,_,X).
 current_op_num(X):- flag(op_num,X,X).
 
-get_tasks(N,Goal,State):- env_call htn_task(N,Goal,State).
+
+get_tasks(N,Goal,State):- ocl:htn_task(N,Goal,State).
 get_tasks(N,Goal,State):- env_call planner_task(N,Goal,State).
+% get_tasks(N,Goal,State):- if_defined(htn_task(N,Goal,State)).
 
 :- set_op_num(0).
 :-asserta(my_stats(0)).
@@ -362,8 +366,7 @@ solve(Id) :-
 show_result_and_clean(F,Id,Sol,TNLst):-
    must(solution_file(F)),
 	tell(F),
-	write('TASK '),write(Id),nl,
-	write('SOLUTION'),nl,
+	format('~NSOLUTION for TASK ~w~n',[Id]),
 	display_sol(Sol),
         write_out_test_data('.preClean',Id),
 	write('END FILE'),nl,nl,
@@ -408,6 +411,7 @@ clean_problem:-
       env_retractall(temp_assertIndivConds(_)),
       env_retractall(opParent(_,_,_,_,_,_)),
       env_retractall(operatorC(_,_,_,_,_)),
+      env_retractall(initial_state(_)),
       env_retractall(objectsOfSort(_,_)),
       env_retractall(objectsD(_,_)),
       env_retractall(objectsC(_,_)),
@@ -439,25 +443,85 @@ clean_problem:-
 	% retractall(my_stats(_)),assert(my_stats(0)),
 	set_op_num(0).
 
-to_ssify(_,G,G):- ( \+ compound(G)),!.
-to_ssify(SS,G,GG):- is_list(G),!,must_maplist(to_ssify(SS),G,GG),!.
-to_ssify(_,ss(S,X,L),ss(S,X,L)):-!.
+
+compare_on_arg(N,Comp,A1,A2):-arg(N,A1,Obj1),arg(N,A2,Obj2),compare(Comp1,Obj1,Obj2),
+   (Comp1== (=) -> compare(Comp,A1,A2) ; Comp=Comp1).
+
 to_ssify(_,goal(S,X,L),goal(S,X,L)):-!.
-to_ssify(_,sc(S,X,L),sc(S,X,L)):-!.
-to_ssify(_,se(S,X,L),se(S,X,L)):-!.
-to_ssify(SS,G,GGG):-must_det_l((get_one_isa(S,X,[G]),GG=..[SS,S,X,[G]],do_ss(GG,GGG))).
+to_ssify(SS,G,GGG):-must(is_list(G)),!,must_maplist(to_ssify0(SS),G,GG),predsort(compare_on_arg(2),GG,GGS),must(merge_ss2s(GGS,GGG)),!.
+
+to_ssify0(_,G,G):- ( \+ compound(G)),!.
+to_ssify0(SS,G,GG):- is_list(G),!,must_maplist(to_ssify0(SS),G,GG),!.
+to_ssify0(_,ss(S,X,L),ss(S,X,L)):-!.
+to_ssify0(_,goal(S,X,L),goal(S,X,L)):-!.
+to_ssify0(_,sc(S,X,L),sc(S,X,L)):-!.
+to_ssify0(_,se(S,X,L),se(S,X,L)):-!.
+to_ssify0(SS,G,GGG):-must_det_l((get_one_isa(S,X,[G]),GG=..[SS,S,X,[G]],do_ss(GG,GGG))).
+
+merge_ss2s([],[]).
+% merge_ss2s([G1,G2|GG],GGG):- do_ss, G1=..[SS,L1],G2=..[SS,L2],get_one_isa(_,Obj,L1),get_one_isa(_,Obj1,L2),Obj==Obj1, must_det_l((append(L1,L2,LL),list_to_set(LL,LS),G=..[SS,LS], merge_ss2s([GG|GG],GGG))).
+
+merge_ss2s([G1,G2|GG],GGG):- must(\+ is_list(G1)),
+  once(must_det_l((G1=..[SS,S,Obj,L1],arg(2,G2,Obj1)))),Obj==Obj1,!,
+  must_det_l((arg(3,G2,L2),append(L1,L2,LL),list_to_set(LL,LS),G=..[SS,S,Obj,LS],
+  merge_ss2s([G|GG],GGG))).
+merge_ss2s([G|GG],[G|GGG]):-
+  merge_ss2s(GG,GGG).
 
 
 init_locl_planner_interface(G,I,Node):-   
   with_assertions(thlocal:db_spy,
      init_locl_planner_interface0(G,I,Node)).
 
+assert_itital_state(I0):- is_list(I0),!, must_maplist(assert_itital_state,I0),!.
+assert_itital_state(sc(S,X,List)):- !,must(assert_itital_state(List)),must(assert_itital_state(is_of_sort(X,S))),!.
+assert_itital_state(ss(S,X,List)):- !,must(assert_itital_state(List)),must(assert_itital_state(is_of_sort(X,S))),!.
+assert_itital_state(is_of_sort(X,S)):- ground(X:S),env_assert(is_of_sort(X,S)).
+assert_itital_state(I0):- env_assert(initial_state(I0)).
+
+get_inital_state_preds0(G,[]):- (\+compound(G)),!.
+get_inital_state_preds0([],[]):-!.
+get_inital_state_preds0([G1|G2],L):- !,get_inital_state_preds0(G1,L1),get_inital_state_preds0(G2,L2),append(L1,L2,L).
+get_inital_state_preds0(ss(_,_,G),L):- !,get_inital_state_preds0(G,L).
+get_inital_state_preds0(sc(_,_,G),L):- !,get_inital_state_preds0(G,L).
+get_inital_state_preds0(se(_,_,G),L):- !,get_inital_state_preds0(G,L).
+get_inital_state_preds0(G,L):- G=..[F,_,_|GL], arg(_,v(ss,sc,se),F),!,get_inital_state_preds0(GL,L).
+get_inital_state_preds0(G,L):- G=..[F,_|GL], arg(_,v(operator,method,substate_classes,se),F),!,get_inital_state_preds0(GL,L).
+get_inital_state_preds0(G,L):- G=..[F|GL], arg(_,v(goal,initial_state,implied_invariant,inconsistent_constraint,(=>),achieve,predicates),F),!,get_inital_state_preds0(GL,L).
+get_inital_state_preds0(G,[F/A]):-functor(G,F,A).
+   
+get_inital_state_preds(Hints,L):-   
+   findall(G1,
+      (member(F/A,[initial_state/1,operator/4,method/6,substate_classes/3,
+         predicates/1,implied_invariant/2,inconsistent_constraint/1]),
+       functor(G1,F,A),
+       env_call(G1)),LS),
+   get_inital_state_preds0([Hints|LS],UL),list_to_set(UL,L).
+   
+
+env_call_if_defined(P):-catch((env_call P),_,fail).
+
+get_inital_state(G,I0):-
+   get_inital_state_preds(G,SP),
+   findall(S,(member(F/A,SP),functor(S,F,A),(if_defined(S,env_call_if_defined(S));env_call(initial_state(S)))),EL),
+   must(to_ssify(ss,EL,I0)).
+   
+
 :-export(init_locl_planner_interface0/3).
 
-init_locl_planner_interface0(G0,I0,Node):-
+init_locl_planner_interface0(G0,I0,Node):-!,init_locl_planner_interface2(G0,I0,Node).
+init_locl_planner_interface0(G0,I0,Node):- must_maplist(assert_itital_state,I0),
+   must(init_locl_planner_interface1(G0,Node)).
+
+init_locl_planner_interface1(G0,Node):-
+    must_det_l((get_inital_state(G0,I0),init_locl_planner_interface2(G0,I0,Node))).
+  
+init_locl_planner_interface2(G0,I0,Node):-
   must_det_l((
-              show_call(to_ssify(se,G0,G)),
-              show_call(to_ssify(ss,I0,I)),
+              to_ssify(se,G0,G),
+              to_ssify(ss,I0,I),
+              wdmsg((goals:-G)),
+              wdmsg((input:-I)),
         change_obj_list(I),
 	ground_op,
 	assert_is_of_sort,
@@ -465,6 +529,7 @@ init_locl_planner_interface0(G0,I0,Node):-
 	prim_substate_class,
         set_op_num(0),
         statistics_runtime(Time),
+        statistics_walltime(_),
         write_out_test_data('.setup',Id),       
         ignore(retract(my_stats(_))),
         assert(my_stats(Time)),
@@ -512,10 +577,12 @@ start_solve(Sol,OPNUM,TNList):-
    statics_consist(Statics),
    extract_solution(Node,Sol,SIZE,TNList),
    statistics_runtime(CP),
-   TIM is CP/1000, tell(user),
+   statistics_walltime(TIM),
+   tell(user),
    flag(op_num,OPNUM,0),
-   nl, nl, write('CPU Time = '),write(CP),nl,
-   write('TIME TAKEN = '),write(TIM),
+   nl, nl, 
+   write('CPU Time = '),write(CP),nl,
+   write('WALL Time = '),write(TIM),
    write(' SECONDS'),nl,
    write('Solution SIZE = '),write(SIZE),nl,
    write('Operator Used = '),write(OPNUM),nl,
@@ -1038,12 +1105,12 @@ combine_exp_steps(Post,Steps,step(HP,achieve(Goal),Pre,Post,exp(TN))):-
 % get the temperal from an ordered steps
 get_action_list([],ACTls,ACTls):-!.
 get_action_list([step(HP,_,_,_,_)|Steps],List,ACTls):-
-    append_cut(List,[HP],List1),
+    append_dcut(List,[HP],List1),
     get_action_list(Steps,List1,ACTls),!.
 
 make_temp([HP|[]],Temp,Temp):-!.
 make_temp([HP1|[HP2|Rest]],List,Temp):-
-    append_cut(List,[before(HP1,HP2)],List1),
+    append_dcut(List,[before(HP1,HP2)],List1),
     make_temp([HP2|Rest],List,Temp),!.
 
 existing_node(Post,_Statics):-
@@ -1369,10 +1436,10 @@ assert_related_states21(A,Pre,[],ST):-!.
 assert_related_states21(A,Pre,[sc(Sort,Obj,SE=>SS)|Trans],ST):-
    rem_statics([se(Sort,Obj,SE)],[se(Sort,Obj,SER)],St1),
    rem_statics([se(Sort,Obj,SS)],[se(Sort,Obj,SSR)],St2),
-   append_cut(ST,St1,ST1),
-   append_cut(ST1,St2,ST21),
+   append_dcut(ST,St1,ST1),
+   append_dcut(ST1,St2,ST21),
    remove_unneed(ST21,[],ST2),
-   append_cut(Pre,[se(Sort,Obj,SER)],Pre1),
+   append_dcut(Pre,[se(Sort,Obj,SER)],Pre1),
    env_assert(produce(se(Sort,Obj,SSR),A,Pre1,ST2)),
    must(produce(se(Sort,Obj,SSR),A,Pre1,ST2)),
    assert_related_states21(A,Pre,Trans,ST),!.
@@ -1852,8 +1919,6 @@ sort_steps2(Steps,[HP|THPS],List,OrderedST):-
 
 % replace ss to se
 make_ss_to_se([],[]):-!.
-make_ss_to_se([ss(SS)|TPost],[se(SS)|TPre]):- do_ss_in_file,
-     make_ss_to_se(TPost,TPre),!.
 make_ss_to_se([ss(Sort,Obj,Post)|TPost],[se(Sort,Obj,Post)|TPre]):-
      make_ss_to_se(TPost,TPre),!.
 make_ss_to_se([se(Sort,Obj,Post)|TPost],[se(Sort,Obj,Post)|TPre]):-
@@ -1881,8 +1946,8 @@ change_op_representation :-
     get_preconditions(C1,B1,Pre,Post),
     rem_statics(Post, PostR,St1),
     rem_statics(Pre, PreR,St2),
-    append_cut(St1,St2,Statics),
-    append_cut(Stat,Statics,Statics1),
+    append_dcut(St1,St2,Statics),
+    append_dcut(Stat,Statics,Statics1),
     remove_unneed(Statics1,[],Statics2),
     get_achieval(A,Dec,T,Dec1,T1,ACH),
     env_assert(methodC(A,PreR,PostR,Statics2,T1,achieve(ACH),Dec1)),
@@ -1897,7 +1962,7 @@ change_op_representation :-
     get_preconditions(C1,B1,Pre,Post),
     rem_statics(Post, PostR,St1),
     rem_statics(Pre, PreR,St2),
-    append_cut(St1,St2,Statics1),
+    append_dcut(St1,St2,Statics1),
     remove_unneed(Statics1,[],Statics),
     statics_consist(Statics),
     env_assert(operatorC(A,PreR,PostR,D,Statics)),
@@ -2181,36 +2246,20 @@ split_prim_noprim([HS|TS],PS,[HS|NP]):-
 get_invariants(Invs) :-
     env_call(atomic_invariantsC(Invs)),!.
 
-get_one_isa(S,X,Preds):-member(is_of_sort(S,X),Preds).
+get_one_isa(S,X,Preds):- \+ is_list(Preds),!,get_one_isa(S,X,[Preds]).
+get_one_isa(S,X,Preds):-member(is_of_sort(X,S),Preds).
+get_one_isa(S,X,Preds):-member(ss(S,X,_),Preds).
+get_one_isa(S,X,Preds):-member(se(S,X,_),Preds).
 get_one_isa(S,X,Preds):-member(Pred,Preds),Pred=..[F|Args],functor(Pred,F,A),get_one_isa_fa(S,X,F,A,Args).
 
-ensure_predR(S,X,[is_of_sort(S,X)|PredR],[is_of_sort(S,X)|PredR]):-!.
-ensure_predR(S,X,PredR,[is_of_sort(S,X)|PredR]):-!.
-
-
 get_one_isa_fa(S,X,S,1,[X]):- is_sort(S).
-get_one_isa_fa(S,X,F,N,[X|_]):- functor(P,F,N),(env_call predicates(SS)),member(P,SS),arg(1,P,S),nonvar(S).
+get_one_isa_fa(S,X,_,_,[X|_]):- nonvar(X), is_decl_of_sort(X,S),!.
+get_one_isa_fa(S,X,F,N,[X|_]):- functor(P,F,N),(env_call predicates(SS)),member(P,SS),arg(1,P,S),S\== physical_obj, nonvar(S).
+
+is_decl_of_sort(X,S):- env_call is_of_sort(X,S).
+is_decl_of_sort(X,S):- env_call objects(S,L),member(X,L).
 
 is_sort(S):- (env_call sorts(_,SS)),member(S,SS).
-/*
-Why does this break it?
-rem_statics([sc(Lhs=>Rhs)|ST], [sc(LhsR=>RhsR)|STR],Rt1) :- do_ss_in_file, must(get_one_isa(S,X,Rhs);get_one_isa(S,X,Lhs)),!,
-    split_st_dy(Lhs,[],LR, [],LhsR),
-    split_st_dy(Rhs,[],RR,[],RhsR),
-    append_dcut(LR,RR,R),
-    rem_statics(ST, STR,Rt),
-    append_dcut(Rt,[is_of_sort(X,S)|R],Rt1),!.
-
-rem_statics([ss(Preds)|Post], [ss(PredRO)|PostR],Rt1) :- do_ss_in_file, must(get_one_isa(S,X,Preds)),
-    split_st_dy(Preds,[],R, [],PredR),
-    rem_statics(Post, PostR,Rt),ensure_predR(S,X,PredR,PredRO),
-    append_dcut(Rt,[is_of_sort(X,S)|R],Rt1),!.
-rem_statics([se(Preds)|Post], [se(PredRO)|PostR],Rt1) :- do_ss_in_file, must(get_one_isa(S,X,Preds)),
-    split_st_dy(Preds,[],R, [],PredR),
-    rem_statics(Post, PostR,Rt),ensure_predR(S,X,PredR,PredRO),
-    append_dcut(Rt,[is_of_sort(X,S)|R],Rt1),!.
-*/
-
 
 rem_statics([sc(S,X,Lhs=>Rhs)|ST], [sc(S,X,LhsR=>RhsR)|STR],Rt1) :-
     split_st_dy(Lhs,[],LR, [],LhsR),
@@ -2249,22 +2298,12 @@ member_e(X,[Y|_]):-
 member_e(X,[Y|L]):-
      var(Y),
      member_e(X,L),!.
-/*
 member_e(ss(Sort,Obj,SE),[ss(Sort,Obj1,SE)|_]):-
      Obj==Obj1,!.
 member_e(se(Sort,Obj,SE),[se(Sort,Obj1,SE)|_]):-
      Obj==Obj1,!.
 member_e(sc(Sort,Obj,SE1=>SE2),[sc(Sort,Obj1,SE1=>SE2)|_]):-
      Obj==Obj1,!.
-*/
-/*
-MAYBE
-member_e(ss([A|SE]),[ss([B|SE])|_]):- do_ss_in_file,
-     arg(1,A,Obj),arg(1,B,Obj1),Obj==Obj1,!.
-member_e(se([A|SE]),[sc([B|SE])|_]):- do_ss_in_file,
-     arg(1,A,Obj),arg(1,B,Obj1),Obj==Obj1,!.
-*/
-
 member_e(X,[Y|L]):- member_e(X,L),!.
 
 
@@ -2288,6 +2327,7 @@ obj_member0(X,[_|Y]) :- obj_member0(X,Y),!.
 
 
 % check if a predicate is a member of a ground predicate list,
+% 1. when only one predicates found
 % just used in binding the predicates to a sort without instantiate it
 % for efficiency, instantiate the variable if the list only have one atom
 pred_member(X,List):-
@@ -2330,15 +2370,15 @@ statics_append0(H,[X|Z],L1,L):-
 append_dcut([],L,L):-!.
 append_dcut([H|T],L,[H|Z]) :- append_dcut(T,L,Z),!.
 
-append_cut([],L,L) :- !.
-append_cut([H|T],L,[H|Z]) :- append_cut(T,L,Z),!.
+
+
 
 % append_st: append_dcut two statics
 % remove the constants that no need
 % instanciate the viables that all ready been bind
 % ------------------------------------------
 append_st(ST1,ST2,ST):-
-    append_cut(ST1,ST2,ST0),
+    append_dcut(ST1,ST2,ST0),
     remove_unneed(ST0,[],ST),!.
 
 % remove the constants that no need
@@ -2413,7 +2453,7 @@ is_equal_list1([Head1|List1],[Head2|List2]):-
     is_equal_list1(List1,List2),!.
 is_equal_list1([Head1|List1],List2):-
     member(Head1,List2),
-    append_cut(List1,[Head1],List10),
+    append_dcut(List1,[Head1],List10),
     is_equal_list1(List10,List2),!.
 
 % two states or lists are different
@@ -2449,7 +2489,7 @@ set_append([A|B], Z, [A|C]) :-
 % no duplicate, no instanciation
 % ------------------------------------------
 set_append_e(A,B,C):-
-    append_cut(A,B,D),
+    append_dcut(A,B,D),
     remove_dup(D,[],C),!.
 
 % remove duplicate
@@ -2542,10 +2582,10 @@ pprint([HS|TS],Size0,SIZE):-
 split_st_dy([],ST,ST,DY,DY):-!.
 split_st_dy([Pred|TStates],ST0,ST,DY0,DY):-
   is_statics(Pred),
-  append_cut(ST0,[Pred],ST1),
+  append_dcut(ST0,[Pred],ST1),
   split_st_dy(TStates,ST1,ST,DY0,DY),!.
 split_st_dy([Pred|TStates],ST0,ST,DY0,DY):-
-  append_cut(DY0,[Pred],DY1),
+  append_dcut(DY0,[Pred],DY1),
   split_st_dy(TStates,ST0,ST,DY1,DY),!.
 
 % list of lists -> list
@@ -2647,7 +2687,7 @@ stoppoint.
 state_related(Post,Cond,undefd):-!.
 state_related(Post,Cond,[]):-!.
 state_related(Post,Cond,State2):-
-     append_cut(Post,Cond,State1),
+     append_dcut(Post,Cond,State1),
      state_related(State1,State2).
 
 % all states in necc are primitive
