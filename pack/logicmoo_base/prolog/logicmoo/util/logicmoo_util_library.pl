@@ -59,17 +59,6 @@ logicmoo_util_library:-module(logicmoo_util_library,
 :- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was_lib(WAS)).
 :- set_prolog_flag(double_quotes,string).
 
-:- meta_predicate(if_file_exists(:)).
-if_file_exists(M:Call):- arg(1,Call,File),(filematch(File,_)-> must((filematch(File,X),exists_file(X),call(M:Call)));fmt(not_installing(M,Call))),!.
-
-:- meta_predicate(with_filematch(0)).
-with_filematch(G):- expand_wfm(G,GG),!,GG.
-with_filematches(G):- forall(expand_wfm(G,GG),GG).
-
-expand_wfm(G,GG):- must((sub_term(Sub, G),compound(Sub),Sub=wfm(F))),
-   (filematch(F,M),subst(G,wfm(F),M,GG),y_must(with_filematch(G), (G\=@=GG))).
-
-
 
 :- ensure_loaded(logicmoo_util_bugger_new).
 :- ensure_loaded(logicmoo_util_bugger_catch).
@@ -171,7 +160,9 @@ list_to_conjuncts(OP,[H|T],Body):-!,
     conjoin_op(OP,HH,TT,Body).
 list_to_conjuncts(_,H,H).
 
-
+conjoin(Var,B,(Var,B)):-var(Var),!.
+conjoin(B,Var,(B,Var)):-var(Var),!.
+conjoin((A1,A),B,(A1,C)):-!,conjoin(A,B,C).
 conjoin(A,B,C):-conjoin_op((,),A,B,C).
 
 %= conjoin_op(OP,+Conjunct1,+Conjunct2,?Conjunction).

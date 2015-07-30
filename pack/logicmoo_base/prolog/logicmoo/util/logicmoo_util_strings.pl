@@ -68,6 +68,7 @@
 
    ]).
 
+:- user:ensure_loaded((logicmoo_util_filestreams)).
 
 :- use_module(library(check)).
 % :- use_module(library(check),[check:string_predicate/1]).
@@ -188,8 +189,11 @@ term_to_string(I,IS):- grtrace(term_to_atom(I,A)),string_to_atom(IS,A),!.
 
 :-multifile(user:package_path/2).
 
+:- meta_predicate(if_file_exists(:)).
+if_file_exists(M:Call):- arg(1,Call,File),(filematch(File,_)-> must((filematch(File,X),exists_file(X),call(M:Call)));fmt(not_installing(M,Call))),!.
+
 :- use_module(library(url)).
-:- use_module(library(http/http_open)).
+:- if_file_exists(use_module(library(http/http_open))).
 :- use_module(library(http/http_ssl_plugin)).
 
 file_to_stream_ssl_verify(_SSL, _ProblemCert, _AllCerts, _FirstCert, _Error) :- !.
@@ -726,6 +730,7 @@ to_word_list_0([A],[A]):-number(A),!.
 to_word_list_0(E,[]):-empty_str(E),!.
 %to_word_list_0(A,WList):- string(A),Final=" (period) ",replace_periods(A,Final,S),not(A=S),!,to_word_list_0(S,WList),!.
 to_word_list_0([A|C],[A|C]):- (compound(A);catch((text_to_string([A|C],_),fail),_,true)),!.
+to_word_list_0([A|C],[A|C]):- string(A),!.
 to_word_list_0(A,WList):-any_to_string(A,String),!,text_to_string(String,Atom),to_word_list_2(Atom,WList),!.
 
 
