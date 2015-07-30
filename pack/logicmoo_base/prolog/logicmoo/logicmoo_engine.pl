@@ -1137,6 +1137,19 @@ defunctionalize(Wff,WffO):-defunctionalize(',',Wff,WffO).
 defunctionalize(OP,Wff,WffO):- call_last_is_var(defunctionalize(OP,Wff,WffO)).
 defunctionalize(_ ,Wff,Wff):- leave_as_is(Wff),!.
 defunctionalize(_ ,Wff,Wff):- non_compound(Wff),!.
+
+defunctionalize(OP,Wff,WffO):- compound(Wff),
+  each_subterm(Wff,SubTerm),
+  compound(SubTerm),
+  not(is_ftEquality(SubTerm)),
+  not(leave_as_is(SubTerm)),
+  arg(_,SubTerm,Function),is_function(Function),
+  subst_except(SubTerm,Function,NewVar,NewSubTerm),
+  show_call(must(function_to_predicate(Function,NewVar,PredifiedFunction))),
+  subst_except(Wff,SubTerm,NewSubTerm,NextWff),!,
+  defunctionalize(OP,NextWff,WffM),!,
+  WffO=..[OP,PredifiedFunction,WffM].
+
 defunctionalize(OP,Wff,WffO):- compound(Wff),
   each_subterm(Wff,SubTerm),
   compound(SubTerm),
@@ -1486,9 +1499,35 @@ save_wfs(Why,PrologI):- must_det_l((thglobal:as_prolog(PrologI,Prolog),
    pfc_add_h(save_in_code_buffer,Why,Prolog)))).
 
 neg_h_if_neg(H,HH):-subst_except(H,not,~,HH).
-neg_b_if_neg(H,HH):-subst_except(H,not,~,HH).
+neg_b_if_neg(W,B,BBB):-subst_except(B,not,~,BB),sort_body(W,BB,BBB).
 
-pfc_add_h(How,Why,(H:- B)):- neg_h_if_neg(H,HH), neg_b_if_neg(B,BB),!,call(How,Why,(HH:-BB)).
+sort_body(W,BB,BBB):-sort_body_0(W,BB,BBB),(BBB=@=BB->true;dmsg(sort_body('=>',BB,BBB))).
+
+sort_body_0(_,SORTED,SORTED):-leave_as_is(SORTED).
+sort_body_0(W,(A,B),SORTED):-!,conjuncts_to_list((A,B),List),predsort(lit_varcost(W),List,SortedL),list_to_conjuncts(SortedL,SORTED).
+sort_body_0(W,(A,B),SORTED):-
+   sort_body_0(W,A,AS),AS\=@=A,!,
+   conjoin(AS,B,C),
+   sort_body_0(W,C,SORTED).
+sort_body_0(W,(B,A),SORTED):-
+   sort_body_0(W,A,AS),AS\=@=A,!,
+   conjoin(B,AS,C),
+   sort_body_0(W,C,SORTED).
+sort_body_0(W,(A,B),SORTED):- 
+   var_count(W,A,AC),var_count(W,B,BC),AC>BC,!,
+   conjoin(B,A,C),sort_body_0(W,C,SORTED).
+sort_body_0(_,SORTED,SORTED).
+
+lit_varcost(_,=,A,B):- A=@=B,!.
+lit_varcost(W,Comp,A,B):-var_count(W,A,AC),var_count(W,B,BC),compare(CompC,AC,BC),
+  (CompC\== (=) -> CompC = Comp ; Comp = (<)).
+
+var_count(_,A,9):-isSlot(A).
+var_count(W,~A,AC):-!,var_count(W,A,AC0),!,AC is AC0+1.
+var_count(W,A,AC):-
+  term_singletons(W+A,Singles),term_singletons(A,SinglesA),length(Singles,SC),length(SinglesA,C),AC is SC*2+C.
+
+pfc_add_h(How,Why,(H:- B)):- neg_h_if_neg(H,HH), neg_b_if_neg((H:- B),B,BB),!,call(How,Why,(HH:-BB)).
 pfc_add_h(How,Why,(H)):- neg_h_if_neg(H,HH), call(How,Why,(HH)).
 
 save_in_code_buffer(_ ,HB):- thlocal:in_code_Buffer(HB,_),!.
@@ -1928,7 +1967,11 @@ kif_test(X):-kif_tell(X).
 %       not_argInst(has, 1, A):- not_has(A, B), wearing(A, B), argInst(has, 2, B).   % notice we can disprove types
 %
 %       not_argInst(has, 2, A):- not_has(B, A), wearing(B, A), argInst(has, 1, B).
+
+
 %
+/*
+
 
 :-kif_test(has(A,B) => (argInst(has, 1, A) & argInst(has, 2, B))).
 
@@ -2020,3 +2063,6 @@ user:sanity_test:- logicmoo_example3.
 
 user:regression_test:- logicmoo_example3.
 
+:- if(gethostname(ubuntu)).
+:- prolog.
+:- endif.

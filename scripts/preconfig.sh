@@ -4,10 +4,18 @@ export NEWPWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )"
 export APTGET="sudo apt-get -o Acquire::ForceIPv4=true "
 
 $APTGET install python-software-properties
-sudo apt-add-repository -y ppa:swi-prolog/devel
+
+if which swipl >/dev/null; then
+   echo swi-prolog exists 
+else
+   sudo apt-add-repository -y ppa:swi-prolog/stable
+   $APTGET update
+   $APTGET install swi-prolog
+fi
+
 sudo add-apt-repository -y ppa:webupd8team/java
 $APTGET update
-$APTGET install swi-prolog oracle-java8-installer
+$APTGET install oracle-java8-installer
 
 echo select java 8
 sudo update-alternatives --config java
