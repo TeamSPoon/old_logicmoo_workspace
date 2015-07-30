@@ -1,0 +1,57 @@
+\ \\
+\ \\
+\label{pagsumm}
+\noindent{\LARGE \sc Abstract}\\
+\ \\
+\ \\
+
+\ \\
+
+\ \\
+\ \\
+
+The researched topic in this work is related to the continuous
+planning using specifications written in the Planning Domain Definition
+Language named PDDL. 
+The objetive is to implement a traslator of a PDDL language subset 
+in order to allow that the Continuous Planning Framework (also, it is introduced
+here) supports PDDL features. This approach is relevant because 
+supposes combining the expressiveness of PDDL standard language with a
+continuous planner that try to solve problems in real environments.  
+We hope to reach a high-level abstraction in order to define more
+complex domains and to compare the performance with other solutions for the
+same problem.
+
+The continuous planner language is STRIPS. This formalism allows
+modeling simple actions using precondition and effect lists. Also,
+each list is a conjunction of propositions. Particulary, PDDL is more 
+expressive than STRIPS because it provides other features defining
+expressiveness levels and allowing to enrich the definition of domains and
+problems of planning.
+
+Based on the above, it is necessary to try with more expressive languages in order to model
+actions in real environments. Nevertheless, this implies to work with
+more complex algorithms too. Then, a trade-off between
+complexity and expressiveness is important.
+ 
+This thesis presents a translator implemented in Ciao Prolog of a 
+PDDL subset with a\-ddi\-tio\-nal features. This subset defines the
+source language of translator and its output is a
+STRIPS-like notation. This output allows adapting the translator to different planning 
+algorithms as the Continuous Planner. 
+
+The research also presents other two theorical results. First, the
+architecture of Planning Continuous Framework is redefined. After, a
+new STRIPS variant with universal preconditions is presented. In the
+last result, actions defined in this variant could be translated to
+STRIPS preserving results for both specifications. This result
+together with other compilation squemes are used in the translator
+implementation.
+
+The experimentation on the implementation has been done on different 
+instances of the ``Blocks World'' problem (a classic problem of
+Artificial Intelligence bibliography). Each instance of this problem is modeled in PDDL by using
+different features. 
+
+\vfill
+\pagebreak

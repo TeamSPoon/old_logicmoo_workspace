@@ -1,0 +1,117 @@
+\documentclass[11pt,a4paper,spanish]{book}
+\usepackage[a4paper,left=3cm,right=2cm,top=3cm,bottom=2cm]{geometry}
+\usepackage[pdftex]{graphicx}
+%\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{natbib}
+
+%\usepackage[colorlinks=true,linkcolor=black,citecolor = blue, urlcolor= blue, breaklinks=true, naturalnames=true]{hyperref}
+\usepackage[colorlinks=true,linkcolor=black,citecolor = black, urlcolor= blue, breaklinks=true, naturalnames=true]{hyperref}
+\usepackage{breakurl} 
+\usepackage{url}
+\usepackage{float}
+%\usepackage{listings}
+\usepackage{color}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+\newcounter{contejemplos} %contador de ejemplos
+\newcounter{contdefiniciones} %contador de definiciones
+\newcounter{contproposiciones} %contador de proposiciones
+
+\definecolor{colorejemplo}{rgb}{0.8,0.85,1} %color para fondo de ejemplos
+
+%\newenvironment{ejemplo}[1]{\begin{flushleft}
+%    \refstepcounter{contejemplos} \textbf{Ejemplo
+%      \arabic{contejemplos}: }\emph{#1}\newline}{\end{flushleft}
+%  \normalsize} %ambiente ejemplos
+
+%\newenvironment{ejemplo}[1]{\begin{quote}
+%   \refstepcounter{contejemplos} \textbf{Ejemplo
+%      \arabic{contejemplos}: }\emph{#1}\newline}{\end{quote}
+ % \normalsize} %ambiente ejemplos
+
+\newtheorem{definition}{Definici\'on}[section]
+
+\newtheorem{proposition}{Proposici\'on}[section]
+
+\newtheorem{teorema}{Teorema}[section]
+
+\newtheorem{corolario}{Corolario}[section]
+
+\newtheorem{demo}{Demostraci\'on}[section]
+
+%\theoremstyle{plain}
+%\theorembodyfont{\normalfont}
+\newtheorem{ejemplo}{Ejemplo}[section]
+
+
+\begin{document}
+
+\renewcommand{\tablename}{Tabla}
+\renewcommand{\listtablename}{\'Indice de tablas}
+
+%Empieza la numeracin en nmeros romanos
+\frontmatter
+% Incluimos la cartula
+\input{caratula}
+
+
+% Incluimos la pgina de prefacio.
+\input{prefacio}
+
+% Incluimos la pgina de dedicatorias. Esta pgina es opcional.
+% Si la pgina no quiere ser incluida anteponga el smbolo "%" al comienzo de la siguiente lnea
+\input{dedicatoria}
+
+
+% Incluimos la pgina de agradecimientos. Esta pgina es opcional.
+% Si la pgina no quiere ser incluida anteponga el smbolo "%" al comienzo de la siguiente lnea
+\input{agradecimiento}
+
+% Incluimos la pgina de resumen
+\input{resumen}
+
+% Incluimos la pgina de resumen en ingls
+\input{abstract}
+
+% Tabla de contenido o Indice del contenido
+\tableofcontents{}
+
+% Lista de figuras o Indice de figuras
+\listoffigures
+
+% Lista de tablas o Indice de Tablas
+%\listoftables
+
+%Empieza la numeracin en nmeros arbigos
+\mainmatter
+\input{cap1} %Intro
+\input{cap2} %PDDL
+\input{cap3} %Framework
+\input{cap4} %Implementaciones Existentes
+\input{cap5} %Traduccion
+\input{cap6} %Implementacion
+\input{cap7} %Conclusion
+
+%\bibliographystyle{alpha}
+%\bibliographystyle{base/abbrv}
+%\bibliographystyle{misc/chicagoa}
+%\bibliographystyle{misc/amsalpha}
+%\bibliographystyle{misc/apasoft}
+%\bibliographystyle{misc/aaai-named.bst}
+%\bibliographystyle{misc/alphanum}
+%\bibliographystyle{misc/ama}
+
+\bibliographystyle{plain}
+
+\bibliography{tesis}
+
+\vfill
+\pagebreak
+
+
+
+\end{document}

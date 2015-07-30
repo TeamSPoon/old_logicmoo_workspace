@@ -1,0 +1,135 @@
+
+\chapter{Introducci\'on} \label{pagcap1}
+
+Esta tesis aborda dos t\'opicos complementarios implicados en la
+resoluci\'on de problemas utilizando agentes inteligentes: la
+planificaci\'on continua y los lenguajes de representaci\'on de problemas.
+
+Russell y Norving \cite{gbraun:Rus09} definen a la planificaci\'on como la tarea de
+obtener una secuencia de acciones que pueden ser aplicadas a un
+conjunto discreto de estados para lograr una meta. Puntualmente, la
+planificaci\'on continua est\'a orientada a resolver problemas en
+ambientes din\'amicos y, por lo tanto, se encarga de atacar problemas en
+ambientes reales.
+
+La complejidad inherente a este tipo de planificaci\'on y a los ambientes
+reales, implica trabajar con otros lenguajes de
+representaci\'on de problemas. Un lenguaje de representaci\'on debe 
+permitir la definici\'on de estados, acciones y metas y, adem\'as, 
+posibilitar que los algoritmos de planificaci\'on puedan obtener 
+ventajas de la estructura l\'ogica de los problemas. Esta necesidad de un lenguaje con un poder expresivo mucho mayor que los existentes 
+hasta el momento, impuls\'o  el desarrollo de un novedoso lenguaje est\'andar llamado PDDL (\emph{Planning Domain Definition Language}) \cite{mder:pddl}. 
+PDDL es un lenguaje centrado en acciones y est\'a inspirado 
+en la formulaci\'on de problemas de planificaci\'on en STRIPS. La
+importancia de PDDL radica en el nivel de abs\-trac\-ci\'on y la
+expresividad para modelar dominios y problemas m\'as
+complejos. Adem\'as, trabajar con un lenguaje est\'andar permite
+realizar comparaciones de performance entre diferentes algoritmos planificadores.
+
+La principal motivaci\'on de esta investigaci\'on es dotar al Planificador Continuo,
+presentado por Moya en \cite{gbraun:tesisMarioMoya}, de un m\'odulo
+traductor del lenguaje PDDL con el objetivo de lograr que el sistema
+de creencias de un agente soporte percepciones y acciones
+especificadas en dicho len\-gua\-je. Esto nos posibilitar\'a combinar la
+expresividad de PDDL con el Planificador Continuo y modelar dominios
+de planificaci\'on con un nivel de abstracci\'on necesario en el trato
+con ambientes reales y din\'amicos.
+La presentaci\'on preliminar de esta investigaci\'on 
+fue publicada en \cite{gbraun:wicc2011}.
+
+Como uno de los resultados principales de esta tesis, se presenta un 
+m\'odulo traductor para un subconjunto del lenguaje PDDL cuyo lenguaje 
+destino es similar a STRIPS. La traducci\'on pro\-pues\-ta involucra un an\'alisis
+exhaustivo de PDDL y la definici\'on de esquemas de compilaci\'on que
+permitan obtener la representaci\'on STRIPS equivalente a las
+especificaciones PDDL de entrada. Adem\'as, se abordan diferentes
+variantes STRIPS, presentadas en la literatura de Inteligencia
+Artificial (IA), que surjen
+de la adici\'on de caracter\'isticas m\'as expresivas al STRIPS
+est\'andar. En este contexto te\'orico y como un resultado
+complementario de esta investigaci\'on, se formaliza 
+una nueva variante que involucra el uso de cuantificaci\'on universal.
+
+El traductor es implementado como una expansi\'on
+sint\'actica de Ciao Prolog. Esta soluci\'on ofrece una notaci\'on
+gen\'erica Prolog que permite adaptar el m\'odulo a diferentes
+planificadores cuyo lenguaje de representaci\'on sea similar a
+STRIPS. Para ilustrar los resultados obtenidos, se muestra el uso del 
+traductor en el dominio del ``Mundo de Bloques'' y c\'omo un
+planificador, cuyo lenguaje de representaci\'on es STRIPS, resuelve un problema especificado
+inicialmente en PDDL. 
+
+
+\section{Trabajos Relacionados}
+
+Algunos resultados preliminares han formado parte de las siguientes
+publicaciones:
+
+\begin{itemize}
+%\subsubsection{Publicaciones}
+%\noindent
+\item Braun, G., Moya, M. y Parra, G. 
+Sistemas Multiagentes en Ambientes Din\'amicos: Planificaci\'on Continua mediante PDDL. 
+En \emph{XIII Workshop de Investigaci\'on en Ciencias de la Computaci\'on}, Rosario, Santa F\'e. Universidad Nacional de
+Rosario. 2011.
+
+%\subsubsection{Trabajos Presentados}
+%\noindent
+\item Braun, G. y Parra, G. Multiagent Systems in Dynamic Environments: Continuous Planning using PDDL. 
+Enviado a las \emph{41 Jornadas Argentinas de Inform\'atica}, La Plata, Buenos Aires. Universidad Nacional de La
+Plata. 2012.
+
+%Moya-Vaucheret 1
+\item Moya, M. y Vaucheret, C. Agentes Deliberativos Basados en Planficaci\'on Continua. 
+En \emph{X Workshop Agentes y Sistemas Inteligentes (WASI)}, S.S.
+de Jujuy. Universidad Nacional de Jujuy. Facultad de Ingeniería. 2009.
+
+%Moya-Vaucheret 2
+\item Moya, M. y Vaucheret, C. Planificador Continuo como Controlador de Agentes Robots. 
+En \emph{X Workshop de Investigadores en Ciencias de la Computaci\'on}, 
+General Pico, La Pampa, Argentina. Universidad Nacional de la
+Pampa. 2008.
+
+\end{itemize}
+
+
+\section{Estructura de la Tesis}
+
+En el cap\'itulo \ref{pagcap2} se presenta un an\'alisis del lenguaje PDDL,
+c\'omo ha sido su evoluci\'on y cu\'ales son sus caracter\'isticas m\'as
+relevantes. El cap\'itulo finaliza con una descripci\'on
+de los requerimientos del lenguaje considerados para ser implementados
+en el traductor propuesto.
+
+En el cap\'itulo \ref{pagcap3} se introduce el Framework de
+Planificaci\'on Continua, se analizan sus ca\-rac\-te\-r\'is\-ti\-cas
+principales y su implementaci\'on. Adem\'as, se concluye con la
+especificaci\'on de una nueva arquitectura para el framework.
+
+Las implementaciones existentes, hasta el momento de presentaci\'on de
+este trabajo, se de\-ta\-llan en el cap\'itulo \ref{pagcap4}. Para cada una de las tres
+implementaciones abordadas, se consideran las caracter\'isticas PDDL que
+soportan, el ambiente de programaci\'on en el que est\'an
+desarrolladas, la especificaci\'on del lenguaje de salida y las
+licencias correspondientes. En todos los casos, se remarcan las
+diferencias con nuestra propuesta.
+
+En el cap\'itulo \ref{pagcap5} se define el marco
+te\'orico subyacente, se estudian variantes de los lenguajes STRIPS y
+PDDL y se especifican esquemas de compilaci\'on que luego ser\'an 
+implementados en el traductor.
+
+Posteriormente, en el cap\'itulo \ref{pagcap6}, se detalla la
+arquitectura propuesta para el traductor de PDDL, se analizan los
+m\'odulos principales de la implementaci\'on y se concluye con un ejemplo de aplicaci\'on en
+Ciao Prolog.
+
+Por \'ultimo, en el cap\'itulo \ref{pagcap7}, se presentan las
+conclusiones de esta tesis, sus resultados y contribuciones y
+se proponen algunas ideas para trabajos futuros.
+
+
+
+
+
+

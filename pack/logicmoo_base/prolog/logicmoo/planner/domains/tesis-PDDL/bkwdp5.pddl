@@ -1,0 +1,19 @@
+(define(domain attbw)
+  (:requirements :strips :equality :disjuntive-preconditions)
+  (:predicates (istable ?t)
+	       (block ?b)
+	       (clear ?x)
+	       (on ?x ?y))
+
+  (:constants table)
+  
+  (:action move
+   :parameters (?obj ?source ?dest)
+        :precondition (and (or (istable ?dest) (clear ?dest))
+                           (or (clear ?obj) (on ?obj ?source)))
+        :effect (and (clear ?source)
+		     (on ?obj ?dest)
+		     (not (on ?obj ?source))
+                     (not (clear ?dest)))
+    )
+)

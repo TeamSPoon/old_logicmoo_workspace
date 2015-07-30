@@ -1,0 +1,101 @@
+
+\chapter{Conclusiones} \label{pagcap7}
+
+El trabajo principal de esta tesis estuvo motivado por la necesidad de dotar
+al Framework de Planificaci\'on Continua de un m\'odulo traductor
+para el lenguaje PDDL. Este objetivo principal ha ido evolucionando durante el transcurso de
+este trabajo y, en consecuencia, nos ha 
+permitido tambi\'en concluir una serie de resultados te\'oricos y
+pr\'acticos complementarios a la implementaci\'on
+propuesta.
+
+La investigaci\'on realizada nos ha posibilitado
+implementar un traductor para un subconjunto
+de PDDL y, de esta manera, facultar a un agente para que pueda percibir y actuar mediante
+especificaciones en este lenguaje. Con este aporte, dicho agente puede disponer de un conjunto de acciones con
+el nivel de expresividad y abstracci\'on necesario para operar en ambientes m\'as
+complejos. Bajo este novedoso enfoque, es esperable poder abordar
+problemas de planificaci\'on sobre cualquier dominio real
+que requiera la intervenci\'on de agentes inteligentes. 
+
+La presente tesis comenz\'o, en el cap\'itulo \ref{pagcap2}, con un an\'alisis del lenguaje
+PDDL y sus caracter\'isticas principales. En el cap\'itulo siguiente, se present\'o el Framework de
+Planificaci\'on Continua desarrollado en \cite{gbraun:tesisMarioMoya}. Tambi\'en se
+estudi\'o el algoritmo de planificaci\'on continua implementado en
+dicho framework y se analiz\'o su lenguaje de representaci\'on. 
+Luego, en el cap\'itulo \ref{pagcap4}, se es\-tu\-dia\-ron algunas implementaciones existentes
+y se remarcaron las diferencias con respecto a nuestra propuesta. En el cap\'itulo \ref{pagcap5} se
+defini\'o el marco te\'orico subyacente introduciendo los conceptos de
+esquemas de compilaci\'on y compilabilidad. Adem\'as, se
+definieron y ejemplificaron algunas va\-rian\-tes PDDL que se mapearon a
+STRIPS mediante los esquemas de compilaci\'on correspondientes. Por \'ultimo, en el
+cap\'itulo \ref{pagcap6}, se analiz\'o la soluci\'on propuesta
+y se trabaj\'o sobre un ejemplo real a fin de ilustrar c\'omo escribir
+PDDL en Ciao Prolog y c\'omo planificar con estas especificaciones.
+
+
+\section{Resultados y Contribuciones}
+
+A continuaci\'on, resumimos los principales resultados y
+contribuciones de esta tesis.
+
+\begin{itemize}
+
+\item Se formaliz\'o y demostr\'o una nueva variante del lenguaje
+STRIPS llamada STRIPS$_{\emph{u}}$. Esta variante surge de adicionar cuantificaci\'on universal 
+a la definici\'on de precondiciones para las acciones del dominio de
+planificaci\'on. 
+
+\item Se enunciaron las dem\'as variantes de STRIPS: STRIPS$_{\emph{C}}$, STRIPS$_{D}$ y
+STRIPS$_{L}$ y se definieron notaciones equivalentes en PDDL que se denotaron
+PDDL$_{\emph{C}}$, PDDL$_{D}$ y PDDL$_{L}$, respectivamente. 
+Estas variantes de PDDL conforman el lenguaje fuente del traductor implementado.
+
+\item La abstracci\'on lograda, mediante las variantes de PDDL, posibilita
+la especificaci\'on de problemas de planificaci\'on complejos.
+
+\item El producto final consta de un m\'odulo traductor del lenguaje fuente
+definido hacia un lenguaje destino. La implementaci\'on ofrece una
+representaci\'on gen\'erica que permite adaptar este
+m\'odulo a otros planificadores cuyo lenguaje de representaci\'on
+tiene una estructura similar a STRIPS.
+
+\item En particular, la integraci\'on del m\'odulo traductor al
+Framework, presentado por Moya en \cite{gbraun:tesisMarioMoya}, 
+permite redefinir el sistema de creencias del agente de
+planificaci\'on continua. Esta nueva arquitectura posibilita la
+definici\'on, en PDDL, de las percepciones y las acciones del agente.
+
+\item El traductor es una expansi\'on sint\'actica para Ciao
+Prolog. Esta novedosa extensi\'on genera una representaci\'on STRIPS,
+con sintaxis Prolog, equivalente a una entrada
+especificada en un subconjunto del lenguaje PDDL. Hasta el momento de presentaci\'on de
+esta tesis, el sistema Ciao no ofrece ning\'un soporte para la
+manipulaci\'on del lenguaje PDDL.
+
+\end{itemize}
+
+\section{Trabajo Futuro}
+
+Esta primera etapa de la investigaci\'on abarca un subconjunto
+acotado del lenguaje PDDL. Se espera poder ampliar el lenguaje fuente
+de este traductor incluyendo otros requerimientos y definiendo los 
+esquemas de compilaci\'on asociados. De la misma manera, se espera poder
+realizar un an\'alisis m\'as exhaustivo de la complejidad de la
+implementaci\'on de manera tal que las traducciones propuestas tengan
+el menor impacto posible en la performance de los planificadores.
+
+Uno de los aspectos pendientes es la implementaci\'on de una
+interface para el Framework de Planificaci\'on
+Continua. Se espera poder aplicarlo a dominios reales y, por lo 
+tanto, es necesario realizar traducciones, en tiempo
+real, de las percepciones del agente.
+
+Finalmente, planteamos dos desaf\'ios. Por un lado, con el objetivo de 
+mejorar el traductor, proponemos la aplicaci\'on de otros conceptos 
+de Compiladores e Int\'erpretes, como la manipulaci\'on y
+recuperaci\'on de errores \cite{gbraun:Aho:2007}. Por \'ultimo,
+proponemos combinar el traductor con otros planificadores implementados
+en Ciao Prolog y realizar comparaciones de performance entre ellos.
+
+

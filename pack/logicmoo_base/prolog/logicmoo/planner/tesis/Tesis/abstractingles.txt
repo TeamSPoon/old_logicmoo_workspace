@@ -1,0 +1,27 @@
+The researched topic in this work is related to the continuous planning using PDDL specifications. The objetive is to implement a traslator of a PDDL language subset for the planning domains description. We hope that the continuous planning framework (also, it is introduced here) supports PDDL features. This would allow to define more complex problems with a high-level abstraction and to compare performances with other solutions for the same problem.
+
+To try with languages more complex than STRIPS has not been a trivial problem. PDDL is a language more expressive than STRIPS and includes capacity to define type structures, constraints, negative and disjuntive preconditions, conditional effects, universal preconditions and durative actions, between other features.
+
+This research presents a translator implemented in Ciao Prolog of a PDDL subset with the following requirements: strips, equality, conditional effects, disjuntive preconditions and universal preconditions. PDDL and these requirements belong to source language of translator.
+
+Target language defines a generic representation similar to STRIPS that allows to adapt this translator to different planning algorithms with other representation languages. Particulary, the translator target language is STRIPS together with equality and equality negation. Lastest features are... 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

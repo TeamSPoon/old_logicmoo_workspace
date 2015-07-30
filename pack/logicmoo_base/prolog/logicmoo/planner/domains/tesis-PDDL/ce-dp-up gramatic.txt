@@ -1,0 +1,57 @@
+<action-def> ::= (:action <action-symbol>
+			:parameters (<list (variable)>)
+			<action-def body>)
+
+<action-symbol>::= <name>
+
+<action-def body> ::=(:disjuntive-preconditions ([:precondition <emptyOr (pre-GD-OR)>] 
+							[:effect <emptyOr (effect)>])) |
+
+		     (:universal-preconditions ([:precondition <emptyOr (pre-GD-forall)>] 
+							[:effect <emptyOr (effect)>])) |
+
+		     ([:precondition <emptyOr (pre-GD)>] 
+				[:effect <emptyOr (conditional-effect)>])	
+
+
+<pre-GD> ::= <GD> <pre-GD>∗
+<pre-GD> ::= <GD>
+
+<pre-GD-OR>::= <GD-OR> <pre-GD-OR>∗
+<pre-GD-OR>::= <GD-OR>
+
+<pre-GD-forall>::= <GD-forall> <pre-GD-forall>∗
+<pre-GD-forall>::= <GD-forall>
+
+<GD-OR>::=:disjunctive−preconditions (or <GD-OR>∗)
+<GD-OR>::=:disjunctive−preconditions (not <GD-OR>)
+<GD-OR>::= <atomic formula(term)>
+<GD-OR>::= (and <GD-OR>∗)
+
+<GD-forall>::=:universal−preconditions (forall (<variable>) <GD-forall>)
+<GD-forall>::= <atomic formula(term)>
+<GD-forall>::= (and <GD-forall>∗)
+
+<GD>::= <atomic formula(term)>
+<GD>::= (and <GD>∗)
+
+<term>::= <name>
+<term>::= <variable>
+
+<effect>::= (and <effect>∗)
+<effect>::= <p-effect>
+
+<conditional-effect>::= (and <c-effect>∗)
+<conditional-effect>::= <c-effect>
+
+<c-effect>::=:conditional−effects (when <GD> <cond-effect>)
+<c-effect>::= <p-effect>
+
+<p-effect>::= (not <atomic formula(term)>)
+<p-effect>::= <atomic formula(term)>
+
+<cond-effect>::= (and <p-effect>∗)
+<cond-effect>::= <p-effect>
+
+
+

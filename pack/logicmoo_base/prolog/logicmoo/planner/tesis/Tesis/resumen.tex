@@ -1,0 +1,67 @@
+\ \\
+\ \\
+\label{pagresum}
+\noindent{\LARGE \sc Resumen}\\
+\ \\
+\ \\
+
+\ \\
+
+\ \\
+\ \\
+
+La tem\'atica que se investiga en este trabajo es la planificaci\'on
+continua mediante especificaciones en un lenguaje de
+definici\'on de dominios de planificaci\'on denominado PDDL. El objetivo es implementar
+un traductor de un subconjunto de este lenguaje a fin de que el
+Framework de Planificaci\'on Continua, tambi\'en presentado aqu\'i,
+pueda aprovechar las caracter\'isticas de PDDL. Este enfoque es
+relevante ya que plantea la posibilidad de combinar
+la expresividad de un lenguaje est\'andar, como PDDL, con un planificador continuo capaz de resolver 
+problemas en ambientes reales. Es esperable alcanzar un mayor nivel 
+de abstracci\'on para tratar dominios m\'as complejos y, adem\'as, realizar comparaciones emp\'iricas
+de performance con otras soluciones para un mismo problema.
+
+El lenguaje del Planificador Continuo, y uno de los lenguajes
+fundacionales de representaci\'on de problemas de planificaci\'on, es STRIPS. Este formalismo
+permite modelar acciones simples como listas de precondiciones y
+efectos. Adem\'as, cada lista es una conjunci\'on de proposiciones. 
+Por su parte, PDDL es un lenguaje sensiblemente m\'as
+expresivo que STRIPS. Este lenguaje prove\'e caracter\'isticas
+adicionales que definen varios niveles de
+expresividad permitiendo enriquecer la definici\'on de dominios y
+problemas de planificaci\'on. 
+
+En base a lo expuesto, se plantea la necesidad de tratar con lenguajes m\'as
+complejos con el objetivo de modelar acciones aplicables en ambientes
+reales. No obstante, esto resulta en un mayor
+costo computacional de los algoritmos al momento de resolver problemas
+de planificaci\'on y, por lo tanto, es importante encontrar un balance aceptable entre expresividad y complejidad.
+
+Este trabajo presenta un traductor, desarrollado en Ciao Prolog, de un
+subconjunto PDDL que soporta algunas de sus caracter\'isticas. El
+subconjunto conforma el lenguaje fuente del traductor y su salida
+consiste en una representaci\'on similar a STRIPS que permite adaptar este traductor a
+diferentes planificadores, entre ellos, al Planificador Continuo.
+
+La investigaci\'on tambi\'en presenta otros dos resultados te\'oricos. 
+La redefinici\'on de la arquitectura modular del Framework
+de Planificaci\'on Continua para soportar PDDL y 
+una nueva variante del lenguaje STRIPS para modelar acciones
+con cuantificaci\'on universal en sus precondiciones. 
+Sobre este \'ultimo resultado, tambi\'en introducimos un esquema de
+compilaci\'on que permite traducir las acciones, definidas 
+en esta variante, a STRIPS est\'andar. Adem\'as, esta traducci\'on conserva los resultados de 
+planificaci\'on que se obtienen con ambas especificaciones. 
+Este esquema, junto con otros esquemas de compilaci\'on enunciados, 
+son usados para el desarrollo del traductor propuesto.
+
+La experimentaci\'on sobre la implementaci\'on presentada se realiza sobre distintas
+instancias del dominio del ``Mundo de Bloques'' (un problema
+cl\'asico de la literatura de Inteligencia Artificial). Cada instancia de
+este problema es modelada en PDDL empleando las distintas
+ca\-rac\-te\-r\'is\-ti\-cas del subconjunto considerado.
+
+
+\vfill
+\pagebreak

@@ -1,0 +1,311 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% El Workshop de Investigadores en Ciencias de la Computacin es           %
+% organizado por la Red de Universidades Nacionales con Carreras de        %
+% Informtica (RedUNCI).                                                   %
+%                                                                          %
+% El objetivo del Workshop es permitir el intercambio de ideas entre       %
+% investigadores de modo de fomentar la vinculacin y potenciar el         %
+% desarrollo coordinado de actividades de Investigacin y Desarrollo       %
+% entre los mismos.                                                        %
+%                                                                          %
+% WICC 2010 se realizar en la ciudad de El Calafate, Santa Cruz, los      %
+% das 5 y 6 de mayo de 2010, organizado por la Facultad de Ingeniera     %
+% de la Universidad Nacional de la Patagonia San Juan Bosco (Sede          %
+% Ushuaia).                                                                %
+%                                                                          %
+% * Formato:                                                               %
+%   Lenguaje: castellano.                                                  %
+%   Tamao de papel: A4. Extensin mxima 5 hojas.                         %
+%   Mrgenes: superior 3 cm; inferior, derecho e izquierdo 2 cm.           %
+% * Formato del texto: Fuentes Times New Roman 12 para el                  %
+%   texto. Justificado a ambos mrgenes. Pginas sin numerar. El texto     %
+%   debe incluir el ttulo del trabajo, nombres de los autores, afiliacin %
+%   (incluyendo direccin electrnica).                                    %
+%   Presentacin final del documento en formato PDF.                       %
+%                                                                          %
+% Autores: Pablo Kogan, Gerardo Parra, Mario Moya.                         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,12pt,twocolumn]{article}
+\usepackage[a4paper,left=2cm,right=2cm,top=3cm,bottom=2cm]{geometry}
+\usepackage[latin1]{inputenc} 
+\usepackage[spanish]{babel}
+\usepackage{url} 
+\usepackage[colorlinks=true,linkcolor=black,citecolor = blue, urlcolor = blue]{hyperref}
+\usepackage{balance}
+
+\setlength{\columnsep}{1cm}
+
+%  Definicin de Palabras Clave
+\def\palabras{ 
+\mbox{{\boldmath $Palabras\;Clave$}{\bf: }}}
+%\emph{Palabras Clave}
+\def\endpalabras{\medskip\rm
+}
+
+
+\hyphenation{Co-ma-hue}
+\hyphenation{Par-ti-cu-lar-men-te}
+\hyphenation{me-ca-nis-mos}
+\hyphenation{pro-ble-mas}
+\hyphenation{in-te-rac-tuar}
+\hyphenation{do-mi-nios}
+
+
+\pagestyle{empty}
+\title{Sistemas Multiagentes en Ambientes Dinmicos: Planificacin Continua mediante PDDL}
+\author{
+     Germn Braun \and Mario Moya \and Gerardo Parra\\
+       }
+       
+\date{{\small email: {\tt \{germanbraun,moya.mario,gerardopar\}@gmail.com} }\\
+\vspace{0.5cm}  \emph{Grupo de Investigacin en Lenguajes e Inteligencia Artificial}\\
+    Departmento de Teora de la Computacin\\
+        Facultad de Informtica\\
+{\normalsize
+\textsc{Universidad Nacional del Comahue}}\\ 
+{\normalsize Buenos Aires 1400 - (8300)Neuqun - Argentina}
+} 
+
+\begin{document}
+\balance
+\maketitle
+
+\begin{abstract}
+Este trabajo se desarrolla en el contexto del proyecto de
+investigacin \emph{Sistemas Multiagentes en Ambientes Dinmicos: Planificacin, Razonamiento y Tecnologas del Lenguaje Natural}.
+Especficamente, en la lnea Planificacin,
+la temtica que se est investigando es el desarrollo de una
+arquitectura para agentes que soporte tanto \emph{control reactivo}
+como \emph{deliberativo}, de forma tal que el agente pueda actuar de
+manera competente y efectiva en un am\-bien\-te real.
+
+Uno de los objetivos de esta investigacin es el intento de dotar a un agente inteligente
+de ambas capacidades. Esto brindar la posibilidad de elegir cul sera
+la mejor forma de actuar frente un problema determinado.
+
+Adems, otro de los resultados esperados de nuestra investigacin es la 
+implementacin de un traductor del lenguaje PDDL (o un subconjunto relevante de l)
+para la descripcin de dominios de planificacin. Esperamos que el framework
+de \emph{planificacin continua} desarrollado en el contexto de nuestro grupo de
+investigacin pueda aprovechar las caractersticas que ofrece PDDL. Esto permitira
+una rpida aplicacin a cualquier problema definido en el lenguaje, y la posibilidad
+de comparar resultados de rendimiento con otras soluciones al mismo problema.
+
+
+\ \\
+\noindent{\bf Palabras Clave:} {\sc Agentes Inteligentes, Sistemas Multiagentes, Planificacin, Planificacin Continua}.
+
+\end{abstract}
+
+\thispagestyle{empty}
+
+%\paragraph{Contexto}
+\section*{Contexto}
+
+Este trabajo est parcialmente financiado por la Universidad
+Nacional del Comahue, en el contexto del proyecto de
+investigacin 
+\emph{Sistemas Multiagentes en Ambientes Dinmicos: Planificacin, Razonamiento y Tecnologas del Lenguaje Natural}.
+El proyecto de investigacin tiene prevista una duracin de tres aos, ha comenzado en enero del 2010 y finaliza en diciembre de 2012.
+
+%\cite{kogan07:_rakid}.
+\section{Introduccin}
+\label{sec:introduccion}
+
+  
+La representacin de los problemas de planificacin (estados, teora de dominio o acciones disponibles, metas, etc.) debe posibilitar que los algoritmos de planificacin utilicen eficientemente las ventajas de la estructura lgica del problema. La clave es encontrar un lenguaje que sea lo suficientemente expresivo para describir una amplia variedad de problemas, pero tambin lo suficientemente acotado para permitir que algoritmos eficientes operen sobre ellos.
+
+Uno de los primeros lenguajes de representacin y, seguramente, uno de los ms referenciados en la literatura de Inteligencia
+Artificial ha sido STRIPS\cite{fn:str}. La representacin STRIPS describe el estado inicial del mundo mediante un conjunto completo de literales bsicos (\emph{ground}) y las metas son definidas como una conjuncin proposicional. La teora de dominio, es decir, la descripcin formal de las acciones disponibles para el agente, completa la descripcin del problema de planificacin.
+
+En la representacin STRIPS, cada accin es descripta por dos frmulas: la frmula de precondicin y la de poscondicin. Ambas estn constitudas por una conjuncin de literales y definen una funcin de transicin de un mundo a otro. Una accin puede ser ejecutada en cualquier mundo \emph{w} que satisfaga la frmula de precondicin. El resultado de ejecutar una accin en un mundo \emph{w} es especificado tomando la descripcin de \emph{w}, adicionando cada literal de la poscondicin de la accin y eliminando literales contradictorios.
+
+
+STRIPS est basado en la idea de que algunas relaciones en el mundo no son afectadas por la ejecucin de una accin. Estas restricciones (entre varias otras como tiempo atmico, no existen eventos exgenos, los efectos de las acciones son determinsticos, etc.) permiten trabajar con algoritmos de planificacin ms simples y eficientes, pero dificultan la descripcin de problemas ms complejos o de problemas reales.
+
+
+La necesidad de un lenguaje con un poder expresivo mucho mayor que los existentes hasta el momento, impuls, a fines de los 90's, el desarrollo  del lenguaje de representacin PDDL (\emph{Planning Domain Definition Language})\cite{mder:pddl}. En la actualidad, PDDL es soportado por muchos planificadores y, al igual que STRIPS, se basa en la suposicin de mundo cerrado, permitiendo
+que la transformacin de estados pueda ser calculada agregando o eliminando
+literales de la descripcin del estado de partida.
+PDDL intenta expresar la ``\emph{fsica}'' del dominio, es decir, cules son los predicados, qu acciones son posibles, cul es la estructura de las acciones compuestas y cules son los efectos de las acciones.
+
+El lenguaje est factorizado en un conjunto de caractersticas, llamadas \emph{requerimientos}, y cada dominio definido usando PDDL debe declarar qu requerimientos asume. El requerimiento por defecto es STRIPS.
+
+En la actualidad, PDDL es considerado el \emph{standard de-facto} de los lenguajes de representacin y mucho desarrollo se est aplicando sobre su especificacin a fin de alcanzar nuevos objetivos tales como la comparacin emprica de la performance de los planificadores y el desarrollo de un conjunto standard de problemas en notaciones comparables.
+
+Existen distintas implementaciones que actan como traductores desde el lenguaje PDDL hacia diferentes lenguajes destino.
+Por ejemplo, en \cite{gbraun:prolog}, se ha implementado un traductor para SWI-Prolog utilizando DCG (\emph{Definite Clause Grammar}) y limitado a un subconjunto de PDDL 3.0\cite{gbraun:pddl30}. El subconjunto considerado para este traductor no incluye algunas caractersticas de PDDL tales como: restricciones, precondiciones negativas y disyuntivas, acciones con restricciones de duracin, predicados derivados, preferencias, precondiciones universales, precondiciones existenciales y efectos condicionales. 
+
+Un enfoque diferente es abordado en \cite{gbraun:antlr1} donde se considera una gramtica ANTLR (\emph{ANother Tool for Language Recognition})\cite{gbraun:antlrtool} para un nuevo subconjunto de PDDL 3.0. La gramtica ha sido dise\~{n}ada para generar un traductor PDDL hacia cdigo Java. Posteriormente, en \cite{gbraun:antlr2}, se ha modificado la gramtica ANTLR original para generar cdigo Python. Al igual que la anterior, ambas gramticas excluyen algunas 
+caractersticas relevantes de PDDL.
+
+Otra alternativa es provista por la librera \emph{PDDL4J}\cite{gbraun:java},
+%Finalmente, la utima implementacion consultada es una libraria JAVA ``PDDL4J'' 
+desarrollada bajo licencia de software libre CeCILL\cite{gbraun:cecill}. Esta librera Java contiene un traductor para PDDL 3.0 y todas las clases necesarias para manipular sus conceptos. El propsito de PDDL4J es facilitar la implementacin, en cdigo Java, de planificadores basados en PDDL.
+
+
+\section{Lneas de Investigacin y Desarrollo}
+\label{sec:lineas-invest}
+
+El proyecto de investigacin 
+\emph{Sistemas Multiagentes en Ambientes Dinmicos: Planificacin, Razonamiento y Tecnologas del Lenguaje Natural} tiene varios objetivos generales. Por un lado, el de desarrollar conocimiento especializado en el rea de Inteligencia Artificial Distribuida. Adems,
+se estudian tcnicas de representacin de conocimiento y razonamiento, junto con mtodos de planificacin\cite{gnt:ap,znk07} y tecnologas del lenguaje natural aplicadas al desarrollo de sistemas multiagentes.
+
+Especficamente, en la lnea Planificacin,
+la temtica que se est investigando es el desarrollo de una
+arquitectura para agentes que soporte tanto \emph{control reactivo}
+como \emph{deliberativo}, de forma tal que el agente pueda actuar de
+manera competente y efectiva en un am\-bien\-te real. \mbox{Hanks y
+  Firby~\cite{hanks90:_issues_in_archit_for_plann_and_execut}}
+su\-gie\-ren tratar de alcanzar un sutil equilibrio de estas dos estrategias:
+\emph{deliberacin} y \emph{reaccin}.
+La primera implica tomar todas las decisiones
+factibles en forma tan anticipada en el tiempo como sea posible. La segunda
+estrategia, \emph{reaccin}, consiste en demorar las decisiones que se tomen
+tanto como se pueda, actuando slo en el ltimo momento posible.
+
+A simple vista, el primer enfoque parece perfectamente razonable.
+Un agente que puede pensar a futuro ser capaz de
+considerar ms opciones y, por lo tanto, con previsin, estar ms
+informado para decidir qu accin tomar.  Por otra parte, ya que la
+informacin sobre el futuro puede ser poco confiable y, en muchas
+situaciones del mundo real, difcil o incluso imposible de obtener,
+parece razonable, tambin,  la alternativa de actuar en el ltimo momento.  Es ms,
+sera razonable que ninguna de las dos polticas, pensar bien a futuro o
+actuar en el ltimo momento, se ejecute con la exclusin de la otra.
+
+Uno de los objetivos de esta investigacin es el intento de dotar a un agente inteligente
+de ambas capacidades. Esto brindar la posibilidad de elegir cul sera
+la mejor forma de actuar frente un problema determinado. 
+
+Las capacidades deliberativas se logran a partir de la implementacin
+de un planificador novedoso, denominado \emph{planificacin
+  continua}~\cite{moya09:_agent_delib_basad_en_contin}, una de las
+alternativas para pla\-ni\-fi\-ca\-cin en ambientes reales planteadas en
+\cite{Rus09}.  En esta aproximacin, se presenta un
+agente que persiste indefinidamente en un entorno, posiblemente cambiante
+y dinmico.
+Tal agente no se
+detiene al alcanzar un meta determinada, sino que sigue ejecutndose
+en una serie de fa\-ses que se repiten e incluyen la formulacin de
+metas, planificar y actuar. Para ganar eficiencia y tiempo de
+deliberacin, la arquitectura provee una \emph{librera de planes}
+prediseados por el programador del agente para que sean adaptados o
+reparados, para aplicarlos a situaciones particulares. Cada miembro de esta 
+li\-bre\-ra
+consiste de un \emph{cuerpo} y una \emph{condicin de invocacin},
+indicando bajo qu circunstancias se puede aplicar este plan.
+
+Asimismo, se tiene previsto que el diseo del agente de esta investigacin
+tenga dos mo\-dos de operacin: \emph{reactivo} o \emph{planificador}. Con estos dos
+modos, bsicamente, se plantea un \emph{subsistema de control} con dos
+posibles configuraciones. En la primera, el planificador tiene el control por
+defecto y slo cuando no pueda resolver una determinada situacin, le transmite el control
+al modo reactivo. En la otra posible configuracin, el modo reactivo est a cargo
+y le pasa el control al modo planificador en situaciones
+previamente identificadas por el diseador del agente. Este subsistema
+se implementa como un conjunto de \emph{reglas de control}.  Estas
+reglas de control permiten determinar cul de los modos de
+operacin tendr el control del agente en determinada situacin.
+
+
+\section{Resultados Obtenidos y Esperados}
+\label{sec:result-obten}
+
+La arquitectura de control basada en pla\-ni\-fi\-ca\-cin continua se
+encuentra en estado de desarrollo. Algunos resultados de esta
+investigacin han sido publicados en
+\cite{moya09:_agent_delib_basad_en_contin,mkpcv10:smad_p}.
+ 
+El caso de estudio en que ha sido aplicada la arquitectura de control es el
+ftbol con robots. El control reactivo para este problema se encuentra
+desarrollado bajo el nombre de
+\emph{Ra\-ki\-duam}~\cite{kogan07:_rakid,moya08:_framew_para_el_desar_de}.
+
+\emph{Rakiduam} es un
+equipo de ftbol de robots con licencia GNU (General
+Public License) que ha participado en numerosas
+ediciones del Campeonato Argentino de Ftbol con Robots (CAFR) 
+con resultados ms que 
+satisfactorios\cite{kogan06:_aspec_de_y_de_del,kogan07:_rakid,mtk08:fdefr,trevisani09:_rakid}.
+
+
+La irrupcin de PDDL como standard de lenguaje de representacin genera nuevos desafos motivados en la necesidad de 
+desarrollar y/o extender herramientas que lo soporten y la ampliacin de su expresividad para adecuarlo a los 
+dominios de aplicacin destino.
+
+
+Uno de los resultados esperados de nuestra investigacin es la 
+implementacin de un traductor del lenguaje PDDL (o un subconjunto relevante de l)
+para la
+descripcin de los dominios y de las acciones, de manera tal que puedan
+ser manipuladas por el framework
+de \emph{planificacin continua}\cite{moya09:_agent_delib_basad_en_contin}.
+Es esperable que el framework
+pueda aprovechar las caractersticas que ofrece PDDL. Esto permitira
+una rpida aplicacin a cualquier problema definido en el lenguaje, y la posibilidad
+de comparar resultados de rendimiento con otras soluciones al mismo problema.
+
+
+
+\section{Formacin de Recursos Humanos}
+\label{sec:form-de-recurs}
+
+El actual proyecto de investigacin es una continuacin de la lnea de investigacin abierta en el  proyecto anterior: 
+ \emph{Tcnicas de Inteligencia Computacional para el Diseo e Implementacin de Sistemas Multiagentes}. 
+
+A partir de las lneas de trabajo planteadas en el actual proyecto de investigacin, se tratar de dar inicio a, por lo menos, dos nuevas tesis de Licenciatura en Ciencias de la Computacin.
+
+Adems, se espera el inicio de la consolidacin como investigadores de los miembros ms recientes del grupo.
+
+\bibliographystyle{abbrv}
+\bibliography{wicc2011ref}
+
+\end{document}
+This is never printed
+
+
+\section{Introduccin}
+
+Los sistemas distribuidos inteligentes se han estado afianzando, durante estos ltimos aos, como uno de los campos de aplicacin ms importantes de las tcnicas de Inteligencia Artificial. El avance tecnolgico en las comunicaciones ha resultado en la  convergencia de dos reas de investigacin muy importantes de las Ciencias de la Computacin: la Inteligencia Artificial y  los Sistemas Distribuidos.
+
+La Inteligencia Artificial Distribuida (IAD) es un campo de la Inteligencia Artificial dedicado al estudio de las tcnicas y mtodos necesarios para la coordinacin y distribucin del conocimiento y las acciones en un entorno con mltiples agentes.
+Particularmente, la IAD estudia la construccin de sistemas multiagentes (SMA), es decir, sistemas en los que varios agentes inteligentes heterogneos interactan utilizando mecanismos de cooperacin, coordinacin y negociacin, con el objeto de lograr sus metas. 
+
+En la actualidad, existen diversos dominios en los que el proceso de distribucin es clave y fundamental para la solucin de los problemas. Esto es logrado a travs de mltiples entidades inteligentes capaces de interactuar y trabajar de manera coordinada, con el fin de alcanzar las metas comunes. Algunos ejemplos de estos dominios son el \emph{e-commerce} (comercio electrnico), las bsquedas en la web, los agentes de planificacin  y los juegos, entre muchos otros.
+
+
+\section{Lneas de Investigacin y Desarrollo}
+
+Otro de los aspectos que es necesario de\-sa\-rro\-llar es la generacin de
+metas. Esta capacidad, de acuerdo al diseo del agente, est a cargo del 
+\emph{subsistema de deseos}. Maes~\cite{Maes90}
+argumenta que, sin metas explcitas, no est claro cmo los agentes
+podrn ser capaces de aprender o mejorar su rendimiento. Por lo tanto,
+se hace necesario que los agentes inteligentes complejos cuenten con este
+subsistema de deseos, que puedan gerenciar varias metas e incluso que stas
+puedan variar en el tiempo. Eventualmente, algunas de estas metas tendrn 
+di\-fe\-ren\-tes
+prioridades que variarn de acuerdo a las necesidades situacionales
+del agente.
+
+\section{Resultados Obtenidos y Esperados}
+
+Se espera que el \emph{agente Rakiduam} pueda participar en las prximas
+competencias de ftbol con robots a nivel nacional, ya incorporando
+capacidades de control deliberativo. Para ello, es necesario
+profundizar en la investigacin de ciertos componentes de la
+arquitectura an no maduros. 
+
+
+\emph{Rakiduam} que, en idioma mapuche, significa 
+\emph{inteligencia}, \emph{pensamiento}, \emph{mente} u \emph{opinin}, es un
+equipo de ftbol de robots con licencia GNU (General
+Public License) que fue 
+ideado como un sistema multiagentes\cite{Huh99,Wei99}.
+Las ltimas ediciones del Campeonato Argentino de Ftbol con Robots (CAFR) han contado 
+con la participacin del equipo \emph{Rakiduam}
+con resultados ms que 
+satisfactorios\cite{kogan06:_aspec_de_y_de_del,kogan07:_rakid,mtk08:fdefr,trevisani09:_rakid}.
+

@@ -1,0 +1,675 @@
+#+TITLE:    Planificación Continua mediante PDDL
+#+AUTHOR:    Germán Braun
+#+EMAIL:     germanbraun@gmail.com
+#+DATE:      30 de Octubre de 2012
+
+#+DESCRIPTION: Planificación Continua mediante PDDL
+#+KEYWORDS: 
+#+LANGUAGE:  es
+#+OPTIONS:   H:3 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME: 
+
+#+startup: beamer
+
+#+startup: fnplain fnadjust 
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [bigger]
+
+#+BEAMER_FRAME_LEVEL: 2
+#+BEAMER_HEADER_EXTRA: \usetheme{Madrid}\usecolortheme{default} \institute[FaI - UNCo]{Facultad de Inform\'atica - Universidad Nacional del Comahue}
+
+#+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
+
+#+LATEX_HEADER: \usepackage[spanish]{babel} \usepackage{amssymb} \usepackage{amsthm} \usepackage{float}
+#+latex_header: \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor= blue,breaklinks=true,naturalnames=true]{hyperref}
+#+latex_header: \usepackage{url}
+#+latex_header: \AtBeginSection[]{\begin{frame}<beamer>\frametitle{Sección Actual}\tableofcontents[currentsection]\end{frame}}
+
+
+
+#+beamer: \begin{frame}<beamer>\frametitle{Agenda}\tableofcontents \end{frame}
+
+* Motivación
+
+** Motivación
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: [<+->]
+    :END:
+*** *Planificación Continua*
+
+*** *Lenguaje de Definición de Dominios de Planificación (PDDL)*
+
+*** Asimo
+    :PROPERTIES:
+    :BEAMER_env: ignoreheading
+    :END:
+#+LATEX: \begin{center} \includegraphics[width=7.5cm,height=4.5cm]{asimo.png} \end{center}
+http://asimo.honda.com/
+
+
+
+** Planificación (1)
+#+LATEX: \begin{center} \includegraphics[width=10cm,height=6cm]{planificacion1.png} \end{center}
+
+** Planificación (2) - Ejemplo			
+#+LATEX: \begin{center} \includegraphics[width=10cm,height=6cm]{planificacion1-1.png} \end{center}
+
+** Planificación (3)
+#+LATEX: \begin{center} \includegraphics[width=11.5cm,height=5cm]{planificacion2.png} \end{center}
+
+** Planificación (4) - Ejemplo
+#+LATEX: \begin{center} \includegraphics[width=11cm,height=5cm]{planificacion2-1.png} \end{center}
+
+
+** Planificación (5)
+#+LATEX: \begin{center} \includegraphics[width=11.5cm,height=5cm]{pddl.png} \end{center}
+
+** Planificación (6) - PDDL
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: [<+->]
+    :END:
+*** *Lenguaje estándar*
+**** /Ampliamente aceptado por la comunidad IA/
+*** *Requerimientos*
+**** /strips (``núcleo''), igualdad, efectos condicionales, precondiciones disyuntivas, precondiciones universales.../
+*** *Action-centered*
+**** /Listas de precondiciones y efectos/
+*** *Dominio*
+**** /Acciones parametrizadas, Predicados, Constantes.../
+*** *Problema*
+**** /Objetos, metas y condiciones iniciales.../
+
+** Planificación (7) - Dominio PDDL
+    :PROPERTIES:
+    :END:
+
+*** Ejemplo: /Dominio PDDL/
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+#+BEGIN_LaTeX
+ \begin{verbatim}
+(define (domain bkw)
+(:requirements :strips)
+(:predicates (clear ?x) (ontable ?x) (armempty)
+             (holding ?x) (on ?x ?y))
+
+(:action stack
+  :parameters  (?ob ?underob)
+  :precondition (and  (clear ?underob) (holding ?ob))
+  :effect (and (clear ?ob) (on ?ob ?underob) (armempty)
+               (not(clear ?underob)) 
+               (not(holding ?ob)))))
+ \end{verbatim}
+#+END_LaTeX
+
+** Planificación (8) - Problema PDDL
+    :PROPERTIES:
+    :END:
+
+*** Ejemplo: /Problema PDDL/
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+#+BEGIN_LaTeX
+ \begin{verbatim}
+(define (problem pb1)
+   (:domain bkw)
+   (:objects a b)
+   (:goal (on a b))
+   (:init (ontable c) (ontable b) 
+          (on a c) (clear a) (clear b) (armempty))
+)
+ \end{verbatim}
+#+END_LaTeX
+
+** Planificación (9) 
+#+LATEX: \begin{center} \includegraphics[width=11.5cm,height=5cm]{planificacion-final.png} \end{center}
+
+
+** Motivación Principal
+*** Motivación
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+
+Dotar al Planificador Continuo[fn:tesismoya] de un módulo traductor del lenguaje
+PDDL, permitiendo que el sistema de creencias de un agente soporte
+percepciones y acciones especificadas en este lenguaje.
+
+[fn:tesismoya] Tesis Mario Moya: ``Control de Agentes Basado en Planificación Continua''.
+
+** Motivación Principal - Aplicaciones
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+
+*** SAP speaks PDDL						      :B_ignoreheading:BMCOL:
+    :PROPERTIES:
+    :BEAMER_env: ignoreheading
+    :BEAMER_col: 0.4
+    :END:
+#+latex: \begin{center} \includegraphics[width=4.5cm,height=3cm]{sap.png}\\\caption{\textbf{SAP speaks PDDL}}\end{center}
+    
+*** Planning aplicado a e-learning						      :B_ignoreheading:BMCOL:
+    :PROPERTIES:
+    :BEAMER_col: 0.4
+    :BEAMER_env: ignoreheading
+    :END:
+#+latex: \begin{center} \includegraphics[width=4cm,height=3cm]{moodle.png}\\\caption{\textbf{Planning aplicado a e-learning}}\end{center}
+
+
+* Objetivos
+
+** Objetivos (1)
+
+*** Objetivo
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+Implementar un módulo capaz de procesar problemas de /pla\-ni\-fi\-ca\-ción/
+en un subconjunto de /PDDL/ y generar una especificación equivalente
+en el lenguaje /STRIPS/ del /Planificador Continuo/.
+
+
+** Objetivos (2)
+#+LATEX: \begin{center} \includegraphics[width=11cm,height=7cm]{puzzle.png} \end{center}
+
+
+
+* Traductor en Ciao Prolog
+** Traductor en Ciao Prolog
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: [<+->]
+    :END:
+*** *Lenguaje Fuente*
+**** /Subconjunto de PDDL/
+**** /Formalismos como variantes de PDDL/
+***** División por requerimientos.
+***** *:strips* es incluido por defecto.
+#***** :strips -> PDDL$_{STRIPS}$
+#***** :conditional-effect -> PDDL$_{\emph{C}}$
+#***** :disjuntive-preconditions -> PDDL$_{D}$
+#***** :universal-preconditions -> PDDL$_{\emph{u}}$
+#***** :equality -> PDDL$_{L}$	  	
+
+
+** Lenguaje Fuente - STRIPS
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: [<+->]
+    :END:
+*** :strips -> PDDL$_{STRIPS}$
+*** Ejemplo: /PDDL_{STRIPS}/ 					    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+#+BEGIN_LaTeX
+ \begin{verbatim}
+(:action stack
+  :parameters  (?ob ?underob)
+  :precondition (and  (clear ?underob) (holding ?ob))
+  :effect (and (clear ?ob) (on ?ob ?underob) (armempty)
+               (not (clear ?underob)) 
+               (not (holding ?ob)))))
+ \end{verbatim}
+#+END_LaTeX
+
+** Lenguaje Fuente - Igualdad
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: [<+->]
+    :END:
+*** :equality -> PDDL$_{L}$	
+*** Ejemplo: /PDDL_{L}/ 					    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+#+BEGIN_LaTeX
+ \begin{verbatim}
+ (:action stack
+   :parameters (?X ?Y)
+   :precondition (and (clear table) (= ?Y table)) 
+   :effect (and (on ?X table) (not (clear table))))
+
+ (:action stack1
+   :parameters (?X ?Y)
+   :precondition (and (clear ?Y) (not (= ?Y table))) 
+   :effect (and (on ?X ?Y) (not (clear ?Y))))                 
+ \end{verbatim}
+#+END_LaTeX
+
+** Lenguaje Fuente - Efectos Condicionales
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: [<+->]
+    :END:
+*** :conditional-effect -> PDDL$_{\emph{C}}$
+*** Ejemplo: /PDDL_{C}/ 					    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+#+BEGIN_LaTeX
+ \begin{verbatim}
+(:action stack
+   :parameters (?X ?Y ?Z)
+   :precondition (and (clear ?X) (clear ?Z) (on ?X ?Y))
+   :effects (and (on ?X ?Z) (clear ?Y) (not (on ?X ?Y)) 
+                 (when (not (= table ?Z)) 
+		       (not (clear ?Z)))))
+ \end{verbatim}
+#+END_LaTeX
+
+** Lenguaje Fuente - Precondiciones Disyuntivas
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: [<+->]
+    :END:
+*** :disjuntive-preconditions -> PDDL$_{D}$
+*** Ejemplo: /PDDL_{D}/ 					    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+#+BEGIN_LaTeX
+ \begin{verbatim}
+(:action stack
+   :parameters (?X ?Y ?Z)
+   :precondition (and (or (istable ?Z) (clear ?Z))
+                      (clear ?X) (on ?X ?Y))
+   :effect (and (on ?X ?Z) (clear ?Y)
+                (not (clear ?Y)) 
+		(not (on ?X ?Y))))
+ \end{verbatim}
+#+END_LaTeX
+
+** Lenguaje Fuente - Precondiciones Universales
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: [<+->]
+    :END:
+*** :universal-preconditions -> PDDL$_{\emph{u}}$
+*** Ejemplo: /PDDL_{u}/ 					    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+#+BEGIN_LaTeX
+ \begin{verbatim}
+(:action stack
+  :parameters  (?ob ?underob)
+  :precondition (and (forall (?block) (ontable ?block))
+                     (clear ?underob) (holding ?ob))
+  :effect (and (clear ?ob) (on ?ob ?underob) (armempty)
+               (not (clear ?underob)) 
+	       (not (holding ?ob))))
+ \end{verbatim}
+#+END_LaTeX
+
+
+
+#** Esquemas de Compilación (1)
+##+LATEX: \begin{center}\includegraphics[width=10cm,height=3.5cm]{ef.png}\\\caption{\emph{Expressiveness}}\end{center}
+    
+
+#** Esquemas de Compilación (2)				     
+##+LATEX: \begin{center}\includegraphics[width=5cm,height=3.5cm]{pu.png}\\\caption{\emph{Syntactic Sugar}}\end{center}
+    
+
+#** Compilabilidad						  
+
+#*** Teorema 							  :B_theorem:
+#    :PROPERTIES:
+#    :BEAMER_env: block
+#    :END:
+##+BEGIN_LaTeX
+##$STRIPS_{\emph{u}} \preccurlyeq^{1}_{p} STRIPS$
+##+END_LaTeX 
+
+#*** Corolario							  :B_theorem:
+#    :PROPERTIES:
+#    :BEAMER_env: block
+#    :BEAMER_envargs: <2->
+#    :END:
+##+BEGIN_LaTeX
+##$PDDL_{\emph{u}} \preccurlyeq^{1}_{p} STRIPS$
+##+END_LaTeX 
+
+	
+** Lenguaje Destino
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: [<+->]
+    :END:
+*** *Lenguaje Destino*
+**** /Representación Genérica (Prolog-like)/
+***** /Independiente del Planificador destino/
+***** /Permite adaptar el traductor a otros Planificadores basados en STRIPS/
+***** *Nuestra Implementación*: /STRIPS-like/ -> /Es el lenguaje del Planificador Continuo y se obtiene a partir de la representación genérica anterior/
+
+** Representación Genérica - Dominio 				    :B_block:
+*** Definición: /Dominio/ 				       :B_definition:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+#+BEGIN_LaTeX
+ \begin{verbatim}
+preconditions(action_name_i(parameters), 
+          [predicate_j(parameters_k),...]).
+   
+achieves(action_name_i(parameters),
+          [predicate_j(parameters_k),...]).
+
+deletes(action_name_i(parameters),
+          [predicate_j(parameters_k),...]).
+ \end{verbatim}
+#+END_LaTeX
+
+
+** Representación Genérica - Problema
+*** Definición: /Problema/
+   :PROPERTIES:
+   :BEAMER_env: block
+   :END:
+#+BEGIN_LaTeX
+ \begin{verbatim}
+(domain(domain_name),
+  objects(obj_1,obj_2,..,obj_N),
+  goal(fact_g),
+  init(fact_1,fact_2,..,fact_N)).
+ \end{verbatim}
+#+END_LaTeX
+
+
+* Demostración
+
+** DEMO
+*** Estado Inicial 				      :B_ignoreheading:BMCOL:
+    :PROPERTIES:
+    :BEAMER_env: ignoreheading
+    :BEAMER_col: 0.4
+    :END:
+    #+LATEX: \begin{center}\includegraphics[width=5cm,height=2.5cm]{bkwInicial.png}\\\caption{Estado Inicial}\end{center}
+    
+*** Estado Final 					     :B_ignoreheading:BMCOL:
+    :PROPERTIES:
+    :BEAMER_col: 0.4
+    :BEAMER_envargs: <2->
+    :BEAMER_env: ignoreheading
+    :END:
+    #+LATEX: \begin{center}\includegraphics[width=5cm,height=2.5cm]{bkwFinal.png}\\\caption{Estado Final}\end{center}
+
+
+
+* Traducción de Requerimientos
+
+** Traducción ¿Cómo es?
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: [<+->]
+    :END:
+*** *Conceptos*
+**** /Esquemas de Compilación/
+**** /Compilabilidad/
+#**** /Efectos Condicionales -> Antecedentes en Precondiciones/
+#**** /Precondiciones Disyuntivas -> Múltiples Operadores/
+#**** /Precondiciones Universales-> Conjunción de Literales/
+#**** /Igualdad y Negación de Igualdad/
+
+
+** Traducción - Esquemas de Compilación				    :B_block:
+   :PROPERTIES:
+   :BEAMER_env: block
+   :BEAMER_envargs: [<+->]
+   :END:
+
+*** Básicamente, un *esquema de compilación* es un mapeo entre dos formalismos de planificación X e Y.
+
+*** Definición: /Esquemas de Compilación/
+   :PROPERTIES:
+   :BEAMER_env: block
+   :END:
+#+BEGIN_LaTeX
+$F(\Pi) = \left\langle f_{\xi}(\Xi),I \cup f_{i}(\Xi),G \cup
+f_{g}(\Xi) \right\rangle$, donde $\Xi$ es un dominio, $I$ es el estado
+inicial y $G$ es un conjunto de metas.
+#+END_LaTeX
+
+*** Condición Importante
+   :PROPERTIES:
+   :BEAMER_env: block
+   :END:
+#+BEGIN_LaTeX
+Existe un plan para $\Pi$, si y solo si, existe un plan para $F(\Pi)$,
+donde $\Pi$ es la definición del dominio en el formalismo X y $F(\Pi)$
+es la definición del dominio en el formalismo Y.
+#+END_LaTeX
+
+
+** Traducción - Compilabilidad (1) 				    :B_block:
+   :PROPERTIES:
+   :BEAMER_env: block
+   :BEAMER_envargs: [<+->]
+   :END:
+
+*** Los esquemas de compilación permiten definir una relación entre formalismos, llamada /Compilabilidad (Compilability)/.
+
+*** Definición: /Compilabilidad/
+   :PROPERTIES:
+   :BEAMER_env: block
+   :END:
+#+begin_latex
+	Un formalismo de planificaci\'on $X$ es {\bf compilable} al formalismo 
+	$Y$, expresado como $X \preccurlyeq^{x} Y$, si y s\'olo si,
+	existe un esquema de compilaci\'on de $X$ a $Y$.
+#+end_latex
+
+** Compilabilidad (2)
+   :PROPERTIES:
+   :BEAMER_env: block
+   :BEAMER_envargs: [<+->]
+   :END:
+*** Si *X \preccurlyeq^{1} Y*, entonces el tamaño del plan es preservado exactamente.
+*** Si *X \preccurlyeq^{c} Y*, entonces el tamaño del plan es preservado linealmente (en $||\Delta||$), donde $||\Delta||$ es el tamaño del plan obtenido en X.
+*** Si *X \preccurlyeq^{p} Y*, entonces el tamaño del plan es preservado polinomialmente (en $||\Delta||$ y $||\Pi||$), donde $||\Pi||$ es el número de acciones en X.	
+*** Si *X \preccurlyeq^{x}_{p} Y*, entonces la compilación es en tiempo polinomial y el tamaño del plan es preservado polinomialmente (en $||\Delta||$ y $||\Pi||$).
+
+** Compilabilidad (3)
+   :PROPERTIES:
+   :BEAMER_env: block
+   :BEAMER_envargs: [<+->]
+   :END:
+*** Entonces, considerando el lenguaje fuente y destino de nuestra implementación, definimos las siguientes relaciones:
+**** *PDDL_{STRIPS}* \preccurlyeq^{1} *STRIPS*
+**** *PDDL_{L}* \preccurlyeq^{1}_{p} *STRIPS*
+**** *PDDL_{C}* \preccurlyeq^{x}_{p} *STRIPS*
+**** *PDDL_{D}* \preccurlyeq^{1}_{p} *STRIPS*
+**** *PDDL_{u}* \preccurlyeq^{1}_{p} *STRIPS*
+
+** Compilabilidad - Ejemplo (1)
+   :PROPERTIES:
+   :BEAMER_env: block
+   :BEAMER_envags: [<+->]
+   :END:
+*** *PDDL_{u}* \preccurlyeq^{1}_{p} *STRIPS*
+
+*** Ejemplo: /Problema/ 				    
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+#+BEGIN_LaTeX
+ \begin{verbatim}
+(define (problem pb1)
+   (:domain bkwup)
+   (:objects a b c)
+   (:goal (on a b))
+   (:init (ontable c) (ontable b) (ontable a) 
+          (on a c) (clear a) (clear b) (armempty))
+)
+ \end{verbatim}
+#+END_LaTeX
+
+
+** Compilabilidad - Ejemplo (2)
+*** Ejemplo: /Dominio/ 						    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+#+begin_latex
+ \begin{verbatim}
+(:action stack
+  :parameters  (?ob ?underob)
+  :precondition (and (forall (?block) (ontable ?block))
+                     (clear ?underob) (holding ?ob))
+  :effect (and (clear ?ob) (on ?ob ?underob) (armempty)
+               (not (clear ?underob)) 
+	       (not (holding ?ob))))
+ \end{verbatim}
+#+end_latex
+
+** Compilabilidad - Ejemplo (3)
+*** Ejemplo: /STRIPS/ 						    :B_block:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+#+begin_latex
+ \begin{verbatim}
+% stack(X,Y)
+preconditions(stack(X,Y),[ontable(a),ontable(b),
+                          ontable(c),
+                          clear(Y),holding(X)]).
+deletes(stack(X,Y),clear(Y)).
+deletes(stack(X,Y),holding(X)).
+achieves(stack(X,Y),clear(X)).
+achieves(stack(X,Y),on(X,Y)).
+achieves(stack(X,Y),armempty).
+ \end{verbatim}
+#+end_latex
+
+
+#** Fases
+##+LATEX: \begin{center} \includegraphics[width=9cm,height=7.5cm]{capastrad.png} \end{center}
+
+
+** Arquitectura Modular
+#+LATEX: \begin{center} \includegraphics[width=9.5cm,height=7cm]{UMLParser.png} \end{center} 
+
+
+
+* Conclusiones
+** Resultados (1)
+
+*** Teorema 							  :B_theorem:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :END:
+#+BEGIN_LaTeX
+#$STRIPS_{\emph{u}} \preccurlyeq^{1}_{p} STRIPS$
+#+END_LaTeX 
+
+*** Corolario 							  :B_theorem:
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs: <2->
+    :END:
+#+BEGIN_LaTeX
+#$PDDL_{\emph{u}} \preccurlyeq^{1}_{p} STRIPS$
+#+END_LaTeX
+
+** Resultados (2)
+   :PROPERTIES:
+   :BEAMER_env: block
+   :BEAMER_envargs: [<+->]
+   :END:
+*** *PDDL_{STRIPS}*
+**** Requerimiento :strips
+*** *PDDL_{L}*
+**** Requerimiento :equality
+*** *PDDL_{C}*
+**** Requerimiento: conditional-effect
+*** *PDDL_{D}*
+**** Requerimiento: disjuntive-preconditions
+
+
+#** Nivel de Abstracción a Planificadores
+##+LATEX: \begin{center}\includegraphics[width=5cm,height=6cm]{abstraccion.png}\end{center}
+
+
+** Adaptación a otros Planificadores 
+#+LATEX: \begin{center}\includegraphics[width=11.5cm,height=3.5cm]{adaptacion.png}\end{center}
+
+
+#** Integración con el Framework de Planificación Continua (1)
+##+LATEX: \begin{center}\includegraphics[width=7.5cm,height=6.5cm]{arqframework_BDI.png}\end{center}
+
+
+** Integración con el Framework de Planificación Continua
+#+LATEX: \begin{center}\includegraphics[width=7.5cm,height=6.5cm]{arqframework.png}\end{center}
+
+
+** Expansión Sintáctica para Ciao Prolog
+#+LATEX: \begin{center}\includegraphics[width=7.5cm,height=7.5cm]{demoPddlCiao.png}\end{center}
+
+
+** Trabajo Futuro						    :B_block:
+   :PROPERTIES:
+   :BEAMER_env: block
+   :BEAMER_envargs: [<+->]
+   :END:
+*** *Ampliar el Lenguaje Fuente del Traductor*
+**** /Definir esquemas de compilación asociados./
+*** *Análisis exhaustivo de la complejidad del Traductor*
+**** /Disminuir el impacto de la traducción en la planificación./
+*** *Interface para el Framework de Planificación Continua*
+**** /Pruebas sobre dominios reales./
+**** /Traducción de percepciones en tiempo real./
+*** *Aplicar conceptos de Compiladores e Intérpretes*
+**** /Manipulación y Recuperación de Errores./
+*** *Combinar el Traductor con otros Planificadores*
+**** /Realizar comparaciones de performance./
+
+** Fin
+   :PROPERTIES:
+   :BEAMER_env: ignoreheading
+   :END:
+#+BEGIN_LaTeX
+%\vspace{0.5cm}
+\hspace{4.5cm}
+{\bf ¿Preguntas?}
+#+END_LaTeX
+
+##+LATEX: \begin{center}\includegraphics[width=6cm,height=5cm]{preguntas.png}\end{center}
+
+** ¡Gracias!
+http://code.google.com/p/my-pddl-to-strips-tesis/
+#+LATEX: \begin{center}\includegraphics[width=6cm,height=6cm]{qrplanet.png}\end{center}
+
+
+** Anexo (1) - Implementaciones Existentes
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_envargs:[<+->]
+    :END:
+
+*** *Analizador en SWI-Prolog*
+**** /Otra implementación Prolog/
+**** /No genera STRIPS/
+**** /No incluye alguno de los requerimientos presentados aquí/
+*** *Gramática ANTLR para PDDL*
+**** /No genera código Prolog ni STRIPS/
+*** *Librería PDDL4J*
+**** /JAVA/
+
+** Anexo (2) - Esquemas de Traducción
+*** PDDL_{C}
+#+LATEX: \begin{center}\includegraphics[width=10cm,height=3.5cm]{ef.png}\end{center}
+
+** Anexo (3) - Diagrama de Traducción
+#+LATEX: \begin{center} \includegraphics[width=9cm,height=7.5cm]{capastrad.png} \end{center}
+

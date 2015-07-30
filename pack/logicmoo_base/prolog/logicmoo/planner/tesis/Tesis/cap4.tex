@@ -1,0 +1,590 @@
+
+\chapter{Implementaciones Existentes} \label{pagcap4}
+
+En el trascurso de este trabajo hemos investigado y
+probado implementaciones existentes que tienen la
+capacidad de interpretar PDDL como lenguaje de entrada 
+y generar una especificaci\'on equivalente en un lenguaje 
+destino o, simplemente, procesar sus estructuras.
+Adem\'as de considerar los lenguajes fuente
+y destino, al momento de abordar estas implementaciones,
+tambi\'en consideramos algunas otras caracter\'isticas
+importantes como lenguaje de implementaci\'on, licencias,
+subconjunto de PDDL que es capaz de interpretar y
+nivel de madurez de la implementaci\'on. Por \'ultimo, indicamos
+las principales diferencias con nuestra propuesta.
+
+En este cap\'itulo se detallan las implementaciones
+investigadas indicando los puntos resaltados
+en el parrafo anterior. En la secci\'on \ref{cap4:sec1} se describe
+la alternativa planteada sobre SWI-Prolog \cite{gbraun:swiweb} y, en la secci\'on
+\ref{cap4:sec2}, se estudia la gr\'amatica especificada 
+en ANTLR \cite{gbraun:antlrtool}.
+Por \'ultimo, en la secci\'on \ref{cap4:sec3}, se analiza una librer\'ia JAVA
+adaptada para Graphplan \cite{gbraun:graphplan}.
+
+
+\section{Analizador en SWI-Prolog} \label{cap4:sec1}
+
+SWI-Prolog es una implementaci\'on del lenguaje de programaci\'on Prolog basada 
+en un subconjunto de la WAM (\emph{Warren Abstract Machine}) \cite{gbraun:wam}.
+Tiene un importante conjunto de caracter\'isticas entre las cuales se destacan
+las librer\'ias para programaci\'on l\'ogica restringida, multi-hilos, testing unitario,
+interfaces y herramientas para la Web Sem\'antica como 
+RDF\footnote{\emph{Resources Description Framework}.} \cite{gbraun:w3cRDF} y 
+RDFS\footnote{\emph{Resources Description Framework Schema}.} \cite{gbraun:w3cRDFS}.
+SWI-Prolog est\'a bajo continuo desarrollo desde 1987 y su principal
+autor es Jan Wielemaker\footnote{Jan
+  Wielemaker. \url{http://staff.science.uva.nl/~wielemak/}. Disponible
+en Septiembre de 2012.}.
+El nombre SWI deriva del grupo \emph{Sociaal-Wetenschappelijke 
+Informatica ("Social Science Informatics")} perteneciente
+a la Universidad de Amsterdam.
+
+SWI-Prolog est\'a distribuido bajo las licencias 
+LGPL\footnote{\emph{Lesser GNU General Public License}.} \cite{gbraun:lgpl},
+para librer\'ias del kernel y aquellas no desarrolladas
+en c\'odigo Prolog y, bajo licencia GPL\footnote{\emph{GNU General Public License}.} \cite{gbraun:gpl},
+para librer\'ias desarrolladas en c\'odigo Prolog.
+
+El analizador PDDL en SWI-Prolog \cite{gbraun:prolog} fue desarrollado por
+R\'obert Sas\'ak\footnote{R\'obert
+  Sas\'ak. \url{http://www.sasak.sk/}. Disponible en Septiembre de 2012.} 
+utilizando la libreria Prolog DCG\footnote{\emph{Definite Clause Grammar}. 
+En el cap\'itulo \ref{pagcap6} introduciremos DCG.}.
+La implementaci\'on est\'a incompleta ya que abarca
+s\'olo un subconjunto de PDDL 3.0 y fue probada
+por Sas\'ak sobre los planificadores \emph{Forward} and 
+\emph{Backward Search} \cite{gbraun:Rus09}.
+
+El analizador incluye tres m\'odulos principales. El primero, llamado \texttt{readFile.pl},
+implementa un ``tokenizador''. Dicho m\'odulo toma como entrada 
+un archivo de texto con la especificaci\'on PDDL y retorna un conjunto
+de tokens. El m\'odulo \texttt{parseProblem.pl} recibe como entrada
+la definici\'on de un problema PDDL y retorna t\'erminos Prolog.
+Por \'ultimo, \texttt{parseDomain.pl}, recibe un dominio PDDL
+y retorna t\'erminos Prolog equivalentes. Es importante destacar que la salida
+de este analizador es una representaci\'on tipo Prolog y
+no STRIPS.
+
+A continuaci\'on, mostramos un ejemplo de una conversi\'on simple
+ejecutada por el parser y luego la salida del analizador para
+una instancia del  ``Mundo de Bloques''.
+
+
+\begin{ejemplo}%{Parser PDDL en SWI-Prolog}
+
+El predicado PDDL \texttt{(on ?x ?y)} es convertido
+al siguiente predicado Prolog \texttt{on(?x, ?y)}.
+
+\end{ejemplo}
+
+
+\begin{ejemplo}
+
+La salida equivalente a la definici\'on del ``Mundo de Bloques'' es la siguiente:
+
+ \begin{verbatim}
+?-parseDomain('blocks_world.pddl', O).
+   O = domain(blocks,                  %name
+         [strips, equality],           %requirements
+         [table],                      %constants
+         [on(?x, ?y),                  %predicates
+	         clear(?x),
+	         holding(?x),
+                 ontable(?x),
+	         armempty],
+         [action('pickup',             %actions 
+              [?x],      
+              [clear(?x), armempty],
+              [holding(?x)],                       
+              [on(?x ?y), armempty]],
+         [action('stack', 
+              [?x, ?y],     
+              [holding(?x), clear(?y)],
+              [on(?x ?y), clear (?x), armempty],                       
+              [clear(?y), holding(?x)]]
+       )
+
+
+?-parseProblem('problem.pddl', O).
+   O = problem('blocks-4-0',            %name
+              blocks,			%domain name
+              [(a,b)],                  %objects
+              [clear(a),                %init 
+               clear(b),
+               ontable(b),
+               ontable(c),
+               armempty, 
+               on(a,c)],
+              [on(a,b)],                %goal
+       )
+ \end{verbatim}
+\end{ejemplo}
+
+Los t\'erminos Prolog retornados por el 
+analizador son predicados con una estructura general 
+con un argumento por cada secci\'on PDDL en el dominio 
+y problema de entrada.
+
+Por \'ultimo, como mencionamos previamente, el analizador PDDL aqu\'i
+presentado s\'olo abarca un subconjunto de la especificaci\'on
+de PDDL 3.0. Los requerimientos no incluidos son:
+restricciones, precondiciones negativas y disyuntivas,
+acciones con restricciones de duraci\'on, predicados derivados, 
+preferencias, precondiciones universales, precondiciones 
+existenciales y efectos condicionales.
+
+En base a lo expuesto, concluimos que las diferencias con nuestra
+propuesta radican en el tipo de salida que presenta el traductor
+implementado por Sas\'ak y en el ambiente de programaci\'on en el que
+est\'a integrado. Como hemos mencionado en est\'a secci\'on, esta
+implementaci\'on est\'a desarrollada un ambiente Prolog diferente
+al de Ciao. Adem\'as, su lenguaje destino no es STRIPS (no distingue
+entre listas de precondiciones, agregados y borrados) y no manipula 
+precondiciones disyuntivas, universales ni efectos condicionales.
+
+
+\section{Gram\'atica ANTLR para PDDL} \label{cap4:sec2}
+
+%\subsection{ANTLR}
+
+ANTLR\footnote{\emph{ANother Tool for Language Recognition}.}
+es una herramienta que prove\'e un framework
+para la construcci\'on de analizadores. Puede generar
+analizadores l\'exicos, sint\'acticos y sem\'anticos en varios
+lenguajes \emph{target}, como JAVA, C, C++ y Python, a partir
+de una especificaci\'on en su propio lenguaje. B\'asicamente, el
+lenguaje de ANTLR est\'a formado por una serie de reglas 
+EBNF\footnote{\emph{Extended Backus Naur Form}.} \cite{gbraun:ebnf}
+y un conjunto de reglas auxiliares. ANTLR toma una gr\'amatica como entrada y genera
+como salida el c\'odigo generado en un lenguaje destino, como
+algunos de los mencionados arriba. El lenguaje \emph{target} deseado es especificado en la 
+misma gram\'atica. La herramienta est\'a disponible desde 1990, fue desarrollada 
+por Terence Parr\footnote{Terence
+  Parr. \url{http://www.cs.usfca.edu/~parrt/}. Disponible en
+  Septiembre de 2012.} 
+y es distribuida bajo licencia de software 
+BSD\footnote{\emph{Berkeley Software Distribution}.} \cite{gbraun:bsd}.
+
+ANTLR genera analizadores \emph{LL(k)} que soportan predicados sint\'acticos
+y sem\'anticos permitiendo especificar muchas gram\'aticas libres y sensibles al
+contexto \cite{gbraun:Chomsky1956}. Se denomina \emph{LL(k)} a la clase de
+gram\'aticas para las cuales es posible construir analizadores
+sint\'acticos descendentes predictivos. Estos analizadores realizan
+un recorrido de izquierda a derecha, con \emph{k} s\'imbolos
+de anticipaci\'on\footnote{En Ingl\'es, \emph{lookahead}.} y obtienen una
+derivaci\'on a izquierda de las cadenas de entrada.
+
+Adem\'as, ANTLR prove\'e soporte para la construcci\'on de \'arboles
+gramaticales y para la recuperaci\'on y reporte de errores. 
+
+Los tres tipos b\'asicos de herramientas procesadoras de lenguaje que 
+ANTLR genera son:
+
+\begin{enumerate}
+
+\item {\bf Analizadores L\'exicos (\emph{lexers})}. Una analizador
+l\'exico lee una cadena de caracteres, y a partir de patrones
+espec\'ificos, detecta y retorna una cadena de \emph{tokens}. Tambi\'en
+puede procesar espacios en blanco y comentarios, 
+
+\item {\bf Analizadores Sint\'acticos (\emph{parsers})}. Un analizador
+sint\'actico lee una cadena de tokens e identifica frases usando reglas
+gramaticales. Generalmente, tambi\'en ejecuta algunas acciones sem\'anticas
+para cada frase identificada, y 
+
+\item {\bf \emph{Tree-parsers}}. Es un analizador que aplica una estructura
+gramatical para guiar la traducci\'on de una entrada.
+Son \'utiles durante la traducci\'on agregando atributos, 
+reglas y acciones a la estructura del \'arbol. 
+Estos analizadores generan como salida un Arbol
+Sint\'actico Abstracto (AST)\footnote{En Ingl\'es, \emph{Abstract Syntax Tree}.}.
+Un AST es una forma de c\'odigo intermedio que representa
+una estructura sint\'actica y jer\'arquica del programa fuente.
+ 
+\end{enumerate}
+
+ANTLR permite, entonces, definir las reglas que el \emph{lexer}
+debe usar para \emph{tokenizar} caracteres y las reglas
+que un \emph{parser} debe usar para interpretar a los \emph{tokens}.
+A continuaci\'on, explicaremos c\'omo una gram\'atica ANTLR es definida y
+ejemplificaremos usando la gram\'atica ANTRL PDDL.
+
+Los archivos ANTLR tiene una extensi\'on ``*.g''. Pueden contener
+la definici\'on gramatical de uno o varios analizadores y, por cada 
+analizador descripto, se generar\'a una clase en el lenguaje destino
+elegido.
+
+ANTLR PDDL fue desarrollada por Zeyn Saigol\footnote{Zeyn Saigol. 
+\url{http://www.zeynsaigol.com/}. Disponible en Septiembre de 2012.} 
+en el a\~{n}o 1998. La gram\'atica toma un 
+subconjunto de PDDL 3.0 y genera un analizador l\'exico y un analizador
+sint\'actico en c\'odigo nativo JAVA. La salida de la gram\'atica, luego
+de cargarla en el entorno de desarrollo ANTLRWorks\footnote{\emph{The ANTLR GUI 
+Development Environment}.} \cite{gbraun:antlrwork}, est\'a conformada por
+tres archivos: un archivo de tokens, y dos ``*.java'', una
+clase \emph{Lexer.java} y una clase \emph{Parser.java}.
+
+A continuaci\'on, analizaremos la estructura de la gram\'atica
+ANTLR desarrollada para el lenguaje PDDL. Empleamos algunos ejemplo extra\'idos de la definici\'on
+original que puede ser encontrada en \cite{gbraun:antlrpddl}.
+ANTLR PDDL tiene la siguiente estructura:
+
+\begin{itemize}
+
+\item {\bf Cabecera}. La cabecera, en una 
+gram\'atica ANTLR, contiene c\'odigo fuente que debe ser ubicado 
+previo a las clases de los analizadores en el c\'odigo generado. 
+Esta secci\'on es opcional. 
+
+El siguiente ejemplo muestra la definici\'on de una cabecera 
+cuando el lenguaje \emph{target} es JAVA.
+
+\begin{ejemplo}%{Cabecera Gramatica ANTLR}
+
+La definici\'on de las cabeceras indican que el paquete
+correspondiente debe declararse previo al resto del
+c\'odigo.
+
+ \begin{verbatim}
+@parser::header {package uk.ac.bham.cs.zas.pddl.antlr;}
+@lexer::header {package uk.ac.bham.cs.zas.pddl.antlr;}
+ \end{verbatim}
+\end{ejemplo}
+
+\item {\bf Opciones}. Es una secci\'on
+opcional, al igual que el \emph{header}, aunque es importante
+en la definici\'on de un gram\'atica. Se pueden especificar
+par\'ametros de ANTLR como por ejemplo, el lenguaje \emph{target}
+elegido, entre otros.
+
+\begin{ejemplo}%{Opciones Generales en ANTLR}
+
+Las siguientes opciones son generales de la gram\'atica:
+
+ \begin{verbatim}
+options {
+    output=AST;
+    backtrack=true;
+}
+ \end{verbatim}
+donde:
+\begin{itemize}
+\item \texttt{output=AST}: especifica
+el tipo de salida del parser. Los valores v\'alidos
+son \texttt{AST} y \texttt{template}. Un
+\texttt{AST} es un forma de
+representaci\'on intermedia que consiste de nodos
+cuyas raices de los sub\'arboles son s\'olo operadores. El valor
+\texttt{template} permite el uso de la librer\'ia
+\texttt{StringTemplate}\footnote{La documentaci\'on oficial de esta
+librer\'ia puede consultarse en
+\url{http://www.antlr.org/wiki/display/ST/Introduction}. Disponible en
+Septiembre de 2012.} 
+para la generaci\'on de c\'odigo a partir de
+determinados \emph{templates}. Esta configuraci\'on separa la
+estructura de datos de c\'omo la salida es presentada. 
+
+\item \texttt{backtrack=true}: activa
+la recuperaci\'on de errores reglas no son
+exitosas. En este caso, ning\'un error es reportado durante
+el an\'alisis.
+\end{itemize}
+
+Ning\'un lenguaje \emph{target} es especificado en esta
+secci\'on pero, por defecto, ANTLR asume que el c\'odigo destino
+es JAVA.
+\end{ejemplo}
+
+\item \texttt{tokens}: En esta secci\'on pueden definirse dos tipos de \emph{tokens}. 
+Los primeros, llamados ``i\-ma\-gi\-na\-rios'', no se corresponden con un s\'imbolo de 
+entrada real y pueden ser usados como \emph{labels} para agrupar \emph{tokens} 
+de la entrada real. Estos \emph{tokens} puede ser referenciados desde
+las reglas gramaticales. Adem\'as, tambi\'en pueden especificarse
+\emph{tokens} llamados ``literales'' que suelen
+usarse para asignar alg\'un \emph{label} a \emph{tokens} de la entraba.
+
+\begin{ejemplo}%{Tokens ANTLR PDDL}
+
+El siguiente es un subconjunto de \emph{tokens} definidos
+en la gram\'atica ANTLR.
+
+ \begin{verbatim}
+tokens {
+    DOMAIN;
+    DOMAIN_NAME;
+    REQUIREMENTS;
+    TYPES;
+    CONSTANTS;
+    PREDICATES;
+    ACTION;
+    PROBLEM;
+    PROBLEM_NAME;
+    PROBLEM_DOMAIN;
+    OBJECTS;
+    INIT;
+    PRECONDITION;
+    EFFECT;
+    AND_GD;
+    OR_GD;
+    NOT_GD;
+    FORALL_GD;
+    AND_EFFECT;
+    FORALL_EFFECT;
+    WHEN_EFFECT;
+    GOAL;
+}
+ \end{verbatim}
+\end{ejemplo}
+
+\item \texttt{members}: en esta secci\'on se definen m\'etodos 
+y variables que luego formar\'an parte de la clase del analizador.
+
+\begin{ejemplo}%{Codigo Nativo en ANTLR PDDL}
+
+La gram\'atica define los siguientes m\'etodos para la clase
+\emph{parser}:
+
+ \begin{verbatim}
+@parser::members {
+    private boolean wasError = false;
+    public void reportError(RecognitionException e) {
+	            wasError = true;
+	            super.reportError(e);
+    }
+    public boolean invalidGrammar() {
+	            return wasError;
+    }
+}
+ \end{verbatim}
+\end{ejemplo}
+
+\item {\bf Reglas}: la \'ultima secci\'on de la gram\'atica
+es la definici\'on de reglas gramaticales. ANTLR PDDL
+incluye reglas para el \emph{lexer}, que se utilizar\'an
+para la identificaci\'on de tokens y reglas para
+el \emph{parser}, que son patrones con el objetivo de
+identificar frases del lenguaje usando los tokens
+generados por el \emph{lexer}. Las reglas est\'an en
+notacion EBNF.
+
+\begin{ejemplo}%{Reglas L\'exicas en ANTLR PDDL}
+
+Las siguientes son algunas de las reglas definidas 
+para el an\'alisis l\'exico. Las reglas est\'an acotadas
+al subconjunto de PDDL definido para el presente trabajo.
+
+ \begin{verbatim}
+
+REQUIRE_KEY
+    : ':strips'
+    | ':disjunctive-preconditions'
+    | ':equality'
+    | ':universal-preconditions'
+    | ':quantified-preconditions'
+    | ':conditional-effects'
+    ;
+
+NAME:    LETTER ANY_CHAR* ;
+
+fragment LETTER:	'a'..'z' | 'A'..'Z';
+fragment ANY_CHAR: LETTER | '0'..'9' | '-' | '_';
+
+VARIABLE : '?' LETTER ANY_CHAR* ;
+
+NUMBER : DIGIT+ ('.' DIGIT+)? ;
+
+fragment DIGIT: '0'..'9';
+
+LINE_COMMENT
+    : ';' ~('\n'|'\r')* '\r'? '\n' { $channel = HIDDEN; }
+    ;
+
+WHITESPACE
+    :   (   ' '
+        |   '\t'
+        |   '\r'
+        |   '\n'
+        )+
+        { $channel = HIDDEN; }
+    ;
+ \end{verbatim}
+\end{ejemplo}
+
+\begin{ejemplo}%{Reglas Sint\'acticas en ANTLR PDDL}
+
+Las siguientes son algunas de las reglas definidas
+para el an\'alisis sint\'actico. Las primeras, corresponden
+a dominios PDDL (\texttt{domain} y \texttt{actionDef}) 
+y las \'ultimas, a problemas PDDL (\texttt{problem}). 
+
+ \begin{verbatim}
+pddlDoc : domain | problem;}
+
+domain
+    : '(' 'define' domainName
+      requireDef?
+      typesDef?
+      constantsDef?
+      predicatesDef?
+      functionsDef?
+      constraints?
+      structureDef*
+      ')'
+      -> ^(DOMAIN domainName requireDef? typesDef?
+                constantsDef? predicatesDef? functionsDef?
+                constraints? structureDef*)
+    ;
+    
+actionDef
+	: '(' ':action' actionSymbol
+	      ':parameters' '(' typedVariableList ')'
+           actionDefBody ')'
+       -> ^(ACTION actionSymbol typedVariableList actionDefBody)
+    ;
+    
+problem
+	: '(' 'define' problemDecl
+	  problemDomain
+      requireDef?
+      objectDecl?
+      init
+      goal
+      probConstraints?
+      metricSpec?
+      ')'
+      -> ^(PROBLEM problemDecl problemDomain requireDef? objectDecl?
+      		init goal probConstraints? metricSpec?)
+    ;
+
+ \end{verbatim}
+\end{ejemplo}
+
+\end{itemize}	
+
+
+De manera similar a la secci\'on anterior, las diferencias con
+nuestra propuesta radican en el tipo de soluci\'on que ofrece la
+gram\'atica ANTLR y el lenguaje en el que est\'a implementada. 
+Si bien, es una alternativa flexible a
+los cambios en la gram\'atica PDDL de entrada, los analizadores,
+generados a partir de la gram\'atica ANTLR PPDL, no
+realizan ninguna traducci\'on de PDDL a STRIPS.
+
+%A continuaci\'on, vamos a introducir la \'ultima implementaci\'on
+%investigada, la libreria \emph{PDDL4J} desarrollada en JAVA.
+
+
+\section{Librer\'ia PDDL4J} \label{cap4:sec3}
+
+PDDL4J es una librer\'ia de c\'odigo abierto 
+distribuida bajo licencia CECILL \cite{gbraun:cecill} y fue de\-sa\-rro\-lla\-da por 
+Damien Pellier\footnote{Damien Pellier. \url{http://www.math-info.univ-paris5.fr/~pellier/home}. Disponible
+en Septiembre de 2012.}. 
+
+El prop\'osito de PDDL4J es facilitar la implementaci\'on JAVA
+de planificadores basados en PDDL. La librer\'ia contiene un
+analizador de la especificaci\'on PDDL 3.0 con todas las clases
+necesarias para la manipulaci\'on de sus prinicipales caracter\'isticas. Acepta un
+importante conjunto de requerimientos PDDL entre los que se
+encuentran los requerimientos presentados para nuestro trabajo
+y se agregan tipos, precondiciones negativas y existenciales,
+fluents, predicados derivados, acciones con tiempo,
+preferencias y restricciones.
+
+La propuesta de Pellier incluye una implementaci\'on
+del planificador Graphplan usando PDDL4J. Lo novedoso de esta implementaci\'on
+es que retorna, junto con el plan final, algunas estad\'isticas 
+sobre la ejecuci\'on del algoritmo con el objetivo de comparar esta soluci\'on con
+otras implementaciones. 
+
+Graphplan es una planificador de prop\'osito general para dominios
+especificados en STRIPS. Dado un problema, Graphplan
+construye, expl\'icitamente, una estructura llamada
+\emph{Grafo de Pla\-ni\-fi\-ca\-ci\'on} que es explorado para obtener un plan
+que resuelva un problema, si es que \'este existe. Graphplan
+fue creado por Avrim Blum\footnote{Avrim
+  Blum. \url{http://www.cs.cmu.edu/~avrim/home.html}. Disponible en
+  Septiembre de 2012.}, 
+Merrick Furst\footnote{Merrick
+  Furst. \url{http://www.scs.gatech.edu/people/merrick-furst}. Disponible
+en Septiembre de 2012.} 
+y John Langford\footnote{John 
+Langford. \url{http://hunch.net/~jl/}. Disponible en Septiembre de 2012.}.
+
+A continuaci\'on, mostramos la salida de Graphplan
+luego de ejecutarlo sobre el dominio y problema
+PDDL de una instancia del ``Mundo de Bloques''.
+
+\begin{ejemplo}%{Graphplan usando PDDL4J}
+
+Dada la meta \texttt{on(a b)} y las acciones
+\texttt{stack} y \texttt{pickup},
+ejecutamos Graphplan pasando, como argumentos
+del planificador, los archivos ``*.pddl'' correspondientes.
+
+ \begin{verbatim}
+java -server -jar graphplan.jar domain.pddl problem.pddl
+ \end{verbatim}
+
+Luego, el resultado de la planificaci\'on es el siguiente:
+
+ \begin{verbatim}
+Parsing domain "bkw" done successfully ...
+Parsing problem "pb1" done successfully ...
+
+Preprocessing ...
+
+time:    0,        5 facts,          0 and exlusive pairs (0,0003s)
+                   7 ops,            7 exlusive pairs
+time:    1,        7 facts,          7 and exlusive pairs (0,0006s)
+                  11 ops,           35 exlusive pairs
+
+goals first reachable in 2 times steps
+
+
+found plan as follows:
+
+time step    0: PICKUP a
+time step    1: STACK a b
+
+number of actions tried :            2 
+number of noops tried   :            1 
+
+Time spent :     0,01 seconds preprocessing 
+                 0,00 seconds build graph 
+                 0,00 seconds calculating exclusions 
+                 0,00 seconds searching graph 
+                 0,01 seconds total time 
+
+ \end{verbatim}
+
+La salida retorna el plan resultante para alcanzar
+la meta e informaci\'on relacionada al tiempo de ejecuci\'on
+del algoritmo. Entre la informaci\'on mostrada, podemos destacar
+que el problema y el dominio en PDDL fue analizado exitosamente, 
+la meta fue alcanzada con s\'olo dos acciones \texttt{pickup a} y
+\texttt{stack a b}, y el tiempo
+total para alcanzar la soluci\'on fue de 0.01 segundos.
+\end{ejemplo}
+
+Teniendo en cuenta lo analizado en esta secci\'on, concluimos que la
+diferencia con nuestra propuesta radica en que la soluci\'on,
+desarrollada por Pellier, es una librer\'ia JAVA y
+su prop\'osito es facilitar la implementaci\'on de planificadores
+en el mismo lenguaje. Este no es el caso del Pla\-ni\-fi\-ca\-dor Continuo
+ya que est\'a desarrollado, \'integramente, en Ciao Prolog. Es esperable
+una mejor integraci\'on si el traductor, propuesto en este
+trabajo, es implementado en el mismo ambiente del Planificador Continuo. 
+\ \\
+
+En resumen, en este cap\'itulo hemos presentado y analizado tres 
+implementaciones existentes que fueron
+estudiadas en el trascurso de este trabajo. 
+A partir del pr\'oximo cap\'itulo, vamos a iniciar el an\'alisis de nuestro traductor
+PDDL y, para esto, comenzaremos definiendo el marco te\'orico subyacente.
+
+
+
+
