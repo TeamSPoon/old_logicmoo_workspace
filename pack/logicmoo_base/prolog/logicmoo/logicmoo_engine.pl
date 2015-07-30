@@ -148,8 +148,9 @@
 
 leave_as_is(V):- \+ compound(V),!.
 leave_as_is('$VAR'(_)).
-leave_as_is(infer_by(_)):-trace.
+leave_as_is(infer_by(By)):-dmsg(warn(infer_by(By))), trace.
 leave_as_is(ignore(_)).
+leave_as_is(original(_)).
 leave_as_is(mudEquals(_,_)).
 leave_as_is(skolem(_,_)).
 leave_as_is(z_unused(_)).
@@ -188,6 +189,28 @@ kif_hook(H:- _):- !,nonvar(H),!,kif_hook(H).
 :- style_check(+singleton).
 
 
+subst_except(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
+subst_except(  Var, _,_,Var ) :- leave_as_is(Var),!.
+subst_except(  Var, _,_,Var ) :- \+compound(Var),!.
+subst_except([H|T],B,A,[HH|TT]):- !,
+   subst_except(H,B,A,HH),
+   subst_except(T,B,A,TT).
+subst_except(HT,B,A,HHTT):- HT=..[F|ARGS],subst_except([F|ARGS],B,A,[FM|MARGS]),
+   (atom(FM)->HHTT=..[FM|MARGS];append_termlist(FM,MARGS,HHTT)).
+
+append_termlist(Call,EList,CallE):-must((compound(Call),is_list(EList))), Call=..List, append(List,EList,ListE), CallE=..ListE.
+
+
+correct_arities(_,FmlO,FmlO):-leave_as_is(FmlO),!.
+correct_arities([],Fml,Fml):-!.
+correct_arities([H|B],Fml,FmlO):-!,correct_arities(H,Fml,FmlM),correct_arities(B,FmlM,FmlO).
+correct_arities(_,Fml,Fml):- \+ compound(Fml),!.
+correct_arities(H,Fml,FmlO):- Fml=..[H,A|ARGS], ARGS\=[_],
+  (ARGS==[]-> correct_arities(H,A,FmlO);
+       (correct_arities(H,A,CA),FmlM=..[H|ARGS],correct_arities(H,FmlM,FmlMC),FmlO=..[H,CA,FmlMC])),!.
+correct_arities(H,Fml,FmlM):- Fml=..[F|ARGS],must_maplist(correct_arities(H),ARGS,ARGSM),FmlM =.. [F|ARGSM].
+
+
 :- export(term_singletons/2).
 term_singletons(A,Vs):- term_singletons(A,[],_,[],Vs). 
 :- export(term_singletons/5).
@@ -198,17 +221,14 @@ term_singletons(Fml, NS, NS, S, [Fml|S]):- is_ftVar(Fml),!.
 term_singletons([H|T],NS,NSO,S,NSV):- !, term_singletons(H,NS,NSM,S,M),term_singletons(T,NSM,NSO,M,NSV).
 term_singletons(Fml, NS,NSO, S,NSV):- compound(Fml),Fml=..[_,H|T],!, term_singletons(H,NS,NSM,S,M),term_singletons(T,NSM,NSO, M,NSV).
 
-subst_eq(A,B,C,A):-B==C,!.
-subst_eq(A,B,C,D):- subst(A,B,C,D),!.
-
 get_kv(X=Y,X,Y):- !.
+get_kv(X-Y,X,Y):- !.
 get_kv(KV,X,Y):- functor(KV,_,1),KV=..[X,Y],!.
 get_kv(KV,X,Y):- arg(1,KV,X),arg(2,KV,Y),!.
 
-:- export(subsT_each/4).
-subsT_each(_,In,[],In):- !.
-subsT_each(each,In,[KV|TODO],Out):- !,get_kv(KV,X,Y),subst_eq(In,X,Y,Mid),subsT_each(each,Mid,TODO,Out),!.
-subsT_each(REV,In,[KV|TODO],Out):- !,get_kv(KV,X,Y),subst_eq(In,Y,X,Mid),subsT_each(REV,Mid,TODO,Out),!.
+:- export(subsT_each/3).
+subsT_each(In,[],In):- !.
+subsT_each(In,[KV|TODO],Out):- !,get_kv(KV,X,Y),subst_except(In,X,Y,Mid),!,subsT_each(Mid,TODO,Out),!.
 
 contains_var_lits(Fml,Var,Lits):- findall(Lit,contains_t_var(Fml,Var,Lit),Lits).
 
@@ -279,23 +299,26 @@ to_prolog_ops([
 
 
 to_nonvars(_Type,IN,IN):- is_ftVar(IN),!.
+to_nonvars(_,Fml,Fml):- leave_as_is(Fml),!.
 to_nonvars(Type,IN,OUT):- is_list(IN),!,must_maplist(to_nonvars(Type),IN,OUT),!.
 to_nonvars(Type,IN,OUT):- call(Type,IN,OUT),!.
 
-convertAndCall(Type,Call):- fail, Call=..[F|IN],must_maplist(to_nonvars(Type),IN,OUT), IN \=@= OUT, !, must(apply(F,OUT)).
+
+convertAndCall(Type,Call):- fail,Call=..[F|IN],must_maplist(to_nonvars(Type),IN,OUT), IN \=@= OUT, !, must(apply(F,OUT)).
 
 as_dlog(Fml,Fml):- leave_as_is(Fml),!.
-as_dlog(or(X,Y,Z),FmlO):- !,as_dlog(v(X,v(Y,Z)),FmlO),!.
-as_dlog(and(X,Y,Z),FmlO):- !,as_dlog(&(X,&(Y,Z)),FmlO),!.
-as_dlog(Fml,FmlO):- to_dlog_ops(OPS),subsT_each(each,Fml,OPS,FmlO),!.
+as_dlog(Fml,FmlO):- to_dlog_ops(OPS),subsT_each(Fml,OPS,FmlM),!,correct_arities(['v','&'],FmlM,FmlO).
 
-as_symlog(Fml,Fml):- is_ftVar(Fml),!.
-as_symlog(Fml,FmlO):- as_dlog(Fml,FmlM),to_symlog_ops(OPS),subsT_each(each,FmlM,OPS,FmlO).
+
+
+
+as_symlog(Fml,Fml):- leave_as_is(Fml),!.
+as_symlog(Fml,FmlO):- as_dlog(Fml,FmlM),to_symlog_ops(OPS),subsT_each(FmlM,OPS,FmlM),correct_arities(['v','&'],FmlM,FmlO).
 
 :- dynamic(thglobal:as_prolog/2).
 thglobal:as_prolog(Fml,Fml):- is_ftVar(Fml),!.
 thglobal:as_prolog(Fml,FmlO):- as_symlog(Fml,FmlM),
-  to_prolog_ops(OPS),subsT_each(each,FmlM,OPS,FmlO).
+  to_prolog_ops(OPS),subsT_each(FmlM,OPS,FmlO).
 
 
 is_modal(n(_Neg,MODAL),BDT):- !, compound(MODAL),is_modal(MODAL,BDT),nonvar(BDT).
@@ -425,16 +448,16 @@ nnf(Neg,KB, Orig,atleast(1,X,Fml),FreeV,NNF,Paths):- !,
 nnf(Neg,KB, Orig,atleast(N,X,Fml),FreeV,NNF,Paths):- 
 	!,
 	NewN is N - 1,
-        subst_eq(Fml,X,Y,FmlY),
+        subst_except(Fml,X,Y,FmlY),
 	nnf(Neg,KB, Orig,&(exists(X,Fml),atleast(NewN,Y,FmlY)),FreeV,NNF,Paths).
 nnf(Neg,KB, Orig,atmost(1,X,Fml),FreeV,NNF,Paths):- 
 	!,
-        subst_eq(Fml,X,Y,FmlY),
-        subst_eq(Fml,X,Z,FmlZ),
+        subst_except(Fml,X,Y,FmlY),
+        subst_except(Fml,X,Z,FmlZ),
 	nnf(Neg,KB, Orig,n(Neg,&(exists(Y,FmlY),exists(Z,FmlZ))),FreeV,NNF,Paths).
 nnf(Neg,KB, Orig,atmost(N,X,Fml),FreeV,NNF,Paths):- 
 	!,
-        subst_eq(Fml,X,Y,FmlY),
+        subst_except(Fml,X,Y,FmlY),
 	NewN is N - 1,
 	nnf(Neg,KB, Orig,&(exists(Y,FmlY),atmost(NewN,X,Fml)),FreeV,NNF,Paths).
 
@@ -504,7 +527,7 @@ nnf(Neg,KB,_Orig,Fml,_,FmlO,1):- nonegate(Neg,KB,Fml,FmlO),!.
 
 
 is_lit_atom(IN):- leave_as_is(IN),!.
-is_lit_atom(IN):- subst_eq(IN,'&','*',M),subst_eq(M,'v','*',O),!,O==IN.
+is_lit_atom(IN):- subst_except(IN,'&','*',M),subst_except(M,'v','*',O),!,O==IN.
 
 mnf(Var,Var):-leave_as_is(Var),!.
 mnf(Fml,Out):-boxRule(_,Fml,M),Fml\=M,mnf(M,Out).
@@ -566,21 +589,24 @@ b_d(always,sometimes).
 % Usage: cnf(Orig, +NNF, ?CNF )
 cnf(A,B):- copy_term(A,Orig),cnf(Orig,A,B).
 cnf(Orig,A,B):- convertAndCall(as_dlog,cnf(Orig,A,B)).
+cnf(_Orig,AS_IS,       AS_IS):-leave_as_is(AS_IS),!.
 cnf(Orig,&(P,Q), &(P1,Q1)):- !, cnf(Orig,P, P1), cnf(Orig,Q, Q1).
 cnf(Orig,v(P,Q),     CNF):- !, cnf(Orig,P, P1), cnf(Orig,Q, Q1), cnf1(Orig, v(P1,Q1), CNF ).
 cnf(_Orig,CNF,       CNF).
 
-cnf1(Orig, v(&(P,Q), R), &(P1,Q1) ):- !, cnf1(Orig, v(P,R), P1), cnf1(Orig, v(Q,R), Q1).
-cnf1(Orig, v(P, &(Q,R)), &(P1,Q1) ):- !, cnf1(Orig, v(P,Q), P1), cnf1(Orig, v(P,R), Q1).
+cnf1(_Orig,AS_IS,       AS_IS):-leave_as_is(AS_IS),!.
+cnf1(Orig, v(LEFT, R), &(P1,Q1) ):- nonvar_unify(LEFT , &(P,Q)), !, cnf1(Orig, v(P,R), P1), cnf1(Orig, v(Q,R), Q1).
+cnf1(Orig, v(P, RIGHT), &(P1,Q1) ):- nonvar_unify(RIGHT , &(Q,R)), !, cnf1(Orig, v(P,Q), P1), cnf1(Orig, v(P,R), Q1).
 cnf1(_Orig, CNF,                 CNF).
 
-
+nonvar_unify(NONVAR,UNIFY):- \+ leave_as_is(NONVAR),  NONVAR=UNIFY.
 %=%
 %=% Disjunctive Normal Form (DNF) : assumes Fml in NNF
 %=%
 % Usage: dnf(Orig, +NNF, ?DNF )
-dnf(A,B):- copy_term(A,Orig),dnf(Orig,A,B).
+dnf(A,B):- copy_term(A,Orig),dnf(orig(Orig),A,B).
 dnf(Orig,A,B):- convertAndCall(as_dlog,dnf(Orig,A,B)).
+dnf(_Orig,AS_IS,       AS_IS):-leave_as_is(AS_IS),!.
 dnf(Orig, v(P,Q),  v(P1,Q1) ):- !, dnf(Orig,P, P1), dnf(Orig,Q, Q1).
 dnf(Orig, &(P,Q), DNF):- !, dnf(Orig,P, P1), dnf(Orig,Q, Q1), dnf1(Orig,&(P1,Q1), DNF).
 dnf(_Orig,DNF,       DNF).
@@ -911,7 +937,7 @@ skolem_bad(Fml,X,FreeV,FmlSk):-
 
 skolem(KB, Orig, F, X, FreeV, Out):-  fail,
    must(skolem_f(KB, Orig, F, X, FreeV, Sk)),
-   subst_eq(F,X,Sk,Out).
+   subst_except(F,X,Sk,Out).
 
 skolem(KB , Orig, F, X, FreeV, Out):-  
    must(skolem_f(KB, Orig, F, X, FreeV, Sk)),
@@ -921,7 +947,7 @@ skolem(KB , Orig, F, X, FreeV, Out):-
 
 skolem(KB, Orig, F, X, FreeV, FmlSk):- 
     must(skolem_f(KB, Orig, F, X, FreeV, Sk)), 
-    must(subst_eq(F, X, Sk, FmlSk)),!.
+    must(subst_except(F, X, Sk, FmlSk)),!.
 
 
 skolem_f(KB, Orig, F, X, FreeVIn, Sk):- 
@@ -947,8 +973,8 @@ skolem_fn(KB, Orig, F, X, FreeVIn,Fun, FreeVSet):-
 
 %=% Substitution
 
-% Usage: subst_eq(+Fml,+X,+Sk,?FmlSk)
-subst_eq(Fml,X,Sk,FmlSkO):- pred_subst(==,Fml,X,Sk,FmlSk),!,must(FmlSkO=FmlSk).
+% Usage: subst_except(+Fml,+X,+Sk,?FmlSk)
+subst_except(Fml,X,Sk,FmlSkO):- pred_subst(==,Fml,X,Sk,FmlSk),!,must(FmlSkO=FmlSk).
 
 
 % Usage: pred_subst(+Pred,+Fml,+X,+Sk,?FmlSk)
@@ -1097,22 +1123,31 @@ is_ftEquality(equals(_,_)).
 function_to_predicate(Function,NewVar,PredifiedFunction):- 
   Function=..[F|ARGS],
   function_corisponding_predicate(F,P),
-  PredifiedFunction=..[P,NewVar|ARGS].
-function_to_predicate(Function,NewVar,mudEquals(NewVar,Function)).
+  fresh_varname(F,NewVar),
+  PredifiedFunction=..[P,NewVar|ARGS],!.
+function_to_predicate(Function,NewVar,mudEquals(NewVar,Function)):-fresh_varname('mudEquals',NewVar),!.
+
+:-meta_predciate(call_last_is_var(1)).
+call_last_is_var(Call):- Call=FArgs,append(Left,[Last],FArgs),(var(Last)->Call;(append(Left,[IsVar],NFArgs),NewCall=..NFArgs,!,(NewCall,must(IsVar=Last)))).
+
+fresh_varname(F,NewVar):- upcase_atom(F,FUP),gensym(FUP,VARNAME),NewVar = '$VAR'(VARNAME),!.
 
 :- export(defunctionalize/2).
-defunctionalize(Wff,WffO):- defunctionalize(',',Wff,WffO).
+defunctionalize(Wff,WffO):-defunctionalize(',',Wff,WffO).
+defunctionalize(OP,Wff,WffO):- call_last_is_var(defunctionalize(OP,Wff,WffO)).
+defunctionalize(_ ,Wff,Wff):- leave_as_is(Wff),!.
 defunctionalize(_ ,Wff,Wff):- non_compound(Wff),!.
 defunctionalize(OP,Wff,WffO):- compound(Wff),
   each_subterm(Wff,SubTerm),
   compound(SubTerm),
   not(is_ftEquality(SubTerm)),
+  not(leave_as_is(SubTerm)),
   arg(_,SubTerm,Function),is_function(Function),
-  subst_eq(SubTerm,Function,NewVar,NewSubTerm),
+  subst_except(SubTerm,Function,NewVar,NewSubTerm),
   show_call(must(function_to_predicate(Function,NewVar,PredifiedFunction))),
   NEW =..[OP,PredifiedFunction,NewSubTerm],
-  subst_eq(Wff,SubTerm,NEW,NextWff),!,
-  defunctionalize(OP,NextWff,WffO).
+  subst_except(Wff,SubTerm,NEW,NextWff),!,
+  defunctionalize(OP,NextWff,WffO),!.
 defunctionalize(_,Wff,Wff).
 
 
@@ -1204,7 +1239,8 @@ kif_to_boxlog(WffIn0,KB0,Why0,FlattenedO):-
    pnf(NNF,PNF),
    %wdmsgl(pnf(PNF)),
    cf(Why, KB,Orig,PNF,NCFsI),!,
-   cf_to_flattened_clauses(KB,Why,NCFsI,FlattenedO))),!.
+   cf_to_flattened_clauses(KB,Why,NCFsI,Flattened))),!,
+   list_to_set(Flattened,FlattenedO),!.
 
 
 add_preconds(Wff6667,(PreCondPOS => Wff6667)):-
@@ -1231,13 +1267,14 @@ add_nesc(IN,nesc(IN)).
 
 
 % add_poss(Wff666,Wff666):-!.
+add_poss(PQ,PQ):- var(PQ),!.
 add_poss(PQ,PQO):- PQ=..[F,V,Q],pttp_quantifier(F),add_poss(Q,QQ),PQO=..[F,V,QQ],!.
 add_poss(Wff666,Wff666):-leave_as_is(Wff666),!.
 add_poss(not(IN),not(IN)).
 add_poss(IN,OUT):-IN=..[F|INL],logical_functor_pttp(F),!,must_maplist(add_poss,INL,OUTL),OUT=..[F|OUTL].
 add_poss(IN,poss(IN)).
 
-
+get_lits(PQ,PQ):- var(PQ),!.
 get_lits(PQ,QQ):- PQ=..[F,_Vs,Q],pttp_quantifier(F),get_lits(Q,QQ).
 get_lits(Wff666,Wff666):-leave_as_is(Wff666),!.
 get_lits(not(IN),not(OUT)):-get_lits(IN,OUT).
@@ -1284,9 +1321,9 @@ mpred_t_tell_kif(OP2,RULE):-
 fix_input_vars(AIn,A):- copy_term(AIn,A),numbervars(A,672,_).
 
 %:- export(show_boxlog/1).
-%assert_boxlog(AIn):- fix_input_vars(AIn,A), as_dlog(A,AA),kif_to_boxlog(AA,B),!,must_maplist(kif_tell_boxes(Why),B),!,nl,nl.
+%assert_boxlog(AIn):- fix_input_vars(AIn,A), as_dlog(A,AA),kif_to_boxlog(AA,B),!,must_maplist(kif_tell_boxes_undef(How,Why),B),!,nl,nl.
 %:- export(show_boxlog2/2).
-%assert_boxlog2(AIn):- fix_input_vars(AIn,A), with_all_dmsg((kif_to_boxlog(A,B),!,must_maplist(kif_tell_boxes(Why),B),!,nl,nl)).
+%assert_boxlog2(AIn):- fix_input_vars(AIn,A), with_all_dmsg((kif_to_boxlog(A,B),!,must_maplist(kif_tell_boxes_undef(How,Why),B),!,nl,nl)).
 
 
 
@@ -1358,7 +1395,7 @@ kif_ask_sent(Wff):-
    gensym(z_q,ZQ),
    Query=..[ZQ,666|Vars],
    kif_to_boxlog('=>'(Wff,Query),Why,Asserts),!,
-   kif_tell_boxes(Why,Asserts),!,
+   kif_tell_boxes(pttp_assert_wid,Why,Wff,Asserts),!,
    call_cleanup(
      kif_ask(Query),
      pttp_retractall_wid(Why)).
@@ -1381,21 +1418,32 @@ kif_ask(Goal0,ProofOut):- logical_pos(_KB,Goal0,Goal),
         search(Goal1,60,0,1,3,DepthIn,DepthOut),
         contract_output_proof(ProofOut1,ProofOut))).
 
+kif_tell(InS):- atom(InS),must_det_l((kif_read(string(InS),Wff,Vs),b_implode_varnames0(Vs),cyc:sterm_to_pterm(Wff,Wff0),kif_tell(Wff0))).
 kif_tell(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),why_to_id(tell,Wff,Why),kif_tell(Why,Wff))).
 
-:- export(kif_tell/2).
+:-op(1000,fy,(kif_tell)).
+
+:- export((kif_tell)/2).
 
 kif_tell(_,[]).
 kif_tell(Why,[H|T]):- !,must_det_l((kif_tell(Why,H),kb_incr(Why,Why2),kif_tell(Why2,T))).
-kif_tell(Why,Wff):-  must_det_l((kif_to_boxlog(Wff,Why,Asserts),kif_tell_boxes(Why,Wff,Asserts))),!.
+kif_tell(Why,Wff):-  must_det_l((kif_to_boxlog(Wff,Why,Asserts),kif_tell_boxes(assert_wfs,Why,Wff,Asserts))),!.
 
-kif_tell_boxes(Why,Wff0,Asserts0):-
+assert_wfs(Why,(H:-B)):- wdmsg((H:-assert_wfs(Why),B)).
+assert_wfs(Why,(H)):- wdmsg((H:-assert_wfs(Why))).
+
+
+
+kif_tell_boxes(How,Why,Wff0,Asserts0):-
  must_det_l((
-  show_call_failure(kif_unnumbervars(Asserts0+Wff0,Asserts+Wff)),
-  
+  show_call_failure(kif_unnumbervars(Asserts0+Wff0,Asserts+Wff)),  
   %fully_expand(Get1,Get),
   get_constraints(Wff,Isas), 
-  kif_add_constraints(Why,Isas,Asserts))).
+  kif_add_constraints(Why,Isas,Asserts))),
+   findall(HB-WhyHB,retract(thlocal:in_code_Buffer(HB,WhyHB)),List),
+   list_to_set(List,Set),
+   forall(member(HB-WhyHB,Set),call(How,WhyHB,HB)).
+
 
 kif_add_constraints(Why,Isas,Get1Get2):- var(Get1Get2),!,trace_or_throw(var_kif_tell_isa_boxes(Why,Isas,Get1Get2)).
 kif_add_constraints(Why,Isas,(Get1,Get2)):- !,kif_add_constraints(Why,Isas,Get1),kb_incr(Why,Why2),kif_add_constraints(Why2,Isas,Get2).
@@ -1406,15 +1454,18 @@ kif_add_constraints(Why,Isas,((H:- B))):- conjoin(Isas,B,BB), kif_tell_boxes1(Wh
 kif_add_constraints(Why,Isas,((H))):- kif_tell_boxes1(Why,(H:- Isas)).
 
 kif_tell_boxes1(_,[]).
-kif_tell_boxes1(Why,[H|T]):- !,must_det_l((kif_tell_boxes1(Why,H),kb_incr(Why,Why2),kif_tell_boxes1(Why2,T))).
+kif_tell_boxes1(Why,List):- is_list(List),!,list_to_set(List,[H|T]),must_det_l((kif_tell_boxes1(Why,H),kb_incr(Why,Why2),kif_tell_boxes1(Why2,T))).
 kif_tell_boxes1(_,z_unused(_)):-!.
-kif_tell_boxes1(Why,AssertI):- must_det_l((simplify_bodies(AssertI,AssertO),kif_tell_boxes2(Why,AssertO))).
+kif_tell_boxes1(Why,AssertI):- must_det_l((simplify_bodies(AssertI,AssertO),kif_tell_boxes3(save_wfs,Why,AssertO))).
 
-kif_tell_boxes2(Why,Assert):- 
+:-thread_local(thlocal:in_code_Buffer/2).
+
+
+kif_tell_boxes3(How,Why,Assert):- 
   must_det_l((
   boxlog_to_prolog(Assert,Prolog),  
   kif_unnumbervars(Prolog,PTTP), 
-  assert_wfs(Why,PTTP))).
+  call(How,Why,PTTP))).
 
 kif_unnumbervars(X,YY):-
  must_det_l((
@@ -1428,16 +1479,20 @@ simplify_bodies((H:- B),(H:- BC)):- must_det_l((conjuncts_to_list(B,RB),simplify
 simplify_bodies((B),(BC)):- must_det_l((conjuncts_to_list(B,RB),simplify_list(RB,BB),list_to_conjuncts(BB,BC))).
 
 
-simplify_list(RB,BBO):- list_to_set(RB,BB),must_maplist(removeQ,BB,BBO).
+simplify_list(RB,BBS):- list_to_set(RB,BB),must_maplist(removeQ,BB,BBO),list_to_set(BBO,BBS).
 
-assert_wfs(Why,PrologI):- must_det_l((thglobal:as_prolog(PrologI,Prolog), 
+save_wfs(Why,PrologI):- must_det_l((thglobal:as_prolog(PrologI,Prolog), 
    with_assertions(thlocal:current_why(Why,Prolog),
-   pfc_add_h(Prolog)))).
+   pfc_add_h(save_in_code_buffer,Why,Prolog)))).
 
-neg_if_neg(H,HH):-subst_eq(H,not,~,HH).
+neg_h_if_neg(H,HH):-subst_except(H,not,~,HH).
+neg_b_if_neg(H,HH):-subst_except(H,not,~,HH).
 
-pfc_add_h((H:- B)):- neg_if_neg(H,HH),  subst_eq(B,not,~,BB),dmsg((((HH:- BB)))),!.
-pfc_add_h(H):- neg_if_neg(H,PrologM),dmsg((PrologM)),!.
+pfc_add_h(How,Why,(H:- B)):- neg_h_if_neg(H,HH), neg_b_if_neg(B,BB),!,call(How,Why,(HH:-BB)).
+pfc_add_h(How,Why,(H)):- neg_h_if_neg(H,HH), call(How,Why,(HH)).
+
+save_in_code_buffer(_ ,HB):- thlocal:in_code_Buffer(HB,_),!.
+save_in_code_buffer(Why,HB):- assert(thlocal:in_code_Buffer(HB,Why)).
 
 use_was_isa_h(_,ftTerm,true):- !.
 use_was_isa_h(_,argi(mudEquals,_),true):- !.
@@ -1460,7 +1515,7 @@ get_constraints(ListA,Isas):-
 
 boxlog_to_prolog(IN,OUT):-notrace(leave_as_is(IN)),!,IN=OUT.
 boxlog_to_prolog(IN,OUT):-once(demodal_sents(IN,MID)),IN\=@=MID,!,boxlog_to_prolog(MID,OUT).
-boxlog_to_prolog(IN,OUT):-once(subst_eq(IN,neg,~,MID)),IN\=@=MID,!,boxlog_to_prolog(MID,OUT).
+boxlog_to_prolog(IN,OUT):-once(subst_except(IN,neg,~,MID)),IN\=@=MID,!,boxlog_to_prolog(MID,OUT).
 boxlog_to_prolog(H, HH):-is_list(H),!,must_maplist(boxlog_to_prolog,H,HH).
 
 boxlog_to_prolog((V:- TRUE),VE):- is_true(TRUE),boxlog_to_prolog(V,VE),!.
@@ -1613,7 +1668,7 @@ nnf_label(Neg,KB, Orig,exists(X,Fml),FreeV,NNF,Paths):-
          nnf(Neg,KB, Orig,Fml,NewVars,NNFMid,_Paths),
          skolem_fn(KB, Orig, NNFMid, X, FreeV, Fun, SkVars),
          SKF =.. [Fun|SkVars],
-         subst_eq(NNFMid,X,SKF,FmlSk),
+         subst_except(NNFMid,X,SKF,FmlSk),
          % MAYBE CLOSE nnf(Neg,KB, Orig,((mudEquals(X,SKF) => ~FmlSk)v Fml),NewVars,NNF,Paths).
          %nnf(Neg,KB, Orig,  (((skolem(X,SKF))=>NNFMid) & FmlSk) ,NewVars,NNF,Paths))).
         % GOOD nnf(Neg,KB, Orig, isa(X,SKF) => (skolem(X,SKF)=>(NNFMid)) ,NewVars,NNF,Paths))).
@@ -1632,7 +1687,6 @@ nnf_label(Neg,KB, Orig,exists(X,Fml),FreeV,NNF,Paths):-
 
 :- wdmsg('we see this').
 
-:- lsting(kif_tell/1).
 :- kif_tell((p => q)).
 :- kif_tell(~p <=> ~q).
 :- kif_tell(tRoom(R) => exists(D, (tDoor(D) & has(R,D)))).
@@ -1641,16 +1695,19 @@ nnf_label(Neg,KB, Orig,exists(X,Fml),FreeV,NNF,Paths):-
 :- kif_tell(all(P, person(P) => exists(D, dollar(D) & has(P,D)))).
 */
 kif_result(_).
+:- export((kif_test)/1).
+kif_test(X):-kif_tell(X).
+:-op(1000,fy,(kif_test)).
 
-end_of_file.
 
-:- kif_tell(all(R, exists(D, room(R) => (door(D) & has(R,D))))).
 
-:- kif_tell(p(A,R) & q(A,R)).
+:- kif_test(all(R, exists(D, room(R) => (door(D) & has(R,D))))).
 
-:- show_call(kif_tell(all(X, (~tNotFly(X) => ~tPengin(X))))).
+:- kif_test(p(A,R) & q(A,R)).
 
-/*
+:- show_call(kif_test(all(X, (~tNotFly(X) => ~tPengin(X))))).
+
+
 
 :- kif_result(
 (=> pfc_default((
@@ -1666,28 +1723,201 @@ end_of_file.
 :- kif_result((  neg(tPengin(A)) :-  ~tNotFly(A)  )).
 
 
-:- kif_tell(loves(fatherFn(Child),Child)).
+:- kif_test(loves(fatherFn(Child),Child)).
 
-:-assert_until_eof(thlocal:canonicalize_types).
+:- assert_until_eof(thlocal:canonicalize_types).
 
 % :- prolog.
-:- must(rtrace((kif_tell(isa(R,tPred) => exists(D, (isa(D,ftInt) & arity(R,D))))))).
+:- must(((kif_test(isa(R,tPred) => exists(D, (isa(D,ftInt) & arity(R,D))))))).
+
 :- kif_result(
 (=> pfc_default((
    tPred(R) => 
       {D = skIsIntInPredArg2ofArityFn(R)},arity(R,D) & ftInt(D))
-
-
  ))).
+
+
+:-kif_test'(relationAllExists causes-EventEvent Exhibitionism VisualEvent)'.
+
+:-kif_test '(relationAllExists properSubEvents Exhibitionism (DisplayingFn SexOrgan))'.
+
+:-kif_test '
+(implies
+       (and 
+           (isa ?AGREEMENT Agreement) 
+           (intangibleParts ?AGREEMENT ?OBLIGATION) 
+           (isa ?OBLIGATION Obligation) 
+           (agreeingAgents ?AGREEMENT ?WOMAN) 
+           (agentViolatesObligation ?WOMAN ?OBLIGATION)) 
+       (agentViolatesAgreement ?WOMAN ?AGREEMENT))'.
+
+% :-prolog.
+
+:-kif_test '
+(implies 
+       (and 
+           (isa ?SEEING VisualEvent) 
+           (objectActedOn ?SEEING ?WOMAN) 
+           (isa ?WOMAN ExhibitionistOffender) 
+           (actorPartsInvolved ?SEEING ?PART-TYPE) 
+           (physicalPartTypes Eyes ?PART-TYPE) 
+           (performedBy ?SEEING ?THEMAN)) 
+       (increases-Generic ?SIT 
+           (relationExistsInstance bodilyDoer 
+               Murder ?THEMAN) probability-Generic))'.
+
+
+:-kif_test '
+(implies 
+       (and 
+           (isa ?ACT CriminalAct) 
+           (isa ?ACT Exhibitionism) 
+           (perpetrator ?ACT ?PERP)) 
+       (isa ?PERP ExhibitionistOffender))'.
+
+
+:-kif_test '
+(implies 
+       (and 
+           (isa ?PUNISH Punishing) 
+           (performedBy ?PUNISH ?THEMAN) 
+           (maleficiary ?PUNISH ?WOMAN)) 
+       (beliefs ?THEMAN 
+           (thereExists ?OBLIGATION 
+               (agentViolatesObligation ?WOMAN ?OBLIGATION))))'.
+
+:-kif_test '
+(implies 
+       (and 
+           (isa ?MURDER Murder) 
+           (performedBy ?MURDER ?THEMAN) 
+           (obligatedAgents TheSixthCommandment ?THEMAN)) 
+       (agentViolatesObligation ?THEMAN TheSixthCommandment))'.
+
+
+:-kif_test '
+(implies 
+       (and 
+           (isa ?INST1 Exhibitionism) 
+           ((PresentTenseVersionFn doneBy) ?INST1 ?INST2)) 
+       (isa ?INST2 ExhibitionistOffender))'.
+
+
+:-kif_test '
+(implies 
+       (and 
+           (isa ?MS VisualEvent) 
+           (actorPartsInvolved ?MS ?MP) 
+           (isa ?MP Eyes)) 
+       (holdsIn ?MS 
+           (portalState ?MP OpenPortal)))'.
+
+:-kif_test '
+(implies 
+       (and 
+           (performedBy ?ACT ?WOMAN)
+           (isa ?ACT (DisplayingFn SexOrgan))           
+           (lawProscribesActType ?LAW Exhibitionism) 
+           (subjectToCOC ?WOMAN ?LAW)) 
+       (and 
+           (isa ?ACT Exhibitionism) 
+           (agentViolatesObligation ?WOMAN ?LAW)))'.
+
+:-kif_test '
+(not 
+       (and 
+           (subjectToCOC ?SUNBATHER KeepAreolaCoveredInPublic) 
+           (objectFoundInLocation ?SUNBATHER ?BEACH) 
+           (isa ?BEACH ToplessBeach)))'.
+
+
+:-kif_test '
+(implies 
+       (and 
+           (isa ?COC LegalCode-ModernWestern) 
+           (isa ?ACT Exhibitionism) 
+           (subjectToCOC ?WOMAN ?COC)
+           (agentViolatesObligation ?WOMAN KeepAreolaCoveredInPublic) 
+           (performedBy ?ACT ?WOMAN)) 
+       (ist ?COC 
+           (isa ?ACT CriminalAct)))'.
+
+:-kif_test '
+(implies 
+       (and 
+           (isa ?AREOLA 
+               (BodyPartCollectionFn ?WOMAN Areola)) 
+           (subjectToCOC ?WOMAN KeepAreolaCoveredInPublic) 
+           (locationState ?WOMAN InPublic)) 
+       (thereExists ?CLOTH 
+           (and 
+               (or 
+                   (agentViolatesObligation ?WOMAN KeepAreolaCoveredInPublic) 
+                   (covers-Generic ?CLOTH ?AREOLA)) 
+               (or 
+                   (agentViolatesObligation ?WOMAN KeepAreolaCoveredInPublic) 
+                   (wearsClothing ?WOMAN ?CLOTH)))))'.
+
+
+:-kif_test '
+(implies 
+       (and 
+           (different ?THEMAN ?WOMAN) 
+           (intendedMaleficiary ?ACT ?THEMAN) 
+           (deliberateActors ?ACT ?WOMAN) 
+           (behaviorCapable ?THEMAN 
+               (CollectionSubsetFn Punishing 
+                   (TheSetOf ?RESPONSE 
+                       (maleficiary ?RESPONSE ?WOMAN))) deliberateActors)) 
+
+       (optionAvailableToAgent-SitType ?THEMAN 
+           (CollectionSubsetFn 
+               (AttemptingFn Punishing) 
+               (TheSetOf ?RETALIATION 
+                   (and 
+                       (intendedMaleficiary ?RETALIATION ?WOMAN) 
+                       (purposeInEvent ?THEMAN ?RETALIATION 
+                           (not 
+                               (thereExists ?ANOTRACT 
+                                   (and 
+                                       (isa ?ANOTRACT PurposefulAction) 
+                                       (startsAfterEndingOf ?ANOTRACT ?ACT) 
+                                       (maleficiary ?ANOTRACT ?THEMAN) 
+                                       (deliberateActors ?ANOTRACT ?WOMAN)))))))) deliberateActors))'.
+
+:-kif_test '
+(implies 
+       (hasBeliefSystems ?WOMAN Karma) 
+       (beliefs ?WOMAN 
+           (implies 
+               (and 
+                   (isa ?MURDER Murder)
+                   (isa ?ANY Punishing)
+                   (sinner ?MURDER ?THEMAN) 
+                   (isa ?THEMAN 
+                       (IncarnationPhysicalFn ?SOUL Organism-Whole)) 
+                   (not 
+                       (punishmentFor ?THEMAN ?ANY 
+                           (sinner ?MURDER ?THEMAN)))) 
+               (thereExists ?NEXTLIFE 
+                   (thereExists ?PUN 
+                       (and 
+                           (isa ?PUN Punishing) 
+                           (startsAfterEndingOf ?NEXTLIFE ?THEMAN) 
+                           (isa ?NEXTLIFE 
+                               (IncarnationPhysicalFn ?SOUL Organism-Whole)) 
+                           (punishmentFor ?NEXTLIFE ?PUN 
+                               (sinner ?MURDER ?THEMAN))))))))'.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % this rule ...
 
-:- kif_tell((   wearing(A,B)  => has(A,B)  )).
+:- kif_test((   wearing(A,B)  => has(A,B)  )).
 
 % has to qualify argument types before canicalization
 
-:-  kif_tell((argInst(has,1,A) & argInst(has,2,B) => (wearing(A,B) => has(A,B)))).
+:-  kif_test((argInst(has,1,A) & argInst(has,2,B) => (wearing(A,B) => has(A,B)))).
 
 % Which produced this code:
 %
@@ -1700,7 +1930,7 @@ end_of_file.
 %       not_argInst(has, 2, A):- not_has(B, A), wearing(B, A), argInst(has, 1, B).
 %
 
-:-kif_tell(has(A,B) => (argInst(has, 1, A) & argInst(has, 2, B))).
+:-kif_test(has(A,B) => (argInst(has, 1, A) & argInst(has, 2, B))).
 
 %         not_has(A, _):- not_argInst(has, 1, A).
 %
@@ -1712,7 +1942,7 @@ end_of_file.
 
 
 
-:-kif_tell(has(A,B) =>  (kb_argInst(KB, has, 1, A) & kb_argInst(KB, has, 2, B))).
+:-kif_test(has(A,B) =>  (kb_argInst(KB, has, 1, A) & kb_argInst(KB, has, 2, B))).
 
 % BAD!
 %         (( not_has(A, _)):- not_kb_argInst( _BAD, has, 1, A)).
@@ -1728,7 +1958,7 @@ end_of_file.
 % :- prolog.
 % GOOD! (the software does this for us but wanted to show the singlton in the consequent on the conjuction)
 
-:-kif_tell(   argInst(kb_argInst, 1 , KB) =>  (        has(A,B) =>  (kb_argInst(KB, has, 1, A) & kb_argInst(KB, has, 2, B)))).
+:-kif_test(   argInst(kb_argInst, 1 , KB) =>  (        has(A,B) =>  (kb_argInst(KB, has, 1, A) & kb_argInst(KB, has, 2, B)))).
 
 %     (( not_argInst(kb_argInst, 1, KB)):-has(A, _),  not_kb_argInst(KB, has, 1, A)).
 %
@@ -1743,7 +1973,7 @@ end_of_file.
 %    (kb_argInst(KB, has, 2, B):-argInst(kb_argInst, 1, KB), has(_, B)).
 
 % EVEN BETTER?
-:-kif_tell(   argInst(kb_argInst, 1 , KB) & argInst(has, 1 , A) & argInst(has, 2 , B) =>  (  has(A,B) =>  (kb_argInst(KB, has, 1, A) & kb_argInst(KB, has, 2, B)))).
+:-kif_test(   argInst(kb_argInst, 1 , KB) & argInst(has, 1 , A) & argInst(has, 2 , B) =>  (  has(A,B) =>  (kb_argInst(KB, has, 1, A) & kb_argInst(KB, has, 2, B)))).
 
 
 %   pfc_add= (not_has(A, B)):- not_kb_argInst(C, has, 1, A), argInst(has, 2, B), argInst(kb_argInst, 1, C), argInst(has, 1, A)).
@@ -1770,7 +2000,7 @@ end_of_file.
 */
 
 
-:- kif_tell(all(R,isa(R,tAgent) => exists(D, (isa(D,tNose) & mudContains(R,D))))).
+:- kif_test(all(R,isa(R,tAgent) => exists(D, (isa(D,tNose) & mudContains(R,D))))).
 
 :- initialization(uses_logic(logicmoo_kb_refution)).
 
@@ -1781,7 +2011,7 @@ end_of_file.
 :- if_startup_script(ensure_loaded(logicmoo_i_mpred_kif_testing)).
 
 
-user:sanity_test:- kif_tell(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
+user:sanity_test:- kif_test(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
 
 user:sanity_test:- kif_to_boxlog(-((a , b ,  c , d)),S),!,disjuncts_to_list(S,L),
   list_to_set(L,SET),forall(member(P,SET),writeln(P)),!.

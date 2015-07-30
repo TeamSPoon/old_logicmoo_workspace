@@ -36,9 +36,10 @@ user:agent_call_command(Agent,actPlan(Goal)) :-
 
 update_charge(Agent,actPlan) :- padd(Agent,mudEnergy(+ -1)).
 
-:- flag(time_used,_,0).
 
-:-must((parseDomain(string("
+
+tpf_sanity:-flag(time_used,_,0),
+  must((parseDomain(string("
 
 (define (domain domAgentVehical)
   (:requirements :strips) 
@@ -185,14 +186,16 @@ update_charge(Agent,actPlan) :- padd(Agent,mudEnergy(+ -1)).
 
 )
 "
-),PP))), !,solve_files_ddpp(DD, PP).
+),PP))), !,solve_files_ddpp(DD, PP),
+   show_call(flag(time_used,W,W)).
+
+:-tpf_sanity.
+
+%:- test_domain('domains_ocl/chameleonWorld/domain*').
+%:- test_all(7).
 
 
-:- test_domain('domains_ocl/chameleonWorld/domain*').
-:- test_all(7).
-:- show_call(flag(time_used,W,W)).  
-
-:-prolog.
+%:-prolog.
 
 :- include(prologmud(mud_footer)).
 

@@ -1,5 +1,9 @@
 #!/usr/local/bin/swipl 
 
+
+
+:- if(if_defined(load_mud_www)).
+
 % :- module(swish_with_localedit,[]).
 
 
@@ -261,7 +265,10 @@ sandbox:safe_meta(V,O):-nonvar(V),nonvar(O).
 sandbox:safe_global_variable(V):-nonvar(V).
 sandbox:safe_directive(V):-nonvar(V).
 
-end_of_file.
+
+:-endif.
+
+:- if(if_defined(install_bower)).
 
 :-shell('sudo apt-get install npm nodejs-legacy').
 :-shell('sudo npm install -g bower').
@@ -380,4 +387,4 @@ using this command and reloading the page:
 */
 %     ?- debug(nominified).
 
-
+:-endif.

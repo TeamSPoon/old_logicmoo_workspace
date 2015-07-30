@@ -386,15 +386,7 @@ update_single_valued_arg(P,N):- arg(N,P,UPDATE),replace_arg(P,N,OLD,Q),
      forall((Q,UPDATE\=OLD),pfc_enqueue(\+Q))),!.
 */
 
-update_single_valued_arg(P,N):- 
- must_det_l((arg(N,P,UPDATE),notrace(replace_arg(P,N,OLD,Q)),
-  (is_relative(UPDATE)->
-     must_det_l((Q,update_value(OLD,UPDATE,NEW),\+ is_relative(NEW), replace_arg(Q,N,NEW,R),pfc_rem(Q),pfc_rem(P),pfc_add(R)));
-     forall(must(clause(Q,true)),must(UPDATE=@=OLD->true;show_call(pfc_rem2(Q))))))).
-
-single_valued_skel(F,A,N,DEFAULT,P,Q):- functor(P,F,A),
- must_det_l((arg(N,P,MISSING),replace_arg(P,N,DEFAULT,Q))).
- 
+/*
 
 % assert_with to change(CA1,CB2) singlevalue pred
 :-export((db_assert_sv/4)).
@@ -456,6 +448,8 @@ db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):-
    %replace_arg(C,A,_,CBLANK),must_det(clr(CBLANK)),hooked_retractall(CBLANK),   
    db_must_asserta_confirmed_sv(CNEW,A,NEW),!.
 
+*/
+
 :-style_check(+singleton).
 
 
@@ -501,18 +495,6 @@ mpred_modify(Op,                 G):- database_modify_0(Op,G ),!.
 mpred_modify(Op,                 G):- trace_or_throw(unknown_database_modify(Op,G)).
 
 
-/*
-database_modify_0(change(assert, add), G):-predicate_property(M:G,_PP),M==system,!,mpred_call(G).
-database_modify_0(change(assert, add), G):-current_predicate(_,G),!,debugOnError(G).
-database_modify_0(Op,G):- Op=change(_,_), G=..[And|Stuff], is_logical_functor(And),dtrace(And),loop_check(with_logical_functor(And,Stuff,database_modify_0(Op))).
-database_modify_0(Op,G):- once(must(db_quf(Op,G,U,Template))),not(is_true(U)),!, mpred_call(U),database_modify_0(Op,Template).
-database_modify_0(change(Assert,AorZ),G):- non_assertable(G,Why),trace_or_throw(non_assertable(Why,change(Assert,AorZ),G)).
-database_modify_0(change(retract,all),G):- !, db_quf(change( retract,all),G,U,Template),!,when_debugging(retract,dtrace), doall((mpred_call(U),hooked_retractall(Template))).
-database_modify_0(change(retract,A),G):- must(db_quf(change( retract,A),G,U,Template)),!,when_debugging(retract,dtrace), mpred_call(U),!,hooked_retract(Template).
-database_modify_0(Op,  G):- Op=..[Assert,How],!,database_modify_0(change(Assert,How),   G).
-database_modify_0(Op,  G):- Op=..[Assert],!,database_modify_0(change(Assert,one),   G).
-*/
-
 database_modify_0(Op,                       M:G):- atom(M),!, database_modify_0(Op,G).
 database_modify_0(Op,                   (C1,C2)):- !, must(database_modify_0(Op,C1)), must(database_modify_0(Op,C2)).
 database_modify_0(change(Assert,AorZ),(G:-TRUE)):- is_true(TRUE),!,database_modify_0(change(Assert,AorZ),G).
@@ -520,42 +502,27 @@ database_modify_0(change(retract,a),          G):- hooked_retract(G).
 database_modify_0(change(retract,one),        G):- hooked_retract(G).
 database_modify_0(change(retract,_),          G):- hooked_retractall(G).
 database_modify_0(change(assert,AZ),          G):- singletons_throw_else_fail(assert(AZ,G)).
-database_modify_0(change(assert,AZ),          G):- copy_term(G,GG),database_modify_assert(change(assert,AZ),G,GG),(must(variant(G,GG))).
+database_modify_0(change(assert,AZ),          G):- database_modify_assert(change(assert,AZ),G).
 
-database_modify_assert(change(assert,_),         G,GG):- ( \+ \+ is_asserted(GG)),must(variant(G,GG)),!.
-database_modify_assert(change(assert,AZ),       _G,GG):- expire_pre_change(AZ,GG),fail.
 
-database_modify_assert(change(assert,_),_, GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfc_add_fast(GGG)),!,show_call_failure(variant(GG,GGG)),!.
-
-database_modify_assert(change(assert,AorZ),      G,GG):- G \= (_:-_), get_functor(G,F,A),
-   (isa(F,prologSingleValued) -> ((AorZ \== sv , db_assert_sv(AorZ,G,F,A) )-> true; fail); 
-       isa(F,prologOrdered) -> (AorZ\==z -> database_modify_assert_must(change(assert,z),G,GG);true)).
-database_modify_assert(change(assert,AorZ),      G,GG):-database_modify_assert_must(change(assert,AorZ),G,GG).
-
-database_modify_assert_must(Op,G,GG):-must(database_modify_assert_4(Op,G,GG)).
-
-database_modify_assert_4(change(assert,_),_, GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfc_add_fast(GGG)),!,show_call_failure(variant(GG,GGG)),!.
-database_modify_assert_4(change(assert,AorZ), _,GG):- Op = change(assert,AorZ),                              
-                              database_modify_5(Op,GG),!,
-                              database_modify_6(Op,GG),
-                              database_modify_7(Op,GG),
-                              ignore(show_call_failure(database_modify_8(Op,GG))),!.
-
-database_modify_5(change(assert,_), GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfc_add_fast(GGG)),!,show_call_failure(variant(GG,GGG)),!.
-database_modify_5(Op,GG):- copy_term(GG,GGG),must((must_storage_op(Op,GGG), sanity(variant(GG,GGG)))),!.
-database_modify_6(Op,GG):- copy_term(GG,GGE),doall(must(call_no_cuts(expire_post_change(Op,GGE)))),sanity(variant(GG,GGE)),!.
-database_modify_7(Op,GG):- copy_term(GG,GGH),must((run_database_hooks(Op,GGH),sanity(variant(GG,GGH)))),!.
-database_modify_8(_ ,GG):- copy_term(GG,GGA),no_loop_check(is_asserted_eq(GGA)),sanity(variant(GG,GGA)),!.
-                               
-
+% database_modify_assert(change(assert,_),        G):- ( \+ \+ is_asserted(G)),must(variant(G,GG)),!.
+% database_modify_assert(change(assert,AZ),       G):- expire_pre_change(AZ,GG),fail.
+database_modify_assert(change(assert,_AorZ),       G):- !,pfc_add(G).
+database_modify_assert(change(assert,AorZ),       G):- 
+ get_functor(G,F,_),!,
+   (AorZ == a -> hooked_asserta(G);
+    AorZ == z ->  hooked_assertz(G);
+    isa(F,prologOrdered) -> database_modify_assert(change(assert,z),G);
+    isa(F,prologSingleValued) -> database_modify_assert(change(assert,a),G);
+      hooked_asserta(G)).
 
 % ========================================
 % only place ever should actual game database be changed from
 % ========================================
 
-hooked_asserta(G):- loop_check(mpred_modify(change(assert,a),G),true).
+hooked_asserta(G):- loop_check(mpred_modify(change(assert,a),G),pfc_asserta(G)).
 
-hooked_assertz(G):- loop_check(mpred_modify(change(assert,z),G),true).
+hooked_assertz(G):- loop_check(mpred_modify(change(assert,z),G),pfc_assertz(G)).
 
 hooked_retract(G):-  Op = change(retract,a),
                    ignore(slow_sanity(ignore(show_call_failure((mpred_op(is_asserted,G)))))),

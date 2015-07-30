@@ -16,6 +16,10 @@
  * Object Life History : chameleonWorld.gfx
  */
 
+end_of_file.
+
+:- if( (false, context_module(ocl))).
+
 domain_name(chameleonWorld).
 
 % Sorts
@@ -304,3 +308,4 @@ planner_task(8,
      outsideFlexarium(newsPaper2)]).
 
 
+:-endif.

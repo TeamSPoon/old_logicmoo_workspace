@@ -13,28 +13,29 @@ genls(tPenguin,tBird).
 % chilly is a penguin.
 tPenguin(iChilly).
 
-:-show_call((tBird(iChilly))).
+:-pfc_test((tBird(iChilly))).
 
 
 % tweety is a canary.
 tCanary(iTweety).
 
-:-show_call((tBird(iTweety))).
+:-pfc_test((tBird(iTweety))).
 
 
 % birds fly by default.
 (pfc_default(( tBird(X) => tFly(X)))).
 
+:-pfc_test((isa(I,tFly),I=iChilly)).
 
-:-show_call(must(tFly(iTweety))).
-:-show_call(must(tFly(iChilly))).
+:-pfc_test((tFly(iTweety))).
+:-pfc_test((tFly(iChilly))).
 
 
 % penguins do neg tFly.
 tPenguin(X) => neg(tFly(X)).
 
-:-show_call(must(\+ tFly(iChilly))).
-:-show_call(must(neg(tFly(iChilly)))).
+:-pfc_test((\+ tFly(iChilly))).
+:-pfc_test((neg(tFly(iChilly)))).
 
 
 

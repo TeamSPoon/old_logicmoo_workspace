@@ -168,6 +168,23 @@ for obvious reasons.
       export_all_preds/0,
      export_all_preds/1 ]).
 
+% have to load this module here so we dont take ownership of prolog_exception_hook/4.
+:- set_prolog_flag(access_level,system).
+:- set_prolog_flag(verbose_autoload, true).
+:- set_prolog_flag(gc, true).
+:- set_prolog_flag(generate_debug_info, true).
+% have to load this module here so we dont take ownership of prolog_exception_hook/4.
+
+% :- user:ensure_loaded(library(backcomp)).
+:- user:ensure_loaded(library(ansi_term)).
+:- user:ensure_loaded(library(check)).
+:- user:ensure_loaded(library(debug)).
+:- user:ensure_loaded(library(listing)).
+:- user:ensure_loaded(library(lists)).
+:- user:ensure_loaded(library(make)).
+:- user:ensure_loaded(library(prolog_stack)).
+:- user:ensure_loaded(library(system)).
+:- user:ensure_loaded(library(apply)).
 
 :-module_transparent(if_may_hide/1).
 %if_may_hide(_G):-!.
@@ -187,9 +204,9 @@ b_moo_hide(M,F,A):-
 
 
 
-b_moo_hide(M:F/A):-!,'$find_predicate'(F/A,List),forall(member(M:F/A,List),moo_hide(M,F,A)).
-b_moo_hide(P):-!,'$find_predicate'(P,List),forall(member(M:F/A,List),moo_hide(M,F,A)).
-b_moo_hide(F/A):-!,'$find_predicate'(F/A,List),forall(member(M:F/A,List),moo_hide(M,F,A)).
+b_moo_hide(M:F/A):-!,'$find_predicate'(F/A,List),forall(lists:member(M:F/A,List),moo_hide(M,F,A)).
+b_moo_hide(P):-!,'$find_predicate'(P,List),forall(lists:member(M:F/A,List),moo_hide(M,F,A)).
+b_moo_hide(F/A):-!,'$find_predicate'(F/A,List),forall(lists:member(M:F/A,List),moo_hide(M,F,A)).
 
 :- meta_predicate(cnotrace(0)).
 cnotrace(G):- notrace(G).
@@ -374,7 +391,7 @@ hotrace(X):- notrace(get_hotrace(X,Y)),Y.
       export_all_preds/0,
      export_all_preds/1 )).
 
-:- set_prolog_flag(generate_debug_info, true).
+
 
 :- thread_local(tlbugger:rtracing/0).
 :- thread_local(tlbugger:no_colors/0).
@@ -437,8 +454,9 @@ ftrace(Goal):- restore_trace((
    visible(+fail),visible(+exception),
    thread_leash(-all),thread_leash(+exception),trace,Goal)).
 
-
-
+non_user_console:-thread_self(Self),Self\=main,current_input(In),stream_property(In,tty(TF)),TF\==true,!,set_stream(In,close_on_exec(true)).
+trace_or_throw(E):-non_user_console,thread_self(Self),wdmsg(thread_trace_or_throw(Self+E)),
+   current_input(In),   logOnError(attach_console),set_stream(In,close_on_exec(true)),throw(abort),thread_exit(trace_or_throw(E)).
 trace_or_throw(E):- trace_or(throw(E)).
 
 :-export(errx/0).
@@ -1064,6 +1082,43 @@ bad_idea:-fail.
 static_predicate(FA):-once(predicate_property(FA,_)),not(predicate_property(FA,dynamic)).
 */
 
+% register_var(?, ?, ?)
+%
+%   During copying one has to remeber copies of variables which can be used further during copying.
+%   Therefore the register of variable copies is maintained.
+%
+register_var(N=V,IN,OUT):-register_var(N,IN,V,OUT).
+
+register_var(N,T,V,OUT):- must(nonvar(N)),
+   ((name_to_var(N,T,VOther)-> must((OUT=T,samify(V,VOther)));
+     (once(nb_getval('$variable_names',Before);Before=[]),
+      (name_to_var(N,Before,VOther)  -> must((samify(V,VOther),OUT= [N=V|T]));
+         (var_to_name(V,T,_OtherName)                  -> OUT= [N=V|T];
+           (var_to_name(V,Before,_OtherName)              -> OUT= [N=V|T];fail)))))).
+
+
+register_var(N,T,V,OUT):- var(N),
+   (var_to_name(V,T,N)                -> OUT=T;
+     (once(nb_getval('$variable_names',Before);Before=[]),
+          (var_to_name(V,Before,N)   -> OUT= [N=V|T];
+               OUT= [N=V|T]))),!.
+
+
+register_var(N,T,V,[N=V|T]).
+
+% different variables (now merged)
+samify(V,V0):-must(V=@=V0),V=V0. 
+
+var_to_name(V,[N=V0|T],N):-
+    V==V0 -> true ;          % same variables
+    var_to_name(V,T,N).
+
+name_to_var(N,T,V):- var(N),!,var_to_name(N,T,V).
+name_to_var(N,[N0=V0|T],V):- 
+   N0==N -> samify(V,V0) ; name_to_var(N,T,V).
+
+
+
 % ===================================================================
 % Safely number vars
 % ===================================================================
@@ -1450,9 +1505,6 @@ nodebugx(X):-
    with_assertions(tlbugger:ifWontTrace,
     with_assertions(tlbugger:show_must_go_on,
        with_assertions(tlbugger:ifHideTrace,hotrace(X))))).
-
-
-% :- use_module(library(prolog_stack)).
 
 :-multifile term_to_message_string/2.
 :-dynamic term_to_message_string/2.
@@ -2346,7 +2398,8 @@ with_assertions(before_after(Before,After),Call):-
 with_assertions(THead,Call):- 
  cnotrace(( 
      to_thread_head(THead,M,_Head,HAssert) -> true ; throw(failed(to_thread_head(THead,M,_,HAssert))))),
-     setup_call_cleanup(hotrace(asserta(M:HAssert,REF)),Call,erase_safe(asserta(M:HAssert,REF),REF)).
+     (setup_call_cleanup(hotrace(asserta(M:HAssert,REF)),Call,erase_safe(asserta(M:HAssert,REF),REF))).
+
 
 :-meta_predicate(with_no_assertions(+,0)).
 with_no_assertions(UHead,Call):- 
@@ -2615,14 +2668,14 @@ dmsg0(V):- is_with_dmsg(FP),!,FP=..FPL,append(FPL,[V],VVL),VV=..VVL,once(dmsg0(V
 dmsg0(_):- \+ always_show_dmsg, is_hiding_dmsgs,!.
 
 dmsg0(V):- var(V),!,dmsg0(dmsg_var(V)).
-dmsg0(NC):- cyclic_term(NC),!,fresh_line,write(dmsg_cyclic_term(NC)),fresh_line.
-dmsg0(NC):- tlbugger:skipDmsg,!,fresh_line,write(dmsg_cyclic_term(NC)),fresh_line.
+dmsg0(NC):- cyclic_term(NC),!,format(user_error,'~N~q~N',[dmsg_cyclic_term(NC)]).
+dmsg0(NC):- tlbugger:skipDmsg,!,format(user_error,'~N~q~N',[skipDmsg(NC)]).
 
 dmsg0(V):- once(dmsg1(V)), ignore((hook:dmsg_hook(V),fail)).
 %dmsg1(trace_or_throw(V)):- dumpST(350),dmsg(warning,V),fail.
 %dmsg1(error(V)):- dumpST(250),dmsg(warning,V),fail.
 %dmsg1(warn(V)):- dumpST(150),dmsg(warning,V),fail.
-dmsg1(NC):- cyclic_term(NC),!,fresh_line,write(dmsg_cyclic_term(NC)),fresh_line.
+dmsg1(NC):- cyclic_term(NC),!,format(user_error,'~N~q~N',[dmsg_cyclic_term(NC)]).
 dmsg1(skip_dmsg(_)):-!.
 %dmsg1(C):- \+ always_show_dmsg, dmsg_hides_message(C),!.
 dmsg1(ansi(Ctrl,Msg)):- ansicall(Ctrl,dmsg1(Msg)).
@@ -2739,7 +2792,7 @@ ansi_control_conv(Ctrl,CtrlO):-flatten([Ctrl],CtrlO),!.
 is_tty(Out):- not(tlbugger:no_colors), is_stream(Out),stream_property(Out,tty(true)).
 
 ansicall(Out,_,Call):- \+ is_tty(Out),!,Call.
-ansicall(Out,_,Call):- tlbugger:skipDmsg,!,Call.
+ansicall(_Out,_,Call):- tlbugger:skipDmsg,!,Call.
 
 ansicall(Out,CtrlIn,Call):- once(ansi_control_conv(CtrlIn,Ctrl)),  CtrlIn\=Ctrl,!,ansicall(Out,Ctrl,Call).
 ansicall(_,_,Call):- in_pengines,!,Call.
@@ -2978,17 +3031,7 @@ loggerFmtReal(S,F,A):-
     flush_output_safe(S),!.
 
 
-dumpSTC0:- MaxDepth=200,integer(MaxDepth),Term = dumpST(MaxDepth),
-   (var(Frame)->prolog_current_frame(Frame);true),
-   ignore(( get_prolog_backtrace(MaxDepth, Trace,[frame(Frame),goal_depth(5)]),
-    format(user_error, '% dumpST ~p', [Term]), nl(user_error),
-    print_prolog_backtrace(user_error, Trace,[subgoal_positions(true)]), nl(user_error), fail)),!.
-
-
  
-dump_st:- must_det_l((prolog_current_frame(Frame),get_prolog_backtrace(1000, Trace,[frame(Frame),goal_depth(10-0)]),
-   dmsg(Trace),
-   print_prolog_backtrace(user_error, Trace,[subgoal_positions(true)]))).
 
 :-moo_hide_childs(stack_depth/1).
 :-moo_hide_childs(stack_check/0).
@@ -3003,13 +3046,23 @@ stack_check(BreakIfOver,Error):- stack_check_else(BreakIfOver, trace_or_throw(st
 stack_check_else(BreakIfOver,Call):- stack_depth(Level) ,  ( Level < BreakIfOver -> true ; (dbgsubst(Call,stack_lvl,Level,NewCall),NewCall)).
 
 
-% dumpstack_arguments.
-dumpST:- tlbugger:skipDmsg-> dumpSTC ; cnotrace(dumpST0).
-dumpSTC:-
-   with_assertions(tlbugger:skipDmsg,dumpST0).
 
-dumpST0:- tlbugger:ifHideTrace,!.
-dumpST0:- hotrace((prolog_current_frame(Frame),dumpST2(Frame,5000))).
+% dumpstack_arguments.
+
+dumpST:- tlbugger:ifHideTrace,!.
+dumpST:- tlbugger:skipDmsg,!, ignore((dumpST0)),!.
+dumpST:- ignore(catch(( with_assertions(tlbugger:skipDmsg,dumpST9)),E,writeq(E))),!.
+ 
+dumpST0:-
+ ignore((catch((
+   MaxDepth=200,integer(MaxDepth),Term = dumpST(MaxDepth),format(user_error, '% dumpST ~p', [Term]), nl(user_error),
+    prolog_current_frame(Frame),ignore(( get_prolog_backtrace(MaxDepth, Trace,[frame(Frame),goal_depth(100)]),    
+    print_prolog_backtrace(user_error, Trace,[subgoal_positions(true)]), nl(user_error), fail))),
+   E,writeq(E)))).
+
+
+dumpST9:- tlbugger:ifHideTrace,!.
+dumpST9:- hotrace((prolog_current_frame(Frame),dumpST2(Frame,5000))).
 % dumpST(_):-is_hiding_dmsgs,!.
 
 dumpST(_):- tlbugger:ifHideTrace,!.
@@ -3155,12 +3208,12 @@ source_variables(Vs):- (((prolog_load_context(variable_names,Vs),Vs\==[]);
 source_variables(Vars):-var(Vars),parent_goal('$toplevel':'$execute_goal2'(_, Vars),_),!.
 source_variables([]).
 
-/*
 b_implode_varnames(_):-!.
 b_implode_varnames0([]):-!.
 b_implode_varnames0([N=V|Vs]):- ignore((V='$VAR'(N);V=N)),b_implode_varnames0(Vs),!.
 
 imploded_copyvars(C,CT):-must((source_variables(Vs),copy_term(C-Vs,CT-VVs),b_implode_varnames(VVs))),!.
+/*
 */
 
 :-export(unnumbervars/2).
@@ -3460,7 +3513,7 @@ call_no_cuts_loop_checked(Call, TODO):- clause(Call,Body),make_key(Body,Key),loo
 */
 
 % =====================================================================================================================
-:- export((call_tabled/1)).
+:- export((call_tabled/2)).
 :- export((cannot_table_call/1)).
 :- export((cannot_use_tables/1)).
 :- export((skipped_table_call/1)).
@@ -3468,8 +3521,8 @@ call_no_cuts_loop_checked(Call, TODO):- clause(Call,Body),make_key(Body,Key),loo
 :- meta_predicate call_tabled(0).
 :- module_transparent call_tabled/1.
 
-:- meta_predicate call_vars_tabled(?,0).
-:- module_transparent call_vars_tabled/2.
+:- meta_predicate call_vars_tabled(?,?,0).
+:- module_transparent call_vars_tabled/3.
 
 :- meta_predicate((cannot_table_call(0))).
 :- meta_predicate((cannot_use_tables(0))).
@@ -3477,9 +3530,9 @@ call_no_cuts_loop_checked(Call, TODO):- clause(Call,Body),make_key(Body,Key),loo
 
 
 
-:- meta_predicate call_setof_tabled(?,0,-).
+:- meta_predicate call_setof_tabled(?,?,?,0,-).
 :- meta_predicate findall_nodupes(?,0,-).
-:- module_transparent call_setof_tabled/3.
+:- module_transparent call_setof_tabled/4.
 
 :- dynamic(table_bugger:call_tabled_cached_results/2).
 :- dynamic(table_bugger:call_tabled_perm/2).
@@ -3494,7 +3547,8 @@ lex:-listing(tlbugger:ilc(_)),forall(current_predicate(table_bugger:F/A),listing
 ex:-expire_tabled_list(_),retractall(tlbugger:ilc(_)),dmsg_showall(_),forall(current_predicate(table_bugger:F/A),(functor(RA,F,A),retractall(RA))),catchvv(expire_dont_add,_,true).
 
 expire_tabled_list(V):-var(V),!,retractall(table_bugger:call_tabled_cached_results(_,_)).
-expire_tabled_list(_):-!,retractall(table_bugger:call_tabled_cached_results(_,_)).
+expire_tabled_list(K):-compound(K),functor(K,_,1),retractall(table_bugger:call_tabled_cached_results(isa(_,_),_)),retractall(table_bugger:call_tabled_cached_results(isa(_,_)+_,_)),fail.
+expire_tabled_list(K):-!,retractall(table_bugger:call_tabled_cached_results(K,_)),retractall(table_bugger:call_tabled_cached_results(K+_,_)).
 expire_tabled_list(T):- atoms_of(T,A1), CT= table_bugger:call_tabled_cached_results(Key,List),ignore(((CT,once(any_term_overlap_atoms_of(A1,List);(not(member(Key,List)),
   any_term_overlap_atoms_of(A1,Key))),retractall(CT)),fail)).
 
@@ -3521,13 +3575,13 @@ skipped_table_call(Call):- cannot_use_tables(cannot_table_call(Call)).
 cannot_table_call(Call):- with_assertions( tlbugger:cannot_save_table,Call).
 cannot_use_tables(Call):- with_assertions( tlbugger:cannot_use_any_tables,Call).
 
-call_tabled(setof(Vars,C,List)):- !,call_setof_tabled(Vars,C,List).
-call_tabled(findall(Vars,C,List)):- !,call_setof_tabled(Vars,C,List).
-call_tabled(C):- sanity(nonvar(C)), term_variables(C,Vars),!,call_vars_tabled(Vars,C).
+call_tabled(Key,setof(Vars,C,List)):- !,call_setof_tabled(Key,Vars,C,List).
+call_tabled(Key,findall(Vars,C,List)):- !,call_setof_tabled(Key,Vars,C,List).
+call_tabled(Key,C):- sanity(nonvar(C)), term_variables(C,Vars),!,call_vars_tabled(Key,Vars,C).
 
-call_vars_tabled(Vars,C):- call_setof_tabled(Vars,C,Set),!,member(Vars,Set).
+call_vars_tabled(Key,Vars,C):- call_setof_tabled(Key,Vars,C,Set),!,member(Vars,Set).
 
-call_setof_tabled(Vars,C,List):- make_key(Vars+C,Key),call_tabled0(Key,Vars,C,List).
+call_setof_tabled(KeyIn,Vars,C,List):- make_key(KeyIn+Vars,Key),call_tabled0(Key,Vars,C,List).
 
 findall_nodupes(Vs,C,List):- ground(Vs),!,(C->List=[Vs];List=[]),!.
 findall_nodupes(Vs,C,L):- findall(Vs,no_repeats_old(Vs,call_t(C)),L).
@@ -3808,7 +3862,7 @@ term_listing_inner(Pred,Match):-
    '@'(ignore((doall((
       synth_clause_for(H,B,Ref),
       once(ok_show(H)),
-      once(slow_term_matches_hb(Match,H,B)),
+      once(term_matches_hb(Match,H,B)),
       once(call(Pred,H,B,Ref)),
       fail)))),'user').
 
@@ -3834,43 +3888,44 @@ synth_clause_ref(H,(fail,synth_clause_info(Props)),0):- (H\=(_:-_)),once(pred_in
 synth_clause_ref(H,B,Ref):- predicate_property(M:H,number_of_clauses(_)),!,clause(M:H,B,Ref).
 
 :-export((term_matches_hb/3)).
-term_matches_hb([],_,_):-!.
-term_matches_hb([F1],H,B):-!,term_matches_hb(F1,H,B),!.
-term_matches_hb([F1|FS],H,B):-!,term_matches_hb((F1;FS),H,B).
-term_matches_hb([F1+FS],H,B):-!,term_matches_hb((F1,FS),H,B).
-term_matches_hb((F1,FS),H,B):-!,term_matches_hb(F1,H,B),term_matches_hb(FS,H,B).
-term_matches_hb((F1;FS),H,B):-!, (term_matches_hb(F1,H,B);term_matches_hb(FS,H,B)).
 
-term_matches_hb(arity(A),H,_):-!,functor(H,_,A).
-term_matches_hb(functor(F),H,_):-!,functor(H,F,_).
-term_matches_hb(not(C),H,B):-nonvar(C),!,term_matches_hb(-(C),H,B).
+term_matches_hb(HO,H,B):-term_matches_hb(999,HO,H,B).
+term_matches_hb(_,[],_,_):-!.
+term_matches_hb(D,_,_,_):- D<0,!,fail.
+term_matches_hb(_,noinfo,_,info(_)):-!,fail. 
+term_matches_hb(D,M:HO,H,B):-!,term_matches_hb(D,module(M);h(HO),H,B).
+term_matches_hb(D,[F1],H,B):-!,term_matches_hb(D,F1,H,B),!.
+term_matches_hb(D,[F1|FS],H,B):-!,term_matches_hb(D,(F1;FS),H,B).
+term_matches_hb(D,[F1+FS],H,B):-!,term_matches_hb(D,(F1,FS),H,B).
+term_matches_hb(D,(F1+FS),H,B):-!,term_matches_hb(D,(F1,FS),H,B).
+term_matches_hb(D,(F1,FS),H,B):-!,term_matches_hb(D,F1,H,B),term_matches_hb(D,FS,H,B).
+term_matches_hb(D,(F1;FS),H,B):-!, (term_matches_hb(D,F1,H,B);term_matches_hb(D,FS,H,B)).
+term_matches_hb(D,-(C),H,B):-nonvar(C),!,\+(term_matches_hb(D,C,H,B)).
+term_matches_hb(D,not(C),H,B):-nonvar(C),!,\+(term_matches_hb(D,C,H,B)).
+term_matches_hb(D,+(C),H,B):-nonvar(C),!, term_matches_hb(D,C,H,B).
+term_matches_hb(_,module(M),H,_):-!,predicate_property(H,imported_from(M)).
+term_matches_hb(D,h(P),H,_):-!,term_matches_hb(D,P,H,666666).
+term_matches_hb(D,b(P),_,B):-!,term_matches_hb(D,P,B,666666).
+term_matches_hb(D,contains(HO),H,B):- !,term_matches_hb(D,string(HO),H,B).
+term_matches_hb(_,string(HO),H,B):- nonvar(HO),any_to_string(HO,HS),!, with_output_to(string(H1B1),write_canonical((H:-B))), (sub_atom_icasechk(HS,_,H1B1);sub_atom_icasechk(H1B1,_,HS)),!.
+term_matches_hb(D,unify(HO),H,B):- nonvar(HO),!,term_matches_hb(D,HO,H,B).
+term_matches_hb(_,depth(Depth,HO),H,B):- term_matches_hb(Depth,HO,H,B).
+term_matches_hb(D,F/A,H,B):-atom(F),integer(A),!,functor(P,F,A),term_matches_hb(D,(unify(P);same(F/A)),H,B).
+term_matches_hb(D,F/A,H,B):-atom(F),var(A),!,term_matches_hb(D,(functor(F);same(F/A)),H,B).
+term_matches_hb(D,F/A,H,B):-var(F),integer(A),!,term_matches_hb(D,(arity(A);same(F/A)),H,B).
+term_matches_hb(D,HO,H,B):- \+ \+ term_matches_unify(D,HO,(H:-B)).
 
-term_matches_hb(-(C),H,B):-nonvar(C),!,not(term_matches_hb(C,H,B)).
-term_matches_hb(+(C),H,B):-nonvar(C),!,(term_matches_hb(C,H,B)).
-term_matches_hb(module(M),H,_):-!,predicate_property(H,imported_from(M)).
-term_matches_hb(F/A,H,_):-atom(F),integer(A),!,functor(H,F,A).
+% ?- term_listing((h(depth(0,pt/2)),same(tBird(A)))).
 
-term_matches_hb(h(P),H,_):-!,term_matches_hb(P,H,666666).
-term_matches_hb(b(P),_,B):-!,term_matches_hb(P,666666,B).
-term_matches_hb(HO,H,B):- string(HO),!, term_matches_hb_2(contains,HO,H,B).
-term_matches_hb(string(HO),H,B):- !, term_matches_hb_2(contains,HO,H,B).
-term_matches_hb(contains(HO),H,B):-!, term_matches_hb_2(contains,HO,H,B).
-
-
-:-export(slow_term_matches_hb/3).
-slow_term_matches_hb(noinfo,_,info(_)):-!,fail. 
-slow_term_matches_hb(HO,H,B):- atom(HO),!, term_matches_hb_2(exact,HO,H,B).
-slow_term_matches_hb(HO,H,B):-term_matches_hb(HO,H,B).
-slow_term_matches_hb(M:HO,H,B):-!,term_matches_hb(module(M),H,B),!,term_matches_hb(h(HO),H,B).
-slow_term_matches_hb(HO,H,B):- !,term_matches_hb_2(exact,HO,H,B).
-
-:-export(fast_term_matches_hb/3).
-fast_term_matches_hb(HO,H,B):-contains_var(HO,(H:-B)).
-fast_term_matches_hb(HO,H,B):-term_matches_hb(HO,H,B).
-
-:-export(term_matches_hb_2/4).
-term_matches_hb_2(contains,HO,H,B):- any_to_string(HO,HS),!, with_output_to(string(H1B1),write_canonical((H:-B))), (sub_atom_icasechk(HS,_,H1B1);sub_atom_icasechk(H1B1,_,HS)),!.
-term_matches_hb_2(exact,HO,H,B):- contains_var(HO,(H:-B)).
+:-export(term_matches_unify/3).
+term_matches_unify(_R,same(HO),V):-HO=@=V.
+term_matches_unify(_R,_,V):-var(V),!,fail.
+term_matches_unify(_R,V,V).
+term_matches_unify(_R,_,V):- \+ compound(V),!,fail.
+term_matches_unify(_R,arity(A),H):-functor(H,_,A).
+term_matches_unify(_R,functor(F),H):-functor(H,F,_).
+term_matches_unify(0,_,_):-!,fail.
+term_matches_unify(R,HO,V):- RR is R -1, V=..List,member(E,List),term_matches_unify(RR,HO,E).
 
 % match_term_listing(HO,H,B):-!, synth_clause_ref(H,B,_Ref), term_matches_hb(HO,H,B).
 
@@ -4145,3 +4200,4 @@ user:goal_expansion(LC,LCOO):- current_predicate(logicmoo_bugger_loaded/0),once(
 
 logicmoo_bugger_loaded.
 
+:- set_prolog_flag(access_level,user).

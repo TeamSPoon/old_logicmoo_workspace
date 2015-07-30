@@ -306,7 +306,7 @@ isa(I,T):- cwc, (nonvar(T)->true;tCol_gen(T)), loop_check(isa_backchaing(I,T)).
 %a(T,I):- thglobal:pfcManageHybrids,clause_safe(isa(I,T),true).
 :-export(isa_backchaing/2).
 
-isa_backchaing(I,T):- (call_tabled(no_repeats(loop_check(isa_backchaing_0(I,T))))).
+isa_backchaing(I,T):- (call_tabled(isa(I,T),no_repeats(loop_check(isa_backchaing_0(I,T))))).
 
 :-export(isa_backchaing_0/2).
 isa_backchaing_0(I,T):- T==ftVar,!,is_ftVar(I).
@@ -352,7 +352,7 @@ type_deduced(I,T):-nonvar(I),not(number(I)),clause(a(P,_,I),true),(argIsa_known(
 compound_isa(F,_,T):- mpred_call(resultIsa(F,T)).
 compound_isa(_,I,T):- mpred_call(formatted_resultIsa(I,T)).
 
-isa_asserted(I,C):-call_tabled(no_repeats(loop_check(isa_asserted_0(I,C)))).
+isa_asserted(I,C):-call_tabled(isa(I,C),no_repeats(loop_check(isa_asserted_0(I,C)))).
 %isa_asserted(I,CC):-no_repeats((isa_asserted_0(I,C),genls(C,CC))).
 
 :-dynamic(isa_asserted_0/2).
@@ -391,12 +391,13 @@ isa_w_type_atom(I,T):- a(ttPredType,T),!,isa(I,T).
 isa_w_type_atom(_,T):- dont_call_type_arity_one(T),!,fail.
 isa_w_type_atom(I,T):- G=..[T,I],once_if_ground(isa_atom_call(T,G),_).
 
+dont_call_type_arity_one(_):-!,fail.
 dont_call_type_arity_one(tCol).
 dont_call_type_arity_one(ttFormatType).
 dont_call_type_arity_one(ttAgentType).
 dont_call_type_arity_one(F):-isa(F,prologHybrid),!.
 
-isa_atom_call(T,G):-fail,loop_check(isa_atom_call_ilc(T,G)).
+isa_atom_call(T,G):-loop_check(isa_atom_call_ilc(T,G)).
 
 isa_atom_call_ilc(_,G):- real_builtin_predicate(G),!,G.
 %isa_atom_call_ilc(_,G):- predicate_property(G,number_of_clauses(_)),!,clause(G,B),call_mpred_body(G,B).
@@ -623,7 +624,7 @@ assert_isa_hooked_after(_,ttFormatType):-!.
 assert_isa_hooked_after(I,T):- not(completelyAssertedCollection(T)),impliedSubClass(T,ST),completelyAssertedCollection(ST),assert_isa(I,ST).
 :-export(impliedSubClass/2).
 impliedSubClass(T,ST):-ground(T:ST),is_known_false(genls(T,ST)),!,fail.
-impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_tabled(transitive_subclass(T,ST)).
+impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_tabled(isa(T,ST),transitive_subclass(T,ST)).
 */
 
 % one of 4 special cols

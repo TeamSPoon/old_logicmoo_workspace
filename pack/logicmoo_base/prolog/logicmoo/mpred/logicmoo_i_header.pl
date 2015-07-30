@@ -414,4 +414,6 @@ load_time_sanity.
 :- thread_local repl_to_string/2.
 :- thread_local repl_writer/2.
 
+:- dynamic_multifile_exported(user:grid_key/1).
+
 :- endif.

@@ -42,6 +42,11 @@
 :- use_module(library(error)).
 :- use_module(library(apply)).
 :- use_module(library(debug)).
+:- use_module(library(unix)).
+:- user:use_module(library(rdf_ntriples),[rdf_ntriple_part/4]).
+:- user:use_module(library(tty),[menu/3]).
+:- user:use_module(library(solution_sequences),[distinct/1]).
+
 :- if(exists_source(library(pldoc))).
 :- use_module(library(pldoc), []).
 	% Must be loaded before doc_process
@@ -49,11 +54,14 @@
 :- endif.
 :- use_module(library(prolog_xref)).
 
+:- if(if_defined(load_mud_www)).
+
 :- include(logicmoo(mpred/logicmoo_i_header)).
 % :- ['../logicmoo_run_swish'].
 :- user:ensure_loaded('../logicmoo_run_clio').
 
-:- initialization(doc_collect(true)).
+% WANT :- initialization(doc_collect(true)).
+
 %:- use_module(library(pldoc/doc_library)).
 %:- doc_load_library.
 
@@ -137,49 +145,21 @@ make_page_for_obj(Obj):-
       format('<body class="yui-skin-sam"><strong><font face="verdana,arial,sans-serif"><font size="5">Object : </font></strong><strong><font size="5"><a href="?search=~q" target="_top">~q</a></font></strong><br/><pre>',[PredURL,Pred]),
       flush_output,
       with_assertions([thlocal:print_mode(html)],
-      ignore(( 
-         logOnFailure(make_page_pretext_obj(Obj))))),
+      ignore(((
+        catch(
+         logOnFailure(make_page_pretext_obj(Obj)),times_up(_)))))),
       format('</pre><hr><span class="copyright"><i>Copyright &copy; 1999 - 2015 <a href="http://prologmoo.com">LogicMOO/PrologMUD</a>. 
         All rights reserved.</i></span></body></html>~n~n'
         ,[]).
 
 
-this_listing(M:F/A):-functor(H,F,A),predicate_property(M:H,number_of_causes(_)),!, forall(clause(M:H,Body),pp_ihtml((M:H :- Body))).
-this_listing(M:F/A):-functor(H,F,A),predicate_property(H,number_of_causes(_)),!, forall(clause(H,Body),pp_ihtml((M:H :- Body))).
-this_listing(M:F/A):-listing(M:F/A),!.
-this_listing(MFA):-listing(MFA).
-
-:-thread_local(pp_ihtml_saved_buffer/2).
-
-pp_ihtml_saved(_,pp_ihtml_saved_buffer(_,_)):-!.
-% pp_ihtml_saved(Obj,H):- \+ is_list(H),cyc:pterm_to_sterm(H,S),H\=@=S,!,pp_ihtml_saved(Obj,S).
-pp_ihtml_saved(Obj,H):-assert_if_new(pp_ihtml_saved_buffer(Obj,H)),!.
-pp_ihtml_saved_done(Obj):-findall(H,retract(pp_ihtml_saved_buffer(Obj,H)),List),predsort(head_functor_sort,List,Set),
-  forall(member(S,Set),pp_ihtml(S)).
-
-head_functor_sort(Result,H1,H2):- (var(H1);var(H2)),compare(Result,H1,H2),!.
-head_functor_sort(Result,H1,H2):- once((get_functor(H1,F1,A1),get_functor(H2,F2,A2))),F1==F2,A1>0,A2>0,arg(1,H1,E1),arg(1,H2,E2),compare(Result,E1,E2),!.
-head_functor_sort(Result,H1,H2):- once((get_functor(H1,F1,_),get_functor(H2,F2,_))),F1\==F2,compare(Result,F1,F2),!.
-head_functor_sort(Result,H1,H2):-compare(Result,H1,H2),!.
-
-ihtml_hbr(H,B,_Ref):- B == true,!,pp_ihtml_r(H).
-ihtml_hbr(H,B,_Ref):- pp_ihtml_r((H:-B)).
-
-pp_ihtml_r(USER:HB):-USER==user,!,pp_ihtml_r(HB),!.
-pp_ihtml_r((USER:H :- B)):-USER==user,!,pp_ihtml_r((H:-B)),!.
-pp_ihtml_r((H :- B)):-B==true,!,pp_ihtml_r((H)),!.
-pp_ihtml_r(HB):-pp_ihtml(HB),!.
-
-:-thread_local(thlocal:pp_ihtml_hook/1).
-
-
-make_page_pretext_obj(Obj):- 
-  get_functor(Obj,Pred,AA),((AA==0)->A=_;A=AA),
-  ignore((catch(mmake,_,true))),
+make_page_pretext_obj(Obj):-atom(Obj),atom_to_term(Obj,Term,Bindings),nonvar(Term),Term\==Obj,!,make_page_pretext_obj(Obj).
+make_page_pretext_obj(Obj):-  
   % forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((this_listing(M:F/A),flush_output)))),
-  forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((reply_object_sub_page(M:F/A),flush_output)))),
-  with_assertions((thlocal:pp_ihtml_hook(H):-pp_ihtml_saved(Obj,H)),term_listing_inner(ihtml_hbr,Obj)),
-  pp_ihtml_saved_done(Obj),
+  % forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((reply_object_sub_page(M:F/A),flush_output)))),
+  statistics(walltime,[Wall,_]),
+  catch(with_assertions((thlocal:pp_i2tml_hook(H):-pp_i2tml_saved(Obj,H)),term_listing_inner(i2tml_hbr(Obj,Wall),Obj)),times_up(Obj),true),
+  pp_i2tml_saved_done(Obj),
   ignore((fail,catch(pfc_listing(Pred),_,true))),!.
 
 
@@ -205,53 +185,8 @@ object_sub_page(Obj, Options) -->
 
 html_html_pp_ball(Color,Alt):-format(S,'<img src="http://prologmoo.com/cycdoc/img/cb/~w.gif" alt="~w" align="top" border="0"></img>',[Color,Alt]).
 
-hide_source_meta.
-   
-:-thread_local(shown_subtype/1).
-:-thread_local(shown_clause/1).
-
-section_open(Type):-  once(shown_subtype(Type)->true;((thlocal:print_mode(html)->format('~n</pre><hr>~w<hr><pre>~n<font face="verdana,arial,sans-serif">',[Type]);(draw_line,format('% ~w~n%~n',[Type]))),asserta(shown_subtype(Type)))),!.
-section_close(Type):- shown_subtype(Type)->(retractall(shown_subtype(Type)),(thlocal:print_mode(html)->format('</font>\n</pre><hr/><pre>',[]);draw_line));true.
-
-pp_item_html(Type,done):-!,section_close(Type),!.
-pp_item_html(_,H):-shown_clause(H),!.
-pp_item_html(Type,H):- \+ thlocal:print_mode(html), pp_item_html_now(Type,H),!.
-pp_item_html(Type,H):- ignore((flag(matched_assertions,X,X),between(0,5000,X),pp_item_html_now(Type,H))).
-
-pp_item_html_now(Type,H):-    
-   flag(matched_assertions,X,X+1),!,
-   pp_item_html_if_in_range(Type,H),!,
-   assert(shown_clause(H)),!.
-
-pp_item_html_if_in_range(Type,H):- section_open(Type),!,pp_ihtml(H),!,nl.
 
 
-pp_ihtml(T):-isVarProlog(T),getVarAtom(T,N),format('~w',[N]).
-pp_ihtml(done):-!.
-pp_ihtml(T):-string(T),format('"~w"',[T]).
-pp_ihtml((H:-B)):-B==true, !, pp_ihtml(H).
-pp_ihtml(was_chain_rule(H)):- pp_ihtml(H).
-pp_ihtml(is_edited_clause(H,B,A)):- pp_ihtml(proplst([(clause)=H,before=B,after=A])).
-pp_ihtml(is_disabled_clause(H)):- pp_ihtml((disabled)=H).
-
-pp_ihtml('$was_imported_kb_content$'(_,_)):- hide_source_meta,!.
-pp_ihtml(pfcMark(_,_,_,_)):- hide_source_meta,!.
-
-
-pp_ihtml(FET):-fully_expand(assert,FET,NEWFET),FET\=@=NEWFET,!,pp_ihtml(NEWFET).
-pp_ihtml(spft(P,U,U)):- nonvar(U),!, pp_ihtml(P:-asserted_by(U)).
-pp_ihtml(spft(P,F,T)):- atom(F),atom(T),!, pp_ihtml(P:-asserted_in(F:T)).
-pp_ihtml(spft(P,F,T)):- atom(T),!,  pp_ihtml(((P):-  T:'t-deduced',F)). 
-pp_ihtml(spft(P,F,T)):- atom(F),!,  pp_ihtml(((P):-  F:'f-deduced',T)). 
-pp_ihtml(spft(P,F,T)):- !, pp_ihtml((P:- ( 'deduced-from'=F,  (rule_why = T)))).
-pp_ihtml(nt(Trigger,Test,Body)) :- !, pp_ihtml(proplst(['n-trigger'=Trigger , format=Test  ,  (body = (Body))])).
-pp_ihtml(pt(Trigger,Body)):-      pp_ihtml(proplst(['p-trigger'=Trigger , ( body = Body)])).
-pp_ihtml(bt(Trigger,Body)):-      pp_ihtml(proplst(['b-trigger'=Trigger ,  ( body = Body)])).
-pp_ihtml(proplst([N=V|Val])):- is_list(Val),!, pp_ihtml(N:-([clause=V|Val])).
-pp_ihtml(proplst(Val)):-!, pp_ihtml(:-(proplst(Val))).
-
-pp_ihtml(C):- ((\+ \+ thlocal:pp_ihtml_hook(C))),!.
-pp_ihtml(C):- ((\+ \+ rok_portray_clause(C))),!.
 
 
 % ===================================================
@@ -265,16 +200,6 @@ write_atom_link(W,A/_,N):-atom(A),!,write_atom_link(W,A,N).
 write_atom_link(W,C,N):-compound(C),get_functor(C,F,A),!,write_atom_link(W,F/A,N).
 write_atom_link(W,_,N):- \+ thlocal:print_mode(html),format(W,'~q',[N]),!.
 write_atom_link(W,A,N):-url_iri(URL,A),format(W,'<a href="?search=~w">~w</a>',[URL,N]).
-
-indent_nbsp(X):-thlocal:print_mode(html),forall(between(0,X,_),format('&nbsp;')),!.
-indent_nbsp(X):-forall(between(0,X,_),format('~t',[])),!.
-
-indent_nl:- fresh_line, flag(indent,X,X), indent_nbsp(X).
-
-
-indent_nbsp(0,''):-!.
-indent_nbsp(1,'\n         '):-!.
-indent_nbsp(X,Chars):-XX is X -1,!, indent_nbsp(XX,OutP),!,sformat(Chars,'~w   ',[OutP]),!.
 
 
 
@@ -450,7 +375,8 @@ write_out(N, _, _, Ci, alpha) :-
 	name(N, String),
 	put_string(String).
 write_out(Term, print, _, Ci, alpha) :-
-	portray(Term),
+	% DMILES HSOULD BE portray(Term),
+        print(Term),
 	!.
 write_out(Atom, Style, Prio, _, punct) :-
 	atom(Atom),
@@ -706,12 +632,12 @@ rok_portray_clause(:-(Command)) :-
 	;   Command = Body,	    Key = ''
 	),  !,
 	nl,
-	numbervars(Body, 0, _),
-	'list clauses'(Body, Key, 2, 8).
+	% numbervars(Body, 0, _),
+	\+ \+ 'list clauses'(Body, Key, 2, 8).
 rok_portray_clause((Pred:-Body)) :-
-	numbervars(Pred+Body, 0, _),
-	portable_writeq(Pred),
-	'list clauses'(Body, 0, 2, 8), !.
+	% numbervars(Pred+Body, 0, _),
+	\+ \+ portable_writeq(Pred),
+	\+ \+ 'list clauses'(Body, 0, 2, 8), !.
 rok_portray_clause((Pred)) :-
 	rok_portray_clause((Pred:-true)).
 
@@ -795,3 +721,6 @@ test_bind([X='$VAR'(X)|L]) :-
 
 
 
+
+
+:- endif. 

@@ -8,6 +8,9 @@
 */
 % :-swi_module(logicmoo_i_loader, []).
 
+:- user:use_module(library(shlib)).
+:- user:use_module(library(operators)).
+
 
 % filetypes 
 %
@@ -22,19 +25,37 @@ loading_source_file(F):-once(thlocal:pretend_loading_file(F);prolog_load_context
 
 user:prolog_load_file(Module:Spec, Options):- loop_check(prolog_load_file_nlc(Module:Spec, Options)).
 
-prolog_load_file_nlc(Module:Spec, Options):-  \+ exists_file_safe(Spec),!,
- foreach(user:filematch(Module:Spec,FileName),
-    (loop_check((prolog_load_file_nlc(Module:FileName, Options))),TF=true)),!,
-  nonvar(TF).
+
+prolog_load_file_nlc(Module:Spec, Options):- thread_self(TID),
+   TID\==main,wdmsg(warn(error(skip_prolog_load_file_nlc(wrong_thread(TID):-thread(Module:Spec, Options))))),!,dumpST.
+
+prolog_load_file_nlc(Module:Spec, Options):- absolute_file_name(Spec,AFN,[extensions(['pl'])]), 
+   (Spec\==AFN),exists_file_safe(AFN),!,prolog_load_file_nlc_0(Module:AFN, Options).
 
 prolog_load_file_nlc(Module:DirName, Options):-  atom(DirName), is_directory(DirName)->
   current_predicate('load_file_dir'/2)->loop_check(show_call(call(load_file_dir,Module:DirName, Options))).
 
-prolog_load_file_nlc(Module:FileName, Options):-  
+prolog_load_file_nlc(Module:FileName, Options):- exists_file_safe(Spec),!,
+   prolog_load_file_nlc_0(Module:FileName, Options).
+
+prolog_load_file_nlc(Module:Spec, Options):- term_to_atom(Spec,String),member(S,['?','*']),sub_atom(String,_,1,_,S),!, 
+ foreach(user:filematch(Module:Spec,FileName),
+    (loop_check((prolog_load_file_nlc_0(Module:FileName, Options))),TF=true)),!,
+  nonvar(TF).
+
+prolog_load_file_nlc_0(Module:Spec, Options):- thread_self(TID),
+   TID\==main,wdmsg(warn(error(skip_prolog_load_file_nlc(wrong_thread(TID):-thread(Module:Spec, Options))))),!.
+
+prolog_load_file_nlc_0(Module:FileName, Options):- 
+  '$set_source_module'(SM,SM),
+ (source_file_property(FileName,load_context(MC,SubFile:Line)),MC\==user,SM==user),!,
+  wdmsg(skipping(prolog_load_file_nlc(Module:FileName, Options):source_file_property(FileName,load_context(MC,SubFile:Line)))),!.
+
+prolog_load_file_nlc_0(Module:FileName, Options):-  
   file_name_extension(_Base,Ext,FileName),
   use_file_type_loader(Ext,Loader)-> loop_check(call(Loader,Module:FileName, Options)).
 
-prolog_load_file_nlc(Module:FileName, Options):- fail, fail, fail, fail, fail, fail, fail, fail, fail, fail, fail, fail, 
+prolog_load_file_nlc_0(Module:FileName, Options):- fail, fail, fail, fail, fail, fail, fail, fail, fail, fail, fail, fail, 
   file_name_extension(_Base,Ext,FileName),
   guess_file_type_loader(Ext,Loader)-> loop_check(call(Loader,Module:FileName, Options)).
 

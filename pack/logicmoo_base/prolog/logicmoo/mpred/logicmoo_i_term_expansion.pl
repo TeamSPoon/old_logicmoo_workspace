@@ -204,7 +204,7 @@ same_terms((A:-AA),(B:-BB)):-!,same_terms(A,B),same_terms(AA,BB).
 same_terms(M:A,B):-atom(M),!,same_terms(A,B).
 same_terms(A,M:B):-atom(M),!,same_terms(A,B).
 
-fully_expand(Op,Sent,SentO):- hotrace(fully_expand0(Op,Sent,SentO)).
+fully_expand(Op,Sent,SentO):- cyclic_break((Sent)),notrace(fully_expand0(Op,Sent,SentO)),!.
 fully_expand0(_,Sent,SentO):- \+(compound(Sent)),!,Sent=SentO.
 fully_expand0(Op,Sent,SentO):-must_expand(Sent),!,fully_expand_now(Op,Sent,SentO),!.
 fully_expand0(_,Sent,SentO):-get_functor(Sent,_,A),A\==1,!,Sent=SentO.
@@ -214,6 +214,7 @@ fully_expand_now(_,Sent,SentO):-not(compound(Sent)),!,Sent=SentO.
 fully_expand_now(_,Sent,SentO):-thlocal:infSkipFullExpand,!,must(Sent=SentO).
 fully_expand_now(_,(:-(Sent)),(:-(Sent))):-!.
 fully_expand_now(Op,Sent,SentO):- copy_term(Sent,NoVary),
+  cyclic_break((NoVary)),   
  with_assertions(thlocal:disable_mpred_term_expansions_locally,
    must(fully_expand_clause(Op,Sent,BO))),!,must(notrace((SentO=BO))),
     must(Sent=@=NoVary),

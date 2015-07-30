@@ -173,8 +173,6 @@ dividesBetween(tAgent,tPlayer,tNpcPlayer).
 %(mpred_prop(_,meta_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) => meta_argtypes(ArgTypes).
 
 
-% tCol(Type),(tBinaryPredicate(Pred)/(functor(G,Pred,2),G=..[Pred,isInstFn(Type),Value])), G => relationMostInstance(Pred,Type,Value).
-
 
 isa(tRegion,ttSpatialType).
 isa(tRelation,ttAbstractType).
@@ -369,8 +367,8 @@ vtValue(Val)/(atom(Val),i_name_lc(Val,KW))=>mudKeyword(Val,KW).
 
 ttPredAndValueType(Str)/(i_name('mud',Str,Pred),i_name('vt',Str,VT)) => (tRolePredicate(Pred),ttValueType(VT),mudKeyword(VT,Str),mudKeyword(Pred,Str),argIsa(Pred,2,VT),argIsa(Pred,1,tTemporalThing)).
 
-relationMostInstance(arg1Isa,tRolePredicate,tTemporalThing).
-relationMostInstance(arg2QuotedIsa,tRolePredicate,ftTerm).
+%relationMostInstance(arg1Isa,tRolePredicate,tTemporalThing).
+%relationMostInstance(arg2QuotedIsa,tRolePredicate,ftTerm).
 
 % mudKeyword(W,R) <= {atom(W),i_name_lc(W,R)}.
 
@@ -786,7 +784,12 @@ mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
 
 
 genls(tBread, tFood).
-typeProps(tCrackers,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]).
+
+typeProps(tCrackers,
+  [mudColor(vTan),isa(tBread),
+   mudShape(isEach(vCircular,vFlat)),
+   mudSize(vSmall),
+   mudTexture(isEach(vDry,vCoarse))]).
 
 nonvar_must_be(V,G):- (var(V);G),!.
 
@@ -937,17 +940,17 @@ Unsuccessful attempt by is a rulebook. [19
 
 
 
-tCol(random_path_dir).
-random_path_dir(Dir):-nonvar(Dir),!,fail.
+prologBuiltin(random_path_dir/1).
+random_path_dir(Dir):-nonvar(Dir),!,random_path_dir(Dir0),Dir=Dir0,!.
 random_path_dir(Dir):-random_instance(vtBasicDir,Dir,true).
 random_path_dir(Dir):-random_instance(vtBasicDirPlusUpDown,Dir,true).
 random_path_dir(Dir):-random_instance(vtDirection,Dir,true).
 
 prologBuiltin(ensure_some_pathBetween(tRegion,tRegion)).
 
-prologBuiltin(onEachLoad).
-argsQuoted(onEachLoad).
-argsQuoted(must).
+prologBuiltin(onEachLoad/0).
+argsQuoted(onEachLoad/1).
+argsQuoted(must/1).
 
 tCol(tStatPred).
 
@@ -978,9 +981,10 @@ prologHybrid(on_command_show(tAgent,vtActionType,ftTerm)).
 prologHybrid(agentTODO(tAgent,vtActionType)).
 prologHybrid(agentGOAL(tAgent,ftAssertable)).
 
-normalAgentGoal(Pred,Val)=>  ( t(Pred,A,V)/(V<Val) => agentTODO(A,actImprove(Pred))).
-normalAgentGoal(Pred,Val)=>  ( t(Pred,A,V)/(V<Val) => agentGOAL(A,t(Pred,A,Val))).
+normalAgentGoal(Pred,Val) =>  ( t(Pred,A,V)/(V<Val) => agentTODO(A,actImprove(Pred))).
+normalAgentGoal(Pred,Val) =>  ( t(Pred,A,V)/(V<Val) => agentGOAL(A,t(Pred,A,Val))).
 
+:-pfc_fwd(normalAgentGoal(Pred,Val) =>  ( t(Pred,A,V)/(V<Val) => agentGOAL(A,t(Pred,A,Val)))).
 normalAgentGoal(Pred,Val)=>  (tAgent(A)=>pfc_default(t(Pred,A,Val))).
 
 genls(tRoom,tRegion).
@@ -1031,6 +1035,8 @@ O = [
 
 */
 
+:- pfc_watch.
+
 :-pfc_add(tAgent(iPlayer1)).
 
 
@@ -1045,7 +1051,9 @@ O = [
 
 :-pfc_rem(mudFacing(iPlayer1,vSouth)).
 
+:-must(\+ mudFacing(iPlayer1,vSouth)).
+
 :-must(mudFacing(iPlayer1,vNorth)).
 
-
+:- pfc_no_watch.
 

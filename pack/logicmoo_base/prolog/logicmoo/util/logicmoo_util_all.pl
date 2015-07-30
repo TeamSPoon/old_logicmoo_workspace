@@ -11,6 +11,19 @@
 :- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
 :- set_prolog_flag(double_quotes,string).
 
+% have to load this module here so we dont take ownership of prolog_exception_hook/4.
+:- set_prolog_flag(access_level,system).
+:- set_prolog_flag(verbose_autoload, true).
+:- set_prolog_flag(generate_debug_info, true).
+% have to load this module here so we dont take ownership of prolog_exception_hook/4.
+:- user:ensure_loaded(library(ansi_term)).
+:- user:ensure_loaded(library(check)).
+:- user:ensure_loaded(library(debug)).
+:- user:ensure_loaded(library(listing)).
+:- user:ensure_loaded(library(lists)).
+:- user:ensure_loaded(library(make)).
+:- user:ensure_loaded(library(prolog_stack)).
+:- user:ensure_loaded(library(system)).
 
 :- export(with_stream_pos/2).
 :- meta_predicate(with_stream_pos(+,0)).

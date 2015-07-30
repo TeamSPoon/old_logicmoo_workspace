@@ -20,9 +20,40 @@ hybrid_tPredStubImpl(prologBuiltin).
 hybrid_tPredStubImpl(prologKIF).
 hybrid_tPredStubImpl(prologEquality).
 
+/*
+1 = single value
+
+t = type transitve becoming more specific
+T = type transitve becoming more general
+tt = type transitve becoming more specific
+TT = type transitve becoming more general
+
+i = instance (non col)
+p3 = predciate arity
+r3 = function arity
+a = agent
+v = value
+o = object
+l = literal
+f = formula of formulas
+ 
 
 
 
+genls =  ct_cT
+relationAllInstance = p2_ct_v
+relationMostInstance = p2_ct_sv
+relationMostExists = p2_ct_ct
+isa X BinaryPredicate = isa_p2_c
+isa BinaryPredicate Role = isa_p2_pc
+isa 4 number =  isa_v_ft
+implies P Q =  
+
+
+
+
+
+*/
 % ================================================
 % db_redir_op_if_needed/4
 % ================================================
@@ -373,11 +404,11 @@ assert_mpred_t(G):-add_from_file(G).
 
 :- op(1150,fx,decl_mpred_hybrid).
 
-user:listing_mpred_hook(Match):- 
+user:listing_mpred_hook(Match):- fail,
  (( 
   dif:dif(Proof,prologRef(_)),
   no_repeats_old([H,B],((user:provide_mpred_storage_clauses(H,B,Proof)),
-                Proof\=prologRef(_))),slow_term_matches_hb(Match,H,B),portray_hb(Proof:H,B))),fail.
+                Proof\=prologRef(_))),term_matches_hb(Match,H,B),portray_hb(Proof:H,B))),fail.
 
       
 user:provide_mpred_storage_clauses(H,B,Proof):-mpred_t_mpred_storage_clauses_facts(H,B,Proof).

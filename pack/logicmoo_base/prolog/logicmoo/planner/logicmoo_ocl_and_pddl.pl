@@ -150,8 +150,8 @@ load_file_rest(F,L):- first_n_elements(L,10,ES),
 :-export(z2p/2).
 z2p(A,A).
 
-save_type_named(Type,Named,O):- doall(retract((is_saved_type(Type,Named,_):-_))),ain((is_saved_type(Type,Named,A):-z2p(O,A))).
-save_sterm(O):-gensym(sterm,Named),save_type_named(sterm,Named,O).
+save_type_named(Type,Named,O):- doall(retract((is_saved_type(Type,Named,_):-_))),nop(ain((is_saved_type(Type,Named,A):-z2p(O,A)))).
+save_sterm(O):-nop((gensym(sterm,Named),save_type_named(sterm,Named,O))).
 
 test_frolog:- test_dir_files_sas('frolog','p02-domain.pddl','p02.pddl'),
     test_dir_files_sas('frolog','tPddlAgent01-domain.pddl','tPddlAgent01.pddl'),
@@ -277,7 +277,7 @@ record_time(G,Runtime,TimeUsed):- statistics(Runtime, [B,_]),G,statistics(Runtim
 
 try_solve(PN,D,P,S):- thlocal:loading_files,!,pmsg((loading_files(PN):-try_solve(D,P,S))),!.
 % try_solve(PN,D,P,S):- once(time_out(solve(PN,D, P, S), 3000, Result)), Result == time_out, portray_clause(hard_working:-try_solve(PN,D,P,S)),fail.
-try_solve(PN,D,P,S):- gripe_time(14,time_out((solve(PN,D, P, S)), 300000, Result)),!, % time limit for a planner (was 500000)
+try_solve(PN,D,P,S):- gripe_time(14,time_out((solve(PN,D, P, S)), 30000, Result)),!, % time limit for a planner (was 500000)
    ((\+ is_list(S)
      -> portray_clause('failed'(Result):-try_solve(PN,D,P,S)) ;
        ((Result=time_out)->portray_clause('failed'(Result):-try_solve(PN,D,P,S));true))),!.
@@ -359,7 +359,7 @@ hyhtn_solve(_,D, P, Solution):-
     prop_get(actions,D, A),
     must_maplist(save_ocl_operators,A),
     bb_put(goalState, G),        
-    bb_put(fictiveGoal, G))),!,    
+    bb_put(fictiveGoal, G))),
     ignore(logicmoo_hyhtn:init_locol_planner_interface0(G,I,Solution)).
 
 save_ocl_operators(A):-dmsg(save_ocl_operators(A)), % varnames_for_assert(A,CA,Vars),
@@ -2348,7 +2348,7 @@ test_blocks:- fail, test_domain('./benchmarks/nomystery-sat11-strips/domain.pddl
 
 :- endif.
 
-:- test_all(7).
+% :- test_all(7).
 
 :- show_call(flag(time_used_other,W,W)).
 :- show_call(flag(time_used,W,W)).

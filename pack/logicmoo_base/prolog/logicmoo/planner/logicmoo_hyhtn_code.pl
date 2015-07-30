@@ -95,14 +95,16 @@ on_call_decl_hyhtn :- decl_mpred_env_task([stubType(dyn),kb(node,cache)],(tp_nod
 on_call_decl_hyhtn :- decl_mpred_env_dom([kb(dom,tasks),stubType(dyn)], ( htn_task/3, planner_task/3, planner_task_slow/3 )).
 
 % Contents of a OCLh Domain
-on_call_decl_hyhtn :- 
+on_call_decl_hyhtn :-  
   decl_mpred_env_dom([kb(dom,file),stubType(dyn)],[domain_name/1,sorts/2,substate_classes/3,objects/2,predicates/1,inconsistent_constraint/1,atomic_invariants/1,
-  implied_invariant/2,operator/4, oper/4, method/6]).
+  implied_invariant/2,operator/4,
+   % oper/4,
+   method/6]).
 
 :-export(call_decl_hyhtn/0).
 call_decl_hyhtn:-must(doall(on_call_decl_hyhtn)).
 
-:-call_decl_hyhtn.
+:-with_pfc_trace_exec(logicmoo_hyhtn:call_decl_hyhtn).
 
 
 
@@ -897,8 +899,8 @@ make_tpnodes(Pre,Post, Statics):-
 
 % forward search for operators can't directly solved
 
-% fwsearch(TN,State):- fwsearch0(fwsearch,1000, TN,State).
-fwsearch(TN,State):- fwsearch0(fwsearch,600, TN,State).
+fwsearch(TN,State):- fwsearch0(fwsearch,1000, TN,State).
+% fwsearch(TN,State):- fwsearch0(fwsearch,600, TN,State).
 
 
 fwsearch0(Caller, D, TN,State):-fwsearch0_0(Caller, D, TN,State).
@@ -1172,7 +1174,7 @@ find_all_related_goals(Pre,Statics,I,N):-
     find_related_goal(Statics,I1,I),
     I2 is I+1,
     Key is random(10),
-    loop_check_term(find_all_related_goals(Pre,Statics,I2,N),goals(Pre,Statics,Key),fail),!.
+    find_all_related_goals(Pre,Statics,I2,N),!.
 find_all_related_goals(Pre,Statics,N,N):-
     not(env_call goal_related(_,_,N)),
     env_assert(goal_related_search(fail)),
@@ -1218,7 +1220,7 @@ all_found([se(Sort,Obj,ST)|States],Pre,Statics):-
 % separete ground operators to related-op and unrelated op
 find_related_goal(Statics,I1,I):-
     env_call gOperator(OPID,ID,operator(Name,Prev,Nec,Cond)),
-    loop_check_term(find_related_goal_nec(OPID,Name,Prev,Nec,Statics,I1,I),Name,fail),
+    find_related_goal_nec(OPID,Name,Prev,Nec,Statics,I1,I),
     find_related_goal_cond(OPID,Name,Prev,Nec,Cond,Statics,I1,I),
     fail.
 find_related_goal(Statics,I1,I).
@@ -2233,9 +2235,10 @@ get_one_isa_fa(S,X,F,N,[X|_]):- functor(P,F,N),(env_call predicates(SS)),member(
 
 is_decl_of_sort(X,S):- env_call is_of_sort(X,S).
 is_decl_of_sort(X,S):- env_call objects(S,L),member(X,L).
-is_decl_of_sort(X,S):- is_sort(S),downcase_atom(S,Thing),name(X,Codes),append(NameCodes,NumberCodes,Codes),catch(number_codes(Number,NumberCodes),error(syntax_error(_),_),fail).
+% is_decl_of_sort(X,S):- ar(S),is_sort(S),downcase_atom(S,Thing),name(X,Codes),append(NameCodes,NumberCodes,Codes),catch(number_codes(Number,NumberCodes),error(syntax_error(_),_),fail).
 is_decl_of_sort(X,S):- name(X,Codes),append(NameCodes,NumberCodes,Codes),catch(number_codes(Number,NumberCodes),error(syntax_error(_),_),fail),name(Thing,NameCodes),downcase_atom(Thing,S).
 
+is_sort(V):-var(V),!,fail.
 is_sort(obj).
 is_sort(driver).
 is_sort(truck).
@@ -2705,24 +2708,22 @@ change_obj_list(I):-
     change_atomic_inv,!.
 
 change_obj_list1:-
-    env_call(objects(Sort,OBjls)),
-    change_obj_list2(Sort),
-    fail.
-change_obj_list1.
+    forall(objects(Sort,_),change_obj_list2(Sort)).
 
 % only keep the dynamic objects that used in tasks
 change_obj_list2(Sort):-
     env_call(objectsC(Sort,Objls)),!.
 % statics objects: keep
 change_obj_list2(Sort):-
-    env_call(objects(Sort,Objls)),
-    env_assert(objectsC(Sort,Objls)),!.
+   findall(Obj1s,env_call(objects(Sort,Objls)),Lists),
+   flatten(Lists,Objls),
+   env_assert(objectsC(Sort,Objls)),!.
 
 % only keep the dynamic objects in atomic_invariants
 change_atomic_inv:-
-    env_call(atomic_invariants(Atom)),
-    change_atomic_inv1(Atom,Atom1),
-    env_assert(atomic_invariantsC(Atom1)),!.
+    findall(Atom1,(env_call(atomic_invariants(Atom)),change_atomic_inv1(Atom,Atom1)),Lists),
+    flatten(Lists,List),
+    env_assert(atomic_invariantsC(List)))),!.
 change_atomic_inv.
 
 change_atomic_inv1([],[]).
@@ -2743,12 +2744,11 @@ find_dynamic_objects([]):-!.
 find_dynamic_objects([SE|Rest]):-
     find_dynamic_objects(SE),
     find_dynamic_objects(Rest),!.
-find_dynamic_objects(ss(Sort,Obj,_)):-
-    env_assert(objectsD(Sort,Obj)),!.
-find_dynamic_objects(ss(List)):- 
-    forall((member(is_of_sort(Obj,Sort),List),
-       nonvar(Obj),nonvar(Sort)),
-       env_assert(objectsD(Sort,Obj))),!.
+find_dynamic_objects(ss(Sort,Obj,List)):-
+    env_assert(objectsD(Sort,Obj)),!,
+    forall((member(is_of_sort(X,S),List),
+       nonvar(X),nonvar(S)),
+       env_assert(objectsD(S,X))),!.
 
 collect_dynamic_obj:-
     env_call(objectsD(Sort,_)),

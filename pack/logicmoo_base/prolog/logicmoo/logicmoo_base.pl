@@ -90,15 +90,15 @@ when_debugging(_,_).
 :- set_prolog_flag(double_quotes, atom).
 :- set_prolog_flag(double_quotes, string).
 
-
+load_mud_www.
 
 % ================================================
 % DBASE_T System
 % ================================================
-:- gripe_time(40,user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
+
+:- ensure_loaded(mpred/logicmoo_i_listing).
 :- ensure_loaded(mpred/logicmoo_i_pfc).
 :- ensure_loaded(mpred/logicmoo_i_loader).
-% % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
 :- ensure_loaded(mpred/logicmoo_i_naming).
 :- ensure_loaded(mpred/logicmoo_i_types).
 :- ensure_loaded(mpred/logicmoo_i_term_expansion).
@@ -129,10 +129,14 @@ user:term_expansion(I,OO):- (I==end_of_file->(must(do_end_of_file_actions),fail)
 :-export(pfc_file_loaded/0).
 pfc_file_loaded.
 
-
 :- retractall(thlocal:disable_mpred_term_expansions_locally).
 
 :- ensure_mpred_file_loaded(mpred/logicmoo_i_builtin).
 
 :- asserta(thlocal:disable_mpred_term_expansions_locally).
+
+:- gripe_time(40,user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
+
+:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_engine)))).
+% :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
 

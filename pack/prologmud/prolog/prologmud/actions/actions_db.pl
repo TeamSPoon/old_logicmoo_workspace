@@ -78,7 +78,7 @@
 
 *************************************************************************/
 
-:- use_module('NLPModules/Actions/execute',[k/1,notk/1,add/1,del/1)]).
+% :- use_module('NLPModules/Actions/execute',[k/1,notk/1,add/1,del/1)]).
 
 % TODO: Design the addition and deletion of the player effects.  
 % TODO: Translate into PKS syntax:
@@ -117,7 +117,7 @@ look(agent(Agent),something(Something)) , [
 %	</preconds>
 %	<effects>
 	add(contains(Something,Agent)),
-	add(knowAllAbout(Agent,Something))]).
+	add(knowsAllAbout(Agent,Something))]).
 %	</effects>
 %</action>
 
@@ -131,7 +131,7 @@ look(agent(Agent),something(Something)) , [
 	k(canSee(Agent,Something)),
 %	</preconds>
 %	<effects>
-	add(knowAllAbout(Agent,Something))]).
+	add(knowsAllAbout(Agent,Something))]).
 %	</effects>
 %</action>
 
@@ -376,7 +376,7 @@ kiss(agent(Agent),entity(Entity)) , [
 %	</effects>
 %</action>
 
-actionDef(
+
 % TODO: We could define only one action kill with 3 parameters. 
 % Replacing the concepts easytokill and notsoeasytokill with a role like
 % kills(knife1,dragon1), for example. In order to have the default use of
@@ -467,7 +467,7 @@ move(protagonist(Protagonist),exit(Exit),goal(Target),source(Source)) , [
 	del(contains(Source,Protagonist)),
 	add(contains(Target,Protagonist)),
 	add(leadsto(Exit,Target)),
-	add(knowAllAbout(Protagonist,Source))]).
+	add(knowsAllAbout(Protagonist,Source))]).
 %	</effects>
 %</action>
 

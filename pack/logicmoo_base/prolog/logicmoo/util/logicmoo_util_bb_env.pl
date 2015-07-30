@@ -9,6 +9,7 @@
 % Dec 13, 2035
 %
 */
+:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_structs)).
 
 :- thread_local(thlocal:push_env_ctx).
 :- dynamic(user:'$env_info'/1).

@@ -1,12 +1,20 @@
+
+
+
 :- multifile(mpred_online:semweb_startup).
 :- include(logicmoo(mpred/logicmoo_i_header)).
 
 
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
-:- multifile
-	prolog:message/3.
+
+
+:- if(if_defined(load_mud_www)).
+
+
+:- multifile prolog:message/3.
 % I WISH I COULD DO :- dynamic prolog:message/3.
+
 
 prolog:message(git(update_versions),A,A):-!.
 
@@ -204,5 +212,7 @@ mpred_online:semweb_startup:- do_semweb_startup_late_once.
 :- user:ensure_loaded(library(semweb/rdf_http_plugin)).
 :- debugOnError(rdf_load('http://prologmoo.com/downloads/mud.ttl')),!.
 %:- logOnError(eggdrop:deregister_unsafe_preds).
+
+:-endif.
 
 
