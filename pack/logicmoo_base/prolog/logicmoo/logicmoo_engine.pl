@@ -1127,7 +1127,7 @@ function_to_predicate(Function,NewVar,PredifiedFunction):-
   PredifiedFunction=..[P,NewVar|ARGS],!.
 function_to_predicate(Function,NewVar,mudEquals(NewVar,Function)):-fresh_varname('mudEquals',NewVar),!.
 
-:-meta_predciate(call_last_is_var(1)).
+:-meta_predicate(call_last_is_var(1)).
 call_last_is_var(Call):- Call=FArgs,append(Left,[Last],FArgs),(var(Last)->Call;(append(Left,[IsVar],NFArgs),NewCall=..NFArgs,!,(NewCall,must(IsVar=Last)))).
 
 fresh_varname(F,NewVar):- upcase_atom(F,FUP),gensym(FUP,VARNAME),NewVar = '$VAR'(VARNAME),!.

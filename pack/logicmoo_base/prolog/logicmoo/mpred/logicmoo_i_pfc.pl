@@ -284,8 +284,8 @@ pfc_debug_trace(F,A):-wdmsg(F,A),!.
 % assert_u(arity(prologHybrid,0)):-trace_or_throw(assert_u(arity(prologHybrid,0))).
 assert_u(X):- not(compound(X)),!,asserta_u(X,X,0).
 assert_u(X):- functor(X,F,A),assert_u(X,F,A).
-assert_u(X,F,_):-if_defined(singleValueInArg(F,SV)),!,with_pfc_trace_exec(update_single_valued_arg(X,SV)).
-assert_u(X,F,A):-prologSingleValued(F),!,with_pfc_trace_exec(update_single_valued_arg(X,A)).
+assert_u(X,F,_):-if_defined(singleValueInArg(F,SV)),!,must(update_single_valued_arg(X,SV)).
+assert_u(X,F,A):-prologSingleValued(F),!,must(update_single_valued_arg(X,A)).
 assert_u(X,F,A):-must(isa(F,prologOrdered) -> assertz_u(X,F,A) ; asserta_u(X,F,A)).
 
 

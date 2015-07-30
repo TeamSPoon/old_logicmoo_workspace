@@ -4,6 +4,7 @@
 		<Project File="pack/PrologMUD_RT.vpj"/>
 		<Project File="pack/prologmud/PrologMUD.vpj"/>
 		<Project File="pack/logicmoo_base/prolog/LogicmooBase.vpj"/>
+		<Project File="pack/logicmoo_planner/LogicmooPlanner.vpj"/>
 		<Project File="pack/logicmoo_packages/prolog/LogicmooPackages.vpj"/>
 		<Project File="pack/logicmoo_nlu/prolog/MUD_DeepParsing.vpj"/>
 	</Projects>

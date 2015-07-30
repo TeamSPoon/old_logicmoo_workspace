@@ -11,6 +11,8 @@
 %
 */
 
+end_of_file.
+
 :- swi_module(modPlan, []).
 :- include(prologmud(mud_header)).
 % :- register_module_type (mtCommand).
