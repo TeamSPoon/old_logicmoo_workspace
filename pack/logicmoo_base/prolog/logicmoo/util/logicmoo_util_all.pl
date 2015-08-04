@@ -14,8 +14,8 @@
 
 % have to load this module here so we dont take ownership of prolog_exception_hook/4.
 :- set_prolog_flag(access_level,system).
-:- set_prolog_flag(verbose_autoload, true).
-:- set_prolog_flag(generate_debug_info, true).
+%:- set_prolog_flag(verbose_autoload, true).
+%:- set_prolog_flag(generate_debug_info, true).
 % have to load this module here so we dont take ownership of prolog_exception_hook/4.
 :- user:ensure_loaded(library(ansi_term)).
 :- user:ensure_loaded(library(check)).

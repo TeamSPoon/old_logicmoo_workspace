@@ -22,6 +22,8 @@ must_be_in_user:-module(parser_e2c,[
 :-export(reorderClause/2).
 :-meta_predicate(reorderClause(?,?)).
 
+cyckb_t_e2c(P,A,B,C):- fail,cyckb_t(P,A,B,C).
+
 :- dynamic_multifile_exported thglobal:use_cyc_database/0.
 
 % :- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_all.pl')).
@@ -88,7 +90,7 @@ makeStringMatcher(Vars,once(H),once(HO)):- !,makeStringMatcher(Vars,H,HO).
 makeStringMatcher(Vars,V^(H),V^(HO)):- !,makeStringMatcher(Vars,H,HO).
 makeStringMatcher(_ ,call(H),call(H)):-!.
 makeStringMatcher(_ ,stringArg(StrVar,BodI),stringArgUC(StrVar,NewVar,BodO)):- !, vsubst(BodI,StrVar,NewVar,BodO).
-makeStringMatcher(Vars,BodI,BodO):- compound(BodI),functor(BodI,F, _),cyckb_t(argIsa,F,N,StringType),isa_stringType(StringType),arg(N,BodI,StrVar),!,
+makeStringMatcher(Vars,BodI,BodO):- compound(BodI),functor(BodI,F, _),cyckb_t_e2c(argIsa,F,N,StringType),isa_stringType(StringType),arg(N,BodI,StrVar),!,
    makeStringMatcher(Vars,stringArg(StrVar,BodI),BodO). 
 makeStringMatcher(_ ,BodI,BodI):-!.
 
@@ -598,7 +600,7 @@ stringToWordsListPOS(String,CycWords,POS):-
 % ==========================================================
 cycWordToPossibleStrings(CycWord,StringAtom):- call_tabled(cycWordToPossibleStrings_0(CycWord,StringAtom)).
 cycWordToPossibleStrings_0(_,[StringAtom]):- nonvar(StringAtom),StringAtom='',!,fail. 
-cycWordToPossibleStrings_0(CycWord,String):- cyckb_t(Form,CycWord,CycString),is_speechPartPred_any(Form),cycStringToString(CycString,String).
+cycWordToPossibleStrings_0(CycWord,String):- cyckb_t_e2c(Form,CycWord,CycString),is_speechPartPred_any(Form),cycStringToString(CycString,String).
 cycWordToPossibleStrings_0(CycWord,StringAtom):- atom(CycWord),stringToCycWord_0(StringAtom2,CycWord),[StringAtom] = StringAtom2.
 
 stringToCycWord_never([String],_):-nonvar(String),String='',!,fail.
@@ -620,7 +622,7 @@ stringToCycWord(String,CycWord):-
 stringToCycWord_0(String,CycWord):-  meetsForm_1(String,CycWord,_).
 stringToCycWord_0(String,CycWord):-  meetsPos_2(String,CycWord,_).
 
-stringToCycWord_1([String],CycWord):- atom(String),not(compound(CycWord)),once(toPropercase(String,UString)),atom_concat(UString,'-TheWord',CycWord),cyckb_t(_,CycWord,_),!.
+stringToCycWord_1([String],CycWord):- atom(String),not(compound(CycWord)),once(toPropercase(String,UString)),atom_concat(UString,'-TheWord',CycWord),cyckb_t_e2c(_,CycWord,_),!.
 
 stringToCycWord_2(String,CycWord):- var(String),nonvar(CycWord),cycWordToPossibleStrings(CycWord,String).
 
@@ -659,15 +661,15 @@ is_speechPartPred_tt(Form):- thlocal:allowTT,!,is_speechPartPred_tt_ever(Form).
 
 speechPartPreds_transitive(POS,Form):-speechPartPreds_asserted(POS,Form).
 speechPartPreds_asserted(POS, Form):- is_speechPartPred_tt(Form),posName(POS),atom_contains(Form,POS).
-speechPartPreds_asserted(POS, Form):- cyckb_t('basicSpeechPartPreds',POS, Form).
-speechPartPreds_asserted(POS, Form):- cyckb_t('mostSpecificSpeechPartPreds',POS, Form).
-speechPartPreds_asserted(POS, Form):- cyckb_t('speechPartPreds',POS, Form).
+speechPartPreds_asserted(POS, Form):- cyckb_t_e2c('basicSpeechPartPreds',POS, Form).
+speechPartPreds_asserted(POS, Form):- cyckb_t_e2c('mostSpecificSpeechPartPreds',POS, Form).
+speechPartPreds_asserted(POS, Form):- cyckb_t_e2c('speechPartPreds',POS, Form).
 %speechPartPreds_asserted(SPOS, SForm):- speechPartPreds_transitive0(SPOS, SForm),must_det((nonvar(SForm),nonvar(SPOS))).
 %speechPartPreds_asserted(SPOS, SForm):- reorderBody('speechPartPreds'(POS, Form),SPOS^pred_or_same('genls',POS,SPOS),SForm^pred_or_same('genlPreds',Form,SForm)).
 
 pred_or_same(_,POS,POS).
-pred_or_same(Pred,POS,SPOS):- (nonvar(SPOS);nonvar(POS)),!,cyckb_t(Pred,POS,SPOS).
-% pred_or_same(Pred,POS,SPOS):-cyckb_t(Pred,POS,MPOS),cyckb_t(Pred,MPOS,SPOS).
+pred_or_same(Pred,POS,SPOS):- (nonvar(SPOS);nonvar(POS)),!,cyckb_t_e2c(Pred,POS,SPOS).
+% pred_or_same(Pred,POS,SPOS):-cyckb_t_e2c(Pred,POS,MPOS),cyckb_t_e2c(Pred,MPOS,SPOS).
 
 :- expire_tabled_list(all).
 
@@ -682,13 +684,13 @@ is_speechPartPred_nontt_ever(Form):- call_tabled_can(no_repeats(Form,(is_speechP
 
 is_speechPartPred_0('baseForm').
 is_speechPartPred_0(Form):-speechPartPreds_asserted(_,Form).
-is_speechPartPred_0(Form):-argIsa(Form,1, 'LexicalWord'),cyckb_t(arity,Form,2).
-is_speechPartPred_0(Form):-argIsa(Form,1, 'EnglishWord'),cyckb_t(arity,Form,2).
-is_speechPartPred_0(Form):-cyckb_t(isa,Form,'SpeechPartPredicate').
-is_speechPartPred_0(Form):-cyckb_t(genlPreds,Form,'wordStrings').
+is_speechPartPred_0(Form):-argIsa(Form,1, 'LexicalWord'),cyckb_t_e2c(arity,Form,2).
+is_speechPartPred_0(Form):-argIsa(Form,1, 'EnglishWord'),cyckb_t_e2c(arity,Form,2).
+is_speechPartPred_0(Form):-cyckb_t_e2c(isa,Form,'SpeechPartPredicate').
+is_speechPartPred_0(Form):-cyckb_t_e2c(genlPreds,Form,'wordStrings').
 
 
-is_SpeechPart(POS):-cyckb_t(isa,POS,'SpeechPart').
+is_SpeechPart(POS):-cyckb_t_e2c(isa,POS,'SpeechPart').
 
 argIsa(Form,1, 'LexicalWord'):-is_speechPartPred_tt(Form).
 argIsa(Form,2, 'CharacterString'):-is_speechPartPred_tt(Form).
@@ -715,7 +717,7 @@ meetsForm_1(String,CycWord,Form):- has_wordage(String),is_wordage_prop(String, f
 meetsForm_1(String,CycWord,Form):- 'abbreviationForLexicalWord'(CycWord,Form, String).
 meetsForm_1(String,CycWord,Form):- 
                       stringArgUC(String, CycString, (((once(nonvar(CycWord);atom(CycString))),                        
-                                 cyckb_t(Form,CycWord,CycString),is_speechPartPred(Form),notPrefixOrSuffix(CycWord)))).
+                                 cyckb_t_e2c(Form,CycWord,CycString),is_speechPartPred(Form),notPrefixOrSuffix(CycWord)))).
 meetsForm_1([String],CycWord,Form):- stringAtomToWordForm([String],CycWord,Form).
 
 
@@ -1309,8 +1311,8 @@ wordageToKif(_Symbol,Words,_Quest,posList(POSList,Words)):-get_pos_list(Words,PO
 % =================================================================
 
 :-export(notPrefixOrSuffix/1).
-notPrefixOrSuffix(CycWord):- not(cyckb_t(isa, CycWord, 'LexicalPrefix')),not(cyckb_t(isa, CycWord, 'LexicalSuffix')).
-is_cycWord_chk(CycWord):- cyckb_t(isa,CycWord,'EnglishWord'),!.
+notPrefixOrSuffix(CycWord):- not(cyckb_t_e2c(isa, CycWord, 'LexicalPrefix')),not(cyckb_t_e2c(isa, CycWord, 'LexicalSuffix')).
+is_cycWord_chk(CycWord):- cyckb_t_e2c(isa,CycWord,'EnglishWord'),!.
 
 usefull_wordage(Var):-var(Var),!,fail.
 usefull_wordage(wordage(_,Props)):-!,usefull_wordage(Props).
@@ -1517,8 +1519,8 @@ string_props(Pass,String,form(Pass,CycWord,Form)):- Pass\=@=2, meetsForm(String,
 string_props(Pass,String,pos(3,CycWord,POS)):- Pass\=@=2, meetsPos(String,CycWord,POS),notPrefixOrSuffix(CycWord).
 
 
-%string_props(Pass,[String],PredProps):-!,  is_speechPartPred_tt(Pred),cyckb_t(Pred,CycWord,String),pred_props(Pred,CycWord,PredProps).
-%string_props(Pass,String,PredProps):- is_speechPartPred_tt(Pred),cyckb_t(Pred,CycWord,String),pred_props(Pred,CycWord,PredProps).
+%string_props(Pass,[String],PredProps):-!,  is_speechPartPred_tt(Pred),cyckb_t_e2c(Pred,CycWord,String),pred_props(Pred,CycWord,PredProps).
+%string_props(Pass,String,PredProps):- is_speechPartPred_tt(Pred),cyckb_t_e2c(Pred,CycWord,String),pred_props(Pred,CycWord,PredProps).
 
 posName(POS):-member(POS,['Preposition','Verb','Conjunction','Determiner','Pronoun','Adjective','Noun','Adverb','Number','Punctuation','Quantifier','QuantifyingIndexical']).
 posAttrib(POS):-posName(POS).
@@ -1888,7 +1890,7 @@ proper_object(CycL) --> pos_cycl(Noun,CycL), { goodStart(noun_phrase,Noun) } .
 poStr(CycL,String):- stringArg(String, poStr0(CycL,String)).
 poStr0(CycL,String):- strings_match,
       'genlPreds'(FirstName,nameString),
-       cyckb_t(FirstName,CycL,String).
+       cyckb_t_e2c(FirstName,CycL,String).
 
 poStr0(CycL,String):- strings_match,
       'initialismString'(CycL,String);
@@ -2065,7 +2067,7 @@ verb_phrase(Subj,Event,'and_adverbal'(Event,AdvCycL,CycL))  -->
 
 % unknown phrase has arity CycL + object5 %TODO rename subject5/3 to noun_phrase/3
 verb_phrase(Subj,Event,and_concat(CycL)) --> [Verb],
-	 {atom(Verb),((words_concat('',Verb,Predicate),cyckb_t('arity',Predicate,N));(cyckb_t('arity',Verb,N),Predicate=Verb)),!},
+	 {atom(Verb),((words_concat('',Verb,Predicate),cyckb_t_e2c('arity',Predicate,N));(cyckb_t_e2c('arity',Verb,N),Predicate=Verb)),!},
 	 verb_phrase_arity(N,Predicate,Subj,Event,CycL).
 
 % :-index(verb_phrase_arity(0,0,0,0,0,0,0)).
@@ -2090,7 +2092,7 @@ verb_phrase(Subj,Event,(CycL)) -->
 %	 best_subject(Obj,true,CycL),
  %        best_subject_constituant(Target,Event,CycL,CycLO),
 	 {cvtWordPosCycL(CycVerb,'Verb',Verb),
-	 (atom(Verb),(atom_concat('',Verb,Predicate),cyckb_t('arity',Predicate,N));(cyckb_t('arity',Verb,N),Predicate=Verb)),!},
+	 (atom(Verb),(atom_concat('',Verb,Predicate),cyckb_t_e2c('arity',Predicate,N));(cyckb_t_e2c('arity',Verb,N),Predicate=Verb)),!},
 	  verb_phrase_arity(N,Predicate,Subj,Event,CycL),{varnameIdea(String,Event)}.
 	 
 % gen phrase 1

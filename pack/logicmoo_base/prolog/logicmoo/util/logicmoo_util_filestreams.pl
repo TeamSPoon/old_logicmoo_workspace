@@ -1,6 +1,6 @@
 /** <module> Logicmoo Path Setups
 */
-:- set_prolog_flag(generate_debug_info, true).
+%:- set_prolog_flag(generate_debug_info, true).
 :- '@'( ensure_loaded(library(filesex)), 'user').
 
 :- meta_predicate(with_filematch(0)).

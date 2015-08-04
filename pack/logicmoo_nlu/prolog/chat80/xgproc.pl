@@ -120,8 +120,8 @@ xg_process(P,Mode) :-
 xg_assertz(P):- flag(xg_assertions,A,A+1),tlxgproc:current_xg_module(M),M:assertz(P).
 
 xg_complete(_F) :-
-   recorded('xg.usurped',P,R0), erase(R0),
-   recorded(P,'xg.usurped',R1), erase(R1),
+   recorded('xg.usurped',P,R0), erase_safe(recorded('xg.usurped',P,R0),R0),
+   recorded(P,'xg.usurped',R1), erase_safe(recorded(P,'xg.usurped',R1),R1),
    fail.
 xg_complete(F):- flag(read_terms,T,T),display(read(T,F)),nl,nl.
 

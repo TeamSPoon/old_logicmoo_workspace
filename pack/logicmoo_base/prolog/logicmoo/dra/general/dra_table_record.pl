@@ -28,6 +28,8 @@
 %%%  Last update: 27 August 2009.                                            %%%
 %%%                                                                          %%%
 
+end_of_file.
+
 %% The tables are normally kept in asserted clauses, but for some systems this
 %% is not convenient, because asserted clauses are compiled.
 %% For example, this is so in SWI Prolog, which in addition does not assert

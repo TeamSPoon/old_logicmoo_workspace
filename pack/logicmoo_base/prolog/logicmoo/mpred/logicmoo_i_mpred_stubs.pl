@@ -20,6 +20,10 @@ hybrid_tPredStubImpl(prologBuiltin).
 hybrid_tPredStubImpl(prologKIF).
 hybrid_tPredStubImpl(prologEquality).
 
+
+make_builtin(F/A):-
+  with_assertions(set_prolog_flag(access_level,system),lock_predicate(F/A)),pfc_add(prologBuiltin(F)),pfc_add(arity(F,A)).
+
 /*
 1 = single value
 
@@ -127,7 +131,7 @@ create_stub_body(call(conjecture),Head,Stub):- Stub = (call_provided_mpred_stora
 erase_mpred_storage_op(Head):-
    create_stub_body(_,Head,Stub),
    doall(retract((Head:- Stub))),
-   foreach(clause(Head,Stub,Ref),erase(Ref)).
+   foreach(clause(Head,Stub,Ref),erase_safe(clause(Head,Stub,Ref),Ref)).
 
 really_add_mpred_storage_op(Head):-
    create_stub_body(call(conjecture),Head,Stub),

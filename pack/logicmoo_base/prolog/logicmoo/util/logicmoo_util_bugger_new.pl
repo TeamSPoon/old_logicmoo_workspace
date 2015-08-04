@@ -577,13 +577,13 @@ get_must(C,C):- fail,is_release,!.
 get_must(C,DO):-  tlbugger:skipMust,!,DO = catchvv(C,E,(debug,wdmsg(E:C),fail)).
 get_must(Call,DO):- skipWrapper,!, DO = (Call *-> true ; ((dmsg(failed(must(Call))),trace,Call))).
 get_must(Call,DO):- tlbugger:show_must_go_on,!,
+  set_prolog_flag(debug_on_error,false), 
  DO = ((catchvv(Call,E,
      notrace(((dumpST,dmsg(error,sHOW_MUST_go_on_xI__xI__xI__xI__xI_(E,Call))),badfood(Call))))
             *-> true ; notrace((dumpST,dmsg(error,sHOW_MUST_go_on_failed_F__A__I__L_(Call)),badfood(Call))))).
 
 get_must(Call,DO):-  
   set_prolog_flag(debug_on_error,true), 
-
    DO = (catchvv(Call,E,
      (dumpST,dmsg(error,must_xI__xI__xI__xI__xI_(E,Call)),
          ignore(rtrace(Call)),dtrace(Call),badfood(Call)))

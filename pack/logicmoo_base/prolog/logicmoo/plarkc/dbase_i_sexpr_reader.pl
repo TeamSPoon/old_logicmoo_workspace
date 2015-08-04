@@ -201,13 +201,14 @@ sym_char(C) :- C > 32, not(member(C,[34,59,40,41,35,39,44,96])).
 
 
 
+
 :-thread_local(thlocal:s2p/1).
 
 
 to_unbackquote(I,O):-to_untyped(I,O).
 
 :-export(to_untyped/2).
-to_untyped(Var,'$VAR'(Name)):-lvar(Var,Name),!.
+to_untyped(Var,'$VAR'(Name)):-svar(Var,Name),!.
 to_untyped(S,S):- string(S).
 to_untyped(S,S):- number(S).
 to_untyped(S,O):- atom(S),catch(atom_number(S,O),_,fail),!.
@@ -237,7 +238,7 @@ extract_lvars(A,B,After):-
      copy_lvars(A,Before,B,After).
 
 % copy_lvars( VAR,Vars,VAR,Vars):- var(VAR),!.
-copy_lvars( VAR,Vars,NV,NVars):- lvar(VAR,Name),must(atom(Name)),!,must(register_var(Name=NV,Vars,NVars)).
+copy_lvars( VAR,Vars,NV,NVars):- svar(VAR,Name),must(atom(Name)),!,must(register_var(Name=NV,Vars,NVars)).
 copy_lvars([],Vars,[],Vars).
 copy_lvars(Term,Vars,Term,Vars):- \+compound(Term),!.
 copy_lvars('?'(Inner),Vars,Out,NVars):- !,
@@ -247,17 +248,29 @@ copy_lvars('?'(Inner),Vars,Out,NVars):- !,
 copy_lvars([H|T],Vars,[NH|NT],NVars):- !, copy_lvars(H,Vars,NH,SVars), copy_lvars(T,SVars,NT,NVars).
 copy_lvars(Term,Vars,NTerm,NVars):-    
     Term=..[F|Args],    % decompose term
-    (lvar(F,_)-> copy_lvars( [F|Args],Vars,NTerm,NVars);
+    (svar(F,_)-> copy_lvars( [F|Args],Vars,NTerm,NVars);
     % construct copy term
     (copy_lvars(Args,Vars,NArgs,NVars), NTerm=..[F|NArgs])).  
 
-lvar(Var,NameU):-var(Var),!,format(atom(Name),'~w',[(Var)]),!,atom_concat('_',NameU,Name).
-lvar('$VAR'(Var),Name):-number(Var),format(atom(Name),'~w',['$VAR'(Var)]),!.
-lvar('$VAR'(VarName),VarNameU):-lvar_fixvarname(VarName,VarNameU),!.
-lvar('$VAR'(Name),Name):-!.
-lvar('?'(Name),NameU):-lvar_fixvarname(Name,NameU),!.
-lvar(VAR,NameU):-atom(VAR),atom_concat('??',Name,VAR),!,lvar_fixvarname(Name,NameI),atom_concat('_',NameI,NameU).
-lvar(VAR,NameU):-atom(VAR),atom_concat('?',Name,VAR),lvar_fixvarname(Name,NameU).
+svar(Var,NameU):-var(Var),!,format(atom(Name),'~w',[(Var)]),!,atom_concat('_',NameU,Name).
+svar('$VAR'(Var),Name):-number(Var),format(atom(Name),'~w',['$VAR'(Var)]),!.
+svar('$VAR'(VarName),VarNameU):-svar_fixvarname(VarName,VarNameU),!.
+svar('$VAR'(Name),Name):-!.
+svar('?'(Name),NameU):-svar_fixvarname(Name,NameU),!.
+svar(VAR,NameU):-atom(VAR),atom_concat('??',Name,VAR),!,svar_fixvarname(Name,NameI),atom_concat('_',NameI,NameU).
+svar(VAR,NameU):-atom(VAR),atom_concat('?',Name,VAR),svar_fixvarname(Name,NameU).
+svar(Var,Var):-var(Var),!.
+
+
+:-export(svar_fixvarname/2).
+svar_fixvarname(SVAR,UP):- atom(SVAR)->(ok_varname(SVAR),fix_varcase(SVAR,UP));UP=SVAR.
+
+fix_varcase(I,O):-fix_varcase0(I,M),atom_subst(M,'-','_',O).
+fix_varcase0(Word,WordC):-!,name(Word,[F|R]),to_upper(F,U),name(WordC,[U|R]).
+% the cut above stops the rest 
+fix_varcase0(Word,Word):-upcase_atom(Word,UC),UC=Word,!.
+fix_varcase0(Word,WordC):-downcase_atom(Word,UC),UC=Word,!,name(Word,[F|R]),to_upper(F,U),name(WordC,[U|R]).
+fix_varcase0(Word,Word). % mixed case
 
 :-export(ok_varname/1).
 ok_varname(Name):- number(Name).
@@ -270,8 +283,6 @@ ok_varname(Name):- atom(Name),atom_codes(Name,[C|_List]),char_type(C,csym).
 %:-export(ok_in_varname/1).
 %ok_in_varname(C):-sym_char(C),\+member(C,`!@#$%^&*?()`).
 
-:-export(lvar_fixvarname/2).
-lvar_fixvarname(SVAR,UP):- atom(SVAR)->(ok_varname(SVAR),upcase_atom(SVAR,UP));UP=SVAR.
 
 atom_upper(A,U):-string_upper(A,S),atom_string(U,S).
 

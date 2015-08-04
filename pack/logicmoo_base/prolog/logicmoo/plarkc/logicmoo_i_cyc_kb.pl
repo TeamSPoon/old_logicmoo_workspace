@@ -53,9 +53,9 @@ wkb0:- tell(fooooo0),
       told.
 
 wkbe:- statistics(cputime,S),tell(foof),ignore((el_holds_pred_impl(F),between(2,16,A),current_predicate(F/A),functor(P,F,A),forall(P,format('~q.~n',[P])),fail)),told,
-   statistics(cuptime,E),Total is E - S. writeln(Total).
+   statistics(cuptime,E),Total is E - S, writeln(Total).
 
-wkb0:- tell(fooooo0),
+wkb01:- tell(fooooo0),
       forall(tinyKB_All(V,MT,STR),format('~q.~n',[tinyKB_All(V,MT,STR)])),
       told.
 

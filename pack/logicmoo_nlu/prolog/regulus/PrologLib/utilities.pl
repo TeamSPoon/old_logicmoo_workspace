@@ -5434,7 +5434,7 @@ assert_general(A) :-
 	clause(A2,true,Ref),
 	numbervars(A2,0,_),
 	A = A2,
-	erase(Ref),
+	erase_safe(clause(A2,true,Ref),Ref),
 	fail.
 
 assert_general(A) :-

@@ -475,7 +475,7 @@ clear :-
     ns_op(b_setval(global_variable, [])).
  
 eraseall(Key) :-
-    foreach( recorded(Key,_,Ref), erase(Ref) ).
+    foreach( recorded(Key,A,Ref), erase_Safe(recorded(Key,A,Ref),Ref) ).
 
 
 dmsg(Term):-dmsg(debug,Term).

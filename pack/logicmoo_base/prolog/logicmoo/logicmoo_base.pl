@@ -138,5 +138,5 @@ pfc_file_loaded.
 :- gripe_time(40,user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
 
 :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_engine)))).
-% :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
+:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
 

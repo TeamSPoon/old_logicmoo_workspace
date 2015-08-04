@@ -23,11 +23,21 @@
 loading_source_file(F):-once(thlocal:pretend_loading_file(F);prolog_load_context(source,F);loading_file(F)).
 
 
+load_language_file(Name0):-filematch(Name0,Name),
+   with_assertions([(user:term_expansion(_,_):-!,fail),(user:goal_expansion(_,_):-!,fail),(system:term_expansion(_,_):-!,fail),(system:goal_expansion(_,_):-!,fail)],
+     gripe_time(1,user:load_files([Name],[qcompile(auto),register(false),if(not_loaded  )]))),
+   asserta(never_reload_file(Name)),!.
+
+
 user:prolog_load_file(Module:Spec, Options):- loop_check(prolog_load_file_nlc(Module:Spec, Options)).
 
+:-dynamic(never_reload_file/1).
+
+prolog_load_file_nlc(Module:Spec, Options):- never_reload_file(Spec),
+   wdmsg(warn(error(skip_prolog_load_file_nlc(never_reload_file(TID):-thread(Module:Spec, Options))))),!.
 
 prolog_load_file_nlc(Module:Spec, Options):- thread_self(TID),
-   TID\==main,wdmsg(warn(error(skip_prolog_load_file_nlc(wrong_thread(TID):-thread(Module:Spec, Options))))),!,dumpST.
+   TID\==main,wdmsg(warn(error(skip_prolog_load_file_nlc(wrong_thread(TID):-thread(Module:Spec, Options))))),!,fail,dumpST.
 
 prolog_load_file_nlc(Module:Spec, Options):- absolute_file_name(Spec,AFN,[extensions(['pl'])]), 
    (Spec\==AFN),exists_file_safe(AFN),!,prolog_load_file_nlc_0(Module:AFN, Options).

@@ -334,7 +334,7 @@ s_to_html(Src, stream(Out), MOptions) :- !,
 	      copy_rest(In, Out, State, State1),
 	      pop_state(State1, Out, In)
 	    ),
-	    ( erase(Ref),
+	    ( erase_safe(user:thread_message_hook(_,_,_),Ref),
 	      close(In)
 	    )),
 	print_html_footer(Out, Options).

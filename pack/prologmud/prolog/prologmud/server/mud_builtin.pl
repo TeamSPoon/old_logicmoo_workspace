@@ -25,6 +25,7 @@
 :- onEndOfFile(dmsg(infSupertypeName)).
 
 :- file_begin(pfc).
+:- retractall(thlocal:disable_mpred_term_expansions_locally).
 
 % baseKB:isa(iPerson99,tPerson).
 
@@ -412,7 +413,7 @@ tCol(tMonster).
 %prologDynamic(user:action_info(vtActionTemplate,ftText)).
 prologDynamic(agent_call_command(tAgent,ftAction)).
 prologSideEffects(agent_call_command(tAgent,ftAction)).
-prologBuiltin(member(ftTerm,ftTerm)).
+%prologBuiltin(member(ftTerm,ftTerm)).
 prologDynamic(mud_test(ftTerm,ftCallable)).
 prologDynamic(use_action_templates(ftTerm)).
 

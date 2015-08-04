@@ -39,7 +39,7 @@ not_variant(G,GG):-
 with_kb_assertions([],Call):- !,Call.
 with_kb_assertions([With|MORE],Call):-!,with_kb_assertions(With,with_kb_assertions(MORE,Call)).
 with_kb_assertions(With,Call):-
-   setup_call_cleanup(asserta(With,Ref),Call,erase(Ref)).
+   setup_call_cleanup(asserta(With,Ref),Call,erase_safe(With,Ref)).
 
 
 world_clear(Named):-fmt('Clearing world database: ~q.~n',[Named]).
@@ -330,14 +330,15 @@ add_0(dynamic(Term)):- !,must(get_arity(Term,F,A)), must(dynamic(F/A)).
 add_0(A):- A =(:-(Term)), !, must(add_fast(A)).
 % add_0(C0):-check_override(add(C0)),!.
 % add_0(Skipped):- ground(Skipped),implied_skipped(Skipped),!. % ,dmsg(implied_skipped(Skipped)).
-add_0(C0):- ignore((ground(C0),asserta(user:already_added_this_round(C0)))),must(pfc_add_fast(C0)),!.
+%add_0(C0):- ignore((ground(C0),asserta(user:already_added_this_round(C0)))),!,must(pfc_add_fast(C0)),!.
+add_0(C0):- must(pfc_add_fast(C0)),!.
 add_0(A):-trace_or_throw(fmt('add/1 is failing ~q.',[A])).
 
 
 implied_skipped(genls(C0,C0)).
 implied_skipped(props(_,[])).
 implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (t(Skipped);out_of_mpred_t(Skipped)).
-implied_skipped(Skipped):-user:already_added_this_round(Skipped),(is_asserted(Skipped)).
+%implied_skipped(Skipped):-user:already_added_this_round(Skipped),(is_asserted(Skipped)).
 
 
 mpred_numbervars_with_names(Term):- term_variables(Term,Vars),mpred_name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(true)]),!.

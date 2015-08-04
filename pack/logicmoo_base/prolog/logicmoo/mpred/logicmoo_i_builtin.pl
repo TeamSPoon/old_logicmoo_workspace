@@ -158,6 +158,7 @@ prologSingleValued(C):-cwc,compound(C),functor(C,F,_),!,prologSingleValued(F).
 ((pfc_default(P)/(pfc_literal(P),nonvar(P),functor(P,F,A),functor(Q,F,A)))  => ((~Q/different_literal(P,_,Q), ~neg(P)) => P)).
 
 
+prologBuiltin(F),arity(F,A)=>{make_builtin(F/A)}.
 
 prologBuiltin(resolveConflict/1).
 prologBuiltin(pfc_select/2).
@@ -232,7 +233,7 @@ prologBuiltin(pfc_select/2,mpred_module(user)).
 prologBuiltin(agent_text_command/4,prologDynamic).
 %tPred(t,prologDynamic).
 
-tPred(member/2,prologBuiltin).
+% tPred(member/2,prologBuiltin).
 
 tCol(tNotForUnboundPredicates).
 
@@ -853,9 +854,6 @@ argQuotedIsa(Prop,N,Type) <= {number(N)},argIsa(Prop,N,Type),ttFormatType(Type).
 :-multifile(mudLabelTypeProps/3).
 :- forall(ttPredType(F),must((decl_type(F),add(isa(F,functorDeclares)),add(genls(F,tPred))))).
 :- export(mtForPred/2).
-
-:- set_prolog_flag(report_error,true).
-:- set_prolog_flag(debug_on_error,true).
 
 :- debug,(decl_mpred_hybrid((argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, 
     isa/2,  genls/2, pddlSomethingIsa/2, 

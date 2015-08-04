@@ -201,26 +201,29 @@ get_it:-
   (exists_file(AFN)->true;(
     (absolute_file_name(library(el_holds),AFND),sformat( S, 'curl --compressed http://prologmoo.com/devel/LogicmooDeveloperFramework/PrologMUD/pack/pldata_larkc/prolog/el_holds/el_assertions.pl.qlf > ~w/el_assertions.pl.qlf',[AFND]),
     shell(S))))))).
+
+
 :- dmsg("Loading loading language data (This may take 10-15 seconds)").
 :- user:ensure_loaded_no_mpreds(library(logicmoo/plarkc/logicmoo_i_cyc)).
-
-:- with_assertions((user:term_expansion(_,_):-!,fail),
-    gripe_time(7,time(user:load_files([library(el_holds/'el_assertions.qlf')],[if(not_loaded ),register(false)])))).
-
 
 % 
 % gripe_time(warn(12.246577455>7),        user:time(user:ensure_loaded_no_mpreds(library(el_holds/'el_assertions.pl.qlf')))).
 % OLD :- gripe_time(7,time(user:ensure_loaded_no_mpreds(library(el_holds/'el_assertions.pl.qlf')))).
 
 % 6.052 CPU on VMWare I7
-%:- gripe_time(7,time(user:load_files([library(el_holds/'el_assertions')],[qcompile(auto),register(false),if(not_loaded )]))).
 
-:- with_assertions([(user:term_expansion(_,_):-!,fail),(user:goal_expansion(_,_):-!,fail),(system:term_expansion(_,_):-!,fail),(system:goal_expansion(_,_):-!,fail)],
+:-thread_local(with_el_holds_enabled/1).
+
+:- 
+  %with_assertions(,[(user:term_expansion(_,_):-!,fail),(user:goal_expansion(_,_):-!,fail),(system:term_expansion(_,_):-!,fail),(system:goal_expansion(_,_):-!,fail)])
   (user:ensure_loaded_no_mpreds(library(logicmoo/plarkc/logicmoo_i_call_kb)),
-   gripe_time(1,user:load_files([pldata/clex_iface],[qcompile(auto),register(false),if(not_loaded  )])),
-   gripe_time(1,user:load_files([pldata/nldata_BRN_WSJ_LEXICON],[qcompile(auto),register(false),if(not_loaded  )])),
-   gripe_time(1,user:load_files([pldata/nldata_freq_pdat],[qcompile(auto),register(false),if(not_loaded  )])),
-   gripe_time(1,user:load_files([pldata/nldata_cycl_pos0],[qcompile(auto),register(false),if(not_loaded  )])))).
+   load_language_file(pldata/clex_iface),
+   load_language_file(pldata/nldata_BRN_WSJ_LEXICON),
+   load_language_file(library(el_holds/'el_assertions.qlf')),
+   load_language_file(pldata/nldata_freq_pdat),
+   load_language_file(pldata/nldata_cycl_pos0)),!.
+
+
 
 
 % ================================================================================================
@@ -264,7 +267,8 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 :- install_converter(parser_chat80:clausify80(+sem_pre80,-sem80)).
 :- install_converter(parser_chat80:qplan(+sem80,-query80)).
 
-
+:-dynamic(partOfSpeech/3).
+:-dynamic(determinerStrings/2).
 
 
 
@@ -298,6 +302,16 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 % :- get_pos_tagger(I),jpl_set(I,is_DEBUG,'@'(false)).
 
 
+:- multifile  el_assertions:el_holds/5.
+:- multifile  el_assertions:el_holds/6.
+:- multifile  el_assertions:el_holds/7.
+:- multifile  el_assertions:el_holds/8.
+:- dynamic  el_assertions:el_holds/5.
+:- dynamic  el_assertions:el_holds/6.
+:- dynamic  el_assertions:el_holds/7.
+:- dynamic  el_assertions:el_holds/8.
+:- multifile  el_assertions:is_cyckb_t_pred/2.
+:- dynamic  el_assertions:is_cyckb_t_pred/2.
 
 
 :- dmsg("Scanning el_assertions.pl for programatic definations (This may take 10-30 seconds)").
@@ -360,5 +374,7 @@ user:regression_test:- ace_to_pkif('A person who loves all animals is loved by s
 :- gripe_time(5,test_chat80_sanity).
 
 
-:- must(retract(thlocal:disable_mpred_term_expansions_locally)).
+% :- must(retract(thlocal:disable_mpred_term_expansions_locally)).
+
+:-asserta(thlocal:disable_mpred_term_expansions_locally).
 

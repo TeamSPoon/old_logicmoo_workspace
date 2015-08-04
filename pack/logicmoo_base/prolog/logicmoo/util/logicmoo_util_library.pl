@@ -128,7 +128,7 @@ disjuncts_to_list((A;B),ABL):-!,
   append(AL,BL,ABL).
 disjuncts_to_list(Lit,[Lit]).
 
-:- export(conjuncts_to_list/3).
+:- export(conjuncts_to_list/2).
 conjuncts_to_list(Var,[Var]):-is_ftVar(Var),!.
 conjuncts_to_list(true,[]).
 conjuncts_to_list([],[]).
@@ -145,6 +145,28 @@ conjuncts_to_list((A,B),ABL):-!,
   conjuncts_to_list(B,BL),
   append(AL,BL,ABL).
 conjuncts_to_list(Lit,[Lit]).
+
+
+:- export(pred_juncts_to_list/3).
+pred_juncts_to_list(_,Var,[Var]):-is_ftVar(Var),!.
+pred_juncts_to_list(_,true,[]).
+pred_juncts_to_list(_,[],[]).
+pred_juncts_to_list(F,AB,ABL):-AB=..[F,A,B],!,
+  pred_juncts_to_list(A,AL),
+  pred_juncts_to_list(B,BL),
+  append(AL,BL,ABL).
+pred_juncts_to_list(F,AB,AL):-AB=..[F,A],!,
+  pred_juncts_to_list(A,AL).
+pred_juncts_to_list(F,AB,ABL):-AB=..[F,A|ABB],
+  pred_juncts_to_list(A,AL),
+  B=..[F|ABB],
+  pred_juncts_to_list(B,BL),
+  append(AL,BL,ABL).
+pred_juncts_to_list([A|B],ABL):-!,
+  pred_juncts_to_list(A,AL),
+  pred_juncts_to_list(B,BL),
+  append(AL,BL,ABL).
+pred_juncts_to_list(Lit,[Lit]).
 
 
 :- export(list_to_conjuncts/2).
@@ -226,8 +248,8 @@ flatten_dedupe(Percepts0,Percepts):-
 asserta_new(_Ctx,NEW):-ignore((retract(NEW),fail)),asserta(NEW).
 writeqnl(_Ctx,NEW):- fmt('~q.~n',[NEW]),!.
 
-eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,_,X),erase(X))).
-eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,_,X),erase(X))).
+eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,B,X),erase_safe(clause(M:C,B,X),X))).
+eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,B,X),erase_safe(clause(M:C,B,X),X))).
 
 asserta_new(NEW):-ignore((retract(NEW),fail)),asserta(NEW).
 assertz_new(NEW):-ignore((retract(NEW),fail)),assertz(NEW).

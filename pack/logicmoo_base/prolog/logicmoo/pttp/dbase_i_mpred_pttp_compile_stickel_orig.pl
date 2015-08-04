@@ -83,9 +83,9 @@ add_features((Head :- Body),NewHeadBody):-
 
 %new_head_body(Head, Body,Head1 ,Body1,(Head1 :- Body1)):-!.
 % new_head_body(Head, Body,Head1 ,Body1,(Head1 :- head_body_was(Head, Body), Body1)):- arg_checks()
-new_head_body(Head, infer_by(ProofID),Head1 ,Body1,(Head1 :- Body1)):- ground(Head),!.
-new_head_body(Head, Body,Head1 ,Body1,(Head1 :- Body1)):- is_query_lit(Head),!.
-new_head_body(Head, Body,Head1 ,Body1,(Head1 :- Body1)):- 
+new_head_body(Head, infer_by(_ProofID),Head1 ,Body1,(Head1 :- Body1)):- ground(Head),!.
+new_head_body(Head, _Body,Head1 ,Body1,(Head1 :- Body1)):- is_query_lit(Head),!.
+new_head_body(Head, _Body,Head1 ,Body1,(Head1 :- Body1)):- 
    true. 
    %   dmsg(pp((head_features(Head1) :-head_body_was(Head, Body), Body1))).
 
@@ -98,15 +98,14 @@ add_features1((Head :- Body),(Head1 :- Body1)) :- (ground(Head);is_query_lit(Hea
 
 add_features1((Head :- Body),(Head1 :- Body1)) :- add_features_hb(Head , Body , Head1 , Body1).
 
-add_features_hb(Head , Body ,Head1 , Body1) :-
-  
+add_features_hb(Head , Body ,Head1 , Body1) :-     
        linearize(Head,Head2,[],_,true,Matches),
        (is_negative_literal(Head) ->
                PosGoal = no;
        %true ->
                PosGoal = yes),
        Head =.. [HF|HeadArgs],
-  
+      
        add_args(Head,Body,
           PosGoal,GoalAtom,HeadArgs,
           PosAncestors,NegAncestors,
@@ -127,6 +126,7 @@ add_features_hb(Head , Body ,Head1 , Body1) :-
 
    search_cost(Body,HeadArgs,Cost),       
    test_and_decrement_search_cost_expr(DepthIn,Cost,Depth1,TestExp0),
+
    argument_type_checking(HF,HeadArgs,TypeCheck),
    conjoin_pttp(TestExp0,TypeCheck,TestExp),
        conjoin_pttp(PushAnc,Body2,Body4),
@@ -141,7 +141,6 @@ add_features_hb(Head , Body ,Head1 , Body1) :-
           ProofIn,ProofOut,Head1,New).
 
 add_features_hb_normal(Head , Body ,Head1 , Body1) :-
-  
        ( is_query_lit(Head) ->
 		Head2 = Head,
 		add_args(Head2,Body,yes,query,[],
@@ -204,7 +203,7 @@ add_head_args(HeadIn,
           DepthIn,DepthOut,
           ProofIn,ProofOut,
           Head1,_New):-
-     correct_pttp_head(proven_t,HeadIn,Head),
+     correct_pttp_head(true_t,HeadIn,Head),
         Head =.. [P|L],
 	internal_functor(P,IntP),
 	list_append(L, [PosAncestors,NegAncestors, DepthIn,DepthOut, ProofIn,ProofOut, GoalAtom], L1),
@@ -279,7 +278,7 @@ add_args(INFO,(A ; B),PosGoal,GoalAtom,HeadArgs,
 add_args(INFO,Search_cost,_PosGoal,_GoalAtom,_HeadArgs,_PosAncestors,_NegAncestors,_NewPosAncestors,_NewNegAncestors,Depth,Depth,Proof,Proof,true,_New):- 
   functor(Search_cost,search_cost,_),!.
 
-add_args(INFO,infer_by(N),PosGoal,GoalAtom,_HeadArgs,
+add_args(INFO,infer_by(_N),PosGoal,GoalAtom,_HeadArgs,
          PosAncestors,NegAncestors,
 	 _NewPosAncestors,_NewNegAncestors,
 	 Depth,Depth,

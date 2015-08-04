@@ -81,7 +81,7 @@ prog_in_dir(Prog, Dir) :-
 						  [ access(read),
 						    file_errors(fail)
 						  ]),
-			       erase(Ref))
+			       erase_safe(resolving(Prog),Ref))
 	->  asserta(dir_cache(Prog, nodir)),
 	    fail
 	;   prog_in_dir_no_cache(Prog, Computed)

@@ -168,8 +168,8 @@ env_learn_pred(ENV,P):-user:decl_mpred_env(ENV,P).
 env_recorded(call,Val) :- recorded(Val,Val).
 env_recorded(assert, Val) :- recordz(Val,Val).
 env_recorded(asserta, Val) :- recorda(Val,Val).
-env_recorded(retract, Val) :- recorded(Val,Val,Ref), erase(Ref).
-env_recorded(retractall, Val) :- foreach( recorded(Val,Val,Ref), erase(Ref) ).
+env_recorded(retract, Val) :- recorded(Val,Val,Ref), erase_safe(recorded(Val,Val,Ref),Ref).
+env_recorded(retractall, Val) :- foreach( recorded(Val,Val,Ref), erase_safe(recorded(Val,Val,Ref),Ref) ).
 
 lg_op2(rec_db,OP,env_recorded(OP)).
 lg_op2(g,OP,OP).

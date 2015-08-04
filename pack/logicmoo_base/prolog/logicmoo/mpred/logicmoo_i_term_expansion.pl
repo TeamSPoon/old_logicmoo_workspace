@@ -237,8 +237,9 @@ fully_expand_goal(Op,Sent,SentO):- must(with_assertions(thlocal:into_form_code,t
 
 
 as_is_term(NC):- \+(compound(NC)),!.
-as_is_term('$VAR'(_)):-!.
 as_is_term(NC):-cyclic_term(NC),!,dmsg(cyclic_term(NC)),!.
+as_is_term('$VAR'(_)):-!.
+as_is_term('wid'(_,_,_)):-!.
 
 as_is_term(M:NC):-atom(M),!,as_is_term(NC).
 as_is_term(NC):-functor(NC,Op,2),infix_op(Op,_).

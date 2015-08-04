@@ -26,64 +26,7 @@
         ]).
 */
 
-user:use_mpred_t.
 
-:- dynamic t/3.
-:- multifile t/3.
-:- dynamic t/4.
-:- multifile t/4.
-
-
-:- dynamic int_asserted_t/11.
-:- multifile int_asserted_t/11.
-
-int_asserted_t(A, B, C, C1, H, I, D, E, F, J, G) :- use_mpred_t,
- user:t(A, B, C, C1),D=E, F=[K, [asserted_t(A, B, C, C1), G, H, I]|L], J=[K|L].
-
-
-:- dynamic int_asserted_t/10.
-:- multifile int_asserted_t/10.
-
-int_asserted_t(A, B, C, H, I, D, E, F, J, G) :- 
-   pretest_call((use_mpred_t, dif(B,C), user:t(A, B, C),D=E)),
-   F=[K, [asserted_t(A, B, C), G, H, I]|L], J=[K|L].
-
-:- dynamic int_pred_t/10.
-:- multifile int_pred_t/10.
-
-int_pred_t(A, B, C, H, I, D, E, F, J, G) :-
-   pretest_call((use_mpred_t, dif(B,C), user:t(A, B, C),D=E)),
-  F=[K, [pred_t(A, B, C), G, H, I]|L], J=[K|L].
-
-:- dynamic not_int_pred_t/10.
-:- multifile not_int_pred_t/10.
-
-not_int_pred_t(A, B, C, H, I, D, E, F, J, G) :- 
-   pretest_call((use_mpred_t,not(user:t(A, B, C)), dif(B,C),D=E)),
- F=[K, [not_pred_t(A, B, C), G, H, I]|L], J=[K|L].
-
-:- dynamic int_proven_not_t/10.
-:- multifile int_proven_not_t/10.
-
-int_proven_not_t(A, B, C, H, I, D, E, F, J, G) :- 
-   pretest_call((is_extent_known(A),use_mpred_t,not(user:t(A, B, C)), dif(B,C),D=E)),
- F=[K, [proven_not_t(A, B, C), G, H, I]|L], J=[K|L].
-
-is_extent_known(wearsClothing).
-is_extent_known(Pred):-wrapper_for(Pred,pred_t).
-
-wrapper_for(reflexive,pred_isa_t).
-wrapper_for(irreflexive,pred_isa_t).
-wrapper_for(tSymmetricRelation,pred_isa_t).
-wrapper_for(antisymmetric,pred_isa_t).
-
-wrapper_for(genls,pred_t).
-wrapper_for(genls,pred_t).
-wrapper_for(genlInverse,pred_t).
-wrapper_for(genlPreds,pred_t).
-wrapper_for(disjointWith,pred_t).
-wrapper_for(negationPreds,pred_t).
-wrapper_for(negationInverse,pred_t).
 
 %%% ****h* PTTP/PTTP
 %%% COPYRIGHT
@@ -578,7 +521,7 @@ body_for_head_literal(Head,Wff,Body) :-
 		conjoin_pttp(A1,B1,Body);
 	Wff == Head ->
 		Body = true;
-	negated_literal(Wff,Head) ->
+	(once(negated_literal(Wff,Was)),Head=@=Was) ->
 		Body = false;
 	%true ->
 		negated_literal(Wff,Body).
@@ -688,48 +631,72 @@ is_holds_true_pttp(F):-is_p_to_n(F,_).
 is_2nd_order_holds_pttp(Prop):- atom(Prop), is_holds_true_pttp(Prop) ; is_holds_false_pttp(Prop).
 
 
+:-style_check(+singleton).
 
 do_not_wrap(F):-not(atom(F)),!,fail.
 do_not_wrap(F):-arg(_,vv(query),F).
 do_not_wrap(F):-atom_concat('int_',_,F).
 
 :-export(correct_pttp/2).
-%:- thread_local user:second_order_wrapper/1.
-:- dynamic user:second_order_wrapper/1.
+%:- dynamic thlocal:second_order_wrapper/1.
+:- thread_local thlocal:second_order_wrapper/1.
 
-user:second_order_wrapper(asserted_t).
+thlocal:second_order_wrapper(true_t).
 
-correct_pttp_head(Wrapper,B,A):- with_assertions(second_order_wrapper(Wrapper), correct_pttp(B,A)),!.
+correct_pttp_head(Wrapper,B,A):- with_assertions(thlocal:second_order_wrapper(Wrapper), correct_pttp(B,A)),!.
 
-correct_pttp(B,A):-correct_pttp([],B,A),!.
+correct_pttp_body(Wrapper,B,A):- with_assertions(thlocal:second_order_wrapper(Wrapper), correct_pttp(B,A)),!.
+
+correct_pttp(B,A):-must(correct_pttp([],B,A)),!.
 
 correct_pttp(LC,B,A):-identical_member(B,LC),A=B.
-correct_pttp(LC,-B,NA):-!,correct_pttp([B|LC],B,A),negated_literal(A,NA).
-correct_pttp(LC,n(_,B),NA):-!,correct_pttp([B|LC],B,A),negated_literal(A,NA).
+correct_pttp(LC,-B,NA):-!,must((correct_pttp([B|LC],B,A),negated_literal(A,AN),correct_pttp(LC,AN,NA))),!.
+correct_pttp(LC,n(_,B),NA):-!,must((correct_pttp([B|LC],B,A),negated_literal(A,AN),correct_pttp(LC,AN,NA))),!.
 correct_pttp(LC,B,A):-once(correct_pttp_0([B|LC],B,A)),B==A,!.
 correct_pttp(LC,B,A):-once(correct_pttp_0([B|LC],B,A)),!. % dmsg(once(correct_pttp_0(LC,B,A))),term_variables(B,BV),term_variables(A,AV),must(AV==BV).
 
-correct_pttp_0(LC,Body,Body):-is_ftVar(Body).
-correct_pttp_0(LC,Body,Body):-not(compound(Body)),!.
-correct_pttp_0(LC,BodyIn,Body):- is_ftVar(BodyIn),trace_or_throw(var_correct_lit(BodyIn,Body)).
-correct_pttp_0(LC,BodyIn,Body):- functor(BodyIn,F,A),BodyIn=..[F|List],correct_pttp_1(LC,BodyIn,F,A,List,Body).
+correct_pttp_0(_,Body,Body):-is_ftVar(Body).
+correct_pttp_0(_,Body,Body):-not(compound(Body)),!.
+correct_pttp_0(_,BodyIn,Body):- is_ftVar(BodyIn),trace_or_throw(var_correct_lit(BodyIn,Body)).
+correct_pttp_0(LC,BodyIn,Body):- functor(BodyIn,F,A),'=..'(BodyIn,[F|List]),correct_pttp_1(LC,BodyIn,F,A,List,Body).
 
-correct_pttp_1(LC, BodyIn,F,_,_,Body):- sanity(atom(F)), atom_concat('not_',_,F),!,negated_literal(BodyIn,Neg),!,correct_pttp(LC,Neg,NegBody),negated_literal(NegBody,Body).
-correct_pttp_1(LC, BodyIn,F,A,L,Body):- is_holds_false_pttp(F),negated_literal(BodyIn,Neg),!,correct_pttp(LC,Neg,NegBody),negated_literal(NegBody,Body),!.
+correct_pttp_1(LC, BodyIn,F,_,_,Body):- sanity(atom(F)), atom_concat('not_',_,F),negated_literal(BodyIn,Neg),!,
+   correct_pttp(LC,Neg,NegBody), 
+   negated_literal(NegBody,Body).
+correct_pttp_1(LC, BodyIn,F,_,_,Body):- is_holds_false_pttp(F),negated_literal(BodyIn,Neg),!,correct_pttp(LC,Neg,NegBody),negated_literal(NegBody,Body),!.
 correct_pttp_1(LC, BodyIn,F,A,L,Body):- is_holds_false_pttp(F),trace_or_throw(correct_pttp_1(LC,BodyIn,F,A,L,Body)).
-correct_pttp_1(LC,_BodyIn,F,_,[L|IST],Body):- correct_pttp_2(LC,F,[L|IST],Body).
+correct_pttp_1(LC,_BodyIn,F,_,[L|IST],Body):- length([L|IST],A), correct_pttp_2(LC,F,A,[L|IST],Body).
 
-correct_pttp_2(LC,F,[L|IST],Body):- do_not_wrap(F),!,Body=..[F,L|IST].
-correct_pttp_2(LC,F,[L|IST],Body):- atom(F),pttp_builtin(F,_),!,Body=..[F,L|IST].
-correct_pttp_2(LC,F,L,Body):- is_ftVar(F),!,trace_or_throw(correct_pttp_2(LC,F,L,Body)).
-correct_pttp_2(LC,F,[L|IST],Body):- is_holds_true_pttp(F),!,Body =..[F,L|IST].
-% uncomment (need it) correct_pttp_2(LC,infer_by,[L|IST],Body):- infer_by = F, Body =..[F,L|IST].
+correct_pttp_2(_,F,_,[L|IST],Body):- wrapper_for(F,Wrapper),!, wrap_univ(Body ,[Wrapper,F,L|IST]).
+correct_pttp_2(_,F,A,[L|IST],Body):- correct_pttp_4(F,A,[L|IST],Body),!.
+correct_pttp_2(_LC,F,_A,[L|IST],Body):- do_not_wrap(F),!,wrap_univ(Body,[F,L|IST]).
+correct_pttp_2(_LC,F,A,[L|IST],Body):- atom(F),pttp_builtin(F,A),!,dmsg(todo(warn(pttp_builtin(F,A)))),wrap_univ(Body,[call_builtin,F,L|IST]).
+correct_pttp_2(LC,F,_, L,Body):- is_ftVar(F),!,trace_or_throw(correct_pttp_2(LC,F,L,Body)).
+correct_pttp_2(_LC,F,_,[L|IST],Body):- is_holds_true_pttp(F),!,wrap_univ(Body,[F,L|IST]).
+% uncomment (need it) 
+correct_pttp_2(_,infer_by,1,[L|IST],Body):- infer_by = F, wrap_univ(Body ,[F,L|IST]).
 
 % slow for 7
-correct_pttp_2(LC,F,[L|IST],Body):- wrapper_for(F,Wrapper),!, Body =..[Wrapper,F,L|IST].
-correct_pttp_2(LC,F,[L|IST],Body):- second_order_wrapper(Wrapper),!, Body =..[Wrapper,F,L|IST].
-correct_pttp_2(LC,F,[L|IST],Body):- Body =..[assumed_t,F,L|IST].
+correct_pttp_2(LC,F,A,[L|IST],Body):-correct_pttp_3(LC,F,A,[L|IST],Body),!.
 
+correct_pttp_3(_,F,A,[L|IST],Body):- correct_pttp_4(F,A,[L|IST],Body),!.
+correct_pttp_3(_,F,_,[L|IST],Body):- thlocal:second_order_wrapper(Wrapper),!, wrap_univ(Body ,[Wrapper,F,L|IST]).
+correct_pttp_3(_,F,_,[L|IST],Body):- wrap_univ(Body,[assumed_t,F,L|IST]).
+
+wrap_univ(Body ,[WapperPred,[P]]):-is_wrapper_pred(WapperPred),compound(P),P=..F_ARGS,!,wrap_univ(Body ,[WapperPred|F_ARGS]).
+wrap_univ(Body ,[WapperPred,P]):-is_wrapper_pred(WapperPred),compound(P),P=..F_ARGS,!,wrap_univ(Body ,[WapperPred|F_ARGS]).
+wrap_univ(Body ,[F1,F2|ARGS]):- F1==F2,!,wrap_univ(Body ,[F1|ARGS]).
+wrap_univ(_Body,[F|ARGS]):- must((atom(F),is_list(ARGS))),length(ARGS,A),must(A>1),functor(P,F,A),fail,
+  (predicate_property(P,_)->fail;(dmsg(once(warn(no_predicate_property(P)))))),fail.
+wrap_univ(Body ,[F|List]):- must((Body=..[F|List])).
+
+is_wrapper_pred(VarPred):-is_ftVar(VarPred),!,fail.
+is_wrapper_pred(not_possible_t).
+is_wrapper_pred(call_builtin).
+is_wrapper_pred(WapperPred):-is_p_or_not(WapperPred),!.
+
+% correct_pttp_4(F,A,[L|IST],Body):-...
+correct_pttp_4(_,_,_,_):-!,fail.
 
 %%% ***
 %%% ****if* PTTP/pttp1
@@ -742,13 +709,20 @@ pttp1_wid(ID,X,Y) :-
  must_det_l((   
    pttp1a_wid(ID,X,X0),
    pttp1b_wid(ID,X0,X8),
-   pttp1c_wid(ID,X8,IntProcs,Procs),
+   pttp1c_wid(ID,X0,X8,IntProcs,Procs),
    conjoin_pttp(Procs,IntProcs,Y))).
 
 
 
 :-export(pttp1a_wid/3).
-pttp1a_wid(ID,X,X0) :-    
+
+% pttp1a_wid(ID,X,XX):-pttp1a_wid_0(ID,X,XX),!.
+
+pttp1a_wid(ID,X,XX):-pttp1a_wid_0(ID,X,X0),
+  ((X0=(FOO:-TRUE),TRUE==true)->pttp1a_wid_0(ID,FOO,XX);XX=X0).
+
+
+pttp1a_wid_0(ID,X,X0) :-    
  must_det_l((
         subst(X , neg,-,XX1),
         subst(XX1,~,-,XX2),
@@ -756,10 +730,10 @@ pttp1a_wid(ID,X,X0) :-
 	% write('PTTP input formulas:'),        
 	clauses(XX3,X0,ID,_))).
 
-pttp1b_wid(ID,X0,X8) :- must(apply_to_conjuncts(X0,add_features,X8)).
+pttp1b_wid(_ID,X0,X8) :- must(apply_to_conjuncts(X0,add_features,X8)).
 
 
-pttp1c_wid(ID,X8,IntProcs,Procs) :-    
+pttp1c_wid(_ID,X0,X8,IntProcs,Procs) :-    
  must_det_l((
 	predicates(X8,IntPreds0),
 	list_reverse(IntPreds0,IntPreds1),
@@ -927,12 +901,20 @@ max(X,Y,Max) :-
 %%% SOURCE
 
 :-export(conjoin_pttp/3).
+
+conjoin_pttp(A,B,C) :- A==B, !, C=A.
+conjoin_pttp(A,B,C) :- var(A),!,conjoin_pttp(varcall(A),B,C).
+conjoin_pttp(A,B,C) :- var(B),!,conjoin_pttp(A,varcall(B),C).
+conjoin_pttp(infer_by(_),B,B) :- !.
+conjoin_pttp(false,true,call(false)).
+conjoin_pttp(A,B,C) :- B==false,!,conjoin_pttp(false,A,C).
+conjoin_pttp(A,B,C) :- A==false,!,must(negated_literal(B,C)).
 conjoin_pttp(A,B,C) :-
 	A == true ->
 		C = B;
 	B == true ->
 		C = A;
-	A == false ->
+        A == false ->
 		C = false;
 	B == false ->
 		C = false;
@@ -958,26 +940,30 @@ disjoin(A,B,C) :-
 
 is_builtin_p_to_n('mudEquals','not_mudEquals').
 
-is_p_to_n_2way('answerable_t','unknown_t').
+%is_p_to_n_2way('answerable_t','unknown_t').
 is_p_to_n_2way('askable_t','fallacy_t').
 
 
-is_p_to_n(',','not_both_t').
-is_p_to_n(';','not_either_t').
-is_p_to_n('&','not_both_t').
-is_p_to_n('v','not_either_t').
-is_p_to_n('both_t','not_both_t').
-is_p_to_n('not_both_t',',').
+%ODD is_p_to_n(',','not_both_t').
+%ODD is_p_to_n(';','not_either_t').
+%ODD is_p_to_n('&','not_both_t').
+%ODD is_p_to_n('v','not_either_t').
+%ODD is_p_to_n('both_t','not_both_t').
+%ODD is_p_to_n('not_both_t',',').
 is_p_to_n('assumed_t','not_proven_t').
 %is_p_to_n('not_proven_t','assumed_t').
-is_p_to_n('proven_t','not_assumed_t').
-%is_p_to_n('not_assumed_t','proven_t').
+is_p_to_n('true_t','not_assumed_t').
+%is_p_to_n('not_assumed_t','true_t').
+is_p_to_n('possible_t','not_possible_t').
+is_p_to_n('not_possible_t','possible_t').
 
+%is_p_to_n('asserted_f','asserted_t').
 
 %is_p_to_n(P,N):-is_p_to_n_2way(P,N).
-is_p_to_n(P,N):-is_p_to_n_2way(N,P).
+%is_p_to_n(P,N):-is_p_to_n_2way(N,P).
 is_p_to_n('not_unknown_t','not_answerable_t').
-is_p_to_n('proven_not_t','possible_t').
+% TODO is_p_to_n('not_true_t','possible_t').
+% is_p_to_n('asserted_t','asserted_f').
 is_p_to_n('proven_in','impossible_in').
 is_p_to_n(P,N):-is_builtin_p_to_n(P,N).
 is_p_to_n('isa','not_mudIsa').
@@ -986,8 +972,8 @@ is_p_to_n(P,N):- false,is_p_to_n1(P,N).
 
 is_p_to_not('asserted_t').
 is_p_to_not('possible_t').
-is_p_to_not('proven_t').
-is_p_to_not('proven_not_t').
+is_p_to_not('true_t').
+is_p_to_not('not_true_t').
 is_p_to_not('fallacy_t').
 is_p_to_not('answerable_t').
 
@@ -996,6 +982,8 @@ is_p_to_not('unknown_t').
 is_p_to_not('askable_t').
 
 is_p_to_not('pred_isa_t').
+
+
 is_p_to_not('pred_t').
 
 
@@ -1018,7 +1006,7 @@ is_p_to_n0('possible_','impossible_').
 
 
 %is_p_simple('not_proven_not_t','possible_t').
-%is_p_simple('not_possible_t','proven_not_t').
+%is_p_simple('not_possible_t','not_true_t').
 %is_p_simple('not_unknown_t','answerable_t').
 %is_p_simple('not_answerable_t','unknown_t').
 is_p_simple(X,X).
@@ -1026,17 +1014,21 @@ is_p_simple(X,X).
 %%% ****if* PTTP/negated_functor
 %%% SOURCE
 
-negated_functor0(F,NotF) :- is_p_to_n(F,NotF).
-negated_functor0(F,NotF) :- is_p_to_n(NotF,F).
+negated_functor0(_,_):-!,fail.
+negated_functor0(true_t,not_possible_t).
+negated_functor0(not_proven_t,possible_t).
+
+%negated_functor0(F,NotF) :- is_p_to_n(F,NotF).
+%negated_functor0(F,NotF) :- is_p_to_n(NotF,F).
 
 :-export(negated_functor/2).
-negated_functor(F,NotF) :- is_ftVar(F),!,trace_or_throw(negated_functor(F,NotF)).
+negated_functor(F,NotF) :- var(F),!,trace_or_throw(negated_functor(F,NotF)).
 %negated_functor(F,NotF) :- sanity(atom(F)),atom_concat('not_',Now,F),!,must(NotF=Now).
 negated_functor(F,SNotF) :- negated_functor0(F,NotF),!,is_p_simple(NotF,SNotF).
 negated_functor((-),_):-!,dtrace(negated_functor((-),_)),fail.
 negated_functor((~),_):-!,dtrace(negated_functor((~),_)),fail.
 negated_functor(F,NotF) :- atom_concat('int_',Now,F),!,negated_functor(Now,Then),atom_concat('int_',Then,NotF),!.
-negated_functor(F,NotF) :-
+negated_functor(F,NotF) :- must( \+member(F,[&,(,),(;),(v),(all),(:-)])),
 	name(F,L),
 	name('not_',L1),
 	(list_append(L1,L2,L) ->
@@ -1051,10 +1043,14 @@ negated_functor(F,NotF) :- is_2nd_order_holds_pttp(NotF),trace_or_throw(negated_
 %%% ****if* PTTP/negated_literal
 %%% SOURCE
 
-negated_literal(-A,B):-is_ftVar(A),!,trace_or_throw(var_negated_literal(-A,B)),!.
+negated_literal(-A,B):-var(A),!,trace_or_throw(var_negated_literal(-A,B)),!.
+negated_literal(not(A),A):-!.
+negated_literal(-(A),A):-!.
+negated_literal(A,B):- functor(A,F,Arity),member(F,[&,(,),(;),(v),(all),(:-)]),must_det_l((as_dlog(A,AA),IN=not(AA), call((nnf('$VAR'('KB'),IN,BB),BB \=@= IN,thglobal:as_prolog(BB,B))))).
+negated_literal(not(A),B):-negated_literal(A,AA),!,negated_literal_0(AA,B),!.
 negated_literal(-A,B):-negated_literal(A,AA),!,negated_literal_0(AA,B),!.
-negated_literal(A,B):- is_ftVar(B),!,negated_literal_0(A,B),!.
-negated_literal(A,-B):-negated_literal(B,BB),!,negated_literal_0(A,B),!.
+negated_literal(A,B):- var(B),!,negated_literal_0(A,B),!.
+negated_literal(B,-A):-negated_literal(A,AA),!,negated_literal_0(AA,B),!.
 negated_literal(A,B):- negated_literal_0(A,B),!.
 negated_literal(A,B):- ground(B),not(ground(A)),!,negated_literal(B,A),!.
 
@@ -1062,10 +1058,10 @@ negated_literal_0(Lit,NotLit) :-
 	Lit =.. [F1|L1],
 	negated_functor(F1,F2),
 	(is_ftVar(NotLit) ->
-		NotLit =.. [F2|L1];
+		wrap_univ(NotLit , [F2|L1]);
 	%true ->
 	       
-               ( NotLit =.. [F2|L2],
+               ( wrap_univ(NotLit , [F2|L2]),
 		L1 == L2) ).
 
 %%% ***
@@ -1213,7 +1209,6 @@ pttp_builtin(V,A):-is_ftVar(V),!,trace_or_throw(pttp_builtin(V,A)).
 pttp_builtin(!,0).
 
 
-pttp_builtin(is_asserted,_).
 pttp_builtin(P,_):- current_predicate(resultIsa/2),user:mpred_prop(P,predStub(prologHybrid)),!,fail.
 pttp_builtin(isa,2):-!,fail.
 pttp_builtin(isa,_):-!,fail.
@@ -1231,6 +1226,7 @@ pttp_builtin(integer,1).
 pttp_builtin(number,1).
 pttp_builtin(F,_):-is_p_or_not(F),!,fail.
 pttp_builtin(not_asserted_t,_):-!,fail.
+pttp_builtin(is_asserted,1).
 pttp_builtin(atomic,1).
 pttp_builtin(constant,1).
 pttp_builtin(functor,3).
@@ -1255,19 +1251,21 @@ pttp_builtin(display,1).
 pttp_builtin(write,1).
 pttp_builtin(nl,0).
 pttp_builtin(only_if_pttp,0).
-pttp_builtin(ANY,0):-atom(ANY).
+pttp_builtin(ANY,A):-atom(ANY),A==0.
 pttp_builtin(infer_by,_).
 pttp_builtin(search_cost,_).
+pttp_builtin(mudEquals,2):-!.
+pttp_builtin(F,A):-functor(P,F,A),prequent(P),!.
 pttp_builtin(F,A):-is_builtin_p_to_n(P,N),member(F,[P,N]),member(A,[2,3,4]).
 pttp_builtin(test_and_decrement_search_cost,_).
 pttp_builtin(unify,_).
 pttp_builtin(identical_member_special,_).
 pttp_builtin(identical_member_special_loop_check,_).
 pttp_builtin(M:P,A):-atom(M),!,pttp_builtin(P,A).
-pttp_builtin(F,_):- (user:mpred_prop(F,prologDynamic)),!. %,fail.
 pttp_builtin(F,_):- (user:mpred_prop(F,prologBuiltin)),!. %,fail.
+% TODO pttp_builtin(F,_):- (user:mpred_prop(F,prologDynamic)),!. %,fail.
 pttp_builtin(unifiable_member,_).
-pttp_builtin(t,_).
+% TODO pttp_builtin(t,_).
 %pttp_builtin(F,_):-user:mpred_prop(F,prologPTTP),!,fail.
 %pttp_builtin(F,_):-user:mpred_prop(F,prologKIF),!,fail.
 pttp_builtin(F,A):-current_predicate(F/A),functor(P,F,A),builtin_why(P,F,A,Why),!,dmsg(todo(warn(builtin_why(F,A,Why)))).
@@ -1277,33 +1275,16 @@ builtin_why(_,int_query,_,_):-!,fail.
 builtin_why(_,query,_,_):-!,fail.
 builtin_why(_,F,_,int_):- atom_concat(_,'_int',F),!.
 builtin_why(_,F,_,int_):- atom_concat('int_',_,F),!,fail.
-builtin_why(P,F,A,meta_predicate(P)):- predicate_property(P,meta_predicate(P)).
-builtin_why(P,F,A,thread_local):- predicate_property(P,thread_local).
-builtin_why(P,F,A,source_file(F)):- source_file(P,F).
-builtin_why(P,F,A,built_in):- real_builtin_predicate(P).
-builtin_why(P,F,A,transparent):- predicate_property(P,transparent).
-builtin_why(P,F,A,number_of_rules(N)):- predicate_property(P,number_of_rules(N)),N>0.
+builtin_why(P,_,_,meta_predicate(P)):- predicate_property(P,meta_predicate(P)).
+builtin_why(P,_,_,thread_local):- predicate_property(P,thread_local).
+builtin_why(P,_,_,source_file(F)):- source_file(P,F).
+builtin_why(P,_,_,built_in):- real_builtin_predicate(P).
+builtin_why(P,_,_,transparent):- predicate_property(P,transparent).
+builtin_why(P,_,_,number_of_rules(N)):- predicate_property(P,number_of_rules(N)),N>0.
 builtin_why(X,0):-atom(X).
 %builtin_why(P,2,t(P,2)):-t(P,_,_),!,fail.
 %builtin_why(P,3,t(P,3)):-t(P,_,_,_),!,fail.
 
-
-
-
-% -- CODEBLOCK
-:-forall(was_pttp_functor(external,F/_),
-   forall(
-    between(7,13,A),
-      ((negated_functor(F,NF),
-   atom_concat('int_',F,IF),
-   atom_concat('int_',NF,INF),
-      assert_if_new(was_pttp_functor(external,NF,A)),
-      assert_if_new(was_pttp_functor(internal,IF,A)),
-      assert_if_new(was_pttp_functor(internal,INF,A)),
-         export(F/A),
-         export(NF/A),
-         export(IF/A),
-         export(INF/A))))).
 
 
 
@@ -1478,3 +1459,4 @@ pttp_nnf_clean((A v B),FreeV,NNF,Paths) :- !,
 pttp_nnf_clean(Lit,_,Lit,1).
 
 
+:-ensure_loaded(dbase_i_mpred_pttp_precompiled).

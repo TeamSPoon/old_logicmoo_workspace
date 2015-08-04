@@ -2002,7 +2002,7 @@ registerCycPred(Mt,Pred,Arity):-
 % Assert Side Effect Prolog to Cyc Predicate Mapping
 %
 % ============================================
-
+% '$undefined_procedure'(Module, Name, Arity, Action) :- current_prolog_flag(autoload, true), '$autoload'(Module, Name, Arity), !,Action = retry.
 %%TODO user:exception(undefined_predicate, Pred ,retry):- isCycOption(hookCycPredicates,true),cycDefineOrFail(Pred).
 
 cycDefineOrFail(Mod:Pred/Arity):-atom_concat('#$',_,Pred),
@@ -2601,7 +2601,7 @@ sterm_to_pterm(VAR,VAR):-isSlot(VAR),!.
 sterm_to_pterm([VAR],VAR):-isSlot(VAR),!.
 sterm_to_pterm([X],Y):-!,nonvar(X),sterm_to_pterm(X,Y).
 
-sterm_to_pterm([S|TERM],PTERM):-isSlot(S),
+sterm_to_pterm([S|TERM],PTERM):- ((isSlot(S),RS=S);(sterm_to_pterm(S,RS),RS\=@=S)),
             sterm_to_pterm_list(TERM,PLIST),            
             PTERM=..[cycHolds,S|PLIST].
 
@@ -2642,6 +2642,9 @@ interleave([''|More],Space,[Space|Result]):-interleave(More,Space,Result),!.
 interleave([Atom|More],Space,[Atom,Space|Result]):-interleave(More,Space,Result),!.
 
 pterm_to_sterm(VAR,VAR):-isNonCompound(VAR),!.
+pterm_to_sterm(VAR,VAR):-is_ftVar(VAR),!.
+pterm_to_sterm('&'(X,Y),['&'|Ls]):- pred_juncts_to_list('&','&'(X,Y),L),maplist(pterm_to_sterm,L,Ls),!.
+pterm_to_sterm('v'(X,Y),['v'|Ls]):- pred_juncts_to_list('v','v'(X,Y),L),maplist(pterm_to_sterm,L,Ls),!.
 pterm_to_sterm([X|L],[Y|Ls]):-!,pterm_to_sterm(X,Y),pterm_to_sterm(L,Ls),!.
 pterm_to_sterm(X,Y):-compound(X),X=..L,pterm_to_sterm(L,Y),!.
 pterm_to_sterm(X,X).

@@ -1955,7 +1955,7 @@ pfcRemoveSupportItems(P,Types):-
   pfc_maptree(pfcRem1,Results).
 
 pfcTypeFilter_l(ResultsO,Filter,ResultsO):-pfcTypeFilter(ResultsO,Filter).
-pfcTypeFilter_l((Body,More),Filter,ResultsO):-!,pfcTypeFilter_l(Body,Filter,BodyO),pfcTypeFilter_l((More),Filter,(ResultsM)),db_conjoin(BodyO,ResultsM,ResultsO).
+pfcTypeFilter_l((Body,More),Filter,ResultsO):-!,pfcTypeFilter_l(Body,Filter,BodyO),pfcTypeFilter_l((More),Filter,(ResultsM)),conjoin(BodyO,ResultsM,ResultsO).
 pfcTypeFilter_l(_,_Filter,!).
 
 pfcFilterSupports(Support,Filter,ResultsO):- 

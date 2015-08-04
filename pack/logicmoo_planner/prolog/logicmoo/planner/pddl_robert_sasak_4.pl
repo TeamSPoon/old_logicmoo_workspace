@@ -16,7 +16,7 @@
 :- use_module(library(timeout)).
 :- use_module(library(lists)).
 
-:-set_prolog_flag(gc,false).
+% :-set_prolog_flag(gc,false).
 :-debug.
 
 

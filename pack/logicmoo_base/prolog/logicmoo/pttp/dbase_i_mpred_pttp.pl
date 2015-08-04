@@ -12,18 +12,22 @@
 
 :- user:ensure_loaded(logicmoo(mpred/logicmoo_i_header)).
 
-
-:-export(internal_functor/1).
-:-export(was_pttp_functor/1).
-:-dynamic(was_pttp_functor/1).
+ainz(A):-if_defined(pfc_assertz(A),assertz_new(A)).
+%:-export(internal_functor/1).
+%:-export(was_pttp_functor/1).
+%:-dynamic(was_pttp_functor/1).
 :-multifile(user:wid/3).
 :-dynamic(user:wid/3).
+:-export(int_query/7).
+:-dynamic(int_query/7).
+:-export(int_not_query/7).
+:-dynamic(int_not_query/7).
 
 % -- CODEBLOCK
 :-export(pttp_ask/1).
 pttp_ask(CALL):-nonegate(_KB,CALL,NNCALL),correct_pttp(NNCALL,REALCALL),apply(REALCALL,[ [], [], 100, _OneHudred, _Proof, [_In|[]]]).
 
-:-dynamic(user:was_pttp_functor/2).
+%:-dynamic(was_pttp_functor/2).
 
 /*
 % -- CODEBLOCK
@@ -87,6 +91,8 @@ pttp_assert_wid(ID,_Mode,call(CALL)):-!, must((save_wid(ID,call,call(CALL)),unnu
 pttp_assert_wid(ID,pttp,X):- must((bugger:with_assertions(thlocal:current_why(ID,X), must(( pttp1_wid(ID,X,Y), pttp2_wid(ID,Y)) )))).
 % pttp_assert_wid(ID,Mode,KIF):- must(kif_tell(ID,KIF)),!.
 pttp_assert_wid(ID,kif,X):- show_call_failure(must(kif_tell(ID,X))).
+
+pttp_assert_wid(ID,pttp_in,HB):- !,must((save_wid(ID,pttp_in,HB), pttp_assert_real_wid(ID,HB))).
 pttp_assert_wid(ID,Mode,(X:-Y)):- !,must((save_wid(ID,Mode,(X:-Y)), pttp_assert_real_wid(ID,(X:-Y)))).
 pttp_assert_wid(ID,_Mode,X):-  show_call_failure(must(pttp_assert_real_wid(ID,X))),!.
 pttp_assert_wid(ID,_Mode,PNF):-  must( pttp_nnf(PNF,X)),!,must(must(pttp_assert_real_wid(ID,X))).
@@ -95,8 +101,8 @@ infer_by(_).
 
 % -- CODEBLOCK
 :-export(pttp_assert_real_wid/2).
-pttp_assert_real_wid(ID,X):- kb_incr(ID,IDINC),
-  must( pttp1_wid(IDINC,X,Y)),!, must(pttp_assert_int_wid(IDINC,Y)),!.
+pttp_assert_real_wid(ID,X):-
+  must( pttp1_wid(ID,X,Y)),!, must(pttp_assert_int_wid(ID,Y)),!.
 
 
 % -- CODEBLOCK
@@ -116,7 +122,7 @@ pttp_assert_int_wid_for_conjuncts(ID,Y,_):- must(pttp_assert_int_wid(ID,Y)).
 
 % -- CODEBLOCK
 :-export(save_wid/3).
-save_wid(IDWhy,Atom,Wff):-must(Atom\=','),to_numbered_ground(user:wid(IDWhy,Atom,Wff),Assert),show_call_failure(assertz_if_new(Assert)).
+save_wid(IDWhy,Atom,Wff):-must(Atom\=','),to_numbered_ground(user:wid(IDWhy,Atom,Wff),Assert),show_call_failure(ainz(Assert)).
 
 to_numbered_ground(I,O):-ground(I)->I=O;(copy_term(I,M),numbervars(M,'$VAR',766,_),O=M->true;trace_or_throw(to_numbered_ground(I,O))).
 
@@ -140,15 +146,18 @@ is_wid_key(Other,_):-compound(Other),not(not(is_wid_key2(Other))).
 
 
 % -- CODEBLOCK
+erase_safe_pttp(_,Ref):-erase(Ref).
+
+% -- CODEBLOCK
 retractall_matches(Y):-unnumbervars(Y,YY),retractall_matches_0(YY).
-retractall_matches_0((Y:-B)):-!,pred_subst(is_wid_key,B,_,_,BB),forall(clause(Y,BB,Ref),erase(Ref)).
-retractall_matches_0(Y):-forall(clause(Y,true,Ref),erase(Ref)).
+retractall_matches_0((Y:-B)):-!,pred_subst(is_wid_key,B,_,_,BB),forall(clause(Y,BB,Ref),erase_safe_pttp(clause(Y,BB,Ref),Ref)).
+retractall_matches_0(Y):-forall(clause(Y,true,Ref),erase_safe_pttp(clause(Y,true,Ref),Ref)).
 
 % -- CODEBLOCK
 :-export(retractall_wid/1).
 retractall_wid(ID):- 
- forall(clauses_wid(ID,_,_/_,Y,Ref),must(show_call_failure((erase(Ref),retract_if_no_wids(Y))))),
- forall(clauses_wid(ID,_,_,Y,Ref),must(erase(Ref))).
+ forall(clauses_wid(ID,A,B/C,Y,Ref),must(show_call_failure((erase_safe_pttp(clauses_wid(ID,A,B/C,Y,Ref),Ref),retract_if_no_wids(Y))))),
+ forall(clauses_wid(ID,A,B,Y,Ref),must(erase_safe_pttp(clauses_wid(ID,A,B,Y,Ref),Ref))).
 
 % -- CODEBLOCK
 :-export(listing_wid/1).
@@ -168,7 +177,7 @@ write_rid(RID):-
   forall(no_repeats(FY,(clauses_wid(RID,RID,NA,FY,_),compound(NA))),
     show_wid_int(FY)).
 
-:- style_check(-singleton).
+:- style_check(+singleton).
 
 show_wid_int(FY):-once((reassemble_intified(FY,FYI),renumbervars_a(FYI,FY2),unnumbervars(FY2,FY3), portray_clause_0( FY3 ),nl)).
 
@@ -180,7 +189,7 @@ reassemble_intified(H, FHARGS ):-compound(H),H=..HEADL,append(HARGS,[G, E, A, M,
 reassemble_intified(OUT,OUT).
 
 grab_body(call_proof(_,A),A):-!.
-grab_body((A,B),AB):-grab_body(A,AA),grab_body(B,BB),db_conjoin(AA,BB,AB).
+grab_body((A,B),AB):-grab_body(A,AA),grab_body(B,BB),conjoin_pttp(AA,BB,AB).
 grab_body(_,true).
 
 :-export(portray_clause_0/1).
@@ -194,7 +203,7 @@ portray_clause_0( AB ):- portray_clause(user_output,(AB),[numbervars(true)]).
 :-export(clear_pttp/0).
 clear_pttp:- eraseall(int_query,_),eraseall(int_not_query,_),
   forall(wid(ID,F/A,_),retractall(wid(ID,_,_))),
-  forall(user:was_pttp_functor(internal,F/A),(abolish(F,A),dynamic(F/A))).
+  forall(was_pttp_functor(internal,F,A),(abolish(F,A),dynamic(F/A))).
 
 %eraseall(M:F,A):-!,functor(C,F,A),forall(clause(M:C,_,X),erase(X)).
 %eraseall(F,A):-current_predicate(F/A),functor(C,F,A),forall(clause(C,_,X),erase(X)).                                                            
@@ -241,7 +250,7 @@ call30timed(TestName,CALL):-
         ),
         statistics(cputime, C),
         F is C-D,
-        assert(pttp_test_took(TestName,B,F)),!,
+        ainz(pttp_test_took(TestName,B,F)),!,
         B=success.
 
 
@@ -271,39 +280,28 @@ isNegOf(N1,N):-dtrace(not(isNegOf(N1,N))),isNegOf(N,N1).
 kb_incr(WffNum1 ,WffNum2):-is_ftVar(WffNum1),trace_or_throw(kb_incr(WffNum1 ,WffNum2)).
 kb_incr(WffNum1 ,WffNum2):-number(WffNum1),WffNum2 is WffNum1 + 1,!.
 %kb_incr(WffNum1 ,WffNum2):-atom(WffNum1),WffNum2=..[WffNum1,0],!.
-kb_incr(WffNum1 ,WffNum2):-atomic(WffNum1),WffNum2 = WffNum1:99,!.
+kb_incr(WffNum1 ,WffNum2):-atomic(WffNum1),WffNum2 = WffNum1:0,!.
 kb_incr(WffNum1 ,WffNum2):-WffNum1=..[F,P,A|REST],kb_incr(A ,AA),!,WffNum2=..[F,P,AA|REST].
 kb_incr(WffNum1 ,WffNum2):-trace_or_throw(kb_incr(WffNum1 ,WffNum2)).
 
-:-multifile user:was_pttp_functor/3.
-:-dynamic user:was_pttp_functor/3.
+:-multifile was_pttp_functor/3.
+:-dynamic was_pttp_functor/3.
 
 
 % -- CODEBLOCK
-user:was_pttp_functor(external, both_t,9).
-user:was_pttp_functor(external, either_t,9).
-user:was_pttp_functor(external, pred_t,9).
-user:was_pttp_functor(external, pred_isa_t,8).
-user:was_pttp_functor(external, isa,8).
-user:was_pttp_functor(internal, query,7).
-user:was_pttp_functor(external, proven_not_t,9).
-user:was_pttp_functor(external, proven_t,8).
-user:was_pttp_functor(external, possible_t,9).
-user:was_pttp_functor(external, asserted_t,9).
-user:was_pttp_functor(external, proven_t,9).
-user:was_pttp_functor(external, askable_t,8).
-user:was_pttp_functor(external, fallacy_t,8).
-user:was_pttp_functor(external, possible_t,10).
-user:was_pttp_functor(external, unknown_t,9).
+
+
+was_pttp_functor(internal, query,7).
+
 
 % -- CODEBLOCK
 int_listing_wid0:-
-  forall(was_pttp_functor(external,F/A),catch(prolog_list:listing(F/A),_,fail)),
-  forall(was_pttp_functor(internal,F/A),catch(prolog_list:listing(F/A),_,fail)),!.
+  forall(was_pttp_functor(external,F,A),catch(prolog_list:listing(F/A),_,fail)),
+  forall(was_pttp_functor(internal,F,A),catch(prolog_list:listing(F/A),_,fail)),!.
 
 int_listing_wid:-
-  forall(was_pttp_functor(external,F/A),(functor(P,F,A),forall(clause(P,B),portray_clause_0((P:-B))))),
-  forall(was_pttp_functor(internal,F/A),(functor(P,F,A),forall(clause(P,B),portray_clause_0((P:-B))))).
+  forall(was_pttp_functor(external,F,A),(functor(P,F,A),forall(clause(P,B),portray_clause_0((P:-B))))),
+  forall(was_pttp_functor(internal,F,A),(functor(P,F,A),forall(clause(P,B),portray_clause_0((P:-B))))).
 
 :- thread_local(is_query_functor/1).
 must_pttp_id(ID):-must(thlocal:current_why(ID,_)).
@@ -341,10 +339,10 @@ assertz_unumbered(_:true):-!.
 %assertz_unumbered((H:- (infer_by(_)))):- !,assertz_unumbered((H)).
 assertz_unumbered(:-(B)):- !, show_call(must(B)),!.
 assertz_unumbered(B):- thlocal:current_pttp_db_oper(OP),!, must((unnumbervars(B,BB),show_call_failure(call(OP,BB)))).
-assertz_unumbered(B):-must((unnumbervars(B,BB),show_call_failure(assertz_if_new(BB)))).
+assertz_unumbered(B):-must((unnumbervars(B,BB),show_call_failure(ainz(BB)))).
 
 :-export(add_functor/2).
-add_functor(Ext,F/A):- must(( export(F/A),assertz_if_new(user:was_pttp_functor(Ext,F/A)))).
+add_functor(Ext,F/A):- must(( export(F/A),ainz(was_pttp_functor(Ext,F,A)))).
 
 
 pttp_tell(Wff):- why_to_id(pttp_tell,Wff,Why),pttp_assert_int_wid(Why,Wff).
@@ -369,17 +367,17 @@ pttp_assert_int_wid(ID,YB):- must((get_functor(YB,F,A),renumbervars_a(YB,Y),pttp
 
 
 pttp_assert_int_wid04(_,Y,_,_):- static_predicate(Y,Why),must( dmsg(error(warn(static_predicate(Y,Why))))),!.
-pttp_assert_int_wid04(_,_,F,A):- user:was_pttp_functor(external,F/A),!.
+pttp_assert_int_wid04(_,_,F,A):- was_pttp_functor(external,F,A),!.
 pttp_assert_int_wid04(_,Y,F,A):- not(internal_functor(F)),add_functor(external,F/A),assertz_unumbered(Y),!.
-pttp_assert_int_wid04(ID,Y,F,A):- show_call_success(user:wid(ID,F/A,Y)),!.
-%pttp_assert_int_wid04(ID,Y,F,A):- fail, once((must((must((renumbervars_a(Y,BB),nonvar(BB))),pred_subst(is_wid_key,BB,_,_,YCheck),nonvar(YCheck),BB \=@= YCheck)))),user:wid(_,F/A,YCheck),!,assertz_if_new(user:wid(ID,F/A,Y)),!.
-pttp_assert_int_wid04(ID,Y,F,A):- user:wid(_,_,Y),!,asserta(user:wid(ID,F/A,Y)),!.
-pttp_assert_int_wid04(ID,Y,F,A):- assertz(user:wid(ID,F/A,Y)),add_functor(internal,F/A),!,assertz_unumbered(Y),!.
+pttp_assert_int_wid04(ID,Y,F,A):- show_call_success(user:wid(ID,FA,Y)),!.
+%pttp_assert_int_wid04(ID,Y,F,A):- fail, once((must((must((renumbervars_a(Y,BB),nonvar(BB))),pred_subst(is_wid_key,BB,_,_,YCheck),nonvar(YCheck),BB \=@= YCheck)))),user:wid(_,F/A,YCheck),!,ainz(user:wid(ID,F/A,Y)),!.
+pttp_assert_int_wid04(ID,Y,F,A):- user:wid(_,_,Y),!,ain(user:wid(ID,F/A,Y)),!.
+pttp_assert_int_wid04(ID,Y,F,A):- ainz(user:wid(ID,F/A,Y)),add_functor(internal,F/A),!,assertz_unumbered(Y),!.
 /*
 pttp_assert_int_wid04(ID,Y,F,A):- 
    static_predicate(Y,Why)-> (trace,wdmsg(warn(error(static_predicate(Y,Why))))); 
     must(show_call_failure(assertz_unumbered(Y)),
-    must((not(internal_functor(F))-> add_functor(external,F/A); (assertz_if_new(user:wid(ID,F/A,Y)),add_functor(internal,F/A)))))
+    must((not(internal_functor(F))-> add_functor(external,F/A); (ainz(user:wid(ID,F/A,Y)),add_functor(internal,F/A)))))
 */
 
 :- user:ensure_loaded(dbase_i_mpred_pttp_statics).

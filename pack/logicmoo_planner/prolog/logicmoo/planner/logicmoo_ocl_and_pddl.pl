@@ -1155,14 +1155,7 @@ domainBNF(Output, List, R):- trace,with_no_assertions(tlbugger:skipMust, debugOn
 
 :-export(domainBNF_dcg//1).
 
-svar(Var,Var):-var(Var),!.
-svar('$VAR'(Var),Name):-number(Var),format(atom(Name),'~w',['$VAR'(Var)]),!.
-svar('$VAR'(Name),Name):-!.
-svar('?'(Name),Name):-!.
-svar(VAR,Name):-atom(VAR),atom_concat('??',Name,VAR),!.
-svar(VAR,Name):-atom(VAR),atom_concat('?',Name,VAR).
 
-svar_fixvarname(VAR,UP):-svar(VAR,SVAR),!,must(atom(SVAR)->fix_varcase(SVAR,UP);UP=SVAR).
 
 sterm2pterm(VAR,VAR):-var(VAR),!.
 sterm2pterm(In,Out):-nonvar(Out),!,sterm2pterm(In,OutM),must(Out=OutM).
@@ -1628,12 +1621,6 @@ length_spec([])                 --> [not_defined].      % there is no definition
 fix_wordcase(Word,WordC):-upcase_atom(Word,UC),UC=Word,!,downcase_atom(Word,WordC).
 fix_wordcase(Word,Word).
 
-
-fix_varcase(Word,WordC):-!,name(Word,[F|R]),to_upper(F,U),name(WordC,[U|R]).
-% the cut above stops the rest 
-fix_varcase(Word,Word):-upcase_atom(Word,UC),UC=Word,!.
-fix_varcase(Word,WordC):-downcase_atom(Word,UC),UC=Word,!,name(Word,[F|R]),to_upper(F,U),name(WordC,[U|R]).
-fix_varcase(Word,Word). % mixed case
 
 %
 % read_file(+File, -List).

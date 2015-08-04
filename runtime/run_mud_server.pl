@@ -57,15 +57,24 @@ user:file_search_path(prologmud, library(prologmud)).
 push_env_ctx:-!,fail.
 push_env_ctx:-!.
 
+
+% [Required] Load the Logicmoo Backchaining Inference System
+%:- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
+
+% [Required] Load the Logicmoo WWW System
+%:- gripe_time(40,user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
+
+:- prolog.
+
 :- if(if_defined(debugging_planner)).
 
 % [Mostly Required] Load the Logicmoo Planner/AI System
-:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner)))).
+%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner)))).
 
 :- else.
 
 % [Mostly Required] Load the Logicmoo Planner/AI System
-:- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner))))).
+%:- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner))))).
 
 
 :- wdmsg("Done with loading logicmoo_planner").
@@ -80,12 +89,6 @@ push_env_ctx:-!.
 
 % [Mostly Required] Load the Logicmoo Parser/Generator System
 :- gripe_time(40,user:ensure_loaded(library(parser_all))).
-
-% [Required] Load the Logicmoo Backchaining Inference System
-:- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
-
-% [Required] Load the Logicmoo WWW System
-:- gripe_time(40,user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
 
 :- asserta(thlocal:disable_mpred_term_expansions_locally).
 :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
@@ -209,6 +212,7 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 :- prolog.
 :- endif.
 
+:- prolog.
 
 % [Optional] the following game files though can be loaded separate instead
 :- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
@@ -218,6 +222,10 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 % :- add_game_dir('../games/src_game_sims',prolog_repl).
 % :- add_game_dir('../games/src_game_nani',prolog_repl).       
 :- add_game_dir('../games/src_game_startrek',prolog_repl).
+
+:- set_prolog_flag(trace_gc,true).
+:- set_prolog_flag(backtrace_depth,400).
+
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_startup_script(finish_processing_world).

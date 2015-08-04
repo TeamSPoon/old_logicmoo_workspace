@@ -9,7 +9,7 @@ cd .\runtime
 
 
 
-# start /wait swipl-win -L32G -G32G -T32G -f run_mud_server.pl
+@rem start /wait swipl-win -L32G -G32G -T32G -f run_mud_server.pl
 swipl -L32G -G32G -T32G -f run_mud_server.pl
 
 CHOICE  /T 2 /C YN /CS /D Y /M  "RESTART MUD"

@@ -74,8 +74,8 @@ to_addable_form_wte(P0,P):-
     once(notrace(to_addable_form(P0,P));must(to_addable_form_wte(P0,P))),
     (P0\=@=P->pfc_debug_trace(to_addable_form(P0,P));true).
 
-retract_eq_quitely((H:-B)):-ignore((clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!,erase(Ref))).
-retract_eq_quitely((H)):-ignore((clause(H,true,Ref),clause(HH,BB,Ref),H=@=HH,BB==true,!,erase(Ref))).
+retract_eq_quitely((H:-B)):-ignore((clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!,erase_safe(clause(HH,BB,Ref),Ref))).
+retract_eq_quitely((H)):-ignore((clause(H,true,Ref),clause(HH,BB,Ref),H=@=HH,BB==true,!,erase_safe(clause(HH,BB,Ref),Ref))).
 assert_eq_quitely(H):-assert_if_new(H).
 
 reduce_clause_from_fwd(H,H):- (\+compound(H)),!.
@@ -311,7 +311,7 @@ pfc_update_literal(P,N,Q,R):-
 
 update_single_valued_arg(P,N):- arg(N,P,UPDATE),notrace(replace_arg(P,N,OLD,Q)),
   must_det_l((assert_if_new(spft(P,u,u)),(P->true;(assertz_u(P))),
-     doall((clause(Q,true,E),UPDATE \== OLD,erase(E),pfc_unfwc1(Q))))).
+     doall((clause(Q,true,E),UPDATE \== OLD,erase_safe(clause(Q,true,E),E),pfc_unfwc1(Q))))).
 
 
 
@@ -1573,7 +1573,7 @@ pfc_cleanup:- forall((no_repeats(F-A,(pfcMark(pfcRHS,_,F,A),A>1))),pfc_cleanup(F
 
 pfc_cleanup(F,A):-functor(P,F,A),predicate_property(P,dynamic)->pfc_cleanup_0(P);true.
 
-pfc_cleanup_0(P):- findall(P-B-Ref,clause(P,B,Ref),L),forall(member(P-B-Ref,L),erase(Ref)),forall(member(P-B-Ref,L),assertz_if_new((P:-B))).
+pfc_cleanup_0(P):- findall(P-B-Ref,clause(P,B,Ref),L),forall(member(P-B-Ref,L),erase_safe(clause(P,B,Ref),Ref)),forall(member(P-B-Ref,L),assertz_if_new((P:-B))).
 
 :-debug.
 %isInstFn(A):-!,trace_or_throw(isInstFn(A)).
@@ -2106,7 +2106,7 @@ pfc_no_spy(Form) :- pfc_no_spy(Form,_,_).
 
 pfc_no_spy(Form,Mode,Condition) :-
   clause_i(pfc_spied(Form,Mode), Condition, Ref),
-  erase(Ref),
+  erase_safe(clause_i(pfc_spied(Form,Mode), Condition, Ref),Ref),
   fail.
 pfc_no_spy(_,_,_).
 
