@@ -507,10 +507,10 @@ is_already_supported(P,_S,(u,u)):- clause_asserted(spft(P,u,u)),!.
 
 maybe_did_support :- fail.
 
-
-different_literal(Q,N,R):- 
+different_literal(M:Q,N,M:R):-atom(M),!,different_literal(Q,N,R).
+different_literal(Q,N,R):-
  nonvar(Q),acyclic_term(Q),acyclic_term(R),functor(Q,F,A),functor(R,F,A),
-  (singleValuedInArg(F,N) -> 
+  ((singleValuedInArg(F,N);N=A) -> 
     (arg(N,Q,Was),dif(Was,NEW),replace_arg(Q,N,NEW,R));
     ((arg(N,Q,Was),nonvar(Q)) -> (dif(Was,NEW),replace_arg(Q,N,NEW,R));
         (N=A,arg(N,Q,Was),dif(Was,NEW),replace_arg(Q,N,NEW,R)))).

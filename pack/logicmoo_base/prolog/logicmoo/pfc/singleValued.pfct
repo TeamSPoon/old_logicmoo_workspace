@@ -12,9 +12,9 @@ host_name(U,_) => user(U).
 
 % when we know a user's full name and host name, make a user/3 assertion.
 (((user(User),
-  full_name(User,Name)/Name\=unknown,
-  host_name(User,Host)/Host\=unknown ),
-  ground(user(User,Name,Host))) => user(User,Name,Host)).
+  full_name(User,Name)/(Name\=unknown),
+  host_name(User,Host)/(Host\=unknown) ),
+  {ground(user(User,Name,Host))}) => user(User,Name,Host)).
 
 
 % the default full_name for a user is 'unknown'.
@@ -29,10 +29,10 @@ prologSingleValued(host_name).
 pfc_default( user(User) => host_name(User,unknown)).
 
 
-(pfc_default1(P => Q),{pfc_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg(Q,N,NEW,R)} => (P, ~R/(NEW\==DEF) => Q)).
+(pfc_default1(P => Q),{pfc_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg_fast(Q,N,NEW,R)} => (P, ~R/(NEW\==DEF) => Q)).
 
 ((singleValuedInArgDefault(F, N, DEF),arity(F,A),
-   {functor(Q,F,A),pfc_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg(Q,N,NEW,R)})=> (~R/(NEW\==DEF) => Q)).
+   {functor(Q,F,A),pfc_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg_fast(Q,N,NEW,R)})=> (~R/(NEW\==DEF) => Q)).
 
 => full_name(finin,'Tim Finin').
 

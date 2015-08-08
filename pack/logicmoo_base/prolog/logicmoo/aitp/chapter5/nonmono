@@ -1,0 +1,145 @@
+/*   Non Monotonic TMS   */
+/*=======================*/
+
+/* Addition of a new justification */
+addjust(From, To,_):-                         % Disallow just. repetitions
+  not( (member((X, Status), From),
+        not((injust(X, Status, J),
+             outjust(J, To, _)))
+       )),!.
+addjust(From, To, J):-
+  newjust(J),
+  bagof0(X,
+          (member((X, Status), From),
+           assert(injust(X, Status, J)),
+           fired(X, Status)),
+         L),
+  length(L, N),
+  assert(outjust(J, To, N)),
+  update(To, N).
+
+/* Delete a justification by name */
+deljust(J):-
+  retractall(injust(_,_,J)),
+  retract(outjust(J, To, _)),
+  update(To, 1).
+
+/* Delete a justification by content */
+deljust(From, To):-
+  find_just(From, To, J),
+  deljust(J).
+
+find_just([(X,Status)|F], To, J):-
+  injust(X, Status, J),
+  outjust(J, To, _),
+  test_injust(F, J).
+
+test_injust([],_).
+test_injust([(X,Status)|F], J):-
+  injust(X, Status, J).
+
+fired(X, +) :- out(X).
+fired(X, -) :- in(X).
+
+in(X)  :- clause(rms(X), true).
+out(X) :- not(in(X)).
+
+/* Update on justification addition */
+update(T, 0):- in(T), !.                   % Node T already In    
+update(T, 0):-                             % Otherwise turn it In and propagate
+  assert(rms(T)),
+  injust(T,+, J),
+  update_outjust(-1, J, Y, NN),
+  update(Y, NN), 
+  fail.
+update(T, 0):- 
+  injust(T, -, J),
+  update_outjust(1, J, Y, NN),
+  update(Y, NN), 
+  fail.
+update(T, 0):- !.
+/* Update on justification deletion */
+vupdate(T, _):- out(T), !.                  % Node T already Out
+update(T, _):- outjust(_, T, 0),!.          % Another justification exists
+update(T, _):-                              % Otherwise propagate the change
+  retract(rms(T)),
+  injust(T, -, J),
+  update_outjust(-1, J, Y,  NN),
+  update(Y, NN), 
+  fail.
+update(T, _):-
+  injust(T, +, J),
+  update_outjust(1, J, Y,  NN),
+  update(Y, NN), 
+  fail.
+update(T, _).
+
+/* Update of outjust count */
+update_outjust(I, J, Y, NN):-
+  retract(outjust(J, Y, N)),
+  NN is N+I,
+  assert(outjust(J, Y, NN)),!.
+
+/* Create unique justification name */
+count(0).
+newjust(J):-
+  retract(count(N)),
+  NN is N+1,
+  assert(count(NN)),
+  name(NN, X), name(j, Xj),
+  append(Xj, X, Jlist),
+  name(J, Jlist), !.
+
+
+
+
+
+
+/* Utilities */
+bagof0(X, Y, Z) :- bagof(X, Y, Z), !.
+bagof0(_,_,[]).
+
+retractall(X):- retract(X), fail.
+retractall(X):- retract((X :- _)), fail.
+retractall(_).
+
+member(X, [X|_]).
+member(X, [_|Xs]) :- member(X, Xs).
+
+append([], Y, Y).
+append([X|Z], Y, [X|ZZ]):- append(Z, Y, ZZ).
+  
+
+/* TMS DATABASE and TESTS */
+initTMS:-
+  retractall(injust(_,_,_)),
+  retractall(outjust(_,_,_)),
+  retractall(rms(_)),
+  retractall(count(_)),
+  assert(count(0)),
+  assert(rms(premiss)).
+
+test1:-
+  addjust([(premiss,+)],has_beak,_),
+  addjust([(premiss,+)],has_feather,_),
+  addjust([(premiss,+)],has_wing,_).
+test2:-
+  addjust([(has_beak,+)],bird,_),
+  addjust([(has_wing,+),(has_feather,+)],bird,_).
+test3:-
+  addjust([(bird,+),(ostrich,-)],can_fly,_),
+  addjust([(ostrich,+)],cannot_fly,_).
+test4:-
+  deljust([(premiss,+)],has_beak).
+test5:-
+  deljust([(has_feather,+),(has_wing,+)],bird).
+test6:-
+  deljust([(has_beak,+)],bird).
+test7:-
+  addjust([(premiss,+)],ostrich,_).
+test8:-
+  deljust([(premiss,+)],ostrich).
+
+db:-
+  listing(rms),listing(injust),listing(outjust).
+

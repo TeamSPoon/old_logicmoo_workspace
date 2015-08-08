@@ -1,31 +1,11 @@
-/*  Part of SWI-Prolog
-
-    Author:        Jan Wielemaker
-    E-mail:        J.Wielemaker@cs.vu.nl
-    WWW:           http://www.swi-prolog.org
-    Copyright (C): 2001-2014, University of Amsterdam
-			      VU University Amsterdam
-
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public License
-    as published by the Free Software Foundation; either version 2
-    of the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
-    As a special exception, if you link this library with other files,
-    compiled with a Free Software compiler, to produce an executable, this
-    library does not by itself cause the resulting executable to be covered
-    by the GNU General Public License. This exception does not however
-    invalidate any other reasons why the executable file might be covered by
-    the GNU General Public License.
+/** <module> logicmoo_i_www
+% Provides /logicmoo runtime preds browsing
+%
+%
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
+%
 */
 
 
@@ -76,8 +56,6 @@
 
 
 :- include(logicmoo(mpred/logicmoo_i_header)).
-% :- ['../logicmoo_run_swish'].
-:- user:ensure_loaded('../logicmoo_run_clio').
 
 % WANT 
 :- initialization(doc_collect(true)).
@@ -195,7 +173,7 @@ get_nv(L,V,D):- (is_list(L)-> member(N,L) ; N=L),
 get_nv(L,V,V):- (is_list(L)-> member(N,L) ; N=L), http_save_in_session(N=V),!.
 
 save_request_in_session(Request):- 
-      http_open_session(F,[renew(true)]),
+      http_open_session(F,[renew(false)]),
         (member(method(post), Request) -> (http_read_data(Request, Data, []),http_save_in_session(Data));true),
         http_save_in_session(Request),
         http_save_in_session(Parameters),
@@ -307,7 +285,7 @@ show_pcall:-
    get_sobj(String,Obj,PredURL,SObj),
 format('<table width="1112" cellspacing="0" cellpadding="0" height="121" id="table4">
  <!-- MSTableType="nolayout" -->
-	<form action="Browse.jsp">
+	<form action="Browse.prolog">
       <!-- MSTableType="nolayout" -->
 		<tr>
           <td align="left" valign="top" width="36" rowspan="2"><img src="http://54.183.42.206:8080/sigma/pixmaps/sigmaSymbol-gray.gif"></td>
@@ -349,8 +327,8 @@ format('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp<br></td></tr>
           <td valign="bottom" width="4" rowspan="2"></td>
           <td height="96">
           <span class="navlinks">
-          <b>[&nbsp;<a href="KBs.jsp">Home</a>&nbsp;|&nbsp;              
-          <a href="Graph.jsp?kb=SUMO&lang=EnglishLanguage&search=~w">Grap2h</a>]</b></span><p>
+          <b>[&nbsp;<a href="KBs.prolog">Home</a>&nbsp;|&nbsp;              
+          <a href="Graph.prolog?kb=SUMO&lang=EnglishLanguage&search=~w">Grap2h</a>]</b></span><p>
           <b>Formal&nbsp;Language&nbsp;<br></b>',
                         [SObj]),
                   show_select2(flang,logic_lang_name,[]),
@@ -392,13 +370,11 @@ action_menu_item('NonMonotonic',"Treat $item NonMonotonic").
 
 show_pcall_right:- 
    must_det_l((get_sobj(String,Obj,PredURL,SObj),
-        format('<form action="Apply.jsp">Apply ',[]),
-
-        action_menu_applied('action_below',"Checked or Clicked","&nbsp;below&nbsp;"),
-        format('<hr/><pre>',[]),
-        with_assertions(thlocal:print_mode(html),catch(make_page_pretext_obj(Obj),times_up(_),true)),
-        
-        format('</pre></form>',[]),
+        format('<form action="Apply.prolog">Apply ',[]),
+        action_menu_applied('action_below',"Checked or Clicked","&nbsp;below&nbsp;"),        
+        format('<hr/><pre>',[]),flush_output,
+        with_assertions(thlocal:print_mode(html),catch(make_page_pretext_obj(Obj),E,(writeq(E),nl))),
+        format('</pre></form>',[]),flush_output,
         show_pcall_footer)).
 
 
@@ -408,8 +384,8 @@ make_page_pretext_obj(Obj):-
   % catch(mmake,_,true),
   % forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((this_listing(M:F/A),flush_output)))),
   % forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((reply_object_sub_page(M:F/A),flush_output)))),
-  statistics(walltime,[Wall,_]),!,
-  ignore(catch(term_listing_inner(i2tml_hbr(Obj,Wall),Obj),times_up(Obj),true)),!,
+  call_with_time_limit(300,ignore(catch(term_listing_inner(i2tml_hbr,Obj),E,writeq(E)))),
+  flush_output,
   pp_i2tml_saved_done(Obj),!.
 
   %ignore((fail,catch(pfc_listing(Pred),_,true))),!.
@@ -458,81 +434,12 @@ set_line_pos(Out,LP):-
 current_line_position(LP):-current_output(Out),current_line_position(Out,LP).
 current_line_position(Out,LP):-stream_property(Out,position( Y)),stream_position_data(line_position,Y,LP),!.
 
+tmw:- with_assertions(thlocal:print_mode(html),
+ (rok_portray_clause(a(LP)),
+  rok_portray_clause((a(LP):-b([1,2,3,4]))),
+  nl,nl,wid(_,_,KIF),
+  KIF=(_=>_),nl,nl,print(KIF),listing(print_request/1))),!.
 tmw:- with_assertions(thlocal:print_mode(html),(print((a(LP):-b([1,2,3,4]))),nl,nl,wid(_,_,KIF),KIF=(_=>_),nl,nl,print(KIF),listing(print_request/1))),!.
-
-
-
-
-
-
-
-
-
-:- predicate_options(print_term/2, 2,
-		     [ output(stream),
-		       right_margin(integer),
-		       left_margin(integer),
-		       tab_width(integer),
-		       indent_arguments(integer),
-		       operators(boolean),
-		       write_options(list)
-		     ]).
-
-
-:- predicate_options(print_term/2, 2,
-		     [ output(stream),
-		       right_margin(integer),
-		       left_margin(integer),
-		       tab_width(integer),
-		       indent_arguments(integer),
-		       operators(boolean),
-		       write_options(list)
-		     ]).
-
-%%	print_term(+Term, +Options) is det.
-%
-%	Pretty print a Prolog term. The following options are processed:
-%
-%	  * output(+Stream)
-%	  Define the output stream.  Default is =user_output=
-%	  * right_margin(+Integer)
-%	  Width of a line.  Default is 72 characters.
-%	  * left_margin(+Integer)
-%	  Left margin for continuation lines.  Default is 0.
-%	  * tab_width(+Integer)
-%	  Distance between tab-stops.  Default is 8 characters.
-%	  * indent_arguments(+Spec)
-%	  Defines how arguments of compound terms are placed.  Defined
-%	  values are:
-%	    $ =false= :
-%	    Simply place them left to right (no line-breaks)
-%	    $ =true= :
-%	    Place them vertically, aligned with the open bracket (not
-%	    implemented)
-%	    $ =auto= (default) :
-%	    As horizontal if line-width is not exceeded, vertical
-%	    otherwise.
-%	    $ An integer :
-%	    Place them vertically aligned, <N> spaces to the right of
-%	    the beginning of the head.
-%	  * operators(+Boolean)
-%	  This is the inverse of the write_term/3 option =ignore_ops=.
-%	  Default is to respect them.
-%	  * write_options(+List)
-%	  List of options passed to write_term/3 for terms that are
-%	  not further processed.  Default:
-%	    ==
-%		[ numbervars(true),
-%		  quoted(true),
-%		  portray(true)
-%	        ]
-%	    ==
-
-
-
-
-
-
 
 
 
@@ -548,11 +455,11 @@ write_atom_link(L,N):-must_det_l((write_atom_link(atom(W),L,N),format('~w',[W]))
 % pred_href(Name/Arity, Module, HREF) :-
 write_atom_link(W,A/_,N):-atom(A),!,write_atom_link(W,A,N).
 write_atom_link(W,C,N):-compound(C),get_functor(C,F,A),!,write_atom_link(W,F/A,N).
-write_atom_link(atom(N),_,N):- thread_self(main),!.
-write_atom_link(W,_,N):- must(nonvar(W)),\+ thlocal:print_mode(html),format(W,'~q',[N]),!.
-write_atom_link(W,A,N):- nonvar(W),url_iri(URL,A),format(W,'<a href="KB.jsp?search=~q" target="_top">~w</a>',[URL,N]).
+%write_atom_link(W,_,N):- thread_self(main),!,write_term_to_atom_one(W,N),!.
+write_atom_link(W,_,N):- must(nonvar(W)),\+ thlocal:print_mode(html),write_term_to_atom_one(W,N),!.
+write_atom_link(W,A,N):- nonvar(W),catch((url_iri(URL,A),format(W,'<a href="KB.prolog?search=~q" target="_parent">~w</a>',[URL,N])),_,write_term_to_atom_one(W,N)).
 
-
+write_term_to_atom_one(atom(A),Term):-format(atom(A),'~q',[Term]).
 
 /*
 
@@ -684,7 +591,7 @@ put_string0([H|T]) :-
 %   quote has already been written.  Instances of Q in S are doubled.
 
 put_string(A,B):- thlocal:print_mode(html),!,
-  with_output_to(atom(S),put_string0(A,B)),url_iri(URL,S),format('<a href="KB.jsp?search=~q" target="_top">~w</a>',[URL,S]).
+  with_output_to(atom(S),put_string0(A,B)),url_iri(URL,S),format('<a href="KB.prolog?search=~q" target="_parent">~w</a>',[URL,S]).
 put_string(A,B):- put_string0(A,B).
 
 put_string0([], Q) :-
@@ -978,7 +885,7 @@ portable_listing(_).
 'functor spec'(Name/Arity, Name, Arity, Arity) :- !.
 'functor spec'(Name, Name, 0, 255).
 
-
+rok_portray_clause(Var):-var(Var),!,writeq(Var).
 rok_portray_clause(:-(Command)) :-
 	(   Command = public(Body), Key = (public)
 	;   Command = mode(Body),   Key = (mode)

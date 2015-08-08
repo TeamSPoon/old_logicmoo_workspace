@@ -753,7 +753,8 @@ pfc_file_expansion_0(Fact,(:- ((cl_assert(pfc(expand_file),Fact))))):-
     notrace(pfc_expand_inside_file_anyways(F)),!,_Output='$was_imported_kb_content$'(Fact,pfc_expand_inside_file_anyways(F)),!.
 */
 
-stream_pos(File:C):-loading_source_file(File),current_input_stream(S),line_count(S,C).
+stream_pos(File:LineNo):-loading_source_file(File),current_input_stream(S),stream_property(S, position(Position)), !,stream_position_data(line_count, Position, LineNo),!.
+
 compile_clause(CL):- make_dynamic(CL),must((assertz_if_new(CL),clause_asserted(CL))).
 
 make_dynamic(C):- compound(C),get_functor(C,F,A),

@@ -1,0 +1,215 @@
+/* Mon monotonic RMS with cycles testing */
+/*=======================================*/
+/* Update the network */
+update(T,0):- in(T),!.                     % The fact is already IN
+update(T,0):- !,                           % The fact T was OUT (-) and changes
+  contaminated((T,-), L),
+  reexamine(L).
+update(T,_):- out(T).                      % The fact is already OUT
+update(T,_):-                              % The fact T was IN (+) and changes
+  contaminated((T,+), L),
+  reexamine(L).
+
+/* Find all the nodes contaminated by the modification */
+contaminated((T,St), Y) :- cont([(T,St)|D]-D, [(T,St)|D]-D, Y).
+
+cont(X-Y,_, []):- var(X),!.
+cont([X|Y]-TT, A-TT, [X|Z]):-
+  setof0(Z,
+         possible_change(X, Z, A-TT),
+         T),
+  create_dl(T, TT-T1),
+  cont(Y-T1, A-T1, Z).
+
+possible_change((From, St), (To, +), A):-  % Fact "To" could be removed
+  injust(From, St, J),
+  outjust(J, To, 0),
+  test_cycle((To,+), A).
+possible_change((From, St), (To, -), A):-  % Fact "To"could be inserted
+  neg_status(St, NSt),
+  injust(From, NSt, J),
+  outjust(J, To, 1),
+  test_cycle((To,-), A).
+
+neg_status(+,-).
+neg_status(-,+).
+
+test_cycle((S,_),X-TT):-
+  not((TT=[],member((S,_),X))),!.        
+test_cycle((S,St),X-[]):-
+  member((S,St),X),!,fail.                  % even cycle           
+test_cycle(S,_):- write('odd cycle for '),  % odd cycle problem
+  write(S),nl,!,fail.
+
+/* recursively take out the node which are justified from the outside */
+reexamine([]):- !.
+reexamine(C) :- 
+  delete_contamin(C, C1),    % forget about justified  contamined nodes
+  reexamine(C1).
+reexamine(C):- flip_status(C).
+
+delete_contamin(C, C1):-
+  del_contamin(C, C, C1), !,
+  not(C == C1).
+
+del_contamin([],_,[]).
+del_contamin([(Y,+)|S], C, C1):-
+  outjust(J, Y, 0),
+  not((injust(From,_,J), 
+      member((From,_), C))),!,    % Y is justified from the outside
+  del_contamin(S, C, C1).
+del_contamin([Y|S], C, [Y|C1]):-  
+  del_contamin(S, C, C1).
+
+flip_status([]).
+flip_status([(Y,+)|S]):-
+  retract(rms(Y)),               % Y was IN and becomes OUT
+  flip(Y,1),
+  flip_status(S).
+flip_status([(_,+)|S]):-         % no change
+  flip_status(S).
+flip_status([(Y,-)|S]):-         % no change
+  in(Y),
+  flip_status(S).
+flip_status([(Y,-)|S]):-         % Y was OUT and becomes IN
+  assert(rms(Y)),
+  flip(Y,-1),
+  flip_status(S).
+
+
+flip(Y, I):-
+  injust(Y, +, J),
+  update_outjust(I, J).
+flip(Y, I):-
+  II is I * -1,
+  injust(Y, -, J),
+  update_outjust(II, J).
+flip(_,_).
+
+
+/* Update of outjust count */
+update_outjust(I, J):-
+  retract(outjust(J, Y, N)),
+  NN is N+I,
+  assert(outjust(J, Y, NN)),!,fail.
+
+
+
+
+
+
+
+/* idem as for nonmonotonic program */
+/* Addition of a new justification */
+addjust(From, To,_):-                         % Disallow just. repetitions
+  not( (member((X, Status), From),
+        not((injust(X, Status, J),
+             outjust(J, To, _)))
+       )),!.
+addjust(From, To, J):-
+  newjust(J),
+  bagof0(X,
+          (member((X, Status), From),
+           assert(injust(X, Status, J)),
+           fired(X, Status)),
+         L),
+  length(L, N),
+  assert(outjust(J, To, N)),
+  update(To,N).
+
+/* Delete a justification by name */
+deljust(J):-
+  retractall(injust(_,_,J)),
+  retract(outjust(J, To, _)),
+  update(To,1).
+
+/* Delete a justification by content */
+deljust(From, To):-
+  find_just(From, To, J),
+  deljust(J).
+
+find_just([(X,Status)|F], To, J):-
+  injust(X, Status, J),
+  outjust(J, To, _),
+  test_injust(F, J).
+
+test_injust([],_).
+test_injust([(X,Status)|F], J):-
+  injust(X, Status, J).
+
+fired(X, +) :- out(X).
+fired(X, -) :- in(X).
+
+in(X)  :- clause(rms(X), true).
+out(X) :- not(in(X)).
+
+
+
+
+/* Create unique justification name */
+newjust(J):-
+  retract(count(N)),
+  NN is N+1,
+  assert(count(NN)),
+  name(NN, X), name(j, Xj),
+  append(Xj, X, Jlist),
+  name(J, Jlist), !.
+
+count(0).
+rms(premiss).
+
+
+/* Utilities */
+bagof0(X, Y, Z) :- bagof(X, Y, Z), !.
+bagof0(_,_,[]).
+
+setof0(X, Y, Z) :- setof(X, Y, Z), !.
+setof0(_,_,[]).
+
+retractall(X):- retract(X), fail.
+retractall(X):- retract((X :- _)), fail.
+retractall(_).
+
+member(X, [X|_]).
+member(X, [_|Xs]) :- member(X, Xs).
+
+append([], Y, Y).
+append([X|Z], Y, [X|ZZ]):- append(Z, Y, ZZ).
+
+create_dl([], D-D).
+create_dl([A|B], [A|BB]-D):-
+  create_dl(B,BB-D).  
+
+/* TMS DATABASE and TESTS */
+initTMS:-
+  retractall(injust(_,_,_)),
+  retractall(outjust(_,_,_)),
+  retractall(rms(_)),
+  retractall(count(_)),
+  assert(count(0)),
+  assert(rms(premiss)).
+
+test1:-
+  addjust([(premiss,+)],has_beak,_),
+  addjust([(premiss,+)],has_feather,_),
+  addjust([(premiss,+)],has_wing,_).
+test2:-
+  addjust([(has_beak,+)],bird,_),
+  addjust([(has_wing,+),(has_feather,+)],bird,_).
+test3:-
+  addjust([(bird,+),(ostrich,-)],can_fly,_),
+  addjust([(ostrich,+)],cannot_fly,_).
+test4:-
+  deljust([(premiss,+)],has_beak).
+test5:-
+  deljust([(has_feather,+),(has_wing,+)],bird).
+test6:-
+  deljust([(has_beak,+)],bird).
+test7:-
+  addjust([(premiss,+)],ostrich,_).
+test8:-
+  deljust([(premiss,+)],ostrich).
+
+db:-
+  listing(rms),listing(injust),listing(outjust).
+

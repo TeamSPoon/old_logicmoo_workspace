@@ -301,7 +301,7 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 % ================================================================================================
 % :- get_pos_tagger(I),jpl_set(I,is_DEBUG,'@'(false)).
 
-
+/*
 :- multifile  el_assertions:el_holds/5.
 :- multifile  el_assertions:el_holds/6.
 :- multifile  el_assertions:el_holds/7.
@@ -312,7 +312,7 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 :- dynamic  el_assertions:el_holds/8.
 :- multifile  el_assertions:is_cyckb_t_pred/2.
 :- dynamic  el_assertions:is_cyckb_t_pred/2.
-
+*/
 
 :- dmsg("Scanning el_assertions.pl for programatic definations (This may take 10-30 seconds)").
 %:- pfc_add(cyckb_t(A, _, _) => is_cyckb_t_pred(A,2)).

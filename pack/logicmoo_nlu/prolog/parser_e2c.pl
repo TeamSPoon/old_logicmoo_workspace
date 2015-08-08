@@ -15,6 +15,15 @@ must_be_in_user:-module(parser_e2c,[
          % idGen/1
          ]).
 
+:-multifile('prefixString'/2).
+:-multifile('suffixString'/2).
+:-multifile('variantOfSuffix'/2).
+:-multifile('nameString'/2).
+:-dynamic('prefixString'/2).
+:-dynamic('suffixString'/2).
+:-dynamic('variantOfSuffix'/2).
+:-dynamic('nameString'/2).
+
 
 % ==============================================================================
 %:- dynamic_multifile_exported kbp_t_list_prehook/2.
@@ -562,7 +571,6 @@ stringAtomToPOS(String,['WordWithSuffixFn', CycWord, CycAffix],POS):-
      'denotation'(['WordWithSuffixFn', CycWord, CycAffix], POS,_,_),
       String^('suffixString'(CycAffix,Affix),words_concat(BaseString,Affix,String),stringToCycWord([BaseString],CycWord))).
      
-
 'suffixString'(CycAffix,Affix):-'variantOfSuffix'(CycAffix,Affix).
 'variantOfSuffix'(CycAffix,Affix):- 'phoneticVariantOfSuffix'(CycAffix,Affix,_BaseType).
 

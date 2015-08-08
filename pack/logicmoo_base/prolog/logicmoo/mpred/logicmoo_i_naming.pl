@@ -82,15 +82,17 @@ createByNameMangle(Name,IDA,InstAO):-must(createByNameMangle0(Name,IDA,InstAO)),
 
 createByNameMangle0(S,I,C):-is_list(S),toCamelAtom0(S,A),!,createByNameMangle0(A,I,C).
 createByNameMangle0(S,I,C):-string(S),!,string_to_atom(S,A),!,createByNameMangle0(A,I,C).
-createByNameMangle0(Name,I,C):-atomic(Name),mudKeyword(W,KW),string_equal_ci(Name,KW),!,createByNameMangle0(W,I,C).
+createByNameMangle0(OType,Name,Type):-compound(OType),!,must(createByNameMangle_compound(OType,Name,Type)),!.
 createByNameMangle0(Name,_,_Type):- not(atom(Name)),!,trace_or_throw(todo(not_atom_createByNameMangle(Name))).
-
-createByNameMangle0(Name,Name,Type):- compound(Name),Name=..[Type|Props],assert_isa(Name,Type),with_assertions(deduceArgTypes(_),padd(Name,Props)).
-createByNameMangle0(Name,Inst,Type):- compound(Name),!,functor_catch(Name,Type,A),must(A==1),assert_isa(Name,Type),Name=Inst.
 createByNameMangle0(OType,Name,Type):- isa_asserted(OType,tCol),!,create_from_type(OType,Name,Type).
 createByNameMangle0(Suggest,Name,Type):- once(split_name_type(Suggest,Name,Type)),Suggest==Name,assert_isa(Name,Type).
-createByNameMangle0(OType,Name,Type):- create_from_type(OType,Name,Type),!.
+createByNameMangle0(Name,I,C):-mudKeyword(W,KW),string_equal_ci(Name,KW),!,createByNameMangle0(W,I,C).
+createByNameMangle0(OType,Name,Type):-create_from_type(OType,Name,Type),!.
 createByNameMangle0(Name,IDA,Name):- gensym(Name,IDA), englishServerInterface([actCreate,Name,IDA]).
+
+createByNameMangle_compound(Name,Name,Type):- Name=..[Type|Props],assert_isa(Name,Type),with_assertions(deduceArgTypes(_),padd(Name,Props)).
+createByNameMangle_compound(Name,Inst,Type):- functor_catch(Name,Type,A),must(A==1),assert_isa(Name,Type),Name=Inst.
+
 
 :-dynamic(thglobal:current_source_suffix/1).
 

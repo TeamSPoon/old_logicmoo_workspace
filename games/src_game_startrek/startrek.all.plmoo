@@ -122,13 +122,13 @@ tAgent('NPC8OBrien696').
 tAgent('NPC9Wesley716').
 tAgent('NPC1010Livingston726').
 tAgent('NPC1011Spot727').
-tAgent('iEnsign732').
-tAgent('iEnsign728').
-tAgent('iEnsign736').
-tAgent('iEnsign740').
-tAgent('iEnsign744').
-tAgent('iEnsign748').
-tAgent('iEnsign752').
+tAgent('iExplorer3').
+tAgent('iExplorer2').
+tAgent('iExplorer4').
+tAgent('iExplorer5').
+tAgent('iExplorer6').
+tAgent('iExplorer7').
+tAgent('iExplorer8').
 tAgent('NPC1013Alexander671').
 
  /* found 21 for tAgent(_G1281). */ 
@@ -173,27 +173,27 @@ wearsClothing('NPC2Worf720','iBoots721').
 wearsClothing('NPC2Worf720','iCommBadge722').
 wearsClothing('NPC2Worf720','iGoldUniform723').
 wearsClothing('NPC2Worf720','Item7Sash725').
-wearsClothing('iEnsign728','iBoots729').
-wearsClothing('iEnsign728','iCommBadge730').
-wearsClothing('iEnsign728','iGoldUniform731').
-wearsClothing('iEnsign732','iBoots733').
-wearsClothing('iEnsign732','iCommBadge734').
-wearsClothing('iEnsign732','iGoldUniform735').
-wearsClothing('iEnsign736','iBoots737').
-wearsClothing('iEnsign736','iCommBadge738').
-wearsClothing('iEnsign736','Item2RedUniform739').
-wearsClothing('iEnsign740','iBoots741').
-wearsClothing('iEnsign740','iCommBadge742').
-wearsClothing('iEnsign740','Item2RedUniform743').
-wearsClothing('iEnsign744','iBoots745').
-wearsClothing('iEnsign744','iCommBadge746').
-wearsClothing('iEnsign744','Item4BlueUniform747').
-wearsClothing('iEnsign748','iBoots749').
-wearsClothing('iEnsign748','iCommBadge750').
-wearsClothing('iEnsign748','Item4BlueUniform751').
-wearsClothing('iEnsign752','iBoots753').
-wearsClothing('iEnsign752','iCommBadge754').
-wearsClothing('iEnsign752','Item4BlueUniform755').
+wearsClothing('iExplorer2','iBoots729').
+wearsClothing('iExplorer2','iCommBadge730').
+wearsClothing('iExplorer2','iGoldUniform731').
+wearsClothing('iExplorer3','iBoots733').
+wearsClothing('iExplorer3','iCommBadge734').
+wearsClothing('iExplorer3','iGoldUniform735').
+wearsClothing('iExplorer4','iBoots737').
+wearsClothing('iExplorer4','iCommBadge738').
+wearsClothing('iExplorer4','Item2RedUniform739').
+wearsClothing('iExplorer5','iBoots741').
+wearsClothing('iExplorer5','iCommBadge742').
+wearsClothing('iExplorer5','Item2RedUniform743').
+wearsClothing('iExplorer6','iBoots745').
+wearsClothing('iExplorer6','iCommBadge746').
+wearsClothing('iExplorer6','Item4BlueUniform747').
+wearsClothing('iExplorer7','iBoots749').
+wearsClothing('iExplorer7','iCommBadge750').
+wearsClothing('iExplorer7','Item4BlueUniform751').
+wearsClothing('iExplorer8','iBoots753').
+wearsClothing('iExplorer8','iCommBadge754').
+wearsClothing('iExplorer8','Item4BlueUniform755').
 
  /* found 53 for wearsClothing(_G1304,_G1305). */ 
 
@@ -336,13 +336,13 @@ localityOfObject('NPC9Wesley716','iArea1016').
 localityOfObject('NPC2Worf720','iArea1025').
 localityOfObject('NPC1010Livingston726','iArea1035').
 localityOfObject('NPC1011Spot727','iArea1003').
-localityOfObject('iEnsign728','iArea1000').
-localityOfObject('iEnsign732','iArea1004').
-localityOfObject('iEnsign736','iArea1011').
-localityOfObject('iEnsign740','iArea1020').
-localityOfObject('iEnsign744','iArea1024').
-localityOfObject('iEnsign748','iArea1022').
-localityOfObject('iEnsign752','iArea1036').
+localityOfObject('iExplorer2','iArea1000').
+localityOfObject('iExplorer3','iArea1004').
+localityOfObject('iExplorer4','iArea1011').
+localityOfObject('iExplorer5','iArea1020').
+localityOfObject('iExplorer6','iArea1024').
+localityOfObject('iExplorer7','iArea1022').
+localityOfObject('iExplorer8','iArea1036').
 localityOfObject('Item10DilithiumCrystal756','iArea1000').
 localityOfObject('Item10DilithiumCrystal757','iArea1000').
 localityOfObject('Item10DilithiumCrystal758','iArea1000').
@@ -361,7 +361,7 @@ Pattern: pddlSomethingIsa(_G1422,_G1423).
  */
 pddlSomethingIsa('NPC0Geordi684',['NPC0',tAgent,'tMaleAnimal']).
 pddlSomethingIsa(iCommanderdata66,['NPC1',tAgent,'tMaleAnimal']).
-% pddlSomethingIsa(iPlayer1,[['OSimClassFn',mudStr("player_osimmarine_mp")],tAgent,'tMaleAnimal']).
+% pddlSomethingIsa(iExplorer1,[['OSimClassFn',mudStr("player_osimmarine_mp")],tAgent,'tMaleAnimal']).
 pddlSomethingIsa('NPC2Worf720',['NPC2',tAgent,'tMaleAnimal']).
 pddlSomethingIsa('NPC3DrCrusher677',['NPC3',tAgent,'tFemaleAnimal']).
 pddlSomethingIsa('NPC4Troi712',['NPC4',tAgent,'tFemaleAnimal']).
@@ -372,13 +372,13 @@ pddlSomethingIsa('NPC8OBrien696',['NPC8',tAgent,'tMaleAnimal']).
 pddlSomethingIsa('NPC9Wesley716',['NPC9',tAgent,'tMaleAnimal']).
 pddlSomethingIsa('NPC1010Livingston726',['NPC1010',tAgent,'tMaleAnimal']).
 pddlSomethingIsa('NPC1011Spot727',['NPC1011',tAgent,'tMaleAnimal']).
-pddlSomethingIsa('iEnsign728',['tEnsign',tAgent,'tMaleAnimal']).
-pddlSomethingIsa('iEnsign732',['tEnsign',tAgent,'tMaleAnimal']).
-pddlSomethingIsa('iEnsign736',['tEnsign',tAgent,'tMaleAnimal']).
-pddlSomethingIsa('iEnsign740',['tEnsign',tAgent,'tMaleAnimal']).
-pddlSomethingIsa('iEnsign744',['tEnsign',tAgent,'tMaleAnimal']).
-pddlSomethingIsa('iEnsign748',['tEnsign',tAgent,'tMaleAnimal']).
-pddlSomethingIsa('iEnsign752',['tEnsign',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('iExplorer2',['tEnsign',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('iExplorer3',['tEnsign',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('iExplorer4',['tEnsign',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('iExplorer5',['tEnsign',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('iExplorer6',['tEnsign',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('iExplorer7',['tEnsign',tAgent,'tMaleAnimal']).
+pddlSomethingIsa('iExplorer8',['tEnsign',tAgent,'tMaleAnimal']).
 pddlSomethingIsa('NPC1013Alexander671',['NPC1013',tAgent,'tMaleAnimal']).
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice',tCarryAble,'DeviceSingleUser','tWearAble']).
 pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice',tCarryAble,'DeviceSingleUser','tWearAble']).
@@ -660,31 +660,31 @@ nameStrings('iPhaser724',"Phaser").
 nameStrings('Item7Sash725',"Sash").
 nameStrings('NPC1010Livingston726',"Livingston").
 nameStrings('NPC1011Spot727',"Spot").
-nameStrings('iEnsign728',"Ensign").
+nameStrings('iExplorer2',"Ensign").
 nameStrings('iBoots729',"Boots").
 nameStrings('iCommBadge730',"Comm Badge").
 nameStrings('iGoldUniform731',"Gold Uniform").
-nameStrings('iEnsign732',"Ensign").
+nameStrings('iExplorer3',"Ensign").
 nameStrings('iBoots733',"Boots").
 nameStrings('iCommBadge734',"Comm Badge").
 nameStrings('iGoldUniform735',"Gold Uniform").
-nameStrings('iEnsign736',"Ensign").
+nameStrings('iExplorer4',"Ensign").
 nameStrings('iBoots737',"Boots").
 nameStrings('iCommBadge738',"Comm Badge").
 nameStrings('Item2RedUniform739',"Red Uniform").
-nameStrings('iEnsign740',"Ensign").
+nameStrings('iExplorer5',"Ensign").
 nameStrings('iBoots741',"Boots").
 nameStrings('iCommBadge742',"Comm Badge").
 nameStrings('Item2RedUniform743',"Red Uniform").
-nameStrings('iEnsign744',"Ensign").
+nameStrings('iExplorer6',"Ensign").
 nameStrings('iBoots745',"Boots").
 nameStrings('iCommBadge746',"Comm Badge").
 nameStrings('Item4BlueUniform747',"Blue Uniform").
-nameStrings('iEnsign748',"Ensign").
+nameStrings('iExplorer7',"Ensign").
 nameStrings('iBoots749',"Boots").
 nameStrings('iCommBadge750',"Comm Badge").
 nameStrings('Item4BlueUniform751',"Blue Uniform").
-nameStrings('iEnsign752',"Ensign").
+nameStrings('iExplorer8',"Ensign").
 nameStrings('iBoots753',"Boots").
 nameStrings('iCommBadge754',"Comm Badge").
 nameStrings('Item4BlueUniform755',"Blue Uniform").
@@ -708,13 +708,13 @@ nameStrings('NPC9Wesley716',"Wesley").
 nameStrings('NPC2Worf720',"Lieutenant Worf").
 nameStrings('NPC1010Livingston726',"Livingston").
 nameStrings('NPC1011Spot727',"Spot").
-nameStrings('iEnsign728',"the ensign").
-nameStrings('iEnsign732',"the ensign").
-nameStrings('iEnsign736',"the ensign").
-nameStrings('iEnsign740',"the ensign").
-nameStrings('iEnsign744',"the ensign").
-nameStrings('iEnsign748',"the ensign").
-nameStrings('iEnsign752',"the ensign").
+nameStrings('iExplorer2',"the ensign").
+nameStrings('iExplorer3',"the ensign").
+nameStrings('iExplorer4',"the ensign").
+nameStrings('iExplorer5',"the ensign").
+nameStrings('iExplorer6',"the ensign").
+nameStrings('iExplorer7',"the ensign").
+nameStrings('iExplorer8',"the ensign").
 nameStrings('iBoots673',"a pair of Starfleet black boots").
 nameStrings('iCommBadge674',"a Starfleet communication badge").
 nameStrings('iGoldUniform675',"a gold Starfleet engineering uniform").
@@ -819,13 +819,13 @@ pddlDescription('NPC8OBrien696',["Chief","O'Brien","Transporter","Chief O'Brien"
 pddlDescription('NPC9Wesley716',["Wesley","Crusher","Wesley","Wesley Crusher is here, eagerly trying to earn your praise","Wesley Crusher is not even an official officer, but he serves as an acting Ensign on the bridge","He got this position only because Captain Picard feels guilty about killing his father","ACT_STAY_ZONE","ACT_WIMPY","wimpy mobile will try to flee when it gets low on hit points. A mobile which is both aggressive and wimpy will not attack a player that is awake","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 12d12+1400","#$PunchingSomething mudBareHandDamage: 9d9+24","Wesley","Wesley","Wesley Crusher is here, eagerly trying to earn your praise","Wesley Crusher is not even an official officer, but he serves as an acting Ensign on the bridge","He got this position only because Captain Picard feels guilty about killing his father"]).
 pddlDescription('NPC1010Livingston726',["Livingston","fish","Livingston","Livingston the fish is here, swimming about in his tank","Livingston is Captain Picard's pet fish","He's some sort of exotic breed, and he's expensive to feed and keep alive","ACT_SENTINEL","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 12d12+800","#$PunchingSomething mudBareHandDamage: 9d9+14","Livingston","Livingston","Livingston the fish is here, swimming about in his tank","Livingston is Captain Picard's pet fish","He's some sort of exotic breed, and he's expensive to feed and keep alive"]).
 pddlDescription('NPC1011Spot727',["spot","the","cat","Spot","Spot, Data's pet cat, is sitting here looking at you","Spot is Data's orange coloured cat","Data is always trying to become more human, so he thinks that having a pet might help him achieve his goal","ACT_SENTINEL","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 12d12+800","#$PunchingSomething mudBareHandDamage: 9d9+14","Spot","Spot","Spot, Data's pet cat, is sitting here looking at you","Spot is Data's orange coloured cat","Data is always trying to become more human, so he thinks that having a pet might help him achieve his goal"]).
-pddlDescription('iEnsign728',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
-pddlDescription('iEnsign732',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
-pddlDescription('iEnsign736',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
-pddlDescription('iEnsign740',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
-pddlDescription('iEnsign744',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
-pddlDescription('iEnsign748',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
-pddlDescription('iEnsign752',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
+pddlDescription('iExplorer2',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
+pddlDescription('iExplorer3',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
+pddlDescription('iExplorer4',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
+pddlDescription('iExplorer5',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
+pddlDescription('iExplorer6',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
+pddlDescription('iExplorer7',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
+pddlDescription('iExplorer8',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
 pddlDescription('NPC1013Alexander671',["alexander","rozhenko","alexander rozhenko","Alexander Rozhenko is here, practicing laughing hour","Alexander Rozhenko is Worf's son","His mother was half human and half Klingon, so Alexander is 3/4 Klingon","He's quite small, but since he's a Klingon he's very strong","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Alexander","alexander rozhenko","Alexander Rozhenko is here, practicing laughing hour","Alexander Rozhenko is Worf's son","His mother was half human and half Klingon, so Alexander is 3/4 Klingon","He's quite small, but since he's a Klingon he's very strong"]).
 pddlDescription('iPhaser676',["standard","issue","starfleet","phaser","a standard issue phaser","A standard issue Starfleet phaser has been left here","damageNumberDice 5","damageSizeDice 5","WeaponBlasting","These phasers are the standard weapon of Starfleet officers. It offers decent mudHealth for its fairly small size","Phaser","a standard issue phaser"]).
 pddlDescription('iPhaser776',["standard","issue","starfleet","phaser","a standard issue phaser","A standard issue Starfleet phaser has been left here","damageNumberDice 5","damageSizeDice 5","WeaponBlasting","These phasers are the standard weapon of Starfleet officers. It offers decent mudHealth for its fairly small size","Phaser","a standard issue phaser"]).
@@ -1244,7 +1244,7 @@ pddlObjects('FluidReservoir',['Item20Tea690','Item21Synthehol691','Item22Ferengi
 pddlObjects(tRegion,['iArea1000','iArea1001','iArea1002','iArea1003','iArea1004','iArea1005','iArea1006','iArea1007','iArea1008','iArea1009','iArea1010','iArea1011','iArea1012','iArea1013','iArea1014','iArea1015','iArea1016','iArea1017','iArea1018','iArea1019','iArea1020','iArea1021','iArea1022','iArea1023','iArea1024','iArea1025','iArea1026','iArea1027','iArea1028','iArea1029','iArea1030','iArea1031','iArea1032','iArea1033','iArea1034','iArea1035','iArea1036','iArea1037','iArea1038','iArea1039','iArea1040','iArea1041','iArea1042'
 % ,'iArea1004075'
 ]).
-pddlObjects(tAgent,['NPC0Geordi684','NPC2Worf720','NPC3DrCrusher677','NPC4Troi712','NPC5Riker707','NPC6Picard701','NPC7Guinan689','NPC8OBrien696','NPC9Wesley716','NPC1010Livingston726','NPC1011Spot727','iEnsign728','iEnsign732','iEnsign736','iEnsign740','iEnsign744','iEnsign748','iEnsign752','NPC1013Alexander671',iCommanderdata66,iExplorer1]).
+pddlObjects(tAgent,['NPC0Geordi684','NPC2Worf720','NPC3DrCrusher677','NPC4Troi712','NPC5Riker707','NPC6Picard701','NPC7Guinan689','NPC8OBrien696','NPC9Wesley716','NPC1010Livingston726','NPC1011Spot727','iExplorer2','iExplorer3','iExplorer4','iExplorer5','iExplorer6','iExplorer7','iExplorer8','NPC1013Alexander671',iCommanderdata66,iExplorer1]).
 
 %%pddlObjects(tPathway,List):findall(apath(A,B),pathDirLeadsTo(A,B,C),List).
 pddlObjects(tPathway,[apathFn('iArea1000',vNorth),apathFn('iArea1001',vEast),apathFn('iArea1002',vNorth),apathFn('iArea1002',vEast),apathFn('iArea1002',vSouth),apathFn('iArea1002',vWest),apathFn('iArea1003',vWest),apathFn('iArea1004',vEast),apathFn('iArea1005',vNorth),apathFn('iArea1005',vEast),apathFn('iArea1005',vSouth),apathFn('iArea1005',vWest),apathFn('iArea1006',vNorth),apathFn('iArea1006',vWest),apathFn('iArea1007',vEast),apathFn('iArea1008',vNorth),apathFn('iArea1008',vEast),apathFn('iArea1008',vSouth),apathFn('iArea1008',vWest),apathFn('iArea1009',vWest),apathFn('iArea1010',vSouth),apathFn('iArea1010',vUp),apathFn('iArea1011',vNorth),apathFn('iArea1011',vUp),apathFn('iArea1011',vDown),apathFn('iArea1012',vEast),apathFn('iArea1013',vNorth),apathFn('iArea1013',vEast),apathFn('iArea1013',vSouth),apathFn('iArea1013',vWest),apathFn('iArea1014',vWest),apathFn('iArea1015',vEast),apathFn('iArea1016',vNorth),apathFn('iArea1016',vEast),apathFn('iArea1016',vSouth),apathFn('iArea1016',vWest),apathFn('iArea1017',vWest),apathFn('iArea1018',vEast),apathFn('iArea1019',vNorth),apathFn('iArea1019',vEast),apathFn('iArea1019',vSouth),apathFn('iArea1019',vWest),apathFn('iArea1020',vWest),apathFn('iArea1021',vSouth),apathFn('iArea1022',vNorth),apathFn('iArea1022',vSouth),apathFn('iArea1023',vEast),apathFn('iArea1024',vNorth),apathFn('iArea1024',vEast),apathFn('iArea1024',vSouth),apathFn('iArea1024',vWest),apathFn('iArea1025',vWest),apathFn('iArea1026',vEast),apathFn('iArea1027',vNorth),apathFn('iArea1027',vEast),apathFn('iArea1027',vSouth),apathFn('iArea1027',vWest),apathFn('iArea1028',vWest),apathFn('iArea1029',vEast),apathFn('iArea1030',vNorth),apathFn('iArea1030',vEast),apathFn('iArea1030',vSouth),apathFn('iArea1030',vWest),apathFn('iArea1031',vWest),apathFn('iArea1032',vSouth),apathFn('iArea1032',vUp),apathFn('iArea1032',vDown),apathFn('iArea1033',vUp),apathFn('iArea1033',vDown),apathFn('iArea1034',vUp),apathFn('iArea1034',vDown),apathFn('iArea1035',vEast),apathFn('iArea1036',vNorth),apathFn('iArea1036',vEast),apathFn('iArea1036',vDown),apathFn('iArea1037',vWest),apathFn('iArea1038',vSouth),apathFn('iArea1038',vWest),apathFn('iArea1039',vNorth),apathFn('iArea1039',vUp),apathFn('iArea1040',vUp),apathFn('iArea1040',vDown),apathFn('iArea1041',vUp),apathFn('iArea1041',vDown),apathFn('iArea1042',vNorth),apathFn('iArea1042',vSouth)]).
@@ -1254,7 +1254,7 @@ pddlObjects(vtDirection,[vNorth,vSouth,vEast,vWest,vUp,vDown]).
 
 
 
-%:- onLoad(must_det(show_call((mudAtLoc('iEnsign728',X),nonvar(X))))).
+%:- onLoad(must_det(show_call((mudAtLoc('iExplorer2',X),nonvar(X))))).
 
 end_of_file.
 
@@ -1770,7 +1770,7 @@ localityOfObject('Tricorder761','iArea1015').
 %% printAll(actorStartState(tAgent,X,List),ss(tAgent,X,List)).
    ss(tAgent,'NPC0Geordi684',[localityOfObject('NPC0Geordi684','iArea1000'),wearsClothing('NPC0Geordi684','iBoots685'),wearsClothing('NPC0Geordi684','iCommBadge686'),wearsClothing('NPC0Geordi684','iGoldUniform687'),wearsClothing('NPC0Geordi684','Item8VISOR688')]),
    ss(tAgent,vacuum(1),[localityOfObject(vacuum(1),'iArea1010'),mudStowing(vacuum(1),'iPhaser676'),wearsClothing(vacuum(1),'iBoots673'),wearsClothing(vacuum(1),'iCommBadge674'),wearsClothing(vacuum(1),'iGoldUniform675')]),
-   ss(tAgent,iPlayer1,[localityOfObject(iPlayer1,'iArea1000'),mudStowing(iPlayer1,'iPhaser776'),wearsClothing(iPlayer1,'iBoots773'),wearsClothing(iPlayer1,'iCommBadge774'),wearsClothing(iPlayer1,'iGoldUniform775')]),
+   ss(tAgent,iExplorer1,[localityOfObject(iExplorer1,'iArea1000'),mudStowing(iExplorer1,'iPhaser776'),wearsClothing(iExplorer1,'iBoots773'),wearsClothing(iExplorer1,'iCommBadge774'),wearsClothing(iExplorer1,'iGoldUniform775')]),
    ss(tAgent,'NPC2Worf720',[localityOfObject('NPC2Worf720','iArea1025'),mudStowing('NPC2Worf720','iPhaser724'),wearsClothing('NPC2Worf720','iBoots721'),wearsClothing('NPC2Worf720','iCommBadge722'),wearsClothing('NPC2Worf720','iGoldUniform723'),wearsClothing('NPC2Worf720','Item7Sash725')]),
    ss(tAgent,'NPC3DrCrusher677',[localityOfObject('NPC3DrCrusher677','iArea1015'),mudStowing('NPC3DrCrusher677','MedicalTricorder681'),mudStowing('NPC3DrCrusher677','MedicalTricorder682'),mudStowing('NPC3DrCrusher677','MedicalTricorder683'),wearsClothing('NPC3DrCrusher677','iBoots678'),wearsClothing('NPC3DrCrusher677','iCommBadge679'),wearsClothing('NPC3DrCrusher677','Item4BlueUniform680')]),
    ss(tAgent,'NPC4Troi712',[localityOfObject('NPC4Troi712','iArea1007'),wearsClothing('NPC4Troi712','iBoots713'),wearsClothing('NPC4Troi712','iCommBadge714'),wearsClothing('NPC4Troi712','Item4BlueUniform715')]),
@@ -1781,13 +1781,13 @@ localityOfObject('Tricorder761','iArea1015').
    ss(tAgent,'NPC9Wesley716',[localityOfObject('NPC9Wesley716','iArea1016'),wearsClothing('NPC9Wesley716','iBoots717'),wearsClothing('NPC9Wesley716','iCommBadge718'),wearsClothing('NPC9Wesley716','Item2RedUniform719')]),
    ss(tAgent,'NPC1010Livingston726',[localityOfObject('NPC1010Livingston726','iArea1035')]),
    ss(tAgent,'NPC1011Spot727',[localityOfObject('NPC1011Spot727','iArea1003')]),
-   ss(tAgent,'iEnsign728',[localityOfObject('iEnsign728','iArea1000'),wearsClothing('iEnsign728','iBoots729'),wearsClothing('iEnsign728','iCommBadge730'),wearsClothing('iEnsign728','iGoldUniform731')]),
-   ss(tAgent,'iEnsign732',[localityOfObject('iEnsign732','iArea1004'),wearsClothing('iEnsign732','iBoots733'),wearsClothing('iEnsign732','iCommBadge734'),wearsClothing('iEnsign732','iGoldUniform735')]),
-   ss(tAgent,'iEnsign736',[localityOfObject('iEnsign736','iArea1011'),wearsClothing('iEnsign736','iBoots737'),wearsClothing('iEnsign736','iCommBadge738'),wearsClothing('iEnsign736','Item2RedUniform739')]),
-   ss(tAgent,'iEnsign740',[localityOfObject('iEnsign740','iArea1020'),wearsClothing('iEnsign740','iBoots741'),wearsClothing('iEnsign740','iCommBadge742'),wearsClothing('iEnsign740','Item2RedUniform743')]),
-   ss(tAgent,'iEnsign744',[localityOfObject('iEnsign744','iArea1024'),wearsClothing('iEnsign744','iBoots745'),wearsClothing('iEnsign744','iCommBadge746'),wearsClothing('iEnsign744','Item4BlueUniform747')]),
-   ss(tAgent,'iEnsign748',[localityOfObject('iEnsign748','iArea1022'),wearsClothing('iEnsign748','iBoots749'),wearsClothing('iEnsign748','iCommBadge750'),wearsClothing('iEnsign748','Item4BlueUniform751')]),
-   ss(tAgent,'iEnsign752',[localityOfObject('iEnsign752','iArea1036'),wearsClothing('iEnsign752','iBoots753'),wearsClothing('iEnsign752','iCommBadge754'),wearsClothing('iEnsign752','Item4BlueUniform755')]),
+   ss(tAgent,'iExplorer2',[localityOfObject('iExplorer2','iArea1000'),wearsClothing('iExplorer2','iBoots729'),wearsClothing('iExplorer2','iCommBadge730'),wearsClothing('iExplorer2','iGoldUniform731')]),
+   ss(tAgent,'iExplorer3',[localityOfObject('iExplorer3','iArea1004'),wearsClothing('iExplorer3','iBoots733'),wearsClothing('iExplorer3','iCommBadge734'),wearsClothing('iExplorer3','iGoldUniform735')]),
+   ss(tAgent,'iExplorer4',[localityOfObject('iExplorer4','iArea1011'),wearsClothing('iExplorer4','iBoots737'),wearsClothing('iExplorer4','iCommBadge738'),wearsClothing('iExplorer4','Item2RedUniform739')]),
+   ss(tAgent,'iExplorer5',[localityOfObject('iExplorer5','iArea1020'),wearsClothing('iExplorer5','iBoots741'),wearsClothing('iExplorer5','iCommBadge742'),wearsClothing('iExplorer5','Item2RedUniform743')]),
+   ss(tAgent,'iExplorer6',[localityOfObject('iExplorer6','iArea1024'),wearsClothing('iExplorer6','iBoots745'),wearsClothing('iExplorer6','iCommBadge746'),wearsClothing('iExplorer6','Item4BlueUniform747')]),
+   ss(tAgent,'iExplorer7',[localityOfObject('iExplorer7','iArea1022'),wearsClothing('iExplorer7','iBoots749'),wearsClothing('iExplorer7','iCommBadge750'),wearsClothing('iExplorer7','Item4BlueUniform751')]),
+   ss(tAgent,'iExplorer8',[localityOfObject('iExplorer8','iArea1036'),wearsClothing('iExplorer8','iBoots753'),wearsClothing('iExplorer8','iCommBadge754'),wearsClothing('iExplorer8','Item4BlueUniform755')]),
    ss(tAgent,'NPC1013Alexander671',[localityOfObject('NPC1013Alexander671','iArea1025')])
    ]).
 

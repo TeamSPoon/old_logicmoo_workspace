@@ -155,7 +155,7 @@ prologSingleValued(C):-cwc,compound(C),functor(C,F,_),!,prologSingleValued(F).
 
 %(pfc_default(P)/pfc_each_literal(P,E))  =>  pfc_default(E).
 
-((pfc_default(P)/(pfc_literal(P),nonvar(P),functor(P,F,A),functor(Q,F,A)))  => ((~Q/different_literal(P,_,Q), ~neg(P)) => P)).
+((pfc_default(P)/(pfc_literal(P),compound(P),different_literal(P,_,Q,Test)))  => ((~Q/(Test), ~neg(P)) => P)).
 
 
 prologBuiltin(F),arity(F,A)=>{make_builtin(F/A)}.
@@ -622,7 +622,7 @@ completelyAssertedCollection(tCol).
 % is retracted.
 mpred_sv(Pred,Arity)=> prologSingleValued(Pred),arity(Pred,Arity),singleValuedInArg(Pred,Arity).
 
-prologSingleValued(Pred),arity(Pred,Arity) => hybrid_support(Pred,Arity).
+% prologSingleValued(Pred),arity(Pred,Arity) => hybrid_support(Pred,Arity).
 
 
 singleValuedInArg(Pred,_)=>prologSingleValued(Pred).
@@ -1090,8 +1090,10 @@ isa(arity,tBinaryPredicate).
 
 :-pfc_test(pfc_add(tCol('UnaryPredicate'))).
 
+% catching of misinterpreation 
+(pfcMark(pfcPosTrigger,_,F,A)/(integer(A),atom(F),functor(P,F,A),((P\= ( call_u(_) ), predicate_property(P,static)))))=>{dtrace}.
 
-pfcMark(_Type,_,F,A)/(integer(A),A>1,F\==arity)=>arity(F,A),pfcControlled(F).
+% pfcMark(Type,_,F,A)/(integer(A),A>1,F\==arity,Assert=..[Type,F])=>arity(F,A),Assert.
 
 pfc_mark_C(G) => {pfc_mark_C(G)}.
 pfc_mark_C(G) :-  map_literals(lambda(P,(get_functor(P,F,A),pfc_add([isa(F,pfcControlled),arity(F,A)]))),G).
@@ -1215,7 +1217,7 @@ vtTestType(vTest2).
 
 :- show_call(source_location(_,_)).
 
-:-pfc_test(in_file_expansion;in_file_directive).
+:- pfc_test(in_file_expansion;in_file_directive).
 
 
 
@@ -1224,7 +1226,7 @@ prologHybrid(isFact/1).
 
 
 
-pfc_default(((ttFormatType(FT),isFact(argIsa(Pred,N,FT))/ground(argIsa(Pred,N,FT)))=>argQuotedIsa(Pred,N,FT))).
+pfc_default(((argIsa(Pred,N,FT),ttFormatType(FT)/(isFact(argIsa(Pred,N,FT)),ground(argIsa(Pred,N,FT))))=>argQuotedIsa(Pred,N,FT))).
 pfc_default(((genlPreds(Child,Parent),argIsa(Parent,N,FT))=>argIsa(Child,N,FT))).
 pfc_default(((genlPreds(Child,Parent),argQuotedIsa(Parent,N,FT)/ground(argIsa(Parent,N,FT)))=>argQuotedIsa(Child,N,FT))).
 

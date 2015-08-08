@@ -1,0 +1,276 @@
+%%%%%%%%%  program as in book
+ebg((A,B),(GenA,GenB), Proof, GenProof) :- !,
+  ebg(A,GenA,AProof,GenAProof),
+  ebg(B,GenB,BProof,GenBProof),
+  append_proofs(AProof,BProof,Proof),
+  append_proofs(GenAProof,GenBProof,GenProof).
+ebg(A,GenA,A,GenA) :- clause(A, B), system(B), B.
+%ebg(A,GenA,B,GenA) :- system(A),!,A,B=A. 
+%ebg(A,GenA,A,GenA) :- clause(A, true).
+ebg(A,GenA,tree(A,Proof),tree(GenA,GenProof)) :- 
+    clause(GenA,GenB),%trace,
+    copy_term(pair(GenA,GenB),pair(A,B)),
+    ebg(B,GenB,BProof,GenBProof),
+    attach_proof(BProof,Proof),
+    attach_proof(GenBProof,GenProof).
+
+append_proofs(AProof,[BProof|More],Proof) :- 
+  !, Proof = [AProof, BProof | More].
+append_proofs(AProof,BProof,[AProof,BProof]).
+
+attach_proof([BProof|More],Proof) :- !, Proof=[BProof|More].
+attach_proof(BProof,[BProof]).
+ 
+%%%%%%%%%  original program in Kedar-Cabelli and McCarty
+%ebj((A,B),(GenA,GenB),(AProof, BProof),(GenAProof, GenBProof)) :- !,
+%	ebj(A,GenA,AProof,GenAProof),
+%	ebj(B,GenB,BProof,GenBProof).
+ 
+%ebj(A,GenA,B,GenA) :- system(A), !, A, B=A.
+%ebj(A,GenA,A,GenA) :- clause(A, true).
+
+%ebj(A,GenA,[A,Bproof],[GenA,GenBProof]) :- 
+%	clause(GenA,GenB), 
+%	copy_term((GenA,GenB),(A,B)), 
+% 	ebj(B,GenB,Bproof,GenBProof).
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Database
+:- dynamic kill/2, hate/2, possess/2, weapon/1, depressed/1, buy/2, gun/1.
+
+kill(A,B) :- hate(A,B),possess(A,C),weapon(C). 
+hate(A,A) :- depressed(A). 
+possess(A,C) :- buy(A,C). 
+weapon(C) :- gun(C). 
+
+depressed(john). 
+buy(john,gun17). 
+gun(gun17).
+
+%system(X):-  predicate_property(X, built_in).
+
+system(true).
+system(fail).
+system(_<_).
+system(_>_).
+system(_ is _).
+system(clause(_,_)).
+system(call(_)).
+system(_ == _).
+system(_ = _).
+system(_ =< _).
+system(ground(_)).
+system(\+(_)).
+system(write(_)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Testing
+test :- 	ebg(kill(john,john), kill(X,X), Exp1, Exp2),
+	display(Exp1, 0), 
+	nl,nl,
+	% Replace vars place holders with actual letters.
+	substvars(Exp2, Exp3),
+	display(Exp3, 0).
+
+
+
+display([], _).
+%display([Pred], Shift) :- !,
+%	shift(Shift),
+%	write(Pred).
+
+display([Pred, Exp], Shift) :- !,
+	shift(Shift), 
+	write(Pred), nl,
+	NewShift is Shift + 4,
+	display(Exp, NewShift).
+
+display((X, Y), Shift) :- !,
+	display(X, Shift),
+	display(Y,Shift).
+
+display(Pred, Shift) :- !,
+	shift(Shift),
+	write(Pred), nl.
+% write(' - Given'),nl.
+ 
+shift(0).
+shift(N) :- write(' '), M is N-1, shift(M).
+
+% ntn(+List, -Position, +-Element)
+% Find the position of an element in the list fail if not there.
+ntn([], _, _)    :- !,false.
+ntn([X|_], 0, Y) :- X == Y.
+ntn([_|Z], N, X) :- ntn(Z,M,X), N is M+1.
+ 
+% locate_var_in_table(+X , -R)
+% Return the position of an element in a list and if not there then
+% insert it at the end.
+locate_var_in_table(X, R,O,O) :- ntn(O, R, X).
+locate_var_in_table(X, R,O,L) :- insert_new_item(O, X, R, L).
+			
+% insert_new_item(+List, +Var, Counter, -NewList)
+insert_new_item([], X, 0, [X]).
+insert_new_item([Z|L1], X, N, [Z|L2]) :- insert_new_item(L1, X, M, L2),
+ 	       				 N is M+1.
+
+% substvars(+Term1, -Term2)
+% Exercise number 18
+
+substvars(Term, Result) :- substvars1(Term, Result, [], _),!.
+				
+substvars1(X, '$VAR'(R), O, L)   :- var(X), locate_var_in_table(X, R,O,L).
+substvars1([],[], O, O).
+substvars1(X, X, O, O) :- atom(X).
+
+substvars1([X|Y], [R1|R2], O, L) :-
+	substvars1(X,R1, O, L1), 
+	substvars1(Y,R2, L1, L).
+
+substvars1((X,Y), (R1,R2), O, L) :- 	
+	substvars1(X,R1, O, L1), 
+	substvars1(Y,R2, L1, L).
+
+substvars1(X,R, O, L) :-
+	functor(X,_,_),
+	X =.. F,
+	substvars1(F,R1,O,L),
+	R =.. R1.
+ 
+ 
+:- dynamic wellpaid/1.
+:- dynamic department/2.
+:- dynamic vital/1.
+:- dynamic manager/1.
+:- dynamic senior/1.
+
+meta_e((A,B), Proof) :- !,
+  meta_e(A,AProof),
+  meta_e(B,BProof),
+  append_proofs(AProof,BProof,Proof).
+meta_e(A,A) :- clause(A,B),system(B),B.
+meta_e(A,tree(A,Proof)) :- 
+    clause(A,B),meta_e(B,BProof),
+    attach_proof(BProof,Proof).
+
+wellpaid(X) :- department(X,Y), vital(Y). 
+wellpaid(X) :- senior(X). 
+
+department(john,research).                   
+vital(research).                 
+
+senior(X) :- manager(X). 
+manager(mary).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Too strong
+
+% To find the culprit clause in a conjunction, look for it
+% first in the first conjunct, and if it is not found then look
+% in the remaining conjuncts. System predicates are safe.
+% For other single goals, examine the body of a clause for the culprit. 
+too_strong((A,B),Culprit) :- !, 
+	too_strong(A,ACulprit), 
+	conj_culprit(ACulprit,B,Culprit). 
+too_strong(A,ok) :- system(A),!,A. 
+too_strong(A,Culprit) :- 
+	clause(A,B), 
+	too_strong(B,BCulprit), 
+	clause_culprit(A,B,BCulprit,Culprit). 
+
+conj_culprit(ok,B,Culprit) :- !,too_strong(B,Culprit). 
+conj_culprit(ACulprit,_,ACulprit).
+
+ 
+% Query the user whether the head  A should succeed. If both A 
+% and the body  B should succeed, then the clause is safe. 
+% If  B  should succeed and  A not, the clause  A:-B is the culprit. 
+% Otherwise, the culprit lies with  B.  
+clause_culprit(A,_,ok,ok) :- should_succeed(A),!. 
+clause_culprit(A,B,ok,(A:-B)) :-  !. 
+clause_culprit(_,_,BCulprit,BCulprit). 
+
+should_succeed(A) :- nl,writel(['Should ',A,' succeed? ']),read(yes). 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Too weak
+
+% To find the culprit clause in a conjunction, run the first conjunct.
+% If it succeeds, the culprit must lie with the remaining conjuncts. 
+% For uncovered single goals, examine the clauses for the goal.  
+% If there exists one whose body should succeed, the problem lie with 
+% that body. Otherwise the single goal itself is the uncovered culprit. 
+too_weak((A,B),BCulprit) :- A,too_weak(B,BCulprit). 
+too_weak((A,_),ACulprit) :- too_weak(A,ACulprit). 
+too_weak(A,BCulprit) :- 
+	clause(A,B), 
+	should_succeed(B),!, 
+	too_weak(B,BCulprit). 
+too_weak(A,A) :- 
+	(ground(A),not(A),! 
+                ; nl,writel(['Which instance of ',A,' ? ']),read(A)). 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Utility
+system(true).
+system(fail).
+system(_<_).
+system(_>_).
+system(_ is _).
+system(clause(_,_)).
+system(call(_)).
+system(_ == _).
+system(_ = _).
+system(_ =< _).
+system(ground(_)).
+system(\+(_)).
+system(write(_)).
+
+not(X) :- X, !, fail.
+not(_).
+
+writel([]).
+writel([X|More]) :- 
+	write(X), write(' '), writel(More).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Database
+:- dynamic fly/1, bird/1, penguin/1, migrates/1, bird1/1, habitat/2, northern/2, dove/1.
+fly(X) :- bird(X).
+bird(X) :- penguin(X). 
+penguin(tweety).
+
+migrates(X) :- 
+	bird1(X), 
+	habitat(X,Y), 
+	northern(Y).
+bird1(X) :- dove(X).
+dove(chirpy).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Test
+
+
+test :- 	too_strong(fly(tweety),Culprit),
+	writel(['Culprit is ', Culprit]).
+
+test1 :-  too_weak(migrates(X),Culprit),
+	writel(['Culprit is ', Culprit]).
+
+
+ 

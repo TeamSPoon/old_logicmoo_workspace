@@ -161,7 +161,7 @@ agent_call_command_now_3(Agent,CMD):-
   padd(Agent,mudLastCommand(CMD)).
 
 user:agent_call_command_all_fallback(Agent,CMD):- user:agent_call_command_fallback(Agent,CMD),!.
-user:agent_call_command_all_fallback(Agent,CMD):-term_listing(CMD).
+% user:agent_call_command_all_fallback(Agent,CMD):-term_listing(CMD).
 
 :-export(send_command_completed_message/4).
 send_command_completed_message(Agent,Where,Done,CMD):-

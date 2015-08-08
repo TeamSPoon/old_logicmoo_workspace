@@ -1,0 +1,33 @@
+
+% Bredth first search meta-interpreter
+ meta_bf(Goal) :- b([conj([Goal], Goal)], Goal).
+
+  b([conj([ ], GoalInstance) | _], GoalInstance).
+  b([conj([ ], _) | S ], Goal) :-  b(S, Goal).
+  b([conj([A|B], OrigGoal) | S ], Goal) :- 
+	system(A),
+	 A, !,
+ 	append(S, [conj(B, OrigGoal)], Newlist),
+ 	b(Newlist, Goal).
+  b([conj([A|_], _)| S ], Goal) :-  
+	% Faild in executing system predicat A.
+ 	system(A), !, 
+ 	b(S, Goal).
+  b([conj([A|B], OrigGoal) | S ], Goal) :- 
+ 	findall(
+		conj(BB, OrigGoal),
+            	(
+		 A^B^Body^(
+			   clause(A, Body),
+                           mixed_append(Body, B, BB))
+		),
+ 		L
+	      ),
+ 	append(S, L, Newlist),
+	b(Newlist, Goal).
+  
+  mixed_append((X,Y), B, [X|BB]):- !, 
+	mixed_append(Y, B, BB).
+  mixed_append(X, B, [X|B]).
+
+

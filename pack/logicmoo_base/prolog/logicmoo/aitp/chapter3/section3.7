@@ -1,0 +1,100 @@
+
+% Bredth first search meta-interpreter 
+ meta_bf(Goal) :- b([conj([Goal], Goal)], Goal).
+
+  b([conj([ ], GoalInstance) | _], GoalInstance).
+  b([conj([ ], _) | S ], Goal) :-  b(S, Goal).
+  b([conj([A|B], OrigGoal) | S ], Goal) :- 
+	system(A),
+	 A, !,
+ 	append(S, [conj(B, OrigGoal)], Newlist),
+ 	b(Newlist, Goal).
+  b([conj([A|_], _)| S ], Goal) :-  
+	% Faild in executing system predicat A.
+ 	system(A), !, 
+ 	b(S, Goal).
+  b([conj([A|B], OrigGoal) | S ], Goal) :- 
+ 	findall(
+		conj(BB, OrigGoal),
+            	 	(
+		  A^B^Body^(
+			      clause(A, Body),
+                            	                        mixed_append(Body, B, BB)
+			    )
+		),
+ 		L
+	             ),
+ 	append(S, L, Newlist),
+	b(Newlist, Goal).
+  
+  mixed_append((X,Y), B, [X|BB]):- !, 
+	mixed_append(Y, B, BB).
+  mixed_append(X, B, [X|B]).
+
+
+% The database
+p(X,Y) :- f(X,Y).
+p(X,Y) :- m(X,Y).
+g(X,Y) :- p(X,Z), p(Z,Y).
+a(X,Y) :- p(X,Y).
+a(X,Y) :- p(Z,Y), a(X,Z).
+ 
+ 
+ % Facts.
+f(d,a).
+f(e,d).
+f(m,i).
+m(i,a).
+m(h,i).
+m(b,d).
+
+% Resaults
+
+ | ?- meta_bf(p(X,Y)).
+
+conj([f(_13766,_13767)], p(_13766,_13767)) , conj([m(_13741,_13742)], p(_13741,_13742)) 
+
+conj([m(_13741,_13742)], p(_13741,_13742)) , conj([true], p(d,a)) , conj([true], p(e,d)) , conj([true], p(m,i)) 
+
+conj([true], p(d,a)) , conj([true], p(e,d)) , conj([true], p(m,i)) , conj([true], p(i,a)) , conj([true], p(h,i)) , conj([true], p(b,d)) 
+
+
+X = d,
+Y = a ;
+
+conj([ ], p(e,d)) , conj([ ], p(m,i)) , conj([ ], p(i,a)) , conj([ ], p(h,i)) , conj([ ], p(b,d)) 
+
+
+X = e,
+Y = d ;
+
+conj([ ], p(m,i)) , conj([ ], p(i,a)) , conj([ ], p(h,i)) , conj([ ], p(b,d)) 
+
+
+X = m,
+Y = i ;
+
+conj([ ], p(i,a)) , conj([ ], p(h,i)) , conj([ ], p(b,d)) 
+
+
+X = i,
+Y = a ;
+
+conj([ ], p(h,i)) , conj([ ], p(b,d)) 
+
+
+X = h,
+Y = i ;
+conj([ ], p(b,d)) 
+
+
+X = b,
+Y = d ;
+
+
+
+no
+[4]
+| ?- 
+
+

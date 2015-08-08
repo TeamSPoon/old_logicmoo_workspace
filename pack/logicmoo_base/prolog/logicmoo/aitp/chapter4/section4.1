@@ -1,0 +1,103 @@
+% Forward Chaining with variable and negative conditions
+%-------------------------------------------------------
+
+:- op(1150, xfx, -:).
+
+add_var_slow(X) :- clause(wm(X), true),!.
+add_var_slow(X) :- assert(wm(X)), propagate_var_slow(X,+).
+
+del_var_slow(X) :- not(clause(wm(X), true)),!.
+del_var_slow(X) :- retract(wm(X)), propagate_var_slow(X,-).
+
+propagate_var_slow(X,S):-
+ bagof0((If,Then,S1,F),
+         ((If -: (Then,S1,F)),
+           amember((X,S),If),
+           not((amember((Y,+),If),not(clause(wm(Y),true)))),
+           not((amember((Y,-),If),clause(wm(Y),true))),
+           F,
+           update_var_slow(Then,S1)),
+        _).
+
+amember(A,A).
+amember(A,(A,_)).
+amember(A,(_,B)):- amember(A,B).
+
+update_var_slow(Then,+):- add_var_slow(Then),!.
+update_var_slow(Then,-):- del_var_slow(Then),!.
+
+bagof0(A,B,C) :- bagof(A,B,C).
+bagof0(A,B,[]):- not(bagof(A,B,_)).
+
+
+
+
+
+% Forward chaining rules to update the working memory upon customer requests
+%---------------------------------------------------------------------------
+%age
+(age(A), +) -: (AgeCat, +, compute_age(A, AgeCat)).
+
+%season
+(day(D),+) , (month(M), +) -: (season(S), -, season(S)).
+(day(D),+) , (month(M), +) -: (season(S), +, compute_season(S)).
+
+%type
+(old,-), (sport,+)     -: (active, +, true).
+(old,-), (athlete,+)   -: (crazy,  +, true).
+(young,+), (nosport,+) -: (serious,+, true).
+(old, +), (athlete,-)  -: (serious,+, true).
+(old, +), (athlete,+)  -: (active, +, true).
+
+%money
+(cost(D),+) -: (money(Cat), +, compute_cost_cat(D, Cat)).
+
+%weather
+(low_temp(L),+), (high_temp(H),+)  -: (weather(W), +, compute_weather(W)).
+
+
+
+
+% "compute" predicates
+compute_season(S):- wm(day(D)),wm(month(M)),
+  Digit is M*100 + D, comp_season(Digit, S),!.
+comp_season(D, spring):- D > 320, D < 621.
+comp_season(D, summer):- D > 620, D < 921.
+comp_season(D, fall)  :- D > 920, D < 1221.
+comp_season(D, winter).
+
+compute_age(A, young):- A < 50, !.
+compute_age(_, old).
+
+compute_cost_cat(D,very_expensive):- D > 2000.
+compute_cost_cat(D,expensive)     :- D > 1000.
+compute_cost_cat(D,normal)        :- D >  500.
+compute_cost_cat(D,cheap)         .
+
+compute_weather(W):- wm(low_temp(L)),wm(high_temp(H)),!,
+   comp_weather(L,H,W).
+comp_weather(L,H,very_cold):- L < -10.
+comp_weather(L,H,cold)     :- L <  10, H > 10.
+comp_weather(L,H,good)     :- L <  20, H > 20.
+comp_weather(L,H,hot)      :- L <  27, H > 27.
+comp_weather(L,H,very_hot) :- H >  32.
+
+
+test1:-add_var_slow(day(7)),add_var_slow(month(11)).
+test2:-add_var_slow(nosport),add_var_slow(age(36)).
+test3:-add_var_slow(cost(1200)).
+test4:-add_var_slow(low_temp(15)),add_var_slow(high_temp(30)).
+cust1:- test1,test2,test3,test4.
+cust2:- test1,add_var_slow(active),add_var_slow(age(36)),test3,test4.
+cust3:- test1,add_var_slow(active),add_var_slow(age(56)),test3,test4.
+cust4:- test1,add_var_slow(athlete),add_var_slow(age(36)),
+        add_var_slow(cost(1000)),test4.
+cust5:- add_var_slow(day(1)),add_var_slow(month(2)),
+        add_var_slow(athlete),add_var_slow(age(36)),
+        test3,
+        add_var_slow(low_temp(-15)),add_var_slow(high_temp(30)).
+
+
+
+lis:- listing(wm).
+

@@ -25,6 +25,7 @@ user:file_search_path(prologmud, library(prologmud)).
 
 :- ((current_prolog_flag(readline, true))->expand_file_name("~/.pl-history", [File|_]),(exists_file(File) -> rl_read_history(File); true),at_halt(rl_write_history(File));true).
 
+
 % :- multifile sandbox:safe_primitive/1.
 % :-asserta((sandbox:safe_primitive(Z):-wdmsg(Z))).
 
@@ -35,20 +36,29 @@ user:file_search_path(prologmud, library(prologmud)).
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 % :- qcompile_libraries.
 
-
 % [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/)
 :- if_file_exists(user:ensure_loaded(library(eggdrop))).
 :-eggdrop:egg_go.
 :- initialization((current_predicate(egg_go/0)->egg_go;true),now).
 
-
+:-asserta(user:load_mud_www).
 
 % [Mostly Required] Load the UPV Curry System
 %:- time(user:ensure_loaded(library(upv_curry/main))).
 
 
+% [Required] Load the Logicmoo WWW System
+:- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_pldoc)))).
+:- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_swish)))).
+:- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_clio)))).
+
+% :- prolog.
+
+
 % [Required] Load the Logicmoo Base System
 :- time(user:ensure_loaded(logicmoo(logicmoo_base))).
+:- gripe_time(40,user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
+
 :- asserta(thlocal:disable_mpred_term_expansions_locally).
 
 :- multifile(user:push_env_ctx/0).
@@ -57,25 +67,22 @@ user:file_search_path(prologmud, library(prologmud)).
 push_env_ctx:-!,fail.
 push_env_ctx:-!.
 
-
 % [Required] Load the Logicmoo Backchaining Inference System
-%:- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
+:- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
 
-% [Required] Load the Logicmoo WWW System
-%:- gripe_time(40,user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
+:- listing([storage_plugin_update,filesys:filesys_data]).
 
 :- prolog.
 
 :- if(if_defined(debugging_planner)).
 
 % [Mostly Required] Load the Logicmoo Planner/AI System
-%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner)))).
+:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
 
 :- else.
 
 % [Mostly Required] Load the Logicmoo Planner/AI System
 %:- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner))))).
-
 
 :- wdmsg("Done with loading logicmoo_planner").
 
@@ -115,7 +122,10 @@ push_env_ctx:-!.
 :-multifile(user:regression_test/0).
 :-multifile(user:feature_test/0).
 
+
 :-dmsg("About to run Sanity").
+
+% :- prolog.
 
 :- show_call_entry(gripe_time(40,if_startup_script(doall(user:sanity_test)))).
 
@@ -197,6 +207,8 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 % [Optionaly] Start the telent server
 :-at_start(toploop_telnet:start_mud_telnet(4000)).
 
+:- prolog.
+
 % ==============================
 % MUD GAME CODE LOADS
 % ==============================
@@ -209,10 +221,9 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 :- if((gethostname(titan),fail)).
 :- if_startup_script( finish_processing_world).
 :- enqueue_agent_action("rez crackers").
-:- prolog.
+%:- prolog.
 :- endif.
 
-:- prolog.
 
 % [Optional] the following game files though can be loaded separate instead
 :- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
@@ -223,7 +234,7 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 % :- add_game_dir('../games/src_game_nani',prolog_repl).       
 :- add_game_dir('../games/src_game_startrek',prolog_repl).
 
-:- set_prolog_flag(trace_gc,true).
+:- set_prolog_flag(trace_gc,false).
 :- set_prolog_flag(backtrace_depth,400).
 
 

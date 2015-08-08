@@ -424,17 +424,20 @@ inverse_args([P,A,R,G,S],[S,A,R,G,P]):-!.
 same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
 
 
-:-moo_hide_childs(replace_arg/4).
-replace_arg(C,A,OLD,CC):- 
+replace_arg_fast(C,A,VAR,CO):- duplicate_term(C,CC),setarg(A,CC,VAR),!,CC=CO.
+
+replace_arg(C,A,VAR,CC):- 
    C=..FARGS,
-   replace_nth(FARGS,A,OLD,FARGO),!,
+   replace_nth(FARGS,A,VAR,FARGO),!,
    CC=..FARGO.
+
+:-moo_hide_childs(replace_arg/4).
 
 :-moo_hide_childs(replace_nth/4).
 replace_nth([],_,_,[]):- !.
-replace_nth([_|ARGO],0,OLD,[OLD|ARGO]):- !.
-replace_nth([T|FARGS],A,OLD,[T|FARGO]):- 
-    A2 is A-1,replace_nth(FARGS,A2,OLD,FARGO).
+replace_nth([_|ARGO],0,VAR,[VAR|ARGO]):- !.
+replace_nth([T|FARGS],A,VAR,[T|FARGO]):- 
+    A2 is A-1,replace_nth(FARGS,A2,VAR,FARGO).
 
 
 replace_nth([],_N,_OldVar,_NewVar,[]):- !,trace_or_throw(missed_the_boat).

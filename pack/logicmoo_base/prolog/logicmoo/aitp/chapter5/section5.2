@@ -1,0 +1,488 @@
+% Notes:
+% 1. Might need to compile 'library(basics)' for the member function.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CMS part.
+
+add_just_cms(If,Then) :- 
+	retractall(newly_changed(_)), 
+	add_just_rms(If,Then),
+	ensure_consistency, 
+	retractall(newly_changed(_)).
+ 
+del_just_cms(If,Then) :- 
+	retractall(newly_changed(_)), 
+ 	del_just_rms(If,Then),
+	ensure_consistency, 
+	retractall(newly_changed(_)).
+ 
+ensure_consistency :- 
+	bad_node(Node), !,
+	faulty_assumption(Node,ANode),
+	display_inconsistency(Node, ANode),
+	del_just_rms(((premise, +)),ANode),
+	ensure_consistency.
+ensure_consistency. 
+
+
+bad_node(Node) :- 
+	% bottom is in the data base.
+	clause(rms(false), true),
+	% Find justification that added it.
+	justificand(J, false),
+	justifier_counter(J,0),
+	justifier(Node,S,J), 
+	newly_changed(Node),
+	satisfied(Node,S).
+
+
+faulty_assumption(Anode,Anode) :- assumption(Anode). 
+faulty_assumption(Node,Anode) :- 
+	justificand(J,Node),
+	% Is Node IN or OUT?
+	satisfied(Node, S),
+	% Find a node in the consequent that contribute to the
+	%  fact that the Node is IN or OUT.
+	justifier(Node1,S1,J), 
+	contributor(Node1,S1,S), 
+	faulty_assumption(Node1,Anode). 
+
+
+% '+' mean we look for support. '-' mean the opposite.
+contributor(Node,S,+) :- !, satisfied(Node,S). 
+contributor(Node,S,-) :- unsatisfied(Node,S). 
+
+
+assumption(Node) :- 
+	% The node is in the data base.
+	clause(rms(Node), true),
+	% There exist justification '(premis, +) ---: Node'
+	justificand(J, Node),
+	bagof((Node1,S),justifier(Node1,S,J),[(premise,+)] ).
+
+
+
+adjust_status(Node,+) :- assert(rms(Node)), mark_newly_changed(Node).
+adjust_status(Node,-) :- retract(rms(Node)), mark_newly_changed(Node). 
+
+mark_newly_changed(Node) :- newly_changed(Node), !.
+mark_newly_changed(Node) :- assert(newly_changed(Node)). 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% RMS part (efficiant).
+
+add_just_rms(If,Then) :- exist_just_rms(If,Then,_), !.
+add_just_rms(If,Then) :- 
+	new_just_label(J),
+	do_all(( amember((Justifier,S),If), 
+	         assert(justifier(Justifier,S,J)), 
+		 fail)), 
+	assert(justificand(J,Then)),
+	mark_contaminated_rms(Then),
+	revalidate_rms.
+
+del_just_rms(If,Then) :-
+	exist_just_rms(If,Then,J), !,
+	retractall(justifier(_,_,J)),
+	retract(justificand(J,_)),
+	mark_contaminated_rms(Then),
+	revalidate_rms.
+del_just_rms(_,_).
+
+exist_just_rms(If,Then,J) :-
+	setof( (Justifier,S),
+	       amember((Justifier,S),If),
+	       If1),
+	justificand(J,Then),
+	setof( (Justifier,S),
+	           justifier(Justifier,S,J),
+	          If1).
+
+mark_contaminated_rms(Node) :-
+	retractall(contaminated(_)),
+	retractall(contam_marked(_)),
+	do_all(( contam_path(Node,Node1), 
+	         assert(contaminated(Node1)))), 
+	retractall(justifier_counter(_,_)),
+	retractall(justificand_counter(_,_)),
+	retractall(not_ruled_out_just(_)),
+	do_all(( contaminated(Node1),
+		 compute_just_counter(Node1),
+		 compute_node_counter(Node1) )).
+
+%  marking contaminating nodes as in the inefficient program: 
+contam_path(Node,Node). 
+contam_path(Node,Node1) :- 
+	justifier(Node,_,J), 
+	justificand(J,NextNode),
+	not(contam_marked(NextNode)), 
+	assert(contam_marked(NextNode)), 
+	contam_path(NextNode,Node1). 
+
+
+% For every justification J s.t. Node is the consecuent (justificand) of J do:
+%	Count the number of unsetisfied or contaminated antecedent 
+%	(justefire) nodes of J	 and insert the number to the data base.
+compute_just_counter(Node) :-
+	do_all(( justificand(J,Node),
+		 count_unsubstantiated_justifiers(J,Justifier_cnt),
+		 assert(justifier_counter(J,Justifier_cnt)) )).
+
+%  a justifier is unsubstantiated if it is unsatisfied or contaminated:  
+count_unsubstantiated_justifiers(J,Justifier_cnt) :-
+	findall( (Justifier,S),
+		 (  justifier(Justifier,S,J),
+		    (unsatisfied(Justifier,S) -> true 
+				; 
+		         		contaminated(Justifier) )),
+		Unsubstantiated),
+	length(Unsubstantiated,Justifier_cnt).
+
+
+% For every justification J s.t. Node is the consecuent (justificand) of J do:
+%	Count the number of setisfied and not contaminated antecedent 
+%	(justefire) nodes of J	, if it is 0 then insert not_ruled_out(J).
+% Calculate the total number and insert it to the data base.
+compute_node_counter(Node) :-
+	findall( J, 
+		 ( justificand(J,Node),
+		   not(ruled_out_by_uncontam_justifier(J)),
+		   assert(not_ruled_out(J))),
+		 Not_ruled_out),
+	length(Not_ruled_out,Justificand_cnt),
+	assert(justificand_counter(Node,Justificand_cnt)).
+
+%   a justification is ruled out if it has an unsatisfied and uncontaminated  
+%  justifier.  
+ruled_out_by_uncontam_justifier(J) :-
+	justifier(Justifier,S,J),
+	unsatisfied(Justifier,S),
+	not(contaminated(Justifier)).
+
+revalidate_rms :-
+	contaminated(Node),
+	determined(Node,S),
+	propagate_rms(Node,S),
+	fail.
+revalidate_rms :-
+	contaminated(Node),
+	propagate_rms(Node,-),
+	fail.
+revalidate_rms.
+
+determined(Node,-) :- justificand_counter(Node,0).
+determined(Node,+) :- justificand(J,Node), justifier_counter(J,0).
+
+propagate_rms(Node,_) :- not(retract(contaminated(Node))), !.
+propagate_rms(Node,S) :-
+	cond_adjust_status(Node,S),
+	do_all(( justifier(Node,S1,J),
+		 justificand(J,NextNode),
+		 update_counter(J,S,S1,NextNode) )).
+
+%  but adjusting node status is slightly different, 
+%  as adjustment need not be required: 
+cond_adjust_status(Node,S) :- satisfied(Node,S), !.
+cond_adjust_status(Node,S) :- adjust_status(Node,S). 
+
+satisfied(Item,+) :- clause(rms(Item),true).
+satisfied(Item,-) :- not(satisfied(Item,+)). 
+unsatisfied(Item,S) :- not(satisfied(Item,S)).
+
+new_just_label(J) :- 
+	retract(just_ctr(N)), 
+	M is N+1, 
+	assert(just_ctr(M)),
+	name(j,[Jval]), 
+	name(M,StrM), 
+	name(J,[Jval | StrM]), !.
+
+update_counter(J,S,S,NextNode) :-
+	retract(justifier_counter(J,N)), 
+	M is N -1, 
+	assert(justifier_counter(J,M)),
+	cond_propagate(M,NextNode,+), !.
+update_counter(J,_,_,NextNode) :-
+	retract(not_ruled_out(J)),
+	retract(justificand_counter(NextNode,N)),
+	M is N -1,
+	assert(justificand_counter(NextNode,M)),
+	cond_propagate(M,NextNode,-), !.
+update_counter(_,_,_,_).
+
+cond_propagate(0,NextNode,S) :- !, propagate_rms(NextNode,S).
+cond_propagate(_,_,_).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Utilities
+once(X) :- X, !.
+do_all(X) :- X, fail ; true.
+not(X) :- X, !, fail.
+not(_).
+
+amember((X,S),((X,S),_)).
+amember((X,S), ((_,_),Y)) :- !,amember((X,S),Y).
+amember((X,S),(X,S)).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DATABASE and TEST
+:- dynamic justificand/2, justifier/3, contam_marked/1, contaminated/1.
+:- dynamic justifier_counter/2, justificand_counter/2, not_rule_out_just/1.
+:- dynamic newly_changed/1.
+
+initTMS:-
+  retractall(justifier(_,_, _)),
+  retractall(justificand(_,_)),
+  retractall(rms(_)),
+  retractall(just_ctr(_)),
+  retractall(justifier_counter(_,_) ),
+  retractall(justificand_counter(_,_)),
+  retractall(not_rule_out_just(_)),
+  assert(just_ctr(0)),
+  assert(rms(premise)).
+
+test1:-
+  add_just_cms(((premise,+)),has_beak),
+  add_just_cms(((premise,+)),has_wing).
+test2:-
+  add_just_cms(((has_beak,+),(has_wing,+)),bird).
+test3:-
+  add_just_cms(((bird,+)),fly).
+test4:-
+  del_just_cms(((premise,+)),has_beak).
+test5:-
+  del_just_cms(((has_beak,+),(has_wing,+)),bird).
+test6:-
+ add_just_cms(((premise,+)),penguin).
+ 
+% Nogood set.
+test7:-
+  add_just_cms(((penguin,+), (fly, +)),false).
+
+
+printdb:-
+	write('Database listing :'), nl,
+	write('The facts:'), listing(rms),nl,
+	write('Justifiers:'),   listing(justifier), nl,
+	write('Justificands:'),  listing(justificand), nl,nl.
+
+
+display_inconsistency(BadNode, DeleteNode) :-
+	write('********* INCONSIST DATA *********'), nl, 
+	write('Befor fixing '),printdb,
+	write('Bad Node: '),  write(BadNode), nl,
+	write('Delete justification: (premise, +) ---: '), write(DeleteNode), nl,
+	write('After fixing ').
+
+
+
+test:- 
+	initTMS, write('*****  START  ******'), nl ,printdb, 
+	write('****** Add nogood set  "(penguin,+), (fly, +)]---:false" ******'),nl,test7,printdb,
+	write('****** Add justification  "(bird, +)---: fly" ******'),nl,test3,printdb,
+	write('****** Add justification  " (has_beak,+),(has_wing,+)---: bird" ******'),nl,test2,printdb,
+	write('****** Add justification  " (premise,+) ---: has_beak " ******'),nl,
+	write('****** Add justification  " (premise,+) ---:  has_wing" ******'),nl,test1,printdb,
+	write('****** Add justification  " (premise,+) ---:  penguin" ******'),nl,test6,printdb,
+	write('****** Delete justification  " (premise,+) ---:  has_beak " ******'),nl,test4,printdb,
+	write('****** Add justification  " (premise,+) ---:  penguin" ******'),nl,test6,printdb.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Results:
+%  | ?- test.
+% *****  START  ******
+% Database listing :
+% The facts:
+% rms(premiss).
+% 
+% Justifiers:
+% Justificands:
+% 
+% ****** Add nogood set  "(penguin,+), (fly, +)]---:false" ******
+% Database listing :
+% The facts:
+% rms(premiss).
+% 
+% Justifiers:
+% justifier(penguin,+,j1).
+% justifier(fly,+,j1).
+% 
+% Justificands:
+% justificand(j1,false).
+% 
+% 
+% ****** Add justification  "(bird, +)---: fly" ******
+% Database listing :
+% The facts:
+% rms(premiss).
+% 
+% Justifiers:
+% justifier(penguin,+,j1).
+% justifier(fly,+,j1).
+% justifier(bird,+,j2).
+% 
+% Justificands:
+% justificand(j1,false).
+% justificand(j2,fly).
+% 
+% 
+% ****** Add justification  " (has_beak,+),(has_wing,+)---: bird" ******
+% Database listing :
+% The facts:
+% rms(premiss).
+% 
+% Justifiers:
+% justifier(penguin,+,j1).
+% justifier(fly,+,j1).
+% justifier(bird,+,j2).
+% justifier(has_beak,+,j3).
+% justifier(has_wing,+,j3).
+% 
+% Justificands:
+% justificand(j1,false).
+% justificand(j2,fly).
+% justificand(j3,bird).
+% 
+% 
+% ****** Add justification  " (premiss,+) ---: has_beak " ******
+% ****** Add justification  " (premiss,+) ---:  has_wing" ******
+% Database listing :
+% The facts:
+% rms(premiss).
+% rms(has_beak).
+% rms(has_wing).
+% rms(bird).
+% rms(fly).
+% 
+% Justifiers:
+% justifier(penguin,+,j1).
+% justifier(fly,+,j1).
+% justifier(bird,+,j2).
+% justifier(has_beak,+,j3).
+% justifier(has_wing,+,j3).
+% justifier(premiss,+,j4).
+% justifier(premiss,+,j5).
+% 
+% Justificands:
+% justificand(j1,false).
+% justificand(j2,fly).
+% justificand(j3,bird).
+% justificand(j4,has_beak).
+% justificand(j5,has_wing).
+% 
+% 
+% ****** Add justification  " (premiss,+) ---:  pingween" ******
+% ********* INCONSIST DATA *********
+% Befor fixing Database listing :
+% The facts:
+% rms(premiss).
+% rms(has_beak).
+% rms(has_wing).
+% rms(bird).
+% rms(fly).
+% rms(penguin).
+% rms(false).
+% 
+% Justifiers:
+% justifier(penguin,+,j1).
+% justifier(fly,+,j1).
+% justifier(bird,+,j2).
+% justifier(has_beak,+,j3).
+% justifier(has_wing,+,j3).
+% justifier(premiss,+,j4).
+% justifier(premiss,+,j5).
+% justifier(premiss,+,j6).
+% 
+% Justificands:
+% justificand(j1,false).
+% justificand(j2,fly).
+% justificand(j3,bird).
+% justificand(j4,has_beak).
+% justificand(j5,has_wing).
+% justificand(j6,penguin).
+% 
+% 
+% Bad Node: penguin
+% Delete justification: (premiss, +) ---: penguin
+% After fixing Database listing :
+% The facts:
+% rms(premiss).
+% rms(has_beak).
+% rms(has_wing).
+% rms(bird).
+% rms(fly).
+% 
+% Justifiers:
+% justifier(penguin,+,j1).
+% justifier(fly,+,j1).
+% justifier(bird,+,j2).
+% justifier(has_beak,+,j3).
+% justifier(has_wing,+,j3).
+% justifier(premiss,+,j4).
+% justifier(premiss,+,j5).
+% 
+% Justificands:
+% justificand(j1,false).
+% justificand(j2,fly).
+% justificand(j3,bird).
+% justificand(j4,has_beak).
+% justificand(j5,has_wing).
+% 
+% 
+% ****** Delete justification  " (premiss,+) ---:  has_beak " ******
+% Database listing :
+% The facts:
+% rms(premiss).
+% rms(has_wing).
+% 
+% Justifiers:
+% justifier(penguin,+,j1).
+% justifier(fly,+,j1).
+% justifier(bird,+,j2).
+% justifier(has_beak,+,j3).
+% justifier(has_wing,+,j3).
+% justifier(premiss,+,j5).
+% 
+% Justificands:
+% justificand(j1,false).
+% justificand(j2,fly).
+% justificand(j3,bird).
+% justificand(j5,has_wing).
+% 
+% 
+% ****** Add justification  " (premiss,+) ---:  pingween" ******
+% Database listing :
+% The facts:
+% rms(premiss).
+% rms(has_wing).
+% rms(penguin).
+% 
+% Justifiers:
+% justifier(penguin,+,j1).
+% justifier(fly,+,j1).
+% justifier(bird,+,j2).
+% justifier(has_beak,+,j3).
+% justifier(has_wing,+,j3).
+% justifier(premiss,+,j5).
+% justifier(premiss,+,j7).
+%
+%Justificands:
+%justificand(j1,false).
+%justificand(j2,fly).
+%justificand(j3,bird).
+%justificand(j5,has_wing).
+%justificand(j7,penguin).
+%
+%
+%
+%yes
+%| ?- 

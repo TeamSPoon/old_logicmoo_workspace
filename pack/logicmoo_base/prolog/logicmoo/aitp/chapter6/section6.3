@@ -1,0 +1,343 @@
+ne( X, Y ) :- not( X = Y ).
+ac1( VarList, ArcList, NewVarList ) :- !,
+	ac1sub( VarList, ArcList, ArcList, 0, NewVarList ).
+
+ac1sub( VarList, OrigArcList, ArcList, Bit, NewVarList ) :-
+	remove( ( V1, V2, P ), ArcList, NewArcList ),
+	revise( V1, V2, P, VarList, TmpVarList1 ),
+	revise( V2, V1, P, TmpVarList1, TmpVarList2 ),
+	( Bit=0, same_set( VarList, TmpVarList2 ) -> NewBit=0; NewBit=1 ),
+	( NewArcList=[ ], NewBit=0  -> NewVarList=TmpVarList2
+         ;( NewArcList=[ ] -> ac1sub( TmpVarList2, OrigArcList, OrigArcList,
+	   0, NewVarList )
+           ; ac1sub( TmpVarList2, OrigArcList, NewArcList, NewBit, NewVarList ) ) ).
+
+
+revise( V1, V2, P, VarListIn, [ ( V1, NewD1List ) | RestVars ] ) :-
+	remove( ( V1, D1List ), VarListIn, RestVars ),
+	member( ( V2, D2List ), RestVars ),
+	( setof( D1,
+		 D2^( member( D1, D1List ), member( D2, D2List ), apply( P, D1, D2 ) ),
+		 NewD1List )
+          ; writel( [ 'no consistent assignment to ', V1 ] ), nl, !, fail ).
+% writel/1 writes the elements in a list; see Chapter 1
+
+
+ac3( VarList, ArcList, NewVarList ) :- !,
+	ac3sub( VarList, ArcList, ArcList, NewVarList ).
+
+ac3sub( VarList, _, [ ], VarList ) :- !.
+ac3sub( VarList, OrigArcList, ArcList, NewVarList ) :-
+	remove( ( V1, V2, P ), ArcList, TmpArcList ),
+	revise( V1, V2, P, VarList, TmpVarList1 ),
+	revise( V2, V1, P, TmpVarList1, TmpVarList2 ),
+	( same_set( TmpVarList2, VarList ) -> NextArcList = TmpArcList
+	  ; findall( ( V3, V1, P ), ( member( ( V3, V1, P ), OrigArcList ), not( V3=V1 ),
+				    not( V3=V2 ) ),
+		     SuspectArcs ),
+	union( TmpArcList, SuspectArcs, NextArcList ) ),
+	ac3sub( TmpVarList2, OrigArcList, NextArcList, NewVarList ).
+% revise/5 is as above
+% union/3 merges two lists, removing duplicates (see Chapter 1)
+
+same_set( X, Y ) :- 
+	setof( Z, member( Z, X ), L1 ),
+	setof( Z, member( Z, Y ), L2 ),
+	L1=L2.
+
+propagate_interval_constraints( N, NewN ) :-
+	allpairs( N, Q ),			% initialize Q
+	p_i_c( N, N, Q, NewN, _, _ ).		% R, the second argument,
+						% is initialized to N
+
+allpairs( N, Q ) :- size( N, Size ),
+		    allpairs1( Size, Q ).
+
+allpairs1( Size, Q ) :- halfpairs( Size, LowHalf ),
+			bagof( ( X, Y ),
+			       member( ( Y, X ), LowHalf ), HiHalf ),
+			append( LowHalf, HiHalf, Q ).
+
+halfpairs( 1, [ ] ).
+halfpairs( N, L ) :-
+ smaller_eq( N, Ln ),
+ bagof( (M, K), 
+       Lm^( member( M, Ln ),
+            smaller( M, Lm ),
+            member( K, Lm ) ),
+       L).
+
+smaller( 1, [ ] ) :- !.
+smaller( N, [ M | R ] ) :- M is N-1, smaller( M, R ).
+
+smaller_eq( N, L ) :- M is N+1, smaller( M, L ).
+
+
+
+% In p_i_c/6 the first three (input) arguments are previous N, R and Q,
+% and the last three (output) arguments are next N, R and Q.
+
+p_i_c( N, _, [ ], NewN, _, _ ) :- !, NewN=N. % if Q is empty stop
+p_i_c( N, R, [ ( I, J ) | Q ], NewN, NewR, NewQ ) :-
+	fetch( R, I, J, Rij ),
+	store( N, I, J, Rij, TmpN ),
+	size( N, Size ),
+	p_i_c_loop( Size, I, J, TmpN, Q, R, TmpR, TmpQ ), % TmpN was NewN
+	p_i_c( TmpN, TmpR, TmpQ, NewN, NewR, NewQ ).
+
+p_i_c_loop( K, _, _, _, Q, R, NewR, NewQ ) :-
+	K=0, !, Q=NewQ, R=NewR.		% If all intervals processed, stop
+
+p_i_c_loop( K, I, J, N, Q, R, NewR, NewQ ) :-
+	( K=I ; K=J ), !,		% Skip over intervals I and J themselves
+	K1 is K-1,
+	p_i_c_loop( K1, I, J, N, Q, R, NewR, NewQ ).
+
+p_i_c_loop( K, I, J, N, Q, R, NewR, NewQ ) :-
+	fetch( N, K, I, ConKI ),
+	fetch( R, I, J, ConIJ ),
+	constraints( ConKI, ConIJ, ConKJ ),
+	fetch( N, K, J, Nkj ),
+	intersect( Nkj, ConKJ, NewKJ ),
+	( NewKJ=[ ], !, write( 'Network not satisfiable' ), nl,
+	  show_domains(  ), fail ; true ),
+	( same_set( Nkj, NewKJ ) -> ( Tmp1R=R , Tmp1Q=Q )
+	  ; ( store( R, K, J, NewKJ, Tmp1R ),	% Con4 was Con2
+	      Tmp1Q = [ ( K, J ) | Q ] ) ),
+	fetch( N, J, K, ConJK ),
+	constraints( ConIJ, ConJK, ConIK ),
+	fetch( N, I, K, Nik ),
+	intersect( Nik, ConIK, NewIK ),
+	( NewIK=[ ], !, write( 'Network not satisfiable' ), nl, fail ; true ),
+	( same_set( Nik, NewIK ) -> ( Tmp2R=Tmp1R , Tmp2Q=Tmp1Q )
+	  ; ( store( Tmp1R, I, K, NewIK, Tmp2R ),	% Tmp1R was R.
+	      Tmp2Q = [ ( I, K ) | Tmp1Q ] ) ),
+	K1 is K-1,
+	p_i_c_loop( K1, I, J, N, Tmp2Q, Tmp2R, NewR, NewQ ).
+
+
+%
+
+
+constraints( Con1, Con2, Con3 ) :-
+	constraints1( Con1, Con2, Con2, [ ], Con3 ).
+constraints1( [ ], _, _, TmpCon, Con3 ) :- !, Con3 = TmpCon.
+constraints1( [ _ | Con1 ], [ ], OrigCon2, TmpCon, Con3 ) :- !,
+	constraints1( Con1, OrigCon2, OrigCon2, TmpCon, Con3 ).
+constraints1( [ R1 | Con1 ], [ R2 | Con2 ], OrigCon2, TmpCon, Con3 ) :-
+	trans( R1, R2, Con4 ),
+	union( TmpCon, Con4, NewTmpCon ),
+	constraints1( [ R1 | Con1 ], Con2, OrigCon2, NewTmpCon, Con3 ).
+
+% intersect/3 intersects two lists (see Chapter 1); union/3} is as above
+
+test1(X) :- 
+ac1([(a,[red]),(b,[red,green,blue]),(c,[red,green,blue]),(d,[red,green,blue]),(e,[red,green,blue])],[(a,b,ne),(a,c,ne),(a,d,ne),(a,e,ne),(b,c,ne),(c,d,ne),(d,e,ne)],X).
+
+test2(X) :- 
+ac1([(a,[red]),(b,[red,green,blue])], [(a,b,ne)], X).
+
+test3(X) :- 
+ac3([(a,[red]),(b,[red,green,blue]),(c,[red,green,blue]),(d,[red,green,blue]),(e,[red,green,blue])],[(a,b,ne),(a,c,ne),(a,d,ne),(a,e,ne),(b,c,ne),(c,d,ne),(d,e,ne)],X).
+
+test4(X) :- 
+ac3([(a,[red]),(b,[red,green,blue])], [(a,b,ne)], X).
+
+con :- [constraints].
+
+trans(b,b,[b]).
+trans(b,a,[b,a,d,di,o,oi,m,mi,s,si,e,ei,=]).
+trans(b,d,[b,o,m,d,s]).
+trans(b,di,[b]).
+trans(b,o,[b]).
+trans(b,oi,[b,o,m,d,s]).
+trans(b,m,[b]).
+trans(b,mi,[b,o,m,d,s]).
+trans(b,s,[b]).
+trans(b,si,[b]).
+trans(b,e,[b,o,m,d,s]).
+trans(b,ei,[b]).
+trans(a,b,[b,a,d,di,o,oi,m,mi,s,si,e,ei,=]).
+trans(a,a,[a]).
+trans(a,d,[a,oi,mi,d,e]).
+trans(a,di,[a]).
+trans(a,o,[a,oi,mi,d,e]).
+trans(a,oi,[a]).
+trans(a,m,[a,oi,mi,d,e]).
+trans(a,mi,[a]).
+trans(a,s,[a,oi,mi,d,e]).
+trans(a,si,[a]).
+trans(a,e,[a]).
+trans(a,ei,[a]).
+trans(d,b,[b]).
+trans(d,a,[a]).
+trans(d,d,[d]).
+trans(d,di,[b,a,d,di,o,oi,m,mi,s,si,e,ei,=]).
+trans(d,o,[b,o,m,d,s]).
+trans(d,oi,[a,oi,mi,d,e]).
+trans(d,m,[b]).
+trans(d,mi,[a]).
+trans(d,s,[d]).
+trans(d,si,[a,oi,mi,d,e]).
+trans(d,e,[d]).
+trans(d,ei,[b,o,m,d,s]).
+trans(di,b,[b,o,m,di,ei]).
+trans(di,a,[a,oi,di,mi,si]).
+trans(di,d,[o,oi,d,di,=]).
+trans(di,di,[di]).
+trans(di,o,[o,di,ei]).
+trans(di,oi,[oi,di,si]).
+trans(di,m,[o,di,ei]).
+trans(di,mi,[oi,di,si]).
+trans(di,s,[o,di,ei]).
+trans(di,si,[di]).
+trans(di,e,[oi,di,si]).
+trans(di,ei,[di]).
+trans(o,b,[b]).
+trans(o,a,[a,oi,di,mi,si]).
+trans(o,d,[o,d,s]).
+trans(o,di,[b,o,m,di,ei]).
+trans(o,o,[b,o,m]).
+trans(o,oi,[o,oi,d,di,=]).
+trans(o,m,[b]).
+trans(o,mi,[oi,di,si]).
+trans(o,s,[o]).
+trans(o,si,[o,di,ei]).
+trans(o,e,[o,d,s]).
+trans(o,ei,[di]).
+trans(oi,b,[b,o,m,di,ei]).
+trans(oi,a,[a]).
+trans(oi,d,[oi,d,e]).
+trans(oi,di,[a,oi,di,mi,si]).
+trans(oi,o,[o,oi,d,di,=]).
+trans(oi,oi,[a,oi,mi]).
+trans(oi,m,[oi,di,ei]).
+trans(oi,mi,[a]).
+trans(oi,s,[oi,d,e]).
+trans(oi,si,[a,oi,mi]).
+trans(oi,e,[oi]).
+trans(oi,ei,[oi,di,si]).
+trans(m,b,[b]).
+trans(m,a,[a,oi,di,mi,si]).
+trans(m,d,[o,d,s]).
+trans(m,di,[b]).
+trans(m,o,[b]).
+trans(m,oi,[o,d,s]).
+trans(m,m,[b]).
+trans(m,mi,[e,ei,=]).
+trans(m,s,[m]).
+trans(m,si,[m]).
+trans(m,e,[o,d,s]).
+trans(m,ei,[b]).
+trans(mi,b,[b,o,m,di,ei]).
+trans(mi,a,[a]).
+trans(mi,d,[oi,d,e]).
+trans(mi,di,[a]).
+trans(mi,o,[oi,d,e]).
+trans(mi,oi,[a]).
+trans(mi,m,[s,si,=]).
+trans(mi,mi,[a]).
+trans(mi,s,[oi,d,e]).
+trans(mi,si,[a]).
+trans(mi,e,[mi]).
+trans(mi,ei,[mi]).
+trans(s,b,[b]).
+trans(s,a,[a]).
+trans(s,d,[d]).
+trans(s,di,[b,o,m,di,ei]).
+trans(s,o,[b,o,m]).
+trans(s,oi,[oi,d,e]).
+trans(s,m,[b]).
+trans(s,mi,[mi]).
+trans(s,s,[s]).
+trans(s,si,[s,si,=]).
+trans(s,e,[d]).
+trans(s,ei,[b,o,m]).
+trans(si,b,[b,o,m,di,ei]).
+trans(si,a,[a]).
+trans(si,d,[oi,d,e]).
+trans(si,di,[di]).
+trans(si,o,[o,di,ei]).
+trans(si,oi,[oi]).
+trans(si,m,[o,di,ei]).
+trans(si,mi,[mi]).
+trans(si,s,[s,si,=]).
+trans(si,si,[si]).
+trans(si,e,[oi]).
+trans(si,ei,[di]).
+trans(e,b,[b]).
+trans(e,a,[a]).
+trans(e,d,[d]).
+trans(e,di,[a,oi,di,mi,si]).
+trans(e,o,[o,d,s]).
+trans(e,oi,[a,oi,mi]).
+trans(e,m,[m]).
+trans(e,mi,[a]).
+trans(e,s,[d]).
+trans(e,si,[a,oi,mi]).
+trans(e,e,[e]).
+trans(e,ei,[e,ei,=]).
+trans(ei,b,[b]).
+trans(ei,a,[a,oi,di,mi,si]).
+trans(ei,d,[o,d,s]).
+trans(ei,di,[di]).
+trans(ei,o,[o]).
+trans(ei,oi,[oi,di,si]).
+trans(ei,m,[m]).
+trans(ei,mi,[oi,di,si]).
+trans(ei,s,[o]).
+trans(ei,si,[di]).
+trans(ei,e,[e,ei,=]).
+trans(ei,ei,[ei]).
+trans(=, R, [R]).
+trans(R, =, [R]).
+
+size( M, Num ) :- array_length( M, Num ), row_size( M, Num, 1 ).
+
+row_size( M, Num, Where ) :- Where is Num+1
+                           ; array_fetch( Where, M, Row ),
+			     array_length( Row, Num ),
+			     NewWhere is Where+1,
+			     row_size( M, Num, NewWhere ).
+
+fetch( M, I, J, Value ) :- array_fetch( I, M, Row ), array_fetch( J, Row, Value ).
+
+store( M, I, J, Value, NewM ) :- array_fetch( I, M, Row ),
+                               array_store( J, Row, Value, NewRow ),
+			       array_store( I, M, NewRow, NewM ).
+
+setup( Arr, Size ) :- array_length( TmpArr, Size ),
+	            row_setup( TmpArr, Size, 1, Arr ).
+
+row_setup( Arr, Num, Where, NewArr ) :-
+     Where is Num+1
+     ; array_length( NewRow, Num ),
+       array_store( Where, Arr, NewRow, TmpArr ),
+       NewWhere is Where+1,
+       row_setup( TmpArr, Num, NewWhere, NewArr ).
+
+list_to_array2D( L, A ) :- list_to_array( [ ], TmpA ),
+			   list_to_part2D( TmpA, L, A ).
+
+list_to_part2D( A, [ First | Rest ], NewA ) :- list_to_array( First, Row ),
+					       array_to_list( A, L ),
+					       append( L, [ Row ], NewL ),
+					       list_to_array( NewL, TmpA ),
+					       list_to_part2D( TmpA, Rest, NewA ).
+list_to_part2D( A, [ ], A ).
+
+array_to_list2D( A, L ) :- array_to_list( A, Rows ),
+			   convert_rows( Rows, [], L ).
+
+convert_rows( [], L, L ).
+convert_rows( [ R | Rows ], L, NewL ) :- array_to_list( R, Row ),
+					 append( L, [ Row ], TmpL ),
+					 convert_rows( Rows, TmpL, NewL ).
+
+prop_test( NewL ) :- All=[ b,a,d,di,o,oi,m,mi,s,si,e,ei,= ],
+		     list_to_array2D( [ [ [ = ],  [ d ], All,   All ],
+					[ [ di ], [ = ], [ a ], [ b ] ],
+					[ All,    [ b ], [ = ], [ b ] ],
+					[ All,    [ a ], [ a ], [ = ] ] ], N ),
+		     propagate_interval_constraints( N, NewN ),
+		     array_to_list2D( NewN, NewL ).

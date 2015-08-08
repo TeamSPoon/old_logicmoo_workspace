@@ -1,0 +1,21 @@
+
+meta_query((A,B)) :- !, meta_query(A), meta_query(B).
+ meta_query(A) :- system(A), !, A.
+ meta_query(A) :- clause(A,B), meta_query(B).
+ meta_query(A) :- 
+  not(clause(A,_)), ground(A),
+  nl,writel(['Should the goal ',A,' succeed? ']), 
+  read(yes). 
+ meta_query(A) :- 
+  not(ground(A)), %  askable(A),
+  (nl,writel(['Should the goal ',A,' succeed ? ']), 
+   (read(yes) -> true ; !, fail), 
+   nl,writel(['Which instantiation of ',A,' should succeed? ']),
+   read(A)
+   ;
+   repeat,
+   nl,writel(['Should the goal ',A,' succeed again? ']), 
+   (read(yes) ; !, fail), 
+   nl,writel(['Which other instantiation of ',A,' should succeed? ']),
+   read(A)). 
+  

@@ -1,0 +1,52 @@
+  %  Depth-first search, without side effects 
+  depth_first_search(Start, GoalPred, Sol) :- 
+	  dfs([[Start]], [ ], GoalPred, Sol).
+
+  %  The first argument to progfont dfs is the OPEN stack, 
+  %  the second argument is the CLOSED list 
+  dfs([[Node | Path]  |   _  ],  _  , GoalPred, [Node | Path]) :- 
+	  Goal =.. [GoalPred,Node], 
+	  Goal. 
+  dfs([[Node | Path] | MoreOPEN], CLOSED, GoalPred, Sol) :- 
+	  % find the  new neighbors of the first OPEN node  
+	  %and add the current path to each of them: 
+	  findall(
+		  [Next,Node | Path], 
+		  (
+		    arc(Node, Next),
+		    not(lmember([Next |  _  ], [[Node | Path]  |  MoreOPEN])), 
+		    not(lmember(Next, CLOSED))
+		  ), 
+		  NewPaths
+		     ), 
+	  % place the new paths on top of the stack: 
+	  append(NewPaths, MoreOPEN, NewOPEN), 
+	  dfs(NewOPEN, [Node | CLOSED], GoalPred, Sol).
+
+
+
+
+
+
+  %Depth-first search, with side effects   
+  depth_first_search_alt(Start, GoalPred, Sol) :-
+	  retractall(marked( _  )), 
+	  asserta(marked(Start)), 
+	  dfs_alt(Start, GoalPred, Sol), !,
+	  retractall(marked( _  )). 
+  depth_first_search_alt( _  , _  , _  ) :- 
+	  retractall(marked( _  )), 
+	  fail. 
+
+  dfs_alt(Node, GoalPred, [Node]) :- 
+	  Goal =.. [GoalPred,Node], 
+	  Goal. 
+  dfs_alt(Node, Goal, [Node | Path]):-
+	  arc(Node, Next),
+	  unmarked(Next),
+	  dfs_alt(Next, Goal, Path).
+
+  unmarked(Node):- 
+	  not(marked(Node)), 
+	  assert(marked(Node)).
+

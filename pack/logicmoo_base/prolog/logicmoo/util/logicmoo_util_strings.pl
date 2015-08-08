@@ -189,47 +189,6 @@ term_to_string(I,IS):- grtrace(term_to_atom(I,A)),string_to_atom(IS,A),!.
 
 :-multifile(user:package_path/2).
 
-:- meta_predicate(if_file_exists(:)).
-if_file_exists(M:Call):- arg(1,Call,File),(filematch(File,_)-> must((filematch(File,X),exists_file(X),call(M:Call)));fmt(not_installing(M,Call))),!.
-
-:- use_module(library(url)).
-:- if_file_exists(use_module(library(http/http_open))).
-:- use_module(library(http/http_ssl_plugin)).
-
-file_to_stream_ssl_verify(_SSL, _ProblemCert, _AllCerts, _FirstCert, _Error) :- !.
-:- export(text_to_stream/2).
-text_to_stream(Text,Stream):-text_to_string(Text,String),string_codes(String,Codes),open_codes_stream(Codes,Stream).
-:- export(file_to_stream/2).
-file_to_stream((StreamIn),Stream):-is_stream(StreamIn),!,copy_stream(StreamIn,Stream).
-file_to_stream(stream(StreamIn),Stream):-copy_stream(StreamIn,Stream).
-file_to_stream('$socket'(Sock),Stream):-tcp_open_socket('$socket'(Sock),StreamIn),copy_stream(StreamIn,Stream).
-file_to_stream(ftTerm(Text),Stream):-term_to_string(Text,String),string_codes(String,Codes),open_codes_stream(Codes,Stream).
-file_to_stream(text(Text),Stream):-text_to_stream(Text,Stream).
-file_to_stream(codes(Text),Stream):-text_to_stream(Text,Stream).
-file_to_stream(chars(Text),Stream):-text_to_stream(Text,Stream).
-file_to_stream(atom(Text),Stream):-text_to_stream(Text,Stream).
-file_to_stream(string(Text),Stream):-text_to_stream(Text,Stream).
-file_to_stream(file(Spec),Stream):-file_to_stream(Spec,Stream).
-file_to_stream(exfile(File),Stream):-!,read_file_to_codes(File,Codes,[expand(true)]),open_codes_stream(Codes,Stream).
-file_to_stream(match(Spec),Stream):-!,filematch(Spec,File),exists_file(File),!,file_to_stream(exfile(File),Stream).
-file_to_stream(package(Pkg,LocalPath),Stream) :-!,
-   user:package_path(Pkg,PkgPath),
-   % build global path
-   atomic_list_concat([PkgPath|LocalPath], '/',  GlobalPath),file_to_stream(GlobalPath,Stream).
-file_to_stream(Spec,Stream):-compound(Spec),!,file_to_stream(match(Spec),Stream).
-file_to_stream(URL,Stream):-atom_contains(URL,":/"),sub_string(URL,0,4,_,'http'), !, http_open(URL,HTTP_Stream,[ cert_verify_hook(file_to_stream_ssl_verify)]),copy_stream(HTTP_Stream,Stream),!.
-file_to_stream(URL,Stream):-atom_concat('file://', File, URL),!,file_to_stream(File,Stream).
-file_to_stream(URL,Stream):-atom_concat('file:', File, URL),!,file_to_stream(File,Stream).
-file_to_stream(URL,Stream):-atomic_list_concat_safe(['package://',Pkg,'/', Path], URL),file_to_stream(package(Pkg,Path),Stream).
-file_to_stream(URL,Stream):-atomic_list_concat_safe([Pkg,'://',Path],URL),file_to_stream(package(Pkg,Path),Stream).
-file_to_stream(Spec,Stream):-file_to_stream(match(Spec),Stream).
-
-user:package_path(Pkg,PkgPath):-expand_file_search_path(pack(Pkg),PkgPathN),exists_directory(PkgPathN),normalize_path(PkgPathN,PkgPath).
-user:package_path(Pkg,PkgPath):-atom(Pkg),T=..[Pkg,'.'],expand_file_search_path(T,PkgPathN),exists_directory(PkgPathN),normalize_path(PkgPathN,PkgPath).
-
-:- export(copy_stream/2).
-copy_stream(HTTP_Stream,Stream):-read_stream_to_codes(HTTP_Stream,Codes),catch(close(HTTP_Stream),_,true),open_codes_stream(Codes,Stream).
-
 :- export(atomic_concat/3).
 atomic_concat(A,B,C,Out):-atomic_list_concat_safe([A,B,C],Out).
 

@@ -1,0 +1,59 @@
+| ?- atms_add_just((brazil, brazil_means_meat), meat),
+atms_add_just((meat, quindim), coke69),
+atms_add_just((brazil, cafezinho), coke69),
+atms_add_just((irish), meat),
+atms_add_just((irish, meat),coke69),
+atms_add_just((lamb), coke69).
+yes
+
+| ?- explaine(coke69).
+
+ There is no way to explaine "coke69"
+yes
+
+| ?- declare_assumption(brazil),
+declare_assumption(brazil_means_meat),
+declare_assumption(quindim),
+declare_assumption(cafezinho),
+declare_assumption(irish),
+declare_assumption(lamb),
+declare_assumption(meat).
+yes
+
+| ?- explaine(coke69).
+
+ Explenation for: "coke69"
+ {irish }
+ {quindim meat }
+ {brazil brazil_means_meat quindim }
+ {lamb }
+ {brazil cafezinho }
+yes
+
+| ?- atms_add_just((brazil), meat),
+atms_add_just((lamb), meat).
+yes
+
+| ?- explaine(coke69).
+
+ Explenation for: "coke69"
+ {irish }
+ {brazil quindim }
+ {quindim meat }
+ {lamb }
+ {brazil cafezinho }
+yes
+
+| ?- atms_add_just((brazil), batida),
+atms_add_just((batida, cafezinho), false).
+yes
+
+| ?- explaine(coke69).
+
+ Explenation for: "coke69"
+ {irish }
+ {brazil quindim }
+ {quindim meat }
+ {lamb }
+yes
+| ?- 

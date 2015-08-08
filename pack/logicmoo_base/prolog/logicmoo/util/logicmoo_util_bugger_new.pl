@@ -3096,7 +3096,7 @@ source_file0(F):-prolog_load_context(file, F).
 source_file0(F):-prolog_load_context(source, F).
 source_file0(F):-seeing(X),is_stream(X),stream_property(X,file_name(F)),exists_file(F).
 source_file0(F):-prolog_load_context(stream, S),stream_property(S,file_name(F)),exists_file(F).
-source_file0(F):-findall(E,(stream_property( S,mode(read)),stream_property(S,file_name(E)),exists_file(E),line_count(S,C),C>1),L),last(L,F).
+source_file0(F):-findall(E,catch((stream_property( S,mode(read)),stream_property(S,file_name(E)),exists_file(E),line_count(S,C),C>0),_,fail),L),last(L,F).
 
 
 source_variables_l(AllS):-

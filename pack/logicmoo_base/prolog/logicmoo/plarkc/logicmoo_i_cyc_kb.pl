@@ -205,8 +205,8 @@ argQuotedIsa(P,N,C):-exactlyAssertedEL(argQuotedIsa,P,N,C,_,_).
 % queuedTinyKB(ist(MT,CycL)):-tDressedMt(MT),queuedTinyKB(CycL,MT).
 
 
-ist(MT,P):-tinyKB(P,MT,vStrMon).
-ist(MT,P):-tinyKB(P,MT,vStrDef).
+ist_tiny(MT,P):-tinyKB(P,MT,vStrMon).
+ist_tiny(MT,P):-tinyKB(P,MT,vStrDef).
 
 tinyKB(P):-tUndressedMt(MT),tinyKB(P,MT,_).
 tinyKB(ist(MT,P)):-tDressedMt(MT),tinyKB(P,MT,_).

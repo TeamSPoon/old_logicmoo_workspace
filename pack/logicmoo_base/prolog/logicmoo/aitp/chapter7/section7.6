@@ -1,0 +1,203 @@
+ 
+% Propagate evidence up. If the ariving message is the same as the previus
+% message then ther is nothing to propagate .
+propagateUp(N, Sender, Message) :-
+	struct(N, _, ChildList, _), 
+ 	same_message(ChildList, Sender, Message), ! .
+propagateUp(N, Sender, Message) :-
+ 	retract(struct(N, Pmessage, ChildList, Matrix)), 
+	replace_sender(ChildList, Sender, Message, NewChildList),
+ 	assert(struct(N, Pmessage, NewChildList, Matrix)), 
+	pi(N, Pi),
+	lambda(N, La),
+ 	arc(Pname, N),
+	(Pname = null, ! ; 
+		% Send message to parent
+		up_message(Matrix, La, UpMessage),
+		propagateUp(Pname, N, UpMessage) ),
+	% Send messages to childs.
+	remove_sender(NewChildList, Sender, SendList),
+	send_to_child(SendList, La, Pi ).
+
+
+% Check if the new message recived from the Sender is the same as 
+% the previus message recevied from it.
+same_message([[Sender, M1, M2] | _], Sender, [M1, M2]).
+same_message([[Sender, _, _] | _], Sender, _) :- !, fail.
+same_message([_ | More], Sender, Message) :- 
+	same_message(More, Sender, Message).
+
+% Replace the old message from Sender with the new one.  
+replace_sender([[Sender, _, _] | More], Sender, [M1, M2], [[Sender, M1, M2] | More]).
+replace_sender([S | More], Sender, Message, [S | Res]) :- replace_sender(More, Sender, Message, Res).
+
+% Remove sender from the list.
+remove_sender([[Sender, _, _] |More], Sender, More).
+remove_sender([Child | More], Sender, [Child | Res]) :- remove_sender(More, Sender, Res).
+
+
+% Send message to every child.
+send_to_child([ ], _, _).
+send_to_child([[Child, M1, M2] | More] , [La1, La2], Pi) :-
+	T1 is La1 / M1,
+	T2 is La2 / M2,
+	belief(Pi, [T1,T2], Bel),
+	propagateDn(Child,  Bel),
+	send_to_child(More,  [La1, La2], Pi).
+
+
+% Propagate messages down. If the message from the parent is the
+% same as the previus message then ignore it.
+propagateDn(N,  [M1, M2]) :-struct(N, [M1, M2], _, _). 
+propagateDn(N,  [M1, M2]) :- 
+	retract(struct(N, _, ChildList, Matrix)), 
+ 	assert(struct(N, [M1, M2], ChildList, Matrix)), 
+	pi(N, Pi),
+	lambda(N, La),
+  	% Send messages to childs.
+  	send_to_child(ChildList,  La, Pi).
+
+
+% Record new evidence. Evidence can be recorded for leafs only.	
+add_evidence(N, _) :-
+ 	arc(N, _),
+	write('Error.  Evidence can be recorded for leaf nodes only.'), nl, !,abort.
+add_evidence(N, Evidence) :-
+	retractall(evidence(N,_)),
+	assert(evidence(N, Evidence)),
+	arc(Parent, N),
+	struct(N, _, _, Matrix),
+	(Evidence = true, !, Lambda = [1,0] ; Lambda = [0,1]),
+	up_message(Matrix, Lambda, Message),!,
+	propagateUp(Parent, N, Message).
+
+% remove evidence
+remove_evidence(N) :-
+	retractall(evidence(N,_)),
+	arc(Parent, N),
+	struct(N, _, _, Matrix),
+	up_message(Matrix, [1,1], Message),!,
+	propagateUp(Parent, N, Message).
+
+
+
+% Calculate the pi value of N.  If N is the root then Pi is the prior
+pi(N, [Pi1, Pi2]) :-
+	struct(N, [P1, P2], _ , [M11, M12, M21, M22]),
+	Pi1 is P1*M11 + P2*M21,
+	Pi2 is P1*M12 + P2*M22 .
+
+ 
+% Calculater the lambda value of the node. There is cases here:
+% 1. N is an uninstantiated leaf - La = [1,1]
+% 2. N is instantiated leaf - there is evidence about N 
+%	La =iff(Evidence = true, [1,0], [0,1]
+% 3. N is not a leaf - compute La.
+lambda(N,[1,1]) :- 
+	not(arc(N, _)), 
+	not(evidence(N,_)), !.
+lambda(N, La) :-
+	not(arc(N,_)), !,
+	evidence(N, Evidence),
+	(Evidence = true, !, La = [1,0] ; La=[0,1]).
+lambda(N, La) :-
+	struct(N, _, ChildList, _),
+	lambda1(ChildList, La).
+
+lambda1([ ], [1,1]).
+lambda1([[_, ChildLambda1, ChildLambda2] | More] , [La1, La2]) :-
+	lambda1(More, [Temp1, Temp2]),
+	La1 is ChildLambda1 * Temp1,
+	La2 is ChildLambda2 * Temp2.
+  
+% Calculate the node belife.
+belief([Pi1, Pi2], [La1, La2], [B1, B2]) :-
+ 	T1 is La1 * Pi1,
+	T2 is La2*Pi2,
+	N is T1+T2,
+	B1 is T1 / N,
+	B2 is T2 / N.
+ 
+% Calculate message to parent.
+up_message([M11, M12, M21, M22] , [La1, La2], [Up1, Up2]) :-
+	Up1 is La1*M11 + La2*M12,
+	Up2 is La1*M21 + La2* M22.
+ 
+
+% Calculate the node current state belife
+state(N, Bel) :- 
+	evidence(N,Evidence), !,
+	(Evidence = true, !, Bel = [1,0] ; Bel = [0,1]).
+state(N, Bel) :-
+	pi(N, Pi),
+	lambda(N, La),
+	belief(Pi, La, Bel).
+
+
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Utilities
+not(X) :- X, !, fail.
+not(_).
+
+doall(X) :- X, fail.
+doall(_).
+
+
+
+
+
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Database
+:- dynamic struct/4, evidence/2.
+% arc(null,a).
+% arc(a, c).
+% arc(a,r).
+
+% prior(a, [0.4,0.6]).
+% matrix(a,  [0.4, 0.6, 0.4,0.6]).
+% matrix(c,[0.8, 0.2, 0.3,0.7]).
+% matrix(r, [0.6, 0.4, 0.1, 0.9]).
+
+
+
+
+init :- 
+	retractall(struct(_,_,_,_)),
+	retractall(evidence(_,_)),
+	arc(null, Root),
+	create_structure(Root),
+  	propagateDn(Root, [1,0]).
+ 
+create_structure(N) :-
+	findall([Child, 1,1], 
+		(arc(N,Child), create_structure(Child)),
+		ChildList),
+	matrix(N, Matrix),
+	assert(struct(N, [0,0], ChildList, Matrix)), !.
+
+dp :- display_probabilities.
+display_probabilities :- show([bonus, money, hawaii, san_francisco, surf, people]).
+show([ ]).
+show([N|L]) :- 
+	state(N, [B1, _]), 
+	write('Probability of  '), write(N), write(': '), write(B1), nl,
+	show(L).
+ 
+ 
+arc(null, bonus).
+arc(bonus, money).
+arc(money, hawaii).
+arc(money, san_francisco).
+arc(hawaii, surf).
+arc(san_francisco, people).
+
+matrix(bonus, [0.6, 0.4, 0.6, 0.4]).
+matrix(money, [ 0.8, 0.2, 0.3, 0.7 ]).
+matrix(hawaii, [ 0.7, 0.3, 0.1, 0.9 ]).
+matrix(san_francisco, [ 0.2, 0.8, 0.5, 0.5 ]).
+matrix(people, [ 0.95, 0.05, 0.6, 0.4 ]).
+matrix(surf, [ 0.75, 0.25, 0.2, 0.8 ]).
+
+	

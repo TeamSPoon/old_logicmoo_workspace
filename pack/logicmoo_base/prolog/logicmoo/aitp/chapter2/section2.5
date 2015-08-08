@@ -1,0 +1,53 @@
+
+  %Inefficient breadth-first search   
+  %(almost identical to the depth-first search program) 
+
+  breadth_first_search_slow(Start, GoalPred, Sol) :- 
+	  bfs_slow([[Start]], [ ], GoalPred, Sol).
+
+  bfs_slow([[Node | Path]  |   _  ],  _  , GoalPred, [Node | Path]) :- 
+	  Goal =.. [GoalPred, Node], 
+	  Goal. 
+  bfs_slow([[Node | Path]  |  MoreOPEN], CLOSED, GoalPred, Sol) :- 
+	  findall(
+		  [Next,Node | Path], 
+		  (
+		    arc(Node, Next),
+		    not(lmember([Next |  _  ], [[Node | Path]  |  MoreOPEN])), 
+		    not(lmember(Next, CLOSED))
+		  ), 
+		  NewPaths
+		    ), 
+	  %place the new paths at the  bottom of the queue: 
+	  append(MoreOPEN, NewPaths, NewOPEN), 
+	  bfs_slow(NewOPEN, [Node | CLOSED], GoalPred, Sol).
+
+
+  % More efficient breadth-first search  
+
+  breadth_first_search(Start, GoalPred, Sol) :- 
+	  bfs([[Start]  |  Qtail], Qtail, [ ], GoalPred, Sol).
+
+  %if the queue is empty, fail 
+  bfs(OPEN,Qtail, _  , _  , _  ) :- 
+	  OPEN==Qtail, !, 
+	  fail. 
+  %otherwise, as in the previous implementation: 
+  bfs([[Node | Path]  |   _  ],  _  ,  _  , GoalPred, [Node | Path]) :- 
+	  Goal =.. [GoalPred, Node], 
+	  Goal. 
+  bfs([[Node | Path]  |  MoreOPEN], Qtail, CLOSED, GoalPred, Sol) :- 
+	  findall(
+		  [Next,Node | Path], 
+		  (
+		    arc(Node, Next),
+		    not(lmember([Next |  _  ], [[Node | Path]  |  MoreOPEN])), 
+		    not(lmember(Next, CLOSED))
+		  ), 
+		  NewPaths
+		     ), 
+	  %and here is where the difference list pays off:  
+	  append(NewPaths, NewQtail, Qtail), 
+	  bfs(MoreOPEN, NewQtail, [Node | CLOSED], GoalPred, Sol).
+
+

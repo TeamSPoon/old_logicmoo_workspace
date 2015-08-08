@@ -182,10 +182,12 @@ list_to_conjuncts(OP,[H|T],Body):-!,
     conjoin_op(OP,HH,TT,Body).
 list_to_conjuncts(_,H,H).
 
-conjoin(Var,B,(Var,B)):-var(Var),!.
-conjoin(B,Var,(B,Var)):-var(Var),!.
+conjoin(A,B,C):-A==B,!,C=A.
+conjoin(A,B,(A,B)):- (var(A);var(B)),!.
 conjoin((A1,A),B,(A1,C)):-!,conjoin(A,B,C).
-conjoin(A,B,C):-conjoin_op((,),A,B,C).
+conjoin(true,C,C):-!.
+conjoin(C,true,C):-!.
+conjoin(A,B,(A,B)).
 
 %= conjoin_op(OP,+Conjunct1,+Conjunct2,?Conjunction).
 %= arg4 is a simplified expression representing the conjunction of
@@ -238,53 +240,6 @@ makeArgIndexes(_NEW,_F).
 
 flatten_dedupe(Percepts0,Percepts):-
    flatten([Percepts0],Percepts1),remove_dupes(Percepts1,Percepts).
-
-
-% peekAttributes/2,pushAttributes/2,pushCateElement/2.
-:- module_transparent((asserta_new/1,asserta_if_new/1,assertz_new/1,assertz_if_new/1,assert_if_new/1,assertz_if_new_clause/1,assertz_if_new_clause/2,clause_asserted/2,as_clause/2,clause_asserted/1,eraseall/2)).
-:- meta_predicate asserta_new(?),asserta_if_new(?),assertz_new(?),assertz_if_new(?),assert_if_new(?),assertz_if_new_clause(?),assertz_if_new_clause(?,?).
-:- meta_predicate clause_asserted(-,-),as_clause(-,-,-),clause_asserted(-),eraseall(-,-).
-
-asserta_new(_Ctx,NEW):-ignore((retract(NEW),fail)),asserta(NEW).
-writeqnl(_Ctx,NEW):- fmt('~q.~n',[NEW]),!.
-
-eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,B,X),erase_safe(clause(M:C,B,X),X))).
-eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,B,X),erase_safe(clause(M:C,B,X),X))).
-
-asserta_new(NEW):-ignore((retract(NEW),fail)),asserta(NEW).
-assertz_new(NEW):-ignore((retract(NEW),fail)),assertz(NEW).
-
-assert_if_new(N):-clause_asserted(N)->true;asserta(N).
-
-assertz_if_new(N):-clause_asserted(N)->true;assertz(N).
-
-asserta_if_new(N):-clause_asserted(N)->true;asserta(N).
-
-assertz_if_new_clause(C):- as_clause(C,H,B),assertz_if_new_clause(H,B).
-
-assertz_if_new_clause(H,B):-clause_asserted(H,B),!.
-assertz_if_new_clause(H,B):-assertz((H:-B)).
-
-as_clause( M:((H :- B)),M:H,B):-!.
-as_clause( ((H :- B)),H,B):-!.
-as_clause( H,  H,  true).
-
-clause_asserted(C):- as_clause(C,H,B),!,clause_asserted(H,B).
-% clause_asserted(H,B):- predicate_property(H,number_of_clauses(N)),N>0, \+ \+ ((numbervars(H:B),clause(H,B))).
-clause_asserted(_:H,B):-!,clause_asserted(H,B).
-clause_asserted(H,B):- predicate_property(H,number_of_clauses(N)),N>0,
-  clause_asserted_0(H,B).
-
-clause_asserted_0(H,B):-
-  copy_term(H:B,HH:BB),!, clause(HH, BB, Ref),(clause(Head, Body, Ref)),=@=(B,Body), =@=(H,Head),!.
-
-same_body(B,Body):-same_heads(B,Body).
-
-same_heads(H,Head):-H=@=Head,!.
-same_heads(M1:H,M2:Head):-H=@=Head,!,call(dmsg(warn(same_heads(M1:H,M2:Head)))).
-same_heads(H,M2:Head):-H=@=Head,!,nop(dmsg(warn(same_heads(_M1:H,M2:Head)))).
-same_heads(M1:H,Head):-H=@=Head,!,nop(dmsg(warn(same_heads(M1:H,_M2:Head)))).
-
 
 % :- ensure_loaded(logicmoo_util_bugger).
 
@@ -427,25 +382,6 @@ weak_nd_subst2( _X, _Sk, L, L ).
 make_list(E,1,[E]):-!.
 make_list(E,N,[E|List]):- M1 is N - 1, make_list(E,M1,List),!.
 
-:- meta_predicate get_module_of_4(0,+,+,-).
-get_module_of_4(_P,F,A,ModuleName):- current_module(ModuleName),module_property(ModuleName, exports(List)),member(F/A,List),!.
-get_module_of_4(_P,F,A,M):- current_predicate(M0:F0/A0),F0=F,A0=A,!,M=M0.
-get_module_of_4(P,F,A,M):-trace_or_throw((get_module_of_4(P,F,A,M))).
-
-/*
-get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,user:mpred_mod(M).
-get_module_of_4(_P,F,A,_M):-trace, isCycPredArity(F,A),!,fail.
-get_module_of_4(P,F,A,M):- trace, debugCall(get_module_of_4(P,F,A,M)).
-*/
-
-:- meta_predicate get_module_of(0,-).
-get_module_of(V,M):-var(V),!,current_module(M).
-get_module_of(F/A,M):-!,functor_catch(P,F,A),!,get_module_of(P,M).
-get_module_of(P,M):-predicate_property(P,imported_from(M)),!.
-get_module_of(P,M):-predicate_property(_:P,imported_from(M)),!.
-get_module_of(MM:_,M):-!,MM=M.
-get_module_of(P,M):-functor_catch(P,F,A),get_module_of_4(P,F,A,M).
-
 :- export(flatten_set/2).
 flatten_set(L,S):-flatten([L],F),list_to_set(F,S),!.
 %flatten_set(Percepts0,Percepts):- flatten([Percepts0],Percepts1),remove_dupes(Percepts1,Percepts).
@@ -518,49 +454,6 @@ at_start(Goal):-
 		 (retractall(at_started(Named2)),trace_or_throw(E)))
 	).
 
-dynamic_multifile(Pred/N):-
-   dynamic(Pred/N),
-   multifile(Pred/N),
-   module_transparent(Pred/N).
-
-
-:-dynamic_multifile(local_directory_search/1).
-
-local_directory_search_combined(X):-local_directory_search(X).
-local_directory_search_combined(X):-local_directory_search_combined2(X).
-% for now dont do the concat 3 version
-local_directory_search_combined(PL):-local_directory_search_combined2(A),local_directory_search(B),join_path(A,B,PL),exists_directory_safe(PL).
-local_directory_search_combined2(PL):-local_directory_search(A),local_directory_search(B),join_path(A,B,PL),exists_directory_safe(PL).
-
-
-
-dynamic_transparent([]):-!.
-dynamic_transparent([X]):-dynamic_transparent(X),!.
-dynamic_transparent([X|Xs]):-!,dynamic_transparent(X),dynamic_transparent(Xs),!.
-dynamic_transparent(M:F/A):-!, module_transparent(M:F/A),dynamic(M:F/A).
-dynamic_transparent(F/A):-!,multi_transparent(user:F/A).
-dynamic_transparent(X):-functor_catch(X,F,A),dynamic_transparent(F/A),!.
-
-multi_transparent([]):-!.
-multi_transparent([X]):-multi_transparent(X),!.
-multi_transparent([X|Xs]):-!,multi_transparent(X),multi_transparent(Xs),!.
-multi_transparent(M:F/A):-!, module_transparent(M:F/A),dynamic(M:F/A),multifile(M:F/A).
-multi_transparent(F/A):-!,multi_transparent(user:F/A).
-multi_transparent(X):-functor_catch(X,F,A),multi_transparent(F/A),!.
-
-
-exists_dirf(X):-atomic(X),(exists_file(X);exists_directory(X)).
-atom_concat_safe(L,R,A):- ((atom(A),(atom(L);atom(R))) ; ((atom(L),atom(R)))), !, atom_concat(L,R,A),!.
-exists_file_safe(File):-nonvar(File),(File=(_:F)->exists_file_safe(F);(atomic(File),exists_file(File))).
-exists_directory_safe(File):-bugger:must(atomic(File)),exists_directory(File).
-/*
-concat_atom_safe(List,Sep,[Atom]):-atom(Atom),!,concat_atom(List,Sep,Atom),!.
-concat_atom_safe(List,Sep,Atom):-atom(Atom),!,concat_atom(ListM,Sep,Atom),!,List = ListM.
-concat_atom_safe(List,Sep,Atom):- concat_atom(List,Sep,Atom),!.
-*/
-upcase_atom_safe(A,B):-atom(A),upcase_atom(A,B),!.
-time_file_safe(_:F,INNER_XML):-!,exists_file_safe(F),time_file(F,INNER_XML).
-time_file_safe(F,INNER_XML):-exists_file_safe(F),time_file(F,INNER_XML).
 
 :- export(list_to_set_safe/2).
 list_to_set_safe(A,A):-(var(A);atomic(A)),!.
@@ -618,8 +511,54 @@ pred_delete(Pred,[A|C], B, D) :-
         ).
 
 
-contains_singletons(Term):- not(ground(Term)),not(not((term_variables(Term,Vs),
-   numbervars(Term,0,_,[attvar(bind),singletons(true)]),member('$VAR'('_'),Vs)))).
+
+:-export(doall/1).
+:- meta_predicate doall(0).
+doall(M:C):-!, M:ignore(M:(C,fail)).
+doall(C):-ignore((C,fail)).
+
+% =================================================================================
+% Loader Utils
+% =================================================================================
+
+
+dynamic_load_pl(PLNAME):-consult(PLNAME),!.
+
+dynamic_load_pl(PLNAME):- % unload_file(PLNAME),
+   open(PLNAME, read, In, []),
+   repeat,
+   line_count(In,Lineno),
+   % double_quotes(_DQBool)
+   Options = [variables(_Vars),variable_names(_VarNames),singletons(_Singletons),comment(_Comment)],
+   catchvv((read_term(In,Term,[syntax_errors(error)|Options])),E,(dmsg(E),fail)),
+   load_term(Term,[line_count(Lineno),file(PLNAME),stream(In)|Options]),
+   Term==end_of_file,
+   close(In).
+
+load_term(E,_Options):- E == end_of_file, !.
+load_term(Term,Options):-catchvv(load_term2(Term,Options),E,(dmsg(error(load_term(Term,Options,E))),throw_safe(E))).
+
+load_term2(':-'(Term),Options):-!,load_dirrective(Term,Options),!.
+load_term2(:-(H,B),Options):-!,load_assert(H,B,Options).
+load_term2(Fact,Options):-!,load_assert(Fact,true,Options).
+
+load_assert(H,B,_Options):-assert((H:-B)),!.
+
+load_dirrective(include(PLNAME),_Options):- (atom_concat_safe(Key,'.pl',PLNAME) ; Key=PLNAME),!, dynamic_load_pl(Key).
+load_dirrective(CALL,_Options):- CALL=..[module,M,_Preds],!,module(M),call(CALL).
+load_dirrective(Term,_Options):-!,Term.
+
+% =====================================================================================================================
+:- export((call_no_cuts/1)).
+% =====================================================================================================================
+:- meta_predicate call_no_cuts(0).
+:- module_transparent call_no_cuts/1.
+call_no_cuts((A,B)):-!,(call_no_cuts(A),call_no_cuts(B)).
+call_no_cuts((A;B)):-!,(call_no_cuts(A);call_no_cuts(B)).
+call_no_cuts((A->B)):-!,(call_no_cuts(A)->call_no_cuts(B)).
+call_no_cuts((A->B;C)):-!,(call_no_cuts(A)->call_no_cuts(B);call_no_cuts(C)).
+call_no_cuts(M:CALL):-atom(M),!,functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(C,_))))),!,clause_safe(CALL,TEST),debugOnError(TEST).
+call_no_cuts(CALL):-functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(C,_))))),!,clause_safe(CALL,TEST),debugOnError(TEST).
 
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6

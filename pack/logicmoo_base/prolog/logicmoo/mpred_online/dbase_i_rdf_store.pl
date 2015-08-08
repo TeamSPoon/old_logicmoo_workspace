@@ -286,9 +286,9 @@ any_to_prolog(_,Ss,Sx):-copy_term(Ss,Sx).
 
 :-dynamic(p2q_alias/3).
 
+p2q(neg,mud,not).
 p2q(~,mud,not).
 p2q(-,mud,not).
-p2q(not,mud,not).
 p2q(naf,mud,not).
 p2q((\+),mud,not).
 

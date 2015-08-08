@@ -1,0 +1,193 @@
+
+  %  General best-first search, unoptimized   
+
+  best_first_search(Start, Hfun, GoalPred, Sol) :-  
+	  bstfs([0-[Start]], [ ], Hfun, GoalPred, Sol).
+
+  bstfs([ _  -[Node | Path]  |   _  ],  _  ,  _  , GoalPred, [Node | Path]) :- 
+	  Goal =.. [GoalPred,Node], 
+	  Goal. 
+  bstfs([Val-[Node | Path]  |  MoreOPEN], CLOSED, Hfun, GoalPred, Sol) :- 
+	  % first, extend the path to progfont Node to all its neighbors: 
+	  findall(
+		  Val1-[Next,Node | Path], 
+		  (
+		    arc(Node, Next),
+		    P =.. [Hfun, [Next,Node | Path], Val1], 
+		    P
+		  ), 
+		  Neighbors
+		     ), 
+	  %next, find among them the em new neighbors: 
+	  findall(
+		  Val1-[Node1 | Path1], 
+		  (
+		    lmember(Val1-[Node1 | Path1],Neighbors), 
+		    not(lmember( _  -[Node1 |  _  ], MoreOPEN)), 
+		    not(lmember( _  -Node1, CLOSED))
+		  ), 
+		  TmpOPEN1
+		     ), 
+	  % now, among the other neighbors, find those to whom 
+	  % a worse path exists in OPEN, and replace that path:  
+	  improve_open(Neighbors, MoreOPEN, TmpOPEN2), 
+	  append(TmpOPEN1, TmpOPEN2, TmpOPEN3),  
+	  % finally, among the remaining neighbors (they must be CLOSED),  
+	  % find those to whom the path found previously is worse than  
+	  % the current one; remove them from the CLOSED list, and add  
+	  % the new path to the OPEN list: 
+	  improve_closed(Neighbors, TmpOPEN3, CLOSED, TmpOPEN4, NewCLOSED), 
+	  move_smallest_to_top(TmpOPEN4,NewOPEN),
+	  %keysort(TmpOPEN4,NewOPEN), 
+	  bstfs(NewOPEN, [Val-Node | NewCLOSED], Hfun, GoalPred, Sol). 
+
+
+  improve_open([ ], OPEN, OPEN). 
+  improve_open([Path | More], OPEN, NewOPEN) :- 
+	  scan_open(Path, OPEN, TmpOPEN), 
+	  improve_open(More, TmpOPEN, NewOPEN). 
+
+  scan_open( _  , [ ], [ ]). 
+  scan_open(Val-[Node | Path], [Val1-[Node1 |  _  ] | More], NewOPEN) :- 
+	  Node = Node1, 
+	  Val < Val1, !, 
+	  NewOPEN = [Val-[Node | Path] | More].
+  scan_open( _  -[Node |  _  ], [Val1-[Node1 | Path1] | More], NewOPEN) :- 
+	  Node = Node1, !,
+	  NewOPEN = [Val1-[Node1 | Path1] | More]. 
+  scan_open(Path,[Path1 | More],[Path1 | More1]) :- 
+	  scan_open(Path,More,More1). 
+
+
+  improve_closed([],OPEN,CLOSED,OPEN,CLOSED). 
+  improve_closed([Path | More], OPEN, CLOSED, NewOPEN, NewCLOSED) :- 
+	  scan_closed(Path, OPEN, CLOSED, TmpOPEN, TmpCLOSED), 
+	  improve_closed(More, TmpOPEN, TmpCLOSED, 
+	  NewOPEN, NewCLOSED). 
+
+
+  scan_closed( _  , OPEN, [ ], OPEN, [ ]). 
+  scan_closed(Val-[Node | Path], OPEN, [Val1-Node1 | MoreCLOSED], NewOPEN, NewCLOSED) :- 
+	  Node = Node1, 
+	  Val < Val1, !,  
+	  NewOPEN = [Val-[Node | Path] | OPEN], 	
+	  NewCLOSED = MoreCLOSED.
+  scan_closed( _  -[Node |  _  ], OPEN, [Val1-Node1 | MoreCLOSED], NewOPEN, NewCLOSED) :- 
+	  Node = Node1, !,  
+	  NewOPEN = OPEN, 
+	  NewCLOSED = [Val1-Node1 | MoreCLOSED].
+  scan_closed(Path,OPEN,[Node | More],NewOPEN,[Node | More1]) :- 
+  scan_closed(Path,OPEN,More,NewOPEN,More1). 
+
+
+
+
+
+  % Best-first search assuming admissibility 
+
+  best_first_search_ad(Start, Hfun, GoalPred, Sol) :-  
+	  bstfs_ad([0-[Start]], [ ], Hfun, GoalPred, Sol).
+
+  bstfs_ad([ _  -[Node | Path]  |   _  ],  _  ,  _  , GoalPred, [Node | Path]) :- 
+	  Goal =.. [GoalPred,Node], 
+	  Goal. 
+  bstfs_ad([Val-[Node | Path]  |  MoreOPEN], CLOSED, Hfun, GoalPred, Sol) :- 
+	  % as before extend the path to progfont Node to all its neighbors: 
+	  findall(
+		  Val1-[Next,Node | Path], 
+		  (
+		     arc(Node, Next),
+		     P =.. [Hfun, [Next,Node | Path], Val1], 
+		     P
+		  ), 
+		  Neighbors
+		     ), 
+	  % as before find among them the em new neighbors: 
+	  findall(
+		  Val1-[Node1 | Path1], 
+		  (
+		    lmember(Val1-[Node1 | Path1],Neighbors),
+		    not(lmember( _  -[Node1 |  _  ], MoreOPEN)), 
+		    not(lmember( _  -Node1, CLOSED))
+		  ), 
+		  TmpOPEN1
+		     ), 
+	  % as before update the paths to previous OPEN nodes: 
+	  improve_open(Neighbors, MoreOPEN, TmpOPEN2), 
+	  append(TmpOPEN1, TmpOPEN2, TmpOPEN3),  
+	  move_smallest_to_top(TmpOPEN3,NewOPEN),
+	  %keysort(TmpOPEN3,NewOPEN), 
+	  bstfs_ad(NewOPEN, [Val-Node | CLOSED], Hfun, GoalPred, Sol). 
+
+
+
+
+  % Best-first search assuming strong admissibility 
+  best_first_search_st_ad(Start, Hfun, GoalPred, Sol) :-  
+	  bstfs_st_ad([0-[Start]], [ ], Hfun, GoalPred, Sol).
+
+  bstfs_st_ad([ _  -[Node | Path]  |   _  ],  _  ,  _  , GoalPred, [Node | Path]) :- 
+	  Goal =.. [GoalPred,Node], 
+	  Goal. 
+  bstfs_st_ad([Val-[Node | Path]  |  MoreOPEN], CLOSED, Hfun, GoalPred, Sol) :- 
+	  findall(
+		  Val1-[Next,Node | Path], 
+		  (
+		     arc(Node, Next),
+		     P =.. [Hfun, [Next,Node | Path], Val1], 
+		     P
+		  ), 
+		  Neighbors
+		    ), 
+	  findall(
+		  Val1-[Node1 | Path1], 
+		  (
+		     lmember(Val1-[Node1 | Path1],Neighbors),
+		     not(lmember( _  -[Node1 |  _  ], MoreOPEN)), 
+		     not(lmember( _  -Node1, CLOSED))
+		  ), 
+		  TmpOPEN
+		    ), 
+	  % note difference: 
+	  append(TmpOPEN, MoreOPEN, TmpOPEN2),
+	  move_smallest_to_top(TmpOPEN2, NewOPEN),
+	  %keysort(TmpOPEN,SortedTempOPEN),
+	  %merge(SortedTempOPEN, MoreOPEN, NewOPEN), 
+	  bstfs_st_ad(NewOPEN, [Val-Node | CLOSED], Hfun, GoalPred, Sol). 
+
+  merge([ ], X, X) :- !.
+  merge(X, [ ], X) :- !.
+  merge([Vx-X  |  Xs], [Vy-Y  |  Ys], Z) :- 
+	  Vx < Vy, !,
+	   Z=[Vx-X  |  W], 
+	  merge(Xs, [Vy-Y  |  Ys], W).
+  merge(X, [Y  |  Ys], [Y  |  Z]):- 
+	  merge(X, Ys, Z).
+
+
+
+  % Best-first search assuming strong admissibility and the search is
+  % on a tree. Meaning the first time we explore a node we have found
+  % the shortest path to the node.
+  best_first_search_st_ad_tree(Start, Hfun, GoalPred, Sol) :-  
+	  bstfs_st_ad_tree([0-[Start]], [ ], Hfun, GoalPred, Sol).
+
+  bstfs_st_ad_tree([ _  -[Node | Path]  |   _  ],  _  ,  _  , GoalPred, [Node | Path]) :- 
+	  Goal =.. [GoalPred,Node], 
+	  Goal. 
+  bstfs_st_ad_tree([Val-[Node | Path]  |  MoreOPEN], CLOSED, Hfun, GoalPred, Sol) :- 
+	  findall(
+		  Val1-[Next,Node | Path], 
+		  (
+		     tree_arc(Node, Next),
+		     P =.. [Hfun, [Next,Node | Path], Val1], 
+		     P
+		  ), 
+		  Neighbors
+		    ), 
+	  % note difference: 
+	  append(Neighbors, MoreOPEN, TmpOPEN1),
+	  move_smallest_to_top(TmpOPEN1, NewOPEN),
+	  bstfs_st_ad_tree(NewOPEN, [Val-Node | CLOSED], Hfun, GoalPred, Sol). 
+
+

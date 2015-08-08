@@ -1,45 +1,126 @@
 #!/usr/local/bin/swipl 
 
-
-
 :- if(if_defined(load_mud_www)).
 
-% :- module(swish_with_localedit,[]).
+:- module(swish_with_localedit,
+	  [
+	  ]).
 
+:- multifile(mpred_online:semweb_startup).
+:- '@'(ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),user).
+:- add_to_search_path(swish, '../pack/swish/').
 
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
 
-:- multifile(mpred_online:semweb_startup).
-:- '@'(ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),user).
 
-:- use_module(library(process)).
-install_bower:- prolog_file_dir(('.'),LPWD),
-   process_create(sudo,[bower,install,'--allow-root'],[cwd(LPWD),process(PID)]),
-   process_wait(PID,_Status).
+		 /*******************************
+		 *	       PATHS		*
+		 *******************************/
 
-:- add_to_search_path(swish, '../pack/swish/').
 
-% setup paths to load relevant packages from development environment
+
+logicmoo_set_swish_path :-
+	absolute_file_name(swish('swish.pl'), _,
+			   [file_errors(fail), access(read)]), !.
+
+logicmoo_set_swish_path :-
+	filematch(pack(swish),Dir),
+	asserta(user:file_search_path(swish, Dir)),!.
+
+
+
+
+                 /*******************************
+                 *   CREATE SWISH APPLICATION   *
+                 *******************************/
+
+:- multifile
+	pengines:prepare_module/3.
+
+:- logicmoo_set_swish_path.
+
+:- user:ensure_loaded(swish(swish)).
+
+% load rendering modules
+:- swish:use_module(logicmoo(swish_lib/render/html),	[]).
+
+
+:- retractall((http:location(swish, _, _))).
+:- asserta(http:location(swish, root(swish), [priority(-100)])).
+
+%%	swish_config:config(?Config, ?Value) is nondet.
+%
+%	All solutions of this predicate are  available in the JavaScript
+%	object config.swish.config. Config must be an  atom that is also
+%	a valid JavaScript identifier. Value  must   be  a value that is
+%	valid for json_write_dict/2. Most configurations  are also saved
+%	in the application preferences. These   are  marked [P]. Defined
+%	config parameters:
+%
+%	  - show_beware
+%	  [P] If `true`, show the *Beware* modal dialog on startup
+%	  - tabled_results
+%	  [P] If `true`, check the _table results_ checkbox by default.
+%	  - application
+%	  Name of the Pengine application.
+%	  - csv_formats
+%	  [P] CSV output formats offered. For example, ClioPatria
+%	  defines this as [rdf,prolog]. The first element is default.
+%	  - community_examples
+%	  Allow marking saved programs as example.  If marked, the
+%	  programs are added to the Examples menu.
+%	  - public_access
+%	  If lib/authenticate.pl is loaded and this flag is `true`,
+%	  _all_ access to SWISH demands authentication.  If false,
+%	  only running queries and saving files is restricted. Note
+%	  that this flag has no effect if no authentication module is
+%	  loaded.
+
+assert_sv((A,B)):-!,assert_sv(A),assert_sv(B).
+assert_sv(M:P):-!,functor(P,_,A),duplicate_term(P,R),setarg(A,R,_),ignore(retract(M:R)),asserta(M:P).
+assert_sv(P):-!,functor(P,_,A),duplicate_term(P,R),setarg(A,R,_),ignore(retract(R)),asserta(P).
+
+		 /*******************************
+		 *	      CONFIG		*
+		 *******************************/
+
+:-abolish(swish_config:config,2).
+:-dynamic(swish_config:config/2).
+:- multifile
+	swish_config:config/2,
+	swish_config:source_alias/2.
+
+
+:-assert_sv((
+   swish_config:config(show_beware,        false),
+   swish_config:config(tabled_results,     false),
+   swish_config:config(application,        swish),
+   swish_config:config(csv_formats,        [prolog]),
+   swish_config:config(community_examples, true),
+   swish_config:config(public_access,      true))).
+
+%%	swish_config:source_alias(Alias, Options) is nondet.
+%
+%	Specify access for files below a given _alias_. Options define
+%
+%	  - access(Access)
+%	  One of `read` or `both`.  Default is `read`.
+%	  - if(Condition)
+%	  Provide additional conditions.  Defined conditions are:
+%	    - loaded
+%	    Only provide access to the file if it is loaded.
+
+
+
+:-endif.
+
 
 /*
-:- asserta(user:file_search_path(foreign, '../http')).
-:- asserta(user:file_search_path(foreign, '../clib')).
-:- asserta(user:file_search_path(foreign, '../sgml')).
-:- asserta(user:file_search_path(library, '.')).
-:- asserta(user:file_search_path(library, '..')).
-:- asserta(user:file_search_path(library, '../sgml')).
-:- asserta(user:file_search_path(library, '../plunit')).
-:- asserta(user:file_search_path(library, '../clib')).
-:- asserta(user:file_search_path(js, 'web/js')).
-*/
-
 % Hack: auto-loading this does not work.
 :- [library(charsio)].
 :- [charsio:library(memfile)].
-
 :- debug(pengine(delay)).
-
 :- use_module(library(plunit)).
 :- use_module(library(pengines)).
 :- use_module(pengine_sandbox:library(pengines)).
@@ -47,234 +128,25 @@ install_bower:- prolog_file_dir(('.'),LPWD),
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_files)).
 :- use_module(library(http/http_dispatch)).
-
-:- ensure_loaded('../pack/swish/swish').
-
-
 :- pengine_application(swish).
 :- use_module(swish:library(pengines_io)).
 pengines:prepare_module(Module, swish, _Options) :- pengines_io:pengine_bind_io_to_html(Module).
-
 :- debug(http(request)).
-
-% :- use_module(library(pldoc)).
-% :- use_module(library(pldoc/doc_http)).
-
-
-:- use_module(library(settings)).
-
-:- multifile http:location/3.
-:- dynamic   http:location/3.
-
-:- use_module(library(memfile)).
-%:- use_module(server).
-
-/*
-swish_highlight:insert_memory_file(X,Y,Z):-dmsg(error(swish_highlight:insert_memory_file(X,Y,Z))).
-swish_highlight:delete_memory_file(X,Y,Z):-dmsg(error(swish_highlight:delete_memory_file(X,Y,Z))).
-swish_highlight:memory_file_line_position(X,Y,Z,A):-dmsg(error(swish_highlight:memory_file_line_position(X,Y,Z,A))).
-swish_highlight:memory_file_substring(X,Y,Z,A,B):-dmsg(error(swish_highlight:memory_file_substring(X,Y,Z,A,B))).
-swish_highlight:memory_file_to_string(X,Y):- memory_file_to_codes(X,C),string_codes(Y,C). %  dmsg(error(swish_highlight:memory_file_to_string(X,Y))).
 */
 
-
-:-multifile(prolog:sandbox_allowed_clause/1).
-prolog:sandbox_allowed_clause(Clause):-nonvar(Clause).
-:-multifile(sandbox:safe_primitive/1).
-sandbox:safe_primitive(X):-nonvar(X),!.
-sandbox:safe_primitive(P):-var(P),!,current_predicate(F/A),functor(P,F,A).
-sandbox:safe_primitive(M:P):-var(P),!,current_predicate(M:F/A),functor(P,F,A).
+:- if(if_defined(must_install_bower)).
 
 
-:- use_module(library(pldoc)).
-:- use_module(library(http/thread_httpd)).
-:- use_module(library(http/http_parameters)).
-:- use_module(library(http/html_write)).
-:- use_module(library(http/mimetype)).
-:- use_module(library(dcg/basics)).
-:- use_module(library(http/http_dispatch)).
-:- use_module(library(http/http_hook)).
-:- use_module(library(http/http_path)).
-:- use_module(library(http/http_wrapper)).
-:- use_module(library(uri)).
-:- use_module(library(debug)).
-:- use_module(library(lists)).
-:- use_module(library(url)).
-:- use_module(library(socket)).
-:- use_module(library(option)).
-:- use_module(library(error)).
-:- use_module(library(www_browser)).
-
-:- use_module(pldoc(doc_process)).
-:- use_module(pldoc(doc_htmlsrc)).
-:- use_module(pldoc(doc_html)).
-:- use_module(pldoc(doc_index)).
-:- use_module(pldoc(doc_search)).
-:- use_module(pldoc(doc_man)).
-:- use_module(pldoc(doc_wiki)).
-:- use_module(pldoc(doc_util)).
-:- use_module(pldoc(doc_access)).
-:- use_module(pldoc(doc_pack)).
-
-:- use_module(library(doc_http)).
-:- abolish(pldoc_http:src_skin,5).
-
-
-
-pldoc_http:src_skin(Request, _Show, FormatComments, header, Out) :-  
-  pldoc_http:((     
-     member(request_uri(ReqURI), Request),!,
-	prolog_xref:negate(FormatComments, AltFormatComments),
-	replace_parameters(ReqURI, [show(raw)], RawLink),
-        replace_parameters(ReqURI, [], EditLink0),
-         logicmoo_util_strings:atom_subst(EditLink0,'help/source/doc','swish/filesystem/',EditLink),
-	replace_parameters(ReqURI, [format_comments(AltFormatComments)], CmtLink),
-	phrase(html(div(class(src_formats),
-			[ 'View source with ',
-			  a(href(CmtLink), \alt_view(AltFormatComments)),
-                        ' or as ',
-                        a(href(RawLink), raw),
-                        ' or EDIT ',
-                        a(href(EditLink), edit)
-			])), Tokens),
-	html_write:print_html(Out, Tokens))).
-
-% called through source_to_html/3.
-:- public(pldoc_http:src_skin/5).
-:- prolog_listing:listing(pldoc_http:src_skin/5).
-
-edit_file_href(_Options,File0, HREF) :-
- pldoc_index:((  is_absolute_file_name(File0),
-	insert_alias(File0, File),
-	ensure_slash_start(File, SlashFile),
-	http_location([path(SlashFile)], Escaped),
-	http_location_by_id(pldoc_doc, DocRoot),
-        atom_concat(DocRoot, Escaped, HREFDOC))),
-        logicmoo_util_strings:atom_subst(HREFDOC,'help/source/doc','swish/filesystem/',HREF),!.
-edit_file_href(_Options,HREF, HREF).
-
-doc_file_href(_Options,File0, HREF) :-
- pldoc_index:(( is_absolute_file_name(File0),
-	insert_alias(File0, File),
-	ensure_slash_start(File, SlashFile),
-	http_location([path(SlashFile)], Escaped),
-	http_location_by_id(pldoc_doc, DocRoot),
-        atom_concat(DocRoot, Escaped, HREF))).
-
-doc_file_href(_Options,HREF, HREF).
-
-
-%%	source_button(+File, +Options)// is det.
-%
-%	Add show-source button.
-:- abolish(pldoc_html:source_button,4).
-:- public(pldoc_html:source_button//2).
-pldoc_html:source_button(_File, Options) -->
-	{ pldoc_html:option(files(_Map), Options) }, !.	% generating files
-pldoc_html:source_button(File, _Options) -->
-	{show_call((doc_file_href(Options, File, HREF0),
-         edit_file_href(Options, File, EDIT_HREF0)))},
-
-	html_write:html([
-         a(href(HREF0+[show(src)]),
-	       img([ class(action),
-		     alt('Show source cOdE'),
-		     title('Show source CODE'),
-		     src(location_by_id(pldoc_resource)+'source.png')
-		   ])),
-         a(href(EDIT_HREF0+[]),
-	       img([ class(action),
-		     alt('Edit source'),
-		     title('Edit source'),
-		     src(location_by_id(pldoc_resource)+'edit.png')
-		   ]))]).
-
-
-doug_debug(O):-format(user_error,'~nDOUG_DEBUG: ~q.~n',[O]),!.
-
-% :-debug(_).
-
-testml([]):-!. testml([M|L]):-!,testml(M),testml(L). 
-testml(M):-atomic(M),!,format('~w',[M]).
-testml(nl(E)):-!,ignore((between(0,E,_),nl,fail)).
-testml(ML):-phrase(ML,C,[]),testml(C).
-
-/*
-:- asserta((http:location(pldoc, root('pldoc'), []))), 
-   asserta((http:location(pldoc_resource, root('pldoc'), []) :- pldoc_http:http_location_by_id(pldoc_resource, root('pldoc')))),
-   asserta((http:location(pldoc_resource, R, []) :- pldoc_http:http_location_by_id(pldoc_resource, R))).
-*/
-:- ensure_loaded('../pack/swish/swish').
-
-
-:- catch(on_signal(hup, _, hup),E,dmsg(warn(E:on_signal(hup, _, hup)))).
-
-hup(_Signal) :-
-        thread_send_message(main, stop).
-
-:- use_module(library(http/thread_httpd)).
-:- use_module(library(http/http_dispatch)).
-% :- if_startup_script((http_server(http_dispatch, [ port(3050), workers(16) ]), debug(http_request(_)),debug(cm(_)),debug(swish(_)),debug(storage))).
-
-
-:- export(do_semweb_startup/0).
-do_semweb_startup:-
-   predicate_property(mpred_online:semweb_startup,number_of_clauses(N1)),
-   forall(clause(mpred_online:semweb_startup,Body,Ref),must(do_ref_job(Body,Ref))),
-   predicate_property(mpred_online:semweb_startup,number_of_clauses(N2)),
-   ((N2\=N1) -> do_semweb_startup ; true).
-
-% [Optionaly] register swish server (remote file editing)
-% TODO :- with_no_mpred_expansions(if_file_exists(ensure_loaded('../pack/swish/logicmoo_run_swish'))).
-
-% [Optionaly] register/run Cliopatria sparql server (remote RDF browsing)
-% TODO mpred_online:semweb_startup:-ensure_loaded('run_clio').
-
-% [Optionaly] register/run KnowRob robot services (we use it for the ontology mainly)
-% TODO mpred_online:semweb_startup :- with_no_mpred_expansions(if_file_exists(ensure_loaded('../pack/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
-
-% [Optionaly] register/run MILO robot services (we use it for the ontology mainly)
-% TODO mpred_online:semweb_startup :- register_ros_package(milo).
-
-% [Optionaly] register/run EulerSharp robot services (we use it for the ontology mainly)
-% TODO mpred_online:semweb_startup :- register_ros_package(euler).
-
-% :- ensure_loaded(logicmoo(dbase/mpred_i_pldoc)).
-% :- do_semweb_startup.
-
-
-% [Optionaly] remove debug noises
-% mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(asserta(prolog_debug:debugging(http(X), false, O)))).
-% mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),show_call(asserta(prolog_debug:debugging((X), false, O)))).
-
-:-multifile(pre_file_search_path/2).
-
-% user:pre_file_search_path(_,_):-!,fail.
-
-:- multifile
-	sandbox:safe_primitive/1,		% Goal
-	sandbox:safe_meta_predicate/1,		% Name/Arity
-	sandbox:safe_meta/2,			% Goal, Calls
-	sandbox:safe_global_variable/1,		% Name
-	sandbox:safe_directive/1.		% Module:Goal
-
-
-sandbox:safe_primitive(V):-nonvar(V).
-sandbox:safe_meta_predicate(V):-nonvar(V).
-sandbox:safe_meta(V,O):-nonvar(V),nonvar(O).
-sandbox:safe_global_variable(V):-nonvar(V).
-sandbox:safe_directive(V):-nonvar(V).
-
-
-:-endif.
-
-:- if(if_defined(install_bower)).
+:- use_module(library(process)).
+install_bower:- prolog_file_dir(('.'),LPWD),
+   process_create(sudo,[bower,install,'--allow-root'],[cwd(LPWD),process(PID)]),
+   process_wait(PID,_Status).
 
 :-shell('sudo apt-get install npm nodejs-legacy').
 :-shell('sudo npm install -g bower').
 
-
-:-shell('bower install').
+:- install_bower.
+% :-shell('bower install').
 
 /*
 #### Download as zip

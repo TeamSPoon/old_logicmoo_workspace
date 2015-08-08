@@ -1,0 +1,152 @@
+
+  % minimax search 
+  % INPUT:\ \  Tree:\  Game tree
+  % OUPUT:  Val: Backpropagated value of root\ \ \ */
+
+  minimax(Tree,Val) :- mnmx(max, Tree, -99999, Val). 
+
+  mnmx(max, [ _  ,X | Y], Vmax, Val) :- !,
+	  mnmx(min, X, 99999, Val1),
+	  max(Vmax, Val1, NewVmax),
+	  mnmx(max, [ _   | Y], NewVmax, Val).
+  mnmx(min, [ _  ,X | Y], Vmin, Val) :- !,
+	  mnmx(max, X, -99999, Val1),
+	  min(Vmin, Val1, NewVmin),
+	  mnmx(min, [ _   | Y], NewVmin, Val).
+  mnmx( _  , [ _  ], NewVal, Val) :- !,
+	   NewVal=Val.
+  mnmx( _  ,  Leaf,  _  , Val) :- leaf_value(Leaf, Val).
+
+
+
+
+  % alpha-beta search 
+  % INPUT:\ \  Tree:\  Game tree
+  % OUPUT:  Val: Backpropagated value of root\ \ \ */
+
+  alphabeta(Tree, Val) :- ab(max, Tree, (-99999,99999), _  , -99999, Val). 
+
+  ab(max, [N, X | Y], (A,B), Vmax, Val) :- !,
+	  ab(min, X, (A,B),  99999, Val1),
+	  str_max([N | Y], (A,B), Vmax,  Val1, Val).
+  ab(min, [N, X | Y], (A,B), Vmin, Val) :- !,
+	  ab(max, X, (A,B), -99999, Val1),
+	  str_min([N | Y], (A,B), Vmin, Val1, Val).
+  % here leaf values are determined: 
+  ab( _  ,  Leaf, _  , _  , Val) :- leaf_value(Leaf, Val).
+
+  %here alpha pruning takes place: 
+  str_min( _  ,(A, _  ), _  , Val1, A1):- 
+	  Val1 < A, !,
+	   A=A1. 
+  %otherwise, the value of min-nodes is determined here: 
+  str_min([ _  ], _  ,Vmin, Val1, Val) :- min(Vmin, Val1, Val).
+  str_min(N, (A,B), Vmin, Val1, Val):-
+	  min(Vmin, Val1, NVmin),
+	  %here beta is updated:
+	  min(NVmin, B, BB), 
+	  ab(min, N, (A,BB), NVmin, Val).
+
+  % here beta pruning takes place:
+  str_max( _  , ( _  ,B), _  , Val1, B1):- 
+	  Val1 > B, !, 
+	  B=B1.  
+  %otherwise, the value of max-nodes is determined here: 
+  str_max([ _  ], _  , Vmax, Val1, Val) :-  max(Vmax, Val1, Val).
+  str_max(N, (A,B),  Vmax, Val1, Val):-
+	  max(Vmax, Val1, NVmax),
+	  % here alpha is updated:
+	  max(NVmax, A, AA),
+	  ab(max, N, (AA,B),  NVmax, Val).
+
+
+
+
+% Library file.
+
+goal(Node) :- Node == i.
+arc(a, b).
+arc(a,m).
+arc(m,i).
+arc(a, c).
+arc(b, d).
+arc(b, e).
+arc(c, b).
+arc(c, f).
+arc(c, g).
+arc(d, h).
+arc(d, i).
+arc(e, d).
+arc(e, j).
+arc(f, b).
+arc(f, j).
+arc(g, k).
+arc(g, l).
+h.
+arc(i, a).
+j.
+arc(k, f).
+arc(k, c).
+arc(l, k).
+
+
+
+
+
+
+% Huristic function
+
+hfun(L,N) :- length(L,N).
+
+lmember(_,[ ]) :-!,fail.
+lmember(X, [X | _]).
+lmember(X, [ _ | L]) :- lmember(X,L).
+
+not(X) :- X, !, fail.
+not(_).
+
+move_smallest_to_top([ ], [ ]).
+move_smallest_to_top([Val-X|L], [S|R]) :-
+	find_smallest(L, Val-X, S, R).
+
+find_smallest([ ], T, T, [ ]).
+find_smallest([Val1-X | L], Val-T, S, [Val-T | R]) :-
+	Val1 < Val, !,
+	find_smallest(L, Val1-X, S, R).
+
+find_smallest([Val1-X | L], Val-T, S, [Val1-X| R]) :-
+	% Val <= Val1
+	find_smallest(L, Val-T, S, R).
+
+
+% Tree structure.
+tree_arc(a, b).
+tree_arc(a, c).
+tree_arc(b, d).
+tree_arc(b, e).
+tree_arc(c, f).
+tree_arc(c, g).
+tree_arc(d, h).
+tree_arc(d, i).
+tree_arc(e, j).
+tree_arc(g, k).
+tree_arc(g, l).
+
+tree_value(a,1).
+tree_value(b,2).
+tree_value(c,3).
+tree_value(d,4).
+tree_value(e,5).
+tree_value(f,6).
+tree_value(g,7).
+tree_value(h,8).
+tree_value(i,9).
+tree_value(j,10).
+tree_value(h,11).
+tree_value(l,12).
+
+htree([Node|_], Val) :- tree_value(Node, Val).
+
+
+
+

@@ -381,9 +381,9 @@ prop_or(Obj,Prop,Value,OrElse):- one_must(ireq(t(Prop,Obj,Value)),Value=OrElse).
 
 
 /*
-update_single_valued_arg(P,N):- arg(N,P,UPDATE),replace_arg(P,N,OLD,Q),
+update_single_valued_arg(P,N):- arg(N,P,UPDATE),replace_arg_fast(P,N,OLD,Q),
   (is_relative(UPDATE)->
-     must_det_l((Q,update_value(OLD,UPDATE,NEW),\+ is_relative(NEW), replace_arg(Q,N,NEW,R),enqueue(\+Q),enqueue(R)));
+     must_det_l((Q,update_value(OLD,UPDATE,NEW),\+ is_relative(NEW), replace_arg_fast(Q,N,NEW,R),enqueue(\+Q),enqueue(R)));
      forall((Q,UPDATE\=OLD),pfc_enqueue(\+Q))),!.
 */
 
@@ -413,7 +413,7 @@ db_assert_sv_now(Must,C,F,A, REPLACE):- db_assert_sv_replace(Must,C,F,A, REPLACE
 
 :-export(db_assert_sv_update/5).
 db_assert_sv_update(Must,C,F,A,UPDATE):-
-   replace_arg(C,A,OLD,COLD),
+   replace_arg_fast(C,A,OLD,COLD),
    % prefer updated values to come from instances but will settle with anything legal
    hotrace(must((once(ireq(COLD);mreq(COLD)),ground(COLD)))),
    update_value(OLD,UPDATE,NEW),!,
@@ -424,20 +424,20 @@ db_assert_sv_update(Must,C,F,A,UPDATE):-
 :-style_check(-singleton).
 % db_assert_sv_replace_noisey_so_disabled
 db_assert_sv_replace(_Must,C,_,A,NEW):- fail,
-   replace_arg(C,A,_,CBLANK),
+   replace_arg_fast(C,A,_,CBLANK),
    hooked_retractall(CBLANK),
-   replace_arg(C,A,NEW,CNEW),
+   replace_arg_fast(C,A,NEW,CNEW),
    db_must_asserta_confirmed_sv(CNEW,A,NEW),!.
 
 db_assert_sv_replace(Must,C,F,A,NEW):- 
-   replace_arg(C,A,OLD,COLD),
-   replace_arg(C,A,NEW,CNEW),
+   replace_arg_fast(C,A,OLD,COLD),
+   replace_arg_fast(C,A,NEW,CNEW),
    hotrace(ignore(ireq(COLD))),
    must_det(db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW)),!.
 
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- var(OLD),!,   
    dmsg(db_assert_sv(COLD,'__add__',CNEW)),
-   % replace_arg(C,A,_,CBLANK),hooked_retractall(CBLANK),
+   % replace_arg_fast(C,A,_,CBLANK),hooked_retractall(CBLANK),
    db_must_asserta_confirmed_sv(CNEW,A,NEW),!.
 
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- OLD =@= NEW,!.
@@ -446,7 +446,7 @@ db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- equals_call(OLD,NEW),!
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):-
    dmsg(db_assert_sv(COLD,'__replace__',CNEW)),
    hotrace((ignore(show_call_failure((clr(COLD), not(ireq(COLD))))))),
-   %replace_arg(C,A,_,CBLANK),must_det(clr(CBLANK)),hooked_retractall(CBLANK),   
+   %replace_arg_fast(C,A,_,CBLANK),must_det(clr(CBLANK)),hooked_retractall(CBLANK),   
    db_must_asserta_confirmed_sv(CNEW,A,NEW),!.
 
 */
@@ -472,7 +472,7 @@ confirm_hook(CNEW:NEW=@=CNOW:NOW):-
 
 % Expect CNEW to be what is found
 db_must_asserta_confirmed_sv(CNEW,A,NEW):- 
-   replace_arg(CNEW,A,NOW,CNOW),
+   replace_arg_fast(CNEW,A,NOW,CNOW),
    sanity(not(singletons_throw_else_fail(CNEW))),
    mpred_modify(change(assert,sv),CNEW),!,
    add(CNEW),

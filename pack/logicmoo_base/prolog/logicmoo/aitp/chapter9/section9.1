@@ -1,0 +1,265 @@
+:- compile(library(basics)).
+
+least3 :- ['least3.pl'].
+
+version_space( Examples, Up, Low ) :- 
+	most_general( InitialUp ), most_specific( InitialLow ), 
+	write( 'Initial upper bound: ' ), write( InitialUp ), nl,
+	write( 'Initial lower bound: ' ), write( InitialLow ), nl,
+	vs( Examples, InitialUp, InitialLow, Up, Low ).
+
+vs( [], Up, Low, Up, Low ).
+
+vs( [+Ex | More], OldUp, OldLow, NewUp, NewLow ) :- 
+        write('Next example: '), write(+Ex), nl,
+        filter_upper_bound( Ex, OldUp, TmpUp ),
+        minimally_generalize_lower_bound( OldLow, Ex, TmpLow1 ),
+	discard_uncovered_low( TmpLow1, TmpUp, TmpLow2 ),
+	discard_non_minimal( TmpLow2, TmpLow ),
+	write('New upper bound: '), write(TmpUp), nl,
+	write('New lower bound: '), write(TmpLow), nl,
+        vs( More, TmpUp, TmpLow, NewUp, NewLow ).
+
+vs( [-Ex | More], OldUp, OldLow, NewUp, NewLow ) :- %trace,
+        write('Next example: '), write(-Ex), nl,
+        filter_lower_bound( Ex, OldUp, OldLow, TmpLow ),
+        minimally_specialize_upper_bound( OldUp, Ex, TmpUp1 ),
+	discard_noncovering_up( TmpUp1, TmpLow, TmpUp2 ),
+	discard_non_minimal( TmpUp2, TmpUp ),
+	write('New upper bound: '), write(TmpUp), nl,
+	write('New lower bound: '), write(TmpLow), nl,
+        vs( More, TmpUp, TmpLow, NewUp, NewLow ).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bound filtering
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+filter_upper_bound( Ex, OldUp, TmpUp ) :-
+     fub( [Ex], OldUp, [ ], TmpUp ),
+     (TmpUp = [_|_] 
+      -> true 
+      ; write('failed to filter upper bound'), nl, fail ).
+ 
+fub( [ ], _, GoodUp, GoodUp ).
+fub( [Concept | More], OldUp, GoodUp, NewUp ) :-
+     member( Concept, OldUp ), !, 
+     (member( Concept, GoodUp)
+      -> fub( More, OldUp, GoodUp, NewUp )
+      ;  fub( More, OldUp, [Concept | GoodUp], NewUp ) ).
+
+fub( [Concept | More], OldUp, GoodUp, NewUp ) :-
+     findall( Concept1, dgeneralize( Concept, Concept1 ), ConList ),
+     append( More, ConList, NewConList),
+     fub( NewConList, OldUp, GoodUp, NewUp ). 
+
+filter_lower_bound( Ex, OldUp, OldLow, TmpLow ) :- 
+     flb( [Ex], OldUp, OldLow, OldLow, TmpLow ),
+     (TmpLow = [_|_] 
+      -> true 
+      ; write('failed to filter lower bound'), nl, fail ).
+ 
+flb( [ ], _, _, GoodLow, GoodLow ).
+flb( [Concept | More], OldUp, OldLow, GoodLow, NewLow ) :-
+     member( Concept, OldLow ), !, 
+     (remove( Concept, GoodLow, TmpLow ) -> true ; TmpLow = GoodLow ),
+     flb( More, OldUp, OldLow, TmpLow, NewLow ).
+
+flb( [Concept | More], OldUp, OldLow, GoodLow, NewLow ) :-
+     member( Concept, OldUp ), !, 
+     flb( More, OldUp, OldLow, GoodLow, NewLow ).
+
+flb( [Concept | More], OldUp, OldLow, GoodLow, NewLow ) :-
+     findall( Concept1, dgeneralize( Concept, Concept1 ), ConList ),
+     append( More, ConList, NewConList),
+     flb( NewConList, OldUp, OldLow, GoodLow, NewLow ). 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% minimal generalization or specialization
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+minimally_generalize_lower_bound( Low1, Ex, Low2) :- 
+   setof(
+     Concept,
+     Concept1^
+     ( member( Concept1, Low1 ),
+       find_some_minimal_generalization( Concept1, Ex, Concept ) ),     
+     Low2 )
+   -> true
+   ; write('cannot generalize lower bound to cover example'), nl, fail.
+
+minimally_specialize_upper_bound( Up1, Ex, Up2) :- %trace,
+   setof(
+     Concept,
+     Concept1^
+     ( member( Concept1, Up1 ),
+       find_some_minimal_specialization( Concept1, Ex, Concept ) ),     
+     Up2 )
+   -> true
+   ; write('cannot specialize upper bound so as to not cover example'), 
+     nl, fail.
+
+
+
+find_some_minimal_generalization(Con1,Con2,Con3) :-
+	as_general(Con2,Con1), !, 
+        Con3=Con1.
+% ;
+%         write('   (turns out "'),write(Con1),
+%         write('" was a bad generalization)'), 
+%         nl,
+%         fail).
+        
+find_some_minimal_generalization(Con1,Con2,Con3) :-
+	dgeneralize(Con1,Con4), 
+	find_some_minimal_generalization(Con4,Con2,Con3).
+
+find_some_minimal_specialization(Con1,Con2,Con3) :-
+	not(as_general(Con2,Con1)), !, 
+        Con3=Con1.
+% ;
+%         write('   (turns out "'),write(Con1),
+%         write('" was a bad specialization'), 
+%         nl,
+%         fail).
+        
+find_some_minimal_specialization(Con1,Con2,Con3) :-
+	dspecialize(Con1,Con4), 
+	find_some_minimal_specialization(Con4,Con2,Con3).
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  cover check
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+discard_uncovered_low( Low1, Up, Low2 ) :-
+   setof( Concept,
+          ( member( Concept, Low1),
+            generalize(Concept,Concept1),
+            member(Concept1,Up) ),
+          Low2)
+   -> true
+   ; write('no generalization of lower bound is covered by upper bound'), nl, 
+     fail.
+
+discard_noncovering_up( Up1, Low, Up2 ) :-
+   setof( Concept,
+          ( member( Concept, Up1),
+            as_general(Concept1,Concept),
+            member(Concept1,Low) ),
+          Up2)
+   -> true
+   ; write('no specialization of upper bound covers lower bound'), nl, 
+     fail.
+
+
+
+
+discard_non_minimal(Set1,Set2) :-
+        setof(Concept,
+            (member(Concept,Set1),
+             not(( member(Concept1,Set1), dgeneralize(Concept1,Concept) ))),
+            Set2).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Library
+generalize(X,Y) :- gen([X],Y).
+gen([X | _],Y) :- dgeneralize(X,Y).
+gen([X | Y],Z) :- 
+	findall(U,dgeneralize(X,U),L), 
+	append(Y,L,W), 
+	gen(W,Z).
+
+% specialize return a pattern `Y' that is more specific then pattern `X'
+specialize(X,Y):- spec([X],Y).
+spec([X | _],Y) :- dspecialize(X,Y).
+spec([X | Y],Z) :- 
+	findall(U,dspecialize(X,U),L), 
+	append(Y,L,W), 
+	spec(W,Z).
+
+as_general(C,C).
+as_general(C1,C2) :- generalize(C1,C2).
+
+as_specific(C,C).
+as_specific(C1,C2) :- specialize(C1,C2).
+
+
+dspecialize(X,Y) :- dgeneralize(Y,X).
+
+most_general(U) :- 
+	setof(X,
+	      Y^(dgeneralize(Y,X),not(dgeneralize(X,_))),
+	      U).
+most_specific(L) :- 
+	setof(X,
+	      Y^(dgeneralize(X,Y),not(dgeneralize(_,X))),
+	      L).
+
+not(X) :- X, !, fail.
+not(_).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Database
+
+dgeneralize(number_150,evens).
+dgeneralize(number_150,integers_less_than_200).
+dgeneralize(oddprimes,primes).
+dgeneralize(oddprimes,odds).
+dgeneralize(primes,even_or_primes).
+dgeneralize(odds,integers).
+dgeneralize(even_or_primes,integers).
+dgeneralize(set_2_36_214,evens).
+dgeneralize(evens,even_or_primes).
+dgeneralize(evens_less_than_100,evens).
+dgeneralize(evens_less_than_100,integers_less_than_200).
+dgeneralize(integers_less_than_200,integers).
+dgeneralize(nonprimes,integers). 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Testing
+test1:- version_space([+set_2_36_214, +primes, -odds], U,L),
+ 	nl, write('Final upper bound: '), write(U),nl,
+	 write('Final lower bound: '), write(L).
+
+
+
+test2:- 
+   version_space([+evens_less_than_100,+number_150,-set_2_36_214], U, L),
+	nl, write('Final upper bound: '), write(U),nl,
+	 write('Final lower bound: '), write(L).
+
+
+test3:- version_space([+set_2_36_214, +primes], U,L),
+ 	nl, write('Final upper bound: '), write(U),nl,
+	 write('Final lower bound: '), write(L).
+
+
+test4:- 
+   version_space([+evens_less_than_100,+number_150], U, L),
+	nl, write('Final upper bound: '), write(U),nl,
+	 write('Final lower bound: '), write(L).
+
+
+
+
+
+
+remove(X,[X|Y],Y).
+remove(X,[Y|Z],[Y|W]) :- remove(X,Z,W).

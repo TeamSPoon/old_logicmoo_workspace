@@ -1,0 +1,168 @@
+%Production system
+%-------------------
+:- [-forward].
+
+ps :- retract(res_ervation(D,P,A)),
+      write('Reservation made for '),write(D),write(' by '),write(P),
+      write(' and in a '),write(A),nl,lis(0),nl.
+ps :- repeat,
+      conflictset(CS),
+      select(CS,  Rule),
+      fire(Rule),
+      ps.
+ps.
+
+conflictset(CS):-
+  bagof0((SortedTagList-(If,Then,S,F)),
+         TagList^STagList^(pr(If, (Then,S,F)),
+           triggered(If, TagList),
+           quicksort(TagList,STagList),
+           reverse(STagList,SortedTagList),
+           not(fired(If,Then,SortedTagList))),
+         CS).
+
+triggered((First,More),[Tag|MoreTags]):- !,
+  triggered(First, [Tag]), triggered(More, MoreTags).
+triggered(If, [Tag]):- wm(If,Tag).
+
+select(CS, Rule):-
+  keysort(CS, SortedCS),
+  first(SortedCS, Rule).
+
+quicksort([X|Xs],Ys):- partition(Xs,X,Littles,Bigs),
+  quicksort(Littles,Ls),
+  quicksort(Bigs,Bs),
+  append(Ls,[X|Bs],Ys).
+quicksort([],[]).
+
+partition([X|Xs],Y,[X|Ls],Bs):- X =< Y, partition(Xs,Y,Ls,Bs).
+partition([X|Xs],Y,Ls,[X|Bs]):- X>Y,partition(Xs,Y,Ls,Bs).
+partition([],_,[],[]).
+
+append([],A,A).
+append([A|B],C,[A|D]):- append(B,C,D).
+
+reverse(Xs,Ys):- reverse2(Xs,[],Ys).
+reverse2([X|Xs],Acc,Ys):- reverse2(Xs,[X|Acc],Ys).
+reverse2([],Ys,Ys).
+
+
+
+first([X|_],X) .
+first([_|X],Y):- first(X,Y).
+
+fire(TagList-(If,ThenInst, S, FInst)):- FInst,
+  assert(fired(If,ThenInst,TagList)), update_status(ThenInst,S).
+
+
+update_status(ThenInst, +):-
+  not(clause(wm(ThenInst,_),true)),!,
+  new_wm_counter(N),
+  assert(wm(ThenInst, N)).
+update_status(ThenInst, -):-
+  clause(wm(ThenInst,_),true),!,
+  retract(wm(ThenInst, _)).
+update_status(_,_).
+
+new_wm_counter(N) :- retract($wm_ctr(M)), N is M+1, assert($wm_ctr(N)).
+
+
+
+
+%-----------------------------------------------------------------------------
+%General rules
+%-----------------------------------------------------------------------------
+%transportation
+pr(money(expensive), (plane,+,true)).
+pr(money(normal), (car,+,true)).
+pr((money(cheap),active), (bus,+,true)).
+pr((money(cheap),crazy), (bus,+,true)).
+
+%accomodation
+pr((money(expensive),serious), (hotel,+,true)).
+pr((money(expensive),active), (hotel,+,true)).
+pr((money(normal),active), (hostel,+,true)).
+pr((money(normal),crazy), (hostel,+,true)).
+pr((money(cheap),active,weather(good)), (camping,+,true)).
+pr((money(cheap),active,weather(hot)), (camping,+,true)).
+pr((money(cheap),crazy,weather(good)), (camping,+,true)).
+pr((money(cheap),crazy,weather(hot)), (camping,+,true)).
+
+%activities
+pr(museum,      (city,+,true)).
+pr(theater,     (city,+,true)).
+pr(backpacking, (mountain,+,true)).
+pr(climbing,    (mountain,+,true)).
+pr(fishing,     (mountain,+,true)).
+pr(swimming,    (sea,+,true)).
+pr(fishing,     (sea,+,true)).
+pr(boating,     (sea,+,true)).
+
+pr((serious,money(normal)),             (museum,+,true)).
+pr((serious,money(expensive)),          (theater,+,true)).
+pr((active,weather(cold),money(cheap)), (backpacking,+,true)).
+pr((active,weather(hot),money(cheap)),  (backpacking,+,true)).
+pr((active,weather(good),money(cheap)), (backpacking,+,true)).
+pr((crazy,weather(cold),money(cheap)),  (backpacking,+,true)).
+pr((crazy,weather(hot),money(cheap)),   (backpacking,+,true)).
+pr((crazy,weather(good),money(cheap)),  (backpacking,+,true)).
+pr((crazy,weater(good),money(normal)),  (climbing,+,true)).
+pr((active,weather(hot),money(cheap)),  (swimming,+,true)).
+pr((active,weather(very_hot),money(cheap)),(swimming,+,true)).
+pr((crazy,weather(good),money(expensive)), (boating,+,true)).
+pr((crazy,weather(hot),money(expensive)),  (boating,+,true)).
+pr((serious,weather(cold),money(normal)),  (fishing,+,true)).
+pr((serious,weather(good),money(normal)),  (fishing,+,true)).
+
+
+%-----------------------------------------------------------------------------
+% Destination
+%-----------------------------------------------------------------------------
+pr((city,plane,hotel),  (paris,+,res(paris,plane,hotel))).
+pr((city,plane,hostel), (paris,+,res(paris,plane,hostel))).
+pr((city,plane,hotel),  (new_york,+,res(new_york,plane,hotel))).
+pr((city,plane,hostel), (new_york,+,res(new_york,plane,hostel))).
+pr((sea,plane,hotel),   (baja,+,res(baja,plane,hotel))).
+pr((sea,car,camping),   (baja,+,res(baja,car,camping))).
+pr((sea,plane,hotel),                      (chile,+,res(chile,plane,hotel))).
+pr((mountain,plane,hotel),                 (chile,+,res(chile,plane,hotel))).
+pr((season(winter),sea,plane,camping),     (chile,+,res(chile,plane,camping))).
+pr((season(winter),mountain,plane,camping),(chile,+,res(chile,plane,camping))).
+pr((season(summer),mountain,car,camping), 
+   (grand_teton,+,res(grand_teton,car,camping))).
+pr((season(summer),mountain,bus,camping), 
+   (grand_teton,+,res(grand_teton,bus,camping))).
+pr((season(fall),crazy,mountain,car,camping), 
+   (grand_teton,+,res(grand_teton,car,camping))).
+pr((mountain,plane,hotel), (grand_teton,+,res(grand_teton,car,hotel))).
+pr((mountain,car,hotel),   (grand_teton,+,res(grand_teton,car,hotel))).
+pr((mountain,bus,hotel),   (grand_teton,+,res(grand_teton,car,hotel))).
+
+% Reservation tasks
+%-------------------
+res(Des, plane,_):- plane(Des,0,_,_),!, fail.
+res(Des, plane, Accom):-
+  retract(plane(Des,N,M,D)),NN is N-1,assert(plane(Des,NN,M,D)),
+  assert(res_ervation(Des,plane,Accom)).
+res(Des, plane,Accom):- wm(month(M),_),wm(day(D),_),
+  assert(plane(Des,1,M,D)),
+  assert(res_ervation(Des,plane,Accom)).
+res(Des,P,Accom):- assert(res_ervation(Des,P,Accom)).
+
+
+
+
+
+lis(I):- wm(A,J),J>I,write('wm('),write(J),write(') --> '),write(A),nl,fail.
+lis(_).
+
+init_production_system:- abolish($wm_ctr,1),assert($wm_ctr(0)),
+ abolish(fired,3), retract(wm(P)),assert(wm(P,0)),fail.
+init_production_system.
+
+c1 :- abolish(wm,2),cust1,init_production_system,ps.
+c2 :- abolish(wm,2),cust2,init_production_system,ps.
+c3 :- abolish(wm,2),cust3,init_production_system,ps.
+c4 :- abolish(wm,2),cust4,init_production_system,ps.
+c5 :- abolish(wm,2),cust5,init_production_system,ps.
+

@@ -1,9 +1,12 @@
 /** <module> Logicmoo Path Setups
 */
-:-module(logicmoo_util_all,[if_flag_true/2,add_to_search_path/2,add_to_search_path_first/2,prolog_file_dir/2,if_startup_script/1,if_startup_script/0]).
+:-module(logicmoo_util_all,[if_flag_true/2]).
 :- set_prolog_flag(generate_debug_info, true).
+:- set_prolog_flag(access_level,system).
 
 :- '@'( ensure_loaded((logicmoo_util_filestreams)), 'user').
+:- '@'( ensure_loaded((logicmoo_util_filesystem)), 'user').
+:- '@'( ensure_loaded((logicmoo_util_term_listing)), 'user').
 
 :- dynamic(double_quotes_was/1).
 :- multifile(double_quotes_was/1).
@@ -70,39 +73,11 @@ with_vars(_,Stuff):- Stuff.
    asserta(user:file_search_path(library, A)).
 */
 
-:-multifile(local_directory_search/1).
-:-dynamic(local_directory_search/1).
-% Add the locations that the MUD source files will be picked up by the system
-%local_directory_search('../..').
-%local_directory_search('~logicmoo-mud/cynd/startrek'). % home vtDirection CynD world
-% local_directory_search('.').
-%local_directory_search('..'). 
-%local_directory_search('../runtime'). 
-%local_directory_search('../src_game'). % for user overrides and uploads
-%local_directory_search('../src_assets').  % for non uploadables (downloadables)
-%local_directory_search('../src_modules'). % for big modules
-%local_directory_search('../src_webui').  % for web UI modules
-local_directory_search('../src'). % shared_library preds
-local_directory_search('../src_lib').
-local_directory_search('../src_mud').  % for vetted src of the MUD
-%local_directory_search('../externals/XperiMental/src_incoming').  % areeba underlay
 
 :- current_prolog_flag(windows,true)->
    setenv('PATH_INDIGOLOG','../../indigolog');
    setenv('PATH_INDIGOLOG','../../indigolog').
 
-my_absolute_file_name(F,A):-catch(expand_file_name(F,[A]),_,fail),F\=A,!.
-my_absolute_file_name(F,A):-catch(absolute_file_name(F,A),_,fail),!.
-
-% register search path hook
-user:file_search_path(library,ATLIB):-getenv('PATH_INDIGOLOG',AT),atom_concat(AT,'/lib',ATLIB).
-user:file_search_path(indigolog,AT):-getenv('PATH_INDIGOLOG',AT).
-user:file_search_path(logicmoo,Dir):- 
-   local_directory_search(Locally),
-   locally_to_dir(Locally,Dir).
-
-locally_to_dir(Locally,Dir):-logicmoo_runtime_dir(RunDir), join_path33(RunDir,Locally,Directory),my_absolute_file_name(Directory,Dir),exists_directory(Dir),!.
-locally_to_dir(Directory,Dir):-my_absolute_file_name(Directory,Dir),exists_directory(Dir),!.
 
 
 :- '@'( ensure_loaded((logicmoo_util_bugger_new)), 'user').
@@ -141,5 +116,6 @@ show_file_search_path:- % 'format'('% ~q.~n',[forall(user:file_search_path(_,_))
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 :- retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
+:- set_prolog_flag(access_level,user).
 
 

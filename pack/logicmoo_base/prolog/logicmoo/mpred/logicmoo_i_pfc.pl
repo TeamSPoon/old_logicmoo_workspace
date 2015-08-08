@@ -290,12 +290,12 @@ assert_u(X,F,A):-must(isa(F,prologOrdered) -> assertz_u(X,F,A) ; asserta_u(X,F,A
 
 
 asserta_u(X):- functor(X,F,A),asserta_u(X,F,A).
-asserta_u(X,F,A):- show_call_success(clause_asserted(X)),!.
-asserta_u(X,_,_):- must((expire_tabled_list(X),asserta(X))).
+asserta_u(X,_,_):- show_call_success(clause_asserted(X)),!.
+asserta_u(X,_,_):- must((expire_tabled_list(X),call_with_attvars(asserta,X))).
 
 assertz_u(X):- functor(X,F,A),assertz_u(X,F,A).
-assertz_u(X,F,A):- show_call_success(clause_asserted(X)),!.
-assertz_u(X,_,_):- must((expire_tabled_list(X),assertz(X))).
+assertz_u(X,_,_):- show_call_success(clause_asserted(X)),!.
+assertz_u(X,_,_):- must((expire_tabled_list(X),call_with_attvars(assertz,X))).
 
 retract_u(X):-retract(X),must((expire_tabled_list(X))).
 retractall_u(X):-retractall(X),must((expire_tabled_list(X))).
@@ -310,7 +310,7 @@ pfc_update_literal(P,N,Q,R):-
     notrace(replace_arg(Q,N,NEW,R)).
 
 update_single_valued_arg(P,N):- arg(N,P,UPDATE),notrace(replace_arg(P,N,OLD,Q)),
-  must_det_l((assert_if_new(spft(P,u,u)),(P->true;(assertz_u(P))),
+  must_det_l((call_with_attvars(assert_if_new,spft(P,u,u)),(P->true;(assertz_u(P))),
      doall((clause(Q,true,E),UPDATE \== OLD,erase_safe(clause(Q,true,E),E),pfc_unfwc1(Q))))).
 
 
@@ -318,19 +318,22 @@ update_single_valued_arg(P,N):- arg(N,P,UPDATE),notrace(replace_arg(P,N,OLD,Q)),
 % ======================= 
 % prolog system database
 % ======================= 
+/*
 assert_prologsys(X):-assert(X).
 asserta_prologsys(X):-asserta(X).
 assertz_prologsys(X):-assertz(X).
+
 clause_prologsys(H,B):-clause(H,B).
 clause_prologsys(H,B,Ref):-clause(H,B,Ref).
+*/
 call_prologsys(X):-call(X).
 
 % ======================= 
 % internal bookkeeping
 % ======================= 
-assert_i(X):-assert_if_new(X).
-asserta_i(X):-asserta_if_new(X).
-assertz_i(X):-assertz_if_new(X).
+assert_i(X):-call_with_attvars(assert_if_new,X).
+asserta_i(X):-call_with_attvars(asserta_if_new,X).
+assertz_i(X):-call_with_attvars(assertz_if_new,X).
 retract_i(X):-retract(X).
 clause_i(H,B):-clause(H,B).
 clause_i(H,B,Ref):-clause(H,B,Ref).
@@ -542,12 +545,12 @@ is_already_supported(P,_S,(u,u)):- clause_asserted(spft(P,u,u)),!.
 
 
 
-different_literal(Q,N,R):- 
+different_literal(Q,N,R,Test):- 
  nonvar(Q),acyclic_term(Q),acyclic_term(R),functor(Q,F,A),functor(R,F,A),
   (singleValuedInArg(F,N) -> 
-    (arg(N,Q,Was),dif(Was,NEW),replace_arg(Q,N,NEW,R));
-    ((arg(N,Q,Was),nonvar(Q)) -> (dif(Was,NEW),replace_arg(Q,N,NEW,R));
-        (N=A,arg(N,Q,Was),dif(Was,NEW),replace_arg(Q,N,NEW,R)))).
+    (arg(N,Q,Was),Test=dif(Was,NEW),replace_arg(Q,N,NEW,R));
+    ((arg(N,Q,Was),nonvar(Q)) -> (Test=dif(Was,NEW),replace_arg(Q,N,NEW,R));
+        (N=A,arg(N,Q,Was),Test=dif(Was,NEW),replace_arg(Q,N,NEW,R)))).
 
 
 
@@ -1184,7 +1187,7 @@ pfc_define_bc_rule(Sup,Head,Body,Parent_rule) :-
 
 pfc_define_bc_rule(Sup,Head,Body,Parent_rule) :- 
   copy_term(Parent_rule,Parent_ruleCopy),
-  assert_if_new(Head:-pfc_bc_only(Head)),
+  call_with_attvars(assert_if_new,Head:-pfc_bc_only(Head)),
   build_rhs(Sup,Head,Rhs),
   foreachl_do(pfc_nf(Body,Lhs),
        (build_trigger(Support,Lhs,rhs(Rhs),Trigger),
@@ -1337,7 +1340,7 @@ pfc_call_0(G,F,A):- (pfc_call_with_no_triggers(G)).
 call_with_bc_triggers(P) :- functor(P,F,A), \+thlocal:infBackChainPrevented(F/A), 
   pfc_get_trigger_quick(bt(P,Trigger)),
   pfc_get_support(bt(P,Trigger),S),
-  thlocal:no_side_effects(P),
+  no_side_effects(P),
   with_no_assertions(thlocal:infBackChainPrevented(F/A),pfc_eval_lhs(Trigger,S)).
 
 
@@ -1347,9 +1350,8 @@ pfc_call_with_no_triggers(F) :-
   (var(F)    ->  pfc_facts_and_universe(F) ; pfc_call_with_no_triggers_bound(F)).
 
 pfc_call_with_no_triggers_bound(F) :- 
-  show_call_failure(thlocal:no_side_effects(F)),
-  (\+ current_predicate(_,F) -> fail;
-  call_prologsys(F)).
+  show_call_failure(no_side_effects(F)),
+  (\+ current_predicate(_,F) -> fail;call_prologsys(F)).
   %= we check for system predicates as well.
   %has_cl(F) -> (clause_u(F,Condition),(Condition==true->true;call_u(Condition)));
   %call_prologsys(F).
@@ -1547,16 +1549,20 @@ pfc_compile_rhsTerm(Sup,I,O):-to_addable_form_wte(I,O), must(\+ \+ pfc_mark_as(S
 
 
 pfc_mark_as(_,_,P,_):-var(P),!.
+
 pfc_mark_as(Sup,_PosNeg,neg(P),Type):-!,pfc_mark_as(Sup,neg,P,Type).
 pfc_mark_as(Sup,_PosNeg,\+(P),Type):-!,pfc_mark_as(Sup,neg,P,Type).
 pfc_mark_as(Sup,_PosNeg,-(P),Type):-!,pfc_mark_as(Sup,neg,P,Type).
 pfc_mark_as(Sup,_PosNeg,~(P),Type):-!,pfc_mark_as(Sup,neg,P,Type).
+pfc_mark_as(Sup,PosNeg,( P / _ ),Type):- !, pfc_mark_as(Sup,PosNeg,P,Type).
 pfc_mark_as(Sup,PosNeg,( _ :- _ ),Type):-!.
+pfc_mark_as(Sup,PosNeg,( _ , _ ),Type):-!.
 pfc_mark_as(Sup,PosNeg,P,Type):-get_functor(P,F,A),ignore(pfc_mark_fa_as(Sup,PosNeg,P,F,A,Type)),!.
 
 :- dynamic( pfcMark/4).
 
-pfc_mark_fa_as(_Sup,_PosNeg,_P,F,A,Type):- pfcMark(Type,_,F,A),!.
+% pfc_mark_fa_as(_,_,_,'\=',2,_):- trace.
+pfc_mark_fa_as(_Sup, PosNeg,_P,F,A,Type):- pfcMark(Type,PosNeg,F,A),!.
 pfc_mark_fa_as(_Sup,_PosNeg,_P,isa,_,_):- !.
 pfc_mark_fa_as(_Sup,_PosNeg,_P,t,_,_):- !.
 pfc_mark_fa_as(_Sup,_PosNeg,_P,argIsa,N,_):- !,must(N=3).
@@ -1681,17 +1687,17 @@ build_trigger(Support,[T|Triggers],Consequent,pt(T,X)) :-
 %= additional test specified in the rule attached to this ~ term.
 %=
 
-build_neg_test(Support,T,Testin,Testout) :-
+build_neg_test(Support,T,Testin,Testout) :- must(nonvar(T)),
   build_code_test(Support,Testin,Testmid),
   conjoin((call_u(T)),Testmid,Testout).
 
 
 %= this just strips away any currly brackets.
 
-build_code_test(Support,Test,TestO):-var(Test),!,TestO=call_u(Test).
+build_code_test(Support,Test,Test):-var(Test),!,must(nonvar(Test)),TestO=call_u(Test).
 build_code_test(Support,{Test},TestO) :- !,build_code_test(Support,Test,TestO).
 build_code_test(Support,Test,TestO):- sentence_op(Test),Test=..[F|TestL],maplist(build_code_test(Support),TestL,TestLO),TestO=..[F|TestLO],!.
-build_code_test(Support,Test,Test):-must(pfc_mark_as(Support,p,Test,pfcWatched)),!.
+build_code_test(Support,Test,Test):- must(pfc_mark_as(Support,p,Test,pfcCallCode)),!.
 build_code_test(Support,Test,Test).
 
 sentence_op(Var):-var(Var),!,fail.
@@ -1701,7 +1707,7 @@ sentence_op(-(_)).
 sentence_op(~(_)).
 sentence_op(\+(_)).
 sentence_op(call_u(_)).
-sentence_op(Test):-predicate_property(Test,meta_predicate(_)),predicate_property(Test,built_in).
+sentence_op(Test):-predicate_property(Test,meta_predicate(PP)),predicate_property(Test,built_in),  \+ (( arg(_,PP,N), N\=0)).
 
 all_closed(C):- \+compound(C)->true;(functor(C,_,A),A>1,\+((arg(_,C,Arg),var(Arg)))),!.
 

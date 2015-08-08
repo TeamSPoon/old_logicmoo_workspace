@@ -64,21 +64,21 @@ pfc_trace_item(M,H):- ignore(thlocal:pfc_trace_exec-> pp_item(M,H); true).
 
 
    
-pp_item(M,H):- \+ \+ (( \+ ground(H), name_vars(H,HH),numbervars(HH,0,_), pp_item(M,HH))).
+pp_item(M,(H:-B)):- B ==true,pp_item(M,H).
 pp_item(M,H):- flag(show_asserions_offered,X,X+1),thlocal:print_mode(html),!, (\+ \+ pp_item_html(M,H)),!.
-pp_item(M,H):- true,(\+ \+ pp_item_html(M,H)),!.
-pp_item(M,(H:-true)):-pp_item(M,H).
+
+% pp_item(M,H):- \+ \+ (( \+ ground(H), name_vars(H,HH),numbervars(HH,0,_,[attvar(skip)]), pp_item(M,HH))).
 
 
 pp_item(M,spft(W,U,U)):-!,pp_item(M,U:W).
 pp_item(M,spft(W,F,U)):- atom(U),!, fmt('~N%~n',[]),pp_item(M,U:W), fmt('~N% rule: ~q~n%~n', [F]),!.
 pp_item(M,spft(W,F,U)):-          !,fmt('~N% ~w~n%d:       ~q~n%format:    ~q~n', [M,W,F]),pp_item(M,U).
 pp_item(M,nt(Trigger,Test,Body)) :- !, fmt('~N%~sn-trigger: ~q~n%test: ~q~n%body: ~q~n', [M,Trigger,Test,Body]).
-pp_item(M,pt(F,Body)):-              !,fmt('~N%~sp-trigger: ~q~n~n%body:~n', [M,F]), rok_portray_clause((F:-Body)).
+pp_item(M,pt(F,Body)):-              !,fmt('~N%~sp-trigger: ~q~n~n%body:~n', [M,F]), pp_i2tml0((F:-Body)).
 pp_item(M,bt(F,Body)):-              !,fmt('~N%~sb-trigger: ~q~n%body: ~q~n', [M,F,Body]).
 
 pp_item(M,U:W):- !,sformat(S,'~w  ~w:',[M,U]),!, pp_item(S,W).
-pp_item(M,H):- \+ \+ (( numbervars(H,0,_), fmt("~N%~s ~q~n",[M,H]))).
+pp_item(M,H):- \+ \+ (( numbervars(H,0,_,[attvar(skip)]), fmt("~N%~s ~q~n",[M,H]))).
 
 pfc_classify_facts([],[],[],[]).
 
@@ -382,14 +382,14 @@ this_listing(M:F/A):-functor(H,F,A),predicate_property(H,number_of_causes(_)),!,
 this_listing(M:F/A):-listing(M:F/A),!.
 this_listing(MFA):-listing(MFA).
 
-:-thread_local(pp_i2tml_saved_buffer/2).
+:-thread_local(sortme_buffer/2).
 
 
 % i2tml_save(Obj,H):- \+ is_list(H),cyc:pterm_to_sterm(H,S),H\=@=S,!,i2tml_save(Obj,S).
 
-pp_i2tml_saved_done(Obj):-pp_now,!.
+pp_i2tml_saved_done(Obj):-pp_now,!,flush_output.
 pp_i2tml_saved_done(Obj):-
-  findall(H,retract(pp_i2tml_saved_buffer(Obj,H)),List),predsort(head_functor_sort,List,Set),
+  findall(H,retract(sortme_buffer(Obj,H)),List),predsort(head_functor_sort,List,Set),
   forall(member(S,Set),pp_i2tml(S)),!.
 
 find_ref((H:-B),Ref):-!, clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!.
@@ -402,26 +402,13 @@ head_functor_sort(Result,H1,H2):- once((get_functor(H1,F1,A1),get_functor(H2,F2,
 head_functor_sort(Result,H1,H2):- once((get_functor(H1,F1,_),get_functor(H2,F2,_))),F1\==F2,compare(Result,F1,F2),Result \== (=),!.
 head_functor_sort(Result,H1,H2):-compare(Result,H1,H2),!.
 
-i2tml_hbr(Obj,Wall,H,B,Ref):- nonvar(Ref),!,pp_i2tml_save_seen(Obj,Wall,clause(H,B,Ref)).
-i2tml_hbr(Obj,Wall,H,B,_):- B==true,!, pp_i2tml_save_seen(Obj,Wall,H).
-i2tml_hbr(Obj,Wall,H,B,_):- !,pp_i2tml_save_seen(Obj,Wall,(H:-B)).
+i2tml_hbr(H,B,Ref):- nonvar(Ref),!,pp_i2tml_save_seen(clause(H,B,Ref)).
+i2tml_hbr(H,B,_):- B==true,!, pp_i2tml_save_seen(H).
+i2tml_hbr(H,B,_):- !,pp_i2tml_save_seen((H:-B)).
 
-pp_i2tml_save_seen(_,PWall,H):-var(PWall),!,pp_i2tml_save_seen(H).
-pp_i2tml_save_seen(Obj,PWall,H):-
-   statistics(walltime,[Wall,_]),
-   StopAt is (30000 + PWall),
-   ((StopAt < Wall) -> throw(times_up(Obj));must(i2tml_save(Obj,H))),!.
+pp_i2tml_save_seen(HB):- pp_now, !,pp_i2tml(HB),!.
+pp_i2tml_save_seen(HB):- assertz_if_new(sortme_buffer(Obj,HB)),!.
 
-   i2tml_save(_,pp_i2tml_saved_buffer(_,_)):-!.
-i2tml_save(_,HB):- pp_now, !,pp_i2tml_now(HB),!.
-i2tml_save(Obj,H):- assertz_if_new(pp_i2tml_saved_buffer(Obj,H)),!.
-
-
-
-pp_i2tml_now(USER:HB):-USER==user,!,pp_i2tml_now(HB),!.
-pp_i2tml_now((USER:H :- B)):-USER==user,!,pp_i2tml_now((H:-B)),!.
-pp_i2tml_now((H :- B)):-B==true,!,pp_i2tml_now((H)),!.
-pp_i2tml_now(HB):-pp_i2tml(HB),!.
 
 :-thread_local(thlocal:pp_i2tml_hook/1).
 
@@ -466,6 +453,9 @@ pp_i2tml(Done):-Done==done,!.
 pp_i2tml(T):-isVarProlog(T),getVarAtom(T,N),format('~w',[N]),!.
 pp_i2tml(T):-string(T),format('"~w"',[T]).
 pp_i2tml(clause(H,B,Ref)):- show_clause_ref(Ref),!,pp_i2tml((H:-B)).
+pp_i2tml((H :- B)):-B==true,!,pp_i2tml((H)),!.
+pp_i2tml(USER:HB):-USER==user,!,pp_i2tml(HB),!.
+pp_i2tml(((USER:H) :- B)):-USER==user,!,pp_i2tml((H:-B)),!.
 pp_i2tml((H:-B)):-B==true, !, pp_i2tml(H).
 pp_i2tml(was_chain_rule(H)):- pp_i2tml(H).
 pp_i2tml(M:(H)):-M==user, pp_i2tml(H).
@@ -499,13 +489,23 @@ pp_i2tml(H):-
    retractall(last_item_offered(Was)),asserta(last_item_offered(H)),
     ((F1 \== F2 -> format('<hr/>',[]);true)))),fail.
 
-pp_i2tml(C):- functor_to_color(C,FC)->fmtimg(FC)->format('<input type="checkbox" name="assertion[]" value="~w" ',[C]),fail.
+pp_i2tml(H):- thlocal:print_mode(html), 
+  term_to_escaped_string(H,ALT)->
+   functor_to_color(H,FC)->fmtimg(FC,ALT)->
+    format('<input type="checkbox" name="assertion[]" value="~w">',[ALT]),fail.
 
-pp_i2tml(H):- \+ \+  (( \+ ground(H), must(( name_vars(H,HH),numbervars(HH,0,_), pp_i2tml0(HH))))).
+pp_i2tml(H):- \+ \+  (( \+ ground(H), must(( name_vars(H,HH),numbervars(HH,0,_,[attvar(skip)]), pp_i2tml0(HH))))).
 pp_i2tml(H):- \+ \+ pp_i2tml0(H).
 
 pp_i2tml0(C):- thlocal:pp_i2tml_hook(C),!.
 pp_i2tml0(C):- if_defined(rok_portray_clause(C),portray_clause(C)).
+
+
+term_to_escaped_string(H,HS2):-term_string(H,HS)->atom_subst(HS,'\\','\\\\',HS1)->atom_subst(HS1,'"','\\"',HS2),!.
+
+fmtimg(N,Alt):- thlocal:print_mode(html),!,
+ format('~N<img src="http://prologmoo.com/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred_online/pixmaps/~w.gif" alt="~w" title="~w">',[N,Alt,Alt]).
+fmtimg(_,_).
 
 
 indent_nbsp(X):-thlocal:print_mode(html),forall(between(0,X,_),format('&nbsp;')),!.
@@ -518,9 +518,6 @@ indent_nbsp(0,''):-!.
 indent_nbsp(1,'\n         '):-!.
 indent_nbsp(X,Chars):-XX is X -1,!, indent_nbsp(XX,OutP),!,sformat(Chars,'~w   ',[OutP]),!.
 
-
-fmtimg(N):- 
- format('~N<img src="http://prologmoo.com/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred_online/pixmaps/~w.gif">',N).
 
 
 functor_to_color(wid(_,_,G),C):-!,functor_to_color(G,C).

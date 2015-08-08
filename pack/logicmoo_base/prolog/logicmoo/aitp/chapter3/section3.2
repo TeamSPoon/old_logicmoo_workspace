@@ -1,0 +1,65 @@
+
+% Basic meta inrterpreter
+  meta_basic((A,B)) :- !, 
+	meta_basic(A), 
+	meta_basic(B).
+  meta_basic(A) :- 
+	system(A), !,
+	A.
+  meta_basic(A) :- 
+	clause(A,B), 
+	meta_basic(B).
+
+
+% Addition of not, bagof...
+meta_basic((A,B)) :- !, meta_basic(A), meta_basic(B).
+meta_basic(A) :- system(A), !, A.
+meta_basic(not(A)) :- not(meta_basic(A)).
+meta_basic(bagof(H, Goal, Sol)) :- bagof(H, meta_basic(Goal), Sol).
+meta_basic(setof(H, Goal, Sol)) :- setof(H, meta_basic(Goal), Sol).
+meta_basic(findall(H, Goal, Sol)) :- findall(H, meta_basic(Goal), Sol).
+meta_basic(A) :- clause(A,B), meta_basic(B).
+
+
+ A meta-interpreter handling `cut'
+  meta(X) :- 
+	meta_cut(X,R), 
+	(
+	  R==bktrk, ! ,fail 
+	; 
+	  true
+	).
+
+  meta_cut(!,R) :- !, 
+	(
+	  true
+	;
+	  R=bktrk
+	).   
+  meta_cut((X;Y),R) :- !, 
+	(
+	  meta_cut(X,R) 
+	; 
+	  meta_cut(Y,R)
+	). 
+% disjunction
+  meta_cut((X,Y),R) :- !, 
+  	meta_cut(X,R), 
+	( 
+	  R==bktrk, ! 
+	; 
+	  meta_cut(Y,R)
+	). 
+  meta_cut(X,_) :- 
+	system(X), !, 
+	X.  
+  meta_cut(X,_) :- 
+	clause(X,Z), 
+	meta_cut(Z,R), 
+	( 
+	  R==bktrk, ! ,fail
+	;
+	  true
+	). 
+
+

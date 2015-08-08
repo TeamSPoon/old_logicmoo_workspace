@@ -305,11 +305,11 @@ clause_u(H,B,Ref):-must(H\==true),clause(H,B,Ref).
 
 
 pfc_update_literal(P,N,Q,R):-
-    arg(N,P,UPDATE),notrace(replace_arg(P,N,OLD,Q)),
+    arg(N,P,UPDATE),notrace(replace_arg_fast(P,N,OLD,Q)),
     must(Q),update_value(OLD,UPDATE,NEW), 
-    notrace(replace_arg(Q,N,NEW,R)).
+    notrace(replace_arg_fast(Q,N,NEW,R)).
 
-update_single_valued_arg(P,N):- arg(N,P,UPDATE),notrace(replace_arg(P,N,OLD,Q)),
+update_single_valued_arg(P,N):- arg(N,P,UPDATE),notrace(replace_arg_fast(P,N,OLD,Q)),
   must_det_l((assert_if_new(spft(P,u,u)),(P->true;(assertz_u(P))),
      doall((clause(Q,true,E),UPDATE \== OLD,erase(E),pfc_unfwc1(Q))))).
 
@@ -545,9 +545,9 @@ is_already_supported(P,_S,(u,u)):- clause_asserted(spft(P,u,u)),!.
 different_literal(Q,N,R):- 
  nonvar(Q),acyclic_term(Q),acyclic_term(R),functor(Q,F,A),functor(R,F,A),
   (singleValuedInArg(F,N) -> 
-    (arg(N,Q,Was),dif(Was,NEW),replace_arg(Q,N,NEW,R));
-    ((arg(N,Q,Was),nonvar(Q)) -> (dif(Was,NEW),replace_arg(Q,N,NEW,R));
-        (N=A,arg(N,Q,Was),dif(Was,NEW),replace_arg(Q,N,NEW,R)))).
+    (arg(N,Q,Was),dif(Was,NEW),replace_arg_fast(Q,N,NEW,R));
+    ((arg(N,Q,Was),nonvar(Q)) -> (dif(Was,NEW),replace_arg_fast(Q,N,NEW,R));
+        (N=A,arg(N,Q,Was),dif(Was,NEW),replace_arg_fast(Q,N,NEW,R)))).
 
 
 

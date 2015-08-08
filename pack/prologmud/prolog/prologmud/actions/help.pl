@@ -49,7 +49,7 @@ action_info_db(TEMPL,INFO,WAS):- (PRED=user:agent_call_command(_,WAS);PRED=user:
     (TEMPL=@=WAS -> ((clause_property(REF,line_count(LC)),INFO=line(LC:S))) ;  (not(not(TEMPL=WAS)) -> INFO=file(S) ; fail)).
 
 % :-trace.
-user:action_info(TEMPL,txtConcatFn(S,contains,WAS)) <= action_info_db(TEMPL,S,WAS)/not_asserted(user:action_info(TEMPL,_Help)).
+user:action_info(TEMPL,txtConcatFn(S,contains,WAS)) <= {action_info_db(TEMPL,S,WAS),not_asserted(user:action_info(TEMPL,_Help))}.
 % user:action_info(TEMPL,txtConcatFn(S,contains,WAS)) <= action_info_db(TEMPL,S,WAS),{not_asserted(user:action_info(TEMPL,_Help))}.
 
 
@@ -77,6 +77,8 @@ user:agent_call_command(_Agent,actHelp(Str)) :-show_help(Str).
 
 show_help(Str):-commands_list(ListS),forall(member(E,ListS),write_string_if_contains(Str,E)).
 
+write_string_if_contains('',E):-!,show_templ_doc(E),!.
+write_string_if_contains([],E):-!,show_templ_doc(E),!.
 write_string_if_contains("",E):-!,show_templ_doc(E),!.
 write_string_if_contains(Must,E):-ignore((with_output_to(string(Str),show_templ_doc_all(E)),str_contains_all([Must],Str),fmt(Str))).
 

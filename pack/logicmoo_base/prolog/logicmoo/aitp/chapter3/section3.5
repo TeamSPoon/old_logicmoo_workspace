@@ -1,0 +1,20 @@
+
+pe(X) :-   doall((premises(X,[X],P),
+                  listtoand(P,AP),
+                  write((X :- AP)),write('.'),nl)).
+
+doall(X) :- X,fail ; true.
+
+premises((X,Y),Old,P) :- !,
+  premises(X,Old,P1), append(P1,Old,New), premises(Y,New,P2), append(P1,P2,P).
+
+premises(X,_,P) :- 
+  system(X),!,
+  (executable(X) -> (call(X) -> P=[] 
+                             ;  fail)
+                 ;  P=[X]).      
+
+premises(X,Z,P) :- clause(X,Y),premises(Y,Z,P).
+
+premises(X,Z,[X]) :- \+clause(X,_),\+(member(X,Z)).
+

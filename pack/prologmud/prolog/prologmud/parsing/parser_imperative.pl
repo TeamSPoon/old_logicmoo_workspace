@@ -504,7 +504,7 @@ mud_test(test_bad_verb, [ true(
 
 
 mud_test(food_is_a_droppable, [ true(
-       parse_agent_text_command(iPlayer1,actDrop,[food],_D2,_E2))]).
+       parse_agent_text_command(iExplorer1,actDrop,[food],_D2,_E2))]).
 
 
 %:- end_tests(test_bad_verb).

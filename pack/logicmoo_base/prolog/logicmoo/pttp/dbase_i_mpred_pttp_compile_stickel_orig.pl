@@ -35,7 +35,7 @@ prove(Goal,Max,Min,Inc,ProofIn,ProofOut) :- prove_inc(Goal,Max,Min,Inc,ProofIn,P
 prove_inc(Goal,Max,Min,Inc,ProofIn,ProofOut) :-
 	expand_input_proof(ProofIn,PrfEnd),
 	PrevInc is Min + 1,
-	add_args(INFO,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],ProofOut1,Goal1,_),
+	add_args(_INFO,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],ProofOut1,Goal1,_),
 	!,
 	timed_call(search(Goal1,Max,Min,Inc,PrevInc,DepthIn,DepthOut),'Proof'),
 	contract_output_proof(ProofOut1,ProofOut),
@@ -85,7 +85,7 @@ add_features((Head :- Body),NewHeadBody):-
 % new_head_body(Head, Body,Head1 ,Body1,(Head1 :- head_body_was(Head, Body), Body1)):- arg_checks()
 new_head_body(Head, infer_by(_ProofID),Head1 ,Body1,(Head1 :- Body1)):- ground(Head),!.
 new_head_body(Head, _Body,Head1 ,Body1,(Head1 :- Body1)):- is_query_lit(Head),!.
-new_head_body(Head, _Body,Head1 ,Body1,(Head1 :- Body1)):- 
+new_head_body(_Head, _Body,Head1 ,Body1,(Head1 :- Body1)):- 
    true. 
    %   dmsg(pp((head_features(Head1) :-head_body_was(Head, Body), Body1))).
 
@@ -275,7 +275,7 @@ add_args(INFO,(A ; B),PosGoal,GoalAtom,HeadArgs,
 			B1 = B2),
 		disjoin(A1,B1,Body1).
 
-add_args(INFO,Search_cost,_PosGoal,_GoalAtom,_HeadArgs,_PosAncestors,_NegAncestors,_NewPosAncestors,_NewNegAncestors,Depth,Depth,Proof,Proof,true,_New):- 
+add_args(_INFO,Search_cost,_PosGoal,_GoalAtom,_HeadArgs,_PosAncestors,_NegAncestors,_NewPosAncestors,_NewNegAncestors,Depth,Depth,Proof,Proof,true,_New):- 
   functor(Search_cost,search_cost,_),!.
 
 add_args(INFO,infer_by(_N),PosGoal,GoalAtom,_HeadArgs,
@@ -291,11 +291,11 @@ add_args(INFO,infer_by(_N),PosGoal,GoalAtom,_HeadArgs,
     Body1 = (ProofIn = [Prf,[N1,GoalAtom,PosAncestors,NegAncestors]|PrfEnd],
 			 ProofOut = [Prf|PrfEnd]).
 
-add_args(INFO,Body,_PosGoal,_GoalAtom,_HeadArgs,_PosAncestors,_NegAncestors,_NewPosAncestors,_NewNegAncestors,Depth,Depth,Proof,Proof,Body,_New):-
+add_args(_INFO,Body,_PosGoal,_GoalAtom,_HeadArgs,_PosAncestors,_NegAncestors,_NewPosAncestors,_NewNegAncestors,Depth,Depth,Proof,Proof,Body,_New):-
    pttp_builtin(Body),!.
 
 % normal lit
-add_args(INFO,BodyIn,
+add_args(_INFO,BodyIn,
          _PosGoal,_GoalAtom,_HeadArgs,
          _PosAncestors,_NegAncestors,
 	 NewPosAncestors,NewNegAncestors,

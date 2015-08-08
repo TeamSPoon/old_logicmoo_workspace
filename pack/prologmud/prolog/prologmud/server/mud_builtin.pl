@@ -1038,23 +1038,23 @@ O = [
 
 :- pfc_watch.
 
-:-pfc_add(tAgent(iPlayer1)).
+:-pfc_add(tAgent(iExplorer1)).
 
 
 
-:-must(mudFacing(iPlayer1,vNorth)).
+:-must(mudFacing(iExplorer1,vNorth)).
 
-:-pfc_add(mudFacing(iPlayer1,vSouth)).
+:-pfc_add(mudFacing(iExplorer1,vSouth)).
 
-:-must(\+ mudFacing(iPlayer1,vNorth)).
+:-must(\+ mudFacing(iExplorer1,vNorth)).
 
-:-must(mudFacing(iPlayer1,vSouth)).
+:-must(mudFacing(iExplorer1,vSouth)).
 
-:-pfc_rem(mudFacing(iPlayer1,vSouth)).
+:-pfc_rem(mudFacing(iExplorer1,vSouth)).
 
-:-must(\+ mudFacing(iPlayer1,vSouth)).
+:-must(\+ mudFacing(iExplorer1,vSouth)).
 
-:-must(mudFacing(iPlayer1,vNorth)).
+:-must(mudFacing(iExplorer1,vNorth)).
 
 :- pfc_no_watch.
 

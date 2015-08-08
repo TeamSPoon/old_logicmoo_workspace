@@ -274,11 +274,12 @@ unify(X,Y) :- unify_with_occurs_check(X,Y).
 unify_cheaper(X,Y) :- compound(X),compound(Y),!,
 		functor(X,F1,N),
 		functor(Y,F2,N),
+
                 same_functor(F1,F2),
-		N = 1 ->
+		(N = 1 ->
 			arg(1,X,X1), arg(1,Y,Y1), unify(X1,Y1);
 		%true ->
-			unify_args(X,Y,N).
+			unify_args(X,Y,N)).
 
 unify_cheaper(X,Y) :- unify_with_occurs_check(X,Y),!.
 
@@ -494,31 +495,31 @@ clauses2(A,[Lit|Lits],L,WffNum) :-
 clauses2(_,[],true,_).
 
 head_literals(Wff,L) :-
-	Wff = (A :- B) ->	% contrapositives not made for A :- ... inputs
+	Wff = (A :- _B) ->	% contrapositives not made for A :- ... inputs
 		head_literals(A,L);
 	Wff = (A , B) ->
-		head_literals(A,L1),
-		head_literals(B,L2),
-		list_union(L1,L2,L);
+		(head_literals(A,L1),
+		 head_literals(B,L2),
+		 list_union(L1,L2,L));
 	Wff = (A ; B) ->
-		head_literals(A,L1),
-		head_literals(B,L2),
-		list_union(L1,L2,L);
+		(head_literals(A,L1),
+		 head_literals(B,L2),
+		 list_union(L1,L2,L));
 	%true ->
 		L = [Wff].
 
 body_for_head_literal(Head,Wff,Body) :-
 	Wff = (A :- B) ->
-		body_for_head_literal(Head,A,A1),
-		conjoin_pttp(A1,B,Body);
+		(body_for_head_literal(Head,A,A1),
+		 conjoin_pttp(A1,B,Body));
 	Wff = (A , B) ->
-		body_for_head_literal(Head,A,A1),
-		body_for_head_literal(Head,B,B1),
-		disjoin(A1,B1,Body);
+		(body_for_head_literal(Head,A,A1),
+		 body_for_head_literal(Head,B,B1),
+		 disjoin(A1,B1,Body));
 	Wff = (A ; B) ->
-		body_for_head_literal(Head,A,A1),
-		body_for_head_literal(Head,B,B1),
-		conjoin_pttp(A1,B1,Body);
+		(body_for_head_literal(Head,A,A1),
+		 body_for_head_literal(Head,B,B1),
+		 conjoin_pttp(A1,B1,Body));
 	Wff == Head ->
 		Body = true;
 	(once(negated_literal(Wff,Was)),Head=@=Was) ->
@@ -590,14 +591,14 @@ predicates(Wff,F,A,[[F,A]|L]):- Wff=..[_|ARGS], predicates(ARGS,L).
 
 
 procedure(P,N,Clauses,Proc) :-
-	Clauses = (A , B) ->
-		procedure(P,N,A,ProcA),
-		procedure(P,N,B,ProcB),
-		conjoin_pttp(ProcA,ProcB,Proc);
-	(Clauses = (A :- B) , functor(A,P,N)) ->
+       ( (Clauses = (A , B)) ->
+		(procedure(P,N,A,ProcA),
+		 procedure(P,N,B,ProcB),
+		 conjoin_pttp(ProcA,ProcB,Proc));
+	((Clauses = (A :- _B) , functor(A,P,N)) ->
 		Proc = Clauses;
 	%true ->
-		Proc = true.
+		Proc = true)).
 
 procedures([[P,N]|Preds],Clauses,Procs) :-
 	procedure(P,N,Clauses,Proc),
@@ -640,8 +641,8 @@ do_not_wrap(F):-atom_concat('int_',_,F).
 :-export(correct_pttp/2).
 %:- dynamic thlocal:second_order_wrapper/1.
 :- thread_local thlocal:second_order_wrapper/1.
-
 thlocal:second_order_wrapper(true_t).
+
 
 correct_pttp_head(Wrapper,B,A):- with_assertions(thlocal:second_order_wrapper(Wrapper), correct_pttp(B,A)),!.
 
@@ -1046,7 +1047,8 @@ negated_functor(F,NotF) :- is_2nd_order_holds_pttp(NotF),trace_or_throw(negated_
 negated_literal(-A,B):-var(A),!,trace_or_throw(var_negated_literal(-A,B)),!.
 negated_literal(not(A),A):-!.
 negated_literal(-(A),A):-!.
-negated_literal(A,B):- functor(A,F,Arity),member(F,[&,(,),(;),(v),(all),(:-)]),must_det_l((as_dlog(A,AA),IN=not(AA), call((nnf('$VAR'('KB'),IN,BB),BB \=@= IN,thglobal:as_prolog(BB,B))))).
+negated_literal(A,-(A)):-atom(A),A\=(~),A\=(-),!.
+negated_literal(A,B):- functor(A,F,_Arity),member(F,[&,(,),(;),(v),(all),(:-)]),must_det_l((as_dlog(A,AA),IN=not(AA), call((nnf('$VAR'('KB'),IN,BB),BB \=@= IN,thglobal:as_prolog(BB,B))))).
 negated_literal(not(A),B):-negated_literal(A,AA),!,negated_literal_0(AA,B),!.
 negated_literal(-A,B):-negated_literal(A,AA),!,negated_literal_0(AA,B),!.
 negated_literal(A,B):- var(B),!,negated_literal_0(A,B),!.

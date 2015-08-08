@@ -1,0 +1,509 @@
+abductively_holds(Ts,Te,Fact, Constrains) :-
+	% Colect garbige.
+	retractall(temp(_)),
+	assert(temp(precedes(Ts,Te))),
+	setof((T3,T4), fact_token(T3,T4,Fact), FactInterval),
+	setof0((T3,T4), (contradiction(Fact,Cont), fact_token(T3,T4,Cont)), ForbidenIntervals),
+	find_constrains(Ts, Te, FactInterval, ForbidenIntervals, Constrains).
+
+find_constrains(Ts, Te, FactInterval, ForbidenIntervals, Constrains) :-
+	member((T1,T2), FactInterval),
+	subrange(Ts,Te,T1,T2, Constrains1),
+	contra_constrains( Ts,Te, ForbidenIntervals, [], Constrains2),
+	append(Constrains1,Constrains2, Constrains).
+	
+subrange(Ts,Te,T1,T2, Constrains) :-
+	clip(T1, Ts, Con1),
+	assert_constrain(Con1),
+	clip(Te, T2, Con2),
+	assert_constrain(Con2),
+	append(Con1,Con2, Constrains).
+	
+contra_constrains( _,_, [], Constrains, Constrains).
+contra_constrains( Ts,Te, [(T1,T2) | More], TConstrains, Constrains) :-
+	(clip(Te, T1, NConstrain) ; clip(T2, Ts, NConstrain)),
+	assert_constrain(NConstrain),
+	append(TConstrains, NConstrain, TConstrains1),
+	contra_constrains(Ts, Te, More, TConstrains1, Constrains).
+
+% Simple. If I added a constrain then backtrack will remove it.
+assert_constrain([]) :- !.
+assert_constrain([Constrain]) :-
+	assert(temp(Constrain)).
+assert_constrain([Constrain]) :-
+	retract(temp(Constrain)), !, fail.
+
+% Finds out the relation between two time points.
+% Note: how do I treat infinity?	
+relation(T1,T2, before) :- is_before(T1,T2),!.
+relation(T1,T2, after)    :- is_before(T2,T1),!.
+relation(T1,T2, coincident) :- is_coincident(T1,T2),!.
+relation(_,_, unknown).
+
+clip(T1,T2, Constrain) :-
+	% The only time I can not do anything is if T1 > T2.
+	relation(T1, T2, Relation),
+	 ( Relation = before, Constrain = [] ;
+	   Relation = coincident, Constrain = [] ;
+	   Relation = unknown, (Constrain = [coincident(T1,T2)] ;  
+			    Constrain = [precedes(T1,T2)])).
+% Add new event at time T1.
+%   add_event_token(+T1, +Event,  +T2)
+add_event_token(T1, NewEvent,  Constrains) :-
+	retractall(temp(_)),
+	retract(event_list(EventList)) ,
+	% Add the event constrains.
+	add_constrains(Constrains),!,
+	partition_eventlist(T1, EventList, BeforEvents, AfterEvents),
+	rollback( AfterEvents),!,
+	%assert(precedes(T1, infinity)),
+	execute_events([(T1, NewEvent) | AfterEvents]),
+	append(BeforEvents, [(T1, NewEvent) | AfterEvents], NEventList),
+	assert(event_list(NEventList)), !.
+
+del_event_token(T1, DEvent) :-
+	retractall(temp(_)),
+	retract(event_list(EventList)),
+	partition_eventlist(T1, EventList, BeforEvents, AfterEvents),
+	rollback( [(T1, DEvent) |AfterEvents]),
+	remove_time_point(T1), 
+	execute_events(AfterEvents),
+	append(BeforEvents, AfterEvents, NEventList),
+	assert(event_list(NEventList)), !.	
+
+execute_events([]).
+execute_events([(Te, Event) | More]) :-
+	execute_event(Te, Event),
+	execute_events(More).
+
+execute_event(Te, Event) :-
+	findall((Pre, Result), causes(Pre, Event, Result), Rules),
+	execute_rules(Te, Rules, RefList),
+	assert(event_token(Te, Event, RefList)).
+
+execute_rules(_, [], []).
+execute_rules(Te, [(Pre, Result) | More], [Ref | RefList]) :-
+	event_holds(Te,Pre),!,
+	%holds(Te,Te, Pre),!, 
+	unique(T1),unique(T2),
+	insert_fact_token(T1,T2,Result, [coincident(Te,T1)], _, Ref),
+	execute_rules(Te, More, RefList).
+execute_rules(Te, [_| More], RefList) :-execute_rules(Te, More, RefList).
+
+event_holds(Te,  Fact) :-
+	fact_token(T1,T2,Fact),
+ 	is_before_or_coincident(T1,Te),
+	(not(precedes(T2, _)) ; is_before_or_coincident(Te,T2)).
+ 
+rollback([]).
+rollback([(Te, Event) | More] ) :-
+	% Do it from the last one backwords
+	rollback( More),
+	rollback_event(Te, Event).
+
+rollback_event(T1, Event) :-
+	retract(event_token(T1, Event, RefList)),
+	del_resulting_facts(RefList).
+
+del_resulting_facts([]).
+del_resulting_facts([Ref | More]) :-
+	% Execute from the end of the list backwards
+	del_resulting_facts(More),
+	% Locate the clause referenced by Ref
+	clause(fact_token(T1,T2,Fact), _, Ref),
+	remove_fact_token(T1,T2,Fact).
+
+
+add_constrains([]).
+add_constrains([X|More]) :- assert(X), add_constrains(More).
+
+% This is very ineficiant. Implementing binry search will have much better results.
+partition_eventlist(_, [], [], []). % I am the last one.
+partition_eventlist(Te,[(Te, _) | More] , [] , More). % Delete case.
+partition_eventlist(Te,[(T, Event) | More] , [(T, Event) | BEvents] , AEvents) :-
+	is_before(T, Te),!,
+	partition_eventlist(Te, More , BEvents, AEvents).
+partition_eventlist(_, AEvents , [] , AEvents). % The rest is after me.
+
+
+unique(NewTime) :-retract(time(T1)), T2 is T1+1, assert(time(T2)),
+	name('auto_time_', X), name(T2,Y), append(X, Y, Z), name(NewTime,Z).
+
+
+/**********************************************************************************************************/
+/**********************************************************************************************************/
+/**********************************************************************************************************/
+% add_fact_token(+T1, +T2, +Fact, +Constrains, -AddConstrains)
+add_fact_token(T1,T2,Fact, Constrains, AddConstrains) :-
+	retractall(temp(_)),
+	event_list(EventList), 
+	partition_eventlist(T1, EventList, _, AfterEvents),
+	rollback(AfterEvents),
+	insert_fact_token(T1,T2,Fact, Constrains, AddConstrains, _),
+	execute_events(AfterEvents), !.
+
+del_fact_token(T1,T2,Fact) :-
+	retractall(temp(_)),
+	fact_token(T1,T2,Fact), 
+	event_list(EventList), 
+	rollback(EventList ),
+	remove_fact_token(T1,T2,Fact ),
+	execute_events(EventList),!.
+
+insert_fact_token(T1,T2,Fact, Constrains, AddConstrains, Ref) :-
+	assert(temp(precedes(T1,T2))),
+	add_temp_constrains(Constrains),
+	findall((T3,T4), (contradiction(Fact,Cont), fact_token(T3,T4,Cont)), Forbiden),
+	contra_constrains(T1,T2,Forbiden, [], AddConstrains), 
+	%not_overlap(T1,T2,Forbiden),
+	%AddConstrains = [],
+	% Process completed. Convert every temporary constrain to real constrain.
+	(member(X, Constrains), assert(X), fail ; true),
+	(member(X, AddConstrains), assert(X), fail ; true),
+	assert(precedes(T1,T2)),
+	%(retract(temp(X)), assert(X), fail ; true),
+	% Add the new fact_token
+	assert(fact_token(T1,T2, Fact), Ref). 
+
+remove_fact_token(T1,T2,Fact) :-
+	fact_token(T1,T2,Fact), 
+	retractall(fact_token(T1,T2,Fact)),
+	remove_time_point(T2),
+	remove_time_point(T1).
+
+
+% Add constrain to the database. Failed if inconsistent.
+add_temp_constrains([]).
+add_temp_constrains([precedes(T1,T2) | More]) :-
+	relation(T1,T2, Relation),
+	(Relation = unknown, assert(temp(precedes(T1,T2))) ; 
+		Relation =  before), !,
+	add_temp_constrains(More).
+add_temp_constrains([coincident(T1,T2) | More]) :-
+	relation(T1,T2, Relation),
+	(Relation = unknown, assert(temp(coincident(T1,T2))) ; 
+		Relation =  coincident), !,
+	add_temp_constrains(More).
+
+remove_time_point(T1) :-
+	setof0(T, precedes(T, T1), BeforeT1),
+	setof0(T, precedes(T1,T), AfterT1),
+	setof0(T, coincident_point(T1, T), CoincidentT1),
+	retractall(precedes(_,T1)), retractall(precedes(T1, _)), 
+	retractall(coincident(T1,_)), retractall(coincident(_,T1)), 
+	conect_precedes(CoincidentT1, AfterT1),
+	union(AfterT1, CoincidentT1, U1),
+	conect_precedes(BeforeT1, U1),
+	conect_coincidenty(CoincidentT1).
+
+conect_precedes(_, []).	
+conect_precedes([], _).
+conect_precedes([T|More], To) :-
+	conect_precedes1(T,To),
+	conect_precedes(More, To).
+
+conect_precedes1(_, []).
+conect_precedes1(From, [To | More]) :-
+	(precedes(From,To) ; assert(precedes(From,To))),
+	conect_precedes1(From, More).
+
+conect_coincidenty([]).
+conect_coincidenty([_]).
+conect_coincidenty([T1,T2 | More]) :-
+	(coincident_point(T1, T2) ; assert(coincident(T1,T2))),
+	conect_coincidenty([T2 | More]).
+
+
+
+
+
+/*******************************************************************************************/
+/*******************************************************************************************/
+/*******************************************************************************************/
+% Additons for partial ordering
+not_overlap(_,_,[]).
+% If the fact and the contra-fact start at the same time then inconsistency.
+not_overlap(Ts,_,[(T1,_) | _]) :- is_coincident(Ts, T1), !, fail.
+not_overlap(_,Te,[(_,T2) | _]) :- is_coincident(Te, T2), !, fail.
+% If Ts < T1 < Te then inconsistency.
+not_overlap(Ts,Te,[(T1,_) | More]) :- 
+	is_before(Ts, T1), !, 
+	not(is_before(T1, Te)), 
+	not_overlap(Ts,Te,More).
+% If T1 < Ts < T2 then inconsistency.
+not_overlap(Ts,Te,[(T1,T2) | More]) :- 
+	is_before(T1, Ts), !, 
+	not(is_before(Ts, T2)), 
+	not_overlap(Ts,Te,More).
+not_overlap(Ts,Te,[_ | More]) :- not_overlap(Ts,Te,More).
+
+	
+
+% TAKEN FROM DEAN; NOT CHECKED
+% Procedures for computing relations between pairs of points (i.e., occasions)
+
+% is_before( Point1, Point2 )
+%	note: rules 3,4,5 are necessary to force breadth-first search of
+%	the time point interrelation graph with least work.
+%	the code is written so that invokations with both variables bound
+%	will not backtrack after succeeding once; it will generate all possible
+%	values for unbound variables, if any.  This feature depends on the
+%	existence of "coincident(A,B)" iff "coincident(B,A)"
+% is_coincident( Point1, Point2 )
+%	note: coincident points are computed specially to avoid circularities.
+%	the predicate assumes that "Point1" is bound.
+% is_before_or_coincident( Point1, Point2 )
+
+is_before( Point1, Point2 ) :-
+	var( Point1 ), !,
+	setof( Point, X^(precedes( Point, X );
+		         precedes( X, Point );
+		         coincident( Point, X )),
+	       Points ),
+	member( Point1, Points ),
+	is_before( Point1, Point2 ).
+is_before( Point1, Point2 ) :-
+	var( Point2 ),
+	setof( Point, X^(precedes( Point, X );
+		         precedes( X, Point );
+		         coincident( Point, X )),
+	       Points ),
+	member( Point2, Points ),
+	is_before( Point1, Point2 ).
+is_before( Point1, Point2 ) :-
+	nonvar( Point1 ), nonvar( Point2 ),
+	is_before_b( Point1, Point2 ).
+
+is_before_b( Point1, Point2 ) :- precedes( Point1, Point2 ), !.
+is_before_b( Point1, Point2 ) :-
+	precedes( NewPoint, Point2 ), 
+        is_before_or_coincident( Point1, NewPoint ), !.
+is_before_b( Point1, Point2 ) :-
+	coincident_class( Point2, Class ), 
+	is_before_b( Point1, Point2, Class ), !.
+is_before_b( Point1, Point2, Class ) :-
+	member( SomePoint, Class ), not( Point2 = SomePoint ),
+	precedes( Point1, SomePoint ), !.
+is_before_b( Point1, Point2, Class ) :-
+	member( SomePoint, Class ), not( Point2 = SomePoint ),
+	precedes( OtherPoint, SomePoint ),
+	is_before_or_coincident( Point1, OtherPoint ).
+
+is_before_or_coincident( Point1, Point2 ) :- is_coincident( Point1, Point2 ).
+is_before_or_coincident( Point1, Point2 ) :- is_before( Point1, Point2 ).
+is_before_or_coincident( Point1, Point2 ) :-
+	is_coincident( Point2 , NewPoint ),
+	precedes( OtherPoint, NewPoint ),
+        is_before_or_coincident( Point1, OtherPoint ).
+
+is_coincident( Point1, Point2 ) :-
+	coincident_class( Point1, Class ),
+	member( Point2, Class ), not( Point1 = Point2 ).
+
+
+% coincident_class( Point, Class )
+%	succeeds if "Class" is a list of all points coincident with "Point"
+
+coincident_class( Point, Class) :- 
+	find_coincidents( Point, [Point], Class ).
+
+find_coincidents( Point, Partial, Class ) :-
+	collect(Any,(coincident(Point,Any),not(member(Any,Partial))),Result),
+        append( Partial, Result, New ),
+	aux_find_coincidents( Result, New, Class ).
+
+aux_find_coincidents( [], Class, Class ).
+aux_find_coincidents([Point|Rest], Partial, Class ) :-
+	find_coincidents( Point, Partial, New ),
+	aux_find_coincidents( Rest, New, Class ).
+% librarys [library(basics)], [library(sets)].
+
+holds(Ts,Te,Fact) :-
+  % Colect garbige
+  retractall(temp(_)),
+  fact_token(T1,T2,Fact),
+  is_before_or_coincident(T1,Ts),
+  is_before_or_coincident(Te,T2),
+  not((fact_token(T3,T4,Fact1),
+          contradiction(Fact,Fact1),
+          not((is_before_or_coincident(Te,T3) ; is_before_or_coincident(T4,Ts))))).
+
+is_before( Point1, Point2 ) :-
+	var( Point1 ), !,
+	% setof all the time points.
+	setof( Point, X^(test_precedes( Point, X );
+		         test_precedes( X, Point );
+		         test_coincident( Point, X )),
+	       Points ),
+	member( Point1, Points ),
+	is_before( Point1, Point2 ).
+is_before( Point1, Point2 ) :-
+	var( Point2 ),!,
+	% setof all the time points.	
+	setof( Point, X^(test_precedes( Point, X );
+		         test_precedes( X, Point );
+		         test_coincident( Point, X )),
+	       Points ),
+	member( Point2, Points ),
+	is_before( Point1, Point2 ).
+% Point1, Point2 are ground.
+is_before( Point, Point ) :-!, fail.
+is_before( Point1, Point2 ) :-
+	is_before1( Point1, Point2 ).
+
+%is_before1(Point1, _ ) :- not(test_precedes(Point1, _)),!, fail. % Point1 is in infinity
+%is_before1( _, Point2 ) :- not(test_precedes(Point2, _)),!.       % Point 2 is in iffinity but Point1 isn't
+is_before1( Point1, Point2 ) :- test_precedes( Point1, Point2 ), !.
+is_before1( Point1, Point2 ) :-
+	test_precedes( NewPoint, Point2 ), 
+      	 is_before_or_coincident( Point1, NewPoint ), !.
+is_before1( Point1, Point2 ) :-
+	coincident_class( Point2, Class ),
+	subtract(Class, [Point2], NClass),
+	is_before_class( Point1, NClass ), !.
+
+is_before_class( Point1, Class ) :-
+	member( SomePoint, Class ),
+	test_precedes( Point1, SomePoint ), !.
+is_before_class( Point1, Class ) :-
+	member( SomePoint, Class ),
+	test_precedes( OtherPoint, SomePoint ),
+	is_before_or_coincident( Point1, OtherPoint ).
+
+
+
+is_before_or_coincident( Point1, Point2 ) :- is_coincident( Point1, Point2 ), !.
+is_before_or_coincident( Point1, Point2 ) :- is_before( Point1, Point2 ), !.
+is_before_or_coincident( Point1, Point2 ) :-
+	is_coincident( Point2 , NewPoint ),
+	test_precedes( OtherPoint, NewPoint ),
+        is_before_or_coincident( Point1, OtherPoint ).
+
+is_coincident( Point1, Point1 ).
+% Note: is that true for infinity?
+%is_coincident( Point1, Point2 ) :-test_infinity(Point1), test_infinity(Point2).
+is_coincident( Point1, Point2 ) :-
+	coincident_class( Point1, Class ),
+	member( Point2, Class ),
+	not((Point2 = Point1)).
+
+
+% coincident_class( Point, Class )
+%	succeeds if "Class" is a list of all points coincident with "Point"
+
+coincident_class( Point, Class) :- 
+	find_coincident_class( [Point], [Point], Class ).
+
+find_coincident_class([],Class, Class) :-!.
+find_coincident_class(Closour,TClass, Class) :-  
+	setof0(Any, Point^(member(Point, Closour), coincident_point(Point,Any)), Result), 
+  	union(TClass, Result, NClass),
+	subtract(Result, TClass, NResult),
+	find_coincident_class(NResult,NClass, Class). 
+
+contradiction(X,Y) :- (contradicts(X,Y) ; contradicts(Y,X)).
+coincident_point(X,Y) :- (test_coincident(X,Y)  ; test_coincident(Y,X)).
+test_precedes(X,Y) :- (precedes(X,Y)  ; temp(precedes(X,Y))).
+test_coincident(X,Y) :- (coincident(X,Y) ; temp(coincident(X,Y))).
+%test_infinity(X) :- (infinity(X),  ; temp(infinity(X))).
+
+% Utility
+not(X) :- X, !, fail.
+not(_).
+
+setof0(X,Y,Z) :- setof(X,Y,Z), !.
+setof0(_,_,[]).
+
+:-dynamic temp/1, event_list/1, time/1.	
+:-dynamic fact_token/3, event_token/3, precedes/2, coincident/2, infinity/1.
+% Database
+
+% Contradicitons
+contradicts(eat(X), think(X)).
+contradicts(eat(X), sleep(X)).
+
+%Causal rules
+causes(think(X), see_Aplaton(X), eat(X)).
+causes(eat(X), see_Socrates(X), think(X)).
+/*
+contradicts(location(X,Y),location(X,Z)) :- not(unify(Y,Z)),!.
+contradicts(routine_service(X),routine_service(Y)) :- not(unify(X,Y)),!. 
+	
+fact_token(location1,location2,location(forklift, loading_area)).
+fact_token(location3,location4, location(forklift, staging_area)).
+fact_token(location5,location6, location(truck45, loading_dock)).
+fact_token(service1, service2, routine_service(assembler)).
+fact_token(service3, service4, routine_service(forklift)).
+
+precedes(location1,location2).
+precedes(location3,location4).
+precedes(location5,location6).
+precedes(service1,servic2).
+precedes(service3,servic4).
+
+precedes(location1,location3).
+precedes(location3,location2).
+precedes(location3,service1).
+precedes(service1,location2).
+precedes(service2, service3).
+
+coincident(location2,location3).
+
+infinity(location4).
+infinity(location6).
+
+
+test1 :- holds(service1, service2, routine_service(assembler)).
+test2 :- holds(service1, T, routine_service(assembler)), write(T).
+test3 :- holds(location3, T, routine_service(assembler)), write(T).
+test4 :- holds(location2,service1, location(forklift, staging_area)).
+test5 :- holds(service2, service4, routine_service(assembler)).
+*/
+
+
+fact_token(t1,t2,eat(philosopher1)).
+fact_token(t3,t4, think(philosopher1)).
+fact_token(t5,t6,eat(philosopher1)).
+fact_token(t7,t8,eat(philosopher2)).
+%fact_token(t9,t10,eat(philosopher2)).
+
+%precedes(t1,t5).
+%precedes(t5,t2).
+precedes(t1,t2).
+precedes(t3,t4).
+precedes(t5,t6).
+precedes(t7,t8).
+precedes(t2,t3).
+precedes(t2,t5).
+precedes(t1,t7).
+precedes(t7,t2).
+%precedes(t9,t10).
+
+
+%coincident(t2,t3).
+
+
+/*
+%infinity(t4).
+infinity(t6).
+infinity(t10).
+*/
+
+
+
+
+display :-
+	(fact_token(X,Y,Z), write(fact_token(X,Y,Z)), nl, fail ;true),
+	(precedes(T1,T2), write(precedes(T1,T2)), nl, fail ;true),	
+	(coincident(T1,T2), write(coincident(T1,T2)), nl, fail ;true),
+	(infinity(T1), write(infinity(T1)), nl, fail ;true), 
+	(event_token(X,Y,Z), write(event_token(X,Y,Z)), nl, fail ;true),nl,nl,
+	(temp(X), write(temp(X)), nl, fail ;true).
+
+
+init :- 
+	retractall(precedes(_,_)), retractall(coincident(_,_)), retractall(infinity(_)),
+	retractall(fact_token(_,_,_)), retractall(event_token(_,_,_)), retractall(temp(_)),
+	retractall(time(_)), assert(time(0)),
+	retractall(event_list(_)), assert(event_list([])).
+

@@ -1,0 +1,145 @@
+id3 :- ['id3.pl'].
+:- ['id3.data'].
+:- ['oklog.pl'].
+
+test1(Tree) :- 
+    data1(D), attrlist(L), id3(L, D, Tree).
+
+test2(Tree) :- 
+    data2(D), attrlist(L), id3(L, D, Tree).
+
+id3( _, Data, Tree ) :-
+  all_same_category( Data, Categ ), !,
+  Tree = leaf( Categ).
+
+id3( AttrList, Data, Tree ) :- 
+  select_and_split( AttrList, Data, BestAttr, BestDataPartition ),
+%  nl,write('splitting attribute: '), write(BestAttr),nl,
+  generate_children_trees( AttrList, BestDataPartition, ChildrenTrees ),
+  Tree = tree( internal( BestAttr ), ChildrenTrees ).
+
+all_same_category( [ ], _ ). 
+all_same_category( [ (Categ,_) | MoreData ], Categ ) :-
+  all_same_category( MoreData, Categ ). 
+
+select_and_split( AttrList, Data, BestAttr, BestPartition ) :- 
+  findall( ( Attr, Partition, Entropy),
+           ( member( ( Attr, PosAttrValues ), AttrList ), 
+             partition( Data, Attr, PosAttrValues, Partition, Entropy ) ),
+           AllPartitions ), 
+  select_minimal_entropy( AllPartitions, BestAttr, BestPartition ).
+
+partition( _, _, [ ] , [ ], 0 ).
+
+partition( Data, Attr, 
+           [ OnePosAttrValue | RestValues ] , Partition, Entropy ) :- 
+  select_by_attr_value( Data, Attr, OnePosAttrValue, SubData ),
+  ( SubData = [ ]
+    -> partition( Data, Attr, RestValues , Partition, Entropy )  
+    ;  
+    compute_set_entropy( SubData, SubEntropy ),
+    partition( Data, Attr, RestValues , RestPartition, RestEntropy ),
+    Partition = [ OnePosAttrValue-SubData | RestPartition ],
+    Entropy is SubEntropy + RestEntropy ).
+
+select_by_attr_value( [ ], _, _, [ ] ).
+select_by_attr_value( [ (V,Datum) | MoreData ], Attr, AttrValue, SubData ) :-
+  member( (Attr,AttrValue), Datum )
+  -> select_by_attr_value( MoreData, Attr, AttrValue, MoreSubData ),
+     SubData = [ (V,Datum) | MoreSubData ]
+  ;  select_by_attr_value( MoreData, Attr, AttrValue, SubData ).
+  
+/* Older implementation of the second clause for 'partition':
+partition( Data, Attr, 
+           [ OnePosAttrValue | RestValues ] , Partition, Entropy ) :- 
+  bagof( (Categ,Datum), 
+         ( member( (Categ,Datum), Data ), 
+           member( (Attr, OnePosAttrValue), Datum ) ),
+         SubData ) 
+  ->
+  compute_set_entropy( SubData, SubEntropy ),
+  partition( Data, Attr, RestValues , RestPartition, RestEntropy ),
+  Partition = [ OnePosAttrValue-SubData | RestPartition ],
+  Entropy is SubEntropy + RestEntropy
+  ;
+  partition( Data, Attr, RestValues , Partition, Entropy ).
+*/
+
+compute_set_entropy( Data, Entropy ) :- 
+  count_positive( Data, Pnum ),
+  length( Data, Dnum ),
+  Pp is Pnum / Dnum,
+  Pn is 1 - Pp,
+  xlogx( Pp, PpLogPp ),
+  xlogx( Pn, PnLogPn ),
+  Entropy is - ( PpLogPp + PnLogPn ).
+
+count_positive( [ ], 0 ).
+count_positive( [ (p,_) | More ], Pnum ) :- !,
+  count_positive( More, Pnum1 ), Pnum is Pnum1 + 1.
+count_positive( [ (n,_) | More ], Pnum ) :- count_positive( More, Pnum ).
+
+xlogx( X, N) :- X is 0.0E+00, !, N = 0.
+xlogx( X, N) :- mylog(X, LogX), N is X * LogX.
+
+
+select_minimal_entropy( 
+    [ (Attr, Partition, Entropy ) | MorePartitions ], 
+    BestAttr, BestPartition ):-
+  select_minimal_entropy_aux( MorePartitions, 
+                              (Attr, Partition, Entropy), 
+                              BestAttr, BestPartition ).
+
+select_minimal_entropy_aux( [ ], (Attr, Partition, _), Attr, Partition ).
+select_minimal_entropy_aux( 
+       [ (Attr1, Partition1, Entropy1) | MorePartitions ],
+       ( _, _, Entropy), BestAttr, BestPartition ) :-
+  Entropy1 < Entropy , !,
+  select_minimal_entropy_aux( 
+      MorePartitions, (Attr1, Partition1, Entropy1), BestAttr, BestPartition ).
+select_minimal_entropy_aux( 
+       [ _ | MorePartitions ],
+       (Attr, Partition, Entropy), BestAttr, BestPartition ) :-
+  select_minimal_entropy_aux( 
+       MorePartitions, (Attr, Partition, Entropy), BestAttr, BestPartition ).
+
+
+generate_children_trees( _, [ ], [ ] ).
+
+generate_children_trees( 
+         AttrList, [ Value-SubData | MoreData ], ChildrenTrees ) :-
+  id3( AttrList, SubData, ChildTree ),
+  generate_children_trees( AttrList, MoreData, MoreTrees ),
+  ChildrenTrees = [ Value-ChildTree | MoreTrees ].
+
+  
+
+
+
+mylog(X,N) :- X is 1.0, !, N is 0.
+mylog(X,N) :- X is 0.5, !, N is -0.30103.
+mylog(X,N) :- X is 0.25, !, N is -0.60206.
+mylog(X,N) :- X is 0.75, !, N is -0.12494.
+mylog(X,N) :- X is 0.6, !, N is -0.22185.
+mylog(X,N) :- X is 0.4, !, N is -0.39794.
+mylog(X,N) :- X is 0.8, !, N is -0.09691.
+mylog(X,N) :- X is 0.2, !, N is -0.69897.
+mylog(X,N) :- X is 2/3, !, N is -0.17609.
+mylog(X,N) :- X is 1-(1/3), !, N is -0.17609.
+mylog(X,N) :- X is 1- (2/3), !, N is -0.47712.
+mylog(X,N) :- X is 1/3, !, N is -0.47712.
+mylog(X,N) :- X is 5/6, !, N is -0.07918.
+mylog(X,N) :- X is 1-(1/6), !, N is -0.07918.
+mylog(X,N) :- X is 1-(5/6), !, N is -0.77815.
+mylog(X,N) :- X is 1/6, !, N is -0.77815.
+mylog(X,N) :- X is 0.375, !, N is -0.42596873.
+mylog(X,N) :- X is 0.625, !, N is -0.20412.
+mylog(X,N) :- X is 0.285714, !, N is -0.54409.
+mylog(X,N) :- X is 0.714286, !, N is -0.14613.
+
+
+mylog(X,LogX) :- 
+  nl, write('Enter the log of '),write(X), write(' : '),
+  read(LogX).
+
+

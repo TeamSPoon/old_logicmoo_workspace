@@ -1,0 +1,158 @@
+ 
+certainty(not(A), Cert) :- !, 
+	certainty(A, Cert1), 
+	complement(Cert1, Cert),
+	cwrite(A,Cert).
+certainty(true, Cert):- 
+	highest_certainty(Cert), !. 
+certainty((A, B), Cert):- !,
+	findall( Cert1, 
+	         ( amember(X, (A, B)), certainty(X, Cert1) ), 
+		 CertList ),
+	comb_fn_serial(CertList, Cert),
+	cwrite((A,B), Cert).
+
+certainty(A, Cert):- 
+	findall(Cert3,  
+	        (cclause(A, B, Cert1),
+		 certainty(B, Cert2),
+		 comb_fn_rule([Cert1, Cert2],Cert3)), 
+		CertList),
+	comb_fn_parallel(CertList, Cert),
+	cwrite(A,Cert).
+
+cassert(Clause,Certainty) :- 
+	assert(Clause,Ref), 
+	assert(cert(Ref,Certainty)). 
+
+cclause(Head,Body,Certainty) :- 
+	clause(Head,Body,Ref), 
+	cert(Ref,Certainty).
+
+comb_fn_rule([A,B],C) :- 
+	number(A,Na),number(B,Nb),
+	Nc is 4 + ((Na-4) * Nb // 7), 
+	number(C,Nc).
+
+comb_fn_serial([ ], certain). 
+comb_fn_serial([A | B],C) :- 
+	number(A,Na), 
+	comb_fn_serial(B,B1), 
+	number(B1,Nb), 
+	(Na < Nb, !, C=A ; C=B1). 
+
+comb_fn_parallel([ ], possible) :- !.
+comb_fn_parallel([A],A) :- !. 
+comb_fn_parallel([A | B],C) :-  
+	number(A,Na), 
+	comb_fn_parallel(B,B1), 
+	number(B1,Nb), 
+	(Na < Nb, !, C=B1 ; C=A).
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Utility
+not(X) :- X,!,fail.
+not(_).
+
+amember(X,(X,_)).
+amember(X,(_,Y)) :- !,amember(X,Y).
+amember(X,X).
+
+max(A,B,A) :- A >= B, !.
+max(_,B,B).
+
+
+cwrite(A,C) :- nl, write('Certainty of '), write(A), write(' = '), write(C).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Database
+
+:- dynamic malaria/0, dysentery/0, recently_in_third_world/0,recently_in_jungle/0.
+:- dynamic recently_in_guatemala/0, high_fever/0, took_pills/0.
+:- dynamic cert/2, highest_certainty/1 .
+
+assert_rules1 :- 
+	cassert((malaria :- high_fever,recently_in_jungle,not(took_pills)),highly_likely),
+ 	cassert((malaria :- dysentery), unlikely),
+	cassert((dysentery :- recently_in_third_world), possible),
+	cassert((recently_in_third_world :- recently_in_guatemala), certain),
+	cassert((recently_in_jungle :- recently_in_guatemala), highly_likely),
+	cassert((recently_in_guatemala), certain),
+	cassert((high_fever), certain),
+	cassert((took_pills), highly_unlikely).
+
+assert_rules2 :- 
+	cassert((malaria :- high_fever,recently_in_jungle,not(took_pills)),likely),
+ 	cassert((malaria :- dysentery), unlikely),
+	cassert((dysentery :- recently_in_third_world), possible),
+	cassert((recently_in_third_world :- recently_in_guatemala), certain),
+	cassert((recently_in_jungle :- recently_in_guatemala), highly_likely),
+	cassert((recently_in_guatemala), certain),
+	cassert((high_fever), certain),
+	cassert((took_pills), highly_unlikely).
+
+assert_rules3 :- 
+	cassert((malaria :- high_fever,recently_in_jungle,not(took_pills)), impossible),
+ 	cassert((malaria :- dysentery),  certain),
+	cassert((dysentery :- recently_in_third_world),   certain),
+	cassert((recently_in_third_world :- recently_in_guatemala), certain),
+	cassert((recently_in_jungle :- recently_in_guatemala),  certain),
+	cassert((recently_in_guatemala), impossible ),
+	cassert((high_fever), certain),
+	cassert((took_pills), certain ).
+
+
+
+
+test1 :- 
+ 	retractall(cert(_,_)),
+	retractall(highest_certainty(_)),
+	assert(highest_certainty(certain)),
+	assert_rules1 ,
+ 	certainty(malaria,C).
+
+ test2 :- 
+ 	retractall(cert(_,_)),
+	retractall(highest_certainty(_)),
+	assert(highest_certainty(certain)),
+	assert_rules2 ,
+ 	certainty(malaria,C).
+
+test3 :- 
+ 	retractall(cert(_,_)),
+	retractall(highest_certainty(_)),
+	assert(highest_certainty(certain)),
+	assert_rules3 ,
+ 	certainty(malaria,C).
+ 
+
+
+number(impossible,1). 
+number(highly_unlikely,2). 
+number(unlikely,3). 
+number(possible,4). 
+number(likely,5). 
+number(highly_likely,6). 
+number(certain,7).
+
+complement(A,B) :- 
+	number(A,Na), 
+	Nb is 8 - Na, 
+	number(B, Nb).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+
+ 
+
+
+

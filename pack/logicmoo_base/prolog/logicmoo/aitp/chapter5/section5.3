@@ -1,0 +1,432 @@
+declare_assumption(Assmp):-
+	% create a new representation. Env is an assumption represantation.
+	new_assumption(Assmp,Env), 
+ 	gather_env(Assmp,Envlist),
+	cond_update_propagate(Assmp, [Env | Envlist]). 
+
+atms_add_just(If,Then) :-
+	% Set of justifiers.
+	setof(N,amember(N,If),If1),    
+	% does not yet exist
+   	not(justificand(_,Then,If1)), 
+	%Create new justification.   
+	new_just_label(J),
+	do_all(( member(InNode,If1), assert(justifier(InNode,J)) )),
+	assert(justificand(J,Then,If1)),
+	node_update_env(J).
+
+node_update_env(Just) :-
+	% Get the 'If' and 'Then' part.
+	justificand(Just,Node,If),
+	% Get a list of al the environment where Node holds.
+	gather_env(Node,OldEnvlist),
+	% Get list of environments where all the justifiers hold.
+	join_assumption(If,Envlist),
+	join_env(OldEnvlist,Envlist,NewEnvlist),
+	% If the Old and New list are diferent then propogate the change.
+	( OldEnvlist = NewEnvlist  , ! ; 
+		cond_update_propagate(Node,NewEnvlist) ), !.
+
+
+gather_env(Node,OldEnvlist) :-
+	findall(Env, holds(Node,Env), OldEnvlist).
+
+
+cond_update_propagate(Node, Envlist):-
+	retractall(holds(Node,_)),
+	do_all(( member(Env,Envlist), assert(holds(Node,Env)) )),
+	( Node = false, cond_bottom_update(Node,Envlist), ! ;
+		do_all(( justifier(Node,J), node_update_env(J) ))). 
+
+
+cond_bottom_update(false,Nogoodlist) :- !,
+	% The Node is bottom.
+	do_all(( member(Nogoods,Nogoodlist),
+		environment(Env,true),
+		subset(Nogoods,Env),
+		remove_inconsistency(Env) )).
+ 
+remove_inconsistency(Env) :-
+	retract(environment(Env,true)),
+	assert(environment(Env,fail)),
+	do_all(( holds(Node,Env),
+	          not(Node=false),
+	          retract(holds(Node,Env)) )). 
+
+% Return a list of environment where all the justifiers hold.
+join_assumption(If,Envlist) :-	
+	findall(Env, (cross_product(If,Env),check_consistency(Env)), Envlist). 
+
+check_consistency(Env) :- environment(Env,Flag), !, Flag.
+check_consistency(Env) :- 
+	holds(false, Nogoods),
+	subset(Nogoods,Env), !,
+	assert(environment(Env,fail)), 
+	fail.
+check_consistency(Env) :- assert(environment(Env,true)).
+
+
+% Return an environment where all the nodes in the input list hold.
+% Everything holds in the empty environment.
+cross_product([ ],Emp):- empty_set(Emp). 	
+cross_product([N | L],Res) :-
+	holds(N,Env),	
+	cross_product(L,Acc),
+	union(Env,Acc,Res).
+
+% Join two lists of environments.
+join_env(OldEnv,Env,NewEnv) :-
+	append(Env,OldEnv,TmpEnv),
+	minimum_env(TmpEnv,NewEnv).
+ 
+% Returns a list of minimum cover environment.
+minimum_env([ ],[ ]).
+minimum_env([Contx | CL],[Contx | Res]) :-
+	remove_superset(Contx,CL,NewCL), 
+	minimum_env(NewCL, Res).
+minimum_env([_ | CL],Res) :-
+	minimum_env(CL,Res). 
+
+
+% Removes evrey list element which is a superset of  'S'.
+% Fail if 'S' is subset of any element in the list.
+remove_superset(_,[ ],[ ]).
+remove_superset(S,[S2 | L],Res) :- 
+	subset(S,S2), !, 
+	remove_superset(S,L,Res).
+remove_superset(S,[S2 | _],_) :- 
+	subset(S2,S), !, fail.
+remove_superset(S,[S2 | L],[S2 | R]) :- 
+	remove_superset(S,L,R).
+
+
+new_just_label(J) :-
+	(retract(just_label_cnt(N)), ! ; N = 0),
+	M is N + 1,
+	assert(just_label_cnt(M)),
+	J = just(N).
+
+new_assumption(Assmp,bitvec(B)) :-
+	% Not assumption yet.
+	not(assumption(Assmp,_)),
+	% Get the current bit vectore or 
+	% if it is the first assumption make it 1.
+	( retract(current_bit(B)), ! ; B = 1),
+	% Get the next bit.
+	NB is B << 1, % shift B left by 1 
+	assert(assumption(Assmp,bitvec(B))),
+	assert(current_bit(NB)).
+
+%bit-vector representation of sets   
+
+empty_set(bitvec(0)).
+
+ 
+%compare_set(S1,S2,'<'):- subset(S1,S2),!.
+%compare_set(S1,S2,'>'):- subset(S2,S1).
+
+union(bitvec(S1),bitvec(S2),bitvec(Res)) :- 
+ Res is S1 \/ S2. 
+
+subset(bitvec(S1),bitvec(S2)) :- S1 is S1 /\ S2.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Utilities
+not(X) :- X, !, fail.
+not(_).
+
+do_all(X) :- X, fail.
+do_all(_).
+
+amember(X, (X,_)).
+amember(X, (_,Y)) :- amember(X,Y), !.
+amember(X,X).
+
+:- dynamic justifier/2, justificand/3, holds/2, environment/2, current_bit/1, assumption/2.
+:- dynamic just_label_cnt/1.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Database
+initial_atms :- 
+	retractall(justifier(_,_)),
+	retractall(justificand(_,_)),
+	retractall(assumption(_,_)),
+	retractall(holds(_,_)),
+	retractall(environment(_,_)),
+	retractall(current_bit(_)),
+	retractall(just_label_cnt(_)),
+	assert(just_label_cnt(1)).
+
+mynl :- nl, write('% ').
+printdb:-
+	write('Database listing :'), mynl,
+	write('The assumptions:'), listing(assumption),mynl,
+	write('The environments:'), listing(environment),mynl,
+	write('The holds:'), listing(holds),mynl,
+	write('Justifiers:'),   listing(justifier), mynl,
+	write('Justificands:'),  listing(justificand), mynl,mynl.
+
+
+explain(X) :- 
+	holds(X,_), !,
+	mynl, write('Explanation for: "'), write(X),write('"'),mynl,
+	do_all(( holds(X,Env), write('{'),list_env(Env,0) )).
+explain(X) :- 
+	mynl, write('There is no way to explain "'), write(X),write('"').
+
+list_env(bitvec(0), _) :- write('}'),mynl,!.
+list_env(bitvec(B), Shift) :-
+	B1 is (B /\ 1) << Shift,
+	( B1 = 0 -> true
+		;
+		assumption(Assumption, bitvec(B1)),
+		write(Assumption), write(' ') ),
+	B2 is B >> 1,
+	Shift2 is Shift + 1,
+	list_env(bitvec(B2), Shift2).
+	
+
+ test1 :- atms_add_just((p,q), s).
+ test2 :- atms_add_just((r), s).
+ test3 :- atms_add_just((p,r), t).
+ test4 :- atms_add_just((p,r), false).
+ test5 :- declare_assumption(p).
+ test6 :- declare_assumption(q).
+ test7 :- declare_assumption(r).
+
+
+
+
+ test  :- 
+ 	initial_atms, write('*****  START  ******'), mynl, 
+ 	write('****** Add assumption  "p" ******'),mynl,test5, 
+ 	write('****** Add assumption  "q" ******'),mynl,test6, 
+ 	write('****** Add assumption  "r" ******'),mynl,test7, 
+ 	write('****** Add justification "[p,q]---:s" ******'),mynl,test1, 
+ 	write('****** Add justification "[r]---:s" ******'),mynl,test2,  
+ 	write('****** Add justification "[p,r]---:t" ******'),mynl,test3,  
+ 	write('****** Add justification "[p,r]---:bottom" ******'),mynl,test4,printdb.
+ 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Brazil dinner.
+
+brazil_dinner1 :- atms_add_just((brazil, brazil_means_meat), meat).
+brazil_dinner2 :- atms_add_just((meat, quindim), coke69).
+brazil_dinner3 :- atms_add_just((brazil, cafezinho), coke69).
+brazil_dinner4 :- atms_add_just((irish), meat).
+brazil_dinner5 :- atms_add_just((irish, meat),coke69).
+brazil_dinner6 :- atms_add_just((lamb), coke69).
+brazil_dinner7 :- atms_add_just((brazil), meat).
+brazil_dinner8 :- atms_add_just((lamb), meat).
+brazil_dinner9 :- atms_add_just((brazil), batida).
+brazil_dinner10 :- atms_add_just((batida, cafezinho), false).
+
+brazil_assump1 :- declare_assumption(brazil).
+brazil_assump2 :- declare_assumption(brazil_means_meat).
+brazil_assump3 :- declare_assumption(quindim).
+brazil_assump4 :- declare_assumption(cafezinho).
+brazil_assump5 :- declare_assumption(irish).
+brazil_assump6 :- declare_assumption(lamb).
+brazil_assump7 :- declare_assumption(meat).
+ 
+
+
+
+brazil_dinner  :- 
+	initial_atms, write('***** Start Planing the meal  ******'), mynl, printdb,
+	write('Step one: add the following justifications'),mynl,
+	write('1. "brazil, brazil_means_meat ---: meat"'),mynl,brazil_dinner1, 
+	write('2. "meat, quindim ---: coke69" '),mynl,brazil_dinner2, 
+	write('3. "brazil, cafezinho ---: coke69 "'),mynl,brazil_dinner3, 
+	write('4. "irish ---: meat " '),mynl,brazil_dinner4,  
+	write('5. "irish, meat ---: coke69 " '),mynl,brazil_dinner5,  
+	write('6. "lamb ---: coke69 " '),mynl,brazil_dinner6,  
+	explain(coke69),mynl,mynl,
+
+	write('Step two: add the following decisions'),mynl,
+	write('1. "It is a Brazilian dinner"'),mynl,brazil_assump1, 
+	write('2. "Brazilian dinner means meat"'),mynl,brazil_assump2,  
+	write('3. "We going to have quindim"'),mynl,brazil_assump3,  
+	write('4. "We going to have cafezinho"'),mynl,brazil_assump4,  
+	write('5. "We going to have Irish theam"'),mynl,brazil_assump5, 
+	write('6. "We going to have meat"'),mynl,brazil_assump7,   
+	write('7. "We going to have lamb"'),mynl,brazil_assump6, 
+	explain(coke69),mynl,mynl,
+
+	write('Step three: add the following justifications'),mynl,
+	write('1. "brazil  ---: meat"'),mynl,brazil_dinner7,  
+	explain(coke69),mynl,mynl,
+
+	write('Step four: add the following justifications'),mynl,
+	write('1. "lamb  ---: meat"'),mynl,brazil_dinner8, 
+	explain(coke69),mynl,mynl,
+
+	write('Step five: add the following justifications'),mynl,
+	write('1. "brazil  ---: batida"'),mynl,brazil_dinner9, 
+	write('2.  "batida, cafezinho ---: false"'),nl,brazil_dinner10, 
+ 	explain(coke69), mynl,mynl,printdb.
+	
+
+
+ 
+
+
+
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Results
+
+% | ?- brazil_dinner .
+% ***** Start Planing the meal  ******
+% Database listing :
+% The assumptions:
+% The environments:
+% The holds:
+% Justifiers:
+% Justificands:
+% 
+% Step one: add the folowing justifications
+% 1. "brazil, brazil_means_meat ---: meat"
+% 2. "meat, quindim ---: coke69" 
+% 3. "brazil, cafezinho ---: coke69 "
+% 4. "irish ---: meat " 
+% 5. "irish, meat ---: coke69 " 
+% 6. "lamb ---: coke69 " 
+% 
+% There is no way to explaine "coke69"
+% 
+% Step two: add the folowing decisions
+% 1. "It is a Brazilian dinner"
+% 2. "Brazilian dinner means meat"
+% 3. "We going to have quindim"
+% 4. "We going to have cafezinho"
+% 5. "We going to have Irish theam"
+% 6. "We going to have meat"
+% 7. "We going to have lamb"
+% 
+% Explenation for: "coke69"
+% {lamb }
+% {irish }
+% {quindim meat }
+% {brazil brazil_means_meat quindim }
+% {brazil cafezinho }
+% 
+% 
+% Step three: add the folowing justifications
+% 1. "brazil  ---: meat"
+% 
+% Explenation for: "coke69"
+% {irish }
+% {brazil quindim }
+% {quindim meat }
+% {lamb }
+% {brazil cafezinho }
+% 
+% 
+% Step four: add the folowing justifications
+% 1. "lamb  ---: meat"
+% 
+% Explenation for: "coke69"
+% {irish }
+% {brazil quindim }
+% {quindim meat }
+% {lamb }
+% {brazil cafezinho }
+% 
+% 
+% Step five: add the folowing justifications
+% 1. "brazil  ---: batida"
+% 2.  "batida, cafezinho ---: false"
+
+% Explenation for: "coke69"
+% {irish }
+% {brazil quindim }
+% {quindim meat }
+% {lamb }
+% 
+% 
+% Database listing :
+% The assumptions:
+% assumption(brazil,bitvec(1)).
+% assumption(brazil_means_meat,bitvec(2)).
+% assumption(quindim,bitvec(4)).
+% assumption(cafezinho,bitvec(8)).
+% assumption(irish,bitvec(16)).
+% assumption(meat,bitvec(32)).
+% assumption(lamb,bitvec(64)).
+%
+% The environments:
+% environment(bitvec(3),true).
+% environment(bitvec(7),true).
+% environment(bitvec(16),true).
+% environment(bitvec(20),true).
+% environment(bitvec(19),true).
+% environment(bitvec(36),true).
+% environment(bitvec(48),true).
+% environment(bitvec(64),true).
+% environment(bitvec(1),true).
+% environment(bitvec(5),true).
+% environment(bitvec(17),true).
+% environment(bitvec(68),true).
+% environment(bitvec(80),true).
+% environment(bitvec(9),fail).
+%
+% The holds:
+% holds(brazil,bitvec(1)).
+% holds(brazil_means_meat,bitvec(2)).
+% holds(quindim,bitvec(4)).
+% holds(cafezinho,bitvec(8)).
+% holds(irish,bitvec(16)).
+% holds(lamb,bitvec(64)).
+% holds(meat,bitvec(64)).
+% holds(meat,bitvec(1)).
+% holds(meat,bitvec(32)).
+% holds(meat,bitvec(16)).
+% holds(coke69,bitvec(16)).
+% holds(coke69,bitvec(5)).
+% holds(coke69,bitvec(36)).
+% holds(coke69,bitvec(64)).
+% holds(batida,bitvec(1)).
+% holds(false,bitvec(9)).
+%
+% Justifiers:
+% justifier(brazil,just(1)).
+% justifier(brazil_means_meat,just(1)).
+% justifier(meat,just(2)).
+% justifier(quindim,just(2)).
+% justifier(brazil,just(3)).
+% justifier(cafezinho,just(3)).
+% justifier(irish,just(4)).
+% justifier(irish,just(5)).
+% justifier(meat,just(5)).
+% justifier(lamb,just(6)).
+% justifier(brazil,just(7)).
+% justifier(lamb,just(8)).
+% justifier(brazil,just(9)).
+% justifier(batida,just(10)).
+% justifier(cafezinho,just(10)).
+%
+% Justificands:
+% justificand(just(1),meat,[brazil,brazil_means_meat]).
+% justificand(just(2),coke69,[meat,quindim]).
+% justificand(just(3),coke69,[brazil,cafezinho]).
+% justificand(just(4),meat,[irish]).
+% justificand(just(5),coke69,[irish,meat]).
+% justificand(just(6),coke69,[lamb]).
+% justificand(just(7),meat,[brazil]).
+% justificand(just(8),meat,[lamb]).
+% justificand(just(9),batida,[brazil]).
+% justificand(just(10),false,[batida,cafezinho]).
+%
+% 
+% 
+% yes
+
+
+
+ 

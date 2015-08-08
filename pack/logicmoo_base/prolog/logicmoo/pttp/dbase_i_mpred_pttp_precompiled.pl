@@ -268,6 +268,6 @@ make_base(BF,A):-
 
 %:-listing([pred_t,int_pred_t,not_pred_t,int_not_pred_t]).
 
-:-listing([not_true_t,int_not_true_t,not_not_true_t,int_not_not_true_t]).
+:-listing([true_t,int_true_t,not_true_t,int_not_true_t]).
 
 
