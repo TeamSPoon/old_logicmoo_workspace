@@ -17,6 +17,7 @@
 % OPERATOR PRECEDANCE
 % ===================================================================
 :- dynamic((exactlyAssertedEL/4,exactlyAssertedEL/5,exactlyAssertedEL/6,exactlyAssertedEL/7)).
+:- dynamic((exactlyAssertedEL_next/4,exactlyAssertedEL_next/5,exactlyAssertedEL_next/6,exactlyAssertedEL_next/7)).
 :- dynamic(assertedTinyKB_implies_first/4).
 :- dynamic(assertedTinyKB_not_first/3).
 :- dynamic((exactlyAssertedEL_first/5,exactlyAssertedEL_with_vars/5)).
@@ -40,13 +41,13 @@ exactlyAssertedEL(A,B,C,D,MT,STR):- exactlyAssertedEL_first(A,B,C,D,MT,STR),true
 exactlyAssertedEL(Pred,A,C,MT,STR):- exactlyAssertedEL_with_vars(Pred,A,C,MT,STR),true.
 exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies_first(A,C,MT,STR),true.
 exactlyAssertedEL(not,What,MT,STR):- assertedTinyKB_not_first(What,MT,STR),true.
-exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies(A,C,MT,STR),not(is_better_backchained(=>(A,C))).
-exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies(A,C,MT,STR),is_better_backchained(=>(A,C)).
-exactlyAssertedEL(not,What,MT,STR):- assertedTinyKB_not(What,MT,STR),true.
 exactlyAssertedEL(A,B,MT,STR):- exactlyAssertedEL_next(A,B,MT,STR),true.
 exactlyAssertedEL(A,B,C,MT,STR):- exactlyAssertedEL_next(A,B,C,MT,STR),true.
 exactlyAssertedEL(A,B,C,D,MT,STR):- exactlyAssertedEL_next(A,B,C,D,MT,STR),true.
 exactlyAssertedEL(A,B,C,D,E,MT,STR):- exactlyAssertedEL_next(A,B,C,D,E,MT,STR),true.
+exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies(A,C,MT,STR),not(is_better_backchained(=>(A,C))).
+exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies(A,C,MT,STR),is_better_backchained(=>(A,C)).
+exactlyAssertedEL(not,What,MT,STR):- assertedTinyKB_not(What,MT,STR),true.
 
 
 :-must((asserta((user:term_expansion(A,B):-cyc_to_pfc_expansion_notify(A,B),!),CLREF),asserta(at_eof_action(erase(CLREF))))).

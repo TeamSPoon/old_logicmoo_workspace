@@ -19,74 +19,76 @@
 
 isa_db(I,C):-clause(isa(I,C),true).
 
-cycFormatType('AssertedAssertion').
-cycFormatType('Assertion').
-cycFormatType('Atom').
-cycFormatType('AtomicAssertion').
-cycFormatType('AtomicSentence').
-cycFormatType('AtomicTerm').
-cycFormatType('Character').
-cycFormatType('ClosedAtomicSentence').
-cycFormatType('ClosedAtomicTerm').
-cycFormatType('ClosedDenotationalTerm').
-cycFormatType('ClosedExpression').
-cycFormatType('ClosedFormula').
-cycFormatType('ClosedNonAtomicTerm').
-cycFormatType('ClosedSentence').
-cycFormatType('Constant').
-cycFormatType('DeducedAssertion').
-cycFormatType('DenotationalTerm').
-cycFormatType('DenotationalTerm-Assertible').
-cycFormatType('DocumentationConstant').
-cycFormatType('Expression').
-cycFormatType('ExpressionAskable').
-cycFormatType('ExpressionAssertible').
-cycFormatType('GAFAssertion').
-cycFormatType('GenericRelationFormula').
-cycFormatType('HLPrototypicalTerm').
-cycFormatType('IndeterminateTerm').
-cycFormatType('IndexedTerm').
-cycFormatType('InferenceDataStructure').
-cycFormatType('InferenceSupportedCollection').
-cycFormatType('InferenceSupportedTerm').
-cycFormatType('KBDatastructure').
-cycFormatType('Keyword').
-cycFormatType('List').
-cycFormatType('NonAtomicReifiedTerm').
-cycFormatType('NonAtomicTerm').
-cycFormatType('NonAtomicTerm-Askable').
-cycFormatType('NonAtomicTerm-Assertible').
-cycFormatType('NonAtomicTerm-ClosedFunctor').
-cycFormatType('NonNegativeInteger').
-cycFormatType('NonVariableNonKeywordSymbol').
-cycFormatType('NonVariableSymbol').
-cycFormatType('OpenDenotationalTerm').
-cycFormatType('OpenExpression').
-cycFormatType('OpenFormula').
-cycFormatType('OpenNonAtomicTerm').
-cycFormatType('OpenSentence').
-cycFormatType('PositiveInteger').
-cycFormatType('PropositionalSentence').
-cycFormatType('RealNumber').
-cycFormatType('ReifiableDenotationalTerm').
-cycFormatType('ReifiableNonAtomicTerm').
-cycFormatType('ReifiedDenotationalTerm').
-cycFormatType('RemovalModuleSupportedCollection-Generic').
-cycFormatType('RemovalModuleSupportedPredicate-Generic').
-cycFormatType('RemovalModuleSupportedPredicate-Specific').
-cycFormatType('RepresentedAtomicTerm').
-cycFormatType('RepresentedTerm').
-cycFormatType('RuleAssertion').
-cycFormatType('ScalarIntegralValue').
-cycFormatType('Sentence').
-cycFormatType('SentenceAskable').
-cycFormatType('SentenceAssertible').
-cycFormatType('String').
-cycFormatType('SupportDatastructure').
-cycFormatType('Symbol').
-cycFormatType('TheTerm').
-cycFormatType('TransformationModuleSupportedCollection').
-cycFormatType('TruthValueSentence').
+cycPrepending(ft,'AssertedAssertion').
+cycPrepending(ft,'Assertion').
+cycPrepending(ft,'Atom').
+cycPrepending(ft,'AtomicAssertion').
+cycPrepending(ft,'AtomicSentence').
+cycPrepending(ft,'AtomicTerm').
+cycPrepending(ft,'Character').
+cycPrepending(ft,'ClosedAtomicSentence').
+cycPrepending(ft,'ClosedAtomicTerm').
+cycPrepending(ft,'ClosedDenotationalTerm').
+cycPrepending(ft,'ClosedExpression').
+cycPrepending(ft,'ClosedFormula').
+cycPrepending(ft,'ClosedNonAtomicTerm').
+cycPrepending(ft,'ClosedSentence').
+cycPrepending(ft,'Constant').
+cycPrepending(ft,'DeducedAssertion').
+cycPrepending(ft,'DenotationalTerm').
+cycPrepending(ft,'DenotationalTerm-Assertible').
+cycPrepending(ft,'DocumentationConstant').
+cycPrepending(ft,'Expression').
+cycPrepending(ft,'ExpressionAskable').
+cycPrepending(ft,'ExpressionAssertible').
+cycPrepending(ft,'GAFAssertion').
+cycPrepending(ft,'GenericRelationFormula').
+cycPrepending(ft,'HLPrototypicalTerm').
+cycPrepending(ft,'IndeterminateTerm').
+cycPrepending(ft,'IndexedTerm').
+cycPrepending(ft,'InferenceDataStructure').
+cycPrepending(ft,'InferenceSupportedCollection').
+cycPrepending(ft,'InferenceSupportedTerm').
+cycPrepending(ft,'KBDatastructure').
+cycPrepending(ft,'Keyword').
+cycPrepending(ft,'List').
+cycPrepending(ft,'NonAtomicReifiedTerm').
+cycPrepending(ft,'NonAtomicTerm').
+cycPrepending(ft,'NonAtomicTerm-Askable').
+cycPrepending(ft,'NonAtomicTerm-Assertible').
+cycPrepending(ft,'NonAtomicTerm-ClosedFunctor').
+cycPrepending(ft,'NonNegativeInteger').
+cycPrepending(ft,'NonVariableNonKeywordSymbol').
+cycPrepending(ft,'NonVariableSymbol').
+cycPrepending(ft,'OpenDenotationalTerm').
+cycPrepending(ft,'OpenExpression').
+cycPrepending(ft,'OpenFormula').
+cycPrepending(ft,'OpenNonAtomicTerm').
+cycPrepending(ft,'OpenSentence').
+cycPrepending(ft,'PositiveInteger').
+cycPrepending(ft,'PropositionalSentence').
+cycPrepending(ft,'RealNumber').
+cycPrepending(ft,'ReifiableDenotationalTerm').
+cycPrepending(ft,'ReifiableNonAtomicTerm').
+cycPrepending(ft,'ReifiedDenotationalTerm').
+cycPrepending(ft,'RemovalModuleSupportedCollection-Generic').
+cycPrepending(ft,'RemovalModuleSupportedPredicate-Generic').
+cycPrepending(ft,'RemovalModuleSupportedPredicate-Specific').
+cycPrepending(ft,'RepresentedAtomicTerm').
+cycPrepending(ft,'RepresentedTerm').
+cycPrepending(ft,'RuleAssertion').
+cycPrepending(ft,'ScalarIntegralValue').
+cycPrepending(ft,'Sentence').
+cycPrepending(ft,'SentenceAskable').
+cycPrepending(ft,'SentenceAssertible').
+cycPrepending(ft,'String').
+cycPrepending(ft,'SupportDatastructure').
+cycPrepending(ft,'Symbol').
+cycPrepending(ft,'TheTerm').
+cycPrepending(ft,'TransformationModuleSupportedCollection').
+cycPrepending(ft,'TruthValueSentence').
+cycPrepending(v,'SingleEntry').
+cycPrepending(v,'SetTheFormat').
 
 :-dynamic(mpred_to_cyc/2).
 
@@ -103,7 +105,7 @@ mpred_to_cyc(ftSentence,'CycLFormulaicSentence').
 mpred_to_cyc(ftSentence,'FormulaicSentence').
 mpred_to_cyc(ftVar,'CycLVariable').
 mpred_to_cyc(ftVar,'Variable').
-:-forall(cycFormatType(A),((atom_concat('ft',A,FT),assert(mpred_to_cyc(FT,A))))).
+:-forall(cycPrepending(ft,A),((atom_concat('ft',A,FT),assert(mpred_to_cyc(FT,A))))).
 
 
 notFormatType(tIndividual).
@@ -120,6 +122,7 @@ notFormatType(tTransformationModuleSupportedPredicate).
 
 
 mpred_prepend_type(X,_):- \+ atom(X),!,fail.
+mpred_prepend_type(X,PP):-cycPrepending(PP,X),!.
 mpred_prepend_type(X,_):- name(X,[S|_]),char_type(S,lower),!,fail.
 mpred_prepend_type(X,_):-atom_concat('ft',_,X),!,fail.
 mpred_prepend_type(X,_):-atom_concat('t',_,X),!,fail.
@@ -168,7 +171,7 @@ cyc_to_pfc_idiom(not,(neg)).
 cyc_to_pfc_idiom(C,P):-
   transitive_lc(cyc_to_pfc_idiom1,C,M),!,
    ((mpred_prepend_type(C,PT),not(atom_concat(PT,_,M)))
-     -> atom_concat(PT,M,P); M=P).
+     -> (atom_concat(PT,M,P),asserta(mpred_to_cyc(P,M))); M=P).
 
 cyc_to_pfc_idiom1(C,P):-nonvar(C),mpred_to_cyc(P,C),!.
 cyc_to_pfc_idiom1('CycLTerm','CycLExpression').
