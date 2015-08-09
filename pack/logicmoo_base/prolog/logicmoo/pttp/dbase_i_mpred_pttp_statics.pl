@@ -682,7 +682,7 @@ correct_pttp_2(LC,F,A,[L|IST],Body):-correct_pttp_3(LC,F,A,[L|IST],Body),!.
 
 correct_pttp_3(_,F,A,[L|IST],Body):- correct_pttp_4(F,A,[L|IST],Body),!.
 correct_pttp_3(_,F,_,[L|IST],Body):- thlocal:second_order_wrapper(Wrapper),!, wrap_univ(Body ,[Wrapper,F,L|IST]).
-correct_pttp_3(_,F,_,[L|IST],Body):- wrap_univ(Body,[assumed_t,F,L|IST]).
+correct_pttp_3(_,F,_,[L|IST],Body):- wrap_univ(Body,[true_t,F,L|IST]).
 
 wrap_univ(Body ,[WapperPred,[P]]):-is_wrapper_pred(WapperPred),compound(P),P=..F_ARGS,!,wrap_univ(Body ,[WapperPred|F_ARGS]).
 wrap_univ(Body ,[WapperPred,P]):-is_wrapper_pred(WapperPred),compound(P),P=..F_ARGS,!,wrap_univ(Body ,[WapperPred|F_ARGS]).
@@ -951,20 +951,15 @@ is_p_to_n_2way('askable_t','fallacy_t').
 %ODD is_p_to_n('v','not_either_t').
 %ODD is_p_to_n('both_t','not_both_t').
 %ODD is_p_to_n('not_both_t',',').
-is_p_to_n('assumed_t','not_proven_t').
-%is_p_to_n('not_proven_t','assumed_t').
-is_p_to_n('true_t','not_assumed_t').
-%is_p_to_n('not_assumed_t','true_t').
+is_p_to_n('true_t','not_possible_t').
+is_p_to_n('not_true_t','possible_t').
 is_p_to_n('possible_t','not_possible_t').
 is_p_to_n('not_possible_t','possible_t').
-
-%is_p_to_n('asserted_f','asserted_t').
 
 %is_p_to_n(P,N):-is_p_to_n_2way(P,N).
 %is_p_to_n(P,N):-is_p_to_n_2way(N,P).
 is_p_to_n('not_unknown_t','not_answerable_t').
 % TODO is_p_to_n('not_true_t','possible_t').
-% is_p_to_n('asserted_t','asserted_f').
 is_p_to_n('proven_in','impossible_in').
 is_p_to_n(P,N):-is_builtin_p_to_n(P,N).
 is_p_to_n('isa','not_mudIsa').
@@ -1017,7 +1012,7 @@ is_p_simple(X,X).
 
 negated_functor0(_,_):-!,fail.
 negated_functor0(true_t,not_possible_t).
-negated_functor0(not_proven_t,possible_t).
+negated_functor0(not_true_t,possible_t).
 
 %negated_functor0(F,NotF) :- is_p_to_n(F,NotF).
 %negated_functor0(F,NotF) :- is_p_to_n(NotF,F).

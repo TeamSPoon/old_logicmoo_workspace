@@ -8800,7 +8800,7 @@ assertedTinyKB_implies( and(isa('$VAR'('CONNECT'), 'FixedArityRelation'), isa('$
 assertedTinyKB_not_first(and(scopingArg('$VAR'('RELN'), '$VAR'('N')), arity('$VAR'('RELN'), '$VAR'('ARITY')), greaterThan('$VAR'('N'), '$VAR'('ARITY'))), 'BaseKB', vStrDef).
 assertedTinyKB_not_first(and(resultGenlArg('$VAR'('FUNC'), '$VAR'('ARGNUM')), arity('$VAR'('FUNC'), '$VAR'('ARITY')), greaterThan('$VAR'('ARGNUM'), '$VAR'('ARITY'))), 'BaseKB', vStrMon).
 assertedTinyKB_not_first(and(omitArgIsa('$VAR'('RELN'), '$VAR'('N')), argIsa('$VAR'('RELN'), '$VAR'('N'), '$VAR'('_THING'))), 'UniversalVocabularyMt', vStrDef).
-assertedTinyKB_not_first(and(nbotAssertible('$VAR'('PRED')), isa('$VAR'('PRED'), 'DistributingMetaKnowledgePredicate')), 'UniversalVocabularyMt', vStrDef).
+assertedTinyKB_not_first(and(notAssertible('$VAR'('PRED')), isa('$VAR'('PRED'), 'DistributingMetaKnowledgePredicate')), 'UniversalVocabularyMt', vStrDef).
 assertedTinyKB_not_first(and(backchainForbiddenWhenUnboundInArg('$VAR'('PRED'), '$VAR'('N')), arity('$VAR'('PRED'), '$VAR'('M')), greaterThan('$VAR'('N'), '$VAR'('M'))), 'UniversalVocabularyMt', vStrDef).
 assertedTinyKB_not_first(and(arity('$VAR'('REL'), 1), commutativeInArgsAndRest('$VAR'('REL'), '$VAR'('M'), '$VAR'('N'))), 'BaseKB', vStrDef).
 assertedTinyKB_not_first(and(arity('$VAR'('REL'), 1), commutativeInArgs('$VAR'('REL'), '$VAR'('M'), '$VAR'('N'))), 'BaseKB', vStrDef).

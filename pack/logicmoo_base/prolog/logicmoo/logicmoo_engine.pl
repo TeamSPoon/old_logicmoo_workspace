@@ -1317,7 +1317,7 @@ ensure_quantifiers(Wff:- B,Wff:- B):- !.
 % ensure_quantifiers(Wff,Wff):-!.
 ensure_quantifiers(Wff,WffO):-
  must_det_l((show_call_failure(term_singletons(Wff,[],NS,[],Singles)),
-  put_singles(Wff,'exists',Singles,WffM),put_singles(WffM,'all',NS,WffO))).
+  put_singles(Wff,'all',Singles,WffM),put_singles(WffM,'all',NS,WffO))).
 
 :- multifile(function_corisponding_predicate/2).
 :- dynamic(function_corisponding_predicate/2).
@@ -1755,7 +1755,7 @@ kif_tell(InS):- atom(InS),must_det_l((kif_read(string(InS),Wff,Vs),b_implode_var
 kif_tell(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),why_to_id(tell,Wff,Why),kif_tell(Why,Wff))),!.
 
 
-local_sterm_to_pterm(Wff,WffO):- kif_sterm_to_pterm(Wff,WffO).
+local_sterm_to_pterm(Wff,WffO):- kif_sterm_to_pterm(Wff,WffO),!.
 
 
 kif_sterm_to_pterm(VAR,'$VAR'(V)):-atom(VAR),atom_concat('?',_,VAR),clip_qm(VAR,V),!.
@@ -2123,10 +2123,11 @@ kif_test(X):-kif_tell(X).
 :-op(1000,fy,(kif_test)).
 :- assert_until_eof(thlocal:canonicalize_types).
 
+:-kif_test(not(and(omitArgIsa(RELN, N), argIsa(RELN, N, _THING)))).
 
-kif_sanity_test:-kif_test(all(R, exists(D, room(R) => (door(D) & has(R,D))))).
+kif_sanity_test_0:-kif_test(all(R, exists(D, room(R) => (door(D) & has(R,D))))).
 
-kif_sanity_test:-kif_test(p(A,R) & q(A,R)).
+kif_sanity_test_0:-kif_test(p(A,R) & q(A,R)).
 
 :- show_call(kif_test(all(X, (~tNotFly(X) => ~tPengin(X))))).
 :- kif_result((tNotFly(X):-tPengin(X))).
@@ -2145,7 +2146,7 @@ kif_sanity_test:-kif_test(p(A,R) & q(A,R)).
 
 
 
-kif_sanity_test:- kif_test(loves(fatherFn(Child),Child)).
+kif_sanity_test_0:- kif_test(loves(fatherFn(Child),Child)).
 
 
 % :- prolog.
@@ -2158,39 +2159,39 @@ kif_sanity_test:- kif_test(loves(fatherFn(Child),Child)).
  ))))).
 
 
-kif_sanity_test:-kif_test'(relationAllExists causes-EventEvent Exhibitionism VisualEvent)'.
+kif_sanity_test_0:-kif_test'(relationAllExists causes-EventEvent Exhibitionism VisualEvent)'.
 
-kif_sanity_test:-kif_test '(relationAllExists properSubEvents Exhibitionism (DisplayingFn SexOrgan))'.
+kif_sanity_test_0:-kif_test '(relationAllExists properSubEvents Exhibitionism (DisplayingFn SexOrgan))'.
 
 
-kif_sanity_test:-kif_test '(knows UnitedStatesOfAmerica (thereExists ?THING  (and  (assets ChevronCorporation ?THING)  (objectFoundInLocation ?THING Kazakhstan))))'.
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '(knows UnitedStatesOfAmerica (thereExists ?THING  (and  (assets ChevronCorporation ?THING)  (objectFoundInLocation ?THING Kazakhstan))))'.
+kif_sanity_test_0:-kif_test '
 (not (beliefs UnitedStatesOfAmerica (not (thereExists ?THING  (and  (assets ChevronCorporation ?THING)  (objectFoundInLocation ?THING Kazakhstan))))))
 '.
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (not (beliefs UnitedStatesOfAmerica (not (forAll ?THING  (not (and  (assets ChevronCorporation ?THING)  (objectFoundInLocation ?THING Kazakhstan)))))))
 '.
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (knows UnitedStatesOfAmerica (not (forAll ?THING  (not (and  (assets ChevronCorporation ?THING)  (objectFoundInLocation ?THING Kazakhstan))))))
 '.
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (knows UnitedStatesOfAmerica (and  KA KB KC KD))
 '.
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (beliefs UnitedStatesOfAmerica (and  BA BB BC BD))
 '.
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (knows UnitedStatesOfAmerica (or  KOA KOB KOC KOD))
 '.
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (beliefs UnitedStatesOfAmerica (or  BOA BOB BOC BOD))
 '.
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (implies 
        (and 
            (different ?THEMAN ?WOMAN) 
@@ -2218,7 +2219,7 @@ kif_sanity_test:-kif_test '
 
 %:-prolog.
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (implies
        (and 
            (isa ?AGREEMENT Agreement) 
@@ -2230,7 +2231,7 @@ kif_sanity_test:-kif_test '
 
 % :-prolog.
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (implies 
        (and 
            (isa ?SEEING VisualEvent) 
@@ -2244,7 +2245,7 @@ kif_sanity_test:-kif_test '
                Shaming ?THEMAN) probability-Generic))'.
 
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (implies 
        (and 
            (isa ?ACT CriminalAct) 
@@ -2253,7 +2254,7 @@ kif_sanity_test:-kif_test '
        (isa ?PERP ExhibitionistOffender))'.
 
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (implies 
        (and 
            (isa ?PUNISH Punishing) 
@@ -2263,17 +2264,17 @@ kif_sanity_test:-kif_test '
            (thereExists ?OBLIGATION 
                (agentViolatesObligation ?WOMAN ?OBLIGATION))))'.
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (implies (and (isa ?MORAL-SHAMING Shaming)  (performedBy ?MORAL-SHAMING ?THEMAN)  (obligatedAgents TheGoldenRule ?THEMAN)) (agentViolatesObligation ?THEMAN TheGoldenRule))
 '.
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (thereExists ?THEMAN (implies 
    (thereExists ?MORAL-SHAMING (and (isa ?MORAL-SHAMING Shaming) (performedBy ?MORAL-SHAMING ?THEMAN)  (obligatedAgents TheGoldenRule ?THEMAN)))
    (agentViolatesObligation ?THEMAN TheGoldenRule)))'.
 
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (implies 
        (and 
            (isa ?INST1 Exhibitionism) 
@@ -2281,7 +2282,7 @@ kif_sanity_test:-kif_test '
        (isa ?INST2 ExhibitionistOffender))'.
 
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (implies 
        (and 
            (isa ?MS VisualEvent) 
@@ -2290,7 +2291,7 @@ kif_sanity_test:-kif_test '
        (holdsIn ?MS 
            (portalState ?MP OpenPortal)))'.
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (implies 
        (and 
            (performedBy ?ACT ?WOMAN)
@@ -2301,7 +2302,7 @@ kif_sanity_test:-kif_test '
            (isa ?ACT Exhibitionism) 
            (agentViolatesObligation ?WOMAN ?LAW)))'.
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (not 
        (and 
            (subjectToCOC ?SUNBATHER KeepAreolaCoveredInPublic) 
@@ -2309,7 +2310,7 @@ kif_sanity_test:-kif_test '
            (isa ?BEACH ToplessBeach)))'.
 
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (implies 
        (and 
            (isa ?COC LegalCode-ModernWestern) 
@@ -2320,7 +2321,7 @@ kif_sanity_test:-kif_test '
        (ist ?COC 
            (isa ?ACT CriminalAct)))'.
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (implies 
        (and 
            (isa ?AREOLA 
@@ -2337,7 +2338,7 @@ kif_sanity_test:-kif_test '
                    (wearsClothing ?WOMAN ?CLOTH)))))'.
 
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (implies 
        (and 
            (different ?THEMAN ?WOMAN) 
@@ -2363,7 +2364,7 @@ kif_sanity_test:-kif_test '
                                        (maleficiary ?ANOTRACT ?THEMAN) 
                                        (deliberateActors ?ANOTRACT ?WOMAN)))))))) deliberateActors))'.
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (beliefs InternationalCommunity 
        (thereExists ?WEAP 
            (and 
@@ -2375,7 +2376,7 @@ kif_sanity_test:-kif_test '
 
 :-if((fail)).
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (implies 
        (hasBeliefSystems ?WOMAN Karma) 
        (beliefs ?WOMAN 
@@ -2400,7 +2401,7 @@ kif_sanity_test:-kif_test '
                                (sinner ?MORAL-SHAMING ?THEMAN))))))))'.
 
 
-kif_sanity_test:-kif_test '
+kif_sanity_test_0:-kif_test '
 (implies 
        (and 
            (isa ?ACTION PurposefulAction) 
@@ -2423,11 +2424,11 @@ kif_sanity_test:-kif_test '
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % this rule ...
 
-kif_sanity_test:-kif_test((   wearing(A,B)  => has(A,B)  )).
+kif_sanity_test_0:-kif_test((   wearing(A,B)  => has(A,B)  )).
 
 % has to qualify argument types before canicalization
 
-kif_sanity_test:-  kif_test((argInst(has,1,A) & argInst(has,2,B) => (wearing(A,B) => has(A,B)))).
+kif_sanity_test_0:-  kif_test((argInst(has,1,A) & argInst(has,2,B) => (wearing(A,B) => has(A,B)))).
 
 % Which produced this code:
 %
@@ -2443,7 +2444,7 @@ kif_sanity_test:-  kif_test((argInst(has,1,A) & argInst(has,2,B) => (wearing(A,B
 %
 
 
-kif_sanity_test:-kif_test(has(A,B) => (argInst(has, 1, A) & argInst(has, 2, B))).
+kif_sanity_test_0:-kif_test(has(A,B) => (argInst(has, 1, A) & argInst(has, 2, B))).
 
 %         not_has(A, _):- not_argInst(has, 1, A).
 %
@@ -2455,7 +2456,7 @@ kif_sanity_test:-kif_test(has(A,B) => (argInst(has, 1, A) & argInst(has, 2, B)))
 
 
 
-kif_sanity_test:-kif_test(has(A,B) =>  (kb_argInst(KB, has, 1, A) & kb_argInst(KB, has, 2, B))).
+kif_sanity_test_0:-kif_test(has(A,B) =>  (kb_argInst(KB, has, 1, A) & kb_argInst(KB, has, 2, B))).
 
 % BAD!
 %         (( not_has(A, _)):- not_kb_argInst( _BAD, has, 1, A)).
@@ -2471,7 +2472,7 @@ kif_sanity_test:-kif_test(has(A,B) =>  (kb_argInst(KB, has, 1, A) & kb_argInst(K
 % :- prolog.
 % GOOD! (the software does this for us but wanted to show the singlton in the consequent on the conjuction)
 
-kif_sanity_test:-kif_test(   argInst(kb_argInst, 1 ,KB) =>  (        has(A,B) =>  (kb_argInst(KB, has, 1, A) & kb_argInst(KB, has, 2, B)))).
+kif_sanity_test_0:-kif_test(   argInst(kb_argInst, 1 ,KB) =>  (        has(A,B) =>  (kb_argInst(KB, has, 1, A) & kb_argInst(KB, has, 2, B)))).
 
 %     (( not_argInst(kb_argInst, 1,KB)):-has(A, _),  not_kb_argInst(KB, has, 1, A)).
 %
@@ -2486,7 +2487,7 @@ kif_sanity_test:-kif_test(   argInst(kb_argInst, 1 ,KB) =>  (        has(A,B) =>
 %    (kb_argInst(KB, has, 2, B):-argInst(kb_argInst, 1,KB), has(_, B)).
 
 % EVEN BETTER?
-kif_sanity_test:-kif_test(   argInst(kb_argInst, 1 ,KB) & argInst(has, 1 , A) & argInst(has, 2 , B) =>  (  has(A,B) =>  (kb_argInst(KB, has, 1, A) & kb_argInst(KB, has, 2, B)))).
+kif_sanity_test_0:-kif_test(   argInst(kb_argInst, 1 ,KB) & argInst(has, 1 , A) & argInst(has, 2 , B) =>  (  has(A,B) =>  (kb_argInst(KB, has, 1, A) & kb_argInst(KB, has, 2, B)))).
 
 
 %   pfc_add= (not_has(A, B)):- not_kb_argInst(C, has, 1, A), argInst(has, 2, B), argInst(kb_argInst, 1, C), argInst(has, 1, A)).
@@ -2513,7 +2514,7 @@ kif_sanity_test:-kif_test(   argInst(kb_argInst, 1 ,KB) & argInst(has, 1 , A) & 
 :-endif. %if_defined(show_argtype_tests)
 
 
-kif_sanity_test:-kif_test(all(R,isa(R,tAgent) => exists(D, (isa(D,tNose) & mudContains(R,D))))).
+kif_sanity_test_0:-kif_test(all(R,isa(R,tAgent) => exists(D, (isa(D,tNose) & mudContains(R,D))))).
 
 :- initialization(uses_logic(logicmoo_kb_refution)).
 
@@ -2534,8 +2535,10 @@ user:regression_test:- logicmoo_example3.
 
 :- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_call_kb)).
 
+kif_sanity_tests:- forall(clause(kif_sanity_test_0,B),must(B)).
+
 :- if(gethostname(ubuntu)).
 % :- logicmoo_example3.
-% :- forall(clause(kif_sanity_test,B),must(B)).
+
 %:- prolog.
 :- endif.
