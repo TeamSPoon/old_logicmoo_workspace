@@ -159,7 +159,7 @@ mpred_online:semweb_startup:- do_semweb_startup_late_once.
 */
 
 :- user:ensure_loaded(library(semweb/rdf_http_plugin)).
-:- debugOnError(rdf_load('http://prologmoo.com/downloads/mud.ttl')),!.
+:- debugOnError(rdf_load('http://prologmoo.com/downloads/mud.ttl',[format(trig),graph(foobar)])),!.
 %:- logOnError(eggdrop:deregister_unsafe_preds).
 
 :-endif.

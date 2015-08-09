@@ -490,7 +490,7 @@ pp_i2tml(H):-
     ((F1 \== F2 -> format('<hr/>',[]);true)))),fail.
 
 pp_i2tml(H):- thlocal:print_mode(html), 
-  term_to_escaped_string(H,ALT)->
+  term_to_pretty_string(H,ALT)->
    functor_to_color(H,FC)->fmtimg(FC,ALT)->
     format('<input type="checkbox" name="assertion[]" value="~w">',[ALT]),fail.
 
@@ -500,11 +500,22 @@ pp_i2tml(H):- \+ \+ pp_i2tml0(H).
 pp_i2tml0(C):- thlocal:pp_i2tml_hook(C),!.
 pp_i2tml0(C):- if_defined(rok_portray_clause(C),portray_clause(C)).
 
+url_encode(B,A):- atom_concat('\n',BT,B),!,url_encode(BT,A).
+url_encode(B,A):- atom_concat(BT,'\n',B),!,url_encode(BT,A).
+url_encode(B,A):- atom_concat(' ',BT,B),!,url_encode(BT,A).
+url_encode(B,A):- atom_concat(BT,' ',B),!,url_encode(BT,A).
+url_encode(B,A):- url_iri(A,B).
 
-term_to_escaped_string(H,HS2):-term_string(H,HS)->atom_subst(HS,'\\','\\\\',HS1)->atom_subst(HS1,'"','\\"',HS2),!.
+term_to_pretty_string(H,HS):-atomic(H),!,with_output_to(atom(HS),writeq(H)).
+term_to_pretty_string(H,HS):-
+   % ignore(source_variables(X))->ignore(X=[])->
+   % numbervars(HC,0,_)->
+  with_output_to(atom(HS),portray_clause(H)).
 
 fmtimg(N,Alt):- thlocal:print_mode(html),!,
- format('~N<img src="http://prologmoo.com/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred_online/pixmaps/~w.gif" alt="~w" title="~w">',[N,Alt,Alt]).
+ make_quotable(Alt,AltQ),
+ url_encode(Alt,AltS),
+ format('~N<a href="edit_term?term=~w" target="_parent"><img src="/pixmaps/~w.gif" alt="~w" title="~w"><a>',[AltS,N,AltQ,AltQ]).
 fmtimg(_,_).
 
 

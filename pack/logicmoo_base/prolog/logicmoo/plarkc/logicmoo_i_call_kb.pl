@@ -353,8 +353,7 @@ assertion_t(Call):- thglobal:use_cyc_database,!,with_assertions(thlocal:useOnlyE
 % end holds_t
 % ================================================================================
 
-:-user:ensure_loaded(logicmoo_i_cyc).
-:-user:ensure_loaded(logicmoo_i_cyc_kb).
+:- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
 
 % ================================================================================
 % begin holds_f

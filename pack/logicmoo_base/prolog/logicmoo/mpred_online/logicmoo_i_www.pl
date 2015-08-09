@@ -7,7 +7,7 @@
 % Dec 13, 2035
 %
 */
-
+:- use_module(library(http/http_server_files)).
 
 
 :- dynamic   user:file_search_path/2.
@@ -109,6 +109,10 @@
 :- http_handler('/logicmoo/', handler_logicmoo_cyclone, [chunked,prefix]). %  % 
 :- http_handler('/logicmoo_nc/', handler_logicmoo_cyclone, [prefix]). %  % 
 
+http:location(pixmaps, root(pixmaps), []).
+user:file_search_path(pixmaps, logicmoo('mpred_online/pixmaps')).
+:- http_handler(pixmaps(.), serve_files_in_directory(pixmaps), [prefix]).
+
 :- meta_predicate
 	handler_logicmoo_cyclone(+).
 
@@ -127,16 +131,17 @@ f_to_mfa(EF,R,F,A):-get_fa(EF,F,A),
 
 :- nb_setval(pldoc_options,[ prefer(manual) ]).
 
-escape_quote(SUnq,SObj):-atom_subst(SUnq,'"','\\\"',SObj).
-escape_quote(Unq,SObj):-url_iri(SObj,Unq).
-escape_double_quotes(String,SObj):-format(string(SUnq),'~q',[String]),escape_quote(SUnq,SObj),!.
+make_quotable_0(SUnq,SObj):-atom_subst(SUnq,'\\','\\\\',SObj0),atom_subst(SObj0,'\n','\\n',SObj1),atom_subst(SObj1,'"','\\\"',SObj).
+make_quotable(String,SObj):-string(String),format(string(SUnq),'~s',[String]),make_quotable_0(SUnq,SObj),!.
+make_quotable(String,SObj):-atomic(String),format(string(SUnq),'~w',[String]),make_quotable_0(SUnq,SObj),!.
+make_quotable(String,SObj):-format(string(SUnq),'~q',[String]),make_quotable_0(SUnq,SObj),!.
 
 % 
-% <link rel="SHORTCUT ICON" href="http://prologmoo.com/cycdoc/img/cb/mini-logo.gif"><meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
+% <link rel="SHORTCUT ICON" href="/pixmaps/mini-logo.gif"><meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
 
 handler_logicmoo_cyclone( Request):-   
    catch(mmake,_,true), 
-   call(handler_logicmoo_cyclone_1,Request).
+   notrace(call(handler_logicmoo_cyclone_1,Request)).
 
 http_save_in_session(NV):- \+ compound(NV),!.
 http_save_in_session(NV):-is_list(NV),!,maplist(http_save_in_session,NV).
@@ -162,22 +167,23 @@ get_nv(N,V):- must(param_default_value(N,D)),get_nv(N,V,D).
 
 get_nv(N,V,D):- nonvar(V),!,get_nv(N,VV,D),!,param_matches(V,VV).
 
-
-get_nv(L,V,D):- (is_list(L)-> member(N,L) ; N=L),
+get_nv(L,V,_):- (is_list(L)-> member(N,L) ; N=L),
      CALL2 =.. [N,V,[optional(true),default(Foo)]],
   httpd_wrapper:http_current_request(B),
    http_parameters:http_parameters(B,[CALL2])->
        V \== Foo,!.
-get_nv(L,V,D):- (is_list(L)-> member(N,L) ; N=L),
-     CALL2 =.. [N,V], http_session:session_data(F, CALL2),!.
-get_nv(L,V,V):- (is_list(L)-> member(N,L) ; N=L), http_save_in_session(N=V),!.
+get_nv(_,V,V):-!.
+% get_nv(L,V,V):- (is_list(L)-> member(N,L) ; N=L), http_save_in_session(N=V),!.
+
+get_nv_session(L,V,_):- (is_list(L)-> member(N,L) ; N=L),
+     CALL2 =.. [N,V], (http_open_session(F,[renew(false)]),http_session:session_data(F, CALL2)),!.
+get_nv_session(_,V,V):-!.
+
 
 save_request_in_session(Request):- 
       http_open_session(F,[renew(false)]),
         (member(method(post), Request) -> (http_read_data(Request, Data, []),http_save_in_session(Data));true),
         http_save_in_session(Request),
-        http_save_in_session(Parameters),
-        http_save_in_session(Data),!,
         http_session:http_session_id(F),forall(http_session:session_data(F,D),wdmsg(D)).
 
 
@@ -186,30 +192,27 @@ handler_logicmoo_cyclone_1(Request):-
  must_det_l((
    save_request_in_session(Request),   
    format('Content-type: text/html~n~n',[])->
-   format('<html><head><base target="_parent" />',[])->
+   format('<html><head>',[])->
    (member(request_uri(URI),Request)->format('<meta http-equiv="refresh" content="300;~w">',[URI]);true),
-   get_nv(call,Call,show_pcall),!,
-   get_sobj(_String,Obj,_PredURL,_SObj),
-   format('<title>~q for ~q</title></head>',[Call,Obj]),
+      member(request_uri(URI),Request),
+      member(path(PATH),Request),directory_file_path(_,FCALL,PATH),
+      (current_predicate(FCALL/0)->get_nv(call,Call,FCALL);get_nv(call,Call,edit_term)),   
+   format('<title>~q for ~q</title></head>',[Call,URI]),
    format('<body class="yui-skin-sam">',[]),flush_output,
-   logOnError(Call),!,
+   notrace(logOnError(Call)),!,
    flush_output,format('</body></html>~n~n',[]),flush_output)),!.
 
 
 show_pcall_footer:-
       format('<hr><span class="copyright"><i>Copyright &copy; 1999 - 2015 <a href="http://prologmoo.com">
-      LogicMOO/PrologMUD</a>.All rights reserved.</i></span></body></html>~n~n',[]),
-      !.
+      LogicMOO/PrologMUD</a>.All rights reserved.</i></span></body></html>~n
+      ',
+      []),!.
 
 cvt_param_to_term(In,Obj):-atom(In),catch(atom_to_term(In,Obj,_),_,fail),nonvar(Obj),!.
 cvt_param_to_term(In,Obj):-string(In),catch(atom_to_term(In,Obj,_),_,fail),nonvar(Obj),!.
 cvt_param_to_term(Obj,Obj).
 
-get_sobj(String,Obj,PredURL,SObj):-
-         get_nv(search,String,"ttPredType"),
-         cvt_param_to_term(String,Obj),
-         url_iri(PredURL,String),
-         escape_double_quotes(Obj,SObj),!.
 
 :- discontiguous param_default_value/2. 
 
@@ -254,6 +257,12 @@ prover_name("proverPFC","PFC").
 prover_name("proverPTTP","PTTP (LogicMOO)").
 prover_name("proverDOLCE","DOLCE (LogicMOO)").
 
+param_default_value(partOfSpeech,'N').
+partOfSpeech("N","Noun").
+partOfSpeech("V","Verb").
+partOfSpeech("J","Adjective").
+partOfSpeech("Z","Adverb").
+
 param_matches(A,B):-A=B,!.
 param_matches(VV,V):-atomic(VV),atomic(V),string_to_atom(VV,VVA),string_to_atom(V,VA),downcase_atom(VVA,VD),downcase_atom(VA,VD).
 param_matches(A,B):-A=B,!.
@@ -280,79 +289,98 @@ show_select1(Name,Pred):-
                 format('<option value="~w">~w</option>',[Value,Value]))),
  format('</select>',[]),!.
 
-show_pcall:- 
+
+edit_term:-
     reset_assertion_display,
-   get_sobj(String,Obj,PredURL,SObj),
-format('<table width="1112" cellspacing="0" cellpadding="0" height="121" id="table4">
+   get_nv(term,String,""),
+   ignore(get_nv(search,Word)),
+   ignore(get_nv_session(search,Word,String)),
+   term_to_pretty_string(Word,SWord),
+   httpd_wrapper:http_current_request(Request),
+   member(request_uri(URL),Request),
+format('
+<table width="1111" cellspacing="0" cellpadding="0" height="121" id="table4">
  <!-- MSTableType="nolayout" -->
-	<form action="Browse.prolog">
+	<form action="edit_term">
       <!-- MSTableType="nolayout" -->
 		<tr>
-          <td align="left" valign="top" width="36" rowspan="2"><img src="http://54.183.42.206:8080/sigma/pixmaps/sigmaSymbol-gray.gif"></td>
+          <td align="left" valign="top" width="36" rowspan="2"><img src="/pixmaps/sigmaSymbol-gray.gif"></td>
           <td></td>
-          <td align="left" valign="top" width="717" rowspan="2">
-          <img src="http://54.183.42.206:8080/sigma/pixmaps/logoText-gray.gif">&nbsp;&nbsp;Prover:&nbsp;',
-          []),
-  show_select2(prover,prover_name,[]),
- format('<table cellspacing="0" cellpadding="0" id="table5" width="658" height="97">
+          <td align="left" valign="top" width="711" rowspan="2">
+          <img src="/pixmaps/logoText-gray.gif">&nbsp;&nbsp;Prover:&nbsp; ~@
+                   <table cellspacing="0" cellpadding="0" id="table5" width="658" height="97">
       <!-- MSTableType="nolayout" -->
 	<tr>
-          <td align="right"><b>KB Call/Find:</b></td>
+          <td align="right"><b>Fml:</b></td>
           <td align="left" valign="top" colspan="2">
-              <textarea rows="4" cols="50" name="search">~s</textarea>
+              <textarea style="white-space: pre; overflow: auto; font-size: 7pt; font-weight: bold; font-family: Verdana, Arial, Helvetica, sans-serif;border: 1px solid black;"
+               wrap="off" rows="10" cols="70" name="term">~w</textarea>
           </td>
-          <td align="left" valign="top" height="68">',
-          [SObj]),action_menu_applied('action_above',"Item",""),
-format('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp<br></td></tr>
-        <tr><td><img src="http://54.183.42.206:8080/sigma/pixmaps/1pixel.gif" height="3"></td>
+          <td align="left" valign="top" height="68">~@<input type="submit" value="TELL" name="TELL"><input type="submit" value="ASK" name="ASK">
+             <br><b>Microthory</b><br>~@
+             <br><b>Formal Language</b><br>~@</td>
+      </tr>
+        <tr><td><img src="/pixmaps/1pixel.gif" height="3"></td>
       		<td></td>
 			<td></td>
 			<td height="3"></td>
             </tr>
             <tr>
-                  <td align="right" width="99"><b>English&nbsp;Word:&nbsp;</b></td>
-                  <td align="left" valign="top" width="276">
-                      <input type="text" size="27" name="word" value="~s">
-                      <img src="http://54.183.42.206:8080/sigma/pixmaps/1pixel.gif" width="3"><input type="submit" value="Overlap" name="xref"></td>
-                  <td align="left" valign="top" width="144">
-                      <select name="POS"><option value="Noun">Noun<option value="Verb">Verb<option value="Adjective">Adjective <option value="Adverb">Adverb</select>
-                      <input type="submit" value="NatLg" name="ShowEnglish"></td>
-                  <td align="left" valign="top" height="26" width="139">',
-                  [SObj]),
-                   show_select1('humanLang',human_language),
-                  format('</td>
+                  <td align="right" width="99"><b>Search:&nbsp;</b></td>
+                  <td align="left" valign="top" width="276"><input type="text" size="27" name="search" value="~w">&nbsp;<input type="submit" value="Overlap" name="xref">&nbsp;</td>
+                  <td align="left" valign="top" width="144">~@&nbsp;<input type="submit" value="NatLg" name="ShowEnglish"></td>
+                  <td align="left" valign="top" height="26" width="139">~@</td>
              </tr>
             </table>
           </td>
-          <td valign="bottom" width="4" rowspan="2"></td>
-          <td height="96">
+          <td valign="bottom" width="9" rowspan="2"></td>
+          <td height="121" rowspan="2" width="163">
           <span class="navlinks">
-          <b>[&nbsp;<a href="KBs.prolog">Home</a>&nbsp;|&nbsp;              
-          <a href="Graph.prolog?kb=SUMO&lang=EnglishLanguage&search=~w">Grap2h</a>]</b></span><p>
-          <b>Formal&nbsp;Language&nbsp;<br></b>',
-                        [SObj]),
-                  show_select2(flang,logic_lang_name,[]),
-
-                  format('</td>
-      </tr>
-		<tr>
-			<td width="4"></td>
-			<td valign="top" height="25" width="351">
+          <b>[&nbsp;<a href="/">Home</a>&nbsp;|&nbsp;              
+          <a href="~w&Graph=true">Grap2h</a>]</b></span><p>
+          <b>Response&nbsp;Language&nbsp;<br></b>~@<p>
                         <input type="checkbox" name="sExprs" value="ON" checked>S-Exprs&nbsp;
                         <input type="checkbox" name="webDebug" value="ON" checked>Debugging
                         </td>
+          <td height="121" rowspan="2" width="188">
+          Display Start<br>
+&nbsp;<input type="text" size="13" name="displayStart" value="~w"><br>
+			Display Max <a href="~w&Next=true">Next</a><br>
+&nbsp;<input type="text" size="13" name="displayMax" value="~w"><br>
+			<input type="checkbox" name="showSystem" value="ON" checked>System 
+			Level<br>
+			<input type="checkbox" name="showMeta" value="ON" checked>Meta/Book 
+			Keeping</td>
+      </tr>
+		<tr>
+			<td width="4">&nbsp;</td>
 		</tr>
-  </form></table><hr><iframe width="100%" height="80%" frameborder="0" scrolling="yes" marginheight="0" marginwidth="0"
-   allowtransparency=true id="main-iframe" name="main-iframe" style="width:100%;height:100%"
-  src="?call=show_pcall_right&search=~w"></iframe>',
-[SObj,SObj,String]),flush_output,!.
-
+  </form></table><hr>
+  <iframe width="100%" height="80%" frameborder="0" scrolling="yes" marginheight="0" marginwidth="0" 
+   allowtransparency=true id="main" name="main" style="width:100%;height:100%" src="search4term?search=~w"></iframe>'
+  ,[show_select2(prover,prover_name,[]),
+    String,
+    action_menu_applied('action_above',"Item",""),
+    show_select2('context',is_context,[]),
+    show_select2(flang,logic_lang_name,[]),
+    SWord,
+    show_select2('POS',partOfSpeech,[]),
+    show_select1('humanLang',human_language),
+    URL,
+    show_select2(olang,logic_lang_name,[]),
+    0,URL,100000,SWord]),!,
+   dmsg(search=SWord).
 
 action_menu_applied(MenuName,ItemName,Where):-
   show_select2(MenuName,action_menu_item,[atom_subst('$item',ItemName)]),
       format('&nbsp;~w&nbsp;&nbsp;<input type="submit" value="Now" name="Apply">',[Where]).
 
-param_default_value(action_menu_item,'Find').
+param_default_value(is_context,'BaseKB').
+is_context(MT,MT):-no_repeats(is_context0(MT)).
+is_context0(MT):-if_defined(exactlyAssertedEL_first(isa, MT, 'Microtheory',_,_)).
+is_context0('BaseKB').
+
+param_default_value(action_menu_item,'query').
 action_menu_item('Find',"Find $item").
 action_menu_item('Forward',"Forward Direction").
 action_menu_item('Backward',"Backward Direction").
@@ -368,11 +396,14 @@ action_menu_item('prologPfc',"Impl $item in PFC").
 action_menu_item('Monotonic',"Treat $item Monotonic").
 action_menu_item('NonMonotonic',"Treat $item NonMonotonic").   
 
-show_pcall_right:- 
-   must_det_l((get_sobj(String,Obj,PredURL,SObj),
-        format('<form action="Apply.prolog">Apply ',[]),
-        action_menu_applied('action_below',"Checked or Clicked","&nbsp;below&nbsp;"),        
-        format('<hr/><pre>',[]),flush_output,
+search4term:- 
+   must_det_l((
+        get_nv(term,Term,"tSet"),
+        get_nv(search,SObj,Term),
+        cvt_param_to_term(SObj,Obj),
+        format('<form action="edit_term?test=666" target="_parent">Apply ',[]),
+        action_menu_applied('action_below',"Checked or Clicked","&nbsp;below&nbsp;"),
+        format('&nbsp;&nbsp;&nbsp;search = <input type="text" name="search" value="~q"><hr/><pre>',[Obj]),flush_output,
         with_assertions(thlocal:print_mode(html),catch(make_page_pretext_obj(Obj),E,(writeq(E),nl))),
         format('</pre></form>',[]),flush_output,
         show_pcall_footer)).
@@ -411,7 +442,6 @@ object_sub_page(Obj, Options) -->
 	).
 
 
-html_html_pp_ball(Color,Alt):-format(S,'<img src="http://prologmoo.com/cycdoc/img/cb/~w.gif" alt="~w" align="top" border="0"></img>',[Color,Alt]).
 
 
 %write_html(HTML):- phrase(html(HTML), Tokens), html_write:print_html(Out, Tokens))).
@@ -439,7 +469,7 @@ tmw:- with_assertions(thlocal:print_mode(html),
   rok_portray_clause((a(LP):-b([1,2,3,4]))),
   nl,nl,wid(_,_,KIF),
   KIF=(_=>_),nl,nl,print(KIF),listing(print_request/1))),!.
-tmw:- with_assertions(thlocal:print_mode(html),(print((a(LP):-b([1,2,3,4]))),nl,nl,wid(_,_,KIF),KIF=(_=>_),nl,nl,print(KIF),listing(print_request/1))),!.
+tmw:- with_assertions(thlocal:print_mode(html),(print((a(_LP):-b([1,2,3,4]))),nl,nl,wid(_,_,KIF),KIF=(_=>_),nl,nl,print(KIF),listing(print_request/1))),!.
 
 
 
@@ -457,7 +487,7 @@ write_atom_link(W,A/_,N):-atom(A),!,write_atom_link(W,A,N).
 write_atom_link(W,C,N):-compound(C),get_functor(C,F,A),!,write_atom_link(W,F/A,N).
 %write_atom_link(W,_,N):- thread_self(main),!,write_term_to_atom_one(W,N),!.
 write_atom_link(W,_,N):- must(nonvar(W)),\+ thlocal:print_mode(html),write_term_to_atom_one(W,N),!.
-write_atom_link(W,A,N):- nonvar(W),catch((url_iri(URL,A),format(W,'<a href="KB.prolog?search=~q" target="_parent">~w</a>',[URL,N])),_,write_term_to_atom_one(W,N)).
+write_atom_link(W,A,N):- nonvar(W),catch((term_to_pretty_string(A,AQ),url_encode(AQ,URL),format(W,'<a href="?term=~w">~w</a>',[URL,AQ])),_,write_term_to_atom_one(W,N)).
 
 write_term_to_atom_one(atom(A),Term):-format(atom(A),'~q',[Term]).
 
@@ -591,7 +621,7 @@ put_string0([H|T]) :-
 %   quote has already been written.  Instances of Q in S are doubled.
 
 put_string(A,B):- thlocal:print_mode(html),!,
-  with_output_to(atom(S),put_string0(A,B)),url_iri(URL,S),format('<a href="KB.prolog?search=~q" target="_parent">~w</a>',[URL,S]).
+  with_output_to(atom(S),put_string0(A,B)),url_iri(URL,S),format('<a href="?term=~w">~w</a>',[URL,S]).
 put_string(A,B):- put_string0(A,B).
 
 put_string0([], Q) :-
@@ -634,7 +664,7 @@ write_out(N, _, _, Ci, alpha) :-
 	),  !,
 	name(N, String),
 	put_string(String).
-write_out(Term, print, _, Ci, alpha) :-
+write_out(Term, print, _,  _, alpha) :-
 	% DMILES HSOULD BE portray(Term),
         print(Term),
 	!.
@@ -706,7 +736,7 @@ write_out(2, F, Term, Style, Prio, Ci, Co) :-
 	arg(2, Term, B),
 	write_out(B, Style, Q, C3, C4),
 	maybe_paren(O, Prio, 41, C4, Co).
-write_out(N, F, Term, Style, Prio, Ci, punct) :-
+write_out(N, F, Term, Style, _Prio, Ci, punct) :-
 	write_atom(F, Style, Ci, _),
 	write_args(0, N, Term, 40, Style).
 
@@ -714,13 +744,13 @@ write_out(N, F, Term, Style, Prio, Ci, punct) :-
 write_oper(Op, Prio, Style, Ci, Co) :-
 	Prio < 700, !,
 	write_atom(Op, Style, Ci, Co).
-write_oper(Op, _, Style, Ci, punct) :-
+write_oper(Op, _, Style, _Ci, punct) :-
 	put(32),
 	write_atom(Op, Style, punct, _),
 	put(32).
 
 
-write_VAR(N, Style, Ci, alpha) :-
+write_VAR(N, _Style, Ci, alpha) :-
 	integer(N), N >= 0, !,
 	maybe_space(Ci, alpha),
 	Letter is N mod 26 + 65,
@@ -729,7 +759,7 @@ write_VAR(N, Style, Ci, alpha) :-
 	;   Rest is N/26, name(Rest, String),
 	    put_string(String)
 	), !.
-write_VAR(A, Style, Ci, Co) :-
+write_VAR(A, _Style, Ci, Co) :-
 	atom(A), !,
 	write_atom(A, write, Ci, Co).
 write_VAR(X, Style, Ci, punct) :-
@@ -746,7 +776,7 @@ write_atom([], _, _, punct) :- !,
 	put(91), put(93).
 write_atom({}, _, _, punct) :- !,
 	put(123), put(125).
-write_atom(A,B,C,D):- write_atom_link(A,A),!.
+write_atom(A, _Style, _Ci, _Co):- write_atom_link(A,A),!.
 write_atom(Atom, Style, Ci, Co) :-
 	name(Atom, String),
 	(   classify_name(String, Co),
@@ -907,7 +937,7 @@ rok_portray_clause((Pred)) :-
 'list clauses'((A,B), L, R, D) :- !,
 	'list clauses'(A, L, 1, D), !,
 	'list clauses'(B, 1, R, D).
-'list clauses'(true, L, 2, D) :- !,
+'list clauses'(true, _L, 2, _D) :- !,
 	put(0'.), nl.
 'list clauses'((A;B), L, R, D) :- !,
 	'list magic'(fail, L, D),
@@ -923,24 +953,24 @@ rok_portray_clause((Pred)) :-
 	'list magic'(R, '.
 ').
 
-'list magic'(!,    0, D) :- !,
+'list magic'(!,    0, _D) :- !,
 	write(' :- ').
-'list magic'(!,    1, D) :- !,
+'list magic'(!,    1, _D) :- !,
 	write(',  ').
-'list magic'(Goal, 0, D) :- !,
+'list magic'(_Goal, 0, D) :- !,
 	write(' :- '),
 	nl, tab(D).
-'list magic'(Goal, 1, D) :- !,
+'list magic'(_Goal, 1, D) :- !,
 	put(0',),
 	nl, tab(D).
-'list magic'(Goal, 3, D) :- !,
+'list magic'(_Goal, 3, _D) :- !,
 	write('(   ').
-'list magic'(Goal, 4, D) :- !,
+'list magic'(_Goal, 4, _D) :- !,
 	write(';   ').
-'list magic'(Goal, 5, D) :- !,
+'list magic'(_Goal, 5, D) :- !,
 	write(' ->'),
 	nl, tab(D).
-'list magic'(Goal, Key, D) :-
+'list magic'(_Goal, Key, D) :-
 	atom(Key),
 	write(':- '), write(Key),
 	nl, tab(D).

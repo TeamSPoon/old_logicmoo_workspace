@@ -28,6 +28,10 @@
     the GNU General Public License.
 */
 
+end_of_file.
+end_of_file.
+end_of_file.
+
 :- module(html_listing,
 	[ l1sting/0,
 	  l1sting/1,

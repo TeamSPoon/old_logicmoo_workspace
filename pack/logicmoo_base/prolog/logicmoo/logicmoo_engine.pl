@@ -1676,7 +1676,6 @@ user:regression_test:- tsn.
 :- thread_local(kif_reader_mode/1).
 :- asserta_if_new(kif_reader_mode(lisp)).
 
-:- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api)).
 kif_read(InS,Wff,Vs):- must(l_open_input(InS,In)),
   must(((kif_reader_mode(lisp) ,without_must( catch(input_to_forms(In,Wff,Vs),E,(dmsg(E:kif_read_input_to_forms(In,Wff,Vs)),fail)))) *-> true ;
       catch(read_term(In,Wff,[module(user),double_quotes(string),variable_names(Vs)]),E,(dmsg(E:kif_read_term_to_forms(In,Wff,Vs)),fail)))).
@@ -1755,6 +1754,7 @@ kif_ask(Goal0,ProofOut):- logical_pos(_KB,Goal0,Goal),
 kif_tell(InS):- atom(InS),must_det_l((kif_read(string(InS),Wff,Vs),b_implode_varnames0(Vs),local_sterm_to_pterm(Wff,Wff0),kif_tell(Wff0))).
 kif_tell(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),why_to_id(tell,Wff,Why),kif_tell(Why,Wff))).
 
+:- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_api)).
 local_sterm_to_pterm(Wff,WffO):- cyc:sterm_to_pterm(Wff,WffO).
 
 :-op(1000,fy,(kif_tell)).
@@ -2497,6 +2497,8 @@ user:sanity_test:- kif_to_boxlog(not((a , b ,  c , d)),S),!,disjuncts_to_list(S,
 user:sanity_test:- logicmoo_example3.
 
 user:regression_test:- logicmoo_example3.
+
+:- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_call_kb)).
 
 :- if(gethostname(ubuntu)).
 % :- logicmoo_example3.

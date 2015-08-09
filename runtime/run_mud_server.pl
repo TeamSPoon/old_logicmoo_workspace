@@ -72,7 +72,6 @@ push_env_ctx:-!.
 
 :- listing([storage_plugin_update,filesys:filesys_data]).
 
-:- prolog.
 
 :- if(if_defined(debugging_planner)).
 

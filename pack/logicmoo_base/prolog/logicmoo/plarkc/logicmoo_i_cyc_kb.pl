@@ -19,22 +19,115 @@
 
 isa_db(I,C):-clause(isa(I,C),true).
 
+cycFormatType('AssertedAssertion').
+cycFormatType('Assertion').
+cycFormatType('Atom').
+cycFormatType('AtomicAssertion').
+cycFormatType('AtomicSentence').
+cycFormatType('AtomicTerm').
+cycFormatType('Character').
+cycFormatType('ClosedAtomicSentence').
+cycFormatType('ClosedAtomicTerm').
+cycFormatType('ClosedDenotationalTerm').
+cycFormatType('ClosedExpression').
+cycFormatType('ClosedFormula').
+cycFormatType('ClosedNonAtomicTerm').
+cycFormatType('ClosedSentence').
+cycFormatType('Constant').
+cycFormatType('DeducedAssertion').
+cycFormatType('DenotationalTerm').
+cycFormatType('DenotationalTerm-Assertible').
+cycFormatType('DocumentationConstant').
+cycFormatType('Expression').
+cycFormatType('ExpressionAskable').
+cycFormatType('ExpressionAssertible').
+cycFormatType('GAFAssertion').
+cycFormatType('GenericRelationFormula').
+cycFormatType('HLPrototypicalTerm').
+cycFormatType('IndeterminateTerm').
+cycFormatType('IndexedTerm').
+cycFormatType('InferenceDataStructure').
+cycFormatType('InferenceSupportedCollection').
+cycFormatType('InferenceSupportedTerm').
+cycFormatType('KBDatastructure').
+cycFormatType('Keyword').
+cycFormatType('List').
+cycFormatType('NonAtomicReifiedTerm').
+cycFormatType('NonAtomicTerm').
+cycFormatType('NonAtomicTerm-Askable').
+cycFormatType('NonAtomicTerm-Assertible').
+cycFormatType('NonAtomicTerm-ClosedFunctor').
+cycFormatType('NonNegativeInteger').
+cycFormatType('NonVariableNonKeywordSymbol').
+cycFormatType('NonVariableSymbol').
+cycFormatType('OpenDenotationalTerm').
+cycFormatType('OpenExpression').
+cycFormatType('OpenFormula').
+cycFormatType('OpenNonAtomicTerm').
+cycFormatType('OpenSentence').
+cycFormatType('PositiveInteger').
+cycFormatType('PropositionalSentence').
+cycFormatType('RealNumber').
+cycFormatType('ReifiableDenotationalTerm').
+cycFormatType('ReifiableNonAtomicTerm').
+cycFormatType('ReifiedDenotationalTerm').
+cycFormatType('RemovalModuleSupportedCollection-Generic').
+cycFormatType('RemovalModuleSupportedPredicate-Generic').
+cycFormatType('RemovalModuleSupportedPredicate-Specific').
+cycFormatType('RepresentedAtomicTerm').
+cycFormatType('RepresentedTerm').
+cycFormatType('RuleAssertion').
+cycFormatType('ScalarIntegralValue').
+cycFormatType('Sentence').
+cycFormatType('SentenceAskable').
+cycFormatType('SentenceAssertible').
+cycFormatType('String').
+cycFormatType('SupportDatastructure').
+cycFormatType('Symbol').
+cycFormatType('TheTerm').
+cycFormatType('TransformationModuleSupportedCollection').
+cycFormatType('TruthValueSentence').
+
+:-dynamic(mpred_to_cyc/2).
+
 mpred_to_cyc(tCol,'Collection').
 mpred_to_cyc(ttFormatType,'CycLExpressionType').
 mpred_to_cyc(ttFormatType,'ExpressionType').
 mpred_to_cyc(tPred,'Predicate').
 mpred_to_cyc(tFunction,'Function-Denotational').
-mpred_to_cyc(ftVar,'CycLVariable').
+
+mpred_to_cyc(ftInt,'Integer').
+
+mpred_to_cyc(ftSentence,'icSentenceSentence').
 mpred_to_cyc(ftSentence,'CycLFormulaicSentence').
+mpred_to_cyc(ftSentence,'FormulaicSentence').
+mpred_to_cyc(ftVar,'CycLVariable').
 mpred_to_cyc(ftVar,'Variable').
+:-forall(cycFormatType(A),((atom_concat('ft',A,FT),assert(mpred_to_cyc(FT,A))))).
+
+
+notFormatType(tIndividual).
+notFormatType(tInferenceSupportedFunction).
+notFormatType(tInferenceSupportedPredicate).
+notFormatType(tNonNegativeScalarInterval).
+notFormatType(tScalarInterval).
+notFormatType(tScalarPointValue).
+notFormatType(tSentenceClosedPredicate).
+notFormatType(tThing).
+notFormatType(tTransformationModuleSupportedPredicate).
+:-forall(notFormatType(NFT),pfc_add(neg(ttFormatType(NFT)))).
 
 
 
 mpred_prepend_type(X,_):- \+ atom(X),!,fail.
+mpred_prepend_type(X,_):- name(X,[S|_]),char_type(S,lower),!,fail.
+mpred_prepend_type(X,_):-atom_concat('ft',_,X),!,fail.
+mpred_prepend_type(X,_):-atom_concat('t',_,X),!,fail.
 mpred_prepend_type(X,ft):- tinyKB(isa(X,ttFormatType)).
 mpred_prepend_type(X,ft):- tinyKB(isa(X,'SubLExpressionType')).
 mpred_prepend_type(X,ft):- tinyKB(genls(X,'SubLExpression')).
 mpred_prepend_type(X,ft):- tinyKB(genls(X,'CycLExpression')).
+mpred_prepend_type(X,ft):- tinyKB(genls(X,ftExpression)).
 mpred_prepend_type(X,tt):- tinyKB(genls(X,'tCol')).
 % mpred_prepend_type(X,i):-atom_concat(_,'Fn',X).
 mpred_prepend_type(X,t):-atom_concat(_,'Function',X).
@@ -77,6 +170,7 @@ cyc_to_pfc_idiom(C,P):-
    ((mpred_prepend_type(C,PT),not(atom_concat(PT,_,M)))
      -> atom_concat(PT,M,P); M=P).
 
+cyc_to_pfc_idiom1(C,P):-nonvar(C),mpred_to_cyc(P,C),!.
 cyc_to_pfc_idiom1('CycLTerm','CycLExpression').
 cyc_to_pfc_idiom1(C,P):-atom_concatM('CycLSentence-',Type,C),!,atom_concat('Sentence',Type,P).
 cyc_to_pfc_idiom1(C,P):-atom_concatM('Expression-',Type,C),!,atom_concat('Expression',Type,P).
@@ -89,7 +183,6 @@ cyc_to_pfc_idiom1(C,P):-atom_concatM('SExpressi',Type,C),!,atom_concat('Expressi
 cyc_to_pfc_idiom1(C,P):-atom_concatR(C,Type,'-Assertible'),!,atom_concat(Type,'Assertible',P).
 cyc_to_pfc_idiom1(C,P):-atom_concatR(C,Type,'-Askable'),!,atom_concat(Type,'Askable',P).
 cyc_to_pfc_idiom1(C,P):-atom_concatR(C,Type,'FormulaicSentence'),!,atom_concat(Type,'Sentence',P).
-cyc_to_pfc_idiom1(C,P):-nonvar(C),mpred_to_cyc(P,C),!.
 
 cyc_to_pfc_idiom_unused([Conj|MORE],Out):-fail, not(is_ftVar(Conj)),!,cyc_to_pfc_sent_idiom_2(Conj,Pred,_),
   with_assertions(thocal:outer_pred_expansion(Conj,MORE),
@@ -125,6 +218,7 @@ label_args(PREFIX,N,[ARG|ARGS]):-atom_concat(PREFIX,N,TOARG),ignore(TOARG=ARG),!
 
 :-thread_local thocal:outer_pred_expansion/2.
 
+cyc_to_pfc_expansion_notify(B,A):-cyc_to_pfc_expansion(B,A)->B\=@=A,(dmsg(A<=B)).
 cyc_to_pfc_expansion_entry(I,O):-fail,cyc_to_pfc_expansion(I,M),!,must((functor(I,FI,_),functor(M,MF,_),FI==MF)),O=M.
 
 cyc_to_pfc_expansion(V,V):-is_ftVar(V),!.
@@ -255,11 +349,11 @@ tinyAssertion0(t(A,B),MT,STR):-exactlyAssertedEL(A,B,MT,STR).
 
 
 addTinyCycL(CycLIn):- into_mpred_form(CycLIn,CycL),
-  ignore((tiny_support(CycL,_MT,CALL),retract(CALL))),!,
+  ignore((tiny_support(CycL,_MT,CALL),must(retract(CALL)))),!,
   addCycL(CycL),!.
 
 
-% tiny_support(CycL,MT,CALL):- CycL=..[F|Args], append(Args,[MT,_STR],WMT),CCALL=..[exactlyAssertedEL,F|WMT],!,((clause(CCALL,true), CCALL=CALL) ; clause(CCALL,(CALL,_))).
+tiny_support(CycL,MT,CALL):- CycL=..[F|Args], append(Args,[MT,_STR],WMT),CCALL=..[exactlyAssertedEL,F|WMT],!,((clause(CCALL,true), CCALL=CALL) ; clause(CCALL,(CALL,_))).
 
 make_functor_h(CycL,F,A):- length(Args,A),CycL=..[F|Args].
 
@@ -401,6 +495,14 @@ checkCycAvailablity:- (isCycAvailable_known;isCycUnavailable_known(_)),!.
 checkCycAvailablity:- ccatch((ignore((invokeSubL("(+ 1 1)",R))),(R==2->assert_if_new(isCycAvailable_known);assert_if_new(isCycUnavailable_known(R)))),E,assert_if_new(isCycUnavailable_known(E))),!.
 
 
+:- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb_tinykb)).
 
 
+:-pfc_add((exactlyAssertedEL(genls,A,B,_,_),ttFormatType(A))=> ttFormatType(B)).
+:-pfc_add((exactlyAssertedEL(genls,B,A,_,_),ttFormatType(A))=> ttFormatType(B)).
+:-pfc_add((exactlyAssertedEL(arg1QuotedIsa,_,B,_,_))=> ttFormatType(B)).
+:-pfc_add((exactlyAssertedEL(arg2QuotedIsa,_,B,_,_))=> ttFormatType(B)).
+:-pfc_add((exactlyAssertedEL(argQuotedIsa,_,_,B,_,_))=> ttFormatType(B)).
+:-pfc_add((exactlyAssertedEL(isa,B,ttFormatType,_,_),ttFormatType(A))=> ttFormatType(B)).
 
+:-prolog.

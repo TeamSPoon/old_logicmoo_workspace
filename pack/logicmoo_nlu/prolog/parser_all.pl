@@ -204,15 +204,12 @@ get_it:-
 
 
 :- dmsg("Loading loading language data (This may take 10-15 seconds)").
-:- user:ensure_loaded_no_mpreds(library(logicmoo/plarkc/logicmoo_i_cyc)).
 
 % 
 % gripe_time(warn(12.246577455>7),        user:time(user:ensure_loaded_no_mpreds(library(el_holds/'el_assertions.pl.qlf')))).
 % OLD :- gripe_time(7,time(user:ensure_loaded_no_mpreds(library(el_holds/'el_assertions.pl.qlf')))).
 
 % 6.052 CPU on VMWare I7
-
-:-thread_local(with_el_holds_enabled/1).
 
 :- 
   %with_assertions(,[(user:term_expansion(_,_):-!,fail),(user:goal_expansion(_,_):-!,fail),(system:term_expansion(_,_):-!,fail),(system:goal_expansion(_,_):-!,fail)])
