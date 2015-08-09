@@ -19,6 +19,7 @@
 
 isa_db(I,C):-clause(isa(I,C),true).
 
+:-dynamic(cycPrepending/2).
 cycPrepending(ft,'AssertedAssertion').
 cycPrepending(ft,'Assertion').
 cycPrepending(ft,'Atom').
@@ -89,6 +90,11 @@ cycPrepending(ft,'TransformationModuleSupportedCollection').
 cycPrepending(ft,'TruthValueSentence').
 cycPrepending(v,'SingleEntry').
 cycPrepending(v,'SetTheFormat').
+cycPrepending(t,'UnreifiableFunction').
+cycPrepending(t,'UnaryFunction').
+cycPrepending(t,'UnaryPredicate').
+cycPrepending(t,'BinaryFunction').
+
 
 :-dynamic(mpred_to_cyc/2).
 
@@ -100,8 +106,10 @@ mpred_to_cyc(tFunction,'Function-Denotational').
 
 mpred_to_cyc(ftInt,'Integer').
 
+mpred_to_cyc(tAgent,'Agent-Generic').
 mpred_to_cyc(ftSentence,'icSentenceSentence').
 mpred_to_cyc(ftSentence,'CycLFormulaicSentence').
+mpred_to_cyc(ftSentence,'SubLFormulaicSentence').
 mpred_to_cyc(ftSentence,'FormulaicSentence').
 mpred_to_cyc(ftVar,'CycLVariable').
 mpred_to_cyc(ftVar,'Variable').
@@ -117,7 +125,7 @@ notFormatType(tScalarPointValue).
 notFormatType(tSentenceClosedPredicate).
 notFormatType(tThing).
 notFormatType(tTransformationModuleSupportedPredicate).
-:-forall(notFormatType(NFT),pfc_add(neg(ttFormatType(NFT)))).
+:-forall(notFormatType(NFT),pfc_add(tSet(NFT))).
 
 
 
@@ -221,7 +229,7 @@ label_args(PREFIX,N,[ARG|ARGS]):-atom_concat(PREFIX,N,TOARG),ignore(TOARG=ARG),!
 
 :-thread_local thocal:outer_pred_expansion/2.
 
-cyc_to_pfc_expansion_notify(B,A):-cyc_to_pfc_expansion(B,A)->B\=@=A,(dmsg(A<=B)).
+cyc_to_pfc_expansion_notify(B,A):-cyc_to_pfc_expansion(B,A)->B\=@=A,nop(dmsg(A<=B)).
 cyc_to_pfc_expansion_entry(I,O):-fail,cyc_to_pfc_expansion(I,M),!,must((functor(I,FI,_),functor(M,MF,_),FI==MF)),O=M.
 
 cyc_to_pfc_expansion(V,V):-is_ftVar(V),!.
@@ -231,41 +239,6 @@ cyc_to_pfc_expansion([H|T],[HH|TT]):-!,cyc_to_pfc_expansion(H,HH),cyc_to_pfc_exp
 cyc_to_pfc_expansion(HOLDS,HOLDSOUT):-HOLDS=..[F|HOLDSL],
   with_assertions(thocal:outer_pred_expansion(F,HOLDSL),cyc_to_pfc_expansion([F|HOLDSL],[C|HOLDSOUTL])),!,
   ((is_list([C|HOLDSOUTL]), atom(C))-> must(HOLDSOUT=..[C|HOLDSOUTL]) ; HOLDSOUT=[C|HOLDSOUTL]),!.
-
-/*
-
-sterm_to_pterm(VAR,'$VAR'(V)):-atom(VAR),atom_concat('?',_,VAR),clip_qm(VAR,V),!.
-sterm_to_pterm(VAR,kw((V))):-atom(VAR),atom_concat(':',V2,VAR),clip_qm(V2,V),!.
-sterm_to_pterm(VAR,VAR):-is_ftVar(VAR),!.
-sterm_to_pterm([VAR],VAR):-is_ftVar(VAR),!.
-sterm_to_pterm([X],Y):-!,nonvar(X),sterm_to_pterm(X,Y).
-
-sterm_to_pterm([S|TERM],dot_holds(PTERM)):- not(is_list(TERM)),!,sterm_to_pterm_list([S|TERM],(PTERM)),!.
-sterm_to_pterm([S|TERM],PTERM):-is_ftVar(S),
-            sterm_to_pterm_list(TERM,PLIST),            
-            PTERM=..[holds,S|PLIST].
-
-sterm_to_pterm([S|TERM],PTERM):-number(S),!,
-            sterm_to_pterm_list([S|TERM],PTERM).            
-	    
-sterm_to_pterm([S|TERM],PTERM):-nonvar(S),atomic(S),!,
-            sterm_to_pterm_list(TERM,PLIST),            
-            PTERM=..[S|PLIST].
-
-sterm_to_pterm([S|TERM],PTERM):-!,  atomic(S),
-            sterm_to_pterm_list(TERM,PLIST),            
-            PTERM=..[holds,S|PLIST].
-
-sterm_to_pterm(VAR,VAR):-!.
-
-sterm_to_pterm_list(VAR,VAR):-is_ftVar(VAR),!.
-sterm_to_pterm_list([],[]):-!.
-sterm_to_pterm_list([S|STERM],[P|PTERM]):-!,
-              sterm_to_pterm(S,P),
-              sterm_to_pterm_list(STERM,PTERM).
-sterm_to_pterm_list(VAR,[VAR]).
-
-*/
 
 clip_us(A,AO):-concat_atom(L,'-',A),concat_atom(L,'_',AO).
 clip_qm(QA,AO):-atom_concat('??',A1,QA),!,atom_concat('_',A1,A),clip_us(A,AO).
@@ -356,7 +329,10 @@ addTinyCycL(CycLIn):- into_mpred_form(CycLIn,CycL),
   addCycL(CycL),!.
 
 
-tiny_support(CycL,MT,CALL):- CycL=..[F|Args], append(Args,[MT,_STR],WMT),CCALL=..[exactlyAssertedEL,F|WMT],!,((clause(CCALL,true), CCALL=CALL) ; clause(CCALL,(CALL,_))).
+tiny_support(CycL,MT,CALL):- compound(CycL),!, CycL=..[F|Args], append(Args,[MT,_STR],WMT),CCALL=..[exactlyAssertedEL,F|WMT],!,
+  ((clause(CCALL,true), CCALL=CALL) ; clause(CCALL,(CALL,_))).
+tiny_support(CycL,MT,CALL):- between(4,7,Len),functor(CCALL,exactlyAssertedEL,Len),CCALL=..[exactlyAssertedEL,F|WMT],append(Args,[MT,_STR],WMT),
+ CCALL,(atom(F)->CycL=..[F|Args];append_termlist(F,Args,CycL)),((clause(CCALL,true), CCALL=CALL) ; clause(CCALL,(CALL,_))).
 
 make_functor_h(CycL,F,A):- length(Args,A),CycL=..[F|Args].
 
@@ -372,8 +348,8 @@ is_simple_arg(A):-not(compound(A)),!.
 is_simple_arg(A):-functor(A,Simple,_),tEscapeFunction(Simple).
 
 'tEscapeFunction'('TINYKB-ASSERTION').
-'tEscapeFunction'('SubLQuoteFn').
-'tEscapeFunction'(X):- 'UnreifiableFunction'(X).
+'tEscapeFunction'('QuoteFn').
+'tEscapeFunction'(X):- 'tUnreifiableFunction'(X).
 
 needs_canoncalization(CycL):-is_ftVar(CycL),!,fail.
 needs_canoncalization(CycL):-functor(CycL,F,_),isa_db(F,'SentenceOperator').
@@ -497,15 +473,8 @@ isCycUnavailable:-checkCycAvailablity,isCycUnavailable.
 checkCycAvailablity:- (isCycAvailable_known;isCycUnavailable_known(_)),!.
 checkCycAvailablity:- ccatch((ignore((invokeSubL("(+ 1 1)",R))),(R==2->assert_if_new(isCycAvailable_known);assert_if_new(isCycUnavailable_known(R)))),E,assert_if_new(isCycUnavailable_known(E))),!.
 
+:- dmsg("Loading ehe tinyKB should take under a minute").
+:- gripe_time(60,user:ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb_tinykb))).
 
-:- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb_tinykb)).
-
-
-:-pfc_add((exactlyAssertedEL(genls,A,B,_,_),ttFormatType(A))=> ttFormatType(B)).
-:-pfc_add((exactlyAssertedEL(genls,B,A,_,_),ttFormatType(A))=> ttFormatType(B)).
-:-pfc_add((exactlyAssertedEL(arg1QuotedIsa,_,B,_,_))=> ttFormatType(B)).
-:-pfc_add((exactlyAssertedEL(arg2QuotedIsa,_,B,_,_))=> ttFormatType(B)).
-:-pfc_add((exactlyAssertedEL(argQuotedIsa,_,_,B,_,_))=> ttFormatType(B)).
-:-pfc_add((exactlyAssertedEL(isa,B,ttFormatType,_,_),ttFormatType(A))=> ttFormatType(B)).
 
 :-prolog.

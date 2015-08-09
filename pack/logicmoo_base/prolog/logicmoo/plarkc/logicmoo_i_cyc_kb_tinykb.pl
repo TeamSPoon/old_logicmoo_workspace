@@ -18,6 +18,7 @@
 % ===================================================================
 :- dynamic((exactlyAssertedEL/4,exactlyAssertedEL/5,exactlyAssertedEL/6,exactlyAssertedEL/7)).
 :- dynamic((exactlyAssertedEL_next/4,exactlyAssertedEL_next/5,exactlyAssertedEL_next/6,exactlyAssertedEL_next/7)).
+:- dynamic((exactlyAssertedEL_first/4,exactlyAssertedEL_first/5,exactlyAssertedEL_first/6,exactlyAssertedEL_first/7)).
 :- dynamic(assertedTinyKB_implies_first/4).
 :- dynamic(assertedTinyKB_not_first/3).
 :- dynamic((exactlyAssertedEL_first/5,exactlyAssertedEL_with_vars/5)).

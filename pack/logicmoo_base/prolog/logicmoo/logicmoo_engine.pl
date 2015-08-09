@@ -1751,11 +1751,45 @@ kif_ask(Goal0,ProofOut):- logical_pos(_KB,Goal0,Goal),
         search(Goal1,60,0,1,3,DepthIn,DepthOut),
         contract_output_proof(ProofOut1,ProofOut))).
 
-kif_tell(InS):- atom(InS),must_det_l((kif_read(string(InS),Wff,Vs),b_implode_varnames0(Vs),local_sterm_to_pterm(Wff,Wff0),kif_tell(Wff0))).
-kif_tell(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),why_to_id(tell,Wff,Why),kif_tell(Why,Wff))).
+kif_tell(InS):- atom(InS),must_det_l((kif_read(string(InS),Wff,Vs),b_implode_varnames0(Vs),local_sterm_to_pterm(Wff,Wff0),kif_tell(Wff0))),!.
+kif_tell(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),why_to_id(tell,Wff,Why),kif_tell(Why,Wff))),!.
 
-:- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_api)).
-local_sterm_to_pterm(Wff,WffO):- cyc:sterm_to_pterm(Wff,WffO).
+
+local_sterm_to_pterm(Wff,WffO):- kif_sterm_to_pterm(Wff,WffO).
+
+
+kif_sterm_to_pterm(VAR,'$VAR'(V)):-atom(VAR),atom_concat('?',_,VAR),clip_qm(VAR,V),!.
+kif_sterm_to_pterm(VAR,kw((V))):-atom(VAR),atom_concat(':',V2,VAR),clip_qm(V2,V),!.
+kif_sterm_to_pterm(VAR,VAR):-is_ftVar(VAR),!.
+kif_sterm_to_pterm([VAR],VAR):-is_ftVar(VAR),!.
+kif_sterm_to_pterm([X],Y):-!,nonvar(X),kif_sterm_to_pterm(X,Y).
+
+kif_sterm_to_pterm([S|TERM],dot_holds(PTERM)):- not(is_list(TERM)),!,kif_sterm_to_pterm_list([S|TERM],(PTERM)),!.
+kif_sterm_to_pterm([S|TERM],PTERM):-is_ftVar(S),
+            kif_sterm_to_pterm_list(TERM,PLIST),            
+            PTERM=..[holds,S|PLIST].
+
+kif_sterm_to_pterm([S|TERM],PTERM):-number(S),!,
+            kif_sterm_to_pterm_list([S|TERM],PTERM).            
+	    
+kif_sterm_to_pterm([S|TERM],PTERM):-nonvar(S),atomic(S),!,
+            kif_sterm_to_pterm_list(TERM,PLIST),            
+            PTERM=..[S|PLIST].
+
+kif_sterm_to_pterm([S|TERM],PTERM):-!,  atomic(S),
+            kif_sterm_to_pterm_list(TERM,PLIST),            
+            PTERM=..[holds,S|PLIST].
+
+kif_sterm_to_pterm(VAR,VAR):-!.
+
+kif_sterm_to_pterm_list(VAR,VAR):-is_ftVar(VAR),!.
+kif_sterm_to_pterm_list([],[]):-!.
+kif_sterm_to_pterm_list([S|STERM],[P|PTERM]):-!,
+              kif_sterm_to_pterm(S,P),
+              kif_sterm_to_pterm_list(STERM,PTERM).
+kif_sterm_to_pterm_list(VAR,[VAR]).
+
+
 
 :-op(1000,fy,(kif_tell)).
 

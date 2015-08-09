@@ -1088,7 +1088,7 @@ isa(arity,tBinaryPredicate).
 %((genlPreds(Col1,Col2),(arity(Col1,1);arity(Col2,1)))=>genls(Col1,Col2)).
 %((genls(Col1,Col2),(tPred(Col1);tPred(Col2)))=>genlPreds(Col1,Col2)).
 
-:-pfc_test(pfc_add(tCol('UnaryPredicate'))).
+:-pfc_test(pfc_add(tCol('tUnaryPredicate'))).
 
 % catching of misinterpreation 
 (pfcMark(pfcPosTrigger,_,F,A)/(integer(A),atom(F),functor(P,F,A),((P\= ( call_u(_) ), predicate_property(P,static)))))=>{dtrace}.

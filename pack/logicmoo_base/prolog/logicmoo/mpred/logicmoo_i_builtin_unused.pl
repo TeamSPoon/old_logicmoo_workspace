@@ -154,9 +154,9 @@ tCol(C)=> {atom(C),P=..[C,I],assertz_if_new((P:-infoF(isa(I,C)))),assertz_if_new
 
 prologHybrid((zDefault/1,tPenguin/1,tFly/1,tBird/1,tCanary/1)).
 
-'UnaryPredicate'(Pred)<=>(arity(Pred,1),tPred(Pred)).
+'tUnaryPredicate'(Pred)<=>(arity(Pred,1),tPred(Pred)).
 
-'UnaryPredicate'(zDefault).
+'tUnaryPredicate'(zDefault).
 ((zDefault(P/pfc_literal(P)))  =>  (~neg(P) => P)).
 zDefault((P => Q))/pfc_literal(Q) => ((P, ~neg(Q) => Q)).
 %zDefault((P => Q))/pfc_literal(Q) => (Q <=(P, ~neg(Q))).
@@ -298,72 +298,6 @@ O = [
 
 
 
-/*
-
-genls(_Sub, Super) => tCol(Super).
-genls(Sub, _Super) => tCol(Sub).
-% use backchain instead (isa(I,Sub), disjointWith(Sub, Super)) => neg(isa(I,Super)).
-
-*/
-
-:- must_det(argIsa(genlPreds,2,_Type)).
-
-
-% Hook a predicate up!
-/*
-(tinyInstallToAssertedEL(F,A) => ({current_predicate(make_el_stub/4),functor(H,F,A),make_el_stub(H,_,_,B)},(H<=B))).
-
-((tinyPredTypeActive(PREDTYPE),isa(F,PREDTYPE)) => tinyPredActive(F)).
-
-((tinyPredActive(F),arity(F,A))=>tinyInstallToAssertedEL(F,A)).
-
-=>tinyPredActive(isa).
-=>tinyPredActive(genls).
-=>tinyPredActive(arity).
-=>tinyInstallToAssertedEL(afterAdding,2).
-
-=>tinyPredTypeActive('WFFConstraintSatisfactionPredicate').
-=>tinyPredTypeActive('WFFConstraintPredicate').
-=>tinyPredTypeActive('WFFSupportedPredicate').
-
-=>tinyPredActive(afterRemoving).
-=>tinyPredActive(afterAdding).
-
-% argQuotedIsa(Pred, N, FT) <=  (argIsa(Pred, N, Type),genls(Type,FT),ttFormatType(FT)).
-
-% consistent(CycL) <= cycLToMpred(neg(CycL),Consequent),not(pfcCall(Consequent)). 
-
-=>tinyPredTypeActive('expansion').
-=>tinyPredTypeActive('collectionExpansion').
-(isa(F,tPred),arity(F,A),{once((tinyAssertion0(DB,MT,STR),arg(1,DB,F),atom(F)))})=>tinyInstallToAssertedEL(F,A).
-*/
-
-argQuotedIsa(sentenceTruth,1,'CycLSentence-Assertible').
-:- pfc_add(((collectionExpansion(COL,RULE),isa(PRED,COL),{subst(RULE,':ARG1',PRED,NEWRULE)}) => trueSentence(NEWRULE))).
-:- pfc_add(((expansion(F,RULE),arity(F,A),{make_kw_functor(F,A,CYCL),kw_to_vars((CYCL<=>RULE),NEWRULE)}) => trueSentence(NEWRULE))).
-
-nearestIsa(I,C) <= is_user_supported(isa(I,C)).
-nearestGenls(I,C) <= is_user_supported(genls(I,C)).
-
-
-% meta_argtypes(ArgTypes)/is_declarations(ArgTypes) => {wdmsg(in_loop(meta_argtypes))},meta_argtypes(ArgTypes).
-tRelation(ArgTypes)/is_declarations(ArgTypes) => meta_argtypes(ArgTypes).
-:- pfc_add(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
-(ttFormatType(FT)/is_declarations(FT))=>meta_argtypes(FT).
-
-:- show_call(source_location(_,_)).
-
-:- must(in_file_expansion;in_file_directive).
-
-
-end_of_file.
-
-%(exactlyAssertedSentence(CycL), is_simple_gaf(CycL)) => ({cycAdd(CycL)},CycL).
-%(exactlyAssertedSentence(CycL), needs_indexing(CycL)) => assertedSentence(CycL).
-%(exactlyAssertedSentence(CycL), needs_canoncalization(CycL)) => trueSentence(CycL).
-%:- prolog.
-assertedSentence(CycL) => ({ sent_to_conseq(CycL,Consequent) }, Consequent).
-trueSentence(CycL) => ({ sent_to_conseq(CycL,Consequent) }, Consequent).
 
 
 % :- pfc_add(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
