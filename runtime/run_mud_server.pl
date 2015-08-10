@@ -57,6 +57,7 @@ user:file_search_path(prologmud, library(prologmud)).
 
 % [Required] Load the Logicmoo Base System
 :- time(user:ensure_loaded(logicmoo(logicmoo_base))).
+
 :- gripe_time(40,user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
 
 :- asserta(thlocal:disable_mpred_term_expansions_locally).
@@ -67,8 +68,11 @@ user:file_search_path(prologmud, library(prologmud)).
 push_env_ctx:-!,fail.
 push_env_ctx:-!.
 
+
+
 % [Required] Load the Logicmoo Backchaining Inference System
 :- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
+
 
 :- listing([storage_plugin_update,filesys:filesys_data]).
 
@@ -122,11 +126,6 @@ push_env_ctx:-!.
 :-multifile(user:feature_test/0).
 
 
-:-dmsg("About to run Sanity").
-
-% :- prolog.
-
-:- show_call_entry(gripe_time(40,if_startup_script(doall(user:sanity_test)))).
 
 % ==========================================================
 % Regression tests that first run whenever a person stats the MUD on the public server
@@ -206,7 +205,7 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 % [Optionaly] Start the telent server
 :-at_start(toploop_telnet:start_mud_telnet(4000)).
 
-:- prolog.
+
 
 % ==============================
 % MUD GAME CODE LOADS
@@ -240,6 +239,13 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_startup_script(finish_processing_world).
 
+:-dmsg("About to run Sanity").
+
+:- prolog.
+
+:- show_call_entry(gripe_time(40,if_startup_script(doall(user:sanity_test)))).
+
+:- prolog.
 
 feature_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
 

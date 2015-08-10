@@ -279,8 +279,8 @@ ist_tiny(MT,P):-tinyKB(P,MT,vStrMon).
 ist_tiny(MT,P):-tinyKB(P,MT,vStrDef).
 
 tinyKB(P):-tUndressedMt(MT),tinyKB(P,MT,_).
-tinyKB(ist(MT,P)):-tDressedMt(MT),tinyKB(P,MT,_).
-
+tinyKB(ist(MT,P)):-!,tDressedMt(MT),tinyKB(P,MT,_).
+tinyKB(P):-nonvar(P),if_defined(P).
 
 tinyKB(PO,MT,STR):- %fwc,  
   (tUndressedMt(MT);tDressedMt(MT)),(STR=vStrMon;STR=vStrDef), 
@@ -329,10 +329,10 @@ addTinyCycL(CycLIn):- into_mpred_form(CycLIn,CycL),
   addCycL(CycL),!.
 
 
-tiny_support(CycL,MT,CALL):- compound(CycL),!, CycL=..[F|Args], append(Args,[MT,_STR],WMT),CCALL=..[exactlyAssertedEL,F|WMT],!,
+tiny_support(CycLIn,MT,CALL):- compound(CycLIn),!,into_mpred_form(CycLIn,CycL), CycL=..[F|Args], append(Args,[MT,_STR],WMT),CCALL=..[exactlyAssertedEL,F|WMT],!,
   ((clause(CCALL,true), CCALL=CALL) ; clause(CCALL,(CALL,_))).
-tiny_support(CycL,MT,CALL):- between(4,7,Len),functor(CCALL,exactlyAssertedEL,Len),CCALL=..[exactlyAssertedEL,F|WMT],append(Args,[MT,_STR],WMT),
- CCALL,(atom(F)->CycL=..[F|Args];append_termlist(F,Args,CycL)),((clause(CCALL,true), CCALL=CALL) ; clause(CCALL,(CALL,_))).
+tiny_support(CycLOut,MT,CALL):- between(4,7,Len),functor(CCALL,exactlyAssertedEL,Len),CCALL=..[exactlyAssertedEL,F|WMT],append(Args,[MT,_STR],WMT),
+ CCALL,(atom(F)->CycL=..[F|Args];append_termlist(F,Args,CycL)),((clause(CCALL,true), CCALL=CALL) ; clause(CCALL,(CALL,_))), fully_expand(CycL,CycLOut).
 
 make_functor_h(CycL,F,A):- length(Args,A),CycL=..[F|Args].
 
@@ -474,7 +474,7 @@ checkCycAvailablity:- (isCycAvailable_known;isCycUnavailable_known(_)),!.
 checkCycAvailablity:- ccatch((ignore((invokeSubL("(+ 1 1)",R))),(R==2->assert_if_new(isCycAvailable_known);assert_if_new(isCycUnavailable_known(R)))),E,assert_if_new(isCycUnavailable_known(E))),!.
 
 :- dmsg("Loading ehe tinyKB should take under a minute").
-:- gripe_time(60,user:ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb_tinykb))).
+% :- gripe_time(60,user:qcompile(logicmoo(plarkc/logicmoo_i_cyc_kb_tinykb))).
 
 
-:-prolog.
+% :-prolog.

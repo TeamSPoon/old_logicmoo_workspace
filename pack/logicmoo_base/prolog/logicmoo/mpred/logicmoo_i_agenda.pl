@@ -53,7 +53,7 @@ pfc_one_second_timer:- repeat,time_tick(1.0,user:hook_one_second_timer_tick),fai
 
 user:hook_one_minute_timer_tick.
 
-pfc_one_minute_timer:- repeat,sleep(600.0),time_tick(60.0,user:hook_one_minute_timer_tick),fail.
+pfc_one_minute_timer:- repeat,sleep(60.0),time_tick(60.0,user:hook_one_minute_timer_tick),fail.
 :-thread_property(X,alias(pfc_one_minute_timer))-> true ; thread_create(pfc_one_minute_timer,_,[alias(pfc_one_minute_timer)]).
 
 
