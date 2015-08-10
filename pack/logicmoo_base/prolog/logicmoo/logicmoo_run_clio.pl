@@ -134,7 +134,7 @@ semweb_startup_late:- listing(http:location/3).
 semweb_startup_late:- ensure_webserver.
 
 ensure_webserver :- thread_property(_,alias('httpd@3020_1')),!.
-ensure_webserver :- http_server(http_dispatch,[ port(3020), workers(16) ]).
+ensure_webserver :- logOnError(http_server(http_dispatch,[ port(3020), workers(16) ])).
   
 
 %prolog:message(git(update_versions))  --> [ 'Updating GIT version stamps in the background.' ])).

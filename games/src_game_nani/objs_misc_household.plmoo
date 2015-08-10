@@ -149,7 +149,8 @@ genls(tPhysicalDevice,tUseAble).
 genls(tWearAble, tCarryAble).
 genls(tFood,tCarryAble).
 genls(tCarryAble,tObj).
-genls(tPartofObj,isTDisjoint(tCarryAble)).
+% genls(tPartofObj,isTDisjoint(tCarryAble)).
+disjointWith(tPartofObj,tCarryAble).
 
 genls(tLightSwitch, tWallFurnature).
 genls(tComputer, tOfficeFurnature).

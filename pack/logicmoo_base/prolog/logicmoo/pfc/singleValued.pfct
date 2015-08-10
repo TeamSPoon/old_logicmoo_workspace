@@ -29,10 +29,10 @@ prologSingleValued(host_name).
 pfc_default( user(User) => host_name(User,unknown)).
 
 
-(pfc_default1(P => Q),{pfc_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg_fast(Q,N,NEW,R)} => (P, ~R/(NEW\==DEF) => Q)).
+(pfc_default1(P => Q),{pfc_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg(Q,N,NEW,R)} => (P, ~R/(NEW\==DEF) => Q)).
 
 ((singleValuedInArgDefault(F, N, DEF),arity(F,A),
-   {functor(Q,F,A),pfc_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg_fast(Q,N,NEW,R)})=> (~R/(NEW\==DEF) => Q)).
+   {functor(Q,F,A),pfc_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg(Q,N,NEW,R)})=> (~R/(NEW\==DEF) => Q)).
 
 => full_name(finin,'Tim Finin').
 

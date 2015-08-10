@@ -60,7 +60,7 @@ pp_items(Type,[H|T]) :-
   pp_items(Type,T).
 pp_items(Type,H) :- gnore(pp_item(Type,H)).
 
-pfc_trace_item(M,H):- ignore(thlocal:pfc_trace_exec-> pp_item(M,H); true).
+pfc_trace_item(M,H):- ignore(thlocal:pfc_trace_exec-> debugOnError(pp_item(M,H)); true).
 
 
    
@@ -73,12 +73,12 @@ pp_item(M,H):- flag(show_asserions_offered,X,X+1),thlocal:print_mode(html),!, (\
 pp_item(M,spft(W,U,U)):-!,pp_item(M,U:W).
 pp_item(M,spft(W,F,U)):- atom(U),!, fmt('~N%~n',[]),pp_item(M,U:W), fmt('~N% rule: ~q~n%~n', [F]),!.
 pp_item(M,spft(W,F,U)):-          !,fmt('~N% ~w~n%d:       ~q~n%format:    ~q~n', [M,W,F]),pp_item(M,U).
-pp_item(M,nt(Trigger,Test,Body)) :- !, fmt('~N%~sn-trigger: ~q~n%test: ~q~n%body: ~q~n', [M,Trigger,Test,Body]).
-pp_item(M,pt(F,Body)):-              !,fmt('~N%~sp-trigger: ~q~n~n%body:~n', [M,F]), pp_i2tml0((F:-Body)).
-pp_item(M,bt(F,Body)):-              !,fmt('~N%~sb-trigger: ~q~n%body: ~q~n', [M,F,Body]).
+pp_item(M,nt(Trigger,Test,Body)) :- !, fmt('~N%~wn-trigger: ~q~n%test: ~q~n%body: ~q~n', [M,Trigger,Test,Body]).
+pp_item(M,pt(F,Body)):-              !,fmt('~N%~wp-trigger: ~q~n~n%body:~n', [M,F]), pp_i2tml0((F:-Body)).
+pp_item(M,bt(F,Body)):-              !,fmt('~N%~wb-trigger: ~q~n%body: ~q~n', [M,F,Body]).
 
 pp_item(M,U:W):- !,sformat(S,'~w  ~w:',[M,U]),!, pp_item(S,W).
-pp_item(M,H):- \+ \+ (( numbervars(H,0,_,[attvar(skip)]), fmt("~N%~s ~q~n",[M,H]))).
+pp_item(M,H):- \+ \+ (( numbervars(H,0,_,[attvar(skip)]), fmt("~N%~w ~q~n",[M,H]))).
 
 pfc_classify_facts([],[],[],[]).
 

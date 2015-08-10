@@ -624,7 +624,6 @@ is_holds_true_pttp(F):-atom_concat(_,'_true',F).
 is_holds_true_pttp(F):-atom_concat(_,'_t',F).
 %is_holds_true_pttp(F):-atom_concat('pos',_,F).
 %is_holds_true_pttp(F):-atom_concat('is',_,F).
-is_holds_true_pttp(F):-atom_concat(_,'_t',F).
 is_holds_true_pttp(F):-atom_concat(_,'_in',F).
 is_holds_true_pttp(F):-is_p_to_n(F,_).
 

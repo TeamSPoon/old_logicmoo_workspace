@@ -73,9 +73,9 @@ is_boolean(isMissing):-!,fail.
 is_boolean(vTrue).
 is_boolean(vFalse).
 
-is_declarations(C):-compound(C),!,ground(C),!,arg(_,C,T),is_spec(T).
+is_declarations(C):-compound(C),ground(C),!, (\+ (arg(_,C,T), \+ is_spec(T))).
 
-is_spec(T):-tCol(T);is_declarations(T).
+is_spec(T):-tCol(T)->true;is_declarations(T).
 
 is_rest([_|Term]):-not(is_list(Term)).
 is_rest_of(_Type,[_|Term]):-not(is_list(Term)).

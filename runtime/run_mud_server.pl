@@ -1,7 +1,9 @@
-#! swipl -L8G -G8G -T8G -f
+% #! swipl -L8G -G8G -T8G -f
 /** <module> MUD server startup script in SWI-Prolog
 
 */
+:-  expects_dialect(swi).
+% :-  use_module(library(swi)).
 
 :- exists_directory(runtime)->working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true).
 
@@ -17,6 +19,7 @@ user:file_search_path(cliopatria, '../pack/ClioPatria'). % :- current_prolog_fla
 user:file_search_path(user, '../pack/ClioPatria/user/').
 user:file_search_path(swish, '../pack/swish'):- current_prolog_flag(unix,true).
 user:file_search_path(pack, '../pack/').
+
 
 :- attach_packs.
 :- initialization(attach_packs).
@@ -98,7 +101,7 @@ push_env_ctx:-!.
 
 
 % [Mostly Required] Load the Logicmoo Parser/Generator System
-:- gripe_time(40,user:ensure_loaded(library(parser_all))).
+%:- gripe_time(40,user:ensure_loaded(library(parser_all))).
 
 :- asserta(thlocal:disable_mpred_term_expansions_locally).
 :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
@@ -203,7 +206,7 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 :- file_begin(pl).
 
 % [Optionaly] Start the telent server
-:-at_start(toploop_telnet:start_mud_telnet(4000)).
+:-at_start(logOnError(toploop_telnet:start_mud_telnet(4000))).
 
 
 
@@ -239,8 +242,10 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_startup_script(finish_processing_world).
 
-:-dmsg("About to run Sanity").
+user:sanity_test:- rescan_pfc.
 
+:- rescan_pfc. 
+:-dmsg("About to run Sanity").
 :- prolog.
 
 :- show_call_entry(gripe_time(40,if_startup_script(doall(user:sanity_test)))).
@@ -302,4 +307,5 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 :- if_startup_script(at_start(prolog)).
 
 :- endif.
+
 

@@ -31,6 +31,7 @@ query(_, _, Op, G):- dtrace, mpred_call(call(Op,G)).
 once(A,B,C,D):-trace_or_throw(once(A,B,C,D)).
 */
 
+second_order(_,_):-fail.
 
 :-meta_predicate(deducedSimply(0)).
 :-export(deducedSimply/1).

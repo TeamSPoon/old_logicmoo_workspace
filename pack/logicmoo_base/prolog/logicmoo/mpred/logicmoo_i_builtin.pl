@@ -202,17 +202,23 @@ arity(pddlObjects,2).
 
 meta_argtypes(support_hilog(tRelation,ftInt)).
 
+% remove conflicts early 
+(neg(P)/pfc_non_neg_literal(P) => ( {pfc_rem(P)}, (\+P ))).
+(P/pfc_non_neg_literal(P) => (\+neg(P))).
+% a pretty basic conflict.
+%(neg(P)/pfc_non_neg_literal(P), P) => conflict(neg(P)).
+%(P/pfc_non_neg_literal(P), neg(P)) => conflict(P).
 
 prologHybrid(genls/2).
 
-(tPred(F),arity(F,A)/(integer(A),A>1) => (neg(tCol(F)),support_hilog(F,A))).
+((tPred(F),arity(F,A)/(integer(A),A>1), ~prologBuiltin(F)) => (neg(tCol(F)),support_hilog(F,A))).
 
-neg(tCol(C))=> \+ completelyAssertedCollection(C).
+neg(tCol(C))/completelyAssertedCollection(C)=> \+ completelyAssertedCollection(C).
 
 (((support_hilog(F,A)/(atom(F),integer(A),\+ static_predicate(F/A), \+ prologDynamic(F)))) =>
    (hybrid_support(F,A), 
    {functor(Head,F,A) ,Head=..[F|TTs],TT=..[t,F|TTs]},
-   ((Head :- cwc, second_order(TT,CuttedCall), ((CuttedCall=(C1,!,C2)) -> (C1,!,C2);CuttedCall))))).
+   ((Head :- cwc, call(second_order(TT,CuttedCall)), ((CuttedCall=(C1,!,C2)) -> (C1,!,C2);CuttedCall))))).
 
 (((hybrid_support(F,A)/(atom(F),integer(A), \+ prologDynamic(F),\+ static_predicate(F/A)))) =>
   (({
@@ -398,10 +404,12 @@ ttFormatType(P) => {get_functor(P,C), functor(Head,C,1),
    neg(functorDeclares(C)),
    % isa(C,prologDynamic),
    arity(C,1),
-   ((Head)/predicate_property(Head,dynamic)=>{retract(Head)}),
-   ((isa(I,C))=>{retract(isa(I,C))}).
+   ((Head)/predicate_property(Head,dynamic)=>{ignore(retract(Head))}),
+   ((isa(I,C))=>{ignore(retract(isa(I,C)))}).
 
 arity(prologMacroHead,1).
+
+% (genls(C,SC)=>(tCol(SC),tCol(C),{repropagate(SC)})).
 
 :-dmsg("line 128").
 
@@ -505,12 +513,7 @@ prologSideEffects(P)=>tNotForUnboundPredicates(P).
 
 isa(tRelation,ttAbstractType).
 
-% remove conflicts early 
-(neg(P)/pfc_non_neg_literal(P) => ( {pfc_rem(P)}, (\+P ))).
-(P/pfc_non_neg_literal(P) => (\+neg(P))).
-% a pretty basic conflict.
-%(neg(P)/pfc_non_neg_literal(P), P) => conflict(neg(P)).
-%(P/pfc_non_neg_literal(P), neg(P)) => conflict(P).
+
 
 
 :-if(load_time_sanity).
@@ -530,9 +533,11 @@ fooBar.
 
 :-pfc_test(fooBar).
 
+%:- start_rtrace.
 neg(fooBar).
 
 :-pfc_test(\+fooBar).
+%:- stop_rtrace.
 
 :-endif. % load_time_sanity
 

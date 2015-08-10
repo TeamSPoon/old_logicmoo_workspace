@@ -35,8 +35,8 @@ is_holds_true_not_hilog(HOFDS):-is_holds_true(HOFDS),\+ hilog_functor(HOFDS).
 is_holds_true(Prop):- hotrace((atom(Prop),is_holds_true0(Prop))),!.
 
 % k,p,..
-is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,t,t,asserted_mpred_t,assertion_t,assertion,secondOrder,firstOrder),Prop).
-is_holds_true0(Prop):-atom_concat(_,'_t',Prop).
+is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,t,t,asserted_mpred_t,assertion_t,true_t,assertion,secondOrder,firstOrder),Prop).
+% is_holds_true0(Prop):-atom_concat(_,'_t',Prop).
 
 :-export(is_2nd_order_holds/1).
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
@@ -44,10 +44,10 @@ is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 :-export(is_holds_false/1).
 is_holds_false(Prop):-hotrace((atom(Prop),is_holds_false0(Prop))).
 
-is_holds_false0(Prop):-member(Prop,[not,nholds,holds_f,mpred_f,aint,assertion_f,asserted_mpred_f,retraction,not_secondOrder,not_firstOrder]).
-is_holds_false0(Prop,Stem):-atom_concat('not_',Stem,Prop).
-is_holds_false0(Prop,Stem):-atom_concat('int_not_',Stem,Prop).
-is_holds_false0(Prop,Stem):-atom_concat(Stem,'_f',Prop).
+is_holds_false0(Prop):-member(Prop,[not,nholds,holds_f,mpred_f,aint,assertion_f,not_true_t,asserted_mpred_f,retraction,not_secondOrder,not_firstOrder]).
+%is_holds_false0(Prop,Stem):-atom_concat('not_',Stem,Prop).
+%is_holds_false0(Prop,Stem):-atom_concat('int_not_',Stem,Prop).
+%is_holds_false0(Prop,Stem):-atom_concat(Stem,'_f',Prop).
 %is_holds_false0(Prop):-is_holds_false0(Prop,Stem),is_holds_true0(Stem).
 %is_holds_false0(Prop,Stem):-atom_concat(Stem,'_not',Prop).
 %is_holds_false0(Prop,Stem):-atom_concat(Stem,'_false',Prop).
@@ -423,13 +423,12 @@ inverse_args([P,A,R,G,S],[S,A,R,G,P]):-!.
 :-export(same_vars/2).
 same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
 
-
-replace_arg_fast(C,A,VAR,CO):- duplicate_term(C,CC),setarg(A,CC,VAR),!,CC=CO.
-
-replace_arg(C,A,VAR,CC):- 
-   C=..FARGS,
-   replace_nth(FARGS,A,VAR,FARGO),!,
-   CC=..FARGO.
+replace_arg(C,0,VAR,CC):-!, C=..[_|ARGS],CC=..[VAR|ARGS].
+replace_arg(C,1,VAR,CC):-!, C=..[F,_|ARGS],CC=..[F,VAR|ARGS].
+replace_arg(C,2,VAR,CC):-!, C=..[F,A,_|ARGS],CC=..[F,A,VAR|ARGS].
+replace_arg(C,3,VAR,CC):-!, C=..[F,A,B,_|ARGS],CC=..[F,A,B,VAR|ARGS].
+% replace_arg(C,A,VAR,CO):- duplicate_term(C,CC),setarg(A,CC,VAR),!,CC=CO.
+replace_arg(C,A,VAR,CC):- C=..FARGS,replace_nth(FARGS,A,VAR,FARGO),!,CC=..FARGO.
 
 :-moo_hide_childs(replace_arg/4).
 

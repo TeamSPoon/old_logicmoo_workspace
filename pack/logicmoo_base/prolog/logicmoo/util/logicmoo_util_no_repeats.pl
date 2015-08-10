@@ -28,15 +28,15 @@ no_repeats_av:-tlbugger:attributedVars.
 :- export(no_repeats/1).
 :- meta_predicate no_repeats(0).
 
-no_repeats(Call):- tlbugger:old_no_repeats,!, no_repeats_old(Call).
-no_repeats(Call):- no_repeats_av,!,no_repeats_av(Call).
+% no_repeats(Call):- tlbugger:old_no_repeats,!, no_repeats_old(Call).
+%no_repeats(Call):- no_repeats_av,!,no_repeats_av(Call).
 no_repeats(Call):- no_repeats_old(Call).
 
 
 :- export(no_repeats/2).
 :- meta_predicate no_repeats(+,0).
-no_repeats(Vs,Call):- tlbugger:old_no_repeats,!,no_repeats_old(Vs,Call).
-no_repeats(Vs,Call):- no_repeats_av,!,no_repeats_av(Vs,Call).
+%no_repeats(Vs,Call):- tlbugger:old_no_repeats,!,no_repeats_old(Vs,Call).
+%no_repeats(Vs,Call):- no_repeats_av,!,no_repeats_av(Vs,Call).
 no_repeats(Vs,Call):- no_repeats_old(Vs,Call).
 
 /*
@@ -65,13 +65,16 @@ no_repeats_old(Call):- no_repeats_old(Call,Call).
 
 :-use_module(library(logicmoo/util/rec_lambda)).
 
+memberchk_same(X, [Y0|Ys]) :- is_list(Ys),!,C=..[v,Y0|Ys],!, arg(_,C,Y), ( X =@= Y ->  (var(X) -> X==Y ; true)),!.
 memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),memberchk_same(X, Ys) )). 
 
+memberchk_pred(Pred, X, [Y0|Ys]) :- is_list(Ys),C=..[v,Y0|Ys],!, arg(_,C,Y), call(Pred,X,Y),!.
 memberchk_pred(Pred, X, [Y|Ys]) :- (   call(Pred,X,Y) -> true ;   (nonvar(Ys),memberchk_pred(Pred, X, Ys) )). 
+memberchk_pred_rev(Pred, X, [Y0|Ys]) :- is_list(Ys),C=..[v,Y0|Ys],!, arg(_,C,Y), call(Pred,Y,X),!.
 memberchk_pred_rev(Pred, X, [Y|Ys]) :- (   call(Pred,Y,X) -> true ;   (nonvar(Ys),memberchk_pred_rev(Pred,X, Ys) )). 
 
 
-no_repeats_old(Vs,Call):- CONS = [_], (Call), hotrace(( \+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T], nb_setarg(2, CONS, [CVs|T]))).
+no_repeats_old(Vs,Call):- CONS = [_], (Call), notrace(( \+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T], nb_setarg(2, CONS, [CVs|T]))).
 
 mcs_t2(A,B) :- call(lambda(X, [Y|Ys], (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),reenter_lambda(X, Ys) ))),A,B). 
 mcs_t(A,B) :- call(lambda(X, [Y|Ys], (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),reenter_lambda(X, Ys) ))),A,B). 
@@ -85,7 +88,7 @@ no_repeats_t(Vs,Call):- CONS = [_], (Call),
 
 :- export(no_repeats_u/2).
 :- meta_predicate no_repeats_u(+,0).
-no_repeats_u(Vs,Call):- CONS = [_], (Call), hotrace((  CONS=[_|T],
+no_repeats_u(Vs,Call):- CONS = [_], (Call), /*hotrace*/((  CONS=[_|T],
     \+ memberchk_pred_rev(subsumes_term,Vs,T), copy_term(Vs,CVs), nb_setarg(2, CONS, [CVs|T]))).
 
 

@@ -35,6 +35,7 @@
 :- op(1050,xfx,('<=')).
 :- op(1100,fx,('=>')).
 :- op(1150,xfx,('::::')).
+:-dynamic(mudTermAnglify/2).
 tCol(meta_argtypes).
 tCol(functorDeclares).
 tCol(prologMultiValued).
@@ -720,7 +721,7 @@ dividesBetween(tObj,tMassfull,tMassless).
 dividesBetween(tSpatialThing,tObj,tRegion).
 dividesBetween(tAgent,tPlayer,tNpcPlayer).
 
-% dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
+dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 
 % disjointWith(P1,P2) => (not(isa(C,P1)) <=> isa(C,P2)).
 
@@ -797,7 +798,7 @@ nonvar_must_be(V,G):- (var(V);G),!.
 % TODO SPEED THIS UP 
 % mudKeyword(I,Str)<= {(nonvar(I);nonvar(Str)), nonvar_must_be(I,\+tCol(I)), nonvar_must_be(Str,string(Str))}, isa(I,Type),mudKeyword(Type,Str).
 
-mudKeyword(Type,Str),tSet(Type),isa(I,Type)/(atom(I),ftID(I)) => mudKeyword(I,Str).
+pfc_slow((mudKeyword(Type,Str),tSet(Type),isa(I,Type)/(atom(I),ftID(I)) => mudKeyword(I,Str))).
 
 
 user:action_info(C,_)=>vtActionTemplate(C).
@@ -1038,7 +1039,7 @@ O = [
 
 :- pfc_watch.
 
-:-pfc_add(tAgent(iExplorer1)).
+:- debugOnError(pfc_add(tAgent(iExplorer1))).
 
 
 
@@ -1055,6 +1056,9 @@ O = [
 :-must(\+ mudFacing(iExplorer1,vSouth)).
 
 :-must(mudFacing(iExplorer1,vNorth)).
+
+% genls(tExplorer,tHumanPlayer).
+isa(iExplorer1,tHumanPlayer).
 
 :- pfc_no_watch.
 

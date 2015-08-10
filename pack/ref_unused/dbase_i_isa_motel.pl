@@ -134,7 +134,7 @@ c2p(CNF,CLF,HP) :- tranlate_M(CNF,CLF), clausesToNHProlog(CLF,HP).
 motel_mpred(FA):-dynamic(FA),multifile(FA).
 
 isFORT(Atom):-atom(Atom).
-isFORTIC(isTDisjoint(_)):-!,fail.
+isFORTIC(isTDisjointFn(_)):-!,fail.
 isFORTIC(C):-compound(C),C=..[F|ARGS],isNART(F,ARGS).
 isFORTIC(Atom):-atomic(Atom).
 
@@ -403,7 +403,7 @@ insert_m([H|T], X, [H|L]) :-
 
 %   permutation_m(?List, ?Perm)
 %   is true when List and Perm are permuations of each other.
-%   Unlike perm/2, it will work even when List is isTDisjoint a proper list.
+%   Unlike perm/2, it will work even when List is isTDisjointFn a proper list.
 %   It even acts in a marginally sensible way when Perm isn't proper
 %   either, but it will still backtrack forever.
 %   Be careful: this is quite efficient, but the number of permutations of an
@@ -608,7 +608,7 @@ loadLibraries(swiprolog) :-
 	assertz_if_new((ask_M(A1,A2,A3,A4) :- deduce_M(A1,A2,A3,A4))),
 	assertz_if_new((map_M(A1,A2,A3) :- hop_map(A1,A2,A3))),
 	assertz_if_new((map_M(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
-	assertz_if_new((portray(isTDisjoint(F)) :- display(isTDisjoint(F)))),
+	assertz_if_new((portray(isTDisjointFn(F)) :- display(isTDisjointFn(F)))),
 	assertz_if_new((getTwoRandomNumbers(RT,CT) :-
 	statistics(cputime,RT1), RT is (ceil(RT1 * 100000)) mod 100000, statistics(atoms,CT))),
 	assertz_if_new((getRuntime(RT) :-
@@ -826,7 +826,7 @@ doMinimalityCheck(_GL1,[]) :-
 doConsistencyCheck(GL1,[in_M(Env,RN,modal(MS),C,X,_A1,_A2,_A3,_A4)|GL2]) :-
 	append(GL1,GL2,GL),
 	HYPS = [orM(GL),rl([]),fl(H3)],
-	normalizeNot(isTDisjoint(C),C1),
+	normalizeNot(isTDisjointFn(C),C1),
 	constructMLCall(Env,rn(_AX3,_RN3,_S3,_O3),bodyMC(MS),headMC(MS),
 	                C1,X,HYPS,[],CALLS,_PT35,Goal),
 	not(Goal),
@@ -911,7 +911,7 @@ sameAxiom(AX,_RN1,MS1,in_M(_C,X1),HYPS1,_D1,
 	not(not(X1 = X2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
-% To prove in_M(C,X) it is isTDisjoint allowed to use a constraint_M-clause generated 
+% To prove in_M(C,X) it is isTDisjointFn allowed to use a constraint_M-clause generated 
 % from the same axiom
 sameAxiom(AX,_RN1,MS1,in_M(_C,X1),HYPS1,_D1,
           constraint_M(rn(AX,_RN2,_,_),MS2,(card,app(_,X2),_Rel,_N),hyp(HYPS2))) :- 
@@ -1095,16 +1095,16 @@ noAxiom(solveConstraint(rn(AX,RN,_,_),MS,(card,app(_F:R,X),Rel,N),hyp(HYPS)),[C1
 	not(sameAxiom(AX,RN,MS,sc(X,R,Rel),HYPS,_D,C1)),
 	noAxiom(solveConstraint(rn(AX,RN,_,_),MS,(card,app(_,X),Rel,N),hyp(HYPS)),CL).
 
-noDouble([in_M(rn(AX,RN,_,_),modal(MS),isTDisjoint(C),X,hyp(_HYPS1),ab(D))|IL]) :-
+noDouble([in_M(rn(AX,RN,_,_),modal(MS),isTDisjointFn(C),X,hyp(_HYPS1),ab(D))|IL]) :-
 	!,
-	not(member(in_M(rn(AX1,RN1,_,_),modal(MS),isTDisjoint(C),X,hyp(_HYPS2),ab(D)),IL)),
+	not(member(in_M(rn(AX1,RN1,_,_),modal(MS),isTDisjointFn(C),X,hyp(_HYPS2),ab(D)),IL)),
 	not(member(in_M(rn(AX2,RN2,_,_),modal(MS),C,X,hyps(_HYPS3),ab(noAb)),IL)),
 	!,
 	noDouble(IL).
 noDouble([in_M(rn(AX,RN,_,_),modal(MS),C,X,hyp(_HYPS1),ab(D))|IL]) :-
 	!,
 	not(member(in_M(rn(AX1,RN1,_,_),modal(MS),C,X,hyp(_HYPS2),ab(D)),IL)),
-	not(member(in_M(rn(AX2,RN2,_,_),modal(MS),isTDisjoint(C),X,hyps(_HYPS3),ab(noAb)),IL)),
+	not(member(in_M(rn(AX2,RN2,_,_),modal(MS),isTDisjointFn(C),X,hyps(_HYPS3),ab(noAb)),IL)),
 	!,
 	noDouble(IL).
 noDouble([eq_M(rn(AX,RN,_,_),modal(MS),X,Y,hyp(_HYPS1))|IL]) :-
@@ -1158,7 +1158,7 @@ printAxiom(true) :-
  * succeeds if CL is a clash, i.e. it obeys one of the following 
  * conditions:
  * - it contains in_M(tBOT,X) for someM X.
- * - it contains both in_M(A,X) and in_M(isTDisjoint(A),X) for someM A and someM X.
+ * - it contains both in_M(A,X) and in_M(isTDisjointFn(A),X) for someM A and someM X.
  *
  */
 
@@ -1193,7 +1193,7 @@ doClashTest(InHead1) :-
 	call(InHead1),
 	InHead1 = in_M(Env,_,modal(W1),C1,X,hyp(HYP),ab(_),call(_CALL),_),
 	isFORTIC(X),
-	normalizeNot(isTDisjoint(C1),C2),
+	normalizeNot(isTDisjointFn(C1),C2),
 	constructMLHead(Env,rn(_AX2,_RN2,_S2,_O2),W1,C2,X,HYP,noAb,[],_,InHead2),
 	call(InHead2),
 	print('Clash test succeeded for'), nl,
@@ -1223,7 +1223,7 @@ doClashTest(Goal) :-
 % 	!.
 % clashCS(CL) :-
 % 	clashTest(possible),
-% 	member(in_M(rn(_,_,_,_),modal(MS),isTDisjoint(A),X,hyp(_HYPS1)),CL),
+% 	member(in_M(rn(_,_,_,_),modal(MS),isTDisjointFn(A),X,hyp(_HYPS1)),CL),
 % 	member(in_M(rn(_,_,_,_),modal(MS),A,X,hyp(_HYPS2)),CL),
 % 	!.
 % clashCS(CL) :-
@@ -1275,7 +1275,7 @@ clashInHyp(CL) :-
 clashInHyp(CL) :-
 	member(in_M(_N2,modal(MS2),A,X,hyp(_HYPS2),ab(_D2)),CL),
 	isFORTIC(A),
-	member(in_M(_N1,modal(MS1),isTDisjoint(A),X,hyp(_HYPS1),ab(_D1)),CL),
+	member(in_M(_N1,modal(MS1),isTDisjointFn(A),X,hyp(_HYPS1),ab(_D1)),CL),
 	not(not(MS1 = MS2)),
 	!.
 % clashInHyp(CL) :-
@@ -1603,7 +1603,7 @@ classify_M(Type,Env,MS,NewConcept,OldTree,NewTree) :-
  *          has NewConcept as tTOP concept and all tConcept of OldTree
  *          which are subsumed by NewConcept below it
  * above  : NewConcept is above  the tTOP concept of OldTree
- *          in this case NewTree is isTDisjoint instantiated
+ *          in this case NewTree is isTDisjointFn instantiated
  * in     : NewConcept is equivalentM to the tTOP concept of OldTree
  *          in this case NewTree is instantiated with the tree which
  *          has NewConcept inserted in OldTree
@@ -1619,7 +1619,7 @@ testForSubsumption(Type,Env,MS,NewConcept,node([ClassifiedConcept|CL],AL),NewTre
         % must have failed
 	once(subsume2(Type,Env,MS,ClassifiedConcept,NewConcept)),
 	% so only x \in NewConcept        => x \in ClassifiedConcept
-	% but isTDisjoint x \in ClassifiedConcept => x \in NewConcept
+	% but isTDisjointFn x \in ClassifiedConcept => x \in NewConcept
 	tfsList1(Type,Env,MS,NewConcept,[ClassifiedConcept|CL],[],AL,
                 below([]),beside([]),above([]),NewTree),
 	!.
@@ -1734,7 +1734,7 @@ testForEquivalence(Type,Env,MS,NewConcept,node([ClassifiedConcept|CL],AL),
 testForEquivalence(_Type,_,_MS,_NewConcept,node([_ClassifiedConcept|_CL],_AL),
 	           _,above) :-
 	% so only x \in ClassifiedConcept => x \in NewConcept
-        % but isTDisjoint x \in NewConcept        => x \in ClassifiedConcept
+        % but isTDisjointFn x \in NewConcept        => x \in ClassifiedConcept
 	!.
 
 subsume2(Type,Env,MS,X,Y) :- is_ftVar(X),!,fail.
@@ -2269,7 +2269,7 @@ find_concept21(tConcept,Env,MS,Concept,[X|R]) :-
 	find_concept21(tConcept,Env,MS,Concept,R),
 	!.
 find_concept21(tConcept,Env,MS,Concept,[X|R]) :-    
-	X = isTDisjoint(R1),
+	X = isTDisjointFn(R1),
 	getConceptName(Env,MS,R1),
 	setofOrNil(K,find_concept22(tConcept,Env,MS,Concept,R1,K),L),
 	find_concept23(tConcept,Env,MS,Concept,L),
@@ -2282,7 +2282,7 @@ find_concept21(tConcept,Env,MS,Concept,[X|R]) :-
 
 find_concept22(tConcept,Env,MS,Concept,R1,K) :-
 	succ_M(tConcept,Env,MS,K,R1),
-	isTDisjoint(succ_M(tConcept,Env,MS,K,Concept)).
+	isTDisjointFn(succ_M(tConcept,Env,MS,K,Concept)).
 
 find_concept23(tConcept,Env,MS,Concept,[]) :-
 	!.	
@@ -2339,11 +2339,11 @@ find_concept21(tConcept,Env,MS,Concept,[X|R]) :-
 */
 % ********************** Primconcepte **************************
 % es fehlt noch defprimconcept(_,_,someM(_,_..))
-%                   "         (_,isTDisjoint(),...)
+%                   "         (_,isTDisjointFn(),...)
 %                   "         (_,...(),...)
 					
 find_pconcept2(tConcept,Env,MS,PrimConcept,CT) :-
-	CT = isTDisjoint(X),
+	CT = isTDisjointFn(X),
 	getConceptName(Env,MS,X),
 	cont1a(tConcept,Env,MS,[],X,PrimConcept),
 %	succ_M(tConcept,Env,MS,Topconcept,X),
@@ -2372,7 +2372,7 @@ find_pconcept2(tConcept,Env,MS,Primconcept,CT) :-
 	CT = andM([X|[R]]),
 %	getConceptName(Env,MS,W1,X),
 	getConceptName(Env,MS,X),
-	R = isTDisjoint(Y),
+	R = isTDisjointFn(Y),
 	getConceptName(Env,MS,Y),
 	find_pconcept23(Env,MS,X,Y,Top),
 	assert_succ(tConcept,Env,MS,Top,PrimConcept),	
@@ -2579,14 +2579,14 @@ find_role21(tRole,Env,MS,Role,[X|R]) :-
 	find_role21(tRole,Env,MS,Role,R),
 	!.
 find_role21(tRole,Env,MS,Role,[X|R]) :-
-	X = isTDisjoint(R1),
+	X = isTDisjointFn(R1),
 	getRoleName(Env,MS,R1),
 	setofOrNil(K,find_role22(tRole,Env,MS,Role,R1,K),L),
 	find_role23(tRole,Env,MS,Role,L),
 	!.
 find_role22(tRole,Env,MS,Role,R1,K) :-
 	succ_M(tRole,Env,MS,K,R1),
-	isTDisjoint(succ_M(tRole,Env,MS,K,Role)).
+	isTDisjointFn(succ_M(tRole,Env,MS,K,Role)).
 
 find_role23(tRole,Env,MS,Role,[]) :-
 	!.	
@@ -2610,7 +2610,7 @@ find_prole2(tRole,Env,MS,PrimRole,CT) :-
 	!.
 
 find_prole2(tRole,Env,MS,PrimRole,CT) :-
-	CT = isTDisjoint(X),
+	CT = isTDisjointFn(X),
 	getRoleName(Env,MS,X),
 	cont1a(tRole,Env,MS,X,PrimRole),
 	find_prole23(Env,MS,X,PrimRole,Top),
@@ -2649,7 +2649,7 @@ find_prole2(tRole,Env,MS,PrimRole,CT) :-
 find_prole2(tRole,Env,MS,PrimRole,CT) :-
 	CT = andM([X|[R]]),
 	getRoleName(Env,MS,X),
-	R = isTDisjoint(Y),
+	R = isTDisjointFn(Y),
 	getRoleName(Env,MS,Y),
 	find_prole23(Env,MS,X,Y,Top),
 	assert_succ(tRole,Env,MS,Top,PrimRole),	
@@ -2920,7 +2920,7 @@ assert_succ(Type,Env,MS,X,RorC) :-
 */
 assert_succ(Type,Env,MS,X,RorC) :-
 	cont(Type,Env,MS,[],X,RorC),
-	isTDisjoint((sub_M(Type,Env,MS,X,Y),isTDisjoint(is_ftVar(Y)),sub_M(Type,Env,MS,Y,RorC),Y \== RorC)),
+	isTDisjointFn((sub_M(Type,Env,MS,X,Y),isTDisjointFn(is_ftVar(Y)),sub_M(Type,Env,MS,Y,RorC),Y \== RorC)),
 	assert1(succ_M(Type,Env,MS,X,RorC)),
 	!.
 assert_succ(Type,Env,MS,X,RorC).
@@ -2954,7 +2954,7 @@ show_dag(Env,MS) :-
 	print('Concepts'),nl,
         not(show_dag(tConcept,Env,MS,tTOP,[])),nl,nl,
 	print('Roles'),nl,
-	isTDisjoint(show_dag(tRole,Env,MS,tTOP,[])).
+	isTDisjointFn(show_dag(tRole,Env,MS,tTOP,[])).
 show_dag(Type,Env,MS,tBOT,_) :- !,fail.
 show_dag(Type,Env,MS,Node,L) :-
 	writes(L),
@@ -3129,16 +3129,16 @@ compileEnvironment(FileName,EnvName) :-
 	write('.'), nl,
 	expand_term_M((in_M(Env,Name,modal(MS),CN,CON,hyp(HYP),
                         ab(D),call(CALL),PT) :-
-		          (CN \== tTOP, CN \== tBOT, CN \== isTDisjoint(tTOP), 
-                           CN \== isTDisjoint(tBOT),
+		          (CN \== tTOP, CN \== tBOT, CN \== isTDisjointFn(tTOP), 
+                           CN \== isTDisjointFn(tBOT),
 	                   kb_in_M(Env,pr(3),Name,modal(MS),CN,CON,hyp(HYP),
                                  ab(D),call(CALL),PT))),
 		    InClause4),
 	writeq(InClause4), write('.'), nl,
 	expand_term_M((in_M(Env,Name,modal(MS),CN,CON,hyp(HYP),
                         ab(D),call(CALL),PT) :-
-		          (CN \== tTOP,CN \== tBOT, CN \== isTDisjoint(tTOP), 
-                           CN \== isTDisjoint(tBOT),
+		          (CN \== tTOP,CN \== tBOT, CN \== isTDisjointFn(tTOP), 
+                           CN \== isTDisjointFn(tBOT),
 			   kb_in_M(Env,pr(1),Name,modal(MS),CN,CON,hyp(HYP),
 				 ab(D),call(CALL),PT))),
 		    InClause5),
@@ -3274,12 +3274,12 @@ termExpansion(off,_) :-
 /***********************************************************************
  *
  * negate_m(+C1,-C2)
- * C2 is just the term isTDisjoint(C1).
+ * C2 is just the term isTDisjointFn(C1).
  *
  */
 
-negate_m(isTDisjoint(C1),C1) :- !.
-negate_m(C1,isTDisjoint(C1)) :- !.
+negate_m(isTDisjointFn(C1),C1) :- !.
+negate_m(C1,isTDisjointFn(C1)) :- !.
 
 /***********************************************************************
  *
@@ -3295,64 +3295,64 @@ invert_m(R,isMudInverseFn(R)) :- !.
  *
  * normalizeNot(+C1,-C2)
  * applies the laws
- *      isTDisjoint(andM([A,B]))   -> andM([isTDisjoint(A),isTDisjoint(B)])
- *      isTDisjoint(orM([A,B]))    -> orM([isTDisjoint(A),isTDisjoint(B)])
+ *      isTDisjointFn(andM([A,B]))   -> andM([isTDisjointFn(A),isTDisjointFn(B)])
+ *      isTDisjointFn(orM([A,B]))    -> orM([isTDisjointFn(A),isTDisjointFn(B)])
  *      not(not(A))       -> A
- *      isTDisjoint(allM(R,C))     -> someM(R,isTDisjoint(C))
- *      isTDisjoint(someM(R,C))    -> allM(R,isTDisjoint(C))
- *      isTDisjoint(atleast(N,R)) -> atmost(N-1,R)
- *      isTDisjoint(atmost(N,R))  -> atleast(N+1,R)
- *      isTDisjoint(b(O,P,C))     -> d(O,P,isTDisjoint(C))
- *      isTDisjoint(d(O,P,C))     -> b(O,P,isTDisjoint(C))
+ *      isTDisjointFn(allM(R,C))     -> someM(R,isTDisjointFn(C))
+ *      isTDisjointFn(someM(R,C))    -> allM(R,isTDisjointFn(C))
+ *      isTDisjointFn(atleast(N,R)) -> atmost(N-1,R)
+ *      isTDisjointFn(atmost(N,R))  -> atleast(N+1,R)
+ *      isTDisjointFn(b(O,P,C))     -> d(O,P,isTDisjointFn(C))
+ *      isTDisjointFn(d(O,P,C))     -> b(O,P,isTDisjointFn(C))
  * to C1 as long as possible to get C2.
  *
  */
 
-normalizeNot(isTDisjoint(andM([C1,C2|L1])),orM(L3)) :-
+normalizeNot(isTDisjointFn(andM([C1,C2|L1])),orM(L3)) :-
 	!,
 	hop_map(negate_m,[C1,C2|L1],L2),
 	hop_map(normalizeNot,L2,L3).
-normalizeNot(isTDisjoint(andM([C1])),C2) :-
+normalizeNot(isTDisjointFn(andM([C1])),C2) :-
 	negate_m(C1,C2).
-normalizeNot(isTDisjoint(andM([])),'tBOT') :-
+normalizeNot(isTDisjointFn(andM([])),'tBOT') :-
 	!.
-normalizeNot(isTDisjoint(setM(L)),isTDisjoint(setM(L))) :-
+normalizeNot(isTDisjointFn(setM(L)),isTDisjointFn(setM(L))) :-
 	!.
-normalizeNot(isTDisjoint(orM([C1,C2|L1])),andM(L3)) :-
+normalizeNot(isTDisjointFn(orM([C1,C2|L1])),andM(L3)) :-
 	!,
 	hop_map(negate_m,[C1,C2|L1],L2),
 	hop_map(normalizeNot,L2,L3).
-normalizeNot(isTDisjoint(orM([C1])),C2) :-
+normalizeNot(isTDisjointFn(orM([C1])),C2) :-
 	negate_m(C1,C2).
-normalizeNot(isTDisjoint(orM([])),'tTOP') :-
+normalizeNot(isTDisjointFn(orM([])),'tTOP') :-
 	!.
-normalizeNot(isTDisjoint(allM(R,C1)),someM(R,C2)) :-
-	normalizeNot(isTDisjoint(C1),C2).
-normalizeNot(isTDisjoint(someM(R,C1)),allM(R,C2)) :-
-	normalizeNot(isTDisjoint(C1),C2).
-normalizeNot(isTDisjoint(atleast(N,R)),atmost(M,R)) :-
+normalizeNot(isTDisjointFn(allM(R,C1)),someM(R,C2)) :-
+	normalizeNot(isTDisjointFn(C1),C2).
+normalizeNot(isTDisjointFn(someM(R,C1)),allM(R,C2)) :-
+	normalizeNot(isTDisjointFn(C1),C2).
+normalizeNot(isTDisjointFn(atleast(N,R)),atmost(M,R)) :-
 	M is N-1.
-normalizeNot(isTDisjoint(atmost(N,R)),atleast(M,R)) :-
+normalizeNot(isTDisjointFn(atmost(N,R)),atleast(M,R)) :-
 	M is N+1.
-normalizeNot(isTDisjoint(b(O,P,C1)),d(O,P,C2)) :-
-	normalizeNot(isTDisjoint(C1),C2).
-normalizeNot(isTDisjoint(d(O,P,C1)),b(O,P,C2)) :-
-	normalizeNot(isTDisjoint(C1),C2).
-normalizeNot(isTDisjoint(bc(O,P,C1)),dc(O,P,C2)) :-
-	normalizeNot(isTDisjoint(C1),C2).
-normalizeNot(isTDisjoint(dc(O,P,C1)),bc(O,P,C2)) :-
-	normalizeNot(isTDisjoint(C1),C2).
-normalizeNot(isTDisjoint(b(O,P)),d(O,P)) :-
+normalizeNot(isTDisjointFn(b(O,P,C1)),d(O,P,C2)) :-
+	normalizeNot(isTDisjointFn(C1),C2).
+normalizeNot(isTDisjointFn(d(O,P,C1)),b(O,P,C2)) :-
+	normalizeNot(isTDisjointFn(C1),C2).
+normalizeNot(isTDisjointFn(bc(O,P,C1)),dc(O,P,C2)) :-
+	normalizeNot(isTDisjointFn(C1),C2).
+normalizeNot(isTDisjointFn(dc(O,P,C1)),bc(O,P,C2)) :-
+	normalizeNot(isTDisjointFn(C1),C2).
+normalizeNot(isTDisjointFn(b(O,P)),d(O,P)) :-
 	!.
-normalizeNot(isTDisjoint(d(O,P)),b(O,P)) :-
+normalizeNot(isTDisjointFn(d(O,P)),b(O,P)) :-
 	!.
-normalizeNot(isTDisjoint(bc(O,P)),dc(O,P)) :-
+normalizeNot(isTDisjointFn(bc(O,P)),dc(O,P)) :-
 	!.
-normalizeNot(isTDisjoint(dc(O,P)),bc(O,P)) :-
+normalizeNot(isTDisjointFn(dc(O,P)),bc(O,P)) :-
 	!.
 normalizeNot(not(not(C1)),C3) :-
 	normalizeNot(C1,C3).
-normalizeNot(isTDisjoint(setM([])),tTOP) :- !.
+normalizeNot(isTDisjointFn(setM([])),tTOP) :- !.
 normalizeNot(C1,C1).
 
 /***********************************************************************
@@ -3410,7 +3410,7 @@ fatten_m(bc(O,P,C1),bc(O,P1,C2)) :-
 fatten_m(dc(O,P,C1),dc(O,P1,C2)) :-
 	fatten_m(P,P1),
 	fatten_m(C1,C2).
-fatten_m(isTDisjoint(C1),isTDisjoint(C2)) :-
+fatten_m(isTDisjointFn(C1),isTDisjointFn(C2)) :-
 	!,
 	fatten_m(C1,C2).
 fatten_m(isMudInverseFn(R1),isMudInverseFn(R2)) :-
@@ -3572,7 +3572,7 @@ cnf_m(C1,C6) :-
  * memberConcept(+Concept,+Dag)
  * Arguments: Concept     concept name
  *            Dag         subsumption hierarchy
- * checks wether or isTDisjoint Concept occurs in the subsumption hierarchy.
+ * checks wether or isTDisjointFn Concept occurs in the subsumption hierarchy.
  *
  */
 
@@ -3587,7 +3587,7 @@ memberConceptSubtrees(Concept,List) :-
  * memberDirectSubConcepts(+Concept,+Dag)
  * Arguments: Concept     concept name
  *            Dag         subsumption hierarchy
- * checks wether or isTDisjoint Concept occurs in the direct subconcepts of
+ * checks wether or isTDisjointFn Concept occurs in the direct subconcepts of
  * the tTOP concept of Dag.
  *
  */
@@ -4070,12 +4070,12 @@ typeOfDefinition(_,_,R,system) :-
 	isFORTIC(R),
 	name(R,[114,111,108,101|_]),
 	!.
-typeOfDefinition(Env,MS,isTDisjoint(C),Type) :-
+typeOfDefinition(Env,MS,isTDisjointFn(C),Type) :-
 	!,
 	typeOfDefinition(Env,MS,C,Type).
 typeOfDefinition(_,_,normal(C),system) :-
 	!.
-typeOfDefinition(_,_,isTDisjoint(normal(C)),system) :-
+typeOfDefinition(_,_,isTDisjointFn(normal(C)),system) :-
 	!.
 typeOfDefinition(_,_,_,user) :-
 	!.
@@ -4303,7 +4303,7 @@ constructMLMark(in_M(_,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(_),_),LoopCheck
  * The information in rn(AX1,RN1,S1,O1)  is used in the following way:
  * AX1, RN1, and O1 is used in the construction of the MLMark
  * which is added to the call stack. If AX1 is `no' then the MLMark is
- * isTDisjoint added to the call stack at allM.
+ * isTDisjointFn added to the call stack at allM.
  * S1 is used in the construction of InHead. If S1 is a variable, any 
  * rule can be used to prove the call. If S1 is user' then only user
  * provided rules may be used. If S1 is `system' then only system provided
@@ -4333,11 +4333,11 @@ getSource(any,_V2) :-
 getSource(V1,V1) :-
 	!.
 
-getNegatedConcept(CN,isTDisjoint(CN)) :-
+getNegatedConcept(CN,isTDisjointFn(CN)) :-
 	is_ftVar(CN),
 	!.
 getNegatedConcept(CN,C2) :-
-	normalizeNot(isTDisjoint(CN),C2),
+	normalizeNot(isTDisjointFn(CN),C2),
 	!.
 
 /***********************************************************************
@@ -4466,7 +4466,7 @@ getRoleName(Env,MS1,CN) :-
  * memberElement(+Element,+Dag)
  * Parameter: Element     element name
  *            Dag         subsumption hierarchy
- * checks wether or isTDisjoint Element occurs in the subsumption hierarchy.
+ * checks wether or isTDisjointFn Element occurs in the subsumption hierarchy.
  *
  */
 
@@ -4491,7 +4491,7 @@ memberElementSubtrees(Element,[_N1|NL]) :-
  * memberDirectSubElements(+Element,+Dag)
  * Parameter: Element     element name
  *            Dag         subsumption hierarchy
- * checks wether or isTDisjoint Element occurs in the direct subelements of
+ * checks wether or isTDisjointFn Element occurs in the direct subelements of
  * the tTOP element of Dag.
  *
  */
@@ -4923,7 +4923,7 @@ removeEnvironment(Name) :-
 	asserta(currentEnvironment(env(e0))),
 	!.
 removeEnvironment(_Name) :-
-	% if we get here, Name was isTDisjoint the current environemt
+	% if we get here, Name was isTDisjointFn the current environemt
 	!.
 
 /***********************************************************************
@@ -5045,7 +5045,7 @@ initEnvironment(EnvName) :-
 %	assertInRule(Env,1,AN10),
 	% Assert X in allM(r,'tBOT') => X in atmost(0,r)
 %	assertInRule(Env,2,AN10),
-	% Assert isTDisjoint('tTOP') law
+	% Assert isTDisjointFn('tTOP') law
 	% necessary for inconsistent knowledge bases?
 	% bad influence on runtime!
 %	assertInRule(Env,4),
@@ -5099,13 +5099,13 @@ assertInRules(Env) :-
 	assertz_if_new((in_M(Env,Name,modal(MS),CN,CON,hyp([orM(H1),rl(H2),fl(H3)]),ab(noAb),call(CALL),PT) :-
 		 clashInHyp(H2), !, fail)),
 	assertz_if_new((in_M(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
-		 (CN \== tTOP, CN \== tBOT, CN \== isTDisjoint(tTOP), CN \== isTDisjoint(tBOT),
+		 (CN \== tTOP, CN \== tBOT, CN \== isTDisjointFn(tTOP), CN \== isTDisjointFn(tBOT),
 	kb_in_M(Env,pr(3),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT)))),
 % There are no kb_in clauses with priority 2 at the moment (07.10.92)
 %	assertz_if_new((in_M(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 %	kb_in_M(Env,pr(2),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT))),
 	assertz_if_new((in_M(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
-		 (CN \== tTOP,CN \== tBOT, CN \== isTDisjoint(tTOP), CN \== isTDisjoint(tBOT),
+		 (CN \== tTOP,CN \== tBOT, CN \== isTDisjointFn(tTOP), CN \== isTDisjointFn(tBOT),
 	kb_in_M(Env,pr(1),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT)))),
 % Experimental code (07.10.92 uh)
 % It might be useful to have global information about the failure of
@@ -5170,22 +5170,22 @@ assertInRule(Env,1) :-
 	assertz_if_new(InHead),
 	!.
 assertInRule(Env,2) :-
-	% For all X: X in isTDisjoint(tBOT) 
-	% What is actually needed is the equivalence of tTOP and isTDisjoint(tBOT).
+	% For all X: X in isTDisjointFn(tBOT) 
+	% What is actually needed is the equivalence of tTOP and isTDisjointFn(tBOT).
 	% So we need
-	% For all X: X in tTOP if X in isTDisjoint(tBOT)
+	% For all X: X in tTOP if X in isTDisjointFn(tBOT)
 	% is subsumed by assertInRule(Env,1).
-	% For all X: X in isTDisjoint(tTOP) if X in tBOT
-	% This rule will isTDisjoint be asserted.
-	% For all X: X in tBOT if X in isTDisjoint(tTOP)
+	% For all X: X in isTDisjointFn(tTOP) if X in tBOT
+	% This rule will isTDisjointFn be asserted.
+	% For all X: X in tBOT if X in isTDisjointFn(tTOP)
 	% is subsumed by assertInRule(Env,4).
-	% For all X: X in isTDisjoint(tBOT) if X in tTOP.
+	% For all X: X in isTDisjointFn(tBOT) if X in tTOP.
 	% is subsumed by assertInRule(Env,2), i.e. the rule we will
 	% assertz_if_new now.
 	% Priority 5 (high priority)
 	gensym(axiom,AN4),
 	gensym(rule,RN4),
-	constructKBHead(Env,pr(5),rn(AN4,RN4,user,lInR),_W1,isTDisjoint(tBOT),X,
+	constructKBHead(Env,pr(5),rn(AN4,RN4,user,lInR),_W1,isTDisjointFn(tBOT),X,
 	                _HYPS,_D,_CALLS,tbox,InHead1),
 	assertz_if_new(InHead1),
 	!.
@@ -5203,7 +5203,7 @@ assertInRule(Env,3) :-
 	assertz_if_new((InHead2 :- (append(H1,H2,H), member(Mark1,H)) ; memberDML(Mark1,H3))),
 	!.
 assertInRule(Env,4) :-
-	% For all X: X in isTDisjoint(tTOP) => X in C 
+	% For all X: X in isTDisjointFn(tTOP) => X in C 
 	% Priority 1 (vtLowSpeed priority)
 	% necessary for inconsistent knowledge bases ?
 	gensym(axiom,AN7),
@@ -5211,7 +5211,7 @@ assertInRule(Env,4) :-
 	constructKBHead(Env,pr(1),rn(AN7,RN7,system,lInR),MS,_C,X,
 	                HYPS,D,CALLS,PT3,InHead3),
 	constructMLCall(Env,rn(AN7,_RN7,_S7,_O7),bodyMC(MS),headMC(MS),
-                        isTDisjoint('tTOP'),X,HYPS,D,CALLS,PT3,L3),
+                        isTDisjointFn('tTOP'),X,HYPS,D,CALLS,PT3,L3),
  	constructMLMark(InHead3,Mark3),
 	assertz_if_new((InHead3 :- cCS(CALLS,Mark3), L3)),
 	!.
@@ -5321,7 +5321,7 @@ assertInRule(Env,9,AN7) :-
 	%            intersection_m(S2,S3,S1) => X in S1
 	% Priority 1 (vtLowSpeed priority)
 	gensym(rule,RN8),
-	constructKBHead(Env,pr(1),rn(AN7,RN8,system,lInR),MS,isTDisjoint(setM(S1)),X,
+	constructKBHead(Env,pr(1),rn(AN7,RN8,system,lInR),MS,isTDisjointFn(setM(S1)),X,
 	                HYPS,D,CALLS,andM([PT2,PT3]),Consequence1),
 	constructMLCall(Env,rn(AN7,_RN2,_S2,_O2),bodyMC(MS),headMC(MS),
 			setM(S2),X,HYPS,D,CALLS,PT2,Antecedent2),
@@ -5752,7 +5752,7 @@ default_changes([Change|Changes],[WeightedChange|WeightedChanges]) :-
  * initFuncdep
  *
  *	asserts default given_ clauses which prevent errors if the user
- *	has isTDisjoint (implicitly) defined any given_ clauses.
+ *	has isTDisjointFn (implicitly) defined any given_ clauses.
  */
 
 initFuncdep :-
@@ -5941,7 +5941,7 @@ def(EnvName,MS,infl(X,Y,W)) :-
 	isFORTIC(Y),
 	assertNames(Env,World,Y,role),
 	wellDefined_InflWeight(W),
-	isTDisjoint(given_inflLink(Env,World,app(_,_,X),Y)),
+	isTDisjointFn(given_inflLink(Env,World,app(_,_,X),Y)),
 	gensym(sk,F),
 	asserta_new(given_inflLink(Env,World,app(F,W,X),Y)).
 
@@ -5950,7 +5950,7 @@ def(EnvName,MS,change(X,W)) :-
 	isFORTIC(X),
 	assertNames(Env,World,X,role),
 	wellDefined_ChangeWeight(W),
-	isTDisjoint(given_change(Env,World,X,_)),
+	isTDisjointFn(given_change(Env,World,X,_)),
 	asserta_new(given_change(Env,World,X,W)).
 
 def(EnvName,MS,posInfl(X,Y)) :-
@@ -6132,7 +6132,7 @@ get_Env_World(EnvName,MS,Env,World) :-
 % Formula =>   Atom
 %            | andM([Formula,Formula]) 
 %            | orM([Formula,Formula])
-%            | isTDisjoint(Formula)
+%            | isTDisjointFn(Formula)
 %            | impliesM(Formula,Formula)
 %            | equivalentM(Formula,Formula)
 %            | forallM(PrologVar,Formula)
@@ -6168,11 +6168,11 @@ tranlate_M(X,Clauses) :-
 %
 % Author: Ullrich Hustadt
 
-implout_M(equivalentM(P,Q),orM([andM([P1,Q1]),andM([isTDisjoint(P1),isTDisjoint(Q1)])])) :-
+implout_M(equivalentM(P,Q),orM([andM([P1,Q1]),andM([isTDisjointFn(P1),isTDisjointFn(Q1)])])) :-
 	!,
 	implout_M(P,P1),
 	implout_M(Q,Q1).
-implout_M(impliesM(P,Q),orM([isTDisjoint(P1),Q1])) :-
+implout_M(impliesM(P,Q),orM([isTDisjointFn(P1),Q1])) :-
 	!,
 	implout_M(P,P1),
 	implout_M(Q,Q1).
@@ -6188,7 +6188,7 @@ implout_M(andM(L),andM(L1)) :-
 implout_M(orM(L),orM(L1)) :-
 	!,
 	map_M(implout_M,L,L1).
-implout_M(isTDisjoint(P),isTDisjoint(P1)) :-
+implout_M(isTDisjointFn(P),isTDisjointFn(P1)) :-
 	!,
 	implout_M(P,P1).
 implout_M(P,P).
@@ -6201,7 +6201,7 @@ implout_M(P,P).
 %
 % Author: Ullrich Hustadt
 
-negin_M(isTDisjoint(P),P1) :-
+negin_M(isTDisjointFn(P),P1) :-
 	!,
 	neg_M(P,P1).
 negin_M(forallM(X,P),forallM(X,P1)) :-
@@ -6226,7 +6226,7 @@ negin_M(P,P).
 %
 % Author: Ullrich Hustadt
 
-neg_M(isTDisjoint(P),P1) :-
+neg_M(isTDisjointFn(P),P1) :-
 	!,
 	negin_M(P,P1).
 neg_M(forallM(X,P),existsM(X,P1)) :-
@@ -6241,7 +6241,7 @@ neg_M(andM(L),orM(L1)) :-
 neg_M(orM(L),andM(L1)) :-
 	!,
 	map_M(neg_M,L,L1).
-neg_M(P,isTDisjoint(P)).
+neg_M(P,isTDisjointFn(P)).
 
 %----------------------------------------------------------------------
 % skolem_M(+F1,-F2,*Vars)
@@ -6308,7 +6308,7 @@ subst4(andM(L),andM(L1),X,Sk) :-
 subst4(orM(L),orM(L1),X,Sk) :-
 	!,
 	map_M(subst4,[X,Sk],L,L1).
-subst4(isTDisjoint(P),isTDisjoint(P1),X,Sk) :-
+subst4(isTDisjointFn(P),isTDisjointFn(P1),X,Sk) :-
 	!,
 	subst4(P,P1,X,Sk).
 subst4(T1,T2,X,Sk) :-
@@ -6377,12 +6377,12 @@ inclause(orM([P,Q]),A,A1,B,B1) :-
 	!,
 	inclause(P,A2,A1,B2,B1),
 	inclause(Q,A,A2,B,B2).
-inclause(isTDisjoint(P),A,A,B1,B) :-
+inclause(isTDisjointFn(P),A,A,B1,B) :-
 	!,
-	isTDisjoint(memq(P,A)),
+	isTDisjointFn(memq(P,A)),
 	putin_M(P,B,B1).
 inclause(P,A1,A,B,B) :-
-	isTDisjoint(memq(P,B)),
+	isTDisjointFn(memq(P,B)),
 	putin_M(P,A,A1).
 
 putin_M(X,[],[X]) :-
@@ -6552,7 +6552,7 @@ getInflDescription(Env,World,app(F,W,DescriptZ),Y) :-
 getInflDescription(Env,World,X,X) :-
 	isFORT(X),
 	!,
-	isTDisjoint(given_inflLink(Env,World,_,X)).
+	isTDisjointFn(given_inflLink(Env,World,_,X)).
 
 getInflDescription(Env,World,X,X) :-
 	is_ftVar(X),
@@ -6845,7 +6845,7 @@ aux_simultInfl(Env,World,[X|Xs],Y,[W|Ws]) :-
 	aux_simultInfl(Env,World,Xs,Y,Ws).
 
 aux_simultInfl(Env,World,[X|Xs],Y,Ws) :-
-	isTDisjoint(getInflDescription(Env,World,_,X,Y)),
+	isTDisjointFn(getInflDescription(Env,World,_,X,Y)),
 	aux_simultInfl(Env,World,Xs,Y,Ws).
 
 /***********************************************************************
@@ -6938,7 +6938,7 @@ decrease(Env,World,Y) :-
  *
  * noChange(+Env,+World,+-Y)
  *
- *	succeeds if attribute Y does isTDisjoint change (i.e. there is neither
+ *	succeeds if attribute Y does isTDisjointFn change (i.e. there is neither
  *	an increase nor a decrease).
  */
 
@@ -7007,8 +7007,8 @@ noInflLinks(Env,World,[X|Xs]) :-
 noInflLinks(_,_,[]).
 
 aux_noInflLinks(Env,World,X,[Y|Ys]) :-
-	isTDisjoint(getInflDescription(Env,World,_,X,Y)),
-	isTDisjoint(getInflDescription(Env,World,_,Y,X)),
+	isTDisjointFn(getInflDescription(Env,World,_,X,Y)),
+	isTDisjointFn(getInflDescription(Env,World,_,Y,X)),
 	aux_noInflLinks(Env,World,X,Ys).
 
 aux_noInflLinks(_,_,_,[]).
@@ -7791,7 +7791,7 @@ defdisjoint(EnvName,MS,[C1|CL]) :-
 defdisjoint(_EnvName,_MS,_C1,[]) :-
 	!.
 defdisjoint(EnvName,MS,C1,[C2|CL]) :-
-	defprimconcept(EnvName,MS,C1,isTDisjoint(C2)),
+	defprimconcept(EnvName,MS,C1,isTDisjointFn(C2)),
 	defdisjoint(EnvName,MS,C1,CL).
 
 
@@ -7854,16 +7854,16 @@ assertName((role,CN1),alreadyAsserted,Env,MS,W1,G1) :-
 	!.
 assertName((concept,CN1),newAsserted,Env,MS,W1,G1) :-
 % Otherwise we assertz_if_new the concept name
-% Remember: The fact that the concept name is isTDisjoint already asserted with
-% identical modal sequence does isTDisjoint mean that we are isTDisjoint already able to 
+% Remember: The fact that the concept name is isTDisjointFn already asserted with
+% identical modal sequence does isTDisjointFn mean that we are isTDisjointFn already able to 
 % deduce that the concept name is present in the modal context corresponding
 % to the modal sequence.
 	assertz_if_new((conceptName(Env,MS,W1,CN1) :- G1)),
 	!.
 assertName((role,CN1),newAsserted,Env,MS,W1,G1) :-
 % Otherwise we assertz_if_new the role name
-% Remember: The fact that the role name is isTDisjoint already asserted with
-% identical modal sequence does isTDisjoint mean that we are isTDisjoint already able to 
+% Remember: The fact that the role name is isTDisjointFn already asserted with
+% identical modal sequence does isTDisjointFn mean that we are isTDisjointFn already able to 
 % deduce that the role name is present in the modal context corresponding
 % to the modal sequence.
 	assertz_if_new((roleName(Env,MS,W1,CN1) :- G1)),
@@ -7905,7 +7905,7 @@ namesInTerm(atmost(_N,R),L,_) :-
 	namesInTerm(R,L,role).
 namesInTerm(isMudInverseFn(R),L,Type) :-
 	namesInTerm(R,L,Type).
-namesInTerm(isTDisjoint(C),L,Type) :-
+namesInTerm(isTDisjointFn(C),L,Type) :-
 	namesInTerm(C,L,Type).
 namesInTerm(nafM(C),L,Type) :-
 	namesInTerm(C,L,Type).
@@ -8024,7 +8024,7 @@ malcToFOL(Trans,U,[X],orM([C1|CL]),
 	   orM([F1,F2])) :-
 	malcToFOL(Trans,U,[X],C1,F1),
 	malcToFOL(Trans,U,[X],orM(CL),F2).
-malcToFOL(Trans,U,[X],isTDisjoint(C),isTDisjoint(F)) :-
+malcToFOL(Trans,U,[X],isTDisjointFn(C),isTDisjointFn(F)) :-
 	malcToFOL(Trans,U,[X],C,F),
 	!.
 malcToFOL(Trans,U,[X],nafM(C),F) :-
@@ -8100,7 +8100,7 @@ malcToFOL(functional,U,[X,Y],P,equal(Y,app(fun(F,P),X))) :-
 %
 % Author: Ullrich Hustadt
 
-nrToFOL(U,[X],atmost(0,R),forallM(Y,isTDisjoint(F1))) :-
+nrToFOL(U,[X],atmost(0,R),forallM(Y,isTDisjointFn(F1))) :-
 	!,
 	malcToFOL(functional,U,[X,Y],R,F1).
 nrToFOL(U,[X],atmost(M,R),F) :-
@@ -8175,9 +8175,9 @@ neqConjunction([Y1|YL],andM([F1,F2])) :-
 	neqConjunction(Y1,YL,F1),
 	neqConjunction(YL,F2).
 
-neqConjunction(Y1,[Y2],isTDisjoint(equal(Y1,Y2))) :-
+neqConjunction(Y1,[Y2],isTDisjointFn(equal(Y1,Y2))) :-
 	!.
-neqConjunction(Y1,[Y2|YL],andM([isTDisjoint(equal(Y1,Y2)),F2])) :-
+neqConjunction(Y1,[Y2|YL],andM([isTDisjointFn(equal(Y1,Y2)),F2])) :-
 	neqConjunction(Y1,YL,F2).
 
 %----------------------------------------------------------------------
@@ -8515,7 +8515,7 @@ modalAxioms(EnvName,MS,kd5,MOp,A1) :-
 	retractall1_M(modalAxioms(Env,MS,user,_,A1,MOp,A)),
 	assertMA(A1,
 	         rel_M(Env,C,m(MOp,A),app(_F1:m(MOp,A),U),app(_F2:m(MOp,A),V)), 
-		 ((world(Env,m(MOp,A),U,V), isTDisjoint(U == []))), 
+		 ((world(Env,m(MOp,A),U,V), isTDisjointFn(U == []))), 
 		 Goal),
 	assertMA(A1,
 	         rel_M(Env,C,m(MOp,A),U,app(_F2:m(MOp,A),U)), 
@@ -8556,7 +8556,7 @@ normal(_,_).
 /**********************************************************************
  *
  * world(+EnvName,m(+MOp,+Agent),+WorldSequence) 
- * checks wether or isTDisjoint WorldSequence is a sequence of worlds for
+ * checks wether or isTDisjointFn WorldSequence is a sequence of worlds for
  * modal operator MOp and agent Agent.
  *
  */
@@ -9165,12 +9165,12 @@ change_classifier2(Env,MS,CT,[]) :-
 	!.
 change_classifier2(Env,MS,CT,[H|T]) :-
 	getConceptName(Env,MS,H),
-	isTDisjoint(make_succ2(tConcept,Env,MS,H)),
+	isTDisjointFn(make_succ2(tConcept,Env,MS,H)),
 	change_classifier2(Env,MS,CT,T),
 	!.
 change_classifier2(Env,MS,CT,[H|T]) :-
 	getRoleName(Env,MS,H),
-	isTDisjoint(make_succ2(tRole,Env,MS,H)),
+	isTDisjointFn(make_succ2(tRole,Env,MS,H)),
 	change_classifier2(Env,MS,CT,T),
 	!.
 change_classifier2(Env,MS,CT,[H|T]) :-
@@ -9421,7 +9421,7 @@ make_primconcept(EnvName,MS,CName1,restrict_inh(RTerm1, restricts(RTerm2 ,
 	defconcept(EnvName,MS,CNameDom ,someM(RName2 ,tTOP)),
         defprimconcept(EnvName,MS,CNameDom ,CName1),
 %	defprimconcept(EnvName,MS,andM([someM(isMudInverseFn(RName1),tTOP),
-%				       nafM(isTDisjoint(CNameDef))]),CNameDef),
+%				       nafM(isTDisjointFn(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	assertz_if_new((roleDomain(Env,W1,RName1,CNameDom) :- G1)),
 	assertz_if_new((roleRange(Env,W1,RName1,CName2) :- G1)),
@@ -9447,7 +9447,7 @@ make_primconcept(EnvName,MS,CName1 , nr(RTerm1, MinNr,MaxNr,DefNr)):-
 	defprimconcept(EnvName,MS,CNameDom , CName1),
 %	gensym(concept,CNameDef),
 %	defconcept(EnvName,MS,CNameDef, andM([atleast(DefNr,RName1),atmost(DefNr,RName1)])),
-%	defprimconcept(EnvName,MS,andM([someM(isMudInverseFn(RName1)),nafM(isTDisjoint(CNameDef))]),CNameDef),
+%	defprimconcept(EnvName,MS,andM([someM(isMudInverseFn(RName1)),nafM(isTDisjointFn(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	assertz_if_new((roleNr(Env,W1,RName1,MinNr,MaxNr) :- G1)),
 	assertz_if_new((roleDefNr(Env,W1,RName1,DefNr) :- G1)),
@@ -9578,7 +9578,7 @@ make_defconcept(EnvName,MS,CName1,'restr-inh'(RName1, restricts(RName2 ,
 	gensym(concept,CNameDom),
 	defconcept(EnvName,MS,CNameDom ,someM(RName2 ,tTOP)),
 %	defprimconcept(EnvName,MS,andM([someM(isMudInverseFn(RName1),tTOP),
-%				       nafM(isTDisjoint(CNameDef))]),CNameDef),
+%				       nafM(isTDisjointFn(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	assertz_if_new((roleDomain(Env,MS,RName1,CNameDom) :- G1)),
 	assertz_if_new((roleRange(Env,MS,RName1,CName2) :- G1)),
@@ -9602,7 +9602,7 @@ make_defconcept(EnvName,MS,CName1 , nr(RTerm, MinNr,MaxNr,DefNr),CNameDom):-
 %	defconcept(EnvName,MS,CNameDom, someM(RName1,tTOP)), 
 %	gensym(concept,CNameDef),
 %	defconcept(EnvName,MS,CNameDef, andM([atleast(DefNr,RName1),atmost(DefNr,RName1)])),
-%	defprimconcept(EnvName,MS,andM([someM(isMudInverseFn(RName1)),nafM(isTDisjoint(CNameDef))]),CNameDef),
+%	defprimconcept(EnvName,MS,andM([someM(isMudInverseFn(RName1)),nafM(isTDisjointFn(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	assertz_if_new((roleNr(Env,W1,RName1,MinNr,MaxNr) :- G1)),
 	assertz_if_new((roleDefNr(Env,W1,RName1,DefNr) :- G1)),
@@ -9752,7 +9752,7 @@ sb_primelemrole(EnvName,MS,RName1, 'domain-range'(CName1,CName2,CNameDef)):-
 	environment_M(EnvName,Env,_),
 	defprimconcept(EnvName,MS,CName1,someM(RName1,tTOP)),
 	defprimconcept(EnvName,MS,someM(isMudInverseFn(RName1),tTOP),CName2),
-%	defprimconcept(ENvName,MS,andM([CName2,nafM(isTDisjoint(CNameDef))]),CNameDef),
+%	defprimconcept(ENvName,MS,andM([CName2,nafM(isTDisjointFn(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	assertz_if_new((roleDomain(Env,W1,RName1,CName1) :- G1)),
 	assertz_if_new((roleRange(Env,W1,RName1,CName2) :- G1)),
@@ -9801,7 +9801,7 @@ sb_defelemrole(EnvName,MS,RName1, restricts(RName2, range(CName1,CNameDef))):-
 	environment_M(EnvName,Env,_),
 	defrole(EnvName,MS,RName1,restr(RName2,CName1)),
 %	defprimconcept(EnvName,MS,andM([someM(isMudInverseFn(RName1),tTOP),
-%                                      nafM(isTDisjoint(CNameDef))]),CNameDef),
+%                                      nafM(isTDisjointFn(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	assertz_if_new((roleRange(Env,MS,RName1,CName1) :- G1)),
 	assertz_if_new((roleDefault(Env,MS,RName1,CNameDef) :- G1)),
@@ -9816,20 +9816,20 @@ sb_defelemrole(EnvName,MS,RName1, restricts(RName2, range(CName1,CNameDef))):-
 
 		     
 sb_disjoint(CName1,CName2):- 
-%	defprimconcept(CName1,isTDisjoint(CName2)),
-	defprimconcept(CName2,isTDisjoint(CName1)),
+%	defprimconcept(CName1,isTDisjointFn(CName2)),
+	defprimconcept(CName2,isTDisjointFn(CName1)),
 	!.
 
 
 sb_disjoint(X,CName1,CName2):- 
-%	defprimconcept(X,CName1,isTDisjoint(CName2)),
-	defprimconcept(X,CName2,isTDisjoint(CName1)),
+%	defprimconcept(X,CName1,isTDisjointFn(CName2)),
+	defprimconcept(X,CName2,isTDisjointFn(CName1)),
 	!.
 
 
 sb_disjoint(EnvName,MS,CName1,CName2):- 
-%	defprimconcept(EnvName,MS,CName1,isTDisjoint(CName2)),
-	defprimconcept(EnvName,MS,CName2,isTDisjoint(CName1)),
+%	defprimconcept(EnvName,MS,CName1,isTDisjointFn(CName2)),
+	defprimconcept(EnvName,MS,CName2,isTDisjointFn(CName1)),
 	!.
 
 
@@ -9896,12 +9896,12 @@ constructRestriction(RName,[vr(ICName2)|L1],[ICName2|L2]) :-
 
 
 consistCheck(Env,MS,IC,Concept) :- 
-% vor dem Test die Normalform von isTDisjoint(Concept) mittels
-% normalizeNot(isTDisjoint(Concept),NotConcept)
+% vor dem Test die Normalform von isTDisjointFn(Concept) mittels
+% normalizeNot(isTDisjointFn(Concept),NotConcept)
 % bilden und dann
 % sb_ask(Env,MS,(isa(IC,NotConcept)))
 % aufrufen
-			 normalizeNot(isTDisjoint(Concept),NotConcept),
+			 normalizeNot(isTDisjointFn(Concept),NotConcept),
 			 sb_ask(Env,MS,(isa(IC,NotConcept))),
 			 nl,
 			 write('--- impossible --- '),
@@ -10899,22 +10899,22 @@ assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,setM(Set1)) :-
 	                    CN,X,HYPS,AB,CALLS,PT1,Body),
 	asserta_new((InHead1 :- (cCS(CALLS,Mark1), (call(G1), once(Body))))),
 	!.
-assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,isTDisjoint(setM(Set1))) :-
+assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,isTDisjointFn(setM(Set1))) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	gensym(rule,RuleName),
 	ruleName(AxiomName,RuleName,O,Orientation,RN1),
-	convertInConsequence(Env,pr(3),RN1,MS,W1,isTDisjoint(setM(Set1)),X,HYPS,AB,CALLS,PT1,InHead1),
+	convertInConsequence(Env,pr(3),RN1,MS,W1,isTDisjointFn(setM(Set1)),X,HYPS,AB,CALLS,PT1,InHead1),
 	constructMLMark(InHead1,Mark1),
 	convertInAntecedent(Env,rn(AxiomName,_AnySource1,Orientation),
 			    bodyMC(W1),headMC(W1),
 	                    CN,X,HYPS,AB,CALLS,PT1,Body),
 	asserta_new((InHead1 :- (cCS(CALLS,Mark1), (call(G1), once(Body))))),
 	!.
-assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,isTDisjoint(D)) :-
+assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,isTDisjointFn(D)) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	gensym(rule,RuleName),
 	ruleName(AxiomName,RuleName,O,Orientation,RN1),
-	convertInConsequence(Env,pr(3),RN1,MS,W1,isTDisjoint(D),X,HYPS,AB,CALLS,PT1,InHead1),
+	convertInConsequence(Env,pr(3),RN1,MS,W1,isTDisjointFn(D),X,HYPS,AB,CALLS,PT1,InHead1),
 	constructMLMark(InHead1,Mark1),
 	convertInAntecedent(Env,rn(AxiomName,_AnySource1,Orientation),
 			    bodyMC(W1),headMC(W1),
@@ -10922,11 +10922,11 @@ assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,isTDisjoint(D)) :-
 	asserta_new((InHead1 :- (cCS(CALLS,Mark1), (call(G1), once(Body))))),
 	!.
 assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,nafM(D)) :-
-	% in the consequence isTDisjoint and nafM have the same meaning
+	% in the consequence isTDisjointFn and nafM have the same meaning
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	gensym(rule,RuleName),
 	ruleName(AxiomName,RuleName,O,Orientation,RN1),
-	convertInConsequence(Env,pr(3),RN1,MS,W1,isTDisjoint(D),X,HYPS,AB,CALLS,PT1,InHead1),
+	convertInConsequence(Env,pr(3),RN1,MS,W1,isTDisjointFn(D),X,HYPS,AB,CALLS,PT1,InHead1),
 	constructMLMark(InHead1,Mark1),
 	convertInAntecedent(Env,rn(AxiomName,_AnySource1,Orientation),
 			    bodyMC(W1),headMC(W1),
@@ -11155,9 +11155,9 @@ convertInAntecedent(Env,rn(AX,Source,_O),MC1,MC2,setM(S1),X,HYPS,AB,CALLS,PT1,Bo
 	                setM(S1),X,HYPS,AB,CALLS,PT1,InHead1),
 	Body = ((not_ftVar(S1), (nongeneric(X), member(X,S1))) ; InHead1),
 	!.
-convertInAntecedent(Env,rn(AX,Source,_O),MC1,MC2,isTDisjoint(setM(S1)),X,HYPS,AB,CALLS,PT1,Body) :-
+convertInAntecedent(Env,rn(AX,Source,_O),MC1,MC2,isTDisjointFn(setM(S1)),X,HYPS,AB,CALLS,PT1,Body) :-
 	constructMLCall(Env,rn(AX,_RN1,Source,_O1),MC1,MC2,
-	                isTDisjoint(setM(S1)),X,HYPS,AB,CALLS,PT1,InHead1),
+	                isTDisjointFn(setM(S1)),X,HYPS,AB,CALLS,PT1,InHead1),
 	Body = ((not_ftVar(S1), (isFORTIC(X), (nongeneric(X), not(member(X,S1)))) ; InHead1)),
 	!.
 convertInAntecedent(Env,Name,MC1,MC2,andM(L),X,HYPS,AB,CALLS,andM(PTL),Body) :-
@@ -11167,47 +11167,47 @@ convertInAntecedent(Env,Name,MC1,MC2,orM(L),X,HYPS,AB,CALLS,orM(PTL),Body) :-
 	convertOrList(Env,Name,MC1,MC2,L,X,HYPS,AB,CALLS,Body,PTL),
 	!.
 convertInAntecedent(Env,rn(AX,S1,_O1),MC1,MC2,
-	            isTDisjoint(D),X,HYPS,AB,CALLS,PT1,Body) :-
+	            isTDisjointFn(D),X,HYPS,AB,CALLS,PT1,Body) :-
 	constructMLCall(Env,rn(AX,_RN,S1,_O2),MC1,MC2,
-	                isTDisjoint(D),X,HYPS,AB,CALLS,PT1,InHead),
+	                isTDisjointFn(D),X,HYPS,AB,CALLS,PT1,InHead),
 	Body = InHead,
 	!.
 convertInAntecedent(Env,rn(AX,S1,_O1),bodyMC(MS1),MC2,
 	            nafM(D),X,HYPS,AB,CALLS,PT1,Body) :-
 	% in the antecedent `x in nafM(D) is provable' means 
-	% `x in D is isTDisjoint provable'
+	% `x in D is isTDisjointFn provable'
 	isFORTIC(D),
 	!,
 	HYPS = [orM(H1),rl(H2),fl(H3)],
 	NewHYPS = [orM(H1),rl([]),fl(H3)],
 	convertInAntecedent(Env,rn(AX,S1,_O1),bodyMC(MS1),MC2,D,X,NewHYPS,
 			    AB,CALLS,PT2,BodyD),
-	PT1 = byDefault(in_M(MS1,isTDisjoint(D),X),hyp(NewHYPS),basedOn([])),
-	constructMLHead(Env,rn(AX,_RN3,_S3,_O3),MS1,isTDisjoint(D),X,
+	PT1 = byDefault(in_M(MS1,isTDisjointFn(D),X),hyp(NewHYPS),basedOn([])),
+	constructMLHead(Env,rn(AX,_RN3,_S3,_O3),MS1,isTDisjointFn(D),X,
 			HYPS,AB,_CALLS,_,DefaultMLTerm),
 	constructMLMark(DefaultMLTerm,DefaultTerm),
 	L1 = addDefaultML(DefaultTerm,H3),
-%	L1 = asserta_new(hypothesis_M(in_M(Env,modal(MS1),isTDisjoint(D),X,hyp(HYPS),ab(AB),PT1))),
+%	L1 = asserta_new(hypothesis_M(in_M(Env,modal(MS1),isTDisjointFn(D),X,hyp(HYPS),ab(AB),PT1))),
 	constructMLMark(BodyD,MarkD),
-	Body = (member(MarkD,HYPS) ; (nongeneric(X), (isTDisjoint(BodyD), nongeneric(X), L1))),
+	Body = (member(MarkD,HYPS) ; (nongeneric(X), (isTDisjointFn(BodyD), nongeneric(X), L1))),
 	!.
 convertInAntecedent(Env,rn(AX,S1,_O1),bodyMC(MS1),MC2,
 	            nafM(D),X,HYPS,AB,CALLS,PT1,Body) :-
 	% in the antecedent `x in nafM(D) is provable' means 
-	% `x in D is isTDisjoint provable'
+	% `x in D is isTDisjointFn provable'
 	HYPS = [orM(H1),rl(H2),fl(H3)],
 	NewHYPS = [orM(H1),rl([]),fl(H3)],
 	convertInAntecedent(Env,rn(AX,S1,_O1),bodyMC(MS1),MC2,D,X,NewHYPS,
 			    AB,CALLS,PT2,BodyD),
 	constructMLMark(BodyD,MarkD),
-	normalizeNot(isTDisjoint(D),D1),
+	normalizeNot(isTDisjointFn(D),D1),
 	PT1 = byDefault(in_M(MS1,D1,X),hyp(NewHYPS),basedOn([])),
 	constructMLHead(Env,rn(AX,_RN3,_S3,_O3),MS1,D1,X,
 			HYPS,AB,_CALLS,_,DefaultMLTerm),
 	constructMLMark(DefaultMLTerm,DefaultTerm),
 	L1 = addDefaultML(DefaultTerm,H3),
 %	L1 = asserta_new(hypothesis_M(in_M(Env,modal(MS1),D1,X,hyp(HYPS),ab(AB),PT1))),
-	Body = (nongeneric(X), (isTDisjoint(BodyD), nongeneric(X), L1)),
+	Body = (nongeneric(X), (isTDisjointFn(BodyD), nongeneric(X), L1)),
 	!.
 convertInAntecedent(Env,rn(AX,S1,_O1),MC1,MC2,
 	            allM(R,D),X,HYPS,AB,CALLS,orM([andM([PT2,PT1]),PT3]),
@@ -11217,7 +11217,7 @@ convertInAntecedent(Env,rn(AX,S1,_O1),MC1,MC2,
 	% construct equational literal
 	constructEqCall(Env,rn(AX,_RN1,_S2,_O2),MC1,MC2,Y,SF,R,X,HYPS,AB,CALLS,PT2,EqLiteral),
 	convertInAntecedent(Env,rn(AX,S1,_O3),MC1,MC2,D,Y,HYPS,AB,CALLS,PT1,Body),
-	constructMLCall(Env,rn(AX,_RN4,_S4,_O4),MC1,MC2,isTDisjoint(normal(R)),X,HYPS,AB,CALLS,PT3,InHead2),
+	constructMLCall(Env,rn(AX,_RN4,_S4,_O4),MC1,MC2,isTDisjointFn(normal(R)),X,HYPS,AB,CALLS,PT3,InHead2),
 	MC1 = bodyMC(W1),
 	C1 = closed_M(Env,MS,X,_,R),
 	C2 = collectAllFillers(Env,W1,R,X,HYPS,D,CALLS,S),
@@ -11344,17 +11344,17 @@ convertInConsequence(Env,_Pr,Name,_MS,W1,atmost(N,R),X,HYPS,AB,CALLS,PT1,InHead)
 	/* construct role term */
         constructConHead(Env,Name,W1,_FF,R,X,'=<',N,HYPS,AB,CALLS,PT1,InHead),
 	!.
-convertInConsequence(Env,Pr,rn(AX,RN,_S,O),MS,W1,isTDisjoint(D),X,
+convertInConsequence(Env,Pr,rn(AX,RN,_S,O),MS,W1,isTDisjointFn(D),X,
                      HYPS,AB,CALLS,PT1,InHead) :-
 	typeOfDefinition(Env,MS,D,S2),
-	constructKBHead(Env,Pr,rn(AX,RN,S2,O),W1,isTDisjoint(D),X,
+	constructKBHead(Env,Pr,rn(AX,RN,S2,O),W1,isTDisjointFn(D),X,
 			HYPS,AB,CALLS,PT1,InHead),
 	!.
 convertInConsequence(Env,Pr,rn(AX,RN,_S,O),MS,W1,nafM(D),X,
                      HYPS,AB,CALLS,PT1,InHead) :-
-	% in the consequence isTDisjoint and nafM have the same meaning
+	% in the consequence isTDisjointFn and nafM have the same meaning
 	typeOfDefinition(Env,MS,D,S2),
-	constructKBHead(Env,Pr,rn(AX,RN,S2,O),W1,isTDisjoint(D),X,
+	constructKBHead(Env,Pr,rn(AX,RN,S2,O),W1,isTDisjointFn(D),X,
 			HYPS,AB,CALLS,PT1,InHead),
 	!.
 convertInConsequence(Env,Pr,rn(AX,RN,_S,O),MS,W1,setM(Set1),X,
@@ -11561,7 +11561,7 @@ assertRoleLInRRestr3(Env,MS,R1,restr(R2,C),AN) :-
  *                          +R3,restr(+R2,+C2),+AN)
  * handles the case R1 is included in restr(R2,C).
  * asserts the constraints describing the relationship between 
- * R1 = restr(R2,C1), R3 = restr(R2,isTDisjoint(C1)) and R2.
+ * R1 = restr(R2,C1), R3 = restr(R2,isTDisjointFn(C1)) and R2.
  *
  */
 
@@ -11721,7 +11721,7 @@ assertRoleRInL(Env,MS,R1,R2,AN) :-
 /**********************************************************************
  *
  * getComplementRole(+MS,restr(+R2,C),-R3,restr(+R2,-CNF))
- * CNF is the normalform of isTDisjoint(C).
+ * CNF is the normalform of isTDisjointFn(C).
  * If there is already a role name R for restr(R2,CNF) then R3
  * will be instantiated with R.
  * If there is no role name for restr(R2,CNF) then a role name R
@@ -11880,7 +11880,7 @@ roleBody(Env,MS,andM([R1|RL]),X,Y,HYPS,AB,CALLS,AN,(EqLiteral, Body),[PT1|PTL]) 
 unfold(_Env,O,_Side,_Type,CT,DL1,O,CT,DL1) :-
 	atomicConcept(CT),
 	!.
-unfold(_Env,_O,_Side,concept,isTDisjoint(CT),DL1,system,isTDisjoint(CT),DL1) :-
+unfold(_Env,_O,_Side,concept,isTDisjointFn(CT),DL1,system,isTDisjointFn(CT),DL1) :-
 	atomicConcept(CT),
 	!.
 unfold(Env,_O,_Side,concept,CT,DL1,user,C,DL1) :-
@@ -11962,7 +11962,7 @@ unfold(Env,[(Origin,concept,A,orM(L1))|L2],[(NewOrigin,concept,A1,orM(L1),orM(L3
 	unfoldList(Env,concept,L1,L3,CL3),
 	append(L4,CL3,L5),
 	!.
-unfold(Env,[(Origin,concept,A,isTDisjoint(B))|L2],[(NewOrigin,concept,A1,isTDisjoint(B),isTDisjoint(B1))|L3]) :-
+unfold(Env,[(Origin,concept,A,isTDisjointFn(B))|L2],[(NewOrigin,concept,A1,isTDisjointFn(B),isTDisjointFn(B1))|L3]) :-
 	unfold(Env,L2,L4),
 	unfold(Env,Origin,left,concept,A,L4,NewOrigin,A1,L5),
 	unfold(Env,Origin,right,concept,B,L5,_NewOriginB,B1,L3),
@@ -12042,15 +12042,15 @@ atomicConcept(CT) :-
 atomicConcept(CT) :-
 	isFORTIC(CT),
 	!.
-atomicConcept(isTDisjoint(CT)) :-
+atomicConcept(isTDisjointFn(CT)) :-
 	is_ftVar(CT),
 	!.
-atomicConcept(isTDisjoint(CT)) :-
+atomicConcept(isTDisjointFn(CT)) :-
 	isFORTIC(CT),
 	!.
 atomicConcept(setM([E1])) :-
 	!.
-%atomicConcept(isTDisjoint(setM([E1]))) :-
+%atomicConcept(isTDisjointFn(setM([E1]))) :-
 %	!.
 	
 /**********************************************************************
@@ -12383,7 +12383,7 @@ getQuery(Env,MS1,C0,X,C3) :-
         conceptElement(Env,_,user,X,_,_),
 	hop_map(negate_m,MS1,MS2),
 	hop_map(normalizeNot,MS2,MS3),
-	axiomToFOL(MS3,[X],_,in_M,isTDisjoint(C0),F),
+	axiomToFOL(MS3,[X],_,in_M,isTDisjointFn(C0),F),
 	tranlate_M(F,C1),
 	clausesToLOP(C1,C2),
 	splitGoal(C2,C3).
@@ -12405,7 +12405,7 @@ getQuery(Env,MS1,C0,X,C3) :-
 	member(C0,L1),
 	hop_map(negate_m,MS1,MS2),
 	hop_map(normalizeNot,MS2,MS3),
-	axiomToFOL(MS3,[X],_,in_M,isTDisjoint(C0),F),
+	axiomToFOL(MS3,[X],_,in_M,isTDisjointFn(C0),F),
 	tranlate_M(F,C1),
 	clausesToLOP(C1,C2),
 	splitGoal(C2,C3).
@@ -12528,7 +12528,7 @@ getQuery(Env,W1,C0,X,Exp,Goal) :-
 getQuery(Env,W1,C0,X,Exp,Goal) :-
 	is_ftVar(C0),
 	clause(conceptName(Env,_,_,C1),_),
-	C0 = isTDisjoint(C1),
+	C0 = isTDisjointFn(C1),
 	constructMLCall(Env,rn(no,_RN1,user,_O1),bodyMC(W1),headMC(_),
 			C0,X,[orM([]),rl([]),fl(_DML1)],noAb,[],Exp,Goal).
 %getQuery(Env,W1,C0,X,Exp,Goal) :-
@@ -12667,7 +12667,7 @@ abduce(EnvName,MS,change(X,Wx),change(Y,Wy),[]) :-
 	get_Env_World(EnvName,MS,Env,World),
 	wellDefined_ChangeWeight(Wx),
 	infl(Env,World,X,Y,Wxy),
-	isTDisjoint(given_change(Env,World,X,_)),
+	isTDisjointFn(given_change(Env,World,X,_)),
 	bagof(W,Z^changingInfl(Env,World,Z,Y,W),Ws),
 	weightOf_change(Wx,Wxy,Wy1),
 	weightOf_SimultChange([Wy1|Ws],Wy).
@@ -12833,16 +12833,16 @@ allowedAnswerConcept(Env,C) :-
 %	conceptSubsets(Env,user,_,_,C,_).
 allowedAnswerConcept(Env,C) :-
 	not_ftVar(C),
-	C = isTDisjoint(D),
+	C = isTDisjointFn(D),
 	!,
 	not_ftVar(D),
-	isTDisjoint(D = isTDisjoint(E)),
+	isTDisjointFn(D = isTDisjointFn(E)),
 	!,
 	allowedAnswerConcept(Env,D).
 allowedAnswerConcept(_,normal(_)) :-
 	!,
 	fail.
-allowedAnswerConcept(_,isTDisjoint(normat(_))) :-
+allowedAnswerConcept(_,isTDisjointFn(normat(_))) :-
 	!,
 	fail.
 allowedAnswerConcept(Env,C) :-
@@ -12876,7 +12876,7 @@ inconsistent_M(EnvName,MS) :-
 	call((call(G1), InHead1)),
 	getConstraint(InHead1,X),
 	isFORTIC(X),
-	constructMLHead(Env,rn(_AX2,_RN2,_S2,_O2),W1,isTDisjoint(C),X,[orM([]),rl([]),fl(_DML1)],noAb,[],_,InHead2),
+	constructMLHead(Env,rn(_AX2,_RN2,_S2,_O2),W1,isTDisjointFn(C),X,[orM([]),rl([]),fl(_DML1)],noAb,[],_,InHead2),
 	call((call(G1), InHead2)).
 
 /***********************************************************************
@@ -12908,9 +12908,9 @@ consistent_M(EnvName,MS) :-
 metaReasoning :-
 	constructMLHead(Env,rn(ti,ti,system,lInR),W1,C,X,
 			_HYPS,_D,_CALLS,inconsistency,InHead1),
-	constructMLHead(Env,rn(ti,ti,system,lInR),W1,isTDisjoint(C),X,
+	constructMLHead(Env,rn(ti,ti,system,lInR),W1,isTDisjointFn(C),X,
 			_HYPS,_D,_CALLS,inconsistency,InHead2),
-	Lit11 = isTDisjoint(inconsistencyCheck(_,_,_)),
+	Lit11 = isTDisjointFn(inconsistencyCheck(_,_,_)),
 	Lit13 = asserta_new(InHead2),
 	Lit14 = asserta_new(inconsistencyCheck(MS,C,X)),
 	Lit15 = tryInconsistency(MS,C,X,InHead2),
@@ -13081,13 +13081,13 @@ example(2) :-
 	makeEnvironment('ex2','krisExample'),
 	initEnvironment,
 	defprimconcept(tMale),
-	defprimconcept(tFemale,isTDisjoint(tMale)),
+	defprimconcept(tFemale,isTDisjointFn(tMale)),
 	defconcept(males,someM(mudSex,tMale)),
 	defconcept(females,someM(mudSex,tFemale)),
 	defprimconcept(tAgent,someM(mudSex,orM([tMale,tFemale]))),
 	defconcept(tRangeParent,andM([tAgent,someM(roleChild,tAgent)])),
 	defconcept(tRangeMother,andM([tRangeParent,someM(mudSex,tFemale)])),
-	defconcept(tRangeFather,andM([tRangeParent,isTDisjoint(tRangeMother)])),
+	defconcept(tRangeFather,andM([tRangeParent,isTDisjointFn(tRangeMother)])),
 	defconcept(grandparent,andM([tRangeParent,someM(roleChild,tRangeParent)])),
 	defconcept(parent_with_sons_only,andM([tRangeParent,allM(roleChild,someM(mudSex,tMale))])),
 	defconcept(parent_with_two_children,andM([tRangeParent,atleast(2,roleChild)])),
@@ -13145,7 +13145,7 @@ example(7) :-
 	makeEnvironment('ex7','Subsumption'),
 	initEnvironment,
 	defconcept(c1,atleast(3,r)),
-	defconcept(c2,andM([allM(andM([r,p]),a),allM(andM([r,q]),isTDisjoint(a)),atleast(2,andM([r,p])),atleast(2,andM([r,q]))])).
+	defconcept(c2,andM([allM(andM([r,p]),a),allM(andM([r,q]),isTDisjointFn(a)),atleast(2,andM([r,p])),atleast(2,andM([r,q]))])).
 %%% Example  8;
 % ask_M(isa(iTom,heterosexual))
 % succeeds in Total runtime 0.033 sec. (05.06.92)
@@ -13153,7 +13153,7 @@ example(8) :-
 	makeEnvironment('ex8','Disjunction of complementary tConcept'),
 	initEnvironment,
 	defprimconcept(tMale),
-	defconcept(tFemale,isTDisjoint(tMale)),
+	defconcept(tFemale,isTDisjointFn(tMale)),
 	defconcept(heterosexual,orM([tMale,tFemale])).
 %%% Example  9:
 % Variation of the KRIS-Example
@@ -13163,11 +13163,11 @@ example(9) :-
 	makeEnvironment('ex9','Variation of the KRIS example'),
 	initEnvironment,
 	defprimconcept(tMale),
-	defprimconcept(tFemale,isTDisjoint(tMale)),
+	defprimconcept(tFemale,isTDisjointFn(tMale)),
 	defprimconcept(tAgent,orM([tMale,tFemale])),
 	defconcept(tRangeParent,andM([tAgent,someM(roleChild,tAgent)])),
 	defconcept(tRangeMother,andM([tRangeParent,tFemale])),
-	defconcept(tRangeFather,andM([tRangeParent,isTDisjoint(tRangeMother)])),
+	defconcept(tRangeFather,andM([tRangeParent,isTDisjointFn(tRangeMother)])),
 	defconcept(grandparent,andM([tRangeParent,someM(roleChild,tRangeParent)])),
 	defconcept(parent_with_sons_only,andM([tRangeParent,allM(roleChild,tMale)])),
 	defconcept(parent_with_two_children,andM([tRangeParent,atleast(2,roleChild)])),
@@ -13254,7 +13254,7 @@ example(18) :-
 	makeEnvironment('ex18','Number restrictions'),
 	initEnvironment,
 	defprimconcept(tFemale),
-	defconcept(tMale,isTDisjoint(tFemale)),
+	defconcept(tMale,isTDisjointFn(tFemale)),
 	defconcept(c3,andM([atmost(4,roleChild),atleast(2,restr(roleChild,tFemale))])),
 	defconcept(c4,atmost(2,restr(roleChild,tFemale))),
 	assert_ind(iTom,tMale),
@@ -13269,7 +13269,7 @@ example(19) :-
 	makeEnvironment('ex19','Number restrictions'),
 	initEnvironment,
 	defprimconcept(tFemale),
-	defconcept(tMale,isTDisjoint(tFemale)),
+	defconcept(tMale,isTDisjointFn(tFemale)),
 	defconcept(c5,andM([atmost(2,restr(roleChild,tMale))])),
 	assert_ind(iTom,tMale),
 	assert_ind(iPeter,tMale),
@@ -13284,7 +13284,7 @@ example(20) :-
 	makeEnvironment('ex20','Number restrictions'),
 	initEnvironment,
 	defprimconcept(tFemale),
-	defconcept(tMale,isTDisjoint(tFemale)),
+	defconcept(tMale,isTDisjointFn(tFemale)),
 	defconcept(c5,andM([atmost(2,restr(roleChild,tMale)),atmost(1,restr(roleChild,tFemale))])),
 	assert_ind(iTom,tMale),
 	assert_ind(iPeter,tMale),
@@ -13299,7 +13299,7 @@ example(21) :-
 	makeEnvironment('ex21','Number restrictions'),
 	initEnvironment,
 	defprimconcept(tFemale),
-	defconcept(tMale,isTDisjoint(tFemale)),
+	defconcept(tMale,isTDisjointFn(tFemale)),
 	defconcept(c1,andM([atmost(1,restr(teacher,tMale)),atmost(1,restr(teacher,tFemale))])),
 	defconcept(c2,andM([atmost(2,restr(teacher,tMale)),atmost(1,restr(teacher,tFemale))])),
 	assert_ind(iTom,c1),
@@ -13320,7 +13320,7 @@ example(22) :-
 	makeEnvironment('ex22','Number restrictions'),
 	initEnvironment,
 	defprimconcept(tFemale),
-	defconcept(tMale,isTDisjoint(tFemale)),
+	defconcept(tMale,isTDisjointFn(tFemale)),
 	defrole(maleTeacher,restr(teacher,tMale)),
 	defrole(femaleTeacher,restr(teacher,tFemale)),
 	defconcept(c1,andM([atmost(1,maleTeacher),atmost(1,femaleTeacher)])),
@@ -13342,7 +13342,7 @@ example(23) :-
 	makeEnvironment('ex23','Number restrictions'),
 	initEnvironment,
 	defprimconcept(tFemale),
-	defconcept(tMale,isTDisjoint(tFemale)),
+	defconcept(tMale,isTDisjointFn(tFemale)),
 	defprimrole(maleTeacher,teacher),
 	defprimrole(femaleTeacher,teacher),
 	defconcept(c1,andM([atmost(1,maleTeacher),atmost(1,femaleTeacher)])),
@@ -13367,7 +13367,7 @@ example(24) :-
 	defconcept([b(believe,a1)],c3,b(believe,a1,c1)),
 	assert_ind(iAudi7,c1).
 %%% Example 25
-% isTDisjoint(ask_M(isa(iAudi7,c3)))
+% isTDisjointFn(ask_M(isa(iAudi7,c3)))
 % succeeds in Total runtime 0.033 sec. (24.06.92)
 example(25) :-
 	makeEnvironment('ex25','Modal operators'),
@@ -13379,7 +13379,7 @@ example(25) :-
 %%% Example 26
 % subsumes([],c2,c1)
 % succeeds in Total runtime 0.034 sec. (24.06.92)
-% isTDisjoint(subsumes([],c1,c2))
+% isTDisjointFn(subsumes([],c1,c2))
 % succeeds in Total runtime 1.333 sec. (24.06.92)
 example(26) :-
 	makeEnvironment('ex27','Subsumption'),
@@ -13389,12 +13389,12 @@ example(26) :-
 %%% Example 27
 % subsumes([],c2,c1) 
 % succeeds in Total runtime 0.067 sec. (24.06.92)
-% isTDisjoint(subsumes([],c1,c2))
+% isTDisjointFn(subsumes([],c1,c2))
 % succeeds
 example(27) :-
 	makeEnvironment('ex28','Subsumption'),
 	initEnvironment,
-	defconcept(c1,isTDisjoint(someM(r,'tTOP'))),
+	defconcept(c1,isTDisjointFn(someM(r,'tTOP'))),
 	defconcept(c2,allM(r,c5)).
 %%% Example 28
 % ask_M(ex28,[b(believe,iJohn)],isa(iAudi7,tAutomobile),P)
@@ -13415,7 +13415,7 @@ example(29) :-
 	makeEnvironment('ex29','Number restrictions'),
 	initEnvironment,
 	defprimconcept(tFemale),
-	defconcept(tMale,isTDisjoint(tFemale)),
+	defconcept(tMale,isTDisjointFn(tFemale)),
 	defprimrole(teacher),
 	defrole(maleTeacher,restr(teacher,tMale)),
 	defrole(femaleTeacher,restr(teacher,tFemale)),
@@ -13431,7 +13431,7 @@ example(30) :-
 	makeEnvironment('ex30','Number restrictions'),
 	initEnvironment,
 	defprimconcept(tFemale),
-	defrole(maleTeacher,restr(teacher,isTDisjoint(tFemale))),
+	defrole(maleTeacher,restr(teacher,isTDisjointFn(tFemale))),
 	defrole(femaleTeacher,restr(teacher,tFemale)),
 	defconcept(c1,andM([atmost(1,maleTeacher),atmost(1,femaleTeacher)])),
 	defconcept(c2,atmost(1,maleTeacher)),
@@ -13464,7 +13464,7 @@ example(31) :-
 example(32) :-
 	makeEnvironment('ex32','abduction'),
 	initEnvironment,
-	defconcept(tMale,isTDisjoint(tFemale)).
+	defconcept(tMale,isTDisjointFn(tFemale)).
 %%% Example 33
 % Second test example for abduction
 % abduce(isa(iNixon,tWarDove),H,E)
@@ -13487,7 +13487,7 @@ example(33) :-
 example(34) :-
 	makeEnvironment('ex34',abduction),
 	initEnvironment,
-	defprimconcept(tPenguin,andM([tBird,isTDisjoint(tCanFly)])),
+	defprimconcept(tPenguin,andM([tBird,isTDisjointFn(tCanFly)])),
 	defprimconcept(tBird,tCanFly),
 	assert_ind(iTweety,tPenguin),
 	assert_ind(iJohn,tBird).
@@ -13511,7 +13511,7 @@ example(34) :-
 example(35) :-
 	makeEnvironment('ex35',abduction),
 	initEnvironment,
-	defprimconcept(tPenguin,andM([tBird,isTDisjoint(normalBird)])),
+	defprimconcept(tPenguin,andM([tBird,isTDisjointFn(normalBird)])),
 	defprimconcept(andM([tBird,normalBird]),tCanFly),
 	assert_ind(iTweety,tPenguin),
 	assert_ind(iJohn,tBird).
@@ -13567,8 +13567,8 @@ example(38) :-
 	assert_ind(ideaste,polyneikes,hasChild),
 	assert_ind(polyneikes,thersandros,hasChild),
 	assert_ind(oedipus,fatherMurderer),
-	assert_ind(thersandros,isTDisjoint(fatherMurderer)),
-	defconcept(c1,andM([fatherMurderer,someM(hasChild,isTDisjoint(fatherMurderer))])),
+	assert_ind(thersandros,isTDisjointFn(fatherMurderer)),
+	defconcept(c1,andM([fatherMurderer,someM(hasChild,isTDisjointFn(fatherMurderer))])),
 	defconcept(c2,someM(hasChild,c1)).
 %%% Example 39
 % ask_M(isa(iLucky,tFemale))
@@ -13577,8 +13577,8 @@ example(39) :-
 	makeEnvironment('ex39','negation_as_failure'),
 	initEnvironment,
 	defrole(parentOf,isMudInverseFn(childOf)),
-	defconcept(tMale,isTDisjoint(tFemale)),
-	defprimconcept(andM([someM(parentOf,tTOP),nafM(isTDisjoint(tFemale))]),tFemale),
+	defconcept(tMale,isTDisjointFn(tFemale)),
+	defprimconcept(andM([someM(parentOf,tTOP),nafM(isTDisjointFn(tFemale))]),tFemale),
 	assert_ind(iMary,iLucky,childOf).
 %%% Example 40
 % ask_M(isa(iPeter,tRichPerson))
@@ -13591,8 +13591,8 @@ example(39) :-
 example(40) :-
 	makeEnvironment('ex40','negation_as_failure'),
 	initEnvironment,
-	defprimconcept(andM([tDoctor,nafM(isTDisjoint(tRichPerson))]),tRichPerson),
-	defconcept(tPoorPerson,isTDisjoint(tRichPerson)),
+	defprimconcept(andM([tDoctor,nafM(isTDisjointFn(tRichPerson))]),tRichPerson),
+	defconcept(tPoorPerson,isTDisjointFn(tRichPerson)),
 	assert_ind(iPeter,tDoctor).
 %%% Example 41
 % ask_M(isa(iTom,tRichPerson))
@@ -13607,8 +13607,8 @@ example(41) :-
 	initEnvironment,
 	defrole(doctorParentOf,restr(isMudInverseFn(childOf),tDoctor)),
 	defrole(childOfDoctor,isMudInverseFn(r1)),
-	defprimconcept(andM([someM(doctorParentOf,tTOP),nafM(isTDisjoint(tRichPerson))]),tRichPerson),
-	defconcept(tPoorPerson,isTDisjoint(tRichPerson)),
+	defprimconcept(andM([someM(doctorParentOf,tTOP),nafM(isTDisjointFn(tRichPerson))]),tRichPerson),
+	defconcept(tPoorPerson,isTDisjointFn(tRichPerson)),
 	assert_ind(iChris,tDoctor),
 	assert_ind(iChris,iTom,childOf).
 %%% Example 42
@@ -13624,7 +13624,7 @@ example(42) :-
 	initEnvironment,
 	defconcept(tFourWheels,andM([atleast(4,wheels),atmost(4,wheels)])),
 	defconcept(fiveWheels,andM([atleast(5,wheels),atmost(5,wheels)])),
-	defprimconcept(andM([car,nafM(isTDisjoint(tFourWheels))]),tFourWheels),
+	defprimconcept(andM([car,nafM(isTDisjointFn(tFourWheels))]),tFourWheels),
 	assert_ind(iAudi7,car).
 %%% Example 43
 example(43) :-
@@ -13652,30 +13652,30 @@ example(45) :-
 	initEnvironment,
 	defconcept(c1,setM([a,b,c])),
 	defconcept(c2,setM([a,b])),
-	defconcept(nc2,isTDisjoint(c2)).
+	defconcept(nc2,isTDisjointFn(c2)).
 %%% Example 46
 % An insufficient specification of 
-% The bmw is either yellow, blue, or tRed but isTDisjoint yellow. 
+% The bmw is either yellow, blue, or tRed but isTDisjointFn yellow. 
 % ask_M(isa(bmw,c3))
 % fails
 example(46) :-
 	makeEnvironment('ex46','concrete_domains'),
 	initEnvironment,
 	defconcept(c1,someM(hasCol,setM([yellow,blue,tRed]))),
-	defconcept(c2,someM(hasCol,isTDisjoint(setM([yellow])))),
+	defconcept(c2,someM(hasCol,isTDisjointFn(setM([yellow])))),
 	defconcept(c3,someM(hasCol,setM([blue,tRed]))),
 	assert_ind(bmw,c1),
 	assert_ind(bmw,c2).
 %%% Example 47
 % A correct specification of
-% The bmw is either yellow, blue, or tRed but isTDisjoint yellow. 
+% The bmw is either yellow, blue, or tRed but isTDisjointFn yellow. 
 % ask_M(isa(bmw,c3))
 % succeeds
 example(47) :-
 	makeEnvironment('ex47','concrete_domains'),
 	initEnvironment,
 	defconcept(c1,andM([someM(hasCol,setM([yellow,blue,tRed])),allM(hasCol,setM([yellow,blue,tRed]))])),
-	defconcept(c2,someM(hasCol,isTDisjoint(setM([yellow])))),
+	defconcept(c2,someM(hasCol,isTDisjointFn(setM([yellow])))),
 	defconcept(c3,someM(hasCol,setM([blue,tRed]))),
 	assert_ind(bmw,c1),
 	assert_ind(bmw,c2).
@@ -13718,16 +13718,16 @@ example(49) :-
 	makeEnvironment('ex49','defaults'),
 	initEnvironment,
 	defconcept(c4,andM([c5,c6])),
-	defprimconcept(andM([c0,nafM(isTDisjoint(c2))]),c5),
-	defprimconcept(andM([c0,nafM(isTDisjoint(c3))]),c6),
-	defconcept(c1,orM([isTDisjoint(c2),isTDisjoint(c3)])),
+	defprimconcept(andM([c0,nafM(isTDisjointFn(c2))]),c5),
+	defprimconcept(andM([c0,nafM(isTDisjointFn(c3))]),c6),
+	defconcept(c1,orM([isTDisjointFn(c2),isTDisjointFn(c3)])),
 	assert_ind(p,c0),
 	assert_ind(p,c1).
 example(50) :-
 	makeEnvironment('ex50','complete_or'),
 	initEnvironment,
 	defprimconcept(c1,c0),
-	defprimconcept(isTDisjoint(c1),c0).
+	defprimconcept(isTDisjointFn(c1),c0).
 example(51) :-
 	makeEnvironment('ex51','functional_dependencies'),
 	initEnvironment,
@@ -13844,16 +13844,16 @@ example(60) :-
 %%% Example 61
 % deduce_M(isa(iTweety,tCanFly))
 % deduce_M(isa(iTweety,tCanNest))
-% deduce_M(isa(iTweety,isTDisjoint(tEmu)))
-% deduce_M(isa(iTweety,isTDisjoint(tCuckoo)))
+% deduce_M(isa(iTweety,isTDisjointFn(tEmu)))
+% deduce_M(isa(iTweety,isTDisjointFn(tCuckoo)))
 % succeed
 example(61) :-
 	makeEnvironment('ex61','Defaults and the lottery paradox'),
 	initEnvironment,	
-	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanFly))]), tCanFly),
-	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanNest))]), tCanNest),
-	defprimconcept(tEmu,isTDisjoint(tCanFly)),
-	defprimconcept(tCuckoo,isTDisjoint(tCanNest)),
+	defprimconcept(andM([tBird,nafM(isTDisjointFn(tCanFly))]), tCanFly),
+	defprimconcept(andM([tBird,nafM(isTDisjointFn(tCanNest))]), tCanNest),
+	defprimconcept(tEmu,isTDisjointFn(tCanFly)),
+	defprimconcept(tCuckoo,isTDisjointFn(tCanNest)),
 	assert_ind(iTweety,tBird).
 %%% Example 62
 % deduce_M(isa(iTweety,tBird))
@@ -13861,19 +13861,19 @@ example(61) :-
 % deduce_M(isa(iTweety,tCanNest))
 % consistent_M([])
 % succeed
-% deduce_M(isa(iTweety,isTDisjoint(tEmu)))
+% deduce_M(isa(iTweety,isTDisjointFn(tEmu)))
 % deduce_M(isa(iTweety,tEmu))
-% deduce_M(isa(iTweety,isTDisjoint(tCuckoo)))
+% deduce_M(isa(iTweety,isTDisjointFn(tCuckoo)))
 % deduce_M(isa(iTweety,tCuckoo))
-% deduce_M(isa(iTweety,isTDisjoint(tBird)))
+% deduce_M(isa(iTweety,isTDisjointFn(tBird)))
 % fail
 example(62) :-
 	makeEnvironment('ex62','Defaults and the lottery paradox'),
 	initEnvironment,	
-	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanFly))]), tCanFly),
-	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanNest))]), tCanNest),
-	defprimconcept(tEmu,isTDisjoint(tCanFly)),
-	defprimconcept(tCuckoo,isTDisjoint(tCanNest)),
+	defprimconcept(andM([tBird,nafM(isTDisjointFn(tCanFly))]), tCanFly),
+	defprimconcept(andM([tBird,nafM(isTDisjointFn(tCanNest))]), tCanNest),
+	defprimconcept(tEmu,isTDisjointFn(tCanFly)),
+	defprimconcept(tCuckoo,isTDisjointFn(tCanNest)),
 	defconcept(tBird,orM([tEmu,tCuckoo])),
 	assert_ind(iTweety,tBird).
 %%% Example 63
@@ -13881,17 +13881,17 @@ example(62) :-
 % deduce_M(isa(iTweety,tCanFly))
 % deduce_M(isa(iTweety,tCanNest))
 % deduce_M(isa(iTweety,sparrow))
-% deduce_M(isa(iTweety,isTDisjoint(tEmu)))
-% deduce_M(isa(iTweety,isTDisjoint(tCuckoo)))
+% deduce_M(isa(iTweety,isTDisjointFn(tEmu)))
+% deduce_M(isa(iTweety,isTDisjointFn(tCuckoo)))
 % consistent_M([])
 % succeed
 example(63) :-
 	makeEnvironment('ex63','Defaults and the lottery paradox'),
 	initEnvironment,	
-	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanFly))]), tCanFly),
-	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanNest))]), tCanNest),
-	defprimconcept(tEmu,isTDisjoint(tCanFly)),
-	defprimconcept(tCuckoo,isTDisjoint(tCanNest)),
+	defprimconcept(andM([tBird,nafM(isTDisjointFn(tCanFly))]), tCanFly),
+	defprimconcept(andM([tBird,nafM(isTDisjointFn(tCanNest))]), tCanNest),
+	defprimconcept(tEmu,isTDisjointFn(tCanFly)),
+	defprimconcept(tCuckoo,isTDisjointFn(tCanNest)),
 	defconcept(tBird,orM([sparrow,tEmu,tCuckoo])),
 	assert_ind(iTweety,tBird).
 %%% Example 64
@@ -13900,7 +13900,7 @@ example(63) :-
 % deduce_M(isa(iPeter,tOneHandUseAble))
 % succeed
 % deduce_M(isa(iPeter,tBothHandsUseAble))
-% deduce_M(isa(iPeter,isTDisjoint(tBothHandsUseAble))
+% deduce_M(isa(iPeter,isTDisjointFn(tBothHandsUseAble))
 % fail
 example(64) :-
 	makeEnvironment('ex64','Defaults and the lottery paradox'),
@@ -13916,16 +13916,16 @@ example(64) :-
 % can prove tLeftHandUseAble by default because
 % cannot prove tLeftHandBroken because
 % can prove tOneHandBroken but
-% cannot prove isTDisjoint(tRightHandBroken) because
+% cannot prove isTDisjointFn(tRightHandBroken) because
 % cannot prove tRightHandUseAble because
 % can prove tRightHandBroken because
 % can prove tOneHandBroken andM
-% can prove isTDisjoint(tLeftHandBroken) because
+% can prove isTDisjointFn(tLeftHandBroken) because
 % can prove tLeftHandUseAble by default because
 % cannot prove tLeftHandBroken because the loop check prevents
 %                                     the application of any axiom
 % deduce_M(isa(iPeter,tRightHandUseAble))
-% deduce_M(isa(iPeter,isTDisjoint(tBothHandsUseAble))
+% deduce_M(isa(iPeter,isTDisjointFn(tBothHandsUseAble))
 % succeed
 % deduce_M(isa(iPeter,tBothHandsUseAble))
 % deduce_M(isa(iPeter,tOneHandUseAble))
@@ -13933,16 +13933,16 @@ example(64) :-
 % (cannot prove tLeftHandUseAble because
 %  can prove tLeftHandBroken because
 %  tOneHandBroken is a fact andM
-%  (can prove isTDisjoint(tRightHandBroken) because
+%  (can prove isTDisjointFn(tRightHandBroken) because
 %   can prove tRightHandUseAble by default because
 %   cannot prove tRightHandBroken because
 %   can prove tOneHandBroken but 
-%   cannot prove isTDisjoint(tLeftHandBroken) because
+%   cannot prove isTDisjointFn(tLeftHandBroken) because
 %   cannot prove tLeftHandUseAble because the loop check prevents
 %                                       the application of any axiom))
-% and it is also isTDisjoint possible possible to prove tRightHandUseAble
+% and it is also isTDisjointFn possible possible to prove tRightHandUseAble
 % for similar reasons
-% deduce_M(isa(iPeter,isTDisjoint(tOneHandUseAble)))
+% deduce_M(isa(iPeter,isTDisjointFn(tOneHandUseAble)))
 % fail
 example(65) :-
 	makeEnvironment('ex65','Defaults and the lottery paradox'),
@@ -13952,17 +13952,17 @@ example(65) :-
 	defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
 	defconcept(tOneHandUseAble,orM([tLeftHandUseAble,tRightHandUseAble])),
 	defconcept(tBothHandsUseAble,andM([tLeftHandUseAble,tRightHandUseAble])),
-	defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUseAble)),
-	defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUseAble)),
+	defprimconcept(tLeftHandBroken,isTDisjointFn(tLeftHandUseAble)),
+	defprimconcept(tRightHandBroken,isTDisjointFn(tRightHandUseAble)),
 	assert_ind(iPeter,tOneHandBroken).
 %%% Example 66
 % deduce_M(isa(iPeter,tLeftHandUseAble))
 % deduce_M(isa(iPeter,tRightHandUseAble))
 % deduce_M(isa(iPeter,tOneHandUseAble))
-% deduce_M(isa(iPeter,isTDisjoint(tBothHandsUseAble))
+% deduce_M(isa(iPeter,isTDisjointFn(tBothHandsUseAble))
 % succeed
 % deduce_M(isa(iPeter,tBothHandsUseAble))
-% deduce_M(isa(iPeter,isTDisjoint(tOneHandUseAble)))
+% deduce_M(isa(iPeter,isTDisjointFn(tOneHandUseAble)))
 % fail
 example(66) :-
 	makeEnvironment('ex66','Defaults and the lottery paradox'),
@@ -13970,10 +13970,10 @@ example(66) :-
 	defprimconcept(nafM(tLeftHandBroken),tLeftHandUseAble),
 	defprimconcept(nafM(tRightHandBroken),tRightHandUseAble),
 	defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
-	defconcept(tOneHandUseAble,orM([nafM(isTDisjoint(tLeftHandUseAble)),nafM(isTDisjoint(tRightHandUseAble))])),
+	defconcept(tOneHandUseAble,orM([nafM(isTDisjointFn(tLeftHandUseAble)),nafM(isTDisjointFn(tRightHandUseAble))])),
 	defconcept(tBothHandsUseAble,andM([tLeftHandUseAble,tRightHandUseAble])),
-	defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUseAble)),
-	defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUseAble)),
+	defprimconcept(tLeftHandBroken,isTDisjointFn(tLeftHandUseAble)),
+	defprimconcept(tRightHandBroken,isTDisjointFn(tRightHandUseAble)),
 	assert_ind(iPeter,tOneHandBroken).
 %%% Example 67
 example(67) :-
@@ -13981,46 +13981,46 @@ example(67) :-
         initEnvironment,        
         defprimconcept(nafM(tLeftHandBroken),tLeftHandUseAble),
         defprimconcept(nafM(tRightHandBroken),tRightHandUseAble),
-        defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUseAble)),
-        defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUseAble)),
+        defprimconcept(tLeftHandBroken,isTDisjointFn(tLeftHandUseAble)),
+        defprimconcept(tRightHandBroken,isTDisjointFn(tRightHandUseAble)),
         defconcept(tOneHandUseAble,orM([tLeftHandUseAble,tRightHandUseAble])),
         defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
         defconcept(tBothHandsBroken,andM([tLeftHandBroken,tRightHandBroken])),
         assert_ind(iPeter,tOneHandBroken),
-        assert_ind(iPeter,isTDisjoint(tBothHandsBroken)).
+        assert_ind(iPeter,isTDisjointFn(tBothHandsBroken)).
 example(68) :-
 	makeEnvironment('ex68','Defaults and the lottery paradox'),
         initEnvironment,        
         defprimconcept(nafM(tBOT),tLeftHandUseAble),
         defprimconcept(nafM(tBOT),tRightHandUseAble),
-        defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUseAble)),
-        defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUseAble)),
+        defprimconcept(tLeftHandBroken,isTDisjointFn(tLeftHandUseAble)),
+        defprimconcept(tRightHandBroken,isTDisjointFn(tRightHandUseAble)),
         defconcept(tOneHandUseAble,orM([tLeftHandUseAble,tRightHandUseAble])),
         defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
         defconcept(tBothHandsBroken,andM([tLeftHandBroken,tRightHandBroken])),
         assert_ind(iPeter,tOneHandBroken),
-        assert_ind(iPeter,isTDisjoint(tBothHandsBroken)).
+        assert_ind(iPeter,isTDisjointFn(tBothHandsBroken)).
 %%% Example 69
 % deduce_M(isa(iTweety,tBird))
 % succeeds
-% deduce_M(isa(iTweety,isTDisjoint(tBird)))
+% deduce_M(isa(iTweety,isTDisjointFn(tBird)))
 % deduce_M(isa(iTweety,tCanFly))
-% deduce_M(isa(iTweety,isTDisjoint(tCanFly)))
+% deduce_M(isa(iTweety,isTDisjointFn(tCanFly)))
 % deduce_M(isa(iTweety,tCanNest))
-% deduce_M(isa(iTweety,isTDisjoint(tCanNest)))
+% deduce_M(isa(iTweety,isTDisjointFn(tCanNest)))
 % fail
 example(69) :-
 	makeEnvironment('ex69','Defaults and the lottery paradox'),
 	initEnvironment,	
-	defprimconcept(andM([tBird,nafM(exception),nafM(isTDisjoint(tCanFly))]), tCanFly),
-	defprimconcept(andM([tBird,nafM(exception),nafM(isTDisjoint(tCanNest))]), tCanNest),
+	defprimconcept(andM([tBird,nafM(exception),nafM(isTDisjointFn(tCanFly))]), tCanFly),
+	defprimconcept(andM([tBird,nafM(exception),nafM(isTDisjointFn(tCanNest))]), tCanNest),
 	defprimconcept(tEmu,exception),
 	defprimconcept(tCuckoo,exception),
 	defconcept(tBird,orM([tEmu,tCuckoo])),
 	assert_ind(iTweety,tBird).
 %%% Example 70
 % deduce_M(isa(a,clearTop))
-% deduce_M(isa(a,isTDisjoint(clearTop)))
+% deduce_M(isa(a,isTDisjointFn(clearTop)))
 % fail
 % deduce_M(isa(b,clearTop))
 % deduce_M(isa(b,clearTop))
@@ -14068,9 +14068,9 @@ example(72) :-
         % f"ur ein Konzept (hier z.B. tVolkswagon) zu haben. Damit ein Konzept im
         % Verlauf des Dialogs st"andig zu verfeinern. 
 	sb_primconcept([b(believe,pv),bc(believe,sporttyp)],tVolkswagon,[supers([langsam])]),
-	defprimconcept([b(believe,pv),bc(believe,sporttyp)],andM([tAutomobile,hatKat,nafM(isTDisjoint(langsam))]),langsam),
+	defprimconcept([b(believe,pv),bc(believe,sporttyp)],andM([tAutomobile,hatKat,nafM(isTDisjointFn(langsam))]),langsam),
 	sb_defconcept([b(believe,pv),bc(want,umwelttyp)],wunsch_auto,[supers([tAutomobile,hatKat])]),
-	sb_primconcept([b(believe,pv),bc(believe,umwelttyp)],tVolkswagon,[supers([isTDisjoint(langsam)])]),
+	sb_primconcept([b(believe,pv),bc(believe,umwelttyp)],tVolkswagon,[supers([isTDisjointFn(langsam)])]),
 	assert_ind([b(believe,pv)],pk,sporttyp),
         % Anmerkung:
 	% Bei der folgenden Definition reicht es nicht zu sagen, da\3
@@ -14081,13 +14081,13 @@ example(72) :-
         % Demo:
         %
         % setof(C,ask_M([b(believe,pk)],isa(polo,C)),L).
-        % L = [tAutomobile,langsam,tTOP,tVolkswagon,isTDisjoint(tBOT)]
+        % L = [tAutomobile,langsam,tTOP,tVolkswagon,isTDisjointFn(tBOT)]
         % Zun"achst erbt hier der pk vom b(believe,allM), den Glauben, da\3
         % polo ein tVolkswagon und damit ein tAutomobile ist. Vom b(believe,sporttyp) erbt 
         % er, da\3 tVolkswagon's langsam sind, womit auch der polo langsam ist.
         % 
         % setof(C,ask_M([b(believe,pk)],isa(manta,C)),L)
-        % L = [tAutomobile,opel,tTOP,isTDisjoint(tBOT)]
+        % L = [tAutomobile,opel,tTOP,isTDisjointFn(tBOT)]
         % Da es sich bei dem manta um einen opel handelt, wird zun"achst
         % nicht angenommen, da\3 der manta langsam ist.
         %
@@ -14099,7 +14099,7 @@ example(72) :-
         % Ergebnis:
         %
         % setof(C,ask_M([b(believe,pk)],isa(manta,C)),L)
-        % L = [tAutomobile,hatKat,langsam,opel,tTOP,isTDisjoint(tBOT)]
+        % L = [tAutomobile,hatKat,langsam,opel,tTOP,isTDisjointFn(tBOT)]
         %
         % Wir k"onnen neben der Deduktion auf Abduktion verwenden:
         %
@@ -14121,13 +14121,13 @@ example(72) :-
         % Dadurch "andern sich die Anfrageergebnisse wie folgt:
         %
         % setof(C,ask_M([b(believe,pk)],isa(polo,C)),L).
-        % L = [tAutomobile,tTOP,tVolkswagon,isTDisjoint(tBOT),isTDisjoint(langsam)]
+        % L = [tAutomobile,tTOP,tVolkswagon,isTDisjointFn(tBOT),isTDisjointFn(langsam)]
         %
         % Der polo geh"ort nun zu den nicht langsamen Autos, da umwelttypen
         % genau dies glauben.
         % 
         % setof(C,ask_M([b(believe,pk)],isa(manta,C)),L).
-        % L = [tAutomobile,hatKat,opel,tTOP,isTDisjoint(tBOT)]
+        % L = [tAutomobile,hatKat,opel,tTOP,isTDisjointFn(tBOT)]
         % 
         % Der Manta hat zwar immernoch einen Katalysator, ist aber trotzdem
         % nicht langsam, da umwelttypen nicht glauben, da\3 Katalysatoren ein
@@ -14165,9 +14165,9 @@ example(74) :-
 	assert_ind([b(believe,allM)],manta,opel),
 	defprimconcept([b(believe,pv),bc(want,sporttyp)],andM([tAutomobile,orM([tHasCarSpoiler,hatSchiebedach])]),wunsch_auto),
 	defprimconcept([b(believe,pv),bc(believe,sporttyp)],tVolkswagon,langsam),
-	defprimconcept([b(believe,pv),bc(believe,sporttyp)],andM([tAutomobile,hatKat,nafM(isTDisjoint(langsam))]),langsam),
+	defprimconcept([b(believe,pv),bc(believe,sporttyp)],andM([tAutomobile,hatKat,nafM(isTDisjointFn(langsam))]),langsam),
 	defconcept([b(believe,pv),bc(want,umwelttyp)],wunsch_auto,andM([tAutomobile,hatKat])),
-	defprimconcept([b(believe,pv),bc(believe,umwelttyp)],tVolkswagon,isTDisjoint(langsam)),
+	defprimconcept([b(believe,pv),bc(believe,umwelttyp)],tVolkswagon,isTDisjointFn(langsam)),
 	assert_ind([b(believe,pv)],pk,sporttyp),
 	assert_ind([b(believe,pv),b(want,pk)],polo,tAutomobile).
 example(75) :-
@@ -14184,9 +14184,9 @@ example(75) :-
 	assert_ind([b(believe,allM)],'bmw735',bmw),
 	defprimconcept([b(believe,ps),bc(want,racer)],andM([car,orM([has_spoiler,has_sliding_roof])]),dream_car),
 	defprimconcept([b(believe,ps),bc(believe,racer)],tVolkswagon,slow),
-	defprimconcept([b(believe,ps),bc(believe,racer)],andM([car,has_cat_conv,nafM(isTDisjoint(slow))]),slow),
+	defprimconcept([b(believe,ps),bc(believe,racer)],andM([car,has_cat_conv,nafM(isTDisjointFn(slow))]),slow),
 	defconcept([b(believe,ps),bc(want,creeper)],dream_car,andM([car,has_cat_conv])),
-	defprimconcept([b(believe,ps),bc(believe,creeper)],tVolkswagon,isTDisjoint(slow)),
+	defprimconcept([b(believe,ps),bc(believe,creeper)],tVolkswagon,isTDisjointFn(slow)),
 	assert_ind([b(believe,ps)],pc,racer),
 	assert_ind([b(believe,ps),b(want,pc)],beetle,car).
 example(76) :-
@@ -14204,7 +14204,7 @@ example(76) :-
 	defprimconcept([b(believe,ps),bc(want,racer)],andM([car,orM([has_spoiler,has_sliding_roof])]),dream_car),
 	defprimconcept([b(believe,ps),bc(believe,racer)],tVolkswagon,slow),
 	defconcept([b(believe,ps),bc(want,creeper)],dream_car,andM([car,has_cat_conv])),
-	defprimconcept([b(believe,ps),bc(believe,creeper)],tVolkswagon,isTDisjoint(slow)),
+	defprimconcept([b(believe,ps),bc(believe,creeper)],tVolkswagon,isTDisjointFn(slow)),
 	assert_ind([b(believe,ps)],pc,racer),
 	assert_ind([b(believe,ps),b(want,pc)],beetle,car).
 
@@ -14420,27 +14420,27 @@ testMotelExample(59) :-
 	printTime(setof(X,sb_ask(roleDefNr('marys-roleChild',X)),L4)), print(L4), nl.
 testMotelExample(60) :-
 	tryGoal(deduce_M(ex60,[b(believe,iPeter)],isa(iTom,tRichPerson),E)),
-	tryGoal(assert_ind([b(believe,iPeter)],iTom,isTDisjoint(tRichPerson))),
+	tryGoal(assert_ind([b(believe,iPeter)],iTom,isTDisjointFn(tRichPerson))),
 	tryGoal(inconsistent_M([b(believe,iPeter)])).
 testMotelExample(61) :-
 	tryGoal(deduce_M(isa(iTweety,tCanFly))),
 	tryGoal(deduce_M(isa(iTweety,tCanNest))),
-	tryGoal(deduce_M(isa(iTweety,isTDisjoint(tEmu)))),
-	tryGoal(deduce_M(isa(iTweety,isTDisjoint(tCuckoo)))),
+	tryGoal(deduce_M(isa(iTweety,isTDisjointFn(tEmu)))),
+	tryGoal(deduce_M(isa(iTweety,isTDisjointFn(tCuckoo)))),
 	tryGoal(consistent_M([])).
 testMotelExample(62) :-
 	tryGoal(deduce_M(isa(iTweety,tCanFly))),
 	tryGoal(deduce_M(isa(iTweety,tCanNest))),
-	tryGoal(not(deduce_M(isa(iTweety,isTDisjoint(tEmu))))),
-	tryGoal(not(deduce_M(isa(iTweety,isTDisjoint(tCuckoo))))),
+	tryGoal(not(deduce_M(isa(iTweety,isTDisjointFn(tEmu))))),
+	tryGoal(not(deduce_M(isa(iTweety,isTDisjointFn(tCuckoo))))),
 	tryGoal(not(deduce_M(isa(iTweety,tEmu)))),
 	tryGoal(not(deduce_M(isa(iTweety,tCuckoo)))),
 	tryGoal(consistent_M([])).
 testMotelExample(63) :-
 	tryGoal(deduce_M(isa(iTweety,tCanFly))),
 	tryGoal(deduce_M(isa(iTweety,tCanNest))),
-	tryGoal(deduce_M(isa(iTweety,isTDisjoint(tEmu)))),
-	tryGoal(deduce_M(isa(iTweety,isTDisjoint(tCuckoo)))),
+	tryGoal(deduce_M(isa(iTweety,isTDisjointFn(tEmu)))),
+	tryGoal(deduce_M(isa(iTweety,isTDisjointFn(tCuckoo)))),
 	tryGoal(deduce_M(isa(iTweety,sparrow))),
 	tryGoal(consistent_M([])).
 
@@ -14461,7 +14461,7 @@ tryGoalF(G) :- !. % print('Goal '), print(G), print(' succeeded_Not'), nl.
  *
  * verifySolution(+TestSol,+ExpectedSol)
  *
- *	prints an error message if TestSol and ExpectedSol do isTDisjoint
+ *	prints an error message if TestSol and ExpectedSol do isTDisjointFn
  *	match.
  */
 
@@ -14489,7 +14489,7 @@ user:term_expansion(X,Y):-term_expansion_M,term_expansion_M(X,Y).
 :-asserta(in_motel_kb(fssKB)).
 
 makeEnvironment(fssKB,"What means fss?").
-defconcept(fssKB,[],tBOT,isTDisjoint(tTOP)).
+defconcept(fssKB,[],tBOT,isTDisjointFn(tTOP)).
 defconcept(fssKB,[],taeglich,andM([daily,lexicon])).
 defconcept(fssKB,[],monat,andM([monthly,lexicon])).
 defconcept(fssKB,[],d,andM([determiner,lexicon])).
@@ -14595,81 +14595,81 @@ defconcept(fssKB,[],buch,andM([lexicon,touchable_object])).
 defconcept(fssKB,[],auktion,andM([lexicon,thing])).
 defconcept(fssKB,[],was,andM([lexicon,thing])).
 defprimconcept(fssKB,[],lexicon,sbone).
-defprimconcept(fssKB,[],isTDisjoint(sbone),isTDisjoint(lexicon)).
+defprimconcept(fssKB,[],isTDisjointFn(sbone),isTDisjointFn(lexicon)).
 defprimconcept(fssKB,[],fss,sbone).
-defprimconcept(fssKB,[],isTDisjoint(sbone),isTDisjoint(fss)).
+defprimconcept(fssKB,[],isTDisjointFn(sbone),isTDisjointFn(fss)).
 defprimconcept(fssKB,[],pointing,fss).
-defprimconcept(fssKB,[],isTDisjoint(fss),isTDisjoint(pointing)).
+defprimconcept(fssKB,[],isTDisjointFn(fss),isTDisjointFn(pointing)).
 defprimconcept(fssKB,[],vague_p,pointing).
-defprimconcept(fssKB,[],isTDisjoint(pointing),isTDisjoint(vague_p)).
+defprimconcept(fssKB,[],isTDisjointFn(pointing),isTDisjointFn(vague_p)).
 defprimconcept(fssKB,[],standard_p,pointing).
-defprimconcept(fssKB,[],isTDisjoint(pointing),isTDisjoint(standard_p)).
+defprimconcept(fssKB,[],isTDisjointFn(pointing),isTDisjointFn(standard_p)).
 defprimconcept(fssKB,[],encircling_p,pointing).
-defprimconcept(fssKB,[],isTDisjoint(pointing),isTDisjoint(encircling_p)).
+defprimconcept(fssKB,[],isTDisjointFn(pointing),isTDisjointFn(encircling_p)).
 defprimconcept(fssKB,[],exact_p,pointing).
-defprimconcept(fssKB,[],isTDisjoint(pointing),isTDisjoint(exact_p)).
+defprimconcept(fssKB,[],isTDisjointFn(pointing),isTDisjointFn(exact_p)).
 defprimconcept(fssKB,[],time,fss).
-defprimconcept(fssKB,[],isTDisjoint(fss),isTDisjoint(time)).
+defprimconcept(fssKB,[],isTDisjointFn(fss),isTDisjointFn(time)).
 defprimconcept(fssKB,[],moment,time).
-defprimconcept(fssKB,[],isTDisjoint(time),isTDisjoint(moment)).
+defprimconcept(fssKB,[],isTDisjointFn(time),isTDisjointFn(moment)).
 defprimconcept(fssKB,[],period,time).
-defprimconcept(fssKB,[],isTDisjoint(time),isTDisjoint(period)).
+defprimconcept(fssKB,[],isTDisjointFn(time),isTDisjointFn(period)).
 defprimconcept(fssKB,[],interval,time).
-defprimconcept(fssKB,[],isTDisjoint(time),isTDisjoint(interval)).
+defprimconcept(fssKB,[],isTDisjointFn(time),isTDisjointFn(interval)).
 defprimconcept(fssKB,[],yearly,interval).
-defprimconcept(fssKB,[],isTDisjoint(interval),isTDisjoint(yearly)).
+defprimconcept(fssKB,[],isTDisjointFn(interval),isTDisjointFn(yearly)).
 defprimconcept(fssKB,[],jaehrlich,yearly).
-defprimconcept(fssKB,[],isTDisjoint(yearly),isTDisjoint(jaehrlich)).
+defprimconcept(fssKB,[],isTDisjointFn(yearly),isTDisjointFn(jaehrlich)).
 defprimconcept(fssKB,[],jaehrlich,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(jaehrlich)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(jaehrlich)).
 defprimconcept(fssKB,[],weekly,interval).
-defprimconcept(fssKB,[],isTDisjoint(interval),isTDisjoint(weekly)).
+defprimconcept(fssKB,[],isTDisjointFn(interval),isTDisjointFn(weekly)).
 defprimconcept(fssKB,[],woechentlich,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(woechentlich)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(woechentlich)).
 defprimconcept(fssKB,[],woechentlich,weekly).
-defprimconcept(fssKB,[],isTDisjoint(weekly),isTDisjoint(woechentlich)).
+defprimconcept(fssKB,[],isTDisjointFn(weekly),isTDisjointFn(woechentlich)).
 defprimconcept(fssKB,[],daily,interval).
-defprimconcept(fssKB,[],isTDisjoint(interval),isTDisjoint(daily)).
+defprimconcept(fssKB,[],isTDisjointFn(interval),isTDisjointFn(daily)).
 defprimconcept(fssKB,[],monthly,interval).
-defprimconcept(fssKB,[],isTDisjoint(interval),isTDisjoint(monthly)).
+defprimconcept(fssKB,[],isTDisjointFn(interval),isTDisjointFn(monthly)).
 defprimconcept(fssKB,[],speech_act,fss).
-defprimconcept(fssKB,[],isTDisjoint(fss),isTDisjoint(speech_act)).
+defprimconcept(fssKB,[],isTDisjointFn(fss),isTDisjointFn(speech_act)).
 defprimconcept(fssKB,[],order,speech_act).
-defprimconcept(fssKB,[],isTDisjoint(speech_act),isTDisjoint(order)).
+defprimconcept(fssKB,[],isTDisjointFn(speech_act),isTDisjointFn(order)).
 defprimconcept(fssKB,[],assertion,speech_act).
-defprimconcept(fssKB,[],isTDisjoint(speech_act),isTDisjoint(assertion)).
+defprimconcept(fssKB,[],isTDisjointFn(speech_act),isTDisjointFn(assertion)).
 defprimconcept(fssKB,[],question,speech_act).
-defprimconcept(fssKB,[],isTDisjoint(speech_act),isTDisjoint(question)).
+defprimconcept(fssKB,[],isTDisjointFn(speech_act),isTDisjointFn(question)).
 defprimconcept(fssKB,[],interjection,speech_act).
-defprimconcept(fssKB,[],isTDisjoint(speech_act),isTDisjoint(interjection)).
+defprimconcept(fssKB,[],isTDisjointFn(speech_act),isTDisjointFn(interjection)).
 defprimconcept(fssKB,[],determiner,fss).
-defprimconcept(fssKB,[],isTDisjoint(fss),isTDisjoint(determiner)).
+defprimconcept(fssKB,[],isTDisjointFn(fss),isTDisjointFn(determiner)).
 defprimconcept(fssKB,[],indefinite,determiner).
-defprimconcept(fssKB,[],isTDisjoint(determiner),isTDisjoint(indefinite)).
+defprimconcept(fssKB,[],isTDisjointFn(determiner),isTDisjointFn(indefinite)).
 defprimconcept(fssKB,[],cardinal,indefinite).
-defprimconcept(fssKB,[],isTDisjoint(indefinite),isTDisjoint(cardinal)).
+defprimconcept(fssKB,[],isTDisjointFn(indefinite),isTDisjointFn(cardinal)).
 defprimconcept(fssKB,[],number50,cardinal).
-defprimconcept(fssKB,[],isTDisjoint(cardinal),isTDisjoint(number50)).
+defprimconcept(fssKB,[],isTDisjointFn(cardinal),isTDisjointFn(number50)).
 defprimconcept(fssKB,[],number50,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(number50)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(number50)).
 defprimconcept(fssKB,[],interrogative,determiner).
-defprimconcept(fssKB,[],isTDisjoint(determiner),isTDisjoint(interrogative)).
+defprimconcept(fssKB,[],isTDisjointFn(determiner),isTDisjointFn(interrogative)).
 defprimconcept(fssKB,[],definite,determiner).
-defprimconcept(fssKB,[],isTDisjoint(determiner),isTDisjoint(definite)).
+defprimconcept(fssKB,[],isTDisjointFn(determiner),isTDisjointFn(definite)).
 defprimconcept(fssKB,[],demonstrative,definite).
-defprimconcept(fssKB,[],isTDisjoint(definite),isTDisjoint(demonstrative)).
+defprimconcept(fssKB,[],isTDisjointFn(definite),isTDisjointFn(demonstrative)).
 defprimconcept(fssKB,[],possessive,definite).
-defprimconcept(fssKB,[],isTDisjoint(definite),isTDisjoint(possessive)).
+defprimconcept(fssKB,[],isTDisjointFn(definite),isTDisjointFn(possessive)).
 defprimconcept(fssKB,[],property_filler,fss).
-defprimconcept(fssKB,[],isTDisjoint(fss),isTDisjoint(property_filler)).
+defprimconcept(fssKB,[],isTDisjointFn(fss),isTDisjointFn(property_filler)).
 defprimconcept(fssKB,[],adjective_property,property_filler).
-defprimconcept(fssKB,[],isTDisjoint(property_filler),isTDisjoint(adjective_property)).
+defprimconcept(fssKB,[],isTDisjointFn(property_filler),isTDisjointFn(adjective_property)).
 
 defprimconcept(fssKB,[],truth_value,adjective_property).
 defprimconcept(fssKB,[],someM(isMudInverseFn(truth_mod),tTOP),truth_value).
-defprimconcept(fssKB,[],isTDisjoint(truth_value),allM(isMudInverseFn(truth_mod),isTDisjoint(tTOP))).
-defprimconcept(fssKB,[],isTDisjoint(adjective_property),isTDisjoint(truth_value)).
-defprimconcept(fssKB,[],allM(truth_mod,isTDisjoint(tTOP)),isTDisjoint(abstract_thing)).
+defprimconcept(fssKB,[],isTDisjointFn(truth_value),allM(isMudInverseFn(truth_mod),isTDisjointFn(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(adjective_property),isTDisjointFn(truth_value)).
+defprimconcept(fssKB,[],allM(truth_mod,isTDisjointFn(tTOP)),isTDisjointFn(abstract_thing)).
 defprimconcept(fssKB,[],abstract_thing,someM(truth_mod,tTOP)).
 defconcept(fssKB,[],concept12,andM([atleast(1,truth_mod),atmost(1,truth_mod)])).
 assert(roleDomain(env(fssKB),[],truth_mod,abstract_thing)).
@@ -14679,323 +14679,323 @@ assert(roleDefault(env(fssKB),[],truth_mod,tBOT)).
 
 
 defprimconcept(fssKB,[],name,abstract_thing).
-defprimconcept(fssKB,[],isTDisjoint(abstract_thing),isTDisjoint(name)).
+defprimconcept(fssKB,[],isTDisjointFn(abstract_thing),isTDisjointFn(name)).
 defprimconcept(fssKB,[],thing,someM(det,tTOP)).
-defprimconcept(fssKB,[],allM(det,isTDisjoint(tTOP)),isTDisjoint(thing)).
+defprimconcept(fssKB,[],allM(det,isTDisjointFn(tTOP)),isTDisjointFn(thing)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(det),tTOP),determiner).
-defprimconcept(fssKB,[],isTDisjoint(determiner),allM(isMudInverseFn(det),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(determiner),allM(isMudInverseFn(det),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],thing,someM(deictic_mod,tTOP)).
-defprimconcept(fssKB,[],allM(deictic_mod,isTDisjoint(tTOP)),isTDisjoint(thing)).
+defprimconcept(fssKB,[],allM(deictic_mod,isTDisjointFn(tTOP)),isTDisjointFn(thing)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(deictic_mod),tTOP),pointing).
-defprimconcept(fssKB,[],isTDisjoint(pointing),allM(isMudInverseFn(deictic_mod),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(pointing),allM(isMudInverseFn(deictic_mod),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],thing,someM(named,tTOP)).
-defprimconcept(fssKB,[],allM(named,isTDisjoint(tTOP)),isTDisjoint(thing)).
+defprimconcept(fssKB,[],allM(named,isTDisjointFn(tTOP)),isTDisjointFn(thing)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(named),tTOP),name).
-defprimconcept(fssKB,[],isTDisjoint(name),allM(isMudInverseFn(named),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(name),allM(isMudInverseFn(named),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],predicate,someM(subject,tTOP)).
-defprimconcept(fssKB,[],allM(subject,isTDisjoint(tTOP)),isTDisjoint(predicate)).
+defprimconcept(fssKB,[],allM(subject,isTDisjointFn(tTOP)),isTDisjointFn(predicate)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(subject),tTOP),thing).
-defprimconcept(fssKB,[],isTDisjoint(thing),allM(isMudInverseFn(subject),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(thing),allM(isMudInverseFn(subject),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],predicate,someM(purpose,tTOP)).
-defprimconcept(fssKB,[],allM(purpose,isTDisjoint(tTOP)),isTDisjoint(predicate)).
+defprimconcept(fssKB,[],allM(purpose,isTDisjointFn(tTOP)),isTDisjointFn(predicate)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(purpose),tTOP),predicate).
-defprimconcept(fssKB,[],isTDisjoint(predicate),allM(isMudInverseFn(purpose),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(predicate),allM(isMudInverseFn(purpose),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],predicate,someM(time,tTOP)).
-defprimconcept(fssKB,[],allM(time,isTDisjoint(tTOP)),isTDisjoint(predicate)).
+defprimconcept(fssKB,[],allM(time,isTDisjointFn(tTOP)),isTDisjointFn(predicate)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(time),tTOP),time).
-defprimconcept(fssKB,[],isTDisjoint(time),allM(isMudInverseFn(time),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(time),allM(isMudInverseFn(time),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],predicate,someM(illoc,tTOP)).
-defprimconcept(fssKB,[],allM(illoc,isTDisjoint(tTOP)),isTDisjoint(predicate)).
+defprimconcept(fssKB,[],allM(illoc,isTDisjointFn(tTOP)),isTDisjointFn(predicate)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(illoc),tTOP),speech_act).
-defprimconcept(fssKB,[],isTDisjoint(speech_act),allM(isMudInverseFn(illoc),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(speech_act),allM(isMudInverseFn(illoc),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],predicate,someM(cause,tTOP)).
-defprimconcept(fssKB,[],allM(cause,isTDisjoint(tTOP)),isTDisjoint(predicate)).
+defprimconcept(fssKB,[],allM(cause,isTDisjointFn(tTOP)),isTDisjointFn(predicate)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(cause),tTOP),predicate).
-defprimconcept(fssKB,[],isTDisjoint(predicate),allM(isMudInverseFn(cause),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(predicate),allM(isMudInverseFn(cause),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],predicate,someM(result,tTOP)).
-defprimconcept(fssKB,[],allM(result,isTDisjoint(tTOP)),isTDisjoint(predicate)).
+defprimconcept(fssKB,[],allM(result,isTDisjointFn(tTOP)),isTDisjointFn(predicate)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(result),tTOP),thing).
-defprimconcept(fssKB,[],isTDisjoint(thing),allM(isMudInverseFn(result),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(thing),allM(isMudInverseFn(result),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],predicate,someM(location,tTOP)).
-defprimconcept(fssKB,[],allM(location,isTDisjoint(tTOP)),isTDisjoint(predicate)).
+defprimconcept(fssKB,[],allM(location,isTDisjointFn(tTOP)),isTDisjointFn(predicate)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(location),tTOP),thing).
-defprimconcept(fssKB,[],isTDisjoint(thing),allM(isMudInverseFn(location),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(thing),allM(isMudInverseFn(location),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],state,predicate).
-defprimconcept(fssKB,[],isTDisjoint(predicate),isTDisjoint(state)).
+defprimconcept(fssKB,[],isTDisjointFn(predicate),isTDisjointFn(state)).
 defprimconcept(fssKB,[],concept93,state).
-defprimconcept(fssKB,[],isTDisjoint(state),isTDisjoint(concept93)).
+defprimconcept(fssKB,[],isTDisjointFn(state),isTDisjointFn(concept93)).
 defprimconcept(fssKB,[],human,someM(volition,tTOP)).
-defprimconcept(fssKB,[],allM(volition,isTDisjoint(tTOP)),isTDisjoint(human)).
+defprimconcept(fssKB,[],allM(volition,isTDisjointFn(tTOP)),isTDisjointFn(human)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(volition),tTOP),volitional_sq).
-defprimconcept(fssKB,[],isTDisjoint(volitional_sq),allM(isMudInverseFn(volition),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(volitional_sq),allM(isMudInverseFn(volition),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],geographical_object,someM(origin_mod,tTOP)).
-defprimconcept(fssKB,[],allM(origin_mod,isTDisjoint(tTOP)),isTDisjoint(geographical_object)).
+defprimconcept(fssKB,[],allM(origin_mod,isTDisjointFn(tTOP)),isTDisjointFn(geographical_object)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(origin_mod),tTOP),origin).
-defprimconcept(fssKB,[],isTDisjoint(origin),allM(isMudInverseFn(origin_mod),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(origin),allM(isMudInverseFn(origin_mod),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],wohn,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(wohn)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(wohn)).
 defprimconcept(fssKB,[],wohn,state).
-defprimconcept(fssKB,[],isTDisjoint(state),isTDisjoint(wohn)).
+defprimconcept(fssKB,[],isTDisjointFn(state),isTDisjointFn(wohn)).
 defprimconcept(fssKB,[],concept111,wohn).
-defprimconcept(fssKB,[],isTDisjoint(wohn),isTDisjoint(concept111)).
+defprimconcept(fssKB,[],isTDisjointFn(wohn),isTDisjointFn(concept111)).
 defprimconcept(fssKB,[],concept113,wohn).
-defprimconcept(fssKB,[],isTDisjoint(wohn),isTDisjoint(concept113)).
+defprimconcept(fssKB,[],isTDisjointFn(wohn),isTDisjointFn(concept113)).
 defprimconcept(fssKB,[],qualitative,adjective_property).
-defprimconcept(fssKB,[],isTDisjoint(adjective_property),isTDisjoint(qualitative)).
+defprimconcept(fssKB,[],isTDisjointFn(adjective_property),isTDisjointFn(qualitative)).
 defprimconcept(fssKB,[],quality,qualitative).
-defprimconcept(fssKB,[],isTDisjoint(qualitative),isTDisjoint(quality)).
+defprimconcept(fssKB,[],isTDisjointFn(qualitative),isTDisjointFn(quality)).
 defprimconcept(fssKB,[],colour,quality).
-defprimconcept(fssKB,[],isTDisjoint(quality),isTDisjoint(colour)).
+defprimconcept(fssKB,[],isTDisjointFn(quality),isTDisjointFn(colour)).
 defprimconcept(fssKB,[],concrete_thing,someM(colour_mod,tTOP)).
-defprimconcept(fssKB,[],allM(colour_mod,isTDisjoint(tTOP)),isTDisjoint(concrete_thing)).
+defprimconcept(fssKB,[],allM(colour_mod,isTDisjointFn(tTOP)),isTDisjointFn(concrete_thing)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(colour_mod),tTOP),colour).
-defprimconcept(fssKB,[],isTDisjoint(colour),allM(isMudInverseFn(colour_mod),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(colour),allM(isMudInverseFn(colour_mod),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],relation,adjective_property).
-defprimconcept(fssKB,[],isTDisjoint(adjective_property),isTDisjoint(relation)).
+defprimconcept(fssKB,[],isTDisjointFn(adjective_property),isTDisjointFn(relation)).
 defprimconcept(fssKB,[],individual,someM(relative_mod,tTOP)).
-defprimconcept(fssKB,[],allM(relative_mod,isTDisjoint(tTOP)),isTDisjoint(individual)).
+defprimconcept(fssKB,[],allM(relative_mod,isTDisjointFn(tTOP)),isTDisjointFn(individual)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(relative_mod),tTOP),relation).
-defprimconcept(fssKB,[],isTDisjoint(relation),allM(isMudInverseFn(relative_mod),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(relation),allM(isMudInverseFn(relative_mod),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],material,mass_noun).
-defprimconcept(fssKB,[],isTDisjoint(mass_noun),isTDisjoint(material)).
+defprimconcept(fssKB,[],isTDisjointFn(mass_noun),isTDisjointFn(material)).
 defprimconcept(fssKB,[],inanimate,someM(material_mod,tTOP)).
-defprimconcept(fssKB,[],allM(material_mod,isTDisjoint(tTOP)),isTDisjoint(inanimate)).
+defprimconcept(fssKB,[],allM(material_mod,isTDisjointFn(tTOP)),isTDisjointFn(inanimate)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(material_mod),tTOP),material).
-defprimconcept(fssKB,[],isTDisjoint(material),allM(isMudInverseFn(material_mod),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(material),allM(isMudInverseFn(material_mod),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],weight,quality).
-defprimconcept(fssKB,[],isTDisjoint(quality),isTDisjoint(weight)).
+defprimconcept(fssKB,[],isTDisjointFn(quality),isTDisjointFn(weight)).
 defprimconcept(fssKB,[],touchable_object,someM(weight_mod,tTOP)).
-defprimconcept(fssKB,[],allM(weight_mod,isTDisjoint(tTOP)),isTDisjoint(touchable_object)).
+defprimconcept(fssKB,[],allM(weight_mod,isTDisjointFn(tTOP)),isTDisjointFn(touchable_object)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(weight_mod),tTOP),weight).
-defprimconcept(fssKB,[],isTDisjoint(weight),allM(isMudInverseFn(weight_mod),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(weight),allM(isMudInverseFn(weight_mod),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],action,someM(instrument,tTOP)).
-defprimconcept(fssKB,[],allM(instrument,isTDisjoint(tTOP)),isTDisjoint(action)).
+defprimconcept(fssKB,[],allM(instrument,isTDisjointFn(tTOP)),isTDisjointFn(action)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(instrument),tTOP),touchable_object).
-defprimconcept(fssKB,[],isTDisjoint(touchable_object),allM(isMudInverseFn(instrument),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(touchable_object),allM(isMudInverseFn(instrument),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],action,someM(concerned,tTOP)).
-defprimconcept(fssKB,[],allM(concerned,isTDisjoint(tTOP)),isTDisjoint(action)).
+defprimconcept(fssKB,[],allM(concerned,isTDisjointFn(tTOP)),isTDisjointFn(action)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(concerned),tTOP),thing).
-defprimconcept(fssKB,[],isTDisjoint(thing),allM(isMudInverseFn(concerned),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(thing),allM(isMudInverseFn(concerned),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],do,action).
-defprimconcept(fssKB,[],isTDisjoint(action),isTDisjoint(do)).
+defprimconcept(fssKB,[],isTDisjointFn(action),isTDisjointFn(do)).
 defprimconcept(fssKB,[],absetz,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(absetz)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(absetz)).
 defprimconcept(fssKB,[],absetz,do).
-defprimconcept(fssKB,[],isTDisjoint(do),isTDisjoint(absetz)).
+defprimconcept(fssKB,[],isTDisjointFn(do),isTDisjointFn(absetz)).
 defprimconcept(fssKB,[],ausfuehr,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(ausfuehr)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(ausfuehr)).
 defprimconcept(fssKB,[],ausfuehr,do).
-defprimconcept(fssKB,[],isTDisjoint(do),isTDisjoint(ausfuehr)).
+defprimconcept(fssKB,[],isTDisjointFn(do),isTDisjointFn(ausfuehr)).
 defprimconcept(fssKB,[],motion,someM(destination,tTOP)).
-defprimconcept(fssKB,[],allM(destination,isTDisjoint(tTOP)),isTDisjoint(motion)).
+defprimconcept(fssKB,[],allM(destination,isTDisjointFn(tTOP)),isTDisjointFn(motion)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(destination),tTOP),geographical_object).
-defprimconcept(fssKB,[],isTDisjoint(geographical_object),allM(isMudInverseFn(destination),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(geographical_object),allM(isMudInverseFn(destination),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],motion,someM(source,tTOP)).
-defprimconcept(fssKB,[],allM(source,isTDisjoint(tTOP)),isTDisjoint(motion)).
+defprimconcept(fssKB,[],allM(source,isTDisjointFn(tTOP)),isTDisjointFn(motion)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(source),tTOP),geographical_object).
-defprimconcept(fssKB,[],isTDisjoint(geographical_object),allM(isMudInverseFn(source),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(geographical_object),allM(isMudInverseFn(source),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],motion_by_means,someM(means,tTOP)).
-defprimconcept(fssKB,[],allM(means,isTDisjoint(tTOP)),isTDisjoint(motion_by_means)).
+defprimconcept(fssKB,[],allM(means,isTDisjointFn(tTOP)),isTDisjointFn(motion_by_means)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(means),tTOP),touchable_object).
-defprimconcept(fssKB,[],isTDisjoint(touchable_object),allM(isMudInverseFn(means),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(touchable_object),allM(isMudInverseFn(means),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],productive,someM(result,tTOP)).
-defprimconcept(fssKB,[],allM(result,isTDisjoint(tTOP)),isTDisjoint(productive)).
+defprimconcept(fssKB,[],allM(result,isTDisjointFn(tTOP)),isTDisjointFn(productive)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(result),tTOP),thing).
-defprimconcept(fssKB,[],isTDisjoint(thing),allM(isMudInverseFn(result),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(thing),allM(isMudInverseFn(result),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],write,someM(concerned,tTOP)).
-defprimconcept(fssKB,[],allM(concerned,isTDisjoint(tTOP)),isTDisjoint(write)).
+defprimconcept(fssKB,[],allM(concerned,isTDisjointFn(tTOP)),isTDisjointFn(write)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(concerned),tTOP),thing).
-defprimconcept(fssKB,[],isTDisjoint(thing),allM(isMudInverseFn(concerned),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(thing),allM(isMudInverseFn(concerned),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],canvas,touchable_object).
-defprimconcept(fssKB,[],isTDisjoint(touchable_object),isTDisjoint(canvas)).
+defprimconcept(fssKB,[],isTDisjointFn(touchable_object),isTDisjointFn(canvas)).
 defprimconcept(fssKB,[],repeat,action).
-defprimconcept(fssKB,[],isTDisjoint(action),isTDisjoint(repeat)).
+defprimconcept(fssKB,[],isTDisjointFn(action),isTDisjointFn(repeat)).
 defprimconcept(fssKB,[],wiederhol,repeat).
-defprimconcept(fssKB,[],isTDisjoint(repeat),isTDisjoint(wiederhol)).
+defprimconcept(fssKB,[],isTDisjointFn(repeat),isTDisjointFn(wiederhol)).
 defprimconcept(fssKB,[],wiederhol,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(wiederhol)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(wiederhol)).
 defprimconcept(fssKB,[],transaction,someM(beneficative,tTOP)).
-defprimconcept(fssKB,[],allM(beneficative,isTDisjoint(tTOP)),isTDisjoint(transaction)).
+defprimconcept(fssKB,[],allM(beneficative,isTDisjointFn(tTOP)),isTDisjointFn(transaction)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(beneficative),tTOP),human).
-defprimconcept(fssKB,[],isTDisjoint(human),allM(isMudInverseFn(beneficative),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(human),allM(isMudInverseFn(beneficative),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],zahl,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(zahl)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(zahl)).
 defprimconcept(fssKB,[],zahl,transaction).
-defprimconcept(fssKB,[],isTDisjoint(transaction),isTDisjoint(zahl)).
+defprimconcept(fssKB,[],isTDisjointFn(transaction),isTDisjointFn(zahl)).
 defprimconcept(fssKB,[],reason,action).
-defprimconcept(fssKB,[],isTDisjoint(action),isTDisjoint(reason)).
+defprimconcept(fssKB,[],isTDisjointFn(action),isTDisjointFn(reason)).
 defprimconcept(fssKB,[],verursach,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(verursach)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(verursach)).
 defprimconcept(fssKB,[],verursach,reason).
-defprimconcept(fssKB,[],isTDisjoint(reason),isTDisjoint(verursach)).
+defprimconcept(fssKB,[],isTDisjointFn(reason),isTDisjointFn(verursach)).
 defprimconcept(fssKB,[],property,predicate).
-defprimconcept(fssKB,[],isTDisjoint(predicate),isTDisjoint(property)).
+defprimconcept(fssKB,[],isTDisjointFn(predicate),isTDisjointFn(property)).
 defprimconcept(fssKB,[],property,someM(has_property,tTOP)).
-defprimconcept(fssKB,[],allM(has_property,isTDisjoint(tTOP)),isTDisjoint(property)).
+defprimconcept(fssKB,[],allM(has_property,isTDisjointFn(tTOP)),isTDisjointFn(property)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(has_property),tTOP),property_filler).
-defprimconcept(fssKB,[],isTDisjoint(property_filler),allM(isMudInverseFn(has_property),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(property_filler),allM(isMudInverseFn(has_property),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],value_property,someM(measure,tTOP)).
-defprimconcept(fssKB,[],allM(measure,isTDisjoint(tTOP)),isTDisjoint(value_property)).
+defprimconcept(fssKB,[],allM(measure,isTDisjointFn(tTOP)),isTDisjointFn(value_property)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(measure),tTOP),abstract_thing).
-defprimconcept(fssKB,[],isTDisjoint(abstract_thing),allM(isMudInverseFn(measure),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(abstract_thing),allM(isMudInverseFn(measure),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],cost,someM(measure,tTOP)).
-defprimconcept(fssKB,[],allM(measure,isTDisjoint(tTOP)),isTDisjoint(cost)).
+defprimconcept(fssKB,[],allM(measure,isTDisjointFn(tTOP)),isTDisjointFn(cost)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(measure),tTOP),abstract_thing).
-defprimconcept(fssKB,[],isTDisjoint(abstract_thing),allM(isMudInverseFn(measure),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(abstract_thing),allM(isMudInverseFn(measure),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],deducte,property).
-defprimconcept(fssKB,[],isTDisjoint(property),isTDisjoint(deducte)).
+defprimconcept(fssKB,[],isTDisjointFn(property),isTDisjointFn(deducte)).
 defprimconcept(fssKB,[],absetzbar,deducte).
-defprimconcept(fssKB,[],isTDisjoint(deducte),isTDisjoint(absetzbar)).
+defprimconcept(fssKB,[],isTDisjointFn(deducte),isTDisjointFn(absetzbar)).
 defprimconcept(fssKB,[],absetzbar,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(absetzbar)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(absetzbar)).
 defprimconcept(fssKB,[],sein,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(sein)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(sein)).
 defprimconcept(fssKB,[],sein,property).
-defprimconcept(fssKB,[],isTDisjoint(property),isTDisjoint(sein)).
+defprimconcept(fssKB,[],isTDisjointFn(property),isTDisjointFn(sein)).
 defprimconcept(fssKB,[],possess,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(possess)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(possess)).
 defprimconcept(fssKB,[],possess,property).
-defprimconcept(fssKB,[],isTDisjoint(property),isTDisjoint(possess)).
+defprimconcept(fssKB,[],isTDisjointFn(property),isTDisjointFn(possess)).
 defprimconcept(fssKB,[],haben,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(haben)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(haben)).
 defprimconcept(fssKB,[],haben,property).
-defprimconcept(fssKB,[],isTDisjoint(property),isTDisjoint(haben)).
+defprimconcept(fssKB,[],isTDisjointFn(property),isTDisjointFn(haben)).
 defprimconcept(fssKB,[],concept230,haben).
-defprimconcept(fssKB,[],isTDisjoint(haben),isTDisjoint(concept230)).
+defprimconcept(fssKB,[],isTDisjointFn(haben),isTDisjointFn(concept230)).
 defprimconcept(fssKB,[],origin,adjective_property).
-defprimconcept(fssKB,[],isTDisjoint(adjective_property),isTDisjoint(origin)).
+defprimconcept(fssKB,[],isTDisjointFn(adjective_property),isTDisjointFn(origin)).
 defprimconcept(fssKB,[],state_q,qualitative).
-defprimconcept(fssKB,[],isTDisjoint(qualitative),isTDisjoint(state_q)).
+defprimconcept(fssKB,[],isTDisjointFn(qualitative),isTDisjointFn(state_q)).
 defprimconcept(fssKB,[],volitional_sq,state_q).
-defprimconcept(fssKB,[],isTDisjoint(state_q),isTDisjoint(volitional_sq)).
+defprimconcept(fssKB,[],isTDisjointFn(state_q),isTDisjointFn(volitional_sq)).
 defprimconcept(fssKB,[],physical_sq,state_q).
-defprimconcept(fssKB,[],isTDisjoint(state_q),isTDisjoint(physical_sq)).
+defprimconcept(fssKB,[],isTDisjointFn(state_q),isTDisjointFn(physical_sq)).
 defprimconcept(fssKB,[],klein,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(klein)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(klein)).
 defprimconcept(fssKB,[],klein,physical_sq).
-defprimconcept(fssKB,[],isTDisjoint(physical_sq),isTDisjoint(klein)).
+defprimconcept(fssKB,[],isTDisjointFn(physical_sq),isTDisjointFn(klein)).
 defprimconcept(fssKB,[],gross,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(gross)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(gross)).
 defprimconcept(fssKB,[],gross,physical_sq).
-defprimconcept(fssKB,[],isTDisjoint(physical_sq),isTDisjoint(gross)).
+defprimconcept(fssKB,[],isTDisjointFn(physical_sq),isTDisjointFn(gross)).
 defprimconcept(fssKB,[],rot,colour).
-defprimconcept(fssKB,[],isTDisjoint(colour),isTDisjoint(rot)).
+defprimconcept(fssKB,[],isTDisjointFn(colour),isTDisjointFn(rot)).
 defprimconcept(fssKB,[],rot,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(rot)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(rot)).
 defprimconcept(fssKB,[],worth,quality).
-defprimconcept(fssKB,[],isTDisjoint(quality),isTDisjoint(worth)).
+defprimconcept(fssKB,[],isTDisjointFn(quality),isTDisjointFn(worth)).
 defprimconcept(fssKB,[],voelklingen,name).
-defprimconcept(fssKB,[],isTDisjoint(name),isTDisjoint(voelklingen)).
+defprimconcept(fssKB,[],isTDisjointFn(name),isTDisjointFn(voelklingen)).
 defprimconcept(fssKB,[],gi,abstract_thing).
-defprimconcept(fssKB,[],isTDisjoint(abstract_thing),isTDisjoint(gi)).
+defprimconcept(fssKB,[],isTDisjointFn(abstract_thing),isTDisjointFn(gi)).
 defprimconcept(fssKB,[],gi,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(gi)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(gi)).
 defprimconcept(fssKB,[],profession,abstract_thing).
-defprimconcept(fssKB,[],isTDisjoint(abstract_thing),isTDisjoint(profession)).
+defprimconcept(fssKB,[],isTDisjointFn(abstract_thing),isTDisjointFn(profession)).
 defprimconcept(fssKB,[],schreiner,profession).
-defprimconcept(fssKB,[],isTDisjoint(profession),isTDisjoint(schreiner)).
+defprimconcept(fssKB,[],isTDisjointFn(profession),isTDisjointFn(schreiner)).
 defprimconcept(fssKB,[],schreiner,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(schreiner)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(schreiner)).
 defprimconcept(fssKB,[],programmer,profession).
-defprimconcept(fssKB,[],isTDisjoint(profession),isTDisjoint(programmer)).
+defprimconcept(fssKB,[],isTDisjointFn(profession),isTDisjointFn(programmer)).
 defprimconcept(fssKB,[],programmer,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(programmer)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(programmer)).
 defprimconcept(fssKB,[],action_content,abstract_thing).
-defprimconcept(fssKB,[],isTDisjoint(abstract_thing),isTDisjoint(action_content)).
+defprimconcept(fssKB,[],isTDisjointFn(abstract_thing),isTDisjointFn(action_content)).
 defprimconcept(fssKB,[],action_content,action).
-defprimconcept(fssKB,[],isTDisjoint(action),isTDisjoint(action_content)).
+defprimconcept(fssKB,[],isTDisjointFn(action),isTDisjointFn(action_content)).
 defprimconcept(fssKB,[],motion_content,action_content).
-defprimconcept(fssKB,[],isTDisjoint(action_content),isTDisjoint(motion_content)).
+defprimconcept(fssKB,[],isTDisjointFn(action_content),isTDisjointFn(motion_content)).
 defprimconcept(fssKB,[],motion_content,motion).
-defprimconcept(fssKB,[],isTDisjoint(motion),isTDisjoint(motion_content)).
+defprimconcept(fssKB,[],isTDisjointFn(motion),isTDisjointFn(motion_content)).
 defprimconcept(fssKB,[],motion_by_means_content,motion_by_means).
-defprimconcept(fssKB,[],isTDisjoint(motion_by_means),isTDisjoint(motion_by_means_content)).
+defprimconcept(fssKB,[],isTDisjointFn(motion_by_means),isTDisjointFn(motion_by_means_content)).
 defprimconcept(fssKB,[],motion_by_means_content,action_content).
-defprimconcept(fssKB,[],isTDisjoint(action_content),isTDisjoint(motion_by_means_content)).
+defprimconcept(fssKB,[],isTDisjointFn(action_content),isTDisjointFn(motion_by_means_content)).
 defprimconcept(fssKB,[],cost,abstract_thing).
-defprimconcept(fssKB,[],isTDisjoint(abstract_thing),isTDisjoint(cost)).
+defprimconcept(fssKB,[],isTDisjointFn(abstract_thing),isTDisjointFn(cost)).
 defprimconcept(fssKB,[],kosten,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(kosten)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(kosten)).
 defprimconcept(fssKB,[],kosten,cost).
-defprimconcept(fssKB,[],isTDisjoint(cost),isTDisjoint(kosten)).
+defprimconcept(fssKB,[],isTDisjointFn(cost),isTDisjointFn(kosten)).
 defprimconcept(fssKB,[],geld,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(geld)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(geld)).
 defprimconcept(fssKB,[],geld,cost).
-defprimconcept(fssKB,[],isTDisjoint(cost),isTDisjoint(geld)).
+defprimconcept(fssKB,[],isTDisjointFn(cost),isTDisjointFn(geld)).
 defprimconcept(fssKB,[],profession,abstract_thing).
-defprimconcept(fssKB,[],isTDisjoint(abstract_thing),isTDisjoint(profession)).
+defprimconcept(fssKB,[],isTDisjointFn(abstract_thing),isTDisjointFn(profession)).
 defprimconcept(fssKB,[],programmer,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(programmer)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(programmer)).
 defprimconcept(fssKB,[],programmer,profession).
-defprimconcept(fssKB,[],isTDisjoint(profession),isTDisjoint(programmer)).
+defprimconcept(fssKB,[],isTDisjointFn(profession),isTDisjointFn(programmer)).
 defprimconcept(fssKB,[],tax_action,abstract_thing).
-defprimconcept(fssKB,[],isTDisjoint(abstract_thing),isTDisjoint(tax_action)).
+defprimconcept(fssKB,[],isTDisjointFn(abstract_thing),isTDisjointFn(tax_action)).
 defprimconcept(fssKB,[],steuerhandlung,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(steuerhandlung)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(steuerhandlung)).
 defprimconcept(fssKB,[],steuerhandlung,tax_action).
-defprimconcept(fssKB,[],isTDisjoint(tax_action),isTDisjoint(steuerhandlung)).
+defprimconcept(fssKB,[],isTDisjointFn(tax_action),isTDisjointFn(steuerhandlung)).
 defprimconcept(fssKB,[],number,abstract_thing).
-defprimconcept(fssKB,[],isTDisjoint(abstract_thing),isTDisjoint(number)).
+defprimconcept(fssKB,[],isTDisjointFn(abstract_thing),isTDisjointFn(number)).
 defprimconcept(fssKB,[],animate,someM(physis_mod,tTOP)).
-defprimconcept(fssKB,[],allM(physis_mod,isTDisjoint(tTOP)),isTDisjoint(animate)).
+defprimconcept(fssKB,[],allM(physis_mod,isTDisjointFn(tTOP)),isTDisjointFn(animate)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(physis_mod),tTOP),physical_sq).
-defprimconcept(fssKB,[],isTDisjoint(physical_sq),allM(isMudInverseFn(physis_mod),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(physical_sq),allM(isMudInverseFn(physis_mod),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],frau,human).
-defprimconcept(fssKB,[],isTDisjoint(human),isTDisjoint(frau)).
+defprimconcept(fssKB,[],isTDisjointFn(human),isTDisjointFn(frau)).
 defprimconcept(fssKB,[],frau,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(frau)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(frau)).
 defprimconcept(fssKB,[],sie,human).
-defprimconcept(fssKB,[],isTDisjoint(human),isTDisjoint(sie)).
+defprimconcept(fssKB,[],isTDisjointFn(human),isTDisjointFn(sie)).
 defprimconcept(fssKB,[],sie,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(sie)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(sie)).
 defprimconcept(fssKB,[],sie,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(sie)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(sie)).
 defprimconcept(fssKB,[],sie,human).
-defprimconcept(fssKB,[],isTDisjoint(human),isTDisjoint(sie)).
+defprimconcept(fssKB,[],isTDisjointFn(human),isTDisjointFn(sie)).
 defprimconcept(fssKB,[],person,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(person)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(person)).
 defprimconcept(fssKB,[],person,human).
-defprimconcept(fssKB,[],isTDisjoint(human),isTDisjoint(person)).
+defprimconcept(fssKB,[],isTDisjointFn(human),isTDisjointFn(person)).
 defprimconcept(fssKB,[],plant,animate).
-defprimconcept(fssKB,[],isTDisjoint(animate),isTDisjoint(plant)).
+defprimconcept(fssKB,[],isTDisjointFn(animate),isTDisjointFn(plant)).
 defprimconcept(fssKB,[],animal,someM(volition,tTOP)).
-defprimconcept(fssKB,[],allM(volition,isTDisjoint(tTOP)),isTDisjoint(animal)).
+defprimconcept(fssKB,[],allM(volition,isTDisjointFn(tTOP)),isTDisjointFn(animal)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(volition),tTOP),volitional_sq).
-defprimconcept(fssKB,[],isTDisjoint(volitional_sq),allM(isMudInverseFn(volition),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(volitional_sq),allM(isMudInverseFn(volition),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],town,geographical_object).
-defprimconcept(fssKB,[],isTDisjoint(geographical_object),isTDisjoint(town)).
+defprimconcept(fssKB,[],isTDisjointFn(geographical_object),isTDisjointFn(town)).
 defprimconcept(fssKB,[],berlin,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(berlin)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(berlin)).
 defprimconcept(fssKB,[],berlin,town).
-defprimconcept(fssKB,[],isTDisjoint(town),isTDisjoint(berlin)).
+defprimconcept(fssKB,[],isTDisjointFn(town),isTDisjointFn(berlin)).
 defprimconcept(fssKB,[],information,inanimate).
-defprimconcept(fssKB,[],isTDisjoint(inanimate),isTDisjoint(information)).
+defprimconcept(fssKB,[],isTDisjointFn(inanimate),isTDisjointFn(information)).
 defprimconcept(fssKB,[],string,information).
-defprimconcept(fssKB,[],isTDisjoint(information),isTDisjoint(string)).
+defprimconcept(fssKB,[],isTDisjointFn(information),isTDisjointFn(string)).
 defprimconcept(fssKB,[],system,human).
-defprimconcept(fssKB,[],isTDisjoint(human),isTDisjoint(system)).
+defprimconcept(fssKB,[],isTDisjointFn(human),isTDisjointFn(system)).
 defprimconcept(fssKB,[],system,inanimate).
-defprimconcept(fssKB,[],isTDisjoint(inanimate),isTDisjoint(system)).
+defprimconcept(fssKB,[],isTDisjointFn(inanimate),isTDisjointFn(system)).
 defprimconcept(fssKB,[],vehicle,someM(worth_mod,tTOP)).
-defprimconcept(fssKB,[],allM(worth_mod,isTDisjoint(tTOP)),isTDisjoint(vehicle)).
+defprimconcept(fssKB,[],allM(worth_mod,isTDisjointFn(tTOP)),isTDisjointFn(vehicle)).
 defprimconcept(fssKB,[],someM(isMudInverseFn(worth_mod),tTOP),worth).
-defprimconcept(fssKB,[],isTDisjoint(worth),allM(isMudInverseFn(worth_mod),isTDisjoint(tTOP))).
+defprimconcept(fssKB,[],isTDisjointFn(worth),allM(isMudInverseFn(worth_mod),isTDisjointFn(tTOP))).
 defprimconcept(fssKB,[],bus,vehicle).
-defprimconcept(fssKB,[],isTDisjoint(vehicle),isTDisjoint(bus)).
+defprimconcept(fssKB,[],isTDisjointFn(vehicle),isTDisjointFn(bus)).
 defprimconcept(fssKB,[],motorcycle,vehicle).
-defprimconcept(fssKB,[],isTDisjoint(vehicle),isTDisjoint(motorcycle)).
+defprimconcept(fssKB,[],isTDisjointFn(vehicle),isTDisjointFn(motorcycle)).
 defprimconcept(fssKB,[],motorcycle,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(motorcycle)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(motorcycle)).
 defprimconcept(fssKB,[],motorcycle,vehicle).
-defprimconcept(fssKB,[],isTDisjoint(vehicle),isTDisjoint(motorcycle)).
+defprimconcept(fssKB,[],isTDisjointFn(vehicle),isTDisjointFn(motorcycle)).
 defprimconcept(fssKB,[],motorcycle,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(motorcycle)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(motorcycle)).
 defprimconcept(fssKB,[],spellbook,lexicon).
-defprimconcept(fssKB,[],isTDisjoint(lexicon),isTDisjoint(spellbook)).
+defprimconcept(fssKB,[],isTDisjointFn(lexicon),isTDisjointFn(spellbook)).
 defprimconcept(fssKB,[],spellbook,touchable_object).
-defprimconcept(fssKB,[],isTDisjoint(touchable_object),isTDisjoint(spellbook)).
+defprimconcept(fssKB,[],isTDisjointFn(touchable_object),isTDisjointFn(spellbook)).
 defprimconcept(fssKB,[],result,touchable_object).
-defprimconcept(fssKB,[],isTDisjoint(touchable_object),isTDisjoint(result)).
+defprimconcept(fssKB,[],isTDisjointFn(touchable_object),isTDisjointFn(result)).
 defrole(fssKB,[],time_state,restr(time,period)).
 defrole(fssKB,[],agent,restr(subject,human)).
 defrole(fssKB,[],location_wohn,restr(location,geographical_object)).
@@ -15395,7 +15395,7 @@ assert(roleRange(env(fssKB),[],worth_mod,worth)).
 :- nl, nl.
 :- initializeMotel.
 
-isTDisjoint(G):-not(G).
+isTDisjointFn(G):-not(G).
 
 
 % :-testMotel.
@@ -15409,13 +15409,13 @@ isTDisjoint(G):-not(G).
 
 :-forall(user:hasInstance_dyn(T,I),show_call(must(assert_ind(I,T)))).
 :-forall(is_asserted(typeSubclass(C1,C2)),show_call(must(defconcept(C1,C2)))).
-:-forall(is_asserted(disjointWith0(C1,C2)),show_call(must(defconcept(C1,isTDisjoint(C2))))).
+:-forall(is_asserted(disjointWith0(C1,C2)),show_call(must(defconcept(C1,isTDisjointFn(C2))))).
 
 mudIsa_motel(ttObjectType,ttObjectType).
-mudIsa_motel(I,T):-no_repeats_av(deduce_M(isa(I,T))),I\=ttObjectType,I\==isTDisjoint(tBOT),I\==tTOP,T\=isTDisjoint(tBOT),T\==tTOP.
+mudIsa_motel(I,T):-no_repeats_av(deduce_M(isa(I,T))),I\=ttObjectType,I\==isTDisjointFn(tBOT),I\==tTOP,T\=isTDisjointFn(tBOT),T\==tTOP.
 
 motel_literal_assert_retract(typeSubclass(X,Y),defprimconcept(X,Y),undefprimconcept(X,Y)).
-motel_literal_assert_retract(disjointWith(X,Y),sb_disjoint(X,Y),undefprimconcept(X,isTDisjoint(Y))).
+motel_literal_assert_retract(disjointWith(X,Y),sb_disjoint(X,Y),undefprimconcept(X,isTDisjointFn(Y))).
 motel_literal_assert_retract(isa(X,Y),assert_ind(X,Y),delete_ind(X,Y)).
 
 %OLD user:decl_database_hook(OP,FACT):-motel_user_decl_database_hook(OP,FACT).
@@ -15428,7 +15428,7 @@ motel_user_decl_database_hook(change( retract,_),Lit):-motel_literal_assert_retr
 
 
 mudIsa_motel(tCol,tCol).
-mudIsa_motel(I,T):-no_repeats_av(deduce_M(isa(I,T))),I\=tCol,I\==isTDisjoint(tBOT),I\==tTOP,T\==isTDisjoint(tBOT),T\==tTOP.
+mudIsa_motel(I,T):-no_repeats_av(deduce_M(isa(I,T))),I\=tCol,I\==isTDisjointFn(tBOT),I\==tTOP,T\==isTDisjointFn(tBOT),T\==tTOP.
 
 
 
