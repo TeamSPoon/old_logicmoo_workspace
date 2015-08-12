@@ -53,22 +53,22 @@ get_pifunctor(Head,PHead,F,A):-var(Head),!,sanity(atom(F)),must(ensure_arity(F,A
 get_pifunctor(Head,PHead,F,A):-get_functor(Head,F,A),functor(PHead,F,A),ignore(PHead=Head),!.
 get_pifunctor(Head,PHead,F,A):-atom(Head),ensure_arity(Head,A),!,get_pifunctor(Head/A,PHead,F,A).
 
-rescan_meta_argtypes(MT):- functor(MT,F,A),functor(M,F,A),MT=..[F|TARGS],M=..[F|ARGS],forall(clause_asserted(M,_),maplist(deduceEachArg_WithType,ARGS,ARGST)),!.
-rescan_argIsa(F,N,Type):- ignore(( arity(F,A), functor(MT,F,A),functor(M,F,A),forall((clause_asserted(M,_),arg(N,M,E)),deduceEachArg_WithType(E,Type)))),!.
+rescan_meta_argtypes(MT):- functor(MT,F,A),functor(M,F,A),MT=..[F|ARGST],M=..[F|ARGS],forall(clause_asserted(M,_),maplist(deduceEachArg_WithType,ARGS,ARGST)),!.
+rescan_argIsa(F,N,Type):- ignore(( arity(F,A), functor(M,F,A),forall((clause_asserted(M,_),arg(N,M,E)),deduceEachArg_WithType(E,Type)))),!.
 
 deduceEachArgType(Var):- \+ compound(Var),!.
 deduceEachArgType(meta_argtypes(MT)):- !, rescan_meta_argtypes(MT).
 deduceEachArgType(tRelation(M)):-compound(M),functor(M,F,A),add(meta_argtypes(M)),add(tRelation(F)),add(arity(F,A)).
 deduceEachArgType(M):-functor(M,F,A),M=..[F|ARGS],deduceEachArgType(F,A,ARGS).
 deduceEachArgType(F,_,_):-var(F),!.
-deduceEachArgType(argIsa,3,[F,N,Type]):-!.
-deduceEachArgType(argIsa,3,[F,N,Type]):- ttFormatType(Type),add(argQuotedIsa(F,N,Type)),!.
+deduceEachArgType(argIsa,3,[_F,_N,_Type]):-!.
+% deduceEachArgType(argIsa,3,[F,N,Type]):- ttFormatType(Type),add(argQuotedIsa(F,N,Type)),!.
 deduceEachArgType(argIsa,3,[F,N,Type]):- rescan_argIsa(F,N,Type),fail.
 deduceEachArgType(t,_,[F|_]):-var(F),!.
 deduceEachArgType(F,_,[E]):- tCol(F),deduceEachArg_WithType(E,F),!.
 deduceEachArgType(t,A,[F|ARGS]):-A2 is A-1, deduceEachArgType(F,A2,ARGS).
 deduceEachArgType(F,A,ARGS):-functor(MT,F,A),meta_argtypes(MT),if_main(dmsg(deduceEachArgType(F,ARGS,ARGST))),MT =..[_|ARGST],maplist(deduceEachArg_WithType,ARGS,ARGST).
-deduceEachArgType(F,A,ARGS):-deduceEachArg_WithArgIsa(F,1,ARGS).
+deduceEachArgType(F,_,ARGS):-deduceEachArg_WithArgIsa(F,1,ARGS).
 
 if_main(G):-thread_self(main)->G,true.
 
@@ -81,7 +81,7 @@ deduceEachArg_WithType(M,tSpatialThing):-isa(M,tSpatialThing),!.
 deduceEachArg_WithType(M,tTemporalhing):-isa(M,tTemporalhing),!.
 deduceEachArg_WithType(M,M):-!.
 deduceEachArg_WithType(M,MT):- compound(M),!, (compound(MT)->(( M =..ARGS,MT =..ARGST,maplist(deduceEachArg_WithType,ARGS,ARGST))); true).
-deduceEachArg_WithType(M,MT):- (MT=ftTerm;ttFormatType(MT)),!.
+deduceEachArg_WithType(_,MT):- (MT=ftTerm;ttFormatType(MT)),!.
 deduceEachArg_WithType(M,MT):-isa(M,MT),!.
 deduceEachArg_WithType(M,MT):- assert_isa_safe(M,MT),!.
 
@@ -327,7 +327,7 @@ add_0(A):- is_ftVar(A),!,trace_or_throw(var_add(A)).
 add_0(((H1,H2):-B)):-!,add_0((H1:-B)),add_0((H2:-B)).
 add_0(((H1,H2))):-!,add_0((H1)),add_0((H2)).
 add_0(dynamic(Term)):- !,must(get_arity(Term,F,A)), must(dynamic(F/A)).
-add_0(A):- A =(:-(Term)), !, must(add_fast(A)).
+add_0(A):- A =(:-(_Term)), !, must(add_fast(A)).
 % add_0(C0):-check_override(add(C0)),!.
 % add_0(Skipped):- ground(Skipped),implied_skipped(Skipped),!. % ,dmsg(implied_skipped(Skipped)).
 %add_0(C0):- ignore((ground(C0),asserta(user:already_added_this_round(C0)))),!,must(pfc_add_fast(C0)),!.

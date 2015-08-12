@@ -4,7 +4,7 @@
 
 %  tlbugger:attributedVars.
 
-:- export(must_not_repeat/1).
+:- swi_export(must_not_repeat/1).
 :-meta_predicate(must_not_repeat(0)).
 must_not_repeat(C):-call(C).
 
@@ -25,7 +25,7 @@ must_not_repeat(C):-call(C).
 
 no_repeats_av:-tlbugger:attributedVars.
 
-:- export(no_repeats/1).
+:- swi_export(no_repeats/1).
 :- meta_predicate no_repeats(0).
 
 % no_repeats(Call):- tlbugger:old_no_repeats,!, no_repeats_old(Call).
@@ -33,7 +33,7 @@ no_repeats_av:-tlbugger:attributedVars.
 no_repeats(Call):- no_repeats_old(Call).
 
 
-:- export(no_repeats/2).
+:- swi_export(no_repeats/2).
 :- meta_predicate no_repeats(+,0).
 %no_repeats(Vs,Call):- tlbugger:old_no_repeats,!,no_repeats_old(Vs,Call).
 %no_repeats(Vs,Call):- no_repeats_av,!,no_repeats_av(Vs,Call).
@@ -56,11 +56,11 @@ no_repeats_dif(Vs,Call):- dif(Vs,_), get_attr(Vs,dif,vardif(CONS,_)),!,
 % X = 1, Y = 4 ;
 % X = 2, Y = 1.
 % ===================================================
-:- export(no_repeats_old/1).
+:- swi_export(no_repeats_old/1).
 :- meta_predicate no_repeats_old(0).
 no_repeats_old(Call):- no_repeats_old(Call,Call).
 
-:- export(no_repeats_old/2).
+:- swi_export(no_repeats_old/2).
 :- meta_predicate no_repeats_old(+,0).
 
 :-use_module(library(logicmoo/util/rec_lambda)).
@@ -86,7 +86,7 @@ no_repeats_t(Vs,Call):- CONS = [_], (Call),
 
 % 
 
-:- export(no_repeats_u/2).
+:- swi_export(no_repeats_u/2).
 :- meta_predicate no_repeats_u(+,0).
 no_repeats_u(Vs,Call):- CONS = [_], (Call), /*hotrace*/((  CONS=[_|T],
     \+ memberchk_pred_rev(subsumes_term,Vs,T), copy_term(Vs,CVs), nb_setarg(2, CONS, [CVs|T]))).
@@ -94,7 +94,7 @@ no_repeats_u(Vs,Call):- CONS = [_], (Call), /*hotrace*/((  CONS=[_|T],
 
 
 % for dont-care vars
-:- export(no_repeats_dc/2).
+:- swi_export(no_repeats_dc/2).
 :- meta_predicate no_repeats_dc(+,0).
 no_repeats_dc(Vs,Call):- term_variables(Call,CV),term_variables(Vs,VsL),subtract_eq(CV,VsL,NewVs),no_repeats(NewVs,Call).
 
@@ -128,11 +128,11 @@ subtract_eq([A|B], C, [A|D]) :-
 %
 % attributed variable verson of getting filtered bindings
 % ===================================================
-:- export(no_repeats_av/1).
+:- swi_export(no_repeats_av/1).
 :-meta_predicate(no_repeats_av(0)).
-:- export(no_repeats_av/2).
+:- swi_export(no_repeats_av/2).
 :-meta_predicate(no_repeats_av(+,0)).
-:- export(no_repeats_av_l/2).
+:- swi_export(no_repeats_av_l/2).
 :-meta_predicate(no_repeats_av_l(+,0)).
 
 no_repeats_av(AVar,Call):- var(AVar),!,
@@ -169,7 +169,7 @@ succeeds_n_times(Goal, Times) :-
 
 
 
-:- export(no_repeats_findall5/5).
+:- swi_export(no_repeats_findall5/5).
 :- meta_predicate no_repeats_findall5(+,0,-,-,-).
 no_repeats_findall5(Vs,Call,ExitDET,USE,NEW):- 
    (((HOLDER = fa([]),
@@ -187,7 +187,7 @@ no_repeats_findall5(Vs,Call,ExitDET,USE,NEW):-
     *-> true;
      (NEW=[],ExitDET=true,USE=false)).
 
-:- export(no_repeats_save/4).
+:- swi_export(no_repeats_save/4).
 :- meta_predicate no_repeats_save(+,0,-,-).
 no_repeats_save(Vs,Call,Saved,USE):-
  SavedHolder = saved(_),
@@ -195,7 +195,7 @@ no_repeats_save(Vs,Call,Saved,USE):-
   ( ExitDET==true -> (nb_linkarg(1,SavedHolder,NEW),!) ; true),  
   arg(1,SavedHolder,Saved).
 
-:- export(no_repeats_save/2).
+:- swi_export(no_repeats_save/2).
 :- meta_predicate no_repeats_save(+,0).
 no_repeats_save(Vs,Call):-  
   call_cleanup(
@@ -204,7 +204,7 @@ no_repeats_save(Vs,Call):-
    (is_list(SavedList) -> writeln(saving(SavedList)) ; writeln(givingup_on(Call)))).
   
 
-:- export(no_repeats_findall_r/5).
+:- swi_export(no_repeats_findall_r/5).
 :- meta_predicate no_repeats_findall_r(+,0,-,-,-).
 no_repeats_findall_r(Vs,Call,CONS,ExitDET,List):- 
    CONS = [ExitDET],

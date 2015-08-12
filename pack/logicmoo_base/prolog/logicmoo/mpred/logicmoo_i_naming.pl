@@ -119,7 +119,7 @@ onSpawn(A):-A==true,!.
 onSpawn((A,B)):-!,onSpawn(A),onSpawn(B).
 onSpawn(ClassFact):-fully_expand(ClassFact,ClassFactO),!,onSpawn_0(t,ClassFactO).
 
-onSpawn_0(Modality,ClassFact):- ClassFact=..[FunctArgType,Name],modality(FunctArgType,_,_),!,
+onSpawn_0(_Modality,ClassFact):- ClassFact=..[FunctArgType,Name],modality(FunctArgType,_,_),!,
  onSpawn_0(FunctArgType,Name).
    
 onSpawn_0(Modality,ClassFact):- ClassFact=..[FunctArgType,Name],

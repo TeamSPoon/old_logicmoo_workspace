@@ -80,7 +80,7 @@ imploded_copyvars(C,CT):-must((source_variables(Vs),copy_term(C-Vs,CT-VVs),b_imp
 /*
 */
 
-:-export(unnumbervars/2).
+:-swi_export(unnumbervars/2).
 
 
 unnumbervars(X,YY):- unnumbervars0(X,Y),!,must(Y=YY).
@@ -208,10 +208,10 @@ numbervars_impl(Term,Functor,Start,End):- sanity((must(var(End);integer(End)),nu
 numbervars_impl(Term,Functor,Start,End,List):-must(( must(var(End);number(End)),numbervars(Term,Start,End,[functor_name(Functor)|List]))).
 
 
-:- export(snumbervars/3).
+:- swi_export(snumbervars/3).
 snumbervars(Term,Start,End):- integer(Start),!,numbervars_impl(Term,'$VAR',Start,End).
-:- export(snumbervars/4).
+:- swi_export(snumbervars/4).
 snumbervars(Term,Functor,Start,List):-numbervars_impl(Term,Functor,Start,List).
-:- export(snumbervars/1).
+:- swi_export(snumbervars/1).
 snumbervars(Term):-numbervars_impl(Term,0,_).
 

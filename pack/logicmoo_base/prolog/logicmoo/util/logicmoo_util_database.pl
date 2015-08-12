@@ -1,25 +1,47 @@
-
+% ===================================================================
+% File 'logicmoo_util_database.pl'
+% Purpose: To load the logicmoo libraries as needed
+% Maintainers: Douglas Miles/Annie Ogborn/Kino Coursey
+% Contact: $Author: dmiles $@users.sourceforge.net ;
+% Version: 'logicmoo_util_library.pl' 1.0.0
+% Revision:  $Revision: 1.7 $
+% Revised At:   $Date: 2002/07/11 21:57:28 $
+% ===================================================================
+:-swi_module(logicmoo_util_database,
+        [   
+         asserta_new/1,
+         assertz_new/1,
+         as_clause/3,
+         asserta_if_new/1,
+         assertz_if_new/1,
+         assertz_if_new_clause/1,
+         assertz_if_new_clause/2,
+         assert_if_new/1,
+         safe_univ/2,
+         clause_asserted/2,
+         clause_asserted/1]).
 
 :-meta_predicate clause_safe(?, ?).
 :-module_transparent clause_safe/2.
-:- export(clause_safe/2).
+:- swi_export(clause_safe/2).
 
 
 clause_safe(M:H,B):-!,predicate_property(M:H,number_of_clauses(_)),clause(H,B).
 clause_safe(H,B):-predicate_property(_:H,number_of_clauses(_)),clause(H,B).
 
 
-:- export(call_with_attvars/2).
+:- swi_export(call_with_attvars/2).
 :- module_transparent(call_with_attvars/2).
 /*
 call_with_attvars(asserta,Term):-!,really_with_attvars(asserta,Term),!.
 call_with_attvars(assertz,Term):-!,really_with_attvars(assertz,Term),!.
 call_with_attvars(assert,Term):-!,really_with_attvars(assert,Term),!.
 */
-call_with_attvars(OP,Term):- call(OP,Term).
+call_with_attvars(OP,Term):-unnumbervars(Term,Unumbered),!,call(OP,Unumbered).
 
-:- export(really_with_attvars/2).
+:- swi_export(really_with_attvars/2).
 :- module_transparent(really_with_attvars/2).
+really_with_attvars(OP,Term):-unnumbervars(Term,Unumbered),!,call(OP,Unumbered).
 really_with_attvars(OP,Term):-call(OP,Term).
 really_with_attvars(OP,Term):-
   copy_term(Term, Copy, Gs),

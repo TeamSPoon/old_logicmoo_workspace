@@ -29,7 +29,7 @@
 :- set_prolog_flag(access_level,system).
 
 is_pfc_action('$VAR'(_)):-!,fail.
-is_pfc_action(remove_if_unsupported(Why,_)).
+is_pfc_action(remove_if_unsupported(_,_)).
 is_pfc_action(P):-predicate_property(P,static).
 pfc_is_builtin(P):-predicate_property(P,built_in).
 
@@ -82,6 +82,14 @@ has_functor(C):-compound(C),\+is_list(C).
 pfc_each_literal(P,E):-nonvar(P),P=(P1,P2),!,(pfc_each_literal(P1,E);pfc_each_literal(P2,E)).
 pfc_each_literal(P,P). %:-conjuncts_to_list(P,List),member(E,List).
 
+
+:- ensure_loaded(library(logicmoo/plarkc/dbase_i_sexpr_reader)).
+
+to_addable_form_wte(Why,I,O):-string(I),must_det_l((input_to_forms(string(I),Wff,Vs),b_setval('$variable_names',Vs),!,kif_sterm_to_pterm(Wff,PTerm),
+  to_addable_form_wte(Why,PTerm,O))).
+to_addable_form_wte(Why,I,O):-atom(I),atom_contains(I,'('),must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,sexpr_sterm_to_pterm_list(Wff,PTerm),
+  to_addable_form_wte(Why,PTerm,O))).
+to_addable_form_wte(Why,=>(I),O):-!,to_addable_form_wte(Why,I,O).
 to_addable_form_wte(Why,USER:I,O):-USER=user,!,to_addable_form_wte(Why,I,O).
 to_addable_form_wte(_Why,neg(USER:P0),neg(P0)):-USER=user,!.
 to_addable_form_wte(_Why,neg(P0),neg(P0)):-!.
@@ -151,7 +159,7 @@ exact_args(true).
 % exact_args(C):-source_file(C,I),absolute_source_location_pfc(I).
 
 pfc_is_tautology(Var):-var(Var).
-pfc_is_tautology(V):- \+ \+ (copy_term_nat(V,VC),numbervars(VC),pfc_is_taut(VC)).
+pfc_is_tautology(V):- \+ \+ notrace((copy_term_nat(V,VC),numbervars(VC),pfc_is_taut(VC))).
 
 pfc_is_taut(A:-B):-!,pfc_is_taut(B=>A).
 pfc_is_taut(A<=B):-!,pfc_is_taut(B=>A).
@@ -573,7 +581,7 @@ different_literal(Q,N,R,Test):-
 
 
 % was nothing  pfc_current_db/1.
-pfc_current_u(pfc_current).
+pfc_current_db(u).
 pfc_current.
 
 
@@ -583,7 +591,7 @@ pfc_current.
 %=
 
 pfc_add_db_to_head(P,NewP) :-
-  pfc_current_u(Db),
+  pfc_current_db(Db),
   (Db=true        -> NewP = P;
    P=(Head:-Body) -> NewP = (Head :- (Db,Body));
    otherwise      -> NewP = (P :- Db)).
@@ -657,8 +665,8 @@ pfc_run0 :-
 pfc_run0.
 
 
-pfc_run_queued:- repeat,sleep(1.0),pfc_run,fail.
-:-thread_property(X,alias(pfc_running_queue))-> true ; thread_create(pfc_run_queued,_,[alias(pfc_running_queue)]).
+%pfc_run_queued:- repeat,sleep(1.0),pfc_run,fail.
+%:-thread_property(_,alias(pfc_running_queue))-> true ; thread_create(pfc_run_queued,_,[alias(pfc_running_queue)]).
 
 
 % pfc_step removes one entry from the pfc_queue and reasons from it.
@@ -758,19 +766,19 @@ pfc_add_trigger(bt(Trigger,Body),Support) :-
       assertz_if_new((Trigger:-pfc_bc_only(Trigger))),
       must(pfc_mark_as(Support,b,Trigger,pfcBcTrigger)),
      % WAS pfc_bt_pt_combine(Trigger,Body).
-  pfc_bt_pt_combine(Sup,Trigger,Body,Support).
+  pfc_bt_pt_combine(Trigger,Body,Support).
 
 pfc_add_trigger(X,Support) :-
   pfc_warn("Unrecognized trigger to pfc_addtrigger: ~q",[X:pfc_add_trigger(X,Support)]).
 
 
-pfc_bt_pt_combine(_Sup,Head,Body,Support) :-
+pfc_bt_pt_combine(Head,Body,Support) :-
   %= a backward trigger (bt) was just added with head and Body and support Support
   %= find any pt''s with unifying heads and assert the instantied bt body.
   pfc_get_trigger_quick(pt(Head,_PtBody)),
   pfc_eval_lhs(Body,Support),
   fail.
-pfc_bt_pt_combine(_Sup,_,_,_) :- !.
+pfc_bt_pt_combine(_,_,_) :- !.
 
 
 pfc_get_trigger_quick(Trigger) :- !, Trigger.
@@ -915,7 +923,7 @@ pfc_remove_supports_f_l(Why,F) :-
 pfc_remove_supports_f_l(_,_).
 
 pfc_remove_supports_quietly(F) :-
-  pfc_rem_support(Why,F,_),
+  pfc_rem_support(pfc_remove_supports_quietly,F,_),
   fail.
 pfc_remove_supports_quietly(_).
 
@@ -932,6 +940,14 @@ pfc_undo(Why,pk(Key,Head,Body)) :-
   %
   !,
   (retract_i(pk(Key,Head,Body))
+    -> pfc_unfwc(pt(Head,Body))
+     ; pfc_warn("Trigger not found to retract: ~q",[pt(Head,Body)])).
+
+pfc_undo(Why,pt(Head,Body)) :- 
+  % undo a positive trigger.
+  %
+  !,
+  (retract_i(pt(Head,Body))
     -> pfc_unfwc(pt(Head,Body))
      ; pfc_warn("Trigger not found to retract: ~q",[pt(Head,Body)])).
 
@@ -987,7 +1003,7 @@ pfc_retract_support_relations(Why,Fact) :-
     pfc_rem_support(Why,P,(Fact,_))),
   remove_if_unsupported(Why,P),
   fail.
-pfc_retract_support_relations(Why,_).
+pfc_retract_support_relations(_,_).
 
 %= remove_if_unsupported(Why,+P) checks to see if P is supported and removes
 %= it from the DB if it is not.
@@ -995,13 +1011,13 @@ pfc_retract_support_relations(Why,_).
 
 remove_if_unsupported_verbose(Why,TMS,P) :- var(P),!,trace_or_throw(warn(var_remove_if_unsupported_verbose(Why,TMS,P))).
 remove_if_unsupported_verbose(Why,TMS,P) :- (\+ ground(P) -> dmsg(warn(ng_remove_if_unsupported_verbose(Why,TMS,P))) ;true),
-   (((pfc_tms_supported(TMS,P,How),How\=unknown(_)) -> pfc_trace(v_still_supported(How,Why,TMS,P)) ; (  pfc_undo(Why,P)))),
+   (((pfc_tms_supported(TMS,P,How),How\=unknown(_)) -> pfc_trace_msg(v_still_supported(How,Why,TMS,P)) ; (  pfc_undo(Why,P)))),
    pfc_run.
 
 
 remove_if_unsupported(Why,P) :- var(P),!,trace_or_throw(warn(var_remove_if_unsupported(Why,P))).
 remove_if_unsupported(Why,P) :- ((\+ ground(P), P \= (_:-_) , P \= neg(_) ) -> dmsg(warn(nonground_remove_if_unsupported(Why,P))) ;true),
-   (((pfc_tms_supported(local,P,How),How\=unknown(_)) -> pfc_trace(still_supported(How,Why,TMS,P)) ; (  pfc_undo(Why,P)))),
+   (((pfc_tms_supported(local,P,How),How\=unknown(_)) -> pfc_trace_msg(still_supported(How,Why,local,P)) ; (  pfc_undo(Why,P)))),
    pfc_run.
 
 
@@ -1106,13 +1122,13 @@ pfc_get_support_via_clause_db(P,OUT):- predicate_property(P,number_of_clauses(N)
 support_ok_via_clause_body(_H):-!,fail.
 support_ok_via_clause_body(H):- get_functor(H,F,A),support_ok_via_clause_body(H,F,A).
 support_ok_via_clause_body(_,(\+),1):-!,fail.
-support_ok_via_clause_body(H,F,A):- prologSideEffects(F),!,fail.
-support_ok_via_clause_body(H,F,A):- \+ predicate_property(H,number_of_clauses(_)),!,fail.
-support_ok_via_clause_body(H,F,A):- pfcMark(pfcRHS,_,F,A),!,fail.
-support_ok_via_clause_body(H,F,A):- pfcMark(pfcMustFC,_,F,A),!,fail.
-support_ok_via_clause_body(H,F,A):- argsQuoted(F),!,fail.
-support_ok_via_clause_body(H,F,A):- prologDynamic(F),!.
-support_ok_via_clause_body(H,F,A):- \+ pfcControlled(F),!.
+support_ok_via_clause_body(_,F,_):- prologSideEffects(F),!,fail.
+support_ok_via_clause_body(H,_,_):- \+ predicate_property(H,number_of_clauses(_)),!,fail.
+support_ok_via_clause_body(_,F,A):- pfcMark(pfcRHS,_,F,A),!,fail.
+support_ok_via_clause_body(_,F,A):- pfcMark(pfcMustFC,_,F,A),!,fail.
+support_ok_via_clause_body(_,F,_):- argsQuoted(F),!,fail.
+support_ok_via_clause_body(_,F,_):- prologDynamic(F),!.
+support_ok_via_clause_body(_,F,_):- \+ pfcControlled(F),!.
 
 
 pfc_get_support_precanonical(F,Sup):-to_addable_form_wte(pfc_get_support_precanonical,F,P),pfc_get_support(P,Sup).
@@ -1484,6 +1500,12 @@ pfc_nf1(NegTerm,NF) :-
   !,
   pfc_nf1_negation(Term,NF).
 
+pfc_nf1(~((P,Q)),NF) :-
+ pfc_nf1(~P,NP),
+ pfc_nf1(~Q,NQ),
+ !,
+ pfc_nf1(((NP/Q);(NQ/P)),NF).
+
 %= disjunction.
 
 pfc_nf1((P;Q),NF) :-
@@ -1777,7 +1799,7 @@ pfc_db_type(_,fact) :-
 
 pfc_call_t_exact(Trigger) :- copy_term(Trigger,Copy),pfc_get_trigger_quick(Trigger),Trigger=@=Copy.
 
-retract_t(Trigger) :-  trace,retract_i(spft(Trigger,_,_)).
+retract_t(Trigger) :-  retract_i(spft(Trigger,_,_)),ignore(retract(Trigger)).
 
 
 pfc_assert_t(P0,Support0) :- 
@@ -1870,18 +1892,15 @@ pfc_get_support_neg(~ (P),S) :- !, nonvar(P), pfc_get_support(neg(P),S).
 % There are three of these to try to efficiently handle the cases
 % where some of the arguments are not bound but at least one is.
 
-pfc_rem_support(Why, N , S):- pfc_rem_support0(Why, N , S),must(nonvar(N)).
-
-pfc_rem_support0(Why, N , S):- nonvar(N), N = (\+ P), pfc_rem_support(Why,neg(P),S).
-
-pfc_rem_support0(Why,P,(Fact,Trigger)) :- nonvar(P), !,    pfc_retract_or_warn_i(spft(P,Fact,Trigger)).
-pfc_rem_support0(WhyIn,P,(Fact,Trigger)) :- copy_term(pfc_rem_support(Why,P,(Fact,Trigger)) ,Why),
+pfc_rem_support(WhyIn,P,(Fact,Trigger)) :- var(P),!,copy_term(pfc_rem_support(Why,P,(Fact,Trigger)) ,Why),
   clause(spft(P,Fact,Trigger),true,Ref),
   ((clause(SPFC,true,Ref),
      (SPFC=@=spft(P,Fact,Trigger) -> 
         erase(Ref); 
-       (wdmsg(=>(Why,~SPFC)),pfc_retract_or_warn_i(spft(P,Fact,Trigger)),trace)),
+       (wdmsg(=>(Why,~SPFC)),pfc_retract_or_warn_i(spft(P,Fact,Trigger)),nop(trace))),
    (var(P)->trace_or_throw(var(P));remove_if_unsupported_verbose(WhyIn,local,P)))).
+pfc_rem_support(Why,(\+ N) , S):- pfc_rem_support(Why,neg(N),S).
+pfc_rem_support(Why,P,(Fact,Trigger)):-pfc_retract_or_warn_i(spft(P,Fact,Trigger)).
 
 /*
 % TODO not called yet
@@ -2097,10 +2116,8 @@ pfc_trace_addPrint_0(_,_).
 
 pfc_trace_break(P,_S) :-
   pfc_spied(P,add) ->
-   \+ \+ ((copy_term(P,Pcopy),
-    numbervars(Pcopy,0,_),
-    fmt("~N% Breaking on pfc_assert(~q)",[Pcopy]),
-    break))
+   ((\+ \+ fmt("~N% Breaking on pfc_assert(~q)",[P])),
+    break)
    ; true.
 
 /*
@@ -2371,7 +2388,7 @@ resolverConflict_robot(N) :- forall(must(pfc_negation_w_neg(N,C)),forall(compute
 resolverConflict_robot(C) :- must((pfc_remove3(C),fmt("~nRem-3 with conflict ~q~n", [C]),pfc_run,sanity(\+C))).
 
 
-pfc_prove_neg(G):-trace, \+ pfc_bc_caching(G), \+ pfc_fact(G).
+pfc_prove_neg(G):-nop(trace), \+ pfc_bc_caching(G), \+ pfc_fact(G).
 
 pred_head(Type,P):- no_repeats_u(P,(call(Type,P),\+ nonfact_metawrapper(P),compound(P))).
 
@@ -2426,7 +2443,7 @@ pred_r0(P=>Q):- (P=>Q).
 pred_r0(P<=>Q):- (P<=>Q).
 pred_r0(P<=Q):- (P<=Q).
 
-cnstrn(X):-term_varaibles(X,Vs),maplist(cnstrn0(X),Vs),!.
+cnstrn(X):-term_variables(X,Vs),maplist(cnstrn0(X),Vs),!.
 cnstrn(V,X):-cnstrn0(X,V).
 cnstrn0(X,V):-when(nonvar(V),X).
 

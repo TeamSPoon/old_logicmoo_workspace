@@ -2,16 +2,14 @@
 /** <module> MUD server startup script in SWI-Prolog
 
 */
-:-  expects_dialect(swi).
-% :-  use_module(library(swi)).
 
-:- exists_directory(runtime)->working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true).
 
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
 
-:- multifile(mpred_online:semweb_startup).
+:- multifile(mpred_online:semweb_startup/0).
 
+:- exists_directory(runtime)->working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true).
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
 user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current_prolog_flag(unix,true).
@@ -19,14 +17,28 @@ user:file_search_path(cliopatria, '../pack/ClioPatria'). % :- current_prolog_fla
 user:file_search_path(user, '../pack/ClioPatria/user/').
 user:file_search_path(swish, '../pack/swish'):- current_prolog_flag(unix,true).
 user:file_search_path(pack, '../pack/').
+user:file_search_path(games, '../games').
 
+:- if(current_prolog_flag(dialect,yap)).
+:-  expects_dialect(swi).
+@(C,M) :- M:call(C).
+user:file_search_path(library, '/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_base/prolog').
+user:file_search_path(library, '/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_nlu/prolog').
+user:file_search_path(library, '/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_packages/prolog').
+user:file_search_path(library, '/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_planner/prolog').
+
+:- else.
 
 :- attach_packs.
 :- initialization(attach_packs).
 user:file_search_path(prologmud, library(prologmud)).
 :- user:use_module(library(persistency)).
-
 :- ((current_prolog_flag(readline, true))->expand_file_name("~/.pl-history", [File|_]),(exists_file(File) -> rl_read_history(File); true),at_halt(rl_write_history(File));true).
+
+
+:- endif.
+
+
 
 
 % :- multifile sandbox:safe_primitive/1.
@@ -38,6 +50,8 @@ user:file_search_path(prologmud, library(prologmud)).
 % [Required] Load the Logicmoo Library Utils
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 % :- qcompile_libraries.
+
+
 
 % [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/)
 :- if_file_exists(user:ensure_loaded(library(eggdrop))).
@@ -134,7 +148,7 @@ push_env_ctx:-!.
 % Regression tests that first run whenever a person stats the MUD on the public server
 % ==========================================================
 
-:- if((gethostname(titan),fail)). % INFO this fail is so we can start faster
+:- if((fail,gethostname(titan),fail)). % INFO this fail is so we can start faster
 :- show_call_entry(gripe_time(40, doall(user:regression_test))).
 :- endif.
 
@@ -219,7 +233,7 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 
 
 % [Never] saves about a 3 minute compilation time (for when not runing mud)
-:- if((gethostname(titan),fail)).
+:- if((fail,gethostname(titan),fail)).
 :- if_startup_script( finish_processing_world).
 :- enqueue_agent_action("rez crackers").
 %:- prolog.
@@ -235,26 +249,26 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 % :- add_game_dir('../games/src_game_nani',prolog_repl).       
 :- add_game_dir('../games/src_game_startrek',prolog_repl).
 
-:- set_prolog_flag(trace_gc,false).
-:- set_prolog_flag(backtrace_depth,400).
+%:- set_prolog_flag(trace_gc,false).
+%:- set_prolog_flag(backtrace_depth,400).
 
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_startup_script(finish_processing_world).
 
-user:sanity_test:- rescan_pfc.
+% user:sanity_test:- rescan_pfc.
 
-:- rescan_pfc. 
+%:- rescan_pfc. 
 :-dmsg("About to run Sanity").
-:- prolog.
+%:- prolog.
 
 :- show_call_entry(gripe_time(40,if_startup_script(doall(user:sanity_test)))).
 
-:- prolog.
+%:- prolog.
 
 feature_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
 
-:- if((gethostname(titan))).
+:- if((fail,gethostname(titan))).
 
 % :-feature_testp1.
 

@@ -490,7 +490,7 @@ guess_supertypes(W):- asserta(tried_guess_types_from_name(W)),ignore((atom(W),gu
 
 guess_supertypes_0(W):-atom(W),atomic_list_concat(List,'_',W),length(List,S),S>2,!, append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),
             atomic_list_concat(FirstPart,'_',_NewCol),pfc_assert_guess(genls(W,Last)),asserta(did_learn_from_name(W)).
-guess_supertypes_0(W):-T=t,to_first_break(W,lower,T,All,upper),to_first_break(All,upper,Super,Rest,_),
+guess_supertypes_0(W):-T=t,to_first_break(W,lower,T,All,upper),to_first_break(All,upper,_UnusedSuper,Rest,_),
    atom_length(Rest,L),!,L>2,i_name(tt,Rest,NewSuper),atom_concat(NewSuper,'Type',SuperTT),pfc_assert_guess(isa(SuperTT,ttTypeType)),
   pfc_assert_guess(isa(W,SuperTT)),asserta(did_learn_from_name(W)),!,guess_typetypes(SuperTT).
 

@@ -1,4 +1,4 @@
-:-module(logicmoo_i_sexp_reader,[codelist_to_forms/2,input_to_forms/3,lisp_read_from_input/2,parse_sexpr/2]).
+:-module(logicmoo_i_sexp_reader,[codelist_to_forms/2,input_to_forms/3,sexpr_sterm_to_pterm_list/2,sexpr_sterm_to_pterm/2,lisp_read_from_input/2,parse_sexpr/2]).
 
 
 
@@ -17,8 +17,26 @@
 % [Required] Load the Logicmoo Library Utils
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 
-:- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api)).
+% :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api)).
 
+:-meta_predicate(sexpr_sterm_to_pterm(?,?)).
+:-meta_predicate(sexpr_sterm_to_pterm_list(?,?)).
+sexpr_sterm_to_pterm([S|TERM],PTERM):- (S == ('=>')),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..['=>'|PLIST])),!.
+sexpr_sterm_to_pterm(VAR,'$VAR'(V)):-atom(VAR),atom_concat('?',_,VAR),clip_qm(VAR,V),!.
+sexpr_sterm_to_pterm(VAR,kw((V))):-atom(VAR),atom_concat(':',V2,VAR),clip_qm(V2,V),!.
+sexpr_sterm_to_pterm(VAR,VAR):-is_ftVar(VAR),!.
+sexpr_sterm_to_pterm([S|TERM],PTERM):- (number(S); \+ is_list(TERM) ; (atom(S),fail,atom_concat(_,'Fn',S))),sexpr_sterm_to_pterm_list([S|TERM],PTERM),!.            
+sexpr_sterm_to_pterm([VAR],VAR):-is_ftVar(VAR),!.
+sexpr_sterm_to_pterm([S],Y):-nonvar(S),sexpr_sterm_to_pterm(S,Y),!.
+sexpr_sterm_to_pterm([S|TERM],dot_holds(PTERM)):- not(is_list(TERM)),sexpr_sterm_to_pterm_list([S|TERM],(PTERM)),!.
+sexpr_sterm_to_pterm([S|TERM],PTERM):-is_ftVar(S), sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..[holds,S|PLIST],!.
+sexpr_sterm_to_pterm([S|TERM],PTERM):- atomic(S),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..[S|PLIST],!.
+sexpr_sterm_to_pterm(VAR,VAR).
+
+sexpr_sterm_to_pterm_list(VAR,VAR):-is_ftVar(VAR),!.
+sexpr_sterm_to_pterm_list([],[]):-!.
+sexpr_sterm_to_pterm_list([S|STERM],[P|PTERM]):-sexpr_sterm_to_pterm(S,P),sexpr_sterm_to_pterm_list(STERM,PTERM),!.
+sexpr_sterm_to_pterm_list(VAR,[VAR]).
 
 
 /*===================================================================
@@ -117,6 +135,9 @@ get_input_to_forms(In,FormsOut,Vars):-
 parse_sexpr(S, Expr) :- is_stream(S),!,stream_to_lazy_list(S,LList),with_stream_pos(S,parse_sexpr_codes(LList, Expr)).
 parse_sexpr([SC|Codes], Expr) :- integer(SC),!,parse_sexpr_codes([SC|Codes], Expr).
 parse_sexpr([SC|Codes], Expr) :- atom(SC),!,string_chars(String,[SC|Codes]),!,parse_sexpr(String, Expr).
+parse_sexpr(string(String), Expr) :- string_codes(String,Codes),parse_sexpr_codes(Codes, Expr).
+parse_sexpr(atom(String), Expr) :- string_codes(String,Codes),parse_sexpr_codes(Codes, Expr).
+parse_sexpr(text(String), Expr) :- string_codes(String,Codes),parse_sexpr_codes(Codes, Expr).
 parse_sexpr(String, Expr) :- string(String),!,string_codes(String,Codes),parse_sexpr_codes(Codes, Expr).
 
 parse_sexpr_codes(Codes, Expr) :- phrase(sexpr(Expr), Codes).

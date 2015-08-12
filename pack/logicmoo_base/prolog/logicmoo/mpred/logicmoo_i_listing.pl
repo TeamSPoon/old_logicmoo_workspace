@@ -11,6 +11,8 @@
 */
 % =======================================================
 
+:- include(logicmoo_i_header).
+:- style_check(-singleton).
 
 :- multifile
   	user:portray/1,
@@ -226,10 +228,8 @@ pp_justification1([J|Js],N) :-
 
 pp_justifications2([],_,_).
 
-pp_justifications2([C|Rest],JustNo,StepNo) :-
-  =(C,CCopy),
-  \+ \+ (( %numbervars(CCopy,0,_),
-  fmt("~N%     ~w.~w ~w",[JustNo,StepNo,CCopy]))),
+pp_justifications2([C|Rest],JustNo,StepNo) :-  
+  fmt("~N%     ~w.~w ~w",[JustNo,StepNo,C]),
   StepNext is 1+StepNo,
   pp_justifications2(Rest,JustNo,StepNext).
 

@@ -76,11 +76,14 @@
 :- meta_predicate theAll(//,?,?).
 :- meta_predicate theCode(?,?,?).
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
+
+:-if(current_prolog_flag(dialect,swi)).
 :- dynamic(double_quotes_was/1).
 :- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
 :- retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
 :- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
 :- set_prolog_flag(double_quotes,string).
+:-endif.
 
 isVarOrVAR(V):-var(V),!.
 isVarOrVAR('$VAR'(_)).
@@ -216,13 +219,13 @@ leastOne([_CO|_LSS]).
 
 % TODO: when using the DCG to generate instead of test it will move the C before the P
 % dcgReorder(P,C) --> P, C.
-:-export(dcgReorder//2).
+:-swi_export(dcgReorder//2).
 dcgReorder(P, C, B, E):- phrase(P, B, D), phrase(C, D, E).
 
-:-export(dcgSeq//2).
+:-swi_export(dcgSeq//2).
 dcgSeq(X,Y,[S0,S1|SS],E):-phrase((X,Y),[S0,S1|SS],E).
 
-:-export(dcgBoth//2).
+:-swi_export(dcgBoth//2).
 dcgBoth(DCG1,DCG2,S,R) :- append(L,R,S),phrase(DCG1,L,[]),once(phrase(DCG2,L,[])).
 
 dcgAnd(DCG1,DCG2,DCG3,DCG4,S,E) :- phrase(DCG1,S,E),phrase(DCG2,S,E),phrase(DCG3,S,E),phrase(DCG4,S,E).
@@ -284,7 +287,7 @@ dcgOptionalGreedy(A)--> dcgOnce(dcgOr(A,dcgNone)).
 
 dcgTraceOnFailure(X):-once(X;(dtrace,X)).
 
-:- export(capitalized//1).
+:- swi_export(capitalized//1).
 capitalized([W|Text]) --> theText([W|Text]),{atom_codes(W,[C|_Odes]),is_upper(C)}.
 
 substAll(B,[],_R,B):-!.
@@ -308,7 +311,7 @@ dcgStartsWith(TheType,SMORE,SMORE) :- phrase(TheType,SMORE,_).
 decl_dcgTest_startsWith("this is text",dcgStartsWith(theText(["this","is"]))).
 
 
-:-export(dcgStartsWith1//1).
+:-swi_export(dcgStartsWith1//1).
 % 1) must be first in list 
 % 2) doesnt consume
 % 3) sees only 1 item
@@ -330,7 +333,7 @@ decl_dcgTest("this is text",dcgStartsWith0(theText(["this",is]))).
 % DCG Tester
 % =======================================================
 
-:-export(do_dcg_util_tests/0).
+:-swi_export(do_dcg_util_tests/0).
 logicmoo_util_dcg:do_dcg_util_tests:-
    forall(decl_dcgTest(List,Phrase,Call),'@'((do_dcgTest(List,Phrase,Call)),logicmoo_util_dcg)),
    forall(decl_dcgTest_startsWith(List,Phrase,Call),'@'((do_dcgTest_startsWith(List,Phrase,Call)),logicmoo_util_dcg)).
@@ -351,7 +354,7 @@ decl_dcgTest_startsWith(List,Phrase,true):-decl_dcgTest_startsWith(List,Phrase).
 
 
 
-% :-source_location(File,_Line),module_property(M,file(File)),!,forall(current_predicate(M:F/A),M:export(F/A)).
+% :-source_location(File,_Line),module_property(M,file(File)),!,forall(current_predicate(M:F/A),M:swi_export(F/A)).
 
      
 
@@ -364,8 +367,9 @@ dumpList(_,[]):-!.
 %dumpList(Ctx,B):-fmt(Ctx,dumpList(B)).
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
+:-if(current_prolog_flag(dialect,swi)).
 :- retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
-
+:-endif.
 
 end_of_file.
 

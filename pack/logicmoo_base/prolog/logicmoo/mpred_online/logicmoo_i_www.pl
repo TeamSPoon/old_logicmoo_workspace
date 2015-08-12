@@ -243,6 +243,7 @@ human_language('ThaiLanguage').
 human_language('de').
 
 param_default_value(logic_lang_name,'CLIF').
+param_default_value(search,'tHumanHead').
 logic_lang_name('CLIF',"Common Logic (CLIF)").
 logic_lang_name('CycL',"CycL").
 logic_lang_name('Prolog',"Prolog").

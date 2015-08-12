@@ -9,8 +9,7 @@
 % Revised At:  $Date: 2002/07/11 21:57:28 $
 % ===================================================================
 */
-:-module(logicmoo_util_bugger_catch,[
-      ]).
+:-swi_module(logicmoo_util_bugger_catch,[]).
 
 %================================================================
 % maplist/[2,3]
@@ -19,7 +18,7 @@
 %================================================================
 % so far only the findall version works .. the other runs out of local stack!?
 
-:-export((   maplist_safe/2,
+:-swi_export((   maplist_safe/2,
    maplist_safe/3)).
 
 maplist_safe(_Pred,[]):-!.
@@ -31,13 +30,13 @@ maplist_safe(Pred,LISTIN, LIST):-!, findall(EE, ((member(E,LISTIN),debugOnFailur
 % though this should been fine % maplist_safe(Pred,[A|B],OUT):- copy_term(Pred+A, Pred0+A0), debugOnFailureEach(once(call(Pred0,A0,AA))),  maplist_safe(Pred,B,BB), !, ignore(OUT=[AA|BB]).
 
 
-:- export(bad_functor/1).
+:- swi_export(bad_functor/1).
 bad_functor(L) :- arg(_,v('|','.',[],':','/'),L).
 
-:- export(warn_bad_functor/1).
+:- swi_export(warn_bad_functor/1).
 warn_bad_functor(L):-ignore((hotrace(bad_functor(L)),!,trace,nop(ddmsg(bad_functor(L))))).
 
-:- export(strip_f_module/2).
+:- swi_export(strip_f_module/2).
 strip_f_module(_:P,FA):-nonvar(P),!,strip_f_module(P,F),!,F=FA.
 strip_f_module(P,PA):-atom(P),!,P=PA.
 
@@ -49,7 +48,7 @@ strip_f_module(P,P).
 % (catch/3 allows you to have these exceptions bubble up past your catch block handlers)
 :- meta_predicate((catchvv(0, ?, 0))).
 :- meta_predicate((ccatch(0, ?, 0))).
-:- export((ccatch/3,catchvv/3)).
+:- swi_export((ccatch/3,catchvv/3)).
 
 bubbled_ex(block(_,_)).
 bubbled_ex('$aborted').
@@ -62,13 +61,13 @@ ccatch(Goal,E,Recovery):- nonvar(E) -> catch(Goal,E,Recovery); % normal mode (th
 catchvv(Goal,E,Recovery):- catch(Goal,E,(bubbled_ex_check(E),Recovery)). % prevents promiscous mode
 
 
-:- export(functor_catch/3).
+:- swi_export(functor_catch/3).
 functor_catch(P,F,A):- catch(functor(P,F,A),_,compound_name_arity(P,F,A)).
 % functor_catch(F,F,0):-atomic(F),!.
 % functor_catch(P,F,A):-ccatch(compound_name_arity(P,F,A),E,(trace,ddmsg(E:functor(P,F,A)),trace)).
 
 
-:- export(functor_safe/3).
+:- swi_export(functor_safe/3).
 functor_safe(P,F,A):- catch(functor(P,F,A),_,compound_name_arity(P,F,A)).
 % functor_safe(P,F,A):- catch(compound_name_arity(P,F,A),_,functor(P,F,A)).
 /*
@@ -95,7 +94,7 @@ set_block_exit(Name, Value) :-  prolog_current_frame(Frame),  prolog_frame_attri
 block(Name, Goal) :-  block(Name, Goal, Var),  (   Var == !  ->  !  ;   true  ). 
 !(Name) :- set_block_exit(Name, !). 
 
-:- export((block/3, 
+:- swi_export((block/3, 
             set_block_exit/2, 
             block/2, 
             !/1 )).

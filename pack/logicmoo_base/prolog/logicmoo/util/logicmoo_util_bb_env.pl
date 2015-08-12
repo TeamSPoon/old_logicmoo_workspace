@@ -101,7 +101,7 @@ get_mpred_stubType(_,_,dyn).
 
 :-thread_local(thlocal:env_ctx/2).
 
-:-export(decl_mpred_env/2).
+:-swi_export(decl_mpred_env/2).
 %:-module_transparent(decl_mpred_env/2).
 
 decl_mpred_env(_,[]):-!.
@@ -156,7 +156,7 @@ decl_mpred_env_real(Prop,Pred,F,A):-
   (Prop==dyn->(dynamic(/*ocluser*/ocl:F/A));true),
   (Prop==cache->(transient(/*ocluser*/ocl:F/A));true),
   (Prop==dom->(multifile(/*ocluser*/ocl:F/A));true),
-  user:export(/*ocluser*/ocl:F/A),
+  user:swi_export(/*ocluser*/ocl:F/A),
   if_defined(decl_mpred(Pred,Prop),ain(user:mpred_prop(F,Prop))),
   ain(env_kb(Prop)), ain(mpred_arity(F,A)),ain(arity(F,A)),!,  
   ain(env_mpred(Prop,F,A)).
@@ -292,7 +292,7 @@ clause_to_hb0((H:-B),H,B).
 clause_to_hb0((:-B),true,B).
 clause_to_hb0((H),H,true).
 
-:- export(env_term_expansion/2).
+:- swi_export(env_term_expansion/2).
 env_term_expansion(HB,OUT):- thlocal:push_env_ctx,!,
   must_det_l((
    clause_to_hb(HB,H,B),

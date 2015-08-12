@@ -20,6 +20,8 @@
 % :- use_module(library(lists)).
 
 
+:- include(logicmoo_i_header).
+
 
 attribs_to_atoms(ListA,List):-map_subterms(attribs_to_atoms0,ListA,List).
 
@@ -47,7 +49,7 @@ max_isa_l(List,ListO):-isa_pred_l(genls,List,ListO).
 
 isa_pred_l(Pred,List,ListO):-isa_pred_l(Pred,List,List,ListO).
 
-isa_pred_l(Pred,[],List,[]).
+isa_pred_l(_Pred,[],_List,[]).
 isa_pred_l(Pred,[X|L],List,O):-member(Y,List),X\=Y,call(Pred,X,Y),!,isa_pred_l(Pred,L,List,O).
 isa_pred_l(Pred,[X|L],List,[X|O]):-isa_pred_l(Pred,L,List,O).
 
@@ -66,6 +68,9 @@ max_isa(HintA,HintB,HintO):- conjoin(HintA,HintB,HintO).
 
 add_iza(Var,HintA):- var(Var),(get_attr(Var,argisa,HintB)->min_isa(HintA,HintB,Hint);Hint=HintA), put_attr(Var,argisa,Hint).
 add_iza(Var,Hint):- ignore(show_call_failure(isa(Var,Hint))).
+
+:- style_check(-singleton).
+
 
 attempt_attribute_args(AndOr,Hint,Var):- var(Var),add_iza(Var,Hint),!.
 attempt_attribute_args(AndOr,Hint,Grnd):-ground(Grnd),!.

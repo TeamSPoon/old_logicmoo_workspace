@@ -1,5 +1,5 @@
 % ----------
-:- export(with_pi/2).
+:- swi_export(with_pi/2).
 :- module_transparent(with_pi/2).
 :- meta_predicate(with_pi(0,4)).
 with_pi(_:[],_):-!.
@@ -9,7 +9,7 @@ with_pi([],_):-!.
 with_pi((P1,P2),Pred3):-!, with_pi(P1,Pred3),with_pi(P2,Pred3).
 with_pi(P,Pred3):-context_module(CM),with_pi_selected(CM,CM,P,Pred3),!.
 
-:- export(with_pi_selected/4).
+:- swi_export(with_pi_selected/4).
 :- meta_predicate(with_pi_selected(+,+,+,+)).
 with_pi_selected(CM, M,[P|L],Pred3):-!,with_pi_selected(CM,M,P,  Pred3),with_pi_selected(CM,M,L,Pred3).
 with_pi_selected(CM,M,(P,L),Pred3):-!,with_pi_selected(CM,M,P,  Pred3),with_pi_selected(CM,M,L,Pred3).
@@ -27,7 +27,7 @@ with_pi_selected(CM,M, P ,Pred3):-  functor_safe(P,F,A), with_pi_stub(CM,M,P,F/A
 
 
 
-:- export(with_pi_stub/5).
+:- swi_export(with_pi_stub/5).
 :- meta_predicate(with_pi_stub(+,+,+,+,3)).
 with_pi_stub(CM, M,P, F//A , PM:Pred3):- ((integer(A),atom(M),atom(F),Ap2 is A+2, functor_safe(P,F,Ap2))),
   must(PM:call(Pred3,CM, M,P,F/Ap2)),!.
@@ -44,7 +44,7 @@ with_pi_stub(CM, M,P, F/A , Pred3):- ((integer(A),atom(M),atom(F),functor_safe(P
 with_pi_stub(CM, M,P,FA,Pred3):- trace_or_throw(invalide_args(CM, M,P,FA,Pred3)).
 % ----------
 
-:- export(with_mfa/2).
+:- swi_export(with_mfa/2).
 :- module_transparent(with_mfa/2).
 :- meta_predicate(with_mfa(0,3)).
 with_mfa(P  ,Pred3):- with_pi(P,with_mfa_of(Pred3)).
@@ -58,7 +58,7 @@ with_mfa_of(Pred3,_CM,M,_P,F/A):-M:call(Pred3,M,F,A).
 
 
 :-module_transparent(make_transparent/4).
-:- export(make_transparent/4).
+:- swi_export(make_transparent/4).
 
 make_transparent(_CM,M,_PI,F/0):-!, compound_name_arity(C,F,0), M:meta_predicate(C).
 make_transparent(CM,_,PI,M:F/A):-!,make_transparent(CM,M,PI,F/A).
@@ -73,26 +73,26 @@ make_transparent(_CM,M,PI,F/A):-
 
 % ----------
 
-:- export((dynamic_multifile_exported)/1).
-:- export((dynamic_multifile_exported)/4).
+:- swi_export((dynamic_multifile_exported)/1).
+:- swi_export((dynamic_multifile_exported)/4).
 :- meta_predicate(( dynamic_multifile_exported(:), dynamic_multifile_exported(+,+,+,+))).
 :- module_transparent((dynamic_multifile_exported)/1).
 dynamic_multifile_exported( (M:F)/A ):- !,context_module(CM),
 '@'((dynamic_safe(M,F,A), 
    (static_predicate(M,F,A) -> true ; ((M:multifile(F/A),CM:multifile(F/A)))),
    % make_transparent(CM,M,PI,F/A),
-   M:export(F/A)),M). %,dmsg(dynamic_multifile_exported(CALL)).
+   M:swi_export(F/A)),M). %,dmsg(dynamic_multifile_exported(CALL)).
 dynamic_multifile_exported( FA ):- with_pi(FA,(dynamic_multifile_exported)).
 dynamic_multifile_exported(CM, M, _PI, F/A):-
 '@'((dynamic_safe(M,F,A), 
    (static_predicate(M,F,A) -> true ; ((M:multifile(F/A),CM:multifile(F/A)))),
    % make_transparent(CM,M,PI,F/A),
-   M:export(F/A)),M). %,dmsg(dynamic_multifile_exported(CALL)).
+   M:swi_export(F/A)),M). %,dmsg(dynamic_multifile_exported(CALL)).
 
 % ----------
 
 
-:- export(fill_args/2).
+:- swi_export(fill_args/2).
 fill_args([Arg|More],With):-!,ignore(With=Arg),fill_args(More,With).
 fill_args([],_).
 fill_args(PI,With):-compound_name_arguments(PI,_,ARGS),fill_args(ARGS,With).
@@ -100,7 +100,7 @@ fill_args(PI,With):-compound_name_arguments(PI,_,ARGS),fill_args(ARGS,With).
 :- meta_predicate(meta_predicate(0)).
 
 
-:- export(def_meta_predicate/3).
+:- swi_export(def_meta_predicate/3).
 :- meta_predicate((def_meta_predicate(0,+,+))).
 
 def_meta_predicate(M:F,S,E):-!,M:doall(((between(S,E,N),make_list('?',N,List),compound_name_arguments(CALL,F,List),'@'(meta_predicate(CALL),M)))).
@@ -108,7 +108,7 @@ def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 
 
 
-:- export(remove_pred/3).
+:- swi_export(remove_pred/3).
 remove_pred(_,_,_):-!.
 remove_pred(_,F,A):-member(_:F/A,[_:delete_common_prefix/4]),!.
 remove_pred(M,F,A):- functor(P,F,A),
@@ -118,7 +118,7 @@ remove_pred(M,F,A):- functor(P,F,A),
 
 
 :- meta_predicate(call_if_defined(0)).
-:- export(call_if_defined/1).
+:- swi_export(call_if_defined/1).
 call_if_defined(G):-current_predicate(_,G),G.
 
 
@@ -188,7 +188,7 @@ get_module_of(P,M):-functor_catch(P,F,A),get_module_of_4(P,F,A,M).
 
 
 % ----------
-:- export(static_predicate/3).
+:- swi_export(static_predicate/3).
 :- meta_predicate(static_predicate(+,+,+)).
 static_predicate(M,F,A):- functor_safe(FA,F,A),  once(M:predicate_property(FA,_)),not(M:predicate_property(FA,dynamic)),not((M:predicate_property(FA,imported_from(Where)),Where \== M)).
 
@@ -200,12 +200,12 @@ static_predicate(FA):-once(predicate_property(FA,_)),not(predicate_property(FA,d
 
 
 
-:- export((((dynamic_safe)/1))).
+:- swi_export((((dynamic_safe)/1))).
 :- meta_predicate(dynamic_safe(+)).
 :- module_transparent((((dynamic_safe)/1))).
 dynamic_safe(MFA):- with_mfa(MFA,dynamic_safe).
 
-:- export((((dynamic_safe)/3))).
+:- swi_export((((dynamic_safe)/3))).
 :- meta_predicate(dynamic_safe(+,+,+)).
 :- module_transparent((((dynamic_safe)/3))).
 
@@ -213,11 +213,11 @@ convert_to_dynamic(M:FA):- !, get_functor(FA,F,A),convert_to_dynamic(M,F,A).
 convert_to_dynamic(FA):- get_functor(FA,F,A), convert_to_dynamic(user,F,A).
 
 convert_to_dynamic(M,F,A):-  functor(C,F,A), M:predicate_property(C,dynamic),!.
-convert_to_dynamic(M,F,A):-  M:functor(C,F,A),\+ predicate_property(C,_),!,M:((dynamic(F/A),multifile(F/A),export(F/A))),!.
+convert_to_dynamic(M,F,A):-  M:functor(C,F,A),\+ predicate_property(C,_),!,M:((dynamic(F/A),multifile(F/A),swi_export(F/A))),!.
 convert_to_dynamic(M,F,A):-  functor(C,F,A),findall((C:-B),clause(C,B),List),rebuild_as_dyn(M,C,F,A),maplist(assertz,List),!.
 
 rebuild_as_dyn(M,C,_,_):- predicate_property(M:C,dynamic),!.
-rebuild_as_dyn(M,C,F,A):- redefine_system_predicate(M:C),M:abolish(F,A),dynamic(M:F/A),multifile(M:F/A),export(F/A),!.
+rebuild_as_dyn(M,C,F,A):- redefine_system_predicate(M:C),M:abolish(F,A),dynamic(M:F/A),multifile(M:F/A),swi_export(F/A),!.
 
 dynamic_safe(M,F,A):- functor(C,F,A),predicate_property(C,imported_from(system)),!,dmsg(warn(predicate_property(M:C,imported_from(system)))).
 dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> show_call(convert_to_dynamic(M,F,A)) ; logOnErrorIgnore((dynamic(M:F/A),multifile(M:F/A)))). % , warn_module_dupes(M,F,A).
@@ -300,7 +300,7 @@ rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
 export_all_preds:-source_location(File,_Line),module_property(M,file(File)),!,export_all_preds(M).
 
 export_all_preds(ModuleName):-forall(current_predicate(ModuleName:F/A),
-                   ((export(F/A),functor_safe(P,F,A),moo_hide_childs(ModuleName:P)))).
+                   ((swi_export(F/A),functor_safe(P,F,A),moo_hide_childs(ModuleName:P)))).
 
 
 
@@ -327,10 +327,10 @@ module_predicates_are_exported0(ModuleName):-
       not(member(F/A,List))), Private),
    module_predicates_are_not_exported_list(ModuleName,Private).
 
-:-export(export_if_noconflict/2).
+:-swi_export(export_if_noconflict/2).
 :-module_transparent(export_if_noconflict/2).
 export_if_noconflict(M,F/A):- current_module(M2),M2\=M,module_property(M2,exports(X)),member(F/A,X),dmsg(skipping_export(M2=M:F/A)),!.
-export_if_noconflict(M,F/A):-M:export(F/A).
+export_if_noconflict(M,F/A):-M:swi_export(F/A).
 
 % module_predicates_are_not_exported_list(ModuleName,Private):- once((length(Private,Len),dmsg(module_predicates_are_not_exported_list(ModuleName,Len)))),fail.
 module_predicates_are_not_exported_list(ModuleName,Private):- forall(member(F/A,Private),export_if_noconflict(ModuleName,F/A)).
@@ -352,7 +352,7 @@ module_meta_predicates_are_transparent(ModuleName):-
                    (dmsg(todo(module_transparent(ModuleName:F/A))),
                    (module_transparent(ModuleName:F/A)))))).
 
-:- export(all_module_predicates_are_transparent/1).
+:- swi_export(all_module_predicates_are_transparent/1).
 % all_module_predicates_are_transparent(_):-!.
 all_module_predicates_are_transparent(ModuleName):-
     forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)), 

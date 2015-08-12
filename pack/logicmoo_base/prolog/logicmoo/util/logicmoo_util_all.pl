@@ -1,12 +1,23 @@
 /** <module> Logicmoo Path Setups
 */
-:-module(logicmoo_util_all,[if_flag_true/2]).
+:- if(current_prolog_flag(dialect,yap)).
+swi_export(_P):-!.
+:- else.
+:-module_transparent(swi_export/1).
+user:swi_export(P):-export(P).
+:-module_transparent(swi_module/2).
+user:swi_module(_,_).
+:- endif.
+
+:-swi_module(logicmoo_util_all,[if_flag_true/2]).
 :- set_prolog_flag(generate_debug_info, true).
 :- set_prolog_flag(access_level,system).
 
-:- '@'( ensure_loaded((logicmoo_util_filestreams)), 'user').
-:- '@'( ensure_loaded((logicmoo_util_filesystem)), 'user').
-:- '@'( ensure_loaded((logicmoo_util_term_listing)), 'user').
+
+
+:- user:ensure_loaded((logicmoo_util_filestreams)).
+:- user:ensure_loaded((logicmoo_util_filesystem)).
+:- user:ensure_loaded((logicmoo_util_term_listing)).
 
 :- dynamic(double_quotes_was/1).
 :- multifile(double_quotes_was/1).
@@ -34,11 +45,13 @@
 :- dynamic   user:file_search_path/2.
 
 %logicmoo_util_all:if_flag_true(Flag,Goal):- catch(Flag,_,fail)->catch(Goal,E,throw(if_flag_true(E)));true.
-logicmoo_util_all:if_flag_true(Flag,Goal):- catch(Flag,E,(dmsg(E:Flag),fail)) -> must(Goal); true.
+
+:-export(if_flag_true/2).
+if_flag_true(Flag,Goal):- catch(Flag,E,(dmsg(E:Flag),fail)) -> must(Goal); true.
 
 join_path33(A,B,C):-exists_directory(B)->B=C;directory_file_path(A,B,C).
 
-:-export(with_vars/2).
+:-swi_export(with_vars/2).
 :-module_transparent(with_vars/2). 
 :- meta_predicate with_vars(*,0).
 with_vars([],Stuff):- !, Stuff.
@@ -80,16 +93,16 @@ with_vars(_,Stuff):- Stuff.
 
 
 
-:- '@'( ensure_loaded((logicmoo_util_bugger_new)), 'user').
-:- '@'( ensure_loaded((logicmoo_util_bugger_catch)), 'user').
-:- '@'( ensure_loaded((logicmoo_util_bugger)), 'user').
-:- '@'( ensure_loaded((logicmoo_util_strings)), 'user').
-:- '@'( ensure_loaded((logicmoo_util_library)), 'user').
-:- '@'( use_module((logicmoo_util_ctx_frame)), 'user').
-:- '@'( use_module((logicmoo_util_terms)), 'user').
-:- '@'( use_module((logicmoo_util_dcg)), 'user').
-:- '@'( use_module((logicmoo_util_coroutining_was)), 'user').
-:- '@'( use_module((logicmoo_util_coroutining_iz)), 'user').
+:- user:ensure_loaded((logicmoo_util_bugger_new)).
+:- user:ensure_loaded((logicmoo_util_bugger_catch)).
+:- user:ensure_loaded((logicmoo_util_bugger)).
+:- user:ensure_loaded((logicmoo_util_strings)).
+:- user:ensure_loaded((logicmoo_util_library)).
+:- user:use_module((logicmoo_util_ctx_frame)).
+:- user:use_module((logicmoo_util_terms)).
+:- user:use_module((logicmoo_util_dcg)).
+:- user:use_module((logicmoo_util_coroutining_was)).
+:- user:use_module((logicmoo_util_coroutining_iz)).
 
 
 /*

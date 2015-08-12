@@ -52,6 +52,8 @@
 %
 % clause types: (:-)/1, (:-)/2, (=>)/1,  (=>)/2, (<=)/1,  (<=)/2, (<=>)/2, fact/1
 %
+:- include(logicmoo_i_header).
+
 default_te(IF,VAR,VAL):-assertz(te_setting(IF,VAR,VAL)).
 
 :-default_te([source_filetype(pl) ],use_te,file_prolog).
@@ -339,6 +341,9 @@ db_expand_0(Op,DECL,O):- arg(_,DECL,S),string(S),DECL=..[F|Args],maplist(destrin
 db_expand_0(Op,EACH,O):- EACH=..[each|List],db_expand_maplist(fully_expand_now(Op),List,T,T,O).
 db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F/A|Args],integer(A),functor_declares_instance(D,TPRED),
   is_relation_type(TPRED),expand_props(_Prefix,Op,props(F,[D,TPRED|Args]),O),!.
+
+:- style_check(-singleton).
+
 db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F,A|Args],integer(A),functor_declares_instance(D,TPRED),
   is_relation_type(TPRED),expand_props(Prefix,Op,props(F,[D,TPRED|Args]),O),!.
 db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..  [D,C|Args],compound(C),functor_declares_instance(D,TPRED),get_functor(C,F,A),  

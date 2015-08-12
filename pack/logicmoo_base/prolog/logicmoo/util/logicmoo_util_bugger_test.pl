@@ -19,12 +19,12 @@ end_of_file.
 
 %:- assert_if_new(tlbugger:use_bugger_expansion).
 
-:- export(test_foo_test_safe/1).
+:- swi_export(test_foo_test_safe/1).
 test_foo_test_safe(Arg):-throw(test_foo_test_safe(Arg)).
-:- export(test_foo_test/1).
+:- swi_export(test_foo_test/1).
 test_foo_test(Arg):-dmsg(color(green,test_foo_test(Arg))).
 
-:- export(test_is/1).
+:- swi_export(test_is/1).
 test_is(Arg):-dmsg(color(red,test_is(Arg))).
 
 test1a:-test_is(bar).
@@ -32,7 +32,7 @@ test1a:-test_is(bar).
 test1b:-test_foo_test(dont_call_self).
 
 tst:-dmg(tSt).
-:- export(tst/0).
+:- swi_export(tst/0).
 
 %example program for testing
 %?-p(X).

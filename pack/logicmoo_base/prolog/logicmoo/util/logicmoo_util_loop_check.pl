@@ -1,5 +1,5 @@
 
-:-export(transitive/3).
+:-swi_export(transitive/3).
 :-meta_predicate(transitive(2,+,-)).
 :-meta_predicate(transitive_lc(2,+,-)).
 :-meta_predicate(transitive_except(+,2,+,-)).
@@ -107,10 +107,10 @@ call_no_cuts_loop_checked(Call, TODO):- clause(Call,Body),make_key(Body,Key),loo
 */
 
 % =====================================================================================================================
-:- export((call_tabled/2)).
-:- export((cannot_table_call/1)).
-:- export((cannot_use_tables/1)).
-:- export((skipped_table_call/1)).
+:- swi_export((call_tabled/2)).
+:- swi_export((cannot_table_call/1)).
+:- swi_export((cannot_use_tables/1)).
+:- swi_export((skipped_table_call/1)).
 % =====================================================================================================================
 :- meta_predicate call_tabled(0).
 :- module_transparent call_tabled/1.

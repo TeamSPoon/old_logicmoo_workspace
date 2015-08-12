@@ -110,15 +110,15 @@ sformat(Str,Msg,Vs,Opts):- with_output_to(chars(Codes),(current_output(CO),portr
 portray_clause_w_vars(Out,Msg,Vs,Options):- \+ \+ ((prolog_listing:do_portray_clause(Out,Msg,[variable_names(Vs),numbervars(true),character_escapes(true),quoted(true)|Options]))),!.
 
 
-:-export((portray_clause_w_vars/4,dmsg5/2,ansicall/3,ansi_control_conv/2)).
+:-swi_export((portray_clause_w_vars/4,dmsg5/2,ansicall/3,ansi_control_conv/2)).
 
 :-thread_local(tlbugger:skipDmsg/0).
 
 dmsginfo(V):-dmsg(info(V)).
 dmsg(V):- cnotrace((dmsg0(V))).
 
-:-export(dmsg0/1).
-:-export(dmsg1/1).
+:-swi_export(dmsg0/1).
+:-swi_export(dmsg1/1).
 dmsg0(V):- is_with_dmsg(FP),!,FP=..FPL,append(FPL,[V],VVL),VV=..VVL,once(dmsg0(VV)).
 dmsg0(_):- \+ always_show_dmsg, is_hiding_dmsgs,!.
 
@@ -151,7 +151,7 @@ dmsg3(Msg):-
          sformat(Str,Msg,[],[]),
          string_to_atom(AStr,Str),concat_atom(Lines,'\n',AStr),
          mesg_color(Msg,Ctrl),!,
-         thread_current_error_stream(ID,Err),
+         thread_current_error_stream(main,Err),
          with_output_to_stream(Err,  
                      forall(member(E,Lines), dmsg5(Ctrl,E))).
 
@@ -222,21 +222,21 @@ ansifmt(Stream, _Attr, Format, Args) :- 'format'(Stream, Format, Args).
 
 :-use_module(library(ansi_term)).
 
-:- export(ansifmt/2).
+:- swi_export(ansifmt/2).
 ansifmt(Ctrl,Fmt):- colormsg(Ctrl,Fmt).
-:- export(ansifmt/3).
+:- swi_export(ansifmt/3).
 ansifmt(Ctrl,F,A):- colormsg(Ctrl,(format(F,A))).
 
 
 
-:- export(colormsg/2).
+:- swi_export(colormsg/2).
 
 
 
 colormsg(d,Msg):- mesg_color(Msg,Ctrl),!,colormsg(Ctrl,Msg).
 colormsg(Ctrl,Msg):- fresh_line,ansicall(Ctrl,fmt0(Msg)),fresh_line.
 
-:- export(ansicall/2).
+:- swi_export(ansicall/2).
 ansicall(Ctrl,Call):- hotrace((current_output(Out), ansicall(Out,Ctrl,Call))).
 
 ansi_control_conv([],[]):-!.
@@ -322,7 +322,7 @@ mesg_arg1(T,F):-functor_h0(T,F,_).
 mesg_arg1(T,C):-compound(T),arg(1,T,F),!,nonvar(F),mesg_arg1(F,C).
 
 
-:- export(defined_message_color/2).
+:- swi_export(defined_message_color/2).
 :-dynamic(defined_message_color/2).
 
 defined_message_color(todo,[fg(red),bg(black),underline]).
@@ -361,7 +361,7 @@ fg_color(LU,FG):-member(fg(FG),LU),FG\=white,!.
 fg_color(LU,FG):-member(hfg(FG),LU),FG\=white,!.
 fg_color(_,default).
 
-:- export(random_color/1).
+:- swi_export(random_color/1).
 random_color([reset,M,FG,BG,font(Font)]):-Font is random(8),
   findall(Cr,ansi_term:ansi_color(Cr, _),L),
   random_member(E,L),
@@ -370,16 +370,16 @@ random_color([reset,M,FG,BG,font(Font)]):-Font is random(8),
   random_member(M,[bold,faint,reset,bold,faint,reset,bold,faint,reset]),!. % underline,negative
 
 
-:- export(tst_color/0).
+:- swi_export(tst_color/0).
 tst_color:- make, ignore((( between(1,20,_),random_member(Call,[colormsg(C,cm(C)),dmsg(color(C,dm(C))),ansifmt(C,C)]),next_color(C),Call,fail))).
-:- export(tst_color/1).
+:- swi_export(tst_color/1).
 tst_color(C):- make,colormsg(C,C).
 
-:- export(next_color/1).
+:- swi_export(next_color/1).
 next_color(C):- between(1,10,_), random_color(C), good_next_color(C),!.
 next_color([underline|C]):- random_color(C),!.
 
-:- export(contrasting_color/2).
+:- swi_export(contrasting_color/2).
 contrasting_color(white,black).
 contrasting_color(A,default):-atom(A),A \= black.
 contrasting_color(fg(C),bg(CC)):-!,contrasting_color(C,CC),!.

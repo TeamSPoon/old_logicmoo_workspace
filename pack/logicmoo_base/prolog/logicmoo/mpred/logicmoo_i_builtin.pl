@@ -55,23 +55,25 @@ pfc_testing.
 
 :- if(if_defined(pfc_testing)).
 
+:- abolish(c,0).
+:- abolish(a,1).
+:- abolish(b,1).
+:- dynamic((a/1,b/1,c/0)).
+
 => a(z).
 
 :-pfc_test(a(_)).
 
-=> ~a(z).
+~a(z).
 
 :-pfc_test(\+neg(a(_))).
+:-pfc_test(\+(a(_))).
 
-
-
-:- endif.
-:- if(if_defined(pfc_testing)).
 
 % U=nt(A,B,C),spft(X,Y,Z),\+ \+
 
 
-:- dynamic((a/1,b/1,c/0)).
+
 (a(B),d(B),f(B)) => b(B).
 
 (a(B),d(B),e(B)) => b(B).
@@ -80,7 +82,7 @@ pfc_testing.
 d(q).
 % ?- nl,ZU=nt(_,_,_),ZU,spft(X,Y,Z),\+ \+ ZU=Z,nl.
 
-(b(B),e(q)) => c.
+(b(_),e(q)) => c.
 (~a(B),~e(B)) => q.
 
 d(B)<=a(B).
@@ -89,7 +91,9 @@ d(B)<=a(B).
 => e(q).
 => b(q).
 => a(q).
+
 :- pfc_test(c).
+
 :- endif.
 
 :-pfc_run.
@@ -307,7 +311,7 @@ tSet(C)=>completelyAssertedCollection(C).
 ttFormatType(C)=> ~completelyAssertedCollection(C).
 
 tCol(C)/(atom(C),TCI=..[C,I]) => {decl_type(C)},arity(C,1),pfc_univ(C,I,TCI).
-(tCol(C)/(atom(C),TCI=..[C,_I],\+ static_predicate(TCI) )) => {dynamic(C/1)}.
+(tCol(C)/(atom(C),TCI=..[C,I],\+ static_predicate(TCI) )) => {dynamic(C/1)}.
 (tCol(C)/(atom(C),TCI=..[C,I],\+ static_predicate(TCI), \+completelyAssertedCollection(C))) 
   => ((TCI:-cwc,
     ( \+ neg(TCI)),
@@ -464,6 +468,7 @@ meta_argtypes(ArgTypes)/compound(ArgTypes) => {get_functor(ArgTypes,F,A)},arity(
 
 prologMacroHead(tCol).
 
+:- must(ensure_loaded('../pfc/relationAllExists.pfc')).
 
 completelyAssertedCollection(prologSingleValued).
 completelyAssertedCollection(tCol).
@@ -1275,6 +1280,8 @@ argSingleValueDefault(F, N, _)=>singleValuedInArg(F,N).
 
 :- must(ensure_loaded('../pfc/singleValued.pfct')).
 
-:-do_gc.
 
+% :-prolog.
 % :- rescan_pfc.
+
+

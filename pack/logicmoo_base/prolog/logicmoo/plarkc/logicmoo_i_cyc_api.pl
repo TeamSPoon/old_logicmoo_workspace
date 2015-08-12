@@ -9,7 +9,9 @@
 % ===================================================================
 
 :-module(cyc,[lisp_read_codes/2,lisp_read/1,lisp_read/2,getSurface/2,getSurface/3,getSurfaceFromChars/3,getSurfaceFromStream/3]).
+:-if(current_prolog_flag(dialect,swi)).
 :-set_prolog_flag(double_quotes,codes).
+:-endif.
 /*
 :-export((
 	 cycInit/0,

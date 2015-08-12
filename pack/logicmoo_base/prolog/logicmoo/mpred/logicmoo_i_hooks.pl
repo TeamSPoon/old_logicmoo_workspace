@@ -77,7 +77,7 @@ isSlot(Denotation,PrologVar):- isVarObject(Denotation,PrologVar),!.
 % ===============================================================================================
 % ===============================================================================================
 
-isHiddenSlot(Term):-fail.
+isHiddenSlot(_Term):-fail.
 
 % ===============================================================================================
 % ===============================================================================================
@@ -88,11 +88,11 @@ isVarProlog(A):-((var(A);A='$VAR'(_))).
 % ===============================================================================================
 
 isVarObject(Denotation):-((
-		  isObject(Denotation,BaseType),
+		  isObject(Denotation,_BaseType),
 		  arg(1,Denotation,Value),!,isSlot(Value))).
 
 isVarObject(Denotation,Value):-((
-		  isObject(Denotation,BaseType),
+		  isObject(Denotation,_BaseType),
 		  arg(1,Denotation,Value),!,isSlot(Value))).
 
 % ===============================================================================================
@@ -119,7 +119,7 @@ isQualifiableAs(Denotation,BaseType,Value):-
 
 isQualifiedAs(Denotation,_,_):-not(compound(Denotation)),!,fail.
 isQualifiedAs(Denotation,BaseType,Value):-
-		  isQualifiedAs(Denotation,BaseType,Value,SubType).
+		  isQualifiedAs(Denotation,BaseType,Value,_SubType).
 isQualifiedAs(Denotation,BaseType,Value,SubType):-
 		  isObject(Denotation,BaseType),
 		  arg(1,Denotation,Value),
@@ -128,6 +128,7 @@ isQualifiedAs(Denotation,BaseType,Value,SubType):-
 
 % ===============================================================================================
 % ===============================================================================================
+:- style_check(-singleton).
 
 lastImproperMember(Default,Default,List):-isVarProlog(List),!.
 lastImproperMember(Default,Default,[]):-!.

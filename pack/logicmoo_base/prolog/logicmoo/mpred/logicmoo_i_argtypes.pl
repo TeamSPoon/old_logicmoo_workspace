@@ -33,7 +33,7 @@ assert_argIsa(Prop,N,Type):-show_call_failure(add_fast(argIsa(Prop,N,Type))).
 assert_predArgTypes(ArgTs):-not(compound(ArgTs)),!.
 assert_predArgTypes(ArgTs):- numbervars(ArgTs,0,_,[functor_name(ftTerm)]),get_functor(ArgTs,F),assert_predArgTypes_fa(F,ArgTs).
 
-assert_predArgTypes_fa(F,ArgTs):- nonvar(ArgTs),ArgTs=(_/_),!.
+assert_predArgTypes_fa(_,ArgTs):- nonvar(ArgTs),ArgTs=(_/_),!.
 assert_predArgTypes_fa(F,ArgTs):- not(is_list(ArgTs)),ArgTs=..[_|ArgsL],!,assert_predArgTypes_fa(F,ArgsL).
 %assert_predArgTypes_fa(F,ArgsList):- clause_asserted(ftAction(F),true),!,show_call(must(assert_predArgTypes_from_left(F,1,ArgsList))).
 assert_predArgTypes_fa(F,ArgsList):- length(ArgsList,L),assert_predArgTypes_l(F,L,ArgsList).
@@ -54,7 +54,7 @@ assert_predArgTypes_from_left(F,A,[Type|ArgsList]):-assert_argIsa(F,A,Type),!,Ap
 term_is_ft(Term,Type):- var(Term),!,member(Type,[ftVar,ftProlog]).
 term_is_ft(_ANY,Type):- Type==ftVar,!,fail.
 term_is_ft([T|Term],ftListFn(Type)):-!,is_list_of(Type,[T|Term]).
-term_is_ft(Term,Type):- nonvar(Type),(ttFormatType==Type;(\+ ttFormatType(Type))),!,fail.
+term_is_ft(_ANY,Type):- nonvar(Type),(ttFormatType==Type;(\+ ttFormatType(Type))),!,fail.
 term_is_ft(Term,Type):- no_repeats_old(Type,(term_is_ft_how(Term,Was),trans_subft(Was,Type))).
 
 

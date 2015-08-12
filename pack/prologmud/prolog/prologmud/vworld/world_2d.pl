@@ -248,14 +248,14 @@ mudExitAtLoc(Region,Dir,xyzFn(Region,X,Y,Z)):-calc_from_center_xyz(Region,Dir,2,
 % :-kif_tell(localityOfObject(A,B) &  localityOfObject(B,C) => localityOfObject(A,C)).
 
 :- decl_mpred_hybrid(mudSubPart/2).
-:- decl_mpred_hybrid(predInnerArgIsa/1).
+:- decl_mpred_hybrid(predInterArgIsa/1).
 :- decl_mpred_hybrid(relationAllExists/3).
 
 
 genls(tPlayer,tHominid).
 genls(tHumanBody,tBodyPart).
 
-predInnerArgIsa(mudSubPart(tBodyPart,tBodyPart)).
+predInterArgIsa(mudSubPart(tBodyPart,tBodyPart)).
 
 
 relationAllExists(Pred,Col1,Col2), isa(Inst,Col1) => ({G=..[Pred,Inst,Value]},( ~G => ({Value=skPredArg2InstFn(Pred,Col2)},isa(Value,Col2), G))).
@@ -277,12 +277,16 @@ find_instance_of(Pred,Subj,Obj):- relationAllExists(Pred,SubjT,ObjT), isa(Subj,S
 
 mudSubPart(Outer,Inner):-mudInsideOf(Inner,Outer).
 mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).
-mudSubPart(Subj,Obj):- (nonvar(Subj);nonvar(Obj)),!,test_tl(infThirdOrder), find_instance_of(mudSubPart,Subj,Obj).
+% mudSubPart(Subj,Obj):- (nonvar(Subj);nonvar(Obj)),!,test_tl(infThirdOrder), find_instance_of(mudSubPart,Subj,Obj).
 % mudSubPart(face,isEach(eyes,nose,mouth)).
 % mudSubPart([upper_torso,arms,left_arm,left_hand,left_digits]).
 % mudSubPart([upper_torso,arms,right_arm,right_hand,right_digits]).
 % mudSubPart([pelvis,legs,left_leg,left_foot,left_toes]).
 % mudSubPart([pelvis,legs,right_leg,right_foot,right_toes]).
+
+predPredicateToFunction(Pred,SubjT,ObjT,FullNameFnO):- 
+  is_asserted(predPredicateToFunction(Pred,SubjT,ObjT,FullNameFn)) *-> FullNameFnO=FullNameFn ; 
+  (i_name('i',ObjT,Obj),i_name(Obj,Pred,ObjPred),i_name('Of',SubjT,OfSubj),concat_atom([ObjPred,OfSubj,'Fn'],FullNameFn)),simplifyFullName(FullNameFn,FullNameFnO).
 
 
 

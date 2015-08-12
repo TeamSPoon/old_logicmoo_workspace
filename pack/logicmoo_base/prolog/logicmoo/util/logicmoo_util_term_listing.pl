@@ -1,6 +1,6 @@
 
 
-:- export(mstatistics/0).
+:- swi_export(mstatistics/0).
 mstatistics:-
   garbage_collect,
   garbage_collect_atoms,
@@ -33,13 +33,13 @@ blob_info(A,blob(record),blob(A,T,Y)):-T=record,with_output_to(string(Y),print_r
 % blob_info(A,blob(T),blob(A,T,Y)):-with_output_to(string(Y),prolog_term_view:emit_term(A, [])).
 blob_info(A,blob(T),blob(A,T)).
 
-:- export(saved_current_atom/2).
+:- swi_export(saved_current_atom/2).
 :-dynamic(saved_current_atom/2).
-:- export(new_atoms/2).
+:- swi_export(new_atoms/2).
 new_atoms(X,Type):-current_atom_or_blob(X,Type),not(saved_current_atom(X,Type)).
-:- export(save_atoms/0).
+:- swi_export(save_atoms/0).
 save_atoms:-forall(new_atoms(X,Type),assert(saved_current_atom(X,Type))).
-:- export(b_i/2).
+:- swi_export(b_i/2).
 b_i(L,NA):-findall(W,(new_atoms(X,Type),once(blob_info(X,Type,W))),LL),list_to_set(LL,L),length(L,NA).
 print_record_properties(Record, Out) :-
 	format(Out, 'Record reference ~w~n', [Record]),
@@ -94,7 +94,7 @@ contains_term_unifiable(SearchThis,Find):-compound(SearchThis),functor_safe(Sear
 :- multifile user:listing_mpred_hook/1.
 :- dynamic user:listing_mpred_hook/1.
 
-:-export((term_listing/1)).
+:-swi_export((term_listing/1)).
 term_listing([]):-!.
 term_listing(Match):- 
   '@'(ignore((catchvv(listing(Match),E,wdmsg(E)))),'user'),
@@ -107,7 +107,7 @@ user:term_mpred_listing(Match):-
  once(debugOnError(doall(call_no_cuts(user:listing_mpred_hook(Match))))),
  !. %format(' <= listing_mpred_hook(~q) */ ~n',[Match]).
 
-:-export(term_non_listing/1).
+:-swi_export(term_non_listing/1).
 term_non_listing(Match):- 
    format('/* term_non_listing(~q) => ~n',[Match]),
       term_listing_inner(portray_hbr,Match),
@@ -132,7 +132,7 @@ prolog:locate_clauses(A, _) :- current_predicate(logicmoo_bugger_loaded/0),bugge
 
 
 :-multifile((synth_clause_for/3)).
-:-export((synth_clause_for/3)).
+:-swi_export((synth_clause_for/3)).
 
 % bookeepingPredicate(M:G):- member(M:F/A,[M:'$exported_op'/3]),current_module(M),functor(G,F,A),once(predicate_property(M:G,_)).
 bookeepingPredicate1(user:file_search_path(_,_)).
@@ -154,7 +154,7 @@ synth_clause_for(M:H,B,Ref):- (findall((Size-(M:H)),retract(thlocal:large_predic
    keysort(KeyList,KeySorted), pairs_values(KeySorted, ByLength),format('~N~n% listing larger preds now.. ~q~n',[KeySorted]))->
       member(M:H,ByLength),clause(M:H,B,Ref),flush_output.
 
-:-export((synth_clause_ref/3)).
+:-swi_export((synth_clause_ref/3)).
 synth_clause_ref(M:H,M:predicate_property(H,B),true,0):- predicate_property(M:H,B).
 synth_clause_ref(G,G,true,0):-  bookeepingPredicate2(G),!,catch(G,_,fail).
 synth_clause_ref(M:H,M:H,B,Ref):- predicate_property(M:H,number_of_clauses(Size)),!,
@@ -164,7 +164,7 @@ synth_clause_ref(M:H,M:H,B,Ref):- predicate_property(M:H,number_of_clauses(Size)
 %synth_clause_ref(M:H,B,Ref):-M==user,!,synth_clause_ref(H,B,Ref).
 % synth_clause_ref(H,(fail,synth_clause_info(Props)),0):- (H\=(_:-_)),once(pred_info(H,Props)), Props\==[].
 
-:-export((term_matches_hb/3)).
+:-swi_export((term_matches_hb/3)).
 
 term_matches_hb(HO,H,B):-term_matches_hb(999,HO,H,B).
 term_matches_hb(_,Var,_,_):-var(Var),!.
@@ -197,7 +197,7 @@ term_matches_hb(D,HO,H,B):- \+ \+ term_matches_unify(D,HO,(H:-B)).
 
 % ?- term_listing((h(depth(0,pt/2)),same(tBird(A)))).
 
-:-export(term_matches_unify/3).
+:-swi_export(term_matches_unify/3).
 term_matches_unify(_R,same(HO),V):-HO=@=V.
 term_matches_unify(_R,_,V):-var(V),!,fail.
 term_matches_unify(_R,V,V).
@@ -217,7 +217,7 @@ nonvar_search(F/A):-!,nonvar(F),nonvar(A).
 %nonvar_search(P):-compound(F).
 
 :-dynamic(cur_predicates/1).
-:-export((cur_predicate)/2).
+:-swi_export((cur_predicate)/2).
 cur_predicate(M:F/A,M:P):-
    current_predicate(M:F/A),functor(P,F,A),\+ predicate_property(M:P,imported_from(_)).
 /*
@@ -266,7 +266,7 @@ to_mp(M1:P,M2,P):-ignore(M1=M2).
 to_mp(P,_,P):-nonvar(P),!.
 */
 
-:-export(ok_show/1).
+:-swi_export(ok_show/1).
 ok_show(F/A):-!,functor(P,F,A),ok_show(P),!.
 ok_show(P):-not(bad_pred(P)).
 
@@ -274,12 +274,12 @@ ok_show(P):-not(bad_pred(P)).
 
 % when we import new and awefull code base (the previous )this can be helpfull
 % we redfine list_undefined/1 .. this is the old version
-:- export(scansrc_list_undefined/1).
+:- swi_export(scansrc_list_undefined/1).
 scansrc_list_undefined(_):-!.
 scansrc_list_undefined(A):- real_list_undefined(A).
 
 
-:- export(real_list_undefined/1).
+:- swi_export(real_list_undefined/1).
 real_list_undefined(A):- 
  merge_options(A, [module_class([user])], B),
         prolog_walk_code([undefined(trace), on_trace(found_undef)|B]),
@@ -292,9 +292,9 @@ real_list_undefined(A):-
             maplist(check:report_undefined, G)
         ).
 
-:-export(mmake/0).
+:-swi_export(mmake/0).
 mmake:- ignore(update_changed_files), ignore(if_defined(load_mpred_files,true)).
-:-export(update_changed_files/0).
+:-swi_export(update_changed_files/0).
 update_changed_files :-
         set_prolog_flag(verbose_load,true),
         ensure_loaded(library(make)),
@@ -313,7 +313,7 @@ update_changed_files :-
            true %list_undefined,list_void_declarations
 	).
 
-:- export(remove_undef_search/0).
+:- swi_export(remove_undef_search/0).
 % check:list_undefined:-real_list_undefined([]).
 remove_undef_search:- ((
  '@'(use_module(library(check)),'user'),
@@ -330,7 +330,7 @@ mp(M,P,MP):-atom(M),!,(MP=M:P ; MP=P).
 mp(_,P,MP):-MP=P.
 
 
-:-export(bad_pred/1).
+:-swi_export(bad_pred/1).
 bad_pred(M:P):-!,atom(M),bad_pred(P). 
 %bad_pred(P):-functor(P,F,A),arg(_,v(cur_predicates/_,db_op/_,db_op00/_,db_op0/_,db_op_loop/_,do_expand_args_l/3),F/A).
 %bad_pred(P):-predicate_property(P,autoloaded(_)).
@@ -338,14 +338,14 @@ bad_pred(M:P):-!,atom(M),bad_pred(P).
 %bad_pred(P):-predicate_property(P,imported_from(_)),predicate_property(P,static).
 %bad_pred(P):-predicate_property(P,foreign).
 
-:-export(pred_info/2).
+:-swi_export(pred_info/2).
 pred_info(H,Props):- get_functor(H,F,_),findall(PP,user:mpred_prop(F,PP),Props).
 
-:-export(portray_hbr/3).
+:-swi_export(portray_hbr/3).
 portray_hbr(H,B,_):- B==true, !, portray_one_line(H).
 portray_hbr(H,B,_):- portray_one_line((H:-B)).
 
-:-export(portray_one_line/1).
+:-swi_export(portray_one_line/1).
 :-thread_local(portray_one_line_hook/1).
 portray_one_line(H):- portray_one_line_hook(H),!.
 portray_one_line(H):- current_predicate(wdmsg/1),wdmsg(H),!.

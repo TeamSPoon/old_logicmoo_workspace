@@ -7,7 +7,7 @@
 % Revision:  $Revision: 1.7 $
 % Revised At:   $Date: 2002/07/11 21:57:28 $
 % ===================================================================
-logicmoo_util_library:-module(logicmoo_util_library,
+:-swi_module(logicmoo_util_library,
         [dynamic_transparent/1,
          upcase_atom_safe/2,
          get_module_of/2,
@@ -33,20 +33,9 @@ logicmoo_util_library:-module(logicmoo_util_library,
          flatten_set/2,
          at_start/1,
          in_thread_and_join/1,
-         in_thread_and_join/2,        
-         asserta_new/1,
-         assertz_new/1,
-         as_clause/3,
-         asserta_if_new/1,
-         assertz_if_new/1,
-         assertz_if_new_clause/1,
-         assertz_if_new_clause/2,
-         throw_if_true_else_fail/2,
-         assert_if_new/1,
-         safe_univ/2,
-         clause_asserted/2,
-         clause_asserted/1,         
+         in_thread_and_join/2,               
          make_list/3,
+         throw_if_true_else_fail/2,
          if_file_exists/1,
          multi_transparent/1]).
 
@@ -84,7 +73,7 @@ safe_univ0(Call,[L|List]):- not(is_list(Call)),sanity(atom(L);compound(Call)), C
 safe_univ0([L|List],[L|List]):- var(List),atomic(Call),!,grtrace,Call =.. [L|List],warn_bad_functor(L).
 safe_univ0(Call,[L|List]):- sanity(atom(L);compound(Call)),ccatch(Call =.. [L|List],E,(dumpST,'format'('~q~n',[E=safe_univ(Call,List)]))),warn_bad_functor(L).
 
-:- export(append_term/3).
+:- swi_export(append_term/3).
 append_term(T,I,HEAD):-atom(T),HEAD=..[T,I],!.
 append_term(Call,E,CallE):-var(Call), must(compound(CallE)),CallE=..ListE,append(List,[E],ListE),Call=..List.
 append_term(Call,E,CallE):-must(compound(Call)), Call=..List, append(List,[E],ListE), CallE=..ListE.
@@ -103,14 +92,14 @@ append_term(Call,E,CallE):-must(compound(Call)), Call=..List, append(List,[E],Li
 % If a third argument many is provided, it is an integer which says how many times func may be applied; 
 % the default, as described above, is infinitely many times.
 :- meta_predicate(maptree(2,+,-)).
-:-export(maptree/3).
+:-swi_export(maptree/3).
 maptree(Pred,I,O):- call(Pred,I,O),!.
 maptree(_ ,I,O):- ( \+ compound(I) ),!, must(I=O).
 maptree(Pred,[F|IL],LIST):- is_list([F|IL]), (maplist(maptree(Pred),[F|IL],LIST)),!.
 maptree(Pred,I,O):- I=..[F|IL], (maplist(maptree(Pred),[F|IL],[FO|OL])),
    (atom(FO)-> O=..[FO|OL] ; must((nop(maptree(I)),O=..[F,FO|OL]))).
 
-:- export(disjuncts_to_list/3).
+:- swi_export(disjuncts_to_list/3).
 disjuncts_to_list(Var,[Var]):-is_ftVar(Var),!.
 disjuncts_to_list(true,[]).
 disjuncts_to_list([],[]).
@@ -128,7 +117,7 @@ disjuncts_to_list((A;B),ABL):-!,
   append(AL,BL,ABL).
 disjuncts_to_list(Lit,[Lit]).
 
-:- export(conjuncts_to_list/2).
+:- swi_export(conjuncts_to_list/2).
 conjuncts_to_list(Var,[Var]):-is_ftVar(Var),!.
 conjuncts_to_list(true,[]).
 conjuncts_to_list([],[]).
@@ -147,7 +136,7 @@ conjuncts_to_list((A,B),ABL):-!,
 conjuncts_to_list(Lit,[Lit]).
 
 
-:- export(pred_juncts_to_list/3).
+:- swi_export(pred_juncts_to_list/3).
 pred_juncts_to_list(_,Var,[Var]):-is_ftVar(Var),!.
 pred_juncts_to_list(_,true,[]).
 pred_juncts_to_list(_,[],[]).
@@ -169,10 +158,10 @@ pred_juncts_to_list([A|B],ABL):-!,
 pred_juncts_to_list(Lit,[Lit]).
 
 
-:- export(list_to_conjuncts/2).
+:- swi_export(list_to_conjuncts/2).
 list_to_conjuncts(I,O):-list_to_conjuncts((,),I,O).
 
-:- export(list_to_conjuncts/3).
+:- swi_export(list_to_conjuncts/3).
 list_to_conjuncts(_,V,V):-not(compound(V)),!.
 list_to_conjuncts(_,[],true).
 list_to_conjuncts(OP,[H],HH):-list_to_conjuncts(OP,H,HH).
@@ -215,10 +204,10 @@ read_each_term(S,CMD,Vs):- atom_string(W,S),atom_to_memory_file(W,MF),
 
 
 
-:- export(each_subterm/2).
+:- swi_export(each_subterm/2).
 each_subterm(B, A):- (compound(B), arg(_, B, C), each_subterm(C, A));A=B.
 
-:- export(each_subterm/3).
+:- swi_export(each_subterm/3).
 each_subterm(A,Pred,B):- call( Pred,A,B).
 each_subterm(A,Pred,O):- 
    compound(A),
@@ -314,7 +303,7 @@ nd_pred_subst2(_, _X, _Sk, L, L ).
 
 % -- CODEBLOCK
 % Usage: pred_subst(+Pred,+Fml,+X,+Sk,?FmlSk)
-:- export(pred_subst/5).
+:- swi_export(pred_subst/5).
 
 pred_subst( Pred, P,       X,Sk,       P1    ) :- call(Pred,P,X),!,must( Sk=P1),!.
 pred_subst(_Pred, P,       _,_ ,       P1    ) :- is_ftVar(P),!, must(P1=P),!.
@@ -382,7 +371,7 @@ weak_nd_subst2( _X, _Sk, L, L ).
 make_list(E,1,[E]):-!.
 make_list(E,N,[E|List]):- M1 is N - 1, make_list(E,M1,List),!.
 
-:- export(flatten_set/2).
+:- swi_export(flatten_set/2).
 flatten_set(L,S):-flatten([L],F),list_to_set(F,S),!.
 %flatten_set(Percepts0,Percepts):- flatten([Percepts0],Percepts1),remove_dupes(Percepts1,Percepts).
 
@@ -455,7 +444,7 @@ at_start(Goal):-
 	).
 
 
-:- export(list_to_set_safe/2).
+:- swi_export(list_to_set_safe/2).
 list_to_set_safe(A,A):-(var(A);atomic(A)),!.
 list_to_set_safe([A|AA],BB):- (not(not(lastMember2(A,AA))) -> list_to_set_safe(AA,BB) ; (list_to_set_safe(AA,NB),BB=[A|NB])),!.
 
@@ -492,15 +481,15 @@ list_retain([],_Pred,[]):-!.
 list_retain([R|List],Pred,[R|Retained]):- call(Pred,R),!, list_retain(List,Pred,Retained).
 list_retain([_|List],Pred,Retained):- list_retain(List,Pred,Retained).
 
-:- export(identical_member/2).
+:- swi_export(identical_member/2).
 identical_member(X,[Y|_])  :-
 	X == Y,
 	!.
 identical_member(X,[_|L]) :-
 	'identical_member'(X,L).
 
-:- export(delete_eq/3).
-:- export(pred_delete/4).
+:- swi_export(delete_eq/3).
+:- swi_export(pred_delete/4).
 delete_eq(A,B,C):-pred_delete(==,A,B,C).
 pred_delete(_,[], _, []).
 pred_delete(Pred,[A|C], B, D) :-
@@ -512,7 +501,7 @@ pred_delete(Pred,[A|C], B, D) :-
 
 
 
-:-export(doall/1).
+:-swi_export(doall/1).
 :- meta_predicate doall(0).
 doall(M:C):-!, M:ignore(M:(C,fail)).
 doall(C):-ignore((C,fail)).
@@ -549,7 +538,7 @@ load_dirrective(CALL,_Options):- CALL=..[module,M,_Preds],!,module(M),call(CALL)
 load_dirrective(Term,_Options):-!,Term.
 
 % =====================================================================================================================
-:- export((call_no_cuts/1)).
+:- swi_export((call_no_cuts/1)).
 % =====================================================================================================================
 :- meta_predicate call_no_cuts(0).
 :- module_transparent call_no_cuts/1.

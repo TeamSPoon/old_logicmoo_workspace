@@ -17,32 +17,32 @@
 pfc_ain(X):-if_defined(pfc_add(X),assert_if_new(X)).
 ain(X):-if_defined(pfc_add(X),assert_if_new(X)).
 
-:-export(user:struct_decl/1).
+:-swi_export(user:struct_decl/1).
 :-multifile(user:struct_decl/1).
 :-dynamic(user:struct_decl/1).
 
-:-export(user:struct_names/2).
+:-swi_export(user:struct_names/2).
 :-multifile(user:struct_names/2).
 :-dynamic(user:struct_names/2).
 
-:-export(user:struct_datatype/2).
+:-swi_export(user:struct_datatype/2).
 :-multifile(user:struct_datatype/2).
 :-dynamic(user:struct_datatype/2).
 
-:-export(user:struct_prototype/2).
+:-swi_export(user:struct_prototype/2).
 :-multifile(user:struct_prototype/2).
 :-dynamic(user:struct_prototype/2).
 
 
-:-export(user:member_datatype/3).
+:-swi_export(user:member_datatype/3).
 :-multifile(user:member_datatype/3).
 :-dynamic(user:member_datatype/3).
 
-:-export(user:member_loc/3).
+:-swi_export(user:member_loc/3).
 :-multifile(user:member_loc/3).
 :-dynamic(user:member_loc/3).
 
-:-export(user:member_init/3).
+:-swi_export(user:member_init/3).
 :-multifile(user:member_init/3).
 :-dynamic(user:member_init/3).
 

@@ -27,13 +27,13 @@
 
 pred_type_test(H,F/_):-!,atom(F),THFA=..[H,F],clause(THFA,true).
 pred_type_test(H,F):- \+ compound(F), !,atom(F),THFA=..[H,F/_],clause(THFA,true).
-pred_type_test(H,P):-functor(P,F,A),!,THFA=..[H,F/A],THF=..[H,F],(clause(THFA,true);clause(HF,true)).
+pred_type_test(H,P):-functor(P,F,A),!,THFA=..[H,F/A],HF=..[H,F],(clause(THFA,true);clause(HF,true)).
 
 pred_type_test2(T,F):- \+ compound(F),!,arity(F,A),!,pred_type_test(T,F,A).
 pred_type_test2(T,F/A):-!,atom(F),arity(F,A),!,pred_type_test(T,F,A).
 pred_type_test2(T,P):-functor(P,F,A),!,pred_type_test(T,F,A).
 
-pred_type_test(H,F,A):- THFA=..[H,F/A],THF=..[H,F],(clause(THFA,true);clause(HF,true)).
+pred_type_test(H,F,A):- THFA=..[H,F/A],HF=..[H,F],(clause(THFA,true);clause(HF,true)).
 
 arity(apathFn,2).
 arity(isKappaFn,2).
@@ -94,7 +94,7 @@ decl_mpred_prolog(CM,M,PI,FA):- loop_check(must(decl_mpred_prolog_ilc(CM,M,PI,FA
 
 decl_mpred_prolog_ilc(CM,M,PI,F/A):-atom(PI),A==0,not(current_predicate(F/A)),!,must(arity(F,_)),forall((arity(F,AA),AA\=0),(functor(PIA,F,AA),decl_mpred_prolog_ilc(CM,M,PIA,F/AA))).
 decl_mpred_prolog_ilc(CM,M,PI,F/A):-loop_check_term(decl_mpred_prolog_ilc_0(CM,M,PI,F/A),decl_mpred_prolog_ilc(CM,M,F),true).
-decl_mpred_prolog_ilc_0(CM,M,PI,F/A):-
+decl_mpred_prolog_ilc_0(_CM,M,PI,F/A):-
       assert_arity(F,A),
       add(mpred_module(PI,M)),
       add(user:mpred_prop(PI,prologDynamic)),
@@ -127,7 +127,7 @@ decl_mpred_hybrid_ilc(CM,M,PI,F/A):-atom(PI),A==0,must(arity(F,_)),not(current_p
    forall((arity(F,AA),AA\=0),(functor(PIA,F,AA),decl_mpred_hybrid_ilc(CM,M,PIA,F/AA))).
 
 decl_mpred_hybrid_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),loop_check_term(decl_mpred_hybrid_ilc_0(CM,M,PI,F/A),decl_mpred_hybrid_ilc(CM,M,F),true).
-decl_mpred_hybrid_ilc_0(CM,M,PI,F/A):-
+decl_mpred_hybrid_ilc_0(_CM,M,PI,F/A):-
       assert_arity(F,A),
       add(mpred_module(F,M)),
       add(prologHybrid(F)),
@@ -143,7 +143,8 @@ decl_mpred_hybrid_ilc_0(CM,M,PI,F/A):-
 :-op(1120,fx,(decl_mpred_hybrid)).
 
 %prologHybrid(X,Y):-dtrace(prologHybrid(X,Y)).
-:-lock_predicate(prologHybrid(X,Y)).
+:-dynamic(prologHybrid(_,_)).
+:-lock_predicate(prologHybrid(_,_)).
 
 % ========================================
 % mpred_props database
@@ -178,7 +179,7 @@ ensure_arity(F,A):- one_must(arity(F,A),one_must((current_predicate(F/A),(A>0),a
 assert_arity(F,A):-not(atom(F)),trace_or_throw(assert_arity(F,A)).
 assert_arity(F,A):-not(integer(A)),trace_or_throw(assert_arity(F,A)).
 assert_arity(typeProps,0):- trace_or_throw(assert_arity(typeProps,0)).
-assert_arity(argsIsa,2):- trace_or_throw(assert_arity_argsIsa(F,2)).
+assert_arity(argsIsa,2):- trace_or_throw(assert_arity_argsIsa(error,2)).
 assert_arity(F,A):- must_det(good_pred_relation_name(F,A)),fail.
 assert_arity(F,A):- arity(F,A),!.
 assert_arity(F,A):- arity(F,AA), A\=AA,dmsg(trace_or_throw(assert_arity_switched(F,AA->A))),fail.

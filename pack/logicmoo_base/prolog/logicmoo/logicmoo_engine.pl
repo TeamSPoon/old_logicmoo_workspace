@@ -371,10 +371,12 @@ adjust_kif(KB,t(Kif),t(KifO)):- !,adjust_kif(KB,Kif,KifO).
 adjust_kif(KB,poss(Kif),poss(b_d(KB,nesc,poss),KifO)):- !,adjust_kif(KB,Kif,KifO).
 adjust_kif(KB,nesc(Kif),nesc(b_d(KB,nesc,poss),KifO)):- !,adjust_kif(KB,Kif,KifO).
 adjust_kif(KB,exists(L,Expr),               ExprO):-L==[],!,adjust_kif(KB,Expr,ExprO).
+adjust_kif(KB,exists(L,Expr),               ExprO):-atom(L),subst(Expr,L,'$VAR'(L),ExprM),!,adjust_kif(KB,exists('$VAR'(L),ExprM),ExprO).
 adjust_kif(KB,exists([L|List],Expr),exists(L,ExprO)):-is_list(List),!,adjust_kif(KB,exists(List,Expr),ExprO).
 adjust_kif(KB,exists(L,Expr),               ExprO):- \+ contains_var(L,Expr),!,adjust_kif(KB,Expr,ExprO).
 adjust_kif(KB,exists(L,Expr),exists(L,ExprO)):-!,adjust_kif(KB,Expr,ExprO).
 adjust_kif(KB,all(L,Expr),               ExprO):-L==[],!,adjust_kif(KB,Expr,ExprO).
+adjust_kif(KB,all(L,Expr),               ExprO):-atom(L),subst(Expr,L,'$VAR'(L),ExprM),!,adjust_kif(KB,all('$VAR'(L),ExprM),ExprO).
 adjust_kif(KB,all([L|List],Expr),all(L,ExprO)):-is_list(List),!,adjust_kif(KB,exists(List,Expr),ExprO).
 adjust_kif(KB,all(L,Expr),               ExprO):- \+ contains_var(L,Expr),!,adjust_kif(KB,Expr,ExprO).
 adjust_kif(KB,all(L,Expr),all(L,ExprO)):-!,adjust_kif(KB,Expr,ExprO).
@@ -1755,39 +1757,7 @@ kif_tell(InS):- atom(InS),must_det_l((kif_read(string(InS),Wff,Vs),b_implode_var
 kif_tell(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),why_to_id(tell,Wff,Why),kif_tell(Why,Wff))),!.
 
 
-local_sterm_to_pterm(Wff,WffO):- kif_sterm_to_pterm(Wff,WffO),!.
-
-
-kif_sterm_to_pterm(VAR,'$VAR'(V)):-atom(VAR),atom_concat('?',_,VAR),clip_qm(VAR,V),!.
-kif_sterm_to_pterm(VAR,kw((V))):-atom(VAR),atom_concat(':',V2,VAR),clip_qm(V2,V),!.
-kif_sterm_to_pterm(VAR,VAR):-is_ftVar(VAR),!.
-kif_sterm_to_pterm([VAR],VAR):-is_ftVar(VAR),!.
-kif_sterm_to_pterm([X],Y):-!,nonvar(X),kif_sterm_to_pterm(X,Y).
-
-kif_sterm_to_pterm([S|TERM],dot_holds(PTERM)):- not(is_list(TERM)),!,kif_sterm_to_pterm_list([S|TERM],(PTERM)),!.
-kif_sterm_to_pterm([S|TERM],PTERM):-is_ftVar(S),
-            kif_sterm_to_pterm_list(TERM,PLIST),            
-            PTERM=..[holds,S|PLIST].
-
-kif_sterm_to_pterm([S|TERM],PTERM):-number(S),!,
-            kif_sterm_to_pterm_list([S|TERM],PTERM).            
-	    
-kif_sterm_to_pterm([S|TERM],PTERM):-nonvar(S),atomic(S),!,
-            kif_sterm_to_pterm_list(TERM,PLIST),            
-            PTERM=..[S|PLIST].
-
-kif_sterm_to_pterm([S|TERM],PTERM):-!,  atomic(S),
-            kif_sterm_to_pterm_list(TERM,PLIST),            
-            PTERM=..[holds,S|PLIST].
-
-kif_sterm_to_pterm(VAR,VAR):-!.
-
-kif_sterm_to_pterm_list(VAR,VAR):-is_ftVar(VAR),!.
-kif_sterm_to_pterm_list([],[]):-!.
-kif_sterm_to_pterm_list([S|STERM],[P|PTERM]):-!,
-              kif_sterm_to_pterm(S,P),
-              kif_sterm_to_pterm_list(STERM,PTERM).
-kif_sterm_to_pterm_list(VAR,[VAR]).
+local_sterm_to_pterm(Wff,WffO):- sexpr_sterm_to_pterm(Wff,WffO),!.
 
 
 

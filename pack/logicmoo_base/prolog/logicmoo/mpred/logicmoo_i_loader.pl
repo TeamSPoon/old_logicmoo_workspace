@@ -34,7 +34,7 @@ user:prolog_load_file(Module:Spec, Options):- loop_check(prolog_load_file_nlc(Mo
 :-dynamic(never_reload_file/1).
 
 prolog_load_file_nlc(Module:Spec, Options):- never_reload_file(Spec),
-   wdmsg(warn(error(skip_prolog_load_file_nlc(never_reload_file(TID):-thread(Module:Spec, Options))))),!.
+   wdmsg(warn(error(skip_prolog_load_file_nlc(never_reload_file(Module:Spec, Options))))),!.
 
 prolog_load_file_nlc(Module:Spec, Options):- thread_self(TID),
    TID\==main,wdmsg(warn(error(skip_prolog_load_file_nlc(wrong_thread(TID):-thread(Module:Spec, Options))))),!,fail,dumpST.
@@ -45,7 +45,7 @@ prolog_load_file_nlc(Module:Spec, Options):- absolute_file_name(Spec,AFN,[extens
 prolog_load_file_nlc(Module:DirName, Options):-  atom(DirName), is_directory(DirName)->
   current_predicate('load_file_dir'/2)->loop_check(show_call(call(load_file_dir,Module:DirName, Options))).
 
-prolog_load_file_nlc(Module:FileName, Options):- exists_file_safe(Spec),!,
+prolog_load_file_nlc(Module:FileName, Options):- exists_file_safe(FileName),!,
    prolog_load_file_nlc_0(Module:FileName, Options).
 
 prolog_load_file_nlc(Module:Spec, Options):- term_to_atom(Spec,String),member(S,['?','*']),sub_atom(String,_,1,_,S),!, 
@@ -119,10 +119,11 @@ with_no_mpred_expansions(Goal):-
   with_assertions(user:no_buggery,
     with_assertions(thlocal:disable_mpred_term_expansions_locally,Goal)).
 
+
 :- export(with_mpred_expansions/1).
 :- meta_predicate(with_mpred_expansions(0)).
 with_mpred_expansions(Goal):-
-  with_assertions(user:buggery,
+  with_no_assertions(user:no_buggery,
     with_no_assertions(thlocal:disable_mpred_term_expansions_locally,Goal)).
 
 :- export(ensure_loaded_no_mpreds/1).
@@ -248,7 +249,7 @@ force_reload_mpred_file(World, File):-
       load_mpred_file_end(World,File)),
    Error,
     (wdmsg(error(Error,File)),retractall(thglobal:loaded_mpred_file(World,File)),
-     retractall(thglobal:loaded_file_world_time(File,World,NewTime))))).
+     retractall(thglobal:loaded_file_world_time(File,World,_AnyTime))))).
 
 :-export(load_mpred_file_end/2).
 load_mpred_file_end(World,File):-
@@ -709,6 +710,12 @@ user:term_expansion((:- DIR),O):- atom(DIR), pfc_directive_expansion(DIR,OO),!,m
 :-meta_predicate(pfc_file_expansion_0(?,?)).
 
 % Specific "*SYNTAX*" based default
+
+:- ensure_loaded(library(logicmoo/plarkc/dbase_i_sexpr_reader)).
+
+pfc_file_expansion_0((=>I),(:- cl_assert(pfc(fwc),(=>O)))):- 
+   atom(I),atom_contains(I,'('),must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,
+     must((sexpr_sterm_to_pterm(Wff,O),!,\+ is_list(O))))),!.
 pfc_file_expansion_0((P=>Q),(:- cl_assert(pfc(fwc),(P=>Q)))).
 pfc_file_expansion_0(if(P,Q),(:- cl_assert(kif(fwc),if(P,Q)))).
 pfc_file_expansion_0(iff(P,Q),(:- cl_assert(kif(fwc),iff(P,Q)))).
