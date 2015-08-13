@@ -3,4 +3,6 @@ text eol=LF
 *.plt linguist-language=Prolog
 *.plmoo linguist-language=Prolog
 *.pl linguist-language=Prolog
+*.P linguist-language=Prolog
+*_old linguist-language=Prolog
 
