@@ -7,20 +7,33 @@
 %
 */
 
-:- ensure_loaded(logicmoo(logicmoo_engine))).
+% we are in "prolog" consultation mode
 
+:- ensure_loaded(logicmoo(logicmoo_engine)).
+:- enable_mpred_expansion.
+
+are_clauses_entailed([C|L]):-!,maplist(clause_asserted,[C|L]).
+are_clauses_entailed((C,L)):-!,are_clauses_entailed(C),are_clauses_entailed(L).
+are_clauses_entailed(CL):-clause_asserted(CL).
+
+:- thlocal:disable_mpred_term_expansions_locally->throw(thlocal:disable_mpred_term_expansions_locally);true.
+
+% cwc "code-wise chaining" is always true in Prolog but will throw programming error if evalled in LogicMOO Prover.
+% Use this to mark code and not axiomatic prolog
+clif_to_prolog(HORN,Prolog):- cwc, compound(HORN), HORN=(_:-_),!,boxlog_to_pfc(HORN,Prolog),!.
 clif_to_prolog(CLIF,Prolog):- cwc,
      must_det_l((kif_to_boxlog(CLIF,HORN),
      boxlog_to_pfc(HORN,Prolog))).
 
-clif_must(HORN):- cwc,
-   sanity((boxlog_to_pfc(HORN,Prolog),show_call(clause_asserted(Prolog)))),!.
 
-clif_must_not(HORN):- cwc,
-   sanity((boxlog_to_pfc(HORN,Prolog),show_call(\+ clause_asserted(Prolog)))),!.
+% Test for specific side-effect entailments
+clif_must(CLIF):- cwc,sanity((clif_to_prolog(CLIF,Prolog),!,show_call(are_clauses_entailed(Prolog)))),!.
 
-:-op(1190,xfx,(:-))).
-:-op(1200,fy,(clif_must))).
+% Test for absence of specific side-effect entailments
+clif_must_not(CLIF):- cwc, sanity((clif_to_prolog(CLIF,Prolog),show_call(\+ are_clauses_entailed(Prolog)))),!.
+
+:-op(1190,xfx,(:-)).
+:-op(1200,fy,(clif_must)).
 
 % this defines a recogniser for clif syntax
 is_clif(all(_,X)):-cwc,compound(X),!,is_clif(X).
@@ -31,19 +44,22 @@ is_clif(CLIF):-cwc,
      compound(CLIF),functor(CLIF,F,2),arg(_,VVs,F)).
 
 % we ensure we are in "pfc" consultation mode
+
+:- wdmsg(pfc_trace).
+:- pfc_trace.
 :- file_begin(pfc).
 
 % whenever we know about clif we'll use the prolog forward chainging system
-(clif(CLIF)=> 
+(clif(CLIF) => 
    ({ clif_to_prolog(CLIF,PROLOG) },
       % this consequent asserts the new rules
       PROLOG)).
 
 % we create syntax listeners for [if,iff,clif_forall,all,exists]/2s
-({is_clif(CLIF)}=>
+({is_clif(CLIF)} =>
   (CLIF/is_clif(CLIF) => clif(CLIF))).
 
-:- if(if_defined(pfc_examples,true))).
+:- if(if_defined(pfc_examples,true)).
 
 :- wdmsg(pfc_trace).
 
