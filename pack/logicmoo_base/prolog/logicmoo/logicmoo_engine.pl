@@ -925,8 +925,7 @@ cf(Why,KB,PNF, SET):-
   make_clause_set([infer_by(Why)],Conj,EachClause),
   must_maplist(correct_cls(KB),EachClause,SOO),
   expand_cl(KB,SOO,SOOO))),
-  sort(SOOO,SET),
-  wdmsg(cf:-SET))).
+  sort(SOOO,SET))).
 
 
 clean_repeats_d((PTT,P0),PTTP):-!, conjuncts_to_list((PTT,P0),DLIST),list_to_set(DLIST,DSET),must_maplist(clean_repeats_d,DSET,CSET),list_to_conjuncts((,),CSET,PTTP),!.
@@ -1512,7 +1511,7 @@ correct_boxlog(CLAUSES,KB,Why,FlattenedO):- (\+ is_list(CLAUSES)),!,correct_boxl
 correct_boxlog(BOXLOG,KB,Why,FlattenedO):-
   must_det_l((  
    must_maplist(adjust_kif(KB),BOXLOG,MODAL),
-   wdmsgl(modal(MODAL)),   
+   %wdmsgl(modal(MODAL)),   
    must_maplist(demodal(KB),MODAL,CLAUSES),
    must_maplist(correct_cls(KB),CLAUSES,NCFs),
    must_maplist(clauses_to_boxlog(KB,Why),NCFs,ListOfLists),
@@ -1544,6 +1543,11 @@ kif_to_boxlog(WffIn,Why,Out):-  kif_to_boxlog(WffIn,'$VAR'('KB'),Why,Out),!.
 kif_to_boxlog(Fml,KB,Why,Flattened):- var(KB),!,kif_to_boxlog(Fml,'$VAR'('KB'),Why,Flattened).
 kif_to_boxlog(Wff,KB,Why,Out):- transitive_lc(adjust_kif(KB),Wff,M),Wff \=@= M ,!,kif_to_boxlog(M,KB,Why,Out).
 kif_to_boxlog((Wff:- B),KB,Why,Flattened):- is_true(B),!, kif_to_boxlog(Wff,KB,Why,Flattened),!.
+
+kif_to_boxlog(I,KB,Why,Flattened):- atom(I),atom_contains(I,('(')),!,
+  must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,sexpr_sterm_to_pterm(Wff,PTerm),PTerm\=[_|_],
+  kif_to_boxlog(PTerm,KB,Why,Flattened))),!.
+
 kif_to_boxlog(WffInIn,KB,Why,FlattenedO):-  as_dlog(WffInIn,WffIn),WffInIn\=@=WffIn,!,kif_to_boxlog(WffIn,KB,Why,FlattenedO),!.
 
 % kif_to_boxlog(Wff,KB,Why,Out):- loop_check(kif_to_boxlog(Wff,KB,Why,Out),alt_kif_to_boxlog(Wff,KB,Why,Out)),!.
@@ -1583,12 +1587,12 @@ kif_to_boxlog(WffIn0,KB0,Why0,FlattenedO):-
    list_to_set(Flattened,FlattenedM),!,
    correct_boxlog(FlattenedM,KB,Why,FlattenedO))).
    
-no_rewrites.
+thlocal:no_rewrites.
 
 
 check_is_kb(KB):-ignore('$VAR'('KB')=KB).
 
-add_preconds(X,X):- no_rewrites,!.
+add_preconds(X,X):- thlocal:no_rewrites,!.
 add_preconds(X,Z):-
  with_assertions(leave_as_is0('CollectionS666666666666666ubsetFn'(_,_)),
    with_assertions(thlocal:dont_use_mudEquals,defunctionalize('=>',X,Y))),add_preconds2(Y,Z).

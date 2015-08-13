@@ -87,7 +87,7 @@ pfc_each_literal(P,P). %:-conjuncts_to_list(P,List),member(E,List).
 
 to_addable_form_wte(Why,I,O):-string(I),must_det_l((input_to_forms(string(I),Wff,Vs),b_setval('$variable_names',Vs),!,kif_sterm_to_pterm(Wff,PTerm),
   to_addable_form_wte(Why,PTerm,O))).
-to_addable_form_wte(Why,I,O):-atom(I),atom_contains(I,'('),must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,sexpr_sterm_to_pterm_list(Wff,PTerm),
+to_addable_form_wte(Why,I,O):-atom(I),atom_contains(I,'('),must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,sexpr_sterm_to_pterm(Wff,PTerm),
   to_addable_form_wte(Why,PTerm,O))).
 to_addable_form_wte(Why,=>(I),O):-!,to_addable_form_wte(Why,I,O).
 to_addable_form_wte(Why,USER:I,O):-USER=user,!,to_addable_form_wte(Why,I,O).
@@ -1775,8 +1775,8 @@ all_closed(C):- \+compound(C)->true;(functor(C,_,A),A>1,\+((arg(_,C,Arg),var(Arg
 
 %=
 
-build_consequent(Support,Test,Test):-var(Test),!.
-build_consequent(Support,Test,TestO):-var(Test),!,TestO=added(Test).
+build_consequent(_      ,Test,Test):-var(Test),!.
+build_consequent(_      ,Test,TestO):-var(Test),!,TestO=added(Test).
 build_consequent(Support,rhs(Test),rhs(TestO)) :- !,build_consequent(Support,Test,TestO).
 build_consequent(Support,Test,TestO):- sentence_op(Test),Test=..[F|TestL],maplist(build_consequent(Support),TestL,TestLO),TestO=..[F|TestLO],!.
 build_consequent(Support,Test,Test):-must(pfc_mark_as(Support,p,Test,pfcCreates)),!.
