@@ -1885,6 +1885,7 @@ pfc_add_support(P,(Fact,Trigger)) :-
 
 
 
+pfc_get_support(not(P),(Fact,Trigger)) :- nonvar(P),!, pfc_get_support(neg(P),(Fact,Trigger)).
 pfc_get_support(P,(Fact,Trigger)) :- spft(P,Fact,Trigger)*->true;(nonvar(P),pfc_get_support_neg(P,(Fact,Trigger))).
 
 % dont pfc_get_support_neg(\+ neg(P),(Fact,Trigger)) :- spft((P),Fact,Trigger).

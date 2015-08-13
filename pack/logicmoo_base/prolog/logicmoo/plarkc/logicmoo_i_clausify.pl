@@ -1040,7 +1040,8 @@ correct_cls0(KB,cl([nesc((H))],B),O):- delete_sublits(B,not(H),BB),BB\=@=B,!,cor
 correct_cls0(KB,cl([not((H))],B),O):- correct_cls(KB,cl([not(poss(H))],B),O).
 */
 
-correct_cls0(_KB,cl(H,B),O):- O=cl(H,B).
+correct_cls0(_KB,cl(H,B),O):- !,O=cl(H,B).
+correct_cls0(KB,H,O):-correct_cls0(KB,(H:-true),O).
 
 incorrect_cl(cl(H,B),cl([z_unused(H:-B)],[])).
 
