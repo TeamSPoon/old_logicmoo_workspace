@@ -284,11 +284,6 @@ mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).
 % mudSubPart([pelvis,legs,left_leg,left_foot,left_toes]).
 % mudSubPart([pelvis,legs,right_leg,right_foot,right_toes]).
 
-predPredicateToFunction(Pred,SubjT,ObjT,FullNameFnO):- 
-  is_asserted(predPredicateToFunction(Pred,SubjT,ObjT,FullNameFn)) *-> FullNameFnO=FullNameFn ; 
-  (i_name('i',ObjT,Obj),i_name(Obj,Pred,ObjPred),i_name('Of',SubjT,OfSubj),concat_atom([ObjPred,OfSubj,'Fn'],FullNameFn)),simplifyFullName(FullNameFn,FullNameFnO).
-
-
 
 is_in_world(Obj):-isa_asserted(Obj,tRegion),!.
 is_in_world(Obj):-clause(mudAtLoc(Obj,_),true),!.

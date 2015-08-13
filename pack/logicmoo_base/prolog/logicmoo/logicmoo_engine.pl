@@ -665,8 +665,6 @@ kif_sanity_tests:- forall(clause(kif_sanity_test_0,B),must(B)).
 %:- prolog.
 :- endif.
 
-:- ensure_loaded(logicmoo('pfc/foImplies.pfc')).
-
 :- kif_test(all(X, (~tNotFly(X) => ~tPengin(X)))).
 :- kif_test(not(and(omitArgIsa(RELN, N), argIsa(RELN, N, _THING)))).
 
@@ -682,5 +680,5 @@ kif_sanity_tests:- forall(clause(kif_sanity_test_0,B),must(B)).
 :- if_startup_script(tkif).
 :- if_startup_script(ensure_loaded(logicmoo_i_mpred_kif_testing)).
 
-
+:- ensure_loaded(plarkc/logicmoo_i_clif).
 

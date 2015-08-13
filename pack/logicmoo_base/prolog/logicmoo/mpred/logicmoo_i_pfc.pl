@@ -1758,18 +1758,18 @@ build_neg_test(Support,T,Testin,Testout) :- must(nonvar(T)),
 
 build_code_test(Support,Test,Test):-var(Test),!,must(nonvar(Test)),TestO=call_u(Test).
 build_code_test(Support,{Test},TestO) :- !,build_code_test(Support,Test,TestO).
-build_code_test(Support,Test,TestO):- sentence_op(Test),Test=..[F|TestL],must_maplist(build_code_test(Support),TestL,TestLO),TestO=..[F|TestLO],!.
+build_code_test(Support,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],must_maplist(build_code_test(Support),TestL,TestLO),TestO=..[F|TestLO],!.
 build_code_test(Support,Test,Test):- must(pfc_mark_as(Support,p,Test,pfcCallCode)),!.
 build_code_test(Support,Test,Test).
 
-sentence_op(Var):-var(Var),!,fail.
-sentence_op(rhs(_)).
-sentence_op(neg(_)).
-sentence_op(-(_)).
-sentence_op(~(_)).
-sentence_op(\+(_)).
-sentence_op(call_u(_)).
-sentence_op(Test):-predicate_property(Test,meta_predicate(PP)),predicate_property(Test,built_in),  \+ (( arg(_,PP,N), N\=0)).
+code_sentence_op(Var):-var(Var),!,fail.
+code_sentence_op(rhs(_)).
+code_sentence_op(neg(_)).
+code_sentence_op(-(_)).
+code_sentence_op(~(_)).
+code_sentence_op(\+(_)).
+code_sentence_op(call_u(_)).
+code_sentence_op(Test):-predicate_property(Test,meta_predicate(PP)),predicate_property(Test,built_in),  \+ (( arg(_,PP,N), N\=0)).
 
 all_closed(C):- \+compound(C)->true;(functor(C,_,A),A>1,\+((arg(_,C,Arg),var(Arg)))),!.
 
@@ -1778,7 +1778,7 @@ all_closed(C):- \+compound(C)->true;(functor(C,_,A),A>1,\+((arg(_,C,Arg),var(Arg
 build_consequent(_      ,Test,Test):-var(Test),!.
 build_consequent(_      ,Test,TestO):-var(Test),!,TestO=added(Test).
 build_consequent(Support,rhs(Test),rhs(TestO)) :- !,build_consequent(Support,Test,TestO).
-build_consequent(Support,Test,TestO):- sentence_op(Test),Test=..[F|TestL],maplist(build_consequent(Support),TestL,TestLO),TestO=..[F|TestLO],!.
+build_consequent(Support,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],maplist(build_consequent(Support),TestL,TestLO),TestO=..[F|TestLO],!.
 build_consequent(Support,Test,Test):-must(pfc_mark_as(Support,p,Test,pfcCreates)),!.
 build_consequent(Support,Test,Test).
 

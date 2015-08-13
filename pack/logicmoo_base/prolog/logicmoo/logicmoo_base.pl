@@ -94,6 +94,7 @@ when_debugging(_,_).
 % DBASE_T System
 % ================================================
 
+:- ensure_loaded(mpred/logicmoo_i_wff).
 :- ensure_loaded(mpred/logicmoo_i_listing).
 :- ensure_loaded(mpred/logicmoo_i_pfc).
 :- ensure_loaded(mpred/logicmoo_i_loader).

@@ -1,6 +1,0 @@
-
-:-file_begin(pfc).
-
-((if(P,Q)/kif_to_boxlog(if(P,Q),Out)) => saved_kif_to_boxlog(if(P,Q),Out)).
-
-

@@ -225,6 +225,19 @@ load_time_sanity.
 :- op(1050,xfx,('<=')).
 :- op(1100,fx,('=>')).
 :- op(1150,xfx,('::::')).
+:- op(300,fx,'-').
+:- op(600,yfx,'&').  
+:- op(600,yfx,'v').
+:- op(1075,xfx,'=>').
+:- op(1075,xfx,'<=>').
+:- op(350,xfx,'xor').
+:- op(300,fx,user:'~').
+:- op(300,fx,user:'-').
+:- op(400,yfx,user:'&').  
+:- op(500,yfx,user:'v').
+:- op(1075,xfx,user:'=>').
+:- op(1075,xfx,user:'<=>').
+:- op(350,xfx,user:'xor').
 
 :-dynamic(user_db:grant_openid_server/2).
 :-multifile(user_db:grant_openid_server/2).
