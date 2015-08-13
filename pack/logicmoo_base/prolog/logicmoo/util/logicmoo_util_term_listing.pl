@@ -115,10 +115,10 @@ term_non_listing(Match):-
 
 term_listing_inner(Pred,Match):-atom(Match),!,
       '@'(doall((
-         synth_clause_for(H,B,Ref),(term_matches_unify(99,Match,((H:-B)))->call(Pred,H,B,Ref)->fail))),'user').
+         synth_clause_for(H,B,Ref),(term_matches_unify(99,Match,((H:-B)))->must(call(Pred,H,B,Ref))->fail))),'user').
 term_listing_inner(Pred,Match):-
       '@'(doall((
-         synth_clause_for(H,B,Ref),(term_matches_hb(Match,H,B)->call(Pred,H,B,Ref)->fail))),'user').
+         synth_clause_for(H,B,Ref),(term_matches_hb(Match,H,B)->must(call(Pred,H,B,Ref))->fail))),'user').
 
 :- multifile user:prolog_list_goal/1.
 % user:prolog_list_goal(Goal):- writeq(hello(prolog_list_goal(Goal))),nl.
@@ -151,8 +151,8 @@ synth_clause_for(G,true,0):-  bookeepingPredicate1(G),catch(G,_,fail).
 synth_clause_for(G,B,Ref):- cur_predicate(_,M:H),synth_clause_ref(M:H,G,B,Ref).
 synth_clause_for(G,true,0):-  bookeepingPredicate3(G),catch(G,_,fail).
 synth_clause_for(M:H,B,Ref):- (findall((Size-(M:H)),retract(thlocal:large_predicates(M:H,Size)),KeyList),
-   keysort(KeyList,KeySorted), pairs_values(KeySorted, ByLength),format('~N~n% listing larger preds now.. ~q~n',[KeySorted]))->
-      member(M:H,ByLength),clause(M:H,B,Ref),flush_output.
+   keysort(KeyList,KeySorted), pairs_values(KeySorted, ByLength),format('~N~n% listing larger preds now.. ~q~n',[KeySorted])),!,KeySorted\==[],
+      ((must(member(M:H,ByLength)),must(M:clause(H,B,Ref)))).
 
 :-swi_export((synth_clause_ref/3)).
 synth_clause_ref(M:H,M:predicate_property(H,B),true,0):- predicate_property(M:H,B).

@@ -133,3 +133,4 @@ pfc_file_loaded.
 
 :- asserta(thlocal:disable_mpred_term_expansions_locally).
 
+

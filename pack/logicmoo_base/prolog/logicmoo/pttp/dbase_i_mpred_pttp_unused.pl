@@ -18,21 +18,21 @@ clear
   - clear out database and reset any flags.
 show 
    - show the internal clauses.
-prove(Goal) 
-prove(Goal,InitialBound)
-prove(Goal,InitialBound,Max)
-  - try to prove the full FOL Goal, which may be of the form
+pttp_prove(Goal) 
+pttp_prove(Goal,InitialBound)
+pttp_prove(Goal,InitialBound,Max)
+  - try to pttp_prove the full FOL Goal, which may be of the form
     Term^Goal, which will cause the variables in Term to be bound.
-    prove constructs a clause query(Term) :- Goal and then tries to
-    prove query(Term).
+    pttp_prove constructs a clause query(Term) :- Goal and then tries to
+    pttp_prove query(Term).
 prove_goal(Goal)
 prove_goal(Goal,InitialBound)
 prove_goal(Goal,InitialBound,Max)
-  - Use iterative deepening to prove Goal within Max starting with a
+  - Use iterative deepening to pttp_prove Goal within Max starting with a
     bound of InitialBound. Goal needs to be an atomic formula.
 prove_goal_bounded(Goal,Ancestors,InitialBound,-Remaining)
 prove_goal_bounded(+Goal,Ancestors,+Bound,-Remaining)
-  - Try to prove Goal within Bound.
+  - Try to pttp_prove Goal within Bound.
 rule(Head,Body,Cost)
   - Clauses are represented with the predicate rule/3.  Calls to
     system predicates may be done by asserting rule/3.  E.g., if you
@@ -73,7 +73,7 @@ SYNTAX
 %%% predicates occasionaly.  This can be trouble with builtins like
 %%% is/2, which require certain vars to be bound.
 %%%
-%%% - prove needs a better interface for collecting bindings.
+%%% - pttp_prove needs a better interface for collecting bindings.
 %%% E.g. if we query some(X,p(X)), then the X gets renamed when
 %%% converting to clausal form, so we don't see the bindings.
 %%%
@@ -138,15 +138,15 @@ axiom(Fol) :-
 	fol_rules(Fol,Clauses),
 	assert_list(Clauses).
 
-%%% prove takes an arbitrary FOL statement and tries to prove it.
+%%% pttp_prove takes an arbitrary FOL statement and tries to pttp_prove it.
 %%% The Sentence may be a FOL sentence in which case only success/failure
 %%% is returned, or it can be a term Vars^Sentence, which will cause
 %%% Vars to have the bindings from the successful proofs.
 
-prove(Sentence) :- prove(Sentence,5).
-prove(Sentence,InitialBound) :- prove(Sentence,InitialBound,100).
+pttp_prove(Sentence) :- pttp_prove(Sentence,5).
+pttp_prove(Sentence,InitialBound) :- pttp_prove(Sentence,InitialBound,100).
 
-prove(Sentence0,InitialBound,Max) :-
+pttp_prove(Sentence0,InitialBound,Max) :-
 	(Sentence0 = Vars^Sentence
     ->
 	Query = query(Vars)
@@ -330,7 +330,7 @@ e1 :-
 	axiom((a or b) and ~(a)),
 	prove_goal(b),
 	\+ prove_goal(a),
-	prove(a or b).
+	pttp_prove(a or b).
 
 e2 :- clear,
 	axioms(
@@ -339,8 +339,8 @@ e2 :- clear,
 	append([],Xs,Xs),
 	(append([X|Xs],Ys,[X|Zs]) <= append(Xs,Ys,Zs))
     ]),
-	prove(rev([a,b,c],[c,b,a])),
-	\+ prove(rev([a,b,c],[c,b,a,z])),
+	pttp_prove(rev([a,b,c],[c,b,a])),
+	\+ pttp_prove(rev([a,b,c],[c,b,a,z])),
 	e2(30,497).
 
 %nrev([],[]).
@@ -372,7 +372,7 @@ e3 :-
 	clear,
 	assertz(rule(len([],0),[],0)),
 	assertz(rule(len([_A|B],N),[len(B,N1),N is N1 + 1],2)),
-	prove(X^len([a,b],X)),
+	pttp_prove(X^len([a,b],X)),
 	X == 2.
 
 e4 :- 
@@ -381,7 +381,7 @@ e4 :-
 	[q(X) => p(X),
 	q(2),
 	q(1)]),
-	bagof(X,prove(X^p(X)),L),
+	bagof(X,pttp_prove(X^p(X)),L),
 	(L = [1,2] ; L = [2,1]).
 
 e5_1(0).
@@ -399,7 +399,7 @@ e5(N) :-
     clear, e5_1(N),
     axiom(q(X) <= p(X)),
     axiom(r(X,Y) <= p(X) and q(Y)),
-    %%bagof(r(X,Y),prove([X,Y]^r(X,Y)),L),
+    %%bagof(r(X,Y),pttp_prove([X,Y]^r(X,Y)),L),
     bagof(r(X,Y),prove_goal(r(X,Y)),L),
     length(L,Len),
     Len =:= N*N.
@@ -409,36 +409,36 @@ e6 :- clear,
 	[p(X) <= apply(format,['APPLY: ~p~n',[X]]) and q(X),
 	q(1),
 	q(2)]),
-	bagof(X,prove(X^p(X)),L),
+	bagof(X,pttp_prove(X^p(X)),L),
 	format('Should have done APPLY on ~p.~n',[L]).
 
 e7 :- clear,
 	axiom(a or b or c),
 	axiom(~c),
-	prove(a or b),
-	\+ prove(a or c).
+	pttp_prove(a or b),
+	\+ pttp_prove(a or c).
 
 e8 :- clear,
 	axiom(a or b or c),
-	prove(a or b or c),
-	\+ prove(a or b),
-	\+ prove(b or c),
-	\+ prove(a or c).
+	pttp_prove(a or b or c),
+	\+ pttp_prove(a or b),
+	\+ pttp_prove(b or c),
+	\+ pttp_prove(a or c).
 
 e9 :- clear,
-	prove(~(a and b) <=> ~a or ~b).
+	pttp_prove(~(a and b) <=> ~a or ~b).
 
 e10 :- clear,
 	axiom(p(X) or q(X) <= r(X)),
 	axiom(r(a) and r(b)),
-	prove(X^(p(X) or q(X))),
-	\+ prove(p(a)),
-	\+ prove(p(b)),
-	\+ prove(q(a)),
-	\+ prove(q(b)),
-	\+ prove(p(a) or q(b)),
-	prove(p(a) or q(a)),
-	prove(p(b) or q(b)).
+	pttp_prove(X^(p(X) or q(X))),
+	\+ pttp_prove(p(a)),
+	\+ pttp_prove(p(b)),
+	\+ pttp_prove(q(a)),
+	\+ pttp_prove(q(b)),
+	\+ pttp_prove(p(a) or q(b)),
+	pttp_prove(p(a) or q(a)),
+	pttp_prove(p(b) or q(b)).
 	
 chang_lee_example1 :-
 	nl,

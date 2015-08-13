@@ -742,7 +742,7 @@ pfc_add_trigger(pt(Trigger,Body),Support) :-
       ( \+ \+ pfc_assert_t(pt(Trigger,Body),Support),
         must(pfc_mark_as(Support,p,Trigger,pfcPosTrigger)),
         copy_term(pt(Trigger,Body),Tcopy), !,
-        call_u(Trigger),
+        no_repeats(call_u(Trigger)),
         debugOnError(pfc_eval_lhs(Body,(Trigger,Tcopy))),
         fail)).
 
@@ -768,7 +768,7 @@ pfc_add_trigger(bt(Trigger,Body),Support) :-
      % WAS pfc_bt_pt_combine(Trigger,Body).
   pfc_bt_pt_combine(Trigger,Body,Support).
 
-pfc_add_trigger(X,Support) :-
+pfc_add_trigger(X,Support) :- trace,
   pfc_warn("Unrecognized trigger to pfc_addtrigger: ~q",[X:pfc_add_trigger(X,Support)]).
 
 
@@ -781,7 +781,7 @@ pfc_bt_pt_combine(Head,Body,Support) :-
 pfc_bt_pt_combine(_,_,_) :- !.
 
 
-pfc_get_trigger_quick(Trigger) :- !, Trigger.
+pfc_get_trigger_quick(Trigger) :- !, no_repeats(Trigger).
 pfc_get_trigger_quick(Trigger) :- clause(Trigger,true)*->true;clause(spft(Trigger,_,_),true).
 
 %=
@@ -1177,21 +1177,21 @@ pfc_add_rule_if_rule(Sup,Fact):-
 
 pfc_add_rule0(Sup,(P=>Q)) :-
   !,
-  process_rule(Sup,P,Q,(P=>Q)).
+  process_rule(P,Q,(P=>Q)).
 
 pfc_add_rule0(Sup,(Name::::P=>Q)) :-
   !,
-  process_rule(Sup,P,Q,(Name::::P=>Q)).
+  process_rule(P,Q,(Name::::P=>Q)).
 
 pfc_add_rule0(Sup,(P<=>Q)) :-
   !,
-  process_rule(Sup,P,Q,(P<=>Q)),
-  process_rule(Sup,Q,P,(P<=>Q)).
+  process_rule(P,Q,(P<=>Q)),
+  process_rule(Q,P,(P<=>Q)).
 
 pfc_add_rule0(Sup,(Name::::P<=>Q)) :-
   !,
-  process_rule(Sup,P,Q,((Name::::P<=>Q))),
-  process_rule(Sup,Q,P,((Name::::P<=>Q))).
+  process_rule(P,Q,((Name::::P<=>Q))),
+  process_rule(Q,P,((Name::::P<=>Q))).
 
 pfc_add_rule0(Sup,('<='(P,Q))) :-
   !,
@@ -1253,12 +1253,12 @@ pfc_define_bc_rule(Sup,Head,Body,Parent_rule) :-
 %= eval something on the LHS of a rule.
 %=
 
-pfc_eval_lhs(P,S):-loop_check(pfc_eval_lhs0(P,S)).
+pfc_eval_lhs(P,S):-no_repeats(loop_check(pfc_eval_lhs0(P,S))).
 
 pfc_eval_lhs0((Test->Body),Support) :-
   !,
-  (call_prologsys(Test) -> pfc_eval_lhs(Body,Support)),
-  !.
+  % (call_prologsys(Test) -> pfc_eval_lhs(Body,Support)),
+   ((no_repeats(call_prologsys(Test)) , no_repeats(pfc_eval_lhs(Body,Support))) *-> true ; (!,fail)).
 
 pfc_eval_lhs0(rhs(X),Support) :-
    cyclic_break((X)),
@@ -1348,13 +1348,13 @@ trigger_trigger(_,_,_).
 trigger_trigger1(presently(Trigger),Body) :- use_presently,
   nonvar(Trigger),!,
   copy_term(Trigger,TriggerCopy),
-  call_u(Trigger),
+  no_repeats(call_u(Trigger)),
   pfc_eval_lhs(Body,(presently(Trigger),pt(presently(TriggerCopy),Body))),
   fail.
 
 trigger_trigger1(Trigger,Body) :-
   copy_term(Trigger,TriggerCopy),
-  pfc_call(Trigger),
+  no_repeats(pfc_call(Trigger)),
   pfc_eval_lhs(Body,(Trigger,pt(TriggerCopy,Body))),
   fail.
 
@@ -1392,8 +1392,8 @@ pfc_call_0(G,F,A):- (pfc_call_with_no_triggers(G)).
 
 call_with_bc_triggers(P) :- functor(P,F,A), \+thlocal:infBackChainPrevented(F/A), 
   pfc_get_trigger_quick(bt(P,Trigger)),
-  pfc_get_support(bt(P,Trigger),S),
-  no_side_effects(P),
+  no_repeats(pfc_get_support(bt(P,Trigger),S)),
+  once(no_side_effects(P)),
   with_no_assertions(thlocal:infBackChainPrevented(F/A),pfc_eval_lhs(Trigger,S)).
 
 
@@ -1429,8 +1429,8 @@ ruleBackward(F,Condition):-ruleBackward0(F,Condition),Condition\=call_sysprolog(
 %ruleBackward0(F,Condition):-clause_u(F,Condition),not(is_true(Condition);pfc_is_info(Condition)).
 ruleBackward0(F,Condition):-'<='(F,Condition),not(is_true(Condition);pfc_is_info(Condition)).
 
-:-dynamic('{}'/1).
-{X}:-dmsg(legacy({X})),call_prologsys(X).
+%:-dynamic('{}'/1).
+%{X}:-dmsg(legacy({X})),call_prologsys(X).
 
 
 pfcBC_NoFacts_TRY(F) :- no_repeats(ruleBackward(F,Condition)),
@@ -1484,10 +1484,11 @@ pfc_nf(LHS,List) :-
 
 pfc_nf1(P,[P]) :- var(P), !.
 
-% these next two rules are here for upward compatibility and will go
+% these next three rules are here for upward compatibility and will go
 % away eventually when the P/Condition form is no longer used anywhere.
 
-pfc_nf1(P/Cond,[(\+P)/Cond]) :- pfc_negated_literal(P), !.
+pfc_nf1(P/Cond,[(\+Q)/Cond]) :- fail, pfc_negated_literal(P,Q), !.  % DMILES does not undersand why this is wron gand the next is correct here
+pfc_nf1(P/Cond,[(\+P)/Cond]) :- pfc_negated_literal(P,_), !.
 
 pfc_nf1(P/Cond,[P/Cond]) :-  pfc_literal(P), !.
 
@@ -1650,7 +1651,8 @@ pfc_negation((~P),P).
 pfc_negation((-P),P).
 pfc_negation((\+(P)),P).
 
-pfc_negated_literal(P) :- nonvar(P),
+pfc_negated_literal(P):-pfc_negated_literal(P,_).
+pfc_negated_literal(P,Q) :- nonvar(P),
   pfc_negation(P,Q),
   pfc_literal(Q).
 
@@ -1682,12 +1684,12 @@ pfc_connective('\\+').
 
 cyclic_break(Cyclic):-cyclic_term(Cyclic)->(writeq(Cyclic),nl,prolog);true.
 
-process_rule(Sup,Lhs,Rhs,Parent_rule) :- 
+process_rule(Lhs,Rhs,Parent_rule) :- 
   copy_term(Parent_rule,Parent_ruleCopy),
   build_rhs((Parent_ruleCopy),Rhs,Rhs2),
    cyclic_break((Lhs,Rhs,Rhs2,Parent_ruleCopy)),
   foreachl_do(pfc_nf(Lhs,Lhs2),
-   build_rule(Lhs2,rhs(Rhs2),(Parent_ruleCopy,u))).
+   doall(build_rule(Lhs2,rhs(Rhs2),(Parent_ruleCopy,u)))).
 
 build_rule(Lhs,Rhs,Support) :-
   build_trigger(Support,Lhs,Rhs,Trigger),
@@ -1843,7 +1845,7 @@ pfc_clause_i(Head) :-
 foreachl_do(Binder,Body) :- Binder,pfcl_do(Body),fail.
 foreachl_do(_,_).
 
-% pfcl_do(X) executes X once and always succeeds.
+% pfcl_do(X) executesf X once and always succeeds.
 pfcl_do(X) :- X,!.
 pfcl_do(_).
 

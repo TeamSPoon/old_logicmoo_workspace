@@ -1,0 +1,30 @@
+
+is_clif(all(_,X)):-cwc,compound(X),!,is_clif(X).
+is_clif(forall(_,X)):-cwc,compound(X),!.
+is_clif(CLIF):-cwc,
+  VVs = v(if,iff,clif_forall,all,exists), % implies,equiv,forall
+   (var(CLIF)-> (arg(_,VVs,F),functor(CLIF,F,2));
+     compound(CLIF),functor(CLIF,F,2),arg(_,VVs,F)).
+
+boxlog_to_pfc(BOXLOG,PFC):- cwc, subst_except(BOXLOG,(:-),(<=),PFCM),subst_except(PFCM,(not),(neg),PFC).
+
+:- file_begin(pfc).
+
+({is_clif(CLIF)}=>
+  (CLIF/is_clif(CLIF) => clif(CLIF))).
+
+     
+% possible_t(P, A, B):- cwc, pttp_prove(possible_t(P, A, B)).
+
+:- wdmsg(pfc_trace).
+
+:-pfc_trace.
+
+(clif(CLIF)=> 
+   ({ kif_to_boxlog(CLIF,HORNL),
+     boxlog_to_pfc(HORNL,PFCL)},PFCL)).
+
+=> clif(forall(A,(forall(B,if( (likes(A,B)  , likes(B,A)), love_compatable(A,B)))))).
+ 
+
+:-prolog.

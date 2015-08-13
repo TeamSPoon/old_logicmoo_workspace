@@ -734,7 +734,7 @@ pfc_add_trigger(pt(Trigger,Body),Support) :-
       ( \+ \+ pfc_assert_t(pt(Trigger,Body),Support),
         must(pfc_mark_as(Support,p,Trigger,pfcPosTrigger)),
         copy_term(pt(Trigger,Body),Tcopy), !,
-        call_u(Trigger),
+        no_repeats(call_u(Trigger),
         debugOnError(pfc_eval_lhs(Body,(Trigger,Tcopy))),
         fail)).
 

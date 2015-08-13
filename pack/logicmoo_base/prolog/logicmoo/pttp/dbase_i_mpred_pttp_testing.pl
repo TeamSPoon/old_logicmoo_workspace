@@ -235,7 +235,7 @@ pttp_test_skipped(overbeek_example4a,
 		(p(e(X,e(e(Y,e(Z,X)),e(Z,Y))))),
 		((p(Y) :- p(e(X,Y)), p(X))),
 		((queryXXX :- p(e(e(e(a,e(b,c)),c),e(b,a))))),
-                ((query:- call(prove(queryXXX,100,0,2))))
+                ((query:- call(pttp_prove(queryXXX,100,0,2))))
 	))).
 
 
@@ -248,7 +248,7 @@ pttp_test(overbeek_example4,
 	))).
 
 %%% ***
-pttp_test_query(overbeek_example4,prove(query,100,0,2)).	% cost 30 proof
+pttp_test_query(overbeek_example4,pttp_prove(query,100,0,2)).	% cost 30 proof
 %%% ***
 
 
@@ -357,7 +357,7 @@ e1 :-
 	axiom((a or b) and ~(a)),
 	prove_goal(b),
 	\+ prove_goal(a),
-	prove(a or b).
+	pttp_prove(a or b).
 
 e2 :- clear,
 	axioms(
@@ -366,8 +366,8 @@ e2 :- clear,
 	append([],Xs,Xs),
 	(append([X|Xs],Ys,[X|Zs]) <= append(Xs,Ys,Zs))
     ]),
-	prove(rev([a,b,c],[c,b,a])),
-	\+ prove(rev([a,b,c],[c,b,a,z])),
+	pttp_prove(rev([a,b,c],[c,b,a])),
+	\+ pttp_prove(rev([a,b,c],[c,b,a,z])),
 	e2(30,497).
 
 %nrev([],[]).
@@ -399,7 +399,7 @@ e3 :-
 	clear,
 	assertz(rule(len([],0),[],0)),
 	assertz(rule(len([_A|B],N),[len(B,N1),N is N1 + 1],2)),
-	prove(X^len([a,b],X)),
+	pttp_prove(X^len([a,b],X)),
 	X == 2.
 
 e4 :- 
@@ -408,7 +408,7 @@ e4 :-
 	[q(X) => p(X),
 	q(2),
 	q(1)]),
-	bagof(X,prove(X^p(X)),L),
+	bagof(X,pttp_prove(X^p(X)),L),
 	(L = [1,2] ; L = [2,1]).
 
 e5_1(0).
@@ -426,7 +426,7 @@ e5(N) :-
     clear, e5_1(N),
     axiom(q(X) <= p(X)),
     axiom(r(X,Y) <= p(X) and q(Y)),
-    %%bagof(r(X,Y),prove([X,Y]^r(X,Y)),L),
+    %%bagof(r(X,Y),pttp_prove([X,Y]^r(X,Y)),L),
     bagof(r(X,Y),prove_goal(r(X,Y)),L),
     length(L,Len),
     Len =:= N*N.
@@ -436,36 +436,36 @@ e6 :- clear,
 	[p(X) <= apply(format,['APPLY: ~p~n',[X]]) and q(X),
 	q(1),
 	q(2)]),
-	bagof(X,prove(X^p(X)),L),
+	bagof(X,pttp_prove(X^p(X)),L),
 	format('Should have done APPLY on ~p.~n',[L]).
 
 e7 :- clear,
 	axiom(a or b or c),
 	axiom(~c),
-	prove(a or b),
-	\+ prove(a or c).
+	pttp_prove(a or b),
+	\+ pttp_prove(a or c).
 
 e8 :- clear,
 	axiom(a or b or c),
-	prove(a or b or c),
-	\+ prove(a or b),
-	\+ prove(b or c),
-	\+ prove(a or c).
+	pttp_prove(a or b or c),
+	\+ pttp_prove(a or b),
+	\+ pttp_prove(b or c),
+	\+ pttp_prove(a or c).
 
 e9 :- clear,
-	prove(~(a and b) <=> ~a or ~b).
+	pttp_prove(~(a and b) <=> ~a or ~b).
 
 e10 :- clear,
 	axiom(p(X) or q(X) <= r(X)),
 	axiom(r(a) and r(b)),
-	prove(X^(p(X) or q(X))),
-	\+ prove(p(a)),
-	\+ prove(p(b)),
-	\+ prove(q(a)),
-	\+ prove(q(b)),
-	\+ prove(p(a) or q(b)),
-	prove(p(a) or q(a)),
-	prove(p(b) or q(b)).
+	pttp_prove(X^(p(X) or q(X))),
+	\+ pttp_prove(p(a)),
+	\+ pttp_prove(p(b)),
+	\+ pttp_prove(q(a)),
+	\+ pttp_prove(q(b)),
+	\+ pttp_prove(p(a) or q(b)),
+	pttp_prove(p(a) or q(a)),
+	pttp_prove(p(b) or q(b)).
 
 
 :- int_listing_wid.

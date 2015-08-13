@@ -1,4 +1,4 @@
-/*:-abolish(prove,6).
+/*:-abolish(pttp_prove,6).
 :-abolish(search_cost,3).
 :-abolish(search,6).
 :-abolish(make_wrapper,3).
@@ -13,5 +13,5 @@ make_wrapper(_DefinedPreds,[P,N],(:-table(P/N))).
 
 add_features(X,X).
 
-prove(X):-query(X).
+pttp_prove(X):-query(X).
 

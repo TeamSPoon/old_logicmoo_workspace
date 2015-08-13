@@ -695,9 +695,9 @@ disable_mpred_expansion:- (( thlocal:disable_mpred_term_expansions_locally) -> t
 
 
 file_begin(W):- must_det((enable_mpred_expansion, loading_source_file(ISource),assert_until_eof(user:mpred_directive_value(W,file,ISource)))),
-   must_det(( prolog_load_context(source,Source),asserta(user:mpred_directive_value(W,file,Source)))).
+   must_det(( loading_source_file(Source),asserta(user:mpred_directive_value(W,file,Source)))).
 file_end(W):- must_det(( enable_mpred_expansion, loading_source_file(ISource),ignore(retract(user:mpred_directive_value(W,file,ISource))))),
-  must_det(( prolog_load_context(source,Source),ignore(retract(user:mpred_directive_value(W,file,Source))))).
+  must_det(( loading_source_file(Source),ignore(retract(user:mpred_directive_value(W,file,Source))))).
 
 inside_file(W) :- prolog_load_context(file,Source),user:mpred_directive_value(W,_,Source),!.
 inside_file(W) :- prolog_load_context(source,Source),user:mpred_directive_value(W,_,Source),!.

@@ -58,7 +58,7 @@ must(Call):-(repeat, (catch(Call,E,(dmsg(E:Call),debug,fail)) *-> true ; (ignore
 :-export(pttp_call/1).
 pttp_call(Goal) :- !,pttp_call(Goal,70,0,3,[],_,no).
 pttp_call(Goal,Max,Min,Inc,ProofIn,ProofOut,ShowProof):-
-  prove(Goal,Max,Min,Inc,ProofIn,ProofOut,ShowProof).
+  pttp_prove(Goal,Max,Min,Inc,ProofIn,ProofOut,ShowProof).
 
 
 % -- CODEBLOCK
@@ -233,14 +233,14 @@ do_pttp_test(TestName,Data) :-
                           retractall_wid(TestName),
                            eraseall(int_query,_),eraseall(int_not_firstOrder,_),eraseall(int_firstOrder,_),                                                           
                                pttp_tell_wid(TestName:0,Data), 
-                               once((ignore(call_print_tf(pttp_prove(TestName,query))))),
+                               once((ignore(call_print_tf(pttp_test_prove(TestName,query))))),
                                sleep(1)])),E,dmsg(error(TestName:E)))),retractall_wid(TestName)).
                               
 
 % -- CODEBLOCK
-:-export(pttp_prove/2).
-pttp_prove(TestName,_):- pttp_test_query(TestName,Other),!,call30timed(TestName,Other).
-pttp_prove(TestName,A):- call30timed(TestName,prove(A)).
+:-export(pttp_test_prove/2).
+pttp_test_prove(TestName,_):- pttp_test_query(TestName,Other),!,call30timed(TestName,Other).
+pttp_test_prove(TestName,A):- call30timed(TestName,pttp_prove(A)).
 
 call30timed(TestName,CALL):-  
    statistics(cputime, D),
@@ -313,14 +313,14 @@ get_int_query(int_query).
 :-export(pttp_query/1).
 pttp_query(X) :- must_pttp_id(ID),pttp_query_wid(ID,X).
 :-export(pttp_query_wid/2).
-pttp_query_wid(ID, Y):- trace,pttp_tell_wid(ID,(query:-Y)), pttp_prove(ID,query),!.
+pttp_query_wid(ID, Y):- trace,pttp_tell_wid(ID,(query:-Y)), pttp_test_prove(ID,query),!.
 
 /*
  A thread local safe way to do it
  pttp_query_wid(ID, Y):- term_variables(Y,Vars),gensym(query_pttp,Q),Z=..[Q|Vars],
     atom_concat('int_',Q,Int_query),
     with_assertions(is_query_functor(Q), 
-           (pttp_assert_int_wid(ID,((Z:-Y))), pttp_prove(ID,Int_query))).
+           (pttp_assert_int_wid(ID,((Z:-Y))), pttp_test_prove(ID,Int_query))).
 */
 
 % ===============================================

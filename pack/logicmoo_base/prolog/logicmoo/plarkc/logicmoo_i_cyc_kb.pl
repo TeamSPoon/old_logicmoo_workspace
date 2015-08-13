@@ -473,8 +473,12 @@ isCycUnavailable:-checkCycAvailablity,isCycUnavailable.
 checkCycAvailablity:- (isCycAvailable_known;isCycUnavailable_known(_)),!.
 checkCycAvailablity:- ccatch((ignore((invokeSubL("(+ 1 1)",R))),(R==2->assert_if_new(isCycAvailable_known);assert_if_new(isCycUnavailable_known(R)))),E,assert_if_new(isCycUnavailable_known(E))),!.
 
-:- dmsg("Loading ehe tinyKB should take under a minute").
-% :- gripe_time(60,user:qcompile(logicmoo(plarkc/logicmoo_i_cyc_kb_tinykb))).
+:- dmsg("Loading tinyKB should take under a minute").
+
+% :-must((asserta((user:term_expansion(A,B):-cyc_to_pfc_expansion_notify(A,B),!),CLREF),asserta(at_eof_action(erase(CLREF))))).
+:- gripe_time(60,user:qcompile(logicmoo(plarkc/logicmoo_i_cyc_kb_tinykb))).
+%:-must(forall(retract(at_eof_action(CALL)),must(CALL))).
+
 
 
 % :-prolog.

@@ -361,10 +361,12 @@ pfc_listing_1(What):-
 
 
 hide_data(source_meta).
+/*
 hide_data(spft/3).
 hide_data(pt/2).
 hide_data(nt/3).
 hide_data(bt/2).
+*/
 
 hide_data((H:-
  cwc,

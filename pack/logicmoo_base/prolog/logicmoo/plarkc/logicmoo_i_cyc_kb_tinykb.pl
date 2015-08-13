@@ -51,8 +51,6 @@ exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies(A,C,MT,STR),is_be
 exactlyAssertedEL(not,What,MT,STR):- assertedTinyKB_not(What,MT,STR),true.
 
 
-:-must((asserta((user:term_expansion(A,B):-cyc_to_pfc_expansion_notify(A,B),!),CLREF),asserta(at_eof_action(erase(CLREF))))).
-
 exactlyAssertedEL_first(isa, xor, 'LogicalConnective', 'UniversalVocabularyMt', vStrDef).
 exactlyAssertedEL_first(isa, xor, 'ELRelation-OneWay', 'UniversalVocabularyMt', vStrDef).
 exactlyAssertedEL_first(isa, xor, 'CommutativeRelation', 'UniversalVocabularyMt', vStrDef).
@@ -9144,6 +9142,4 @@ assertedTinyKB_NEVER(coExtensional, 'List', 'List', 'UniversalVocabularyMt', vSt
 assertedTinyKB_NEVER(genls, 'SubLSExpression', 'CharacterString', 'UniversalVocabularyMt', vStrDef).
 assertedTinyKB_NEVER(genls, 'CycLExpression', 'CycLTerm', 'UniversalVocabularyMt', vStrDef).
 assertedTinyKB_NEVER(genls, 'CycLExpression', 'CycLTerm', 'CoreCycLMt', vStrDef).
-
-:-must(forall(retract(at_eof_action(CALL)),must(CALL))).
 

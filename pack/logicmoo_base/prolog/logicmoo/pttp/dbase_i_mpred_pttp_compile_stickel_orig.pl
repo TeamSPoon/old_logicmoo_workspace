@@ -1,11 +1,11 @@
-:-abolish(prove,6).
+:-abolish(pttp_prove,6).
 :-abolish(search_cost,3).
 :-abolish(search,6).
 :-abolish(make_wrapper,3).
 :-abolish(add_features,2).
 :-abolish(add_args,13).
 
-prove(Goal,Max,Min,Inc,ProofIn,ProofOut,ShowProof) :-
+pttp_prove(Goal,Max,Min,Inc,ProofIn,ProofOut,ShowProof) :-
 	expand_input_proof(ProofIn,PrfEnd),
 	PrevInc is Min + 1,
 	add_args(Goal,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],ProofOut1,Goal1,_),!,
@@ -13,24 +13,24 @@ prove(Goal,Max,Min,Inc,ProofIn,ProofOut,ShowProof) :-
         (ShowProof == no ; ( contract_output_proof(ProofOut1,ProofOut),write_proof(ProofOut1),nl)).
 
 %%% ***
-%%% ****f* PTTP/prove
+%%% ****f* PTTP/pttp_prove
 %%% DESCRIPTION
-%%%   prove(Goal) can be used to prove Goal using code compiled by PTTP.
+%%%   pttp_prove(Goal) can be used to pttp_prove Goal using code compiled by PTTP.
 %%%   It uses depth-first iterative-deepening search and prints the proof.
 %%%
 %%%   Depth-first iterative-deepening search can be controlled
-%%%   by extra paramaters of the prove predicate:
-%%%      prove(Goal,Max,Min,Inc,ProofIn)
+%%%   by extra paramaters of the pttp_prove predicate:
+%%%      pttp_prove(Goal,Max,Min,Inc,ProofIn)
 %%%   Max is the maximum depth to search (defaults to a big number),
 %%%   Min is the minimum depth to search (defaults to 0),
 %%%   Inc is the amount to increment the bound each time (defaults to 1).
 %%%   ProofIn specifies initial steps of proof to retrace (defaults to []).
 %%%
 %%%   A query can be compiled along with the axioms by including the
-%%%   clause 'query :- ...'.  The query can then be proved by 'prove(query)'.
+%%%   clause 'query :- ...'.  The query can then be proved by 'pttp_prove(query)'.
 %%% SOURCE
 
-prove(Goal,Max,Min,Inc,ProofIn,ProofOut) :- prove_inc(Goal,Max,Min,Inc,ProofIn,ProofOut).
+pttp_prove(Goal,Max,Min,Inc,ProofIn,ProofOut) :- prove_inc(Goal,Max,Min,Inc,ProofIn,ProofOut).
 
 prove_inc(Goal,Max,Min,Inc,ProofIn,ProofOut) :-
 	expand_input_proof(ProofIn,PrfEnd),
@@ -42,20 +42,20 @@ prove_inc(Goal,Max,Min,Inc,ProofIn,ProofOut) :-
 	must(write_proof(ProofOut1)),
 	nl.
 
-prove(Goal,Max,Min,Inc,ProofIn) :-
-	prove(Goal,Max,Min,Inc,ProofIn,_).
+pttp_prove(Goal,Max,Min,Inc,ProofIn) :-
+	pttp_prove(Goal,Max,Min,Inc,ProofIn,_).
 
-prove(Goal,Max,Min,Inc) :-
-	prove(Goal,Max,Min,Inc,[],_).
+pttp_prove(Goal,Max,Min,Inc) :-
+	pttp_prove(Goal,Max,Min,Inc,[],_).
 
-prove(Goal,Max,Min) :-
-	prove(Goal,Max,Min,1,[],_).
+pttp_prove(Goal,Max,Min) :-
+	pttp_prove(Goal,Max,Min,1,[],_).
 
-prove(Goal,Max) :-
-	prove(Goal,Max,2,3).
+pttp_prove(Goal,Max) :-
+	pttp_prove(Goal,Max,2,3).
 
-%prove(Goal) :- prove(Goal,15).
-prove(Goal) :-  prove(Goal,1000000,0,1,[],_).
+%pttp_prove(Goal) :- pttp_prove(Goal,15).
+pttp_prove(Goal) :-  pttp_prove(Goal,1000000,0,1,[],_).
 
 
 %%% ****if* PTTP/test_and_decrement_search_cost_expr

@@ -1,4 +1,4 @@
-:-abolish(prove,6).
+:-abolish(pttp_prove,6).
 :-abolish(search_cost,3).
 :-abolish(search,6).
 :-abolish(make_wrapper,3).
@@ -43,8 +43,8 @@
 %%%   to replace changed definitions.
 %%% SOURCE
 
-:-abolish(prove,6).
-prove(Goal,Max,Min,Inc,ProofIn,ProofOut):-dalit_prove(Goal,Max,Min,Inc,ProofIn,ProofOut).
+:-abolish(pttp_prove,6).
+pttp_prove(Goal,Max,Min,Inc,ProofIn,ProofOut):-dalit_prove(Goal,Max,Min,Inc,ProofIn,ProofOut).
 
 dalit_prove(Goal,Max,Min,Inc,ProofIn,ProofOut) :-
 	expand_input_proof(ProofIn,PrfEnd),

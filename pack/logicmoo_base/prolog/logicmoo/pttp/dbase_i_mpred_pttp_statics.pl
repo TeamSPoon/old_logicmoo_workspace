@@ -86,7 +86,7 @@
 %%%     ancestor goals;
 %%%  
 %%%     using a sequence of bounded depth-first searches
-%%%     to prove a theorem;
+%%%     to pttp prove a theorem;
 %%%  
 %%%     retaining information on what formulas are
 %%%     used for each inference so that the proof
@@ -103,11 +103,11 @@
 %%%       (normally a conjunction of formulas) into Prolog
 %%%       and compiles it
 %%%
-%%%     prove(formula) - tries to prove formula
+%%%     pttp_prove(formula) - tries to pttp prove a formula
 %%%
 %%%   Look at the mudDescription of these functions
 %%%   and the examples for more details on how
-%%%   pttp_assert and prove should be used.
+%%%   pttp_assert and pttp_prove should be used.
 %%%   For more information on PTTP, consult
 %%%     Stickel, M.E.  A Prolog technology theorem prover:
 %%%     implementation by an extended Prolog compiler.
@@ -532,10 +532,10 @@ body_for_head_literal(Head,Wff,Body) :-
 %%%   predicates returns a list of the predicates appearing in a formula.
 %%% SOURCE
 
-is_functor_like_search(Search):-atom(Search),arg(_,vv(search,prove),Search).
+is_functor_like_search(Search):-atom(Search),arg(_,vv(search,pttp_prove),Search).
 
 
-is_functor_like_firstOrder(Search):-atom(Search),arg(_,vv(asserted_t,secondOrder,prove),Search).
+is_functor_like_firstOrder(Search):-atom(Search),arg(_,vv(asserted_t,secondOrder,pttp_prove),Search).
 is_functor_like_firstOrder(Search):-atom(Search),is_holds_true_pttp(Search).
 is_functor_like_firstOrder(Search):-atom(Search),is_holds_false_pttp(Search).
 
@@ -950,8 +950,8 @@ is_p_to_n_2way('askable_t','fallacy_t').
 %ODD is_p_to_n('v','not_either_t').
 %ODD is_p_to_n('both_t','not_both_t').
 %ODD is_p_to_n('not_both_t',',').
-is_p_to_n('true_t','not_possible_t').
-is_p_to_n('not_true_t','possible_t').
+% is_p_to_n('true_t','not_possible_t').
+% is_p_to_n('not_true_t','possible_t').
 is_p_to_n('possible_t','not_possible_t').
 is_p_to_n('not_possible_t','possible_t').
 
@@ -1010,8 +1010,8 @@ is_p_simple(X,X).
 %%% SOURCE
 
 negated_functor0(_,_):-!,fail.
-negated_functor0(true_t,not_possible_t).
-negated_functor0(not_true_t,possible_t).
+%negated_functor0(true_t,not_possible_t).
+%negated_functor0(not_true_t,possible_t).
 
 %negated_functor0(F,NotF) :- is_p_to_n(F,NotF).
 %negated_functor0(F,NotF) :- is_p_to_n(NotF,F).
@@ -1038,9 +1038,11 @@ negated_functor(F,NotF) :- is_2nd_order_holds_pttp(NotF),trace_or_throw(negated_
 %%% ****if* PTTP/negated_literal
 %%% SOURCE
 
-negated_literal(-A,B):-var(A),!,trace_or_throw(var_negated_literal(-A,B)),!.
+negated_literal(A,B):-var(A),!,trace_or_throw(var_negated_literal(A,B)),!.
 negated_literal(not(A),A):-!.
 negated_literal(-(A),A):-!.
+negated_literal(A,-(A)):-is_ftVar(A),!.
+negated_literal(-(A),(A)):-is_ftVar(A),!.
 negated_literal(A,-(A)):-atom(A),A\=(~),A\=(-),!.
 negated_literal(A,B):- functor(A,F,_Arity),member(F,[&,(,),(;),(v),(all),(:-)]),must_det_l((as_dlog(A,AA),IN=not(AA), call((nnf('$VAR'('KB'),IN,BB),BB \=@= IN,thglobal:as_prolog(BB,B))))).
 negated_literal(not(A),B):-negated_literal(A,AA),!,negated_literal_0(AA,B),!.
