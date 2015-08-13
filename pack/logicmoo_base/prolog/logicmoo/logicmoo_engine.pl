@@ -374,12 +374,12 @@ adjust_kif0(KB,t(Kif),t(KifO)):- !,adjust_kif0(KB,Kif,KifO).
 adjust_kif0(KB,poss(Kif),poss(b_d(KB,nesc,poss),KifO)):- !,adjust_kif0(KB,Kif,KifO).
 adjust_kif0(KB,nesc(Kif),nesc(b_d(KB,nesc,poss),KifO)):- !,adjust_kif0(KB,Kif,KifO).
 adjust_kif0(KB,exists(L,Expr),               ExprO):-L==[],!,adjust_kif0(KB,Expr,ExprO).
-adjust_kif0(KB,exists(L,Expr),               ExprO):-atom(L),subst(Expr,L,'$VAR'(L),ExprM),!,adjust_kif0(KB,exists('$VAR'(L),ExprM),ExprO).
+adjust_kif0(KB,exists(V,Expr),               ExprO):-atom(V),svar_fixvarname(V,L),subst(Expr,V,'$VAR'(L),ExprM),!,adjust_kif0(KB,exists('$VAR'(L),ExprM),ExprO).
 adjust_kif0(KB,exists([L|List],Expr),exists(L,ExprO)):-is_list(List),!,adjust_kif0(KB,exists(List,Expr),ExprO).
 adjust_kif0(KB,exists(L,Expr),               ExprO):- \+ contains_var(L,Expr),!,adjust_kif0(KB,Expr,ExprO).
 adjust_kif0(KB,exists(L,Expr),exists(L,ExprO)):-!,adjust_kif0(KB,Expr,ExprO).
 adjust_kif0(KB,all(L,Expr),               ExprO):-L==[],!,adjust_kif0(KB,Expr,ExprO).
-adjust_kif0(KB,all(L,Expr),               ExprO):-atom(L),subst(Expr,L,'$VAR'(L),ExprM),!,adjust_kif0(KB,all('$VAR'(L),ExprM),ExprO).
+adjust_kif0(KB,all(V,Expr),               ExprO):-atom(V),svar_fixvarname(V,L),subst(Expr,V,'$VAR'(L),ExprM),!,adjust_kif0(KB,all('$VAR'(L),ExprM),ExprO).
 adjust_kif0(KB,all([L|List],Expr),all(L,ExprO)):-is_list(List),!,adjust_kif0(KB,exists(List,Expr),ExprO).
 adjust_kif0(KB,all(L,Expr),               ExprO):- \+ contains_var(L,Expr),!,adjust_kif0(KB,Expr,ExprO).
 adjust_kif0(KB,all(L,Expr),all(L,ExprO)):-!,adjust_kif0(KB,Expr,ExprO).
@@ -392,6 +392,7 @@ adjust_kif0(_,A,A):-leave_as_is(A),!.
 adjust_kif0(KB,Kif,KifO):- Kif=..[F|ARGS],adjust_kif0(KB,F,ARGS,KifO),!.
 adjust_kif0(KB,PAB,PABO):- PAB=..[P|AB],must_maplist(adjust_kif0(KB),AB,ABO),PABO=..[P|ABO].
 
+adjust_kif0(KB,call_builtin,ARGS,O):-!,PARGS=..ARGS,adjust_kif0(KB,PARGS,O),!.
 adjust_kif0(KB,true_t,[F|LIST],O3):-atom(F),!,PARGS=..[F|LIST],adjust_kif0(KB,(PARGS),O3),!.
 adjust_kif0(KB,not_true_t,[F|LIST],O3):-atom(F),!,PARGS=..[F|LIST],adjust_kif0(KB,not(PARGS),O3),!.
 adjust_kif0(KB,not,[A],not(O)):-!,adjust_kif0(KB,A,O),!.
@@ -400,7 +401,6 @@ adjust_kif0(KB,possible_t,[A],O):-!,adjust_kif0(KB,poss(A),O),!.
 adjust_kif0(KB,possible_t,ARGS,O):-!,PARGS=..ARGS,adjust_kif0(KB,poss(PARGS),O).
 adjust_kif0(KB,asserted_t,[A],O):-!,adjust_kif0(KB,t(A),O),!.
 adjust_kif0(KB,asserted_t,ARGS,O):-!,PARGS=..ARGS,adjust_kif0(KB,t(PARGS),O).
-adjust_kif0(KB,call_builtin,ARGS,O):-!,PARGS=..ARGS,adjust_kif0(KB,PARGS,O),!.
 adjust_kif0(KB,true_t,ARGS,O):-PARGS=..ARGS,adjust_kif0(KB,PARGS,O),!.
 adjust_kif0(KB,Not_P,ARGS,O):-atom_concat('not_',P,Not_P),!,PARGS=..[P|ARGS],adjust_kif0(KB,not(PARGS),O).
 adjust_kif0(KB,Int_P,ARGS,O):-atom_concat('int_',P,Int_P),!,append(LARGS,[_, _, _, _, _, _, _ ],ARGS),
@@ -570,6 +570,14 @@ nnf(KB,&(A,B),FreeV,NNF,Paths):- !,
 	Paths is Paths1 * Paths2,
 	(Paths1 > Paths2 -> NNF = &(NNF2,NNF1);
 		            NNF = &(NNF1,NNF2)).
+
+nnf(KB,<=>(A,B),FreeV,NNFO,Paths):- !,
+	nnf(KB,A=>B,FreeV,NNF1,Paths1),
+	nnf(KB,A<=B,FreeV,NNF2,Paths2),
+	Paths is Paths1 * Paths2,
+	(Paths1 > Paths2 -> NNF = &(NNF2,NNF1);
+		            NNF = &(NNF1,NNF2)),
+        nnf(KB,NNF,FreeV,NNFO,Paths).
 
 nnf(KB,v(A,B),FreeV,NNF,Paths):- !,
         nnf(KB,A,FreeV,NNF1,Paths1),
@@ -896,7 +904,7 @@ pnf(_KB,          PNF, _,       PNF ).
 % Head and Body are lists.
 
 % cf(Why,KB,A,B,C):- convertAndCall(as_dlog,cf(Why,KB,A,B,C)).
-cf(Why,KB,PNF, LIST):- !,
+cf(Why,KB,PNF, LIST):- fail, !,
  must_det_l((
   removeQ(KB,PNF,[], UnQ),  
   cnf(KB,UnQ,CNF),
@@ -908,18 +916,17 @@ cf(Why,KB,PNF, LIST):- !,
   sort(LISTM,LIST),
   wdmsg(pttp:-LIST))),!.
 
-/*
+
 cf(Why,KB,PNF, SET):- 
  must_det_l((
   removeQ(KB,PNF,[], UnQ),
   cnf(KB,UnQ,CNF),!,
-   
-  conjuncts_to_list(CNF,Conj),
+ call(( conjuncts_to_list(CNF,Conj),
   make_clause_set([infer_by(Why)],Conj,EachClause),
   must_maplist(correct_cls(KB),EachClause,SOO),
-  expand_cl(KB,SOO,SOOO),
-  sort(SOOO,SET))).
-*/
+  expand_cl(KB,SOO,SOOO))),
+  sort(SOOO,SET),
+  wdmsg(cf:-SET))).
 
 
 clean_repeats_d((PTT,P0),PTTP):-!, conjuncts_to_list((PTT,P0),DLIST),list_to_set(DLIST,DSET),must_maplist(clean_repeats_d,DSET,CSET),list_to_conjuncts((,),CSET,PTTP),!.
@@ -1470,8 +1477,8 @@ correct_cls0(KB,cl(H,B),O):- member(E,B),removes_literal(E,R),delete_sublits(B,R
 correct_cls0(KB,cl(H,B),O):- list_to_set(H,HH),HH\=@=H,!,correct_cls(KB,cl(HH,B),O).
 correct_cls0(KB,cl(H,B),O):- list_to_set(B,BB),BB\=@=B,!,correct_cls(KB,cl(H,BB),O).
 
-
-correct_cls0(KB,cl([not(poss(H))],B),cl([z_unused(~pos(H:-B))],[])):-member(not(H),B),!.
+/*
+correct_cls0(_,cl([not(poss(H))],B),cl([z_unused(~pos(H:-B))],[])):-member(not(H),B),!.
 correct_cls0(KB,cl([not(poss(H))],B),O):- correct_cls0(KB,cl([not((H))],B),O).
 correct_cls0(KB,cl([not(H)],B),O):- delete_sublits(B,poss(H),BB),BB\=@=B,!,correct_cls(KB,cl([not(H)],BB),O).
 correct_cls0(KB,cl([not(H)],B),O):- delete_sublits(B,(H),BB),BB\=@=B,!,correct_cls(KB,cl([not(H)],BB),O).
@@ -1487,11 +1494,12 @@ correct_cls0(KB,cl(H,B),O):- member(nesc(not(E)),B),delete_sublits(B,poss(E),BB)
 
 % correct_cls0(KB,cl([(poss(H))],B),O):- correct_cls0(KB,cl([((H))],B),O).
 
-correct_cls0(KB,cl(H,B),O):- member(E,B),member(not(E),B),!,incorrect_cl(cl(H,B),O).
+correct_cls0(_,cl(H,B),O):- member(E,B),member(not(E),B),!,incorrect_cl(cl(H,B),O).
 
-correct_cls0(KB,cl([nesc((H))],B),cl([z_unused(nesc(H:-B))],[])):-member((H),B),!.
+correct_cls0(_,cl([nesc((H))],B),cl([z_unused(nesc(H:-B))],[])):-member((H),B),!.
 correct_cls0(KB,cl([nesc((H))],B),O):- delete_sublits(B,not(H),BB),BB\=@=B,!,correct_cls(KB,cl([(H)],BB),O).
 correct_cls0(KB,cl([not((H))],B),O):- correct_cls(KB,cl([not(poss(H))],B),O).
+*/
 
 correct_cls0(_KB,cl(H,B),O):- O=cl(H,B).
 
@@ -1575,10 +1583,12 @@ kif_to_boxlog(WffIn0,KB0,Why0,FlattenedO):-
    list_to_set(Flattened,FlattenedM),!,
    correct_boxlog(FlattenedM,KB,Why,FlattenedO))).
    
+no_rewrites.
 
 
 check_is_kb(KB):-ignore('$VAR'('KB')=KB).
 
+add_preconds(X,X):- no_rewrites,!.
 add_preconds(X,Z):-
  with_assertions(leave_as_is0('CollectionS666666666666666ubsetFn'(_,_)),
    with_assertions(thlocal:dont_use_mudEquals,defunctionalize('=>',X,Y))),add_preconds2(Y,Z).
@@ -1689,6 +1699,18 @@ fix_input_vars(AIn,A):- copy_term(AIn,A),numbervars(A,672,_).
 %assert_boxlog2(AIn):- fix_input_vars(AIn,A), with_all_dmsg((kif_to_boxlog(A,B),!,must_maplist(kif_tell_boxes_undef(How,Why),B),!,nl,nl)).
 
 
+boxlog_to_pfc(PFCM,PFCO):- transitive_lc(boxlog_to_pfc0,PFCM,PFC),!, subst(PFC,(not),(neg),PFCO).
+
+boxlog_to_pfc0(AIS,AIS):- cwc, leave_as_is(AIS),!.
+boxlog_to_pfc0({A},{A}):-!.
+boxlog_to_pfc0(PFCM,PFC):- is_list(PFCM),must_maplist(boxlog_to_pfc0,PFCM,PFC).
+boxlog_to_pfc0((A,B),C):- !, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]),conjoin(AA,BB,C).
+boxlog_to_pfc0((A;B),C):- !, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]),conjoin_op((;),AA,BB,C).
+boxlog_to_pfc0(not(A),C):- !, boxlog_to_pfc0(neg(A),C).
+boxlog_to_pfc0((A:-B),(BB=>AA)):- !, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]).
+boxlog_to_pfc0((B=>A),(BB=>AA)):- !, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]).
+boxlog_to_pfc0((A<=B),(AA<=BB)):- !, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]).
+boxlog_to_pfc0(O,O).
 
 %:- export(tsn/0).
 tsn:- with_all_dmsg(forall(clause(kif,C),must(C))).

@@ -6,8 +6,6 @@ is_clif(CLIF):-cwc,
    (var(CLIF)-> (arg(_,VVs,F),functor(CLIF,F,2));
      compound(CLIF),functor(CLIF,F,2),arg(_,VVs,F)).
 
-boxlog_to_pfc(BOXLOG,PFC):- cwc, subst_except(BOXLOG,(:-),(<=),PFCM),subst_except(PFCM,(not),(neg),PFC).
-
 :- file_begin(pfc).
 
 ({is_clif(CLIF)}=>
@@ -24,7 +22,68 @@ boxlog_to_pfc(BOXLOG,PFC):- cwc, subst_except(BOXLOG,(:-),(<=),PFCM),subst_excep
    ({ kif_to_boxlog(CLIF,HORNL),
      boxlog_to_pfc(HORNL,PFCL)},PFCL)).
 
-=> clif(forall(A,(forall(B,if( (likes(A,B)  , likes(B,A)), love_compatable(A,B)))))).
- 
+clif(forall(a,(forall(b,if( (likes(a,b)  & likes(b,a)), love_compatable(a,b)))))).
 
-:-prolog.
+clif(forall(a,(forall(b,if(love_compatable(a,b), (likes(a,b)  & likes(b,a))))))).
+
+clif(forall(a,(forall(b,iff(scrap_compatable(a,b), (dislikes(a,b)  & dislikes(b,a))))))).
+ 
+/*
+
+  This will have the effect... 
+
+:- dynamic (=>)/2.
+:- multifile (=>)/2.
+
+love_compatable(B, A)=>likes(A, B).
+love_compatable(A, B)=>likes(A, B).
+neg(likes(B, A))=>neg(love_compatable(A, B)).
+neg(likes(A, B))=>neg(love_compatable(A, B)).
+likes(B, A), likes(A, B)=>love_compatable(B, A).
+neg(love_compatable(A, B)), likes(A, B)=>neg(likes(B, A)).
+neg(love_compatable(B, A)), likes(A, B)=>neg(likes(B, A)).
+
+*/
+
+
+likes(alice,bill).
+likes(alice,ted).
+neg(likes(bill,alice)).
+dislikes(bill,ted).
+dislikes(ted,bill).
+
+% we support also SUMO 
+clif(dislikes(A,B) <=> not(likes(A,B))).
+/*
+% interestingly this canonicallizes to ... 
+
+        [ (not(dislikes(N3, O3)):-likes(N3, O3)),
+          (not(likes(N3, O3)):-dislikes(N3, O3)),
+          (dislikes(N3, O3):-not(likes(N3, O3)))
+        ].
+
+ which is awesome since not(disliking does not lead to likeing)
+
+*/
+
+
+/*
+ This will have the effect... 
+
+neg(love_compatable(bill, alice)).
+neg(love_compatable(alice, bill)).
+scrap_compatable(ted, bill).
+scrap_compatable(bill, ted).
+
+
+?- pfc_get_support(neg(love_compatable(bill, alice))   ,Why).
+
+ O = (neg(likes(bill, alice)), pt(neg(likes(bill, alice)), rhs([neg(love_compatable(bill, alice))]))) ;
+ O = (u, u).   % TODO fix this error
+
+
+*/ 
+% break to the debugger
+:- wdmsg("press Ctrl-D to resume.").
+:- break.
+

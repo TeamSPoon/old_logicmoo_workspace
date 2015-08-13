@@ -1278,7 +1278,7 @@ builtin_why(P,_,_,thread_local):- predicate_property(P,thread_local).
 builtin_why(P,_,_,source_file(F)):- source_file(P,F).
 builtin_why(P,_,_,built_in):- real_builtin_predicate(P).
 builtin_why(P,_,_,transparent):- predicate_property(P,transparent).
-builtin_why(P,_,_,number_of_rules(N)):- predicate_property(P,number_of_rules(N)),N>0.
+% builtin_why(P,_,_,number_of_rules(N)):- predicate_property(P,number_of_rules(N)),N>0.
 builtin_why(X,0):-atom(X).
 %builtin_why(P,2,t(P,2)):-t(P,_,_),!,fail.
 %builtin_why(P,3,t(P,3)):-t(P,_,_,_),!,fail.

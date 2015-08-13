@@ -534,6 +534,7 @@ pfc_post1_sp(S,[P1]) :- !,pfc_post1_sp(S,(P1)).
 pfc_post1_sp(S,[P1|P2]) :- !,pfc_post1_sp(S,(P1)),pfc_post1_sp(S,(P2)).
 pfc_post1_sp(S, \+ P) :-!,doall(pfc_rem2a(P,S)),!,pfc_undo((\+),P).
 pfc_post1_sp(S, ~  P) :-!,doall(pfc_rem2a(P,S)),!,pfc_undo((~ ),P).
+pfc_post1_sp(S, not( P)) :-!,pfc_post1_sp(S, neg( P)).
 pfc_post1_sp(_S,P) :- once((pfc_is_tautology(P),dumpST,dmsg(trace_or_throw(todo(error(pfc_is_tautology(P))))))),show_load_context,prolog,fail.
 
 % only do loop check if it's already supported

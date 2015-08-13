@@ -278,13 +278,13 @@ svar('$VAR'(Var),Name):-number(Var),format(atom(Name),'~w',['$VAR'(Var)]),!.
 svar('$VAR'(VarName),VarNameU):-svar_fixvarname(VarName,VarNameU),!.
 svar('$VAR'(Name),Name):-!.
 svar('?'(Name),NameU):-svar_fixvarname(Name,NameU),!.
-svar(VAR,NameU):-atom(VAR),atom_concat('??',Name,VAR),!,svar_fixvarname(Name,NameI),atom_concat('_',NameI,NameU).
-svar(VAR,NameU):-atom(VAR),atom_concat('?',Name,VAR),svar_fixvarname(Name,NameU).
+svar(VAR,NameU):-atom(VAR),atom_concat('??',Name,VAR),ok_varname(Name),!,svar_fixvarname(Name,NameI),atom_concat('_',NameI,NameU).
+svar(VAR,NameU):-atom(VAR),atom_concat('?',Name,VAR),ok_varname(Name),svar_fixvarname(Name,NameU).
 svar(Var,Var):-var(Var),!.
 
 
 :-export(svar_fixvarname/2).
-svar_fixvarname(SVAR,UP):- atom(SVAR)->(ok_varname(SVAR),fix_varcase(SVAR,UP));UP=SVAR.
+svar_fixvarname(SVAR,UP):- atom(SVAR)->(ok_varname(SVAR),fix_varcase(SVAR,UP),must(ok_varname(UP)));UP=SVAR.
 
 fix_varcase(I,O):-fix_varcase0(I,M),atom_subst(M,'-','_',O).
 fix_varcase0(Word,WordC):-!,name(Word,[F|R]),to_upper(F,U),name(WordC,[U|R]).
