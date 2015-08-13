@@ -1,1 +1,6 @@
 text eol=LF
+special-vendored-path/* linguist-vendored
+*.pfc linguist-language=Prolog
+*.plt linguist-language=Prolog
+*.plmoo linguist-language=Prolog
+

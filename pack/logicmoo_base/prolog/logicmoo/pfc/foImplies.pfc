@@ -1,3 +1,12 @@
+/** <module> special module hooks into the logicmoo engine allow
+%   clif syntax to be recocogized via our CycL/KIF handers 
+% 
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
+%
+*/
+
 
 % this defines a recogniser for clif syntax
 is_clif(all(_,X)):-cwc,compound(X),!,is_clif(X).
@@ -21,6 +30,7 @@ is_clif(CLIF):-cwc,
 ({is_clif(CLIF)}=>
   (CLIF/is_clif(CLIF) => clif(CLIF))).
 
+:- if(pfc_examples).
 
 :- wdmsg(pfc_trace).
 :- pfc_trace.
@@ -163,4 +173,7 @@ scrap_compatable(bill, ted).
 % break to the debugger
 :- wdmsg("press Ctrl-D to resume.").
 :- break.
+
+:- endif.
+
 
