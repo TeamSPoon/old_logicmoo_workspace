@@ -65,29 +65,6 @@
 %=%   Convert wffs to list of normal logic clauses
 :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_clausify)).
 
-%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%
-%=% 
-%=%   kif_in_prolog.P
-%=%      SWI-Prolog version
-%=% 
-%=%   Convert wffs to list of normal logic clauses
-%=%
-%=%   and       &  
-%=%   or        v
-%=%   not       ~
-%=%   xor       xor
-%=%   implies   =>   
-%=%   iff       <=>  
-%=%   all       all(X,0)
-%=%   some      exists(Y,0)
-%=%
-%=%    all(X,p(X) => exists(Y, r(Y) & q(X,Y))) 
-%=%  ===============
-%=%    p(X) => r(sk1(X)) & q(X,sk1(X))
-%=%  ===============
-%=%    r(sk1(X)):- p(X).
-%=%    q(X,sk1(X)):- p(X).
-
 
 :- op(300,fx,'~').
 :- op(300,fx,'-').
