@@ -90,6 +90,7 @@ to_addable_form_wte(Why,I,O):-string(I),must_det_l((input_to_forms(string(I),Wff
 to_addable_form_wte(Why,I,O):-atom(I),atom_contains(I,'('),must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,sexpr_sterm_to_pterm(Wff,PTerm),
   to_addable_form_wte(Why,PTerm,O))).
 to_addable_form_wte(Why,=>(I),O):-!,to_addable_form_wte(Why,I,O).
+to_addable_form_wte(Why,(I),O):- subst(I,'impliesF',(=>),M),I\=@=M,!,to_addable_form_wte(Why,M,O).
 to_addable_form_wte(Why,USER:I,O):-USER=user,!,to_addable_form_wte(Why,I,O).
 to_addable_form_wte(_Why,neg(USER:P0),neg(P0)):-USER=user,!.
 to_addable_form_wte(_Why,neg(P0),neg(P0)):-!.
@@ -549,7 +550,7 @@ pfc_post1_sp_0(S,P) :-
   must(once(pfc_add_support(P,S))),
   pfc_post1_sp_1(S,P).
 
-pfc_post1_sp_1(S,P):- 
+pfc_post1_sp_1(S,P):- P\==true,
   pfc_unique_u(P),
   must(assert_u(P)),!,
   must(pfc_trace_add(P,S)),

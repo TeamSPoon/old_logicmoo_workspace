@@ -11,6 +11,7 @@
 
 :- ensure_loaded(logicmoo(logicmoo_engine)).
 :- enable_mpred_expansion.
+:- user:ensure_loaded(logicmoo_i_compiler).
 
 are_clauses_entailed([C|L]):-!,maplist(clause_asserted,[C|L]).
 are_clauses_entailed((C,L)):-!,are_clauses_entailed(C),are_clauses_entailed(L).
@@ -22,15 +23,17 @@ are_clauses_entailed(CL):-clause_asserted(CL).
 % Use this to mark code and not axiomatic prolog
 clif_to_prolog(HORN,Prolog):- cwc, compound(HORN), HORN=(_:-_),!,boxlog_to_pfc(HORN,Prolog),!.
 clif_to_prolog(CLIF,Prolog):- cwc,
+  % somehow integrate why_to_id(tell,Wff,Why),
      must_det_l((kif_to_boxlog(CLIF,HORN),
      boxlog_to_pfc(HORN,Prolog))).
 
 
-% Test for specific side-effect entailments
+% Sanity Test for expected side-effect entailments
 clif_must(CLIF):- cwc,sanity((clif_to_prolog(CLIF,Prolog),!,show_call(are_clauses_entailed(Prolog)))),!.
 
-% Test for absence of specific side-effect entailments
+% Sanity Test for required absence of specific side-effect entailments
 clif_must_not(CLIF):- cwc, sanity((clif_to_prolog(CLIF,Prolog),show_call(\+ are_clauses_entailed(Prolog)))),!.
+
 
 :-op(1190,xfx,(:-)).
 :-op(1200,fy,(clif_must)).
@@ -49,6 +52,9 @@ is_clif(CLIF):-cwc,
 :- pfc_trace.
 :- file_begin(pfc).
 
+% make sure op alias for '=>' is not overriden
+:- op_alias( (=>),  (=>)).
+
 % whenever we know about clif we'll use the prolog forward chainging system
 (clif(CLIF) => 
    ({ clif_to_prolog(CLIF,PROLOG) },
@@ -64,6 +70,9 @@ is_clif(CLIF):-cwc,
 :- wdmsg(pfc_trace).
 
 :- pfc_trace.
+
+% see logicmoo_i_compiler.pl for more info
+:- set_clause_compile(fwc).
 
 % if two like each other then they are love compatable
 clif(
@@ -104,21 +113,21 @@ clif(
 % this uses biconditional implicatature 
 clif(
  forall(a,forall(b,
-  iff(scrap_compatable(a,b),
+  iff(might_altercate(a,b),
     (dislikes(a,b)  & dislikes(b,a)))))).
 
 %  canonicalizes to..
 
 % A and B will not scrap becasue it takes two to tango and A doesnt dislike B
-:- clif_must((not(scrap_compatable(A, B)):-not(dislikes(A, B)))).
+:- clif_must((not(might_altercate(A, B)):-not(dislikes(A, B)))).
 % A and B will not scrap becasue it takes B doent dislike A (like above)
-:- clif_must((not(scrap_compatable(A, B)):-not(dislikes(B, A)))).
+:- clif_must((not(might_altercate(A, B)):-not(dislikes(B, A)))).
 % Since we can prove A and B  dislike each other we can prove they are scrap compatable
-:- clif_must((scrap_compatable(A, B):-dislikes(A, B), dislikes(B, A))).
+:- clif_must((might_altercate(A, B):-dislikes(A, B), dislikes(B, A))).
 %  A dislikes B  when we prove A and B are scrap compatable somehow  (this was due to the biconditional implicatature)
-:- clif_must((dislikes(A, B):-scrap_compatable(A, B))).
+:- clif_must((dislikes(A, B):-might_altercate(A, B))).
 %  B dislikes A  when we prove A and B are scrap compatable
-:- clif_must((dislikes(B, A):-scrap_compatable(A, B))).
+:- clif_must((dislikes(B, A):-might_altercate(A, B))).
 
 
 % alice likes bill
@@ -134,8 +143,13 @@ clif(not(likes(bill,alice))).
 clif((dislikes(bill,ted) & dislikes(ted,bill))).
 
 % we support also SUMO language 
+:- file_begin(kif).
 % (yes we are reading and atom.. which contains parens so we read it as sexprs
-% thank you triska for showing off this neat hack term reading hack
+% thank you triska for showing off this neat hack for term reading)
+
+% treat the (normally PFC) operators as clif
+:- op_alias((<=>), iff).
+:- op_alias( (=>),  if).
 
 clif('
 
@@ -148,6 +162,17 @@ clif('
 ).
 
 
+% we support also CycL language 
+clif('
+
+(equiv
+  (dislikes ?A ?B)
+  (not
+      (likes ?A ?B)))
+
+'
+).
+
 % interestingly this canonicallizes to ... 
 % A does not dislike B when A like B
 :- clif_must((not(dislikes(A, B)):-likes(A, B))).
@@ -156,7 +181,7 @@ clif('
 % A does dislikes B when we can somehow prove A not liking B
 :- clif_must((dislikes(A, B):-not(likes(A, B)))).
 
-% NOTE: somehow we avoid this trap! 
+% NOTE: somehow we avoided this trap! 
 :- clif_must_not((likes(A,B) :- not(dislikes(A,B)))).
 /*
  Though it a bit of a red herring due the the fact not(disliking(..)) in our system means 
@@ -169,13 +194,92 @@ clif('
 % The above assertions forward chain to these side-effects... 
 :- clif_must((not(love_compatable(bill, alice)))).
 :- clif_must((not(love_compatable(alice, bill)))).
-:- clif_must((scrap_compatable(ted, bill))).
-:- clif_must((scrap_compatable(bill, ted))).
+:- clif_must((might_altercate(ted, bill))).
+:- clif_must((might_altercate(bill, ted))).
 
 % get proof
 :- sanity(call(pfc_get_support(not(love_compatable(bill, alice))   ,Why))).
 % O = (not(likes(bill, alice)), pt(not(likes(bill, alice)), rhs([not(love_compatable(bill, alice))]))) ;
 % TODO fix this error O = (u, u). 
+
+% logic tests...
+
+
+:- file_begin(kif).
+% treat the (normally PFC) operators as clif
+:- op_alias((<=>), iff).
+:- op_alias( (=>),  if).
+
+
+% save compiled clauses using forward chaining storage
+% we are using forward chaining just so any logical errors, performance and program bugs manefest
+% immediately
+:- set_clause_compile(fwc).
+:- file_begin(kif).
+
+otherGender(male,female).
+otherGender(female,male).
+% :-start_rtrace.
+spouse(X,Y) <=> spouse(Y,X).
+:-prolog.
+(spouse(X,Y),gender(X,G1), otherGender(G1,G2))
+     => gender(Y,G2).
+
+
+
+gender(P,male) <=> male(P).
+gender(P,female) <=> female(P).
+
+male(P) <=> ~female(P).
+
+% human(P) => (female(P) v male(P)).
+clif(if(human(P), (female(P) v male(P)))).
+
+all(P,exists([M,F],
+  (human(P) => mother(M,P) & father(F,P)))).
+
+parent(X,Y),female(X) <=> mother(X,Y).
+parent(X,Y),parent(Y,Z) => grandparent(X,Z).
+grandparent(X,Y),male(X) <=> grandfather(X,Y).
+grandparent(X,Y),female(X) <=> grandmother(X,Y).
+mother(Ma,Kid),parent(Kid,GrandKid)
+      =>grandmother(Ma,GrandKid).
+grandparent(X,Y),female(X) <=> grandmother(X,Y).
+parent(X,Y),male(X) <=> father(X,Y).
+parent(Ma,X),parent(Ma,Y),{dif(X,Y)} =>sibling(X,Y).
+parent(P1,P2) => ancestor(P1,P2).
+parent(P1,P2), ancestor(P2,P3) => ancestor(P1,P3).
+
+
+((human(P1),ancestor(P1,P2))=>human(P2)).
+
+mother(eileen,douglas).
+mother(trudy,eileen).
+mother(trudy,robby).
+mother(trudy,liana).
+mother(liana,matt).
+mother(liana,liz).
+mother(trudy,pam).
+
+% this fact sets off the anscesteral rule that her decendants are humans to
+human(trudy).
+
+% therefore
+:-clif_must(human(douglas)).
+
+% so far no males in the KB
+% :- sanity( ~(~(male(_)))). 
+
+% we should report the presence on non male though...
+%    the ~/1 is our negatinon hook into the inference engine 
+:-doall(show_call(~ male(Who ))).
+% we expect to see at least there mothers here
+
+
+% unaliasing
+:- op_alias( (<=>),  <=>).
+:- op_alias(  (=>),   =>).
+
 
 % break to the debugger
 :- wdmsg("press Ctrl-D to resume.").

@@ -151,6 +151,7 @@
 
 
 :- user:ensure_loaded(logicmoo_i_kif).
+:- user:ensure_loaded(logicmoo_i_compiler).
 
 
 :- style_check(+singleton).
@@ -665,7 +666,9 @@ cf(Why,KB,PNF, LIST):- fail, !,
 cf(Why,KB,PNF, SET):- 
  must_det_l((
   removeQ(KB,PNF,[], UnQ),
-  cnf(KB,UnQ,CNF),!,
+  cnf(KB,UnQ,CNF0),!,
+  nnf(KB,CNF0,[],CNF,_),
+  wdmsg(cnf:-CNF),
  call(( conjuncts_to_list(CNF,Conj),
   make_clause_set([infer_by(Why)],Conj,EachClause),
   must_maplist(correct_cls(KB),EachClause,SOO),
@@ -1049,7 +1052,7 @@ incorrect_cl(cl(H,B),cl([z_unused(H:-B)],[])).
 
 :- export(correct_boxlog/4).
 correct_boxlog(CLAUSES,KB,Why,FlattenedO):- (\+ is_list(CLAUSES)),!,correct_boxlog([CLAUSES],KB,Why,FlattenedO).
-correct_boxlog(BOXLOG,KB,Why,FlattenedO):-
+correct_boxlog(BOXLOG,KB,Why,FlattenedS):-
   must_det_l((  
    must_maplist(adjust_kif(KB),BOXLOG,MODAL),
    %wdmsgl(modal(MODAL)),   
@@ -1059,9 +1062,12 @@ correct_boxlog(BOXLOG,KB,Why,FlattenedO):-
    flatten([ListOfLists],Flattened),
    must_maplist(removeQ(KB),Flattened,FlattenedM),
    must_maplist(demodal(KB),FlattenedM,FlattenedO),
-   wdmsgl(horn(FlattenedO)))),!.
+   predsort(variants_are_equal,FlattenedO,FlattenedS),
+   wdmsgl(horn(FlattenedS)))),!.
 
-
+variants_are_equal( =, A,B):- unnumbervars(A+B,AA+BB),AA=@=BB,!.
+variants_are_equal( Order, A,B):- compare(Order,A,B).
+ 
 cf_to_flattened_clauses(KB,Why,NCFsI,FlattenedO):- 
  must_det_l((
    must_maplist(correct_cls(KB),NCFsI,NCFs),

@@ -231,30 +231,33 @@
 %%%      p(X,Y,f(X1,Y1)) :- unify(X,X1), unify(Y,Y1).
 %%% SOURCE
 
-linearize(TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut) :-
+linearize(TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut):- linearize(unify, TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut).
+
+linearize(Pred, TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut) :-
 	not_ftVar(TermIn) ->
 		functor(TermIn,F,N),
 		pttp_functor(TermOut,F,N),
-		linearize_args(TermIn,TermOut,VarsIn,VarsOut,
+		linearize_args(Pred,TermIn,TermOut,VarsIn,VarsOut,
 		               MatchesIn,MatchesOut,1,N);
 	identical_member_special(TermIn,VarsIn) ->
-		VarsOut = VarsIn,
-		conjoin_pttp(MatchesIn,unify(TermIn,TermOut),MatchesOut);
+		((VarsOut = VarsIn,
+                UNIFY =.. [Pred,TermIn,TermOut],
+		conjoin_pttp(MatchesIn,UNIFY,MatchesOut)));
 	%true ->
-		TermOut = TermIn,
+	      ((  TermOut = TermIn,
 		VarsOut = [TermIn|VarsIn],
-		MatchesOut = MatchesIn.
+		MatchesOut = MatchesIn)).
 
-linearize_args(TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut,I,N) :-
+linearize_args(Pred,TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut,I,N) :-
 	I > N ->
 		VarsOut = VarsIn,
 		MatchesOut = MatchesIn;
 	%true ->
 		arg(I,TermIn,ArgI),
-		linearize(ArgI,NewArgI,VarsIn,Vars1,MatchesIn,Matches1),
+		linearize(Pred,ArgI,NewArgI,VarsIn,Vars1,MatchesIn,Matches1),
 		arg(I,TermOut,NewArgI),
 		I1 is I + 1,
-		linearize_args(TermIn,TermOut,Vars1,VarsOut,Matches1,MatchesOut,I1,N).
+		linearize_args(Pred,TermIn,TermOut,Vars1,VarsOut,Matches1,MatchesOut,I1,N).
 %%% ***
 %%% ****if* PTTP/unify
 %%% DESCRIPTION
