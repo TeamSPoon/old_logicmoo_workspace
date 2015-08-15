@@ -66,9 +66,6 @@ skolem(X,Y,_):- X=Y.
 :- dynamic(not_mudEquals/2).
 not_mudEquals(X,Y):- X \= Y.
 
-contains_type_lits(Fml,Var,Lits):- findall(T,(contains_t_var(Fml,Var,Lit),get_isa(Lit,O,T),same_var(O,Var)),Lits).
-contains_t_var(Fml,Var,Term):- each_subterm(Fml,Term),compound(Term),arg(_,Term,O),same_var(O,Var).
-
 :- export(type_of_var/3).
 type_of_var(Fml,Var,Type):- contains_type_lits(Fml,Var,Lits),!,(member(Type,Lits)*->true;Type='Unk').
 :- style_check(+singleton).
@@ -151,9 +148,9 @@ adjust_kif0(KB,I,O):- as_dlog(I,M),I\=@=M,!,adjust_kif0(KB,M,O).
 adjust_kif0(_,V,V):- is_ftVar(V),!.
 adjust_kif0(_,A,A):- \+ compound(A),!.
 
-adjust_kif0(KB,~(Kif),(KifO)):- !,adjust_kif0(KB,not(KifO),KifO).
-adjust_kif0(KB,neg(Kif),(KifO)):- !,adjust_kif0(KB,not(KifO),KifO).
-adjust_kif0(KB,\+(Kif),(KifO)):- !,adjust_kif0(KB,not(KifO),KifO).
+adjust_kif0(KB,~(Kif),(KifO)):- !,adjust_kif0(KB,not(Kif),KifO).
+adjust_kif0(KB,neg(Kif),(KifO)):- !,adjust_kif0(KB,not(Kif),KifO).
+adjust_kif0(KB,\+(Kif),(KifO)):- !,adjust_kif0(KB,not(Kif),KifO).
 
 
 adjust_kif0(KB,nesc(N,Kif),nesc(N,KifO)):- !,adjust_kif0(KB,Kif,KifO).

@@ -47,8 +47,6 @@
 
 :- include((logicmoo_i_header)).
 
-% :- dynamic(added/1).
-added(Added):-cwc,spft(Added,U,U).
 
 pfc_testing.
 
@@ -160,6 +158,23 @@ prologSingleValued(C):-cwc,compound(C),functor(C,F,_),!,prologSingleValued(F).
 
 ((pfc_default(P)/(pfc_literal(P),compound(P),different_literal(P,_,Q,Test)))  => ((~Q/(Test), ~neg(P)) => P)).
 
+if_missing(foob(_),foob(a)).
+
+%(if_missing(H,HH) => (H/(H\==HH) => {ignore(retract(HH))})).
+(if_missing(H,HH) => (~H/(H\==HH) => HH)).
+
+:-show_call(must(foob(a))).
+
+foob(b).
+
+:-show_call(must(\+foob(a))).
+:-must(foob(b)).
+
+~foob(b).
+
+:-show_call(must(\+foob(b))).
+:-must(foob(a)).
+
 
 prologBuiltin(F),arity(F,A)=>{make_builtin(F/A)}.
 
@@ -185,10 +200,9 @@ type_prefix(_Prefix,Type)=>tCol(Type).
 type_suffix(Suffix,Type)=>tCol(Type).
 
 
-
 pfc_undo_sys(P, WhenAdded, WhenRemoved) => (P => {WhenAdded}), pfc_undo_method(WhenAdded,WhenRemoved).
 
-pfc_undo_sys(added(P),pfc_assert(P),pfc_retract(P)).
+% DONT pfc_undo_sys(added(P),pfc_assert(P),pfc_retract(P)).
 % pfc_undo_sys(asserted(P),assert_eq_quitely(PE),retract_eq_quitely(PE)):-expand_goal(P,PE).
 
 % 
@@ -220,8 +234,11 @@ neg(tCol(C))/completelyAssertedCollection(C)=> \+ completelyAssertedCollection(C
 
 (((support_hilog(F,A)/(atom(F),integer(A),\+ static_predicate(F/A), \+ prologDynamic(F)))) =>
    (hybrid_support(F,A), 
-   {functor(Head,F,A) ,Head=..[F|TTs],TT=..[t,F|TTs]},
-   ((Head :- cwc, call(second_order(TT,CuttedCall)), ((CuttedCall=(C1,!,C2)) -> (C1,!,C2);CuttedCall))))).
+    {functor(Head,F,A) ,Head=..[F|TTs],TT=..[t,F|TTs],
+    % (CL = (Head :- cwc, call(second_order(TT,CuttedCall)), ((CuttedCall=(C1,!,C2)) -> (C1,!,C2);CuttedCall)))
+    CL = arity(F,A)
+    },
+   (CL))).
 
 (((hybrid_support(F,A)/(atom(F),integer(A), \+ prologDynamic(F),\+ static_predicate(F/A)))) =>
   (({
@@ -427,6 +444,9 @@ functorDeclares(X)=>tCol(X).
 % prologMacroHead(pddlSomethingIsa/2).
 tPred(pddlSomethingIsa(ftTerm,ftListFn(tCol))).
 
+prologBuiltin(A) :- cwc,compound(A),get_functor(A, B),call(prologBuiltin, B).
+prologBuiltin(P) :- cwc,compound(P),!,get_functor(P, F,A),(predicate_property(P,built_in)). % predicate_property(P,static)).
+ttPredType(PT)=> {atom(PT),H=..[PT,I]}, (H:-cwc,compound(I),get_functor(I,F),call(PT,F)).
 
 isa(pddlSomethingIsa/2, prologHybrid).
 
@@ -608,7 +628,6 @@ isa('CycLTerm',ttNonGenled).
 =>prologHybrid(quotedIsa(ftTerm,ttFormatType)).
 :-dynamic(quotedIsa/2).
 
-isFact(A):- cwc, nonvar(A), ( added(A) ; clause_asserted(A)),not((arg(_,A,V),var(V))).
 isa(I,C):- cwc, pfc_univ(C,I,CI),atom(C),current_predicate(C/1,CI)->call(CI).
 isa(I,C):- cwc, is_asserted(ttFormatType(C)),!, quotedIsa(I,C).
 quotedIsa(I,C):- cwc, term_is_ft(I,C).
@@ -1232,6 +1251,9 @@ vtTestType(vTest2).
 
 notAssertable(isFact/1).
 prologHybrid(isFact/1).
+% :- dynamic(added/1).
+added(Added):-spft(Added,U,U).
+isFact(A):- cwc, nonvar(A), ( added(A) ; clause_asserted(A)),not((arg(_,A,V),var(V))).
 
 
 

@@ -312,12 +312,20 @@ additiveOp(-).
 additiveOp((/)).
 
 
+contains_no_negs(X):- \+ contains_negs(X).
+
+contains_negs(X):-sub_term(Sub, X),compound(Sub),Sub=not(_).
+
 
 is_modal(MODAL,_):- \+ compound(MODAL),!,fail.
 is_modal(MODAL,BDT):- (MODAL = nesc(BDT,_) ; MODAL = poss(BDT,_)),!,nonvar(BDT).
 is_modal(MODAL,BDT):- arg(_,MODAL,ARG),is_modal(ARG,BDT).
 
 contains_var_lits(Fml,Var,Lits):- findall(Lit,contains_t_var(Fml,Var,Lit),Lits).
+
+contains_type_lits(Fml,Var,Lits):- findall(T,(contains_t_var(Fml,Var,Lit),get_isa(Lit,O,T),same_var(O,Var)),Lits).
+contains_t_var(Fml,Var,Term):- each_subterm(Fml,Term),compound(Term),arg(_,Term,O),same_var(O,Var).
+
 
 get_isa(Lit,I,TT):- compound(Lit),get_isa0(Lit,I,TT).
 get_isa0(isa(I,T),I,TT):- to_iname(T,TT),!.

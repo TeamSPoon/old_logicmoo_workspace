@@ -219,22 +219,6 @@ door(What).
 ).
 
 
-
-% skolem_fn
-
-nnf_label(KB,exists(X,Fml),FreeV,NNF,Paths):-
-   must_det_l((
-         list_to_set([X|FreeV],NewVars),
-         nnf(KB,Fml,NewVars,NNFMid,_Paths),
-         skolem_fn(KB, NNFMid, X, FreeV, Fun, SkVars),
-         SKF =.. [Fun|SkVars],
-         subst_except(NNFMid,X,SKF,FmlSk),
-         % MAYBE CLOSE nnf(KB,((mudEquals(X,SKF) => ~FmlSk)v Fml),NewVars,NNF,Paths).
-         %nnf(KB,  (((skolem(X,SKF))=>NNFMid) & FmlSk) ,NewVars,NNF,Paths))).
-        % GOOD nnf(KB, isa(X,SKF) => (skolem(X,SKF)=>(NNFMid)) ,NewVars,NNF,Paths))).
-         nnf(KB, skolem(X,SKF) => NNFMid ,NewVars,NNF,Paths))).
-
-
 /*
 :- told.
 :- dmsg_show(_).

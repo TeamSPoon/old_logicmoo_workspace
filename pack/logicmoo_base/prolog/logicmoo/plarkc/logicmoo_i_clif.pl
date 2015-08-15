@@ -13,23 +13,34 @@
 :- enable_mpred_expansion.
 :- user:ensure_loaded(logicmoo_i_compiler).
 
-are_clauses_entailed(List):-is_list(List),!,maplist(are_clauses_entailed,List).
+are_clauses_entailed(E):-not(compound(E)),!,must(true==E).
+are_clauses_entailed([E|List]):-is_list([E|List]),!,maplist(are_clauses_entailed,[E|List]).
 are_clauses_entailed((C,L)):-!,are_clauses_entailed(C),are_clauses_entailed(L).
-are_clauses_entailed(CL):- unnumbervars(CL,UCL),show_call_failure(clause_asserted(UCL)).
+are_clauses_entailed(CL):- unnumbervars(CL,UCL),  !, \+ \+ show_call_failure(is_entailed(UCL)),!.
+
+is_entailed(UCL):-clause_asserted(UCL),!.
+is_entailed(UCL):-pfc_call(UCL),!.
+
 
 :- thlocal:disable_mpred_term_expansions_locally->throw(thlocal:disable_mpred_term_expansions_locally);true.
 
 % cwc "code-wise chaining" is always true in Prolog but will throw programming error if evalled in LogicMOO Prover.
 % Use this to mark code and not axiomatic prolog
-clif_to_prolog(HORN,Prolog):- cwc, compound(HORN), HORN=(_:-_),!,boxlog_to_pfc(HORN,Prolog),!.
-clif_to_prolog(CLIF,Prolog):- cwc,
+
+clif_to_prolog(CLIF,Prolog):-cwc,is_list(CLIF),!,must_maplist(clif_to_prolog,CLIF,Prolog).
+clif_to_prolog((H,CLIF),(T,Prolog)):-cwc,sanity(must(nonvar(H))),!,trace,clif_to_prolog(H,T),clif_to_prolog(CLIF,Prolog).
+clif_to_prolog((H:-B),PrologO):- cwc,!,must((show_call(boxlog_to_pfc((H:-B),Prolog)),!,=(Prolog,PrologO))),!.
+clif_to_prolog(CLIF,PrologO):- cwc,
   % somehow integrate why_to_id(tell,Wff,Why),
      must_det_l((kif_to_boxlog(CLIF,HORN),
-     boxlog_to_pfc(HORN,Prolog))).
+     boxlog_to_pfc(HORN,Prolog),
+     dmsg(pfc:-Prolog),
+     =(Prolog,PrologO))),!.
 
 
 % Sanity Test for expected side-effect entailments
-clif_must(CLIF):- cwc,sanity((clif_to_prolog(CLIF,Prolog),!,show_call(are_clauses_entailed(Prolog)))),!.
+% why does renumbervars work but not copy_term? 
+clif_must(CLIF0):- cwc, =(CLIF0,CLIF),sanity((clif_to_prolog(CLIF,Prolog),!,sanity(( \+ \+ (show_call(are_clauses_entailed(Prolog))))))),!.
 
 % Sanity Test for required absence of specific side-effect entailments
 clif_must_not(CLIF):- cwc, sanity((clif_to_prolog(CLIF,Prolog),show_call(\+ are_clauses_entailed(Prolog)))),!.
@@ -57,9 +68,9 @@ is_clif(CLIF):-cwc,
 
 % whenever we know about clif we'll use the prolog forward chainging system
 (clif(CLIF) => 
-   ({ clif_to_prolog(CLIF,PROLOG) },
+   ({ clif_to_prolog(CLIF,PROLOG)},
       % this consequent asserts the new rules
-      PROLOG)).
+      PROLOG,{sanity(clif_must(CLIF))})).
 
 % we create syntax listeners for [if,iff,clif_forall,all,exists]/2s
 ({is_clif(CLIF)} =>
@@ -213,12 +224,14 @@ clif('
 :- file_begin(kif).
 :- pfc_trace.
 
+prologBuiltin(otherGender/2).
 otherGender(male,female).
 otherGender(female,male).
-% :-start_rtrace.
-spouse(X,Y) <=> spouse(Y,X).
 
-(spouse(X,Y),gender(X,G1), otherGender(G1,G2))
+% :-start_rtrace.
+breeder(X,Y) <=> breeder(Y,X).
+
+(breeder(X,Y),gender(X,G1), otherGender(G1,G2))
      => gender(Y,G2).
 
 
@@ -231,8 +244,6 @@ male(P) <=> ~female(P).
 % human(P) => (female(P) v male(P)).
 clif(if(human(P), (female(P) v male(P)))).
 
-all(P,exists([M,F],
-  (human(P) => mother(M,P) & father(F,P)))).
 
 
 ((parent(X,Y) & female(X)) <=> mother(X,Y)).
@@ -242,8 +253,6 @@ all(P,exists([M,F],
 :- clif_must((mother(X,Y)=>(parent(X,Y) & female(X)))).
 :- clif_must((parent(A,B):-mother(A,B))).
 :- clif_must(not(mother(A,B)):-not(parent(A,B))).
-
-:-prolog.
 
 ((parent(X,Y) & female(X)) => mother(X,Y)).
 ((mother(X,Y) => parent(X,Y) & female(X))).
@@ -260,15 +269,23 @@ mother(Ma,Kid),parent(Kid,GrandKid)
       =>grandmother(Ma,GrandKid).
 grandparent(X,Y),female(X) <=> grandmother(X,Y).
 parent(X,Y),male(X) <=> father(X,Y).
-parent(Ma,X),parent(Ma,Y),{dif(X,Y)} =>sibling(X,Y).
+(parent(Ma,X),parent(Ma,Y),different(X,Y) =>siblings(X,Y)).
 parent(P1,P2) => ancestor(P1,P2).
-parent(P1,P2), ancestor(P2,P3) => ancestor(P1,P3).
+(parent(P1,P2), ancestor(P2,P3)) => ancestor(P1,P3).
+(ancestor(P1,P2), ancestor(P2,P3)) => ancestor(P1,P3).
 
-
-((human(P1),ancestor(P1,P2))=>human(P2)).
 
 mother(eileen,douglas).
+
+
+human(trudy).
+all(P,exists([M,F], (human(P) => (mother(M,P) & father(F,P))))).
+:-show_call(must(father(_,trudy))).
 mother(trudy,eileen).
+((human(P1),ancestor(P1,P2))=>human(P2)).
+:- listing([ancestor,human,parent]).
+:- wdmsg("press Ctrl-D to resume.").
+:- prolog.
 
 :-clif_must(grandmother(trudy,douglas)).
 
@@ -280,23 +297,43 @@ mother(trudy,pam).
 
 
 % this fact sets off the anscesteral rule that her decendants are humans to
-human(trudy).
+% human(trudy).
 
 % therefore
 :-clif_must(human(douglas)).
 
-% so far no males in the KB
-:- must( \+ male(_)). 
+:- wdmsg("press Ctrl-D to resume.").
+:-prolog.
+
+
+% so far no males "asserted" in the KB
+:-doall(show_call(male(Who ))).
+/*
+male(skArg1ofFatherFn(pam)).
+male(skArg1ofFatherFn(liz)).
+male(skArg1ofFatherFn(matt)).
+male(skArg1ofFatherFn(liana)).
+male(skArg1ofFatherFn(robby)).
+male(skArg1ofFatherFn(eileen)).
+male(skArg1ofFatherFn(douglas)).
+male(skArg1ofFatherFn(trudy)).
+*/
 
 % we can report the presence on non male though...
 %    the ~/1 is our negation hook into the inference engine 
-:-doall(show_call(~ male(Who ))).
+:-doall(show_call(~male(Who ))).
 % we expect to see at least there mothers here
 %                  succeed(user: ~male(liana)).
 %                  succeed(user: ~male(trudy)).
+%               succeed(user: ~male(skArg1ofMotherFn(trudy))).
 %                  succeed(user: ~male(eileen)).
 
 % thus ~/1 is tnot/1 of XSB ?!?
+
+% there ar explicly non females
+:-doall(show_call(~ female(Who ))).
+
+
 
 
 % unaliasing

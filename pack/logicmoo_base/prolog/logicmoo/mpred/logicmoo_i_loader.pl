@@ -37,7 +37,10 @@ prolog_load_file_nlc(Module:Spec, Options):- never_reload_file(Spec),
    wdmsg(warn(error(skip_prolog_load_file_nlc(never_reload_file(Module:Spec, Options))))),!.
 
 prolog_load_file_nlc(Module:Spec, Options):- thread_self(TID),
-   TID\==main,wdmsg(warn(error(skip_prolog_load_file_nlc(wrong_thread(TID):-thread(Module:Spec, Options))))),!,fail,dumpST.
+   TID\==main,nop(wdmsg(warn(error(skip_prolog_load_file_nlc(wrong_thread(TID):-thread(Module:Spec, Options)))))),!.
+
+prolog_load_file_nlc(Module:Spec, Options):- thread_self(TID),
+   TID\==main,nop(wdmsg(warn(error(skip_prolog_load_file_nlc(wrong_thread(TID):-thread(Module:Spec, Options)))))),!,fail,dumpST.
 
 prolog_load_file_nlc(Module:Spec, Options):- absolute_file_name(Spec,AFN,[extensions(['pl'])]), 
    (Spec\==AFN),exists_file_safe(AFN),!,prolog_load_file_nlc_0(Module:AFN, Options).

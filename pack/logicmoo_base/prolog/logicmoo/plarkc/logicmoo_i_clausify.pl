@@ -154,6 +154,9 @@
 :- user:ensure_loaded(logicmoo_i_compiler).
 
 
+to_poss(poss(BDT,X),poss(BDT,X)):-nonvar(X),!.
+to_poss(X,poss(X)):-!.
+
 :- style_check(+singleton).
 %=% Negation Normal Form
 
@@ -161,13 +164,13 @@
 nnf(KB,Fml,NNF):-   
    nnf(KB,Fml,[],NNF,_),!.
 
-skolem_setting(label).
+skolem_setting(shared).
+%skolem_setting(label).
 %skolem_setting(nnf).
 %skolem_setting(removeQ).
 %skolem_setting(eliminate).
 %skolem_setting(ignore).
 %skolem_setting(leavein).
-
 
 % get_quantifier_isa(TypedX,X,Col).
 get_quantifier_isa(_,_,_):-fail.
@@ -275,6 +278,9 @@ nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- skolem_setting(nnf),!, wdmsg(nnf(skolemi
 nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- skolem_setting(label),
    nnf_label(KB,exists(X,Fml),FreeV,NNF,Paths),!.
 
+nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- skolem_setting(shared),
+   nnf_shared(KB,exists(X,Fml),FreeV,NNF,Paths),!.
+
 
 nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- skolem_setting(ignore),
    list_to_set([X|FreeV],NewVars),
@@ -313,6 +319,18 @@ nnf(KB,xor(X , Y),FreeV,NNF,Paths):-
    !,
    nnf(KB,&(v(X , Y) , v(not(X) , not(Y))),FreeV,NNF,Paths).
    
+nnf(KB,(C => &(A,B)),FreeV,NNFO,PathsO):- 
+	nnf(KB,A,FreeV,NNF1,Paths1),contains_no_negs(NNF1),
+	nnf(KB,B,FreeV,NNF2,Paths2),contains_no_negs(NNF2),
+        can_use_hack(two_implications),!,
+        to_poss(NNF1,NNF1WFFChk),to_poss(NNF2,NNF2WFFChk),
+        FullNNF2 = ((NNF1WFFChk => (C => NNF2))),
+        FullNNF1 = ((NNF2WFFChk => (C => NNF1))),
+	% Paths is Paths1 * Paths2,
+	(Paths1 > Paths2 -> NNF = &(FullNNF2,FullNNF1);
+		            NNF = &(FullNNF1,FullNNF2)),
+        did_use_hack(two_implications),
+        nnf(KB,NNF,FreeV,NNFO,PathsO).
 
 nnf(KB,&(A,B),FreeV,NNF,Paths):- !,
 	nnf(KB,A,FreeV,NNF1,Paths1),
@@ -877,6 +895,34 @@ unbuiltin_negate(_Neg,_, Fml,Fml):- is_ftVar(Fml),!.
 unbuiltin_negate(_Neg,_, Fml,Out):- get_functor(Fml,F,A),pttp_builtin(F,A),!,must(Out=Fml).
 unbuiltin_negate(_KB,Fml,Out):- once(negate(KB,Fml,Neg)),negate(KB,Neg,Out),!.
 
+
+
+
+
+% skolem_fn
+
+nnf_label(KB,exists(X,Fml),FreeV,NNF,Paths):-
+   must_det_l((
+         list_to_set([X|FreeV],NewVars),
+         nnf(KB,Fml,NewVars,NNFMid,_Paths),
+         skolem_fn(KB, NNFMid, X, FreeV, Fun, SkVars),
+         SKF =.. [Fun|SkVars],
+        % subst_except(NNFMid,X,SKF,FmlSk),
+         % MAYBE CLOSE nnf(KB,((mudEquals(X,SKF) => ~FmlSk)v Fml),NewVars,NNF,Paths).
+         %nnf(KB,  (((skolem(X,SKF))=>NNFMid) & FmlSk) ,NewVars,NNF,Paths))).
+        % GOOD nnf(KB, isa(X,SKF) => (skolem(X,SKF)=>(NNFMid)) ,NewVars,NNF,Paths))).
+         nnf(KB, skolem(X,SKF) => NNFMid ,NewVars,NNF,Paths))).
+
+nnf_shared(KB,exists(X,Fml),FreeV,NNF,Paths):-
+   must_det_l((
+         list_to_set([X|FreeV],NewVars),
+         nnf(KB,Fml,NewVars,NNFMid,_Paths),
+         skolem_fn_shared(KB, NNFMid, X, FreeV, Fun, SkVars),
+         SKF =.. [Fun|SkVars],
+         % subst_except(NNFMid,X,SKF,FmlSk),
+         nnf(KB, skolem(X,SKF) => NNFMid ,NewVars,NNF,Paths))).
+
+
 %=%  Skolemizing : method 1
 
 % Usage: skolem(+Fml,+X,+FreeV,?FmlSk)
@@ -927,6 +973,14 @@ skolem_fn(KB, F, X, FreeVIn,Fun, FreeVSet):-
          delete_eq(FreeV0,X,FreeV),
          list_to_set(FreeV,FreeVSet),
 	contains_var_lits(F,X,LitsList),
+        mk_skolem_name(KB,X,LitsList,'',SK),
+        concat_atom(['sk',SK,'Fn'],Fun))).
+
+skolem_fn_shared(KB, F, X, _FreeVIn,Fun, Slots):- 
+       must_det_l((
+	contains_var_lits(F,X,LitsList),
+        term_slots(LitsList,FreeV0),
+        delete_eq(FreeV0,X,Slots),
         mk_skolem_name(KB,X,LitsList,'',SK),
         concat_atom(['sk',SK,'Fn'],Fun))).
 /*
