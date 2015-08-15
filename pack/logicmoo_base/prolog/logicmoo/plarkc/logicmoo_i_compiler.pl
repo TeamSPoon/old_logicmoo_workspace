@@ -19,15 +19,25 @@ additional features that may be added/manipulated in the body
 
 */
 
+% might trace down when it is not
+must_ground(G):-ground(G).
+
 set_clause_compile(TYPE):-op_alias((:-),TYPE).
 
-boxlog_to_compile((AA),OUTPUT):- get_op_alias((:-),TYPE),!,boxlog_to_compile(TYPE,(AA),OUTPUT),!.
+boxlog_to_compile((AA),OUTPUT):- get_op_alias((:-),TYPE),!,boxlog_to_compile(TYPE,(AA),OUTPUTM),!,OUTPUTM=OUTPUT.
 
+boxlog_to_compile(rev(=>),(AA),OUTPUT):-!, boxlog_to_compile(fwc,(AA),OUTPUT).
+boxlog_to_compile(neg(<=),not(AA),OUTPUT):-!, boxlog_to_compile(bwc,not(AA),OUTPUT).
 boxlog_to_compile(fwc,(not(AA):-_),true):- nonvar(AA),AA = skolem(_,_),!.
-boxlog_to_compile(fwc,(not(AA):-B),BB=>neg(AA)):-body_for_pfc(AA,B,BB).
-boxlog_to_compile(fwc,(AA:-B),BB=>AA):- body_for_pfc(AA,B,BB).
+boxlog_to_compile(fwc,(not(AA):-B),BB=>({must_ground(AA)},neg(AA))):- body_for_pfc(AA,B,BB).
+boxlog_to_compile(fwc,(AA:-B),BB=>({must_ground(AA)},AA)):- body_for_pfc(AA,B,BB).
 boxlog_to_compile(fwc,not(AA),neg(AA)):-  !.
 boxlog_to_compile(fwc,(AA),(AA)):-  !.
+boxlog_to_compile(bwc,(not(AA):-_),true):- nonvar(AA),AA = skolem(_,_),!.
+boxlog_to_compile(bwc,(not(AA):-B),neg(AA)<=(BBB)):-body_for_pfc(AA,B,BB),conjoin_body(BB,{must_ground(AA)},BBB).
+boxlog_to_compile(bwc,(AA:-B),AA<=(BBB)):- body_for_pfc(AA,B,BB),conjoin_body(BB,{must_ground(AA)},BBB).
+boxlog_to_compile(bwc,not(AA),neg(AA)):-  !.
+boxlog_to_compile(bwc,(AA),(AA)):-  !.
 boxlog_to_compile(TYPE,(AA:-BB),OUTPUT):- !,boxlog_to_compile2(TYPE,AA,BB,OUTPUT).
 boxlog_to_compile(TYPE,not(AA),OUTPUT):-  !,boxlog_to_compile2(TYPE,not(AA),true,OUTPUT).
 boxlog_to_compile(TYPE,(AA),OUTPUT):-     !,boxlog_to_compile2(TYPE,AA,true,OUTPUT).
@@ -44,13 +54,16 @@ conjoin_maybe(_X,true,true):-!.
 conjoin_maybe(TYPE,BB,OUTPUT):-conjoin(TYPE,BB,OUTPUT).
 
 
-body_for_pfc(AA,B,(BB,{ground(AA)})):- body_for_pfc_0(B,BB).
+% body_for_pfc(AA,B,(BB/ground(AA))):- body_for_pfc_0(B,BB).
+% body_for_pfc(AA,B,BBG):- body_for_pfc_0(B,BB),body_conjoin(BB,{ground(AA)},BBG).
+body_for_pfc(AA,B,BB):- body_for_pfc_0(B,BB).
 
 body_for_pfc_0(A,A):-is_ftVar(A).
 body_for_pfc_0((A,B), C):-!,body_for_pfc_0(A,AA),body_for_pfc_0(B,BB),body_conjoin(AA,BB,C).
 body_for_pfc_0((A;B),(AA;BB)):-!,body_for_pfc_0(A,AA),body_for_pfc_0(B,BB).
 body_for_pfc_0((A/B),(AA/BB)):-!,body_for_pfc_0(A,AA),body_for_pfc_0(B,BB).
-body_for_pfc_0(skolem(In,Out),{(In=Out;when('nonvar'(In),ignore((In=Out))))}).
+body_for_pfc_0(skolem(In,Out),{ignore(In=Out)}).
+%body_for_pfc_0(skolem(In,Out),{(In=Out;when('nonvar'(In),ignore((In=Out))))}).
 % body_for_pfc_0(skolem(In,Out),{when((?=(In,_);nonvar(In)),ignore(Out=In))}).
 body_for_pfc_0(different(A,B),{dif:dif(A,B)}).
 body_for_pfc_0(A,A).

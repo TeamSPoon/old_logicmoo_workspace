@@ -13,9 +13,9 @@
 :- enable_mpred_expansion.
 :- user:ensure_loaded(logicmoo_i_compiler).
 
-are_clauses_entailed([C|L]):-!,maplist(clause_asserted,[C|L]).
+are_clauses_entailed(List):-is_list(List),!,maplist(are_clauses_entailed,List).
 are_clauses_entailed((C,L)):-!,are_clauses_entailed(C),are_clauses_entailed(L).
-are_clauses_entailed(CL):-clause_asserted(CL).
+are_clauses_entailed(CL):- unnumbervars(CL,UCL),show_call_failure(clause_asserted(UCL)).
 
 :- thlocal:disable_mpred_term_expansions_locally->throw(thlocal:disable_mpred_term_expansions_locally);true.
 
@@ -64,6 +64,9 @@ is_clif(CLIF):-cwc,
 % we create syntax listeners for [if,iff,clif_forall,all,exists]/2s
 ({is_clif(CLIF)} =>
   (CLIF/is_clif(CLIF) => clif(CLIF))).
+
+mother(Ma,Kid),parent(Kid,GrandKid)
+      =>grandmother(Ma,GrandKid).
 
 :- if(if_defined(pfc_examples,true)).
 
@@ -180,16 +183,8 @@ clif('
 :- clif_must((not(likes(A, B)):-dislikes(A, B))).
 % A does dislikes B when we can somehow prove A not liking B
 :- clif_must((dislikes(A, B):-not(likes(A, B)))).
-
-% NOTE: somehow we avoided this trap! 
-:- clif_must_not((likes(A,B) :- not(dislikes(A,B)))).
-/*
- Though it a bit of a red herring due the the fact not(disliking(..)) in our system means 
-  you have "proven by some means that not disliking is true"
-    .. such means would include likes(N3, O3) .. and it does above.
-   but still not sure if this is by crook.
-
-*/
+% A does likes B when we can somehow prove A not disliking B
+:- clif_must((likes(A,B) :- not(dislikes(A,B)))).
 
 % The above assertions forward chain to these side-effects... 
 :- clif_must((not(love_compatable(bill, alice)))).
@@ -216,12 +211,13 @@ clif('
 % immediately
 :- set_clause_compile(fwc).
 :- file_begin(kif).
+:- pfc_trace.
 
 otherGender(male,female).
 otherGender(female,male).
 % :-start_rtrace.
 spouse(X,Y) <=> spouse(Y,X).
-:-prolog.
+
 (spouse(X,Y),gender(X,G1), otherGender(G1,G2))
      => gender(Y,G2).
 
@@ -238,7 +234,25 @@ clif(if(human(P), (female(P) v male(P)))).
 all(P,exists([M,F],
   (human(P) => mother(M,P) & father(F,P)))).
 
-parent(X,Y),female(X) <=> mother(X,Y).
+
+((parent(X,Y) & female(X)) <=> mother(X,Y)).
+
+:- clif_must(((parent(X,Y) & female(X)) <=> mother(X,Y))).
+:- clif_must(((parent(X,Y) & female(X)) => mother(X,Y))).
+:- clif_must((mother(X,Y)=>(parent(X,Y) & female(X)))).
+:- clif_must((parent(A,B):-mother(A,B))).
+:- clif_must(not(mother(A,B)):-not(parent(A,B))).
+
+:-prolog.
+
+((parent(X,Y) & female(X)) => mother(X,Y)).
+((mother(X,Y) => parent(X,Y) & female(X))).
+
+:- clif_must((parent(A,B):-mother(A,B))).
+
+
+
+
 parent(X,Y),parent(Y,Z) => grandparent(X,Z).
 grandparent(X,Y),male(X) <=> grandfather(X,Y).
 grandparent(X,Y),female(X) <=> grandmother(X,Y).
@@ -255,11 +269,15 @@ parent(P1,P2), ancestor(P2,P3) => ancestor(P1,P3).
 
 mother(eileen,douglas).
 mother(trudy,eileen).
+
+:-clif_must(grandmother(trudy,douglas)).
+
 mother(trudy,robby).
 mother(trudy,liana).
 mother(liana,matt).
 mother(liana,liz).
 mother(trudy,pam).
+
 
 % this fact sets off the anscesteral rule that her decendants are humans to
 human(trudy).
@@ -268,12 +286,17 @@ human(trudy).
 :-clif_must(human(douglas)).
 
 % so far no males in the KB
-% :- sanity( ~(~(male(_)))). 
+:- must( \+ male(_)). 
 
-% we should report the presence on non male though...
-%    the ~/1 is our negatinon hook into the inference engine 
+% we can report the presence on non male though...
+%    the ~/1 is our negation hook into the inference engine 
 :-doall(show_call(~ male(Who ))).
 % we expect to see at least there mothers here
+%                  succeed(user: ~male(liana)).
+%                  succeed(user: ~male(trudy)).
+%                  succeed(user: ~male(eileen)).
+
+% thus ~/1 is tnot/1 of XSB ?!?
 
 
 % unaliasing

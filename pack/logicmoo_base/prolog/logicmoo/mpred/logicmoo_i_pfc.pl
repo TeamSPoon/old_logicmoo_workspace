@@ -305,6 +305,7 @@ pfc_debug_trace(F):-wdmsg(F),!.
 pfc_debug_trace(_,_):-pfc_silient,!.
 pfc_debug_trace(F,A):-wdmsg(F,A),!.
 
+show_if_debug(A):- !,show_call(A).
 show_if_debug(A):- thlocal:pfc_debug_local,!,show_call(A).
 show_if_debug(A):- A.
 

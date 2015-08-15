@@ -106,6 +106,9 @@
 				Refilter="0"
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
+		<Folder Name="../../runtime">
+			<F N="../../runtime/run_mud_server.pl"/>
+		</Folder>
 		<F
 			N="Makefile.mk"
 			Type="Makefile"/>

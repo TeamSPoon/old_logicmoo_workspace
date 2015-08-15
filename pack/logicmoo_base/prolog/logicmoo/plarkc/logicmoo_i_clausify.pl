@@ -323,7 +323,7 @@ nnf(KB,&(A,B),FreeV,NNF,Paths):- !,
 
 nnf(KB,<=>(A,B),FreeV,NNFO,Paths):- !,
 	nnf(KB,A=>B,FreeV,NNF1,Paths1),
-	nnf(KB,A<=B,FreeV,NNF2,Paths2),
+	nnf(KB,B=>A,FreeV,NNF2,Paths2),
 	Paths is Paths1 * Paths2,
 	(Paths1 > Paths2 -> NNF = &(NNF2,NNF1);
 		            NNF = &(NNF1,NNF2)),

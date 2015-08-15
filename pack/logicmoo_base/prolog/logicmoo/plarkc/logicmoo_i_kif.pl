@@ -145,15 +145,21 @@ thglobal:as_prolog(Fml,FmlO):- as_symlog(Fml,FmlM),
 adjust_kif(KB,Kif,KifO):-must(adjust_kif0(KB,Kif,KifO)),!.
 
 % Converts to syntax that NNF/DNF/CNF/removeQ like
+
+
+adjust_kif0(KB,I,O):- as_dlog(I,M),I\=@=M,!,adjust_kif0(KB,M,O).
 adjust_kif0(_,V,V):- is_ftVar(V),!.
 adjust_kif0(_,A,A):- \+ compound(A),!.
+
+adjust_kif0(KB,~(Kif),(KifO)):- !,adjust_kif0(KB,not(KifO),KifO).
+adjust_kif0(KB,neg(Kif),(KifO)):- !,adjust_kif0(KB,not(KifO),KifO).
+adjust_kif0(KB,\+(Kif),(KifO)):- !,adjust_kif0(KB,not(KifO),KifO).
+
+
 adjust_kif0(KB,nesc(N,Kif),nesc(N,KifO)):- !,adjust_kif0(KB,Kif,KifO).
 adjust_kif0(KB,poss(N,Kif),poss(N,KifO)):- !,adjust_kif0(KB,Kif,KifO).
 adjust_kif0(KB,not(Kif),not(KifO)):- !,adjust_kif0(KB,Kif,KifO).
 adjust_kif0(KB,not(KB,Kif),not(KifO)):- !,adjust_kif0(KB,Kif,KifO).
-adjust_kif0(KB,neg(Kif),not(KifO)):- !,adjust_kif0(KB,Kif,KifO).
-adjust_kif0(KB,not(Kif),not(KifO)):- !,adjust_kif0(KB,Kif,KifO).
-adjust_kif0(KB,~(Kif),not(KifO)):- !,adjust_kif0(KB,Kif,KifO).
 adjust_kif0(KB,t(Kif),t(KifO)):- !,adjust_kif0(KB,Kif,KifO).
 adjust_kif0(KB,poss(Kif),poss(b_d(KB,nesc,poss),KifO)):- !,adjust_kif0(KB,Kif,KifO).
 adjust_kif0(KB,nesc(Kif),nesc(b_d(KB,nesc,poss),KifO)):- !,adjust_kif0(KB,Kif,KifO).
@@ -374,8 +380,8 @@ kif_to_boxlog(WffIn0,KB0,Why0,FlattenedO):-
    %wdmsgl(nnf(NNF)),
    pnf(KB,NNF,PNF),
    %wdmsgl(pnf(PNF)),
-   save_wid(Why,kif,Wff),
-   save_wid(Why,pkif,Wff6669),
+   %save_wid(Why,kif,Wff),
+   %save_wid(Why,pkif,Wff6669),
    cf(Why,KB,PNF,NCFsI),!,
    cf_to_flattened_clauses(KB,Why,NCFsI,Flattened),
    list_to_set(Flattened,FlattenedM),!,
@@ -492,7 +498,7 @@ fix_input_vars(AIn,A):- copy_term(AIn,A),numbervars(A,672,_).
 boxlog_to_pfc(PFCM,PFC):- is_list(PFCM),must_maplist(boxlog_to_pfc,PFCM,PFC).
 boxlog_to_pfc((A,B),C):- !, must_maplist(boxlog_to_pfc,[A,B],[AA,BB]),conjoin(AA,BB,C).
 boxlog_to_pfc(PFCM,PFCO):- boxlog_to_compile(PFCM,PFC),!, subst(PFC,(not),(neg),PFCO).
-
+/*
 boxlog_to_pfc0(AIS,AIS):- cwc, leave_as_is(AIS),!.
 boxlog_to_pfc0({A},{A}):-!.
 boxlog_to_pfc0(PFCM,PFC):- fail,boxlog_to_pfc1(PFCM,PFC),!.
@@ -511,7 +517,7 @@ boxlog_to_pfc0((A),OUTPUT):- !, must_maplist(boxlog_to_pfc0,[A],[AA]),boxlog_to_
 %boxlog_to_pfc0(not(A),OUTPUT):- !, must_maplist(boxlog_to_pfc0,[A],[AA]),boxlog_to_compile(not(AA),OUTPUT).
 %boxlog_to_pfc0(not(A),C):- !, boxlog_to_pfc0(neg(A),C).
 %boxlog_to_pfc0(O,O).
-
+*/
 
 boxlog_to_pfc1(not(AB),(BBAA)):- get_op_alias(not(OP),rev(OTHER)), atom(OP),atom(OTHER),AB=..[OP,A,B],!, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]),BBAA=..[OTHER,BB,AA].
 boxlog_to_pfc1(not(AB),(BOTH)):- get_op_alias(not(OP),dup(OTHER,AND)),atom(OTHER), atom(OP),AB=..[OP,A,B],!, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]),AABB=..[OTHER,AA,BB],BBAA=..[OTHER,BB,AA],BOTH=..[AND,AABB,BBAA].
@@ -625,7 +631,7 @@ local_sterm_to_pterm(Wff,WffO):- sexpr_sterm_to_pterm(Wff,WffO),!.
 :-op(1000,fy,(kif_tell)).
 
 :- export((kif_tell)/2).
-
+/*
 kif_tell(_,[]).
 kif_tell(Why,[H|T]):- !,must_det_l((kif_tell(Why,H),kb_incr(Why,Why2),kif_tell(Why2,T))).
 kif_tell(Why,Wff):-  
@@ -656,7 +662,7 @@ kif_tell_boxes(How,Why,Wff0,Asserts0):-
    list_to_set(List,Set),
    forall(member(HB-WhyHB,Set),
       call(How,WhyHB,HB)).
-
+*/
 
 kif_tell_adding_constraints(Why,Isas,Get1Get2):- var(Get1Get2),!,trace_or_throw(var_kif_tell_isa_boxes(Why,Isas,Get1Get2)).
 kif_tell_adding_constraints(Why,Isas,(Get1,Get2)):- !,kif_tell_adding_constraints(Why,Isas,Get1),kb_incr(Why,Why2),kif_tell_adding_constraints(Why2,Isas,Get2).

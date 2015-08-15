@@ -691,7 +691,7 @@ get_lang(LANG):-current_lang(LANG),!.
 get_lang(pfc).
 
 % pfc
-lang_op_alias(pfc,(<=>),dup(impliesF,(','))).
+lang_op_alias(pfc,(<=>),(<=>)).
 lang_op_alias(pfc,(=>),(=>)).
 lang_op_alias(pfc,(not),(neg)).
 lang_op_alias(pfc, not(:-),neg(:-)).
@@ -702,8 +702,6 @@ lang_op_alias(kif,(not),(neg)).
 lang_op_alias(kif,(~),(neg)).
 lang_op_alias(kif,(=>),(if)).
 lang_op_alias(kif,(<=>),(iff)).
-lang_op_alias(kif,(if),(if)).
-lang_op_alias(kif,(iff),(iff)).
 lang_op_alias(kif, (:-),rev(=>)).
 lang_op_alias(kif, not(':-'),neg('<=')).
 % cyc
