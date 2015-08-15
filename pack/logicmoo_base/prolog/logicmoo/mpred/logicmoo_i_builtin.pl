@@ -445,7 +445,7 @@ functorDeclares(X)=>tCol(X).
 tPred(pddlSomethingIsa(ftTerm,ftListFn(tCol))).
 
 prologBuiltin(A) :- cwc,compound(A),get_functor(A, B),call(prologBuiltin, B).
-prologBuiltin(P) :- cwc,compound(P),!,get_functor(P, F,A),(predicate_property(P,built_in)). % predicate_property(P,static)).
+prologBuiltin(P) :- cwc,compound(P),!,get_functor(P,F,A),functor(C,F,A),(predicate_property(C,built_in)). % predicate_property(P,static)).
 ttPredType(PT)=> {atom(PT),H=..[PT,I]}, (H:-cwc,compound(I),get_functor(I,F),call(PT,F)).
 
 isa(pddlSomethingIsa/2, prologHybrid).

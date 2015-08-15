@@ -83,7 +83,7 @@ write_string_if_contains("",E):-!,show_templ_doc(E),!.
 write_string_if_contains(Must,E):-ignore((with_output_to(string(Str),show_templ_doc_all(E)),str_contains_all([Must],Str),fmt(Str))).
 
 
-(vtActionTemplate(A),{nonvar(A),functor_safe(A,Inst,_)} => isa(Inst,vtVerb)).
+(vtActionTemplate(A),{nonvar(A),get_functor(A,Inst)} => isa(Inst,vtVerb)).
 
 user:hook_coerce(Text,vtVerb,Inst):- isa(Inst,vtVerb),name_text(Inst,Text).
 

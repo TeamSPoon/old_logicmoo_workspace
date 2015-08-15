@@ -152,24 +152,27 @@ renumbervars(Y,Z):-safe_numbervars(Y,Z),!.
 %   During copying one has to remeber copies of variables which can be used further during copying.
 %   Therefore the register of variable copies is maintained.
 %
-register_var(N=V,IN,OUT):-register_var(N,IN,V,OUT).
+register_var(N=V,IN,OUT):- (var(N)->true;register_var(N,IN,V,OUT)),!.
 
-register_var(N,T,V,OUT):- must(nonvar(N)),
+register_var(N,T,V,OUTO):-register_var_0(N,T,V,OUT),must(OUT=OUTO),!.
+
+register_var_0(N,T,V,OUT):- must(nonvar(N)),
    ((name_to_var(N,T,VOther)-> must((OUT=T,samify(V,VOther)));
      (once(nb_getval('$variable_names',Before);Before=[]),
       (name_to_var(N,Before,VOther)  -> must((samify(V,VOther),OUT= [N=V|T]));
          (var_to_name(V,T,_OtherName)                  -> OUT= [N=V|T];
-           (var_to_name(V,Before,_OtherName)              -> OUT= [N=V|T];fail)))))).
+           (var_to_name(V,Before,_OtherName)              -> OUT= [N=V|T];fail)))))),!.
 
 
-register_var(N,T,V,OUT):- var(N),
+register_var_0(N,T,V,OUT):- var(N),
    (var_to_name(V,T,N)                -> OUT=T;
      (once(nb_getval('$variable_names',Before);Before=[]),
           (var_to_name(V,Before,N)   -> OUT= [N=V|T];
                OUT= [N=V|T]))),!.
 
 
-register_var(N,T,V,[N=V|T]).
+register_var(N,T,V,O):-append(T,[N=V],O),!.
+
 
 % different variables (now merged)
 samify(V,V0):-must(V=@=V0),V=V0. 

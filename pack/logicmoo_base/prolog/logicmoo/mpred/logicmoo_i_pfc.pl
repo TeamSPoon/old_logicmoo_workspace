@@ -307,15 +307,15 @@ pfc_debug_trace(F):-wdmsg(F),!.
 pfc_debug_trace(_,_):-pfc_silient,!.
 pfc_debug_trace(F,A):-wdmsg(F,A),!.
 
-show_if_debug(A):- !,show_call(A).
-show_if_debug(A):- thlocal:pfc_debug_local,!,show_call(A).
-show_if_debug(A):- A.
+% show_if_debug(A):- !,show_call(A).
+show_if_debug(A):- pfc_tracing->show_call(A);A.
 
 % ======================= 
 % user''s program''s database
 % ======================= 
 % assert_u(arity(prologHybrid,0)):-trace_or_throw(assert_u(arity(prologHybrid,0))).
 assert_u(X):- not(compound(X)),!,asserta_u(X,X,0).
+assert_u(X):- never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
 assert_u(X):- unnumbervars(X,XO),functor(X,F,A),assert_u(XO,F,A).
 
 assert_u(X,F,_):-if_defined(singleValueInArg(F,SV)),!,must(update_single_valued_arg(X,SV)).
@@ -323,15 +323,17 @@ assert_u(X,F,A):-prologSingleValued(F),!,must(update_single_valued_arg(X,A)).
 assert_u(X,F,A):-must(isa(F,prologOrdered) -> assertz_u(X,F,A) ; asserta_u(X,F,A)).
 
 
+asserta_u(X):- never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
 asserta_u(X):- functor(X,F,A),unnumbervars(X,XO),asserta_u(XO,F,A).
 asserta_u(X,_,_):- show_call_success(clause_asserted(X)),!.
 asserta_u(X,_,_):- must((expire_tabled_list(X),show_if_debug(call_with_attvars(asserta,X)))).
 
+assertz_u(X):- never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
 assertz_u(X):- functor(X,F,A),unnumbervars(X,XO),assertz_u(XO,F,A).
 assertz_u(X,_,_):- show_call_success(clause_asserted(X)),!.
 assertz_u(X,_,_):- must((expire_tabled_list(X),show_if_debug(call_with_attvars(assertz,X)))).
 
-
+never_assert_u(vtVerb(BAD)):-fail,BAD=='[|]'.
 never_retract_u(human(trudy)).
 never_retract_u((father(skArg1ofFatherFn(trudy), trudy))).
 
@@ -1170,7 +1172,7 @@ pfc_fwd(P,S) :- pfc_fwd1(P,S).
 
 pfc_fwd1(Fact,Sup) :- gripe_time(0.50,pfc_fwd2(Fact,Sup)).
 
-pfc_fwd2(Fact,_Sup) :- is_pfc_action(Fact),show_call(must(Fact)),fail.
+pfc_fwd2(Fact,_Sup) :- is_pfc_action(Fact),must(Fact),fail.
 pfc_fwd2(Fact,Sup) :- cyclic_term(Fact;Sup),writeq(pfc_fwd2_cyclic_term(Fact;Sup)),!.
 pfc_fwd2(Fact,_Sup) :-
   must(pfc_add_rule_if_rule(Fact)),
@@ -1630,7 +1632,7 @@ pfc_mark_as(Sup,_PosNeg,-(P),Type):-!,pfc_mark_as(Sup,neg,P,Type).
 pfc_mark_as(Sup,_PosNeg,~(P),Type):-!,pfc_mark_as(Sup,neg,P,Type).
 pfc_mark_as(Sup,PosNeg,( P / _ ),Type):- !, pfc_mark_as(Sup,PosNeg,P,Type).
 pfc_mark_as(_Sup,_PosNeg,( _ :- _ ),_Type):-!.
-pfc_mark_as(_Sup,_PosNeg,( _ , _ ),+Type):-!.
+pfc_mark_as(_Sup,_PosNeg,( _ , _ ),_Type):-!.
 pfc_mark_as(Sup,PosNeg,P,Type):-get_functor(P,F,A),ignore(pfc_mark_fa_as(Sup,PosNeg,P,F,A,Type)),!.
 
 :- dynamic( pfcMark/4).
@@ -1769,11 +1771,11 @@ build_neg_test(Support,T,Testin,Testout) :- must(nonvar(T)),
 
 %= this just strips away any currly brackets.
 
-build_code_test(Support,Test,Test):-var(Test),!,must(nonvar(Test)),TestO=call_u(Test).
+build_code_test(_Support,Test,TestO):-var(Test),!,must(nonvar(Test)),TestO=call_u(Test).
 build_code_test(Support,{Test},TestO) :- !,build_code_test(Support,Test,TestO).
 build_code_test(Support,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],must_maplist(build_code_test(Support),TestL,TestLO),TestO=..[F|TestLO],!.
 build_code_test(Support,Test,Test):- must(pfc_mark_as(Support,p,Test,pfcCallCode)),!.
-build_code_test(Support,Test,Test).
+build_code_test(_,Test,Test).
 
 code_sentence_op(Var):-var(Var),!,fail.
 code_sentence_op(rhs(_)).
@@ -1793,7 +1795,7 @@ build_consequent(_      ,Test,TestO):-var(Test),!,TestO=added(Test).
 build_consequent(Support,rhs(Test),rhs(TestO)) :- !,build_consequent(Support,Test,TestO).
 build_consequent(Support,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],maplist(build_consequent(Support),TestL,TestLO),TestO=..[F|TestLO],!.
 build_consequent(Support,Test,Test):-must(pfc_mark_as(Support,p,Test,pfcCreates)),!.
-build_consequent(Support,Test,Test).
+build_consequent(_ ,Test,Test).
 
 %= simple typeing for pfc objects
 
@@ -1917,7 +1919,7 @@ pfc_rem_support(WhyIn,P,(Fact,Trigger)) :- var(P),!,copy_term(pfc_rem_support(Wh
        (wdmsg(=>(Why,~SPFC)),pfc_retract_or_warn_i(spft(P,Fact,Trigger)),nop(trace))),
    (var(P)->trace_or_throw(var(P));remove_if_unsupported_verbose(WhyIn,local,P)))).
 pfc_rem_support(Why,(\+ N) , S):- pfc_rem_support(Why,neg(N),S).
-pfc_rem_support(Why,P,(Fact,Trigger)):-pfc_retract_or_warn_i(spft(P,Fact,Trigger)).
+pfc_rem_support(_Why,P,(Fact,Trigger)):-pfc_retract_or_warn_i(spft(P,Fact,Trigger)).
 
 /*
 % TODO not called yet
@@ -2035,14 +2037,14 @@ pfc_traced(_):- pfc_tracing.
 
 
 
-get_fa(PI,F,A):-var(PI),!.
+get_fa(PI,_F,_A):-var(PI),!.
 get_fa(F/A,F,A):- !.
-get_fa(PI,PI,A):- atomic(PI),!.
+get_fa(PI,PI,_A):- atomic(PI),!.
 get_fa(PI,F,A):- compound(PI),!,functor(PI,F,A).
 get_fa(Mask,F,A):-get_functor(Mask,F,A).
 
 
-clause_or_call(M:H,B):-var(M),!,no_repeats(M:F/A,(f_to_mfa(H,M,_F,_A))),M:clause_or_call(H,B).
+clause_or_call(M:H,B):-var(M),!,no_repeats(M:F/A,(f_to_mfa(H,M,F,A))),M:clause_or_call(H,B).
 clause_or_call(isa(I,C),true):-!,req(isa_asserted(I,C)).
 clause_or_call(genls(I,C),true):-!,logOnError(req(genls(I,C))).
 clause_or_call(H,B):- clause(src_edit(_Before,H),B).
@@ -2052,12 +2054,12 @@ clause_or_call(H,true):- should_call_for_facts(H),no_repeats(logOnError(H)).
 
 % as opposed to simply using clause(H,true).
 should_call_for_facts(H):- get_functor(H,F,A),should_call_for_facts(H,F,A).
-should_call_for_facts(H,F,A):- prologSideEffects(F),!,fail.
-should_call_for_facts(H,F,A):- \+ predicate_property(H,number_of_clauses(_)),!.
-should_call_for_facts(H,F,A):- pfcMark(pfcRHS,_,F,A),!,fail.
-should_call_for_facts(H,F,A):- pfcMark(pfcMustFC,_,F,A),!,fail.
-should_call_for_facts(H,F,A):- prologDynamic(F),!.
-should_call_for_facts(H,F,A):- \+ pfcControlled(F),!.
+should_call_for_facts(_,F,_):- prologSideEffects(F),!,fail.
+should_call_for_facts(H,_,_):- \+ predicate_property(H,number_of_clauses(_)),!.
+should_call_for_facts(_,F,A):- pfcMark(pfcRHS,_,F,A),!,fail.
+should_call_for_facts(_,F,A):- pfcMark(pfcMustFC,_,F,A),!,fail.
+should_call_for_facts(_,F,_):- prologDynamic(F),!.
+should_call_for_facts(_,F,_):- \+ pfcControlled(F),!.
 
 
 no_side_effects(S):- get_functor(S,F), (prologSideEffects(F)->thlocal:side_effect_ok;true).
@@ -2482,13 +2484,14 @@ repropagate(F/A):- atom(F),var(A),!,repropagate(F).
 repropagate(P):-  must(repropagate0(P)).
 
 repropagate0(USER:P):- USER==user,!,repropagate0(P).
-repropagate0(P):- forall(pfc_facts_and_universe(P),with_assertions(thlocal:pfc_debug_local,(fwd_ok(P),pfc_fwd(P)))).
+repropagate0(P):- forall(pfc_facts_and_universe(P),with_assertions(thlocal:pfc_debug_local,(once(fwd_ok(P)),pfc_fwd(P)))).
 
 
 fwd_ok(P):-ground(P),!.
 fwd_ok(if_missing(_,_)).
 fwd_ok(idForTest(_,_)).
 fwd_ok(clif(_)).
+fwd_ok(_).
 fwd_ok(P):-must(ground(P)),!.
 
 pfc_facts_only(P):- (var(P)->(pred_head_all(P),\+ meta_wrapper_rule(P));true),(no_repeats(debugOnError(P))).

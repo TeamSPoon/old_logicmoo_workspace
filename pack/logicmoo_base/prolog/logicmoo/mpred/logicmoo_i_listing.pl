@@ -128,6 +128,7 @@ pp_supports :-
   draw_line.
 
 
+loop_check_true(G):-loop_check(G,ignore(arg(1,G,[]))).
 
 % ======================= pfc_file('pfcwhy').	% interactive exploration of justifications.
 
@@ -224,14 +225,14 @@ pp_justification1([J|Js],N) :-
   nl,
   pp_justifications2(J,N,1),
   N2 is N+1,
-  pp_justification1(Js,N2).
+  loop_check_true(pp_justification1(Js,N2)).
 
 pp_justifications2([],_,_).
 
 pp_justifications2([C|Rest],JustNo,StepNo) :-  
   fmt("~N%     ~w.~w ~w",[JustNo,StepNo,C]),
   StepNext is 1+StepNo,
-  pp_justifications2(Rest,JustNo,StepNext).
+  loop_check_true(pp_justifications2(Rest,JustNo,StepNext)).
 
 pfc_ask(Msg,Ans) :-
   fmt("~N% ~w",[Msg]),

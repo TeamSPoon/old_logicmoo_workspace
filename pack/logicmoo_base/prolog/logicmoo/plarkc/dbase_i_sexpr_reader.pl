@@ -254,10 +254,17 @@ to_untyped(ExprI,ExprO):- ExprI=..Expr,
 % to_untyped(Expr,Forms):-compile_all(Expr,Forms),!.
 
 
+remove_incompletes([],[]).
+remove_incompletes([N=_|Before],CBefore):-var(N),!,
+ remove_incompletes(Before,CBefore).
+remove_incompletes([NV|Before],[NV|CBefore]):-
+ remove_incompletes(Before,CBefore).
+
 :-export(extract_lvars/3).
 extract_lvars(A,B,After):-
      b_getval('$variable_names',Before),
-     copy_lvars(A,Before,B,After).
+     remove_incompletes(Before,CBefore),!,
+     copy_lvars(A,CBefore,B,After).
 
 % copy_lvars( VAR,Vars,VAR,Vars):- var(VAR),!.
 copy_lvars( VAR,Vars,NV,NVars):- svar(VAR,Name),must(atom(Name)),!,must(register_var(Name=NV,Vars,NVars)).

@@ -20,7 +20,14 @@ are_clauses_entailed(CL):- unnumbervars(CL,UCL),  !, \+ \+ show_call_failure(is_
 
 is_entailed(UCL):-clause_asserted(UCL),!.
 is_entailed(UCL):-pfc_call(UCL),!.
+ 
+member_ele(E,E):- \+ compound(E),!.
+member_ele([L|List],E):- is_list([L|List]),C=..[v,L|List],!,arg(_,C,EL),member_ele(EL,E).
+member_ele((H,T),E):-!, (member_ele(H,E);member_ele(T,E)).
+member_ele(E,E).
 
+delistify_last_arg(CALL):-CALL=..[F|ARGS],append(Left,[OLD],ARGS),append(Left,[NEW],NARGS),NEWCALL=..[F|NARGS],!,
+  NEWCALL,member_ele(NEW,OLD).
 
 :- thlocal:disable_mpred_term_expansions_locally->throw(thlocal:disable_mpred_term_expansions_locally);true.
 
@@ -29,6 +36,7 @@ is_entailed(UCL):-pfc_call(UCL),!.
 
 clif_to_prolog(CLIF,Prolog):-cwc,is_list(CLIF),!,must_maplist(clif_to_prolog,CLIF,Prolog).
 clif_to_prolog((H,CLIF),(T,Prolog)):-cwc,sanity(must(nonvar(H))),!,trace,clif_to_prolog(H,T),clif_to_prolog(CLIF,Prolog).
+clif_to_prolog((H<=B),(H<=B)):- cwc,!.
 clif_to_prolog((H:-B),PrologO):- cwc,!,must((show_call(boxlog_to_pfc((H:-B),Prolog)),!,=(Prolog,PrologO))),!.
 clif_to_prolog(CLIF,PrologO):- cwc,
   % somehow integrate why_to_id(tell,Wff,Why),
@@ -71,6 +79,11 @@ is_clif(CLIF):-cwc,
    ({ clif_to_prolog(CLIF,PROLOG)},
       % this consequent asserts the new rules
       PROLOG,{sanity(clif_must(CLIF))})).
+% (clif(CLIF),{delistify_last_arg(kif_to_boxlog(CLIF,PROLOG))}) => boxlog(PROLOG).
+(boxlog(CLIF),{delistify_last_arg(boxlog_to_pfc(CLIF,PROLOG))}) => pfclog(PROLOG).
+(pfclog(PROLOG)=>(PROLOG,{clif_must(PROLOG)})).
+
+
 
 % we create syntax listeners for [if,iff,clif_forall,all,exists]/2s
 ({is_clif(CLIF)} =>
@@ -284,8 +297,8 @@ all(P,exists([M,F], (human(P) => (mother(M,P) & father(F,P))))).
 mother(trudy,eileen).
 ((human(P1),ancestor(P1,P2))=>human(P2)).
 :- listing([ancestor,human,parent]).
-:- wdmsg("press Ctrl-D to resume.").
-:- prolog.
+%:- wdmsg("press Ctrl-D to resume.").
+%:- prolog.
 
 :-clif_must(grandmother(trudy,douglas)).
 
@@ -302,8 +315,8 @@ mother(trudy,pam).
 % therefore
 :-clif_must(human(douglas)).
 
-:- wdmsg("press Ctrl-D to resume.").
-:-prolog.
+%:- wdmsg("press Ctrl-D to resume.").
+%:-prolog.
 
 
 % so far no males "asserted" in the KB
@@ -342,8 +355,8 @@ male(skArg1ofFatherFn(trudy)).
 
 
 % break to the debugger
-:- wdmsg("press Ctrl-D to resume.").
-:- break.
+%:- wdmsg("press Ctrl-D to resume.").
+%:- break.
 
 :- endif.
 

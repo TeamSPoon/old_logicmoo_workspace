@@ -402,7 +402,7 @@ name_text(Name,Text):- name_text_now(Name,Text).
 
 name_text_now_lc(I,O):-nonvar(I),name_text_now(I,M),!,toLowercase(M,O).
 
-:-pfc_add((vtActionTemplate(AT)/functor(AT,F,_)=>vtVerb(F))).
+:-pfc_add((vtActionTemplate(AT)/(get_functor(AT,F))) => vtVerb(F)).
 :-pfc_add(vtVerb(F)/name_text_now_lc(F,Txt)=>mudKeyword(F,Txt)).
 :-pfc_add(tCol(F)/name_text_now_lc(F,Txt)=>mudKeyword(F,Txt)).
 

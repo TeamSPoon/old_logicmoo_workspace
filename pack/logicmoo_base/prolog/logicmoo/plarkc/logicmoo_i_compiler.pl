@@ -95,6 +95,7 @@ body_for_pfc_0(Head,Head,poss(X),{loop_check(\+ neg(X),true)}).
 %body_for_pfc_0(Head,Head,skolem(In,Out),{(In=Out;when('nonvar'(In),ignore((In=Out))))}).
 % body_for_pfc_0(Head,Head,skolem(In,Out),{when((?=(In,_);nonvar(In)),ignore(Out=In))}).
 body_for_pfc_0(Head,Head,different(A,B),{dif:dif(A,B)}).
+body_for_pfc_0(Head,Head,not(A),neg(A)):-!.
 body_for_pfc_0(Head,Head,A,{A}):-prologBuiltin(A),!.
 body_for_pfc_0(Head,Head,A,A).
 

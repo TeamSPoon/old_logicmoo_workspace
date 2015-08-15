@@ -386,8 +386,9 @@ get_functor(Obj,FO):-call((must(functor_h(Obj,F,_)),!,FO=F)).
 get_functor(Obj,FO,AO):-call((must(functor_h(Obj,F,A)),!,FO=F,AO=A)).
 
 functor_h(Obj,F,A):- var(Obj),trace_or_throw(var_functor_h(Obj,F,A)).
-functor_h(Obj,F,A):- (Obj = '$VAR'(_)),trace_or_throw(var_functor_h(Obj,F,A)).
 functor_h(Obj,F,A):-var(Obj),!,(number(A)->functor(Obj,F,A);((current_predicate(F/A);throw(var_functor_h(Obj,F,A))))).
+functor_h(Obj,F,A):- (Obj = '$VAR'(_)),trace_or_throw(var_functor_h(Obj,F,A)).
+functor_h([L|Ist],F,A):- is_list([L|Ist]),!,var(F),L=F,length(Ist,A).
 functor_h(F//A,F,Ap2):-number(A),!,Ap2 is A+2,( atom(F) ->  true ; current_predicate(F/Ap2)).
 functor_h(F/A,F,A):-number(A),!,( atom(F) ->  true ; current_predicate(F/A)).
 functor_h(':'(_,Obj),F,A):-nonvar(Obj),!,functor_h(Obj,F,A).
