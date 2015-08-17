@@ -99,7 +99,7 @@ attempt_attribute_one_arg(Hint,F,N,A):-attempt_attribute_args(AndOr,argi(F,N),A)
 
 
 % mdif(A,B):- tlbugger:attributedVars,!,dif(A,B).
-mdif(_,_).
+mdif(A,B):-A\==B.
 
 :-export((samef/2,same/2)).
 same(X,Y):- samef(X,Y),!.
@@ -107,9 +107,10 @@ same(X,Y):- compound(X),arg(1,X,Y),!.
 same(X,Y):- compound(Y),arg(1,Y,X),!.
 
 
-samef(X,Y):- X=Y,!.
-samef(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
+samef(X,Y):- hotrace(((to_functor(X,XF),to_functor(Y,YF),(XF=YF->true;tring_equal_ci(XF,YF))))).
 
+to_functor(A,O):-compound(A),get_functor(A,F),!,to_functor(F,O).
+to_functor(A,A).
 
 :-export(arg_to_var/3).
 arg_to_var(_Type,_String,_Var).

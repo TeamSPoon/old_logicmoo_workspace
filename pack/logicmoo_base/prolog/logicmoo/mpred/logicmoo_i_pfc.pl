@@ -1164,23 +1164,23 @@ trigger_supports_f_l(Trigger,[Fact|MoreFacts]) :-
 pfc_fwd(P):-pfc_fwd(P,(u,u)).
 pfc_fwd([H|T],S) :- !, pfc_fwd1(H,S), pfc_fwd(T,S).
 pfc_fwd([],_) :- !.
-pfc_fwd(P,S) :- pfc_fwd1(P,S).
+pfc_fwd(P,S) :- pfc_fwd1(P,S),!.
 
 % pfc_fwd1(+P) forward chains for a single fact.
 
 
 
-pfc_fwd1(Fact,Sup) :- gripe_time(0.50,pfc_fwd2(Fact,Sup)).
+pfc_fwd1(Fact,Sup) :- gripe_time(0.50,pfc_fwd2(Fact,Sup)),!.
 
-pfc_fwd2(Fact,_Sup) :- is_pfc_action(Fact),must(Fact),fail.
+pfc_fwd2(Fact,_Sup) :- is_pfc_action(Fact),doall(show_call(must(Fact))),fail.
 pfc_fwd2(Fact,Sup) :- cyclic_term(Fact;Sup),writeq(pfc_fwd2_cyclic_term(Fact;Sup)),!.
 pfc_fwd2(Fact,_Sup) :-
-  must(pfc_add_rule_if_rule(Fact)),
+  once(must(pfc_add_rule_if_rule(Fact))),
   copy_term(Fact,F),
   % check positive triggers
-  must(fcpt(Fact,F)),
+  once(must(fcpt(Fact,F))),
   % check negative triggers
-  must(fcnt(Fact,F)),!.
+  once(must(fcnt(Fact,F))).
 
 
 %=
@@ -2470,7 +2470,8 @@ cnstrn0(X,V):-when(nonvar(V),X).
 
 rescan_pfc:-forall(clause(user:rescan_pfc_hook,Body),show_call_entry(Body)).
 
-pfc_facts_and_universe(P):- (var(P)->pred_head_all(P);true),(meta_wrapper_rule(P)->show_call(no_repeats(debugOnError(P))) ; (no_repeats(debugOnError(P)))).
+pfc_facts_and_universe(P):- (var(P)->pred_head_all(P);true),(meta_wrapper_rule(P)->
+(no_repeats(debugOnError(P))) ; (no_repeats(debugOnError(P)))).
 
 add_reprop(Var):- var(Var), !. % trace_or_throw(add_reprop(Var)).
 add_reprop(neg(_Var)):-!.

@@ -13,7 +13,7 @@
 */
 
 
-((vtActionTemplate(AT)/functor(AT,F,_)=>vtVerb(F))).
+((vtActionTemplate(AT)/get_functor(AT,F)=>vtVerb(F))).
 (vtVerb(F)/name_text_now_lc(F,Txt)=>mudKeyword(F,Txt)).
 (tCol(F)/name_text_now_lc(F,Txt)=>mudKeyword(F,Txt)).
 

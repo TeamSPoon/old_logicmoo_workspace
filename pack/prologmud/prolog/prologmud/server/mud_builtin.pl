@@ -101,13 +101,13 @@ disjointWith(ttSpatialType,ttAbstractType).
 
 
 
-isa(arity,tBinaryPredicate).
+isa(arity,ptBinaryPredicate).
 
-(arity(Pred,2),tPred(Pred)) <=> isa(Pred,tBinaryPredicate).
-prologHybrid(relationMostInstance(tBinaryPredicate,tCol,vtValue)).
-relationMostInstance(BP,_,_)=>(tBinaryPredicate(BP),tRolePredciate(BP)).
-prologHybrid(relationAllInstance(tBinaryPredicate,tCol,vtValue)).
-relationAllInstance(BP,_,_)=>tBinaryPredicate(BP).
+(arity(Pred,2),tPred(Pred)) <=> isa(Pred,ptBinaryPredicate).
+prologHybrid(relationMostInstance(ptBinaryPredicate,tCol,vtValue)).
+relationMostInstance(BP,_,_)=>(ptBinaryPredicate(BP),tRolePredciate(BP)).
+prologHybrid(relationAllInstance(ptBinaryPredicate,tCol,vtValue)).
+relationAllInstance(BP,_,_)=>ptBinaryPredicate(BP).
 
 ((isa(Inst,ttSpatialType), tCol(Inst)) => genls(Inst,tSpatialThing)).
 
@@ -367,10 +367,10 @@ ttPredAndValueType("material").
 
 vtValue(Val)/(atom(Val),i_name_lc(Val,KW))=>mudKeyword(Val,KW).
 
-ttPredAndValueType(Str)/(i_name('mud',Str,Pred),i_name('vt',Str,VT)) => (tRolePredicate(Pred),ttValueType(VT),mudKeyword(VT,Str),mudKeyword(Pred,Str),argIsa(Pred,2,VT),argIsa(Pred,1,tTemporalThing)).
+ttPredAndValueType(Str)/(i_name('mud',Str,Pred),i_name('vt',Str,VT)) => (ptRolePredicate(Pred),ttValueType(VT),mudKeyword(VT,Str),mudKeyword(Pred,Str),argIsa(Pred,2,VT),argIsa(Pred,1,tTemporalThing)).
 
-%relationMostInstance(arg1Isa,tRolePredicate,tTemporalThing).
-%relationMostInstance(arg2QuotedIsa,tRolePredicate,ftTerm).
+%relationMostInstance(arg1Isa,ptRolePredicate,tTemporalThing).
+%relationMostInstance(arg2QuotedIsa,ptRolePredicate,ftTerm).
 
 % mudKeyword(W,R) <= {atom(W),i_name_lc(W,R)}.
 
@@ -958,7 +958,7 @@ tCol(tStatPred).
 
 prologHybrid(normalAgentGoal(tStatPred,ftTerm)).
 
-(tStatPred(Pred)=>(tRolePredicate(Pred),arity(Pred,2),singleValuedInArg(Pred,2))).
+(tStatPred(Pred)=>(ptRolePredicate(Pred),arity(Pred,2),singleValuedInArg(Pred,2))).
 
 (normalAgentGoal(Pred,_)/atom(Pred) =>
  ({AT=..[Pred,tAgent,ftPercent]},meta_argtypes(AT),prologHybrid(Pred),tStatPred(Pred))).

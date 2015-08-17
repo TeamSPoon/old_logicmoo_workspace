@@ -49,7 +49,7 @@ arity(arity,2).
 arity(is_never_type,1).
 arity(prologSingleValued,1).
 arity('<=>',2).
-arity(F,A):- atom(F), current_predicate(F/A),A>1.
+arity(F,A):- atom(F), integer(A),current_predicate(F/A),A>1.
 arity(F,1):- atom(F), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
 
 

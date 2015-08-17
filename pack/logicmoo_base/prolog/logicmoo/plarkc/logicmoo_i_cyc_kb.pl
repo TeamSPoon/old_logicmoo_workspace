@@ -1,6 +1,6 @@
 /** <module> 
 % ===================================================================
-% File 'logicmoo_i_cyc.pl'
+% File 'logicmoo_i_cyc_kb.pl'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;
@@ -9,6 +9,8 @@
 % Revised At:   $Date: 2002/06/27 14:13:20 $
 % ===================================================================
 % File used as storage place for all predicates which make us more like Cyc
+% special module hooks into the logicmoo engine allow
+% syntax to be recocogized via our CycL/KIF handlers 
 %
 % Dec 13, 2035
 % Douglas Miles
@@ -18,6 +20,7 @@
 :-if_file_exists(user:ensure_loaded(logicmoo(ext/moo_ext_cyc_new))).
 
 isa_db(I,C):-clause(isa(I,C),true).
+
 
 :-dynamic(cycPrepending/2).
 cycPrepending(ft,'AssertedAssertion').
@@ -48,7 +51,7 @@ cycPrepending(ft,'HLPrototypicalTerm').
 cycPrepending(ft,'IndeterminateTerm').
 cycPrepending(ft,'IndexedTerm').
 cycPrepending(ft,'InferenceDataStructure').
-cycPrepending(ft,'InferenceSupportedCollection').
+cycPrepending(ft,'NonNegativeScalarInterval').
 cycPrepending(ft,'InferenceSupportedTerm').
 cycPrepending(ft,'KBDatastructure').
 cycPrepending(ft,'Keyword').
@@ -72,9 +75,6 @@ cycPrepending(ft,'RealNumber').
 cycPrepending(ft,'ReifiableDenotationalTerm').
 cycPrepending(ft,'ReifiableNonAtomicTerm').
 cycPrepending(ft,'ReifiedDenotationalTerm').
-cycPrepending(ft,'RemovalModuleSupportedCollection-Generic').
-cycPrepending(ft,'RemovalModuleSupportedPredicate-Generic').
-cycPrepending(ft,'RemovalModuleSupportedPredicate-Specific').
 cycPrepending(ft,'RepresentedAtomicTerm').
 cycPrepending(ft,'RepresentedTerm').
 cycPrepending(ft,'RuleAssertion').
@@ -83,71 +83,242 @@ cycPrepending(ft,'Sentence').
 cycPrepending(ft,'SentenceAskable').
 cycPrepending(ft,'SentenceAssertible').
 cycPrepending(ft,'String').
-cycPrepending(ft,'SupportDatastructure').
 cycPrepending(ft,'Symbol').
+
+cycPrepending(ft,'SupportDatastructure').
 cycPrepending(ft,'TheTerm').
-cycPrepending(ft,'TransformationModuleSupportedCollection').
 cycPrepending(ft,'TruthValueSentence').
+
 cycPrepending(v,'SingleEntry').
 cycPrepending(v,'SetTheFormat').
-cycPrepending(t,'UnreifiableFunction').
-cycPrepending(t,'UnaryFunction').
-cycPrepending(t,'UnaryPredicate').
-cycPrepending(t,'BinaryFunction').
+
+cycPrepending(tt,'TransformationModuleSupportedCollection').
+cycPrepending(tt,'RemovalModuleSupportedCollection-Generic').
+
+cycPrepending(pt,'UnaryPredicate').
+cycPrepending(pt,'RemovalModuleSupportedPredicate-Generic').
+cycPrepending(pt,'RemovalModuleSupportedPredicate-Specific').
+cycPrepending(pt,'InferenceSupportedPredicate').
+cycPrepending(pt,'SentenceClosedPredicate').
+cycPrepending(pt,'TransformationModuleSupportedPredicate').
+cycPrepending(pt,'ArgGenlQuantityBinaryPredicate').
+
+
+cycPrepending(v,'Forward-AssertionDirection').
+cycPrepending(v,'Code-AssertionDirection').
+cycPrepending(v,'Backward-AssertionDirection').
+cycPrepending(vt,'AssertionDirection').
+
+cycPrepending(vt,'BinaryFunction').
+cycPrepending(vt,'UnreifiableFunction').
+cycPrepending(vt,'UnaryFunction').
+
+
+cycPrepending(tt,'InferenceSupportedCollection').
+
+cycPrepending(pt,A):-atom(A),atom_contains(A,'Predicate').
+
+
+
+:- dynamic cyc_to_plarkc/2.
+
+
+cyc_to_plarkc('between', cycBetween).
+cyc_to_plarkc('forall', cycforAll).
+
+cyc_to_plarkc('equals', mudEquals).
+cyc_to_plarkc('termOfUnit',skolem ).
+
+cyc_to_plarkc('NART', aNARTFn).
+cyc_to_plarkc('RelationAllExistsFn', aRelationAllExistsFn).
+cyc_to_plarkc('RelationExistsAllFn', aRelationExistsAllFn).
+cyc_to_plarkc('RelationExistsInstanceFn', aRelationExistsInstanceFn).
+cyc_to_plarkc('RelationInstanceExistsFn', aRelationInstanceExistsFn).
+cyc_to_plarkc('Cyclist', tAuthor).
+%cyc_to_plarkc('and', '&').
+cyc_to_plarkc('forAll', 'all').
+cyc_to_plarkc('thereExists', 'exists').
+cyc_to_plarkc('thereExistsAtLeast', 'atleast').
+cyc_to_plarkc('thereExistsAtMost', 'atmost').
+%cyc_to_plarkc('or', 'v').
+cyc_to_plarkc('holds', 't').
+cyc_to_plarkc('dot_holds', 't').
+
 
 
 :-dynamic(mpred_to_cyc/2).
 
-mpred_to_cyc(tCol,'Collection').
-mpred_to_cyc(ttFormatType,'CycLExpressionType').
-mpred_to_cyc(ttFormatType,'ExpressionType').
-mpred_to_cyc(tPred,'Predicate').
-mpred_to_cyc(tFunction,'Function-Denotational').
-
+mpred_to_cyc(P,C):- cyc_to_plarkc(C,P),!.
 mpred_to_cyc(ftInt,'Integer').
-
-mpred_to_cyc(tAgent,'Agent-Generic').
-mpred_to_cyc(ftSentence,'icSentenceSentence').
 mpred_to_cyc(ftSentence,'CycLFormulaicSentence').
-mpred_to_cyc(ftSentence,'SubLFormulaicSentence').
 mpred_to_cyc(ftSentence,'FormulaicSentence').
+mpred_to_cyc(ftSentence,'SubLFormulaicSentence').
+mpred_to_cyc(ftSentence,'icSentenceSentence').
 mpred_to_cyc(ftVar,'CycLVariable').
 mpred_to_cyc(ftVar,'Variable').
-:-forall(cycPrepending(ft,A),((atom_concat('ft',A,FT),assert(mpred_to_cyc(FT,A))))).
+
+mpred_to_cyc(ttFormatType,'CycLExpressionType').
+mpred_to_cyc(ttFormatType,'ExpressionType').
+
+mpred_to_cyc(tAgent,'Agent-Generic').
+mpred_to_cyc(tCol,'Collection').
+mpred_to_cyc(tFunction,'Function-Denotational').
+mpred_to_cyc(tHumanCyclist, 'HumanCyclist').
+mpred_to_cyc(tKnowledgeBase, 'KnowledgeBase').
+mpred_to_cyc(tMicrotheory, 'Microtheory').
+mpred_to_cyc(tPred,'Predicate').
+mpred_to_cyc(tProblemStore, 'CycProblemStore').
+mpred_to_cyc(tRuleTemplate, 'RuleTemplate').
+mpred_to_cyc(tThing, 'Thing').
+mpred_to_cyc(tIndividual, 'Individual').
+
+mpred_to_cyc(vtDayOfWeekType, 'DayOfWeekType').
+mpred_to_cyc(vtMonthOfYearType, 'MonthOfYearType').
+mpred_to_cyc(vtFormat, 'Format').
+mpred_to_cyc(vtInferenceProblemLinkStatus, 'CycInferenceProblemLinkStatus').
+mpred_to_cyc(vtHLTruthValue, 'CycHLTruthValue').
+mpred_to_cyc(vtProvabilityStatus, 'CycProvabilityStatus').
+mpred_to_cyc(vtTruthValue, 'TruthValue').
+mpred_to_cyc(vtCanonicalizerDirective, 'CanonicalizerDirective').
+
+mpred_to_cyc(aCollectionSubsetFn,'CollectionSubsetFn').
+mpred_to_cyc(vTrue, 'True').
+mpred_to_cyc(vFalse, 'False').
+mpred_to_cyc(vGuest, 'Guest').
+mpred_to_cyc(vAdministrator, 'CycAdministrator').
+
+mpred_to_cyc(vIntervalEntry, 'IntervalEntry').
+mpred_to_cyc(vSingleEntry, 'SingleEntry').
+
+mpred_to_cyc(vSetTheFormat, 'SetTheFormat').
+
+mpred_to_cyc(vAssertedFalseDefault, 'AssertedFalseDefault').
+mpred_to_cyc(vAssertedFalseMonotonic, 'AssertedFalseMonotonic').
+mpred_to_cyc(vAssertedTrueDefault, 'AssertedTrueDefault').
+mpred_to_cyc(vAssertedTrueMonotonic, 'AssertedTrueMonotonic').
+mpred_to_cyc(vMonotonicallyFalse, 'MonotonicallyFalse').
+mpred_to_cyc(vMonotonicallyTrue, 'MonotonicallyTrue').
+mpred_to_cyc(vDefaultFalse, 'DefaultFalse').
+mpred_to_cyc(vDefaultTrue, 'DefaultTrue').
+
+mpred_to_cyc('vGood-ProblemProvabilityStatus', 'Good-ProblemProvabilityStatus').
+mpred_to_cyc('vNeutral-ProblemProvabilityStatus', 'Neutral-ProblemProvabilityStatus').
+mpred_to_cyc('vNoGood-ProblemProvabilityStatus', 'NoGood-ProblemProvabilityStatus').
+mpred_to_cyc('vUnknown-HLTruthValue', 'Unknown-HLTruthValue').
+mpred_to_cyc('vExistentialQuantifier-Bounded', 'ExistentialQuantifier-Bounded').
+mpred_to_cyc(vAllowGenericArgVariables, 'AllowGenericArgVariables').
+mpred_to_cyc(vAllowKeywordVariables, 'AllowKeywordVariables').
+mpred_to_cyc(vRelaxArgTypeConstraintsForVariables, 'RelaxArgTypeConstraintsForVariables').
+mpred_to_cyc(vLeaveSomeTermsAtEL, 'LeaveSomeTermsAtEL').
+mpred_to_cyc(vLeaveSomeTermsAtELAndAllowKeywordVariables, 'LeaveSomeTermsAtELAndAllowKeywordVariables').
+mpred_to_cyc(vLeaveVariablesAtEL, 'LeaveVariablesAtEL').
+mpred_to_cyc(vDontReOrderCommutativeTerms, 'DontReOrderCommutativeTerms').
+
+mpred_to_cyc(vReformulationBackwardDirection, 'ReformulationBackwardDirection').
+mpred_to_cyc(vReformulationForwardDirection, 'ReformulationForwardDirection').
+mpred_to_cyc(vReformulationNeitherDirection, 'ReformulationNeitherDirection').
 
 
+mpred_to_cyc(vApril, 'April').
+mpred_to_cyc(vAugust, 'August').
+mpred_to_cyc(vDecember, 'December').
+mpred_to_cyc(vFebruary, 'February').
+mpred_to_cyc(vJanuary, 'January').
+mpred_to_cyc(vJuly, 'July').
+mpred_to_cyc(vJune, 'June').
+mpred_to_cyc(vMarch, 'March').
+mpred_to_cyc(vMay, 'May').
+mpred_to_cyc(vNovember, 'November').
+mpred_to_cyc(vOctober, 'October').
+mpred_to_cyc(vSeptember, 'September').
+
+mpred_to_cyc(vSunday, 'Sunday').
+mpred_to_cyc(vMonday, 'Monday').
+mpred_to_cyc(vTuesday, 'Tuesday').
+mpred_to_cyc(vWednesday, 'Wednesday').
+mpred_to_cyc(vThursday, 'Thursday').
+mpred_to_cyc(vFriday, 'Friday').
+mpred_to_cyc(vSaturday, 'Saturday').
+
+
+
+:-forall(cycPrepending(AT,A),((atom_concat(AT,A,FT),asserta(mpred_to_cyc(FT,A))))).
+
+
+notFormatType(tThing).
 notFormatType(tIndividual).
 notFormatType(tInferenceSupportedFunction).
-notFormatType(tInferenceSupportedPredicate).
-notFormatType(tNonNegativeScalarInterval).
-notFormatType(tScalarInterval).
-notFormatType(tScalarPointValue).
-notFormatType(tSentenceClosedPredicate).
-notFormatType(tThing).
-notFormatType(tTransformationModuleSupportedPredicate).
+
 :-forall(notFormatType(NFT),pfc_add(tSet(NFT))).
 
 
+expT('SubLExpressionType').
+expT('SubLExpression').
+expT('CycLExpression').
+expT('ttFormatType').
+
+
+isF(X):- atom_concat(_,'Fn',X).
+isF(X):- tinyKB1(resultIsa(X,_)).
+isF(X):- tinyKB1(resultQuotedIsa(X,_)).
+isF(X):- tinyKB1(resultGenls(X,_)).
+isF(X):- tinyKB1(isa(X,C)),atom_contains(C,'Function').
+
+isFT(X):- expT(FT),tinyKB1(isa(X,FT)),!.
+isFT(X):- expT(FT),tinyKB1(genls(X,FT)),!.
+
+isV(X):- tinyKB1(isa(X,VT)),isVT(VT).
+isVT(X):- tinyKB1(genls(X,'Individual')).
+
+isPT(X):- atom_concat(_,'Predicate',X).
+isPT(X):- tinyKB1(genls(X,'tPred')).
+
+isRT(X):- atom_concat(_,'Function',X).
+isRT(X):- atom_concat(_,'Relation',X).
+isRT(X):- tinyKB1(genls(X,'tRelation')).
+isRT(X):- tinyKB1(genls(X,'tFunction')).
+
+
+maybe_ruleRewrite(I,O):-ruleRewrite(I,O),!.
+maybe_ruleRewrite(IO,IO).
+
+:-dynamic(cyc_to_plarkc/2).
+
+mwkb1:- tell(fooooo0),
+      ignore(( tinyKB(D), maybe_ruleRewrite(D,E),format('~q.~n',[tinyKB0(E)]),asserta_if_new(tinyKB0(E)),fail)),
+      told.
+ltkb1:-
+ must_det_l(( mwkb1,tell(fooooo9),
+      ignore(( tinyKB(D), maybe_ruleRewrite(D,E),once(cyc_to_pfc_expansion(E,KB)),format('~q.~n',[tinyK8(KB)]),assertz_if_new(tinyK8(KB)),fail)),
+      listing(cyc_to_plarkc/2),
+      listing(mpred_to_cyc/2),
+      told,
+      retractall(tinyKB0(comment(_,_))))).
 
 mpred_prepend_type(X,_):- \+ atom(X),!,fail.
 mpred_prepend_type(X,PP):-cycPrepending(PP,X),!.
 mpred_prepend_type(X,_):- name(X,[S|_]),char_type(S,lower),!,fail.
-mpred_prepend_type(X,_):-atom_concat('ft',_,X),!,fail.
-mpred_prepend_type(X,_):-atom_concat('t',_,X),!,fail.
-mpred_prepend_type(X,ft):- tinyKB(isa(X,ttFormatType)).
-mpred_prepend_type(X,ft):- tinyKB(isa(X,'SubLExpressionType')).
-mpred_prepend_type(X,ft):- tinyKB(genls(X,'SubLExpression')).
-mpred_prepend_type(X,ft):- tinyKB(genls(X,'CycLExpression')).
-mpred_prepend_type(X,ft):- tinyKB(genls(X,ftExpression)).
-mpred_prepend_type(X,tt):- tinyKB(genls(X,'tCol')).
-% mpred_prepend_type(X,i):-atom_concat(_,'Fn',X).
-mpred_prepend_type(X,t):-atom_concat(_,'Function',X).
-mpred_prepend_type(X,t):-atom_concat(_,'Relation',X).
-mpred_prepend_type(X,t):-atom_concat(_,'Predicate',X).
-mpred_prepend_type(X,t):- tinyKB(isa(X,'tCol')).
-mpred_prepend_type(X,t):- tinyKB(isa(_,X)).
-mpred_prepend_type(X,tt):- tinyKB(isa(X,'AtemporalNecessarilyEssentialCollectionType')).
-% mpred_prepend_type(X,v):- name(X,[C|_]),char_type(C,upper),!.
+mpred_prepend_type(X,_):-upcase_atom(X,U),X==U,!,fail.
+
+
+mpred_prepend_type(X,t):- tinyKB1(genls(X,'tMicrotheory')),!.
+mpred_prepend_type(X,ft):- isFT(X),!.
+mpred_prepend_type(X,ft):- tinyKB1(resultIsa(X,FT)),expT(FT),!.
+mpred_prepend_type(X,ft):- tinyKB1(resultGenls(X,FT)),expT(FT),!.
+mpred_prepend_type(X,ft):- tinyKB1(resultQuotedIsa(X,_)),!.
+mpred_prepend_type(X,a):- isF(X),!.
+mpred_prepend_type(X,pt):-isPT(X),!.
+mpred_prepend_type(X,vt):-isRT(X),!.
+mpred_prepend_type(X,v):- isV(X),!.
+mpred_prepend_type(X,v):- isVT(X),!.
+mpred_prepend_type(X,tt):- tinyKB1(genls(X,'tCol')),!.
+mpred_prepend_type(X,tt):- tinyKB1(isa(X,'AtemporalNecessarilyEssentialCollectionType')),!.
+mpred_prepend_type(X,t):- tinyKB1(isa(X,'tCol')),!.
+mpred_prepend_type(X,t):- tinyKB1(isa(_,X)),!.
+mpred_prepend_type(X,v):- name(X,[C|_]),char_type(C,upper),!.
+
+mpred_postpend_type(X,_):- name(X,[S|_]),char_type(S,lower),!,fail.
+mpred_postpend_type(C,'Fn'):-isF(C).
 
 tinyKB_wstr(P):-tUndressedMt(MT),tinyKB(P,MT,_).
 tinyKB_wstr(ist(MT,P)):-tDressedMt(MT),tinyKB(P,MT,_).
@@ -163,9 +334,10 @@ wkb01:- tell(fooooo0),
       forall(tinyKB_All(V,MT,STR),format('~q.~n',[tinyKB_All(V,MT,STR)])),
       told.
 
-wkb1:- tell(fooooo1),
-      ignore(( tinyKB(D),cyc_to_pfc_expansion(D,KB),format('~N~q.~N',[KB]),fail)),
+wkb02:- tell(fooooo0),
+      forall(tinyKB_All(V,MT,STR),once((cyc_to_pfc_expansion(tinyKB_All(V,MT,STR),KB),format('~q.~n',[KB])))),
       told.
+
 wkb2:- tell(fooooo2),
       ignore(( tinyKB(D,MT,Str),cyc_to_pfc_expansion(D,KB),format('~N~q.~N',[proof(KB,D,MT,Str)]),fail)),
       told.
@@ -173,13 +345,20 @@ wkb2:- tell(fooooo2),
 
 :-export(cyc_to_pfc_idiom/2).
 %cyc_to_pfc_idiom(different,dif).
+cyc_to_pfc_idiom(X,X):- \+ atom(X),!,fail.
+cyc_to_pfc_idiom(C,P):-cyc_to_plarkc(C,P),!.
+cyc_to_pfc_idiom(M,P):-mpred_to_cyc(P,M),!.
 cyc_to_pfc_idiom(equiv,(<=>)).
 cyc_to_pfc_idiom(implies,(=>)). 
 cyc_to_pfc_idiom(not,(neg)).
-cyc_to_pfc_idiom(C,P):-
+cyc_to_pfc_idiom(X,X):- name(X,[S|_]),char_type(S,lower),!.
+cyc_to_pfc_idiom(X,X):-upcase_atom(X,U),X==U,!.
+cyc_to_pfc_idiom(C,PM):- atom(C),  
   transitive_lc(cyc_to_pfc_idiom1,C,M),!,
-   ((mpred_prepend_type(C,PT),not(atom_concat(PT,_,M)))
-     -> (atom_concat(PT,M,P),asserta(mpred_to_cyc(P,M))); M=P).
+   (mpred_prepend_type(C,PT)->(atom_concat(PT,_,M)-> P=M; (atom_concat(PT,M,P)));P=M),
+   (mpred_postpend_type(C,PPT)->(atom_concat(_,PPT,P)-> PM=P; (atom_concat(P,PPT,PM)));PM=P),
+   asserta(cyc_to_plarkc(C,PM)),
+   asserta(mpred_to_cyc(PM,C)),!.
 
 cyc_to_pfc_idiom1(C,P):-nonvar(C),mpred_to_cyc(P,C),!.
 cyc_to_pfc_idiom1('CycLTerm','CycLExpression').
@@ -235,6 +414,9 @@ cyc_to_pfc_expansion_entry(I,O):-fail,cyc_to_pfc_expansion(I,M),!,must((functor(
 cyc_to_pfc_expansion(V,V):-is_ftVar(V),!.
 cyc_to_pfc_expansion(I,O):-atom(I),must(cyc_to_pfc_idiom(I,O)),!.
 cyc_to_pfc_expansion(V,V):-not(compound(V)),!.
+cyc_to_pfc_expansion('SubLQuoteFn'(V),V):-atom(V),!.
+cyc_to_pfc_expansion(isa(I,C),O):-atom(C),M=..[C,I],!,cyc_to_pfc_expansion(M,O).
+cyc_to_pfc_expansion(I,O):-ruleRewrite(I,M),I\=@=M,!,cyc_to_pfc_expansion(M,O).
 cyc_to_pfc_expansion([H|T],[HH|TT]):-!,cyc_to_pfc_expansion(H,HH),cyc_to_pfc_expansion(T,TT),!.
 cyc_to_pfc_expansion(HOLDS,HOLDSOUT):-HOLDS=..[F|HOLDSL],
   with_assertions(thocal:outer_pred_expansion(F,HOLDSL),cyc_to_pfc_expansion([F|HOLDSL],[C|HOLDSOUTL])),!,
@@ -278,9 +460,18 @@ argQuotedIsa(P,N,C):-exactlyAssertedEL(argQuotedIsa,P,N,C,_,_).
 ist_tiny(MT,P):-tinyKB(P,MT,vStrMon).
 ist_tiny(MT,P):-tinyKB(P,MT,vStrDef).
 
-tinyKB(P):-tUndressedMt(MT),tinyKB(P,MT,_).
+%TODO ADD BACK AFTER OPTIZING
+tinyKB(P):- tinyKB(P,MT,_).
 tinyKB(ist(MT,P)):-!,tDressedMt(MT),tinyKB(P,MT,_).
-tinyKB(P):-nonvar(P),if_defined(P).
+tinyKB(D):-tinyKB0(D).
+
+tinyKB1(D):-no_repeats(tinyKB2(D)).
+tinyKB2(D):-tinyKB0(D).
+tinyKB2(isa(C1,C3)):-nonvar(C1),!,tinyKB0(isa(C1,C2)),tinyKB2(genls(C2,C3)).
+tinyKB2(genls(C1,C3)):-nonvar(C1),tinyKB0(genls(C1,C2)),tinyKB2(genls(C2,C3)).
+%tinyKB2(genls(C1,C4)):-nonvar(C1),tinyKB0(genls(C1,C2)),tinyKB0(genls(C2,C3)),tinyKB0(genls(C3,C4)).
+%tinyKB2(genls(C1,C4)):-nonvar(C1),tinyKB0(genls(C1,C2)),tinyKB0(genls(C2,C3)),tinyKB0(genls(C3,C4)),tinyKB0(genls(C4,C5)).
+%TODO ADD BACK AFTER OPTIZING tinyKB(P):-nonvar(P),if_defined(P).
 
 tinyKB(PO,MT,STR):- %fwc,  
   (tUndressedMt(MT);tDressedMt(MT)),(STR=vStrMon;STR=vStrDef), 
@@ -329,6 +520,7 @@ addTinyCycL(CycLIn):- into_mpred_form(CycLIn,CycL),
   addCycL(CycL),!.
 
 
+
 tiny_support(CycLIn,MT,CALL):- compound(CycLIn),!,into_mpred_form(CycLIn,CycL), CycL=..[F|Args], append(Args,[MT,_STR],WMT),CCALL=..[exactlyAssertedEL,F|WMT],!,
   ((clause(CCALL,true), CCALL=CALL) ; clause(CCALL,(CALL,_))).
 tiny_support(CycLOut,MT,CALL):- between(4,7,Len),functor(CCALL,exactlyAssertedEL,Len),CCALL=..[exactlyAssertedEL,F|WMT],append(Args,[MT,_STR],WMT),
@@ -348,8 +540,8 @@ is_simple_arg(A):-not(compound(A)),!.
 is_simple_arg(A):-functor(A,Simple,_),tEscapeFunction(Simple).
 
 'tEscapeFunction'('TINYKB-ASSERTION').
-'tEscapeFunction'('QuoteFn').
-'tEscapeFunction'(X):- 'tUnreifiableFunction'(X).
+'tEscapeFunction'('aQuoteFn').
+'tEscapeFunction'(X):- 'vtUnreifiableFunction'(X).
 
 needs_canoncalization(CycL):-is_ftVar(CycL),!,fail.
 needs_canoncalization(CycL):-functor(CycL,F,_),isa_db(F,'SentenceOperator').

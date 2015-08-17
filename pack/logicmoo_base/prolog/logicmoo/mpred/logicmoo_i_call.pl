@@ -124,6 +124,10 @@ naf(Goal):-not(mpred_call(Goal)).
 is_callable(C):-current_predicate(_,C),!.
 
 :-meta_predicate(mpred_call(0)).
+:-meta_predicate(mpred_call_0(0)).
+:-meta_predicate(mpred_call_1(0)).
+:-meta_predicate(mpred_call_2(0)).
+:-meta_predicate(mpred_call_3(0)).
 :-export(mpred_call/1).
 mpred_call(V):-var(V),trace_or_throw(var_mpred_call(V)).
 mpred_call(call(X)):-!,mpred_call(X).
@@ -139,16 +143,16 @@ mpred_call(Call):-
 
 mpred_call(Call):- mpred_call_0(Call).
 
-mpred_call_0(Call):-predicate_property(Call,foreign),!,Call.
-mpred_call_0(Expand):- fully_expand(query(t,mpred_call),Expand,Call), Expand\=@=Call, !, loop_check(mpred_call(Call),Call).
+mpred_call_0(Call):-predicate_property(Call,foreign),!,debugOnError(Call).
+mpred_call_0(Expand):- fully_expand(query(t,mpred_call),Expand,Call), Expand\=@=Call, !, loop_check(mpred_call(Call),mpred_call_3(Call)).
 mpred_call_0(Call):- one_must(mpred_call_1(Call),mpred_call_2(Call)).
 
-mpred_call_1(Call):-current_predicate(_,Call),debugOnError(loop_check(Call)).
+mpred_call_1(Call):-current_predicate(_,Call),mpred_call_3(Call).
 mpred_call_1(Call):-clause(prolog_xref:process_directive(D, Q),_),nonvar(D),D=Call,!, show_call((prolog_xref:process_directive(Call,Q),must(nonvar(Q)),fmt(Q))).
 mpred_call_2(Call):-predicate_property(Call,dynamic),!,is_asserted(Call).
-mpred_call_2(Call):-debugOnError(loop_check(Call)).
+mpred_call_2(Call):-mpred_call_3(Call).
 
 % https://gist.githubusercontent.com/vwood/662109/raw/dce9e9ce9505443a82834cdc86163773a0dccc0c/ecldemo.c
 
 
-
+mpred_call_3(Call):-debugOnError(loop_check(if_defined(Call))).

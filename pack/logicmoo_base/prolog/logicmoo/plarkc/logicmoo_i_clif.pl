@@ -40,10 +40,11 @@ clif_to_prolog((H<=B),(H<=B)):- cwc,!.
 clif_to_prolog((H:-B),PrologO):- cwc,!,must((show_call(boxlog_to_pfc((H:-B),Prolog)),!,=(Prolog,PrologO))),!.
 clif_to_prolog(CLIF,PrologO):- cwc,
   % somehow integrate why_to_id(tell,Wff,Why),
-     must_det_l((kif_to_boxlog(CLIF,HORN),
-     boxlog_to_pfc(HORN,Prolog),
-     dmsg(pfc:-Prolog),
-     =(Prolog,PrologO))),!.
+     must_det_l((
+      kif_to_boxlog(CLIF,HORN),
+      boxlog_to_pfc(HORN,Prolog),
+      dmsg(pfc:-Prolog),
+      =(Prolog,PrologO))),!.
 
 
 % Sanity Test for expected side-effect entailments

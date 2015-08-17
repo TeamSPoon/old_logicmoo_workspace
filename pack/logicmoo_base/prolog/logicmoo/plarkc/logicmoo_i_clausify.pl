@@ -269,7 +269,7 @@ nnf(KB,all(X,NNF),FreeV,all(X,NNF2),Paths):-
 nnf(KB,exists(X,Fml),FreeV,NNF,Paths):-  \+ contains_var(X,Fml),!,nnf(KB,Fml,FreeV,NNF,Paths).
 
 nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- skolem_setting(nnf),!, wdmsg(nnf(skolemizing(exists(X,Fml)))),
-   must(skolem(KB,Fml,X,FreeV,FmlSk)),
+   must(mk_skolem(KB,Fml,X,FreeV,FmlSk)),
    must(nnf(KB,FmlSk,FreeV,NNF,Paths)).
 
 % exists(X,nesc(f(X)))  ->  exists(X,not(poss(not(f(X))))) ->  not(poss(not(f(X))))
@@ -731,7 +731,7 @@ removeQ(KB, nesc(BDT, not(F)),Vars, XF):- !,removeQ(KB, not(poss(BDT, F)),Vars, 
 removeQ(KB, poss(BDT, not(F)),Vars, XF):- !,removeQ(KB, not(nesc(BDT, F)),Vars, XF).
 
 removeQ(KB,  exists(X,F),Vars, HH):- skolem_setting(removeQ),!,wdmsg(removeQ(skolemizing(exists(X,F)))),
-	skolem(KB,F,X,Vars,Fsk),
+	mk_skolem(KB,F,X,Vars,Fsk),
 	removeQ(KB,Fsk,Vars, HH).
 
 removeQ(KB, exists(X,F),Vars, HH):-   must(removeQ(KB,F,[X|Vars], RQ0)),RQ0=HH.
@@ -925,7 +925,7 @@ nnf_shared(KB,exists(X,Fml),FreeV,NNF,Paths):-
 
 %=%  Skolemizing : method 1
 
-% Usage: skolem(+Fml,+X,+FreeV,?FmlSk)
+% Usage: mk_skolem(+Fml,+X,+FreeV,?FmlSk)
 % Replaces existentially quantified variable with the formula
 % VARIABLES MUST BE PROLOG VARIABLES
 % exists(X,p(X)) ==> p(p(exists))
@@ -936,23 +936,23 @@ skolem_bad(Fml,X,FreeV,FmlSk):-
 
 %=%  Skolemizing : method 2
 
-% Usage: skolem(KB, +Fml, +X, +FreeV, ?FmlSk )
+% Usage: mk_skolem(KB, +Fml, +X, +FreeV, ?FmlSk )
 % Replaces existentially quantified variable with a unique function
 % fN(Vars) N=1,...
 % VARIABLES MAYBE EITHER PROLOG VARIABLES OR TERMS
 
 
-skolem(KB, F, X, FreeV, Out):-  fail,
+mk_skolem(KB, F, X, FreeV, Out):-  fail,
    must(skolem_f(KB, F, X, FreeV, Sk)),
    subst_except(F,X,Sk,Out).
 
-skolem(KB, F, X, FreeV, Out):-  
+mk_skolem(KB, F, X, FreeV, Out):-  
    must(skolem_f(KB, F, X, FreeV, Sk)),
    %writeq(freev(Sk,FreeV)),
    must(Out= '=>'({skolem(X,Sk)},F)),
    !,show_call( asserta((constraintRules(X,Sk,F)))).
 
-skolem(KB, F, X, FreeV, FmlSk):- 
+mk_skolem(KB, F, X, FreeV, FmlSk):- 
     must(skolem_f(KB, F, X, FreeV, Sk)), 
     must(subst_except(F, X, Sk, FmlSk)),!.
 
@@ -1016,7 +1016,7 @@ pred_subst2(Pred, X, Sk, [A|As], [Ap|AS] ):- pred_subst(Pred, A,X,Sk,Ap ), pred_
 
 
 %=%=%=%=%=%=%=%=%=%=%=
-%=% generate a skolem 
+%=% generate a mk_skolem 
 
 mk_skolem_name(_O,Var,Fml,SIn,SOut):- is_ftVar(Fml), same_var(Var,Fml),!,atom_concat('Is',SIn,SOut).
 mk_skolem_name(_O,_V,Fml,SIn,SIn):- is_ftVar(Fml),!.
@@ -1105,8 +1105,11 @@ incorrect_cl(cl(H,B),cl([z_unused(H:-B)],[])).
 
 
 :- export(correct_boxlog/4).
-correct_boxlog(CLAUSES,KB,Why,FlattenedO):- (\+ is_list(CLAUSES)),!,correct_boxlog([CLAUSES],KB,Why,FlattenedO).
-correct_boxlog(BOXLOG,KB,Why,FlattenedS):-
+correct_boxlog((CLAU,SES),KB,Why,FlattenedO):- nonvar(SES),conjuncts_to_list((CLAU,SES),CLAUSES),!,correct_boxlog_0(CLAUSES,KB,Why,FlattenedO),!.
+correct_boxlog(CLAUSES,KB,Why,FlattenedO):- (\+ is_list(CLAUSES)),!,correct_boxlog_0([CLAUSES],KB,Why,FlattenedO),!.
+correct_boxlog(BOXLOG,KB,Why,FlattenedS):-correct_boxlog_0(BOXLOG,KB,Why,FlattenedS),!.
+
+correct_boxlog_0(BOXLOG,KB,Why,FlattenedS):-
   must_det_l((  
    must_maplist(adjust_kif(KB),BOXLOG,MODAL),
    %wdmsgl(modal(MODAL)),   
@@ -1121,8 +1124,11 @@ correct_boxlog(BOXLOG,KB,Why,FlattenedS):-
 
 variants_are_equal( =, A,B):- unnumbervars(A+B,AA+BB),AA=@=BB,!.
 variants_are_equal( Order, A,B):- compare(Order,A,B).
- 
-cf_to_flattened_clauses(KB,Why,NCFsI,FlattenedO):- 
+
+cf_to_flattened_clauses(KB,Why,NCFsI,FlattenedO):-
+  loop_check(cf_to_flattened_clauses_0(KB,Why,NCFsI,FlattenedO),NCFsI=FlattenedO),!.
+
+cf_to_flattened_clauses_0(KB,Why,NCFsI,FlattenedO):- 
  must_det_l((
    must_maplist(correct_cls(KB),NCFsI,NCFs),
    % wdmsgl(cf(NCFs)),

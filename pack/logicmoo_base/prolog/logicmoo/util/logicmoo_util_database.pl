@@ -78,9 +78,11 @@ as_clause( ((H :- B)),H,B):-!.
 as_clause( H,  H,  true).
 
 clause_asserted(C):- as_clause(C,H,B),clause_asserted(H,B).
-clause_asserted(H,B):- predicate_property(H,number_of_clauses(N))-> 
+clause_asserted(H,B):-clause_asserted(H,B,_).
+clause_asserted(H,B,Ref):- predicate_property(H,number_of_clauses(N))-> 
    N>0   -> (clause(H, B, Ref), clause(Head, Body, Ref),  (B =@= Body), (H =@= Head)),!.
 
+retract_eq(HB):-as_clause(HB,H,B),show_call_failure(predicate_property(H,number_of_clauses(_))),clause_asserted(H,B,Ref),erase(Ref).
 
 erase_safe(_,REF):-erase(REF).
 /*

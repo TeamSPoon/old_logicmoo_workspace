@@ -1105,18 +1105,18 @@ quotedDefnIff(ftBoolean,is_boolean).
 quotedDefnIff(ftText,is_string).
 quotedDefnIff(ftCodeIs(SomeCode),SomeCode):-nonvar(SomeCode).
 
-isa(arity,tBinaryPredicate).
+isa(arity,ptBinaryPredicate).
 
 
 
-% tCol(Type),(tBinaryPredicate(Pred)/(functor(G,Pred,2),G=..[Pred,isInstFn(Type),Value])), G => relationMostInstance(Pred,Type,Value).
+% tCol(Type),(ptBinaryPredicate(Pred)/(functor(G,Pred,2),G=..[Pred,isInstFn(Type),Value])), G => relationMostInstance(Pred,Type,Value).
 
 
 
 %((genlPreds(Col1,Col2),(arity(Col1,1);arity(Col2,1)))=>genls(Col1,Col2)).
 %((genls(Col1,Col2),(tPred(Col1);tPred(Col2)))=>genlPreds(Col1,Col2)).
 
-:-pfc_test(pfc_add(tCol('tUnaryPredicate'))).
+:-pfc_test(pfc_add(tCol('ptUnaryPredicate'))).
 
 % catching of misinterpreation 
 (pfcMark(pfcPosTrigger,_,F,A)/(integer(A),atom(F),functor(P,F,A),((P\= ( call_u(_) ), predicate_property(P,static)))))=>{dtrace}.
@@ -1164,15 +1164,15 @@ specialFunctor('/').
 
 :-pfc_trace.
 
-:-time(pfc_add((((arity(Pred,2),tPred(Pred)) <=> isa(Pred,tBinaryPredicate))))).
+:-time(pfc_add((((arity(Pred,2),tPred(Pred)) <=> isa(Pred,ptBinaryPredicate))))).
 
 % if arity is ever greater than 1 it can never become 1
 % arity(F,A)/(number(A),A>1) => neg(arity(F,1)).
 
-completelyAssertedCollection(tBinaryPredicate).
+completelyAssertedCollection(ptBinaryPredicate).
 
-prologHybrid(relationMostInstance(tBinaryPredicate,tCol,vtValue)).
-relationMostInstance(BP,_,_)=>tBinaryPredicate(BP).
+prologHybrid(relationMostInstance(ptBinaryPredicate,tCol,vtValue)).
+relationMostInstance(BP,_,_)=>ptBinaryPredicate(BP).
 
 (relationMostInstance(Pred,_,Value),{\+number(Value)},argIsa(Pred,2,Type))=> isa(Value,Type).
 %((relationMostInstance(Pred,Type,Value),{G=..[Pred,Inst,Value],GI=..[Pred,Inst,_]})) => (({GI=..[Pred,Inst,_]},isa(Inst,Type), ~GI) => G ).
@@ -1181,9 +1181,9 @@ relationMostInstance(Pred,Type,Value) => pfc_default(isa(Inst,Type) => t(Pred,In
 
 
 
-prologHybrid(relationAllInstance(tBinaryPredicate,tCol,vtValue)).
-relationAllInstance(BP,_,_)=>tBinaryPredicate(BP).
-(relationAllInstance(Pred,_,Value),{\+number(Value)},argIsa(Pred,2,Type)=>(isa(Value,Type),isa(Pred,tRolePredicate))).
+prologHybrid(relationAllInstance(ptBinaryPredicate,tCol,vtValue)).
+relationAllInstance(BP,_,_)=>ptBinaryPredicate(BP).
+(relationAllInstance(Pred,_,Value),{\+number(Value)},argIsa(Pred,2,Type)=>(isa(Value,Type),isa(Pred,ptRolePredicate))).
 ((relationAllInstance(Pred,Type,Value),{G=..[Pred,Inst,Value]})) =>  ((isa(Inst,Type), {G=..[Pred,Inst,Value]} => G )).
 
 % TODO ADD THIS 
@@ -1292,7 +1292,7 @@ argFormat(P,S,vSetTheFormat)<=> ~singleValuedInArg(P,S).
 :-must(ensure_loaded('../pfc/zenls.pfct')).
 
 
-((singleValuedInArg(F,N),arity(F,A),{atom(F),integer(N),integer(A),functor(P,F,A)}) => 
+((singleValuedInArg(F,N),arity(F,A),{atom(F),integer(N),integer(A),functor(P,F,A),\+ is_ftEquality(P)}) => 
   (made_update_single_valued_arg(P,N),
    (P => {update_single_valued_arg(P,N)}))).
 

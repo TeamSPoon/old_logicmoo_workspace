@@ -2109,7 +2109,7 @@ retractOnceThrough(ToMt,CycL):-
 % examples
 %:-registerCycPred('BaseKB',isa,2).
 %:-registerCycPred('BaseKB',genls,2).
-:-registerCycPred('BaseKB',genlMt,2).
+%:-registerCycPred('BaseKB',genlMt,2).
 
 
 % ============================================

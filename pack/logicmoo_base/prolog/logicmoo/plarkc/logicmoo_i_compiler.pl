@@ -42,26 +42,27 @@ boxlog_to_compile(H,OUTPUT):- get_op_alias((:-),TYPE),!,boxlog_to_compile(TYPE,H
 
 boxlog_to_compile(_,(H:-(Cwc,B)),(H:-(Cwc,B))):-Cwc == cwc,!.
 boxlog_to_compile(cwc,H,OUTPUT):-!, boxlog_to_compile((:-),H,OUTPUT).
+boxlog_to_compile(Mode,(H:-(Cwc,B)),(H:-(Cwc,B))):-Mode==Cwc,!.
 boxlog_to_compile(rev(=>),H,OUTPUT):-!, boxlog_to_compile(fwc,H,OUTPUT).
 boxlog_to_compile(neg(<=),not(H),OUTPUT):-!, boxlog_to_compile(bwc,not(H),OUTPUT).
 
 boxlog_to_compile((:-),(not(H):-_),true):- nonvar(H),prologBuiltin(H),!.
-boxlog_to_compile((:-),(not(H):-B),HH:-(cwc,BBB)):-body_for_pfc(neg(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
-boxlog_to_compile((:-),(H:-B),HH:-(cwc,BBB)):- body_for_pfc(H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_compile((:-),(not(H):-B),HH:-(cwc,BBB)):-body_for_pfc((:-),neg(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_compile((:-),(H:-B),HH:-(cwc,BBB)):- body_for_pfc((:-),H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_compile((:-),not(H),neg(H)):-  !.
 boxlog_to_compile((:-),H,H):-  !.
 
 
 boxlog_to_compile(fwc,(not(H):-_),true):- nonvar(H),H = skolem(_,_),!.
 boxlog_to_compile(fwc,(not(H):-B),OUT):- term_slots(H,HV),term_slots(B,BV), HV\==BV,!,boxlog_to_compile(bwc,(not(H):-B),OUT).
-boxlog_to_compile(fwc,(not(H):-B),BB=>(MMG,HH)):- body_for_pfc(neg(H),HH,B,BB),make_must_ground(HH,BB,MMG).
-boxlog_to_compile(fwc,(H:-B),BB=>(MMG,HH)):- body_for_pfc(H,HH,B,BB),make_must_ground(HH,BB,MMG).
+boxlog_to_compile(fwc,(not(H):-B),BB=>(MMG,HH)):- body_for_pfc(=>,neg(H),HH,B,BB),make_must_ground(HH,BB,MMG).
+boxlog_to_compile(fwc,(H:-B),BB=>(MMG,HH)):- body_for_pfc(=>,H,HH,B,BB),make_must_ground(HH,BB,MMG).
 boxlog_to_compile(fwc,not(H),neg(H)):-  !.
 boxlog_to_compile(fwc,H,H):-  !.
 
 boxlog_to_compile(bwc,(not(H):-_),true):- nonvar(H),H = skolem(_,_),!.
-boxlog_to_compile(bwc,(not(H):-B),(HH<=BBB)):-body_for_pfc(neg(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
-boxlog_to_compile(bwc,(H:-B),(HH<=BBB)):- body_for_pfc(H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_compile(bwc,(not(H):-B),(HH<=BBB)):-body_for_pfc(<=,neg(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_compile(bwc,(H:-B),(HH<=BBB)):- body_for_pfc(<=,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_compile(bwc,not(H),neg(H)):-  !.
 boxlog_to_compile(bwc,H,H):-  !.
 
@@ -80,26 +81,47 @@ conjoin_body(H,BB,C):-conjoin(H,BB,C).
 conjoin_maybe(_X,true,true):-!.
 conjoin_maybe(TYPE,BB,OUTPUT):-conjoin(TYPE,BB,OUTPUT).
 
+correct_mode(_,O,O):-var(O),!.
+correct_mode((:-),{M},O):-!,correct_mode(Mode,M,O).
+correct_mode(Mode,(A,B),O):-!,correct_mode(Mode,A,AA),correct_mode(Mode,B,BB),conjoin_body(AA,BB,O).
+correct_mode(_,O,O).
 
-body_for_pfc(Head,NewHead,B,BB):- body_for_pfc_0(Head,NewHead,B,BB),!.
+body_for_pfc(Mode,Head,NewNewHead,I,O):-reduce_literal(Head,NewHead),!,body_for_pfc_1(Mode,NewHead,NewNewHead,I,O).
+body_for_pfc(Mode,Head,NewHead,B,BB):- body_for_pfc_1(Mode,Head,NewHead,B,BB),!.
 
-body_for_pfc_0(Head,Head,A,A):-is_ftVar(A).
-body_for_pfc_0(Head,HeadO,(A,B), C):-!,body_for_pfc_0(Head,HeadM,A,AA),body_for_pfc_0(HeadM,HeadO,B,BB),conjoin_body(AA,BB,C).
-body_for_pfc_0(Head,HeadO,(A;B),(AA;BB)):-!,body_for_pfc_0(Head,HeadM,A,AA),body_for_pfc_0(HeadM,HeadO,B,BB).
-body_for_pfc_0(Head,HeadO,(A/B),(AA/BB)):-!,body_for_pfc_0(Head,HeadM,A,AA),body_for_pfc_0(HeadM,HeadO,B,BB).
-body_for_pfc_0(H,(if_missing(H,HH)),skolem(In,Out),true):-contains_var(In,H),subst(H,In,Out,HH),!.
-body_for_pfc_0(H,H,skolem(_,_),true).
-body_for_pfc_0(neg(Head),neg(Head),skolem(_,_),true).
-body_for_pfc_0(Head,Head,skolem(In,Out),{ignore(In=Out)}).
-body_for_pfc_0(Head,Head,poss(X),{loop_check(\+ neg(X),true)}).
-%body_for_pfc_0(Head,Head,skolem(In,Out),{(In=Out;when('nonvar'(In),ignore((In=Out))))}).
-% body_for_pfc_0(Head,Head,skolem(In,Out),{when((?=(In,_);nonvar(In)),ignore(Out=In))}).
-body_for_pfc_0(Head,Head,different(A,B),{dif:dif(A,B)}).
-body_for_pfc_0(Head,Head,not(A),neg(A)):-!.
-body_for_pfc_0(Head,Head,A,{A}):-prologBuiltin(A),!.
-body_for_pfc_0(Head,Head,A,A).
+body_for_pfc_1(Mode,Head,HeadO,C,CO):- (Mode ==(:-);Mode==(cwc)),compound(C),once((get_functor(C,FC),get_functor(Head,HC))),FC==HC,
+    body_for_pfc_1(Mode,Head,HeadM,{ ground(C),(C\=Head),\+ is_loop_checked(C)},AA),body_for_pfc_2(Mode,HeadM,HeadO,C,BB),!,conjoin_body(AA,BB,CM),correct_mode(Mode,CM,CO).
+body_for_pfc_1(Mode,Head,NewNewHead,I,O):-body_for_pfc_2(Mode,Head,NewNewHead,I,M),correct_mode(Mode,M,O).
 
 
+body_for_pfc_2(_Mode,Head,Head,A,A):-is_ftVar(A).
+body_for_pfc_2(Mode,Head,HeadO,(A,B), C):-!,body_for_pfc_1(Mode,Head,HeadM,A,AA),body_for_pfc(Mode,HeadM,HeadO,B,BB),conjoin_body(AA,BB,C).
+body_for_pfc_2(Mode,Head,HeadO,(A;B),(AA;BB)):-!,body_for_pfc_1(Mode,Head,HeadM,A,AA),body_for_pfc(Mode,HeadM,HeadO,B,BB).
+body_for_pfc_2((:-),Head,HeadO,(A/B),(AA,BB)):-!,body_for_pfc_1(Mode,Head,HeadM,A,AA),body_for_pfc(Mode,HeadM,HeadO,B,BB).
+body_for_pfc_2(Mode,Head,HeadO,(A/B),(AA/BB)):-!,body_for_pfc_1(Mode,Head,HeadM,A,AA),body_for_pfc(Mode,HeadM,HeadO,B,BB).
+
+
+body_for_pfc_2((=>),H,(if_missing(H,HH)),skolem(In,Out),true):-contains_var(In,H),subst(H,In,Out,HH),!.
+body_for_pfc_2(Mode,neg(Head),neg(Head),skolem(_,_),true).
+%body_for_pfc_2(Mode,H,H,skolem(_,_),true).
+body_for_pfc_2(Mode,Head,Head,skolem(In,Out),{ignore(In=Out)}).
+body_for_pfc_2(Mode,Head,Head,poss(X),{loop_check(\+ neg(X),true)}).
+% body_for_pfc_2(Mode,Head,Head,skolem(In,Out),{(In=Out;when('nonvar'(In),ignore((In=Out))))}).
+% body_for_pfc_2(Mode,Head,Head,skolem(In,Out),{when((?=(In,_);nonvar(In)),ignore(Out=In))}).
+body_for_pfc_2(Mode,Head,NewHead,B,BBB):- once(reduce_literal(B,BB)),B\=@=BB,!,body_for_pfc_1(Mode,Head,NewHead,BB,BBB).
+body_for_pfc_2(Mode,Head,Head,not(A),neg(A)):-!.
+body_for_pfc_2(Mode,Head,Head,different(A,B),{dif:dif(A,B)}).
+body_for_pfc_2(Mode,Head,Head,A,{A}):-prologBuiltin(A),!.
+body_for_pfc_2(Mode,Head,Head,A,A).
+
+reduce_literal(A,A):-is_ftVar(A).
+reduce_literal(neg(different(P3, R3)),mudEquals(P3, R3)).
+reduce_literal(neg(mudEquals(P3, R3)),different(P3, R3)).
+reduce_literal(neg(skolem(P3, R3)),different(P3, R3)).
+reduce_literal(neg(termOfUnit(P3, R3)),different(P3, R3)).
+reduce_literal(neg(equals(P3, R3)),different(P3, R3)).
+reduce_literal(termOfUnit(P3, R3),skolem(P3, R3)).
+reduce_literal(A,A).
 
 can_use_hack(two_implications):-!,fail.
 can_use_hack(_).

@@ -337,26 +337,25 @@ kif_to_boxlog(WffIn,Why,Out):-  kif_to_boxlog(WffIn,'$VAR'('KB'),Why,Out),!.
 
 
 :- export(kif_to_boxlog/4).
-kif_to_boxlog(Fml,KB,Why,Flattened):- var(KB),!,kif_to_boxlog(Fml,'$VAR'('KB'),Why,Flattened).
-kif_to_boxlog(Wff,KB,Why,Out):- transitive_lc(adjust_kif(KB),Wff,M),Wff \=@= M ,!,kif_to_boxlog(M,KB,Why,Out).
-kif_to_boxlog((Wff:- B),KB,Why,Flattened):- is_true(B),!, kif_to_boxlog(Wff,KB,Why,Flattened),!.
-
 kif_to_boxlog(I,KB,Why,Flattened):- atom(I),atom_contains(I,('(')),!,
   must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,sexpr_sterm_to_pterm(Wff,PTerm),PTerm\=[_|_],
   kif_to_boxlog(PTerm,KB,Why,Flattened))),!.
 
-kif_to_boxlog(WffInIn,KB,Why,FlattenedO):-  as_dlog(WffInIn,WffIn),WffInIn\=@=WffIn,!,kif_to_boxlog(WffIn,KB,Why,FlattenedO),!.
+% kif_to_boxlog(WffInIn,KB,Why,FlattenedO):-  as_dlog(WffInIn,WffIn),kif_to_boxlog_0(WffIn,KB,Why,FlattenedO),!.
 
 % kif_to_boxlog(Wff,KB,Why,Out):- loop_check(kif_to_boxlog(Wff,KB,Why,Out),alt_kif_to_boxlog(Wff,KB,Why,Out)),!.
 
-kif_to_boxlog((HEAD:- BODY),KB,Why,FlattenedO):-  
+%kif_to_boxlog((Wff:- B),KB,Why,Flattened):- is_true(B),!, kif_to_boxlog(Wff,KB,Why,Flattened),!.
+%kif_to_boxlog(Wff,KB,Why,Out):- adjust_kif(KB,Wff,M),Wff \=@= M ,!,kif_to_boxlog(M,KB,Why,Out).
+
+kif_to_boxlog(HB,KB,Why,FlattenedO):- compound(HB),HB=(HEAD:- BODY),!,
   must_det_l((
    check_is_kb(KB),
    conjuncts_to_list(HEAD,HEADL),conjuncts_to_list(BODY,BODYL),
-   correct_boxlog(cl(HEADL,BODYL),KB,Why,FlattenedO))).
+   correct_boxlog([cl(HEADL,BODYL)],KB,Why,FlattenedO))).
 
 kif_to_boxlog(WffIn0,KB0,Why0,FlattenedO):-  
-  nl,nl,nl,draw_line,draw_line,draw_line,draw_line,
+  must_det_l((nl,nl,nl,draw_line,draw_line,draw_line,draw_line)),
   must_det_l((
     must(numbervars_with_names(WffIn0:KB0:Why0,WffIn:KB:Why)),      
    ensure_quantifiers(WffIn,Wff),
@@ -460,22 +459,32 @@ pttp_quantifier(F):- pttp_nnf_pre_clean_functor(F,(all),[]);pttp_nnf_pre_clean_f
 
 should_be_poss(argInst).
 
-clauses_to_boxlog(KB,Why,In,Prolog):- call_last_is_var(clauses_to_boxlog(KB,Why,In,Prolog)).
-clauses_to_boxlog(KB,Why,In,Prolog):- is_list(In),must_maplist(clauses_to_boxlog(KB,Why),In,Prolog).
-clauses_to_boxlog(_KB,_Why,(H:-B),(H:-B)):-!.
-clauses_to_boxlog(KB,Why,In,Prolog):- correct_cls(KB,In,Mid), Mid \=@= In, !,clauses_to_boxlog(KB,Why,Mid,Prolog).
+:-dynamic(elInverse/2).
 
-clauses_to_boxlog(_,_Why,cl([HeadIn],[]),Prolog):- !,is_lit_atom(HeadIn) -> Prolog=HeadIn ; kif_to_boxlog(HeadIn,Prolog).
-clauses_to_boxlog(KB,Why,cl([],BodyIn),Prolog):-  !,
-   is_lit_atom(BodyIn) -> clauses_to_boxlog(KB,Why,cl([inconsistentKB(KB)],BodyIn),Prolog);  kif_to_boxlog(not(BodyIn),Prolog).
+clauses_to_boxlog(KB,Why,In,Prolog):- clauses_to_boxlog_0(KB,Why,In,Prolog).
 
-clauses_to_boxlog(KB,_Why,cl([HeadIn],BodyIn),RET):-!, must_maplist(logical_pos(KB),BodyIn,Body), list_to_conjuncts(Body,BodyOut),!,RET=(HeadIn:- BodyOut).
 
-clauses_to_boxlog(KB,Why,cl([H,Head|List],BodyIn),Prolog):- 
-  findall(Answer,((member(E,[H,Head|List]),delete_eq([H,Head|List],E,RestHead),
-    must_maplist(logical_neg(KB),RestHead,RestHeadS),append(RestHeadS,BodyIn,Body),
-    clauses_to_boxlog(KB,Why,cl([E],Body),Answer))),Prolog),!.
+clauses_to_boxlog_0(KB,Why,In,Prolog):-loop_check(clauses_to_boxlog_1(KB,Why,In,Prolog),show_call((clauses_to_boxlog_5(KB,Why,In,Prolog)))),!.
+clauses_to_boxlog_0(KB,Why,In,Prolog):-correct_cls(KB,In,Mid),!,clauses_to_boxlog_1(KB,Why,Mid,PrologM),!,Prolog=PrologM.
 
+clauses_to_boxlog_1(KB, Why,In,Prolog):- clauses_to_boxlog_2(KB,Why,In,PrologM),!,must(Prolog=PrologM).
+
+clauses_to_boxlog_2(KB, Why,In,Prolog):- is_list(In),!,must_maplist(clauses_to_boxlog_1(KB,Why),In,Prolog).
+clauses_to_boxlog_2(KB, Why,cl([],BodyIn),  Prolog):- !, (is_lit_atom(BodyIn) -> clauses_to_boxlog_1(KB,Why,cl([inconsistentKB(KB)],BodyIn),Prolog);  (trace,kif_to_boxlog(not(BodyIn),KB,Why,Prolog))).
+clauses_to_boxlog_2(KB, Why,cl([HeadIn],[]),Prolog):- !, (is_lit_atom(HeadIn) -> Prolog=HeadIn ; (kif_to_boxlog(HeadIn,KB,Why,Prolog))).
+clauses_to_boxlog_2(KB,_Why,cl([HeadIn],BodyIn),(HeadIn:- BodyOut)):-!, must_maplist(logical_pos(KB),BodyIn,Body), list_to_conjuncts(Body,BodyOut),!.
+
+clauses_to_boxlog_2(KB, Why,cl([H,Head|List],BodyIn),Prolog):- trace,
+  findall(Answer,((member(E,[H,Head|List]),delete_eq([H,Head|List],E,RestHead), 
+     must_maplist(logical_neg(KB),RestHead,RestHeadS),append(RestHeadS,BodyIn,Body),
+       clauses_to_boxlog_1(KB,Why,cl([E],Body),Answer))),Prolog),!.
+
+clauses_to_boxlog_2(_KB,_Why,(H:-B),(H:-B)):- trace,!.
+
+clauses_to_boxlog_5(KB, Why,In,Prolog):- is_list(In),!,must_maplist(clauses_to_boxlog_5(KB,Why),In,Prolog).
+clauses_to_boxlog_5(_KB,_Why,(H:-B),(H:-B)):-!.
+clauses_to_boxlog_5(_KB,_Why,cl([HeadIn],[]),HeadIn):-!.
+clauses_to_boxlog_5(_KB,_Why,In,Prolog):-trace,In=Prolog.
 
 mpred_t_tell_kif(OP2,RULE):- 
  with_assertions(thlocal:current_pttp_db_oper(mud_call_store_op(OP2)),

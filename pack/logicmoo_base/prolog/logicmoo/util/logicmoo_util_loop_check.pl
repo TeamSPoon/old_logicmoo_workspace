@@ -59,7 +59,7 @@ make_key(M:CC,Key):- atom(M),!,hotrace((ground(CC)->Key=CC ; cc_key(CC,Key))).
 make_key(CC,Key):- hotrace((ground(CC)->Key=CC ; cc_key(CC,Key))).
 
 
-%is_loop_checked(Call):-  make_key(Call,Key),!,tlbugger:ilc(Key).
+is_loop_checked(Call):-  make_key(Call,Key),!,tlbugger:ilc(Key).
 
 
 

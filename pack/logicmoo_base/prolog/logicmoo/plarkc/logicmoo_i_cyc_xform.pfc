@@ -40,7 +40,7 @@ genls(Sub, _Super) => tCol(Sub).
 
 */
 
-:- must_det(argIsa(genlPreds,2,_Type)).
+:- must_det(argIsa(genlPreds,2,_)).
 
 
 % Hook a predicate up!

@@ -21,7 +21,7 @@
 :- dynamic((exactlyAssertedEL_first/4,exactlyAssertedEL_first/5,exactlyAssertedEL_first/6,exactlyAssertedEL_first/7)).
 :- dynamic(assertedTinyKB_implies_first/4).
 :- dynamic(assertedTinyKB_not_first/3).
-:- dynamic((exactlyAssertedEL_first/5,exactlyAssertedEL_with_vars/5)).
+:- dynamic((exactlyAssertedEL_first/5,exactlyAssertedEL_with_vars/5,exactlyAssertedEL_with_vars/6,assertedTinyKB_implies_Already/4)).
 :- dynamic user:term_expansion/2.
 :- multifile user:term_expansion/2.
 
@@ -33,13 +33,14 @@
 % :-style_check(-string).
 :-set_prolog_flag(double_quotes,string).
 :- discontiguous exactlyAssertedEL/5. 
-:- discontiguous xactlyAssertedEL_first/5.
+:- discontiguous exactlyAssertedEL_first/5.
 
 
 exactlyAssertedEL(A,B,MT,STR):- exactlyAssertedEL_first(A,B,MT,STR),true.
 exactlyAssertedEL(A,B,C,MT,STR):- exactlyAssertedEL_first(A,B,C,MT,STR),true.
 exactlyAssertedEL(A,B,C,D,MT,STR):- exactlyAssertedEL_first(A,B,C,D,MT,STR),true.
 exactlyAssertedEL(Pred,A,C,MT,STR):- exactlyAssertedEL_with_vars(Pred,A,C,MT,STR),true.
+exactlyAssertedEL(Pred,A,C,D,MT,STR):- exactlyAssertedEL_with_vars(Pred,A,C,D,MT,STR),true.
 exactlyAssertedEL(implies,A,C,MT,STR):- assertedTinyKB_implies_first(A,C,MT,STR),true.
 exactlyAssertedEL(not,What,MT,STR):- assertedTinyKB_not_first(What,MT,STR),true.
 exactlyAssertedEL(A,B,MT,STR):- exactlyAssertedEL_next(A,B,MT,STR),true.

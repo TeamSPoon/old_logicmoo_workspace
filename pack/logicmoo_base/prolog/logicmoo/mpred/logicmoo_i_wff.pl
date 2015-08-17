@@ -256,7 +256,9 @@ defunctionalize(OP,Wff,WffO):-
   compound(SubTerm),
   \+ (is_ftEquality(SubTerm)),
   \+ (leave_as_is(SubTerm)),
-  arg(_,SubTerm,Function),is_function(Function),
+  arg(_,SubTerm,Function),
+  is_function(Function),
+  \+ (leave_as_is(Function)),
   subst_except(SubTerm,Function,NewVar,NewSubTerm),
   function_to_predicate(Function,NewVar,PredifiedFunction),
   subst_except(Wff,SubTerm,NewSubTerm,NextWff),!,
@@ -343,19 +345,31 @@ is_sentence_functor(all).
 
 :-dynamic(leave_as_is0/1).
 leave_as_is(V):- \+ compound(V),!.
-leave_as_is(V):-leave_as_is0(V),!.
+leave_as_is(V):-compound(V),leave_as_is0(V),!.
+
 leave_as_is0('$VAR'(_)).
+leave_as_is0('aNARTFn'(_)).
+leave_as_is0('comment'(_,_)).
+
+leave_as_is0(C):-get_functor(C,F),leave_as_is_f(F).
 leave_as_is0(infer_by(_)).
 leave_as_is0(b_d(_,_,_)).
 leave_as_is0(ct(_,_)).
 % leave_as_is0('CollectionSubsetFn'(_,_)).
 leave_as_is0(ignore(_)).
-leave_as_is0(z_unused(_)).
 leave_as_is0(isa(_,_)).
-leave_as_is0({}).
-leave_as_is0(kbMark(_)).
-
 leave_as_is0(P):-prequent(P).
+
+
+leave_as_is_f(Atom):- \+ atom(Atom),!,fail.
+leave_as_is_f('TINYKB-ASSERTION').
+leave_as_is_f('skolem').
+leave_as_is_f('$VAR').
+leave_as_is_f('kbMark').
+leave_as_is_f('z_unused').
+leave_as_is_f('genlMt').
+leave_as_is_f('{}').
+leave_as_is_f(F):-if_defined(ptReformulatorDirectivePredicate(F)).
 
 prequent(original(_)).
 prequent(mudEquals(_,_)).
@@ -404,7 +418,10 @@ is_function(Function):- compound(Function),get_functor(Function,F,A),is_function
 
 
 is_function(_,'SubLQuoteFn',_):- !,fail.
+is_function(_,'aQuoteFn',_):- !,fail.
+is_function(_,'aNARTFn',_):- !,fail.
 is_function(_,'CollectionSubsetFn',_).
+is_function(_,'aCollectionSubsetFn',_).
 is_function(_,F,_):- atom_concat('sk',_Was,F),!,fail.
 is_function(P,_,_):- leave_as_is(P),!,fail.
 is_function(_,F,_):- is_log_op(F),!,fail.
@@ -419,6 +436,7 @@ is_ftEquality(Term):- is_ftVar(Term),!,fail.
 is_ftEquality(mudEquals(_,_)).
 is_ftEquality(skolem(_,_)).
 is_ftEquality(equals(_,_)).
+is_ftEquality(termOfUnit(_,_)).
 
 :-thread_local(thlocal:dont_use_mudEquals/0).
 
@@ -434,6 +452,7 @@ ensure_quantifiers(Wff,WffO):-
 :- dynamic(function_corisponding_predicate/2).
 
 get_pred(Pred,F):- get_functor(Pred,F).
+
 
 
 
