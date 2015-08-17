@@ -43,6 +43,8 @@ boxlog_to_compile(H,OUTPUT):- get_op_alias((:-),TYPE),!,boxlog_to_compile(TYPE,H
 boxlog_to_compile(_,(H:-(Cwc,B)),(H:-(Cwc,B))):-Cwc == cwc,!.
 boxlog_to_compile(cwc,H,OUTPUT):-!, boxlog_to_compile((:-),H,OUTPUT).
 boxlog_to_compile(Mode,(H:-(Cwc,B)),(H:-(Cwc,B))):-Mode==Cwc,!.
+boxlog_to_compile(<=,H,OUTPUT):-!, boxlog_to_compile(fwc,H,OUTPUT).
+boxlog_to_compile(<-,H,OUTPUT):-!, boxlog_to_compile(bwc,H,OUTPUT).
 boxlog_to_compile(rev(=>),H,OUTPUT):-!, boxlog_to_compile(fwc,H,OUTPUT).
 boxlog_to_compile(neg(<=),not(H),OUTPUT):-!, boxlog_to_compile(bwc,not(H),OUTPUT).
 
@@ -53,16 +55,18 @@ boxlog_to_compile((:-),not(H),neg(H)):-  !.
 boxlog_to_compile((:-),H,H):-  !.
 
 
+
+
 boxlog_to_compile(fwc,(not(H):-_),true):- nonvar(H),H = skolem(_,_),!.
 boxlog_to_compile(fwc,(not(H):-B),OUT):- term_slots(H,HV),term_slots(B,BV), HV\==BV,!,boxlog_to_compile(bwc,(not(H):-B),OUT).
-boxlog_to_compile(fwc,(not(H):-B),BB=>(MMG,HH)):- body_for_pfc(=>,neg(H),HH,B,BB),make_must_ground(HH,BB,MMG).
-boxlog_to_compile(fwc,(H:-B),BB=>(MMG,HH)):- body_for_pfc(=>,H,HH,B,BB),make_must_ground(HH,BB,MMG).
+boxlog_to_compile(fwc,(not(H):-B),HH<=BBB)):- body_for_pfc(=>,neg(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_compile(fwc,(H:-B),HH<=BBB):- body_for_pfc(=>,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_compile(fwc,not(H),neg(H)):-  !.
 boxlog_to_compile(fwc,H,H):-  !.
 
 boxlog_to_compile(bwc,(not(H):-_),true):- nonvar(H),H = skolem(_,_),!.
-boxlog_to_compile(bwc,(not(H):-B),(HH<=BBB)):-body_for_pfc(<=,neg(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
-boxlog_to_compile(bwc,(H:-B),(HH<=BBB)):- body_for_pfc(<=,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_compile(bwc,(not(H):-B),(HH<-BBB)):-body_for_pfc(<-,neg(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_compile(bwc,(H:-B),(HH<-BBB)):- body_for_pfc(<-,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_compile(bwc,not(H),neg(H)):-  !.
 boxlog_to_compile(bwc,H,H):-  !.
 

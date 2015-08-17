@@ -109,10 +109,13 @@ print_db_items(I):- bagof(I,clause_u(I,true),R1),pp_items(Type,R1),!.
 print_db_items(I):- listing(I),!,nl,nl.
 
 pp_rules :-
-   print_db_items("Forward Rules",(_=>_)),
-   print_db_items("Bidirectional Rules",(_<=>_)), 
-   print_db_items("Backchaining Rules",(_<=_)),
-   print_db_items("Forward Facts",(=>(_))).
+   print_db_items("Forward Rules",(_<=_)),
+   print_db_items("Bidirectional Rules",(_ <-> _)), 
+   print_db_items("implication Rules",(_ => _)),
+   print_db_items("Bi-conditional Rules",(_ <=> _)),
+   print_db_items("Backchaining Rules",(_ <- _)),
+   print_db_items("Positive Facts",(nesc(_))),
+   print_db_items("Negative Facts",(neg(_))).
 
 pp_triggers :-
      print_db_items("Positive triggers",pt(_,_)),
@@ -319,8 +322,8 @@ pfc_listing_1(neg(_What)):-!.
 pfc_listing_1(What):-var(What),!.
 pfc_listing_1(What):-
    print_db_items('Supports User',spft_precanonical(P,u,u),spft(P,u,u),What),
-   print_db_items('Forward Facts',(=>(F)),F,What),
-   print_db_items('Forward Rules',(_=>_),What),
+   print_db_items('Forward Facts',(nesc(F)),F,What),
+   print_db_items('Forward Rules',(_<=_),What),
  ignore((What\=neg(_),functor(What,IWhat,_),
    print_db_items_and_neg('Instance Of',isa(IWhat,_),IWhat),
    print_db_items_and_neg('Instances: ',isa(_,IWhat),IWhat),
@@ -330,7 +333,7 @@ pfc_listing_1(What):-
    print_db_items('Triggers Negative', nt(_,_,_),What),
    print_db_items('Triggers Goal',bt(_,_),What),
    print_db_items('Triggers Positive',pt(_,_),What),
-   print_db_items('Bidirectional Rules',(_<=>_),What), 
+   print_db_items('Bidirectional Rules',(_<->_),What), 
    dif(A,B),print_db_items('Supports Deduced',spft_precanonical(P,A,B),spft(P,A,B),What),
    dif(G,u),print_db_items('Supports Nonuser',spft_precanonical(P,G,G),spft(P,G,G),What),
    print_db_items('Backchaining Rules',(_<=_),What),
@@ -557,9 +560,9 @@ functor_to_color(_,not,_,red).
 functor_to_color(_,~,_,red).
 functor_to_color(_,neg,_,red).
 
-functor_to_color(G,(<=>),_,'plus-purple').
-functor_to_color(G,(<=),_,purple).
-functor_to_color(G,(=>),_,'cyc-right-triangle-violet').
+functor_to_color(G,(<->),_,'plus-purple').
+functor_to_color(G,(<-),_,purple).
+functor_to_color(G,(<=),_,'cyc-right-triangle-violet').
 functor_to_color(G,(:-),_,red_diam).
 
 functor_to_color(G,(if),_,cy_menu).

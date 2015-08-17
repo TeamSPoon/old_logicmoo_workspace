@@ -500,39 +500,10 @@ fix_input_vars(AIn,A):- copy_term(AIn,A),numbervars(A,672,_).
 
 
 
-% boxlog_to_pfc(LANG,PFCM,PFCO):- with_assertions(current_lang(LANG),((transitive_lc(boxlog_to_pfc0,PFCM,PFC),!, subst(PFC,(not),(neg),PFCO)))).
+
 boxlog_to_pfc(PFCM,PFC):- is_list(PFCM),must_maplist(boxlog_to_pfc,PFCM,PFC).
 boxlog_to_pfc((A,B),C):- !, must_maplist(boxlog_to_pfc,[A,B],[AA,BB]),conjoin(AA,BB,C).
 boxlog_to_pfc(PFCM,PFCO):- boxlog_to_compile(PFCM,PFC),!, subst(PFC,(not),(neg),PFCO).
-/*
-boxlog_to_pfc0(AIS,AIS):- cwc, leave_as_is(AIS),!.
-boxlog_to_pfc0({A},{A}):-!.
-boxlog_to_pfc0(PFCM,PFC):- fail,boxlog_to_pfc1(PFCM,PFC),!.
-boxlog_to_pfc0((A;B),C):- !, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]),conjoin_op((;),AA,BB,C).
-boxlog_to_pfc0((B=>A),(BB=>AA)):- !, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]).
-boxlog_to_pfc0((A<=B),(AA<=BB)):- !, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]).
-boxlog_to_pfc0((A<=>B),(AA<=>BB)):- !, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]).
-boxlog_to_pfc0(if(A,B),if(AA,BB)):- !, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]).
-boxlog_to_pfc0(iff(A,B),iff(AA,BB)):- !, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]).
-boxlog_to_pfc0(impliesF(A,B),impliesF(AA,BB)):- !, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]).
-boxlog_to_pfc0(implies(A,B),implies(AA,BB)):- !, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]).
-boxlog_to_pfc0(equiv(A,B),equiv(AA,BB)):- !, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]).
-
-boxlog_to_pfc0((B:-A),OUTPUT):- !, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]),boxlog_to_compile((BB:-AA),OUTPUT).
-boxlog_to_pfc0((A),OUTPUT):- !, must_maplist(boxlog_to_pfc0,[A],[AA]),boxlog_to_compile((AA),OUTPUT).
-%boxlog_to_pfc0(not(A),OUTPUT):- !, must_maplist(boxlog_to_pfc0,[A],[AA]),boxlog_to_compile(not(AA),OUTPUT).
-%boxlog_to_pfc0(not(A),C):- !, boxlog_to_pfc0(neg(A),C).
-%boxlog_to_pfc0(O,O).
-*/
-
-boxlog_to_pfc1(not(AB),(BBAA)):- get_op_alias(not(OP),rev(OTHER)), atom(OP),atom(OTHER),AB=..[OP,A,B],!, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]),BBAA=..[OTHER,BB,AA].
-boxlog_to_pfc1(not(AB),(BOTH)):- get_op_alias(not(OP),dup(OTHER,AND)),atom(OTHER), atom(OP),AB=..[OP,A,B],!, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]),AABB=..[OTHER,AA,BB],BBAA=..[OTHER,BB,AA],BOTH=..[AND,AABB,BBAA].
-boxlog_to_pfc1(not(AB),neg(NEG)):- get_op_alias(not(OP),neg(OTHER)),atom(OTHER), atom(OP),AB=..[OP|ABL],!, must_maplist(boxlog_to_pfc0,ABL,AABB),NEG=..[OTHER|AABB].
-boxlog_to_pfc1(not(AB),(RESULT)):- get_op_alias(not(OP),(OTHER)), atom(OP),atom(OTHER),AB=..[OP|ABL],!, must_maplist(boxlog_to_pfc0,ABL,AABB),RESULT=..[OTHER|AABB].
-boxlog_to_pfc1((AB),(BBAA)):- get_op_alias(OP,rev(OTHER)), atom(OP),atom(OTHER),AB=..[OP,A,B],!, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]),BBAA=..[OTHER,BB,AA].
-boxlog_to_pfc1((AB),(BOTH)):- get_op_alias(OP,dup(OTHER,AND)), atom(OP),atom(OTHER),AB=..[OP,A,B],!, must_maplist(boxlog_to_pfc0,[A,B],[AA,BB]),AABB=..[OTHER,AA,BB],BBAA=..[OTHER,BB,AA],BOTH=..[AND,AABB,BBAA].
-boxlog_to_pfc1((AB),(RESULT)):- get_op_alias(OP,(OTHER)),atom(OP), atom(OTHER),AB=..[OP|ABL],!, must_maplist(boxlog_to_pfc0,ABL,AABB),RESULT=..[OTHER|AABB].
-boxlog_to_pfc1(OP,OTHER):- get_op_alias(OP,OTHER).
 
 
 %:- export(tsn/0).

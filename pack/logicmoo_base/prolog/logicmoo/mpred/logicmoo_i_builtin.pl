@@ -59,6 +59,7 @@ pfc_testing.
 :- dynamic((a/1,b/1,c/0)).
 
 => a(z).
+:-pfc_test(a(z)).
 
 :-pfc_test(a(_)).
 
@@ -70,8 +71,9 @@ pfc_testing.
 
 % U=nt(A,B,C),spft(X,Y,Z),\+ \+
 
-
+:-start_rtrace.
 (a(B),d(B),f(B)) => b(B).
+:-stop_rtrace.
 
 (a(B),d(B),e(B)) => b(B).
 (a(B),e(B),d(B)) => b(B).
@@ -85,6 +87,7 @@ d(q).
 d(B)<=a(B).
 
 :- pfc_test(\+c).
+
 => e(q).
 => b(q).
 => a(q).

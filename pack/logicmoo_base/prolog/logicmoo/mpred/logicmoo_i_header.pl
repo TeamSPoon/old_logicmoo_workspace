@@ -76,12 +76,12 @@ load_time_sanity.
 
 
 
-:- dynamic(('=>')/1).
+:- dynamic(('nesc')/1).
 :- dynamic((('neg'))/1).
-:- dynamic((('=>'))/2).
-:- dynamic(('<=')/2).
+:- dynamic((('<='))/2).
+:- dynamic(('<-')/2).
 :- dynamic(('::::')/2).
-:- dynamic(('<=>')/2).
+:- dynamic(('<->')/2).
 :- dynamic('pt'/2).
 :- dynamic('pk'/3).
 :- dynamic('nt'/3).
@@ -95,12 +95,12 @@ load_time_sanity.
 :- dynamic(pfc_select/2).
 :- dynamic(pfc_search/1).
 
-:- multifile(('=>')/1).
+:- multifile(('nesc')/1).
 :- multifile(('neg')/1).
-:- multifile(('=>')/2).
 :- multifile(('<=')/2).
+:- multifile(('<-')/2).
 :- multifile(('::::')/2).
-:- multifile(('<=>')/2).
+:- multifile(('<->')/2).
 :- multifile('pt'/2).
 :- multifile('pk'/3).
 :- multifile('nt'/3).
@@ -220,23 +220,26 @@ load_time_sanity.
           mpred_f/7)).
 
 :- op(500,fx,'~').
-:- op(1050,xfx,('=>')).
-:- op(1050,xfx,'<=>').
 :- op(1050,xfx,('<=')).
+:- op(1050,xfx,'<->').
+:- op(1050,xfx,('<-')).
 :- op(1100,fx,('=>')).
+:- op(1100,fx,('nesc')).
 :- op(1150,xfx,('::::')).
 :- op(300,fx,'-').
 :- op(600,yfx,'&').  
 :- op(600,yfx,'v').
-:- op(1075,xfx,'=>').
-:- op(1075,xfx,'<=>').
+:- op(1075,xfx,'<=').
+:- op(1075,xfx,'<=').
+:- op(1070,xfx,'=>').
+:- op(1070,xfx,'<=>').
 :- op(350,xfx,'xor').
 :- op(300,fx,user:'~').
 :- op(300,fx,user:'-').
 :- op(400,yfx,user:'&').  
 :- op(500,yfx,user:'v').
-:- op(1075,xfx,user:'=>').
-:- op(1075,xfx,user:'<=>').
+:- op(1075,xfx,user:'<=').
+:- op(1075,xfx,user:'<->').
 :- op(350,xfx,user:'xor').
 
 :-dynamic(user_db:grant_openid_server/2).
@@ -348,7 +351,7 @@ load_time_sanity.
 :- dynamic_multifile_exported user:arity/2.
 :- dynamic_multifile_exported user:mpred_prop/2.
 :- dynamic_multifile_exported user:relationMostInstance/3.
-:- dynamic_multifile_exported user:'<=>'/2.
+:- dynamic_multifile_exported user:'<->'/2.
 % :- dynamic_multifile_exported user:ruleForward/2.
 :- dynamic_multifile_exported user:ruleRewrite/2.
 % :- dynamic_multifile_exported user:ruleBackward/2.

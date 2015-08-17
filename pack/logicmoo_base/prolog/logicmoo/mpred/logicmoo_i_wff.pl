@@ -345,6 +345,9 @@ is_sentence_functor(all).
 
 :-dynamic(leave_as_is0/1).
 leave_as_is(V):- \+ compound(V),!.
+leave_as_is((_ :-_ )):-!,fail.
+leave_as_is((_;_)):-!,fail.
+leave_as_is((_/_)):-!,fail.
 leave_as_is(V):-compound(V),leave_as_is0(V),!.
 
 leave_as_is0('$VAR'(_)).

@@ -50,7 +50,7 @@
 %
 %
 %
-% clause types: (:-)/1, (:-)/2, (=>)/1,  (=>)/2, (<=)/1,  (<=)/2, (<=>)/2, fact/1
+% clause types: (:-)/1, (:-)/2, (=>)/1,  (=>)/2, (<-)/1,  (<-)/2, (<->)/2, fact/1
 %
 :- include(logicmoo_i_header).
 
@@ -68,7 +68,7 @@ default_te(IF,VAR,VAL):-assertz(te_setting(IF,VAR,VAL)).
 :-default_te(file_pfc, compile_clause, pfc_assert).
 :-default_te(file_pfc, expand_clause, fully_expand_clause).
 :-default_te(file_pfc, proccess_directive, proccess_directive).
-:-default_te(file_pfc, fact_neck, (clause <= true)).
+:-default_te(file_pfc, fact_neck, (clause <- true)).
 :-default_te(file_pfc, rule_neck, (head :- body)).
 
 :-default_te(file_syspreds,isa_detector, always_fail(i,c)).
@@ -89,17 +89,17 @@ default_te(IF,VAR,VAL):-assertz(te_setting(IF,VAR,VAL)).
 :-default_te((:-)/1, compile_clause, proccess_directive).
 :-default_te((:-)/2, rule_neck, clause).
 :-default_te((=>),use_te, file_pfc).
-:-default_te((<=>),use_te, file_pfc).
-:-default_te((<=),use_te, file_pfc).
+:-default_te((<->),use_te, file_pfc).
+:-default_te((<-),use_te, file_pfc).
 
 %
 %  
 % :- directive:  process_directive, call
 % fact:  fwc(pfc), bwc(pfc), *cwc(prolog), bwc(pttp), implies(kif), other
 % :- rule:  fwc(pfc), bwc(pfc), *cwc(prolog), bwc(pttp), implies(kif), other
-% <= rule:   fwc(pfc), *bwc(pfc), cwc(prolog), bwc(pttp), implies(kif), other
-% => rule:   *fwc(pfc), bwc(pfc), cwc(prolog), bwc(pttp), implies(kif), other
-% <= fact:   fwc(pfc), *bwc(pfc), cwc(prolog), bwc(pttp), implies(kif), other
+% <- rule:   fwc(pfc), *bwc(pfc), cwc(prolog), bwc(pttp), implies(kif), other
+% <= rule:   *fwc(pfc), bwc(pfc), cwc(prolog), bwc(pttp), implies(kif), other
+% <- fact:   fwc(pfc), *bwc(pfc), cwc(prolog), bwc(pttp), implies(kif), other
 % => fact:   *fwc(pfc), bwc(pfc), cwc(prolog), bwc(pttp), implies(kif), other
 % loading:  compile_clause, process_directive, assertz, 
 % head types: code, *hybrid, functor(outer), holds(outer)
@@ -302,9 +302,12 @@ db_expand_chain(_,M:PO,PO) :- atom(M),!.
 db_expand_chain(_,(P:-B),P) :-is_true(B),!.
 db_expand_chain(_,B=>P,P) :-is_true(B),!.
 db_expand_chain(_,P<=B,P) :-is_true(B),!.
+db_expand_chain(_,P<->B,P) :-is_true(B),!.
+db_expand_chain(_,B<->P,P) :-is_true(B),!.
+db_expand_chain(_,P<-B,P) :-is_true(B),!.
 db_expand_chain(_,isa(I,Not),INot):-Not==not,!,INot =.. [Not,I].
 db_expand_chain(_,P,PE):-fail,cyc_to_pfc_expansion_entry(P,PE).
-db_expand_chain(_,(=>P),P) :- !.
+db_expand_chain(_,('nesc'(P)),P) :- !.
 
 db_expand_a(Op ,(S1,S2),SentO):-db_expand_a(Op ,S1,S1O),db_expand_a(Op ,S2,S2O),conjoin(S1O,S2O,SentO).
 db_expand_a(A,B,C):- loop_check_term(db_expand_0(A,B,C),db_expand_0(A,B,C),trace_or_throw(loop_check(db_expand_0(A,B,C)))).

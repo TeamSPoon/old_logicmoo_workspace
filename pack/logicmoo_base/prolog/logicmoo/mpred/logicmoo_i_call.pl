@@ -13,6 +13,7 @@
 */
 
 
+
 :-meta_predicate(mpred_call(0)).
 
 % oncely later will throw an error if there where choice points left over by call

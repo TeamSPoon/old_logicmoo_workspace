@@ -21,7 +21,7 @@ hybrid_tPredStubImpl(prologKIF).
 hybrid_tPredStubImpl(prologEquality).
 
 
-make_builtin(F/A):-
+make_builtin(F/A):- show_call_failure((atom(F),integer(A))),
   with_assertions(set_prolog_flag(access_level,system),lock_predicate(F/A)),pfc_add(prologBuiltin(F)),pfc_add(arity(F,A)).
 
 /*
