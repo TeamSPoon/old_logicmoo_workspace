@@ -50,22 +50,23 @@ boxlog_to_compile(neg(<=),not(H),OUTPUT):-!, boxlog_to_compile(bwc,not(H),OUTPUT
 
 boxlog_to_compile((:-),(not(H):-_),true):- nonvar(H),prologBuiltin(H),!.
 boxlog_to_compile((:-),(not(H):-B),HH:-(cwc,BBB)):-body_for_pfc((:-),neg(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_compile((:-),(H:-B),OUT):-pfcControlled(H),boxlog_to_compile((bwc),(H:-B),OUT),!.
 boxlog_to_compile((:-),(H:-B),HH:-(cwc,BBB)):- body_for_pfc((:-),H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_compile((:-),not(H),neg(H)):-  !.
 boxlog_to_compile((:-),H,H):-  !.
 
 
 
-
 boxlog_to_compile(fwc,(not(H):-_),true):- nonvar(H),H = skolem(_,_),!.
 boxlog_to_compile(fwc,(not(H):-B),OUT):- term_slots(H,HV),term_slots(B,BV), HV\==BV,!,boxlog_to_compile(bwc,(not(H):-B),OUT).
-boxlog_to_compile(fwc,(not(H):-B),HH<=BBB)):- body_for_pfc(=>,neg(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
-boxlog_to_compile(fwc,(H:-B),HH<=BBB):- body_for_pfc(=>,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_compile(fwc,(not(H):-B),(HH<=BBB)):- body_for_pfc(=>,neg(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_compile(fwc,(H:-B),(HH<=BBB)):- body_for_pfc(=>,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_compile(fwc,not(H),neg(H)):-  !.
 boxlog_to_compile(fwc,H,H):-  !.
 
 boxlog_to_compile(bwc,(not(H):-_),true):- nonvar(H),H = skolem(_,_),!.
 boxlog_to_compile(bwc,(not(H):-B),(HH<-BBB)):-body_for_pfc(<-,neg(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_compile(bwc,(H:-B),OUT):-pfcRHS(H),term_slots(H,HV),term_slots(B,BV), HV==BV,boxlog_to_compile((fwc),(H:-B),OUT),!.
 boxlog_to_compile(bwc,(H:-B),(HH<-BBB)):- body_for_pfc(<-,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_compile(bwc,not(H),neg(H)):-  !.
 boxlog_to_compile(bwc,H,H):-  !.
@@ -93,7 +94,7 @@ correct_mode(_,O,O).
 body_for_pfc(Mode,Head,NewNewHead,I,O):-reduce_literal(Head,NewHead),!,body_for_pfc_1(Mode,NewHead,NewNewHead,I,O).
 body_for_pfc(Mode,Head,NewHead,B,BB):- body_for_pfc_1(Mode,Head,NewHead,B,BB),!.
 
-body_for_pfc_1(Mode,Head,HeadO,C,CO):- (Mode ==(:-);Mode==(cwc)),compound(C),once((get_functor(C,FC),get_functor(Head,HC))),FC==HC,
+body_for_pfc_1(Mode,Head,HeadO,C,CO):- (Mode ==(:-);Mode==(cwc));Mode==(<-)),compound(C),once((get_functor(C,FC),get_functor(Head,HC))),FC==HC,
     body_for_pfc_1(Mode,Head,HeadM,{ ground(C),(C\=Head),\+ is_loop_checked(C)},AA),body_for_pfc_2(Mode,HeadM,HeadO,C,BB),!,conjoin_body(AA,BB,CM),correct_mode(Mode,CM,CO).
 body_for_pfc_1(Mode,Head,NewNewHead,I,O):-body_for_pfc_2(Mode,Head,NewNewHead,I,M),correct_mode(Mode,M,O).
 

@@ -71,10 +71,7 @@ pfc_testing.
 
 % U=nt(A,B,C),spft(X,Y,Z),\+ \+
 
-:-start_rtrace.
 (a(B),d(B),f(B)) => b(B).
-:-stop_rtrace.
-
 (a(B),d(B),e(B)) => b(B).
 (a(B),e(B),d(B)) => b(B).
 

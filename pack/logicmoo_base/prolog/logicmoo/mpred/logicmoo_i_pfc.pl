@@ -317,18 +317,20 @@ assert_u(X):- not(compound(X)),!,asserta_u(X,X,0).
 assert_u(X):- never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
 assert_u(X):- unnumbervars(X,XO),functor(X,F,A),assert_u(XO,F,A).
 
-assert_u(X,F,_):-if_defined(singleValueInArg(F,SV)),!,must(update_single_valued_arg(X,SV)).
-assert_u(X,F,A):-prologSingleValued(F),!,must(update_single_valued_arg(X,A)).
+assert_u(X,F,_):-if_defined(singleValueInArg(F,SV)),!,must(update_single_valued_arg(X,SV)),!.
+assert_u(X,F,A):-prologSingleValued(F),!,must(update_single_valued_arg(X,A)),!.
 assert_u(X,F,A):-must(isa(F,prologOrdered) -> assertz_u(X,F,A) ; asserta_u(X,F,A)).
 
 
 asserta_u(X):- never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
 asserta_u(X):- functor(X,F,A),unnumbervars(X,XO),asserta_u(XO,F,A).
+
 asserta_u(X,_,_):- show_call_success(clause_asserted(X)),!.
 asserta_u(X,_,_):- must((expire_tabled_list(X),show_if_debug(call_with_attvars(asserta,X)))).
 
 assertz_u(X):- never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
 assertz_u(X):- functor(X,F,A),unnumbervars(X,XO),assertz_u(XO,F,A).
+
 assertz_u(X,_,_):- show_call_success(clause_asserted(X)),!.
 assertz_u(X,_,_):- must((expire_tabled_list(X),show_if_debug(call_with_attvars(assertz,X)))).
 
@@ -336,9 +338,10 @@ never_assert_u(vtVerb(BAD)):-fail,BAD=='[|]'.
 never_retract_u(human(trudy)).
 never_retract_u((father(skArg1ofFatherFn(trudy), trudy))).
 
-retract_u(neg(X)):-must(nonvar(X)),!,retract(neg(X)),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
 retract_u(X):- never_retract_u(Y),X=@=Y,trace_or_throw(never_retract_u(Y)).
-retract_u(X):-show_if_debug(retract(X)),must((expire_tabled_list(X))).
+retract_u(neg(X)):-must(nonvar(X)),!,retract_eq(neg(X)),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
+retract_u(X):-show_if_debug(call_with_attvars(retract_eq,X)),!,must((expire_tabled_list(X))).
+
 retractall_u(X):-retractall(X),must((expire_tabled_list(X))).
 call_u(X):- pfc_call(X).
 clause_u(H,B):- must(H\==true),clause(H,B).
@@ -351,7 +354,7 @@ pfc_update_literal(P,N,Q,R):-
     notrace(replace_arg(Q,N,NEW,R)).
 
 update_single_valued_arg(P,N):- arg(N,P,UPDATE),notrace(replace_arg(P,N,OLD,Q)),
-  must_det_l((call_with_attvars(assert_if_new,spft(P,u,u)),(P->true;(assertz_u(P))),
+  must_det_l((call_with_attvars(assert_if_new,spft(P,u,u)),(if_defined(P)->true;(assertz_u(P))),
      doall((clause(Q,true,E),UPDATE \== OLD,erase_safe(clause(Q,true,E),E),pfc_unfwc1(Q))))).
 
 

@@ -24,8 +24,9 @@ transTiny(Template,If):-transfer_predicate(tinyK8(Template),If,once(pfc_add(Temp
 :- pfc_no_trace.
 
 :- transTiny(tCol(X),ground(X)).
-:- transTiny(ttFormatType(X),ground(X)).
 :- transTiny(arity(X,Y),ground((X,Y))).
+:- transTiny(genlMt(X,Y),writeq((X,Y))).
+:- transTiny(ttFormatType(X),ground(X)).
 :- transTiny(Form,(ground(Form),functor(Form,F,1),F\==neg)).
 
 
