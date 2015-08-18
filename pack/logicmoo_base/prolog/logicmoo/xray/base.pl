@@ -67,6 +67,7 @@ mysubset([X|R],L) :-
 	mysubset(R,L).
 
 
+concatenate(String1,String2,String):-!,atom_concat(String1,String2,String),!.
 concatenate(String1,String2,String) :-
 	name(String1,L1),
 	name(String2,L2),

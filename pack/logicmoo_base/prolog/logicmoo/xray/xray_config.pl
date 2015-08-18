@@ -17,8 +17,8 @@
 :- ensure_loaded(hooks).
 :- ensure_loaded(lemma).
 
-show_call_value(N,V):- V -> dmsg(N=true) ; dmsg(N=false).
 show_call_value(V):-show_call_value(V,V).
+show_call_value(N,V):- V -> dmsg(N=true) ; dmsg(N=false).
 show_call_value1(N,V):- V -> dmsg(N=V) ; dmsg(N=false).
 
 
@@ -52,7 +52,7 @@ dont_compile_complete_search :-
 dont_compile_complete_search.
 
 :- do_compile_complete_search.            % default is to compile complete search
-
+% :- dont_compile_complete_search.
 %%% Proof printing is (better) turned (during compile-time)
 %%%  on by   do_compile_proof_printing (print_proof),
 %%% off by dont_compile_proof_printing (dont_print_proof).
@@ -80,36 +80,27 @@ dont_compile_count_inferences :- dont_count_inferences.
 
 pttp_configuration :-
 	nl,dmsg('PTTP CONFIGURATION:'),nl,
-	(count_inferences_pred(true) ->
-	    dmsg('PTTP counts no inferences.');
-	    dmsg('PTTP counts inferences!')),
-        (trace_search_progress_pred(nop) ->
-	    dmsg('PTTP does not trace search progress.');
-	    dmsg('PTTP traces search progress!')),
-	(compile_proof_printing ->
-	    dmsg('PTTP compiles proof printing!');
-	    dmsg('PTTP does not compile proof printing.')),
-	(compile_complete_search ->
-	    dmsg('PTTP compiles complete search!');
-	    dmsg('PTTP does not compile complete search.')).
+        %(count_inferences_pred(true) ->dmsg('PTTP counts no inferences.');dmsg('PTTP counts inferences!')),
+        show_call_value(count_inferences_pred(_)),
+        %(trace_search_progress_pred(nop) ->msg('PTTP does not trace search progress.');dmsg('PTTP traces search progress!')),
+        show_call_value(trace_search_progress_pred(_)),        
+        %(compile_proof_printing ->dmsg('PTTP compiles proof printing!');dmsg('PTTP does not compile proof printing.')),
+        show_call_value(compile_proof_printing),
+        % (compile_complete_search -> dmsg('PTTP compiles complete search!');dmsg('PTTP does not compile complete search.'))
+        show_call_value(compile_complete_search).
 
-:- pttp_configuration.
 
 %%% ----------------------------------------------------------------------
 %%% XRay CONFIGURATION
 
-xray_configuration :-
-	nl,dmsg('XRay CONFIGURATION:'),nl,nl,
-	
-	dmsg(delta_ordering),
-	dmsg(' = '),
-	(delta_ordering(O), dmsg(O),dmsg(' '),fail ; dmsg('.')),
-	nl,
-	
-	dmsg(verbose_mode),
-	dmsg(' = '),
-	(verbose_flag, dmsg("on") ; dmsg("off")),
-	nl.
+xray_configuration_inner :-
+	dmsg('XRay CONFIGURATION:'),
+	show_call_value(delta_ordering(_)),
+	show_call_value(verbose_mode),
+        show_call_value(no_disk),
+        show_call_value(do_model_inits),
+        show_call_value(herbrandize),
+        show_call_value(use_sound_unification(_)).
 
 %%% delta_ordering stears the order of admissibility 
 %%% and compatibility checking in delta rules
@@ -155,6 +146,7 @@ no_verbose_mode.
 :- verbose_mode.                         % default is to print proof
 
 %%% verbose predicate, chatting if verbose_mode is turned on
+:-abolish(verbose,1).
 verbose(X) :-
 	verbose_flag ->
 	        dmsg(X),nl;
@@ -164,10 +156,13 @@ verbose(X) :-
 %%% PRINT CONFIGURATION
 %%%
 
-:- xray_configuration,nl.
+% :- lemma_handling.   % indicated by lemma_handling_flag
 
-configuration :-
+xray_configuration :-
 	hook_configuration,
 	lemma_configuration,
 	pttp_configuration,
-	xray_configuration.
+	xray_configuration_inner.
+
+:- xray_configuration.
+

@@ -203,9 +203,9 @@ read_lem(Name,Wff) :-
 	read_clauses(LFile,Wff).	
 write_lem(File,LemmaProcs) :-
 	concatenate(File,'.lem',LemmaFile),
-	open(LemmaFile,write,LemmaStream),
+	myopen(LemmaFile,write,LemmaStream),
         write_clauses(LemmaStream,LemmaProcs),
-        close(LemmaStream),
+        myclose(LemmaStream),
 	!.
 compile_lem(File) :-	
 	concatenate(File,'.lem',KBFile),

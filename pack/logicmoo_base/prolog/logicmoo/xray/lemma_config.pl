@@ -22,7 +22,7 @@
 
 :- lemma_format(unit).                     % default is to use UNIT lemmas only
 
-add_lemmatization_p(Head :- Body) :-
+add_lemmatization_p(Head :- _Body) :-
 	lemma_flag,
 	!,
 	(functor(Head,query,_) -> fail;

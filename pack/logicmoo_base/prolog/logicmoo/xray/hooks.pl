@@ -77,13 +77,14 @@ add_body_hooks((Head :- Body),(Head :- Body2)) :-
 	    conjoin(Body1,(bhook2(Head :- Body)),Body2);
         %true ->
 	    Body2=Body1).
+
 add_body_hooks((Head :- Body),(Head :- Body)).
 
 %%% COMPILE-TIME conditions for body hook insertion
 
-bhook1_p(Head :- Body) :-
+bhook1_p(_Head :- _Body) :-
 	true.
-bhook2_p(Head :- Body) :-
+bhook2_p(_Head :- _Body) :-
 	true.
 
 %%% RUN-TIME predicates for body hooks

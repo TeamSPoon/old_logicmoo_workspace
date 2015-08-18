@@ -40,10 +40,11 @@ myfunctor(Term,F,N) :-
 %%% ***
 %%% ****if* PTTP/append
 %%% SOURCE
-
+/*
 append([X|L1],L2,[X|L3]) :-
 	append(L1,L2,L3).
 append([],L,L).
+*/
 %%% ***
 %%% ****if* PTTP/list_reverse
 %%% SOURCE
@@ -94,7 +95,7 @@ max(X,Y,Max) :-
 %%% ***
 %%% ****if* PTTP/conjoin
 %%% SOURCE
-
+/*
 intersection([X|L1],L2,[X|L3]) :-
         identical_member(X,L2),
         !,
@@ -123,7 +124,7 @@ conjoin(A,B,C) :-
 %%% ***
 %%% ****if* PTTP/disjoin
 %%% SOURCE
-
+*/
 disjoin(A,B,C) :-
 	A == true ->
 		C = true;
@@ -193,7 +194,8 @@ internal_functor(P,IntP) :-
 %%% SOURCE
 
 apply_to_conjuncts(Wff,P,Wff1) :-
-	Wff = (A , B) ->
+  must(nonvar(Wff)),
+      (  Wff = (A , B) ->
 		apply_to_conjuncts(A,P,A1),
 		apply_to_conjuncts(B,P,B1),
 		conjoin(A1,B1,Wff1);
@@ -201,7 +203,7 @@ apply_to_conjuncts(Wff,P,Wff1) :-
 		P =.. G,
 		append(G,[Wff,Wff1],G1),
 		T1 =.. G1,
-		call(T1).
+		must(T1)),!.
 %%% ***
 %%% ****if* PTTP/apply_to_elements
 %%% SOURCE
@@ -382,7 +384,7 @@ not_xray:-fail.
 :- dynamic(count_inferences_pred/1).
 :- dynamic(trace_search_progress_pred/1).
 :- dynamic(compile_proof_printing/0).
-:- dynamic(ncalls/1).
+
 %%% Sound unification algorithm with occurs check that is called
 %%% by code resulting from the `add_sound_unification' transformation.
 %%% This should be coded in a lower-level language for efficiency.
@@ -482,21 +484,22 @@ pttp_tests:-time((ignore(source_file(chang_lee_example7,F)),!,ignore((source_fil
 %%%    p(X,Y,f(X1,Y1)) :- unify_with_occurs_check(X,X1), unify_with_occurs_check(Y,Y1).
 %%% SOURCE
 
-linearize(TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut) :-
+linearize(Pred,TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut) :-
         nonvar(TermIn) ->
                 functor(TermIn,F,N),
                 myfunctor(TermOut,F,N),
-		linearize_args(TermIn,TermOut,VarsIn,VarsOut,
+		linearize_args(Pred,TermIn,TermOut,VarsIn,VarsOut,
 		               MatchesIn,MatchesOut,1,N);
         identical_member(TermIn,VarsIn) ->
-                VarsOut = VarsIn,
-                conjoin(MatchesIn,unify_with_occurs_check(TermIn,TermOut),MatchesOut);
+                (VarsOut = VarsIn,
+                 CALL=..[Pred,TermIn,TermOut],
+                 conjoin(MatchesIn,CALL,MatchesOut));
         %true ->
                 TermOut = TermIn,
                 VarsOut = [TermIn|VarsIn],
                 MatchesOut = MatchesIn.
 
-linearize_args(TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut,I,N) :-
+linearize_args(Pred,TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut,I,N) :-
            I > N ->
                    VarsOut = VarsIn,
                    MatchesOut = MatchesIn;
@@ -505,10 +508,10 @@ linearize_args(TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut,I,N) :-
                 MatchesOut = MatchesIn;
         %true ->
                 arg(I,TermIn,ArgI),
-                linearize(ArgI,NewArgI,VarsIn,Vars1,MatchesIn,Matches1),
+                linearize(Pred,ArgI,NewArgI,VarsIn,Vars1,MatchesIn,Matches1),
                 arg(I,TermOut,NewArgI),
                 I1 is I + 1,
-                linearize_args(TermIn,TermOut,Vars1,VarsOut,Matches1,MatchesOut,I1,N).
+                linearize_args(Pred,TermIn,TermOut,Vars1,VarsOut,Matches1,MatchesOut,I1,N).
 
 
 %%% ***
@@ -625,7 +628,7 @@ prove(Goal,Max,Min) :-
 prove(Goal,Max) :-
         prove(Goal,Max,0).
 
-prove(query) :- !,   prove(query,100,0,3).
+prove(query) :- !,   prove(query,1000,0,3).
 prove(Goal) :-
         prove(Goal,1000000).
 
@@ -678,13 +681,13 @@ unifiable_member(X,[_|L]) :-
 %%%   identical_member(X,L) succeeds iff X is an element of the list L
 %%%   it does not use unification during element comparisons
 %%% SOURCE
-
+/*
 identical_member(X,[Y|_])  :-
 	X == Y,
 	!.
 identical_member(X,[_|L]) :-
 	identical_member(X,L).
-
+*/
 %%% ***
 
 %%% ****if* PTTP/clauses
@@ -908,7 +911,7 @@ time(X,Type) :-
         nl,
         write(Type),
         write(' time: '),
-        ncalls(N),
+        get_ncalls(N),
         (N > 0 -> write(N) , write(' inferences in ') ; true),
         write(Secs),
         write(' seconds, including printing'),
@@ -1185,17 +1188,9 @@ add_count_inferences((Head :- Body),(Head :- Body1)) :-
                 count_inferences_pred(P),
                 conjoin(P,Body,Body1).
 
-clear_ncalls :-
-        retract(ncalls(_)),
-        fail.
-clear_ncalls :-
-        assert(ncalls(0)).
-
-inc_ncalls :-
-        retract(ncalls(N)),
-        N1 is N + 1,
-        assert(ncalls(N1)),
-        !.
+clear_ncalls :- flag(ncalls,_,0).
+inc_ncalls :- flag(ncalls,X,X+1).
+get_ncalls(X):- flag(ncalls,X,X).
 
 %%% Search tracing is turned on by trace_search,
 %%% off by dont_trace_search.
@@ -1215,10 +1210,13 @@ dont_trace_search :-
 :- trace_search.                        % default is to trace searching
 
 
+:- dynamic(use_sound_unification/1).
+use_sound_unification(unify_with_occurs_check).
 
-add_sound_unification((Head :- Body),(Head1 :- Body1)) :-
-        linearize(Head,Head1,[],_,true,Matches),
+add_sound_unification((Head :- Body),(Head1 :- Body1)) :- use_sound_unification(Pred),!,
+        linearize(Pred,Head,Head1,[],_,true,Matches),
         conjoin(Matches,Body,Body1).
+add_sound_unification((Head :- Body),(Head :- Body)).
 
 
 add_proof_recording((Head :- Body),(Head1 :- Body1)) :-
@@ -1323,7 +1321,7 @@ ancestor_tests(P,N,Result) :-
 
 
 
-
+add_complete_search(HeadBody,HeadBody) :-  (\+ compile_complete_search ),!.
 add_complete_search((Head :- Body),(Head1 :- Body1)) :-
   Head =.. [_|HeadArgs],((
         Head =.. L,
@@ -1337,7 +1335,9 @@ add_complete_search((Head :- Body),(Head1 :- Body1)) :-
         %true ->
                 add_complete_search_args(Head,Body,DepthIn,DepthOut,Body1)))).
 
-add_complete_search_args(Head,Body,DepthIn,DepthOut,Body1) :-
+
+add_complete_search_args(Head,Body,DepthInOut,DepthInOut,Body) :-  (\+ compile_complete_search ),!.   
+add_complete_search_args(Head,Body,DepthIn,DepthOut,Body1) :-  
    Head =.. [_|HeadArgs],
        	
         ((Body = (A , B) ->
@@ -1435,10 +1435,10 @@ pttp2(Y) :-
         File = 'temp.prolog',                     % Quintus Prolog on Sun
 %       File = 'darwin:>stickel>pttp>temp.prolog',% change file name for other systems
 
-        open(File,write,OutFile),
+        myopen(File,write,OutFile),
         write_clause_to_file(Y,OutFile),
-        close(OutFile),
-        compile(File),
+        myclose(OutFile),
+        compile_with_cyclic_term(File),
         nl,
         !.
 

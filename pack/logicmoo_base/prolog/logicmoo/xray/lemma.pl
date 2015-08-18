@@ -29,7 +29,7 @@
 lemma_configuration :-
 	nl,dmsg('LEMMA CONFIGURATION:'),nl,nl,
 	
-	show_call_value("Lemma handling",lemma_handling_flag),
+	show_call_value(lemma_handling_flag),
 	ignore((lemma_handling_flag,
          (show_call_value1(lemma_format,lemma_format_parameter(_)),
          show_call_value1(lemma_mode,lemma_mode_parameter(_)),
@@ -506,12 +506,12 @@ disjoin2(_,B,B).
 
 write_lemmas(File) :-   
         concatenate(File,'.lem',LFile),
-        open(LFile,dmsg,LStream),
+        myopen(LFile,write,LStream),
         !,
         (static_lemma(X,Y,Z),
          write_clauses(LStream,static_lemma(X,Y,Z)),
          fail;
-         close(LStream)).
+         myclose(LStream)).
 
 show_lemmas :-  
         show_dynamic_lemmas,fail;

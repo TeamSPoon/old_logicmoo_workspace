@@ -21,6 +21,7 @@
 %%% as an ancestor for use in reduction or pruning.
 %%% This list can be added to as required.
 
+:- multifile(builtin/2).
 builtin(T) :-
 	nonvar(T),
         functor(T,F,N),
