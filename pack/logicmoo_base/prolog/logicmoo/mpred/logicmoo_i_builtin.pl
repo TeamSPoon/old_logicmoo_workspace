@@ -105,6 +105,8 @@ quasiQuote('QuoteFn').
 argsQuoted('loop_check_term').
 argsQuoted('loop_check_term_key').
 argsQuoted('QuoteFn').
+argsQuoted('$VAR').
+arity('$VAR',1).
 
 argsQuoted(pfc_add).
 argsQuoted(meta_argtypes).
@@ -232,7 +234,7 @@ prologHybrid(genls/2).
 
 neg(tCol(C))/completelyAssertedCollection(C)=> \+ completelyAssertedCollection(C).
 
-(((support_hilog(F,A)/(atom(F),integer(A),\+ static_predicate(F/A), \+ prologDynamic(F)))) =>
+(((support_hilog(F,A)/(F\='$VAR',atom(F),integer(A),\+ static_predicate(F/A), \+ prologDynamic(F)))) =>
    (hybrid_support(F,A), 
     {functor(Head,F,A) ,Head=..[F|TTs],TT=..[t,F|TTs],
     % (CL = (Head :- cwc, call(second_order(TT,CuttedCall)), ((CuttedCall=(C1,!,C2)) -> (C1,!,C2);CuttedCall)))
@@ -240,9 +242,9 @@ neg(tCol(C))/completelyAssertedCollection(C)=> \+ completelyAssertedCollection(C
     },
    (CL))).
 
-(((hybrid_support(F,A)/(atom(F),integer(A), \+ prologDynamic(F),\+ static_predicate(F/A)))) =>
-  (({
-    functor(Head,F,A),    
+(((hybrid_support(F,A)/(F\='$VAR',atom(F),integer(A), \+ prologDynamic(F),\+ static_predicate(F/A)))) =>
+  (({    
+    functor(Head,F,A),
     % pfc_test(rebuild_pred_into(Head,Head,pfc_assert,[+dynamic,+multifile,+discontiguous])),
     convert_to_dynamic(user,F,A),
     must(show_call_failure( \+ static_predicate(Head)))}),

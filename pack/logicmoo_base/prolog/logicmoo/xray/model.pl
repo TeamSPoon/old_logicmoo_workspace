@@ -18,13 +18,20 @@
 
 :- ensure_loaded(base).
 
+:- dynamic(do_model_inits).
+
+do_model_inits.
+
+
 %%% ----------------------------------------------------------------------
 %%% model_initialization/2
 %%%     generates an initial model
 
+display_cmm(Type,Info):-wdmsg(Type:Info).
+
 model_initialization(Matrix,cmm(Model,NewMatrix)) :-
 	model_generation(matrix([],Matrix),NewMatrix,Model),
-%	display_cmm('INITIALIZATION',cmm(Model,NewMatrix)),
+	display_cmm('INITIALIZATION',cmm(Model,NewMatrix)),
 	!.
 
 %%% Runtime predicate for consistency checking
@@ -97,7 +104,7 @@ model_generation(matrix(Units,Matrix),matrix(Units2,M1),Model) :-
 %	writeln(unit_extraction),display_matrix(Matrix),display_matrix(M1),display_units(Units1),
 	dp(M1,Model1),
 	append(Units,Units1,Units2),
-/*	union(Units,Units1,Units2), append allows for multiple occurrences */
+/*	list_union(Units,Units1,Units2), append allows for multiple occurrences */
 	append(Units2,Model1,Model),
 	verbose('* model generation').
 

@@ -55,9 +55,15 @@ builtin(write,1).
 builtin(nl,0).
 builtin(infer_by,_).
 builtin(write_proved,_).
+builtin(prove,_).
 builtin(search,_).
 builtin(search_cost,_).
 builtin(unify,_).
+builtin(unify_with_occurs_check,_).
+
+builtin(model_initialization,_).
+builtin(model_generation,_).
+
 builtin(identical_member,_).
 builtin(unifiable_member,_).
 builtin(inc_ncalls,0).

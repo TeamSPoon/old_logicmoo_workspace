@@ -1,8 +1,16 @@
-add_herbrand_preds((Head :- Body),(Head :- Body1)) :-
+
+
+:- dynamic(herbrandize).
+
+:- retractall(herbrandize).
+
+add_herbrand_preds((Head :- Body),(Head :- Body1)) :- herbrandize ,!,
 	herbrandize_variables(Body,[],BodyVars,false,_),
 	herbrandize_variables(Head,BodyVars,_,true,Matches),
         conjoin(Matches,Body,Body1).
 	
+add_herbrand_preds((Head :- Body),(Head :- Body)) :- !.
+
 
 herbrandize_variables(Term,VarsIn,VarsOut,MatchesIn,MatchesOut) :-
         builtin(Term) ->
@@ -48,19 +56,23 @@ constants(Wff,L) :-
         Wff = (A :- B) ->
                 constants(A,L1),
                 constants(B,L2),
-                union(L2,L1,L);
+                list_union(L2,L1,L);
         Wff = (A , B) ->
                 constants(A,L1),
                 constants(B,L2),
-                union(L2,L1,L);
+                list_union(L2,L1,L);
         Wff = (A ; B) ->
                 constants(A,L1),
                 constants(B,L2),
-                union(L2,L1,L);
+                list_union(L2,L1,L);
         Wff = (A : B) ->
                 constants(A,L1),
                 constants(B,L2),
-                union(L2,L1,L);
+                list_union(L2,L1,L);
+        Wff = (A | B) ->
+                constants(A,L1),
+                constants(B,L2),
+                list_union(L2,L1,L);
         myfunctor(Wff,search,_) ->        % list constants in first argument of search
                 arg(1,Wff,X),
                 constants(X,L);
@@ -74,8 +86,10 @@ constants(Wff,L) :-
                    L = []).
 
 constantize_args(Term,FnsIn,FnsOut,I,N) :-
-	var(Term) ->
-		FnsOut = FnsIn;
+        cyclic_term(Term) ->
+                   FnsOut = FnsIn;
+        var(Term) ->
+                FnsOut = FnsIn;
 	atom(Term) ->
 	        FnsOut = [Term|FnsIn];
         I > N ->
@@ -96,19 +110,23 @@ variables(Wff,L) :-
         Wff = (A :- B) ->
                 variables(A,L1),
                 variables(B,L2),
-                union(L2,L1,L);
+                list_union(L2,L1,L);
         Wff = (A , B) ->
                 variables(A,L1),
                 variables(B,L2),
-                union(L2,L1,L);
+                list_union(L2,L1,L);
         Wff = (A ; B) ->
                 variables(A,L1),
                 variables(B,L2),
-                union(L2,L1,L);
+                list_union(L2,L1,L);
         Wff = (A : B) ->
                 variables(A,L1),
                 variables(B,L2),
-                union(L2,L1,L);
+                list_union(L2,L1,L);
+	Wff = (A | B) ->
+                variables(A,L1),
+                variables(B,L2),
+                list_union(L2,L1,L);
         myfunctor(Wff,search,_) ->        % list variables in first argument of search
                 arg(1,Wff,X),
                 variables(X,L);
@@ -121,9 +139,11 @@ variables(Wff,L) :-
 		 %true ->
                    L = []).
 
-variablize_args(Term,FnsIn,FnsOut,I,N) :-
-	atom(Term) ->
-		FnsOut = FnsIn;
+variablize_args(Term,FnsIn,FnsOut,I,N) :- 
+        cyclic_term(Term) ->
+                   FnsOut = FnsIn;
+        atom(Term) ->
+                FnsOut = FnsIn;
 	var(Term) ->
 	        FnsOut = [Term|FnsIn];
         I > N ->
@@ -131,7 +151,7 @@ variablize_args(Term,FnsIn,FnsOut,I,N) :-
         %true ->
                 arg(I,Term,ArgI),
 		(var(ArgI) ->
-		        union([ArgI],FnsIn,Fns1);
+		        list_union([ArgI],FnsIn,Fns1);
 		%true ->
 		        myfunctor(ArgI,_,NI),
                         variablize_args(ArgI,FnsIn,Fns1,1,NI)),

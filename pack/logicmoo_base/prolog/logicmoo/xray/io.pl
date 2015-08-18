@@ -58,19 +58,23 @@ read_matrix_loop(Stream,Matrix) :-
 % to the file 'Name.ckb'
 
 write_ckb(File,KB) :-
+ must_det_l((
 	concatenate(File,'.ckb',KBFile),
-	open(KBFile,write,KBStream),
+	open(KBFile,write,KBStream),        
 	concatenate(File,'.que',QFile),
 	open(QFile,write,QStream),
         write_contrapositives(streams(KBStream,QStream),KB),
         close(KBStream),
-        close(QStream),
+        close(QStream))),!.
+
+        /*
 	get_file_info(KBFile,size,KBFileSize),
 	get_file_info(QFile,size,QFileSize),
 	nl,nl,
 	write(KBFile),write(" written "),write(KBFileSize),writeln(" bytes"),
 	write(QFile), write(" written "),write(QFileSize), writeln(" bytes"),
 	!.
+        */
 
 write_cmm(File,Matrix) :-
 	concatenate(File,'.cmm',MFile),
@@ -112,11 +116,8 @@ write_clauses(Stream,(A,B)) :-
         write_clauses(Stream,A),
         write_clauses(Stream,B),
         !.
-write_clauses(Stream,A) :-
-        write(Stream,A),
-        write(Stream,.),
-        nl(Stream),
-        !.
+write_clauses(Stream,A) :- show_call(format(Stream,'~N~q.~n',[A])).
+
 write_clauses(A) :-
 	File = 'temp.pl',
 	open(File,write,Stream),
@@ -141,7 +142,7 @@ write_matrix(L) :-
 
 
 compile_ckb(File) :-	
-	concatenate(File,'.ckb',KBFile),
+	notrace(concatenate(File,'.ckb',KBFile)),
 	compile(KBFile).
 
 compile_query(File) :-	
@@ -149,6 +150,7 @@ compile_query(File) :-
 	compile(QFile).
 
 ask(Name,Query) :-
+  must_det_l((
 	(variables(Query,[]) ->
 	         classical_clauses(Query,Q0),
 		 cnf(Q0,Q1),
@@ -171,7 +173,7 @@ ask(Name,Query) :-
         write('XRay compiling query ... '),
         compile_query(Name),
 	write('done.'),
-        nl,
+        nl)),
         !.
 
 tell(Name,Wff) :-	
@@ -194,5 +196,5 @@ write_proof(Proof,ProofEnd) :-
 write_proof([X|Y],ProofEnd) :-
 	nl,
         write(' '),
-        write(X),
+        writeq(X),
         write_proof(Y,ProofEnd).

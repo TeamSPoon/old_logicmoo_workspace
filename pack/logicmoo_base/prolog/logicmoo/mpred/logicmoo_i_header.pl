@@ -64,6 +64,10 @@ load_time_sanity.
 :- dynamic(type_suffix/2).
 :- multifile(type_suffix/2).
 
+:- dynamic(natFunction/2).
+:- multifile(natFunction/2).
+
+
 
 :- dynamic(pfcControlled/1).
 :- multifile(pfcControlled/1).

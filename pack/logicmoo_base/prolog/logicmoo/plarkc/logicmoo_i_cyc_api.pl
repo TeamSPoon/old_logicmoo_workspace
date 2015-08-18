@@ -7,6 +7,7 @@
 % Revision:  $Revision: 1.7 $
 % Revised At:   $Date: 2002/07/11 21:57:28 $
 % ===================================================================
+end_of_file.
 
 :-module(cyc,[lisp_read_codes/2,lisp_read/1,lisp_read/2,getSurface/2,getSurface/3,getSurfaceFromChars/3,getSurfaceFromStream/3]).
 :-if(current_prolog_flag(dialect,swi)).

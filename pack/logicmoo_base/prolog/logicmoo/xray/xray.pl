@@ -16,6 +16,21 @@
 %%                                                                           %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+:- dynamic   user:file_search_path/2.
+:- multifile user:file_search_path/2.
+:- prolog_load_context(directory,Dir),
+   DirFor = xray,
+   (( \+ user:file_search_path(DirFor,Dir)) ->asserta(user:file_search_path(DirFor,Dir));true),
+   absolute_file_name('../../../../',Y,[relative_to(Dir),file_type(directory)]),
+   (( \+ user:file_search_path(pack,Y)) ->asserta(user:file_search_path(pack,Y));true).
+:- attach_packs.
+:- initialization(attach_packs).
+% [Required] Load the Logicmoo Library Utils
+:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+:- initialization(attach_packs).
+prove_query:-query.
+
 :- ensure_loaded(base).
 :- ensure_loaded(pttp).
 :- ensure_loaded(builtin).
@@ -27,6 +42,7 @@
 :- ensure_loaded(lemma).
 :- ensure_loaded(xray_config).
 
+
 %%% ----------------------------------------------------------------------
 %%% XRay COMPILATION (patches pttp)
 
@@ -36,12 +52,14 @@
 
 clauses((A , B),L,WffNum) :-
         !,
+        must_det_l((
         clauses(A,L1,WffNum),
         WffNum2 is WffNum + 1,
         clauses(B,L2,WffNum2),
-        conjoin(L1,L2,L).
+        conjoin(L1,L2,L))).
 clauses( (Gamma :- Alpha : Beta) , L , WffNum ) :-
 	!,
+        must_det_l((
 	clauses((Gamma :- gamma(WffNum,Gamma)),L1,WffNum),
 	clauses((alpha(WffNum,Alpha) :- Alpha),L2,WffNum),
 	conjoin(L1,L2,L3),
@@ -63,7 +81,7 @@ clauses( (Gamma :- Alpha : Beta) , L , WffNum ) :-
 	    Record = true),
 	conjoin(Record,Body,Body1),
 	DRule= (gamma(WffNum,Gamma) :- Body1),
-	conjoin(DRule,L3,L).
+	conjoin(DRule,L3,L))).
 
 clauses(A,L,WffNum) :-
         head_literals(A,Lits),
@@ -176,10 +194,11 @@ procedures_with_tests([],_Clauses,true).
 %%% I suppose Wff has to be replaced by cmm(Model,ModelStructure) ...
 %%% [all this is a quick copy of add_proof_recording ...]
 
+
 add_consistency_checking((Head :- Body),(Head1 :- Body1)) :-
         functor(Head,query,_) ->
                 Head1 = Head,
-		conjoin(model_initialization(MM0),Body,Body2),
+		(do_model_inits -> conjoin(model_initialization(MM0),Body,Body2); Body=Body2),
 		add_consistency_checking_args(Body2,MM0,MMOut,Body1);
         %true ->
 		Head =.. L,
@@ -196,9 +215,9 @@ add_consistency_checking_args(Body,MMIn,MMOut,Body1) :-
                 add_consistency_checking_args(A,MMIn,MMOut,A1),
                 add_consistency_checking_args(B,MMIn,MMOut,B1),
                 disjoin(A1,B1,Body1);
-        Body =.. [search,Goal|L] ->
+        Body =.. [prove,Goal|L] ->
                 add_consistency_checking_args(Goal,MMIn,MMOut,Goal1), % ???
-                Body1 =.. [search,Goal1|L];
+                Body1 =.. [prove,Goal1|L];
         Body = justification(X) ->
 		Body1 = compatible(X,MMIn,MMOut);
         Body = fail ->
@@ -268,7 +287,8 @@ query(M) :-                             % call query with depth bound M
         compile_complete_search ->
                 query(M,_N).
 
-query :-                                % unbounded search of query
+query:- prove(query,100,0,3). % rtrace(query0).
+query0 :-                                % unbounded prove of query
         (compile_complete_search ->
 	    query(1000000);
 	%true ->
@@ -291,25 +311,28 @@ xray(Name) :-
 	
 
 dpttp(Name,X) :-
-        time(dpttp1(X,Y:Z),'Compilation Phase I'),
+  with_assertions(set_prolog_flag(occurs_check,true),
+  (      time(dpttp1(X,Y:Z),'Compilation Phase I'),
 	time(dpttp2(Name,Y:Z),'Compilation Phase II'),
-	time(dpttp3(Name),'Compilation Phase III').
+	time(dpttp3(Name),'Compilation Phase III'))).
 
 dpttp(X) :-
 	Name = 'temp',
 	dpttp(Name,X).
 
+pttp(X) :- dpttp(X).
+
 dpttp1(X,Y:C) :-
         nl,
-        write('XRay input formulas:'),
+        dmsg('XRay input formulas:'),
         apply_to_conjuncts(X,write_clause,_),
         nl,
 
 	constants(X,H),
 	(H = [] ->
-	    nl,write('Empty Herbrand universe.'),nl;
+	    nl,dmsg('Empty Herbrand universe.'),nl;
 	 %true ->
-	    nl,write('Herbrand universe':H),nl),
+	    nl,dmsg('Herbrand universe':H),nl),
 
 	classical_clauses(X,C0),
 	cnf(C0,C1),
@@ -319,7 +342,7 @@ dpttp1(X,Y:C) :-
 
         (verbose_flag ->
 	     nl,
-	     write('Classical output formulas:'),
+	     dmsg('Classical output formulas:'),
 	     apply_to_list(C,write_clause,_),
 	     nl;
 	%true ->
@@ -343,10 +366,10 @@ dpttp1(X,C,Y:C) :-
 
         (verbose_flag ->
 	     nl,
-	     write('Query formula:'),
+	     dmsg('Query formula:'),
 	     apply_to_conjuncts(Q0,write_clause,_),
 	     nl,
-	     write('      compiled:'),
+	     dmsg('      compiled:'),
 	     apply_to_list(Q,write_clause,_),
 	     nl,nl;
 	%true ->
@@ -358,7 +381,7 @@ dpttp1(X,Q,C,Y:C) :-
         clauses(X,XC,1),
 
 	constants(X,H),
-	(H = [] ->
+	((H = [],herbrandize) ->
 	    XH=true,
 	    X0=XC;
 	 %true ->
@@ -393,7 +416,7 @@ dpttp1(X,Q,C,Y:C) :-
 
         (verbose_flag -> 
 	     nl,
-	     write('XRay output formulas:'),
+	     dmsg('XRay output formulas:'),
 	     apply_to_conjuncts(Y,write_clause,_),
 	     nl;
 	%true ->
@@ -405,10 +428,10 @@ dpttp1(X) :-
 
 dpttp2(Name,Y:Z) :-
         nl,
-        write('XRay writing compiled clauses ... '),
+        dmsg('XRay writing compiled clauses ... '),
         write_ckb(Name,Y),
 	write_cmm(Name,Z),
-	write('done.'),
+	dmsg('done.'),
 	!.
 
 dpttp2(Y:Z) :-
@@ -417,13 +440,13 @@ dpttp2(Y:Z) :-
 
 dpttp3(Name) :-
 	nl,
-        write('XRay compiling clauses ... '),
+        dmsg('XRay compiling clauses ... '),
         compile_ckb(Name),
-	write('done.'),
+	dmsg('done.'),
         nl,
-        write('XRay compiling query ... '),
+        dmsg('XRay compiling query ... '),
         compile_query(Name),
-	write('done.'),
+	dmsg('done.'),
         nl,
         !.
 dpttp3 :-

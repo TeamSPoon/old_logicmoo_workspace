@@ -27,31 +27,13 @@
 %%% LEMMA CONFIGURATION
 
 lemma_configuration :-
-	nl,write('LEMMA CONFIGURATION:'),nl,nl,
+	nl,dmsg('LEMMA CONFIGURATION:'),nl,nl,
 	
-	write("Lemma handling"),
-	write(' = '),
-	(lemma_handling_flag ->
-	    write(on),
-	    nl,nl,
-	
-	    write(lemma_format),
-	    write(' = '),
-	    (lemma_format_parameter(P), write(P),write(' '),fail ; write('.')),
-	    nl,
-	    
-	    write(lemma_mode),
-	    write(' = '),
-	    (lemma_mode_parameter(M),   write(M),write(' '),fail ; write('.')),
-	    nl,
-	    
-	    write(lemma_type),
-	    write(' = '),
-	    (lemma_type_parameter(T),   write(T),write(' '),fail ; write('.')),
-	    nl;
-	%true ->
-	    write(off)),
-	nl.
+	show_call_value("Lemma handling",lemma_handling_flag),
+	ignore((lemma_handling_flag,
+         (show_call_value1(lemma_format,lemma_format_parameter(_)),
+         show_call_value1(lemma_mode,lemma_mode_parameter(_)),
+         show_call_value1(lemma_type,lemma_type_parameter(_))))).
 
 %%% Lemma handling is turned on by lemma_handling,
 %%% off by no_lemma_handling.
@@ -141,7 +123,7 @@ no_dystatic_lemmas.
 
 %%% some macros for easier lemma configuration.
 
-lemma_flag :- lemma_mode_parameter(X).
+lemma_flag :- lemma_mode_parameter(X), X\==none.
 dynamic_lemma_flag  :- lemma_mode_parameter(dynamic).
 static_lemma_flag   :- lemma_mode_parameter(static).
 dystatic_lemma_flag :- lemma_mode_parameter(dystatic).
@@ -524,7 +506,7 @@ disjoin2(_,B,B).
 
 write_lemmas(File) :-   
         concatenate(File,'.lem',LFile),
-        open(LFile,write,LStream),
+        open(LFile,dmsg,LStream),
         !,
         (static_lemma(X,Y,Z),
          write_clauses(LStream,static_lemma(X,Y,Z)),
@@ -537,13 +519,13 @@ show_lemmas :-
 
 show_dynamic_lemmas :- 
         (dynamic_lemma(X,Y,Z),
-         write(dynamic_lemma(X,Y,Z)),
+         dmsg(dynamic_lemma(X,Y,Z)),
          nl,
          fail;
          true).
 show_static_lemmas :-
         (static_lemma(X,Y,Z),
-         write(static_lemma(X,Y,Z)),
+         dmsg(static_lemma(X,Y,Z)),
          nl,
          fail;
          true).

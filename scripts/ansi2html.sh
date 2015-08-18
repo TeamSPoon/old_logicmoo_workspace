@@ -102,8 +102,44 @@ fi
 
 printf '%s' "<html>
 <head>
+<meta http-equiv=\"refresh\" content=\"45\"/>
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
 <style type=\"text/css\">
+
+body {background-color:white;padding:50px 50px}
+
+pre {
+  background-color:#eee;
+  overflow:auto;
+  margin:0 0 1em;
+  padding:.5em 1em;
+}
+
+pre code,
+pre .line-number {
+  /* Ukuran line-height antara teks di dalam tag <code> dan <span class=\"line-number\"> harus sama! */
+  font:normal normal 12px/14px \"Courier New\",Courier,Monospace;
+  color:black;
+  display:block;
+}
+
+pre .line-number {
+  float:left;
+  margin:0 1em 0 -1em;
+  border-right:1px solid;
+  text-align:right;
+}
+
+pre .line-number span {
+  display:block;
+  padding:0 .5em 0 1em;
+}
+
+pre .cl {
+  display:block;
+  clear:both;
+}
+
 .ef0,.f0 { color: #$P0; } .eb0,.b0 { background-color: #$P0; }
 .ef1,.f1 { color: #$P1; } .eb1,.b1 { background-color: #$P1; }
 .ef2,.f2 { color: #$P2; } .eb2,.b2 { background-color: #$P2; }
@@ -171,10 +207,29 @@ printf '%s' '
 /* Avoid pixels between adjacent span elements.  */
 span { display: inline-block; }
 </style>
+
+<script type="text/javascript">//<![CDATA[
+function(){
+window.setInterval(function() {
+    var pre = document.getElementsByTagName(''pre''),
+        pl = pre.length;
+    for (var i = 0; i < pl; i++) {
+        pre[i].innerHTML = ''<span class="line-number"></span>'' + pre[i].innerHTML + ''<span class="cl"></span>'';
+        var num = pre[i].innerHTML.split(/\\n/).length;
+        for (var j = 0; j < num; j++) {
+            var line_num = pre[i].getElementsByTagName(''span'')[0];
+            line_num.innerHTML += ''<span>'' + (j + 1) + ''</span>'';
+        }
+    }
+}, 15000);
+}();
+//]]>
+
+</script>
 </head>
 
 <body class="f9 b9">
-<pre>
+<pre><code>
 '
 
 p='\x1b\['        #shortcut to match escape codes
@@ -490,6 +545,6 @@ END {
 }'
 )
 
-printf '</pre>
+printf '</code></pre>
 </body>
 </html>\n'

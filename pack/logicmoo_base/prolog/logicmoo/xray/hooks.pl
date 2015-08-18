@@ -21,17 +21,10 @@
 %%% HOOKS CONFIGURATION
 
 hook_configuration :-
-	nl,write('HOOK CONFIGURATION:'),nl,nl,
-	
-	write("body hook handling     "),
-	write(' = '),
-	(body_hooks_flag -> write(on) ; write(off)),
-	nl,
-
-	write("predicate hook handling"),
-	write(' = '),
-	(pred_hooks_flag -> write(on) ; write(off)),
-	nl.
+	dmsg('HOOK CONFIGURATION:'),
+	show_call_value(body_hooks_flag),
+	% dmsg("~N% predicate hook handling"),
+        show_call_value(pred_hooks_flag).
 
 %%% Hook handling is turned off by no_hook_handling
 
@@ -98,13 +91,13 @@ bhook2_p(Head :- Body) :-
 bhook1(Head :- Body) :-
 	(Head = _) ->
 	    Head =.. [P|_],
-	    nl,write(b1:(P)),nl,nl;
+	    nl,dmsg(b1:(P)),nl,nl;
         %true ->
 	     true.
 bhook2(Head :- Body) :-
 	(Head = _) ->
 	    Head =.. [P|_],
-	    nl,write(b2:(P)),nl,nl;
+	    nl,dmsg(b2:(P)),nl,nl;
         %true ->
 	     true.
 
@@ -143,7 +136,7 @@ phook1_tests(P,N,Result) :-
 	phook1_p(P,N),
 	!,
 	head(P,N,Head),
-	Body=(nl,write(p1:P),nl,fail),
+	Body=(nl,dmsg(p1:P),nl,fail),
 	Result = (Head :- Body).
 phook1_tests(_,_,true).
 
@@ -151,7 +144,7 @@ phook2_tests(P,N,Result) :-
 	phook2_p(P,N),
 	!,
 	head(P,N,Head),
-	Body=(nl,write(p2:P),nl,fail),
+	Body=(nl,dmsg(p2:P),nl,fail),
 	Result = (Head :- Body).
 phook2_tests(_,_,true).
 
@@ -159,7 +152,7 @@ phook3_tests(P,N,Result) :-
 	phook3_p(P,N),
 	!,
 	head(P,N,Head),
-	Body=(nl,write(p3:P),nl,fail),
+	Body=(nl,dmsg(p3:P),nl,fail),
 	Result = (Head :- Body).
 phook3_tests(_,_,true).
 

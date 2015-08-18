@@ -17,6 +17,11 @@
 :- ensure_loaded(hooks).
 :- ensure_loaded(lemma).
 
+show_call_value(N,V):- V -> dmsg(N=true) ; dmsg(N=false).
+show_call_value(V):-show_call_value(V,V).
+show_call_value1(N,V):- V -> dmsg(N=V) ; dmsg(N=false).
+
+
 :- no_hook_handling,hook_configuration.     % indicated by {pred|body}_hook_flag
 
 :- no_lemma_handling,lemma_configuration.   % indicated by lemma_handling_flag
@@ -74,19 +79,19 @@ dont_compile_count_inferences :- dont_count_inferences.
 :- dont_compile_count_inferences.
 
 pttp_configuration :-
-	nl,writeln('PTTP CONFIGURATION:'),nl,
+	nl,dmsg('PTTP CONFIGURATION:'),nl,
 	(count_inferences_pred(true) ->
-	    writeln('PTTP counts no inferences.');
-	    writeln('PTTP counts inferences!')),
+	    dmsg('PTTP counts no inferences.');
+	    dmsg('PTTP counts inferences!')),
         (trace_search_progress_pred(nop) ->
-	    writeln('PTTP does not trace search progress.');
-	    writeln('PTTP traces search progress!')),
+	    dmsg('PTTP does not trace search progress.');
+	    dmsg('PTTP traces search progress!')),
 	(compile_proof_printing ->
-	    writeln('PTTP compiles proof printing!');
-	    writeln('PTTP does not compile proof printing.')),
+	    dmsg('PTTP compiles proof printing!');
+	    dmsg('PTTP does not compile proof printing.')),
 	(compile_complete_search ->
-	    writeln('PTTP compiles complete search!');
-	    writeln('PTTP does not compile complete search.')).
+	    dmsg('PTTP compiles complete search!');
+	    dmsg('PTTP does not compile complete search.')).
 
 :- pttp_configuration.
 
@@ -94,16 +99,16 @@ pttp_configuration :-
 %%% XRay CONFIGURATION
 
 xray_configuration :-
-	nl,write('XRay CONFIGURATION:'),nl,nl,
+	nl,dmsg('XRay CONFIGURATION:'),nl,nl,
 	
-	write(delta_ordering),
-	write(' = '),
-	(delta_ordering(O), write(O),write(' '),fail ; write('.')),
+	dmsg(delta_ordering),
+	dmsg(' = '),
+	(delta_ordering(O), dmsg(O),dmsg(' '),fail ; dmsg('.')),
 	nl,
 	
-	write(verbose_mode),
-	write(' = '),
-	(verbose_flag, write("on") ; write("off")),
+	dmsg(verbose_mode),
+	dmsg(' = '),
+	(verbose_flag, dmsg("on") ; dmsg("off")),
 	nl.
 
 %%% delta_ordering stears the order of admissibility 
@@ -152,7 +157,7 @@ no_verbose_mode.
 %%% verbose predicate, chatting if verbose_mode is turned on
 verbose(X) :-
 	verbose_flag ->
-	        write(X),nl;
+	        dmsg(X),nl;
 	%true->
 		true.
 
