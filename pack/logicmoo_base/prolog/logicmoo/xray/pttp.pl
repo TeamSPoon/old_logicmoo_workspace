@@ -691,33 +691,6 @@ identical_member(X,[_|L]) :-
 %%% Include a literal in the body of each clause to
 %%% indicate the number of the formula the clause came from.
 %%% SOURCE
-:- if(not_xray).
-clauses((A , B),L,WffNum1,WffNum2) :-
-	!,
-	clauses(A,L1,WffNum1,W),
-	clauses(B,L2,W,WffNum2),
-	conjoin(L1,L2,L).
-clauses(A,L,WffNum1,WffNum2) :-
-	write_clause_with_number(A,WffNum1),
-	head_literals(A,Lits),
-	clauses2(A,Lits,L,WffNum1),
-	WffNum2 is WffNum1 + 1.
-
-clauses2(A,[Lit|Lits],L,WffNum) :-
-	body_for_head_literal(Lit,A,Body1),
-	(Body1 == false ->
-		L = true;
-	%true ->
-		% conjoin(infer_by(WffNum),Body1,Body),
-                conjoin(infer_by(proof(A)),Body1,Body),
-		clauses2(A,Lits,L1,WffNum),
-		conjoin((Lit :- Body),L1,L)).
-clauses2(_,[],true,_).
-:- else.
-
-
-%%% SOURCE
-
 clauses((A , B),L,WffNum) :-
         !,
         clauses(A,L1,WffNum),
@@ -738,8 +711,6 @@ clauses(A,[Lit|Lits],L,WffNum) :-
         clauses(A,Lits,L1,WffNum),
         conjoin((Lit :- Body),L1,L).
 clauses(_,[],true,_).
-
-:- endif.
 
 head_literals(Wff,L) :-
 	Wff = (A :- B) ->	% contrapositives not made for A :- ... inputs
@@ -841,7 +812,8 @@ query_n(M) :-                             % call query with depth bound M
                 query(M,_N).
 
 query :-                                % unbounded prove of query
-        query_n(1000000).
+        query_n(1000000)
+.
 
  %%% ***
 %%% ****if* PTTP/write_clause

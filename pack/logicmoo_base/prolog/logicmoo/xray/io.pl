@@ -221,26 +221,3 @@ tell(Name,Wff) :-
 	conjoin(Wff,KB,NewKB),
 	dpttp(Name,NewKB).
 
-write_proved(Proof,ProofEnd) :-
-        write('proved'),
-	verbose_flag ->
-	        write(' by:'),
-		write_proof(Proof,ProofEnd);
-	%true->
-		length(Proof,X),
-		write(' qed ;-) ':X).
-
-write_proof(Proof,ProofEnd) :-
-        Proof == ProofEnd,
-        !.
-
-write_proof(Proof,ProofEnd) :-
-        Proof =@= ProofEnd,
-        !.
-
-write_proof([X|Y],ProofEnd) :-
-	
-        write(' '),
-        writeq(X),
-        nl,
-        write_proof(Y,ProofEnd).
