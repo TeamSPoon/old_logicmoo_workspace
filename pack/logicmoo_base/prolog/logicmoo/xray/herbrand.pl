@@ -76,7 +76,7 @@ constants(Wff,L) :-
                 constants(A,L1),
                 constants(B,L2),
                 list_union(L2,L1,L);
-        myfunctor(Wff,search,_) ->        % list constants in first argument of search
+        myfunctor(Wff,prove,_) ->        % list constants in first argument of prove
                 arg(1,Wff,X),
                 constants(X,L);
         builtin(Wff) ->
@@ -130,7 +130,7 @@ variables(Wff,L) :-
                 variables(A,L1),
                 variables(B,L2),
                 list_union(L2,L1,L);
-        myfunctor(Wff,search,_) ->        % list variables in first argument of search
+        myfunctor(Wff,prove,_) ->        % list variables in first argument of prove
                 arg(1,Wff,X),
                 variables(X,L);
         builtin(Wff) ->

@@ -463,3 +463,6 @@ dpttp3 :-
 	Name = 'temp',
 	dpttp3(Name).
 
+%:- dont_print_proof.
+%:- lemma_handling.
+:- xray_configuration.

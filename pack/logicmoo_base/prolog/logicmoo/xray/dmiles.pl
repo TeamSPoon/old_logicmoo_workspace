@@ -33,6 +33,7 @@ prove_query:-query.
 
 :- ensure_loaded(base).
 :- ensure_loaded(pttp).
+:- ensure_loaded(xray).
 :- ensure_loaded(builtin).
 :- ensure_loaded(model).
 :- ensure_loaded(io).
@@ -284,9 +285,47 @@ query_clause(WffI,WffO) :-
         %true ->
 	        fail.
 
+
+% :-abolish(prove,4).
+%%% Depth-first iterative-deepening prove can be
+%%% specified for a goal by wrapping it in a call
+%%% on the prove predicate:
+%%%    prove(Goal,Max,Min,Inc)
+prove(Goal,Max,Min,Inc) :-
+        PrevInc is Min + 1,
+        prove_previnc(Goal,Max,Min,Inc,PrevInc).
+
+prove_previnc(Goal,Max,Min,Inc,PrevInc) :-
+        show_call(add_goal_args_n(Goal,PrevInc,Goal2)),
+        debugOnError(prove(Goal2,Max,Min,Inc,10000,DepthIn,DepthOut)).
+
+append_termlist(PLeft,List,Result):-PLeft=..Left,append(Left,List,NewL),Result=..NewL.
+
+
+add_goal_args_n(Qry,M,Made) :-   % call query with depth bound M
+	(compile_complete_search, (compile_proof_printing , lemma_handling_flag)) ->
+	        append_termlist(Qry,[M,_N,_LemProof,_LemProofEnd,_Proof,_ProofEnd],Made);
+        (compile_complete_search, (compile_proof_printing ; lemma_handling_flag)) -> 
+                append_termlist(Qry,[M,_N,_Proof,_ProofEnd],Made);
+        compile_complete_search ->
+                append_termlist(Qry,[M,_N],Made).
+
+add_goal_args(Qry,Made) :-                                % unbounded prove of query
+        (compile_complete_search ->
+	    add_goal_args_n(Qry,1000000,Made);
+	%true ->  % not a "complete" search
+	    ((compile_proof_printing , lemma_handling_flag) ->
+	         append_termlist(Qry,[_LemProof,_LemProofEnd,_Proof,_ProofEnd],Made);
+	     (compile_proof_printing ; lemma_handling_flag) -> 
+		 append_termlist(Qry,[_Proof2,_ProofEnd],Made);
+             %true ->
+		 throw(unknown_type(add_goal_args(Qry,Made))))).
+	    
+
 :-abolish(query,1).
-query(M) :-                             % call query with depth bound M
-	(compile_complete_search, compile_proof_printing , lemma_handling_flag) ->
+query_n(M) :-  !, add_goal_args_n(query,M,Made),Made.
+query_n(M) :-                             % call query with depth bound M
+	(compile_complete_search, (compile_proof_printing , lemma_handling_flag)) ->
 	        query(M,_N,_LemProof,_LemProofEnd,_Proof,_ProofEnd);
         (compile_complete_search, (compile_proof_printing ; lemma_handling_flag)) -> 
                 query(M,_N,_Proof,_ProofEnd);
@@ -294,16 +333,17 @@ query(M) :-                             % call query with depth bound M
                 query(M,_N).
 
 :-abolish(query,0).
+query :-  !, add_goal_args(query,Made),Made.
 query :-                                % unbounded prove of query
         (compile_complete_search ->
-	    query(1000000);
-	%true ->
+	    query_n(1000000);
+	%true ->  % not complete search
 	    ((compile_proof_printing , lemma_handling_flag) ->
 	         query(_LemProof,_LemProofEnd,_Proof,_ProofEnd);
 	     (compile_proof_printing ; lemma_handling_flag) -> 
 		 query(_Proof2,_ProofEnd);
              %true ->
-		 query(1000000))).
+		 throw(unknown_type(query(1000000))))).
 	    
 
 

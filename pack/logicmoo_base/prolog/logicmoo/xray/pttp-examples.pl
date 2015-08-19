@@ -167,7 +167,7 @@ chang_lee_example6 :-
 %%% SOURCE
 
 chang_lee_example7 :-
-	pttp((
+	notrace((pttp((
 		p(a),
 		m(a,s(c),s(b)),
 		m(X,X,s(X)),
@@ -175,7 +175,7 @@ chang_lee_example7 :-
 		(not_m(X,Y,Z) ; d(X,Z)),
 		(not_p(X) ; not_m(Y,Z,U) ; not_d(X,U) ; d(X,Y) ; d(X,Z)),
 		(query :- d(a,b))
-	)),
+	)))),
 	fail.
 chang_lee_example7 :-
 	prove(query).

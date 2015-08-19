@@ -602,11 +602,6 @@ search_cost(Body,HeadArgs,N) :-
 prove(Goal,Max,Min,Inc,ProofIn) :-
 	prove(Goal,Max,Min,Inc,ProofIn,_).
 
-%%% Depth-first iterative-deepening prove can be
-%%% specified for a goal by wrapping it in a call
-%%% on the prove predicate:
-%%%    prove(Goal,Max,Min,Inc)
-
 
 %%% Depth-first iterative-deepening prove can be
 %%% specified for a goal by wrapping it in a call
@@ -615,8 +610,8 @@ prove(Goal,Max,Min,Inc,ProofIn) :-
 prove(Goal,Max,Min,Inc) :-
         PrevInc is Min + 1,
         add_complete_search_args(Goal,Goal,DepthIn,DepthOut,Goal1),
-        (compile_proof_printing ->
-                add_proof_recording_args(Goal1,_Proof,_ProofEnd,Goal2);
+   (compile_proof_printing ->
+           add_proof_recording_args(Goal1,_Proof,_ProofEnd,Goal2);
         %true ->
                 Goal2 = Goal1),
         !,
@@ -662,8 +657,8 @@ prove(Goal,Max,Min,Inc,_PrevInc,DepthIn,DepthOut) :-
 %%%   that would be created by make_wrapper
 %%% SOURCE
 
-query(PosAncestors,NegAncestors,DepthIn,DepthOut,ProofIn,ProofOut) :-
-	int_query(PosAncestors,NegAncestors,DepthIn,DepthOut,ProofIn,ProofOut,query).
+% wrong pttp ! query(PosAncestors,NegAncestors,DepthIn,DepthOut,ProofIn,ProofOut) :-
+%	int_query(PosAncestors,NegAncestors,DepthIn,DepthOut,ProofIn,ProofOut,query).
 %%% ***
 %%% ****if* PTTP/unifiable_member
 %%% DESCRIPTION
@@ -839,14 +834,14 @@ procedures_with_ancestor_tests([],_Clauses,true).
 :-endif.
 
 
-query(M) :-                             % call query with depth bound M
+query_n(M) :-                             % call query with depth bound M
         compile_proof_printing -> 
                 query(M,_N,_Proof,_ProofEnd);
         %true ->
                 query(M,_N).
 
 query :-                                % unbounded prove of query
-        query(1000000).
+        query_n(1000000).
 
  %%% ***
 %%% ****if* PTTP/write_clause
@@ -1320,6 +1315,10 @@ ancestor_tests(P,N,Result) :-
                 conjoin(C1,C2,Result).
 
 
+:- dynamic(compile_complete_search/0).
+compile_complete_search.
+
+:- ensure_loaded(io).
 
 add_complete_search(HeadBody,HeadBody) :-  (\+ compile_complete_search ),!.
 add_complete_search((Head :- Body),(Head1 :- Body1)) :-

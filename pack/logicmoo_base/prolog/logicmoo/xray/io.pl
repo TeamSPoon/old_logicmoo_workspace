@@ -233,6 +233,11 @@ write_proved(Proof,ProofEnd) :-
 write_proof(Proof,ProofEnd) :-
         Proof == ProofEnd,
         !.
+
+write_proof(Proof,ProofEnd) :-
+        Proof =@= ProofEnd,
+        !.
+
 write_proof([X|Y],ProofEnd) :-
 	
         write(' '),

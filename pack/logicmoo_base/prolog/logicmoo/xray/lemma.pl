@@ -213,7 +213,7 @@ lemma_format(disj) :-
 %%% at the end.
 
 add_lemmatization((Head :- Body),(Head1 :- Body1)) :-
-	lemma_handling_flag,
+        lemma_handling_flag,
 	!,
         Head =.. L,
         append(L,[ProofOut,ProofEnd],L1),
@@ -253,9 +253,9 @@ add_lemmatization_args(Body,Proof,ProofEnd,Body1,Lemma) :-
         Body = infer_by(X) ->
 	        add_lemmatization_inference(X,Proof,ProofEnd,Record,Lemma),
 		conjoin(Body,Record,Body1);
-        Body =.. [search,Goal|L] ->
+        Body =.. [prove,Goal|L] ->
                 add_lemmatization_args(Goal,Proof,ProofEnd,Goal1),
-                Body1 =.. [search,Goal1|L],
+                Body1 =.. [prove,Goal1|L],
                 Lemma = true;
         Body = fail ->
                 Body1 = Body,

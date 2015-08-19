@@ -28,7 +28,6 @@ show_call_value1(N,V):- V -> dmsg(N=V) ; dmsg(N=false).
 
 :- dynamic(delta_ordering/1).
 :- dynamic(verbose_flag/0).
-:- dynamic(compile_complete_search/0).
 
 %%% ----------------------------------------------------------------------
 %%% PTTP CONFIGURATION
@@ -156,8 +155,7 @@ verbose(X) :-
 %%% PRINT CONFIGURATION
 %%%
 
-% :- lemma_handling.   % indicated by lemma_handling_flag
-
+:- lemma_type(all).
 xray_configuration :-
 	hook_configuration,
 	lemma_configuration,
