@@ -17,6 +17,8 @@
         last_test_name/1,
         test_call/1]).
 
+:- include(prologmud(mud_header)).
+
 :- thread_local was_test_name/1.
 :- multifile(user:mud_regression_test/0).
 :- multifile(user:mud_test_local/0).

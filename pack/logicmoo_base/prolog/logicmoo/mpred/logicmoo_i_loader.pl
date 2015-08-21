@@ -578,9 +578,9 @@ show_interesting_cl(Dir,P):- loading_source_file(File),get_file_type(File,Type),
   ((nonvar(Dir),functor(Dir,Type,_))->true;dmsg(Type:cl_assert(Dir,P))).
 
 :-meta_predicate(cl_assert(?,?)).
-cl_assert(kif(Dir),P):-show_call(must_det_l(( show_interesting_cl(kif(Dir),P),kif_process(P)))),!.
+cl_assert(kif(Dir),P):- show_call(must_det_l(( show_interesting_cl(kif(Dir),P),kif_process(P)))),!.
 cl_assert(Dir,P):- show_interesting_cl(Dir,P),pfc_assert(P).
-cl_assert(pl,P):-!, show_call(must_det_l((source_location(F,_L), '$compile_aux_clauses'(P,F)))).
+cl_assert(pl,P):-  !, show_call(must_det_l((source_location(F,_L), '$compile_aux_clauses'(P,F)))).
 cl_assert(_Code,P):- !, show_call(pfc_assert(P)).
 
 :- meta_predicate(pfc_file_expansion_cl_assert(?,?)).
@@ -588,12 +588,17 @@ pfc_file_expansion_cl_assert(_,cl_assert(pl,OO),OO,_):-!,show_interesting_cl(pl,
 pfc_file_expansion_cl_assert(I,cl_assert(OTHER,OO),OO,I):- inside_file(kif),is_kif_rule(OO),!,pfc_file_expansion_cl_assert(I,cl_assert(kif(OTHER),OO),OO,I).
 pfc_file_expansion_cl_assert(I,CALL,OO,O):- (current_predicate(_,CALL) -> ((must(call(CALL)),was_exported_content(I,CALL,OO))); OO=O).
 
-do_end_of_file_actions:- must(loading_source_file(F)),GETTER=onEndOfFile(F,TODO),forall(GETTER,((doall(show_call_failure(TODO))),ignore(retract(GETTER)))).
+in_include_file:- prolog_load_context(file,F),!, \+ prolog_load_context(source,F).
+
+% ensure we only process onEndOfFile directive at the end of the actual source files
+do_end_of_file_actions:- in_include_file,!.
+do_end_of_file_actions:- must(loading_source_file(F)),
+   GETTER=onEndOfFile(F,TODO),forall(GETTER,((doall(show_call_failure(TODO))),ignore(retract(GETTER)))).
 
 :- export(pfc_file_expansion/2).
 :- meta_predicate(pfc_file_expansion(?,?)).
 pfc_file_expansion(I,OO):- var(I),!,I=OO.
-pfc_file_expansion(end_of_file,end_of_file):-!,do_end_of_file_actions.
+pfc_file_expansion(end_of_file,end_of_file):-once(do_end_of_file_actions),!,fail.
 pfc_file_expansion(I,OO):- (I\=(:-(_))), I\= '$was_imported_kb_content$'(_,_),
    once(loop_check(pfc_file_expansion_0(I,O))),
    I\=@=O, 

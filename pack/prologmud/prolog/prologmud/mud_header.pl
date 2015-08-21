@@ -184,6 +184,7 @@
 :- multifile user:agent_text_command/4.
 :- multifile user:check_permanence/4.
 
+:- file_begin(pfc).
 :- enable_mpred_expansion.
 
 

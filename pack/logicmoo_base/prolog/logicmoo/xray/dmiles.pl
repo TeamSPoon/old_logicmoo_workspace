@@ -245,27 +245,22 @@ apply_to_conjuncts(Wff,P,Wff1) :-
 %%% ***
 %%% ****if* PTTP/apply_to_tree
 %%% SOURCE
-apply_to_tree(Wff,must(P),Wff1) :- must(nonvar(P)),!, must(apply_to_tree(Wff,P,Wff1)).
-apply_to_tree(Wff,show_call(P),Wff1) :- must(nonvar(P)),!, show_call(apply_to_tree(Wff,P,Wff1)).
-apply_to_tree((A , B),P,(A1 , B1)) :-!, must(nonvar(A)),
-		apply_to_tree(A,P,A1),
-		apply_to_tree(B,P,B1).
-apply_to_tree([A | B ],P,[A1 | B1 ] ) :-!, must(is_list(B)),
-		apply_to_tree(A,P,A1),
-		apply_to_tree(B,P,B1).
-apply_to_tree((A ; B),P,(A1 ; B1)) :- !,must(nonvar(A)),
-		apply_to_tree(A,P,A1),
-		apply_to_tree(B,P,B1).
-apply_to_tree((A :- B),P,(A1 :- B1)) :- !,must(nonvar(A)),
-		apply_to_tree(A,P,A1),
-		apply_to_tree(B,P,B1).
-apply_to_tree(true,_,true) :-!.
-apply_to_tree(Wff,P,Wff1) :- must(P\=must(_)),
-		P =.. G,
-		append(G,[Wff,Wff1],G1),
-		T1 =.. G1,
-		call(T1),!.
-
+/*
+apply_to_tree([],Wff,Wff) :- !.
+apply_to_tree([P1|PS],Wff,Wff1) :- !,apply_to_tree(P,Wff,Wff0),apply_to_tree(PS,Wff0,Wff1).
+apply_to_tree(must(P),Wff,Wff1) :- must(nonvar(P)),!, must(apply_to_tree(P,Wff,Wff1)).
+apply_to_tree(show_call(P),Wff,Wff1) :- must(nonvar(P)),!, show_call(apply_to_tree(P,Wff,Wff1)).
+apply_to_tree(P,Wff,Wff1) :- call(P,Wff,Wff1),!.
+apply_to_tree(P,Wff,Wff) :- \+ compound(Wff),!.
+apply_to_tree(P,Wff,Wff1) :- call(P,Wff,Wff1),!.
+apply_to_tree(P,(A :- B),(A1 :- B1)) :- apply_to_tree(P,A,A1),apply_to_tree(P,B,B1).
+apply_to_tree(P,Wff,Wff1) :- predicate_property(Wff,meta_predicate(_)),
+               Wff=..[F|Args],
+               maplist(apply_to_tree(P),Args,Args1),
+               Wff1=..[F|Args1]
+               
+apply_to_tree(_,Wff,Wff) :-!.
+*/
 
 
 %%% ***

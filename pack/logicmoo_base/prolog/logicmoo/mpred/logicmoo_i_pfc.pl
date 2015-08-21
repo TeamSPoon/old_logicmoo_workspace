@@ -15,8 +15,19 @@
 %                            bug in the recorded database.
 %   Purpose: core Pfc predicates.
 
+/*
 
+LogicMOO is mixing Mark Stickel's PTTP (prolog techn theorem prover) to create horn clauses that 
+ PFC forwards and helps maintain in visible states )  in prolog knowledge base.. We use spft/4 to track deductions
+Research-wise LogicMOO has a main purpose is to prove that grounded negations (of contrapostives) are of first class in importance in helping
+with Wff checking/TMS 
+Also alows an inference engine constrain search.. PFC became important since it helps memoize and close off (terminate) transitive closures
 
+*/
+
+:-set_prolog_stack(global, limit(16*10**9)).
+:-set_prolog_stack(local, limit(16*10**9)).
+:-set_prolog_stack(trail, limit(16*10**9)).
 :-multifile(user:rescan_pfc_hook/0).
 :-dynamic(user:rescan_pfc_hook/0).
 :-dynamic(use_presently/0).
@@ -2317,8 +2328,8 @@ bases([X|Rest],L) :-
 	
 
 axiom(F) :-
-  pfc_get_support(F,(u,u));
-  pfc_get_support(F,(g,g));
+  %pfc_get_support(F,(u,u));
+  %pfc_get_support(F,(g,g));
   pfc_get_support(F,(OTHER,OTHER)).
 
 % axiom(F) :-  pfc_get_support(F,(U,U)).

@@ -29,6 +29,10 @@ user:file_search_path(library, '/devel/LogicmooDeveloperFramework/PrologMUD/pack
 
 :- else.
 
+:-set_prolog_stack(global, limit(16*10**9)).
+:-set_prolog_stack(local, limit(16*10**9)).
+:-set_prolog_stack(trail, limit(16*10**9)).
+:- statistics.
 :- attach_packs.
 :- initialization(attach_packs).
 user:file_search_path(prologmud, library(prologmud)).

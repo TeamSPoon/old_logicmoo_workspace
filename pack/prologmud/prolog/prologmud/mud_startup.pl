@@ -53,9 +53,9 @@ prolog:message(git(update_versions),A,A):-!.
 % :- make.
 %:- portray_text(true).
 
-:-set_prolog_stack(global, limit(64*10**9)).
-:-set_prolog_stack(local, limit(64*10**9)).
-:-set_prolog_stack(trail, limit(64*10**9)).
+:-set_prolog_stack(global, limit(32*10**9)).
+:-set_prolog_stack(local, limit(32*10**9)).
+:-set_prolog_stack(trail, limit(32*10**9)).
 
 
 :- multifile( entailment:rdf /3 ).

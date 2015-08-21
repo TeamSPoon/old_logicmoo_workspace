@@ -24,6 +24,8 @@
 :- assert_until_eof(infSupertypeName).
 :- onEndOfFile(dmsg(infSupertypeName)).
 
+
+:- include(prologmud(mud_header)).
 :- file_begin(pfc).
 :- retractall(thlocal:disable_mpred_term_expansions_locally).
 
