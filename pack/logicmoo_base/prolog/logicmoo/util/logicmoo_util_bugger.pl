@@ -1777,7 +1777,7 @@ matches_term0(Filter,Term):- atomic(Filter),!,contains_atom(Term,Filter).
 matches_term0(F/A,Term):- (var(A)->member(A,[0,1,2,3,4]);true), functor_safe(Filter,F,A), matches_term0(Filter,Term).
 matches_term0(Filter,Term):- sub_term(STerm,Term),nonvar(STerm),matches_term0(Filter,STerm),!.
 
-show_source_location :- once((ignore((prolog_load_context(file,F),prolog_load_context(stream,S),line_count(S,L),format_to_error('~N% ~w~n',[F:L]))))).
+show_source_location :- once((ignore((prolog_load_context(file,F),prolog_load_context(stream,S),line_count(S,L),format_to_error('~N% ~w ',[F:L]))))).
 
 :-meta_predicate(gripe_time(+,0)).
 :-swi_export(gripe_time/2).
@@ -1808,7 +1808,7 @@ show_call_success(C):- show_call0(C),dmsg(show_call_success(C)).
 
 :- meta_predicate logOnFailure(0).
 :- swi_export(logOnFailure/1).
-logOnFailure(C):-one_must(C,(dmsg(failed_show_call(C)),garbage_collect_atoms,!,fail)).
+logOnFailure(C):-one_must(C,notrace((dmsg(failed_show_call(C)),garbage_collect_atoms,!,fail))).
 
 
 :-dynamic(user:logLevel/2).

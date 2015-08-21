@@ -35,6 +35,105 @@ model_initialization(Matrix,cmm(Model,NewMatrix)) :-
 	display_cmm('INITIALIZATION',cmm(Model,NewMatrix)),
 	!.
 
+%%% Consistency checking.
+%%%
+%%% Add extra arguments to each goal so that information
+%%% on what assumptions were made in the proof can be checked
+%%% at each step/the end.
+%%%
+%%% I suppose Wff has to be replaced by cmm(Model,ModelStructure) ...
+%%% [all this is a quick copy of add_proof_recording ...]
+% ======================================================
+% HEAD+(ModelIn,ModelOut)  BODY+(ModelIn,ModelOut)
+% ======================================================
+add_consistency_checking((Head :- Body),(Head :- Body)) :- \+ do_model_inits,!.
+
+add_consistency_checking((Head :- Body),(Head1 :- Body1)) :-
+        functor(Head,query,_) ->
+                Head1 = Head,
+		(do_model_inits -> conjoin(model_initialization(MM0),Body,Body2); Body=Body2),
+		add_consistency_checking_args(Body2,MM0,MMOut,Body1);
+        %true ->
+		Head =.. L,
+		append(L,[MMIn,MMOut],L1),
+		Head1 =.. L1,
+		add_consistency_checking_args(Body,MMIn,MMOut,Body1).
+
+add_consistency_checking_args(Body,MMIn,MMOut,Body1) :-
+        Body = (A , B) ->
+                add_consistency_checking_args(A,MMIn,MMIn1,A1),
+                add_consistency_checking_args(B,MMIn1,MMOut,B1),
+                conjoin(A1,B1,Body1);
+        Body = (A ; B) ->
+                add_consistency_checking_args(A,MMIn,MMOut,A1),
+                add_consistency_checking_args(B,MMIn,MMOut,B1),
+                disjoin(A1,B1,Body1);
+        Body =.. [prove,Goal|L] ->
+                add_consistency_checking_args(Goal,MMIn,MMOut,Goal1), % ???
+                Body1 =.. [prove,Goal1|L];
+        Body = justification(X) ->
+		Body1 = compatible(X,MMIn,MMOut);
+        Body = fail ->
+                Body1 = Body;
+        builtin(Body) ->
+                MMIn = MMOut,
+                Body1 = Body;
+        %true ->
+                Body =.. L,
+                append(L,[MMIn,MMOut],L1),
+                Body1 =.. L1.
+
+classical_clauses(WffI,WffO) :-
+        WffI = (A , B) ->
+                classical_clauses(A,A1),
+                classical_clauses(B,B1),
+		conjoin(A1,B1,WffO);
+        WffI = (A ; B) ->
+                classical_clauses(A,A1),
+                classical_clauses(B,B1),
+		disjoin(A1,B1,WffO);
+        WffI = (A :- B) ->                        % ??? (special case query elim. TS Apr04)
+	        WffO = true;
+        builtin(WffI) ->
+                WffO = true;
+        %true ->
+	        WffI = WffO.
+
+
+query_clause(WffI,WffO) :-
+        WffI = (A , B) ->
+	        (query_clause(A,WffO);
+                 query_clause(B,WffO));
+        WffI = (A ; B) ->
+                (query_clause(A,WffO);
+                 query_clause(B,WffO));
+        WffI = (A :- B) ->
+	        (A = query ->
+                      classical_clauses(B,WffO);
+		 %true ->
+                      fail);
+        %true ->
+	        fail.
+
+
+add_model_structure(WffI,Q,C,WffO) :-
+	WffI = (A , B) ->
+                add_model_structure(A,Q,C,A1),
+                add_model_structure(B,Q,C,B1),
+		conjoin(A1,B1,WffO);
+        WffI = (A ; B) ->
+                add_model_structure(A,Q,C,A1),
+                add_model_structure(B,Q,C,B1),
+		disjoin(A1,B1,WffO);
+        WffI = (A :- B) ->
+                add_model_structure(B,Q,C,B1),
+		WffO = (A :- B1);
+	WffI = model_initialization(Var) ->
+	        combine_clauses(Q,C,Matrix),
+		WffO = model_initialization(Matrix,Var);
+        %true ->
+	        WffO = WffI.
+
 %%% Runtime predicate for consistency checking
 %%%
 

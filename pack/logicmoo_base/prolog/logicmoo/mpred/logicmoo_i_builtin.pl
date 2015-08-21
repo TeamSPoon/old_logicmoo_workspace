@@ -1259,7 +1259,7 @@ isFact(A):- cwc, nonvar(A), ( added(A) ; clause_asserted(A)),not((arg(_,A,V),var
 
 
 
-pfc_default(((argIsa(Pred,N,FT),ttFormatType(FT)/(isFact(argIsa(Pred,N,FT)),ground(argIsa(Pred,N,FT))))=>argQuotedIsa(Pred,N,FT))).
+% pfc_default(((argIsa(Pred,N,FT),ttFormatType(FT)/(isFact(argIsa(Pred,N,FT)),ground(argIsa(Pred,N,FT))))=>argQuotedIsa(Pred,N,FT))).
 pfc_default(((genlPreds(Child,Parent),argIsa(Parent,N,FT))=>argIsa(Child,N,FT))).
 pfc_default(((genlPreds(Child,Parent),argQuotedIsa(Parent,N,FT)/ground(argIsa(Parent,N,FT)))=>argQuotedIsa(Child,N,FT))).
 

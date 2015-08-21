@@ -91,6 +91,8 @@ push_env_ctx:-!.
 :- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
 
 
+:- prolog.
+
 :- listing([storage_plugin_update,filesys:filesys_data]).
 
 

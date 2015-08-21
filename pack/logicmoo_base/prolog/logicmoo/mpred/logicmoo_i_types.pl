@@ -310,6 +310,7 @@ isa_backchaing(I,T):- (call_tabled(isa(I,T),no_repeats(loop_check(isa_backchaing
 
 :-export(isa_backchaing_0/2).
 isa_backchaing_0(I,T):- T==ftVar,!,is_ftVar(I).
+isa_backchaing_0(I,T):- nonvar(I),is_ftVar(I),!,T=ftVar.
 isa_backchaing_0(_,T):- T==ftProlog,!.
 isa_backchaing_0(I,T):-  I==T,I=ttTypeByAction,!,fail.
 isa_backchaing_0(I,T):-  nonvar(I),nonvar(T),not_mud_isa(I,T),!,fail.

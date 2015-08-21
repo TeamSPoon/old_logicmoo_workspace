@@ -212,6 +212,10 @@ lemma_format(disj) :-
 %%% on what inferences were made in the proof can be printed
 %%% at the end.
 
+% ======================================================
+% HEAD+(LemmaPrfIn,LemmaPrfOut)  BODY+(LemmaPrfIn,LemmaPrfOut)
+% ======================================================
+add_lemmatization((Head :- Body),(Head :- Body)):-  \+ lemma_handling_flag,!.
 add_lemmatization((Head :- Body),(Head1 :- Body1)) :-
         lemma_handling_flag,
 	!,
@@ -229,7 +233,7 @@ add_lemmatization((Head :- Body),(Head1 :- Body1)) :-
         %true ->
              Body1 = Body2,
              ProofOut = Proof).
-add_lemmatization((Head :- Body),(Head :- Body)).
+
 
 add_lemmatization_p(Head :- Body) :-
 	lemma_flag,
@@ -254,7 +258,7 @@ add_lemmatization_args(Body,Proof,ProofEnd,Body1,Lemma) :-
 	        add_lemmatization_inference(X,Proof,ProofEnd,Record,Lemma),
 		conjoin(Body,Record,Body1);
         Body =.. [prove,Goal|L] ->
-                add_lemmatization_args(Goal,Proof,ProofEnd,Goal1),
+                add_lemmatization_args(Goal,Proof,ProofEnd,Goal1,Lemma),
                 Body1 =.. [prove,Goal1|L],
                 Lemma = true;
         Body = fail ->

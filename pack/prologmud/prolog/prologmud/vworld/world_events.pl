@@ -8,9 +8,7 @@
 */
 % :-swi_module(world_events,[]).
 
-/*
-% This file is "included" from world.pl 
-*/
+:- include(prologmud(mud_header)).
 
 
 asInvoked(Cmd,[L|Ist]):-stack_check,once(append([L|Ist],[],Foo)),Foo\==[L|Ist],!,asInvoked(Cmd,Foo).

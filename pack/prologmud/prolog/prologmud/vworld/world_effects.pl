@@ -8,10 +8,8 @@
 %
 */
 % :-swi_module(world_effects,[]).
-/*
-% This file is "included" from world.pl 
-*/
 
+:- include(prologmud(mud_header)).
 
 prologHybrid(mudActAffect/3).
 

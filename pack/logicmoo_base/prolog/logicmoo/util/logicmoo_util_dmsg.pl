@@ -51,13 +51,17 @@ indent_e(X):-XX is X -1,!,write(' '), indent_e(XX).
 % ===================================================================
 
 fmt0(user_error,F,A):-!,thread_current_error_stream(main,Err),!,format(Err,F,A).
+fmt0(current_error,F,A):-!,thread_current_error_stream(Err),!,format(Err,F,A).
 fmt0(X,Y,Z):-catchvv((format(X,Y,Z),flush_output_safe(X)),E,dmsg(E)).
-fmt0(X,Y):-catchvv((format(X,Y),flush_output_safe),E,dmsg(E)).
+fmt0(X,Y):-catchvv((format(X,Y),flush_output_safe),E,dfmt(E:format(X,Y))).
 fmt0(X):- (atomic(X);is_list(X)),catchvv(text_to_string(X,S),_,fail),!,'format'('~w',[S]),!.
 fmt0(X):- (atom(X) -> catchvv((format(X,[]),flush_output_safe),E,dmsg(E)) ; (term_to_message_string(X,M) -> 'format'('~q~n',[M]);fmt_or_pp(X))).
 fmt(X):-fresh_line,fmt_ansi(fmt0(X)).
 fmt(X,Y):- fresh_line,fmt_ansi(fmt0(X,Y)),!.
 fmt(X,Y,Z):- fmt_ansi(fmt0(X,Y,Z)),!.
+
+fmt9(fmt0(F,A)):-catch(fmt0(F,A),_,fail),!.
+fmt9(Msg):- portray_clause_w_vars(Msg).
 
 % :-reexport(library(ansi_term)).
 
@@ -91,6 +95,7 @@ with_output_to_stream(Stream,Goal):-
          Goal,
          set_output(Saved)).
 
+to_stderror(Call):- thread_current_error_stream(main,Err), with_output_to_stream(Err,Call).
 
 
 
@@ -107,82 +112,91 @@ with_dmsg(Functor,Goal):-
 :-use_module(library(listing)).
 sformat(Str,Msg,Vs,Opts):- nonvar(Msg),functor_safe(Msg,':-',_),!,with_output_to(string(Str),portray_clause_w_vars(user_output,Msg,Vs,Opts)).
 sformat(Str,Msg,Vs,Opts):- with_output_to(chars(Codes),(current_output(CO),portray_clause_w_vars(CO,':-'(Msg),Vs,Opts))),append([_,_,_],PrintCodes,Codes),'sformat'(Str,'   ~s',[PrintCodes]),!.
+
+
 portray_clause_w_vars(Out,Msg,Vs,Options):- \+ \+ ((prolog_listing:do_portray_clause(Out,Msg,[variable_names(Vs),numbervars(true),character_escapes(true),quoted(true)|Options]))),!.
+portray_clause_w_vars(Msg,Vs,Options):- portray_clause_w_vars(current_output,Msg,Vs,Options).
+portray_clause_w_vars(Msg,Options):- source_variables_l(Vs),portray_clause_w_vars(current_output,Msg,Vs,Options).
+portray_clause_w_vars(Msg):- source_variables_l(Vs),portray_clause_w_vars(current_output,Msg,Vs,[]).
 
+prepend_strings(S,AC,O):-once(atomics_to_string(LL,'\n',S)),[L,'']=LL,atom(L),atom_concat(AC,_,L),O=S,!.
+prepend_strings(S,AC,O):-atomics_to_string(Lines,'\n',S),!,atom_concat('\n',AC,Sep),atomics_to_string([''|Lines],Sep,O),!.
+in_cmt(Call):- prepend_each_line('% ',Call).
+with_current_indent(Call):- get_indent_level(Indent), indent_to_spaces(Indent,Space),prepend_each_line(Space,Call).
 
-:-swi_export((portray_clause_w_vars/4,dmsg5/2,ansicall/3,ansi_control_conv/2)).
+indent_to_spaces(1,' '):-!.
+indent_to_spaces(0,''):-!.
+indent_to_spaces(2,'  '):-!.
+indent_to_spaces(3,'   '):-!.
+indent_to_spaces(N,Out):- 1 is N rem 2,!, N1 is N-1, indent_to_spaces(N1,Spaces),atom_concat(' ',Spaces,Out).
+indent_to_spaces(N,Out):- N2 is N div 2, indent_to_spaces(N2,Spaces),atom_concat(Spaces,Spaces,Out).
 
-:-thread_local(tlbugger:skipDmsg/0).
-
-dmsginfo(V):-dmsg(info(V)).
-dmsg(V):- cnotrace((dmsg0(V))).
-
-:-swi_export(dmsg0/1).
-:-swi_export(dmsg1/1).
-dmsg0(V):- is_with_dmsg(FP),!,FP=..FPL,append(FPL,[V],VVL),VV=..VVL,once(dmsg0(VV)).
-dmsg0(_):- \+ always_show_dmsg, is_hiding_dmsgs,!.
-
-dmsg0(V):- var(V),!,dmsg0(dmsg_var(V)).
-dmsg0(NC):- cyclic_term(NC),!,format_to_error('~N~q~N',[dmsg_cyclic_term(NC)]).
-dmsg0(NC):- tlbugger:skipDmsg,!,format_to_error('~N~q~N',[skipDmsg(NC)]).
-
-dmsg0(V):- once(dmsg1(V)), ignore((hook:dmsg_hook(V),fail)).
-%dmsg1(trace_or_throw(V)):- dumpST(350),dmsg(warning,V),fail.
-%dmsg1(error(V)):- dumpST(250),dmsg(warning,V),fail.
-%dmsg1(warn(V)):- dumpST(150),dmsg(warning,V),fail.
-
-dmsg1(NC):- cyclic_term(NC),!,format_to_error('~N~q~N',[dmsg_cyclic_term(NC)]).
-dmsg1(skip_dmsg(_)):-!.
-%dmsg1(C):- \+ always_show_dmsg, dmsg_hides_message(C),!.
-dmsg1(ansi(Ctrl,Msg)):- ansicall(Ctrl,dmsg1(Msg)).
-dmsg1(C):-functor_safe(C,Topic,_),debugging(Topic,_True_or_False),logger_property(Topic,once,true),!,
-      (dmsg_log(Topic,_Time,C) -> true ; ((get_time(Time),asserta(dmsg_log(todo,Time,C)),!,dmsg2(C)))).
-
-
-dmsg1(_):- show_source_location,fail.
-dmsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall(Ctrl, dmsg2(Msg)).
-
-dmsg2(C):-not(ground(C)),copy_term(C,Stuff), snumbervars(Stuff),!,dmsg3(Stuff).
-dmsg2(Msg):-dmsg3(Msg).
-
-into_comments(S,AC,O):-atomics_to_string(Lines,'\n',S),!,atom_concat('\n',AC,Sep),atomics_to_string(Lines,Sep,O).
-
-dmsg3(Msg):- 
-         sformat(Str,Msg,[],[]),
-         string_to_atom(AStr,Str),concat_atom(Lines,'\n',AStr),
-         mesg_color(Msg,Ctrl),!,
-         thread_current_error_stream(main,Err),
-         with_output_to_stream(Err,  
-                     forall(member(E,Lines), dmsg5(Ctrl,E))).
-
-get_indent_level(Depth-25) :- if_prolog(swi,((prolog_current_frame(Frame),prolog_frame_attribute(Frame,level,Depth)))),!.
-get_indent_level(2):-!.
+prepend_each_line(Prepend,Call):-with_output_to(string(Str),Call),prepend_strings(Str,Prepend,StrOut),format('~s',[StrOut]).
 
 if_color_debug:-current_prolog_flag(dmsg_color,true).
 if_color_debug(Call):- if_color_debug(Call, true).
 if_color_debug(Call,UnColor):- if_color_debug->Call;UnColor.
 
-dmsg5(_,color(Ctrl,E)):-!,dmsg5(Ctrl,E).
-dmsg5(Ctrl,E):- get_indent_level(Indent), 
- (fresh_line,if_color_debug(write('\e[0m')),write('%'),indent_e(Indent),!,
-  ansicall(Ctrl,
-   if_color_debug(format('~w\e[0m',[E]),format('~w',[E]))),fresh_line),!.
 
-/*dmsg5([]):-!.
-dmsg5(LF):-functor_safe(LF,F,_),loggerReFmt(F,LR), ((LR==F,is_stream(F))->loggerFmtReal(F,LF,[]);dmsg(LR,LF,[])),!.
-dmsg5([A|L]):-!,dmsg('% ~q~n',[[A|L]]).
-dmsg5(Comp):-bugger:evil_term(_,Comp,Comp2),!,dmsg('% ~q~n',[Comp2]).
-dmsg5(Stuff):-!,dmsg('% ~q~n',[Stuff]).
-*/
-dmsg(_,F):-F==[-1];F==[[-1]].
-dmsg(F,A):-is_list(A),!,thread_current_error_stream(Err),nl(Err),fmt0(Err,F,A),nl(Err),flush_output_safe(Err),!.
-dmsg(_,_):- is_hiding_dmsgs,!.
-dmsg(C,T):-!, ansicall(C,dmsg(msg(C,T))).
-dmsg(C,T):-!, (( fmt('<font size=+1 color=~w>',[C]), fmt(T), fmt('</font>',[]))),!.
 
+:-swi_export((portray_clause_w_vars/4,color_dmsg/2,ansicall/3,ansi_control_conv/2)).
+
+:-thread_local(tlbugger:skipDmsg/0).
+
+
+
+
+dmsginfo(V):-dmsg(info(V)).
+dmsg(V):- notrace(dmsg0(V)).
+dmsg(F,A):-notrace(dmsg0(F,A)).
+dmsg0(_,_):- is_hiding_dmsgs,!.
+dmsg0(F,A):- is_sgr_on_code(F),!,dmsg(ansi(F,A)).
+dmsg0(F,A):- dmsg(fmt0(F,A)).
+vdmsg(L,F):-loggerReFmt(L,LR),loggerFmtReal(LR,F,[]).
 dmsg(L,F,A):-loggerReFmt(L,LR),loggerFmtReal(LR,F,A).
 
-vdmsg(L,F):-loggerReFmt(L,LR),loggerFmtReal(LR,F,[]).
+user:portray(A) :- compound(A),functor(A,(:-),_),portray_clause_w_vars(A),!.
+
+:-thread_local(tlbugger:in_dmsg/0).
+
+dmsg0(V):- tlbugger:in_dmsg,!,format_to_error('~N% ~q~N',[dmsg0(V)]).
+dmsg0(V):- asserta(tlbugger:in_dmsg,Ref),dmsg1(V),erase(Ref).
+
+:-swi_export(dmsg1/1).
+:-swi_export(dmsg2/1).
+dmsg1(V):- is_with_dmsg(FP),!,FP=..FPL,append(FPL,[V],VVL),VV=..VVL,once(dmsg1(VV)).
+dmsg1(_):- \+ always_show_dmsg, is_hiding_dmsgs,!.
+dmsg1(V):- var(V),!,dmsg1(warn(dmsg_var(V))).
+dmsg1(NC):- cyclic_term(NC),!,format_to_error('~N% ~q~N',[dmsg_cyclic_term(NC)]).
+dmsg1(NC):- tlbugger:skipDmsg,!,format_to_error('~N% ~q~N',[skipDmsg(NC)]).
+
+dmsg1(V):- once(dmsg2(V)), ignore((hook:dmsg_hook(V),fail)).
+
+dmsg2(NC):- cyclic_term(NC),!,format_to_error('~N% ~q~N',[dmsg_cyclic_term(NC)]).
+dmsg2(skip_dmsg(_)):-!.
+%dmsg2(C):- \+ always_show_dmsg, dmsg_hides_message(C),!.
+%dmsg2(trace_or_throw(V)):- dumpST(350),dmsg(warning,V),fail.
+%dmsg2(error(V)):- dumpST(250),dmsg(warning,V),fail.
+%dmsg2(warn(V)):- dumpST(150),dmsg(warning,V),fail.
+dmsg2(ansi(Ctrl,Msg)):- !, ansicall(Ctrl,dmsg3(Msg)).
+dmsg2(color(Ctrl,Msg)):- !, ansicall(Ctrl,dmsg3(Msg)).
+dmsg2(Msg):- mesg_color(Msg,Ctrl),ansicall(Ctrl,dmsg3(Msg)).
+
+dmsg3(C):-
+  ((functor_safe(C,Topic,_),debugging(Topic,_True_or_False),logger_property(Topic,once,true),!,
+      (dmsg_log(Topic,_Time,C) -> true ; ((get_time(Time),asserta(dmsg_log(todo,Time,C)),!,dmsg4(C)))))),!.
+
+dmsg3(C):-dmsg4(C),!.
+
+dmsg4(_):- show_source_location,fail.
+% dmsg4(C):- not(ground(C)),copy_term(C,Stuff), snumbervars(Stuff),!,dmsg5(Stuff).
+dmsg4(Msg):-dmsg5(Msg).
+
+dmsg5(Msg):- to_stderror(in_cmt(fmt9(Msg))).
+
+
+get_indent_level(Max) :- if_prolog(swi,((prolog_current_frame(Frame),prolog_frame_attribute(Frame,level,FD)))),Depth is FD div 5,Max is min(Depth,40),!.
+get_indent_level(2):-!.
 
 
 /*
@@ -289,30 +303,36 @@ keep_line_pos(S, G) :-
 :-dynamic(term_color0/2).
 
 
-term_color0(retract,magenta).
-term_color0(retractall,magenta).
+%term_color0(retract,magenta).
+%term_color0(retractall,magenta).
 term_color0(assertz,hfg(green)).
 term_color0(assertz_new,hfg(green)).
 term_color0(asserta_new,hfg(green)).
 term_color0(db_op,hfg(blue)).
 
-
+mesg_color(T,C):-var(T),!,nop(dumpST),!,C=[blink(slow),fg(red),hbg(black)],!.
+mesg_color(T,C):-is_sgr_on_code(T),!,C=T.
 mesg_color(T,C):-cyclic_term(T),!,C=reset.
-mesg_color(T,C):-var(T),!,dumpST,!,C=[blink(slow),fg(red),hbg(black)],!.
 mesg_color(T,C):- string(T),!,must(f_word(T,F)),!,functor_color(F,C).
+mesg_color([_,_,_T|_],C):-atom(T),mesg_color(T,C).
+mesg_color([T|_],C):-atom(T),mesg_color(T,C).
 mesg_color(T,C):-(atomic(T);is_list(T)),catchvv(text_to_string(T,S),_,fail),!,mesg_color(S,C).
 mesg_color(T,C):-not(compound(T)),term_to_atom(T,A),!,mesg_color(A,C).
 mesg_color(succeed(T),C):-nonvar(T),mesg_color(T,C).
+mesg_color((T),C):- \+ \+ ((predicate_property(T,meta_predicate(_)))),arg(1,T,E),nonvar(E),!,mesg_color(E,C).
 mesg_color(=(T,_),C):-nonvar(T),mesg_color(T,C).
 mesg_color(debug(T),C):-nonvar(T),mesg_color(T,C).
 mesg_color(_:T,C):-nonvar(T),!,mesg_color(T,C).
 mesg_color(T,C):-functor_safe(T,F,_),member(F,[color,ansi]),compound(T),arg(1,T,C),nonvar(C).
+mesg_color(T,C):-functor_safe(T,F,_),member(F,[succeed,must,call_with_attvars]),compound(T),arg(1,T,E),nonvar(E),!,mesg_color(E,C).
+mesg_color(T,C):-functor_safe(T,F,_),member(F,[fmt0,msg]),compound(T),arg(2,T,E),nonvar(E),!,mesg_color(E,C).
 mesg_color(T,C):-predef_functor_color(F,C),mesg_arg1(T,F).
 mesg_color(T,C):-nonvar(T),defined_message_color(F,C),matches_term(F,T),!.
 mesg_color(T,C):-functor_h0(T,F,_),!,functor_color(F,C),!.
 
-f_word(T,A):-concat_atom([A|_],' ',T),!.
-f_word(T,A):-concat_atom([A|_],'_',T),!.
+f_word(T,A):-concat_atom(List,' ',T),member(A,List),atom_length(A,L),L>0,!.
+f_word(T,A):-concat_atom(List,'_',T),member(A,List),atom_length(A,L),L>0,!.
+f_word(T,A):- string_to_atom(T,P),!,sub_atom(P,0,10,_,A),A\==P.
 f_word(T,A):- string_to_atom(T,A),!.
 
 mesg_arg1(T,_TT):-var(T),!,fail.
@@ -390,10 +410,14 @@ contrasting_color(_,default).
 
 :-thread_local(ansi_prop/2).
 
-sgr_on_code(Ctrl,OnCode):- ansi_term:sgr_code(Ctrl,OnCode),!.
-sgr_on_code(blink, 6).
-sgr_on_code(-Ctrl,OffCode):-  nonvar(Ctrl), sgr_off_code(Ctrl,OffCode),!.
-sgr_on_code(Foo,7):- format_to_error('~nMISSING: n~q~n',[sgr_on_code(Foo,7)]),!,dtrace(sgr_on_code(Foo,7)).
+sgr_on_code(Ctrl,OnCode):-sgr_on_code0(Ctrl,OnCode),!.
+sgr_on_code(Foo,7):- notrace((format_to_error('~NMISSING: ~q~n',[sgr_on_code(Foo,7)]))),!. % ,dtrace(sgr_on_code(Foo,7)))).
+
+is_sgr_on_code(Ctrl):-sgr_on_code0(Ctrl,_),!.
+
+sgr_on_code0(Ctrl,OnCode):- ansi_term:sgr_code(Ctrl,OnCode).
+sgr_on_code0(blink, 6).
+sgr_on_code0(-Ctrl,OffCode):-  nonvar(Ctrl), sgr_off_code(Ctrl,OffCode).
 
 sgr_off_code(Ctrl,OnCode):-ansi_term:off_code(Ctrl,OnCode),!.
 sgr_off_code(- Ctrl,OnCode):- nonvar(Ctrl), sgr_on_code(Ctrl,OnCode),!.

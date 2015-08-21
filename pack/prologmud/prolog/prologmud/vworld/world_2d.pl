@@ -25,9 +25,7 @@
          round_loc_target/8,
          to_3d/2))).
 
-/*
-% This file is "included" from world.pl 
-*/
+:- include(prologmud(mud_header)).
 
 :- do_gc.
 

@@ -490,6 +490,7 @@ get_file_type(File,Type):-file_name_extension(_,Type,File).
 is_pfc_file(F):- var(F),!,loading_source_file(F), is_pfc_file(F),!.
 is_pfc_file(F):- file_name_extension(_,pfc,F),!.
 is_pfc_file(F):- file_name_extension(_,mpred,F),!.
+is_pfc_file(F):- filematch(prologmud(**/*),F).
 is_pfc_file(F):- registered_mpred_file(F).
 is_pfc_file(F):- inside_file(pfc),!,loading_source_file(F).
 is_pfc_file(F):- file_name_extension(_,WAS,F),WAS\=pl,WAS\= '',WAS\=chr,!.

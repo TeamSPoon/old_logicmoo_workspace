@@ -45,11 +45,11 @@ pp_facts(P,C) :-
   pfc_facts(P,C,L),
   pfc_classify_facts(L,User,Pfc,_Rule),
   draw_line,
-  fmt("~N% User added facts:",[]),
+  fmt("User added facts:",[]),
   pp_items(Type,User),
   draw_line,
   draw_line,
-  fmt("~N% Pfc added facts:",[]),
+  fmt("Pfc added facts:",[]),
   pp_items(Type,Pfc),
   draw_line.
 
@@ -58,11 +58,11 @@ draw_line:- (thlocal:print_mode(H)->true;H=unknown),fmt("~N%%%%%%%%%%%%%%%%%%%%%
 
 pp_items(Type,[]).
 pp_items(Type,[H|T]) :-
-  ignore(pp_item(Type,H)),
+  ignore(pp_item(Type,H)),!,
   pp_items(Type,T).
-pp_items(Type,H) :- gnore(pp_item(Type,H)).
+pp_items(Type,H) :- ignore(pp_item(Type,H)).
 
-pfc_trace_item(M,H):- ignore(thlocal:pfc_trace_exec-> debugOnError(pp_item(M,H)); true).
+pfc_trace_item(M,H):- ignore(thlocal:pfc_trace_exec-> debugOnError(in_cmt(pp_item(M,H))); true).
 
 
    
@@ -73,14 +73,14 @@ pp_item(M,H):- flag(show_asserions_offered,X,X+1),thlocal:print_mode(html),!, (\
 
 
 pp_item(M,spft(W,U,U)):-!,pp_item(M,U:W).
-pp_item(M,spft(W,F,U)):- atom(U),!, fmt('~N%~n',[]),pp_item(M,U:W), fmt('~N% rule: ~q~n%~n', [F]),!.
-pp_item(M,spft(W,F,U)):-          !,fmt('~N% ~w~n%d:       ~q~n%format:    ~q~n', [M,W,F]),pp_item(M,U).
-pp_item(M,nt(Trigger,Test,Body)) :- !, fmt('~N%~wn-trigger: ~q~n%test: ~q~n%body: ~q~n', [M,Trigger,Test,Body]).
-pp_item(M,pt(F,Body)):-              !,fmt('~N%~wp-trigger: ~q~n~n%body:~n', [M,F]), pp_i2tml0((F:-Body)).
-pp_item(M,bt(F,Body)):-              !,fmt('~N%~wb-trigger: ~q~n%body: ~q~n', [M,F,Body]).
+pp_item(M,spft(W,F,U)):- atom(U),!,    fmt('~N%~n',[]),pp_item(M,U:W), fmt('rule: ~p~n~n', [F]),!.
+pp_item(M,spft(W,F,U)):-          !,   fmt('~w~nd:       ~p~nformat:    ~p~n', [M,W,F]),pp_item(M,U).
+pp_item(M,nt(Trigger,Test,Body)) :- !, fmt('~w n-trigger: ~p~ntest: ~p~nbody: ~p~n', [M,Trigger,Test,Body]).
+pp_item(M,pt(F,Body)):-              !,fmt('~w p-trigger: ~p~n~nbody:~n', [M,F]), pp_i2tml0((F:-Body)).
+pp_item(M,bt(F,Body)):-              !,fmt('~w b-trigger: ~p~nbody: ~p~n', [M,F,Body]).
 
 pp_item(M,U:W):- !,sformat(S,'~w  ~w:',[M,U]),!, pp_item(S,W).
-pp_item(M,H):- \+ \+ (( numbervars(H,0,_,[attvar(skip)]), fmt("~N%~w ~q~n",[M,H]))).
+pp_item(M,H):- \+ \+ (( numbervars(H,0,_,[attvar(skip)]), fmt("~w ~p~n",[M,H]))).
 
 pfc_classify_facts([],[],[],[]).
 
@@ -100,7 +100,7 @@ pfc_classify_facts([H|T],User,[H|Pfc],Rule) :-
 
 print_db_items(T, I):- 
     draw_line, 
-    fmt("~N% ~w ...~n",[T]),
+    fmt("~w ...~n",[T]),
     print_db_items(I),
     draw_line.
 
@@ -125,7 +125,7 @@ pp_triggers :-
 pp_supports :-
   % temporary hack.
   draw_line,
-  fmt("~N% Supports ...~n",[]),
+  fmt("Supports ...~n",[]),
   setof((S > P), pfc_get_support(P,S),L),
   pp_items(Type,L),
   draw_line.
@@ -143,11 +143,11 @@ loop_check_true(G):-loop_check(G,ignore(arg(1,G,[]))).
 % ***** predicates for brousing justifications *****
 
 :-dynamic(whymemory/2).
-:-thread_local(thlocal:pfc_interactive_why).
+:-thread_local(thlocal:is_pfc_interactive_why/0).
 
 :- use_module(library(lists)).
 
-pfc_interactive_why:- with_assertions(thlocal:pfc_interactive_why,pfc_why).
+pfc_interactive_why:- with_assertions(thlocal:is_pfc_interactive_why,pfc_why).
 
 pfc_why :-
   whymemory(P,_),
@@ -155,7 +155,7 @@ pfc_why :-
 
 user:why(N) :- pfc_why(N).
 
-pfc_interactive_why(N):- with_assertions(thlocal:pfc_interactive_why,pfc_why(N)).
+pfc_interactive_why(N):- with_assertions(thlocal:is_pfc_interactive_why,pfc_why(N)).
 
 pfc_why(N) :-
   number(N),
@@ -164,20 +164,20 @@ pfc_why(N) :-
   pfc_why_command(N,P,Js).
 
 pfc_why(P) :-
-  justifications(P,Js),
+  no_repeats(justifications(P,Js)),
   retractall_i(whymemory(_,_)),
-  assert_i(whymemory(P,Js)),
+  assert_i(whymemory(P,Js)),!,
   pfc_whyBrouse(P,Js).
 
 pfc_why1(P) :-
-  justifications(P,Js),
+  justifications(P,Js),!,
   pfc_whyBrouse(P,Js).
 
 pfc_whyBrouse(P,Js) :-
-  pp_justifications(P,Js),
-  pfc_interactive_why -> ((
+  pp_justifications(P,Js),!,
+  (thlocal:is_pfc_interactive_why -> ((
   pfc_ask(' >> ',Answer),
-  pfc_why_command(Answer,P,Js))); true.
+  pfc_why_command(Answer,P,Js))); true).
 
 pfc_why_command(q,_,_) :- !.
 pfc_why_command(h,_,_) :-
@@ -204,11 +204,11 @@ pfc_why_command(u,_,_) :-
 pfc_command(N,_,_) :-
   integer(N),
   !,
-  fmt("~N% ~w is a yet unimplemented command.",[N]),
+  fmt("~w is a yet unimplemented command.",[N]),
   fail.
 
 pfc_command(X,_,_) :-
- fmt("~N% ~w is an unrecognized command, enter h. for help.",[X]),
+ fmt("~w is an unrecognized command, enter h. for help.",[X]),
  fail.
 
 pp_why(P):- is_list(P),!,maplist(pp_why,P),!.
@@ -218,7 +218,7 @@ pp_why(P):-must((
       pp_justifications(P,Js))),!.
 
 pp_justifications(P,Js) :-
-  fmt("~N% Justifications for ~w:",[P]),
+  fmt("Justifications for ~w:",[P]),
   must(pp_justification1(Js,1)).
 
 pp_justification1([],_).
@@ -233,12 +233,12 @@ pp_justification1([J|Js],N) :-
 pp_justifications2([],_,_).
 
 pp_justifications2([C|Rest],JustNo,StepNo) :-  
-  fmt("~N%     ~w.~w ~w",[JustNo,StepNo,C]),
+  fmt("    ~w.~w ~w",[JustNo,StepNo,C]),
   StepNext is 1+StepNo,
   loop_check_true(pp_justifications2(Rest,JustNo,StepNext)).
 
 pfc_ask(Msg,Ans) :-
-  fmt("~N% ~w",[Msg]),
+  fmt("~w",[Msg]),
   read(Ans).
 
 pfc_select_justificationNode(Js,Index,Step) :-
@@ -271,7 +271,7 @@ show_pred_info_0(Head):-
 print_db_items(Title,Mask,What):-print_db_items(Title,Mask,Mask,What).
 print_db_items(Title,Mask,SHOW,What0):-
      get_pi(Mask,H),get_pi(What0,What),
-     format(atom(Showing),'~q for ~q...',[Title,What]),
+     format(atom(Showing),'~p for ~p...',[Title,What]),
      statistics(cputime,Now),Max is Now + 2,!,
        gripe_time(1.0,
          doall((once(statistics(cputime,NewNow)),NewNow<Max,clause_or_call(H,B),
@@ -422,7 +422,7 @@ pp_i2tml_save_seen(HB):- assertz_if_new(sortme_buffer(Obj,HB)),!.
 :-thread_local(shown_subtype/1).
 :-thread_local(shown_clause/1).
 
-section_open(Type):-  once(shown_subtype(Type)->true;((thlocal:print_mode(html)->format('~n</pre><hr>~w<hr><pre>~n<font face="verdana,arial,sans-serif">',[Type]);(draw_line,format('% ~w~n%~n',[Type]))),asserta(shown_subtype(Type)))),!.
+section_open(Type):-  once(shown_subtype(Type)->true;((thlocal:print_mode(html)->format('~n</pre><hr>~w<hr><pre>~n<font face="verdana,arial,sans-serif">',[Type]);(draw_line,format('% ~w~n~n',[Type]))),asserta(shown_subtype(Type)))),!.
 section_close(Type):- shown_subtype(Type)->(retractall(shown_subtype(Type)),(thlocal:print_mode(html)->format('</font>\n</pre><hr/><pre>',[]);draw_line));true.
 
 pp_item_html(_Type,H):-var(H),!.

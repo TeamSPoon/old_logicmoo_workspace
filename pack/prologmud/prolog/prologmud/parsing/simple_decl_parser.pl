@@ -7,6 +7,9 @@
 %
 */
 
+
+:- include(prologmud(mud_header)).
+
 :- user:use_module(logicmoo(util/logicmoo_util_dcg)).
 
 :-discontiguous((translation_spo/6,parserTest/2,parserTest/3,translation_w//1)).

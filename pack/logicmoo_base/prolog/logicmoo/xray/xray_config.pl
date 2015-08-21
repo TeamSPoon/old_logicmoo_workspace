@@ -99,6 +99,7 @@ xray_configuration_inner :-
         show_call_value(no_disk),
         show_call_value(do_model_inits),
         show_call_value(herbrandize),
+        show_call_value(use_ancestor_checks(_)),        
         show_call_value(use_sound_unification(_)).
 
 %%% delta_ordering stears the order of admissibility 

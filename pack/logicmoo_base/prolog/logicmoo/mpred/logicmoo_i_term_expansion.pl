@@ -349,7 +349,7 @@ db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F/A|Args],integer(A),functor_decl
 
 db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F,A|Args],integer(A),functor_declares_instance(D,TPRED),
   is_relation_type(TPRED),expand_props(Prefix,Op,props(F,[D,TPRED|Args]),O),!.
-db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..  [D,C|Args],compound(C),functor_declares_instance(D,TPRED),get_functor(C,F,A),  
+db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..  [D,C|Args],compound(C),functor_declares_instance(D,TPRED),\+ is_ftVar(C),!,get_functor(C,F,A),  
   expand_props(Prefix,Op,props(F,[D,TPRED|Args]),M),!,
   (\+((arg(_,C,Arg),var(Arg))) -> O = (meta_argtypes(C),M) ; (O= (M))).
 

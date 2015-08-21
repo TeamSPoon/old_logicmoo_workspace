@@ -12,7 +12,6 @@
 
 :- include(prologmud(mud_header)).
 /*
-% This file is "included" from world.pl 
 :-swi_module(modr, [ agent_call_unparsed/1, agent_call_unparsed/2,  agent_call_command_now/2 ]).
 
 

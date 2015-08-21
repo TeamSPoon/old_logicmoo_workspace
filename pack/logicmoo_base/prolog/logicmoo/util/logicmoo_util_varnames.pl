@@ -153,8 +153,8 @@ renumbervars(Y,Z):-safe_numbervars(Y,Z),!.
 %   Therefore the register of variable copies is maintained.
 %
 register_var(N=V,IN,OUT):- (var(N)->true;register_var(N,IN,V,OUT)),!.
-
 register_var(N,T,V,OUTO):-register_var_0(N,T,V,OUT),must(OUT=OUTO),!.
+register_var(N,T,V,O):-append(T,[N=V],O),!.
 
 register_var_0(N,T,V,OUT):- must(nonvar(N)),
    ((name_to_var(N,T,VOther)-> must((OUT=T,samify(V,VOther)));
@@ -171,7 +171,7 @@ register_var_0(N,T,V,OUT):- var(N),
                OUT= [N=V|T]))),!.
 
 
-register_var(N,T,V,O):-append(T,[N=V],O),!.
+
 
 
 % different variables (now merged)
@@ -217,4 +217,14 @@ snumbervars(Term,Start,End):- integer(Start),!,numbervars_impl(Term,'$VAR',Start
 snumbervars(Term,Functor,Start,List):-numbervars_impl(Term,Functor,Start,List).
 :- swi_export(snumbervars/1).
 snumbervars(Term):-numbervars_impl(Term,0,_).
+
+varname:attr_unify_hook(_,_).
+varname:attr_portray_hook(Value, _Var) :- nonvar(Value),!,write('?'(Value)).
+:- public
+	varname:portray_attvar/1.
+'varname':portray_attvar(Var) :-
+	write('{<'),
+	get_attrs(Var, Attr),
+	catch(writeq(Attr),_,'$attvar':portray_attrs(Attr, Var)),
+	write('>}').
 

@@ -99,8 +99,10 @@ to_addable_form_wte(Why,P0,P):-
     once(notrace(to_addable_form(P0,P));must(to_addable_form(P0,P))),
     ((P0\=@=P,P0\=isa(_,_))->pfc_debug_trace(to_addable_form(Why,P0,P));true).
 
-retract_eq_quitely((H:-B)):-ignore((clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!,erase_safe(clause(HH,BB,Ref),Ref))).
-retract_eq_quitely((H)):-ignore((clause(H,true,Ref),clause(HH,BB,Ref),H=@=HH,BB==true,!,erase_safe(clause(HH,BB,Ref),Ref))).
+retract_eq_quitely(H):-ignore(retract_eq_quitely_f(H)).
+retract_eq_quitely_f((H:-B)):- ((clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!,erase_safe(clause(HH,BB,Ref),Ref))).
+retract_eq_quitely_f((H)):- ((clause(H,true,Ref),clause(HH,BB,Ref),H=@=HH,BB==true,!,erase_safe(clause(HH,BB,Ref),Ref))).
+
 assert_eq_quitely(H):-assert_if_new(H).
 
 reduce_clause_from_fwd(H,H):- (\+compound(H)),!.
@@ -335,11 +337,18 @@ assertz_u(X,_,_):- show_call_success(clause_asserted(X)),!.
 assertz_u(X,_,_):- must((expire_tabled_list(X),show_if_debug(call_with_attvars(assertz,X)))).
 
 never_assert_u(vtVerb(BAD)):-fail,BAD=='[|]'.
+never_retract_u((X)):-is_ftVar(X).
+never_retract_u(neg(X)):-is_ftVar(X).
 never_retract_u(human(trudy)).
 never_retract_u((father(skArg1ofFatherFn(trudy), trudy))).
+never_retract_u(argQuotedIsa(thereExistAtLeast, 1, ftPositiveInteger)).
 
 retract_u(X):- never_retract_u(Y),X=@=Y,trace_or_throw(never_retract_u(Y)).
-retract_u(neg(X)):-must(nonvar(X)),!,retract_eq(neg(X)),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
+%retract_u(neg(X)):-must(nonvar(X)),!,retract_eq_quitely_f(neg(X)),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
+%retract_u(pfc_halt_signal(X)):-!,retract_eq_quitely_f(pfc_halt_signal(X)),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
+retract_u(pfc_queue(X,Y)):-!,show_call_failure(retract_eq_quitely_f(pfc_queue(X,Y))),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
+retract_u(neg(X)):-!,show_call_success(retract_eq_quitely_f(neg(X))),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
+retract_u((X)):-!,show_call_success(retract_eq_quitely_f((X))),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
 retract_u(X):-show_if_debug(call_with_attvars(retract_eq,X)),!,must((expire_tabled_list(X))).
 
 retractall_u(X):-retractall(X),must((expire_tabled_list(X))).
@@ -518,7 +527,7 @@ pfc_assert_fast_sp(S,P) :-
      pfc_asserting(OutcomeO),
      (pfc_post_sp_zzz(S,P),pfc_debug_trace(looped_outcome((P))))),!.
 %pfc_assert_fast_sp(_,_).
-pfc_assert_fast_sp(P,S) :- pfc_error("pfc_assert_fast(~q,~q) failed",[P,S]).
+pfc_assert_fast_sp(P,S) :- pfc_error("pfc_assert_fast(~p,~p) failed",[P,S]).
 
 
 
@@ -550,7 +559,7 @@ pfc_post_sp_zzz(S,[P1|P2]) :- !,pfc_post_sp_zzz(S,(P1)),pfc_post_sp_zzz(S,(P2)).
 pfc_post_sp_zzz(S, \+ P) :-!,doall(pfc_rem2a(P,S)),!,pfc_undo((\+),P).
 pfc_post_sp_zzz(S, ~  P) :-!,doall(pfc_rem2a(P,S)),!,pfc_undo((~ ),P).
 pfc_post_sp_zzz(S, not( P)) :-!,pfc_post_sp_zzz(S, neg( P)).
-pfc_post_sp_zzz(_S,P) :- once((pfc_is_tautology(P),dumpST,dmsg(trace_or_throw(todo(error(pfc_is_tautology(P))))))),show_load_context,prolog,fail.
+pfc_post_sp_zzz(_S,P) :- once((pfc_is_tautology(P),dmsg(trace_or_throw(todo(error(pfc_is_tautology(P))))))),show_load_context,fail.
 
 % only do loop check if it's already supported
 
@@ -573,7 +582,7 @@ pfc_post1_sp_1(S,P):- P\==true,
   !.
 
 pfc_post1_sp_1(_,_). % arleady added
-pfc_post1_sp_1(S,P) :-  pfc_warn("pfc_post1(~q,~q) failed",[P,S]).
+pfc_post1_sp_1(S,P) :-  pfc_warn("pfc_post1(~p,~p) failed",[P,S]).
 
 
 with_pfc_trace_exec(P):- with_assertions(thlocal:pfc_trace_exec, must(show_call(P))).
@@ -637,7 +646,7 @@ pfc_enqueue(P,S) :-
 	Mode=depth   -> pfc_asserta_i(pfc_queue(P,S),S) ;
 	Mode=breadth -> pfc_assertz_i(pfc_queue(P,S),S) ;
 	% else
-          otherwise           -> pfc_warn("Unrecognized pfc_search mode: ~q", Mode))
+          otherwise           -> pfc_warn("Unrecognized pfc_search mode: ~p", Mode))
      ; pfc_warn("No pfc_search mode").
 
 
@@ -647,7 +656,7 @@ pfc_remove_old_version((Identifier::::Body)) :-
   % this should never happen.
   var(identifier),
   !,
-  pfc_warn("variable used as an  rule name in ~q :::: ~q",
+  pfc_warn("variable used as an  rule name in ~p :::: ~p",
           [Identifier,Body]).
 
 
@@ -692,7 +701,7 @@ pfc_step0 :-
   % if pfc_halt_signal(Signal) is true, reset it and fail, thereby stopping inferencing.
   pfc_retract_db_type(pfc_halt_signal(Signal)),
   !,
-  pfc_warn("~N% Stopping on signal ~q",[Signal]),
+  pfc_warn("Stopping on signal ~p",[Signal]),
   fail.
 
 pfc_step0 :-
@@ -712,7 +721,7 @@ remove_selection(P,S) :-
   pfc_remove_supports_quietly(pfc_queue(P,S)),
   !.
 remove_selection(P,S) :-
-  brake(fmt("~N% pfc:get_next_fact - selected fact not on Queue: ~q (~q)",
+  brake(wdmsg("pfc:get_next_fact - selected fact not on Queue: ~p (~p)",
                [P,S])).
 
 
@@ -738,9 +747,9 @@ pfc_halt(Format) :- pfc_halt(Format,[]).
 pfc_halt(Format,Args) :-
   sformat(S,Format,Args),
   !,
-  fmt('~N% ~q~n',[S]),
+  in_cmt((wdmsg('~s',[S]))),
   (pfc_halt_signal(Signal) ->
-       pfc_warn("pfc_halt finds pfc_halt_signal(Signal) already set to ~q",[Signal])
+       pfc_warn("pfc_halt finds pfc_halt_signal(Signal) already set to ~p",[Signal])
      ; assert_i(pfc_halt_signal(S))).
 
 
@@ -784,7 +793,7 @@ pfc_add_trigger(bt(Trigger,Body),Support) :-
   pfc_bt_pt_combine(Trigger,Body,Support).
 
 pfc_add_trigger(X,Support) :- trace,
-  pfc_warn("Unrecognized trigger to pfc_addtrigger: ~q",[X:pfc_add_trigger(X,Support)]).
+  pfc_warn("Unrecognized trigger to pfc_addtrigger: ~p",[X:pfc_add_trigger(X,Support)]).
 
 
 pfc_bt_pt_combine(Head,Body,Support) :-
@@ -843,7 +852,7 @@ pfc_retract_db_type(rule,X) :-
 pfc_retract_db_type(trigger,X) :-
   retract_t(X)
     -> pfc_unfwc(X)
-     ; pfc_warn("Trigger not found to retract: ~q",[X]).
+     ; pfc_warn("Trigger not found to retract: ~p",[X]).
 
 pfc_retract_db_type(action,X) :- pfc_rem_actiontrace(X).
 
@@ -891,7 +900,7 @@ pfc_rem1(P,S) :- copy_term(pfc_rem1(P,S),Why),
   pfc_trace_item('Removing support',pfc_rem1(P,S)),
   pfc_rem_support(Why,P,S)
      -> (remove_if_unsupported(Why,P))
-      ; pfc_warn("pfc_rem1/2 Could not find support ~q to remove from fact ~q",
+      ; pfc_warn("pfc_rem1/2 Could not find support ~p to remove from fact ~p",
                 [S,P]).
 
 %=
@@ -933,7 +942,7 @@ pfc_remove3(F) :-
 
 pfc_remove_supports_f_l(Why,F) :-
   pfc_rem_support(Why,F,S),
-  (S=(z,z)->true;pfc_warn("~q was still supported by ~q",[F,S])),
+  (S=(z,z)->true;pfc_warn("~p was still supported by ~p",[F,S])),
   fail.
 pfc_remove_supports_f_l(_,_).
 
@@ -956,7 +965,7 @@ pfc_undo(Why,pk(Key,Head,Body)) :-
   !,
   (retract_i(pk(Key,Head,Body))
     -> pfc_unfwc(pt(Head,Body))
-     ; pfc_warn("for ~q \nTrigger not found to retract: ~q",[Why,pt(Head,Body)])).
+     ; pfc_warn("for ~p \nTrigger not found to retract: ~p",[Why,pt(Head,Body)])).
 
 pfc_undo(Why,pt(Head,Body)) :- 
   % undo a positive trigger.
@@ -964,14 +973,14 @@ pfc_undo(Why,pt(Head,Body)) :-
   !,
   (retract_i(pt(Head,Body))
     -> pfc_unfwc(pt(Head,Body))
-     ; pfc_warn("for ~q:\nTrigger not found to retract: ~q",[Why,pt(Head,Body)])).
+     ; pfc_warn("for ~p:\nTrigger not found to retract: ~p",[Why,pt(Head,Body)])).
 
 pfc_undo(Why,nt(Head,Condition,Body)) :-
   % undo a negative trigger.
   !,
   (retract_i(nt(Head,Condition,Body))
     -> pfc_unfwc(nt(Head,Condition,Body))
-     ; pfc_warn("for ~q:\nTrigger not found to retract: ~q",[Why,nt(Head,Condition,Body)])).
+     ; pfc_warn("for ~p:\nTrigger not found to retract: ~p",[Why,nt(Head,Condition,Body)])).
 
 pfc_undo(Why,Fact):- pfc_undo_u(Why,Fact)*->true;pfc_undo_e(Why,Fact).
 
@@ -982,8 +991,8 @@ pfc_undo_u(Why,Fact) :-
      pfc_unfwc1(Fact).
 
 pfc_undo_e(Why,Fact) :- 
-     (Fact\=neg(_)->pfc_debug_trace("pfc_undo_e ; Fact not found in user db: ~q",[Fact]);true),
-     pfc_trace_rem(Why,Fact),
+     (Fact\=neg(_)->pfc_debug_trace("pfc_undo_e ; Fact not found in user db: ~p",[Fact]);true),
+     (Fact\=neg(_)->pfc_trace_rem(Why,Fact);true),
      pfc_unfwc(Fact).
 
 
@@ -1057,7 +1066,7 @@ pfc_tms_supported0(deep,P,How) :- pfc_deep_support(How,P).
 
 pfc_scan_tms(P):-pfc_get_support(P,(S,SS)),
   (S==SS-> true;
-   once((pfc_deep_support(How,P)->true;
+   once((pfc_deep_support(_How,P)->true;
      (dmsg(warn(now_maybe_unsupported(pfc_get_support(P,(S,SS)),fail))))))).
 
 user_atom(u).
@@ -1174,7 +1183,6 @@ pfc_fwd(P,S) :- pfc_fwd1(P,S),!.
 
 pfc_fwd1(Fact,Sup) :- gripe_time(0.50,pfc_fwd2(Fact,Sup)),!.
 
-pfc_fwd2(Fact,_Sup) :- is_pfc_action(Fact),doall(show_call(must(Fact))),fail.
 pfc_fwd2(Fact,Sup) :- cyclic_term(Fact;Sup),writeq(pfc_fwd2_cyclic_term(Fact;Sup)),!.
 pfc_fwd2(Fact,_Sup) :-
   once(must(pfc_add_rule_if_rule(Fact))),
@@ -1189,6 +1197,9 @@ pfc_fwd2(Fact,_Sup) :-
 %= pfc_add_rule_if_rule(P) does some special, built in forward chaining if P is
 %= a rule.
 %=
+
+pfc_add_rule_if_rule(Fact) :- is_pfc_action(Fact),(ground(Fact)->must(once(Fact));doall(show_call(must(Fact)))),fail.
+
 pfc_add_rule_if_rule(Fact):-  
   cyclic_break(Fact),
   must(pfc_add_rule0(Fact)),!.
@@ -1238,9 +1249,10 @@ fcnt(_,_).
 fcnt0(_Fact,F) :- 
   spft(X,_,nt(F,Condition,Body)),
   (call_u(Condition) *-> 
-   (pfc_trace_item('Using Trigger'(X),nt(F,Condition,Body)),pfc_rem1(X,(_,nt(F,Condition,Body))),fail);
+   (pfc_trace_item('Using Trigger'(X),nt(F,Condition,Body)),
+      pfc_rem1(X,(_,nt(F,Condition,Body))),fail);
       (pfc_trace_item('Unused Trigger'(X),nt(F,Condition,Body)),fail)).
-  
+
 
 
 %=
@@ -1250,8 +1262,8 @@ fcnt0(_Fact,F) :-
 
 pfc_define_bc_rule(Head,Body,Parent_rule) :-
   (\+ pfc_literal(Head)),
-  pfc_warn("Malformed backward chaining rule.  ~q not atomic.",[(Head:-Body)]),
-  pfc_warn("rule: ~q",[Parent_rule]),
+  pfc_warn("Malformed backward chaining rule.  ~p not atomic.",[(Head:-Body)]),
+  pfc_warn("rule: ~p",[Parent_rule]),
  % !,
   dtrace(pfc_define_bc_rule(Head,Body,Parent_rule)),
   fail.
@@ -1297,7 +1309,7 @@ pfc_eval_lhs0(X,Support) :-
 %  pfc_eval_lhs(X,Support).
 
 pfc_eval_lhs0(_Sup,X,_) :-
-  pfc_warn("Unrecognized item found in trigger body, namely ~q.",[X]).
+  pfc_warn("Unrecognized item found in trigger body, namely ~p.",[X]).
 
 
 %=
@@ -1340,7 +1352,7 @@ pfc_eval_rhs1(Assertion,Support) :-
  pfc_post1(Assertion,Support).
 
 pfc_eval_rhs1(X,_) :-
-  pfc_warn("Malformed rhs of a rule: ~q",[X]).
+  pfc_warn("Malformed rhs of a rule: ~p",[X]).
 
 
 %=
@@ -1548,7 +1560,7 @@ pfc_nf1(P,[P]) :-
 
 %=% shouln't we have something to catch the rest as errors?
 pfc_nf1(Term,[Term]) :-
-  pfc_warn("pfc_nf doesn't know how to normalize ~q",[Term]),!,fail.
+  pfc_warn("pfc_nf doesn't know how to normalize ~p",[Term]),!,fail.
 
 pfc_negation_w_neg(neg(P),P):-nonvar(P),!.
 pfc_negation_w_neg(P,NF):-pfc_nf1_negation(P,NF).
@@ -1700,7 +1712,7 @@ pfc_connective('-').
 pfc_connective('~').
 pfc_connective('\\+').
 
-cyclic_break(Cyclic):-cyclic_term(Cyclic)->(writeq(Cyclic),nl,prolog);true.
+cyclic_break(Cyclic):-cyclic_term(Cyclic)->(writeq(cyclic_break(Cyclic)),nl,prolog);true.
 
 process_rule(Lhs,Rhs,Parent_rule) :- 
   copy_term(Parent_rule,Parent_ruleCopy),
@@ -1888,6 +1900,8 @@ pfc_union([Head|Tail],L,[Head|Tail2]) :-
 %= predicates for manipulating support relationships
 %=
 
+user:portray(C):-compound(C),C=spft(A,B,C),pp_item('',C).
+
 %= pfc_add_support(+Fact,+Support)
 
 %pfc_add_support(tCol(PC),(u,u)) :- PC== pathConnects, trace_or_throw(pfc_add_support(tCol(PC),(u,u))).
@@ -2006,7 +2020,7 @@ pfc_reset :-
   fail.
 pfc_reset :-
   pfc_database_item(T),
-  pfc_error("Pfc database not empty after pfc_reset, e.g., ~p.~n",[T]).
+  pfc_error("Pfc database not empty after pfc_reset, e.g., ~p.",[T]).
 pfc_reset.
 
 % true if there is some pfc crud still in the database.
@@ -2129,15 +2143,15 @@ pfc_trace_addPrint_0(P,S) :-
   !,
   must(S=(F,T)),
   (F==T
-       -> pfc_debug_trace("~N% Adding (~q) ~q ~n",[F,P])
-        ; pfc_debug_trace("~N% Adding (:) ~q    <-------- (~q <-TFnesc  ~q)~n",[P,(T),(F)])).
+       -> pfc_debug_trace("Adding (~p) ~p ",[F,P])
+        ; pfc_debug_trace("Adding (:) ~p    <-------- (~p <-TF-> ~p)",[P,(T),(F)])).
 
 pfc_trace_addPrint_0(_,_).
 
 
 pfc_trace_break(P,_S) :-
   pfc_spied(P,add) ->
-   ((\+ \+ fmt("~N% Breaking on pfc_assert(~q)",[P])),
+   ((\+ \+ wdmsg("Breaking on pfc_assert(~p)",[P])),
     break)
    ; true.
 
@@ -2155,10 +2169,10 @@ pfc_trace_rem(Why,nt(Head,Condition,Body)) :-
 
 pfc_trace_rem(Why,P) :-
   ((pfc_traced(P);pfc_traced(Why))
-     -> (pfc_debug_trace('~N% Removing (~q) ~q.~n',[Why,P]))
+     -> (pfc_debug_trace('Removing (~p) ~p.',[Why,P]))
       ; true),
   ((pfc_spied(P,rem);pfc_spied(P,Why))
-     -> (fmt("~N% Breaking on remove(~q,~q)",[Why,P]), break)
+     -> (in_cmt(wdmsg("Breaking on remove(~p,~p)",[Why,P])), break)
    ; true),!.
 
 
@@ -2203,11 +2217,8 @@ pfc_untrace(Form) :- retractall_i(pfc_traced(Form)).
 
 
 % if the correct flag is set, trace exection of Pfc
-pfc_trace_msg(Msg) :- pfc_trace_msg('~q.',[Msg]).
-pfc_trace_msg(Msg,Args) :-
-    pfc_tracing,
-    !,
-    notrace((fresh_line, \+ \+  fmt(user_output, Msg, Args))).
+pfc_trace_msg(Msg) :- pfc_trace_msg('~p.',[Msg]).
+pfc_trace_msg(Msg,Args) :- pfc_tracing,!,wdmsg(Msg, Args).
 pfc_trace_msg(_Msg,_Args).
 
 pfc_watch :- assert_i(thlocal:pfc_trace_exec).
@@ -2217,8 +2228,7 @@ pfc_no_watch :-  retractall_i(thlocal:pfc_trace_exec).
 pfc_error(Msg) :-  pfc_error(Msg,[]).
 
 pfc_error(Msg,Args) :-
-  fmt("~N% ERROR/Pfc: ",[]),
-  fmt(Msg,Args).
+ in_cmt(( wdmsg("ERROR/Pfc: ",[]),wdmsg(Msg,Args))).
 
 
 %=
@@ -2394,7 +2404,7 @@ compute_resolve(NewerP,OlderQ,Resolve):-
 resolveConflict(C):- must((resolveConflict0(C),
   show_call(is_resolved(C)),pfc_rem(conflict(C)))).
 resolveConflict(C) :-
-  fmt("~NHalting with conflict ~q~n", [C]),   
+  wdmsg("Halting with conflict ~p", [C]),   
   must(pfc_halt(conflict(C))),fail.
 
 is_resolved(C):-pfc_call(C),\+pfc_call(neg(C)).
@@ -2408,7 +2418,7 @@ resolveConflict0(C) :- forall(must(pfc_negation_w_neg(C,N)),ignore(show_call_fai
     is_resolved(C),!.
 
 resolverConflict_robot(N) :- forall(must(pfc_negation_w_neg(N,C)),forall(compute_resolve(C,N,TODO),debugOnError(show_call(TODO)))).
-resolverConflict_robot(C) :- must((pfc_remove3(C),fmt("~nRem-3 with conflict ~q~n", [C]),pfc_run,sanity(\+C))).
+resolverConflict_robot(C) :- must((pfc_remove3(C),wdmsg("Rem-3 with conflict ~p", [C]),pfc_run,sanity(\+C))).
 
 
 pfc_prove_neg(G):-nop(trace), \+ pfc_bc_caching(G), \+ pfc_fact(G).

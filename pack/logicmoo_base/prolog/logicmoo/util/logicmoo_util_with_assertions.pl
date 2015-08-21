@@ -34,7 +34,7 @@ with_assertions(set_prolog_flag(N,XFY),MCall):- !,
      (setup_call_cleanup(set_prolog_flag(N,XFY),'@'(Call,M),(WAS=unUSED->true;set_prolog_flag(N,WAS))))).
 
 with_assertions(before_after(Before,After),Call):-
-     (Before -> setup_call_cleanup(Call,After);Call).
+     (Before -> setup_call_cleanup(true,Call,After);Call).
 
 with_assertions(THead,Call):- 
  notrace(( 

@@ -217,21 +217,57 @@ internal_functor(P,IntP) :-
 	name(int_,L1),
 	append(L1,L,L2),
 	name(IntP,L2).
+
 %%% ***
 %%% ****if* PTTP/apply_to_conjuncts
 %%% SOURCE
-
-apply_to_conjuncts(Wff,P,Wff1) :-
-  must(nonvar(Wff)),
-      (  Wff = (A , B) ->
+apply_to_conjuncts((A , B),P,Wff1) :- must(nonvar(A)),
 		apply_to_conjuncts(A,P,A1),
 		apply_to_conjuncts(B,P,B1),
-		conjoin(A1,B1,Wff1);
-	%true ->
+		conjoin(A1,B1,Wff1).
+apply_to_conjuncts(true,_,true) :-!.
+apply_to_conjuncts(Wff,must(P),Wff1) :-!, must(nonvar(P)),
 		P =.. G,
 		append(G,[Wff,Wff1],G1),
 		T1 =.. G1,
-		must(T1)),!.
+		must((T1)),!.
+apply_to_conjuncts(Wff,show_call(P),Wff1) :-!, must(nonvar(P)),
+		P =.. G,
+		append(G,[Wff,Wff1],G1),
+		T1 =.. G1,
+		show_call((T1)),!.
+apply_to_conjuncts(Wff,P,Wff1) :-
+		P =.. G,
+		append(G,[Wff,Wff1],G1),
+		T1 =.. G1,
+		must(T1),!.
+
+%%% ***
+%%% ****if* PTTP/apply_to_tree
+%%% SOURCE
+apply_to_tree(Wff,must(P),Wff1) :- must(nonvar(P)),!, must(apply_to_tree(Wff,P,Wff1)).
+apply_to_tree(Wff,show_call(P),Wff1) :- must(nonvar(P)),!, show_call(apply_to_tree(Wff,P,Wff1)).
+apply_to_tree((A , B),P,(A1 , B1)) :-!, must(nonvar(A)),
+		apply_to_tree(A,P,A1),
+		apply_to_tree(B,P,B1).
+apply_to_tree([A | B ],P,[A1 | B1 ] ) :-!, must(is_list(B)),
+		apply_to_tree(A,P,A1),
+		apply_to_tree(B,P,B1).
+apply_to_tree((A ; B),P,(A1 ; B1)) :- !,must(nonvar(A)),
+		apply_to_tree(A,P,A1),
+		apply_to_tree(B,P,B1).
+apply_to_tree((A :- B),P,(A1 :- B1)) :- !,must(nonvar(A)),
+		apply_to_tree(A,P,A1),
+		apply_to_tree(B,P,B1).
+apply_to_tree(true,_,true) :-!.
+apply_to_tree(Wff,P,Wff1) :- must(P\=must(_)),
+		P =.. G,
+		append(G,[Wff,Wff1],G1),
+		T1 =.. G1,
+		call(T1),!.
+
+
+
 %%% ***
 %%% ****if* PTTP/apply_to_elements
 %%% SOURCE
@@ -478,7 +514,9 @@ not_xray:-fail.
 %%% call on subgoals in bodies of nonunit clauses.
 :- ensure_loaded('pttp-examples').
 
-pttp_tests:-time((ignore(source_file(chang_lee_example7,F)),!,ignore((source_file(Pred,F),atom(Pred),once(timed_call(Pred,'Total',Time)),assertz(timed_result(Pred,'Total',Time)),fail)))),listing(timed_result).
+pttp_tests:-time((ignore(source_file(chang_lee_example7,F)),!,ignore((source_file(Pred,F),atom(Pred),
+  once(timed_call(Pred,'Total',Time)),
+   assertz(timed_result(Pred,'Total',Time)),fail)))),listing(timed_result).
 
 
 %%% ***
@@ -848,20 +886,12 @@ procedure(P,N,Clauses,Proc) :-
                 Proc = true.
 
 
-:- if(not_xray).
-procedures_with_ancestor_tests([[P,N]|Preds],Clauses,Procs) :-
-	procedure(P,N,Clauses,Proc),
-	procedures_with_ancestor_tests(Preds,Clauses,Procs2),
-	conjoin(Proc,Procs2,Procs).
-procedures_with_ancestor_tests([],_Clauses,true).
-:-else.
 procedures_with_ancestor_tests([[P,N]|Preds],Clauses,Procs) :-
         procedure(P,N,Clauses,Proc1),
         ancestor_tests(P,N,Tests),conjoin(Tests,Proc1,Proc),
         procedures_with_ancestor_tests(Preds,Clauses,Procs2),
         conjoin(Proc,Procs2,Procs).
 procedures_with_ancestor_tests([],_Clauses,true).
-:-endif.
 
 
 %:-abolish(query,1).
@@ -1250,15 +1280,23 @@ dont_trace_search :-
 
 
 :- dynamic(use_sound_unification/1).
-use_sound_unification(unify_with_occurs_check).
+% use_sound_unification(unify_with_occurs_check).
+set_sound_unification(true):-!,set_sound_unification(unify_with_occurs_check).
+set_sound_unification(W):-retractall(use_sound_unification(_)),asserta(use_sound_unification(W)).
+:- set_sound_unification(true).
 
-add_sound_unification((Head :- Body),(Head1 :- Body1)) :- use_sound_unification(Pred),!,
+add_sound_unification((Head :- Body),(Head1 :- Body1)) :- use_sound_unification(Pred),Pred\==false,!,
         linearize(Pred,Head,Head1,[],_,true,Matches),
         conjoin(Matches,Body,Body1).
 add_sound_unification((Head :- Body),(Head :- Body)).
 
-
+% ======================================================
+% HEAD+(Proof,ProofEnd)  BODY+(Proof,ProofEnd)
+% ======================================================
 add_proof_recording((Head :- Body),(Head1 :- Body1)) :-
+    name_the_var('Proof',Proof),
+    name_the_var('ProofEnd',ProofEnd),
+
         Head =.. L,
         append(L,[Proof,ProofEnd],L1),
         Head1 =.. L1,
@@ -1293,101 +1331,20 @@ add_proof_recording_args(Body,Proof,ProofEnd,Body1) :-
                 Body1 =.. L1.
 
 
-%%% Consistency checking.
-%%%
-%%% Add extra arguments to each goal so that information
-%%% on what assumptions were made in the proof can be checked
-%%% at each step/the end.
-%%%
-%%% I suppose Wff has to be replaced by cmm(Model,ModelStructure) ...
-%%% [all this is a quick copy of add_proof_recording ...]
+% ======================================================
+% HEAD+(PosAncestors,NegAncestors,Defaults)  BODY+(PosAncestors,NegAncestors,Defaults)
+% ======================================================
+:- dynamic(use_ancestor_checks/1).
+% use_ancestor_checks(unify_with_occurs_check).
+set_ancestor_checks(true):-!,set_ancestor_checks(unify_with_occurs_check).
+set_ancestor_checks(W):-retractall(use_ancestor_checks(_)),asserta(use_ancestor_checks(W)).
+:- set_ancestor_checks(global).  % TODO Make global work next
+:- set_ancestor_checks(true).
 
-add_consistency_checking((Head :- Body),(Head1 :- Body1)) :-
-        functor(Head,query,_) ->
-                Head1 = Head,
-		(do_model_inits -> conjoin(model_initialization(MM0),Body,Body2); Body=Body2),
-		add_consistency_checking_args(Body2,MM0,MMOut,Body1);
-        %true ->
-		Head =.. L,
-		append(L,[MMIn,MMOut],L1),
-		Head1 =.. L1,
-		add_consistency_checking_args(Body,MMIn,MMOut,Body1).
+no_ancestor_args:- (use_ancestor_checks(global) ; (\+ use_ancestor_checks(_)) ; use_ancestor_checks(false)),!.
+ancestor_global:- use_ancestor_checks(global).
 
-add_consistency_checking_args(Body,MMIn,MMOut,Body1) :-
-        Body = (A , B) ->
-                add_consistency_checking_args(A,MMIn,MMIn1,A1),
-                add_consistency_checking_args(B,MMIn1,MMOut,B1),
-                conjoin(A1,B1,Body1);
-        Body = (A ; B) ->
-                add_consistency_checking_args(A,MMIn,MMOut,A1),
-                add_consistency_checking_args(B,MMIn,MMOut,B1),
-                disjoin(A1,B1,Body1);
-        Body =.. [prove,Goal|L] ->
-                add_consistency_checking_args(Goal,MMIn,MMOut,Goal1), % ???
-                Body1 =.. [prove,Goal1|L];
-        Body = justification(X) ->
-		Body1 = compatible(X,MMIn,MMOut);
-        Body = fail ->
-                Body1 = Body;
-        builtin(Body) ->
-                MMIn = MMOut,
-                Body1 = Body;
-        %true ->
-                Body =.. L,
-                append(L,[MMIn,MMOut],L1),
-                Body1 =.. L1.
-
-add_model_structure(WffI,Q,C,WffO) :-
-	WffI = (A , B) ->
-                add_model_structure(A,Q,C,A1),
-                add_model_structure(B,Q,C,B1),
-		conjoin(A1,B1,WffO);
-        WffI = (A ; B) ->
-                add_model_structure(A,Q,C,A1),
-                add_model_structure(B,Q,C,B1),
-		disjoin(A1,B1,WffO);
-        WffI = (A :- B) ->
-                add_model_structure(B,Q,C,B1),
-		WffO = (A :- B1);
-	WffI = model_initialization(Var) ->
-	        combine_clauses(Q,C,Matrix),
-		WffO = model_initialization(Matrix,Var);
-        %true ->
-	        WffO = WffI.
-
-classical_clauses(WffI,WffO) :-
-        WffI = (A , B) ->
-                classical_clauses(A,A1),
-                classical_clauses(B,B1),
-		conjoin(A1,B1,WffO);
-        WffI = (A ; B) ->
-                classical_clauses(A,A1),
-                classical_clauses(B,B1),
-		disjoin(A1,B1,WffO);
-        WffI = (A :- B) ->                        % ??? (special case query elim. TS Apr04)
-	        WffO = true;
-        builtin(WffI) ->
-                WffO = true;
-        %true ->
-	        WffI = WffO.
-
-
-query_clause(WffI,WffO) :-
-        WffI = (A , B) ->
-	        (query_clause(A,WffO);
-                 query_clause(B,WffO));
-        WffI = (A ; B) ->
-                (query_clause(A,WffO);
-                 query_clause(B,WffO));
-        WffI = (A :- B) ->
-	        (A = query ->
-                      classical_clauses(B,WffO);
-		 %true ->
-                      fail);
-        %true ->
-	        fail.
-
-
+add_ancestor((Head :- Body),(Head :- Body)) :- no_ancestor_args,!.
 add_ancestor((Head :- Body),(Head1 :- Body1)) :-
         functor(Head,query,_) ->
                 Head1 = Head,
@@ -1418,8 +1375,8 @@ add_ancestor((Head :- Body),(Head1 :- Body1)) :-
                         conjoin((NewPosAncestors = [Head|PosAncestors]),Body2,Body1)).
 
 
-add_ancestor_args(Body,AncestorLists,Body1) :-
-        Body = (A , B) ->
+add_ancestor_args(Body,AncestorLists,Body1) :- must(\+ no_ancestor_args),
+       (Body = (A , B) ->
                 add_ancestor_args(A,AncestorLists,A1),
                 add_ancestor_args(B,AncestorLists,B1),
                 conjoin(A1,B1,Body1);
@@ -1435,8 +1392,58 @@ add_ancestor_args(Body,AncestorLists,Body1) :-
         %true ->
                 Body =.. L,
                 append(L,AncestorLists,L1),
-                Body1 =.. L1.
+                Body1 =.. L1).
 
+replace_last_args(AncestorLists,Body,Body1):-
+        (Body =.. [prove,Goal|L] ->
+                replace_last_args(AncestorLists,Goal,Goal1),
+                Body1 =.. [prove,Goal1|L];
+        builtin(Body) ->
+                Body1 = Body),!.
+replace_last_args(List,Head,Head1):-
+           Head=..[P|Args],
+           append(Args1,List,Args),
+           Head1=..[P|Args1].
+
+
+gancestor_tests(P,N,Result) :-
+        P == query ->
+                Result = true;
+	P == gamma ->
+		Head = gamma(DefaultID,DefaultConseq,_,_,Defaults),
+		Default = gamma(DefaultID,DefaultConseq),
+		Result = (Head :-  identical_member(Default,Defaults), !, fail);
+	P == alpha ->
+		Result = true;          % ??? <== Please, VERIFY !
+        %true ->
+                negated_functor(P,NotP),
+                N3 is N,            % N - 3 due to 3 gancestor-lists
+                functor(Head1,P,N3),
+                Head1 =.. [P|Args1],
+                Head2 =.. [NotP|Args1],
+                append(Args1,[PosAncestors,NegAncestors,_],Args),
+                Head =.. [P|Args],
+                (negative_functor(P) ->
+                        C1Ancestors = NegAncestors, 
+			C2Ancestors = PosAncestors;
+                %true ->
+                        C1Ancestors = PosAncestors, 
+			C2Ancestors = NegAncestors),
+                C1 = (Head :- identical_member(Head1,C1Ancestors), !, fail),
+                count_inferences_pred(IncNcalls),
+                (N3 = 0 ->              % special case for propositional calculus
+                        conjoin((identical_member(Head2,C2Ancestors) , !),IncNcalls,V);
+                %true ->
+                        conjoin(unifiable_member(Head2,C2Ancestors),IncNcalls,V)),
+                (compile_proof_printing ->
+                        conjoin(V,infer_by(reduction(Head2)),V1);
+                %true ->
+                        V1 = V),
+                C2 = (Head :- V1),
+                conjoin(C1,C2,Result).
+
+
+ancestor_tests(P,N,ResultO):- ancestor_global,!,must(gancestor_tests(P,N,ResultO)).
 ancestor_tests(P,N,Result) :-
         P == query ->
                 Result = true;
@@ -1493,9 +1500,15 @@ compile_complete_search.
 
 :- ensure_loaded(io).
 
+% ======================================================
+% HEAD+(DepthIn,DepthOut)  BODY+(DepthIn,DepthOut)
+% ======================================================
 add_complete_search(HeadBody,HeadBody) :-  (\+ compile_complete_search ),!.
 add_complete_search((Head :- Body),(Head1 :- Body1)) :-
-  Head =.. [_|HeadArgs],((
+                   name_the_var('DepthIn',DepthIn),
+                   name_the_var('DepthOut',DepthOut),
+    Head =.. [_|HeadArgs],
+   ((
         Head =.. L,
         append(L,[DepthIn,DepthOut],L1),
         Head1 =.. L1,
@@ -1505,11 +1518,15 @@ add_complete_search((Head :- Body),(Head1 :- Body1)) :-
                 add_complete_search_args(Head,Body,Depth1,DepthOut,Body2),
                 conjoin((DepthIn >= Cost , Depth1 is DepthIn - Cost),Body2,Body1);
         %true ->
-                add_complete_search_args(Head,Body,DepthIn,DepthOut,Body1)))).
+                add_complete_search_args(Head,Body,DepthIn,DepthOut,Body1)))),!.
 
+name_the_var(DepthOutN,DepthOut):-gensym(DepthOutN,DepthOutS),put_attr(DepthOut,varname,DepthOutS).
+% name_the_var2(DepthOutN,DepthOut):-gensym(DepthOutN,DepthOutS),ignore('$VAR'(DepthOutS)=DepthOut).
 
 add_complete_search_args(Head,Body,DepthInOut,DepthInOut,Body) :-  (\+ compile_complete_search ),!.   
 add_complete_search_args(Head,Body,DepthIn,DepthOut,Body1) :-  
+                  name_the_var('DepthIn',DepthIn),
+                  name_the_var('DepthOut',DepthOut),
    Head =.. [_|HeadArgs],
        	
         ((Body = (A , B) ->
