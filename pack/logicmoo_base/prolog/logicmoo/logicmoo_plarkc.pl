@@ -35,14 +35,18 @@ transTiny(Template,If):-transfer_predicate(tinyK8(Template),If,once(pfc_add(Temp
 
 :- transTiny(tCol(X),ground(X)).
 :- transTiny(arity(X,Y),ground((X,Y))).
-:- transTiny(genls(X,Y),ground((X,Y))).
-:- pfc_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
+:- transTiny(genls(X,Y),((X\=ftAtomicTerm,ground((X,Y))))).
+:- pfc_trace.
+% :- transTiny(genls(X,Y),((ground((X,Y))))).
+:- retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
+:- trace, pfc_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
 :- transTiny(genlMt(X,Y),writeq((X,Y))).
 :- transTiny(ttFormatType(X),ground(X)).
 
 :-pfc_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
 
 :-retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
+:- pfc_no_trace.
 
 /*
 :- transTiny(Form,(ground(Form),functor(Form,F,1),F\==neg)).

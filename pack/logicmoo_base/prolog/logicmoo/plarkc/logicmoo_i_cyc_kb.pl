@@ -30,13 +30,6 @@ cycPrepending(ft,'AtomicAssertion').
 cycPrepending(ft,'AtomicSentence').
 cycPrepending(ft,'AtomicTerm').
 cycPrepending(ft,'Character').
-cycPrepending(ft,'ClosedAtomicSentence').
-cycPrepending(ft,'ClosedAtomicTerm').
-cycPrepending(ft,'ClosedDenotationalTerm').
-cycPrepending(ft,'ClosedExpression').
-cycPrepending(ft,'ClosedFormula').
-cycPrepending(ft,'ClosedNonAtomicTerm').
-cycPrepending(ft,'ClosedSentence').
 cycPrepending(ft,'Constant').
 cycPrepending(ft,'DeducedAssertion').
 cycPrepending(ft,'DenotationalTerm').
@@ -64,11 +57,21 @@ cycPrepending(ft,'NonAtomicTerm-ClosedFunctor').
 cycPrepending(ft,'NonNegativeInteger').
 cycPrepending(ft,'NonVariableNonKeywordSymbol').
 cycPrepending(ft,'NonVariableSymbol').
+
 cycPrepending(ft,'OpenDenotationalTerm').
 cycPrepending(ft,'OpenExpression').
 cycPrepending(ft,'OpenFormula').
 cycPrepending(ft,'OpenNonAtomicTerm').
 cycPrepending(ft,'OpenSentence').
+cycPrepending(ft,'ClosedAtomicSentence').
+% cycPrepending(ft,'ClosedAtomicTerm').
+cycPrepending(ft,'ClosedDenotationalTerm').
+cycPrepending(ft,'ClosedExpression').
+cycPrepending(ft,'ClosedFormula').
+cycPrepending(ft,'ClosedNonAtomicTerm').
+cycPrepending(ft,'ClosedSentence').
+
+
 cycPrepending(ft,'PositiveInteger').
 cycPrepending(ft,'PropositionalSentence').
 cycPrepending(ft,'RealNumber').
@@ -140,6 +143,7 @@ cyc_to_plarkc('forAll', 'all').
 cyc_to_plarkc('thereExists', 'exists').
 cyc_to_plarkc('thereExistsAtLeast', 'atleast').
 cyc_to_plarkc('thereExistsAtMost', 'atmost').
+cyc_to_plarkc('CycLClosedAtomicTerm', 'ftAtomicTerm').
 %cyc_to_plarkc('or', 'v').
 cyc_to_plarkc('holds', 't').
 cyc_to_plarkc('dot_holds', 't').
@@ -190,6 +194,8 @@ mpred_to_cyc(vAdministrator, 'CycAdministrator').
 mpred_to_cyc(vIntervalEntry, 'IntervalEntry').
 mpred_to_cyc(vSingleEntry, 'SingleEntry').
 
+
+mpred_to_cyc(ftAtomicTerm, 'ClosedAtomicTerm').
 mpred_to_cyc(vSetTheFormat, 'SetTheFormat').
 
 mpred_to_cyc(vAssertedFalseDefault, 'AssertedFalseDefault').

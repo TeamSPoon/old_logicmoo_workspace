@@ -291,7 +291,7 @@ datatype(ftText)--> dcgOptional(detn(_)),[text].
 datatype(ftTerm)--> dcgOptional(detn(_)),[value].
 
 predicate_named(Pred) --> dcgAnd(theText(Text),dcgLenBetween(1,5)),
-  {trace,toCamelAtom(Text,O),i_name(mud,O,Pred),ignore(assumed_isa(Pred,tPred))}.
+  {toCamelAtom(Text,O),i_name(mud,O,Pred),ignore(assumed_isa(Pred,tPred))}.
 
 
 assumed_isa(I,C):-isa(I,C),!.

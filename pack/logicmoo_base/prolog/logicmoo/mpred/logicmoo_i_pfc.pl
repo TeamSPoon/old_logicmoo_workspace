@@ -84,9 +84,22 @@ compiled(F/A):- dynamic(F/A),compile_predicates([F/A]).
 :- compiled(('::::')/2).
 :- compiled(('<->')/2).
 */
+:-thread_local(thlocal:current_why_source/1).
 
-make_uu_remove((u(U),u(U))).
-get_source_ref((u(Mt),u(Mt))):- Mt =  mt.
+get_why_source(F):- thlocal:current_why_source(F),!.
+get_why_source(F:L):- get_source_location(F:L),L\=0,!.
+get_why_source(unk).
+
+% TODO ISSUE https://github.com/TeamSPoon/PrologMUD/issues/7
+match_source_ref1(u):-!.
+match_source_ref1(u(_)).
+make_uu_remove((U,U)):-match_source_ref1(U).
+
+% TODO ISSUE https://github.com/TeamSPoon/PrologMUD/issues/7
+get_source_ref1(u):-!.
+get_source_ref1(u(Mt)):-get_why_source(Mt),!.
+get_source_ref1(u(Mt)):-Mt=mt.
+get_source_ref((U,U)):- get_source_ref1(U).
 
 has_functor(_):-!,fail.
 has_functor(F/A):-!,atom(F),integer(A),!.
@@ -323,6 +336,7 @@ pfc_debug_trace(_,_):-pfc_silient,!.
 pfc_debug_trace(F,A):-wdmsg(F,A),!.
 
 % show_if_debug(A):- !,show_call(A).
+show_if_debug(A):- !, A.
 show_if_debug(A):- pfc_tracing->show_call(A);A.
 
 % ======================= 
@@ -335,7 +349,8 @@ assert_u(X):- unnumbervars(X,XO),functor(X,F,A),assert_u(XO,F,A).
 
 assert_u(X,F,_):-if_defined(singleValueInArg(F,SV)),!,must(update_single_valued_arg(X,SV)),!.
 assert_u(X,F,A):-prologSingleValued(F),!,must(update_single_valued_arg(X,A)),!.
-assert_u(X,F,A):-must(isa(F,prologOrdered) -> assertz_u(X,F,A) ; asserta_u(X,F,A)).
+assert_u(X,F,A):-must(isa(F,prologAssertAOrdered) -> asserta_u(X,F,A) ; assertz_u(X,F,A)).
+% assert_u(X,F,A):-must(isa(F,prologOrdered) -> assertz_u(X,F,A) ; asserta_u(X,F,A)).
 
 
 asserta_u(X):- never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
@@ -379,7 +394,8 @@ pfc_update_literal(P,N,Q,R):-
 update_single_valued_arg(P,N):-
    must(get_source_ref((U,U))),
   arg(N,P,UPDATE),notrace(replace_arg(P,N,OLD,Q)),
-  must_det_l((call_with_attvars(assert_if_new,spft(P,u,u)),(if_defined(P)->true;(assertz_u(P))),
+  get_source_ref1(U),
+  must_det_l((call_with_attvars(assert_if_new,spft(P,U,U)),(if_defined(P)->true;(assertz_u(P))),
      doall((clause(Q,true,E),UPDATE \== OLD,erase_safe(clause(Q,true,E),E),pfc_unfwc1(Q))))).
 
 
@@ -529,7 +545,7 @@ pfc_assert_fast(P0):-
 pfc_assert_fast((nesc P),S) :- nonvar(P),!,
   pfc_assert_fast(P,S).
 
-pfc_assert_fast(P0,S):- gripe_time(0.6,pfc_assert_fast_timed(P0,S)).
+pfc_assert_fast(P0,S):- gripe_time(0.90,pfc_assert_fast_timed(P0,S)).
 
 pfc_assert_fast_timed(P0,S):-
   must(to_addable_form_wte(assert,P0,P)),
@@ -606,7 +622,7 @@ with_pfc_trace_exec(P):- with_assertions(thlocal:pfc_trace_exec, must(show_call(
 pfc_test(P):- with_pfc_trace_exec(must(show_call(P))).
 
 is_already_supported(P,(S,T),(S,T)):- clause_asserted(spft(P,S,T)),!.
-is_already_supported(P,_S,UU):- must(get_source_ref(UU)), clause_asserted(spft(P,US,UT)),!,UU=(US,UT).
+is_already_supported(P,_S,UU):- clause_asserted(spft(P,US,UT)),!,must(get_source_ref(UU)),UU=(US,UT).
 
 % TOO UNSAFE 
 % is_already_supported(P,_S):- copy_term(P,PC),spft(PC,_,_),P=@=PC,!.
@@ -623,7 +639,7 @@ different_literal(Q,N,R,Test):-
 
 
 % was nothing  pfc_current_db/1.
-pfc_current_db(u).
+pfc_current_db(U):-get_source_ref1(U).
 pfc_current.
 
 
@@ -1089,7 +1105,7 @@ pfc_scan_tms(P):-pfc_get_support(P,(S,SS)),
    once((pfc_deep_support(_How,P)->true;
      (dmsg(warn(now_maybe_unsupported(pfc_get_support(P,(S,SS)),fail))))))).
 
-user_atom(u).
+user_atom(U):-match_source_ref1(U).
 user_atom(g).
 user_atom(m).
 user_atom(d).
@@ -1181,7 +1197,7 @@ support_ok_via_clause_body(_,F,_):- \+ pfcControlled(F),!.
 pfc_get_support_precanonical(F,Sup):-to_addable_form_wte(pfc_get_support_precanonical,F,P),pfc_get_support(P,Sup).
 spft_precanonical(F,SF,ST):-to_addable_form_wte(spft_precanonical,F,P),!,spft(P,SF,ST).
 
-trigger_supports_f_l(u,[]) :- !.
+trigger_supports_f_l(U,[]) :- match_source_ref1(U),!.
 trigger_supports_f_l(Trigger,[Fact|MoreFacts]) :-
   pfc_get_support_precanonical_plus_more(Trigger,(Fact,AnotherTrigger)),
   trigger_supports_f_l(AnotherTrigger,MoreFacts).
@@ -1201,7 +1217,7 @@ pfc_fwd(P,S) :- pfc_fwd1(P,S),!.
 
 
 
-pfc_fwd1(Fact,Sup) :- gripe_time(0.50,pfc_fwd2(Fact,Sup)),!.
+pfc_fwd1(Fact,Sup) :- gripe_time(0.80,pfc_fwd2(Fact,Sup)),!.
 
 pfc_fwd2(Fact,Sup) :- cyclic_term(Fact;Sup),writeq(pfc_fwd2_cyclic_term(Fact;Sup)),!.
 pfc_fwd2(Fact,_Sup) :-
@@ -1288,14 +1304,14 @@ pfc_define_bc_rule(Head,Body,Parent_rule) :-
   dtrace(pfc_define_bc_rule(Head,Body,Parent_rule)),
   fail.
 
-pfc_define_bc_rule(Head,Body,Parent_rule) :- 
+pfc_define_bc_rule(Head,Body,Parent_rule) :-  
   copy_term(Parent_rule,Parent_ruleCopy),
   call_with_attvars(assert_if_new,Head:-pfc_bc_only(Head)),
   build_rhs(Head,Head,Rhs),
   foreachl_do(pfc_nf(Body,Lhs),
        (build_trigger(Parent_ruleCopy,Lhs,rhs(Rhs),Trigger),
-       % can be pfc_post_sp(bt(Head,Trigger),(Parent_ruleCopy,u))
-         pfc_assert_fast(bt(Head,Trigger),(Parent_ruleCopy,u)))).
+       % can be pfc_post_sp(bt(Head,Trigger),(Parent_ruleCopy,U))
+         ((get_source_ref1(U),pfc_assert_fast(bt(Head,Trigger),(Parent_ruleCopy,U)))))).
         
 
 %=
@@ -1735,11 +1751,12 @@ pfc_connective('\\+').
 cyclic_break(Cyclic):-cyclic_term(Cyclic)->(writeq(cyclic_break(Cyclic)),nl,prolog);true.
 
 process_rule(Lhs,Rhs,Parent_rule) :- 
+  get_source_ref1(U),
   copy_term(Parent_rule,Parent_ruleCopy),
   build_rhs((Parent_ruleCopy),Rhs,Rhs2),
-   cyclic_break((Lhs,Rhs,Rhs2,Parent_ruleCopy)),
+   cyclic_break((Lhs,Rhs,Rhs2,Parent_ruleCopy)),   
   foreachl_do(pfc_nf(Lhs,Lhs2),
-   doall(build_rule(Lhs2,rhs(Rhs2),(Parent_ruleCopy,u)))).
+   doall(build_rule(Lhs2,rhs(Rhs2),(Parent_ruleCopy,U)))).
 
 build_rule(Lhs,Rhs,Support) :-
   build_trigger(Support,Lhs,Rhs,Trigger),
@@ -2045,9 +2062,9 @@ pfc_database_item(Term) :-
   clause_u(Term,_).
 
 pfc_retract_or_warn_i(X) :- retract_i(X),pfc_debug_trace("Success retract: ~p.",[X]),!.
-pfc_retract_or_warn_i(X) :- \+ \+ X =spft(neg(_),_,_),!.
-pfc_retract_or_warn_i(X) :- ground(X),pfc_debug_trace("Couldn't retract ~p.",[X]),!.
-pfc_retract_or_warn_i(_).
+pfc_retract_or_warn_i(X) :- ( \+ \+  (X =spft(neg(_),_,_))), !.
+pfc_retract_or_warn_i(X) :- ground(X),pfc_debug_trace("Couldn't retract ground term ~p.",[X]),!.
+pfc_retract_or_warn_i(X) :- pfc_debug_trace("Couldn't retract ~p.",[X]),!.
 
 % ======================= pfc_file('pfcdebug').	% debugging aids (e.g. tracing).
 %   File   : pfcdebug.pl
@@ -2398,7 +2415,7 @@ pfc_descendants(P,L) :-
 compute_resolve(NewerP,OlderQ,SU,SU,(pfc_remove3(OlderQ),pfc_add(NewerP,S),pfc_rem1(conflict(NewerP)))):-
   must(correctify_support(SU,S)),
   wdmsg(compute_resolve(newer(NewerP-S)>older(OlderQ-S))).
-compute_resolve(NewerP,OlderQ,S1,[u],Resolve):-compute_resolve(OlderQ,NewerP,[u],S1,Resolve),!.
+compute_resolve(NewerP,OlderQ,S1,[U],Resolve):-compute_resolve(OlderQ,NewerP,[U2],S1,Resolve),match_source_ref1(U),match_source_ref1(U2),!.
 compute_resolve(NewerP,OlderQ,SU,S2,(pfc_remove3(OlderQ),pfc_add(NewerP,S1),pfc_rem1(conflict(NewerP)))):-
   must(correctify_support(SU,S1)),
   wdmsg(compute_resolve((NewerP-S1)>(OlderQ-S2))).
