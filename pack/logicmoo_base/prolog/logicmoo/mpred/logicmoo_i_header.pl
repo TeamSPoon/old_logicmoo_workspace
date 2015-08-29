@@ -228,15 +228,18 @@ load_time_sanity.
 :- op(1050,xfx,'<->').
 :- op(1050,xfx,('<-')).
 :- op(1100,fx,('=>')).
+:- op(1100,fx,('==>')).
 :- op(1100,fx,('nesc')).
 :- op(1150,xfx,('::::')).
 :- op(300,fx,'-').
 :- op(600,yfx,'&').  
 :- op(600,yfx,'v').
 :- op(1075,xfx,'<=').
-:- op(1075,xfx,'<=').
+:- op(1075,xfx,'<-').
 :- op(1070,xfx,'=>').
 :- op(1070,xfx,'<=>').
+:- op(1100,xfx,('<==>')).
+:- op(1100,xfx,('==>')).
 :- op(350,xfx,'xor').
 :- op(300,fx,user:'~').
 :- op(300,fx,user:'-').
@@ -307,6 +310,7 @@ load_time_sanity.
 :- dynamic_multifile_exported user:registered_module_type/2.
 :- dynamic_multifile_exported user:already_added_this_round/1.
 :- dynamic_multifile_exported user:is_mpred_file/1.
+:- dynamic_multifile_exported user:decl_database_hook/2.
 
 :- multifile user:local_term_anglify/2.
 :- multifile user:term_anglify_last/2.

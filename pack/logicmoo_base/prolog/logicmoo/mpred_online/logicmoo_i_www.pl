@@ -166,13 +166,15 @@ get_nv(N,V):- must(param_default_value(N,D)),get_nv(N,V,D).
 
 
 get_nv(N,V,D):- nonvar(V),!,get_nv(N,VV,D),!,param_matches(V,VV).
+get_nv(L,V,_):-get_param(L,V).
+get_nv(_,V,V):-!.
 
-get_nv(L,V,_):- (is_list(L)-> member(N,L) ; N=L),
+get_param(L,V):- (is_list(L)-> member(N,L) ; N=L),
      CALL2 =.. [N,V,[optional(true),default(Foo)]],
   httpd_wrapper:http_current_request(B),
    http_parameters:http_parameters(B,[CALL2])->
        V \== Foo,!.
-get_nv(_,V,V):-!.
+
 % get_nv(L,V,V):- (is_list(L)-> member(N,L) ; N=L), http_save_in_session(N=V),!.
 
 get_nv_session(L,V,_):- (is_list(L)-> member(N,L) ; N=L),
@@ -291,14 +293,27 @@ show_select1(Name,Pred):-
  format('</select>',[]),!.
 
 
+ 
+
 edit_term:-
-    reset_assertion_display,
+ must_det_l((
+   reset_assertion_display,
    get_nv(term,String,""),
-   ignore(get_nv(search,Word)),
-   ignore(get_nv_session(search,Word,String)),
+   ignore(get_nv(search,Word,String)),
+   % ignore(get_nv_session(search,Word,String)),
    term_to_pretty_string(Word,SWord),
-   httpd_wrapper:http_current_request(Request),
-   member(request_uri(URL),Request),
+   show_call(show_edit_term(String,SWord)))).
+
+show_edit_term(String,_SWord):-read_term_from_atom(String,T,[]),compound(T),T=(H:-_),!,show_edit_term0(String,H).
+show_edit_term(String,SWord):-show_edit_term0(String,SWord).
+
+show_edit_term0(String,SWord):-atom(SWord),read_term_from_atom(SWord,T,[]),nonvar(T),!,show_edit_term1(String,T).
+show_edit_term0(String,SWord):-show_edit_term1(String,SWord).
+
+show_edit_term1(String,(P=>Q)):-show_edit_term1(String,(P;Q;(P=>Q))).
+show_edit_term1(String,SWord):-
+    httpd_wrapper:http_current_request(Request),
+    member(request_uri(URL),Request),  
 format('
 <table width="1111" cellspacing="0" cellpadding="0" height="121" id="table4">
  <!-- MSTableType="nolayout" -->

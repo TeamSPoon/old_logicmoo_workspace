@@ -17,7 +17,7 @@ pfc_translate_rule((LP-->>RP),(H <= B)):-
 
 
 pfc_translate_rule((LP--*>>[]),H) :- !, pfc_t_lp(LP,_Id,S,S,H).
-pfc_translate_rule((LP--*>>RP),(B => H)):-
+pfc_translate_rule((LP--*>>RP),(B ==> H)):-
    pfc_t_lp(LP,Id,S,SR,H),
    pfc_t_rp(RP,Id,S,SR,B1),
    pfc_tidy(B1,B).

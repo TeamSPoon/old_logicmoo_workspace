@@ -76,7 +76,7 @@ pp_item(M,spft(W,U,U)):-!,pp_item(M,U:W).
 pp_item(M,spft(W,F,U)):- atom(U),!,    fmt('~N%~n',[]),pp_item(M,U:W), fmt('rule: ~p~n~n', [F]),!.
 pp_item(M,spft(W,F,U)):-          !,   fmt('~w~nd:       ~p~nformat:    ~p~n', [M,W,F]),pp_item(M,U).
 pp_item(M,nt(Trigger,Test,Body)) :- !, fmt('~w n-trigger: ~p~ntest: ~p~nbody: ~p~n', [M,Trigger,Test,Body]).
-pp_item(M,pt(F,Body)):-              !,fmt('~w p-trigger: ~p~n~nbody:~n', [M,F]), pp_i2tml0((F:-Body)).
+pp_item(M,pt(F,Body)):-              !,fmt('~w p-trigger: ~p~n~nbody:~n', [M,F]), pp_i2tml_now((F:-Body)).
 pp_item(M,bt(F,Body)):-              !,fmt('~w b-trigger: ~p~nbody: ~p~n', [M,F,Body]).
 
 pp_item(M,U:W):- !,sformat(S,'~w  ~w:',[M,U]),!, pp_item(S,W).
@@ -398,8 +398,13 @@ pp_i2tml_saved_done(Obj):-
   findall(H,retract(sortme_buffer(Obj,H)),List),predsort(head_functor_sort,List,Set),
   forall(member(S,Set),pp_i2tml(S)),!.
 
-find_ref((H:-B),Ref):-!, clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!.
-find_ref(H,Ref):- clause(H,true,Ref),clause(HH,true,Ref),H=@=HH,!.
+
+find_cl_ref(clause(H,B,Ref),Ref):-!.
+find_cl_ref(clause(H,B),Ref):- clause(H,B,Ref),!.
+find_cl_ref((H:-B),Ref):-!, clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!.
+find_cl_ref(H,Ref):- clause(H,true,Ref),clause(HH,true,Ref),H=@=HH,!.
+
+find_ref(H,Ref):- find_cl_ref(H,Ref),!.
 find_ref(This,Ref):- '$was_imported_kb_content$'(A,CALL),arg(1,CALL,This),clause('$was_imported_kb_content$'(A,CALL),true,Ref),!.
 find_ref(M:This,Ref):- atom(M),!,find_ref(This,Ref).
 
@@ -442,69 +447,90 @@ pp_item_html_now(Type,H):-
    pp_item_html_if_in_range(Type,H),!,
    assert(shown_clause(H)),!.
 
+
 pp_item_html_if_in_range(Type,H):- section_open(Type),!,pp_i2tml(H),!,nl.
 
 :-thread_local(thlocal:last_show_clause_ref/1).
+:-thread_local(thlocal:current_clause_ref/1).
 
+
+show_clause_ref(Ref):- Ref == none,!.
 show_clause_ref(Ref):- thlocal:last_show_clause_ref(Ref),!.
 show_clause_ref(Ref):- retractall(thlocal:last_show_clause_ref(_)),asserta(thlocal:last_show_clause_ref(Ref)),logOnError(show_clause_ref_now(Ref)),!.
 
-show_clause_ref_now(_):-!.
+show_clause_ref_now(V):-var(V),!.
+show_clause_ref_now(0):-!.
+show_clause_ref_now(Ref):- \+ clause_property(Ref,predicate(_)),format('~N~p~N',[clref(Ref)]),!.
+% write_html(div(class(src_formats),a(href(EditLink), edit)])).
 show_clause_ref_now(Ref):- clause_property(Ref,file(File)),ignore(clause_property(Ref,line_count(Line))),
-  ignore(clause_property(Ref,module(Module))),format('~N~nfile:~w:~w (~w)~N',[File,Line,Module]),!.
-  % write_html(div(class(src_formats),a(href(EditLink), edit)])).
-
+  ignore(clause_property(Ref,module(Module))),
+    format('<a href="/swish/filesystem/~w#L~w">@file:~w:~w</a>(~w)~N',[File,Line,File,Line,Module]),
+    fail. 
+show_clause_ref_now(Ref):- clause_property(Ref,erased),
+  ignore(clause_property(Ref,module(Module))),
+    format('erased(~w) (~w)~N',[Ref,Module]),!.
 
 pp_i2tml(Done):-Done==done,!.
 pp_i2tml(T):-isVarProlog(T),getVarAtom(T,N),format('~w',[N]),!.
 pp_i2tml(T):-string(T),format('"~w"',[T]).
-pp_i2tml(clause(H,B,Ref)):- show_clause_ref(Ref),!,pp_i2tml((H:-B)).
-pp_i2tml((H :- B)):-B==true,!,pp_i2tml((H)),!.
-pp_i2tml(USER:HB):-USER==user,!,pp_i2tml(HB),!.
-pp_i2tml(((USER:H) :- B)):-USER==user,!,pp_i2tml((H:-B)),!.
-pp_i2tml((H:-B)):-B==true, !, pp_i2tml(H).
-pp_i2tml(was_chain_rule(H)):- pp_i2tml(H).
-pp_i2tml(M:(H)):-M==user, pp_i2tml(H).
-pp_i2tml(is_edited_clause(H,B,A)):- pp_i2tml(proplst([(clause)=H,before=B,after=A])).
-pp_i2tml(is_disabled_clause(H)):- pp_i2tml((disabled)=H).
+pp_i2tml(clause(H,B,Ref)):- !, with_assertions(thlocal:current_clause_ref(Ref),pp_i2tml_0((H:-B))).
+pp_i2tml(HB):- find_ref(HB,Ref),!, with_assertions(thlocal:current_clause_ref(Ref),pp_i2tml_0((HB))).
+pp_i2tml(HB):- with_assertions(thlocal:current_clause_ref(none),pp_i2tml_0((HB))).
 
-pp_i2tml('$was_imported_kb_content$'(_,_)):- hide_data(source_meta),!.
-pp_i2tml(pfcMark(_,_,_,_)):- hide_data(source_meta),!.
+pp_i2tml_0((H :- B)):-B==true,!,pp_i2tml_0((H)),!.
+pp_i2tml_0(USER:HB):-USER==user,!,pp_i2tml_0(HB),!.
+pp_i2tml_0(((USER:H) :- B)):-USER==user,!,pp_i2tml_0((H:-B)),!.
+pp_i2tml_0((H:-B)):-B==true, !, pp_i2tml_0(H).
+pp_i2tml_0(was_chain_rule(H)):- pp_i2tml_0(H).
+pp_i2tml_0(M:(H)):-M==user, pp_i2tml_0(H).
+pp_i2tml_0(is_edited_clause(H,B,A)):- pp_i2tml_0(proplst([(clause)=H,before=B,after=A])).
+pp_i2tml_0(is_disabled_clause(H)):- pp_i2tml_0((disabled)=H).
 
-% pp_i2tml(FET):-fully_expand(assert,FET,NEWFET),FET\=@=NEWFET,!,pp_i2tml(NEWFET).
+pp_i2tml_0('$was_imported_kb_content$'(_,_)):- hide_data(source_meta),!.
+pp_i2tml_0(pfcMark(_,_,_,_)):- hide_data(source_meta),!.
 
-pp_i2tml(P):- (hide_data(P); (compound(P),functor(P,F,A),(hide_data(F/A);hide_data(F)))),!.
+% pp_i2tml_0(FET):-fully_expand(assert,FET,NEWFET),FET\=@=NEWFET,!,pp_i2tml_0(NEWFET).
 
-pp_i2tml(spft(P,U,U)):- nonvar(U),!, pp_i2tml(P:-asserted_by(U)).
-pp_i2tml(spft(P,F,T)):- atom(F),atom(T),!, pp_i2tml(P:-asserted_in(F:T)).
-pp_i2tml(spft(P,F,T)):- atom(T),!,  pp_i2tml(((P):-  T:'t-deduced',F)). 
-pp_i2tml(spft(P,F,T)):- atom(F),!,  pp_i2tml(((P):-  F:'f-deduced',T)). 
-pp_i2tml(spft(P,F,T)):- !, pp_i2tml((P:- ( 'deduced-from'=F,  (rule_why = T)))).
-pp_i2tml(nt(Trigger,Test,Body)) :- !, pp_i2tml(proplst(['n-trigger'=Trigger , format=Test  ,  (body = (Body))])).
-pp_i2tml(pt(Trigger,Body)):-      pp_i2tml(proplst(['p-trigger'=Trigger , ( body = Body)])).
-pp_i2tml(bt(Trigger,Body)):-      pp_i2tml(proplst(['b-trigger'=Trigger ,  ( body = Body)])).
+pp_i2tml_0(P):- (hide_data(P); (compound(P),functor(P,F,A),(hide_data(F/A);hide_data(F)))),!.
 
-pp_i2tml(proplst([N=V|Val])):- is_list(Val),!, pp_i2tml(N:-([clause=V|Val])).
-pp_i2tml(proplst(Val)):-!, pp_i2tml(:-(proplst(Val))).
+pp_i2tml_0(spft(P,U,U)):- nonvar(U),!, pp_i2tml_1(P:-asserted_by(U)).
+pp_i2tml_0(spft(P,F,T)):- atom(F),atom(T),!, pp_i2tml_1(P:-asserted_in(F:T)).
+pp_i2tml_0(spft(P,F,T)):- atom(T),!,  pp_i2tml_1(((P):-  T:'t-deduced',F)). 
+pp_i2tml_0(spft(P,F,T)):- atom(F),!,  pp_i2tml_1(((P):-  F:'f-deduced',T)). 
+pp_i2tml_0(spft(P,F,T)):- !, pp_i2tml_1((P:- ( 'deduced-from'=F,  (rule_why = T)))).
+pp_i2tml_0(nt(Trigger,Test,Body)) :- !, pp_i2tml_1(proplst(['n-trigger'=Trigger , format=Test  ,  (body = (Body))])).
+pp_i2tml_0(pt(Trigger,Body)):-      pp_i2tml_1(proplst(['p-trigger'=Trigger , ( body = Body)])).
+pp_i2tml_0(bt(Trigger,Body)):-      pp_i2tml_1(proplst(['b-trigger'=Trigger ,  ( body = Body)])).
+
+pp_i2tml_0(proplst([N=V|Val])):- is_list(Val),!, pp_i2tml_1(N:-([clause=V|Val])).
+pp_i2tml_0(proplst(Val)):-!, pp_i2tml_1(:-(proplst(Val))).
 
 
-pp_i2tml(M:H):- M==user,!,pp_i2tml(H).
-pp_i2tml((M:H:-B)):- M==user,!,pp_i2tml((H:-B)).
-pp_i2tml(H):- 
+pp_i2tml_0(M:H):- M==user,!,pp_i2tml_1(H).
+pp_i2tml_0((M:H:-B)):- M==user,!,pp_i2tml_1((H:-B)).
+pp_i2tml_0(HB):-pp_i2tml_1(HB).
+
+if_html(F,A):-thlocal:print_mode(html),!,format(F,[A]).
+if_html(F,A):-A.
+
+pp_i2tml_1(H):- 
  once(((last_item_offered(Was);Was=foobar),get_functor(Was,F1,A1),get_functor(H,F2,A2),
    retractall(last_item_offered(Was)),asserta(last_item_offered(H)),
-    ((F1 \== F2 -> format('<hr/>',[]);true)))),fail.
+    ((F1 \== F2 -> if_html('~N<hr/>',true);true)))),fail.
 
-pp_i2tml(H):- thlocal:print_mode(html), 
+pp_i2tml_1(_H):- thlocal:current_clause_ref(Ref),
+    if_html('<font size="1">~@</font>',show_clause_ref(Ref)),fail.
+
+pp_i2tml_1(H):- thlocal:print_mode(html), 
   term_to_pretty_string(H,ALT)->
    functor_to_color(H,FC)->fmtimg(FC,ALT)->
     format('<input type="checkbox" name="assertion[]" value="~w">',[ALT]),fail.
 
-pp_i2tml(H):- \+ \+  (( \+ ground(H), must(( name_vars(H,HH),numbervars(HH,0,_,[attvar(skip)]), pp_i2tml0(HH))))).
-pp_i2tml(H):- \+ \+ pp_i2tml0(H).
+pp_i2tml_1(H):- \+ \+  (( \+ ground(H), must(( name_vars(H,HH),numbervars(HH,0,_,[attvar(skip)]), pp_i2tml_now(HH))))).
+pp_i2tml_1(H):- \+ \+ pp_i2tml_now(H).
 
-pp_i2tml0(C):- thlocal:pp_i2tml_hook(C),!.
-pp_i2tml0(C):- if_defined(rok_portray_clause(C),portray_clause(C)).
+pp_i2tml_now(C):- thlocal:pp_i2tml_hook(C),!.
+pp_i2tml_now(C):- if_html('<font size="3">~@</font>~n',if_defined(rok_portray_clause(C),portray_clause(C))).
 
 url_encode(B,A):- atom_concat('\n',BT,B),!,url_encode(BT,A).
 url_encode(B,A):- atom_concat(BT,'\n',B),!,url_encode(BT,A).
@@ -574,3 +600,5 @@ functor_to_color(G,(mudEquals),_,pink).
 functor_to_color(G,(skolem),_,pink).
 functor_to_color(G,(wid),_,green_yellow).
 
+
+% :- (thread_property(ID,status(running)),ID=reloader30) -> true; thread_create(((repeat,sleep(30),mmake,fail)),_,[alias(reloader30),detached(true)]).

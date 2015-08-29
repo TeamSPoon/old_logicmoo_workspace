@@ -29,7 +29,7 @@ user:agent_call_command(Agent,Verb):- compound(Verb), functor(Verb,Sit,1),vtPost
 
 user:action_info(actOnto(isOptional(tFurniture,vHere),Posture),txtConcatFn("onto tObj do ",Posture)):-vtPosture(Posture).
 
-vtPosture(Posture)/i_name(act,Posture,ActPosture) => {DO=..[ActPosture,isOptional(tFurniture,vHere)]}, user:action_info(DO,txtConcatFn("onto tObj do ",Posture)).
+vtPosture(Posture)/i_name(act,Posture,ActPosture) ==> {DO=..[ActPosture,isOptional(tFurniture,vHere)]}, user:action_info(DO,txtConcatFn("onto tObj do ",Posture)).
 
 
 user:agent_call_command(Agent,actOnto(Where,Sit)):-

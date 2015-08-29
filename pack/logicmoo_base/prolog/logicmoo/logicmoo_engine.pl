@@ -266,8 +266,8 @@ kif_sanity_test_0:- kif_test(loves(fatherFn(Child),Child)).
 %:- must(((kif_test(isa(F,tPred) => exists(A, (isa(A,ftInt) & arity(F,A))))))).
 
 :-nop(( kif_result(
-(=> pfc_default((
-   tPred(F) => 
+(==> pfc_default((
+   tPred(F) ==> 
       {A = skIsIntInPredArg2ofArityFn(F)},arity(F,A) & ftInt(A))
  ))))).
 

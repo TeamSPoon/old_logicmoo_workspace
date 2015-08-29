@@ -33,9 +33,9 @@
 
 :- op(500,fx,'~').
 :- op(1050,xfx,('=>')).
-:- op(1050,xfx,'<=>').
+:- op(1050,xfx,'<==>').
 :- op(1050,xfx,('<=')).
-:- op(1100,fx,('=>')).
+:- op(1100,fx,('==>')).
 :- op(1150,xfx,('::::')).
 :-dynamic(mudTermAnglify/2).
 tCol(meta_argtypes).
@@ -61,7 +61,7 @@ tCol(ftProlog).
 tCol(tWorld).
 isa(iWorld7,tWorld).
 
-% => neg(arity(bordersOn,1)).
+% ==> neg(arity(bordersOn,1)).
 
 %user:ruleRewrite(isa(isInstFn(Sub),Super),genls(Sub,Super)):-ground(Sub:Super),!.
 
@@ -85,7 +85,7 @@ genls(ttSpatialType,ttTemporalType).
 ttUnverifiableType(ftDice).
 ttUnverifiableType(vtDirection).
 
-((typeGenls(TypeType,Super), genls(Type,Super)) => isa(Type,TypeType)).
+((typeGenls(TypeType,Super), genls(Type,Super)) ==> isa(Type,TypeType)).
 
 
 
@@ -95,7 +95,7 @@ disjointWith(A,B):- disjointWithT(A,B).
 disjointWith(A,B):- disjointWithT(AS,BS),transitive_subclass_or_same(A,AS),transitive_subclass_or_same(B,BS).
 disjointWith(A,B):- once((type_isa(A,AT),type_isa(B,BT))),AT \= BT.
 */
-disjointWith(Sub, Super) => disjointWith( Super, Sub).
+disjointWith(Sub, Super) ==> disjointWith( Super, Sub).
 disjointWith(tObj,tRegion).
 disjointWith(tRegion,tObj).
 disjointWith(ttSpatialType,ttAbstractType).
@@ -105,22 +105,22 @@ disjointWith(ttSpatialType,ttAbstractType).
 
 isa(arity,ptBinaryPredicate).
 
-(arity(Pred,2),tPred(Pred)) <=> isa(Pred,ptBinaryPredicate).
+(arity(Pred,2),tPred(Pred)) <==> isa(Pred,ptBinaryPredicate).
 prologHybrid(relationMostInstance(ptBinaryPredicate,tCol,vtValue)).
-relationMostInstance(BP,_,_)=>(ptBinaryPredicate(BP),tRolePredciate(BP)).
+relationMostInstance(BP,_,_)==>(ptBinaryPredicate(BP),tRolePredciate(BP)).
 prologHybrid(relationAllInstance(ptBinaryPredicate,tCol,vtValue)).
-relationAllInstance(BP,_,_)=>ptBinaryPredicate(BP).
+relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
 
-((isa(Inst,ttSpatialType), tCol(Inst)) => genls(Inst,tSpatialThing)).
+((isa(Inst,ttSpatialType), tCol(Inst)) ==> genls(Inst,tSpatialThing)).
 
-% (isa(Inst,Type), tCol(Inst)) => isa(Type,ttTypeType).
-% (isa(TypeType,ttTypeType) , isa(Inst,TypeType), genls(SubInst,Inst)) => isa(SubInst,TypeType).
+% (isa(Inst,Type), tCol(Inst)) ==> isa(Type,ttTypeType).
+% (isa(TypeType,ttTypeType) , isa(Inst,TypeType), genls(SubInst,Inst)) ==> isa(SubInst,TypeType).
 
-(ttFormatType(FT),{compound(FT)})=>meta_argtypes(FT).
+(ttFormatType(FT),{compound(FT)})==>meta_argtypes(FT).
 
-=> tCol(vtDirection).
+==> tCol(vtDirection).
 
-disjointWith(Sub, Super) => disjointWith( Super, Sub).
+disjointWith(Sub, Super) ==> disjointWith( Super, Sub).
 disjointWith(tObj,tRegion).
 disjointWith(ttSpatialType,ttAbstractType).
 
@@ -138,7 +138,7 @@ dividesBetween(tAgent,tPlayer,tNpcPlayer).
 %:-export(repl_writer(tAgent,ftTerm)).
 %prologHybrid(typeProps(tCol,ftVoprop)).
 
-% defined more correctly below dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
+% defined more correctly below dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 dividesBetween(tItem,tMassfull,tMassless).
 dividesBetween(tObj,tItem,tAgent).
 dividesBetween(tObj,tMassfull,tMassless).
@@ -153,28 +153,28 @@ dividesBetween(tObj,tMassfull,tMassless).
 dividesBetween(tSpatialThing,tObj,tRegion).
 dividesBetween(tAgent,tPlayer,tNpcPlayer).
 
-% dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
+% dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 
-% disjointWith(P1,P2) => ((neg(isa(C,P1))) <=> isa(C,P2)).
+% disjointWith(P1,P2) ==> ((neg(isa(C,P1))) <==> isa(C,P2)).
 
-% isa(Col1, ttObjectType) => neg(isa(Col1, ttFormatType)).
+% isa(Col1, ttObjectType) ==> neg(isa(Col1, ttFormatType)).
 
-=> tCol(tCol).
-=> tCol(tPred).
-=> tCol(tFunction).
-=> tCol(tRelation).
-=> tCol(ttSpatialType).
-=> tCol(ttFormatType).
-=> tCol(functorDeclares).
+==> tCol(tCol).
+==> tCol(tPred).
+==> tCol(tFunction).
+==> tCol(tRelation).
+==> tCol(ttSpatialType).
+==> tCol(ttFormatType).
+==> tCol(functorDeclares).
 % tCol(ArgsIsa):-user:mpred_is_trigger(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
-=> tCol(ttFormatType).
-=> tSpec(vtActionTemplate).
-=> tCol(tRegion).
-=> tCol(tContainer).
+==> tCol(ttFormatType).
+==> tSpec(vtActionTemplate).
+==> tCol(tRegion).
+==> tCol(tContainer).
 
-%(mpred_prop(_,meta_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) => meta_argtypes(ArgTypes).
+%(mpred_prop(_,meta_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) ==> meta_argtypes(ArgTypes).
 
 
 
@@ -194,11 +194,11 @@ tCol(tFly).
 prologHybrid(localityOfObject(tObj,tSpatialThing)).
 
 
-(tCol(Inst), {isa_from_morphology(Inst,Type)}) => isa(Inst,Type).
+(tCol(Inst), {isa_from_morphology(Inst,Type)}) ==> isa(Inst,Type).
 
 % HOW TO MAKE THIS FAST? isa(Inst,Type) <= {isa_from_morphology(Inst,Type)}.
 
-%((disjointWith(P1,P2) , genls(C1,P1), {dif:dif(C1,P1)}) =>    disjointWith(C1,P2)).
+%((disjointWith(P1,P2) , genls(C1,P1), {dif:dif(C1,P1)}) ==>    disjointWith(C1,P2)).
 % (disjointWith(C1,P2) <= (genls(C1,P1), {dif:dif(C1,P1)}, disjointWith(P1,P2))).
 
 tCol(completelyAssertedCollection).
@@ -224,20 +224,20 @@ dividesBetween(tSpatialThing,tObj,tRegion).
 dividesBetween(tAgent,tPlayer,tNpcPlayer).
 
 
-((dividesBetween(S,C1,C2),{ground(S:C1:C2)}) => ((disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)))).
+((dividesBetween(S,C1,C2),{ground(S:C1:C2)}) ==> ((disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)))).
 
-isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
+isa(Col1, ttObjectType) ==> ~isa(Col1, ttFormatType).
 
 neg(isa(I,Super)) <= {ground(isa(I,Super))}, (isa(I,Sub), disjointWith(Sub, Super)).
-% disjointWith(P1,P2) => {\+(isa(P1,ttNonGenled)),\+(isa(P2,ttNonGenled))},(neg(isa(C,P1)) <=> isa(C,P2)).
+% disjointWith(P1,P2) ==> {\+(isa(P1,ttNonGenled)),\+(isa(P2,ttNonGenled))},(neg(isa(C,P1)) <==> isa(C,P2)).
 
 
-=> tCol(ttSpatialType).
+==> tCol(ttSpatialType).
 
 % Representations
-vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => meta_argtypes(ArgTypes).
+vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes).
 
-meta_argtypes(ArgTypes)/get_functor(ArgTypes,F),vtVerb(F)=>vtActionTemplate(ArgTypes).
+meta_argtypes(ArgTypes)/get_functor(ArgTypes,F),vtVerb(F)==>vtActionTemplate(ArgTypes).
 
 
 
@@ -320,7 +320,7 @@ prologNegByFailure(tCol(ftID),prologHybrid).
 prologNegByFailure(tItem(ftID),prologHybrid).
 prologNegByFailure(tRegion(ftID),prologHybrid).
 prologNegByFailure(tThinking(tAgent),prologHybrid).
-pathName(Region,Dir,Text)=>mudDescription(apathFn(Region,Dir),Text).
+pathName(Region,Dir,Text)==>mudDescription(apathFn(Region,Dir),Text).
 
 prologSingleValued(chargeCapacity(tChargeAble,ftInt),prologHybrid).
 prologSingleValued(location_center(tRegion,xyzFn(tRegion,ftInt,ftInt,ftInt)),prologHybrid).
@@ -357,9 +357,9 @@ prologSingleValued(spawn_rate(tCol,ftInt)).
 prologSingleValued(stat_total(tAgent,ftInt)).
 prologSingleValued(typeGrid(tCol,ftInt,ftListFn(ftString))).
 resultIsa(apathFn,tPathway).
-% '<=>'(isa(Whom,tNpcPlayer),whenAnd(isa(Whom,tPlayer),naf(isa(Whom,tHumanPlayer)))).
-'<=>'(mudDescription(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
-'<=>'(nameStrings(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
+% '<==>'(isa(Whom,tNpcPlayer),whenAnd(isa(Whom,tPlayer),naf(isa(Whom,tHumanPlayer)))).
+'<==>'(mudDescription(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
+'<==>'(nameStrings(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 
 ttPredAndValueType("size").
 ttPredAndValueType("texture").
@@ -367,9 +367,9 @@ ttPredAndValueType("color").
 ttPredAndValueType("shape").
 ttPredAndValueType("material").
 
-vtValue(Val)/(atom(Val),i_name_lc(Val,KW))=>mudKeyword(Val,KW).
+vtValue(Val)/(atom(Val),i_name_lc(Val,KW))==>mudKeyword(Val,KW).
 
-ttPredAndValueType(Str)/(i_name('mud',Str,Pred),i_name('vt',Str,VT)) => (ptRolePredicate(Pred),ttValueType(VT),mudKeyword(VT,Str),mudKeyword(Pred,Str),argIsa(Pred,2,VT),argIsa(Pred,1,tTemporalThing)).
+ttPredAndValueType(Str)/(i_name('mud',Str,Pred),i_name('vt',Str,VT)) ==> (ptRolePredicate(Pred),ttValueType(VT),mudKeyword(VT,Str),mudKeyword(Pred,Str),argIsa(Pred,2,VT),argIsa(Pred,1,tTemporalThing)).
 
 %relationMostInstance(arg1Isa,ptRolePredicate,tTemporalThing).
 %relationMostInstance(arg2QuotedIsa,ptRolePredicate,ftTerm).
@@ -380,7 +380,7 @@ ttValueType(vtSize).
 ttValueType(vtTexture).
 ttValueType(vtColor).
 
-ttValueType(VT)=>tInferInstanceFromArgType(VT).
+ttValueType(VT)==>tInferInstanceFromArgType(VT).
 
 prologDynamic(user:verb_alias(ftString,vtVerb)).
 prologHybrid(typeHasGlyph(tCol,ftString)).
@@ -502,10 +502,10 @@ meta_argtypes(xyzFn(tRegion,ftInt,ftInt,ftInt)).
 
 tCol(ttTypeByAction).
 genls(ttTypeByAction,tCol).
-(isa(X,ttTypeByAction) => isa(X,tCol)).
+(isa(X,ttTypeByAction) ==> isa(X,tCol)).
 
 
-% (isa(Inst,Type),isa(Type,ttTypeByAction)) => isa(Inst,tHasAction).
+% (isa(Inst,Type),isa(Type,ttTypeByAction)) ==> isa(Inst,tHasAction).
 
 genls(tAgent,tObj).
 genls(tAgent,tSpatialThing).
@@ -573,9 +573,9 @@ ttAgentType(tMonster).
 % user:instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
 
 
-=> tSpec(vtActionTemplate).
-=> tCol(tRegion).
-=> tCol(tContainer).
+==> tSpec(vtActionTemplate).
+==> tCol(tRegion).
+==> tCol(tContainer).
 disjointWith(tObj,tRegion).
 disjointWith(tObj,tRegion).
 disjointWith(tRegion,tObj).
@@ -607,7 +607,7 @@ typeGenls(ttRegionType,tRegion).
 
 prologHybrid(dividesBetween(tCol,tCol,tCol)).
 
-% defined more correctly below dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
+% defined more correctly below dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 dividesBetween(tItem,tMassfull,tMassless).
 dividesBetween(tObj,tItem,tAgent).
 dividesBetween(tObj,tMassfull,tMassless).
@@ -645,7 +645,7 @@ ensure_some_pathBetween(R1,R2):- random_path_dir(Dir), \+(is_asserted(pathDirLea
    must((add(pathDirLeadsTo(R1,Dir,R2)),add(pathDirLeadsTo(R2,Rev,R1)))),!.
 ensure_some_pathBetween(R1,R2):- must((add(pathDirLeadsTo(R1,aRelatedFn(vtDirection,R1,R2),R2)),add(pathDirLeadsTo(R2,aRelatedFn(vtDirection,R2,R1),R1)))),!.
 
-bordersOn(R1,R2)/ground(bordersOn(R1,R2)) => isa(R1,tRegion),isa(R2,tRegion), {ensure_some_pathBetween(R2,R1),ensure_some_pathBetween(R1,R2)}.
+bordersOn(R1,R2)/ground(bordersOn(R1,R2)) ==> isa(R1,tRegion),isa(R2,tRegion), {ensure_some_pathBetween(R2,R1),ensure_some_pathBetween(R1,R2)}.
 
 
 % ==================================================
@@ -670,9 +670,9 @@ genlsInheritable(tCol).
 genlsInheritable(ttPredType).
 :-must(pfc_assert((genls(ttTypeType,genlsInheritable)))).
 
-(genls(C,SC)/ground(genls(C,SC))=>(tCol(C),tCol(SC))).
+(genls(C,SC)/ground(genls(C,SC))==>(tCol(C),tCol(SC))).
 
-(genls(C,SC)/ground(genls(C,SC)),nearestIsa(SC,W),\+ genlsInheritable(W) )=>isa(C,W).
+(genls(C,SC)/ground(genls(C,SC)),nearestIsa(SC,W),\+ genlsInheritable(W) )==>isa(C,W).
 
 % throw(sane_transitivity (genls( tCarryAble, tThrowAble))).
 % genls( tCarryAble, tCarryAble).
@@ -711,7 +711,7 @@ genls(tPartofFurnature,tPartofObj).
 
 
 
-%(isa(I,Sub), disjointWith(Sub, Super)) => neg(isa(I,Super)).
+%(isa(I,Sub), disjointWith(Sub, Super)) ==> neg(isa(I,Super)).
 
 
 genls(tPartofObj,tItem).
@@ -723,26 +723,26 @@ dividesBetween(tObj,tMassfull,tMassless).
 dividesBetween(tSpatialThing,tObj,tRegion).
 dividesBetween(tAgent,tPlayer,tNpcPlayer).
 
-dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
+dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 
-% disjointWith(P1,P2) => (not(isa(C,P1)) <=> isa(C,P2)).
+% disjointWith(P1,P2) ==> (not(isa(C,P1)) <==> isa(C,P2)).
 
-% isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
+% isa(Col1, ttObjectType) ==> ~isa(Col1, ttFormatType).
 
-=> tCol(tCol).
-=> tCol(tPred).
-=> tCol(tFunction).
-=> tCol(tRelation).
-=> tCol(ttSpatialType).
-=> tCol(ttFormatType).
-% => tCol(functorDeclares).
+==> tCol(tCol).
+==> tCol(tPred).
+==> tCol(tFunction).
+==> tCol(tRelation).
+==> tCol(ttSpatialType).
+==> tCol(ttFormatType).
+% ==> tCol(functorDeclares).
 % tCol(ArgsIsa):-ttPredType(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
-=> tCol(ttFormatType).
-=> tSpec(vtActionTemplate).
-=> tCol(tRegion).
-=> tCol(tContainer).
+==> tCol(ttFormatType).
+==> tSpec(vtActionTemplate).
+==> tCol(tRegion).
+==> tCol(tContainer).
 
 isa(tRegion,ttSpatialType).
 isa(tRelation,ttAbstractType).
@@ -777,14 +777,14 @@ typeProps(tSpatialThing,mudHeight(0)).
 
 % :-end_module_type(dynamic).
 
-mudLabelTypeProps(Lbl,Type,Props)/ground(mudLabelTypeProps(Lbl,Type,Props))=> (typeHasGlyph(Type,Lbl) , typeProps(Type,Props)).
+mudLabelTypeProps(Lbl,Type,Props)/ground(mudLabelTypeProps(Lbl,Type,Props))==> (typeHasGlyph(Type,Lbl) , typeProps(Type,Props)).
 
 % Vacuum World example objects........
 mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
 
 %TOO SLOW isa(I,SC)<=isa(I,C),genls(C,SC).
 
-(wearsClothing(A,I)=>{add(tAgent(A)),add(tClothing(I))}).
+(wearsClothing(A,I)==>{add(tAgent(A)),add(tClothing(I))}).
 
 
 genls(tBread, tFood).
@@ -800,14 +800,14 @@ nonvar_must_be(V,G):- (var(V);G),!.
 % TODO SPEED THIS UP 
 % mudKeyword(I,Str)<= {(nonvar(I);nonvar(Str)), nonvar_must_be(I,\+tCol(I)), nonvar_must_be(Str,string(Str))}, isa(I,Type),mudKeyword(Type,Str).
 
-pfc_slow((mudKeyword(Type,Str),tSet(Type),isa(I,Type)/(atom(I),ftID(I)) => mudKeyword(I,Str))).
+pfc_slow((mudKeyword(Type,Str),tSet(Type),isa(I,Type)/(atom(I),ftID(I)) ==> mudKeyword(I,Str))).
 
 
-user:action_info(C,_)=>vtActionTemplate(C).
+user:action_info(C,_)==>vtActionTemplate(C).
 
 argsQuoted(cachedPredicate).
 
-cachedPredicate(Goal)=>{forall(Goal,pfc_add(Goal))}.
+cachedPredicate(Goal)==>{forall(Goal,pfc_add(Goal))}.
 
 tCol(cachedPredicate).
 cachedPredicate(vtActionTemplate(_)).
@@ -960,9 +960,9 @@ tCol(tStatPred).
 
 prologHybrid(normalAgentGoal(tStatPred,ftTerm)).
 
-(tStatPred(Pred)=>(ptRolePredicate(Pred),arity(Pred,2),singleValuedInArg(Pred,2))).
+(tStatPred(Pred)==>(ptRolePredicate(Pred),arity(Pred,2),singleValuedInArg(Pred,2))).
 
-(normalAgentGoal(Pred,_)/atom(Pred) =>
+(normalAgentGoal(Pred,_)/atom(Pred) ==>
  ({AT=..[Pred,tAgent,ftPercent]},meta_argtypes(AT),prologHybrid(Pred),tStatPred(Pred))).
 
 normalAgentGoal(mudEnergy,90).
@@ -978,18 +978,18 @@ normalAgentGoal(mudComfort,90).
 typeProps(tAgent,[mudStr(2),mudHeight(2),mudStm(2),mudSpd(2)]).
 
 
-%normalAgentGoal(Pred,Val)=>  (tAgent(A)=>agentGoals(A,Pred,((t(Pred,A,V),V>=Val)))).
-%agentGoals(A,About,State)/State => \+ agentTODO(A,actImprove(About)).
+%normalAgentGoal(Pred,Val)==>  (tAgent(A)==>agentGoals(A,Pred,((t(Pred,A,V),V>=Val)))).
+%agentGoals(A,About,State)/State ==> \+ agentTODO(A,actImprove(About)).
 
 prologHybrid(on_command_show(tAgent,vtActionType,ftTerm)).
 prologHybrid(agentTODO(tAgent,vtActionType)).
 prologHybrid(agentGOAL(tAgent,ftAssertable)).
 
-normalAgentGoal(Pred,Val) =>  ( t(Pred,A,V)/(V<Val) => agentTODO(A,actImprove(Pred))).
-normalAgentGoal(Pred,Val) =>  ( t(Pred,A,V)/(V<Val) => agentGOAL(A,t(Pred,A,Val))).
+normalAgentGoal(Pred,Val) ==>  ( t(Pred,A,V)/(V<Val) ==> agentTODO(A,actImprove(Pred))).
+normalAgentGoal(Pred,Val) ==>  ( t(Pred,A,V)/(V<Val) ==> agentGOAL(A,t(Pred,A,Val))).
 
-:-pfc_fwd(normalAgentGoal(Pred,Val) =>  ( t(Pred,A,V)/(V<Val) => agentGOAL(A,t(Pred,A,Val)))).
-normalAgentGoal(Pred,Val)=>  (tAgent(A)=>pfc_default(t(Pred,A,Val))).
+:-pfc_fwd(normalAgentGoal(Pred,Val) ==>  ( t(Pred,A,V)/(V<Val) ==> agentGOAL(A,t(Pred,A,Val)))).
+normalAgentGoal(Pred,Val)==>  (tAgent(A)==>pfc_default(t(Pred,A,Val))).
 
 genls(tRoom,tRegion).
 
@@ -1032,10 +1032,10 @@ O = [
 
 (((meta_argtypes(Types)/
  (functor(Types,F,A), A >1, functor(Matcher,F,A),arity(F,A)))
-  => 
-    ((Matcher => {between(1,A,N),arg(N,Matcher,I),arg(N,Types,T),ground(I:T)},\+ttFormatType(T),isa(I,T),{dmsg(isa(I,T))})))).
+  ==> 
+    ((Matcher ==> {between(1,A,N),arg(N,Matcher,I),arg(N,Types,T),ground(I:T)},\+ttFormatType(T),isa(I,T),{dmsg(isa(I,T))})))).
 
-((argQuotedIsa(Pred, _, 'CycLSentence') => 'SententialOperator'(Pred))).
+((argQuotedIsa(Pred, _, 'CycLSentence') ==> 'SententialOperator'(Pred))).
 
 */
 

@@ -107,7 +107,7 @@ same(X,Y):- compound(X),arg(1,X,Y),!.
 same(X,Y):- compound(Y),arg(1,Y,X),!.
 
 
-samef(X,Y):- hotrace(((to_functor(X,XF),to_functor(Y,YF),(XF=YF->true;tring_equal_ci(XF,YF))))).
+samef(X,Y):- hotrace(((to_functor(X,XF),to_functor(Y,YF),(XF=YF->true;string_equal_ci(XF,YF))))).
 
 to_functor(A,O):-compound(A),get_functor(A,F),!,to_functor(F,O).
 to_functor(A,A).

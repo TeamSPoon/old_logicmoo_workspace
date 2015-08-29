@@ -81,7 +81,9 @@ include_moo_file_ni(M):-absolute_file_name(M,EX,[expand(true),access(read),file_
 :-export(mmake/0).
 mmake:- update_changed_files.
 :-export(update_changed_files/0).
-update_changed_files :-
+
+update_changed_files:-thread_signal(main,update_changed_files0).
+update_changed_files0 :-
         set_prolog_flag(verbose_load,true),
         ensure_loaded(library(make)),
 	findall(File, make:modified_file(File), Reload0),

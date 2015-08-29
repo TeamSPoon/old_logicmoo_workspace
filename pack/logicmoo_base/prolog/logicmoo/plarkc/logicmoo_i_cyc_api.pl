@@ -147,7 +147,7 @@ end_of_file.
       unquoteAtom/2,
       subst/4,
       flush_output_safe/1,
-      is_string/1,
+      is_ftString/1,
       unnumbervars/2,
       debugFmt/1,
       debugFmt/2,
@@ -308,7 +308,7 @@ s2p(X,Y,Feat):-s2p(nothingExtra,X,Y,Feat).
 nothingExtra(X,Y,Z):-fail.
 
 s2p(Extra,X,Y,Feat):-call(Extra,X,Y,Feat),!.
-s2p(Extra,X,X,[]):- (var(X);number(X);is_string(X)),!.
+s2p(Extra,X,X,[]):- (var(X);number(X);is_ftString(X)),!.
 s2p(Extra,svar(X,Name),X,[Name=X]):-atom_concat(':',_,Name),!.
 s2p(Extra,svar(X,Name),Name,[Name=X])-!.
 s2p(Extra,var(X,Name),X,[Name=X]):-!.
@@ -744,7 +744,7 @@ writel(OutStream,N,Vars):-N==[],!,writeFmtFlushed(OutStream,'NIL~n',[]).
 writel(OutStream,Send,Vars):-     
 %      (var(Send) ->
  %        throw(cyc_error('Unbound SubL message',Send));
-         is_string(Send) ->
+         is_ftString(Send) ->
 	    formatCyc(OutStream,'~s~n',[Send]);
 	      % atom(Send) -> formatCyc(OutStream,'~w~n',[Send]);
       	       toCycApiExpression(Send,Vars,STerm),formatCyc(OutStream,'~w~n',[STerm]).
@@ -1296,13 +1296,13 @@ is_charlist([X|T]):-atom(X),not(number(X)),atom_length(X,1),is_charlist(T),!.
 is_codelist([A]):-integer(A),!,A>8,A<129,!.
 is_codelist([A|L]):-integer(A),!,A>8,A<129,is_codelist(L).
 
-is_string(X):-atom(X),!,atom_length(X,L),L>1,atom_concat('"',_,X),atom_concat(_,'"',X),!.
-is_string(X):-var(X),!,fail.
-is_string(string(_)):-!.
-is_string("").
-is_string(X):-string(X),!.
-is_string(L):-is_charlist(L),!.
-is_string(L):-is_codelist(L),!.
+is_ftString(X):-atom(X),!,atom_length(X,L),L>1,atom_concat('"',_,X),atom_concat(_,'"',X),!.
+is_ftString(X):-var(X),!,fail.
+is_ftString(X):-string(X),!.
+is_ftString(string(_)):-!.
+is_ftString("").
+is_ftString(L):-is_charlist(L),!.
+is_ftString(L):-is_codelist(L),!.
 
 :-dynamic(asserted/4).
 :-dynamic(assertion/13).
@@ -1317,14 +1317,14 @@ decyclify(X,X):-not(atom(X)),!.
 decyclify(B,A):-atom_concat('#$',A,B),!.
 decyclify(B,B):-!.
 
-destringify(X,X):-var(X);number(X),!.
-destringify(X,S):-is_string(X),stringToCodelist(X,CL),name(S,CL),!.
-destringify([],[]):-!.
-destringify([H|T],[HH|TT]):-!,destringify(H,HH),destringify(T,TT),!.
-destringify(X,P):-compound(X),X=..LIST,destringify(LIST,DL),P=..DL,!.
-destringify(X,X):-not(atom(X)),!.
-destringify(B,A):-atom_concat('#$',A,B),!.
-destringify(B,B):-!.
+destringify_cycl(X,X):- (is_ftVar(X);number(X)),!.
+destringify_cycl(X,S):- is_ftString(X),must((stringToCodelist(X,CL))),name(S,CL),!.
+destringify_cycl([],[]):-!.
+destringify_cycl([H|T],[HH|TT]):-!,destringify_cycl(H,HH),destringify_cycl(T,TT),!.
+destringify_cycl(X,P):-compound(X),X=..LIST,destringify_cycl(LIST,DL),P=..DL,!.
+destringify_cycl(X,X):-not(atom(X)),!.
+destringify_cycl(B,A):-atom_concat('#$',A,B),!.
+destringify_cycl(B,B):-!.
 
 %stringToList(X,Y):-writeq(string_to_list(X,Y)),nl,fail.
 stringToList(X,Y):-var(X),!,string_to_list(X,Y).
@@ -1333,15 +1333,15 @@ stringToList("",[]).
 stringToList(X,Y):-atom(X),atom_codes(X,Codes),!,stringToList(Codes,Y),!.
 stringToList(X,Y):-string(X),string_to_atom(X,M),!,stringToList(M,Y).
 stringToList(X,Y):-string(X),!,string_to_list(X,Y).
-stringToList(X,Y):-is_string(X),!,string_to_list(X,Y).
+stringToList(X,Y):-is_ftString(X),!,string_to_list(X,Y).
 stringToList([string(X)],Y):-!,stringToList(X,Y).
 stringToList(string(X),Y):-!,stringToList(X,Y).
 stringToList([X|XX],Y):-concat_atom([X|XX],' ',XXX),!,string_to_list(XXX,Y).
 %prologPredToCyc(Predicate):-arity(PredicateHead)
 
-stringToCodelist(S,CL):-stringToCodelist2(S,SL),!,escapeString(SL,CS),!,stringToList(CL,CS),!.
+stringToCodelist(S,CL):-must(is_ftString(S)),must(var(CL)),stringToCodelist2(S,SL),!,escapeString(SL,CS),!,stringToList(CL,CS),!.
 
-stringToCodelist2(string(S),Codes):-!,stringToCodelist2(S,Codes).
+stringToCodelist2(string(S),Codes):-must(nonvar(S)),!,stringToCodelist2(S,Codes).
 stringToCodelist2([],[]):-!.
 stringToCodelist2([[]],[]):-!.
 stringToCodelist2([''],[]):-!.
@@ -1367,7 +1367,7 @@ toCycApiExpression(string(Rep),Vars,SVar):-free_variables(Rep,[Var]),!,toCycApiE
 toCycApiExpression(string(Rep),Vars,'""'):-Rep==[],!.
 toCycApiExpression(string(Rep),Vars,'""'):-Rep==[''],!.
 toCycApiExpression(string(Rep),Vars,Chars):-nonvar(Rep),stringToCodelist(Rep,Prolog),!,sformat(Chars,'"~s"',[Prolog]),!.
-toCycApiExpression(Rep,Vars,Chars):-is_string(Rep),!,stringToCodelist(Rep,Prolog),sformat(Chars,'"~s"',[Prolog]),!.
+toCycApiExpression(Rep,Vars,Chars):-is_ftString(Rep),!,stringToCodelist(Rep,Prolog),sformat(Chars,'"~s"',[Prolog]),!.
 toCycApiExpression(listofvars([]),Vars,'NIL'):-!. %listofvars
 toCycApiExpression(listofvars([P|List]),Vars,Chars):-!,toCycApiExpression_l([P|List],Vars,Term),sformat(Chars,'\'(~w)',[Term]),!.
 toCycApiExpression(nv(List),Vars,Chars):-!,toCycApiExpression_l(List,Vars,Chars),!.
@@ -1878,7 +1878,7 @@ isCycConstantNever(_,'4').
 
 :-dynamic_transparent(termCyclify/2).
 
-isCycConstant(Const):-(var(Const);is_string(Const);number(Const)),!,fail.
+isCycConstant(Const):-(var(Const);is_ftString(Const);number(Const)),!,fail.
 isCycConstant(Const):-user:isCycConstantMade(Const),!.
 isCycConstant(Const):-cyc:constant(Const,_,_,_),!.
 isCycConstant(Const):-cycHolds(isa,Const,_),!.
@@ -2128,7 +2128,7 @@ isSlot('$VAR'(Var)):-number(Var).
 isNonCompound(Var):-isSlot(Var),!.
 isNonCompound(Var):-not(compound(Var)),!.
 isNonCompound(svar(_,_)):-!.
-isNonCompound(Var):-is_string(Var),!.
+isNonCompound(Var):-is_ftString(Var),!.
 isNonCompound(string(Var)):-!.
 
 % ===================================================================
@@ -2353,7 +2353,7 @@ constant(Constant) -->  [':|','|'],{!},symname(C1),['|','|'] , { concat_atom([':
 constant(Constant) -->  ['*'],symname(C1),['*'] , { concat_atom(['*',C1,'*'],Constant) } .
 
 string(AA) -->  [[U|Q]] , { stringToList(AA,[U|Q]),! } .
-string(UQ) -->  [UQ] , { (string(UQ);is_string(UQ)),! } .
+string(UQ) -->  [UQ] , { (string(UQ);is_ftString(UQ)),! } .
 
 symname(Sym) -->  [Head,':',UQ] , { checkValidConstAtoms(Head,C1),checkValidConstAtoms(UQ,C2),!,concat_atom([C1,':',C2],Sym) } .
 symname(Sym) -->  [UQ] , { checkValidConstAtoms(UQ,Sym),! } .
@@ -3157,7 +3157,7 @@ cfaslWrite(Out,O):-number(O),encodeNumber(O,E),cfaslWriteSeq(Out,E).
 cfaslWriteSeq(Out,[]):-!.
 cfaslWriteSeq(Out,[V|O]):-put(Out,V),cfaslWriteSeq(Out,O).
 % STRING                                                                                                          //53
-cfaslWrite(Out,S):-is_string(S),string_to_atom(S,A),atom_codes(A,C),length(C,L),put(Out,53),cfaslWrite(Out,L),cfaslWriteSeq(Out,C).
+cfaslWrite(Out,S):-is_ftString(S),string_to_atom(S,A),atom_codes(A,C),length(C,L),put(Out,53),cfaslWrite(Out,L),cfaslWriteSeq(Out,C).
 cfaslWrite(Out,S):-atom(S),atom_concat('"',_,S),unquoteAtom(S,New),atom_codes(New,C),cfaslWrite(Out,C).
 % NIL
 cfaslWrite(Out,[]):-put(Out,12).
@@ -3210,7 +3210,7 @@ toConstant(Len,Const):-integer(Len),sformat(S,'(find-constant-by-internal-id ~w)
          unhashConstant(BB,Const),
          asserta(constantId(Const,Len)),!.
 toConstant(guid(Guid),Const):-!,toConstant(Guid,Const).
-toConstant(Guid,Const):-is_string(Guid),!,string_to_atom(Guid,Atom),toConstant(Atom,Const).
+toConstant(Guid,Const):-is_ftString(Guid),!,string_to_atom(Guid,Atom),toConstant(Atom,Const).
 toConstant(Guid,Const):-constantGuid(Const,Guid),!.
 toConstant(Len,Const):-concat_atom([A,B|C],'-',Len),sformat(S,'(find-constant-by-external-id (string-to-guid "~w"))',[Len]),evalSubL(S,X,_),balanceBinding(X,BB),
          unhashConstant(BB,Const),

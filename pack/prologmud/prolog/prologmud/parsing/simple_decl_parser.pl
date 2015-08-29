@@ -21,7 +21,7 @@
 
 glue_words(W):- member(W,[is,a,the,in,carries,'An','A','The',was,of,type]).
 
-toCamelAtom(List,O):-hotrace((not((member(IS,List),glue_words(IS))),toCamelAtom00(List,O))),!.
+toCamelAtom(List,O):-((\+((member(IS,List),glue_words(IS))),toCamelAtom00(List,O))),!.
 
 % toCamelAtom00(I,O):-toCamelAtom0(I,O).
 toCamelAtom00(I,O):-toCamelcase(I,O).
@@ -45,7 +45,7 @@ completelyAssertedCollection(vtValue).
 
 
 isa(vtColor,ttValueType).
-:- pfc_add('=>'(isa(X,ttValueType),(genls(X,vtValue),completelyAssertedCollection(X)))).
+:- pfc_add('==>'(isa(X,ttValueType),(genls(X,vtValue),completelyAssertedCollection(X)))).
 
 isa(vtValue,ttValueType).
 
@@ -127,8 +127,8 @@ attribute(Pred,I,C,t(Pred,I,C))--> [W],{ \+ glue_words(W),collection00(W,C,vtVal
 dcgParse213(A1,A2,A3,S,E):-append([L|Left],[MidT|RightT],S),phrase(A2,[MidT|RightT],EE),     ((phrase(A1,[L|Left],[]),phrase(A3,EE,E))).
 dcgParse213(A1,A2,A3,S,E):-debugPass,append([L|Left],[MidT|RightT],S),phrase(A2,[MidT|RightT],EE), trace, must((phrase(A1,[L|Left],[]),phrase(A3,EE,E))).
 
-predicate(Pred,_Arg1Isa,_Arg2Isa)-->predicate0(Pred),{current_predicate(Pred/_),!}.
-predicate(Pred,_Arg1Isa,_Arg2Isa)-->{loosePass},predicate0(Pred).
+p_predicate(Pred,_Arg1Isa,_Arg2Isa)-->predicate0(Pred),{current_predicate(Pred/_),!}.
+p_predicate(Pred,_Arg1Isa,_Arg2Isa)-->{loosePass},predicate0(Pred).
 
 
 predicate0(mudStowing)-->[carries].
@@ -166,7 +166,7 @@ translation_spo(Prolog,localityOfObject,I,C) --> dcgParse213(subject(I,More1),is
 % :-assertz_if_new(parserTest(iKitchen7,"This is the red room.")).
 
 :-assertz_if_new(parserTest(iWorld7,"The player carries the sack.")).
-translation_spo(Prolog,Pred,I,C) --> dcgParse213(subject(I,Arg1Isa,More1),predicate(Pred,Arg1Isa,Arg2Isa),object(C,Arg2Isa,More2)),{conjoin(More1,More2,Prolog)}.
+translation_spo(Prolog,Pred,I,C) --> dcgParse213(subject(I,Arg1Isa,More1),p_predicate(Pred,Arg1Isa,Arg2Isa),object(C,Arg2Isa,More2)),{conjoin(More1,More2,Prolog)}.
 
 :-assertz_if_new(parserTest(iWorld7,"room is type of tRegion")).
 translation_spo(Prolog,isa,I,C) --> dcgParse213(subject(I,tCol,More1),is_type_of,object(C,tCol,More2)),{conjoin(More1,More2,Prolog)}.
@@ -222,7 +222,7 @@ assert_text_now(Ctx,CtxISA,String):-
 
 :-dynamic(asserted_text/3).
 
-(describedTyped(ISA),isa(Ctx,ISA),mudDescription(Ctx,String)/ ( \+asserted_text(Ctx,String,_), \+assert_text(Ctx,String))) => mudDescriptionHarder(Ctx,String).
+(describedTyped(ISA),isa(Ctx,ISA),mudDescription(Ctx,String)/ ( \+asserted_text(Ctx,String,_), \+assert_text(Ctx,String))) ==> mudDescriptionHarder(Ctx,String).
 
 to_icase_strs(WL,IC):-maplist(to_icase_str,WL,IC).
 
@@ -289,7 +289,9 @@ collection(C)-->subject(C,tCol,true).
 datatype(ftBoolean)--> dcgOptional(detn(_)),[truth,state].
 datatype(ftText)--> dcgOptional(detn(_)),[text].
 datatype(ftTerm)--> dcgOptional(detn(_)),[value].
-predicate_named(Pred)-->dcgAnd(theText(Text),dcgLenBetween(1,5)),{toCamelAtom(Text,O),i_name(mud,O,Pred),ignore(assumed_isa(Pred,tPred))}.
+
+predicate_named(Pred) --> dcgAnd(theText(Text),dcgLenBetween(1,5)),
+  {trace,toCamelAtom(Text,O),i_name(mud,O,Pred),ignore(assumed_isa(Pred,tPred))}.
 
 
 assumed_isa(I,C):-isa(I,C),!.
@@ -317,14 +319,14 @@ col(Pfx,C)-->{loosePass},subject(C,_,true).
 
 % set of small things in the world
 tSet(tSmall).  % I dont like doing this with adjectives.. but it cant be argued to be sane
-tSmall(X) <=> mudSize(X,vSmall).
+tSmall(X) <==> mudSize(X,vSmall).
 
 % set of green things in the world
 tSet(tGreen).
-tGreen(X) <=> mudColor(X,vGreen).
+tGreen(X) <==> mudColor(X,vGreen).
 
-%:-assertz_if_new(parserTest(iWorld7,"All green books are small.", (tGreen(X),tBook(X))=>tSmall(X))).
-%:-assertz_if_new(parserTest(iWorld7,"Most green books are small.", pfc_default((tGreen(X),tBook(X))=>tSmall(X)))).
+%:-assertz_if_new(parserTest(iWorld7,"All green books are small.", (tGreen(X),tBook(X))==>tSmall(X))).
+%:-assertz_if_new(parserTest(iWorld7,"Most green books are small.", pfc_default((tGreen(X),tBook(X))==>tSmall(X)))).
 
 /*   The litmus
 

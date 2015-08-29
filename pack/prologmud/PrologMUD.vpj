@@ -50,6 +50,11 @@
 		</Folder>
 		<Folder Name="../logicmoo_base">
 			<Folder Name="prolog">
+				<F
+					N="../logicmoo_base/prolog/*.*"
+					Recurse="1"
+					Refilter="0"
+					Excludes=""/>
 				<Folder Name="logicmoo">
 					<Folder Name="mpred">
 						<F N="../logicmoo_base/prolog/logicmoo/mpred/logicmoo_i_builtin.pl"/>

@@ -77,18 +77,18 @@ is_clif(CLIF):-cwc,
 :- op_alias( (=>),  (=>)).
 
 % whenever we know about clif we'll use the prolog forward chainging system
-(clif(CLIF) => 
+(clif(CLIF) ==> 
    ({ clif_to_prolog(CLIF,PROLOG)},
       % this consequent asserts the new rules
       PROLOG,{sanity(clif_must(CLIF))})).
-% (clif(CLIF),{delistify_last_arg(kif_to_boxlog(CLIF,PROLOG))}) => boxlog(PROLOG).
-(boxlog(CLIF),{delistify_last_arg(boxlog_to_pfc(CLIF,PROLOG))}) => pfclog(PROLOG).
+% (clif(CLIF),{delistify_last_arg(kif_to_boxlog(CLIF,PROLOG))}) ==> boxlog(PROLOG).
+(boxlog(CLIF),{delistify_last_arg(boxlog_to_pfc(CLIF,PROLOG))}) ==> pfclog(PROLOG).
 (pfclog(PROLOG)=>(PROLOG,{clif_must(PROLOG)})).
 
 
 % we create code syntax listeners for [if,iff,clif_forall,all,exists]/2s
-({is_clif(CLIF)} =>
-  (CLIF/is_clif(CLIF) => clif(CLIF))).
+({is_clif(CLIF)} ==>
+  (CLIF/is_clif(CLIF) ==> clif(CLIF))).
 
 :- if(if_defined(pfc_examples,true)).
 
@@ -157,6 +157,12 @@ clif(
 
 % alice likes bill
 clif(likes(alice,bill)).
+
+% dumbo does not exists
+% TODO clif(not(isa(dumbo,_))).
+
+% evertyting that exists is an instance of Thing
+% TODO clif(isa(_,tThing))).
 
 % also she likes ted
 clif(likes(alice,ted)).

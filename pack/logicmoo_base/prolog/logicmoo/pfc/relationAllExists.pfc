@@ -2,10 +2,10 @@
 :- file_begin(pfc).
 
 :- op(500,fx,'~').
-:- op(1050,xfx,('=>')).
-:- op(1050,xfx,'<=>').
+:- op(1050,xfx,('==>')).
+:- op(1050,xfx,'<==>').
 :- op(1050,xfx,('<=')).
-:- op(1100,fx,('=>')).
+:- op(1100,fx,('==>')).
 :- op(1150,xfx,('::::')).
 :- dynamic(tCol/1).
 
@@ -25,77 +25,77 @@ predInterArgIsa(mudSubPart(tBodyPart,tBodyPart)).
 relationAllOnly(mudSubPart,tHumanBody,tBodyPart).
 
 
-((relationAllOnly(Pred,Col1,Col2)/(G=..[Pred,VAL,Value])) => (isa(VAL,Col1) => (( G => isa(Value,Col2))))).
+((relationAllOnly(Pred,Col1,Col2)/(G=..[Pred,VAL,Value])) ==> (isa(VAL,Col1) ==> (( G ==> isa(Value,Col2))))).
 
 
 % version that works but not safe
 /*
-relationAllExists(Pred,Col1,Col2)/(G=..[Pred,VAL,Value]) => 
-  (isa(VAL,Col1) => 
-    ((( {ignore(cnstrn(Value,isa(Value,Col2))},(~ (G/isa(Value,Col2)))) => ({Value=skRelationInstanceExistsFn(Pred,VAL,Col2)},isa(Value,Col2), G))))).
+relationAllExists(Pred,Col1,Col2)/(G=..[Pred,VAL,Value]) ==> 
+  (isa(VAL,Col1) ==> 
+    ((( {ignore(cnstrn(Value,isa(Value,Col2))},(~ (G/isa(Value,Col2)))) ==> ({Value=skRelationInstanceExistsFn(Pred,VAL,Col2)},isa(Value,Col2), G))))).
 */
 
 /*
-relationAllExists(Pred,Col1,Col2)/(G=..[Pred,VAL,Value]) => 
-  (isa(VAL,Col1) => 
-    ((~ (G/isa(Value,Col2))) => ({Value=skRelationInstanceExistsFn(Pred,VAL,Col2)},isa(Value,Col2), G))).
+relationAllExists(Pred,Col1,Col2)/(G=..[Pred,VAL,Value]) ==> 
+  (isa(VAL,Col1) ==> 
+    ((~ (G/isa(Value,Col2))) ==> ({Value=skRelationInstanceExistsFn(Pred,VAL,Col2)},isa(Value,Col2), G))).
 
 
-relationAllExists(Pred,Col1,Col2) =>
+relationAllExists(Pred,Col1,Col2) ==>
  ({G1=..[Pred,VAL,Value1],G2=..[Pred,VAL,Value2],Value2=skRelationInstanceExistsFn(Pred,VAL,Col2)},
-  (isa(VAL,Col1) => (
-    ((((~ (G1/(isa(Value1,Col2))))) => (isa(Value2,Col2), G2)))))).
+  (isa(VAL,Col1) ==> (
+    ((((~ (G1/(isa(Value1,Col2))))) ==> (isa(Value2,Col2), G2)))))).
 
 */
 
 
 
-relationInstanceExists(Pred,VAL,D_COL) =>
+relationInstanceExists(Pred,VAL,D_COL) ==>
  ({SK= skRelationInstanceExistsFn(Pred,VAL,D_COL), G1=..[Pred,VAL,Missing],G2=..[Pred,VAL,SK],ISA=..[D_COL,SK]},
-  (( ~ (G1/(isa(Missing,D_COL)))) => (G2,ISA))).
+  (( ~ (G1/(isa(Missing,D_COL)))) ==> (G2,ISA))).
 
-relationAllExists(Pred,I_COL,D_COL) =>
+relationAllExists(Pred,I_COL,D_COL) ==>
  ({SK= skRelationAllExistsFn(Pred,VAL,D_COL), G1=..[Pred,VAL,Missing],G2=..[Pred,VAL,SK],ISA=..[D_COL,SK]},
-  (isa(VAL,I_COL) => (
-    ((((~ (G1/(isa(Missing,D_COL))))) => (G2,ISA)))))).
+  (isa(VAL,I_COL) ==> (
+    ((((~ (G1/(isa(Missing,D_COL))))) ==> (G2,ISA)))))).
 
-relationExistsAll(Pred,D_COL,I_COL) =>
+relationExistsAll(Pred,D_COL,I_COL) ==>
  ({SK= skRelationExistsAllFn(VAL,Pred,D_COL,I_COL), G1=..[Pred,Missing,VAL],G2=..[Pred,SK,VAL],ISA=..[D_COL,SK]},
-   (isa(VAL,I_COL) =>   
-  (( ~ (G1/(isa(Missing,D_COL)))) => (G2,ISA)))).
+   (isa(VAL,I_COL) ==>   
+  (( ~ (G1/(isa(Missing,D_COL)))) ==> (G2,ISA)))).
 
-relationExistsInstance(Pred,D_COL,VAL) =>
+relationExistsInstance(Pred,D_COL,VAL) ==>
  ({SK= skRelationExistsInstanceFn(Pred,D_COL,VAL), G1=..[Pred,Missing,VAL],G2=..[Pred,SK,VAL],ISA=..[D_COL,SK]},
-  (( ~ (G1/(isa(Missing,D_COL)))) => (G2,ISA))).
+  (( ~ (G1/(isa(Missing,D_COL)))) ==> (G2,ISA))).
 
-relationAllInstance(Pred,I_COL,VAL) =>
+relationAllInstance(Pred,I_COL,VAL) ==>
  ({G1=..[Pred,INST,_Missing],G2=..[Pred,INST,VAL]},
-  (isa(INST,I_COL) => ( ~ G1 => G2))).
+  (isa(INST,I_COL) ==> ( ~ G1 ==> G2))).
 
-relationInstanceAll(Pred,VAL,I_COL) =>
+relationInstanceAll(Pred,VAL,I_COL) ==>
  ({G2=..[Pred,VAL,INST]},
-  (isa(INST,I_COL) =>  G2 )).
+  (isa(INST,I_COL) ==>  G2 )).
 
 /*
 (relationAllExists(Pred,Col1,Col2)/(Value = skRelationInstanceExistsFn(Pred,VAL,Col2),G=..[Pred,VAL,Value]))
-  => 
-  ((isa(VAL,Col1), G) => G).
+  ==> 
+  ((isa(VAL,Col1), G) ==> G).
 */
 
 % version that works best but wrong
 /*
-(relationAllExists(Pred,Col1,Col2)/(G=..[Pred,VAL,Value])) => 
-  ((isa(VAL,Col1),G,isa(Value,Col2)) => unneeded(relationAllExists(Pred,VAL,Col2))).
+(relationAllExists(Pred,Col1,Col2)/(G=..[Pred,VAL,Value])) ==> 
+  ((isa(VAL,Col1),G,isa(Value,Col2)) ==> unneeded(relationAllExists(Pred,VAL,Col2))).
 
-((relationAllExists(Pred,Col1,Col2)/(G=..[Pred,VAL,Value]))=>
-   (isa(VAL,Col1) => ((~G , ~unneeded(relationAllExists(Pred,VAL,Col2))) => ({Value=skRelationInstanceExistsFn(Pred,VAL,Col2)},isa(Value,Col2), G)))).
+((relationAllExists(Pred,Col1,Col2)/(G=..[Pred,VAL,Value]))==>
+   (isa(VAL,Col1) ==> ((~G , ~unneeded(relationAllExists(Pred,VAL,Col2))) ==> ({Value=skRelationInstanceExistsFn(Pred,VAL,Col2)},isa(Value,Col2), G)))).
 */
 
 
 /*
-relationAllExists(Pred,Col1,Col2)/(G=..[Pred,VAL,Value]) => 
-  (isa(VAL,Col1) => 
-    ((( ~((G,isa(Value,Col2)))) => ({Value=skRelationInstanceExistsFn(Pred,VAL,Col2)},isa(Value,Col2), G)))).
+relationAllExists(Pred,Col1,Col2)/(G=..[Pred,VAL,Value]) ==> 
+  (isa(VAL,Col1) ==> 
+    ((( ~((G,isa(Value,Col2)))) ==> ({Value=skRelationInstanceExistsFn(Pred,VAL,Col2)},isa(Value,Col2), G)))).
 */
 
 relationAllExists(mudSubPart,tHominid,tHumanBody).
@@ -106,10 +106,10 @@ relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
 
 :- pfc_watch.
 
-=>
-'(=> 
+==>
+'(==> 
   (relationInstanceMost ?BINPRED ?THING ?COL)
-     (=> 
+     (==> 
        (isa ?THING ?COL1)        
        (relationExistsMost ?BINPRED ?COL1 ?COL2)))'.
 

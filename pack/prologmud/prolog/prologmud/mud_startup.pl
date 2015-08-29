@@ -43,10 +43,8 @@
 
 % xyzFn(R,X,Y,Z):-dmsg(xyzFn(R,X,Y,Z)),trace_or_throw(xyzFn(R,X,Y,Z)).
 
-:- multifile
-	prolog:message/3.
-
-prolog:message(git(update_versions),A,A):-!.
+% :- multifile prolog:message/3.
+% prolog:message(git(update_versions),A,A):-!.
 
 :- use_module(library(settings)).
 % :- use_module(library(check)).

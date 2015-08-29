@@ -169,8 +169,8 @@ is_at(Obj,Where):-mudSubPart(What,Obj),is_at(What,Where).
 tPathway(Obj)=>spatialInRegion(Obj).
 
 
-localityOfObject(Obj,Region),tRegion(Region)=> inRegion(Obj,Region).
-mudAtLoc(Obj,LOC),{locationToRegion(LOC,Region)},tRegion(Region)=> inRegion(Obj,Region).
+localityOfObject(Obj,Region),tRegion(Region)==> inRegion(Obj,Region).
+mudAtLoc(Obj,LOC),{locationToRegion(LOC,Region)},tRegion(Region)==> inRegion(Obj,Region).
 
 
 prologHybrid(mudInsideOf/2).
@@ -206,36 +206,36 @@ mostSpecificLocalityOfObject(Obj,Where):-
 % objects can be two places x,y,z's at once
 ((spatialInRegion(Obj),mudAtLoc(Obj,NewLoc), 
  {(mudAtLoc(Obj,OldLoc), OldLoc\==NewLoc)})
-   =>
+   ==>
    ~mudAtLoc(Obj,OldLoc)).
 
 % objects are placed by default in center of region
 ((spatialInRegion(Obj), inRegion(Obj,Region), ~tPathway(Obj),
  {not_asserted(mudAtLoc(Obj,xyzFn(Region,_,_,_))),in_grid_rnd(Region,LOC)})
-  =>
+  ==>
    mudAtLoc(Obj,LOC)).
 
 % objects cannot be in two localities (Regions?) at once
 ((spatialInRegion(Obj),localityOfObject(Obj,NewLoc), 
  {(localityOfObject(Obj,OldLoc), OldLoc\==NewLoc)})
-  => 
+  ==> 
   ~localityOfObject(Obj,OldLoc)).
 
 % if something leaves a room get rid of old location 
 ((spatialInRegion(Obj),inRegion(Obj,NewRegion), 
  {(mudAtLoc(Obj,OldLoc), OldLoc\=xyzFn(NewRegion,_,_,_))})
-  => 
+  ==> 
   ~mudAtLoc(Obj,OldLoc)).
 
 % if something leaves a room get rid of old inRegion/2 
 ((spatialInRegion(Obj),inRegion(Obj,NewRegion), 
  {(inRegion(Obj,OldLoc), OldLoc\=NewRegion)})
-  => 
+  ==> 
   ~inRegion(Obj,OldLoc)).
 
 % create pathway objects and place them in world
 (pathDirLeadsTo(Region,Dir,R2)/ground(pathDirLeadsTo(Region,Dir,R2)),   
-    { mudExitAtLoc(Region,Dir,LOC), Obj = apathFn(Region,Dir) }) =>  
+    { mudExitAtLoc(Region,Dir,LOC), Obj = apathFn(Region,Dir) }) ==>  
                         (tPathway(Obj),localityOfObject(Obj,Region),mudAtLoc(Obj,LOC)).
 
 
@@ -243,7 +243,7 @@ mudDoorwayDir(Region,apathFn(Region,Dir),Dir) :- tPathway(apathFn(Region,Dir)).
 
 mudExitAtLoc(Region,Dir,xyzFn(Region,X,Y,Z)):-calc_from_center_xyz(Region,Dir,2,X,Y,Z).
 
-% :-kif_tell(localityOfObject(A,B) &  localityOfObject(B,C) => localityOfObject(A,C)).
+% :-kif_tell(localityOfObject(A,B) &  localityOfObject(B,C) ==> localityOfObject(A,C)).
 
 :- decl_mpred_hybrid(mudSubPart/2).
 :- decl_mpred_hybrid(predInterArgIsa/1).
@@ -256,7 +256,7 @@ genls(tHumanBody,tBodyPart).
 predInterArgIsa(mudSubPart(tBodyPart,tBodyPart)).
 
 
-relationAllExists(Pred,Col1,Col2), isa(Inst,Col1) => ({G=..[Pred,Inst,Value]},( ~G => ({Value=skPredArg2InstFn(Pred,Col2)},isa(Value,Col2), G))).
+relationAllExists(Pred,Col1,Col2), isa(Inst,Col1) ==> ({G=..[Pred,Inst,Value]},( ~G ==> ({Value=skPredArg2InstFn(Pred,Col2)},isa(Value,Col2), G))).
 
 relationAllExists(mudSubPart,tHominid,tHumanBody).
 relationAllExists(mudSubPart,tHumanBody,tBodyPart).
@@ -419,6 +419,7 @@ round_loc_dir(Region1,X,Y,Z,Dir,Region2,X2,Y2,Z2):-
 
 round_loc_dir(Region1,X,Y,Z,_Dir,Region2,X2,Y2,Z2):-Region2=Region1,X2=X,Y2=Y,Z2=Z.
 
+prologBuiltin(compute_dir/5).
 compute_dir(Region1,X,Y,Z,Dir):-
   grid_size(Region1,MaxX,MaxY,MaxZ),
    ((X<1 -> EW=vWest ; X > MaxX -> EW=vEast ; EW= ''),
@@ -426,7 +427,7 @@ compute_dir(Region1,X,Y,Z,Dir):-
    (Z<1 -> UD=vDown ; Z > MaxZ -> UD=vUp ; UD= '')),
    atomic_list_concat_catch([NS,EW,UD],'',Dir),!.
 
-
+prologBuiltin(get_dir_offset/5).
 get_dir_offset(Dir,F,OX,OY,OZ):-
   dir_offset(Dir,F,OX,OY,OZ),!.
 get_dir_offset(Dir,F,OX,OY,OZ):- any_to_atom(Dir,DirA),
@@ -459,7 +460,12 @@ any_to_dir(D,D):-pathDirLeadsTo(_,D,_),!.
 
 % prologHybrid(dir_offset(term,int,int,int,int)).
 
+:-pfc_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
 
+:-retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
+:-pfc_trace.
+
+prologBuiltin(dir_offset/5).
 dir_offset(vUp,F,0,0,F).
 dir_offset(vDown,F,0,0,-F).
 dir_offset(vNorth,F,0,-F,0).
@@ -471,6 +477,8 @@ dir_offset(vSW,F,-F,F,0).
 dir_offset(vSE,F,F,F,0).
 dir_offset(vNW,F,-F,-F,0).
 dir_offset(vHere,_,0,0,0).
+
+:-pfc_no_trace.
 
 % MergedNess -1,0,1 = contacting_at,inside,outside_near_on
 with_offset(detatched,F,X,Y,Z):-dir_offset(vHere,F,X,Y,Z).

@@ -48,7 +48,7 @@ user:hook_coerce(StrIn,txtPrepSpatial,Str):-member(Prep,[in,on,north_of,inside,o
 user:hook_coerce(Prep,txtPrepSpatial,Inst):-user:hook_coerce(Prep,txtPrepOf,Inst).
 user:hook_coerce([SDir,of],txtPrepOf,vDirFn(Dir)):-user:hook_coerce(SDir,vtDirection,Dir).
 
-=>vtVerb(actLook).
+==> vtVerb(actLook).
 
 user:action_info(actLook, "generalized look in region").
 user:action_info(actLook(isOptionalStr("in"),isOptionalStr("here")), "generalized look in region").

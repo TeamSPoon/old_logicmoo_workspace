@@ -54,11 +54,12 @@ irc_action_queue(Agent,TODO,Channel):-  get_session_id(ID), enqueue_session_acti
 
 :-pfc_add(( (irc_user_plays(Agent,User,Channel)/
   ( irc_user_plays(OAgent,User,Other), (Other\=Channel;OAgent\=Agent) ))
-   => \+ irc_user_plays(OAgent,User,Other))).
+   ==> \+ irc_user_plays(OAgent,User,Other))).
 
 
-:-pfc_add(( ~irc_user_plays(Agent,User,_) => {retractall(thglobal:agent_session(Agent,User)),retractall(thglobal:session_agent(User,Agent))} )).
+:-pfc_add(( ~irc_user_plays(Agent,User,_) ==> {retractall(thglobal:agent_session(Agent,User)),retractall(thglobal:session_agent(User,Agent))} )).
 
+end_of_file.
 
 
 :-dynamic(wotp_server_port/1).
@@ -125,9 +126,9 @@ wotp_service(StreamPair):-
          thread_self(TID),
          format(Out,'~N~q.~n',TID),
          flush_output(Out),
-         read(In,ReaderPred),read(In,HookPred), debug(wotp,'~q. => ~q. ~n',[ReaderPred,HookPred]),!,
+         read(In,ReaderPred),read(In,HookPred), debug(wotp,'~q. ==> ~q. ~n',[ReaderPred,HookPred]),!,
          repeat,
-         call(ReaderPred,In,Data), debug(wotp,'~q => ~q.~n',[read_data(ReaderPred,In,Data),HookPred]),
+         call(ReaderPred,In,Data), debug(wotp,'~q ==> ~q.~n',[read_data(ReaderPred,In,Data),HookPred]),
          ((Data \==end_of_file, Data \== -1 ) -> (once(call(HookPred,Data)),fail) ;
          ignore(catch(close(StreamPair, [force(true)]),_,true))).
         

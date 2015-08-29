@@ -19,6 +19,8 @@ user:file_search_path(swish, '../pack/swish'):- current_prolog_flag(unix,true).
 user:file_search_path(pack, '../pack/').
 user:file_search_path(games, '../games').
 
+
+
 :- if(current_prolog_flag(dialect,yap)).
 :-  expects_dialect(swi).
 @(C,M) :- M:call(C).
@@ -73,8 +75,6 @@ user:file_search_path(prologmud, library(prologmud)).
 :- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_swish)))).
 :- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_clio)))).
 
-% :- prolog.
-
 
 % [Required] Load the Logicmoo Base System
 :- time(user:ensure_loaded(logicmoo(logicmoo_base))).
@@ -95,9 +95,9 @@ push_env_ctx:-!.
 :- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
 
 
-:- prolog.
+% :- prolog.
 
-:- listing([storage_plugin_update,filesys:filesys_data]).
+% :- listing([storage_plugin_update,filesys:filesys_data]).
 
 
 :- if(if_defined(debugging_planner)).
@@ -228,6 +228,7 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 % [Optionaly] Start the telent server
 :-at_start(logOnError(toploop_telnet:start_mud_telnet(4000))).
 
+:- prolog.
 
 
 % ==============================

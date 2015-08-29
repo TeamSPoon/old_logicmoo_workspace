@@ -3,54 +3,54 @@
 
 
 % if we learn that someone has a full name, then we know they are a user.
-full_name(U,_) => user(U).
+full_name(U,_) ==> user(U).
 
 
 % if we learn that someone has a host name, then we know they are a user.
-host_name(U,_) => user(U).
+host_name(U,_) ==> user(U).
 
 
 % when we know a user's full name and host name, make a user/3 assertion.
 (((user(User),
   full_name(User,Name)/(Name\=unknown),
   host_name(User,Host)/(Host\=unknown) ),
-  {ground(user(User,Name,Host))}) => user(User,Name,Host)).
+  {ground(user(User,Name,Host))}) ==> user(User,Name,Host)).
 
 
 % the default full_name for a user is 'unknown'.
-%user(User), ~full_name(User,X)/(X\=unknown)=>full_name(User,unknown).
+%user(User), ~full_name(User,X)/(X\=unknown)==>full_name(User,unknown).
 prologSingleValued(full_name).
-pfc_default( user(User) => full_name(User,unknown)).  
+pfc_default( user(User) ==> full_name(User,unknown)).  
 
 
 % the default host_name for a user is 'unknown'.
-%user(User), ~host_name(User,X)/(X\==unknown) => host_name(User,unknown).
+%user(User), ~host_name(User,X)/(X\==unknown) ==> host_name(User,unknown).
 prologSingleValued(host_name).
-pfc_default( user(User) => host_name(User,unknown)).
+pfc_default( user(User) ==> host_name(User,unknown)).
 
 
-(pfc_default1(P => Q),{pfc_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg(Q,N,NEW,R)} => (P, ~R/(NEW\==DEF) => Q)).
+(pfc_default1(P ==> Q),{pfc_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg(Q,N,NEW,R)} ==> (P, ~R/(NEW\==DEF) ==> Q)).
 
 ((singleValuedInArgDefault(F, N, DEF),arity(F,A),
-   {functor(Q,F,A),pfc_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg(Q,N,NEW,R)})=> (~R/(NEW\==DEF) => Q)).
+   {functor(Q,F,A),pfc_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg(Q,N,NEW,R)})==> (~R/(NEW\==DEF) ==> Q)).
 
-=> full_name(finin,'Tim Finin').
+==> full_name(finin,'Tim Finin').
 
-=> host_name(finin,antares).
+==> host_name(finin,antares).
 
-=> full_name(robin,'Robin,McEntire').
+==> full_name(robin,'Robin,McEntire').
 
-=> host_name(fritzson,hamlet).
+==> host_name(fritzson,hamlet).
 
 :- listing([full_name/2,host_name/2,user/3]).
 
 :-must(host_name(robin,unknown)).
 
-=> host_name(robin,rmachine).
+==> host_name(robin,rmachine).
 
 :-must(\+ host_name(robin,unknown)).
 
-=> ~host_name(robin,rmachine).
+==> ~host_name(robin,rmachine).
 
 :-must(\+ host_name(robin,rmachine)).
 
@@ -78,7 +78,7 @@ idForTest(iTweety,foo1).
 
 :-show_call(listing(idForTest)).
 
-=> \+ idForTest(iTweety,foo1).
+==> \+ idForTest(iTweety,foo1).
 
 :-must(idForTest(iTweety,unknown)).
 :-must(\+ idForTest(iTweety,foo1)).

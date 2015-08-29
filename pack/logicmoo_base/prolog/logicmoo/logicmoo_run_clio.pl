@@ -10,23 +10,19 @@
 
 :- multifile(mpred_online:semweb_startup).
 
-:- include(logicmoo(mpred/logicmoo_i_header)).
-
-
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
 
-
 :- if(if_defined(load_mud_www)).
-
 
 :- multifile prolog:message/3.
 % I WISH I COULD DO :- dynamic prolog:message/3.
-prolog:message(git(update_versions),A,A):-!.
+%prolog:message(git(update_versions),A,A):-!.
 
 :-dynamic(did_do_semweb_startup_late_once).
 do_semweb_startup_late_once:-did_do_semweb_startup_late_once,!.
 do_semweb_startup_late_once:-asserta(did_semweb_startup_late_once),forall(clause(semweb_startup_late,G),must(show_call(G))).
+
 
 :- use_module(user(user_db)).
 
@@ -137,7 +133,7 @@ ensure_webserver :- thread_property(_,alias('httpd@3020_1')),!.
 ensure_webserver :- logOnError(http_server(http_dispatch,[ port(3020), workers(16) ])).
   
 
-%prolog:message(git(update_versions))  --> [ 'Updating GIT version stamps in the background.' ])).
+% prolog:message(git(update_versions))  --> [ 'Updating GIT version stamps in the background.' ])).
 % :-must(prolog:retract((message(git(update_versions,_,_):-_)))).
 
 mpred_online:semweb_startup:- do_semweb_startup_late_once.

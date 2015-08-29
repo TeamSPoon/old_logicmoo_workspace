@@ -211,3 +211,21 @@ no_repeats_findall_r(Vs,Call,CONS,ExitDET,List):-
    (Call,once((\+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T],List=[CVs|T], nb_linkarg(2, CONS, List)))),
    deterministic(ExitDET).
 
+
+
+term((-7), 3).
+term(2,10).
+term((-8), 5).
+term((-8), 2).
+term(42,11).
+term(42,14).
+term(1,3).
+term(77,2).
+term(80,10).
+term(80,0).
+term((-3),12).
+term((-4), 14).
+term((-4), 0).
+term(45,0).
+term(45,9).
+term((-1),1).

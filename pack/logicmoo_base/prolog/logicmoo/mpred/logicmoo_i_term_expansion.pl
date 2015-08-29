@@ -50,7 +50,7 @@
 %
 %
 %
-% clause types: (:-)/1, (:-)/2, (=>)/1,  (=>)/2, (<-)/1,  (<-)/2, (<->)/2, fact/1
+% clause types: (:-)/1, (:-)/2, (=>)/1,  (=>)/2,  (==>)/1,  (==>)/2, (<-)/1,  (<-)/2, (<->)/2, fact/1
 %
 :- include(logicmoo_i_header).
 
@@ -309,11 +309,11 @@ db_expand_chain(_,isa(I,Not),INot):-Not==not,!,INot =.. [Not,I].
 db_expand_chain(_,P,PE):-fail,cyc_to_pfc_expansion_entry(P,PE).
 db_expand_chain(_,('nesc'(P)),P) :- !.
 
-db_expand_a(Op ,(S1,S2),SentO):-db_expand_a(Op ,S1,S1O),db_expand_a(Op ,S2,S2O),conjoin(S1O,S2O,SentO).
-db_expand_a(A,B,C):- loop_check_term(db_expand_0(A,B,C),db_expand_0(A,B,C),trace_or_throw(loop_check(db_expand_0(A,B,C)))).
-db_expand_a_noloop(A,B,C):- loop_check_term(db_expand_0(A,B,C),db_expand_0(A,B,C),B=C).
+db_expand_a(Op ,(S1,S2),SentO):-db_expand_a(Op ,S1,S1O),db_expand_a(Op ,S2,S2O),conjoin(S1O,S2O,SentO),!.
+db_expand_a(A,B,C):- loop_check_term(db_expand_0(A,B,C),db_expand_0(A,B,C),trace_or_throw(loop_check(db_expand_0(A,B,C)))),!.
+db_expand_a_noloop(A,B,C):- loop_check_term(db_expand_0(A,B,C),db_expand_0(A,B,C),B=C),!.
 
-db_expand_0(Op ,Sent,SentO):-db_expand_final(Op ,Sent,SentO),!.
+db_expand_0(Op,Sent,SentO):-must(acyclic_term(Sent)),db_expand_final(Op ,Sent,SentO),!.
 
 db_expand_0(Op,(:-(CALL)),(:-(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
 db_expand_0(Op,isa(I,O),INot):-Not==not,!,INot =.. [Not,I],!,db_expand_term(Op,INot,O).

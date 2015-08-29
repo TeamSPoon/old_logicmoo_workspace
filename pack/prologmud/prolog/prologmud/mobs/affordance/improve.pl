@@ -10,9 +10,16 @@
 %
 */
 
+:- op(1200,yfx,'==>').
+
+
+
+% If you want to do Something to Obj and you are in the same place.. Go ahead and do it!
+% That means: remove its on the todo list and enqueue the action)
+% We might change the later to enqueing it and then only remove from bucket list once it is completed (or action is started)
 
 ((agentTODO(Agent,actDo(Something,Obj)),
    localityOfObject(Obj,LOC),
-   localityOfObject(A,LOC)) => 
+   localityOfObject(A,LOC)) ==> 
      (~ agentTODO(Agent,actDo(Something,Obj)),
      enqueue_agent_action(Agent,actDo(Something,Obj)))).

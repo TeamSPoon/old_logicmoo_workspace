@@ -23,7 +23,7 @@ tCanary(iTweety).
 
 
 % birds fly by default.
-(pfc_default(( tBird(X) => tFly(X)))).
+(pfc_default(( tBird(X) ==> tFly(X)))).
 
 :-pfc_test((isa(I,tFly),I=iChilly)).
 
@@ -32,7 +32,7 @@ tCanary(iTweety).
 
 
 % penguins do neg tFly.
-tPenguin(X) => neg(tFly(X)).
+tPenguin(X) ==> neg(tFly(X)).
 
 :-pfc_test((\+ tFly(iChilly))).
 :-pfc_test((neg(tFly(iChilly)))).

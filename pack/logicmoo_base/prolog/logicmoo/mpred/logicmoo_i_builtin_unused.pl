@@ -24,10 +24,10 @@
 end_of_file.
 
 :- op(500,fx,'~').
-:- op(1050,xfx,('=>')).
-:- op(1050,xfx,'<=>').
+:- op(1050,xfx,('==>')).
+:- op(1050,xfx,'<==>').
 :- op(1050,xfx,('<=')).
-:- op(1100,fx,('=>')).
+:- op(1100,fx,('==>')).
 :- op(1150,xfx,('::::')).
 :- dynamic(tCol/1).
 
@@ -45,7 +45,7 @@ sane_transitivity(_PredInfo,I,Sub,Super):-
   \+(isa(Super,ttNonGenled)),
   \+(isa(I,ttNonGenled)).
 
-(genls(I,Sub),genls(Sub, Super),{sane_transitivity((genls(I,Sub),genls(Sub, Super)),I,Sub,Super)}) => genls(I,Super).
+(genls(I,Sub),genls(Sub, Super),{sane_transitivity((genls(I,Sub),genls(Sub, Super)),I,Sub,Super)}) ==> genls(I,Super).
 
 
 
@@ -58,16 +58,16 @@ sane_transitivity(_PredInfo,I,Sub,Super):-
 
 tCol(tFly).
 
-(mpred_prop(_,meta_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) =>  meta_argtypes(ArgTypes).
+(mpred_prop(_,meta_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) ==>  meta_argtypes(ArgTypes).
 
 
 
-a=>b.
-b=>c.
-c=>a.
+a==>b.
+b==>c.
+c==>a.
 
 
-jj=>jj.
+jj==>jj.
 
 
 % completeExtentAsserted(genls)
@@ -82,12 +82,12 @@ implies(and(resultIsaArg('$VAR'('FUNC'), 5), arg5Genl('$VAR'('FUNC'), '$VAR'('CO
 dividesBetween(tTemporalThing,tMassfull,tMassless).
 dividesBetween(tObj,tMassfull,tMassless).
 
-((dividesBetween(S,C1,C2),{ground(S:C1:C2)}) => ({ground(S:C1:C2)},(disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)))).
+((dividesBetween(S,C1,C2),{ground(S:C1:C2)}) ==> ({ground(S:C1:C2)},(disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)))).
 
-isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
+isa(Col1, ttObjectType) ==> ~isa(Col1, ttFormatType).
 
 (neg(isa(I,Super)) <= (disjointWith(Sub, Super),isa(I,Sub))).
-% disjointWith(P1,P2) => {\+(isa(P1,ttNonGenled)),\+(isa(P2,ttNonGenled))},(neg(isa(C,P1)) <=> isa(C,P2)).
+% disjointWith(P1,P2) ==> {\+(isa(P1,ttNonGenled)),\+(isa(P2,ttNonGenled))},(neg(isa(C,P1)) <==> isa(C,P2)).
 
 tCol(tCol).
 tCol(tPred).
@@ -104,7 +104,7 @@ resolveConflict(C) :- dtrace,
 
 
 % a conflict triggers a Prolog action to resolve it.
-conflict(C) => {resolveConflict(C)}.
+conflict(C) ==> {resolveConflict(C)}.
 
 % meta rules to schedule inferencing.
 
@@ -112,7 +112,7 @@ conflict(C) => {resolveConflict(C)}.
 pfc_select(conflict(X),S) :- pfc_queue(conflict(X),S).
   
 % a pretty basic conflict.
-((neg(P), P ) => conflict(P)).
+((neg(P), P ) ==> conflict(P)).
 
 */
 
@@ -122,77 +122,77 @@ tCol(tPenguin).
 tCol(tBird).
 genls(tCanary,tBird).
 genls(tPenguin,tBird).
-%(isa(A, tBird) =>isa(A, tFly)).
-%(isa(A, tBird), ~neg(isa(A, tFly))=>isa(A, tFly)).
+%(isa(A, tBird) ==>isa(A, tFly)).
+%(isa(A, tBird), ~neg(isa(A, tFly))==>isa(A, tFly)).
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 % % % These next two have been comnbined with the two following % % %
-(((pfc_default(P)/pfc_literal(P))  =>  (~neg(P) => P))).
-((pfc_default((P => Q))/pfc_literal(Q) => (P, ~neg(Q) => Q))).
+(((pfc_default(P)/pfc_literal(P))  ==>  (~neg(P) ==> P))).
+((pfc_default((P ==> Q))/pfc_literal(Q) ==> (P, ~neg(Q) ==> Q))).
 
 
-%((pfc_default(P)/pfc_literal(P), {pfcVerifyMissing(P,F)})) =>  ((F, ~neg(P)) => P).
-%((pfc_default((P => Q))/pfc_literal(Q), {pfcVerifyMissing(Q,F)})) => ((P, F, ~neg(Q)) => Q).
+%((pfc_default(P)/pfc_literal(P), {pfcVerifyMissing(P,F)})) ==>  ((F, ~neg(P)) ==> P).
+%((pfc_default((P ==> Q))/pfc_literal(Q), {pfcVerifyMissing(Q,F)})) ==> ((P, F, ~neg(Q)) ==> Q).
 % % % 
-(pfc_default((Q <= P))/pfc_literal(Q)) => (Q <=(P, ~neg(Q))).
-%(pfc_default((P => Q))/pfc_literal(Q)) => (Q <=(P, ~neg(Q))).
+(pfc_default((Q <= P))/pfc_literal(Q)) ==> (Q <=(P, ~neg(Q))).
+%(pfc_default((P ==> Q))/pfc_literal(Q)) ==> (Q <=(P, ~neg(Q))).
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
 neg(P) <= {pfcVerifyMissing(P,F,Test)},Test,{F\=P}.
 isMissing(P) <= {pfcVerifyMissing(P,F,Test)},Test,{F\=P}.
 
 % is this how to define constraints?
-either(P,Q) => (neg(P) => Q), (neg(Q) => P).
-% (P,Q => false) => (P => neg(Q)), (Q => neg(P)).
+either(P,Q) ==> (neg(P) ==> Q), (neg(Q) ==> P).
+% (P,Q ==> false) ==> (P ==> neg(Q)), (Q ==> neg(P)).
 
 % rembmer the tCol rule points to isa/2
-% tCol(C)=>{atom(C),P=..[C,I],assertz_if_new((P:-infoF(isa(I,C)))),assertz_if_new((P:-isa(I,C)))}.
+% tCol(C)==>{atom(C),P=..[C,I],assertz_if_new((P:-infoF(isa(I,C)))),assertz_if_new((P:-isa(I,C)))}.
 
-tCol(C)=> {atom(C),P=..[C,I],assertz_if_new((P:-infoF(isa(I,C)))),assertz_if_new((isa(I,C):-no_repeats(P)))}.
+tCol(C)==> {atom(C),P=..[C,I],assertz_if_new((P:-infoF(isa(I,C)))),assertz_if_new((isa(I,C):-no_repeats(P)))}.
 % isa(I,C):- tCol(C),{append_term(C,I,G)},(G/current_predicate(_,G)).
 % isa(I,C):- no_repeats((no_repeats(tCol(C)),append_term(C,I,G),current_predicate(_,G),G)).
 
 prologHybrid((zDefault/1,tPenguin/1,tFly/1,tBird/1,tCanary/1)).
 
-'tUnaryPredicate'(Pred)<=>(arity(Pred,1),tPred(Pred)).
+'tUnaryPredicate'(Pred)<==>(arity(Pred,1),tPred(Pred)).
 
 'tUnaryPredicate'(zDefault).
-((zDefault(P/pfc_literal(P)))  =>  (~neg(P) => P)).
-zDefault((P => Q))/pfc_literal(Q) => ((P, ~neg(Q) => Q)).
-%zDefault((P => Q))/pfc_literal(Q) => (Q <=(P, ~neg(Q))).
-%zDefault((Q <= P))/pfc_literal(Q) => (Q <=(P, ~neg(Q))).
+((zDefault(P/pfc_literal(P)))  ==>  (~neg(P) ==> P)).
+zDefault((P ==> Q))/pfc_literal(Q) ==> ((P, ~neg(Q) ==> Q)).
+%zDefault((P ==> Q))/pfc_literal(Q) ==> (Q <=(P, ~neg(Q))).
+%zDefault((Q <= P))/pfc_literal(Q) ==> (Q <=(P, ~neg(Q))).
 
 % birds fly by default.
-zDefault((tBird(X) => tFly(X))).
+zDefault((tBird(X) ==> tFly(X))).
 
 % here's one way to do an isa hierarchy.
 % genlPreds = subclass.
 
 /*
-(genlPreds(C1,C2),arity(C1,2)) =>
+(genlPreds(C1,C2),arity(C1,2)) ==>
   {P1 =.. [C1,X,Y],
     P2 =.. [C2,X,Y]},
-  (P1 => P2).
+  (P1 ==> P2).
 
-(genlPreds(C1,C2),arity(C1,3)) =>
+(genlPreds(C1,C2),arity(C1,3)) ==>
   {P1 =.. [C1,X,Y,Z],
     P2 =.. [C2,X,Y,Z]},
-  (P1 => P2).
+  (P1 ==> P2).
 */
 
 
 
-(zenlPreds(C1,C2)) =>
+(zenlPreds(C1,C2)) ==>
   {P1 =.. [C1,X],
     P2 =.. [C2,X]},
-  (P1 => P2).
+  (P1 ==> P2).
 
 
 zenlPreds(tCanary,tBird).
 zenlPreds(tPenguin,tBird).
 
 % penguins do neg fly.
-tPenguin(X) => neg(tFly(X)).
+tPenguin(X) ==> neg(tFly(X)).
 
 % chilly is a penguin.
 tPenguin(iChilly).
@@ -202,7 +202,7 @@ tCanary(iTweety).
 
 
 % birds fly by default.
-(pfc_default(( tBird(X) => tFly(X)))).
+(pfc_default(( tBird(X) ==> tFly(X)))).
 
 
 tCol(tFly).
@@ -210,17 +210,17 @@ tCol(tCanary).
 tCol(tPenguin).
 tCol(tBird).
 
-% => genls(tBird,tFly).
+% ==> genls(tBird,tFly).
 
 
 % penguins do neg tFly.
-tPenguin(X) => neg(tFly(X)).
+tPenguin(X) ==> neg(tFly(X)).
 
 % iChilly is a tPenguin.
-((=> tPenguin(iChilly))).
+((==> tPenguin(iChilly))).
 
 % iTweety is a tCanary.
-((=> tCanary(iTweety))).
+((==> tCanary(iTweety))).
 
 :-must(in_file_expansion;in_file_directive).
 
@@ -236,20 +236,20 @@ end_of_file.
 
 
 % birds fly by default.
-(pfc_default((bird(X) => fly(X)))).
+(pfc_default((bird(X) ==> fly(X)))).
 
 % heres one way to do an subclass hierarchy.
 
-(((genls_test(C1,C2) =>
+(((genls_test(C1,C2) ==>
   {P1 =.. [C1,X],
     P2 =.. [C2,X]},
-  (P1 => P2)))).
+  (P1 ==> P2)))).
 
 (genls_test(canary,bird)).
 (genls_test(penguin,bird)).
 
 % penguins do neg fly.
-(penguin(X) => neg(fly(X))).
+(penguin(X) ==> neg(fly(X))).
 
 % chilly is a penguin.
 (penguin(chilly)).
@@ -273,14 +273,14 @@ end_of_file.
 
 
 
-?-  kif_to_boxlog(((parent('$VAR'('G'),'$VAR'('P')) & parent('$VAR'('P'),'$VAR'('C'))) => grandparent('$VAR'('G'),'$VAR'('C'))),O). 
+?-  kif_to_boxlog(((parent('$VAR'('G'),'$VAR'('P')) & parent('$VAR'('P'),'$VAR'('C'))) ==> grandparent('$VAR'('G'),'$VAR'('C'))),O). 
 
 O = [ (-parent(G, P):- -grandparent(G, C), parent(P, C)), 
       (-parent(P, C):- -grandparent(G, C), parent(G, P)), 
       (grandparent(G, C):-parent(G, P), parent(P, C))].
 
 
-?- kif_to_boxlog( (grandparent('$VAR'('G'),'$VAR'('C')) => exists('$VAR'('P'), (parent('$VAR'('G'),'$VAR'('P')) & parent('$VAR'('P'),'$VAR'('C'))))),O).
+?- kif_to_boxlog( (grandparent('$VAR'('G'),'$VAR'('C')) ==> exists('$VAR'('P'), (parent('$VAR'('G'),'$VAR'('P')) & parent('$VAR'('P'),'$VAR'('C'))))),O).
 
     (-grandparent(G, C):- mudEquals(P, skUnkArg2OfParentArg1OfFn(KB, C, G)), (-parent(G, P) ; -parent(P, C))),   % You have proven G is not the grandparent of C when you have proven tha G has no children or that C has no parents
     (-mudEquals(P, skUnkArg2OfParentArg1OfFn(KB, C, G)):- grandparent(G, C), (-parent(G, P) ; -parent(P, C))), 
@@ -300,16 +300,16 @@ O = [
 
 
 
-% :- pfc_add(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
-% :- rtrace,pfc_add((isa(_,ArgsIsa)=>tCol(ArgsIsa))).
+% :- pfc_add(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) ==> functorDeclares(F))).
+% :- rtrace,pfc_add((isa(_,ArgsIsa)==>tCol(ArgsIsa))).
 
 
 
 
-% (typeProps(Type,Props)=>(tSet(Type),((isa(I,Type)=>props(I,Props))))).
+% (typeProps(Type,Props)==>(tSet(Type),((isa(I,Type)==>props(I,Props))))).
 
 
-% props(I,Props)/(ground(I:Props),as_list(Props,PList))=>pfc_assert(props(I,isEach(PList))).
+% props(I,Props)/(ground(I:Props),as_list(Props,PList))==>pfc_assert(props(I,isEach(PList))).
 
 ))).
 

@@ -100,6 +100,8 @@ assert_sv(P):-!,functor(P,_,A),duplicate_term(P,R),setarg(A,R,_),ignore(retract(
    swish_config:config(community_examples, true),
    swish_config:config(public_access,      true))).
 
+
+
 %%	swish_config:source_alias(Alias, Options) is nondet.
 %
 %	Specify access for files below a given _alias_. Options define

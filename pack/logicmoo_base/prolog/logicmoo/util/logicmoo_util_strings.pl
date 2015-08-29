@@ -43,7 +43,7 @@
          toPropercase/2,
          toCamelcase/2,
 
-         is_string/1,
+         is_ftString2/1,
          is_codelist/1,
          is_charlist/1,
          string_to_atom_safe/2,
@@ -325,13 +325,13 @@ is_charlist([X|T]):-atom(X),not(number(X)),atom_length(X,1),is_charlist(T),!.
 is_codelist([A]):-integer(A),!,A>8,A<129,!.
 is_codelist([A|L]):-integer(A),!,A>8,A<129,is_codelist(L).
 
-is_string(X):-atom(X),!,atom_length(X,L),L>1,atom_concat('"',_,X),atom_concat(_,'"',X),!.
-is_string(X):-var(X),!,fail.
-is_string(string(_)):-!.
-is_string("").
-is_string(X):- string(X),!.
-is_string(L):-is_charlist(L),!.
-is_string(L):-is_codelist(L),!.
+is_ftString2(X):- atom(X),!,atom_length(X,L),L>1,atom_concat('"',_,X),atom_concat(_,'"',X),!.
+is_ftString2(X):- var(X),!,fail.
+is_ftString2(string(_)):-!.
+is_ftString2("").
+is_ftString2(X):- string(X),!.
+is_ftString2(L):-is_charlist(L),!.
+is_ftString2(L):-is_codelist(L),!.
 
 
 isWhitespace(32).
@@ -358,12 +358,13 @@ escapeCodes(Escaped,EscapeChar,[Skipped|Source],[Skipped|New]):-
 % ===========================================================
 
 
-destringify(X,X):-var(X);number(X),!.
+destringify(X,X):-(var(X);number(X)),!.
 destringify('$VAR'(S),'$VAR'(S)):-!.
+destringify(string(S),string(S)):-is_ftVar(S),!.
 destringify([],[]):-!.
 destringify('[]','[]'):-!.
-destringify(T,A):-catch((text_to_string(T,S),atom_string(A,S)),_,fail),!.
-destringify(X,S):-is_string(X),stringToCodelist(X,CL),name(S,CL),!.
+destringify(T,A):- catch(call((text_to_string(T,S),!,atom_string(A,S))),_,fail),!.
+destringify(X,S):-is_ftString2(X),stringToCodelist(X,CL),name(S,CL),!.
 destringify([H|T],[HH|TT]):-!,destringify(H,HH),destringify(T,TT),!.
 destringify(X,P):-compound(X),X=..LIST,maplist(destringify,LIST,DL),P=..DL,!.
 destringify(B,A):- (atom(A),atom_concat('#$',A,B))->true;A=B.
@@ -375,12 +376,13 @@ stringToList("",[]).
 stringToList(X,Y):-atom(X),atom_codes(X,Codes),!,stringToList(Codes,Y),!.
 stringToList(X,Y):- string(X),string_to_atom(X,M),!,stringToList(M,Y).
 stringToList(X,Y):- string(X),!,string_to_list(X,Y).
-stringToList(X,Y):-is_string(X),!,string_to_list(X,Y).
+stringToList(X,Y):-is_ftString2(X),!,string_to_list(X,Y).
 stringToList([X|XX],Y):-concat_atom_safe([X|XX],' ',XXX),!,string_to_list(XXX,Y).
 %prologPredToCyc(Predicate):-arity(PredicateHead)
 
 stringToCodelist(S,CL):- stringToCodelist2(S,SL),!,escapeString(SL,CS),!,stringToList(CL,CS),!.
 
+stringToCodelist2(S,Codes):-var(S),!,fail.
 stringToCodelist2(string(S),Codes):-!,stringToCodelist2(S,Codes).
 stringToCodelist2([],[]):-!.
 stringToCodelist2([[]],[]):-!.

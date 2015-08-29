@@ -34,7 +34,7 @@ get_bad_templates(Templ):- no_repeats_old((user:action_info(Templ,_),not(good_te
 
 
 user:action_info(TEMPL, txtConcatFn(Text,'does: ',do(A2,TEMPL))) <= {between(1,5,L),length(Text,L),get_agent_text_command(_A,Text,A2,Goal),(ground(Goal)->TEMPL=Goal;TEMPL=Text)}.
-(action_rules(_Agent,Verb,[Obj|Objs],List),{atom(Verb),safe_univ(Syntax,[Verb,Obj|Objs])} => user:action_info(Syntax, txtConcatFn(makes,happen,List))).
+(action_rules(_Agent,Verb,[Obj|Objs],List),{atom(Verb),safe_univ(Syntax,[Verb,Obj|Objs])} ==> user:action_info(Syntax, txtConcatFn(makes,happen,List))).
 
 to_param_doc(TEMPL,S):-sformat(S,'Prolog looks like: ~q',[TEMPL]).
 
@@ -83,7 +83,7 @@ write_string_if_contains("",E):-!,show_templ_doc(E),!.
 write_string_if_contains(Must,E):-ignore((with_output_to(string(Str),show_templ_doc_all(E)),str_contains_all([Must],Str),fmt(Str))).
 
 
-(vtActionTemplate(A),{nonvar(A),get_functor(A,Inst)} => isa(Inst,vtVerb)).
+(vtActionTemplate(A),{nonvar(A),get_functor(A,Inst)} ==> isa(Inst,vtVerb)).
 
 user:hook_coerce(Text,vtVerb,Inst):- isa(Inst,vtVerb),name_text(Inst,Text).
 
@@ -92,12 +92,12 @@ user:hook_coerce(Text,vtVerb,Inst):- isa(Inst,vtVerb),name_text(Inst,Text).
 
 :- include(prologmud(mud_footer)).
 
-% :-add(((get_all_templates(Templ))=>vtActionTemplate(Templ))).
+% :-add(((get_all_templates(Templ))==>vtActionTemplate(Templ))).
 
-(user:type_action_info(_,TEMPL,Help) => user:action_info(TEMPL,Help)).
-(user:action_info(TEMPL,_Help) => vtActionTemplate(TEMPL)).
-((vtActionTemplate(TEMPL), { not_asserted(user:action_info(TEMPL,_)),to_param_doc(TEMPL,S)}) => user:action_info(TEMPL,S)).
-user:action_info(TEMPL,_S)=>vtActionTemplate(TEMPL).
+(user:type_action_info(_,TEMPL,Help) ==> user:action_info(TEMPL,Help)).
+(user:action_info(TEMPL,_Help) ==> vtActionTemplate(TEMPL)).
+((vtActionTemplate(TEMPL), { not_asserted(user:action_info(TEMPL,_)),to_param_doc(TEMPL,S)}) ==> user:action_info(TEMPL,S)).
+user:action_info(TEMPL,_S)==>vtActionTemplate(TEMPL).
 
 
 

@@ -85,6 +85,9 @@ compiled(F/A):- dynamic(F/A),compile_predicates([F/A]).
 :- compiled(('<->')/2).
 */
 
+make_uu_remove((u(U),u(U))).
+get_source_ref((u(Mt),u(Mt))):- Mt =  mt.
+
 has_functor(_):-!,fail.
 has_functor(F/A):-!,atom(F),integer(A),!.
 has_functor(C):- (\+ compound(C)),!,fail.
@@ -373,7 +376,9 @@ pfc_update_literal(P,N,Q,R):-
     must(Q),update_value(OLD,UPDATE,NEW), 
     notrace(replace_arg(Q,N,NEW,R)).
 
-update_single_valued_arg(P,N):- arg(N,P,UPDATE),notrace(replace_arg(P,N,OLD,Q)),
+update_single_valued_arg(P,N):-
+   must(get_source_ref((U,U))),
+  arg(N,P,UPDATE),notrace(replace_arg(P,N,OLD,Q)),
   must_det_l((call_with_attvars(assert_if_new,spft(P,u,u)),(if_defined(P)->true;(assertz_u(P))),
      doall((clause(Q,true,E),UPDATE \== OLD,erase_safe(clause(Q,true,E),E),pfc_unfwc1(Q))))).
 
@@ -518,7 +523,8 @@ pfc_assert(P,S) :-
   pfc_assert_fast(P,S).
 
 
-pfc_assert_fast(P0):-pfc_assert_fast(P0,(u,u)).
+pfc_assert_fast(P0):-
+  must(get_source_ref(S)), pfc_assert_fast(P0,S).
 
 pfc_assert_fast((nesc P),S) :- nonvar(P),!,
   pfc_assert_fast(P,S).
@@ -600,7 +606,7 @@ with_pfc_trace_exec(P):- with_assertions(thlocal:pfc_trace_exec, must(show_call(
 pfc_test(P):- with_pfc_trace_exec(must(show_call(P))).
 
 is_already_supported(P,(S,T),(S,T)):- clause_asserted(spft(P,S,T)),!.
-is_already_supported(P,_S,(u,u)):- clause_asserted(spft(P,u,u)),!.
+is_already_supported(P,_S,UU):- must(get_source_ref(UU)), clause_asserted(spft(P,US,UT)),!,UU=(US,UT).
 
 % TOO UNSAFE 
 % is_already_supported(P,_S):- copy_term(P,PC),spft(PC,_,_),P=@=PC,!.
@@ -900,11 +906,13 @@ pfc_rem1(List) :-
 
 pfc_rem1(P) :-
   % pfc_rem1/1 is the user''s interface - it withdraws user support for P.
-  pfc_rem1(P,(u,u)).
+  make_uu_remove(UU),
+  pfc_rem1(P,UU).
 
 rem_list([H|T]) :-
   % pfc_rem1 each element in the list.
-  pfc_rem1(H,(u,u)),
+  make_uu_remove(UU),
+  pfc_rem1(H,UU),
   rem_list(T).
 
 pfc_rem1(P,S) :- copy_term(pfc_rem1(P,S),Why),
@@ -921,7 +929,8 @@ pfc_rem1(P,S) :- copy_term(pfc_rem1(P,S),Why),
 
 pfc_rem2a(P) :- pfc_run,
   % pfc_rem2/1 is the user''s interface - it withdraws user support for P.
-  pfc_rem2a(P,(u,u)).
+  make_uu_remove(UU),
+  pfc_rem2a(P,UU).
 
 pfc_rem2a(P,S) :-
   pfc_rem1(P,S),
@@ -1183,7 +1192,7 @@ trigger_supports_f_l(Trigger,[Fact|MoreFacts]) :-
 %= pfc_fwd(X) forward chains from a fact or a list of facts X.
 %=
 
-pfc_fwd(P):-pfc_fwd(P,(u,u)).
+pfc_fwd(P):- get_source_ref(UU), pfc_fwd(P,UU).
 pfc_fwd([H|T],S) :- !, pfc_fwd1(H,S), pfc_fwd(T,S).
 pfc_fwd([],_) :- !.
 pfc_fwd(P,S) :- pfc_fwd1(P,S),!.
@@ -1911,15 +1920,10 @@ pfc_union([Head|Tail],L,[Head|Tail2]) :-
 %= predicates for manipulating support relationships
 %=
 
-user:portray(C):-compound(C),C=spft(A,B,C),pp_item('',C).
+user:portray(C):-compound(C),C=spft(_,_,C),pp_item('',C).
 
 %= pfc_add_support(+Fact,+Support)
 
-%pfc_add_support(tCol(PC),(u,u)) :- PC== pathConnects, trace_or_throw(pfc_add_support(tCol(PC),(u,u))).
-%pfc_add_support(P,(Fact,Trigger)) :-  clause_asserted( spft(P,Fact,Trigger)),!. % ,dmsg(dup(warn(pfc_add_support(P,(Fact,Trigger))))),!.
-%pfc_add_support(P,(Fact,Trigger)) :-  assertz( spft(P,Fact,Trigger)),!. 
-%pfc_add_support(P,(Fact,Trigger)) :-  once((IS= spft(P,Fact,Trigger), copy_term(IS,WAS),IS)),(IS=@=WAS->show_call_failure(clause_asserted( spft(P,Fact,Trigger)));
-%     ( ignore((fail,numbervars(WAS),retract(WAS))),assertz(IS), nop(dmsg(warn([unify,pfc_add_support,WAS,IS]))))),!.
 pfc_add_support(P,(Fact,Trigger)) :- 
    U=spft(P,Fact,Trigger),
    unnumbervars(U,UNNUMBEREDVARS),
@@ -1968,12 +1972,12 @@ pfc_make_supports_f_l((P,S1,S2)) :-
 */
 
 is_relative(V):- (\+compound(V)),!,fail.
-is_relative(+(_)).
 is_relative(update(_)).
 is_relative(replace(_)).
 is_relative(rel(_)).
-is_relative(-(_)).
-is_relative(*(_)).
+is_relative(+(X)):- \+ is_ftVar(X).
+is_relative(-(X)):- \+ is_ftVar(X).
+is_relative(*(X)):- \+ is_ftVar(X).
 
 /*
 % TODO not called yet
@@ -2328,7 +2332,7 @@ bases([X|Rest],L) :-
 	
 
 axiom(F) :-
-  %pfc_get_support(F,(u,u));
+  %pfc_get_support(F,UU);
   %pfc_get_support(F,(g,g));
   pfc_get_support(F,(OTHER,OTHER)).
 

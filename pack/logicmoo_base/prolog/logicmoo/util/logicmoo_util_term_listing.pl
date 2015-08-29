@@ -292,10 +292,12 @@ real_list_undefined(A):-
             maplist(check:report_undefined, G)
         ).
 
+
 :-swi_export(mmake/0).
 mmake:- ignore(update_changed_files), ignore(if_defined(load_mpred_files,true)).
 :-swi_export(update_changed_files/0).
-update_changed_files :-
+update_changed_files:-thread_signal(main,update_changed_files0).
+update_changed_files0 :- 
         set_prolog_flag(verbose_load,true),
         ensure_loaded(library(make)),
 	findall(File, make:modified_file(File), Reload0),
@@ -354,4 +356,13 @@ portray_one_line(H):- writeq(H),write('.'),nl,!.
 
 pp_listing(Pred):- functor_safe(Pred,File,A),functor_safe(FA,File,A),listing(File),nl,findall(NV,predicate_property(FA,NV),LIST),writeq(LIST),nl,!.
 
-
+agg_all_test2(min(X), Goal, Min) :- !,
+  State = state(X),
+   (  call(Goal),
+      arg(1, State, M0),
+      M is min(M0,X),
+      nb_setarg(1, State, M),
+      fail
+   ;  arg(1, State, Min),
+      nonvar(Min)
+   ).
