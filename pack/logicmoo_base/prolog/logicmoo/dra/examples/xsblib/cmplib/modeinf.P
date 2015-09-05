@@ -504,7 +504,7 @@ make_iff([Y|Ys], X, T) :-
 	T =.. [PName, X, Y | Ys],
 	First = prop_iff(X,Y,Z),
 	(N == 4
-		-> % X <-> Y1,Y2,Y3 :written as:  X <-> Y1,Z /\ Z <-> Y2,Y3
+		-> % X <==> Y1,Y2,Y3 :written as:  X <==> Y1,Z /\ Z <==> Y2,Y3
 		   Ys = [Y2,Y3],
 		   Sec = prop_iff(Z,Y2,Y3)
 		;

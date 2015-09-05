@@ -103,6 +103,8 @@ with_vars(_,Stuff):- Stuff.
 :- user:use_module((logicmoo_util_dcg)).
 :- user:use_module((logicmoo_util_coroutining_was)).
 :- user:use_module((logicmoo_util_coroutining_iz)).
+:- user:ensure_loaded(logicmoo_util_prolog_streams).
+
 
 
 /*

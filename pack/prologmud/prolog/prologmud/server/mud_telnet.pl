@@ -66,12 +66,15 @@ sanify_thread(ID):-
 % ===========================================================
 % TELNET REPL + READER
 % ===========================================================
+start_mud_telnet_4000:-start_mud_telnet(4000).
 start_mud_telnet(Port):- 
   must(telnet_server(Port, [allow(_ALL),call_pred(login_and_run_nodebug)])),!.
 
+:- volatile(main_thread_error_stream/1).
 :- dynamic(main_thread_error_stream/1).
 
-:-  ignore((thread_self(main),(quintus:current_stream(2, write, Err),asserta(main_thread_error_stream(Err))))).
+save_error_stream:-  ignore((thread_self(main),(quintus:current_stream(2, write, Err),asserta(main_thread_error_stream(Err))))).
+:- initialization(save_error_stream).
 
 get_main_thread_error_stream(user_error):-!.
 get_main_thread_error_stream(ES):-main_thread_error_stream(ES),!.
@@ -179,7 +182,12 @@ set_tty_control(TF):-
    set_prolog_flag(tty_control, TF))))),!.
 
 user:deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
-      foreach(no_repeats(get_agent_sessions(A,O)),foreach(no_repeats(thglobal:session_io(O,In,Out,Id)),fmt(Out,'~N~q.~n',[NewEvent]))).
+      foreach(no_repeats(get_agent_sessions(A,O)),
+         foreach(no_repeats(thglobal:session_io(O,In,Out,Id)),
+          fmtevent(Out,NewEvent))).
+
+fmtevent(Out,NewEvent):-string(NewEvent),!,format(Out,'~s',[NewEvent]).
+fmtevent(Out,NewEvent):-format(Out,'~N~q.~n',[NewEvent]).
 
 :-thread_local(thlocal:telnet_prefix/1).
 

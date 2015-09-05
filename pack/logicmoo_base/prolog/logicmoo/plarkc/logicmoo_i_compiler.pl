@@ -38,20 +38,27 @@ make_vg(B,S,H,{vg(CB,CS,CH)}):- CB=..[b|B],CS=..[s|S],CH=..[h|H].
 
 set_clause_compile(TYPE):-op_alias((:-),TYPE).
 
-boxlog_to_compile(H,OUTPUT):- get_op_alias((:-),TYPE),!,boxlog_to_compile(TYPE,H,OUTPUTM),!,OUTPUTM=OUTPUT.
+get_op_alias_compile(I,O):-get_op_alias(I,O),( I== (:-)),( O\== (:-)),!.
+get_op_alias_compile(_,fwc).
+
+boxlog_to_compile(H,OUTPUT):- get_op_alias_compile((:-),TYPE),!,must((boxlog_to_compile(TYPE,H,OUTPUTM))),!,OUTPUTM=OUTPUT.
 
 boxlog_to_compile(_,(H:-(Cwc,B)),(H:-(Cwc,B))):-Cwc == cwc,!.
-boxlog_to_compile(cwc,H,OUTPUT):-!, boxlog_to_compile((:-),H,OUTPUT).
 boxlog_to_compile(Mode,(H:-(Cwc,B)),(H:-(Cwc,B))):-Mode==Cwc,!.
+boxlog_to_compile(cwc,H,OUTPUT):-!, boxlog_to_compile((:-),H,OUTPUT).
+boxlog_to_compile(==>,H,OUTPUT):-!, boxlog_to_compile(fwc,H,OUTPUT).
+boxlog_to_compile(=>,H,OUTPUT):-!, boxlog_to_compile(fwc,H,OUTPUT).
 boxlog_to_compile(<=,H,OUTPUT):-!, boxlog_to_compile(fwc,H,OUTPUT).
 boxlog_to_compile(<-,H,OUTPUT):-!, boxlog_to_compile(bwc,H,OUTPUT).
+boxlog_to_compile(rev(==>),H,OUTPUT):-!, boxlog_to_compile(fwc,H,OUTPUT).
 boxlog_to_compile(rev(=>),H,OUTPUT):-!, boxlog_to_compile(fwc,H,OUTPUT).
-boxlog_to_compile(neg(<=),not(H),OUTPUT):-!, boxlog_to_compile(bwc,not(H),OUTPUT).
+boxlog_to_compile(neg(WHAT),(not(H):-B),OUTPUT):-!, boxlog_to_compile(WHAT,(not(H):-B),OUTPUT).
+boxlog_to_compile(neg(WHAT),not(H),OUTPUT):-!, boxlog_to_compile(WHAT,not(H),OUTPUT).
 
 boxlog_to_compile((:-),(not(H):-_),true):- nonvar(H),prologBuiltin(H),!.
-boxlog_to_compile((:-),(not(H):-B),HH:-(cwc,BBB)):-body_for_pfc((:-),neg(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_compile((:-),(not(H):-B),(HH:-(cwc,BBB))):-body_for_pfc((:-),neg(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_compile((:-),(H:-B),OUT):-pfcControlled(H),boxlog_to_compile((bwc),(H:-B),OUT),!.
-boxlog_to_compile((:-),(H:-B),HH:-(cwc,BBB)):- body_for_pfc((:-),H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_compile((:-),(H:-B),(HH:-(cwc,BBB))):- body_for_pfc((:-),H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_compile((:-),not(H),neg(H)):-  !.
 boxlog_to_compile((:-),H,H):-  !.
 
@@ -59,8 +66,8 @@ boxlog_to_compile((:-),H,H):-  !.
 
 boxlog_to_compile(fwc,(not(H):-_),true):- nonvar(H),H = skolem(_,_),!.
 boxlog_to_compile(fwc,(not(H):-B),OUT):- term_slots(H,HV),term_slots(B,BV), HV\==BV,!,boxlog_to_compile(bwc,(not(H):-B),OUT).
-boxlog_to_compile(fwc,(not(H):-B),(HH<=BBB)):- body_for_pfc(=>,neg(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
-boxlog_to_compile(fwc,(H:-B),(HH<=BBB)):- body_for_pfc(=>,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_compile(fwc,(not(H):-B),(BBB==>HH)):- body_for_pfc(fwc,neg(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_compile(fwc,(H:-B),(BBB==>HH)):- body_for_pfc(fwc,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_compile(fwc,not(H),neg(H)):-  !.
 boxlog_to_compile(fwc,H,H):-  !.
 
@@ -123,7 +130,7 @@ body_for_pfc_2((:-),Head,HeadO,(A/B),(AA,BB)):-!,body_for_pfc_1(Mode,Head,HeadM,
 body_for_pfc_2(Mode,Head,HeadO,(A/B),(AA/BB)):-!,body_for_pfc_1(Mode,Head,HeadM,A,AA),body_for_pfc(Mode,HeadM,HeadO,B,BB).
 
 
-body_for_pfc_2((=>),H,(if_missing(H,HH)),skolem(In,Out),true):-contains_var(In,H),subst(H,In,Out,HH),!.
+body_for_pfc_2((fwc),H,(if_missing(H,HH)),skolem(In,Out),true):-contains_var(In,H),subst(H,In,Out,HH),!.
 body_for_pfc_2(Mode,neg(Head),neg(Head),skolem(_,_),true).
 %body_for_pfc_2(Mode,H,H,skolem(_,_),true).
 body_for_pfc_2(Mode,Head,Head,skolem(In,Out),{ignore(In=Out)}).

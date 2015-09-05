@@ -50,7 +50,7 @@
 %
 %
 %
-% clause types: (:-)/1, (:-)/2, (=>)/1,  (=>)/2,  (==>)/1,  (==>)/2, (<-)/1,  (<-)/2, (<->)/2, fact/1
+% clause types: (:-)/1, (:-)/2, (=>)/1,  (=>)/2,  (==>)/1,  (==>)/2, (<-)/1,  (<-)/2, (<==>)/2, fact/1
 %
 :- include(logicmoo_i_header).
 
@@ -89,7 +89,7 @@ default_te(IF,VAR,VAL):-assertz(te_setting(IF,VAR,VAL)).
 :-default_te((:-)/1, compile_clause, proccess_directive).
 :-default_te((:-)/2, rule_neck, clause).
 :-default_te((=>),use_te, file_pfc).
-:-default_te((<->),use_te, file_pfc).
+:-default_te((<==>),use_te, file_pfc).
 :-default_te((<-),use_te, file_pfc).
 
 %
@@ -229,6 +229,7 @@ fully_expand_clause(Op,Sent,SentO):-var(Op),!,fully_expand_clause(is_asserted,Se
 fully_expand_clause(_ ,NC,NC):- as_is_term(NC),!.
 fully_expand_clause(_ ,arity(F,A),arity(F,A)):-!.
 fully_expand_clause(Op ,NC,NCO):- db_expand_final(Op,NC,NCO),!.
+fully_expand_clause(Op,'==>'(Sent),(SentO)):-!,fully_expand_clause(Op,Sent,SentO),!.
 fully_expand_clause(Op,'=>'(Sent),(SentO)):-!,fully_expand_clause(Op,Sent,SentO),!.
 fully_expand_clause(Op,':-'(Sent),Out):-!,fully_expand_goal(Op,Sent,SentO),!,must(Out=':-'(SentO)).
 fully_expand_clause(Op,(H:-B),Out):- !,fully_expand_head(Op,H,HH),fully_expand_goal(Op,B,BB),!,must(Out=(HH:-BB)).
@@ -243,6 +244,7 @@ as_is_term(NC):-cyclic_term(NC),!,dmsg(cyclic_term(NC)),!.
 as_is_term('$VAR'(_)):-!.
 as_is_term('wid'(_,_,_)):-!.
 
+as_is_term(NC):-is_unit(NC),!.
 as_is_term(M:NC):-atom(M),!,as_is_term(NC).
 as_is_term(NC):-functor(NC,Op,2),infix_op(Op,_).
 %as_is_term(NC):-var(NC).
@@ -285,14 +287,17 @@ db_expand_final(_ ,meta_argtypes(Args),    O  ):-compound(Args),functor(Args,Pre
 db_expand_final(_ ,meta_argtypes(F,Args),    meta_argtypes(Args)):-atom(F),!,functor(Args,Pred,A),assert_arity(Pred,A).
 db_expand_final(_ ,meta_argtypes(Args),      meta_argtypes(Args)):-!.
 db_expand_final(_ ,isa(Args,Meta_argtypes),  meta_argtypes(Args)):-Meta_argtypes==meta_argtypes,!,compound(Args),!,functor(Args,Pred,A),assert_arity(Pred,A).
-db_expand_final(Op,(A,B),(AA,BB)):-!,db_expand_final(Op,A,AA),db_expand_final(Op,B,BB).
+db_expand_final(Op,(A,B),(AA,BB)):-  !,db_expand_final(Op,A,AA),db_expand_final(Op,B,BB).
 db_expand_final(Op,props(A,B),PROPS):- (nonvar(A);nonvar(B)),!,expand_props(_,Op,props(A,B),Props),!,Props\=props(_,_),db_expand_term(Op,Props,PROPS).
+/*
 db_expand_final(_, MArg1User, NewMArg1User):- compound(MArg1User), fail,
    MArg1User=..[M,Arg1,Arg2|User],
    compound_all_open(Arg1),
    get_functor(Arg1,F,A),F\==(t),F\==(/),
    member(F,[arity,mpred_module]),
    NewMArg1User=..[M,F/A,Arg2|User],!.
+*/
+
 
 
 listToE(EL,E):-nonvar(EL),must((ground(EL),as_list(EL,List))),E=..[isEach|List].
@@ -301,12 +306,12 @@ listToE(EL,E):-nonvar(EL),must((ground(EL),as_list(EL,List))),E=..[isEach|List].
 db_expand_chain(_,M:PO,PO) :- atom(M),!.
 db_expand_chain(_,(P:-B),P) :-is_true(B),!.
 db_expand_chain(_,B=>P,P) :-is_true(B),!.
-db_expand_chain(_,P<=B,P) :-is_true(B),!.
-db_expand_chain(_,P<->B,P) :-is_true(B),!.
-db_expand_chain(_,B<->P,P) :-is_true(B),!.
+db_expand_chain(_,<=(P,B),P) :-is_true(B),!.
+db_expand_chain(_,P<==>B,P) :-is_true(B),!.
+db_expand_chain(_,B<==>P,P) :-is_true(B),!.
 db_expand_chain(_,P<-B,P) :-is_true(B),!.
 db_expand_chain(_,isa(I,Not),INot):-Not==not,!,INot =.. [Not,I].
-db_expand_chain(_,P,PE):-fail,cyc_to_pfc_expansion_entry(P,PE).
+db_expand_chain(_,P,PE):-fail,cyc_to_clif_entry(P,PE).
 db_expand_chain(_,('nesc'(P)),P) :- !.
 
 db_expand_a(Op ,(S1,S2),SentO):-db_expand_a(Op ,S1,S1O),db_expand_a(Op ,S2,S2O),conjoin(S1O,S2O,SentO),!.
@@ -342,14 +347,14 @@ db_expand_0(Op,pddlPredicates(EL),O):- listToE(EL,E),db_expand_0(Op,isa(E,tPred)
 db_expand_0(Op,DECL,O):- arg(_,DECL,S),string(S),DECL=..[F|Args],maplist(destringify,Args,ArgsO),ArgsO\=@=Args,!,DECLM=..[F|ArgsO],db_expand_0(Op,DECLM,O).
 
 db_expand_0(Op,EACH,O):- EACH=..[each|List],db_expand_maplist(fully_expand_now(Op),List,T,T,O).
-db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F/A|Args],integer(A),functor_declares_instance(D,TPRED),
+db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F/A|Args],atom(F),integer(A),functor_declares_instance(D,TPRED),
   is_relation_type(TPRED),expand_props(_Prefix,Op,props(F,[D,TPRED|Args]),O),!.
 
 :- style_check(-singleton).
 
-db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F,A|Args],integer(A),functor_declares_instance(D,TPRED),
+db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F,A|Args],atom(F),integer(A),functor_declares_instance(D,TPRED),
   is_relation_type(TPRED),expand_props(Prefix,Op,props(F,[D,TPRED|Args]),O),!.
-db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..  [D,C|Args],compound(C),functor_declares_instance(D,TPRED),\+ is_ftVar(C),!,get_functor(C,F,A),  
+db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..  [D,C|Args],compound(C),functor_declares_instance(D,TPRED),\+ is_ftVar(C),is_non_unit(C),!,get_functor(C,F,A),  
   expand_props(Prefix,Op,props(F,[D,TPRED|Args]),M),!,
   (\+((arg(_,C,Arg),var(Arg))) -> O = (meta_argtypes(C),M) ; (O= (M))).
 

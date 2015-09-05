@@ -34,7 +34,7 @@
 :- op(500,fx,'~').
 :- op(1050,xfx,('=>')).
 :- op(1050,xfx,'<==>').
-:- op(1050,xfx,('<=')).
+:- op(1050,xfx,('<-')).
 :- op(1100,fx,('==>')).
 :- op(1150,xfx,('::::')).
 :-dynamic(mudTermAnglify/2).
@@ -199,7 +199,7 @@ prologHybrid(localityOfObject(tObj,tSpatialThing)).
 % HOW TO MAKE THIS FAST? isa(Inst,Type) <= {isa_from_morphology(Inst,Type)}.
 
 %((disjointWith(P1,P2) , genls(C1,P1), {dif:dif(C1,P1)}) ==>    disjointWith(C1,P2)).
-% (disjointWith(C1,P2) <= (genls(C1,P1), {dif:dif(C1,P1)}, disjointWith(P1,P2))).
+% (disjointWith(C1,P2) <- (genls(C1,P1), {dif:dif(C1,P1)}, disjointWith(P1,P2))).
 
 tCol(completelyAssertedCollection).
 tCol(completeIsaAsserted).
@@ -228,7 +228,7 @@ dividesBetween(tAgent,tPlayer,tNpcPlayer).
 
 isa(Col1, ttObjectType) ==> ~isa(Col1, ttFormatType).
 
-neg(isa(I,Super)) <= {ground(isa(I,Super))}, (isa(I,Sub), disjointWith(Sub, Super)).
+neg(isa(I,Super)) <- {ground(isa(I,Super))}, (isa(I,Sub), disjointWith(Sub, Super)).
 % disjointWith(P1,P2) ==> {\+(isa(P1,ttNonGenled)),\+(isa(P2,ttNonGenled))},(neg(isa(C,P1)) <==> isa(C,P2)).
 
 
@@ -334,7 +334,6 @@ prologSingleValued(mudBareHandDamage(tAgent,ftInt),prologHybrid).
 % prologSingleValued(mudEnergy(tChargeAble,ftInt(90)),prologHybrid).
 prologSingleValued(mudEnergy(tChargeAble,ftInt),prologHybrid).
 prologSingleValued(mudEnergy(tObj,ftInt),[argSingleValueDefault(2,90)],prologHybrid).
-prologSingleValued(mudFacing(tObj,vtDirection(vNorth)),prologHybrid).
 prologSingleValued(mudFacing(tObj,vtDirection),[argSingleValueDefault(2,vNorth)],prologHybrid).
 prologSingleValued(mudHealth(tObj,ftInt),prologHybrid).
 prologSingleValued(mudHeight(tObj,ftInt),prologHybrid).
@@ -434,7 +433,7 @@ prologHybrid(mudSize(tSpatialThing,ftTerm)).
 prologHybrid(mudTextSame(ftText,ftText)).
 prologHybrid(mudTexture(tSpatialThing,vtTexture)).
 prologHybrid(typeGrid(tCol,ftInt,ftListFn(ftString))).
-prologListValued(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
+meta_argtypes(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
 prologListValued(mudGetPrecepts(tAgent,ftListFn(tSpatialThing)),[mpred_module(user)]).
 prologListValued(mudNearFeet(tAgent,ftListFn(tSpatialThing)),[]).
 prologListValued(mudNearReach(tAgent,ftListFn(tSpatialThing)),[mpred_module(user)]).
@@ -665,6 +664,7 @@ genls( tCarryAble, tItem).
 genls( tCarryAble, tDropAble).
 
 tCol(genlsInheritable).
+:-dynamic(genlsInheritable/1).
 
 genlsInheritable(tCol).
 genlsInheritable(ttPredType).
@@ -1039,7 +1039,7 @@ O = [
 
 */
 
-:- pfc_watch.
+:- pfc_spy_all.
 
 :- debugOnError(pfc_add(tAgent(iExplorer1))).
 
@@ -1062,5 +1062,5 @@ O = [
 % genls(tExplorer,tHumanPlayer).
 isa(iExplorer1,tHumanPlayer).
 
-:- pfc_no_watch.
+:- pfc_no_spy_all.
 

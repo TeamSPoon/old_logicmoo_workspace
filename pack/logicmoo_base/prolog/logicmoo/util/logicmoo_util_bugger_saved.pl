@@ -3017,7 +3017,7 @@ safe_numbervars(E,EE):-duplicate_term(E,EE),
   forall(member(V,AttVars),(copy_term(V,VC,Gs),V='$VAR'(VC=Gs))).
    
 
-get_gtime(G):- get_time(T),convert_time(T,_A,_B,_C,_D,_E,_F,G).
+get_gtime(G):- get_time(T),convert_time(T,_A,_B,_C,_D,_E,_F,G),GG is G//1.
 
 safe_numbervars(EE):-get_gtime(G),numbervars(EE,G,_End,[attvar(skip),functor_name('$VAR'),singletons(false)]).
 

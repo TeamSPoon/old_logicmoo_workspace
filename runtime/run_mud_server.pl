@@ -3,99 +3,8 @@
 
 */
 
+:- user:ensure_loaded(logicmoo_repl).
 
-:- dynamic   user:file_search_path/2.
-:- multifile user:file_search_path/2.
-
-:- multifile(mpred_online:semweb_startup/0).
-
-:- exists_directory(runtime)->working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true).
-user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
-user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
-user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current_prolog_flag(unix,true).
-user:file_search_path(cliopatria, '../pack/ClioPatria'). % :- current_prolog_flag(unix,true).
-user:file_search_path(user, '../pack/ClioPatria/user/').
-user:file_search_path(swish, '../pack/swish'):- current_prolog_flag(unix,true).
-user:file_search_path(pack, '../pack/').
-user:file_search_path(games, '../games').
-
-
-
-:- if(current_prolog_flag(dialect,yap)).
-:-  expects_dialect(swi).
-@(C,M) :- M:call(C).
-user:file_search_path(library, '/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_base/prolog').
-user:file_search_path(library, '/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_nlu/prolog').
-user:file_search_path(library, '/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_packages/prolog').
-user:file_search_path(library, '/devel/LogicmooDeveloperFramework/PrologMUD/pack/logicmoo_planner/prolog').
-
-:- else.
-
-:-set_prolog_stack(global, limit(16*10**9)).
-:-set_prolog_stack(local, limit(16*10**9)).
-:-set_prolog_stack(trail, limit(16*10**9)).
-:- statistics.
-:- attach_packs.
-:- initialization(attach_packs).
-user:file_search_path(prologmud, library(prologmud)).
-:- user:use_module(library(persistency)).
-:- ((current_prolog_flag(readline, true))->expand_file_name("~/.pl-history", [File|_]),(exists_file(File) -> rl_read_history(File); true),at_halt(rl_write_history(File));true).
-
-
-:- endif.
-
-
-
-
-% :- multifile sandbox:safe_primitive/1.
-% :-asserta((sandbox:safe_primitive(Z):-wdmsg(Z))).
-
-%%% ON :- initialization( profiler(_,walltime) ).
-%%% ON :- initialization(user:use_module(library(swi/pce_profile))).
-
-% [Required] Load the Logicmoo Library Utils
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
-% :- qcompile_libraries.
-
-
-
-% [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/)
-:- if_file_exists(user:ensure_loaded(library(eggdrop))).
-:-eggdrop:egg_go.
-:- initialization((current_predicate(egg_go/0)->egg_go;true),now).
-
-:-asserta(user:load_mud_www).
-
-% [Mostly Required] Load the UPV Curry System
-%:- time(user:ensure_loaded(library(upv_curry/main))).
-
-
-% [Required] Load the Logicmoo WWW System
-:- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_pldoc)))).
-:- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_swish)))).
-:- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_clio)))).
-
-
-% [Required] Load the Logicmoo Base System
-:- time(user:ensure_loaded(logicmoo(logicmoo_base))).
-
-:- gripe_time(40,user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
-
-:- asserta(thlocal:disable_mpred_term_expansions_locally).
-
-:- multifile(user:push_env_ctx/0).
-:- dynamic(user:push_env_ctx/0).
-
-push_env_ctx:-!,fail.
-push_env_ctx:-!.
-
-
-
-% [Required] Load the Logicmoo Backchaining Inference System
-:- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
-
-
-% :- prolog.
 
 % :- listing([storage_plugin_update,filesys:filesys_data]).
 
@@ -105,6 +14,8 @@ push_env_ctx:-!.
 % [Mostly Required] Load the Logicmoo Planner/AI System
 :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
 
+:- prolog.
+
 :- else.
 
 % [Mostly Required] Load the Logicmoo Planner/AI System
@@ -112,9 +23,10 @@ push_env_ctx:-!.
 
 :- wdmsg("Done with loading logicmoo_planner").
 
+:-endif.
 
 % [Required] most of the Library system should not be loaded with mpred expansion on
-:- ignore((\+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
+% :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 
 % [Required] Load the CYC Network Client and Logicmoo CycServer Emulator (currently server is disabled)
 :- with_no_mpred_expansions(user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api))).
@@ -170,6 +82,7 @@ push_env_ctx:-!.
 
 
 
+
 % ==============================
 % MUD SERVER CODE STARTS
 % ==============================
@@ -191,6 +104,11 @@ tExplorer(iExplorer4).
 tExplorer(iExplorer5).
 tExplorer(iExplorer6).
 
+(tHumanBody(skRelationAllExistsFn)==>{trace_or_throw(tHumanBody(skRelationAllExistsFn))}).
+
+genls(tExplorer,tHominid).
+
+
 
 tExplorer(iExplorer7).
 wearsClothing(iExplorer7,'iBoots773').
@@ -205,6 +123,7 @@ pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice','Por
 isa(iCommanderdata66,'tMonster').
 mudDescription(iCommanderdata66,txtFormatFn("Very screy looking monster named ~w",[iCommanderdata66])).
 tAgent(iCommanderdata66).
+tHominid(iCommanderdata66).
 isa(iCommanderdata66,'tExplorer').
 wearsClothing(iCommanderdata66,'iBoots673').
 wearsClothing(iCommanderdata66,'iCommBadge674').
@@ -226,107 +145,12 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 :- file_begin(pl).
 
 % [Optionaly] Start the telent server
-:-at_start(logOnError(toploop_telnet:start_mud_telnet(4000))).
+start_telnet:- logOnError(toploop_telnet:start_mud_telnet_4000).
 
-:- prolog.
+:- initialization(start_telnet).
 
+:- user:ensure_loaded(start_mud_server).
 
-% ==============================
-% MUD GAME CODE LOADS
-% ==============================
-
-% [Manditory] This loads the game and initializes so test can be ran
-:- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
-
-
-% [Never] saves about a 3 minute compilation time (for when not runing mud)
-:- if((fail,gethostname(titan),fail)).
-:- if_startup_script( finish_processing_world).
-:- enqueue_agent_action("rez crackers").
-%:- prolog.
-:- endif.
-
-
-% [Optional] the following game files though can be loaded separate instead
-:- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
-:- declare_load_dbase('../games/src_game_nani/?*.plmoo').
-% [Optional] the following worlds are in version control in examples
-% :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
-% :- add_game_dir('../games/src_game_sims',prolog_repl).
-% :- add_game_dir('../games/src_game_nani',prolog_repl).       
-:- add_game_dir('../games/src_game_startrek',prolog_repl).
-
-%:- set_prolog_flag(trace_gc,false).
-%:- set_prolog_flag(backtrace_depth,400).
-
-
-% [Manditory] This loads the game and initializes so test can be ran
-:- if_startup_script(finish_processing_world).
-
-% user:sanity_test:- rescan_pfc.
-
-%:- rescan_pfc. 
-:-dmsg("About to run Sanity").
-%:- prolog.
-
-:- show_call_entry(gripe_time(40,if_startup_script(doall(user:sanity_test)))).
-
-%:- prolog.
-
-feature_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
-
-:- if((fail,gethostname(titan))).
-
-% :-feature_testp1.
-
-% [Optionaly] Run a battery of tests
-% :- if_startup_script( doall(now_run_local_tests_dbg)).
-
-% [Optionaly] Run a battery of tests
-% :- if_startup_script( doall(user:regression_test)).
-
-
-sanity_test0a:- enqueue_agent_action("hide").
-
-sanity_test0b:- enqueue_agent_action(actWho).
-:-sanity_test0b.
-
-sanity_test1:-   
-   enqueue_agent_action("rez crackers"),
-   enqueue_agent_action("drop crackers"),
-   enqueue_agent_action('look'),
-   enqueue_agent_action("take crackers"),
-   enqueue_agent_action("eat crackers"),
-   enqueue_agent_action('look').
-:-sanity_test1.
-
-sanity_test2:- enqueue_agent_action("rez pants"),
-   enqueue_agent_action("wear pants"),
-   enqueue_agent_action("tp to closet"),
-   enqueue_agent_action("take shirt"),
-   enqueue_agent_action("inventory").
-
-:-sanity_test2.
-
-
-% [Optionaly] Tell the NPCs to do something every 60 seconds (instead of 90 seconds)
-% :- register_timer_thread(npc_ticker,60,npc_tick).
-
-
-:- pce_show_profile.
-
-:-endif.  % MUD TESTS
-% :- enqueue_agent_action(prolog).
-
-% ==============================
-% MUD GAME REPL 
-% ==============================
-% [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
-:- if_startup_script(at_start(login_and_run)).
-
-% So scripted versions don't just exit
-:- if_startup_script(at_start(prolog)).
-
-:- endif.
+:- rl_add_history( 'user:ensure_loaded(start_mud_server).' ).
 
 

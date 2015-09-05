@@ -49,13 +49,16 @@ time_tick(Time,Pred):- repeat,sleep(Time), (suspend_timers->true;(once(doall(log
 user:hook_one_second_timer_tick.
 
 pfc_one_second_timer:- repeat,time_tick(1.0,user:hook_one_second_timer_tick),fail.
-:-thread_property(_,alias(pfc_one_second_timer))-> true ; thread_create(pfc_one_second_timer,_,[alias(pfc_one_second_timer)]).
+start_one_second_timer:-thread_property(_,alias(pfc_one_second_timer))-> true ; thread_create(pfc_one_second_timer,_,[alias(pfc_one_second_timer)]).
+
+:-initialization(start_one_second_timer).
 
 user:hook_one_minute_timer_tick.
 
 pfc_one_minute_timer:- repeat,sleep(60.0),time_tick(60.0,user:hook_one_minute_timer_tick),fail.
-:-thread_property(_,alias(pfc_one_minute_timer))-> true ; thread_create(pfc_one_minute_timer,_,[alias(pfc_one_minute_timer)]).
+start_one_minute_timer:-thread_property(_,alias(pfc_one_minute_timer))-> true ; thread_create(pfc_one_minute_timer,_,[alias(pfc_one_minute_timer)]).
 
+:-initialization(start_one_minute_timer).
 
 
 agenda_do_prequery:-!.

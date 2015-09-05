@@ -25,7 +25,7 @@ options=$2
 ../gentest.sh "$XEMU $options" test_incr_depends "test".
 #------------------------------------------------- inc trans depends (non cyclic)
 ../gentest.sh "$XEMU $options" test_incr_depends_2 "test".
-#------------------------------------------------- test incremental <-> opaque
+#------------------------------------------------- test incremental <==> opaque
 ../gentest.sh "$XEMU $options" test_inc_switch "test".
 #------------------------------------------------- testing executable incremental dirs.
 ../gentest.sh "$XEMU $options" test_directives "test".

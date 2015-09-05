@@ -220,7 +220,7 @@ non_assertable(WW,notAssertable(Why)):- compound(WW),get_functor(WW,F),user:mpre
 is_logical_functor(And):-hotrace(is_logical_functor0(And)).
 is_logical_functor0(X):-atom(X),member(X,[',',';',xor,'\\+',neg]).
 is_logical_functor0(X):-call_if_defined(logical_functor_pttp(X)).
-is_logical_functor0(And):-member(And,[(,),(;),('<='),('=>'),('<=>'),(':-'),(and),nop]).
+is_logical_functor0(And):-member(And,[(,),(;),('<-'),('=>'),('<=>'),(':-'),(and),nop]).
 
 % ===============================================================================================
 % ===============================================================================================

@@ -27,7 +27,7 @@ safe_numbervars(E,EE):-duplicate_term(E,EE),
 
 name_vars(Term,Named):- ignore((source_variables_l(AllS))), copy_term(Term+AllS,Named+CAllS),maplist(must,CAllS).
 
-get_gtime(G):- get_time(T),convert_time(T,_A,_B,_C,_D,_E,_F,G).
+get_gtime(GG):- get_time(T),convert_time(T,_A,_B,_C,_D,_E,_F,G),GG is (floor(G) rem 500).
 
 safe_numbervars(EE):-get_gtime(G),numbervars(EE,G,_End,[attvar(skip),functor_name('$VAR'),singletons(true)]).
 
@@ -219,12 +219,12 @@ snumbervars(Term,Functor,Start,List):-numbervars_impl(Term,Functor,Start,List).
 snumbervars(Term):-numbervars_impl(Term,0,_).
 
 varname:attr_unify_hook(_,_).
-varname:attr_portray_hook(Value, _Var) :- nonvar(Value),!,write('?'(Value)).
+varname:attr_portray_hook(Value, _Var) :- nonvar(Value),!,writeq('?'(Value)).
 :- public
 	varname:portray_attvar/1.
 'varname':portray_attvar(Var) :-
 	write('{<'),
 	get_attrs(Var, Attr),
-	catch(writeq(Attr),_,'$attvar':portray_attrs(Attr, Var)),
+	catch(writeq('??'(Attr)),_,'$attvar':portray_attrs(Attr, Var)),
 	write('>}').
 

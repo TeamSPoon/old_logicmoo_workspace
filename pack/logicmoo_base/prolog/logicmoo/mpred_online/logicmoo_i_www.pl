@@ -10,6 +10,11 @@
 :- use_module(library(http/http_server_files)).
 
 
+:- volatile(user:session_data/2).
+:- volatile(system:'$loading_file'/3).
+:- volatile(http_log:log_stream/2).
+:- volatile(http_session:urandom_handle/1).
+
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
 :- prolog_load_context(directory,Dir),
@@ -21,7 +26,7 @@
 :- initialization(attach_packs).
 % [Required] Load the Logicmoo Library Utils
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
-
+ 
 
 % :- module(logicmoo_i_www,[ html_print_term/2  ]).  % +Term, +Options
 
@@ -115,7 +120,6 @@ user:file_search_path(pixmaps, logicmoo('mpred_online/pixmaps')).
 
 :- meta_predicate
 	handler_logicmoo_cyclone(+).
-
 
 print_request([]).
 print_request([H|T]) :-
@@ -401,7 +405,7 @@ action_menu_item('Find',"Find $item").
 action_menu_item('Forward',"Forward Direction").
 action_menu_item('Backward',"Backward Direction").
 action_menu_item('query',"Query $item").
-action_menu_item('repropogate',"Repropogate $item (ReAssert)").
+action_menu_item('repropagate',"Repropagate $item (ReAssert)").
 action_menu_item('remove',"Remove $item(Unassert)").   
 action_menu_item('Code',"Assume Theorem (Disable $item)").
 action_menu_item('prologSingleValued',"Make $item Single Valued").
@@ -640,6 +644,7 @@ put_string(A,B):- thlocal:print_mode(html),!,
   with_output_to(atom(S),put_string0(A,B)),url_iri(URL,S),format('<a href="?term=~w">~w</a>',[URL,S]).
 put_string(A,B):- put_string0(A,B).
 
+% :-start_rtrace.
 put_string0([], Q) :-
 	put(Q).
 put_string0([Q|T], Q) :- !,
@@ -775,9 +780,9 @@ write_VAR(N, _Style, Ci, alpha) :-
 	;   Rest is N/26, name(Rest, String),
 	    put_string(String)
 	), !.
-write_VAR(A, _Style, Ci, Co) :-
+write_VAR(A, _Style, _Ci, _Co) :-
 	atom(A), !,
-	write_atom(A, write, Ci, Co).
+	write(A).
 write_VAR(X, Style, Ci, punct) :-
 	write_atom('$VAR', Style, Ci, _),
 	write_args(0, 1, '$VAR'(X), 40, Style).
@@ -792,6 +797,7 @@ write_atom([], _, _, punct) :- !,
 	put(91), put(93).
 write_atom({}, _, _, punct) :- !,
 	put(123), put(125).
+write_atom(A, write, _Ci, _Co):- !,write(A),!.
 write_atom(A, _Style, _Ci, _Co):- write_atom_link(A,A),!.
 write_atom(Atom, Style, Ci, Co) :-
 	name(Atom, String),

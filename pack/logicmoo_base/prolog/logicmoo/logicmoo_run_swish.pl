@@ -6,6 +6,9 @@
 	  [
 	  ]).
 
+
+:- volatile(swish_trace:installed/1).
+
 :- multifile(mpred_online:semweb_startup).
 :- '@'(ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),user).
 :- add_to_search_path(swish, '../pack/swish/').

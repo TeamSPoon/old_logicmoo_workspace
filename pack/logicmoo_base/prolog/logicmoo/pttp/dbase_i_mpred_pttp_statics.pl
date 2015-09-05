@@ -1388,6 +1388,7 @@ pttp_nnf_post_clean(C,CC,Vars):-
 :-export(logical_functor_pttp/1).
 
 logical_functor_pttp(X):-not(atom(X)),!,fail.
+logical_functor_pttp(props):-!,fail.
 logical_functor_pttp(X):-pttp_nnf_pre_clean_functor(A,B,_),(X==A;X==B),!.
 logical_functor_pttp(&).
 logical_functor_pttp(~).

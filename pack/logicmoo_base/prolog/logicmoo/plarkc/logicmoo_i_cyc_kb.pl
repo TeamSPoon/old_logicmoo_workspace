@@ -39,7 +39,7 @@ cycPrepending(ft,'Expression').
 cycPrepending(ft,'ExpressionAskable').
 cycPrepending(ft,'ExpressionAssertible').
 cycPrepending(ft,'GAFAssertion').
-cycPrepending(ft,'GenericRelationFormula').
+%cycPrepending(ft,'GenericRelationFormula').
 cycPrepending(ft,'HLPrototypicalTerm').
 cycPrepending(ft,'IndeterminateTerm').
 cycPrepending(ft,'IndexedTerm').
@@ -53,11 +53,11 @@ cycPrepending(ft,'NonAtomicReifiedTerm').
 cycPrepending(ft,'NonAtomicTerm').
 cycPrepending(ft,'NonAtomicTerm-Askable').
 cycPrepending(ft,'NonAtomicTerm-Assertible').
-cycPrepending(ft,'NonAtomicTerm-ClosedFunctor').
 cycPrepending(ft,'NonNegativeInteger').
 cycPrepending(ft,'NonVariableNonKeywordSymbol').
 cycPrepending(ft,'NonVariableSymbol').
-
+/*
+cycPrepending(ft,'NonAtomicTerm-ClosedFunctor').
 cycPrepending(ft,'OpenDenotationalTerm').
 cycPrepending(ft,'OpenExpression').
 cycPrepending(ft,'OpenFormula').
@@ -70,7 +70,7 @@ cycPrepending(ft,'ClosedExpression').
 cycPrepending(ft,'ClosedFormula').
 cycPrepending(ft,'ClosedNonAtomicTerm').
 cycPrepending(ft,'ClosedSentence').
-
+*/
 
 cycPrepending(ft,'PositiveInteger').
 cycPrepending(ft,'PropositionalSentence').
@@ -156,6 +156,8 @@ mpred_to_cyc(P,C):- cyc_to_plarkc(C,P),!.
 mpred_to_cyc(ftInt,'Integer').
 mpred_to_cyc(ftSentence,'CycLFormulaicSentence').
 mpred_to_cyc(ftSentence,'FormulaicSentence').
+% mpred_to_cyc(ftNonAtomicTerm,'CycLGenericRelationFormula').
+
 mpred_to_cyc(ftSentence,'SubLFormulaicSentence').
 mpred_to_cyc(ftSentence,'icSentenceSentence').
 mpred_to_cyc(ftVar,'CycLVariable').
@@ -195,7 +197,7 @@ mpred_to_cyc(vIntervalEntry, 'IntervalEntry').
 mpred_to_cyc(vSingleEntry, 'SingleEntry').
 
 
-mpred_to_cyc(ftAtomicTerm, 'ClosedAtomicTerm').
+mpred_to_cyc(ftAtomicTerm, 'CycLClosedAtomicTerm').
 mpred_to_cyc(vSetTheFormat, 'SetTheFormat').
 
 mpred_to_cyc(vAssertedFalseDefault, 'AssertedFalseDefault').
@@ -223,6 +225,8 @@ mpred_to_cyc(vDontReOrderCommutativeTerms, 'DontReOrderCommutativeTerms').
 mpred_to_cyc(vReformulationBackwardDirection, 'ReformulationBackwardDirection').
 mpred_to_cyc(vReformulationForwardDirection, 'ReformulationForwardDirection').
 mpred_to_cyc(vReformulationNeitherDirection, 'ReformulationNeitherDirection').
+mpred_to_cyc(ftSentenceAssertible, 'CycLSentence-ClosedPredicate').
+mpred_to_cyc(ftNonAtomicTerm, 'CycLNonAtomicTerm-ClosedFunctor').
 
 
 mpred_to_cyc(vApril, 'April').
@@ -295,7 +299,7 @@ mwkb1:- tell(fooooo0),
       told.
 ltkb1:-
  must_det_l(( mwkb1,tell(fooooo9),
-      ignore(( tinyKB(D), maybe_ruleRewrite(D,E),once(cyc_to_pfc_expansion(E,KB)),format('~q.~n',[tinyK8(KB)]),assertz_if_new(tinyK8(KB)),fail)),
+      ignore(( tinyKB(D), maybe_ruleRewrite(D,E),once(cyc_to_clif(E,KB)),format('~q.~n',[tinyK8(KB)]),assertz_if_new(tinyK8(KB)),fail)),
       listing(cyc_to_plarkc/2),
       listing(mpred_to_cyc/2),
       told,
@@ -341,11 +345,11 @@ wkb01:- tell(fooooo0),
       told.
 
 wkb02:- tell(fooooo0),
-      forall(tinyKB_All(V,MT,STR),once((cyc_to_pfc_expansion(tinyKB_All(V,MT,STR),KB),format('~q.~n',[KB])))),
+      forall(tinyKB_All(V,MT,STR),once((cyc_to_clif(tinyKB_All(V,MT,STR),KB),format('~q.~n',[KB])))),
       told.
 
 wkb2:- tell(fooooo2),
-      ignore(( tinyKB(D,MT,Str),cyc_to_pfc_expansion(D,KB),format('~N~q.~N',[proof(KB,D,MT,Str)]),fail)),
+      ignore(( tinyKB(D,MT,Str),cyc_to_clif(D,KB),format('~N~q.~N',[proof(KB,D,MT,Str)]),fail)),
       told.
 
 
@@ -370,6 +374,12 @@ cyc_to_pfc_idiom1(C,P):-nonvar(C),mpred_to_cyc(P,C),!.
 cyc_to_pfc_idiom1('CycLTerm','CycLExpression').
 cyc_to_pfc_idiom1(C,P):-atom_concatM('CycLSentence-',Type,C),!,atom_concat('Sentence',Type,P).
 cyc_to_pfc_idiom1(C,P):-atom_concatM('Expression-',Type,C),!,atom_concat('Expression',Type,P).
+
+% TODO remove these next two simplifcations one day
+cyc_to_pfc_idiom1(C,P):-atom_concatM('CycLOpen',P,C).
+cyc_to_pfc_idiom1(C,P):-atom_concatM('CycLClosed',P,C).
+ 
+
 cyc_to_pfc_idiom1(C,P):-atom_concatM('CycL',P,C).
 cyc_to_pfc_idiom1(C,P):-atom_concatM('SubL',P,C).
 cyc_to_pfc_idiom1(C,P):-atom_concatM('Cyclist',Type,C),!,atom_concat('Author',Type,P).
@@ -382,7 +392,7 @@ cyc_to_pfc_idiom1(C,P):-atom_concatR(C,Type,'FormulaicSentence'),!,atom_concat(T
 
 cyc_to_pfc_idiom_unused([Conj|MORE],Out):-fail, not(is_ftVar(Conj)),!,cyc_to_pfc_sent_idiom_2(Conj,Pred,_),
   with_assertions(thocal:outer_pred_expansion(Conj,MORE),
-    ( maplist(cyc_to_pfc_expansion,MORE,MOREL), 
+    ( maplist(cyc_to_clif,MORE,MOREL), 
        with_assertions(thocal:outer_pred_expansion(Pred,MOREL),       
          list_to_ops(Pred,MOREL,Out)))),!.
 
@@ -393,11 +403,11 @@ cyc_to_pfc_sent_idiom_2(and,(','),trueSentence).
 
 list_to_ops(_,V,V):-is_ftVar(V),!.
 list_to_ops(Pred,[],Out):-cyc_to_pfc_sent_idiom_2(_,Pred,Out),!.
-list_to_ops(Pred,In,Out):-not(is_list(In)),!,cyc_to_pfc_expansion(In,Mid),cyc_to_pfc_sent_idiom_2(_,Pred,ArityOne),Out=..[ArityOne,Mid].
-list_to_ops(_,[In],Out):-!,cyc_to_pfc_expansion(In,Out).
+list_to_ops(Pred,In,Out):-not(is_list(In)),!,cyc_to_clif(In,Mid),cyc_to_pfc_sent_idiom_2(_,Pred,ArityOne),Out=..[ArityOne,Mid].
+list_to_ops(_,[In],Out):-!,cyc_to_clif(In,Out).
 list_to_ops(Pred,[H,T],Body):-!,
-    cyc_to_pfc_expansion(H,HH),
-    cyc_to_pfc_expansion(T,TT),
+    cyc_to_clif(H,HH),
+    cyc_to_clif(T,TT),
     (is_list(TT)-> Body=..[Pred,HH|TT]; Body=..[Pred,HH,TT]).
 
 list_to_ops(Pred,[H|T],Body):-!,
@@ -414,18 +424,18 @@ label_args(PREFIX,N,[ARG|ARGS]):-atom_concat(PREFIX,N,TOARG),ignore(TOARG=ARG),!
 
 :-thread_local thocal:outer_pred_expansion/2.
 
-cyc_to_pfc_expansion_notify(B,A):-cyc_to_pfc_expansion(B,A)->B\=@=A,nop(dmsg(A<=B)).
-cyc_to_pfc_expansion_entry(I,O):-fail,cyc_to_pfc_expansion(I,M),!,must((functor(I,FI,_),functor(M,MF,_),FI==MF)),O=M.
+cyc_to_clif_notify(B,A):- cyc_to_clif(B,A) -> B\=@=A, nop(dmsg(B==A)).
+cyc_to_clif_entry(I,O):-fail,cyc_to_clif(I,M),!,must((functor(I,FI,_),functor(M,MF,_),FI==MF)),O=M.
 
-cyc_to_pfc_expansion(V,V):-is_ftVar(V),!.
-cyc_to_pfc_expansion(I,O):-atom(I),must(cyc_to_pfc_idiom(I,O)),!.
-cyc_to_pfc_expansion(V,V):-not(compound(V)),!.
-cyc_to_pfc_expansion('SubLQuoteFn'(V),V):-atom(V),!.
-cyc_to_pfc_expansion(isa(I,C),O):-atom(C),M=..[C,I],!,cyc_to_pfc_expansion(M,O).
-cyc_to_pfc_expansion(I,O):-ruleRewrite(I,M),I\=@=M,!,cyc_to_pfc_expansion(M,O).
-cyc_to_pfc_expansion([H|T],[HH|TT]):-!,cyc_to_pfc_expansion(H,HH),cyc_to_pfc_expansion(T,TT),!.
-cyc_to_pfc_expansion(HOLDS,HOLDSOUT):-HOLDS=..[F|HOLDSL],
-  with_assertions(thocal:outer_pred_expansion(F,HOLDSL),cyc_to_pfc_expansion([F|HOLDSL],[C|HOLDSOUTL])),!,
+cyc_to_clif(V,V):-is_ftVar(V),!.
+cyc_to_clif(I,O):-atom(I),must(cyc_to_pfc_idiom(I,O)),!.
+cyc_to_clif(V,V):-not(compound(V)),!.
+cyc_to_clif('SubLQuoteFn'(V),V):-atom(V),!.
+cyc_to_clif(isa(I,C),O):-atom(C),M=..[C,I],!,cyc_to_clif(M,O).
+cyc_to_clif(I,O):-ruleRewrite(I,M),I\=@=M,!,cyc_to_clif(M,O).
+cyc_to_clif([H|T],[HH|TT]):-!,cyc_to_clif(H,HH),cyc_to_clif(T,TT),!.
+cyc_to_clif(HOLDS,HOLDSOUT):-HOLDS=..[F|HOLDSL],
+  with_assertions(thocal:outer_pred_expansion(F,HOLDSL),cyc_to_clif([F|HOLDSL],[C|HOLDSOUTL])),!,
   ((is_list([C|HOLDSOUTL]), atom(C))-> must(HOLDSOUT=..[C|HOLDSOUTL]) ; HOLDSOUT=[C|HOLDSOUTL]),!.
 
 clip_us(A,AO):-concat_atom(L,'-',A),concat_atom(L,'_',AO).
@@ -568,7 +578,7 @@ as_cycl(VP,VE):-subst(VP,('-'),(neg),V0),subst(V0,('v'),(or),V1),subst(V1,('exis
 addCycL(V):-addTiny_added(V),!.
 addCycL(V):-into_mpred_form(V,M),V\=@=M,!,addCycL(M),!.
 addCycL(V):-defunctionalize('implies',V,VE),V\=@=VE,!,addCycL(VE).
-addCycL(V):-cyc_to_pfc_expansion(V,VE),V\=@=VE,!,addCycL(VE).
+addCycL(V):-cyc_to_clif(V,VE),V\=@=VE,!,addCycL(VE).
 addCycL(V):-is_simple_gaf(V),!,addCycL0(V),!.
 addCycL(V):-kif_to_boxlog(V,VB),boxlog_to_prolog(VB,VP),V\=@=VP,!,as_cycl(VP,VE),show_call(addCycL0(VE)).
 addCycL(V):-addCycL0(V),!.
@@ -576,9 +586,9 @@ addCycL(V):-addCycL0(V),!.
 addCycL0(V):-addCycL1(V).
 
 addCycL1(V):-into_mpred_form(V,M),V\=@=M,!,addCycL0(M),!.
-addCycL1(V):-cyc_to_pfc_expansion(V,VE),V\=@=VE,!,addCycL0(VE).
+addCycL1(V):-cyc_to_clif(V,VE),V\=@=VE,!,addCycL0(VE).
 addCycL1((TRUE=>V)):-is_true(TRUE),addCycL0(V),!.
-addCycL1((V<=TRUE)):-is_true(TRUE),addCycL0(V),!.
+addCycL1(<=(V , TRUE)):-is_true(TRUE),addCycL0(V),!.
 addCycL1((V :- TRUE)):-is_true(TRUE),addCycL0(V),!.
 addCycL1((V :- A)):- show_call(addCycL0((A => V))).
 addCycL1((A => (V1 , V2))):-not(is_ftVar(V1)),!,show_call(addCycL0((A => V1))) , show_call(addCycL0((A => V2))).
@@ -593,16 +603,16 @@ sent_to_conseq(CycLIn,Consequent):- into_mpred_form(CycLIn,CycL), ignore((tiny_s
 :-dynamic(addTiny_added/1).
 
 cycLToMpred(V,CP):-into_mpred_form(V,M),V\=@=M,!,cycLToMpred(M,CP),!.
-cycLToMpred(V,CP):-cyc_to_pfc_expansion(V,VE),V\=@=VE,!,cycLToMpred(VE,CP).
+cycLToMpred(V,CP):-cyc_to_clif(V,VE),V\=@=VE,!,cycLToMpred(VE,CP).
 cycLToMpred(V,CP):-is_simple_gaf(V),!,cycLToMpred0(V,CP),!.
 cycLToMpred(V,CP):-defunctionalize('implies',V,VE),V\=@=VE,!,cycLToMpred(VE,CP).
 cycLToMpred(V,CP):-kif_to_boxlog(V,VB),boxlog_to_prolog(VB,VP),V\=@=VP,!,as_cycl(VP,VE),show_call(cycLToMpred0(VE,CP)).
 cycLToMpred(V,CP):-cycLToMpred0(V,CP),!.
 
 cycLToMpred0(V,CP):-into_mpred_form(V,M),V\=@=M,!,cycLToMpred0(M,CP),!.
-cycLToMpred0(V,CP):-cyc_to_pfc_expansion(V,VE),V\=@=VE,!,cycLToMpred0(VE,CP).
+cycLToMpred0(V,CP):-cyc_to_clif(V,VE),V\=@=VE,!,cycLToMpred0(VE,CP).
 cycLToMpred0((TRUE=>V),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
-cycLToMpred0((V<=TRUE),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
+cycLToMpred0((V <=> TRUE),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
 cycLToMpred0((V :- TRUE),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
 cycLToMpred0((V :- A),CP):- show_call(cycLToMpred0((A => V),CP)).
 cycLToMpred0((A => (V1 , V2)),CP):-not(is_ftVar(V1)),!,cycLToMpred0((A=> (V1/consistent(V2))),V1P),cycLToMpred0((A=> (V2/consistent(V1))),V2P) ,!,conjoin(V1P,V2P,CP).
@@ -676,7 +686,7 @@ checkCycAvailablity:- ccatch((ignore((invokeSubL("(+ 1 1)",R))),(R==2->assert_if
 
 :- dmsg("Loading tinyKB should take under a minute").
 
-% :-must((asserta((user:term_expansion(A,B):-cyc_to_pfc_expansion_notify(A,B),!),CLREF),asserta(at_eof_action(erase(CLREF))))).
+% :-must((asserta((user:term_expansion(A,B):-cyc_to_clif_notify(A,B),!),CLREF),asserta(at_eof_action(erase(CLREF))))).
 :- gripe_time(60,user:qcompile(logicmoo(plarkc/logicmoo_i_cyc_kb_tinykb))).
 %:-must(forall(retract(at_eof_action(CALL)),must(CALL))).
 

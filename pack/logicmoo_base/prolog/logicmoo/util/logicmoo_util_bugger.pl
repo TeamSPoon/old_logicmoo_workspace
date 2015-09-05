@@ -193,6 +193,7 @@ nop(_).
 
 :- ensure_loaded(logicmoo_util_database).
 :- ensure_loaded(logicmoo_util_with_assertions).
+:- ensure_loaded(logicmoo_util_prolog_streams).
 
 
 

@@ -109,8 +109,8 @@ print_db_items(I):- bagof(I,clause_u(I,true),R1),pp_items(Type,R1),!.
 print_db_items(I):- listing(I),!,nl,nl.
 
 pp_rules :-
-   print_db_items("Forward Rules",(_<=_)),
-   print_db_items("Bidirectional Rules",(_ <-> _)), 
+   print_db_items("Forward Rules",(_ ==> _)),
+   print_db_items("Bidirectional Rules",(_ <==> _)), 
    print_db_items("implication Rules",(_ => _)),
    print_db_items("Bi-conditional Rules",(_ <=> _)),
    print_db_items("Backchaining Rules",(_ <- _)),
@@ -323,7 +323,7 @@ pfc_listing_1(What):-var(What),!.
 pfc_listing_1(What):-
    print_db_items('Supports User',spft_precanonical(P,u,u),spft(P,u,u),What),
    print_db_items('Forward Facts',(nesc(F)),F,What),
-   print_db_items('Forward Rules',(_<=_),What),
+   print_db_items('Forward Rules',(_==>_),What),
  ignore((What\=neg(_),functor(What,IWhat,_),
    print_db_items_and_neg('Instance Of',isa(IWhat,_),IWhat),
    print_db_items_and_neg('Instances: ',isa(_,IWhat),IWhat),
@@ -333,10 +333,10 @@ pfc_listing_1(What):-
    print_db_items('Triggers Negative', nt(_,_,_),What),
    print_db_items('Triggers Goal',bt(_,_),What),
    print_db_items('Triggers Positive',pt(_,_),What),
-   print_db_items('Bidirectional Rules',(_<->_),What), 
+   print_db_items('Bidirectional Rules',(_<==>_),What), 
    dif(A,B),print_db_items('Supports Deduced',spft_precanonical(P,A,B),spft(P,A,B),What),
    dif(G,u),print_db_items('Supports Nonuser',spft_precanonical(P,G,G),spft(P,G,G),What),
-   print_db_items('Backchaining Rules',(_<=_),What),
+   print_db_items('Backchaining Rules',(_<-_),What),
    % print_db_items('Edits',is_disabled_clause(_),What),
    print_db_items('Edits',is_edited_clause(_,_,_),What),
    print_db_items('Instances',isa(_,_),What),
@@ -473,9 +473,12 @@ show_clause_ref_now(Ref):- clause_property(Ref,erased),
 pp_i2tml(Done):-Done==done,!.
 pp_i2tml(T):-isVarProlog(T),getVarAtom(T,N),format('~w',[N]),!.
 pp_i2tml(T):-string(T),format('"~w"',[T]).
-pp_i2tml(clause(H,B,Ref)):- !, with_assertions(thlocal:current_clause_ref(Ref),pp_i2tml_0((H:-B))).
-pp_i2tml(HB):- find_ref(HB,Ref),!, with_assertions(thlocal:current_clause_ref(Ref),pp_i2tml_0((HB))).
-pp_i2tml(HB):- with_assertions(thlocal:current_clause_ref(none),pp_i2tml_0((HB))).
+pp_i2tml(clause(H,B,Ref)):- !, with_assertions(thlocal:current_clause_ref(Ref),pp_i2tml_v((H:-B))).
+pp_i2tml(HB):- find_ref(HB,Ref),!, with_assertions(thlocal:current_clause_ref(Ref),pp_i2tml_v((HB))).
+pp_i2tml(HB):- with_assertions(thlocal:current_clause_ref(none),pp_i2tml_v((HB))).
+
+
+pp_i2tml_v(HB):- \+ \+ ((get_clause_vars(HB),pp_i2tml_0(HB))),!.
 
 pp_i2tml_0((H :- B)):-B==true,!,pp_i2tml_0((H)),!.
 pp_i2tml_0(USER:HB):-USER==user,!,pp_i2tml_0(HB),!.
@@ -586,9 +589,10 @@ functor_to_color(_,not,_,red).
 functor_to_color(_,~,_,red).
 functor_to_color(_,neg,_,red).
 
-functor_to_color(G,(<->),_,'plus-purple').
+functor_to_color(G,(<==>),_,'plus-purple').
 functor_to_color(G,(<-),_,purple).
 functor_to_color(G,(<=),_,'cyc-right-triangle-violet').
+functor_to_color(G,(==>),_,'cyc-right-triangle-violet').
 functor_to_color(G,(:-),_,red_diam).
 
 functor_to_color(G,(if),_,cy_menu).

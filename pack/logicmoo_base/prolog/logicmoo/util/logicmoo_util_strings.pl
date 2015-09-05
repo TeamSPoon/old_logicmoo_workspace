@@ -426,12 +426,11 @@ ltrim([P|X],Y):- (isWhitespace(P);not(number(P));P<33;P>128),trim(X,Y),!.
 ltrim(X,X).
 
 
-any_to_string(Atom,String):- must(any_to_string1(Atom,StringS)),StringS=String.
+any_to_string(Atom,String):- must(any_to_string1(Atom,StringS)),!,StringS=String.
 
-any_to_string1(Text,String):- catch(text_to_string(Text,String),_,fail),!.
 any_to_string1(Atom,String):- string(Atom),!,Atom=String.
 any_to_string1(O,O):-stack_depth(X),X>2000,!,sanity(fail).
-%any_to_string1(Atom,String):-var(Atom),!,term_string(Atom,String).
+any_to_string1(Atom,String):-var(Atom),!,term_string(Atom,String).
 any_to_string1(Atom,String):- var(Atom),!,=(Atom,String).
 any_to_string1(Atom,String):- number(Atom),!,number_string(Atom,String).
 any_to_string1("",String):- !,""=String.
@@ -446,7 +445,7 @@ any_to_string1([Atom],String):-nonvar(Atom),!,any_to_string1(Atom,String).
 any_to_string1(A,""):-nonvar(A),member(A,[[],'',"",``]),!.
 any_to_string1(List,String):-catch(text_to_string(List,String),_,fail).
 %any_to_string1(List,String):- fail, dtrace, is_list(List), (catch(atomics_to_string(List, ' ', String),_,fail); ((list_to_atomics_list0(List,AList),catch(atomics_to_string(AList, ' ', String),_,fail)))),!.
-any_to_string1(List,String):-sformat(String,'~q',[List]).
+any_to_string1(List,String):-sformat(String,'~s',[List]).
 /*
 list_to_atomics_list0(Var,A):-var(Var),!,any_to_string(Var,A),!.
 list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-

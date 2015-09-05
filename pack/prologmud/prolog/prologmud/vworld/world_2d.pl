@@ -460,10 +460,8 @@ any_to_dir(D,D):-pathDirLeadsTo(_,D,_),!.
 
 % prologHybrid(dir_offset(term,int,int,int,int)).
 
-:-pfc_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
 
-:-retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
-:-pfc_trace.
+:-pfc_spy_all.
 
 prologBuiltin(dir_offset/5).
 dir_offset(vUp,F,0,0,F).
@@ -478,7 +476,7 @@ dir_offset(vSE,F,F,F,0).
 dir_offset(vNW,F,-F,-F,0).
 dir_offset(vHere,_,0,0,0).
 
-:-pfc_no_trace.
+:-pfc_no_spy_all.
 
 % MergedNess -1,0,1 = contacting_at,inside,outside_near_on
 with_offset(detatched,F,X,Y,Z):-dir_offset(vHere,F,X,Y,Z).

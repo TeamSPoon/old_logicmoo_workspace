@@ -10,6 +10,8 @@
 %
 */
 
+:- include(logicmoo(mpred/logicmoo_i_header)).
+
 :- file_begin(code).
 
 :-dynamic(user:irc_event_hooks/3).

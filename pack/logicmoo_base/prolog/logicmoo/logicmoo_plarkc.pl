@@ -12,7 +12,7 @@
 
 :- dynamic(cwtdl_failed/1).
 
-cwtdl(Goal,DL,TL):- 
+cwtdl(Goal,DL,TL):- cwc,
   notrace((ignore((stop_rtrace,
    (show_call_failure(catch(call_with_time_limit(TL,(((call_with_depth_limit(Goal,DL,DLE),DLE\==depth_limit_exceeded)))),E,(dmsg(E:cwtdl(Goal,DL,TL)),fail)))
      ->true;
@@ -21,6 +21,9 @@ cwtdl(Goal,DL,TL):-
 :-in_cmt(listing(cwtdl/3)).
 
 :- ltkb1.
+
+:- dmsg("Loading tinyKB should take under a minute").
+
 :- doall((filematch(logicmoo('plarkc/logicmoo_i_cyc_kb_tinykb.pl'),F),must(source_file(X,F)),predicate_property(X,dynamic),retract(X:-_))).
 :- in_cmt(doall((filematch(logicmoo('plarkc/logicmoo_i_cyc_kb_tinykb.pl'),F),source_file(X,F),predicate_property(X,static),X\='$pldoc'(_G8428,_G8429,_G8430,_G8431),listing(X)))).
 
@@ -33,20 +36,39 @@ transTiny(Template,If):-transfer_predicate(tinyK8(Template),If,once(pfc_add(Temp
 
 :- pfc_no_trace.
 
+:- if(false).
+
 :- transTiny(tCol(X),ground(X)).
 :- transTiny(arity(X,Y),ground((X,Y))).
 :- transTiny(genls(X,Y),((X\=ftAtomicTerm,ground((X,Y))))).
 :- pfc_trace.
-% :- transTiny(genls(X,Y),((ground((X,Y))))).
-:- retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
-:- trace, pfc_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
+:- transTiny(genls(X,Y),((ground((X,Y))))).
+%TODO_VERIFY_STILL_UNNEEDED :- retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
+%TODO_VERIFY_STILL_UNNEEDED :- pfc_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
 :- transTiny(genlMt(X,Y),writeq((X,Y))).
 :- transTiny(ttFormatType(X),ground(X)).
 
-:-pfc_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
+%TODO_VERIFY_STILL_UNNEEDED :-pfc_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
 
-:-retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
+%TODO_VERIFY_STILL_UNNEEDED :-retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
 :- pfc_no_trace.
+:- endif.
+
+
+%TODO FIX :-pfc_add((((cycl(X),{must(cyc_to_clif(X,Y))}) ==> clif(Y)))).
+
+:-pfc_add((((cycl('$VAR'('X')),{must(cyc_to_clif('$VAR'('X'),'$VAR'('Y')))}) ==> clif('$VAR'('Y'))))).
+
+?-listing(cycl).
+
+%TODO FIX :- must(isa(iExplorer2,tHominid)).
+%TODO FIX :- must(tHominid(iExplorer2)).
+
+tHominid(iExplorer2).
+
+:- must((mudSubPart(iExplorer2,Inst),isa(Inst,tHumanNeck))).
+:- must((mudSubPart(iExplorer2,Inst),isa(Inst,tHumanHair))).
+
 
 /*
 :- transTiny(Form,(ground(Form),functor(Form,F,1),F\==neg)).

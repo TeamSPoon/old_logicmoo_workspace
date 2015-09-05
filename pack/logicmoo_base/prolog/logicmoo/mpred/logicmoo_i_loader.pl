@@ -11,7 +11,7 @@
 :- user:use_module(library(shlib)).
 :- user:use_module(library(operators)).
 
-
+:- source_location(F,_),asserta(never_registered_mpred_file(F)).
 % filetypes 
 %
 %  pfc - all terms are sent to pfc_add/1 (the the execeptions previously defined)
@@ -171,7 +171,7 @@ ensure_mpred_file_loaded(M:F0,List):-
 
 ******/
 
-:-dynamic(registered_mpred_file/1).
+
 :-export(declare_load_dbase/1).
 declare_load_dbase(Spec):- forall(no_repeats_old(File,must_locate_file(Spec,File)),show_call(asserta_if_new(registered_mpred_file(File)))).
 
@@ -301,6 +301,7 @@ read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quote
   Out),writeq(Out).
 */
 
+is_kif_string([]):- !,fail.
 is_kif_string(String):-atomic(String),name(String,Codes), memberchk(40,Codes),memberchk(41,Codes).
 
 from_kif_string(String,Forms) :- must((codelist_to_forms(String,Forms);parse_to_source(string(String),Forms))),!.
@@ -491,11 +492,17 @@ get_file_type(File,Type):-file_name_extension(_,Type,File).
 
 is_pfc_file(F):- var(F),!,loading_source_file(F), is_pfc_file(F),!.
 is_pfc_file(F):- file_name_extension(_,pfc,F),!.
-is_pfc_file(F):- file_name_extension(_,mpred,F),!.
-is_pfc_file(F):- filematch(prologmud(**/*),F).
-is_pfc_file(F):- registered_mpred_file(F).
-is_pfc_file(F):- inside_file(pfc),!,loading_source_file(F).
-is_pfc_file(F):- file_name_extension(_,WAS,F),WAS\=pl,WAS\= '',WAS\=chr,!.
+is_pfc_file(F):- file_name_extension(_,plmoo,F),!.
+is_pfc_file(F):- registered_mpred_file(F),!.
+is_pfc_file(F):- never_registered_mpred_file(F),!,fail.
+is_pfc_file(F):- is_pfc_file0(F),!,asserta(registered_mpred_file(F)),!.
+is_pfc_file(F):- asserta(never_registered_mpred_file(F)),!,fail.
+
+decache_file_type(F):- retractall(registered_mpred_file(F)),retractall(never_registered_mpred_file(F)).
+
+is_pfc_file0(F):- filematch(prologmud(**/*),F),!.
+is_pfc_file0(F):- inside_file(pfc),!,loading_source_file(F).
+is_pfc_file0(F):- file_name_extension(_,WAS,F),WAS\=pl,WAS\= '',WAS\=chr,!.
 
 must_compile_special_clause(:- (_) ):-!,fail.
 %must_compile_special_clause(CL):- sanity(nonvar(CL)),not(thlocal:into_form_code),not(thlocal:pfc_already_in_file_expansion(CL)),not((get_functor(CL,F),expanded_already_functor(F))).
@@ -652,7 +659,7 @@ pfc_directive_expansion(_,_):- (\+ current_predicate(logicmoo_bugger_loaded/0)),
 pfc_directive_expansion(_,_):- thlocal:disable_mpred_term_expansions_locally,!,fail.
 
 pfc_directive_expansion(pfc_ops, 
-           ( op(500,fx,('~')),op(500,fx,('neg')),op(1075,xfx,('<=')), op(1075,xfx,('<->')),op(1075,xfx,('<-')), op(1100,fx,('nesc')), op(1150,xfx,('::::')))).
+           ( op(500,fx,('~')),op(500,fx,('neg')),op(1075,xfx,('<-')), op(1075,xfx,('<==>')),op(1075,xfx,('<-')), op(1100,fx,('nesc')), op(1150,xfx,('::::')))).
 pfc_directive_expansion(pfc_dcg,( file_begin(pfc), op(400,yfx,('\\\\')),op(1200,xfx,('-->>')),op(1200,xfx,('--*>>')), op(1200,xfx,('<<--')))).
 pfc_directive_expansion(pfc_multifile,
            ( asserta(user:mpred_directive_value(pfc,multifile,M)),
@@ -666,15 +673,15 @@ pfc_directive_expansion(pfc_module,(asserta(user:mpred_directive_value(pfc,modul
 decl_pfc_multifile(M):-
                  multifile(M:('<-')/2),
                     multifile(M:('::::')/2),
-                 multifile(M:('<->'/2)),
-                 multifile(M:(('<=')/2)),
+                 multifile(M:('<==>'/2)),
+                 multifile(M:(('==>')/2)),
                  multifile(M:('nesc')/1),
                  multifile(M:('~')/1),
                  multifile(M:('neg')/1),
                  export(M:('<-')/2),
                     export(M:('::::')/2),
-                 export(M:('<->'/2)),
-                 export(M:(('<=')/2)),
+                 export(M:('<==>'/2)),
+                 export(M:(('==>')/2)),
                  export(M:('nesc')/1),
                  export(M:('~')/1),
                  export(M:('neg')/1).
@@ -711,13 +718,14 @@ disable_mpred_expansion:- (( thlocal:disable_mpred_term_expansions_locally) -> t
                  onEndOfFile(retractall(thlocal:disable_mpred_term_expansions_locally)))).
 
 
-
-file_begin(W):- must_det((enable_mpred_expansion, loading_source_file(ISource),
+file_begin(W):-  
+  must_det((enable_mpred_expansion, loading_source_file(ISource),
   op_lang(W), assert_until_eof(user:current_lang(W)),
+   decache_file_type(ISource),
    assert_until_eof(user:mpred_directive_value(W,file,ISource)))),
-   must_det(( loading_source_file(Source),asserta(user:mpred_directive_value(W,file,Source)))).
-file_end(W):- must_det(( enable_mpred_expansion, loading_source_file(ISource),ignore(retract(user:mpred_directive_value(W,file,ISource))))),
-  must_det(( loading_source_file(Source),ignore(retract(user:mpred_directive_value(W,file,Source))))).
+   must_det(( loading_source_file(Source),decache_file_type(Source),asserta(user:mpred_directive_value(W,file,Source)))).
+file_end(W):- must_det(( enable_mpred_expansion, loading_source_file(ISource),decache_file_type(ISource),ignore(retract(user:mpred_directive_value(W,file,ISource))))),  
+  must_det(( loading_source_file(Source),decache_file_type(Source),ignore(retract(user:mpred_directive_value(W,file,Source))))).
 
 inside_file(W) :- prolog_load_context(file,Source),user:mpred_directive_value(W,_,Source),!.
 inside_file(W) :- prolog_load_context(source,Source),user:mpred_directive_value(W,_,Source),!.
@@ -740,9 +748,9 @@ op_lang(LANG):-retractall(current_op_alias(_,_)),retractall(current_lang(_)),ass
 get_op_alias(OP,ALIAS):-current_op_alias(OP,ALIAS).
 get_op_alias(OP,ALIAS):-get_lang(LANG),lang_op_alias(LANG,OP,ALIAS).
 
-current_op_alias((<->),dup(impliesF,(','))).
-current_op_alias((=>),rev(<=)).
-current_op_alias((not),(neg)).
+current_op_alias((<==>),dup(impliesF,(','))).
+current_op_alias((=>),==>).
+%current_op_alias((not),(neg)).
 current_op_alias( not(:-),neg(:-)).
 current_op_alias( (:-),(:-)).
 
@@ -750,35 +758,34 @@ get_lang(LANG):-current_lang(LANG),!.
 get_lang(pfc).
 
 % pfc
-lang_op_alias(pfc,(<==>),(<->)).
-lang_op_alias(pfc,(==>),rev(<=)).
-lang_op_alias(pfc,(<=>),(<->)).
-lang_op_alias(pfc,(=>),rev(<=)).
-lang_op_alias(pfc,(<=),(<=)).
+lang_op_alias(pfc,(<==>),(<==>)).
+lang_op_alias(pfc,(==>),==>).
+lang_op_alias(pfc,(<=>),(<==>)).
+lang_op_alias(pfc,(<=),(<-)).
 lang_op_alias(pfc,(<-),(<-)).
 lang_op_alias(pfc,(not),(neg)).
 lang_op_alias(pfc,not(:-),neg(:-)).
 lang_op_alias(pfc,(:-),(:-)).
 lang_op_alias(pfc,(A=B),{(A=B)}).
 % kif
-lang_op_alias(kif,(<==>),(<->)).
-lang_op_alias(kif,(==>),rev(<=)).
+lang_op_alias(kif,(<==>),(<==>)).
+lang_op_alias(kif,(==>),==>).
 lang_op_alias(kif,(not),(neg)).
 lang_op_alias(kif,(~),(neg)).
 lang_op_alias(kif,(=>),(if)).
 lang_op_alias(kif,(<=>),(iff)).
 lang_op_alias(kif, not(':-'),neg('<-')).
-lang_op_alias(kif,(:-),(<=)).
+lang_op_alias(kif,(:-),rev(==>)).
 % cyc
-lang_op_alias(cyc,(<==>),(<->)).
-lang_op_alias(cyc,(==>),rev(<=)).
+lang_op_alias(cyc,(<==>),(<==>)).
+lang_op_alias(cyc,(==>),==>).
 lang_op_alias(cyc,(implies),(if)).
 lang_op_alias(cyc,(equiv),(iff)).
 lang_op_alias(cyc, not(':-'),neg('<-')).
-lang_op_alias(cyc,(:-),(<=)).
+lang_op_alias(cyc,(:-),rev(==>)).
 % prolog
-lang_op_alias(prolog,(<==>),(<->)).
-lang_op_alias(prolog,(==>),rev(<=)).
+lang_op_alias(prolog,(<==>),(<==>)).
+lang_op_alias(prolog,(==>),==>).
 lang_op_alias(prolog, not(':-'),neg('<-')).
 lang_op_alias(prolog,(:-),(:-)).
 lang_op_alias(prolog,(<=),(<=)).
@@ -797,11 +804,11 @@ transform_opers_0({A},{A}):-!.
 transform_opers_0((A;B),C):- !, must_maplist(transform_opers_0,[A,B],[AA,BB]),conjoin_op((;),AA,BB,C).
 transform_opers_0((B=>A),(BB=>AA)):- !, must_maplist(transform_opers_0,[A,B],[AA,BB]).
 transform_opers_0((B==>A),(BB==>AA)):- !, must_maplist(transform_opers_0,[A,B],[AA,BB]).
-transform_opers_0((A<=B),(AA<=BB)):- !, must_maplist(transform_opers_0,[A,B],[AA,BB]).
+transform_opers_0(<=(A,B),<=(AABB)):- !, must_maplist(transform_opers_0,[A,B],[AA,BB]).
 transform_opers_0((A<-B),(AA<-BB)):- !, must_maplist(transform_opers_0,[A,B],[AA,BB]).
 transform_opers_0((A<=>B),(AA<=>BB)):- !, must_maplist(transform_opers_0,[A,B],[AA,BB]).
 transform_opers_0((A<==>B),(AA<==>BB)):- !, must_maplist(transform_opers_0,[A,B],[AA,BB]).
-transform_opers_0((A<->B),(AA<->BB)):- !, must_maplist(transform_opers_0,[A,B],[AA,BB]).
+transform_opers_0((A<==>B),(AA<==>BB)):- !, must_maplist(transform_opers_0,[A,B],[AA,BB]).
 transform_opers_0(if(A,B),if(AA,BB)):- !, must_maplist(transform_opers_0,[A,B],[AA,BB]).
 transform_opers_0(iff(A,B),iff(AA,BB)):- !, must_maplist(transform_opers_0,[A,B],[AA,BB]).
 transform_opers_0(implies(A,B),implies(AA,BB)):- !, must_maplist(transform_opers_0,[A,B],[AA,BB]).
@@ -822,7 +829,7 @@ transform_opers_1((AB),(RESULT)):- get_op_alias(OP,(OTHER)),atom(OP), atom(OTHER
 transform_opers_1(OP,OTHER):- get_op_alias(OPO,OTHER),OPO=OP,!.
 
 
-pfc_file_expansion_0a(X,Y):-expand_term(X,M),!,pfc_file_expansion_0(M,Y),!.
+pfc_file_expansion_0a(X,Y):- current_predicate(pfc_loader_file/0),current_predicate(pfc_pfc_file/0), expand_term(X,M),!,pfc_file_expansion_0(M,Y),!.
 
 pfc_file_expansion_0(I,OO):-
    is_kif_string(I),must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,
@@ -838,13 +845,13 @@ pfc_file_expansion_0(C,O):- compound(C), get_op_alias(OP,ALIAS),
 
 pfc_file_expansion_0(C,O):- get_lang(LANG),transform_opers(LANG,C,M),C\=@=M,!,pfc_file_expansion_0(M,O).
 
-pfc_file_expansion_0(((Q<=P)),(:- cl_assert(pfc(fwc),(Q<=P)))).
-pfc_file_expansion_0(((P==>Q)),(:- cl_assert(pfc(fwc),(Q<=P)))).
+pfc_file_expansion_0((<=(Q,P)),(:- cl_assert(pfc(bwc),(Q<-P)))).
+pfc_file_expansion_0(((P==>Q)),(:- cl_assert(pfc(fwc),(P==>Q)))).
 pfc_file_expansion_0((('=>'(Q))),(:- cl_assert(pfc(fwc),('=>'(Q))))).
 pfc_file_expansion_0((('==>'(Q))),(:- cl_assert(pfc(fwc),('=>'(Q))))).
 pfc_file_expansion_0(((nesc(Q))),(:- cl_assert(pfc(fwc),nesc(Q)))).
 pfc_file_expansion_0(('<-'(P,Q)),(:- cl_assert(pfc(bwc),('<-'(P,Q))))).
-pfc_file_expansion_0(('<->'(P,Q)),(:- cl_assert(pfc(bwc),(P<->Q)))).
+pfc_file_expansion_0(('<==>'(P,Q)),(:- cl_assert(pfc(bwc),(P<==>Q)))).
 pfc_file_expansion_0(neg(Q),(:- cl_assert(pfc(fwc),neg(Q)))).
 pfc_file_expansion_0(~(Q),(:- cl_assert(pfc(fwc),~(Q)))).
 
@@ -857,14 +864,14 @@ pfc_file_expansion_0(all(V,PQ),(:- cl_assert(kif(fwc),all(V,PQ)))).
 
 
 % maybe reverse some rules?
-%pfc_file_expansion_0((Q<=P),(:- cl_assert(pfc(fwc),('<-'(Q,P))))).  % speed-up attempt
+%pfc_file_expansion_0((P==>Q),(:- cl_assert(pfc(fwc),('<-'(Q,P))))).  % speed-up attempt
 pfc_file_expansion_0((RuleName :::: Rule),(:- cl_assert(named_rule,(RuleName :::: Rule)))).
 pfc_file_expansion_0((nescP),(:- cl_assert(pfc(fwc),(nescP)))).
 pfc_file_expansion_0(Fact,(:- cl_assert(pl,Fact))):- get_functor(Fact,F,_A),if_defined(prologDynamic(F)).
 pfc_file_expansion_0(Fact,Output):- pfc_file_expansion_1(_Dir,Fact,C),must(pfc_file_expansion_0(C,Output)),!.
 
-      pfc_file_expansion_1(pfc(act),(H:-Chain,B),({(Chain,B)}<=H)):-cwc, is_action_body(Chain),make_dynamic(H).
-      pfc_file_expansion_1(pfc(fwc),(H:-Chain,B),(H<=(Chain,B))):-cwc, is_fc_body(Chain),make_dynamic(H).
+      pfc_file_expansion_1(pfc(act),(H:-Chain,B),({(Chain,B)}==>H)):-cwc, is_action_body(Chain),make_dynamic(H).
+      pfc_file_expansion_1(pfc(fwc),(H:-Chain,B),({(Chain,B)}==>H)):-cwc, is_fc_body(Chain),make_dynamic(H).
       pfc_file_expansion_1(pfc(bwc),(H:-Chain,B),(H<-(Chain,B))):-cwc, is_bc_body(Chain),make_dynamic(H).
       
 

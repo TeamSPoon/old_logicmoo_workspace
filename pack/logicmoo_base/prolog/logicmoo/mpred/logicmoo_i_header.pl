@@ -10,7 +10,34 @@
 %
 */
 
+
 :- if( \+ current_predicate( thlocal:current_pttp_db_oper/1 )).
+
+
+:- op(500,fx,'~').
+:- op(1050,xfx,'<==>').
+:- op(1050,xfx,('<-')).
+:- op(1200,fx,('=>')).
+:- op(1200,fx,('==>')).
+:- op(1100,fx,('nesc')).
+:- op(1150,xfx,('::::')).
+:- op(300,fx,'-').
+:- op(600,yfx,'&').  
+:- op(600,yfx,'v').
+:- op(1075,xfx,'<-').
+:- op(1075,xfx,'<-').
+:- op(1070,xfx,'=>').
+:- op(1070,xfx,'<=>').
+:- op(1100,xfx,('<==>')).
+:- op(1100,xfx,('==>')).
+:- op(350,xfx,'xor').
+:- op(300,fx,user:'~').
+:- op(300,fx,user:'-').
+:- op(400,yfx,user:'&').  
+:- op(500,yfx,user:'v').
+:- op(1075,xfx,user:'<-').
+:- op(1075,xfx,user:'<==>').
+:- op(350,xfx,user:'xor').
 
 :- must(context_module(user)).
 
@@ -18,6 +45,11 @@
 :- multifile(system:term_expansion/2).
 :- multifile(user:term_expansion/2).
 :- multifile(user:goal_expansion/2).
+
+:-dynamic(registered_mpred_file/1).
+:-dynamic(never_registered_mpred_file/1).
+
+
 
 
 :- multifile(thlocal:current_pttp_db_oper/1).
@@ -82,10 +114,10 @@ load_time_sanity.
 
 :- dynamic(('nesc')/1).
 :- dynamic((('neg'))/1).
-:- dynamic((('<='))/2).
+:- dynamic((('<-'))/2).
 :- dynamic(('<-')/2).
 :- dynamic(('::::')/2).
-:- dynamic(('<->')/2).
+:- dynamic(('<==>')/2).
 :- dynamic('pt'/2).
 :- dynamic('pk'/3).
 :- dynamic('nt'/3).
@@ -101,10 +133,10 @@ load_time_sanity.
 
 :- multifile(('nesc')/1).
 :- multifile(('neg')/1).
-:- multifile(('<=')/2).
+:- multifile(('<-')/2).
 :- multifile(('<-')/2).
 :- multifile(('::::')/2).
-:- multifile(('<->')/2).
+:- multifile(('<==>')/2).
 :- multifile('pt'/2).
 :- multifile('pk'/3).
 :- multifile('nt'/3).
@@ -116,6 +148,15 @@ load_time_sanity.
 :- multifile(pfc_halt_signal/1).
 :- multifile(pfc_select/2).
 :- multifile(pfc_search/1).
+
+:- dynamic((exactlyAssertedEL/4,exactlyAssertedEL/5,exactlyAssertedEL/6,exactlyAssertedEL/7)).
+:- dynamic((exactlyAssertedEL_next/4,exactlyAssertedEL_next/5,exactlyAssertedEL_next/6,exactlyAssertedEL_next/7)).
+:- dynamic((exactlyAssertedEL_first/4,exactlyAssertedEL_first/5,exactlyAssertedEL_first/6,exactlyAssertedEL_first/7)).
+:- dynamic(assertedTinyKB_implies_first/4).
+:- dynamic(assertedTinyKB_not_first/3).
+:- dynamic((exactlyAssertedEL_first/5,exactlyAssertedEL_with_vars/5,exactlyAssertedEL_with_vars/6,assertedTinyKB_implies_Already/4)).
+:- dynamic user:term_expansion/2.
+:- multifile user:term_expansion/2.
 
 :- dynamic(formatted_resultIsa/2).
 :- multifile(formatted_resultIsa/2).
@@ -151,6 +192,7 @@ load_time_sanity.
 
 %:-dynamic((t/1,t/2)).
 :- dynamic((
+   meta_argtypes/1,
          % t/1,
          % t/2,
           t/3,
@@ -188,6 +230,7 @@ load_time_sanity.
 
 :-multifile((t/1,t/2)).
 :- multifile((
+  meta_argtypes/1,
          % t/1,
         %  t/2,
           t/3,
@@ -223,31 +266,6 @@ load_time_sanity.
           mpred_f/6,
           mpred_f/7)).
 
-:- op(500,fx,'~').
-:- op(1050,xfx,('<=')).
-:- op(1050,xfx,'<->').
-:- op(1050,xfx,('<-')).
-:- op(1100,fx,('=>')).
-:- op(1100,fx,('==>')).
-:- op(1100,fx,('nesc')).
-:- op(1150,xfx,('::::')).
-:- op(300,fx,'-').
-:- op(600,yfx,'&').  
-:- op(600,yfx,'v').
-:- op(1075,xfx,'<=').
-:- op(1075,xfx,'<-').
-:- op(1070,xfx,'=>').
-:- op(1070,xfx,'<=>').
-:- op(1100,xfx,('<==>')).
-:- op(1100,xfx,('==>')).
-:- op(350,xfx,'xor').
-:- op(300,fx,user:'~').
-:- op(300,fx,user:'-').
-:- op(400,yfx,user:'&').  
-:- op(500,yfx,user:'v').
-:- op(1075,xfx,user:'<=').
-:- op(1075,xfx,user:'<->').
-:- op(350,xfx,user:'xor').
 
 :-dynamic(user_db:grant_openid_server/2).
 :-multifile(user_db:grant_openid_server/2).
@@ -359,7 +377,7 @@ load_time_sanity.
 :- dynamic_multifile_exported user:arity/2.
 :- dynamic_multifile_exported user:mpred_prop/2.
 :- dynamic_multifile_exported user:relationMostInstance/3.
-:- dynamic_multifile_exported user:'<->'/2.
+:- dynamic_multifile_exported user:'<==>'/2.
 % :- dynamic_multifile_exported user:ruleForward/2.
 :- dynamic_multifile_exported user:ruleRewrite/2.
 % :- dynamic_multifile_exported user:ruleBackward/2.
@@ -441,3 +459,4 @@ load_time_sanity.
 :- dynamic_multifile_exported(user:grid_key/1).
 
 :- endif.
+

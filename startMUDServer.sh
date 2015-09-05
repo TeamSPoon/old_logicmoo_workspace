@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ "$(id -u)" = "0" ]; then
+   exec sudo -u prologmud  /bin/bash -c "$0 $*"
+   exit 0
+fi
+
+
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 if [ -z ${STANFORD_JAR+x} ]; then export STANFORD_JAR="${DIR}/pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar"; fi
@@ -14,9 +20,8 @@ fi
 
 if [ $# -eq 0 ] 
  then
-   echo "No arguments supplied"
-   exec sudo -u prologmud /bin/bash -c "$0 runtime/run_mud_server.pl"
-   exit 0
+   echo "No arguments supplied thus this will NOT restart when crashed"
+   export RUNFILE="runtime/run_mud_server.pl"
  else
     export RUNFILE="$1"
 fi
@@ -34,7 +39,8 @@ do
    echo "This ($0 $@) will be run from user $UID"
    echo "Hit CTRL+C ${BASH_SOURCE[0]} ";
    sleep 4;
-   (cd $DIR ; exec swipl $RUNFILE)         
+   (cd $DIR ; exec swipl $RUNFILE)
+
 if [ $# -eq 0 ]
 then
   exit 0

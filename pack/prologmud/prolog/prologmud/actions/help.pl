@@ -33,7 +33,7 @@ get_good_templates(Templ):- isa(Templ,vtActionTemplate),good_template(Templ).
 get_bad_templates(Templ):- no_repeats_old((user:action_info(Templ,_),not(good_template(Templ)))).
 
 
-user:action_info(TEMPL, txtConcatFn(Text,'does: ',do(A2,TEMPL))) <= {between(1,5,L),length(Text,L),get_agent_text_command(_A,Text,A2,Goal),(ground(Goal)->TEMPL=Goal;TEMPL=Text)}.
+{between(1,5,L),length(Text,L),get_agent_text_command(_A,Text,A2,Goal),(ground(Goal)->TEMPL=Goal;TEMPL=Text)}==>user:action_info(TEMPL, txtConcatFn(Text,'does: ',do(A2,TEMPL))).
 (action_rules(_Agent,Verb,[Obj|Objs],List),{atom(Verb),safe_univ(Syntax,[Verb,Obj|Objs])} ==> user:action_info(Syntax, txtConcatFn(makes,happen,List))).
 
 to_param_doc(TEMPL,S):-sformat(S,'Prolog looks like: ~q',[TEMPL]).

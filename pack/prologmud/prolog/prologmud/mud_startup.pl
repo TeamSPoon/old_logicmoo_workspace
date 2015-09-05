@@ -617,4 +617,4 @@ lundef :- A = [],
 */
 
 :-pfc_untrace.
-:-pfc_no_watch.
+:-pfc_no_spy_all.

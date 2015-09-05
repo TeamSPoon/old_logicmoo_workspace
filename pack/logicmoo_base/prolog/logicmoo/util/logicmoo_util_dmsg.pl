@@ -1,6 +1,15 @@
 
-:-thread_self(ID),current_input(In),asserta(thread_current_input(ID,In)).
-:-thread_self(ID),current_output(Err),asserta(thread_current_error_stream(ID,Err)).
+
+:- dynamic(thread_current_input/2).
+:- dynamic(thread_current_error_stream/2).
+:- volatile(thread_current_input/2).
+:- volatile(thread_current_error_stream/2).
+save_streams:-
+  thread_self(ID),
+  current_input(In),asserta(thread_current_input(ID,In)),
+  current_output(Err),asserta(thread_current_error_stream(ID,Err)).
+
+:-initialization(save_streams).
 
 thread_current_error_stream(Err):-thread_current_error_stream(main,Err).
 

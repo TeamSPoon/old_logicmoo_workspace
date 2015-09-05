@@ -494,7 +494,7 @@ rdf_assert_hook0(genls(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:
 rdf_assert_hook0(mudDescription(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:comment,P),!.
 rdf_assert_hook0((H:-TRUE)):-is_true(TRUE),!,rdf_assert_hook0(H),!.
 rdf_assert_hook0((H:-B)):-rdf_assert_hook0(neck(H,B)),!.
-rdf_assert_hook0('<='(H  , B)):-rdf_assert_hook0(backchain(H,B)),!.
+rdf_assert_hook0('<-'(H  , B)):-rdf_assert_hook0(backchain(H,B)),!.
 rdf_assert_hook0('=..'(H  , B)):-rdf_assert_hook0(univ_p_l(H,B)),!.
 rdf_assert_hook0('=>'(L , R)):-rdf_assert_hook0(forwardchain(L,R)),!.
 rdf_assert_hook0(isa(Prop,tPred)):- rdf_to_pred(Prop,P),!,rdf_object(P),rdf_assert_x(P,rdf:type,owl:'Property'),!.

@@ -21,13 +21,13 @@ are_clauses_entailed(CL):- unnumbervars(CL,UCL),  !, \+ \+ show_call_failure(is_
 is_entailed(UCL):-clause_asserted(UCL),!.
 is_entailed(UCL):-pfc_call(UCL),!.
  
-member_ele(E,E):- \+ compound(E),!.
-member_ele([L|List],E):- is_list([L|List]),C=..[v,L|List],!,arg(_,C,EL),member_ele(EL,E).
-member_ele((H,T),E):-!, (member_ele(H,E);member_ele(T,E)).
+member_ele(E,E):- (\+ (compound(E))),!.
+member_ele([L|List],E):- is_list([L|List]),!,member(EE,[L|List]),member_ele(EE,E).
+member_ele((H,T),E):- nonvar(H),nonvar(T),!, (member_ele(H,E);member_ele(T,E)).
 member_ele(E,E).
 
-delistify_last_arg(CALL):-CALL=..[F|ARGS],append(Left,[OLD],ARGS),append(Left,[NEW],NARGS),NEWCALL=..[F|NARGS],!,
-  NEWCALL,member_ele(NEW,OLD).
+delistify_last_arg(Arg,Pred,Last):-is_list(Arg),!,member(E,Arg),delistify_last_arg(E,Pred,Last).
+delistify_last_arg(Arg,Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARGS),NEWCALL=..[F|NARGS],show_call(NEWCALL),!,member_ele(NEW,Last).
 
 % sanity that mpreds (manage prolog prodicate) are abily to transform
 :- thlocal:disable_mpred_term_expansions_locally->throw(thlocal:disable_mpred_term_expansions_locally);true.
@@ -37,7 +37,8 @@ delistify_last_arg(CALL):-CALL=..[F|ARGS],append(Left,[OLD],ARGS),append(Left,[N
 
 clif_to_prolog(CLIF,Prolog):-cwc,is_list(CLIF),!,must_maplist(clif_to_prolog,CLIF,Prolog).
 clif_to_prolog((H,CLIF),(T,Prolog)):-cwc,sanity(must(nonvar(H))),!,trace,clif_to_prolog(H,T),clif_to_prolog(CLIF,Prolog).
-clif_to_prolog((H<=B),(H<=B)):- cwc,!.
+clif_to_prolog((H<-B),(H<-B)):- cwc,!.
+clif_to_prolog((P==>Q),(P==>Q)):- cwc,!.
 clif_to_prolog((H:-B),PrologO):- cwc,!,must((show_call(boxlog_to_pfc((H:-B),Prolog)),!,=(Prolog,PrologO))),!.
 clif_to_prolog(CLIF,PrologO):- cwc,
   % somehow integrate why_to_id(tell,Wff,Why),
@@ -77,14 +78,33 @@ is_clif(CLIF):-cwc,
 :- op_alias( (=>),  (=>)).
 
 % whenever we know about clif we'll use the prolog forward chainging system
+
 (clif(CLIF) ==> 
    ({ clif_to_prolog(CLIF,PROLOG)},
       % this consequent asserts the new rules
       PROLOG,{sanity(clif_must(CLIF))})).
-% (clif(CLIF),{delistify_last_arg(kif_to_boxlog(CLIF,PROLOG))}) ==> boxlog(PROLOG).
-(boxlog(CLIF),{delistify_last_arg(boxlog_to_pfc(CLIF,PROLOG))}) ==> pfclog(PROLOG).
-(pfclog(PROLOG)=>(PROLOG,{clif_must(PROLOG)})).
 
+
+arity(clif,1).
+arity(boxlog,1).
+arity(pfclog,1).
+
+(clif(CLIF),{delistify_last_arg(CLIF,kif_to_boxlog,PROLOG)}) ==> boxlog(PROLOG).
+(boxlog(CLIF),{delistify_last_arg(CLIF,boxlog_to_pfc,PROLOG)}) ==> pfclog(PROLOG).
+:- pfc_trace.
+(pfclog(PROLOG)==>(PROLOG,{clif_must(PROLOG)})).
+
+
+/*
+(clif(CLIF),{member_ele(CLIF,E)}) ==> clif1(E).
+(clif1(CLIF),{kif_to_boxlog(CLIF,PROLOG)}) ==> boxlog(PROLOG).
+
+(boxlog(CLIF),{member_ele(CLIF,E)}) ==> boxlog1(E).
+(boxlog1(CLIF),{boxlog_to_pfc(CLIF,PROLOG)}) ==> pfclog(PROLOG).
+
+(pfclog(CLIF),{member_ele(CLIF,E)}) ==> pfclog1(E).
+(pfclog1(PROLOG)==>(PROLOG,{clif_must(PROLOG)})).
+*/
 
 % we create code syntax listeners for [if,iff,clif_forall,all,exists]/2s
 ({is_clif(CLIF)} ==>
@@ -99,11 +119,13 @@ is_clif(CLIF):-cwc,
 % see logicmoo_i_compiler.pl for more info
 :- set_clause_compile(fwc).
 
+
 % if two like each other then they are love compatible
 clif(
  forall(a,forall(b,
     if( (likes(a,b)  & likes(b,a)), 
      love_compatible(a,b))))).
+:- pfc_no_trace.
 
 
 % will have the side effects... 
@@ -156,7 +178,7 @@ clif(
 
 
 % alice likes bill
-clif(likes(alice,bill)).
+clif(likes(alice,bill)). 
 
 % dumbo does not exists
 % TODO clif(not(isa(dumbo,_))).
@@ -310,6 +332,8 @@ mother(eileen,douglas).
 
 human(trudy).
 
+never_retract_u(human(trudy)).
+
 clif(forall(p,exists([m,f], if(human(p), (mother(m,p) & father(f,p)))))).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -373,6 +397,8 @@ clif(forall(p,exists([m,f], if(human(p), (mother(m,p) & father(f,p)))))).
 
 
 :-show_call(must(father(_,trudy))).
+
+
 mother(trudy,eileen).
 ((human(P1),ancestor(P1,P2))=>human(P2)).
 :- listing([ancestor,human,parent]).
