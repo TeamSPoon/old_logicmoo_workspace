@@ -11,6 +11,65 @@
 */
 
 
+
+get_clause_vars(MHB):- (ground(MHB); \+ compound(MHB)),!.
+get_clause_vars(MHB):- strip_module(MHB,_M,HB), as_clause( HB,  H, B),ignore(user:saved_varname_info(H,B,_)),!.
+
+
+:-multifile(user:saved_varname_info/3).
+:-dynamic(user:saved_varname_info/3).
+assign_varname(O=I):-assign_varname_l(I,'$VAR'(O)),!.
+
+assign_varname_vars(N='$VAR'(N)).
+
+save_clause_vars(_,[]):-!. 
+save_clause_vars(MHB,Vs):- strip_module(MHB,_M,HB), compound(HB),
+ ( \+ \+
+    ((
+    once(maplist(assign_varname_vars,Vs)),
+%     once(maplist(assign_varname,Vs)),
+%    numbervars(HB,555,_,[attvar(skip)]), % singletons(true)
+    as_clause( HB,  H, B),
+    ignore(source_location(File, Line)),    
+    assert_if_new_kv(user:saved_varname_info(H,B,File:Line))))),!.
+
+try_save_vars(HB):-nb_current('$variable_names',Vs),Vs\==[],save_clause_vars(HB,Vs),!.
+
+assert_if_new_kv(A):- clause_asserted(A),!.
+assert_if_new_kv(A):- assert(A).
+
+ensure_vars_labled(I,I):-!.
+ensure_vars_labled(I,I):- ground(I),!.
+ensure_vars_labled(I,I):- ( \+ compound(I)),!.
+ensure_vars_labled(I,OO):- must(ensure_vars_labled_r(I,O)),!,OO=O.
+ensure_vars_labled(I,I).
+
+ensure_vars_labled_r(I,O):- 
+  ((nb_current('$variable_names',Vs),Vs\==[])),
+   copy_term(I:Vs,O:OVs),
+    must_maplist(assign_varname,OVs),
+   (O \=@= I ;  ground(O)),!.
+
+ensure_vars_labled_r(I,O):- 
+     term_variables(I,Vs),
+     copy_term(I,O),
+     copy_term(I:Vs,O:OVs),
+     get_clause_vars(O),
+     must_maplist(assign_varname_l,Vs,OVs),
+     (O \=@= I ;  ground(O)),!.
+
+ensure_vars_labled_r(I,O):- unnumbervars_and_save_r(I,UI),I\=@=UI,O=I.
+
+
+
+unnumbervars_and_save_r(I,O):-unnumbervars(I,UI),term_variables(UI,UIV),copy_term(UI-UIV,UIC-UIVC),
+    I=UIC,
+    must_maplist(assign_varname_l,UIV,UIVC),!.
+
+assign_varname_l(I,O):-var(I),var(O),!,I=O.
+assign_varname_l(I,O):-is_ftVar(O),var(I),!, put_varname(I,O).
+assign_varname_l(I,O):-trace,!,I=O.
+
 contains_singletons(Term):- not(ground(Term)),not(not((term_variables(Term,Vs),
    numbervars(Term,0,_,[attvar(bind),singletons(true)]),member('$VAR'('_'),Vs)))).
 
@@ -102,14 +161,15 @@ unnumbervars0(X,YY):-
    must_det_l((with_output_to(string(A),write_term(X,[numbervars(true),character_escapes(true),ignore_ops(true),quoted(true)])),
    atom_to_term(A,Y,_NewVars),!,must(YY=Y))).
 
-/*
-
 unnumbervars_and_save(X,YO):-
  term_variables(X,TV),
  must((source_variables(Vs),
    with_output_to(string(A),write_term(X,[numbervars(true),variable_names(Vs),character_escapes(true),ignore_ops(true),quoted(true)])))),
    must(atom_to_term(A,Y,NewVars)),
    (NewVars==[]-> YO=X ; (length(TV,TVL),length(NewVars,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (trace,add_newvars(NewVars),Y=X)))).
+
+/*
+
 
 unnumbervars_and_copy(X,YO):-
  term_variables(X,TV),
@@ -218,6 +278,8 @@ snumbervars(Term,Functor,Start,List):-numbervars_impl(Term,Functor,Start,List).
 :- swi_export(snumbervars/1).
 snumbervars(Term):-numbervars_impl(Term,0,_).
 
+put_varname(Var,'$VAR'(Name)):-atom(Name),!, put_attr(Var,varname,Name).
+put_varname(Var,Name):-  put_attr(Var,varname,Name).
 varname:attr_unify_hook(_,_).
 varname:attr_portray_hook(Value, _Var) :- nonvar(Value),!,writeq('?'(Value)).
 :- public

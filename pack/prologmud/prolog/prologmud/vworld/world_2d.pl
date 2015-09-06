@@ -392,11 +392,11 @@ move_dir_target(RegionXYZ,DirS,Force,XXYY):-
 
 move_dir_target(RegionXYZ,Dir,_Force,XXYY):-
    any_to_string(Dir,DirS),
-   locationToRegion(RegionXYZ,Region1),
+   locationToRegion(RegionXYZ,Region1),!,
    pathBetween_call(Region1,DirS,Region2),
    in_grid_rnd(Region2,XXYY),
    XXYY = xyzFn(Region2,_X2,_Y2,_Z2),
-   sanity(ground(XXYY)),
+   sanity(ground(XXYY)),!,
    check_ahead_for_ground(XXYY),!.
 
 

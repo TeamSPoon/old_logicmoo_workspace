@@ -736,6 +736,8 @@ user:term_expansion((:- (M:DIR)),O):-atom(M),atom(DIR),with_source_module(M, ((p
 user:term_expansion((:- DIR),O):- atom(DIR), pfc_directive_expansion(DIR,OO),!,must(O=(:- OO)).
 
 :-meta_predicate(pfc_file_expansion_0(?,?)).
+:-meta_predicate(pfc_file_expansion_0a(?,?)).
+:-meta_predicate(pfc_file_expansion_z(?,?)).
 
 % Specific "*SYNTAX*" based default
 
@@ -845,42 +847,44 @@ pfc_file_expansion_0(C,O):- compound(C), get_op_alias(OP,ALIAS),
 
 pfc_file_expansion_0(C,O):- get_lang(LANG),transform_opers(LANG,C,M),C\=@=M,!,pfc_file_expansion_0(M,O).
 
-pfc_file_expansion_0((<=(Q,P)),(:- cl_assert(pfc(bwc),(Q<-P)))).
-pfc_file_expansion_0(((P==>Q)),(:- cl_assert(pfc(fwc),(P==>Q)))).
-pfc_file_expansion_0((('=>'(Q))),(:- cl_assert(pfc(fwc),('=>'(Q))))).
-pfc_file_expansion_0((('==>'(Q))),(:- cl_assert(pfc(fwc),('=>'(Q))))).
-pfc_file_expansion_0(((nesc(Q))),(:- cl_assert(pfc(fwc),nesc(Q)))).
-pfc_file_expansion_0(('<-'(P,Q)),(:- cl_assert(pfc(bwc),('<-'(P,Q))))).
-pfc_file_expansion_0(('<==>'(P,Q)),(:- cl_assert(pfc(bwc),(P<==>Q)))).
-pfc_file_expansion_0(neg(Q),(:- cl_assert(pfc(fwc),neg(Q)))).
-pfc_file_expansion_0(~(Q),(:- cl_assert(pfc(fwc),~(Q)))).
+pfc_file_expansion_0(C,O):- ensure_vars_labled(C,M),pfc_file_expansion_z(M,O).
 
-pfc_file_expansion_0(if(P,Q),(:- cl_assert(kif(fwc),if(P,Q)))).
-pfc_file_expansion_0(iff(P,Q),(:- cl_assert(kif(fwc),iff(P,Q)))).
-pfc_file_expansion_0(not(Q),(:- cl_assert(kif(fwc),not(Q)))).
-pfc_file_expansion_0(exists(V,PQ),(:- cl_assert(kif(fwc),exists(V,PQ)))).
-pfc_file_expansion_0(forall(V,PQ),(:- cl_assert(kif(fwc),forall(V,PQ)))).
-pfc_file_expansion_0(all(V,PQ),(:- cl_assert(kif(fwc),all(V,PQ)))).
+pfc_file_expansion_z((<=(Q,P)),(:- cl_assert(pfc(bwc),(Q<-P)))).
+pfc_file_expansion_z(((P==>Q)),(:- cl_assert(pfc(fwc),(P==>Q)))).
+pfc_file_expansion_z((('=>'(Q))),(:- cl_assert(pfc(fwc),('=>'(Q))))).
+pfc_file_expansion_z((('==>'(Q))),(:- cl_assert(pfc(fwc),('=>'(Q))))).
+pfc_file_expansion_z(((nesc(Q))),(:- cl_assert(pfc(fwc),nesc(Q)))).
+pfc_file_expansion_z(('<-'(P,Q)),(:- cl_assert(pfc(bwc),('<-'(P,Q))))).
+pfc_file_expansion_z(('<==>'(P,Q)),(:- cl_assert(pfc(bwc),(P<==>Q)))).
+pfc_file_expansion_z(neg(Q),(:- cl_assert(pfc(fwc),neg(Q)))).
+pfc_file_expansion_z(~(Q),(:- cl_assert(pfc(fwc),~(Q)))).
+
+pfc_file_expansion_z(if(P,Q),(:- cl_assert(kif(fwc),if(P,Q)))).
+pfc_file_expansion_z(iff(P,Q),(:- cl_assert(kif(fwc),iff(P,Q)))).
+pfc_file_expansion_z(not(Q),(:- cl_assert(kif(fwc),not(Q)))).
+pfc_file_expansion_z(exists(V,PQ),(:- cl_assert(kif(fwc),exists(V,PQ)))).
+pfc_file_expansion_z(forall(V,PQ),(:- cl_assert(kif(fwc),forall(V,PQ)))).
+pfc_file_expansion_z(all(V,PQ),(:- cl_assert(kif(fwc),all(V,PQ)))).
 
 
 % maybe reverse some rules?
-%pfc_file_expansion_0((P==>Q),(:- cl_assert(pfc(fwc),('<-'(Q,P))))).  % speed-up attempt
-pfc_file_expansion_0((RuleName :::: Rule),(:- cl_assert(named_rule,(RuleName :::: Rule)))).
-pfc_file_expansion_0((nescP),(:- cl_assert(pfc(fwc),(nescP)))).
-pfc_file_expansion_0(Fact,(:- cl_assert(pl,Fact))):- get_functor(Fact,F,_A),if_defined(prologDynamic(F)).
-pfc_file_expansion_0(Fact,Output):- pfc_file_expansion_1(_Dir,Fact,C),must(pfc_file_expansion_0(C,Output)),!.
+%pfc_file_expansion_z((P==>Q),(:- cl_assert(pfc(fwc),('<-'(Q,P))))).  % speed-up attempt
+pfc_file_expansion_z((RuleName :::: Rule),(:- cl_assert(named_rule,(RuleName :::: Rule)))).
+pfc_file_expansion_z((==>(P)),(:- cl_assert(pfc(fwc),(==>(P))))).
+pfc_file_expansion_z(Fact,(:- cl_assert(pl,Fact))):- get_functor(Fact,F,_A),if_defined(prologDynamic(F)).
+pfc_file_expansion_z(Fact,Output):- pfc_file_expansion_1(_Dir,Fact,C),must(pfc_file_expansion_z(C,Output)),!.
 
       pfc_file_expansion_1(pfc(act),(H:-Chain,B),({(Chain,B)}==>H)):-cwc, is_action_body(Chain),make_dynamic(H).
       pfc_file_expansion_1(pfc(fwc),(H:-Chain,B),({(Chain,B)}==>H)):-cwc, is_fc_body(Chain),make_dynamic(H).
       pfc_file_expansion_1(pfc(bwc),(H:-Chain,B),(H<-(Chain,B))):-cwc, is_bc_body(Chain),make_dynamic(H).
       
 
-pfc_file_expansion_0((H:-Chain,B),(H:-(B))):- is_code_body(Chain),!,fail,must(atom(Chain)),make_dynamic(H).
+pfc_file_expansion_z((H:-Chain,B),(H:-(B))):- is_code_body(Chain),!,fail,must(atom(Chain)),make_dynamic(H).
 
 
 % Specific "*PREDICATE CLASS*" based default
-pfc_file_expansion_0(Fact,Fact):- get_functor(Fact,F,A),prologDynamic(F),!.
-pfc_file_expansion_0(Fact,(:- ((cl_assert(Dir,Fact))))):- pfc_file_expansion_2(Dir,Fact,_Output),!.
+pfc_file_expansion_z(Fact,Fact):- get_functor(Fact,F,A),prologDynamic(F),!.
+pfc_file_expansion_z(Fact,(:- ((cl_assert(Dir,Fact))))):- pfc_file_expansion_2(Dir,Fact,_Output),!.
 
       % Specific "*PREDICATE CLASS*" based default
       pfc_file_expansion_2(pfc(pred_type),Fact,Output):- get_functor(Fact,F,A),if_defined(ttPredType(F)),Output='$was_imported_kb_content$'(Fact,ttPredType(F)),!.
@@ -892,12 +896,12 @@ pfc_file_expansion_0(Fact,(:- ((cl_assert(Dir,Fact))))):- pfc_file_expansion_2(D
 
 
 % Specific "*FILE*" based default
-pfc_file_expansion_0(Fact,Fact):- inside_file(pl),!.
-pfc_file_expansion_0(Fact,(:- ((cl_assert(pfc(pfc_file),Fact))))):- inside_file(pfc),!.
-pfc_file_expansion_0(Fact,(:- ((cl_assert(dyn(dyn_file),Fact))))):- inside_file(dyn),!.
-pfc_file_expansion_0(Fact,(:- ((cl_assert(mpred(mpreds_file),Fact))))):- inside_file(mpreds),!.
+pfc_file_expansion_z(Fact,Fact):- inside_file(pl),!.
+pfc_file_expansion_z(Fact,(:- ((cl_assert(pfc(pfc_file),Fact))))):- inside_file(pfc),!.
+pfc_file_expansion_z(Fact,(:- ((cl_assert(dyn(dyn_file),Fact))))):- inside_file(dyn),!.
+pfc_file_expansion_z(Fact,(:- ((cl_assert(mpred(mpreds_file),Fact))))):- inside_file(mpreds),!.
 /*
-pfc_file_expansion_0(Fact,(:- ((cl_assert(pfc(expand_file),Fact))))):-
+pfc_file_expansion_z(Fact,(:- ((cl_assert(pfc(expand_file),Fact))))):-
     notrace(pfc_expand_inside_file_anyways(F)),!,_Output='$was_imported_kb_content$'(Fact,pfc_expand_inside_file_anyways(F)),!.
 */
 

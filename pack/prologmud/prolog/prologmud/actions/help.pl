@@ -49,7 +49,7 @@ action_info_db(TEMPL,INFO,WAS):- (PRED=user:agent_call_command(_,WAS);PRED=user:
     (TEMPL=@=WAS -> ((clause_property(REF,line_count(LC)),INFO=line(LC:S))) ;  (not(not(TEMPL=WAS)) -> INFO=file(S) ; fail)).
 
 % :-trace.
-user:action_info(TEMPL,txtConcatFn(S,contains,WAS)) <= {action_info_db(TEMPL,S,WAS),not_asserted(user:action_info(TEMPL,_Help))}.
+action_info_db(TEMPL,S,WAS) ==> if_missing(action_info(TEMPL,_Help), action_info(TEMPL,txtConcatFn(S,contains,WAS))).
 % user:action_info(TEMPL,txtConcatFn(S,contains,WAS)) <= action_info_db(TEMPL,S,WAS),{not_asserted(user:action_info(TEMPL,_Help))}.
 
 

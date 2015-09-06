@@ -260,7 +260,8 @@ mpred_missing_stubs(F,A):-prologHybrid = StubType, hybrid_tPredStubImpl(StubType
 :-export(rescan_missing_stubs/0).
 % rescan_missing_stubs:-no_rescans,!.
 rescan_missing_stubs:-loop_check(time_call(rescan_missing_stubs_ilc),true).
-rescan_missing_stubs_ilc:- once(thglobal:use_cyc_database), once(with_assertions(thlocal:useOnlyExternalDBs,forall((kb_t(arity(F,A)),A>1,good_pred_relation_name(F,A),not(arity(F,A))),with_no_dmsg(decl_mpred_mfa,decl_mpred_hybrid(F,A))))),fail.
+rescan_missing_stubs_ilc:- once(thglobal:use_cyc_database), once(with_assertions(thlocal:useOnlyExternalDBs,forall((kb_t(arity(F,A)),A>1,
+   good_pred_relation_name(F,A),not(arity(F,A))),with_no_dmsg(decl_mpred_mfa,decl_mpred_hybrid(F,A))))),fail.
 rescan_missing_stubs_ilc:- hotrace((doall((mpred_missing_stubs(F,A),arity(F,A),ensure_universal_stub(F/A))))).
 
 no_rescans.

@@ -179,7 +179,9 @@ arity(pddlObjects,2).
 meta_argtypes(support_hilog(tRelation,ftInt)).
 
 % remove conflicts early 
+
 (neg(P)/pfc_non_neg_literal(P) ==> ( {pfc_rem(P)}, (\+P ))).
+%:- start_rtrace.
 (P/pfc_non_neg_literal(P) ==> (\+neg(P))).
 % a pretty basic conflict.
 %(neg(P)/pfc_non_neg_literal(P), P) ==> conflict(neg(P)).
@@ -346,6 +348,7 @@ prologSideEffects(write/1).
 prologSideEffects(resolveConflict/1).
 
 
+% :- prolog.
 
 ttPredType(isEach(meta_argtypes,pfcDatabaseTerm,pfcControlled,pfcWatched,pfcMustFC,predIsFlag,tPred,prologMultiValued,
  prologSingleValued,prologMacroHead,notAssertable,prologBuiltin,prologDynamic,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,prologEquality,prologPTTP,

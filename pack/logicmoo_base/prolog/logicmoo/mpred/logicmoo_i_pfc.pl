@@ -124,7 +124,7 @@ to_addable_form_wte(_Why,neg(P0),neg(P0)):-!.
 to_addable_form_wte(assert,(H:-B),(H:-B)):-B\==true,!.
 to_addable_form_wte(Why,(CUT,P0),(CUT,P)):-pfc_is_builtin(CUT),!,trace,!,to_addable_form_wte(Why,P0,P).
 to_addable_form_wte(Why,P0,P):-
-    once(notrace(to_addable_form(P0,P));must(to_addable_form(P0,P))),
+    once(/* notrace */(to_addable_form(P0,P));must(to_addable_form(P0,P))),
     ((P0\=@=P,P0\=isa(_,_))->pfc_debug_trace(to_addable_form(Why,P0,P));true).
 
 retract_eq_quitely(H):-ignore(retract_eq_quitely_f(H)).
@@ -331,7 +331,7 @@ pfc_silient :- \+ thlocal:pfc_debug_local, \+ thlocal:pfc_trace_exec.
 pfc_tracing :-  thlocal:pfc_debug_local ;  thlocal:pfc_trace_exec.
 
 pfc_debug_trace(_):-pfc_silient,!.
-pfc_debug_trace(F):-wdmsg(F),!.
+pfc_debug_trace(F):- wdmsg(F),!.
 
 pfc_debug_trace(_,_):-pfc_silient,!.
 pfc_debug_trace(F,A):-wdmsg(F,A),!.
@@ -552,14 +552,17 @@ pfc_assert_fast_timed(P0,S):-
        pfc_assert_fast_sp(S,P)).
 
 
+pfc_assert_fast_sp(S,P):- ensure_vars_labled(S:P,S0:P0),
+   pfc_assert_fast_sp0(S0,P0).
+
 % pfc_assert_fast_sp(S,P->Q) :-!,pfc_assert_fast_sp(S,P==>Q).
-pfc_assert_fast_sp(S,P) :-
+pfc_assert_fast_sp0(S,P) :-
    pfc_rule_hb(P,OutcomeO,_),
      loop_check_term((pfc_post_sp_zzz(S,P),pfc_run_maybe),
      pfc_asserting(OutcomeO),
      (pfc_post_sp_zzz(S,P),pfc_debug_trace(looped_outcome((P))))),!.
 %pfc_assert_fast_sp(_,_).
-pfc_assert_fast_sp(P,S) :- pfc_error("pfc_assert_fast(~p,~p) failed",[P,S]).
+pfc_assert_fast_sp0(P,S) :- pfc_error("pfc_assert_fast(~p,~p) failed",[P,S]).
 
 
 
@@ -1660,17 +1663,18 @@ build_rhs(Sup,X,[X2]) :-
 
 pfc_compile_rhsTerm(_Sup,P,P):-is_ftVar(P),!.
 pfc_compile_rhsTerm(Sup,(P/C),((P0:-C0))) :- !,pfc_compile_rhsTerm(Sup,P,P0),build_code_test(Sup,C,C0),!.
-pfc_compile_rhsTerm(Sup,I,O):-to_addable_form_wte(pfc_compile_rhsTerm,I,O), must(\+ \+ pfc_mark_as(Sup,r,O,pfcRHS)),!.
+pfc_compile_rhsTerm(Sup,I,O):-to_addable_form_wte(pfc_compile_rhsTerm,I,O), must(\+ \+ pfc_mark_as(Sup,r,O,pfcRHSR)),!.
 
 
 
-pfc_mark_as(_,_,P,_):-var(P),!.
+pfc_mark_as(_,_,P,_):- is_ftVar(P),!.
 
 pfc_mark_as(Sup,_PosNeg,neg(P),Type):-!,pfc_mark_as(Sup,neg,P,Type).
 pfc_mark_as(Sup,_PosNeg,\+(P),Type):-!,pfc_mark_as(Sup,neg,P,Type).
 pfc_mark_as(Sup,_PosNeg,-(P),Type):-!,pfc_mark_as(Sup,neg,P,Type).
 pfc_mark_as(Sup,_PosNeg,~(P),Type):-!,pfc_mark_as(Sup,neg,P,Type).
 pfc_mark_as(Sup,PosNeg,( P / _ ),Type):- !, pfc_mark_as(Sup,PosNeg,P,Type).
+pfc_mark_as(_Sup,_PosNeg,'{}'(  _P ), _Type):- !. % , pfc_mark_as(Sup,PosNeg,P,Type).
 pfc_mark_as(_Sup,_PosNeg,( _ :- _ ),_Type):-!.
 pfc_mark_as(Sup,PosNeg,( A , B), Type):- !, pfc_mark_as(Sup,PosNeg,A, Type),pfc_mark_as(Sup,PosNeg,B, Type).
 pfc_mark_as(Sup,PosNeg,( A ; B), Type):- !, pfc_mark_as(Sup,PosNeg,A, Type),pfc_mark_as(Sup,PosNeg,B, Type).
@@ -2518,13 +2522,17 @@ add_reprop(neg(_Var)):-!.
 add_reprop((H:-B)):- trace_or_throw(add_reprop((H:-B))).
 add_reprop(Trigger):- assertz_if_new(pfc_queue(repropagate(Trigger),(g,g))).
 
-repropagate(P):-  meta_wrapper_rule(P)*->repropagate0(P);fail.
+
+repropagate(P):- (is_ftVar(P),!).
+repropagate(P):-  (meta_wrapper_rule(P))->repropagate_meta_wrapper_rule(P);fail.
 repropagate(P):-  \+ predicate_property(P,_),'$find_predicate'(P,PP),PP\=[],!,forall(member(M:F/A,PP),must((functor(Q,F,A),repropagate0(M:Q)))).
 repropagate(F/A):- atom(F),integer(A),!,functor(P,F,A),!,repropagate(P).
 repropagate(F/A):- atom(F),var(A),!,repropagate(F).
 repropagate(P):-  must(repropagate0(P)).
 
+repropagate0(P):- (is_ftVar(P),!).
 repropagate0(USER:P):- USER==user,!,repropagate0(P).
+repropagate0((P/_)):-!,repropagate0(P).
 repropagate0(P):-
  forall(pfc_facts_and_universe(P),
   with_assertions(thlocal:pfc_debug_local,
@@ -2532,6 +2540,8 @@ repropagate0(P):-
    once(fwd_ok(P)),
    pfc_fwd(P))))).
 
+% repropagate_meta_wrapper_rule(P==>_):- !, repropagate(P).
+repropagate_meta_wrapper_rule(P):-repropagate0(P).
 
 fwd_ok(P):-ground(P),!.
 fwd_ok(if_missing(_,_)).

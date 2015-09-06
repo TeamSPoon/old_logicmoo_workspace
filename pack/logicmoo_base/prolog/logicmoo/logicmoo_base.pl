@@ -22,22 +22,7 @@
 :- include(mpred/logicmoo_i_header).
 
 
-get_clause_vars(MHB):- (ground(MHB); \+ compound(MHB)),!.
-get_clause_vars(MHB):- strip_module(MHB,M,HB), as_clause( HB,  H, B),ignore(user:saved_varname_info(H,B,_)),!.
-
-
-:-multifile(user:saved_varname_info/3).
-:-dynamic(user:saved_varname_info/3).
-assign_varname(N='$VAR'(N)).
-
-save_clause_vars(_,[]):-!. 
-save_clause_vars(MHB,Vs):- strip_module(MHB,M,HB), compound(HB),
-    once(maplist(assign_varname,Vs)),    
-    as_clause( HB,  H, B),
-    ignore(source_location(File, Line)), 
-    assert(user:saved_varname_info(H,B,File:Line)),fail.
-
-user:term_expansion(HB,_):- b_getval('$variable_names',Vs),Vs\==[],save_clause_vars(HB,Vs),fail.
+user:term_expansion(HB,_):- try_save_vars(HB),fail.
 
 /*
 :- meta_predicate user:call_mpred_body(*,0).

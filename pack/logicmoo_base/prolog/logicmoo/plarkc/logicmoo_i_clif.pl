@@ -84,6 +84,7 @@ is_clif(CLIF):-cwc,
       % this consequent asserts the new rules
       PROLOG,{sanity(clif_must(CLIF))})).
 
+% :- prolog.
 
 arity(clif,1).
 arity(boxlog,1).
@@ -295,7 +296,6 @@ male(P) <=> ~female(P).
 
 % human(P) => (female(P) v male(P)).
 clif(if(human(P), (female(P) v male(P)))).
-
 
 
 ((parent(X,Y) & female(X)) <=> mother(X,Y)).
