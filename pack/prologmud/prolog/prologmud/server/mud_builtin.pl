@@ -642,7 +642,7 @@ bordersOn(R1,R2):-is_asserted(pathDirLeadsTo(R2,Dir,R1)),nop(Dir).
 ensure_some_pathBetween(R1,R2):- bordersOn(R1,R2),!.
 ensure_some_pathBetween(R1,R2):- random_path_dir(Dir), \+(is_asserted(pathDirLeadsTo(R1,Dir,_))),must(reverse_dir(Dir,Rev)),\+(is_asserted(pathDirLeadsTo(R2,Rev,_))),!, 
    must((add(pathDirLeadsTo(R1,Dir,R2)),add(pathDirLeadsTo(R2,Rev,R1)))),!.
-ensure_some_pathBetween(R1,R2):- must((add(pathDirLeadsTo(R1,aRelatedFn(vtDirection,R1,R2),R2)),add(pathDirLeadsTo(R2,aRelatedFn(vtDirection,R2,R1),R1)))),!.
+ensure_some_pathBetween(R1,R2):- trace,must((add(pathDirLeadsTo(R1,aRelatedFn(vtDirection,R1,R2),R2)),add(pathDirLeadsTo(R2,aRelatedFn(vtDirection,R2,R1),R1)))),!.
 
 bordersOn(R1,R2)/ground(bordersOn(R1,R2)) ==> isa(R1,tRegion),isa(R2,tRegion), {ensure_some_pathBetween(R2,R1),ensure_some_pathBetween(R1,R2)}.
 

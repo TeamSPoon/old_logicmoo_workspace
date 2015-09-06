@@ -10,8 +10,18 @@
   ensure_struct/2,ensure_struct/3,
   ensure_instance/2,ensure_instance/3]).
 
-:- expects_dialect(sicstus).
+:- use_module(library(record)).
 
+:- record point(x:integer=0, y:integer=0).
+
+     /*
+        default_point(Point),
+        point_x(Point, X),
+        set_x_of_point(10, Point, Point1),
+
+        make_point([y(20)], YPoint),
+   */
+:- expects_dialect(sicstus).
 
 
 pfc_ain(X):-if_defined(pfc_add(X),assert_if_new(X)).

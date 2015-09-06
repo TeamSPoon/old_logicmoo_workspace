@@ -1,4 +1,6 @@
 
+:- if(if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
+
 :-file_begin(pfc).
 
 tCol(tFly).
@@ -39,4 +41,5 @@ tPenguin(X) ==> neg(tFly(X)).
 
 
 
-end_of_file.
+:- endif.
+

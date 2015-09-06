@@ -111,7 +111,10 @@ arity(pfclog,1).
 ({is_clif(CLIF)} ==>
   (CLIF/is_clif(CLIF) ==> clif(CLIF))).
 
-:- if(if_defined(pfc_examples,true)).
+
+
+
+:- if(if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
 
 :- wdmsg(pfc_trace).
 

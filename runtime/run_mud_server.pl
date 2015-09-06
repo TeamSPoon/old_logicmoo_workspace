@@ -2,48 +2,31 @@
 /** <module> MUD server startup script in SWI-Prolog
 
 */
+% ==========================================================
+% Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
+% ==========================================================
+:-multifile(user:sanity_test/0).
+:-multifile(user:regression_test/0).
+:-multifile(user:feature_test/0).
+
 
 :- user:ensure_loaded(logicmoo_repl).
 
 
-% :- listing([storage_plugin_update,filesys:filesys_data]).
-
-
-:- if(if_defined(debugging_planner)).
-
-% [Mostly Required] Load the Logicmoo Planner/AI System
+% [Mostly Required] Load the Logicmoo Plan Generator System
 :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
 
-:- prolog.
-
-:- else.
-
-% [Mostly Required] Load the Logicmoo Planner/AI System
-%:- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(planner/logicmoo_planner))))).
-
-:- wdmsg("Done with loading logicmoo_planner").
-
-:-endif.
-
-% [Required] most of the Library system should not be loaded with mpred expansion on
-% :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
 
 % [Required] Load the CYC Network Client and Logicmoo CycServer Emulator (currently server is disabled)
 :- with_no_mpred_expansions(user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api))).
 
 
 % [Mostly Required] Load the Logicmoo Parser/Generator System
-%:- gripe_time(40,user:ensure_loaded(library(parser_all))).
-
-:- asserta(thlocal:disable_mpred_term_expansions_locally).
-:- ignore((\+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
-
-% [Required] most of the Library system should not be loaded with mpred expansion on
-% :- ignore((\+(thlocal:disable_mpred_term_expansions_locally),throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
+:- gripe_time(40,user:ensure_loaded(library(parser_all))).
 
 
-% [Optional] Load the Logicmoo RDF/OWL Browser System
-%%:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(mpred_online/dbase_i_rdf_store)))).
+% [Optional] NOT YET Load the Logicmoo RDF/OWL Browser System
+% % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(mpred_online/dbase_i_rdf_store)))).
 
 
 % [Debugging] Normarily this set as 'true' can interfere with debugging
@@ -54,19 +37,10 @@
 
 
 % ==========================================================
-% Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
-% ==========================================================
-:-multifile(user:sanity_test/0).
-:-multifile(user:regression_test/0).
-:-multifile(user:feature_test/0).
-
-
-
-% ==========================================================
 % Regression tests that first run whenever a person stats the MUD on the public server
 % ==========================================================
 
-:- if((fail,gethostname(titan),fail)). % INFO this fail is so we can start faster
+:- if((gethostname(ubuntu),fail)). % INFO this fail is so we can start faster
 :- show_call_entry(gripe_time(40, doall(user:regression_test))).
 :- endif.
 
@@ -75,12 +49,8 @@
 % MUD SERVER CODE LOADS
 % ==============================
 
-:- retractall(thlocal:disable_mpred_term_expansions_locally).
 % [Required] load the mud system
-:- show_call_entry(gripe_time(40,user:ensure_loaded(prologmud(mud_startup)))).
-
-
-
+:- show_call_entry(gripe_time(40,user:ensure_loaded(prologmud(mud_loader)))).
 
 
 % ==============================

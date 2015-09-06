@@ -39,13 +39,15 @@ user:file_search_path(library, '/devel/LogicmooDeveloperFramework/PrologMUD/pack
 :- initialization(attach_packs).
 user:file_search_path(prologmud, library(prologmud)).
 :- user:use_module(library(persistency)).
-:- ((current_prolog_flag(readline, true))->expand_file_name("~/.pl-history", [File|_]),(exists_file(File) -> rl_read_history(File); true),at_halt(rl_write_history(File));true).
+setup_rl_read_history:- 
+  ((current_prolog_flag(readline, true))->expand_file_name("~/.pl-history", [File|_]),(exists_file(File) -> rl_read_history(File); true),at_halt(rl_write_history(File));true).
 
 
 :- endif.
 
 
-
+machine_config_file(Y):- gethostname(X),concat_atom([machine_,X,.,pl],Y).
+load_machine_config:-machine_config_file(Y),exists_file(Y),ensure_loaded(Y).
 
 % :- multifile sandbox:safe_primitive/1.
 % :-asserta((sandbox:safe_primitive(Z):-wdmsg(Z))).
@@ -66,6 +68,10 @@ user:file_search_path(prologmud, library(prologmud)).
 
 :-asserta(user:load_mud_www).
 
+:- setup_rl_read_history.
+:- initialization(setup_rl_read_history,now).
+
+
 % [Mostly Required] Load the UPV Curry System
 %:- time(user:ensure_loaded(library(upv_curry/main))).
 
@@ -75,6 +81,7 @@ user:file_search_path(prologmud, library(prologmud)).
 :- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_swish)))).
 :- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_clio)))).
 
+:-dynamic(user:startup_option/2).
 
 % [Required] Load the Logicmoo Base System
 :- time(user:ensure_loaded(logicmoo(logicmoo_base))).
@@ -88,10 +95,12 @@ user:file_search_path(prologmud, library(prologmud)).
 push_env_ctx:-!,fail.
 push_env_ctx:-!.
 
+:- load_machine_config.
+:- initialization(load_machine_config,now).
+
 
 
 % [Required] Load the Logicmoo Backchaining Inference System
 :- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
-
 
 

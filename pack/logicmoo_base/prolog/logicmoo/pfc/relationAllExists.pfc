@@ -10,6 +10,9 @@
 :- dynamic(tCol/1).
 
 
+
+:- if(if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
+
 isa(iExplorer1,tHumanPlayer).
 isa(iExplorer2,tHumanPlayer).
 genls(tHumanPlayer,tHominid).
@@ -25,10 +28,11 @@ genls(tHumanBody,tBodyPart).
 
 %isa(iHumanBody1,tHumanBody).
 
+
+:- endif.
+
 predInterArgIsa(mudSubPart(tBodyPart,tBodyPart)).
-
 relationAllOnly(mudSubPart,tHumanBody,tBodyPart).
-
 
 ((relationAllOnly(Pred,Col1,Col2)/(G=..[Pred,VAL,Value])) ==> 
    (isa(VAL,Col1) ==> (( G ==> isa(Value,Col2))))).
@@ -132,8 +136,11 @@ relationAllExists(mudSubPart,tHumanBody,isEach(tHumanHead,tHumanNeck,tHumanUpper
 relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
 
 
+:- if(if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
 
 :- pfc_spy_all.
+
+:- endif.
 
 ==>
 '(==>
@@ -142,10 +149,13 @@ relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
        (isa ?THING ?COL1)        
        (relationExistsMost ?BINPRED ?COL1 ?COL2)))'.
 
-?- listing(mudSubPart).
+
 
 isa(skRelationAllExistsFn(P,A,C),C):- nonvar(P),nonvar(A),nonvar(C).
 
+:- if(if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
+
+?- listing(mudSubPart).
 %:-rtrace((isa(Inst,tHumanNeck),mudSubPart(iExplorer1,Inst))).
 %:-rtrace((mudSubPart(iExplorer1,Inst),isa(Inst,tHumanNeck))).
 :- must((isa(Inst,tHumanHair),mudSubPart(iExplorer1,Inst))).
@@ -155,6 +165,7 @@ isa(skRelationAllExistsFn(P,A,C),C):- nonvar(P),nonvar(A),nonvar(C).
 ?- listing(mudSubPart).
 
 
+:- endif.
 
 
 

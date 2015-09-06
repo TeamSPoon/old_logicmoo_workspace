@@ -60,6 +60,7 @@ user:my_pfc_add(A):-if_defined(pfc_add(A),assert_if_new(A)).
 :- use_module(library(timeout)).
 :- use_module(library(lists)).
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_structs)).
+:- user:ensure_loaded(library(logicmoo/plarkc/dbase_i_sexpr_reader)).
 
 :- decl_struct(domain(domain_name, requires, types, constants, predicates, functions, constraints, actions, dict(extraprops))).
 :- decl_struct(problem(problem_name, domain_name, requires, objects, init, goal, constraints, metric, length, dict(extraprops))).
@@ -597,17 +598,17 @@ copy_term_for_assert(A,B):-
     b_setval('$variable_names',After).
 
 cp( VAR,Vars,VAR,Vars):- var(VAR),!.
-cp( VAR,Vars,NV,NVars):- svar(VAR,_),!,must((svar_fixvarname(VAR,Name),atom(Name))),!, must(register_var(Name=NV,Vars,NVars)).
+cp( VAR,Vars,NV,NVars):- logicmoo_i_sexp_reader:svar(VAR,_),!,must((svar_fixvarname(VAR,Name),atom(Name))),!, must(register_var(Name=NV,Vars,NVars)).
 cp([],Vars,[],Vars).
 cp( Term,Vars,Term,Vars):- \+compound(Term),!.
 cp([H|T],Vars,[NH|NT],NVars):- !, cp(H,Vars,NH,SVars), cp(T,SVars,NT,NVars).
 cp( Term,Vars,NTerm,NVars):-    
     Term=..[F|Args],    % decompose term
-    (svar(F,_)-> cp( [F|Args],Vars,NTerm,NVars);
+    (logicmoo_i_sexp_reader:svar(F,_)-> cp( [F|Args],Vars,NTerm,NVars);
     % construct copy term
     (cp(Args,Vars,NArgs,NVars), NTerm=..[F|NArgs])).  
 
-
+/*
 
 % register_var(?, ?, ?)
 %
@@ -645,7 +646,7 @@ name_to_var(N,[N0=V0|T],V):-
    N0==N -> samify(V,V0) ; name_to_var(N,T,V).
 
 
-
+*/ 
 
 
 reset_statistic:-
@@ -1164,7 +1165,7 @@ sterm2pterm([S],S):-atom(S),!. % ,atom_concat(':',_,S),!.
 sterm2pterm([S|SLIST],PTERM):-atom(S),atom_concat(':',_,S),
             must_maplist(sterm2pterm,SLIST,PLIST),           
             PTERM=..[S,PLIST].
-sterm2pterm([S|SLIST],PTERM):-atom(S),\+ svar(S,_),!,
+sterm2pterm([S|SLIST],PTERM):-atom(S),\+ logicmoo_i_sexp_reader:svar(S,_),!,
             must_maplist(sterm2pterm,SLIST,PLIST),           
             PTERM=..[S|PLIST].
 sterm2pterm(SLIST,PLIST):- is_list(SLIST),!,must_maplist(sterm2pterm,SLIST,PLIST).
@@ -1268,7 +1269,7 @@ atomic_formula_skeleton(Struct) -->
 predicate(_) --> [P], {P==not,!,fail}.
 predicate(P)                    --> name(P).
 
-variable(V)                     --> ['?'], name(N), { fix_varcase(N,N0), V =.. [?, N0]}.
+variable(V)                     --> ['?'], name(N), { logicmoo_i_sexp_reader:fix_varcase(N,N0), V =.. [?, N0]}.
 
 % atomic_function_skeleton(f(S, L)) --> ['('], function_symbol(S), typed_list(variable, L), [')'].
 atomic_function_skeleton(f(S,Struct)) -->

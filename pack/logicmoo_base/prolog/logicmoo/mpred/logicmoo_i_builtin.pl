@@ -695,6 +695,7 @@ prologHybrid(argIsa/3).
 
 */
 
+:- if(if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
 
 
 % :- if_startup_script(with_assertions(thlocal:pfcExpansion,ensure_loaded(mpred_i_mpred_pfc_testing))).
@@ -713,6 +714,9 @@ tCol(tBird).
 %:-debug.
 %:-rtrace.
 :-pfc_test(dynamic(tBird/1)).
+
+
+:- endif.
 
 :- meta_predicate(neg(0)).
 :- dynamic(neg(0)).
@@ -1138,12 +1142,15 @@ specialFunctor('\\+').
 specialFunctor('/').
 
 
+:- if(if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
 
 :-time(expand_props(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O)),time(pfc_add(pfc_default(O))).
 
 :-time(fully_expand(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),_)).
 
 :-pfc_trace.
+
+:- endif.
 
 :-time(pfc_add((((arity(Pred,2),tPred(Pred)) <==> isa(Pred,ptBinaryPredicate))))).
 
@@ -1272,6 +1279,17 @@ argFormat(P,S,vSetTheFormat)<==> ~singleValuedInArg(P,S).
 
 
 
+((singleValuedInArg(F,N),arity(F,A),{atom(F),integer(N),integer(A),functor(P,F,A),\+ is_ftEquality(P)}) ==> 
+  (made_update_single_valued_arg(P,N),
+   (P ==> {update_single_valued_arg(P,N)}))).
+
+
+argSingleValueDefault(F, N, _)==>singleValuedInArg(F,N).
+
+
+:- if(if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
+
+
 :- meta_predicate(mp_test_agr(?,+,-,*,^,:,0,1,5,9)).
 % becomes         mp_test_agr(+,+,-,?,^,:,0,1,0,0)
 
@@ -1327,18 +1345,11 @@ a(B)==>d(B).
 
 :-must(ensure_loaded('../pfc/zenls.pfct')).
 
-
-((singleValuedInArg(F,N),arity(F,A),{atom(F),integer(N),integer(A),functor(P,F,A),\+ is_ftEquality(P)}) ==> 
-  (made_update_single_valued_arg(P,N),
-   (P ==> {update_single_valued_arg(P,N)}))).
-
-
-argSingleValueDefault(F, N, _)==>singleValuedInArg(F,N).
-
 :- must(ensure_loaded('../pfc/singleValued.pfct')).
 
 
 % :-prolog.
 % :- rescan_pfc.
 
+:- endif.
 

@@ -1,4 +1,6 @@
 
+:- if(if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
+
 :-file_begin(pfc).
 
 
@@ -62,6 +64,9 @@ meta_argtypes(idForTest(tBird,ftTerm)).
 singleValuedInArgDefault(idForTest,2,isMissing).
 
 tBird(iPeety).
+
+:- endif.
+
 
 end_of_file.
 

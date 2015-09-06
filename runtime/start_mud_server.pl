@@ -89,6 +89,8 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 % [Optionaly] Tell the NPCs to do something every 60 seconds (instead of 90 seconds)
 % :- register_timer_thread(npc_ticker,60,npc_tick).
 
+:- show_call_entry(gripe_time(40,user:ensure_loaded(prologmud(mud_startup)))).
+
 
 :- pce_show_profile.
 

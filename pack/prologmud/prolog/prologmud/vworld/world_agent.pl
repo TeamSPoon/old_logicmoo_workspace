@@ -266,16 +266,21 @@ guess_session_ids(In):-thread_self(ID),thread_util:has_console(ID,In,Out,Err).
 my_random_member(LOC,LOCS):- must_det((length(LOCS,Len),Len>0)),random_permutation(LOCS,LOCS2),!,member(LOC,LOCS2).
 
 :-export(random_instance/3).
-random_instance_no_throw(Type,Value,Test):-var(Test),!,Test=isa(Test,Type),random_instance_no_throw(Type,Value,Test).
-random_instance_no_throw(Type,Value,Test):- copy_term(ri(Type,Value,Test),ri(RType,RValue,RTest)),
+
+random_instance_no_throw(Type,Value,Test):-random_instance_no_throw0(Type,Value,Test).
+
+random_instance_no_throw0(Type,Value,Test):-var(Test),!,Test=isa(Test,Type),random_instance_no_throw(Type,Value,Test).
+random_instance_no_throw0(Type,Value,Test):- copy_term(ri(Type,Value,Test),ri(RType,RValue,RTest)),
    hooked_random_instance(RType,RValue,RTest),
    checkAnyType(query(_,_),RValue,Type,Value),
-   must_det(Test),!.
-random_instance_no_throw(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),!,call(Fact),Test.
-random_instance_no_throw(Type,Value,Test):- compound(Type),get_functor(Type,F),atom_concat('random_',F,Pred),current_predicate(F/1),Fact=..[Pred,Value],predicate_property(Fact,_),!,Fact,Test.
-random_instance_no_throw(Type,Value,Test):- compound(Type),get_functor(Type,F,GA),guess_arity(F,GA,A),functor(Formatted,F,A),t(meta_argtypes,Formatted),
+   must_det(Test).
+
+random_instance_no_throw0(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),!,call(Fact),Test.
+random_instance_no_throw0(Type,Value,Test):- compound(Type),get_functor(Type,F),atom_concat('random_',F,Pred),current_predicate(F/1),Fact=..[Pred,Value],
+  predicate_property(Fact,_),!,Fact,Test.
+random_instance_no_throw0(Type,Value,Test):- compound(Type),get_functor(Type,F,GA),guess_arity(F,GA,A),functor(Formatted,F,A),t(meta_argtypes,Formatted),
                          Formatted=..[F|ArgTypes],functor(Value,F,A),Value=..[F|ValueArgs],must((maplist(random_instance_no_throw,ArgTypes,ValueArgs,_),Test)).
-random_instance_no_throw(Type,Value,Test):-must(( findall(V,isa(V,Type),Possibles),Possibles\=[])),must_det((my_random_member(Value,Possibles),Test)).
+random_instance_no_throw0(Type,Value,Test):-must(( findall(V,isa(V,Type),Possibles),Possibles\=[])),!,must((my_random_member(Value,Possibles),Test)).
 
 random_instance(Type,Value,Test):- must(random_instance_no_throw(Type,Value,Test)).
 

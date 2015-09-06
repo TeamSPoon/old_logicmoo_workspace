@@ -1560,8 +1560,8 @@ is_statics(Pred):-
 % an object's state meet action's precondition
 % it change to the postcondition
 % Pre is the current ground states(Sort is primitive)
-% Pre0 and Post0 are from an Operator or Method(
-% Sorts are all primitive
+% Pre0 and Post0 are from an Operator or Method
+% (Sorts are all primitive)
 state_change([],Pre0,Post0,[]):-!.
 state_change(Pre,[],[],Pre):-!.
 state_change([se(Sort,Obj,SPre)|Pre],Pre0,Post0,[se(Sort,Obj,STPost)|Post]):-
@@ -1904,7 +1904,7 @@ make_ss_to_se([se(Sort,Obj,Post)|TPost],[se(Sort,Obj,Post)|TPre]):-
 %*******************************************************
 % extract_solution(Node,..
 % recurvise routine to work down tree and
-% print out a linearisation of it
+% print out a linearisation of it )
 extract_solution(Node,PHPs,SIZE1,TNList) :-
        % its the name of a hierarchical op......
    getN_decomp(Node, HPs),
@@ -2723,7 +2723,7 @@ change_obj_list2(Sort):-
 change_atomic_inv:-
     findall(Atom1,(env_call(atomic_invariants(Atom)),change_atomic_inv1(Atom,Atom1)),Lists),
     flatten(Lists,List),
-    env_assert(atomic_invariantsC(List)))),!.
+    env_assert(atomic_invariantsC(List)),!.
 change_atomic_inv.
 
 change_atomic_inv1([],[]).
@@ -2759,7 +2759,7 @@ collect_dynamic_obj:-
 collect_dynamic_obj.
 
 get_preconditions_g([],Prev,Prev,Prev):-!.
-get_preconditions_g([sc(S,X,From =>To)|Rest],Prev,[se(S,X,From)|Pre],[se(S,X,To)|Post]):-
+get_preconditions_g([sc(S,X,(From =>To))|Rest],Prev,[se(S,X,From)|Pre],[se(S,X,To)|Post]):-
      !,
      get_preconditions_g(Rest,Prev, Pre,Post).
 
