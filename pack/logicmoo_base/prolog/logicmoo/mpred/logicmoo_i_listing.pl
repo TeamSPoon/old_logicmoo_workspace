@@ -365,8 +365,14 @@ pfc_listing_1(What):-
 
 :-thread_local(thlocal:tl_hide_data/1).
 
+
+
 hide_data(P):-thlocal:tl_hide_data(P),!.
-hide_data(source_meta).
+
+hide_data(pfcMark/4):- !,hide_data(source_meta).
+hide_data(saved_varname_info/3):- !,hide_data(source_meta).
+hide_data('$was_imported_kb_content$'/2):- !,hide_data(source_meta).
+
 hide_data(spft/3):- !,hide_data(triggers).
 hide_data(nt/3):- !,hide_data(triggers).
 hide_data(pt/2):- !, hide_data(triggers).
@@ -494,8 +500,6 @@ pp_i2tml_0(M:(H)):-M==user, pp_i2tml_0(H).
 pp_i2tml_0(is_edited_clause(H,B,A)):- pp_i2tml_0(proplst([(clause)=H,before=B,after=A])).
 pp_i2tml_0(is_disabled_clause(H)):- pp_i2tml_0((disabled)=H).
 
-pp_i2tml_0('$was_imported_kb_content$'(_,_)):- hide_data(source_meta),!.
-pp_i2tml_0(pfcMark(_,_,_,_)):- hide_data(source_meta),!.
 
 % pp_i2tml_0(FET):-fully_expand(assert,FET,NEWFET),FET\=@=NEWFET,!,pp_i2tml_0(NEWFET).
 
@@ -538,11 +542,70 @@ pp_i2tml_1(H):- \+ \+ pp_i2tml_now(H).
 pp_i2tml_now(C):- thlocal:pp_i2tml_hook(C),!.
 pp_i2tml_now(C):- if_html('<font size="3">~@</font>~n',if_defined(rok_portray_clause(C),portray_clause(C))).
 
+
+
+
+%  II = 56+TTT, rtrace((url_encode(II,EE),url_decode(EE,OO))),writeq(OO),OO=II.
+
+
+
+% url_decode(B,A):- \+ atom(B),!,term_to_atom(B,BB),!,url_encode(BB,O),!,A=O.
+url_decode(B,A):- \+ atom(B),A=B.
+url_decode(A,B):- atom_concat('#%24%28',_,A) , url_decode_term(A,T),!,T=B.
+url_decode(A,B):- url_iri(A,C),!,B=C.
+
+url_decode_term(A,T):- nb_current(A,T),nb_delete(A),!.
+url_decode_term(A,T):- url_iri(A,B),
+    read_term_from_atom(B,'#$'(T:Vs2),[variable_names(Vs3)]),
+    ignore(Vs2=Vs3),!, ignore(Vs2=[]),!.
+
+url_decode_term(A,T):-
+    url_iri(A,B),
+    read_term_from_atom(B,'#$'(T:Vs2),[variable_names(Vs3)]),
+    ignore(Vs2=[]),ignore(Vs2=Vs3),
+    merge_key_vals(Before,Vs2,Merge),
+    nb_current('$variable_names',Env),
+    merge_key_vals(Env,Merge,New),
+    b_setval('$variable_names',New),!.
+
+
+
+
+% x(Z+B)
+
+% II = 56+TTT, ((show_call((url_encode(II,EE),var_property(TTT,name(NNN)),url_decode(EE,OO))))),writeq(OO).
+
+url_encode(B,A):- \+ atom(B),!,term_variables(B,Vars),url_encode_term(B,Vars,O),O=A.
 url_encode(B,A):- atom_concat('\n',BT,B),!,url_encode(BT,A).
 url_encode(B,A):- atom_concat(BT,'\n',B),!,url_encode(BT,A).
 url_encode(B,A):- atom_concat(' ',BT,B),!,url_encode(BT,A).
 url_encode(B,A):- atom_concat(BT,' ',B),!,url_encode(BT,A).
 url_encode(B,A):- url_iri(A,B).
+
+name_the_var(Num,Vs,[],Vs,[]).
+
+name_the_var(Num,Vs,[VIn|More],VsOut,[N=V|Added]):- member_open(N=V,Vs),VIn==V,!,name_the_var(Num,Vs,More,VsOut,Added).
+% name_the_var(Num,Vs,[VIn|More],VsOut,[N=VIn|Added]):- \+ is_list(Vs), append(Vs,[N=VIn],NewVs),!, name_the_var(Num,NewVs,More,VsOut,Added).
+name_the_var(Num,Vs,[VIn|More],[N=VIn|VsOut],[N=VIn|Added]):- Num2 is Num +1, NV = '$VAR'(Num),
+  with_output_to(atom(N),write_term(NV,[portrayed(true),quoted,priority(9)])),
+  name_the_var(Num2,Vs,More,VsOut,Added).
+
+url_encode_term(B,[],A):- !, term_to_atom('#$'(B:[]),BB),!,url_iri(O,BB).
+
+url_encode_term(InTerm,VsIn,URL):- fail, with_output_to(atom(IRI),portray_clause('#$'((InTerm:_)))),
+  url_iri(URL,IRI),nb_linkval(URL,InTerm),!.
+
+url_encode_term(InTerm,VsIn,URL):-
+  nb_current('$variable_names',Prev),
+  name_the_var(40,Prev,VsIn,NewVs,Added),
+  % (NewVs\==Prev ->  show_call(b_setval('$variable_names',NewVs)) ; true),
+  with_output_to(atom(IRI),write_term('#$'(InTerm:Added),[quoted(true),variable_names(Added),quoted,priority(9)])),
+  url_iri(URL,IRI),!.
+
+%   b_setval(URL,InTerm).
+
+write_as_url_encoded(_Arg, D):- url_encode(D,U),!,writeq(U).
+:-format_predicate('u',write_as_url_encoded(_Arg,_Time)).
 
 term_to_pretty_string(H,HS):-atomic(H),!,with_output_to(atom(HS),writeq(H)).
 term_to_pretty_string(H,HS):-
@@ -566,6 +629,26 @@ indent_nl:- fresh_line, flag(indent,X,X), indent_nbsp(X).
 indent_nbsp(0,''):-!.
 indent_nbsp(1,'\n         '):-!.
 indent_nbsp(X,Chars):-XX is X -1,!, indent_nbsp(XX,OutP),!,sformat(Chars,'~w   ',[OutP]),!.
+
+
+
+tovl([],[],[]).
+tovl([K|KL],[V|VL],[K=V|KVL]) :- tovl(KL, VL, KVL).
+
+member_open(C, [B|A]) :-  (nonvar(B),B=C) ; (nonvar(A),member_open(C, A)).
+
+merge_key_vals(Prev,Pairs,NewSave):-var(Prev),!,NewSave=Pairs.
+merge_key_vals([],Pairs,NewSave):-!,NewSave=Pairs.
+merge_key_vals([K1=V1|Prev],Pairs,NewSave):-
+   member_open(K2=V2,Pairs),
+   V1==V2, merge_key_vals(Prev,Pairs,NewSave).
+merge_key_vals([K1=V1|Prev],Pairs,NewSave):-
+   member_open(K2=V2,Pairs),
+   K1==K2, V1=V2, merge_key_vals(Prev,Pairs,NewSave).
+merge_key_vals([K1=V1|Prev],Pairs,NewSave):-
+   merge_key_vals(Prev,[K1=V1|Pairs],NewSave).
+
+
 
 
 

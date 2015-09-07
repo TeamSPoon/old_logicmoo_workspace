@@ -174,19 +174,18 @@ get_nv(N,V,D):- nonvar(V),!,get_nv(N,VV,D),!,param_matches(V,VV).
 get_nv(N,V,D):-get_param(N,V)*->true;V=D.
 
 :-dynamic(http_last_request/1).
-get_http_current_request(B):- httpd_wrapper:http_current_request(B), !,
-   ignore((member(peer(ip(73,37,100,94)),B),retractall(http_last_request(_)),asserta(http_last_request(B)))).
+get_http_current_request(B):- httpd_wrapper:http_current_request(B), !,ignore((member(peer(ip(73,37,100,94)),B),retractall(http_last_request(_)),asserta(http_last_request(B)))).
 get_http_current_request(B):-http_last_request(B),!.
 
 
 get_param(N,V):-nonvar(N),!,get_param0(N,V),!.
-get_param(N,V):-current_form_var(N),get_param0(N,V).
+get_param(N,V):-current_form_var(N)*->get_param0(N,V)->true.
 
 replaced_value(call,edit,edit1term):-!.
 replaced_value(call,edit_term,edit1term):-!.
 replaced_value(_,X,X).
 
-get_param0(N,VO):-get_param1(N,V),replaced_value(N,V,VO).
+get_param0(N,O):-get_param1(N,V),replaced_value(N,V,VO),!,VO=O.
 
 get_param1(N,V):-get_param_from_req(N,V).
 get_param1(N,V):-atom(N),atom_concat('request_',UN,N),!,C=..[UN,V],get_http_current_request(B),member(C,B).
@@ -203,14 +202,15 @@ get_param_from_req(L,V):- (is_list(L)-> member(N,L) ; N=L),
   http_parameters:http_parameters(B,[CALL2])->
        V \== Foo,!.
 
-get_param_from_filename(N,V):- 
+get_param_from_filename(PN,VO):- url_encode(PN,N),
   get_param('_path_file',FILE),
   sformat(Sub,'_n_~w_v0_',[N]),!,
   sub_atom(FILE,B,L,_,Sub),
   Start is B + L,
   sub_atom(FILE,Start,_,0,AfterAtom),
   sub_atom(AfterAtom,NB,_,_,'_vZ_n_'),
-  sub_atom(AfterAtom,0,NB,_,V),!.
+  sub_atom(AfterAtom,0,NB,_,V),!,
+  url_decode(V,VO).
 
 % get_nv(L,V,V):- (is_list(L)-> member(N,L) ; N=L), http_save_in_session(N=V),!.
 
@@ -243,7 +243,7 @@ call_404(Call):-
    write_end_html.
 
 write_begin_html(B,BASE):-  
-      sformat(BASE,'~w~@',[B,get_request_vars('_n_~w_v0_~w_vZ',[search,session_data,call,term])),
+      sformat(BASE,'~w~@',[B,get_request_vars('_n_~w_v0_~w_vZ',[search,session_data,call,term])]),
       format('<html><head>',[]),            
       %get_http_current_request(Request), (member(request_uri(URI),Request)->format('<meta http-equiv="refresh" content="300;~w">',[URI]);true),
       ((BASE\='') ->format('<base href="~w" />',[BASE]);true),
@@ -423,7 +423,7 @@ format('
 		</tr>
   </form></table><hr>
   <iframe width="100%" height="80%" frameborder="0" scrolling="yes" marginheight="0" marginwidth="0" 
-   allowtransparency=true id="main" name="main" style="width:100%;height:100%" src="~w?call=search4term&term=~w"></iframe>'
+   allowtransparency=true id="main" name="main" style="width:100%;height:100%" src="search4term?call=search4term&term=~w"></iframe>'
   ,[show_select2(prover,prover_name,[]),
     String,
     action_menu_applied('action_above',"Item",""),
@@ -445,19 +445,20 @@ show_search_filters(BR):-
    forall(search_filter_name_comment(N,C,_),session_checkbox(N,C,BR)).
 
 parameter_names(List,N):-is_list(List),!,member(E,List),parameter_names(E,N).
+parameter_names(V,_):- var(V),!,fail.
 parameter_names(N=_,N):-!,atom(N).
 parameter_names(C,N):-compound(C),functor(C,N,1).
 
-current_form_var(N):-no_repeats(current_form_var0(N)).
+current_form_var(N):-no_repeats((current_form_var0(N))),atom(N),\+ arg(_,v(peer,idle,ip,session),N).
 current_form_var0(N):- param_default_value(N,_).
-current_form_var0(N):- get_http_current_request(B),http_parameters(B, Parameters),parameter_names(Parameters,N).
-current_form_var0(N):- get_http_in_session(B),http_current_session(B, Parameters),parameter_names(Parameters,N).
+current_form_var0(N):- get_http_current_request(B),member(search(Parameters),B),parameter_names(Parameters,N).
+current_form_var0(N):- http_current_session(_, Parameters),parameter_names(Parameters,N).
 
  
 param_default_value(N,D):-search_filter_name_comment(N,_,D).
-search_filter_name_comment(showMeta,'Meta/Book Keeping','ON').
-search_filter_name_comment(showSystem,'System Level','ON').
-search_filter_name_comment(hideTriggers,'Hide Triggers','ON').
+search_filter_name_comment(hideMeta,'Hide Meta/BookKeeping','OFF').
+search_filter_name_comment(showSystem,'Hide System','OFF').
+search_filter_name_comment(hideTriggers,'Hide Triggers','OFF').
 search_filter_name_comment(showAll,'Show All','OFF').
  
 
@@ -506,7 +507,7 @@ search4term:-
         get_nv(search,SObj,Term),
         cvt_param_to_term(SObj,Obj),
         write_begin_html('search4term',Base),
-        format('<form action="edit1term?call=edit1term~@" target="_parent">Apply ',[get_request_vars('&~w=~w',[search,session_data,call,showMeta,showSystem,hideTriggers,showAll,term])]),
+        format('<form action="edit1term?call=edit1term~@" target="_parent">Apply ',[get_request_vars('&~w=~w',[search,session_data,call,hideMeta,showSystem,hideTriggers,showAll,term])]),
         action_menu_applied('action_below',"Checked or Clicked","&nbsp;below&nbsp;"),
         format('&nbsp;&nbsp;&nbsp;search = <input type="text" name="search" value="~q"> ~@  <br/>Base = ~w <hr/><pre>',[Obj,show_search_filters('&nbsp;&nbsp;'),Base]),flush_output,
         with_assertions(thlocal:print_mode(html),
@@ -519,9 +520,11 @@ search4term:-
 :-thread_local(thlocal:tl_hide_data/1).
 
 
-
 with_search_filters(C):-
     session_checked(hideTriggers), \+ thlocal:tl_hide_data(triggers),!,
+    with_assertions(thlocal:tl_hide_data(triggers),with_search_filters(C)).
+with_search_filters(C):-
+    session_checked(hideMeta), \+ thlocal:tl_hide_data(source_meta),!,
     with_assertions(thlocal:tl_hide_data(triggers),with_search_filters(C)).
 with_search_filters(C):-C.
 
