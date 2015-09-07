@@ -292,7 +292,8 @@ svar(Var,Var):-var(Var),!.
 
 
 :-export(svar_fixvarname/2).
-svar_fixvarname(SVARIN,UP):- compound(SVARIN), SVARIN = '?'(SVAR),!, (atom(SVAR)->(ok_varname(SVAR),fix_varcase(SVAR,UP),must(ok_varname(UP)));UP=SVAR).
+svar_fixvarname(SVARIN,UP):- compound(SVARIN),!, SVARIN = '?'(SVAR),!,atom(SVAR), svar_fixvarname(SVAR,UP).
+svar_fixvarname(SVAR,UP):- \+ atom(SVAR),trace,UP=SVAR.
 svar_fixvarname(SVAR,UP):- atom(SVAR)->(ok_varname(SVAR),fix_varcase(SVAR,UP),must(ok_varname(UP)));UP=SVAR.
 
 fix_varcase(I,O):-fix_varcase0(I,M),atom_subst(M,'-','_',O).

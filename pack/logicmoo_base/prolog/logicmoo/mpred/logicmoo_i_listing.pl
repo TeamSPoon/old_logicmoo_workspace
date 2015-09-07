@@ -363,14 +363,16 @@ pfc_listing_1(What):-
    !.     
 
 
+:-thread_local(thlocal:tl_hide_data/1).
 
+hide_data(P):-thlocal:tl_hide_data(P),!.
 hide_data(source_meta).
-/*
-hide_data(spft/3).
-hide_data(pt/2).
-hide_data(nt/3).
-hide_data(bt/2).
-*/
+hide_data(spft/3):- !,hide_data(triggers).
+hide_data(nt/3):- !,hide_data(triggers).
+hide_data(pt/2):- !, hide_data(triggers).
+hide_data(bt/2):- !, hide_data(triggers).
+hide_data(_/_):-!,fail.
+hide_data(P):- compound(P),functor(P,F,A), (hide_data(F/A);hide_data(F)).
 
 hide_data((H:-
  cwc,
@@ -474,16 +476,19 @@ pp_i2tml(Done):-Done==done,!.
 pp_i2tml(T):-isVarProlog(T),getVarAtom(T,N),format('~w',[N]),!.
 pp_i2tml(T):-string(T),format('"~w"',[T]).
 pp_i2tml(clause(H,B,Ref)):- !, with_assertions(thlocal:current_clause_ref(Ref),pp_i2tml_v((H:-B))).
-pp_i2tml(HB):- find_ref(HB,Ref),!, with_assertions(thlocal:current_clause_ref(Ref),pp_i2tml_v((HB))).
-pp_i2tml(HB):- with_assertions(thlocal:current_clause_ref(none),pp_i2tml_v((HB))).
+pp_i2tml(HB):- find_ref(HB,Ref),!, must(with_assertions(thlocal:current_clause_ref(Ref),pp_i2tml_v((HB)))).
+pp_i2tml(HB):- with_assertions(thlocal:current_clause_ref(none),must(pp_i2tml_v((HB)))).
 
 
 pp_i2tml_v(HB):- \+ \+ ((get_clause_vars(HB),pp_i2tml_0(HB))),!.
 
-pp_i2tml_0((H :- B)):-B==true,!,pp_i2tml_0((H)),!.
+pp_i2tml_0(Var):-var(Var),!.
 pp_i2tml_0(USER:HB):-USER==user,!,pp_i2tml_0(HB),!.
+pp_i2tml_0((H :- B)):-B==true,!,pp_i2tml_0((H)),!.
 pp_i2tml_0(((USER:H) :- B)):-USER==user,!,pp_i2tml_0((H:-B)),!.
 pp_i2tml_0((H:-B)):-B==true, !, pp_i2tml_0(H).
+
+pp_i2tml_0(P):- hide_data(P),!.
 pp_i2tml_0(was_chain_rule(H)):- pp_i2tml_0(H).
 pp_i2tml_0(M:(H)):-M==user, pp_i2tml_0(H).
 pp_i2tml_0(is_edited_clause(H,B,A)):- pp_i2tml_0(proplst([(clause)=H,before=B,after=A])).
@@ -493,8 +498,6 @@ pp_i2tml_0('$was_imported_kb_content$'(_,_)):- hide_data(source_meta),!.
 pp_i2tml_0(pfcMark(_,_,_,_)):- hide_data(source_meta),!.
 
 % pp_i2tml_0(FET):-fully_expand(assert,FET,NEWFET),FET\=@=NEWFET,!,pp_i2tml_0(NEWFET).
-
-pp_i2tml_0(P):- (hide_data(P); (compound(P),functor(P,F,A),(hide_data(F/A);hide_data(F)))),!.
 
 pp_i2tml_0(spft(P,U,U)):- nonvar(U),!, pp_i2tml_1(P:-asserted_by(U)).
 pp_i2tml_0(spft(P,F,T)):- atom(F),atom(T),!, pp_i2tml_1(P:-asserted_in(F:T)).
@@ -550,7 +553,7 @@ term_to_pretty_string(H,HS):-
 fmtimg(N,Alt):- thlocal:print_mode(html),!,
  make_quotable(Alt,AltQ),
  url_encode(Alt,AltS),
- format('~N<a href="edit_term?term=~w" target="_parent"><img src="/pixmaps/~w.gif" alt="~w" title="~w"><a>',[AltS,N,AltQ,AltQ]).
+ format('~N<a href="?call=edit1term&term=~w" target="_parent"><img src="/pixmaps/~w.gif" alt="~w" title="~w"><a>',[AltS,N,AltQ,AltQ]).
 fmtimg(_,_).
 
 

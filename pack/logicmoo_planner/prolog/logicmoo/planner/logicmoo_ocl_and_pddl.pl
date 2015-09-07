@@ -124,6 +124,7 @@ first_n_elements(ListR,Num,List):-length(ListR,PosNum),min_sas(PosNum,Num,MinNum
 test_domain(DP):- thlocal:loading_files,!,must(load_domain(DP)).
 test_domain(DP):- test_domain(DP,12).
 
+test_domain(DP,Num):- \+ atom(DP),forall((filematch(DP,FOUND),exists_file(FOUND)),test_domain(FOUND,Num)),!.
 test_domain(DP,Num):- \+ exists_file(DP),!, forall(filematch(DP,MATCH),(exists_file(MATCH),test_domain(MATCH,Num))).
 test_domain(DP,Num):-
    format('~q.~n',[test_domain(DP)]),
@@ -133,6 +134,7 @@ test_domain(DP,Num):-
   solve_files(DP,TP)))).
 
 load_domain(string(DP)):-!,load_file(string(DP)).
+test_domain(DP):- \+ atom(DP),forall((filematch(DP,FOUND),exists_file(FOUND)),test_domain(FOUND)),!.
 load_domain(DP):- \+ exists_file(DP),!, forall(filematch(DP,MATCH),((exists_file(MATCH),load_domain(MATCH)))).
 load_domain(DP):-
    format('~q.~n',[load_domain(DP)]),
@@ -550,14 +552,14 @@ replc_vars(Term,NVars):-
 replc_vars2(Term,NVars):-      
      compound(Term),
      arg(N,Term,V),
-     once(var(V)->true;
-     once(svar_fixvarname(V,Name)->  
+     once((var(V)->true;
+     once((svar_fixvarname(V,Name)->  
         must_det_l((            
             arg(1,NVars,Vars),
             register_var(Name=NV,Vars,MVars),
             nb_setarg(N,Term,NV),
             nb_setarg(1,NVars,MVars)));
-        replc_vars2(V,NVars))),
+        replc_vars2(V,NVars))))),
      fail.
 */
 
@@ -2266,25 +2268,24 @@ mysame_key(_, L, [], L).
 
 :- debug,(must(test_blocks)).
 
-:- solve_files('benchmarks/mystery/domain.pddl','benchmarks/mystery/prob01.pddl').
-:- test_domain('benchmarks/driverlog/domain.pddl',4).
-:- solve_files('hsp-planners-master/hsp2-1.0/examples/parcprinter-strips/p01-domain-woac.pddl','hsp-planners-master/hsp2-1.0/examples/parcprinter-strips/p01-woac.pddl').
+:- prolog_load_context(directory,Dir),
+   must((absolute_file_name('../../../pddl/',Y,[relative_to(Dir),file_type(directory)]),
+   (( \+ user:file_search_path(pddl,Y)) ->asserta(user:file_search_path(pddl,Y));true))).
+
+
+
+
+:- solve_files(pddl('benchmarks/mystery/domain.pddl'),pddl('benchmarks/mystery/prob01.pddl')).
+:- test_domain(pddl('benchmarks/driverlog/domain.pddl'),4).
+:- solve_files(pddl('hsp2_1_0_pddl/parcprinter-strips/p01-domain-woac.pddl'),
+               pddl('hsp2_1_0_pddl/parcprinter-strips/p01-woac.pddl')).
 
 
 % :-doall(on_call_decl_hyhtn).
-:- if((fail,if_startup_script)).
 
-/*
+:- if(gethostname(c3po);gethostname(ubuntu);gethostname(titan)).
 
-
-
-%:- asserta(thlocal:loading_files).
-
-%:- test_ocl('domains_ocl/?*WashingMachine.ocl').
-*/
-
-
-:- test_domain('domains_ocl/chameleonWorld/domain*').
+:- test_domain(pddl('domains_ocl/chameleonWorld/domain*')).
 :- test_all(7).
 
 /*
@@ -2307,7 +2308,7 @@ mysame_key(_, L, [], L).
 
 
 
-:- if(gethostname(c3po);gethostname(titan)).
+:- if(gethostname(c3po);gethostname(ubuntu);gethostname(titan)).
 
 
 /*
