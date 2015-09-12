@@ -52,7 +52,7 @@ if_flag_true(Flag,Goal):- catch(Flag,E,(dmsg(E:Flag),fail)) -> must(Goal); true.
 join_path33(A,B,C):-exists_directory(B)->B=C;directory_file_path(A,B,C).
 
 :-swi_export(with_vars/2).
-:-module_transparent(with_vars/2). 
+:-module_transparent(with_vars/2).
 :- meta_predicate with_vars(*,0).
 with_vars([],Stuff):- !, Stuff.
 with_vars([V|Vs],Stuff):- !,
@@ -77,7 +77,7 @@ with_vars(_,Stuff):- Stuff.
 
 
 /*
-:- 
+:-
     source_location(File,_Line),
     file_directory_name(File, RunDir),
     atom_concat(RunDir,'/../library',RelDir),
@@ -119,8 +119,14 @@ win_fork(G,SERVIO,PID):-atom_concat('swipl-win.exe ',G,AC),writeq(win_fork(AC,SE
 */
 
 
-show_file_search_path:- % 'format'('% ~q.~n',[forall(user:file_search_path(_,_))]), 
-  forall(user:file_search_path(A,B),'format'('% ~q.~n',[user:file_search_path(A,B)])).
+:-getenv('PATH',PATH),writeq(PATH).
+
+% :-prolog.
+
+
+show_file_search_path:- % 'format'('% ~q.~n',[forall(user:file_search_path(_,_))]),
+  forall(must(user:file_search_path(A,B)),'format'('% ~q.~n',[user:file_search_path(A,B)])).
+
 
 :- show_file_search_path.
 

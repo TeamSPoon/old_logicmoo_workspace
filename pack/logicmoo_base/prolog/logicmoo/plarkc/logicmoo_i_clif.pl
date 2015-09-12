@@ -114,7 +114,7 @@ arity(pfclog,1).
 
 
 
-:- if(if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
+:- if( if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
 
 :- wdmsg(pfc_trace).
 
@@ -317,7 +317,8 @@ clif(if(human(P), (female(P) v male(P)))).
 
 
 
-parent(X,Y),parent(Y,Z) => grandparent(X,Z).
+parent(GRAND,PARENT),parent(PARENT,CHILD) => grandparent(GRAND,CHILD).
+
 grandparent(X,Y),male(X) <=> grandfather(X,Y).
 grandparent(X,Y),female(X) <=> grandmother(X,Y).
 mother(Ma,Kid),parent(Kid,GrandKid)
@@ -423,24 +424,32 @@ mother(trudy,pam).
 % therefore
 :-clif_must(human(douglas)).
 
-% :- pfc_why(human(douglas)),!.
-% Justifications for human(douglas):
-%  1.1 ancestor(eileen,douglas)
-%  1.2 human(eileen)
-%  1.3 human(_G97841)<=human(eileen),ancestor(eileen,_G97841),{vg(s(_G97841))}
-%  2.1 ancestor(trudy,douglas)
-%  2.2 human(trudy)
-%  2.3 human(_G97802)<=human(trudy),ancestor(trudy,_G97802),{vg(s(_G97802))}
-%  3.1 ancestor(trudy,douglas)
-%  3.2 human(trudy)
-%  3.3 human(douglas)<=human(trudy),ancestor(trudy,douglas),{vg(s(douglas))}
-%  4.1 ancestor(eileen,douglas)
-%  4.2 human(eileen)
-%  4.3 human(douglas)<=human(eileen),ancestor(eileen,douglas),{vg(s(douglas))}
+/*
 
+?- pfc_why(human(douglas)).
+
+Justifications for human(douglas):
+    1.1 ancestor(trudy,douglas)
+    1.2 human(trudy)
+    1.3 human(trudy),ancestor(trudy,douglas),{vg(s(douglas))}==>human(douglas)
+    2.1 ancestor(eileen,douglas)
+    2.2 human(eileen)
+    2.3 human(eileen),ancestor(eileen,douglas),{vg(s(douglas))}==>human(douglas)
+
+
+:- pfc_why(grandparent(trudy,douglas)).
+
+Justifications for grandparent(trudy,douglas):
+    1.1 grandmother(trudy,douglas)
+    1.2 grandmother(trudy,douglas),{vg(s(douglas,trudy))}==>grandparent(trudy,douglas)
+    2.1 parent(eileen,douglas)
+    2.2 parent(trudy,eileen)
+    2.3 parent(trudy,eilee.),parent(eileen,douglas),{vg(s(douglas,trudy))}==>grandparent(trudy,douglas)
+
+*/
 
 %:- wdmsg("press Ctrl-D to resume.").
-%:-prolog.
+
 
 :- style_check(-singleton).
 

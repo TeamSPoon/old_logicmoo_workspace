@@ -78,13 +78,13 @@ make_transparent(_CM,M,PI,F/A):-
 :- meta_predicate(( dynamic_multifile_exported(:), dynamic_multifile_exported(+,+,+,+))).
 :- module_transparent((dynamic_multifile_exported)/1).
 dynamic_multifile_exported( (M:F)/A ):- !,context_module(CM),
-'@'((dynamic_safe(M,F,A), 
+'@'((dynamic_safe(M,F,A),
    (static_predicate(M,F,A) -> true ; ((M:multifile(F/A),CM:multifile(F/A)))),
    % make_transparent(CM,M,PI,F/A),
    M:swi_export(F/A)),M). %,dmsg(dynamic_multifile_exported(CALL)).
 dynamic_multifile_exported( FA ):- with_pi(FA,(dynamic_multifile_exported)).
 dynamic_multifile_exported(CM, M, _PI, F/A):-
-'@'((dynamic_safe(M,F,A), 
+'@'((dynamic_safe(M,F,A),
    (static_predicate(M,F,A) -> true ; ((M:multifile(F/A),CM:multifile(F/A)))),
    % make_transparent(CM,M,PI,F/A),
    M:swi_export(F/A)),M). %,dmsg(dynamic_multifile_exported(CALL)).
@@ -243,7 +243,7 @@ pred_prop(M:F/A,'$iso'(M:F/A) ,(iso)).
 :-dynamic(mpred_impl/2).
 :-multifile(mpred_impl/2).
 
-%%  rebuild_pred_into(OMC,NMC,AssertZ,[+dynamic,-built_in,+volatile, etc]).
+%  rebuild_pred_into(OMC,NMC,AssertZ,[+dynamic,-built_in,+volatile, etc]).
 
 :-meta_predicate(rebuild_pred_into(0,1,?)).
 rebuild_pred_into(C,AssertZ,OtherTraits):-rebuild_pred_into(C,C,AssertZ,OtherTraits).
@@ -257,16 +257,16 @@ rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
   strip_module(OMC, OM, OC),
   strip_module(NMC, NM, NC),
    must_det_l((
-      '$set_source_module'(Before, OM),  
-      functor(NC,NF,A), functor(OC,OF,A), 
+      '$set_source_module'(Before, OM),
+      functor(NC,NF,A), functor(OC,OF,A),
       (show_call(predicate_property(OMC,number_of_clauses(_)))),
       must(show_call_failure(predicate_property(OMC,number_of_clauses(_)))),
       forall(predicate_property(OC,PP),asserta(pp_temp(NC,PP))),
       findall((OC:-B),((clause(OC,B),assertz(pp_clauses((OC:-B))))),List),
       '$set_source_module'(_, NM),
       forall(member(-PP,OtherTraits),retractall(pp_temp(NC,PP))),
-      forall(member(+PP,OtherTraits),asserta(pp_temp(NC,PP))),      
-      once(pp_temp(NC,(built_in))->(redefine_system_predicate(NF/A),unlock_predicate(NF/A));true),      
+      forall(member(+PP,OtherTraits),asserta(pp_temp(NC,PP))),
+      once(pp_temp(NC,(built_in))->(redefine_system_predicate(NF/A),unlock_predicate(NF/A));true),
       show_call(must(abolish(NF/A))),
       show_call(must(abolish(NF/A))),
       garbage_collect_clauses,
@@ -278,17 +278,17 @@ rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
       %ignore(logOnError(pp_temp(NC,(dynamic))->dynamic(NF/A);true)),
       %ignore(once(pp_temp(NC,(multifile))->multifile(NF/A);true)),
       must(((pp_temp(NC,file(File)),pp_temp(NC,line_count(_Line))))
-        -> 
+        ->
             must(('$compile_aux_clauses'(CC, File),retractall(CC)));
             must(dmsg(noFileFor(NC)))),
       forall(pred_prop(NM:NF/A,TODO,PP,ELSE),(pp_temp(NC,PP)->must(TODO);must(ELSE))),
       (pp_temp(NC,meta_predicate(NC))->meta_predicate(NC);true),
       dbgsubst(List,OF,NF,ListO),maplist(AssertZ,ListO),!,
-      
+
       retractall(mpred_impl(NMC,_)),
       asserta(mpred_impl(NMC,AssertZ)),
       '$set_source_module'(_, Before),
-      lsting(NMC),      
+      lsting(NMC),
       retractall(pp_temp(NC,_))
       )).
 
@@ -346,7 +346,7 @@ arg_is_transparent(Arg):- number(Arg).
 % make meta_predicate's module_transparent
 module_meta_predicates_are_transparent(_):-!.
 module_meta_predicates_are_transparent(ModuleName):-
-    forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)), 
+    forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),
       ignore(((predicate_property(ModuleName:P,(meta_predicate( P ))),
             not(predicate_property(ModuleName:P,(transparent))), (compound(P),arg(_,P,Arg),arg_is_transparent(Arg))),
                    (dmsg(todo(module_transparent(ModuleName:F/A))),
@@ -355,7 +355,7 @@ module_meta_predicates_are_transparent(ModuleName):-
 :- swi_export(all_module_predicates_are_transparent/1).
 % all_module_predicates_are_transparent(_):-!.
 all_module_predicates_are_transparent(ModuleName):-
-    forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)), 
+    forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),
       ignore((
             not(predicate_property(ModuleName:P,(transparent))),
                    ( dmsg(todo(module_transparent(ModuleName:F/A)))),
@@ -363,7 +363,7 @@ all_module_predicates_are_transparent(ModuleName):-
 
 quiet_all_module_predicates_are_transparent(_):-!.
 quiet_all_module_predicates_are_transparent(ModuleName):-
-    forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)), 
+    forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),
       ignore((
             not(predicate_property(ModuleName:P,(transparent))),
                    nop(dmsg(todo(module_transparent(ModuleName:F/A)))),

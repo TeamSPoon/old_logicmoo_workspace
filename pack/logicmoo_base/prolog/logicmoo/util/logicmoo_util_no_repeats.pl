@@ -9,11 +9,11 @@
 must_not_repeat(C):-call(C).
 
 % ===================================================
-% 
-% no_repeats(:Call) 
+%
+% no_repeats(:Call)
 %
 % Like call/1 but ony succeeds only unique variabes
-% 
+%
 % logicmoo_mud:  ?- no_repeats(member(X,[3,1,1,1,3,2])).
 % X = 3 ;
 % X = 1 ;
@@ -46,11 +46,11 @@ no_repeats_dif(Vs,Call):- dif(Vs,_), get_attr(Vs,dif,vardif(CONS,_)),!,
 */
 
 % ===================================================
-% 
-% no_repeats_old([+Vars,]:Call) 
-% 
+%
+% no_repeats_old([+Vars,]:Call)
+%
 % Like call/1 but ony succeeds on unique free variabes
-% 
+%
 % logicmoo_mud:  ?- no_repeats( X , member(X-Y,[3-2,1-4,1-5,2-1])).
 % X = 3, Y = 2 ;
 % X = 1, Y = 4 ;
@@ -63,28 +63,28 @@ no_repeats_old(Call):- no_repeats_old(Call,Call).
 :- swi_export(no_repeats_old/2).
 :- meta_predicate no_repeats_old(+,0).
 
-:-use_module(library(logicmoo/util/rec_lambda)).
+:-use_module(rec_lambda).
 
 memberchk_same(X, [Y0|Ys]) :- is_list(Ys),!,C=..[v,Y0|Ys],!, arg(_,C,Y), ( X =@= Y ->  (var(X) -> X==Y ; true)),!.
-memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),memberchk_same(X, Ys) )). 
+memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),memberchk_same(X, Ys) )).
 
 memberchk_pred(Pred, X, [Y0|Ys]) :- is_list(Ys),C=..[v,Y0|Ys],!, arg(_,C,Y), call(Pred,X,Y),!.
-memberchk_pred(Pred, X, [Y|Ys]) :- (   call(Pred,X,Y) -> true ;   (nonvar(Ys),memberchk_pred(Pred, X, Ys) )). 
+memberchk_pred(Pred, X, [Y|Ys]) :- (   call(Pred,X,Y) -> true ;   (nonvar(Ys),memberchk_pred(Pred, X, Ys) )).
 memberchk_pred_rev(Pred, X, [Y0|Ys]) :- is_list(Ys),C=..[v,Y0|Ys],!, arg(_,C,Y), call(Pred,Y,X),!.
-memberchk_pred_rev(Pred, X, [Y|Ys]) :- (   call(Pred,Y,X) -> true ;   (nonvar(Ys),memberchk_pred_rev(Pred,X, Ys) )). 
+memberchk_pred_rev(Pred, X, [Y|Ys]) :- (   call(Pred,Y,X) -> true ;   (nonvar(Ys),memberchk_pred_rev(Pred,X, Ys) )).
 
 
 no_repeats_old(Vs,Call):- CONS = [_], (Call), notrace(( \+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T], nb_setarg(2, CONS, [CVs|T]))).
 
-mcs_t2(A,B) :- call(lambda(X, [Y|Ys], (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),reenter_lambda(X, Ys) ))),A,B). 
-mcs_t(A,B) :- call(lambda(X, [Y|Ys], (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),reenter_lambda(X, Ys) ))),A,B). 
+mcs_t2(A,B) :- call(lambda(X, [Y|Ys], (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),reenter_lambda(X, Ys) ))),A,B).
+mcs_t(A,B) :- call(lambda(X, [Y|Ys], (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),reenter_lambda(X, Ys) ))),A,B).
 
 
-no_repeats_t(Vs,Call):- CONS = [_], (Call), 
+no_repeats_t(Vs,Call):- CONS = [_], (Call),
   (( \+ call(lambda(X, [Y|Ys], (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),reenter_lambda(X, Ys) ))),Vs,CONS),
        copy_term(Vs,CVs), CONS=[_|T], nb_linkarg(2, CONS, [CVs|T]))).
 
-% 
+%
 
 :- swi_export(no_repeats_u/2).
 :- meta_predicate no_repeats_u(+,0).
@@ -116,11 +116,11 @@ subtract_eq([A|B], C, [A|D]) :-
 % Cehcked via ?- was(AVar,Foo), get_attrs(AVar,ATTRS1), get_attrs(AVar,ATTRS2), ATTRS1==ATTRS2.
 %
 %  So the variable binding gerts rejected several frames below your code? ( are we nipping away futile bindings?)
-% 
+%
 % however ..
 %     does that mess with anything in code that we are calling?
 %  Could some peice of code been required to see some binding to make a side effect come about?
-%  
+%
 % logicmoo_mud:  ?- no_repeats_av(member(X,[3,1,1,1,3,2])).
 % X = 3 ;
 % X = 1 ;
@@ -171,19 +171,19 @@ succeeds_n_times(Goal, Times) :-
 
 :- swi_export(no_repeats_findall5/5).
 :- meta_predicate no_repeats_findall5(+,0,-,-,-).
-no_repeats_findall5(Vs,Call,ExitDET,USE,NEW):- 
+no_repeats_findall5(Vs,Call,ExitDET,USE,NEW):-
    (((HOLDER = fa([]),
    Call,arg(1,HOLDER,CONS),
    ((
-   ((\+ memberchk_same(Vs,CONS), 
-   copy_term(Vs,CVs), 
+   ((\+ memberchk_same(Vs,CONS),
+   copy_term(Vs,CVs),
    append(CONS,[CVs],NEW),
     nb_setarg(1, HOLDER, NEW)))
       ->
        USE=true;
        ((USE=false,CONS=NEW))
        )),
-   deterministic(ExitDET))) 
+   deterministic(ExitDET)))
     *-> true;
      (NEW=[],ExitDET=true,USE=false)).
 
@@ -192,21 +192,21 @@ no_repeats_findall5(Vs,Call,ExitDET,USE,NEW):-
 no_repeats_save(Vs,Call,Saved,USE):-
  SavedHolder = saved(_),
   no_repeats_findall5(Vs,Call,ExitDET,USE,NEW),
-  ( ExitDET==true -> (nb_linkarg(1,SavedHolder,NEW),!) ; true),  
+  ( ExitDET==true -> (nb_linkarg(1,SavedHolder,NEW),!) ; true),
   arg(1,SavedHolder,Saved).
 
 :- swi_export(no_repeats_save/2).
 :- meta_predicate no_repeats_save(+,0).
-no_repeats_save(Vs,Call):-  
+no_repeats_save(Vs,Call):-
   call_cleanup(
    (( no_repeats_save(Vs,Call,SavedList,USE),
-      (USE==true -> true ; fail))), 
+      (USE==true -> true ; fail))),
    (is_list(SavedList) -> writeln(saving(SavedList)) ; writeln(givingup_on(Call)))).
-  
+
 
 :- swi_export(no_repeats_findall_r/5).
 :- meta_predicate no_repeats_findall_r(+,0,-,-,-).
-no_repeats_findall_r(Vs,Call,CONS,ExitDET,List):- 
+no_repeats_findall_r(Vs,Call,CONS,ExitDET,List):-
    CONS = [ExitDET],
    (Call,once((\+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T],List=[CVs|T], nb_linkarg(2, CONS, List)))),
    deterministic(ExitDET).

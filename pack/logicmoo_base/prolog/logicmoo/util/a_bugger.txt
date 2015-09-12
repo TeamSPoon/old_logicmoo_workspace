@@ -1951,23 +1951,23 @@ bugger_name_variables([Var|Vars]):-
    bugger_name_variables(Vars).
 
 
-numbervars_impl(Term,Start,List):- integer(Start),!,numbervars_impl(Term,'$VAR',Start,List).
-numbervars_impl(Term,Functor,Start):- integer(Start),atom(Functor),!,numbervars_impl(Term,Functor,Start,_End).
-numbervars_impl(Term,Functor,List):- is_list(List),atom(Functor),!, term_variables(Term,Vars),bugger_name_variables(Vars),!,must(( numbervars(Term,0,_End,[functor_name(Functor)|List]))).
+snumbervars(Term,Start,List):- integer(Start),!,snumbervars(Term,'$VAR',Start,List).
+snumbervars(Term,Functor,Start):- integer(Start),atom(Functor),!,snumbervars(Term,Functor,Start,_End).
+snumbervars(Term,Functor,List):- is_list(List),atom(Functor),!, term_variables(Term,Vars),bugger_name_variables(Vars),!,must(( numbervars(Term,0,_End,[functor_name(Functor)|List]))).
 
-numbervars_impl(Term,Start,End,List):-number(Start),is_list(List),!,must(( numbervars(Term,Start,End,List) )).
-numbervars_impl(Term,Functor,Start,List):- sanity(number(Start)),trace,is_list(List),!,must(( numbervars(Term,Start,_End,[functor_name(Functor)|List]))).
-numbervars_impl(Term,Functor,Start,End):- sanity((must(var(End);number(End)),numbervars(Term,Start,End,[attvar(skip),functor_name(Functor),singletons(true)]))).
+snumbervars(Term,Start,End,List):-number(Start),is_list(List),!,must(( numbervars(Term,Start,End,List) )).
+snumbervars(Term,Functor,Start,List):- sanity(number(Start)),trace,is_list(List),!,must(( numbervars(Term,Start,_End,[functor_name(Functor)|List]))).
+snumbervars(Term,Functor,Start,End):- sanity((must(var(End);number(End)),numbervars(Term,Start,End,[attvar(skip),functor_name(Functor),singletons(true)]))).
 
-numbervars_impl(Term,Functor,Start,End,List):-must(( must(var(End);number(End)),numbervars(Term,Start,End,[functor_name(Functor)|List]))).
+snumbervars(Term,Functor,Start,End,List):-must(( must(var(End);number(End)),numbervars(Term,Start,End,[functor_name(Functor)|List]))).
 
 
 :- export(snumbervars/3).
-snumbervars(Term,Start,End):- integer(Start),!,numbervars_impl(Term,'$VAR',Start,End).
+snumbervars(Term,Start,End):- integer(Start),!,snumbervars(Term,'$VAR',Start,End).
 :- export(snumbervars/4).
-snumbervars(Term,Functor,Start,List):-numbervars_impl(Term,Functor,Start,List).
+snumbervars(Term,Functor,Start,List):-snumbervars(Term,Functor,Start,List).
 :- export(snumbervars/1).
-snumbervars(Term):-numbervars_impl(Term,0,_).
+snumbervars(Term):-snumbervars(Term,0,_).
 
 % ===================================================================
 % Bugger Term Expansions

@@ -10,10 +10,18 @@
 :- use_module(library(http/http_server_files)).
 
 
-:- volatile(user:session_data/2).
+:- multifile(http_session:session_data/2).
+:- multifile(system:'$loading_file'/3).
+:- multifile(http_log:log_stream/2).
+:- multifile(http_session:urandom_handle/1).
+
+:- volatile(http_session:session_data/2).
 :- volatile(system:'$loading_file'/3).
 :- volatile(http_log:log_stream/2).
 :- volatile(http_session:urandom_handle/1).
+
+hmust(G):-G.
+hmust_l(G):-G.
 
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
@@ -47,7 +55,11 @@
 :- use_module(library(error)).
 :- use_module(library(apply)).
 :- use_module(library(debug)).
+
+:- if(exists_source(library(unix))).
 :- use_module(library(unix)).
+:- endif.
+
 :- user:use_module(library(rdf_ntriples),[rdf_ntriple_part/4]).
 :- user:use_module(library(tty),[menu/3]).
 :- user:use_module(library(solution_sequences),[distinct/1]).
@@ -108,7 +120,6 @@
 :- portray_text(false).  % Enable portray of strings
 :- use_module(library(http/http_parameters)).
 
-% :- use_module(library(http/http_session)).
 %:- thread_property(_,alias('http@3020'))->true; http_server(http_dispatch, [port(3020)]).
 
 :- http_handler('/logicmoo/', handler_logicmoo_cyclone, [chunked,prefix]). %  % 
@@ -143,24 +154,48 @@ make_quotable(String,SObj):-format(string(SUnq),'~q',[String]),make_quotable_0(S
 % 
 % <link rel="SHORTCUT ICON" href="/pixmaps/mini-logo.gif"><meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
 
-handler_logicmoo_cyclone( Request):-   
-   catch(mmake,_,true), 
-   notrace(call(handler_logicmoo_cyclone_1,Request)).
+% :- use_module(library(gui_tracer)).
+% :- guitracer.
+% :- set_yes_debug.
 
-http_save_in_session(NV):- \+ compound(NV),!.
-http_save_in_session(NV):-is_list(NV),!,maplist(http_save_in_session,NV).
-http_save_in_session(NV):-NV=..[_,V],is_list(V),http_save_in_session(V),fail.
-http_save_in_session(NV):-NV=..[N,V],!,http_save_in_session(N=V).
-http_save_in_session(Unsaved=_):- member(Unsaved,[path_info,protocol,peer]),!.
-http_save_in_session(N=V):- NV=..[N,V],!, maybe_http_set_session(NV).
-http_save_in_session(NV):-  maybe_http_set_session(NV).
+:-export(save_in_session/1).
+save_in_session(NV):- \+ compound(NV),!.
+save_in_session(NV):-is_list(NV),!,must_maplist(save_in_session,NV),!.
+save_in_session(search([X=Y|R])):-nonvar(Y),is_list([X=Y|R]),once(save_in_session([X=Y|R])),!.
+save_in_session(NV):-NV=..[N,V],!,hmust(save_in_session(N,V)),!.
+save_in_session(N=V):- hmust(save_in_session(N,V)),!.
+save_in_session(NV):- dmsg(not_save_in_session(NV)),!.
 
-maybe_http_set_session(NV):-functor(NV,N,1),functor(NVR,N,1),get_http_in_session(S),
-   retractall(session_data(S,NVR)),
-   catch(http_session:http_set_session(NV),_,asserta(session_data(S,NV))).
+:-export(save_in_session/2).
+save_in_session(Unsaved,_):- member(Unsaved,[session_data,request_uri,search,pool,input,session]),!.
+save_in_session(_,V):- sub_term(Sub,V),nonvar(Sub),is_stream(Sub),!.
+save_in_session(N,V):- get_http_session(S), save_in_session(S, N,V),!.
 
-get_http_in_session(S):-show_call(http_in_session(S)),!.
-get_http_in_session(S):-get_http_current_request(R),member(session(S),R).
+% save_in_session(S,N,V):- \+ param_default_value(N,_),!.
+save_in_session(S,N,V):- atom(N), NV=..[N,V],functor(NVR,N,1),
+   retractall(http_session:session_data(S,NVR)),
+   asserta(http_session:session_data(S,NV)),!.
+save_in_session(S,N,V):- dmsg(not_save_in_session(S,N,V)),!.
+
+
+show_http_session:-hmust(get_http_session(S)),listing(http_session:session_data(S,_NV)).
+  
+
+make_session(S):- ignore((is_cgi_stream,http_session:http_open_session(S,[renew(false)]))),!.
+
+:-export(get_http_session/1).
+get_http_session(S):- catch(get_http_session0(S),_,fail),nonvar(S),!, make_session(S).
+get_http_session(main).
+
+logOnErrorFail(G):- catch(G,E,(dmsg(E:G),fail)).
+
+:-export(get_http_session0/1).
+get_http_session0(S):- logOnErrorFail((http_session:http_in_session(S))),!.
+get_http_session0(S):- logOnErrorFail((is_cgi_stream,http_session:http_open_session(S,[renew(false)]))),!.
+get_http_session0(S):- logOnErrorFail((get_http_current_request(R),member(session(S),R))),!.
+get_http_session0(S):- logOnErrorFail((get_http_current_request(R),member(cookie([swipl_session=S]),R))),!.
+
+is_cgi_stream:-current_output(X),http_stream:is_cgi_stream(X).
 
 reset_assertion_display:-
    flag(matched_assertions,_,0),
@@ -168,93 +203,125 @@ reset_assertion_display:-
    retractall(shown_subtype(_)),
    retractall(shown_clause(_)).
 
-get_nv(N,V):- get_nv(N,V,DDD), (V==DDD->must(param_default_value(N,V));true).
+get_param_sess(N,V):- must(param_default_value(N,D)),get_param_sess(N,V,D).
 
-get_nv(N,V,D):- nonvar(V),!,get_nv(N,VV,D),!,param_matches(V,VV).
-get_nv(N,V,D):-get_param(N,V)*->true;V=D.
 
 :-dynamic(http_last_request/1).
-get_http_current_request(B):- httpd_wrapper:http_current_request(B), !,ignore((member(peer(ip(73,37,100,94)),B),retractall(http_last_request(_)),asserta(http_last_request(B)))).
-get_http_current_request(B):-http_last_request(B),!.
+get_http_current_request(B):- http_request:http_current_request(B), !,ignore((retractall(http_last_request(_)),asserta(http_last_request(B)))).
+get_http_current_request(B):- http_last_request(B),!.
+get_http_current_request([]).
 
+get_param_sess(N,V,D):- nonvar(V),!,get_param_sess(N,VV,D),!,param_matches(V,VV).
+get_param_sess(L,V,D):-get_nv_session(L,V,D).
 
-get_param(N,V):-nonvar(N),!,get_param0(N,V),!.
-get_param(N,V):-current_form_var(N)*->get_param0(N,V)->true.
-
-replaced_value(call,edit,edit1term):-!.
-replaced_value(call,edit_term,edit1term):-!.
-replaced_value(_,X,X).
-
-get_param0(N,O):-get_param1(N,V),replaced_value(N,V,VO),!,VO=O.
-
-get_param1(N,V):-get_param_from_req(N,V).
-get_param1(N,V):-atom(N),atom_concat('request_',UN,N),!,C=..[UN,V],get_http_current_request(B),member(C,B).
-get_param1('_path_file',FILE):-!, get_http_current_request(B), member(path(PATH),B),directory_file_path(_,FILE,PATH),!.
-get_param1(N,V):-get_param_from_filename(N,V),!.
-%get_param1(N,V):-atom(N),C=..[N,V],get_http_current_request(B),member(C,B),!.
-get_param1(N,V):-atom(N),atom_concat('_',UN,N),C=..[UN,V],get_http_current_request(B),member(C,B),!.
-get_param1(call,V):-get_param0('_path_file',FILE),sub_atom(FILE,N,_,_,'_'),sub_atom(FILE,0,N,_,V),!.
-
-
-get_param_from_req(L,V):- (is_list(L)-> member(N,L) ; N=L),
+get_param_req(L,V):- (is_list(L)-> member(N,L) ; N=L),
      CALL2 =.. [N,V,[optional(true),default(Foo)]],
   get_http_current_request(B),
-  http_parameters:http_parameters(B,[CALL2])->
+   http_parameters:http_parameters(B,[CALL2])->
        V \== Foo,!.
 
-get_param_from_filename(PN,VO):- url_encode(PN,N),
-  get_param('_path_file',FILE),
-  sformat(Sub,'_n_~w_v0_',[N]),!,
-  sub_atom(FILE,B,L,_,Sub),
-  Start is B + L,
-  sub_atom(FILE,Start,_,0,AfterAtom),
-  sub_atom(AfterAtom,NB,_,_,'_vZ_n_'),
-  sub_atom(AfterAtom,0,NB,_,V),!,
-  url_decode(V,VO).
-
-% get_nv(L,V,V):- (is_list(L)-> member(N,L) ; N=L), http_save_in_session(N=V),!.
+% get_param_sess(L,V,V):- (is_list(L)-> member(N,L) ; N=L), save_in_session(N=V),!.
 
 get_nv_session(L,V,_):- (is_list(L)-> member(N,L) ; N=L),
-     CALL2 =.. [N,V], (http_open_session(F,[renew(false)]),http_session:session_data(F, CALL2)),!.
+     CALL2 =.. [N,V], (get_http_session(F),http_session:session_data(F, CALL2)),!.
 get_nv_session(_,V,V):-!.
 
 
 save_request_in_session(Request):- 
-      http_open_session(F,[renew(false)]),
-        (member(method(post), Request) -> (http_read_data(Request, Data, []),http_save_in_session(Data));true),
-        http_save_in_session(Request),
-        http_session:http_session_id(F),forall(http_session:session_data(F,D),wdmsg(D)).
+        (member(method(post), Request) -> (http_read_data(Request, Data, []),save_in_session(Data));true),
+        save_in_session(Request).
+        % http_session:http_session_id(F),forall(http_session:session_data(F,D),wdmsg(D)).
 
 
+
+handler_logicmoo_cyclone(_Request):- mmake, is_goog_bot,!,
+  format('Content-type: text/html~n~n',[]),
+  format('<!DOCTYPE html><html><head></head><body></body></html>~n~n',[]),flush_output,!.
+
+handler_logicmoo_cyclone( Request):-    
+   notrace(call(handler_logicmoo_cyclone_1,Request)),!.
 
 handler_logicmoo_cyclone_1(Request):- 
  must_det_l((
-   save_request_in_session(Request),
-   format('Content-type: text/html~n~n',[]),!,
-   member(path(PATH),Request),directory_file_path(_,FCALL,PATH),
-   (current_predicate(FCALL/0)->get_nv(call,Call,FCALL);get_nv(call,Call,edit1term)),
-   (current_predicate(_,Call) -> must(Call) ; must(call_404(Call))))),!.
+   must(save_request_in_session(Request)),
+   format('Content-type: text/html~n~n',[]),
+   format('<!DOCTYPE html>',[]),
+   flush_output,
+    % member(request_uri(URI),Request),
+    member(path(PATH),Request),
+    directory_file_path(_,FCALL,PATH),
+   once(get_param_req(call,Call);(current_predicate(FCALL/0),Call=FCALL);get_param_sess(call,Call,edit1term)),
+   notrace(logOnError(Call)),!,flush_output)),!.
+   
 
-call_404(Call):-
-   write_begin_html('edit1term',Base),
-   format('<pre>'),
-   writeq(call_404(Call:Base)),
-   format('</pre>'),
-   write_end_html.
 
-write_begin_html(B,BASE):-  
-      sformat(BASE,'~w~@',[B,get_request_vars('_n_~w_v0_~w_vZ',[search,session_data,call,term])]),
-      format('<html><head>',[]),            
-      %get_http_current_request(Request), (member(request_uri(URI),Request)->format('<meta http-equiv="refresh" content="300;~w">',[URI]);true),
-      ((BASE\='') ->format('<base href="~w" />',[BASE]);true),
+write_begin_html(B,BASE,URI):-  
+  hmust_l((
+      % sformat(BASE,'~w~@',[B,get_request_vars('_n_~w_v0_~w_vZ')]),
+      BASE = B,
+      format('<html><head><style type="text/css">input[type="checkbox"] {width:10px; height:10px; }</style>',[]),            
+      hmust((get_http_current_request(Request))),
+      hmust_l(member(request_uri(URI),Request)->true;URI=''),
+      % ((URI\==''->format('<meta http-equiv="refresh" content="300;~w">',[URI]);true)),
+      % hmust_l((BASE\='' -> format('<base href="~w" target="_parent"/>',[BASE]);true)),
       ignore(URI=''),
       ignore(BASE=''),
+     format('<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>',[]),
      format('<title>~w for ~w</title></head>',[BASE,URI]),
-     format('<body class="yui-skin-sam">',[]),flush_output,!.
+     format('<body class="yui-skin-sam">',[]),flush_output)),!.
    
 
 write_end_html:- flush_output,format('</body></html>~n~n',[]),flush_output,!.
 
+% logicmoo_html_needs_debug
+
+add_form_script:-format("
+<script type=\"text/javascript\">
+$('form').submit(function() {
+  $(this).find('input[type=checkbox]').each(function (i, el) {
+    if(!el.checked) {
+      var hidden_el = $(el).clone();
+      hidden_el[0].checked = true;
+      hidden_el[0].value = '0';
+      hidden_el[0].type = 'hidden';
+      hidden_el.insertAfter($(el));
+    }    
+  })
+ // alert($(this));
+});
+
+
+function callback(e) {
+    var e = window.e || e;
+
+    var targ = e.target;
+    if (targ.tagName !== 'A')
+        return;
+    if(!handled) {
+      handled[targ] = true;
+      e.preventDefault();
+      e.stopPropagation();
+      $('form').action = targ.href;
+      document.getElementById('find').value = targ.innerText;
+     // alert('hi ' +  targ.innerText);
+      $('form').submit();
+    } else {
+      handled = false;           
+    }
+}
+
+if (document.addEventListener)
+    document.addEventListener('click', callback, false);
+else
+    document.attachEvent('onclick', callback);
+
+var handled = false;
+
+
+
+</script>
+"
+).
 
 
 show_pcall_footer:-
@@ -296,8 +363,16 @@ human_language('SpanishLanguage').
 human_language('ThaiLanguage').
 human_language('de').
 
+
+param_default_value(call,edit1term).
+
+param_default_value(N,V):-
+  member(N=V,['prover'='proverPTTP','apply'='find','term'='',action_below=query,'action_above'='query','context'='BaseKB','flang'='CLIF','find'='tHumanHead','xref'='Overlap','POS'='N','humanLang'='EnglishLanguage','olang'='CLIF','sExprs'='1','webDebug'='1','displayStart'='0','displayMax'='100000']).
+
+param_default_value(request_uri,'/logicmoo/').
 param_default_value(logic_lang_name,'CLIF').
-param_default_value(search,'tHumanHead').
+param_default_value(olang,'CLIF').
+param_default_value(find,'tHumanHead').
 logic_lang_name('CLIF',"Common Logic (CLIF)").
 logic_lang_name('CycL',"CycL").
 logic_lang_name('Prolog',"Prolog").
@@ -322,10 +397,11 @@ param_matches(A,B):-A=B,!.
 param_matches(VV,V):-atomic(VV),atomic(V),string_to_atom(VV,VVA),string_to_atom(V,VA),downcase_atom(VVA,VD),downcase_atom(VA,VD).
 param_matches(A,B):-A=B,!.
 
-show_select2(Name,Pred,Options):-  
+show_select2(Name,Pred,Options):-
+  
     Call=..[Pred,ID,Value],
-    once(must(param_default_value(Name,D);param_default_value(Pred,D))),
-    get_nv(Name,UValue,D),
+    must(param_default_value(Name,D);param_default_value(Pred,D)),!,
+    get_param_sess(Name,UValue,D),
     format('<select name="~w">',[Name]),
     forall(Call,
        (((member(atom_subst(Item,ItemName),Options) -> atom_subst(Value,Item,ItemName,NValue); NValue=Value),
@@ -336,10 +412,10 @@ show_select2(Name,Pred,Options):-
 
 show_select1(Name,Pred):-
  Call=..[Pred,Value],
- must(once(param_default_value(Name,D);param_default_value(Pred,D))),
+ (param_default_value(Name,D);param_default_value(Pred,D)),!,
  format('<select name="~w">',[Name]),
  forall(Call,
-    (get_nv(Name,Value,D)->format('<option value="~w" selected="yes">~w</option>',[Value,Value]);
+    (get_param_sess(Name,Value,D)->format('<option value="~w" selected="yes">~w</option>',[Value,Value]);
                 format('<option value="~w">~w</option>',[Value,Value]))),
  format('</select>',[]),!.
 
@@ -349,23 +425,20 @@ show_select1(Name,Pred):-
 edit1term:-
  must_det_l((
    reset_assertion_display,
-   get_nv(term,String,""),
-   ignore(get_nv(search,Word,String)),
-   % ignore(get_nv_session(search,Word,String)),
+   get_param_sess(term,String,""),
+   get_param_sess(find,Word,String),
    term_to_pretty_string(Word,SWord),
-   show_call(show_edit1term(String,SWord)))).
+   show_call(show_edit_term(String,SWord)))).
 
-show_edit1term(String,_SWord):-read_term_from_atom(String,T,[]),compound(T),T=(H:-_),!,show_edit1term_0(String,H).
-show_edit1term(String,SWord):-show_edit1term_0(String,SWord).
+show_edit_term(String,SWord):- samef(SWord,String),cvt_param_to_term(String,T),compound(T),T=(H:-_),!,show_edit_term0(String,H).
+show_edit_term(String,SWord):-show_edit_term0(String,SWord).
 
-show_edit1term_0(String,SWord):-atom(SWord),read_term_from_atom(SWord,T,[]),nonvar(T),!,show_edit1term_1(String,T).
-show_edit1term_0(String,SWord):-show_edit1term_1(String,SWord).
+show_edit_term0(String,SWord):-atomic(SWord),cvt_param_to_term(SWord,T),nonvar(T),!,show_edit_term1(String,T).
+show_edit_term0(String,SWord):-show_edit_term1(String,SWord).
 
-show_edit1term_1(String,(P=>Q)):-show_edit1term_1(String,(P;Q;(P=>Q))).
-show_edit1term_1(String,SWord):-
-  write_begin_html('edit1term',Base),
-    get_http_current_request(Request),
-    member(request_uri(URL),Request),
+show_edit_term1(String,(P=>Q)):-!,show_edit_term1(String,(P;Q;(P=>Q))).
+show_edit_term1(String,SWord):-
+ write_begin_html('edit1term',_BASE,URL),
 format('
 <table width="1111" cellspacing="0" cellpadding="0" height="121" id="table4">
  <!-- MSTableType="nolayout" -->
@@ -395,7 +468,7 @@ format('
             </tr>
             <tr>
                   <td align="right" width="99"><b>Search:&nbsp;</b></td>
-                  <td align="left" valign="top" width="276"><input type="text" size="27" name="search" value="~w">&nbsp;<input type="submit" value="Overlap" name="xref">&nbsp;</td>
+                  <td align="left" valign="top" width="276"><input type="text" size="27" name="find" value="~w">&nbsp;<input type="submit" value="Overlap" name="xref">&nbsp;</td>
                   <td align="left" valign="top" width="144">~@&nbsp;<input type="submit" value="NatLg" name="ShowEnglish"></td>
                   <td align="left" valign="top" height="26" width="139">~@</td>
              </tr>
@@ -407,23 +480,17 @@ format('
           <b>[&nbsp;<a href="/">Home</a>&nbsp;|&nbsp;              
           <a href="~w&Graph=true">Grap2h</a>]</b></span><p>
           <b>Response&nbsp;Language&nbsp;<br></b>~@<p>
-                        <input type="checkbox" name="sExprs" value="ON" checked>S-Exprs&nbsp;
-                        <input type="checkbox" name="webDebug" value="ON" checked>Debugging
+                        <input type="checkbox" name="sExprs" value="1" checked>S-Exprs&nbsp;
+                        <input type="checkbox" name="webDebug" value="1" checked>Debugging
                         </td>
-          <td height="121" rowspan="2" width="188">
-          Display Start<br>
-&nbsp;<input type="text" size="13" name="displayStart" value="~w"><br>
-			Display Max <a href="~w&Next=true">Next</a><br>
-&nbsp;<input type="text" size="13" name="displayMax" value="~w"><br>
-			~@</td>
-                        
+          <td height="121" rowspan="2" width="188"></td>
       </tr>
 		<tr>
 			<td width="4">&nbsp;</td>
 		</tr>
   </form></table><hr>
-  <iframe width="100%" height="80%" frameborder="0" scrolling="yes" marginheight="0" marginwidth="0" 
-   allowtransparency=true id="main" name="main" style="width:100%;height:100%" src="search4term?call=search4term&term=~w"></iframe>'
+  <iframe width="100%" height="800" frameborder="0" scrolling="yes" marginheight="0" marginwidth="0" 
+   allowtransparency=true id="main" name="main" style="width:100%;height:800" src="search4term?find=~w"></iframe>'
   ,[show_select2(prover,prover_name,[]),
     String,
     action_menu_applied('action_above',"Item",""),
@@ -434,12 +501,10 @@ format('
     show_select1('humanLang',human_language),
     URL,
     show_select2(olang,logic_lang_name,[]),
-    0,URL,100000,
-    show_search_filters('<br>'),
-    URL,Base,SWord]),!,
-   write_end_html,
-   dmsg(search=SWord).
+    SWord]),!,
+   dmsg(find=SWord).
 
+show_search_filtersTop(BR):- write(BR).
 
 show_search_filters(BR):- 
    forall(search_filter_name_comment(N,C,_),session_checkbox(N,C,BR)).
@@ -451,27 +516,35 @@ parameter_names(C,N):-compound(C),functor(C,N,1).
 
 current_form_var(N):-no_repeats((current_form_var0(N))),atom(N),\+ arg(_,v(peer,idle,ip,session),N).
 current_form_var0(N):- param_default_value(N,_).
-current_form_var0(N):- get_http_current_request(B),member(search(Parameters),B),parameter_names(Parameters,N).
-current_form_var0(N):- http_current_session(_, Parameters),parameter_names(Parameters,N).
+%current_form_var0(N):- get_http_current_request(B),member(search(Parameters),B),parameter_names(Parameters,N).
+%current_form_var0(N):- http_current_session(_, Parameters),parameter_names(Parameters,N).
 
+is_goog_bot:- get_http_current_request(B),member(user_agent(UA),B),!,atom_contains(UA,'Googlebot').
  
 param_default_value(N,D):-search_filter_name_comment(N,_,D).
-search_filter_name_comment(hideMeta,'Hide Meta/BookKeeping','OFF').
-search_filter_name_comment(showSystem,'Hide System','OFF').
-search_filter_name_comment(hideTriggers,'Hide Triggers','OFF').
-search_filter_name_comment(showAll,'Show All','OFF').
- 
+search_filter_name_comment(hideMeta,'Hide Meta/BookKeeping','1').
+search_filter_name_comment(hideSystem,'Skip System','0').
+search_filter_name_comment(hideTriggers,'Hide Triggers','1').
+search_filter_name_comment(skipLarge,'No Large','1').
+search_filter_name_comment(showHyperlink,'Hyperlink','1').
+search_filter_name_comment(showFilenames,'Filenames','0').
+search_filter_name_comment(skipVarnames,'Skip Varnames','0').
+search_filter_name_comment(hideClauseInfo,'Skip ClauseInfo','1').
+search_filter_name_comment(showAll,'Show All','0').
+  
 
-session_checked(Name):- get_param(Name,V),V\=='OFF'.
+session_checked(Name):- get_param_sess(Name,V),V\=='0',V\==0,V\=="0".
 
 session_checkbox(Name,Caption,BR):-
+ format('<font size="-3">',[]),
   (session_checked(Name) -> 
-     format('<input type="checkbox" name="~w" value="ON" checked/>&nbsp;~w~w',[Name,Caption,BR]);
-     format('<input type="checkbox" name="~w" value="ON"/>&nbsp;~w~w',[Name,Caption,BR])).
+     format('<input type="checkbox" name="~w" value="1" checked/>&nbsp;~w~w',[Name,Caption,BR]);
+     format('<input type="checkbox" name="~w" value="1"/>&nbsp;~w~w',[Name,Caption,BR])),
+  format('</font>',[]).
 
 action_menu_applied(MenuName,ItemName,Where):-
   show_select2(MenuName,action_menu_item,[atom_subst('$item',ItemName)]),
-      format('&nbsp;~w&nbsp;&nbsp;<input type="submit" value="Now" name="apply">',[Where]).
+      format('&nbsp;~w&nbsp;&nbsp;<input type="submit" value="Now" name="Apply">',[Where]).
 
 param_default_value(is_context,'BaseKB').
 is_context(MT,MT):-no_repeats(is_context0(MT)).
@@ -496,39 +569,39 @@ action_menu_item('NonMonotonic',"Treat $item NonMonotonic").
 
 
 
-get_request_vars(Format,Exclude):- ignore(Exclude=[session_data]),
-   findall(N=V,(current_form_var(N),\+ member(N,Exclude),get_nv(N,V)),NVs),
+get_request_vars(Format):- ignore(Exclude=[term,find,session_data,call,user_agent,referer,session,request_uri,accept]),
+   findall(N=V,(current_form_var(N),\+ member(N,Exclude),once(get_param_sess(N,V))),NVs),
    forall(member(N=V,NVs),format(Format,[N,V])).
     
-
 search4term:- 
    must_det_l((
-        get_nv(term,Term,"tSet"),
-        get_nv(search,SObj,Term),
+        get_param_sess(term,Term,"tHumanHead"),
+        get_param_sess(find,SObj,Term),
         cvt_param_to_term(SObj,Obj),
-        write_begin_html('search4term',Base),
-        format('<form action="edit1term?call=edit1term~@" target="_parent">Apply ',[get_request_vars('&~w=~w',[search,session_data,call,hideMeta,showSystem,hideTriggers,showAll,term])]),
+        write_begin_html('search4term',Base,_),
+        format('<form action="search4term" target="_self">Apply ',[]),
         action_menu_applied('action_below',"Checked or Clicked","&nbsp;below&nbsp;"),
-        format('&nbsp;&nbsp;&nbsp;search = <input type="text" name="search" value="~q"> ~@  <br/>Base = ~w <hr/><pre>',[Obj,show_search_filters('&nbsp;&nbsp;'),Base]),flush_output,
+        format('&nbsp;&nbsp;&nbsp;find = <input id="find" type="text" name="find" value="~q"><font size="-3"> ~@  Base = ~w</font><hr/></form>~@<pre>',
+        [Obj,show_search_filters('&nbsp;&nbsp;'),Base,add_form_script]),flush_output,
         with_assertions(thlocal:print_mode(html),
            (with_search_filters(catch(make_page_pretext_obj(Obj),E,(writeq(E),nl))))),
-        format('</pre></form>',[]),flush_output,
+        format('</pre>',[]),flush_output,
         show_pcall_footer,
-        write_end_html)).
-
+        write_end_html)),!.
 
 :-thread_local(thlocal:tl_hide_data/1).
 
 
+
 with_search_filters(C):-
-    session_checked(hideTriggers), \+ thlocal:tl_hide_data(triggers),!,
-    with_assertions(thlocal:tl_hide_data(triggers),with_search_filters(C)).
-with_search_filters(C):-
-    session_checked(hideMeta), \+ thlocal:tl_hide_data(source_meta),!,
-    with_assertions(thlocal:tl_hide_data(triggers),with_search_filters(C)).
+   search_filter_name_comment(FILTER,_,_),
+   session_checked(FILTER), 
+   \+ thlocal:tl_hide_data(FILTER),!,
+    with_assertions(thlocal:tl_hide_data(FILTER),with_search_filters(C)).
 with_search_filters(C):-C.
 
-% make_page_pretext_obj(Obj):- atom(Obj),atom_to_term(Obj,Term,Bindings),nonvar(Term),Term\=@=Obj,!,must(make_page_pretext_obj(Term)).
+% make_page_pretext_obj(Obj):- atom(Obj),atom_to_term(Obj,Term,Bindings),nonvar(Term),Term\=@=Obj,!,hmust(make_page_pretext_obj(Term)).
+
 make_page_pretext_obj(Obj):- 
   % catch(mmake,_,true),
   % forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((this_listing(M:F/A),flush_output)))),
@@ -536,8 +609,8 @@ make_page_pretext_obj(Obj):-
   call_with_time_limit(300,ignore(catch(term_listing_inner(i2tml_hbr,Obj),E,writeq(E)))),
   flush_output,
   pp_i2tml_saved_done(Obj),!.
-
   %ignore((fail,catch(pfc_listing(Pred),_,true))),!.
+make_page_pretext_obj(Obj):- writeq(make_page_pretext_obj(Obj)),!.
 
 
 
@@ -605,8 +678,7 @@ write_atom_link(W,A/_,N):-atom(A),!,write_atom_link(W,A,N).
 write_atom_link(W,C,N):-compound(C),get_functor(C,F,A),!,write_atom_link(W,F/A,N).
 %write_atom_link(W,_,N):- thread_self(main),!,write_term_to_atom_one(W,N),!.
 write_atom_link(W,_,N):- must(nonvar(W)),\+ thlocal:print_mode(html),write_term_to_atom_one(W,N),!.
-write_atom_link(W,A,N):- nonvar(W),catch((term_to_pretty_string(A,AQ),url_encode(AQ,URL),
-   format(W,'<a href="?call=search4term&search=~w">~w</a>',[URL,AQ])),_,write_term_to_atom_one(W,N)).
+write_atom_link(W,A,N):- nonvar(W),catch((term_to_pretty_string(A,AQ),url_encode(AQ,URL),format(W,'<a href="?term=~w">~w</a>',[URL,AQ])),_,write_term_to_atom_one(W,N)).
 
 write_term_to_atom_one(atom(A),Term):-format(atom(A),'~q',[Term]).
 
@@ -869,23 +941,11 @@ write_oper(Op, _, Style, _Ci, punct) :-
 	write_atom(Op, Style, punct, _),
 	put(32).
 
-
-write_VAR(N, _Style, Ci, alpha) :-
-	integer(N), N >= 0, !,
-	maybe_space(Ci, alpha),
-	Letter is N mod 26 + 65,
-	put(Letter),
-	(   N < 26
-	;   Rest is N/26, name(Rest, String),
-	    put_string(String)
-	), !.
-write_VAR(A, _Style, _Ci, _Co) :-
-	atom(A), !,
-	write(A).
+write_VAR(A, _Style, _Ci, _Co) :- atom(A), !,write(A).
+write_VAR(N, writeq, _Ci, alpha):- writeq('$VAR'(N)),!.
 write_VAR(X, Style, Ci, punct) :-
 	write_atom('$VAR', Style, Ci, _),
 	write_args(0, 1, '$VAR'(X), 40, Style).
-
 
 
 write_atom(('!'), _, _, punct) :- !,
@@ -1045,10 +1105,10 @@ rok_portray_clause(:-(Command)) :-
 	;   Command = Body,	    Key = ''
 	),  !,
 	nl,
-	% numbervars(Body, 0, _),
+	% nu mbervars(Body, 0, _),
 	\+ \+ 'list clauses'(Body, Key, 2, 8).
 rok_portray_clause((Pred:-Body)) :-
-	% numbervars(Pred+Body, 0, _),
+	% nu mbervars(Pred+Body, 0, _),
 	\+ \+ portable_writeq(Pred),
 	\+ \+ 'list clauses'(Body, 0, 2, 8), !.
 rok_portray_clause((Pred)) :-
@@ -1059,12 +1119,16 @@ rok_portray_clause((Pred)) :-
 	'list clauses'(A, L, 1, D), !,
 	'list clauses'(B, 1, R, D).
 'list clauses'(true, _L, 2, _D) :- !,
-	put(0'.), nl.
+	put(0'.
+        ), nl.
+        
 'list clauses'((A;B), L, R, D) :- !,
 	'list magic'(fail, L, D),
 	'list magic'((A;B), 0, 2, D),
 	'list magic'(R, '.
-').
+'
+).
+
 'list clauses'((A->B), L, R, D) :- !,
 	'list clauses'(A, L, 5, D), !,
 	'list clauses'(B, 5, R, D).
@@ -1072,7 +1136,8 @@ rok_portray_clause((Pred)) :-
 	'list magic'(Goal, L, D),
 	portable_writeq(Goal),
 	'list magic'(R, '.
-').
+'
+).
 
 'list magic'(!,    0, _D) :- !,
 	write(' :- ').
@@ -1082,7 +1147,8 @@ rok_portray_clause((Pred)) :-
 	write(' :- '),
 	nl, tab(D).
 'list magic'(_Goal, 1, D) :- !,
-	put(0',),
+	put(0',
+        ),
 	nl, tab(D).
 'list magic'(_Goal, 3, _D) :- !,
 	write('(   ').
@@ -1166,7 +1232,7 @@ user:my_portray(A) :-
         format('__~w#~w', [F, G]).
 user:my_portray(A) :- atom(A),!,user:write_atom_link(A,A).
 user:my_portray(A) :- \+compound(A),fail.
-%user:my_portray(P):- must((return_to_pos(rok_portray_clause(P)),!)).
+%user:my_portray(P):- hmust((return_to_pos(rok_portray_clause(P)),!)).
 
 
 
@@ -1195,3 +1261,4 @@ pkif :-
         ])),nl,nl,nl.
 
 
+:- prolog_load_context(source,File),forall(source_file(M:X,File),(functor(X,F,A),export(M:F/A))).

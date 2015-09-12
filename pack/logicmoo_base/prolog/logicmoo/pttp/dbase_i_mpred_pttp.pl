@@ -124,7 +124,7 @@ pttp_assert_int_wid_for_conjuncts(ID,Y,_):- must(pttp_assert_int_wid(ID,Y)).
 :-export(save_wid/3).
 save_wid(IDWhy,Atom,Wff):-must(Atom\=','),to_numbered_ground(user:wid(IDWhy,Atom,Wff),Assert),show_call_failure(ainz(Assert)).
 
-to_numbered_ground(I,O):-ground(I)->I=O;(copy_term(I,M),numbervars(M,'$VAR',766,_),O=M->true;trace_or_throw(to_numbered_ground(I,O))).
+to_numbered_ground(I,O):-ground(I)->I=O;(copy_term(I,M),numbervars(M,766,_,[functor_name('$VAR')]),O=M->true;trace_or_throw(to_numbered_ground(I,O))).
 
 % -- CODEBLOCK
 clauses_wid(ID,ID:R,F,Y,Ref):-atomic(ID),!,nonvar(ID),clause(user:wid(ID:R,F,Y),true,Ref).

@@ -22,8 +22,6 @@
 :- include(mpred/logicmoo_i_header).
 
 
-user:term_expansion(HB,_):- try_save_vars(HB),fail.
-
 /*
 :- meta_predicate user:call_mpred_body(*,0).
 :- meta_predicate user:decl_mpred_hybrid_ilc_0(*,*,0,*).
@@ -131,6 +129,12 @@ user:term_expansion(I,OO):- (I==end_of_file->(must(do_end_of_file_actions),fail)
 
 :-export(pfc_file_loaded/0).
 pfc_file_loaded.
+
+:- read_source_files.
+:- if(if_defined(logicmoo_html_needs_debug)).
+:- write(ready),nl,flush_output.
+:- prolog.
+:- endif.
 
 :- retractall(thlocal:disable_mpred_term_expansions_locally).
 

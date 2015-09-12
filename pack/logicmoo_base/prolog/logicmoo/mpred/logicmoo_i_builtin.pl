@@ -1353,3 +1353,6 @@ a(B)==>d(B).
 
 :- endif.
 
+:- must(ensure_loaded('../pfc/pttpFWC.pfc')).
+
+

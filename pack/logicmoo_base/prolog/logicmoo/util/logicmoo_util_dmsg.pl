@@ -1,4 +1,18 @@
 
+:- thread_self(X),assert(thread_main(X)).
+
+is_pdt_like:-thread_property(_,alias(pdt_console_server)).
+is_pdt_like:-thread_main(X),!,X \= main.
+
+is_main_thread:-thread_main(X),!,thread_self(X).
+
+:- thread_local(tlbugger:no_colors/0).
+
+:- is_pdt_like-> assert(tlbugger:no_colors); true.
+
+thread_current_error_stream(Err):-thread_self(ID),thread_current_error_stream(ID,Err).
+current_main_error_stream(Err):-thread_main(ID),thread_current_error_stream(ID,Err).
+format_to_error(F,A):-current_main_error_stream(Err),!,format(Err,F,A).
 
 :- dynamic(thread_current_input/2).
 :- dynamic(thread_current_error_stream/2).
@@ -9,12 +23,25 @@ save_streams:-
   current_input(In),asserta(thread_current_input(ID,In)),
   current_output(Err),asserta(thread_current_error_stream(ID,Err)).
 
+:-meta_predicate(with_main_input(0)).
+with_main_input(G):-
+    current_output(OutPrev),
+    current_input(InPrev),
+    stream_property(ErrPrev,alias(user_error)),
+    thread_main(ID),thread_current_input(ID,In),thread_current_error_stream(ID,Err),
+    setup_call_cleanup(set_prolog_IO(In,OutPrev,Err),G,set_prolog_IO(InPrev,OutPrev,ErrPrev)).
+
+ with_main_io(G):-
+    current_output(OutPrev),
+    current_input(InPrev),
+    stream_property(ErrPrev,alias(user_error)),
+    thread_main(ID),thread_current_input(ID,In),thread_current_error_stream(ID,Err),
+    setup_call_cleanup(set_prolog_IO(In,Err,Err),G,set_prolog_IO(InPrev,OutPrev,ErrPrev)).
+
+:-save_streams.
 :-initialization(save_streams).
 
-thread_current_error_stream(Err):-thread_current_error_stream(main,Err).
-
-format_to_error(F,A):-thread_current_error_stream(main,Err),!,format(Err,F,A).
-
+:- listing(thread_current_error_stream/2).
 % ==========================================================
 % Sending Notes
 % ==========================================================
@@ -59,7 +86,7 @@ indent_e(X):-XX is X -1,!,write(' '), indent_e(XX).
 % Lowlevel printng
 % ===================================================================
 
-fmt0(user_error,F,A):-!,thread_current_error_stream(main,Err),!,format(Err,F,A).
+fmt0(user_error,F,A):-!,current_main_error_stream(Err),!,format(Err,F,A).
 fmt0(current_error,F,A):-!,thread_current_error_stream(Err),!,format(Err,F,A).
 fmt0(X,Y,Z):-catchvv((format(X,Y,Z),flush_output_safe(X)),E,dmsg(E)).
 fmt0(X,Y):-catchvv((format(X,Y),flush_output_safe),E,dfmt(E:format(X,Y))).
@@ -90,10 +117,13 @@ tst_fmt:- make,
 
 fmt_ansi(Call):-ansicall([reset,bold,hfg(white),bg(black)],Call).
 
-fmt_portray_clause(X):- unnumbervars(X,Y),!,snumbervars(Y), portray_clause(Y).
+fmt_portray_clause(X):- renumbervars(X,Y),!, portray_clause(Y).
 fmt_or_pp(portray((X:-Y))):-!,fmt_portray_clause((X:-Y)),!.
 fmt_or_pp(portray(X)):-!,functor_safe(X,F,A),fmt_portray_clause((pp(F,A):-X)),!.
 fmt_or_pp(X):-format('~q~n',[X]).
+
+with_output_to_console(X):- current_main_error_stream(Err),with_output_to_stream(Err,X).
+with_output_to_main(X):- current_main_error_stream(Err),with_output_to_stream(Err,X).
 
 dfmt(X):- thread_current_error_stream(Err),with_output_to_stream(Err,fmt(X)).
 dfmt(X,Y):- thread_current_error_stream(Err), with_output_to_stream(Err,fmt(X,Y)).
@@ -104,7 +134,7 @@ with_output_to_stream(Stream,Goal):-
          Goal,
          set_output(Saved)).
 
-to_stderror(Call):- thread_current_error_stream(main,Err), with_output_to_stream(Err,Call).
+to_stderror(Call):- thread_current_error_stream(Err), with_output_to_stream(Err,Call).
 
 
 
@@ -292,7 +322,7 @@ ansicall1(Out,Ctrl,Call):-
 ansicall(S,Set,Call):-
      call_cleanup((
          stream_property(S, tty(true)), current_prolog_flag(color_term, true), !,
-	(is_list(Ctrl) ->  maplist(sgr_code_on_off, Ctrl, Codes, OffCodes), 
+	(is_list(Ctrl) ->  maplist(sgr_code_on_off, Ctrl, Codes, OffCodes),
           atomic_list_concat(Codes, (';'), OnCode) atomic_list_concat(OffCodes, (';'), OffCode) ;   sgr_code_on_off(Ctrl, OnCode, OffCode)),
         keep_line_pos(S, (format(S,'\e[~wm', [OnCode])))),
 	call_cleanup(Call,keep_line_pos(S, (format(S, '\e[~wm', [OffCode]))))).
@@ -304,7 +334,7 @@ ansicall(S,Set,Call):-
 
 
 keep_line_pos(S, G) :-
-       (stream_property(S, position(Pos)) -> 
+       (stream_property(S, position(Pos)) ->
 	(stream_position_data(line_position, Pos, LPos),
         call_cleanup(G, set_stream(S, line_position(LPos)))) ; G).
 

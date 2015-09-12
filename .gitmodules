@@ -1,9 +1,6 @@
 [submodule "pack/swish"]
 	path = pack/swish
 	url = https://github.com/TeamSPoon/swish.git
-[submodule "pack/trill_on_swish"]
-	path = pack/trill_on_swish
-	url = https://github.com/TeamSPoon/trill_on_swish.git
 [submodule "pack/hMUD"]
 	path = pack/hMUD
 	url = https://github.com/TeamSPoon/hmud.git

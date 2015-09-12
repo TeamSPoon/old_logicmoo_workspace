@@ -194,7 +194,7 @@ show_pipeline:-forall(installed_converter(CNV),wdmsg(installed_converter(CNV))).
 % PLDATA: LOAD ENGLISH CORE FILES
 % ================================================================================================
 
-%:- time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),(exists_file(AFN)->true;qcompile(library(el_holds/'el_assertions.pl.hide')))))).
+% :- time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),(exists_file(AFN)->true;qcompile(library(el_holds/'el_assertions.pl.hide')))))).
 
 get_it:- 
  time(ignore((absolute_file_name(library(el_holds/'el_assertions.pl.qlf'),AFN),   
@@ -212,11 +212,11 @@ get_it:-
 % 6.052 CPU on VMWare I7
 
 :- 
-  %with_assertions(,[(user:term_expansion(_,_):-!,fail),(user:goal_expansion(_,_):-!,fail),(system:term_expansion(_,_):-!,fail),(system:goal_expansion(_,_):-!,fail)])
+%  with_assertions([(user:term_expansion(_,_):-!,fail),(user:goal_expansion(_,_):-!,fail),(system:term_expansion(_,_):-!,fail),(system:goal_expansion(_,_):-!,fail)],
   (user:ensure_loaded_no_mpreds(library(logicmoo/plarkc/logicmoo_i_call_kb)),
    load_language_file(pldata/clex_iface),
    load_language_file(pldata/nldata_BRN_WSJ_LEXICON),
-   load_language_file(library(el_holds/'el_assertions.qlf')),
+   load_language_file(library(el_holds/el_assertions)),
    load_language_file(pldata/nldata_freq_pdat),
    load_language_file(pldata/nldata_cycl_pos0)),!.
 

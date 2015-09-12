@@ -382,7 +382,7 @@ stringToList([X|XX],Y):-concat_atom_safe([X|XX],' ',XXX),!,string_to_list(XXX,Y)
 
 stringToCodelist(S,CL):- stringToCodelist2(S,SL),!,escapeString(SL,CS),!,stringToList(CL,CS),!.
 
-stringToCodelist2(S,Codes):-var(S),!,fail.
+stringToCodelist2(S,_Codes):-var(S),!,fail.
 stringToCodelist2(string(S),Codes):-!,stringToCodelist2(S,Codes).
 stringToCodelist2([],[]):-!.
 stringToCodelist2([[]],[]):-!.
@@ -407,10 +407,10 @@ trim(S,Y):-flatten(S,S2),trim2(S2,Y).
 trim2(S,Y):-
       ground(S),%true,
       stringToList(S,X),
-      ltrim(X,R),lists:reverse(R,Rvs), 
-      addSpaceBeforeSym(Rvs,Rv),      
+      ltrim(X,R),lists:reverse(R,Rvs),
+      addSpaceBeforeSym(Rvs,Rv),
       ltrim(Rv,RY),lists:reverse(RY,Y),!.
-     
+
 addSpaceBeforeSym([H|T],[H,32|T]):-member(H,"?.!"),!.
 addSpaceBeforeSym(H,H).
 
@@ -468,7 +468,7 @@ splt_words(Atom,Words1,[]):- catch(atomic_list_concat_safe(Words1,' ',Atom),_,fa
 splt_words_0(S,Terms,Var):-any_to_atom(S,Atom),!,splt_words_0_atom(Atom,Terms,Var),!.
 
 splt_words_0_atom('',[],[]):-!.
-splt_words_0_atom(Atom,[Term|List],Vars):- atom_length(Atom,To),between(0,To,X), 
+splt_words_0_atom(Atom,[Term|List],Vars):- atom_length(Atom,To),between(0,To,X),
       sub_atom(Atom,0,Len,X,Sub),Len>0,
       catch_read_term_from_atom(Sub,Term,NewOnes),
       (compound(Term)->sub_atom(Sub,_,1,0,')');true),
@@ -503,13 +503,13 @@ atomSplit(In,List):- hotrace(( ground(In),
 atomSplit(Atom,WordsO):-atomSplitEasy(Atom,WordsO),!.
 
 :- swi_export(atomSplitEasy/2).
-atomSplitEasy(Atom,WordsO):- 
+atomSplitEasy(Atom,WordsO):-
    hotrace((atomSplit(Atom,WordsO,[' ','\t','\n','\v','\f','\r',' ','!','"','#','$','%','&','\'',
     '(',')','*','+',',','-','.','/',':',';','<',
     '=','>','?','@','[',\,']','^','_',
     '`','{','|','}','~']
     ))).
-   
+
 %%atomSplit(Atom,WordsO):- atomSplit(Atom,WordsO,[' ','\'',';',',','"','`',':','?','!','.','\n','\t','\r','\\','*','%','(',')','#']),!.
 
 atomSplit(S,WordsO,List):- hotrace(( atomic(S),atomic_list_concat_safe(Words1," ",S),!, atomSplit2(Words1,Words,List),!, Words=WordsO )).
@@ -642,8 +642,8 @@ replace_in_string(SepChars, PadChars,Repl, A,C):- split_string(A,SepChars,PadCha
 replace_in_string(F,R,A,K):-atom(A),!,atom_string(A,S),replace_in_string(F,R,S,C),atom_string(K,C).
 replace_in_string(SepChars,Repl,A,C):- atomics_to_string(B,SepChars,A),atomics_to_string(B,Repl,C).
 
-replace_periods(A,S):-  
- convert_members([    
+replace_periods(A,S):-
+ convert_members([
    %  white space
     replace_in_string("\r"," "),
     replace_in_string("\n"," "),
@@ -701,7 +701,7 @@ to_word_list_0(A,WList):-any_to_string(A,String),!,text_to_string(String,Atom),t
 
 read_stream_to_arglist(Input,[]):- at_end_of_stream(Input),!.
 read_stream_to_arglist(Input,[]):- catch((once(wait_for_input([Input], Inputs, 0.01)),Inputs=[]),_,fail),!.
-read_stream_to_arglist(Input,[H|T]):-show_call(cyc:lisp_read(Input,_,H)),!,(is_ending(H)->T=[];read_stream_to_arglist(Input,T)),!.
+read_stream_to_arglist(Input,[H|T]):-show_call(lisp_read(Input,H,_)),!,(is_ending(H)->T=[];read_stream_to_arglist(Input,T)),!.
 
 is_ending(List):-nonvar(List),(is_list(List)->last(List,whitepace("\n"));List==whitepace("\n")).
 

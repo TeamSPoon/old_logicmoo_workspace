@@ -189,7 +189,7 @@ exact_args(true).
 % exact_args(C):-source_file(C,I),absolute_source_location_pfc(I).
 
 pfc_is_tautology(Var):-var(Var).
-pfc_is_tautology(V):- \+ \+ notrace((copy_term_nat(V,VC),numbervars(VC),pfc_is_taut(VC))).
+pfc_is_tautology(V):- \+ \+ notrace((copy_term_nat(V,VC),snumbervars(VC),pfc_is_taut(VC))).
 
 pfc_is_taut(A:-B):-!,pfc_is_taut(B==>A).
 pfc_is_taut(A<-B):-!,pfc_is_taut(B==>A).
@@ -510,7 +510,7 @@ pfc_init_i(GeneralTerm,Default) :-
   clause_i(GeneralTerm,true) -> true ; assert_i(Default).
 
 %= fcTmsMode is one of {none,local,cycles} and controles the tms alg.
-:- pfc_init_i(fcTmsMode(_), fcTmsMode(cycles)).
+:- must((pfc_init_i(fcTmsMode(_), fcTmsMode(cycles)))).
 
 % Pfc Search strategy. pfc_search(X) where X is one of {direct,depth,breadth}
 :- pfc_init_i(pfc_search(_), pfc_search(direct)).

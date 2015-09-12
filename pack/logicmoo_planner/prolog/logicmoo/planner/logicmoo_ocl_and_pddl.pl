@@ -2286,7 +2286,7 @@ mysame_key(_, L, [], L).
 :- if(gethostname(c3po);gethostname(ubuntu);gethostname(titan)).
 
 :- test_domain(pddl('domains_ocl/chameleonWorld/domain*')).
-:- test_all(7).
+:- test_all(5). % should be 7
 
 /*
 :- if(current_predicate(pce_show_profile/0)).

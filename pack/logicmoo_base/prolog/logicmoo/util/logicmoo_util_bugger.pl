@@ -1257,8 +1257,11 @@ tlbugger:ifCanTrace.
 %:-meta_predicate(set_no_debug).
 :- swi_export(set_no_debug/0).
 
+:-dynamic(is_set_no_debug/0).
+
 set_no_debug:- 
   must_det_l((
+   asserta(is_set_no_debug),
    set_prolog_flag(generate_debug_info, false),
    retractall(tlbugger:ifCanTrace),
    retractall(tlbugger:ifWontTrace),
@@ -1280,8 +1283,8 @@ set_no_debug_thread:-
    retractall(tlbugger:ifWontTrace),
    asserta(tlbugger:ifWontTrace))),!.
 
-set_gui_debug(TF):-ignore((catchvv(guitracer,_,true))),
-   ((TF,has_gui_debug)-> set_prolog_flag(gui_tracer, true) ; set_prolog_flag(gui_tracer, false)).
+set_gui_debug(TF):- 
+   ((TF, has_gui_debug,set_yes_debug, ignore((use_module(library(gui_tracer)),catchvv(guitracer,_,true)))) -> set_prolog_flag(gui_tracer, true) ; set_prolog_flag(gui_tracer, false)).
 
 
 :-meta_predicate(set_yes_debug()).
@@ -1289,9 +1292,6 @@ set_gui_debug(TF):-ignore((catchvv(guitracer,_,true))),
 set_yes_debug:- 
   must_det_l([
    set_prolog_flag(generate_debug_info, true),
-   (tlbugger:ifCanTrace->true;assert(tlbugger:ifCanTrace)),
-   retractall(tlbugger:ifWontTrace),   
-   (tlbugger:ifWontTrace->true;assert(tlbugger:ifWontTrace)),   
    set_prolog_flag(report_error,true),   
    set_prolog_flag(debug_on_error,true),
    set_prolog_flag(debug, true),   
@@ -1302,6 +1302,10 @@ set_yes_debug:-
    visible(+cut_call),
    notrace, debug]),!.
 
+set_yes_debug_thread:-
+  set_yes_debug,
+   (tlbugger:ifCanTrace->true;assert(tlbugger:ifCanTrace)),
+   retractall(tlbugger:ifWontTrace).
 
 :- tlbugger:use_bugger_expansion->true;assert(tlbugger:use_bugger_expansion).
 
@@ -1883,7 +1887,7 @@ dumpST(_,_,_):- tlbugger:ifHideTrace,!.
 dumpST(N,Frame,Opts):-
   ignore(prolog_current_frame(Frame)),
   must(( dumpST4(N,Frame,Opts,Out))),
-   must((get_m_opt(Opts,numbervars,-1,Start),
+   must((get_m_opt(Opts,numbervars,88,Start),
    neg1_numbervars(Out,Start,ROut),
    reverse(ROut,RROut),
    ignore((forall(member(E,RROut),fdmsg(E)))))).

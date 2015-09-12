@@ -253,7 +253,7 @@ guess_session_ids(ID):-if_defined(thlocal:default_user(ID)).
 % telnet session
 guess_session_ids(ID):-thread_self(TID),thglobal:session_io(ID,_,_,TID).
 % returns http sessions as well
-guess_session_ids(ID):-if_defined(http_in_session(ID)).
+guess_session_ids(ID):-if_defined(http_in_session:http_in_session(ID)).
 % tcp session
 guess_session_ids(ID):-thread_self(TID),thread_property(TID,alias(ID)).
 % anonymous sessions

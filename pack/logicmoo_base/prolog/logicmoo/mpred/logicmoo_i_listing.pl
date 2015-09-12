@@ -69,8 +69,6 @@ pfc_trace_item(M,H):- ignore(thlocal:pfc_trace_exec-> debugOnError(in_cmt(pp_ite
 pp_item(M,(H:-B)):- B ==true,pp_item(M,H).
 pp_item(M,H):- flag(show_asserions_offered,X,X+1),thlocal:print_mode(html),!, (\+ \+ pp_item_html(M,H)),!.
 
-% pp_item(M,H):- \+ \+ (( \+ ground(H), name_vars(H,HH),numbervars(HH,0,_,[attvar(skip)]), pp_item(M,HH))).
-
 
 pp_item(M,spft(W,U,U)):-!,pp_item(M,U:W).
 pp_item(M,spft(W,F,U)):- atom(U),!,    fmt('~N%~n',[]),pp_item(M,U:W), fmt('rule: ~p~n~n', [F]),!.
@@ -80,7 +78,7 @@ pp_item(M,pt(F,Body)):-              !,fmt('~w p-trigger: ~p~n~nbody:~n', [M,F])
 pp_item(M,bt(F,Body)):-              !,fmt('~w b-trigger: ~p~nbody: ~p~n', [M,F,Body]).
 
 pp_item(M,U:W):- !,sformat(S,'~w  ~w:',[M,U]),!, pp_item(S,W).
-pp_item(M,H):- \+ \+ (( numbervars(H,0,_,[attvar(skip)]), fmt("~w ~p~n",[M,H]))).
+pp_item(M,H):- \+ \+ (( get_clause_vars_hb(H,HH),fmt("~w ~p~n",[M,HH]))).
 
 pfc_classify_facts([],[],[],[]).
 
@@ -118,9 +116,9 @@ pp_rules :-
    print_db_items("Negative Facts",(neg(_))).
 
 pp_triggers :-
-     print_db_items("Positive triggers",pt(_,_)),
-     print_db_items("Negative triggers", nt(_,_,_)),
-     print_db_items("Goal triggers",bt(_,_)).
+     print_db_items("Positive hideTriggers",pt(_,_)),
+     print_db_items("Negative hideTriggers", nt(_,_,_)),
+     print_db_items("Goal hideTriggers",bt(_,_)).
 
 pp_supports :-
   % temporary hack.
@@ -281,7 +279,7 @@ print_db_items(Title,Mask,SHOW,What0):-
      ignore(pp_item(Showing,done)),!.
 
 pfc_contains_term(What,_):-is_ftVar(What),!.
-pfc_contains_term(What,Inside):-compound(What),!,(\+ \+ ((copy_term_nat(Inside,Inside0),numbervars(Inside0),contains_term(What,Inside0)))),!.
+pfc_contains_term(What,Inside):- compound(What),!,(\+ \+ ((copy_term_nat(Inside,Inside0),snumbervars(Inside0),contains_term(What,Inside0)))),!.
 pfc_contains_term(What,Inside):- (\+ \+ notrace((subst(Inside,What,foundZadooksy,Diff),Diff \=@= Inside ))),!.
 
 % user:listing_mpred_hook(What):- debugOnError(pfc_listing(What)).
@@ -365,22 +363,24 @@ pfc_listing_1(What):-
 
 :-thread_local(thlocal:tl_hide_data/1).
 
+logicmoo_html_needs_debug.
 
+hide_data(P):-hide_data0(showAll),!,fail.
+hide_data(P):-notrace(hide_data0(P)).
+hide_data0(P):-var(P),!,fail.
+hide_data0(P):-thlocal:tl_hide_data(P),!.
 
-hide_data(P):-thlocal:tl_hide_data(P),!.
+hide_data0(pfcMark/4):- !,hide_data0(hideMeta).
+hide_data0(saved_varname_info/3):- !,hide_data0(hideMeta).
+hide_data0('$was_imported_kb_content$'/2):- !,hide_data0(hideMeta).
 
-hide_data(pfcMark/4):- !,hide_data(source_meta).
-hide_data(saved_varname_info/3):- !,hide_data(source_meta).
-hide_data('$was_imported_kb_content$'/2):- !,hide_data(source_meta).
-
-hide_data(spft/3):- !,hide_data(triggers).
-hide_data(nt/3):- !,hide_data(triggers).
-hide_data(pt/2):- !, hide_data(triggers).
-hide_data(bt/2):- !, hide_data(triggers).
-hide_data(_/_):-!,fail.
-hide_data(P):- compound(P),functor(P,F,A), (hide_data(F/A);hide_data(F)).
-
-hide_data((H:-
+hide_data0(spft/3):- !,hide_data0(hideTriggers).
+hide_data0(nt/3):- !,hide_data0(hideTriggers).
+hide_data0(pt/2):- !, hide_data0(hideTriggers).
+hide_data0(bt/2):- !, hide_data0(hideTriggers).
+hide_data0(_/_):-!,fail.
+hide_data0(M:P):- atom(M),!,hide_data0(P).
+hide_data0((H:-
  cwc,
         second_order(_,_G19865),
         (   _G19865 = (_G19867,!,_G19871) ->
@@ -388,6 +388,9 @@ hide_data((H:-
                 call(_G19871)
         ;   CALL
         ))):- CALL=@=call(_G19865).
+
+hide_data0(P):- compound(P),functor(P,F,A), (hide_data0(F/A);hide_data0(F)).
+
 
 pp_now.
 
@@ -406,12 +409,13 @@ pp_i2tml_saved_done(Obj):-
   findall(H,retract(sortme_buffer(Obj,H)),List),predsort(head_functor_sort,List,Set),
   forall(member(S,Set),pp_i2tml(S)),!.
 
-
+find_cl_ref(_,none):- thlocal:tl_hide_data(hideClauseInfo),!.
 find_cl_ref(clause(H,B,Ref),Ref):-!.
 find_cl_ref(clause(H,B),Ref):- clause(H,B,Ref),!.
 find_cl_ref((H:-B),Ref):-!, clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!.
 find_cl_ref(H,Ref):- clause(H,true,Ref),clause(HH,true,Ref),H=@=HH,!.
 
+find_ref(_,none):- thlocal:tl_hide_data(hideClauseInfo),!.
 find_ref(H,Ref):- find_cl_ref(H,Ref),!.
 find_ref(This,Ref):- '$was_imported_kb_content$'(A,CALL),arg(1,CALL,This),clause('$was_imported_kb_content$'(A,CALL),true,Ref),!.
 find_ref(M:This,Ref):- atom(M),!,find_ref(This,Ref).
@@ -431,6 +435,7 @@ pp_i2tml_save_seen(HB):- assertz_if_new(sortme_buffer(Obj,HB)),!.
 
 :-thread_local(thlocal:pp_i2tml_hook/1).
 
+:-thread_local(thlocal:tl_hide_data/1).
    
 :-thread_local(shown_subtype/1).
 :-thread_local(shown_clause/1).
@@ -468,9 +473,10 @@ show_clause_ref(Ref):- retractall(thlocal:last_show_clause_ref(_)),asserta(thloc
 
 show_clause_ref_now(V):-var(V),!.
 show_clause_ref_now(0):-!.
-show_clause_ref_now(Ref):- \+ clause_property(Ref,predicate(_)),format('~N~p~N',[clref(Ref)]),!.
+show_clause_ref_now(Ref):- hide_data(hideClauseRef),!.
+show_clause_ref_now(Ref):- hide_data(showFilenames), \+ clause_property(Ref,predicate(_)),format('~N~p~N',[clref(Ref)]),!.
 % write_html(div(class(src_formats),a(href(EditLink), edit)])).
-show_clause_ref_now(Ref):- clause_property(Ref,file(File)),ignore(clause_property(Ref,line_count(Line))),
+show_clause_ref_now(Ref):- hide_data(showFilenames),clause_property(Ref,file(File)),ignore(clause_property(Ref,line_count(Line))),
   ignore(clause_property(Ref,module(Module))),
     format('<a href="/swish/filesystem/~w#L~w">@file:~w:~w</a>(~w)~N',[File,Line,File,Line,Module]),
     fail. 
@@ -485,8 +491,12 @@ pp_i2tml(clause(H,B,Ref)):- !, with_assertions(thlocal:current_clause_ref(Ref),p
 pp_i2tml(HB):- find_ref(HB,Ref),!, must(with_assertions(thlocal:current_clause_ref(Ref),pp_i2tml_v((HB)))).
 pp_i2tml(HB):- with_assertions(thlocal:current_clause_ref(none),must(pp_i2tml_v((HB)))).
 
+get_clause_vars_hb(HB,HB):- ground(HB),!.
+get_clause_vars_hb(HH,HH):- sub_term(S,HH),compound(S),S='$VAR'(A),atom(A),!. % faiol.trace_or_throw(already_numbers(HH)).
+get_clause_vars_hb(I,I):- hide_data(skipVarnames),!.
+get_clause_vars_hb(H,HH):-  get_clause_vars(H),!,must((name_vars(H,HH),get_clause_vars(HH),snumbervars(HH,198,_,[attvar(skip)]))),!.
 
-pp_i2tml_v(HB):- \+ \+ ((get_clause_vars(HB),pp_i2tml_0(HB))),!.
+pp_i2tml_v(HB):- \+ \+ ((get_clause_vars_hb(HB,HB2),pp_i2tml_0(HB2))),!.
 
 pp_i2tml_0(Var):-var(Var),!.
 pp_i2tml_0(USER:HB):-USER==user,!,pp_i2tml_0(HB),!.
@@ -526,7 +536,7 @@ if_html(F,A):-A.
 pp_i2tml_1(H):- 
  once(((last_item_offered(Was);Was=foobar),get_functor(Was,F1,A1),get_functor(H,F2,A2),
    retractall(last_item_offered(Was)),asserta(last_item_offered(H)),
-    ((F1 \== F2 -> if_html('~N<hr/>',true);true)))),fail.
+    ((F1 \== F2 -> if_html('~N<hr/>',true);true)))),flush_output,fail.
 
 pp_i2tml_1(_H):- thlocal:current_clause_ref(Ref),
     if_html('<font size="1">~@</font>',show_clause_ref(Ref)),fail.
@@ -536,7 +546,6 @@ pp_i2tml_1(H):- thlocal:print_mode(html),
    functor_to_color(H,FC)->fmtimg(FC,ALT)->
     format('<input type="checkbox" name="assertion[]" value="~w">',[ALT]),fail.
 
-pp_i2tml_1(H):- \+ \+  (( \+ ground(H), must(( name_vars(H,HH),numbervars(HH,0,_,[attvar(skip)]), pp_i2tml_now(HH))))).
 pp_i2tml_1(H):- \+ \+ pp_i2tml_now(H).
 
 pp_i2tml_now(C):- thlocal:pp_i2tml_hook(C),!.
@@ -609,8 +618,8 @@ write_as_url_encoded(_Arg, D):- url_encode(D,U),!,writeq(U).
 
 term_to_pretty_string(H,HS):-atomic(H),!,with_output_to(atom(HS),writeq(H)).
 term_to_pretty_string(H,HS):-
-   % ignore(source_variables(X))->ignore(X=[])->
-   % numbervars(HC,0,_)->
+   % igno re(source_variables(X))->ignore(X=[])->
+   % numb ervars(HC,0,_)->
   with_output_to(atom(HS),portray_clause(H)).
 
 fmtimg(N,Alt):- thlocal:print_mode(html),!,

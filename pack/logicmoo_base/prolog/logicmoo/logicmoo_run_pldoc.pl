@@ -1,4 +1,4 @@
-#!/usr/local/bin/swipl 
+#!/usr/local/bin/swipl
 
 :- if(if_defined(load_mud_www)).
 
@@ -54,8 +54,8 @@ swish_highlight:memory_file_to_string(X,Y):- memory_file_to_codes(X,C),string_co
 
 
 
-pldoc_http:src_skin(Request, _Show, FormatComments, header, Out) :-  
-  pldoc_http:((     
+pldoc_http:src_skin(Request, _Show, FormatComments, header, Out) :-
+  pldoc_http:((
      member(request_uri(ReqURI), Request),!,
 	prolog_xref:negate(FormatComments, AltFormatComments),
 	replace_parameters(ReqURI, [show(raw)], RawLink),
@@ -127,21 +127,23 @@ doug_debug(O):-format(user_error,'~nDOUG_DEBUG: ~q.~n',[O]),!.
 
 % :-debug(_).
 
-testml([]):-!. testml([M|L]):-!,testml(M),testml(L). 
+testml([]):-!. testml([M|L]):-!,testml(M),testml(L).
 testml(M):-atomic(M),!,format('~w',[M]).
 testml(nl(E)):-!,ignore((between(0,E,_),nl,fail)).
 testml(ML):-phrase(ML,C,[]),testml(C).
 
 /*
-:- asserta((http:location(pldoc, root('pldoc'), []))), 
+:- asserta((http:location(pldoc, root('pldoc'), []))),
    asserta((http:location(pldoc_resource, root('pldoc'), []) :- pldoc_http:http_location_by_id(pldoc_resource, root('pldoc')))),
    asserta((http:location(pldoc_resource, R, []) :- pldoc_http:http_location_by_id(pldoc_resource, R))).
 */
 
-:- catch(on_signal(hup, _, hup),E,dmsg(warn(E:on_signal(hup, _, hup)))).
 
 hup(_Signal) :-
         thread_send_message(main, stop).
+
+
+:- catch(on_signal(hup, _, hup),error(domain_error(signal, hup), context(system:'$on_signal'/4, _)),dmsg(warn(not_installing_HUP_handler))).
 
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_dispatch)).

@@ -70,7 +70,9 @@ deduceEachArgType(t,A,[F|ARGS]):-A2 is A-1, deduceEachArgType(F,A2,ARGS).
 deduceEachArgType(F,A,ARGS):-functor(MT,F,A),meta_argtypes(MT),if_main(dmsg(deduceEachArgType(F,ARGS,ARGST))),MT =..[_|ARGST],maplist(deduceEachArg_WithType,ARGS,ARGST).
 deduceEachArgType(F,_,ARGS):-deduceEachArg_WithArgIsa(F,1,ARGS).
 
-if_main(G):-thread_self(main)->G,true.
+
+
+if_main(G):-(thread_self(M),thread_main(M))->G ; true.
 
 deduceEachArg_WithArgIsa(_,_,[]).
 deduceEachArg_WithArgIsa(F,N,[A|RGS]):- ignore((clause_asserted(argIsa(F,N,Type)),deduceEachArg_WithType(A,Type))),
