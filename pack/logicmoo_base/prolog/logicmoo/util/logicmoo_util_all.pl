@@ -93,7 +93,6 @@ with_vars(_,Stuff):- Stuff.
 
 
 
-:- user:ensure_loaded((logicmoo_util_bugger_new)).
 :- user:ensure_loaded((logicmoo_util_bugger_catch)).
 :- user:ensure_loaded((logicmoo_util_bugger)).
 :- user:ensure_loaded((logicmoo_util_strings)).

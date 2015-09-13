@@ -8,6 +8,7 @@
 
 :- discontiguous some_test/0.
 
+:-dynamic(is_prolog_stream/1).
 
 %%	open_prolog_stream(+Module, +Mode, -Stream, +Options)
 %
@@ -56,21 +57,21 @@ with_output_to_pred(Callback,Goal):-
 with_err_to_pred(Callback,Goal):-
   thread_current_error_stream(Err),
     with_output_to_pred(Callback,Stream,
-      (set_stream(Stream, alias(user_error)),Goal),
+      (set_stream(Stream, alias(user_error)), Goal),
        set_stream(Err, alias(user_error))).
-
 
 with_output_to_pred(Callback,Stream,Goal,Exit):-
  open_prolog_stream(tl_with_prolog_streams, write, Stream, []),
   call_cleanup((
-   asserta(((tl_with_prolog_streams:stream_write(Stream,Data):- (ignore(call(Callback,Data))))),Ref),
-   asserta(((tl_with_prolog_streams:stream_close(Stream):- (ignore(call(Callback,end_of_file))))),Ref2),
+   asserta(((tl_with_prolog_streams:stream_write(Stream,Data):- (ignore(failOnError(call(Callback,Data)))))),Ref),
+   asserta(((tl_with_prolog_streams:stream_close(Stream):- (ignore(failOnError(call(Callback,end_of_file)))))),Ref2),
+   asserta(((is_prolog_stream(Stream))),Ref3),
     % catch so we will not exception on a closed stream
     % set_stream(Stream, buffer(line)),
     set_stream(Stream, buffer(false)),
     % set_stream(Stream, buffer_size(0)),    
-    % set_stream(Stream, close_on_exec(false)),
-    call_cleanup((call_cleanup(Goal,catch(flush_output(Stream),_,true))),(erase(Ref),erase(Ref2)))),
+    % set_stream(Stream, close_on_exec(false)),    
+    call_cleanup((call_cleanup(Goal,catch(flush_output(Stream),_,true))),(erase(Ref),erase(Ref2),erase(Ref3)))),
   Exit). % Not decided that a with_output_to_pred/2 should call close of not (flush gets the job done equally as well as closing)
 
 

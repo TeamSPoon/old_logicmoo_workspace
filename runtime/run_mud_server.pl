@@ -13,17 +13,16 @@
 :- user:ensure_loaded(logicmoo_repl).
 
 
+% [Mostly Required] Load the Logicmoo Parser/Generator System
+:- gripe_time(40,user:ensure_loaded(library(parser_all))).
+
+
 % [Mostly Required] Load the Logicmoo Plan Generator System
 :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_planner)))).
 
 
 % [Required] Load the CYC Network Client and Logicmoo CycServer Emulator (currently server is disabled)
-:- with_no_mpred_expansions(user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api))).
-
-
-% [Mostly Required] Load the Logicmoo Parser/Generator System
-:- gripe_time(40,user:ensure_loaded(library(parser_all))).
-
+:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_i_cyc_api)))).
 
 % [Optional] NOT YET Load the Logicmoo RDF/OWL Browser System
 % % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(mpred_online/dbase_i_rdf_store)))).
@@ -119,8 +118,10 @@ start_telnet:- logOnError(toploop_telnet:start_mud_telnet_4000).
 
 :- initialization(start_telnet).
 
-:- user:ensure_loaded(start_mud_server).
-
 :- rl_add_history( 'user:ensure_loaded(start_mud_server).' ).
+:- rl_add_history( 'login_and_run.' ).
 
+% :-  statistics(globallimit,G),statistics(locallimit,L),statistics(traillimit,T), qsave_program(run_mud_server,[map('run_mud_server.sav'),global(G),trail(T),local(L)]).
 
+:- write('\n?- user:ensure_loaded(start_mud_server). % to begin loading mud worlds').
+% :- user:ensure_loaded(start_mud_server).

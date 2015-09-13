@@ -17,10 +17,10 @@ in_logicmoo_repl_source_file.
 :-source_file(in_logicmoo_repl_source_file,F),file_directory_name(F, D),
   asserta(user:pmrt(D)),cd(D).
 
-:-pwd.
 
-
-:- exists_directory(runtime)->working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true).
+fix_pwd:- exists_directory(runtime)->working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true),pwd.
+:-fix_pwd.
+:-initialization(fix_pwd).
 
 user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current_prolog_flag(unix,true).
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
@@ -73,7 +73,7 @@ setup_rl_read_history:-
 
 
 machine_config_file(Y):- gethostname(X),concat_atom([machine_,X,.,pl],Y).
-load_machine_config:-machine_config_file(Y),exists_file(Y),ensure_loaded(Y).
+load_machine_config:- ignore((machine_config_file(Y),exists_file(Y),ensure_loaded(Y))).
 
 % :- multifile sandbox:safe_primitive/1.
 % :-asserta((sandbox:safe_primitive(Z):-wdmsg(Z))).
@@ -134,4 +134,4 @@ push_env_ctx:-!.
 % [Required] Load the Logicmoo Backchaining Inference System
 :- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
 
-
+% :- statistics(globallimit,G),statistics(locallimit,L),statistics(traillimit,T),qsave_program(logicmoo_repl,[map('logicmoo_repl.sav'),global(G),trail(T),local(L)]).

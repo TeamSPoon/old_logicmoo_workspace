@@ -982,7 +982,7 @@ differnt_modules(User2,User1):- User1 \== User2.
 :-meta_predicate(bugger_goal_expansion(:,-)).
 bugger_goal_expansion(CM:T,TT):-  tlbugger:use_bugger_expansion,!,bugger_goal_expansion(CM,T,TT).
 :-meta_predicate(bugger_goal_expansion(+,+,-)).
-bugger_goal_expansion(CM,T,T3):- once(bugger_t_expansion(CM,T,T2)),T\==T2,!,catchvv(expand_term(T2,T3),_,fail).
+bugger_goal_expansion(CM,T,T3):- once(bugger_t_expansion(CM,T,T2)),T\==T2,!,failOnError(expand_term(T2,T3)).
 
 :-meta_predicate(bugger_expand_goal(0,-)).
 bugger_expand_goal(T,_):- fail,ddmsg(bugger_expand_goal(T)),fail.
@@ -1287,7 +1287,7 @@ set_gui_debug(TF):-
    ((TF, has_gui_debug,set_yes_debug, ignore((use_module(library(gui_tracer)),catchvv(guitracer,_,true)))) -> set_prolog_flag(gui_tracer, true) ; set_prolog_flag(gui_tracer, false)).
 
 
-:-meta_predicate(set_yes_debug()).
+:- module_transparent(set_yes_debug/0).
 :- swi_export(set_yes_debug/0).
 set_yes_debug:- 
   must_det_l([
@@ -1442,9 +1442,10 @@ do_gc1:- cnotrace((garbage_collect, garbage_collect_atoms /*garbage_collect_clau
                     )).
 
 
-failOnError(Call):-catchvv(Call,_,fail).
+failOnError(Call):-notrace(catchvv(Call,_,fail)).
 
 fresh_line:-current_output(Strm),fresh_line(Strm),!.
+fresh_line(Strm):-is_prolog_stream(Strm),failOnError(format(Strm,'~n',[])),!.
 fresh_line(Strm):-failOnError(format(Strm,'~N',[])),!.
 fresh_line(Strm):-failOnError((stream_property(Strm,position('$stream_position'(_,_,POS,_))),(POS>0->nl(Strm);true))),!.
 fresh_line(Strm):-failOnError(nl(Strm)),!.
@@ -1840,131 +1841,6 @@ loggerFmtReal(S,F,A):-
     fmt(S,F,A),
     flush_output_safe(S),!.
 
-
-
-% dumpstack_arguments.
-
-dumpST:- tlbugger:ifHideTrace,!.
-dumpST:- tlbugger:skipDmsg,!, ignore((dumpST0)),!.
-dumpST:- ignore(catch(( with_assertions(tlbugger:skipDmsg,dumpST9)),E,writeq(E))),!.
- 
-dumpST0:-
- ignore((catch((
-  thread_current_error_stream(ERR),
-   MaxDepth=200,integer(MaxDepth),Term = dumpST(MaxDepth),format_to_error( '% dumpST ~p', [Term]), nl(ERR),
-    prolog_current_frame(Frame),ignore(( get_prolog_backtrace(MaxDepth, Trace,[frame(Frame),goal_depth(100)]),    
-    print_prolog_backtrace(ERR, Trace,[subgoal_positions(true)]), nl(ERR), fail))),
-   E,writeq(E)))).
-
-
-dumpST9:- tlbugger:ifHideTrace,!.
-dumpST9:- hotrace((prolog_current_frame(Frame),dumpST2(Frame,5000))).
-% dumpST(_):-is_hiding_dmsgs,!.
-
-dumpST(_):- tlbugger:ifHideTrace,!.
-dumpST(Opts):- dumpST(_,Opts).
-
-dumpST(_,_):- tlbugger:ifHideTrace,!.
-dumpST(Frame,Opts):-var(Opts),!,dumpST(Frame,5000).
-dumpST(Frame,MaxDepth):-
-   thread_current_error_stream(ERR),
-   integer(MaxDepth),Term = dumpST(MaxDepth),
-   (var(Frame)->prolog_current_frame(Frame);true),
-   ignore(( get_prolog_backtrace(MaxDepth, Trace,[frame(Frame),goal_depth(100)]),
-    format_to_error( '% dumpST ~p ~n', [Term]),
-    print_prolog_backtrace(ERR, Trace,[subgoal_positions(true)]), nl(ERR), fail)),!.
-dumpST(Frame,MaxDepth):- integer(MaxDepth),(var(Frame)->prolog_current_frame(Frame);true),dumpST2(Frame,MaxDepth).
-dumpST(Frame,Opts):-is_list(Opts),!,dumpST(1,Frame,Opts).
-dumpST(Frame,Opts):-show_call(dumpST(1,Frame,[Opts])).
-
-dumpST2(_,_):- tlbugger:ifHideTrace,!.
-dumpST2(Frame,From-MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[skip_depth(From),max_depth(MaxDepth),numbervars(safe),show([has_alternatives,level,context_module,goal,clause])]).
-dumpST2(Frame,MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[max_depth(MaxDepth),numbervars(safe),show([has_alternatives,level,context_module,goal,clause])]).
-
-get_m_opt(Opts,Max_depth,D100,RetVal):-E=..[Max_depth,V],(((member(E,Opts),nonvar(V)))->RetVal=V;RetVal=D100).
-
-dumpST(_,_,_):- tlbugger:ifHideTrace,!.
-dumpST(N,Frame,Opts):-
-  ignore(prolog_current_frame(Frame)),
-  must(( dumpST4(N,Frame,Opts,Out))),
-   must((get_m_opt(Opts,numbervars,88,Start),
-   neg1_numbervars(Out,Start,ROut),
-   reverse(ROut,RROut),
-   ignore((forall(member(E,RROut),fdmsg(E)))))).
-
-neg1_numbervars(T,-1,T):-!.
-neg1_numbervars(Out,Start,ROut):-copy_term(Out,ROut),integer(Start),!,snumbervars(ROut,Start,_).
-neg1_numbervars(Out,safe,ROut):-copy_term(Out,ROut),safe_numbervars(ROut).
-
-fdmsg1(txt(S)):-format_to_error(S,[]),!.
-fdmsg1(level=L):-format_to_error('(~q)',[L]),!.
-fdmsg1(context_module=G):-!,format_to_error('[~w] ',[G]),!.
-fdmsg1(has_alternatives=G):- (G==false->true;format_to_error('*',[G])),!.
-fdmsg1(goal=G):-mesg_color(G,Ctrl),simplify_goal_printed(G,GG),!,ansicall(Ctrl,format_to_error(' ~q. ',[GG])),!.
-fdmsg1(clause=[F,L]):- directory_file_path(_,FF,F),format_to_error('  %  ~w:~w: ',[FF,L]),!.
-fdmsg1(clause=[F,L]):- fresh_line,format_to_error('%  ~w:~w: ',[F,L]),!.
-fdmsg1(clause=[]):-format_to_error(' /*DYN*/ ',[]),!.
-fdmsg1(G):-mesg_color(G,Ctrl),ansicall(Ctrl,format_to_error(' ~q ',[G])),!.
-fdmsg1(M):-dmsg(failed_fdmsg1(M)).
-
-fdmsg(fr(List)):-is_list(List),!,fresh_line,ignore(forall(member(E,List),fdmsg1(E))),nl.
-fdmsg(M):-dmsg(M).
-
-simplify_goal_printed(O,O):-!.
-simplify_goal_printed(G,O):- must(transitive(simplify_goal_printed0,G,O)),!.
-
-
-:-swi_export(simplify_goal_printed0/2).
-simplify_goal_printed0(Var,Var):- \+ compound(Var),!.
-simplify_goal_printed0(user:G,G).
-simplify_goal_printed0(system:G,G).
-simplify_goal_printed0(catchvv(G,_,_),G).
-simplify_goal_printed0(call(G),G).
-simplify_goal_printed0(G,O):- G=..[F|A],must_maplist(simplify_goal_printed,A,AA),!,A\==AA,O=..[F|AA].
-simplify_goal_printed0(G,O):- G=..[F|A],must_maplist(simplify_goal_printed,A,AA),!,A\==AA,O=..[F|AA].
-
-dumpST4(N,Frame,Opts,[nf(max_depth,N,Frame,Opts)]):-get_m_opt(Opts,max_depth,100,MD),N>=MD,!.
-%dumpST4(N,Frame,Opts,[nf(max_depth,N,Frame,Opts)]):-get_m_opt(Opts,skip_depth,100,SD),N=<SD,!,fail.
-dumpST4(N,Frame,Opts,[fr(Goal)|MORE]):- get_m_opt(Opts,show,goal,Ctrl),getPFA(Frame,Ctrl,Goal),!,dumpST_Parent(N,Frame,Opts,MORE).
-dumpST4(N,Frame,Opts,[nf(no(Ctrl),N,Frame,Opts)|MORE]):- get_m_opt(Opts,show,goal,Ctrl),!,dumpST_Parent(N,Frame,Opts,MORE).
-dumpST4(N,Frame,Opts,[nf(noFrame(N,Frame,Opts))]).
-
-dumpST_Parent(N,Frame,Opts,More):- prolog_frame_attribute(Frame,parent,ParentFrame), NN is N +1,dumpST4(NN,ParentFrame,Opts,More),!.
-dumpST_Parent(N,Frame,Opts,[nf(noParent(N,Frame,Opts))]).
-
-
-
-getPFA(Frame,[L|List],Goal):- !,findall(R, (member(A,[L|List]),getPFA1(Frame,A,R)) ,Goal).
-getPFA(Frame,Ctrl,Goal):-getPFA1(Frame,Ctrl,Goal).
-
-getPFA1(_Frame,txt(Txt),txt(Txt)):-!.
-getPFA1(Frame,clause,Goal):-getPFA2(Frame,clause,ClRef),clauseST(ClRef,Goal),!.
-getPFA1(Frame,Ctrl,Ctrl=Goal):-getPFA2(Frame,Ctrl,Goal),!.
-getPFA1(_,Ctrl,no(Ctrl)).
-
-getPFA2(Frame,Ctrl,Goal):- catchvv((prolog_frame_attribute(Frame,Ctrl,Goal)),E,Goal=[error(Ctrl,E)]),!.
-
-clauseST(ClRef,clause=Goal):- findall(V,(member(Prop,[file(V),line_count(V)]),clause_property(ClRef,Prop)),Goal).
-
-clauseST(ClRef,Goal = HB):- ignore(((clause(Head, Body, ClRef),copy_term(((Head :- Body)),HB)))),
-   snumbervars(HB,0,_),
-   findall(Prop,(member(Prop,[source(_),line_count(_),file(_),fact,erased]),clause_property(ClRef,Prop)),Goal).
-
-
-
-withFormatter(Lang,From,Vars,SForm):-formatter_hook(Lang,From,Vars,SForm),!.
-withFormatter(_Lang,From,_Vars,SForm):-sformat(SForm,'~w',[From]).
-
-flush_output_safe:-ignore(catchvv(flush_output,_,true)).
-flush_output_safe(X):-ignore(catchvv(flush_output(X),_,true)).
-
-writeFailureLog(E,X):-
-  thread_current_error_stream(ERR),
-		(fmt(ERR,'\n% error: ~q ~q\n',[E,X]),flush_output_safe(ERR),!,
-		%,true.
-		fmt('\n% error: ~q ~q\n',[E,X]),!,flush_output).
-
-%unknown(Old, autoload).
 
 
 %=========================================

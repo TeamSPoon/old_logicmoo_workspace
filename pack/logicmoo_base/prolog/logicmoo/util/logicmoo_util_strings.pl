@@ -183,8 +183,8 @@ list_replace(List,Char,Replace,NewList):-
 	append(NewLeft,NewRight,NewList),!.
 list_replace(List,_Char,_Replace,List):-!.
 
-term_to_string(IS,I):- catch(term_string(IS,I),_,fail),!.
-term_to_string(I,IS):- catch(string_to_atom(IS,I),_,fail),!.
+term_to_string(IS,I):- failOnError(term_string(IS,I)),!.
+term_to_string(I,IS):- failOnError(string_to_atom(IS,I)),!.
 term_to_string(I,IS):- grtrace(term_to_atom(I,A)),string_to_atom(IS,A),!.
 
 :-multifile(user:package_path/2).
@@ -206,7 +206,7 @@ first_char_to_upper(CX,Y):- name(CX,[S|SS]),char_type(S,to_lower(NA)),name(NA,[N
 first_char_to_lower(CX,Y):- name(CX,[S|SS]),char_type(S,to_upper(NA)),name(NA,[N]),name(Y,[N|SS]),!.
 to_titlecase(CX,Y):- sub_string(CX,1,_,0,Z),string_lower(Z,L), name(CX,[S|_]),char_type(S,to_lower(NA)),atom_concat(NA,L,Y).
 
-text_to_string_safe(Expr,Forms):-notrace(catch(text_to_string(Expr,Forms),_,fail)).
+text_to_string_safe(Expr,Forms):-failOnError(text_to_string(Expr,Forms)).
 
 
 toLowercase(I,O):-integer(I),!,to_lower(I,O).
@@ -271,7 +271,7 @@ ctype_switcher(digit).
 ctype_switcher(punct).
 ctype_switcher(white).
 
-breaked_codes(S,C0):-catch(write_to_codes(S,C),_,fail),!,C=C0.
+breaked_codes(S,C0):-failOnError(write_to_codes(S,C)),!,C=C0.
 breaked_codes(S,C0):-catch(number_codes(S,C),_,string_codes(S,C)->true;(atom_codes(S,C)->true;string_equal_ci(S,C))),!,C=C0.
 
 ctype_continue(upper,lower).
@@ -363,7 +363,7 @@ destringify('$VAR'(S),'$VAR'(S)):-!.
 destringify(string(S),string(S)):-is_ftVar(S),!.
 destringify([],[]):-!.
 destringify('[]','[]'):-!.
-destringify(T,A):- catch(call((text_to_string(T,S),!,atom_string(A,S))),_,fail),!.
+destringify(T,A):- failOnError(call((text_to_string(T,S),!,atom_string(A,S)))),!.
 destringify(X,S):-is_ftString2(X),stringToCodelist(X,CL),name(S,CL),!.
 destringify([H|T],[HH|TT]):-!,destringify(H,HH),destringify(T,TT),!.
 destringify(X,P):-compound(X),X=..LIST,maplist(destringify,LIST,DL),P=..DL,!.
@@ -443,8 +443,8 @@ any_to_string1(txtFormatFn(Fmt,Args),String):-!,sformat(String,Fmt,Args).
 any_to_string1(Atom,String):-atom(Atom),!,atom_string(Atom,String).
 any_to_string1([Atom],String):-nonvar(Atom),!,any_to_string1(Atom,String).
 any_to_string1(A,""):-nonvar(A),member(A,[[],'',"",``]),!.
-any_to_string1(List,String):-catch(text_to_string(List,String),_,fail).
-%any_to_string1(List,String):- fail, dtrace, is_list(List), (catch(atomics_to_string(List, ' ', String),_,fail); ((list_to_atomics_list0(List,AList),catch(atomics_to_string(AList, ' ', String),_,fail)))),!.
+any_to_string1(List,String):- text_to_string_safe(List,String).
+%any_to_string1(List,String):- fail, dtrace, is_list(List), (failOnError(atomics_to_string(List, ' ', String)); ((list_to_atomics_list0(List,AList),failOnError(atomics_to_string(AList, ' ', String))))),!.
 any_to_string1(List,String):-sformat(String,'~s',[List]).
 /*
 list_to_atomics_list0(Var,A):-var(Var),!,any_to_string(Var,A),!.
@@ -459,11 +459,11 @@ atomic_list_concat_catch(List,Sep,Atom):-catch(atomic_list_concat_safe(List,Sep,
 
 
 catch_read_term_from_atom(Sub,Term,NewOnes):-
-  catch(read_term_from_atom(Sub,Term,[module(user),variable_names(NewOnes)]),_,fail),Term\==end_of_file.
+  failOnError(read_term_from_atom(Sub,Term,[module(user),variable_names(NewOnes)])),Term\==end_of_file.
 
 :- swi_export(splt_words/3).
-splt_words(Atom,Terms,Var):- catch((hotrace(once(splt_words_0(Atom,Terms,Var)))),_,fail),!.
-splt_words(Atom,Words1,[]):- catch(atomic_list_concat_safe(Words1,' ',Atom),_,fail),!.
+splt_words(Atom,Terms,Var):- failOnError((hotrace(once(splt_words_0(Atom,Terms,Var))))),!.
+splt_words(Atom,Words1,[]):- failOnError(atomic_list_concat_safe(Words1,' ',Atom)),!.
 
 splt_words_0(S,Terms,Var):-any_to_atom(S,Atom),!,splt_words_0_atom(Atom,Terms,Var),!.
 
@@ -700,7 +700,7 @@ to_word_list_0(A,WList):-any_to_string(A,String),!,text_to_string(String,Atom),t
 
 
 read_stream_to_arglist(Input,[]):- at_end_of_stream(Input),!.
-read_stream_to_arglist(Input,[]):- catch((once(wait_for_input([Input], Inputs, 0.01)),Inputs=[]),_,fail),!.
+read_stream_to_arglist(Input,[]):- failOnError((once(wait_for_input([Input], Inputs, 0.01)),Inputs=[])),!.
 read_stream_to_arglist(Input,[H|T]):-show_call(lisp_read(Input,H,_)),!,(is_ending(H)->T=[];read_stream_to_arglist(Input,T)),!.
 
 is_ending(List):-nonvar(List),(is_list(List)->last(List,whitepace("\n"));List==whitepace("\n")).

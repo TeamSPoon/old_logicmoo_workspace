@@ -78,7 +78,7 @@ pp_item(M,pt(F,Body)):-              !,fmt('~w p-trigger: ~p~n~nbody:~n', [M,F])
 pp_item(M,bt(F,Body)):-              !,fmt('~w b-trigger: ~p~nbody: ~p~n', [M,F,Body]).
 
 pp_item(M,U:W):- !,sformat(S,'~w  ~w:',[M,U]),!, pp_item(S,W).
-pp_item(M,H):- \+ \+ (( get_clause_vars_hb(H,HH),fmt("~w ~p~n",[M,HH]))).
+pp_item(M,H):- \+ \+ (( get_clause_vars_hb(H,HH),fmt("~w ~p~N",[M,HH]))).
 
 pfc_classify_facts([],[],[],[]).
 
@@ -363,7 +363,7 @@ pfc_listing_1(What):-
 
 :-thread_local(thlocal:tl_hide_data/1).
 
-logicmoo_html_needs_debug.
+% logicmoo_html_needs_debug.
 
 hide_data(P):-hide_data0(showAll),!,fail.
 hide_data(P):-notrace(hide_data0(P)).
@@ -496,7 +496,7 @@ get_clause_vars_hb(HH,HH):- sub_term(S,HH),compound(S),S='$VAR'(A),atom(A),!. % 
 get_clause_vars_hb(I,I):- hide_data(skipVarnames),!.
 get_clause_vars_hb(H,HH):-  get_clause_vars(H),!,must((name_vars(H,HH),get_clause_vars(HH),snumbervars(HH,198,_,[attvar(skip)]))),!.
 
-pp_i2tml_v(HB):- \+ \+ ((get_clause_vars_hb(HB,HB2),pp_i2tml_0(HB2))),!.
+pp_i2tml_v(HB):- ignore(catch(( \+ \+ ((get_clause_vars_hb(HB,HB2),pp_i2tml_0(HB2)))),_,true)),!.
 
 pp_i2tml_0(Var):-var(Var),!.
 pp_i2tml_0(USER:HB):-USER==user,!,pp_i2tml_0(HB),!.
@@ -549,7 +549,7 @@ pp_i2tml_1(H):- thlocal:print_mode(html),
 pp_i2tml_1(H):- \+ \+ pp_i2tml_now(H).
 
 pp_i2tml_now(C):- thlocal:pp_i2tml_hook(C),!.
-pp_i2tml_now(C):- if_html('<font size="3">~@</font>~n',if_defined(rok_portray_clause(C),portray_clause(C))).
+pp_i2tml_now(C):- if_html('<font size="3">~@</font>~N',if_defined(rok_portray_clause(C),portray_clause(C))).
 
 
 

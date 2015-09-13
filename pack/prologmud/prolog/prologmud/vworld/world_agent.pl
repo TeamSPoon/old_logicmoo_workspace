@@ -102,7 +102,7 @@ agent_call_unparsed_0(Agent,Var):-var(Var),trace_or_throw(var_agent_call_unparse
 
 % execute a prolog command including prolog/0
 agent_call_unparsed_0(_Gent,Atom):- atomic(Atom), catch((
-   (once((catch(read_term_from_atom(Atom,OneCmd,[variables(VARS)]),_,fail),
+   (once((failOnError(read_term_from_atom(Atom,OneCmd,[variables(VARS)])),
       predicate_property(OneCmd,_),
       fmt('doing command ~q~n',[OneCmd]))),!, doall((OneCmd,fmt('Yes: ~w',[VARS]))))),E,(dmsg(E),fail)).
 
@@ -112,7 +112,7 @@ agent_call_unparsed_0(A,Atom):-to_word_list(Atom,List),must(is_list(List)),!,age
 
 
 agent_call_words(A,Words):- (\+ is_list(Words)),must(agent_call_unparsed(A,Words)),!.
-agent_call_words(Agent,Text):- catch(text_to_string(Text,String),_,fail),Text\=@=String,!,agent_call_unparsed(Agent,String).
+agent_call_words(Agent,Text):- text_to_string_safe(Text,String),Text\=@=String,!,agent_call_unparsed(Agent,String).
 
 
 % remove period at end
@@ -137,7 +137,7 @@ where_atloc(Agent,'OffStage'):-fail,nonvar(Agent).
 
 % All Actions must be called from here!
 agent_call_command_now(Agent,CMD  ):- var(CMD),trace_or_throw(var_agent_call_command_now(Agent,CMD)).
-agent_call_command_now(Agent,Text ):- catch(text_to_string(Text,String),_,fail),show_call(loop_check(agent_call_unparsed(Agent,String))).
+agent_call_command_now(Agent,Text ):- text_to_string_safe(Text,String),show_call(loop_check(agent_call_unparsed(Agent,String))).
 agent_call_command_now(Agent,Words):- is_list(Words),loop_check(agent_call_words(Agent,Words)).
 agent_call_command_now(Agent,CMD  ):- subst(CMD,isSelfAgent,Agent,NewCMD),CMD\=@=NewCMD,!,agent_call_command_now(Agent,NewCMD).
 agent_call_command_now(Agent,CMD  ):- correctCommand(Agent,CMD,NewCMD),CMD\=@=NewCMD,!,agent_call_command_now(Agent,NewCMD).
@@ -216,8 +216,8 @@ get_agent_input_stream(P,In):-no_repeats(P-In,(get_agent_session(P,O),thglobal:s
 
 get_agent_input_thread(P,Id):-no_repeats(P-Id,(get_agent_input_stream(P,O),thglobal:session_io(_,In,_,Id))).
 
-
-with_agent(P,CALL):-
+with_agent(P,CALL):-with_agent0(P,CALL).
+with_agent0(P,CALL):-
  get_session_id(TS),must(nonvar(TS)),
  thread_self(Self),
  ((get_agent_session(P,O),thglobal:session_io(O,In,Out,Id),Id\=Self)->Wrap=thread_signal_blocked(Id);Wrap=call),!,

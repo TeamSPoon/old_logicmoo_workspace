@@ -6,7 +6,6 @@
 
 :- user:ensure_loaded(run_mud_server).
 
-
 started_mud_server.
 
 % ==============================

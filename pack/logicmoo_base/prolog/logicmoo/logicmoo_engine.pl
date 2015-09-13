@@ -667,3 +667,5 @@ kif_sanity_tests:- forall(clause(kif_sanity_test_0,B),must(B)).
 :- ensure_loaded(plarkc/logicmoo_i_clif).
 
 :- ensure_loaded(logicmoo_plarkc).
+
+:- autoload.

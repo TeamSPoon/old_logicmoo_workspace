@@ -49,7 +49,7 @@
 :- set_prolog_flag(double_quotes,string).
 
 
-:- ensure_loaded(logicmoo_util_bugger_new).
+% :- ensure_loaded(logicmoo_util_bugger_new).
 :- ensure_loaded(logicmoo_util_bugger_catch).
 :- '@'( ensure_loaded(logicmoo_util_bugger), 'user').
 

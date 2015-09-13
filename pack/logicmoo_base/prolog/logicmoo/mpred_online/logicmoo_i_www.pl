@@ -167,7 +167,7 @@ save_in_session(N=V):- hmust(save_in_session(N,V)),!.
 save_in_session(NV):- dmsg(not_save_in_session(NV)),!.
 
 :-export(save_in_session/2).
-save_in_session(Unsaved,_):- member(Unsaved,[session_data,request_uri,search,pool,input,session]),!.
+save_in_session(Unsaved,_):- member(Unsaved,[session_data,request_uri,search,pool,path,input,session]),!.
 save_in_session(_,V):- sub_term(Sub,V),nonvar(Sub),is_stream(Sub),!.
 save_in_session(N,V):- get_http_session(S), save_in_session(S, N,V),!.
 
@@ -203,7 +203,7 @@ reset_assertion_display:-
    retractall(shown_subtype(_)),
    retractall(shown_clause(_)).
 
-get_param_sess(N,V):- must(param_default_value(N,D)),get_param_sess(N,V,D).
+get_param_sess(N,V):- must(param_default_value(N,D)),!,get_param_sess(N,V,D),!.
 
 
 :-dynamic(http_last_request/1).
@@ -234,12 +234,12 @@ save_request_in_session(Request):-
 
 
 
-handler_logicmoo_cyclone(_Request):- mmake, is_goog_bot,!,
+handler_logicmoo_cyclone(_Request):- is_goog_bot,!,
   format('Content-type: text/html~n~n',[]),
   format('<!DOCTYPE html><html><head></head><body></body></html>~n~n',[]),flush_output,!.
 
 handler_logicmoo_cyclone( Request):-    
-   notrace(call(handler_logicmoo_cyclone_1,Request)),!.
+  notrace( call(handler_logicmoo_cyclone_1,Request)),!.
 
 handler_logicmoo_cyclone_1(Request):- 
  must_det_l((
@@ -251,7 +251,7 @@ handler_logicmoo_cyclone_1(Request):-
     member(path(PATH),Request),
     directory_file_path(_,FCALL,PATH),
    once(get_param_req(call,Call);(current_predicate(FCALL/0),Call=FCALL);get_param_sess(call,Call,edit1term)),
-   notrace(logOnError(Call)),!,flush_output)),!.
+   (logOnError(Call)),!,flush_output)),!.
    
 
 
@@ -259,7 +259,22 @@ write_begin_html(B,BASE,URI):-
   hmust_l((
       % sformat(BASE,'~w~@',[B,get_request_vars('_n_~w_v0_~w_vZ')]),
       BASE = B,
-      format('<html><head><style type="text/css">input[type="checkbox"] {width:10px; height:10px; }</style>',[]),            
+      format('<html><head><style type="text/css">
+   element.style {
+    position: relative;
+    min-height: 100%;
+    top: 0px;
+}
+html, body {
+    font-family: Verdana,sans-serif;
+    font-size: 10px;
+    line-height: 1.5;
+}
+body {
+    margin: 1;
+}
+        input[type="checkbox"] {width:10px; height:10px; }</style>',
+        []),            
       hmust((get_http_current_request(Request))),
       hmust_l(member(request_uri(URI),Request)->true;URI=''),
       % ((URI\==''->format('<meta http-equiv="refresh" content="300;~w">',[URI]);true)),
@@ -267,13 +282,13 @@ write_begin_html(B,BASE,URI):-
       ignore(URI=''),
       ignore(BASE=''),
      format('<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>',[]),
-     format('<title>~w for ~w</title></head>',[BASE,URI]),
+     format('<title>~w for ~w</title></head>',[BASE,uri]),
      format('<body class="yui-skin-sam">',[]),flush_output)),!.
    
 
 write_end_html:- flush_output,format('</body></html>~n~n',[]),flush_output,!.
 
-% logicmoo_html_needs_debug
+logicmoo_html_needs_debug.
 
 add_form_script:-format("
 <script type=\"text/javascript\">
@@ -290,6 +305,7 @@ $('form').submit(function() {
  // alert($(this));
 });
 
+var handled = false;
 
 function callback(e) {
     var e = window.e || e;
@@ -297,8 +313,12 @@ function callback(e) {
     var targ = e.target;
     if (targ.tagName !== 'A')
         return;
-    if(!handled) {
-      handled[targ] = true;
+    if(!handled) {     
+      handled = true;
+     // alert('hi ' +  targ.target);
+      if (targ.target !== '') {
+       return;
+      }
       e.preventDefault();
       e.stopPropagation();
       $('form').action = targ.href;
@@ -315,8 +335,6 @@ if (document.addEventListener)
 else
     document.attachEvent('onclick', callback);
 
-var handled = false;
-
 
 
 </script>
@@ -324,14 +342,14 @@ var handled = false;
 ).
 
 
-show_pcall_footer:-
-      format('<hr><span class="copyright"><i>Copyright &copy; 1999 - 2015 <a href="http://prologmoo.com">
-      LogicMOO/PrologMUD</a>.All rights reserved.</i></span></body></html>~n
-      ',
-      []),!.
+show_pcall_footer:- format('<hr><a href="http://prologmoo.com">LogicMOO/PrologMUD</a>',[]),!.
 
-cvt_param_to_term(In,Obj):-atom(In),catch(atom_to_term(In,Obj,_),_,fail),nonvar(Obj),!.
-cvt_param_to_term(In,Obj):-string(In),catch(atom_to_term(In,Obj,_),_,fail),nonvar(Obj),!.
+sensical_nonvar(O):-nonvar(O), O \= (_ - _).
+
+cvt_param_to_term(In,Obj,Vs):-atom(In),failOnError(atom_to_term(In,Obj,Vs)),sensical_nonvar(Obj),!.
+cvt_param_to_term(In,Obj,Vs):-string(In),failOnError(atom_to_term(In,Obj,Vs)),sensical_nonvar(Obj),!.
+cvt_param_to_term('~w',"").
+cvt_param_to_term(In,Obj):-cvt_param_to_term(In,Obj,_Vs).
 cvt_param_to_term(Obj,Obj).
 
 
@@ -363,6 +381,7 @@ human_language('SpanishLanguage').
 human_language('ThaiLanguage').
 human_language('de').
 
+foobar:- f((_A < _B) > _C).
 
 param_default_value(call,edit1term).
 
@@ -420,24 +439,72 @@ show_select1(Name,Pred):-
  format('</select>',[]),!.
 
 
- 
+as_ftVars(N='$VAR'(N)):-atomic(N),!.
+as_ftVars(N=V).
+as_ftVars(_).
 
+    
+search4term:- 
+  get_param_sess(term,Term,"tHumanHead"),
+  get_param_sess(find,SObj,Term),
+  cvt_param_to_term(SObj,Obj),
+  call_for_terms(make_page_pretext_obj(Obj)).
+
+edit1term:-  
+  get_param_req('ASK','ASK'),!,
+  with_main_error_to_output(
+   must_det_l((
+   get_param_sess(term,String,""),
+   cvt_param_to_term(String,Term,VNs),
+   save_in_session(find,Term),
+   term_variables(Term,Vs),
+   % call_for_terms
+   edit1term(forall(Term,pp_item('Answer',':-'(VNs,Term))))))).
+  
+edit1term:- 
+  get_param_req('TELL','TELL'),!,
+  with_main_error_to_output(
+   must_det_l((
+   get_param_sess(term,String,""),
+   cvt_param_to_term(String,Term,VNs),
+   save_in_session(find,Term),
+   term_variables(Term,Vs),
+   maplist(as_ftVars,VNs),
+   call_for_terms(forall(pfc_add(Term),pp_item('Assert',':-'(VNs,Term))))))).
+  
+edit1term:- 
+  get_param_req('RETRACT','RETRACT'),!,
+  with_main_error_to_output(
+   must_det_l((
+   get_param_sess(term,String,""),
+   cvt_param_to_term(String,Term,VNs),
+   save_in_session(find,Term),
+   term_variables(Term,Vs),
+   maplist(as_ftVars,VNs),
+   call_for_terms(forall(pfc_rem1(Term),pp_item('Retract',':-'(VNs,Term))))))).
+  
 edit1term:-
  must_det_l((
-   reset_assertion_display,
-   get_param_sess(term,String,""),
-   get_param_sess(find,Word,String),
-   term_to_pretty_string(Word,SWord),
-   show_call(show_edit_term(String,SWord)))).
+             reset_assertion_display,
+             get_param_sess(term,String,""),get_param_sess(find,Word,""),term_to_pretty_string(Word,SWord),
+   show_edit_term(true,String,SWord))),!,
+ show_iframe(search4term,find,SWord).
 
-show_edit_term(String,SWord):- samef(SWord,String),cvt_param_to_term(String,T),compound(T),T=(H:-_),!,show_edit_term0(String,H).
-show_edit_term(String,SWord):-show_edit_term0(String,SWord).
+edit1term(Call):-
+ must_det_l((
+             reset_assertion_display,
+             get_param_sess(term,String,""),get_param_sess(find,Word,""),term_to_pretty_string(Word,SWord),
+   show_edit_term(Call,String,SWord))),!.
 
-show_edit_term0(String,SWord):-atomic(SWord),cvt_param_to_term(SWord,T),nonvar(T),!,show_edit_term1(String,T).
-show_edit_term0(String,SWord):-show_edit_term1(String,SWord).
 
-show_edit_term1(String,(P=>Q)):-!,show_edit_term1(String,(P;Q;(P=>Q))).
-show_edit_term1(String,SWord):-
+show_edit_term(Call,String,_SWord):- cvt_param_to_term(String,T),compound(T),T=(H:-_),!,show_edit_term0(Call,String,H).
+show_edit_term(Call,String,SWord):- show_edit_term0(Call,String,SWord),!.
+
+show_edit_term0(Call,String,SWord):-atomic(SWord),cvt_param_to_term(SWord,T),nonvar(T),!,show_edit_term1(Call,String,T).
+show_edit_term0(Call,String,SWord):-show_edit_term1(Call,String,SWord).
+
+show_edit_term1(Call,String,(P=>Q)):-!,show_edit_term1(Call,String,(P;Q;(P=>Q))),!.
+show_edit_term1(Call,String,SWord):-
  write_begin_html('edit1term',_BASE,URL),
 format('
 <table width="1111" cellspacing="0" cellpadding="0" height="121" id="table4">
@@ -457,8 +524,8 @@ format('
               <textarea style="white-space: pre; overflow: auto; font-size: 7pt; font-weight: bold; font-family: Verdana, Arial, Helvetica, sans-serif;border: 1px solid black;"
                wrap="off" rows="10" cols="70" name="term">~w</textarea>
           </td>
-          <td align="left" valign="top" height="68">~@<input type="submit" value="TELL" name="TELL"><input type="submit" value="ASK" name="ASK">
-             <br><b>Microthory</b><br>~@
+          <td align="left" valign="top" height="68">~@
+             <br><b>Microthory</b><br>~@<br/><input type="submit" value="ASK" name="ASK"><input type="submit" value="TELL" name="TELL"><input type="submit" value="RETRACT" name="RETRACT">
              <br><b>Formal Language</b><br>~@</td>
       </tr>
         <tr><td><img src="/pixmaps/1pixel.gif" height="3"></td>
@@ -488,9 +555,7 @@ format('
 		<tr>
 			<td width="4">&nbsp;</td>
 		</tr>
-  </form></table><hr>
-  <iframe width="100%" height="800" frameborder="0" scrolling="yes" marginheight="0" marginwidth="0" 
-   allowtransparency=true id="main" name="main" style="width:100%;height:800" src="search4term?find=~w"></iframe>'
+  </form></table><hr>'
   ,[show_select2(prover,prover_name,[]),
     String,
     action_menu_applied('action_above',"Item",""),
@@ -500,10 +565,16 @@ format('
     show_select2('POS',partOfSpeech,[]),
     show_select1('humanLang',human_language),
     URL,
-    show_select2(olang,logic_lang_name,[]),
-    SWord]),!,
-   dmsg(find=SWord).
+    show_select2(olang,logic_lang_name,[])]),!,
+   dmsg(find=SWord),!,
+   format('<pre>',[]),
+   Call,
+   format('</pre>',[]),
+   write_end_html.
 
+show_iframe(URL,Name,Value):- format('<iframe width="100%" height="800" frameborder="0" scrolling="yes" marginheight="0" marginwidth="0" allowtransparency=true id="main" name="main" style="width:100%;height:800" src="~w?~w=~w"></iframe>',[URL,Name,Value]).
+show_iframe(URL):- format('<iframe width="100%" height="800" frameborder="0" scrolling="yes" marginheight="0" marginwidth="0" allowtransparency=true id="main" name="main" style="width:100%;height:800" src="search4term?find=~w"></iframe>',[URL]).
+  
 show_search_filtersTop(BR):- write(BR).
 
 show_search_filters(BR):- 
@@ -536,15 +607,14 @@ search_filter_name_comment(showAll,'Show All','0').
 session_checked(Name):- get_param_sess(Name,V),V\=='0',V\==0,V\=="0".
 
 session_checkbox(Name,Caption,BR):-
- format('<font size="-3">',[]),
-  (session_checked(Name) -> 
-     format('<input type="checkbox" name="~w" value="1" checked/>&nbsp;~w~w',[Name,Caption,BR]);
-     format('<input type="checkbox" name="~w" value="1"/>&nbsp;~w~w',[Name,Caption,BR])),
-  format('</font>',[]).
+ (session_checked(Name)-> CHECKED='CHECKED';CHECKED=''),
+ format('<font size="-3"><input type="checkbox" name="~w" value="1" ~w />~w</font>~w',[Name,CHECKED,Caption,BR]).
+ % format('<font size="-3"><label><input type="checkbox" name="~w" value="1" ~w/>~w</label></font>~w',[Name,CHECKED,Caption,BR]).
 
 action_menu_applied(MenuName,ItemName,Where):-
-  show_select2(MenuName,action_menu_item,[atom_subst('$item',ItemName)]),
-      format('&nbsp;~w&nbsp;&nbsp;<input type="submit" value="Now" name="Apply">',[Where]).
+  format('<label>',[]),show_select2(MenuName,action_menu_item,[atom_subst('$item',ItemName)]),
+      format('&nbsp;~w&nbsp;&nbsp;<input type="submit" value="Now" name="Apply">',[Where]),
+      format('</label>',[]).
 
 param_default_value(is_context,'BaseKB').
 is_context(MT,MT):-no_repeats(is_context0(MT)).
@@ -572,19 +642,20 @@ action_menu_item('NonMonotonic',"Treat $item NonMonotonic").
 get_request_vars(Format):- ignore(Exclude=[term,find,session_data,call,user_agent,referer,session,request_uri,accept]),
    findall(N=V,(current_form_var(N),\+ member(N,Exclude),once(get_param_sess(N,V))),NVs),
    forall(member(N=V,NVs),format(Format,[N,V])).
-    
-search4term:- 
+
+
+call_for_terms(Call):- 
    must_det_l((
-        get_param_sess(term,Term,"tHumanHead"),
-        get_param_sess(find,SObj,Term),
-        cvt_param_to_term(SObj,Obj),
+               get_param_sess(term,Term,"tHumanHead"),
+               get_param_sess(find,SObj,Term),
+               cvt_param_to_term(SObj,Obj),
         write_begin_html('search4term',Base,_),
-        format('<form action="search4term" target="_self">Apply ',[]),
+        format('<form action="search4term" target="_self"><font size="-3"> Apply ',[]),
         action_menu_applied('action_below',"Checked or Clicked","&nbsp;below&nbsp;"),
-        format('&nbsp;&nbsp;&nbsp;find = <input id="find" type="text" name="find" value="~q"><font size="-3"> ~@  Base = ~w</font><hr/></form>~@<pre>',
-        [Obj,show_search_filters('&nbsp;&nbsp;'),Base,add_form_script]),flush_output,
-        with_assertions(thlocal:print_mode(html),
-           (with_search_filters(catch(make_page_pretext_obj(Obj),E,(writeq(E),nl))))),
+        format('&nbsp;&nbsp;&nbsp;find = <input id="find" type="text" name="find" value="~q">~@  Base = ~w</font> <a href="edit1term" target="_top">edit1term</a> <hr/></form>~n~@',
+        [Obj,show_search_filters('&nbsp;&nbsp;'),Base,add_form_script]),        
+        format('<pre>',[]),flush_output,
+        with_assertions(thlocal:print_mode(html),with_search_filters(catch(call(Call),E,dmsg(E)))),
         format('</pre>',[]),flush_output,
         show_pcall_footer,
         write_end_html)),!.
@@ -606,10 +677,11 @@ make_page_pretext_obj(Obj):-
   % catch(mmake,_,true),
   % forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((this_listing(M:F/A),flush_output)))),
   % forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((reply_object_sub_page(M:F/A),flush_output)))),
+  % ignore((fail,catch(pfc_listing(Pred),_,true))),
   call_with_time_limit(300,ignore(catch(term_listing_inner(i2tml_hbr,Obj),E,writeq(E)))),
   flush_output,
   pp_i2tml_saved_done(Obj),!.
-  %ignore((fail,catch(pfc_listing(Pred),_,true))),!.
+
 make_page_pretext_obj(Obj):- writeq(make_page_pretext_obj(Obj)),!.
 
 
@@ -678,7 +750,9 @@ write_atom_link(W,A/_,N):-atom(A),!,write_atom_link(W,A,N).
 write_atom_link(W,C,N):-compound(C),get_functor(C,F,A),!,write_atom_link(W,F/A,N).
 %write_atom_link(W,_,N):- thread_self(main),!,write_term_to_atom_one(W,N),!.
 write_atom_link(W,_,N):- must(nonvar(W)),\+ thlocal:print_mode(html),write_term_to_atom_one(W,N),!.
-write_atom_link(W,A,N):- nonvar(W),catch((term_to_pretty_string(A,AQ),url_encode(AQ,URL),format(W,'<a href="?term=~w">~w</a>',[URL,AQ])),_,write_term_to_atom_one(W,N)).
+write_atom_link(W,A,N):- nonvar(W),catch((term_to_pretty_string(A,AQ),
+   url_encode(AQ,URL),
+   format(W,'<a href="?f=~w">~w</a>',[URL,AQ])),_,write_term_to_atom_one(W,N)).
 
 write_term_to_atom_one(atom(A),Term):-format(atom(A),'~q',[Term]).
 
@@ -812,7 +886,9 @@ put_string0([H|T]) :-
 %   quote has already been written.  Instances of Q in S are doubled.
 
 put_string(A,B):- thlocal:print_mode(html),!,
-  with_output_to(atom(S),put_string0(A,B)),url_iri(URL,S),format('<a href="?term=~w">~w</a>',[URL,S]).
+  with_output_to(atom(S),put_string0(A,B)),
+  url_iri(URL,S),format('<a href="?f=~w">~w</a>',[URL,S]).
+
 put_string(A,B):- put_string0(A,B).
 
 % :-start_rtrace.

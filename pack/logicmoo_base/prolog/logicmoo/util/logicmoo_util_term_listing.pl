@@ -141,8 +141,11 @@ predicateUsesCall(_:G):-
   member(F/A,[module_property/2,predicate_property/2,pengine_property/2,current_pengine_application/1,source_file_property/2,
             source_file/2,current_prolog_flag/2,current_op/3]),functor(G,F,A).
 
-%sourceTextPredicate(el_assertions:G):- between(4,16,A),functor(G,el_holds_implies_t,A).
-%sourceTextPredicate(el_assertions:G):- between(4,16,A),functor(G,el_holds_t,A).
+sourceTextPredicate(M:G):- source_file((M:el_holds(_,_,_,_,_,_,_)),F) -> source_file(M:G,F).
+%sourceTextPredicate(el_assertions:G):- between(4,16,A),functor(G,el_holds,A),current_predicate(_,el_assertions:G).
+%sourceTextPredicate(el_assertions:G):- between(4,16,A),functor(G,el_holds,A),current_predicate(_,el_assertions:G).
+%sourceTextPredicate(el_assertions:G):- between(4,16,A),functor(G,el_holds_implies_t,A),current_predicate(_,el_assertions:G).
+%sourceTextPredicate(el_assertions:G):- between(4,16,A),functor(G,el_holds_t,A),current_predicate(_,el_assertions:G).
 sourceTextPredicate(_):-fail.
 
 sourceTextPredicateSource(_):-fail.
@@ -150,9 +153,9 @@ sourceTextPredicateSource(_):-fail.
 :- thread_local(thlocal:large_predicates/2).
 
 
-synth_clause_for(G,true,0):-  bookeepingPredicateXRef(G), \+ hide_data(hideMeta), catch(G,_,fail).
+synth_clause_for(G,true,0):-  bookeepingPredicateXRef(G), \+ hide_data(hideMeta), failOnError(G).
 synth_clause_for(G,B,Ref):-  cur_predicate(_,M:H), \+ bookeepingPredicateXRef(M:H), \+ sourceTextPredicate(M:H), \+ hide_data(M:H), synth_clause_ref(M:H,G,B,Ref).
-synth_clause_for(G,true,0):-  sourceTextPredicate(G), \+ hide_data(G), catch(G,_,fail).
+synth_clause_for(G,true,0):-  sourceTextPredicate(G), \+ hide_data(G), failOnError(G).
 synth_clause_for(G,B, Ref):- \+ hide_data(skipLarge), gripe_time(10,synth_clause_for_l2(G,B,Ref)).
 
 synth_clause_for_l2(M:H,B,Ref):- 
@@ -168,7 +171,7 @@ synth_clause_for_large(M:H,B,Ref,ByLength):- \+ hide_data(M:H),
 :-swi_export((synth_clause_ref/3)).
 synth_clause_ref(M:H,M:predicate_property(H,B),true,0):- predicate_property(M:H,B), \+ hide_data(hideMeta).
 synth_clause_ref(_:saved_varname_info(_,_,_),_,_,_):-  \+ hide_data(showAll)  ,!,fail.
-synth_clause_ref(G,G,true,0):- synth_in_listing(G),  predicateUsesCall(G),!,catch(G,_,fail).
+synth_clause_ref(G,G,true,0):- synth_in_listing(G),  predicateUsesCall(G),!,failOnError(G).
 synth_clause_ref(M:H,M:H,B,Ref):- predicate_property(M:H,number_of_clauses(Size)),!,
     synth_in_listing(M:H),
     (Size > 5000 -> (\+ hide_data(skipLarge), asserta(thlocal:large_predicates(M:H,Size)),fail); M:clause(H,B,Ref)).
