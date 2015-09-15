@@ -487,13 +487,14 @@ edit1term:-
  must_det_l((
              reset_assertion_display,
              get_param_sess(term,String,""),get_param_sess(find,Word,""),term_to_pretty_string(Word,SWord),
+                save_in_session(find,SWord),
    show_edit_term(true,String,SWord))),!,
  show_iframe(search4term,find,SWord).
 
 edit1term(Call):-
  must_det_l((
              reset_assertion_display,
-             get_param_sess(term,String,""),get_param_sess(find,Word,""),term_to_pretty_string(Word,SWord),
+             get_param_sess(term,String,""),get_param_sess(find,Word,""),term_to_pretty_string(Word,SWord),save_in_session(find,SWord),
    show_edit_term(Call,String,SWord))),!.
 
 
