@@ -189,7 +189,9 @@ imploded_copyvars(C,CT):-must((source_variables(Vs),copy_term(C-Vs,CT-VVs),b_imp
 
 
 :-swi_export(unnumbervars/2).
-unnumbervars(X,YY):- must(unnumbervars0(X,Y)),!,must(Y=YY).
+unnumbervars(X,YY):- unnumbervars1(X,[],Y,_Vs),!, must(YY=Y).
+% TODO compare the speed
+% unnumbervars(X,YY):- must(unnumbervars0(X,Y)),!,must(Y=YY).
 
 
 
@@ -200,14 +202,20 @@ unnumbervars_saved(X,YY):-
     ( % writeq((unnumbervars1(X,Y,Vs))),nl,
      save_clause_vars(Y,Vs),must(Y=YY))).
 
+/*
 % todo this slows the system!
 unnumbervars0(X,clause(UH,UB,Ref)):- sanity(nonvar(X)),
   X = clause(H,B,Ref),!,
   must(unnumbervars0((H:-B),(UH:-UB))),!.
 
-unnumbervars0(X,YY):-
+unnumbervars0(X,YY):-unnumbervars1(X,YY,_Vs).
+*/
+/*
+unnumbervars1(X,YY):-
    must_det_l((with_output_to(string(A),write_term(X,[numbervars(true),character_escapes(true),ignore_ops(true),quoted(true)])),
    atom_to_term(A,Y,_NewVars),!,must(YY=Y))),check_varnames(YY).
+unnumbervars1(X,YY,Vs):-!,unnumbervars1(X,[],YY,Vs).
+*/
 
 unnumbervars1(X,Vs,X,Vs):- ( \+ compound(X)),!.
 unnumbervars1('$VAR'(X),VsIn,Y,Vs):-!, (memberchk(X=Y,VsIn)->Vs=VsIn;Vs=[X=Y|VsIn]).
@@ -220,6 +228,12 @@ unnumbervars1(XXM,VsIn,YYM,Vs):-
   unnumbervars1(XM,VsM,YM,Vs),
   YYM=..[F,Y|YM].
 
+/*
+unnumbervars1(X,YY,Vs):-
+ must_det_l((
+   with_output_to(codes(A),write_term(X,[numbervars(true),character_escapes(true),ignore_ops(true),quoted(true)])),   
+   read_term_from_codes(A,Y,[variable_names(Vs),character_escapes(true),ignore_ops(true)]),!,must(YY=Y),check_varnames(YY))).
+
 unnumbervars_and_save(X,YO):-
  term_variables(X,TV),
  must((source_variables(Vs),
@@ -227,7 +241,6 @@ unnumbervars_and_save(X,YO):-
    must(atom_to_term(A,Y,NewVars)),
    (NewVars==[]-> YO=X ; (length(TV,TVL),length(NewVars,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (trace,add_newvars(NewVars),Y=X)))).
 
-/*
 
 
 unnumbervars_and_copy(X,YO):-
@@ -262,8 +275,24 @@ remove_grounds([N=V|V0s],[N=NV|Vs]):-
    remove_grounds(V0s,Vs).
 
 % renumbervars(X,X):-ground(X),!.
+renumbervars(X,Y):-renumbervars1(X,[],Y,_),!.
 renumbervars(X,Z):-unnumbervars(X,Y),safe_numbervars(Y,Z),!.
 renumbervars(Y,Z):-safe_numbervars(Y,Z),!.
+
+
+renumbervars1(X,Y):-renumbervars1(X,[],Y,_).
+
+renumbervars1(V,VsIn,'$VAR'(X),Vs):- var(V), sformat(atom(X),'~w_RNV',[V]), !, (memberchk(X=V,VsIn)->Vs=VsIn;Vs=[X=V|VsIn]).
+renumbervars1(X,Vs,X,Vs):- ( \+ compound(X)),!.
+renumbervars1('$VAR'(V),VsIn,Y,Vs):- sformat(atom(X),'~w_VAR',[V]), !, (memberchk(X=Y,VsIn)->Vs=VsIn;Vs=[X=Y|VsIn]).
+renumbervars1([X|XM],VsIn,[Y|YM],Vs):-!,
+  renumbervars1(X,VsIn,Y,VsM),
+  renumbervars1(XM,VsM,YM,Vs).
+renumbervars1(XXM,VsIn,YYM,Vs):-
+  XXM=..[F,X|XM],
+  renumbervars1(X,VsIn,Y,VsM),
+  renumbervars1(XM,VsM,YM,Vs),
+  YYM=..[F,Y|YM].
 
 
 % register_var(?, ?, ?)
@@ -305,7 +334,7 @@ name_to_var(N,[N0=V0|T],V):-
    N0==N -> samify(V,V0) ; name_to_var(N,T,V).
 
 
-
+/*
 % ===================================================================
 % Safely number vars
 % ===================================================================
@@ -317,7 +346,7 @@ bugger_name_variables([Var|Vars]):-
    (var_property(Var, name(Name)) -> Var = '$VAR'(Name) ; true),
    bugger_name_variables(Vars).
 
-
+*/
 :- swi_export(snumbervars/1).
 snumbervars(Term):-snumbervars(Term,0,_).
 

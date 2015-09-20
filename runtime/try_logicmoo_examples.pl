@@ -33,4 +33,4 @@ user:file_search_path(pack, '../pack').
 :- ensure_webserver.
 
 
-
+:- user:ensure_loaded(logicmoo_repl).

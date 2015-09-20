@@ -84,7 +84,7 @@ compiled(F/A):- dynamic(F/A),compile_predicates([F/A]).
 :- compiled(('nesc')/1).
 :- compiled(('neg')/1).
 :- compiled(('<-')/2).
-:- compiled(('<-')/2).
+:- compiled(('==>')/2).
 :- compiled(('::::')/2).
 :- compiled(('<==>')/2).
 */
@@ -361,8 +361,8 @@ assert_u(X):- functor(X,F,A),assert_u(X,F,A).
 
 assert_u(X,F,_):-if_defined(singleValueInArg(F,SV)),!,must(update_single_valued_arg(X,SV)),!.
 assert_u(X,F,A):-prologSingleValued(F),!,must(update_single_valued_arg(X,A)),!.
-assert_u(X,F,A):- assertz_u(X,F,A).
 % assert_u(X,F,A):-must(isa(F,prologAssertAOrdered) -> asserta_u(X,F,A) ; assertz_u(X,F,A)).
+assert_u(X,F,A):- assertz_u(X,F,A).
 % assert_u(X,F,A):-must(isa(F,prologOrdered) -> assertz_u(X,F,A) ; asserta_u(X,F,A)).
 
 

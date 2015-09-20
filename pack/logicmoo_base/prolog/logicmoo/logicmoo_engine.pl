@@ -60,6 +60,8 @@
 
 
 :- user:ensure_loaded(logicmoo_base).
+
+
 :- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_call_kb)).
 
 :- dynamic(wid/3).

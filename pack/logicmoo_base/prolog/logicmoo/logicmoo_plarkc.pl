@@ -10,6 +10,10 @@
 :- ensure_loaded(logicmoo_engine).
 :- ensure_loaded(plarkc/logicmoo_i_cyc_kb).
 
+:- meta_predicate cwtdl(0,+,+).
+:- meta_predicate transfer_predicate(?,0,0).
+:- meta_predicate transTiny(?,0).
+
 :- dynamic(cwtdl_failed/1).
 
 cwtdl(Goal,DL,TL):- cwc,

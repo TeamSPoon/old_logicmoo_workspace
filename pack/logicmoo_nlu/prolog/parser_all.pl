@@ -24,6 +24,8 @@
 :- multifile(user:regression_test/0).
 :- multifile(user:feature_test/0).
 
+
+
 % ==============================================================================
 %   
 % APE: Converter Pipeline
@@ -189,7 +191,6 @@ show_pipeline:-forall(installed_converter(CNV),wdmsg(installed_converter(CNV))).
 :- dmsg(parser_all_start).
 
 
-
 % ================================================================================================
 % PLDATA: LOAD ENGLISH CORE FILES
 % ================================================================================================
@@ -211,8 +212,11 @@ get_it:-
 
 % 6.052 CPU on VMWare I7
 
+
+
 :- 
-%  with_assertions([(user:term_expansion(_,_):-!,fail),(user:goal_expansion(_,_):-!,fail),(system:term_expansion(_,_):-!,fail),(system:goal_expansion(_,_):-!,fail)],
+%  with_assertions
+%  [(user:term_expansion(_,_):-!,fail),(user:goal_expansion(_,_):-!,fail),(system:term_expansion(_,_):-!,fail),(system:goal_expansion(_,_):-!,fail)],
   (user:ensure_loaded_no_mpreds(library(logicmoo/plarkc/logicmoo_i_call_kb)),
    load_language_file(pldata/clex_iface),
    load_language_file(pldata/nldata_BRN_WSJ_LEXICON),
@@ -298,18 +302,7 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 % ================================================================================================
 % :- get_pos_tagger(I),jpl_set(I,is_DEBUG,'@'(false)).
 
-/*
-:- multifile  el_assertions:el_holds/5.
-:- multifile  el_assertions:el_holds/6.
-:- multifile  el_assertions:el_holds/7.
-:- multifile  el_assertions:el_holds/8.
-:- dynamic  el_assertions:el_holds/5.
-:- dynamic  el_assertions:el_holds/6.
-:- dynamic  el_assertions:el_holds/7.
-:- dynamic  el_assertions:el_holds/8.
-:- multifile  el_assertions:is_cyckb_t_pred/2.
-:- dynamic  el_assertions:is_cyckb_t_pred/2.
-*/
+
 
 :- dmsg("Scanning el_assertions.pl for programatic definations (This may take 10-30 seconds)").
 %:- pfc_add(cyckb_t(A, _, _) ==> is_cyckb_t_pred(A,2)).
@@ -357,7 +350,10 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 % ================================================================================================
 
 :- dmsg("List of possible data transformations").
+
+
 :- show_pipeline.
+
 
 :- dmsg(parser_all_complete).
 
@@ -368,12 +364,22 @@ user:regression_test_TODO:- run_pipleine(acetext='A person who loves all animals
 
 user:regression_test:- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
 
+% som3how this next directive changes  -/1 op?
 :- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
+:- op(300,fx,(-)).
+
 
 user:regression_test:- gripe_time(5,test_chat80_sanity).
 
 
 % :- must(retract(thlocal:disable_mpred_term_expansions_locally)).
 
+
 :-asserta(thlocal:disable_mpred_term_expansions_locally).
+
+
+% set  -/1 op 
+:- op(200,fy,(-)).
+:- must((current_op(P,FXY,(-)),((arg(_,v(fy,fx),FXY),P =< 300)))).
+
 

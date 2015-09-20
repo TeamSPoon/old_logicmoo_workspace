@@ -234,15 +234,16 @@ post_header_hook:-asserta(canDoTermExp).
 :-export(env_clear_doms_and_tasks/0).
 env_clear_doms_and_tasks:- env_clear(kb(dom,file)),env_clear(kb(dom,tasks)),env_clear(kb(dom,cache)),!.
    
-
-:- op(100,xfy,/*ocluser*/ocl:'=>').
-
+:- op(100,xfy,( /*ocluser*/ocl:('=>'))).
 
 % :-set_prolog_flag(verbose_file_search,true).
 post_header_hook:-set_prolog_flag(verbose_load,full).
 post_header_hook:-use_module(library(lists)).
+
+:- must((current_op(P,FXY,(-)),arg(_,v(fy,fx),FXY),P =< 300)).
 :- style_check(-singleton).
 :- style_check(+discontiguous).
+
 
 %post_header_hook:-use_module(library(system)).
 :-if(exists_source(library(gui_tracer))).

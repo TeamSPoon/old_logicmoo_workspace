@@ -1,6 +1,6 @@
 :-swi_module(logicmoo_i_call_kb,[]).
 
-
+/*
 :- multifile  el_assertions:el_holds/4.
 :- multifile  el_assertions:el_holds/5.
 :- multifile  el_assertions:el_holds/6.
@@ -12,9 +12,25 @@
 :- multifile  el_assertions:el_holds/12.
 :- multifile  el_assertions:el_holds/13.
 :- multifile  el_assertions:el_holds/14.
-:- multifile  el_assertions:el_holds_pred_impl/1.
-:- multifile  el_assertions:is_cyckb_t_pred/2.
 
+
+
+:- module_transparent   el_assertions:el_holds/4.
+:- module_transparent   el_assertions:el_holds/5.
+:- module_transparent   el_assertions:el_holds/6.
+:- module_transparent   el_assertions:el_holds/7.
+:- module_transparent   el_assertions:el_holds/8.
+:- module_transparent   el_assertions:el_holds/9.
+:- module_transparent   el_assertions:el_holds/10.
+:- module_transparent   el_assertions:el_holds/11.
+:- module_transparent   el_assertions:el_holds/12.
+:- module_transparent   el_assertions:el_holds/13.
+:- module_transparent   el_assertions:el_holds/14.
+
+
+
+
+*/
 
 :- dynamic  el_assertions:el_holds/4.
 :- dynamic  el_assertions:el_holds/5.
@@ -27,6 +43,12 @@
 :- dynamic  el_assertions:el_holds/12.
 :- dynamic  el_assertions:el_holds/13.
 :- dynamic  el_assertions:el_holds/14.
+
+:- meta_predicate call_whichlist_t(?,0,?).
+:- meta_predicate with_kb_assertions_matching(?,?,0).
+
+:- multifile  el_assertions:el_holds_pred_impl/1.
+:- multifile  el_assertions:is_cyckb_t_pred/2.
 :- dynamic  el_assertions:el_holds_pred_impl/1.
 :- dynamic  el_assertions:is_cyckb_t_pred/2.
 
