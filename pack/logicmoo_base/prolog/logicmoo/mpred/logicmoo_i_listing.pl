@@ -71,6 +71,8 @@ pfc_trace_item(M,H):- ignore(thlocal:pfc_trace_exec-> debugOnError(in_cmt(pp_ite
 pp_item(M,(H:-B)):- B ==true,pp_item(M,H).
 pp_item(M,H):- flag(show_asserions_offered,X,X+1),thlocal:print_mode(html),!, (\+ \+ pp_item_html(M,H)),!.
 
+pp_item(M,spftY(P,F,T,W)):-!,
+   with_assertions(thlocal:current_why_source(W),pp_item(M,spft(P,F,T))).
 
 pp_item(M,spft(W,U,U)):-!,pp_item(M,U:W).
 pp_item(M,spft(W,F,U)):- atom(U),!,    fmt('~N%~n',[]),pp_item(M,U:W), fmt('rule: ~p~n~n', [F]),!.
@@ -367,6 +369,7 @@ pfc_listing_1(What):-
 :-multifile shared_hide_data/1.
 
 shared_hide_data('$was_imported_kb_content$'/2):- !,hide_data(hideMeta).
+shared_hide_data(spftY/4):- !,hide_data(hideTriggers).
 shared_hide_data(spft/3):- !,hide_data(hideTriggers).
 shared_hide_data(nt/3):- !,hide_data(hideTriggers).
 shared_hide_data(pt/2):- !, hide_data(hideTriggers).
@@ -503,6 +506,9 @@ pp_i2tml_0(is_disabled_clause(H)):- pp_i2tml_0((disabled)=H).
 
 
 % pp_i2tml_0(FET):-fully_expand(assert,FET,NEWFET),FET\=@=NEWFET,!,pp_i2tml_0(NEWFET).
+
+pp_i2tml_0(spftY(P,F,T,W)):-!,
+   with_assertions(thlocal:current_why_source(W),pp_i2tml_0(spft(P,F,T))).
 
 pp_i2tml_0(spft(P,U,U)):- nonvar(U),!, pp_i2tml_1(P:-asserted_by(U)).
 pp_i2tml_0(spft(P,F,T)):- atom(F),atom(T),!, pp_i2tml_1(P:-asserted_in(F:T)).

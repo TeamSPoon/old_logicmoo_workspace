@@ -1240,7 +1240,7 @@ vtTestType(vTest2).
 notAssertable(isFact/1).
 prologHybrid(isFact/1).
 % :- dynamic(added/1).
-added(Added):-spft(Added,U,U).
+added(Added):-spftY(Added,U,U,_).
 isFact(A):- cwc, nonvar(A), ( added(A) ; clause_asserted(A)),not((arg(_,A,V),var(V))).
 
 

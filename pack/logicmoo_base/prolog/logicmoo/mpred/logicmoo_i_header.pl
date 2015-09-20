@@ -125,7 +125,7 @@ load_time_sanity.
 :- dynamic('nt'/3).
 :- dynamic('bt'/2).
 
-:- dynamic('spft'/3).
+:- dynamic('spftY'/4).
 :- dynamic(pfc_undo_method/2).
 :- dynamic(fcTmsMode/1).
 :- dynamic(pfc_queue/2).

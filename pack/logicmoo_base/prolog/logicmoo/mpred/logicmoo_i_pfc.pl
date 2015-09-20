@@ -259,7 +259,7 @@ pfc_pbody(H,infoF(INFO),R,B,Why):-!,pfc_pbody_f(H,INFO,R,B,Why).
 pfc_pbody(H,B,R,BIn,WHY):- is_true(B),!,BIn=B,get_why(H,H,R,WHY).
 pfc_pbody(H,B,R,B,asserted(R,(H:-B))).
 
-get_why(_,CL,R,asserted(R,CL)):- clause(spftY(CL, U, U),true),!.
+get_why(_,CL,R,asserted(R,CL)):- clause(spftY(CL, U, U, _Why),true),!.
 get_why(H,CL,R,deduced(R,WHY)):-pfc_get_support(H,WH)*->WHY=(H=WH);(pfc_get_support(CL,WH),WHY=(CL=WH)).
 
 
@@ -649,11 +649,17 @@ pfc_post1_sp_1(S,P) :-  pfc_warn("pfc_post1(~p,~p) failed",[P,S]).
 with_pfc_trace_exec(P):- with_assertions(thlocal:pfc_trace_exec, must(show_if_debug(P))).
 pfc_test(P):- with_pfc_trace_exec(must(show_if_debug(P))).
 
-is_already_supported(P,(S,T),(S,T)):- clause_asserted(spftY(P,S,T)),!.
-is_already_supported(P,_S,UU):- clause_asserted(spftY(P,US,UT)),!,must(get_source_ref(UU)),UU=(US,UT).
+clause_asserted_local(spftY(P,Fact,Trigger,UOldWhy)):-
+  clause(spftY(P,Fact,Trigger,OldWhy),true,Ref),
+  clause(spftY(UP,UFact,UTrigger,UOldWhy),true,Ref),
+  (((UP=@=P,UFact=@=Fact,UTrigger=@=Trigger))).
+
+
+is_already_supported(P,(S,T),(S,T)):- clause_asserted_local(spftY(P,S,T,_)),!.
+is_already_supported(P,_S,UU):- clause_asserted_local(spftY(P,US,UT,_)),!,must(get_source_ref(UU)),UU=(US,UT).
 
 % TOO UNSAFE 
-% is_already_supported(P,_S):- copy_term(P,PC),spftY(PC,_,_),P=@=PC,!.
+% is_already_supported(P,_S):- copy_term(P,PC),sp ftY(PC,_,_),P=@=PC,!.
 
 
 
@@ -1303,7 +1309,7 @@ fcnt(Fact,F):- fcnt0(Fact,F)*->fail;nop(pfc_trace_msg(no_spft_nt(Fact,F))).
 fcnt(_,_).
 
 fcnt0(_Fact,F) :- 
-  spftY(X,_,nt(F,Condition,Body)),
+  spftY(X,_,nt(F,Condition,Body),_Why),
   (call_u(Condition) *-> 
    (pfc_trace_item('Using Trigger'(X),nt(F,Condition,Body)),
       pfc_rem1(X,(_,nt(F,Condition,Body))),fail);
@@ -1892,7 +1898,7 @@ pfc_db_type(_,fact) :-
 
 pfc_call_t_exact(Trigger) :- copy_term(Trigger,Copy),pfc_get_trigger_quick(Trigger),Trigger=@=Copy.
 
-retract_t(Trigger) :-  retract_i(spftY(Trigger,_,_)),ignore(retract_i(Trigger)).
+retract_t(Trigger) :-  retract_i(spftY(Trigger,_,_,_)),ignore(retract_i(Trigger)).
 
 
 pfc_assert_t(P,Support) :- 
@@ -1958,20 +1964,23 @@ pfc_union([Head|Tail],L,[Head|Tail2]) :-
 %= predicates for manipulating support relationships
 %=
 
-user:portray(C):-compound(C),C=spftY(_,_,C),pp_item('',C).
+
+user:portray(C):-compound(C),C=spftY(_,_,C,_),pp_item('',C).
 
 %= pfc_add_support(+Fact,+Support)
 
 pfc_add_support(P,(Fact,Trigger)) :- 
-   U=spftY(P,Fact,Trigger),   
-   attvar_op(assertz_if_new,U),!. % was assert_i
+ ( clause_asserted_local(spftY(P,Fact,Trigger,_OldWhy)) ->
+    true ; 
+    (current_why(Why), attvar_op(assertz,(spftY(P,Fact,Trigger,Why))))),!.  % was assert_i
+
 pfc_add_support(P,FT) :- trace_or_throw(failed_pfc_add_support(P,FT)).
 
 
 pfc_get_support(not(P),(Fact,Trigger)) :- nonvar(P),!, pfc_get_support(neg(P),(Fact,Trigger)).
-pfc_get_support(P,(Fact,Trigger)) :- spftY(P,Fact,Trigger)*->true;(nonvar(P),pfc_get_support_neg(P,(Fact,Trigger))).
+pfc_get_support(P,(Fact,Trigger)) :- spftY(P,Fact,Trigger,_)*->true;(nonvar(P),pfc_get_support_neg(P,(Fact,Trigger))).
 
-% dont pfc_get_support_neg(\+ neg(P),(Fact,Trigger)) :- spftY((P),Fact,Trigger).
+% dont pfc_get_support_neg(\+ neg(P),(Fact,Trigger)) :- sp ftY((P),Fact,Trigger).
 pfc_get_support_neg(\+ (P),S) :- !, nonvar(P), pfc_get_support(neg(P),S).
 pfc_get_support_neg(~ (P),S) :- !, nonvar(P), pfc_get_support(neg(P),S).
 
@@ -1979,12 +1988,13 @@ pfc_get_support_neg(~ (P),S) :- !, nonvar(P), pfc_get_support(neg(P),S).
 % There are three of these to try to efficiently handle the cases
 % where some of the arguments are not bound but at least one is.
 
-pfc_rem_support(WhyIn,P,(Fact,Trigger)) :- var(P),!,copy_term(pfc_rem_support(Why,P,(Fact,Trigger)) ,Why),
-  clause(spftY(P,Fact,Trigger),true,Ref),
+pfc_rem_support(WhyIn,P,(Fact,Trigger)) :- var(P),!,copy_term(pfc_rem_support(Why,P,(Fact,Trigger)) ,TheWhy),
+  SPFC = spftY(RP,RFact,RTrigger,RWhy),
+  clause(spftY(P,Fact,Trigger,_),true,Ref),
   ((clause(SPFC,true,Ref),
-     (SPFC=@=spftY(P,Fact,Trigger) -> 
+     ( spftV(RP,RFact,RTrigger) =@= spftV(P,Fact,Trigger) -> 
         erase_w_attvars(clause(SPFC,true,Ref),Ref); 
-       (wdmsg(<=(Why,~SPFC)),pfc_retract_or_warn_i(spftY(P,Fact,Trigger)),nop(trace))),
+       (wdmsg(<=(TheWhy,~SPFC)),nop(pfc_retract_or_warn_i(spftVVVVVVV(P,Fact,Trigger))),nop(trace))),
    (var(P)->trace_or_throw(var(P));remove_if_unsupported_verbose(WhyIn,local,P)))).
 pfc_rem_support(Why,(\+ N) , S):- pfc_rem_support(Why,neg(N),S).
 pfc_rem_support(_Why,P,(Fact,Trigger)):-pfc_retract_or_warn_i(spftY(P,Fact,Trigger,_)).
