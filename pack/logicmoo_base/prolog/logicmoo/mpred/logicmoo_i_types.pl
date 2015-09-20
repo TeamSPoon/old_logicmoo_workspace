@@ -136,14 +136,10 @@ type_prefix(macro,ttMacroType).
 :- dynamic decided_not_was_isa/2.
 :-export(was_isa/3).
 was_isa(G,I,C):- fail, \+(current_predicate(_,G)),
-  compound(G),functor(G,F,_),hotrace(((not(decided_not_was_isa(F,_)),once(was_isa0(G,I,C)-> true;((functor(G,F,1),get_when(When),asserta_if_new(decided_not_was_isa(F,When)),!,fail)))))).
+  compound(G),functor(G,F,_),hotrace(((not(decided_not_was_isa(F,_)),once(was_isa0(G,I,C)-> true;((functor(G,F,1),
+  current_source_location(When),asserta_if_new(decided_not_was_isa(F,When)),!,fail)))))).
 
-% get_when(When)
-get_when(F:L):-source_location(file,F),current_input(S),line_position(S,L),!.
-get_when(F:L):-source_location(F,L),!.
-get_when(When):-current_input(S),findall(NV,stream_property(S,NV),When),!.
-get_when(M):-context_module(M),!.
-get_when(user):-!.
+% current_source_location(When)
 
 to_isa_out(I,C,OUT):-new_was_isa,!,(atom(C)->OUT=..[C,I];OUT=a(C,I)).
 to_isa_out(I,C,isa(I,C)).

@@ -44,16 +44,38 @@ assign_varname(O=I):-assign_varname_l(I,'$VAR'(O)),!.
 
 assign_varname_vars(N='$VAR'(N)).
 
+
+current_source_location(F):- (current_source_location0(W), (W= (F:foo) -> true;F=W)),!.
+current_source_location0(F:L):-source_location(F,L),!.
+current_source_location0(F:L):-prolog_load_context(file,F),current_input(S),line_position(S,L),!.
+current_source_location0(When):-loading_file(When).
+current_source_location0(F:L):- current_filesource(F),ignore((prolog_load_context(stream,S),!,line_count(S,L))),!.
+current_source_location0(F:L):- prolog_load_context(file,F),!,ignore((prolog_load_context(stream,S),!,line_count(S,L))),!.
+current_source_location0(module(M)):-source_module(M),!.
+current_source_location0(When):-current_input(S),findall(NV,stream_property(S,NV),When),!.
+current_source_location0(module(user)):-!.
+current_source_location0(unknown:0).
+
+
+:- thread_local(thlocal:current_local_why/2).
+:- thread_local(thlocal:current_why_source/1).
+
+current_why(F):- thlocal:current_why_source(F),!.
+current_why(F):- thlocal:current_local_why(F,_),!.
+current_why(F):- current_source_location(F),!.
+current_why(unk).
+
 save_clause_vars(_,[]):-!.
-save_clause_vars(MHB,Vs):- ignore(source_location(File, Line)),save_clause_vars(MHB,Vs,File,Line).
-save_clause_vars(MHB,Vs,File,_Line):-
+save_clause_vars(MHB,Vs):- current_why(Why),!,save_clause_vars(MHB,Vs,Why).
+save_clause_vars(MHB,Vs):- trace,current_why(Why),!,save_clause_vars(MHB,Vs,Why).
+save_clause_vars(MHB,Vs,Why):-
  ( \+ \+
     ((
     once(maplist(assign_varname_vars,Vs)),
     as_clause_no_m(MHB,  H, B),
 %     once(map list(assign_varname,Vs)),
 %    numberv ars(HB,555,_,[attvar(skip)]), % singletons(true) 
-    assert_if_new_kv(user:saved_varname_info(H,B,File:_))))),!.
+    assert_if_new_kv(user:saved_varname_info(H,B,Why))))),!.
 
 
 assert_if_new_kv(A):- clause_asserted(A),!.
@@ -135,7 +157,6 @@ source_module(M):-nonvar(M),source_module(M0),!,M0=M.
 source_module(M):-loading_module(M),!.
 source_module(M):-'$set_source_module'(M,   M),!.
 
-
 :-thread_local(thlocal:last_source_file/1).
 loading_file(FIn):- ((source_file0(F) *-> (retractall(thlocal:last_source_file(_)),asserta(thlocal:last_source_file(F))) ; (fail,thlocal:last_source_file(F)))),!,F=FIn.
 source_file0(F):-source_location(F,_).
@@ -143,7 +164,8 @@ source_file0(F):-prolog_load_context(file, F).
 source_file0(F):-prolog_load_context(source, F).
 source_file0(F):-seeing(X),is_stream(X),stream_property(X,file_name(F)),exists_file(F).
 source_file0(F):-prolog_load_context(stream, S),stream_property(S,file_name(F)),exists_file(F).
-source_file0(F):-findall(E,catch((stream_property( S,mode(read)),stream_property(S,file_name(E)),exists_file(E),line_count(S,C),C>0),_,fail),L),last(L,F).
+source_file0(F):-findall(E,catch((stream_property( S,mode(read)),stream_property(S,file_name(E)),exists_file(E),
+  line_count(S,C),C>0),_,fail),L),last(L,F).
 
 
 source_variables_l(AllS):-
@@ -320,8 +342,8 @@ user:term_expansion(HB,_):- try_save_vars(HB),fail.
 read_source_files:- 
  forall(source_file(F),catch(read_source_file_vars(F),_,true)).
 
-read_source_file_vars(F):- clause_asserted(user:saved_varname_info(F,F,F:_)),!.
-read_source_file_vars(F):- assert(user:saved_varname_info(F,F,F:_)),
+read_source_file_vars(F):- clause_asserted(user:saved_varname_info(F,F,F)),!.
+read_source_file_vars(F):- assert(user:saved_varname_info(F,F,F)),
    open(F,read,S), 
    call_cleanup(read_vars_until_oes(F,S),close(S)),!.
 
@@ -330,9 +352,10 @@ read_vars_until_oes(F,S):-
   repeat,
    read_term(S,T,[variable_names(Vs)]),
    (T==end_of_file->!;
-    ((Vs\==[],must(line_count(S,C)),
+    ((Vs\==[],must(line_count(S,C)),    
     b_setval('$variable_names',Vs),
-    save_clause_vars(T,Vs,F,C),fail))).
+    with_assertions(thlocal:current_why_source(F:C),
+    (save_clause_vars(T,Vs),fail))))).
 
     
 :- initialization(read_source_files).

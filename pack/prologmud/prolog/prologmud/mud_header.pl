@@ -102,7 +102,7 @@
 :- dynamic_multifile_exported thglobal:pfcManageHybrids/0.
 :- dynamic_multifile_exported thlocal:infMustArgIsa/0.
 :- thread_local thlocal:into_form_code/0.
-:- thread_local thlocal:current_why/2.
+:- thread_local thlocal:current_local_why/2.
 :- dynamic_multifile_exported user:defnSufficient/2.
 :- thread_local user:repl_to_string/2.
 :- thread_local user:repl_writer/2.

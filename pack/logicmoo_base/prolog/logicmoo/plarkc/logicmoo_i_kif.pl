@@ -672,7 +672,7 @@ simplify_bodies((B),(BC)):- must_det_l((conjuncts_to_list(B,RB),simplify_list(_K
 simplify_list(KB,RB,BBS):- list_to_set(RB,BB),must_maplist(removeQ(KB),BB,BBO),list_to_set(BBO,BBS).
 
 save_wfs(Why,PrologI):- must_det_l((thglobal:as_prolog(PrologI,Prolog), 
-   with_assertions(thlocal:current_why(Why,Prolog),
+   with_assertions(thlocal:current_local_why(Why,Prolog),
    pfc_add_h(save_in_code_buffer,Why,Prolog)))).
 
 nots_to(H,To,HH):-subst_except(H,neg,To,HH),subst_except(H,-,To,HH),subst_except(H,~,To,HH),subst_except(H,neg,To,HH),!.

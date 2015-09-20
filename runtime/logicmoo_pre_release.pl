@@ -56,9 +56,11 @@ user:file_search_path(pack, '../pack').
 
 :- tell(blalla).
 
-:-listing(side_effect_buffer/2).
+:-listing(side_effect_buffer/3).
 
-:-forall(actual_side_effect(H,B),portray_clause(H:-B)).
+:-forall(actual_side_effect(H,B),(nl,portray_clause(H:-B))).
+
+:-listing(side_effect_buffer/3).
 
 :- told.
 

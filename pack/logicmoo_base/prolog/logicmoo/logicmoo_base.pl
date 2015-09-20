@@ -164,56 +164,82 @@ lmbase_record_transactions(I,OO):- nonvar(I),current_predicate(pfc_loader_file/0
 lmbase_record_transactions_maybe(I,Supposed):- 
   thlocal:verify_side_effect_buffer,!,
    sanity(var(ActualSupposed)),
-    push_predicates(thlocal:side_effect_buffer/2,STATE),
+    push_predicates(thlocal:side_effect_buffer/3,STATE),
     pfc_file_expansion(I,Supposed),
-    collect_expansions(I,Actual),
-    conjoin((:- supposed(Supposed)), Actual,ActualSupposed),
+    current_source_location(Why),
+    collect_expansions(Why,I,Actual),
+    convert_side_effect(suppose(Supposed),S),
+    conjoin(S, Actual,ActualSupposed),
     conjuncts_to_list(ActualSupposed,Readable),
     assert(actual_side_effect(I,Readable)),
-    pop_predicates(thlocal:side_effect_buffer/2,STATE),!.
+    pop_predicates(thlocal:side_effect_buffer/3,STATE),!.
 
 
 
 lmbase_record_transactions_maybe(I,ActualSupposed):- 
-  thlocal:use_side_effect_buffer,!,
+  thlocal:use_side_effect_buffer,!,trace,
    sanity(var(ActualSupposed)),
-    push_predicates(thlocal:side_effect_buffer/2,STATE),
+    push_predicates(thlocal:side_effect_buffer/3,STATE),
     pfc_file_expansion(I,Supposed),
-    collect_expansions(I,Actual),
+    collect_expansions(Why,I,Actual),
     conjoin(Actual,Supposed,ActualSupposed),
-    pop_predicates(thlocal:side_effect_buffer/2,STATE),!.
+    pop_predicates(thlocal:side_effect_buffer/3,STATE),!.
 
 lmbase_record_transactions_maybe(I,OO):- pfc_file_expansion(I,OO),!.
 
 
-collect_expansions(I,I):- \+ thlocal:side_effect_buffer(_Op,_Data),!.
-collect_expansions(I, TODO):- findall(Reproduce, 
-  (retract(thlocal:side_effect_buffer(Op,Data)),convert_side_effect(Op,Data,Reproduce)), TODOs),
-    keysort(TODOs,ORDEREDTODOs),
-    pairs_values(ORDEREDTODOs, ORDEREDTODOValues),
-    must_det_l(show_call(list_to_conjuncts(ORDEREDTODOValues,TODO))).
+collect_expansions(_Why,I,I):- \+ thlocal:side_effect_buffer(_Op,_Data,_),!.
+collect_expansions(NWhy,I, TODO):- findall(ReproduceSWhy, 
+  ( retract(thlocal:side_effect_buffer(Op, Data, Why)),
+    must_det_l(convert_side_effect(Op, Data,Reproduce)),
+    must(simplify_why_r(Reproduce,Why,NWhy,ReproduceSWhy))), TODOs),
+   must_det_l( list_to_conjuncts(TODOs,TODO)).
 
+simplify_why_r(Reproduce,Why,NWhy,   Reproduce):- Why==NWhy, !.
+simplify_why_r(Reproduce,Why,_,Reproduce:SWhy):-simplify_why(Why,SWhy),!.
+ 
 % aliases
 :-meta_predicate(convert_side_effect(?,+,-)).
 
+simplify_why(Why,SWhy):-var(Why),!,Why=SWhy.
+simplify_why(Why:0,SWhy):-!,simplify_why(Why,SWhy).
+simplify_why(Why:N,SWhy:N):-!,simplify_why(Why,SWhy).
+simplify_why(Why,SWhy):- atom(Why),!,directory_file_path(_,SWhy,Why).
+simplify_why(Why,Why).
 
-convert_side_effect(( :-(OP)),Data,( :-(Result))):-!,convert_side_effect(Op,Data,Result),!.
-convert_side_effect(call,'$was_imported_kb_content$'(I, OO),supposed(Result)):-!,convert_side_effect(call,OO,Result),!.
-convert_side_effect(asserta_if_new,Data,Result):-!,convert_side_effect(asserta,Data,Result).
-convert_side_effect(assertz_if_new,Data,Result):-!,convert_side_effect(assertz,Data,Result).
-convert_side_effect(assert_if_new,Data,Result):-!,convert_side_effect(assertz,Data,Result).
-convert_side_effect(assert,Data,Result):-!,convert_side_effect(assertz,Data,Result).
-convert_side_effect(asserta,Data,2- (:- asserta(Data))):-!.
-convert_side_effect(assertz,Data,2- (:- assertz(Data))):-!.
-convert_side_effect(user:Op,Data,Reproduce):- !,convert_side_effect(Op,Data,Reproduce),!.
-convert_side_effect(Op,Data,Reproduce):- show_call_success(convert_side_effect_buggy(Op,Data,Reproduce)),!.
-convert_side_effect(Op,Data,Reproduce):-trace_or_throw(unknown_convert_side_effect(Op,Data,Reproduce)),!.
+convert_side_effect(M:C,A,SE):- Call=..[C,A],!,convert_side_effect(M:Call,SE).
+convert_side_effect(C,A,SE):- Call=..[C,A],!,convert_side_effect(Call,SE).
+
+convert_side_effect(suppose(OO), suppose(Result)):- convert_side_effect_0a(OO,Result),!.
+convert_side_effect(I,OO):-convert_side_effect_0c(I,O),((O=(N-V),number(N))->OO=O;OO=O),!.
+
+convert_side_effect_0a(asserta(Data), (  a(DataR))):-convert_side_effect_0a(Data,DataR).
+convert_side_effect_0a(assertz(Data), (  (DataR))):-convert_side_effect_0a(Data,DataR).
+convert_side_effect_0a(retract(Data), (  r(DataR))):-convert_side_effect_0a(Data,DataR).
+convert_side_effect_0a(cl_assert(Why,Data), (  cl_assert(Why,DataR))):-convert_side_effect_0a(Data,DataR).
+convert_side_effect_0a(attvar_op(Why,Data),Reproduce):-!,convert_side_effect(Why,Data,Reproduce),!.
+convert_side_effect_0a(I,O):-convert_side_effect_0b(I,O),!.
+convert_side_effect_0a(I,I).
+
+convert_side_effect_0b((OpData:-TRUE),Result):- is_true(TRUE),!,convert_side_effect_0a(OpData,Result),!.
+convert_side_effect_0b(suppose(OpData),Result):-!,convert_side_effect_0a(OpData,Result),!.
+convert_side_effect_0b(user:OpData,Reproduce):- !,convert_side_effect_0a(OpData,Reproduce),!.
+convert_side_effect_0b(( :- OpData),( ( (Result)))):-!,convert_side_effect_0a(OpData,Result),!.
+convert_side_effect_0b('$was_imported_kb_content$'(_, OO),Result):-!,convert_side_effect_0a(OO,Result),!.
+convert_side_effect_0b(asserta_if_new(Data),Result):-!,convert_side_effect_0a(asserta(Data),Result).
+convert_side_effect_0b(assertz_if_new(Data),Result):-!,convert_side_effect_0a(assertz(Data),Result).
+convert_side_effect_0b(assert_if_new(Data),Result):-!,convert_side_effect_0a(assertz(Data),Result).
+convert_side_effect_0b(assert(Data),Result):-!,convert_side_effect_0a(assertz(Data),Result).
+
+convert_side_effect_0c(OpData,Reproduce):- convert_side_effect_0b(OpData,Reproduce),!.
+convert_side_effect_0c(OpData,Reproduce):- show_call_success(convert_side_effect_buggy(OpData,Reproduce)),!.
+convert_side_effect_0c(OpData,Reproduce):- trace_or_throw(unknown_convert_side_effect(OpData,Reproduce)),!.
 
 % todo
-convert_side_effect_buggy(erase,clause(H,B,_Ref),2 - (:-retract(H:-B))).
-convert_side_effect_buggy(retract,Data,1 - (:-retract(Data))).
-convert_side_effect_buggy(retractall,Data,0 - (:-retractall(Data))).
-convert_side_effect_buggy(Op,Data,(2- (:- attvar_op(Op,Data)))):-dmsg(unknown_convert_side_effect(Op,Data,Reproduce)).
+convert_side_effect_buggy(erase(clause(H,B,_Ref)), (e(HB))):- convert_side_effect_0a((H:-B),HB).
+convert_side_effect_buggy(retract(Data), (r(DataR))):-convert_side_effect_0a(Data,DataR).
+convert_side_effect_buggy(retractall(Data), (c(DataR))):-convert_side_effect_0a(Data,DataR).
+convert_side_effect_buggy(OpData,( (  error_op(OpData)))):-dmsg(unknown_convert_side_effect(OpData)).
 
 
 clear_predicates(M:H):- forall(M:clause(H,_,Ref),erase(Ref)).

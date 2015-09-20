@@ -610,8 +610,14 @@ do_end_of_file_actions:- must(loading_source_file(F)),
 :- export(pfc_file_expansion/2).
 :- meta_predicate(pfc_file_expansion(?,?)).
 pfc_file_expansion(I,OO):- var(I),!,I=OO.
-pfc_file_expansion(end_of_file,end_of_file):-once(do_end_of_file_actions),!,fail.
-pfc_file_expansion(I,OO):- (I\=(:-(_))), I\= '$was_imported_kb_content$'(_,_),
+
+pfc_file_expansion(I,OO):-
+  must(current_source_location(FL)),
+   with_assertions(thlocal:current_why_source(FL),pfc_file_expansion0(I,OO)).
+
+
+pfc_file_expansion0(end_of_file,end_of_file):-once(do_end_of_file_actions),!,fail.
+pfc_file_expansion0(I,OO):- (I\=(:-(_))), I\= '$was_imported_kb_content$'(_,_),
    once(loop_check(pfc_file_expansion_0a(I,O))),
    I\=@=O, 
    (((thlocal:pfc_term_expansion_ok;pfc_expand_inside_file_anyways)-> nop(wdmsg((pfc_file_expansion(I,O)))) ; ((show_load_context,wdmsg(warning,wanted_pfc_term_expansion(I,O))),fail)),
@@ -738,7 +744,7 @@ inside_file(W) :- loading_source_file(Source),!,user:mpred_directive_value(W,_,S
 user:term_expansion((:- (M:DIR)),O):-atom(M),atom(DIR),with_source_module(M, ((pfc_directive_expansion(DIR,OO),!, must(O=(:- OO))))).
 user:term_expansion((:- DIR),O):- atom(DIR), pfc_directive_expansion(DIR,OO),!,must(O=(:- OO)).
 
-:-meta_predicate(pfc_file_expansion_0(?,?)).
+:-meta_predicate(pfc_file_expansion_0c(?,?)).
 :-meta_predicate(pfc_file_expansion_0a(?,?)).
 :-meta_predicate(pfc_file_expansion_z(?,?)).
 
@@ -834,23 +840,23 @@ transform_opers_1((AB),(RESULT)):- get_op_alias(OP,(OTHER)),atom(OP), atom(OTHER
 transform_opers_1(OP,OTHER):- get_op_alias(OPO,OTHER),OPO=OP,!.
 
 
-pfc_file_expansion_0a(X,Y):- current_predicate(pfc_loader_file/0),current_predicate(pfc_pfc_file/0), expand_term(X,M),!,pfc_file_expansion_0(M,Y),!.
+pfc_file_expansion_0a(X,Y):- current_predicate(pfc_loader_file/0),current_predicate(pfc_pfc_file/0), expand_term(X,M),!,pfc_file_expansion_0c(M,Y),!.
 
-pfc_file_expansion_0(I,OO):-
+pfc_file_expansion_0c(I,OO):-
    is_kif_string(I),must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,
-     must((sexpr_sterm_to_pterm(Wff,O),!,\+ is_list(O))))),pfc_file_expansion_0(O,OO).
+     must((sexpr_sterm_to_pterm(Wff,O),!,\+ is_list(O))))),pfc_file_expansion_0c(O,OO).
 
-pfc_file_expansion_0(PI,OO):- PI=..[P,I],
+pfc_file_expansion_0c(PI,OO):- PI=..[P,I],
    is_kif_string(I),must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,
      must((sexpr_sterm_to_pterm(Wff,O),!,\+ is_list(O))))),
-   PO=..[P,O], pfc_file_expansion_0(PO,OO).
+   PO=..[P,O], pfc_file_expansion_0c(PO,OO).
 
-pfc_file_expansion_0(C,O):- compound(C), get_op_alias(OP,ALIAS),
-  atom(OP),atom(ALIAS),C=..[OP|ARGS],CC=..[ALIAS|ARGS],loop_check(pfc_file_expansion_0(CC,O)),!.
+pfc_file_expansion_0c(C,O):- compound(C), get_op_alias(OP,ALIAS),
+  atom(OP),atom(ALIAS),C=..[OP|ARGS],CC=..[ALIAS|ARGS],loop_check(pfc_file_expansion_0c(CC,O)),!.
 
-pfc_file_expansion_0(C,O):- get_lang(LANG),transform_opers(LANG,C,M),C\=@=M,!,pfc_file_expansion_0(M,O).
+pfc_file_expansion_0c(C,O):- get_lang(LANG),transform_opers(LANG,C,M),C\=@=M,!,pfc_file_expansion_0c(M,O).
 
-pfc_file_expansion_0(C,O):- ensure_vars_labled(C,M),pfc_file_expansion_z(M,O).
+pfc_file_expansion_0c(C,O):- ensure_vars_labled(C,M),pfc_file_expansion_z(M,O).
 
 pfc_file_expansion_z((<=(Q,P)),(:- cl_assert(pfc(bwc),(Q<-P)))).
 pfc_file_expansion_z(((P==>Q)),(:- cl_assert(pfc(fwc),(P==>Q)))).

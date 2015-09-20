@@ -89,20 +89,15 @@ compiled(F/A):- dynamic(F/A),compile_predicates([F/A]).
 :- compiled(('<==>')/2).
 */
 
-record_se:- thlocal:use_side_effect_buffer;thlocal:verify_side_effect_buffer.
-
-:-thread_local(thlocal:current_why_source/1).
+record_se:- (thlocal:use_side_effect_buffer ; thlocal:verify_side_effect_buffer).
 
 
-attvar_op(Op,Data0):- unnumbervars(Data0,Data),
-  (record_se->assert(thlocal:side_effect_buffer(Op,Data0));true),
-   call(Op,Data).
-erase_w_attvars(Data0,Ref):- unnumbervars(Data0,_Data), erase(Ref),
-  (record_se -> assert(thlocal:side_effect_buffer(erase,Data0));true).
+add_side_effect(_,_):- ( \+  record_se ),!.
+add_side_effect(Op,Data):-current_why(Why),assert(thlocal:side_effect_buffer(Op,Data,Why)).
 
-get_why_source(F):- thlocal:current_why_source(F),!.
-get_why_source(F:L):- get_source_location(F:L),L\=0,!.
-get_why_source(unk).
+attvar_op(Op,Data0):- add_side_effect(Op,Data0),unnumbervars(Data0,Data),call(Op,Data).
+erase_w_attvars(Data0,Ref):- erase(Ref),add_side_effect(erase,Data0).
+
 
 % TODO ISSUE https://github.com/TeamSPoon/PrologMUD/issues/7
 match_source_ref1(u):-!.
@@ -111,7 +106,7 @@ make_uu_remove((U,U)):-match_source_ref1(U).
 
 % TODO ISSUE https://github.com/TeamSPoon/PrologMUD/issues/7
 get_source_ref1(u):-!.
-get_source_ref1(u(Mt)):-get_why_source(Mt),!.
+get_source_ref1(u(Mt)):-current_why(Mt),!.
 get_source_ref1(u(Mt)):-Mt=mt.
 get_source_ref((U,U)):- get_source_ref1(U).
 
@@ -823,18 +818,19 @@ pfc_halt(Format,Args) :-
 %= predicates for manipulating triggers
 %=
 pfc_add_trigger(Trig,Support) :- arg(1,Trig,Term),
-   loop_check_term(pfc_add_trigger_0(Trig,Support),trig(Term),true).
+   copy_term(Trig,Int), 
+   loop_check_term(pfc_add_trigger_0(Int,Trig,Support),trig(Term),true).
 
 
-pfc_add_trigger_0(pt(Trigger,Body),Support) :-
+pfc_add_trigger_0(Trig,pt(Trigger,Body),Support) :-
   !,  
   pfc_trace_item('Adding For Later',pt(Trigger,Body)),
   (clause_asserted(pt(Trigger,Body)) -> ! ;   
      (( pfc_assert_t(pt(Trigger,Body),Support),
         (must(pfc_mark_as(Support,p,Trigger,pfcPosTrigger))),
-        add_reprop(Trigger)))).
+        add_reprop(Trig,Trigger)))).
 
-pfc_add_trigger_0(nt(Trigger,Test,Body),Support) :- !,
+pfc_add_trigger_0(Trig,nt(Trigger,Test,Body),Support) :- !,
   pfc_trace_item('Adding For Later',nt(Trigger,Test,Body)),
    must(pfc_mark_as(Support,n,Trigger,pfcNegTrigger)),
         copy_term(Trigger,TriggerCopy),!,
@@ -844,7 +840,7 @@ pfc_add_trigger_0(nt(Trigger,Test,Body),Support) :- !,
            doall(( pfc_eval_lhs(Body,((\+Trigger),nt(TriggerCopy,Test,Body))))))),!.
 
 
-pfc_add_trigger_0(bt(Trigger,Body),Support) :- !,
+pfc_add_trigger_0(Trig,bt(Trigger,Body),Support) :- !,
   pfc_trace_item('Adding For Later',bt(Trigger,Body)),
    must(pfc_assert_t(bt(Trigger,Body),Support)),
       attvar_op(assertz_if_new,((Trigger:-pfc_bc_only(Trigger)))),!,
@@ -852,7 +848,7 @@ pfc_add_trigger_0(bt(Trigger,Body),Support) :- !,
      % WAS pfc_bt_pt_combine(Trigger,Body).
   must(pfc_bt_pt_combine(Trigger,Body,Support)),!.
 
-pfc_add_trigger_0(X,Support) :- pfc_warn("Unrecognized trigger to pfc_addtrigger: ~p",[pfc_add_trigger(X,Support)]).
+pfc_add_trigger_0(Trig,X,Support) :- pfc_warn("Unrecognized trigger to pfc_addtrigger: ~p",[pfc_add_trigger(X,Support)]).
 
 
 pfc_bt_pt_combine(Head,Body,Support) :-
@@ -1329,7 +1325,7 @@ pfc_define_bc_rule(Head,Body,Parent_rule) :-
 
 pfc_define_bc_rule(Head,Body,Parent_rule) :- 
   copy_term(Parent_rule,Parent_ruleCopy),
-  attvar_op(assert_if_new,Head:-pfc_bc_only(Head)),
+  attvar_op(assert_if_new,(Head:-pfc_bc_only(Head))),
   build_rhs(Head,Head,Rhs),
   foreachl_do(pfc_nf(Body,Lhs),
        (build_trigger(Parent_ruleCopy,Lhs,rhs(Rhs),Trigger),
@@ -2544,13 +2540,15 @@ rescan_pfc:-forall(clause(user:rescan_pfc_hook,Body),show_call_entry(Body)).
 
 pfc_facts_and_universe(P):- (var(P)->pred_head_all(P);true),(meta_wrapper_rule(P)->(no_repeats(debugOnError(P))) ; (no_repeats(debugOnError(P)))).
 
-add_reprop(Var):- var(Var), !. % trace_or_throw(add_reprop(Var)).
-add_reprop(neg(_Var)):-!.
-% add_reprop(_):-!.
-add_reprop((H:-B)):- trace_or_throw(add_reprop((H:-B))).
-add_reprop(Trigger):- attvar_op(assertz_if_new,(pfc_queue(repropagate(Trigger),(g,g)))).
+add_reprop(_Trig,Var):- var(Var), !. % trace_or_throw(add_reprop(Trig,Var)).
+add_reprop(_Trig,neg(_Var)):-!.
+% add_reprop(_Trig,_):-!.
+add_reprop(_Trig,(H:-B)):- trace_or_throw(add_reprop(Trig,(H:-B))).
+add_reprop(Trig,Trigger):-
+  with_assertions(thlocal:current_why_source(Trig),
+    attvar_op(assertz_if_new,(pfc_queue(repropagate(Trigger),(g,g))))).
 
-
+ 
 repropagate(P):- (is_ftVar(P),!).
 repropagate(P):-  (meta_wrapper_rule(P))->repropagate_meta_wrapper_rule(P);fail.
 repropagate(P):-  \+ predicate_property(P,_),'$find_predicate'(P,PP),PP\=[],!,forall(member(M:F/A,PP),must((functor(Q,F,A),repropagate0(M:Q)))).

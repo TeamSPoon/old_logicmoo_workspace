@@ -320,7 +320,6 @@ load_time_sanity.
 :- dynamic(mpred_module_ready).
 :- dynamic thglobal:pfcManageHybrids/0.
 :- thread_local thlocal:into_form_code/0.
-:- thread_local thlocal:current_why/2.
 :- dynamic_multifile_exported user:defnSufficient/2.
 :- thread_local user:repl_to_string/2.
 :- thread_local user:repl_writer/2.
@@ -404,8 +403,12 @@ load_time_sanity.
 
 :- thread_local thlocal:side_effect_ok/0.
 :- thread_local(thlocal:use_side_effect_buffer/0).
+
+:- if( \+ current_predicate(thlocal:verify_side_effect_buffer/0)).
 :- thread_local(thlocal:verify_side_effect_buffer/0).
-:- thread_local(thlocal:side_effect_buffer/2).
+:- endif.
+
+:- thread_local(thlocal:side_effect_buffer/3).
 
 
 :- thread_local thlocal:agenda_slow_op_do_prereqs/0.
