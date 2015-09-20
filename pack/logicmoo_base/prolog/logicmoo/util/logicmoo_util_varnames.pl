@@ -191,6 +191,15 @@ imploded_copyvars(C,CT):-must((source_variables(Vs),copy_term(C-Vs,CT-VVs),b_imp
 :-swi_export(unnumbervars/2).
 unnumbervars(X,YY):- must(unnumbervars0(X,Y)),!,must(Y=YY).
 
+
+
+:-swi_export(unnumbervars_saved/2).
+unnumbervars_saved(X,YY):-
+   unnumbervars1(X,[],Y,Vs),
+    (Vs==[]->must(X=YY);
+    ( % writeq((unnumbervars1(X,Y,Vs))),nl,
+     save_clause_vars(Y,Vs),must(Y=YY))).
+
 % todo this slows the system!
 unnumbervars0(X,clause(UH,UB,Ref)):- sanity(nonvar(X)),
   X = clause(H,B,Ref),!,
@@ -199,6 +208,17 @@ unnumbervars0(X,clause(UH,UB,Ref)):- sanity(nonvar(X)),
 unnumbervars0(X,YY):-
    must_det_l((with_output_to(string(A),write_term(X,[numbervars(true),character_escapes(true),ignore_ops(true),quoted(true)])),
    atom_to_term(A,Y,_NewVars),!,must(YY=Y))),check_varnames(YY).
+
+unnumbervars1(X,Vs,X,Vs):- ( \+ compound(X)),!.
+unnumbervars1('$VAR'(X),VsIn,Y,Vs):-!, (memberchk(X=Y,VsIn)->Vs=VsIn;Vs=[X=Y|VsIn]).
+unnumbervars1([X|XM],VsIn,[Y|YM],Vs):-!,
+  unnumbervars1(X,VsIn,Y,VsM),
+  unnumbervars1(XM,VsM,YM,Vs).
+unnumbervars1(XXM,VsIn,YYM,Vs):-
+  XXM=..[F,X|XM],
+  unnumbervars1(X,VsIn,Y,VsM),
+  unnumbervars1(XM,VsM,YM,Vs),
+  YYM=..[F,Y|YM].
 
 unnumbervars_and_save(X,YO):-
  term_variables(X,TV),

@@ -591,7 +591,7 @@ dumpST(N,Frame,Opts):-
 
 neg1_numbervars(T,-1,T):-!.
 neg1_numbervars(Out,Start,ROut):-copy_term(Out,ROut),integer(Start),!,snumbervars(ROut,Start,_).
-neg1_numbervars(Out,safe,ROut):-copy_term(Out,ROut),safe_numbervars(ROut).
+neg1_numbervars(Out,safe,ROut):-copy_term(Out,ROut),snumbervars(ROut).
 
 fdmsg1(txt(S)):-format_to_error(S,[]),!.
 fdmsg1(level=L):-format_to_error('~n(~q)',[L]),!.

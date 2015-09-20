@@ -95,7 +95,7 @@ record_se:- (thlocal:use_side_effect_buffer ; thlocal:verify_side_effect_buffer)
 add_side_effect(_,_):- ( \+  record_se ),!.
 add_side_effect(Op,Data):-current_why(Why),assert(thlocal:side_effect_buffer(Op,Data,Why)).
 
-attvar_op(Op,Data0):- add_side_effect(Op,Data0),unnumbervars(Data0,Data),call(Op,Data).
+attvar_op(Op,Data0):- add_side_effect(Op,Data0),unnumbervars_saved(Data0,Data),call(Op,Data).
 erase_w_attvars(Data0,Ref):- erase(Ref),add_side_effect(erase,Data0).
 
 
@@ -354,8 +354,9 @@ show_if_debug(A):- pfc_tracing->show_if_debug(A);A.
 % user''s program''s database
 % ======================= 
 % assert_u(arity(prologHybrid,0)):-trace_or_throw(assert_u(arity(prologHybrid,0))).
-assert_u(X):- not(compound(X)),!,asserta_u(X,X,0).
-assert_u(X):- never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
+% assert_u(X):- not(compound(X)),!,asserta_u(X,X,0).
+
+assert_u(X):- copy_term(X,Y),never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
 assert_u(X):- functor(X,F,A),assert_u(X,F,A).
 
 assert_u(X,F,_):-if_defined(singleValueInArg(F,SV)),!,must(update_single_valued_arg(X,SV)),!.
@@ -365,11 +366,11 @@ assert_u(X,F,A):- assertz_u(X,F,A).
 % assert_u(X,F,A):-must(isa(F,prologOrdered) -> assertz_u(X,F,A) ; asserta_u(X,F,A)).
 
 
-asserta_u(X):- never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
-asserta_u(X):- functor(X,F,A),asserta_u(X,F,A).
+% asserta_u(X):- never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
+% asserta_u(X):- functor(X,F,A),asserta_u(X,F,A).
 
-asserta_u(X,_,_):- show_call_success(clause_asserted(X)),!.
-asserta_u(X,_,_):- must((expire_tabled_list(X),show_if_debug(attvar_op(asserta,X)))).
+% asserta_u(X,_,_):- show_call_success(clause_asserted(X)),!.
+% asserta_u(X,_,_):- must((expire_tabled_list(X),show_if_debug(attvar_op(asserta,X)))).
 
 assertz_u(X):- never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
 assertz_u(X):- functor(X,F,A),assertz_u(X,F,A).
