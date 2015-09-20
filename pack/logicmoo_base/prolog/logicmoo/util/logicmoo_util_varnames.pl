@@ -167,10 +167,14 @@ imploded_copyvars(C,CT):-must((source_variables(Vs),copy_term(C-Vs,CT-VVs),b_imp
 
 
 :-swi_export(unnumbervars/2).
-unnumbervars(X,YY):- unnumbervars0(X,Y),!,must(Y=YY).
+unnumbervars(X,YY):- must(unnumbervars0(X,Y)),!,must(Y=YY).
 
+% todo this slows the system!
+unnumbervars0(X,clause(UH,UB,Ref)):- sanity(nonvar(X)),
+  X = clause(H,B,Ref),!,
+  must(unnumbervars0((H:-B),(UH:-UB))),!.
 
-unnumbervars0(X,YY):- 
+unnumbervars0(X,YY):-
    must_det_l((with_output_to(string(A),write_term(X,[numbervars(true),character_escapes(true),ignore_ops(true),quoted(true)])),
    atom_to_term(A,Y,_NewVars),!,must(YY=Y))),check_varnames(YY).
 

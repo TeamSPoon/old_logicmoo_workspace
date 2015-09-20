@@ -189,12 +189,6 @@ correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- not(is_ephemeral(Arg)), show_c
 correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- (coerce(Arg,Type,Inst)),not(is_ephemeral(Inst)),!.
 correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- !,acceptableArg(Arg,Type),!,Inst = Arg.
 
-is_ephemeral(Var):-var(Var),!,fail.
-is_ephemeral(isMissing).
-is_ephemeral(isOptional(_,_)).
-is_ephemeral(isRandom(_)).
-is_ephemeral(isOneOf(_)).
-
 
 acceptableArg(Arg,Type):-dmsg(acceptableArg(Arg,Type)).
 

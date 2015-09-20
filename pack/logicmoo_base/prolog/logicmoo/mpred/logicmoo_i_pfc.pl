@@ -25,6 +25,28 @@ Also alows an inference engine constrain search.. PFC became important since it 
 
 */
 
+:- include(logicmoo_i_header).
+
+:- meta_predicate attvar_op(1,?).
+
+:- meta_predicate int_asserted_t(5,?,?,?,?,?,?,?,?,?,?,?,?).
+:- meta_predicate isa_pred_l(2,?,?).
+:- meta_predicate isa_pred_l(2,?,?,?).
+:- meta_predicate kif_process(?,?).
+:- meta_predicate kif_process(?).
+:- meta_predicate kif_tell_boxes3(2,?,?).
+:- meta_predicate pttp_assert_int_wid04(?,?,?,?).
+:- meta_predicate registerCycPredPlus2(?).
+:- meta_predicate transitive_P(3,?,?,?).
+:- meta_predicate transitive_P_l_r(3,?,?,?).
+:- meta_predicate transitive_P_r_l(3,?,?,?).
+:- meta_predicate prolog_op(?,?).
+:- meta_predicate del0(?).
+:- meta_predicate cwdl(?,+).
+:- meta_predicate db_expand_maplist(2,?,?,?,?).
+:- meta_predicate resolverConflict_robot(?).
+
+
 set_prolog_stack_gb(Six):-set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
 :-set_prolog_stack_gb(16).
 :-multifile(user:rescan_pfc_hook/0).
@@ -51,25 +73,8 @@ pfc_is_builtin(P):-predicate_property(P,built_in).
 */
 
 :- use_module(library(lists)).
+:- meta_predicate with_pfc_trace_exec(0).
 
-/*
-:- use_module(library('pldoc/doc_process')).
-:- use_module(library('pldoc/doc_colour')).
-:- use_module(library('pldoc/doc_html')).
-:- use_module(library('pldoc/doc_index')).
-:- use_module(library('pldoc/doc_search')).
-:- use_module(library('pldoc/doc_modes')).
-:- use_module(library('pldoc/doc_man')).
-:- use_module(library('pldoc/doc_wiki')).
-:- use_module(library('pldoc/doc_util')).
-:- use_module(library('pldoc/doc_modes')).
-:- use_module(library('pldoc/doc_htmlsrc')).
-:- use_module(library('pldoc/doc_access')).
-:- use_module(library('pldoc/doc_pack')).
-:- use_module(library('pldoc/doc_register')).
-:- use_module(library('pldoc/doc_library')).
-
-*/
 % :- user:ensure_loaded(library(dra/tabling3/swi_toplevel)).
 
 
@@ -83,7 +88,17 @@ compiled(F/A):- dynamic(F/A),compile_predicates([F/A]).
 :- compiled(('::::')/2).
 :- compiled(('<==>')/2).
 */
+
+record_se:- thlocal:use_side_effect_buffer;thlocal:verify_side_effect_buffer.
+
 :-thread_local(thlocal:current_why_source/1).
+
+
+attvar_op(Op,Data0):- unnumbervars(Data0,Data),
+  (record_se->assert(thlocal:side_effect_buffer(Op,Data0));true),
+   call(Op,Data).
+erase_w_attvars(Data0,Ref):- unnumbervars(Data0,_Data), erase(Ref),
+  (record_se -> assert(thlocal:side_effect_buffer(erase,Data0));true).
 
 get_why_source(F):- thlocal:current_why_source(F),!.
 get_why_source(F:L):- get_source_location(F:L),L\=0,!.
@@ -111,27 +126,27 @@ pfc_each_literal(P,P). %:-conjuncts_to_list(P,List),member(E,List).
 
 :- ensure_loaded(library(logicmoo/plarkc/dbase_i_sexpr_reader)).
 
-to_addable_form_wte(Why,I,O):-string(I),must_det_l((input_to_forms(string(I),Wff,Vs),b_setval('$variable_names',Vs),!,kif_sterm_to_pterm(Wff,PTerm),
+to_addable_form_wte(Why,I,O):-string(I),must_det_l((input_to_forms(string(I),Wff,Vs),b_setval('$variable_names',Vs),!,sexpr_sterm_to_pterm(Wff,PTerm),
   to_addable_form_wte(Why,PTerm,O))).
 to_addable_form_wte(Why,I,O):-atom(I),atom_contains(I,'('),must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,sexpr_sterm_to_pterm(Wff,PTerm),
   to_addable_form_wte(Why,PTerm,O))).
 
 to_addable_form_wte(_,X,X):-if_defined(as_is_term(X)),!.
 to_addable_form_wte(Why,nesc (I),O):-!,to_addable_form_wte(Why,I,O).
-to_addable_form_wte(Why,USER:I,O):-USER=user,!,to_addable_form_wte(Why,I,O).
-to_addable_form_wte(_Why,neg(USER:P0),neg(P0)):-USER=user,!.
+to_addable_form_wte(Why,USER:I,O):-USER==user,!,to_addable_form_wte(Why,I,O).
+to_addable_form_wte(_Why,neg(USER:P0),neg(P0)):-USER==user,!.
 to_addable_form_wte(_Why,neg(P0),neg(P0)):-!.
 to_addable_form_wte(assert,(H:-B),(H:-B)):-B\==true,!.
-to_addable_form_wte(Why,(CUT,P0),(CUT,P)):-pfc_is_builtin(CUT),!,trace,!,to_addable_form_wte(Why,P0,P).
+to_addable_form_wte(Why,(CUT,P0),(CUT,P)):-pfc_is_builtin(CUT),!,to_addable_form_wte(Why,P0,P).
 to_addable_form_wte(Why,P0,P):-
     once(/* notrace */(to_addable_form(P0,P));must(to_addable_form(P0,P))),
     ((P0\=@=P,P0\=isa(_,_))->pfc_debug_trace(to_addable_form(Why,P0,P));true).
 
 retract_eq_quitely(H):-ignore(retract_eq_quitely_f(H)).
-retract_eq_quitely_f((H:-B)):- ((clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!,erase_safe(clause(HH,BB,Ref),Ref))).
-retract_eq_quitely_f((H)):- ((clause(H,true,Ref),clause(HH,BB,Ref),H=@=HH,BB==true,!,erase_safe(clause(HH,BB,Ref),Ref))).
+retract_eq_quitely_f((H:-B)):- ((clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!,erase_w_attvars(clause(HH,BB,Ref),Ref))).
+retract_eq_quitely_f((H)):- ((clause(H,true,Ref),clause(HH,BB,Ref),H=@=HH,BB==true,!,erase_w_attvars(clause(HH,BB,Ref),Ref))).
 
-assert_eq_quitely(H):-assert_if_new(H).
+assert_eq_quitely(H):- attvar_op(assert_if_new,H).
 
 reduce_clause_from_fwd(H,H):- (\+compound(H)),!.
 reduce_clause_from_fwd((H:-B),HH):-B==true,reduce_clause_from_fwd(H,HH).
@@ -225,7 +240,7 @@ pfc_clause_is_asserted_hb_nonunify(G, T   ):- T==true,!,hotrace(pfc_rule_hb(G,H,
 pfc_clause_is_asserted_hb_nonunify(H,(T,B)):- T==true,!,pfc_clause_is_asserted_hb_nonunify(H,B).
 pfc_clause_is_asserted_hb_nonunify(H,(B,T)):- T==true,!,pfc_clause_is_asserted_hb_nonunify(H,B).
 pfc_clause_is_asserted_hb_nonunify(H,B):- clause_u( <-( H , B) , true).
-pfc_clause_is_asserted_hb_nonunify(H,B):- pfc_clause_is_asserted(H,B,_).
+pfc_clause_is_asserted_hb_nonunify(H,B):- pfc_clause_is_asserted(H,B).
 
 pfc_clause_is_asserted(H,B):- var(H),nonvar(B),!,fail.
 pfc_clause_is_asserted(H,B):- has_cl(H) -> clause(H,B) ; pfc_clause_is_asserted_hb_nonunify(H,B).
@@ -293,13 +308,13 @@ pfc_add_minfo(How,(B==>H)):- !,pfc_add_minfo(How,(H:-infoF(B==>H))),!,pfc_add_mi
 pfc_add_minfo(How,(B<==>H)):- !,pfc_add_minfo(How,(H:-infoF(B<==>H))),!,pfc_add_minfo(How,(B:-infoF(B<==>H))),!.
 pfc_add_minfo(How,((A,B):-INFOC)):-pfc_is_info(INFOC),(nonvar(A);nonvar(B)),!,pfc_add_minfo(How,((A):-INFOC)),pfc_add_minfo(How,((B):-INFOC)),!.
 pfc_add_minfo(How,((A;B):-INFOC)):-pfc_is_info(INFOC),(nonvar(A);nonvar(B)),!,pfc_add_minfo(How,((A):-INFOC)),pfc_add_minfo(How,((B):-INFOC)),!.
-pfc_add_minfo(How,(~(A):-infoF(C))):-nonvar(C),nonvar(A),!,pfc_add_minfo(How,((A):-infoF((C)))). % call(How,(~(A):-infoF(C))).
-pfc_add_minfo(How,(neg(A):-infoF(C))):-nonvar(C),nonvar(A),!,pfc_add_minfo(How,((A):-infoF((C)))). % call(How,(~(A):-infoF(C))).
-pfc_add_minfo(How,(A:-INFOC)):-nonvar(INFOC),INFOC= pfc_bc_only(A),!,call(How,(A:-INFOC)),!.
-pfc_add_minfo(How,bt(H,_)):-!,call(How,(H:-pfc_bc_only(H))).
-pfc_add_minfo(How,nt(H,Test,Body)):-!,call(How,(H:-fail,nt(H,Test,Body))).
-pfc_add_minfo(How,pt(H,Body)):-!,call(How,(H:-fail,pt(H,Body))).
-pfc_add_minfo(How,(A0:-INFOC0)):- pfc_is_info(INFOC0), copy_term((A0:-INFOC0),(A:-INFOC)),!,must((pfc_rewrap_h(A,AA),imploded_copyvars((AA:-INFOC),ALLINFO), call(How,(ALLINFO)))),!.
+pfc_add_minfo(How,(~(A):-infoF(C))):-nonvar(C),nonvar(A),!,pfc_add_minfo(How,((A):-infoF((C)))). % attvar_op(How,(~(A):-infoF(C))).
+pfc_add_minfo(How,(neg(A):-infoF(C))):-nonvar(C),nonvar(A),!,pfc_add_minfo(How,((A):-infoF((C)))). % attvar_op(How,(~(A):-infoF(C))).
+pfc_add_minfo(How,(A:-INFOC)):-nonvar(INFOC),INFOC= pfc_bc_only(A),!,attvar_op(How,(A:-INFOC)),!.
+pfc_add_minfo(How,bt(H,_)):-!,attvar_op(How,(H:-pfc_bc_only(H))).
+pfc_add_minfo(How,nt(H,Test,Body)):-!,attvar_op(How,(H:-fail,nt(H,Test,Body))).
+pfc_add_minfo(How,pt(H,Body)):-!,attvar_op(How,(H:-fail,pt(H,Body))).
+pfc_add_minfo(How,(A0:-INFOC0)):- pfc_is_info(INFOC0), copy_term((A0:-INFOC0),(A:-INFOC)),!,must((pfc_rewrap_h(A,AA),imploded_copyvars((AA:-INFOC),ALLINFO), attvar_op(How,(ALLINFO)))),!.
 %pfc_add_minfo(How,G):-dmsg(skipped_add_meta_facts(How,G)).
 pfc_add_minfo(_,_).
 
@@ -346,7 +361,7 @@ show_if_debug(A):- pfc_tracing->show_if_debug(A);A.
 % assert_u(arity(prologHybrid,0)):-trace_or_throw(assert_u(arity(prologHybrid,0))).
 assert_u(X):- not(compound(X)),!,asserta_u(X,X,0).
 assert_u(X):- never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
-assert_u(X):- unnumbervars(X,XO),functor(X,F,A),assert_u(XO,F,A).
+assert_u(X):- functor(X,F,A),assert_u(X,F,A).
 
 assert_u(X,F,_):-if_defined(singleValueInArg(F,SV)),!,must(update_single_valued_arg(X,SV)),!.
 assert_u(X,F,A):-prologSingleValued(F),!,must(update_single_valued_arg(X,A)),!.
@@ -356,16 +371,16 @@ assert_u(X,F,A):- assertz_u(X,F,A).
 
 
 asserta_u(X):- never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
-asserta_u(X):- functor(X,F,A),unnumbervars(X,XO),asserta_u(XO,F,A).
+asserta_u(X):- functor(X,F,A),asserta_u(X,F,A).
 
 asserta_u(X,_,_):- show_call_success(clause_asserted(X)),!.
-asserta_u(X,_,_):- must((expire_tabled_list(X),show_if_debug(call_with_attvars(asserta,X)))).
+asserta_u(X,_,_):- must((expire_tabled_list(X),show_if_debug(attvar_op(asserta,X)))).
 
 assertz_u(X):- never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
-assertz_u(X):- functor(X,F,A),unnumbervars(X,XO),assertz_u(XO,F,A).
+assertz_u(X):- functor(X,F,A),assertz_u(X,F,A).
 
 assertz_u(X,_,_):- show_call_success(clause_asserted(X)),!.
-assertz_u(X,_,_):- must((expire_tabled_list(X),show_if_debug(call_with_attvars(assertz,X)))).
+assertz_u(X,_,_):- must((expire_tabled_list(X),show_if_debug(attvar_op(assertz,X)))).
 
 :-dynamic(never_assert_u/1).
 :-dynamic(never_retract_u/1).
@@ -376,7 +391,7 @@ retract_u(X):- never_retract_u(Y),X=@=Y,trace_or_throw(never_retract_u(Y)).
 retract_u(pfc_queue(X,Y)):-!,show_call_failure(retract_eq_quitely_f(pfc_queue(X,Y))),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
 retract_u(neg(X)):-!,show_call_success(retract_eq_quitely_f(neg(X))),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
 retract_u((X)):-!,show_call_success(retract_eq_quitely_f((X))),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
-retract_u(X):-show_if_debug(call_with_attvars(retract_eq,X)),!,must((expire_tabled_list(X))).
+retract_u(X):-show_if_debug(attvar_op(retract_eq,X)),!,must((expire_tabled_list(X))).
 
 retractall_u(X):-retractall(X),must((expire_tabled_list(X))).
 call_u(X):- pfc_call(X).
@@ -393,8 +408,8 @@ update_single_valued_arg(P,N):-
    must(get_source_ref((U,U))),
   arg(N,P,UPDATE),notrace(replace_arg(P,N,OLD,Q)),
   get_source_ref1(U),
-  must_det_l((call_with_attvars(assert_if_new,spft(P,U,U)),(if_defined(P)->true;(assertz_u(P))),
-     doall((clause(Q,true,E),UPDATE \== OLD,erase_safe(clause(Q,true,E),E),pfc_unfwc1(Q))))).
+  must_det_l((attvar_op(assert_if_new,spft(P,U,U)),(if_defined(P)->true;(assertz_u(P))),
+     doall((clause(Q,true,E),UPDATE \== OLD,erase_w_attvars(clause(Q,true,E),E),pfc_unfwc1(Q))))).
 
 
 
@@ -402,9 +417,9 @@ update_single_valued_arg(P,N):-
 % prolog system database
 % ======================= 
 /*
-assert_prologsys(X0):-unnumbervars(X0,X),assert(X).
-asserta_prologsys(X0):-unnumbervars(X0,X),asserta(X).
-assertz_prologsys(X0):-unnumbervars(X0,X),assertz(X).
+assert_prologsys(X):- attvar_op(assert,X).
+asserta_prologsys(X):- attvar_op(asserta,X).
+assertz_prologsys(X):-attvar_op(assertz,X).
 
 clause_prologsys(H,B):-clause(H,B).
 clause_prologsys(H,B,Ref):-clause(H,B,Ref).
@@ -414,14 +429,14 @@ call_prologsys(X):-call(X).
 % ======================= 
 % internal bookkeeping
 % ======================= 
-assert_i(X0):-unnumbervars(X0,X),call_with_attvars(assert_if_new,X).
-asserta_i(X0):-unnumbervars(X0,X),call_with_attvars(asserta_if_new,X).
-assertz_i(X0):-unnumbervars(X0,X),call_with_attvars(assertz_if_new,X).
-retract_i(X0):-unnumbervars(X0,X),retract(X).
+assert_i(X):- attvar_op(assert_if_new,X).
+asserta_i(X):-attvar_op(asserta_if_new,X).
+assertz_i(X):-attvar_op(assertz_if_new,X).
+retract_i(X):-attvar_op(retract,X).
 clause_i(H,B):-clause(H,B).
 clause_i(H,B,Ref):-clause(H,B,Ref).
 call_i(X):-call(X).
-retractall_i(X0):-unnumbervars(X0,X),retractall(X).
+retractall_i(X):-attvar_op(retractall,X).
 
 
 % ======================= 
@@ -453,7 +468,7 @@ pfc_maptree(Pred,(H;T),S):-!, pfc_maptree(Pred,H,S) ; pfc_maptree(Pred,T,S).
 pfc_maptree(Pred,[H|T],S):-!, apply(Pred,[H|S]), pfc_maptree(Pred,T,S).
 pfc_maptree(Pred,H,S):-apply(Pred,[H|S]). 
 
-:-use_module(library(logicmoo/util/rec_lambda)).
+% :- user:ensure_loaded(library(logicmoo/util/rec_lambda)).
 
 
 
@@ -470,6 +485,21 @@ pfc_freeLastArg(_G,false).
 pfc_current_op_support((p,p)):-!.
 
 pfcVersion(1.2).
+
+:- meta_predicate pfc_add_h(2,?,*).
+:- meta_predicate pfc_add_minfo(1,*).
+:- meta_predicate pfc_add_minfo_2(1,*).
+:- meta_predicate pfc_add_rule_if_rule(?).
+:- meta_predicate pfc_call_t_exact(?).
+:- meta_predicate pfc_enqueue(?,*).
+:- meta_predicate pfc_facts_and_universe(?).
+:- meta_predicate pfc_facts_only(?).
+:- meta_predicate pfc_fwd(?).
+:- meta_predicate pfc_fwd(?,*).
+:- meta_predicate pfc_fwd1(?,*).
+:- meta_predicate pfc_fwd2(?,*).
+:- meta_predicate pfc_test(?).
+:- meta_predicate pfc_update_literal(*,*,?,*).
 
 :- meta_predicate pfcl_do(0).
 :- meta_predicate pfc_fact(*,0).
@@ -587,7 +617,7 @@ pfc_post1(P0,S):-
         ->maplist(pfc_post_sp_zzz(S),P);
        pfc_post_sp_zzz(S,P)).
 
-pfc_post_sp(S,P):-unnumbervars(S+P,SO+PO),pfc_post_sp_zzz(SO,PO).
+pfc_post_sp(S,P):- pfc_post_sp_zzz(S,P).
 pfc_post_sp_zzz(S,(P1,P2)) :- !,pfc_post_sp_zzz(S,(P1)),pfc_post_sp_zzz(S,(P2)).
 pfc_post_sp_zzz(S,[P1]) :- !,pfc_post_sp_zzz(S,(P1)).
 pfc_post_sp_zzz(S,[P1|P2]) :- !,pfc_post_sp_zzz(S,(P1)),pfc_post_sp_zzz(S,(P2)).
@@ -792,8 +822,11 @@ pfc_halt(Format,Args) :-
 %=
 %= predicates for manipulating triggers
 %=
+pfc_add_trigger(Trig,Support) :- arg(1,Trig,Term),
+   loop_check_term(pfc_add_trigger_0(Trig,Support),trig(Term),true).
 
-pfc_add_trigger(pt(Trigger,Body),Support) :-
+
+pfc_add_trigger_0(pt(Trigger,Body),Support) :-
   !,  
   pfc_trace_item('Adding For Later',pt(Trigger,Body)),
   (clause_asserted(pt(Trigger,Body)) -> ! ;   
@@ -801,8 +834,7 @@ pfc_add_trigger(pt(Trigger,Body),Support) :-
         (must(pfc_mark_as(Support,p,Trigger,pfcPosTrigger))),
         add_reprop(Trigger)))).
 
-
-pfc_add_trigger(nt(Trigger,Test,Body),Support) :- !,
+pfc_add_trigger_0(nt(Trigger,Test,Body),Support) :- !,
   pfc_trace_item('Adding For Later',nt(Trigger,Test,Body)),
    must(pfc_mark_as(Support,n,Trigger,pfcNegTrigger)),
         copy_term(Trigger,TriggerCopy),!,
@@ -812,15 +844,15 @@ pfc_add_trigger(nt(Trigger,Test,Body),Support) :- !,
            doall(( pfc_eval_lhs(Body,((\+Trigger),nt(TriggerCopy,Test,Body))))))),!.
 
 
-pfc_add_trigger(bt(Trigger,Body),Support) :- !,
+pfc_add_trigger_0(bt(Trigger,Body),Support) :- !,
   pfc_trace_item('Adding For Later',bt(Trigger,Body)),
    must(pfc_assert_t(bt(Trigger,Body),Support)),
-      assertz_if_new((Trigger:-pfc_bc_only(Trigger))),!,
+      attvar_op(assertz_if_new,((Trigger:-pfc_bc_only(Trigger)))),!,
       must(pfc_mark_as(Support,b,Trigger,pfcBcTrigger)),
      % WAS pfc_bt_pt_combine(Trigger,Body).
   must(pfc_bt_pt_combine(Trigger,Body,Support)),!.
 
-pfc_add_trigger(X,Support) :- pfc_warn("Unrecognized trigger to pfc_addtrigger: ~p",[pfc_add_trigger(X,Support)]).
+pfc_add_trigger_0(X,Support) :- pfc_warn("Unrecognized trigger to pfc_addtrigger: ~p",[pfc_add_trigger(X,Support)]).
 
 
 pfc_bt_pt_combine(Head,Body,Support) :-
@@ -844,7 +876,7 @@ pfc_add_actiontrace(Action,Support) :-
   % adds an action trace and it''s support.
   pfc_add_support(pfc_action(Action),Support).
 
-pfc_rem_actiontrace(pfc_action(A)) :-
+pfc_rem_actiontrace(_,pfc_action(A)) :-
   pfc_undo_method(A,M),
   M,
   !.
@@ -881,7 +913,7 @@ pfc_retract_db_type(trigger,X) :-
     -> pfc_unfwc(X)
      ; pfc_warn("Trigger not found to retract: ~p",[X]).
 
-pfc_retract_db_type(action,X) :- pfc_rem_actiontrace(X).
+pfc_retract_db_type(action,X) :- pfc_rem_actiontrace(pfc_retract_db_type,X).
 
 
 /* UNUSED TODAY
@@ -1297,7 +1329,7 @@ pfc_define_bc_rule(Head,Body,Parent_rule) :-
 
 pfc_define_bc_rule(Head,Body,Parent_rule) :- 
   copy_term(Parent_rule,Parent_ruleCopy),
-  call_with_attvars(assert_if_new,Head:-pfc_bc_only(Head)),
+  attvar_op(assert_if_new,Head:-pfc_bc_only(Head)),
   build_rhs(Head,Head,Rhs),
   foreachl_do(pfc_nf(Body,Lhs),
        (build_trigger(Parent_ruleCopy,Lhs,rhs(Rhs),Trigger),
@@ -1701,7 +1733,7 @@ pfc_cleanup:- forall((no_repeats(F-A,(pfcMark(pfcRHS,_,F,A),A>1))),pfc_cleanup(F
 
 pfc_cleanup(F,A):-functor(P,F,A),predicate_property(P,dynamic)->pfc_cleanup_0(P);true.
 
-pfc_cleanup_0(P):- findall(P-B-Ref,clause(P,B,Ref),L),forall(member(P-B-Ref,L),erase_safe(clause(P,B,Ref),Ref)),forall(member(P-B-Ref,L),assertz_if_new((P:-B))).
+pfc_cleanup_0(P):- findall(P-B-Ref,clause(P,B,Ref),L),forall(member(P-B-Ref,L),erase_w_attvars(clause(P,B,Ref),Ref)),forall(member(P-B-Ref,L),attvar_op(assertz_if_new,((P:-B)))).
 
 :-debug.
 %isInstFn(A):-!,trace_or_throw(isInstFn(A)).
@@ -1863,26 +1895,23 @@ pfc_db_type(_,fact) :-
 
 pfc_call_t_exact(Trigger) :- copy_term(Trigger,Copy),pfc_get_trigger_quick(Trigger),Trigger=@=Copy.
 
-retract_t(Trigger) :-  retract_i(spft(Trigger,_,_)),ignore(retract(Trigger)).
+retract_t(Trigger) :-  retract_i(spft(Trigger,_,_)),ignore(retract_i(Trigger)).
 
 
-pfc_assert_t(P0,Support0) :- 
-  unnumbervars(P0+Support0,P+Support),
+pfc_assert_t(P,Support) :- 
   (pfc_clause_i(P) ; (assert_i(P),pfc_add_trigger(P,Support))),
   !,
   pfc_add_support(P,Support).
 
 
 
-pfc_asserta_i(P0,Support0) :- 
-  unnumbervars(P0+Support0,P+Support),
+pfc_asserta_i(P,Support) :-
   (pfc_clause_i(P) ; asserta_i(P)),
   !,
   pfc_add_support(P,Support).
 
 
-pfc_assertz_i(P0,Support0) :-
-  unnumbervars(P0+Support0,P+Support),
+pfc_assertz_i(P,Support) :-  
   (pfc_clause_i(P) ; assertz_i(P)),
   !,
   pfc_add_support(P,Support).
@@ -1937,9 +1966,8 @@ user:portray(C):-compound(C),C=spft(_,_,C),pp_item('',C).
 %= pfc_add_support(+Fact,+Support)
 
 pfc_add_support(P,(Fact,Trigger)) :- 
-   U=spft(P,Fact,Trigger),
-   unnumbervars(U,UNNUMBEREDVARS),
-   assertz_if_new(UNNUMBEREDVARS),!. % was assert_i
+   U=spft(P,Fact,Trigger),   
+   attvar_op(assertz_if_new,U),!. % was assert_i
 pfc_add_support(P,FT) :- trace_or_throw(failed_pfc_add_support(P,FT)).
 
 
@@ -1958,7 +1986,7 @@ pfc_rem_support(WhyIn,P,(Fact,Trigger)) :- var(P),!,copy_term(pfc_rem_support(Wh
   clause(spft(P,Fact,Trigger),true,Ref),
   ((clause(SPFC,true,Ref),
      (SPFC=@=spft(P,Fact,Trigger) -> 
-        erase(Ref); 
+        erase_w_attvars(clause(SPFC,true,Ref),Ref); 
        (wdmsg(<=(Why,~SPFC)),pfc_retract_or_warn_i(spft(P,Fact,Trigger)),nop(trace))),
    (var(P)->trace_or_throw(var(P));remove_if_unsupported_verbose(WhyIn,local,P)))).
 pfc_rem_support(Why,(\+ N) , S):- pfc_rem_support(Why,neg(N),S).
@@ -2237,7 +2265,7 @@ pfc_no_spy(Form) :- pfc_no_spy(Form,_,_).
 
 pfc_no_spy(Form,Mode,Condition) :-
   clause_i(pfc_spied(Form,Mode), Condition, Ref),
-  erase_safe(clause_i(pfc_spied(Form,Mode), Condition, Ref),Ref),
+  erase_w_attvars(clause_i(pfc_spied(Form,Mode), Condition, Ref),Ref),
   fail.
 pfc_no_spy(_,_,_).
 
@@ -2453,7 +2481,7 @@ resolverConflict_robot(N) :- forall(must(pfc_negation_w_neg(N,C)),forall(compute
 resolverConflict_robot(C) :- must((pfc_remove3(C),wdmsg("Rem-3 with conflict ~p", [C]),pfc_run,sanity(\+C))).
 
 
-pfc_prove_neg(G):-nop(trace), \+ pfc_bc_caching(G), \+ pfc_fact(G).
+pfc_prove_neg(G):-nop(trace), \+ pfc_bc_only(G), \+ pfc_fact(G).
 
 pred_head(Type,P):- no_repeats_u(P,(call(Type,P),\+ nonfact_metawrapper(P),compound(P))).
 
@@ -2520,7 +2548,7 @@ add_reprop(Var):- var(Var), !. % trace_or_throw(add_reprop(Var)).
 add_reprop(neg(_Var)):-!.
 % add_reprop(_):-!.
 add_reprop((H:-B)):- trace_or_throw(add_reprop((H:-B))).
-add_reprop(Trigger):- assertz_if_new(pfc_queue(repropagate(Trigger),(g,g))).
+add_reprop(Trigger):- attvar_op(assertz_if_new,(pfc_queue(repropagate(Trigger),(g,g)))).
 
 
 repropagate(P):- (is_ftVar(P),!).

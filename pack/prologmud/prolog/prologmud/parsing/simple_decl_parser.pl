@@ -230,15 +230,6 @@ to_icase_strs(WL,IC):-maplist(to_icase_str,WL,IC).
 to_icase_str(SL,IC):-string_to_atom(SL,SA),string_to_atom(SS,SA),when(nonvar(IC);?=(IC,IC),(IC=SA;IC=SS)).
 
 
-modality(pfc_default, [usually],[]).
-modality(neg , [cannot],[can]).
-modality(pfc_default,[sometimes],[]).
-modality(can,[can],[be]).
-modality(possibly,[either],[]).
-modality(neg,[not],[]).
-modality(neg,[never],[]).
-
-
 % somethingCanBe(tFountainDrink,[vSmall,vMedium,vLarge]).
 
 translation_for(Room,'tRegion',(isa(Room,'tCorridor'),isa(Room,'tWellLit')),WS,[]):-concat_atom(WS,' ',O),tag_pos(O,IO),IO = 

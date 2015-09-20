@@ -10,11 +10,19 @@ transitive_lc(X,A,B):-transitive_except([],X,A,B).
 
 transitive_except(NotIn,X,A,B):- memberchk_same(A,NotIn)-> (B=A,!) ;((once(debugOnError(call(X,A,R)) -> ( R\=@=A -> transitive_except([A|NotIn],X,R,B) ; B=R); B=A))),!.
 
+:- meta_predicate no_loop_check(0).
+:- meta_predicate no_loop_check(0,0).
+:- meta_predicate no_loop_check_term_key(0,?,0).
+:- meta_predicate call_tabled(?,0).
+:- meta_predicate loop_check(0).
+:- meta_predicate loop_check(0,0).
+:- meta_predicate loop_check_nr(0).
+:- meta_predicate loop_check_true(0).
 
 %:- meta_predicate((loop_check(0,0))).
 %:- meta_predicate((no_loop_check(0,0))).
 %:- meta_predicate((no_loop_check(0))).
-%:- meta_predicate((no_loop_check_unsafe(0))).
+%:- meta_predicate((no_loop_check(0))).
 :- meta_predicate((loop_check_term(0,?,0))).
 :- meta_predicate((loop_check_term_key(0,?,0))).
 %:- meta_predicate((loop_check(0,0))).
@@ -41,7 +49,7 @@ reduce_make_key(no_repeats(_,C),O):-!,reduce_make_key(C,O).
 reduce_make_key(no_repeats_old(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(no_repeats_old(_,C),O):-!,reduce_make_key(C,O).
 reduce_make_key(call_tabled(C),O):-!,reduce_make_key(C,O).
-reduce_make_key(no_loop_check_unsafe(C),O):-!,reduce_make_key(C,O).
+reduce_make_key(no_loop_check(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(loop_check(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(loop_check(C,_),O):-!,reduce_make_key(C,O).
 reduce_make_key(loop_check_term_key(C,_,_),O):-!,reduce_make_key(C,O).
@@ -124,7 +132,7 @@ call_no_cuts_loop_checked(Call, TODO):- clause(Call,Body),make_key(Body,Key),loo
 
 
 
-:- meta_predicate call_setof_tabled(?,?,?,0,-).
+:- meta_predicate call_setof_tabled(?,?,0,-).
 :- meta_predicate findall_nodupes(?,0,-).
 :- module_transparent call_setof_tabled/4.
 
@@ -136,9 +144,10 @@ retract_can_table :- retractall(maybe_table_key(_)).
 
 :- meta_predicate(make_key(?,-)).
 
-:-module_transparent(ex/0).
+:- module_transparent((ex)/0).
+
 lex:-listing(tlbugger:ilc(_)),forall(current_predicate(table_bugger:F/A),listing(table_bugger:F/A)),catchvv(listing(user:already_added_this_round),_,true).
-ex:-expire_tabled_list(_),retractall(tlbugger:ilc(_)),dmsg_showall(_),forall(current_predicate(table_bugger:F/A),(functor(RA,F,A),retractall(RA))),catchvv(expire_dont_add,_,true).
+(ex):-expire_tabled_list(_),retractall(tlbugger:ilc(_)),dmsg_showall(_),forall(current_predicate(table_bugger:F/A),(functor(RA,F,A),retractall(RA))),catchvv(expire_dont_add,_,true).
 
 expire_tabled_list(V):-var(V),!,retractall(table_bugger:call_tabled_cached_results(_,_)).
 expire_tabled_list(K):-compound(K),functor(K,_,1),retractall(table_bugger:call_tabled_cached_results(isa(_,_),_)),retractall(table_bugger:call_tabled_cached_results(isa(_,_)+_,_)),fail.
@@ -154,7 +163,7 @@ any_term_overlap(T1,T2):- atoms_of(T1,A1),atoms_of(T2,A2),!,member(A,A1),member(
 
 make_tabled_perm(Call):- must(really_can_table),must(outside_of_loop_check),
   term_variables(Call,Vars),!,make_key(Vars+Call,LKey),reduce_make_key(LKey,Key),
-  findall(Vars,with_no_assertions(tlbugger:cannot_save_table,no_loop_check_unsafe(no_repeats_old(Call))),KList),
+  findall(Vars,with_no_assertions(tlbugger:cannot_save_table,no_loop_check(no_repeats_old(Call))),KList),
   must(KList=[_|_]),!,
   asserta(table_bugger:call_tabled_perm(Key,KList)),!,
   member(Vars,KList).
@@ -169,6 +178,7 @@ skipped_table_call(Call):- cannot_use_tables(cannot_table_call(Call)).
 cannot_table_call(Call):- with_assertions( tlbugger:cannot_save_table,Call).
 cannot_use_tables(Call):- with_assertions( tlbugger:cannot_use_any_tables,Call).
 
+call_tabled(A):-call_tabled(A,A).
 call_tabled(Key,setof(Vars,C,List)):- !,call_setof_tabled(Key,Vars,C,List).
 call_tabled(Key,findall(Vars,C,List)):- !,call_setof_tabled(Key,Vars,C,List).
 call_tabled(Key,C):- sanity(nonvar(C)), term_variables(C,Vars),!,call_vars_tabled(Key,Vars,C).

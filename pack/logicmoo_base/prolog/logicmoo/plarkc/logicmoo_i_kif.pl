@@ -28,19 +28,6 @@ kif_hook(H:- _):- !,nonvar(H),!,kif_hook(H).
 
 :- style_check(+singleton).
 
-
-subst_except(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
-subst_except(  Var, _,_,Var ) :- \+compound(Var),!.
-subst_except(  Var, _,_,Var ) :- leave_as_is(Var),!.
-subst_except([H|T],B,A,[HH|TT]):- !,
-   subst_except(H,B,A,HH),
-   subst_except(T,B,A,TT).
-subst_except(HT,B,A,HHTT):- HT=..FARGS,subst_except(FARGS,B,A,[FM|MARGS]),
-   (atom(FM)->HHTT=..[FM|MARGS];append_termlist(FM,MARGS,HHTT)).
-
-append_termlist(Call,EList,CallE):-must((compound(Call),is_list(EList))), Call=..LeftSide, append(LeftSide,EList,ListE), CallE=..ListE.
-
-
 correct_arities(_,FmlO,FmlO):-leave_as_is(FmlO),!.
 correct_arities([],Fml,Fml):-!.
 correct_arities([H|B],Fml,FmlO):-!,correct_arities(H,Fml,FmlM),correct_arities(B,FmlM,FmlO).
@@ -247,6 +234,19 @@ fmtl(X):- thglobal:as_prolog(X,XX), fmt(XX).
 write_list([F|R]):- write(F), write('.'), nl, write_list(R).
 write_list([]).
 
+numbervars_with_names(Term,CTerm):- ground(Term),!,duplicate_term(Term,CTerm).
+numbervars_with_names(Term,CTerm):- 
+ must_det_l((
+   source_variables_l(NamedVars),!,
+   copy_term(Term:NamedVars,CTerm:CNamedVars),
+   term_variables(CTerm,Vars),   
+   get_var_names(Vars,CNamedVars,Names),
+   b_implode_varnames0(Names),
+   numbervars(CTerm,91,_,[attvar(skip),singletons(false)]),
+   append(CNamedVars,NamedVars,NewCNamedVars),
+   list_to_set(NewCNamedVars,NewCNamedVarsS),
+   remove_grounds(NewCNamedVarsS,NewCNamedVarsSG),
+   b_setval('$variable_names',NewCNamedVarsSG))),!.
 
 numbervars_with_names(Term,CTerm):- 
  must_det_l((
@@ -259,7 +259,8 @@ numbervars_with_names(Term,CTerm):-
    append(CNamedVars,NamedVars,NewCNamedVars),
    list_to_set(NewCNamedVars,NewCNamedVarsS),
    remove_grounds(NewCNamedVarsS,NewCNamedVarsSG),
-   b_setval('$variable_names',NewCNamedVarsSG))).
+   b_setval('$variable_names',NewCNamedVarsSG))),!.
+
 get_var_names([],_,[]).
 get_var_names([V|Vars],NamedVars,[S|SNames]):-
     get_1_var_name(V,NamedVars,S),
@@ -291,23 +292,6 @@ wdmsgl_3(NAME,F,NF):-
 wdmsgl_4(NAME,_,NF):- as_symlog(NF,NF2), with_all_dmsg(display_form(_KB,(NAME:-NF2))).
 
 
-
-put_singles(Wff,_,[],Wff).
-put_singles(Wff,Exists,[S|Singles],NewWff):-   
-   (((each_subterm(Wff,SubTerm),compound(SubTerm),
-    SubTerm=..[OtherExists,SO,_],same_var(SO,S),
-     member(OtherExists,[all,exists])))
- -> WffM = Wff ; WffM =..[Exists,S,Wff]),
-   put_singles(WffM,Exists,Singles,NewWff),!.
-
-
-:-meta_predicate(call_last_is_var(1)).
-call_last_is_var(MCall):- strip_module(MCall,M,Call),
-   must((compound(Call),functor(Call,_,A))),
-   arg(A,Call,Last),nonvar(Last),Call=..FArgs,
-   append(Left,[Last],FArgs),append(Left,[IsVar],NFArgs),NewCall=..NFArgs,!,M:NewCall*->IsVar=Last;fail.
-
-   
 
 fresh_varname(F,NewVar):-is_ftVar(F),NewVar=F.
 fresh_varname(F,NewVar):-var(F),fresh_varname('mudEquals',NewVar).
@@ -509,6 +493,7 @@ boxlog_to_pfc(PFCM,PFCO):- boxlog_to_compile(PFCM,PFC),!, subst(PFC,(not),(neg),
 tsn:- with_all_dmsg(forall(clause(kif,C),must(C))).
 
 % kif:- make.
+:- dynamic(kif_test_string/1).
 tkif:- kif_test_string(TODO),kif_io(string(TODO),current_output).
 
 :- multifile(user:sanity_test/0).
@@ -552,7 +537,7 @@ why_to_id(Atom,Wff,IDWhy):- must(atomic(Atom)),gensym(Atom,IDWhyI),kb_incr(IDWhy
 
 :- export(kif_process/1).
 kif_process(end_of_file):- !.
-kif_process(prolog):- prolog_repl,!.
+kif_process(prolog):- prolog,!.
 kif_process(Assert):- atom(Assert),retractall(kif_action_mode(_)),asserta(kif_action_mode(Assert)),fmtl(kif_action_mode(Assert)),!.
 kif_process(Wff):- kif_action_mode(Mode),kif_process(Mode,Wff),!.
 
@@ -571,11 +556,12 @@ kif_ask_sent(Wff):-
    term_variables(Wff,Vars),
    gensym(z_q,ZQ),
    Query=..[ZQ,666|Vars],
+   why_to_id(rule,'=>'(Wff,Query),Why),   
    kif_to_boxlog('=>'(Wff,Query),Why,QueryAsserts),!,
-   kif_tell_boxes(pttp_assert_wid,Why,pttp_in,QueryAsserts),!,
+   kif_tell_boxes1(Why,QueryAsserts),!,
    call_cleanup(
      kif_ask(Query),
-     pttp_retractall_wid(Why)).
+     retractall_wid(Why)).
 
 
 :- export(kif_ask/1).
@@ -606,8 +592,9 @@ local_sterm_to_pterm(Wff,WffO):- sexpr_sterm_to_pterm(Wff,WffO),!.
 
 :-op(1000,fy,(kif_tell)).
 
-:- export((kif_tell)/2).
 /*
+:- export((kif_tell)/2).
+
 kif_tell(_,[]).
 kif_tell(Why,[H|T]):- !,must_det_l((kif_tell(Why,H),kb_incr(Why,Why2),kif_tell(Why2,T))).
 kif_tell(Why,Wff):-  
@@ -625,9 +612,16 @@ assert_wfs_fallback0(Why,(H:-B)):- adjust_kif('$VAR'(KB),B,HBK),demodal('$VAR'(K
 assert_wfs_fallback0(Why, HB):- adjust_kif('$VAR'(KB),HB,HBK),demodal('$VAR'(KB),HBK,HBKD),
    wdmsg((HBKD:-w_infer_by(Why))),pttp_assert_wid(Why,pttp_in,(HB)),!.
 
+*/
 
-
-
+:-export(kb_incr/2).
+kb_incr(WffNum1 ,WffNum2):-is_ftVar(WffNum1),trace_or_throw(kb_incr(WffNum1 ,WffNum2)).
+kb_incr(WffNum1 ,WffNum2):-number(WffNum1),WffNum2 is WffNum1 + 1,!.
+%kb_incr(WffNum1 ,WffNum2):-atom(WffNum1),WffNum2=..[WffNum1,0],!.
+kb_incr(WffNum1 ,WffNum2):-atomic(WffNum1),WffNum2 = WffNum1:0,!.
+kb_incr(WffNum1 ,WffNum2):-WffNum1=..[F,P,A|REST],kb_incr(A ,AA),!,WffNum2=..[F,P,AA|REST].
+kb_incr(WffNum1 ,WffNum2):-trace_or_throw(kb_incr(WffNum1 ,WffNum2)).
+/*
 kif_tell_boxes(How,Why,Wff0,Asserts0):-
  must_det_l((
   show_call_failure(kif_unnumbervars(Asserts0+Wff0,Asserts+Wff)),  

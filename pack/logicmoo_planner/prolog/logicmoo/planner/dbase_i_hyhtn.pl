@@ -171,7 +171,9 @@ post_header_hook:-use_module(library(lists)).
 :- style_check(+discontiguous).
 
 post_header_hook:-use_module(library(system)).
+:-if(exists_source(library(gui_tracer))).
 post_header_hook:-catch(guitracer,_,true).
+:-endif.
 post_header:- !.
 post_header:- dmsg(post_header),fail, forall(clause(post_header_hook,G),G). 
 

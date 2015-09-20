@@ -13,7 +13,113 @@ user:swi_module(_,_).
 :- set_prolog_flag(generate_debug_info, true).
 :- set_prolog_flag(access_level,system).
 
+:- meta_predicate agenda_slow_op_enqueue(?).
+:- meta_predicate agg_all_test2(?,?,?).
+:- meta_predicate asserted_t(5,?,?,?,?,?,?,?,?,?,?,?).
+:- meta_predicate call30timed(?,?).
+:- meta_predicate call_after(?,?).
+:- meta_predicate call_after_next(?,?).
 
+:- meta_predicate call_for_terms(?).
+:- meta_predicate call_mpred_body(?,?).
+:- meta_predicate call_mpred_body_ilc(?,?).
+:- meta_predicate call_whichlist_t(?,?,?).
+:- meta_predicate call_with_attvars(1,?).
+
+:- meta_predicate call_proof(?,?).
+:- meta_predicate callOr(?,?,?).
+:- meta_predicate clr0(?).
+
+:- meta_predicate cnstrn(?,?).
+:- meta_predicate cnstrn(?).
+:- meta_predicate cnstrn0(?,?).
+:- meta_predicate convertAndCall(?,?).
+:- meta_predicate ddmsg_call(?).
+:- meta_predicate debugCallWhy(?,?).
+:- meta_predicate do_all_of_when(?).
+:- meta_predicate dumptrace_ret(?).
+
+:- meta_predicate each_subterm(?,2,?).
+:- meta_predicate edit1term(?).
+:- meta_predicate fmt_ansi(?).
+:- meta_predicate forall_setof(?,?).
+:- meta_predicate gftrace(?).
+:- meta_predicate ggtrace(?).
+:- meta_predicate grtrace(?).
+:- meta_predicate hmust(?).
+:- meta_predicate hmust_l(?).
+
+:- meta_predicate if_html(?,?).
+:- meta_predicate if_main(?).
+:- meta_predicate if_may_hide(?).
+:- meta_predicate in_cmt(0).
+:- meta_predicate is_asserted(?).
+:- meta_predicate keep_line_pos(?,?).
+
+
+:- meta_predicate list_retain(?,1,?).
+:- meta_predicate logOnErrorFail(0).
+:- meta_predicate logOnErrorIgnore(0).
+:- meta_predicate logOnFailureIgnore(0).
+:- meta_predicate map_subterms(?,?,?).
+:- meta_predicate map_unless(?,?,?,?).
+:- meta_predicate memberchk_pred(2,?,?).
+:- meta_predicate memberchk_pred_rev(2,?,?).
+:- meta_predicate must_det(?,?).
+:- meta_predicate must_l(0).
+:- meta_predicate must_op(?,?).
+:- meta_predicate myDebugOnError(?).
+:- meta_predicate nd_predsubst(?,2,?).
+:- meta_predicate nd_predsubst1(2,?,?,?).
+:- meta_predicate nd_predsubst2(2,?,?).
+:- meta_predicate(onLoad((?))).
+:- meta_predicate pred_delete(2,?,?,?).
+:- meta_predicate pred_head(1,?).
+:- meta_predicate pred_subst(2,?,?,?,?).
+:- meta_predicate pred_term_parts(1,?,?).
+:- meta_predicate pred_term_parts_l(1,?,?).
+:- meta_predicate predsubst(?,2,?).
+:- meta_predicate prepend_each_line(?,?).
+:- meta_predicate pretest_call(?).
+:- meta_predicate prolog_call(?).
+
+:- meta_predicate really_with_attvars(1,?).
+
+:- meta_predicate return_to_pos(?).
+:- meta_predicate search(?,?,?,?,?,?,?).
+:- meta_predicate search0(?,?,?,?,?,?,?).
+:- meta_predicate search1(?,?,?,?,?,?,?).
+:- meta_predicate show_and_do(?).
+:- meta_predicate show_cgoal(?).
+:- meta_predicate show_edit_term(?,?,?).
+:- meta_predicate show_edit_term0(?,?,?).
+:- meta_predicate show_edit_term1(?,?,?).
+:- meta_predicate show_if_debug(?).
+:- meta_predicate simply_functors(2,?,?).
+:- meta_predicate term_listing_inner(3,?).
+:- meta_predicate throw_if_true_else_fail(?,?).
+:- meta_predicate to_atomic_name(?,2,?).
+:- meta_predicate to_nonvars(2,?,?).
+:- meta_predicate to_stderror(?).
+:- meta_predicate toCase(2,?,?).
+:- meta_predicate toCaseSplit(?,2,?,?).
+:- meta_predicate trace_or(?).
+:- meta_predicate traceafter_call(?).
+:- meta_predicate whenAnd(?,?).
+:- meta_predicate with_output_to_stream(?,?).
+
+:- meta_predicate with_current_indent(0).
+:- meta_predicate with_dmsg(?,0).
+:- meta_predicate with_err_to_pred(?,0).
+:- meta_predicate with_fail_is_asserted(?,0).
+:- meta_predicate with_input_from_pred(?,0).
+:- meta_predicate with_logical_functor(?,?,1).
+:- meta_predicate with_main_io(0).
+:- meta_predicate with_no_dmsg(?,0).
+:- meta_predicate with_output_to_console(0).
+:- meta_predicate with_output_to_main(0).
+:- meta_predicate with_output_to_pred(?,?,0,0).
+:- meta_predicate with_output_to_pred(?,0).
 
 :- user:ensure_loaded((logicmoo_util_filestreams)).
 :- user:ensure_loaded((logicmoo_util_filesystem)).
@@ -118,7 +224,7 @@ win_fork(G,SERVIO,PID):-atom_concat('swipl-win.exe ',G,AC),writeq(win_fork(AC,SE
 */
 
 
-:-getenv('PATH',PATH),writeq(PATH).
+% :-getenv('PATH',PATH),writeq(PATH).
 
 % :-prolog.
 
@@ -126,13 +232,15 @@ win_fork(G,SERVIO,PID):-atom_concat('swipl-win.exe ',G,AC),writeq(win_fork(AC,SE
 show_file_search_path:- % 'format'('% ~q.~n',[forall(user:file_search_path(_,_))]),
   forall(must(user:file_search_path(A,B)),'format'('% ~q.~n',[user:file_search_path(A,B)])).
 
-
+:- if(if_defined(run_sanity_tests)).
 :- show_file_search_path.
 
 % :- list_undefined.
 
-:- logicmoo_util_dcg:call(do_dcg_util_tests).
 
+:- endif.
+
+:- logicmoo_util_dcg:call(do_dcg_util_tests).
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 :- retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).

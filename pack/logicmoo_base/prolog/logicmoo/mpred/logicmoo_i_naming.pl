@@ -34,7 +34,7 @@ i_name_lc(OType,IType):-typename_to_iname0('',OType,IOType),!,string_equal_ci(IO
 
 to_iname(T,T):-!.
 to_iname(T,TT):-not(current_predicate(i_name/3)),!,T=TT.
-to_iname(T,TT):-is_ftVar(T)->TT=T;(not_log_op(T),i_name_lc(t,T,TT)).
+to_iname(T,TT):-is_ftVar(T)->TT=T;(not_log_op(T),i_name(t,T,TT)).
 
 
 toUpperCamelcase(Type,TypeUC):-toCamelcase(Type,TypeUC). % ,toPropercase(TypeC,TypeUC),!.
@@ -114,6 +114,16 @@ create_from_type(OType,Name,Type):- sanity(var(Name)),
 % ========================================
 % Spawn new instances
 % ========================================
+
+
+modality(pfc_default, [usually],[]).
+modality(neg , [cannot],[can]).
+modality(pfc_default,[sometimes],[]).
+modality(can,[can],[be]).
+modality(possibly,[either],[]).
+modality(neg,[not],[]).
+modality(neg,[never],[]).
+
 
 onSpawn(A):-A==true,!.
 onSpawn((A,B)):-!,onSpawn(A),onSpawn(B).

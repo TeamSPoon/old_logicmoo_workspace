@@ -68,6 +68,8 @@ load_time_sanity.
 :-dynamic(user:hook_one_minute_timer_tick/0).
 :-multifile(user:hook_one_minute_timer_tick/0).
 
+:- dynamic(user:startup_option/2).
+
 :- dynamic(completelyAssertedCollection/1).
 :- multifile(completelyAssertedCollection/1).
 :- dynamic(((tCol/1,tFunction/1,tSet/1,mpred_module/2))).
@@ -342,7 +344,6 @@ load_time_sanity.
 :- multifile user:deduce_facts/2.
 :- multifile user:default_type_props/3.
 :- multifile user:fact_always_true/1.
-:- multifile user:fact_is_false/2.
 :- multifile user:fact_maybe_deduced/1.
 :- multifile user:tms_reject_why/2.
 :- multifile user:fskel/7.
@@ -399,7 +400,14 @@ load_time_sanity.
 :- thread_local thlocal:caller_module/2.
 :- thread_local thlocal:mpred_opcall/2.
 :- thread_local thlocal:deduceArgTypes/1.
+
+
 :- thread_local thlocal:side_effect_ok/0.
+:- thread_local(thlocal:use_side_effect_buffer/0).
+:- thread_local(thlocal:verify_side_effect_buffer/0).
+:- thread_local(thlocal:side_effect_buffer/2).
+
+
 :- thread_local thlocal:agenda_slow_op_do_prereqs/0.
 :- thread_local thlocal:enable_src_loop_checking/0.
 :- thread_local thlocal:in_dynamic_reader/1.

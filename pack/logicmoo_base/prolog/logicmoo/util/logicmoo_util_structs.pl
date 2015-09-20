@@ -1,6 +1,6 @@
 :- module(logicmoo_util_structs,[
   prop_get/1,prop_get/3,prop_set/1,prop_set/3,prop_merge/3,
-  prop_set_nvlist/2,
+  prop_set_nvlist/2,ain/1,
   decl_argtypes/1,
   decl_struct/1,struct_decl/1,
   if_changed/3,

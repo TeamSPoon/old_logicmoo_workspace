@@ -86,7 +86,7 @@ mpred_plist_t(P,LIST):- CALL=..[t,P|LIST],debugOnError(CALL).
 
 :-meta_predicate(loop_check_mpred(?)).
 % loop_check_mpred(Call):- current_predicate(ireq/1), loop_check_term(ireq(Call),loop_check_mpred(Call),fail).
-loop_check_mpred(Call):- !, fail,not(thlocal:infInstanceOnly(_)),loop_check(ireq(Call),loop_check_mpred(Call),fail).
+loop_check_mpred(Call):- !, fail,not(thlocal:infInstanceOnly(_)),loop_check_term(ireq(Call),loop_check_mpred(Call),fail).
 % loop_check_mpred(Call):-loop_check(mpred_call(t,Call),fail).
 
 :-meta_predicate(mpred_pa_call(?,?,0)).
@@ -201,6 +201,7 @@ update_value(OLDI,-X,NEW):- compute_value(OLDI,OLD),number(OLD),catch(NEW is OLD
 update_value(OLDI,X,NEW):- number(X),X<0,compute_value(OLDI,OLD),number(OLD),catch(NEW is OLD + X,_,fail),!.
 update_value(_,NEW,NEWV):- compute_value_no_dice(NEW,NEWV),!.
 
+flatten_append(First,Last,Out):-flatten([First],FirstF),flatten([Last],LastF),append(FirstF,LastF,Out),!.
 
 list_update_op(OLDI,+X,NEW):-flatten_append(OLDI,X,NEW),!.
 list_update_op(OLDI,-X,NEW):-flatten([OLDI],OLD),flatten([X],XX),!,list_difference_eq(OLD,XX,NEW),!.

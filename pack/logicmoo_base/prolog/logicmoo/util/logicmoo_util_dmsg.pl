@@ -14,6 +14,10 @@ is_main_thread:-thread_main(X),!,thread_self(X).
 
 :- is_pdt_like-> assert(tlbugger:no_colors); true.
 
+:- meta_predicate ansicall(*,*,0).
+:- meta_predicate ansicall(*,0).
+:- meta_predicate ansicall0(*,*,0).
+:- meta_predicate ansicall1(*,*,0).
 
 
 :-meta_predicate(with_main_error_to_output(0)).
@@ -60,7 +64,9 @@ with_main_input(G):-
 :-save_streams.
 :-initialization(save_streams).
 
+:- if(current_predicate(run_sanity_tests/0)).
 :- listing(thread_current_error_stream/2).
+:- endif.
 % ==========================================================
 % Sending Notes
 % ==========================================================
@@ -192,6 +198,8 @@ indent_to_spaces(N,Out):- N2 is N div 2, indent_to_spaces(N2,Spaces),atom_concat
 
 prepend_each_line(Prepend,Call):-with_output_to(string(Str),Call),prepend_strings(Str,Prepend,StrOut),format('~s',[StrOut]).
 
+:- meta_predicate if_color_debug(0).
+:- meta_predicate if_color_debug(0,0).
 if_color_debug:-current_prolog_flag(dmsg_color,true).
 if_color_debug(Call):- if_color_debug(Call, true).
 if_color_debug(Call,UnColor):- if_color_debug->Call;UnColor.

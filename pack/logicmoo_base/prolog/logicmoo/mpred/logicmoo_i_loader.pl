@@ -232,7 +232,7 @@ must_locate_file(FileIn,File):-
 
 
 force_reload_mpred_file(FileIn):- \+ exists_file_safe(FileIn),
-   forall(force_reload_mpred_file(FileIn,File),must_locate_file(File)).
+   forall(must_locate_file(FileIn,File),force_reload_mpred_file(File)).
 
 force_reload_mpred_file(_:File):- atomic(File),!,force_reload_mpred_file(File).
 force_reload_mpred_file(File):-
@@ -306,7 +306,7 @@ read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quote
 is_kif_string([]):- !,fail.
 is_kif_string(String):-atomic(String),name(String,Codes), memberchk(40,Codes),memberchk(41,Codes).
 
-from_kif_string(String,Forms) :- must((codelist_to_forms(String,Forms);parse_to_source(string(String),Forms))),!.
+from_kif_string(String,Forms) :- must((codelist_to_forms(String,Forms);input_to_forms(string(String),Forms))),!.
 
 assert_kif(String):- from_kif_string(String,Forms),dmsg(warn(assert_kif(Forms))),!.
 
@@ -399,15 +399,16 @@ scan_updates:-thread_property(X,alias(loading_code)),thread_property(X,status(ru
 scan_updates:-!.
 scan_updates:-ignore(catch(make,_,true)).
 
-
+/*
 do_term_expansions:- context_module(CM), (do_term_expansions(CM)).
 
 do_term_expansions(_):- thread_self(ID),user:always_expand_on_thread(ID),!.
-do_term_expansions(_):- always_transform_heads,not(prevent_transform_mpreds),!.
+%do_term_expansions(_):- always_transform_heads,not(prevent_transform_mpreds),!.
 do_term_expansions(_):- is_compiling_clause.
 do_term_expansions(CM):- registered_mpred_file(CM),!, not(ended_transform_mpreds), not(prevent_transform_mpreds).
 
 check_term_expansions:- not(do_term_expansions).
+*/
 
 % :- (do_term_expansions(_)->true;throw(not_term_expansions)).
 
@@ -530,7 +531,7 @@ compile_this(M,F,C,pfc_add):- is_pfc_file(F), \+ pfc_skipped_module(M),!.
 compile_this(M,F,C,dyn):- inside_file(dyn),!.
 compile_this(M,F,C,O):- (var(M);var(F);var(C)),trace_or_throw(var_compile_this(M,F,C,O)).
 compile_this(M,F,C,requires_storage(WHY)):- requires_storage(C,WHY),!.
-compile_this(M,F,C,must_compile_special):- must_compile_special_clause(C),pfc_already_inside_file_expansion(C).
+compile_this(M,F,C,must_compile_special):- must_compile_special_clause(C),thlocal:pfc_already_inside_file_expansion(C).
 compile_this(_,_,_,pl).
 
 :- module_transparent(pfc_may_expand).
@@ -594,7 +595,7 @@ cl_assert(Dir,P):- show_interesting_cl(Dir,P),pfc_assert(P).
 cl_assert(pl,P):-  !, show_call(must_det_l((source_location(F,_L), '$compile_aux_clauses'(P,F)))).
 cl_assert(_Code,P):- !, show_call(pfc_assert(P)).
 
-:- meta_predicate(pfc_file_expansion_cl_assert(?,?)).
+:- meta_predicate(pfc_file_expansion_cl_assert(?,?,?,?)).
 pfc_file_expansion_cl_assert(_,cl_assert(pl,OO),OO,_):-!,show_interesting_cl(pl,OO).
 pfc_file_expansion_cl_assert(I,cl_assert(OTHER,OO),OO,I):- inside_file(kif),is_kif_rule(OO),!,pfc_file_expansion_cl_assert(I,cl_assert(kif(OTHER),OO),OO,I).
 pfc_file_expansion_cl_assert(I,CALL,OO,O):- (current_predicate(_,CALL) -> ((must(call(CALL)),was_exported_content(I,CALL,OO))); OO=O).
@@ -650,7 +651,7 @@ expanded_already_functor(_:NV):-nonvar(NV),!,expanded_already_functor(NV).
 % system:goal_expansion(A,_B):-fail,hotrace((source_module(M),(M=pfc_sanity;M=user;M=system),if_defined(pmsg(M:goal_expansion(A)),format(user_output /*e*/,'~N% ~q~n',M:goal_expansion(A))))),fail.
 % user:term_expansion(A,_B):-fail,hotrace((source_module(M),(M=pfc_sanity;M=user;M=system),if_defined(pmsg(M:term_expansion(A)),format(user_output /*e*/,'~N% ~q~n',M:term_expansion(A))))),fail.
 
-system:goal_expansion(N,pfc_prove_neg(P)):-fail,pfc_from_negation_plus_holder(N,P),show_call_failure(mpred_prop(P,pfcControlled)).
+% system:goal_expansion(N,pfc_prove_neg(P)):-fail,pfc_from_negation_plus_holder(N,P),show_call_failure(mpred_prop(P,pfcControlled)).
 
 
 
@@ -907,7 +908,7 @@ pfc_file_expansion_z(Fact,(:- ((cl_assert(pfc(expand_file),Fact))))):-
     notrace(pfc_expand_inside_file_anyways(F)),!,_Output='$was_imported_kb_content$'(Fact,pfc_expand_inside_file_anyways(F)),!.
 */
 
-stream_pos(File:LineNo):-loading_source_file(File),current_input_stream(S),stream_property(S, position(Position)), !,stream_position_data(line_count, Position, LineNo),!.
+stream_pos(File:LineNo):-loading_source_file(File),current_input(S),stream_property(S, position(Position)), !,stream_position_data(line_count, Position, LineNo),!.
 
 compile_clause(CL):- make_dynamic(CL),must((assertz_if_new(CL),clause_asserted(CL))).
 
@@ -932,7 +933,7 @@ to_var_functors(Outer,In,Out):-
       ((Name=VFE,Args=[JustOne] )-> (to_var_functors(VFE,JustOne,VOut),(functor(VOut,t,_)->Out=VOut;Out=..[VFE,VOut]));
       ( maplist(to_var_functors(Name),Args,ArgsO),
       ((Name\='[|]',Outer=VFE,atom_codes(Name,[C|_]),code_type(C,prolog_var_start),
-         nb_getval('$variable_names', Vs),(member(Name=Var,Vs)->true;nb_setval('$variable_names', [Name=Var|Vs])))
+         nb_getval('$variable_names', Vs),(member(Name=Var,Vs)->true;b_setval('$variable_names', [Name=Var|Vs])))
            -> Out=..[t,Var|ArgsO];  (Args==ArgsO->(Out=In);compound_name_arguments(Out,Name,ArgsO))))))).
 
 system:term_expansion(I,O):- current_prolog_flag(allow_variable_name_as_functor,true),

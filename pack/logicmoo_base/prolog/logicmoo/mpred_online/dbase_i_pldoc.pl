@@ -73,19 +73,6 @@ prolog:doc_object_page(Obj, Options,A,B) :-  format(user_error,'~n~q~n',[pldoc_m
 
 :- listing(prolog:doc_object_page//2).
 
-:-export(show_all/1).
-show_all(Call):-doall((show_call(Call))).
-
-:-export(alt_calls/1).
-alt_calls(call).
-alt_calls(mpred_call).
-alt_calls(is_asserted).
-alt_calls(t).
-alt_calls(req).
-alt_calls(mreq).
-alt_calls(ireq).
-
-showall(Call):- doall(show_call(Call)).
 
 findallCall(Args,Functor,ICallL,ICallLL):-  findall(Args,call(Functor,Args),ICallL),findall(Functor:C,member(C,ICallL),ICallLL).
 

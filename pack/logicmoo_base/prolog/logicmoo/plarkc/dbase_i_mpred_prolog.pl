@@ -142,18 +142,6 @@ prolog_modify(change(retract,one),(G-B)):-!,retract((G-B)).
 prolog_modify(change(retract,_),G):-!,retract(G).
 prolog_modify(Op,G):- reduce_mpred_op(Op,Op2), mud_call_store_op(Op2,G).
 
-ensure_dynamic(Var):-var(Var),!,trace_or_throw(var_ensure_dynamic(Var)).
-ensure_dynamic(M:H1):-atom(M),!,ensure_dynamic(H1).
-ensure_dynamic((H1,H2)):-!,ensure_dynamic(H1),ensure_dynamic(H2).
-ensure_dynamic((H1;H2)):-!,ensure_dynamic(H1),ensure_dynamic(H2).
-ensure_dynamic((H1:-_)):-!,ensure_dynamic(H1).
-ensure_dynamic(':-'(_)):-!.
-ensure_dynamic(Head):- Head\=isa(_,_),
-   get_functor(Head,F,A),
-   functor(PF,F,A),
-   (\+ predicate_property(PF,_)->show_call((dynamic(F/A),multifile(F/A),export(F/A)));
-   (is_static_pred(PF)-> 
-     ((listing(F/A),dmsg(want_to_assert(ensure_dynamic(Head),decl_mpred_prolog(F,A,Head))),nop(dtrace))); true)).
 
 
 

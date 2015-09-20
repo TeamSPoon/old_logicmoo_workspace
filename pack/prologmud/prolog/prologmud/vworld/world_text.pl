@@ -214,7 +214,6 @@ local_term_anglify_first(T,TA):-compound(T),loop_check(local_term_anglify(T,TA))
 local_term_anglify_first(T,TA):-must(enter_term_anglify(T,TA)),!.
 
 
-flatten_append(First,Last,Out):-flatten([First],FirstF),flatten([Last],LastF),append(FirstF,LastF,Out),!.
 
 :-export(local_term_anglify/2).
 local_term_anglify(Var,[ftCallable(Var)]):- var(Var),!.

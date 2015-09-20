@@ -58,8 +58,83 @@ print_clause_properties(REF, Out) :-
 	).
 
 
+:-thread_local(thlocal:tl_hide_data/1).
 
 
+:-multifile shared_hide_data/1.
+
+shared_hide_data(saved_varname_info/3):- !,hide_data(hideMeta).
+
+hide_data(_):-hide_data0(showAll),!,fail.
+hide_data(P):-notrace(hide_data0(P)).
+hide_data0(P):-var(P),!,fail.
+hide_data0(P):-thlocal:tl_hide_data(P),!.
+hide_data0(P):-shared_hide_data(P),!.
+hide_data0(_/_):-!,fail.
+hide_data0(P):- compound(P),functor(P,F,A), (hide_data0(F/A);hide_data0(F)).
+hide_data0(M:P):- atom(M),!,hide_data0(P).
+
+
+  :- use_module(library(pldoc)).
+  :- use_module(library(http/thread_httpd)).
+  :- use_module(library(http/http_parameters)).
+  :- use_module(library(http/html_write)).
+  :- use_module(library(http/mimetype)).
+  :- use_module(library(dcg/basics)).
+  :- use_module(library(http/http_dispatch)).
+  :- use_module(library(http/http_hook)).
+  :- use_module(library(http/http_path)).
+  :- use_module(library(http/http_wrapper)).
+  :- use_module(library(uri)).
+  :- use_module(library(debug)).
+  :- use_module(library(lists)).
+  :- use_module(library(url)).
+  :- use_module(library(socket)).
+  :- use_module(library(option)).
+  :- use_module(library(error)).
+  :- use_module(library(www_browser)).
+  :- use_module(library(pldoc/doc_process)).
+  :- use_module(library(pldoc/doc_htmlsrc)).
+  :- use_module(library(pldoc/doc_html)).
+  :- use_module(library(pldoc/doc_index)).
+  :- use_module(library(pldoc/doc_search)).
+  :- use_module(library(pldoc/doc_man)).
+  :- use_module(library(pldoc/doc_wiki)).
+  :- use_module(library(pldoc/doc_util)).
+  :- use_module(library(pldoc/doc_access)).
+  :- use_module(library(pldoc/doc_pack)).
+
+% start a unused server
+:- use_module(library(doc_http)).
+%:- use_module(library(doc_html)).
+:- doc_collect(true).
+
+
+% find normal docs
+% prolog:help_hook(help(_M:F/A)):- predicate(F, A, _, _From, _To),!,fail.
+% else use a structured comment 
+% our smarter matching system (based off listing)
+%prolog:help_hook(help(What)):- '$find_predicate'(What, Preds), Preds\==[], Preds\==[What],forall(member(M:F/A,Preds),help(M:F/A)),fail.
+prolog:help_hook(help(A)):-  pfc_show_doc(A),fail.
+
+%%	pfc_show_doc(+Object) is det.
+%
+%	Searches in doc indexes for Object occurances
+%
+%	@see	help/1.
+
+pfc_show_doc(What):- findall(Infos,pfc_show_doc(What,Infos),LInfos),LInfos\=[],flatten(LInfos,Infos),forall(member(E,Infos),format('~N~w~n',[E])).
+pfc_show_doc(What):- '$find_predicate'(What, Preds), Preds\==[], Preds\==[What],forall(member(M:F/A,Preds),pfc_show_doc(M:F/A)).
+
+
+pfc_show_doc(M:F/A,['$mode'(PI, Det)]):-functor(PI,F,A),M:'$mode'(PI, Det).
+pfc_show_doc(M:F/A,[Info,Info2]):-M:'$pldoc'(F/A,_FL,Info,Info2).
+pfc_show_doc(Id,[Info,Info2]):- '$pldoc'(Id,_FL,Info,Info2).
+pfc_show_doc(M,[Title,Info,Info2]):- pldoc_process:doc_comment(M:module(Title),_FileLines,Info,Info2).
+
+
+% ?- help(term_expansion/2).
+% ?- help(match_regex/2).
 :- user:ensure_loaded(library(listing)).
 :- user:ensure_loaded(library(check)).
 :- user:ensure_loaded(library(make)).

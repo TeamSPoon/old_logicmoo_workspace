@@ -16,30 +16,30 @@ with_pi_selected(CM,M,(P,L),Pred3):-!,with_pi_selected(CM,M,P,  Pred3),with_pi_s
 with_pi_selected(_CM,_M,[]  ,_Pred3):-!.
 with_pi_selected(CM,M,[P]  ,Pred3):-!,with_pi_selected(CM,M,P,  Pred3).
 with_pi_selected(CM,_, M:F//A,Pred3):-Ap2 is A+2, !,with_pi_selected(CM,M,F/Ap2,Pred3).
+with_pi_selected(CM,M, F//A ,Pred3):-Ap2 is A+2,!,functor_safe(P,F,A),  with_pi_stub(CM,M,P,F/Ap2,Pred3).
 with_pi_selected(CM,_, M:F/A,Pred3):-!,with_pi_selected(CM,M,F/A,Pred3).
 with_pi_selected(CM,_, M:P ,Pred3):-!,with_pi_selected(CM,M,P,  Pred3).
-with_pi_selected(CM,M, F//A ,Pred3):-Ap2 is A+2,!,functor_safe(P,F,A),  with_pi_stub(CM,M,P,F/Ap2,Pred3).
 with_pi_selected(CM,M, F/A ,Pred3):-!,functor_safe(P,F,A),  with_pi_stub(CM,M,P,F/A,Pred3).
 with_pi_selected(CM,M, P ,Pred3):-  functor_safe(P,F,A), with_pi_stub(CM,M,P,F/A,Pred3).
 
 
 % ----------
 
-
+:- meta_predicate(must_pi(0)).
+must_pi(X):-X,!.
+must_pi(X):-gtrace,X,!.
 
 :- swi_export(with_pi_stub/5).
-:- meta_predicate(with_pi_stub(+,+,+,+,3)).
-with_pi_stub(CM, M,P, F//A , PM:Pred3):- ((integer(A),atom(M),atom(F),Ap2 is A+2, functor_safe(P,F,Ap2))),
-  must(PM:call(Pred3,CM, M,P,F/Ap2)),!.
+:- meta_predicate(with_pi_stub(+,+,+,+,0)).
+with_pi_stub(CM, M,P, F//A , PM:Pred3):- ((integer(A),atom(M),atom(F),Ap2 is A+2, functor_safe(P,F,Ap2))),must_pi(PM:call(Pred3,CM, M,P,F/Ap2)),!.
 with_pi_stub(CM, M,P, F/A , PM:Pred3):- ((integer(A),atom(M),atom(F),functor_safe(P,F,A))),
-  must(PM:call(Pred3,CM, M,P,F/A)),!.
-with_pi_stub(CM, M,P, F//A , Pred3):- ((integer(A),atom(M),atom(F),Ap2 is A+2,functor_safe(P,F,Ap2))),
-   must(call(Pred3,CM, M,P,F/Ap2)),!.
+  must_pi(PM:call(Pred3,CM, M,P,F/A)),!.
+with_pi_stub(CM, M,P, F//A , Pred3):- ((integer(A),atom(M),atom(F),Ap2 is A+2,functor_safe(P,F,Ap2))),must_pi(call(Pred3,CM, M,P,F/Ap2)),!.
 with_pi_stub(CM, M,P, F/A , Pred3):- ((integer(A),atom(M),atom(F),functor_safe(P,F,A))),
-   must(call(Pred3,CM, M,P,F/A)),!.
-%with_pi_stub(CM, M,P, F/A ,_: Pred3):- ((integer(A),atom(M),atom(F),functor_safe(P,F,A))),  must(call(Pred3,CM, M,P,F/A)),!.
-%with_pi_stub(CM, M,P, F/A ,CP: Pred3):-!, must(CP:call(Pred3,CM, M,P,F/A)),!.
-%with_pi_stub(CM, M,P, F/A , Pred3):-!, must(call(Pred3,CM, M,P,F/A)),!.
+   must_pi(call(Pred3,CM, M,P,F/A)),!.
+%with_pi_stub(CM, M,P, F/A ,_: Pred3):- ((integer(A),atom(M),atom(F),functor_safe(P,F,A))),  must_pi(call(Pred3,CM, M,P,F/A)),!.
+%with_pi_stub(CM, M,P, F/A ,CP: Pred3):-!, must_pi(CP:call(Pred3,CM, M,P,F/A)),!.
+%with_pi_stub(CM, M,P, F/A , Pred3):-!, must_pi(call(Pred3,CM, M,P,F/A)),!.
 
 with_pi_stub(CM, M,P,FA,Pred3):- trace_or_throw(invalide_args(CM, M,P,FA,Pred3)).
 % ----------
@@ -240,6 +240,7 @@ pred_prop(M:F/A,noprofile(M:F/A)	    , (noprofile)).
 pred_prop(M:F/A,'$iso'(M:F/A) ,(iso)).
 
 
+:-dynamic(pp_temp/2).
 :-dynamic(mpred_impl/2).
 :-multifile(mpred_impl/2).
 
@@ -260,28 +261,28 @@ rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
       '$set_source_module'(Before, OM),
       functor(NC,NF,A), functor(OC,OF,A),
       (show_call(predicate_property(OMC,number_of_clauses(_)))),
-      must(show_call_failure(predicate_property(OMC,number_of_clauses(_)))),
+      must_pi(show_call_failure(predicate_property(OMC,number_of_clauses(_)))),
       forall(predicate_property(OC,PP),asserta(pp_temp(NC,PP))),
       findall((OC:-B),((clause(OC,B),assertz(pp_clauses((OC:-B))))),List),
       '$set_source_module'(_, NM),
       forall(member(-PP,OtherTraits),retractall(pp_temp(NC,PP))),
       forall(member(+PP,OtherTraits),asserta(pp_temp(NC,PP))),
       once(pp_temp(NC,(built_in))->(redefine_system_predicate(NF/A),unlock_predicate(NF/A));true),
-      show_call(must(abolish(NF/A))),
-      show_call(must(abolish(NF/A))),
+      show_call(must_pi(abolish(NF/A))),
+      show_call(must_pi(abolish(NF/A))),
       garbage_collect_clauses,
       ignore(convert_to_dynamic(NM,NF,A)),
       garbage_collect_clauses,
-      %must(\+ predicate_property(NMC,_)),
+      %must_pi(\+ predicate_property(NMC,_)),
       %once(memberchk(CC,List)->true;(CC=((NC:-fail,1234)))),
       %convert_to_dynamic(NM,NF,A),
       %ignore(logOnError(pp_temp(NC,(dynamic))->dynamic(NF/A);true)),
       %ignore(once(pp_temp(NC,(multifile))->multifile(NF/A);true)),
-      must(((pp_temp(NC,file(File)),pp_temp(NC,line_count(_Line))))
+      must_pi(((pp_temp(NC,file(File)),pp_temp(NC,line_count(_Line))))
         ->
-            must(('$compile_aux_clauses'(CC, File),retractall(CC)));
-            must(dmsg(noFileFor(NC)))),
-      forall(pred_prop(NM:NF/A,TODO,PP,ELSE),(pp_temp(NC,PP)->must(TODO);must(ELSE))),
+            must_pi(('$compile_aux_clauses'(CC, File),retractall(CC)));
+            must_pi(dmsg(noFileFor(NC)))),
+      forall(pred_prop(NM:NF/A,TODO,PP,ELSE),(pp_temp(NC,PP)->must_pi(TODO);must_pi(ELSE))),
       (pp_temp(NC,meta_predicate(NC))->meta_predicate(NC);true),
       dbgsubst(List,OF,NF,ListO),maplist(AssertZ,ListO),!,
 
@@ -349,7 +350,7 @@ module_meta_predicates_are_transparent(ModuleName):-
     forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),
       ignore(((predicate_property(ModuleName:P,(meta_predicate( P ))),
             not(predicate_property(ModuleName:P,(transparent))), (compound(P),arg(_,P,Arg),arg_is_transparent(Arg))),
-                   (dmsg(todo(module_transparent(ModuleName:F/A))),
+                   (nop(dmsg(todo(module_transparent(ModuleName:F/A)))),
                    (module_transparent(ModuleName:F/A)))))).
 
 :- swi_export(all_module_predicates_are_transparent/1).
@@ -358,7 +359,7 @@ all_module_predicates_are_transparent(ModuleName):-
     forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),
       ignore((
             not(predicate_property(ModuleName:P,(transparent))),
-                   ( dmsg(todo(module_transparent(ModuleName:F/A)))),
+                   ( nop(dmsg(todo(module_transparent(ModuleName:F/A))))),
                    (module_transparent(ModuleName:F/A))))).
 
 quiet_all_module_predicates_are_transparent(_):-!.

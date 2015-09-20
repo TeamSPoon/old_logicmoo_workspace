@@ -239,12 +239,12 @@ gather_fact_heads(M,H):- (nonvar(M)->true; member(M,[dbase,moo,world,user,hook])
   not((arg(_,vv(system,bugger,logicmoo_util_dcg,user),M);predicate_property(M:H,imported_from(_)))))).
 
 
-
+/*
 :-export(begin_prolog_source/0).
 :-export(end_prolog_source/0).
 begin_prolog_source:- must_det(asserta(thlocal:in_prolog_source_code)).
-end_prolog_source:- must_det(change( retract,thlocal:in_prolog_source_code)).
-
+end_prolog_source:- mpred_modify(change( retract,_),thlocal:in_prolog_source_code).
+*/
 
 
 assertOnLoad(X):-add_later(X).

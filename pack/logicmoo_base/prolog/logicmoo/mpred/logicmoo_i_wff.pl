@@ -10,6 +10,20 @@
 
 :- include(logicmoo_i_header).
 
+
+
+subst_except(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
+subst_except(  Var, _,_,Var ) :- \+compound(Var),!.
+subst_except(  Var, _,_,Var ) :- leave_as_is(Var),!.
+subst_except([H|T],B,A,[HH|TT]):- !,
+   subst_except(H,B,A,HH),
+   subst_except(T,B,A,TT).
+subst_except(HT,B,A,HHTT):- HT=..FARGS,subst_except(FARGS,B,A,[FM|MARGS]),
+   (atom(FM)->HHTT=..[FM|MARGS];append_termlist(FM,MARGS,HHTT)).
+
+append_termlist(Call,EList,CallE):-must((compound(Call),is_list(EList))), Call=..LeftSide, append(LeftSide,EList,ListE), CallE=..ListE.
+
+
 % ========================================
 % Logic Preds Shared
 % ========================================
@@ -124,7 +138,7 @@ isQualifiedAs(Denotation,BaseType,Value,SubType):-
 
 lastImproperMember(Default,Default,List):-isVarProlog(List),!.
 lastImproperMember(Default,Default,[]):-!.
-lastImproperMember(Default,SubType,List):-proper_lst(List),last(SubType,List).
+lastImproperMember(Default,SubType,List):-proper_list(List),last(SubType,List).
 lastImproperMember(Default,SubType,[SubType|End]):-isVarProlog(End),!.
 lastImproperMember(Default,SubType,[_|Rest]):-
 	lastImproperMember(Default,SubType,Rest),!.
@@ -187,7 +201,7 @@ isEntitySlot(Term):-isEntityFunction(Term,FnT,ArgsT),!.
 
 isEntityFunction(Term,FnT,ArgsT):-isSlot(Term),!,fail.
 isEntityFunction(Term,FnT,ArgsT):-atomic(Term),!,fail.
-isEntityFunction(Term,FnT,ArgsT):-Term=..[FnT|ArgsT],hlPredicateAttribute(FnT,'Function'),!.
+isEntityFunction(Term,FnT,ArgsT):-Term=..[FnT|ArgsT],isa(FnT,'Function'),!.
 
 % ===============================================================================================
 % ===============================================================================================
@@ -195,7 +209,7 @@ isEntityFunction(Term,FnT,ArgsT):-Term=..[FnT|ArgsT],hlPredicateAttribute(FnT,'F
 isNonCompound(Var):-isSlot(Var),!.
 isNonCompound(Var):-not(compound(Var)),!.
 isNonCompound(svar(_,_)):-!.
-isNonCompound(Var):-is_string(Var),!.
+isNonCompound(Var):-is_ftText(Var),!.
 isNonCompound(string(Var)):-!.
 
 % ===============================================================================================
@@ -234,6 +248,25 @@ is_log_sent(S):- get_functor(S,F,_),is_log_op(F).
 not_log_op(OP):- not(is_log_op(OP)).
 :- export(is_log_op/1).
 is_log_op(OP):- atomic(OP),to_dlog_ops(OPS),!,(member(OP=_,OPS);member(_=OP,OPS)).
+
+:- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_kif)).
+
+put_singles(Wff,_,[],Wff).
+put_singles(Wff,Exists,[S|Singles],NewWff):-   
+   (((each_subterm(Wff,SubTerm),compound(SubTerm),
+    SubTerm=..[OtherExists,SO,_],same_var(SO,S),
+     member(OtherExists,[all,exists])))
+ -> WffM = Wff ; WffM =..[Exists,S,Wff]),
+   put_singles(WffM,Exists,Singles,NewWff),!.
+
+
+:-meta_predicate(call_last_is_var(0)).
+call_last_is_var(MCall):- strip_module(MCall,M,Call),
+   must((compound(Call),functor(Call,_,A))),
+   arg(A,Call,Last),nonvar(Last),Call=..FArgs,
+   append(Left,[Last],FArgs),append(Left,[IsVar],NFArgs),NewCall=..NFArgs,!,M:NewCall*->IsVar=Last;fail.
+
+   
 
 
 :- export(defunctionalize/2).
@@ -430,7 +463,7 @@ is_function(P,_,_):- leave_as_is(P),!,fail.
 is_function(_,F,_):- is_log_op(F),!,fail.
 is_function(_,F,_):- atom_concat(_Was,'Fn',F).
 is_function(_,F,_):- tFunction(F).
-is_function(_,F,A):- A2 is A+1,current_predicate(F/A2), not(current_predicate(F/A)).
+% is_function(_,F,A):- A2 is A+1, current_predicate(F/A2), \+ current_predicate(F/A).
 
 %:- pfc_add(isa(I,C)<=(ttPredType(C),user:isa(I,C))).
 

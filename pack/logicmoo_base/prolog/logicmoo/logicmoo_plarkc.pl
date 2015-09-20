@@ -18,14 +18,11 @@ cwtdl(Goal,DL,TL):- cwc,
      ->true;
     assert(cwtdl_failed(Goal))))))).
 
-:-in_cmt(listing(cwtdl/3)).
-
+%:-in_cmt(listing(cwtdl/3)).
 :- ltkb1.
+% :- dmsg("Loading tinyKB should take under a minute").
 
-:- dmsg("Loading tinyKB should take under a minute").
-
-:- doall((filematch(logicmoo('plarkc/logicmoo_i_cyc_kb_tinykb.pl'),F),must(source_file(X,F)),predicate_property(X,dynamic),retract(X:-_))).
-:- in_cmt(doall((filematch(logicmoo('plarkc/logicmoo_i_cyc_kb_tinykb.pl'),F),source_file(X,F),predicate_property(X,static),X\='$pldoc'(_G8428,_G8429,_G8430,_G8431),listing(X)))).
+%:- in_cmt(doall((filematch(logicmoo('plarkc/logicmoo_i_cyc_kb_tinykb.pl'),F),source_file(X,F),predicate_property(X,static),X\='$pldoc'(_G8428,_G8429,_G8430,_G8431),listing(X)))).
 
 :- file_begin(pfc).
 
@@ -36,30 +33,34 @@ transTiny(Template,If):-transfer_predicate(tinyK8(Template),If,once(pfc_add(Temp
 
 :- pfc_no_trace.
 
-:- if(false).
 
-:- transTiny(tCol(X),ground(X)).
-:- transTiny(arity(X,Y),ground((X,Y))).
-:- transTiny(genls(X,Y),((X\=ftAtomicTerm,ground((X,Y))))).
-:- pfc_trace.
-:- transTiny(genls(X,Y),((ground((X,Y))))).
+reallyLoadTiny:- transTiny(tCol(X),ground(X)).
+reallyLoadTiny:- transTiny(arity(X,Y),ground((X,Y))).
+reallyLoadTiny:- transTiny(genls(X,Y),((X\=ftAtomicTerm,ground((X,Y))))).
+reallyLoadTiny:- pfc_trace.
+reallyLoadTiny:- transTiny(genls(X,Y),((ground((X,Y))))).
 %TODO_VERIFY_STILL_UNNEEDED :- retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
 %TODO_VERIFY_STILL_UNNEEDED :- pfc_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
-:- transTiny(genlMt(X,Y),writeq((X,Y))).
-:- transTiny(ttFormatType(X),ground(X)).
+reallyLoadTiny:- transTiny(genlMt(X,Y),writeq((X,Y))).
+reallyLoadTiny:- transTiny(ttFormatType(X),ground(X)).
 
 %TODO_VERIFY_STILL_UNNEEDED :-pfc_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
 
 %TODO_VERIFY_STILL_UNNEEDED :-retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
-:- pfc_no_trace.
+reallyLoadTiny:- pfc_no_trace.
+
+
+:- if(false).
+:- doall(reallyLoadTiny).
 :- endif.
 
 
 %TODO FIX :-pfc_add((((cycl(X),{must(cyc_to_clif(X,Y))}) ==> clif(Y)))).
 
+:-pfc_no_trace.
 :-pfc_add((((cycl('$VAR'('X')),{must(cyc_to_clif('$VAR'('X'),'$VAR'('Y')))}) ==> clif('$VAR'('Y'))))).
 
-?-listing(cycl).
+% ?-listing(cycl).
 
 %TODO FIX :- must(isa(iExplorer2,tHominid)).
 %TODO FIX :- must(tHominid(iExplorer2)).

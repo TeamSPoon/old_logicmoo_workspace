@@ -117,8 +117,8 @@
 :- multifile(user:feature_test/0).
 
 :- include(logicmoo(mpred/logicmoo_i_header)).
-:- user:ensure_loaded(logicmoo(pttp/dbase_i_mpred_pttp_testing)). 
-% :- user:ensure_loaded(logicmoo(pttp/dbase_i_mpred_pttp)). 
+%:- user:ensure_loaded(logicmoo(pttp/dbase_i_mpred_pttp_testing)). 
+:- user:ensure_loaded(logicmoo(pttp/dbase_i_mpred_pttp)). 
 
 %  all(R, room(R) => exists(D, (door(D) & has(R,D))))
 % for any arbitrary R, if R is a room then there exists some object D that is a door, and R has a D.

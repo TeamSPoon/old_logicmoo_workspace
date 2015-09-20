@@ -77,6 +77,7 @@ decl_mpred_mfa(M,FF,A):-
 :-op(0,fx,(decl_mpred_prolog)).
 
 :-export(decl_mpred_prolog/1).
+:-meta_predicate(decl_mpred_prolog(?)).
 decl_mpred_prolog(A):-not(compound(A)),!.
 decl_mpred_prolog(M):- M=..[isEach|List],!,maplist(decl_mpred_prolog,List).
 decl_mpred_prolog(P):- with_pi(P,decl_mpred_prolog).
@@ -107,6 +108,8 @@ decl_mpred_prolog_ilc_0(_CM,M,PI,F/A):-
 :-op(0,fx,(decl_mpred_hybrid)).
 
 :-export(decl_mpred_hybrid/1).
+
+:-meta_predicate(decl_mpred_hybrid(?)).
 decl_mpred_hybrid(A):-not(compound(A)),!.
 decl_mpred_hybrid(M):-M=..[isEach|List],!,maplist(decl_mpred_hybrid,List).
 decl_mpred_hybrid(P):- with_pi(P,decl_mpred_hybrid).
@@ -114,6 +117,7 @@ decl_mpred_hybrid(P):- with_pi(P,decl_mpred_hybrid).
 :-export(decl_mpred_hybrid/3).
 decl_mpred_hybrid(M,F,A):-integer(A),!,must(functor(PI,F,A)),decl_mpred_hybrid(M,PI,F/A).
 decl_mpred_hybrid(M,PI,FA):- must(decl_mpred_hybrid(_,M,PI,FA)).
+
 decl_mpred_hybrid(F,A):- integer(A),!,decl_mpred_hybrid(F/A).
 decl_mpred_hybrid(F,Other):- decl_mpred(F,Other),
      get_functor(F,F0),
@@ -199,7 +203,7 @@ bad_pred_relation_name1(X,Y):-bad_pred_relation_name0(X,Y).
 bad_pred_relation_name1(F,A):-must_det((atom_codes(F,[C|_]),to_upper(C,U))),!, U == C, A>1.
 bad_pred_relation_name1(F,A):-arity(F,AO), A \= AO.
 
-:-at_start(writeq("Seen Mpred_props at start!\n")),!.
+% :-at_start(writeq("Seen Mpred_props at start!\n")),!.
 
 
 % ========================================
@@ -208,6 +212,7 @@ bad_pred_relation_name1(F,A):-arity(F,AO), A \= AO.
 
 :- export((decl_mpred/1)).
 
+:-meta_predicate(decl_mpred(?)).
 decl_mpred((A,B)):-decl_mpred(A),decl_mpred(B).
 decl_mpred(M):-loop_check(with_pi(M,decl_mpred_4),true).
 

@@ -300,6 +300,7 @@ put_in_world(Obj):-random_xyzFn(LOC),add_fast(mudAtLoc(Obj,LOC)).
 %:-export fact_always_true/1.
 :-export fact_maybe_deduced/1.
 :-export fact_is_false/2.
+:-dynamic fact_is_false/2.
 
 prologHybrid(mudInsideOf(tObj,tObj)).
 

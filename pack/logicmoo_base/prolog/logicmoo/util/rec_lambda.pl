@@ -33,6 +33,9 @@ official policies, either expressed or implied, of Ulrich Neumerkel.
 
 
 */
+:- if( ( \+ current_prolog_flag(xref,true))).
+:- if( \+ current_module(rec_lambda)).
+:- if( \+ current_predicate(memberchk_same/2)).
 
 :- module(rec_lambda, [
 		   (^)/3, (^)/4, (^)/5, (^)/6, (^)/7, (^)/8, (^)/9,
@@ -41,9 +44,10 @@ official policies, either expressed or implied, of Ulrich Neumerkel.
                    (reenter_lambda)/0, (reenter_lambda)/1, (reenter_lambda)/2, (reenter_lambda)/3, (reenter_lambda)/4, (reenter_lambda)/5, (reenter_lambda)/6,
                    (lambda)/3,(lambda)/5,(lambda)/7,(lambda)/9,
                    ctn/2,
-		   op(201,xfx,+\)]).
+		   op(201,xfx, ( +\ )) ]).
 
-:- abolish( cyc: (/)/2).
+
+
 
 /** <module> Lambda expressions
 
@@ -259,4 +263,9 @@ no_hat_call(MGoal) :-
 % I would like to replace this by:
 % V1^Goal :- throw(error(existence_error(lambda_parameters,V1^Goal),_)).
 
+:- endif.
+:- endif.
+:- endif.
+
+% :- abolish( cyc: (/)/2).
 

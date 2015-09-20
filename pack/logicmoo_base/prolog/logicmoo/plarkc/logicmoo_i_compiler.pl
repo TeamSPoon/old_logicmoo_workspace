@@ -94,7 +94,7 @@ conjoin_maybe(_X,true,true):-!.
 conjoin_maybe(TYPE,BB,OUTPUT):-conjoin(TYPE,BB,OUTPUT).
 
 correct_mode(_,O,O):-var(O),!.
-correct_mode((:-),{M},O):-!,correct_mode(Mode,M,O).
+correct_mode((:-),{M},O):-!,correct_mode((:-),M,O).
 correct_mode(Mode,(A,B),O):-!,correct_mode(Mode,A,AA),correct_mode(Mode,B,BB),conjoin_body(AA,BB,O).
 correct_mode(_,O,O).
 
@@ -105,15 +105,16 @@ body_for_pfc_1(Mode,Head,HeadO,C,CO):- (Mode ==(:-);Mode==(cwc);Mode==(<-)),over
     body_for_pfc_1(Mode,Head,HeadM,{Avoid},AA),body_for_pfc_2(Mode,HeadM,HeadO,C,BB),!,conjoin_body(AA,BB,CM),correct_mode(Mode,CM,CO).
 body_for_pfc_1(Mode,Head,NewNewHead,I,O):-body_for_pfc_2(Mode,Head,NewNewHead,I,M),correct_mode(Mode,M,O).
 
-overlaping(neg(C),Head,Avoid):-nonvar(C),!,overlaping(C,Head,Avoid).
-overlaping(C,neg(Head),Avoid):-nonvar(Head),!,overlaping(C,Head,Avoid).
-overlaping(C,Head,avoidHeadLoop(C,Head)):- compound(C),compound(Head),once((get_reln(C,FC),get_reln(Head,HC))),!,overlapingFunctors(FC,HC),!.
+overlaping(neg(C),Head,Avoid):-not_ftVar(C),!,overlaping(C,Head,Avoid).
+overlaping(C,neg(Head),Avoid):-not_ftVar(Head),!,overlaping(C,Head,Avoid).
+overlaping(C,Head,Avoid):-not_ftVar(Head),not_ftVar(C), compound(C),compound(Head),once((get_reln(C,FC),get_reln(Head,HC))),!,overlapingFunctors(FC,HC),!,Avoid=avoidHeadLoop(C,Head).
 
 overlapingFunctors(FC,HC):- (\+ \+ FC=HC),!.
 overlapingFunctors(t,_):-!.
 overlapingFunctors(_,t):-!.
 
 get_reln(C,F):-var(C),!,F=_.
+get_reln(C,F):-is_ftVar(C),!,F=_.
 get_reln(neg(C),RO):-nonvar(C),!,get_reln(C,RO).
 get_reln('{}'(C),RO):-nonvar(C),!,get_reln(C,RO).
 get_reln(C,RO):-get_functor(C,F),
@@ -131,17 +132,17 @@ body_for_pfc_2(Mode,Head,HeadO,(A/B),(AA/BB)):-!,body_for_pfc_1(Mode,Head,HeadM,
 
 
 body_for_pfc_2((fwc),H,(if_missing(H,HH)),skolem(In,Out),true):-contains_var(In,H),subst(H,In,Out,HH),!.
-body_for_pfc_2(Mode,neg(Head),neg(Head),skolem(_,_),true).
+body_for_pfc_2(_Mode,neg(Head),neg(Head),skolem(_,_),true).
 %body_for_pfc_2(Mode,H,H,skolem(_,_),true).
-body_for_pfc_2(Mode,Head,Head,skolem(In,Out),{ignore(In=Out)}).
-body_for_pfc_2(Mode,Head,Head,poss(X),{loop_check(\+ neg(X),true)}).
+body_for_pfc_2(_Mode,Head,Head,skolem(In,Out),{ignore(In=Out)}).
+body_for_pfc_2(_Mode,Head,Head,poss(X),{loop_check(\+ neg(X),true)}).
 % body_for_pfc_2(Mode,Head,Head,skolem(In,Out),{(In=Out;when('nonvar'(In),ignore((In=Out))))}).
 % body_for_pfc_2(Mode,Head,Head,skolem(In,Out),{when((?=(In,_);nonvar(In)),ignore(Out=In))}).
 body_for_pfc_2(Mode,Head,NewHead,B,BBB):- once(reduce_literal(B,BB)),B\=@=BB,!,body_for_pfc_1(Mode,Head,NewHead,BB,BBB).
-body_for_pfc_2(Mode,Head,Head,not(A),neg(A)):-!.
-body_for_pfc_2(Mode,Head,Head,different(A,B),{dif:dif(A,B)}).
-body_for_pfc_2(Mode,Head,Head,A,{A}):-prologBuiltin(A),!.
-body_for_pfc_2(Mode,Head,Head,A,A).
+body_for_pfc_2(_Mode,Head,Head,not(A),neg(A)):-!.
+body_for_pfc_2(_Mode,Head,Head,different(A,B),{dif:dif(A,B)}).
+body_for_pfc_2(_Mode,Head,Head,A,{A}):-prologBuiltin(A),!.
+body_for_pfc_2(_Mode,Head,Head,A,A).
 
 reduce_literal(A,A):-is_ftVar(A).
 reduce_literal(neg(different(P3, R3)),mudEquals(P3, R3)).

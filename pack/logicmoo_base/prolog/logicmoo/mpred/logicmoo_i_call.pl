@@ -40,7 +40,7 @@ deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not_asserted((Call)),
 
 % deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),nonvar(Fact),Body,ground(Call),dmsg((deducedSimply1(Call):-Fact)),show_call((is_asserted(Fact),ground(Call))).
 
-
+:-meta_predicate(mpred_op(?,?)).
 mpred_op(Op,     H ):- (var(Op);var(H)),!,trace_or_throw(var_database_call(Op,  H )).
 mpred_op(is_asserted,H):-!,is_asserted(H).
 mpred_op(Op,     H ):- once(fully_expand(Op,H,HH)),H\=@=HH,!,mpred_op(Op, HH).
@@ -157,3 +157,7 @@ mpred_call_2(Call):-mpred_call_3(Call).
 
 
 mpred_call_3(Call):-debugOnError(loop_check(if_defined(Call))).
+
+
+:- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_call_kb)).
+

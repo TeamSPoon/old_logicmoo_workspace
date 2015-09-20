@@ -9,7 +9,8 @@
 % Revised At:  $Date: 2002/07/11 21:57:28 $
 % ===================================================================
 */
-unused_bugger:-module(bugger,[
+/*
+unused_bugger:-nop((module(bugger,[
      was_module/2,
      with_dmsg/2,
      evil_term/3,
@@ -107,6 +108,8 @@ unused_bugger:-module(bugger,[
           % can ignore
      failOnError/1, % for wrapping code may throw to indicate failure
    must_not_repeat/1,  % predicate must never bind the same arguments the same way twice
+
+   */
 /*
 
 debug(+Topic, +Format, +Arguments)
@@ -121,7 +124,7 @@ This facility is derived from the assert() macro as used in C, renamed
 for obvious reasons.
 */
 
-
+/*
      prolog_must/1,
      prolog_must_l/1,
 
@@ -166,8 +169,16 @@ for obvious reasons.
       
       op(1150,fx,(dynamic_multifile_exported)),
       export_all_preds/0,
-     export_all_preds/1 ]).
+     export_all_preds/1 ]))).
+*/
 
+:- meta_predicate nodebugx(0).
+:- meta_predicate oncely(0).
+:- meta_predicate with_preds(?,?,?,?,?,0).
+:- meta_predicate with_search_filters(0).
+:- meta_predicate with_skip_bugger(0).
+
+:- meta_predicate one_must(0,0,0).
 
 :- swi_export(nop/1).
 nop(_).
@@ -256,6 +267,7 @@ hotrace(X):- notrace(get_hotrace(X,Y)),Y.
 
       writeSTDERR0(A):-dmsg(A).
       debugFmt(A):-dmsg(A).
+
 :-module_transparent((
      was_module/2,
      with_dmsg/2,
@@ -308,6 +320,9 @@ hotrace(X):- notrace(get_hotrace(X,Y)),Y.
      ggtrace/0,
      gftrace/0,
      grtrace/0,
+     ggtrace/1,
+     gftrace/1,
+     grtrace/1,
      has_auto_trace/1,
      one_must/2,
 %     read_line_with_nl/3,
@@ -521,7 +536,7 @@ must_det(C):- must(C),!.
 one_must_det(Call,_OnFail):-Call,!.
 one_must_det(_Call,OnFail):-OnFail,!.
 
-must_det(Call,_OnFail):-Call,!.
+must_det(Call,OnFail):- trace_or_throw(deprecated(must_det(Call,OnFail))),Call,!.
 must_det(_Call,OnFail):-OnFail.
 
 :-module_transparent(must_det_l/1).
@@ -880,8 +895,10 @@ show_call_entry(Call):-wdmsg(show_call_entry(Call)),show_call(Call).
 % ===================================================================
 % Bugger Term Expansions
 % ===================================================================
-always_show_dmsg:-thread_self(main).
+:-dynamic(always_show_dmsg).
+always_show_dmsg:-fail,thread_self(main).
 
+:-dynamic(is_hiding_dmsgs).
 is_hiding_dmsgs:- \+always_show_dmsg, current_prolog_flag(opt_debug,false),!.
 is_hiding_dmsgs:- \+always_show_dmsg, tlbugger:ifHideTrace,!.
 
@@ -1021,6 +1038,8 @@ thread_local_leaks:-!.
 trace_or(E):- dumpST,dmsg(E),trace,dtrace,!.
 trace_or(E):- trace,E.
 
+has_gui_debug :- current_prolog_flag(windows,true),!.
+has_gui_debug :- ( \+ current_prolog_flag(gui,true) ),!,fail.
 has_gui_debug :- getenv('DISPLAY',NV),NV\==''.
 
 :- swi_export(nodebugx/1).
@@ -1283,9 +1302,15 @@ set_no_debug_thread:-
    retractall(tlbugger:ifWontTrace),
    asserta(tlbugger:ifWontTrace))),!.
 
-set_gui_debug(TF):- 
-   ((TF, has_gui_debug,set_yes_debug, ignore((use_module(library(gui_tracer)),catchvv(guitracer,_,true)))) -> set_prolog_flag(gui_tracer, true) ; set_prolog_flag(gui_tracer, false)).
-
+:-if(exists_source(library(gui_tracer))).
+:- meta_predicate set_gui_debug(0).
+set_gui_debug(TF):- current_prolog_flag(gui,true),!,
+   ((TF, has_gui_debug,set_yes_debug, ignore((use_module(library(gui_tracer)),catchvv(guitracer,_,true)))) 
+     -> set_prolog_flag(gui_tracer, true) ;
+        set_prolog_flag(gui_tracer, false)).
+:-endif.
+set_gui_debug(false):-!.
+set_gui_debug(true):- dmsg("Warning: no GUI").
 
 :- module_transparent(set_yes_debug/0).
 :- swi_export(set_yes_debug/0).
@@ -1365,7 +1390,6 @@ hideRest:- functor_source_file(system,_P,F,A,_File),hideTraceMFA(system,F,A,-all
 hideRest.
 
 :- meta_predicate(hideTrace(:,-)).
-:- meta_predicate with_output_to_stream(?,0).
 
 functor_source_file(M,P,F,A,File):-functor_source_file0(M,P,F,A,File). % sanity(ground((M,F,A,File))),must(user:nonvar(P)).
 functor_source_file0(M,P,F,A,File):-current_predicate(F/A),functor_safe(P,F,A),source_file(P,File),predicate_module(P,M).
@@ -1787,6 +1811,7 @@ get_source_location(F:L):- prolog_load_context(file,F),!,ignore((prolog_load_con
 get_source_location(F:L):- current_filesource(F),ignore((prolog_load_context(stream,S),!,line_count(S,L))),!.
 get_source_location(unknown:0).
 
+show_source_location:- tlbugger:ifHideTrace,!.
 show_source_location:- get_source_location(FL),format_to_error('~N% ~w ',[FL]).
 
 :-meta_predicate(gripe_time(+,0)).
@@ -2133,7 +2158,6 @@ bugger_error_info(C):-contains_var(instantiation_error,C).
 bugger_error_info(C):-contains_var(existence_error(procedure,_/_),C).
 
 
-:-listing(thread_current_input/2).
 
 % Installs exception reporter.
 :- multifile(user:prolog_exception_hook/4).

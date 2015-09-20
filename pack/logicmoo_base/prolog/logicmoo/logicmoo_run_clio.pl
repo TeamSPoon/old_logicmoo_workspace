@@ -8,6 +8,8 @@
 %
 */
 
+:- user:ensure_loaded(logicmoo_base).
+
 :- multifile(mpred_online:semweb_startup).
 
 :- dynamic   user:file_search_path/2.
@@ -21,7 +23,7 @@
 
 :-dynamic(did_do_semweb_startup_late_once).
 do_semweb_startup_late_once:-did_do_semweb_startup_late_once,!.
-do_semweb_startup_late_once:-asserta(did_semweb_startup_late_once),forall(clause(semweb_startup_late,G),must(show_call(G))).
+do_semweb_startup_late_once:-asserta(did_semweb_startup_late_once),forall(clause(semweb_startup_late,G),must(show_call_failure(G))).
 
 
 :- use_module(user(user_db)).
@@ -126,12 +128,9 @@ semweb_startup_late:- cp_server:attach_account_info.
 
 % semweb_startup_late:- debug(http_request(_)),debug(cm(_)),debug(swish(_)),debug(storage).
 % semweb_startup_late:- listing(pre_http_location/3).
-semweb_startup_late:- listing(http:location/3).
+% semweb_startup_late:- listing(http:location/3).
 semweb_startup_late:- ensure_webserver.
 
-ensure_webserver :- thread_property(_,alias('httpd@3020_1')),!.
-ensure_webserver :- logOnError(http_server(http_dispatch,[ port(3020), workers(16) ])).
-  
 
 % prolog:message(git(update_versions))  --> [ 'Updating GIT version stamps in the background.' ])).
 % :-must(prolog:retract((message(git(update_versions,_,_):-_)))).

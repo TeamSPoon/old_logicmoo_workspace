@@ -109,7 +109,7 @@ load_machine_config:- ignore((machine_config_file(Y),exists_file(Y),ensure_loade
 
 :- ensure_webserver.
 
-:-dynamic(user:startup_option/2).
+
 
 :- endif.
 

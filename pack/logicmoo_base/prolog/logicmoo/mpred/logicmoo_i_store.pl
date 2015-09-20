@@ -124,6 +124,10 @@ infThirdOrder :- fail, infSecondOrder, not(thlocal:noRandomValues(_)).
 with_fail_is_asserted(Temp,Goal):-ground(Temp),!,Goal.
 with_fail_is_asserted(Temp,Goal):-with_assertions(thlocal:fail_is_asserted(Temp),Goal).
 
+:- meta_predicate is_asserted_1(?).
+:- meta_predicate is_asserted_eq(?).
+:- meta_predicate not_asserted(?).
+
 not_asserted(X):- !,(\+ clause(X,true)).
 not_asserted(X):- not(no_loop_check(is_asserted_1(X))).
 is_asserted_eq(HB):- ( \+ \+ no_loop_check(is_asserted_1(HB))).
@@ -186,8 +190,9 @@ fact_loop_checked(Fact,Call):- no_repeats(fact_checked(Fact,Call)).
 % ================================================
 % hooked_assert/1 hooked_retract/1
 % ================================================
+/*
 ensure_predicate_reachable(_,_):- fast_mud,!.
-ensure_predicate_reachable(M,C):-functor(C,F,A),ensure_predicate_reachable(M,C,F,A),fail.
+%ensure_predicate_reachable(M,C):-functor(C,F,A),ensure_predicate_reachable(M,C,F,A),fail.
 ensure_predicate_reachable(_,_):- is_release,!.
 ensure_predicate_reachable(M,C):-once((predicate_property(C,imported_from(Other)),M\=Other,
                                        context_module(CM),
@@ -195,7 +200,7 @@ ensure_predicate_reachable(M,C):-once((predicate_property(C,imported_from(Other)
                                        ignore(delete_import_module(CM,Other)),
                                        '@'((M:dynamic(C),M:export(C)),M),user:import(M:C))),fail.
 ensure_predicate_reachable(_,_).
-
+*/
 
 singletons_throw_else_fail(C):- fail,not_is_release,contains_singletons(C),!,(test_tl(thlocal:already_in_file_term_expansion) -> (dmsg(contains_singletons(C))); dmsg(trace_or_throw(contains_singletons(C)))),fail.
 nonground_throw_else_fail(C):- not_is_release,not(ground(C)),!,( (test_tl(thlocal:already_in_file_term_expansion) ->dmsg(not_ground(C)); trace_or_throw(not_ground(C)))),fail.
@@ -608,4 +613,16 @@ prolog_modify(change(retract,one),(G-B)):-!,retract((G-B)).
 prolog_modify(change(retract,_),G):-!,retract(G).
 prolog_modify(Op,G):- reduce_mpred_op(Op,Op2), mud_call_store_op(Op2,G).
 
+ensure_dynamic(Var):-var(Var),!,trace_or_throw(var_ensure_dynamic(Var)).
+ensure_dynamic(M:H1):-atom(M),!,ensure_dynamic(H1).
+ensure_dynamic((H1,H2)):-!,ensure_dynamic(H1),ensure_dynamic(H2).
+ensure_dynamic((H1;H2)):-!,ensure_dynamic(H1),ensure_dynamic(H2).
+ensure_dynamic((H1:-_)):-!,ensure_dynamic(H1).
+ensure_dynamic(':-'(_)):-!.
+ensure_dynamic(Head):- Head\=isa(_,_),
+   get_functor(Head,F,A),
+   functor(PF,F,A),
+   (\+ predicate_property(PF,_)->show_call((dynamic(F/A),multifile(F/A),export(F/A)));
+   (is_static_pred(PF)-> 
+     ((listing(F/A),dmsg(want_to_assert(ensure_dynamic(Head),decl_mpred_prolog(F,A,Head))),nop(dtrace))); true)).
 

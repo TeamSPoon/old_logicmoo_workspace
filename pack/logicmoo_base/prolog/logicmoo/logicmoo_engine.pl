@@ -58,6 +58,10 @@
 */
 :- nodebug(_).
 
+
+:- user:ensure_loaded(logicmoo_base).
+:- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_call_kb)).
+
 :- dynamic(wid/3).
 
 :- user:ensure_loaded(library(logicmoo/plarkc/dbase_i_sexpr_reader)).
@@ -130,7 +134,7 @@ user:provide_mpred_setup(Op,H):- provide_kif_op(Op,H).
 provide_kif_op(change(assert,How),(HeadBody)):- 
    pttp_listens_to_head(change(assert,How),HeadBody),
    why_to_id(provide_kif_op,(HeadBody),ID),
-   kif_tell(ID,(HeadBody)).
+   kif_tell_boxes1(ID,(HeadBody)).
 
 % OPHOOK CALL
 provide_kif_op(call(How),Head):- 
@@ -179,7 +183,8 @@ int_assumed_t(P, X, Y, E, F, A, B, C, G, D):- t(P,X,Y),
 
 
 */
-kif_test_string(
+:- dynamic(kif_test_string/1).
+kif_test_string_disabled(
 "
 % )
 tell.
@@ -206,6 +211,7 @@ door(What).
 :- kif_tell(rains_tuesday => wear_rain_gear xor carry_umbrella).
 :- kif_tell(exists(P, (person(P) & all(C, car(C) => ~has(P,C))))).
 
+/*
 :- kif_tell(room(R) => exists(D, (door(D) & has(R,D)))).
 :- kif_tell((goes(jane) xor goes(sandra) => goes(bill))).
 :- kif_tell(exists(P, exists(C, (person(P) & car(C) & has(P,C))))).
@@ -214,6 +220,7 @@ door(What).
 :- kif_tell(go(sam) & (go(bill) v go(sally) ) & go(nancy)).
 :- kif_tell(exists(C, course(C) & exists(MT1, midterm(C,MT1) & exists(MT2, midterm(C,MT2) & different(MT1,MT2))))).
 :- kif_tell(exists(C, course(C) & ~exists(MT3, midterm(C,MT3)))).
+*/
 
 "
 ).
@@ -224,7 +231,7 @@ door(What).
 :- dmsg_show(_).
 :- dmsg('i see this').
 :- kif_tell(exists(C, course(C) & ~exists(MT3, midterm(C,MT3)))).
-:- kif_test_string(TODO),kif_io(string(TODO),current_output).
+:- forall(kif_test_string(TODO),(kif_io(string(TODO),current_output)))
 :- set_no_debug.
 :- notrace.
 :- nodebug.
@@ -244,6 +251,8 @@ kif_test(X):-kif_tell(X).
 :-op(1000,fy,(kif_test)).
 :- assert_until_eof(thlocal:canonicalize_types).
 
+:- discontiguous kif_sanity_test_0/0.
+
 kif_sanity_test_0:-kif_test(all(R, exists(D, room(R) => (door(D) & has(R,D))))).
 
 kif_sanity_test_0:-kif_test(p(A,R) & q(A,R)).
@@ -259,7 +268,7 @@ kif_sanity_test_0:-kif_test(p(A,R) & q(A,R)).
 
 
 
-kif_sanity_test_0:- kif_test(loves(fatherFn(Child),Child)).
+% kif_sanity_test_0:- kif_test(loves(fatherFn(Child),Child)).
 
 
 % :- prolog.
@@ -639,27 +648,27 @@ user:sanity_test:- logicmoo_example3.
 
 user:regression_test:- logicmoo_example3.
 
-:- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_call_kb)).
 
 kif_sanity_tests:- forall(clause(kif_sanity_test_0,B),must(B)).
 
-:- if(gethostname(ubuntu)).
+:- if((gethostname(ubuntu))).
 % :- logicmoo_example3.
 
 %:- prolog.
 :- endif.
 
-:- kif_test(all(X, (~tNotFly(X) => ~tPengin(X)))).
-:- kif_test(not(and(omitArgIsa(RELN, N), argIsa(RELN, N, _THING)))).
+kif_sanity_test_0:- kif_test(all(X, (~tNotFly(X) => ~tPengin(X)))).
+kif_sanity_test_0:- kif_test(not(and(omitArgIsa(RELN, N), argIsa(RELN, N, _THING)))).
 
 
-:- kif_result((tNotFly(X):-tPengin(X))).
+kif_sanity_test_0:- kif_result((tNotFly(X):-tPengin(X))).
    % we prove we dont yet know if something not a pengiun when we call notFly and it fails
-:- kif_result((  neg(tPengin(A)) :-  ~tNotFly(A)  )).
+kif_sanity_test_0:- kif_result((  neg(tPengin(A)) :-  ~tNotFly(A)  )).
 
+default_logic_uses:-uses_logic(logicmoo_kb_refution).
 
-:- initialization(uses_logic(logicmoo_kb_refution)).
-
+%:- initialization(default_logic_uses).
+%:- default_logic_uses.
 
 :- if_startup_script(tkif).
 :- if_startup_script(ensure_loaded(logicmoo_i_mpred_kif_testing)).
@@ -668,4 +677,4 @@ kif_sanity_tests:- forall(clause(kif_sanity_test_0,B),must(B)).
 
 :- ensure_loaded(logicmoo_plarkc).
 
-:- autoload.
+%:- autoload.

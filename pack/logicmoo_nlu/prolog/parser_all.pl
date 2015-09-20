@@ -368,7 +368,9 @@ user:regression_test_TODO:- run_pipleine(acetext='A person who loves all animals
 
 user:regression_test:- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
 
-:- gripe_time(5,test_chat80_sanity).
+:- ace_to_pkif('A person who loves all animals is loved by someone.',X),kif_to_boxlog(X,BOX),portray_clause(user_error,(fol:-BOX)),!.
+
+user:regression_test:- gripe_time(5,test_chat80_sanity).
 
 
 % :- must(retract(thlocal:disable_mpred_term_expansions_locally)).

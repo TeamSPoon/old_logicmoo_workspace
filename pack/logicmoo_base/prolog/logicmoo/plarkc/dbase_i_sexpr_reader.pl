@@ -21,6 +21,25 @@
 
 % :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api)).
 
+
+:-export(fixvars/4).
+
+fixvars(P,_,[],P):-!.
+fixvars(P,N,[V|VARS],PO):-  
+     atom_string(Name,V),clip_qm(Name,NB),Var = '$VAR'(NB),
+     subst(P,'$VAR'(N),Var,PM0),
+     subst(PM0,'$VAR'(Name),Var,PM),
+   %  nb_getval('$variable_names', Vs),
+  %   append(Vs,[Name=Var],NVs),
+  %   nb_setval('$variable_names', NVs),
+     N2 is N + 1,fixvars(PM,N2,VARS,PO).
+
+
+clip_us(A,AO):-concat_atom(L,'-',A),concat_atom(L,'_',AO).
+clip_qm(QA,AO):-atom_concat('??',A1,QA),!,atom_concat('_',A1,A),clip_us(A,AO).
+clip_qm(QA,AO):-atom_concat('?',A,QA),!,clip_us(A,AO).
+clip_qm(A,AO):-clip_us(A,AO).
+
 :-meta_predicate(sexpr_sterm_to_pterm(?,?)).
 :-meta_predicate(sexpr_sterm_to_pterm_list(?,?)).
 sexpr_sterm_to_pterm([S|TERM],PTERM):- (S == ('=>')),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..['=>'|PLIST])),!.
@@ -170,6 +189,9 @@ sblank --> ";", line_comment, swhite.
 swhite --> sblank.
 swhite --> [].
 
+eoln(13).
+eoln(10).
+
 line_comment --> [C], {eoln(C)}, !.
 line_comment --> [C], line_comment.
 
@@ -180,7 +202,7 @@ sexprs([]) --> [].
 :-export(sexpr_list//1).
 
 sexpr_list([]) --> ")", !.
-sexpr_list(_) --> ".", [C], {\+ sym_char(C)}, !, fail.
+sexpr_list(_) --> ".", [C], {\+ sym_char(C)}, !, {fail}.
 sexpr_list([Car|Cdr]) --> sexpr(Car), !, sexpr_rest(Cdr).
 
 sexpr_rest([]) --> ")", !.
@@ -447,7 +469,7 @@ eval(if, [Cond,Then|Else], Value) -->
     ;   eval(Then, Value)
     ).
 
-:- meta_predicate user:goal_truth(0,*,*,*).
+:- meta_predicate goal_truth(0,*,*,*).
 goal_truth(Goal, T) --> { Goal -> T = t ; T = [] }.
 
 bind_arguments([], [], Bs, Bs).
@@ -457,6 +479,8 @@ bind_arguments([A|As], [V|Vs], Bs0, Bs) :-
 
 run(S):-'format'('~n~s~n',[S]),run(S,V),writeq(V).
 
+
+:-meta_predicate(if_script_file_time(0)).
 if_script_file_time(X):-if_startup_script(time(X)).
 
 % Append:

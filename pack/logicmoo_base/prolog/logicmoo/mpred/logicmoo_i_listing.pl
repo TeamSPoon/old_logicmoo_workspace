@@ -62,6 +62,8 @@ pp_items(Type,[H|T]) :-
   pp_items(Type,T).
 pp_items(Type,H) :- ignore(pp_item(Type,H)).
 
+
+pfc_trace_item(_,_):- tlbugger:ifHideTrace,!.
 pfc_trace_item(M,H):- ignore(thlocal:pfc_trace_exec-> debugOnError(in_cmt(pp_item(M,H))); true).
 
 
@@ -361,26 +363,15 @@ pfc_listing_1(What):-
    !.     
 
 
-:-thread_local(thlocal:tl_hide_data/1).
-
 % logicmoo_html_needs_debug.
+:-multifile shared_hide_data/1.
 
-hide_data(P):-hide_data0(showAll),!,fail.
-hide_data(P):-notrace(hide_data0(P)).
-hide_data0(P):-var(P),!,fail.
-hide_data0(P):-thlocal:tl_hide_data(P),!.
-
-hide_data0(pfcMark/4):- !,hide_data0(hideMeta).
-hide_data0(saved_varname_info/3):- !,hide_data0(hideMeta).
-hide_data0('$was_imported_kb_content$'/2):- !,hide_data0(hideMeta).
-
-hide_data0(spft/3):- !,hide_data0(hideTriggers).
-hide_data0(nt/3):- !,hide_data0(hideTriggers).
-hide_data0(pt/2):- !, hide_data0(hideTriggers).
-hide_data0(bt/2):- !, hide_data0(hideTriggers).
-hide_data0(_/_):-!,fail.
-hide_data0(M:P):- atom(M),!,hide_data0(P).
-hide_data0((H:-
+shared_hide_data('$was_imported_kb_content$'/2):- !,hide_data(hideMeta).
+shared_hide_data(spft/3):- !,hide_data(hideTriggers).
+shared_hide_data(nt/3):- !,hide_data(hideTriggers).
+shared_hide_data(pt/2):- !, hide_data(hideTriggers).
+shared_hide_data(bt/2):- !, hide_data(hideTriggers).
+shared_hide_data((H:-
  cwc,
         second_order(_,_G19865),
         (   _G19865 = (_G19867,!,_G19871) ->
@@ -389,7 +380,7 @@ hide_data0((H:-
         ;   CALL
         ))):- CALL=@=call(_G19865).
 
-hide_data0(P):- compound(P),functor(P,F,A), (hide_data0(F/A);hide_data0(F)).
+shared_hide_data(pfcMark/4):- !,hide_data(hideMeta).
 
 
 pp_now.
@@ -485,7 +476,7 @@ show_clause_ref_now(Ref):- clause_property(Ref,erased),
     format('erased(~w) (~w)~N',[Ref,Module]),!.
 
 pp_i2tml(Done):-Done==done,!.
-pp_i2tml(T):-isVarProlog(T),getVarAtom(T,N),format('~w',[N]),!.
+pp_i2tml(T):-isVarProlog(T),format('~w',[T]),!.
 pp_i2tml(T):-string(T),format('"~w"',[T]).
 pp_i2tml(clause(H,B,Ref)):- !, with_assertions(thlocal:current_clause_ref(Ref),pp_i2tml_v((H:-B))).
 pp_i2tml(HB):- find_ref(HB,Ref),!, must(with_assertions(thlocal:current_clause_ref(Ref),pp_i2tml_v((HB)))).

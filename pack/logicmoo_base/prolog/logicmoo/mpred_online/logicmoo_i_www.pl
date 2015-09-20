@@ -9,6 +9,8 @@
 */
 :- use_module(library(http/http_server_files)).
 
+ensure_webserver :- thread_property(_,alias('httpd@3020_1')),!.
+ensure_webserver :- logOnError(http_server(http_dispatch,[ port(3020), workers(16) ])).
 
 :- multifile(http_session:session_data/2).
 :- multifile(system:'$loading_file'/3).
@@ -38,7 +40,7 @@ hmust_l(G):-G.
 
 % :- module(logicmoo_i_www,[ html_print_term/2  ]).  % +Term, +Options
 
-:- user:ensure_loaded(logicmoo_i_www_listing).
+% :- user:ensure_loaded(logicmoo_i_www_listing).
 % :- if(if_defined(load_mud_www)).
 
 
@@ -89,6 +91,7 @@ hmust_l(G):-G.
 
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_error)).
+:- use_module(library(http/http_client)).
 
 :- include(library(pldoc/hooks)).
 % http_reply_from_files is here
@@ -154,8 +157,6 @@ make_quotable(String,SObj):-format(string(SUnq),'~q',[String]),make_quotable_0(S
 % 
 % <link rel="SHORTCUT ICON" href="/pixmaps/mini-logo.gif"><meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
 
-% :- use_module(library(gui_tracer)).
-% :- guitracer.
 % :- set_yes_debug.
 
 :-export(save_in_session/1).
@@ -205,7 +206,7 @@ reset_assertion_display:-
 
 get_param_sess(N,V):- must(param_default_value(N,D)),!,get_param_sess(N,V,D),!.
 
-
+:- use_module(library(http/http_wrapper)).
 :-dynamic(http_last_request/1).
 get_http_current_request(B):- http_request:http_current_request(B), !,ignore((retractall(http_last_request(_)),asserta(http_last_request(B)))).
 get_http_current_request(B):- http_last_request(B),!.
@@ -288,7 +289,7 @@ body {
 
 write_end_html:- flush_output,format('</body></html>~n~n',[]),flush_output,!.
 
-logicmoo_html_needs_debug.
+% logicmoo_html_needs_debug.
 
 add_form_script:-format("
 <script type=\"text/javascript\">
@@ -381,7 +382,8 @@ human_language('SpanishLanguage').
 human_language('ThaiLanguage').
 human_language('de').
 
-foobar:- f((_A < _B) > _C).
+:-dynamic(foobar/1).
+foobar:- foobar((_A < _B) > _C).
 
 param_default_value(call,edit1term).
 
@@ -440,7 +442,7 @@ show_select1(Name,Pred):-
 
 
 as_ftVars(N='$VAR'(N)):-atomic(N),!.
-as_ftVars(N=V).
+as_ftVars(_N=_V).
 as_ftVars(_).
 
     
@@ -457,7 +459,6 @@ edit1term:-
    get_param_sess(term,String,""),
    cvt_param_to_term(String,Term,VNs),
    save_in_session(find,Term),
-   term_variables(Term,Vs),
    % call_for_terms
    edit1term(forall(Term,pp_item('Answer',':-'(VNs,Term))))))).
   
@@ -468,7 +469,6 @@ edit1term:-
    get_param_sess(term,String,""),
    cvt_param_to_term(String,Term,VNs),
    save_in_session(find,Term),
-   term_variables(Term,Vs),
    maplist(as_ftVars,VNs),
    call_for_terms(forall(pfc_add(Term),pp_item('Assert',':-'(VNs,Term))))))).
   
@@ -479,7 +479,6 @@ edit1term:-
    get_param_sess(term,String,""),
    cvt_param_to_term(String,Term,VNs),
    save_in_session(find,Term),
-   term_variables(Term,Vs),
    maplist(as_ftVars,VNs),
    call_for_terms(forall(pfc_rem1(Term),pp_item('Retract',':-'(VNs,Term))))))).
   
@@ -1287,7 +1286,7 @@ test_bind([X='$VAR'(X)|L]) :-
 
 % '$messages':user:my_portray(X):-fail,loop_check(user:my_portray(X)).
 % portray(X):-loop_check(user:my_portray(X)).
-
+/*
 :- discontiguous my_portray/1. 
 :-export(user:my_portray/1).
 user:my_portray(A) :- var(A),!,fail,writeq(A).
@@ -1310,12 +1309,12 @@ user:my_portray(A) :-
 user:my_portray(A) :- atom(A),!,user:write_atom_link(A,A).
 user:my_portray(A) :- \+compound(A),fail.
 %user:my_portray(P):- hmust((return_to_pos(rok_portray_clause(P)),!)).
+*/
 
 
 
 
-
-:- rok_portray_clause((
+sanity_test_000:- rok_portray_clause((
 pkif :-
 
         [ implies,

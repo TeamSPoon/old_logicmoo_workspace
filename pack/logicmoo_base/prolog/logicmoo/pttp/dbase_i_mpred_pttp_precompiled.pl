@@ -83,7 +83,8 @@ int_pred_t(A, B, C, H, I, D, E, F, J, G) :-
    pretest_call((use_mpred_t, dif(B,C), user:t(A, B, C),D=E)),
   F=[K, [pred_t(A, B, C), G, H, I]|L], J=[K|L].
 */
-:-listing(int_pred_t).
+
+% :-listing(int_pred_t).
 
 :- dynamic int_not_pred_t/10.
 :- multifile int_not_pred_t/10.
@@ -268,6 +269,6 @@ make_base(BF,A):-
 
 %:-listing([pred_t,int_pred_t,not_pred_t,int_not_pred_t]).
 
-:-listing([true_t,int_true_t,not_true_t,int_not_true_t]).
+%:-listing([true_t,int_true_t,not_true_t,int_not_true_t]).
 
 

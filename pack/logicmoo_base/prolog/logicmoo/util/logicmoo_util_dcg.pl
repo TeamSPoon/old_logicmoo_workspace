@@ -40,6 +40,8 @@
 	 ]).
 
  
+:- meta_predicate dcgLeftOfMid(?,//,?,?).
+:- meta_predicate dcgLeftMidRight(//,//,//,?,?).
 
 :- meta_predicate dcgAnd(//,//,//,//,?,?).
 :- meta_predicate dcgAnd(//,//,//,?,?).

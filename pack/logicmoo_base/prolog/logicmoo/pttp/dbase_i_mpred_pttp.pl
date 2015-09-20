@@ -90,7 +90,7 @@ pttp_assert_wid(ID,_Mode,call(CALL)):-!, must((save_wid(ID,call,call(CALL)),unnu
 %pttp_assert_wid(ID,Mode,(query:-B)):- must(assertz_unumbered((query:-B))),PNF =(query:-B), must( pttp_nnf(PNF,X)),!,must(must(pttp_assert_real_wid(ID,X))).
 pttp_assert_wid(ID,pttp,X):- must((bugger:with_assertions(thlocal:current_why(ID,X), must(( pttp1_wid(ID,X,Y), pttp2_wid(ID,Y)) )))).
 % pttp_assert_wid(ID,Mode,KIF):- must(kif_tell(ID,KIF)),!.
-pttp_assert_wid(ID,kif,X):- show_call_failure(must(kif_tell(ID,X))).
+pttp_assert_wid(ID,kif,X):- show_call_failure(must(kif_tell_boxes1(ID,X))).
 
 pttp_assert_wid(ID,pttp_in,HB):- !,must((save_wid(ID,pttp_in,HB), pttp_assert_real_wid(ID,HB))).
 pttp_assert_wid(ID,Mode,(X:-Y)):- !,must((save_wid(ID,Mode,(X:-Y)), pttp_assert_real_wid(ID,(X:-Y)))).
@@ -276,13 +276,7 @@ isNegOf(N,-N):-not_ftVar(N),!.
 isNegOf(-N,N):-not_ftVar(N),!.
 isNegOf(N1,N):-dtrace(not(isNegOf(N1,N))),isNegOf(N,N1).
 
-:-export(kb_incr/2).
-kb_incr(WffNum1 ,WffNum2):-is_ftVar(WffNum1),trace_or_throw(kb_incr(WffNum1 ,WffNum2)).
-kb_incr(WffNum1 ,WffNum2):-number(WffNum1),WffNum2 is WffNum1 + 1,!.
-%kb_incr(WffNum1 ,WffNum2):-atom(WffNum1),WffNum2=..[WffNum1,0],!.
-kb_incr(WffNum1 ,WffNum2):-atomic(WffNum1),WffNum2 = WffNum1:0,!.
-kb_incr(WffNum1 ,WffNum2):-WffNum1=..[F,P,A|REST],kb_incr(A ,AA),!,WffNum2=..[F,P,AA|REST].
-kb_incr(WffNum1 ,WffNum2):-trace_or_throw(kb_incr(WffNum1 ,WffNum2)).
+
 
 :-multifile was_pttp_functor/3.
 :-dynamic was_pttp_functor/3.
@@ -371,7 +365,7 @@ pttp_assert_int_wid04(_,_,F,A):- was_pttp_functor(external,F,A),!.
 pttp_assert_int_wid04(_,Y,F,A):- not(internal_functor(F)),add_functor(external,F/A),assertz_unumbered(Y),!.
 pttp_assert_int_wid04(ID,Y,F,A):- show_call_success(user:wid(ID,F/A,Y)),!.
 %pttp_assert_int_wid04(ID,Y,F,A):- fail, once((must((must((renumbervars_a(Y,BB),nonvar(BB))),pred_subst(is_wid_key,BB,_,_,YCheck),nonvar(YCheck),BB \=@= YCheck)))),user:wid(_,F/A,YCheck),!,ainz(user:wid(ID,F/A,Y)),!.
-pttp_assert_int_wid04(ID,Y,F,A):- user:wid(_,_,Y),!,ain(user:wid(ID,F/A,Y)),!.
+pttp_assert_int_wid04(ID,Y,F,A):- user:wid(_,_,Y),!,ainz(user:wid(ID,F/A,Y)),!.
 pttp_assert_int_wid04(ID,Y,F,A):- ainz(user:wid(ID,F/A,Y)),add_functor(internal,F/A),!,assertz_unumbered(Y),!.
 /*
 pttp_assert_int_wid04(ID,Y,F,A):- 

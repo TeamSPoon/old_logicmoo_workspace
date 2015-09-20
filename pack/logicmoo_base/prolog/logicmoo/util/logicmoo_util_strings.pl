@@ -100,7 +100,9 @@ string_lower(M,U):-toLowercase(M,U).
 
 %:- meta_predicate(user:camelSplitters(+)).
 
-%:- meta_predicate(to_string_hook(-,-,+)).
+:- meta_predicate(to_string_hook(-,-,+)).
+:- multifile(to_string_hook/3).
+:- dynamic(to_string_hook/3).
 
 user:camelSplitters(V):-arg(_,v(' ','-','_',':' /*,'mt','doom','Mt','Doom'*/ ),V).
 
@@ -626,6 +628,7 @@ empty_string("").
 
 
 % Meta-Interp that appends the arguments to the calls
+:- meta_predicate convert_members(?,?,?).
 convert_members([], InOut,InOut).
 convert_members([A,!|B], In,Out):- !, convert_members(A,In,M),!,convert_members(B,M,Out).
 convert_members([A|B], In,Out):- !, convert_members(A,In,M),convert_members(B,M,Out).
@@ -645,22 +648,22 @@ replace_in_string(SepChars,Repl,A,C):- atomics_to_string(B,SepChars,A),atomics_t
 replace_periods(A,S):-
  convert_members([
    %  white space
-    replace_in_string("\r"," "),
-    replace_in_string("\n"," "),
-    % replace_in_string("\s"," "),
-    replace_in_string("'"," apostraphyMARK "),
-    replace_in_string("\t"," "),
+    replace_in_string(`\r`,` `),
+    replace_in_string(`\n`,` `),
+    % replace_in_string(`\s`,` `),
+    replace_in_string(`'`,` apostraphyMARK `),
+    replace_in_string(`\t`,` `),
     % only remove leading and trailing white space
-   % at(split_string("", "\s\t\n")),
+   % at(split_string(``, `\s\t\n`)),
     % respace the spaces
-    replace_in_string(" ", " ", " "),
+    replace_in_string(` `, ` `, ` `),
     % add a space on the end
-    ht(string_concat(" ")),
-    replace_in_string("?"," ? "),
-    replace_in_string("!"," ! "),
-    replace_in_string("."," . "),
+    ht(string_concat(` `)),
+    replace_in_string(`?`,` ? `),
+    replace_in_string(`!`,` ! `),
+    replace_in_string(`.`,` . `),
     % replace periods
-   replace_in_string(". "," periodMARK ")
+   replace_in_string(`. `,` periodMARK `)
    ],A,S).
 
 % ?- replace_periods_string_list("hi there bub. how are you.",X),to_list_of_sents(X,L).
@@ -696,7 +699,7 @@ to_word_list_0(A,WList):-any_to_string(A,String),!,text_to_string(String,Atom),t
 
 
 
-:- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api)).
+% :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api)).
 
 
 read_stream_to_arglist(Input,[]):- at_end_of_stream(Input),!.

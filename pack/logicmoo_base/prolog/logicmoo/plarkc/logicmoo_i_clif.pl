@@ -70,12 +70,13 @@ is_clif(CLIF):-cwc,
 
 % we ensure we are in "pfc" consultation mode (so the syntax rules will define correctly)
 
-:- wdmsg(pfc_trace).
-:- pfc_trace.
+% :- pfc_trace.
 :- file_begin(pfc).
 
 % make sure op alias for '=>' is not overriden
 :- op_alias( (=>),  (=>)).
+
+==> hybrid_support(clif,1).
 
 % whenever we know about clif we'll use the prolog forward chainging system
 
@@ -86,13 +87,15 @@ is_clif(CLIF):-cwc,
 
 % :- prolog.
 
+% pfc_examples.
+
 arity(clif,1).
 arity(boxlog,1).
 arity(pfclog,1).
 
 (clif(CLIF),{delistify_last_arg(CLIF,kif_to_boxlog,PROLOG)}) ==> boxlog(PROLOG).
 (boxlog(CLIF),{delistify_last_arg(CLIF,boxlog_to_pfc,PROLOG)}) ==> pfclog(PROLOG).
-:- pfc_trace.
+% :- pfc_trace.
 (pfclog(PROLOG)==>(PROLOG,{clif_must(PROLOG)})).
 
 

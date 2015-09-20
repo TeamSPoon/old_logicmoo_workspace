@@ -22,7 +22,7 @@
 
 
 % [Required] Load the CYC Network Client and Logicmoo CycServer Emulator (currently server is disabled)
-:- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_i_cyc_api)))).
+% :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_i_cyc_api)))).
 
 % [Optional] NOT YET Load the Logicmoo RDF/OWL Browser System
 % % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(mpred_online/dbase_i_rdf_store)))).

@@ -125,6 +125,20 @@ Writing in Prolog is actually really easy for a MUD is when the length's chosen
 % Douglas Miles
 */
 
+:-export(show_all/1).
+show_all(Call):-doall((show_call(Call))).
+
+:-export(alt_calls/1).
+alt_calls(call).
+alt_calls(mpred_call).
+alt_calls(is_asserted).
+alt_calls(t).
+alt_calls(req).
+alt_calls(mreq).
+alt_calls(ireq).
+
+showall(Call):- doall(show_call(Call)).
+
 is_pred_declarer(P):-functor_declares_instance(P,tPred).
 is_relation_type(tRelation).
 is_relation_type(tFunction).
@@ -283,8 +297,8 @@ db_expand_final(_, tPred(V),tPred(V)):-!.
 db_expand_final(_ ,NC,NC):-functor(NC,_,1),arg(1,NC,T),not(compound(T)),!.
 %db_expand_final(_ ,NC,NC):-functor(NC,_,1),arg(1,NC,T),db_expand_final(_,T,_),!.
 db_expand_final(_ ,isa(Atom,PredArgTypes), tRelation(Atom)):-PredArgTypes==meta_argtypes,atom(Atom),!.
-db_expand_final(_ ,meta_argtypes(Args),    O  ):-compound(Args),functor(Args,Pred,A),
-    (Pred=t->  (db_expand_term(Args,ArgsO),O=meta_argtypes(ArgsO)) ; (assert_arity(Pred,A),O=meta_argtypes(Args))).
+db_expand_final(Op, meta_argtypes(Args),    O  ):-compound(Args),functor(Args,Pred,A),
+    (Pred=t->  (db_expand_term(Op, Args,ArgsO),O=meta_argtypes(ArgsO)) ; (assert_arity(Pred,A),O=meta_argtypes(Args))).
 db_expand_final(_ ,meta_argtypes(F,Args),    meta_argtypes(Args)):-atom(F),!,functor(Args,Pred,A),assert_arity(Pred,A).
 db_expand_final(_ ,meta_argtypes(Args),      meta_argtypes(Args)):-!.
 db_expand_final(_ ,isa(Args,Meta_argtypes),  meta_argtypes(Args)):-Meta_argtypes==meta_argtypes,!,compound(Args),!,functor(Args,Pred,A),assert_arity(Pred,A).
@@ -312,7 +326,7 @@ db_expand_chain(_,P<==>B,P) :-is_true(B),!.
 db_expand_chain(_,B<==>P,P) :-is_true(B),!.
 db_expand_chain(_,P<-B,P) :-is_true(B),!.
 db_expand_chain(_,isa(I,Not),INot):-Not==not,!,INot =.. [Not,I].
-db_expand_chain(_,P,PE):-fail,cyc_to_clif_entry(P,PE).
+%db_expand_chain(_,P,PE):-fail,cyc_to_clif_entry(P,PE).
 db_expand_chain(_,('nesc'(P)),P) :- !.
 
 db_expand_a(Op ,(S1,S2),SentO):-db_expand_a(Op ,S1,S1O),db_expand_a(Op ,S2,S2O),conjoin_l(S1O,S2O,SentO),!.
@@ -775,6 +789,8 @@ simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=S
 % ================================================
 add_from_file(B,_):- contains_singletons(B),trace_or_throw(dtrace),dmsg(todo(add_from_file_contains_singletons(B))),!,fail.
 add_from_file(B,B):- pfc_add(B). % db_op(change(assert,_OldV),B),!.
+
+dbase_mod(user).
 
 univ_left(Comp,[M:P|List]):- nonvar(M),univ_left0(M, Comp, [P|List]),!.
 univ_left(Comp,[H,M:P|List]):- nonvar(M),univ_left0(M,Comp,[H,P|List]),!.

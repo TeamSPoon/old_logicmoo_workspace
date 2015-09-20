@@ -98,7 +98,7 @@ pl_arg_type(Arg,Type):-
       integer(Arg) -> Type =ftInteger;
       number(Arg) -> Type =ftFloat;
       string(Arg) -> Type =ftString;
-      is_string(Arg) -> Type =ftText;
+      is_ftText(Arg) -> Type =ftText;
       is_list(Arg) -> Type =ftListFn(_);
       atom(Arg) -> Type =ftAtom;
       atomic(Arg) -> Type =ftAtomic;
@@ -106,6 +106,13 @@ pl_arg_type(Arg,Type):-
          Arg = Type.
 
 
+is_ftText(Arg):-string(Arg),!.
+is_ftText(Arg):- \+ compound(Arg),!,fail.
+is_ftText(Arg):- text_to_string_safe(Arg,_),!.
+is_ftText(Arg):- functor(Arg,S,_),resultIsa(S,ftText).
+
+:-dynamic(coerce/3).
+:-multifile(coerce/3).
 :-export(coerce/4).
 coerce(What,Type,NewThing,_Else):-coerce(What,Type,NewThing),!.
 coerce(_ ,_,     NewThing,Else):- NewThing = Else.
@@ -322,6 +329,14 @@ mpred_full_arity({},A):-trace_or_throw(crazy_mpred_full_arity({}, A)).
 mpred_full_arity(F,A):-arity(F,A),!.
 mpred_full_arity(F,A):-grab_argsIsa(F,Types),maybe_argtypes(Types),show_call((functor(Types,F,A),assert_arity(F,A))),!.
 
+
+
+is_ephemeral(Var):-var(Var),!,fail.
+is_ephemeral(isMissing).
+is_ephemeral(isOptional(_,_)).
+is_ephemeral(isRandom(_)).
+is_ephemeral(isOneOf(_)).
+
 :-export(correctAnyType/4).
 
 is_valuespec(G):-is_ephemeral(G).
@@ -398,8 +413,6 @@ correctType0(query(ftID,Op),A,ftAction,AA):- must_equals_correct(Op,A,AA),!.
 correctType0(Op,A,Type,AAA):-is_renamed_to(A,AA),!,must(correctType0(Op,AA,Type,AAA)).
 correctType0(Op,+A,Type,+AA):-nonvar(A),!,correctType0(Op,A,Type,AA).
 correctType0(Op,-A,Type,-AA):-nonvar(A),!,correctType0(Op,A,Type,AA).
-correctType0(_ ,A,vtDirection,AA):- current_predicate(any_to_dir/2),!,any_to_dir(A,AA).
-correctType0(_ ,A,vtDirection,AA):- must_equals(A,AA).
 correctType0(Op,A,ftInteger,AA):-!,correctType0(Op,A,ftInt,AA).
 correctType0(Op,A,ftAskable,AA):-!,must_equals_correct(query(ftAskable,Op),A,AA).
 correctType0(_ ,A,ftInt,AA):- any_to_number(A,AA).
@@ -436,6 +449,11 @@ correctType0(_ ,A,Type,AA):- functor(Type,F,A),
    (A2 is A+2,current_predicate(F/A2)->show_call(is_asserted(t(Type,A,AA)));
    (A1 is A+1,current_predicate(F/A1)->show_call(is_asserted(t(Type,A))));
    fail),ignore(AA=A).
+
+
+correctType0(_ ,What,Type,NewThing):- coerce(What,Type,NewThing),!.
+%TODO Confirm vtDirection is coerce/3'd correctType0(_ ,A,vtDirection,AA):- call((current_predicate(any_to_dir/2),!,call(any_to_dir,A,AA))),!.
+%TODO Confirm vtDirection is coerce/3'd correctType0(_ ,A,vtDirection,AA):- must_equals(A,AA).
 
 correctType0(query(HLDS,Must),A,xyzFn(Region, ftInt, ftInt, ftInt),xyzFn(AA, _, _, _)):-atom(A),correctAnyType(query(HLDS,Must),A,Region,AA).
 correctType0(_ ,A,ftListFn(_),AA):- A == [],!,A=AA.
@@ -528,7 +546,7 @@ any_to_relation(A,F):-functor_h(A,F).
 roll_dice(Rolls,_,Bonus,Result):- Rolls < 0, !, Result is Bonus.
 roll_dice(Rolls,Sided,Bonus,Result):- LessRolls is Rolls-1, roll_dice(LessRolls,Sided, Bonus + random(Sided) +1, Result).
 
-call_argIsa_ForAssert(F,N,Type):-argIsa_known(F,N,Type),atom(Type),!,not(nonusefull_deduction_type(Type)),tCol(Type).
+% call_argIsa_ForAssert(F,N,Type):-argIsa_known(F,N,Type),atom(Type),!,not(nonusefull_deduction_type(Type)),tCol(Type).
 
 %:-pfc_add_fast(<=( argIsa(F,N,Isa), asserted_argIsa_known(F,N,Isa))).
 %:-pfc_add_fast(<=( argIsa(F,N,Isa), argIsa_known(F,N,Isa))).

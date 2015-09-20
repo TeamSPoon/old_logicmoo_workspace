@@ -236,7 +236,8 @@ call_wdmsg(P,DB):- get_functor(DB,F,A), call_wdmsg(P,DB,F,A).
 
 call_wdmsg(P,DB,t,_A):-!, append_term(P,DB,CALL),dmsg((CALL)),mpred_call(CALL).
 call_wdmsg(P,MP,F,A):- user:mpred_prop(F,prologHybrid),must(A>1),into_functor_form(t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,mpred_call(CALL).
-call_wdmsg(P,MP,F,A):-  (\+ user:mpred_prop(F,prologDynamic)), (\+ user:mpred_prop(F,prologBuiltin)),decl_mpred_hybrid(F/A), into_functor_form(t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,mpred_call(CALL).
+call_wdmsg(P,MP,F,A):-  (\+ user:mpred_prop(F,prologDynamic)), (\+ user:mpred_prop(F,prologBuiltin)), decl_mpred_hybrid(F/A), into_functor_form(t,MP,DB),!, 
+  append_term(P,DB,CALL),dmsg(info(CALL)),!,mpred_call(CALL).
 call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(user:mpred_prop(F,prologDynamic);user:mpred_prop(F,prologBuiltin)),!,mpred_call(CALL).
 %call_wdmsg(P,DB,S,_):-  dtrace((append_term(P,DB,CALL),dmsg((CALL)),mpred_call(CALL))).
 
@@ -406,6 +407,9 @@ assert_mpred_t(DB):-once(fully_expand(change(assert,add),DB,MP)),DB\=@=MP,!,must
 assert_mpred_t((G1,G2)):-!,assert_mpred_t(G1),assert_mpred_t(G2).
 assert_mpred_t(G):-add_from_file(G).
 
+:-export(portray_hb/2).
+portray_hb(H,B):- B==true, !, portray_one_line(H).
+portray_hb(H,B):- portray_one_line((H:-B)).
 
 :- op(1150,fx,decl_mpred_hybrid).
 
@@ -567,7 +571,7 @@ constrain_args(A,B):-constrain_args_pttp(A,B).
 
 % call_body_req(HEAD):- functor(HEAD,F,A),HEAD_T=..[F|ARGS],HEAD_T=..[t,F|ARGS],hook_body_req(HEAD,HEAD_T).
 
-
+/*
 
 % ========================================================================================
 % BODY StubType
@@ -615,7 +619,9 @@ body_req_only_rules(HEAD, _):-  ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BOD
 body_req_only_rules(_,_,_,t(F,Obj,LValue)):-  choose_val(F,Obj,LValue).
 
 body_req_plus_cyc(F,_,_,HEAD_T):-  user:mpred_prop(F,cycPlus2(_)),thlocal:useOnlyExternalDBs,!,with_assertions(thglobal:use_cyc_database,body_call_cyckb(HEAD_T)).
- 
+
+*/
+
 foo_b(b1).
 foo_b(b2):-!.
 foo_b(b3):-!.
@@ -626,6 +632,7 @@ foo_b(b3):-!.
 
 %OLD user:decl_database_hook(AR,C):-smart_decl_database(AR,C).
 
+/*
 smart_decl_database(AR,svo(S,V,O)):- !,dbase2pred2svo(DBASE,PRED,svo(S,V,O)),!,smart_db_op(AR,DBASE,PRED,svo(S,V,O)).
 smart_decl_database(AR,DBASE):- functor_catch(DBASE,t,_),!,dbase2pred2svo(DBASE,PRED,SVO),!,smart_db_op(AR,DBASE,PRED,SVO).
 smart_decl_database(AR,PRED):- dbase2pred2svo(DBASE,PRED,SVO),!,smart_db_op(AR,DBASE,PRED,SVO).
@@ -641,16 +648,16 @@ retract_ar_fact(one,What):- predicate_property(What,_),!, clause_safe(What,true)
 retract_ar_fact(one,What):- dmsg(mssing(retract_ar_fact(one,What))).
 
 
-make_functorskel(_,_):-!. % currently ununused
-make_functorskel(F,_):- fskel(F,_,_,_,_,_,_),!.
-make_functorskel(F,N):- arity(F,N),make_functorskel(F,N,SKEL),asserta(SKEL),!.
-make_functorskel(F,N):- ignore(arity(F,A)),dmsg(todo(trace_or_throw(illegal_make_functorskel(F,N,A)))).
+make_functorskel(_,_,_):-!. % currently ununused
+make_functorskel(F,_,_):- fskel(F,_,_,_,_,_,_),!.
+make_functorskel(F,N,_):- arity(F,N),make_functorskel(F,N,SKEL),asserta(SKEL),!.
+make_functorskel(F,N,_):- ignore(arity(F,A)),dmsg(todo(trace_or_throw(illegal_make_functorskel(F,N,A)))).
 
 dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-fskel(F,DBASE,PRED,A,RGS,_,_),!.
 dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-compound(PRED),functor(PRED,F,N),make_functorskel(F,N),!,fskel(F,DBASE,PRED,A,RGS,_,_),!.
 dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-compound(DBASE),!,arg(1,DBASE,F),must_det(arity(F,N)),make_functorskel(F,N),!,fskel(F,DBASE,PRED,A,RGS,_,_),!.
 dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-nonvar(F),must(arity(F,N)),make_functorskel(F,N),!,fskel(F,DBASE,PRED,A,RGS,_,_),!.
-
+*/
 
 :-export(registerCycPredPlus2/1).
 

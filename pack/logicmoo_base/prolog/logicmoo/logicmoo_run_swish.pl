@@ -6,6 +6,8 @@
 	  [
 	  ]).
 
+:- user:ensure_loaded(logicmoo_base).
+
 
 :- volatile(swish_trace:installed/1).
 

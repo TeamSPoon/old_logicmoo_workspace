@@ -174,7 +174,7 @@ not_ft_quick(T):-nonvar(T),(T=tItem;T=tRegion;T=tCol;T=completelyAssertedCollect
 
 :-export(asserted_subclass/2).
 asserted_subclass(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([genls,I,T])).
-asserted_subclass(T,ST):-a(genls,T,ST).
+asserted_subclass(T,ST):- t(genls,T,ST).
 
 chk_ft(T):- not_ft_quick(T),!,fail.
 %chk_ft(I):- thlocal:infForward, a(defnSufficient,I,_),!.
@@ -332,7 +332,7 @@ isa_backchaing(I,T):-  I==T,I=ttTypeByAction,!,fail.
 isa_backchaing(I,T):- var(I),var(T),!,tCol_gen(T),nonvar(T),isa_backchaing(I,T).
 isa_backchaing(I,T):- call_tabled(isa(I,T),no_repeats(loop_check(isa_backchaing_0(I,T)))).
 
-isa_backchaing_0(I,T):- nonvar(T),is_ftVar(T),!,trace_of_throw(var_isa_backchaing(I,T)).
+isa_backchaing_0(I,T):- nonvar(T),is_ftVar(T),!,trace_or_throw(var_isa_backchaing(I,T)).
 isa_backchaing_0(I,T):-  nonvar(T),completelyAssertedCollection(T),!,isa_asserted(I,T).
 isa_backchaing_0(I,T):-  nonvar(I),nonvar(T),!,no_repeats_old(transitive_subclass_or_same(AT,T)),isa_asserted(I,AT).
 isa_backchaing_0(I,T):-  var(I),nonvar(T),!,no_repeats_old(transitive_subclass_or_same(AT,T)),isa_asserted(I,AT).
@@ -401,7 +401,7 @@ isa_asserted_1(_, prologHybrid):-!,fail.
 isa_asserted_1(I,T):- atom(T),loop_check(isa_w_type_atom(I,T)).
 isa_asserted_1(_,T):- a(completelyAssertedCollection,T),!,fail.
 %isa_asserted_1(I,T):- append_term(T,I,HEAD),ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
-isa_asserted_1(I,'&'(T1 , T2)):-!,nonvar(T1),var(T2),!,dif:dif(T1,T2),isa_backchaing(I,T1),subclass(T1,T2),isa_backchaing(I,T2).
+isa_asserted_1(I,'&'(T1 , T2)):-!,nonvar(T1),var(T2),!,dif:dif(T1,T2),isa_backchaing(I,T1),genls(T1,T2),isa_backchaing(I,T2).
 isa_asserted_1(I,'&'(T1 , T2)):-!,nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 isa_asserted_1(I,(T1 ; T2)):-!,nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 
@@ -664,6 +664,7 @@ system:goal_expansion(ISA,GO) :- \+ thlocal:disable_mpred_term_expansions_locall
 % ISA EVER
 %pfc_term_expansion(G,GO):-  \+ thlocal:disable_mpred_term_expansions_locally,was_isa(G,I,C),GO=isa(I,C).
 
-:-decl_type(tCol).
-:-decl_type(ttPredType).
+:-pfc_add(tCol(tCol)).
+:-pfc_add(tCol(ttPredType)).
+
 

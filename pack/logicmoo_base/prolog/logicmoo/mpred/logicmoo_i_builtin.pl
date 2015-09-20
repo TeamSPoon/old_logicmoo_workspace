@@ -1209,7 +1209,7 @@ prologHybrid(resultIsa/2).
 
 % :- sanity(test_expand_units(number(_A))).
 
-:- sanity((writeq(tCol(_A)),nl)).
+% :- sanity((writeq(tCol(_A)),nl)).
 
 
 tCol(vtTestType).

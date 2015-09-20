@@ -17,7 +17,6 @@
 */
 %:- module(tiny_kb,['TINYKB-ASSERTION'/5, 'TINYKB-ASSERTION'/6]).
 
-:-if_file_exists(user:ensure_loaded(logicmoo(ext/moo_ext_cyc_new))).
 
 isa_db(I,C):-clause(isa(I,C),true).
 
@@ -305,6 +304,9 @@ ltkb1:-
       told,
       retractall(tinyKB0(comment(_,_))))).
 
+ltkb2:- doall((filematch(logicmoo('plarkc/logicmoo_i_cyc_kb_tinykb.pl'),F),must(source_file(X,F)),predicate_property(X,dynamic),retract(X:-_))).
+
+
 mpred_prepend_type(X,_):- \+ atom(X),!,fail.
 mpred_prepend_type(X,PP):-cycPrepending(PP,X),!.
 mpred_prepend_type(X,_):- name(X,[S|_]),char_type(S,lower),!,fail.
@@ -337,7 +339,7 @@ wkb0:- tell(fooooo0),
       forall(tinyKB_All(V,MT,STR),format('~q.~n',[tinyKB_All(V,MT,STR)])),
       told.
 
-wkbe:- statistics(cputime,S),tell(foof),ignore((el_holds_pred_impl(F),between(2,16,A),current_predicate(F/A),functor(P,F,A),forall(P,format('~q.~n',[P])),fail)),told,
+wkbe:- statistics(cputime,S),tell(foof),ignore((el_assertions:el_holds_pred_impl(F),between(2,16,A),current_predicate(F/A),functor(P,F,A),forall(P,format('~q.~n',[P])),fail)),told,
    statistics(cuptime,E),Total is E - S, writeln(Total).
 
 wkb01:- tell(fooooo0),
@@ -425,7 +427,7 @@ label_args(PREFIX,N,[ARG|ARGS]):-atom_concat(PREFIX,N,TOARG),ignore(TOARG=ARG),!
 :-thread_local thocal:outer_pred_expansion/2.
 
 cyc_to_clif_notify(B,A):- cyc_to_clif(B,A) -> B\=@=A, nop(dmsg(B==A)).
-cyc_to_clif_entry(I,O):-fail,cyc_to_clif(I,M),!,must((functor(I,FI,_),functor(M,MF,_),FI==MF)),O=M.
+%cyc_to_clif_entry(I,O):-fail,cyc_to_clif(I,M),!,must((functor(I,FI,_),functor(M,MF,_),FI==MF)),O=M.
 
 cyc_to_clif(V,V):-is_ftVar(V),!.
 cyc_to_clif(I,O):-atom(I),must(cyc_to_pfc_idiom(I,O)),!.
@@ -438,20 +440,6 @@ cyc_to_clif(HOLDS,HOLDSOUT):-HOLDS=..[F|HOLDSL],
   with_assertions(thocal:outer_pred_expansion(F,HOLDSL),cyc_to_clif([F|HOLDSL],[C|HOLDSOUTL])),!,
   ((is_list([C|HOLDSOUTL]), atom(C))-> must(HOLDSOUT=..[C|HOLDSOUTL]) ; HOLDSOUT=[C|HOLDSOUTL]),!.
 
-clip_us(A,AO):-concat_atom(L,'-',A),concat_atom(L,'_',AO).
-clip_qm(QA,AO):-atom_concat('??',A1,QA),!,atom_concat('_',A1,A),clip_us(A,AO).
-clip_qm(QA,AO):-atom_concat('?',A,QA),!,clip_us(A,AO).
-clip_qm(A,AO):-clip_us(A,AO).
-
-fixvars(P,_,[],P):-!.
-fixvars(P,N,[V|VARS],PO):-  
-     atom_string(Name,V),clip_qm(Name,NB),Var = '$VAR'(NB),
-     subst(P,'$VAR'(N),Var,PM0),
-     subst(PM0,'$VAR'(Name),Var,PM),
-   %  nb_getval('$variable_names', Vs),
-  %   append(Vs,[Name=Var],NVs),
-  %   nb_setval('$variable_names', NVs),
-     N2 is N + 1,fixvars(PM,N2,VARS,PO).
 
 
 :-dynamic(argIsa/3).
@@ -477,7 +465,7 @@ ist_tiny(MT,P):-tinyKB(P,MT,vStrMon).
 ist_tiny(MT,P):-tinyKB(P,MT,vStrDef).
 
 %TODO ADD BACK AFTER OPTIZING
-tinyKB(P):- tinyKB(P,MT,_).
+tinyKB(P):- tinyKB(P,_MT,_).
 tinyKB(ist(MT,P)):-!,tDressedMt(MT),tinyKB(P,MT,_).
 tinyKB(D):-tinyKB0(D).
 
@@ -499,7 +487,7 @@ tinyKB(PO,MT,STR):- %fwc,
 tinyKB_All(V,MT,STR):- tinyAssertion(V,MT,STR).
 tinyKB_All(PO,MT,STR):- current_predicate('TINYKB-ASSERTION'/5),!,
     tiny_kb_ASSERTION(PLISTIn,PROPS),
-        once((sterm_to_pterm(PLISTIn,P),
+        once((sexpr_sterm_to_pterm(PLISTIn,P),
                memberchk(amt(MT),PROPS),
                memberchk(str(STR),PROPS), 
               (member(vars(VARS),PROPS)->(nb_setval('$variable_names', []),fixvars(P,0,VARS,PO));PO=P ))).
@@ -558,6 +546,7 @@ needs_indexing(V):-compound(V),arg(_,V,A),not(is_simple_arg(A)),!,fail.
 is_simple_arg(A):-not(compound(A)),!.
 is_simple_arg(A):-functor(A,Simple,_),tEscapeFunction(Simple).
 
+:- dynamic(vtUnreifiableFunction/1).
 'tEscapeFunction'('TINYKB-ASSERTION').
 'tEscapeFunction'('aQuoteFn').
 'tEscapeFunction'(X):- 'vtUnreifiableFunction'(X).
@@ -595,7 +584,7 @@ addCycL1((A => (V1 , V2))):-not(is_ftVar(V1)),!,show_call(addCycL0((A => V1))) ,
 addCycL1((V1 , V2)):-!,addCycL0(V1),addCycL0(V2),!.
 addCycL1([V1 | V2]):-!,addCycL0(V1),addCycL0(V2),!.
 addCycL1(V):-addTiny_added(V),!.
-addCycL1(V):-asserta(addTiny_added(V)),unnumbervars(V,VE),pfc_add(VE),remQueuedTinyKB(VE).
+addCycL1(V):-asserta(addTiny_added(V)),unnumbervars(V,VE),must(nop(remQueuedTinyKB(VE))),pfc_add(VE).
 
 
 sent_to_conseq(CycLIn,Consequent):- into_mpred_form(CycLIn,CycL), ignore((tiny_support(CycL,_MT,CALL),retract(CALL))),must(cycLToMpred(CycL,Consequent)),!.
@@ -670,6 +659,7 @@ make_functorskel(F,N,fskel(F,DBASE,Call,I,NList,MtVars,Call2)):-typical_mtvars(M
 :-dynamic(isCycUnavailable_known/1).
 :-dynamic(isCycAvailable_known/0).
 
+/*
 :-export(isCycAvailable/0).
 isCycAvailable:-isCycUnavailable_known(_),!,fail.
 isCycAvailable:-isCycAvailable_known,!.
@@ -682,9 +672,9 @@ isCycUnavailable:-checkCycAvailablity,isCycUnavailable.
 
 :-export(checkCycAvailablity/0).
 checkCycAvailablity:- (isCycAvailable_known;isCycUnavailable_known(_)),!.
-checkCycAvailablity:- ccatch((ignore((invokeSubL("(+ 1 1)",R))),(R==2->assert_if_new(isCycAvailable_known);assert_if_new(isCycUnavailable_known(R)))),E,assert_if_new(isCycUnavailable_known(E))),!.
-
-:- dmsg("Loading tinyKB should take under a minute").
+checkCycAvailablity:- ccatch((current_predicate(invokeSubL/2),ignore((invokeSubL("(+ 1 1)",R))),(R==2->assert_if_new(isCycAvailable_known);assert_if_new(isCycUnavailable_known(R)))),E,assert_if_new(isCycUnavailable_known(E))),!.
+*/
+% :- dmsg("Loading tinyKB should take under a minute 666").
 
 % :-must((asserta((user:term_expansion(A,B):-cyc_to_clif_notify(A,B),!),CLREF),asserta(at_eof_action(erase(CLREF))))).
 :- gripe_time(60,user:qcompile(logicmoo(plarkc/logicmoo_i_cyc_kb_tinykb))).
