@@ -60,8 +60,8 @@ reduce_make_key(M:C,O):-atom(M),!,reduce_make_key(C,O).
 reduce_make_key(O,O).
 
 
-cc_key(CC,Key):- cyclic_term(CC),copy_term(CC,CKey,_),numbervars(CKey,0,_),format(atom(Key),'~w',[CKey]),!.
-cc_key(CC,Key):- copy_term(CC,Key,_),numbervars(Key,0,_),!.
+cc_key(CC,Key):- cyclic_term(CC),copy_term_nat(CC,CKey),numbervars(CKey,0,_),format(atom(Key),'~w',[CKey]),!.
+cc_key(CC,Key):- copy_term_nat(CC,Key),numbervars(Key,0,_),!.
 
 make_key(M:CC,Key):- atom(M),!,hotrace((ground(CC)->Key=CC ; cc_key(CC,Key))).
 make_key(CC,Key):- hotrace((ground(CC)->Key=CC ; cc_key(CC,Key))).
@@ -145,6 +145,10 @@ retract_can_table :- retractall(maybe_table_key(_)).
 :- meta_predicate(make_key(?,-)).
 
 :- module_transparent((ex)/0).
+
+:-dynamic(user:already_added_this_round/1).
+:- export(user:already_added_this_round/1).
+expire_dont_add:-retractall(user:already_added_this_round(_)),expire_tabled_list(all),nop(dmsg(expire_dont_add)).
 
 lex:-listing(tlbugger:ilc(_)),forall(current_predicate(table_bugger:F/A),listing(table_bugger:F/A)),catchvv(listing(user:already_added_this_round),_,true).
 (ex):-expire_tabled_list(_),retractall(tlbugger:ilc(_)),dmsg_showall(_),forall(current_predicate(table_bugger:F/A),(functor(RA,F,A),retractall(RA))),catchvv(expire_dont_add,_,true).

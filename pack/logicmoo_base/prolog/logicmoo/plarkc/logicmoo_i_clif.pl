@@ -39,7 +39,7 @@ clif_to_prolog(CLIF,Prolog):-cwc,is_list(CLIF),!,must_maplist(clif_to_prolog,CLI
 clif_to_prolog((H,CLIF),(T,Prolog)):-cwc,sanity(must(nonvar(H))),!,trace,clif_to_prolog(H,T),clif_to_prolog(CLIF,Prolog).
 clif_to_prolog((H<-B),(H<-B)):- cwc,!.
 clif_to_prolog((P==>Q),(P==>Q)):- cwc,!.
-clif_to_prolog((H:-B),PrologO):- cwc,!,must((show_call(boxlog_to_pfc((H:-B),Prolog)),!,=(Prolog,PrologO))),!.
+clif_to_prolog((H:-B),PrologO):- cwc,!,must((show_call_failure(boxlog_to_pfc((H:-B),Prolog)),!,=(Prolog,PrologO))),!.
 clif_to_prolog(CLIF,PrologO):- cwc,
   % somehow integrate why_to_id(tell,Wff,Why),
      must_det_l((
@@ -51,10 +51,10 @@ clif_to_prolog(CLIF,PrologO):- cwc,
 
 % Sanity Test for expected side-effect entailments
 % why does renumbervars work but not copy_term? 
-clif_must(CLIF0):- cwc, =(CLIF0,CLIF),sanity((clif_to_prolog(CLIF,Prolog),!,sanity(( \+ \+ (show_call(are_clauses_entailed(Prolog))))))),!.
+clif_must(CLIF):- cwc, sanity((clif_to_prolog(CLIF,Prolog),!,sanity(( \+ \+ (show_call_failure(are_clauses_entailed(Prolog))))))),!.
 
 % Sanity Test for required absence of specific side-effect entailments
-clif_must_not(CLIF):- cwc, sanity((clif_to_prolog(CLIF,Prolog),show_call(\+ are_clauses_entailed(Prolog)))),!.
+clif_must_not(CLIF):- cwc, sanity((clif_to_prolog(CLIF,Prolog),show_call_failure(\+ are_clauses_entailed(Prolog)))),!.
 
 
 :-op(1190,xfx,(:-)).
@@ -96,7 +96,7 @@ arity(pfclog,1).
 (clif(CLIF),{delistify_last_arg(CLIF,kif_to_boxlog,PROLOG)}) ==> boxlog(PROLOG).
 (boxlog(CLIF),{delistify_last_arg(CLIF,boxlog_to_pfc,PROLOG)}) ==> pfclog(PROLOG).
 % :- pfc_trace.
-(pfclog(PROLOG)==>(PROLOG,{clif_must(PROLOG)})).
+(pfclog(PROLOG)==>(PROLOG,{slow_sanity(clif_must(PROLOG))})).
 
 
 /*
@@ -114,6 +114,8 @@ arity(pfclog,1).
 ({is_clif(CLIF)} ==>
   (CLIF/is_clif(CLIF) ==> clif(CLIF))).
 
+
+end_of_file.
 
 
 

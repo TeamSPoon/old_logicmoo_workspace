@@ -80,7 +80,7 @@ run_mud_test(Filter):-
    functor(H,F,A),
    not(predicate_property(M:H,imported_from(_))),
    clause(M:H,B),
-   use_term_listing(Filter,M:H,B),
+   term_matches_hb(Filter,M:H,B),
    once(run_mud_test_clause(M:H,B)),
    fail)).
 

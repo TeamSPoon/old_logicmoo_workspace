@@ -109,7 +109,6 @@
 :- dynamic_multifile_exported user:loaded_external_kbs/0.
 :- dynamic_multifile_exported user:loading_module_h/1.
 :- dynamic_multifile_exported user:registered_module_type/2.
-:- dynamic_multifile_exported user:already_added_this_round/1.
 :- dynamic_multifile_exported user:must_compile_special_clause_file/1.
 
 % HOOKS

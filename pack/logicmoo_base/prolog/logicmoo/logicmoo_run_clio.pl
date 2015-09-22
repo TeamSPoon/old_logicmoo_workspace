@@ -66,7 +66,7 @@ user_db:grant_openid_server(_,_).
 :- http_handler('/hmud/', http_reply_from_files('../pack/hMUD/', []), [prefix]).
 %user:file_search_path(hmud_files, '../pack/hMUD')).
 
-% :- lsting((pre_http_location(_, _, _))), retractall((pre_http_location(cliopatria, root('.'), []))), retractall((pre_http_location(_, root('.'), []))),!.
+% :- listing((pre_http_location(_, _, _))), retractall((pre_http_location(cliopatria, root('.'), []))), retractall((pre_http_location(_, root('.'), []))),!.
 % doesn't descend from root because that's being moved for cliopatria
 % http:location(cliopatria, root(cliopatria), [priority(100)]).
 
@@ -125,6 +125,9 @@ semweb_startup_late:- cp_server:attach_account_info.
 % :- asserta((user:file_search_path(A,B):-pre_file_search_path(A,B))).
  
 % :- debug(_).
+
+:- meta_predicate cpa_browse:when_true(0,//,?,?).
+:- meta_predicate rdf_describe:rdf_include_labels(3,+,+).
 
 % semweb_startup_late:- debug(http_request(_)),debug(cm(_)),debug(swish(_)),debug(storage).
 % semweb_startup_late:- listing(pre_http_location/3).

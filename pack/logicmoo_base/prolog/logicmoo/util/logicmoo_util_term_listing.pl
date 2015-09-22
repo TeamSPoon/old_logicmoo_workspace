@@ -28,7 +28,7 @@ blob_info(A,blob(text),blob(A,text)).
 blob_info(A,functor_safe(Y),functor_safe(A,Y)).
 blob_info(A,key,key(A,Y)):-findall(V,recorded(A,V),Y).
 blob_info(A,flag,flag(A,Y)):-flag(A,Y,Y).
-blob_info(A,blob(clause),blob(A,T,Y,H,B)):-T=clause, findall(V,clause_property(A,V),Y),(clause(H,B,A)->true;H=dead).
+blob_info(A,blob(clause),blob(A,T,Y,H,B)):-T=clause, findall(V,clause_property(A,V),Y),(m_clause(_,H,B,A)->true;H=dead).
 blob_info(A,blob(record),blob(A,T,Y)):-T=record,with_output_to(string(Y),print_record_properties(A, current_output)).
 % blob_info(A,blob(T),blob(A,T,Y)):-with_output_to(string(Y),prolog_term_view:emit_term(A, [])).
 blob_info(A,blob(T),blob(A,T)).
@@ -51,19 +51,24 @@ print_record_properties(Record, Out) :-
 
 print_clause_properties(REF, Out) :-
 	format(Out, 'Clause reference ~w~n', [REF]),
-	(   clause(Head, Body, REF)
+	(   m_clause(_,Head, Body, REF)
 	->  nl(Out),
 	    portray_clause(Out, (Head:-Body))
 	;   format(Out, '\t<erased>~n', [])
 	).
 
 
+m_clause(M,H,B,R):- catch(m_clause0(M,H,B,R),E, R=missing(M,H,B,E)).
+
+m_clause0(M,H,B,R):- atom(M),!, M:clause(H,B,R).
+m_clause0(_,H,B,R):- user:clause(H,B,R).
+
 :-thread_local(thlocal:tl_hide_data/1).
 
 
 :-multifile shared_hide_data/1.
 
-shared_hide_data(saved_varname_info/3):- !,hide_data(hideMeta).
+shared_hide_data(varname_info/3):- !,hide_data(hideMeta).
 
 hide_data(_):-hide_data0(showAll),!,fail.
 hide_data(P):-notrace(hide_data0(P)).
@@ -188,12 +193,22 @@ term_non_listing(Match):-
       term_listing_inner(portray_hbr,Match),
    format(' <= term_non_listing(~q) */ ~n',[Match]).
 
-term_listing_inner(Pred,Match):-atom(Match),!,
-      '@'(doall((
-         synth_clause_for(H,B,Ref),(term_matches_unify(99,Match,((H:-B)))->must(call(Pred,H,B,Ref))->fail))),'user').
-term_listing_inner(Pred,Match):-
-      '@'(doall((
-         synth_clause_for(H,B,Ref),(term_matches_hb(Match,H,B)->must(call(Pred,H,B,Ref))->fail))),'user').
+
+
+get_matcher_code(Match,H,B,CODE):-  atom(Match),!, CODE= term_matches_unify(99,Match,((H:-B))).
+get_matcher_code(Match,H,B,CODE):-  CODE = term_matches_hb(Match,H,B).
+
+term_listing_inner(Pred,Match):-     
+   get_matcher_code(Match,H,B,CODE),!,
+   doall(((synth_clause_for(H,B,Ref,Size,CALL),
+     (( 
+      (hide_data(wholePreds),Size<100) 
+        -> 
+          ( \+ \+ ((CALL,CODE)) -> '@'(forall(CALL,must(once(call(Pred,H,B,Ref)))),'user') ; true) 
+         ; 
+
+        ('@'(forall(CALL,(CODE->must(once(call(Pred,H,B,Ref))))),'user'))))))).
+      
 
 :- multifile user:prolog_list_goal/1.
 % user:prolog_list_goal(Goal):- writeq(hello(prolog_list_goal(Goal))),nl.
@@ -228,28 +243,33 @@ sourceTextPredicateSource(_):-fail.
 :- thread_local(thlocal:large_predicates/2).
 
 
-synth_clause_for(G,true,0):-  bookeepingPredicateXRef(G), \+ hide_data(hideMeta), failOnError(G).
-synth_clause_for(G,B,Ref):-  cur_predicate(_,M:H), \+ bookeepingPredicateXRef(M:H), \+ sourceTextPredicate(M:H), \+ hide_data(M:H), synth_clause_ref(M:H,G,B,Ref).
-synth_clause_for(G,true,0):-  sourceTextPredicate(G), \+ hide_data(G), failOnError(G).
-synth_clause_for(G,B, Ref):- \+ hide_data(skipLarge), gripe_time(10,synth_clause_for_l2(G,B,Ref)).
 
-synth_clause_for_l2(M:H,B,Ref):- 
- (findall((Size-(M:H)),retract(thlocal:large_predicates(M:H,Size)),KeyList),
-   keysort(KeyList,KeySorted), pairs_values(KeySorted, ByLength),format('~N~n% listing larger preds now.. ~q~n',[KeySorted])),!,
-   synth_clause_for_large(M:H,B,Ref,ByLength).
+synth_clause_for(G,true,0,200,CALL):-  bookeepingPredicateXRef(G), \+ hide_data(hideMeta), CALL=failOnError(G).
+synth_clause_for(G,B,Ref,Size,CALL):-  cur_predicate(_,M:H), \+ bookeepingPredicateXRef(M:H), \+ sourceTextPredicate(M:H), \+ hide_data(M:H), synth_clause_ref(M:H,G,B,Ref,Size,CALL).
+synth_clause_for(G,true,0,200, CALL):-  sourceTextPredicate(G), \+ hide_data(G), CALL = failOnError(G).
+synth_clause_for(G,  B, Ref,Size, CALL):- \+ hide_data(skipLarge), gripe_time(10,synth_clause_for_l2(G,B,Ref,Size,CALL)).
+ 
+synth_clause_for_l2(M:H,B,Ref,Size,CALL):- 
+ (findall((Size- (M:H)),retract(thlocal:large_predicates(M:H,Size)),KeyList),
+   keysort(KeyList,KeySorted), format('~N~n% listing larger preds now.. ~q~n',[KeySorted])),!,
+   synth_clause_for_large(M:H,B,Ref,KeySorted,Size,CALL).
 
-synth_clause_for_large(_,_,_,[]):-!.
-synth_clause_for_large(_,_,_,_):- hide_data(skipLarge),!.
-synth_clause_for_large(M:H,B,Ref,ByLength):- \+ hide_data(M:H),
-      ((must(member(M:H,ByLength)),must(M:clause(H,B,Ref)))).
+synth_clause_for_large(_,_,_,[],0,fail):-!.
+synth_clause_for_large(_,_,_,_,0,fail):- hide_data(skipLarge),!.
+synth_clause_for_large(M:H,B,Ref,KeySorted,Size,CALL):-   
+      ((must(member( (Size- (M:H)) , KeySorted))),
+      \+ hide_data(M:H),
+      CALL= must(m_clause(M,H,B,Ref))).
 
 :-swi_export((synth_clause_ref/3)).
-synth_clause_ref(M:H,M:predicate_property(H,B),true,0):- predicate_property(M:H,B), \+ hide_data(hideMeta).
-synth_clause_ref(_:saved_varname_info(_,_,_),_,_,_):-  \+ hide_data(showAll)  ,!,fail.
-synth_clause_ref(G,G,true,0):- synth_in_listing(G),  predicateUsesCall(G),!,failOnError(G).
-synth_clause_ref(M:H,M:H,B,Ref):- predicate_property(M:H,number_of_clauses(Size)),!,
+synth_clause_ref(M:H,M:predicate_property(H,B),true,0, 250, CALL):- \+ hide_data(hideMeta), CALL= predicate_property(M:H,B).
+synth_clause_ref(_:varname_info(_,_,_),_,_,_, _Size, _CALL):-  \+ hide_data(showAll)  ,!,fail.
+
+synth_clause_ref(G,G,true,  0,  213,CALL):- synth_in_listing(G),  predicateUsesCall(G),!, CALL= failOnError(G).
+synth_clause_ref(M:H,M:H,B,Ref,Size,CALL):- 
+  predicate_property(M:H,number_of_clauses(Size)),
     synth_in_listing(M:H),
-    (Size > 5000 -> (\+ hide_data(skipLarge), asserta(thlocal:large_predicates(M:H,Size)),fail); M:clause(H,B,Ref)).
+  (Size > 5000 ->  (\+ hide_data(skipLarge), asserta(thlocal:large_predicates(M:H,Size)),fail) ; CALL = m_clause(M,H,B,Ref)).
 
 
 synth_in_listing(MH):- ( \+ hide_data(MH), \+ sourceTextPredicateSource(MH) ),!.
@@ -258,6 +278,8 @@ synth_in_listing(MH):- ( \+ hide_data(MH), \+ sourceTextPredicateSource(MH) ),!.
 % synth_clause_ref(H,(fail,synth_clause_info(Props)),0):- (H\=(_:-_)),once(pred_info(H,Props)), Props\==[].
 
 :-swi_export((term_matches_hb/3)).
+
+
 
 term_matches_hb(HO,H,B):-term_matches_hb(999,HO,H,B).
 term_matches_hb(_,Var,_,_):-var(Var),!.

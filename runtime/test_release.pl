@@ -1,53 +1,40 @@
-% #! swipl -L8G -G8G -T8G -f
+#!/usr/bin/env swipl
 /** <module> Logicmoo_base sanity test script to be ran before a release
 
 */
 
-:- initialization(attach_packs).
 
-:-if(\+(exists_source(logicmoo(logicmoo_base)))).
-:- dynamic   user:file_search_path/2.
-:- multifile user:file_search_path/2.
-
-:- if(exists_directory(runtime)).
-user:file_search_path(pack, './pack').
-:- else.
-user:file_search_path(pack, '../pack').
-:- endif.
-
-:- attach_packs.
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
-:- endif.
-
-:- initialization(attach_packs).
-
-:- asserta(thlocal:verify_side_effect_buffer).
+% ==============================
+% Setup Testing Options
+% ==============================
 
 :- asserta(user:load_mud_www).
-:- user:ensure_loaded(library(logicmoo/logicmoo_base)).
-:- gripe_time(40,user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
-:- ensure_webserver.
-
-% [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/)
-:- if_file_exists(user:ensure_loaded(library(eggdrop))).
-:- eggdrop:egg_go.
-:- initialization((current_predicate(egg_go/0)->egg_go;true),now).
-
-/*
-% [Required] Load the Logicmoo WWW System
-:- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_pldoc)))).
-:- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_clio)))).
-:- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_swish)))).
-*/
+:- asserta(thlocal:verify_side_effect_buffer).
+:- asserta(skip_el_assertions).
 
 
+% ==============================
+% Setup Runtime paths
+% ==============================
+
+:- ensure_loaded(setup_paths).
+
+:- test_for_release(setup_paths).
+
+% ==============================
+% Load logicmoo REPL Base
+% (and Default Daemons/inference engine)
+% ==============================
+
+:- test_for_release(logicmoo_repl).
 
 
-
+% ==============================
+% Release tests
+% ==============================
 
 % :- statistics(globallimit,G),statistics(locallimit,L),statistics(traillimit,T),qsave_program(logicmoo_repl,[map('logicmoo_repl.sav'),global(G),trail(T),local(L)]).
 
-:- initialization(list_undefined).
 
 :- tell(blalla).
 
@@ -59,13 +46,12 @@ user:file_search_path(pack, '../pack').
 
 :- told.
 
-:- initialization(list_undefined).
 
 % [Required] Load the Logicmoo Backchaining Inference System
-:- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
+:- gripe_time(40,with_no_mpred_expansions(if_file_exists(test_for_release(logicmoo(logicmoo_engine))))).
 
 
-
+:- asserta(skip_el_assertions).
 :- dynamic  el_assertions:el_holds/4.
 :- dynamic  el_assertions:el_holds/10.
 :- dynamic  el_assertions:el_holds/11.
@@ -76,27 +62,18 @@ user:file_search_path(pack, '../pack').
 :- rl_add_history('help(match_regex/2).').
 :- rl_add_history('list_undefined.').
 
-:- user:ensure_loaded(library(logicmoo/logicmoo_plarkc)).
-:- initialization(list_undefined).
-:- prolog.
 
-:- user:ensure_loaded(library(logicmoo/logicmoo_planner)).
-:- initialization(list_undefined).
-:- prolog.
-
-:- user:ensure_loaded(run_mud_server).
-:- initialization(list_undefined).
-:- prolog.
-
-
-:- user:ensure_loaded(init_mud_server).
+:- test_for_release(library(logicmoo/logicmoo_plarkc)).
+:- test_for_release(library(logicmoo/logicmoo_planner)).
+:- test_for_release(library(parser_all)).
+:- test_for_release(init_mud_server).
 
 
 % [Never] saves about a 3 minute compilation time (for when not runing mud)
 :- if((fail,gethostname(titan),fail)).
 :- if_startup_script( finish_processing_world).
 :- enqueue_agent_action("rez crackers").
-%:- prolog.
+
 :- endif.
 
 
@@ -111,11 +88,10 @@ user:file_search_path(pack, '../pack').
 
 %:- rescan_pfc. 
 :-dmsg("About to run Sanity").
-%:- prolog.
+
 
 :- show_call_entry(gripe_time(40,if_startup_script(doall(user:sanity_test)))).
 
-%:- prolog.
 
 feature_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
 
@@ -156,20 +132,34 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 % [Optionaly] Tell the NPCs to do something every 60 seconds (instead of 90 seconds)
 % :- register_timer_thread(npc_ticker,60,npc_tick).
 
-:- show_call_entry(gripe_time(40,user:ensure_loaded(prologmud(mud_startup)))).
+:- show_call_entry(gripe_time(40,test_for_release(prologmud(mud_startup)))).
 
 
 :- pce_show_profile.
 
 :-endif.  % MUD TESTS
-% :- enqueue_agent_action(prolog).
-
-:- initialization(list_undefined).
-:- prolog.
-
-:- user:ensure_loaded(library(logicmoo/parser_all)).
-:- initialization(list_undefined).
 
 
-:- user:ensure_loaded(run_mud_game).
+
+:- multifile(user:push_env_ctx/0).
+:- dynamic(user:push_env_ctx/0).
+
+push_env_ctx:-!,fail.
+push_env_ctx:-!.
+
+:- test_for_release(debug_mud_game).
+
+:- asserta(thlocal:disable_mpred_term_expansions_locally).
+
+
+% :- statistics(globallimit,G),statistics(locallimit,L),statistics(traillimit,T),qsave_program(logicmoo_repl,[map('logicmoo_repl.sav'),global(G),trail(T),local(L)]).
+
+
+
+% [Mostly Required] Load the UPV Curry System
+%:- time(test_for_release(library(upv_curry/main))).
+
+
+
+
 

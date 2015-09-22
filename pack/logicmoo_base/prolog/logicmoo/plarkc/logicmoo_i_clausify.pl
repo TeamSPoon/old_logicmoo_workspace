@@ -762,7 +762,7 @@ display_form(KB,Form):- demodal_sents(KB,Form,OutM),local_pterm_to_sterm(OutM,Ou
 demodal_sents(KB,I,O):- must_det_l((demodal(KB,I,M),modal2sent(M,O))).
 
 demodal(KB,In,Prolog):- call_last_is_var(demodal(KB,In,Prolog)),!.
-demodal(_KB,Var, Var):- notrace(leave_as_is(Var)),!.
+demodal(_KB,Var, Var):- cnotrace(leave_as_is(Var)),!.
 demodal(KB,[H|T],[HH|TT]):- !, demodal(KB,H,HH),demodal(KB,T,TT).
 demodal(KB, not(H), not(HH)):-!, demodal(KB,H, HH),!.
 
@@ -783,7 +783,7 @@ is_sent_op_modality(poss).
 is_sent_op_modality(nesc).
 atom_compat(F,HF,HHF):- fail,F\=HF, is_sent_op_modality(F),is_sent_op_modality(HF), format(atom(HHF),'~w_~w',[F,HF]).
 
-modal2sent(Var, Var):- notrace(leave_as_is(Var)),!.
+modal2sent(Var, Var):- cnotrace(leave_as_is(Var)),!.
 modal2sent(G,O):- G=..[F,H], \+ leave_as_is(H), H=..[HF,HH], atom_compat(F,HF,HHF),!, GG=..[HHF,HH], modal2sent(GG,O).
 modal2sent([H|T],[HH|TT]):- !, must(( modal2sent(H,HH),modal2sent(T,TT))),!.
 modal2sent(H,HH ):- H=..[F|ARGS],!,must_maplist(modal2sent,ARGS,ARGSO),!,HH=..[F|ARGSO].
@@ -1024,7 +1024,7 @@ mk_skolem_name(_O ,_V,[],SIn,SIn):- !.
 mk_skolem_name(_O,_V, OP,SIn,SIn):- is_log_op(OP),!.
 mk_skolem_name(_O,_V,Fml,SIn,SOut):- atomic(Fml),!,i_name(Fml,N),toPropercase(N,CU),!,(atom_contains(SIn,CU)->SOut=SIn;atom_concat(SIn,CU,SOut)).
 mk_skolem_name(KB,Var,[H|T],SIn,SOut):- !,mk_skolem_name(KB,Var,H,SIn,M),mk_skolem_name(KB,Var,T,M,SOut).
-mk_skolem_name(KB,Var,isa(VX,Lit),SIn,SOut):- same_var(Var,VX),not_ftVar(Lit),!,mk_skolem_name(KB,Var,['Is',Lit,'In'],'',F),atom_concat(F,SIn,SOut).
+mk_skolem_name(KB,Var,isa(VX,Lit),SIn,SOut):- same_var(Var,VX),is_ftNonvar(Lit),!,mk_skolem_name(KB,Var,['Is',Lit,'In'],'',F),atom_concat(F,SIn,SOut).
 mk_skolem_name(KB,Var,Fml,SIn,SOut):- Fml=..[F,VX],same_var(Var,VX),!,mk_skolem_name(KB,Var,['Is',F,'In'],SIn,SOut).
 mk_skolem_name(KB,Var,Fml,SIn,SOut):- Fml=..[F,Other,VX|_],same_var(Var,VX),!,type_of_var(KB,Other,OtherType),
    mk_skolem_name(KB,Var,[OtherType,'Arg2Of',F],SIn,SOut).

@@ -379,6 +379,7 @@ ensure_universal_stub5(HeadIn,Head,F,A,HBLIST):- user:mpred_prop(F,prologDynamic
        ((wdmsg(error(cannot_absorb_all_clauses((Head))))),!,fail)).
 
 
+
 ensure_universal_stub5(HeadIn,Head,F,A,HBLIST):-  must((StubType = prologHybrid)),
    forall(member(HB,HBLIST),must(show_call(assert_mpred_t(HB)))),!,
    expire_dont_add,ex,

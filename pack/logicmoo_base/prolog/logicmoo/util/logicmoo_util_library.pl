@@ -400,7 +400,8 @@ functor_h(Obj,Obj,0):-not(compound(Obj)),!.
 functor_h(Obj,F,A):-functor(Obj,F,A).
 
 
-:- dynamic_multifile_exported((do_expand_args/3)).
+:- swi_export((do_expand_args/3)).
+:- dynamic_multifile_exported((argsQuoted/1)).
 
 do_expand_args(_,Term,Term):- compound(Term),functor(Term,F,_),argsQuoted(F),!.
 do_expand_args(Exp,Term,Out):- compound(Term),!,do_expand_args_c(Exp,Term,Out).

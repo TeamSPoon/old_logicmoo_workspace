@@ -138,7 +138,7 @@ relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
 
 :- if(if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
 
-:- pfc_spy_all.
+% :- pfc_spy_all.
 
 :- endif.
 

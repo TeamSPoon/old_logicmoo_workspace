@@ -235,9 +235,9 @@ save_request_in_session(Request):-
 
 
 
-handler_logicmoo_cyclone(_Request):- is_goog_bot,!,
+handler_logicmoo_cyclone(_Request):- notrace(((is_goog_bot,!,
   format('Content-type: text/html~n~n',[]),
-  format('<!DOCTYPE html><html><head></head><body></body></html>~n~n',[]),flush_output,!.
+  format('<!DOCTYPE html><html><head></head><body></body></html>~n~n',[]),flush_output))),!.
 
 handler_logicmoo_cyclone( Request):-    
   notrace( call(handler_logicmoo_cyclone_1,Request)),!.
@@ -349,8 +349,8 @@ sensical_nonvar(O):-nonvar(O), O \= (_ - _).
 
 cvt_param_to_term(In,Obj,Vs):-atom(In),failOnError(atom_to_term(In,Obj,Vs)),sensical_nonvar(Obj),!.
 cvt_param_to_term(In,Obj,Vs):-string(In),failOnError(atom_to_term(In,Obj,Vs)),sensical_nonvar(Obj),!.
-cvt_param_to_term('~w',"").
-cvt_param_to_term(In,Obj):-cvt_param_to_term(In,Obj,_Vs).
+cvt_param_to_term('~w',""):-!.
+cvt_param_to_term(In,Obj):-cvt_param_to_term(In,Obj,_Vs),!.
 cvt_param_to_term(Obj,Obj).
 
 
@@ -450,7 +450,7 @@ search4term:-
   get_param_sess(term,Term,"tHumanHead"),
   get_param_sess(find,SObj,Term),
   cvt_param_to_term(SObj,Obj),
-  call_for_terms(make_page_pretext_obj(Obj)).
+  call_for_terms(make_page_pretext_obj(Obj)),!.
 
 edit1term:-  
   get_param_req('ASK','ASK'),!,
@@ -460,7 +460,7 @@ edit1term:-
    cvt_param_to_term(String,Term,VNs),
    save_in_session(find,Term),
    % call_for_terms
-   edit1term(forall(Term,pp_item('Answer',':-'(VNs,Term))))))).
+   edit1term(forall(Term,pp_item('Answer',':-'(VNs,Term))))))),!.
   
 edit1term:- 
   get_param_req('TELL','TELL'),!,
@@ -470,7 +470,7 @@ edit1term:-
    cvt_param_to_term(String,Term,VNs),
    save_in_session(find,Term),
    maplist(as_ftVars,VNs),
-   call_for_terms(forall(pfc_add(Term),pp_item('Assert',':-'(VNs,Term))))))).
+   call_for_terms(forall(pfc_add(Term),pp_item('Assert',':-'(VNs,Term))))))),!.
   
 edit1term:- 
   get_param_req('RETRACT','RETRACT'),!,
@@ -480,20 +480,20 @@ edit1term:-
    cvt_param_to_term(String,Term,VNs),
    save_in_session(find,Term),
    maplist(as_ftVars,VNs),
-   call_for_terms(forall(pfc_rem1(Term),pp_item('Retract',':-'(VNs,Term))))))).
+   call_for_terms(forall(pfc_rem1(Term),pp_item('Retract',':-'(VNs,Term))))))),!.
   
 edit1term:-
  must_det_l((
              reset_assertion_display,
              get_param_sess(term,String,""),get_param_sess(find,Word,""),term_to_pretty_string(Word,SWord),
-                save_in_session(find,SWord),
+                save_in_session(find,Word),
    show_edit_term(true,String,SWord))),!,
  show_iframe(search4term,find,SWord).
 
 edit1term(Call):-
  must_det_l((
              reset_assertion_display,
-             get_param_sess(term,String,""),get_param_sess(find,Word,""),term_to_pretty_string(Word,SWord),save_in_session(find,SWord),
+             get_param_sess(term,String,""),get_param_sess(find,Word,""),term_to_pretty_string(Word,SWord),save_in_session(find,Word),
    show_edit_term(Call,String,SWord))),!.
 
 
@@ -505,7 +505,7 @@ show_edit_term0(Call,String,SWord):-show_edit_term1(Call,String,SWord).
 
 show_edit_term1(Call,String,(P=>Q)):-!,show_edit_term1(Call,String,(P;Q;(P=>Q))),!.
 show_edit_term1(Call,String,SWord):-
- write_begin_html('edit1term',_BASE,URL),
+ write_begin_html('edit1term',_BASE,URL),!,
 format('
 <table width="1111" cellspacing="0" cellpadding="0" height="121" id="table4">
  <!-- MSTableType="nolayout" -->
@@ -565,12 +565,11 @@ format('
     show_select2('POS',partOfSpeech,[]),
     show_select1('humanLang',human_language),
     URL,
-    show_select2(olang,logic_lang_name,[])]),!,
-   dmsg(find=SWord),!,
+    show_select2(olang,logic_lang_name,[])]),!,   
    format('<pre>',[]),
-   Call,
+   logOnError(Call),!,
    format('</pre>',[]),
-   write_end_html.
+   write_end_html,!.
 
 show_iframe(URL,Name,Value):- format('<iframe width="100%" height="800" frameborder="0" scrolling="yes" marginheight="0" marginwidth="0" allowtransparency=true id="main" name="main" style="width:100%;height:800" src="~w?~w=~w"></iframe>',[URL,Name,Value]).
 show_iframe(URL):- format('<iframe width="100%" height="800" frameborder="0" scrolling="yes" marginheight="0" marginwidth="0" allowtransparency=true id="main" name="main" style="width:100%;height:800" src="search4term?find=~w"></iframe>',[URL]).
@@ -599,6 +598,7 @@ search_filter_name_comment(hideTriggers,'Hide Triggers','1').
 search_filter_name_comment(skipLarge,'No Large','1').
 search_filter_name_comment(showHyperlink,'Hyperlink','1').
 search_filter_name_comment(showFilenames,'Filenames','0').
+search_filter_name_comment(wholePreds,'Whole Preds','0').
 search_filter_name_comment(skipVarnames,'Skip Varnames','0').
 search_filter_name_comment(hideClauseInfo,'Skip ClauseInfo','1').
 search_filter_name_comment(showAll,'Show All','0').

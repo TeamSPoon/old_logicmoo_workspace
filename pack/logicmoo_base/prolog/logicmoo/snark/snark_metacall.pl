@@ -106,7 +106,7 @@ each_subterm00(B, A):- A=B;(compound(B), (functor(B,A,_);((arg(_, B, C), each_su
 
 add_mi(_Caller,G,O):- prolog_load_context(source,File),
    source_location(File,_),trace,source_location(File,_),
-   not(notrace((each_subterm00(G,ST),atom(ST),member(ST,[show_call,show_gcall])))), get_functor(G,F,A),!,use_gcall(F,A),!,
+   not(cnotrace((each_subterm00(G,ST),atom(ST),member(ST,[show_call,show_gcall])))), get_functor(G,F,A),!,use_gcall(F,A),!,
     not(dont_use_gcall(F,A)),!, O=gshow_call(G),!. % dmsg(expanded(G)).
 
 logical_pos_maybe(_,A,A):-!.

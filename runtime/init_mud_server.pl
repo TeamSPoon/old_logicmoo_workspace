@@ -1,4 +1,4 @@
-% #! swipl -L8G -G8G -T8G -f
+#!/usr/bin/env swipl
 /** <module> MUD server startup script in SWI-Prolog
 
 */

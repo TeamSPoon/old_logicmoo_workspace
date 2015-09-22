@@ -11,7 +11,7 @@ user:swi_module(_,_).
 
 :-swi_module(logicmoo_util_all,[if_flag_true/2]).
 :- set_prolog_flag(generate_debug_info, true).
-:- set_prolog_flag(access_level,system).
+%:- set_prolog_flag(access_level,system).
 
 :- meta_predicate agenda_slow_op_enqueue(?).
 :- meta_predicate agg_all_test2(?,?,?).
@@ -133,7 +133,7 @@ user:swi_module(_,_).
 :- set_prolog_flag(double_quotes,string).
 
 % have to load this module here so we dont take ownership of prolog_exception_hook/4.
-:- set_prolog_flag(access_level,system).
+%:- set_prolog_flag(access_level,system).
 %:- set_prolog_flag(verbose_autoload, true).
 %:- set_prolog_flag(generate_debug_info, true).
 % have to load this module here so we dont take ownership of prolog_exception_hook/4.

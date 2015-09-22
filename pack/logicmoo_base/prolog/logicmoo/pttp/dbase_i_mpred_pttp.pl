@@ -217,7 +217,7 @@ clear_pttp:- eraseall(int_query,_),eraseall(int_not_query,_),
 :-dynamic(pttp_test_fails_is_ok/1).
 :-export(do_pttp_test_maybe/2).
 
-do_pttp_test_maybe(TestName):- forall(pttp_test(TestName,Data),do_pttp_test_maybe(TestName,Data)),lsting(pttp_test_took).
+do_pttp_test_maybe(TestName):- forall(pttp_test(TestName,Data),do_pttp_test_maybe(TestName,Data)),listing(pttp_test_took).
 do_pttp_test_maybe(TestName,_) :- pttp_test_fails_is_ok(TestName),!.
 do_pttp_test_maybe(TestName,Data) :- do_pttp_test(TestName,Data).
 
@@ -272,8 +272,8 @@ gripe_pttp_failure(Test):- ignore(pttp_test_took(Test, failure, Time)),trace_or_
 
 :-export(isNegOf/2).
 isNegOf(N1,N):-number(N),!,N1 is -N.
-isNegOf(N,-N):-not_ftVar(N),!.
-isNegOf(-N,N):-not_ftVar(N),!.
+isNegOf(N,-N):-is_ftNonvar(N),!.
+isNegOf(-N,N):-is_ftNonvar(N),!.
 isNegOf(N1,N):-dtrace(not(isNegOf(N1,N))),isNegOf(N,N1).
 
 

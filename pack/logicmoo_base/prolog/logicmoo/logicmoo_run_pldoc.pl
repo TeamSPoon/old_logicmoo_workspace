@@ -201,7 +201,7 @@ do_semweb_startup:-
 prolog:sandbox_allowed_clause(Clause):-nonvar(Clause).
 
 
-
+/*
 normal_verify_predefined_safe_declarations :-
         \+ ( clause(safe_primitive(A), _, C),
              \+ ( catch(verify_safe_declaration(A), B, true),
@@ -216,7 +216,7 @@ normal_verify_predefined_safe_declarations :-
                   )
                 )
            ).
-
+*/
 
 
 :- abolish(sandbox:safe_primitive,1).

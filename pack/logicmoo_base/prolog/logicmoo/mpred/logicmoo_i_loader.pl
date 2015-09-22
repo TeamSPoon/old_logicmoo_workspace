@@ -33,7 +33,7 @@ load_language_file(Name0):-
  
 
 
-user:prolog_load_file(Module:Spec, Options):- loop_check(prolog_load_file_nlc(Module:Spec, Options)).
+user:prolog_load_file(Module:Spec, Options):- fail,loop_check(prolog_load_file_nlc(Module:Spec, Options)).
 
 prolog_load_file_nlc(Module:Spec, Options):- user:never_reload_file(Spec),
    wdmsg(warn(error(skip_prolog_load_file_nlc(user:never_reload_file(Module:Spec, Options))))),!.
@@ -468,7 +468,7 @@ pfc_skipped_module(eggdrop).
 :-retractall(pfc_skipped_module(pfc)).
 % :-show_call(loading_module(X)),retractall(X).
 
-%:-lsting(pfc_skipped_module/1).
+%:-listing(pfc_skipped_module/1).
 
 
 :-multifile(thlocal:into_form_code).
@@ -480,9 +480,9 @@ pfc_skipped_module(eggdrop).
 %bwc:-true.
 cwc:-true.
 
-%is_fc_body(P):- notrace(fwc==P ; (compound(P),arg(1,P,E),is_fc_body(E))),!.
-%is_bc_body(P):- notrace(bwc==P ; (compound(P),arg(1,P,E),is_bc_body(E))),!.
-is_code_body(P):- notrace(cwc==P ; (compound(P),arg(1,P,E),is_code_body(E))),!.
+%is_fc_body(P):- cnotrace(fwc==P ; (compound(P),arg(1,P,E),is_fc_body(E))),!.
+%is_bc_body(P):- cnotrace(bwc==P ; (compound(P),arg(1,P,E),is_bc_body(E))),!.
+is_code_body(P):- cnotrace(cwc==P ; (compound(P),arg(1,P,E),is_code_body(E))),!.
 
 
 :- meta_predicate(with_source_module(:,(*))).
@@ -777,7 +777,7 @@ lang_op_alias(pfc,(<-),(<-)).
 lang_op_alias(pfc,(not),(neg)).
 lang_op_alias(pfc,not(:-),neg(:-)).
 lang_op_alias(pfc,(:-),(:-)).
-lang_op_alias(pfc,(A=B),{(A=B)}).
+% lang_op_alias(pfc,(A=B),{(A=B)}).
 % kif
 lang_op_alias(kif,(<==>),(<==>)).
 lang_op_alias(kif,(==>),==>).
@@ -883,10 +883,29 @@ pfc_file_expansion_z((==>(P)),(:- cl_assert(pfc(fwc),(==>(P))))).
 pfc_file_expansion_z(Fact,(:- cl_assert(pl,Fact))):- get_functor(Fact,F,_A),if_defined(prologDynamic(F)).
 pfc_file_expansion_z(Fact,Output):- pfc_file_expansion_1(_Dir,Fact,C),must(pfc_file_expansion_z(C,Output)),!.
 
-      pfc_file_expansion_1(pfc(act),(H:-Chain,B),({(Chain,B)}==>H)):-cwc, is_action_body(Chain),make_dynamic(H).
-      pfc_file_expansion_1(pfc(fwc),(H:-Chain,B),({(Chain,B)}==>H)):-cwc, is_fc_body(Chain),make_dynamic(H).
-      pfc_file_expansion_1(pfc(bwc),(H:-Chain,B),(H<-(Chain,B))):-cwc, is_bc_body(Chain),make_dynamic(H).
-      
+      pfc_file_expansion_1(pfc(act),(H:-(Chain,B)),(PFC==>PH)):-cwc, is_action_body(Chain),pl_to_pfc_syntax((Chain,B),PFC),pl_to_pfc_syntax_h(H,PH).
+      pfc_file_expansion_1(pfc(awc),(H:-(Chain,B)),(PH==>PFC)):-cwc, has_body_atom(twc,Chain),pl_to_pfc_syntax((Chain,B),PFC),pl_to_pfc_syntax_h(H,PH).
+      pfc_file_expansion_1(pfc(fwc),(H:-(Chain,B)),(PFC==>PH)):-cwc, is_fc_body(Chain),pl_to_pfc_syntax((Chain,B),PFC),pl_to_pfc_syntax_h(H,PH),can_be_dynamic(PH),make_dynamic(PH).
+      pfc_file_expansion_1(pfc(bwc),(H:-(Chain,B)),(PH<-PFC)):-cwc, is_bc_body(Chain),pl_to_pfc_syntax((Chain,B),PFC),pl_to_pfc_syntax_h(H,PH),can_be_dynamic(PH),make_dynamic(PH).
+      pfc_file_expansion_1(Type,In,Out):-pfc_file_expansion_1b(Type,In,Out),!.
+
+      pfc_file_expansion_1b(pfc(act),(H:-Chain,B),(H==>{(Chain,B)})):-cwc, is_action_body(Chain),make_dynamic(H).
+      pfc_file_expansion_1b(pfc(fwc),(H:-Chain,B),((Chain,B)==>H)):-cwc, is_fc_body(Chain),make_dynamic(H).
+      pfc_file_expansion_1b(pfc(bwc),(H:-Chain,B),(H<-(Chain,B))):-cwc, is_bc_body(Chain),make_dynamic(H).
+
+/*
+*/
+
+
+can_be_dynamic(H):- \+ is_static_pred(H), \+ predicate_property(H,static),  \+ predicate_property(H,meta_predicate(_)).
+
+pl_to_pfc_syntax_h(A,PFC_A):- must(pl_to_pfc_syntax0(A,PFC_A)),!, PFC_A \= '{}'(_).
+pl_to_pfc_syntax(A,PFC_A):- must(pl_to_pfc_syntax0(A,PFC_A)),!.
+
+pl_to_pfc_syntax0(A,A):-is_ftVar(A),!.
+pl_to_pfc_syntax0((A,B),PFC):-!,pl_to_pfc_syntax(A,PFC_A),pl_to_pfc_syntax(B,PFC_B),conjoin_body(PFC_A,PFC_B,PFC).
+pl_to_pfc_syntax0(pfc(A),A):-!.
+pl_to_pfc_syntax0(A,{A}):-!.
 
 pfc_file_expansion_z((H:-Chain,B),(H:-(B))):- is_code_body(Chain),!,fail,must(atom(Chain)),make_dynamic(H).
 
@@ -911,7 +930,7 @@ pfc_file_expansion_z(Fact,(:- ((cl_assert(dyn(dyn_file),Fact))))):- inside_file(
 pfc_file_expansion_z(Fact,(:- ((cl_assert(mpred(mpreds_file),Fact))))):- inside_file(mpreds),!.
 /*
 pfc_file_expansion_z(Fact,(:- ((cl_assert(pfc(expand_file),Fact))))):-
-    notrace(pfc_expand_inside_file_anyways(F)),!,_Output='$was_imported_kb_content$'(Fact,pfc_expand_inside_file_anyways(F)),!.
+    cnotrace(pfc_expand_inside_file_anyways(F)),!,_Output='$was_imported_kb_content$'(Fact,pfc_expand_inside_file_anyways(F)),!.
 */
 
 stream_pos(File:LineNo):-loading_source_file(File),current_input(S),stream_property(S, position(Position)), !,stream_position_data(line_count, Position, LineNo),!.

@@ -8,6 +8,13 @@ modes of compile for (H:-B) are
  pttp, = pttp iterative deepening
  dra,  = dynamic reording of alternatives (Solid tabling)
 
+File mode interpretation (LHS=>RHS) are 
+ clif  = Common Logic Interchange Format
+ cycl  = CycL
+ kif   = Knowledge Interchange Format
+ pfc   = Prolog Forward Chaining
+
+
 additional features that may be added/manipulated in the body
  ctx
  lin = argument linearization  via  linearize(lin,(H:-(G,B)),(HH:-BB),[],_,true,G).
@@ -105,9 +112,9 @@ body_for_pfc_1(Mode,Head,HeadO,C,CO):- (Mode ==(:-);Mode==(cwc);Mode==(<-)),over
     body_for_pfc_1(Mode,Head,HeadM,{Avoid},AA),body_for_pfc_2(Mode,HeadM,HeadO,C,BB),!,conjoin_body(AA,BB,CM),correct_mode(Mode,CM,CO).
 body_for_pfc_1(Mode,Head,NewNewHead,I,O):-body_for_pfc_2(Mode,Head,NewNewHead,I,M),correct_mode(Mode,M,O).
 
-overlaping(neg(C),Head,Avoid):-not_ftVar(C),!,overlaping(C,Head,Avoid).
-overlaping(C,neg(Head),Avoid):-not_ftVar(Head),!,overlaping(C,Head,Avoid).
-overlaping(C,Head,Avoid):-not_ftVar(Head),not_ftVar(C), compound(C),compound(Head),once((get_reln(C,FC),get_reln(Head,HC))),!,overlapingFunctors(FC,HC),!,Avoid=avoidHeadLoop(C,Head).
+overlaping(neg(C),Head,Avoid):-is_ftNonvar(C),!,overlaping(C,Head,Avoid).
+overlaping(C,neg(Head),Avoid):-is_ftNonvar(Head),!,overlaping(C,Head,Avoid).
+overlaping(C,Head,Avoid):-is_ftNonvar(Head),is_ftNonvar(C), compound(C),compound(Head),once((get_reln(C,FC),get_reln(Head,HC))),!,overlapingFunctors(FC,HC),!,Avoid=avoidHeadLoop(C,Head).
 
 overlapingFunctors(FC,HC):- (\+ \+ FC=HC),!.
 overlapingFunctors(t,_):-!.

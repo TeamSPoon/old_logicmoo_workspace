@@ -199,7 +199,7 @@ atomic_concat(A,B,C,Out):-atomic_list_concat_safe([A,B,C],Out).
 % CASE CHANGE
 % ===========================================================
 
-noCaseChange(VAR):-isSlot(VAR),!.
+noCaseChange(VAR):- if_defined(isSlot(VAR)),!.
 noCaseChange([]):-!.
 noCaseChange(MiXed):-atom(MiXed),atom_concat('#$',_,MiXed),!.
 noCaseChange(c(_)):-!.

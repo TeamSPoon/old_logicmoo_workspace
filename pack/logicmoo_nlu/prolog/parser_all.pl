@@ -9,7 +9,7 @@
 % Revised At:   $Date: 2002/06/06 15:43:15 $
 % ===================================================================
 
-% end_of_file.
+end_of_file.
 
 % ==============================================================================
 
@@ -220,7 +220,7 @@ get_it:-
   (user:ensure_loaded_no_mpreds(library(logicmoo/plarkc/logicmoo_i_call_kb)),
    load_language_file(pldata/clex_iface),
    load_language_file(pldata/nldata_BRN_WSJ_LEXICON),
-   load_language_file(library(el_holds/el_assertions)),
+   if_defined(skip_el_assertions,load_language_file(library(el_holds/el_assertions))),
    load_language_file(pldata/nldata_freq_pdat),
    load_language_file(pldata/nldata_cycl_pos0)),!.
 
@@ -303,6 +303,8 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 % :- get_pos_tagger(I),jpl_set(I,is_DEBUG,'@'(false)).
 
 
+:- dynamic is_cyckb_t_pred/2.
+:- dynamic is_cyckb_t_pred_rename/2.
 
 :- dmsg("Scanning el_assertions.pl for programatic definations (This may take 10-30 seconds)").
 %:- pfc_add(cyckb_t(A, _, _) ==> is_cyckb_t_pred(A,2)).
@@ -312,7 +314,6 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 %:- pfc_add(cyckb_t(A, _, _, _, _ ) ==> is_cyckb_t_pred(A,4)).
 :- with_el_holds_enabled(gripe_time(2,forall(cyckb_t(A, _, _,_ ,_ ) , assert_if_new(is_cyckb_t_pred(A,4))))).
 :- with_el_holds_enabled(gripe_time(2,forall(cyckb_t(A, _, _,_ ,_,_ ) , assert_if_new(is_cyckb_t_pred(A,5))))).
-
 
 :- dmsg("Implementing programatic definations (This shoiuld take less than 2 seconds)").
 % :- pfc_add((is_cyckb_t_pred(F,A) ==> {functor(H,F,A),H=..[F|ARGS],KB=..[cyckb_t,F|ARGS],assert_if_new((H:-KB))})).

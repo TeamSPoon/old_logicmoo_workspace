@@ -1,4 +1,4 @@
-% end_of_file.
+end_of_file.
 
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.

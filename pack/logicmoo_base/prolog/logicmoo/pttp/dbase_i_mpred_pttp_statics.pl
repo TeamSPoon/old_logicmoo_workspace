@@ -234,7 +234,7 @@
 linearize(TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut):- linearize(unify, TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut).
 
 linearize(Pred, TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut) :-
-	not_ftVar(TermIn) ->
+	is_ftNonvar(TermIn) ->
 		functor(TermIn,F,N),
 		pttp_functor(TermOut,F,N),
 		linearize_args(Pred,TermIn,TermOut,VarsIn,VarsOut,
@@ -453,7 +453,7 @@ collect_proof_subgoals(Depth1,[[_,_,_,Depth,_]|_],Result) :-
 
 add_proof_query_line(Proof,Proof2) :-
 	Proof = [Prf|_PrfEnd],
-	not_ftVar(Prf),
+	is_ftNonvar(Prf),
 	Prf = [[_,query,_,_]|_],
 	!,
 	Proof2 = Proof.
@@ -832,13 +832,13 @@ proof_depth([[[_,_,PosAnc,NegAnc]|L]|PrfEnd],N) :-
 %%% SOURCE
 
 pttp_functor(Term,F,N) :-
-	not_ftVar(F),
+	is_ftNonvar(F),
 	atomic(F),
 	N == 0,
 	!,
 	Term = F.
 pttp_functor(Term,F,N) :-
-	not_ftVar(Term),
+	is_ftNonvar(Term),
 	atomic(Term),
 	!,
 	F = Term,
@@ -1305,7 +1305,7 @@ builtin_why(X,0):-atom(X).
 % Example:  pttp_nnf(ex(Y, all(X, (f(Y) => f(X)))),NNF).
 %           NNF =  all(_A,(-(f(all(X,f(ex)=>f(X))));f(_A)))) ?
 :-export(pttp_nnf/2).
-pttp_nnf((A,B),(C,D)):- must(not_ftVar(A)), !, pttp_nnf(A,C), pttp_nnf(B,D).
+pttp_nnf((A,B),(C,D)):- must(is_ftNonvar(A)), !, pttp_nnf(A,C), pttp_nnf(B,D).
 pttp_nnf(Fml,NNFOUT) :- pttp_nnf(Fml,[],NNF,_),NNFOUT=NNF.
 
 :-      op(400,fy,-),    % negation

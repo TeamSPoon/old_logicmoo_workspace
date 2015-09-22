@@ -24,7 +24,7 @@
   	user:portray/1.
 
 
-pfc_queue :- lsting(pfc_queue/2).
+pfc_queue :- listing(pfc_queue/2).
 
 
 
@@ -82,7 +82,7 @@ pp_item(M,pt(F,Body)):-              !,fmt('~w p-trigger: ~p~n~nbody:~n', [M,F])
 pp_item(M,bt(F,Body)):-              !,fmt('~w b-trigger: ~p~nbody: ~p~n', [M,F,Body]).
 
 pp_item(M,U:W):- !,sformat(S,'~w  ~w:',[M,U]),!, pp_item(S,W).
-pp_item(M,H):- \+ \+ (( get_clause_vars_hb(H,HH),fmt("~w ~p~N",[M,HH]))).
+pp_item(M,H):- \+ \+ (( get_clause_vars_for_print(H,HH),fmt("~w ~p~N",[M,HH]))).
 
 pfc_classify_facts([],[],[],[]).
 
@@ -262,7 +262,7 @@ show_pred_info(Head):-
 
 show_pred_info_0(Head):- 
         doall(show_call(predicate_property(Head,_))),
-        (has_cl(Head)->doall((show_call(clause(Head,_))));hotrace((lsting(Head)))),!.
+        (has_cl(Head)->doall((show_call(clause(Head,_))));hotrace((listing(Head)))),!.
 
 
 % ===================================================
@@ -284,11 +284,12 @@ print_db_items(Title,Mask,SHOW,What0):-
 
 pfc_contains_term(What,_):-is_ftVar(What),!.
 pfc_contains_term(What,Inside):- compound(What),!,(\+ \+ ((copy_term_nat(Inside,Inside0),snumbervars(Inside0),contains_term(What,Inside0)))),!.
-pfc_contains_term(What,Inside):- (\+ \+ notrace((subst(Inside,What,foundZadooksy,Diff),Diff \=@= Inside ))),!.
+pfc_contains_term(What,Inside):- (\+ \+ once((subst(Inside,What,foundZadooksy,Diff),Diff \=@= Inside ))),!.
 
 % user:listing_mpred_hook(What):- debugOnError(pfc_listing(What)).
 
 :-thread_local thlocal:pfc_listing_disabled.
+% listing(L):-with_assertions(thlocal:pfc_listing_disabled,listing(L)).
 
 pfc_listing(What):-thlocal:pfc_listing_disabled,!.
 pfc_listing(What):-loop_check(pfc_listing_nlc(What)).
@@ -485,12 +486,17 @@ pp_i2tml(clause(H,B,Ref)):- !, with_assertions(thlocal:current_clause_ref(Ref),p
 pp_i2tml(HB):- find_ref(HB,Ref),!, must(with_assertions(thlocal:current_clause_ref(Ref),pp_i2tml_v((HB)))).
 pp_i2tml(HB):- with_assertions(thlocal:current_clause_ref(none),must(pp_i2tml_v((HB)))).
 
-get_clause_vars_hb(HB,HB):- ground(HB),!.
-get_clause_vars_hb(HH,HH):- sub_term(S,HH),compound(S),S='$VAR'(A),atom(A),!. % faiol.trace_or_throw(already_numbers(HH)).
-get_clause_vars_hb(I,I):- hide_data(skipVarnames),!.
-get_clause_vars_hb(H,HH):-  get_clause_vars(H),!,must((name_vars(H,HH),get_clause_vars(HH),snumbervars(HH,198,_,[attvar(skip)]))),!.
+get_clause_vars_for_print(HB,HB):- ground(HB),!.
+get_clause_vars_for_print(I,I):- hide_data(skipVarnames),!.
+get_clause_vars_for_print(H0,MHB):- get_clause_vars_copy(H0,MHB).
 
-pp_i2tml_v(HB):- ignore(catch(( \+ \+ ((get_clause_vars_hb(HB,HB2),pp_i2tml_0(HB2)))),_,true)),!.
+numberlist_at(_,[]).
+numberlist_at(_,[N|More]):- number(N),!,N2 is N+1,numberlist_at(N2,More),!.
+numberlist_at(Was,[N|More]):-var(N),  N is Was+1, N2 is N+1,  numberlist_at(N2,More),!.
+numberlist_at(Was,[_|More]):- N2 is Was+2, numberlist_at(N2,More),!.
+
+
+pp_i2tml_v(HB):- ignore(catch(( \+ \+ ((get_clause_vars_for_print(HB,HB2),pp_i2tml_0(HB2)))),_,true)),!.
 
 pp_i2tml_0(Var):-var(Var),!.
 pp_i2tml_0(USER:HB):-USER==user,!,pp_i2tml_0(HB),!.

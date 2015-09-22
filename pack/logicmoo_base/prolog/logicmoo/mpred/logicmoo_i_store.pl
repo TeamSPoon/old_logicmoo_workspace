@@ -578,7 +578,9 @@ retract_all(HB) :- ignore((retract(HB),fail)).
 
 
 is_static_pred(Head:-_):-!,predicate_property(Head,_),not(predicate_property(Head,dynamic)).
-is_static_pred(Head):-predicate_property(Head,_),not(predicate_property(Head,dynamic)).
+is_static_pred(Head):-  predicate_property(Head,static),!.
+is_static_pred(Head):- predicate_property(Head,_), !, \+ (predicate_property(Head,dynamic)).
+is_static_pred(Head):-  predicate_property(Head,meta_predicate),!.
 
 prolog_provide_mpred_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),user:mpred_prop(F,prologDynamic),!, prolog_op(Op,G).
 prolog_provide_mpred_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),not(user:mpred_prop(F,prologHybrid)),!,current_predicate(_,G), prolog_op(Op,G).

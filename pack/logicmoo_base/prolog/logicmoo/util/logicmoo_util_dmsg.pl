@@ -1,6 +1,6 @@
 
 :-meta_predicate(catchvvnt(0,?,0)).
-catchvvnt(T,E,F):-catchvv(notrace(T),E,F).
+catchvvnt(T,E,F):-catchvv(cnotrace(T),E,F).
 
 :- thread_self(X),assert(thread_main(X)).
 
@@ -23,7 +23,7 @@ is_main_thread:-thread_main(X),!,thread_self(X).
 :-meta_predicate(with_main_error_to_output(0)).
 with_main_error_to_output(Goal):-
  current_output(Out),
-  with_assertions(thread_local_current_main_error_stream(Out),Goal).
+  with_assertions(thlocal:thread_local_current_main_error_stream(Out),Goal).
    
 
 thread_current_error_stream(Err):- thlocal:thread_local_current_main_error_stream(Err),!.
@@ -33,7 +33,7 @@ current_main_error_stream(Err):- thlocal:thread_local_current_main_error_stream(
 current_main_error_stream(Err):-thread_main(ID),thread_current_error_stream(ID,Err).
 
 format_to_error(F,A):-current_main_error_stream(Err),!,format(Err,F,A).
-fresh_line_to_err:- notrace((flush_output_safe,current_main_error_stream(Err),format(Err,'~N',[]),flush_output_safe(Err))).
+fresh_line_to_err:- cnotrace((flush_output_safe,current_main_error_stream(Err),format(Err,'~N',[]),flush_output_safe(Err))).
 
 :- dynamic(thread_current_input/2).
 :- dynamic(thread_current_error_stream/2).
@@ -75,16 +75,19 @@ with_main_input(G):-
 :-meta_predicate(with_all_dmsg(0)).
 :-meta_predicate(with_show_dmsg(*,0)).
 
-with_all_dmsg(Call):- always_show_dmsg,!,Call.
+
 with_all_dmsg(Call):-
+   with_assertions(always_show_dmsg,
      with_assertions(set_prolog_flag(opt_debug,true),
-       with_assertions( tlbugger:dmsg_match(show,_),Call)).
-with_all_dmsg(Call):- always_show_dmsg,!,Call.
+       with_assertions( tlbugger:dmsg_match(show,_),Call))).
+
+
 with_show_dmsg(TypeShown,Call):-
   with_assertions(set_prolog_flag(opt_debug,filter),
      with_assertions( tlbugger:dmsg_match(showing,TypeShown),Call)).
 
 :-meta_predicate(with_no_dmsg(0)).
+with_no_dmsg(Call):- always_show_dmsg,!,Call.
 with_no_dmsg(Call):-with_assertions(set_prolog_flag(opt_debug,false),Call).
 with_no_dmsg(TypeUnShown,Call):-with_assertions(set_prolog_flag(opt_debug,filter),
   with_assertions( tlbugger:dmsg_match(hidden,TypeUnShown),Call)).
@@ -208,14 +211,15 @@ if_color_debug(Call,UnColor):- if_color_debug->Call;UnColor.
 
 :-swi_export((portray_clause_w_vars/4,color_dmsg/2,ansicall/3,ansi_control_conv/2)).
 
-:-thread_local(tlbugger:skipDmsg/0).
+:-thread_local(tlbugger:skipDumpST9/0).
+:-thread_local(tlbugger:skipDMsg/0).
 
 
 
 
 dmsginfo(V):-dmsg(info(V)).
-dmsg(V):- notrace(dmsg0(V)).
-dmsg(F,A):-notrace(dmsg0(F,A)).
+dmsg(V):- cnotrace(dmsg0(V)).
+dmsg(F,A):- cnotrace(dmsg0(F,A)).
 dmsg0(_,_):- is_hiding_dmsgs,!.
 dmsg0(F,A):- is_sgr_on_code(F),!,dmsg(ansi(F,A)).
 dmsg0(F,A):- dmsg(fmt0(F,A)).
@@ -235,9 +239,9 @@ dmsg1(V):- is_with_dmsg(FP),!,FP=..FPL,append(FPL,[V],VVL),VV=..VVL,once(dmsg1(V
 dmsg1(_):- \+ always_show_dmsg, is_hiding_dmsgs,!.
 dmsg1(V):- var(V),!,dmsg1(warn(dmsg_var(V))).
 dmsg1(NC):- cyclic_term(NC),!,format_to_error('~N% ~q~n',[dmsg_cyclic_term(NC)]).
-dmsg1(NC):- tlbugger:skipDmsg,!,format_to_error('~N% ~q~n',[skipDmsg(NC)]).
+dmsg1(NC):- tlbugger:skipDMsg,!,format_to_error('~N% ~q~n',[skipDumpST9(NC)]).
 
-dmsg1(V):- once(dmsg2(V)), ignore((hook:dmsg_hook(V),fail)).
+dmsg1(V):- with_assertions(tlbugger:skipDMsg,((once(dmsg2(V)), ignore((hook:dmsg_hook(V),fail))))).
 
 dmsg2(NC):- cyclic_term(NC),!,format_to_error('~N% ~q~n',[dmsg_cyclic_term(NC)]).
 dmsg2(skip_dmsg(_)):-!.
@@ -255,11 +259,12 @@ dmsg3(C):-
 
 dmsg3(C):-dmsg4(C),!.
 
-dmsg4(_):- show_source_location,fail.
+dmsg4(_):- cnotrace(show_source_location),fail.
 % dmsg4(C):- not(ground(C)),copy_term(C,Stuff), snumbervars(Stuff),!,dmsg5(Stuff).
 dmsg4(Msg):-dmsg5(Msg).
 
 dmsg5(Msg):- to_stderror(in_cmt(fmt9(Msg))).
+dmsg5(Msg,Args):- to_stderror(in_cmt(fmt9(Msg,Args))).
 
 
 get_indent_level(Max) :- if_prolog(swi,((prolog_current_frame(Frame),prolog_frame_attribute(Frame,level,FD)))),Depth is FD div 5,Max is min(Depth,40),!.
@@ -330,7 +335,7 @@ ansi_control_conv(Ctrl,CtrlO):-flatten([Ctrl],CtrlO),!.
 is_tty(Out):- not(tlbugger:no_colors), is_stream(Out),stream_property(Out,tty(true)).
 
 ansicall(Out,_,Call):- \+ is_tty(Out),!,Call.
-ansicall(_Out,_,Call):- tlbugger:skipDmsg,!,Call.
+ansicall(_Out,_,Call):- tlbugger:skipDumpST9,!,Call.
 
 ansicall(Out,CtrlIn,Call):- once(ansi_control_conv(CtrlIn,Ctrl)),  CtrlIn\=Ctrl,!,ansicall(Out,Ctrl,Call).
 ansicall(_,_,Call):- in_pengines,!,Call.
@@ -481,7 +486,7 @@ contrasting_color(_,default).
 :-thread_local(ansi_prop/2).
 
 sgr_on_code(Ctrl,OnCode):-sgr_on_code0(Ctrl,OnCode),!.
-sgr_on_code(Foo,7):- notrace((format_to_error('~NMISSING: ~q~n',[sgr_on_code(Foo,7)]))),!. % ,dtrace(sgr_on_code(Foo,7)))).
+sgr_on_code(Foo,7):- cnotrace((format_to_error('~NMISSING: ~q~n',[sgr_on_code(Foo,7)]))),!. % ,dtrace(sgr_on_code(Foo,7)))).
 
 is_sgr_on_code(Ctrl):-sgr_on_code0(Ctrl,_),!.
 
@@ -541,9 +546,9 @@ msg_to_string(Msg,Str):-sformat(Str,Msg,[],[]),!.
 % ==========================================================
 % ==========================================================
 
-dumpST:- tlbugger:ifHideTrace,!.
-dumpST:- tlbugger:skipDmsg,!, ignore((dumpST0)),!.
-dumpST:- ignore(catch(( with_assertions(tlbugger:skipDmsg,dumpST9)),E,writeq(E))),!.
+dumpST:- is_hiding_dmsgs,!.
+dumpST:- tlbugger:skipDumpST9,!, ignore((dumpST0)),!.
+dumpST:- ignore(catch(( with_assertions(tlbugger:skipDumpST9,dumpST9)),E,writeq(E))),!.
  
 dumpST0:-
  ignore((catch((
@@ -554,14 +559,11 @@ dumpST0:-
    E,writeq(E)))).
 
 
-dumpST9:- tlbugger:ifHideTrace,!.
 dumpST9:- hotrace((prolog_current_frame(Frame),dumpST2(Frame,5000))).
-% dumpST(_):-is_hiding_dmsgs,!.
 
-dumpST(_):- tlbugger:ifHideTrace,!.
+dumpST(_):- is_hiding_dmsgs,!.
 dumpST(Opts):- dumpST(_,Opts).
 
-dumpST(_,_):- tlbugger:ifHideTrace,!.
 dumpST(Frame,Opts):-var(Opts),!,dumpST(Frame,5000).
 dumpST(Frame,MaxDepth):-
    thread_current_error_stream(ERR),
@@ -574,13 +576,13 @@ dumpST(Frame,MaxDepth):- integer(MaxDepth),(var(Frame)->prolog_current_frame(Fra
 dumpST(Frame,Opts):-is_list(Opts),!,dumpST(1,Frame,Opts).
 dumpST(Frame,Opts):-show_call(dumpST(1,Frame,[Opts])).
 
-dumpST2(_,_):- tlbugger:ifHideTrace,!.
+
 dumpST2(Frame,From-MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[skip_depth(From),max_depth(MaxDepth),numbervars(safe),show([has_alternatives,level,context_module,goal,clause])]).
 dumpST2(Frame,MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[max_depth(MaxDepth),numbervars(safe),show([has_alternatives,level,context_module,goal,clause])]).
+dumpST2(_,_):-dumpST0.
 
 get_m_opt(Opts,Max_depth,D100,RetVal):-E=..[Max_depth,V],(((member(E,Opts),nonvar(V)))->RetVal=V;RetVal=D100).
 
-dumpST(_,_,_):- tlbugger:ifHideTrace,!.
 dumpST(N,Frame,Opts):-
   ignore(prolog_current_frame(Frame)),
   must(( dumpST4(N,Frame,Opts,Out))),

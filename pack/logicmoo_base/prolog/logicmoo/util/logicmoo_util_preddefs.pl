@@ -252,7 +252,7 @@ rebuild_pred_into(C,AssertZ,OtherTraits):-rebuild_pred_into(C,C,AssertZ,OtherTra
 :-meta_predicate(rebuild_pred_into(0,0,1,?)).
 rebuild_pred_into(_,NMC,AssertZ,_):-mpred_impl(NMC,AssertZ),!.
 rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
-  lsting(OMC),
+  listing(OMC),
   asserta(mpred_impl(NMC,AssertZ)),
   show_call((predicate_property(OMC,number_of_clauses(_)))),
   strip_module(OMC, OM, OC),
@@ -289,7 +289,7 @@ rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
       retractall(mpred_impl(NMC,_)),
       asserta(mpred_impl(NMC,AssertZ)),
       '$set_source_module'(_, Before),
-      lsting(NMC),
+      listing(NMC),
       retractall(pp_temp(NC,_))
       )).
 

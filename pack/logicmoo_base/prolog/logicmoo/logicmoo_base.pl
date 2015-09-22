@@ -264,6 +264,7 @@ pfc_file_loaded.
 :-  user:call(with_mfa_of(user: (dynamic_safe)),user,user,boxlog_to_compile(D,E,F),boxlog_to_compile/3).
 :- retractall(thlocal:disable_mpred_term_expansions_locally).
 
+:- ensure_mpred_file_loaded(mpred/logicmoo_i_builtin).
 :- with_assertions(tlbugger:ifHideTrace,(ensure_mpred_file_loaded(mpred/logicmoo_i_builtin))).
 
 :- asserta(thlocal:disable_mpred_term_expansions_locally).

@@ -381,13 +381,17 @@
 			Name="Other Files"
 			Filters=""/>
 	</CustomFolders>
-	<Files AutoFolders="PackageView">
-		<Folder Name="../pack/logicmoo_base/prolog">
-			<F
-				N="../pack/logicmoo_base/prolog/*.*"
-				Recurse="1"
-				Refilter="0"
-				Excludes=""/>
+	<Files AutoFolders="DirectoryView">
+		<Folder Name="../pack">
+			<Folder Name="logicmoo_base">
+				<Folder Name="prolog">
+					<F
+						N="../pack/logicmoo_base/prolog/*.*"
+						Recurse="1"
+						Refilter="0"
+						Excludes=""/>
+				</Folder>
+			</Folder>
 		</Folder>
 		<F
 			N="*.*"

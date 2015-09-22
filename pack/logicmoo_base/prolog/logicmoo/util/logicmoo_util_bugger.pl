@@ -231,7 +231,7 @@ b_moo_hide(P):-!,'$find_predicate'(P,List),forall(lists:member(M:F/A,List),moo_h
 b_moo_hide(F/A):-!,'$find_predicate'(F/A,List),forall(lists:member(M:F/A,List),moo_hide(M,F,A)).
 
 :- meta_predicate(cnotrace(0)).
-cnotrace(G):- notrace(G).
+cnotrace(G):- once(G).
 :-moo_hide(cnotrace/1).
 :-if_may_hide('$set_predicate_attribute'(cnotrace(_), hide_childs, 1)).
 :-if_may_hide('$set_predicate_attribute'(cnotrace(_), trace, 0)).
@@ -248,7 +248,7 @@ thread_leash(-Some):-!, (thread_self(main)->leash(-Some);thread_leash(-Some)).
 thread_leash(Some):-!, (thread_self(main)->leash(+Some);thread_leash(-Some)).
 
 % ((tracing, notrace) -> CC=trace;CC=true), '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,(('$leash'(_, Old),'$visible'(_, OldV),CC),CC)).
-get_hotrace(X,Y):- tracing,!,'$visible'(OldV, OldV),notrace,visible(-all),visible(+exception),Y = call_cleanup(X,('$visible'(_, OldV),trace)).
+get_hotrace(X,Y):- tracing,!,'$visible'(OldV, OldV),notrace,visible(-all),visible(+exception),Y = call_cleanup(show_call(X),notrace(('$visible'(_, OldV),trace))).
 get_hotrace(X,Y):- !,'$visible'(OldV, OldV),notrace,visible(-all),visible(+exception),Y = call_cleanup(X,('$visible'(_, OldV))).
 
 hotrace(X):- notrace(get_hotrace(X,Y)),Y.
@@ -470,7 +470,7 @@ get_rtrace(X,Y):- tracing,!,'$leash'(Old, Old),'$visible'(OldV, OldV),rtrace, Y=
 get_rtrace(X,Y):- '$leash'(Old, Old),'$visible'(OldV, OldV), (Y= call_cleanup((X),(notrace,'$leash'(_, Old),'$visible'(_, OldV)))).
 
 :-meta_predicate rtrace(0).
-rtrace(Goal):- (tracing -> (notrace(get_rtrace(Goal,C)),C) ; (trace,cnotrace(get_rtrace(Goal,C)),C,notrace)).
+rtrace(Goal):- (tracing -> (notrace(get_rtrace(Goal,C)),C) ; (trace,notrace(get_rtrace(Goal,C)),C,notrace)).
 
 :-moo_hide(rtrace/1).
 
@@ -513,11 +513,7 @@ skipWrapper:- tlbugger:skip_bugger,!.
 showHiddens:-true.
 
 % -- CODEBLOCK
-:-swi_export(is_ftVar/1).
-user:is_ftVar(V):-var(V),!.
-user:is_ftVar('$VAR'(_)).
-:-swi_export(not_ftVar/1).
-not_ftVar(V):-not(is_ftVar(V)).
+
 
 logOnError(C):-prolog_ecall(0,logOnError0,C).
 :-swi_export(logOnError0/1).
@@ -561,11 +557,12 @@ must_l((A,B)):-!,must((A,(deterministic(true)->(!,must_l(B));B))).
 must_l(C):- must(C).
 
 
-:-thread_local  tlbugger:skip_use_slow_sanity/0.
+:-thread_local tlbugger:skip_use_slow_sanity/0.
+tlbugger:skip_use_slow_sanity.
 
 % thread locals should defaults to false  tlbugger:skip_use_slow_sanity.
 
-slow_sanity(C):-  sanity(C),!. %  ( tlbugger:skip_use_slow_sanity ; must_det(C)),!.
+slow_sanity(C):- ( tlbugger:skip_use_slow_sanity ; sanity(C)),!.
 
 
 % -- CODEBLOCK
@@ -607,7 +604,7 @@ y_must(Y,C):- catchvv(C,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,C)),fail)) *-> tru
 :-set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(200), attributes(portray)]).
 :-set_prolog_flag(debugger_show_context,true).
 
-must(C):-cnotrace(get_must(C,CALL)),CALL.
+must(C):- notrace(get_must(C,CALL)),CALL.
 
 get_must(C,C):- fail,is_release,!.
 get_must(C,DO):-  tlbugger:skipMust,!,DO = C.
@@ -664,6 +661,39 @@ must_maplist( Goal, [Elem1|Tail1], [Elem2|Tail2], [Elem3|Tail3]) :-
 motrace(O):-one_must(hotrace(must(O)),(trace,O)).
 
 throw_safe(Exc):-trace_or_throw(Exc).
+
+:- thread_local( thlocal:testing_for_release/1).
+
+test_for_release(File):-  source_file(File), \+ make:modified_file(File), !.
+test_for_release(File):-  
+ G = test_for_release(File),
+ setup_call_cleanup(dmsg('~N~nPress Ctrl-D to begin ~n~n  :- ~q. ~n~n',[G]),
+  if_interactive(prolog),
+   setup_call_cleanup(dmsg('~N~nStarting ~q...~n',[G]),
+      with_assertions(thlocal:testing_for_release(File),user:ensure_loaded(File)),
+      test_for_release_problems(File))).
+
+test_for_release_problems(_):-!.
+test_for_release_problems(File):-  
+      dmsg('~N~nListing problems after ~q...~n',[File]),
+      list_undefined,
+      nop(at_start(if_defined(gxref,true))),!.
+
+:- meta_predicate if_interactive(0).
+
+if_interactive(Goal):-ignore(if_interactive0(Goal)),!.
+if_interactive0(Goal):- 
+   thread_self(main),
+   current_input(In),
+   stream_property(In,input),
+   stream_property(In,tty(true)),
+   read_pending_input(In,_,_),!,
+   dmsg('~n(waiting ... ~n',[]),!,
+   wait_for_input([In],RL,5),!,
+   ( RL ==[] -> dmsg('...moving on)~n',[]) ; (dmsg('... starting goal)~n',[]),Goal)),
+   !.
+
+
 
 :- dynamic(buggerDir/1).
 :- abolish(buggerDir/1),prolog_load_context(directory,D),asserta(buggerDir(D)).
@@ -896,7 +926,7 @@ show_call_entry(Call):-wdmsg(show_call_entry(Call)),show_call(Call).
 % Bugger Term Expansions
 % ===================================================================
 :-dynamic(always_show_dmsg).
-always_show_dmsg:-fail,thread_self(main).
+always_show_dmsg:- thread_self(main).
 
 :-dynamic(is_hiding_dmsgs).
 is_hiding_dmsgs:- \+always_show_dmsg, current_prolog_flag(opt_debug,false),!.
@@ -1808,7 +1838,7 @@ matches_term0(F/A,Term):- (var(A)->member(A,[0,1,2,3,4]);true), functor_safe(Fil
 matches_term0(Filter,Term):- sub_term(STerm,Term),nonvar(STerm),matches_term0(Filter,STerm),!.
 
 
-show_source_location:- tlbugger:ifHideTrace,!.
+show_source_location:- is_hiding_dmsgs,!.
 show_source_location:- current_source_location(FL),format_to_error('~N% ~w ',[FL]).
 
 :-meta_predicate(gripe_time(+,0)).
@@ -2070,7 +2100,7 @@ show_and_do(C):-wdmsg(show_and_do(C)),!,trace,C.
 
 
 %dtrace:- skipWrapper,!,dmsg(dtrace_skipWrapper).
-dtrace:- dtrace(ignore(show_call_failure(trace))).
+dtrace:- notrace(dumpST0),notrace(dumpST9),gtrace,trace.
 
 
 % esa Michele Murer 360-750-7500 ext_135
@@ -2079,11 +2109,13 @@ dtrace:- dtrace(ignore(show_call_failure(trace))).
 dtrace(MSG,G):-wdmsg(error,MSG),dtrace(G).
 
 :-meta_predicate(dtrace(0)).
-dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,hotrace(dumpST).
-dtrace(G):-has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G).
-dtrace(G):-tracing,notrace,!,wdmsg(tracing_dtrace(G)),(dumptrace(G)*->trace;trace).
-dtrace(G):-current_predicate(logicmoo_bugger_loaded/0),!,dumptrace(G).
-dtrace(G):-G.
+dtrace(G):- notrace(get_dtrace(G,DT)),!,call(DT).
+
+get_dtrace(G,call(C,G)):-has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!.
+get_dtrace(G,true):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,hotrace(dumpST).
+get_dtrace(G,call_cleanup((dumptrace(G)*->trace;trace),trace)):-tracing,notrace,!,wdmsg(tracing_dtrace(G)),!.
+get_dtrace(G,dumptrace(G)):-current_predicate(logicmoo_bugger_loaded/0),!.
+get_dtrace(G,G).
 
 :-meta_predicate(dumptrace(0)).
 %dumptrace(G):- tracing,!,thread_leash(+call),wdmsg(tracing_dumptrace(G)),with_all_dmsg(G).

@@ -13,39 +13,100 @@
 
 as_clause_no_m( MHB,  H, B):- strip_module(MHB,_M,HB), as_clause( HB,  MH, MB),strip_module(MH,_M2H,H),strip_module(MB,_M2B,B).
 
-get_clause_vars(MHB):- (ground(MHB); \+ compound(MHB)),!.
-get_clause_vars(MHB):- as_clause_no_m( MHB,  H, B), get_clause_vars(H,B),!.
+:-swi_export(is_ftCompound/1).
+is_ftCompound(C):-compound(C),C\='$VAR'(_).
+
+:-swi_export(is_ftVar/1).
+is_ftVar(V):-var(V),!.
+is_ftVar('$VAR'(_)).
+
+:-swi_export(is_ftNonvar/1).
+is_ftNonvar(V):- \+ is_ftVar(V).
+
+show_call_when(P,In,Out):- pmust(call(P,In,Out)),ignore((In\=@=Out,dmsg((show_call_when(P) :- (In,Out))))).
+
+lock_vars(Var):-var(Var),!,when(nonvar(Var),is_ftVar(Var)).
+lock_vars(Var):-atomic(Var),!.
+lock_vars('$VAR'(_)):-!.
+lock_vars([X|XM]):-!,lock_vars(X),lock_vars(XM),!.
+lock_vars(XXM):-XXM=..[_,X|XM],lock_vars(X),lock_vars(XM).
+
+unlock_vars(Var):-var(Var),!,del_attr(Var,when).
+unlock_vars(Var):-atomic(Var),!.
+unlock_vars('$VAR'(_)):-!.
+unlock_vars([X|XM]):-!,unlock_vars(X),unlock_vars(XM),!.
+unlock_vars(XXM):-XXM=..[_,X|XM],unlock_vars(X),unlock_vars(XM).
+
+make_subterm_path(Sub,Term,PathO):-vmust(subterm_path(Sub,Term,Path)),!,PathO=Path.
+
+subterm_path(Sub,Term,[]):-Sub==Term,!.
+subterm_path(Sub,Term,[arg(N)|Path]):-compound(Term),!,arg(N,Term,TermE),subterm_path(Sub,TermE,Path),!.
+
+get_clause_vars(MHB):- vmust((get_clause_vars_copy(MHB,WVARS),!,vmust(MHB=WVARS),unlock_vars(MHB),check_varnames(MHB))).
+
+get_clause_vars_copy(HB,HB):- ground(HB),!.
+get_clause_vars_copy(HH,HH):- sub_term(S,HH),compound(S),S='$VAR'(_),!. % already labled
+get_clause_vars_copy(H0,MHB):- name_vars(H0,MHB),lock_vars(MHB),as_clause_no_m( MHB,  H, B),
+    get_clause_vars_hb_int(H,B),!.
 
 
+get_clause_vars_hb_int(H,B):- user:varname_info(H,B,Vs,_),must_maplist(assign_name_equal_var,Vs),!.
+get_clause_vars_hb_int(H,B):- call_return_tf(try_get_body_vars(B),_TF1),call_return_tf(try_get_head_vars(H),_TF2),!.
 
-get_clause_vars(H,B):- user:saved_varname_info(H,B,_),!.
-get_clause_vars(H,B):- try_get_head_vars(H),try_get_head_vars(B),!.
-get_clause_vars(_,_):-!.
-get_clause_vars(H,B):- dmsg(missed_clause_vars(H,B)).
-
-ignoreq(X,Y):-var(Y),ignore(X=Y).
-ignoreq(X,'$VAR'(Y)):-!,ignore(X='$VAR'(Y)).
-ignoreq(X, Y):-atom(Y),atom_concat('"?',LS,Y),atom_concat(N,'"',LS),fix_varcase_name(N,VN),!,ignore(X='$VAR'(VN)).
-ignoreq(X,Y):-ignore(X=Y).
 
 fix_varcase_name(N,VN):-atom_subst(N,'-','_',O),atom_subst(O,'?','_',VN).
 
-try_get_head_vars(H):- ground(H),!.
-try_get_head_vars(H):- (\+ compound(H)) ,!.
-try_get_head_vars(H):- once((functor(H,_,N),arg(N,H,List),member(vars(Vs),List))),is_list(Vs),term_variables(H,VL),maplist(ignoreq,VL,Vs).
-try_get_head_vars((A,B)):-!,try_get_head_vars(A),try_get_head_vars(B).
-try_get_head_vars((A;B)):-!,try_get_head_vars(A),try_get_head_vars(B).
-try_get_head_vars(H):- term_variables(H,HVs),user:saved_varname_info(H,_,_),maplist(is_ftVar,HVs),!.
-try_get_head_vars(_).
+no_vars_needed(H):- ( ground(H) ; \+ compound(H)) ,!.
+try_get_inner_vars(H):- once((functor(H,_,N),arg(N,H,List),member(vars(Vs),List))),is_list(Vs),term_variables(H,VL),must_maplist(assign_name_equal_var,Vs,VL).
 
-:-multifile(user:saved_varname_info/3).
-:-dynamic(user:saved_varname_info/3).
-assign_varname(O=I):-assign_varname_l(I,'$VAR'(O)),!.
+call_return_tf(Call,TF):- ((Call-> TF = t ; TF = nil)).
 
-assign_varname_vars(N='$VAR'(N)).
+try_get_head_vars(H):- no_vars_needed(H),!.
+try_get_head_vars(H):- user:varname_info(H,_,Vs,_),maplist(assign_name_equal_var,Vs),!.
+try_get_head_vars(H):- try_get_inner_vars(H),!.
+try_get_head_vars(H):- user:varname_info(_,H,Vs,_),maplist(assign_name_equal_var,Vs),!.
+try_get_body_vars(_).
+
+try_get_body_vars(H):- no_vars_needed(H),!.
+try_get_body_vars(H):- user:varname_info(_,H,Vs,_),maplist(assign_name_equal_var,Vs),!.
+try_get_body_vars(H):- try_get_inner_vars(H).
+try_get_body_vars(H):- user:varname_info(H,_,Vs,_),maplist(assign_name_equal_var,Vs),!.
+try_get_body_vars((A,B)):-!,try_get_head_vars(A),try_get_head_vars(B).
+try_get_body_vars((A;B)):-!,try_get_head_vars(A),try_get_head_vars(B).
+try_get_body_vars(_).
+
+vmust(G):-must(G).
+:-multifile(user:varname_info/4).
+:-dynamic(user:varname_info/4).
+
+% assign_name_equal_var(B):-var(B),!.
+assign_name_equal_var(B):-var(B),writeq(assign_name_equal_var(B)),nl,trace_or_throw(var_assign_varname_vars(B)).
+assign_name_equal_var(N=V):-assign_name_equal_var(N,V),!.
+assign_name_equal_var(_).
+
+assign_name_equal_var(N,V):- (var(V),var(N)),trace_or_throw(var_ignoreq(N,V)).
+%assign_name_equal_var(N,V):-var(N),!, (var(V)->ignore(V=N);ignore(V=N)),!.
+assign_name_equal_var(N,V):-atom(N),var(V),!,ignoreN(N,V).
+assign_name_equal_var(_,'$VAR'(N)):-number(N),!.
+assign_name_equal_var(_,'$VAR'(N)):-atom(N),!.
+assign_name_equal_var(_,NV):-nonvar(NV),NV\='$VAR'(_),!.
+assign_name_equal_var('$VAR'(N),V):- number(N),!,format(atom(VN),'~w',[N]),ignoreN(VN,V).
+assign_name_equal_var('$VAR'(N),V):-atom(N),atom_concat('"?',LS,N),atom_concat(NN,'"',LS),fix_varcase_name(NN,VN),!,ignoreN(VN,V).
+assign_name_equal_var('$VAR'(N),V):-atom(N),ignoreN(N,V).
+assign_name_equal_var(N,V):-atom(N),!,ignoreN(N,V).
+
+assign_name_equal_var(N,V):-ignore(N=V).
+
+ignoreN(N,V):-var(V),var(N),!,V=N.
+ignoreN('$VAR'(Name),Var):-atom(Name),!,ignoreN(Name,Var).
+ignoreN(Name,Var):- attvar(Var),put_attr(Var,varname,Name),!.
+ignoreN(N,'$VAR'(N)):-atom(N),!.
+ignoreN(N,V):-ignore(V='$VAR'(N)),!.
+ignoreN(Name,Var):- vmust(Var = '$VAR'(Name)).
 
 
-current_source_location(F):- (current_source_location0(W), (W= (F:foo) -> true;F=W)),!.
+
+current_source_location(F):- catch(notrace((current_source_location0(W), (W= (F:foo) -> true;F=W))),E,F=error(E)),!.
 current_source_location0(F:L):-source_location(F,L),!.
 current_source_location0(F:L):-prolog_load_context(file,F),current_input(S),line_position(S,L),!.
 current_source_location0(When):-loading_file(When).
@@ -68,50 +129,32 @@ current_why(unk).
 save_clause_vars(_,[]):-!.
 save_clause_vars(MHB,Vs):- current_why(Why),!,save_clause_vars(MHB,Vs,Why).
 save_clause_vars(MHB,Vs):- trace,current_why(Why),!,save_clause_vars(MHB,Vs,Why).
-save_clause_vars(MHB,Vs,Why):-
- ( \+ \+
-    ((
-    once(maplist(assign_varname_vars,Vs)),
-    as_clause_no_m(MHB,  H, B),
-%     once(map list(assign_varname,Vs)),
-%    numberv ars(HB,555,_,[attvar(skip)]), % singletons(true) 
-    assert_if_new_kv(user:saved_varname_info(H,B,Why))))),!.
 
+save_clause_vars(_, [],_):-!.
+save_clause_vars(MHB,Vs,Why):- ( \+ \+ ((as_clause_no_m(MHB,  H, B), assert_if_new_kv(user:varname_info(H,B,Vs,Why))))).
 
 assert_if_new_kv(A):- clause_asserted(A),!.
 assert_if_new_kv(A):- asserta(A).
 
-ensure_vars_labled(I,I):-!.
-ensure_vars_labled(I,I):- ground(I),!.
-ensure_vars_labled(I,I):- ( \+ compound(I)),!.
-ensure_vars_labled(I,OO):- must(ensure_vars_labled_r(I,O)),!,OO=O.
+
+
+ensure_vars_labled(I,I):- no_vars_needed(I),!.
+% ensure_vars_labled(I,I):- !.
+ensure_vars_labled(I,OO):- acyclic_term(O),ensure_vars_labled_r(I,O),vmust(acyclic_term(O)),!,OO=O.
 ensure_vars_labled(I,I).
 
 ensure_vars_labled_r(I,O):- 
-  ((nb_current('$variable_names',Vs),Vs\==[])),
+  once((((nb_current('$variable_names',Vs),Vs\==[])),
    copy_term(I:Vs,O:OVs),
-    must_maplist(assign_varname,OVs),
+    must_maplist(assign_name_equal_var,OVs))),
    (O \=@= I ;  ground(O)),!.
 
 ensure_vars_labled_r(I,O):- 
-     term_variables(I,Vs),
-     copy_term(I,O),
-     copy_term(I:Vs,O:OVs),
-     get_clause_vars(O),
-     must_maplist(assign_varname_l,Vs,OVs),
+     once((get_clause_vars_copy(I,O),unlock_vars(O))),
      (O \=@= I ;  ground(O)),!.
 
-ensure_vars_labled_r(I,O):- unnumbervars_and_save_r(I,UI),I\=@=UI,O=I.
+ensure_vars_labled_r(I,O):- name_vars(I,O),I\=@=O.
 
-
-
-unnumbervars_and_save_r(I,O):-unnumbervars(I,UI),term_variables(UI,UIV),copy_term(UI-UIV,UIC-UIVC),
-    I=UIC,
-    must_maplist(assign_varname_l,UIV,UIVC),!,O=UI.
-
-assign_varname_l(I,O):-var(I),var(O),!,I=O.
-assign_varname_l(I,O):-is_ftVar(O),var(I),!, put_varname(I,O).
-assign_varname_l(I,O):-trace,!,I=O.
 
 contains_singletons(Term):- not(ground(Term)),call_not_not(((term_variables(Term,Vs),
    numbervars(Term,0,_,[attvar(bind),singletons(true)]),member('$VAR'('_'),Vs)))).
@@ -120,10 +163,12 @@ contains_singletons(Term):- not(ground(Term)),call_not_not(((term_variables(Term
 
 call_not_not(G):- \+ \+ G.
 
-contains_badvarnames(Term):- notrace((sub_term(SubV,Term),compound(SubV),SubV='$VAR'(Sub),nonvar(Sub),bad_varnamez(Sub))),!.
-bad_varnamez(Sub):- integer(Sub),!, (Sub < 0 ; Sub > 1000).
-bad_varnamez(Sub):- number(Sub).
+contains_badvarnames(Term):- fail, notrace((sub_term(SubV,Term),compound(SubV),SubV='$VAR'(Sub),bad_varnamez(Sub))),!.
+
 bad_varnamez(Sub):- atom(Sub),!,atom_contains(Sub,'.').
+bad_varnamez(Sub):- var(Sub),!.
+bad_varnamez(Sub):- integer(Sub),!, (Sub < 0 ; Sub > 991000).
+bad_varnamez(Sub):- number(Sub).
 
 
 
@@ -140,7 +185,7 @@ safe_numbervars(E,EE):-duplicate_term(E,EE),
   numbervars(EE,End,_,[attvar(skip),functor_name('$VAR'),singletons(true)]),
   forall(member(V,AttVars),(copy_term(V,VC,Gs),V='$VAR'(VC=Gs))),check_varnames(EE).
 
-name_vars(Term,Named):- ignore((source_variables_l(AllS))), copy_term(Term+AllS,Named+CAllS),maplist(must,CAllS).
+name_vars(Term,Named):- ignore((source_variables_l(AllS))), copy_term(Term+AllS,Named+CAllS),maplist(assign_name_equal_var,CAllS).
 
 get_gtime(GG):- get_time(T),convert_time(T,_A,_B,_C,_D,_E,_F,G),GG is (floor(G) rem 500).
 
@@ -185,69 +230,69 @@ b_implode_varnames(_):-!.
 b_implode_varnames0([]):-!.
 b_implode_varnames0([N=V|Vs]):- ignore((V='$VAR'(N);V=N)),b_implode_varnames0(Vs),!.
 
-imploded_copyvars(C,CT):-must((source_variables(Vs),copy_term(C-Vs,CT-VVs),b_implode_varnames(VVs))),!.
+imploded_copyvars(C,CT):-vmust((source_variables(Vs),copy_term(C-Vs,CT-VVs),b_implode_varnames(VVs))),!.
 
 
 :-swi_export(unnumbervars/2).
-unnumbervars(X,YY):- unnumbervars1(X,[],Y,_Vs),!, must(YY=Y).
+unnumbervars(X,YY):- lock_vars(X,[],Y,_Vs),!, vmust(YY=Y).
 % TODO compare the speed
-% unnumbervars(X,YY):- must(unnumbervars0(X,Y)),!,must(Y=YY).
+% unnumbervars(X,YY):- vmust(unnumbervars0(X,Y)),!,vmust(Y=YY).
 
 
 
-:-swi_export(unnumbervars_saved/2).
-unnumbervars_saved(X,YY):-
-   unnumbervars1(X,[],Y,Vs),
-    (Vs==[]->must(X=YY);
-    ( % writeq((unnumbervars1(X,Y,Vs))),nl,
-     save_clause_vars(Y,Vs),must(Y=YY))).
+:-swi_export(unnumbervars_and_save/2).
+unnumbervars_and_save(X,YY):-
+   lock_vars(X,[],Y,Vs),
+    (Vs==[]->vmust(X=YY);
+    ( % writeq((lock_vars(X,Y,Vs))),nl,
+     save_clause_vars(Y,Vs),vmust(Y=YY))).
 
 /*
 % todo this slows the system!
 unnumbervars0(X,clause(UH,UB,Ref)):- sanity(nonvar(X)),
   X = clause(H,B,Ref),!,
-  must(unnumbervars0((H:-B),(UH:-UB))),!.
+  vmust(unnumbervars0((H:-B),(UH:-UB))),!.
 
-unnumbervars0(X,YY):-unnumbervars1(X,YY,_Vs).
+unnumbervars0(X,YY):-lock_vars(X,YY,_Vs).
 */
 /*
-unnumbervars1(X,YY):-
+lock_vars(X,YY):-
    must_det_l((with_output_to(string(A),write_term(X,[numbervars(true),character_escapes(true),ignore_ops(true),quoted(true)])),
-   atom_to_term(A,Y,_NewVars),!,must(YY=Y))),check_varnames(YY).
-unnumbervars1(X,YY,Vs):-!,unnumbervars1(X,[],YY,Vs).
+   atom_to_term(A,Y,_NewVars),!,vmust(YY=Y))),check_varnames(YY).
+lock_vars(X,YY,Vs):-!,lock_vars(X,[],YY,Vs).
 */
 
-unnumbervars1(X,Vs,X,Vs):- ( \+ compound(X)),!.
-unnumbervars1('$VAR'(X),VsIn,Y,Vs):-!, (memberchk(X=Y,VsIn)->Vs=VsIn;Vs=[X=Y|VsIn]).
-unnumbervars1([X|XM],VsIn,[Y|YM],Vs):-!,
-  unnumbervars1(X,VsIn,Y,VsM),
-  unnumbervars1(XM,VsM,YM,Vs).
-unnumbervars1(XXM,VsIn,YYM,Vs):-
+lock_vars(X,Vs,X,Vs):- ( \+ compound(X)),!.
+lock_vars('$VAR'(X),IVs,Y,Vs):-!, (memberchk(X=Y,IVs)->Vs=IVs;Vs=[X=Y|IVs]).
+lock_vars([X|XM],IVs,[Y|YM],Vs):-!,
+  lock_vars(X,IVs,Y,VsM),
+  lock_vars(XM,VsM,YM,Vs).
+lock_vars(XXM,IVs,YYM,Vs):-
   XXM=..[F,X|XM],
-  unnumbervars1(X,VsIn,Y,VsM),
-  unnumbervars1(XM,VsM,YM,Vs),
+  lock_vars(X,IVs,Y,VsM),
+  lock_vars(XM,VsM,YM,Vs),
   YYM=..[F,Y|YM].
 
 /*
-unnumbervars1(X,YY,Vs):-
+lock_vars(X,YY,Vs):-
  must_det_l((
    with_output_to(codes(A),write_term(X,[numbervars(true),character_escapes(true),ignore_ops(true),quoted(true)])),   
-   read_term_from_codes(A,Y,[variable_names(Vs),character_escapes(true),ignore_ops(true)]),!,must(YY=Y),check_varnames(YY))).
+   read_term_from_codes(A,Y,[variable_names(Vs),character_escapes(true),ignore_ops(true)]),!,vmust(YY=Y),check_varnames(YY))).
 
 unnumbervars_and_save(X,YO):-
  term_variables(X,TV),
- must((source_variables(Vs),
+ vmust((source_variables(Vs),
    with_output_to(string(A),write_term(X,[numbervars(true),variable_names(Vs),character_escapes(true),ignore_ops(true),quoted(true)])))),
-   must(atom_to_term(A,Y,NewVars)),
+   vmust(atom_to_term(A,Y,NewVars)),
    (NewVars==[]-> YO=X ; (length(TV,TVL),length(NewVars,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (trace,add_newvars(NewVars),Y=X)))).
 
 
 
 unnumbervars_and_copy(X,YO):-
  term_variables(X,TV),
- must((source_variables(Vs),
+ vmust((source_variables(Vs),
    with_output_to(string(A),write_term(X,[numbervars(true),variable_names(Vs),character_escapes(true),ignore_ops(true),quoted(true)])))),
-   must(atom_to_term(A,Y,NewVars)),
+   vmust(atom_to_term(A,Y,NewVars)),
    (NewVars==[]-> YO=X ; (length(TV,TVL),length(NewVars,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (trace,add_newvars(NewVars),Y=X)))).
 */
 
@@ -282,15 +327,15 @@ renumbervars(Y,Z):-safe_numbervars(Y,Z),!.
 
 renumbervars1(X,Y):-renumbervars1(X,[],Y,_).
 
-renumbervars1(V,VsIn,'$VAR'(X),Vs):- var(V), sformat(atom(X),'~w_RNV',[V]), !, (memberchk(X=V,VsIn)->Vs=VsIn;Vs=[X=V|VsIn]).
+renumbervars1(V,IVs,'$VAR'(X),Vs):- var(V), sformat(atom(X),'~w_RNV',[V]), !, (memberchk(X=V,IVs)->Vs=IVs;Vs=[X=V|IVs]).
 renumbervars1(X,Vs,X,Vs):- ( \+ compound(X)),!.
-renumbervars1('$VAR'(V),VsIn,Y,Vs):- sformat(atom(X),'~w_VAR',[V]), !, (memberchk(X=Y,VsIn)->Vs=VsIn;Vs=[X=Y|VsIn]).
-renumbervars1([X|XM],VsIn,[Y|YM],Vs):-!,
-  renumbervars1(X,VsIn,Y,VsM),
+renumbervars1('$VAR'(V),IVs,Y,Vs):- sformat(atom(X),'~w_VAR',[V]), !, (memberchk(X=Y,IVs)->Vs=IVs;Vs=[X=Y|IVs]).
+renumbervars1([X|XM],IVs,[Y|YM],Vs):-!,
+  renumbervars1(X,IVs,Y,VsM),
   renumbervars1(XM,VsM,YM,Vs).
-renumbervars1(XXM,VsIn,YYM,Vs):-
+renumbervars1(XXM,IVs,YYM,Vs):-
   XXM=..[F,X|XM],
-  renumbervars1(X,VsIn,Y,VsM),
+  renumbervars1(X,IVs,Y,VsM),
   renumbervars1(XM,VsM,YM,Vs),
   YYM=..[F,Y|YM].
 
@@ -301,13 +346,13 @@ renumbervars1(XXM,VsIn,YYM,Vs):-
 %   Therefore the register of variable copies is maintained.
 %
 register_var(N=V,IN,OUT):- (var(N)->true;register_var(N,IN,V,OUT)),!.
-register_var(N,T,V,OUTO):-register_var_0(N,T,V,OUT),must(OUT=OUTO),!.
+register_var(N,T,V,OUTO):-register_var_0(N,T,V,OUT),vmust(OUT=OUTO),!.
 register_var(N,T,V,O):-append(T,[N=V],O),!.
 
-register_var_0(N,T,V,OUT):- must(nonvar(N)),
-   ((name_to_var(N,T,VOther)-> must((OUT=T,samify(V,VOther)));
+register_var_0(N,T,V,OUT):- vmust(nonvar(N)),
+   ((name_to_var(N,T,VOther)-> vmust((OUT=T,samify(V,VOther)));
      (once(nb_getval('$variable_names',Before);Before=[]),
-      (name_to_var(N,Before,VOther)  -> must((samify(V,VOther),OUT= [N=V|T]));
+      (name_to_var(N,Before,VOther)  -> vmust((samify(V,VOther),OUT= [N=V|T]));
          (var_to_name(V,T,_OtherName)                  -> OUT= [N=V|T];
            (var_to_name(V,Before,_OtherName)              -> OUT= [N=V|T];fail)))))),!.
 
@@ -323,7 +368,7 @@ register_var_0(N,T,V,OUT):- var(N),
 
 
 % different variables (now merged)
-samify(V,V0):-must(V=@=V0),V=V0. 
+samify(V,V0):-vmust(V=@=V0),V=V0. 
 
 var_to_name(V,[N=V0|T],N):-
     V==V0 -> true ;          % same variables
@@ -360,20 +405,18 @@ snumbervars(Term,Functor,List):- is_list(List),atom(Functor),!,snumbervars4(Term
 :- swi_export(snumbervars/4).
 snumbervars(Term,Start,End,List):-snumbervars4(Term,Start,End,List).
 
-% snumbervars(Term,Functor,Start,End,List):-must(( must(var(End);number(End)),numbervars(Term,Start,End,[functor_name(Functor)|List]))),check_varnames(Term).
+% snumbervars(Term,Functor,Start,End,List):-vmust(( vmust(var(End);number(End)),numbervars(Term,Start,End,[functor_name(Functor)|List]))),check_varnames(Term).
 
 
 check_varnames(Vs):-var(Vs),!.
 check_varnames([]):-!.
-check_varnames([N=V|Vs]):-atom(N),var(V),check_varnames(Vs).
+check_varnames([N=V|Vs]):-atom(N),var(V),!,check_varnames(Vs).
 check_varnames(Term):- contains_badvarnames(Term),!,dumpST0,trace,stop_rtrace,trace,!,dtrace(contains_badvarnames(Term)).
 check_varnames(_).
 
 snumbervars4(Term,Start,End,List):-must_det_l((integer(Start),is_list(List), numbervars(Term,Start,End,List),check_varnames(Term))).
 
 
-put_varname(Var,'$VAR'(Name)):-atom(Name),!, put_attr(Var,varname,Name).
-put_varname(Var,Name):-  put_attr(Var,varname,Name).
 varname:attr_unify_hook(_,_).
 varname:attr_portray_hook(Value, _Var) :- nonvar(Value),!,writeq('?'(Value)).
 :- public
@@ -386,13 +429,13 @@ varname:attr_portray_hook(Value, _Var) :- nonvar(Value),!,writeq('?'(Value)).
 
 
 try_save_vars(HB):-ignore((nb_current('$variable_names',Vs),Vs\==[],save_clause_vars(HB,Vs))),!.
-user:term_expansion(HB,_):- try_save_vars(HB),fail.
+user:term_expansion(HB,_):- once(try_save_vars(HB)),fail.
 
 read_source_files:- 
  forall(source_file(F),catch(read_source_file_vars(F),_,true)).
 
-read_source_file_vars(F):- clause_asserted(user:saved_varname_info(F,F,F)),!.
-read_source_file_vars(F):- assert(user:saved_varname_info(F,F,F)),
+read_source_file_vars(F):- clause_asserted(user:varname_info_file(F)),!.
+read_source_file_vars(F):- assert(user:varname_info_file(F)),
    open(F,read,S), 
    call_cleanup(read_vars_until_oes(F,S),close(S)),!.
 
@@ -401,7 +444,7 @@ read_vars_until_oes(F,S):-
   repeat,
    read_term(S,T,[variable_names(Vs)]),
    (T==end_of_file->!;
-    ((Vs\==[],must(line_count(S,C)),    
+    ((Vs\==[],vmust(line_count(S,C)),    
     b_setval('$variable_names',Vs),
     with_assertions(thlocal:current_why_source(F:C),
     (save_clause_vars(T,Vs),fail))))).
