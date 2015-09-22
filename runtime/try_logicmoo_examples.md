@@ -1,8 +1,7 @@
 #!/usr/bin/env swipl
-/** <module> Example Logicmoo_base startup script in SWI-Prolog
-
+/**
+````
 */
-
 :- if(gethostname(ubuntu)).
 :- user:ensure_loaded(logicmoo_repl).
 :- else.
@@ -10,20 +9,99 @@
 :- endif.
 
 
+:-multifile shared_hide_data/1.
+shared_hide_data(hideMeta):-is_main_thread.
+shared_hide_data(hideTriggers):-is_main_thread.
 
+% setup pfc
 :- file_begin(pfc).
-:- pfc_trace.
-:- pfc_watch.
 
 % see logicmoo_i_compiler.pl for more info
 :- set_clause_compile(fwc).
 
 
-==> clif(male(P)  => ~ female(P)).
+% Logical Negation (not by failure)
 
-:-prolog.
 
+
+% joe is male
 ==> male(joe).
+
+% pat is not female
+==> ~female(pat).
+
+
+
+
+==> clif(male(P)  => ~female(P)).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% kif = 
+%       all(P, (male(P)=> ~female(P))).
+%
+% pkif = 
+%       all(P, (male(P)=>not(female(P)))).
+%
+% cnf = 
+%       not(male(P))v not(female(P)).
+%
+% horn = 
+%       [ (not(female(P)):-male(P)), (not(male(P)):-female(P))].
+%
+%
+% succeed(user:boxlog_to_pfc((not(female(P)):-male(P)), (male(P), {is_unit(P)}==>neg(female(P))))).
+%
+% succeed(user:boxlog_to_pfc((not(male(P)):-female(P)), (female(P), {is_unit(P)}==>neg(male(P))))).
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+% Notice we do not have the evidence to prove anyone male to female!
+% Only the ability to "disprove" right now
+
+
+% Humans are male or female
+==> clif(human(P) => (female(P) v male(P))).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% kif = 
+%       all(P, (human(P)=>female(P)v male(P))).
+%
+% pkif = 
+%       all(P, (human(P)=>female(P)v male(P))).
+%
+% cnf = 
+%       not(human(P))v (female(P)v male(P)).
+%
+% horn = 
+%
+%       [ (female(P):-human(P), not(male(P))),
+%         (male(P):-human(P), not(female(P))),
+%         (not(human(P)):-not(female(P)), not(male(P)))
+%       ].
+%
+%
+% succeed(user:boxlog_to_pfc((female(P):-human(P), not(male(P))), (human(P), neg(male(P)), {is_unit(P)}==>female(P)))).
+%
+% succeed(user:boxlog_to_pfc((male(P):-human(P), not(female(P))), (human(P), neg(female(P)), {is_unit(P)}==>male(P)))).
+%
+% succeed(user:boxlog_to_pfc((not(human(P)):-not(female(P)), not(male(P))), (neg(female(P)), neg(male(P)), {is_unit(P)}==>neg(human(P))))).
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+% We check that we cannot prove Pat is male.
+% Thus a query to ?- male(pat ). 
+:- test_is_failure( male(pat )).
+
+% Assert pat is human
+==> human(pat).
+
+% Thus we can deduce he is male now 
+:- test_is_success( male(pat )).
+
+
 
 :-prolog.
 
@@ -155,7 +233,7 @@ clif('
 % A does dislikes B when we can somehow prove A not liking B
 :- horn_true((dislikes(A, B):-not(likes(A, B)))).
 % A does likes B when we can somehow prove A not disliking B
-:- horn_true((likes(A,B) :- not(dislikes(A,B)))).
+:- horn_true((likes(A,B) =  not(dislikes(A,B)))).
 
 % The above assertions forward chain to these side-effects... 
 :- horn_true((not(love_compatible(bill, alice)))).
@@ -247,23 +325,23 @@ clif(forall(p,exists([m,f], if(human(p), (mother(m,p) & father(f,p)))))).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  % /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_clif.pl:309
-%  kif :-
+%  kif = 
 %          all(M,
 %              all(F, all(P, exists([M, F], (human(P)=>mother(M, P)&father(F, P)))))).
 %  %
 %  % /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_clif.pl:309
-%  pkif :-
+%  pkif = 
 %          all(M,
 %              all(F,
 %                  all(P,
 %                      exists(M, exists(F, (human(P)=>mother(M, P)&father(F, P))))))).
 %  %
 %  % /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_clif.pl:309
-%  cnf :-
+%  cnf = 
 %          (not(skolem(M, skArg1ofMotherFn(P)))v (not(skolem(F, skArg1ofFatherFn(P)))v (not(human(P))v mother(M, P))))& (not(skolem(M, skArg1ofMotherFn(P)))v (not(skolem(F, skArg1ofFatherFn(P)))v (not(human(P))v father(F, P)))).
 %  %
 %  % /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_clif.pl:309
-%  horn :-
+%  horn = 
 %  
 %          [ (not(human(P)):-skolem(M, skArg1ofMotherFn(P)), skolem(F, skArg1ofFatherFn(P)), not(father(F, P))),
 %            (not(human(P)):-skolem(M, skArg1ofMotherFn(P)), skolem(F, skArg1ofFatherFn(P)), not(mother(M, P))),
@@ -276,7 +354,7 @@ clif(forall(p,exists([m,f], if(human(p), (mother(m,p) & father(f,p)))))).
 %          ].
 %  %
 %  % /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_clif.pl:309
-%  pfc :-
+%  pfc = 
 %  
 %          [ (neg(human(P))<-neg(father(F, P)), {vg(s(P))}),
 %            (neg(human(P))<-neg(mother(M, P)), {vg(s(P))}),
@@ -478,3 +556,6 @@ father(douglas,zaltana).
 %  succeed(user:siblings(zaltana, sophiaWebb)).
 %  succeed(user:siblings(zaltana, sophiaWisdom)).
 
+/*
+````
+*/

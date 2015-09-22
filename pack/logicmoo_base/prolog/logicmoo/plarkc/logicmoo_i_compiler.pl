@@ -26,6 +26,12 @@ additional features that may be added/manipulated in the body
 
 */
 :- use_module(library(dialect/hprolog),[]).
+is_units_h(A):-maplist(is_unit,A).
+is_units_b(A):-maplist(is_unit,A).
+% is_unit(A):-is_unit(A).
+is_unit(A,B):-is_unit(A),is_unit(B).
+is_unit(A,B,C):-is_unit(A),is_unit(B),is_unit(C).
+is_unit(A,B,C,D):-is_unit(A),is_unit(B),is_unit(C),is_unit(D).
 
 % might trace down when it is not
 % vg(G):-var(G),!,fail.
@@ -39,9 +45,9 @@ make_must_ground(H,BB,VG):-
    hprolog:list_difference_eq(BBVs,HVs,UBBVs),
    make_vg(UBBVs,Shared,UHVs,VG),!.
 
-make_vg([],Shared,[],{vg(S)}):-  S=..[s|Shared],!.
-make_vg(_,Shared,_,{vg(S)}):-  S=..[s|Shared],!.
-make_vg(B,S,H,{vg(CB,CS,CH)}):- CB=..[b|B],CS=..[s|S],CH=..[h|H].
+make_vg([],Shared,[],{(S)}):-  S=..[is_unit|Shared],!.
+make_vg(_,Shared,_,{(S)}):-  S=..[is_unit|Shared],!.
+make_vg(B,S,H,{(CB,CS,CH)}):- CB=..[is_units_b,B],CS=..[is_unit|S],CH=..[is_units_h,H].
 
 set_clause_compile(TYPE):-op_alias((:-),TYPE).
 

@@ -311,7 +311,7 @@ pfc_add_minfo(How,bt(H,_)):-!,attvar_op(How,(H:-pfc_bc_only(H))).
 pfc_add_minfo(How,nt(H,Test,Body)):-!,attvar_op(How,(H:-fail,nt(H,Test,Body))).
 pfc_add_minfo(How,pt(H,Body)):-!,attvar_op(How,(H:-fail,pt(H,Body))).
 pfc_add_minfo(How,(A0:-INFOC0)):- pfc_is_info(INFOC0), copy_term((A0:-INFOC0),(A:-INFOC)),!,pmust((pfc_rewrap_h(A,AA),imploded_copyvars((AA:-INFOC),ALLINFO), attvar_op(How,(ALLINFO)))),!.
-%pfc_add_minfo(How,G):-dmsg(skipped_add_meta_facts(How,G)).
+%pfc_add_minfo(How,G):-pfc_trace_msg(skipped_add_meta_facts(How,G)).
 pfc_add_minfo(_,_).
 
 :-export(pfc_add_minfo_2/2).
@@ -346,9 +346,9 @@ is_atom_body_pfa(WAC,P,F,2,Rest):-arg(2,P,E),E==WAC,arg(1,P,Rest),!.
 
 
 :-thread_local(thlocal:pfc_debug_local/0).
-pfc_silient :- \+ thlocal:pfc_debug_local, \+ thlocal:pfc_trace_exec.
+pfc_silient :- ( \+ thlocal:pfc_debug_local, \+ thlocal:pfc_trace_exec) ,!.
 
-pfc_tracing :- thlocal:pfc_debug_local ;  thlocal:pfc_trace_exec.
+pfc_tracing :- ( thlocal:pfc_debug_local ;  thlocal:pfc_trace_exec ),!.
 
 
 
@@ -638,14 +638,18 @@ pfc_post_sp_zzzz(S,(P1,P2)) :- !,pfc_post_sp_zzzz(S,(P1)),pfc_post_sp_zzzz(S,(P2
 pfc_post_sp_zzzz(S,[P1]) :- !,pfc_post_sp_zzzz(S,(P1)).
 pfc_post_sp_zzzz(S,[P1|P2]) :- !,pfc_post_sp_zzzz(S,(P1)),pfc_post_sp_zzzz(S,(P2)).
 pfc_post_sp_zzzz(S, \+ P) :-!,doall(pfc_rem2a(P,S)),!,pfc_undo((\+),P).
-pfc_post_sp_zzzz(S, ~  P) :-!,doall(pfc_rem2a(P,S)),!,pfc_undo((~ ),P).
-pfc_post_sp_zzzz(S, not( P)) :-!,pfc_post_sp_zzzz(S, neg( P)).
-pfc_post_sp_zzzz(_S,P) :- once((pfc_is_tautology(P),dmsg(trace_or_throw(todo(error(pfc_is_tautology(P))))))),show_load_context,fail.
+pfc_post_sp_zzzz(S, ~(P)) :-!,pfc_post_sp_zzzz(S, neg( P)).
+pfc_post_sp_zzzz(S, not(P)) :-!,pfc_post_sp_zzzz(S, neg( P)).
+pfc_post_sp_zzzz(S, neg(P)) :-doall(pfc_rem2a(P,S)),pfc_undo((\+),P),fail.
+pfc_post_sp_zzzz(_S,P) :- once((pfc_is_tautology(P),wdmsg(trace_or_throw(todo(error(pfc_is_tautology(P))))))),show_load_context,fail.
 
 % only do loop check if it's already supported
 
 pfc_post_sp_zzzz(S,P) :- is_ftCompound(P), arg(SV,P,V),is_relative(V),pmust((pfc_update_literal(P,SV,Q,R),pfc_post_sp_zzzz(S,R))),(Q=R->true;pfc_undo(update,Q)).
 pfc_post_sp_zzzz(S,P) :- is_already_supported(P,S,_How),pmust(loop_check(pfc_post1_sp_0(S,P),pfc_post1_sp_1(S,P))),!. % ,pfc_enqueue(P,S).
+
+pfc_post_sp_zzzz(S,neg(P)) :-!, pfc_post1_sp_0(S,neg(P)),pfc_run,!,assert_u(neg(P)).
+
 pfc_post_sp_zzzz(S,P) :- pfc_post1_sp_0(S,P).
 
 pfc_post1_sp_0(S,P) :-
@@ -662,7 +666,7 @@ pfc_post1_sp_1(S,P):- P\==true,
   pmust(pfc_enqueue(P,S)),
   !.
 
-pfc_post1_sp_1(_,_). % arleady added
+pfc_post1_sp_1(_,_). % already added
 pfc_post1_sp_1(S,P) :-  pfc_warn("pfc_post1(~p,~p) failed",[P,S]).
 
 
@@ -1077,7 +1081,7 @@ pfc_undo_u(Why,Fact) :-
      pfc_unfwc1(Fact).
 
 pfc_undo_e(Why,Fact) :- 
-     (Fact\=neg(_)->pfc_trace_msg("pfc_undo_e ; Fact not found in user db: ~p",[Fact]);true),
+     (Fact\=neg(_)->cnotrace(pfc_trace_msg("pfc_undo_e ; Fact not found in user db: ~p",[Fact]));true),
      (Fact\=neg(_)->pfc_trace_rem(Why,Fact);true),
      pfc_unfwc(Fact).
 
@@ -1102,7 +1106,7 @@ pfc_unfwc_check_triggers(_Sup,F) :-
   pfc_get_trigger_quick(nt(Fcopy,Condition,Action)),
   (\+ Condition),
   G = pfc_eval_lhs(Action,((\+F),nt(F,Condition,Action))),
-  loop_check(G,wdmsg(unfwc_caught_loop(G))),
+  loop_check(G,pfc_trace_msg(unfwc_caught_loop(G))),
   fail.
 pfc_unfwc_check_triggers(_Sup,_).
 
@@ -1120,13 +1124,13 @@ pfc_retract_support_relations(_,_).
 
 
 remove_if_unsupported_verbose(Why,TMS,P) :- is_ftVar(P),!,trace_or_throw(warn(var_remove_if_unsupported_verbose(Why,TMS,P))).
-remove_if_unsupported_verbose(Why,TMS,P) :- (\+ ground(P) -> dmsg(warn(ng_remove_if_unsupported_verbose(Why,TMS,P))) ;true),
+remove_if_unsupported_verbose(Why,TMS,P) :- (\+ ground(P) -> pfc_trace_msg(warn(ng_remove_if_unsupported_verbose(Why,TMS,P))) ;true),
    (((pfc_tms_supported(TMS,P,How),How\=unknown(_)) -> pfc_trace_msg(v_still_supported(How,Why,TMS,P)) ; (  pfc_undo(Why,P)))),
    pfc_run.
 
 
 remove_if_unsupported(Why,P) :- is_ftVar(P),!,trace_or_throw(warn(var_remove_if_unsupported(Why,P))).
-remove_if_unsupported(Why,P) :- ((\+ ground(P), P \= (_:-_) , P \= neg(_) ) -> dmsg(warn(nonground_remove_if_unsupported(Why,P))) ;true),
+remove_if_unsupported(Why,P) :- ((\+ ground(P), P \= (_:-_) , P \= neg(_) ) -> pfc_trace_msg(warn(nonground_remove_if_unsupported(Why,P))) ;true),
    (((pfc_tms_supported(local,P,How),How\=unknown(_)) -> pfc_trace_msg(still_supported(How,Why,local,P)) ; (  pfc_undo(Why,P)))),
    pfc_run.
 
@@ -1153,7 +1157,7 @@ pfc_tms_supported0(deep,P,How) :- pfc_deep_support(How,P).
 pfc_scan_tms(P):-pfc_get_support(P,(S,SS)),
   (S==SS-> true;
    once((pfc_deep_support(_How,P)->true;
-     (dmsg(warn(now_maybe_unsupported(pfc_get_support(P,(S,SS)),fail))))))).
+     (pfc_trace_msg(warn(now_maybe_unsupported(pfc_get_support(P,(S,SS)),fail))))))).
 
 user_atom(U):-match_source_ref1(U).
 user_atom(g).
@@ -2014,7 +2018,7 @@ pfc_rem_support(WhyIn,P,(Fact,Trigger)) :- is_ftVar(P),!,copy_term(pfc_rem_suppo
   ((clause(SPFC,true,Ref),
      ( spftV(RP,RFact,RTrigger) =@= spftV(P,Fact,Trigger) -> 
         erase_w_attvars(clause(SPFC,true,Ref),Ref); 
-       (wdmsg(<=(TheWhy,~SPFC)),nop(pfc_retract_or_warn_i(spftVVVVVVV(P,Fact,Trigger))),nop(trace))),
+       (pfc_trace_msg(<=(TheWhy,~SPFC)),nop(pfc_retract_or_warn_i(spftVVVVVVV(P,Fact,Trigger))),nop(trace))),
    (is_ftVar(P)->trace_or_throw(is_ftVar(P));remove_if_unsupported_verbose(WhyIn,local,P)))).
 pfc_rem_support(Why,(\+ N) , S):- pfc_rem_support(Why,neg(N),S).
 pfc_rem_support(_Why,P,(Fact,Trigger)):-pfc_retract_or_warn_i(spftY(P,Fact,Trigger,_)).
@@ -2304,12 +2308,9 @@ pfc_untrace(Form) :- retractall_i(pfc_traced(Form)).
 
 
 % if the correct flag is set, trace exection of Pfc
-pfc_trace_msg(Msg) :- pfc_trace_msg('~p.',[Msg]).
+pfc_trace_msg(Msg) :- pfc_trace_msg('~p.',[Msg]),!.
 
-pfc_trace_msg(_Msg,_Args):- (pfc_silient ; \+ pfc_tracing),!.
-
-pfc_trace_msg(Msg,Args) :- is_list(Args),!, wdmsg(Msg, Args),!.
-pfc_trace_msg(Msg,Args) :- pfc_trace_item(Msg, Args),!.
+pfc_trace_msg(Msg,Args) :- ignore((pfc_tracing,!,\+ pfc_silient, !, ((is_list(Args) -> wdmsg(Msg, Args) ; pfc_trace_item(Msg, Args))))),!.
 
 
 pfc_watch :- assert_i(thlocal:pfc_trace_exec).
@@ -2319,7 +2320,7 @@ pfc_no_watch :-  retractall_i(thlocal:pfc_trace_exec).
 pfc_error(Msg) :-  pfc_error(Msg,[]).
 
 pfc_error(Msg,Args) :-
- in_cmt(( wdmsg("ERROR/Pfc: ",[]),wdmsg(Msg,Args))).
+ ignore((in_cmt(( wdmsg("ERROR/Pfc: ",[]),wdmsg(Msg,Args))))),!.
 
 
 %=
@@ -2345,12 +2346,13 @@ pfc_warn(Msg) :-  pfc_warn(Msg,[]).
 :-pfc_warn.
 
 pfc_warn(Msg,Args) :-
+ ignore((
  (pfc_warnings(true); \+ pfc_silient),
   !,
   sformat(S, Msg,Args),
   show_source_location,
-  dmsg(pfc(warn(S))),!.  
-pfc_warn(_,_).
+  wdmsg(pfc(warn(S))))),!.
+
 
 %=
 %= pfc_warnings/0 sets flag to cause pfc warning messages to print.
@@ -2591,12 +2593,14 @@ repropagate(F/A):- atom(F),integer(A),!,functor(P,F,A),!,repropagate(P).
 repropagate(F/A):- atom(F),is_ftVar(A),!,repropagate(F).
 repropagate(P):-  pmust(repropagate0(P)).
 
+:-thread_local thlocal:is_repropagating/1.
+
 repropagate0(P):- is_ftVar(P),!.
 repropagate0(USER:P):- USER==user,!,repropagate0(P).
 repropagate0((P/_)):-!,repropagate0(P).
 repropagate0(P):-
  forall(pfc_facts_and_universe(P),
-  with_assertions(thlocal:pfc_debug_local,
+  with_assertions(thlocal:is_repropagating(P),
   ignore((
    once(fwd_ok(P)),
    pfc_fwd(P))))).
@@ -2613,9 +2617,9 @@ fwd_ok(clif(_)).
 
 pfc_facts_only(P):- (is_ftVar(P)->(pred_head_all(P),\+ meta_wrapper_rule(P));true),(no_repeats(debugOnError(P))).
 
-
-user:rescan_pfc_hook:- forall(pfc_facts_and_universe(P),with_assertions(thlocal:pfc_debug_local,pfc_fwd(P))).
-user:rescan_pfc_hook:- forall(pfc_facts_and_universe(P),with_assertions(thlocal:pfc_debug_local,pfc_scan_tms(P))).
+:- thread_local(thlocal:in_rescan_pfc_hook/0).
+user:rescan_pfc_hook:- forall(pfc_facts_and_universe(P),with_assertions(thlocal:in_rescan_pfc_hook,pfc_fwd(P))).
+user:rescan_pfc_hook:- forall(pfc_facts_and_universe(P),with_assertions(thlocal:in_rescan_pfc_hook,pfc_scan_tms(P))).
 /*
 user:rescan_pfc_hook:- forall(pred_head(pred_u0,P), 
                           forall(no_repeats(P,call(P)),

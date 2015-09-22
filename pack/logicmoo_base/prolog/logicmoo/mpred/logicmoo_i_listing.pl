@@ -369,12 +369,12 @@ pfc_listing_1(What):-
 % logicmoo_html_needs_debug.
 :-multifile shared_hide_data/1.
 
-shared_hide_data('$was_imported_kb_content$'/2):- !,hide_data(hideMeta).
-shared_hide_data(spftY/4):- !,hide_data(hideTriggers).
-shared_hide_data(spft/3):- !,hide_data(hideTriggers).
-shared_hide_data(nt/3):- !,hide_data(hideTriggers).
-shared_hide_data(pt/2):- !, hide_data(hideTriggers).
-shared_hide_data(bt/2):- !, hide_data(hideTriggers).
+shared_hide_data('$was_imported_kb_content$'/2):- !,listing_filter(hideMeta).
+shared_hide_data(spftY/4):- !,listing_filter(hideTriggers).
+shared_hide_data(spft/3):- !,listing_filter(hideTriggers).
+shared_hide_data(nt/3):- !,listing_filter(hideTriggers).
+shared_hide_data(pt/2):- !, listing_filter(hideTriggers).
+shared_hide_data(bt/2):- !, listing_filter(hideTriggers).
 shared_hide_data((H:-
  cwc,
         second_order(_,_G19865),
@@ -384,7 +384,7 @@ shared_hide_data((H:-
         ;   CALL
         ))):- CALL=@=call(_G19865).
 
-shared_hide_data(pfcMark/4):- !,hide_data(hideMeta).
+shared_hide_data(pfcMark/4):- !,listing_filter(hideMeta).
 
 
 pp_now.
@@ -441,7 +441,7 @@ section_close(Type):- shown_subtype(Type)->(retractall(shown_subtype(Type)),(thl
 pp_item_html(_Type,H):-var(H),!.
 pp_item_html(Type,done):-!,section_close(Type),!.
 pp_item_html(_,H):-shown_clause(H),!.
-pp_item_html(_,P):- (hide_data(P); (compound(P),functor(P,F,A),(hide_data(F/A);hide_data(F)))),!.
+pp_item_html(_,P):- (listing_filter(P); (compound(P),functor(P,F,A),(listing_filter(F/A);listing_filter(F)))),!.
 
 pp_item_html(Type,H):- \+ thlocal:print_mode(html), pp_item_html_now(Type,H),!.
 pp_item_html(Type,H):- ignore((flag(matched_assertions,X,X),between(0,5000,X),pp_item_html_now(Type,H))).
@@ -468,10 +468,10 @@ show_clause_ref(Ref):- retractall(thlocal:last_show_clause_ref(_)),asserta(thloc
 
 show_clause_ref_now(V):-var(V),!.
 show_clause_ref_now(0):-!.
-show_clause_ref_now(Ref):- hide_data(hideClauseRef),!.
-show_clause_ref_now(Ref):- hide_data(showFilenames), \+ clause_property(Ref,predicate(_)),format('~N~p~N',[clref(Ref)]),!.
+show_clause_ref_now(Ref):- listing_filter(hideClauseRef),!.
+show_clause_ref_now(Ref):- listing_filter(showFilenames), \+ clause_property(Ref,predicate(_)),format('~N~p~N',[clref(Ref)]),!.
 % write_html(div(class(src_formats),a(href(EditLink), edit)])).
-show_clause_ref_now(Ref):- hide_data(showFilenames),clause_property(Ref,file(File)),ignore(clause_property(Ref,line_count(Line))),
+show_clause_ref_now(Ref):- listing_filter(showFilenames),clause_property(Ref,file(File)),ignore(clause_property(Ref,line_count(Line))),
   ignore(clause_property(Ref,module(Module))),
     format('<a href="/swish/filesystem/~w#L~w">@file:~w:~w</a>(~w)~N',[File,Line,File,Line,Module]),
     fail. 
@@ -487,7 +487,7 @@ pp_i2tml(HB):- find_ref(HB,Ref),!, must(with_assertions(thlocal:current_clause_r
 pp_i2tml(HB):- with_assertions(thlocal:current_clause_ref(none),must(pp_i2tml_v((HB)))).
 
 get_clause_vars_for_print(HB,HB):- ground(HB),!.
-get_clause_vars_for_print(I,I):- hide_data(skipVarnames),!.
+get_clause_vars_for_print(I,I):- listing_filter(skipVarnames),!.
 get_clause_vars_for_print(H0,MHB):- get_clause_vars_copy(H0,MHB).
 
 numberlist_at(_,[]).
@@ -504,7 +504,7 @@ pp_i2tml_0((H :- B)):-B==true,!,pp_i2tml_0((H)),!.
 pp_i2tml_0(((USER:H) :- B)):-USER==user,!,pp_i2tml_0((H:-B)),!.
 pp_i2tml_0((H:-B)):-B==true, !, pp_i2tml_0(H).
 
-pp_i2tml_0(P):- hide_data(P),!.
+pp_i2tml_0(P):- listing_filter(P),!.
 pp_i2tml_0(was_chain_rule(H)):- pp_i2tml_0(H).
 pp_i2tml_0(M:(H)):-M==user, pp_i2tml_0(H).
 pp_i2tml_0(is_edited_clause(H,B,A)):- pp_i2tml_0(proplst([(clause)=H,before=B,after=A])).

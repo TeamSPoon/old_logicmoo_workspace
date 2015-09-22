@@ -68,16 +68,19 @@ m_clause0(_,H,B,R):- user:clause(H,B,R).
 
 :-multifile shared_hide_data/1.
 
-shared_hide_data(varname_info/3):- !,hide_data(hideMeta).
+shared_hide_data(varname_info/3):- !,listing_filter(hideMeta).
+shared_hide_data(table_bugger:_):- listing_filter(hideMeta).
+shared_hide_data(wid):- listing_filter(hideMeta).
 
-hide_data(_):-hide_data0(showAll),!,fail.
-hide_data(P):-notrace(hide_data0(P)).
+listing_filter(_):-hide_data0(showAll),!,fail.
+listing_filter(P):-notrace(hide_data0(P)).
 hide_data0(P):-var(P),!,fail.
+hide_data0(neg(_)):-!,fail.
 hide_data0(P):-thlocal:tl_hide_data(P),!.
 hide_data0(P):-shared_hide_data(P),!.
 hide_data0(_/_):-!,fail.
 hide_data0(P):- compound(P),functor(P,F,A), (hide_data0(F/A);hide_data0(F)).
-hide_data0(M:P):- atom(M),!,hide_data0(P).
+hide_data0(M:P):- atom(M),(listing_filter(M);hide_data0(P)).
 
 
   :- use_module(library(pldoc)).
@@ -147,8 +150,9 @@ pfc_show_doc(M,[Title,Info,Info2]):- pldoc_process:doc_comment(M:module(Title),_
 
 :- meta_predicate user:unify_listing(0).
 unify_listing(FileMatch):-functor_safe(FileMatch,F,A),unify_listing(FileMatch,F,A),!.
-unify_listing_header(FileMatch):-functor_safe(FileMatch,F,A),unify_listing_header(FileMatch,F,A),!.
 
+
+% unify_listing_header(FileMatch):-functor_safe(FileMatch,F,A),unify_listing_header(FileMatch,F,A),!.
 
 :- meta_predicate user:unify_listing(0,*,*).
 unify_listing_header(FileMatch,F,A):- (fmt('~n/* Prediate: ~q / ~q ~n',[F,A,FileMatch])),fail.
@@ -174,40 +178,48 @@ contains_term_unifiable(SearchThis,Find):-compound(SearchThis),functor_safe(Sear
 :- multifile user:listing_mpred_hook/1.
 :- dynamic user:listing_mpred_hook/1.
 
+:-thread_local(thlocal:in_term_listing/1).
+
 :-swi_export((term_listing/1)).
 term_listing([]):-!.
+term_listing(Match):- \+ \+ thlocal:in_term_listing(Match),!.
 term_listing(Match):- 
-  '@'(ignore((catchvv(listing(Match),E,wdmsg(E)))),'user'),
-  term_non_listing(Match),!.
+ with_assertions(thlocal:in_term_listing(Match), 
+  ('@'(ignore((catchvv(listing(Match),E,wdmsg(E)))),'user'),
+  term_non_listing(Match))),!.
 
-user:listing_mpred_hook(_):-fail.
-user:term_mpred_listing(Match):-
- current_predicate(user:listing_mpred_hook/1), 
- %format('/* listing_mpred_hook(~q) => ~n',[Match]),!,
- once(debugOnError(doall(call_no_cuts(user:listing_mpred_hook(Match))))),
- !. %format(' <= listing_mpred_hook(~q) */ ~n',[Match]).
+
+user:listing_mpred_hook(Match):- user:term_listing(Match).
+
+user:term_mpred_listing(Match):- current_predicate(user:listing_mpred_hook/1), once(debugOnError(doall(call_no_cuts(user:listing_mpred_hook(Match))))),!.
+ 
+
 
 :-swi_export(term_non_listing/1).
 term_non_listing(Match):- 
-   format('/* term_non_listing(~q) => ~n',[Match]),
-      term_listing_inner(portray_hbr,Match),
+   format('~N/* term_non_listing(~q) => ~n',[Match]),
+   term_listing_inner(portray_hbr,Match),!,
    format(' <= term_non_listing(~q) */ ~n',[Match]).
 
 
 
-get_matcher_code(Match,H,B,CODE):-  atom(Match),!, CODE= term_matches_unify(99,Match,((H:-B))).
-get_matcher_code(Match,H,B,CODE):-  CODE = term_matches_hb(Match,H,B).
+get_matcher_code(Match,H,B,MATCHER):-  atom(Match),!, MATCHER= term_matches_unify(99,Match,((H:-B))).
+get_matcher_code(Match,H,B,MATCHER):-  MATCHER = term_matches_hb(Match,H,B).
 
-term_listing_inner(Pred,Match):-     
-   get_matcher_code(Match,H,B,CODE),!,
-   doall(((synth_clause_for(H,B,Ref,Size,CALL),
-     (( 
-      (hide_data(wholePreds),Size<100) 
+
+term_listing_inner(Pred,Match):-
+ must_det_l((
+   get_matcher_code(Match,H,B,MATCHER),
+   PRINT = must(ignore(show_call_failure(once(call(Pred,H,B,Ref))))),
+   PREDZ = must(synth_clause_for(H,B,Ref,Size,SYNTH)),
+   forall(PREDZ,
+     must(( 
+      (listing_filter(wholePreds),Size<100) 
         -> 
-          ( \+ \+ ((CALL,CODE)) -> '@'(forall(CALL,must(once(call(Pred,H,B,Ref)))),'user') ; true) 
+          ( \+ \+ ((SYNTH,MATCHER)) -> '@'(forall(SYNTH,PRINT),'user') ; true) 
          ; 
 
-        ('@'(forall(CALL,(CODE->must(once(call(Pred,H,B,Ref))))),'user'))))))).
+        ('@'(forall(SYNTH,(MATCHER->PRINT;true)),'user'))))))).
       
 
 :- multifile user:prolog_list_goal/1.
@@ -217,7 +229,11 @@ term_listing_inner(Pred,Match):-
 user:buggery_ok :- \+ compiling, current_predicate(logicmoo_bugger_loaded/0), \+ user:no_buggery.
 
 :- multifile prolog:locate_clauses/2.
-prolog:locate_clauses(A, _) :- current_predicate(logicmoo_bugger_loaded/0),buggery_ok ,current_predicate(user:term_mpred_listing/1),call_no_cuts(user:term_mpred_listing(A)),fail.
+prolog:locate_clauses(A, _) :- 
+    current_predicate(logicmoo_bugger_loaded/0),
+    buggery_ok,
+    current_predicate(user:term_mpred_listing/1),
+    call_no_cuts(user:term_mpred_listing(A)),fail.
 
 
 
@@ -244,35 +260,35 @@ sourceTextPredicateSource(_):-fail.
 
 
 
-synth_clause_for(G,true,0,200,CALL):-  bookeepingPredicateXRef(G), \+ hide_data(hideMeta), CALL=failOnError(G).
-synth_clause_for(G,B,Ref,Size,CALL):-  cur_predicate(_,M:H), \+ bookeepingPredicateXRef(M:H), \+ sourceTextPredicate(M:H), \+ hide_data(M:H), synth_clause_ref(M:H,G,B,Ref,Size,CALL).
-synth_clause_for(G,true,0,200, CALL):-  sourceTextPredicate(G), \+ hide_data(G), CALL = failOnError(G).
-synth_clause_for(G,  B, Ref,Size, CALL):- \+ hide_data(skipLarge), gripe_time(10,synth_clause_for_l2(G,B,Ref,Size,CALL)).
+synth_clause_for(G,true,0,244,SYNTH):-  bookeepingPredicateXRef(G), \+ listing_filter(hideMeta), SYNTH=failOnError(G).
+synth_clause_for(G,B,Ref,Size,SYNTH):-  cur_predicate(_,M:H), \+ bookeepingPredicateXRef(M:H), \+ sourceTextPredicate(M:H), \+ listing_filter(M:H), synth_clause_ref(M:H,G,B,Ref,Size,SYNTH).
+synth_clause_for(G,true,0,222, SYNTH):-  sourceTextPredicate(G), \+ listing_filter(G), SYNTH = failOnError(G).
+synth_clause_for(G,  B, Ref,Size, SYNTH):- \+ listing_filter(skipLarge), gripe_time(10,synth_clause_for_l2(G,B,Ref,Size,SYNTH)).
  
-synth_clause_for_l2(M:H,B,Ref,Size,CALL):- 
+synth_clause_for_l2(M:H,B,Ref,Size,SYNTH):- 
  (findall((Size- (M:H)),retract(thlocal:large_predicates(M:H,Size)),KeyList),
    keysort(KeyList,KeySorted), format('~N~n% listing larger preds now.. ~q~n',[KeySorted])),!,
-   synth_clause_for_large(M:H,B,Ref,KeySorted,Size,CALL).
+   synth_clause_for_large(M:H,B,Ref,KeySorted,Size,SYNTH).
 
 synth_clause_for_large(_,_,_,[],0,fail):-!.
-synth_clause_for_large(_,_,_,_,0,fail):- hide_data(skipLarge),!.
-synth_clause_for_large(M:H,B,Ref,KeySorted,Size,CALL):-   
+synth_clause_for_large(_,_,_,_,0,fail):- listing_filter(skipLarge),!.
+synth_clause_for_large(M:H,B,Ref,KeySorted,Size,SYNTH):-   
       ((must(member( (Size- (M:H)) , KeySorted))),
-      \+ hide_data(M:H),
-      CALL= must(m_clause(M,H,B,Ref))).
+      \+ listing_filter(M:H),
+      SYNTH= must(m_clause(M,H,B,Ref))).
 
 :-swi_export((synth_clause_ref/3)).
-synth_clause_ref(M:H,M:predicate_property(H,B),true,0, 250, CALL):- \+ hide_data(hideMeta), CALL= predicate_property(M:H,B).
-synth_clause_ref(_:varname_info(_,_,_),_,_,_, _Size, _CALL):-  \+ hide_data(showAll)  ,!,fail.
+synth_clause_ref(M:H,M:predicate_property(H,B),true,0, 250, SYNTH):- \+ listing_filter(hideMeta), SYNTH= predicate_property(M:H,B).
+synth_clause_ref(_:varname_info(_,_,_),_,_,_, _Size, _CALL):-  \+ listing_filter(showAll)  ,!,fail.
 
-synth_clause_ref(G,G,true,  0,  213,CALL):- synth_in_listing(G),  predicateUsesCall(G),!, CALL= failOnError(G).
-synth_clause_ref(M:H,M:H,B,Ref,Size,CALL):- 
+synth_clause_ref(G,G,true,  0,  213,SYNTH):- synth_in_listing(G),  predicateUsesCall(G),!, SYNTH= failOnError(G).
+synth_clause_ref(M:H,M:H,B,Ref,Size,SYNTH):- 
   predicate_property(M:H,number_of_clauses(Size)),
     synth_in_listing(M:H),
-  (Size > 5000 ->  (\+ hide_data(skipLarge), asserta(thlocal:large_predicates(M:H,Size)),fail) ; CALL = m_clause(M,H,B,Ref)).
+  (Size > 5000 ->  (\+ listing_filter(skipLarge), asserta(thlocal:large_predicates(M:H,Size)),fail) ; SYNTH = m_clause(M,H,B,Ref)).
 
 
-synth_in_listing(MH):- ( \+ hide_data(MH), \+ sourceTextPredicateSource(MH) ),!.
+synth_in_listing(MH):- ( \+ listing_filter(MH), \+ sourceTextPredicateSource(MH) ),!.
 
 %synth_clause_ref(M:H,B,Ref):-M==user,!,synth_clause_ref(H,B,Ref).
 % synth_clause_ref(H,(fail,synth_clause_info(Props)),0):- (H\=(_:-_)),once(pred_info(H,Props)), Props\==[].
@@ -332,8 +348,11 @@ nonvar_search(F/A):-!,nonvar(F),nonvar(A).
 
 :-dynamic(cur_predicates/1).
 :-swi_export((cur_predicate)/2).
+
+
 cur_predicate(M:F/A,M:P):-
-   current_predicate(M:F/A),functor(P,F,A),\+ predicate_property(M:P,imported_from(_)).
+   current_predicate(M:F/A),functor(P,F,A),\+ ((predicate_property(M:P,imported_from(_)))).
+
 /*
 cur_predicate(M:F/A,MP):-atom(M),var(F),!,cur_predicate(M,F/A,MP).
 cur_predicate(MFA,M:P):-atom(M),var(P),!,cur_predicate(M,MFA,P).
