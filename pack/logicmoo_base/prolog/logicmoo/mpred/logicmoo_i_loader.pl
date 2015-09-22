@@ -733,7 +733,7 @@ file_begin(W):-
    decache_file_type(ISource),
    assert_until_eof(user:mpred_directive_value(W,file,ISource)))),
    must_det(( loading_source_file(Source),decache_file_type(Source),asserta(user:mpred_directive_value(W,file,Source)))).
-file_end(W):- must_det(( enable_mpred_expansion, loading_source_file(ISource),decache_file_type(ISource),ignore(retract(user:mpred_directive_value(W,file,ISource))))),  
+file_end(W):- must_det(( loading_source_file(ISource),decache_file_type(ISource),ignore(retract(user:mpred_directive_value(W,file,ISource))))),  
   must_det(( loading_source_file(Source),decache_file_type(Source),ignore(retract(user:mpred_directive_value(W,file,Source))))).
 
 inside_file(W) :- prolog_load_context(file,Source),user:mpred_directive_value(W,_,Source),!.

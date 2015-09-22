@@ -3,16 +3,11 @@
 
 */
 
+:- if(gethostname(ubuntu)).
 :- user:ensure_loaded(logicmoo_repl).
-% :- load_files(logicmoo_repl, [if(not_loaded),qcompile(auto)]).
-
-
-% Sanity Test for expected side-effect entailments
-% why does renumbervars work but not copy_term? 
-horn_true(CLIF0):- cwc, =(CLIF0,CLIF),sanity((clif_to_prolog(CLIF,Prolog),!,sanity(( \+ \+ (show_call(are_clauses_entailed(Prolog))))))),!.
-
-% Sanity Test for required absence of specific side-effect entailments
-horn_false(CLIF):- cwc, sanity((clif_to_prolog(CLIF,Prolog),show_call(\+ are_clauses_entailed(Prolog)))),!.
+:- else.
+:- load_files(logicmoo_repl, [if(not_loaded),qcompile(auto)]).
+:- endif.
 
 
 
