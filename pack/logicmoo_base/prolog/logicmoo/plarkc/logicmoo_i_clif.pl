@@ -1,5 +1,7 @@
-% -*- mode: md;-*-
-% vim: set filetype=md:
+/* 
+-*- mode: md;-*- 
+vim: set filetype=md:
+*/
 /** <module> special module hooks into the logicmoo engine allow
 %   clif syntax to be recocogized via our CycL/KIF handlers 
 % 
