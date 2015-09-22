@@ -21,10 +21,12 @@
 
 ==> clif(male(P)  => ~ female(P)).
 
+:-prolog.
+
 ==> male(joe).
 
-
 :-prolog.
+
 
 % if two thing do like  each other then they are "love compatible"
 clif(

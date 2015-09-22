@@ -1,3 +1,5 @@
+% -*- mode: md;-*-
+% vim: set filetype=md:
 /** <module> special module hooks into the logicmoo engine allow
 %   clif syntax to be recocogized via our CycL/KIF handlers 
 % 
@@ -5,6 +7,9 @@
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
+% If you've come here looking for the clif examples please follow this link
+%
+%  https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.pl
 */
 
 % we are in "prolog" consultation mode
