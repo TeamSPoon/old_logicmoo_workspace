@@ -1,4 +1,5 @@
 text eol=LF
+PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_clif.pl linguist-language=Markdown
 *.pfc linguist-language=Prolog
 *.plt linguist-language=Prolog
 *.plmoo linguist-language=Prolog
