@@ -9,7 +9,7 @@
 %
 % If you've come here looking for the clif examples please follow this link
 %
-%  https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.pl
+%  https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.md
 */
 
 % we are in "prolog" consultation mode
@@ -124,7 +124,7 @@ arity(pfclog,1).
 end_of_file.
 
 % If you've come here looking for the clif examples please follow this link
-% <a href="https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.pl">https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.pl</a>
+% <a href="https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.md">https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.md</a>
 
 :- if( if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
 :- include(try_logicmoo_examples).
