@@ -5,4 +5,5 @@ text eol=LF
 *.pl linguist-language=Prolog
 *.P linguist-language=Prolog
 *_old linguist-language=Prolog
-
+*.p linguist-language=Prolog
+PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_clif.pl linguist-language=Markdown
