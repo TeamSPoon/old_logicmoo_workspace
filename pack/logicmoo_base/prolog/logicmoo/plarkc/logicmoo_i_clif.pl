@@ -119,10 +119,9 @@ arity(pfclog,1).
 end_of_file.
 
 
+% see https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.pl
 
 :- if( if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
-
-/* @see https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.pl */
-
+:- include(try_logicmoo_examples).
 :- endif.
 
