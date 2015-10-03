@@ -1,130 +1,68 @@
 #!/usr/bin/env swipl
+
 /**
 ````
 */
+
 :- if(gethostname(ubuntu)).
 :- user:ensure_loaded(logicmoo_repl).
 :- else.
-:- load_files(logicmoo_repl, [if(not_loaded),qcompile(auto)]).
+:- user:ensure_loaded(logicmoo_repl).
+% :- load_files(logicmoo_repl, [if(not_loaded),qcompile(auto)]).
 :- endif.
 
+show_call_test(G):-must(show_call(G)).
 
+%= define the example language
+example_known_is_success(G):-  G.
+example_impossible_is_success(G):- neg(G).
+example_known_is_failure(G):-  \+ G.
+example_impossible_is_failure(G):- \+ neg(G).
+
+%= define the four truth values
+example_proven_true(G):- example_known_is_success(G),example_impossible_is_failure(G).
+example_proven_false(G):- example_impossible_is_success(G),example_known_is_failure(G).
+example_inconsistent(G):- example_known_is_success(G),example_impossible_is_success(G).
+example_unknown(G):- example_known_is_failure(G),example_impossible_is_failure(G).
+  
 :-multifile shared_hide_data/1.
-shared_hide_data(hideMeta):-is_main_thread.
-shared_hide_data(hideTriggers):-is_main_thread.
+%= shared_hide_data(hideMeta):-is_main_thread.
+%= shared_hide_data(hideTriggers):-is_main_thread.
 
-% setup pfc
+:- shell(cls).
+:- process_this_script.
+
+
+%=  setup pfc
 :- file_begin(pfc).
 
-% see logicmoo_i_compiler.pl for more info
+%=  see logicmoo_i_compiler.pl for more info
 :- set_clause_compile(fwc).
 
 
-% Logical Negation (not by failure)
+isa(Pred, ptSymmetric)==> (t(Pred, X, Y)==>t(Pred, Y, X)), (neg(t(Pred, X, Y))==>neg(t(Pred, Y, X))).
+
+isa(love_compatible, ptSymmetric).
 
 
-
-% joe is male
-==> male(joe).
-
-% pat is not female
-==> ~female(pat).
-
-
-
-
-==> clif(male(P)  => ~female(P)).
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% kif = 
-%       all(P, (male(P)=> ~female(P))).
-%
-% pkif = 
-%       all(P, (male(P)=>not(female(P)))).
-%
-% cnf = 
-%       not(male(P))v not(female(P)).
-%
-% horn = 
-%       [ (not(female(P)):-male(P)), (not(male(P)):-female(P))].
-%
-%
-% succeed(user:boxlog_to_pfc((not(female(P)):-male(P)), (male(P), {is_unit(P)}==>neg(female(P))))).
-%
-% succeed(user:boxlog_to_pfc((not(male(P)):-female(P)), (female(P), {is_unit(P)}==>neg(male(P))))).
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-% Notice we do not have the evidence to prove anyone male to female!
-% Only the ability to "disprove" right now
-
-
-% Humans are male or female
-==> clif(human(P) => (female(P) v male(P))).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% kif = 
-%       all(P, (human(P)=>female(P)v male(P))).
-%
-% pkif = 
-%       all(P, (human(P)=>female(P)v male(P))).
-%
-% cnf = 
-%       not(human(P))v (female(P)v male(P)).
-%
-% horn = 
-%
-%       [ (female(P):-human(P), not(male(P))),
-%         (male(P):-human(P), not(female(P))),
-%         (not(human(P)):-not(female(P)), not(male(P)))
-%       ].
-%
-%
-% succeed(user:boxlog_to_pfc((female(P):-human(P), not(male(P))), (human(P), neg(male(P)), {is_unit(P)}==>female(P)))).
-%
-% succeed(user:boxlog_to_pfc((male(P):-human(P), not(female(P))), (human(P), neg(female(P)), {is_unit(P)}==>male(P)))).
-%
-% succeed(user:boxlog_to_pfc((not(human(P)):-not(female(P)), not(male(P))), (neg(female(P)), neg(male(P)), {is_unit(P)}==>neg(human(P))))).
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-% We check that we cannot prove Pat is male.
-% Thus a query to ?- male(pat ). 
-:- test_is_failure( male(pat )).
-
-% Assert pat is human
-==> human(pat).
-
-% Thus we can deduce he is male now 
-:- test_is_success( male(pat )).
-
-
-
-:-prolog.
-
-
-% if two thing do like  each other then they are "love compatible"
+%= if two thing do like  each other then they are "love compatible"
 clif(
  forall(a,forall(b,
     if( (likes(a,b)  & likes(b,a)), 
      love_compatible(a,b))))).
 
-:-prolog.
 
-% will have the side effects... 
+%= will have the side effects... 
 
-% if A is not love compatible with B .. yet B likes A.. we must conclude A must not like B back.
-:- horn_true((not(likes(A, B)):-not(love_compatible(A, B)), likes(B, A))).
-% if A is not love compatible with B .. yet A likes B.. we must conclude B must not like A back.
-:- horn_true((not(likes(B, A)):-not(love_compatible(A, B)), likes(A, B))).
-% if A and B like each other both ways then they are love compatible
-:- horn_true((love_compatible(A, B):-likes(A, B), likes(B, A))).
+%= if A is not love compatible with B .. yet B likes A.. we show_call conclude A show_call not like B back.
+:- is_entailed((not(likes(A, B)):-not(love_compatible(A, B)), likes(B, A))).
+%= if A is not love compatible with B .. yet A likes B.. we show_call conclude B show_call not like A back.
+:- is_entailed((not(likes(B, A)):-not(love_compatible(A, B)), likes(A, B))).
+%= if A and B like each other both ways then they are love compatible
+:- is_entailed((love_compatible(A, B):-likes(A, B), likes(B, A))).
 
 
-% if people are love compatible then they must like each other
+%= if people are love compatible then they show_call like each other
 clif(
   forall(a,forall(b,
    if(love_compatible(a,b), 
@@ -132,66 +70,66 @@ clif(
 
 
  
-% will have the side effects... 
+%= will have the side effects... 
 
-% if A and B must not be love compatible since A does not like B
-:- horn_true((not(love_compatible(A, B)):-not(likes(A, B)))).
-% if A and B must not be love compatible since B does not like A
-:- horn_true((not(love_compatible(A, B)):-not(likes(B, A)))).
-% obviously A likes B .. since they are love compatible
-:- horn_true((likes(A, B):-love_compatible(A, B))).
-% obviously B likes A .. after all they are love compatible
-:- horn_true((likes(B, A):-love_compatible(A, B))).
+%= if A and B show_call not be love compatible since A does not like B
+:- is_entailed((not(love_compatible(A, B)):-not(likes(A, B)))).
+%= if A and B show_call not be love compatible since B does not like A
+:- is_entailed((not(love_compatible(A, B)):-not(likes(B, A)))).
+%= obviously A likes B .. since they are love compatible
+:- is_entailed((likes(A, B):-love_compatible(A, B))).
+%= obviously B likes A .. after all they are love compatible
+:- is_entailed((likes(B, A):-love_compatible(A, B))).
 
 
-% this uses biconditional implicatature 
+%= this uses biconditional implicatature 
 clif(
  forall(a,forall(b,
   iff(might_altercate(a,b),
     (dislikes(a,b)  & dislikes(b,a)))))).
 
-%  canonicalizes to..
+%=  canonicalizes to..
 
-% A and B will not scrap becasue it takes two to tango and A doesnt dislike B
-:- horn_true((not(might_altercate(A, B)):-not(dislikes(A, B)))).
-% A and B will not scrap becasue it takes B doent dislike A (like above)
-:- horn_true((not(might_altercate(A, B)):-not(dislikes(B, A)))).
-% Since we can prove A and B  dislike each other we can prove they are scrap compatible
-:- horn_true((might_altercate(A, B):-dislikes(A, B), dislikes(B, A))).
-%  A dislikes B  when we prove A and B are scrap compatible somehow  (this was due to the biconditional implicatature)
-:- horn_true((dislikes(A, B):-might_altercate(A, B))).
-%  B dislikes A  when we prove A and B are scrap compatible
-:- horn_true((dislikes(B, A):-might_altercate(A, B))).
+%= A and B will not scrap becasue it takes two to tango and A doesnt dislike B
+:- is_entailed((not(might_altercate(A, B)):-not(dislikes(A, B)))).
+%= A and B will not scrap becasue it takes B doent dislike A (like above)
+:- is_entailed((not(might_altercate(A, B)):-not(dislikes(B, A)))).
+%= Since we can prove A and B  dislike each other we can prove they are scrap compatible
+:- is_entailed((might_altercate(A, B):-dislikes(A, B), dislikes(B, A))).
+%=  A dislikes B  when we prove A and B are scrap compatible somehow  (this was due to the biconditional implicatature)
+:- is_entailed((dislikes(A, B):-might_altercate(A, B))).
+%=  B dislikes A  when we prove A and B are scrap compatible
+:- is_entailed((dislikes(B, A):-might_altercate(A, B))).
 
 
-% alice likes bill
+%= alice likes bill
 clif(likes(alice,bill)). 
 
-% dumbo does not exists
-% TODO clif(not(isa(dumbo,_))).
+%= dumbo does not exists
+%= TODO clif(not(isa(dumbo,_))).
 
-% evertyting that exists is an instance of Thing
-% TODO clif(isa(_,tThing))).
+%= evertyting that exists is an instance of Thing
+%= TODO clif(isa(_,tThing))).
 
-% also she likes ted
+%= also she likes ted
 clif(likes(alice,ted)).
 
-% we take as a given that bill does not like alice (why?)
+%= we take as a given that bill does not like alice (why?)
 clif(not(likes(bill,alice))).
 
-% we take as a given that bill and ted dislike each other (dont blame the woman!)
+%= we take as a given that bill and ted dislike each other (dont blame the woman!)
 clif((dislikes(bill,ted) & dislikes(ted,bill))).
 
-% we support also SUMO language 
+%= we support also SUMO language 
 :- file_begin(kif).
-% (yes we are reading and atom.. which contains parens so we read it as sexprs
-% thank you triska for showing off this neat hack for term reading)
+%= (yes we are reading and atom.. which contains parens so we read it as sexprs
+%= thank you triska for showing off this neat hack for term reading)
 
-% treat the (normally PFC) operators as clif
+%= treat the (normally PFC) operators as clif
 :- op_alias((<=>), iff).
 :- op_alias( (=>),  if).
 
-% we of course supprt KIF
+%= we of course supprt KIF
 clif('
 
 (<=>
@@ -202,7 +140,7 @@ clif('
 '
 ).
 
-% we of course supprt CLIF!
+%= we of course supprt CLIF!
 clif('
 
 (forall (a b)
@@ -214,7 +152,7 @@ clif('
 '
 ).
 
-% we support also CycL language 
+%= we support also CycL language 
 clif('
 
 (equiv
@@ -225,39 +163,39 @@ clif('
 '
 ).
 
-% interestingly this canonicallizes to ... 
-% A does not dislike B when A like B
-:- horn_true((not(dislikes(A, B)):-likes(A, B))).
-% A does not like B when A dislikes B
-:- horn_true((not(likes(A, B)):-dislikes(A, B))).
-% A does dislikes B when we can somehow prove A not liking B
-:- horn_true((dislikes(A, B):-not(likes(A, B)))).
-% A does likes B when we can somehow prove A not disliking B
-:- horn_true((likes(A,B) =  not(dislikes(A,B)))).
+%= interestingly this canonicallizes to ... 
+%= A does not dislike B when A like B
+:- is_entailed((not(dislikes(A, B)):-likes(A, B))).
+%= A does not like B when A dislikes B
+:- is_entailed((not(likes(A, B)):-dislikes(A, B))).
+%= A does dislikes B when we can somehow prove A not liking B
+:- is_entailed((dislikes(A, B):-not(likes(A, B)))).
+%= A does likes B when we can somehow prove A not disliking B
+:- is_entailed((likes(A,B) => not(dislikes(A,B)))).
 
-% The above assertions forward chain to these side-effects... 
-:- horn_true((not(love_compatible(bill, alice)))).
-:- horn_true((not(love_compatible(alice, bill)))).
-:- horn_true((might_altercate(ted, bill))).
-:- horn_true((might_altercate(bill, ted))).
+%= The above assertions forward chain to these side-effects... 
+:- is_entailed((not(love_compatible(bill, alice)))).
+:- is_entailed((not(love_compatible(alice, bill)))).
+:- is_entailed((might_altercate(ted, bill))).
+:- is_entailed((might_altercate(bill, ted))).
 
-% get proof
+%= get proof
 :- sanity(call(pfc_get_support(not(love_compatible(bill, alice))   ,Why))).
-% O = (not(likes(bill, alice)), pt(not(likes(bill, alice)), rhs([not(love_compatible(bill, alice))]))) ;
-% TODO fix this error O = (u, u). 
+%= O = (not(likes(bill, alice)), pt(not(likes(bill, alice)), rhs([not(love_compatible(bill, alice))]))) ;
+%= TODO fix this error O = (u, u). 
 
-% logic tests...
+%= logic tests...
 
 
 :- file_begin(kif).
-% treat the (normally PFC) operators as clif
+%= treat the (normally PFC) operators as clif
 :- op_alias((<=>), iff).
 :- op_alias( (=>),  if).
 
 
-% save compiled clauses using forward chaining storage
-% we are using forward chaining just so any logical errors, performance and program bugs manefest
-% immediately
+%= save compiled clauses using forward chaining storage
+%= we are using forward chaining just so any logical errors, performance and program bugs manefest
+%= immediately
 :- set_clause_compile(fwc).
 :- file_begin(kif).
 :- pfc_trace.
@@ -274,28 +212,25 @@ breeder(X,Y) <=> breeder(Y,X).
      => gender(Y,G2).
 
 
-
 gender(P,male) <=> male(P).
 gender(P,female) <=> female(P).
 
 male(P) <=> ~female(P).
 
-% human(P) => (female(P) v male(P)).
-clif(if(human(P), (female(P) v male(P)))).
 
 
 ((parent(X,Y) & female(X)) <=> mother(X,Y)).
 
-:- horn_true(((parent(X,Y) & female(X)) <=> mother(X,Y))).
-:- horn_true(((parent(X,Y) & female(X)) => mother(X,Y))).
-:- horn_true((mother(X,Y)=>(parent(X,Y) & female(X)))).
-:- horn_true((parent(A,B):-mother(A,B))).
-:- horn_true(not(mother(A,B)):-not(parent(A,B))).
+:- is_entailed(((parent(X,Y) & female(X)) <=> mother(X,Y))).
+:- is_entailed(((parent(X,Y) & female(X)) => mother(X,Y))).
+:- is_entailed((mother(X,Y)=>(parent(X,Y) & female(X)))).
+:- is_entailed((parent(A,B):-mother(A,B))).
+:- is_entailed(not(mother(A,B)):-not(parent(A,B))).
 
 ((parent(X,Y) & female(X)) => mother(X,Y)).
 ((mother(X,Y) => parent(X,Y) & female(X))).
 
-:- horn_true((parent(A,B):-mother(A,B))).
+:- is_entailed((parent(A,B):-mother(A,B))).
 
 
 
@@ -323,76 +258,17 @@ never_retract_u(human(trudy)).
 
 clif(forall(p,exists([m,f], if(human(p), (mother(m,p) & father(f,p)))))).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  % /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_clif.pl:309
-%  kif = 
-%          all(M,
-%              all(F, all(P, exists([M, F], (human(P)=>mother(M, P)&father(F, P)))))).
-%  %
-%  % /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_clif.pl:309
-%  pkif = 
-%          all(M,
-%              all(F,
-%                  all(P,
-%                      exists(M, exists(F, (human(P)=>mother(M, P)&father(F, P))))))).
-%  %
-%  % /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_clif.pl:309
-%  cnf = 
-%          (not(skolem(M, skArg1ofMotherFn(P)))v (not(skolem(F, skArg1ofFatherFn(P)))v (not(human(P))v mother(M, P))))& (not(skolem(M, skArg1ofMotherFn(P)))v (not(skolem(F, skArg1ofFatherFn(P)))v (not(human(P))v father(F, P)))).
-%  %
-%  % /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_clif.pl:309
-%  horn = 
-%  
-%          [ (not(human(P)):-skolem(M, skArg1ofMotherFn(P)), skolem(F, skArg1ofFatherFn(P)), not(father(F, P))),
-%            (not(human(P)):-skolem(M, skArg1ofMotherFn(P)), skolem(F, skArg1ofFatherFn(P)), not(mother(M, P))),
-%            (not(skolem(F, skArg1ofFatherFn(P))):-skolem(M, skArg1ofMotherFn(P)), human(P), not(father(F, P))),
-%            (not(skolem(F, skArg1ofFatherFn(P))):-skolem(M, skArg1ofMotherFn(P)), human(P), not(mother(M, P))),
-%            (not(skolem(M, skArg1ofMotherFn(P))):-skolem(F, skArg1ofFatherFn(P)), human(P), not(father(F, P))),
-%            (not(skolem(M, skArg1ofMotherFn(P))):-skolem(F, skArg1ofFatherFn(P)), human(P), not(mother(M, P))),
-%            (father(F, P):-skolem(M, skArg1ofMotherFn(P)), skolem(F, skArg1ofFatherFn(P)), human(P)),
-%            (mother(M, P):-skolem(M, skArg1ofMotherFn(P)), skolem(F, skArg1ofFatherFn(P)), human(P))
-%          ].
-%  %
-%  % /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_clif.pl:309
-%  pfc = 
-%  
-%          [ (neg(human(P))<-neg(father(F, P)), {vg(s(P))}),
-%            (neg(human(P))<-neg(mother(M, P)), {vg(s(P))}),
-%            true,
-%            true,
-%            true,
-%            true,
-%            (if_missing(father(F, P), father(skArg1ofFatherFn(P), P))<={ignore(M=skArg1ofMotherFn(P))}, human(P), {vg(s(P))}),
-%            (if_missing(mother(M, P), mother(skArg1ofMotherFn(P), P))<={ignore(F=skArg1ofFatherFn(P))}, human(P), {vg(s(P))})
-%          ].
-%  %
-%  % /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_clif.pl:309
-%  %                succeed(user:must(repropagate(arity(if_missing, _)))).
-%  %
-%  
-%  % Removing (pfc_rem1(neg(arity(if_missing,2)), (u,u))) neg(arity(if_missing,2)).
-%  
-%  % /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_clif.pl:309
-%  %     succeed(user:must(repropagate(arity(if_missing, _)))).
-%  %
-%  % /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_clif.pl:309
-%  %      succeed(user:must(repropagate(argIsa(if_missing, 2, ftPercent)))).
-%  %
-%  % /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_clif.pl:309
-%  %       succeed(user:must(repropagate(argIsa(if_missing, 2, ftInt)))).
-%  %
 
-
-:-show_call(must(father(_,trudy))).
+:-show_call(show_call(father(_,trudy))).
 
 
 mother(trudy,eileen).
 ((human(P1),ancestor(P1,P2))=>human(P2)).
-:- listing([ancestor,human,parent]).
-%:- wdmsg("press Ctrl-D to resume.").
-%:- prolog.
+% :- listing([ancestor,human,parent]).
+%=:- wdmsg("press Ctrl-D to resume.").
+%=:- prolog.
 
-:-horn_true(grandmother(trudy,douglas)).
+:-is_entailed(grandmother(trudy,douglas)).
 
 mother(trudy,robby).
 mother(trudy,liana).
@@ -401,11 +277,11 @@ mother(liana,liz).
 mother(trudy,pam).
 
 
-% this fact sets off the anscesteral rule that her decendants are humans to
-% human(trudy).
+%= this fact sets off the anscesteral rule that her decendants are humans to
+%= human(trudy).
 
-% therefore
-:-horn_true(human(douglas)).
+%= therefore
+:-is_entailed(human(douglas)).
 
 /*
 
@@ -431,13 +307,13 @@ Justifications for grandparent(trudy,douglas):
 
 */
 
-%:- wdmsg("press Ctrl-D to resume.").
+%=:- wdmsg("press Ctrl-D to resume.").
 
 
 :- style_check(-singleton).
 
 
-% so far no males "asserted" in the KB
+%= so far no males "asserted" in the KB
 :-doall(show_call(male(Who ))).
 /*
 OUTPUT WAS.. 
@@ -451,21 +327,23 @@ male(skArg1ofFatherFn(douglas)).
 male(skArg1ofFatherFn(trudy)).
 */
 
-% we can report the presence on non male though...
-%    the ~/1 is our negation hook into the inference engine 
-:-doall(show_call(~male(Who ))).
-% we expect to see at least there mothers here
-%  succeed(user: ~male(liana)).
-%  succeed(user: ~male(trudy)).
-%            succeed(user: ~male(skArg1ofMotherFn(trudy))).
-%  succeed(user: ~male(eileen)).
+%= we can report the presence on non male though...
+%=    the ~/1 is our negation hook into the inference engine 
+% :-prolog.
+:- no_varnaming( pfc_no_chaining(doall((trace,show_call(~male(Who )))))).
+:-prolog.
+%= we expect to see at least there mothers here
+%=  succeed(user: ~male(liana)).
+%=  succeed(user: ~male(trudy)).
+%=            succeed(user: ~male(skArg1ofMotherFn(trudy))).
+%=  succeed(user: ~male(eileen)).
 
-% thus ~/1 is tnot/1 of XSB ?!?
+%= thus ~/1 is tnot/1 of XSB ?!?
 
-% there ar explicly non females
+%= there ar explicly non females
 :-doall(show_call(~ female(Who ))).
 
-% ensure skolems are made or destroyed
+%= ensure skolems are made or destroyed
 
 father(robert,eileen).
 siblings(douglas,cassiopea).
@@ -474,88 +352,27 @@ father(douglas,skylar).
 father(douglas,sophiaWisdom).
 father(douglas,zaltana).
 
-:-doall(show_call(mother(Female,Who))).
-%  succeed(user:mother(eileen, douglas)).
-%  succeed(user:mother(liana, liz)).
-%  succeed(user:mother(liana, matt)).
-%  succeed(user:mother(skArg1ofMotherFn(skylar), skylar)).
-%  succeed(user:mother(skArg1ofMotherFn(sophiaWebb), sophiaWebb)).
-%  succeed(user:mother(skArg1ofMotherFn(sophiaWisdom), sophiaWisdom)).
-%  succeed(user:mother(skArg1ofMotherFn(trudy), trudy)).
-%  succeed(user:mother(skArg1ofMotherFn(zaltana), zaltana)).
-%  succeed(user:mother(trudy, eileen)).
-%  succeed(user:mother(trudy, liana)).
-%  succeed(user:mother(trudy, pam)).
-%  succeed(user:mother(trudy, robby)).
+:-is_entailed(human(douglas)).
+
+:- pfc_why(human(douglas)).
+
+:- pfc_why(grandparent(trudy,douglas)).
+
+:-doall(show_call_test(mother(Female,Who))).
+
+:-doall(show_call_test(father(Male,Who))).
+
+% :-doall(show_call_test(male(Who))).
+
+% :-doall(show_call_test(female(Who))).
+
+:-doall(show_call_test(siblings(Who,AndWho))).
+
+:-prolog.
+
+%= human(P) => (female(P) v male(P)).
+clif(if(gendered_human(P), (female(P) v male(P)))).
+
+%= ````
 
 
-:-doall(show_call(father(Female,Who))).
-%  succeed(user:father(douglas, skylar)).
-%  succeed(user:father(douglas, sophiaWebb)).
-%  succeed(user:father(douglas, sophiaWisdom)).
-%  succeed(user:father(douglas, zaltana)).
-%  succeed(user:father(robert, eileen)).
-%  succeed(user:father(skArg1ofFatherFn(douglas), douglas)).
-%  succeed(user:father(skArg1ofFatherFn(eileen), eileen)).
-%  succeed(user:father(skArg1ofFatherFn(liana), liana)).
-%  succeed(user:father(skArg1ofFatherFn(liz), liz)).
-%  succeed(user:father(skArg1ofFatherFn(matt), matt)).
-%  succeed(user:father(skArg1ofFatherFn(pam), pam)).
-%  succeed(user:father(skArg1ofFatherFn(robby), robby)).
-%  succeed(user:father(skArg1ofFatherFn(trudy), trudy)).
-
-
-:-doall(show_call(male(Who))).
-%  succeed(user:male(douglas)).
-%  succeed(user:male(robert)).
-%  succeed(user:male(skArg1ofFatherFn(douglas))).
-%  succeed(user:male(skArg1ofFatherFn(eileen))).
-%  succeed(user:male(skArg1ofFatherFn(liana))).
-%  succeed(user:male(skArg1ofFatherFn(liz))).
-%  succeed(user:male(skArg1ofFatherFn(matt))).
-%  succeed(user:male(skArg1ofFatherFn(pam))).
-%  succeed(user:male(skArg1ofFatherFn(robby))).
-%  succeed(user:male(skArg1ofFatherFn(trudy))).
-
-:-doall(show_call(female(Who))).
-%  succeed(user:female(eileen)).
-%  succeed(user:female(liana)).
-%  succeed(user:female(skArg1ofMotherFn(skylar))).
-%  succeed(user:female(skArg1ofMotherFn(sophiaWebb))).
-%  succeed(user:female(skArg1ofMotherFn(sophiaWisdom))).
-%  succeed(user:female(skArg1ofMotherFn(trudy))).
-%  succeed(user:female(skArg1ofMotherFn(zaltana))).
-%  succeed(user:female(trudy)).
-
-:-doall(show_call(siblings(Who,AndWho))).
-%  succeed(user:siblings(douglas, cassiopea)).
-%  succeed(user:siblings(eileen, liana)).
-%  succeed(user:siblings(eileen, pam)).
-%  succeed(user:siblings(eileen, robby)).
-%  succeed(user:siblings(liana, eileen)).
-%  succeed(user:siblings(liana, pam)).
-%  succeed(user:siblings(liana, robby)).
-%  succeed(user:siblings(liz, matt)).
-%  succeed(user:siblings(matt, liz)).
-%  succeed(user:siblings(pam, eileen)).
-%  succeed(user:siblings(pam, liana)).
-%  succeed(user:siblings(pam, robby)).
-%  succeed(user:siblings(robby, eileen)).
-%  succeed(user:siblings(robby, liana)).
-%  succeed(user:siblings(robby, pam)).
-%  succeed(user:siblings(skylar, sophiaWebb)).
-%  succeed(user:siblings(skylar, sophiaWisdom)).
-%  succeed(user:siblings(skylar, zaltana)).
-%  succeed(user:siblings(sophiaWebb, skylar)).
-%  succeed(user:siblings(sophiaWebb, sophiaWisdom)).
-%  succeed(user:siblings(sophiaWebb, zaltana)).
-%  succeed(user:siblings(sophiaWisdom, skylar)).
-%  succeed(user:siblings(sophiaWisdom, sophiaWebb)).
-%  succeed(user:siblings(sophiaWisdom, zaltana)).
-%  succeed(user:siblings(zaltana, skylar)).
-%  succeed(user:siblings(zaltana, sophiaWebb)).
-%  succeed(user:siblings(zaltana, sophiaWisdom)).
-
-/*
-````
-*/

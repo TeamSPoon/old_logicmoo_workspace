@@ -78,8 +78,9 @@ pp_item(M,spft(W,U,U)):-!,pp_item(M,U:W).
 pp_item(M,spft(W,F,U)):- atom(U),!,    fmt('~N%~n',[]),pp_item(M,U:W), fmt('rule: ~p~n~n', [F]),!.
 pp_item(M,spft(W,F,U)):-          !,   fmt('~w~nd:       ~p~nformat:    ~p~n', [M,W,F]),pp_item(M,U).
 pp_item(M,nt(Trigger,Test,Body)) :- !, fmt('~w n-trigger: ~p~ntest: ~p~nbody: ~p~n', [M,Trigger,Test,Body]).
-pp_item(M,pt(F,Body)):-              !,fmt('~w p-trigger: ~p~n~nbody:~n', [M,F]), pp_i2tml_now((F:-Body)).
-pp_item(M,bt(F,Body)):-              !,fmt('~w b-trigger: ~p~nbody: ~p~n', [M,F,Body]).
+pp_item(M,pt(F,Body)):-              !,fmt('~w p-trigger:~n', [M]), pp_i2tml_now((F:-Body)).
+pp_item(M,bt(F,Body)):-              !,fmt('~w b-trigger:~n', [M]), pp_i2tml_now((F:-Body)).
+
 
 pp_item(M,U:W):- !,sformat(S,'~w  ~w:',[M,U]),!, pp_item(S,W).
 pp_item(M,H):- \+ \+ (( get_clause_vars_for_print(H,HH),fmt("~w ~p~N",[M,HH]))).

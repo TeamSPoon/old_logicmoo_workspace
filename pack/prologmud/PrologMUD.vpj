@@ -112,13 +112,8 @@
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
 		<Folder Name="../../runtime">
-			<F N="../../runtime/logicmoo_example.pl"/>
 			<F N="../../runtime/logicmoo_repl.pl"/>
-			<F N="../../runtime/machine_ubuntu.pl"/>
 			<F N="../../runtime/README.md"/>
-			<F N="../../runtime/run.pl"/>
-			<F N="../../runtime/run_mud_server.pl"/>
-			<F N="../../runtime/start_mud_server.pl"/>
 		</Folder>
 		<F
 			N="Makefile.mk"

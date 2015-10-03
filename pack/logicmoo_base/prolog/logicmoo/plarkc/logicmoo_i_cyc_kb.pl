@@ -294,7 +294,7 @@ maybe_ruleRewrite(IO,IO).
 :-dynamic(cyc_to_plarkc/2).
 
 mwkb1:- tell(fooooo0),
-      ignore(( tinyKB(D), maybe_ruleRewrite(D,E),format('~q.~n',[tinyKB0(E)]),asserta_if_new(tinyKB0(E)),fail)),
+      ignore(( tinyKB(D), maybe_ruleRewrite(D,E),format('~q.~n',[tinyKB0(E)]),attvar_op(asserta_if_new,tinyKB0(E)),fail)),
       told.
 ltkb1:-
  must_det_l(( mwkb1,tell(fooooo9),
@@ -490,7 +490,7 @@ tinyKB_All(PO,MT,STR):- current_predicate('TINYKB-ASSERTION'/5),!,
         once((sexpr_sterm_to_pterm(PLISTIn,P),
                memberchk(amt(MT),PROPS),
                memberchk(str(STR),PROPS), 
-              (member(vars(VARS),PROPS)->(nb_setval('$variable_names', []),fixvars(P,0,VARS,PO));PO=P ))).
+              (member(vars(VARS),PROPS)->(nb_setval('$variable_names', []),fixvars(P,0,VARS,PO),nb_setval('$variable_names', PO));PO=P ))).
 
 loadTinyKB:-forall(tinyKB(P,MT,STR),((print_assertion(P,MT,STR),pfc_add(P)))).
 % ssveTinyKB:-tinyKB_All(tinyKB(P,MT,STR),tell((print_assertion(P,MT,STR),pfc_add(P)))).

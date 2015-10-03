@@ -95,13 +95,15 @@ no_repeats_u(Vs,Call):- CONS = [_], (Call), /*hotrace*/((  CONS=[_|T],
 
 
 % for dont-care vars
+/*
 :- swi_export(no_repeats_dc/2).
 :- meta_predicate no_repeats_dc(+,0).
 no_repeats_dc(Vs,Call):- term_variables(Call,CV),term_variables(Vs,VsL),subtract_eq(CV,VsL,NewVs),no_repeats(NewVs,Call).
+*/
 
 subtract_eq([], _, []) :- !.
 subtract_eq([A|C], B, D) :-
-        memberchk_same(A, B), !,
+        ==(A, B), !,
         subtract_eq(C, B, D).
 subtract_eq([A|B], C, [A|D]) :-
         subtract_eq(B, C, D).

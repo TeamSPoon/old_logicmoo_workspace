@@ -1,4 +1,6 @@
 
+
+
 :-meta_predicate(catchvvnt(0,?,0)).
 catchvvnt(T,E,F):-catchvv(cnotrace(T),E,F).
 
@@ -126,7 +128,7 @@ fmt(X,Y):- fresh_line,fmt_ansi(fmt0(X,Y)),!.
 fmt(X,Y,Z):- fmt_ansi(fmt0(X,Y,Z)),!.
 
 fmt9(fmt0(F,A)):-failOnError(fmt0(F,A)),!.
-fmt9(Msg):- portray_clause_w_vars(Msg).
+fmt9(Msg):- notrace(portray_one_line(Msg)).
 
 % :-reexport(library(ansi_term)).
 
@@ -163,7 +165,7 @@ with_output_to_stream(Stream,Goal):-
          Goal,
          set_output(Saved)).
 
-to_stderror(Call):- thread_current_error_stream(Err), with_output_to_stream(Err,Call).
+to_stderror(Call):- thread_current_error_stream(Err), notrace((with_output_to_stream(Err,Call))).
 
 
 
@@ -185,10 +187,13 @@ sformat(Str,Msg,Vs,Opts):- with_output_to(chars(Codes),(current_output(CO),portr
 portray_clause_w_vars(Out,Msg,Vs,Options):- \+ \+ ((prolog_listing:do_portray_clause(Out,Msg,[variable_names(Vs),numbervars(true),character_escapes(true),quoted(true)|Options]))),!.
 portray_clause_w_vars(Msg,Vs,Options):- portray_clause_w_vars(current_output,Msg,Vs,Options).
 portray_clause_w_vars(Msg,Options):- source_variables_l(Vs),portray_clause_w_vars(current_output,Msg,Vs,Options).
-portray_clause_w_vars(Msg):- source_variables_l(Vs),portray_clause_w_vars(current_output,Msg,Vs,[]).
+
+:-export(portray_clause_w_vars/1).
+portray_clause_w_vars(Msg):- portray_one_line(Msg),!.
 
 prepend_strings(S,AC,O):-once(atomics_to_string(LL,'\n',S)),[L,'']=LL,atom(L),atom_concat(AC,_,L),O=S,!.
 prepend_strings(S,AC,O):-atomics_to_string(Lines,'\n',S),!,atom_concat('\n',AC,Sep),atomics_to_string([''|Lines],Sep,O),!.
+in_cmt(Call):-no_slow_io,!,format('~N/*~n',[]),call_cleanup(Call,format('~N*/~n',[])).
 in_cmt(Call):- prepend_each_line('% ',Call).
 with_current_indent(Call):- get_indent_level(Indent), indent_to_spaces(Indent,Space),prepend_each_line(Space,Call).
 
@@ -226,8 +231,6 @@ dmsg0(F,A):- dmsg(fmt0(F,A)).
 vdmsg(L,F):-loggerReFmt(L,LR),loggerFmtReal(LR,F,[]).
 dmsg(L,F,A):-loggerReFmt(L,LR),loggerFmtReal(LR,F,A).
 
-user:portray(A) :- compound(A),functor(A,(:-),_),portray_clause_w_vars(A),!.
-
 :-thread_local(tlbugger:in_dmsg/0).
 
 dmsg0(V):- tlbugger:in_dmsg,!,format_to_error('~N% ~q~n',[dmsg0(V)]).
@@ -249,6 +252,7 @@ dmsg2(skip_dmsg(_)):-!.
 %dmsg2(trace_or_throw(V)):- dumpST(350),dmsg(warning,V),fail.
 %dmsg2(error(V)):- dumpST(250),dmsg(warning,V),fail.
 %dmsg2(warn(V)):- dumpST(150),dmsg(warning,V),fail.
+dmsg2(Msg):-no_slow_io,format(''
 dmsg2(ansi(Ctrl,Msg)):- !, ansicall(Ctrl,dmsg3(Msg)).
 dmsg2(color(Ctrl,Msg)):- !, ansicall(Ctrl,dmsg3(Msg)).
 dmsg2(Msg):- mesg_color(Msg,Ctrl),ansicall(Ctrl,dmsg3(Msg)).
@@ -325,6 +329,7 @@ colormsg(Ctrl,Msg):- ansicall(Ctrl,fmt0(Msg)).
 :- swi_export(ansicall/2).
 ansicall(Ctrl,Call):- hotrace((current_output(Out), ansicall(Out,Ctrl,Call))).
 
+ansi_control_conv(Ctrl,CtrlO):-no_slow_io,!,flatten([Ctrl],CtrlO),!.
 ansi_control_conv([],[]):-!.
 ansi_control_conv([H|T],HT):-!,ansi_control_conv(H,HH),!,ansi_control_conv(T,TT),!,flatten([HH,TT],HT),!.
 ansi_control_conv(warn,Ctrl):- !, ansi_control_conv(warning,Ctrl),!.
@@ -332,11 +337,13 @@ ansi_control_conv(Level,Ctrl):- ansi_term:level_attrs(Level,Ansi),Level\=Ansi,!,
 ansi_control_conv(Color,Ctrl):- ansi_term:ansi_color(Color,_),!,ansi_control_conv(fg(Color),Ctrl).
 ansi_control_conv(Ctrl,CtrlO):-flatten([Ctrl],CtrlO),!.
 
-is_tty(Out):- not(tlbugger:no_colors), is_stream(Out),stream_property(Out,tty(true)).
+
+is_tty(Out):- not(tlbugger:no_colors), \+ no_slow_io, is_stream(Out),stream_property(Out,tty(true)).
 
 ansicall(Out,_,Call):- \+ is_tty(Out),!,Call.
 ansicall(_Out,_,Call):- tlbugger:skipDumpST9,!,Call.
 
+ansicall(_,_,Call):-no_slow_io,!,Call.
 ansicall(Out,CtrlIn,Call):- once(ansi_control_conv(CtrlIn,Ctrl)),  CtrlIn\=Ctrl,!,ansicall(Out,Ctrl,Call).
 ansicall(_,_,Call):- in_pengines,!,Call.
 ansicall(Out,Ctrl,Call):-
@@ -382,6 +389,7 @@ term_color0(assertz_new,hfg(green)).
 term_color0(asserta_new,hfg(green)).
 term_color0(db_op,hfg(blue)).
 
+mesg_color(_,[reset]):-no_slow_io,!.
 mesg_color(T,C):-var(T),!,nop(dumpST),!,C=[blink(slow),fg(red),hbg(black)],!.
 mesg_color(T,C):-is_sgr_on_code(T),!,C=T.
 mesg_color(T,C):-cyclic_term(T),!,C=reset.

@@ -96,7 +96,7 @@ user:swi_module(_,_).
 :- meta_predicate show_edit_term1(?,?,?).
 :- meta_predicate show_if_debug(?).
 :- meta_predicate simply_functors(2,?,?).
-:- meta_predicate term_listing_inner(3,?).
+:- meta_predicate term_listing_inner(3,?,?).
 :- meta_predicate throw_if_true_else_fail(?,?).
 :- meta_predicate to_atomic_name(?,2,?).
 :- meta_predicate to_nonvars(2,?,?).

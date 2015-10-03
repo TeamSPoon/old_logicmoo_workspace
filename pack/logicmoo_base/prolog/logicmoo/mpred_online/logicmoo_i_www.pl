@@ -678,7 +678,7 @@ make_page_pretext_obj(Obj):-
   % forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((this_listing(M:F/A),flush_output)))),
   % forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((reply_object_sub_page(M:F/A),flush_output)))),
   % ignore((fail,catch(pfc_listing(Pred),_,true))),
-  call_with_time_limit(300,ignore(catch(term_listing_inner(i2tml_hbr,Obj),E,writeq(E)))),
+  call_with_time_limit(300,ignore(catch(term_listing_inner(i2tml_hbr,Obj,[]),E,writeq(E)))),
   flush_output,
   pp_i2tml_saved_done(Obj),!.
 

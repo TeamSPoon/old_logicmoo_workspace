@@ -32,8 +32,8 @@ swipl -g "time(load_files(['pack/logicmoo_nlu/prolog/pldata/nldata_freq_pdat'],[
 swipl -g "time(load_files(['pack/logicmoo_nlu/prolog/pldata/nldata_BRN_WSJ_LEXICON'],[qcompile(auto),if_needed(true)])),halt."
 swipl -g "time(load_files(['pack/logicmoo_nlu/prolog/pldata/nldata_colloc_pdat'],[qcompile(auto),if_needed(true)])),halt."
 swipl -g "time(load_files(['pack/logicmoo_nlu/prolog/pldata/nldata_cycl_pos0'],[qcompile(auto),if_needed(true)])),halt."
-swipl -g "time(qcompile('pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_cyc_kb_tinykb')),halt."
-
+#swipl -g "time(qcompile('pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_cyc_kb_tinykb')),halt."
+swipl -g "time(load_files(['pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_cyc_kb_tinykb'],[qcompile(auto),if_needed(true)])),halt."
 
 if [!-f $STANFORD_JAR]; then 
     echo "Downloading $STANFORD_JAR ...";

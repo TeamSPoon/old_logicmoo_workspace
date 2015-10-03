@@ -58,7 +58,9 @@ clif_to_prolog(CLIF,PrologO):- cwc,
 
 % Sanity Test for expected side-effect entailments
 % why does renumbervars work but not copy_term? 
-is_entailed(CLIF):- cwc, sanity((clif_to_prolog(CLIF,Prolog),!,sanity(( \+ \+ (show_call_failure(are_clauses_entailed(Prolog))))))),!.
+is_entailed(CLIF):-
+ pfc_no_chaining((
+   cwc, sanity((clif_to_prolog(CLIF,Prolog),!,sanity(( \+ \+ (show_call_failure(are_clauses_entailed(Prolog))))))))),!.
 
 % Sanity Test for required absence of specific side-effect entailments
 is_not_entailed(CLIF):- cwc, sanity((clif_to_prolog(CLIF,Prolog),show_call_failure(\+ are_clauses_entailed(Prolog)))),!.
@@ -76,7 +78,6 @@ is_clif(CLIF):-cwc,
 
 % we ensure we are in "pfc" consultation mode (so the syntax rules will define correctly)
 
-% :- pfc_trace.
 :- file_begin(pfc).
 
 % make sure op alias for '=>' is not overriden
@@ -85,7 +86,7 @@ is_clif(CLIF):-cwc,
 ==> hybrid_support(clif,1).
 
 % whenever we know about clif we''ll use the prolog forward chainging system
-/*
+
 
 % this is broken down to the next 6 clauses
 
@@ -93,7 +94,7 @@ is_clif(CLIF):-cwc,
    ({ clif_to_prolog(CLIF,PROLOG)},
       % this consequent asserts the new rules
       PROLOG,{slow_sanity(is_entailed(CLIF))})).
-*/
+
 
 arity(clif,1).
 arity(boxlog,1).

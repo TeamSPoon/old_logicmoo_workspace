@@ -130,7 +130,7 @@ ctn(I,O):-copy_term(I,O).
 
 
 :- meta_predicate
-	reenter_lambda(),
+	reenter_lambda,
 	reenter_lambda(?),
 	reenter_lambda(?,?),
 	reenter_lambda(?,?,?),

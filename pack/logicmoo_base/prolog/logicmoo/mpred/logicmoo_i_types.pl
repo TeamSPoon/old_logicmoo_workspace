@@ -248,7 +248,8 @@ is_non_skolem(C):- \+ is_sk_unit(C).
 
 is_sk_unit(C):-is_ftCompound(C), C\=(_:-_),get_functor(C,F),is_sk_functor(F),!.
 
-is_unit(C):-is_ftCompound(C), C\=(_:-_),C\=ftRest(_),C\=ftListFn(_),get_functor(C,F),is_unit_functor(F).
+is_unit(C):-is_ftCompound(C),!, C\=(_:-_),C\=ftRest(_),C\=ftListFn(_),get_functor(C,F),is_unit_functor(F).
+is_unit(C):-is_ftNonvar(C).
 
 is_sk_functor(F):- (\+ atom(F)),!,fail.
 is_sk_functor(F):-atom_concat('sk',_,F).

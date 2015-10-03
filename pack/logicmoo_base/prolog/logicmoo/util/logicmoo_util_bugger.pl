@@ -925,19 +925,6 @@ show_call_entry(Call):-wdmsg(show_call_entry(Call)),show_call(Call).
 % ===================================================================
 % Bugger Term Expansions
 % ===================================================================
-:-dynamic(always_show_dmsg).
-always_show_dmsg:- thread_self(main).
-
-:-dynamic(is_hiding_dmsgs).
-is_hiding_dmsgs:- \+always_show_dmsg, current_prolog_flag(opt_debug,false),!.
-is_hiding_dmsgs:- \+always_show_dmsg, tlbugger:ifHideTrace,!.
-
-% bugger_debug=false turns off just debugging about the debugger
-% opt_debug=false turns off all the rest of debugging
-% ddmsg(_):-current_prolog_flag(bugger_debug,false),!.
-ddmsg(D):-format_to_error('~Ndmsg: ~q~n',[D]).
-ddmsg_call(D):- ( (ddmsg(ddmsg_call(D)),call(D),ddmsg(ddmsg_exit(D))) *-> true ; ddmsg(ddmsg_failed(D))).
-
 
 :-moo_show_childs(must(0)).
 
@@ -1298,9 +1285,8 @@ tlbugger:ifCanTrace.
 :-thread_local(tlbugger:ifWontTrace/0).
 :-moo_hide(tlbugger:ifWontTrace/0).
 
+:- ensure_loaded(logicmoo_util_first).
 
-:- swi_export(tlbugger:ifHideTrace/0).
-:-thread_local(tlbugger:ifHideTrace/0).
 :-moo_hide(tlbugger:ifHideTrace/0).
 
 %:-meta_predicate(set_no_debug).
@@ -1837,9 +1823,6 @@ matches_term0(Filter,Term):- atomic(Filter),!,contains_atom(Term,Filter).
 matches_term0(F/A,Term):- (var(A)->member(A,[0,1,2,3,4]);true), functor_safe(Filter,F,A), matches_term0(Filter,Term).
 matches_term0(Filter,Term):- sub_term(STerm,Term),nonvar(STerm),matches_term0(Filter,STerm),!.
 
-
-show_source_location:- is_hiding_dmsgs,!.
-show_source_location:- current_source_location(FL),format_to_error('~N% ~w ',[FL]).
 
 :-meta_predicate(gripe_time(+,0)).
 :-swi_export(gripe_time/2).

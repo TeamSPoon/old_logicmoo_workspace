@@ -612,7 +612,7 @@ do_end_of_file_actions:- must(loading_source_file(F)),
 pfc_file_expansion(I,OO):- var(I),!,I=OO.
 
 pfc_file_expansion(I,OO):-
-  must(current_source_location(FL)),
+  must(if_defined(current_source_location(FL),source_location(FL,_))),
    with_assertions(thlocal:current_why_source(FL),pfc_file_expansion0(I,OO)).
 
 
@@ -855,8 +855,8 @@ pfc_file_expansion_0c(C,O):- compound(C), get_op_alias(OP,ALIAS),
   atom(OP),atom(ALIAS),C=..[OP|ARGS],CC=..[ALIAS|ARGS],loop_check(pfc_file_expansion_0c(CC,O)),!.
 
 pfc_file_expansion_0c(C,O):- get_lang(LANG),transform_opers(LANG,C,M),C\=@=M,!,pfc_file_expansion_0c(M,O).
-
-pfc_file_expansion_0c(C,O):- ensure_vars_labled(C,M),pfc_file_expansion_z(M,O).
+pfc_file_expansion_0c(C,O):- \+ current_predicate(logicmoo_util_varnames_file/0),!, (C=M),pfc_file_expansion_z(M,O).
+pfc_file_expansion_0c(C,O):- if_defined(ensure_vars_labled(C,M),(C=M)),pfc_file_expansion_z(M,O).
 
 pfc_file_expansion_z((<=(Q,P)),(:- cl_assert(pfc(bwc),(Q<-P)))).
 pfc_file_expansion_z(((P==>Q)),(:- cl_assert(pfc(fwc),(P==>Q)))).
@@ -983,6 +983,27 @@ system:goal_expansion(I,O):- current_prolog_flag(allow_variable_name_as_functor,
 
 % :- source_location(S,_),forall(loading_source_file(H,S),ignore(( \+predicate_property(M:H,built_in), functor(H,F,A),M:module_transparent(F/A),M:export(F/A)))).
 
+
+pfc_process_input_1(':-'(TT)):-!,must(TT),!.
+pfc_process_input_1('?-'(TT)):-!,doall(must(TT)),!.
+pfc_process_input_1('$was_imported_kb_content$'(_,_)):-!.
+pfc_process_input_1(T):-try_save_vars(T),pfc_add(T),!.
+pfc_process_input(':-'(T),Vs):- b_setval('$variable_names', Vs),must(T),!.
+pfc_process_input(T,Vs):- expand_term(T,TT),b_setval('$variable_names', Vs),pfc_process_input_1(TT),!.
+
+process_this_script:- show_call(prolog_load_context(script,_)), prolog_load_context(stream,S), process_this_script(S).
+process_this_script(S):- at_end_of_stream(S),!.
+process_this_script(S):- repeat,once(process_this_script0(S)),at_end_of_stream(S).
+
+process_this_script0(S):- at_end_of_stream(S),!.
+process_this_script0(S):- peek_string(S,3,W), W="\n\n\n",get_code(S,_),get_code(S,_),!,process_this_script0(S).
+process_this_script0(S):- peek_string(S,2,W), W="\r\n",get_code(S,_),!,process_this_script0(S).
+process_this_script0(S):- peek_string(S,2,W), W="\n\n",get_code(S,_),!,process_this_script0(S).
+process_this_script0(S):- peek_code(S,W),member(W,`\n`),get_code(S,P),put(P),!,process_this_script0(S).
+process_this_script0(S):- peek_code(S,W),member(W,` \t\r`),get_code(S,_),!,process_this_script0(S).
+process_this_script0(S):- peek_string(S,2,W),W="%=",!,read_line_to_string(S,String),format('~N~s~n',[String]).
+process_this_script0(S):- peek_string(S,1,W),W="%",!,read_line_to_string(S,_String).
+process_this_script0(S):- read_term(S,T,[variable_names(Vs)]),b_setval('$variable_names', Vs),format('~N~n',[]),portray_one_line(T),format('~N~n',[]),!,pfc_process_input(T,Vs). 
 
 
 
