@@ -1,3 +1,43 @@
+#!/usr/bin/env swipl
+
+/**
+````
+*/
+
+:- if(gethostname(ubuntu)).
+:- user:ensure_loaded(logicmoo_repl).
+:- else.
+:- user:ensure_loaded(logicmoo_repl).
+% :- load_files(logicmoo_repl, [if(not_loaded),qcompile(auto)]).
+:- endif.
+
+show_call_test(G):-must(show_call(G)).
+
+%= define the example language
+example_known_is_success(G):-  G.
+example_impossible_is_success(G):- neg(G).
+example_known_is_failure(G):-  \+ G.
+example_impossible_is_failure(G):- \+ neg(G).
+
+%= define the four truth values
+example_proven_true(G):- example_known_is_success(G),example_impossible_is_failure(G).
+example_proven_false(G):- example_impossible_is_success(G),example_known_is_failure(G).
+example_inconsistent(G):- example_known_is_success(G),example_impossible_is_success(G).
+example_unknown(G):- example_known_is_failure(G),example_impossible_is_failure(G).
+  
+:-multifile shared_hide_data/1.
+%= shared_hide_data(hideMeta):-is_main_thread.
+%= shared_hide_data(hideTriggers):-is_main_thread.
+
+:- shell(cls).
+:- process_this_script.
+
+
+%=  setup pfc
+:- file_begin(pfc).
+
+%=  see logicmoo_i_compiler.pl for more info
+:- set_clause_compile(fwc).
 
 ==> clif(male(P)  => ~female(P)).
 %=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

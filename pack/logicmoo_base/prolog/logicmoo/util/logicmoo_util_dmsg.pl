@@ -252,7 +252,7 @@ dmsg2(skip_dmsg(_)):-!.
 %dmsg2(trace_or_throw(V)):- dumpST(350),dmsg(warning,V),fail.
 %dmsg2(error(V)):- dumpST(250),dmsg(warning,V),fail.
 %dmsg2(warn(V)):- dumpST(150),dmsg(warning,V),fail.
-dmsg2(Msg):-no_slow_io,format(''
+dmsg2(Msg):-no_slow_io,!,dmsg3(Msg).
 dmsg2(ansi(Ctrl,Msg)):- !, ansicall(Ctrl,dmsg3(Msg)).
 dmsg2(color(Ctrl,Msg)):- !, ansicall(Ctrl,dmsg3(Msg)).
 dmsg2(Msg):- mesg_color(Msg,Ctrl),ansicall(Ctrl,dmsg3(Msg)).
