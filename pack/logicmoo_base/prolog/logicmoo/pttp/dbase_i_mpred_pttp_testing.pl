@@ -8,7 +8,7 @@
 %%% 
 %%% 
 
-% :- '@'(ensure_loaded('../../src_lib/logicmoo_util/logicmoo_util_all'),user).
+% :- '@'(ensure_loaded('../../src_lib/logicmoo_logicmoo_utils'),user).
 :- ensure_loaded(logicmoo(mpred/logicmoo_i_header)).
 :- ensure_loaded(dbase_i_mpred_pttp).
 
@@ -58,7 +58,7 @@ pttp_test(chang_lee_example2,
 %%%   this is problem GRP003-1 in TPTP
 %%% SOURCE
 
-:-export(chang_lee_example3/0).
+:- export(chang_lee_example3/0).
 pttp_test(chang_lee_example3,
 	((
           p(e,X,X),

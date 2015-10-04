@@ -1,21 +1,34 @@
 /** <module> Logicmoo Debug Tools
 % ===================================================================
-% File 'logicmoo_util_bugger.pl'
+% File 'logicmoo_util_varnames.pl'
 % Purpose: An Implementation in SWI-Prolog of certain debugging tools
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;
-% Version: 'logicmoo_util_bugger.pl' 1.0.0
+% Version: 'logicmoo_util_varnames.pl' 1.0.0
 % Revision: $Revision: 1.1 $
 % Revised At:  $Date: 2002/07/11 21:57:28 $
 % ===================================================================
 */
 
-:- use_module(library(clpfd)).
-:- ensure_loaded(logicmoo_util_first).
+:- multifile
+	unify_goal/5,			% +Read, +Decomp, +M, +Pos, -Pos
+	unify_clause_hook/5,
+	make_varnames_hook/5,
+	open_source/2.			% +Input, -Stream
+
+:- predicate_options(prolog_clause:clause_info/5, 5,
+		     [ variable_names(-list)
+		     ]).
+
+:- use_module(library(prolog_source)).
+:- use_module(library(prolog_clause)). % read_term_at_line/6
+
 
 show_call_when(P,In,Out):- pmust(call(P,In,Out)),ignore((In\=@=Out,dmsg((show_call_when(P) :- (In,Out))))).
 
-:-thread_local(thlocal:dont_varname/0).
+:- thread_local(thlocal:dont_varname/0).
+:- thread_local(thlocal:dont_varname_te/0).
+:- thread_local(thlocal:try_varname_clause_next/1).
 
 no_varnaming(G):-!, G.
 no_varnaming(G):-with_assertions(thlocal:dont_varname,G).
@@ -93,8 +106,8 @@ try_get_body_vars(C):- C=..[_,L],maplist(try_get_body_vars,L).
 try_get_body_vars(_).
 
 vmust(G):-must(G).
-:-multifile(user:varname_info/4).
-:-dynamic(user:varname_info/4).
+:- multifile(user:varname_info/4).
+:- dynamic(user:varname_info/4).
 
 % assign_name_equal_var(B):-var(B),!.
 assign_name_equal_var(B):-var(B),writeq(assign_name_equal_var(B)),nl,trace,trace_or_throw(var_assign_varname_vars(B)).
@@ -149,15 +162,45 @@ current_source_location0(When):-current_input(S),findall(NV,stream_property(S,NV
 current_source_location0(module(user)):-!.
 current_source_location0(unknown:0).
 
-save_clause_vars(_,[]):-!.
+:-export(save_clause_vars/2).
+% save_clause_vars(_,[]):-!.
 save_clause_vars(MHB,Vs):- current_why(Why),!,save_clause_vars(MHB,Vs,Why),!.
 save_clause_vars(MHB,Vs):- trace,current_why(Why),!,save_clause_vars(MHB,Vs,Why).
 
+% ?- clause(pui_help:prolog_help_topic(A),B,ClauseRef), prolog_clause:clause_info(ClauseRef, File, TermPos, NameOffset, Options).
+
+
+:-export(save_clause_vars/3).
 save_clause_vars(_, [],_):-!.
-save_clause_vars(MHB,Vs,Why):- ( \+ \+ ((as_clause_no_m(MHB,  H, B), assert_if_new_kv(user:varname_info(H,B,Vs,Why))))).
+save_clause_vars(MHB,Vs,Why:_):-atom(Why),!,save_clause_vars(MHB,Vs,Why).
+save_clause_vars(MHB,Vs,Why):-  ( \+ \+ (as_clause_w_m(MHB, M, H, B, MB),save_clause_vars(M,H,MB,B,Vs,Why))).
+
+:-export(clause_eq/3).
+%clause_eq(H,B,R):-clause(H,B,R),clause(RH,RB,R),term_variables(RH:RB,RVs),term_variables(H:B,Vs).
+clause_eq(H,B,R):-copy_term(H:B,CHB),clause(H,B,R),CHB=@=H:B.
+
+locate_clause_ref(M,H,_MB,_B,_ClauseRef):- (\+ (predicate_property(M:H,number_of_clauses(_)))),(\+ (predicate_property(_:H,number_of_clauses(_)))),!,fail.
+locate_clause_ref(M,H,MB,B,ClauseRef):-clause_eq(M:H,MB:B,ClauseRef).
+locate_clause_ref(_M,H,MB,B,ClauseRef):-clause_eq(H,MB:B,ClauseRef).
+locate_clause_ref(_M,H,MB,B,ClauseRef):-clause_eq(_:H,MB:B,ClauseRef).
+locate_clause_ref(M,H,_MB,B,ClauseRef):-clause_eq(M:H,B,ClauseRef).
+locate_clause_ref(_M,H,_MB,B,ClauseRef):-clause_eq(H,B,ClauseRef).
+locate_clause_ref(_M,H,_MB,B,ClauseRef):-clause_eq(_:H,B,ClauseRef).
+
+clause_ref_vars(ClauseRef,Was):-prolog_clause:clause_info(ClauseRef, _File, _TermPos, _NameOffset, [variable_names(Was)]).
+clause_ref_file(ClauseRef,File):-prolog_clause:clause_info(ClauseRef, File, _TermPos, _NameOffset, []).
+
+:-export(save_to_clause_ref/3).
+save_to_clause_ref(ClauseRef,Vs,Why):- assert_if_new_kv(names(ClauseRef,Vs)),assert_if_new_kv(names_why(ClauseRef,Why)),!.
+
+:-export(save_clause_vars/6).
+save_clause_vars(M,H,MB,B,Vs,Why:_):-atom(Why),!,save_clause_vars(M,H,MB,B,Vs,Why).
+save_clause_vars(M,H,MB,B,Vs,Why):- locate_clause_ref(M,H,MB,B,ClauseRef),clause_ref_vars(ClauseRef,Was),
+   (show_call_failure(Was=Vs)->true;save_to_clause_ref(ClauseRef,Vs,Why)),!.
+save_clause_vars(_M,H,_MB,B,Vs,Why):- assert_if_new_kv(user:varname_info(H,B,Vs,Why)).
 
 assert_if_new_kv(A):- clause_asserted(A),!.
-assert_if_new_kv(A):- asserta(A).
+assert_if_new_kv(A):- assertz(A).
 
 
 ensure_vars_labled_r(I,O):- 
@@ -177,7 +220,7 @@ ensure_vars_labled_r(I,O):- name_vars(I,O),I\=@=O.
 contains_singletons(Term):- not(ground(Term)),call_not_not(((term_variables(Term,Vs),
    snumbervars4(Term,0,_,[attvar(bind),singletons(true)]),member('$VAR'('_'),Vs)))).
 
-:-meta_predicate(call_not_not(0)).
+:- meta_predicate(call_not_not(0)).
 
 call_not_not(G):- \+ \+ G.
 
@@ -220,7 +263,7 @@ source_module(M):-nonvar(M),source_module(M0),!,M0=M.
 source_module(M):-loading_module(M),!.
 source_module(M):-'$set_source_module'(M,   M),!.
 
-:-thread_local(thlocal:last_source_file/1).
+:- thread_local(thlocal:last_source_file/1).
 loading_file(FIn):- ((source_file0(F) *-> (retractall(thlocal:last_source_file(_)),asserta(thlocal:last_source_file(F))) ; (fail,thlocal:last_source_file(F)))),!,F=FIn.
 source_file0(F):-source_location(F,_).
 source_file0(F):-prolog_load_context(file, F).
@@ -251,14 +294,14 @@ b_implode_varnames0([N=V|Vs]):- ignore((V='$VAR'(N);V=N)),b_implode_varnames0(Vs
 imploded_copyvars(C,CT):-vmust((source_variables(Vs),copy_term(C-Vs,CT-VVs),b_implode_varnames(VVs))),!.
 
 
-:-swi_export(unnumbervars/2).
+:- export(unnumbervars/2).
 unnumbervars(X,YY):- lbl_vars(X,[],Y,_Vs),!, vmust(YY=Y).
 % TODO compare the speed
 % unnumbervars(X,YY):- vmust(unnumbervars0(X,Y)),!,vmust(Y=YY).
 
 
 
-:-swi_export(unnumbervars_and_save/2).
+:- export(unnumbervars_and_save/2).
 unnumbervars_and_save(X,YY):-
    lbl_vars(X,[],Y,Vs),
     (Vs==[]->vmust(X=YY);
@@ -415,17 +458,17 @@ bugger_name_variables([Var|Vars]):-
    bugger_name_variables(Vars).
 
 */
-:- swi_export(snumbervars/1).
+:- export(snumbervars/1).
 snumbervars(Term):-snumbervars(Term,0,_).
 
-:- swi_export(snumbervars/3).
+:- export(snumbervars/3).
 snumbervars(Term,Start,End):- integer(Start),var(End),!,snumbervars4(Term,Start,End,[]).
 snumbervars(Term,Start,List):- integer(Start),is_list(List),!,snumbervars4(Term,Start,_,List).
 snumbervars(Term,Functor,Start):- integer(Start),atom(Functor),!,snumbervars4(Term,Start,_End,[functor_name(Functor)]).
 snumbervars(Term,Functor,List):- is_list(List),atom(Functor),!,snumbervars4(Term,0,_End,[functor_name(Functor)]).
 
 
-:- swi_export(snumbervars/4).
+:- export(snumbervars/4).
 snumbervars(Term,Start,End,List):-snumbervars4(Term,Start,End,List).
 
 % snumbervars(Term,Functor,Start,End,List):-vmust(( vmust(var(End);number(End)),snumbervars4(Term,Start,End,[functor_name(Functor)|List]))),check_varnames(Term).
@@ -454,34 +497,71 @@ varname:attr_portray_hook(Value, _Var) :- nonvar(Value),!,writeq('?'(Value)).
 	catch(writeq('??'(VarName,Attr)),_,'$attvar':portray_attrs(Attr, Var)),
 	write('>}').
 
+:-export(try_save_vars/1).
 try_save_vars(_):- thlocal:dont_varname,!.
 try_save_vars(HB):-ignore((nb_current('$variable_names',Vs),Vs\==[],save_clause_vars(HB,Vs))),!.
-user:term_expansion(HB,_):- \+ thlocal:dont_varname, current_predicate(logicmoo_util_varnames_file/0),once(try_save_vars(HB)),fail.
 
 read_source_files:- 
  ensure_loaded(library(make)),
  forall(make:modified_file(F),retractall(user:varname_info_file(F))),
- forall(source_file(F),catch(read_source_file_vars(F),_,true)).
+ forall(source_file(F),catch(with_assertions(thlocal:dont_varname_te,read_source_file_vars(F)),_,true)).
 
-:-dynamic(user:varname_info_file/1).
+:- dynamic(user:varname_info_file/1).
 read_source_file_vars(F):- \+ ((atom(F),exists_file(F))),!, forall(filematch(F,E),read_source_file_vars(E)).
 read_source_file_vars(F):- clause_asserted(user:varname_info_file(F)),!.
-read_source_file_vars(F):-
-   assert(user:varname_info_file(F)),
-   catch(((open(F,read,S), 
-   call_cleanup(read_vars_until_oes(F,S),close(S)))),E,(dmsg(E),
-    retractall(user:varname_info_file(F)))).
+read_source_file_vars(F):- assert(user:varname_info_file(F)), catch(read_source_file_vars_1(F),E,(dmsg(E),retractall(user:varname_info_file(F)))).
+
+
+save_file_source_vars(_F,end_of_file,_Vs):-!.
+save_file_source_vars(_F,_T,[]):-!.
+save_file_source_vars(F,T,Vs):- b_setval('$variable_names',Vs),!,with_assertions(thlocal:current_why_source(F),save_clause_vars(T,Vs)),!.
+
+:- if(true).
+
+read_source_terms(File,In):-
+	repeat,
+	  catch(prolog_read_source_term(In, Term, Expanded, [ variable_names(Vs) /*, term_position(TermPos) */ ]),
+		E,(dmsg(E),trace,fail)),
+          % stream_position_data(line_count, TermPos, LineNo),
+	  ignore(save_file_source_vars(File /* :LineNo */,Term,Vs)),
+	  (   is_list(Expanded)
+	  ->  member(T, Expanded)
+	  ;   T = Expanded
+	  ),
+	(   T == end_of_file
+	->  !
+	;  ( T\==Term, save_file_source_vars(File/* :LineNo */,T,Vs)),
+	    fail
+	).
+
+
+% new method
+read_source_file_vars_1(File):-
+	setup_call_cleanup(
+	    prolog_open_source(File, In),
+	    read_source_terms(File,In),
+	    prolog_close_source(In)),!.
+
+:- else.
+
+% old method
+read_source_file_vars_1(F):- 
+   catch(((setup_call_cleanup(open(F,S),read_vars_until_oes(F,S),close(S)))),E,(dmsg(E),throw(E))).
 
 read_vars_until_oes(_,S):-at_end_of_stream(S),!.
-read_vars_until_oes(F,S):-
-  repeat,
-   read_term(S,T,[variable_names(Vs)]),
-   (T==end_of_file->!;
-    ((Vs\==[],vmust(line_count(S,C)),    
-    b_setval('$variable_names',Vs),
-    with_assertions(thlocal:current_why_source(F:C),
-    (save_clause_vars(T,Vs),fail))))).
+read_vars_until_oes(F,S):- repeat,catch(once(read_vars_until_oes_1(F,S)),E,ddmsg(E)),at_end_of_stream(S).
 
+eat_to_term(S):-repeat, \+ eat_to_term_1(S).
+eat_to_term_1(S):-peek_char(S,W),char_type(W,white),get_char(S,_),!.
+eat_to_term_1(S):-line_count(S,C),C=1,peek_char(S,'#'),read_line_to_codes(S,_),!.
+
+read_vars_until_oes_1(_,S):- eat_to_term(S).
+read_vars_until_oes_1(F,S):-
+   line_count(S,C),
+   read_term(S,T,[variable_names(Vs)]),   
+   save_file_source_vars(F:C,T,Vs).
+
+:- endif.
 
 ensure_vars_labled(I,I):- (thlocal:dont_varname;no_vars_needed(I)),!.
 % ensure_vars_labled(I,I):- !.
@@ -490,7 +570,12 @@ ensure_vars_labled(I,OO):- acyclic_term(O),term_variables(I,Vs),ensure_vars_labl
 ensure_vars_labled(I,OO):- acyclic_term(O),ensure_vars_labled_r(I,O),vmust(acyclic_term(O)),!,OO=O.
 ensure_vars_labled(I,I).
 
-:- initialization(read_source_files).
+% :- prolog_load_context(module,M),source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),'$set_predicate_attribute'(M:H, hide_childs, 1),module_transparent(F/A))).
 
 logicmoo_util_varnames_file.
 :- export(logicmoo_util_varnames_file/0).
+
+:- initialization(read_source_files).
+
+user:term_expansion(HB,_):- \+ thlocal:dont_varname_te,\+ thlocal:dont_varname, current_predicate(logicmoo_util_varnames_file/0),once(try_save_vars(HB)),fail.
+

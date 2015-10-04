@@ -46,8 +46,8 @@
 :- multifile(user:term_expansion/2).
 :- multifile(user:goal_expansion/2).
 
-:-dynamic(registered_mpred_file/1).
-:-dynamic(never_registered_mpred_file/1).
+:- dynamic(registered_mpred_file/1).
+:- dynamic(never_registered_mpred_file/1).
 
 
 
@@ -63,10 +63,10 @@
 
 load_time_sanity.
 
-:-dynamic(user:hook_one_second_timer_tick/0).
-:-multifile(user:hook_one_second_timer_tick/0).
-:-dynamic(user:hook_one_minute_timer_tick/0).
-:-multifile(user:hook_one_minute_timer_tick/0).
+:- dynamic(user:hook_one_second_timer_tick/0).
+:- multifile(user:hook_one_second_timer_tick/0).
+:- dynamic(user:hook_one_minute_timer_tick/0).
+:- multifile(user:hook_one_minute_timer_tick/0).
 
 :- dynamic(user:startup_option/2).
 
@@ -190,7 +190,7 @@ load_time_sanity.
 
 
 
-:-thread_local(thlocal:print_mode/1).
+:- thread_local(thlocal:print_mode/1).
 
 %:-dynamic((t/1,t/2)).
 :- dynamic((
@@ -230,7 +230,7 @@ load_time_sanity.
           mpred_f/6,
           mpred_f/7)).
 
-:-multifile((t/1,t/2)).
+:- multifile((t/1,t/2)).
 :- multifile((
   meta_argtypes/1,
          % t/1,
@@ -269,16 +269,16 @@ load_time_sanity.
           mpred_f/7)).
 
 
-:-dynamic(user_db:grant_openid_server/2).
-:-multifile(user_db:grant_openid_server/2).
+:- dynamic(user_db:grant_openid_server/2).
+:- multifile(user_db:grant_openid_server/2).
 
 :- dynamic user:'$was_imported_kb_content$'/2.
 :- multifile user:'$was_imported_kb_content$'/2.
 :- discontiguous(user:'$was_imported_kb_content$'/2).
 
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+:- user:ensure_loaded(library(logicmoo/logicmoo_utils)).
 
-:-foreach(arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,prologKIF,pfcControlled,tSet,tPredType,
+:- foreach(arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,prologKIF,pfcControlled,tSet,tPredType,
  prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,tCol,prologMacroHead,prologListValued,prologSingleValued,functorDeclares),P),
    ((dynamic(P/1),multifile(P/1)))).
 
@@ -303,12 +303,12 @@ load_time_sanity.
 % these do not get defined!?
 % :-dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
-:-dynamic((
+:- dynamic((
                      user:argIsa/3,
                      user:isa/2,
                      user:resultIsa/2,
                       user:ttTemporalType/1)).
-:-multifile((
+:- multifile((
                      user:argIsa/3,
                      user:isa/2,
                      user:resultIsa/2,
@@ -385,8 +385,8 @@ load_time_sanity.
 :- dynamic_multifile_exported deduceFromArgTypes/1.
 :- dynamic_multifile_exported prologSideEffects/1.
 
-:-dynamic agent_action_queue/3.
-:-multifile agent_action_queue/3.
+:- dynamic agent_action_queue/3.
+:- multifile agent_action_queue/3.
 
 % ================================================
 % Thread Locals

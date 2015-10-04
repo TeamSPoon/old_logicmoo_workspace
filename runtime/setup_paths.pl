@@ -65,7 +65,7 @@ user:pmrt_expand_file_search_path(T,O):- user:pmrt_file_search_path(T,A), once((
 user:file_search_path(T,R):- user:pmrt_expand_file_search_path(T,R).
 
 :- attach_packs.
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+:- user:ensure_loaded(library(logicmoo/logicmoo_utils)).
 :- endif.
 
 :- attach_packs.

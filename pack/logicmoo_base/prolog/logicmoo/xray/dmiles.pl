@@ -27,7 +27,7 @@
 :- attach_packs.
 :- initialization(attach_packs).
 % [Required] Load the Logicmoo Library Utils
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+:- user:ensure_loaded(library(logicmoo/logicmoo_utils)).
 :- initialization(attach_packs).
 prove_query:-query.
 
@@ -760,7 +760,7 @@ clauses((A , B),L,WffNum) :-
         clauses(B,L2,WffNum2),
         conjoin(L1,L2,L))).
 
-:-abolish(clauses,4).
+:- abolish(clauses,4).
 clauses( (Gamma :- Alpha : Beta) , L , WffNum ) :-
 	!,
         must_det_l((

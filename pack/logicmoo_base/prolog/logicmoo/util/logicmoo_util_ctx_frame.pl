@@ -25,8 +25,8 @@
 % it meant that you held an "index" into the arry list that as you went backwards you'd find your bindings.. each symbol had a java ftInt field "lastBindingIndex" 
 % .. that was a "hint" to where you could fastforward the backwards search .. end named binding context also had a "index" to when you leave a named block.. 
 % you could quickly reset the top of an index.
-
-:-module(ctx_frame,[
+:- if(\+ current_module(logicmoo_utils)).
+:- module(ctx_frame,[
          lastMemberCtx/2,
          lastMemberCtx/3,
          pushCtxFrame/3,
@@ -34,6 +34,8 @@
          makeLocalContext/2,
          appendAttributes/4,
          currentContext/2]).
+:- include(logicmoo_util_header).
+:- endif.
 
 
 % :- ensure_loaded((logicmoo_util_library)).
@@ -43,7 +45,7 @@ currentContext(Name,X):-hotrace(makeLocalContext(Name,X)),!.
 
 
 % ===================================================================
-:-dynamic(no_cyclic_terms).
+:- dynamic(no_cyclic_terms).
 
 no_cyclic_terms.
 

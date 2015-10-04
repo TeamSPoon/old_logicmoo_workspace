@@ -46,10 +46,10 @@ if_result(TF,Call):-(TF->Call;true).
 % ========================================
 
 
-:-export(into_plist/2).
+:- export(into_plist/2).
 into_plist(In,Out):-into_plist_arities(2,12,In,Out).
 
-:-export(into_plist_arities/4).
+:- export(into_plist_arities/4).
 into_plist_arities(Min,Max,PLIST,PLISTO):- var(PLIST),!,between(Min,Max,X),length(PLIST,X),PLISTO=PLIST.
 into_plist_arities(_,_,[P|LIST],[P|LIST]):-var(P),!.
 into_plist_arities(_,_,[t|PLIST],PLIST):-!.  % t is our versuion of '$holds' or call/N
@@ -66,7 +66,7 @@ never_mpred_mpred(arity).
 % begin holds_t
 % ================================================================================
 
-:-dynamic t/2.
+:- dynamic t/2.
 % t(C,I):- trace_or_throw(t(C,I)),t(C,I). % ,fail,loop_check_term(isa_backchaing(I,C),t(C,I),fail).
 t(X,Y):-isa(Y,X).
 
@@ -84,15 +84,15 @@ mpred_plist_t(P,[L|IST]):-is_holds_true(P),!,mpred_plist_t(L,IST).
 mpred_plist_t(P,LIST):-is_holds_false(P),!,mpred_f(LIST).
 mpred_plist_t(P,LIST):- CALL=..[t,P|LIST],debugOnError(CALL).
 
-:-meta_predicate(loop_check_mpred(?)).
+:- meta_predicate(loop_check_mpred(?)).
 % loop_check_mpred(Call):- current_predicate(ireq/1), loop_check_term(ireq(Call),loop_check_mpred(Call),fail).
 loop_check_mpred(Call):- !, fail,not(thlocal:infInstanceOnly(_)),loop_check_term(ireq(Call),loop_check_mpred(Call),fail).
 % loop_check_mpred(Call):-loop_check(mpred_call(t,Call),fail).
 
-:-meta_predicate(mpred_pa_call(?,?,0)).
-:-meta_predicate(t(?,?,?,?,?)).
-:-meta_predicate(t(?,?,?,?)).
-:-meta_predicate(t(?,?,?)).
+:- meta_predicate(mpred_pa_call(?,?,0)).
+:- meta_predicate(t(?,?,?,?,?)).
+:- meta_predicate(t(?,?,?,?)).
+:- meta_predicate(t(?,?,?)).
 
 t(P,A1,A2):- mpred_pa_call(P,2,call(P,A1,A2)).
 t(P,A1,A2):- loop_check_mpred(t(P,A1,A2)).
@@ -160,13 +160,13 @@ holds_plist_t(P,LIST):- apply(holds_t,[P|LIST]).
 % term utils
 % =======================================================
 
-:-export(inverse_args/2).
+:- export(inverse_args/2).
 inverse_args([AR,GS],[GS,AR]):-!.
 inverse_args([AR,G,S],[S,G,AR]):-!.
 inverse_args([A,R,G,S],[S,R,G,A]):-!.
 inverse_args([P,A,R,G,S],[S,A,R,G,P]):-!.
 
-:-export(same_vars/2).
+:- export(same_vars/2).
 same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
 
 replace_arg(C,0,VAR,CC):-!, C=..[_|ARGS],CC=..[VAR|ARGS].
@@ -176,9 +176,9 @@ replace_arg(C,3,VAR,CC):-!, C=..[F,A,B,_|ARGS],CC=..[F,A,B,VAR|ARGS].
 % replace_arg(C,A,VAR,CO):- duplicate_term(C,CC),setarg(A,CC,VAR),!,CC=CO.
 replace_arg(C,A,VAR,CC):- C=..FARGS,replace_nth(FARGS,A,VAR,FARGO),!,CC=..FARGO.
 
-:-moo_hide_childs(replace_arg/4).
+:- moo_hide_childs(replace_arg/4).
 
-:-moo_hide_childs(replace_nth/4).
+:- moo_hide_childs(replace_nth/4).
 replace_nth([],_,_,[]):- !.
 replace_nth([_|ARGO],0,VAR,[VAR|ARGO]):- !.
 replace_nth([T|FARGS],A,VAR,[T|FARGO]):- 
@@ -192,7 +192,7 @@ replace_nth([Carry|ARGS],Which,OldVar,NewVar,[Carry|NEWARGS]):-
  replace_nth(ARGS,Which1,OldVar,NewVar,NEWARGS),!.
 
 
-:-moo_hide_childs(update_value/4).
+:- moo_hide_childs(update_value/4).
 update_value(OLD,NEW,NEXT):- var(NEW),!,trace_or_throw(logicmoo_bug(update_value(OLD,NEW,NEXT))).
 update_value(OLD,NEW,NEWV):- var(OLD),!,compute_value_no_dice(NEW,NEWV).
 update_value(OLD,X,NEW):- is_list(OLD),!,list_update_op(OLD,X,NEW),!.

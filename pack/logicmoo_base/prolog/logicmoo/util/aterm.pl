@@ -6,15 +6,15 @@
 :- prolog_load_context(directory,H),absolute_file_name('../..',A,[file_type(directory),relative_to(H)]),asserta(user:library_directory(A)).
 :- prolog_load_context(directory,H),absolute_file_name('../../../..',A,[file_type(directory),relative_to(H)]),asserta(user:file_search_path(pack,A)).
 :- attach_packs.
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
-:-set_prolog_flag(answer_write_options,[quoted(true), portray(true), max_depth(1000), attributes(portray)]).
-:-set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(1000), attributes(portray)]).
+:- user:ensure_loaded(library(logicmoo/logicmoo_utils)).
+:- set_prolog_flag(answer_write_options,[quoted(true), portray(true), max_depth(1000), attributes(portray)]).
+:- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(1000), attributes(portray)]).
 
 % i should ask on list .. but i like giving this channel a chance first ,,,  has anyone implemented prolog variables in a metainterp using b_setarg ?
 
-:-use_module(library(ordsets)).
-:-visible(+unify).
-:-style_check(-singleton).
+:- use_module(library(ordsets)).
+:- visible(+unify).
+:- style_check(-singleton).
 
 lvar(E,N):-var(E),must((format(codes([_,_|C]),'~q',[E]),number_codes(N,C))),!.
 lvar(E,E).
@@ -144,7 +144,7 @@ unify_to_nonvar(ATerm,Y):- trace, ord_memberchk(Y, ATerm),trace.
 
 find_label(Pred,S):- dmsg(must(find_label(Pred,S))),sanity((member(G,S),functor(G,Pred,_))),!.
 
-:-meta_predicate mi(?),mi(?,?),mi(?,?,?),mi(?,?,?,?).
+:- meta_predicate mi(?),mi(?,?),mi(?,?,?),mi(?,?,?,?).
 
 mi(G) :-mi(true,G).
 mi(Then,G) :- mi(Then,[mi(G)],G,_). 
@@ -226,7 +226,7 @@ q(4).
 
 
 % see http://www.cs.bham.ac.uk/~pjh/modules/current/25433/examples/l15_example3.html
-:-module(aterm).
+:- module(aterm).
 
 % :-at_initialization(mi).
 

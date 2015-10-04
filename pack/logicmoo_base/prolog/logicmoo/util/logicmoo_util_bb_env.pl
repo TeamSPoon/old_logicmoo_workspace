@@ -1,15 +1,22 @@
 /** <module> logicmoo_util_bb_env
 % Provides a prolog database *env*
-%
-%  
-%
-% Logicmoo Project PrologMUD: A MUD server written in Prolog
+% ===================================================================
+% File '$FILENAME.pl'
+% Purpose: An Implementation in SWI-Prolog of certain debugging tools
 % Maintainer: Douglas Miles
-% Denton, TX 2005, 2010, 2014 
-% Dec 13, 2035
-%
+% Contact: $Author: dmiles $@users.sourceforge.net ;
+% Version: '$FILENAME.pl' 1.0.0
+% Revision: $Revision: 1.1 $
+% Revised At:  $Date: 2002/07/11 21:57:28 $
+% Licience: LGPL
+% ===================================================================
 */
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_structs)).
+:- if(\+ current_module(logicmoo_utils)).
+:- module(logicmoo_util_bb_env,
+    [  % when the predciates are not being moved from file to file the exports will be moved here
+      ]).  
+:- include(logicmoo_util_header).
+:- endif.
 
 :- thread_local(thlocal:push_env_ctx).
 :- dynamic(user:'$env_info'/1).
@@ -72,7 +79,7 @@ env_op(OP,P):- trace,trace_or_throw(unk_env_op(OP,P)).
 env_shadow(OP,P):-user:call(OP,P).
 
 /*********************** initialisation**************/
-:-dynamic( in_dyn/2).
+:- dynamic( in_dyn/2).
 in_dyn(_DB,Call):- var(Call),!,mpred_arity(F,A),functor(Call,F,A),( predicate_property(Call,_) -> loop_check(Call)).
 in_dyn(_DB,Call):- functor(Call,F,A), mpred_arity(F,A), predicate_property(Call,_), !, loop_check(Call).
 in_dyn_pred(_DB,Call):- var(Call),!,mpred_arity(F,A),functor(Call,F,A),( predicate_property(Call,_) -> loop_check(Call)).
@@ -82,7 +89,7 @@ in_dyn_pred(_DB,Call):- functor(Call,F,A), mpred_arity(F,A), predicate_property(
 mpred_arity(F,A):-if_defined(user:arity(F,A)).
 
 env_mpred(Prop,F,A):- user:mpred_prop(F,Prop),mpred_arity(F,A).
-mpred_prop(Prop,F,A):- user:mpred_prop(F,Prop),arity(F,A).
+mpred_prop(Prop,F,A):- user:mpred_prop(F,Prop),if_defined(clif:arity(F,A)).
 
 get_mpred_stubType(_,_,dyn):-!.
 get_mpred_stubType(F,A,StubOut):-    
@@ -94,14 +101,14 @@ get_mpred_stubType(F,A,StubOut):-
 get_mpred_stubType(F,A,dyn):-env_mpred(dyn,F,A).
 get_mpred_stubType(_,_,dyn).
 
-:-ain(env_kb(l)).
-:-ain(env_kb(g)).
-:-ain(env_kb(dyn)).
-:-nb_setval(disabled_env_learn_pred,false).
+:- ain(env_kb(l)).
+:- ain(env_kb(g)).
+:- ain(env_kb(dyn)).
+:- nb_setval(disabled_env_learn_pred,false).
 
-:-thread_local(thlocal:env_ctx/2).
+:- thread_local(thlocal:env_ctx/2).
 
-:-swi_export(decl_mpred_env/2).
+:- export(decl_mpred_env/2).
 %:-module_transparent(decl_mpred_env/2).
 
 decl_mpred_env(_,[]):-!.
@@ -146,7 +153,7 @@ decl_mpred_env_fa(Prop,_Pred,F,A):- thlocal:push_env_ctx,
    add_push_prefix_arg(Pred,Type,Prefix,Pred1),
    decl_mpred_env_real(Prop,Pred1,F,A1),!,
    abolish_and_make_static(F,A),!,
-   arity(F,AA),
+   if_defined(clif:arity(F,AA)),
    must(arity(F,A1)==arity(F,AA)))).
 decl_mpred_env_fa(Prop,Pred,F,A):-
    decl_mpred_env_real(Prop,Pred,F,A).
@@ -156,7 +163,7 @@ decl_mpred_env_real(Prop,Pred,F,A):-
   (Prop==dyn->(dynamic(/*ocluser*/ocl:F/A));true),
   (Prop==cache->(transient(/*ocluser*/ocl:F/A));true),
   (Prop==dom->(multifile(/*ocluser*/ocl:F/A));true),
-  user:swi_export(/*ocluser*/ocl:F/A),
+  user:export(/*ocluser*/ocl:F/A),
   if_defined(decl_mpred(Pred,Prop),ain(user:mpred_prop(F,Prop))),
   ain(env_kb(Prop)), ain(mpred_arity(F,A)),ain(arity(F,A)),!,  
   ain(env_mpred(Prop,F,A)).
@@ -243,14 +250,14 @@ pred_1_info(_,F,A,Info):- env_mpred(Info,F,A).
 pred_1_info(_,F,A,F/A).
 
 
-:-meta_predicate(env_consult(:)).
+:- meta_predicate(env_consult(:)).
 env_consult(M:File):- \+ exists_file(File),!,forall(filematch(File,FM),env_consult(M:FM)).
 env_consult(M:File):- ain(user:env_source_file(File)),
    with_assertions((M:term_expansion(A,B):-env_term_expansion(A,B)),M:consult(File)).
 
 
-env_set(Call):-Call=..[P,V],!,bb_put(P,V).
-env_get(Call):-Call=..[P,V],!,bb_get(P,V).
+env_set(Call):-Call=..[P,V],!,gvar_put(P,V).
+env_get(Call):-Call=..[P,V],!,gvar_get(P,V).
 
 
 env_meta_term(t(env_call,env_assert,env_asserta,env_retract,env_retractall)).
@@ -278,7 +285,7 @@ term_expansion_add_context(_NeedIt,_Ctx,_,DECL,DECLN):-
     DECLN =..[DF,(F/B)],functor(HH,F,B).
 term_expansion_add_context( NeedIt, Ctx,_,B,BB):- B=..[F|A], maplist(term_expansion_add_context(NeedIt,Ctx,F),A,AA),BB=..[F|AA],!.
 
-:-dynamic(user:env_source_file/1).
+:- dynamic(user:env_source_file/1).
 
 hb_to_clause(H,B,HB):- hb_to_clause0(H,B,HB0),!,HB=HB0.
 hb_to_clause0(H,T,H):- T==true.
@@ -292,7 +299,7 @@ clause_to_hb0((H:-B),H,B).
 clause_to_hb0((:-B),true,B).
 clause_to_hb0((H),H,true).
 
-:- swi_export(env_term_expansion/2).
+:- export(env_term_expansion/2).
 env_term_expansion(HB,OUT):- thlocal:push_env_ctx,!,
   must_det_l((
    clause_to_hb(HB,H,B),
@@ -317,7 +324,7 @@ get_env_source_ctx(A,Active):-
     clause(domain_name(A),true,Ref),
     (clause_property(Ref,file(From)) -> (env_source_file(From) -> Active = loaded(From) ;  Active = loading(From)) ; Active = memory).
 
-get_env_ctx(A):- bb_get(domain_name,A),!.
+get_env_ctx(A):- gvar_get(domain_name,A),!.
 get_env_ctx(A):- 
     get_env_expected_ctx(Current),
     get_env_source_ctx(A, Active),

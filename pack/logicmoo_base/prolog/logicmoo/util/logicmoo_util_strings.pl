@@ -7,7 +7,7 @@
 % Revision:  $Revision: 1.7 $
 % Revised At:   $Date: 2002/07/11 21:57:28 $
 % ===================================================================
-:-swi_module(logicmoo_util_strings,[
+:- module(logicmoo_util_strings,[
             atoms_of/2,
             to_word_list/2,
             equals_icase/2,
@@ -68,7 +68,6 @@
 
    ]).
 
-:- user:ensure_loaded((logicmoo_util_filestreams)).
 
 :- use_module(library(check)).
 % :- use_module(library(check),[check:string_predicate/1]).
@@ -189,9 +188,9 @@ term_to_string(IS,I):- failOnError(term_string(IS,I)),!.
 term_to_string(I,IS):- failOnError(string_to_atom(IS,I)),!.
 term_to_string(I,IS):- grtrace(term_to_atom(I,A)),string_to_atom(IS,A),!.
 
-:-multifile(user:package_path/2).
+:- multifile(user:package_path/2).
 
-:- swi_export(atomic_concat/3).
+:- export(atomic_concat/3).
 atomic_concat(A,B,C,Out):-atomic_list_concat_safe([A,B,C],Out).
 
 % :-atomic_list_concat_safe([A,'/',C],'','foo/bar/baz').
@@ -255,14 +254,14 @@ empty_str(E):-ground(E),memberchk(E,[``,[],"",'']).
 % ===========================================================
 % CHECK CASE
 % ===========================================================
-:- swi_export(capitalized/1).
+:- export(capitalized/1).
 
 capitalized(Type):- string_codes(Type,[S|_]),char_type(S,upper),must(char_type(S,alpha)).
 
 % ===========================================================
 % BREAKING ON CASE CHANGE
 % ===========================================================
-:- swi_export(to_case_breaks/2).
+:- export(to_case_breaks/2).
 to_case_breaks(Text,New):- string_codes(Text,[C|Codes]), char_type_this(C,WillBe),!,to_case_breaks(Codes,WillBe,[C],WillBe,New).
 
 char_type_this(C,Lower):-ctype_switcher(Lower),char_type(C,Lower),!.
@@ -294,9 +293,9 @@ to_case_breaks(C___Codes,WillBe,SoFar,Upper,OUT):- is_list(OUT),OUT=[t(Left,Will
 to_case_breaks([C|Codes],WillBe,SoFar,Upper,OUT):- ctype_switch(Upper,Digit), char_type(C,Digit),!, breaked_codes(Left,SoFar), to_case_breaks(Codes,Digit,[C],Digit,New),!,(hide_char_type(WillBe)->OUT=New;OUT=[t(Left,WillBe)|New]).
 to_case_breaks([C|Codes],WillBe,SoFar,Upper,New):- append(SoFar,[C],SoFarC),to_case_breaks(Codes,WillBe,SoFarC,Upper,New).
 
-:- swi_export(to_first_break/2).
+:- export(to_first_break/2).
 to_first_break(Text,Left):-to_first_break(Text,_LeftType,Left,_Right,_NextType).
-:- swi_export(to_first_break/5).
+:- export(to_first_break/5).
 to_first_break(Text,LType,Left,Right,RType):- string_codes(Text,[C|Codes]), char_type_this(C,LType),!,to_first_break_w(Codes,[C],LType,Left,Right,RType).
 to_first_break(Text,LType,Left,Right,RType):- string_codes(Text,[C|Codes]), !,to_first_break_w(Codes,[C],LType,Left,Right,RType).
 
@@ -400,9 +399,9 @@ stringToCodelist2(Term,Codes):-sformat(Codes,'~q',[Term]),true.
 %===================================================================
 % Removes Leading and Trailing whitespaces and non ANSI charsets.
 %====================================================================
-:-assert(bugger:show_this_hide(trim,2)).
-:-current_prolog_flag(double_quotes,X),asserta(double_quotes_string_was(X)).
-:-set_prolog_flag(double_quotes,codes).
+:- assert(bugger:show_this_hide(trim,2)).
+:- current_prolog_flag(double_quotes,X),asserta(double_quotes_string_was(X)).
+:- set_prolog_flag(double_quotes,codes).
 
 trim(S,Y):-flatten(S,S2),trim2(S2,Y).
 
@@ -416,8 +415,8 @@ trim2(S,Y):-
 addSpaceBeforeSym([H|T],[H,32|T]):-member(H,"?.!"),!.
 addSpaceBeforeSym(H,H).
 
-:-retract(double_quotes_string_was(X)),set_prolog_flag(double_quotes,X).
-:-set_prolog_flag(double_quotes,string).
+:- retract(double_quotes_string_was(X)),set_prolog_flag(double_quotes,X).
+:- set_prolog_flag(double_quotes,string).
 
 ltrim([],[]):-!.
 ltrim([32,32,32,32,32,32,32|String],Out) :-trim(String,Out),!.
@@ -456,14 +455,14 @@ list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-
 list_to_atomics_list0([],[]):-!.
 */
 
-:- swi_export(atomic_list_concat_catch/3).
+:- export(atomic_list_concat_catch/3).
 atomic_list_concat_catch(List,Sep,Atom):-catch(atomic_list_concat_safe(List,Sep,Atom),E,(dumpST,dmsg(E:atomic_list_concat_safe(List,Sep,Atom)),!,fail)).
 
 
 catch_read_term_from_atom(Sub,Term,NewOnes):-
   failOnError(read_term_from_atom(Sub,Term,[module(user),variable_names(NewOnes)])),Term\==end_of_file.
 
-:- swi_export(splt_words/3).
+:- export(splt_words/3).
 splt_words(Atom,Terms,Var):- failOnError((hotrace(once(splt_words_0(Atom,Terms,Var))))),!.
 splt_words(Atom,Words1,[]):- failOnError(atomic_list_concat_safe(Words1,' ',Atom)),!.
 
@@ -504,7 +503,7 @@ atomSplit(In,List):- hotrace(( ground(In),
 
 atomSplit(Atom,WordsO):-atomSplitEasy(Atom,WordsO),!.
 
-:- swi_export(atomSplitEasy/2).
+:- export(atomSplitEasy/2).
 atomSplitEasy(Atom,WordsO):-
    hotrace((atomSplit(Atom,WordsO,[' ','\t','\n','\v','\f','\r',' ','!','"','#','$','%','&','\'',
     '(',')','*','+',',','-','.','/',':',';','<',
@@ -583,7 +582,7 @@ member_ci(W,WL):-to_word_list(WL,ListI),member(LL2,ListI),string_equal_ci(LL2,W)
 string_ci(A,LIC):-hotrace((must(nonvar(A)),non_empty(A),any_to_string(A,S),!,text_to_string(S,SS),string_lower(SS,SL),atomics_to_string(SLIC,"_",SL),
    atomics_to_string(SLIC," ",LIC))),!.
 
-:- swi_export(append_ci/3).
+:- export(append_ci/3).
 append_ci(A1,A2,A3):-to_word_list(A1,L1),to_word_list(A2,L2),to_word_list(A3,L3),!, append_ci0(L1,L2,L3),!.
 
 append_ci0([],L1,L2):- string_equal_ci(L1,L2),!.
@@ -688,7 +687,7 @@ to_word_list(A,SL):-once(hotrace((to_word_list_0(A,S0),(is_list(S0)->delete(S0,'
 % as_atom(S,A):-string_to_atom(S,A),!.
 as_atom(A,A).
 
-:-swi_export(to_word_list_0/2).
+:- export(to_word_list_0/2).
 to_word_list_0(V,V):-var(V),!.
 to_word_list_0([A],[A]):-number(A),!.
 to_word_list_0(E,[]):-empty_str(E),!.
@@ -750,14 +749,10 @@ longest_string(Order,TStr1,TStr2):-
    text_to_string(TStr1,Str1),string_length(Str1,L1),
    text_to_string(TStr2,Str2),string_length(Str2,L2),
    compare(Order,L2-Str2,L1-Str1).
-
-:- module_property(logicmoo_util_strings, exports(List)),forall(member(F/A,List),moo_hide_childs(logicmoo_util_strings:F/A)).
+:- notrace(trace).
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 :- retract(double_quotes_was_strings(WAS)),set_prolog_flag(double_quotes,WAS).
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),swi_export(F/A),module_transparent(F/A))).
-
-% :- module_predicates_are_exported(logicmoo_util_strings).
-:- all_module_predicates_are_transparent(logicmoo_util_strings).
+:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),'$set_predicate_attribute'(logicmoo_util_strings:H, hide_childs, 1),module_transparent(F/A))).
 

@@ -26,12 +26,17 @@
 	<CustomFolders>
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
-		<Folder Name=".">
+		<Folder Name="../">
 			<F
-				N="*.*"
+				N="../*.*"
 				Recurse="1"
-				Refilter="1"
+				Refilter="0"
 				Excludes=".git/;.svn/;*.*~;*~/"/>
 		</Folder>
+		<F
+			N="*.*"
+			Recurse="1"
+			Refilter="1"
+			Excludes=".git/;.svn/;*.*~;*~/"/>
 	</Files>
 </Project>

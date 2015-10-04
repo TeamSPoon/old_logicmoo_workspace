@@ -8,7 +8,7 @@
 :- attach_packs.
 :- initialization(attach_packs).
 % [Required] Load the Logicmoo Library Utils
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+:- user:ensure_loaded(library(logicmoo/logicmoo_utils)).
 :- initialization(attach_packs).
 
 %%% ***
@@ -795,14 +795,14 @@ procedures_with_ancestor_tests([[P,N]|Preds],Clauses,Procs) :-
 	procedures_with_ancestor_tests(Preds,Clauses,Procs2),
 	conjoin(Proc,Procs2,Procs).
 procedures_with_ancestor_tests([],_Clauses,true).
-:-else.
+:- else.
 procedures_with_ancestor_tests([[P,N]|Preds],Clauses,Procs) :-
         procedure(P,N,Clauses,Proc1),
         ancestor_tests(P,N,Tests),conjoin(Tests,Proc1,Proc),
         procedures_with_ancestor_tests(Preds,Clauses,Procs2),
         conjoin(Proc,Procs2,Procs).
 procedures_with_ancestor_tests([],_Clauses,true).
-:-endif.
+:- endif.
 
 
 query_n(M) :-                             % call query with depth bound M

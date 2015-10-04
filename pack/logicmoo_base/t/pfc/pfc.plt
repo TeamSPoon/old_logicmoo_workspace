@@ -212,7 +212,7 @@ argIsa(owns,2,notHuman).
 
 end_of_file.
 
-:-dynamic((disjointWith/2,genls/2,isa/2)).
+:- dynamic((disjointWith/2,genls/2,isa/2)).
 
 %(disjointWith(P1,P2) , genls(C1,P1)) =>    disjointWith(C1,P2).
 disjointWith(Sub, Super) => disjointWith( Super, Sub).
@@ -263,7 +263,7 @@ isa(tRelation,ttAbstractType).
 
 
 
-:-dynamic(pfc_default/1).
+:- dynamic(pfc_default/1).
 % -*-Prolog-*-
 % here is an example which defines pfc_default facts and rules.  Will it work?
 
@@ -272,11 +272,11 @@ isa(tRelation,ttAbstractType).
 ((pfc_default((P => Q))/pfc_literal(Q) => (P, ~neg(Q) => Q))).
 
 
-:-dynamic(conflict/1).
+:- dynamic(conflict/1).
 % a conflict triggers a Prolog action to resolve it.
 ((conflict(C) => {resolveConflict(C)})).
 
-:-dynamic(resolveConflict/1).
+:- dynamic(resolveConflict/1).
 % this isnt written yet.
 resolveConflict(C) :-
   format("~NHalting with conflict ~w", [C]),
@@ -306,7 +306,7 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 % either(P,Q) => (neg(P) => Q), (neg(Q) => P).
 % (P,Q => false) => (P => neg(Q)), (Q => neg(P)).
 
-:-dynamic((fly/1,bird/1,penguin/1)).
+:- dynamic((fly/1,bird/1,penguin/1)).
 
 
 % birds fly by pfc_default.
@@ -496,7 +496,7 @@ start :-
   add(at(monkey,xy(7,7))),
   add(grasping(monkey,blanket)).
 
-:-dynamic(go/0).
+:- dynamic(go/0).
 % go. to get started.
 go :- add(action(grasping(monkey,bananas))).
 
@@ -560,7 +560,7 @@ cat(on,prep).
 cat(house,noun).
 cat(table,noun).
 
-:-compile_pfcg.
+:- compile_pfcg.
 
 
 
@@ -623,7 +623,7 @@ test1 :-
   consult('finin.pfc').
 
 % test2 
-:-
+:- 
   add([(a(X),~b(Y)/(Y>X) => biggest(a)),
        (b(X),~a(Y)/(Y>X) => biggest(b)),
         a(5)]).
@@ -635,7 +635,7 @@ test1 :-
 %        a(5)]).
 
 % test4 
-:-
+:- 
     add([(foo(X), bar(Y)/{X=:=Y} => foobar(X)),
          (foobar(X), go => found(X)),
 	 (found(X), {X>=100} => big(X)),
@@ -651,7 +651,7 @@ test1 :-
 
 
 % test5 
-:-
+:- 
     add([(faz(X), ~baz(Y)/{X=:=Y} => fazbaz(X)),
          (fazbaz(X), go => found(X)),
 	 (found(X), {X>=100} => big(X)),
@@ -665,7 +665,7 @@ test1 :-
 
 
 % test6 
-:-
+:- 
     add([(d(X), ~f(Y)/{X=:=Y} => justD(X)),
          (justD(X), go => dGo(X)),
 	 d(1),
@@ -675,7 +675,7 @@ test1 :-
 
 
 % test7 
-:-
+:- 
     add([(g(X), h(Y)/{X=:=Y} => justG(X)),
          (justG(X), go => gGo(X)),
 	 g(1),
@@ -685,7 +685,7 @@ test1 :-
 
 
 % test8 
-:-
+:- 
     add([(j(X), k(Y) => bothJK(X,Y)),
          (bothJK(X,Y), go => jkGo(X,Y)),
 	 j(1),
@@ -695,7 +695,7 @@ test1 :-
 
 
 % test9 
-:-
+:- 
     add([(j(X), k(Y) => bothJK(X,Y)),
          (bothJK(X,Y) => jkGo(X,Y)),
 	 j(1),
@@ -703,7 +703,7 @@ test1 :-
 	]).
 
 % test10 
-:-
+:- 
   add([
 	(j(X), k(Y) => bothJK(X,Y)),
 	(bothJK(X,Y), go => jkGo(X,Y)),
@@ -764,18 +764,18 @@ isa(C1,C2) =>
 penguin(X) => neg(fly(X)).
 
 % chilly is a penguin.
-:-(add(=> penguin(chilly))).
+:- (add(=> penguin(chilly))).
 
 % rtrace(Goal):- Goal. % (hotrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
 
 % :- gutracer.
 
 
-:-prolog.
+:- prolog.
 end_of_file.
 
-:-next_test.
-:-debug.
+:- next_test.
+:- debug.
 
 
 end_of_file.
@@ -1013,14 +1013,14 @@ time(Call,Time) :-
        t(1)]).
 
 %test1 
-:-
+:- 
   consult('pfc/kinship.pfc'),
   consult('pfc/finin.pfc').
 
-:-dynamic((a/2,b/2,found/1)).
+:- dynamic((a/2,b/2,found/1)).
 
 %test2 
-:-
+:- 
   add([(a(X),~b(Y)/(Y>X) => biggest(a)),
        (b(X),~a(Y)/(Y>X) => biggest(b)),
         a(5)]).
@@ -1033,7 +1033,7 @@ test3 :-
 
 
 %test4 
-:-
+:- 
     add([(foo(X), bar(Y)/{X=:=Y} => foobar(X)),
          (foobar(X), go => found(X)),
 	 (found(X), {X>=100} => big(X)),
@@ -1049,7 +1049,7 @@ test3 :-
 
 
 %test5 
-:-
+:- 
     add([(faz(X), ~baz(Y)/{X=:=Y} => fazbaz(X)),
          (fazbaz(X), go => found(X)),
 	 (found(X), {X>=100} => big(X)),
@@ -1063,7 +1063,7 @@ test3 :-
 
 
 %test6 
-:-
+:- 
     add([(d(X), ~f(Y)/{X=:=Y} => justD(X)),
          (justD(X), go => dGo(X)),
 	 d(1),
@@ -1073,7 +1073,7 @@ test3 :-
 
 
 %test7 
-:-
+:- 
     add([(g(X), h(Y)/{X=:=Y} => justG(X)),
          (justG(X), go => gGo(X)),
 	 g(1),
@@ -1108,7 +1108,7 @@ test10 :-
        ]).
 
 
-:-next_test. % ==
+:- next_test. % ==
 
 
 % if we learn that someone has a full name, then we know they are a user.
@@ -1155,7 +1155,7 @@ host_name(User,unknown).
 
 
 
-:-next_test. % ==
+:- next_test. % ==
 
 skCheck(eq(_,_),[]) :- !.
 
@@ -1222,7 +1222,7 @@ termSubst(Old,New,Term,Term2) :-
 
 
 
-:-next_test. % ==
+:- next_test. % ==
 %% a simple Knowledge Representation Language:
 %%   class(Class)
 %%   isa(Individual,Class)
@@ -1264,8 +1264,8 @@ neg(subsumes(C1,C2)) <=
   type(C2,R,T2),
   neg(subsume(T1,T2)).
 
-:-export otherGender/2.
-:-next_test. % ==
+:- export otherGender/2.
+:- next_test. % ==
 
 % kinship domain example.
 
@@ -1326,7 +1326,7 @@ parent(P,K), sibling(P,P2)
      (spouse(P2,P3) => aunt(P3,K))).
 
 
-:-next_test. % ==
+:- next_test. % ==
 
 %% equality axiomm
 
@@ -1350,7 +1350,7 @@ demons(P, WhenAdded, WhenRemoved) =>
 show(P) => demons(P,show_pfc_fact(P),hide_pfc_fact(P)).
 
 
-:-next_test. % ==
+:- next_test. % ==
 
 :- op(1050,xfx,('==>')).
 
@@ -1377,9 +1377,9 @@ prove_by_contradiction(P) :-
 
 % try :- prove_by_contradiction(x).
 
-:-prolog.
+:- prolog.
 
-:-next_test. % ==
+:- next_test. % ==
 % here is an example which defines pfc_default facts and rules.  Will it work?
 
 (pfc_default(P)/pfc_literal(P))  =>  (~neg(P) => P).
@@ -1418,7 +1418,7 @@ either(P,Q) => (neg(P) => Q), (neg(Q) => P).
 (P,Q => false) => (P => neg(Q)), (Q => neg(P)).
 
 
-:-next_test. % ==
+:- next_test. % ==
 % here is an interesting rule!
 
 neg(P), P => contradiction(P).
@@ -1471,7 +1471,7 @@ fib(N,M) <=
 
 
 
-:-next_test. % ==
+:- next_test. % ==
 
 mudAtLoc(Obj,NewLoc), 
 {(mudAtLoc(Obj,OldLoc), OldLoc\==NewLoc)}
@@ -1522,9 +1522,9 @@ bird(X), injured(X) => neg(fly(X)).
 
 bird(X), dead(X) => neg(fly(X)).
 
-:-pfcPrintDB.
+:- pfcPrintDB.
 
-:-next_test.
+:- next_test.
 
 
 % dcg_pfc: translation of dcg-like grammar rules into pfc rules.
@@ -1652,7 +1652,7 @@ make_term(ss(Constituent,Id,String),Term) :-
 
 
 
-:-next_test. % ==
+:- next_test. % ==
 
 :- dynamic ('-->>')/2.
 :- dynamic ('--*>>')/2.
@@ -1695,7 +1695,7 @@ cat(table,noun).
 end_of_file.
 
 
-:-next_test. % ==
+:- next_test. % ==
 
 %% a simple Pfc example - the three bulb problem (see DeKleer and
 %% Williams, IJCAI89)
@@ -1798,7 +1798,7 @@ test_bs(X) :-
        observed(lit(b3(X)))]).
 
 
-:-next_test. % ==
+:- next_test. % ==
 
 %% a simple Pfc example - the one bulb problem (see DeKleer and
 %% Williams, IJCAI89)
@@ -1860,7 +1860,7 @@ test_b1(X) :-
 
 
 
-:-next_test. % ==
+:- next_test. % ==
 
 %% a simple Pfc example - the standard circuit diagnosis problem.
 %%

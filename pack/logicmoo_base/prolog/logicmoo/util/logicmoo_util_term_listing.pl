@@ -1,6 +1,25 @@
+/** <module> Logicmoo Debug Tools
+% ===================================================================
+% File '$FILENAME.pl'
+% Purpose: An Implementation in SWI-Prolog of certain debugging tools
+% Maintainer: Douglas Miles
+% Contact: $Author: dmiles $@users.sourceforge.net ;
+% Version: '$FILENAME.pl' 1.0.0
+% Revision: $Revision: 1.1 $
+% Revised At:  $Date: 2002/07/11 21:57:28 $
+% Licience: LGPL
+% ===================================================================
+*/
+:- if(\+ current_module(logicmoo_utils)).
+:- module(logicmoo_util_term_listing,
+    [  % when the predciates are not being moved from file to file the exports will be moved here
+
+    ]).  
+:- endif.
+:- include(logicmoo_util_header).
 
 
-:- swi_export(mstatistics/0).
+:- export(mstatistics/0).
 mstatistics:-
   garbage_collect,
   garbage_collect_atoms,
@@ -29,17 +48,17 @@ blob_info(A,functor_safe(Y),functor_safe(A,Y)).
 blob_info(A,key,key(A,Y)):-findall(V,recorded(A,V),Y).
 blob_info(A,flag,flag(A,Y)):-flag(A,Y,Y).
 blob_info(A,blob(clause),blob(A,T,Y,H,B)):-T=clause, findall(V,clause_property(A,V),Y),(m_clause(_,H,B,A)->true;H=dead).
-blob_info(A,blob(record),blob(A,T,Y)):-T=record,with_output_to(string(Y),print_record_properties(A, current_output)).
+blob_info(A,blob((record)),blob(A,T,Y)):-T=(record),with_output_to(string(Y),print_record_properties(A, current_output)).
 % blob_info(A,blob(T),blob(A,T,Y)):-with_output_to(string(Y),prolog_term_view:emit_term(A, [])).
 blob_info(A,blob(T),blob(A,T)).
 
-:- swi_export(saved_current_atom/2).
-:-dynamic(saved_current_atom/2).
-:- swi_export(new_atoms/2).
+:- export(saved_current_atom/2).
+:- dynamic(saved_current_atom/2).
+:- export(new_atoms/2).
 new_atoms(X,Type):-current_atom_or_blob(X,Type),not(saved_current_atom(X,Type)).
-:- swi_export(save_atoms/0).
+:- export(save_atoms/0).
 save_atoms:-forall(new_atoms(X,Type),assert(saved_current_atom(X,Type))).
-:- swi_export(b_i/2).
+:- export(b_i/2).
 b_i(L,NA):-findall(W,(new_atoms(X,Type),once(blob_info(X,Type,W))),LL),list_to_set(LL,L),length(L,NA).
 print_record_properties(Record, Out) :-
 	format(Out, 'Record reference ~w~n', [Record]),
@@ -66,7 +85,7 @@ m_clause0(M,H,B,R):- atom(M),!, M:clause(H,B,R).
 m_clause0(_,H,B,R):- user:clause(H,B,R).
 m_clause0(M,H,B,R):- atom(M),!, clause(H,M:B,R).
 
-:-thread_local(thlocal:tl_hide_data/1).
+:- thread_local(thlocal:tl_hide_data/1).
 
 clause_ref(HB,Ref):-as_clause_w_m( HB, M, H, B),m_clause_no_missing(M,H,B,Ref).
 
@@ -92,11 +111,11 @@ searchable_of_clause_1([H|T],List):-searchable_of_clause_1(H,T,List).
 searchable_of_clause_1(H,T,[H|List]):-atomic(H),searchable_of_clause_1(T,List).
 searchable_of_clause_1(H,T,List):-searchable_of_clause_0(H,List1),searchable_of_clause_1(T,List2),append(List1,List2,List).
 
-:-dynamic(search_refs_use_recorded/0).
+:- dynamic(search_refs_use_recorded/0).
 search_refs_use_recorded.
 
 searchable_terms(T):-search_refs_use_recorded,!,current_key(Key),unmake_search_key(Key,T).
-searchable_terms(T):-unify_in_thread(searchable_terms_tl(T)).
+searchable_terms(T):-unify_in_thread(main,searchable_terms_tl(T)).
 
 searchable_terms_tl(T):-use_module(library(dialect/ifprolog),[current_global/1]),current_global(Key),unmake_search_key(Key,T).
 
@@ -142,7 +161,7 @@ save_search_ref_tl(Ref,Atomic):-nb_setval(Atomic,[Ref]).
 % that is    CL=beliefs(we,loves(joe,turkey)), asserta(C,Ref),forall(find_each_atom(CL,A),(asserta_if_new(idexed_atom(A)),asserta(atom_index(A,Ref)))).
 
 
-:-multifile shared_hide_data/1.
+:- multifile shared_hide_data/1.
 
 shared_hide_data(varname_info/4):- !,listing_filter(hideMeta).
 shared_hide_data(table_bugger:_):- listing_filter(hideMeta).
@@ -202,6 +221,7 @@ hide_data0(M:P):- atom(M),(listing_filter(M);hide_data0(P)).
 %prolog:help_hook(help(What)):- '$find_predicate'(What, Preds), Preds\==[], Preds\==[What],forall(member(M:F/A,Preds),help(M:F/A)),fail.
 prolog:help_hook(help(A)):-  pfc_show_doc(A),fail.
 
+
 %%	pfc_show_doc(+Object) is det.
 %
 %	Searches in doc indexes for Object occurances
@@ -225,7 +245,7 @@ pfc_show_doc(M,[Title,Info,Info2]):- pldoc_process:doc_comment(M:module(Title),_
 :- user:ensure_loaded(library(make)).
 
 
-:- meta_predicate user:unify_listing(0).
+:- meta_predicate unify_listing(0).
 unify_listing(FileMatch):-functor_safe(FileMatch,F,A),unify_listing(FileMatch,F,A),!.
 
 
@@ -255,12 +275,12 @@ contains_term_unifiable(SearchThis,Find):-compound(SearchThis),functor_safe(Sear
 :- multifile user:listing_mpred_hook/1.
 :- dynamic user:listing_mpred_hook/1.
 
-:-thread_local(thlocal:in_term_listing/1).
-:-thread_local(thlocal:in_prolog_listing/1).
+:- thread_local(thlocal:in_term_listing/1).
+:- thread_local(thlocal:in_prolog_listing/1).
 
-:-swi_export((term_listing/1)).
+:- export(term_listing/1).
+:- module_transparent(term_listing/1).
 term_listing([]):-!.
-
 term_listing(Match):- \+ \+ thlocal:in_term_listing(Match),!.
 term_listing(Match):- thlocal:in_prolog_listing(Match),findall(PI,to_pi(Match,PI),SkipPI),!,term_non_listing(Match,SkipPI),!.
 term_listing(f(Match)):- !,term_listing_inner(portray_hbr,Match,[]).
@@ -277,14 +297,14 @@ plisting_2(_).
 
 
 
-user:listing_mpred_hook(Match):- user:term_listing(Match).
+user:listing_mpred_hook(Match):- term_listing(Match).
 
 user:term_mpred_listing(Match):- current_predicate(user:listing_mpred_hook/1), once(debugOnError(doall(call_no_cuts(user:listing_mpred_hook(Match))))),!.
  
 
-:-swi_export(term_non_listing/2).
+:- export(term_non_listing/2).
 term_non_listing(Match):- term_non_listing(Match,[]).
-:-swi_export(term_non_listing/2).
+:- export(term_non_listing/2).
 term_non_listing(Match,SkipPI):- 
   with_assertions(thlocal:in_term_listing(Match),
  (
@@ -317,7 +337,7 @@ term_listing_inner(Pred,Match,SkipPI):-
 % user:prolog_list_goal(Goal):- writeq(hello(prolog_list_goal(Goal))),nl.
 
 :- dynamic(user:no_buggery/0).
-user:buggery_ok :- \+ compiling, current_predicate(logicmoo_bugger_loaded/0), \+ user:no_buggery.
+user:buggery_ok :- \+ compiling, current_predicate(logicmoo_bugger_loaded/0), \+ no_buggery.
 
 :- multifile prolog:locate_clauses/2.
 prolog:locate_clauses(A, _) :- 
@@ -328,8 +348,8 @@ prolog:locate_clauses(A, _) :-
 
 
 
-:-multifile((synth_clause_for/5)).
-:-swi_export((synth_clause_for/5)).
+:- multifile((synth_clause_for/5)).
+:- export((synth_clause_for/5)).
 
 % bookeepingPredicate(M:G):- member(M:F/A,[M:'$exported_op'/3]),current_module(M),functor(G,F,A),once(predicate_property(M:G,_)).
 bookeepingPredicateXRef(user:file_search_path(_,_)).
@@ -370,7 +390,7 @@ synth_clause_for_large(M:H,B,Ref,KeySorted,Size,SYNTH):-
       \+ listing_filter(M:H),
       SYNTH= must(m_clause(M,H,B,Ref))).
 
-:-swi_export((synth_clause_ref/5)).
+:- export((synth_clause_ref/5)).
 synth_clause_ref(_:in_term_listing(_),_B,_Ref, _Size, _CALL):-!,fail.
 synth_clause_ref(_:in_prolog_listing(_),_B,_Ref, _Size, _CALL):-!,fail.
 synth_clause_ref(_:varname_info(_,_,_,_),_B,_Ref,_Size, _CALL):- \+ listing_filter(showAll),!,fail.
@@ -383,7 +403,7 @@ synth_clause_ref(M:H,B,Ref,Size, SYNTH):- predicate_property(M:H,number_of_claus
 
 synth_in_listing(MH):- ( \+ listing_filter(MH), \+ sourceTextPredicateSource(MH) ),!.
 
-:-swi_export((term_matches_hb/3)).
+:- export((term_matches_hb/3)).
 
 
 
@@ -417,7 +437,7 @@ term_matches_hb(D,HO,H,B):- \+ \+ term_matches_unify(D,HO,(H:-B)).
 
 % ?- term_listing((h(depth(0,pt/2)),same(tBird(A)))).
 
-:-swi_export(term_matches_unify/3).
+:- export(term_matches_unify/3).
 term_matches_unify(_R,same(HO),V):-HO=@=V.
 term_matches_unify(_R,_,V):-var(V),!,fail.
 term_matches_unify(_R,V,V).
@@ -435,8 +455,8 @@ nonvar_search(F/A):-!,nonvar(F),nonvar(A).
 %nonvar_search(F):-atom(F).
 %nonvar_search(P):-compound(F).
 
-:-dynamic(cur_predicates/1).
-:-swi_export((cur_predicate)/2).
+:- dynamic(cur_predicates/1).
+:- export((cur_predicate)/2).
 
 cur_predicate(M:F/A,M:P):-atomic(M),compound(P),!,ignore(functor(P,F,A)).
 cur_predicate(M:F/A,M:P):-
@@ -488,7 +508,7 @@ to_mp(M1:P,M2,P):-ignore(M1=M2).
 to_mp(P,_,P):-nonvar(P),!.
 */
 
-:-swi_export(ok_show/1).
+:- export(ok_show/1).
 ok_show(F/A):-!,functor(P,F,A),ok_show(P),!.
 ok_show(P):-not(bad_pred(P)).
 
@@ -496,12 +516,12 @@ ok_show(P):-not(bad_pred(P)).
 
 % when we import new and awefull code base (the previous )this can be helpfull
 % we redfine list_undefined/1 .. this is the old version
-:- swi_export(scansrc_list_undefined/1).
+:- export(scansrc_list_undefined/1).
 scansrc_list_undefined(_):-!.
 scansrc_list_undefined(A):- real_list_undefined(A).
 
 
-:- swi_export(real_list_undefined/1).
+:- export(real_list_undefined/1).
 real_list_undefined(A):- 
  merge_options(A, [module_class([user])], B),
         prolog_walk_code([undefined(trace), on_trace(found_undef)|B]),
@@ -515,10 +535,10 @@ real_list_undefined(A):-
         ).
 
 
-:-swi_export(mmake/0).
+:- export(mmake/0).
 mmake:- thread_main(Main), \+ thread_self(Main), !.
 mmake:- thread_main(Main),!,thread_signal(Main,catch(((ignore(update_changed_files), ignore(if_defined(load_mpred_files,true)))),_,true)).
-:-swi_export(update_changed_files/0).
+:- export(update_changed_files/0).
 update_changed_files:-!,thread_signal(main,update_changed_files0).
 update_changed_files0 :- current_main_error_stream(Err),with_output_to(Err,update_changed_files1).
 update_changed_files1 :- 
@@ -539,7 +559,7 @@ update_changed_files1 :-
            true %list_undefined,list_void_declarations
 	).
 
-:- swi_export(remove_undef_search/0).
+:- export(remove_undef_search/0).
 % check:list_undefined:-real_list_undefined([]).
 remove_undef_search:- ((
  '@'(use_module(library(check)),'user'),
@@ -556,7 +576,7 @@ mp(M,P,MP):-atom(M),!,(MP=M:P ; MP=P).
 mp(_,P,MP):-MP=P.
 
 
-:-swi_export(bad_pred/1).
+:- export(bad_pred/1).
 bad_pred(M:P):-!,atom(M),bad_pred(P). 
 %bad_pred(P):-functor(P,F,A),arg(_,v(cur_predicates/_,db_op/_,db_op00/_,db_op0/_,db_op_loop/_,do_expand_args_l/3),F/A).
 %bad_pred(P):-predicate_property(P,autoloaded(_)).
@@ -564,23 +584,23 @@ bad_pred(M:P):-!,atom(M),bad_pred(P).
 %bad_pred(P):-predicate_property(P,imported_from(_)),predicate_property(P,static).
 %bad_pred(P):-predicate_property(P,foreign).
 
-:-swi_export(pred_info/2).
+:- export(pred_info/2).
 pred_info(H,Props):- get_functor(H,F,_),findall(PP,user:mpred_prop(F,PP),Props).
 
-:-swi_export(portray_hbr/3).
+:- export(portray_hbr/3).
 portray_hbr(H,B,_):- B==true, !, portray_one_line(H).
 portray_hbr(H,B,_):- \+ \+ portray_one_line((H:-B)).
 
-:-swi_export(portray_one_line/1).
-:-thread_local(portray_one_line_hook/1).
+:- export(portray_one_line/1).
+:- thread_local(portray_one_line_hook/1).
 
 portray_one_line(H):- no_slow_io,!, writeq(H),write('.'),nl,!.
-portray_one_line(H):- notrace((user:loop_check(user:portray_one_line0(H),((portray_clause(H),nl))))).
-% portray_one_line(H):- notrace((loop_check(portray_one_line0(H),((writeq(H),write('.'),nl))))).
+portray_one_line(H):- notrace((loop_check(user:portray_one_line0(H),((portray_clause(H),nl))))).
+% portray_one_line(H):- notrace((loop_check(logicmoo_utils:portray_one_line0(H),((writeq(H),write('.'),nl))))).
 portray_one_line0(H):- call_not_not((portray_one_line_hook(H))),!.
 portray_one_line0(H):- call_not_not(((get_clause_vars(H),portray_clause(H)))),!.
 portray_one_line0(H):- writeq(H),write('.'),nl,!.
-user:portray(A) :- compound(A),portray_one_line(A),!.
+% user:portray(A) :- compound(A),catch(portray_one_line(A),_,fail),!.
 
 pp_listing(Pred):- functor_safe(Pred,File,A),functor_safe(FA,File,A),listing(File),nl,findall(NV,predicate_property(FA,NV),LIST),writeq(LIST),nl,!.
 

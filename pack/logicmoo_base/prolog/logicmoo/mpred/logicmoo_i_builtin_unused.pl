@@ -222,17 +222,17 @@ tPenguin(X) ==> neg(tFly(X)).
 % iTweety is a tCanary.
 ((==> tCanary(iTweety))).
 
-:-must(in_file_expansion;in_file_directive).
+:- must(in_file_expansion;in_file_directive).
 
-:-listing(tBird).
-:-listing(tFly).
+:- listing(tBird).
+:- listing(tFly).
 
 
 
 end_of_file.
 
 
-:-dynamic((fly/1,bird/1,penguin/1,canary/1)).
+:- dynamic((fly/1,bird/1,penguin/1,canary/1)).
 
 
 % birds fly by default.
@@ -257,9 +257,9 @@ end_of_file.
 % tweety is a canary.
 (canary(tweety)).
 
-:-listing([fly/1,bird/1,penguin/1,canary/1]).
+:- listing([fly/1,bird/1,penguin/1,canary/1]).
 
-:-ignore(show_call_failure(fly(tweety))).
+:- ignore(show_call_failure(fly(tweety))).
 
 /*
 

@@ -62,7 +62,7 @@ pfc_tidy((P1,P2),(Q1,Q2)) :-
    pfc_tidy(P2,Q2).
 pfc_tidy(A,A) :- !.
 
-:-dynamic(sentence/2).
+:- dynamic(sentence/2).
 
 compile_pfcg :-
   ((retract((L -->> R)), pfc_translate_rule((L -->> R), PfcRule));
@@ -88,7 +88,7 @@ parse1([H|T],Id) :-
  parse1(T,Id).
 
 
-:-dynamic(sentences/2).
+:- dynamic(sentences/2).
 
 show_sentences(Id) :- show_sentences(Id,_).
 

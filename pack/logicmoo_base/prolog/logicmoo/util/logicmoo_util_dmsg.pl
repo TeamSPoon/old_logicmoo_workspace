@@ -1,85 +1,36 @@
+/** <module> Logicmoo Debug Tools
+% ===================================================================
+% File '$FILENAME.pl'
+% Purpose: An Implementation in SWI-Prolog of certain debugging tools
+% Maintainer: Douglas Miles
+% Contact: $Author: dmiles $@users.sourceforge.net ;
+% Version: '$FILENAME.pl' 1.0.0
+% Revision: $Revision: 1.1 $
+% Revised At:  $Date: 2002/07/11 21:57:28 $
+% Licience: LGPL
+% ===================================================================
+*/
+:- if(\+ current_module(logicmoo_utils)).
+:- module(logicmoo_util_dmsg,
+[  % when the predciates are not being moved from file to file the exports will be moved here
+       ]).
 
-
-
-:-meta_predicate(catchvvnt(0,?,0)).
-catchvvnt(T,E,F):-catchvv(cnotrace(T),E,F).
-
-:- thread_self(X),assert(thread_main(X)).
-
-is_pdt_like:-thread_property(_,alias(pdt_console_server)).
-is_pdt_like:-thread_main(X),!,X \= main.
-
-is_main_thread:-thread_main(X),!,thread_self(X).
-
-:- thread_local(tlbugger:no_colors/0).
-:- thread_local(thlocal:thread_local_current_main_error_stream/1).
-
-:- is_pdt_like-> assert(tlbugger:no_colors); true.
-
-:- meta_predicate ansicall(*,*,0).
-:- meta_predicate ansicall(*,0).
-:- meta_predicate ansicall0(*,*,0).
-:- meta_predicate ansicall1(*,*,0).
-
-
-:-meta_predicate(with_main_error_to_output(0)).
-with_main_error_to_output(Goal):-
- current_output(Out),
-  with_assertions(thlocal:thread_local_current_main_error_stream(Out),Goal).
-   
-
-thread_current_error_stream(Err):- thlocal:thread_local_current_main_error_stream(Err),!.
-thread_current_error_stream(Err):-thread_self(ID),thread_current_error_stream(ID,Err).
-
-current_main_error_stream(Err):- thlocal:thread_local_current_main_error_stream(Err),!.
-current_main_error_stream(Err):-thread_main(ID),thread_current_error_stream(ID,Err).
-
-format_to_error(F,A):-current_main_error_stream(Err),!,format(Err,F,A).
-fresh_line_to_err:- cnotrace((flush_output_safe,current_main_error_stream(Err),format(Err,'~N',[]),flush_output_safe(Err))).
-
-:- dynamic(thread_current_input/2).
-:- dynamic(thread_current_error_stream/2).
-:- volatile(thread_current_input/2).
-:- volatile(thread_current_error_stream/2).
-save_streams:- thread_self(ID), save_streams(ID).
-
-save_streams(ID):- current_input(In),thread_current_input(ID,In),!.
-save_streams(ID):-
-  current_input(In),asserta(thread_current_input(ID,In)),
-  current_output(Err),asserta(thread_current_error_stream(ID,Err)).
-
-:-meta_predicate(with_main_input(0)).
-with_main_input(G):-
-    current_output(OutPrev),
-    current_input(InPrev),
-    stream_property(ErrPrev,alias(user_error)),
-    thread_main(ID),thread_current_input(ID,In),thread_current_error_stream(ID,Err),
-    setup_call_cleanup(set_prolog_IO(In,OutPrev,Err),G,set_prolog_IO(InPrev,OutPrev,ErrPrev)).
-
- with_main_io(G):-
-    current_output(OutPrev),
-    current_input(InPrev),
-    stream_property(ErrPrev,alias(user_error)),
-    thread_main(ID),thread_current_input(ID,In),thread_current_error_stream(ID,Err),
-    setup_call_cleanup(set_prolog_IO(In,Err,Err),G,set_prolog_IO(InPrev,OutPrev,ErrPrev)).
-
-:-save_streams.
-:-initialization(save_streams).
-
-:- if(current_predicate(run_sanity_tests/0)).
-:- listing(thread_current_error_stream/2).
+:- include(logicmoo_util_header).
 :- endif.
+
+
+
 % ==========================================================
 % Sending Notes
 % ==========================================================
 
-:-thread_local( tlbugger: tlbugger:dmsg_match/2).
-:-meta_predicate(with_all_dmsg(0)).
-:-meta_predicate(with_show_dmsg(*,0)).
+:- thread_local( tlbugger: tlbugger:dmsg_match/2).
+:- meta_predicate(with_all_dmsg(0)).
+:- meta_predicate(with_show_dmsg(*,0)).
 
 
 with_all_dmsg(Call):-
-   with_assertions(always_show_dmsg,
+   with_assertions(tlbugger:tl_always_show_dmsg,
      with_assertions(set_prolog_flag(opt_debug,true),
        with_assertions( tlbugger:dmsg_match(show,_),Call))).
 
@@ -88,7 +39,7 @@ with_show_dmsg(TypeShown,Call):-
   with_assertions(set_prolog_flag(opt_debug,filter),
      with_assertions( tlbugger:dmsg_match(showing,TypeShown),Call)).
 
-:-meta_predicate(with_no_dmsg(0)).
+:- meta_predicate(with_no_dmsg(0)).
 with_no_dmsg(Call):- always_show_dmsg,!,Call.
 with_no_dmsg(Call):-with_assertions(set_prolog_flag(opt_debug,false),Call).
 with_no_dmsg(TypeUnShown,Call):-with_assertions(set_prolog_flag(opt_debug,filter),
@@ -169,7 +120,7 @@ to_stderror(Call):- thread_current_error_stream(Err), notrace((with_output_to_st
 
 
 
-:-dynamic dmsg_log/3.
+:- dynamic dmsg_log/3.
 
 
 
@@ -179,7 +130,7 @@ with_dmsg(Functor,Goal):-
    with_assertions(is_with_dmsg(Functor),Goal).
 
 
-:-use_module(library(listing)).
+:- use_module(library(listing)).
 sformat(Str,Msg,Vs,Opts):- nonvar(Msg),functor_safe(Msg,':-',_),!,with_output_to(string(Str),portray_clause_w_vars(user_output,Msg,Vs,Opts)).
 sformat(Str,Msg,Vs,Opts):- with_output_to(chars(Codes),(current_output(CO),portray_clause_w_vars(CO,':-'(Msg),Vs,Opts))),append([_,_,_],PrintCodes,Codes),'sformat'(Str,'   ~s',[PrintCodes]),!.
 
@@ -188,7 +139,7 @@ portray_clause_w_vars(Out,Msg,Vs,Options):- \+ \+ ((prolog_listing:do_portray_cl
 portray_clause_w_vars(Msg,Vs,Options):- portray_clause_w_vars(current_output,Msg,Vs,Options).
 portray_clause_w_vars(Msg,Options):- source_variables_l(Vs),portray_clause_w_vars(current_output,Msg,Vs,Options).
 
-:-export(portray_clause_w_vars/1).
+:- export(portray_clause_w_vars/1).
 portray_clause_w_vars(Msg):- portray_one_line(Msg),!.
 
 prepend_strings(S,AC,O):-once(atomics_to_string(LL,'\n',S)),[L,'']=LL,atom(L),atom_concat(AC,_,L),O=S,!.
@@ -214,10 +165,10 @@ if_color_debug(Call,UnColor):- if_color_debug->Call;UnColor.
 
 
 
-:-swi_export((portray_clause_w_vars/4,color_dmsg/2,ansicall/3,ansi_control_conv/2)).
+:- export((portray_clause_w_vars/4,ansicall/3,ansi_control_conv/2)).
 
-:-thread_local(tlbugger:skipDumpST9/0).
-:-thread_local(tlbugger:skipDMsg/0).
+:- thread_local(tlbugger:skipDumpST9/0).
+:- thread_local(tlbugger:skipDMsg/0).
 
 
 
@@ -231,13 +182,13 @@ dmsg0(F,A):- dmsg(fmt0(F,A)).
 vdmsg(L,F):-loggerReFmt(L,LR),loggerFmtReal(LR,F,[]).
 dmsg(L,F,A):-loggerReFmt(L,LR),loggerFmtReal(LR,F,A).
 
-:-thread_local(tlbugger:in_dmsg/0).
+:- thread_local(tlbugger:in_dmsg/0).
 
 dmsg0(V):- tlbugger:in_dmsg,!,format_to_error('~N% ~q~n',[dmsg0(V)]).
 dmsg0(V):- asserta(tlbugger:in_dmsg,Ref),call_cleanup(dmsg1(V),erase(Ref)).
 
-:-swi_export(dmsg1/1).
-:-swi_export(dmsg2/1).
+:- export(dmsg1/1).
+:- export(dmsg2/1).
 dmsg1(V):- is_with_dmsg(FP),!,FP=..FPL,append(FPL,[V],VVL),VV=..VVL,once(dmsg1(VV)).
 dmsg1(_):- \+ always_show_dmsg, is_hiding_dmsgs,!.
 dmsg1(V):- var(V),!,dmsg1(warn(dmsg_var(V))).
@@ -268,7 +219,7 @@ dmsg4(_):- cnotrace(show_source_location),fail.
 dmsg4(Msg):-dmsg5(Msg).
 
 dmsg5(Msg):- to_stderror(in_cmt(fmt9(Msg))).
-dmsg5(Msg,Args):- to_stderror(in_cmt(fmt9(Msg,Args))).
+dmsg5(Msg,Args):- dmsg5(fmt0(Msg,Args)).
 
 
 get_indent_level(Max) :- if_prolog(swi,((prolog_current_frame(Frame),prolog_frame_attribute(Frame,level,FD)))),Depth is FD div 5,Max is min(Depth,40),!.
@@ -310,23 +261,23 @@ ansifmt(Stream, _Attr, Format, Args) :- 'format'(Stream, Format, Args).
 
 */
 
-:-use_module(library(ansi_term)).
+:- use_module(library(ansi_term)).
 
-:- swi_export(ansifmt/2).
+:- export(ansifmt/2).
 ansifmt(Ctrl,Fmt):- colormsg(Ctrl,Fmt).
-:- swi_export(ansifmt/3).
+:- export(ansifmt/3).
 ansifmt(Ctrl,F,A):- colormsg(Ctrl,(format(F,A))).
 
 
 
-:- swi_export(colormsg/2).
+:- export(colormsg/2).
 
 
 
 colormsg(d,Msg):- mesg_color(Msg,Ctrl),!,colormsg(Ctrl,Msg).
 colormsg(Ctrl,Msg):- ansicall(Ctrl,fmt0(Msg)).
 
-:- swi_export(ansicall/2).
+:- export(ansicall/2).
 ansicall(Ctrl,Call):- hotrace((current_output(Out), ansicall(Out,Ctrl,Call))).
 
 ansi_control_conv(Ctrl,CtrlO):-no_slow_io,!,flatten([Ctrl],CtrlO),!.
@@ -379,7 +330,7 @@ keep_line_pos(S, G) :-
         call_cleanup(G, set_stream(S, line_position(LPos)))) ; G).
 
 
-:-dynamic(term_color0/2).
+:- dynamic(term_color0/2).
 
 
 %term_color0(retract,magenta).
@@ -425,8 +376,8 @@ mesg_arg1(T,F):-functor_h0(T,F,_).
 mesg_arg1(T,C):-compound(T),arg(1,T,F),!,nonvar(F),mesg_arg1(F,C).
 
 
-:- swi_export(defined_message_color/2).
-:-dynamic(defined_message_color/2).
+:- export(defined_message_color/2).
+:- dynamic(defined_message_color/2).
 
 defined_message_color(todo,[fg(red),bg(black),underline]).
 %defined_message_color(error,[fg(red),hbg(black),bold]).
@@ -442,7 +393,7 @@ functor_color(F,C):- predef_functor_color(F,C),!.
 functor_color(F,C):- next_color(C),assertz(term_color0(F,C)),!.
 
 
-:-dynamic(last_used_color/1).
+:- dynamic(last_used_color/1).
 
 last_used_color(pink).
 
@@ -464,7 +415,7 @@ fg_color(LU,FG):-member(fg(FG),LU),FG\=white,!.
 fg_color(LU,FG):-member(hfg(FG),LU),FG\=white,!.
 fg_color(_,default).
 
-:- swi_export(random_color/1).
+:- export(random_color/1).
 random_color([reset,M,FG,BG,font(Font)]):-Font is random(8),
   findall(Cr,ansi_term:ansi_color(Cr, _),L),
   random_member(E,L),
@@ -473,16 +424,16 @@ random_color([reset,M,FG,BG,font(Font)]):-Font is random(8),
   random_member(M,[bold,faint,reset,bold,faint,reset,bold,faint,reset]),!. % underline,negative
 
 
-:- swi_export(tst_color/0).
+:- export(tst_color/0).
 tst_color:- make, ignore((( between(1,20,_),random_member(Call,[colormsg(C,cm(C)),dmsg(color(C,dm(C))),ansifmt(C,C)]),next_color(C),Call,fail))).
-:- swi_export(tst_color/1).
+:- export(tst_color/1).
 tst_color(C):- make,colormsg(C,C).
 
-:- swi_export(next_color/1).
+:- export(next_color/1).
 next_color(C):- between(1,10,_), random_color(C), good_next_color(C),!.
 next_color([underline|C]):- random_color(C),!.
 
-:- swi_export(contrasting_color/2).
+:- export(contrasting_color/2).
 contrasting_color(white,black).
 contrasting_color(A,default):-atom(A),A \= black.
 contrasting_color(fg(C),bg(CC)):-!,contrasting_color(C,CC),!.
@@ -491,7 +442,7 @@ contrasting_color(black,white).
 contrasting_color(default,default).
 contrasting_color(_,default).
 
-:-thread_local(ansi_prop/2).
+:- thread_local(ansi_prop/2).
 
 sgr_on_code(Ctrl,OnCode):-sgr_on_code0(Ctrl,OnCode),!.
 sgr_on_code(Foo,7):- cnotrace((format_to_error('~NMISSING: ~q~n',[sgr_on_code(Foo,7)]))),!. % ,dtrace(sgr_on_code(Foo,7)))).
@@ -621,7 +572,7 @@ simplify_goal_printed(O,O):-!.
 simplify_goal_printed(G,O):- must(transitive(simplify_goal_printed0,G,O)),!.
 
 
-:-swi_export(simplify_goal_printed0/2).
+:- export(simplify_goal_printed0/2).
 simplify_goal_printed0(Var,Var):- \+ compound(Var),!.
 simplify_goal_printed0(user:G,G).
 simplify_goal_printed0(system:G,G).

@@ -1,3 +1,17 @@
+/** <module> logicmoo_util_bb_env
+% Provides a prolog database *env*
+% ===================================================================
+% File '$FILENAME.pl'
+% Purpose: An Implementation in SWI-Prolog of certain debugging tools
+% Maintainer: Douglas Miles
+% Contact: $Author: dmiles $@users.sourceforge.net ;
+% Version: '$FILENAME.pl' 1.0.0
+% Revision: $Revision: 1.1 $
+% Revised At:  $Date: 2002/07/11 21:57:28 $
+% Licience: LGPL
+% ===================================================================
+*/
+:- if(\+ current_module(logicmoo_utils)).
 :- module(logicmoo_util_structs,[
   prop_get/1,prop_get/3,prop_set/1,prop_set/3,prop_merge/3,
   prop_set_nvlist/2,ain/1,
@@ -9,11 +23,14 @@
   new_struct/2,
   ensure_struct/2,ensure_struct/3,
   ensure_instance/2,ensure_instance/3]).
+:- include(logicmoo_util_header).
+:- endif.
+
+
 
 :- use_module(library(record)).
 
 :- record point(x:integer=0, y:integer=0).
-
      /*
         default_point(Point),
         point_x(Point, X),
@@ -21,42 +38,40 @@
 
         make_point([y(20)], YPoint),
    */
-:- expects_dialect(sicstus).
-
 
 pfc_ain(X):-if_defined(pfc_add(X),assert_if_new(X)).
 ain(X):-if_defined(pfc_add(X),assert_if_new(X)).
 
-:-swi_export(user:struct_decl/1).
-:-multifile(user:struct_decl/1).
-:-dynamic(user:struct_decl/1).
+:- export(struct_decl/1).
+:- multifile(struct_decl/1).
+:- dynamic(struct_decl/1).
 
-:-swi_export(user:struct_names/2).
-:-multifile(user:struct_names/2).
-:-dynamic(user:struct_names/2).
+:- export(struct_names/2).
+:- multifile(struct_names/2).
+:- dynamic(struct_names/2).
 
-:-swi_export(user:struct_datatype/2).
-:-multifile(user:struct_datatype/2).
-:-dynamic(user:struct_datatype/2).
+:- export(struct_datatype/2).
+:- multifile(struct_datatype/2).
+:- dynamic(struct_datatype/2).
 
-:-swi_export(user:struct_prototype/2).
-:-multifile(user:struct_prototype/2).
-:-dynamic(user:struct_prototype/2).
+:- export(struct_prototype/2).
+:- multifile(struct_prototype/2).
+:- dynamic(struct_prototype/2).
 
 
-:-swi_export(user:member_datatype/3).
-:-multifile(user:member_datatype/3).
-:-dynamic(user:member_datatype/3).
+:- export(member_datatype/3).
+:- multifile(member_datatype/3).
+:- dynamic(member_datatype/3).
 
-:-swi_export(user:member_loc/3).
-:-multifile(user:member_loc/3).
-:-dynamic(user:member_loc/3).
+:- export(member_loc/3).
+:- multifile(member_loc/3).
+:- dynamic(member_loc/3).
 
-:-swi_export(user:member_init/3).
-:-multifile(user:member_init/3).
-:-dynamic(user:member_init/3).
+:- export(member_init/3).
+:- multifile(member_init/3).
+:- dynamic(member_init/3).
 
-:- struct_datatype(_,_) -> true; true.
+% :- struct_datatype(_,_) -> true; true.
 
 record_onto_var(AttribName,AV,Value):-
  ignore((
@@ -113,6 +128,8 @@ prop_get(Name,mutable(Dict),Value):-!,nonvar(Dict),prop_get(Name,Dict,Value).
 
 
 */
+:-meta_predicate(sisctus_key(:,-)).
+sisctus_key(Module:Key, Atom) :- atom(Module), !,atomic(Key),atomic_list_concat([Module, Key], :, Atom).
 
 prop_get(Call):- Call=..[P,A,B],prop_get(P,A,B).
 
@@ -122,14 +139,20 @@ prop_get(_,     Dict, _ ):- (\+ \+ Dict=[] ),!, fail.
 prop_get(Name, Struct,  Value):- prop_get_try(Name, Struct,  Value, _),!.
 prop_get(Name, Struct,  Value):- Name \= extraprops, prop_get(extraprops, Struct,  Extra),
                                               prop_get_try(Name, Extra,  Value, _),!.
-prop_get(Name, _Struct, Value):- bb_get(Name,Value),!.
-prop_get(Name, _Struct, Value):- nb_current(Name,Value),!.
+prop_get(Name,_Struct, Value):-gvar_get(Name,  Value).
+
+gvar_get(Name,  Value):- sisctus_key(Name,N),nb_current(N,ValueV),!,Value=ValueV.
+gvar_get(Name,  Value):- nb_current(Name,Value).
+
+gvar_put(Name,  Value):- sisctus_key(Name,N),nb_current(N,_),!,nb_setval(N,Value).
+gvar_put(Name,  Value):- nb_setval(Name,Value).
+
 
 
 key_match(Name,N):-atom(N), (Name=N -> true ; atom_concat(':',Name,N)).
 
 prop_get_try(_,     Dict, _  ,_ ):- (\+ \+ Dict=[] ),!, fail.
-prop_get_try(Name, bb,   Value, gvar(Name,Value)):- !, must(bb_get(Name,Value)).
+prop_get_try(Name, bb,   Value, gvar(Name,Value)):- !, must(gvar_get(Name,Value)).
 prop_get_try(_   , Atomic,  _  , _  ):- atomic(Atomic),!,fail.
 prop_get_try(Name, Dict,   Value, Ref):- prop_get_map(Name, Dict, Value),!,must(Dict=Ref).
 prop_get_try(Name, STRUCT,  Value, Ref):- STRUCT = mutable(Struct), !, prop_get_try(Name, Struct,  Value, Ref).
@@ -168,7 +191,7 @@ prop_set(Name,Dict,Value):-
 prop_set_try(Name,Dict,Value,_):- (var(Name);var(Dict);var(Value)),!,trace,trace_or_throw(var_prop_set(Name,Dict,Value)).
 prop_set_try(_,    Dict,   _, _):- (\+ \+ Dict=[] ),!, fail.
 prop_set_try([Name],Dict,Value,NewDict):-!, prop_set_try(Name,Dict,Value, NewDict).
-prop_set_try(Name, bb,   Value, _):- !, bb_put(Name,Value).
+prop_set_try(Name, bb,   Value, _):- !, gvar_put(Name,Value).
 prop_set_try(_,    Struct,   _, _):- ( \+ compound(Struct)),!,fail.
 prop_set_try([Name,Last],Dict,Value,Dict):- prop_get(Name,Dict,SubDict),prop_set_try(Last,SubDict,Value,NewSubDict),NewSubDict\==SubDict,prop_set_try(Name,Dict,NewSubDict),!.
 prop_set_try([Name|More],Dict,Value,WasNewDict):-prop_get(Name,Dict,SubDict),prop_set_try(More,SubDict,Value,NewDict),NewDict\==SubDict,prop_set_try(Name,Dict,NewDict,WasNewDict).
@@ -357,7 +380,7 @@ extract_struct_parameter(_Def,Decl,Name,Type):-Decl=..[K1,K2,Name],!,Type=..[K1,
 extract_struct_parameter(_Def,Decl,Name,Type):-Decl=..[Type,Name],!.
 extract_struct_parameter(Def,Name,Name,Def).
    
-:-ain(=>(struct_decl(StructDecl),decl_struct(StructDecl))).
+:- ain(=>(struct_decl(StructDecl),decl_struct(StructDecl))).
 
 
 ensure_instance(Type,Struct):-ensure_struct(Type,Struct).

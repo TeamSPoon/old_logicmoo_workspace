@@ -21,7 +21,7 @@
 % I WISH I COULD DO :- dynamic prolog:message/3.
 %prolog:message(git(update_versions),A,A):-!.
 
-:-dynamic(did_do_semweb_startup_late_once).
+:- dynamic(did_do_semweb_startup_late_once).
 do_semweb_startup_late_once:-did_do_semweb_startup_late_once,!.
 do_semweb_startup_late_once:-asserta(did_semweb_startup_late_once),forall(clause(semweb_startup_late,G),must(show_call_failure(G))).
 
@@ -44,9 +44,9 @@ do_semweb_startup_late_once:-asserta(did_semweb_startup_late_once),forall(clause
 % :- use_module(cliopatria(components/menu)).
 
 
-:-if(not(current_predicate(user_db:grant_openid_server/2))).
+:- if(not(current_predicate(user_db:grant_openid_server/2))).
 user_db:grant_openid_server(_,_).
-:-endif.
+:- endif.
 
 % Load package manager
 
@@ -161,7 +161,7 @@ mpred_online:semweb_startup:- do_semweb_startup_late_once.
 % :- debugOnError(rdf_load('./mud.ttl',[format(trig),graph(foobar)])),!.
 %:- logOnError(eggdrop:deregister_unsafe_preds).
 
-:-endif.
+:- endif.
 
 end_of_file.
 
@@ -181,7 +181,7 @@ load_blog_core:- use_module(library(arouter)),use_module(library(docstore)),use_
 :- set_prolog_flag(message_ide,   false). % cause xpce to trap messages
 
 % [Optionaly] Solve the Halting problem
-:-use_module(library(process)).
+:- use_module(library(process)).
 % :-use_module(library(pce)).
 %:- has_gui_debug -> true ; remove_pred(pce_principal,send,2).
 %:- has_gui_debug -> true ; remove_pred(pce_principal,new,2).

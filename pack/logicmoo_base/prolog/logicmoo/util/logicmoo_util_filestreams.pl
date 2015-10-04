@@ -1,5 +1,29 @@
+/** <module> Logicmoo Debug Tools
+% ===================================================================
+% File '$FILENAME.pl'
+% Purpose: An Implementation in SWI-Prolog of certain debugging tools
+% Maintainer: Douglas Miles
+% Contact: $Author: dmiles $@users.sourceforge.net ;
+% Version: '$FILENAME.pl' 1.0.0
+% Revision: $Revision: 1.1 $
+% Revised At:  $Date: 2002/07/11 21:57:28 $
+% Licience: LGPL
+% ===================================================================
+*/
+:- if(\+ current_module(logicmoo_utils)).
+:- module(logicmoo_util_filestreams,
+[  % when the predciates are not being moved from file to file the exports will be moved here
+       ]).
 
-:- swi_export(with_stream_pos/2).
+:- include(logicmoo_util_header).
+:- endif.
+
+:- meta_predicate clause_safe(?, ?).
+:- module_transparent clause_safe/2.
+:- export(clause_safe/2).
+
+
+:- export(with_stream_pos/2).
 :- meta_predicate(with_stream_pos(+,0)).
 with_stream_pos(In,Call):-
     stream_property(In, position(InitalPos)),
@@ -9,9 +33,9 @@ with_stream_pos(In,Call):-
        ((arg(1,PS,Pos),set_stream_position(In, Pos)),!,fail)).
 
 
-:-swi_export(l_open_input/2).
-:-swi_export(l_open_input0/2).
-:-swi_export(l_open_input1/2).
+:- export(l_open_input/2).
+:- export(l_open_input0/2).
+:- export(l_open_input1/2).
 l_open_input(InS,In):-once(must(l_open_input0(InS,In))).
 
 l_open_input0(In,InS):-l_open_input1(In,InS),!.
@@ -196,9 +220,9 @@ negotiate_http_connect(StreamPair, Address):-
 
 
 file_to_stream_ssl_verify(_SSL, _ProblemCert, _AllCerts, _FirstCert, _Error) :- !.
-:- swi_export(text_to_stream/2).
+:- export(text_to_stream/2).
 text_to_stream(Text,Stream):-text_to_string(Text,String),string_codes(String,Codes),open_codes_stream(Codes,Stream).
-:- swi_export(file_to_stream/2).
+:- export(file_to_stream/2).
 file_to_stream((StreamIn),Stream):-is_stream(StreamIn),!,copy_stream(StreamIn,Stream).
 file_to_stream(stream(StreamIn),Stream):-copy_stream(StreamIn,Stream).
 file_to_stream('$socket'(Sock),Stream):-tcp_open_socket('$socket'(Sock),StreamIn),copy_stream(StreamIn,Stream).
@@ -223,7 +247,7 @@ file_to_stream(URL,Stream):-atomic_list_concat_safe(['package://',Pkg,'/', Path]
 file_to_stream(URL,Stream):-atomic_list_concat_safe([Pkg,'://',Path],URL),file_to_stream(package(Pkg,Path),Stream).
 file_to_stream(Spec,Stream):-file_to_stream(match(Spec),Stream).
 
-:- swi_export(copy_stream/2).
+:- export(copy_stream/2).
 copy_stream(HTTP_Stream,Stream):-read_stream_to_codes(HTTP_Stream,Codes),catch(close(HTTP_Stream),_,true),open_codes_stream(Codes,Stream).
 
 

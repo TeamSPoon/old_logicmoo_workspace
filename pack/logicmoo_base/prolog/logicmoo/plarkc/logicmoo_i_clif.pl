@@ -65,8 +65,8 @@ is_entailed(CLIF):-
 % Sanity Test for required absence of specific side-effect entailments
 is_not_entailed(CLIF):- cwc, sanity((clif_to_prolog(CLIF,Prolog),show_call_failure(\+ are_clauses_entailed(Prolog)))),!.
 
-:-op(1190,xfx,(:-)).
-:-op(1200,fy,(is_entailed)).
+:- op(1190,xfx,(:-)).
+:- op(1200,fy,(is_entailed)).
 
 % this defines a recogniser for clif syntax (well stuff that might be safe to send in thru kif_to_boxlog)
 is_clif(all(_,X)):-cwc,compound(X),!,is_clif(X).

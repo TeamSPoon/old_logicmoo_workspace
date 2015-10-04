@@ -45,7 +45,7 @@ with_assertions(THead,Call):-
 
 with_no_assertions(UHead,Call):- !,with_assertions((UHead:-!,fail),Call).
 
-:-meta_predicate(with_no_assertions(+,0)).
+:- meta_predicate(with_no_assertions(+,0)).
 with_no_assertions(UHead,Call):- 
   hotrace((THead = (UHead:- (!,fail)),
    (to_thread_head(THead,M,Head,HAssert) -> true; throw(to_thread_head(THead,M,Head,HAssert))))),
@@ -53,7 +53,7 @@ with_no_assertions(UHead,Call):-
 
 /*
 old version
-:-meta_predicate(with_no_assertions(+,0)).
+:- meta_predicate(with_no_assertions(+,0)).
 with_no_assertions(THead,Call):-
  must_det(to_thread_head((THead:- (!,fail)),M,Head,H)),
    copy_term(H,  WithA), !, setup_call_cleanup(M:asserta(WithA,REF),Call,must_det(M:retract(Head))).

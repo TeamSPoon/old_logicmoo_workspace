@@ -9,9 +9,9 @@
 */
 % =======================================================
 
-% :-swi_module(mpred_formattypes, []).
+% :-module(mpred_formattypes, []).
 
-:-export((          
+:- export((          
           any_to_number/2,
           any_to_value/2,
           argIsa_op_call/4,
@@ -25,7 +25,7 @@
 
 
 :- include(logicmoo_i_header).
-:-export correctArgsIsa/3.
+:- export correctArgsIsa/3.
 
 assert_argIsa(Prop,N,Type):-show_call_failure(add_fast(argIsa(Prop,N,Type))).
 
@@ -111,9 +111,9 @@ is_ftText(Arg):- \+ compound(Arg),!,fail.
 is_ftText(Arg):- text_to_string_safe(Arg,_),!.
 is_ftText(Arg):- functor(Arg,S,_),resultIsa(S,ftText).
 
-:-dynamic(coerce/3).
-:-multifile(coerce/3).
-:-export(coerce/4).
+:- dynamic(coerce/3).
+:- multifile(coerce/3).
+:- export(coerce/4).
 coerce(What,Type,NewThing,_Else):-coerce(What,Type,NewThing),!.
 coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 
@@ -132,9 +132,9 @@ argIsa_op_call(Op,Func,N,Type):- compound(Func),!,functor(Func,F,_),argIsa_op_ca
 argIsa_op_call(_,F,N,Type):-hotrace((loop_check((argIsa_known(F,N,Type),!),Type=ftTerm),must(nonvar(Type)))).
 
 
-:-dynamic(argIsa_known/3).
-:-multifile(argIsa_known/3).
-:-export(argIsa_known/3).
+:- dynamic(argIsa_known/3).
+:- multifile(argIsa_known/3).
+:- export(argIsa_known/3).
 argIsa_known(F/_,N,Type):-nonvar(F),!,argIsa_known(F,N,Type).
 argIsa_known(F,N,Type):-  one_must(asserted_argIsa_known(F,N,Type),argIsa_call_7(F,N,Type)).
 
@@ -155,7 +155,7 @@ argIsa_ft(F/_,N,Type):-nonvar(F),!,argIsa_ft(F,N,Type).
 argIsa_ft(F,N,FTO):-must((argIsa_known(F,N,FT),to_format_type(FT,FTO))),!.
 
 
-:-export(argIsa_call_0/3).
+:- export(argIsa_call_0/3).
 argIsa_call_0(F/_,N,Type):-nonvar(F),!,argIsa_call_0(F,N,Type).
 argIsa_call_0(F,N,Type):- clause(t(argIsa,F,N,Type),true).
 argIsa_call_0(F,N,Type):- clause(argIsa(F,N,Type),true).
@@ -270,10 +270,10 @@ argIsa_call_9(Prop,N1,Type):- dmsg(todo(define(argIsa_known_b(Prop,N1,'_TYPE')))
 argIsa_call_9(_,_,ftTerm).
 
 
-:-export(correctArgsIsa/2).
+:- export(correctArgsIsa/2).
 correctArgsIsa(In,Out):- correctArgsIsa(query(must,t),In,Out),!.
 
-:-export(correctArgsIsa/3).
+:- export(correctArgsIsa/3).
 correctArgsIsa(_,NC,NC):-not(compound(NC)),!.
 correctArgsIsa(_,NC,NC):-as_is_term(NC),!.
 correctArgsIsa(_,G,G):- (\+ thlocal:infMustArgIsa), (is_release; bad_idea; skipWrapper;  thlocal:infSkipArgIsa),!.
@@ -289,7 +289,7 @@ correctArgsIsa(_,G,GG):- thlocal:infSkipArgIsa, !,must_equals(G,GG).
 correctArgsIsa(Op,G,GG):- correctArgsIsa0(Op,G,GG),nonvar(GG),!.
 correctArgsIsa(Op,G,GG):- grtrace,correctArgsIsa0(Op,G,GG).
 
-:-export(correctArgsIsa/4).
+:- export(correctArgsIsa/4).
 correctArgsIsa(Op,A,Type,AA):- trace_or_throw(warn(not(correctArgsIsa(Op,A,Type,AA)))).
 
 list_to_callform([P|ARGS],_,CALL):-atom(P),!,CALL=..[P|ARGS].
@@ -337,7 +337,7 @@ is_ephemeral(isOptional(_,_)).
 is_ephemeral(isRandom(_)).
 is_ephemeral(isOneOf(_)).
 
-:-export(correctAnyType/4).
+:- export(correctAnyType/4).
 
 is_valuespec(G):-is_ephemeral(G).
 is_valuespec(G):-t(tCol,G).
@@ -362,14 +362,14 @@ correctAnyType(Op,A,Type,A):- dtrace,dmsg(warn(not(correctAnyType(Op,A,Type)))).
 
 %  @set mudMoveDist 4
 
-:-export(correctFormatType/4).
+:- export(correctFormatType/4).
 correctFormatType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),sanity(var(AA)),must_det(A==AA),!.
 correctFormatType(Op,A,Type,AA):- var(Type),trace_or_throw(correctFormatType(Op,A,Type,AA)).
 correctFormatType(Op,A,Type,AA):- correctType(Op,A,Type,AA),sanity(nonvar(AA)),!.
 correctFormatType(Op,A,Type,AA):- tracing, correctType(Op,A,Type,AA).
 correctFormatType(Op,A,Type,A):- dmsg(todo(not(correctFormatType(Op,A,Type)))),fail.
 
-:-export(checkAnyType/4).
+:- export(checkAnyType/4).
 
 checkAnyType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),sanity(var(AA)),must_det(A==AA),!.
 checkAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
@@ -378,7 +378,7 @@ correctAnyTypeOrFail(Op,A,Type,AA):- with_assertions(tlbugger:skipMust,checkAnyT
 
 
 
-:-thread_local thlocal:can_coerce/1.
+:- thread_local thlocal:can_coerce/1.
 correctType_gripe(Op,A,Fmt,AA):- t(ttFormatType,Fmt),!,trace_or_throw(correctType(is_ft_correctFormatType(Op,A,Fmt,AA))).
 correctType_gripe(Op,A,Type,AA):- fail,atom(Type),must_equals(A,AA),
       dmsg(todo(isa_assert_type(Type))),
@@ -516,7 +516,7 @@ must_equals(A,AA):-must_det(A=AA).
 deduced_is_tCol(A):- (thlocal:infSkipArgIsa->true; (t(tCol,A)->true;(fail,pfc_add(isa(A,tCol))))),!.
 :- style_check(+singleton).
 
-:-export(any_to_value/2).
+:- export(any_to_value/2).
 any_to_value(Var,Var):-var(Var),!.
 any_to_value(V,Term):-atom(V),!,atom_to_value(V,Term).
 any_to_value(A,V):-any_to_number(A,V).
@@ -524,13 +524,13 @@ any_to_value(A,A).
 
 :- export(correctArgsIsa/3).
 
-:-export(any_to_number/2).
+:- export(any_to_number/2).
 any_to_number(N,N):- number(N),!.
 any_to_number(ftDice(A,B,C),N):- ground(A),roll_dice(A,B,C,N),!.
 any_to_number(A,N):-atom(A),atom_to_value(A,V),A\=V,any_to_number(V,N).
 any_to_number(A,N):- catch(number_string(N,A),_,fail).
 
-:-export(atom_to_value/2).
+:- export(atom_to_value/2).
 atom_to_value(V,Term):-not(atom(V)),!,any_to_value(V,Term).
 % 56
 atom_to_value(V,Term):- catch((read_term_from_atom(V,Term,[variable_names([])])),_,fail),!.
@@ -550,6 +550,6 @@ roll_dice(Rolls,Sided,Bonus,Result):- LessRolls is Rolls-1, roll_dice(LessRolls,
 
 %:-pfc_add_fast(<=( argIsa(F,N,Isa), asserted_argIsa_known(F,N,Isa))).
 %:-pfc_add_fast(<=( argIsa(F,N,Isa), argIsa_known(F,N,Isa))).
-:-pfc_add_fast(prologHybrid(formatted_resultIsa/2)).
-:-pfc_add_fast(prologHybrid(resultIsa/2)).
+:- pfc_add_fast(prologHybrid(formatted_resultIsa/2)).
+:- pfc_add_fast(prologHybrid(resultIsa/2)).
 

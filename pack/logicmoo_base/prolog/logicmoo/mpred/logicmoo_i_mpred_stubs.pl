@@ -203,7 +203,7 @@ is_mpred_op(query(_,_)).
 is_mpred_op(clauses(_)).
 
 % -- CODEBLOCK
-:-export(last_arg_ground/1).
+:- export(last_arg_ground/1).
 last_arg_ground(HEAD):-compound(HEAD),functor(HEAD,F,A),last_arg_ground(F, A, HEAD),!.
 last_arg_ground(mud_test,_,_).
 last_arg_ground(_,A,_):-A>2,!.
@@ -256,9 +256,9 @@ scan_missing_stubs(F):-
 mpred_missing_stubs(F,A):-prologHybrid = StubType, hybrid_tPredStubImpl(StubType),arity(F,A),user:mpred_prop(F,StubType),must(arity(F,A)),not(has_storage_stub(F/A)).
 
 
-:-assertz_if_new(call_OnEachLoad(rescan_missing_stubs)).
+:- assertz_if_new(call_OnEachLoad(rescan_missing_stubs)).
 
-:-export(rescan_missing_stubs/0).
+:- export(rescan_missing_stubs/0).
 % rescan_missing_stubs:-no_rescans,!.
 rescan_missing_stubs:-loop_check(time_call(rescan_missing_stubs_ilc),true).
 rescan_missing_stubs_ilc:- once(thglobal:use_cyc_database), once(with_assertions(thlocal:useOnlyExternalDBs,forall((kb_t(arity(F,A)),A>1,
@@ -267,7 +267,7 @@ rescan_missing_stubs_ilc:- hotrace((doall((mpred_missing_stubs(F,A),arity(F,A),e
 
 no_rescans.
 
-:-export(agenda_rescan_mpred_props/0).
+:- export(agenda_rescan_mpred_props/0).
 
 agenda_rescan_mpred_props:- loop_check(rescan_mpred_props_ilc,true).
 rescan_mpred_props_ilc:-no_rescans,!.
@@ -408,7 +408,7 @@ assert_mpred_t(DB):-once(fully_expand(change(assert,add),DB,MP)),DB\=@=MP,!,must
 assert_mpred_t((G1,G2)):-!,assert_mpred_t(G1),assert_mpred_t(G2).
 assert_mpred_t(G):-add_from_file(G).
 
-:-export(portray_hb/2).
+:- export(portray_hb/2).
 portray_hb(H,B):- B==true, !, portray_one_line(H).
 portray_hb(H,B):- portray_one_line((H:-B)).
 
@@ -587,7 +587,7 @@ body_call_cyckb(HEAD_T):-el_holds_DISABLED_KB, HEAD_T =.. [t|PLIST], thglobal:us
 % =====================================
 body_req(HEAD,HEAD_T):- (hook_body_req(HEAD,HEAD_T)).
 
-:-export(body_req_normal/4).
+:- export(body_req_normal/4).
 %hook_body_req(HEAD,HEAD_T):- user:mpred_prop(F,prologPTTP),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
 %hook_body_req(HEAD,HEAD_T):- user:mpred_prop(F,prologDynamic),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
 hook_body_req(_,_,isa(I,C),_):- !, body_req_isa(I,C).
@@ -598,11 +598,11 @@ hook_body_req(_,_,_ ,HEAD_T):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(HEA
 hook_body_req(HEAD,HEAD_T):-  no_repeats(body_req_normal(HEAD,HEAD_T)).
 
 
-:-export(body_req_normal/4).
+:- export(body_req_normal/4).
 body_req_normal(HEAD,HEAD_T):- not(ground(HEAD)),!,no_repeats(HEAD_T,body_req_1(HEAD,HEAD_T)).
 body_req_normal(HEAD,HEAD_T):- body_req_1(HEAD,HEAD_T),!. 
 
-:-export(body_req_1/4).
+:- export(body_req_1/4).
 body_req_1(HEAD,HEAD_T):- get_functor(HEAD,F), user:mpred_prop(F,call_tabled),!, call_tabled(body_req_2(HEAD,HEAD_T)).
 body_req_1(HEAD,HEAD_T):- body_req_2(HEAD,HEAD_T).
 
@@ -627,7 +627,7 @@ foo_b(b1).
 foo_b(b2):-!.
 foo_b(b3):-!.
 
-:-must_det((findall(R,call_no_cuts(foo_b(R)),List),length(List,3))).
+:- must_det((findall(R,call_no_cuts(foo_b(R)),List),length(List,3))).
 
 
 
@@ -660,7 +660,7 @@ dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-compound(DBASE),!,arg(1,DBASE,F),must_d
 dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-nonvar(F),must(arity(F,N)),make_functorskel(F,N),!,fskel(F,DBASE,PRED,A,RGS,_,_),!.
 */
 
-:-export(registerCycPredPlus2/1).
+:- export(registerCycPredPlus2/1).
 
 
 registerCycPredPlus2_3(_CM,M,PI,F/A2):-

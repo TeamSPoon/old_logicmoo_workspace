@@ -250,7 +250,7 @@ door(What).
 kif_result(_).
 :- export((kif_test)/1).
 kif_test(X):-kif_tell(X).
-:-op(1000,fy,(kif_test)).
+:- op(1000,fy,(kif_test)).
 :- assert_until_eof(thlocal:canonicalize_types).
 
 :- discontiguous kif_sanity_test_0/0.
@@ -276,7 +276,7 @@ kif_sanity_test_0:-kif_test(p(A,R) & q(A,R)).
 % :- prolog.
 %:- must(((kif_test(isa(F,tPred) => exists(A, (isa(A,ftInt) & arity(F,A))))))).
 
-:-nop(( kif_result(
+:- nop(( kif_result(
 (==> pfc_default((
    tPred(F) ==> 
       {A = skIsIntInPredArg2ofArityFn(F)},arity(F,A) & ftInt(A))
@@ -498,7 +498,7 @@ kif_sanity_test_0:-kif_test '
 
 
 
-:-if((fail)).
+:- if((fail)).
 
 kif_sanity_test_0:-kif_test '
 (implies 
@@ -542,8 +542,8 @@ kif_sanity_test_0:-kif_test '
                        (TheSetOf ?OBJ 
                            (eventOccursAt ?OBJ ?LAND))) directingAgent))))'.
 
-:-endif.
-:-if(if_defined(show_argtype_tests)).
+:- endif.
+:- if(if_defined(show_argtype_tests)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % this rule ...
@@ -635,7 +635,7 @@ kif_sanity_test_0:-kif_test(   argInst(kb_argInst, 1 ,KB) & argInst(has, 1 , A) 
 %   (not_argInst(has, 1, A)):-has(A, B), not_kb_argInst(C, has, 2, B), argInst(has, 2, B), argInst(kb_argInst, 1, C)).
 
 
-:-endif. %if_defined(show_argtype_tests)
+:- endif. %if_defined(show_argtype_tests)
 
 
 kif_sanity_test_0:-kif_test(all(R,isa(R,tAgent) => exists(D, (isa(D,tNose) & mudContains(R,D))))).

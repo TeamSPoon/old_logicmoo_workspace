@@ -6,7 +6,7 @@
 user:file_search_path(pack,'/devel/PrologMUD/pack').
 :- attach_packs.
 
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+:- user:ensure_loaded(library(logicmoo/logicmoo_utils)).
 
 % not(P):- \+ P.
 
@@ -16,10 +16,10 @@ user:file_search_path(pack,'/devel/PrologMUD/pack').
 :- thread_local thlocal:pfcExpansion.
 :- thread_local thlocal:pfcExpansionWas.
 
-:-dynamic p.
-:-dynamic x.
-:-dynamic q.
-:-dynamic fly/1.
+:- dynamic p.
+:- dynamic x.
+:- dynamic q.
+:- dynamic fly/1.
 
 :- dynamic old_clausedb/0.
 :- dynamic old_assert/0.
@@ -114,7 +114,7 @@ pfc_term_expansion((=>P),(:- pfc_add(P))).
 :- multifile(term_expansion/2).
 term_expansion(A,B):- once(true ; thlocal:pfcExpansion), once(pfc_term_expansion(A,B)),A\=@=B.
 
-:-asserta(thlocal:pfcExpansion).
+:- asserta(thlocal:pfcExpansion).
 
 % pfcFile('pfccore').	% core of Pfc.
 
@@ -1157,8 +1157,8 @@ pfcConjoin(C1,C2,(C1,C2)).
 %%
 
 %:-dynamic(support2/3).
-:-dynamic(spft/3).
-:-dynamic(support3/3).
+:- dynamic(spft/3).
+:- dynamic(support3/3).
 
 %% pfc_addSupport(+Fact,+Support)
 
@@ -1774,7 +1774,7 @@ pfc_selectJustificationNode(Js,Index,Step) :-
 
 :- pfc_trace.
 
-:-
+:- 
     pfc_add([(faz(X), ~baz(Y)/{X=:=Y} => fazbaz(X)),
          (fazbaz(X), go => found(X)),
 	 (found(X), {X>=100} => big(X)),
@@ -1789,4 +1789,4 @@ pfc_selectJustificationNode(Js,Index,Step) :-
 
 :- include(pfc_tests).
 
-:-run_tests.
+:- run_tests.

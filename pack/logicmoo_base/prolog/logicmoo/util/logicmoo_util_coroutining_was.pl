@@ -29,6 +29,7 @@
     the GNU General Public License.
 */
 
+end_of_file.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This module implements the was/2 constraint. It allows two terms

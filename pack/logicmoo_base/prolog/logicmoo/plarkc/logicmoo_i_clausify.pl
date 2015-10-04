@@ -186,8 +186,8 @@ logically_matches(_,A,A).
 
 axiom_lhs_to_rhs(_,poss(beliefs(A,~F1)),~nesc(knows(A,F1))).
 
-:-discontiguous(nnf/5).
-:-discontiguous(axiom_lhs_to_rhs/3).
+:- discontiguous(nnf/5).
+:- discontiguous(axiom_lhs_to_rhs/3).
 %====== drive negation inward ===
 %  nnf(KB,+Fml,+FreeV,-NNF,-Paths)
 %

@@ -16,7 +16,7 @@
 % Douglas Miles
 */
 
-:-export(( (add)/1, clr/1,fully_expand/3,ireq/1,del/1,  
+:- export(( (add)/1, clr/1,fully_expand/3,ireq/1,del/1,  
   padd/2, padd/3, prop/3, prop_or/4, props/2, iprops/2, upprop/2,add/1, ireq/1, mreq/1, upprop/1, req/1, 
   % use_term_listing/2,  
   world_clear/1,  
@@ -91,24 +91,24 @@ side_effect_prone:- \+ thlocal:noDBaseMODs(_), thlocal:side_effect_ok.
 
 
 
-:-meta_predicate(with_no_modifications(0)).
+:- meta_predicate(with_no_modifications(0)).
 with_no_modifications(CALL):-!,CALL.
 with_no_modifications(CALL):-with_assertions(thlocal:noDBaseMODs(_),CALL).
 
-:-meta_predicate(with_no_db_hooks(0)).
+:- meta_predicate(with_no_db_hooks(0)).
 with_no_db_hooks(CALL):-!,CALL.
 with_no_db_hooks(CALL):-with_assertions(thlocal:noDBaseHOOKS(_),CALL).
 
-:-meta_predicate(with_fallbacks(0)).
+:- meta_predicate(with_fallbacks(0)).
 with_fallbacks(CALL):-with_no_assertions(thlocal:infAssertedOnly(_),CALL).
 
-:-meta_predicate(with_fallbacksg(0)).
+:- meta_predicate(with_fallbacksg(0)).
 with_fallbacksg(CALL):-with_no_assertions(thlocal:noRandomValues(_),CALL).
 
-:-meta_predicate(with_no_fallbacksg(0)).
+:- meta_predicate(with_no_fallbacksg(0)).
 with_no_fallbacksg(CALL):-with_assertions(thlocal:noRandomValues(_),CALL).
 
-:-meta_predicate(with_no_fallbacks(0)).
+:- meta_predicate(with_no_fallbacks(0)).
 with_no_fallbacks(CALL):-with_assertions(thlocal:infAssertedOnly(_),CALL).
 
 infSecondOrder :- not(thlocal:infInstanceOnly(_)).
@@ -182,7 +182,7 @@ fact_checked(Fact,_):- is_known_false0(Fact),!,fail.
 fact_checked(Fact,_):- is_known_trew(Fact),!.
 fact_checked(Fact,Call):- no_loop_check(call_tabled(Call),is_asserted(Fact)).
 
-:-meta_predicate(fact_loop_checked(+,0)).
+:- meta_predicate(fact_loop_checked(+,0)).
 fact_loop_checked(Fact,Call):- no_repeats(fact_checked(Fact,Call)).
 
 
@@ -302,8 +302,8 @@ ireq(C0):- nop(dmsg(ireq(C0))),
   agenda_rescan_for_module_ready,
    no_loop_check(with_assertions([+infInstanceOnly(_), +thlocal:infAssertedOnly(_),+thlocal:noRandomValues(_)],preq(ireq,/*to_exp*/(C0)))).
 
-:-dmsg_hide(req).
-:-dmsg_hide(ireq).
+:- dmsg_hide(req).
+:- dmsg_hide(ireq).
 
 % -  props(Obj,QueryPropSpecs)
 props(Obj,PropSpecs):- req(props(Obj,PropSpecs)).
@@ -311,18 +311,18 @@ iprops(Obj,PropSpecs):- ireq(/*to_exp*/(props(Obj,PropSpecs))).
 
 
 
-:-export(forall_setof/2).
+:- export(forall_setof/2).
 forall_setof(ForEach,Call):-
    findall(ForEach,ForEach,ForEachAll),
    list_to_set(ForEachAll,Set),!,
    ignore(forall(member(ForEach,Set),Call)).
 
 
-:-thread_local add_thread_override/1.
+:- thread_local add_thread_override/1.
 % thlocal:add_thread_override(A):-add_from_macropred(A),!.
 
-:-export(((add)/1)).
-:-moo_hide_childs((add)/1).
+:- export(((add)/1)).
+:- moo_hide_childs((add)/1).
 add(A):- var(A),!,trace_or_throw(var_add(A)).
 add(end_of_file):-!.
 add(grid_key(KW=COL)):- !, add(typeHasGlyph(COL,KW)).
@@ -356,7 +356,7 @@ mpred_name_variables([Var|Vars]):-
    mpred_name_variables(Vars).
 
 
-:-export(pfc_add_fast/1).
+:- export(pfc_add_fast/1).
 % -  add(Assertion)
 % pfc_add_fast(C0):- must_det((pfc_add_fast(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(pfc_add_fast(C0)),rtrace(pfc_add_fast(C0)),dtrace(ireq(C0))))))))),!.
 add_fast(Term):-mpred_numbervars_with_names(Term),mpred_modify(change(assert,add), Term),!. % ,xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0)))))),!.
@@ -379,12 +379,12 @@ prop_or(Obj,Prop,Value,OrElse):- one_must(ireq(t(Prop,Obj,Value)),Value=OrElse).
 % db_assert_sv/3
 % ================================================
 
-:-dmsg_hide(db_assert_sv).
+:- dmsg_hide(db_assert_sv).
 
-:-dmsg_hide(mpred_modify).
-:-dmsg_hide(add).
+:- dmsg_hide(mpred_modify).
+:- dmsg_hide(add).
 
-:-dmsg_hide(into_mpred_form).
+:- dmsg_hide(into_mpred_form).
 
 
 /*
@@ -397,17 +397,17 @@ update_single_valued_arg(P,N):- arg(N,P,UPDATE),replace_arg(P,N,OLD,Q),
 /*
 
 % assert_with to change(CA1,CB2) singlevalue pred
-:-export((db_assert_sv/4)).
+:- export((db_assert_sv/4)).
 %db_assert_sv(_Must,C,F,A):- throw_if_true_else_fail(contains_singletons(C),db_assert_sv(C,F,A)).
 
 db_assert_sv(C):- get_functor(C,F,A), db_assert_sv(must,C,F,A),!.
 
 db_assert_sv(Must,C,F,A):- ex, ignore(( loop_check(db_assert_sv_ilc(Must,C,F,A),true))).
 
-:-export((db_assert_sv_ilc/4)).
+:- export((db_assert_sv_ilc/4)).
 db_assert_sv_ilc(Must,C,F,A):- arg(A,C,UPDATE),is_relative(UPDATE),db_assert_sv_now(Must,C,F,A,UPDATE),!.
 
-:-export(db_assert_sv_now/5).
+:- export(db_assert_sv_now/5).
 
 db_assert_sv_now(Must,C,F,A,    +UPDATE):-!,  db_assert_sv_update(Must,C,F,A,+UPDATE).
 db_assert_sv_now(Must,C,F,A,    -UPDATE):-!,  db_assert_sv_update(Must,C,F,A,-UPDATE).
@@ -418,7 +418,7 @@ db_assert_sv_now(Must,C,F,A, -(+(UPDATE))):-!,db_assert_sv_update(Must,C,F,A,-UP
 db_assert_sv_now(Must,C,F,A, +(-(UPDATE))):-  db_assert_sv_update(Must,C,F,A,-UPDATE).
 db_assert_sv_now(Must,C,F,A, REPLACE):- db_assert_sv_replace(Must,C,F,A, REPLACE).
 
-:-export(db_assert_sv_update/5).
+:- export(db_assert_sv_update/5).
 db_assert_sv_update(Must,C,F,A,UPDATE):-
    replace_arg(C,A,OLD,COLD),
    % prefer updated values to come from instances but will settle with anything legal
@@ -426,9 +426,9 @@ db_assert_sv_update(Must,C,F,A,UPDATE):-
    update_value(OLD,UPDATE,NEW),!,
    db_assert_sv_replace(Must,C,F,A,NEW),!.
 
-:-export(db_assert_sv_replace/5).
+:- export(db_assert_sv_replace/5).
 
-:-style_check(-singleton).
+:- style_check(-singleton).
 % db_assert_sv_replace_noisey_so_disabled
 db_assert_sv_replace(_Must,C,_,A,NEW):- fail,
    replace_arg(C,A,_,CBLANK),
@@ -458,7 +458,7 @@ db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):-
 
 */
 
-:-style_check(+singleton).
+:- style_check(+singleton).
 
 
 equals_call(X,Y):-unify_with_occurs_check(X,Y),!.

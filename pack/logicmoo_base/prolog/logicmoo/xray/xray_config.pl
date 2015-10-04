@@ -146,7 +146,7 @@ no_verbose_mode.
 :- verbose_mode.                         % default is to print proof
 
 %%% verbose predicate, chatting if verbose_mode is turned on
-:-abolish(verbose,1).
+:- abolish(verbose,1).
 verbose(X) :-
 	verbose_flag ->
 	        dmsg(X),nl;

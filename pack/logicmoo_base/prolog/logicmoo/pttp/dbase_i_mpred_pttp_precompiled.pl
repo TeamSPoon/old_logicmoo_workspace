@@ -18,8 +18,8 @@ univ_tl(Call,EList,CallE):-must((compound(Call),is_list(EList))), Call=..LeftSid
 
 
 
-:-multifile was_pttp_functor/3.
-:-dynamic was_pttp_functor/3.
+:- multifile was_pttp_functor/3.
+:- dynamic was_pttp_functor/3.
 
 
 % -- CODEBLOCK
@@ -261,7 +261,7 @@ make_base(BF,A):-
 
 
 % -- CODEBLOCK
-:-forall(was_pttp_functor(base,F,S-E),forall(between(S,E,A),must(make_base(F,A)))).
+:- forall(was_pttp_functor(base,F,S-E),forall(between(S,E,A),must(make_base(F,A)))).
 
 %:-listing([answerable_t,int_answerable_t,not_answerable_t,int_not_answerable_t]).
 

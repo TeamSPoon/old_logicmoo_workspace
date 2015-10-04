@@ -1,9 +1,9 @@
   
 
-:-moo_hide_childs(stack_depth/1).
-:-moo_hide_childs(stack_check/0).
-:-moo_hide_childs(stack_check/1).
-:-moo_hide_childs(stack_check/2).
+:- moo_hide_childs(stack_depth/1).
+:- moo_hide_childs(stack_check/0).
+:- moo_hide_childs(stack_check/1).
+:- moo_hide_childs(stack_check/2).
 stack_depth(Level):-hotrace((prolog_current_frame(Frame),prolog_frame_attribute(Frame,level,Level))).
 
 stack_check:-!.
@@ -16,12 +16,12 @@ stack_check_else(BreakIfOver,Call):- stack_depth(Level) ,  ( Level < BreakIfOver
 in_pengines:- relative_frame(context_module,pengines,_).
 
 % ?- relative_frame(context_module,X,Y).
-:- swi_export(relative_frame/3).
+:- export(relative_frame/3).
 relative_frame(Attrib,Term,Nth):- parent_frame_attribute(Attrib,Term,Nth,_RealNth,_FrameNum).
 
-:- swi_export(parent_goal/2).
+:- export(parent_goal/2).
 parent_goal(Term,Nth):- parent_frame_attribute(goal,Term,Nth,_RealNth,_FrameNum).
-:- swi_export(parent_frame_attribute/5).
+:- export(parent_frame_attribute/5).
 parent_frame_attribute(Attrib,Term,Nth,RealNth,FrameNum):-hotrace((ignore(Attrib=goal),prolog_current_frame(Frame),
                                                 current_frames(Frame,Attrib,5,NextList))),!,nth1(Nth,NextList,RealNth-FrameNum-Term).
 

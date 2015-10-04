@@ -27,7 +27,7 @@
 :- attach_packs.
 :- initialization(attach_packs).
 % [Required] Load the Logicmoo Library Utils
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+:- user:ensure_loaded(library(logicmoo/logicmoo_utils)).
 :- initialization(attach_packs).
 prove_query:-query.
 
@@ -50,7 +50,7 @@ prove_query:-query.
 %%% Include a literal in the body of each clause to
 %%% indicate the number of the formula the clause came from.
 
-:-abolish(clauses,3).
+:- abolish(clauses,3).
 clauses((A , B),L,WffNum) :-
         !,
         must_det_l((
@@ -59,7 +59,7 @@ clauses((A , B),L,WffNum) :-
         clauses(B,L2,WffNum2),
         conjoin(L1,L2,L))).
 
-:-abolish(clauses,4).
+:- abolish(clauses,4).
 clauses( (Gamma :- Alpha : Beta) , L , WffNum ) :-
 	!,
         must_det_l((
@@ -107,7 +107,7 @@ clauses(_,[],true,_).
 %%%
 %%%
 
-:-abolish(add_ancestor,2).
+:- abolish(add_ancestor,2).
 add_ancestor((Head :- Body),(Head1 :- Body1)) :-
         functor(Head,query,_) ->
                 Head1 = Head,
@@ -138,7 +138,7 @@ add_ancestor((Head :- Body),(Head1 :- Body1)) :-
                         conjoin((NewPosAncestors = [Head|PosAncestors]),Body2,Body1)).
 
 
-:-abolish(ancestor_tests,3).
+:- abolish(ancestor_tests,3).
 ancestor_tests(P,N,Result) :-
         P == query ->
                 Result = true;
@@ -284,7 +284,7 @@ query_clause(WffI,WffO) :-
         %true ->
 	        fail.
 
-:-abolish(query,1).
+:- abolish(query,1).
 query(M) :-                             % call query with depth bound M
 	(compile_complete_search, compile_proof_printing , lemma_handling_flag) ->
 	        query(M,_N,_LemProof,_LemProofEnd,_Proof,_ProofEnd);
@@ -293,7 +293,7 @@ query(M) :-                             % call query with depth bound M
         compile_complete_search ->
                 query(M,_N).
 
-:-abolish(query,0).
+:- abolish(query,0).
 query :-                                % unbounded prove of query
         (compile_complete_search ->
 	    query(1000000);
@@ -326,7 +326,7 @@ dpttp(X) :-
 	Name = 'temp',
 	dpttp(Name,X).
 
-:-abolish(pttp,1).
+:- abolish(pttp,1).
 % redefine for pttp
 pttp(X) :- dpttp(X).
 

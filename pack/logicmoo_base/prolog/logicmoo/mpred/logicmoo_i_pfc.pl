@@ -27,7 +27,7 @@ Also alows an inference engine constrain search.. PFC became important since it 
 
 :- include(logicmoo_i_header).
 
-:-discontiguous(user:pfc_init_once/0).
+:- discontiguous(user:pfc_init_once/0).
 
 is_side_effect_disabled:- thlocal:no_physical_side_effects,!.
 is_side_effect_disabled:- thlocal:side_effect_ok,!,fail.
@@ -55,14 +55,14 @@ is_side_effect_disabled:- thlocal:noDBaseMODs(_),!.
 
 set_prolog_stack_gb(Six):-set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
 user:pfc_init_once:-set_prolog_stack_gb(16).
-:-multifile(user:rescan_pfc_hook/0).
-:-dynamic(user:rescan_pfc_hook/0).
-:-dynamic(use_presently/0).
-:-dynamic(pfc_undo_method/2).
+:- multifile(user:rescan_pfc_hook/0).
+:- dynamic(user:rescan_pfc_hook/0).
+:- dynamic(use_presently/0).
+:- dynamic(pfc_undo_method/2).
 % used to annotate a predciate to indicate PFC support
-:-multifile(infoF/1).
-:-dynamic(infoF/1).
-:-export(infoF/1).
+:- multifile(infoF/1).
+:- dynamic(infoF/1).
+:- export(infoF/1).
 
 % :- set_prolog_flag(access_level,system).
 
@@ -107,7 +107,7 @@ erase_w_attvars(Data0,Ref):- physical_side_effect(erase(Ref)),add_side_effect(er
 
 
 
-:-thread_local(thlocal:no_physical_side_effects/0).
+:- thread_local(thlocal:no_physical_side_effects/0).
 physical_side_effect(PSE):- is_side_effect_disabled,!,pfc_warn('no_physical_side_effects ~p',PSE).
 physical_side_effect(PSE):- PSE.
 pfc_no_chaining(Goal):- with_assertions(thlocal:no_physical_side_effects,call(Goal)).
@@ -192,7 +192,7 @@ to_predicate_isas0(C,C):-exact_args(C),!.
 to_predicate_isas0([H|T],[HH|TT]):-!,to_predicate_isas0(H,HH),to_predicate_isas0(T,TT),!.
 to_predicate_isas0(C,CO):-C=..[F|CL],must_maplist(to_predicate_isas0,CL,CLO),!,CO=..[F|CLO].
 
-:-source_location(F,_),asserta(absolute_source_location_pfc(F)).
+:- source_location(F,_),asserta(absolute_source_location_pfc(F)).
 exact_args(Q):-is_ftVar(Q),!,fail.
 exact_args(Q):-argsQuoted(Q).
 exact_args(Q):-is_ftCompound(Q),functor(Q,F,_),argsQuoted(F).
@@ -223,6 +223,9 @@ pfc_is_taut((B,_)==>A):-is_ftNonvar(B),pfc_is_taut(A==>B),!.
 pfc_is_taut((_,B)==>A):-is_ftNonvar(B),pfc_is_taut(A==>B),!.
 pfc_is_taut(B==>(A,_)):-is_ftNonvar(A),pfc_is_taut(A==>B),!.
 pfc_is_taut(B==>(_,A)):-is_ftNonvar(A),pfc_is_taut(A==>B),!.
+
+:- meta_predicate loop_check_nr(0).
+:- meta_predicate loop_check_true(0).
 
 loop_check_nr(CL):- loop_check(no_repeats(CL)).
 
@@ -327,7 +330,7 @@ pfc_add_minfo(How,(A0:-INFOC0)):- pfc_is_info(INFOC0), copy_term((A0:-INFOC0),(A
 %pfc_add_minfo(How,G):-pfc_trace_msg(skipped_add_meta_facts(How,G)).
 pfc_add_minfo(_,_).
 
-:-export(pfc_add_minfo_2/2).
+:- export(pfc_add_minfo_2/2).
 pfc_add_minfo_2(How,G):-pfc_add_minfo(How,G).
 
 pfc_is_info(pfc_bc_only(C)):-is_ftNonvar(C),!.
@@ -358,7 +361,7 @@ is_atom_body_pfa(WAC,P,F,2,Rest):-arg(2,P,E),E==WAC,arg(1,P,Rest),!.
 */
 
 
-:-thread_local(thlocal:pfc_debug_local/0).
+:- thread_local(thlocal:pfc_debug_local/0).
 pfc_silient :- ( \+ thlocal:pfc_debug_local, \+ thlocal:pfc_trace_exec) ,!.
 
 pfc_tracing :- ( thlocal:pfc_debug_local ;  thlocal:pfc_trace_exec ),!.
@@ -397,8 +400,8 @@ assertz_u(X,_,_):- never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
 assertz_u(X,_,_):- clause_asserted(X),!.
 assertz_u(X,_,_):- pmust((expire_tabled_list(X),show_if_debug(attvar_op(assertz,X)))).
 
-:-dynamic(never_assert_u/1).
-:-dynamic(never_retract_u/1).
+:- dynamic(never_assert_u/1).
+:- dynamic(never_retract_u/1).
 
 retract_u(X):- never_retract_u(Y),X=@=Y,trace_or_throw(never_retract_u(Y)).
 %retract_u(neg(X)):-pmust(is_ftNonvar(X)),!,retract_eq_quitely_f(neg(X)),pmust((expire_tabled_list(neg(X)))),pmust((expire_tabled_list((X)))).
@@ -1557,7 +1560,7 @@ pfc_call_0(G,F,A):-  (ground(G); \+ current_predicate(F/A) ; \+ (predicate_prope
 pfc_call_0(G,_,_):- (pfc_call_with_no_triggers(G)).
 
 
-:-thread_local thlocal:infBackChainPrevented/1.
+:- thread_local thlocal:infBackChainPrevented/1.
 
 call_with_bc_triggers(P) :- functor(P,F,A), \+thlocal:infBackChainPrevented(F/A), 
   pfc_get_trigger_quick(bt(P,Trigger)),
@@ -2388,7 +2391,7 @@ pfc_untrace(Form) :- retractall_i(pfc_traced(Form)).
 % if the correct flag is set, trace exection of Pfc
 pfc_trace_msg(Msg) :- pfc_trace_msg('~p.',[Msg]),!.
 
-:-dynamic(pfc_hide_msg/1).
+:- dynamic(pfc_hide_msg/1).
 pfc_hide_msg('Adding For Later').
 pfc_hide_msg('Skipped Trigger').
 pfc_hide_msg('Had Support').
@@ -2562,7 +2565,7 @@ pfc_descendants(P,L) :-
   bagof(Q,pfc_descendant1(P,Q,[]),L).
 
 
-:-dynamic(prologMacroHead/1).
+:- dynamic(prologMacroHead/1).
 
 compute_resolve(NewerP,OlderQ,SU,SU,(pfc_remove3(OlderQ),pfc_add(NewerP,S),pfc_rem1(conflict(NewerP)))):-
   pmust(correctify_support(SU,S)),
@@ -2579,11 +2582,11 @@ compute_resolve(NewerP,OlderQ,Resolve):-
    compute_resolve(NewerP,OlderQ,S1,S2,Resolve).
 
 
-:-multifile(resolveConflict/1).
-:-dynamic(resolveConflict/1).
-:-multifile(resolverConflict_robot/1).
-:-dynamic(resolverConflict_robot/1).
-:-export(resolverConflict_robot/1).
+:- multifile(resolveConflict/1).
+:- dynamic(resolveConflict/1).
+:- multifile(resolverConflict_robot/1).
+:- dynamic(resolverConflict_robot/1).
+:- export(resolverConflict_robot/1).
 
 resolveConflict(C):- pmust((resolveConflict0(C),
   show_if_debug(is_resolved(C)),pfc_rem(conflict(C)))).
@@ -2594,7 +2597,7 @@ resolveConflict(C) :-
 is_resolved(C):- Why= is_resolved, pfc_call_fact(Why,C),\+pfc_call_fact(Why,neg(C)).
 is_resolved(C):- Why= is_resolved, pfc_call_fact(Why,neg(C)),\+pfc_call_fact(Why,C).
 
-:-pmust(nop(_)).
+:- pmust(nop(_)).
 
 resolveConflict0(C) :- forall(pmust(pfc_negation_w_neg(C,N)),ignore(show_call_failure((nop(resolveConflict(C)),pp_why(N))))),
   ignore(show_call_failure((nop(resolveConflict(C)),pp_why(C)))), 
@@ -2692,7 +2695,7 @@ repropagate(P):-  pmust(repropagate_0(P)).
 
 repropagate_0(P):- loop_check(repropagate_1(P),true).
 
-:-thread_local thlocal:is_repropagating/1.
+:- thread_local thlocal:is_repropagating/1.
 
 repropagate_1(P):- is_ftVar(P),!.
 repropagate_1(USER:P):- USER==user,!,repropagate_1(P).
@@ -2725,7 +2728,7 @@ user:rescan_pfc_hook:- forall(pred_head(pred_u0,P),
                             show_if_debug(pfc_fwd(P)))).
 */
 
-:- set_prolog_flag(access_level,user).
+% :- set_prolog_flag(access_level,user).
 
 user:pfc_init_once:-multifile(pfc_default/1).
 user:pfc_init_once:-dynamic(pfc_default/1).

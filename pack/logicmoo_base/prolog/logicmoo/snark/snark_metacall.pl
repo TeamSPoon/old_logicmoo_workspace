@@ -43,8 +43,8 @@
           op(500,yfx,'v')
         ]). 
 
-:-multifile(use_kif_expansion/0).
-:-thread_local(use_kif_expansion/0).
+:- multifile(use_kif_expansion/0).
+:- thread_local(use_kif_expansion/0).
 %user:term_expansion(H ,CE):-kif_term_expansion(H,CE),((H)\=@=CE,dmsg(kif_term_expansion(H,CE))).
 %user:goal_expansion(H ,CE):-kif_goal_expansion(H,CE),((H)\=@=CE,dmsg(kif_goal_expansion(H,CE))).
 
@@ -53,7 +53,7 @@ use_kif_term(B):- use_kif_expansion;kif_hook(B);kif_pred_head(B).
 
 kif_head_expansion(B,CE):- use_kif_term(B),kif_term_expansion(B,CE).
 
-:-export(kif_clause_expansion/3).
+:- export(kif_clause_expansion/3).
 kif_clause_expansion(H,B,OUT):- kif_head_expansion(H,HH),
   must(kif_goal_expansion(B,BB)),!,OUT=(HH:-BB).
 
@@ -100,8 +100,8 @@ kif_goal_args_expansion(_,F,ARGS,CEO):- maplist(kif_arg_expansion,ARGS,CEARGS),
 each_subterm00(B, A):- A=B;(compound(B), (functor(B,A,_);((arg(_, B, C), each_subterm00(C, A))))).
 
 
-:-meta_predicate(gshow_call(0)).
-:-export(gshow_call/1).
+:- meta_predicate(gshow_call(0)).
+:- export(gshow_call/1).
 
 
 add_mi(_Caller,G,O):- prolog_load_context(source,File),

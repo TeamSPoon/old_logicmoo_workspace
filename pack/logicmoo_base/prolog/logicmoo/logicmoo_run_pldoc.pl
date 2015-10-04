@@ -185,7 +185,7 @@ do_semweb_startup:-
 % mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(asserta(prolog_debug:debugging(http(X), false, O)))).
 % mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),show_call(asserta(prolog_debug:debugging((X), false, O)))).
 
-:-multifile(pre_file_search_path/2).
+:- multifile(pre_file_search_path/2).
 
 % user:pre_file_search_path(_,_):-!,fail.
 
@@ -234,4 +234,4 @@ sandbox:safe_global_variable(V):-nonvar(V).
 sandbox:safe_directive(V):-nonvar(V).
 
 
-:-endif.
+:- endif.

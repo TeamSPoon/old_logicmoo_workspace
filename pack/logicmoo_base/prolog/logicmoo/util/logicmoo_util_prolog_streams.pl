@@ -8,7 +8,7 @@
 
 :- discontiguous some_test/0.
 
-:-dynamic(is_prolog_stream/1).
+:- dynamic(is_prolog_stream/1).
 
 %%	open_prolog_stream(+Module, +Mode, -Stream, +Options)
 %

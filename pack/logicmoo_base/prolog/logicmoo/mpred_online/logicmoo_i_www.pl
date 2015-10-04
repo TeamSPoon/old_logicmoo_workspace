@@ -35,7 +35,7 @@ hmust_l(G):-G.
 :- attach_packs.
 :- initialization(attach_packs).
 % [Required] Load the Logicmoo Library Utils
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+:- user:ensure_loaded(library(logicmoo/logicmoo_utils)).
  
 
 % :- module(logicmoo_i_www,[ html_print_term/2  ]).  % +Term, +Options
@@ -159,7 +159,7 @@ make_quotable(String,SObj):-format(string(SUnq),'~q',[String]),make_quotable_0(S
 
 % :- set_yes_debug.
 
-:-export(save_in_session/1).
+:- export(save_in_session/1).
 save_in_session(NV):- \+ compound(NV),!.
 save_in_session(NV):-is_list(NV),!,must_maplist(save_in_session,NV),!.
 save_in_session(search([X=Y|R])):-nonvar(Y),is_list([X=Y|R]),once(save_in_session([X=Y|R])),!.
@@ -167,7 +167,7 @@ save_in_session(NV):-NV=..[N,V],!,hmust(save_in_session(N,V)),!.
 save_in_session(N=V):- hmust(save_in_session(N,V)),!.
 save_in_session(NV):- dmsg(not_save_in_session(NV)),!.
 
-:-export(save_in_session/2).
+:- export(save_in_session/2).
 save_in_session(Unsaved,_):- member(Unsaved,[session_data,request_uri,search,pool,path,input,session]),!.
 save_in_session(_,V):- sub_term(Sub,V),nonvar(Sub),is_stream(Sub),!.
 save_in_session(N,V):- get_http_session(S), save_in_session(S, N,V),!.
@@ -184,13 +184,13 @@ show_http_session:-hmust(get_http_session(S)),listing(http_session:session_data(
 
 make_session(S):- ignore((is_cgi_stream,http_session:http_open_session(S,[renew(false)]))),!.
 
-:-export(get_http_session/1).
+:- export(get_http_session/1).
 get_http_session(S):- catch(get_http_session0(S),_,fail),nonvar(S),!, make_session(S).
 get_http_session(main).
 
 logOnErrorFail(G):- catch(G,E,(dmsg(E:G),fail)).
 
-:-export(get_http_session0/1).
+:- export(get_http_session0/1).
 get_http_session0(S):- logOnErrorFail((http_session:http_in_session(S))),!.
 get_http_session0(S):- logOnErrorFail((is_cgi_stream,http_session:http_open_session(S,[renew(false)]))),!.
 get_http_session0(S):- logOnErrorFail((get_http_current_request(R),member(session(S),R))),!.
@@ -207,7 +207,7 @@ reset_assertion_display:-
 get_param_sess(N,V):- must(param_default_value(N,D)),!,get_param_sess(N,V,D),!.
 
 :- use_module(library(http/http_wrapper)).
-:-dynamic(http_last_request/1).
+:- dynamic(http_last_request/1).
 get_http_current_request(B):- http_request:http_current_request(B), !,ignore((retractall(http_last_request(_)),asserta(http_last_request(B)))).
 get_http_current_request(B):- http_last_request(B),!.
 get_http_current_request([]).
@@ -382,7 +382,7 @@ human_language('SpanishLanguage').
 human_language('ThaiLanguage').
 human_language('de').
 
-:-dynamic(foobar/1).
+:- dynamic(foobar/1).
 foobar:- foobar((_A < _B) > _C).
 
 param_default_value(call,edit1term).
@@ -660,10 +660,10 @@ call_for_terms(Call):-
         show_pcall_footer,
         write_end_html)),!.
 
-:-thread_local(thlocal:tl_hide_data/1).
+:- thread_local(thlocal:tl_hide_data/1).
 
 
-
+:- meta_predicate with_search_filters(0).
 with_search_filters(C):-
    search_filter_name_comment(FILTER,_,_),
    session_checked(FILTER), 
@@ -740,9 +740,9 @@ tmw:- with_assertions(thlocal:print_mode(html),(print((a(_LP):-b([1,2,3,4]))),nl
 % ===================================================
 % Pretty Print Formula
 % ===================================================
-:-export(write_atom_link/1).
+:- export(write_atom_link/1).
 write_atom_link(A):-must(write_atom_link(A,A)).
-:-export(write_atom_link/2).
+:- export(write_atom_link/2).
 write_atom_link(L,N):-must_det_l((write_atom_link(atom(W),L,N),format('~w',[W]))),!.
 
 % pred_href(Name/Arity, Module, HREF) :-
@@ -1271,7 +1271,7 @@ test_portray_clause(File) :-
 test_bind([]) :- !.
 test_bind([X='$VAR'(X)|L]) :-
 	test_bind(L).
-:-public test_portray_clause/1.
+:- public test_portray_clause/1.
 */
 
 
@@ -1288,7 +1288,7 @@ test_bind([X='$VAR'(X)|L]) :-
 % portray(X):-loop_check(user:my_portray(X)).
 /*
 :- discontiguous my_portray/1. 
-:-export(user:my_portray/1).
+:- export(user:my_portray/1).
 user:my_portray(A) :- var(A),!,fail,writeq(A).
 user:my_portray(A) :-
         atom(A),

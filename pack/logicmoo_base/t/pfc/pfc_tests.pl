@@ -2,7 +2,7 @@
 % :-use_module(library(pfc)).
 % :-user:ensure_loaded(logicmoo(mpred/logicmoo_props)).
 
-:-dynamic(b/1).
+:- dynamic(b/1).
 
 time(Call,Time) :-
   statistics(runtime,_),

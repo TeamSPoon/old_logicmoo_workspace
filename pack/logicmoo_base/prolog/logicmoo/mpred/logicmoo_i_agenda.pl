@@ -34,16 +34,16 @@ after_mpred_load_pass2:- not(thglobal:will_call_after(thglobal:after_mpred_load,
 % call_after_mpred_load(Code):- thglobal:after_mpred_load,!, call_after_next(after_mpred_load_pass2,Code).
 call_after_mpred_load(Code):- call_after_next(thglobal:after_mpred_load,Code).
 
-:-export(rescan_mpred_loaded/0).
+:- export(rescan_mpred_loaded/0).
 rescan_mpred_loaded:- ignore((thglobal:after_mpred_load, loop_check(call_after(thglobal:after_mpred_load, true ),true))).
 
-:-export(rescan_mpred_loaded_pass2/0).
+:- export(rescan_mpred_loaded_pass2/0).
 rescan_mpred_loaded_pass2:- ignore((thglobal:after_mpred_load, loop_check(call_after(after_mpred_load_pass2,  dmsg(rescan_mpred_loaded_pass2_comlpete)),true))).
 
 % ================================================
 % Agenda system - standard database
 % ================================================
-:-dynamic(suspend_timers/0).
+:- dynamic(suspend_timers/0).
 time_tick(Time,Pred):- repeat,sleep(Time), (suspend_timers->true;(once(doall(logOnError(call_no_cuts(Pred)))))),fail.
 
 user:hook_one_second_timer_tick.
@@ -63,16 +63,16 @@ start_one_minute_timer:-thread_property(_,alias(pfc_one_minute_timer))-> true ; 
 
 agenda_do_prequery:-!.
 agenda_do_prequery:- loop_check(agenda_rescan_mpred_ops,true),!.
-:-'$hide'(agenda_rescan_mpred_ops/0).
-:-'$hide'(agenda_do_prequery/0).
+:- '$hide'(agenda_rescan_mpred_ops/0).
+:- '$hide'(agenda_do_prequery/0).
 %:- rescan_missing_stubs.
 %:- agenda_rescan_mpred_props.
 
 
 :- sanity(user:mpred_mod(user)).
 
-:-export(agenda_slow_op_restart/0).
-:-dynamic(doing_agenda_slow_op/0).
+:- export(agenda_slow_op_restart/0).
+:- dynamic(doing_agenda_slow_op/0).
 
 % agenda_slow_op_restart:-!.
 agenda_slow_op_restart:-doing_agenda_slow_op,!.
@@ -83,16 +83,16 @@ agenda_slow_op_restart:-
       ((copy_term(Slow,CopySlow),
           must((is_callable(Slow),must(Slow),ignore(retract(user:agenda_slow_op_todo(CopySlow)))))))))).
 
-:-export(agenda_rescan_mpred_ops/0).
+:- export(agenda_rescan_mpred_ops/0).
 agenda_rescan_mpred_ops:- test_tl(agenda_suspend_scans),!.
 agenda_rescan_mpred_ops:- agenda_rescan_for_module_ready,!.
 
-:-thread_local thlocal:in_agenda_rescan_for_module_ready/0.
+:- thread_local thlocal:in_agenda_rescan_for_module_ready/0.
 agenda_rescan_for_module_ready:- thlocal:in_agenda_rescan_for_module_ready,!.
 agenda_rescan_for_module_ready:- with_assertions(thlocal:in_agenda_rescan_for_module_ready,loop_check(do_all_of(mpred_module_ready),true)).
 
-:-export(agenda_slow_op_todo/1).
-:-dynamic(agenda_slow_op_todo/1).
+:- export(agenda_slow_op_todo/1).
+:- dynamic(agenda_slow_op_todo/1).
 user:agenda_slow_op_enqueue(_):-!.
 user:agenda_slow_op_enqueue(Slow):- test_tl(agenda_slow_op_do_prereqs),!,debugOnError(Slow).
 user:agenda_slow_op_enqueue(Slow):- assertz_if_new(agenda_slow_op_todo(Slow)),!.
@@ -107,7 +107,7 @@ expire_post_change(_,_).
 % Prolog will_call_after/do_all_of
 % ============================================
 
-:-dynamic(thglobal:will_call_after/2).
+:- dynamic(thglobal:will_call_after/2).
 
 call_after(When,C):- When,!,do_all_of(When),must_det(C),!.
 call_after(When,C):- assert_next(When,C),!.
@@ -123,7 +123,7 @@ call_after_next(When,C):- ignore((When,!,do_all_of(When))),assert_next(When,C).
 
 do_all_of_when(When):- ignore((more_to_do(When),When,do_all_of(When))).
 
-:-export(do_all_of/1).
+:- export(do_all_of/1).
 do_all_of(When):- ignore(loop_check(do_all_of_ilc(When),true)),!.
 do_all_of_ilc(When):- not(thglobal:will_call_after(When,_)),!.
 do_all_of_ilc(When):-  repeat,do_stuff_of_ilc(When), not(more_to_do(When)).
@@ -138,7 +138,7 @@ do_stuff_of_ilc(When):- thglobal:will_call_after(When,A),!,retract(thglobal:will
 show_cgoal(G):- slow_sanity((stack_check(9600,dmsg(warning(maybe_overflow(stack_lvl)))))),call(G).
 
 
-:-export(add_later/1).
+:- export(add_later/1).
 add_later(Fact):- call_after_mpred_load(add(Fact)).
 
 % ========================================
@@ -205,7 +205,7 @@ rescandb:- mpred_call(finish_processing_world).
 
 
 
-:-export((agenda_mpred_repropigate/0, rescan_duplicated_facts/0, rerun_database_hooks/0 , gather_fact_heads/2)).
+:- export((agenda_mpred_repropigate/0, rescan_duplicated_facts/0, rerun_database_hooks/0 , gather_fact_heads/2)).
 
 agenda_mpred_repropigate:-  loop_check(rescan_mpred_facts_local).
 
@@ -238,8 +238,8 @@ gather_fact_heads(M,H):- (nonvar(M)->true; member(M,[dbase,moo,world,user,hook])
 
 
 /*
-:-export(begin_prolog_source/0).
-:-export(end_prolog_source/0).
+:- export(begin_prolog_source/0).
+:- export(end_prolog_source/0).
 begin_prolog_source:- must_det(asserta(thlocal:in_prolog_source_code)).
 end_prolog_source:- mpred_modify(change( retract,_),thlocal:in_prolog_source_code).
 */
@@ -251,13 +251,13 @@ setTemplate(X):-add(X).
 
 englishServerInterface(SomeEnglish):-dmsg(todo(englishServerInterface(SomeEnglish))).
 
-:-multifile(user:call_OnEachLoad/1).
-:-export(user:call_OnEachLoad/1).
-:-dynamic(user:call_OnEachLoad/1).
+:- multifile(user:call_OnEachLoad/1).
+:- export(user:call_OnEachLoad/1).
+:- dynamic(user:call_OnEachLoad/1).
 
-:-export(onLoad/1).
+:- export(onLoad/1).
 onLoad(C):-call_after_mpred_load(C).
-:-export(user:onEachLoad/1).
+:- export(user:onEachLoad/1).
 onEachLoad(C):-assert_if_new(user:call_OnEachLoad(C)).
 
 

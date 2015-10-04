@@ -1,15 +1,116 @@
+#!/usr/bin/env swipl
 /** <module> Logicmoo Path Setups
+% ===================================================================
+    File:         'logicmoo_utils).'
+    Purpose:       To load the logicmoo libraries as needed
+    Contact:       $Author: dmiles $@users.sourceforge.net ;
+    Version:       'logicmoo_utils).' 1.0.0
+    Revision:      $Revision: 1.7 $
+    Revised At:    $Date: 2002/07/11 21:57:28 $
+    Author:        Douglas R. Miles
+    Maintainers:   TeamSPoon
+    E-mail:        logicmoo@gmail.com
+    WWW:           http://www.prologmoo.com
+    SCM:           https://github.com/TeamSPoon/PrologMUD/tree/master/pack/logicmoo_base
+    Copyleft:      1999-2015, LogicMOO Prolog Extensions
+    License:       Lesser GNU Public License
+% ===================================================================
 */
-:- if(current_prolog_flag(dialect,yap)).
-swi_export(_P):-!.
-:- else.
-:-module_transparent(swi_export/1).
-user:swi_export(P):-export(P).
-:-module_transparent(swi_module/2).
-user:swi_module(_,_).
+:- if(\+ current_module(logicmoo_util_library)).
+:- module(logicmoo_utils,
+[  % when the predciates are not being moved from file to file the exports will be moved here
+]
+).
+
+:- set_prolog_flag(verbose_autoload, false).
+:- autoload.
+:- set_prolog_flag(verbose_autoload, true).
+:- set_prolog_flag(generate_debug_info, true).
+:- set_prolog_flag(report_error,true),set_prolog_flag(debug_on_error,true),set_prolog_flag(debug, true).
+:- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(100000)]).
+:- set_prolog_flag(backtrace_show_lines, true).
+:- set_prolog_flag(debugger_show_context,true).
+:- set_prolog_flag(verbose_load,true).
+
+:- if(current_prolog_flag(gui,true)).
+:- guitracer.
+:- notrace(trace).
+:- notrace.
 :- endif.
 
-:-swi_module(logicmoo_util_all,[if_flag_true/2]).
+:- include(util/logicmoo_util_header).
+:- include(util/logicmoo_util_first).
+:- include(util/logicmoo_util_dmsg).
+:- include(util/logicmoo_util_with_assertions).
+:- include(util/logicmoo_util_bugger_catch).
+:- include(util/logicmoo_util_bugger).
+:- include(util/logicmoo_util_coroutining_iz).
+:- include(util/logicmoo_util_coroutining_was).
+:- include(util/logicmoo_util_ctx_frame).
+:- include(util/logicmoo_util_dcg).
+:- include(util/logicmoo_util_filestreams).
+:- include(util/logicmoo_util_filesystem).
+:- include(util/logicmoo_util_library).
+:- include(util/logicmoo_util_loop_check).
+:- include(util/logicmoo_util_multivar).
+:- include(util/logicmoo_util_no_repeats).
+:- include(util/logicmoo_util_preddefs).
+:- include(util/logicmoo_util_prolog_frames).
+:- include(util/logicmoo_util_prolog_streams).
+:- include(util/logicmoo_util_term_listing).
+:- include(util/logicmoo_util_terms).
+:- include(util/logicmoo_util_varnames).
+:- include(util/logicmoo_util_structs).
+:- include(util/logicmoo_util_bb_env).
+:- include(util/logicmoo_util_bb_gvar).
+
+:- else.
+/*
+:- set_prolog_flag(verbose_autoload, true).
+:- set_prolog_flag(generate_debug_info, true).
+:- set_prolog_flag(report_error,true),set_prolog_flag(debug_on_error,true),set_prolog_flag(debug, true).
+:- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(100000)]).
+:- set_prolog_flag(backtrace_show_lines, true).
+:- set_prolog_flag(debugger_show_context,true).
+:- set_prolog_flag(verbose_load,true).
+
+:- user:ensure_loaded(util/logicmoo_util_bb_env).
+:- user:ensure_loaded(util/logicmoo_util_bb_gvar).
+:- user:ensure_loaded(util/logicmoo_util_bugger).
+:- user:ensure_loaded(util/logicmoo_util_coroutining_iz).
+:- user:ensure_loaded(util/logicmoo_util_coroutining_was).
+:- user:ensure_loaded(util/logicmoo_util_ctx_frame).
+:- user:ensure_loaded(util/logicmoo_util_dcg).
+:- user:ensure_loaded(util/logicmoo_util_dmsg).
+:- user:ensure_loaded(util/logicmoo_util_filestreams).
+:- user:ensure_loaded(util/logicmoo_util_filesystem).
+:- user:ensure_loaded(util/logicmoo_util_first).
+:- user:ensure_loaded(util/logicmoo_util_header).
+:- user:ensure_loaded(util/logicmoo_util_library).
+:- user:ensure_loaded(util/logicmoo_util_loop_check).
+:- user:ensure_loaded(util/logicmoo_util_multivar).
+:- user:ensure_loaded(util/logicmoo_util_no_repeats).
+:- user:ensure_loaded(util/logicmoo_util_preddefs).
+:- user:ensure_loaded(util/logicmoo_util_prolog_frames).
+:- user:ensure_loaded(util/logicmoo_util_prolog_streams).
+:- user:ensure_loaded(util/logicmoo_util_structs).
+:- user:ensure_loaded(util/logicmoo_util_term_listing).
+:- user:ensure_loaded(util/logicmoo_util_terms).
+:- user:ensure_loaded(util/logicmoo_util_varnames).
+*/
+:- endif.
+
+:- user:ensure_loaded(util/logicmoo_util_strings).
+
+:- set_prolog_flag(verbose_autoload, false).
+:- autoload.
+:- set_prolog_flag(verbose_autoload, true).
+
+% :- prolog.
+
+end_of_file.
+
+
 :- set_prolog_flag(generate_debug_info, true).
 %:- set_prolog_flag(access_level,system).
 
@@ -24,7 +125,6 @@ user:swi_module(_,_).
 :- meta_predicate call_mpred_body(?,?).
 :- meta_predicate call_mpred_body_ilc(?,?).
 :- meta_predicate call_whichlist_t(?,?,?).
-:- meta_predicate call_with_attvars(1,?).
 
 :- meta_predicate call_proof(?,?).
 :- meta_predicate callOr(?,?,?).
@@ -152,13 +252,13 @@ user:swi_module(_,_).
 
 %logicmoo_util_all:if_flag_true(Flag,Goal):- catch(Flag,_,fail)->catch(Goal,E,throw(if_flag_true(E)));true.
 
-:-export(if_flag_true/2).
+:- export(if_flag_true/2).
 if_flag_true(Flag,Goal):- catch(Flag,E,(dmsg(E:Flag),fail)) -> must(Goal); true.
 
 join_path33(A,B,C):-exists_directory(B)->B=C;directory_file_path(A,B,C).
 
-:-swi_export(with_vars/2).
-:-module_transparent(with_vars/2).
+:- export(with_vars/2).
+:- module_transparent(with_vars/2).
 :- meta_predicate with_vars(*,0).
 with_vars([],Stuff):- !, Stuff.
 with_vars([V|Vs],Stuff):- !,
@@ -183,7 +283,7 @@ with_vars(_,Stuff):- Stuff.
 
 
 /*
-:-
+:- 
     source_location(File,_Line),
     file_directory_name(File, RunDir),
     atom_concat(RunDir,'/../library',RelDir),
@@ -198,17 +298,6 @@ with_vars(_,Stuff):- Stuff.
    setenv('PATH_INDIGOLOG','../../indigolog').
 
 
-
-:- user:ensure_loaded((logicmoo_util_bugger_catch)).
-:- user:ensure_loaded((logicmoo_util_bugger)).
-:- user:ensure_loaded((logicmoo_util_strings)).
-:- user:ensure_loaded((logicmoo_util_library)).
-:- user:use_module((logicmoo_util_ctx_frame)).
-:- user:use_module((logicmoo_util_terms)).
-:- user:use_module((logicmoo_util_dcg)).
-:- user:use_module((logicmoo_util_coroutining_was)).
-:- user:use_module((logicmoo_util_coroutining_iz)).
-:- user:ensure_loaded(logicmoo_util_prolog_streams).
 
 
 

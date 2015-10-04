@@ -31,7 +31,7 @@
 :- attach_packs.
 :- initialization(attach_packs).
 % [Required] Load the Logicmoo Library Utils
-:- ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+:- ensure_loaded(library(logicmoo/logicmoo_utils)).
 
 :- prolog_load_context(directory,Dir),asserta(file_search_path(logicmoo,Dir)).
 :- dynamic(isa_pred_now_locked/0).
@@ -62,7 +62,7 @@
 % TODO uncomment the next line without breaking it all!
 % thglobal:use_cyc_database.
 
-:-asserta(thglobal:pfcManageHybrids).
+:- asserta(thglobal:pfcManageHybrids).
 
 :- export(user:mpred_mod/1).
 :- dynamic user:mpred_mod/1.
@@ -70,10 +70,10 @@ user:mpred_mod(user).
 
 
 % [Manditory] define how we interact with the module system
-:-if(not(current_predicate(swi_module/2))).
-:-export(swi_module/2).
-swi_module(M,E):-dmsg(swi_module(M,E)).
-:-endif.
+:- if(not(current_predicate(module/2))).
+:- export(module/2).
+module(M,E):-dmsg(module(M,E)).
+:- endif.
 
 
 
@@ -83,7 +83,7 @@ swi_module(M,E):-dmsg(swi_module(M,E)).
 % Debugging settings
 % ================================================
 
-:-export(is_stable/0).
+:- export(is_stable/0).
 
 is_stable:-fail.
 
@@ -111,7 +111,7 @@ xtreme_debug(_).
 verify_sanity(P):- \+ is_recompile, (true; is_release),!,nop(P).
 verify_sanity(P):- debugOnError(hotrace(P)),!.
 verify_sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
-:-meta_predicate(when_debugging(+,0)).
+:- meta_predicate(when_debugging(+,0)).
 when_debugging(What,Call):- debugging(What),!,Call.
 when_debugging(_,_).
 
@@ -142,7 +142,7 @@ when_debugging(_,_).
 :- ensure_loaded(mpred/logicmoo_i_mpred_stubs).
 :- ensure_loaded(mpred/logicmoo_i_argtypes).
 
-:-dynamic(thlocal:pfc_already_in_file_expansion/1).
+:- dynamic(thlocal:pfc_already_in_file_expansion/1).
 
 :- asserta(thlocal:disable_mpred_term_expansions_locally).
 
@@ -199,7 +199,7 @@ simplify_why_r(Reproduce,Why,NWhy,   Reproduce):- Why==NWhy, !.
 simplify_why_r(Reproduce,Why,_,Reproduce:SWhy):-simplify_why(Why,SWhy),!.
  
 % aliases
-:-meta_predicate(convert_side_effect(?,+,-)).
+:- meta_predicate(convert_side_effect(?,+,-)).
 
 simplify_why(Why,SWhy):-var(Why),!,Why=SWhy.
 simplify_why(Why:0,SWhy):-!,simplify_why(Why,SWhy).
@@ -252,7 +252,7 @@ user:term_expansion(I,OO):- (I==end_of_file->(must(do_end_of_file_actions),fail)
                                  (\+ thlocal:disable_mpred_term_expansions_locally, 
                                      if_defined(lmbase_record_transactions(I,OO)),I\=@=OO)).
 
-:-export(pfc_file_loaded/0).
+:- export(pfc_file_loaded/0).
 pfc_file_loaded.
 
 

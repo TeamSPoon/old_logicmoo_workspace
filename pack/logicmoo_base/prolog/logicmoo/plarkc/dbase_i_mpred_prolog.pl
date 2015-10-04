@@ -41,7 +41,7 @@ user:provide_mpred_read_attributes(P,_,_,predicate_property(P,built_in)):-real_b
 user:provide_mpred_read_attributes(P,_,_,predicate_property(P,imported_from(system))):-predicate_property(P,imported_from(system)).
 
 
-:-export(prolog_side_effects/1).
+:- export(prolog_side_effects/1).
 prolog_side_effects(G):-var(G),!,fail.
 prolog_side_effects(F/A):- ((integer(A);current_predicate(F/A)),functor(G,F,A)), prolog_side_effects(G).
 prolog_side_effects(G):-get_functor(G,F),user:mpred_prop(F,prologSideEffects),!.

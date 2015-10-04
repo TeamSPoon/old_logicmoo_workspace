@@ -93,7 +93,7 @@ meta_argtypes(pfc_default(ftAssertable)).
 
 prologSingleValued(C):-cwc,is_ftCompound(C),functor(C,F,_),!,prologSingleValued(F).
 
-:-dynamic(pfc_default/1).
+:- dynamic(pfc_default/1).
 
 % here is an example which defines pfc_default facts and rules.  Will it work?
 (pfc_default(P)/pfc_literal(P))  ==>  (~neg(P) ==> P).
@@ -122,7 +122,7 @@ prologSingleValued(C):-cwc,is_ftCompound(C),functor(C,F,_),!,prologSingleValued(
 
 ((pfc_default(P)/(pfc_literal(P),is_ftCompound(P),different_literal(P,_,Q,Test)))  ==> ((~Q/(Test), ~neg(P)) ==> P)).
 
-:-dynamic(foob/1).
+:- dynamic(foob/1).
 
 if_missing(foob(_),foob(a)).
 
@@ -133,13 +133,13 @@ if_missing(foob(_),foob(a)).
 
 foob(b).
 
-:-pfc_test(\+foob(a)).
-:-pfc_test(foob(b)).
+:- pfc_test(\+foob(a)).
+:- pfc_test(foob(b)).
 
 ~foob(b).
 
-:-pfc_test(\+foob(b)).
-:-pfc_test(foob(a)).
+:- pfc_test(\+foob(b)).
+:- pfc_test(foob(a)).
 
 
 prologBuiltin(F),arity(F,A)==>{make_builtin(F/A)}.
@@ -147,11 +147,11 @@ prologBuiltin(F),arity(F,A)==>{make_builtin(F/A)}.
 prologBuiltin(resolveConflict/1).
 prologBuiltin(pfc_select/2).
 
-:-dynamic(conflict/1).
+:- dynamic(conflict/1).
 % a conflict triggers a Prolog action to resolve it.
 conflict(C) ==> {must(with_pfc_trace_exec(resolveConflict(C),\+conflict(C)))}.
 
-:-dynamic(ttTypeType/1).
+:- dynamic(ttTypeType/1).
 
 % meta rules to schedule inferencing.
 % resolve conflicts asap
@@ -292,7 +292,7 @@ completelyAssertedCollection(prologMacroHead).  % Items read from a file might b
 completelyAssertedCollection(ttPredType).  % Or they might be a predciate declarer
 completelyAssertedCollection(functorDeclares).  % or they might declare other things
 
-:-time((pfc_add((completelyAssertedCollection(isEach(tPred,prologMultiValued,prologOrdered,predIsFlag,ttNonGenled,
+:- time((pfc_add((completelyAssertedCollection(isEach(tPred,prologMultiValued,prologOrdered,predIsFlag,ttNonGenled,
  prologNegByFailure,meta_argtypes,prologHybrid,prologPTTP,prologDynamic,prologKIF,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued)))))).
 
 completelyAssertedCollection(ftTerm).
@@ -383,9 +383,9 @@ ttPredType(pfcControlled).
 ttPredType(prologKIF).
 ttPredType(prologBuiltin).
 ttPredType(prologPTTP).
-:-pfc_add( pfcControlled(genlPreds)).
-:-pfc_add( pfcControlled(isa)).
-:-pfc_add(pfcControlled(argIsa)).
+:- pfc_add( pfcControlled(genlPreds)).
+:- pfc_add( pfcControlled(isa)).
+:- pfc_add(pfcControlled(argIsa)).
 
 
 
@@ -493,7 +493,7 @@ completelyAssertedCollection(C)==>completeExtentAsserted(C).
 completeExtentAsserted(genlPreds).
 completeExtentAsserted(defnSufficient).
 
-:-dynamic(ttNotTemporalType/1).
+:- dynamic(ttNotTemporalType/1).
 ttNotTemporalType(ftInt).
 %ttNotTemporalType(ftTerm).
 ttNotTemporalType(tCol).
@@ -531,7 +531,7 @@ isa(tRelation,ttAbstractType).
 
 
 
-:-if(load_time_sanity).
+:- if(load_time_sanity).
 
 % :-pfc_trace.
 
@@ -541,19 +541,19 @@ fooBar.
 
 \+ fooBar.
 
-:-pfc_test(\+fooBar).
+:- pfc_test(\+fooBar).
 
 fooBar.
 
-:-pfc_test(fooBar).
+:- pfc_test(fooBar).
 
 %:- start_rtrace.
 neg(fooBar).
 
-:-pfc_test(\+fooBar).
+:- pfc_test(\+fooBar).
 %:- stop_rtrace.
 
-:-endif. % load_time_sanity
+:- endif. % load_time_sanity
 
 
 %P/(is_ftNonvar(P),get_functor(P,F)),afterAdding(F,Do)/is_ftNonvar(Do)==>{call(Do,P)}.
@@ -617,7 +617,7 @@ tCol(ttNonGenled).
 isa('Thing',ttNonGenled).
 isa('CycLTerm',ttNonGenled).
 ==>prologHybrid(quotedIsa(ftTerm,ttFormatType)).
-:-dynamic(quotedIsa/2).
+:- dynamic(quotedIsa/2).
 
 isa(I,C):- cwc, pfc_univ(C,I,CI),atom(C),current_predicate(C/1,CI)->call(CI).
 isa(I,C):- cwc, is_asserted(ttFormatType(C)),!, quotedIsa(I,C).
@@ -672,14 +672,14 @@ ttPredType(Prop)==>tCol(Prop).
 ((P/is_ftNonvar(P),{functor(P,F,A),\+ pfc_connective(F), A>1}) ==> {user:agenda_slow_op_enqueue(must(ignore(deduceEachArgType(P))))}).
 % tCol(Col) <==> isa(Col,tCol).
 
-:-dynamic((disjointWith/2,genls/2,isa/2)).
+:- dynamic((disjointWith/2,genls/2,isa/2)).
 
 %(disjointWith(P1,P2) , genls(C1,P1)) ==>    disjointWith(C1,P2).
 disjointWith(Sub, Super) ==> disjointWith( Super, Sub).
 disjointWith(ttTemporalType,ttAbstractType).
 
 prologHybrid(typeGenls/2).
-:-add(meta_argtypes(typeGenls(ttTypeType,tCol))).
+:- add(meta_argtypes(typeGenls(ttTypeType,tCol))).
 %(isa(COLTYPEINST,COLTYPE) , typeGenls(COLTYPE,COL)) ==> genls(COLTYPEINST,COL).
 
 typeGenls(ttPredType,tPred).
@@ -687,7 +687,7 @@ typeGenls(ttPredType,tPred).
 
 prologHybrid(argIsa/3).
 
-:-asserta(thlocal:pfcExpansion).
+:- asserta(thlocal:pfcExpansion).
 
 
 /*
@@ -717,7 +717,7 @@ prologHybrid(argIsa/3).
 tCol(tBird).
 %:-debug.
 %:-rtrace.
-:-pfc_test(dynamic(tBird/1)).
+:- pfc_test(dynamic(tBird/1)).
 
 
 :- endif.
@@ -725,11 +725,11 @@ tCol(tBird).
 :- meta_predicate(neg(0)).
 :- dynamic(neg(0)).
 
-:-dynamic(mpred_module/2).
-:-decl_mpred(mpred_module/2).
+:- dynamic(mpred_module/2).
+:- decl_mpred(mpred_module/2).
 
 meta_argtypes(mpred_module(tPred,tPrologModule)).
-:-debug.
+:- debug.
 
 prologHybrid(mpred_module, 2).
 prologMultiValued(mpred_module(tRelation,ftAtom)).
@@ -739,9 +739,9 @@ prologMultiValued(mpred_module(tRelation,ftAtom)).
 % pddlSorts(Type,EList)==> genls(isEach(EList),Type).
 
 
-:-dynamic(argIsa/3).
+:- dynamic(argIsa/3).
 
-:-decl_mpred(argIsa/3).
+:- decl_mpred(argIsa/3).
 
 isa(Spec,tCol) ==> arity(Spec,1).
 
@@ -751,7 +751,7 @@ isa(Spec,tCol) ==> arity(Spec,1).
 
 % :-include(logicmoo_i_header).
 tCol(tPred).
-:-pfc_test(assert_argIsa(tPred,1,tPred)).
+:- pfc_test(assert_argIsa(tPred,1,tPred)).
 
 
 /*
@@ -769,16 +769,16 @@ equal(A,C),notequal(A,B) ==> notequal(C,B).
 % ((P,Q ==> false) ==> (P ==> neg(Q)), (Q ==> neg(P))).
 
 
-:-export(member/2).
-:-export(arg/3).
+:- export(member/2).
+:- export(arg/3).
 %:-export(mpred_call/1).
 % prologDynamic(cycAssert/2).
-:-export(integer/1).
+:- export(integer/1).
 % :-export(makeConstant/1).
 % :-export(naf/1).
-:-export(number/1).
-:-export(string/1).
-:-export(var/1).
+:- export(number/1).
+:- export(string/1).
+:- export(var/1).
 
 tCol(completeExtentAsserted).
 tCol(ttFormatType).
@@ -857,18 +857,18 @@ isa(vtValue,ttValueType).
 typeGenls(ttValueType,vtValue).
 
 
-:-pfc_test(vtColor(vRed)).
+:- pfc_test(vtColor(vRed)).
 
 
-:-assertz_if_new((argIsa(Prop,N,Type) :- cwc,number(N),argIsa_known(Prop,N,Type),must(ground(argIsa(Prop,N,Type))))).
+:- assertz_if_new((argIsa(Prop,N,Type) :- cwc,number(N),argIsa_known(Prop,N,Type),must(ground(argIsa(Prop,N,Type))))).
 
 argIsa(Prop,N,Type),{number(N)},ttFormatType(Type) ==> argQuotedIsa(Prop,N,Type).
 
 :- discontiguous(prologSingleValued/1).
 :- do_gc.
 
-:-dynamic(mudLabelTypeProps/3).
-:-multifile(mudLabelTypeProps/3).
+:- dynamic(mudLabelTypeProps/3).
+:- multifile(mudLabelTypeProps/3).
 :- forall(ttPredType(F),must((decl_type(F),add(isa(F,functorDeclares)),add(genls(F,tPred))))).
 :- export(mtForPred/2).
 
@@ -881,10 +881,10 @@ prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, localityOfObject/2, subForm
    genls/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, 
    completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
 
-:-add(isa(ttFormatType,ttAbstractType)).
-:-discontiguous(subFormat/2).
-:-dynamic(tChannel/1).
-:-multifile(tChannel/1).
+:- add(isa(ttFormatType,ttAbstractType)).
+:- discontiguous(subFormat/2).
+:- dynamic(tChannel/1).
+:- multifile(tChannel/1).
 
 % pfc_add((I/(pfc_literal(I),fully_expand(_,I,O),I \=@=O )==> ({format('~q~n',[fully_expand(I->O)])},O))).
 
@@ -1105,7 +1105,7 @@ isa(arity,ptBinaryPredicate).
 %((genlPreds(Col1,Col2),(arity(Col1,1);arity(Col2,1)))==>genls(Col1,Col2)).
 %((genls(Col1,Col2),(tPred(Col1);tPred(Col2)))==>genlPreds(Col1,Col2)).
 
-:-pfc_test(pfc_add(tCol('ptUnaryPredicate'))).
+:- pfc_test(pfc_add(tCol('ptUnaryPredicate'))).
 
 % pfcMark(Type,_,F,A)/(integer(A),A>1,F\==arity,Assert=..[Type,F])==>arity(F,A),Assert.
 
@@ -1147,15 +1147,15 @@ specialFunctor('/').
 
 :- if(if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
 
-:-time(expand_props(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O)),time(pfc_add(pfc_default(O))).
+:- time(expand_props(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O)),time(pfc_add(pfc_default(O))).
 
-:-time(fully_expand(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),_)).
+:- time(fully_expand(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),_)).
 
 % :-pfc_trace.
 
 :- endif.
 
-:-time(pfc_add((((arity(Pred,2),tPred(Pred)) <==> isa(Pred,ptBinaryPredicate))))).
+:- time(pfc_add((((arity(Pred,2),tPred(Pred)) <==> isa(Pred,ptBinaryPredicate))))).
 
 % if arity is ever greater than 1 it can never become 1
 % arity(F,A)/(number(A),A>1) ==> neg(arity(F,1)).
@@ -1194,7 +1194,7 @@ relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
 
 
 
-:-pfc_test((fully_expand_goal(_,:-multifile user:create_random_fact/1,O),show_call_failure(O=(:-multifile user:create_random_fact/1)))).
+:- pfc_test((fully_expand_goal(_,:-multifile user:create_random_fact/1,O),show_call_failure(O=(:-multifile user:create_random_fact/1)))).
 
 tCol(tPred).
 prologHybrid(isa/2).
@@ -1306,14 +1306,14 @@ mp_test_agr(_,_,_,_,_,_,_,_,_,_).
 :- dynamic((a/1,b/1,c/0)).
 
 ==> a(z).
-:-pfc_test(a(z)).
+:- pfc_test(a(z)).
 
-:-pfc_test(a(_)).
+:- pfc_test(a(_)).
 
 ~a(z).
 
-:-pfc_test(\+neg(a(_))).
-:-pfc_test(\+(a(_))).
+:- pfc_test(\+neg(a(_))).
+:- pfc_test(\+(a(_))).
 
 
 % U=nt(A,B,C),spft(X,Y,Z),\+ \+
@@ -1340,12 +1340,12 @@ a(B)==>d(B).
 
 :- endif.
 
-:-pfc_run.
+:- pfc_run.
 
 
-:-pfc_test(predicate_property(mp_test_agr(_,_,_,_,_,_,_,_,_,_),meta_predicate(_))).
+:- pfc_test(predicate_property(mp_test_agr(_,_,_,_,_,_,_,_,_,_),meta_predicate(_))).
 
-:-pfc_test(ensure_loaded('../pfc/zenls.pfct')).
+:- pfc_test(ensure_loaded('../pfc/zenls.pfct')).
 
 :- pfc_test(ensure_loaded('../pfc/singleValued.pfct')).
 

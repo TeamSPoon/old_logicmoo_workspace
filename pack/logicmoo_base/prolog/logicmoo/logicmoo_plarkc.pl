@@ -61,8 +61,8 @@ reallyLoadTiny:- pfc_no_trace.
 
 %TODO FIX :-pfc_add((((cycl(X),{must(cyc_to_clif(X,Y))}) ==> clif(Y)))).
 
-:-pfc_no_trace.
-:-pfc_add((((cycl('$VAR'('X')),{must(cyc_to_clif('$VAR'('X'),'$VAR'('Y')))}) ==> clif('$VAR'('Y'))))).
+:- pfc_no_trace.
+:- pfc_add((((cycl('$VAR'('X')),{must(cyc_to_clif('$VAR'('X'),'$VAR'('Y')))}) ==> clif('$VAR'('Y'))))).
 
 % ?-listing(cycl).
 
@@ -78,9 +78,9 @@ tHominid(iExplorer2).
 /*
 :- transTiny(Form,(ground(Form),functor(Form,F,1),F\==neg)).
 
-:-set_gui_debug(false).
-:-set_no_debug.
-:-set_no_debug_thread.
+:- set_gui_debug(false).
+:- set_no_debug.
+:- set_no_debug_thread.
 
 :- transfer_predicate(tinyK8(Form), ( \+ contains_term('$VAR'(_),Form)) , pfc_add((Form))).
 

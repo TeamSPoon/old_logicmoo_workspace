@@ -1,16 +1,24 @@
+:- if(\+ current_module(logicmoo_utils)).
+:- module(logicmoo_util_bb_gvar,
+    [  % when the predciates are not being moved from file to file the exports will be moved here
+      ]).  
+:- include(logicmoo_util_header).
+:- endif.
+
+end_of_file.
 
 :- use_module(library(rbtrees)).
-:- use_module(library(nb_rbtrees)).
+% :- use_module(library(nb_rbtrees)).
 
 p_e(P,ENV):-functor(P,ENV,_),!. % ,functor(ENV,F,A).
-p_e(P,test123).
+p_e(_P,test123).
 
 pe_get(P,ENV,Q):-p_e(P,ENV), nb_getval(ENV,Q),!.
 pe_set(P,ENV,Q):-p_e(P,ENV), nb_setval(ENV,Q),!.
 
 pe_get_key(P,_,Q):-p_e(P,Q).
 
-:-dynamic(in_bb/2).
+:- dynamic(in_bb/2).
 
 gvar_update_value(Before,After):-p_e(Before,BB),nb_current(BB,Before),!,nb_setval(BB,After).
 gvar_update_value(Before,After):-retract(Before),assert(After),!.
@@ -23,14 +31,13 @@ gvar_value0(BB,asserta,Value):-!,nb_setval(BB,Value),!.
 gvar_value0(BB,retract,Value):-nb_getval(BB,Value),!,nb_setval(BB,[]).
 gvar_value0(BB,retractall,_):-nb_setval(BB,[]).
 
-
 gvar_list(BB,call,Value):-!,must(nb_current(BB,List)),!,dmsg(member(Value,List)),!,member(Value,List).
 gvar_list(BB,OP,Value):-must(gvar_list0(BB,OP,Value)).
 
 gvar_list0(BB,assert,Value):-!,must(nb_current(BB,List)), (List=[] ->  nb_setval(BB,[Value]); append_el_via_setarg(List,Value)).
 gvar_list0(BB,asserta,Value):-!,must(nb_current(BB,List)),nb_setval(BB,[Value|List]).
 gvar_list0(BB,retract,Value):-!,must(nb_current(BB,List)), ( List=[Value|Rest]-> nb_setval(BB,Rest); remove_el_via_setarg(List,Value) ).
-gvar_list0(BB,retractall,F/A):- !,nb_setval(BB,[]).
+gvar_list0(BB,retractall,_F/_A):- !,nb_setval(BB,[]).
 gvar_list0(BB,retractall,Value):- args_all_vars(Value)-> nb_setval(BB,[]) ;  
   ((   must(nb_current(BB,List)) , gvar_remove_all_list_matches(BB,List,Value) )).
 
@@ -42,12 +49,12 @@ gvar_remove_all_list_matches(BB,List,Value) :-
     ((List \= [Value|Rest] ->  gvar_remove_all_list_matches(BB, Rest,Value) ;
        ((nb_setval(BB,Rest),gvar_remove_all_list_matches(BB,Rest,Value)))))).
 
-remove_el_via_setarg(List,Value):- ([Value|T] = List -> nb_setarg(2,List,T) ; remove_el_via_setarg(T,Value)).
+remove_el_via_setarg(List,Value):- [_|T] = List, [_,Was|_] = List,(Was=Value -> nb_setarg(2,List,T) ;  remove_el_via_setarg(Was|T,Value)).
 append_el_via_setarg(List,Value):- List = [_|T], (T==[] -> setarg(2,List,[Value]) ; append_el_via_setarg(T,Value)).
 
 
 
-bnb_current(BB,LIST):-!,fail.
+bnb_current(BB,LIST):- trace_or_throw(bnb_current(BB,LIST)),!,fail.
 bnb_current(BB,LIST):-nb_current(BB,LIST),!.
 bnb_current(BB,LIST):-nb_setval(BB,[]),nb_current(BB,LIST),!.
 
@@ -101,8 +108,8 @@ pop_queue(Q,E) :-
         ;   false
         ).
 
-inside_queue(Q,E) :-
-        b_getval(Q, fast_slow(H-T, I-U)),(   nonvar(H) , member(E,H)  ;   nonvar(I) , member(E,H)).
+inside_queue(Q,E) :- %  trace_or_throw(inside_queue(Q,E)),!,fail.
+        b_getval(Q, fast_slow(H-_T, I-_U)),(   nonvar(H) , member(E,H)  ;   nonvar(I) , member(E,I)).
 
 
 
@@ -364,7 +371,7 @@ with_assertions(M,WithA,Call):- M:WithA,!,Call.
 with_assertions(M,WithA,Call):-
    setup_call_cleanup(M:asserta(WithA),Call,must(M:retract(WithA))).
 
-:-meta_predicate(with_no_assertions(+,0)).
+:- meta_predicate(with_no_assertions(+,0)).
 with_no_assertions(THead,Call):-
  must(to_thread_head((THead:-!,fail),M,_Head,H)),
    copy_term(H,  WithA), !, setup_call_cleanup(M:asserta(WithA),Call,must(M:retract(WithA))).
@@ -397,6 +404,7 @@ term_expansion_hyhtn(In,Out):-nonvar(In),term_expansion_alias(In,Out).
 
 make_key(CC,KeyA):- notrace(ground(CC)->KeyA=CC ;(copy_term(CC,Key,_),numbervars(Key,0,_))),!,KeyA=Key. % ,term_to_atom(Key,KeyA).
 loop_check(B):- loop_check(B,fail).
+:- trace.
 loop_check(B, TODO):- make_key(B,BC),!, loop_check_term(B,BC,TODO).
 
 loop_check_term(B,BC,TODO):-  ( \+(tlbugger:inside_loop_check(BC)) 
@@ -502,7 +510,7 @@ nop(_P).
 doall(G):-ignore((G,fail)).
 one_must(Call,Else):- trye(Call)*->true;Else.
 
-:-dynamic((env_mpred/3, mpred_arity/2, env_kb/1)).
+:- dynamic((env_mpred/3, mpred_arity/2, env_kb/1)).
 
 
 

@@ -28,26 +28,26 @@ append_termlist(Call,EList,CallE):-must((compound(Call),is_list(EList))), Call=.
 % Logic Preds Shared
 % ========================================
 
-:-export(is_svo_functor/1).
+:- export(is_svo_functor/1).
 is_svo_functor(Prop):- hotrace((atom(Prop),arg(_,svo(svo,prop,valueOf,rdf),Prop))).
 
-:-export(hilog_functor/1).
+:- export(hilog_functor/1).
 hilog_functor(true_t).
 
-:-export(is_holds_true_not_hilog/1).
+:- export(is_holds_true_not_hilog/1).
 is_holds_true_not_hilog(HOFDS):-is_holds_true(HOFDS),\+ hilog_functor(HOFDS).
 
-:-export(is_holds_true/1).
+:- export(is_holds_true/1).
 is_holds_true(Prop):- hotrace((atom(Prop),is_holds_true0(Prop))),!.
 
 % k,p,..
 is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,t,t,asserted_mpred_t,assertion_t,true_t,assertion,secondOrder,firstOrder),Prop).
 % is_holds_true0(Prop):-atom_concat(_,'_t',Prop).
 
-:-export(is_2nd_order_holds/1).
+:- export(is_2nd_order_holds/1).
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 
-:-export(is_holds_false/1).
+:- export(is_holds_false/1).
 is_holds_false(Prop):-hotrace((atom(Prop),is_holds_false0(Prop))).
 
 is_holds_false0(Prop):-member(Prop,[not,nholds,holds_f,mpred_f,aint,assertion_f,not_true_t,asserted_mpred_f,retraction,not_secondOrder,not_firstOrder]).
@@ -73,9 +73,9 @@ isNonVar(Denotation):-not(isSlot(Denotation)).
 % ===============================================================================================
 % ===============================================================================================
 
-:-if(\+ current_predicate(isSlot/1)).
+:- if(\+ current_predicate(isSlot/1)).
 isSlot(Denotation):-((isVarProlog(Denotation);isVarObject(Denotation))),!.
-:-endif.
+:- endif.
 
 isSlot(Denotation,Denotation):- isVarProlog(Denotation),!.
 isSlot(Denotation,PrologVar):- isVarObject(Denotation,PrologVar),!.
@@ -260,7 +260,7 @@ put_singles(Wff,Exists,[S|Singles],NewWff):-
    put_singles(WffM,Exists,Singles,NewWff),!.
 
 
-:-meta_predicate(call_last_is_var(0)).
+:- meta_predicate(call_last_is_var(0)).
 call_last_is_var(MCall):- strip_module(MCall,M,Call),
    must((compound(Call),functor(Call,_,A))),
    arg(A,Call,Last),nonvar(Last),Call=..FArgs,
@@ -324,11 +324,11 @@ wrap_in_neg_functor(mpred,X,not(X)).
 wrap_in_neg_functor(callable,X, (\+(X))).
 
 
-:-export(infix_op/2).
+:- export(infix_op/2).
 infix_op(Op,_):-comparitiveOp(Op).
 infix_op(Op,_):-additiveOp(Op).
 
-:-export(comparitiveOp/1).
+:- export(comparitiveOp/1).
 comparitiveOp((\=)).
 comparitiveOp((\==)).
 comparitiveOp((=)).
@@ -339,7 +339,7 @@ comparitiveOp((>)).
 comparitiveOp((=<)).
 comparitiveOp((>=)).
 
-:-export(additiveOp/1).
+:- export(additiveOp/1).
 additiveOp((is)).
 additiveOp((*)).
 additiveOp(+).
@@ -376,7 +376,7 @@ is_sentence_functor(exists).
 is_sentence_functor(all).
 
 
-:-dynamic(leave_as_is0/1).
+:- dynamic(leave_as_is0/1).
 leave_as_is(V):- \+ compound(V),!.
 leave_as_is((_ :-_ )):-!,fail.
 leave_as_is((_;_)):-!,fail.
@@ -474,7 +474,7 @@ is_ftEquality(skolem(_,_)).
 is_ftEquality(equals(_,_)).
 is_ftEquality(termOfUnit(_,_)).
 
-:-thread_local(thlocal:dont_use_mudEquals/0).
+:- thread_local(thlocal:dont_use_mudEquals/0).
 
 
 ensure_quantifiers(Wff:- B,WffO):- B== true,!, ensure_quantifiers(Wff,WffO).

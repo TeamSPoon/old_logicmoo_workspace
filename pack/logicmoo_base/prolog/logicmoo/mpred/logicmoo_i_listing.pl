@@ -145,8 +145,8 @@ loop_check_true(G):-loop_check(G,ignore(arg(1,G,[]))).
 
 % ***** predicates for brousing justifications *****
 
-:-dynamic(whymemory/2).
-:-thread_local(thlocal:is_pfc_interactive_why/0).
+:- dynamic(whymemory/2).
+:- thread_local(thlocal:is_pfc_interactive_why/0).
 
 :- use_module(library(lists)).
 
@@ -289,13 +289,13 @@ pfc_contains_term(What,Inside):- (\+ \+ once((subst(Inside,What,foundZadooksy,Di
 
 % user:listing_mpred_hook(What):- debugOnError(pfc_listing(What)).
 
-:-thread_local thlocal:pfc_listing_disabled.
+:- thread_local thlocal:pfc_listing_disabled.
 % listing(L):-with_assertions(thlocal:pfc_listing_disabled,listing(L)).
 
 pfc_listing(What):-thlocal:pfc_listing_disabled,!.
 pfc_listing(What):-loop_check(pfc_listing_nlc(What)).
 
-:-meta_predicate(pfc_listing_nlc(?)).
+:- meta_predicate(pfc_listing_nlc(?)).
 
 pfc_listing_nlc(M:What):-atom(M),!,M:pfc_listing(What).
 pfc_listing_nlc(What):-loop_check(pfc_listing_0(What),true).
@@ -368,7 +368,7 @@ pfc_listing_1(What):-
 
 
 % logicmoo_html_needs_debug.
-:-multifile shared_hide_data/1.
+:- multifile shared_hide_data/1.
 
 shared_hide_data('$was_imported_kb_content$'/2):- !,listing_filter(hideMeta).
 shared_hide_data(spftY/4):- !,listing_filter(hideTriggers).
@@ -395,7 +395,7 @@ this_listing(M:F/A):-functor(H,F,A),predicate_property(H,number_of_causes(_)),!,
 this_listing(M:F/A):-listing(M:F/A),!.
 this_listing(MFA):-listing(MFA).
 
-:-thread_local(sortme_buffer/2).
+:- thread_local(sortme_buffer/2).
 
 
 % i2tml_save(Obj,H):- \+ is_list(H),cyc:pterm_to_sterm(H,S),H\=@=S,!,i2tml_save(Obj,S).
@@ -429,12 +429,12 @@ pp_i2tml_save_seen(HB):- pp_now, !,pp_i2tml(HB),!.
 pp_i2tml_save_seen(HB):- assertz_if_new(sortme_buffer(Obj,HB)),!.
 
 
-:-thread_local(thlocal:pp_i2tml_hook/1).
+:- thread_local(thlocal:pp_i2tml_hook/1).
 
-:-thread_local(thlocal:tl_hide_data/1).
+:- thread_local(thlocal:tl_hide_data/1).
    
-:-thread_local(shown_subtype/1).
-:-thread_local(shown_clause/1).
+:- thread_local(shown_subtype/1).
+:- thread_local(shown_clause/1).
 
 section_open(Type):-  once(shown_subtype(Type)->true;((thlocal:print_mode(html)->format('~n</pre><hr>~w<hr><pre>~n<font face="verdana,arial,sans-serif">',[Type]);(draw_line,format('% ~w~n~n',[Type]))),asserta(shown_subtype(Type)))),!.
 section_close(Type):- shown_subtype(Type)->(retractall(shown_subtype(Type)),(thlocal:print_mode(html)->format('</font>\n</pre><hr/><pre>',[]);draw_line));true.
@@ -447,7 +447,7 @@ pp_item_html(_,P):- (listing_filter(P); (compound(P),functor(P,F,A),(listing_fil
 pp_item_html(Type,H):- \+ thlocal:print_mode(html), pp_item_html_now(Type,H),!.
 pp_item_html(Type,H):- ignore((flag(matched_assertions,X,X),between(0,5000,X),pp_item_html_now(Type,H))).
 
-:-dynamic(last_item_offered/1).
+:- dynamic(last_item_offered/1).
 last_item_offered(unknonw).
 
 
@@ -459,8 +459,8 @@ pp_item_html_now(Type,H):-
 
 pp_item_html_if_in_range(Type,H):- section_open(Type),!,pp_i2tml(H),!,nl.
 
-:-thread_local(thlocal:last_show_clause_ref/1).
-:-thread_local(thlocal:current_clause_ref/1).
+:- thread_local(thlocal:last_show_clause_ref/1).
+:- thread_local(thlocal:current_clause_ref/1).
 
 
 show_clause_ref(Ref):- Ref == none,!.
@@ -618,7 +618,7 @@ url_encode_term(InTerm,VsIn,URL):-
 %   b_setval(URL,InTerm).
 
 write_as_url_encoded(_Arg, D):- url_encode(D,U),!,writeq(U).
-:-format_predicate('u',write_as_url_encoded(_Arg,_Time)).
+:- format_predicate('u',write_as_url_encoded(_Arg,_Time)).
 
 term_to_pretty_string(H,HS):-atomic(H),!,with_output_to(atom(HS),writeq(H)).
 term_to_pretty_string(H,HS):-

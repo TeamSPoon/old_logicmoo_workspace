@@ -29,6 +29,7 @@
     the GNU General Public License.
 */
 
+end_of_file.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This module implements the iz/2 constraint. It allows two terms
@@ -60,7 +61,7 @@ iz:iz(X,Y) :-
 iz:attr_portray_hook(variz(L,U),_Var) :-
 	write(iz([L-U])).
 
-:-meta_predicate(mshow_call(0)).
+:- meta_predicate(mshow_call(0)).
 
 mshow_call(C):-call(C).
 

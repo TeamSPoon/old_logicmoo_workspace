@@ -442,7 +442,7 @@ pttp_quantifier(F):- pttp_nnf_pre_clean_functor(F,(all),[]);pttp_nnf_pre_clean_f
 
 should_be_poss(argInst).
 
-:-dynamic(elInverse/2).
+:- dynamic(elInverse/2).
 
 clauses_to_boxlog(KB,Why,In,Prolog):- clauses_to_boxlog_0(KB,Why,In,Prolog).
 
@@ -590,7 +590,7 @@ local_sterm_to_pterm(Wff,WffO):- sexpr_sterm_to_pterm(Wff,WffO),!.
 
 
 
-:-op(1000,fy,(kif_tell)).
+:- op(1000,fy,(kif_tell)).
 
 /*
 :- export((kif_tell)/2).
@@ -602,7 +602,7 @@ kif_tell(Why,Wff):-
       kif_tell_boxes(assert_wfs_def,Why,Wff,Asserts))),!.
 
 
-:-thread_local(thlocal:assert_wfs/2).
+:- thread_local(thlocal:assert_wfs/2).
 assert_wfs_def(HBINFO,HB):-if_defined(thlocal:assert_wfs(HBINFO,HB)),!.
 assert_wfs_def(Why,H):-assert_wfs_fallback(Why,H).
 
@@ -614,7 +614,7 @@ assert_wfs_fallback0(Why, HB):- adjust_kif('$VAR'(KB),HB,HBK),demodal('$VAR'(KB)
 
 */
 
-:-export(kb_incr/2).
+:- export(kb_incr/2).
 kb_incr(WffNum1 ,WffNum2):-is_ftVar(WffNum1),trace_or_throw(kb_incr(WffNum1 ,WffNum2)).
 kb_incr(WffNum1 ,WffNum2):-number(WffNum1),WffNum2 is WffNum1 + 1,!.
 %kb_incr(WffNum1 ,WffNum2):-atom(WffNum1),WffNum2=..[WffNum1,0],!.
@@ -647,7 +647,7 @@ kif_tell_boxes1(Why,List):- is_list(List),!,list_to_set(List,[H|T]),must_det_l((
 kif_tell_boxes1(_,z_unused(_)):-!.
 kif_tell_boxes1(Why,AssertI):- must_det_l((simplify_bodies(AssertI,AssertO),kif_tell_boxes3(save_wfs,Why,AssertO))).
 
-:-thread_local(thlocal:in_code_Buffer/3).
+:- thread_local(thlocal:in_code_Buffer/3).
 
 
 kif_tell_boxes3(How,Why,Assert):- 
