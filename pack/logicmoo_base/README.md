@@ -1,12 +1,15 @@
-# Logicmoo_base 
+# logicmoo_base
 
-A package for First Order Logic (FOL) declarations in Prolog source code.
+Is probably 10 packages... 
+ 
 
-# Introduction 
+# First Order Logic (FOL) declarations in Prolog source code. 
 
 Prolog, like most logic programming languages, offers depth first backward chaining as the only reasoning scheme. It is well known that sound and complete reasoning systems can be built using either exclusive backward chaining or exclusive forward chaining. Thus, this is not a theoretical problem. It is also well understood how to ``implement'' forward reasoning using an exclusively backward chaining system and vice versa. Thus, this need not be a practical problem. In fact, many of the logic-based languages developed for AI applications allow one to build systems with both forward and backward chaining rules.
 
 There are, however, some interesting and important issues which need to be addresses in order to provide the Prolog programmer with a practical, efficient, and well integrated facility for forward chaining.
+
+# Forward chaining macros create smaller self-maintaining codebase.
 
 This module uses such a facility, written by Tim Finin called PFC, which he has implemented in standard Prolog. The PFC  system is a package that provides a forward reasoning capability to be used together with conventional Prolog programs. The PFC  inference rules are Prolog terms which are asserted as facts into the regular Prolog database.
 
@@ -15,7 +18,7 @@ The PFC  system package provides a forward reasoning capability to be used toget
 # FIRST ORDER LOGIC 
 Despite Prolog's logic heritage and its use of model elimination in linear logic theorem-proving in projects such as LeanTAP , Prolog fails to qualify as a full general-purpose theorem-proving system. There are three main reasons: (1) Prolog is a programming language and not an inference engine so if we used  the unification algorithm of Prolog for FOL, it is unsound,  (2) Prolog's unbounded depth-first search strategy is inefficient when it is doing complete search, and (3) Prolog's inference system is not complete for non-Horn clauses. Nevertheless, Prolog is quite interesting from a theorem-proving standpoint because of its very high inference rate as compared to conventional theorem-proving programs. 
 
-Logicmoo’s use of the Prolog Technology Theorem Prover (PTTP) was to overcome the deficiencies while retaining as fully as possible the high performance of well-engineered Prolog systems.
+Logicmooâ€™s use of the Prolog Technology Theorem Prover (PTTP) was to overcome the deficiencies while retaining as fully as possible the high performance of well-engineered Prolog systems.
 
 PTTP is an implementation of the model elimination theorem-proving procedure that extends Prolog to the full first-order predicate calculus. PTTP differs from Prolog in its use of (1) unification with the occurs check for soundness, (2) depth-first iterative deepening search instead of unbounded depth-first search to make the search strategy complete, and (3) the model elimination inference rule that is added to Prolog inferences to make the inference system complete. PTTP also extends Prolog by providing the capability of printing the proofs it finds. Because PTTP compiles the clauses of a problem, its inference rate is very high. Because PTTP uses depth-first search, its storage requirements are low and term size need not be limited to reduce memory usage at the expense of completeness. PTTP's simple architecture facilitates its adaptation and use in applications.
 
@@ -43,7 +46,6 @@ mother(Ma,X),mother(Ma,Y),{X\==Y}
      ==>sibling(X,Y).
 
 ````
-
 
 
 
@@ -98,6 +100,39 @@ You may have noticed that Logicmoo defines {}/1 as a escape construct for bypass
 
 As exemplified above, this is the same control construct that is used in grammar rules for bypassing the expansion of rule body goals when a rule is converted into a clause. 
 Both control constructs can be combined in order to call a goal from a grammar rule body, while bypassing at the same time the Prolog compiler. Consider the following example:
+
+
+
+
+
+# Runtime Loop checking.  @loop_check(+:Goal)
+
+````
+````
+
+
+# Lexical @with_assertions(+:ThreadLocal,+:Goal).
+
+
+````
+````
+
+
+# Online Prolog current state cross referencer.  
+````
+?- start_logicmoo_www(11111).
+
+````
+
+# S-Expr reader utilities
+
+The abiliity to use CLIF/KIF/CycL Etc
+
+
+# External predicate proxies 
+
+````
+````
 
 
 # Changes in this Version
