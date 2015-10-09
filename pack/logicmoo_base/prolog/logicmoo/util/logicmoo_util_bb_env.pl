@@ -336,7 +336,7 @@ is_env_expanded_file:- loading_file(File),!,once(file_name_extension(_,ocl,File)
 is_ocl_expanded_file:- loading_file(File),file_name_extension(_,ocl,File).
    
 /*
-user: term_expansion(A,B):- nonvar(A), A\==end_of_file, is_env_expanded_file,
+user:term_expansion(A,B):- nonvar(A), A\==end_of_file, is_env_expanded_file,
   env_term_expansion(A,B),
   must(nonvar(B)),A\=@=B.
 */

@@ -16,13 +16,13 @@
 % Douglas Miles
 */
 % ========================================
-% user: mpred_prop/1/2/3
+% user:mpred_prop/1/2/3
 % ========================================
 
 :- export(arity/2).
 :- export(mpred_module/2).
 :- dynamic(mpred_module/2).
-:- export(user: mpred_prop/2).
+:- export(user:mpred_prop/2).
 :- export(is_never_type/1).
 
 pred_type_test(H,F/_):-!,atom(F),THFA=..[H,F],clause(THFA,true).
@@ -61,7 +61,7 @@ decl_mpred_mfa(M,FF,A):-
    get_functor(FF,F,_),
    must_det_l([
      ignore((var(M),context_module(M),dmsg(decl_mpred_mfa(M,F,A)))),
-     ignore((nonvar(M),asserta_if_new(user: mpred_prop(F,mpred_module(M))))),
+     ignore((nonvar(M),asserta_if_new(user:mpred_prop(F,mpred_module(M))))),
      assert_arity(F,A),  
      must_det(nonvar(M)),
     '@'((
@@ -98,8 +98,8 @@ decl_mpred_prolog_ilc(CM,M,PI,F/A):-loop_check_term(decl_mpred_prolog_ilc_0(CM,M
 decl_mpred_prolog_ilc_0(_CM,M,PI,F/A):-
       assert_arity(F,A),
       add(mpred_module(PI,M)),
-      add(user: mpred_prop(PI,prologDynamic)),
-      add(user: mpred_prop(PI,predCanHaveSingletons)),!.
+      add(user:mpred_prop(PI,prologDynamic)),
+      add(user:mpred_prop(PI,predCanHaveSingletons)),!.
 
 
 % ========================================
@@ -158,19 +158,19 @@ decl_mpred_hybrid_ilc_0(_CM,M,PI,F/A):-
 
 
 
-% user: mpred_prop(F,prologDynamic):- not(user: mpred_prop(F,prologHybrid)),(F=ttPredType;(current_predicate(F/1);not(t(F,tCol)))).
-user: mpred_prop(G,predProxyAssert(add)):- atom(G),prologMacroHead(G).
-user: mpred_prop(G,predProxyQuery(ireq)):- atom(G),prologMacroHead(G).
-user: mpred_prop(G,predProxyRetract(del)):- atom(G),prologMacroHead(G).
+% user:mpred_prop(F,prologDynamic):- not(user:mpred_prop(F,prologHybrid)),(F=ttPredType;(current_predicate(F/1);not(t(F,tCol)))).
+user:mpred_prop(G,predProxyAssert(add)):- atom(G),prologMacroHead(G).
+user:mpred_prop(G,predProxyQuery(ireq)):- atom(G),prologMacroHead(G).
+user:mpred_prop(G,predProxyRetract(del)):- atom(G),prologMacroHead(G).
 */
 
 
 
 get_mpred_prop(F,_A,P):-get_mpred_prop(F,P).
-get_mpred_prop(F,P):- user: mpred_prop(F,P).
+get_mpred_prop(F,P):- user:mpred_prop(F,P).
 
 :- export(listprolog/0).
-listprolog:-listing(user: mpred_prop(_,prologDynamic)).
+listprolog:-listing(user:mpred_prop(_,prologDynamic)).
 
 
 get_arity(Term,F,A):- atom(Term),F=Term,!,ensure_arity(F,A).
@@ -275,4 +275,4 @@ add_mpred_prop_gleaned_4(Arg1,_F,_,FRGS):-decl_mpred(Arg1,FRGS).
 
 
 
-% user: term_expansion(G,_):- current_predicate(logicmoo_bugger_loaded/0),\+ t_l:disable_mpred_term_expansions_locally, not(t_l:into_form_code),hotrace((once(glean_pred_props_maybe(G)),fail)).
+% user:term_expansion(G,_):- current_predicate(logicmoo_bugger_loaded/0),\+ t_l:disable_mpred_term_expansions_locally, not(t_l:into_form_code),hotrace((once(glean_pred_props_maybe(G)),fail)).

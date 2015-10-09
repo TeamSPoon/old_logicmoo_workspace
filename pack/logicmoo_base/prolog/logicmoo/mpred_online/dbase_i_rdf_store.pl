@@ -460,15 +460,15 @@ rdf_assert_ignored((_:-INFOC)):-is_meta_info(INFOC),!.
 rdf_assert_ignored(svo(_,prologDynamic,_)).
 rdf_assert_ignored(mpred_prop(_,_)).
 rdf_assert_ignored(_:mpred_prop(_,_)).
-rdf_assert_ignored(user: mpred_prop(_,arity(1))).
-rdf_assert_ignored(user: mpred_prop(_,meta_argtypes(_))).
+rdf_assert_ignored(user:mpred_prop(_,arity(1))).
+rdf_assert_ignored(user:mpred_prop(_,meta_argtypes(_))).
 %rdf_assert_ignored(DB):-functor(DB,F,_),member(F,[ruleBackward,mudTermAnglify,'<=>']).
 rdf_assert_ignored(DB):-functor(DB,_,1).
 rdf_assert_ignored(G):-pfcTypeFull(G,Type),!,(Type==trigger;Type==support).
 % rdf_assert_ignored(DB):-  not(ground(DB)). 
 
 
-cyc_to_rdf(user: mpred_prop(P,PST),svo(F,StubType,S)):- PST=..[StubType,S],rdf_object(S),rdf_to_pred(P,F).
+cyc_to_rdf(user:mpred_prop(P,PST),svo(F,StubType,S)):- PST=..[StubType,S],rdf_object(S),rdf_to_pred(P,F).
 cyc_to_rdf(argIsa(P,1,D),domain(P,D)).
 cyc_to_rdf(isa(apathFn(A,Dir),T),isa([apathFn,A,Dir],T)).
 cyc_to_rdf(pathName(A,Dir,String),mudNamed([apathFn,A,Dir],String)).
@@ -694,7 +694,7 @@ sync_from_rdf:-forall(rdf_db:rdf(S,P,O,DB),add_spog(S,P,O,DB)).
 sync_to_rdf:-!.
 sync_to_rdf:-
    forall(p2q(P,NS,N),must(rdf_assert_p2q(P,NS,N))),  
-   forall(user: mpred_prop(P,O),rdf_assert_hook(user: mpred_prop(P,O))),
+   forall(user:mpred_prop(P,O),rdf_assert_hook(user:mpred_prop(P,O))),
    forall(t(C,I),rdf_assert_hook(isa(I,C))),
    forall(is_known_trew(B),rdf_assert_hook(B)),
    (lmconf:using_rdf_mpred_hook -> true ; (asserta(lmconf:using_rdf_mpred_hook),forall(prologHybridFact(G),rdf_assert_hook(G)))),

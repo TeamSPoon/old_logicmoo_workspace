@@ -57,7 +57,7 @@ into_plist_arities(_,_,plist(P,LIST),[P|LIST]):-!.
 into_plist_arities(_,_,Call,PLIST):-Call=..PLIST. % finally the fallthrue
 
 
-never_mpred_mpred(user: mpred_prop).
+never_mpred_mpred(user:mpred_prop).
 never_mpred_mpred(isa).
 never_mpred_mpred(arity).
 
@@ -77,7 +77,7 @@ t(CALL):- into_plist_arities(3,10,CALL,[P|LIST]),mpred_plist_t(P,LIST).
 mpred_plist_t(P,[]):-!,t(P).
 mpred_plist_t(P,LIST):-var(P),!,is_list(LIST),CALL=..[t,P|LIST],on_x_rtrace((CALL)).
 mpred_plist_t(t,[P|LIST]):-!, mpred_plist_t(P,LIST).
-mpred_plist_t(user: mpred_prop,[C,_A,I]):-!,ground(I:C),user: mpred_prop(C,I).
+mpred_plist_t(user:mpred_prop,[C,_A,I]):-!,ground(I:C),user:mpred_prop(C,I).
 mpred_plist_t(isa,[I,C]):-!,t(C,I).
 mpred_plist_t(P,_):-never_mpred_mpred(P),!,fail.
 mpred_plist_t(P,[L|IST]):-is_holds_true(P),!,mpred_plist_t(L,IST).
@@ -114,7 +114,7 @@ mpred_fact_arity(F,A):-arity(F,A),once(mpred_prop(F,prologHybrid);mpred_prop(F,p
 
 prologHybridFact(G):- (var(G)->(mpred_fact_arity(F,A),functor(G,F,A));true),into_mpred_form(G,M),!,no_repeats(mpred_call(M)).
 
-isCycPredArity_ignoreable(F,A):- ignore(user: mpred_prop(F,cycPred(A))),ignore(arity(F,A)).
+isCycPredArity_ignoreable(F,A):- ignore(user:mpred_prop(F,cycPred(A))),ignore(arity(F,A)).
 
 which_t(dac(d,a_notnow,c,no_fallback)).
 

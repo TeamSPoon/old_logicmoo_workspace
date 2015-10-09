@@ -43,8 +43,8 @@
 
 :- thread_local(t_l:disable_mpred_term_expansions_locally /0).
 :- multifile(system:term_expansion/2).
-:- multifile(user: term_expansion/2).
-:- multifile(user: goal_expansion/2).
+:- multifile(user:term_expansion/2).
+:- multifile(user:gioal_expansion/2).
 
 :-dynamic(registered_mpred_file/1).
 :-dynamic(never_registered_mpred_file/1).
@@ -157,8 +157,8 @@ load_time_sanity.
 :- dynamic(assertedTinyKB_implies_first/4).
 :- dynamic(assertedTinyKB_not_first/3).
 :- dynamic((exactlyAssertedEL_first/5,exactlyAssertedEL_with_vars/5,exactlyAssertedEL_with_vars/6,assertedTinyKB_implies_Already/4)).
-:- dynamic user: term_expansion/2.
-:- multifile user: term_expansion/2.
+:- dynamic user:term_expansion/2.
+:- multifile user:term_expansion/2.
 
 :- dynamic(formatted_resultIsa/2).
 :- multifile(formatted_resultIsa/2).
@@ -331,9 +331,9 @@ load_time_sanity.
 :- dynamic_multifile_exported user: decl_database_hook/2.
 
 :- multifile user: local_term_anglify/2.
-:- multifile user: term_anglify_last/2.
-:- multifile user: term_anglify_np/3.
-:- multifile user: term_anglify_np_last/3.
+:- multifile user:term_anglify_last/2.
+:- multifile user:term_anglify_np/3.
+:- multifile user:term_anglify_np_last/3.
 
 % HOOKS
 :- multifile user: create_random_fact/1.

@@ -22,8 +22,8 @@
 :- dynamic(assertedTinyKB_implies_first/4).
 :- dynamic(assertedTinyKB_not_first/3).
 :- dynamic((exactlyAssertedEL_first/5,exactlyAssertedEL_with_vars/5,exactlyAssertedEL_with_vars/6,assertedTinyKB_implies_Already/4)).
-:- dynamic user: term_expansion/2.
-:- multifile user: term_expansion/2.
+:- dynamic user:term_expansion/2.
+:- multifile user:term_expansion/2.
 
 :- dynamic(assertedTinyKB_not/3).
 :- dynamic(assertedTinyKB_implies/4).

@@ -2,8 +2,8 @@
 
 
 
-:-dynamic(user: mpred_prop/2).
-:-multifile(user: mpred_prop/2).
+:-dynamic(user:mpred_prop/2).
+:-multifile(user:mpred_prop/2).
 
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.

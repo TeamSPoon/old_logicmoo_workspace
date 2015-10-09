@@ -1,7 +1,7 @@
 
 
-:- multifile((term_expansion/2,user: term_expansion/2,system:term_expansion/2)).
-:- dynamic((term_expansion/2,user: term_expansion/2,system:term_expansion/2)).
+:- multifile((term_expansion/2,user:term_expansion/2,system:term_expansion/2)).
+:- dynamic((term_expansion/2,user:term_expansion/2,system:term_expansion/2)).
 
 :- multifile
         % '$pldoc'/4,

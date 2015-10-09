@@ -4,6 +4,7 @@
             ain0/1,
             aina/1,
             ainz/1,
+paina/1,pain/1,            painz/1,
             ainz_clause/1,
             ainz_clause/2,
             append_term/3,
@@ -37,6 +38,9 @@
 :- meta_predicate
         ain(:),
         ain0(:),
+        pain(:),
+        paina(:),
+        painz(:),
         aina(:),
         ainz(:),
         ainz_clause(:),
@@ -56,7 +60,7 @@
         eraseall(+, +),
         find_and_call(+, +, ?),
         mpred_mop(+, 1, ?),
-        mpred_op_prolog(1, :).
+        mpred_op_prolog(?, :).
 :- module_transparent
         append_term/3,
         assertz_new/1,
@@ -130,24 +134,28 @@ ain0(N):-clause_asserted(N)->true;mpred_op_prolog(assert,N).
 
 :- export(mpred_op_prolog/2).
 :- module_transparent(mpred_op_prolog/2).
-:- meta_predicate mpred_op_prolog(1,:).
-mpred_op_prolog(M:aina,N):-!,(clause_asserted(N)->true;mpred_op_prolog(M:asserta,N)).
-mpred_op_prolog(M:ainz,N):-!,(clause_asserted(N)->true;mpred_op_prolog(M:assertz,N)).
-mpred_op_prolog(M:ain,N):- !,(clause_asserted(N)->true;mpred_op_prolog(M:assert,N)).
-mpred_op_prolog(M:ain0,N):- !,(clause_asserted(N)->true;mpred_op_prolog(M:assert,N)).
+:- meta_predicate mpred_op_prolog(?,:).
+mpred_op_prolog(ain0,N):- !,(clause_asserted(N)->true;mpred_op_prolog0(assert,N)).
+mpred_op_prolog(paina,N):-!,(clause_asserted(N)->true;mpred_op_prolog0(asserta,N)).
+mpred_op_prolog(painz,N):-!,(clause_asserted(N)->true;mpred_op_prolog0(assertz,N)).
+mpred_op_prolog(pain,N):- !,(clause_asserted(N)->true;mpred_op_prolog0(assert,N)).
+mpred_op_prolog(aina,N):- !,(clause_asserted(N)->true;mpred_op_prolog0(asserta,N)).
+mpred_op_prolog(ainz,N):- !,(clause_asserted(N)->true;mpred_op_prolog0(assertz,N)).
+mpred_op_prolog(ain,N):-  !,(clause_asserted(N)->true;mpred_op_prolog0(assert,N)).
 % mpred_op_prolog(OP,M:Term):- unnumbervars(Term,Unumbered),Term \=@= Unumbered,!,trace,mpred_mop(M,OP,Unumbered).
-mpred_op_prolog(OP,M:Term):- !,mpred_mop(M,OP,Term).
+mpred_op_prolog(OP,M:Term):-  trace,!,mpred_mop(M, OP,Term).
 mpred_op_prolog(OP,M:Term):- 
   copy_term(Term, Copy, Gs),
   (Gs==[] -> mpred_mop(M,OP,Term);
     show_call((as_clause(Copy,H,B),conjoin(maplist(call,Gs),B,NB),trace,mpred_mop(M,OP,(H:-NB))))).
   
+mpred_op_prolog0(OP,MTerm):- call(OP,MTerm).
 
 % peekAttributes/2,pushAttributes/2,pushCateElement/2.
 :- module_transparent((aina/1,ain/1,ainz/1,ain0/1,ainz_clause/1,ainz_clause/2,clause_asserted/2,as_clause/2,clause_asserted/1,eraseall/2)).
 :- module_transparent((asserta_new/1,asserta_if_new/1,assertz_new/1,assertz_if_new/1,assert_if_new/1)). % ,assertz_if_new_clause/1,assertz_if_new_clause/2,clause_asserted/2,as_clause/2,clause_asserted/1,eraseall/2)).
 
-:- meta_predicate aina(:),ain(:),ainz(:),ain0(:),ainz_clause(:),ainz_clause(:,?).
+:- meta_predicate paina(:),pain(:),painz(:),ain0(:),ainz_clause(:),ainz_clause(:,?).
 :- meta_predicate clause_asserted(:,?),as_clause(?,?,?),clause_asserted(:),eraseall(+,+).
 
 % aina(NEW):-ignore((retract(NEW),fail)),asserta(NEW).
@@ -171,7 +179,7 @@ get_current_mpred_provider(OP,Term,PROVIDER):- lmhook:first_mpred_provider(OP,Te
 
 lmhook:first_mpred_provider(_,_,mpred_op_prolog).
 
-:- meta_predicate call_provider(0).
+:- meta_predicate call_provider(?).
 call_provider(P):-mpred_split_op_data(P,OP,Term),call_provider(OP,Term).
 
 call_provider(OP,Term):- must(get_current_mpred_provider(OP,Term,PROVIDER)),!,call(PROVIDER,OP,Term).
@@ -181,20 +189,25 @@ call_provider(OP,Term):- must(get_current_mpred_provider(OP,Term,PROVIDER)),!,
    (loop_check_early(must(lmhook:next_mpred_provider(PROVIDER,NEXT)),NEXT=mpred_op_prolog),!,PROVIDER\=NEXT,call(NEXT,OP,Term))).
 
 :- meta_predicate assert_if_new(:).
-assert_if_new(X):-mpred_op_prolog(ain,X).
+assert_if_new(X):-mpred_op_prolog(pain,X).
 :- meta_predicate asserta_if_new(:).
-asserta_if_new(X):-mpred_op_prolog(aina,X).
+asserta_if_new(X):-mpred_op_prolog(paina,X).
 :- meta_predicate assertz_if_new(:).
-assertz_if_new(X):-mpred_op_prolog(ainz,X).
+assertz_if_new(X):-mpred_op_prolog(painz,X).
 
 :- meta_predicate asserta_new(:).
-asserta_new(X):-mpred_op_prolog(aina,X).
+asserta_new(X):-mpred_op_prolog(paina,X).
 :- meta_predicate asserta_new(:).
-assertz_new(X):-mpred_op_prolog(ainz,X).
+assertz_new(X):-mpred_op_prolog(painz,X).
 
-ain(N):-call_provider(ain(N)).
-aina(N):-call_provider(aina(N)).
-ainz(N):-call_provider(ainz(N)).
+pain(N):- call_provider(pain(N)).
+paina(N):-call_provider(paina(N)).
+painz(N):-call_provider(painz(N)).
+
+
+ain(N):- call_provider(pain(N)).
+aina(N):-call_provider(paina(N)).
+ainz(N):-call_provider(painz(N)).
 
 ainz_clause(C):- as_clause(C,H,B),ainz_clause(H,B).
 ainz_clause(H,B):- clause_asserted(H,B)->true;call_provider(assertz((H:-B))).

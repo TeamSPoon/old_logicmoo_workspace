@@ -28,7 +28,7 @@ loading_source_file(F):-once(t_l:pretend_loading_file(F);prolog_load_context(sou
 load_language_file(Name0):- 
  forall(filematch_ext('qlf',Name0,Name),
   ((
-   w_tl([(user: term_expansion(_,_):-!,fail),(user: goal_expansion(_,_):-!,fail),(system:term_expansion(_,_):-!,fail),(system:goal_expansion(_,_):-!,fail)],
+   w_tl([(user:term_expansion(_,_):-!,fail),(user:gioal_expansion(_,_):-!,fail),(system:term_expansion(_,_):-!,fail),(system:goal_expansion(_,_):-!,fail)],
      gripe_time(1,(user: load_files(Name,[qcompile(auto),register(false),if(not_loaded  )])->asserta(user: never_reload_file(Name));retract(user: never_reload_file(Name)))))))),!.
  
 
@@ -290,7 +290,7 @@ myDebugOnError(Term):-catch(once(must((Term))),E,(dmsg(error(E,start_myDebugOnEr
 read_one_term(Term,Vs):- catch(once(( read_term(Term,[double_quotes(string),variable_names(Vs)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
 read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quotes(string),variable_names(Vs)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
 
-% rescan_mpred_stubs:- doall((user: mpred_prop(F,prologHybrid),arity(F,A),A>0,warnOnError(declare_mpred_local_dynamic(moo,F,A)))).
+% rescan_mpred_stubs:- doall((user:mpred_prop(F,prologHybrid),arity(F,A),A>0,warnOnError(declare_mpred_local_dynamic(moo,F,A)))).
 
 
 /*
@@ -652,10 +652,10 @@ expanded_already_functor(_:NV):-nonvar(NV),!,expanded_already_functor(NV).
 %is_compiling:-is_compiling_clause;compiling.
 
 
-:- multifile(user: term_expansion/2).
+:- multifile(user:term_expansion/2).
 :- multifile(system:goal_expansion/2).
 % system:goal_expansion(A,_B):-fail,hotrace((source_module(M),(M=mpred_sanity;M=user;M=system),if_defined(pmsg(M:goal_expansion(A)),format(user_output /*e*/,'~N% ~q~n',M:goal_expansion(A))))),fail.
-% user: term_expansion(A,_B):-fail,hotrace((source_module(M),(M=mpred_sanity;M=user;M=system),if_defined(pmsg(M:term_expansion(A)),format(user_output /*e*/,'~N% ~q~n',M:term_expansion(A))))),fail.
+% user:term_expansion(A,_B):-fail,hotrace((source_module(M),(M=mpred_sanity;M=user;M=system),if_defined(pmsg(M:term_expansion(A)),format(user_output /*e*/,'~N% ~q~n',M:term_expansion(A))))),fail.
 
 % system:goal_expansion(N,mpred_prove_neg(P)):-fail,mpred_from_negation_plus_holder(N,P),show_call_failure(mpred_prop(P,pfcControlled)).
 
@@ -741,8 +741,8 @@ inside_file(W) :- prolog_load_context(source,Source),user: mpred_directive_value
 inside_file(W) :- loading_source_file(Source),!,user: mpred_directive_value(W,_,Source),!.
 
 
-user: term_expansion((:- (M:DIR)),O):-atom(M),atom(DIR),with_source_module(M, ((mpred_directive_expansion(DIR,OO),!, must(O=(:- OO))))).
-user: term_expansion((:- DIR),O):- atom(DIR), mpred_directive_expansion(DIR,OO),!,must(O=(:- OO)).
+user:term_expansion((:- (M:DIR)),O):-atom(M),atom(DIR),with_source_module(M, ((mpred_directive_expansion(DIR,OO),!, must(O=(:- OO))))).
+user:term_expansion((:- DIR),O):- atom(DIR), mpred_directive_expansion(DIR,OO),!,must(O=(:- OO)).
 
 :-meta_predicate(mpred_file_expansion_0c(?,?)).
 :-meta_predicate(mpred_file_expansion_0a(?,?)).
@@ -973,9 +973,9 @@ system:goal_expansion(I,O):- current_prolog_flag(allow_variable_name_as_functor,
                        to_var_functors((:-),I,O),I\=@=O.
 
 
-%user: goal_expansion(G,OUT):- \+  t_l:disable_mpred_term_expansions_locally, G\=isa(_,_),(use_was_isa(G,I,C)),!,to_isa_out(I,C,OUT).
-%user: term_expansion(G,OUT):- \+  t_l:disable_mpred_term_expansions_locally, hotrace(use_was_isa(G,I,C)),!,to_isa_out(I,C,OUT).
-%user: term_expansion(I,O):- \+ t_l:disable_mpred_term_expansions_locally, t_l:consulting_sources, wno_tl(t_l:consulting_sources,add(I)),O=true.
+%user:gioal_expansion(G,OUT):- \+  t_l:disable_mpred_term_expansions_locally, G\=isa(_,_),(use_was_isa(G,I,C)),!,to_isa_out(I,C,OUT).
+%user:term_expansion(G,OUT):- \+  t_l:disable_mpred_term_expansions_locally, hotrace(use_was_isa(G,I,C)),!,to_isa_out(I,C,OUT).
+%user:term_expansion(I,O):- \+ t_l:disable_mpred_term_expansions_locally, t_l:consulting_sources, wno_tl(t_l:consulting_sources,add(I)),O=true.
 
 
 

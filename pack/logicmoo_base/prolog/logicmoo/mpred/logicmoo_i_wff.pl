@@ -225,7 +225,7 @@ logical_functor_ft((',')).
 :- dynamic(non_assertable/1).
 non_assertable(WW,isVar(WW)):- var(WW),!.
 non_assertable(_:WW,Why):- !,non_assertable(WW,Why).
-non_assertable(WW,notAssertable(Why)):- compound(WW),get_functor(WW,F),user: mpred_prop(F,notAssertable(Why)),!.
+non_assertable(WW,notAssertable(Why)):- compound(WW),get_functor(WW,F),user:mpred_prop(F,notAssertable(Why)),!.
 % non_assertable(WW,Why):- db_prop_add
 
 % ===============================================================================================

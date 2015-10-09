@@ -565,7 +565,7 @@ mpred_impl_module(M):- current_module(M),atom_concat(logicmoo_utils_,_,M).
 prolog:make_hook(before, Files):-forall(member(File,Files),retractall(logicmoo_varnames:varname_info_file(File))).
 prolog:make_hook(after, Files):-forall(member(File,Files),show_call(ain00(logicmoo_varnames:varname_info_file(File)))).
 
-user: term_expansion(HB,_):- current_prolog_flag(mpred_vars,true),term_expansion_save_vars(HB),fail.
+user:term_expansion(HB,_):- current_prolog_flag(mpred_vars,true),term_expansion_save_vars(HB),fail.
 
 
 logicmoo_util_varnames_file.

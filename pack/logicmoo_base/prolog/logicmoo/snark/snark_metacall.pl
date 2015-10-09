@@ -45,8 +45,8 @@
 
 :-multifile(use_kif_expansion/0).
 :-thread_local(use_kif_expansion/0).
-%user: term_expansion(H ,CE):-kif_term_expansion(H,CE),((H)\=@=CE,dmsg(kif_term_expansion(H,CE))).
-%user: goal_expansion(H ,CE):-kif_goal_expansion(H,CE),((H)\=@=CE,dmsg(kif_goal_expansion(H,CE))).
+%user:term_expansion(H ,CE):-kif_term_expansion(H,CE),((H)\=@=CE,dmsg(kif_term_expansion(H,CE))).
+%user:gioal_expansion(H ,CE):-kif_goal_expansion(H,CE),((H)\=@=CE,dmsg(kif_goal_expansion(H,CE))).
 
 
 use_kif_term(B):- use_kif_expansion;kif_hook(B);kif_pred_head(B).
@@ -120,9 +120,9 @@ dont_use_gcall(goal_expansion,2).
 use_gcall(_,2).
 gshow_call(C):-show_call_failure(C).
 
-user: goal_expansion(true,writeq(true)):-!.
-%user: goal_expansion(V,V):-not(compound(V)),!.
-%user: goal_expansion(G,O):-source_file(G,File),add_mi(file(File),G,O).
+user:gioal_expansion(true,writeq(true)):-!.
+%user:gioal_expansion(V,V):-not(compound(V)),!.
+%user:gioal_expansion(G,O):-source_file(G,File),add_mi(file(File),G,O).
 
 
 

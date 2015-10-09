@@ -582,8 +582,8 @@ is_static_pred(Head):-  predicate_property(Head,static),!.
 is_static_pred(Head):- predicate_property(Head,_), !, \+ (predicate_property(Head,dynamic)).
 is_static_pred(Head):-  predicate_property(Head,meta_predicate),!.
 
-prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),user: mpred_prop(F,prologDynamic),!, prolog_op(Op,G).
-prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),not(user: mpred_prop(F,prologHybrid)),!,current_predicate(_,G), prolog_op(Op,G).
+prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),user:mpred_prop(F,prologDynamic),!, prolog_op(Op,G).
+prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),not(user:mpred_prop(F,prologHybrid)),!,current_predicate(_,G), prolog_op(Op,G).
 use_if_modify_new:- current_predicate(assert_if_new/1).
 prolog_op(change(AR,Op), G):-ensure_dynamic(G),!,prolog_modify(change(AR,Op), G).
 

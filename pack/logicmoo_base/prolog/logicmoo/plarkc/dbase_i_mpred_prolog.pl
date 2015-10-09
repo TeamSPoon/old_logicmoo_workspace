@@ -31,8 +31,8 @@ user: mpred_provide_read_attributes(Obj,PropVal):- fail, safe_univ(PropVal,[Prop
      predicate_property(CallVal,_),!,mpred_call(CallVal).
 
 
-user: mpred_provide_read_attributes(F,_,_):-user: mpred_prop(F,prologHybrid),!,fail.
-user: mpred_provide_read_attributes(F,A,prologDynamic(F,A)):-user: mpred_prop(F,prologDynamic).
+user: mpred_provide_read_attributes(F,_,_):-user:mpred_prop(F,prologHybrid),!,fail.
+user: mpred_provide_read_attributes(F,A,prologDynamic(F,A)):-user:mpred_prop(F,prologDynamic).
 user: mpred_provide_read_attributes(F,A,Why):-functor_safe(P,F,A),user: mpred_provide_read_attributes(P,F,A,Why).
 
 user: mpred_provide_read_attributes(P,F,A,static_predicate(P)):-static_predicate(user,F,A).
@@ -44,10 +44,10 @@ user: mpred_provide_read_attributes(P,_,_,predicate_property(P,imported_from(sys
 :-export(prolog_side_effects/1).
 prolog_side_effects(G):-var(G),!,fail.
 prolog_side_effects(F/A):- ((integer(A);current_predicate(F/A)),functor(G,F,A)), prolog_side_effects(G).
-prolog_side_effects(G):-get_functor(G,F),user: mpred_prop(F,prologSideEffects),!.
+prolog_side_effects(G):-get_functor(G,F),user:mpred_prop(F,prologSideEffects),!.
 prolog_side_effects(G):-predicate_property(G,number_of_rules(N)),N >0,clause(G,(B,_)),compound(B),!.
 prolog_side_effects(G):-predicate_property(G,exported),!.
-prolog_side_effects(G):-functor_h(G,F),user: mpred_prop(F,prologDynamic),!.
+prolog_side_effects(G):-functor_h(G,F),user:mpred_prop(F,prologDynamic),!.
 prolog_side_effects(G):-get_mpred_prop(G,predStub(prologDynamic)),!.
 prolog_side_effects(P):-atom(P),!,prolog_side_effects(P/_).
 
@@ -59,10 +59,10 @@ cant_redefine(PI):-real_builtin_predicate(PI);predicate_property(PI,imported_fro
 user: mpred_provide_setup(Op,HeadIn,StubType,OUT):-  StubType = prologDynamic,
    get_pifunctor(HeadIn,Head,F),
  predicate_property(Head,_),
- not(user: mpred_prop(F,prologHybrid)),
+ not(user:mpred_prop(F,prologHybrid)),
  must(OUT=defined(user: mpred_provide_setup(Op,Head,StubType))),!.
 
-user: mpred_provide_setup(Op,HeadIn,prologDynamic,OUT):- get_functor(HeadIn,F),user: mpred_prop(F,prologHybrid),retractall(user: mpred_prop(F,prologDynamic)),
+user: mpred_provide_setup(Op,HeadIn,prologDynamic,OUT):- get_functor(HeadIn,F),user:mpred_prop(F,prologHybrid),retractall(user:mpred_prop(F,prologDynamic)),
    MSG = trace_or_throw(prologOnly_was_hybrid(HeadIn,Op)),
    wdmsg(MSG),must(OUT=MSG),!.
 
@@ -71,8 +71,8 @@ user: mpred_provide_setup(Op,HeadIn,StubType,OUT):-  StubType = prologDynamic, g
   must((Op= call(_))),
   not(current_predicate(F/A)),
   module_transparent(F/A),export(F/A),dynamic_safe(F/A),
-  asserta_if_new(user: mpred_prop(F,predStub(StubType))),
-  asserta_if_new(user: mpred_prop(F,StubType)),!,
+  asserta_if_new(user:mpred_prop(F,predStub(StubType))),
+  asserta_if_new(user:mpred_prop(F,StubType)),!,
   must(OUT=defined(user: mpred_provide_setup(Op,Head,StubType))).
    
 user: mpred_provide_setup(Op,HeadIn,StubType,OUT):-  StubType = prologDynamic, get_pifunctor(HeadIn,Head,F,A),  
@@ -81,12 +81,12 @@ user: mpred_provide_setup(Op,HeadIn,StubType,OUT):-  StubType = prologDynamic, g
   must_det_l((      
    (provide_clauses_list(Head,HBLIST)),
    erase_mpred_storage_op(Head),
-   (user: mpred_prop(F,prologHybrid) -> show_call((predicate_property(Head,thread_local)->retract_all(Head:-_);abolish(F,A);true)) ; true),
-   retract_all((user: mpred_prop(F,prologHybrid):-true)),
-   retract_all((user: mpred_prop(F,stubType(prologHybrid)):-true)),
+   (user:mpred_prop(F,prologHybrid) -> show_call((predicate_property(Head,thread_local)->retract_all(Head:-_);abolish(F,A);true)) ; true),
+   retract_all((user:mpred_prop(F,prologHybrid):-true)),
+   retract_all((user:mpred_prop(F,stubType(prologHybrid)):-true)),
    module_transparent(F/A),export(F/A),dynamic_safe(F/A),
-   asserta_if_new(user: mpred_prop(F,predStub(StubType))),
-   asserta_if_new(user: mpred_prop(F,StubType)),
+   asserta_if_new(user:mpred_prop(F,predStub(StubType))),
+   asserta_if_new(user:mpred_prop(F,StubType)),
    forall(member(HB,HBLIST),must(mpred_modify(change(assert,z),HB))),!,
    must_same_clauses(Head,HBLIST))),
    must(OUT=defined(user: mpred_provide_setup(Op,Head,StubType))).
@@ -108,9 +108,9 @@ retract_all(HB) :- ignore((retract(HB),fail)).
 is_static_pred(Head:-_):-!,predicate_property(Head,_),not(predicate_property(Head,dynamic)).
 is_static_pred(Head):-predicate_property(Head,_),not(predicate_property(Head,dynamic)).
 
-prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),user: mpred_prop(F,prologDynamic),!, prolog_op(Op,G).
-prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),user: mpred_prop(F,prologBuiltin),!, prolog_op(Op,G).
-prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),not(user: mpred_prop(F,prologHybrid)),!,current_predicate(_,G), prolog_op(Op,G).
+prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),user:mpred_prop(F,prologDynamic),!, prolog_op(Op,G).
+prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),user:mpred_prop(F,prologBuiltin),!, prolog_op(Op,G).
+prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),not(user:mpred_prop(F,prologHybrid)),!,current_predicate(_,G), prolog_op(Op,G).
 use_if_modify_new:- current_predicate(assert_if_new/1).
 prolog_op(change(AR,Op), G):-ensure_dynamic(G),!,prolog_modify(change(AR,Op), G).
 

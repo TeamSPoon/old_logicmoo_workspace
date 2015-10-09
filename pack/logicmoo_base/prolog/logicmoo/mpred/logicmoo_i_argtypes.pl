@@ -281,7 +281,7 @@ correctArgsIsa(Op,M:G,MAA):- nonvar(M),!,correctArgsIsa(Op,G,GG),M:GG=MAA.
 correctArgsIsa(_,(A,B),(AA,BB)):-!,correctArgsIsa(Op,A,AA),correctArgsIsa(Op,B,BB).
 correctArgsIsa(_,isa(Args,PredArgTypes),isa(Args,PredArgTypes)):- PredArgTypes==meta_argtypes,!.
 correctArgsIsa(_,G,GG):- get_functor(G,F,A),
-  arg(_,vv('{}'/_,  genls/_,user: mpred_prop/_,
+  arg(_,vv('{}'/_,  genls/_,user:mpred_prop/_,
     t/2,arity/_,genls/_,'<=>'/_,pt/_,rhs/_,nt/_,bt/_,
     formatted_resultIsa/_,resultIsa/_,quotedDefnIff/_),F/A),!,must_equals(G,GG).
 correctArgsIsa(_,G,GG):- get_functor(G,F),t(functorDeclares,F),!,must_equals(G,GG).

@@ -151,7 +151,7 @@ when_debugging(_,_).
 
 :- asserta(t_l:disable_mpred_term_expansions_locally).
 
-% user: goal_expansion(ISA,G) :- compound(ISA),t_l:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
+% user:gioal_expansion(ISA,G) :- compound(ISA),t_l:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
 :- meta_predicate(lmbase_record_transactions(?,?)).
 :- meta_predicate(lmbase_record_transactions_maybe(?,?)).
 :- meta_predicate(mpred_file_expansion(?,?)).
@@ -254,7 +254,7 @@ pop_predicates(M:F/A,STATE):- functor(H,F,A),forall(member((H:-B),STATE),M:asser
 
 
 
-user: term_expansion(I,OO):- (I==end_of_file->(must(do_end_of_file_actions),fail);
+user:term_expansion(I,OO):- (I==end_of_file->(must(do_end_of_file_actions),fail);
                                  (\+ t_l:disable_mpred_term_expansions_locally, 
                                      if_defined(lmbase_record_transactions(I,OO)),I\=@=OO)).
 

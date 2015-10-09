@@ -1210,7 +1210,7 @@ pttp_builtin(V,A):-is_ftVar(V),!,trace_or_throw(pttp_builtin(V,A)).
 pttp_builtin(!,0).
 
 
-pttp_builtin(P,_):- current_predicate(resultIsa/2),user: mpred_prop(P,predStub(prologHybrid)),!,fail.
+pttp_builtin(P,_):- current_predicate(resultIsa/2),user:mpred_prop(P,predStub(prologHybrid)),!,fail.
 pttp_builtin(isa,2):-!,fail.
 pttp_builtin(isa,_):-!,fail.
 pttp_builtin(S2,_):-is_p_to_not(S2),!,fail.
@@ -1263,12 +1263,12 @@ pttp_builtin(unify,_).
 pttp_builtin(identical_member_special,_).
 pttp_builtin(identical_member_special_loop_check,_).
 pttp_builtin(M:P,A):-atom(M),!,pttp_builtin(P,A).
-pttp_builtin(F,_):- (user: mpred_prop(F,prologBuiltin)),!. %,fail.
-% TODO pttp_builtin(F,_):- (user: mpred_prop(F,prologDynamic)),!. %,fail.
+pttp_builtin(F,_):- (user:mpred_prop(F,prologBuiltin)),!. %,fail.
+% TODO pttp_builtin(F,_):- (user:mpred_prop(F,prologDynamic)),!. %,fail.
 pttp_builtin(unifiable_member,_).
 % TODO pttp_builtin(t,_).
-%pttp_builtin(F,_):-user: mpred_prop(F,prologPTTP),!,fail.
-%pttp_builtin(F,_):-user: mpred_prop(F,prologKIF),!,fail.
+%pttp_builtin(F,_):-user:mpred_prop(F,prologPTTP),!,fail.
+%pttp_builtin(F,_):-user:mpred_prop(F,prologKIF),!,fail.
 pttp_builtin(F,A):-current_predicate(F/A),functor(P,F,A),builtin_why(P,F,A,Why),!,dmsg(todo(warn(builtin_why(F,A,Why)))).
 %%% ***
 

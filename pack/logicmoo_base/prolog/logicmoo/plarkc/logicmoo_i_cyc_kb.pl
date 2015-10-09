@@ -676,7 +676,7 @@ checkCycAvailablity:- ccatch((current_predicate(invokeSubL/2),ignore((invokeSubL
 */
 % :- dmsg("Loading tinyKB should take under a minute 666").
 
-% :-must((asserta((user: term_expansion(A,B):-cyc_to_clif_notify(A,B),!),CLREF),asserta(at_eof_action(erase(CLREF))))).
+% :-must((asserta((user:term_expansion(A,B):-cyc_to_clif_notify(A,B),!),CLREF),asserta(at_eof_action(erase(CLREF))))).
 :- gripe_time(60,user: qcompile(logicmoo(plarkc/logicmoo_i_cyc_kb_tinykb))).
 %:-must(forall(retract(at_eof_action(CALL)),must(CALL))).
 

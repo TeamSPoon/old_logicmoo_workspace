@@ -11,7 +11,7 @@
 :- include(logicmoo_i_header).
 
 
-% user: term_expansion(A,B):- \+ t_l:disable_mpred_term_expansions_locally, current_predicate(pfcExpansion_loaded/0),loop_check(mpred_file_expansion(A,B)),A\=@=B.
+% user:term_expansion(A,B):- \+ t_l:disable_mpred_term_expansions_locally, current_predicate(pfcExpansion_loaded/0),loop_check(mpred_file_expansion(A,B)),A\=@=B.
 
 
 :- mpred_trace.
