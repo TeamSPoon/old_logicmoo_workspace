@@ -70,7 +70,7 @@ Also alows an inference engine constrain search.. PFC became important since it 
 :- dynamic(singleValuedInArg/2).
 :- dynamic(ptReformulatorDirectivePredicate/1).
 
-:-discontiguous(user: mpred_init_once/0).
+:-discontiguous(lmconf:mpred_hook_init_files/0).
 
 is_side_effect_disabled:- t_l:no_physical_side_effects,!.
 is_side_effect_disabled:- t_l:side_effect_ok,!,fail.
@@ -126,9 +126,9 @@ is_side_effect_disabled:- t_l:noDBaseMODs(_),!.
 
 
 set_prolog_stack_gb(Six):-set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
-user: mpred_init_once:-set_prolog_stack_gb(16).
-:-multifile(user: rescan_mpred_hook/0).
-:-dynamic(user: rescan_mpred_hook/0).
+lmconf:mpred_hook_init_files:-set_prolog_stack_gb(16).
+:-multifile(lmconf:mpred_hook_rescan_files/0).
+:-dynamic(lmconf:mpred_hook_rescan_files/0).
 :-dynamic(use_presently/0).
 :-dynamic(mpred_undo_method/2).
 % used to annotate a predciate to indicate PFC support
@@ -296,7 +296,7 @@ mpred_is_taut(B==>(_,A)):-is_ftNonvar(A),mpred_is_taut(A==>B),!.
 
 loop_check_nr(CL):- loop_check(no_repeats(CL)).
 
-user: decl_database_hook(Op,Hook):- loop_check_nr(mpred_mpred_provide_storage_op(Op,Hook)).
+lmconf:decl_database_hook(Op,Hook):- loop_check_nr(mpred_mpred_provide_storage_op(Op,Hook)).
 
 is_retract_first(one).
 is_retract_first(a).
@@ -580,10 +580,10 @@ mpred_init_i(GeneralTerm,Default) :-
   clause_i(GeneralTerm,true) -> true ; assert_i(Default).
 
 %= fcTmsMode is one of {none,local,cycles} and controles the tms alg.
-user: mpred_init_once:- pmust((mpred_init_i(fcTmsMode(_), fcTmsMode(cycles)))).
+lmconf:mpred_hook_init_files:- pmust((mpred_init_i(fcTmsMode(_), fcTmsMode(cycles)))).
 
 % Pfc Search strategy. mpred_search(X) where X is one of {direct,depth,breadth}
-user: mpred_init_once:- mpred_init_i(mpred_search(_), mpred_search(direct)).
+lmconf:mpred_hook_init_files:- mpred_init_i(mpred_search(_), mpred_search(direct)).
 
 % aliases
 mpred_adda(G):-mpred_add(G).
@@ -2233,7 +2233,7 @@ mpred_retract_or_warn_i(_).
 
 mpred_traced(_):- mpred_is_tracing.
 
-user: mpred_init_once:- mpred_init_i(mpred_warnings(_), mpred_warnings(true)).
+lmconf:mpred_hook_init_files:- mpred_init_i(mpred_warnings(_), mpred_warnings(true)).
 
 
 
@@ -2364,7 +2364,7 @@ mpred_no_trace_all :-  retractall_i(t_l:mpred_trace_exec).
 mpred_spy_all :- !. %assert_i(t_l:mpred_trace_exec).
 mpred_trace_all :- !. %assert_i(t_l:mpred_trace_exec).
 mpred_trace :- mpred_trace(_).
-user: mpred_init_once:-mpred_no_trace_all.
+lmconf:mpred_hook_init_files:-mpred_no_trace_all.
 
 mpred_trace(Form) :-
   assert_i(mpred_traced(Form)).
@@ -2446,7 +2446,7 @@ nompred_warn :-
 
 mpred_warn(Msg) :-  mpred_warn(Msg,[]).
 
-user: mpred_init_once:-mpred_warn.
+lmconf:mpred_hook_init_files:-mpred_warn.
 
 mpred_warn(Msg,Args) :-
   gethostname(ubuntu),!,
@@ -2683,7 +2683,7 @@ cnstrn(X):-term_variables(X,Vs),maplist(cnstrn0(X),Vs),!.
 cnstrn(V,X):-cnstrn0(X,V).
 cnstrn0(X,V):-when(is_ftNonvar(V),X).
 
-rescan_pfc:-forall(clause(user: rescan_mpred_hook,Body),show_call_entry(Body)).
+rescan_pfc:-forall(clause(lmconf:mpred_hook_rescan_files,Body),show_call_entry(Body)).
 
 mpred_facts_and_universe(P):- (is_ftVar(P)->pred_head_all(P);true),(meta_wrapper_rule(P)->(no_repeats(on_x_rtrace(P))) ; (no_repeats(on_x_rtrace(P)))).
 
@@ -2736,22 +2736,22 @@ fwd_ok(clif(_)).
 mpred_facts_only(P):- (is_ftVar(P)->(pred_head_all(P),\+ meta_wrapper_rule(P));true),(no_repeats(on_x_rtrace(P))).
 
 :- thread_local(t_l:in_rescan_mpred_hook/0).
-user: rescan_mpred_hook:- forall(mpred_facts_and_universe(P),w_tl(t_l:in_rescan_mpred_hook,mpred_fwd(P))).
-user: rescan_mpred_hook:- forall(mpred_facts_and_universe(P),w_tl(t_l:in_rescan_mpred_hook,mpred_scan_tms(P))).
+lmconf:mpred_hook_rescan_files:- forall(mpred_facts_and_universe(P),w_tl(t_l:in_rescan_mpred_hook,mpred_fwd(P))).
+lmconf:mpred_hook_rescan_files:- forall(mpred_facts_and_universe(P),w_tl(t_l:in_rescan_mpred_hook,mpred_scan_tms(P))).
 /*
-user: rescan_mpred_hook:- forall(pred_head(pred_u0,P), 
+lmconf:mpred_hook_rescan_files:- forall(pred_head(pred_u0,P), 
                           forall(no_repeats(P,call(P)),
                             show_if_debug(mpred_fwd(P)))).
 */
 
 :- set_prolog_flag(access_level,user).
 
-user: mpred_init_once:-multifile(mpred_default/1).
-user: mpred_init_once:-dynamic(mpred_default/1).
-user: mpred_init_once:-retractall(t_l:mpred_debug_local).
-user: mpred_init_once:-retractall(t_l:mpred_trace_exec).
-user: mpred_init_once:-retractall(mpred_traced(_)).
+lmconf:mpred_hook_init_files:-multifile(mpred_default/1).
+lmconf:mpred_hook_init_files:-dynamic(mpred_default/1).
+lmconf:mpred_hook_init_files:-retractall(t_l:mpred_debug_local).
+lmconf:mpred_hook_init_files:-retractall(t_l:mpred_trace_exec).
+lmconf:mpred_hook_init_files:-retractall(mpred_traced(_)).
 
-:- w_tl(t_l:side_effect_ok,doall(call_no_cuts(user: mpred_init_once))).
+:- w_tl(t_l:side_effect_ok,doall(call_no_cuts(lmconf:mpred_hook_init_files))).
 
 mpred_mpred_file.

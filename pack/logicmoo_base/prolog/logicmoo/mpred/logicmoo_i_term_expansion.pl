@@ -273,7 +273,7 @@ as_is_term(NC):-compound(NC),functor(NC,Op,2),infix_op(Op,_).
 
 db_expand_term(Op,SI,SentO):- loop_check(db_expand_term0(Op,SI,SentO),SI=SentO).
 
-db_expand_term0(_,Sent,SentO):-is_ftNonvar(Sent),copy_term(Sent,NoVary),if_defined(user: ruleRewrite(Sent,SentO),fail),Sent\=@=NoVary,SentO \=@= Sent.
+db_expand_term0(_,Sent,SentO):-is_ftNonvar(Sent),copy_term(Sent,NoVary),if_defined(lmconf:ruleRewrite(Sent,SentO),fail),Sent\=@=NoVary,SentO \=@= Sent.
 
 db_expand_term0(Op,Sent,SentO):- Op==callable, quasiQuote(QQuote),subst(Sent,QQuote,isEach,MID),Sent\=@=MID,!,db_expand_term(Op,MID,SentO).
 db_expand_term0(Op,Sent,SentO):- db_expand_final(Op ,Sent,SentO),!.
@@ -459,8 +459,8 @@ demodulize(_ ,HB,HB).
 db_expand_1(_,X,X).
 
 
-db_expand_2(_,Sent,SentO):-is_ftNonvar(Sent),user: ruleRewrite(Sent,SentO),!.
-db_expand_2(change(_,_),Sent,SentO):-is_ftNonvar(Sent),user: ruleRewrite(Sent,SentO),!.
+db_expand_2(_,Sent,SentO):-is_ftNonvar(Sent),lmconf:ruleRewrite(Sent,SentO),!.
+db_expand_2(change(_,_),Sent,SentO):-is_ftNonvar(Sent),lmconf:ruleRewrite(Sent,SentO),!.
 db_expand_2(_,X,X):-!.
 db_expand_2(_ ,NC,NC):- as_is_term(NC),!.
 db_expand_2(Op,Sent,SentO):-loop_check(expand_term(Sent,SentO)),Sent\=@=SentO,!.
@@ -652,7 +652,7 @@ into_functor_form(Dbase_t,_X,F,A,Call):-Call=..[Dbase_t,F|A].
 :-export(into_mpred_form/2).
 into_mpred_form(V,VO):- \+ (is_ftCompound(V)),!,VO=V.
 into_mpred_form(M:X,M:O):- atom(M),!,into_mpred_form(X,O),!.
-into_mpred_form(Sent,SentO):-is_ftNonvar(Sent),if_defined(user: ruleRewrite(Sent,SentM),fail),into_mpred_form(SentM,SentO).
+into_mpred_form(Sent,SentO):-is_ftNonvar(Sent),if_defined(lmconf:ruleRewrite(Sent,SentM),fail),into_mpred_form(SentM,SentO).
 into_mpred_form((H:-B),(HH:-BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H:-B),(HH:-BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H,B),(HH,BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).

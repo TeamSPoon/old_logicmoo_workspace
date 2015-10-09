@@ -481,11 +481,11 @@ assert_subclass_safe(O,T):-
 :-export(assert_isa_safe/2).
 assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(O,T))).
 
-%OLD user: decl_database_hook(change(assert,_A_or_Z),genls(S,C)):-decl_type_safe(S),decl_type_safe(C).
+%OLD lmconf:decl_database_hook(change(assert,_A_or_Z),genls(S,C)):-decl_type_safe(S),decl_type_safe(C).
 
 
-%OLD user: decl_database_hook(change(assert,_A_or_Z),isa(W,ttTemporalType)):-decl_type_safe(W). %,call_after_mpred_load(forall(isa(I,W),create_instance(I,W))).
-%OLD user: decl_database_hook(change(assert,_A_or_Z),isa(W,tCol)):- (test_tl(infSupertypeName);true),guess_supertypes(W).
+%OLD lmconf:decl_database_hook(change(assert,_A_or_Z),isa(W,ttTemporalType)):-decl_type_safe(W). %,call_after_mpred_load(forall(isa(I,W),create_instance(I,W))).
+%OLD lmconf:decl_database_hook(change(assert,_A_or_Z),isa(W,tCol)):- (test_tl(infSupertypeName);true),guess_supertypes(W).
 
 :-dynamic(tried_guess_types_from_name/1).
 :-dynamic(did_learn_from_name/1).
@@ -599,11 +599,11 @@ assert_isa_reversed(T,I):-assert_isa(I,T).
 % ================================================
 % assert_isa HOOKS
 % ================================================
-%OLD user: decl_database_hook(_,genls(_,_)):-retractall(a(_,isa,_,_)),retractall(a(_,genls,_,_)).
-%OLD user: decl_database_hook(change(assert,_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace(doall(assert_isa_hooked(I,T))).
-%OLD user: decl_database_hook(change(assert,_),isa(I,T)):- assert_hasInstance(T,I),fail.
+%OLD lmconf:decl_database_hook(_,genls(_,_)):-retractall(a(_,isa,_,_)),retractall(a(_,genls,_,_)).
+%OLD lmconf:decl_database_hook(change(assert,_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace(doall(assert_isa_hooked(I,T))).
+%OLD lmconf:decl_database_hook(change(assert,_),isa(I,T)):- assert_hasInstance(T,I),fail.
 
-%OLD user: decl_database_hook(change( retract,_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
+%OLD lmconf:decl_database_hook(change( retract,_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
 
 assert_isa_hooked(A,_):-retractall(a(cache_I_L,isa,A,_)),fail.
 assert_isa_hooked(F,T):- a(ttPredType,T),decl_mpred(F,T),fail.
@@ -626,7 +626,7 @@ assert_isa_hooked(food5,tWeapon):-trace_or_throw(assert_isa(food5,tWeapon)).
 % assert_isa_hooked(I,T):-dmsg((told(assert_isa(I,T)))).
 
 
-%OLD user: decl_database_hook(change(assert,_),isa(I,T)):- doall(assert_isa_hooked_after(I,T)).
+%OLD lmconf:decl_database_hook(change(assert,_),isa(I,T)):- doall(assert_isa_hooked_after(I,T)).
 
 assert_isa_hooked_after(F,T):-a(ttPredType,T),!,decl_mpred(F,T).
 assert_isa_hooked_after(_,tCol):-!.

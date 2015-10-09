@@ -328,7 +328,7 @@ load_time_sanity.
 :- dynamic_multifile_exported user: loading_module_h/1.
 :- dynamic_multifile_exported user: registered_module_type/2.
 :- dynamic_multifile_exported user: is_mpred_file/1.
-:- dynamic_multifile_exported user: decl_database_hook/2.
+:- dynamic_multifile_exported lmconf:decl_database_hook/2.
 
 :- multifile user: local_term_anglify/2.
 :- multifile user:term_anglify_last/2.
@@ -337,8 +337,8 @@ load_time_sanity.
 
 % HOOKS
 :- multifile user: create_random_fact/1.
-:- multifile user: decl_coerce/3.
-:- multifile user: decl_database_hook/2.
+:- multifile lmconf:decl_coerce/3.
+:- multifile lmconf:decl_database_hook/2.
 :- multifile user: deduce_facts/2.
 :- multifile user: default_type_props/3.
 :- multifile user: fact_always_true/1.

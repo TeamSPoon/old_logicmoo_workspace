@@ -441,8 +441,8 @@ rdf_object(O):-ground(O).
 
 :-dynamic(lmconf:using_rdf_mpred_hook).
 
-:-multifile(user: decl_database_hook).
-%OLD user: decl_database_hook(change(assert,_A_or_Z),DBI):- copy_term(DBI,DB), lmconf:using_rdf_mpred_hook,numbervars_with_names(DB),rdf_assert_hook(DB),!.
+:-multifile(lmconf:decl_database_hook).
+%OLD lmconf:decl_database_hook(change(assert,_A_or_Z),DBI):- copy_term(DBI,DB), lmconf:using_rdf_mpred_hook,numbervars_with_names(DB),rdf_assert_hook(DB),!.
 
 :-thread_local(t_l:rdf_asserting/2).
 

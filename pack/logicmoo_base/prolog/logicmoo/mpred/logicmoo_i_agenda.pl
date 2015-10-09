@@ -146,10 +146,10 @@ add_later(Fact):- call_after_mpred_load(add(Fact)).
 %
 %     assert/retract hooks
 % ========================================
-:- export(user: decl_database_hook/2).
+:- export(lmconf:decl_database_hook/2).
 % hooks are declared as
-%        user: decl_database_hook(change(assert,A_or_Z),Fact):- ...
-%        user: decl_database_hook(change( retract,One_or_All),Fact):- ...
+%        lmconf:decl_database_hook(change(assert,A_or_Z),Fact):- ...
+%        lmconf:decl_database_hook(change( retract,One_or_All),Fact):- ...
 
 run_database_hooks(Type,Hook):- t_l:noDBaseHOOKS(_),dmsg(noDBaseHOOKS(Type,Hook)),!.
 run_database_hooks(Type,HookIn):-run_database_hooks_0(Type,HookIn).
@@ -168,7 +168,7 @@ run_database_hooks_0(TypeIn,HookIn):-
    kb_db_op(TypeIn,Type),
    into_mpred_form(HookIn,Hook),
    copy_term(Hook,HookCopy),
-   loop_check_term(doall(call_no_cuts(user: decl_database_hook(Type,HookCopy))),run_database_hooks(Hook),true).
+   loop_check_term(doall(call_no_cuts(lmconf:decl_database_hook(Type,HookCopy))),run_database_hooks(Hook),true).
 
 % ========================================
 % Rescan for consistency

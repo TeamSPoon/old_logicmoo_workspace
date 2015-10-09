@@ -88,11 +88,11 @@ db_redir_op_if_needed(Op,_C0,Prop,ARGS):- database_modify_units(Op,Unit).
 maybe_storage_stub(F,StubType):- hybrid_tPredStubImpl(StubType),not((StubType==prologDynamic)),arity(F,A),must(ensure_universal_stub(F/A)).
 
 
-%OLD user: decl_database_hook(change(assert,_),user:mpred_prop(F,StubType)):- maybe_storage_stub(F,StubType).
+%OLD lmconf:decl_database_hook(change(assert,_),user:mpred_prop(F,StubType)):- maybe_storage_stub(F,StubType).
 
-%OLD user: decl_database_hook(change(assert,_),isa(F,StubType)):- maybe_storage_stub(F,StubType).
+%OLD lmconf:decl_database_hook(change(assert,_),isa(F,StubType)):- maybe_storage_stub(F,StubType).
 
-%OLD user: decl_database_hook(change(assert,_),arity(F,StubType)):-  hybrid_tPredStubImpl(StubType),user:mpred_prop(F,StubType),must(ensure_universal_stub(F/A)).
+%OLD lmconf:decl_database_hook(change(assert,_),arity(F,StubType)):-  hybrid_tPredStubImpl(StubType),user:mpred_prop(F,StubType),must(ensure_universal_stub(F/A)).
 
 
 % has_storage_stub(Head):- !.
@@ -631,7 +631,7 @@ foo_b(b3):-!.
 
 
 
-%OLD user: decl_database_hook(AR,C):-smart_decl_database(AR,C).
+%OLD lmconf:decl_database_hook(AR,C):-smart_decl_database(AR,C).
 
 /*
 smart_decl_database(AR,svo(S,V,O)):- !,dbase2pred2svo(DBASE,PRED,svo(S,V,O)),!,smart_db_op(AR,DBASE,PRED,svo(S,V,O)).

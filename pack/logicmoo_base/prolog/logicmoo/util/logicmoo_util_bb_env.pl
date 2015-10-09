@@ -162,7 +162,7 @@ decl_env_mepred_real(Prop,Pred,F,A):-
 
 
 env_learn_pred(_,_):-nb_getval(disabled_env_learn_pred,true),!.
-env_learn_pred(ENV,P):-user: decl_env_mepred(ENV,P).
+env_learn_pred(ENV,P):-lmconf:decl_env_mepred(ENV,P).
 
 env_recorded(call,Val) :- recorded(Val,Val).
 env_recorded(assert, Val) :- recordz(Val,Val).

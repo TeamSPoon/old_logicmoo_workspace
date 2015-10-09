@@ -25,8 +25,8 @@
 :- retractall(lmconfig:logicmoo_utils_separate).
 :- set_prolog_flag(generate_debug_info, true).
 
-:- multifile(lmhook:mpred_init_once/0).
-:- dynamic(lmhook:mpred_init_once/0).
+:- multifile(lmhook:mpred_hook_init_files/0).
+:- dynamic(lmhook:mpred_hook_init_files/0).
 
 :- if( \+ current_predicate(lmconfig:mpred_user_kb/1)).
 :- multifile(lmconfig:mpred_user_kb/1).
