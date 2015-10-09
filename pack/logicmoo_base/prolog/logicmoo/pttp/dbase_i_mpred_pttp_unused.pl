@@ -1226,8 +1226,8 @@ not_askable_t(A, B, C, F, E, H, G, I, J) :-
 end_of_file.
 
 
-:- multifile was_pttp_functor/3.
-:- dynamic was_pttp_functor/3.
+:-multifile was_pttp_functor/3.
+:-dynamic was_pttp_functor/3.
 
 was_pttp_functor(internal, int_unknown_t, 9).
 was_pttp_functor(internal, int_unknown_t, 8).

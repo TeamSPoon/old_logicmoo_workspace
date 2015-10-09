@@ -1,3 +1,24 @@
+% File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_prolog_streams.pl
+:- module(logicmoo_util_prolog_streams,
+          [ buffer_chars/1,
+            read_received/1,
+            with_err_to_pred/2,
+            with_input_from_pred/2,
+            with_output_to_pred/2,
+            with_output_to_pred/4
+          ]).
+:- meta_predicate
+        with_err_to_pred(1, 0),
+        with_input_from_pred(1, 0),
+        with_output_to_pred(1, 0),
+        with_output_to_pred(1, 1, 0, 0).
+:- module_transparent
+        buffer_chars/1,
+        read_received/1,
+        some_test/0,
+        test1_0/1,
+        test2/1.
+
 
 
 :- use_module(library(prolog_stream)).
@@ -8,9 +29,10 @@
 
 :- discontiguous some_test/0.
 
-:- dynamic(is_prolog_stream/1).
+:- multifile(lmconfig:is_prolog_stream/1).
+:- dynamic(lmconfig:is_prolog_stream/1).
 
-%%	open_prolog_stream(+Module, +Mode, -Stream, +Options)
+%=	open_prolog_stream(+Module, +Mode, -Stream, +Options)
 %
 %	Create  a  new  stream  that  implements   its  I/O  by  calling
 %	predicates in Module.  The called predicates are:
@@ -32,7 +54,7 @@
 %	  succeed.  The callback can be used to cleanup associated
 %	  resources.
 
-some_test :- thread_local(tl_with_prolog_streams:stream_close/1).
+:- thread_local(tl_with_prolog_streams:stream_close/1).
 
 %	  - Module:stream_write(+Stream, +String)
 %	  Called for a `Mode = write` stream if data is available.
@@ -41,9 +63,9 @@ some_test :- thread_local(tl_with_prolog_streams:stream_close/1).
 %	  Stream overflows, the user calls flush_output(Stream)
 %	  or Stream is closed and there is buffered data.
 
-some_test :- thread_local(tl_with_prolog_streams:stream_write/2).
+:- thread_local(tl_with_prolog_streams:stream_write/2).
 
-some_test :- meta_predicate(with_output_to_pred(1,0)).
+:- meta_predicate(with_output_to_pred(1,0)).
 
 with_output_to_pred(Callback,Goal):-
   current_output(Prev),
@@ -63,8 +85,8 @@ with_err_to_pred(Callback,Goal):-
 with_output_to_pred(Callback,Stream,Goal,Exit):-
  open_prolog_stream(tl_with_prolog_streams, write, Stream, []),
   call_cleanup((
-   asserta(((tl_with_prolog_streams:stream_write(Stream,Data):- (ignore(failOnError(call(Callback,Data)))))),Ref),
-   asserta(((tl_with_prolog_streams:stream_close(Stream):- (ignore(failOnError(call(Callback,end_of_file)))))),Ref2),
+   asserta(((tl_with_prolog_streams:stream_write(Stream,Data):- (ignore(on_x_fail(call(Callback,Data)))))),Ref),
+   asserta(((tl_with_prolog_streams:stream_close(Stream):- (ignore(on_x_fail(call(Callback,end_of_file)))))),Ref2),
    asserta(((is_prolog_stream(Stream))),Ref3),
     % catch so we will not exception on a closed stream
     % set_stream(Stream, buffer(line)),
@@ -142,9 +164,8 @@ some_test :- with_output_to_pred(dmsg, (current_output(Out),forall(stream_proper
 %	  To signal end-of-file, unify stream with an empty text,
 %	  e.g., `stream_read(Stream, "")`.
 
-some_test :- thread_local(tl_with_prolog_streams:stream_read/2).
+:- thread_local(tl_with_prolog_streams:stream_read/2).
 
-some_test :- meta_predicate(with_input_from_pred(1,0)).
 
 with_input_from_pred(Callback,Goal):-
  current_input(Old),
@@ -241,5 +262,4 @@ test2(In) :-
 
 % TODO
 % :- with_input_from_pred(read_received, test2(current_input)).
-
 

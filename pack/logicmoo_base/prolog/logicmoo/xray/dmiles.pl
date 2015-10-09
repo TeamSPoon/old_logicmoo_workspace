@@ -760,7 +760,7 @@ clauses((A , B),L,WffNum) :-
         clauses(B,L2,WffNum2),
         conjoin(L1,L2,L))).
 
-:- abolish(clauses,4).
+:-abolish(clauses,4).
 clauses( (Gamma :- Alpha : Beta) , L , WffNum ) :-
 	!,
         must_det_l((
@@ -1585,7 +1585,7 @@ xray(Name) :-
 	
 
 dpttp(Name,X) :-
- with_assertions(set_prolog_flag(occurs_check,true),
+ w_tl(set_prolog_flag(occurs_check,true),
      must_det_l((time(dpttp1(X,Y:Z),'Compilation Phase I'),
 	         time(dpttp2(Name,Y:Z),'Compilation Phase II'),
 	         time(dpttp3(Name),'Compilation Phase III')))).

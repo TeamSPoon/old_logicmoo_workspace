@@ -127,6 +127,6 @@ nationality(PA, NA) <==
 
 % The question is: who owns the fish?
 
-:- forall((C <== A) ,  (dynamic(C),pfc_assert(A ==> C))).
+:- forall((C <== A) ,  (dynamic(C),mpred_add(A ==> C))).
 
 :- prolog.

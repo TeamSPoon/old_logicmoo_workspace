@@ -1,3 +1,55 @@
+% File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_no_repeats.pl
+:- module(logicmoo_util_no_repeats,
+          [ memberchk_pred/3,
+            memberchk_pred_rev/3,
+            memberchk_same/2,
+            must_not_repeat/1,
+            no_repeats/1,
+            no_repeats/2,
+            no_repeats_av/0,
+            no_repeats_findall5/5,
+            no_repeats_findall_r/5,
+            no_repeats_old/1,
+            no_repeats_old/2,
+            no_repeats_save/2,
+            no_repeats_save/4,
+            no_repeats_u/2,
+            subtract_eq/3,
+            succeeds_n_times/2,
+            term/2
+          ]).
+:- meta_predicate
+        memberchk_pred(2, ?, ?),
+        memberchk_pred_rev(2, ?, ?),
+        must_not_repeat(0),
+        no_repeats(0),
+        no_repeats(+, 0),
+        no_repeats_findall5(+, 0, -, -, -),
+        no_repeats_findall_r(+, 0, -, -, -),
+        no_repeats_old(0),
+        no_repeats_old(+, 0),
+        no_repeats_save(+, 0),
+        no_repeats_save(+, 0, -, -),
+        no_repeats_u(+, 0),
+        succeeds_n_times(0, -).
+:- module_transparent
+        memberchk_same/2,
+        no_repeats_av/0,
+        subtract_eq/3,
+        term/2.
+
+
+
+:- if(current_predicate(logicmoo_utils:combine_logicmoo_utils/0)).
+:- module(logicmoo_util_no_repeatsqqqqqqqqqq,
+[  % when the predciates are not being moved from file to file the exports will be moved here
+       ]).
+
+:- else.
+:- include(logicmoo_util_header).
+:- endif.
+
+
 % ===================================================================
 
 :- thread_local  tlbugger:attributedVars.
@@ -5,7 +57,7 @@
 %  tlbugger:attributedVars.
 
 :- export(must_not_repeat/1).
-:- meta_predicate(must_not_repeat(0)).
+% = :- meta_predicate(must_not_repeat(0)).
 must_not_repeat(C):-call(C).
 
 % ===================================================
@@ -60,8 +112,6 @@ no_repeats_dif(Vs,Call):- dif(Vs,_), get_attr(Vs,dif,vardif(CONS,_)),!,
 :- meta_predicate no_repeats_old(0).
 no_repeats_old(Call):- no_repeats_old(Call,Call).
 
-:- export(no_repeats_old/2).
-:- meta_predicate no_repeats_old(+,0).
 
 :- user:ensure_loaded(rec_lambda).
 
@@ -73,8 +123,9 @@ memberchk_pred(Pred, X, [Y|Ys]) :- (   call(Pred,X,Y) -> true ;   (nonvar(Ys),me
 memberchk_pred_rev(Pred, X, [Y0|Ys]) :- is_list(Ys),C=..[v,Y0|Ys],!, arg(_,C,Y), call(Pred,Y,X),!.
 memberchk_pred_rev(Pred, X, [Y|Ys]) :- (   call(Pred,Y,X) -> true ;   (nonvar(Ys),memberchk_pred_rev(Pred,X, Ys) )).
 
-
-no_repeats_old(Vs,Call):- CONS = [_], (Call), notrace(( \+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T], nb_setarg(2, CONS, [CVs|T]))).
+:- export(no_repeats_old/2).
+:- meta_predicate no_repeats_old(+,0).
+no_repeats_old(Vs,Call):- CONS = [_], (Call), cnotrace(( \+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T], nb_setarg(2, CONS, [CVs|T]))).
 
 % mcs_t2(A,B) :- call(lambda(X, [Y|Ys], (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),reenter_lambda(X, Ys) ))),A,B).
 % mcs_t(A,B) :- call(lambda(X, [Y|Ys], (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),reenter_lambda(X, Ys) ))),A,B).
@@ -131,30 +182,32 @@ subtract_eq([A|B], C, [A|D]) :-
 %
 % attributed variable verson of getting filtered bindings
 % ===================================================
+/*
 :- export(no_repeats_av/1).
-:- meta_predicate(no_repeats_av(0)).
+% = :- meta_predicate(no_repeats_av(0)).
 :- export(no_repeats_av/2).
-:- meta_predicate(no_repeats_av(+,0)).
+% = :- meta_predicate(no_repeats_av(+,0)).
 :- export(no_repeats_av_l/2).
-:- meta_predicate(no_repeats_av_l(+,0)).
+% = :- meta_predicate(no_repeats_av_l(+,0)).
 
 no_repeats_av(AVar,Call):- var(AVar),!,
-      setup_call_cleanup(
-       (was(AVar,iNEVER),asserta(tlbugger:cannot_save_table,Ref),get_attr(AVar,was,varwas(CONS,_))),
+   Call):-term_variables(Call,Vs),!,no_repeats_av_l(Vs,Call).
+
+no_repeats_av_l([],Call):-!,Call,!.
+no_repeats_av_l([AVar],Call):-!,
+   no_repeats_av(AVar,Call).
+no_repeats_av_l([AVar|List],Call):-   setup_call_cleanup(
+       (was(AVar,iNEVER),asserta(tlbugger:cannot_save_table,Ref),get_attr(AVar,waz,varwaz(CONS,_))),
         (Call,copy_term_nat(AVar,C),nb_linkarg(2, CONS, [_-C|CONS])),
         (del_attr(AVar,was),erase_safe(tlbugger:cannot_save_table,Ref))).
 no_repeats_av(List,Call):- is_list(List),!,no_repeats_av_l(List,Call).
 no_repeats_av(Term,Call):-term_variables(Term,List),!,no_repeats_av_l(List,Call).
 
-no_repeats_av(Call):-term_variables(Call,Vs),!,no_repeats_av_l(Vs,Call).
-
-no_repeats_av_l([],Call):-!,Call,!.
-no_repeats_av_l([AVar],Call):-!,
-   no_repeats_av(AVar,Call).
-no_repeats_av_l([AVar|List],Call):-
+no_repeats_av(
    no_repeats_av(AVar,no_repeats_av_l(List,Call)).
 
 
+*/
 
 % =========================================================================
 :- meta_predicate succeeds_n_times(0, -).
@@ -178,7 +231,7 @@ no_repeats_findall5(Vs,Call,ExitDET,USE,NEW):-
    (((HOLDER = fa([]),
    Call,arg(1,HOLDER,CONS),
    ((
-   ((\+ memberchk_same(Vs,CONS),
+   (( \+ memberchk_same(Vs,CONS),
    copy_term(Vs,CVs),
    append(CONS,[CVs],NEW),
     nb_setarg(1, HOLDER, NEW)))
@@ -211,7 +264,7 @@ no_repeats_save(Vs,Call):-
 :- meta_predicate no_repeats_findall_r(+,0,-,-,-).
 no_repeats_findall_r(Vs,Call,CONS,ExitDET,List):-
    CONS = [ExitDET],
-   (Call,once((\+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T],List=[CVs|T], nb_linkarg(2, CONS, List)))),
+   (Call,once(( \+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T],List=[CVs|T], nb_linkarg(2, CONS, List)))),
    deterministic(ExitDET).
 
 

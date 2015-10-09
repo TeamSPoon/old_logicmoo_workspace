@@ -32,26 +32,26 @@ cwtdl(Goal,DL,TL):- cwc,
 
 :- must_det(argIsa(genlPreds,2,_)).
 
-transfer_predicate(C,If,Q):-doall((clause(C,true,Ref),If,Q,logOnError(erase(Ref)))).
-transTiny(Template,If):-transfer_predicate(tinyK8(Template),If,once(pfc_add(Template))).
+transfer_predicate(C,If,Q):-doall((clause(C,true,Ref),If,Q,on_x_log_throw(erase(Ref)))).
+transTiny(Template,If):-transfer_predicate(tinyK8(Template),If,once(mpred_add(Template))).
 
-:- pfc_no_trace.
+:- mpred_no_trace.
 
 
 reallyLoadTiny:- transTiny(tCol(X),ground(X)).
 reallyLoadTiny:- transTiny(arity(X,Y),ground((X,Y))).
 reallyLoadTiny:- transTiny(genls(X,Y),((X\=ftAtomicTerm,ground((X,Y))))).
-reallyLoadTiny:- pfc_trace.
+reallyLoadTiny:- mpred_trace.
 reallyLoadTiny:- transTiny(genls(X,Y),((ground((X,Y))))).
 %TODO_VERIFY_STILL_UNNEEDED :- retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
-%TODO_VERIFY_STILL_UNNEEDED :- pfc_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
+%TODO_VERIFY_STILL_UNNEEDED :- mpred_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
 reallyLoadTiny:- transTiny(genlMt(X,Y),writeq((X,Y))).
 reallyLoadTiny:- transTiny(ttFormatType(X),ground(X)).
 
-%TODO_VERIFY_STILL_UNNEEDED :-pfc_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
+%TODO_VERIFY_STILL_UNNEEDED :-mpred_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
 
 %TODO_VERIFY_STILL_UNNEEDED :-retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
-reallyLoadTiny:- pfc_no_trace.
+reallyLoadTiny:- mpred_no_trace.
 
 
 :- if(false).
@@ -59,10 +59,10 @@ reallyLoadTiny:- pfc_no_trace.
 :- endif.
 
 
-%TODO FIX :-pfc_add((((cycl(X),{must(cyc_to_clif(X,Y))}) ==> clif(Y)))).
+%TODO FIX :-mpred_add((((cycl(X),{must(cyc_to_clif(X,Y))}) ==> clif(Y)))).
 
-:- pfc_no_trace.
-:- pfc_add((((cycl('$VAR'('X')),{must(cyc_to_clif('$VAR'('X'),'$VAR'('Y')))}) ==> clif('$VAR'('Y'))))).
+:-mpred_no_trace.
+:-mpred_add((((cycl('$VAR'('X')),{must(cyc_to_clif('$VAR'('X'),'$VAR'('Y')))}) ==> clif('$VAR'('Y'))))).
 
 % ?-listing(cycl).
 
@@ -78,19 +78,19 @@ tHominid(iExplorer2).
 /*
 :- transTiny(Form,(ground(Form),functor(Form,F,1),F\==neg)).
 
-:- set_gui_debug(false).
-:- set_no_debug.
-:- set_no_debug_thread.
+:-set_gui_debug(false).
+:-set_no_debug.
+:-set_no_debug_thread.
 
-:- transfer_predicate(tinyK8(Form), ( \+ contains_term('$VAR'(_),Form)) , pfc_add((Form))).
+:- transfer_predicate(tinyK8(Form), ( \+ contains_term('$VAR'(_),Form)) , mpred_add((Form))).
 
-:- pfc_trace.
+:- mpred_trace.
 
 :- set_clause_compile(fwc).
 
-load_later:- notrace((transfer_predicate(tinyK8(Form),writeq(Form),ignore(logOnError(cwtdl(pfc_add(clif(Form)),500,10)))))).
+load_later:- notrace((transfer_predicate(tinyK8(Form),writeq(Form),ignore(on_x_log_throw(cwtdl(mpred_add(clif(Form)),500,10)))))).
 
-:- pfc_no_trace.
+:- mpred_no_trace.
 
 :- in_cmt(listing(cwtdl_failed/1)).
 

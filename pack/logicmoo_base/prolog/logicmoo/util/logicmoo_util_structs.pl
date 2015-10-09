@@ -1,4 +1,4 @@
-/** <module> logicmoo_util_bb_env
+/* Part of LogicMOO Base logicmoo_util_bb_env
 % Provides a prolog database *env*
 % ===================================================================
 % File '$FILENAME.pl'
@@ -11,18 +11,162 @@
 % Licience: LGPL
 % ===================================================================
 */
-:- if(\+ current_module(logicmoo_utils)).
-:- module(logicmoo_util_structs,[
+% File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_structs.pl
+:- module(logicmoo_util_structs,
+          [ attr_portray_hook/2,
+            attr_unify_hook/2,
+            by_name_datatype/2,
+            compile_argtypes/3,
+            compile_struct_slots/6,
+            datatype_to_init/2,
+            decl_argtypes/1,
+            decl_struct/1,
+            default_point/1,
+            ensure_instance/2,
+            ensure_instance/3,
+            ensure_struct/2,
+            ensure_struct/3,
+            extract_struct_parameter/4,
+            extract_struct_parameter/5,
+            gvar_get/2,
+            gvar_put/2,
+            if_changed/3,
+            is_point/1,
+            key_match/2,
+            make_point/2,
+            make_point/3,
+            member_arg_convert/5,
+            member_datatype/2,
+            merge_values/3,
+            nb_set_pairlist/3,
+            nb_set_pairlist0/3,
+            nb_set_s2list/4,
+            nb_set_s2list0/4,
+            nb_set_x_of_point/2,
+            nb_set_y_of_point/2,
+            nb_setarg_ex/3,
+            new_struct/2,
+            point_data/3,
+            point_x/2,
+            point_y/2,
+            prop_get/1,
+            prop_get/3,
+            prop_get_map/3,
+            prop_get_nvlist/2,
+            prop_get_try/4,
+            prop_merge/3,
+            prop_put_extra_extra/2,
+            prop_set/1,
+            prop_set/3,
+            prop_set_dict_real/4,
+            prop_set_map/3,
+            prop_set_nvlist/2,
+            prop_set_try/4,
+            record_onto_var/3,
+            record_var_names/1,
+            record_var_names/2,
+            record_var_type/2,
+            set_point_field/3,
+            set_point_fields/3,
+            set_point_fields/4,
+            set_x_of_point/2,
+            set_x_of_point/3,
+            set_y_of_point/2,
+            set_y_of_point/3,
+            sisctus_key/2,
+            struct_sclass/2,
+            t2ot/2,
+            t2ot_0/2,
+            term_to_ord_term/2,
+            to_datatype/3
+          ]).
+:- multifile
+        lmhook:mpred_init_once/0.
+:- meta_predicate
+        sisctus_key(:, -).
+:- module_transparent
+        attr_portray_hook/2,
+        attr_unify_hook/2,
+        by_name_datatype/2,
+        compile_argtypes/3,
+        compile_struct_slots/6,
+        datatype_to_init/2,
+        decl_argtypes/1,
+        decl_struct/1,
+        default_point/1,
+        ensure_instance/2,
+        ensure_instance/3,
+        ensure_struct/2,
+        ensure_struct/3,
+        extract_struct_parameter/4,
+        extract_struct_parameter/5,
+        gvar_get/2,
+        gvar_put/2,
+        if_changed/3,
+        is_point/1,
+        key_match/2,
+        make_point/2,
+        make_point/3,
+        member_arg_convert/5,
+        member_datatype/2,
+        merge_values/3,
+        lmhook:mpred_init_once/0,
+        nb_set_pairlist/3,
+        nb_set_pairlist0/3,
+        nb_set_s2list/4,
+        nb_set_s2list0/4,
+        nb_set_x_of_point/2,
+        nb_set_y_of_point/2,
+        nb_setarg_ex/3,
+        new_struct/2,
+        point_data/3,
+        point_x/2,
+        point_y/2,
+        prop_get/1,
+        prop_get/3,
+        prop_get_map/3,
+        prop_get_nvlist/2,
+        prop_get_try/4,
+        prop_merge/3,
+        prop_put_extra_extra/2,
+        prop_set/1,
+        prop_set/3,
+        prop_set_dict_real/4,
+        prop_set_map/3,
+        prop_set_nvlist/2,
+        prop_set_try/4,
+        record_onto_var/3,
+        record_var_names/1,
+        record_var_names/2,
+        record_var_type/2,
+        set_point_field/3,
+        set_point_fields/3,
+        set_point_fields/4,
+        set_x_of_point/2,
+        set_x_of_point/3,
+        set_y_of_point/2,
+        set_y_of_point/3,
+        struct_sclass/2,
+        t2ot/2,
+        t2ot_0/2,
+        term_to_ord_term/2,
+        to_datatype/3.
+:- dynamic
+        lmhook:mpred_init_once/0.
+
+:- if(current_module(logicmoo_utils)).
+:- public((
   prop_get/1,prop_get/3,prop_set/1,prop_set/3,prop_merge/3,
-  prop_set_nvlist/2,ain/1,
+  prop_set_nvlist/2,
   decl_argtypes/1,
   decl_struct/1,struct_decl/1,
   if_changed/3,
-  ain/1,pfc_ain/1,prop_get_nvlist/2,
+  prop_get_nvlist/2,
   term_to_ord_term/2,
   new_struct/2,
   ensure_struct/2,ensure_struct/3,
-  ensure_instance/2,ensure_instance/3]).
+  ensure_instance/2,ensure_instance/3)).
+:- else.
 :- include(logicmoo_util_header).
 :- endif.
 
@@ -39,8 +183,6 @@
         make_point([y(20)], YPoint),
    */
 
-pfc_ain(X):-if_defined(pfc_add(X),assert_if_new(X)).
-ain(X):-if_defined(pfc_add(X),assert_if_new(X)).
 
 :- export(struct_decl/1).
 :- multifile(struct_decl/1).
@@ -135,7 +277,7 @@ prop_get(Call):- Call=..[P,A,B],prop_get(P,A,B).
 
 prop_get(Name,Dict,Value):- (var(Name);var(Dict)),!,trace_or_throw(var_prop_get(Name,Dict,Value)).
 prop_get(Name,Dict,Value):- nonvar(Value),!,must(prop_get(Name,Dict,ValueVar)),!,Value=ValueVar.
-prop_get(_,     Dict, _ ):- (\+ \+ Dict=[] ),!, fail.
+prop_get(_,     Dict, _ ):- ( \+ \+ Dict=[] ),!, fail.
 prop_get(Name, Struct,  Value):- prop_get_try(Name, Struct,  Value, _),!.
 prop_get(Name, Struct,  Value):- Name \= extraprops, prop_get(extraprops, Struct,  Extra),
                                               prop_get_try(Name, Extra,  Value, _),!.
@@ -151,13 +293,13 @@ gvar_put(Name,  Value):- nb_setval(Name,Value).
 
 key_match(Name,N):-atom(N), (Name=N -> true ; atom_concat(':',Name,N)).
 
-prop_get_try(_,     Dict, _  ,_ ):- (\+ \+ Dict=[] ),!, fail.
+prop_get_try(_,     Dict, _  ,_ ):- ( \+ \+ Dict=[] ),!, fail.
 prop_get_try(Name, bb,   Value, gvar(Name,Value)):- !, must(gvar_get(Name,Value)).
 prop_get_try(_   , Atomic,  _  , _  ):- atomic(Atomic),!,fail.
 prop_get_try(Name, Dict,   Value, Ref):- prop_get_map(Name, Dict, Value),!,must(Dict=Ref).
 prop_get_try(Name, STRUCT,  Value, Ref):- STRUCT = mutable(Struct), !, prop_get_try(Name, Struct,  Value, Ref).
 
-prop_get_map(_,    Dict,       _ ):- (\+ \+ Dict=[] ),!, fail.
+prop_get_map(_,    Dict,       _ ):- ( \+ \+ Dict=[] ),!, fail.
 prop_get_map(Name, Struct,  Value):- is_list(Struct),memberchk(Name=Value,Struct).
 prop_get_map(Name, Dict,    Value):- is_dict(Dict),!,get_dict(Name,Dict,Value).
 prop_get_map(Name, Dict,    Value):- is_rbtree(Dict),!,trace,nb_rb_get_node(Dict,Name,Value).
@@ -182,18 +324,18 @@ prop_set(Call):- Call=..[P,A,B],prop_set(P,A,B).
 
 
 prop_set(Name,Dict,Value):- (var(Name);var(Dict)),!,trace,trace_or_throw(var_prop_set(Name,Dict,Value)).
-prop_set(_,     Dict, _ ):- (\+ \+ Dict=[] ),!, fail.
+prop_set(_,     Dict, _ ):- ( \+ \+ Dict=[] ),!, fail.
 prop_set(Name,Dict,Value):- 
  member_arg_convert(Dict,Name,_,Value,NewValue) -> 
     must(((prop_set_try(Name,Dict,NewValue, NewDict ),NewDict==Dict)));
     must(((prop_set_try(Name,Dict,Value, NewDict ),NewDict==Dict))).
 
 prop_set_try(Name,Dict,Value,_):- (var(Name);var(Dict);var(Value)),!,trace,trace_or_throw(var_prop_set(Name,Dict,Value)).
-prop_set_try(_,    Dict,   _, _):- (\+ \+ Dict=[] ),!, fail.
+prop_set_try(_,    Dict,   _, _):- ( \+ \+ Dict=[] ),!, fail.
 prop_set_try([Name],Dict,Value,NewDict):-!, prop_set_try(Name,Dict,Value, NewDict).
 prop_set_try(Name, bb,   Value, _):- !, gvar_put(Name,Value).
 prop_set_try(_,    Struct,   _, _):- ( \+ compound(Struct)),!,fail.
-prop_set_try([Name,Last],Dict,Value,Dict):- prop_get(Name,Dict,SubDict),prop_set_try(Last,SubDict,Value,NewSubDict),NewSubDict\==SubDict,prop_set_try(Name,Dict,NewSubDict),!.
+prop_set_try([Name,Last],Dict,Value,WasNewDict):- prop_get(Name,Dict,SubDict),prop_set_try(Last,SubDict,Value,NewSubDict),NewSubDict\==SubDict,prop_set_try(Name,Dict,NewSubDict,WasNewDict),!.
 prop_set_try([Name|More],Dict,Value,WasNewDict):-prop_get(Name,Dict,SubDict),prop_set_try(More,SubDict,Value,NewDict),NewDict\==SubDict,prop_set_try(Name,Dict,NewDict,WasNewDict).
 
 prop_set_try( Name,Dict,Value, Dict):-  prop_set_map(Name,Dict,Value),!.
@@ -306,7 +448,7 @@ by_name_datatype(preconditions, sorted).
 :- functor(t{a:t},A,_),asserta(dict_functor(A)).
 
 
-%% member_arg_convert(+StructName,+Name,?N,+Value,-NewValue).
+% member_arg_convert(+StructName,+Name,?N,+Value,-NewValue).
 
 struct_sclass(sterm(SC,_),SC).
 struct_sclass(mutable(Struct),SC):-!,struct_sclass(Struct,SC).
@@ -380,7 +522,7 @@ extract_struct_parameter(_Def,Decl,Name,Type):-Decl=..[K1,K2,Name],!,Type=..[K1,
 extract_struct_parameter(_Def,Decl,Name,Type):-Decl=..[Type,Name],!.
 extract_struct_parameter(Def,Name,Name,Def).
    
-:- ain(=>(struct_decl(StructDecl),decl_struct(StructDecl))).
+lmhook:mpred_init_once:- ain('==>'(struct_decl(StructDecl),decl_struct(StructDecl))).
 
 
 ensure_instance(Type,Struct):-ensure_struct(Type,Struct).

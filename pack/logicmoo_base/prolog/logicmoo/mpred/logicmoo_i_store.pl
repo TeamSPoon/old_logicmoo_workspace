@@ -16,7 +16,7 @@
 % Douglas Miles
 */
 
-:- export(( (add)/1, clr/1,fully_expand/3,ireq/1,del/1,  
+:-export(( (add)/1, clr/1,fully_expand/3,ireq/1,del/1,  
   padd/2, padd/3, prop/3, prop_or/4, props/2, iprops/2, upprop/2,add/1, ireq/1, mreq/1, upprop/1, req/1, 
   % use_term_listing/2,  
   world_clear/1,  
@@ -72,7 +72,7 @@ deduceEachArgType(F,_,ARGS):-deduceEachArg_WithArgIsa(F,1,ARGS).
 
 
 
-if_main(G):-(thread_self(M),thread_main(M))->G ; true.
+if_main(G):-(thread_self(M),lmcache:thread_main(_,M))->G ; true.
 
 deduceEachArg_WithArgIsa(_,_,[]).
 deduceEachArg_WithArgIsa(F,N,[A|RGS]):- ignore((clause_asserted(argIsa(F,N,Type)),deduceEachArg_WithType(A,Type))),
@@ -87,42 +87,42 @@ deduceEachArg_WithType(_,MT):- (MT=ftTerm;ttFormatType(MT)),!.
 deduceEachArg_WithType(M,MT):-isa(M,MT),!.
 deduceEachArg_WithType(M,MT):- assert_isa_safe(M,MT),!.
 
-side_effect_prone:- \+ thlocal:noDBaseMODs(_), thlocal:side_effect_ok.
+side_effect_prone:- \+ t_l:noDBaseMODs(_), t_l:side_effect_ok.
 
 
 
-:- meta_predicate(with_no_modifications(0)).
+:-meta_predicate(with_no_modifications(0)).
 with_no_modifications(CALL):-!,CALL.
-with_no_modifications(CALL):-with_assertions(thlocal:noDBaseMODs(_),CALL).
+with_no_modifications(CALL):-w_tl(t_l:noDBaseMODs(_),CALL).
 
-:- meta_predicate(with_no_db_hooks(0)).
+:-meta_predicate(with_no_db_hooks(0)).
 with_no_db_hooks(CALL):-!,CALL.
-with_no_db_hooks(CALL):-with_assertions(thlocal:noDBaseHOOKS(_),CALL).
+with_no_db_hooks(CALL):-w_tl(t_l:noDBaseHOOKS(_),CALL).
 
-:- meta_predicate(with_fallbacks(0)).
-with_fallbacks(CALL):-with_no_assertions(thlocal:infAssertedOnly(_),CALL).
+:-meta_predicate(with_fallbacks(0)).
+with_fallbacks(CALL):-wno_tl(t_l:infAssertedOnly(_),CALL).
 
-:- meta_predicate(with_fallbacksg(0)).
-with_fallbacksg(CALL):-with_no_assertions(thlocal:noRandomValues(_),CALL).
+:-meta_predicate(with_fallbacksg(0)).
+with_fallbacksg(CALL):-wno_tl(t_l:noRandomValues(_),CALL).
 
-:- meta_predicate(with_no_fallbacksg(0)).
-with_no_fallbacksg(CALL):-with_assertions(thlocal:noRandomValues(_),CALL).
+:-meta_predicate(with_no_fallbacksg(0)).
+with_no_fallbacksg(CALL):-w_tl(t_l:noRandomValues(_),CALL).
 
-:- meta_predicate(with_no_fallbacks(0)).
-with_no_fallbacks(CALL):-with_assertions(thlocal:infAssertedOnly(_),CALL).
+:-meta_predicate(with_no_fallbacks(0)).
+with_no_fallbacks(CALL):-w_tl(t_l:infAssertedOnly(_),CALL).
 
-infSecondOrder :- not(thlocal:infInstanceOnly(_)).
+infSecondOrder :- not(t_l:infInstanceOnly(_)).
 
-infThirdOrder :- fail, infSecondOrder, not(thlocal:noRandomValues(_)).
+infThirdOrder :- fail, infSecondOrder, not(t_l:noRandomValues(_)).
 
 
 % ================================================
 % is_asserted/1/2/3
 % ================================================
-:- thread_local thlocal:fail_is_asserted/1.
+:- thread_local t_l:fail_is_asserted/1.
 
 with_fail_is_asserted(Temp,Goal):-ground(Temp),!,Goal.
-with_fail_is_asserted(Temp,Goal):-with_assertions(thlocal:fail_is_asserted(Temp),Goal).
+with_fail_is_asserted(Temp,Goal):-w_tl(t_l:fail_is_asserted(Temp),Goal).
 
 :- meta_predicate is_asserted_1(?).
 :- meta_predicate is_asserted_eq(?).
@@ -142,7 +142,7 @@ is_asserted_1(V):-var(V),!,trace_or_throw(var_is_asserted(V)).
 is_asserted_1((H)):- is_static_pred(H),!,show_pred_info(H),dtrace(is_asserted_1((H))).
 %is_asserted_1(HB):-hotrace((fully_expand_warn(is_asserted_1,HB,HHBB))),!,is_asserted_1(HHBB).
 
-is_asserted_1(H):- !, with_assertions(thlocal:infAssertedOnly(H),mpred_call(H)).
+is_asserted_1(H):- !, w_tl(t_l:infAssertedOnly(H),mpred_call(H)).
 
 %is_asserted_1(argIsa(mpred_prop,2,mpred_prop/2)):- dtrace,!,fail.
 is_asserted_1(clause(H,B,Ref)):-!,is_asserted_3(H,B,Ref).
@@ -160,14 +160,14 @@ is_asserted_2((H:-BB),B):- is_true(B),!,is_asserted_2(H,BB).
 is_asserted_2(H,B):-  skip_is_asserted_expansion(H),!,is_asserted_2a(H,B).
 is_asserted_2(H,B):-hotrace((fully_expand_warn(is_asserted_2,(H:-B),CL),expand_to_hb(CL,HH,BB))),!,is_asserted_2a(HH,BB).
 
-is_asserted_2a(H,B):-thglobal:pfcManageHybrids,!,pfc_clause_is_asserted(H,B).
-is_asserted_2a(H,B):-call_no_cuts(user:provide_mpred_storage_clauses(H,B,_Ref)),not(hotrace(special_wrapper_body(B,_))).
+is_asserted_2a(H,B):-thglobal:pfcManageHybrids,!,mpred_clause_is_asserted(H,B).
+is_asserted_2a(H,B):-call_no_cuts(user:mpred_provide_storage_clauses(H,B,_Ref)),not(hotrace(special_wrapper_body(B,_))).
 
 is_asserted_3((H:-BB),B,Ref):- is_true(B),!,is_asserted_3(H,BB,Ref).
 is_asserted_3(H,B,Ref):- skip_is_asserted_expansion(H), !,is_asserted_3a(H,B,Ref).
 is_asserted_3(H,B,Ref):-hotrace((fully_expand_warn(is_asserted_3,(H:-B),CL),expand_to_hb(CL,HH,BB))),is_asserted_3a(HH,BB,Ref).
 
-is_asserted_3a(H,B,Ref):-call_no_cuts(user:provide_mpred_storage_clauses(H,B,Ref)),not(hotrace(special_wrapper_body(B,_))).
+is_asserted_3a(H,B,Ref):-call_no_cuts(user:mpred_provide_storage_clauses(H,B,Ref)),not(hotrace(special_wrapper_body(B,_))).
 
 is_source_proof(_).
 
@@ -182,7 +182,7 @@ fact_checked(Fact,_):- is_known_false0(Fact),!,fail.
 fact_checked(Fact,_):- is_known_trew(Fact),!.
 fact_checked(Fact,Call):- no_loop_check(call_tabled(Call),is_asserted(Fact)).
 
-:- meta_predicate(fact_loop_checked(+,0)).
+:-meta_predicate(fact_loop_checked(+,0)).
 fact_loop_checked(Fact,Call):- no_repeats(fact_checked(Fact,Call)).
 
 
@@ -202,8 +202,8 @@ ensure_predicate_reachable(M,C):-once((predicate_property(C,imported_from(Other)
 ensure_predicate_reachable(_,_).
 */
 
-singletons_throw_else_fail(C):- fail,not_is_release,contains_singletons(C),!,(test_tl(thlocal:already_in_file_term_expansion) -> (dmsg(contains_singletons(C))); dmsg(trace_or_throw(contains_singletons(C)))),fail.
-nonground_throw_else_fail(C):- not_is_release,not(ground(C)),!,( (test_tl(thlocal:already_in_file_term_expansion) ->dmsg(not_ground(C)); trace_or_throw(not_ground(C)))),fail.
+singletons_throw_else_fail(C):- fail,not_is_release,contains_singletons(C),!,(test_tl(t_l:already_in_file_term_expansion) -> (dmsg(contains_singletons(C))); dmsg(trace_or_throw(contains_singletons(C)))),fail.
+nonground_throw_else_fail(C):- not_is_release,not(ground(C)),!,( (test_tl(t_l:already_in_file_term_expansion) ->dmsg(not_ground(C)); trace_or_throw(not_ground(C)))),fail.
 
 % ================================================
 % mpred_modify/2
@@ -220,12 +220,12 @@ requires_storage((Head :- Body),Why):- nonvar(Head),!, requires_storage(Head,Bod
 requires_storage(C,Why):- requires_storage(C,true,Why).
 
 requires_storage(G,_,Why):-get_functor(G,F),!,special_head(G,F,Why),!.
-requires_storage(_,_,thlocal:consulting_sources):-thlocal:consulting_sources,pfc_may_expand,!.
-% requires_storage(_,_,thlocal:consulting_sources):-thlocal:consulting_sources,in_file_expansion.
+requires_storage(_,_,t_l:consulting_sources):-t_l:consulting_sources,mpred_may_expand,!.
+% requires_storage(_,_,t_l:consulting_sources):-t_l:consulting_sources,in_file_expansion.
 
 special_wrapper_functor(call_mpred_body,direct_to_prolog).
 special_wrapper_functor(body_req,direct_to_prolog).
-special_wrapper_functor(user:provide_mpred_setup,direct_to_prolog).
+special_wrapper_functor(user:mpred_provide_setup,direct_to_prolog).
 special_wrapper_functor(call_provided_mpred_storage_op,direct_to_prolog).
 special_wrapper_functor(loop_check,meta).
 special_wrapper_functor(loop_check_term,meta).
@@ -266,7 +266,7 @@ get_body_functor(BDY,BF,A):-get_functor(BDY,BF,A).
 
 
 % -  del(RetractOne) 
-del(C):- fully_expand(change(retract,a),C,C0),pfc_maptree(del0,C0).
+del(C):- fully_expand(change(retract,a),C,C0),mpred_maptree(del0,C0).
 del0(C0):- mpred_call(C0),!,clr(C0),!.
 del0(C0):- ireq(C0),!,idel(C0),!.
 del0(C0):- mreq(C0),!,mdel(C0),!.
@@ -280,10 +280,10 @@ mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 % -  clr(Retractall)
 % clr(C0):- dmsg(clr(C0)),fail,mpred_modify(change(retract,all),/*to_exp*/(C0)),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
 clr(P):- agenda_do_prequery,
-  fully_expand(change(retract,all),P,PL),pfc_maptree(clr0,PL).
+  fully_expand(change(retract,all),P,PL),mpred_maptree(clr0,PL).
 
 clr0(P):- 
-  forall(debugOnError(P), ((forall( pfc_rem2(P), true)),nop((sanity((not(pfc_tms_supported(local,P)),must(\+(P)))))))).
+  forall(on_x_rtrace(P), ((forall( mpred_rem2(P), true)),nop((sanity((not(mpred_tms_supported(local,P)),must(\+(P)))))))).
 
 
 % -  preq(Query) = query with P note
@@ -294,16 +294,16 @@ req(C0):- nop(dmsg(req(C0))), !,preq(req,/*to_exp*/(C0)).
 
 % -  mreq(Query) = Forced Full query
 mreq(C0):- nop(dmsg(mreq(C0))), agenda_rescan_for_module_ready,
-   no_loop_check(with_assertions([-infInstanceOnly(_),-thlocal:infAssertedOnly(_),-thlocal:noRandomValues(_)],
+   no_loop_check(w_tl([-infInstanceOnly(_),-t_l:infAssertedOnly(_),-t_l:noRandomValues(_)],
      preq(must,/*to_exp*/(C0)))).
 
 % -  ireq(Query) = Normal query (May not use second order logic) (must be asserted on isntance) (used mainly by 2nd order logic to avoid looping)
 ireq(C0):- nop(dmsg(ireq(C0))), 
   agenda_rescan_for_module_ready,
-   no_loop_check(with_assertions([+infInstanceOnly(_), +thlocal:infAssertedOnly(_),+thlocal:noRandomValues(_)],preq(ireq,/*to_exp*/(C0)))).
+   no_loop_check(w_tl([+infInstanceOnly(_), +t_l:infAssertedOnly(_),+t_l:noRandomValues(_)],preq(ireq,/*to_exp*/(C0)))).
 
-:- dmsg_hide(req).
-:- dmsg_hide(ireq).
+:-dmsg_hide(req).
+:-dmsg_hide(ireq).
 
 % -  props(Obj,QueryPropSpecs)
 props(Obj,PropSpecs):- req(props(Obj,PropSpecs)).
@@ -311,18 +311,18 @@ iprops(Obj,PropSpecs):- ireq(/*to_exp*/(props(Obj,PropSpecs))).
 
 
 
-:- export(forall_setof/2).
+:-export(forall_setof/2).
 forall_setof(ForEach,Call):-
    findall(ForEach,ForEach,ForEachAll),
    list_to_set(ForEachAll,Set),!,
    ignore(forall(member(ForEach,Set),Call)).
 
 
-:- thread_local add_thread_override/1.
-% thlocal:add_thread_override(A):-add_from_macropred(A),!.
+:-thread_local add_thread_override/1.
+% t_l:add_thread_override(A):-add_from_macropred(A),!.
 
-:- export(((add)/1)).
-:- moo_hide_childs((add)/1).
+:-export(((add)/1)).
+:-mpred_trace_nochilds((add)/1).
 add(A):- var(A),!,trace_or_throw(var_add(A)).
 add(end_of_file):-!.
 add(grid_key(KW=COL)):- !, add(typeHasGlyph(COL,KW)).
@@ -337,8 +337,8 @@ add_0(dynamic(Term)):- !,must(get_arity(Term,F,A)), must(dynamic(F/A)).
 add_0(A):- A =(:-(_Term)), !, must(add_fast(A)).
 % add_0(C0):-check_override(add(C0)),!.
 % add_0(Skipped):- ground(Skipped),implied_skipped(Skipped),!. % ,dmsg(implied_skipped(Skipped)).
-%add_0(C0):- ignore((ground(C0),asserta(user:already_added_this_round(C0)))),!,must(pfc_add_fast(C0)),!.
-add_0(C0):- must(pfc_add_fast(C0)),!.
+%add_0(C0):- ignore((ground(C0),asserta(user:already_added_this_round(C0)))),!,must(mpred_add_fast(C0)),!.
+add_0(C0):- must(mpred_add_fast(C0)),!.
 add_0(A):-trace_or_throw(fmt('add/1 is failing ~q.',[A])).
 
 
@@ -356,9 +356,9 @@ mpred_name_variables([Var|Vars]):-
    mpred_name_variables(Vars).
 
 
-:- export(pfc_add_fast/1).
+:-export(mpred_add_fast/1).
 % -  add(Assertion)
-% pfc_add_fast(C0):- must_det((pfc_add_fast(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(pfc_add_fast(C0)),rtrace(pfc_add_fast(C0)),dtrace(ireq(C0))))))))),!.
+% mpred_add_fast(C0):- must_det((mpred_add_fast(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(mpred_add_fast(C0)),rtrace(mpred_add_fast(C0)),dtrace(ireq(C0))))))))),!.
 add_fast(Term):-mpred_numbervars_with_names(Term),mpred_modify(change(assert,add), Term),!. % ,xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0)))))),!.
 
 % -  upprop(Obj,PropSpecs) update the properties
@@ -379,35 +379,35 @@ prop_or(Obj,Prop,Value,OrElse):- one_must(ireq(t(Prop,Obj,Value)),Value=OrElse).
 % db_assert_sv/3
 % ================================================
 
-:- dmsg_hide(db_assert_sv).
+:-dmsg_hide(db_assert_sv).
 
-:- dmsg_hide(mpred_modify).
-:- dmsg_hide(add).
+:-dmsg_hide(mpred_modify).
+:-dmsg_hide(add).
 
-:- dmsg_hide(into_mpred_form).
+:-dmsg_hide(into_mpred_form).
 
 
 /*
 update_single_valued_arg(P,N):- arg(N,P,UPDATE),replace_arg(P,N,OLD,Q),
   (is_relative(UPDATE)->
      must_det_l((Q,update_value(OLD,UPDATE,NEW),\+ is_relative(NEW), replace_arg(Q,N,NEW,R),enqueue(\+Q),enqueue(R)));
-     forall((Q,UPDATE\=OLD),pfc_enqueue(\+Q))),!.
+     forall((Q,UPDATE\=OLD),mpred_enqueue(\+Q))),!.
 */
 
 /*
 
 % assert_with to change(CA1,CB2) singlevalue pred
-:- export((db_assert_sv/4)).
+:-export((db_assert_sv/4)).
 %db_assert_sv(_Must,C,F,A):- throw_if_true_else_fail(contains_singletons(C),db_assert_sv(C,F,A)).
 
 db_assert_sv(C):- get_functor(C,F,A), db_assert_sv(must,C,F,A),!.
 
 db_assert_sv(Must,C,F,A):- ex, ignore(( loop_check(db_assert_sv_ilc(Must,C,F,A),true))).
 
-:- export((db_assert_sv_ilc/4)).
+:-export((db_assert_sv_ilc/4)).
 db_assert_sv_ilc(Must,C,F,A):- arg(A,C,UPDATE),is_relative(UPDATE),db_assert_sv_now(Must,C,F,A,UPDATE),!.
 
-:- export(db_assert_sv_now/5).
+:-export(db_assert_sv_now/5).
 
 db_assert_sv_now(Must,C,F,A,    +UPDATE):-!,  db_assert_sv_update(Must,C,F,A,+UPDATE).
 db_assert_sv_now(Must,C,F,A,    -UPDATE):-!,  db_assert_sv_update(Must,C,F,A,-UPDATE).
@@ -418,7 +418,7 @@ db_assert_sv_now(Must,C,F,A, -(+(UPDATE))):-!,db_assert_sv_update(Must,C,F,A,-UP
 db_assert_sv_now(Must,C,F,A, +(-(UPDATE))):-  db_assert_sv_update(Must,C,F,A,-UPDATE).
 db_assert_sv_now(Must,C,F,A, REPLACE):- db_assert_sv_replace(Must,C,F,A, REPLACE).
 
-:- export(db_assert_sv_update/5).
+:-export(db_assert_sv_update/5).
 db_assert_sv_update(Must,C,F,A,UPDATE):-
    replace_arg(C,A,OLD,COLD),
    % prefer updated values to come from instances but will settle with anything legal
@@ -426,9 +426,9 @@ db_assert_sv_update(Must,C,F,A,UPDATE):-
    update_value(OLD,UPDATE,NEW),!,
    db_assert_sv_replace(Must,C,F,A,NEW),!.
 
-:- export(db_assert_sv_replace/5).
+:-export(db_assert_sv_replace/5).
 
-:- style_check(-singleton).
+:-style_check(-singleton).
 % db_assert_sv_replace_noisey_so_disabled
 db_assert_sv_replace(_Must,C,_,A,NEW):- fail,
    replace_arg(C,A,_,CBLANK),
@@ -458,7 +458,7 @@ db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):-
 
 */
 
-:- style_check(+singleton).
+:-style_check(+singleton).
 
 
 equals_call(X,Y):-unify_with_occurs_check(X,Y),!.
@@ -487,7 +487,7 @@ db_must_asserta_confirmed_sv(CNEW,A,NEW):-
 
 db_must_asserta_confirmed_sv(CNEW,A,NEW):-dmsg(unconfirmed(db_must_asserta_confirmed_sv(CNEW,A,NEW))).
 
-with_assert_op_override(Op,Call):-with_assertions(thlocal:assert_op_override(Op),Call).
+with_assert_op_override(Op,Call):-w_tl(t_l:assert_op_override(Op),Call).
 
 test_expand_units(IN):-fully_expand(query(t,must),IN,OUT),dmsg(test_expand_units((IN->OUT))).
 
@@ -496,8 +496,8 @@ test_expand_units(IN):-fully_expand(query(t,must),IN,OUT),dmsg(test_expand_units
 mpred_modify(Op,                 G):- (var(Op);var(G)),!,trace_or_throw(var_database_modify_op(Op,  G )).
 mpred_modify(Op,                 G):- \+ skip_is_asserted_expansion(G),G\=meta_argtypes(_),fully_expand_warn(Op,G,GG),not_variant(G,GG),!,mpred_modify(Op, GG ),!.
 mpred_modify(_,  (:-include(FILE))):- !,must(ensure_mpred_file_loaded(FILE)).
-mpred_modify(Op,  (:-(G))         ):- !,must(with_assert_op_override(Op,debugOnError(G))).
-mpred_modify(P,                  G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
+mpred_modify(Op,  (:-(G))         ):- !,must(with_assert_op_override(Op,on_x_rtrace(G))).
+mpred_modify(P,                  G):- t_l:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
 %mpred_modify(Op,                 G):- mpred_head_expansion(clause,G,GG),not_variant(G,GG),database_modify_0(Op, GG ),!.
 mpred_modify(Op,                 G):- database_modify_0(Op,G ),!.
 mpred_modify(Op,                 G):- trace_or_throw(unknown_database_modify(Op,G)).
@@ -515,7 +515,7 @@ database_modify_0(change(assert,AZ),          G):- database_modify_assert(change
 
 % database_modify_assert(change(assert,_),        G):- ( \+ \+ is_asserted(G)),must(variant(G,GG)),!.
 % database_modify_assert(change(assert,AZ),       G):- expire_pre_change(AZ,GG),fail.
-database_modify_assert(change(assert,_AorZ),       G):- !,pfc_add(G).
+database_modify_assert(change(assert,_AorZ),       G):- !,mpred_add(G).
 database_modify_assert(change(assert,AorZ),       G):- 
  get_functor(G,F,_),!,
    (AorZ == a -> hooked_asserta(G);
@@ -528,13 +528,13 @@ database_modify_assert(change(assert,AorZ),       G):-
 % only place ever should actual game database be changed from
 % ========================================
 
-hooked_asserta(G):- loop_check(mpred_modify(change(assert,a),G),pfc_asserta(G)).
+hooked_asserta(G):- loop_check(mpred_modify(change(assert,a),G),mpred_adda(G)).
 
-hooked_assertz(G):- loop_check(mpred_modify(change(assert,z),G),pfc_assertz(G)).
+hooked_assertz(G):- loop_check(mpred_modify(change(assert,z),G),mpred_addz(G)).
 
 hooked_retract(G):-  Op = change(retract,a),
                    ignore(slow_sanity(ignore(show_call_failure((mpred_op(is_asserted,G)))))),
-                   slow_sanity(not(singletons_throw_else_fail(retract_cloc(G)))),
+                   slow_sanity(not(singletons_throw_else_fail(hooked_retract(G)))),
                    slow_sanity(ignore(((ground(G), once(show_call_failure((is_asserted(G)))))))),
                    must_storage_op(Op,G),expire_post_change( Op,G),
                    sanity(ignore(show_call_failure(not_asserted((G))))),
@@ -548,18 +548,18 @@ hooked_retractall(G):- Op = change(retract,all),
 
 
 
-user:provide_mpred_storage_op(Op,G):- get_functor(G,F,A),user:provide_mpred_storage_op(Op,G,F,A).
+user:mpred_provide_storage_op(Op,G):- get_functor(G,F,A),user:mpred_provide_storage_op(Op,G,F,A).
 
-user:provide_mpred_storage_op(Op,G, F,_A):- t(pfcControlled,F),!,loop_check(prolog_provide_mpred_storage_op(Op,G)).
-user:provide_mpred_storage_op(Op,G, F,_A):- t(prologDynamic,F),!,loop_check(pfc_provide_mpred_storage_op(Op,G)).
-user:provide_mpred_storage_op(Op,G,_F,_A):- loop_check(prolog_provide_mpred_storage_op(Op,G)).
+user:mpred_provide_storage_op(Op,G, F,_A):- t(pfcControlled,F),!,loop_check(prolog_mpred_provide_storage_op(Op,G)).
+user:mpred_provide_storage_op(Op,G, F,_A):- t(prologDynamic,F),!,loop_check(mpred_mpred_provide_storage_op(Op,G)).
+user:mpred_provide_storage_op(Op,G,_F,_A):- loop_check(prolog_mpred_provide_storage_op(Op,G)).
 
-%user:provide_mpred_storage_op(Op,G):- (loop_check(isa_provide_mpred_storage_op(Op,G))).
-%user:provide_mpred_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(user:provide_mpred_storage_clauses(G,true,_Proof))).
+%user:mpred_provide_storage_op(Op,G):- (loop_check(isa_mpred_provide_storage_op(Op,G))).
+%user:mpred_provide_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(user:mpred_provide_storage_clauses(G,true,_Proof))).
 
 must_storage_op(Op,G):- doall(must(may_storage_op(Op,G))).
 
-may_storage_op(Op,G):-call_no_cuts(user:provide_mpred_storage_op(Op,G)).
+may_storage_op(Op,G):-call_no_cuts(user:mpred_provide_storage_op(Op,G)).
 
 
 :- meta_predicate hooked_asserta(+), hooked_assertz(+), hooked_retract(+), hooked_retractall(+).
@@ -582,8 +582,8 @@ is_static_pred(Head):-  predicate_property(Head,static),!.
 is_static_pred(Head):- predicate_property(Head,_), !, \+ (predicate_property(Head,dynamic)).
 is_static_pred(Head):-  predicate_property(Head,meta_predicate),!.
 
-prolog_provide_mpred_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),user:mpred_prop(F,prologDynamic),!, prolog_op(Op,G).
-prolog_provide_mpred_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),not(user:mpred_prop(F,prologHybrid)),!,current_predicate(_,G), prolog_op(Op,G).
+prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),user:mpred_prop(F,prologDynamic),!, prolog_op(Op,G).
+prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),not(user:mpred_prop(F,prologHybrid)),!,current_predicate(_,G), prolog_op(Op,G).
 use_if_modify_new:- current_predicate(assert_if_new/1).
 prolog_op(change(AR,Op), G):-ensure_dynamic(G),!,prolog_modify(change(AR,Op), G).
 
@@ -598,7 +598,7 @@ prolog_op(is_asserted,(G)):-!,clause_asserted(G,true).
 
 prolog_op(conjecture,G):-!, mpred_call(G).
 prolog_op(call,G):-!, mpred_call(G).
-prolog_op(Op,G):- reduce_mpred_op(Op,Op2), debugOnError(call(Op2,G)).
+prolog_op(Op,G):- reduce_mpred_op(Op,Op2), on_x_rtrace(call(Op2,G)).
 
 
 

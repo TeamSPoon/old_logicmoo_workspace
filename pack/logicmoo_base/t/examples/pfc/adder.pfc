@@ -11,7 +11,7 @@ isa(X,Class), ~faulty(X) => behave(X,Class).
 wire(T1,T2) => (value(T1,V) <=> value(T2,V)).
 
 % It is a conflict if a terminal has two different values.
-value(T,V1), value(T,V2)/(\+V1=:=V2) => conflict(two_values(T,V1,V2)).
+value(T,V1), value(T,V2)/( \+V1=:=V2) => conflict(two_values(T,V1,V2)).
 
 % assume an observation is true.
 observed(P), ~false_observation(P) => P.
@@ -22,7 +22,7 @@ conflict(C) => {resolveConflict(C)}.
 % this isn't written yet.
 resolveConflict(C) :-
   format("~NHalting with conflict ~w", [C]),
-  pfc_halt.
+  mpred_halt.
 
 % an adder's behaviour
 behave(X,adder) =>
@@ -40,7 +40,7 @@ behave(X,multiplier) =>
 % meta rules to schedule inferencing.
 
 % resolve conflicts asap
-pfc_select(conflict(X),S) :- pfc_queue(conflict(X),S).
+mpred_select(conflict(X),S) :- mpred_queue(conflict(X),S).
 
 
 

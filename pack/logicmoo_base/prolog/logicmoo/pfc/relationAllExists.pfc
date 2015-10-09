@@ -11,7 +11,7 @@
 
 
 
-:- if(if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
+:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 
 isa(iExplorer1,tHumanPlayer).
 isa(iExplorer2,tHumanPlayer).
@@ -61,6 +61,7 @@ ptTransitiveBinaryPredicate(mudSubPart).
 ((transitiveViaArg(PRED,BPRED,3),arity(PRED,3)) /ground(PRED:BPRED)) ==> clif((t(PRED,Z,A,B) , t(BPRED,B,C)) => t(PRED,Z,A,C)).
 ((transitiveViaArgInverse(PRED,BPRED,3),arity(PRED,3))/ground(PRED:BPRED)) ==> clif((t(PRED,Z,A,B) , t(BPRED,C,B)) => t(PRED,Z,A,C)).
 
+(relationAllExists(Pred,Col1,Col2) ==> (ptBinaryPredicate(Pred),tCol(Col2),tCol(Col2))).
 
 % version that works but not safe
 /*
@@ -136,9 +137,9 @@ relationAllExists(mudSubPart,tHumanBody,isEach(tHumanHead,tHumanNeck,tHumanUpper
 relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
 
 
-:- if(if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
+:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 
-% :- pfc_spy_all.
+% :- mpred_spy_all.
 
 :- endif.
 
@@ -153,7 +154,7 @@ relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
 
 isa(skRelationAllExistsFn(P,A,C),C):- nonvar(P),nonvar(A),nonvar(C).
 
-:- if(if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
+:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 
 ?- listing(mudSubPart).
 %:-rtrace((isa(Inst,tHumanNeck),mudSubPart(iExplorer1,Inst))).

@@ -38,7 +38,7 @@ not(P), P => conflict(P).
 % voltage(T,V) => (not(voltage(T,V2)) <= {\+V=:=V2}).
 
 % It is a conflict if a terminal has two different voltages.
-voltage(T,V1), voltage(T,V2)/(\+V1=:=V2) => conflict(two_voltages(T,V1,V2)).
+voltage(T,V1), voltage(T,V2)/( \+V1=:=V2) => conflict(two_voltages(T,V1,V2)).
 
 % assume an observation is true.
 observed(P), ~false_observation(P) => P.
@@ -49,12 +49,12 @@ conflict(C) => {resolveConflict(C)}.
 % this isn't written yet.
 resolveConflict(C) :-
   format("~NHalting with conflict ~w", [C]),
-  pfc_halt.
+  mpred_halt.
 
 % meta rules to schedule inferencing.
 
 % resolve conflicts asap
-pfc_select(conflict(X),S) :- pfc_queue(conflict(X),S).
+mpred_select(conflict(X),S) :- mpred_queue(conflict(X),S).
   
 
 %% ***** here is a particular test case. *****

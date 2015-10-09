@@ -101,7 +101,7 @@ attempt_attribute_one_arg(Hint,F,N,A):-attempt_attribute_args(AndOr,argi(F,N),A)
 % mdif(A,B):- tlbugger:attributedVars,!,dif(A,B).
 mdif(A,B):-A\==B.
 
-:- export((samef/2,same/2)).
+:-export((samef/2,same/2)).
 same(X,Y):- samef(X,Y),!.
 same(X,Y):- compound(X),arg(1,X,Y),!.
 same(X,Y):- compound(Y),arg(1,Y,X),!.
@@ -113,10 +113,10 @@ to_functor(A,O):-is_ftVar(A),!,A=O.
 to_functor(A,O):-compound(A),get_functor(A,F),!,to_functor(F,O).
 to_functor(A,A).
 
-:- export(arg_to_var/3).
+:-export(arg_to_var/3).
 arg_to_var(_Type,_String,_Var).
 
-:- export(same_arg/3).
+:-export(same_arg/3).
 
 same_arg(_How,X,Y):-var(X),var(Y),!,X=Y.
 same_arg(equals,X,Y):-!,equals_call(X,Y).
@@ -141,9 +141,9 @@ promp_yn(Fmt,A):- format(Fmt,A),get_single_char(C),C=121.
 :- debug.
 
 
-% :-module(domain, [ domain/2  ]). % Var, ?Domain
+% :-swi_module(domain, [ domain/2  ]). % Var, ?Domain
 :- use_module(library(ordsets)).
-:- export(domain/2).
+:-export(domain/2).
 domain(X, Dom) :-
       var(Dom), !,
       get_attr(X, domain, Dom).
@@ -152,13 +152,13 @@ domain(X, List) :-
       put_attr(Y, domain, Domain),
       X = Y.
 
-:- export(extend_domain/2).
+:-export(extend_domain/2).
 extend_domain(X, DomL):- init_dom(X, Dom2), ord_union(Dom2, DomL, NewDomain),put_attr( X, domain, NewDomain ).
 
-:- export(extend_dom/2).
+:-export(extend_dom/2).
 extend_dom(X, DomE):-  init_dom(X, Dom2),ord_add_element(Dom2, DomE, NewDomain),put_attr( X, domain, NewDomain ).
 
-:- export(init_dom/2).
+:-export(init_dom/2).
 init_dom(X,Dom):-get_attr(X, domain, Dom),!.
 init_dom(X,Dom):-Dom =[_], put_attr(X, domain, Dom),!.
 
@@ -209,7 +209,7 @@ cmp_memberchk0(Item, [X1]) :-
 
 
 
-:- export(isac/2).
+:-export(isac/2).
 isac(X, Dom) :-
       var(Dom), !,
       get_attr(X, isac, Dom).

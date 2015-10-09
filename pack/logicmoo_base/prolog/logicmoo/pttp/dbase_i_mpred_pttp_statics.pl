@@ -1,8 +1,8 @@
 
 :- ensure_loaded(logicmoo(mpred/logicmoo_i_header)).
 
-:- 
- %module(logicmoo_i_pttp_statics,[ 
+:-
+ %swi_module(logicmoo_i_pttp_statics,[ 
     % pttp1/2,
       op(400,fy,-),    % negation
       op(500,xfy,&),   % conjunction
@@ -612,7 +612,7 @@ procedures([],_Clauses,true).
 
 head_body_was(_,_).
 
-:- export(is_holds_false_pttp/1).
+:-export(is_holds_false_pttp/1).
 is_holds_false_pttp(A):-not(atom(A)),!,fail.
 is_holds_false_pttp(Prop):-member(Prop,[not,nholds,holds_f,mpred_f,aint,assertion_f,asserted_mpred_f,retraction,not_secondOrder,not_firstOrder]).
 is_holds_false_pttp(F):-atom_concat(_,'_false',F).
@@ -620,7 +620,7 @@ is_holds_false_pttp(F):-atom_concat(_,'_false',F).
 is_holds_false_pttp(F):-is_p_to_n(_,F).
 % is_holds_false_pttp(F):-atom_concat('imp',_,F).
 
-:- export(is_holds_true_pttp/1).
+:-export(is_holds_true_pttp/1).
 is_holds_true_pttp(A):-not(atom(A)),!,fail.
 is_holds_true_pttp(Prop):-arg(_,vvv(holds,holds_t,t,asserted_mpred_t,assertion_t,assertion,secondOrder,asserted_t),Prop).
 is_holds_true_pttp(F):-atom_concat(_,'_true',F).
@@ -630,25 +630,25 @@ is_holds_true_pttp(F):-atom_concat(_,'_t',F).
 is_holds_true_pttp(F):-atom_concat(_,'_in',F).
 is_holds_true_pttp(F):-is_p_to_n(F,_).
 
-:- export(is_2nd_order_holds_pttp/1).
+:-export(is_2nd_order_holds_pttp/1).
 is_2nd_order_holds_pttp(Prop):- atom(Prop), is_holds_true_pttp(Prop) ; is_holds_false_pttp(Prop).
 
 
-:- style_check(+singleton).
+:-style_check(+singleton).
 
 do_not_wrap(F):-not(atom(F)),!,fail.
 do_not_wrap(F):-arg(_,vv(query),F).
 do_not_wrap(F):-atom_concat('int_',_,F).
 
-:- export(correct_pttp/2).
-%:- dynamic thlocal:second_order_wrapper/1.
-:- thread_local thlocal:second_order_wrapper/1.
-thlocal:second_order_wrapper(true_t).
+:-export(correct_pttp/2).
+%:- dynamic t_l:second_order_wrapper/1.
+:- thread_local t_l:second_order_wrapper/1.
+t_l:second_order_wrapper(true_t).
 
 
-correct_pttp_head(Wrapper,B,A):- with_assertions(thlocal:second_order_wrapper(Wrapper), correct_pttp(B,A)),!.
+correct_pttp_head(Wrapper,B,A):- w_tl(t_l:second_order_wrapper(Wrapper), correct_pttp(B,A)),!.
 
-correct_pttp_body(Wrapper,B,A):- with_assertions(thlocal:second_order_wrapper(Wrapper), correct_pttp(B,A)),!.
+correct_pttp_body(Wrapper,B,A):- w_tl(t_l:second_order_wrapper(Wrapper), correct_pttp(B,A)),!.
 
 correct_pttp(B,A):-must(correct_pttp([],B,A)),!.
 
@@ -683,7 +683,7 @@ correct_pttp_2(_,infer_by,1,[L|IST],Body):- infer_by = F, wrap_univ(Body ,[F,L|I
 correct_pttp_2(LC,F,A,[L|IST],Body):-correct_pttp_3(LC,F,A,[L|IST],Body),!.
 
 correct_pttp_3(_,F,A,[L|IST],Body):- correct_pttp_4(F,A,[L|IST],Body),!.
-correct_pttp_3(_,F,_,[L|IST],Body):- thlocal:second_order_wrapper(Wrapper),!, wrap_univ(Body ,[Wrapper,F,L|IST]).
+correct_pttp_3(_,F,_,[L|IST],Body):- t_l:second_order_wrapper(Wrapper),!, wrap_univ(Body ,[Wrapper,F,L|IST]).
 correct_pttp_3(_,F,_,[L|IST],Body):- wrap_univ(Body,[true_t,F,L|IST]).
 
 wrap_univ(Body ,[WapperPred,[P]]):-is_wrapper_pred(WapperPred),compound(P),P=..F_ARGS,!,wrap_univ(Body ,[WapperPred|F_ARGS]).
@@ -707,7 +707,7 @@ correct_pttp_4(_,_,_,_):-!,fail.
 
 %:-export(pttp1/2).
 %pttp1(X,Y) :- must_pttp_id(ID), !, pttp1_wid(ID, X,Y).
-:- export(pttp1_wid/3).
+:-export(pttp1_wid/3).
 pttp1_wid(ID,X,Y) :-    
  must_det_l((   
    pttp1a_wid(ID,X,X0),
@@ -717,7 +717,7 @@ pttp1_wid(ID,X,Y) :-
 
 
 
-:- export(pttp1a_wid/3).
+:-export(pttp1a_wid/3).
 
 % pttp1a_wid(ID,X,XX):-pttp1a_wid_0(ID,X,XX),!.
 
@@ -755,10 +755,10 @@ pttp1c_wid(_ID,X0,X8,IntProcs,Procs) :-
 %%% ****if* PTTP/pttp2
 %%% SOURCE
 
-:- export(pttp2_wid/2).
+:-export(pttp2_wid/2).
 pttp2_wid(ID,Y) :- !, must(apply_to_conjuncts(Y,pttp_assert_int_wid_for_conjuncts(ID),_)).
 /*
-:- export(pttp2/1).
+:-export(pttp2/1).
 pttp2(Y) :- must_pttp_id(ID), pttp2_wid(ID,Y).
 
 pttp2(Y) :-
@@ -779,7 +779,7 @@ pttp2(Y) :-
 %%% SOURCE
 */
 
-:- export(expand_input_proof/2).
+:-export(expand_input_proof/2).
 expand_input_proof([],_Proof).
 expand_input_proof([N|L],[[N|_]|L1]) :-
 	expand_input_proof(L,L1).
@@ -787,7 +787,7 @@ expand_input_proof([N|L],[[N|_]|L1]) :-
 %%% ****if* PTTP/contract_output_proof
 %%% SOURCE
 
-:- export(contract_output_proof/2).
+:-export(contract_output_proof/2).
 contract_output_proof([Prf|PrfEnd],Proof) :-
 	Prf == PrfEnd,
 	!,
@@ -903,7 +903,7 @@ max(X,Y,Max) :-
 %%% ****if* PTTP/conjoin_pttp
 %%% SOURCE
 
-:- export(conjoin_pttp/3).
+:-export(conjoin_pttp/3).
 
 conjoin_pttp(A,B,C) :- A==B, !, C=A.
 conjoin_pttp(A,B,C) :- var(A),!,conjoin_pttp(varcall(A),B,C).
@@ -1019,7 +1019,7 @@ negated_functor0(_,_):-!,fail.
 %negated_functor0(F,NotF) :- is_p_to_n(F,NotF).
 %negated_functor0(F,NotF) :- is_p_to_n(NotF,F).
 
-:- export(negated_functor/2).
+:-export(negated_functor/2).
 negated_functor(F,NotF) :- var(F),!,trace_or_throw(negated_functor(F,NotF)).
 %negated_functor(F,NotF) :- sanity(atom(F)),atom_concat('not_',Now,F),!,must(NotF=Now).
 negated_functor(F,SNotF) :- negated_functor0(F,NotF),!,is_p_simple(NotF,SNotF).
@@ -1160,7 +1160,7 @@ write_indent_for_number(N) :-
 %%%   assumes that statistics(cputime,T) binds T to run-time in seconds
 %%%   different Prolog systems have different ways to get this information
 %%% SOURCE
-:- export(timed_call/2).
+:-export(timed_call/2).
 :- meta_predicate(timed_call(0,+)).
 timed_call(X,Type) :-
 	statistics(cputime,T1),			%SWI Prolog
@@ -1304,7 +1304,7 @@ builtin_why(X,0):-atom(X).
 %
 % Example:  pttp_nnf(ex(Y, all(X, (f(Y) => f(X)))),NNF).
 %           NNF =  all(_A,(-(f(all(X,f(ex)=>f(X))));f(_A)))) ?
-:- export(pttp_nnf/2).
+:-export(pttp_nnf/2).
 pttp_nnf((A,B),(C,D)):- must(is_ftNonvar(A)), !, pttp_nnf(A,C), pttp_nnf(B,D).
 pttp_nnf(Fml,NNFOUT) :- pttp_nnf(Fml,[],NNF,_),NNFOUT=NNF.
 
@@ -1385,7 +1385,7 @@ pttp_nnf_post_clean(C,CC,Vars):-
    pttp_nnf_post_clean(B,BB,Vars),
    CC=..[AA|BB],!.
 
-:- export(logical_functor_pttp/1).
+:-export(logical_functor_pttp/1).
 
 logical_functor_pttp(X):-not(atom(X)),!,fail.
 logical_functor_pttp(props):-!,fail.
@@ -1461,4 +1461,4 @@ pttp_nnf_clean((A v B),FreeV,NNF,Paths) :- !,
 pttp_nnf_clean(Lit,_,Lit,1).
 
 
-:- ensure_loaded(dbase_i_mpred_pttp_precompiled).
+:-ensure_loaded(dbase_i_mpred_pttp_precompiled).

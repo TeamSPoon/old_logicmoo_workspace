@@ -1,4 +1,4 @@
-/** <module> An Implementation a MUD server in SWI-Prolog
+/* Part of LogicMOO Base An Implementation a MUD server in SWI-Prolog
 % ===================================================================
 % File 'logicmoo_util_dcg.pl'
 % Purpose: An Implementation in SWI-Prolog of certain debugging tools
@@ -9,7 +9,6 @@
 % Revised At:   $Date: 2002/07/11 21:57:28 $
 % ===================================================================
 */
-:- if(\+ current_module(logicmoo_utils)).
 :- module(logicmoo_util_dcg,[
          do_dcg_util_tests/0,
          isVar/1,
@@ -39,15 +38,20 @@
          decl_dcgTest/3,
          dcgReorder/4
 	 ]).
-:- include(logicmoo_util_header).
 
+:- use_module(logicmoo(logicmoo_utils)).
+:- use_module(logicmoo_util_strings).
+
+/*
 :- '@'((use_module((logicmoo_util_library)),
         use_module((logicmoo_util_bugger)),        
          use_module((logicmoo_util_ctx_frame)),
          use_module((logicmoo_util_strings)),
          use_module((logicmoo_util_terms))),'user').
-
-:- endif.
+*/
+%:- else.
+:- include(logicmoo_util_header).
+%:- endif.
 
  
 :- meta_predicate dcgLeftOfMid(?,//,?,?).
@@ -90,10 +94,10 @@
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 
 :- if(current_prolog_flag(dialect,swi)).
-:- dynamic(double_quotes_was/1).
-:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
-:- retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
-:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
+:- dynamic(double_quotes_was_in_dcg/1).
+:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was_in_dcg(WAS)).
+:- retract(double_quotes_was_in_dcg(WAS)),set_prolog_flag(double_quotes,WAS).
+:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was_in_dcg(WAS)).
 :- set_prolog_flag(double_quotes,string).
 :- endif.
 
@@ -375,7 +379,7 @@ dumpList(_,[]):-!.
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 :- if(current_prolog_flag(dialect,swi)).
-:- retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
+:- retract(double_quotes_was_in_dcg(WAS)),set_prolog_flag(double_quotes,WAS).
 :- endif.
 
 end_of_file.

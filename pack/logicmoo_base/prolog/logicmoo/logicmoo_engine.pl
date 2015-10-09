@@ -130,7 +130,7 @@ pttp_listens_to_stub(prologPTTP).
 pttp_listens_to_stub(prologKIF).
 
 
-user:provide_mpred_setup(Op,H):- provide_kif_op(Op,H).
+user:mpred_provide_setup(Op,H):- provide_kif_op(Op,H).
 
 % OPHOOK ASSERT
 provide_kif_op(change(assert,How),(HeadBody)):- 
@@ -146,7 +146,7 @@ provide_kif_op(call(How),Head):-
 % OPHOOK CLAUSES
 provide_kif_op(clauses(How),(Head:- Body)):- 
    pttp_listens_to_head(clauses(How),Head),
-   provide_mpred_storage_clauses(Head,Body,_Why).
+   mpred_provide_storage_clauses(Head,Body,_Why).
 
 % OPHOOK 
 provide_kif_op(OP,(HeadBody)):- 
@@ -155,12 +155,12 @@ provide_kif_op(OP,(HeadBody)):-
 
 
 % CLAUSES HOOK 
-user:provide_mpred_storage_clauses(H,B,wid3(IDWhy)):- wid(IDWhy,_,(H:- B)).
-user:provide_mpred_storage_clauses(H,true,wid3(IDWhy)):- wid(IDWhy,_,(H)),compound(H),not(functor(H,':-',2)).
+user:mpred_provide_storage_clauses(H,B,wid3(IDWhy)):- wid(IDWhy,_,(H:- B)).
+user:mpred_provide_storage_clauses(H,true,wid3(IDWhy)):- wid(IDWhy,_,(H)),compound(H),not(functor(H,':-',2)).
 
 
 % REGISTER HOOK
-user:provide_mpred_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(StubType),!,
+user:mpred_provide_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(StubType),!,
    get_pifunctor(HeadIn,Head,F),
       assert_if_new(isa(F,prologPTTP)),
          ensure_universal_stub(Head),
@@ -250,8 +250,8 @@ door(What).
 kif_result(_).
 :- export((kif_test)/1).
 kif_test(X):-kif_tell(X).
-:- op(1000,fy,(kif_test)).
-:- assert_until_eof(thlocal:canonicalize_types).
+:-op(1000,fy,(kif_test)).
+:- assert_until_eof(t_l:canonicalize_types).
 
 :- discontiguous kif_sanity_test_0/0.
 
@@ -261,7 +261,7 @@ kif_sanity_test_0:-kif_test(p(A,R) & q(A,R)).
 
 
 :- kif_result(
-(=> pfc_default((
+(=> mpred_default((
    room(R) => 
       {D = skIsDoorInRoomArg2ofHasFn(R)},has(R,D) & door(D))))).
 
@@ -276,8 +276,8 @@ kif_sanity_test_0:-kif_test(p(A,R) & q(A,R)).
 % :- prolog.
 %:- must(((kif_test(isa(F,tPred) => exists(A, (isa(A,ftInt) & arity(F,A))))))).
 
-:- nop(( kif_result(
-(==> pfc_default((
+:-nop(( kif_result(
+(==> mpred_default((
    tPred(F) ==> 
       {A = skIsIntInPredArg2ofArityFn(F)},arity(F,A) & ftInt(A))
  ))))).
@@ -498,7 +498,7 @@ kif_sanity_test_0:-kif_test '
 
 
 
-:- if((fail)).
+:-if((fail)).
 
 kif_sanity_test_0:-kif_test '
 (implies 
@@ -542,8 +542,8 @@ kif_sanity_test_0:-kif_test '
                        (TheSetOf ?OBJ 
                            (eventOccursAt ?OBJ ?LAND))) directingAgent))))'.
 
-:- endif.
-:- if(if_defined(show_argtype_tests)).
+:-endif.
+:-if(if_defined(show_argtype_tests)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % this rule ...
@@ -614,15 +614,15 @@ kif_sanity_test_0:-kif_test(   argInst(kb_argInst, 1 ,KB) =>  (        has(A,B) 
 kif_sanity_test_0:-kif_test(   argInst(kb_argInst, 1 ,KB) & argInst(has, 1 , A) & argInst(has, 2 , B) =>  (  has(A,B) =>  (kb_argInst(KB, has, 1, A) & kb_argInst(KB, has, 2, B)))).
 
 
-%   pfc_add= (not_has(A, B)):- not_kb_argInst(C, has, 1, A), argInst(has, 2, B), argInst(kb_argInst, 1, C), argInst(has, 1, A)).
+%   mpred_add= (not_has(A, B)):- not_kb_argInst(C, has, 1, A), argInst(has, 2, B), argInst(kb_argInst, 1, C), argInst(has, 1, A)).
 %
-%   pfc_add= (kb_argInst(C, has, 1, A):-has(A, B), argInst(has, 2, B), argInst(kb_argInst, 1, C), argInst(has, 1, A)).
+%   mpred_add= (kb_argInst(C, has, 1, A):-has(A, B), argInst(has, 2, B), argInst(kb_argInst, 1, C), argInst(has, 1, A)).
 %
-%   pfc_add= (not_argInst(has, 2, A)):-has(B, A), not_kb_argInst(C, has, 1, B), argInst(kb_argInst, 1, C), argInst(has, 1, B)).
+%   mpred_add= (not_argInst(has, 2, A)):-has(B, A), not_kb_argInst(C, has, 1, B), argInst(kb_argInst, 1, C), argInst(has, 1, B)).
 %
-%   pfc_add= (not_argInst(kb_argInst, 1, A)):-has(B, C), not_kb_argInst(A, has, 1, B), argInst(has, 2, C), argInst(has, 1, B)).
+%   mpred_add= (not_argInst(kb_argInst, 1, A)):-has(B, C), not_kb_argInst(A, has, 1, B), argInst(has, 2, C), argInst(has, 1, B)).
 %
-%   pfc_add= (not_argInst(has, 1, A)):-has(A, B), not_kb_argInst(C, has, 1, A), argInst(has, 2, B), argInst(kb_argInst, 1, C)).
+%   mpred_add= (not_argInst(has, 1, A)):-has(A, B), not_kb_argInst(C, has, 1, A), argInst(has, 2, B), argInst(kb_argInst, 1, C)).
 %
 %   (not_has(C, A)):- not_kb_argInst(B, has, 2, A), argInst(has, 2, A), argInst(kb_argInst, 1, B), argInst(has, 1, C)).
 %
@@ -635,7 +635,7 @@ kif_sanity_test_0:-kif_test(   argInst(kb_argInst, 1 ,KB) & argInst(has, 1 , A) 
 %   (not_argInst(has, 1, A)):-has(A, B), not_kb_argInst(C, has, 2, B), argInst(has, 2, B), argInst(kb_argInst, 1, C)).
 
 
-:- endif. %if_defined(show_argtype_tests)
+:-endif. %if_defined(show_argtype_tests)
 
 
 kif_sanity_test_0:-kif_test(all(R,isa(R,tAgent) => exists(D, (isa(D,tNose) & mudContains(R,D))))).

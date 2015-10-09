@@ -30,6 +30,11 @@
 */
 
 end_of_file.
+ 
+:- if(false).
+:- else.
+:- include(logicmoo_util_header).
+:- endif.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This module implements the was/2 constraint. It allows two terms

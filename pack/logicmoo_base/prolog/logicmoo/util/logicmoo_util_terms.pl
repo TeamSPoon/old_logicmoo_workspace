@@ -1,4 +1,4 @@
-/** <module> Logicmoo Path Setups
+/* <module> Logicmoo Path Setups
 
    $Id$
 
@@ -38,7 +38,7 @@
     invalidate any other reasons why the executable file might be covered by
     the GNU General Public License.
 */
-:- if(\+ current_module(logicmoo_utils)).
+:- if(current_predicate(logicmoo_utils:combine_logicmoo_utils/0)).
 
 :- module(logicmoo_util_terms,
         [dynamic_transparent/1,
@@ -72,9 +72,154 @@
          multi_transparent/1]).
 
 
-:- set_prolog_flag(generate_debug_info, true).
+:- else.
+
+% File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_terms.pl
+:- module(logicmoo_util_terms,
+          [ at_start/1,
+            call_n_times/2,
+            call_no_cuts/1,
+            conjoin/3,
+            conjoin_op/4,
+            conjuncts_to_list/2,
+            delete_eq/3,
+            disjuncts_to_list/2,
+            do_expand_args/3,
+            do_expand_args_c/3,
+            do_expand_args_l/3,
+            do_expand_args_pa/4,
+            doall/1,
+            dynamic_load_pl/1,
+            each_subterm/2,
+            each_subterm/3,
+            flatten_dedupe/2,
+            flatten_set/2,
+            functor_h/2,
+            functor_h/3,
+            get_functor/2,
+            get_functor/3,
+            identical_member/2,
+            in_thread_and_join/1,
+            in_thread_and_join/2,
+            is_proof/1,
+            is_true/1,
+            lastMember2/2,
+            list_retain/3,
+            list_to_conjuncts/2,
+            list_to_conjuncts/3,
+            list_to_set_safe/2,
+            load_assert/3,
+            load_dirrective/2,
+            load_term/2,
+            load_term2/2,
+            logicmoo_library_file_loaded/0,
+            makeArgIndexes/1,
+            makeArgIndexes/2,
+            make_list/3,
+            maptree/3,
+            nd_predsubst/3,
+            nd_predsubst1/4,
+            nd_predsubst2/3,
+            nd_subst/4,
+            nd_subst1/5,
+            nd_subst2/4,
+            pred_delete/4,
+            pred_juncts_to_list/2,
+            pred_juncts_to_list/3,
+            pred_subst/5,
+            pred_term_parts/3,
+            pred_term_parts_l/3,
+            predsubst/3,
+            proccess_status/3,
+            read_each_term/3,
+            remove_dupes/2,
+            remove_dupes/3,
+            subst/4,
+            term_parts/2,
+            term_parts_l/2,
+            throw_if_true_else_fail/2,
+            univ_safe/2,
+            univ_term/2,
+            weak_nd_subst/4,
+            weak_nd_subst1/5,
+            weak_nd_subst2/4,
+            wsubst/4
+          ]).
+:- meta_predicate
+        at_start(0),
+        call_n_times(+, 0),
+        call_no_cuts(0),
+        doall(0),
+        each_subterm(?, 2, ?),
+        functor_h(?, ?),
+        functor_h(?, ?, ?),
+        get_functor(?, ?),
+        get_functor(?, ?, ?),
+        in_thread_and_join(0),
+        in_thread_and_join(0, +),
+        list_retain(?, 1, ?),
+        load_dirrective(0, ?),
+        maptree(2, +, -),
+        nd_predsubst(?, 2, ?),
+        nd_predsubst1(2, ?, ?, ?),
+        nd_predsubst2(2, ?, ?),
+        pred_delete(2, ?, ?, ?),
+        pred_subst(2, ?, ?, ?, ?),
+        pred_term_parts(1, ?, ?),
+        pred_term_parts_l(1, ?, ?),
+        predsubst(?, 2, ?),
+        throw_if_true_else_fail(0, ?).
+:- module_transparent
+        conjoin/3,
+        conjoin_op/4,
+        conjuncts_to_list/2,
+        delete_eq/3,
+        disjuncts_to_list/2,
+        do_expand_args/3,
+        do_expand_args_c/3,
+        do_expand_args_l/3,
+        do_expand_args_pa/4,
+        dynamic_load_pl/1,
+        each_subterm/2,
+        flatten_dedupe/2,
+        flatten_set/2,
+        identical_member/2,
+        is_proof/1,
+        is_true/1,
+        lastMember2/2,
+        list_to_conjuncts/2,
+        list_to_conjuncts/3,
+        list_to_set_safe/2,
+        load_assert/3,
+        load_term/2,
+        load_term2/2,
+        logicmoo_library_file_loaded/0,
+        makeArgIndexes/1,
+        makeArgIndexes/2,
+        make_list/3,
+        nd_subst/4,
+        nd_subst1/5,
+        nd_subst2/4,
+        pred_juncts_to_list/2,
+        pred_juncts_to_list/3,
+        proccess_status/3,
+        read_each_term/3,
+        remove_dupes/2,
+        remove_dupes/3,
+        subst/4,
+        term_parts/2,
+        term_parts_l/2,
+        univ_safe/2,
+        univ_term/2,
+        weak_nd_subst/4,
+        weak_nd_subst1/5,
+        weak_nd_subst2/4,
+        wsubst/4.
+
+
 :- include(logicmoo_util_header).
 :- endif.
+
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 :- dynamic(double_quotes_was_lib/1).
@@ -109,7 +254,7 @@ is_proof(P):-compound(P),functor(P,ftProofFn,_).
 % Note that, unlike simplification rules, func functions may not make destructive changes to expr. 
 % If a third argument many is provided, it is an integer which says how many times func may be applied; 
 % the default, as described above, is infinitely many times.
-:- meta_predicate(maptree(2,+,-)).
+% = :- meta_predicate(maptree(2,+,-)).
 :- export(maptree/3).
 maptree(Pred,I,O):- call(Pred,I,O),!.
 maptree(_ ,I,O):- ( \+ compound(I) ),!, must(I=O).
@@ -240,9 +385,9 @@ each_subterm(A,Pred,O):-
 % :-index(argNFound(1,1,1)).
 
 makeArgIndexes(CateSig):-functor_catch(CateSig,F,_),makeArgIndexes(CateSig,F),!.
-makeArgIndexes(CateSig,F):- argNumsTracked(F,Atom,Number),arg(Number,CateSig,Arg),user:nonvar(Arg),
-     %%Number<10,user:nonvar(Arg),atom_number(Atom,Number),
-     assert_if_new(argNFound(F,Atom,Arg)),fail.
+makeArgIndexes(CateSig,F):- argNumsTracked(F,Atom,Number),arg(Number,CateSig,Arg), nonvar(Arg),
+     % Number<10, nonvar(Arg),atom_number(Atom,Number),
+     ain(argNFound(F,Atom,Arg)),fail.
 makeArgIndexes(_NEW,_F).
 
 flatten_dedupe(Percepts0,Percepts):-
@@ -331,8 +476,8 @@ pred_subst(_Pred ,P,       _, _,       P     ).
 
 % dcgPredicate(M,F,A,P).
 
-univ_safe(P,[L|L1]):- nonvar(P), must_det((var(L);atom(L))),!,debugOnError(( P=..[L|L1] )).
-univ_safe(P,L):- must_det(is_list(L)),debugOnError((P=..L)).
+univ_safe(P,[L|L1]):- nonvar(P), must_det((var(L);atom(L))),!,on_x_debug(( P=..[L|L1] )).
+univ_safe(P,L):- must_det(is_list(L)),on_x_debug((P=..L)).
 
 % ===================================================================
 % Substitution based on ==
@@ -340,7 +485,7 @@ univ_safe(P,L):- must_det(is_list(L)),debugOnError((P=..L)).
 
 % Usage: subst(+Fml,+X,+Sk,?FmlSk)
 
-:- moo_hide_childs(subst/4).
+% :- mpred_trace_nochilds(subst/4).
 
 subst(A,B,C,D):-  hotrace((ccatch(hotrace(nd_subst(A,B,C,D)),E,(dumpST,dmsg(E:nd_subst(A,B,C,D)),fail)))),!.
 subst(A,_B,_C,A).
@@ -399,9 +544,17 @@ remove_dupes([],[],_):-!.
 remove_dupes([I|In],Out,Shown):-member(I,Shown),!,remove_dupes(In,Out,Shown).
 remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
 
+% = :- meta_predicate(functor_h(?,?)).
 functor_h(Obj,F):- functor_h(Obj,F,_),!.
+% = :- meta_predicate(get_functor(?,?)).
 get_functor(Obj,FO):-call((must(functor_h(Obj,F,_)),!,FO=F)).
+% = :- meta_predicate(get_functor(?,?,?)).
 get_functor(Obj,FO,AO):-call((must(functor_h(Obj,F,A)),!,FO=F,AO=A)).
+
+% = :- meta_predicate(functor_h(?,?,?)).
+functor_h(Obj,F,A):-nonvar(Obj),atom(F),strip_module(Obj,_M,P),functor(P,F,A).
+functor_h(Obj,F,A):-nonvar(Obj),var(F),strip_module(Obj,_M,P),functor(P,F,A).
+functor_h(Obj,M:F,A):-nonvar(Obj),strip_module(Obj,M,P),!,functor(P,F,A).
 
 functor_h(Obj,F,A):- var(Obj),trace_or_throw(var_functor_h(Obj,F,A)).
 functor_h(Obj,F,A):-var(Obj),!,(number(A)->functor(Obj,F,A);((current_predicate(F/A);throw(var_functor_h(Obj,F,A))))).
@@ -420,7 +573,7 @@ functor_h(Obj,F,A):-functor(Obj,F,A).
 
 :- export((do_expand_args/3)).
 
-do_expand_args(_,Term,Term):- compound(Term),functor(Term,F,_),if_defined(argsQuoted(F)),!.
+do_expand_args(_,Term,Term):- compound(Term),functor(Term,F,_),if_defined(logicmoo_base:argsQuoted(F)),!.
 do_expand_args(Exp,Term,Out):- compound(Term),!,do_expand_args_c(Exp,Term,Out).
 do_expand_args(_,Term,Term).
 
@@ -436,8 +589,8 @@ do_expand_args_l(Exp,[A|RGS],[E|ARGS]):- do_expand_args(Exp,A,E),do_expand_args_
 
 
 
-% :- moo_hide_childs(functor_safe/2).
-% :- moo_hide_childs(functor_safe/3).
+% :- mpred_trace_nochilds(functor_safe/2).
+% :- mpred_trace_nochilds(functor_safe/3).
 
 
 :- meta_predicate call_n_times(+,0).
@@ -565,14 +718,14 @@ call_no_cuts((A,B)):-!,(call_no_cuts(A),call_no_cuts(B)).
 call_no_cuts((A;B)):-!,(call_no_cuts(A);call_no_cuts(B)).
 call_no_cuts((A->B)):-!,(call_no_cuts(A)->call_no_cuts(B)).
 call_no_cuts((A->B;C)):-!,(call_no_cuts(A)->call_no_cuts(B);call_no_cuts(C)).
-call_no_cuts(M:CALL):-atom(M),!,functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(C,_))))),!,clause_safe(CALL,TEST),debugOnError(TEST).
-call_no_cuts(CALL):-functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(C,_))))),!,clause_safe(CALL,TEST),debugOnError(TEST).
+call_no_cuts(M:CALL):-atom(M),!,functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(M:C,_))))),!,clause_safe(M:CALL,TEST),M:on_x_debug(TEST).
+call_no_cuts(CALL):-functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(C,_))))),!,clause_safe(CALL,TEST),on_x_debug(TEST).
 
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 :- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was_lib(WAS)).
 
-:- module_predicates_are_exported.
-:- all_module_predicates_are_transparent(logicmoo_util_terms).
+%:- module_predicates_are_exported.
+%:- all_module_predicates_are_transparent(logicmoo_util_terms).
 
 logicmoo_library_file_loaded.

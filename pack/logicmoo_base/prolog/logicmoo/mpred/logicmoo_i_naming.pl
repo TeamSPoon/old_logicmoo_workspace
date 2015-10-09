@@ -14,7 +14,7 @@
 % ================================================
 % Naming System
 % ================================================
-:- export(create_meta/4).
+:-export(create_meta/4).
 % if SuggestedName was 'food666' it'd like the SuggestedClass to be 'food' and the stystem name will remain 'food666'
 % if SuggestedName was 'food' it'd like the SuggestedClass to be 'food' and the stystem name will become a gensym like 'food1'
 create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
@@ -28,7 +28,7 @@ create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
 
 
 
-:- export(i_name_lc/2).
+:-export(i_name_lc/2).
 i_name_lc(OType,IType):-typename_to_iname0('',OType,IOType),!,string_equal_ci(IOType,IType).
 
 
@@ -38,18 +38,18 @@ to_iname(T,TT):-is_ftVar(T)->TT=T;(not_log_op(T),i_name(t,T,TT)).
 
 
 toUpperCamelcase(Type,TypeUC):-toCamelcase(Type,TypeUC). % ,toPropercase(TypeC,TypeUC),!.
-:- export(i_name/2).
+:-export(i_name/2).
 i_name(OType,IType):-typename_to_iname0('',OType,IOType),!,IOType=IType.
-:- export(i_name/3).
+:-export(i_name/3).
 i_name(I,OType,IType):-typename_to_iname0(I,OType,IOType),!,IOType=IType.
 
-:- export(typename_to_iname0/3).
+:-export(typename_to_iname0/3).
 
 typename_to_iname0(I, [], O):- trace_or_throw(bad_typename_to_iname0(I, [], O)).
 typename_to_iname0(I,OType,IType):-type_prefix(Prefix,_),atom_concat(Prefix,Type,OType),capitalized(Type),!,typename_to_iname0(I,Type,IType).
 typename_to_iname0(I,Type,IType):-nonvar(Type),toUpperCamelcase(Type,UType),atom_concat(I,UType,IType).
 
-:- export(split_name_type/3).
+:-export(split_name_type/3).
 :- '$hide'(split_name_type/3).
 split_name_type(Suggest,InstName,Type):- must_det(split_name_type_0(Suggest,NewInstName,NewType)),!,must((NewInstName=InstName,NewType=Type)),!.
 
@@ -90,11 +90,11 @@ createByNameMangle0(Name,I,C):-mudKeyword(W,KW),string_equal_ci(Name,KW),!,creat
 createByNameMangle0(OType,Name,Type):-create_from_type(OType,Name,Type),!.
 createByNameMangle0(Name,IDA,Name):- gensym(Name,IDA), englishServerInterface([actCreate,Name,IDA]).
 
-createByNameMangle_compound(Name,Name,Type):- Name=..[Type|Props],assert_isa(Name,Type),with_assertions(deduceArgTypes(_),padd(Name,Props)).
+createByNameMangle_compound(Name,Name,Type):- Name=..[Type|Props],assert_isa(Name,Type),w_tl(deduceArgTypes(_),padd(Name,Props)).
 createByNameMangle_compound(Name,Inst,Type):- functor_catch(Name,Type,A),must(A==1),assert_isa(Name,Type),Name=Inst.
 
 
-:- dynamic(thglobal:current_source_suffix/1).
+:-dynamic(thglobal:current_source_suffix/1).
 
 get_source_suffix(SS):- thglobal:current_source_suffix(SS),!.
 get_source_suffix('7').
@@ -116,9 +116,9 @@ create_from_type(OType,Name,Type):- sanity(var(Name)),
 % ========================================
 
 
-modality(pfc_default, [usually],[]).
+modality(mpred_default, [usually],[]).
 modality(neg , [cannot],[can]).
-modality(pfc_default,[sometimes],[]).
+modality(mpred_default,[sometimes],[]).
 modality(can,[can],[be]).
 modality(possibly,[either],[]).
 modality(neg,[not],[]).
@@ -149,7 +149,7 @@ onSpawn_f_args(Modality,Funct,List):-
    Later =.. [Funct|NewList],
    fully_expand(t(Modality,Later),TO),
    add(TO),!. 
-  % call_after_mpred_load_slow(with_assertions(deduceArgTypes(Funct), add(Later))))),!.
+  % call_after_mpred_load_slow(w_tl(deduceArgTypes(Funct), add(Later))))),!.
 
 convertSpawnArgs(_,_,[],[]).
 convertSpawnArgs(Funct,N,[A|List],[O|NewList]):-

@@ -9,8 +9,34 @@
 */
 :- use_module(library(http/http_server_files)).
 
+
+:- op(500,fx,'~').
+:- op(1050,xfx,'<==>').
+:- op(1050,xfx,('<-')).
+:- op(1200,fx,('=>')).
+:- op(1200,fx,('==>')).
+:- op(1100,fx,('nesc')).
+:- op(1150,xfx,('::::')).
+:- op(300,fx,'-').
+:- op(600,yfx,'&').  
+:- op(600,yfx,'v').
+:- op(1075,xfx,'<-').
+:- op(1075,xfx,'<-').
+:- op(1070,xfx,'=>').
+:- op(1070,xfx,'<=>').
+:- op(1100,xfx,('<==>')).
+:- op(1100,xfx,('==>')).
+:- op(350,xfx,'xor').
+:- op(300,fx,user:'~').
+:- op(300,fx,user:'-').
+:- op(400,yfx,user:'&').  
+:- op(500,yfx,user:'v').
+:- op(1075,xfx,user:'<-').
+:- op(1075,xfx,user:'<==>').
+:- op(350,xfx,user:'xor').
+
 ensure_webserver :- thread_property(_,alias('httpd@3020_1')),!.
-ensure_webserver :- logOnError(http_server(http_dispatch,[ port(3020), workers(16) ])).
+ensure_webserver :- on_x_log_throw(http_server(http_dispatch,[ port(3020), workers(16) ])).
 
 :- multifile(http_session:session_data/2).
 :- multifile(system:'$loading_file'/3).
@@ -87,7 +113,7 @@ hmust_l(G):-G.
 %:- style_check(-singleton).
 
 
-:- thread_local(thlocal:omit_full_stop).
+:- thread_local(t_l:omit_full_stop).
 
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_error)).
@@ -159,7 +185,7 @@ make_quotable(String,SObj):-format(string(SUnq),'~q',[String]),make_quotable_0(S
 
 % :- set_yes_debug.
 
-:- export(save_in_session/1).
+:-export(save_in_session/1).
 save_in_session(NV):- \+ compound(NV),!.
 save_in_session(NV):-is_list(NV),!,must_maplist(save_in_session,NV),!.
 save_in_session(search([X=Y|R])):-nonvar(Y),is_list([X=Y|R]),once(save_in_session([X=Y|R])),!.
@@ -167,7 +193,7 @@ save_in_session(NV):-NV=..[N,V],!,hmust(save_in_session(N,V)),!.
 save_in_session(N=V):- hmust(save_in_session(N,V)),!.
 save_in_session(NV):- dmsg(not_save_in_session(NV)),!.
 
-:- export(save_in_session/2).
+:-export(save_in_session/2).
 save_in_session(Unsaved,_):- member(Unsaved,[session_data,request_uri,search,pool,path,input,session]),!.
 save_in_session(_,V):- sub_term(Sub,V),nonvar(Sub),is_stream(Sub),!.
 save_in_session(N,V):- get_http_session(S), save_in_session(S, N,V),!.
@@ -184,17 +210,17 @@ show_http_session:-hmust(get_http_session(S)),listing(http_session:session_data(
 
 make_session(S):- ignore((is_cgi_stream,http_session:http_open_session(S,[renew(false)]))),!.
 
-:- export(get_http_session/1).
+:-export(get_http_session/1).
 get_http_session(S):- catch(get_http_session0(S),_,fail),nonvar(S),!, make_session(S).
 get_http_session(main).
 
-logOnErrorFail(G):- catch(G,E,(dmsg(E:G),fail)).
+% on_x_log_fail(G):- catch(G,E,(dmsg(E:G),fail)).
 
-:- export(get_http_session0/1).
-get_http_session0(S):- logOnErrorFail((http_session:http_in_session(S))),!.
-get_http_session0(S):- logOnErrorFail((is_cgi_stream,http_session:http_open_session(S,[renew(false)]))),!.
-get_http_session0(S):- logOnErrorFail((get_http_current_request(R),member(session(S),R))),!.
-get_http_session0(S):- logOnErrorFail((get_http_current_request(R),member(cookie([swipl_session=S]),R))),!.
+:-export(get_http_session0/1).
+get_http_session0(S):- on_x_log_fail((http_session:http_in_session(S))),!.
+get_http_session0(S):- on_x_log_fail((is_cgi_stream,http_session:http_open_session(S,[renew(false)]))),!.
+get_http_session0(S):- on_x_log_fail((get_http_current_request(R),member(session(S),R))),!.
+get_http_session0(S):- on_x_log_fail((get_http_current_request(R),member(cookie([swipl_session=S]),R))),!.
 
 is_cgi_stream:-current_output(X),http_stream:is_cgi_stream(X).
 
@@ -207,7 +233,7 @@ reset_assertion_display:-
 get_param_sess(N,V):- must(param_default_value(N,D)),!,get_param_sess(N,V,D),!.
 
 :- use_module(library(http/http_wrapper)).
-:- dynamic(http_last_request/1).
+:-dynamic(http_last_request/1).
 get_http_current_request(B):- http_request:http_current_request(B), !,ignore((retractall(http_last_request(_)),asserta(http_last_request(B)))).
 get_http_current_request(B):- http_last_request(B),!.
 get_http_current_request([]).
@@ -252,7 +278,7 @@ handler_logicmoo_cyclone_1(Request):-
     member(path(PATH),Request),
     directory_file_path(_,FCALL,PATH),
    once(get_param_req(call,Call);(current_predicate(FCALL/0),Call=FCALL);get_param_sess(call,Call,edit1term)),
-   (logOnError(Call)),!,flush_output)),!.
+   (on_x_log_throw(Call)),!,flush_output)),!.
    
 
 
@@ -347,8 +373,8 @@ show_pcall_footer:- format('<hr><a href="http://prologmoo.com">LogicMOO/PrologMU
 
 sensical_nonvar(O):-nonvar(O), O \= (_ - _).
 
-cvt_param_to_term(In,Obj,Vs):-atom(In),failOnError(atom_to_term(In,Obj,Vs)),sensical_nonvar(Obj),!.
-cvt_param_to_term(In,Obj,Vs):-string(In),failOnError(atom_to_term(In,Obj,Vs)),sensical_nonvar(Obj),!.
+cvt_param_to_term(In,Obj,Vs):-atom(In),on_x_fail(atom_to_term(In,Obj,Vs)),sensical_nonvar(Obj),!.
+cvt_param_to_term(In,Obj,Vs):-string(In),on_x_fail(atom_to_term(In,Obj,Vs)),sensical_nonvar(Obj),!.
 cvt_param_to_term('~w',""):-!.
 cvt_param_to_term(In,Obj):-cvt_param_to_term(In,Obj,_Vs),!.
 cvt_param_to_term(Obj,Obj).
@@ -382,7 +408,7 @@ human_language('SpanishLanguage').
 human_language('ThaiLanguage').
 human_language('de').
 
-:- dynamic(foobar/1).
+:-dynamic(foobar/1).
 foobar:- foobar((_A < _B) > _C).
 
 param_default_value(call,edit1term).
@@ -470,7 +496,7 @@ edit1term:-
    cvt_param_to_term(String,Term,VNs),
    save_in_session(find,Term),
    maplist(as_ftVars,VNs),
-   call_for_terms(forall(pfc_add(Term),pp_item('Assert',':-'(VNs,Term))))))),!.
+   call_for_terms(forall(mpred_add(Term),pp_item('Assert',':-'(VNs,Term))))))),!.
   
 edit1term:- 
   get_param_req('RETRACT','RETRACT'),!,
@@ -480,7 +506,7 @@ edit1term:-
    cvt_param_to_term(String,Term,VNs),
    save_in_session(find,Term),
    maplist(as_ftVars,VNs),
-   call_for_terms(forall(pfc_rem1(Term),pp_item('Retract',':-'(VNs,Term))))))),!.
+   call_for_terms(forall(mpred_rem1(Term),pp_item('Retract',':-'(VNs,Term))))))),!.
   
 edit1term:-
  must_det_l((
@@ -567,7 +593,7 @@ format('
     URL,
     show_select2(olang,logic_lang_name,[])]),!,   
    format('<pre>',[]),
-   logOnError(Call),!,
+   on_x_log_throw(Call),!,
    format('</pre>',[]),
    write_end_html,!.
 
@@ -655,20 +681,20 @@ call_for_terms(Call):-
         format('&nbsp;&nbsp;&nbsp;find = <input id="find" type="text" name="find" value="~q">~@  Base = ~w</font> <a href="edit1term" target="_top">edit1term</a> <hr/></form>~n~@',
         [Obj,show_search_filters('&nbsp;&nbsp;'),Base,add_form_script]),        
         format('<pre>',[]),flush_output,
-        with_assertions(thlocal:print_mode(html),with_search_filters(catch(call(Call),E,dmsg(E)))),
+        w_tl(t_l:print_mode(html),with_search_filters(catch(call(Call),E,dmsg(E)))),
         format('</pre>',[]),flush_output,
         show_pcall_footer,
         write_end_html)),!.
 
-:- thread_local(thlocal:tl_hide_data/1).
+:-thread_local(t_l:tl_hide_data/1).
 
 
-:- meta_predicate with_search_filters(0).
+
 with_search_filters(C):-
    search_filter_name_comment(FILTER,_,_),
    session_checked(FILTER), 
-   \+ thlocal:tl_hide_data(FILTER),!,
-    with_assertions(thlocal:tl_hide_data(FILTER),with_search_filters(C)).
+   \+ t_l:tl_hide_data(FILTER),!,
+    w_tl(t_l:tl_hide_data(FILTER),with_search_filters(C)).
 with_search_filters(C):-C.
 
 % make_page_pretext_obj(Obj):- atom(Obj),atom_to_term(Obj,Term,Bindings),nonvar(Term),Term\=@=Obj,!,hmust(make_page_pretext_obj(Term)).
@@ -677,8 +703,8 @@ make_page_pretext_obj(Obj):-
   % catch(mmake,_,true),
   % forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((this_listing(M:F/A),flush_output)))),
   % forall(no_repeats(M:F/A,(f_to_mfa(Pred/A,M,F,A))),ignore(logOnFailure((reply_object_sub_page(M:F/A),flush_output)))),
-  % ignore((fail,catch(pfc_listing(Pred),_,true))),
-  call_with_time_limit(300,ignore(catch(term_listing_inner(i2tml_hbr,Obj,[]),E,writeq(E)))),
+  % ignore((fail,catch(mpred_listing(Pred),_,true))),
+  call_with_time_limit(300,ignore(catch(xlisting_inner(i2tml_hbr,Obj,[]),E,writeq(E)))),
   flush_output,
   pp_i2tml_saved_done(Obj),!.
 
@@ -727,12 +753,12 @@ set_line_pos(Out,LP):-
 current_line_position(LP):-current_output(Out),current_line_position(Out,LP).
 current_line_position(Out,LP):-stream_property(Out,position( Y)),stream_position_data(line_position,Y,LP),!.
 
-tmw:- with_assertions(thlocal:print_mode(html),
+tmw:- w_tl(t_l:print_mode(html),
  (rok_portray_clause(a(LP)),
   rok_portray_clause((a(LP):-b([1,2,3,4]))),
   nl,nl,wid(_,_,KIF),
   KIF=(_=>_),nl,nl,print(KIF),listing(print_request/1))),!.
-tmw:- with_assertions(thlocal:print_mode(html),(print((a(_LP):-b([1,2,3,4]))),nl,nl,wid(_,_,KIF),KIF=(_=>_),nl,nl,print(KIF),listing(print_request/1))),!.
+tmw:- w_tl(t_l:print_mode(html),(print((a(_LP):-b([1,2,3,4]))),nl,nl,wid(_,_,KIF),KIF=(_=>_),nl,nl,print(KIF),listing(print_request/1))),!.
 
 
 
@@ -740,16 +766,16 @@ tmw:- with_assertions(thlocal:print_mode(html),(print((a(_LP):-b([1,2,3,4]))),nl
 % ===================================================
 % Pretty Print Formula
 % ===================================================
-:- export(write_atom_link/1).
+:-export(write_atom_link/1).
 write_atom_link(A):-must(write_atom_link(A,A)).
-:- export(write_atom_link/2).
+:-export(write_atom_link/2).
 write_atom_link(L,N):-must_det_l((write_atom_link(atom(W),L,N),format('~w',[W]))),!.
 
 % pred_href(Name/Arity, Module, HREF) :-
 write_atom_link(W,A/_,N):-atom(A),!,write_atom_link(W,A,N).
 write_atom_link(W,C,N):-compound(C),get_functor(C,F,A),!,write_atom_link(W,F/A,N).
 %write_atom_link(W,_,N):- thread_self(main),!,write_term_to_atom_one(W,N),!.
-write_atom_link(W,_,N):- must(nonvar(W)),\+ thlocal:print_mode(html),write_term_to_atom_one(W,N),!.
+write_atom_link(W,_,N):- must(nonvar(W)),\+ t_l:print_mode(html),write_term_to_atom_one(W,N),!.
 write_atom_link(W,A,N):- nonvar(W),catch((term_to_pretty_string(A,AQ),
    url_encode(AQ,URL),
    format(W,'<a href="?f=~w">~w</a>',[URL,AQ])),_,write_term_to_atom_one(W,N)).
@@ -885,7 +911,7 @@ put_string0([H|T]) :-
 %   writes a quoted list of character codes, where the first
 %   quote has already been written.  Instances of Q in S are doubled.
 
-put_string(A,B):- thlocal:print_mode(html),!,
+put_string(A,B):- t_l:print_mode(html),!,
   with_output_to(atom(S),put_string0(A,B)),
   url_iri(URL,S),format('<a href="?f=~w">~w</a>',[URL,S]).
 
@@ -1271,7 +1297,7 @@ test_portray_clause(File) :-
 test_bind([]) :- !.
 test_bind([X='$VAR'(X)|L]) :-
 	test_bind(L).
-:- public test_portray_clause/1.
+:-public test_portray_clause/1.
 */
 
 
@@ -1288,7 +1314,7 @@ test_bind([X='$VAR'(X)|L]) :-
 % portray(X):-loop_check(user:my_portray(X)).
 /*
 :- discontiguous my_portray/1. 
-:- export(user:my_portray/1).
+:-export(user:my_portray/1).
 user:my_portray(A) :- var(A),!,fail,writeq(A).
 user:my_portray(A) :-
         atom(A),

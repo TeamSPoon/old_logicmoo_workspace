@@ -1,9 +1,9 @@
 :-abolish(pttp_prove,6).
-:- abolish(search_cost,3).
-:- abolish(search,6).
-:- abolish(make_wrapper,3).
-:- abolish(add_features,2).
-:- abolish(add_args,13).
+:-abolish(search_cost,3).
+:-abolish(search,6).
+:-abolish(make_wrapper,3).
+:-abolish(add_features,2).
+:-abolish(add_args,13).
 
 pttp_prove(Goal,Max,Min,Inc,ProofIn,ProofOut,ShowProof) :-
 	expand_input_proof(ProofIn,PrfEnd),
@@ -213,7 +213,7 @@ add_head_args(HeadIn,
 %%% ****if* PTTP/add_args
 %%% SOURCE
 
-:- export(add_args/15).
+:-export(add_args/15).
 
 add_args(INFO,(A , B),PosGoal,GoalAtom,HeadArgs,
          PosAncestors,NegAncestors,

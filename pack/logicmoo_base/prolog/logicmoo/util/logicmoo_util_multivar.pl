@@ -1,4 +1,4 @@
-/** <module> Logicmoo Debug Tools
+/* Part of LogicMOO Base Logicmoo Debug Tools
 % ===================================================================
 % File '$FILENAME.pl'
 % Purpose: An Implementation in SWI-Prolog of certain debugging tools
@@ -10,14 +10,16 @@
 % Licience: LGPL
 % ===================================================================
 */
-:- if(\+ current_module(logicmoo_utils)).
+% File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_multivar.pl
+:- module(logicmoo_util_multivar,[]).
+
+
+:- if(current_predicate(logicmoo_utils:combine_logicmoo_utils/0)).
 :- module(multi,
           [ multi/2,multi/1,
             domain/2                    % Var, ?Domain
           ]).
 :- set_prolog_flag(generate_debug_info, true).
-:- include(logicmoo_util_header).
-
 
 
 nobind0(X):- when((?=(X, Y);?=(X, X);?=(X, xx);nonvar(X)),unbind(X,Y)).
@@ -350,6 +352,8 @@ eqs_lefts_rights([], [], []).
 eqs_lefts_rights([A=B|ABs], [A|As], [B|Bs]) :-
         eqs_lefts_rights(ABs, As, Bs).
 
+:- else.
+:- include(logicmoo_util_header).
 :- endif.
 
 

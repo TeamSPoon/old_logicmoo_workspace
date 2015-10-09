@@ -32,7 +32,7 @@ end_of_file.
 :- dynamic(tCol/1).
 
 :- dynamic(subFormat/2).
-:- dynamic(pfc_undo_sys/3).
+:- dynamic(mpred_undo_sys/3).
 
 :- include((logicmoo_i_header)).
 
@@ -100,7 +100,7 @@ tCol(ttFormatType).
 % this isn't written yet.
 resolveConflict(C) :- dtrace,
   format("~NHalting with conflict ~w", [C]),
-  pfc_halt.
+  mpred_halt.
 
 
 % a conflict triggers a Prolog action to resolve it.
@@ -109,7 +109,7 @@ conflict(C) ==> {resolveConflict(C)}.
 % meta rules to schedule inferencing.
 
 % resolve conflicts asap
-pfc_select(conflict(X),S) :- pfc_queue(conflict(X),S).
+mpred_select(conflict(X),S) :- mpred_queue(conflict(X),S).
   
 % a pretty basic conflict.
 ((neg(P), P ) ==> conflict(P)).
@@ -127,15 +127,15 @@ genls(tPenguin,tBird).
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 % % % These next two have been comnbined with the two following % % %
-(((pfc_default(P)/pfc_literal(P))  ==>  (~neg(P) ==> P))).
-((pfc_default((P ==> Q))/pfc_literal(Q) ==> (P, ~neg(Q) ==> Q))).
+(((mpred_default(P)/mpred_literal(P))  ==>  (~neg(P) ==> P))).
+((mpred_default((P ==> Q))/mpred_literal(Q) ==> (P, ~neg(Q) ==> Q))).
 
 
-%((pfc_default(P)/pfc_literal(P), {pfcVerifyMissing(P,F)})) ==>  ((F, ~neg(P)) ==> P).
-%((pfc_default((P ==> Q))/pfc_literal(Q), {pfcVerifyMissing(Q,F)})) ==> ((P, F, ~neg(Q)) ==> Q).
+%((mpred_default(P)/mpred_literal(P), {pfcVerifyMissing(P,F)})) ==>  ((F, ~neg(P)) ==> P).
+%((mpred_default((P ==> Q))/mpred_literal(Q), {pfcVerifyMissing(Q,F)})) ==> ((P, F, ~neg(Q)) ==> Q).
 % % % 
-(pfc_default((Q <= P))/pfc_literal(Q)) ==> (Q <=(P, ~neg(Q))).
-%(pfc_default((P ==> Q))/pfc_literal(Q)) ==> (Q <=(P, ~neg(Q))).
+(mpred_default((Q <= P))/mpred_literal(Q)) ==> (Q <=(P, ~neg(Q))).
+%(mpred_default((P ==> Q))/mpred_literal(Q)) ==> (Q <=(P, ~neg(Q))).
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
 neg(P) <= {pfcVerifyMissing(P,F,Test)},Test,{F\=P}.
@@ -157,10 +157,10 @@ prologHybrid((zDefault/1,tPenguin/1,tFly/1,tBird/1,tCanary/1)).
 'tUnaryPredicate'(Pred)<==>(arity(Pred,1),tPred(Pred)).
 
 'tUnaryPredicate'(zDefault).
-((zDefault(P/pfc_literal(P)))  ==>  (~neg(P) ==> P)).
-zDefault((P ==> Q))/pfc_literal(Q) ==> ((P, ~neg(Q) ==> Q)).
-%zDefault((P ==> Q))/pfc_literal(Q) ==> (Q <=(P, ~neg(Q))).
-%zDefault((Q <= P))/pfc_literal(Q) ==> (Q <=(P, ~neg(Q))).
+((zDefault(P/mpred_literal(P)))  ==>  (~neg(P) ==> P)).
+zDefault((P ==> Q))/mpred_literal(Q) ==> ((P, ~neg(Q) ==> Q)).
+%zDefault((P ==> Q))/mpred_literal(Q) ==> (Q <=(P, ~neg(Q))).
+%zDefault((Q <= P))/mpred_literal(Q) ==> (Q <=(P, ~neg(Q))).
 
 % birds fly by default.
 zDefault((tBird(X) ==> tFly(X))).
@@ -202,7 +202,7 @@ tCanary(iTweety).
 
 
 % birds fly by default.
-(pfc_default(( tBird(X) ==> tFly(X)))).
+(mpred_default(( tBird(X) ==> tFly(X)))).
 
 
 tCol(tFly).
@@ -222,21 +222,21 @@ tPenguin(X) ==> neg(tFly(X)).
 % iTweety is a tCanary.
 ((==> tCanary(iTweety))).
 
-:- must(in_file_expansion;in_file_directive).
+:-must(in_file_expansion;in_file_directive).
 
-:- listing(tBird).
-:- listing(tFly).
+:-listing(tBird).
+:-listing(tFly).
 
 
 
 end_of_file.
 
 
-:- dynamic((fly/1,bird/1,penguin/1,canary/1)).
+:-dynamic((fly/1,bird/1,penguin/1,canary/1)).
 
 
 % birds fly by default.
-(pfc_default((bird(X) ==> fly(X)))).
+(mpred_default((bird(X) ==> fly(X)))).
 
 % heres one way to do an subclass hierarchy.
 
@@ -257,9 +257,9 @@ end_of_file.
 % tweety is a canary.
 (canary(tweety)).
 
-:- listing([fly/1,bird/1,penguin/1,canary/1]).
+:-listing([fly/1,bird/1,penguin/1,canary/1]).
 
-:- ignore(show_call_failure(fly(tweety))).
+:-ignore(show_call_failure(fly(tweety))).
 
 /*
 
@@ -300,8 +300,8 @@ O = [
 
 
 
-% :- pfc_add(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) ==> functorDeclares(F))).
-% :- rtrace,pfc_add((isa(_,ArgsIsa)==>tCol(ArgsIsa))).
+% :- mpred_add(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) ==> functorDeclares(F))).
+% :- rtrace,mpred_add((isa(_,ArgsIsa)==>tCol(ArgsIsa))).
 
 
 
@@ -309,7 +309,7 @@ O = [
 % (typeProps(Type,Props)==>(tSet(Type),((isa(I,Type)==>props(I,Props))))).
 
 
-% props(I,Props)/(ground(I:Props),as_list(Props,PList))==>pfc_assert(props(I,isEach(PList))).
+% props(I,Props)/(ground(I:Props),as_list(Props,PList))==>mpred_add(props(I,isEach(PList))).
 
 ))).
 

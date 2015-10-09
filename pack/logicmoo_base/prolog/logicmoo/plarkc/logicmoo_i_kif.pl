@@ -346,7 +346,7 @@ kif_to_boxlog(WffIn0,KB0,Why0,FlattenedO):-
    % KB = WffQ,
     check_is_kb(KB),
     must(dif(KB,Why)),
-   %with_assertions(thlocal:dont_use_mudEquals,defunctionalize('=>',WffQ,Wff)),
+   %w_tl(t_l:dont_use_mudEquals,defunctionalize('=>',WffQ,Wff)),
    %(WffQ\==Wff-> dmsg(defunctionalize('=>',WffQ,Wff));wdmsgl(kif(Wff))),
    as_dlog(Wff,Wff666),
    % kb_nlit(KB,Neg),
@@ -366,15 +366,15 @@ kif_to_boxlog(WffIn0,KB0,Why0,FlattenedO):-
    list_to_set(Flattened,FlattenedM),!,
    correct_boxlog(FlattenedM,KB,Why,FlattenedO))).
    
-thlocal:no_rewrites.
+t_l:no_rewrites.
 
 
 check_is_kb(KB):-ignore('$VAR'('KB')=KB).
 
-add_preconds(X,X):- thlocal:no_rewrites,!.
+add_preconds(X,X):- t_l:no_rewrites,!.
 add_preconds(X,Z):-
- with_assertions(leave_as_is0('CollectionS666666666666666ubsetFn'(_,_)),
-   with_assertions(thlocal:dont_use_mudEquals,defunctionalize('=>',X,Y))),add_preconds2(Y,Z).
+ w_tl(leave_as_is0('CollectionS666666666666666ubsetFn'(_,_)),
+   w_tl(t_l:dont_use_mudEquals,defunctionalize('=>',X,Y))),add_preconds2(Y,Z).
 
 add_preconds2(Wff6667,PreCondPOS):-
    must_det_l((get_lits(Wff6667,PreCond),list_to_set(PreCond,PreCondS),
@@ -442,7 +442,7 @@ pttp_quantifier(F):- pttp_nnf_pre_clean_functor(F,(all),[]);pttp_nnf_pre_clean_f
 
 should_be_poss(argInst).
 
-:- dynamic(elInverse/2).
+:-dynamic(elInverse/2).
 
 clauses_to_boxlog(KB,Why,In,Prolog):- clauses_to_boxlog_0(KB,Why,In,Prolog).
 
@@ -470,7 +470,7 @@ clauses_to_boxlog_5(_KB,_Why,cl([HeadIn],[]),HeadIn):-!.
 clauses_to_boxlog_5(_KB,_Why,In,Prolog):-trace,In=Prolog.
 
 mpred_t_tell_kif(OP2,RULE):- 
- with_assertions(thlocal:current_pttp_db_oper(mud_call_store_op(OP2)),
+ w_tl(t_l:current_pttp_db_oper(mud_call_store_op(OP2)),
    (show_call(call((must(kif_tell(RULE))))))).
 
 
@@ -523,7 +523,7 @@ kif:- current_input(In),current_output(Out),!,kif_io(In,Out).
 kif_io(InS,Out):- 
   l_open_input(InS,In),
    repeat,             
-      debugOnError((once((kif_action_mode(Mode),write(Out,Mode),write(Out,'> '))),
+      on_x_rtrace((once((kif_action_mode(Mode),write(Out,Mode),write(Out,'> '))),
         kif_read(In,Wff,Vs),
          b_setval('$variable_names', Vs),
            portray_clause(Out,Wff,[variable_names(Vs),quoted(true)]),
@@ -583,14 +583,14 @@ kif_ask(Goal0,ProofOut):- logical_pos(_KB,Goal0,Goal),
 
 kif_tell(InS):- atom(InS),must_det_l((kif_read(string(InS),Wff,Vs),b_implode_varnames0(Vs),local_sterm_to_pterm(Wff,Wff0),kif_tell(Wff0))),!.
 % kif_tell(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),why_to_id(tell,Wff,Why),kif_tell(Why,Wff))),!.
-kif_tell(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),pfc_add(clif(Wff)))),!.
+kif_tell(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),mpred_add(clif(Wff)))),!.
 
 
 local_sterm_to_pterm(Wff,WffO):- sexpr_sterm_to_pterm(Wff,WffO),!.
 
 
 
-:- op(1000,fy,(kif_tell)).
+:-op(1000,fy,(kif_tell)).
 
 /*
 :- export((kif_tell)/2).
@@ -602,8 +602,8 @@ kif_tell(Why,Wff):-
       kif_tell_boxes(assert_wfs_def,Why,Wff,Asserts))),!.
 
 
-:- thread_local(thlocal:assert_wfs/2).
-assert_wfs_def(HBINFO,HB):-if_defined(thlocal:assert_wfs(HBINFO,HB)),!.
+:-thread_local(t_l:assert_wfs/2).
+assert_wfs_def(HBINFO,HB):-if_defined(t_l:assert_wfs(HBINFO,HB)),!.
 assert_wfs_def(Why,H):-assert_wfs_fallback(Why,H).
 
 assert_wfs_fallback(Why, HB):- subst(HB,(~),(-),HB2),subst(HB2,(not_proven_t),(not_true_t),HB1),subst(HB1,(poss),(possible_t),HBO),assert_wfs_fallback0(Why, HBO).
@@ -614,7 +614,7 @@ assert_wfs_fallback0(Why, HB):- adjust_kif('$VAR'(KB),HB,HBK),demodal('$VAR'(KB)
 
 */
 
-:- export(kb_incr/2).
+:-export(kb_incr/2).
 kb_incr(WffNum1 ,WffNum2):-is_ftVar(WffNum1),trace_or_throw(kb_incr(WffNum1 ,WffNum2)).
 kb_incr(WffNum1 ,WffNum2):-number(WffNum1),WffNum2 is WffNum1 + 1,!.
 %kb_incr(WffNum1 ,WffNum2):-atom(WffNum1),WffNum2=..[WffNum1,0],!.
@@ -628,7 +628,7 @@ kif_tell_boxes(How,Why,Wff0,Asserts0):-
   %fully_expand(Get1,Get),
   get_constraints(Wff,Isas), 
   kif_tell_adding_constraints(Why,Isas,Asserts))),
-   findall(HB-WhyHB,retract(thlocal:in_code_Buffer(HB,WhyHB,_)),List),
+   findall(HB-WhyHB,retract(t_l:in_code_Buffer(HB,WhyHB,_)),List),
    list_to_set(List,Set),
    forall(member(HB-WhyHB,Set),
       call(How,WhyHB,HB)).
@@ -647,7 +647,7 @@ kif_tell_boxes1(Why,List):- is_list(List),!,list_to_set(List,[H|T]),must_det_l((
 kif_tell_boxes1(_,z_unused(_)):-!.
 kif_tell_boxes1(Why,AssertI):- must_det_l((simplify_bodies(AssertI,AssertO),kif_tell_boxes3(save_wfs,Why,AssertO))).
 
-:- thread_local(thlocal:in_code_Buffer/3).
+:-thread_local(t_l:in_code_Buffer/3).
 
 
 kif_tell_boxes3(How,Why,Assert):- 
@@ -672,8 +672,8 @@ simplify_bodies((B),(BC)):- must_det_l((conjuncts_to_list(B,RB),simplify_list(_K
 simplify_list(KB,RB,BBS):- list_to_set(RB,BB),must_maplist(removeQ(KB),BB,BBO),list_to_set(BBO,BBS).
 
 save_wfs(Why,PrologI):- must_det_l((thglobal:as_prolog(PrologI,Prolog), 
-   with_assertions(thlocal:current_local_why(Why,Prolog),
-   pfc_add_h(save_in_code_buffer,Why,Prolog)))).
+   w_tl(t_l:current_local_why(Why,Prolog),
+   mpred_add_h(save_in_code_buffer,Why,Prolog)))).
 
 nots_to(H,To,HH):-subst_except(H,neg,To,HH),subst_except(H,-,To,HH),subst_except(H,~,To,HH),subst_except(H,neg,To,HH),!.
 neg_h_if_neg(H,HH):-nots_to(H,'~',HH).
@@ -718,11 +718,11 @@ var_count_num(Term,SharedTest,SharedCount,UnsharedCount):- term_slots(Term,Slots
   length(SharedSlots,SharedCount),
   length(UnsharedSlots,UnsharedCount).
 
-pfc_add_h(How,Why,(H:- B)):- neg_h_if_neg(H,HH), neg_b_if_neg((HH:- B),B,BB),!,call(How,Why,(HH:-BB)).
-pfc_add_h(How,Why,(H)):- neg_h_if_neg(H,HH), call(How,Why,(HH)).
+mpred_add_h(How,Why,(H:- B)):- neg_h_if_neg(H,HH), neg_b_if_neg((HH:- B),B,BB),!,call(How,Why,(HH:-BB)).
+mpred_add_h(How,Why,(H)):- neg_h_if_neg(H,HH), call(How,Why,(HH)).
 
-save_in_code_buffer(_ ,HB):- simp_code(HB,SIMP),thlocal:in_code_Buffer(HB,_,SIMP),!.
-save_in_code_buffer(Why,HB):- simp_code(HB,SIMP),assert(thlocal:in_code_Buffer(HB,Why,SIMP)).
+save_in_code_buffer(_ ,HB):- simp_code(HB,SIMP),t_l:in_code_Buffer(HB,_,SIMP),!.
+save_in_code_buffer(Why,HB):- simp_code(HB,SIMP),assert(t_l:in_code_Buffer(HB,Why,SIMP)).
 
 use_was_isa_h(_,ftTerm,true):- !.
 use_was_isa_h(_,argi(mudEquals,_),true):- !.

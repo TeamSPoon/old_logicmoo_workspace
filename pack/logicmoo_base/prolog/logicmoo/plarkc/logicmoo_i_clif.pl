@@ -26,7 +26,7 @@ are_clauses_entailed((C,L)):-!,are_clauses_entailed(C),are_clauses_entailed(L).
 are_clauses_entailed(CL):- unnumbervars(CL,UCL),  !, \+ \+ show_call_failure(is_prolog_entailed(UCL)),!.
 
 is_prolog_entailed(UCL):-clause_asserted(UCL),!.
-is_prolog_entailed(UCL):-pfc_call(UCL),!.
+is_prolog_entailed(UCL):-mpred_call(UCL),!.
  
 member_ele(E,E):- (\+ (compound(E))),!.
 member_ele([L|List],E):- is_list([L|List]),!,member(EE,[L|List]),member_ele(EE,E).
@@ -37,7 +37,7 @@ delistify_last_arg(Arg,Pred,Last):-is_list(Arg),!,member(E,Arg),delistify_last_a
 delistify_last_arg(Arg,Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARGS),NEWCALL=..[F|NARGS],show_call(NEWCALL),!,member_ele(NEW,Last).
 
 % sanity that mpreds (manage prolog prodicate) are abily to transform
-:- thlocal:disable_mpred_term_expansions_locally->throw(thlocal:disable_mpred_term_expansions_locally);true.
+:- t_l:disable_mpred_term_expansions_locally->throw(t_l:disable_mpred_term_expansions_locally);true.
 
 % cwc "code-wise chaining" is always true in Prolog but will throw programming error if evalled in LogicMOO Prover.
 % Use this to mark code and not axiomatic prolog
@@ -59,14 +59,14 @@ clif_to_prolog(CLIF,PrologO):- cwc,
 % Sanity Test for expected side-effect entailments
 % why does renumbervars work but not copy_term? 
 is_entailed(CLIF):-
- pfc_no_chaining((
+ mpred_no_chaining((
    cwc, sanity((clif_to_prolog(CLIF,Prolog),!,sanity(( \+ \+ (show_call_failure(are_clauses_entailed(Prolog))))))))),!.
 
 % Sanity Test for required absence of specific side-effect entailments
 is_not_entailed(CLIF):- cwc, sanity((clif_to_prolog(CLIF,Prolog),show_call_failure(\+ are_clauses_entailed(Prolog)))),!.
 
-:- op(1190,xfx,(:-)).
-:- op(1200,fy,(is_entailed)).
+:-op(1190,xfx,(:-)).
+:-op(1200,fy,(is_entailed)).
 
 % this defines a recogniser for clif syntax (well stuff that might be safe to send in thru kif_to_boxlog)
 is_clif(all(_,X)):-cwc,compound(X),!,is_clif(X).
@@ -129,7 +129,9 @@ end_of_file.
 % If you've come here looking for the clif examples please follow this link
 % <a href="https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.md">https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.md</a>
 
-:- if( if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
+
+:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
+:- file_begin(pfc).
 :- include(try_logicmoo_examples).
 :- endif.
 

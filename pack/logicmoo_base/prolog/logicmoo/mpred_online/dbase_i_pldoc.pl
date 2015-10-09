@@ -52,7 +52,7 @@ end_of_file.
 
 % prolog:doc_object_summary(A,B,C,D):-man_object_summary(A,B,C,D).
 
-:- thread_local(user:html_listed/1).
+:-thread_local(user:html_listed/1).
 
 prolog:doc_object_page_footer(Obj,_) --> { not(user:html_listed(Obj)) },!,pldoc_html:html_listing('Footer',Obj).
 
@@ -70,6 +70,8 @@ prolog:doc_object_page_footer(Obj,_) --> { not(user:html_listed(Obj)) },!,pldoc_
 prolog:doc_object_page(Obj, Options,A,B) :-  format(user_error,'~n~q~n',[pldoc_man:man_page(Obj, Options)]), pldoc_man:man_page(Obj, [no_manual(fail), footer(false)|Options],A,B).
 */
 
+:- nb_setval(pldoc_object,pldoc_object_missing).
+
 
 :- listing(prolog:doc_object_page//2).
 
@@ -80,7 +82,7 @@ sreq(Call):-
  into_mpred_form(Call,MCall),get_functor(MCall,MF),findall(P,pred_info(MF,P),Props),dmsg(props=Props),
    dmsg(call=Call),dmsg(call=MCall),
  % some calls remember deduced fasts and we need to prevent that
- with_assertions(readOnlyDatabases,
+ w_tl(readOnlyDatabases,
                 (
            (is_callable(Call)-> findallCall(Call,call,CallL,CallLL) ; (CallL=[];CallLL=[])),
                  findallCall(Call,mpred_call,MCallL,MCallLL),
@@ -146,10 +148,10 @@ write_count(H,N):- writeq(H:N),write(', ').
 
 /*
 
-:- source_to_txt('../src_mud/actions/take.pl').
+:-source_to_txt('../src_mud/actions/take.pl').
 
 */
-:- export(to_tclass/2).
+:-export(to_tclass/2).
 to_tclass(F,FO):- atom(F),current_predicate(_:F/A),!,functor(P,F,A),(real_builtin_predicate(P);predicate_property(P, nodebug );predicate_property(P, meta_predicate(P) )),FO=F.
 to_tclass(F,FO):- string(F),!,atom_string(F,S),to_tclass(S,FO).
 
@@ -172,7 +174,7 @@ is_actverb(X):-vtPosture(PX),functor(PX,X,_).
 is_actverb(X):-user:verb_alias(_,X).
 % user:vtVerb(X):-is_actverb(X).
 
-:- export(ensure_starts_with_prefix/3).
+:-export(ensure_starts_with_prefix/3).
 ensure_starts_with_prefix(A,Prefix,A):- atom_concat(Prefix,Rest,A),toCamelcase(Rest,CC),toPropercase(CC,PC),Rest==PC,!.
 ensure_starts_with_prefix(A,Prefix,B):- toCamelcase(A,CC),toPropercase(CC,PC),!,atom_concat(Prefix,PC,B),!.
  
@@ -251,7 +253,7 @@ source_to_txt(S,Out,Opts):-
      retract(nohtml)).
 
 
-:- thread_local nohtml/0.
+:-thread_local nohtml/0.
 
 /** <module> HTML source pretty-printer
 
@@ -409,14 +411,14 @@ html_fragments([H|T], In, Out, State0, State, Options) :-
 %	Print from current position upto the end of Fragment.  First
 %	clause deals with structured comments.
 
-:- thread_local(thlocal:frag_class/1).
+:-thread_local(t_l:frag_class/1).
 
-get_frag_class(FC):-thlocal:frag_class(FC),!.
+get_frag_class(FC):-t_l:frag_class(FC),!.
 get_frag_class(noFC).
 
 html_fragment_new(H, In, Out, State0, State1, Options):-
  class_from_frag(H,Class),
-  with_assertions(thlocal:frag_class(Class),
+  w_tl(t_l:frag_class(Class),
    html_fragment(H, In, Out, State0, State1, Options)).
 
 class_from_frag(H,H):-atom(H),!.
@@ -784,17 +786,17 @@ cp_src(F):-atom_concat('/mnt/mint-oldsys/devel/PrologMUD/',B,F),atom_concat('/de
   dmsg(telling(NF)),
    tell(NF),source_to_txt(F),told.
 
-:- export(psaveall/0).
+:-export(psaveall/0).
 psaveall:- mmake, forall(enumerate_files('../src_mud/**/*.pl*',F),cp_src(F)).
-:- export(psaveall1/0).
+:-export(psaveall1/0).
 psaveall1:- mmake, forall(enumerate_files('../src_mud/**/buil*.pl*',F),cp_src(F)).
-:- export(psaveall2/0).
+:-export(psaveall2/0).
 psaveall2:- forall(enumerate_files('../games/*nan*/*.pl*',F),cp_src(F)).
-:- export(psaveall3/0).
+:-export(psaveall3/0).
 psaveall3:- forall(enumerate_files('../games/*start*/*.pl*',F),cp_src(F)).
-:- export(psaveall4/0).
+:-export(psaveall4/0).
 psaveall4:- forall(enumerate_files('../games/*wump*/*.pl*',F),cp_src(F)).
-:- export(psaveall5/0).
+:-export(psaveall5/0).
 psaveall5:- forall(enumerate_files('../games/*e_sim*/*.pl*',F),cp_src(F)).
 
 

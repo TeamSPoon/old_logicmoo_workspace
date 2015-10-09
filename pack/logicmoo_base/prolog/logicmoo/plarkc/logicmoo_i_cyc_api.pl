@@ -9,12 +9,12 @@
 % ===================================================================
 end_of_file.
 
-:- module(cyc,[lisp_read_codes/2,lisp_read/1,lisp_read/2,getSurface/2,getSurface/3,getSurfaceFromChars/3,getSurfaceFromStream/3]).
-:- if(current_prolog_flag(dialect,swi)).
-:- set_prolog_flag(double_quotes,codes).
-:- endif.
+:-module(cyc,[lisp_read_codes/2,lisp_read/1,lisp_read/2,getSurface/2,getSurface/3,getSurfaceFromChars/3,getSurfaceFromStream/3]).
+:-if(current_prolog_flag(dialect,swi)).
+:-set_prolog_flag(double_quotes,codes).
+:-endif.
 /*
-:- export((
+:-export((
 	 cycInit/0,
 	 getCycConnection/4,
 	 finishCycConnection/3,
@@ -156,7 +156,7 @@ end_of_file.
       writeFailureLog/2,
       debugOnFailure/2,
       debugOnFailure/1,
-      debugOnError/1,
+      on_x_rtrace/1,
       dynamic_transparent/1,
       trim/2,
       canTrace/0, 
@@ -164,7 +164,7 @@ end_of_file.
       isConsole/0,
       multi_transparent/1
 */
-:- module_transparent(user:nart/3).
+:-module_transparent(user:nart/3).
 
 
 cyc:cyc_magic.
@@ -175,7 +175,7 @@ current_file(FileBase,Dir):-current_stream(File,read,_Stream),atom(File),is_abso
 asserta_if_new(A):-retract(A),fail.
 asserta_if_new(A):-asserta(A),!.
 
-:- current_file(F,Dir),writeq(current_file(F,Dir)),nl,!,
+:-current_file(F,Dir),writeq(current_file(F,Dir)),nl,!,
    asserta_if_new(user:library_directory(Dir)),
    asserta_if_new(user:file_search_path(cyc_api, Dir)),
    asserta_if_new(user:file_search_path(('.'), Dir)),!,
@@ -186,10 +186,10 @@ addStagedDirs:-
 addStagedDirs.
 
 
-:- dynamic(withoutCyc).
+:-dynamic(withoutCyc).
 withoutCyc:-fail.
 
-:- dynamic(canTrace/0).
+:-dynamic(canTrace/0).
 canTrace.
 
 %isConsole :- telling(user).
@@ -212,17 +212,17 @@ ctrace:-willTrace->trace;notrace.
 
 withoutCyc(_,[]):-fail.
 
-:- use_module(library(system)).
-:- use_module(library(shlib)).
-:- use_module(library(listing)).
-:- use_module(library(sgml)).
+:-use_module(library(system)).
+:-use_module(library(shlib)).
+:-use_module(library(listing)).
+:-use_module(library(sgml)).
 %:-use_module(library(rdf)).
 :- use_module(library(socket)).
 :- use_module(library(readutil)).
 
 %Load the TCP Library
 %:-use_module(library('http/http_open')).
-:- use_module(library('http/http_client')).
+:-use_module(library('http/http_client')).
 %:-use_module(library('http/http_header')).
 %:-use_module(library('http/thread_httpd')).
 
@@ -254,19 +254,19 @@ multi_transparent(M:F/A):-!, module_transparent(M:F/A),dynamic(M:F/A),multifile(
 multi_transparent(F/A):-!,multi_transparent(user:F/A).
 multi_transparent(X):-functor(X,F,A),multi_transparent(F/A),!.
    
-:- multi_transparent(cycHolds/1).
-:- multi_transparent(cycHolds/2).
-:- multi_transparent(cycHolds/3).
-:- multi_transparent(cycHolds/4).
-:- multi_transparent(cycHolds/5).
-:- multi_transparent(cycHolds/6).
-:- multi_transparent(cycHolds/7).
-:- multi_transparent(cycHolds/8).
+:-multi_transparent(cycHolds/1).
+:-multi_transparent(cycHolds/2).
+:-multi_transparent(cycHolds/3).
+:-multi_transparent(cycHolds/4).
+:-multi_transparent(cycHolds/5).
+:-multi_transparent(cycHolds/6).
+:-multi_transparent(cycHolds/7).
+:-multi_transparent(cycHolds/8).
 
 
 
-:- dynamic(double_quotes_was/1).
-:- current_prolog_flag(double_quotes,X),asserta(double_quotes_was(X)).
+:-dynamic(double_quotes_was/1).
+:-current_prolog_flag(double_quotes,X),asserta(double_quotes_was(X)).
 
 %:- set_prolog_flag(optimise,true).
 %:- set_prolog_flag(file_name_variables,false).
@@ -276,15 +276,15 @@ multi_transparent(X):-functor(X,F,A),multi_transparent(F/A),!.
 %:-set_prolog_flag(double_quotes,string).
 %:-set_prolog_flag(report_error,true).
 %:-set_prolog_flag(verbose,normal).
-:- set_prolog_flag(double_quotes,codes).
-:- set_prolog_flag(float_format,'%.12g').
+:-set_prolog_flag(double_quotes,codes).
+:-set_prolog_flag(float_format,'%.12g').
 % Stop turning GC on/off
 %:-set_prolog_flag(gc,false).
-:- dynamic_transparent(cycConnectionAvalable/5).
-:- dynamic_transparent(cycConnectionUsed/5).
-:- dynamic_transparent(cycMutex/2).
-:- dynamic_transparent(cycChatMode/1).
-:- dynamic_transparent(termCyclify/2).
+:-dynamic_transparent(cycConnectionAvalable/5).
+:-dynamic_transparent(cycConnectionUsed/5).
+:-dynamic_transparent(cycMutex/2).
+:-dynamic_transparent(cycChatMode/1).
+:-dynamic_transparent(termCyclify/2).
 
 
 
@@ -358,7 +358,7 @@ balanceBindingS2P(X,Z,Feats):-
       unnumbervars(Y,UN),
       s2p(UN,Z,Feats),!.
 
-:- dynamic(cyc:dbCache/2).
+:-dynamic(cyc:dbCache/2).
 doLispLine([P|Surf],Vars):-toUppercase(P,UP),not(UP==P),!,doLispLine([UP|Surf],Vars).
 doLispLine(['CYC-ASSERT',quote(STUFF),quote(WHERE)|_],Vars):-!,doLispLine(['CYC-ASSERT',quote(STUFF),(WHERE)|_],Vars).
 doLispLine(['CYC-ASSERT',quote(STUFF),(WHERE)|_],Vars):-
@@ -390,8 +390,8 @@ catchIgnore(CX):-ignore(catch(CX,_,true)).
 % =====================================
 % Database
 % =====================================
-:- dynamic(cycCacheToDo/1).
-:- dynamic(cycCache/1).
+:-dynamic(cycCacheToDo/1).
+:-dynamic(cycCache/1).
 
                     
 
@@ -432,7 +432,7 @@ predOfCycL(SENT,Y):-member(OP,[forward,and,':',or,implies,not]),SENT=..[OP|LIST]
 predOfCycL(CX,Y):-functor(CX,Y,_).
 
 
-:- dynamic_transparent(mtForPred/2).
+:-dynamic_transparent(mtForPred/2).
 
 getMtForPred(X,Y):-mtForPred(X,Y),!.
 getMtForPred(genlMt,'BaseKB').
@@ -576,11 +576,11 @@ setCycOptionDefaults:-
 % ===================================================================
 cycInit.
 
-:- dynamic_transparent('$CycOption'/3).
+:-dynamic_transparent('$CycOption'/3).
 
-:- ((setCycOptionDefaults)).
+:-((setCycOptionDefaults)).
 
-:- (( %at_initialization
+:-(( %at_initialization
     setCycOption(cycServer,'10.1.1.104':36001),
       setCycOption(cycCoServer,'10.10.10.198':3679),
       setCycOption(cycServer,'10.10.10.198':13701),
@@ -594,7 +594,7 @@ cycInit.
       setCycOption(query(depth),nil),
    !)).
       
-:- ((
+:-((
       setCycOption(defaultAssertOptions,[':DIRECTION', ':FORWARD', ':STRENGTH', ':MONOTONIC']),
       setCycOption(':DIRECTION', ':FORWARD'),
       setCycOption(':STRENGTH', ':MONOTONIC'),
@@ -778,7 +778,7 @@ getSurface(InStream0,Surf,Vars):-
 getSurface(Response):- readCycLTermChars(user_input,Response).
 
 
-:- dynamic(saved_stream_buffer/2).
+:-dynamic(saved_stream_buffer/2).
 find_stream_buffer(I,B):-saved_stream_buffer(I,B),!.
 find_stream_buffer(I,[]):-!. %%throw(nobuffer(I)).
 set_stream_buffer(I,B):-retractall(saved_stream_buffer(I,_)),asserta(saved_stream_buffer(I,B)).
@@ -811,7 +811,7 @@ read_line_to_codes_one_at_a_time_util(Stream,NewBuffer,false):-
       set_stream_buffer(Stream,NewBuffer),
       charGoodForInput(Stream,Code),!.
 
-:- flag(inbracket,_,0).
+:-flag(inbracket,_,0).
 
 charGoodForInput(_Stream,''):-!,fail.
 charGoodForInput(_Stream,C):-code_type(C,end_of_line),!.
@@ -1046,7 +1046,7 @@ readCycLTermChars(InStream0,Response,ResponseType):- l_open_input(InStream0,InSt
 
 subType(_Type,_ExpectedType).
 
-:- set_prolog_flag(double_quotes,codes).
+:-set_prolog_flag(double_quotes,codes).
 
 
 getTypeHintFromChar(InStream0,T,SexpO):-l_open_input(InStream0,InStream),InStream0\=InStream,!,getTypeHintFromChar(InStream,T,SexpO).
@@ -1304,9 +1304,9 @@ is_ftString("").
 is_ftString(L):-is_charlist(L),!.
 is_ftString(L):-is_codelist(L),!.
 
-:- dynamic(asserted/4).
-:- dynamic(assertion/13).
-:- dynamic(('/')/2).
+:-dynamic(asserted/4).
+:-dynamic(assertion/13).
+:-dynamic(('/')/2).
 
 
 decyclify(X,X):-var(X);number(X),!.
@@ -1433,7 +1433,7 @@ toCycVar(VAR,_,VarName):-
 %  Debugging Cyc 
 % ===================================================================
      
-:- dynamic_transparent(isDebug).
+:-dynamic_transparent(isDebug).
 
 % Uncomment this next line to see Cyc debug messages
 
@@ -1445,8 +1445,8 @@ isDebug(Call):- isDebug -> Call ; true.
 % ===================================================================
 %  Cyc Query Cache Control
 % ===================================================================
-:- dynamic_transparent(cyc:cachable_query/1).
-:- dynamic_transparent(cyc:cached_query/2).
+:-dynamic_transparent(cyc:cachable_query/1).
+:-dynamic_transparent(cyc:cached_query/2).
 
 user:save_cached_query:-
    tell(saved_cached_queries),
@@ -1479,9 +1479,9 @@ listingWithnumberVars(F/A):-
 listingWithnumberVars(F/A).
 
 
-:- exists_file(saved_cached_queries)->true;user:save_cached_query.
+:-exists_file(saved_cached_queries)->true;user:save_cached_query.
 
-:- catch([saved_cached_queries],_,true).
+:-catch([saved_cached_queries],_,true).
 
 % ===================================================================
 %  Cyc Assert
@@ -1519,8 +1519,8 @@ cycAssertNow(CycL,Mt):-
 
 defaultAssertOptions(Opts):-isCycOption(defaultAssertOptions,Opts).
 
-:- dynamic_transparent(defaultAssertMt/1).
-:- dynamic_transparent(everythingMt/1).
+:-dynamic_transparent(defaultAssertMt/1).
+:-dynamic_transparent(everythingMt/1).
 
 defaultAssertMt('doom:VocabularyMt').
 everythingMt('EverythingPSC').
@@ -1588,7 +1588,7 @@ cycQuery(Copy,CycL,Mt,Vars,Backchain,Number,Time,Depth):-
 %queryParams(0,	nil,	nil,	nil). % default
 %queryParams(1,	nil,	nil,	nil). % used here
 
-:- set_prolog_flag(double_quotes,codes).
+:-set_prolog_flag(double_quotes,codes).
 
 queryParams(Backchain,Number,Time,Depth):-
    ignore(isCycOption(query(backchains),Backchain)),
@@ -1820,12 +1820,12 @@ unquoteAtom(Atom,New):-concat_atom(LIST,'"',Atom),concat_atom(LIST,'',New),!.
 % Make new CycConstant
 % ============================================
 
-:- dynamic_transparent(makeConstant/0).
-:- dynamic_transparent(user:isCycConstantMade/1).
-:- dynamic_transparent(isCycConstantNever/1).
-:- dynamic_transparent(isCycConstantNever/2).
-:- dynamic_transparent(isCycConstantGuess/1).
-:- dynamic_transparent(isCycConstantGuess/2).
+:-dynamic_transparent(makeConstant/0).
+:-dynamic_transparent(user:isCycConstantMade/1).
+:-dynamic_transparent(isCycConstantNever/1).
+:-dynamic_transparent(isCycConstantNever/2).
+:-dynamic_transparent(isCycConstantGuess/1).
+:-dynamic_transparent(isCycConstantGuess/2).
 
 
 user:isCycConstantMade(isa).
@@ -1876,7 +1876,7 @@ isCycConstantNever(_,'2').
 isCycConstantNever(_,'3').
 isCycConstantNever(_,'4').
 
-:- dynamic_transparent(termCyclify/2).
+:-dynamic_transparent(termCyclify/2).
 
 isCycConstant(Const):-(var(Const);is_ftString(Const);number(Const)),!,fail.
 isCycConstant(Const):-user:isCycConstantMade(Const),!.
@@ -1887,7 +1887,7 @@ isCycConstant(Const):-atom(Const),atom_concat('#$',X,Const),!,isCycConstant(X).
 isCycConstant(Const):-sformat(S,'(find-constant "~w")',[Const]),converseRaw(S,R),!,R=[35|_],asserta(user:isCycConstantMade(Const)).
 
 
-:- dynamic(aliasConstant/2).
+:-dynamic(aliasConstant/2).
 aliasConstant(type_of,isa).
 aliasConstant(friendly,friends).
 guessConstant(Xs,Y):-string_to_atom(Xs,X),aliasConstant(X,Y),!.
@@ -1905,7 +1905,7 @@ guessConstantFind(Name,R):-evalSubL('ps-get-cycls-for-np'(string(Name)),RS,_),is
 guessConstantFind(Name,R):-evalSubL('constant-apropos'(string(Name)),RSR,_),isTrue(RSR),reverse(RSR,RS),!,member(RE,RS),balanceBinding(RE,R).
 %guessConstantFind(Name,R):-evalSubL('cyclify'(string([a,Name])),RS,_),isTrue(RS),!,member([_|RE],RS),balanceBinding(RE,R).
 
-:- dynamic_transparent(makeConstant/0).
+:-dynamic_transparent(makeConstant/0).
 %makeConstant.
 
 makeConstant(_Const):-not(isCycOption(makeConstant)),!.
@@ -1967,10 +1967,10 @@ genParaphrase(CycL,English):-
 %  Query into BaseKB for (isa ?X ?Y) 
 %
 % ============================================
-:- if(\+ current_predicate(isRegisterCycPred_lc/3)).
-:- dynamic(isRegisterCycPred_lc/3).
-:- module_transparent(isRegisterCycPred_lc/3).
-:- endif.
+:-if(\+ current_predicate(isRegisterCycPred_lc/3)).
+:-dynamic(isRegisterCycPred_lc/3).
+:-module_transparent(isRegisterCycPred_lc/3).
+:-endif.
 
 % ?- registerCycPred('BaseKB':isa/2). 
 registerCycPred(Mt:Pred/Arity):-!,
@@ -2032,7 +2032,7 @@ cycDefineOrFail(_,Pred,Arity):-
 ifHookRedef(_):-!.
 %ifHookRedef(C):-C,!.
 
-:- ifHookRedef((redefine_system_predicate(system:assert(_)),assert((system:assert(Term):-nonvar(Term),assertThrough(Term))))).
+:-ifHookRedef((redefine_system_predicate(system:assert(_)),assert((system:assert(Term):-nonvar(Term),assertThrough(Term))))).
 
 assertThrough(Mt:CycL):-assertThrough(Mt,CycL).
 assertThrough(CycL):-mtForCycL(CycL,Mt),assertThrough(Mt,CycL).
@@ -2056,7 +2056,7 @@ assertThrough(ToMt,CycL):-
 % ?- retractall('DogsMt':isa('Fido','Dog')).
 % Will retract (isa Fido Dog) from DogsMt
 % ============================================
-:- ifHookRedef((redefine_system_predicate(retractall(_)),asserta((retractall(Term):-nonvar(Term),retractAllThrough(Term))))).
+:-ifHookRedef((redefine_system_predicate(retractall(_)),asserta((retractall(Term):-nonvar(Term),retractAllThrough(Term))))).
 
 retractAllThrough(Mt:CycL):-
       retractAllThrough(Mt,CycL).
@@ -2084,7 +2084,7 @@ retractAllThrough(ToMt,CycL):-
 % ?- retractall('DogsMt':isa('Fido','Dog')).
 % Will retract (isa Fido Dog) from DogsMt
 % ============================================
-:- ifHookRedef((redefine_system_predicate(retract(_)),asserta((retract(Term):-nonvar(Term),retractOnceThrough(Term))))).
+:-ifHookRedef((redefine_system_predicate(retract(_)),asserta((retract(Term):-nonvar(Term),retractOnceThrough(Term))))).
 
 retractOnceThrough(Mt:CycL):-
       retractOnceThrough(Mt,CycL).
@@ -2134,9 +2134,9 @@ isNonCompound(string(Var)):-!.
 % ===================================================================
 % CycL Term Reader
 % ===================================================================
-:- dynamic reading_in_comment/0.
-:- dynamic reading_in_string/0.
-:- dynamic read_in_atom/0.
+:-dynamic reading_in_comment/0.
+:-dynamic reading_in_string/0.
+:-dynamic read_in_atom/0.
 
 readCycL(CHARS):-readCycL(user_input,CHARS).
 
@@ -2268,14 +2268,14 @@ getSurfaceFromToks(WFFClean,OUT,VARSOut):- OUT=[unk_comment,WFFClean], debugFmt(
 
 getSurfaceFromStream(Stream0,Term,Vars):- any_to_lazy_list(Stream0,Chars),getSurfaceFromChars(Chars,Term,Term).
 
-:- export(any_to_lazy_list/2).
+:-export(any_to_lazy_list/2).
 any_to_lazy_list(Stream0,Chars):-l_open_input(Stream0,Stream),stream_to_lazy_list_pushback(Stream,CharsM),!,Chars=CharsM.
 
 %===================================================================
 % Removes Leading and Trailing whitespaces and non ANSI charsets.
 %====================================================================
-:- assert(show_this_hide(trim,2)).
-:- set_prolog_flag(double_quotes,codes).
+:-assert(show_this_hide(trim,2)).
+:-set_prolog_flag(double_quotes,codes).
 
 trim(S,Y):-flatten(S,S2),trim2(S2,Y).
 
@@ -2289,7 +2289,7 @@ trim2(S,Y):-
 addSpaceBeforeSym([H|T],[H,32|T]):-member(H,"?.!"),!.
 addSpaceBeforeSym(H,H).
 
-:- set_prolog_flag(double_quotes,string).
+:-set_prolog_flag(double_quotes,string).
 
 ltrim([],[]):-!.
 ltrim([32,32,32,32,32,32,32|String],Out) :-trim(String,Out),!.
@@ -2396,7 +2396,7 @@ idGen(X):-flag(idGen,X,X+1).
 var_number(A,'$VAR'(VN)):-numbered_var(A,'$VAR'(VN)),!.
 var_number(A,'$VAR'(VN)):-flag(get_next_num,VN,VN+1),asserta(numbered_var(A,'$VAR'(VN))),!.
 
-:- dynamic_transparent(numbered_var/2).
+:-dynamic_transparent(numbered_var/2).
 
 % This creates ISO Prolog getPrologVars w/in a CycL/STANDARD expression to be reconstrated as after parsing is complete 
 
@@ -2427,9 +2427,9 @@ collect_temp_vars(VARS):-!,(setof(=(Name,Number),numbered_var(Name,Number),VARS)
 %================================================================
 % STRING TOKENIZATION                            
 %================================================================
-:- assert(show_this_hide(tokenize,2)).
+:-assert(show_this_hide(tokenize,2)).
 
-:- set_prolog_flag(double_quotes,codes).
+:-set_prolog_flag(double_quotes,codes).
 
 toCodeList(string(S),XS):-ground(S),toCodeList(S,XS),!.
 toCodeList(S,XS):-string(S),!,string_to_atom(S,A),toCodeList(A,XS),!.
@@ -2708,7 +2708,7 @@ weak_nd_subst2( X, Sk, L, L ).
 
     
 /*
-:- module(system_dependant,
+:-module(system_dependant,
       [getCputime/1,
       safe_numbervars/1,
       unnumbervars/2,
@@ -2765,7 +2765,7 @@ thread_join(Id,X):-thread_join(Id,X).
 % Some prologs have a printf() type predicate.. so I made up fmtString/writeFmt in the Cyc code that calls the per-prolog mechaism
 % in SWI it''s formzat/N and sformat/N
 % ========================================================================================
-:- dynamic_transparent(isConsoleOverwritten/0).
+:-dynamic_transparent(isConsoleOverwritten/0).
 
 /*
 defined above
@@ -2851,7 +2851,7 @@ if_prolog(_,_):-!.  % Dont run SWI Specificd or others
 %  Http, Native or Soap and replies accordingly
 % ===========================================================
 /*
-:- module(cyc_httpd,[
+:-module(cyc_httpd,[
    createCycServer/1,
    xmlPrologServer/1,
    read_line_with_nl/3,
@@ -2867,9 +2867,9 @@ if_prolog(_,_):-!.  % Dont run SWI Specificd or others
 % :-use_module(cyc_threads).
 %=  :-ensure_loaded(system_dependant).
 
-:- dynamic_transparent(isKeepAlive/1).
+:-dynamic_transparent(isKeepAlive/1).
 
-:- dynamic_transparent(isServerCreated/1).
+:-dynamic_transparent(isServerCreated/1).
 %startCycAPIServer:-isServerCreated,!.
 startCycAPIServer:- createCycServer(4600),!.
 createCycServer(BasePort) :-isServerCreated(BasePort),!.
@@ -3191,11 +3191,11 @@ cfaslWrite(Out,ist(Mt,Assert)):-put(Out,51),put(Out,33),cfaslWrite(Out,Assert),c
 %:-dynamic(assertion/13).
 %:-multifile(assertion/13).
 
-:- module_transparent(constant/4).
-:- dynamic(constant/4).
+:-module_transparent(constant/4).
+:-dynamic(constant/4).
 %user:constant(A,B,C,D):-cyc:constant(A,B,C,D).
 
-:- dynamic(constantGuid/2).
+:-dynamic(constantGuid/2).
 constantGuid(Const,ID):-cyc:constant(Const,_,ID,_).
 fromConstant(Const,guid(BB)):-constantGuid(Const,Guid),!,atom_codes(Guid,BB).
 fromConstant(Const,Id):-constantId(Const,Id),!.
@@ -3203,7 +3203,7 @@ fromConstant(Const,BB):-sformat(S,'(constant-external-id (find-constant "~w"))',
          BB=guid(String),string_to_atom(String,Atom),
          asserta(constantGuid(Const,Atom)).
 
-:- dynamic(constantId/2).
+:-dynamic(constantId/2).
 constantId(Const,ID):-cyc:constant(Const,ID,_,_).
 toConstant(Len,Const):-constantId(Const,Len),!.
 toConstant(Len,Const):-integer(Len),sformat(S,'(find-constant-by-internal-id ~w)',[Len]),evalSubL(S,X,_),balanceBinding(X,BB),
@@ -3229,7 +3229,7 @@ isTrue(_).
 
 
 
-:- module_transparent(user:nart/3).
+:-module_transparent(user:nart/3).
 
 nart(not,not,not).
 toNart(Id,Nart):-nart(Id,_,Nart),!.
@@ -3287,7 +3287,7 @@ callCycApi(Out,PrologGoal,ToplevelVars):-cycGoal(PrologGoal,ToplevelVars,Result)
 
 
 
-:- dynamic(evalSubLCache/2).
+:-dynamic(evalSubLCache/2).
 
 
 %passAlong([H|T],Y):-X=..[H|T],!,passAlong(X,Y).
@@ -3455,18 +3455,18 @@ reply(Request) :-
 sigma_ua(X):-processRequest(X).
 
 
-:- module_transparent(user:processRequestHook/1).
-:- dynamic(user:processRequestHook/1).
-:- multifile(user:processRequestHook/1).
+:-module_transparent(user:processRequestHook/1).
+:-dynamic(user:processRequestHook/1).
+:-multifile(user:processRequestHook/1).
 
 processRequest(X):-catch(user:processRequestHook(X),E,( debugFmt('processRequestHook: "~q" \n',[X:E]), fail)),!.
 
 % =================================================
 % SubL
 % =================================================
-:- dynamic(processRequestHook/1).
-:- multifile(processRequestHook/1).
-:- module_transparent(processRequestHook/1).
+:-dynamic(processRequestHook/1).
+:-multifile(processRequestHook/1).
+:-module_transparent(processRequestHook/1).
 
 user:processRequestHook(ARGS):-member(file='subl.moo',ARGS),!,
       ignore(member(formula=W,ARGS)),
@@ -3692,7 +3692,7 @@ ifInteractive(X):-X.
 
 % :-include('cyc_header.pl').
 
-:- dynamic_transparent(xmlCurrentOpenTags/2).
+:-dynamic_transparent(xmlCurrentOpenTags/2).
 
 serviceSoapRequest(In,Out):-
       debugFmt('SOAP Request'),
@@ -3810,7 +3810,7 @@ parse_cyc_soap(Options):-memberchk(submit=ask,Options),!,make,
                      )))),
         write('</cycml:ask>\n').
 
-:- dynamic_transparent(invokeRequestToBuffer(NEWFORM,ChaseVars,Ctx,TrackingAtom,Context,User,Vars,CPU)).
+:-dynamic_transparent(invokeRequestToBuffer(NEWFORM,ChaseVars,Ctx,TrackingAtom,Context,User,Vars,CPU)).
 
 invokeRequest_xml(NEWFORM,ChaseVars,Ctx,TrackingAtom,Context,User,Vars,CPU):-
         invokeRequestToBuffer(NEWFORM,ChaseVars,Ctx,TrackingAtom,Context,User,Vars,CPU),
@@ -3839,7 +3839,7 @@ cite_xml_buffered_answers:-
 */
 cite_xml_buffered_answers:-!.
 
-:- dynamic_transparent(cycassertgaffast/4).
+:-dynamic_transparent(cycassertgaffast/4).
 
 cycassertgaffast(P,X,Y,Mt):-
    termCyclify(P,CP),
@@ -3857,7 +3857,7 @@ prologEval(X,Y):-Y is X + 211.
 %:-use_module(library(odbc)).  
 %:-odbc_debug(5).
 
-:- dynamic(ensureCycCallsProlog/2).
+:-dynamic(ensureCycCallsProlog/2).
 
 ensureCycCallsProlog(Host,Port):-withoutCyc,!.
 ensureCycCallsProlog(Host,Port):-
@@ -3998,7 +3998,7 @@ inform_xml_agent(_, ['Summary'=_|_G5892], _, _).
 % ===========================================================
 % Write Answers
 % ===========================================================
-:- dynamic_transparent(length_explaination/2).
+:-dynamic_transparent(length_explaination/2).
 
 inform_xml_agent(UResultsSoFar,Result,InExplaination,Status):-
         writeFmt('<binding>\n',[]),
@@ -4102,7 +4102,7 @@ write_e(C):-put_code(C),!.
 % ===================================================================
 
 			  /*      				   
-:- module(cyc_generation,
+:-module(cyc_generation,
 	 [ 
 	 debugFmt/1,
 	 debugFmt/2,
@@ -4182,7 +4182,7 @@ dumpstack_argument(N,Frame):-
 	
 dumpstack_argument(N,Frame):-!,write('\n').
 	
-:- dynamic_transparent(mods/1).
+:-dynamic_transparent(mods/1).
 
 write_response_begin:-!.
 write_response_end:-!.
@@ -4298,10 +4298,10 @@ debugOnFailure(arg_domains,CALL):-!,logOnFailure(CALL),!.
 debugOnFailure(Module,CALL):-debugOnFailure(Module:CALL),!.
 
 
-debugOnError((X,Y)):-!,debugOnError(X),debugOnError(Y).
-debugOnError((X;Y)):-!,(debugOnError(X);debugOnError(Y)).
-debugOnError(call(X)):-!,debugOnError(X).
-debugOnError(X):-catch(X,E,(writeFailureLog(E,X),ctrace,call(X))).
+on_x_rtrace((X,Y)):-!,on_x_rtrace(X),on_x_rtrace(Y).
+on_x_rtrace((X;Y)):-!,(on_x_rtrace(X);on_x_rtrace(Y)).
+on_x_rtrace(call(X)):-!,on_x_rtrace(X).
+on_x_rtrace(X):-catch(X,E,(writeFailureLog(E,X),ctrace,call(X))).
 
 
 noDebug(CALL):-CALL.
@@ -4355,8 +4355,8 @@ writeObject_conj(Output,Vars):-
 	writeObject(Output,Vars).
 
 
-:- dynamic_transparent(resolve_skolem/2).
-:- dynamic_transparent(final_answer/1).
+:-dynamic_transparent(resolve_skolem/2).
+:-dynamic_transparent(final_answer/1).
 
 ignoreOnce(X):-ignore(once(X)).
 
@@ -4373,7 +4373,7 @@ write_val_xml(Any,Vars):-
       toMarkUp(leml,Any,Vars,Chars),write(Chars),nl.
                                         /*
 
-:- dynamic_transparent(telling_file).               
+:-dynamic_transparent(telling_file).               
 
 writeCycEvent(_,_,_):-isCycOption(disp_hide_all=true),!.
 writeCycEvent(_,_,_):-telling_file,!.
@@ -4453,9 +4453,9 @@ Where <cr> indicates a carriage return or some other suitable delimiter.
 
 
 % User Agent
-:- dynamic_transparent('$CycOption'/3).
-:- dynamic_transparent(saved_note/4).
-:- dynamic_transparent(act_mem/3).
+:-dynamic_transparent('$CycOption'/3).
+:-dynamic_transparent(saved_note/4).
+:-dynamic_transparent(act_mem/3).
 
 
 % ===========================================================
@@ -4471,7 +4471,7 @@ Where <cr> indicates a carriage return or some other suitable delimiter.
 % thread_join(Id,_)
 
 /*
-:- module(cyc_threads,
+:-module(cyc_threads,
       [ 
       	 servantProcessCreate/1,
 	 servantProcessCreate/3,
@@ -4487,7 +4487,7 @@ Where <cr> indicates a carriage return or some other suitable delimiter.
   */
 % :-include('cyc_header.pl').
 
-:- dynamic_transparent(isCycProcess/5).
+:-dynamic_transparent(isCycProcess/5).
 
 
 createProcessedGoal(Goal):-
@@ -4676,7 +4676,7 @@ writeSpaces(N):-format('&nbsp;'),NN is N-1,writeSpaces(NN),!.
 valueToCheckMark(Value,'ON','CHECKED'):-memberchk(Value,['ON',yes,true,'TT','T','True','Yes']).
 valueToCheckMark(Value,'OFF',' ').
 
-:- set_prolog_flag(double_quotes,string).
+:-set_prolog_flag(double_quotes,string).
 
 
 %=  ======================================
@@ -4685,7 +4685,7 @@ valueToCheckMark(Value,'OFF',' ').
 % :-set_prolog_flag(double_quotes,codes).
 
 
-:- retract(double_quotes_was(X)),set_prolog_flag(double_quotes,X).
+:-retract(double_quotes_was(X)),set_prolog_flag(double_quotes,X).
 
 
 % ===================================================================

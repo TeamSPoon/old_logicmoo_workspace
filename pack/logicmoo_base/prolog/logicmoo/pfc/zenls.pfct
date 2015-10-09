@@ -1,5 +1,5 @@
 
-:- if(if_defined(pfc_examples,user:startup_option(clif,sanity_tests))).
+:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity))).
 
 :-file_begin(pfc).
 
@@ -15,29 +15,29 @@ genls(tPenguin,tBird).
 % chilly is a penguin.
 tPenguin(iChilly).
 
-:-pfc_test((tBird(iChilly))).
+:-mpred_test((tBird(iChilly))).
 
 
 % tweety is a canary.
 tCanary(iTweety).
 
-:-pfc_test((tBird(iTweety))).
+:-mpred_test((tBird(iTweety))).
 
 
 % birds fly by default.
-(pfc_default(( tBird(X) ==> tFly(X)))).
+(mpred_default(( tBird(X) ==> tFly(X)))).
 
-:-pfc_test((isa(I,tFly),I=iChilly)).
+:-mpred_test((isa(I,tFly),I=iChilly)).
 
-:-pfc_test((tFly(iTweety))).
-:-pfc_test((tFly(iChilly))).
+:-mpred_test((tFly(iTweety))).
+:-mpred_test((tFly(iChilly))).
 
 
 % penguins do neg tFly.
 tPenguin(X) ==> neg(tFly(X)).
 
-:-pfc_test((\+ tFly(iChilly))).
-:-pfc_test((neg(tFly(iChilly)))).
+:-mpred_test((\+ tFly(iChilly))).
+:-mpred_test((neg(tFly(iChilly)))).
 
 
 

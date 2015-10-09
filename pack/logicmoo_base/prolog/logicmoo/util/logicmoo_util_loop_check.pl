@@ -1,14 +1,117 @@
+% File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_loop_check.pl
+:- module(logicmoo_util_loop_check,
+          [ any_term_overlap/2,
+            any_term_overlap_atoms_of/2,
+            atoms_of_0/2,
+            call_setof_tabled/4,
+            call_t/1,
+            call_tabled/1,
+            call_tabled/2,
+            call_tabled0/4,
+            call_tabled1/4,
+            call_vars_tabled/3,
+            can_fail/1,
+            cannot_table_call/1,
+            cannot_use_tables/1,
+            cc_key/2,
+            ex/0,
+            expire_dont_add/0,
+            expire_tabled_list/1,
+            findall_nodupes/3,
+            get_where/1,
+            get_where0/1,
+            is_loop_checked/1,
+            lco_goal_expansion/2,
+            lex/0,
+            loop_check/1,
+            loop_check/2,
+            loop_check_early/2,
+            loop_check_term/3,
+            loop_check_term_key/3,
+            make_key/2,
+            make_tabled_perm/1,
+            mpred_expire_caches/1,
+            no_loop_check/1,
+            no_loop_check/2,
+            no_loop_check_term_key/3,
+            outside_of_loop_check/0,
+            really_can_table/0,
+            reduce_make_key/2,
+            retract_can_table/0,
+            skipped_table_call/1,
+            transitive/3,
+            transitive_except/4,
+            transitive_lc/3
+          ]).
+:- multifile
+        goal_expansion/2.
+:- meta_predicate
+        call_setof_tabled(?, ?, 0, -),
+        call_t(0),
+        call_tabled(0),
+        call_tabled(?, 0),
+        call_tabled0(?, ?, ?, ?),
+        call_tabled1(?, ?, ?, ?),
+        call_vars_tabled(?, ?, 0),
+        cannot_table_call(0),
+        cannot_use_tables(0),
+        findall_nodupes(?, 0, -),
+        loop_check(0),
+        loop_check(0, 0),
+        loop_check_early(0, 0),
+        loop_check_term(0, ?, 0),
+        loop_check_term_key(0, ?, 0),        
+        make_tabled_perm(0),
+        no_loop_check(0),
+        no_loop_check(0, 0),
+        no_loop_check_term_key(0, ?, 0),
+        reduce_make_key(+, -),
+        skipped_table_call(0),
+        transitive(2, +, -),
+        transitive_except(+, 2, +, -),
+        transitive_lc(2, +, -).
+:- meta_predicate(go_as_last(0,0)).
+
+:- export(go_as_last/2).
+:- thread_local lmcache:going_last/1.
+% go_as_last(Call1,Call2):- \+ lmcache:going_last(Call1),w_tl(lmcache:going_last(Call1), (Call1->true;(must(catch(Call2,_,fail))))),!.
+go_as_last(Call1,Call2):- \+ lmcache:going_last(Call1),w_tl(lmcache:going_last(Call1), (Call1->true;Call2)),!.
+
+
+:- module_transparent
+        any_term_overlap/2,
+        any_term_overlap_atoms_of/2,
+        atoms_of_0/2,
+        can_fail/1,
+        ex/0,
+        expire_dont_add/0,
+        expire_tabled_list/1,
+        get_where/1,
+        get_where0/1,
+        goal_expansion/2,
+        is_loop_checked/1,
+        lco_goal_expansion/2,
+        lex/0,
+        mpred_expire_caches/1,
+        outside_of_loop_check/0,
+        really_can_table/0,
+        retract_can_table/0.
+:- dynamic
+        goal_expansion/2.
+
+
+:- include(logicmoo_util_header).
 
 :- export(transitive/3).
-:- meta_predicate(transitive(2,+,-)).
-:- meta_predicate(transitive_lc(2,+,-)).
-:- meta_predicate(transitive_except(+,2,+,-)).
+% = :- meta_predicate(transitive(2,+,-)).
+% = :- meta_predicate(transitive_lc(2,+,-)).
+% = :- meta_predicate(transitive_except(+,2,+,-)).
 
-transitive(X,A,B):- once(debugOnError(call(X,A,R)) -> ( R\=@=A -> transitive_lc(X,R,B) ; B=R); B=A),!.
+transitive(X,A,B):- once(on_x_debug(call(X,A,R)) -> ( R\=@=A -> transitive_lc(X,R,B) ; B=R); B=A),!.
 
 transitive_lc(X,A,B):-transitive_except([],X,A,B).
 
-transitive_except(NotIn,X,A,B):- memberchk_same(A,NotIn)-> (B=A,!) ;((once(debugOnError(call(X,A,R)) -> ( R\=@=A -> transitive_except([A|NotIn],X,R,B) ; B=R); B=A))),!.
+transitive_except(NotIn,X,A,B):- memberchk_same(A,NotIn)-> (B=A,!) ;((once(on_x_debug(call(X,A,R)) -> ( R\=@=A -> transitive_except([A|NotIn],X,R,B) ; B=R); B=A))),!.
 
 :- meta_predicate no_loop_check(0).
 :- meta_predicate no_loop_check(0,0).
@@ -17,30 +120,31 @@ transitive_except(NotIn,X,A,B):- memberchk_same(A,NotIn)-> (B=A,!) ;((once(debug
 :- meta_predicate loop_check(0).
 :- meta_predicate loop_check(0,0).
 
-%:- meta_predicate((loop_check(0,0))).
-%:- meta_predicate((no_loop_check(0,0))).
-%:- meta_predicate((no_loop_check(0))).
-%:- meta_predicate((no_loop_check(0))).
-:- meta_predicate((loop_check_term(0,?,0))).
-:- meta_predicate((loop_check_term_key(0,?,0))).
-%:- meta_predicate((loop_check(0,0))).
-%:- meta_predicate((loop_check(0))).
+%% = :- meta_predicate((loop_check(0,0))).
+%% = :- meta_predicate((no_loop_check(0,0))).
+%% = :- meta_predicate((no_loop_check(0))).
+%% = :- meta_predicate((no_loop_check(0))).
+% = :- meta_predicate((loop_check_term(0,?,0))).
+% = :- meta_predicate((loop_check_term_key(0,?,0))).
+%% = :- meta_predicate((loop_check(0,0))).
+%% = :- meta_predicate((loop_check(0))).
 
 
 % ===================================================================
 % Loop checking
 % ===================================================================
-:- thread_local tlbugger:ilc/1.
+:- thread_local lmcache:ilc/1.
 
-:- meta_predicate(call_t(0)).
+% = :- meta_predicate(call_t(0)).
 % call_t(C0):-reduce_make_key(C0,C),!,table(C),!,query(C).
 % call_t(C0):-query(C).
 call_t(C):- call(C).
 
+:- meta_predicate reduce_make_key(+,-).
 reduce_make_key(call(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(call_u(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(req(C),O):-!,reduce_make_key(C,O).
-reduce_make_key(pfc_call(C),O):-!,reduce_make_key(C,O).
+reduce_make_key(mpred_call(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(must(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(no_repeats(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(no_repeats(_,C),O):-!,reduce_make_key(C,O).
@@ -58,34 +162,38 @@ reduce_make_key(M:C,O):-atom(M),!,reduce_make_key(C,O).
 reduce_make_key(O,O).
 
 
-cc_key(CC,Key):- cyclic_term(CC),copy_term_nat(CC,CKey),numbervars(CKey,0,_),format(atom(Key),'~w',[CKey]),!.
+cc_key(CC,Key):- cyclic_term(CC),!,trace,copy_term_nat(CC,CKey),numbervars(CKey,0,_),format(atom(Key),'~w',[CKey]),!.
 cc_key(CC,Key):- copy_term_nat(CC,Key),numbervars(Key,0,_),!.
 
-make_key(M:CC,Key):- atom(M),!,hotrace((ground(CC)->Key=CC ; cc_key(CC,Key))).
-make_key(CC,Key):- hotrace((ground(CC)->Key=CC ; cc_key(CC,Key))).
+make_key(M:CC,KeyO):- atom(M),!,((ground(CC)->Key=CC ; cc_key(CC,Key))),!,KeyO=Key.
+make_key(CC,KeyO):- ((ground(CC)->Key=CC ; cc_key(CC,Key))),!,KeyO=Key.
 
 
-is_loop_checked(Call):-  make_key(Call,Key),!,tlbugger:ilc(Key).
+is_loop_checked(Call):-  make_key(Call,Key),!,lmcache:ilc(Key).
 
-
+:- meta_predicate logicmoo_utils:loop_check_early(0,0).
+:- export(loop_check_early/2).
+loop_check_early(Call, TODO):- loop_check_term_key(Call,Call, TODO).
 
 :- export(loop_check/1).
 loop_check(Call):- loop_check(Call, fail).
 
 :- export(loop_check/2).
-loop_check(Call, TODO):- parent_goal(Term,2)->loop_check_term_key(Call,Term+Call, TODO).
-% user:loop_check(Call, TODO):- trace, parent_goal(Term,2)->loop_check_term_key(Call,Term+Call, TODO).
+loop_check(Call, TODO):- !, loop_check_early(Call, TODO).
+% loop_check(Call, TODO):- trace, parent_goal(Term,2)->loop_check_term_key(Call,Term+Call, TODO).
 loop_check_term_key(Call,KeyIn,TODO):- make_key(KeyIn,Key) -> loop_check_term(Call,Key,TODO).
 
 
-no_loop_check(Call):- parent_goal(Term,2)->no_loop_check_term_key(Call,Term+Call,fail).
-no_loop_check(Call, TODO):- parent_goal(Term,2)->no_loop_check_term_key(Call,Term+Call, TODO).
-no_loop_check_term_key(Call,KeyIn,TODO):- make_key(KeyIn,Key) -> with_no_assertions(tlbugger:ilc(_),loop_check_term(Call,Key,TODO)).
+no_loop_check(Call):- no_loop_check(Call, fail).
+:- export(no_loop_check/2).
+no_loop_check(Call, TODO):- !, no_loop_check_term_key(Call,Call,TODO).
+%no_loop_check(Call, TODO):- parent_goal(Term,2)->no_loop_check_term_key(Call,Term+Call, TODO).
+no_loop_check_term_key(Call,KeyIn,TODO):- make_key(KeyIn,Key) -> wno_tl(lmcache:ilc(_),loop_check_term(Call,Key,TODO)).
 
 
-loop_check_term(Call,Key,TODO):- TT = tlbugger:ilc(Key),
+loop_check_term(Call,Key,TODO):- TT = lmcache:ilc(Key),
  ( \+(TT) -> (setup_call_cleanup(asserta(TT,REF), Call, 
-   erase_safe(TT,REF))) ; 
+   erase(REF))) ; 
    ((can_fail(TODO)->retract_can_table;true),call(TODO)) ).
 
 can_fail(G):-not(G=true),not(G=must(_)).
@@ -98,6 +206,7 @@ get_where0(A:0):-current_input(S),stream_property(S,alias(A)),!.
 get_where0(M:0):-context_module(M),!.
 get_where0(user:0):-!.
 
+lco_goal_expansion(_,_):-!,fail.
 lco_goal_expansion(B,A):-nonvar(A),!,lco_goal_expansion(B,M),!,M=A.
 lco_goal_expansion(V,V):- \+ compound(V),!.
 lco_goal_expansion(loop_check(G),O):-!,lco_goal_expansion(loop_check(G,fail),O).
@@ -129,9 +238,9 @@ call_no_cuts_loop_checked(Call, TODO):- clause(Call,Body),make_key(Body,Key),loo
 :- meta_predicate call_vars_tabled(?,?,0).
 :- module_transparent call_vars_tabled/3.
 
-:- meta_predicate((cannot_table_call(0))).
-:- meta_predicate((cannot_use_tables(0))).
-:- meta_predicate((skipped_table_call(0))).
+% = :- meta_predicate((cannot_table_call(0))).
+% = :- meta_predicate((cannot_use_tables(0))).
+% = :- meta_predicate((skipped_table_call(0))).
 
 
 
@@ -139,51 +248,71 @@ call_no_cuts_loop_checked(Call, TODO):- clause(Call,Body),make_key(Body,Key),loo
 :- meta_predicate findall_nodupes(?,0,-).
 :- module_transparent call_setof_tabled/4.
 
-:- dynamic(table_bugger:call_tabled_cached_results/2).
-:- dynamic(table_bugger:call_tabled_perm/2).
-:- thread_local table_bugger:maybe_table_key/1.
+:- dynamic(lmcache:call_tabled_cached_results/2).
+:- dynamic(lmcache:call_tabled_perm/2).
+:- thread_local lmcache:maybe_table_key/1.
 
 retract_can_table :- retractall(maybe_table_key(_)).
 
-:- meta_predicate(make_key(?,-)).
+% = :- meta_predicate(make_key(?,-)).
 
+:- multifile(lmhook:mpred_on_expire_caches/1).
+:- dynamic(lmhook:mpred_on_expire_caches/1).
 :- module_transparent((ex)/0).
 
-:- dynamic(user:already_added_this_round/1).
-:- export(user:already_added_this_round/1).
-expire_dont_add:-retractall(user:already_added_this_round(_)),expire_tabled_list(all),nop(dmsg(expire_dont_add)).
+:- dynamic(lmconfig:already_added_this_round/1).
+:- export(lmconfig:already_added_this_round/1).
+expire_dont_add:-retractall(lmconfig:already_added_this_round(_)),mpred_expire_caches(all),nop(dmsg(expire_dont_add)).
 
-lex:-listing(tlbugger:ilc(_)),forall(current_predicate(table_bugger:F/A),listing(table_bugger:F/A)),catchvv(listing(user:already_added_this_round),_,true).
-(ex):-expire_tabled_list(_),retractall(tlbugger:ilc(_)),dmsg_showall(_),forall(current_predicate(table_bugger:F/A),(functor(RA,F,A),retractall(RA))),catchvv(expire_dont_add,_,true).
+lex:-listing(lmcache:ilc(_)),forall(current_predicate(lmcache:F/A),listing(lmcache:F/A)),catchvv(listing(lmconfig:already_added_this_round),_,true).
+(ex):-mpred_expire_caches(_),retractall(lmcache:ilc(_)),dmsg_showall(_),forall(current_predicate(lmcache:F/A),(functor(RA,F,A),retractall(RA))),catchvv(expire_dont_add,_,true).
 
-expire_tabled_list(V):-var(V),!,retractall(table_bugger:call_tabled_cached_results(_,_)).
-expire_tabled_list(K):-compound(K),functor(K,_,1),retractall(table_bugger:call_tabled_cached_results(isa(_,_),_)),retractall(table_bugger:call_tabled_cached_results(isa(_,_)+_,_)),fail.
-expire_tabled_list(K):-!,retractall(table_bugger:call_tabled_cached_results(K,_)),retractall(table_bugger:call_tabled_cached_results(K+_,_)).
-expire_tabled_list(T):- atoms_of(T,A1), CT= table_bugger:call_tabled_cached_results(Key,List),ignore(((CT,once(any_term_overlap_atoms_of(A1,List);(not(member(Key,List)),
+mpred_expire_caches(A):-doall(call_no_cuts(must(lmhook:mpred_on_expire_caches(A)))).
+
+:-multifile(lmhook:mpred_on_expire_caches/1).
+:-asserta((lmhook:mpred_on_expire_caches(A):-expire_tabled_list(A))).
+
+expire_tabled_list(V):-var(V),!,retractall(lmcache:call_tabled_cached_results(_,_)).
+expire_tabled_list(K):-compound(K),functor(K,_,1),retractall(lmcache:call_tabled_cached_results(isa(_,_),_)),retractall(lmcache:call_tabled_cached_results(isa(_,_)+_,_)),fail.
+expire_tabled_list(K):-!,retractall(lmcache:call_tabled_cached_results(K,_)),retractall(lmcache:call_tabled_cached_results(K+_,_)).
+expire_tabled_list(T):- atoms_of_0(T,A1), CT= lmcache:call_tabled_cached_results(Key,List),ignore(((CT,once(any_term_overlap_atoms_of(A1,List);(not(member(Key,List)),
   any_term_overlap_atoms_of(A1,Key))),retractall(CT)),fail)).
 
-any_term_overlap_atoms_of(A1,T2):-atoms_of(T2,A2),!,member(A,A1),member(A,A2),!.
+any_term_overlap_atoms_of(A1,T2):-atoms_of_0(T2,A2),!,member(A,A1),member(A,A2),!.
 
-any_term_overlap(T1,T2):- atoms_of(T1,A1),atoms_of(T2,A2),!,member(A,A1),member(A,A2),!.
+any_term_overlap(T1,T2):- atoms_of_0(T1,A1),atoms_of_0(T2,A2),!,member(A,A1),member(A,A2),!.
 
-:- meta_predicate(make_tabled_perm(0)).
+% = :- meta_predicate(make_tabled_perm(0)).
 
 make_tabled_perm(Call):- must(really_can_table),must(outside_of_loop_check),
   term_variables(Call,Vars),!,make_key(Vars+Call,LKey),reduce_make_key(LKey,Key),
-  findall(Vars,with_no_assertions(tlbugger:cannot_save_table,no_loop_check(no_repeats_old(Call))),KList),
+  findall(Vars,wno_tl(lmcache:cannot_save_table,no_loop_check(no_repeats_old(Call))),KList),
   must(KList=[_|_]),!,
-  asserta(table_bugger:call_tabled_perm(Key,KList)),!,
+  asserta(lmcache:call_tabled_perm(Key,KList)),!,
   member(Vars,KList).
 
 
 
 
-:- thread_local tlbugger:cannot_save_table/0.
-:- thread_local tlbugger:cannot_use_any_tables/0.
+atoms_of_0(Var,[]):- (var(Var);Var==[]),!.
+atoms_of_0(':',[]).
+atoms_of_0('moo',[]).
+atoms_of_0('t',[]).
+atoms_of_0(',',[]).
+atoms_of_0(':-',[]).
+atoms_of_0('$VAR',[]):-!.
+atoms_of_0(Atom,[]):-number(Atom),!.
+atoms_of_0(Atom,[Atom]):-atomic(Atom),!.
+atoms_of_0([H|T],L):-!,atoms_of_0(H,HL),atoms_of_0(T,TL),append(HL,TL,L),!.
+atoms_of_0(C,L):-C=..CL,atoms_of_0(CL,L),!.
+
+
+:- thread_local lmcache:cannot_save_table/0.
+:- thread_local lmcache:cannot_use_any_tables/0.
 
 skipped_table_call(Call):- cannot_use_tables(cannot_table_call(Call)).
-cannot_table_call(Call):- with_assertions( tlbugger:cannot_save_table,Call).
-cannot_use_tables(Call):- with_assertions( tlbugger:cannot_use_any_tables,Call).
+cannot_table_call(Call):- w_tl( lmcache:cannot_save_table,Call).
+cannot_use_tables(Call):- w_tl( lmcache:cannot_use_any_tables,Call).
 
 call_tabled(A):-call_tabled(A,A).
 call_tabled(Key,setof(Vars,C,List)):- !,call_setof_tabled(Key,Vars,C,List).
@@ -199,36 +328,36 @@ findall_nodupes(Vs,C,L):- findall(Vs,no_repeats_old(Vs,call_t(C)),L).
 %findall_nodupes(Vs,C,L):- setof(Vs,no_repeats_old(Vs,C),L).
 
 
-:- meta_predicate(call_tabled0(?,?,?,?)).
-:- meta_predicate(call_tabled1(?,?,?,?)).
-%call_tabled0(Key,Vars,C,List):- table_bugger:maybe_table_key(Key),dmsg(looped_findall_nodupes(Vars,C,List)),fail.
-call_tabled0( Key,_,_,List):- reduce_make_key(Key,RKey),table_bugger:call_tabled_perm(RKey,List),!.
-call_tabled0( Key,_,_,List):- \+ (tlbugger:cannot_use_any_tables), table_bugger:call_tabled_cached_results(Key,List),!.
-call_tabled0(_Key,Vars,C,List):- tlbugger:cannot_save_table,!,findall_nodupes(Vars,C,List).
+% = :- meta_predicate(call_tabled0(?,?,?,?)).
+% = :- meta_predicate(call_tabled1(?,?,?,?)).
+%call_tabled0(Key,Vars,C,List):- lmcache:maybe_table_key(Key),dmsg(looped_findall_nodupes(Vars,C,List)),fail.
+call_tabled0( Key,_,_,List):- reduce_make_key(Key,RKey),lmcache:call_tabled_perm(RKey,List),!.
+call_tabled0( Key,_,_,List):- \+ (lmcache:cannot_use_any_tables), lmcache:call_tabled_cached_results(Key,List),!.
+call_tabled0(_Key,Vars,C,List):- lmcache:cannot_save_table,!,findall_nodupes(Vars,C,List).
 
 call_tabled0(Key,Vars,C,List):- outside_of_loop_check,!, findall_nodupes(Vars,C,List),
-  ignore((really_can_table,!,asserta_if_ground(table_bugger:call_tabled_cached_results(Key,List)))),!.
+  ignore((really_can_table,!,asserta_if_ground(lmcache:call_tabled_cached_results(Key,List)))),!.
 
-%call_tabled0(Key,Vars,C,List):- table_bugger:maybe_table_key(Key),!,findall_nodupes(Vars,C,List).
+%call_tabled0(Key,Vars,C,List):- lmcache:maybe_table_key(Key),!,findall_nodupes(Vars,C,List).
 
 call_tabled0(Key,Vars,C,List):-call_tabled1(Key,Vars,C,List).
 
-call_tabled1(Key,Vars,C,List):- asserta(table_bugger:maybe_table_key(Key)), findall_nodupes(Vars,C,List),
+call_tabled1(Key,Vars,C,List):- asserta(lmcache:maybe_table_key(Key)), findall_nodupes(Vars,C,List),
   ignore((really_can_table,!,
-  % if table_bugger:maybe_table_key(Key) is now missing that meant a loop_checker had limited some results
-  show_call_failure(retract(table_bugger:maybe_table_key(Key))),!,
-  asserta_if_ground(table_bugger:call_tabled_cached_results(Key,List)))),!.
+  % if lmcache:maybe_table_key(Key) is now missing that meant a loop_checker had limited some results
+  show_call_failure(retract(lmcache:maybe_table_key(Key))),!,
+  asserta_if_ground(lmcache:call_tabled_cached_results(Key,List)))),!.
 
-really_can_table:- not(test_tl(tlbugger:cannot_save_table)),!.
+really_can_table:- not(test_tl(lmcache:cannot_save_table)),!.
 
-outside_of_loop_check:- (clause(tlbugger:ilc(_),B)->B=(!,fail);true).
+outside_of_loop_check:- (clause(lmcache:ilc(_),B)->B=(!,fail);true).
 
 
 
 %system:goal_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
 %system:term_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
 % user:term_expansion(LC,LCOO):-nonvar(LC),(LC=(H:-B)),lco_goal_expansion(B,BE),B\=@=BE,((H:-BE)=LCOO).
-user:goal_expansion(LC,LCOO):- current_predicate(logicmoo_bugger_loaded/0),once(lco_goal_expansion(LC,LCOO)),LC\=@=LCOO.
+user:goal_expansion(LC,LCOO):- notrace((current_predicate(_:logicmoo_bugger_loaded/0),once(lco_goal_expansion(LC,LCOO)),LC\=@=LCOO)).
 
 
 

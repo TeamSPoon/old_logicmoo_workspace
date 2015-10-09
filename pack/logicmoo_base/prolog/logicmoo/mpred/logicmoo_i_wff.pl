@@ -28,26 +28,26 @@ append_termlist(Call,EList,CallE):-must((compound(Call),is_list(EList))), Call=.
 % Logic Preds Shared
 % ========================================
 
-:- export(is_svo_functor/1).
+:-export(is_svo_functor/1).
 is_svo_functor(Prop):- hotrace((atom(Prop),arg(_,svo(svo,prop,valueOf,rdf),Prop))).
 
-:- export(hilog_functor/1).
+:-export(hilog_functor/1).
 hilog_functor(true_t).
 
-:- export(is_holds_true_not_hilog/1).
+:-export(is_holds_true_not_hilog/1).
 is_holds_true_not_hilog(HOFDS):-is_holds_true(HOFDS),\+ hilog_functor(HOFDS).
 
-:- export(is_holds_true/1).
+:-export(is_holds_true/1).
 is_holds_true(Prop):- hotrace((atom(Prop),is_holds_true0(Prop))),!.
 
 % k,p,..
 is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,t,t,asserted_mpred_t,assertion_t,true_t,assertion,secondOrder,firstOrder),Prop).
 % is_holds_true0(Prop):-atom_concat(_,'_t',Prop).
 
-:- export(is_2nd_order_holds/1).
+:-export(is_2nd_order_holds/1).
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 
-:- export(is_holds_false/1).
+:-export(is_holds_false/1).
 is_holds_false(Prop):-hotrace((atom(Prop),is_holds_false0(Prop))).
 
 is_holds_false0(Prop):-member(Prop,[not,nholds,holds_f,mpred_f,aint,assertion_f,not_true_t,asserted_mpred_f,retraction,not_secondOrder,not_firstOrder]).
@@ -59,9 +59,9 @@ is_holds_false0(Prop):-member(Prop,[not,nholds,holds_f,mpred_f,aint,assertion_f,
 %is_holds_false0(Prop,Stem):-atom_concat(Stem,'_false',Prop).
 
 
-:- thread_local thlocal:override_hilog/1.
+:- thread_local t_l:override_hilog/1.
 
-current_hilog(Dbase_t):- thlocal:override_hilog(Dbase_t),!.
+current_hilog(Dbase_t):- t_l:override_hilog(Dbase_t),!.
 current_hilog(t).
 
 
@@ -73,9 +73,9 @@ isNonVar(Denotation):-not(isSlot(Denotation)).
 % ===============================================================================================
 % ===============================================================================================
 
-:- if(\+ current_predicate(isSlot/1)).
+:-if(\+ current_predicate(isSlot/1)).
 isSlot(Denotation):-((isVarProlog(Denotation);isVarObject(Denotation))),!.
-:- endif.
+:-endif.
 
 isSlot(Denotation,Denotation):- isVarProlog(Denotation),!.
 isSlot(Denotation,PrologVar):- isVarObject(Denotation,PrologVar),!.
@@ -260,7 +260,7 @@ put_singles(Wff,Exists,[S|Singles],NewWff):-
    put_singles(WffM,Exists,Singles,NewWff),!.
 
 
-:- meta_predicate(call_last_is_var(0)).
+:-meta_predicate(call_last_is_var(0)).
 call_last_is_var(MCall):- strip_module(MCall,M,Call),
    must((compound(Call),functor(Call,_,A))),
    arg(A,Call,Last),nonvar(Last),Call=..FArgs,
@@ -270,14 +270,14 @@ call_last_is_var(MCall):- strip_module(MCall,M,Call),
 
 
 :- export(defunctionalize/2).
-defunctionalize(Wff,WffO):- with_assertions(thlocal:dont_use_mudEquals,defunctionalize(',',Wff,WffO)).
+defunctionalize(Wff,WffO):- w_tl(t_l:dont_use_mudEquals,defunctionalize(',',Wff,WffO)).
 defunctionalize(OP,Wff,WffO):- call_last_is_var(defunctionalize(OP,Wff,WffO)).
 defunctionalize(_ ,Wff,Wff):- \+ compound(Wff),!.
 defunctionalize(_ ,Wff,Wff):- non_compound(Wff),!.
 defunctionalize(_ ,Wff,Wff):- leave_as_is(Wff),!.
 
-defunctionalize(OP,(H:-B),WffO):- thlocal:dont_use_mudEquals,!,
- with_no_assertions(thlocal:dont_use_mudEquals,defunctionalize(OP,(H:-B),WffO)).
+defunctionalize(OP,(H:-B),WffO):- t_l:dont_use_mudEquals,!,
+ wno_tl(t_l:dont_use_mudEquals,defunctionalize(OP,(H:-B),WffO)).
 defunctionalize(OP,(H:-B),WffO):- !,
   defunctionalize(',',(B=>H),HH),
   (HH=(PreC,(NewBody=>NEWH))-> 
@@ -324,11 +324,11 @@ wrap_in_neg_functor(mpred,X,not(X)).
 wrap_in_neg_functor(callable,X, (\+(X))).
 
 
-:- export(infix_op/2).
+:-export(infix_op/2).
 infix_op(Op,_):-comparitiveOp(Op).
 infix_op(Op,_):-additiveOp(Op).
 
-:- export(comparitiveOp/1).
+:-export(comparitiveOp/1).
 comparitiveOp((\=)).
 comparitiveOp((\==)).
 comparitiveOp((=)).
@@ -339,7 +339,7 @@ comparitiveOp((>)).
 comparitiveOp((=<)).
 comparitiveOp((>=)).
 
-:- export(additiveOp/1).
+:-export(additiveOp/1).
 additiveOp((is)).
 additiveOp((*)).
 additiveOp(+).
@@ -376,7 +376,7 @@ is_sentence_functor(exists).
 is_sentence_functor(all).
 
 
-:- dynamic(leave_as_is0/1).
+:-dynamic(leave_as_is0/1).
 leave_as_is(V):- \+ compound(V),!.
 leave_as_is((_ :-_ )):-!,fail.
 leave_as_is((_;_)):-!,fail.
@@ -465,7 +465,7 @@ is_function(_,F,_):- atom_concat(_Was,'Fn',F).
 is_function(_,F,_):- tFunction(F).
 % is_function(_,F,A):- A2 is A+1, current_predicate(F/A2), \+ current_predicate(F/A).
 
-%:- pfc_add(isa(I,C)<=(ttPredType(C),user:isa(I,C))).
+%:- mpred_add(isa(I,C)<=(ttPredType(C),user:isa(I,C))).
 
 is_ftEquality(Term):- is_ftVar(Term),!,fail.
 %is_ftEquality(Term):- get_pred(Term,Pred),is),!,(Pred==mudEquals;genlPreds(Pred,equals);clause_asserted(prologEquality(Pred))),!.
@@ -474,7 +474,7 @@ is_ftEquality(skolem(_,_)).
 is_ftEquality(equals(_,_)).
 is_ftEquality(termOfUnit(_,_)).
 
-:- thread_local(thlocal:dont_use_mudEquals/0).
+:-thread_local(t_l:dont_use_mudEquals/0).
 
 
 ensure_quantifiers(Wff:- B,WffO):- B== true,!, ensure_quantifiers(Wff,WffO).
@@ -503,7 +503,7 @@ function_to_predicate(Function,NewVar,PredifiedFunction):-
   fresh_varname(Function,NewVar),
   PredifiedFunction=..[P,NewVar|ARGS],!.
 
-function_to_predicate(Function,NewVar,mudEquals(NewVar,Function)):- \+ thlocal:dont_use_mudEquals, fresh_varname(Function,NewVar),!.
+function_to_predicate(Function,NewVar,mudEquals(NewVar,Function)):- \+ t_l:dont_use_mudEquals, fresh_varname(Function,NewVar),!.
 
 
 

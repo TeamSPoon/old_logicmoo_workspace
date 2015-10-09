@@ -151,7 +151,7 @@ mi(Then,G) :- mi(Then,[mi(G)],G,_).
 mi(S,G1,L) :-mi(true,S,G1,L).
 
 mi(Then,S,G1,L) :- nonvar(L),!,dmsg(cutted_solve(Then,S,G1,L)),!. % This is the REAL cutter
-mi(Then,S,V, _):- var(V), (\+ get_attr(V,aterm,_)),!, throw(error(instantiation_error, _)).
+mi(Then,S,V, _):- var(V), ( \+ get_attr(V,aterm,_)),!, throw(error(instantiation_error, _)).
 mi(Then,S,true,_) :-!.
 mi(Then,S,!,L) :- must(Then==true), !, (var(L);L=cut).
 % mi(Then,S,!,L) :- arg(1,S,G),!, functor(G,F,_),!,(var(L);L=cut_to(F)).
@@ -162,7 +162,7 @@ mi(Then,S,(G1->G2;G3),L) :- !, (mi(S,G1,L)->mi(S,G2,L);mi(S,G3,L)),do_then(Then)
 mi(Then,S,(G1->G2),L) :- !, (mi(S,G1,L)->mi(S,G2,L)),do_then(Then).
 mi(Then,S,(G1,G2),L) :- !,mi(S,G1,L),mi(Then,S,G2,L).
 mi(Then,S,(G1;G2),L) :- !,(mi(Then,S,G1,L);mi(Then,S,G2,L)).
-mi(Then,S,G,_):- ((\+ predicate_property(G,number_of_clauses(_)));system_pred(G)),!,make_aterm(G,GG),call(GG),do_then(Then).
+mi(Then,S,G,_):- (( \+ predicate_property(G,number_of_clauses(_)));system_pred(G)),!,make_aterm(G,GG),call(GG),do_then(Then).
 mi(Then,S,H,L):- 
  make_aterm(H,HA),!,
  copy_term_nat(HA,HH),
@@ -197,6 +197,9 @@ project_attributes(QueryVars0, AttrVars) :-
         sort(Roots0, Roots),
         maplist(remove_hidden_variables(QueryVars), Roots).
 
+
+:- dynamic((term_expansion/2,user:term_expansion/2,system:term_expansion/2)).
+:- multifile((term_expansion/2,user:term_expansion/2,system:term_expansion/2)).
 
 %system:goal_expansion(G,_):-writeq(system:goal_expansion(G)),nl,fail.
 user:goal_expansion(G,_):-writeq(goal_expansion(G)),nl,fail.

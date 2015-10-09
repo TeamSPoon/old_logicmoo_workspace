@@ -27,11 +27,11 @@
 
 :- dynamic(assertedTinyKB_not/3).
 :- dynamic(assertedTinyKB_implies/4).
-:- style_check(-singleton).
-:- style_check(-discontiguous).
+:-style_check(-singleton).
+:-style_check(-discontiguous).
 % :-style_check(-atom).
 % :-style_check(-string).
-:- set_prolog_flag(double_quotes,string).
+:-set_prolog_flag(double_quotes,string).
 :- discontiguous exactlyAssertedEL/5. 
 :- discontiguous exactlyAssertedEL_first/5.
 

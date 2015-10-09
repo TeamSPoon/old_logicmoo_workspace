@@ -19,6 +19,11 @@
 :- meta_predicate with_assert_op_override(?,0).
 
 
+:- multifile lmconf:startup_option/2. 
+:- dynamic lmconf:startup_option/2. 
+
+lmconf:startup_option(datalog,sanity). %  Run datalog sanity tests while starting
+lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 
 :- dynamic   file_search_path/2.
 :- multifile file_search_path/2.
@@ -30,13 +35,12 @@
    (( \+ file_search_path(pack,Y)) ->asserta(file_search_path(pack,Y));true).
 :- attach_packs.
 :- initialization(attach_packs).
+
 % [Required] Load the Logicmoo Library Utils
 :- ensure_loaded(library(logicmoo/logicmoo_utils)).
 
 :- prolog_load_context(directory,Dir),asserta(file_search_path(logicmoo,Dir)).
 :- dynamic(isa_pred_now_locked/0).
-
-:- nb_setval(pldoc_object,pldoc_object_missing).
 
 :- include(mpred/logicmoo_i_header).
 
@@ -62,7 +66,7 @@
 % TODO uncomment the next line without breaking it all!
 % thglobal:use_cyc_database.
 
-:- asserta(thglobal:pfcManageHybrids).
+:-asserta(thglobal:pfcManageHybrids).
 
 :- export(user:mpred_mod/1).
 :- dynamic user:mpred_mod/1.
@@ -70,10 +74,10 @@ user:mpred_mod(user).
 
 
 % [Manditory] define how we interact with the module system
-:- if(not(current_predicate(module/2))).
-:- export(module/2).
-module(M,E):-dmsg(module(M,E)).
-:- endif.
+:-if(not(current_predicate(swi_module/2))).
+:-export(swi_module/2).
+swi_module(M,E):-dmsg(swi_module(M,E)).
+:-endif.
 
 
 
@@ -83,7 +87,7 @@ module(M,E):-dmsg(module(M,E)).
 % Debugging settings
 % ================================================
 
-:- export(is_stable/0).
+:-export(is_stable/0).
 
 is_stable:-fail.
 
@@ -109,9 +113,9 @@ xtreme_debug(_).
 
 :- meta_predicate verify_sanity(0).
 verify_sanity(P):- \+ is_recompile, (true; is_release),!,nop(P).
-verify_sanity(P):- debugOnError(hotrace(P)),!.
+verify_sanity(P):- on_x_rtrace(hotrace(P)),!.
 verify_sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
-:- meta_predicate(when_debugging(+,0)).
+:-meta_predicate(when_debugging(+,0)).
 when_debugging(What,Call):- debugging(What),!,Call.
 when_debugging(_,_).
 
@@ -131,8 +135,9 @@ when_debugging(_,_).
 :- ensure_loaded(mpred/logicmoo_i_pfc).
 :- ensure_loaded(mpred/logicmoo_i_loader).
 :- ensure_loaded(mpred/logicmoo_i_naming).
-:- ensure_loaded(mpred/logicmoo_i_types).
 :- ensure_loaded(mpred/logicmoo_i_term_expansion).
+:- ensure_loaded(mpred/logicmoo_i_types).
+
 :- ensure_loaded(mpred/logicmoo_i_mpred_props).
 :- ensure_loaded(mpred/logicmoo_i_agenda).
 :- ensure_loaded(mpred/logicmoo_i_call).
@@ -142,55 +147,56 @@ when_debugging(_,_).
 :- ensure_loaded(mpred/logicmoo_i_mpred_stubs).
 :- ensure_loaded(mpred/logicmoo_i_argtypes).
 
-:- dynamic(thlocal:pfc_already_in_file_expansion/1).
+:-dynamic(t_l:mpred_already_in_file_expansion/1).
 
-:- asserta(thlocal:disable_mpred_term_expansions_locally).
+:- asserta(t_l:disable_mpred_term_expansions_locally).
 
-% user:goal_expansion(ISA,G) :- compound(ISA),thlocal:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
+% user:goal_expansion(ISA,G) :- compound(ISA),t_l:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
 :- meta_predicate(lmbase_record_transactions(?,?)).
 :- meta_predicate(lmbase_record_transactions_maybe(?,?)).
-:- meta_predicate(pfc_file_expansion(?,?)).
+:- meta_predicate(mpred_file_expansion(?,?)).
 
 
 lmbase_record_transactions(I,OO):-thread_self(X),X\==main,!,I=OO.
 
 % not actual function
-lmbase_record_transactions(I,OO):- nonvar(I),current_predicate(pfc_loader_file/0),current_predicate(logicmoo_bugger_loaded/0), 
-  ( \+ thlocal:pfc_already_in_file_expansion(I) ),
-  with_assertions(thlocal:pfc_already_in_file_expansion(I),if_defined(lmbase_record_transactions_maybe(I,OO))),!,I\=@=OO,
-  nop(dmsg(pfc_file_expansion(I,OO))).
+lmbase_record_transactions(I,OO):- nonvar(I),current_predicate(mpred_loader_file/0),current_predicate(logicmoo_bugger_loaded/0), 
+  ( \+ t_l:mpred_already_in_file_expansion(I) ),
+  w_tl(t_l:mpred_already_in_file_expansion(I),if_defined(lmbase_record_transactions_maybe(I,OO))),!,I\=@=OO,
+  nop(dmsg(mpred_file_expansion(I,OO))).
 
 
 lmbase_record_transactions_maybe(I,Supposed):- 
-  thlocal:verify_side_effect_buffer,!,
+  t_l:verify_side_effect_buffer,!,
    sanity(var(ActualSupposed)),
-    push_predicates(thlocal:side_effect_buffer/3,STATE),
-    pfc_file_expansion(I,Supposed),
+    push_predicates(t_l:side_effect_buffer/3,STATE),
+    mpred_file_expansion(I,Supposed),
     current_source_location(Why),
     collect_expansions(Why,I,Actual),
     convert_side_effect(suppose(Supposed),S),
     conjoin(S, Actual,ActualSupposed),
     conjuncts_to_list(ActualSupposed,Readable),
     assert(actual_side_effect(I,Readable)),
-    pop_predicates(thlocal:side_effect_buffer/3,STATE),!.
+    pop_predicates(t_l:side_effect_buffer/3,STATE),!.
 
 
 
 lmbase_record_transactions_maybe(I,ActualSupposed):- 
-  thlocal:use_side_effect_buffer,!,trace,
+  t_l:use_side_effect_buffer,!,trace,
    sanity(var(ActualSupposed)),
-    push_predicates(thlocal:side_effect_buffer/3,STATE),
-    pfc_file_expansion(I,Supposed),
+    push_predicates(t_l:side_effect_buffer/3,STATE),
+    mpred_file_expansion(I,Supposed),
+    current_source_location(Why),
     collect_expansions(Why,I,Actual),
     conjoin(Actual,Supposed,ActualSupposed),
-    pop_predicates(thlocal:side_effect_buffer/3,STATE),!.
+    pop_predicates(t_l:side_effect_buffer/3,STATE),!.
 
-lmbase_record_transactions_maybe(I,OO):- pfc_file_expansion(I,OO),!.
+lmbase_record_transactions_maybe(I,OO):- mpred_file_expansion(I,OO),!.
 
 
-collect_expansions(_Why,I,I):- \+ thlocal:side_effect_buffer(_Op,_Data,_),!.
-collect_expansions(NWhy,I, TODO):- findall(ReproduceSWhy, 
-  ( retract(thlocal:side_effect_buffer(Op, Data, Why)),
+collect_expansions(_Why,I,I):- \+ t_l:side_effect_buffer(_Op,_Data,_),!.
+collect_expansions(NWhy,_I, TODO):- findall(ReproduceSWhy, 
+  ( retract(t_l:side_effect_buffer(Op, Data, Why)),
     must_det_l(convert_side_effect(Op, Data,Reproduce)),
     must(simplify_why_r(Reproduce,Why,NWhy,ReproduceSWhy))), TODOs),
    must_det_l( list_to_conjuncts(TODOs,TODO)).
@@ -199,7 +205,7 @@ simplify_why_r(Reproduce,Why,NWhy,   Reproduce):- Why==NWhy, !.
 simplify_why_r(Reproduce,Why,_,Reproduce:SWhy):-simplify_why(Why,SWhy),!.
  
 % aliases
-:- meta_predicate(convert_side_effect(?,+,-)).
+:-meta_predicate(convert_side_effect(?,+,-)).
 
 simplify_why(Why,SWhy):-var(Why),!,Why=SWhy.
 simplify_why(Why:0,SWhy):-!,simplify_why(Why,SWhy).
@@ -211,7 +217,7 @@ convert_side_effect(M:C,A,SE):- Call=..[C,A],!,convert_side_effect(M:Call,SE).
 convert_side_effect(C,A,SE):- Call=..[C,A],!,convert_side_effect(Call,SE).
 
 convert_side_effect(suppose(OO), suppose(Result)):- convert_side_effect_0a(OO,Result),!.
-convert_side_effect(I,OO):-convert_side_effect_0c(I,O),((O=(N-V),number(N))->OO=O;OO=O),!.
+convert_side_effect(I,OO):-convert_side_effect_0c(I,O),((O=(N-_V),number(N))->OO=O;OO=O),!.
 
 convert_side_effect_0a(asserta(Data), (  a(DataR))):-convert_side_effect_0a(Data,DataR).
 convert_side_effect_0a(assertz(Data), (  (DataR))):-convert_side_effect_0a(Data,DataR).
@@ -249,24 +255,23 @@ pop_predicates(M:F/A,STATE):- functor(H,F,A),forall(member((H:-B),STATE),M:asser
 
 
 user:term_expansion(I,OO):- (I==end_of_file->(must(do_end_of_file_actions),fail);
-                                 (\+ thlocal:disable_mpred_term_expansions_locally, 
+                                 (\+ t_l:disable_mpred_term_expansions_locally, 
                                      if_defined(lmbase_record_transactions(I,OO)),I\=@=OO)).
 
-:- export(pfc_file_loaded/0).
-pfc_file_loaded.
+:-export(mpred_file_loaded/0).
 
+mpred_file_loaded.
 
-:- read_source_files.
-:- if(if_defined(logicmoo_html_needs_debug)).
+% :- read_source_files.
+% logicmoo_html_needs_debug.
+:- if((lmconf:startup_option(www,sanity),if_defined(logicmoo_html_needs_debug))).
 :- write(ready),nl,flush_output.
 :- prolog.
 :- endif.
-:-  user:call(with_mfa_of(user: (dynamic_safe)),user,user,boxlog_to_compile(D,E,F),boxlog_to_compile/3).
-:- retractall(thlocal:disable_mpred_term_expansions_locally).
+:-  user:call(with_mfa_of(user: (dynamic_safe)),user,user,boxlog_to_compile(_D,_E,_F),boxlog_to_compile/3).
+:- retractall(t_l:disable_mpred_term_expansions_locally).
 
 :- ensure_mpred_file_loaded(mpred/logicmoo_i_builtin).
-:- with_assertions(tlbugger:ifHideTrace,(ensure_mpred_file_loaded(mpred/logicmoo_i_builtin))).
+:- w_tl(tlbugger:ifHideTrace,(ensure_mpred_file_loaded(mpred/logicmoo_i_builtin))).
 
-:- asserta(thlocal:disable_mpred_term_expansions_locally).
-
-
+:- list_undefined.

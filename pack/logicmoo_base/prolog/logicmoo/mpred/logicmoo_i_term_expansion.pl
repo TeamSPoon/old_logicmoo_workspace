@@ -56,41 +56,41 @@
 
 default_te(IF,VAR,VAL):-assertz(te_setting(IF,VAR,VAL)).
 
-:- default_te([source_filetype(pl) ],use_te,file_prolog).
-:- default_te([source_filetype(pfc) ],use_te,file_pfc).
-:- default_te([source_filetype(console) ],use_te,file_prolog).
+:-default_te([source_filetype(pl) ],use_te,file_prolog).
+:-default_te([source_filetype(pfc) ],use_te,file_pfc).
+:-default_te([source_filetype(console) ],use_te,file_prolog).
 
-:- default_te(file_prolog,proccess_directive, proccess_directive).
-:- default_te(file_prolog,compile_clause, compile_clause).
-:- default_te(file_prolog,rule_neck, (head :- body)).
-:- default_te(file_prolog,fact_neck, (head :- true)).
+:-default_te(file_prolog,proccess_directive, proccess_directive).
+:-default_te(file_prolog,compile_clause, compile_clause).
+:-default_te(file_prolog,rule_neck, (head :- body)).
+:-default_te(file_prolog,fact_neck, (head :- true)).
 
-:- default_te(file_pfc, compile_clause, pfc_assert).
-:- default_te(file_pfc, expand_clause, fully_expand_clause).
-:- default_te(file_pfc, proccess_directive, proccess_directive).
-:- default_te(file_pfc, fact_neck, (clause <- true)).
-:- default_te(file_pfc, rule_neck, (head :- body)).
+:-default_te(file_pfc, compile_clause, mpred_add).
+:-default_te(file_pfc, expand_clause, fully_expand_clause).
+:-default_te(file_pfc, proccess_directive, proccess_directive).
+:-default_te(file_pfc, fact_neck, (clause <- true)).
+:-default_te(file_pfc, rule_neck, (head :- body)).
 
-:- default_te(file_syspreds,isa_detector, always_fail(i,c)).
-:- default_te(file_syspreds,isa_holder, c(i)).
-:- default_te(file_syspreds,isa_varholder, t(c,i)).  % was isa(i,c).
-:- default_te(file_syspreds,pred_holder, head).  % was isa(i,c).
-:- default_te(file_syspreds,pred_varholder, newhead=..[t,pred|args]).
-:- default_te(file_syspreds,proccess_directive, proccess_directive).
-:- default_te(file_syspreds,compile_clause, compile_clause).
-:- default_te(file_syspreds,rule_neck, (head :- body)).
-:- default_te(file_syspreds,fact_neck, (clause :- true)).
-:- default_te(file_syspreds, expand_clause, (=)).
+:-default_te(file_syspreds,isa_detector, always_fail(i,c)).
+:-default_te(file_syspreds,isa_holder, c(i)).
+:-default_te(file_syspreds,isa_varholder, t(c,i)).  % was isa(i,c).
+:-default_te(file_syspreds,pred_holder, head).  % was isa(i,c).
+:-default_te(file_syspreds,pred_varholder, newhead=..[t,pred|args]).
+:-default_te(file_syspreds,proccess_directive, proccess_directive).
+:-default_te(file_syspreds,compile_clause, compile_clause).
+:-default_te(file_syspreds,rule_neck, (head :- body)).
+:-default_te(file_syspreds,fact_neck, (clause :- true)).
+:-default_te(file_syspreds, expand_clause, (=)).
 
-:- default_te(file_syspreds:pred(*), neck_override, (cwc)).
-:- default_te(file_pfc:pred(*), neck_override, (hybrid)).
-:- default_te(file_prolog:pred(*), neck_override, (hybrid)).
+:-default_te(file_syspreds:pred(*), neck_override, (cwc)).
+:-default_te(file_pfc:pred(*), neck_override, (hybrid)).
+:-default_te(file_prolog:pred(*), neck_override, (hybrid)).
 
-:- default_te((:-)/1, compile_clause, proccess_directive).
-:- default_te((:-)/2, rule_neck, clause).
-:- default_te((=>),use_te, file_pfc).
-:- default_te((<==>),use_te, file_pfc).
-:- default_te((<-),use_te, file_pfc).
+:-default_te((:-)/1, compile_clause, proccess_directive).
+:-default_te((:-)/2, rule_neck, clause).
+:-default_te((=>),use_te, file_pfc).
+:-default_te((<==>),use_te, file_pfc).
+:-default_te((<-),use_te, file_pfc).
 
 %
 %  
@@ -125,10 +125,10 @@ Writing in Prolog is actually really easy for a MUD is when the length's chosen
 % Douglas Miles
 */
 
-:- export(show_all/1).
+:-export(show_all/1).
 show_all(Call):-doall((show_call(Call))).
 
-:- export(alt_calls/1).
+:-export(alt_calls/1).
 alt_calls(call).
 alt_calls(mpred_call).
 alt_calls(is_asserted).
@@ -200,11 +200,11 @@ db_expand_maplist(FE,List,T,G,O):-findall(M, (member(T,List),call(FE,G,M)), ML),
 %   SIMPLISTIC REWRITE (this is not the PRECANONICALIZER)
 % ================================================
 
-:- export(fully_expand/2).
+:-export(fully_expand/2).
 fully_expand(X,Y):-fully_expand(_,X,Y).
 
 
-:- moo_hide_childs(fully_expand/3).
+:-mpred_trace_nochilds(fully_expand/3).
 
 must_expand(/*to_exp*/(_)).
 must_expand(props(_,_)).
@@ -227,11 +227,11 @@ fully_expand0(_,Sent,SentO):-get_functor(Sent,_,A),A\==1,!,Sent=SentO.
 fully_expand0(Op,Sent,SentO):-fully_expand_now(Op,Sent,SentO),!.
 
 fully_expand_now(_,Sent,SentO):- \+ (is_ftCompound(Sent)),!,Sent=SentO.
-fully_expand_now(_,Sent,SentO):-thlocal:infSkipFullExpand,!,must(Sent=SentO).
+fully_expand_now(_,Sent,SentO):-t_l:infSkipFullExpand,!,must(Sent=SentO).
 fully_expand_now(_,(:-(Sent)),(:-(Sent))):-!.
 fully_expand_now(Op,Sent,SentO):- copy_term(Sent,NoVary),
   cyclic_break((NoVary)),   
- with_assertions(thlocal:disable_mpred_term_expansions_locally,
+ w_tl(t_l:disable_mpred_term_expansions_locally,
    must(fully_expand_clause(Op,Sent,BO))),!,must(cnotrace((SentO=BO))),
     must(Sent=@=NoVary),
 
@@ -249,8 +249,8 @@ fully_expand_clause(Op,':-'(Sent),Out):-!,fully_expand_goal(Op,Sent,SentO),!,mus
 fully_expand_clause(Op,(H:-B),Out):- !,fully_expand_head(Op,H,HH),fully_expand_goal(Op,B,BB),!,must(Out=(HH:-BB)).
 fully_expand_clause(Op, HB,HHBB):- must((to_reduced_hb(Op,HB,H,B),fully_expand_head(Op,H,HH),!,fully_expand_goal(Op,B,BB),!,reduce_clause(Op,(HH:-BB),HHBB))),!.
 
-fully_expand_head(Op,Sent,SentO):- must(with_assertions(thlocal:into_form_code,transitive_lc(db_expand_term(Op),Sent,SentO))),!.
-fully_expand_goal(Op,Sent,SentO):- must(with_assertions(thlocal:into_form_code,transitive_lc(db_expand_term(Op),Sent,SentO))),!.
+fully_expand_head(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,transitive_lc(db_expand_term(Op),Sent,SentO))),!.
+fully_expand_goal(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,transitive_lc(db_expand_term(Op),Sent,SentO))),!.
 
 
 as_is_term(NC):- \+(is_ftCompound(NC)),!.
@@ -278,8 +278,8 @@ db_expand_term0(_,Sent,SentO):-is_ftNonvar(Sent),copy_term(Sent,NoVary),if_defin
 db_expand_term0(Op,Sent,SentO):- Op==callable, quasiQuote(QQuote),subst(Sent,QQuote,isEach,MID),Sent\=@=MID,!,db_expand_term(Op,MID,SentO).
 db_expand_term0(Op,Sent,SentO):- db_expand_final(Op ,Sent,SentO),!.
 db_expand_term0(Op,Sent,SentO):- is_meta_functor(Sent,F,List),F\=t,!,maplist(fully_expand_goal(Op),List,ListO),List\=@=ListO,SentO=..[F|ListO].
-%db_expand_term(_ ,NC,OUT):-pfc_expand(NC,OUT),NC\=@=OUT,!.
-db_expand_term0(_,A,B):- thlocal:infSkipFullExpand,!,A=B.
+%db_expand_term(_ ,NC,OUT):-mpred_expand(NC,OUT),NC\=@=OUT,!.
+db_expand_term0(_,A,B):- t_l:infSkipFullExpand,!,A=B.
 db_expand_term0(Op,SI,SentO):-
        transitive_lc(db_expand_chain(Op),SI,S0),!,
        transitive_lc(db_expand_a(Op),S0,S1),!,
@@ -287,7 +287,7 @@ db_expand_term0(Op,SI,SentO):-
        transitive_lc(db_expand_3(Op),S3,S4),!,transitive_lc(db_expand_4(Op),S4,S5),!,
        transitive_lc(db_expand_5(Op),S5,SentO).
 
-pfc_expand(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),pfc_database_term(F/A),
+mpred_expand(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),mpred_database_term(F/A),
    PfcRule=[F|Args],maplist(fully_expand_goal(is_asserted),Args,ArgsO),!,Out=..[F|ArgsO].
 
 
@@ -389,16 +389,16 @@ db_expand_0(Op,DECL,O):-DECL=..[D,F|Args],functor_declares_instance(D,DType),
 db_expand_0(Op,ClassTemplate,OUT):- ClassTemplate=..[TypePropsFunctor,Inst|Props],
    functor_declares_instance(TypePropsFunctor,PropsIsa),
    \+ compound_all_open(ClassTemplate),
-   pfc_assert(isa(PropsIsa,tCol)),
-   pfc_assert(isa(Inst,PropsIsa)),
+   mpred_add(isa(PropsIsa,tCol)),
+   mpred_add(isa(Inst,PropsIsa)),
    expand_props(t,Op,props(Inst,[PropsIsa|Props]),OUT),!.
 
 % typeProps(tCrackers,.....).
 db_expand_0(Op,ClassTemplate,OUT):- ClassTemplate=..[TypeTypePropsFunctor,Type|Props],
    functor_declares_collectiontype(TypeTypePropsFunctor,PropsIsa),
    \+ compound_all_open(ClassTemplate),
-   pfc_assert(isa(Type,tCol)),
-   pfc_assert(isa(Type,PropsIsa)),
+   mpred_add(isa(Type,tCol)),
+   mpred_add(isa(Type,PropsIsa)),
    expand_props(relationMostInstance,Op,props(Type,Props),OUT),!.
 
 % tRegion_inst_template(X, tLivingRoom,.....).
@@ -412,7 +412,7 @@ db_expand_0(Op,ClassTemplate,(isa(NewInst,Type)=>OUT)):- ClassTemplate=..[Functo
 % tRegion_template(tLivingRoom,.....).
 db_expand_0(Op,typeProps(C,Props),(isa(I,C)=>OOUT)):- (is_ftNonvar(C);is_ftNonvar(Props)), expand_props(Prefix,Op,props(I,Props),OUT),trace,list_to_conjuncts(OUT,OUTC),conjuncts_to_list(OUTC,OUTL),
    ISEACH=..[isEach|OUTL],
-  db_expand_term(Op,pfc_default(ISEACH),OOUT).
+  db_expand_term(Op,mpred_default(ISEACH),OOUT).
 
 */
 
@@ -444,9 +444,9 @@ ex_argIsa(P,N,C):-clause_asserted(argIsa(P,N,C)).
 compound_all_open(C):-compound(C),functor(C,_,A),A>1,\+((arg(_,C,Arg),is_ftNonvar(Arg))),!.
 
 /*
-db_expand_0(Op,MT:Term,MT:O):- is_kb_module(MT),!,with_assertions(thlocal:caller_module(kb,MT),db_expand_0(Op,Term,O)).
-db_expand_0(Op,DB:Term,DB:O):- dbase_mod(DB),!,with_assertions(thlocal:caller_module(db,DB),db_expand_0(Op,Term,O)).
-db_expand_0(Op,KB:Term,KB:O):- atom(KB),!,with_assertions(thlocal:caller_module(prolog,KB),db_expand_0(Op,Term,O)).
+db_expand_0(Op,MT:Term,MT:O):- is_kb_module(MT),!,w_tl(t_l:caller_module(kb,MT),db_expand_0(Op,Term,O)).
+db_expand_0(Op,DB:Term,DB:O):- dbase_mod(DB),!,w_tl(t_l:caller_module(db,DB),db_expand_0(Op,Term,O)).
+db_expand_0(Op,KB:Term,KB:O):- atom(KB),!,w_tl(t_l:caller_module(prolog,KB),db_expand_0(Op,Term,O)).
 */
 
 % db_expand_0(query(HLDS,Must),props(Obj,Props)):- is_ftNonvar(Obj),is_ftVar(Props),!,gather_props_for(query(HLDS,Must),Obj,Props).
@@ -546,7 +546,7 @@ db_quf_l_0(Op, And,[C|C12],PreO,TemplO):-
   conjoin_l(Pre,Pre2,PreO),
   conjoin_op(And,Next,Templ2,TemplO).
 
-:- export(db_quf/4).
+:-export(db_quf/4).
 db_quf(_ ,C,Pretest,Template):- \+ (is_ftCompound(C)),!,must(Pretest=true),must(Template=C).
 db_quf(Op,C,Pretest,Template):-is_ftVar(C),!,trace_or_throw(var_db_quf(Op,C,Pretest,Template)).
 db_quf(_ ,C,Pretest,Template):-as_is_term(C),!,must(Pretest=true),must(Template=C),!.
@@ -616,8 +616,8 @@ compare_op(Type,F,OLD,VAL):-nop(Type),show_call((call(F,OLD,VAL))),!.
 % expanded_different compares fact terms to see if they are different
 % ========================================
 
-:- '$hide'(expanded_different/2).
-:- export(expanded_different/2).
+:-'$hide'(expanded_different/2).
+:-export(expanded_different/2).
 
 expanded_different(G0,G1):-call(expanded_different_ic(G0,G1)).
 
@@ -634,7 +634,7 @@ expanded_different_1(G0,G1):- G0 \= G1,!.
 % ========================================
 % into_functor_form/3 (adds a second order functor onto most predicates)
 % ========================================
-:- export(into_functor_form/3).
+:-export(into_functor_form/3).
 into_functor_form(HFDS,M:X,O):- atom(M),!,into_functor_form(HFDS,X,O),!.
 into_functor_form(HFDS,X,O):-call((( X=..[F|A],into_functor_form(HFDS, X,F,A,O)))),!.
 
@@ -648,8 +648,8 @@ into_functor_form(Dbase_t,_X,F,A,Call):-Call=..[Dbase_t,F|A].
 % ========================================
 % into_mpred_form/2 (removes a second order functors until the common mpred form is left)
 % ========================================
-:- moo_hide_childs(into_mpred_form/2).
-:- export(into_mpred_form/2).
+:-mpred_trace_nochilds(into_mpred_form/2).
+:-export(into_mpred_form/2).
 into_mpred_form(V,VO):- \+ (is_ftCompound(V)),!,VO=V.
 into_mpred_form(M:X,M:O):- atom(M),!,into_mpred_form(X,O),!.
 into_mpred_form(Sent,SentO):-is_ftNonvar(Sent),if_defined(user:ruleRewrite(Sent,SentM),fail),into_mpred_form(SentM,SentO).
@@ -676,7 +676,7 @@ was_isa_syntax(a(C,I),I,C):-!.
 was_isa_syntax(G,I,C):-was_isa(G,I,C).
 
 into_mpred_form6(C,_,_,2,_,C):-!.
-% into_mpred_form6(H,_,_,_,_,G0):- once(with_assertions(thlocal:into_form_code,(expand_term( (H :- true) , C ), reduce_clause(is_asserted,C,G)))),expanded_different(H,G),!,into_mpred_form(G,G0),!.
+% into_mpred_form6(H,_,_,_,_,G0):- once(w_tl(t_l:into_form_code,(expand_term( (H :- true) , C ), reduce_clause(is_asserted,C,G)))),expanded_different(H,G),!,into_mpred_form(G,G0),!.
 into_mpred_form6(_,F,_,1,[C],O):-alt_calls(F),!,into_mpred_form(C,O),!.
 into_mpred_form6(_,':-',C,1,_,':-'(O)):-!,into_mpred_form_ilc(C,O).
 into_mpred_form6(_,not,C,1,_,not(O)):-into_mpred_form(C,O),!.
@@ -779,7 +779,7 @@ db_op_sentence(_Op,Prop,ARGS,C0):- atom(Prop),!, C0=..[Prop|ARGS].
 db_op_sentence(_Op,Prop,ARGS,C0):- C0=..[t,Prop|ARGS].
 
 
-:- export(simply_functors/3).
+:-export(simply_functors/3).
 simply_functors(Db_pred,query(HLDS,Must),Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=Simpler,!,call(Db_pred,query(HLDS,Must),Simpler).
 simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=Simpler,!,call(Db_pred,Op,Simpler).
 
@@ -790,7 +790,7 @@ simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=S
 % add_from_file/2
 % ================================================
 add_from_file(B,_):- contains_singletons(B),trace_or_throw(dtrace),dmsg(todo(add_from_file_contains_singletons(B))),!,fail.
-add_from_file(B,B):- pfc_add(B). % db_op(change(assert,_OldV),B),!.
+add_from_file(B,B):- mpred_add(B). % db_op(change(assert,_OldV),B),!.
 
 dbase_mod(user).
 
@@ -809,12 +809,12 @@ end_of_file.
 end_of_file.
 
 
-:- export((force_expand_head/2,force_head_expansion/2)).
-:- export((force_expand_goal/2)).
+:-export((force_expand_head/2,force_head_expansion/2)).
+:-export((force_expand_goal/2)).
 force_expand_head(G,GH) :- force_head_expansion(G,GH),!.
 force_expand_goal(A, B) :- force_expand(expand_goal(A, B)).
 
-:- thread_local inside_clause_expansion/1.
+:-thread_local inside_clause_expansion/1.
    
 set_list_len(List,A,NewList):-length(List,LL),A=LL,!,NewList=List.
 set_list_len(List,A,NewList):-length(List,LL),A>LL,length(NewList,A),append(List,_,NewList),!.
@@ -831,7 +831,7 @@ if_mud_asserted(F,A2,A,Why):-using_holds_db(F,A2,A,Why).
 is_kb_module(Moo):-atom(Moo),member(Moo,[add,dyn,abox,tbox,kb,opencyc]).
 is_kb_mt_module(Moo):-atom(Moo),member(Moo,[moomt,kbmt,mt]).
 
-:- export(if_use_holds_db/4).
+:-export(if_use_holds_db/4).
 if_use_holds_db(F,A2,_,_):- is_mpred_prolog(F,A2),!,fail.
 if_use_holds_db(F,A,_,_):-  never_use_holds_db(F,A,_Why),!,fail.
 if_use_holds_db(F,A2,A,Why):- using_holds_db(F,A2,A,Why),!.
@@ -867,7 +867,7 @@ negate_wrapper0(firstOrder,not_firstOrder).
 negate_wrapper0(asserted_dbase_t,asserted_dbase_f).
 negate_wrapper0(Dbase_t,Dbase_f):- atom_concat(Dbase,'_t',Dbase_t),atom_concat(Dbase,'_f',Dbase_f).
 
-:- thread_local hga_wrapper/3.
+:-thread_local hga_wrapper/3.
 hga_wrapper(t,holds_t,t).
 
 get_goal_wrappers(if_use_holds_db, Holds_t , N):- hga_wrapper(_,Holds_t,_),!,negate_wrapper(Holds_t,N),!.
@@ -891,7 +891,7 @@ try_mud_asserted_expansion(G0,G2):-  must(is_compiling_sourcecode),
    while_capturing_changes(add_from_file(G1,G2),Changes),!,ignore((Changes\==[],dmsg(add(todo(Changes-G2))))).
 mud_asserted_expansion_0(G1,G2):- ((get_asserted_wrappers(If_mud_asserted, Asserted_dbase_t , Asserted_dbase_f),!,Asserted_dbase_t\=nil,mud_pred_expansion(If_mud_asserted, Asserted_dbase_t - Asserted_dbase_f,G1,G2))),!.
 
-:- export(force_clause_expansion/2).
+:-export(force_clause_expansion/2).
 
 attempt_clause_expansion(B,BR):- is_ftCompound(B), copy_term(B,BC),snumbervars(BC),!, attempt_clause_expansion(B,BC,BR).
 attempt_clause_expansion(_,BC,_):-inside_clause_expansion(BC),!,fail.
@@ -900,8 +900,8 @@ attempt_clause_expansion(B,BC,BR):-
     force_clause_expansion(B,BR),
     ignore(retract(inside_clause_expansion(BC)))).
 
-force_clause_expansion(':-'(B),':-'(BR)):- !, with_assertions(is_compiling_clause,user:expand_goal(B,BR)).
-force_clause_expansion(B,BR):- with_assertions(is_compiling_clause,force_expand(force_clause_expansion0(B,BR))).
+force_clause_expansion(':-'(B),':-'(BR)):- !, w_tl(is_compiling_clause,user:expand_goal(B,BR)).
+force_clause_expansion(B,BR):- w_tl(is_compiling_clause,force_expand(force_clause_expansion0(B,BR))).
 
 force_clause_expansion0(M:((H:-B)),R):- !, mud_rule_expansion(M:H,M:B,R),!.
 force_clause_expansion0(((M:H:-B)),R):- !, mud_rule_expansion(M:H,B,R),!.
@@ -909,7 +909,7 @@ force_clause_expansion0(((H:-B)),R):- mud_rule_expansion(H,B,R),!.
 force_clause_expansion0(H,HR):- try_mud_asserted_expansion(H,HR),!.
 force_clause_expansion0(B,BR):- force_head_expansion(B,BR).
 
-force_expand(Goal):-thread_self(ID),with_assertions(user:always_expand_on_thread(ID),Goal),!.
+force_expand(Goal):-thread_self(ID),w_tl(user:always_expand_on_thread(ID),Goal),!.
 
 
 force_head_expansion(H,HR):- try_mud_head_expansion(H,HR),!.

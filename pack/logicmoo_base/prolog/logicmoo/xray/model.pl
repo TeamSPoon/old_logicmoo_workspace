@@ -21,7 +21,7 @@
 :- dynamic(do_model_inits).
 
 do_model_inits.
-:- retractall(do_model_inits). 
+:-retractall(do_model_inits). 
 
 
 %%% ----------------------------------------------------------------------

@@ -25,7 +25,100 @@
 % it meant that you held an "index" into the arry list that as you went backwards you'd find your bindings.. each symbol had a java ftInt field "lastBindingIndex" 
 % .. that was a "hint" to where you could fastforward the backwards search .. end named binding context also had a "index" to when you leave a named block.. 
 % you could quickly reset the top of an index.
-:- if(\+ current_module(logicmoo_utils)).
+% File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_ctx_frame.pl
+:- module(logicmoo_util_ctx_frame,
+          [ addCtxValue/3,
+            addCtxValue1/3,
+            addKeyValue/2,
+            appendAttributes/4,
+            bestSetterFn/3,
+            checkCtx/1,
+            copy_term_numvars/2,
+            currentContext/2,
+            delete_safe/3,
+            eqmember/2,
+            evil_term/3,
+            getCtxValue/3,
+            getKeyValue/2,
+            get_ctx_frame_holder/3,
+            get_ctx_frame_holder1/3,
+            get_ctx_holder/2,
+            get_ctx_holder1/2,
+            get_ctx_holderFreeSpot/3,
+            get_ctx_holderFreeSpot0/3,
+            get_ctx_holderFreeSpot1/3,
+            get_ctx_holderFreeSpot1/5,
+            get_ctx_value/4,
+            get_n_value/6,
+            get_o_value/4,
+            get_o_value0/4,
+            get_o_value1/4,
+            hideIfNeeded/2,
+            lastMemberCtx/2,
+            lastMemberCtx/3,
+            makeLocalContext/2,
+            makeLocalContext1/2,
+            mergeAppend0/3,
+            no_cyclic_terms/0,
+            popCtxFrame/3,
+            pushCtxFrame/3,
+            remCtxValue/3,
+            revappend_0/3,
+            reverseA/2,
+            setCtxValue/3,
+            to_open_list/4,
+            unwrapValue/2,
+            unwrapValue1/2
+          ]).
+:- module_transparent
+        addCtxValue/3,
+        addCtxValue1/3,
+        addKeyValue/2,
+        appendAttributes/4,
+        bestSetterFn/3,
+        checkCtx/1,
+        copy_term_numvars/2,
+        currentContext/2,
+        delete_safe/3,
+        eqmember/2,
+        getCtxValue/3,
+        getKeyValue/2,
+        get_ctx_frame_holder/3,
+        get_ctx_frame_holder1/3,
+        get_ctx_holder/2,
+        get_ctx_holder1/2,
+        get_ctx_holderFreeSpot/3,
+        get_ctx_holderFreeSpot0/3,
+        get_ctx_holderFreeSpot1/3,
+        get_ctx_holderFreeSpot1/5,
+        get_ctx_value/4,
+        get_n_value/6,
+        get_o_value/4,
+        get_o_value0/4,
+        get_o_value1/4,
+        hideIfNeeded/2,
+        lastMemberCtx/2,
+        lastMemberCtx/3,
+        makeLocalContext/2,
+        makeLocalContext1/2,
+        mergeAppend0/3,
+        no_cyclic_terms/0,
+        popCtxFrame/3,
+        pushCtxFrame/3,
+        remCtxValue/3,
+        revappend_0/3,
+        reverseA/2,
+        setCtxValue/3,
+        to_open_list/4,
+        unwrapValue/2,
+        unwrapValue1/2.
+:- dynamic
+        no_cyclic_terms/0.
+
+
+
+
+:- if(current_predicate(logicmoo_utils:combine_logicmoo_utils/0)).
 :- module(ctx_frame,[
          lastMemberCtx/2,
          lastMemberCtx/3,
@@ -34,8 +127,11 @@
          makeLocalContext/2,
          appendAttributes/4,
          currentContext/2]).
+
+:- else.
 :- include(logicmoo_util_header).
 :- endif.
+
 
 
 % :- ensure_loaded((logicmoo_util_library)).
@@ -175,7 +271,9 @@ addKeyValue(FullList,NV):- must((not(ground(FullList)),nonvar(NV))),append(_Clos
 
 %lastMemberCtx(End,List) :- append(_,[End|_],List).
 
-bugger:evil_term(_Ctx,Before,After):-hideIfNeeded(Before,After),!.
+:- multifile evil_term/3.
+:- dynamic evil_term/3.
+evil_term(_Ctx,Before,After):-hideIfNeeded(Before,After),!.
 
 hideIfNeeded(I,I):- (var(I);atomic(I)),!.
 hideIfNeeded([I|_],ctx):-nonvar(I),I=frame(_,_,_),!.
@@ -189,10 +287,10 @@ to_open_list(FullList,Closed,Open,FullList) :- append(Closed,Open,FullList),var(
 to_open_list(Closed,Closed,Open,FullList) :- append(Closed,Open,FullList),!.
 
 
-revappend([], Ys, Ys).
-revappend([X|Xs], Ys, Zs) :- revappend(Xs, [X|Ys], Zs).
+revappend_0([], Ys, Ys).
+revappend_0([X|Xs], Ys, Zs) :- revappend_0(Xs, [X|Ys], Zs).
 
-reverseA(Xs,Ys) :- revappend(Xs,[],Ys).
+reverseA(Xs,Ys) :- revappend_0(Xs,[],Ys).
 
 appendAttributes(_Ctx,L,R,AA):-hotrace((mergeAppend0(L,R,A),list_to_set_safe(A,AA))),!.
 

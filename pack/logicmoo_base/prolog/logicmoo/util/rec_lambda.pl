@@ -39,7 +39,7 @@ official policies, either expressed or implied, of Ulrich Neumerkel.
 
 :- module(rec_lambda, [
 		   (^)/3, (^)/4, (^)/5, (^)/6, (^)/7, (^)/8, (^)/9,
-		 %  (\)/1, (\)/2, (\)/3, (\)/4, (\)/5, (\)/6, (\)/7,
+		 %  ( \)/1, ( \)/2, ( \)/3, ( \)/4, ( \)/5, ( \)/6, ( \)/7,
 		   (+\)/2, (+\)/3, (+\)/4, (+\)/5, (+\)/6, (+\)/7,
                    (reenter_lambda)/0, (reenter_lambda)/1, (reenter_lambda)/2, (reenter_lambda)/3, (reenter_lambda)/4, (reenter_lambda)/5, (reenter_lambda)/6,
                    (lambda)/3,(lambda)/5,(lambda)/7,(lambda)/9,
@@ -49,7 +49,7 @@ official policies, either expressed or implied, of Ulrich Neumerkel.
 
 
 
-/** <module> Lambda expressions
+/* Part of LogicMOO Base Lambda expressions
 
 This library provides lambda expressions to simplify higher order
 programming based on call/N.
@@ -81,7 +81,7 @@ In the following example the parentheses around X>3 are necessary.
 ?- use_module(library(lambda)).
 ?- use_module(library(apply)).
 
-?- maplist(\X^(X>3),[4,5,9]).
+?- maplist( \X^(X>3),[4,5,9]).
 true.
 ==
 
@@ -106,9 +106,9 @@ The following queries are all equivalent. To see this, use
 the fact f(x,y).
 ==
 ?- call(f,A1,A2).
-?- call(\X^f(X),A1,A2).
-?- call(\X^Y^f(X,Y), A1,A2).
-?- call(\X^(X+\Y^f(X,Y)), A1,A2).
+?- call( \X^f(X),A1,A2).
+?- call( \X^Y^f(X,Y), A1,A2).
+?- call( \X^(X+\Y^f(X,Y)), A1,A2).
 ?- call(call(f, A1),A2).
 ?- call(f(A1),A2).
 ?- f(A1,A2).
@@ -203,7 +203,7 @@ term_expansion((H:-B),(H :- (ctn(HC,HCC),b_setval(Key,HCC),B))):-functor(H,(^),A
 	\(5,?,?,?,?,?),
 	\(6,?,?,?,?,?,?).
 
-term_expansion((H:-B),(H :- (ctn(HC,HCC),b_setval(Key,HCC),B))):-functor(H,(\),A1),A is A1-1, atom_concat('$rec_lambda_',A,Key),H=..[F,FC|_],HC=..[F,FC].
+term_expansion((H:-B),(H :- (ctn(HC,HCC),b_setval(Key,HCC),B))):-functor(H,( \),A1),A is A1-1, atom_concat('$rec_lambda_',A,Key),H=..[F,FC|_],HC=..[F,FC].
 
 \(FC) :-
    ctn(FC,C),no_hat_call(C).

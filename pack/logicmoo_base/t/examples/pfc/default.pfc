@@ -1,9 +1,9 @@
 % -*-Prolog-*-
 % here is an example which defines default facts and rules.  Will it work?
 
-(default(P)/pfc_literal(P))  =>  (~not(P) => P).
+(default(P)/mpred_literal(P))  =>  (~not(P) => P).
 
-default((P => Q))/pfc_literal(Q) => (P, ~not(Q) => Q).
+default((P => Q))/mpred_literal(Q) => (P, ~not(Q) => Q).
 
 % birds fly by default.
 => default((bird(X) => fly(X))).
