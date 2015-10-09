@@ -583,7 +583,7 @@ user: xfile_load_form(How,M,P,O):-
   w_tl(t_l:mpred_already_in_file_expansion(P), 
    ((mpred_file_expansion(P,C),P\=@=C,O=(:- user: (C))))),!.
 
-user: mpred_provide_clauses(H,B,(What)):- !.
+lmconf:mpred_provide_clauses(H,B,(What)):- !.
 
 
 show_interesting_cl(Dir,P):- loading_source_file(File),get_file_type(File,Type),

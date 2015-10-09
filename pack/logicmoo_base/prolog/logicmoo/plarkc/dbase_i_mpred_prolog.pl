@@ -22,23 +22,23 @@ end_of_file.
 end_of_file.
 
 
-user: mpred_provide_write_attributes(F,A,multifile):- multifile(F/A).
-user: mpred_provide_write_attributes(F,A,thread_local):- thread_local(F/A).
-user: mpred_provide_write_attributes(F,A,dynamic):- dynamic(F/A).
-user: mpred_provide_write_attributes(F,external(Module)):- dmsg(decl_mpred(F,external(Module))),not(lmconf:mpred_user_kb(Module)),must_det(arity(F,A)),functor(HEAD,F,A),must_det(predicate_property(Module:HEAD,_)),!.
+lmconf:mpred_provide_write_attributes(F,A,multifile):- multifile(F/A).
+lmconf:mpred_provide_write_attributes(F,A,thread_local):- thread_local(F/A).
+lmconf:mpred_provide_write_attributes(F,A,dynamic):- dynamic(F/A).
+lmconf:mpred_provide_write_attributes(F,external(Module)):- dmsg(decl_mpred(F,external(Module))),not(lmconf:mpred_user_kb(Module)),must_det(arity(F,A)),functor(HEAD,F,A),must_det(predicate_property(Module:HEAD,_)),!.
 
-user: mpred_provide_read_attributes(Obj,PropVal):- fail, safe_univ(PropVal,[Prop,NonVar|Val]),safe_univ(CallVal,[Prop,Obj,NonVar|Val]),
+lmconf:mpred_provide_read_attributes(Obj,PropVal):- fail, safe_univ(PropVal,[Prop,NonVar|Val]),safe_univ(CallVal,[Prop,Obj,NonVar|Val]),
      predicate_property(CallVal,_),!,mpred_call(CallVal).
 
 
-user: mpred_provide_read_attributes(F,_,_):-user:mpred_prop(F,prologHybrid),!,fail.
-user: mpred_provide_read_attributes(F,A,prologDynamic(F,A)):-user:mpred_prop(F,prologDynamic).
-user: mpred_provide_read_attributes(F,A,Why):-functor_safe(P,F,A),user: mpred_provide_read_attributes(P,F,A,Why).
+lmconf:mpred_provide_read_attributes(F,_,_):-user:mpred_prop(F,prologHybrid),!,fail.
+lmconf:mpred_provide_read_attributes(F,A,prologDynamic(F,A)):-user:mpred_prop(F,prologDynamic).
+lmconf:mpred_provide_read_attributes(F,A,Why):-functor_safe(P,F,A),lmconf:mpred_provide_read_attributes(P,F,A,Why).
 
-user: mpred_provide_read_attributes(P,F,A,static_predicate(P)):-static_predicate(user,F,A).
-user: mpred_provide_read_attributes(P,_,_,predicate_property(P,foreign)):-predicate_property(P,foreign),!.
-user: mpred_provide_read_attributes(P,_,_,predicate_property(P,built_in)):-real_builtin_predicate(P),!.
-user: mpred_provide_read_attributes(P,_,_,predicate_property(P,imported_from(system))):-predicate_property(P,imported_from(system)).
+lmconf:mpred_provide_read_attributes(P,F,A,static_predicate(P)):-static_predicate(user,F,A).
+lmconf:mpred_provide_read_attributes(P,_,_,predicate_property(P,foreign)):-predicate_property(P,foreign),!.
+lmconf:mpred_provide_read_attributes(P,_,_,predicate_property(P,built_in)):-real_builtin_predicate(P),!.
+lmconf:mpred_provide_read_attributes(P,_,_,predicate_property(P,imported_from(system))):-predicate_property(P,imported_from(system)).
 
 
 :-export(prolog_side_effects/1).
@@ -52,30 +52,30 @@ prolog_side_effects(G):-get_mpred_prop(G,predStub(prologDynamic)),!.
 prolog_side_effects(P):-atom(P),!,prolog_side_effects(P/_).
 
 
-user: mpred_provide_storage_clauses(G,B,(prologRef(Mod:Ref))):-predicate_property(G,number_of_clauses(_)),clause(G,B,Ref),clause_property(Ref,predicate(Mod:_)).
+lmconf:mpred_provide_storage_clauses(G,B,(prologRef(Mod:Ref))):-predicate_property(G,number_of_clauses(_)),clause(G,B,Ref),clause_property(Ref,predicate(Mod:_)).
 
 cant_redefine(PI):-real_builtin_predicate(PI);predicate_property(PI,imported_from(lists)).
 
-user: mpred_provide_setup(Op,HeadIn,StubType,OUT):-  StubType = prologDynamic,
+lmconf:mpred_provide_setup(Op,HeadIn,StubType,OUT):-  StubType = prologDynamic,
    get_pifunctor(HeadIn,Head,F),
  predicate_property(Head,_),
  not(user:mpred_prop(F,prologHybrid)),
- must(OUT=defined(user: mpred_provide_setup(Op,Head,StubType))),!.
+ must(OUT=defined(lmconf:mpred_provide_setup(Op,Head,StubType))),!.
 
-user: mpred_provide_setup(Op,HeadIn,prologDynamic,OUT):- get_functor(HeadIn,F),user:mpred_prop(F,prologHybrid),retractall(user:mpred_prop(F,prologDynamic)),
+lmconf:mpred_provide_setup(Op,HeadIn,prologDynamic,OUT):- get_functor(HeadIn,F),user:mpred_prop(F,prologHybrid),retractall(user:mpred_prop(F,prologDynamic)),
    MSG = trace_or_throw(prologOnly_was_hybrid(HeadIn,Op)),
    wdmsg(MSG),must(OUT=MSG),!.
 
-user: mpred_provide_setup(Op,HeadIn,StubType,OUT):-  StubType = prologDynamic, get_pifunctor(HeadIn,Head,F,A),  
+lmconf:mpred_provide_setup(Op,HeadIn,StubType,OUT):-  StubType = prologDynamic, get_pifunctor(HeadIn,Head,F,A),  
   show_call_failure(not(cant_redefine(Head))),
   must((Op= call(_))),
   not(current_predicate(F/A)),
   module_transparent(F/A),export(F/A),dynamic_safe(F/A),
   asserta_if_new(user:mpred_prop(F,predStub(StubType))),
   asserta_if_new(user:mpred_prop(F,StubType)),!,
-  must(OUT=defined(user: mpred_provide_setup(Op,Head,StubType))).
+  must(OUT=defined(lmconf:mpred_provide_setup(Op,Head,StubType))).
    
-user: mpred_provide_setup(Op,HeadIn,StubType,OUT):-  StubType = prologDynamic, get_pifunctor(HeadIn,Head,F,A),  
+lmconf:mpred_provide_setup(Op,HeadIn,StubType,OUT):-  StubType = prologDynamic, get_pifunctor(HeadIn,Head,F,A),  
   show_call_failure(not(cant_redefine(Head))),
   must((Op= call(_))),
   must_det_l((      
@@ -89,7 +89,7 @@ user: mpred_provide_setup(Op,HeadIn,StubType,OUT):-  StubType = prologDynamic, g
    asserta_if_new(user:mpred_prop(F,StubType)),
    forall(member(HB,HBLIST),must(mpred_modify(change(assert,z),HB))),!,
    must_same_clauses(Head,HBLIST))),
-   must(OUT=defined(user: mpred_provide_setup(Op,Head,StubType))).
+   must(OUT=defined(lmconf:mpred_provide_setup(Op,Head,StubType))).
 
    
 

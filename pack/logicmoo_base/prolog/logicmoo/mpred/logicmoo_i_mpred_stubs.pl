@@ -287,7 +287,7 @@ mpred_prop_ordered(Pred,Prop):-user:mpred_prop(Pred,Prop),not(first_mpred_props(
 % ================================================================================
 provide_clauses_list(Head,HBLISTO):- get_pifunctor(Head,PHead,_),  
   findall((PHead :- B),
-   no_repeats_old([PHead:B],((call_no_cuts(user: mpred_provide_storage_clauses(_,PHead,B,Proof)),is_source_proof(Proof)))),
+   no_repeats_old([PHead:B],((call_no_cuts(lmconf:mpred_provide_storage_clauses(_,PHead,B,Proof)),is_source_proof(Proof)))),
    HBLIST),
    create_stub_body(PHead,Stub),
    delete(HBLIST,Stub,HBLISTO),!.
@@ -299,11 +299,11 @@ get_cc(PI,NC):-provide_clauses_list(PI,HBLISTO),length(HBLISTO,NC).
 % ==============================
 % SETUP HYBRID HOOK
 % ==============================
-user: mpred_provide_setup(Op,HeadIn,StubType,OUT):- StubType \== prologDynamic,
+lmconf:mpred_provide_setup(Op,HeadIn,StubType,OUT):- StubType \== prologDynamic,
  sanity(var(OUT)),
  must(ensure_universal_stub(HeadIn)),
  must((StubType = prologHybrid)),
- OUT=defined(user: mpred_provide_setup(Op,HeadIn,StubType)).
+ OUT=defined(lmconf:mpred_provide_setup(Op,HeadIn,StubType)).
 
 % ==============================
 % SETUP HYBRID STUB 1-5
@@ -417,11 +417,11 @@ assert_mpred_t(G):-add_from_file(G).
 user: listing_mpred_hook(Match):- fail,
  (( 
   dif:dif(Proof,prologRef(_)),
-  no_repeats_old([H,B],((user: mpred_provide_storage_clauses(H,B,Proof)),
+  no_repeats_old([H,B],((lmconf:mpred_provide_storage_clauses(H,B,Proof)),
                 Proof\=prologRef(_))),term_matches_hb(Match,H,B),portray_hb(Proof:H,B))),fail.
 
       
-user: mpred_provide_storage_clauses(H,B,Proof):-mpred_t_mpred_storage_clauses_facts(H,B,Proof).
+lmconf:mpred_provide_storage_clauses(H,B,Proof):-mpred_t_mpred_storage_clauses_facts(H,B,Proof).
 
 mpred_t_mpred_storage_clauses_facts(H,true,t(H)):-is_list(H),!,length(H,A),A>2,loop_check(t(H)).
 mpred_t_mpred_storage_clauses_facts(H,true,t(H)):-compound(H),!,current_predicate(into_plist_arities/4),functor(H,_,A),A>1,loop_check(t(H)).

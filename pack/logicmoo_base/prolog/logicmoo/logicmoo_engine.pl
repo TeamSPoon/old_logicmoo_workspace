@@ -130,7 +130,7 @@ pttp_listens_to_stub(prologPTTP).
 pttp_listens_to_stub(prologKIF).
 
 
-user: mpred_provide_setup(Op,H):- provide_kif_op(Op,H).
+lmconf:mpred_provide_setup(Op,H):- provide_kif_op(Op,H).
 
 % OPHOOK ASSERT
 provide_kif_op(change(assert,How),(HeadBody)):- 
@@ -155,12 +155,12 @@ provide_kif_op(OP,(HeadBody)):-
 
 
 % CLAUSES HOOK 
-user: mpred_provide_storage_clauses(H,B,wid3(IDWhy)):- wid(IDWhy,_,(H:- B)).
-user: mpred_provide_storage_clauses(H,true,wid3(IDWhy)):- wid(IDWhy,_,(H)),compound(H),not(functor(H,':-',2)).
+lmconf:mpred_provide_storage_clauses(H,B,wid3(IDWhy)):- wid(IDWhy,_,(H:- B)).
+lmconf:mpred_provide_storage_clauses(H,true,wid3(IDWhy)):- wid(IDWhy,_,(H)),compound(H),not(functor(H,':-',2)).
 
 
 % REGISTER HOOK
-user: mpred_provide_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(StubType),!,
+lmconf:mpred_provide_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(StubType),!,
    get_pifunctor(HeadIn,Head,F),
       assert_if_new(isa(F,prologPTTP)),
          ensure_universal_stub(Head),

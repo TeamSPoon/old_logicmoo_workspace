@@ -542,7 +542,7 @@ isa_mpred_provide_storage_clauses(H,true,hasInstanceCI):-
 %isa_mpred_provide_storage_clauses(isa(I,C),B,W):-nonvar(C),append_term(C,I,H),mpred_t_mpred_storage_clauses_rules(H,B,W).
 
 
-user: mpred_provide_storage_clauses(H,B,(What)):-fail,isa_mpred_provide_storage_clauses(H,B,What).
+lmconf:mpred_provide_storage_clauses(H,B,(What)):-fail,isa_mpred_provide_storage_clauses(H,B,What).
 
 % isa_backchaing(I,T):- stack_depth(Level),Level>650,trace_or_throw(skip_dmsg_nope(failing_stack_overflow(isa_backchaing(I,T)))),!,fail.
 

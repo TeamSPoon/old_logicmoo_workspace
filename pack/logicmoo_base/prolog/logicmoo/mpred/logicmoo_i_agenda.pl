@@ -46,16 +46,16 @@ rescan_mpred_loaded_pass2:- ignore((lmconf:after_mpred_load, loop_check(call_aft
 :-dynamic(suspend_timers/0).
 time_tick(Time,Pred):- repeat,sleep(Time), (suspend_timers->true;(once(doall(on_x_log_throw(call_no_cuts(Pred)))))),fail.
 
-user: hook_one_second_timer_tick.
+lmconf:hook_one_second_timer_tick.
 
-mpred_one_second_timer:- repeat,time_tick(1.0,user: hook_one_second_timer_tick),fail.
+mpred_one_second_timer:- repeat,time_tick(1.0,lmconf:hook_one_second_timer_tick),fail.
 start_one_second_timer:-thread_property(_,alias(mpred_one_second_timer))-> true ; thread_create(mpred_one_second_timer,_,[alias(mpred_one_second_timer)]).
 
 % :-initialization(start_one_second_timer).
 
-user: hook_one_minute_timer_tick.
+lmconf:hook_one_minute_timer_tick.
 
-mpred_one_minute_timer:- repeat,sleep(60.0),time_tick(60.0,user: hook_one_minute_timer_tick),fail.
+mpred_one_minute_timer:- repeat,sleep(60.0),time_tick(60.0,lmconf:hook_one_minute_timer_tick),fail.
 start_one_minute_timer:-thread_property(_,alias(mpred_one_minute_timer))-> true ; thread_create(mpred_one_minute_timer,_,[alias(mpred_one_minute_timer)]).
 
 % :-initialization(start_one_minute_timer).
@@ -196,7 +196,7 @@ finish_processing_dbase:- savedb,fail.
 finish_processing_dbase:- do_gc,dmsginfo(end_finish_processing_dbase),fail.
 finish_processing_dbase.
 
-user: hook_one_minute_timer_tick:-agenda_slow_op_restart.
+lmconf:hook_one_minute_timer_tick:-agenda_slow_op_restart.
 
 
 %:-meta_predicate(rescandb/0).

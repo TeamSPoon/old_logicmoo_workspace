@@ -63,10 +63,10 @@
 
 load_time_sanity.
 
-:-dynamic(user: hook_one_second_timer_tick/0).
-:-multifile(user: hook_one_second_timer_tick/0).
-:-dynamic(user: hook_one_minute_timer_tick/0).
-:-multifile(user: hook_one_minute_timer_tick/0).
+:-dynamic(lmconf:hook_one_second_timer_tick/0).
+:-multifile(lmconf:hook_one_second_timer_tick/0).
+:-dynamic(lmconf:hook_one_minute_timer_tick/0).
+:-multifile(lmconf:hook_one_minute_timer_tick/0).
 
 :- dynamic(lmconf:startup_option/2).
 
@@ -345,16 +345,16 @@ load_time_sanity.
 :- multifile user: fact_maybe_deduced/1.
 :- multifile user: tms_reject_why/2.
 :- multifile user: fskel/7.
-:- multifile user: hook_coerce/3.
-:- dynamic user: hook_coerce/3.
+:- multifile lmconf:hook_coerce/3.
+:- dynamic lmconf:hook_coerce/3.
 :- multifile user: hooked_random_instance/3.
 
 :- multifile user: now_unused/1.
-:- multifile user: mpred_provide_read_attributes/3.
-:- multifile user: mpred_provide_setup/4.
-:- multifile user: mpred_provide_storage_clauses/3.
-:- multifile user: mpred_provide_storage_op/2.
-:- multifile user: mpred_provide_write_attributes/2.
+:- multifile lmconf:mpred_provide_read_attributes/3.
+:- multifile lmconf:mpred_provide_setup/4.
+:- multifile lmconf:mpred_provide_storage_clauses/3.
+:- multifile lmconf:mpred_provide_storage_op/2.
+:- multifile lmconf:mpred_provide_write_attributes/2.
 
 % DYN HOOKS
 :- dynamic_multifile_exported user: is_never_type/1.

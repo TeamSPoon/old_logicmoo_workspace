@@ -161,13 +161,13 @@ is_asserted_2(H,B):-  skip_is_asserted_expansion(H),!,is_asserted_2a(H,B).
 is_asserted_2(H,B):-hotrace((fully_expand_warn(is_asserted_2,(H:-B),CL),expand_to_hb(CL,HH,BB))),!,is_asserted_2a(HH,BB).
 
 is_asserted_2a(H,B):-lmconf:pfcManageHybrids,!,mpred_clause_is_asserted(H,B).
-is_asserted_2a(H,B):-call_no_cuts(user: mpred_provide_storage_clauses(H,B,_Ref)),not(hotrace(special_wrapper_body(B,_))).
+is_asserted_2a(H,B):-call_no_cuts(lmconf:mpred_provide_storage_clauses(H,B,_Ref)),not(hotrace(special_wrapper_body(B,_))).
 
 is_asserted_3((H:-BB),B,Ref):- is_true(B),!,is_asserted_3(H,BB,Ref).
 is_asserted_3(H,B,Ref):- skip_is_asserted_expansion(H), !,is_asserted_3a(H,B,Ref).
 is_asserted_3(H,B,Ref):-hotrace((fully_expand_warn(is_asserted_3,(H:-B),CL),expand_to_hb(CL,HH,BB))),is_asserted_3a(HH,BB,Ref).
 
-is_asserted_3a(H,B,Ref):-call_no_cuts(user: mpred_provide_storage_clauses(H,B,Ref)),not(hotrace(special_wrapper_body(B,_))).
+is_asserted_3a(H,B,Ref):-call_no_cuts(lmconf:mpred_provide_storage_clauses(H,B,Ref)),not(hotrace(special_wrapper_body(B,_))).
 
 is_source_proof(_).
 
@@ -225,7 +225,7 @@ requires_storage(_,_,t_l:consulting_sources):-t_l:consulting_sources,mpred_may_e
 
 special_wrapper_functor(call_mpred_body,direct_to_prolog).
 special_wrapper_functor(body_req,direct_to_prolog).
-special_wrapper_functor(user: mpred_provide_setup,direct_to_prolog).
+special_wrapper_functor(lmconf:mpred_provide_setup,direct_to_prolog).
 special_wrapper_functor(call_provided_mpred_storage_op,direct_to_prolog).
 special_wrapper_functor(loop_check,meta).
 special_wrapper_functor(loop_check_term,meta).
@@ -548,18 +548,18 @@ hooked_retractall(G):- Op = change(retract,all),
 
 
 
-user: mpred_provide_storage_op(Op,G):- get_functor(G,F,A),user: mpred_provide_storage_op(Op,G,F,A).
+lmconf:mpred_provide_storage_op(Op,G):- get_functor(G,F,A),lmconf:mpred_provide_storage_op(Op,G,F,A).
 
-user: mpred_provide_storage_op(Op,G, F,_A):- t(pfcControlled,F),!,loop_check(prolog_mpred_provide_storage_op(Op,G)).
-user: mpred_provide_storage_op(Op,G, F,_A):- t(prologDynamic,F),!,loop_check(mpred_mpred_provide_storage_op(Op,G)).
-user: mpred_provide_storage_op(Op,G,_F,_A):- loop_check(prolog_mpred_provide_storage_op(Op,G)).
+lmconf:mpred_provide_storage_op(Op,G, F,_A):- t(pfcControlled,F),!,loop_check(prolog_mpred_provide_storage_op(Op,G)).
+lmconf:mpred_provide_storage_op(Op,G, F,_A):- t(prologDynamic,F),!,loop_check(mpred_mpred_provide_storage_op(Op,G)).
+lmconf:mpred_provide_storage_op(Op,G,_F,_A):- loop_check(prolog_mpred_provide_storage_op(Op,G)).
 
-%user: mpred_provide_storage_op(Op,G):- (loop_check(isa_mpred_provide_storage_op(Op,G))).
-%user: mpred_provide_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(user: mpred_provide_storage_clauses(G,true,_Proof))).
+%lmconf:mpred_provide_storage_op(Op,G):- (loop_check(isa_mpred_provide_storage_op(Op,G))).
+%lmconf:mpred_provide_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(lmconf:mpred_provide_storage_clauses(G,true,_Proof))).
 
 must_storage_op(Op,G):- doall(must(may_storage_op(Op,G))).
 
-may_storage_op(Op,G):-call_no_cuts(user: mpred_provide_storage_op(Op,G)).
+may_storage_op(Op,G):-call_no_cuts(lmconf:mpred_provide_storage_op(Op,G)).
 
 
 :- meta_predicate hooked_asserta(+), hooked_assertz(+), hooked_retract(+), hooked_retractall(+).

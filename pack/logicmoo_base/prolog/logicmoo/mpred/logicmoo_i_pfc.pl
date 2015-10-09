@@ -1204,7 +1204,7 @@ mpred_tms_supported0(local,P,How) :-  mpred_get_support(P,How). % ,sanity(mpred_
 mpred_tms_supported0(cycles,P,How) :-  wellFounded(P,How).
 mpred_tms_supported0(deep,P,How) :- mpred_deep_support(How,P).
 
-% user: hook_one_minute_timer_tick:- statistics.
+% lmconf:hook_one_minute_timer_tick:- statistics.
 
 
 mpred_scan_tms(P):-mpred_get_support(P,(S,SS)),
@@ -1826,7 +1826,7 @@ mpred_mark_fa_as(_Sup,_PosNeg,_P,_:mpred_prop,N,_):- pmust(N=2).
 mpred_mark_fa_as(Sup,PosNeg,_P,F,A,Type):- mpred_post_sp_zzz((s(Sup),g),pfcMark(Type,PosNeg,F,A)),!.
 
 
-user: hook_one_minute_timer_tick:-mpred_cleanup.
+lmconf:hook_one_minute_timer_tick:-mpred_cleanup.
 
 mpred_cleanup:- forall((no_repeats(F-A,(pfcMark(pfcRHS,_,F,A),A>1))),mpred_cleanup(F,A)).
 

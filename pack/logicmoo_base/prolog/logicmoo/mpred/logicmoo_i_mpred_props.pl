@@ -139,7 +139,7 @@ decl_mpred_hybrid_ilc_0(_CM,M,PI,F/A):-
       must(M=user),     
       decl_mpred_mfa(M,F,A),
       decl_mpred_pi(PI),
-      must(user: mpred_provide_setup(call(conjecture),F/A,prologHybrid,_OUT)),
+      must(lmconf:mpred_provide_setup(call(conjecture),F/A,prologHybrid,_OUT)),
       must((get_cc(PI,NCN),NCN>=NC)).
 
 
@@ -250,7 +250,7 @@ decl_mpred_2(_,meta_argtypes(FARGS)):- functor(FARGS,_,A),arg(A,FARGS,Arg),var(A
 % decl_mpred_2(F,prologHybrid):- decl_mpred_hybrid(F).
 decl_mpred_2(F,cycPlus2(A)):- ensure_universal_stub_plus_2(F,A).
 
-decl_mpred_2(F,A):-once(user: mpred_provide_write_attributes(F,A)).
+decl_mpred_2(F,A):-once(lmconf:mpred_provide_write_attributes(F,A)).
 decl_mpred_2(F,Prop):-add(mpred_prop(F,Prop)).
 
 decl_mpred(Mt,F,A):-decl_mpred(F,A),ignore((nonvar(Mt),decl_mpred(F,mt(Mt)))).
