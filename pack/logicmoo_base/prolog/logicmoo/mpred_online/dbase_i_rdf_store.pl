@@ -22,7 +22,7 @@ end_of_file.
 
 
 
-:-multifile(user:expire_one_rdf_cache/0).
+:-multifile(user: expire_one_rdf_cache/0).
 
 
 :-multifile(rdf_db:rdf_open_hook/3).
@@ -198,10 +198,10 @@ cache_all_qnames:- all_qnames_cached -> check_each_ns ;
 check_each_ns :- !.
 check_each_ns :- rdf_current_prefix(NS,_),not(rdf_current_qname_cached(NS,_)),retractall(all_qnames_cached),cache_all_qnames.
 
-user:expire_one_rdf_cache :- dmsg(color(red,expire_one_rdf_cache)).
-user:expire_one_rdf_cache :- retractall(all_qnames_cached).
+user: expire_one_rdf_cache :- dmsg(color(red,expire_one_rdf_cache)).
+user: expire_one_rdf_cache :- retractall(all_qnames_cached).
 
-:-user:expire_one_rdf_cache.
+:-user: expire_one_rdf_cache.
 
 :-export(atom_to_qname/2).
 
@@ -341,7 +341,7 @@ any_to_rdf(_,U,U):-is_url(U),!.
 any_to_rdf(_,A,Sx):-var(A),format(atom(S),'~w',[(A)]),atom_concat('__bnode',S,Sx),!.
 any_to_rdf(DB,User:B,URL):-not(rdf_current_prefix(User,_)),!,any_to_rdf(DB,prefix_concat(User,B),URL),!.
 any_to_rdf(DB,A:B,URL):-is_ftVar(A),!,any_to_rdf(DB,prefix_concat(A,B),URL),!.
-any_to_rdf(DB,user:B,URL):-!,any_to_rdf(DB,prefix_concat(user,B),URL),!.
+any_to_rdf(DB,user: B,URL):-!,any_to_rdf(DB,prefix_concat(user,B),URL),!.
 any_to_rdf(DB,A / B,URL):-any_to_rdf(DB,f_a(A,B),URL),!.
 any_to_rdf(_,'$VAR'('_'),Sx):-format(atom(S),'~w',[_]),atom_concat('__bnode',S,Sx),!.
 any_to_rdf(_,'$VAR'(A),Sx):-format(atom(S),'~w',['$VAR'(A)]),atom_concat('__bnode',S,Sx),!.
@@ -439,10 +439,10 @@ rdf_object(L):-is_list(L),!.
 rdf_object(C):-atomic(C).
 rdf_object(O):-ground(O).
 
-:-dynamic(thglobal:using_rdf_mpred_hook).
+:-dynamic(lmconf:using_rdf_mpred_hook).
 
-:-multifile(user:decl_database_hook).
-%OLD user:decl_database_hook(change(assert,_A_or_Z),DBI):- copy_term(DBI,DB), thglobal:using_rdf_mpred_hook,numbervars_with_names(DB),rdf_assert_hook(DB),!.
+:-multifile(user: decl_database_hook).
+%OLD user: decl_database_hook(change(assert,_A_or_Z),DBI):- copy_term(DBI,DB), lmconf:using_rdf_mpred_hook,numbervars_with_names(DB),rdf_assert_hook(DB),!.
 
 :-thread_local(t_l:rdf_asserting/2).
 
@@ -460,15 +460,15 @@ rdf_assert_ignored((_:-INFOC)):-is_meta_info(INFOC),!.
 rdf_assert_ignored(svo(_,prologDynamic,_)).
 rdf_assert_ignored(mpred_prop(_,_)).
 rdf_assert_ignored(_:mpred_prop(_,_)).
-rdf_assert_ignored(user:mpred_prop(_,arity(1))).
-rdf_assert_ignored(user:mpred_prop(_,meta_argtypes(_))).
+rdf_assert_ignored(user: mpred_prop(_,arity(1))).
+rdf_assert_ignored(user: mpred_prop(_,meta_argtypes(_))).
 %rdf_assert_ignored(DB):-functor(DB,F,_),member(F,[ruleBackward,mudTermAnglify,'<=>']).
 rdf_assert_ignored(DB):-functor(DB,_,1).
 rdf_assert_ignored(G):-pfcTypeFull(G,Type),!,(Type==trigger;Type==support).
 % rdf_assert_ignored(DB):-  not(ground(DB)). 
 
 
-cyc_to_rdf(user:mpred_prop(P,PST),svo(F,StubType,S)):- PST=..[StubType,S],rdf_object(S),rdf_to_pred(P,F).
+cyc_to_rdf(user: mpred_prop(P,PST),svo(F,StubType,S)):- PST=..[StubType,S],rdf_object(S),rdf_to_pred(P,F).
 cyc_to_rdf(argIsa(P,1,D),domain(P,D)).
 cyc_to_rdf(isa(apathFn(A,Dir),T),isa([apathFn,A,Dir],T)).
 cyc_to_rdf(pathName(A,Dir,String),mudNamed([apathFn,A,Dir],String)).
@@ -694,12 +694,12 @@ sync_from_rdf:-forall(rdf_db:rdf(S,P,O,DB),add_spog(S,P,O,DB)).
 sync_to_rdf:-!.
 sync_to_rdf:-
    forall(p2q(P,NS,N),must(rdf_assert_p2q(P,NS,N))),  
-   forall(user:mpred_prop(P,O),rdf_assert_hook(user:mpred_prop(P,O))),
+   forall(user: mpred_prop(P,O),rdf_assert_hook(user: mpred_prop(P,O))),
    forall(t(C,I),rdf_assert_hook(isa(I,C))),
    forall(is_known_trew(B),rdf_assert_hook(B)),
-   (thglobal:using_rdf_mpred_hook -> true ; (asserta(thglobal:using_rdf_mpred_hook),forall(prologHybridFact(G),rdf_assert_hook(G)))),
-   asserta_if_new(user:call_OnEachLoad(sync_to_rdf)),
-   asserta_if_new(user:call_OnEachLoad(sync_from_rdf)),
+   (lmconf:using_rdf_mpred_hook -> true ; (asserta(lmconf:using_rdf_mpred_hook),forall(prologHybridFact(G),rdf_assert_hook(G)))),
+   asserta_if_new(user: call_OnEachLoad(sync_to_rdf)),
+   asserta_if_new(user: call_OnEachLoad(sync_from_rdf)),
    !.
 
 
@@ -708,7 +708,7 @@ mpred_online:semweb_startup:- must(sync_from_rdf).
 mpred_online:semweb_startup:- must(sync_to_rdf).
 
 
-:- multifile(user:call_OnEachLoad/1).
-mpred_online:semweb_startup:- asserta_if_new(user:call_OnEachLoad(sync_to_rdf)).
-mpred_online:semweb_startup:- asserta_if_new(user:call_OnEachLoad(sync_from_rdf)).
+:- multifile(user: call_OnEachLoad/1).
+mpred_online:semweb_startup:- asserta_if_new(user: call_OnEachLoad(sync_to_rdf)).
+mpred_online:semweb_startup:- asserta_if_new(user: call_OnEachLoad(sync_from_rdf)).
 

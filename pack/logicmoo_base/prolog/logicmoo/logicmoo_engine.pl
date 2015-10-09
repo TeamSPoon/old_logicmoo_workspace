@@ -59,17 +59,17 @@
 :- nodebug(_).
 
 
-:- user:ensure_loaded(logicmoo_base).
+:- user: ensure_loaded(logicmoo_base).
 
 
-:- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_call_kb)).
+:- user: ensure_loaded(logicmoo(plarkc/logicmoo_i_call_kb)).
 
 :- dynamic(wid/3).
 
-:- user:ensure_loaded(library(logicmoo/plarkc/dbase_i_sexpr_reader)).
+:- user: ensure_loaded(library(logicmoo/plarkc/dbase_i_sexpr_reader)).
 
 %=%   Convert wffs to list of normal logic clauses
-:- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_clausify)).
+:- user: ensure_loaded(library(logicmoo/plarkc/logicmoo_i_clausify)).
 
 
 :- op(300,fx,'~').
@@ -94,14 +94,14 @@
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(logicmoo,Dir)).
-:- dynamic(user:isa_pred_now_locked/0).
-:- multifile(user:isa_pred_now_locked/0).
-:- multifile(user:type_action_info/3).
-:- multifile(user:agent_call_command/2).
-:- multifile(user:mud_test/2).
-:- multifile(user:sanity_test/0).
-:- multifile(user:regression_test/0).
-:- multifile(user:feature_test/0).
+:- dynamic(user: isa_pred_now_locked/0).
+:- multifile(user: isa_pred_now_locked/0).
+:- multifile(user: type_action_info/3).
+:- multifile(user: agent_call_command/2).
+:- multifile(user: mud_test/2).
+:- multifile(user: sanity_test/0).
+:- multifile(user: regression_test/0).
+:- multifile(user: feature_test/0).
 
 :- include(logicmoo(mpred/logicmoo_i_header)).
 
@@ -130,7 +130,7 @@ pttp_listens_to_stub(prologPTTP).
 pttp_listens_to_stub(prologKIF).
 
 
-user:mpred_provide_setup(Op,H):- provide_kif_op(Op,H).
+user: mpred_provide_setup(Op,H):- provide_kif_op(Op,H).
 
 % OPHOOK ASSERT
 provide_kif_op(change(assert,How),(HeadBody)):- 
@@ -155,12 +155,12 @@ provide_kif_op(OP,(HeadBody)):-
 
 
 % CLAUSES HOOK 
-user:mpred_provide_storage_clauses(H,B,wid3(IDWhy)):- wid(IDWhy,_,(H:- B)).
-user:mpred_provide_storage_clauses(H,true,wid3(IDWhy)):- wid(IDWhy,_,(H)),compound(H),not(functor(H,':-',2)).
+user: mpred_provide_storage_clauses(H,B,wid3(IDWhy)):- wid(IDWhy,_,(H:- B)).
+user: mpred_provide_storage_clauses(H,true,wid3(IDWhy)):- wid(IDWhy,_,(H)),compound(H),not(functor(H,':-',2)).
 
 
 % REGISTER HOOK
-user:mpred_provide_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(StubType),!,
+user: mpred_provide_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(StubType),!,
    get_pifunctor(HeadIn,Head,F),
       assert_if_new(isa(F,prologPTTP)),
          ensure_universal_stub(Head),
@@ -169,7 +169,7 @@ user:mpred_provide_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(Stub
 
 /*
 
-:- dynamic(user:int_proven_t/10).
+:- dynamic(user: int_proven_t/10).
 
 int_proven_t(P, X, Y, E, F, A, B, C, G, D):- t(P,X,Y),
         test_and_decrement_search_cost(A, 0, B),
@@ -177,7 +177,7 @@ int_proven_t(P, X, Y, E, F, A, B, C, G, D):- t(P,X,Y),
         G=[H|I].
 
 
-:- dynamic(user:int_assumed_t/10).
+:- dynamic(user: int_assumed_t/10).
 int_assumed_t(P, X, Y, E, F, A, B, C, G, D):- t(P,X,Y),
         test_and_decrement_search_cost(A, 0, B),
         C=[H, [assumed_t(P, X, Y), D, E, F]|I],
@@ -641,14 +641,14 @@ kif_sanity_test_0:-kif_test(   argInst(kb_argInst, 1 ,KB) & argInst(has, 1 , A) 
 kif_sanity_test_0:-kif_test(all(R,isa(R,tAgent) => exists(D, (isa(D,tNose) & mudContains(R,D))))).
 
 
-user:sanity_test:- kif_test(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
+user: sanity_test:- kif_test(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
 
-user:sanity_test:- kif_to_boxlog(not((a , b ,  c , d)),S),!,disjuncts_to_list(S,L),
+user: sanity_test:- kif_to_boxlog(not((a , b ,  c , d)),S),!,disjuncts_to_list(S,L),
   list_to_set(L,SET),forall(member(P,SET),writeln(P)),!.
 
-user:sanity_test:- logicmoo_example3.
+user: sanity_test:- logicmoo_example3.
 
-user:regression_test:- logicmoo_example3.
+user: regression_test:- logicmoo_example3.
 
 
 kif_sanity_tests:- forall(clause(kif_sanity_test_0,B),must(B)).

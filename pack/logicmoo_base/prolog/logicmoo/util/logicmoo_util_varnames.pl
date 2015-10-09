@@ -442,7 +442,7 @@ try_save_vars(HB):-ignore((nb_current('$variable_names',Vs),Vs\==[],save_clause_
 
 :-export(scan_source_files_for_varnames/0).
 scan_source_files_for_varnames:- 
- user:call((
+ user: call((
  use_module(library(make)),
  forall(make:modified_file(F),retractall(logicmoo_varnames:varname_info_file(F))),
  forall(source_file(F),logicmoo_varnames:read_source_file_vars(F)))).
@@ -565,7 +565,7 @@ mpred_impl_module(M):- current_module(M),atom_concat(logicmoo_utils_,_,M).
 prolog:make_hook(before, Files):-forall(member(File,Files),retractall(logicmoo_varnames:varname_info_file(File))).
 prolog:make_hook(after, Files):-forall(member(File,Files),show_call(ain00(logicmoo_varnames:varname_info_file(File)))).
 
-user:term_expansion(HB,_):- current_prolog_flag(mpred_vars,true),term_expansion_save_vars(HB),fail.
+user: term_expansion(HB,_):- current_prolog_flag(mpred_vars,true),term_expansion_save_vars(HB),fail.
 
 
 logicmoo_util_varnames_file.

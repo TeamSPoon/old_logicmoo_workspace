@@ -69,7 +69,7 @@ env_mpred_op(OP,P):- functor_h(P,F,A),must(get_mpred_stubType(F,A,ENV)),!,env_mp
 env_mpred_op(OP,P):- append_term(OP,P,CALL),current_predicate(_,CALL),!,show_call(/*ocluser*/ocl:CALL).
 env_mpred_op(OP,P):- trace,trace_or_throw(unk_env_mpred_op(OP,P)).
 
-env_shadow(OP,P):-user:call(OP,P).
+env_shadow(OP,P):-user: call(OP,P).
 
 :- dynamic( in_dyn/2).
 in_dyn(_DB,Call):- var(Call),!,get_mp_arity(F,A),functor(Call,F,A),( predicate_property(Call,_) -> loop_check(Call)).
@@ -145,7 +145,7 @@ decl_env_mepred_fa(Prop,_Pred,F,A):- t_l:push_env_ctx,
    add_push_prefix_arg(Pred,Type,Prefix,Pred1),
    decl_env_mepred_real(Prop,Pred1,F,A1),!,
    abolish_and_make_static(F,A),!,
-   if_defined(user:arity(F,AA)),
+   if_defined(user: arity(F,AA)),
    must(arity(F,A1)==arity(F,AA)))).
 decl_env_mepred_fa(Prop,Pred,F,A):-
    decl_env_mepred_real(Prop,Pred,F,A).
@@ -155,14 +155,14 @@ decl_env_mepred_real(Prop,Pred,F,A):-
   (Prop==dyn->(dynamic(/*ocluser*/ocl:F/A));true),
   (Prop==cache->'$set_pattr'(ocl:Pred, pred, (volatile));true),
   (Prop==dom->(multifile(/*ocluser*/ocl:F/A));true),
-  user:export(/*ocluser*/ocl:F/A),
+  user: export(/*ocluser*/ocl:F/A),
   if_defined(decl_mpred(Pred,Prop),ain(kb:mpred_isa(F,Prop))),
   ain(isa_kb:mpred_isa(Prop)), ain(get_mp_arity(F,A)),ain(arity(F,A)),!,
   trace,ain(prop_mpred(Prop,F,A)).
 
 
 env_learn_pred(_,_):-nb_getval(disabled_env_learn_pred,true),!.
-env_learn_pred(ENV,P):-user:decl_env_mepred(ENV,P).
+env_learn_pred(ENV,P):-user: decl_env_mepred(ENV,P).
 
 env_recorded(call,Val) :- recorded(Val,Val).
 env_recorded(assert, Val) :- recordz(Val,Val).
@@ -336,7 +336,7 @@ is_env_expanded_file:- loading_file(File),!,once(file_name_extension(_,ocl,File)
 is_ocl_expanded_file:- loading_file(File),file_name_extension(_,ocl,File).
    
 /*
-user:term_expansion(A,B):- nonvar(A), A\==end_of_file, is_env_expanded_file,
+user: term_expansion(A,B):- nonvar(A), A\==end_of_file, is_env_expanded_file,
   env_term_expansion(A,B),
   must(nonvar(B)),A\=@=B.
 */

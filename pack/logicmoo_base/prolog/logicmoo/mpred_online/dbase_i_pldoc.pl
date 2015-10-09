@@ -52,9 +52,9 @@ end_of_file.
 
 % prolog:doc_object_summary(A,B,C,D):-man_object_summary(A,B,C,D).
 
-:-thread_local(user:html_listed/1).
+:-thread_local(user: html_listed/1).
 
-prolog:doc_object_page_footer(Obj,_) --> { not(user:html_listed(Obj)) },!,pldoc_html:html_listing('Footer',Obj).
+prolog:doc_object_page_footer(Obj,_) --> { not(user: html_listed(Obj)) },!,pldoc_html:html_listing('Footer',Obj).
 
 %prolog:doc_page_header(A,B) --> {format(user_error,'~n~q~n',[doc_page_header(A, B)]),fail}.
 %prolog:doc_object_summary(A,B,C,D) :- format(user_error,'~n~q~n',[doc_object_summary(A, B,C,D)]),dumpST(10),fail.
@@ -160,19 +160,19 @@ to_tclass(Prop,New):- ttFormatType(Prop),ensure_starts_with_prefix(Prop,ft,New),
 to_tclass(Prop,New):- ttValueType(Prop),ensure_starts_with_prefix(Prop,vt,New),!.
 
 to_tclass(Prop,New):- arity(Prop,1),arity(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
-to_tclass(Prop,New):- user:mpred_prop(Prop,prologHybrid),arity(Prop,M),M>1,user:mpred_prop(Prop,meta_argtypes(_)),ensure_starts_with_prefix(Prop,mud,New),!.
+to_tclass(Prop,New):- user: mpred_prop(Prop,prologHybrid),arity(Prop,M),M>1,user: mpred_prop(Prop,meta_argtypes(_)),ensure_starts_with_prefix(Prop,mud,New),!.
 to_tclass(Prop,New):- (call(t,Prop,_,_);t(Prop,_,_,_);t(Prop,_,_,_,_)),ensure_starts_with_prefix(Prop,mud,New),!.
 to_tclass(Prop,New):- is_actverb(Prop),ensure_starts_with_prefix(Prop,act,New),!.
 to_tclass(Prop,New):- isa(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
 to_tclass(Prop,New):- (t(_,_,Prop);t(_,_,Prop,_);t(_,_,_,Prop)),ensure_starts_with_prefix(Prop,v,New),!.
 % to_tclass(Prop,actDrop).
 
-is_actverb(X):-user:type_action_info(_,PX,_),functor(PX,X,_).
-is_actverb(X):-user:action_info(PX,_),functor(PX,X,_).
+is_actverb(X):-user: type_action_info(_,PX,_),functor(PX,X,_).
+is_actverb(X):-user: action_info(PX,_),functor(PX,X,_).
 is_actverb(X):-vtActionTemplate(PX),functor(PX,X,_).
 is_actverb(X):-vtPosture(PX),functor(PX,X,_).
-is_actverb(X):-user:verb_alias(_,X).
-% user:vtVerb(X):-is_actverb(X).
+is_actverb(X):-user: verb_alias(_,X).
+% user: vtVerb(X):-is_actverb(X).
 
 :-export(ensure_starts_with_prefix/3).
 ensure_starts_with_prefix(A,Prefix,A):- atom_concat(Prefix,Rest,A),toCamelcase(Rest,CC),toPropercase(CC,PC),Rest==PC,!.
@@ -180,7 +180,7 @@ ensure_starts_with_prefix(A,Prefix,B):- toCamelcase(A,CC),toPropercase(CC,PC),!,
  
 
 
-%user:mpred_prop(Prop,prologHybrid).
+%user: mpred_prop(Prop,prologHybrid).
 
 transform_term(TermIn,TermOut):-nohtml,transform_term0(TermIn,TermOut).
 
@@ -316,14 +316,14 @@ s_to_html(Src, stream(Out), MOptions) :- !,
 	colour_fragments(Src, Fragments),
 	setup_call_cleanup(
 	    ( open_source(Src, In),
-	      asserta(user:thread_message_hook(_,_,_), Ref)
+	      asserta(user: thread_message_hook(_,_,_), Ref)
 	    ),
 	    ( print_html_head(Out, HeadOptions),
 	      html_fragments(Fragments, In, Out, [], State, Options),
 	      copy_rest(In, Out, State, State1),
 	      pop_state(State1, Out, In)
 	    ),
-	    ( erase_safe(user:thread_message_hook(_,_,_),Ref),
+	    ( erase_safe(user: thread_message_hook(_,_,_),Ref),
 	      close(In)
 	    )),
 	print_html_footer(Out, Options).

@@ -491,7 +491,7 @@
 
 
 :- 
-      op(1150,fx,(user:dynamic_multifile_exported)),
+      op(1150,fx,(user: dynamic_multifile_exported)),
       op(1150,fx,meta_predicate),
       op(1150,fx,thread_local).
 
@@ -1790,7 +1790,7 @@ test_tl(M:C):-!,call(M:C).
 test_tl(C):-functor(C,F,A),test_tl(C,F,A).
 
 % = %= :- meta_predicate (test_tl(+,+,+)).
-test_tl(C,F,A):-current_predicate(thglobal:F/A),call(thglobal:C).
+test_tl(C,F,A):-current_predicate(lmconf:F/A),call(lmconf:C).
 test_tl(C,F,A):-current_predicate(t_l:F/A),call(t_l:C).
 test_tl(C,F,A):-current_predicate(thlocal_global:F/A),call(thlocal_global:C).
 
@@ -1810,10 +1810,10 @@ asserta_if_ground(_).
 
 :- mpred_trace_childs(user:prolog_ecall_fa/5).
 :- mpred_trace_childs(user:prolog_ecall/3).
-%:- mpred_trace_childs(user:must/1).
-%:- mpred_trace_childs(user:must/2).
-:- mpred_trace_childs(user:must_flag/3).
-:- mpred_trace_childs(user:traceok/1).
+%:- mpred_trace_childs(user: must/1).
+%:- mpred_trace_childs(user: must/2).
+:- mpred_trace_childs(user: must_flag/3).
+:- mpred_trace_childs(user: traceok/1).
 :- mpred_trace_childs(user;hotrace/1).
 
 % though maybe dumptrace
@@ -1966,9 +1966,9 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
 
 
 % show the warnings origins
-:- multifile(user:message_hook/3). 
-:- dynamic(user:message_hook/3).
-hook_message_hook:- asserta((user:message_hook(Term, Kind, Lines):-  if_defined(buggery_ok), (Kind= warning;Kind= error),Term\=syntax_error(_), 
+:- multifile(user: message_hook/3). 
+:- dynamic(user: message_hook/3).
+hook_message_hook:- asserta((user: message_hook(Term, Kind, Lines):-  if_defined(buggery_ok), (Kind= warning;Kind= error),Term\=syntax_error(_), 
  current_predicate(_:logicmoo_bugger_loaded/0), \+ lmconfig:no_buggery, \+ tlbugger:no_buggery_tl,
   dmsg(message_hook(Term, Kind, Lines)),hotrace(dumpST(20)),dmsg(message_hook(Term, Kind, Lines)),
 

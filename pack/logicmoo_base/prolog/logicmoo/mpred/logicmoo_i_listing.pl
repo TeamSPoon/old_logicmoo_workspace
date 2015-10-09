@@ -156,7 +156,7 @@ mpred_why :-
   whymemory(P,_),
   mpred_why(P).
 
-user:why(N) :- mpred_why(N).
+user: why(N) :- mpred_why(N).
 
 mpred_interactive_why(N):- w_tl(t_l:is_mpred_interactive_why,mpred_why(N)).
 
@@ -287,7 +287,7 @@ mpred_contains_term(What,_):-is_ftVar(What),!.
 mpred_contains_term(What,Inside):- compound(What),!,(\+ \+ ((copy_term_nat(Inside,Inside0),snumbervars(Inside0),contains_term(What,Inside0)))),!.
 mpred_contains_term(What,Inside):- (\+ \+ once((subst(Inside,What,foundZadooksy,Diff),Diff \=@= Inside ))),!.
 
-% user:listing_mpred_hook(What):- on_x_rtrace(mpred_listing(What)).
+% user: listing_mpred_hook(What):- on_x_rtrace(mpred_listing(What)).
 
 :-thread_local t_l:mpred_listing_disabled.
 % listing(L):-w_tl(t_l:mpred_listing_disabled,listing(L)).

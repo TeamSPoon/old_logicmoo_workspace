@@ -6,7 +6,7 @@
 :-abolish(add_args,13).
 :-abolish(query,0).*/
 
-:- user:ensure_loaded(library(dra/tabling3/swi_toplevel)).
+:- user: ensure_loaded(library(dra/tabling3/swi_toplevel)).
 
 % make_wrapper(_DefinedPreds,[query,0],true) :- !.
 make_wrapper(_DefinedPreds,[P,N],(:-table(P/N))).

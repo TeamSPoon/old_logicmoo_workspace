@@ -404,7 +404,7 @@ xlisting(f(Match)):- !,xlisting_inner(portray_hbr,Match,[]),!.
 
 xlisting(Match):- mpred_match_listing_skip_pi(Match,[]),!. % ,w_tl(t_l:no_xlisting(Match),plisting(Match)),!.
 
-% user:xlisting(G):-logicmoo_util_term_listing:xlisting(G).
+% user: xlisting(G):-logicmoo_util_term_listing:xlisting(G).
 % listing with varnames
 :- export(plisting/1).
 :- module_transparent(plisting/1).
@@ -786,11 +786,11 @@ prolog_listing:listing(M:X) :-
    '@'((
 	(   prolog:locate_clauses(X, ClauseRefs)
 	->  logicmoo_utils:list_clauserefs(ClauseRefs)
-	;   catch('$find_predicate'(M:X, Preds),_,catch('$find_predicate'(X, Preds),_,'$find_predicate'(user:X, Preds))),
+	;   catch('$find_predicate'(M:X, Preds),_,catch('$find_predicate'(X, Preds),_,'$find_predicate'(user: X, Preds))),
 	    logicmoo_utils:list_predicates(Preds,M:X)
 	)),'user').
 
-:- user:import(prolog_listing:listing/1).
+:- user: import(prolog_listing:listing/1).
 
 :- meta_predicate list_clauserefs(:).
 list_clauserefs(_:[]) :- !.

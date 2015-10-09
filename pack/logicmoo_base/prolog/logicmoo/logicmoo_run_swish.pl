@@ -6,7 +6,7 @@
 	  [
 	  ]).
 
-:- user:ensure_loaded(logicmoo_base).
+:- user: ensure_loaded(logicmoo_base).
 
 
 :- volatile(swish_trace:installed/1).
@@ -45,7 +45,7 @@ logicmoo_set_swish_path :-
 
 :- logicmoo_set_swish_path.
 
-:- user:ensure_loaded(swish(swish)).
+:- user: ensure_loaded(swish(swish)).
 
 % load rendering modules
 :- swish:use_module(logicmoo(swish_lib/render/html),	[]).

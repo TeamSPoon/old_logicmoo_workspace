@@ -94,11 +94,11 @@ createByNameMangle_compound(Name,Name,Type):- Name=..[Type|Props],assert_isa(Nam
 createByNameMangle_compound(Name,Inst,Type):- functor_catch(Name,Type,A),must(A==1),assert_isa(Name,Type),Name=Inst.
 
 
-:-dynamic(thglobal:current_source_suffix/1).
+:-dynamic(lmconf:current_source_suffix/1).
 
-get_source_suffix(SS):- thglobal:current_source_suffix(SS),!.
+get_source_suffix(SS):- lmconf:current_source_suffix(SS),!.
 get_source_suffix('7').
-%get_source_suffix(SS):- source_location(F,_),!,file_directory_name(F,DN),file_base_name(DN,SS),concat_atom(['-',SS,'7'],SSM),asserta_if_new(thglobal:current_source_suffix(SSM)).
+%get_source_suffix(SS):- source_location(F,_),!,file_directory_name(F,DN),file_base_name(DN,SS),concat_atom(['-',SS,'7'],SSM),asserta_if_new(lmconf:current_source_suffix(SSM)).
 
 
 create_from_type(OType,Name,Type):- sanity(var(Name)),

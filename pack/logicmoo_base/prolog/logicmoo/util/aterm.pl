@@ -3,10 +3,10 @@
             aterm/2                    % Var, ?ATerm ?NVar
           ]).
 
-:- prolog_load_context(directory,H),absolute_file_name('../..',A,[file_type(directory),relative_to(H)]),asserta(user:library_directory(A)).
+:- prolog_load_context(directory,H),absolute_file_name('../..',A,[file_type(directory),relative_to(H)]),asserta(user: library_directory(A)).
 :- prolog_load_context(directory,H),absolute_file_name('../../../..',A,[file_type(directory),relative_to(H)]),asserta(user:file_search_path(pack,A)).
 :- attach_packs.
-:- user:ensure_loaded(library(logicmoo/logicmoo_utils)).
+:- user: ensure_loaded(library(logicmoo/logicmoo_utils)).
 :- set_prolog_flag(answer_write_options,[quoted(true), portray(true), max_depth(1000), attributes(portray)]).
 :- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(1000), attributes(portray)]).
 
@@ -198,13 +198,13 @@ project_attributes(QueryVars0, AttrVars) :-
         maplist(remove_hidden_variables(QueryVars), Roots).
 
 
-:- dynamic((term_expansion/2,user:term_expansion/2,system:term_expansion/2)).
-:- multifile((term_expansion/2,user:term_expansion/2,system:term_expansion/2)).
+:- dynamic((term_expansion/2,user: term_expansion/2,system:term_expansion/2)).
+:- multifile((term_expansion/2,user: term_expansion/2,system:term_expansion/2)).
 
 %system:goal_expansion(G,_):-writeq(system:goal_expansion(G)),nl,fail.
-user:goal_expansion(G,_):-writeq(goal_expansion(G)),nl,fail.
-user:goal_expansion(V1=V2,aunify(V1,V2)).
-%user:term_expansion(G,_):-writeq(user:term_expansion(G)),nl,fail.
+user: goal_expansion(G,_):-writeq(goal_expansion(G)),nl,fail.
+user: goal_expansion(V1=V2,aunify(V1,V2)).
+%user: term_expansion(G,_):-writeq(user: term_expansion(G)),nl,fail.
 system:term_expansion(G,_):-writeq(system:term_expansion(G)),nl,fail.
 
 %---------------------------------------------------------- 

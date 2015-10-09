@@ -68,28 +68,28 @@
 :- meta_predicate xcall_t(4,?,?,?,?).
 :- meta_predicate xcall_t(5,?,?,?,?,?).
 :- meta_predicate xcall_t(6,?,?,?,?,?,?).
-:- meta_predicate user:call_f(?,1,?).
-:- meta_predicate user:call_f(?,2,?,?).
-:- meta_predicate user:call_f(?,3,?,?,?).
-:- meta_predicate user:call_f(?,4,?,?,?,?).
-:- meta_predicate user:call_f(?,5,?,?,?,?,?).
-:- meta_predicate user:call_f(?,6,?,?,?,?,?,?).
-:- meta_predicate user:call_mt_f(?,2,?,?).
-:- meta_predicate user:call_mt_f(?,3,?,?,?).
-:- meta_predicate user:call_mt_f(?,4,?,?,?,?).
-:- meta_predicate user:call_mt_f(?,5,?,?,?,?,?).
-:- meta_predicate user:call_mt_f(?,6,?,?,?,?,?,?).
-:- meta_predicate user:call_mt_t(?,2,?,?).
-:- meta_predicate user:call_mt_t(?,3,?,?,?).
-:- meta_predicate user:call_mt_t(?,4,?,?,?,?).
-:- meta_predicate user:call_mt_t(?,5,?,?,?,?,?).
-:- meta_predicate user:call_mt_t(?,6,?,?,?,?,?,?).
-:- meta_predicate user:call_which_t(?,1,?).
-:- meta_predicate user:call_which_t(?,2,?,?).
-:- meta_predicate user:call_which_t(?,3,?,?,?).
-:- meta_predicate user:call_which_t(?,4,?,?,?,?).
-:- meta_predicate user:call_which_t(?,5,?,?,?,?,?).
-:- meta_predicate user:call_which_t(?,6,?,?,?,?,?,?).
+:- meta_predicate user: call_f(?,1,?).
+:- meta_predicate user: call_f(?,2,?,?).
+:- meta_predicate user: call_f(?,3,?,?,?).
+:- meta_predicate user: call_f(?,4,?,?,?,?).
+:- meta_predicate user: call_f(?,5,?,?,?,?,?).
+:- meta_predicate user: call_f(?,6,?,?,?,?,?,?).
+:- meta_predicate user: call_mt_f(?,2,?,?).
+:- meta_predicate user: call_mt_f(?,3,?,?,?).
+:- meta_predicate user: call_mt_f(?,4,?,?,?,?).
+:- meta_predicate user: call_mt_f(?,5,?,?,?,?,?).
+:- meta_predicate user: call_mt_f(?,6,?,?,?,?,?,?).
+:- meta_predicate user: call_mt_t(?,2,?,?).
+:- meta_predicate user: call_mt_t(?,3,?,?,?).
+:- meta_predicate user: call_mt_t(?,4,?,?,?,?).
+:- meta_predicate user: call_mt_t(?,5,?,?,?,?,?).
+:- meta_predicate user: call_mt_t(?,6,?,?,?,?,?,?).
+:- meta_predicate user: call_which_t(?,1,?).
+:- meta_predicate user: call_which_t(?,2,?,?).
+:- meta_predicate user: call_which_t(?,3,?,?,?).
+:- meta_predicate user: call_which_t(?,4,?,?,?,?).
+:- meta_predicate user: call_which_t(?,5,?,?,?,?,?).
+:- meta_predicate user: call_which_t(?,6,?,?,?,?,?,?).
 
 :- meta_predicate holds_f(5,?,?,?,?,?).
 :- meta_predicate holds_f(6,?,?,?,?,?,?).
@@ -311,7 +311,7 @@ kbp_to_mpred_0:- once(time_call(hide_empty_strings)),fail.
 kbp_to_mpred_0:- time_call(drain_assert_next_buffer),!.
 
 kbp_to_mpred_no_more:- forall((into_plist(_Call,PLIST),kbp_t(PLIST)),assert_to_db_list(_F,PLIST)),
-   retractall(thglobal:use_cyc_database),tell('a.txt'),listing(t),listing('ASSERTION'),told,dmsg(done_mpred_t).
+   retractall(lmconf:use_cyc_database),tell('a.txt'),listing(t),listing('ASSERTION'),told,dmsg(done_mpred_t).
 
 
 :-export(move_implied/0).
@@ -445,15 +445,15 @@ xcall_t(P):- call(P).
 % todo hook into loaded files!
 :- export(assertion_t/1).
 
-% assertion_t(Call):- t_l:useOnlyExternalDBs,!,thglobal:use_cyc_database,wno_tl(t_l:useOnlyExternalDBs,kb_t(Call)).
-assertion_t(Call):- thglobal:use_cyc_database,!,w_tl(t_l:useOnlyExternalDBs,kb_t(Call)).
+% assertion_t(Call):- t_l:useOnlyExternalDBs,!,lmconf:use_cyc_database,wno_tl(t_l:useOnlyExternalDBs,kb_t(Call)).
+assertion_t(Call):- lmconf:use_cyc_database,!,w_tl(t_l:useOnlyExternalDBs,kb_t(Call)).
 % assertion_t(Call):- w_tl(t_l:useOnlyExternalDBs,loop_check(req(Call))).
 
 % ================================================================================
 % end holds_t
 % ================================================================================
 
-% :- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
+% :- user: ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
 
 % ================================================================================
 % begin holds_f

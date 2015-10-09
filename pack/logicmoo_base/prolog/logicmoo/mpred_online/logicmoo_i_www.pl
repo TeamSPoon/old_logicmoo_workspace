@@ -61,12 +61,12 @@ hmust_l(G):-G.
 :- attach_packs.
 :- initialization(attach_packs).
 % [Required] Load the Logicmoo Library Utils
-:- user:ensure_loaded(library(logicmoo/logicmoo_utils)).
+:- user: ensure_loaded(library(logicmoo/logicmoo_utils)).
  
 
 % :- module(logicmoo_i_www,[ html_print_term/2  ]).  % +Term, +Options
 
-% :- user:ensure_loaded(logicmoo_i_www_listing).
+% :- user: ensure_loaded(logicmoo_i_www_listing).
 % :- if(if_defined(load_mud_www)).
 
 
@@ -79,7 +79,7 @@ hmust_l(G):-G.
 :- use_module(library(operators), [push_op/3]).
 :- use_module(library(shlib), [current_foreign_library/2]).
 :- use_module(library(prolog_source)).
-:- user:use_module(library(option)).
+:- user: use_module(library(option)).
 :- use_module(library(error)).
 :- use_module(library(apply)).
 :- use_module(library(debug)).
@@ -88,9 +88,9 @@ hmust_l(G):-G.
 :- use_module(library(unix)).
 :- endif.
 
-:- user:use_module(library(rdf_ntriples),[rdf_ntriple_part/4]).
-:- user:use_module(library(tty),[menu/3]).
-:- user:use_module(library(solution_sequences),[distinct/1]).
+:- user: use_module(library(rdf_ntriples),[rdf_ntriple_part/4]).
+:- user: use_module(library(tty),[menu/3]).
+:- user: use_module(library(solution_sequences),[distinct/1]).
 
 :- if(exists_source(library(pldoc))).
 :- use_module(library(pldoc), []).
@@ -1310,13 +1310,13 @@ test_bind([X='$VAR'(X)|L]) :-
 :- dynamic portray/1.
 :- multifile portray/1.
 
-% '$messages':user:my_portray(X):-fail,loop_check(user:my_portray(X)).
-% portray(X):-loop_check(user:my_portray(X)).
+% '$messages':user: my_portray(X):-fail,loop_check(user: my_portray(X)).
+% portray(X):-loop_check(user: my_portray(X)).
 /*
 :- discontiguous my_portray/1. 
-:-export(user:my_portray/1).
-user:my_portray(A) :- var(A),!,fail,writeq(A).
-user:my_portray(A) :-
+:-export(user: my_portray/1).
+user: my_portray(A) :- var(A),!,fail,writeq(A).
+user: my_portray(A) :-
         atom(A),
         sub_atom(A, 0, _, _, 'http://'), !,
         (   style(B)
@@ -1324,7 +1324,7 @@ user:my_portray(A) :-
         ;   B=prefix:id
         ),
         portray_url(B, A).
-user:my_portray(A) :-
+user: my_portray(A) :-
         atom(A),
         atom_concat('__file://', B, A),
         sub_atom(B, D, _, C, #),
@@ -1332,9 +1332,9 @@ user:my_portray(A) :-
         sub_atom(B, 0, D, _, E),
         file_base_name(E, F),
         format('__~w#~w', [F, G]).
-user:my_portray(A) :- atom(A),!,user:write_atom_link(A,A).
-user:my_portray(A) :- \+compound(A),fail.
-%user:my_portray(P):- hmust((return_to_pos(rok_portray_clause(P)),!)).
+user: my_portray(A) :- atom(A),!,user: write_atom_link(A,A).
+user: my_portray(A) :- \+compound(A),fail.
+%user: my_portray(P):- hmust((return_to_pos(rok_portray_clause(P)),!)).
 */
 
 

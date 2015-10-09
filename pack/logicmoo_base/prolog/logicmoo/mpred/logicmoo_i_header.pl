@@ -43,8 +43,8 @@
 
 :- thread_local(t_l:disable_mpred_term_expansions_locally /0).
 :- multifile(system:term_expansion/2).
-:- multifile(user:term_expansion/2).
-:- multifile(user:goal_expansion/2).
+:- multifile(user: term_expansion/2).
+:- multifile(user: goal_expansion/2).
 
 :-dynamic(registered_mpred_file/1).
 :-dynamic(never_registered_mpred_file/1).
@@ -63,10 +63,10 @@
 
 load_time_sanity.
 
-:-dynamic(user:hook_one_second_timer_tick/0).
-:-multifile(user:hook_one_second_timer_tick/0).
-:-dynamic(user:hook_one_minute_timer_tick/0).
-:-multifile(user:hook_one_minute_timer_tick/0).
+:-dynamic(user: hook_one_second_timer_tick/0).
+:-multifile(user: hook_one_second_timer_tick/0).
+:-dynamic(user: hook_one_minute_timer_tick/0).
+:-multifile(user: hook_one_minute_timer_tick/0).
 
 :- dynamic(lmconf:startup_option/2).
 
@@ -157,28 +157,28 @@ load_time_sanity.
 :- dynamic(assertedTinyKB_implies_first/4).
 :- dynamic(assertedTinyKB_not_first/3).
 :- dynamic((exactlyAssertedEL_first/5,exactlyAssertedEL_with_vars/5,exactlyAssertedEL_with_vars/6,assertedTinyKB_implies_Already/4)).
-:- dynamic user:term_expansion/2.
-:- multifile user:term_expansion/2.
+:- dynamic user: term_expansion/2.
+:- multifile user: term_expansion/2.
 
 :- dynamic(formatted_resultIsa/2).
 :- multifile(formatted_resultIsa/2).
 
-:- dynamic(user:asserted_argIsa_known/3).
-:- dynamic(user:argQuotedIsa/3).
-:- dynamic(user:resultGenls/2).
-:- multifile(user:resultGenls/2).
+:- dynamic(  asserted_argIsa_known/3).
+:- dynamic(  argQuotedIsa/3).
+:- dynamic(  resultGenls/2).
+:- multifile(  resultGenls/2).
 
-:- dynamic(user:argGenls/3).
-:- multifile(user:argGenls/3).
+:- dynamic(  argGenls/3).
+:- multifile(  argGenls/3).
 
-:- dynamic(user:prologSideEffects/1).
-:- multifile(user:prologSideEffects/1).
+:- dynamic( prologSideEffects/1).
+:- multifile(prologSideEffects/1).
 
-:- dynamic(user:argsQuoted/1).
-:- multifile(user:argsQuoted/1).
+:- dynamic(  argsQuoted/1).
+:- multifile(  argsQuoted/1).
 
-:- dynamic(user:disjointWith/2).
-:- multifile(user:disjointWith/2).
+:- dynamic(  disjointWith/2).
+:- multifile(  disjointWith/2).
 
 
 :- dynamic(was_chain_rule/1).
@@ -276,21 +276,21 @@ load_time_sanity.
 :- multifile user:'$was_imported_kb_content$'/2.
 :- discontiguous(user:'$was_imported_kb_content$'/2).
 
-:- user:ensure_loaded(library(logicmoo/logicmoo_utils)).
+:- user: ensure_loaded(library(logicmoo/logicmoo_utils)).
 
 :-foreach(arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,prologKIF,pfcControlled,tSet,tPredType,
  prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,tCol,prologMacroHead,prologListValued,prologSingleValued,functorDeclares),P),
    ((dynamic(P/1),multifile(P/1)))).
 
-:- multifile user:listing_mpred_hook/1.
-:- dynamic user:listing_mpred_hook/1.
+:- multifile listing_mpred_hook/1.
+:- dynamic listing_mpred_hook/1.
 
-:- dynamic user:genls/2.
-:- dynamic user:isa/2.
-:- dynamic user:mudKeyword/2.
-:- multifile user:mudKeyword/2.
-:- multifile user:genls/2.
-:- multifile user:isa/2.
+:- dynamic genls/2.
+:- dynamic isa/2.
+:- dynamic mudKeyword/2.
+:- multifile mudKeyword/2.
+:- multifile genls/2.
+:- multifile isa/2.
 
 %:- dynamic t/2.
 %:- multifile t/2.
@@ -304,84 +304,84 @@ load_time_sanity.
 % :-dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
 :-dynamic((
-                     user:argIsa/3,
-                     user:isa/2,
-                     user:resultIsa/2,
-                      user:ttTemporalType/1)).
+                     argIsa/3,
+                     isa/2,
+                     resultIsa/2,
+                      ttTemporalType/1)).
 :-multifile((
-                     user:argIsa/3,
-                     user:isa/2,
-                     user:resultIsa/2,
-                      user:ttTemporalType/1)).
+                     argIsa/3,
+                     isa/2,
+                     resultIsa/2,
+                      ttTemporalType/1)).
 
 :- multifile(mpred_online:semweb_startup).
 
 :- dynamic(t_l:infForward).
 :- dynamic(mpred_module_ready).
-:- dynamic thglobal:pfcManageHybrids/0.
+:- dynamic lmconf:pfcManageHybrids/0.
 :- thread_local t_l:into_form_code/0.
-:- dynamic_multifile_exported user:defnSufficient/2.
-:- thread_local user:repl_to_string/2.
-:- thread_local user:repl_writer/2.
+:- dynamic_multifile_exported user: defnSufficient/2.
+:- thread_local user: repl_to_string/2.
+:- thread_local user: repl_writer/2.
 :- thread_local t_l:infSupertypeName/0.
-:- dynamic_multifile_exported user:loaded_external_kbs/0.
-:- dynamic_multifile_exported user:loading_module_h/1.
-:- dynamic_multifile_exported user:registered_module_type/2.
-:- dynamic_multifile_exported user:is_mpred_file/1.
-:- dynamic_multifile_exported user:decl_database_hook/2.
+:- dynamic_multifile_exported user: loaded_external_kbs/0.
+:- dynamic_multifile_exported user: loading_module_h/1.
+:- dynamic_multifile_exported user: registered_module_type/2.
+:- dynamic_multifile_exported user: is_mpred_file/1.
+:- dynamic_multifile_exported user: decl_database_hook/2.
 
-:- multifile user:local_term_anglify/2.
-:- multifile user:term_anglify_last/2.
-:- multifile user:term_anglify_np/3.
-:- multifile user:term_anglify_np_last/3.
+:- multifile user: local_term_anglify/2.
+:- multifile user: term_anglify_last/2.
+:- multifile user: term_anglify_np/3.
+:- multifile user: term_anglify_np_last/3.
 
 % HOOKS
-:- multifile user:create_random_fact/1.
-:- multifile user:decl_coerce/3.
-:- multifile user:decl_database_hook/2.
-:- multifile user:deduce_facts/2.
-:- multifile user:default_type_props/3.
-:- multifile user:fact_always_true/1.
-:- multifile user:fact_maybe_deduced/1.
-:- multifile user:tms_reject_why/2.
-:- multifile user:fskel/7.
-:- multifile user:hook_coerce/3.
-:- dynamic user:hook_coerce/3.
-:- multifile user:hooked_random_instance/3.
+:- multifile user: create_random_fact/1.
+:- multifile user: decl_coerce/3.
+:- multifile user: decl_database_hook/2.
+:- multifile user: deduce_facts/2.
+:- multifile user: default_type_props/3.
+:- multifile user: fact_always_true/1.
+:- multifile user: fact_maybe_deduced/1.
+:- multifile user: tms_reject_why/2.
+:- multifile user: fskel/7.
+:- multifile user: hook_coerce/3.
+:- dynamic user: hook_coerce/3.
+:- multifile user: hooked_random_instance/3.
 
-:- multifile user:now_unused/1.
-:- multifile user:mpred_provide_read_attributes/3.
-:- multifile user:mpred_provide_setup/4.
-:- multifile user:mpred_provide_storage_clauses/3.
-:- multifile user:mpred_provide_storage_op/2.
-:- multifile user:mpred_provide_write_attributes/2.
+:- multifile user: now_unused/1.
+:- multifile user: mpred_provide_read_attributes/3.
+:- multifile user: mpred_provide_setup/4.
+:- multifile user: mpred_provide_storage_clauses/3.
+:- multifile user: mpred_provide_storage_op/2.
+:- multifile user: mpred_provide_write_attributes/2.
 
 % DYN HOOKS
-:- dynamic_multifile_exported user:is_never_type/1.
+:- dynamic_multifile_exported user: is_never_type/1.
 
 % DYN FOR CODE
-:- dynamic_multifile_exported thglobal:after_mpred_load/0.
-:- dynamic_multifile_exported thglobal:use_cyc_database/0.
-:- dynamic_multifile_exported thglobal:agent_session/2.
+:- dynamic_multifile_exported lmconf:after_mpred_load/0.
+:- dynamic_multifile_exported lmconf:use_cyc_database/0.
+:- dynamic_multifile_exported lmconf:agent_session/2.
 
-:- dynamic_multifile_exported user:fact_is_false/2.
-:- dynamic_multifile_exported user:kbp_t_list_prehook/2.
+:- dynamic_multifile_exported user: fact_is_false/2.
+:- dynamic_multifile_exported user: kbp_t_list_prehook/2.
 
 
 % DYN KB
-:- dynamic_multifile_exported user:only_if_pttp/0.
-:- dynamic_multifile_exported user:use_kif/2.
-:- dynamic_multifile_exported user:is_mpred_prop/2.
-%:- dynamic_multifile_exported user:hasInstance_dyn/2.
-:- dynamic_multifile_exported user:arity/2.
-:- dynamic_multifile_exported user:mpred_prop/2.
-:- dynamic_multifile_exported user:relationMostInstance/3.
+:- dynamic_multifile_exported   only_if_pttp/0.
+:- dynamic_multifile_exported   use_kif/2.
+:- dynamic_multifile_exported   is_mpred_prop/2.
+%:- dynamic_multifile_exported   hasInstance_dyn/2.
+:- dynamic_multifile_exported   arity/2.
+:- dynamic_multifile_exported   mpred_prop/2.
+:- dynamic_multifile_exported   relationMostInstance/3.
 :- dynamic_multifile_exported user:'<==>'/2.
-% :- dynamic_multifile_exported user:ruleForward/2.
-:- dynamic_multifile_exported user:ruleRewrite/2.
-% :- dynamic_multifile_exported user:ruleBackward/2.
-:- dynamic_multifile_exported user:tNearestReachableItem/1.
-:- dynamic_multifile_exported user:tFarthestReachableItem/1.
+% :- dynamic_multifile_exported   ruleForward/2.
+:- dynamic_multifile_exported   ruleRewrite/2.
+% :- dynamic_multifile_exported   ruleBackward/2.
+:- dynamic_multifile_exported   tNearestReachableItem/1.
+:- dynamic_multifile_exported   tFarthestReachableItem/1.
 :- dynamic_multifile_exported deduceFromArgTypes/1.
 :- dynamic_multifile_exported prologSideEffects/1.
 
@@ -433,12 +433,12 @@ load_time_sanity.
 :- thread_local t_l:with_callMPred/1.
 :- thread_local t_l:assert_op_override/1.
 
-:- dynamic   thglobal:session_io/4, thglobal:session_agent/2, thglobal:agent_session/2, user:telnet_fmt_shown/3, user:agent_action_queue/3.
-:- multifile thglobal:session_io/4, thglobal:session_agent/2, thglobal:agent_session/2, user:telnet_fmt_shown/3, user:agent_action_queue/3.
+:- dynamic   lmconf:session_io/4, lmconf:session_agent/2, lmconf:agent_session/2, user: telnet_fmt_shown/3, user: agent_action_queue/3.
+:- multifile lmconf:session_io/4, lmconf:session_agent/2, lmconf:agent_session/2, user: telnet_fmt_shown/3, user: agent_action_queue/3.
 :- thread_local(infSecondOrder/0).
 :- thread_local(infThirdOrder/0).
 
-:- dynamic_multifile_exported(thglobal:use_cyc_database/0).
+:- dynamic_multifile_exported(lmconf:use_cyc_database/0).
 :- thread_local(t_l:already_in_file_term_expansion/0).
 :- thread_local(t_l:assert_op_override/1).
 :- thread_local(t_l:caller_module/2).
@@ -456,17 +456,17 @@ load_time_sanity.
 :- thread_local(t_l:noDBaseMODs/1).
 :- thread_local(t_l:mpred_loads_file/0).
 :- thread_local(t_l:with_callMPred/1).
-:- dynamic_multifile_exported(user:isa_pred_now_locked/0).
-:- dynamic_multifile_exported(user:mpred_manages_unknowns/0).
+:- dynamic_multifile_exported(user: isa_pred_now_locked/0).
+:- dynamic_multifile_exported(user: mpred_manages_unknowns/0).
 
-:- dynamic_multifile_exported(user:props/2).
-:- dynamic_multifile_exported(user:props/2).
+:- dynamic_multifile_exported( props/2).
+:- dynamic_multifile_exported( props/2).
 
 
 :- thread_local repl_to_string/2.
 :- thread_local repl_writer/2.
 
-:- dynamic_multifile_exported(user:grid_key/1).
+:- dynamic_multifile_exported(  grid_key/1).
 
 :- endif.
 

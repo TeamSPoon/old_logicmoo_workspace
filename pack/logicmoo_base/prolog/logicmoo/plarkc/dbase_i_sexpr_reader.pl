@@ -2,8 +2,8 @@
 
 
 
-:-dynamic(user:mpred_prop/2).
-:-multifile(user:mpred_prop/2).
+:-dynamic(user: mpred_prop/2).
+:-multifile(user: mpred_prop/2).
 
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
@@ -17,9 +17,9 @@
 :- initialization(attach_packs).
 
 % [Required] Load the Logicmoo Library Utils
-:- user:ensure_loaded(library(logicmoo/logicmoo_utils)).
+:- user: ensure_loaded(library(logicmoo/logicmoo_utils)).
 
-% :- user:ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api)).
+% :- user: ensure_loaded(library(logicmoo/plarkc/logicmoo_i_cyc_api)).
 
 
 :-export(fixvars/4).
@@ -562,12 +562,12 @@ if_script_file_time(X):-if_startup_script(time(X)).
 
 /*
 
-:-export(user:rff/0).
+:-export(user: rff/0).
 
-user:rff:-user:rff(wdmsg(n(first)),wdmsg(n(retry)),wdmsg(n(success)),wdmsg(n(failure))).
+user: rff:-user: rff(wdmsg(n(first)),wdmsg(n(retry)),wdmsg(n(success)),wdmsg(n(failure))).
 
-:-export(user:rff/4).
-user:rff(OnFirst,OnRetry,OnSuccess,OnFailure) :- CU = was(never,first),
+:-export(user: rff/4).
+user: rff(OnFirst,OnRetry,OnSuccess,OnFailure) :- CU = was(never,first),
   call_cleanup((
     process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure),
     (nb_setarg(1,CU,first));((nb_setarg(1,CU,second)),!,fail)),

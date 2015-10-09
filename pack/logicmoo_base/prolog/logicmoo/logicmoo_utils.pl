@@ -98,8 +98,8 @@ lmconfig:logicmoo_pre_release.
 % ======================================================
 % Create one big logicmoo_utils module
 % ======================================================
-:- multifile((term_expansion/2,user:term_expansion/2,system:term_expansion/2)).
-:- dynamic((term_expansion/2,user:term_expansion/2,system:term_expansion/2)).
+:- multifile((term_expansion/2,user: term_expansion/2,system:term_expansion/2)).
+:- dynamic((term_expansion/2,user: term_expansion/2,system:term_expansion/2)).
 %logicmoo_utils:term_expansion((:-module(Name,List)), :-maplist(export,List)):- atom(Name),atom_concat(logicmoo_util_,_,Name).
 logicmoo_utils:term_expansion((:-use_module(Name)), :-true):- atom(Name),atom_concat(logicmoo_util_,_,Name).
 
@@ -174,8 +174,8 @@ i_have_a_name(AndThisIsIt,_Singleton,_,_):-writeq(AndThisIsIt),nl.
 
 ?- list_undefined.
 
-:- user:use_module(util/logicmoo_util_term_listing).
-:- user:use_module(util/logicmoo_util_bugger_catch).
+:- user: use_module(util/logicmoo_util_term_listing).
+:- user: use_module(util/logicmoo_util_bugger_catch).
 
 ?- logicmoo_util_term_listing:xlisting(get_gtime).
 

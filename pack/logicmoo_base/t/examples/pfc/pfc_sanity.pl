@@ -7,7 +7,7 @@
 % Dec 13, 2035
 %
 */
-% :- module(user,[]).
+% :- module(  'lmbase',[]).
 
 
 :- ensure_loaded(library(pfc/mpred_runtime)).
@@ -1281,32 +1281,32 @@ test10 :-
 :- next_test. % ==
 
 
-% if we learn that someone has a full name, then we know they are a user.
-full_name(U,_) => user(U).
+% if we learn that someone has a full name, then we know they are a  'lmbase'.
+full_name(U,_) =>  'lmbase'(U).
 
 
-% if we learn that someone has a host name, then we know they are a user.
-host_name(U,_) => user(U).
+% if we learn that someone has a host name, then we know they are a  'lmbase'.
+host_name(U,_) =>  'lmbase'(U).
 
 
-% when we know a user's full name and host name, make a user/3 assertion.
-user(User),
+% when we know a  'lmbase''s full name and host name, make a  'lmbase'/3 assertion.
+ 'lmbase'(User),
 full_name(User,Name),
 host_name(User,Host) 
   =>
-  user(User,Name,Host).
+   'lmbase'(User,Name,Host).
 
 
-% the mpred_default full_name for a user is 'unknown'.
-user(User),
+% the mpred_default full_name for a  'lmbase' is 'unknown'.
+ 'lmbase'(User),
 ~full_name(User,X)/(X\==unknown)
   =>
 full_name(User,unknown).
   
 
 
-% the mpred_default host_name for a user is 'unknown'.
-user(User),
+% the mpred_default host_name for a  'lmbase' is 'unknown'.
+ 'lmbase'(User),
 ~host_name(User,X)/(X\==unknown)
   =>
 host_name(User,unknown).

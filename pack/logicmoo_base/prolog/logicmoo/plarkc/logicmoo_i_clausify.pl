@@ -60,7 +60,7 @@
 
 :- dynamic(wid/3).
 
-:- user:ensure_loaded(library(logicmoo/plarkc/dbase_i_sexpr_reader)).
+:- user: ensure_loaded(library(logicmoo/plarkc/dbase_i_sexpr_reader)).
 
 %=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%=%
 %=% 
@@ -107,18 +107,18 @@
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(logicmoo,Dir)).
-:- dynamic(user:isa_pred_now_locked/0).
-:- multifile(user:isa_pred_now_locked/0).
-:- multifile(user:type_action_info/3).
-:- multifile(user:agent_call_command/2).
-:- multifile(user:mud_test/2).
-:- multifile(user:sanity_test/0).
-:- multifile(user:regression_test/0).
-:- multifile(user:feature_test/0).
+:- dynamic(user: isa_pred_now_locked/0).
+:- multifile(user: isa_pred_now_locked/0).
+:- multifile(user: type_action_info/3).
+:- multifile(user: agent_call_command/2).
+:- multifile(user: mud_test/2).
+:- multifile(user: sanity_test/0).
+:- multifile(user: regression_test/0).
+:- multifile(user: feature_test/0).
 
 :- include(logicmoo(mpred/logicmoo_i_header)).
-%:- user:ensure_loaded(logicmoo(pttp/dbase_i_mpred_pttp_testing)). 
-:- user:ensure_loaded(logicmoo(pttp/dbase_i_mpred_pttp)). 
+%:- user: ensure_loaded(logicmoo(pttp/dbase_i_mpred_pttp_testing)). 
+:- user: ensure_loaded(logicmoo(pttp/dbase_i_mpred_pttp)). 
 
 %  all(R, room(R) => exists(D, (door(D) & has(R,D))))
 % for any arbitrary R, if R is a room then there exists some object D that is a door, and R has a D.
@@ -129,9 +129,9 @@
 % - room(R):- - has(R,_).
 
 :- %(current_prolog_flag(argv,[pl|_]) -> )
-     %op(400, fy, user:(nesc) ),	% Necessity, Always
-     %op(400, fy, user:(poss) ),	% Possibly, Eventually
-     op(400, fy, user:(cir) ),	% Next time
+     %op(400, fy, user: (nesc) ),	% Necessity, Always
+     %op(400, fy, user: (poss) ),	% Possibly, Eventually
+     op(400, fy, user: (cir) ),	% Next time
      op(1075,xfx,user:'<-'),
   
   
@@ -150,8 +150,8 @@
      ,!.
 
 
-:- user:ensure_loaded(logicmoo_i_kif).
-:- user:ensure_loaded(logicmoo_i_compiler).
+:- user: ensure_loaded(logicmoo_i_kif).
+:- user: ensure_loaded(logicmoo_i_compiler).
 
 
 to_poss(poss(BDT,X),poss(BDT,X)):-nonvar(X),!.
@@ -856,7 +856,7 @@ make_1_cl(Extras,One,Conj,cl([One],NewBodyListO)):-
   delete_eq(Conj,One,Rest0),delete_eq(Rest0,NHead,Rest),
   must_maplist(negate_one_maybe(Extras),Rest,NewBodyList),!,
   flattenConjs(Extras,NewBodyList,NewBodyListM),
-  must_maplist(thglobal:as_prolog,NewBodyListM,NewBodyListO).
+  must_maplist(lmconf:as_prolog,NewBodyListM,NewBodyListO).
 
 flattenConjs(_Extras,I,O):- conjuncts_to_list(I,M),must_maplist(conjuncts_to_list,M,L),flatten(L,O).
 
@@ -1134,7 +1134,7 @@ cf_to_flattened_clauses_0(KB,Why,NCFsI,FlattenedO):-
    % wdmsgl(cf(NCFs)),
    must_maplist(clauses_to_boxlog(KB,Why),NCFs,ListOfLists),
    flatten([ListOfLists],Flattened),
-   thglobal:as_prolog(Flattened,FlattenedL),
+   lmconf:as_prolog(Flattened,FlattenedL),
    list_to_set(FlattenedL,FlattenedS),
    must_maplist(demodal_sents(KB),FlattenedS,FlattenedO))),!.
   

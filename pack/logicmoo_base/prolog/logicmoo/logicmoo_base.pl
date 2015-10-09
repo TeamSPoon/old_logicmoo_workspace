@@ -60,17 +60,17 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 
 
 % ========================================
-% user:mpred_mod/1
+% user: mpred_mod/1
 % ========================================
 
 % TODO uncomment the next line without breaking it all!
-% thglobal:use_cyc_database.
+% lmconf:use_cyc_database.
 
-:-asserta(thglobal:pfcManageHybrids).
+:-asserta(lmconf:pfcManageHybrids).
 
-:- export(user:mpred_mod/1).
-:- dynamic user:mpred_mod/1.
-user:mpred_mod(user).
+:- export(user: mpred_mod/1).
+:- dynamic user: mpred_mod/1.
+user: mpred_mod(user).
 
 
 % [Manditory] define how we interact with the module system
@@ -128,7 +128,7 @@ when_debugging(_,_).
 % ================================================
 % DBASE_T System
 % ================================================
-:- gripe_time(40,user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
+:- gripe_time(40,user: ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
 
 :- ensure_loaded(mpred/logicmoo_i_wff).
 :- ensure_loaded(mpred/logicmoo_i_listing).
@@ -151,7 +151,7 @@ when_debugging(_,_).
 
 :- asserta(t_l:disable_mpred_term_expansions_locally).
 
-% user:goal_expansion(ISA,G) :- compound(ISA),t_l:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
+% user: goal_expansion(ISA,G) :- compound(ISA),t_l:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
 :- meta_predicate(lmbase_record_transactions(?,?)).
 :- meta_predicate(lmbase_record_transactions_maybe(?,?)).
 :- meta_predicate(mpred_file_expansion(?,?)).
@@ -229,7 +229,7 @@ convert_side_effect_0a(I,I).
 
 convert_side_effect_0b((OpData:-TRUE),Result):- is_true(TRUE),!,convert_side_effect_0a(OpData,Result),!.
 convert_side_effect_0b(suppose(OpData),Result):-!,convert_side_effect_0a(OpData,Result),!.
-convert_side_effect_0b(user:OpData,Reproduce):- !,convert_side_effect_0a(OpData,Reproduce),!.
+convert_side_effect_0b(user: OpData,Reproduce):- !,convert_side_effect_0a(OpData,Reproduce),!.
 convert_side_effect_0b(( :- OpData),( ( (Result)))):-!,convert_side_effect_0a(OpData,Result),!.
 convert_side_effect_0b('$was_imported_kb_content$'(_, OO),Result):-!,convert_side_effect_0a(OO,Result),!.
 convert_side_effect_0b(asserta_if_new(Data),Result):-!,convert_side_effect_0a(asserta(Data),Result).
@@ -254,7 +254,7 @@ pop_predicates(M:F/A,STATE):- functor(H,F,A),forall(member((H:-B),STATE),M:asser
 
 
 
-user:term_expansion(I,OO):- (I==end_of_file->(must(do_end_of_file_actions),fail);
+user: term_expansion(I,OO):- (I==end_of_file->(must(do_end_of_file_actions),fail);
                                  (\+ t_l:disable_mpred_term_expansions_locally, 
                                      if_defined(lmbase_record_transactions(I,OO)),I\=@=OO)).
 
@@ -268,7 +268,7 @@ mpred_file_loaded.
 :- write(ready),nl,flush_output.
 :- prolog.
 :- endif.
-:-  user:call(with_mfa_of(user: (dynamic_safe)),user,user,boxlog_to_compile(_D,_E,_F),boxlog_to_compile/3).
+:-  user: call(with_mfa_of(user:  (dynamic_safe)),user,user,boxlog_to_compile(_D,_E,_F),boxlog_to_compile/3).
 :- retractall(t_l:disable_mpred_term_expansions_locally).
 
 :- ensure_mpred_file_loaded(mpred/logicmoo_i_builtin).

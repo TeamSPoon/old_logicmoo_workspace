@@ -156,7 +156,7 @@ functor_declares_instance_0(tPred,tPred).
 functor_declares_instance_0(meta_argtypes,tRelation).
 functor_declares_instance_0(prologMacroHead,tRelation).
 functor_declares_instance_0(tFunction,tFunction).
-functor_declares_instance_0(P,tPred):- arg(_,s(tPred,prologMultiValued,mpred_prop,user:mpred_prop,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,
+functor_declares_instance_0(P,tPred):- arg(_,s(tPred,prologMultiValued,mpred_prop,user: mpred_prop,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,
        predCanHaveSingletons,prologBuiltin,prologKIF,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),P).
 
 functor_declares_instance_0(P,tCol):- arg(_,s(tCol,tSpec,ttFormatType),P).
@@ -236,7 +236,7 @@ fully_expand_now(Op,Sent,SentO):- copy_term(Sent,NoVary),
     must(Sent=@=NoVary),
 
    ignore(((fail,cnotrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), 
-    (Sent \=@= user:SentO), dmsg(fully_expand(Op,(Sent --> SentO)))))))),!.
+    (Sent \=@= user: SentO), dmsg(fully_expand(Op,(Sent --> SentO)))))))),!.
 
 fully_expand_clause(_,Sent,SentO):- \+ (is_ftCompound(Sent)),!,must(SentO=Sent).
 fully_expand_clause(Op,Sent,SentO):-is_ftVar(Op),!,fully_expand_clause(is_asserted,Sent,SentO),!.
@@ -273,7 +273,7 @@ as_is_term(NC):-compound(NC),functor(NC,Op,2),infix_op(Op,_).
 
 db_expand_term(Op,SI,SentO):- loop_check(db_expand_term0(Op,SI,SentO),SI=SentO).
 
-db_expand_term0(_,Sent,SentO):-is_ftNonvar(Sent),copy_term(Sent,NoVary),if_defined(user:ruleRewrite(Sent,SentO),fail),Sent\=@=NoVary,SentO \=@= Sent.
+db_expand_term0(_,Sent,SentO):-is_ftNonvar(Sent),copy_term(Sent,NoVary),if_defined(user: ruleRewrite(Sent,SentO),fail),Sent\=@=NoVary,SentO \=@= Sent.
 
 db_expand_term0(Op,Sent,SentO):- Op==callable, quasiQuote(QQuote),subst(Sent,QQuote,isEach,MID),Sent\=@=MID,!,db_expand_term(Op,MID,SentO).
 db_expand_term0(Op,Sent,SentO):- db_expand_final(Op ,Sent,SentO),!.
@@ -459,8 +459,8 @@ demodulize(_ ,HB,HB).
 db_expand_1(_,X,X).
 
 
-db_expand_2(_,Sent,SentO):-is_ftNonvar(Sent),user:ruleRewrite(Sent,SentO),!.
-db_expand_2(change(_,_),Sent,SentO):-is_ftNonvar(Sent),user:ruleRewrite(Sent,SentO),!.
+db_expand_2(_,Sent,SentO):-is_ftNonvar(Sent),user: ruleRewrite(Sent,SentO),!.
+db_expand_2(change(_,_),Sent,SentO):-is_ftNonvar(Sent),user: ruleRewrite(Sent,SentO),!.
 db_expand_2(_,X,X):-!.
 db_expand_2(_ ,NC,NC):- as_is_term(NC),!.
 db_expand_2(Op,Sent,SentO):-loop_check(expand_term(Sent,SentO)),Sent\=@=SentO,!.
@@ -475,7 +475,7 @@ db_expand_3(_Op,Sent,SentO):-once(transform_holds(t,Sent,SentO)).
 
 db_expand_4(_,A,B):-A=B,!.
 db_expand_4(_ ,NC,NC):- as_is_term(NC),!.
-% db_expand_4(_,A,B):-thglobal:pfcManageHybrids,!,A=B.
+% db_expand_4(_,A,B):-lmconf:pfcManageHybrids,!,A=B.
 db_expand_4(Op,Sent,SentO):-db_quf(Op,Sent,Pretest,Template),(Pretest==true-> SentO = Template ; SentO = (Pretest,Template)),!.
 
 
@@ -483,7 +483,7 @@ is_meta_functor(Sent,F,List):-is_ftCompound(Sent),Sent=..[F|List],(predicate_pro
 
 db_expand_5(Op,t(Sent),SentO):- is_ftNonvar(Sent),db_expand_5(Op,Sent,SentO).
 db_expand_5(_,A,B):-A=B,!.
-db_expand_5(_Op,Sent,SentO):-once(subst(Sent,user:mpred_prop,isa,SentO)).
+db_expand_5(_Op,Sent,SentO):-once(subst(Sent,user: mpred_prop,isa,SentO)).
 db_expand_5(_Op,Sent,SentO):-once(subst(Sent,mpred_prop,isa,SentO)).
 % db_expand_5(_Op,Sent,SentO):-once(to_predicate_isas(Sent,SentO)).
 db_expand_5(Op,{Sent},{SentO}):-!, fully_expand_goal(Op,Sent,SentO).
@@ -491,7 +491,7 @@ db_expand_5(_ ,NC,NC):- as_is_term(NC),!.
 db_expand_5(_,A,A):-unnumbervars(A,U),A\=@=U.
 db_expand_5(Op,Sent,SentO):-current_predicate(correctArgsIsa/3),arg(2,Sent,Arg),is_ftNonvar(Arg),get_functor(Sent,F),asserted_argIsa_known(F,2,_),!,
   correctArgsIsa(Op,Sent,SentO),!.
-db_expand_5(_,A,B):-thglobal:pfcManageHybrids,!,A=B.
+db_expand_5(_,A,B):-lmconf:pfcManageHybrids,!,A=B.
 db_expand_5(_,A,B):-A=B.
 
 
@@ -652,7 +652,7 @@ into_functor_form(Dbase_t,_X,F,A,Call):-Call=..[Dbase_t,F|A].
 :-export(into_mpred_form/2).
 into_mpred_form(V,VO):- \+ (is_ftCompound(V)),!,VO=V.
 into_mpred_form(M:X,M:O):- atom(M),!,into_mpred_form(X,O),!.
-into_mpred_form(Sent,SentO):-is_ftNonvar(Sent),if_defined(user:ruleRewrite(Sent,SentM),fail),into_mpred_form(SentM,SentO).
+into_mpred_form(Sent,SentO):-is_ftNonvar(Sent),if_defined(user: ruleRewrite(Sent,SentM),fail),into_mpred_form(SentM,SentO).
 into_mpred_form((H:-B),(HH:-BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H:-B),(HH:-BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H,B),(HH,BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
@@ -687,8 +687,8 @@ into_mpred_form6(G,_,_,1,_,G):-predicate_property(G,number_of_rules(N)),N >0, !.
 into_mpred_form6(G,F,C,1,_,O):-real_builtin_predicate(G),!,into_mpred_form(C,OO),O=..[F,OO].
 into_mpred_form6(_X,H,P,_N,A,O):-is_holds_false(H),(atom(P)->(G=..[P|A],O=not(G));O=..[holds_f,P|A]).
 into_mpred_form6(_X,H,P,_N,A,O):-is_holds_true(H),(atom(P)->O=..[P|A];O=..[t,P|A]).
-into_mpred_form6(G,F,_,_,_,G):-user:mpred_prop(F,prologHybrid),!.
-into_mpred_form6(G,F,_,_,_,G):-user:mpred_prop(F,prologDynamic),!.
+into_mpred_form6(G,F,_,_,_,G):-user: mpred_prop(F,prologHybrid),!.
+into_mpred_form6(G,F,_,_,_,G):-user: mpred_prop(F,prologDynamic),!.
 into_mpred_form6(G,F,_,_,_,G):-nop(dmsg(warn(unknown_mpred_type(F,G)))).
 
 % ========================================
@@ -717,7 +717,7 @@ transform_functor_holds(Op,_,ArgIn,_,ArgOut):- transform_holds(Op,ArgIn,ArgOut),
 transform_holds_3(_,A,A):- \+ (is_ftCompound(A)),!.
 transform_holds_3(_,props(Obj,Props),props(Obj,Props)):-!.
 %transform_holds_3(Op,Sent,OUT):-Sent=..[And|C12],is_logical_functor(And),!,maplist(transform_holds_3(Op),C12,O12),OUT=..[And|O12].
-transform_holds_3(_,A,A):-functor_catch(A,F,N), predicate_property(A,_),user:mpred_prop(F,arity(N)),!.
+transform_holds_3(_,A,A):-functor_catch(A,F,N), predicate_property(A,_),user: mpred_prop(F,arity(N)),!.
 transform_holds_3(HFDS,M:Term,OUT):-atom(M),!,transform_holds_3(HFDS,Term,OUT).
 transform_holds_3(HFDS,[P,A|ARGS],DBASE):- is_ftVar(P),!,DBASE=..[HFDS,P,A|ARGS].
 transform_holds_3(HFDS, ['[|]'|ARGS],DBASE):- trace_or_throw(list_transform_holds_3(HFDS,['[|]'|ARGS],DBASE)).
@@ -900,7 +900,7 @@ attempt_clause_expansion(B,BC,BR):-
     force_clause_expansion(B,BR),
     ignore(retract(inside_clause_expansion(BC)))).
 
-force_clause_expansion(':-'(B),':-'(BR)):- !, w_tl(is_compiling_clause,user:expand_goal(B,BR)).
+force_clause_expansion(':-'(B),':-'(BR)):- !, w_tl(is_compiling_clause,user: expand_goal(B,BR)).
 force_clause_expansion(B,BR):- w_tl(is_compiling_clause,force_expand(force_clause_expansion0(B,BR))).
 
 force_clause_expansion0(M:((H:-B)),R):- !, mud_rule_expansion(M:H,M:B,R),!.
@@ -909,7 +909,7 @@ force_clause_expansion0(((H:-B)),R):- mud_rule_expansion(H,B,R),!.
 force_clause_expansion0(H,HR):- try_mud_asserted_expansion(H,HR),!.
 force_clause_expansion0(B,BR):- force_head_expansion(B,BR).
 
-force_expand(Goal):-thread_self(ID),w_tl(user:always_expand_on_thread(ID),Goal),!.
+force_expand(Goal):-thread_self(ID),w_tl(user: always_expand_on_thread(ID),Goal),!.
 
 
 force_head_expansion(H,HR):- try_mud_head_expansion(H,HR),!.

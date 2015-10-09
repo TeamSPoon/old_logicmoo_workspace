@@ -274,11 +274,11 @@ tSet(ttFormatType).
 (pfcMark(pfcPosTrigger,_,F,A)/(integer(A),atom(F),functor(P,F,A),((P\= ( call_u(_) ), predicate_property(P,static)))))
   ==> {trace_or_throw(predicate_property(P,static))}.
 
-(pfcMark(pfcPosTrigger,_,F,A)/(integer(A),atom(F),functor(P,F,A),((P\= ( call_u(_) ))))) ==> {user:dynamic(F/A)}.
+(pfcMark(pfcPosTrigger,_,F,A)/(integer(A),atom(F),functor(P,F,A),((P\= ( call_u(_) ))))) ==> {user: dynamic(F/A)}.
 
 (pfcMark(pfcNegTrigger,_,F,A)/(integer(A),atom(F),functor(P,F,A),((P\= ( call_u(_) ), predicate_property(P,static)))))
   ==> {trace_or_throw(predicate_property(P,static))}.
-(pfcMark(pfcNegTrigger,_,F,A)/(integer(A),atom(F),functor(P,F,A),((P\= ( call_u(_) ))))) ==> {user:dynamic(F/A)}.
+(pfcMark(pfcNegTrigger,_,F,A)/(integer(A),atom(F),functor(P,F,A),((P\= ( call_u(_) ))))) ==> {user: dynamic(F/A)}.
 
 
 % Cols are either syntactic or existential
@@ -665,14 +665,14 @@ ttPredType(Prop)==>tCol(Prop).
 
 
 
-%:-user:agenda_slow_op_enqueue(add(((arity(Pred,2),argIsa(Pred,1,Col)/(is_ftNonvar(Pred),Col\=ftTerm,tSet(Col)), \+prologSideEffects(Pred), t(Pred,Arg,_)/is_ftNonvar(Arg)) ==> t(Col,Arg)))).
-%:-user:agenda_slow_op_enqueue(add(((arity(Pred,2),argIsa(Pred,2,Col)/(is_ftNonvar(Pred),Col\=ftTerm,tSet(Col)), \+prologSideEffects(Pred), t(Pred,_,Arg)/is_ftNonvar(Arg)) ==> t(Col,Arg)))).
+%:-user: agenda_slow_op_enqueue(add(((arity(Pred,2),argIsa(Pred,1,Col)/(is_ftNonvar(Pred),Col\=ftTerm,tSet(Col)), \+prologSideEffects(Pred), t(Pred,Arg,_)/is_ftNonvar(Arg)) ==> t(Col,Arg)))).
+%:-user: agenda_slow_op_enqueue(add(((arity(Pred,2),argIsa(Pred,2,Col)/(is_ftNonvar(Pred),Col\=ftTerm,tSet(Col)), \+prologSideEffects(Pred), t(Pred,_,Arg)/is_ftNonvar(Arg)) ==> t(Col,Arg)))).
 %:-add_slow(((arity(Pred,2),argIsa(Pred,2,Col)/(is_ftNonvar(Pred),Col\=ftTerm,tSet(Col)),t(Pred,_,Arg)/is_ftNonvar(Arg)) ==> t(Col,Arg))).
-%(((P/(has_functor(P),get_functor(P,F,A),A\=2,\+prologSideEffects(F),mpred_literal(P)) ==> {user:agenda_slow_op_enqueue(deduceEachArgType(P))}))).
+%(((P/(has_functor(P),get_functor(P,F,A),A\=2,\+prologSideEffects(F),mpred_literal(P)) ==> {user: agenda_slow_op_enqueue(deduceEachArgType(P))}))).
 
 % :-start_rtrace.
 
-((P/is_ftNonvar(P),{functor(P,F,A),\+ mpred_connective(F), A>1}) ==> {user:agenda_slow_op_enqueue(must(ignore(deduceEachArgType(P))))}).
+((P/is_ftNonvar(P),{functor(P,F,A),\+ mpred_connective(F), A>1}) ==> {user: agenda_slow_op_enqueue(must(ignore(deduceEachArgType(P))))}).
 % tCol(Col) <==> isa(Col,tCol).
 
 :-dynamic((disjointWith/2,genls/2,isa/2)).
@@ -695,7 +695,7 @@ prologHybrid(argIsa/3).
 
 /*
 :- mpred_add(((vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) ==> vtActionTemplate(ArgTypes)))).
-:- mpred_add(((user:action_info(ArgTypes,_)/is_declarations(ArgTypes) ==> vtActionTemplate(ArgTypes)))).
+:- mpred_add(((user: action_info(ArgTypes,_)/is_declarations(ArgTypes) ==> vtActionTemplate(ArgTypes)))).
 :- mpred_add(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) ==> functorDeclares(F))).
 (ttFormatType(FT)/is_declarations(FT))==>meta_argtypes(FT).
 
@@ -707,7 +707,7 @@ prologHybrid(argIsa/3).
 
 % :- if_startup_script(w_tl(t_l:pfcExpansion,ensure_loaded(mpred_i_mpred_mpred_testing))).
 
-% :-asserta(user:isa_pred_now_locked).
+% :-asserta(user: isa_pred_now_locked).
 
 
 % :-loadTinyAssertions1.
@@ -1195,14 +1195,14 @@ relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
 
 
 
-:-mpred_test((fully_expand_goal(_,:-multifile user:create_random_fact/1,O),show_call_failure(O=(:-multifile user:create_random_fact/1)))).
+:-mpred_test((fully_expand_goal(_,:-multifile user: create_random_fact/1,O),show_call_failure(O=(:-multifile user: create_random_fact/1)))).
 
 tCol(tPred).
 prologHybrid(isa/2).
 
-%mpred_online:semweb_startup:- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(dbase/mpred_i_rdf_store)))).
+%mpred_online:semweb_startup:- with_no_term_expansions(if_file_exists(user: ensure_loaded(logicmoo(dbase/mpred_i_rdf_store)))).
 
-% :- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(mobs/planner/mpred_i_hyhtn)))).
+% :- with_no_term_expansions(if_file_exists(user: ensure_loaded(logicmoo(mobs/planner/mpred_i_hyhtn)))).
 tCol(predIsFlag).
 tCol(prologDynamic).
 prologHybrid(formatted_resultIsa/2).

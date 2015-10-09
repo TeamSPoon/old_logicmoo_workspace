@@ -1,7 +1,7 @@
 
 
-:- multifile((term_expansion/2,user:term_expansion/2,system:term_expansion/2)).
-:- dynamic((term_expansion/2,user:term_expansion/2,system:term_expansion/2)).
+:- multifile((term_expansion/2,user: term_expansion/2,system:term_expansion/2)).
+:- dynamic((term_expansion/2,user: term_expansion/2,system:term_expansion/2)).
 
 :- multifile
         % '$pldoc'/4,
@@ -40,7 +40,7 @@ lmconfig:logicmoo_utils_separate.
 user:file_search_path(pack, '../../../../').
 :- attach_packs.
 :- initialization(attach_packs).
-:- user:use_module(library(logicmoo/logicmoo_utils)).
+:- user: use_module(library(logicmoo/logicmoo_utils)).
 
 add_pack_dir(UpUp):- prolog_load_context(directory,Dir),   
    DirFor = logicmoo,

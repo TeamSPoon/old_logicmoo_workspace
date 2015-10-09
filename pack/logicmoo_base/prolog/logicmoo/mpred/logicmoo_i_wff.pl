@@ -225,7 +225,7 @@ logical_functor_ft((',')).
 :- dynamic(non_assertable/1).
 non_assertable(WW,isVar(WW)):- var(WW),!.
 non_assertable(_:WW,Why):- !,non_assertable(WW,Why).
-non_assertable(WW,notAssertable(Why)):- compound(WW),get_functor(WW,F),user:mpred_prop(F,notAssertable(Why)),!.
+non_assertable(WW,notAssertable(Why)):- compound(WW),get_functor(WW,F),user: mpred_prop(F,notAssertable(Why)),!.
 % non_assertable(WW,Why):- db_prop_add
 
 % ===============================================================================================
@@ -249,7 +249,7 @@ not_log_op(OP):- not(is_log_op(OP)).
 :- export(is_log_op/1).
 is_log_op(OP):- atomic(OP),to_dlog_ops(OPS),!,(member(OP=_,OPS);member(_=OP,OPS)).
 
-:- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_kif)).
+:- user: ensure_loaded(logicmoo(plarkc/logicmoo_i_kif)).
 
 put_singles(Wff,_,[],Wff).
 put_singles(Wff,Exists,[S|Singles],NewWff):-   
@@ -465,7 +465,7 @@ is_function(_,F,_):- atom_concat(_Was,'Fn',F).
 is_function(_,F,_):- tFunction(F).
 % is_function(_,F,A):- A2 is A+1, current_predicate(F/A2), \+ current_predicate(F/A).
 
-%:- mpred_add(isa(I,C)<=(ttPredType(C),user:isa(I,C))).
+%:- mpred_add(isa(I,C)<=(ttPredType(C),user: isa(I,C))).
 
 is_ftEquality(Term):- is_ftVar(Term),!,fail.
 %is_ftEquality(Term):- get_pred(Term,Pred),is),!,(Pred==mudEquals;genlPreds(Pred,equals);clause_asserted(prologEquality(Pred))),!.

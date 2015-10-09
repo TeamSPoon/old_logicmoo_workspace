@@ -160,14 +160,14 @@ is_asserted_2((H:-BB),B):- is_true(B),!,is_asserted_2(H,BB).
 is_asserted_2(H,B):-  skip_is_asserted_expansion(H),!,is_asserted_2a(H,B).
 is_asserted_2(H,B):-hotrace((fully_expand_warn(is_asserted_2,(H:-B),CL),expand_to_hb(CL,HH,BB))),!,is_asserted_2a(HH,BB).
 
-is_asserted_2a(H,B):-thglobal:pfcManageHybrids,!,mpred_clause_is_asserted(H,B).
-is_asserted_2a(H,B):-call_no_cuts(user:mpred_provide_storage_clauses(H,B,_Ref)),not(hotrace(special_wrapper_body(B,_))).
+is_asserted_2a(H,B):-lmconf:pfcManageHybrids,!,mpred_clause_is_asserted(H,B).
+is_asserted_2a(H,B):-call_no_cuts(user: mpred_provide_storage_clauses(H,B,_Ref)),not(hotrace(special_wrapper_body(B,_))).
 
 is_asserted_3((H:-BB),B,Ref):- is_true(B),!,is_asserted_3(H,BB,Ref).
 is_asserted_3(H,B,Ref):- skip_is_asserted_expansion(H), !,is_asserted_3a(H,B,Ref).
 is_asserted_3(H,B,Ref):-hotrace((fully_expand_warn(is_asserted_3,(H:-B),CL),expand_to_hb(CL,HH,BB))),is_asserted_3a(HH,BB,Ref).
 
-is_asserted_3a(H,B,Ref):-call_no_cuts(user:mpred_provide_storage_clauses(H,B,Ref)),not(hotrace(special_wrapper_body(B,_))).
+is_asserted_3a(H,B,Ref):-call_no_cuts(user: mpred_provide_storage_clauses(H,B,Ref)),not(hotrace(special_wrapper_body(B,_))).
 
 is_source_proof(_).
 
@@ -198,7 +198,7 @@ ensure_predicate_reachable(M,C):-once((predicate_property(C,imported_from(Other)
                                        context_module(CM),
                                        dmsg(wrong_import_module(M,Other:C,from(CM))),
                                        ignore(delete_import_module(CM,Other)),
-                                       '@'((M:dynamic(C),M:export(C)),M),user:import(M:C))),fail.
+                                       '@'((M:dynamic(C),M:export(C)),M),user: import(M:C))),fail.
 ensure_predicate_reachable(_,_).
 */
 
@@ -225,7 +225,7 @@ requires_storage(_,_,t_l:consulting_sources):-t_l:consulting_sources,mpred_may_e
 
 special_wrapper_functor(call_mpred_body,direct_to_prolog).
 special_wrapper_functor(body_req,direct_to_prolog).
-special_wrapper_functor(user:mpred_provide_setup,direct_to_prolog).
+special_wrapper_functor(user: mpred_provide_setup,direct_to_prolog).
 special_wrapper_functor(call_provided_mpred_storage_op,direct_to_prolog).
 special_wrapper_functor(loop_check,meta).
 special_wrapper_functor(loop_check_term,meta).
@@ -337,7 +337,7 @@ add_0(dynamic(Term)):- !,must(get_arity(Term,F,A)), must(dynamic(F/A)).
 add_0(A):- A =(:-(_Term)), !, must(add_fast(A)).
 % add_0(C0):-check_override(add(C0)),!.
 % add_0(Skipped):- ground(Skipped),implied_skipped(Skipped),!. % ,dmsg(implied_skipped(Skipped)).
-%add_0(C0):- ignore((ground(C0),asserta(user:already_added_this_round(C0)))),!,must(mpred_add_fast(C0)),!.
+%add_0(C0):- ignore((ground(C0),asserta(user: already_added_this_round(C0)))),!,must(mpred_add_fast(C0)),!.
 add_0(C0):- must(mpred_add_fast(C0)),!.
 add_0(A):-trace_or_throw(fmt('add/1 is failing ~q.',[A])).
 
@@ -345,7 +345,7 @@ add_0(A):-trace_or_throw(fmt('add/1 is failing ~q.',[A])).
 implied_skipped(genls(C0,C0)).
 implied_skipped(props(_,[])).
 implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (t(Skipped);out_of_mpred_t(Skipped)).
-%implied_skipped(Skipped):-user:already_added_this_round(Skipped),(is_asserted(Skipped)).
+%implied_skipped(Skipped):-user: already_added_this_round(Skipped),(is_asserted(Skipped)).
 
 
 mpred_numbervars_with_names(Term):- term_variables(Term,Vars),mpred_name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(true)]),!.
@@ -548,18 +548,18 @@ hooked_retractall(G):- Op = change(retract,all),
 
 
 
-user:mpred_provide_storage_op(Op,G):- get_functor(G,F,A),user:mpred_provide_storage_op(Op,G,F,A).
+user: mpred_provide_storage_op(Op,G):- get_functor(G,F,A),user: mpred_provide_storage_op(Op,G,F,A).
 
-user:mpred_provide_storage_op(Op,G, F,_A):- t(pfcControlled,F),!,loop_check(prolog_mpred_provide_storage_op(Op,G)).
-user:mpred_provide_storage_op(Op,G, F,_A):- t(prologDynamic,F),!,loop_check(mpred_mpred_provide_storage_op(Op,G)).
-user:mpred_provide_storage_op(Op,G,_F,_A):- loop_check(prolog_mpred_provide_storage_op(Op,G)).
+user: mpred_provide_storage_op(Op,G, F,_A):- t(pfcControlled,F),!,loop_check(prolog_mpred_provide_storage_op(Op,G)).
+user: mpred_provide_storage_op(Op,G, F,_A):- t(prologDynamic,F),!,loop_check(mpred_mpred_provide_storage_op(Op,G)).
+user: mpred_provide_storage_op(Op,G,_F,_A):- loop_check(prolog_mpred_provide_storage_op(Op,G)).
 
-%user:mpred_provide_storage_op(Op,G):- (loop_check(isa_mpred_provide_storage_op(Op,G))).
-%user:mpred_provide_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(user:mpred_provide_storage_clauses(G,true,_Proof))).
+%user: mpred_provide_storage_op(Op,G):- (loop_check(isa_mpred_provide_storage_op(Op,G))).
+%user: mpred_provide_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(user: mpred_provide_storage_clauses(G,true,_Proof))).
 
 must_storage_op(Op,G):- doall(must(may_storage_op(Op,G))).
 
-may_storage_op(Op,G):-call_no_cuts(user:mpred_provide_storage_op(Op,G)).
+may_storage_op(Op,G):-call_no_cuts(user: mpred_provide_storage_op(Op,G)).
 
 
 :- meta_predicate hooked_asserta(+), hooked_assertz(+), hooked_retract(+), hooked_retractall(+).
@@ -582,8 +582,8 @@ is_static_pred(Head):-  predicate_property(Head,static),!.
 is_static_pred(Head):- predicate_property(Head,_), !, \+ (predicate_property(Head,dynamic)).
 is_static_pred(Head):-  predicate_property(Head,meta_predicate),!.
 
-prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),user:mpred_prop(F,prologDynamic),!, prolog_op(Op,G).
-prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),not(user:mpred_prop(F,prologHybrid)),!,current_predicate(_,G), prolog_op(Op,G).
+prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),user: mpred_prop(F,prologDynamic),!, prolog_op(Op,G).
+prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),not(user: mpred_prop(F,prologHybrid)),!,current_predicate(_,G), prolog_op(Op,G).
 use_if_modify_new:- current_predicate(assert_if_new/1).
 prolog_op(change(AR,Op), G):-ensure_dynamic(G),!,prolog_modify(change(AR,Op), G).
 

@@ -27,7 +27,7 @@
 :- attach_packs.
 :- initialization(attach_packs).
 % [Required] Load the Logicmoo Library Utils
-:- user:ensure_loaded(library(logicmoo/logicmoo_utils)).
+:- user: ensure_loaded(library(logicmoo/logicmoo_utils)).
 :- initialization(attach_packs).
 prove_query:-query.
 

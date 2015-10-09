@@ -855,7 +855,7 @@ simplify_goal_printed(G,O):- must(transitive(simplify_goal_printed0,G,O)),!.
 
 % = :- export(simplify_goal_printed0/2).
 simplify_goal_printed0(Var,Var):- \+ compound(Var),!.
-simplify_goal_printed0(user:G,G).
+simplify_goal_printed0(user: G,G).
 simplify_goal_printed0(system:G,G).
 simplify_goal_printed0(catchvv(G,_,_),G).
 simplify_goal_printed0(call(G),G).

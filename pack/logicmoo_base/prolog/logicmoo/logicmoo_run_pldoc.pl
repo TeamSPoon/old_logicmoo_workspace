@@ -1,6 +1,6 @@
 #!/usr/local/bin/swipl
 
-:- user:ensure_loaded(logicmoo_base).
+:- user: ensure_loaded(logicmoo_base).
 
 :- if(if_defined(load_mud_www)).
 

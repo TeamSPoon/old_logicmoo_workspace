@@ -217,7 +217,7 @@ argIsa_call_0(must,1,ftAskable).
 
 argIsa_call_0(mpred_module,1,tPred).
 argIsa_call_0(mpred_module,2,ftAtom).
-% argIsa_call_0(user:agent_text_command,_,ftTerm).
+% argIsa_call_0(user: agent_text_command,_,ftTerm).
 argIsa_call_0('<=>',_,ftTerm).
 argIsa_call_0(class_template,N,Type):- (N=1 -> Type=tCol;Type=ftListFn(ftVoprop)).
 argIsa_call_0(Arity,N,T):-mpred_arity_pred(Arity),arity(Arity,A),number(A),number(N),N=<A,arg(N,vv(tPred,ftInt,tCol),T).
@@ -281,7 +281,7 @@ correctArgsIsa(Op,M:G,MAA):- nonvar(M),!,correctArgsIsa(Op,G,GG),M:GG=MAA.
 correctArgsIsa(_,(A,B),(AA,BB)):-!,correctArgsIsa(Op,A,AA),correctArgsIsa(Op,B,BB).
 correctArgsIsa(_,isa(Args,PredArgTypes),isa(Args,PredArgTypes)):- PredArgTypes==meta_argtypes,!.
 correctArgsIsa(_,G,GG):- get_functor(G,F,A),
-  arg(_,vv('{}'/_,  genls/_,user:mpred_prop/_,
+  arg(_,vv('{}'/_,  genls/_,user: mpred_prop/_,
     t/2,arity/_,genls/_,'<=>'/_,pt/_,rhs/_,nt/_,bt/_,
     formatted_resultIsa/_,resultIsa/_,quotedDefnIff/_),F/A),!,must_equals(G,GG).
 correctArgsIsa(_,G,GG):- get_functor(G,F),t(functorDeclares,F),!,must_equals(G,GG).

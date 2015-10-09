@@ -47,7 +47,7 @@ end_of_file.
 	 ensureMt/1,
 	 isCycConstant/1,
 	 readCycL/2,
-	 %%user: termCyclify/2,
+	 %%user:  termCyclify/2,
          %constant/4,
 	 idGen/1,
 	 isCycOption/1,
@@ -164,7 +164,7 @@ end_of_file.
       isConsole/0,
       multi_transparent/1
 */
-:-module_transparent(user:nart/3).
+:-module_transparent(user: nart/3).
 
 
 cyc:cyc_magic.
@@ -176,13 +176,13 @@ asserta_if_new(A):-retract(A),fail.
 asserta_if_new(A):-asserta(A),!.
 
 :-current_file(F,Dir),writeq(current_file(F,Dir)),nl,!,
-   asserta_if_new(user:library_directory(Dir)),
+   asserta_if_new(user: library_directory(Dir)),
    asserta_if_new(user:file_search_path(cyc_api, Dir)),
    asserta_if_new(user:file_search_path(('.'), Dir)),!,
    asserta_if_new(cyc_magic_dir(Dir)),!.
 
 addStagedDirs:-
-  cyc_magic_dir(Dir),expand_file_name('./stage*',X),member(A,X),absolute_file_name(A,[relative_to(Dir)],O),asserta_if_new(user:library_directory(O)),!.
+  cyc_magic_dir(Dir),expand_file_name('./stage*',X),member(A,X),absolute_file_name(A,[relative_to(Dir)],O),asserta_if_new(user: library_directory(O)),!.
 addStagedDirs.
 
 
@@ -204,7 +204,7 @@ hideTrace:-
    trace(ctrace/0, -all),
    trace(system:throw/1, +all),
    trace(system:print_message/2, +all),
-   trace(user:message_hook/3 , +all),
+   trace(user: message_hook/3 , +all),
    trace(system:message_to_string/2, +all).
 
 ctrace:-willTrace->trace;notrace.
@@ -244,14 +244,14 @@ dynamic_transparent([]):-!.
 dynamic_transparent([X]):-dynamic_transparent(X),!.
 dynamic_transparent([X|Xs]):-!,dynamic_transparent(X),dynamic_transparent(Xs),!.
 dynamic_transparent(M:F/A):-!, module_transparent(M:F/A),dynamic(M:F/A).
-dynamic_transparent(F/A):-!,multi_transparent(user:F/A).
+dynamic_transparent(F/A):-!,multi_transparent(user: F/A).
 dynamic_transparent(X):-functor(X,F,A),dynamic_transparent(F/A),!.
 
 multi_transparent([]):-!.
 multi_transparent([X]):-multi_transparent(X),!.
 multi_transparent([X|Xs]):-!,multi_transparent(X),multi_transparent(Xs),!.
 multi_transparent(M:F/A):-!, module_transparent(M:F/A),dynamic(M:F/A),multifile(M:F/A).
-multi_transparent(F/A):-!,multi_transparent(user:F/A).
+multi_transparent(F/A):-!,multi_transparent(user: F/A).
 multi_transparent(X):-functor(X,F,A),multi_transparent(F/A),!.
    
 :-multi_transparent(cycHolds/1).
@@ -408,7 +408,7 @@ unusedCycL(_:end_fo_file).
 %unusedCycL(_:comment(_,_)).
 %unusedCycL(_:isa(A,'Property')):-nonvar(A),!.
 
-cycSync:-user:cycCacheToDo(Out),cycSync(Out),fail.
+cycSync:-user: cycCacheToDo(Out),cycSync(Out),fail.
 cycSync:-!.%%d3Info.
 
 cycSync(_:end_fo_file):-!.
@@ -654,7 +654,7 @@ finishCycConnection(SocketId,OutStream,InStream):-
 cycInfo:- % will add more 
    listing(cycConnectionAvalable),
    listing(cycConnectionUsed),
-%   listing(user:isCycConstantMade),
+%   listing(user: isCycConstantMade),
   % listing('$CycOption'),
    number_of_clauses(cycCache(_)),
    number_of_clauses(cycCacheToDo(_)).
@@ -1448,7 +1448,7 @@ isDebug(Call):- isDebug -> Call ; true.
 :-dynamic_transparent(cyc:cachable_query/1).
 :-dynamic_transparent(cyc:cached_query/2).
 
-user:save_cached_query:-
+user: save_cached_query:-
    tell(saved_cached_queries),
    listing_cq,
    told.
@@ -1479,7 +1479,7 @@ listingWithnumberVars(F/A):-
 listingWithnumberVars(F/A).
 
 
-:-exists_file(saved_cached_queries)->true;user:save_cached_query.
+:-exists_file(saved_cached_queries)->true;user: save_cached_query.
 
 :-catch([saved_cached_queries],_,true).
 
@@ -1821,24 +1821,24 @@ unquoteAtom(Atom,New):-concat_atom(LIST,'"',Atom),concat_atom(LIST,'',New),!.
 % ============================================
 
 :-dynamic_transparent(makeConstant/0).
-:-dynamic_transparent(user:isCycConstantMade/1).
+:-dynamic_transparent(user: isCycConstantMade/1).
 :-dynamic_transparent(isCycConstantNever/1).
 :-dynamic_transparent(isCycConstantNever/2).
 :-dynamic_transparent(isCycConstantGuess/1).
 :-dynamic_transparent(isCycConstantGuess/2).
 
 
-user:isCycConstantMade(isa).
-user:isCycConstantMade(or).
-user:isCycConstantMade(genls).
-user:isCycConstantMade('UniversalVocabularyMt').
-user:isCycConstantMade('BaseKB').
-user:isCycConstantMade('Collection').
-user:isCycConstantMade('Predicate').
-user:isCycConstantMade('Microtheory').
-user:isCycConstantMade(X):-constant(X,_,_,_).
+user: isCycConstantMade(isa).
+user: isCycConstantMade(or).
+user: isCycConstantMade(genls).
+user: isCycConstantMade('UniversalVocabularyMt').
+user: isCycConstantMade('BaseKB').
+user: isCycConstantMade('Collection').
+user: isCycConstantMade('Predicate').
+user: isCycConstantMade('Microtheory').
+user: isCycConstantMade(X):-constant(X,_,_,_).
 
-%user:isCycConstantMade(X):-nonvar(X),isCycConstantGuess(X).
+%user: isCycConstantMade(X):-nonvar(X),isCycConstantGuess(X).
 
 
 isCycConstantGuess(X):-nonvar(X),isCycConstant(X).
@@ -1879,12 +1879,12 @@ isCycConstantNever(_,'4').
 :-dynamic_transparent(termCyclify/2).
 
 isCycConstant(Const):-(var(Const);is_ftString(Const);number(Const)),!,fail.
-isCycConstant(Const):-user:isCycConstantMade(Const),!.
+isCycConstant(Const):-user: isCycConstantMade(Const),!.
 isCycConstant(Const):-cyc:constant(Const,_,_,_),!.
 isCycConstant(Const):-cycHolds(isa,Const,_),!.
 %isCycConstant(Const):-termCyclify(Const,_),!,fail.
 isCycConstant(Const):-atom(Const),atom_concat('#$',X,Const),!,isCycConstant(X).
-isCycConstant(Const):-sformat(S,'(find-constant "~w")',[Const]),converseRaw(S,R),!,R=[35|_],asserta(user:isCycConstantMade(Const)).
+isCycConstant(Const):-sformat(S,'(find-constant "~w")',[Const]),converseRaw(S,R),!,R=[35|_],asserta(user: isCycConstantMade(Const)).
 
 
 :-dynamic(aliasConstant/2).
@@ -1915,14 +1915,14 @@ makeConstant(Const):-
    (isCycConstant(Const)->true;
    (sformat(String,'(CREATE-CONSTANT "~w")',[Const]),
    debugOnFailure(converse(String)),
-   asserta(user:isCycConstantMade(Const)))),!.
+   asserta(user: isCycConstantMade(Const)))),!.
 
 %makeConstant(_Const):-!.
 killConstant(Const):-atom_concat('#$',New,Const),!,killConstant(New).
 killConstant(Const):-
    sformat(String,'(FI-KILL (find-or-create-constant "~w"))',[Const]),
    debugOnFailure(converse(String)),
-   retractall(user:isCycConstantMade(Const)),!.
+   retractall(user: isCycConstantMade(Const)),!.
 
 % ============================================
 % Make new Microtheory
@@ -1996,7 +1996,7 @@ registerCycPred(Mt,Pred,Arity):-isRegisterCycPred_lc(Mt,Pred,Arity),!.
 registerCycPred(Mt,Pred,Arity):-
       functor(Term,Pred,Arity),
       ignore(defaultAssertMt(Mt)),
-      asserta(( user:Term :- cycQuery(Term,Mt))),
+      asserta(( user: Term :- cycQuery(Term,Mt))),
       %asserta(( Mt:Term :- cycQuery(Term,Mt))),
       assertz(isRegisterCycPred_lc(Mt,Pred,Arity)),!.
 
@@ -2006,7 +2006,7 @@ registerCycPred(Mt,Pred,Arity):-
 %
 % ============================================
 % '$undefined_procedure'(Module, Name, Arity, Action) :- current_prolog_flag(autoload, true), '$autoload'(Module, Name, Arity), !,Action = retry.
-%%TODO user:exception(undefined_predicate, Pred ,retry):- isCycOption(hookCycPredicates,true),cycDefineOrFail(Pred).
+%%TODO user: exception(undefined_predicate, Pred ,retry):- isCycOption(hookCycPredicates,true),cycDefineOrFail(Pred).
 
 cycDefineOrFail(Mod:Pred/Arity):-atom_concat('#$',_,Pred),
       cycDefineOrFail(Mod,Pred,Arity).
@@ -2343,7 +2343,7 @@ variable(VN)-->  ['?',A], { var_number(A,VN)   } .
 
 checkValidConstAtoms(UQ,R):-not(member(UQ,['(',')','<','>','?','.','#'])),
       once(is_list(UQ) -> (stringToList(RR,UQ),R=string(RR)) ; R=UQ),!.
-      %once(user:isCycConstantMade(UQ) -> true; assert(user:isCycConstantMade(UQ))),
+      %once(user: isCycConstantMade(UQ) -> true; assert(user: isCycConstantMade(UQ))),
 
                                                 %preconditionFor-Props
 constant(Constant) -->  ['#$'],{!},symname(C1) , { atom_concat('#$',C1,Constant)}.
@@ -3193,7 +3193,7 @@ cfaslWrite(Out,ist(Mt,Assert)):-put(Out,51),put(Out,33),cfaslWrite(Out,Assert),c
 
 :-module_transparent(constant/4).
 :-dynamic(constant/4).
-%user:constant(A,B,C,D):-cyc:constant(A,B,C,D).
+%user: constant(A,B,C,D):-cyc:constant(A,B,C,D).
 
 :-dynamic(constantGuid/2).
 constantGuid(Const,ID):-cyc:constant(Const,_,ID,_).
@@ -3229,7 +3229,7 @@ isTrue(_).
 
 
 
-:-module_transparent(user:nart/3).
+:-module_transparent(user: nart/3).
 
 nart(not,not,not).
 toNart(Id,Nart):-nart(Id,_,Nart),!.
@@ -3326,7 +3326,7 @@ cycGoal(X,Y,Z):-functor(X,F,_),sformat(S,'"~q is not defined in the API"',[F]),t
 %cycGoal(['DEFVAR',NAME,VALUE|_],ToplevelVars,NAME).
 
 
-user:keepUpWithAssertions:-
+user: keepUpWithAssertions:-
       evalSubL('(assertion-count)',X:Var),
        flag('$cyc_assertion_pointer',_,X-100),
        crawlAssertionsBG.

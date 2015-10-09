@@ -6,7 +6,7 @@
 user:file_search_path(pack,'/devel/PrologMUD/packs').
 :- attach_packs.
 
-:- user:ensure_loaded(library(logicmoo/logicmoo_utils)).
+:-  'lmbase':ensure_loaded(library(logicmoo/logicmoo_utils)).
 
 % not(P):- \+ P.
 

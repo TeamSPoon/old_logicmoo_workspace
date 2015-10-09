@@ -19,13 +19,13 @@
 % ============================================
 :-dynamic(tSet/1).
 
-% user:hasInstance_dyn(W,SS):-nonvar(W),nonvar(SS),SS=isKappaFn(_,S),nonvar(S),!.
+% user: hasInstance_dyn(W,SS):-nonvar(W),nonvar(SS),SS=isKappaFn(_,S),nonvar(S),!.
 
 
 
 /*
-disabled a(T,I):- not(current_predicate(deduce_M/1)),!,user:hasInstance_dyn(T,I).
-disabled a(T,I):- !, (mudIsa_motel(I,T) *-> true ; (((atom(I),must(not(user:hasInstance_dyn(T,I)))),fail))).
+disabled a(T,I):- not(current_predicate(deduce_M/1)),!,user: hasInstance_dyn(T,I).
+disabled a(T,I):- !, (mudIsa_motel(I,T) *-> true ; (((atom(I),must(not(user: hasInstance_dyn(T,I)))),fail))).
 disabled a(T,I):- rdf_x(I,rdf:type,T).
 */
 
@@ -64,7 +64,7 @@ never_type_f('clause_asserted').
 never_type_f('onSpawn').
 never_type_f('ensure_loaded').
 never_type_f('declare_load_dbase').
-never_type_f('user:ensure_loaded').
+never_type_f('user: ensure_loaded').
 never_type_f('meta_predicate').
 never_type_f('Area1000').
 never_type_f(iPlayer2).
@@ -169,7 +169,7 @@ not_ft(T):-nonvar(T),not_ft_quick(T),not(a(ttFormatType,T)).
 not_ft_quick(T):-nonvar(T),(T=tItem;T=tRegion;T=tCol;T=completelyAssertedCollection;transitive_subclass_or_same(T,tTemporalThing)).
 
 :-export(asserted_subclass/2).
-asserted_subclass(I,T):- ((t_l:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([genls,I,T])).
+asserted_subclass(I,T):- ((t_l:useOnlyExternalDBs,!);lmconf:use_cyc_database),(kbp_t([genls,I,T])).
 asserted_subclass(T,ST):- t(genls,T,ST).
 
 chk_ft(T):- not_ft_quick(T),!,fail.
@@ -315,7 +315,7 @@ tCol_gen(T):- no_repeats(T,(ttTemporalType(T);completelyAssertedCollection(T);tS
 % ==========================
 isa(I,T):- cwc,isa_backchaing(I,T).
 %a(P,F):-loop_check(isa(F,P)).
-%a(T,I):- thglobal:pfcManageHybrids,clause_safe(isa(I,T),true).
+%a(T,I):- lmconf:pfcManageHybrids,clause_safe(isa(I,T),true).
 :-export(isa_backchaing/2).
 
 
@@ -377,7 +377,7 @@ isa_asserted_0(F,tCol):-isa_from_morphology(F,Col),atom_concat(_,'Type',Col),ari
 isa_asserted_0(isInstFn(I),T):-nonvar(I),trace,!,T=I.
 isa_asserted_0(aRelatedFn(T,_),I):-nonvar(T),!,T=I.
 isa_asserted_0(aRelatedFn(T,_,_),I):-nonvar(T),!,T=I.
-isa_asserted_0(I,T):- ((t_l:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([isa,I,T]);kbp_t([T,I])).
+isa_asserted_0(I,T):- ((t_l:useOnlyExternalDBs,!);lmconf:use_cyc_database),(kbp_t([isa,I,T]);kbp_t([T,I])).
 isa_asserted_0(ttPredType, completelyAssertedCollection):-!.
 isa_asserted_0(I,T):- atom(I),isa_from_morphology(I,T).
 isa_asserted_0(I,T):- (atom(I);atom(T)),type_isa(I,T).
@@ -481,11 +481,11 @@ assert_subclass_safe(O,T):-
 :-export(assert_isa_safe/2).
 assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(O,T))).
 
-%OLD user:decl_database_hook(change(assert,_A_or_Z),genls(S,C)):-decl_type_safe(S),decl_type_safe(C).
+%OLD user: decl_database_hook(change(assert,_A_or_Z),genls(S,C)):-decl_type_safe(S),decl_type_safe(C).
 
 
-%OLD user:decl_database_hook(change(assert,_A_or_Z),isa(W,ttTemporalType)):-decl_type_safe(W). %,call_after_mpred_load(forall(isa(I,W),create_instance(I,W))).
-%OLD user:decl_database_hook(change(assert,_A_or_Z),isa(W,tCol)):- (test_tl(infSupertypeName);true),guess_supertypes(W).
+%OLD user: decl_database_hook(change(assert,_A_or_Z),isa(W,ttTemporalType)):-decl_type_safe(W). %,call_after_mpred_load(forall(isa(I,W),create_instance(I,W))).
+%OLD user: decl_database_hook(change(assert,_A_or_Z),isa(W,tCol)):- (test_tl(infSupertypeName);true),guess_supertypes(W).
 
 :-dynamic(tried_guess_types_from_name/1).
 :-dynamic(did_learn_from_name/1).
@@ -520,7 +520,7 @@ guess_typetypes_0(TtTypeType):-atom_concat(tt,TypeType,TtTypeType),atom_concat(T
 /*
 system:term_expansion(isa(Compound,PredArgTypes),
   (:-dmsg(mpred_add(wizza(Compound,PredArgTypes))))):-
-  user:isa_pred_now_locked,
+  user: isa_pred_now_locked,
    ground(Compound:PredArgTypes),show_call(mpred_add(isa(Compound,PredArgTypes))),!.
 */
 
@@ -542,7 +542,7 @@ isa_mpred_provide_storage_clauses(H,true,hasInstanceCI):-
 %isa_mpred_provide_storage_clauses(isa(I,C),B,W):-nonvar(C),append_term(C,I,H),mpred_t_mpred_storage_clauses_rules(H,B,W).
 
 
-user:mpred_provide_storage_clauses(H,B,(What)):-fail,isa_mpred_provide_storage_clauses(H,B,What).
+user: mpred_provide_storage_clauses(H,B,(What)):-fail,isa_mpred_provide_storage_clauses(H,B,What).
 
 % isa_backchaing(I,T):- stack_depth(Level),Level>650,trace_or_throw(skip_dmsg_nope(failing_stack_overflow(isa_backchaing(I,T)))),!,fail.
 
@@ -599,11 +599,11 @@ assert_isa_reversed(T,I):-assert_isa(I,T).
 % ================================================
 % assert_isa HOOKS
 % ================================================
-%OLD user:decl_database_hook(_,genls(_,_)):-retractall(a(_,isa,_,_)),retractall(a(_,genls,_,_)).
-%OLD user:decl_database_hook(change(assert,_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace(doall(assert_isa_hooked(I,T))).
-%OLD user:decl_database_hook(change(assert,_),isa(I,T)):- assert_hasInstance(T,I),fail.
+%OLD user: decl_database_hook(_,genls(_,_)):-retractall(a(_,isa,_,_)),retractall(a(_,genls,_,_)).
+%OLD user: decl_database_hook(change(assert,_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace(doall(assert_isa_hooked(I,T))).
+%OLD user: decl_database_hook(change(assert,_),isa(I,T)):- assert_hasInstance(T,I),fail.
 
-%OLD user:decl_database_hook(change( retract,_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
+%OLD user: decl_database_hook(change( retract,_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
 
 assert_isa_hooked(A,_):-retractall(a(cache_I_L,isa,A,_)),fail.
 assert_isa_hooked(F,T):- a(ttPredType,T),decl_mpred(F,T),fail.
@@ -626,7 +626,7 @@ assert_isa_hooked(food5,tWeapon):-trace_or_throw(assert_isa(food5,tWeapon)).
 % assert_isa_hooked(I,T):-dmsg((told(assert_isa(I,T)))).
 
 
-%OLD user:decl_database_hook(change(assert,_),isa(I,T)):- doall(assert_isa_hooked_after(I,T)).
+%OLD user: decl_database_hook(change(assert,_),isa(I,T)):- doall(assert_isa_hooked_after(I,T)).
 
 assert_isa_hooked_after(F,T):-a(ttPredType,T),!,decl_mpred(F,T).
 assert_isa_hooked_after(_,tCol):-!.
@@ -648,8 +648,8 @@ impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_ta
 % assert_isa_hooked_creation(I,T):- doall((ttTemporalType(ST),impliedSubClass(T,ST),call_after_mpred_load((create_instance(I,ST,[isa(T)]))))).
 
 
-% :- asserta((user:isa(I,C):-loop_check(isa_backchaing(I,C)))).
-:- asserta(('$toplevel':isa(I,C):-user:isa(I,C))).
+% :- asserta((user: isa(I,C):-loop_check(isa_backchaing(I,C)))).
+:- asserta(('$toplevel':isa(I,C):-user: isa(I,C))).
 
 mpred_types_loaded.
 

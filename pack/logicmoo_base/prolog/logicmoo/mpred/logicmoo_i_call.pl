@@ -159,5 +159,5 @@ mpred_call_2(Call):-mpred_call_3(Call).
 mpred_call_3(Call):-on_x_rtrace(loop_check(if_defined(Call))).
 
 
-:- user:ensure_loaded(logicmoo(plarkc/logicmoo_i_call_kb)).
+:- user: ensure_loaded(logicmoo(plarkc/logicmoo_i_call_kb)).
 

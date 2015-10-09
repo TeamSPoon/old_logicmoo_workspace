@@ -8,8 +8,8 @@
 %
 */
 
-:- user:ensure_loaded(logicmoo(mpred/logicmoo_i_wff)).
-:- user:ensure_loaded(logicmoo_i_clausify).
+:- user: ensure_loaded(logicmoo(mpred/logicmoo_i_wff)).
+:- user: ensure_loaded(logicmoo_i_clausify).
 
 kif_hook(0=>0).
 kif_hook(0<=>0).
@@ -117,9 +117,9 @@ as_dlog(Fml,FmlO):- to_dlog_ops(OPS),subsT_each(Fml,OPS,FmlM),!,correct_arities(
 as_symlog(Fml,Fml):- leave_as_is(Fml),!.
 as_symlog(Fml,FmlO):- as_dlog(Fml,FmlM),to_symlog_ops(OPS),subsT_each(FmlM,OPS,FmlM),correct_arities(['v','&'],FmlM,FmlO).
 
-:- dynamic(thglobal:as_prolog/2).
-thglobal:as_prolog(Fml,Fml):- is_ftVar(Fml),!.
-thglobal:as_prolog(Fml,FmlO):- as_symlog(Fml,FmlM),
+:- dynamic(lmconf:as_prolog/2).
+lmconf:as_prolog(Fml,Fml):- is_ftVar(Fml),!.
+lmconf:as_prolog(Fml,FmlO):- as_symlog(Fml,FmlM),
   to_prolog_ops(OPS),subsT_each(FmlM,OPS,FmlO).
 
 
@@ -229,7 +229,7 @@ flatten_or_list(_KB,X,[X]).
 
 
 
-fmtl(X):- thglobal:as_prolog(X,XX), fmt(XX).
+fmtl(X):- lmconf:as_prolog(X,XX), fmt(XX).
 
 write_list([F|R]):- write(F), write('.'), nl, write_list(R).
 write_list([]).
@@ -496,8 +496,8 @@ tsn:- with_all_dmsg(forall(clause(kif,C),must(C))).
 :- dynamic(kif_test_string/1).
 tkif:- kif_test_string(TODO),kif_io(string(TODO),current_output).
 
-:- multifile(user:sanity_test/0).
-user:regression_test:- tsn.
+:- multifile(user: sanity_test/0).
+user: regression_test:- tsn.
 
 :- thread_local(kif_action_mode/1).
 :- asserta_if_new(kif_action_mode(tell)).
@@ -533,7 +533,7 @@ kif_io(InS,Out):-
 :- export(id_to_why/3).
 why_to_id(Term,Wff,IDWhy):- not(atom(Term)),term_to_atom(Term,Atom),!,why_to_id(Atom,Wff,IDWhy).
 why_to_id(Atom,Wff,IDWhy):- wid(IDWhy,Atom,Wff),!.
-why_to_id(Atom,Wff,IDWhy):- must(atomic(Atom)),gensym(Atom,IDWhyI),kb_incr(IDWhyI,IDWhy),assertz_if_new(user:wid(IDWhy,Atom,Wff)).
+why_to_id(Atom,Wff,IDWhy):- must(atomic(Atom)),gensym(Atom,IDWhyI),kb_incr(IDWhyI,IDWhy),assertz_if_new(user: wid(IDWhy,Atom,Wff)).
 
 :- export(kif_process/1).
 kif_process(end_of_file):- !.
@@ -570,13 +570,13 @@ kif_ask(P => Q):- kif_ask_sent(P => Q).
 kif_ask((P v Q)):- kif_ask_sent(((P v Q))).
 kif_ask((P & Q)):- kif_ask_sent((P & Q)).
 kif_ask(Goal0):-  logical_pos(_KB,Goal0,Goal),
-    no_repeats(user:(
+    no_repeats(user: (
 	add_args(Goal0,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],_ProofOut1,Goal1,_),!,
         search(Goal1,60,0,1,3,DepthIn,DepthOut))).
 
 :- export(kif_ask/2).
 kif_ask(Goal0,ProofOut):- logical_pos(_KB,Goal0,Goal),
-    no_repeats(user:(
+    no_repeats(user: (
 	add_args(Goal0,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],ProofOut1,Goal1,_),!,
         search(Goal1,60,0,1,3,DepthIn,DepthOut),
         contract_output_proof(ProofOut1,ProofOut))).
@@ -671,7 +671,7 @@ simplify_bodies((B),(BC)):- must_det_l((conjuncts_to_list(B,RB),simplify_list(_K
 
 simplify_list(KB,RB,BBS):- list_to_set(RB,BB),must_maplist(removeQ(KB),BB,BBO),list_to_set(BBO,BBS).
 
-save_wfs(Why,PrologI):- must_det_l((thglobal:as_prolog(PrologI,Prolog), 
+save_wfs(Why,PrologI):- must_det_l((lmconf:as_prolog(PrologI,Prolog), 
    w_tl(t_l:current_local_why(Why,Prolog),
    mpred_add_h(save_in_code_buffer,Why,Prolog)))).
 
@@ -770,6 +770,6 @@ boxlog_to_prolog(IN,OUT):-demodal_sents(_KB,IN,M),IN\=@=M,!,boxlog_to_prolog(M,O
 
 
 boxlog_to_prolog( H, HH):- H=..[F|ARGS],!,boxlog_to_prolog(ARGS,ARGSO),!,HH=..[F|ARGSO].
-boxlog_to_prolog(BL,PTTP):- thglobal:as_prolog(BL,PTTP).
+boxlog_to_prolog(BL,PTTP):- lmconf:as_prolog(BL,PTTP).
 
 

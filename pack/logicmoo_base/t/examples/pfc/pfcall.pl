@@ -6,7 +6,7 @@
 user:file_search_path(pack,'/devel/PrologMUD/packs').
 :- attach_packs.
 
-:- user:ensure_loaded(library(logicmoo/logicmoo_utils)).
+:-  'lmbase':ensure_loaded(library(logicmoo/logicmoo_utils)).
 
 %   File   : pfc
 %   Author : Tim Finin, finin@umbc.edu
@@ -169,7 +169,7 @@ mpred_default(GeneralTerm,Default) :-
 
 %% ain(P,S) asserts P into the dataBase with support from S.
 
-ain(P) :-  ain(P,(user,user)).
+ain(P) :-  ain(P,(  'lmbase', 'lmbase')).
 
 ain((=>P),S) :- ain(P,S).
 
@@ -306,7 +306,7 @@ remove_selection(P) :-
 
 
 % select_next_fact(P) identifies the next fact to reason from.  
-% It tries the user defined predicate first and, failing that, 
+% It tries the  'lmbase' defined predicate first and, failing that, 
 %  the default mechanism.
 
 select_next_fact(P) :- 
@@ -449,12 +449,12 @@ pfcRem(List) :-
   remlist(List).
   
 pfcRem(P) :- 
-  % pfcRem/1 is the user's interface - it withdraws user support for P.
-  pfcRem(P,(user,user)).
+  % pfcRem/1 is the  'lmbase''s interface - it withdraws  'lmbase' support for P.
+  pfcRem(P,(  'lmbase', 'lmbase')).
 
 remlist([H|T]) :-
   % pfcRem each element in the list.
-  pfcRem(H,(user,user)),
+  pfcRem(H,(  'lmbase', 'lmbase')),
   remlist(T).
 
 pfcRem(P,S) :-
@@ -467,12 +467,12 @@ pfcRem(P,S) :-
 
 %%
 %% mpred_rem2 is like pfcRem, but if P is still in the DB after removing the
-%% user's support, it is retracted by more forceful means (e.g. remove).
+%%  'lmbase''s support, it is retracted by more forceful means (e.g. remove).
 %%
 
 mpred_rem2(P) :- 
-  % mpred_rem2/1 is the user's interface - it withdraws user support for P.
-  mpred_rem2(P,(user,user)).
+  % mpred_rem2/1 is the  'lmbase''s interface - it withdraws  'lmbase' support for P.
+  mpred_rem2(P,(  'lmbase', 'lmbase')).
 
 mpred_rem2(P,S) :-
   pfcRem(P,S),
@@ -588,14 +588,14 @@ mpred_tms_supported(_,_P) :- true.
 
 
 %%
-%% a fact is well founded if it is supported by the user
+%% a fact is well founded if it is supported by the  'lmbase'
 %% or by a set of facts and a rules, all of which are well founded.
 %%
 
 wellFounded(Fact) :- wf(Fact,[]).
 
 wf(F,_) :-
-  % supported by user (axiom) or an "absent" fact (assumption).
+  % supported by  'lmbase' (axiom) or an "absent" fact (assumption).
   (axiom(F) ; assumption(F)),
   !.
 
@@ -620,13 +620,13 @@ wflist([X|Rest],L) :-
 % supports(+F,-ListofSupporters) where ListOfSupports is a list of the
 % supports for one justification for fact F -- i.e. a list of facts which,
 % together allow one to deduce F.  One of the facts will typidb_cally be a rule.
-% The supports for a user-defined fact are: [user].
+% The supports for a  'lmbase'-defined fact are: [ 'lmbase'].
 
 supports(F,[Fact|MoreFacts]) :-
   pfcGetSupport(F,(Fact,Trigger)),
   triggerSupports(Trigger,MoreFacts).
 
-triggerSupports(user,[]) :- !.
+triggerSupports(  'lmbase',[]) :- !.
 triggerSupports(Trigger,[Fact|MoreFacts]) :-
   pfcGetSupport(Trigger,(Fact,AnotherTrigger)),
   triggerSupports(AnotherTrigger,MoreFacts).
@@ -719,7 +719,7 @@ pfcDefineBcRule(Head,Body,ParentRule) :-
   buildRhs(Head,Rhs),
   pfcForEach(mpred_nf(Body,Lhs),
           (buildTrigger(Lhs,rhs(Rhs),Trigger),
-           ain(trigBC(Head,Trigger),(ParentRuleCopy,user)))).
+           ain(trigBC(Head,Trigger),(ParentRuleCopy, 'lmbase')))).
  
 
 
@@ -1010,7 +1010,7 @@ processRule(Lhs,Rhs,ParentRule) :-
   copy_term(ParentRule,ParentRuleCopy),
   buildRhs(Rhs,Rhs2),
   pfcForEach(mpred_nf(Lhs,Lhs2), 
-          buildRule(Lhs2,rhs(Rhs2),(ParentRuleCopy,user))).
+          buildRule(Lhs2,rhs(Rhs2),(ParentRuleCopy, 'lmbase'))).
 
 buildRule(Lhs,Rhs,Support) :-
   buildTrigger(Lhs,Rhs,Trigger),
@@ -1348,7 +1348,7 @@ pfcClassifyFacts([H|T],User,Pfc,[H|Rule]) :-
   pfcClassifyFacts(T,User,Pfc,Rule).
 
 pfcClassifyFacts([H|T],[H|User],Pfc,Rule) :-
-  pfcGetSupport(H,(user,user)),
+  pfcGetSupport(H,(  'lmbase', 'lmbase')),
   !,
   pfcClassifyFacts(T,User,Pfc,Rule).
 
@@ -1432,7 +1432,7 @@ pfcTraceAddPrint(P,S) :-
   !,
   copy_term(P,Pcopy),
   numbervars(Pcopy,0,_),
-  (S=(user,user)
+  (S=(  'lmbase', 'lmbase')
        -> format("~nAdding (u) ~w",[Pcopy])
         ; format("~nAdding ~w",[Pcopy])).
 
@@ -1587,7 +1587,7 @@ justifications(F,Js) :- bagof(J,justification(F,J),Js).
 
 %% base(P,L) - is true iff L is a list of "base" facts which, taken
 %% together, allows us to deduce P.  A base fact is an axiom (a fact 
-%% added by the user or a raw Prolog fact (i.e. one w/o any support))
+%% added by the  'lmbase' or a raw Prolog fact (i.e. one w/o any support))
 %% or an assumption.
 
 base(F,[F]) :- (axiom(F) ; assumption(F)),!.
@@ -1608,7 +1608,7 @@ bases([X|Rest],L) :-
   pfcUnion(Bx,Br,L).
 	
 axiom(F) :- 
-  pfcGetSupport(F,(user,user)); 
+  pfcGetSupport(F,(  'lmbase', 'lmbase')); 
   pfcGetSupport(F,(god,god)).
 
 %% an assumption is a failed goal, i.e. were assuming that our failure to 

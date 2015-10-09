@@ -485,7 +485,7 @@ maplist_safe(Pred,LISTIN, LIST):-!, findall(EE, ((member(E,LISTIN),on_f_debug(ap
 
 % = :- meta_predicate('match_predicates'(:,-)).
 
-match_predicates(M:Spec,Preds):- catch('$find_predicate'(M:Spec, Preds),_,catch('$find_predicate'(Spec, Preds),_,catch('$find_predicate'(user:Spec, Preds),_,fail))),!.
+match_predicates(M:Spec,Preds):- catch('$find_predicate'(M:Spec, Preds),_,catch('$find_predicate'(Spec, Preds),_,catch('$find_predicate'(user: Spec, Preds),_,fail))),!.
 match_predicates(MSpec,MatchesO):- catch('$dwim':'$find_predicate'(MSpec,Matches),_,Matches=[]),!,MatchesO=Matches.
 
 match_predicates(_:[],_M,_P,_F,_A):-!,fail.

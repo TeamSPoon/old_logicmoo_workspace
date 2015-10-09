@@ -8,7 +8,7 @@
 %
 */
 
-:- user:ensure_loaded(logicmoo_base).
+:- user: ensure_loaded(logicmoo_base).
 
 :- multifile(mpred_online:semweb_startup).
 
@@ -156,7 +156,7 @@ mpred_online:semweb_startup:- do_semweb_startup_late_once.
 :- on_x_rtrace(shell('wget http://localhost:3020/help/source/doc/devel/PrologMUD/pack/ClioPatria/hooks.pl')).
 */
 
-:- user:ensure_loaded(library(semweb/rdf_http_plugin)).
+:- user: ensure_loaded(library(semweb/rdf_http_plugin)).
 % :- on_x_rtrace(rdf_load('http://prologmoo.com/downloads/mud.ttl',[format(trig),graph(foobar)])),!.
 % :- on_x_rtrace(rdf_load('./mud.ttl',[format(trig),graph(foobar)])),!.
 %:- on_x_log_throw(eggdrop:deregister_unsafe_preds).
