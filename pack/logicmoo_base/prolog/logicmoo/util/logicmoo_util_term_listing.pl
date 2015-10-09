@@ -452,9 +452,9 @@ user:prolog_list_goal(Goal):- cnotrace(xlisting(Goal)). % writeq(hello(prolog_li
 % :- dynamic(buggery_ok/0).
 :- export(buggery_ok/0).
 :- thread_local(tlbugger:no_buggery_tl/0).
-:- dynamic(lmconfig:no_buggery/0).
+:- dynamic(lmconf:no_buggery/0).
 
-buggery_ok :- \+ compiling, current_predicate(_:logicmoo_bugger_loaded/0), \+ lmconfig:no_buggery, \+ tlbugger:no_buggery_tl.
+buggery_ok :- \+ compiling, current_predicate(_:logicmoo_bugger_loaded/0), \+ lmconf:no_buggery, \+ tlbugger:no_buggery_tl.
 
 
 :- multifile((synth_clause_for/5)).

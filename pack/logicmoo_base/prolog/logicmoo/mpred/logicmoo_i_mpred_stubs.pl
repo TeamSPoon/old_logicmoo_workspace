@@ -693,6 +693,6 @@ ensure_universal_stub_plus_2(F,A2):-
    AMinus2 is A2 -2,
    assert_if_new((HEAD:-HEADMinus2)),!,
   % compile_predicates([HEAD]),
-   user: mpred_mod(M),
+   lmconf:mpred_user_kb(M),
    decl_mpred_hybrid(M,F,AMinus2).
 

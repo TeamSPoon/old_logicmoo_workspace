@@ -260,11 +260,11 @@ retract_can_table :- retractall(maybe_table_key(_)).
 :- dynamic(lmhook:mpred_on_expire_caches/1).
 :- module_transparent((ex)/0).
 
-:- dynamic(lmconfig:already_added_this_round/1).
-:- export(lmconfig:already_added_this_round/1).
-expire_dont_add:-retractall(lmconfig:already_added_this_round(_)),mpred_expire_caches(all),nop(dmsg(expire_dont_add)).
+:- dynamic(lmconf:already_added_this_round/1).
+:- export(lmconf:already_added_this_round/1).
+expire_dont_add:-retractall(lmconf:already_added_this_round(_)),mpred_expire_caches(all),nop(dmsg(expire_dont_add)).
 
-lex:-listing(lmcache:ilc(_)),forall(current_predicate(lmcache:F/A),listing(lmcache:F/A)),catchvv(listing(lmconfig:already_added_this_round),_,true).
+lex:-listing(lmcache:ilc(_)),forall(current_predicate(lmcache:F/A),listing(lmcache:F/A)),catchvv(listing(lmconf:already_added_this_round),_,true).
 (ex):-mpred_expire_caches(_),retractall(lmcache:ilc(_)),dmsg_showall(_),forall(current_predicate(lmcache:F/A),(functor(RA,F,A),retractall(RA))),catchvv(expire_dont_add,_,true).
 
 mpred_expire_caches(A):-doall(call_no_cuts(must(lmhook:mpred_on_expire_caches(A)))).
@@ -357,7 +357,7 @@ outside_of_loop_check:- (clause(lmcache:ilc(_),B)->B=(!,fail);true).
 %system:goal_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
 %system:term_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
 % user:term_expansion(LC,LCOO):-nonvar(LC),(LC=(H:-B)),lco_goal_expansion(B,BE),B\=@=BE,((H:-BE)=LCOO).
-user:gioal_expansion(LC,LCOO):- notrace((current_predicate(_:logicmoo_bugger_loaded/0),once(lco_goal_expansion(LC,LCOO)),LC\=@=LCOO)).
+user:goal_expansion(LC,LCOO):- notrace((current_predicate(_:logicmoo_bugger_loaded/0),once(lco_goal_expansion(LC,LCOO)),LC\=@=LCOO)).
 
 
 

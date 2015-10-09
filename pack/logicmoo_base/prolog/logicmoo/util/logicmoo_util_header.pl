@@ -9,24 +9,24 @@
 	user:prolog_list_goal/1,
 	user:prolog_predicate_name/2,
 	user:prolog_clause_name/2,
-        lmconfig:mpred_is_impl_file/1.
+        lmconf:mpred_is_impl_file/1.
 :- dynamic
 	user:portray/1,
-        lmconfig:mpred_is_impl_file.
+        lmconf:mpred_is_impl_file.
 
 :- prolog_load_context(source,F), 
-   once(lmconfig:mpred_is_impl_file(F);asserta(lmconfig:mpred_is_impl_file(F))).
+   once(lmconf:mpred_is_impl_file(F);asserta(lmconf:mpred_is_impl_file(F))).
 
 % ===================================================================
 % Creates a warning if we are in the incorrect context
 % ===================================================================
 /*
 :- if(current_predicate(logicmoo_utils:combine_logicmoo_utils/0)).
-:- multifile(lmconfig:logicmoo_utils_separate/0).
-lmconfig:logicmoo_utils_separate.
+:- multifile(lmconf:logicmoo_utils_separate/0).
+lmconf:logicmoo_utils_separate.
 :- set_prolog_flag(generate_debug_info, true).
 :- else.
-:- \+ lmconfig:logicmoo_utils_separate.
+:- \+ lmconf:logicmoo_utils_separate.
 :- endif.
 */
 

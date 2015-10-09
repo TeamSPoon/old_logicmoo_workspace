@@ -244,7 +244,9 @@
             writeFileToStream/2,
             writeOverwritten/0,
             writeSTDERR0/1,
-            writeSavedPrompt/0
+            writeSavedPrompt/0,
+     op(1150,fx,(user: dynamic_multifile_exported))
+
           ]).
 :- multifile
         logLevel/2.
@@ -1266,11 +1268,11 @@ do_gc0:- set_prolog_flag(gc,true), do_gc1, set_prolog_flag(gc,false).
 do_gc1:- cnotrace((garbage_collect, garbage_collect_atoms /*garbage_collect_clauses*/ /*, statistics*/
                     )).
 
-:- multifile(lmconfig:is_prolog_stream/1).
-:- dynamic(lmconfig:is_prolog_stream/1).
+:- multifile(lmconf:is_prolog_stream/1).
+:- dynamic(lmconf:is_prolog_stream/1).
 
 fresh_line:-current_output(Strm),fresh_line(Strm),!.
-fresh_line(Strm):-lmconfig:is_prolog_stream(Strm),on_x_fail(format(Strm,'~n',[])),!.
+fresh_line(Strm):-lmconf:is_prolog_stream(Strm),on_x_fail(format(Strm,'~n',[])),!.
 fresh_line(Strm):-on_x_fail(format(Strm,'~N',[])),!.
 fresh_line(Strm):-on_x_fail((stream_property(Strm,position('$stream_position'(_,_,POS,_))),(POS>0->nl(Strm);true))),!.
 fresh_line(Strm):-on_x_fail(nl(Strm)),!.
@@ -1381,7 +1383,7 @@ atom_contains666(F,C):- hotrace((atom(F),atom(C),sub_atom(F,_,_,_,C))).
 
 real_builtin_predicate(G):- predicate_property(G,foreign),!.
 real_builtin_predicate(G):- strip_module(G,_,GS),(predicate_property(prolog:GS,built_in);predicate_property(system:GS,built_in)),!.
-real_builtin_predicate(G):- predicate_property(G,built_in),functor(G,F,_), lmconfig:mpred_system_kb(M), (if_defined(M:mpred_isa(F,prologHybrid));if_defined(kb:mpred_isa(F,prologHybrid))).
+real_builtin_predicate(G):- predicate_property(G,built_in),functor(G,F,_), lmconf:mpred_system_kb(M), (if_defined(M:mpred_isa(F,prologHybrid));if_defined(kb:mpred_isa(F,prologHybrid))).
 
 will_debug_else_throw(E,Goal):- dmsg(bugger(will_debug_else_throw(E,Goal))),grtrace,Goal.
 
@@ -1969,7 +1971,7 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
 :- multifile(user: message_hook/3). 
 :- dynamic(user: message_hook/3).
 hook_message_hook:- asserta((user: message_hook(Term, Kind, Lines):-  if_defined(buggery_ok), (Kind= warning;Kind= error),Term\=syntax_error(_), 
- current_predicate(_:logicmoo_bugger_loaded/0), \+ lmconfig:no_buggery, \+ tlbugger:no_buggery_tl,
+ current_predicate(_:logicmoo_bugger_loaded/0), \+ lmconf:no_buggery, \+ tlbugger:no_buggery_tl,
   dmsg(message_hook(Term, Kind, Lines)),hotrace(dumpST(20)),dmsg(message_hook(Term, Kind, Lines)),
 
   % (repeat,get_single_char(C),dumptrace(true,C),!),

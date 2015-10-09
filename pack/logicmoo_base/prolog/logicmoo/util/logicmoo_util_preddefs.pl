@@ -268,7 +268,7 @@ get_module_of_4(_P,F,A,M):- current_predicate(M0:F0/A0),F0=F,A0=A,!,M=M0.
 get_module_of_4(P,F,A,M):-trace_or_throw((get_module_of_4(P,F,A,M))).
 
 /*
-get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,lmconfig:mpred_user_kb(M).
+get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,lmconf:mpred_user_kb(M).
 get_module_of_4(_P,F,A,_M):-trace, isCycPredArity(F,A),!,fail.
 get_module_of_4(P,F,A,M):- trace, debugCall(get_module_of_4(P,F,A,M)).
 */

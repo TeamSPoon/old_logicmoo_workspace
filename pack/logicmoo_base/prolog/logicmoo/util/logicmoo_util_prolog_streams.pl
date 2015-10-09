@@ -29,8 +29,8 @@
 
 :- discontiguous some_test/0.
 
-:- multifile(lmconfig:is_prolog_stream/1).
-:- dynamic(lmconfig:is_prolog_stream/1).
+:- multifile(lmconf:is_prolog_stream/1).
+:- dynamic(lmconf:is_prolog_stream/1).
 
 %=	open_prolog_stream(+Module, +Mode, -Stream, +Options)
 %

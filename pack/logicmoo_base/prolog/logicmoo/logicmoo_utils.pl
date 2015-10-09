@@ -17,26 +17,26 @@
 % ===================================================================
 */
 % We save the name of the module loading this module
-%:- if(( \+ current_predicate(lmconfig:logicmoo_utils_separate/0);( \+lmconfig:logicmoo_utils_separate))).
+%:- if(( \+ current_predicate(lmconf:logicmoo_utils_separate/0);( \+lmconf:logicmoo_utils_separate))).
 
 :- module(logicmoo_utils,[]).
 
-:- dynamic(lmconfig:logicmoo_utils_separate/0).
-:- retractall(lmconfig:logicmoo_utils_separate).
+:- dynamic(lmconf:logicmoo_utils_separate/0).
+:- retractall(lmconf:logicmoo_utils_separate).
 :- set_prolog_flag(generate_debug_info, true).
 
 :- multifile(lmhook:mpred_hook_init_files/0).
 :- dynamic(lmhook:mpred_hook_init_files/0).
 
-:- if( \+ current_predicate(lmconfig:mpred_user_kb/1)).
-:- multifile(lmconfig:mpred_user_kb/1).
-:- dynamic(lmconfig:mpred_user_kb/1).
+:- if( \+ current_predicate(lmconf:mpred_user_kb/1)).
+:- multifile(lmconf:mpred_user_kb/1).
+:- dynamic(lmconf:mpred_user_kb/1).
 :- endif.
-:- if( \+ current_predicate(lmconfig:mpred_system_kb/1)).
-:- multifile(lmconfig:mpred_system_kb/1).
-:- dynamic(lmconfig:mpred_system_kb/1).
+:- if( \+ current_predicate(lmconf:mpred_system_kb/1)).
+:- multifile(lmconf:mpred_system_kb/1).
+:- dynamic(lmconf:mpred_system_kb/1).
 :- endif.
-:- lmconfig:mpred_system_kb(_)->true;('$module'(M,M),asserta(lmconfig:mpred_system_kb(M))).
+:- lmconf:mpred_system_kb(_)->true;('$module'(M,M),asserta(lmconf:mpred_system_kb(M))).
 
 % ======================================================
 % Add Extra file_search_paths
@@ -66,9 +66,9 @@ add_file_search_path(Name,UpUp):-
 % ======================================================
 % Pre-release Sanity tests
 % ======================================================
-:- dynamic(lmconfig:logicmoo_pre_release/0).
-lmconfig:logicmoo_pre_release.
-:- if(lmconfig:logicmoo_pre_release).
+:- dynamic(lmconf:logicmoo_pre_release/0).
+lmconf:logicmoo_pre_release.
+:- if(lmconf:logicmoo_pre_release).
 
 
 :- set_prolog_flag(report_error,true),set_prolog_flag(debug_on_error,true),set_prolog_flag(debug, true).
@@ -87,9 +87,9 @@ lmconfig:logicmoo_pre_release.
 % ======================================================
 % Pre-release Should check if autoloading messes up anything
 % ======================================================
-:- dynamic(lmconfig:logicmoo_scan_autoloads/0).
-% lmconfig:logicmoo_scan_autoloads
-:- if(lmconfig:logicmoo_scan_autoloads).
+:- dynamic(lmconf:logicmoo_scan_autoloads/0).
+% lmconf:logicmoo_scan_autoloads
+:- if(lmconf:logicmoo_scan_autoloads).
 :- set_prolog_flag(verbose_autoload, false).
 :- autoload.
 :- set_prolog_flag(verbose_autoload, true).
@@ -106,7 +106,7 @@ logicmoo_utils:term_expansion((:-use_module(Name)), :-true):- atom(Name),atom_co
 % ======================================================
 % Include separated logicmoo util file
 % ======================================================
-:- lmconfig:mpred_system_kb(M), M:((
+:- lmconf:mpred_system_kb(M), M:((
  ensure_loaded(util/logicmoo_util_first),
  ensure_loaded(util/logicmoo_util_database),
  ensure_loaded(util/logicmoo_util_bugger_catch),
@@ -143,7 +143,7 @@ logicmoo_utils:term_expansion((:-use_module(Name)), :-true):- atom(Name),atom_co
 % :- use_module(util/logicmoo_util_dcg).
 % :- ensure_loaded(util/logicmoo_util_help).
 
-:- lmconfig:mpred_system_kb(M),M:use_module(util/logicmoo_util_strings).
+:- lmconf:mpred_system_kb(M),M:use_module(util/logicmoo_util_strings).
 
 unused:- M= logicmoo_utils, 
      doall((current_predicate(_,M:P),functor(P,F,A),

@@ -555,7 +555,7 @@ mpred_impl_module(tlbugger).
 mpred_impl_module(lmcache).
 mpred_impl_module(lmhook).
 mpred_impl_module(logicmoo_varnames).
-mpred_impl_module(M):- lmconfig:mpred_is_impl_file(F),make_module_name(F,M).
+mpred_impl_module(M):- lmconf:mpred_is_impl_file(F),make_module_name(F,M).
 mpred_impl_module(M):- current_module(M),atom_concat(logicmoo_utils_,_,M).
 % mpred_impl_module(user).
 

@@ -121,7 +121,7 @@ inside_queue(Q,E) :- %  trace_or_throw(inside_queue(Q,E)),!,fail.
 
 
 %:- export(pred_info/2).
-pred_info(H,Props):- get_functor(H,F,_),lmconfig:mpred_system_kb(M),findall(PP,M:kb:mpred_isa(F,PP),Props).
+pred_info(H,Props):- get_functor(H,F,_),lmconf:mpred_system_kb(M),findall(PP,M:kb:mpred_isa(F,PP),Props).
 
 
 

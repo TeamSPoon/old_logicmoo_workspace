@@ -69,7 +69,7 @@ agenda_do_prequery:- loop_check(agenda_rescan_mpred_ops,true),!.
 %:- agenda_rescan_mpred_props.
 
 
-:- sanity(user: mpred_mod(user)).
+:- sanity(lmconf:mpred_user_kb(user)).
 
 :-export(agenda_slow_op_restart/0).
 :-dynamic(doing_agenda_slow_op/0).
@@ -251,14 +251,14 @@ setTemplate(X):-add(X).
 
 englishServerInterface(SomeEnglish):-dmsg(todo(englishServerInterface(SomeEnglish))).
 
-:-multifile(user: call_OnEachLoad/1).
-:-export(user: call_OnEachLoad/1).
-:-dynamic(user: call_OnEachLoad/1).
+:-multifile(lmconf:call_OnEachLoad/1).
+:-export(lmconf:call_OnEachLoad/1).
+:-dynamic(lmconf:call_OnEachLoad/1).
 
 :-export(onLoad/1).
 onLoad(C):-call_after_mpred_load(C).
 :-export(user: onEachLoad/1).
-onEachLoad(C):-assert_if_new(user: call_OnEachLoad(C)).
+onEachLoad(C):-assert_if_new(lmconf:call_OnEachLoad(C)).
 
 
 call_after_mpred_load_slow(A):-dmsg(call_after_mpred_load_slow(A)).

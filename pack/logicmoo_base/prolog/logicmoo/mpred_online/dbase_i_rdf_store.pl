@@ -698,8 +698,8 @@ sync_to_rdf:-
    forall(t(C,I),rdf_assert_hook(isa(I,C))),
    forall(is_known_trew(B),rdf_assert_hook(B)),
    (lmconf:using_rdf_mpred_hook -> true ; (asserta(lmconf:using_rdf_mpred_hook),forall(prologHybridFact(G),rdf_assert_hook(G)))),
-   asserta_if_new(user: call_OnEachLoad(sync_to_rdf)),
-   asserta_if_new(user: call_OnEachLoad(sync_from_rdf)),
+   asserta_if_new(lmconf:call_OnEachLoad(sync_to_rdf)),
+   asserta_if_new(lmconf:call_OnEachLoad(sync_from_rdf)),
    !.
 
 
@@ -708,7 +708,7 @@ mpred_online:semweb_startup:- must(sync_from_rdf).
 mpred_online:semweb_startup:- must(sync_to_rdf).
 
 
-:- multifile(user: call_OnEachLoad/1).
-mpred_online:semweb_startup:- asserta_if_new(user: call_OnEachLoad(sync_to_rdf)).
-mpred_online:semweb_startup:- asserta_if_new(user: call_OnEachLoad(sync_from_rdf)).
+:- multifile(lmconf:call_OnEachLoad/1).
+mpred_online:semweb_startup:- asserta_if_new(lmconf:call_OnEachLoad(sync_to_rdf)).
+mpred_online:semweb_startup:- asserta_if_new(lmconf:call_OnEachLoad(sync_from_rdf)).
 

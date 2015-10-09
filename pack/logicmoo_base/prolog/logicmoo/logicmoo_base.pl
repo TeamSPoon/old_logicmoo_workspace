@@ -60,7 +60,7 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 
 
 % ========================================
-% user: mpred_mod/1
+% lmconf:mpred_user_kb/1
 % ========================================
 
 % TODO uncomment the next line without breaking it all!
@@ -68,9 +68,9 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 
 :-asserta(lmconf:pfcManageHybrids).
 
-:- export(user: mpred_mod/1).
-:- dynamic user: mpred_mod/1.
-user: mpred_mod(user).
+:- export(lmconf:mpred_user_kb/1).
+:- dynamic lmconf:mpred_user_kb/1.
+lmconf:mpred_user_kb(user).
 
 
 % [Manditory] define how we interact with the module system
@@ -129,6 +129,8 @@ when_debugging(_,_).
 % DBASE_T System
 % ================================================
 :- gripe_time(40,user: ensure_loaded(logicmoo(mpred_online/logicmoo_i_www))).
+% user:term_expansion((:-module(Name,List)), :-maplist(export,List)):- atom(Name),atom_concat(logicmoo_i_,_,Name).
+% user:term_expansion((:-use_module(Name)), :-true):- atom(Name),atom_concat(logicmoo_i_,_,Name).
 
 :- ensure_loaded(mpred/logicmoo_i_wff).
 :- ensure_loaded(mpred/logicmoo_i_listing).
@@ -151,7 +153,7 @@ when_debugging(_,_).
 
 :- asserta(t_l:disable_mpred_term_expansions_locally).
 
-% user:gioal_expansion(ISA,G) :- compound(ISA),t_l:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
+% user:goal_expansion(ISA,G) :- compound(ISA),t_l:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
 :- meta_predicate(lmbase_record_transactions(?,?)).
 :- meta_predicate(lmbase_record_transactions_maybe(?,?)).
 :- meta_predicate(mpred_file_expansion(?,?)).
@@ -268,7 +270,7 @@ mpred_file_loaded.
 :- write(ready),nl,flush_output.
 :- prolog.
 :- endif.
-:-  user: call(with_mfa_of(user:  (dynamic_safe)),user,user,boxlog_to_compile(_D,_E,_F),boxlog_to_compile/3).
+:-   call(with_mfa_of( (dynamic_safe)),user,user,boxlog_to_compile(_D,_E,_F),boxlog_to_compile/3).
 :- retractall(t_l:disable_mpred_term_expansions_locally).
 
 :- ensure_mpred_file_loaded(mpred/logicmoo_i_builtin).

@@ -19,8 +19,8 @@
 % We save the name of the module loading this module
 :- module(logicmoo_util_all,[]).
 
-:- dynamic(lmconfig:logicmoo_utils_separate/0).
-:- retractall(lmconfig:logicmoo_utils_separate).
+:- dynamic(lmconf:logicmoo_utils_separate/0).
+:- retractall(lmconf:logicmoo_utils_separate).
 :- set_prolog_flag(generate_debug_info, true).
 
 :- multifile(lmhook:mpred_hook_init_files/0).
@@ -37,9 +37,9 @@
 :- lmconfig:mpred_system_kb(_)->true;('$module'(M,M),asserta(lmconfig:mpred_system_kb(M))).
 
 
-:- dynamic(lmconfig:mpred_is_impl_file/1).
-:- multifile(lmconfig:mpred_is_impl_file/1).
-:- volatile(lmconfig:mpred_is_impl_file/1).
+:- dynamic(lmconf:mpred_is_impl_file/1).
+:- multifile(lmconf:mpred_is_impl_file/1).
+:- volatile(lmconf:mpred_is_impl_file/1).
 
 
 

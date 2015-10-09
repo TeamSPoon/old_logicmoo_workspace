@@ -44,7 +44,7 @@
 :- thread_local(t_l:disable_mpred_term_expansions_locally /0).
 :- multifile(system:term_expansion/2).
 :- multifile(user:term_expansion/2).
-:- multifile(user:gioal_expansion/2).
+:- multifile(user:goal_expansion/2).
 
 :-dynamic(registered_mpred_file/1).
 :-dynamic(never_registered_mpred_file/1).

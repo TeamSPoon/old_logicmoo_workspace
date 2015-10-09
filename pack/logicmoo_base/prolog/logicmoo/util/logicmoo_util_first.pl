@@ -113,16 +113,16 @@ always_show_dmsg:- tlbugger:tl_always_show_dmsg.
 :- export(tlbugger:ifHideTrace/0).
 :- thread_local(tlbugger:ifHideTrace/0).
 
-:- dynamic(lmconfig:mpred_is_impl_file/1).
-:- multifile(lmconfig:mpred_is_impl_file/1).
-:- volatile(lmconfig:mpred_is_impl_file/1).
+:- dynamic(lmconf:mpred_is_impl_file/1).
+:- multifile(lmconf:mpred_is_impl_file/1).
+:- volatile(lmconf:mpred_is_impl_file/1).
 
 :- if(false).
 :- else.
 :- include(logicmoo_util_header).
 :- endif.
 
-write_modules:- forall(lmconfig:mpred_is_impl_file(F),(scan_file_preds(F),list_file_preds(F))).
+write_modules:- forall(lmconf:mpred_is_impl_file(F),(scan_file_preds(F),list_file_preds(F))).
 
 term_to_string(IS,I):- on_x_fail(term_string(IS,I)),!.
 term_to_string(I,IS):- on_x_fail(string_to_atom(IS,I)),!.
@@ -179,18 +179,18 @@ module_meta_transparent(M:P):-functor(P,F,A),module_transparent(M:F/A),!. % grou
 % module_meta_transparent(M:P):-P=..[_|Args],maplist('='(?),Args),module_meta_transparent(M:P).
 module_meta_transparent(_).
 
-mpred_source_file(M:P,S):-no_repeats(mpred_source_file_0(M:P,S)),once((to_fa(P,F,A),make_module_name(S,MN),assert_if_new(lmconfig:sf_known(S,F,A,MN)))).
+mpred_source_file(M:P,S):-no_repeats(mpred_source_file_0(M:P,S)),once((to_fa(P,F,A),make_module_name(S,MN),assert_if_new(lmconf:sf_known(S,F,A,MN)))).
 mpred_source_file_0(M:P,S):-mpred_source_file_1(M:P,S).
 mpred_source_file_1(M:P,S):-predicate_property(M:P,file(S)).
 mpred_source_file_1(M:P,S):-source_file(M:P,S).
 
 m_cp(M,F,A):-no_repeats(M:F/A,((functor(P,F,A),current_predicate(_,M:P)))),\+ predicate_property(M:P,imported_from(_)).
 
-:-dynamic(lmconfig:sf_known/4).
-no_location(M,F,A):-m_cp(M,F,A),\+ lmconfig:sf_known(_S,F,A,_MN).
+:-dynamic(lmconf:sf_known/4).
+no_location(M,F,A):-m_cp(M,F,A),\+ lmconf:sf_known(_S,F,A,_MN).
 
-some_location(M,F,A):-no_repeats(F/A,(( m_cp(M,F,A); lmconfig:sf_known(_S,F,A,_MN)))).
-some_flocation(MN,F,A):-no_repeats(F/A,(( lmconfig:sf_known(_S,F,A,MN);m_cp(MN,F,A)))).
+some_location(M,F,A):-no_repeats(F/A,(( m_cp(M,F,A); lmconf:sf_known(_S,F,A,_MN)))).
+some_flocation(MN,F,A):-no_repeats(F/A,(( lmconf:sf_known(_S,F,A,MN);m_cp(MN,F,A)))).
 
 
 :- module_meta_transparent(scan_file_preds/1).

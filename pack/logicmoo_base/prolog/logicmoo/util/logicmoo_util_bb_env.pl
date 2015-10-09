@@ -78,10 +78,10 @@ in_dyn_pred(_DB,Call):- var(Call),!,get_mp_arity(F,A),functor(Call,F,A),( predic
 in_dyn_pred(_DB,Call):- functor(Call,F,A), get_mp_arity(F,A), predicate_property(Call,_), !, loop_check(Call).
 
 
-get_mp_arity(F,A):- lmconfig:mpred_user_kb(M),M:arity(F,A).
-get_mp_arity(F,A):- lmconfig:mpred_system_kb(M),M:mpred_arity(F,A).
+get_mp_arity(F,A):- lmconf:mpred_user_kb(M),M:arity(F,A).
+get_mp_arity(F,A):- lmconf:mpred_system_kb(M),M:mpred_arity(F,A).
 
-prop_mpred(Prop,F,A):- lmconfig:mpred_system_kb(M),M:kb:mpred_isa(F,Prop),get_mp_arity(F,A).
+prop_mpred(Prop,F,A):- lmconf:mpred_system_kb(M),M:kb:mpred_isa(F,Prop),get_mp_arity(F,A).
 
 get_mpred_stubType(_,_,dyn):-!.
 get_mpred_stubType(F,A,StubOut):-    

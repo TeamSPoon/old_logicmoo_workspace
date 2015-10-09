@@ -202,8 +202,8 @@ project_attributes(QueryVars0, AttrVars) :-
 :- multifile((term_expansion/2,user:term_expansion/2,system:term_expansion/2)).
 
 %system:goal_expansion(G,_):-writeq(system:goal_expansion(G)),nl,fail.
-user:gioal_expansion(G,_):-writeq(goal_expansion(G)),nl,fail.
-user:gioal_expansion(V1=V2,aunify(V1,V2)).
+user:goal_expansion(G,_):-writeq(goal_expansion(G)),nl,fail.
+user:goal_expansion(V1=V2,aunify(V1,V2)).
 %user:term_expansion(G,_):-writeq(user:term_expansion(G)),nl,fail.
 system:term_expansion(G,_):-writeq(system:term_expansion(G)),nl,fail.
 

@@ -76,11 +76,11 @@
 
 */
 
-:- dynamic(lmconfig:mpred_is_impl_file/1).
-:- multifile(lmconfig:mpred_is_impl_file/1).
-:- volatile(lmconfig:mpred_is_impl_file/1).
+:- dynamic(lmconf:mpred_is_impl_file/1).
+:- multifile(lmconf:mpred_is_impl_file/1).
+:- volatile(lmconf:mpred_is_impl_file/1).
 
-target_module(P,M):-mpred_source_file(P,F),lmconfig:mpred_is_impl_file(F),make_module_name(F,M).
+target_module(P,M):-mpred_source_file(P,F),lmconf:mpred_is_impl_file(F),make_module_name(F,M).
 
 print_fake_doc(M,P):- 
    scan_source_files_for_varnames,
