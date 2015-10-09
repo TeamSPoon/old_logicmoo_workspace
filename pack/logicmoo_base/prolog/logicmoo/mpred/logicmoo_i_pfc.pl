@@ -328,9 +328,9 @@ mpred_clause_is_asserted(H,B):- has_cl(H) -> clause(H,B) ; mpred_clause_is_asser
 
 % pfcDatabaseGoal(G):-is_ftCompound(G),get_functor(G,F,A),pfcDatabaseTerm(F/A).
 
-user: mpred_provide_storage_clauses(pfc,H,B,Proof):-mpred_clause(H,B,Proof).
+lmconf:mpred_provide_storage_clauses(pfc,H,B,Proof):-mpred_clause(H,B,Proof).
 
-%mpred_clause('nesc'(H),B,forward(Proof)):- is_ftNonvar(H),!, user: mpred_provide_storage_clauses(H,B,Proof).
+%mpred_clause('nesc'(H),B,forward(Proof)):- is_ftNonvar(H),!, lmconf:mpred_provide_storage_clauses(H,B,Proof).
 %mpred_clause(H,B,forward(R)):- R=(==>(B,H)),clause(R,true).
 mpred_clause(H,B,Why):-has_cl(H),clause(H,CL,R),mpred_pbody(H,CL,R,B,Why).
 %mpred_clause(H,B,backward(R)):- R=(<-(H,B)),clause(R,true).
