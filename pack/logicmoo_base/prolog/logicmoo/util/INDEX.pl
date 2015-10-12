@@ -745,10 +745,12 @@ index((fill_args), 2, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((get_module_of), 2, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((get_module_of_4), 4, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((get_pi), 2, logicmoo_util_preddefs, logicmoo_util_preddefs).
+index((only_3rd), 4, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((make_transparent), 4, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((multi_transparent), 1, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((must_pi), 1, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((p_predicate_property), 2, logicmoo_util_preddefs, logicmoo_util_preddefs).
+index((to_canonical_mpi), 2, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((pred_prop), 3, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((pred_prop), 4, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((rebuild_as_dyn), 4, logicmoo_util_preddefs, logicmoo_util_preddefs).
@@ -758,8 +760,11 @@ index((remove_pred), 3, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((static_predicate), 1, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((static_predicate), 3, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((with_mfa), 2, logicmoo_util_preddefs, logicmoo_util_preddefs).
-index((shared_multifile), 3, logicmoo_util_preddefs, logicmoo_util_preddefs).
-index((shared_multifile_fa), 3, logicmoo_util_preddefs, logicmoo_util_preddefs).
+index((make_shared_multifile), 3, logicmoo_util_preddefs, logicmoo_util_preddefs).
+index((with_pfa), 2, logicmoo_util_preddefs, logicmoo_util_preddefs).
+index((with_pfa), 4, logicmoo_util_preddefs, logicmoo_util_preddefs).
+index((with_pfa_single), 4, logicmoo_util_preddefs, logicmoo_util_preddefs).
+index((with_pfa_group), 4, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((with_mfa_of), 5, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((with_pi), 2, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((with_pi_selected), 4, logicmoo_util_preddefs, logicmoo_util_preddefs).

@@ -870,7 +870,7 @@ resolverConflict_robot(0),
 :- shared_multifile(mpred_search/1).
 :- shared_multifile(mpred_search_mode/1).
 :- shared_multifile(mpred_select/2).
-:- shared_multifile(mpred_undo_method/2).
+:- shared_multifile(mpred_do_and_undo_method/2).
 :- foreach(arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,tPredType,
  prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),P),
  ((shared_multifile(P/1)))).
@@ -1779,7 +1779,7 @@ mpred_add_actiontrace(Action,Support) :-
   mpred_add_support(mpred_action(Action),Support).
 
 mpred_rem_actiontrace(_,mpred_action(A)) :-
-  mpred_undo_method(A,M),
+  mpred_do_and_undo_method(A,M),
   M,
   !.
 
@@ -2484,7 +2484,7 @@ mpred_ignored(isa(_,argIsaFn(_, _))).
 has_cl(H):-predicate_property(H,number_of_clauses(_)).
 
 % an action is undoable if there exists a method for undoing it.
-undoable(A) :- mpred_undo_method(A,_).
+undoable(A) :- mpred_do_and_undo_method(A,_).
 
 %=
 %=

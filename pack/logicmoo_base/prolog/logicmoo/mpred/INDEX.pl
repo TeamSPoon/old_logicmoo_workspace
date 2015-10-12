@@ -1585,7 +1585,7 @@ index((mpred_queue), 2, kb, mpred_userkb).
 index((mpred_search), 1, kb, mpred_userkb).
 index((mpred_search_mode), 1, kb, mpred_userkb).
 index((mpred_select), 2, kb, mpred_userkb).
-index((mpred_undo_method), 2, kb, mpred_userkb).
+index((mpred_do_and_undo_method), 2, kb, mpred_userkb).
 index((conflict), 1, kb, mpred_userkb).
 index((mpred_univ), 1, kb, mpred_userkb).
 index((natFunction), 2, kb, mpred_userkb).

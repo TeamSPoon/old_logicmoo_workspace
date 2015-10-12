@@ -27,10 +27,12 @@
             get_module_of/2,
             get_module_of_4/4,
             get_pi/2,
+            only_3rd/4,
             make_transparent/4,
             multi_transparent/1,
             must_pi/1,
             p_predicate_property/2,
+            to_canonical_mpi/2,
             pred_prop/3,
             pred_prop/4,
             rebuild_as_dyn/4,
@@ -40,8 +42,11 @@
             static_predicate/1,
             static_predicate/3,
             with_mfa/2,            
-            (shared_multifile)/3,
-            shared_multifile_fa/3,
+            (make_shared_multifile)/3,
+            with_pfa/2,
+            with_pfa/4,
+            with_pfa_single/4,
+            with_pfa_group/4,
             with_mfa_of/5,
             with_pi/2,
             with_pi_selected/4,
@@ -50,8 +55,9 @@
 :- meta_predicate
         call_if_defined(0),
         def_meta_predicate(0, +, +),
-        ( (shared_multifile(+))),
+        ( (with_pfa_group(3,+,+,+))),
         ( (dynamic_safe(+)) ),
+         with_pfa_single(3,?,?,?),
         ( dynamic_safe(+, +, +) ),
         get_module_of(0, -),
         get_module_of_4(0, +, +, -),
@@ -71,6 +77,7 @@
         dynamic_if_missing/1,
         dynamic_multifile/1,
         dynamic_transparent/1,
+        only_3rd/4,
         fill_args/2,
         get_pi/2,
         make_transparent/4,
@@ -90,7 +97,7 @@
 :- export(with_pi/2).
 :- module_transparent(with_pi/2).
 % = :- meta_predicate(with_pi(0,4)).
-with_pi(_:[],_):-!.
+with_pi(_:[]):-!.
 with_pi(M:(P1,P2),Pred3):-!,'@'(( with_pi(M:P1,Pred3),with_pi(M:P2,Pred3) ),M).
 with_pi(M:P,Pred3):-context_module(CM),!,with_pi_selected(CM,M,P,Pred3),!.
 with_pi([],_):-!.
@@ -109,6 +116,7 @@ with_pi_selected(CM,_, M:F/A,Pred3):-!,with_pi_selected(CM,M,F/A,Pred3).
 with_pi_selected(CM,_, M:P ,Pred3):-!,with_pi_selected(CM,M,P,  Pred3).
 with_pi_selected(CM,M, F/A ,Pred3):-!,functor_safe(P,F,A),  with_pi_stub(CM,M,P,F/A,Pred3).
 with_pi_selected(CM,M, P ,Pred3):-  functor_safe(P,F,A), with_pi_stub(CM,M,P,F/A,Pred3).
+
 
 
 % ----------
@@ -164,45 +172,75 @@ make_transparent(_CM,M,PI,F/A):-
 
 :-module_transparent(context_module_of_file/1).
 context_module_of_file(CM):- prolog_load_context(source,F),make_module_name(F,CM),current_module(CM),!.
-context_module_of_file(CM):- trace, context_module(CM),!.
-
-:- multifile(lmconf:mpred_is_shared_multifile/3).
-:- dynamic(lmconf:mpred_is_shared_multifile/3).
-:- export((shared_multifile)/3).
+context_module_of_file(CM):- context_module(CM),!.
 
 :- export((shared_multifile)/1).
-:- meta_predicate(shared_multifile(+)).
 :- module_transparent((shared_multifile)/1).
+:- meta_predicate((shared_multifile(+))).
+shared_multifile(_):-!.
+shared_multifile(PI):- context_module_of_file(CM),with_pfa_group(make_shared_multifile,CM, kb, PI).
 
-:-module_transparent(shared_multifile/1).
-shared_multifile(_).
-shared_multifile(PI ):- context_module_of_file(CM),shared_multifile(CM, kb, PI).
-
-:-module_transparent(shared_multifile/3).
-shared_multifile(CM,_, M:F/A ):- sanity(atom(F)), !,context_module_of_file(CM),shared_multifile(CM, M, F/A).
-shared_multifile(CM,_, (M:F)/A ):- !,context_module_of_file(CM),shared_multifile(CM, M, F/A).
-shared_multifile(CM,_, M:PI ):-!, shared_multifile(CM,M,PI).
-shared_multifile(CM, M, List ) :- is_list(List),!,maplist(shared_multifile(CM,M),List).
-shared_multifile(CM, M, (A,B) ):-!,shared_multifile(CM,M, A ),shared_multifile(CM,M, B ).
-
-shared_multifile(CM, M, F):- atom(F),!,must(shared_multifile_fa(CM, M, F/0)).
-shared_multifile(CM, M, F/A):- must(shared_multifile_fa(CM, M, F/A)).
-
-:-export(shared_multifile_fa/3).
-:-module_transparent(shared_multifile_fa/3).
-shared_multifile_fa(CM, M, F/A):- lmconf:mpred_is_shared_multifile(CM, M, F/A),!.
-% shared_multifile_fa(CM, M, F/A):- CM==M, M\==lmconf,!,shared_multifile_fa(CM, kb, F/A).
-
-shared_multifile_fa(_CM, M, F/A):- functor(P,F,A), \+ \+ current_predicate(_,_:P), ignore(once((must((current_predicate(_,RM:P),\+ predicate_property(RM:P,imported_form(_)), M==RM))))),fail.
-shared_multifile_fa(CM, M, F/A):- lmconf:mpred_is_shared_multifile(CM0, M0, F/A),M0\==M, dmsg(shared_multifile_fa(CM->CM0, M->M0, F/A)),!,asserta(lmconf:mpred_is_shared_multifile(CM, M, F/A)),!.
-shared_multifile_fa(CM, M, F/A):- 
-  must_det_l((
-    asserta(lmconf:mpred_is_shared_multifile(CM, M, F/A)),
+:-module_transparent(make_shared_multifile/3).
+:- export((make_shared_multifile)/3).
+make_shared_multifile(CM, M, F/A):- 
+ must_det_l((    
     dynamic_safe(M,F,A), 
    '@'(M:export(M:F/A),M),
    '@'(M:multifile(M:F/A),M),
    '@'(M:multifile(M:F/A),CM),   
     (CM\==M->CM:import(M:F/A);true))).
+make_shared_multifile(CM, M, PI):- functor(PI,F,A),make_shared_multifile(CM, M, F/A).
+
+
+:-module_transparent(with_pfa/2).
+with_pfa(With, PI):- context_module_of_file(CM),with_pfa_group(only_3rd(With),CM, user, PI).
+:-module_transparent(with_pfa/4).
+with_pfa(With,CM, M, PI):- context_module_of_file(CM),with_pfa_group(only_3rd(With),CM, M, PI).
+
+:-module_transparent(only_3rd/4).
+only_3rd([],CM, M, PI):- !.
+only_3rd([With|List],CM, M, PI):- is_list(List),!,only_3rd(With,CM, M, PI),only_3rd(List,CM, M, PI).
+only_3rd(With,user, user, PI):-!, show_call(call(With,PI)).
+only_3rd(With,CM, user, PI):-!, show_call(call(With,CM:PI)).
+only_3rd(With,user, M, PI):-!, show_call(call(With,M:PI)).
+only_3rd(With,CM, M, PI):- show_call(CM:call(With,M:PI)).
+
+:- multifile(lmconf:mpred_is_decl_called/4).
+:- dynamic(lmconf:mpred_is_decl_called/4).
+
+:- meta_predicate(with_pfa_group(3,+,+,+)).
+:- module_transparent(with_pfa_group/4).
+:- export((with_pfa_group)/4).
+
+to_canonical_mpi(M:FA,MPI):-atom(M),!,to_canonical_mpi(FA,PI),add_mi(M,PI,MPI).
+to_canonical_mpi((M:F)/A,MPI):- integer(A),!,functor(PI,F,A),add_mi(M,PI,MPI).
+to_canonical_mpi((M:F)//A2,MPI):-integer(A),!,A is A2 + 2, functor(P,F,A),add_mi(M,PI,MPI).
+to_canonical_mpi(F/A,MPI):- functor(P,F,A), functor(P,F,A),strip_module(P,M,PI),add_mi(M,PI,MPI).
+to_canonical_mpi(F//A2,MPI):- A is A2 + 2, functor(P,F,A),strip_module(P,M,PI),add_mi(M,PI,MPI).
+to_canonical_mpi(P,MPI):- strip_module(P,M,PI),add_mi(M,PI,MPI).
+
+add_mi(M,P,M:PI):-strip_module(P,_,PI).
+
+with_pfa_group(With,CM, _, M:F/A ):- must(atom(F)), !,with_pfa_group(With,CM, M,F/A ).
+with_pfa_group(With,CM, _, (M:F)/A ):- must(atom(F)), !,with_pfa_group(With,CM, M,F/A ).
+with_pfa_group(With,CM, _, M:PI ):- must(nonvar(PI)),!, with_pfa_group(With,CM,M,PI).
+with_pfa_group(With,CM, M, List ) :- is_list(List),!,maplist(with_pfa_group(With,CM,M),List).
+with_pfa_group(With,CM, M, (A,B) ):-!,with_pfa_group(With,CM,M, A ),with_pfa_group(With,CM,M, B ).
+with_pfa_group(With,CM, M, ([F1|FL])/A):- !,with_pfa_single(With,CM, M, F1/A),with_pfa_group(With,CM, M, FL/A).
+with_pfa_group(With,CM, M, (F1,FL)/A):- !,with_pfa_single(With,CM, M, F1/A),with_pfa_group(With,CM, M, FL/A).
+
+with_pfa_group(With,CM, M, F):- atom(F),!,must(with_pfa_single(With,CM, M, F/0)).
+with_pfa_group(With,CM, M, F/A):- !,must(with_pfa_single(With,CM, M, F/A)).
+with_pfa_group(With,CM, M, PI):- must(with_pfa_single(With,CM, M, PI)).
+
+:-export(with_pfa_single/4).
+:-module_transparent(with_pfa_single/4).
+with_pfa_single(With,CM, M, FA):- lmconf:mpred_is_decl_called(With,CM, M, FA),!.
+% with_pfa_single(With,_CM, M, FA):- to_canonical_mpi(FA,P), \+ \+ current_predicate(_,_:P), ignore(once((must((current_predicate(_,RM:P),\+ predicate_property(RM:P,imported_form(_)), M==RM))))),fail.
+with_pfa_single([], _CM, _M, _FA):-!.
+with_pfa_single([With|List],CM, M, FA):- is_list(List),!,with_pfa_single(With,CM, M, FA),!,with_pfa_single(List,CM, M, FA).
+with_pfa_single(With,CM, M, FA):- lmconf:mpred_is_decl_called(With,CM0, M0, FA),M0\==M, dmsg(with_pfa_single(With,CM->CM0, M->M0, FA)),!,asserta(lmconf:mpred_is_decl_called(With,CM, M, FA)),!.
+with_pfa_single(With,CM, M, FA):- asserta(lmconf:mpred_is_decl_called(With,CM, M, FA)), must(call(With,CM, M, FA)).
 
 
 % ----------
