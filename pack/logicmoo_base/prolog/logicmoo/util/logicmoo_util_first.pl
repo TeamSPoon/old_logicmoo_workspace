@@ -1,6 +1,19 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first.pl
 :- module(logicmoo_util_first,
-          [ add_newvar/2,
+          [ 
+  scan_and_list_file_preds/1,
+  portray_clause_pi_UD/2,
+  portray_clause_pi_LR/2,
+
+          match_predicates/2,
+          match_predicates/5,
+          if_may_hide/1,
+          mpred_trace_less/1,
+          mpred_trace_none/1,
+          mpred_trace_nochilds/1,
+          mpred_trace_childs/1,
+
+            add_newvar/2,
             add_newvars/1,
             always_show_dmsg/0,
             export_module_preds/0,
@@ -16,11 +29,10 @@
             module_meta_transparent/1,
             mpred_source_file/2,
             mpred_source_file_0/2,
-            mpred_source_file_1/2,
             mustvv/1,
             name_to_var/3,
             no_location/3,
-            portray_clause_pi/2,
+            portray_clause_pi_LR/2,
             register_var/3,
             register_var/4,
             register_var_0/4,
@@ -29,9 +41,9 @@
             renumbervars1/2,
             renumbervars1/4,
             samify/2,
-            scan_file_preds/0,
-            scan_file_preds/1,
-            scan_file_preds/6,
+            export_file_preds/0,
+            export_file_preds/1,
+            export_file_preds/6,
             snumbervars/1,
             snumbervars/3,
             snumbervars/4,
@@ -45,6 +57,15 @@
             write_modules/0
           ]).
 :- meta_predicate
+
+  if_may_hide(0),
+   match_predicates(:, -),
+   match_predicates(:,-,-,-,-),
+   mpred_trace_none(:),
+   mpred_trace_less(:),
+   mpred_trace_childs(:),
+   mpred_trace_nochilds(:),
+
         module_meta_transparent(:),
         mustvv(0),
         renumbervars(?, 0),
@@ -52,6 +73,17 @@
         snumbervars(0, ?, ?),
         snumbervars(0, ?, ?, ?).
 :- module_transparent
+
+
+          match_predicates/2,
+          match_predicates/5,
+          if_may_hide/1,
+          mpred_trace_less/1,
+          mpred_trace_none/1,
+          mpred_trace_nochilds/1,
+          mpred_trace_childs/1,
+
+
         add_newvar/2,
         add_newvars/1,
         always_show_dmsg/0,
@@ -67,10 +99,9 @@
         make_module_name/2,
         mpred_source_file/2,
         mpred_source_file_0/2,
-        mpred_source_file_1/2,
         name_to_var/3,
         no_location/3,
-        portray_clause_pi/2,
+        portray_clause_pi_LR/2,
         register_var/3,
         register_var/4,
         register_var_0/4,
@@ -78,9 +109,9 @@
         renumbervars1/2,
         renumbervars1/4,
         samify/2,
-        scan_file_preds/0,
-        scan_file_preds/1,
-        scan_file_preds/6,
+        export_file_preds/0,
+        export_file_preds/1,
+        export_file_preds/6,
         some_flocation/3,
         some_location/3,
         term_to_string/2,
@@ -106,6 +137,73 @@
 :- meta_predicate safe_numbervars(*,0).
 
 
+%================================================================
+% pred tracing 
+%================================================================
+
+% = :- meta_predicate('match_predicates'(:,-)).
+
+match_predicates(M:Spec,Preds):- catch('$find_predicate'(M:Spec, Preds),_,catch('$find_predicate'(Spec, Preds),_,catch('$find_predicate'(lmconf:Spec, Preds),_,fail))),!.
+match_predicates(MSpec,MatchesO):- catch('$dwim':'$find_predicate'(MSpec,Matches),_,Matches=[]),!,MatchesO=Matches.
+
+match_predicates(_:[],_M,_P,_F,_A):-!,fail.
+match_predicates(IM:(ASpec,BSpec),M,P,F,A):-!, (match_predicates(IM:(ASpec),M,P,F,A);match_predicates(IM:(BSpec),M,P,F,A)).
+match_predicates(IM:[ASpec|BSpec],M,P,F,A):-!, (match_predicates(IM:(ASpec),M,P,F,A);match_predicates(IM:(BSpec),M,P,F,A)).
+match_predicates(IM:IF/IA,M,P,F,A):- '$find_predicate'(IM:P,Matches),member(CM:F/A,Matches),functor(P,F,A),(predicate_property(CM:P,imported_from(M))->true;CM=M),IF=F,IA=A.
+match_predicates(Spec,M,P,F,A):- '$find_predicate'(Spec,Matches),member(CM:F/A,Matches),functor(P,F,A),(predicate_property(CM:P,imported_from(M))->true;CM=M).
+
+:- module_transparent(if_may_hide/1).
+% = :- meta_predicate(if_may_hide(0)).
+if_may_hide(_G):-!.
+% if_may_hide(G):-G.
+
+:- meta_predicate with_unlocked_pred(:,0).
+with_unlocked_pred(Pred,Goal):-
+   (predicate_property(Pred,foreign)-> true ;
+  (
+ ('$get_predicate_attribute'(Pred, system, 0) -> Goal ;
+ ('$set_predicate_attribute'(Pred, system, 0),
+   catch(Goal,_,true),'$set_predicate_attribute'(Pred, system, 1))))).
+
+:- export(mpred_trace_less/1).
+mpred_trace_less(W):- if_may_hide(forall(match_predicates(W,M,Pred,_,_),(
+with_unlocked_pred(M:Pred,(
+  '$set_predicate_attribute'(M:Pred, noprofile, 1),
+  (A==0 -> '$set_predicate_attribute'(M:Pred, hide_childs, 1);'$set_predicate_attribute'(M:Pred, hide_childs, 1)),
+  (A==0 -> '$set_predicate_attribute'(M:Pred, trace, 0);'$set_predicate_attribute'(M:Pred, trace, 1))))))).
+
+:- export(mpred_trace_none/1).
+mpred_trace_none(W):- (forall(match_predicates(W,M,Pred,F,A),
+with_unlocked_pred(M:Pred,(
+('$hide'(M:F/A),'$set_predicate_attribute'(M:Pred, hide_childs, 1),noprofile(M:F/A),nospy(M:Pred)))))).
+
+:- export(mpred_trace_nochilds/1).
+mpred_trace_nochilds(W):- if_may_hide(forall(match_predicates(W,M,Pred,_,_),(
+with_unlocked_pred(M:Pred,(
+'$set_predicate_attribute'(M:Pred, trace, 1),
+'$set_predicate_attribute'(M:Pred, noprofile, 1),
+'$set_predicate_attribute'(M:Pred, hide_childs, 1)))))).
+
+:- export(mpred_trace_childs/1).
+mpred_trace_childs(W) :- if_may_hide(forall(match_predicates(W,M,Pred,_,_),(
+with_unlocked_pred(M:Pred,(
+'$set_predicate_attribute'(M:Pred, trace, 0),
+'$set_predicate_attribute'(M:Pred, noprofile, 1),
+'$set_predicate_attribute'(M:Pred, hide_childs, 0)))))).   
+
+mpred_trace_all(W) :- forall(match_predicates(W,M,Pred,_,A),( 
+ with_unlocked_pred(M:Pred,(
+ (A==0 -> '$set_predicate_attribute'(M:Pred, trace, 0);'$set_predicate_attribute'(M:Pred, trace, 1)),
+ '$set_predicate_attribute'(M:Pred, noprofile, 0),
+'$set_predicate_attribute'(M:Pred, hide_childs, 0))))).
+
+%:-mpred_trace_all(prolog:_).
+%:-mpred_trace_all('$apply':_).
+%:-mpred_trace_all(system:_).
+
+
+
+
 :- thread_local(tlbugger:tl_always_show_dmsg).
 always_show_dmsg:- thread_self(main).
 always_show_dmsg:- tlbugger:tl_always_show_dmsg.
@@ -119,10 +217,10 @@ always_show_dmsg:- tlbugger:tl_always_show_dmsg.
 
 :- if(false).
 :- else.
-:- include(logicmoo_util_header).
+:- include('logicmoo_util_header.pi').
 :- endif.
 
-write_modules:- forall(lmconf:mpred_is_impl_file(F),(scan_file_preds(F),list_file_preds(F))).
+write_modules:- forall(lmconf:mpred_is_impl_file(F),(export_file_preds(F),list_file_preds(F))).
 
 term_to_string(IS,I):- on_x_fail(term_string(IS,I)),!.
 term_to_string(I,IS):- on_x_fail(string_to_atom(IS,I)),!.
@@ -132,9 +230,11 @@ term_to_string(I,IS):- grtrace(term_to_atom(I,A)),string_to_atom(IS,A),!.
 make_module_name(P,M):-file_base_name(P,F),file_name_extension(M,_Ext,F).
 helper_name0(F):- atom_chars(F,Chars),append(_,[U,N],Chars), ( char_type(U,digit) ;  char_type(N,digit)), !.
 helper_name(F):-fail,helper_name0(F).
-portray_clause_pi(_,[]):-!.
-% portray_clause_pi(T,List):- list_to_conjuncts(List,E), P=..[T,E],portray_clause( (:-P )),!.
-portray_clause_pi(T,LIST0):-list_to_set(LIST0,LIST),list_to_conjuncts(LIST,E), portray_clause( (T :- E )),!. % portray_clause_pi(T,L).
+portray_clause_pi_LR(_,[]):-!.
+portray_clause_pi_LR(T,LIST0):-list_to_set(LIST0,LIST),list_to_conjuncts(LIST,E),P=..[T,E], format('~N',[]), portray_clause( ( :-P )),!.
+
+portray_clause_pi_UD(_,[]):-!.
+portray_clause_pi_UD(T,LIST0):-list_to_set(LIST0,LIST),list_to_conjuncts(LIST,E),P=..[T,E], format('~N :~ ~q % ',[T]), portray_clause( ( :-P )),!.
 
 to_fa(P,_,A):-var(P),!,integer(A).
 to_fa(_-FA,F,A):-!,to_fa(FA,F,A).
@@ -147,10 +247,12 @@ functor_compare(R,P1,P2):-to_fa(P1,F1,A1),to_fa(P2,F2,A2),compare(FR,F1,F2),(FR\
 
 
 list_file_preds:- source_location(S,_),list_file_preds(S).
-list_file_preds(S):- make_module_name(S,MN),list_file_preds(S,MN).
+
+scan_and_list_file_preds(F):- forall(filematch(F,S),((make_module_name(S,MN),ensure_loaded(S),export_file_preds(S),list_file_preds(S,MN)))).
+list_file_preds(F):- forall(filematch(F,S),((make_module_name(S,MN),ensure_loaded(S),list_file_preds(S,MN)))).
 list_file_preds(S,MN):-
  must_det_l((
-   findall(M:P-F/A,(mpred_source_file_0(M:P,S),functor(P,F,A)),List),predsort(functor_compare,List,Set),
+   findall(M:P-F/A,(mpred_source_file(M:P,S),functor(P,F,A)),List),predsort(functor_compare,List,Set),
    findall(F/A,(member(M:P-F/A,Set),\+ predicate_property(M:P,multifile),\+ helper_name(F)),Exports),
    findall(F/A,(member(M:P-F/A,Set),predicate_property(M:P,multifile)),Multifile),
    format('~N~n~n% File: ~w ~n',[S]),
@@ -161,28 +263,29 @@ list_file_preds(S,MN):-
    findall(F/A,(member(M:P-F/A,Set),predicate_property(M:P,volatile)),Volatile),
    
    portray_clause( :- module(MN,Exports)),
-   portray_clause_pi( multifile,Multifile),
-   portray_clause_pi( meta_predicate,MPList),
-   portray_clause_pi( module_transparent,Transparent),
-   portray_clause_pi( thread_local,ThreadLocal),
-   portray_clause_pi( dynamic,Dynamic),
-   portray_clause_pi( volatile,Volatile))),!.
+   portray_clause_pi_UD( meta_predicate,MPList),
+   portray_clause_pi_LR( multifile,Multifile),
+   portray_clause_pi_LR( module_transparent,Transparent),
+   portray_clause_pi_LR( thread_local,ThreadLocal),subtract(Dynamic,ThreadLocal,DynamicL),
+   portray_clause_pi_LR( volatile,Volatile))),
+   portray_clause_pi_LR( shared_multifile,DynamicL),!.
+   
 
 
 
 :-export(module_meta_transparent/1).
 % = :- meta_predicate(module_meta_transparent(:)).
-module_meta_transparent(M:F/A):-functor(P,F,A),!,module_meta_transparent(M:P).
+module_meta_transparent(M:F/A):-must(functor(P,F,A)),!,module_meta_transparent(M:P).
 module_meta_transparent(M:P):-predicate_property(M:P,meta_predicate(_)),!.
 module_meta_transparent(M:P):-predicate_property(M:P,transparent),!.
 module_meta_transparent(M:P):-functor(P,F,A),module_transparent(M:F/A),!. % ground(P),M:meta_predicate(P),!.
 % module_meta_transparent(M:P):-P=..[_|Args],maplist('='(?),Args),module_meta_transparent(M:P).
 module_meta_transparent(_).
 
-mpred_source_file(M:P,S):-no_repeats(mpred_source_file_0(M:P,S)),once((to_fa(P,F,A),make_module_name(S,MN),assert_if_new(lmconf:sf_known(S,F,A,MN)))).
-mpred_source_file_0(M:P,S):-mpred_source_file_1(M:P,S).
-mpred_source_file_1(M:P,S):-predicate_property(M:P,file(S)).
-mpred_source_file_1(M:P,S):-source_file(M:P,S).
+mpred_source_file(M:P,S):- no_repeats(mpred_source_file_0(M:P,S)),once((to_fa(P,F,A),assert_if_new(lmconf:sf_known(S,F,A,M)))).
+mpred_source_file_0(M:P,S):-predicate_property(M:P,file(S)).
+mpred_source_file_0(M:P,S):-source_file(M:P,S).
+mpred_source_file_0(M:P,S):-var(P)-> (lmconf:sf_known(S,F,A,M),functor(P,F,A)) ; (functor(P,F,A),lmconf:sf_known(S,F,A,M)).
 
 m_cp(M,F,A):-no_repeats(M:F/A,((functor(P,F,A),current_predicate(_,M:P)))),\+ predicate_property(M:P,imported_from(_)).
 
@@ -193,26 +296,37 @@ some_location(M,F,A):-no_repeats(F/A,(( m_cp(M,F,A); lmconf:sf_known(_S,F,A,_MN)
 some_flocation(MN,F,A):-no_repeats(F/A,(( lmconf:sf_known(_S,F,A,MN);m_cp(MN,F,A)))).
 
 
-:- module_meta_transparent(scan_file_preds/1).
-:- export(scan_file_preds/0).
-scan_file_preds:- source_location(S,_),scan_file_preds(S),!.
-:- export(scan_file_preds/1).
-scan_file_preds(_):- current_prolog_flag(xref,true),!.
-scan_file_preds(S):- context_module(NotUser),must(NotUser\==user),forall(mpred_source_file(M:P,S),(functor(P,F,A),scan_file_preds(NotUser,S,M,P,F,A))).
+:- module_transparent(export_file_preds/1).
+:- export(export_file_preds/0).
+export_file_preds:- source_location(S,_),export_file_preds(S),!.
+:- export(export_file_preds/1).
+export_file_preds(_):- current_prolog_flag(xref,true),!.
+export_file_preds(FileMatch):- forall(filematch(FileMatch,File),(context_module(NotUser),must(NotUser\==user),
+   forall(must(mpred_source_file(M:P,File)),(functor(P,F,A),must(export_file_preds(NotUser,File,M,P,F,A)))))).
+
+predicate_decl_module(Pred,RM):-current_predicate(_,RM:Pred),\+ predicate_property(RM:Pred,imported_from(_)),must(RM\==user).
+
 
 :- style_check(-singleton).
-scan_file_preds(NotUser,S,M,P,F,A):- M==user,!,show_call(scan_file_preds(NotUser,S,NotUser,P,F,A)).
-scan_file_preds(NotUser,S,M,P,F,A):- \+ helper_name(F), export(M:F/A), fail.
-scan_file_preds(NotUser,S,M,P,F,A):- export(M:F/A), fail. % export anyways
-scan_file_preds(NotUser,S,M,P,F,A):- module_transparent(M:F/A), fail. % export anyways
-scan_file_preds(NotUser,S,M,P,F,A):- module_meta_transparent(M:F/A),!.
-scan_file_preds(NotUser,S,M,P,F,A).
+
+
+export_file_preds(NotUser,S,_,P,F,A):-current_predicate(logicmoo_varnames:F/A),!.
+export_file_preds(NotUser,S,system,P,F,A):-current_predicate(system:F/A),!.
+export_file_preds(NotUser,S,user,P,F,A):-current_predicate(system:F/A),!.
+export_file_preds(NotUser,S,M,P,F,A):- M==user,!,trace,show_call(export_file_preds(NotUser,S,NotUser,P,F,A)).
+export_file_preds(NotUser,S,M,P,F,A):- predicate_decl_module(P,RM),RM\==M,!,export_file_preds(NotUser,S,RM,P,F,A).
+%export_file_preds(NotUser,S,M,P,F,A):- \+ helper_name(F), export(M:F/A), fail.
+export_file_preds(NotUser,S,M,P,F,A):- M:export(M:F/A), fail. % export anyways
+export_file_preds(NotUser,S,M,P,F,A):- M:module_transparent(F/A), fail.
+% export_file_preds(NotUser,S,M,P,F,A):- module_meta_transparent(M:F/A),fail.
+export_file_preds(NotUser,S,M,P,F,A):- must(predicate_property(M:P,transparent)).
+
 :- style_check(+singleton).
 
-:- module_meta_transparent(export_module_preds/0).
+:- module_transparent(export_module_preds/0).
 :- export(export_module_preds/0).
 export_module_preds:- current_prolog_flag(xref,true),!.
-export_module_preds:- context_module(M),source_file_property(S,module(M)),scan_file_preds(S),forall(source_file_property(S,includes(F,_)),scan_file_preds(F)).
+export_module_preds:- context_module(M),source_file_property(S,module(M)),export_file_preds(S),forall(source_file_property(S,includes(F,_)),export_file_preds(F)).
 
 
 :- meta_predicate mustvv(0).
@@ -416,4 +530,4 @@ snumbervars(Term,Start,End,List):-numbervars(Term,Start,End,List).
 
 
 
-:- use_module(logicmoo_util_varnames).
+% % :- use_module(logicmoo_util_varnames).

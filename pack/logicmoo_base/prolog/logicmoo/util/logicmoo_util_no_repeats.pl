@@ -46,7 +46,7 @@
        ]).
 
 :- else.
-:- include(logicmoo_util_header).
+:- include('logicmoo_util_header.pi').
 :- endif.
 
 
@@ -113,7 +113,7 @@ no_repeats_dif(Vs,Call):- dif(Vs,_), get_attr(Vs,dif,vardif(CONS,_)),!,
 no_repeats_old(Call):- no_repeats_old(Call,Call).
 
 
-:- user: ensure_loaded(rec_lambda).
+% :- use_module(rec_lambda).
 
 memberchk_same(X, [Y0|Ys]) :- is_list(Ys),!,C=..[v,Y0|Ys],!, arg(_,C,Y), ( X =@= Y ->  (var(X) -> X==Y ; true)),!.
 memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),memberchk_same(X, Ys) )).

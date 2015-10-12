@@ -38,22 +38,12 @@
     invalidate any other reasons why the executable file might be covered by
     the GNU General Public License.
 */
-:- if(current_predicate(logicmoo_utils:combine_logicmoo_utils/0)).
 
 :- module(logicmoo_util_terms,
-        [dynamic_transparent/1,
-         upcase_atom_safe/2,
-         get_module_of/2,
+        [
          call_n_times/2,
-         % concat_atom_safe/3,
          makeArgIndexes/1,
-         contains_singletons/1,
          doall/1,
-         atom_concat_safe/3,
-         exists_file_safe/1,
-         exists_directory_safe/1,
-         eraseall/2,
-         time_file_safe/2,         
          subst/4,
          predsubst/3,
          wsubst/4,
@@ -68,15 +58,9 @@
          in_thread_and_join/2,               
          make_list/3,
          throw_if_true_else_fail/2,
-         if_file_exists/1,
-         multi_transparent/1]).
+         %if_file_exists/1,
 
-
-:- else.
-
-% File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_terms.pl
-:- module(logicmoo_util_terms,
-          [ at_start/1,
+          at_start/1,
             call_n_times/2,
             call_no_cuts/1,
             conjoin/3,
@@ -84,10 +68,6 @@
             conjuncts_to_list/2,
             delete_eq/3,
             disjuncts_to_list/2,
-            do_expand_args/3,
-            do_expand_args_c/3,
-            do_expand_args_l/3,
-            do_expand_args_pa/4,
             doall/1,
             dynamic_load_pl/1,
             each_subterm/2,
@@ -175,10 +155,6 @@
         conjuncts_to_list/2,
         delete_eq/3,
         disjuncts_to_list/2,
-        do_expand_args/3,
-        do_expand_args_c/3,
-        do_expand_args_l/3,
-        do_expand_args_pa/4,
         dynamic_load_pl/1,
         each_subterm/2,
         flatten_dedupe/2,
@@ -217,8 +193,16 @@
         wsubst/4.
 
 
-:- include(logicmoo_util_header).
-:- endif.
+:- include('logicmoo_util_header.pi').
+
+         %upcase_atom_safe/2,
+         %get_module_of/2,
+          % concat_atom_safe/3,
+           %atom_concat_safe/3,
+           %exists_file_safe/1,
+           %exists_directory_safe/1,
+           %eraseall/2,
+           %time_file_safe/2,         
 
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
@@ -229,9 +213,6 @@
 :- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was_lib(WAS)).
 :- set_prolog_flag(double_quotes,string).
 
-
-% :-user_use_module((logicmoo_util_strings)).
-% :-user_use_module((logicmoo_util_ctx_frame)).
 
 lastMember2(_E,List):-var(List),!,fail.
 lastMember2(E,[H|List]):-lastMember2(E,List);E=H.
@@ -571,27 +552,6 @@ functor_h(Obj,Obj,0):-not(compound(Obj)),!.
 functor_h(Obj,F,A):-functor(Obj,F,A).
 
 
-:- export((do_expand_args/3)).
-
-do_expand_args(_,Term,Term):- compound(Term),functor(Term,F,_),if_defined(logicmoo_base:argsQuoted(F)),!.
-do_expand_args(Exp,Term,Out):- compound(Term),!,do_expand_args_c(Exp,Term,Out).
-do_expand_args(_,Term,Term).
-
-do_expand_args_c(Exp,[L|IST],Out):- !,do_expand_args_l(Exp,[L|IST],Out).
-do_expand_args_c(Exp,Term,Out):- Term=..[P|ARGS],do_expand_args_pa(Exp,P,ARGS,Out).
-
-do_expand_args_pa(Exp,Exp,ARGS,Out):- !,member(Out,ARGS).
-do_expand_args_pa(Exp,P,ARGS,Out):- do_expand_args_l(Exp,ARGS,EARGS), Out=..[P|EARGS].
-
-do_expand_args_l(_,A,A):- var(A),!.
-do_expand_args_l(_,[],[]):- !.
-do_expand_args_l(Exp,[A|RGS],[E|ARGS]):- do_expand_args(Exp,A,E),do_expand_args_l(Exp,RGS,ARGS).
-
-
-
-% :- mpred_trace_nochilds(functor_safe/2).
-% :- mpred_trace_nochilds(functor_safe/3).
-
 
 :- meta_predicate call_n_times(+,0).
 call_n_times(0,_Goal):-!.
@@ -621,9 +581,6 @@ list_to_set_safe(A,A):-(var(A);atomic(A)),!.
 list_to_set_safe([A|AA],BB):- (not(not(lastMember2(A,AA))) -> list_to_set_safe(AA,BB) ; (list_to_set_safe(AA,NB),BB=[A|NB])),!.
 
 
-% TODO remove this next line
-% :-ensure_loaded(logicmoo_util_bugger).
-% and replace with...
 
 
 term_parts(A,[A]):- not(compound(A)),!.

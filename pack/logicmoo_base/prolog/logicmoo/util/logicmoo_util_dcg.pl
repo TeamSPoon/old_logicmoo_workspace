@@ -39,8 +39,8 @@
          dcgReorder/4
 	 ]).
 
-:- use_module(logicmoo(logicmoo_utils)).
-:- use_module(logicmoo_util_strings).
+% :- use_module(logicmoo(logicmoo_utils)).
+% :- use_module(logicmoo_util_strings).
 
 /*
 :- '@'((use_module((logicmoo_util_library)),
@@ -50,7 +50,7 @@
          use_module((logicmoo_util_terms))),'user').
 */
 %:- else.
-:- include(logicmoo_util_header).
+:- include('logicmoo_util_header.pi').
 %:- endif.
 
  

@@ -1,8 +1,4 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_prolog_frames.pl
-
-:-if(false).
-:- module(logicmoo_util_prolog_frames,[]).
-:-else.
 :- module(logicmoo_util_prolog_frames,
           [ current_frames/4,
             current_next_frames/4,
@@ -31,12 +27,7 @@
         stack_check_else/2,
         stack_depth/1.
 
-
-
-:- if(false).
-:- else.
-:- include(logicmoo_util_header).
-:- endif.
+:- include('logicmoo_util_header.pi').
   
 
 /*
@@ -86,4 +77,4 @@ current_next_frames(Attrib,Nth,Frame,NextList):-
     ( Nth2 is Nth+1, current_next_frames(Attrib,Nth2, ParentFrame,NextList));
          NextList=[]).
 current_next_frames(_,_,_,[]).
-:-endif.
+

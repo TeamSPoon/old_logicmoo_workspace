@@ -27,7 +27,7 @@ paina/1,pain/1,            painz/1,
             eraseall/2,
             find_and_call/1,
             find_and_call/3,
-            get_current_mpred_provider/3,
+            get_current_lmconf:mpred_provider/3,
             mpred_mop/3,
             mpred_op_prolog/2,
             mpred_split_op_data/3,
@@ -60,7 +60,8 @@ paina/1,pain/1,            painz/1,
         eraseall(+, +),
         find_and_call(+, +, ?),
         mpred_mop(+, 1, ?),
-        mpred_op_prolog(?, :).
+        mpred_op_prolog(?, :),
+        mpred_op_prolog0(1,?).
 :- module_transparent
         append_term/3,
         assertz_new/1,
@@ -68,8 +69,8 @@ paina/1,pain/1,            painz/1,
         clause_eq/3,
         erase_safe/2,
         find_and_call/1,
-        lmhook:first_mpred_provider/3,
-        get_current_mpred_provider/3,
+        lmconf:first_lmconf:mpred_provider/3,
+        get_current_lmconf:mpred_provider/3,
         mpred_split_op_data/3,
         retract_eq/1,
         safe_univ/2,
@@ -79,7 +80,7 @@ paina/1,pain/1,            painz/1,
 
 :- if(false).
 :- else.
-:- include(logicmoo_util_header).
+:- include('logicmoo_util_header.pi').
 :- endif.
 
 
@@ -167,26 +168,26 @@ eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall
 eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,B,X),erase_safe(clause(M:C,B,X),X))).
 
 
-:-thread_local(t_l:mpred_provider/3).
-:-thread_local(t_l:current_mpred_provider/1).
-:-dynamic(lmhook:first_mpred_provider/2).
-:-dynamic(lmhook:next_mpred_provider/2).
-:-multifile(lmhook:first_mpred_provider/2).
-:-multifile(lmhook:next_mpred_provider/2).
-get_current_mpred_provider(OP,Term,PROVIDER):- t_l:mpred_provider(OP,Term,PROVIDER).
-get_current_mpred_provider(_,_,PROVIDER):- t_l:current_mpred_provider(PROVIDER).
-get_current_mpred_provider(OP,Term,PROVIDER):- lmhook:first_mpred_provider(OP,Term,PROVIDER).
+:-thread_local(t_l:lmconf:mpred_provider/3).
+:-thread_local(t_l:current_lmconf:mpred_provider/1).
+:-dynamic(lmconf:first_lmconf:mpred_provider/2).
+:-dynamic(lmconf:next_lmconf:mpred_provider/2).
+:-multifile(lmconf:first_lmconf:mpred_provider/2).
+:-multifile(lmconf:next_lmconf:mpred_provider/2).
+get_current_lmconf:mpred_provider(OP,Term,PROVIDER):- t_l:lmconf:mpred_provider(OP,Term,PROVIDER).
+get_current_lmconf:mpred_provider(_,_,PROVIDER):- t_l:current_lmconf:mpred_provider(PROVIDER).
+get_current_lmconf:mpred_provider(OP,Term,PROVIDER):- lmconf:first_lmconf:mpred_provider(OP,Term,PROVIDER).
 
-lmhook:first_mpred_provider(_,_,mpred_op_prolog).
+lmconf:first_lmconf:mpred_provider(_,_,mpred_op_prolog).
 
 :- meta_predicate call_provider(?).
 call_provider(P):-mpred_split_op_data(P,OP,Term),call_provider(OP,Term).
 
-call_provider(OP,Term):- must(get_current_mpred_provider(OP,Term,PROVIDER)),!,call(PROVIDER,OP,Term).
+call_provider(OP,Term):- must(get_current_lmconf:mpred_provider(OP,Term,PROVIDER)),!,call(PROVIDER,OP,Term).
 
-call_provider(OP,Term):- must(get_current_mpred_provider(OP,Term,PROVIDER)),!,
+call_provider(OP,Term):- must(get_current_lmconf:mpred_provider(OP,Term,PROVIDER)),!,
    (loop_check_early(call(PROVIDER,OP,Term),fail)*->true;
-   (loop_check_early(must(lmhook:next_mpred_provider(PROVIDER,NEXT)),NEXT=mpred_op_prolog),!,PROVIDER\=NEXT,call(NEXT,OP,Term))).
+   (loop_check_early(must(lmconf:next_lmconf:mpred_provider(PROVIDER,NEXT)),NEXT=mpred_op_prolog),!,PROVIDER\=NEXT,call(NEXT,OP,Term))).
 
 :- meta_predicate assert_if_new(:).
 assert_if_new(X):-mpred_op_prolog(pain,X).

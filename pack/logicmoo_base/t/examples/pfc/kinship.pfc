@@ -1,7 +1,7 @@
 % -*-Prolog-*-
 
 
-:-dynamic_multifile_exported otherGender/2.
+:- shared_multifile otherGender/2.
 
 % kinship domain example.
 

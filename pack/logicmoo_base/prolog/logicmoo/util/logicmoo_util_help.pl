@@ -10,7 +10,7 @@
 % ===================================================================
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_varnames.pl
-:- module(logicmoo_varnames,
+:- module(logicmoo_util_help,
           [ 
           e2h/2,
           longer_sumry/2,
@@ -75,6 +75,9 @@
 :- doc_collect(true).
 
 */
+
+name_modes(ModeAs:NameAs,ModeAs,NameAs).
+
 
 :- dynamic(lmconf:mpred_is_impl_file/1).
 :- multifile(lmconf:mpred_is_impl_file/1).

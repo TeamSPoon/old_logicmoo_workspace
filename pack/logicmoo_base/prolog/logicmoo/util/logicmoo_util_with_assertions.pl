@@ -26,7 +26,7 @@
         check_thread_local_1m/1,
         to_thread_head_1m/4.
 
-:- include(logicmoo_util_header).
+:- include('logicmoo_util_header.pi').
 
 % maybe this one wont use thread local checking
 % = :- meta_predicate(wtg(:,0)).
@@ -80,13 +80,14 @@ to_thread_head_1m((H:-B),TL,HO,(HH:-B)):-!,to_thread_head_1m(H,TL,HO,HH),!.
 to_thread_head_1m(lmconf:Head,lmconf,lmconf:Head,Head):- !.
 to_thread_head_1m(TL:Head,TL,TL:Head,Head):-!, check_thread_local_1m(TL:Head).
 % to_thread_head_1m(Head,Module,Module:Head,Head):-Head \= (_:_), predicate_module(Head,Module),!.
-to_thread_head_1m(user: Head,user,user: Head,Head):- !.
+to_thread_head_1m(lmconf:Head,user,lmconf:Head,Head):- !.
 to_thread_head_1m(Head,t_l,t_l:Head,Head):-!,check_thread_local_1m(t_l:Head).
 to_thread_head_1m(Head,tlbugger,tlbugger:Head,Head):-check_thread_local_1m(tlbugger:Head).
 
+check_thread_local_1m(_):-!.
 check_thread_local_1m(t_l:_):-!.
 check_thread_local_1m(tlbugger:_):-!.
 %check_thread_local_1m(_):-!.
-%check_thread_local_1m(user: _):-!.
-check_thread_local_1m(TLHead):- slow_sanity(( must_det(predicate_property(TLHead,(thread_local))))).
+%check_thread_local_1m(lmconf:_):-!.
+check_thread_local_1m(TLHead):- slow_sanity(( must_det(predicate_property(TLHead,(thread_local))))),!.
 

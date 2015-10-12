@@ -30,6 +30,8 @@
             contains_badvarnames/1,
             contains_singletons/1,
             del_attr_type/2,
+            name_vars/2,
+            mpred_numbervars_with_names/1,
             ensure_vars_labled/2,
             ensure_vars_labled_r/2,
             fix_varcase_name/2,
@@ -40,13 +42,12 @@
             ignoreN/2,
             ignoreN0/2,
             imploded_copyvars/2,
-            loading_file/1,
             locate_clause_ref/5,
             lock_vars/1,
             logicmoo_util_varnames_file/0,
             make_subterm_path/3,
             maybe_record_scanned_file/0,
-            mpred_impl_module/1,
+            
             no_varnaming/1,
             no_vars_needed/1,
             not_member_eq/2,            
@@ -76,7 +77,8 @@
             unlock_vars/1,
             v_dif_rest/2,
             vmust/1,
-            init_varname_stores/1
+            init_varname_stores/1,
+            maybe_scan_source_files_for_varnames/0
           ]).
 :- multifile
         make_hook/2.
@@ -124,13 +126,11 @@
             ignoreN/2,
             ignoreN0/2,
             imploded_copyvars/2,
-            loading_file/1,
             locate_clause_ref/5,
             lock_vars/1,
             logicmoo_util_varnames_file/0,
             make_subterm_path/3,
-            maybe_record_scanned_file/0,
-            mpred_impl_module/1,
+            maybe_record_scanned_file/0,            
             no_varnaming/1,
             no_vars_needed/1,
             not_member_eq/2,            
@@ -163,7 +163,7 @@
             init_varname_stores/1
  .
 
-:- include(logicmoo_util_header).
+:- include('logicmoo_util_header.pi').
 
 :- prolog_clause:multifile((
 	unify_goal/5,			% +Read, +Decomp, +M, +Pos, -Pos
@@ -206,7 +206,7 @@ all_different_vals([V|Vs],SET):-subtract_eq(SET,V,REST),!,v_dif_rest(V,REST),all
 v_dif_rest(V,REST):- not_member_eq(V,REST), when('?='(V,_),not_member_eq(V,REST)).
 
 lock_vars(Var):-atomic(Var),!.
-lock_vars(Var):-var(Var),!,when(nonvar(Var),is_ftVar(Var)).
+lock_vars(Var):-var(Var),!,when:when(nonvar(Var),Var='$VAR'(_)).
 lock_vars('$VAR'(_)):-!.
 lock_vars([X|XM]):-!,lock_vars(X),lock_vars(XM),!.
 lock_vars(XXM):-XXM=..[_,X|XM],lock_vars(X),lock_vars(XM).
@@ -245,7 +245,7 @@ get_clause_vars_copy(H0,MHB):- must((name_vars(H0,MHB),lock_vars(MHB),as_clause_
     get_clause_vars_hb_int(H,B))),!.
 
 
-get_clause_vars_hb_int(H,B):- logicmoo_varnames:varname_info(H,B,Vs,_),must_maplist(assign_name_equal_var,Vs),!.
+get_clause_vars_hb_int(H,B):- varname_cache:varname_info(H,B,Vs,_),must_maplist(assign_name_equal_var,Vs),!.
 get_clause_vars_hb_int(H,B):- call_return_tf(try_get_body_vars(B),_TF1),call_return_tf(try_get_head_vars(H),_TF2),!.
 
 
@@ -262,21 +262,21 @@ try_get_inner_vars(H):- once((functor(H,_,N),arg(N,H,List),member(vars(Vs),List)
 call_return_tf(Call,TF):- ((Call-> TF = t ; TF = nil)).
 
 try_get_head_vars(H):- no_vars_needed(H),!.
-try_get_head_vars(H):- logicmoo_varnames:varname_info(H,_,Vs,_),maplist(assign_name_equal_var,Vs),!.
+try_get_head_vars(H):- varname_cache:varname_info(H,_,Vs,_),maplist(assign_name_equal_var,Vs),!.
 try_get_head_vars(H):- try_get_inner_vars(H),!.
-try_get_head_vars(H):- logicmoo_varnames:varname_info(_,H,Vs,_),maplist(assign_name_equal_var,Vs),!.
+try_get_head_vars(H):- varname_cache:varname_info(_,H,Vs,_),maplist(assign_name_equal_var,Vs),!.
 
 try_get_body_vars(H):- no_vars_needed(H),!.
-try_get_body_vars(H):- logicmoo_varnames:varname_info(_,H,Vs,_),maplist(assign_name_equal_var,Vs),!.
+try_get_body_vars(H):- varname_cache:varname_info(_,H,Vs,_),maplist(assign_name_equal_var,Vs),!.
 try_get_body_vars(H):- try_get_inner_vars(H).
-try_get_body_vars(H):- logicmoo_varnames:varname_info(H,_,Vs,_),maplist(assign_name_equal_var,Vs),!.
+try_get_body_vars(H):- varname_cache:varname_info(H,_,Vs,_),maplist(assign_name_equal_var,Vs),!.
 try_get_body_vars((A,B)):-!,try_get_head_vars(A),try_get_head_vars(B).
 try_get_body_vars((A;B)):-!,try_get_head_vars(A),try_get_head_vars(B).
 try_get_body_vars(C):- C=..[_,L],maplist(try_get_body_vars,L).
 try_get_body_vars(_).
 
-:- multifile(logicmoo_varnames:varname_info/4).
-:- dynamic(logicmoo_varnames:varname_info/4).
+:- multifile(varname_cache:varname_info/4).
+:- dynamic(varname_cache:varname_info/4).
 
 % assign_name_equal_var(B):-var(B),!.
 assign_name_equal_var(B):-var(B),writeq(assign_name_equal_var(B)),nl,trace,trace_or_throw(var_assign_varname_vars(B)).
@@ -343,7 +343,7 @@ save_to_clause_ref(ClauseRef,Vs,Why):- ain00(names(ClauseRef,Vs)),ain00(names_wh
 save_clause_vars(M,H,MB,B,Vs,Why:_):-atom(Why),!,save_clause_vars(M,H,MB,B,Vs,Why).
 save_clause_vars(M,H,MB,B,Vs,Why):- fail, locate_clause_ref(M,H,MB,B,ClauseRef),clause_ref_vars(ClauseRef,Was),
    ((Was=Vs) -> fail ; save_to_clause_ref(ClauseRef,Vs,Why)),!.
-save_clause_vars(_M,H,_MB,B,Vs,Why):- ain00(logicmoo_varnames:varname_info(H,B,Vs,Why)).
+save_clause_vars(_M,H,_MB,B,Vs,Why):- ain00(varname_cache:varname_info(H,B,Vs,Why)).
 
 ain00(A):- logicmoo_util_database:clause_asserted(A),!.
 ain00(A):- assertz(A).
@@ -387,7 +387,12 @@ bad_varnamez(Sub):- var(Sub),!.
 bad_varnamez(Sub):- integer(Sub),!, (Sub < 0 ; Sub > 991000).
 bad_varnamez(Sub):- number(Sub).
 
-name_modes(ModeAs:NameAs,ModeAs,NameAs).
+mpred_numbervars_with_names(Term):- term_variables(Term,Vars),mpred_name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(true)]),!.
+
+mpred_name_variables([]).
+mpred_name_variables([Var|Vars]):-
+   (var_property(Var, name(Name)) -> Var = '$VAR'(Name) ; true),
+   mpred_name_variables(Vars).
 
 
 %=========================================
@@ -424,6 +429,8 @@ snumbervars5(Term,Start,End,List):-must_det_l((integer(Start),is_list(List), num
 :- export(logicmoo_varnames:attr_unify_hook/2).
 :- export(logicmoo_varnames:attr_portray_hook/2).
 :- export(logicmoo_varnames:portray_attvar/1).
+:- export(logicmoo_varnames:attribute_goals/3).
+
 logicmoo_varnames:attr_unify_hook(_,_).
 logicmoo_varnames:attr_portray_hook(Value, _Var) :- nonvar(Value),!,writeq('?'(Value)).
 logicmoo_varnames:portray_attvar(Var) :-
@@ -435,25 +442,37 @@ logicmoo_varnames:portray_attvar(Var) :-
 	write('>}').
 
 
+attribute_goals(A, B, E) :-
+    logicmoo_varnames:
+    (   get_attr(A, logicmoo_varnames, D),
+        C=B,
+        C=[put_attr(A,logicmoo_varnames, D)|E]
+    ).
+
 
 :-export(try_save_vars/1).
 try_save_vars(_):- t_l:dont_varname,!.
 try_save_vars(HB):-ignore((nb_current('$variable_names',Vs),Vs\==[],save_clause_vars(HB,Vs))),!.
 
+:-export(maybe_scan_source_files_for_varnames/0).
+maybe_scan_source_files_for_varnames:- current_prolog_flag(mpred_vars, true),scan_source_files_for_varnames.
+
 :-export(scan_source_files_for_varnames/0).
 scan_source_files_for_varnames:- 
+ set_prolog_flag(mpred_vars, true),
  user: call((
  use_module(library(make)),
- forall(make:modified_file(F),retractall(logicmoo_varnames:varname_info_file(F))),
+ forall(make:modified_file(F),retractall(varname_cache:varname_info_file(F))),
  forall(source_file(F),logicmoo_varnames:read_source_file_vars(F)))).
 
 show_call_if_verbose(G):-!, notrace(G).
 show_call_if_verbose(G):-show_call(G).
 
-:- dynamic(logicmoo_varnames:varname_info_file/1).
+:- dynamic(varname_cache:varname_info_file/1).
+read_source_file_vars(_):- \+ prolog_flag(mpred_vars, true),!.
 read_source_file_vars(F):- \+ ((atom(F),exists_file(F))),!, forall(filematch(F,E),read_source_file_vars(E)).
-read_source_file_vars(F):- clause_asserted(logicmoo_varnames:varname_info_file(F)),!.
-read_source_file_vars(F):- asserta(logicmoo_varnames:varname_info_file(F,Ref)), catch(show_call_if_verbose(read_source_file_vars_1(F)),E,(dmsg(E),erase(Ref))).
+read_source_file_vars(F):- clause_asserted(varname_cache:varname_info_file(F)),!.
+read_source_file_vars(F):- asserta(varname_cache:varname_info_file(F,Ref)), catch(show_call_if_verbose(read_source_file_vars_1(F)),E,(dmsg(E),erase(Ref))).
 
 save_file_source_vars(_F,end_of_file,_Vs):-!.
 save_file_source_vars(_F,_T,[]):-!.
@@ -531,7 +550,7 @@ print_numbervars_maybe(H):-(compound(H);var(H)) , \+ \+ ((copy_term(H,HC),get_cl
 
 print_numbervars_1(H):- loop_check(print_numbervars_2(H),format('~N~q.~n',[H])).
 
-% print_numbervars_2(H):- trace,lmhook:portray_one_line_hook(H),!.
+% print_numbervars_2(H):- trace,lmconf:portray_one_line_hook(H),!.
 print_numbervars_2(H):- current_output(S),prolog_listing:portray_clause(S,H,[portrayed(true),singletons(false)]),!.
 print_numbervars_2(H):- write_term(H,[portrayed(false)]),nl,!.
 
@@ -540,7 +559,7 @@ term_expansion_save_vars(HB):- \+ ground(HB),  \+ t_l:dont_varname_te,\+ t_l:don
    current_predicate(_:logicmoo_util_varnames_file/0), current_prolog_flag(mpred_vars,true),  
    context_module(M),init_varname_stores(M),logicmoo_util_with_assertions:w_tl([t_l:dont_varname_te,current_prolog_flag(xref, true)],logicmoo_varnames:try_save_vars(M:HB)),!,fail.
 
-maybe_record_scanned_file:-ignore((  fail,source_location(F,_), \+ logicmoo_varnames:varname_info_file(F), asserta(logicmoo_varnames:varname_info_file(F)))).
+maybe_record_scanned_file:-ignore((  fail,source_location(F,_), \+ varname_cache:varname_info_file(F), asserta(varname_cache:varname_info_file(F)))).
 
 init_varname_stores(_):- !.
 init_varname_stores(M):- 
@@ -548,28 +567,16 @@ init_varname_stores(M):-
    M:use_module(logicmoo_util_varnames).
 
 
+% :- initialization(maybe_scan_source_files_for_varnames).
 
-mpred_impl_module(logicmoo_utils).
-mpred_impl_module(t_l).
-mpred_impl_module(tlbugger).
-mpred_impl_module(lmcache).
-mpred_impl_module(lmhook).
-mpred_impl_module(logicmoo_varnames).
-mpred_impl_module(M):- lmconf:mpred_is_impl_file(F),make_module_name(F,M).
-mpred_impl_module(M):- current_module(M),atom_concat(logicmoo_utils_,_,M).
-% mpred_impl_module(user).
-
-
-:- initialization(scan_source_files_for_varnames).
-
-prolog:make_hook(before, Files):-forall(member(File,Files),retractall(logicmoo_varnames:varname_info_file(File))).
-prolog:make_hook(after, Files):-forall(member(File,Files),show_call(ain00(logicmoo_varnames:varname_info_file(File)))).
+prolog:make_hook(before, Files):-forall(member(File,Files),retractall(varname_cache:varname_info_file(File))).
+prolog:make_hook(after, Files):-forall(member(File,Files),show_call(ain00(varname_cache:varname_info_file(File)))).
 
 user:term_expansion(HB,_):- current_prolog_flag(mpred_vars,true),term_expansion_save_vars(HB),fail.
 
 
 logicmoo_util_varnames_file.
 
-:- set_prolog_flag(mpred_vars, true).
+% :- set_prolog_flag(mpred_vars, true).
 
 

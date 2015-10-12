@@ -1,4 +1,4 @@
-/* Part of LogicMOO Base logicmoo_i_mpred_mpred_testing
+/* Part of LogicMOO Base mpred_mpred_testing
 % Tests a prolog database replacent that uses PFC
 %  
 %
@@ -8,7 +8,7 @@
 %
 */
 
-:- include(logicmoo_i_header).
+:- include('mpred_header.pi').
 
 
 % user:term_expansion(A,B):- \+ t_l:disable_mpred_term_expansions_locally, current_predicate(pfcExpansion_loaded/0),loop_check(mpred_file_expansion(A,B)),A\=@=B.

@@ -129,7 +129,7 @@
          currentContext/2]).
 
 :- else.
-:- include(logicmoo_util_header).
+:- include('logicmoo_util_header.pi').
 :- endif.
 
 

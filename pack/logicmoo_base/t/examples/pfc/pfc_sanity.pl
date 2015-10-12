@@ -1,4 +1,4 @@
-/* Part of LogicMOO Base logicmoo_i_mpred_mpred_testing
+/* Part of LogicMOO Base mpred_mpred_testing
 % Tests a prolog database replacent that uses PFC
 %  
 %
@@ -10,7 +10,7 @@
 % :- module(  'lmbase',[]).
 
 
-:- ensure_loaded(library(pfc/mpred_runtime)).
+:- ensure_loaded(  library(pfc/mpred_runtime)).
 
 :- mpred_module.
 :- mpred_begin.

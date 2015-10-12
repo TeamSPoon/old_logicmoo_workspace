@@ -1,6 +1,3 @@
-#!/usr/local/bin/swipl
-
-:- user: ensure_loaded(logicmoo_base).
 
 :- if(if_defined(load_mud_www)).
 
@@ -10,6 +7,7 @@
 :- dynamic   http:location/3.
 
 :- use_module(library(memfile)).
+:- use_module(logicmoo_base).
 %:- use_module(server).
 
 /*

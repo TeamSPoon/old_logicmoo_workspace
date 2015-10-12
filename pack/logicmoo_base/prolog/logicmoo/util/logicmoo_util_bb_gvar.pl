@@ -4,7 +4,7 @@
       ]).  
 
 :- else.
-:- include(logicmoo_util_header).
+:- include('logicmoo_util_header.pi').
 :- endif.
 
 end_of_file.

@@ -7,8 +7,8 @@
 %
 */
 
-:- ensure_loaded(logicmoo_engine).
-:- ensure_loaded(plarkc/logicmoo_i_cyc_kb).
+%:- ensure_loaded(logicmoo_engine).
+%:- ensure_loaded(plarkc/mpred_cyc_kb).
 
 :- meta_predicate cwtdl(0,+,+).
 :- meta_predicate transfer_predicate(?,0,0).
@@ -26,7 +26,7 @@ cwtdl(Goal,DL,TL):- cwc,
 :- ltkb1.
 % :- dmsg("Loading tinyKB should take under a minute").
 
-%:- in_cmt(doall((filematch(logicmoo('plarkc/logicmoo_i_cyc_kb_tinykb.pl'),F),source_file(X,F),predicate_property(X,static),X\='$pldoc'(_G8428,_G8429,_G8430,_G8431),listing(X)))).
+%:- in_cmt(doall((filematch(logicmoo('plarkc/mpred_cyc_kb_tinykb.pl'),F),source_file(X,F),predicate_property(X,static),X\='$pldoc'(_G8428,_G8429,_G8430,_G8431),listing(X)))).
 
 :- file_begin(pfc).
 

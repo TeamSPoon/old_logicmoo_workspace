@@ -9,7 +9,7 @@
 %%% 
 
 % :- '@'(ensure_loaded('../../src_lib/logicmoo_util/logicmoo_util_all'),user).
-:- ensure_loaded(logicmoo(mpred/logicmoo_i_header)).
+:- ensure_loaded(logicmoo(mpred/'mpred_header.pi')).
 :- ensure_loaded(dbase_i_mpred_pttp).
 
 :- multifile(pttp_test/2).

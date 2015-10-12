@@ -89,7 +89,7 @@
             gmust/2,
             gripe_time/2,
             on_f_debug/1,
-            on_f_debug_cont/1,
+            on_f_debug_ignore/1,
             on_x_debug/1,
             on_x_debug_cont/1,
             on_x_rtraceEach/1,
@@ -125,7 +125,7 @@
             on_f_log_fail/1,
             logOnFailure0/1,
             logOnFailureEach/1,
-            on_f_log_continue/1,
+            on_f_log_ignore/1,
             loggerFmtReal/3,
             loggerReFmt/2,
             logger_property/3,
@@ -245,7 +245,7 @@
             writeOverwritten/0,
             writeSTDERR0/1,
             writeSavedPrompt/0,
-     op(1150,fx,(user: dynamic_multifile_exported))
+     op(1150,fx,(lmconf:shared_multifile))
 
           ]).
 :- multifile
@@ -264,6 +264,7 @@
         cli_ntrace(0),
         on_x_debug(0),
         on_x_debug_cont(0),
+        on_f_debug(0),
         debugOnFailure0(0),
         dtrace(0),
         dtrace(+, 0),
@@ -288,8 +289,9 @@
         on_x_cont(0),
         ignore_each(1),
         on_f_log_fail(0),
+        on_f_debug_ignore(0),
         logOnFailure0(0),
-        on_f_log_continue(0),
+        on_f_log_ignore(0),
         meta_interp(:, +),
         motrace(0),
         must_each(0),
@@ -365,7 +367,7 @@
         on_x_rtraceEach/1,
         on_f_debug/1,
         debugOnFailureEach/1,
-        on_f_debug_cont/1,
+        on_f_debug_ignore/1,
         default_dumptrace/1,
         default_ecall/3,
         define_if_missing/2,
@@ -489,11 +491,11 @@
 :- dynamic
         logLevel/2.
 
-:- include(logicmoo_util_header).
+:- include('logicmoo_util_header.pi').
 
 
 :- 
-      op(1150,fx,(user: dynamic_multifile_exported)),
+      op(1150,fx,(lmconf:shared_multifile)),
       op(1150,fx,meta_predicate),
       op(1150,fx,thread_local).
 
@@ -519,8 +521,6 @@
      rtrace/1,  % trace why choice points are left over
      must_each/1,  % list block must succeed once .. it smartly only debugs to the last failures
      on_x_log_cont/1,
-     on_x_log_throw/1,
-     on_x_log_throw0/1,
      on_f_debug/1, % Succeeds but can be set to [Fail or Debug]
      on_f_log_fail/1,  % Fails unless [+Ignore]
           % can ignore
@@ -540,7 +540,6 @@ user_ensure_loaded(What):- !, '@'(ensure_loaded(What),'user').
 % user_use_module(library(What)):- !, use_module(library(What)).
 user_use_module(What):- '@'(use_module(What),'user').
 
-% :- '@'(ensure_loaded(logicmoo_util_library), 'user').
 
 
 
@@ -563,7 +562,7 @@ get_rtrace(X,Y):- tracing,!,'$leash'(Old, Old),'$visible'(OldV, OldV),rtrace, Y=
 get_rtrace(X,Y):- '$leash'(Old, Old),'$visible'(OldV, OldV), (Y= call_cleanup((X),(notrace,'$leash'(_, Old),'$visible'(_, OldV)))).
 
 %= :- meta_predicate  rtrace(0).
-rtrace(Goal):- debug,asserta(tlbugger:no_slow_io),get_rtrace(Goal,C),!,C.
+rtrace(Goal):- notrace((get_rtrace(Goal,C))),!,C.
 
 % :- mpred_trace_less(rtrace/1).
 
@@ -939,8 +938,6 @@ nodebugx(X):-
     w_tl(tlbugger:show_must_go_on,
        w_tl(tlbugger:ifHideTrace,hotrace(X))))).
 
-:- multifile term_to_message_string/2.
-:- dynamic term_to_message_string/2.
 
 :- dynamic isDebugging/1.
 
@@ -1183,12 +1180,10 @@ hideTrace:-
   !,hideRest,!.
   % findall(File-F/A,(functor_source_file(M,P,F,A,File),M==user),List),sort(List,Sort),dmsg(Sort),!.
 
-:- dynamic(buggerDir/1).
-:- abolish(buggerDir/1),prolog_load_context(directory,D),asserta(buggerDir(D)).
-
+/*
 hideRest:- fail, buggerDir(BuggerDir),
    functor_source_file(M,_P,F,A,File),atom_concat(BuggerDir,_,File),hideTraceMFA(M,F,A,-all),
-   fail.
+   fail.  */
 hideRest:- functor_source_file(system,_P,F,A,_File),hideTraceMFA(system,F,A,-all), fail.
 hideRest.
 
@@ -1320,25 +1315,26 @@ on_x_cont(CX):-ignore(catchvv(CX,_,true)).
 :- export(rtraceOnError/1).
 rtraceOnError(C):-
   catchvv(
-  with_skip_bugger( C ),E,(dmsg(rtraceOnError(E=C)),dtrace,thread_leash(+call),trace,thread_leash(+exception),thread_leash(+all),rtrace(with_skip_bugger( C )),dmsg(E=C),thread_leash(+call),dtrace)).
+       with_skip_bugger( C ),
+   E,(dmsg(rtraceOnError(E=C)),dtrace,thread_leash(+call),trace,thread_leash(+exception),thread_leash(+all),rtrace(with_skip_bugger( C )),dmsg(E=C),thread_leash(+call),dtrace)).
 
 
 with_skip_bugger(C):-setup_call_cleanup(asserta( tlbugger:skip_bugger),C,retract( tlbugger:skip_bugger)).
 
-%on_x_debug(C):- tlbugger:rtracing,!, catchvv(C,E,call_cleanup(debugCallWhy(thrown(E),C),throw(E))).
-%on_x_debug(C):- skipWrapper,!,C.
-on_x_debug(C):-prolog_ecall(0,on_x_rtrace,C).
+on_x_debug(C):- skipWrapper,!,C.
+on_x_debug(C):- tlbugger:rtracing,!,C.
+on_x_debug(C):- debug,prolog_ecall(0,on_x_rtrace,C).
 on_x_rtraceEach(C):-prolog_ecall(1,on_x_debug,C).
 on_x_debug_cont(C):-ignore(on_x_debug(C)).
 
 on_f_debug(C):-prolog_ecall(0,debugOnFailure0,C).
 debugOnFailure0(C):- one_must(rtraceOnError(C),debugCallWhy(failed(debugOnFailure0(C)),C)).
 debugOnFailureEach(C):-prolog_ecall(1,on_f_debug,C).
-on_f_debug_cont(C):-ignore(on_f_debug(C)).
+on_f_debug_ignore(C):-ignore(on_f_debug(C)).
 
 logOnFailure0(C):- one_must(C,dmsg(on_f_log_fail(C))).
 logOnFailureEach(C):-prolog_ecall(1,on_f_log_fail,C).
-on_f_log_continue(C):-ignore(logOnFailure0(on_x_log_throw0(C))).
+on_f_log_ignore(C):-ignore(logOnFailure0(on_x_log_throw(C))).
 
 
 %debugOnFailure0(X):-ctrace,X.
@@ -1592,8 +1588,6 @@ logger_property(todo,once,true).
 
 contains_atom(V,A):-sub_term(VV,V),nonvar(VV),functor_safe(VV,A,_).
 
-:- dynamic hook:dmsg_hook/1.
-:- multifile hook:dmsg_hook/1.
 
 :- export(matches_term/2).
 matches_term(Filter,_):- var(Filter),!.
@@ -1710,7 +1704,6 @@ module_predicate(ModuleName,P,F,A):-current_predicate(ModuleName:F/A),functor_ca
 % in SWI it''s formzat/N and sformat/N
 % ========================================================================================
 :- dynamic(isConsoleOverwritten_bugger/0).
-:- dynamic(formatter_hook/4).
 
 
 fmtString(X,Y,Z):-sformat(X,Y,Z).
@@ -1812,10 +1805,10 @@ asserta_if_ground(_).
 
 :- mpred_trace_childs(user:prolog_ecall_fa/5).
 :- mpred_trace_childs(user:prolog_ecall/3).
-%:- mpred_trace_childs(user: must/1).
-%:- mpred_trace_childs(user: must/2).
-:- mpred_trace_childs(user: must_flag/3).
-:- mpred_trace_childs(user: traceok/1).
+%:- mpred_trace_childs(lmconf:must/1).
+%:- mpred_trace_childs(lmconf:must/2).
+:- mpred_trace_childs(lmconf:must_flag/3).
+:- mpred_trace_childs(lmconf:traceok/1).
 :- mpred_trace_childs(user;hotrace/1).
 
 % though maybe dumptrace
@@ -1967,19 +1960,27 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
     nl(ERR), fail)).
 
 
+
+:- dynamic(lmconf:no_buggery/0).
 % show the warnings origins
-:- multifile(user: message_hook/3). 
-:- dynamic(user: message_hook/3).
-hook_message_hook:- asserta((user: message_hook(Term, Kind, Lines):-  if_defined(buggery_ok), (Kind= warning;Kind= error),Term\=syntax_error(_), 
- current_predicate(_:logicmoo_bugger_loaded/0), \+ lmconf:no_buggery, \+ tlbugger:no_buggery_tl,
+:- multifile(user:message_hook/3). 
+:- dynamic(user:message_hook/3).
+:- thread_local(tlbugger:no_buggery_tl/0).
+
+hook_message_hook:- asserta((
+
+user:message_hook(Term, Kind, Lines):- fail, (Kind= warning;Kind= error),Term\=syntax_error(_), 
+   current_predicate(_:logicmoo_bugger_loaded/0), \+ lmconf:no_buggery, \+ tlbugger:no_buggery_tl,
   dmsg(message_hook(Term, Kind, Lines)),hotrace(dumpST(20)),dmsg(message_hook(Term, Kind, Lines)),
 
-  % (repeat,get_single_char(C),dumptrace(true,C),!),
+   (repeat,get_single_char(C),dumptrace(true,C),!),
 
    fail)).
 
+:-hook_message_hook.
+
 % have to load this module here so we dont take ownership of prolog_exception_hook/4.
-:- user_use_module(library(prolog_stack)).
+:- user:use_module(library(prolog_stack)).
 
 %user:prolog_exception_hook(A,B,C,D):- fail,
 %   once(copy_term(A,AA)),catchvv(( once(bugger_prolog_exception_hook(AA,B,C,D))),_,fail),fail.

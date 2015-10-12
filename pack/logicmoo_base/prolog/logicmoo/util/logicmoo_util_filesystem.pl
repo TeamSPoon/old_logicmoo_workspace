@@ -134,14 +134,14 @@
 
 
 :- else.
-:- include(logicmoo_util_header).
+:- include('logicmoo_util_header.pi').
 :- endif.
 
 
 %:- set_prolog_flag(generate_debug_info, true).
 :- '@'( ensure_loaded(library(filesex)), 'user').
 
-% = :- meta_predicate(with_filematch(0)).
+:- meta_predicate(with_filematch(0)).
 with_filematch(G):- expand_wfm(G,GG),!,GG.
 with_filematches(G):- forall(expand_wfm(G,GG),GG).
 
@@ -156,22 +156,23 @@ current_filesource(F):-seeing(X),is_stream(X),stream_property(X,file_name(F)).
 current_filesource(F):-stream_property(_,file_name(F)).
 
 :- export(filematch/2).
-% = :- meta_predicate(filematch(:,-)).
+:- meta_predicate(filematch(:,-)).
 filematch(Spec,Result):-  enumerate_files(Spec,Result).
 
 
 :- thread_local(t_l:file_ext/1).
-% = :- meta_predicate(filematch_ext(+,:,-)).
+:- meta_predicate(filematch_ext(+,:,-)).
 :- export(filematch_ext/3).
 filematch_ext(Ext,FileIn,File):-
   w_tl(t_l:file_ext(Ext),filematch(FileIn,File)).
 
-% = :- meta_predicate(enumerate_files(:,-)).
+:- meta_predicate(enumerate_files(:,-)).
 :- export(enumerate_files/2).
+enumerate_files(_:Spec,Result):- notrace((atom(Spec),is_absolute_file_name(Spec),(exists_file(Spec);exists_directory(Spec)),prolog_to_os_filename(Result,Spec))),!.
 enumerate_files(M:Spec,Result):-
-   no_repeats_old([Result],((enumerate_m_files(M,Spec,NResult),normalize_path(NResult,Result),exists_file_or_dir(Result)))).
+   hotrace((no_repeats_old([Result],((enumerate_m_files(M,Spec,NResult),normalize_path(NResult,Result),exists_file_or_dir(Result)))))).
 
-% = :- meta_predicate(enumerate_files(:,-)).
+:- meta_predicate(enumerate_files(:,-)).
 :- export(enumerate_m_files/3).
 enumerate_m_files(user, Mask,File1):-!,enumerate_files0(Mask,File1).
 enumerate_m_files(M, Mask,File1):- 
@@ -291,7 +292,7 @@ if_startup_script:- prolog_load_context(source, HereF),current_prolog_flag(assoc
 if_startup_script:- prolog_load_context(source, HereF),file_base_name(HereF,HereFB),
    current_prolog_flag(os_argv,List),!,member(Arg,List),file_base_name(Arg,ArgFB),atom_concat(ArgFB,_,HereFB),!.
 
-% = :- meta_predicate(if_startup_script(0)).
+:- meta_predicate(if_startup_script(0)).
 if_startup_script(Call):-if_startup_script->Call;true.
 
 :- export(normalize_path/2).
@@ -364,7 +365,7 @@ time_file_safe(F,INNER_XML):-exists_file_safe(F),time_file(F,INNER_XML).
 
 
 
-% = :- meta_predicate(if_file_exists(:)).
+:- meta_predicate(if_file_exists(:)).
 if_file_exists(M:Call):- arg(1,Call,File),(filematch(File,_)-> must((filematch(File,X),exists_file(X),call(M:Call)));fmt(not_installing(M,Call))),!.
 
 

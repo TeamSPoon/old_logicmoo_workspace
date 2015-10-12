@@ -1,4 +1,4 @@
-/** <module> logicmoo_i_clausify
+/** <module> mpred_clausify
 % Provides a prolog database replacement that uses an interpretation of KIF
 %
 %  t/N
@@ -59,17 +59,17 @@
 :- nodebug(_).
 
 
-:- user: ensure_loaded(logicmoo_base).
+% :- use_module(logicmoo_base).
 
 
-:- user: ensure_loaded(logicmoo(plarkc/logicmoo_i_call_kb)).
+% = % :- ensure_loaded(logicmoo(snark/common_logic_kb_hooks)).
 
 :- dynamic(wid/3).
 
-:- user: ensure_loaded(library(logicmoo/plarkc/dbase_i_sexpr_reader)).
+% :- use_module(  logicmoo(snark/common_logic_sexpr)).
 
 %=%   Convert wffs to list of normal logic clauses
-:- user: ensure_loaded(library(logicmoo/plarkc/logicmoo_i_clausify)).
+% :- use_module(   logicmoo(plarkc/mpred_clausify)).
 
 
 :- op(300,fx,'~').
@@ -94,16 +94,16 @@
 :- dynamic   user:file_search_path/2.
 :- multifile user:file_search_path/2.
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(logicmoo,Dir)).
-:- dynamic(user: isa_pred_now_locked/0).
-:- multifile(user: isa_pred_now_locked/0).
-:- multifile(user: type_action_info/3).
-:- multifile(user: agent_call_command/2).
-:- multifile(user: mud_test/2).
-:- multifile(user: sanity_test/0).
-:- multifile(user: regression_test/0).
-:- multifile(user: feature_test/0).
+:- dynamic(lmconf:isa_pred_now_locked/0).
+:- multifile(lmconf:isa_pred_now_locked/0).
+:- multifile(lmconf:type_action_info/3).
+:- multifile(lmconf:agent_call_command/2).
+:- multifile(lmconf:mud_test/2).
+:- multifile(lmconf:sanity_test/0).
+:- multifile(lmconf:regression_test/0).
+:- multifile(lmconf:feature_test/0).
 
-:- include(logicmoo(mpred/logicmoo_i_header)).
+:- include(logicmoo(mpred/'mpred_header.pi')).
 
 
 
@@ -146,7 +146,7 @@ provide_kif_op(call(How),Head):-
 % OPHOOK CLAUSES
 provide_kif_op(clauses(How),(Head:- Body)):- 
    pttp_listens_to_head(clauses(How),Head),
-   mpred_provide_storage_clauses(Head,Body,_Why).
+   lmconf:mpred_provide_storage_clauses(Head,Body,_Why).
 
 % OPHOOK 
 provide_kif_op(OP,(HeadBody)):- 
@@ -169,7 +169,7 @@ lmconf:mpred_provide_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(St
 
 /*
 
-:- dynamic(user: int_proven_t/10).
+:- dynamic(lmconf:int_proven_t/10).
 
 int_proven_t(P, X, Y, E, F, A, B, C, G, D):- t(P,X,Y),
         test_and_decrement_search_cost(A, 0, B),
@@ -177,7 +177,7 @@ int_proven_t(P, X, Y, E, F, A, B, C, G, D):- t(P,X,Y),
         G=[H|I].
 
 
-:- dynamic(user: int_assumed_t/10).
+:- dynamic(lmconf:int_assumed_t/10).
 int_assumed_t(P, X, Y, E, F, A, B, C, G, D):- t(P,X,Y),
         test_and_decrement_search_cost(A, 0, B),
         C=[H, [assumed_t(P, X, Y), D, E, F]|I],
@@ -641,14 +641,14 @@ kif_sanity_test_0:-kif_test(   argInst(kb_argInst, 1 ,KB) & argInst(has, 1 , A) 
 kif_sanity_test_0:-kif_test(all(R,isa(R,tAgent) => exists(D, (isa(D,tNose) & mudContains(R,D))))).
 
 
-user: sanity_test:- kif_test(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
+lmconf:sanity_test:- kif_test(all(R,'=>'(room(R) , exists(D, '&'(door(D) , has(R,D)))))).
 
-user: sanity_test:- kif_to_boxlog(not((a , b ,  c , d)),S),!,disjuncts_to_list(S,L),
+lmconf:sanity_test:- kif_to_boxlog(not((a , b ,  c , d)),S),!,disjuncts_to_list(S,L),
   list_to_set(L,SET),forall(member(P,SET),writeln(P)),!.
 
-user: sanity_test:- logicmoo_example3.
+lmconf:sanity_test:- logicmoo_example3.
 
-user: regression_test:- logicmoo_example3.
+lmconf:regression_test:- logicmoo_example3.
 
 
 kif_sanity_tests:- forall(clause(kif_sanity_test_0,B),must(B)).
@@ -673,10 +673,10 @@ default_logic_uses:-uses_logic(logicmoo_kb_refution).
 %:- default_logic_uses.
 
 :- if_startup_script(tkif).
-:- if_startup_script(ensure_loaded(logicmoo_i_mpred_kif_testing)).
+:- if_startup_script(ensure_loaded(mpred_kif_testing)).
 
-:- ensure_loaded(plarkc/logicmoo_i_clif).
+% = % :- ensure_loaded(plarkc/mpred_clif).
 
-:- ensure_loaded(logicmoo_plarkc).
+% = % :- ensure_loaded(logicmoo_plarkc).
 
 %:- autoload.

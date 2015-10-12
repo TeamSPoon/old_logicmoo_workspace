@@ -1,4 +1,4 @@
-/** <module> logicmoo_i_mpred_pttp
+/** <module> mpred_pttp
 % Provides a prolog database replacent that uses PTTP
 %
 %  wid/3
@@ -10,14 +10,14 @@
 %
 */
 
-:- user: ensure_loaded(logicmoo(mpred/logicmoo_i_header)).
+% :- use_module(logicmoo(mpred/'mpred_header.pi')).
 
 ainz_pttp(A):-if_defined(mpred_addz(A),assertz_new(A)).
 %:-export(internal_functor/1).
 %:-export(was_pttp_functor/1).
 %:-dynamic(was_pttp_functor/1).
-:-multifile(user: wid/3).
-:-dynamic(user: wid/3).
+:-multifile(lmconf:wid/3).
+:-dynamic(lmconf:wid/3).
 :-export(int_query/7).
 :-dynamic(int_query/7).
 :-export(int_not_query/7).
@@ -122,17 +122,17 @@ pttp_assert_int_wid_for_conjuncts(ID,Y,_):- must(pttp_assert_int_wid(ID,Y)).
 
 % -- CODEBLOCK
 :-export(save_wid/3).
-save_wid(IDWhy,Atom,Wff):-must(Atom\=','),to_numbered_ground(user: wid(IDWhy,Atom,Wff),Assert),show_call_failure(ainz_pttp(Assert)).
+save_wid(IDWhy,Atom,Wff):-must(Atom\=','),to_numbered_ground(lmconf:wid(IDWhy,Atom,Wff),Assert),show_call_failure(ainz_pttp(Assert)).
 
 to_numbered_ground(I,O):-ground(I)->I=O;(copy_term(I,M),numbervars(M,766,_,[functor_name('$VAR')]),O=M->true;trace_or_throw(to_numbered_ground(I,O))).
 
 % -- CODEBLOCK
-clauses_wid(ID,ID:R,F,Y,Ref):-atomic(ID),!,nonvar(ID),clause(user: wid(ID:R,F,Y),true,Ref).
-clauses_wid(ID,ID,F,Y,Ref):-clause(user: wid(ID,F,Y),true,Ref).
+clauses_wid(ID,ID:R,F,Y,Ref):-atomic(ID),!,nonvar(ID),clause(lmconf:wid(ID:R,F,Y),true,Ref).
+clauses_wid(ID,ID,F,Y,Ref):-clause(lmconf:wid(ID,F,Y),true,Ref).
 
 % -- CODEBLOCK
 :-export(retract_if_no_wids/1).
-retract_if_no_wids(Y):- \+ user: wid(_,_,Y) -> retractall_matches(Y) ; true.
+retract_if_no_wids(Y):- \+ lmconf:wid(_,_,Y) -> retractall_matches(Y) ; true.
 
 % -- CODEBLOCK
 :-export(is_wid_key/2).
@@ -266,8 +266,8 @@ gripe_pttp_failure(Test):- pttp_test_fails_is_ok(Test),!.
 gripe_pttp_failure(Test):- dmsg(gripe_pttp_failure(Test)),!.
 gripe_pttp_failure(Test):- ignore(pttp_test_took(Test, failure, Time)),trace_or_throw(pttp_test_took(Test, failure, Time)).
 
-:-multifile(user: sanity_test/0).
-% user: sanity_test :- do_pttp_tests.
+:-multifile(lmconf:sanity_test/0).
+% lmconf:sanity_test :- do_pttp_tests.
 
 
 :-export(isNegOf/2).
@@ -363,20 +363,20 @@ pttp_assert_int_wid(ID,YB):- must((get_functor(YB,F,A),renumbervars_a(YB,Y),pttp
 pttp_assert_int_wid04(_,Y,_,_):- static_predicate(Y,Why),must( dmsg(error(warn(static_predicate(Y,Why))))),!.
 pttp_assert_int_wid04(_,_,F,A):- was_pttp_functor(external,F,A),!.
 pttp_assert_int_wid04(_,Y,F,A):- not(internal_functor(F)),add_functor(external,F/A),assertz_unumbered(Y),!.
-pttp_assert_int_wid04(ID,Y,F,A):- show_call_success(user: wid(ID,F/A,Y)),!.
-%pttp_assert_int_wid04(ID,Y,F,A):- fail, once((must((must((renumbervars_a(Y,BB),nonvar(BB))),pred_subst(is_wid_key,BB,_,_,YCheck),nonvar(YCheck),BB \=@= YCheck)))),user: wid(_,F/A,YCheck),!,ainz_pttp(user: wid(ID,F/A,Y)),!.
-pttp_assert_int_wid04(ID,Y,F,A):- user: wid(_,_,Y),!,ainz_pttp(user: wid(ID,F/A,Y)),!.
-pttp_assert_int_wid04(ID,Y,F,A):- ainz_pttp(user: wid(ID,F/A,Y)),add_functor(internal,F/A),!,assertz_unumbered(Y),!.
+pttp_assert_int_wid04(ID,Y,F,A):- show_call_success(lmconf:wid(ID,F/A,Y)),!.
+%pttp_assert_int_wid04(ID,Y,F,A):- fail, once((must((must((renumbervars_a(Y,BB),nonvar(BB))),pred_subst(is_wid_key,BB,_,_,YCheck),nonvar(YCheck),BB \=@= YCheck)))),lmconf:wid(_,F/A,YCheck),!,ainz_pttp(lmconf:wid(ID,F/A,Y)),!.
+pttp_assert_int_wid04(ID,Y,F,A):- lmconf:wid(_,_,Y),!,ainz_pttp(lmconf:wid(ID,F/A,Y)),!.
+pttp_assert_int_wid04(ID,Y,F,A):- ainz_pttp(lmconf:wid(ID,F/A,Y)),add_functor(internal,F/A),!,assertz_unumbered(Y),!.
 /*
 pttp_assert_int_wid04(ID,Y,F,A):- 
    static_predicate(Y,Why)-> (trace,wdmsg(warn(error(static_predicate(Y,Why))))); 
     must(show_call_failure(assertz_unumbered(Y)),
-    must((not(internal_functor(F))-> add_functor(external,F/A); (ainz_pttp(user: wid(ID,F/A,Y)),add_functor(internal,F/A)))))
+    must((not(internal_functor(F))-> add_functor(external,F/A); (ainz_pttp(lmconf:wid(ID,F/A,Y)),add_functor(internal,F/A)))))
 */
 
-:- user: ensure_loaded(dbase_i_mpred_pttp_statics).
-:- user: ensure_loaded(dbase_i_mpred_pttp_precompiled).
-:- user: ensure_loaded(dbase_i_mpred_pttp_testing).
+:- use_module(dbase_i_mpred_pttp_statics).
+:- use_module(dbase_i_mpred_pttp_precompiled).
+:- use_module(dbase_i_mpred_pttp_testing).
 
 :- if_startup_script(do_pttp_tests).
 

@@ -16,15 +16,19 @@
     [  % when the predciates are not being moved from file to file the exports will be moved here
       ]).
 
-:- else.
-:- include(logicmoo_util_header).
-:- endif.
+:- include('logicmoo_util_header.pi').
+
+:- multifile(lmconf:mpred_user_kb/1).
+:- dynamic(lmconf:mpred_user_kb/1).
+
+:- multifile(lmconf:mpred_system_kb/1).
+:- dynamic(lmconf:mpred_system_kb/1).
 
 :- thread_local(t_l:push_env_ctx).
 :- dynamic(bb:'$env_info'/1).
 :- multifile(bb:'$env_info'/1).
 
-% = :- meta_predicate(env_call(+)).
+:- meta_predicate(env_call(+)).
 
 :- dynamic(env_push_args/4).
 :- multifile(env_push_args/4).
@@ -58,8 +62,8 @@ env_clear(kb(Dom)):-nonvar(Dom),!,env_clear(Dom).
 env_clear(Dom):- forall(prop_mpred(Dom,F,A),env_mpred_op(retractall(F/A))).
 env_mpred_op(OP_P):- OP_P=..[OP,P],env_mpred_op(OP,P).
 
-% :- module_transparent(env_mpred_op/2).
-:- meta_predicate logicmoo_utils:env_mpred_op(1,:).
+:- module_transparent(env_mpred_op/2).
+:- meta_predicate env_mpred_op(1,:).
 env_mpred_op(OP,P):- var(OP),!,P.
 %TODO env_mpred_op(OP,P):- prop_mpred(P,_,_),!,forall(prop_mpred(P,F,A),(nop(trace),env_mpred_op(OP,F/A) )).
 %TODO env_mpred_op(OP,F):- prop_mpred(_,F,_),!,forall(prop_mpred(_,F,A),(nop(trace),env_mpred_op(OP,F/A) )).
@@ -69,7 +73,7 @@ env_mpred_op(OP,P):- functor_h(P,F,A),must(get_mpred_stubType(F,A,ENV)),!,env_mp
 env_mpred_op(OP,P):- append_term(OP,P,CALL),current_predicate(_,CALL),!,show_call(/*ocluser*/ocl:CALL).
 env_mpred_op(OP,P):- trace,trace_or_throw(unk_env_mpred_op(OP,P)).
 
-env_shadow(OP,P):-user: call(OP,P).
+env_shadow(OP,P):-lmconf:call(OP,P).
 
 :- dynamic( in_dyn/2).
 in_dyn(_DB,Call):- var(Call),!,get_mp_arity(F,A),functor(Call,F,A),( predicate_property(Call,_) -> loop_check(Call)).
@@ -145,7 +149,7 @@ decl_env_mepred_fa(Prop,_Pred,F,A):- t_l:push_env_ctx,
    add_push_prefix_arg(Pred,Type,Prefix,Pred1),
    decl_env_mepred_real(Prop,Pred1,F,A1),!,
    abolish_and_make_static(F,A),!,
-   if_defined(user: arity(F,AA)),
+   if_defined(lmconf:arity(F,AA)),
    must(arity(F,A1)==arity(F,AA)))).
 decl_env_mepred_fa(Prop,Pred,F,A):-
    decl_env_mepred_real(Prop,Pred,F,A).
@@ -155,7 +159,7 @@ decl_env_mepred_real(Prop,Pred,F,A):-
   (Prop==dyn->(dynamic(/*ocluser*/ocl:F/A));true),
   (Prop==cache->'$set_pattr'(ocl:Pred, pred, (volatile));true),
   (Prop==dom->(multifile(/*ocluser*/ocl:F/A));true),
-  user: export(/*ocluser*/ocl:F/A),
+  lmconf:export(/*ocluser*/ocl:F/A),
   if_defined(decl_mpred(Pred,Prop),ain(kb:mpred_isa(F,Prop))),
   ain(isa_kb:mpred_isa(Prop)), ain(get_mp_arity(F,A)),ain(arity(F,A)),!,
   trace,ain(prop_mpred(Prop,F,A)).
@@ -246,7 +250,7 @@ pred_1_info(_,F,A,Info):- prop_mpred(Info,F,A).
 pred_1_info(_,F,A,F/A).
 
 
-% = :- meta_predicate(env_consult(:)).
+:- meta_predicate(env_consult(:)).
 env_consult(M:File):- \+ exists_file(File),!,forall(filematch(File,FM),env_consult(M:FM)).
 env_consult(M:File):- ain(env_source_file(File)),
    w_tl((M:term_expansion(A,B):-env_term_expansion(A,B)),M:consult(File)).
@@ -369,6 +373,6 @@ env_retractall(F):-!,maybe_show_env_mpred_op(retractall(F)).
 maybe_show_env_mpred_op(G):- !,G.
 maybe_show_env_mpred_op(G):- t_l:db_spy -> show_call(G); G.
 
-% = :- meta_predicate(maybe_show_env_mpred_op(0)).
+:- meta_predicate(maybe_show_env_mpred_op(0)).
 
 */

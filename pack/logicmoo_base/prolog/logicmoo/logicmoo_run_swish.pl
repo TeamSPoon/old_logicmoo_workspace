@@ -1,18 +1,14 @@
-#!/usr/local/bin/swipl 
-
-:- if(if_defined(load_mud_www)).
-
 :- module(swish_with_localedit,
 	  [
 	  ]).
 
-:- user: ensure_loaded(logicmoo_base).
+% % :- use_module(logicmoo_base).
 
 
 :- volatile(swish_trace:installed/1).
 
 :- multifile(mpred_online:semweb_startup).
-:- '@'(ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),user).
+% :- '@'(ensure_loaded(logicmoo(util/logicmoo_util_bugger)),user).
 :- add_to_search_path(swish, '../pack/swish/').
 
 :- dynamic   user:file_search_path/2.
@@ -45,7 +41,7 @@ logicmoo_set_swish_path :-
 
 :- logicmoo_set_swish_path.
 
-:- user: ensure_loaded(swish(swish)).
+:- use_module(swish(swish)).
 
 % load rendering modules
 :- swish:use_module(logicmoo(swish_lib/render/html),	[]).
@@ -268,4 +264,4 @@ using this command and reloading the page:
 */
 %     ?- debug(nominified).
 
-:-endif.
+

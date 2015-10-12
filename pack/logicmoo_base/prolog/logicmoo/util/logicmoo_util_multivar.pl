@@ -353,7 +353,7 @@ eqs_lefts_rights([A=B|ABs], [A|As], [B|Bs]) :-
         eqs_lefts_rights(ABs, As, Bs).
 
 :- else.
-:- include(logicmoo_util_header).
+:- include('logicmoo_util_header.pi').
 :- endif.
 
 

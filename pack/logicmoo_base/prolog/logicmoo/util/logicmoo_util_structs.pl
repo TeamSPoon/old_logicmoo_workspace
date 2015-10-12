@@ -80,8 +80,6 @@
             term_to_ord_term/2,
             to_datatype/3
           ]).
-:- multifile
-        lmhook:mpred_hook_init_files/0.
 :- meta_predicate
         sisctus_key(:, -).
 :- module_transparent
@@ -110,7 +108,7 @@
         member_arg_convert/5,
         member_datatype/2,
         merge_values/3,
-        lmhook:mpred_hook_init_files/0,
+        module_local_init /0,
         nb_set_pairlist/3,
         nb_set_pairlist0/3,
         nb_set_s2list/4,
@@ -152,7 +150,7 @@
         term_to_ord_term/2,
         to_datatype/3.
 :- dynamic
-        lmhook:mpred_hook_init_files/0.
+        module_local_init/0.
 
 :- if(current_module(logicmoo_utils)).
 :- public((
@@ -167,7 +165,7 @@
   ensure_struct/2,ensure_struct/3,
   ensure_instance/2,ensure_instance/3)).
 :- else.
-:- include(logicmoo_util_header).
+:- include('logicmoo_util_header.pi').
 :- endif.
 
 
@@ -522,7 +520,7 @@ extract_struct_parameter(_Def,Decl,Name,Type):-Decl=..[K1,K2,Name],!,Type=..[K1,
 extract_struct_parameter(_Def,Decl,Name,Type):-Decl=..[Type,Name],!.
 extract_struct_parameter(Def,Name,Name,Def).
    
-lmhook:mpred_hook_init_files:- ain('==>'(struct_decl(StructDecl),decl_struct(StructDecl))).
+module_local_init:- ain('==>'(struct_decl(StructDecl),decl_struct(StructDecl))).
 
 
 ensure_instance(Type,Struct):-ensure_struct(Type,Struct).

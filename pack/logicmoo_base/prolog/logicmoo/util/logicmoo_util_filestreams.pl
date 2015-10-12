@@ -48,7 +48,7 @@
         text_to_stream/2.
 
 
-:- include(logicmoo_util_header).
+:- include('logicmoo_util_header.pi').
 
 :- export(with_stream_pos/2).
 % = :- meta_predicate(with_stream_pos(+,0)).

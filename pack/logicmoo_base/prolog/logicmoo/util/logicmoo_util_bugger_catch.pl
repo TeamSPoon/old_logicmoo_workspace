@@ -15,10 +15,13 @@
 :- module(logicmoo_util_bugger_catch,
           [ !/1,
             addLibraryDir/0,
+            source_variables_l/1,
             as_clause_no_m/3,
             as_clause_w_m/4,
             as_clause_w_m/5,
+            source_module/1,
             bad_functor/1,
+            current_why/1,
             badfood/1,
             block/2,
             block/3,
@@ -51,7 +54,6 @@
             if_defined/1,
             if_defined/2,
             if_defined_else/2,
-            if_may_hide/1,
             input_key/1,
             is_ftCompound/1,
             is_ftNonvar/1,
@@ -61,20 +63,15 @@
             is_pdt_like/0,
             is_release/0,
             keep/2,
+            loading_file/1,
             on_x_log_throw/1,
-            on_x_log_throw0/1,
             on_x_log_throwEach/1,
             on_x_log_cont/1,
+            on_x_log_fail/1,
             maplist_safe/2,
             maplist_safe/3,            
             module_functor/4,
 
-          match_predicates/2,
-          match_predicates/5,
-          mpred_trace_less/1,
-          mpred_trace_none/1,
-          mpred_trace_nochilds/1,
-          mpred_trace_childs/1,
 
             must/1,
             must_det/1,
@@ -127,17 +124,11 @@
         hotrace(0),
         if_defined(:),
         if_defined(:, 0),
-        if_defined_else(:, 0),
-        if_may_hide(0),
+        if_defined_else(:, 0),        
         on_x_log_throw(0),
-        on_x_log_throw0(0),
         on_x_log_cont(0),
-   match_predicates(:, -),
-   match_predicates(:,-,-,-,-),
-   mpred_trace_none(:),
-   mpred_trace_less(:),
-   mpred_trace_childs(:),
-   mpred_trace_nochilds(:),
+        on_x_log_fail(0),
+
         must(0),
         must_det(0),
         must_det(0, 0),
@@ -192,6 +183,7 @@
         is_pdt_like/0,
         is_release/0,
         keep/2,
+        loading_file/1,
         on_x_log_throwEach/1,
         maplist_safe/2,
         maplist_safe/3,
@@ -249,7 +241,6 @@
 
 :- endif.
 
-:- meta_predicate logicmoo_util_bugger_catch:with_unlocked_pred(:,0).
 
 % = :- meta_predicate(catchvvnt(0,?,0)).
 catchvvnt(T,E,F):-catchvv(cnotrace(T),E,F).
@@ -321,7 +312,7 @@ is_hiding_dmsgs:- \+always_show_dmsg, tlbugger:ifHideTrace,!.
 % ddmsg(D):- current_predicate(wdmsg/1),wdmsg(D),!.
 ddmsg(D):- ddmsg('~q',[D]).
 %ddmsg(F,A):- current_predicate(wdmsg/2),wdmsg(F,A),!.
-ddmsg(F,A):- sformat(SF,'~~Ndmsg: ~w~n',[F]),format_to_error(SF,A),!.
+ddmsg(F,A):- format_to_error(F,A),!.
 ddmsg_call(D):- ( (ddmsg(ddmsg_call(D)),call(D),ddmsg(ddmsg_exit(D))) *-> true ; ddmsg(ddmsg_failed(D))).
 
 
@@ -439,7 +430,7 @@ show_source_location:- current_source_location(FL),!,show_new_src_location(FL),!
 show_source_location.
 
 
-:- use_module(logicmoo_util_database).
+% % :- use_module(logicmoo_util_database).
 
 :-export( as_clause_no_m/3).
 as_clause_no_m( MHB,  H, B):- strip_module(MHB,_M,HB), as_clause( HB,  MH, MB),strip_module(MH,_M2H,H),strip_module(MB,_M2B,B).
@@ -474,73 +465,6 @@ maplist_safe(Pred,LIST):-findall(E,(member(E,LIST), on_f_debug(apply(Pred,[E])))
 maplist_safe(_Pred,[],[]):-!.
 maplist_safe(Pred,LISTIN, LIST):-!, findall(EE, ((member(E,LISTIN),on_f_debug(apply(Pred,[E,EE])))), LISTO),  ignore(LIST=LISTO),!.
 % though this should been fine % maplist_safe(Pred,[A|B],OUT):- copy_term(Pred+A, Pred0+A0), debugOnFailureEach(once(call(Pred0,A0,AA))),  maplist_safe(Pred,B,BB), !, ignore(OUT=[AA|BB]).
-
-
-
-
-
-%================================================================
-% pred tracing 
-%================================================================
-
-% = :- meta_predicate('match_predicates'(:,-)).
-
-match_predicates(M:Spec,Preds):- catch('$find_predicate'(M:Spec, Preds),_,catch('$find_predicate'(Spec, Preds),_,catch('$find_predicate'(user: Spec, Preds),_,fail))),!.
-match_predicates(MSpec,MatchesO):- catch('$dwim':'$find_predicate'(MSpec,Matches),_,Matches=[]),!,MatchesO=Matches.
-
-match_predicates(_:[],_M,_P,_F,_A):-!,fail.
-match_predicates(IM:(ASpec,BSpec),M,P,F,A):-!, (match_predicates(IM:(ASpec),M,P,F,A);match_predicates(IM:(BSpec),M,P,F,A)).
-match_predicates(IM:[ASpec|BSpec],M,P,F,A):-!, (match_predicates(IM:(ASpec),M,P,F,A);match_predicates(IM:(BSpec),M,P,F,A)).
-match_predicates(IM:IF/IA,M,P,F,A):- '$find_predicate'(IM:P,Matches),member(CM:F/A,Matches),functor(P,F,A),(predicate_property(CM:P,imported_from(M))->true;CM=M),IF=F,IA=A.
-match_predicates(Spec,M,P,F,A):- '$find_predicate'(Spec,Matches),member(CM:F/A,Matches),functor(P,F,A),(predicate_property(CM:P,imported_from(M))->true;CM=M).
-
-:- module_transparent(if_may_hide/1).
-% = :- meta_predicate(if_may_hide(0)).
-if_may_hide(_G):-!.
-% if_may_hide(G):-G.
-
-with_unlocked_pred(Pred,Goal):-
-   (predicate_property(Pred,foreign)-> true ;
-  (
- ('$get_predicate_attribute'(Pred, system, 0) -> Goal ;
- ('$set_predicate_attribute'(Pred, system, 0),
-   catch(Goal,_,true),'$set_predicate_attribute'(Pred, system, 1))))).
-
-:- export(mpred_trace_less/1).
-mpred_trace_less(W):- if_may_hide(forall(match_predicates(W,M,Pred,_,_),(
-with_unlocked_pred(M:Pred,(
-  '$set_predicate_attribute'(M:Pred, noprofile, 1),
-  (A==0 -> '$set_predicate_attribute'(M:Pred, hide_childs, 1);'$set_predicate_attribute'(M:Pred, hide_childs, 1)),
-  (A==0 -> '$set_predicate_attribute'(M:Pred, trace, 0);'$set_predicate_attribute'(M:Pred, trace, 1))))))).
-
-:- export(mpred_trace_none/1).
-mpred_trace_none(W):- (forall(match_predicates(W,M,Pred,F,A),
-with_unlocked_pred(M:Pred,(
-('$hide'(M:F/A),'$set_predicate_attribute'(M:Pred, hide_childs, 1),noprofile(M:F/A),nospy(M:Pred)))))).
-
-:- export(mpred_trace_nochilds/1).
-mpred_trace_nochilds(W):- if_may_hide(forall(match_predicates(W,M,Pred,_,_),(
-with_unlocked_pred(M:Pred,(
-'$set_predicate_attribute'(M:Pred, trace, 1),
-'$set_predicate_attribute'(M:Pred, noprofile, 1),
-'$set_predicate_attribute'(M:Pred, hide_childs, 1)))))).
-
-:- export(mpred_trace_childs/1).
-mpred_trace_childs(W) :- if_may_hide(forall(match_predicates(W,M,Pred,_,_),(
-with_unlocked_pred(M:Pred,(
-'$set_predicate_attribute'(M:Pred, trace, 0),
-'$set_predicate_attribute'(M:Pred, noprofile, 1),
-'$set_predicate_attribute'(M:Pred, hide_childs, 0)))))).   
-
-mpred_trace_all(W) :- forall(match_predicates(W,M,Pred,_,A),( 
- with_unlocked_pred(M:Pred,(
- (A==0 -> '$set_predicate_attribute'(M:Pred, trace, 0);'$set_predicate_attribute'(M:Pred, trace, 1)),
- '$set_predicate_attribute'(M:Pred, noprofile, 0),
-'$set_predicate_attribute'(M:Pred, hide_childs, 0))))).
-
-%:-mpred_trace_all(prolog:_).
-%:-mpred_trace_all('$apply':_).
-%:-mpred_trace_all(system:_).
 
 
 
@@ -619,13 +543,15 @@ block(Name, Goal) :-  block(Name, Goal, Var),  (   Var == !  ->  !  ;   true  ).
 :- dynamic(buggerFile/1).
 :- abolish(buggerFile/1),prolog_load_context(source,D),asserta(buggerFile(D)).
 
-:- module_transparent(library_directory/1).
 
 % hasLibrarySupport :- absolute_file_name('logicmoo_util_library.pl',File),exists_file(File).
 
-throwNoLib:- trace,absolute_file_name('.',Here), buggerFile(BuggerFile), listing(library_directory), trace_or_throw(error(existence_error(url, BuggerFile), context(_, status(404, [BuggerFile, from( Here) ])))).
+throwNoLib:- trace,absolute_file_name('.',Here), buggerFile(BuggerFile), listing(user:library_directory), trace_or_throw(error(existence_error(url, BuggerFile), context(_, status(404, [BuggerFile, from( Here) ])))).
 
-addLibraryDir :- buggerDir(Here),atom_concat(Here,'/..',UpOne), absolute_file_name(UpOne,AUpOne),asserta(library_directory(AUpOne)).
+:- dynamic(buggerDir/1).
+:- abolish(buggerDir/1),prolog_load_context(directory,D),asserta(buggerDir(D)).
+
+addLibraryDir :- buggerDir(Here),atom_concat(Here,'/..',UpOne), absolute_file_name(UpOne,AUpOne),asserta(user:library_directory(AUpOne)).
 
 % if not has library suport, add this direcotry as a library directory
 % :-not(hasLibrarySupport) -> addLibraryDir ; true .
@@ -768,7 +694,7 @@ hotrace(X):-  X.
 
 :- if(false).
 :- else.
-:- include(logicmoo_util_header).
+:- include('logicmoo_util_header.pi').
 :- endif.
 
 :-export(on_x_fail/1).
@@ -780,17 +706,16 @@ showHiddens:-true.
 
 :- meta_predicate on_x_log_fail(0).
 :- export(on_x_log_fail/1).
-on_x_log_fail(G):- catch(G,E,(dmsg(E:G),fail)).
+on_x_log_fail(G):- catchvv(G,E,(dmsg(E:G),fail)).
 
 
 % -- CODEBLOCK
 
 :- export(on_x_log_throw/1).
-on_x_log_throw(C):-prolog_ecall(0,on_x_log_throw0,C).
-:- export(on_x_log_throw0/1).
-on_x_log_throw0(C):- catchvv(C,E,ddmsg(on_x_log_throw(E,C))).
+:- export(on_x_log_throw/1).
+on_x_log_throw(C):- catchvv(C,E,(ddmsg(on_x_log_throw(E,C)),throw(E))).
 on_x_log_throwEach(C):-prolog_ecall(1,on_x_log_throw,C).
-on_x_log_cont(C):-ignore(on_x_log_throw0(C)).
+on_x_log_cont(C):-ignore(on_x_log_throw(C)).
 
 :- thread_local( tlbugger:skipMust/0).
 %MAIN tlbugger:skipMust.
@@ -909,7 +834,7 @@ get_must(Call,DO):- tlbugger:show_must_go_on,!,
             *-> true ; notrace((dumpST,ddmsg(error,sHOW_MUST_go_on_failed_F__A__I__L_(Call)),badfood(Call))))).
 
 % get_must(Call,DO):- !, DO = on_f_debug(on_x_debug(Call)).
-get_must(Call,DO):- !, DO = (catch(Call,E,(ddmsg(eRRR(E,must(Call))),rtrace(Call),trace,!,fail)) *-> true ; ((ddmsg(failed(must(Call))),trace,Call))).
+get_must(Call,DO):- !, DO = (catch(Call,E,(notrace,ddmsg(eXXX(E,must(Call))),rtrace(Call),trace,!,fail)) *-> true ; ((ddmsg(failed(must(Call))),trace,Call))).
 
 get_must(Call,DO):-    
    (DO = (catchvv(Call,E,

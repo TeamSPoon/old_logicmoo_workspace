@@ -1,6 +1,6 @@
 /** <module> 
 % ===================================================================
-% File 'logicmoo_i_cyc_kb.pl'
+% File 'mpred_cyc_kb.pl'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;
@@ -16,9 +16,108 @@
 % Douglas Miles
 */
 %:- module(tiny_kb,['TINYKB-ASSERTION'/5, 'TINYKB-ASSERTION'/6]).
+% File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_cyc_kb.pl
+:- module(logicmoo_i_cyc_kb,
+          [ addCycL/1,
+            addCycL0/1,
+            addCycL1/1,
+            addTinyCycL/1,
+            addTiny_added/1,
+            as_cycl/2,
+            atom_concatM/3,
+            atom_concatR/3,
+            call_el_stub/3,
+            cycLToMpred/2,
+            cycLToMpred0/2,
+            cycPrepending/2,
+            cyc_to_clif/2,
+            cyc_to_clif_notify/2,
+            cyc_to_mpred_idiom/2,
+            cyc_to_mpred_idiom1/2,
+            cyc_to_mpred_idiom_unused/2,
+            cyc_to_mpred_sent_idiom_2/3,
+            cyc_to_plarkc/2,
+            expT/1,
+            isCycAvailable_known/0,
+            isCycUnavailable_known/1,
+            isF/1,
+            isFT/1,
+            isPT/1,
+            isRT/1,
+            isV/1,
+            isVT/1,
+            is_better_backchained/1,
+            is_simple_arg/1,
+            is_simple_gaf/1,
+            isa_db/2,
+            ist_tiny/2,
+            kw_to_vars/2,
+            label_args/3,
+            list_to_ops/3,
+            loadTinyKB/0,
+            ltkb1/0,
+            ltkb2/0,
+            make_el_stub/4,
+            make_functor_h/3,
+            make_kw_functor/3,
+            make_kw_functor/4,
+            maybe_ruleRewrite/2,
+            mpred_postpend_type/2,
+            mpred_prepend_type/2,
+            mpred_to_cyc/2,
+            mwkb1/0,
+            needs_canoncalization/1,
+            needs_indexing/1,
+            notFormatType/1,
+            print_assertion/3,
+            sent_to_conseq/2,
+            tDressedMt/1,
+            tEscapeFunction/1,
+            tUndressedMt/1,
+            tinyAssertion/3,
+            tinyAssertion0/3,
+            tinyKB/1,
+            tinyKB/3,
+            tinyKB1/1,
+            tinyKB2/1,
+            tinyKB_All/3,
+            tinyKB_wstr/1,
+            tiny_support/3,
+            vtUnreifiableFunction/1,
+            wkb0/0,
+            wkb01/0,
+            wkb02/0,
+            wkb2/0,
+            wkbe/0
+          ]).
+:- multifile
+        '$load_context_module'/3,
+        argGenl/3,
+        argIsa/3,
+        argQuotedIsa/3.
+:- dynamic
+        '$load_context_module'/3,
+        addTiny_added/1,
+        argGenl/3,
+        argIsa/3,
+        argQuotedIsa/3,
+        cycPrepending/2,
+        cyc_to_plarkc/2,
+        isCycAvailable_known/0,
+        isCycUnavailable_known/1,
+        mpred_to_cyc/2,
+        vtUnreifiableFunction/1.
 
 
 isa_db(I,C):-clause(isa(I,C),true).
+
+
+:- dynamic((exactlyAssertedEL/4,exactlyAssertedEL/5,exactlyAssertedEL/6,exactlyAssertedEL/7)).
+:- dynamic((exactlyAssertedEL_next/4,exactlyAssertedEL_next/5,exactlyAssertedEL_next/6,exactlyAssertedEL_next/7)).
+:- dynamic((exactlyAssertedEL_first/4,exactlyAssertedEL_first/5,exactlyAssertedEL_first/6,exactlyAssertedEL_first/7)).
+:- dynamic(assertedTinyKB_implies_first/4).
+:- dynamic(assertedTinyKB_not_first/3).
+:- dynamic((exactlyAssertedEL_first/5,exactlyAssertedEL_with_vars/5,exactlyAssertedEL_with_vars/6,assertedTinyKB_implies_Already/4)).
 
 
 :-dynamic(cycPrepending/2).
@@ -304,7 +403,7 @@ ltkb1:-
       told,
       retractall(tinyKB0(comment(_,_))))).
 
-ltkb2:- doall((filematch(logicmoo('plarkc/logicmoo_i_cyc_kb_tinykb.pl'),F),must(source_file(X,F)),predicate_property(X,dynamic),retract(X:-_))).
+ltkb2:- doall((filematch(logicmoo('plarkc/mpred_cyc_kb_tinykb.pl'),F),must(source_file(X,F)),predicate_property(X,dynamic),retract(X:-_))).
 
 
 mpred_prepend_type(X,_):- \+ atom(X),!,fail.
@@ -441,14 +540,13 @@ cyc_to_clif(HOLDS,HOLDSOUT):-HOLDS=..[F|HOLDSL],
   ((is_list([C|HOLDSOUTL]), atom(C))-> must(HOLDSOUT=..[C|HOLDSOUTL]) ; HOLDSOUT=[C|HOLDSOUTL]),!.
 
 
-
+/*
 :-dynamic(argIsa/3).
 :-multifile(argIsa/3).
 :-dynamic(argGenl/3).
 :-multifile(argGenl/3).
 :-dynamic(argQuotedIsa/3).
 :-multifile(argQuotedIsa/3).
-/*
 isa(I,C):-exactlyAssertedEL(isa,I,C,_,_).
 genls(I,C):-exactlyAssertedEL(genls,I,C,_,_).
 arity(I,C):-exactlyAssertedEL(arity,I,C,_,_).
@@ -677,7 +775,7 @@ checkCycAvailablity:- ccatch((current_predicate(invokeSubL/2),ignore((invokeSubL
 % :- dmsg("Loading tinyKB should take under a minute 666").
 
 % :-must((asserta((user:term_expansion(A,B):-cyc_to_clif_notify(A,B),!),CLREF),asserta(at_eof_action(erase(CLREF))))).
-:- gripe_time(60,user: qcompile(logicmoo(plarkc/logicmoo_i_cyc_kb_tinykb))).
+:- gripe_time(60,lmconf:qcompile(logicmoo(plarkc/mpred_cyc_kb_tinykb))).
 %:-must(forall(retract(at_eof_action(CALL)),must(CALL))).
 
 

@@ -253,7 +253,7 @@
        ]).
 
 :- else.
-:- include(logicmoo_util_header).
+:- include('logicmoo_util_header.pi').
 :- endif.
 
 
@@ -305,6 +305,8 @@ dmsg_text_to_string_safe(Expr,Forms):-on_x_fail(text_to_string(Expr,Forms)).
 % ===================================================================
 % Lowlevel printng
 % ===================================================================
+:- multifile term_to_message_string/2.
+:- dynamic term_to_message_string/2.
 
 fmt0(user_error,F,A):-!,current_main_error_stream(Err),!,format(Err,F,A).
 fmt0(current_error,F,A):-!,thread_current_error_stream(Err),!,format(Err,F,A).
@@ -448,6 +450,8 @@ vdmsg(L,F):-loggerReFmt(L,LR),loggerFmtReal(LR,F,[]).
 dmsg(L,F,A):-loggerReFmt(L,LR),loggerFmtReal(LR,F,A).
 
 :- thread_local(tlbugger:in_dmsg/1).
+:- dynamic tlbugger:dmsg_hook/1.
+:- multifile tlbugger:dmsg_hook/1.
 
 dmsg0(V):- notrace(make_key(V,K)),
    (tlbugger:in_dmsg(K)-> dmsg5(V);  % format_to_error('~N% ~q~n',[dmsg0(V)]) ;
@@ -459,7 +463,7 @@ dmsg1(_):- \+ always_show_dmsg, is_hiding_dmsgs,!.
 dmsg1(V):- var(V),!,dmsg1(warn(dmsg_var(V))).
 dmsg1(NC):- cyclic_term(NC),!,trace,format_to_error('~N% ~q~n',[dmsg_cyclic_term_1]).
 dmsg1(NC):- tlbugger:skipDMsg,!,loop_check_early(dmsg2(NC),format_to_error('~N% ~q~n',[skipDMsg])).
-dmsg1(V):- w_tl(tlbugger:skipDMsg,((once(dmsg2(V)), ignore((hook:dmsg_hook(V),fail))))).
+dmsg1(V):- w_tl(tlbugger:skipDMsg,((once(dmsg2(V)), ignore((tlbugger:dmsg_hook(V),fail))))).
 
 % = :- export(dmsg2/1).
 dmsg2(NC):- cyclic_term(NC),!,format_to_error('~N% ~q~n',[dmsg_cyclic_term_2]).
@@ -855,7 +859,7 @@ simplify_goal_printed(G,O):- must(transitive(simplify_goal_printed0,G,O)),!.
 
 % = :- export(simplify_goal_printed0/2).
 simplify_goal_printed0(Var,Var):- \+ compound(Var),!.
-simplify_goal_printed0(user: G,G).
+simplify_goal_printed0(lmconf:G,G).
 simplify_goal_printed0(system:G,G).
 simplify_goal_printed0(catchvv(G,_,_),G).
 simplify_goal_printed0(call(G),G).
@@ -889,6 +893,7 @@ clauseST(ClRef,Goal = HB):- ignore(((clause(Head, Body, ClRef),copy_term(((Head 
    snumbervars(HB,0,_),
    findall(Prop,(member(Prop,[source(_),line_count(_),file(_),fact,erased]),clause_property(ClRef,Prop)),Goal).
 
+:- dynamic(formatter_hook/4).
 
 
 withFormatter(Lang,From,Vars,SForm):-formatter_hook(Lang,From,Vars,SForm),!.

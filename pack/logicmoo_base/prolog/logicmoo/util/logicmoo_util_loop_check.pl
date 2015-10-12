@@ -100,7 +100,7 @@ go_as_last(Call1,Call2):- \+ lmcache:going_last(Call1),w_tl(lmcache:going_last(C
         goal_expansion/2.
 
 
-:- include(logicmoo_util_header).
+:- include('logicmoo_util_header.pi').
 
 :- export(transitive/3).
 % = :- meta_predicate(transitive(2,+,-)).
@@ -204,7 +204,7 @@ get_where0(F:L):-source_location(file,F),current_input(S),line_position(S,L),!.
 get_where0(F:L):-source_location(F,L),!.
 get_where0(A:0):-current_input(S),stream_property(S,alias(A)),!.
 get_where0(M:0):-context_module(M),!.
-get_where0(user: 0):-!.
+get_where0(lmconf:0):-!.
 
 lco_goal_expansion(_,_):-!,fail.
 lco_goal_expansion(B,A):-nonvar(A),!,lco_goal_expansion(B,M),!,M=A.
@@ -256,8 +256,8 @@ retract_can_table :- retractall(maybe_table_key(_)).
 
 % = :- meta_predicate(make_key(?,-)).
 
-:- multifile(lmhook:mpred_on_expire_caches/1).
-:- dynamic(lmhook:mpred_on_expire_caches/1).
+:- multifile(lmconf:mpred_on_expire_caches/1).
+:- dynamic(lmconf:mpred_on_expire_caches/1).
 :- module_transparent((ex)/0).
 
 :- dynamic(lmconf:already_added_this_round/1).
@@ -267,10 +267,10 @@ expire_dont_add:-retractall(lmconf:already_added_this_round(_)),mpred_expire_cac
 lex:-listing(lmcache:ilc(_)),forall(current_predicate(lmcache:F/A),listing(lmcache:F/A)),catchvv(listing(lmconf:already_added_this_round),_,true).
 (ex):-mpred_expire_caches(_),retractall(lmcache:ilc(_)),dmsg_showall(_),forall(current_predicate(lmcache:F/A),(functor(RA,F,A),retractall(RA))),catchvv(expire_dont_add,_,true).
 
-mpred_expire_caches(A):-doall(call_no_cuts(must(lmhook:mpred_on_expire_caches(A)))).
+mpred_expire_caches(A):-doall(call_no_cuts(must(lmconf:mpred_on_expire_caches(A)))).
 
-:-multifile(lmhook:mpred_on_expire_caches/1).
-:-asserta((lmhook:mpred_on_expire_caches(A):-expire_tabled_list(A))).
+:-multifile(lmconf:mpred_on_expire_caches/1).
+:-asserta((lmconf:mpred_on_expire_caches(A):-expire_tabled_list(A))).
 
 expire_tabled_list(V):-var(V),!,retractall(lmcache:call_tabled_cached_results(_,_)).
 expire_tabled_list(K):-compound(K),functor(K,_,1),retractall(lmcache:call_tabled_cached_results(isa(_,_),_)),retractall(lmcache:call_tabled_cached_results(isa(_,_)+_,_)),fail.
@@ -360,4 +360,15 @@ outside_of_loop_check:- (clause(lmcache:ilc(_),B)->B=(!,fail);true).
 user:goal_expansion(LC,LCOO):- notrace((current_predicate(_:logicmoo_bugger_loaded/0),once(lco_goal_expansion(LC,LCOO)),LC\=@=LCOO)).
 
 
+
+
+mpred_impl_module(logicmoo_utils).
+mpred_impl_module(t_l).
+mpred_impl_module(tlbugger).
+mpred_impl_module(lmcache).
+mpred_impl_module(lmconf).
+mpred_impl_module(logicmoo_varnames).
+mpred_impl_module(M):- lmconf:mpred_is_impl_file(F),make_module_name(F,M).
+mpred_impl_module(M):- current_module(M),atom_concat(logicmoo_utils_,_,M).
+% mpred_impl_module(user).
 

@@ -19,8 +19,7 @@
             def_meta_predicate/3,
             dynamic_if_missing/1,
             dynamic_multifile/1,
-            (dynamic_multifile_exported)/1,
-            (dynamic_multifile_exported)/4,
+            (shared_multifile)/1,            
             (dynamic_safe)/1,
             (dynamic_safe)/3,
             dynamic_transparent/1,
@@ -40,7 +39,9 @@
             remove_pred/3,
             static_predicate/1,
             static_predicate/3,
-            with_mfa/2,
+            with_mfa/2,            
+            (shared_multifile)/3,
+            shared_multifile_fa/3,
             with_mfa_of/5,
             with_pi/2,
             with_pi_selected/4,
@@ -49,8 +50,7 @@
 :- meta_predicate
         call_if_defined(0),
         def_meta_predicate(0, +, +),
-        ( (dynamic_multifile_exported(:))),
-        ( dynamic_multifile_exported(+, +, +, +)),
+        ( (shared_multifile(+))),
         ( (dynamic_safe(+)) ),
         ( dynamic_safe(+, +, +) ),
         get_module_of(0, -),
@@ -83,15 +83,7 @@
         static_predicate/1.
 
 
-
-:- if(current_predicate(logicmoo_utils:combine_logicmoo_utils/0)).
-:- module(logicmoo_util_preddefs,
-[  % when the predciates are not being moved from file to file the exports will be moved here
-       ]).
-
-:- else.
-:- include(logicmoo_util_header).
-:- endif.
+:- include('logicmoo_util_header.pi').
 
 
 % ----------
@@ -169,21 +161,49 @@ make_transparent(_CM,M,PI,F/A):-
 
 % ----------
 
-:- export((dynamic_multifile_exported)/1).
-:- export((dynamic_multifile_exported)/4).
-% = :- meta_predicate(( dynamic_multifile_exported(:), dynamic_multifile_exported(+,+,+,+))).
-:- module_transparent((dynamic_multifile_exported)/1).
-dynamic_multifile_exported( (M:F)/A ):- !,context_module(CM),
-'@'((dynamic_safe(M,F,A),
-   (static_predicate(M,F,A) -> true ; ((M:multifile(F/A),CM:multifile(F/A)))),
-   % make_transparent(CM,M,PI,F/A),
-   M:export(F/A)),M). %,dmsg(dynamic_multifile_exported(CALL)).
-dynamic_multifile_exported( FA ):- with_pi(FA,(dynamic_multifile_exported)).
-dynamic_multifile_exported(CM, M, _PI, F/A):-
-'@'((dynamic_safe(M,F,A),
-   (static_predicate(M,F,A) -> true ; ((M:multifile(F/A),CM:multifile(F/A)))),
-   % make_transparent(CM,M,PI,F/A),
-   M:export(F/A)),M). %,dmsg(dynamic_multifile_exported(CALL)).
+
+:-module_transparent(context_module_of_file/1).
+context_module_of_file(CM):- prolog_load_context(source,F),make_module_name(F,CM),current_module(CM),!.
+context_module_of_file(CM):- trace, context_module(CM),!.
+
+:- multifile(lmconf:mpred_is_shared_multifile/3).
+:- dynamic(lmconf:mpred_is_shared_multifile/3).
+:- export((shared_multifile)/3).
+
+:- export((shared_multifile)/1).
+:- meta_predicate(shared_multifile(+)).
+:- module_transparent((shared_multifile)/1).
+
+:-module_transparent(shared_multifile/1).
+shared_multifile(_).
+shared_multifile(PI ):- context_module_of_file(CM),shared_multifile(CM, kb, PI).
+
+:-module_transparent(shared_multifile/3).
+shared_multifile(CM,_, M:F/A ):- sanity(atom(F)), !,context_module_of_file(CM),shared_multifile(CM, M, F/A).
+shared_multifile(CM,_, (M:F)/A ):- !,context_module_of_file(CM),shared_multifile(CM, M, F/A).
+shared_multifile(CM,_, M:PI ):-!, shared_multifile(CM,M,PI).
+shared_multifile(CM, M, List ) :- is_list(List),!,maplist(shared_multifile(CM,M),List).
+shared_multifile(CM, M, (A,B) ):-!,shared_multifile(CM,M, A ),shared_multifile(CM,M, B ).
+
+shared_multifile(CM, M, F):- atom(F),!,must(shared_multifile_fa(CM, M, F/0)).
+shared_multifile(CM, M, F/A):- must(shared_multifile_fa(CM, M, F/A)).
+
+:-export(shared_multifile_fa/3).
+:-module_transparent(shared_multifile_fa/3).
+shared_multifile_fa(CM, M, F/A):- lmconf:mpred_is_shared_multifile(CM, M, F/A),!.
+% shared_multifile_fa(CM, M, F/A):- CM==M, M\==lmconf,!,shared_multifile_fa(CM, kb, F/A).
+
+shared_multifile_fa(_CM, M, F/A):- functor(P,F,A), \+ \+ current_predicate(_,_:P), ignore(once((must((current_predicate(_,RM:P),\+ predicate_property(RM:P,imported_form(_)), M==RM))))),fail.
+shared_multifile_fa(CM, M, F/A):- lmconf:mpred_is_shared_multifile(CM0, M0, F/A),M0\==M, dmsg(shared_multifile_fa(CM->CM0, M->M0, F/A)),!,asserta(lmconf:mpred_is_shared_multifile(CM, M, F/A)),!.
+shared_multifile_fa(CM, M, F/A):- 
+  must_det_l((
+    asserta(lmconf:mpred_is_shared_multifile(CM, M, F/A)),
+    dynamic_safe(M,F,A), 
+   '@'(M:export(M:F/A),M),
+   '@'(M:multifile(M:F/A),M),
+   '@'(M:multifile(M:F/A),CM),   
+    (CM\==M->CM:import(M:F/A);true))).
+
 
 % ----------
 
@@ -240,14 +260,14 @@ dynamic_transparent([]):-!.
 dynamic_transparent([X]):-dynamic_transparent(X),!.
 dynamic_transparent([X|Xs]):-!,dynamic_transparent(X),dynamic_transparent(Xs),!.
 dynamic_transparent(M:F/A):-!, module_transparent(M:F/A),dynamic(M:F/A).
-dynamic_transparent(F/A):-!,multi_transparent(user: F/A).
+dynamic_transparent(F/A):-!,multi_transparent(lmconf:F/A).
 dynamic_transparent(X):-functor_catch(X,F,A),dynamic_transparent(F/A),!.
 
 multi_transparent([]):-!.
 multi_transparent([X]):-multi_transparent(X),!.
 multi_transparent([X|Xs]):-!,multi_transparent(X),multi_transparent(Xs),!.
 multi_transparent(M:F/A):-!, module_transparent(M:F/A),dynamic(M:F/A),multifile(M:F/A).
-multi_transparent(F/A):-!,multi_transparent(user: F/A).
+multi_transparent(F/A):-!,multi_transparent(lmconf:F/A).
 multi_transparent(X):-functor_catch(X,F,A),multi_transparent(F/A),!.
 
 
@@ -265,7 +285,7 @@ get_pi(Mask,PI):-get_functor(Mask,F,A),functor(PI,F,A),!.
 :- meta_predicate get_module_of_4(0,+,+,-).
 get_module_of_4(_P,F,A,ModuleName):- current_module(ModuleName),module_property(ModuleName, exports(List)),member(F/A,List),!.
 get_module_of_4(_P,F,A,M):- current_predicate(M0:F0/A0),F0=F,A0=A,!,M=M0.
-get_module_of_4(P,F,A,M):-trace_or_throw((get_module_of_4(P,F,A,M))).
+get_module_of_4(P,F,A,M):- trace_or_throw((get_module_of_4(P,F,A,M))).
 
 /*
 get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,lmconf:mpred_user_kb(M).
@@ -317,7 +337,7 @@ rebuild_as_dyn(M,C,F,A):- redefine_system_predicate(M:C),M:abolish(F,A),dynamic(
 
 dynamic_safe(M,F,A):- functor(C,F,A),predicate_property(C,imported_from(system)),!,dmsg(warn(predicate_property(M:C,imported_from(system)))).
 dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> show_call(convert_to_dynamic(M,F,A)) ; on_x_log_cont((dynamic(M:F/A),multifile(M:F/A)))). % , warn_module_dupes(M,F,A).
-:- op(1150,fx,user: dynamic_safe).
+:- op(1150,fx,lmconf:dynamic_safe).
 
 
 % pred_prop(Spec,DO,TEST,DONT)
