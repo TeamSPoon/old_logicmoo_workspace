@@ -33,13 +33,6 @@
 				Refilter="0"
 				Excludes=""/>
 		</Folder>
-		<Folder Name="../t">
-			<F
-				N="../t/*.*"
-				Recurse="1"
-				Refilter="0"
-				Excludes=".git/;.svn/;*.*~;*~/"/>
-		</Folder>
 		<F
 			N="*.*"
 			Recurse="1"

@@ -644,9 +644,9 @@ ensure_mpred_file_loaded(M:F0,List):-
 
 ******/
 
-
-:-export(declare_load_dbase/1).
-declare_load_dbase(Spec):- forall(no_repeats_old(File,must_locate_file(Spec,File)),show_call(asserta_if_new(registered_mpred_file(File)))).
+/1).
+declare_load_dbase(Spec):- 
+:-export(declare_load_dbaseforall(no_repeats_old(File,must_locate_file(Spec,File)),show_call(asserta_if_new(registered_mpred_file(File)))).
 
 % :-export((is_compiling_sourcecode/1)).
 is_compiling_sourcecode:-is_compiling,!.
