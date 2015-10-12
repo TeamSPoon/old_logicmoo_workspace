@@ -259,7 +259,9 @@ index((programmer_error), 1, logicmoo_util_bugger, logicmoo_util_bugger).
 index((prolog_call), 1, logicmoo_util_bugger, logicmoo_util_bugger).
 index((prolog_current_frame_or_parent), 2, logicmoo_util_bugger, logicmoo_util_bugger).
 index((prolog_current_frames), 1, logicmoo_util_bugger, logicmoo_util_bugger).
-index((prolog_ecall), 3, logicmoo_util_bugger, logicmoo_util_bugger).
+index((with_each), 1, logicmoo_util_bugger, logicmoo_util_bugger).
+index((with_each), 2, logicmoo_util_bugger, logicmoo_util_bugger).
+index((with_each), 3, logicmoo_util_bugger, logicmoo_util_bugger).
 index((prolog_ecall_fa), 5, logicmoo_util_bugger, logicmoo_util_bugger).
 index((prolog_must), 1, logicmoo_util_bugger, logicmoo_util_bugger).
 index((prolog_must_l), 1, logicmoo_util_bugger, logicmoo_util_bugger).

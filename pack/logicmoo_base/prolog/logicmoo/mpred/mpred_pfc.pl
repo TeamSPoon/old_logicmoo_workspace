@@ -374,9 +374,7 @@
         
           ]).
 :- multifile % (multifile) :-
-        '$included'/4,
-        '$load_context_module'/3,
-        
+      
         lmconf:hook_one_minute_timer_tick/0,
         infoF/1,
         mpred_hook_rescan_files/0,
@@ -888,6 +886,7 @@ resolverConflict_robot(0),
 :- dynamic(module_local_init/0).
 :- discontiguous(module_local_init/0).
 
+:- include('mpred_header.pi').
 
 % ======================= mpred_file('pfcsyntax').	% operator declarations.
 :- module_transparent(wlmuser/1).
@@ -1001,6 +1000,7 @@ compiled(F/A):- dynamic(F/A),compile_predicates([F/A]).
 :- compiled(('<==>')/2).
 */
 
+:- thread_local((t_l:use_side_effect_buffer , t_l:verify_side_effect_buffer)).
 record_se:- (t_l:use_side_effect_buffer ; t_l:verify_side_effect_buffer).
 
 

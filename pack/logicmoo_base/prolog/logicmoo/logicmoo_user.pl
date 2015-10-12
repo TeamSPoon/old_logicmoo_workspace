@@ -38,11 +38,13 @@ m1:- gripe_time(40,ensure_loaded(logicmoo(mpred_online/mpred_www))),if_defined(m
 % :- hook_message_hook.
 :- set_prolog_flag(verbose_autoload,false).
 :- set_prolog_flag(verbose_load,true).
-m2:- (F = mpred/_),foreach(must(lmconf:mpred_is_impl_file(F)),must_det_l((dmsg(list_file_preds(F)),ensure_loaded(F),export_file_preds(F),list_file_preds(F)))).
+m9:- (F = mpred/_),foreach(must(lmconf:mpred_is_impl_file(F)),must_det_l((dmsg(list_file_preds(F)),ensure_loaded(F),export_file_preds(F),list_file_preds(F)))).
 
-m3:- rtrace(ensure_mpred_system).
+m2:- rtrace(ensure_mpred_system).
 
-m4:- w_tl(tlbugger:ifHideTrace,(ensure_mpred_file_loaded(mpred/mpred_builtin))).
+m3:- must(filematch_ext(['',mpred,ocl,moo,plmoo,pl,plt,pro,p,'pl.in',pfc,pfct],logicmoo_user:pfc/mpred,W)),dmsg(W).
+m4:- ensure_mpred_file_loaded(pfc/mpred).
+m5:- w_tl(tlbugger:ifHideTrace,(ensure_mpred_file_loaded(pfc/mpred))).
 
 
 

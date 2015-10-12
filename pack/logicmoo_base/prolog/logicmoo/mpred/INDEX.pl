@@ -509,6 +509,8 @@ index((assert_kif), 1, mpred_loader, mpred_loader).
 index((assert_kif_dolce), 1, mpred_loader, mpred_loader).
 index((assert_until_eof), 1, mpred_loader, mpred_loader).
 index((begin_pfc), 0, mpred_loader, mpred_loader).
+index((call_with_source_module), 2, mpred_loader, mpred_loader).
+index((call_with_module), 2, mpred_loader, mpred_loader).
 index((can_be_dynamic), 1, mpred_loader, mpred_loader).
 index((cl_assert), 2, mpred_loader, mpred_loader).
 index((clear_predicates), 1, mpred_loader, mpred_loader).
@@ -525,6 +527,7 @@ index((current_context_module), 1, mpred_loader, mpred_loader).
 index((current_lang), 1, mpred_loader, mpred_loader).
 index((current_op_alias), 2, mpred_loader, mpred_loader).
 index((current_world), 1, mpred_loader, mpred_loader).
+index((prolog_load_file_loop_checked), 2, mpred_loader, mpred_loader).
 index((cwc), 0, mpred_loader, mpred_loader).
 index((decache_file_type), 1, mpred_loader, mpred_loader).
 index((decl_mpred_multifile), 1, mpred_loader, mpred_loader).
@@ -577,7 +580,7 @@ index((load_file_dir), 2, mpred_loader, mpred_loader).
 index((load_file_some_type), 2, mpred_loader, mpred_loader).
 index((load_init_world), 2, mpred_loader, mpred_loader).
 index((load_language_file), 1, mpred_loader, mpred_loader).
-index((load_mpred_file_end), 2, mpred_loader, mpred_loader).
+index((load_mpred_on_file_end), 2, mpred_loader, mpred_loader).
 index((load_mpred_files), 0, mpred_loader, mpred_loader).
 index((loaded_file_world_time), 3, mpred_loader, mpred_loader).
 index((loader_side_effect_capture_only), 2, mpred_loader, mpred_loader).

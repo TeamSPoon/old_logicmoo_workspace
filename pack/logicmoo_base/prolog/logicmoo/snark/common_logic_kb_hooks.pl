@@ -1,4 +1,4 @@
-:- module(common_logic_kb_hooks,[kbp_t/1,with_el_holds_disabled/1,noGenlPreds/1,cyckb_t/3]).
+:- module(common_logic_kb_hooks,[kbp_t/1,with_el_holds_disabled/1,noGenlPreds/1,cyckb_t/3,link_to_holds2/2]).
 :- meta_predicate 
       % common_logic_kb_hooks
       call_f(*,1,?),

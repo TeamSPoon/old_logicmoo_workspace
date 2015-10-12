@@ -194,8 +194,7 @@
           search/7,
           support_hilog/2,
           svar_fixvarname/2,
-          tNotForUnboundPredicates/1,
-          sanity/1)).
+          tNotForUnboundPredicates/1)).
 
 
 :-dynamic((
@@ -234,8 +233,6 @@
            resolverConflict_robot/1
 
                      ))).
-
-sanity(G):-sanity(G).
 
 % mpred_props
 :- export(arity/2).

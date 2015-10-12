@@ -165,26 +165,26 @@ pp_items(Type,H) :- ignore(pp_item(Type,H)).
 
 
 mpred_trace_item(_,_):- tlbugger:ifHideTrace,!.
-mpred_trace_item(M,H):- ignore(t_l:mpred_trace_exec-> on_x_rtrace(in_cmt(pp_item(M,H))); true).
+mpred_trace_item(MM,H):- ignore(t_l:mpred_trace_exec-> on_x_rtrace(in_cmt(pp_item(MM,H))); true).
 
 
    
-pp_item(M,(H:-B)):- B ==true,pp_item(M,H).
-pp_item(M,H):- flag(show_asserions_offered,X,X+1),t_l:print_mode(html),!, (\+ \+ pp_item_html(M,H)),!.
+pp_item(MM,(H:-B)):- B ==true,pp_item(MM,H).
+pp_item(MM,H):- flag(show_asserions_offered,X,X+1),t_l:print_mode(html),!, (\+ \+ pp_item_html(MM,H)),!.
 
-pp_item(M,spftY(P,F,T,W)):-!,
-   w_tl(t_l:current_why_source(W),pp_item(M,spft(P,F,T))).
+pp_item(MM,spftY(KB,P,F,T,W)):-!,
+   w_tl(t_l:current_why_source(W),pp_item(MM,spft(KB,P,F,T))).
 
-pp_item(M,spft(W,U,U)):-!,pp_item(M,U:W).
-pp_item(M,spft(W,F,U)):- atom(U),!,    fmt('~N%~n',[]),pp_item(M,U:W), fmt('rule: ~p~n~n', [F]),!.
-pp_item(M,spft(W,F,U)):-          !,   fmt('~w~nd:       ~p~nformat:    ~p~n', [M,W,F]),pp_item(M,U).
-pp_item(M,nt(Trigger,Test,Body)) :- !, fmt('~w n-trigger: ~p~ntest: ~p~nbody: ~p~n', [M,Trigger,Test,Body]).
-pp_item(M,pt(F,Body)):-              !,fmt('~w p-trigger:~n', [M]), pp_i2tml_now((F:-Body)).
-pp_item(M,bt(F,Body)):-              !,fmt('~w b-trigger:~n', [M]), pp_i2tml_now((F:-Body)).
+pp_item(MM,spft(KB,W0,U,U)):- W = (KB:W0),!,pp_item(MM,U:W).
+pp_item(MM,spft(KB,W0,F,U)):- W = (KB:W0),atom(U),!,    fmt('~N%~n',[]),pp_item(MM,U:W), fmt('rule: ~p~n~n', [F]),!.
+pp_item(MM,spft(KB,W0,F,U)):- W = (KB:W0),         !,   fmt('~w~nd:       ~p~nformat:    ~p~n', [MM,W,F]),pp_item(MM,U).
+pp_item(MM,nt(KB,Trigger0,Test,Body)) :- Trigger = (KB:Trigger0), !, fmt('~w n-trigger: ~p~ntest: ~p~nbody: ~p~n', [MM,Trigger,Test,Body]).
+pp_item(MM,pt(KB,F0,Body)):- F = (KB:F0),             !,fmt('~w p-trigger:~n', [MM]), pp_i2tml_now((F:-Body)).
+pp_item(MM,bt(KB,F0,Body)):- F = (KB:F0),             !,fmt('~w b-trigger:~n', [MM]), pp_i2tml_now((F:-Body)).
 
 
-pp_item(M,U:W):- !,sformat(S,'~w  ~w:',[M,U]),!, pp_item(S,W).
-pp_item(M,H):- \+ \+ (( get_clause_vars_for_print(H,HH),fmt("~w ~p~N",[M,HH]))).
+pp_item(MM,U:W):- !,sformat(S,'~w  ~w:',[MM,U]),!, pp_item(S,W).
+pp_item(MM,H):- \+ \+ (( get_clause_vars_for_print(H,HH),fmt("~w ~p~N",[MM,HH]))).
 
 mpred_classify_facts([],[],[],[]).
 
@@ -292,7 +292,7 @@ mpred_why_command(h,_,_) :-
 Justification Browser Commands:
  q   quit.
  N   focus on Nth justification.
- N.M brouse step M of the Nth justification
+ N.MM brouse step MM of the Nth justification
  u   up a level
 ",
 []).
@@ -401,7 +401,7 @@ mpred_list_triggers(What):-loop_check(mpred_list_triggers_nlc(What)).
 
 :-meta_predicate(mpred_list_triggers_nlc(?)).
 
-mpred_list_triggers_nlc(M:What):-atom(M),!,M:mpred_list_triggers(What).
+mpred_list_triggers_nlc(MM:What):-atom(MM),!,MM:mpred_list_triggers(What).
 mpred_list_triggers_nlc(What):-loop_check(mpred_list_triggers_0(What),true).
 
 mpred_list_triggers_0(What):-get_pi(What,PI),PI\=@=What,mpred_list_triggers(PI).

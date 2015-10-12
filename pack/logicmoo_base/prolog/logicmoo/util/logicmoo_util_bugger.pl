@@ -172,7 +172,9 @@
             prolog_call/1,
             prolog_current_frame_or_parent/2,
             prolog_current_frames/1,
-            prolog_ecall/3,
+            with_each/1,
+            with_each/2,
+            with_each/3,
             prolog_ecall_fa/5,
             prolog_must/1,
             prolog_must_l/1,
@@ -260,6 +262,9 @@
         bugger_t_expansion(+, +, -),
         bugger_term_expansion(:, -),
         bugger_term_expansion(+, +, -),
+         logOnFailureEach(0),
+         debugOnFailureEach(0),
+         on_x_rtraceEach(0),
         callsc(0),
         cli_ntrace(0),
         on_x_debug(0),
@@ -305,7 +310,9 @@
         printPredCount(?, 0, ?),
         programmer_error(0),
         prolog_call(0),
-        prolog_ecall(?, 1, ?),
+        with_each(?, 1, 0),
+        with_each(?, 0),
+        with_each(0),
         prolog_ecall_fa(?, 1, ?, ?, 0),
         prolog_must(0),
         prolog_must_l(?),
@@ -802,8 +809,8 @@ show_call_entry(Call):-wdmsg(show_call_entry(Call)),show_call(Call).
 % :- mpred_trace_childs(must(0)).
 
 :- export(wdmsg/1).
-wdmsg(X):- cnotrace(with_all_dmsg(dmsg(X))).
-wdmsg(F,X):- with_all_dmsg(dmsg(F,X)).
+wdmsg(X):- ignore(hotrace(with_all_dmsg(dmsg(X)))).
+wdmsg(F,X):- ignore(with_all_dmsg(dmsg(F,X))).
 
 prolog_call(Call):-call(Call).
 :- mpred_trace_childs(prolog_call(0)).
@@ -818,7 +825,7 @@ prolog_call(Call):-call(Call).
 % :- if_may_hide('$set_predicate_attribute'(hotrace(_), hide_childs, 1)).
 
 :- export(fixhotrace/1).
-fixhotrace(X):- tracing -> (call(X),trace) ; call(X).
+fixhotrace(X):- tracing -> call_cleanup(X,trace) ; call(X).
 % :- mpred_trace_none(fixhotrace(0)).
 
 :- export(hidetrace/1).
@@ -1319,21 +1326,24 @@ rtraceOnError(C):-
    E,(dmsg(rtraceOnError(E=C)),dtrace,thread_leash(+call),trace,thread_leash(+exception),thread_leash(+all),rtrace(with_skip_bugger( C )),dmsg(E=C),thread_leash(+call),dtrace)).
 
 
-with_skip_bugger(C):-setup_call_cleanup(asserta( tlbugger:skip_bugger),C,retract( tlbugger:skip_bugger)).
+with_skip_bugger(C):-setup_call_cleanup(asserta( tlbugger:skip_bugger,Ref),C,erase(Ref)).
 
 on_x_debug(C):- skipWrapper,!,C.
 on_x_debug(C):- tlbugger:rtracing,!,C.
-on_x_debug(C):- debug,prolog_ecall(0,on_x_rtrace,C).
-on_x_rtraceEach(C):-prolog_ecall(1,on_x_debug,C).
+on_x_debug(C):- debug,with_each(0,on_x_rtrace,C).
+on_x_rtraceEach(C):-with_each(1,on_x_debug,C).
 on_x_debug_cont(C):-ignore(on_x_debug(C)).
 
-on_f_debug(C):-prolog_ecall(0,debugOnFailure0,C).
+with_each(WrapperGoal):- WrapperGoal=..[Wrapper,Goal],with_each(Wrapper,Goal).
+with_each(Wrapper,Goal):-with_each(1,Wrapper,Goal).
+
+on_f_debug(C):-with_each(0,debugOnFailure0,C).
 debugOnFailure0(C):- one_must(rtraceOnError(C),debugCallWhy(failed(debugOnFailure0(C)),C)).
-debugOnFailureEach(C):-prolog_ecall(1,on_f_debug,C).
+debugOnFailureEach(C):-with_each(1,on_f_debug,C).
 on_f_debug_ignore(C):-ignore(on_f_debug(C)).
 
-logOnFailure0(C):- one_must(C,dmsg(on_f_log_fail(C))).
-logOnFailureEach(C):-prolog_ecall(1,on_f_log_fail,C).
+logOnFailure0(C):- one_must(C,(dmsg(on_f_log_fail(C)),fail)).
+logOnFailureEach(C):-with_each(1,on_f_log_fail,C).
 on_f_log_ignore(C):-ignore(logOnFailure0(on_x_log_throw(C))).
 
 
@@ -1422,16 +1432,20 @@ bin_ecall(F,A,fail,
 bin_ecall(F,A,asis,true):-member(F/A,[('must')/1]).
 
 
-:- mpred_trace_childs(prolog_ecall/2).
-:- mpred_trace_childs(prolog_ecall/5).
+:- mpred_trace_childs(with_each/2).
+:- mpred_trace_childs(with_each/5).
 
 
-prolog_ecall(_,_,Call):-var(Call),!,trace,randomVars(Call).
-% prolog_ecall(BDepth,OnCall,M:Call):- fail,!, '@'( prolog_ecall(BDepth,OnCall,Call), M).
+with_each(_,_,Call):-var(Call),!,trace,randomVars(Call).
+% with_each(BDepth,Wrapper,M:Call):- fail,!, '@'( with_each(BDepth,Wrapper,Call), M).
 
-prolog_ecall(_,_,Call):-skipWrapper,!,Call.
-prolog_ecall(BDepth,OnCall, (X->Y;Z)):-!,(prolog_ecall(BDepth,OnCall,X) -> prolog_ecall(BDepth,OnCall,Y) ; prolog_ecall(BDepth,OnCall,Z)).
-prolog_ecall(BDepth,OnCall,Call):-functor_safe(Call,F,A),prolog_ecall_fa(BDepth,OnCall,F,A,Call).
+with_each(_,_,Call):-skipWrapper,!,Call.
+with_each(BDepth,Wrapper, (X->Y;Z)):- atom(Wrapper),atom_concat('on_f',_,Wrapper),!,(X -> with_each(BDepth,Wrapper,Y) ; with_each(BDepth,Wrapper,Z)).
+with_each(N, Wrapper, Call):- N < 1, call(Wrapper,Call).
+with_each(BDepth,Wrapper, (X->Y;Z)):- with_each(BDepth,Wrapper,X) -> with_each(BDepth,Wrapper,Y) ; with_each(BDepth,Wrapper,Z).
+with_each(PDepth,Wrapper, (X , Y)):- BDepth is PDepth-1, !,(with_each(BDepth,Wrapper,X),with_each(BDepth,Wrapper,Y)).
+with_each(PDepth,Wrapper, [X | Y]):- BDepth is PDepth-1, !,(with_each(BDepth,Wrapper,X),!,with_each(BDepth,Wrapper,Y)).
+with_each(BDepth,Wrapper,Call):-functor_safe(Call,F,A),prolog_ecall_fa(BDepth,Wrapper,F,A,Call).
 
 % fake = true
 prolog_ecall_fa(_,_,F,A,Call):-
@@ -1446,18 +1460,18 @@ prolog_ecall_fa(_,_,F,0,Call):-
   call(Call).
 
 % A=1 , (unwrap = true )
-prolog_ecall_fa(BDepth,OnCall,F,1,Call):-
+prolog_ecall_fa(BDepth,Wrapper,F,1,Call):-
   on_prolog_ecall(F,1,unwrap,true),
   arg(1,Call,Arg),!,
-  prolog_ecall(BDepth,OnCall,Arg).
+  with_each(BDepth,Wrapper,Arg).
 
 % A>1 , (unwrap = true )
-prolog_ecall_fa(BDepth,OnCall,F,A,Call):-
+prolog_ecall_fa(BDepth,Wrapper,F,A,Call):-
   on_prolog_ecall(F,A,unwrap,true),!,
   Call=..[F|OArgs],
   functor_safe(Copy,F,A),
   Copy=..[F|NArgs],
-  replace_elements(OArgs,E,prolog_ecall(BDepth,OnCall,E),NArgs),
+  replace_elements(OArgs,E,with_each(BDepth,Wrapper,E),NArgs),
   call(Copy).
 
 % A>1 , (asis = true )
@@ -1466,17 +1480,17 @@ prolog_ecall_fa(_,_,F,A,Call):-
   call(Call).
 
 % each = true
-prolog_ecall_fa(BDepth,OnCall,F,A,Call):-
+prolog_ecall_fa(BDepth,Wrapper,F,A,Call):-
   (on_prolog_ecall(F,A,each,true);BDepth>0),!,
   BDepth1 is BDepth-1,
   predicate_property(Call,number_of_clauses(_Count)),
   % any with bodies
   clause(Call,NT),NT \== true,!,
   clause(Call,Body),
-   prolog_ecall(BDepth1,OnCall,Body).
+   with_each(BDepth1,Wrapper,Body).
 
-prolog_ecall_fa(_,OnCall,_F,_A,Call):-
-  call(OnCall,Call).
+prolog_ecall_fa(_,Wrapper,_F,_A,Call):-
+  call(Wrapper,Call).
 
 replace_elements([],_,_,[]):-!.
 replace_elements([A|ListA],A,B,[B|ListB]):-replace_elements(ListA,A,B,ListB).
@@ -1804,7 +1818,7 @@ asserta_if_ground(_).
 % :- ignore((source_location(File,_Line),module_property(M,file(File)),!,forall(current_predicate(M:F/A),mpred_trace_childs(M:F/A)))).
 
 :- mpred_trace_childs(user:prolog_ecall_fa/5).
-:- mpred_trace_childs(user:prolog_ecall/3).
+:- mpred_trace_childs(user:with_each/3).
 %:- mpred_trace_childs(lmconf:must/1).
 %:- mpred_trace_childs(lmconf:must/2).
 :- mpred_trace_childs(lmconf:must_flag/3).
@@ -1969,7 +1983,7 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
 
 hook_message_hook:- asserta((
 
-user:message_hook(Term, Kind, Lines):- fail, (Kind= warning;Kind= error),Term\=syntax_error(_), 
+user:message_hook(Term, Kind, Lines):- (Kind= warning;Kind= error),Term\=syntax_error(_), 
    current_predicate(_:logicmoo_bugger_loaded/0), \+ lmconf:no_buggery, \+ tlbugger:no_buggery_tl,
   dmsg(message_hook(Term, Kind, Lines)),hotrace(dumpST(20)),dmsg(message_hook(Term, Kind, Lines)),
 
@@ -1977,7 +1991,7 @@ user:message_hook(Term, Kind, Lines):- fail, (Kind= warning;Kind= error),Term\=s
 
    fail)).
 
-:-hook_message_hook.
+% :-hook_message_hook.
 
 % have to load this module here so we dont take ownership of prolog_exception_hook/4.
 :- user:use_module(library(prolog_stack)).

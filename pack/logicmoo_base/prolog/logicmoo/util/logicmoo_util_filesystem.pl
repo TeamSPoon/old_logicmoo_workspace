@@ -168,17 +168,21 @@ filematch_ext(Ext,FileIn,File):-
 
 :- meta_predicate(enumerate_files(:,-)).
 :- export(enumerate_files/2).
-enumerate_files(_:Spec,Result):- notrace((atom(Spec),is_absolute_file_name(Spec),(exists_file(Spec);exists_directory(Spec)),prolog_to_os_filename(Result,Spec))),!.
+enumerate_files(_:Spec,Result):- call((atom(Spec),is_absolute_file_name(Spec),(exists_file(Spec);exists_directory(Spec)),prolog_to_os_filename(Result,Spec))),!.
 enumerate_files(M:Spec,Result):-
-   hotrace((no_repeats_old([Result],((enumerate_m_files(M,Spec,NResult),normalize_path(NResult,Result),exists_file_or_dir(Result)))))).
+   hotrace((no_repeats_old([Result],((enumerate_m_files(M,Spec,NResult),once((normalize_path(NResult,Result)->exists_file_or_dir(Result)))))))).
 
 :- meta_predicate(enumerate_files(:,-)).
 :- export(enumerate_m_files/3).
 enumerate_m_files(user, Mask,File1):-!,enumerate_files0(Mask,File1).
-enumerate_m_files(M, Mask,File1):- 
+enumerate_m_files(M, Mask,File1):- enumerate_files0(Mask,File1)*->true;enumerate_m_files_mscoped(M, Mask,File1).
+
+enumerate_m_files_mscoped(M, Mask,File1):- 
   findall(t_l:search_first_dir(Dir),
    (((M\=user,file_search_path(M,SP),expand_file_search_path(SP,Dir));((module_property(M, file(File)),directory_file_path(Dir,_,File)))),
-   exists_directory(Dir)),List),list_to_set(List,Set),w_tl(Set,enumerate_files0(Mask,File1)).
+   exists_directory(Dir)),List),
+  list_to_set(List,Set),
+  w_tl(Set,enumerate_files0(Mask,File1)).
 
 :- export(enumerate_files0/2).
 enumerate_files0(Mask,File1):- absolute_file_name(Mask,X,[expand(true),file_errors(fail),solutions(all)]),expand_file_name(X,Y),member(File1,Y).
@@ -352,7 +356,7 @@ local_directory_search('../src_mud').  % for vetted src of the MUD
 
 exists_dirf(X):-atomic(X),(exists_file(X);exists_directory(X)).
 atom_concat_safe(L,R,A):- ((atom(A),(atom(L);atom(R))) ; ((atom(L),atom(R)))), !, atom_concat(L,R,A),!.
-exists_file_safe(File):-nonvar(File),(File=(_:F)->exists_file_safe(F);(atomic(File),exists_file(File))).
+exists_file_safe(File):- hotrace((nonvar(File),(File=(_:F)->exists_file_safe(F);(atomic(File),exists_file(File))))).
 exists_directory_safe(File):- must(atomic(File)),exists_directory(File).
 /*
 concat_atom_safe(List,Sep,[Atom]):-atom(Atom),!,concat_atom(List,Sep,Atom),!.
@@ -360,8 +364,8 @@ concat_atom_safe(List,Sep,Atom):-atom(Atom),!,concat_atom(ListM,Sep,Atom),!,List
 concat_atom_safe(List,Sep,Atom):- concat_atom(List,Sep,Atom),!.
 */
 upcase_atom_safe(A,B):-atom(A),upcase_atom(A,B),!.
-time_file_safe(_:F,INNER_XML):-!,exists_file_safe(F),time_file(F,INNER_XML).
-time_file_safe(F,INNER_XML):-exists_file_safe(F),time_file(F,INNER_XML).
+time_file_safe(_:F,INNER_XML):-atom(F),!,exists_file_safe(F),time_file(F,INNER_XML).
+time_file_safe(F,INNER_XML):-exists_file_safe(F),!,time_file(F,INNER_XML).
 
 
 
