@@ -1631,7 +1631,6 @@ index((search), 7, kb, mpred_userkb).
 index((session_agent), 2, kb, mpred_userkb).
 index((session_io), 4, kb, mpred_userkb).
 index((singleValuedInArg), 2, kb, mpred_userkb).
-index((spftY), 4, kb, mpred_userkb).
 index((startup_option), 2, kb, mpred_userkb).
 index((support_hilog), 2, kb, mpred_userkb).
 index((svar_fixvarname), 2, kb, mpred_userkb).

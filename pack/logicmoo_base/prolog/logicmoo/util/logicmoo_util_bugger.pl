@@ -81,7 +81,6 @@
             functor_source_file/5,
             functor_source_file0/5,
             get_dtrace/2,
-            get_rtrace/2,
             gftrace/0,
             gftrace/1,
             ggtrace/0,
@@ -278,8 +277,7 @@
         dumptrace_ret(0),
         fixhotrace(0),
         forall_member(?, ?, 0),
-        ftrace(0),
-        get_rtrace(:, -),
+        ftrace(0),        
         gftrace(0),
         ggtrace(0),
         gmust(0, 0),
@@ -562,14 +560,18 @@ user_use_module(What):- '@'(use_module(What),'user').
 restore_trace(Goal):-  ((tracing, notrace) -> CC=trace;CC=true), 
    '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,(('$leash'(_, Old),'$visible'(_, OldV),CC),CC)).
 
-:-meta_predicate(get_rtrace(:,-)).
-get_rtrace(X,Y):- current_prolog_flag(gui_tracer, true),!,set_prolog_flag(gui_tracer, false),noguitracer,get_rtrace(X,N),!,Y=call_cleanup(N,guitracer).
-get_rtrace(X,Y):- tlbugger:rtracing,!,X=Y.
-get_rtrace(X,Y):- tracing,!,'$leash'(Old, Old),'$visible'(OldV, OldV),rtrace, Y= call_cleanup((X),cnotrace(('$leash'(_, Old),'$visible'(_, OldV),stop_rtrace))).
-get_rtrace(X,Y):- '$leash'(Old, Old),'$visible'(OldV, OldV), (Y= call_cleanup((X),(notrace,'$leash'(_, Old),'$visible'(_, OldV)))).
 
 %= :- meta_predicate  rtrace(0).
-rtrace(Goal):- notrace((get_rtrace(Goal,C))),!,C.
+
+rtrace(Goal):- notrace(tlbugger:rtracing) -> Goal ; 
+   (notrace, ((tracing, notrace) -> CC=trace;CC=true), 
+     '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup((start_rtrace,trace,Goal),(notrace,stop_rtrace0,'$leash'(_, Old),'$visible'(_, OldV),CC))).
+
+
+
+
+
+
 
 % :- mpred_trace_less(rtrace/1).
 
@@ -2035,9 +2037,10 @@ user:message_hook(Term, Kind, Lines):- (Kind= warning;Kind= error),Term\=syntax_
 save_guitracer:- ignore((current_prolog_flag(gui_tracer, GWas),asserta(t_l:wasguitracer(GWas)))).
 restore_guitracer:- ignore((retract(t_l:wasguitracer(GWas)),set_prolog_flag(gui_tracer, GWas))).
 nortrace:- cnotrace((stop_rtrace,trace)).
-rtrace:-cnotrace((visible(+all),visible(+unify),visible(+exception),thread_leash(-all),thread_leash(+exception),assert(tlbugger:rtracing),save_guitracer,noguitracer)).
-start_rtrace:-cnotrace((debug,rtrace,trace)).
-stop_rtrace:-cnotrace((visible(+all),visible(+unify),visible(+exception),thread_leash(+all),thread_leash(+exception),notrace,restore_guitracer,ignore(retract(tlbugger:rtracing)))).
+rtrace:- notrace((visible(+all),visible(+unify),visible(+exception),thread_leash(-all),thread_leash(+exception),assert(tlbugger:rtracing),save_guitracer,noguitracer)).
+start_rtrace:- notrace((debug,rtrace,trace)).
+stop_rtrace:-notrace((visible(+all),visible(+unify),visible(+exception),thread_leash(+all),thread_leash(+exception),stop_rtrace0)).
+stop_rtrace0:- notrace((notrace,restore_guitracer,ignore(retract(tlbugger:rtracing)))).
 % :- mpred_trace_less(start_rtrace/0).
 % :- mpred_trace_less(stop_rtrace/0).
 % :- mpred_trace_less(nortrace/0).

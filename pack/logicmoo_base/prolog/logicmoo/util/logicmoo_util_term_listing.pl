@@ -469,7 +469,7 @@ sourceTextPredicateSource(_):-fail.
 
 :- thread_local(t_l:large_predicates/2).
 
-plisting_1:-plisting(spftY(_,_,_,_)).
+plisting_1:-plisting(kbp:spftY(_,_,_,_)).
 
 synth_clause_for(G,true,0,244,SYNTH):-  bookeepingPredicateXRef(G), cnotrace(( \+ listing_filter(hideMeta))), SYNTH=on_x_fail(G).
 synth_clause_for(G,B,Ref,Size,SYNTH):- cur_predicate(_,G), ((cnotrace(( \+ bookeepingPredicateXRef(G), \+ sourceTextPredicate(G), \+ listing_filter(G))))), 

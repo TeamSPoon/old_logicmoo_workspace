@@ -172,7 +172,7 @@ mpred_trace_item(MM,H):- ignore(t_l:mpred_trace_exec-> on_x_rtrace(in_cmt(pp_ite
 pp_item(MM,(H:-B)):- B ==true,pp_item(MM,H).
 pp_item(MM,H):- flag(show_asserions_offered,X,X+1),t_l:print_mode(html),!, (\+ \+ pp_item_html(MM,H)),!.
 
-pp_item(MM,spftY(KB,P,F,T,W)):-!,
+pp_item(MM,kbp:spftY(KB,P,F,T,W)):-!,
    w_tl(t_l:current_why_source(W),pp_item(MM,spft(KB,P,F,T))).
 
 pp_item(MM,spft(KB,W0,U,U)):- W = (KB:W0),!,pp_item(MM,U:W).

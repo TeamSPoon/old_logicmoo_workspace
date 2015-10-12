@@ -168,7 +168,6 @@ index((functor_h0), 3, logicmoo_util_bugger, logicmoo_util_bugger).
 index((functor_source_file), 5, logicmoo_util_bugger, logicmoo_util_bugger).
 index((functor_source_file0), 5, logicmoo_util_bugger, logicmoo_util_bugger).
 index((get_dtrace), 2, logicmoo_util_bugger, logicmoo_util_bugger).
-index((get_rtrace), 2, logicmoo_util_bugger, logicmoo_util_bugger).
 index((gftrace), 0, logicmoo_util_bugger, logicmoo_util_bugger).
 index((gftrace), 1, logicmoo_util_bugger, logicmoo_util_bugger).
 index((ggtrace), 0, logicmoo_util_bugger, logicmoo_util_bugger).

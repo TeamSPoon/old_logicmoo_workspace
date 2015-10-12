@@ -892,7 +892,7 @@ indent_nbsp(X,Chars):-XX is X -1,!, indent_nbsp(XX,OutP),!,sformat(Chars,'~w   '
 :-multifile lmconf:shared_hide_data/1.
 
 lmconf:shared_hide_data('$was_imported_kb_content$'/2):- !,listing_filter(hideMeta).
-lmconf:shared_hide_data(spftY/4):- !,listing_filter(hideTriggers).
+lmconf:shared_hide_data(kbp:spftY/4):- !,listing_filter(hideTriggers).
 lmconf:shared_hide_data(spft/3):- !,listing_filter(hideTriggers).
 lmconf:shared_hide_data(nt/3):- !,listing_filter(hideTriggers).
 lmconf:shared_hide_data(pt/2):- !, listing_filter(hideTriggers).
@@ -1039,7 +1039,7 @@ pp_i2tml_0(is_disabled_clause(H)):- pp_i2tml_0((disabled)=H).
 
 % pp_i2tml_0(FET):-fully_expand(assert,FET,NEWFET),FET\=@=NEWFET,!,pp_i2tml_0(NEWFET).
 
-pp_i2tml_0(spftY(P,F,T,W)):-!,
+pp_i2tml_0(kbp:spftY(P,F,T,W)):-!,
    w_tl(t_l:current_why_source(W),pp_i2tml_0(spft(P,F,T))).
 
 pp_i2tml_0(spft(P,U,U)):- nonvar(U),!, pp_i2tml_1(P:-asserted_by(U)).

@@ -855,7 +855,7 @@ resolverConflict_robot(0),
 :- shared_multifile('nt'/3).
 :- shared_multifile('pk'/3).
 :- shared_multifile('pt'/2).
-:- shared_multifile('spftY'/4).
+:- multifile(kbp:spftY/4).
 :- shared_multifile(('::::')/2).
 :- shared_multifile(('<-')/2).
 :- shared_multifile(('<==>')/2).
@@ -944,7 +944,7 @@ mpred_call_shared(G):- find_and_call(G).
 /*
 
 LogicMOO is mixing Mark Stickel's PTTP (prolog techn theorem prover) to create horn clauses that 
- PFC forwards and helps maintain in visible states )  in prolog knowledge baseable.. We use spftY/4 to track deductions
+ PFC forwards and helps maintain in visible states )  in prolog knowledge baseable.. We use kbp:spftY/4 to track deductions
 Research-wise LogicMOO has a main purpose is to prove that grounded negations (of contrapostives) are of first class in importance in helping
 with Wff checking/TMS 
 Also alows an inference engine constrain search.. PFC became important since it helps memoize and close off (terminate) transitive closures
@@ -1179,7 +1179,7 @@ mpred_pbody(H,infoF(INFO),R,B,Why):-!,mpred_pbody_f(H,INFO,R,B,Why).
 mpred_pbody(H,B,R,BIn,WHY):- is_true(B),!,BIn=B,get_why(H,H,R,WHY).
 mpred_pbody(H,B,R,B,asserted(R,(H:-B))).
 
-get_why(_,CL,R,asserted(R,CL)):- clause(spftY(CL, U, U, _Why),true),!.
+get_why(_,CL,R,asserted(R,CL)):- clause(kbp:spftY(CL, U, U, _Why),true),!.
 get_why(H,CL,R,deduced(R,WHY)):-mpred_get_support(H,WH)*->WHY=(H=WH);(mpred_get_support(CL,WH),WHY=(CL=WH)).
 
 
@@ -1210,7 +1210,7 @@ mpred_rule_hb_0(bt(Outcome,Ante1),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outco
 mpred_rule_hb_0(pt(Ante1,Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
 mpred_rule_hb_0(pk(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
 mpred_rule_hb_0(nt(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(spftY(Outcome,Ante1a,Ante1b,_),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0(kbp:spftY(Outcome,Ante1a,Ante1b,_),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
 mpred_rule_hb_0(mpred_queue(Outcome,_),OutcomeO,Ante2):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
 % mpred_rule_hb_0(pfc Default(Outcome),OutcomeO,Ante2):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
 mpred_rule_hb_0((Outcome:-Ante),Outcome,Ante):-!.
@@ -1324,7 +1324,7 @@ update_single_valued_arg(P,N):-
   arg(N,P,UPDATE),call(replace_arg(P,N,OLD,Q)),
   current_why(Why),
   lmconf:mpred_system_kb(M), M:get_source_ref1(U),
-  must_det_l((attvar_op(assert_if_new,spftY(P,U,U,Why)),(mpred_call(P)->true;(assertz_u(P))),
+  must_det_l((attvar_op(assert_if_new,kbp:spftY(P,U,U,Why)),(mpred_call(P)->true;(assertz_u(P))),
      doall((clause(Q,true,E),UPDATE \== OLD,erase_w_attvars(clause(Q,true,E),E),mpred_unfwc1(Q))))).
 
 
@@ -1546,14 +1546,14 @@ with_mpred_trace_exec(P):- w_tl(t_l:mpred_trace_exec, must(show_if_debug(P))).
 % mpred_test(P):- mpred_is_silient,!,show_if_debug(must(P)),!.
 mpred_test(P):- show_call(with_mpred_trace_exec(P)),!.
 
-clause_asserted_local(spftY(P,Fact,Trigger,UOldWhy)):-
-  clause(spftY(P,Fact,Trigger,_OldWhy),true,Ref),
-  clause(spftY(UP,UFact,UTrigger,UOldWhy),true,Ref),
+clause_asserted_local(kbp:spftY(P,Fact,Trigger,UOldWhy)):-
+  clause(kbp:spftY(P,Fact,Trigger,_OldWhy),true,Ref),
+  clause(kbp:spftY(UP,UFact,UTrigger,UOldWhy),true,Ref),
   (((UP=@=P,UFact=@=Fact,UTrigger=@=Trigger))).
 
 
-is_already_supported(P,(S,T),(S,T)):- clause_asserted_local(spftY(P,S,T,_)),!.
-is_already_supported(P,_S,UU):- clause_asserted_local(spftY(P,US,UT,_)),must(get_source_ref(UU)),UU=(US,UT).
+is_already_supported(P,(S,T),(S,T)):- clause_asserted_local(kbp:spftY(P,S,T,_)),!.
+is_already_supported(P,_S,UU):- clause_asserted_local(kbp:spftY(P,US,UT,_)),must(get_source_ref(UU)),UU=(US,UT).
 
 % TOO UNSAFE 
 % is_already_supported(P,_S):- copy_term(P,PC),sp ftY(PC,_,_),P=@=PC,!.
@@ -1767,7 +1767,7 @@ mpred_bt_pt_combine(_,_,_) :- !.
 
 
 mpred_get_trigger_quick(Trigger) :- !, mpred_call_shared(Trigger).
-mpred_get_trigger_quick(Trigger) :- clause_i(Trigger,true)*->true;clause(spftY(Trigger,_,_,_),true).
+mpred_get_trigger_quick(Trigger) :- clause_i(Trigger,true)*->true;clause(kbp:spftY(Trigger,_,_,_),true).
 
 %=
 %=
@@ -2138,7 +2138,7 @@ support_ok_via_clause_body(_,F,_):- \+ mpred_call_shared(pfcControlled(F)),!.
 
 
 mpred_get_support_precanonical(F,Sup):-to_addable_form_wte(mpred_get_support_precanonical,F,P),mpred_get_support(P,Sup).
-spft_precanonical(F,SF,ST):-to_addable_form_wte(spft_precanonical,F,P),!,spftY(P,SF,ST,_).
+spft_precanonical(F,SF,ST):-to_addable_form_wte(spft_precanonical,F,P),!,kbp:spftY(P,SF,ST,_).
 
 trigger_supports_f_l(U,[]) :- match_source_ref1(U),!.
 trigger_supports_f_l(Trigger,[Fact|MoreFacts]) :-
@@ -2224,7 +2224,7 @@ fcnt(Fact,F):- fcnt0(Fact,F)*->fail;nop(mpred_trace_msg(no_spft_nt(Fact,F))).
 fcnt(_,_).
 
 fcnt0(_Fact,F) :- 
-  spftY(X,_,nt(F,Condition,Body),_Why),
+  kbp:spftY(X,_,nt(F,Condition,Body),_Why),
   (call_u(Condition) *-> 
    (mpred_trace_msg('Using Trigger'(X),nt(F,Condition,Body)),
       mpred_rem1(X,(_,nt(F,Condition,Body))),fail);
@@ -2838,7 +2838,7 @@ mpred_db_type(_,fact) :-
 
 mpred_call_t_exact(Trigger) :- copy_term(Trigger,Copy),mpred_get_trigger_quick(Trigger),Trigger=@=Copy.
 
-retract_t(Trigger) :-  retract_i(spftY(Trigger,_,_,_)),ignore(retract_i(Trigger)).
+retract_t(Trigger) :-  retract_i(kbp:spftY(Trigger,_,_,_)),ignore(retract_i(Trigger)).
 
 
 mpred_add_t(P,Support) :- 
@@ -2905,29 +2905,29 @@ mpred_union([Head|Tail],L,[Head|Tail2]) :-
 %=
 
 
-% user:portray(C):-is_ftCompound(C),C=spftY(_,_,_,_),pp_item('',C).
+% user:portray(C):-is_ftCompound(C),C=kbp:spftY(_,_,_,_),pp_item('',C).
 
 %= mpred_had_support(+Fact,+Support)
 mpred_had_support(P,(Fact,Trigger)) :- 
- ( clause_asserted_local(spftY(P,Fact,Trigger,_OldWhy)) -> 
+ ( clause_asserted_local(kbp:spftY(P,Fact,Trigger,_OldWhy)) -> 
     true ; fail).
 
 
 %= mpred_add_support(+Fact,+Support)
 
 mpred_add_support(P,(Fact,Trigger)) :- 
- ( clause_asserted_local(spftY(P,Fact,Trigger,_OldWhy)) ->
+ ( clause_asserted_local(kbp:spftY(P,Fact,Trigger,_OldWhy)) ->
     true ; 
     (current_why(Why), 
       ( % get_clause_vars(P),get_clause_vars(Fact),get_clause_vars(Trigger),
-        get_clause_vars(spftY(P,Fact,Trigger,Why)),
-      attvar_op(assertz,(spftY(P,Fact,Trigger,Why)))))),!.  % was assert_i
+        get_clause_vars(kbp:spftY(P,Fact,Trigger,Why)),
+      attvar_op(assertz,(kbp:spftY(P,Fact,Trigger,Why)))))),!.  % was assert_i
 
 /*
 mpred_add_support(P,(Fact,Trigger)) :-
-  NEWSUPPORT = spftY(NewP,NewFact,NewTrigger,NewWhy),
- copy_term(spftY(P,Fact,Trigger,Why,OldWhy),NEWSUPPORT),
- ( clause_asserted_local(spftY(P,Fact,Trigger,OldWhy)) ->
+  NEWSUPPORT = kbp:spftY(NewP,NewFact,NewTrigger,NewWhy),
+ copy_term(kbp:spftY(P,Fact,Trigger,Why,OldWhy),NEWSUPPORT),
+ ( clause_asserted_local(kbp:spftY(P,Fact,Trigger,OldWhy)) ->
     true ; 
     (current_why(NewWhy),attvar_op(assertz,(NEWSUPPORT)))),!. 
 */
@@ -2936,7 +2936,7 @@ mpred_add_support(P,FT) :- trace_or_throw(failed_mpred_add_support(P,FT)).
 
 
 mpred_get_support(not(P),(Fact,Trigger)) :- is_ftNonvar(P),!, mpred_get_support(neg(P),(Fact,Trigger)).
-mpred_get_support(P,(Fact,Trigger)) :- spftY(P,Fact,Trigger,_)*->true;(is_ftNonvar(P),mpred_get_support_neg(P,(Fact,Trigger))).
+mpred_get_support(P,(Fact,Trigger)) :- kbp:spftY(P,Fact,Trigger,_)*->true;(is_ftNonvar(P),mpred_get_support_neg(P,(Fact,Trigger))).
 
 % dont mpred_get_support_neg(\+ neg(P),(Fact,Trigger)) :- sp ftY((P),Fact,Trigger).
 mpred_get_support_neg(\+ (P),S) :- !, is_ftNonvar(P), mpred_get_support(neg(P),S).
@@ -2947,15 +2947,15 @@ mpred_get_support_neg(~ (P),S) :- !, is_ftNonvar(P), mpred_get_support(neg(P),S)
 % where some of the arguments are not bound but at least one is.
 
 mpred_rem_support(WhyIn,P,(Fact,Trigger)) :- is_ftVar(P),!,copy_term(mpred_rem_support(mpred_rem_support,P,(Fact,Trigger)) ,TheWhy),
-  SPFC = spftY(RP,RFact,RTrigger,_RWhy),
-  clause(spftY(P,Fact,Trigger,_),true,Ref),
+  SPFC = kbp:spftY(RP,RFact,RTrigger,_RWhy),
+  clause(kbp:spftY(P,Fact,Trigger,_),true,Ref),
   ((clause(SPFC,true,Ref),
      ( spftV(RP,RFact,RTrigger) =@= spftV(P,Fact,Trigger) -> 
         erase_w_attvars(clause(SPFC,true,Ref),Ref); 
        (mpred_trace_msg(<=(TheWhy,~SPFC)),nop(mpred_retract_or_warn_i(spftVVVVVVV(P,Fact,Trigger))),nop(trace))),
    (is_ftVar(P)->trace_or_throw(is_ftVar(P));remove_if_unsupported_verbose(WhyIn,local,P)))).
 mpred_rem_support(Why,(\+ N) , S):- mpred_rem_support(Why,neg(N),S).
-mpred_rem_support(_Why,P,(Fact,Trigger)):-mpred_retract_or_warn_i(spftY(P,Fact,Trigger,_)).
+mpred_rem_support(_Why,P,(Fact,Trigger)):-mpred_retract_or_warn_i(kbp:spftY(P,Fact,Trigger,_)).
 
 /*
 % TODO not called yet
@@ -2966,7 +2966,7 @@ mpred_collect_supports_f_l([]).
 */
 /* UNUSED TODAY
 % TODO not called yet
-mpred_support_relation((P,F,T)) :- spftY(P,F,T,_).
+mpred_support_relation((P,F,T)) :- kbp:spftY(P,F,T,_).
 
 % TODO not called yet
 mpred_make_supports_f_l((P,S1,S2)) :-
@@ -3021,7 +3021,7 @@ mpred_trigger_key(X,X).
 % mpred_database_term(P/A) is true iff P/A is something that pfc adds to
 % the database and should not be present in an empty pfc database
 
-mpred_database_term(spftY/4).
+mpred_database_term(kbp:spftY/4).
 mpred_database_term(pk/3).
 mpred_database_term(bt/2).  % was 3
 mpred_database_term(nt/3). % was 4
@@ -3036,9 +3036,9 @@ mpred_database_term(mpred_queue/2).
 % removes all forward chaining rules and justifications from db.
 
 mpred_reset :-
-  clause_i(spftY(P,F,Trigger,Why),true),
+  clause_i(kbp:spftY(P,F,Trigger,Why),true),
   mpred_retract_or_warn_i(P),
-  mpred_retract_or_warn_i(spftY(P,F,Trigger,Why)),
+  mpred_retract_or_warn_i(kbp:spftY(P,F,Trigger,Why)),
   fail.
 mpred_reset :-
   mpred_database_item(T),
@@ -3052,7 +3052,7 @@ mpred_database_item(Term) :-
   clause_u(Term,_).
 
 mpred_retract_or_warn_i(X) :- retract_i(X),mpred_trace_msg("Success retract: ~p.",[X]),!.
-mpred_retract_or_warn_i(X) :- \+ \+ X =spftY(neg(_),_,_,_),!.
+mpred_retract_or_warn_i(X) :- \+ \+ X =kbp:spftY(neg(_),_,_,_),!.
 mpred_retract_or_warn_i(X) :- ground(X),mpred_trace_msg("Couldn't retract ~p.",[X]),!.
 mpred_retract_or_warn_i(_).
 
@@ -3113,7 +3113,7 @@ mpred_fact(P) :- mpred_fact(P,true).
 %=  mpred_fact(X,mpred_user_fact(X))
 %=
 
-mpred_user_fact(X):-no_repeats(spftY(X,U,U,_)).
+mpred_user_fact(X):-no_repeats(kbp:spftY(X,U,U,_)).
 
 mpred_fact(P,PrologCond) :-
   mpred_get_support(P,_),is_ftNonvar(P),
@@ -3472,7 +3472,7 @@ nonfact_metawrapper(neg(_)).
 nonfact_metawrapper(pt(_,_)).
 nonfact_metawrapper(bt(_,_)).
 nonfact_metawrapper(nt(_,_,_)).
-nonfact_metawrapper(spftY(_,_,_,_)).
+nonfact_metawrapper(kbp:spftY(_,_,_,_)).
 nonfact_metawrapper(added(_)).
 % we use the arity 1 forms is why 
 nonfact_metawrapper(term_expansion(_,_)).
@@ -3508,7 +3508,7 @@ has_db_clauses(P):- predicate_property(P,number_of_clauses(NC)),\+ predicate_pro
 pred_t0(P):-mpred_call_shared(pt(P,_)).
 pred_t0(P):-mpred_call_shared(bt(P,_)).
 pred_t0(P):-mpred_call_shared(nt(P,_,_)).
-pred_t0(P):-mpred_call_shared(spftY(P,_,_,_)).
+pred_t0(P):-mpred_call_shared(kbp:spftY(P,_,_,_)).
 pred_t0(P):- mpred_call_shared('nesc'(P)).
 %pred_r0(~(P)):- mpred_call_shared(~(P)).
 %pred_r0(neg(P)):- mpred_call_shared(neg(P)).

@@ -198,7 +198,7 @@ with_pfa(With, PI):- context_module_of_file(CM),with_pfa_group(only_3rd(With),CM
 with_pfa(With,CM, M, PI):- context_module_of_file(CM),with_pfa_group(only_3rd(With),CM, M, PI).
 
 :-module_transparent(only_3rd/4).
-only_3rd([],CM, M, PI):- !.
+only_3rd([],_CM, _M, _PI):- !.
 only_3rd([With|List],CM, M, PI):- is_list(List),!,only_3rd(With,CM, M, PI),only_3rd(List,CM, M, PI).
 only_3rd(With,user, user, PI):-!, show_call(call(With,PI)).
 only_3rd(With,CM, user, PI):-!, show_call(call(With,CM:PI)).
@@ -214,7 +214,7 @@ only_3rd(With,CM, M, PI):- show_call(CM:call(With,M:PI)).
 
 to_canonical_mpi(M:FA,MPI):-atom(M),!,to_canonical_mpi(FA,PI),add_mi(M,PI,MPI).
 to_canonical_mpi((M:F)/A,MPI):- integer(A),!,functor(PI,F,A),add_mi(M,PI,MPI).
-to_canonical_mpi((M:F)//A2,MPI):-integer(A),!,A is A2 + 2, functor(P,F,A),add_mi(M,PI,MPI).
+to_canonical_mpi((M:F)//A2,MPI):-integer(A),!,A is A2 + 2, functor(PI,F,A),add_mi(M,PI,MPI).
 to_canonical_mpi(F/A,MPI):- functor(P,F,A), functor(P,F,A),strip_module(P,M,PI),add_mi(M,PI,MPI).
 to_canonical_mpi(F//A2,MPI):- A is A2 + 2, functor(P,F,A),strip_module(P,M,PI),add_mi(M,PI,MPI).
 to_canonical_mpi(P,MPI):- strip_module(P,M,PI),add_mi(M,PI,MPI).

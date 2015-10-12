@@ -610,7 +610,7 @@ tCol_gen(T):- no_repeats(T,(ttTemporalType(T);completelyAssertedCollection(T);tS
 % ==========================
 % isa_backchaing(i,c)
 % ==========================
-module_local_init:- mpred_add((isa(I,T):- cwc,isa_backchaing(I,T))).
+module_local_init:- rtrace(mpred_add((isa(I,T):- cwc,isa_backchaing(I,T)))).
 %a(P,F):-loop_check(isa(F,P)).
 %a(T,I):- lmconf:pfcManageHybrids,clause_safe(isa(I,T),true).
 :-export(isa_backchaing/2).

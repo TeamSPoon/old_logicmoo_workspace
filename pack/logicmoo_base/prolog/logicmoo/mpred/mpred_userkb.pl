@@ -108,7 +108,7 @@
             session_agent/2,
             session_io/4,
             singleValuedInArg/2,
-            spftY/4,
+            kbp:spftY/4,
             startup_option/2,
             support_hilog/2,
             svar_fixvarname/2,
@@ -146,7 +146,7 @@
           pp_i2tml_now/1,pp_item_html/2,pttp1a_wid/3,pttp_builtin/2,pttp_nnf_pre_clean_functor/3,quasiQuote/1,relax_term/6,retractall_wid/1,ruleRewrite/2,search/7,support_hilog/2,svar_fixvarname/2)))),
  with_pfa(With,((pfcControlled/1,pfcRHS/1,logical_functor_pttp/1,          add_args/15,argIsa_known/3,call_mt_t/11,call_which_t/9,constrain_args_pttp/2,contract_output_proof/2,f_to_mfa/4,get_clause_vars_for_print/2,holds_f_p2/2,input_to_forms/2,is_wrapper_pred/1,lambda/5,mpred_f/1,pp_i2tml_now/1,pp_item_html/2,pttp1a_wid/3,pttp_builtin/2,pttp_nnf_pre_clean_functor/3,
           quasiQuote/1,relax_term/6,retractall_wid/1,ruleRewrite/2,search/7,support_hilog/2,svar_fixvarname/2,tNotForUnboundPredicates/1))),
- with_pfa(With,(((('==>')/1),('bt'/2),('nt'/3),('pk'/3),('pt'/2),('spftY'/4),
+ with_pfa(With,(((('==>')/1),('bt'/2),('nt'/3),('pk'/3),('pt'/2),('kbp:spftY'/4),
           (('::::')/2),(('<-')/2),(('<==>')/2),(('==>')/2),(('neg')/1),(('nesc')/1),         ((mpred_action)/1),(fcTmsMode/1),(mpred_halt_signal/1),
           (mpred_queue/2),(mpred_search/1),(mpred_search_mode/1),(mpred_select/2),(mpred_do_and_undo_method/2),
 
