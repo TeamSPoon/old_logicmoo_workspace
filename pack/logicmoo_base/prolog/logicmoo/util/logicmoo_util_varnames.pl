@@ -81,18 +81,18 @@
             maybe_scan_source_files_for_varnames/0
           ]).
 :- multifile
-        make_hook/2.
+        prolog:make_hook/2.
 :- meta_predicate
        ain00(:),
         call_not_not(0),
         call_return_tf(0, ?),
-        contains_singletons(0),
+        contains_singletons(*),
         get_clause_vars(:),
         get_clause_vars(:, ?),        
         no_varnaming(0),
         show_call_when(2, ?, ?),
-        snumbervars4(0, ?, ?, ?),
-        snumbervars5(0, ?, ?, ?),
+        snumbervars4(*, ?, ?, ?),
+        snumbervars5(*, ?, ?, ?),
         try_save_vars(:),
         init_varname_stores(?),
         vmust(0).
@@ -164,6 +164,8 @@
  .
 
 :- include('logicmoo_util_header.pi').
+
+:- use_module(library(when)).
 
 :- prolog_clause:multifile((
 	unify_goal/5,			% +Read, +Decomp, +M, +Pos, -Pos
@@ -455,15 +457,15 @@ try_save_vars(_):- t_l:dont_varname,!.
 try_save_vars(HB):-ignore((nb_current('$variable_names',Vs),Vs\==[],save_clause_vars(HB,Vs))),!.
 
 :-export(maybe_scan_source_files_for_varnames/0).
-maybe_scan_source_files_for_varnames:- current_prolog_flag(mpred_vars, true),scan_source_files_for_varnames.
+maybe_scan_source_files_for_varnames:- current_prolog_flag(mpred_vars, true),!,scan_source_files_for_varnames.
+maybe_scan_source_files_for_varnames.
 
 :-export(scan_source_files_for_varnames/0).
 scan_source_files_for_varnames:- 
  set_prolog_flag(mpred_vars, true),
- user: call((
- use_module(library(make)),
+ ensure_loaded(library(make)),
  forall(make:modified_file(F),retractall(varname_cache:varname_info_file(F))),
- forall(source_file(F),logicmoo_varnames:read_source_file_vars(F)))).
+ forall(source_file(F),read_source_file_vars(F)),!.
 
 show_call_if_verbose(G):-!, notrace(G).
 show_call_if_verbose(G):-show_call(G).

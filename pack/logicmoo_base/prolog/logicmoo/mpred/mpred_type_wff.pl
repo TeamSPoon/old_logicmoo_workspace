@@ -8,10 +8,10 @@
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_wff.pl
 :- module(mpred_type_wff,
-          [ additiveOp/1,
+          [ 
             append_termlist/3,            
             call_last_is_var/1,
-            comparitiveOp/1,
+
             contains_negs/1,
             contains_no_negs/1,
             contains_t_var/3,
@@ -28,7 +28,7 @@
             get_kv/3,
             get_pred/2,
             hilog_functor/1,
-            infix_op/2,
+
             isBodyConnective/1,
             isEntityFunction/3,
             isEntitySlot/1,
@@ -75,10 +75,9 @@
             kb_nlit/2,
             lastImproperMember/3,
             leave_as_is/1,
-            leave_as_is0/1,
-            leave_as_is_f/1,
-            logical_functor_ft/1,
-            non_assertable/1,
+            leave_as_is_db/1,
+            leave_as_is_functor/1,
+            logical_functor_ft/1,            
             non_assertable/2,
             non_compound/1,
             not_log_op/1,
@@ -89,104 +88,15 @@
             term_singletons/2,
             term_singletons/5,
             term_slots/2,
-            wrap_in_neg_functor/3,
-            ttPredType/1
+            wrap_in_neg_functor/3            
           ]).
-:- meta_predicate % (meta_predicate) :-
+:- meta_predicate 
         call_last_is_var(0).
-:- module_transparent % (module_transparent) :-
-        additiveOp/1,
-        append_termlist/3,
-        comparitiveOp/1,
-        contains_negs/1,
-        contains_no_negs/1,
-        contains_t_var/3,
-        contains_type_lits/3,
-        contains_var_lits/3,
-        correct_negations/3,
-        current_hilog/1,
-        defunctionalize/2,
-        defunctionalize/3,
-        ensure_quantifiers/2,
-        function_corisponding_predicate/2,
-        function_to_predicate/3,
-        get_isa/3,
-        get_isa0/3,
-        get_kv/3,
-        get_pred/2,
-        hilog_functor/1,
-        infix_op/2,
-        isBodyConnective/1,
-        isEntityFunction/3,
-        isEntitySlot/1,
-        isEntityref/2,
-        isHiddenSlot/1,
-        isLiteralTerm/1,
-        isLiteralTerm_util/1,
-        isNonCompound/1,
-        isNonVar/1,
-        isObject/2,
-        isQualifiableAs/3,
-        isQualifiableAsClass/1,
-        isQualifiedAndKnownAs/3,
-        isQualifiedAndVarAndUnifiable/3,
-        isQualifiedAndVarAs/3,
-        isQualifiedAs/3,
-        isQualifiedAs/4,
-        isSlot/1,
-        isSlot/2,
-        isVarObject/1,
-        isVarObject/2,
-        isVarProlog/1,
-        is_2nd_order_holds/1,
-        is_colection_name/3,
-        is_ftEquality/1,
-        is_function/1,
-        is_function/3,
-        is_gaf/1,
-        is_holds_false/1,
-        is_holds_false0/1,
-        is_holds_true/1,
-        is_holds_true0/1,
-        is_holds_true_not_hilog/1,
-        is_kif_rule/1,
-        is_log_op/1,
-        is_log_sent/1,
-        is_logical_functor/1,
-        is_logical_functor0/1,
-        is_modal/2,
-        is_neg/1,
-        is_pos/1,
-        is_sentence_functor/1,
-        is_svo_functor/1,
-        kb_nlit/2,
-        lastImproperMember/3,
-        leave_as_is/1,
-        leave_as_is0/1,
-        leave_as_is_f/1,
-        logical_functor_ft/1,
-        non_assertable/1,
-        non_assertable/2,
-        non_compound/1,
-        not_log_op/1,
-        prequent/1,
-        put_singles/4,
-        set_is_lit/1,
-        subst_except/4,
-        term_singletons/2,
-        term_singletons/5,
-        term_slots/2,
-        wrap_in_neg_functor/3.
-:- dynamic % (dynamic) :-
-        '$included'/4,
-        function_corisponding_predicate/2,
-        leave_as_is0/1,
-        ttPredType/1,
-        non_assertable/1.
 
+:- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
 :- include('mpred_header.pi').
-
+:- use_module(logicmoo(mpred/mpred_expansion)).
 
 
 subst_except(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
@@ -205,26 +115,26 @@ append_termlist(Call,EList,CallE):-must((compound(Call),is_list(EList))), Call=.
 % Logic Preds Shared
 % ========================================
 
-:-export(is_svo_functor/1).
+:- was_export(is_svo_functor/1).
 is_svo_functor(Prop):- hotrace((atom(Prop),arg(_,svo(svo,prop,valueOf,rdf),Prop))).
 
-:-export(hilog_functor/1).
+:- was_export(hilog_functor/1).
 hilog_functor(true_t).
 
-:-export(is_holds_true_not_hilog/1).
+:- was_export(is_holds_true_not_hilog/1).
 is_holds_true_not_hilog(HOFDS):-is_holds_true(HOFDS),\+ hilog_functor(HOFDS).
 
-:-export(is_holds_true/1).
+:- was_export(is_holds_true/1).
 is_holds_true(Prop):- hotrace((atom(Prop),is_holds_true0(Prop))),!.
 
 % k,p,..
 is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,t,t,asserted_mpred_t,assertion_t,true_t,assertion,secondOrder,firstOrder),Prop).
 % is_holds_true0(Prop):-atom_concat(_,'_t',Prop).
 
-:-export(is_2nd_order_holds/1).
+:- was_export(is_2nd_order_holds/1).
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 
-:-export(is_holds_false/1).
+:- was_export(is_holds_false/1).
 is_holds_false(Prop):-hotrace((atom(Prop),is_holds_false0(Prop))).
 
 is_holds_false0(Prop):-member(Prop,[not,nholds,holds_f,mpred_f,aint,assertion_f,not_true_t,asserted_mpred_f,retraction,not_secondOrder,not_firstOrder]).
@@ -250,9 +160,9 @@ isNonVar(Denotation):-not(isSlot(Denotation)).
 % ===============================================================================================
 % ===============================================================================================
 
-:-if(\+ current_predicate(isSlot/1)).
+:- if(\+ current_predicate(isSlot/1)).
 isSlot(Denotation):-((isVarProlog(Denotation);isVarObject(Denotation))),!.
-:-endif.
+:- endif.
 
 isSlot(Denotation,Denotation):- isVarProlog(Denotation),!.
 isSlot(Denotation,PrologVar):- isVarObject(Denotation,PrologVar),!.
@@ -399,7 +309,6 @@ logical_functor_ft((',')).
 % ===============================================================================================
 % ===============================================================================================
 
-:- dynamic(non_assertable/1).
 non_assertable(WW,isVar(WW)):- var(WW),!.
 non_assertable(_:WW,Why):- !,non_assertable(WW,Why).
 non_assertable(WW,notAssertable(Why)):- compound(WW),get_functor(WW,F),mpred_isa(F,notAssertable(Why)),!.
@@ -419,11 +328,11 @@ is_logical_functor0(And):-member(And,[(,),(;),('<-'),('=>'),('<=>'),(':-'),(and)
 is_neg(not(_)).
 is_pos(One):- get_functor(One,F),!,not(is_log_op(F)).
 
-:- export(is_log_sent/1).
+:- was_export(is_log_sent/1).
 is_log_sent(S):- get_functor(S,F,_),is_log_op(F).
 
 not_log_op(OP):- not(is_log_op(OP)).
-:- export(is_log_op/1).
+:- was_export(is_log_op/1).
 is_log_op(OP):- atomic(OP),to_dlog_ops(OPS),!,(member(OP=_,OPS);member(_=OP,OPS)).
 
 % % :- use_module(logicmoo(plarkc/mpred_kif)).
@@ -437,7 +346,7 @@ put_singles(Wff,Exists,[S|Singles],NewWff):-
    put_singles(WffM,Exists,Singles,NewWff),!.
 
 
-:-meta_predicate(call_last_is_var(0)).
+:- meta_predicate(call_last_is_var(0)).
 call_last_is_var(MCall):- strip_module(MCall,M,Call),
    must((compound(Call),functor(Call,_,A))),
    arg(A,Call,Last),nonvar(Last),Call=..FArgs,
@@ -446,7 +355,7 @@ call_last_is_var(MCall):- strip_module(MCall,M,Call),
    
 
 
-:- export(defunctionalize/2).
+:- was_export(defunctionalize/2).
 defunctionalize(Wff,WffO):- w_tl(t_l:dont_use_mudEquals,defunctionalize(',',Wff,WffO)).
 defunctionalize(OP,Wff,WffO):- call_last_is_var(defunctionalize(OP,Wff,WffO)).
 defunctionalize(_ ,Wff,Wff):- \+ compound(Wff),!.
@@ -501,28 +410,6 @@ wrap_in_neg_functor(mpred,X,not(X)).
 wrap_in_neg_functor(callable,X, (\+(X))).
 
 
-:-export(infix_op/2).
-infix_op(Op,_):-comparitiveOp(Op).
-infix_op(Op,_):-additiveOp(Op).
-
-:-export(comparitiveOp/1).
-comparitiveOp((\=)).
-comparitiveOp((\==)).
-comparitiveOp((=)).
-comparitiveOp((=:=)).
-comparitiveOp((==)).
-comparitiveOp((<)).
-comparitiveOp((>)).
-comparitiveOp((=<)).
-comparitiveOp((>=)).
-
-:-export(additiveOp/1).
-additiveOp((is)).
-additiveOp((*)).
-additiveOp(+).
-additiveOp(-).
-additiveOp((/)).
-
 
 contains_no_negs(X):- \+ contains_negs(X).
 
@@ -553,36 +440,35 @@ is_sentence_functor(exists).
 is_sentence_functor(all).
 
 
-:-dynamic(leave_as_is0/1).
 leave_as_is(V):- \+ compound(V),!.
 leave_as_is((_ :-_ )):-!,fail.
 leave_as_is((_;_)):-!,fail.
 leave_as_is((_/_)):-!,fail.
-leave_as_is(V):-compound(V),leave_as_is0(V),!.
+leave_as_is(V):-compound(V),leave_as_is_db(V),!.
 
-leave_as_is0('$VAR'(_)).
-leave_as_is0('aNARTFn'(_)).
-leave_as_is0('comment'(_,_)).
+leave_as_is_db('$VAR'(_)).
+leave_as_is_db('aNARTFn'(_)).
+leave_as_is_db('comment'(_,_)).
 
-leave_as_is0(C):-get_functor(C,F),leave_as_is_f(F).
-leave_as_is0(infer_by(_)).
-leave_as_is0(b_d(_,_,_)).
-leave_as_is0(ct(_,_)).
-% leave_as_is0('CollectionSubsetFn'(_,_)).
-leave_as_is0(ignore(_)).
-leave_as_is0(isa(_,_)).
-leave_as_is0(P):-prequent(P).
+leave_as_is_db(C):-get_functor(C,F),leave_as_is_functor(F).
+leave_as_is_db(infer_by(_)).
+leave_as_is_db(b_d(_,_,_)).
+leave_as_is_db(ct(_,_)).
+% leave_as_is_db('CollectionSubsetFn'(_,_)).
+leave_as_is_db(ignore(_)).
+leave_as_is_db(isa(_,_)).
+leave_as_is_db(P):-prequent(P).
 
 
-leave_as_is_f(Atom):- \+ atom(Atom),!,fail.
-leave_as_is_f('TINYKB-ASSERTION').
-leave_as_is_f('skolem').
-leave_as_is_f('$VAR').
-leave_as_is_f('kbMark').
-leave_as_is_f('z_unused').
-leave_as_is_f('genlMt').
-leave_as_is_f('{}').
-leave_as_is_f(F):-if_defined(ptReformulatorDirectivePredicate(F)).
+leave_as_is_functor(Atom):- \+ atom(Atom),!,fail.
+leave_as_is_functor('TINYKB-ASSERTION').
+leave_as_is_functor('skolem').
+leave_as_is_functor('$VAR').
+leave_as_is_functor('kbMark').
+leave_as_is_functor('z_unused').
+leave_as_is_functor('genlMt').
+leave_as_is_functor('{}').
+leave_as_is_functor(F):-if_defined_else(kb:ptReformulatorDirectivePredicate(F),fail).
 
 prequent(original(_)).
 prequent(mudEquals(_,_)).
@@ -600,18 +486,18 @@ non_compound(InOut):- once(not(compound(InOut));is_ftVar(InOut)).
 
 is_gaf(Gaf):-when(nonvar(Gaf),not(is_kif_rule(Gaf))).
 
-:- export(is_kif_rule/1).
+:- was_export(is_kif_rule/1).
 is_kif_rule(Var):- is_ftVar(Var),!,fail.
 % is_kif_rule(_:- _):- !.
 is_kif_rule(R):- get_functor(R,F,A),functor(P,F,A),kif_hook(P),!.
 
 
-:- export(term_slots/2).
+:- was_export(term_slots/2).
 term_slots(Term,Slots):-term_singletons(Term, [],NS, [],S),append(NS,S,Slots).
 
-:- export(term_singletons/2).
+:- was_export(term_singletons/2).
 term_singletons(A,Vs):- term_singletons(A,[],_,[],Vs). 
-:- export(term_singletons/5).
+:- was_export(term_singletons/5).
 term_singletons(Fml, NS,NS, S,S):- atomic(Fml),!.
 term_singletons(Fml, NS,NS, S,S):- identical_member(Fml,NS),!.
 term_singletons(Fml, NS, [Fml|NS], S, NSV):- is_ftVar(Fml),identical_member(Fml,S),!,delete_eq(S,Fml,NSV),!.
@@ -651,7 +537,7 @@ is_ftEquality(skolem(_,_)).
 is_ftEquality(equals(_,_)).
 is_ftEquality(termOfUnit(_,_)).
 
-:-thread_local(t_l:dont_use_mudEquals/0).
+:- thread_local(t_l:dont_use_mudEquals/0).
 
 
 ensure_quantifiers(Wff:- B,WffO):- B== true,!, ensure_quantifiers(Wff,WffO).
@@ -661,8 +547,8 @@ ensure_quantifiers(Wff,WffO):-
  must_det_l((show_call_failure(term_singletons(Wff,[],NS,[],Singles)),
   put_singles(Wff,'all',Singles,WffM),put_singles(WffM,'all',NS,WffO))).
 
-:- multifile(function_corisponding_predicate/2).
-:- dynamic(function_corisponding_predicate/2).
+:- was_shared_multifile(function_corisponding_predicate/2).
+:- was_dynamic(function_corisponding_predicate/2).
 
 get_pred(Pred,F):- get_functor(Pred,F).
 
@@ -683,4 +569,5 @@ function_to_predicate(Function,NewVar,PredifiedFunction):-
 function_to_predicate(Function,NewVar,mudEquals(NewVar,Function)):- \+ t_l:dont_use_mudEquals, fresh_varname(Function,NewVar),!.
 
 
+:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 

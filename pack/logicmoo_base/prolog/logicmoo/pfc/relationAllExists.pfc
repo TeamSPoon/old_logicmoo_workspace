@@ -7,7 +7,7 @@
 :- op(1050,xfx,('<-')).
 :- op(1100,fx,('==>')).
 :- op(1150,xfx,('::::')).
-:- dynamic(tCol/1).
+:- was_dynamic(tCol/1).
 
 
 

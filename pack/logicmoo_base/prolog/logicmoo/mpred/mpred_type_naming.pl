@@ -18,7 +18,6 @@
             createByNameMangle_compound/3,
             create_from_type/3,
             create_meta/4,
-            current_source_suffix/1,
             get_source_suffix/1,
             i_name/2,
             i_name/3,
@@ -37,42 +36,15 @@
             to_prefixed/3,
             typename_to_iname0/3
           ]).
-:- module_transparent % (module_transparent) :-
-        convertOneSpawnArg/4,
-        convertSpawnArgs/4,
-        convertToInstance/3,
-        createByNameMangle/3,
-        createByNameMangle0/3,
-        createByNameMangle_compound/3,
-        create_from_type/3,
-        create_meta/4,
-        current_source_suffix/1,
-        get_source_suffix/1,
-        i_name/2,
-        i_name/3,
-        i_name_lc/2,
-        modality/3,
-        onSpawn/1,
-        onSpawn_0/2,
-        onSpawn_f_args/3,
-        spawnOneSpawnArg/4,
-        split_name_type/3,
-        split_name_type_0/3,
-        toCamelAtom0/2,
-        toUpperCamelcase/2,
-        to_atomic_name/3,
-        to_iname/2,
-        to_prefixed/3,
-        typename_to_iname0/3.
-:- dynamic % (dynamic) :-
-        current_source_suffix/1.
+:- use_module(logicmoo(util/logicmoo_util_preddefs)).
+
 
 :- include('mpred_header.pi').
 
 % ================================================
 % Naming System
 % ================================================
-:-export(create_meta/4).
+:- was_export(create_meta/4).
 % if SuggestedName was 'food666' it'd like the SuggestedClass to be 'food' and the stystem name will remain 'food666'
 % if SuggestedName was 'food' it'd like the SuggestedClass to be 'food' and the stystem name will become a gensym like 'food1'
 create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
@@ -86,7 +58,7 @@ create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
 
 
 
-:-export(i_name_lc/2).
+:- was_export(i_name_lc/2).
 i_name_lc(OType,IType):-typename_to_iname0('',OType,IOType),!,string_equal_ci(IOType,IType).
 
 
@@ -96,18 +68,18 @@ to_iname(T,TT):-is_ftVar(T)->TT=T;(not_log_op(T),i_name(t,T,TT)).
 
 
 toUpperCamelcase(Type,TypeUC):-toCamelcase(Type,TypeUC). % ,toPropercase(TypeC,TypeUC),!.
-:-export(i_name/2).
+:- was_export(i_name/2).
 i_name(OType,IType):-typename_to_iname0('',OType,IOType),!,IOType=IType.
-:-export(i_name/3).
+:- was_export(i_name/3).
 i_name(I,OType,IType):-typename_to_iname0(I,OType,IOType),!,IOType=IType.
 
-:-export(typename_to_iname0/3).
+:- was_export(typename_to_iname0/3).
 
 typename_to_iname0(I, [], O):- trace_or_throw(bad_typename_to_iname0(I, [], O)).
 typename_to_iname0(I,OType,IType):-type_prefix(Prefix,_),atom_concat(Prefix,Type,OType),capitalized(Type),!,typename_to_iname0(I,Type,IType).
 typename_to_iname0(I,Type,IType):-nonvar(Type),toUpperCamelcase(Type,UType),atom_concat(I,UType,IType).
 
-:-export(split_name_type/3).
+:- was_export(split_name_type/3).
 :- '$hide'(split_name_type/3).
 split_name_type(Suggest,InstName,Type):- must_det(split_name_type_0(Suggest,NewInstName,NewType)),!,must((NewInstName=InstName,NewType=Type)),!.
 
@@ -153,7 +125,7 @@ createByNameMangle_compound(Name,Name,Type):- Name=..[Type|Props],assert_isa(Nam
 createByNameMangle_compound(Name,Inst,Type):- functor_catch(Name,Type,A),must(A==1),assert_isa(Name,Type),Name=Inst.
 
 
-:-dynamic(lmconf:current_source_suffix/1).
+:- was_dynamic(lmconf:current_source_suffix/1).
 
 get_source_suffix(SS):- lmconf:current_source_suffix(SS),!.
 get_source_suffix('7').
@@ -233,4 +205,5 @@ convertToInstance(Name,FunctArgType,Inst):- createByNameMangle(Name,Inst,TypeA),
   %  assert_isa(Inst,FunctArgType),
     add(genls(TypeA,FunctArgType)),!.
 
+:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 

@@ -204,7 +204,7 @@
             show_call/1,
             show_call0/1,
             show_call_entry/1,
-            show_call_failure/1,
+          show_call_failure/1,
             show_call_success/1,
             show_goal_rethrow/2,
             show_module/1,
@@ -246,7 +246,7 @@
             writeOverwritten/0,
             writeSTDERR0/1,
             writeSavedPrompt/0,
-     op(1150,fx,(lmconf:shared_multifile))
+     op(1150,fx,(lmconf:was_shared_multifile))
 
           ]).
 :- multifile
@@ -344,7 +344,7 @@
         with_no_term_expansions(0),
         with_skip_bugger(0).
 :- module_transparent
-        
+                    show_call_failure/1,
         all_module_predicates_are_transparent/1,
         alldiscontiguous/0,
         arg_is_transparent/1,
@@ -500,7 +500,7 @@
 
 
 :- 
-      op(1150,fx,(lmconf:shared_multifile)),
+      op(1150,fx,(lmconf:was_shared_multifile)),
       op(1150,fx,meta_predicate),
       op(1150,fx,thread_local).
 
@@ -566,6 +566,7 @@ restore_trace(Goal):-  ((tracing, notrace) -> CC=trace;CC=true),
 rtrace(Goal):- notrace(tlbugger:rtracing) -> Goal ; 
    (notrace, ((tracing, notrace) -> CC=trace;CC=true), 
      '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup((start_rtrace,trace,Goal),(notrace,stop_rtrace0,'$leash'(_, Old),'$visible'(_, OldV),CC))).
+
 
 
 
@@ -1269,7 +1270,7 @@ do_gc:- do_gc0.
 
 do_gc0:- current_prolog_flag(gc,true),!,do_gc0.
 do_gc0:- set_prolog_flag(gc,true), do_gc1, set_prolog_flag(gc,false).
-do_gc1:- cnotrace((garbage_collect, garbage_collect_atoms /*garbage_collect_clauses*/ /*, statistics*/
+do_gc1:- notrace((garbage_collect, garbage_collect_atoms /*garbage_collect_clauses*/ /*, statistics*/
                     )).
 
 :- multifile(lmconf:is_prolog_stream/1).
@@ -1644,7 +1645,7 @@ show_call_success(C):- show_call0(C),dmsg(show_call_success(C)).
 
 %= :- meta_predicate  on_f_log_fail(0).
 :- export(on_f_log_fail/1).
-on_f_log_fail(C):-one_must(C,cnotrace((dmsg(failed_show_call(C)),garbage_collect_atoms,!,fail))).
+on_f_log_fail(C):-one_must(C,notrace((dmsg(failed_show_call(C)),garbage_collect_atoms,!,fail))).
 
 
 :- dynamic(logLevel/2).
@@ -1861,7 +1862,7 @@ show_and_do(C):-wdmsg(show_and_do(C)),!,trace,C.
 
 
 %dtrace:- skipWrapper,!,dmsg(dtrace_skipWrapper).
-dtrace:- cnotrace(dumpST),trace.
+dtrace:- notrace(dumpST),trace.
 
 
 % esa Michele Murer 360-750-7500 ext_135
@@ -1870,10 +1871,9 @@ dtrace:- cnotrace(dumpST),trace.
 dtrace(MSG,G):-wdmsg(error,MSG),dtrace(G).
 
 % = %= :- meta_predicate (dtrace(0)).
-dtrace(G):- hotrace(get_dtrace(G,DT)),!,call(DT).
 
-get_dtrace(G,call(C,G)):-has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!.
-get_dtrace(G,true):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,hotrace(dumpST).
+dtrace(G):- has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,C.
+dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,hotrace(dumpST).
 get_dtrace(G,call_cleanup((dumptrace(G)*->trace;trace),trace)):-tracing,notrace,!,wdmsg(tracing_dtrace(G)),!.
 get_dtrace(G,dumptrace(G)):-current_predicate(_:logicmoo_bugger_loaded/0),!.
 get_dtrace(G,G).
@@ -1933,7 +1933,6 @@ in_toplevel :- nth_pi(LF,_:'$load_file'/_),nth_pi(TL,'$toplevel':_/0),!,LF>TL,
   (nth_pi(ED,_:'$execute_directive_3'/_)-> (ED>TL) ; true).
 
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
 :- dynamic(did_ref_job/1).
 do_ref_job(_Body,Ref):-did_ref_job(Ref),!.
@@ -2036,7 +2035,7 @@ user:message_hook(Term, Kind, Lines):- (Kind= warning;Kind= error),Term\=syntax_
 :-thread_local(t_l:wasguitracer/1).
 save_guitracer:- ignore((current_prolog_flag(gui_tracer, GWas),asserta(t_l:wasguitracer(GWas)))).
 restore_guitracer:- ignore((retract(t_l:wasguitracer(GWas)),set_prolog_flag(gui_tracer, GWas))).
-nortrace:- cnotrace((stop_rtrace,trace)).
+nortrace:- notrace((stop_rtrace,trace)).
 rtrace:- notrace((visible(+all),visible(+unify),visible(+exception),thread_leash(-all),thread_leash(+exception),assert(tlbugger:rtracing),save_guitracer,noguitracer)).
 start_rtrace:- notrace((debug,rtrace,trace)).
 stop_rtrace:-notrace((visible(+all),visible(+unify),visible(+exception),thread_leash(+all),thread_leash(+exception),stop_rtrace0)).
@@ -2071,4 +2070,6 @@ logicmoo_bugger_loaded.
 %:- module_predicates_are_exported.
 % :- module_meta_predicates_are_transparent(user).
 % :- all_module_predicates_are_transparent(logicmoo_util_bugger_catch).
+
+:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 

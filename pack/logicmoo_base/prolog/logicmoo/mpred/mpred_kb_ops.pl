@@ -27,9 +27,7 @@
             second_order/2,
             whenAnd/2
           ]).
-:- multifile % (multifile) :-
-        '$load_context_module'/3.
-:- meta_predicate % (meta_predicate) :-
+:- meta_predicate 
         deducedSimply(0),
         is_callable(0),
         mpred_op(?, ?),
@@ -37,21 +35,15 @@
         oncely(0),
         whenAnd(0,0).
 
-:- module_transparent % (module_transparent) :-
-        how_to_op/2,
-        lookup_inverted_op/3,
-        mpred_call_1/1,
-        mpred_call_2/1,
-        mpred_call_3/1,
-        reduce_mpred_op/2,
-        second_order/2,
-        whenAnd/2.
+:- include('mpred_header.pi').
+
+:- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
 
 
 % oncely later will throw an error if there where choice points left over by call
-:-meta_predicate(oncely(0)).
-:-export(oncely/1).
+:- meta_predicate(oncely(0)).
+:- was_export(oncely/1).
 oncely(:-(Call)):-!,Call,!.
 oncely(:-(Call)):-!,req(Call).
 oncely(Call):-once(Call).
@@ -67,13 +59,13 @@ once(A,B,C,D):-trace_or_throw(once(A,B,C,D)).
 
 second_order(_,_):-fail.
 
-:-meta_predicate(deducedSimply(0)).
-:-export(deducedSimply/1).
+:- meta_predicate(deducedSimply(0)).
+:- was_export(deducedSimply/1).
 deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not_asserted((Call)),nonvar(Fact),Body,dmsg((deducedSimply2(Call):-Fact)),!,show_call((is_asserted(Fact),ground(Call))).
 
 % deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),nonvar(Fact),Body,ground(Call),dmsg((deducedSimply1(Call):-Fact)),show_call((is_asserted(Fact),ground(Call))).
 
-:-meta_predicate(mpred_op(?,?)).
+:- meta_predicate(mpred_op(?,?)).
 mpred_op(Op,     H ):- (var(Op);var(H)),!,trace_or_throw(var_database_call(Op,  H )).
 mpred_op(is_asserted,H):-!,is_asserted(H).
 mpred_op(Op,     H ):- once(fully_expand(Op,H,HH)),H\=@=HH,!,mpred_op(Op, HH).
@@ -100,7 +92,7 @@ mpred_op(_ , (H :- B) ):- !, is_asserted(H,B).
 mpred_op(clauses(Op),  H):-!,mpred_op((Op),  H).
 mpred_op(_,C):- mpred_call(C).
 
-:-export(whenAnd/2).
+:- was_export(whenAnd/2).
 whenAnd(A,B):-A,ground(B),once(B).
 
 
@@ -148,22 +140,22 @@ lookup_inverted_op(asserta_new,retract,+).
 % is_callable/mpred_call/naf
 % ================================================
 
-%:-dynamic(naf/1).
-:-meta_predicate(naf(0)).
-:-export(naf/1).
+%:- was_dynamic(naf/1).
+:- meta_predicate(naf(0)).
+:- was_export(naf/1).
 naf(Goal):-not(mpred_call(Goal)).
 
-:-meta_predicate(is_callable(0)).
-:-export(is_callable/1).
+:- meta_predicate(is_callable(0)).
+:- was_export(is_callable/1).
 is_callable(C):-current_predicate(_,C),!.
 /*
-:-meta_predicate(export(0)).
-:-meta_predicate(mpred_call(0)).
-:-meta_predicate(mpred_call_0(0)).
-:-meta_predicate(mpred_call_1(0)).
-:-meta_predicate(mpred_call_2(0)).
-:-meta_predicate(mpred_call_3(0)).
-:-export(mpred_call/1).
+:- meta_predicate(export(0)).
+:- meta_predicate(mpred_call(0)).
+:- meta_predicate(mpred_call_0(0)).
+:- meta_predicate(mpred_call_1(0)).
+:- meta_predicate(mpred_call_2(0)).
+:- meta_predicate(mpred_call_3(0)).
+:- was_export(mpred_call/1).
 mpred_call(V):-var(V),trace_or_throw(var_mpred_call(V)).
 mpred_call(call(X)):-!,mpred_call(X).
 mpred_call((X,Y)):-!,mpred_call(X),mpred_call(Y).
@@ -189,6 +181,9 @@ mpred_call_2(Call):-mpred_call_3(Call).
 
 % https://gist.githubusercontent.com/vwood/662109/raw/dce9e9ce9505443a82834cdc86163773a0dccc0c/ecldemo.c
 
+
+
+:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
 mpred_call_3(Call):-on_x_rtrace(loop_check(if_defined(Call))).
 

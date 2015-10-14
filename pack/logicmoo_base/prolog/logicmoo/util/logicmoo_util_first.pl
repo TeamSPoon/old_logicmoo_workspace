@@ -1,9 +1,8 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first.pl
 :- module(logicmoo_util_first,
           [ 
-  scan_and_list_file_preds/1,
-  portray_clause_pi_UD/2,
-  portray_clause_pi_LR/2,
+          safe_numbervars/1,
+          safe_numbervars/2,
 
           match_predicates/2,
           match_predicates/5,
@@ -16,23 +15,13 @@
             add_newvar/2,
             add_newvars/1,
             always_show_dmsg/0,
-            export_module_preds/0,
-            functor_compare/3,
-            helper_name/1,
-            helper_name0/1,
             lbl_vars/4,
-            list_file_preds/0,
-            list_file_preds/1,
-            list_file_preds/2,
-            m_cp/3,
-            make_module_name/2,
-            module_meta_transparent/1,
-            mpred_source_file/2,
-            mpred_source_file_0/2,
+
             mustvv/1,
             name_to_var/3,
-            no_location/3,
-            portray_clause_pi_LR/2,
+
+
+            tlbugger:ifHideTrace/0,
             register_var/3,
             register_var/4,
             register_var_0/4,
@@ -41,20 +30,13 @@
             renumbervars1/2,
             renumbervars1/4,
             samify/2,
-            export_file_preds/0,
-            export_file_preds/1,
-            export_file_preds/6,
             snumbervars/1,
             snumbervars/3,
             snumbervars/4,
-            some_flocation/3,
-            some_location/3,
             term_to_string/2,
-            to_fa/3,
             unnumbervars/2,
             unnumbervars_and_save/2,
-            var_to_name/3,
-            write_modules/0
+            var_to_name/3
           ]).
 :- meta_predicate
 
@@ -68,10 +50,10 @@
 
         module_meta_transparent(:),
         mustvv(0),
-        renumbervars(?, 0),
-        snumbervars(0),
-        snumbervars(0, ?, ?),
-        snumbervars(0, ?, ?, ?).
+        renumbervars(?, ?),
+        snumbervars(?),
+        snumbervars(*, ?, ?),
+        snumbervars(*, ?, ?, ?).
 :- module_transparent
 
 
@@ -82,26 +64,11 @@
           mpred_trace_none/1,
           mpred_trace_nochilds/1,
           mpred_trace_childs/1,
-
-
         add_newvar/2,
         add_newvars/1,
         always_show_dmsg/0,
-        export_module_preds/0,
-        functor_compare/3,
-        helper_name/1,
-        helper_name0/1,
         lbl_vars/4,
-        list_file_preds/0,
-        list_file_preds/1,
-        list_file_preds/2,
-        m_cp/3,
-        make_module_name/2,
-        mpred_source_file/2,
-        mpred_source_file_0/2,
         name_to_var/3,
-        no_location/3,
-        portray_clause_pi_LR/2,
         register_var/3,
         register_var/4,
         register_var_0/4,
@@ -115,17 +82,17 @@
         some_flocation/3,
         some_location/3,
         term_to_string/2,
-        to_fa/3,
         unnumbervars/2,
+   safe_numbervars/1,
+   safe_numbervars/2,
         unnumbervars_and_save/2,
-        var_to_name/3,
-        write_modules/0.
+        var_to_name/3.
 
 
 :- meta_predicate snumbervars(?,?,?,?).
 :- meta_predicate snumbervars(?,?,?).
-:- meta_predicate safe_numbervars(0).
-:- meta_predicate contains_singletons(0).
+:- meta_predicate safe_numbervars(?).
+:- meta_predicate contains_singletons(?).
 % Restarting analysis ...
 % Found new meta-predicates in iteration 2 (0.206 sec)
 :- meta_predicate renumbervars(?,?).
@@ -134,7 +101,8 @@
 % Restarting analysis ...
 % Found new meta-predicates in iteration 3 (0.121 sec)
 :- meta_predicate programmer_error(0).
-:- meta_predicate safe_numbervars(*,0).
+:- meta_predicate safe_numbervars(*,?).
+
 
 
 %================================================================
@@ -201,132 +169,17 @@ mpred_trace_all(W) :- forall(match_predicates(W,M,Pred,_,A),(
 %:-mpred_trace_all('$apply':_).
 %:-mpred_trace_all(system:_).
 
+:- include('logicmoo_util_header.pi').
 
-
-
+:- export(tlbugger:ifHideTrace/0).
+:- thread_local(tlbugger:ifHideTrace/0).
 :- thread_local(tlbugger:tl_always_show_dmsg).
 always_show_dmsg:- thread_self(main).
 always_show_dmsg:- tlbugger:tl_always_show_dmsg.
 
-:- export(tlbugger:ifHideTrace/0).
-:- thread_local(tlbugger:ifHideTrace/0).
-
-:- dynamic(lmconf:mpred_is_impl_file/1).
-:- multifile(lmconf:mpred_is_impl_file/1).
-:- volatile(lmconf:mpred_is_impl_file/1).
-
-:- if(false).
-:- else.
-:- include('logicmoo_util_header.pi').
-:- endif.
-
-write_modules:- forall(lmconf:mpred_is_impl_file(F),(export_file_preds(F),list_file_preds(F))).
-
 term_to_string(IS,I):- on_x_fail(term_string(IS,I)),!.
 term_to_string(I,IS):- on_x_fail(string_to_atom(IS,I)),!.
 term_to_string(I,IS):- grtrace(term_to_atom(I,A)),string_to_atom(IS,A),!.
-
-
-make_module_name(P,M):-file_base_name(P,F),file_name_extension(M,_Ext,F).
-helper_name0(F):- atom_chars(F,Chars),append(_,[U,N],Chars), ( char_type(U,digit) ;  char_type(N,digit)), !.
-helper_name(F):-fail,helper_name0(F).
-portray_clause_pi_LR(_,[]):-!.
-portray_clause_pi_LR(T,LIST0):-list_to_set(LIST0,LIST),list_to_conjuncts(LIST,E),P=..[T,E], format('~N',[]), portray_clause( ( :-P )),!.
-
-portray_clause_pi_UD(_,[]):-!.
-portray_clause_pi_UD(T,LIST0):-list_to_set(LIST0,LIST),list_to_conjuncts(LIST,E),P=..[T,E], format('~N :~ ~q % ',[T]), portray_clause( ( :-P )),!.
-
-to_fa(P,_,A):-var(P),!,integer(A).
-to_fa(_-FA,F,A):-!,to_fa(FA,F,A).
-to_fa(_:FA,F,A):-!,to_fa(FA,F,A).
-to_fa(F/A,F,A):-!.
-to_fa(P,F,A):-functor(P,F,A).
-
-
-functor_compare(R,P1,P2):-to_fa(P1,F1,A1),to_fa(P2,F2,A2),compare(FR,F1,F2),(FR\==(=)->R=FR;compare(R,A1,A2)).
-
-
-list_file_preds:- source_location(S,_),list_file_preds(S).
-
-scan_and_list_file_preds(F):- forall(filematch(F,S),((make_module_name(S,MN),ensure_loaded(S),export_file_preds(S),list_file_preds(S,MN)))).
-list_file_preds(F):- forall(filematch(F,S),((make_module_name(S,MN),ensure_loaded(S),list_file_preds(S,MN)))).
-list_file_preds(S,MN):-
- must_det_l((
-   findall(M:P-F/A,(mpred_source_file(M:P,S),functor(P,F,A)),List),predsort(functor_compare,List,Set),
-   findall(F/A,(member(M:P-F/A,Set),\+ predicate_property(M:P,multifile),\+ helper_name(F)),Exports),
-   findall(F/A,(member(M:P-F/A,Set),predicate_property(M:P,multifile)),Multifile),
-   format('~N~n~n% File: ~w ~n',[S]),
-   findall(MP,   (member(M:P-F/A,Set),predicate_property(M:P,meta_predicate(MP))),MPList),
-   findall(F/A,(member(M:P-F/A,Set),predicate_property(M:P,transparent),\+ predicate_property(M:P,meta_predicate(_))),Transparent),
-   findall(F/A,(member(M:P-F/A,Set),predicate_property(M:P,thread_local)),ThreadLocal),
-   findall(F/A,(member(M:P-F/A,Set),predicate_property(M:P,dynamic),\+ predicate_property(M:P,thread_local)),Dynamic),   
-   findall(F/A,(member(M:P-F/A,Set),predicate_property(M:P,volatile)),Volatile),
-   
-   portray_clause( :- module(MN,Exports)),
-   portray_clause_pi_UD( meta_predicate,MPList),
-   portray_clause_pi_LR( multifile,Multifile),
-   portray_clause_pi_LR( module_transparent,Transparent),
-   portray_clause_pi_LR( thread_local,ThreadLocal),subtract(Dynamic,ThreadLocal,DynamicL),
-   portray_clause_pi_LR( volatile,Volatile))),
-   portray_clause_pi_LR( shared_multifile,DynamicL),!.
-   
-
-
-
-:-export(module_meta_transparent/1).
-% = :- meta_predicate(module_meta_transparent(:)).
-module_meta_transparent(M:F/A):-must(functor(P,F,A)),!,module_meta_transparent(M:P).
-module_meta_transparent(M:P):-predicate_property(M:P,meta_predicate(_)),!.
-module_meta_transparent(M:P):-predicate_property(M:P,transparent),!.
-module_meta_transparent(M:P):-functor(P,F,A),module_transparent(M:F/A),!. % ground(P),M:meta_predicate(P),!.
-% module_meta_transparent(M:P):-P=..[_|Args],maplist('='(?),Args),module_meta_transparent(M:P).
-module_meta_transparent(_).
-
-mpred_source_file(M:P,S):- no_repeats(mpred_source_file_0(M:P,S)),once((to_fa(P,F,A),assert_if_new(lmconf:sf_known(S,F,A,M)))).
-mpred_source_file_0(M:P,S):-predicate_property(M:P,file(S)).
-mpred_source_file_0(M:P,S):-source_file(M:P,S).
-mpred_source_file_0(M:P,S):-var(P)-> (lmconf:sf_known(S,F,A,M),functor(P,F,A)) ; (functor(P,F,A),lmconf:sf_known(S,F,A,M)).
-
-m_cp(M,F,A):-no_repeats(M:F/A,((functor(P,F,A),current_predicate(_,M:P)))),\+ predicate_property(M:P,imported_from(_)).
-
-:-dynamic(lmconf:sf_known/4).
-no_location(M,F,A):-m_cp(M,F,A),\+ lmconf:sf_known(_S,F,A,_MN).
-
-some_location(M,F,A):-no_repeats(F/A,(( m_cp(M,F,A); lmconf:sf_known(_S,F,A,_MN)))).
-some_flocation(MN,F,A):-no_repeats(F/A,(( lmconf:sf_known(_S,F,A,MN);m_cp(MN,F,A)))).
-
-
-:- module_transparent(export_file_preds/1).
-:- export(export_file_preds/0).
-export_file_preds:- source_location(S,_),export_file_preds(S),!.
-:- export(export_file_preds/1).
-export_file_preds(_):- current_prolog_flag(xref,true),!.
-export_file_preds(FileMatch):- forall(filematch(FileMatch,File),(context_module(NotUser),must(NotUser\==user),
-   forall(must(mpred_source_file(M:P,File)),(functor(P,F,A),must(export_file_preds(NotUser,File,M,P,F,A)))))).
-
-predicate_decl_module(Pred,RM):-current_predicate(_,RM:Pred),\+ predicate_property(RM:Pred,imported_from(_)),must(RM\==user).
-
-
-:- style_check(-singleton).
-
-
-export_file_preds(NotUser,S,_,P,F,A):-current_predicate(logicmoo_varnames:F/A),!.
-export_file_preds(NotUser,S,system,P,F,A):-current_predicate(system:F/A),!.
-export_file_preds(NotUser,S,user,P,F,A):-current_predicate(system:F/A),!.
-export_file_preds(NotUser,S,M,P,F,A):- M==user,!,trace,show_call(export_file_preds(NotUser,S,NotUser,P,F,A)).
-export_file_preds(NotUser,S,M,P,F,A):- predicate_decl_module(P,RM),RM\==M,!,export_file_preds(NotUser,S,RM,P,F,A).
-%export_file_preds(NotUser,S,M,P,F,A):- \+ helper_name(F), export(M:F/A), fail.
-export_file_preds(NotUser,S,M,P,F,A):- M:export(M:F/A), fail. % export anyways
-export_file_preds(NotUser,S,M,P,F,A):- M:module_transparent(F/A), fail.
-% export_file_preds(NotUser,S,M,P,F,A):- module_meta_transparent(M:F/A),fail.
-export_file_preds(NotUser,S,M,P,F,A):- must(predicate_property(M:P,transparent)).
-
-:- style_check(+singleton).
-
-:- module_transparent(export_module_preds/0).
-:- export(export_module_preds/0).
-export_module_preds:- current_prolog_flag(xref,true),!.
-export_module_preds:- context_module(M),source_file_property(S,module(M)),export_file_preds(S),forall(source_file_property(S,includes(F,_)),export_file_preds(F)).
 
 
 :- meta_predicate mustvv(0).

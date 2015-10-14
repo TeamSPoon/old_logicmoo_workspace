@@ -46,7 +46,6 @@
             fresh_line_to_err/0,
             functor_catch/3,
             functor_safe/3,
-            get_hotrace/2,
             get_must/2,
             hotrace/0,
             hotrace/1,
@@ -171,7 +170,6 @@
         fresh_line_to_err/0,
         functor_catch/3,
         functor_safe/3,
-        get_hotrace/2,
         get_must/2,
         hotrace/0,
         ib_multi_transparent33/1,
@@ -221,26 +219,6 @@
         warn_bad_functor/1.
 :- dynamic
         is_hiding_dmsgs/0.
-
-
-
-
-:- if(current_predicate(logicmoo_utils:combine_logicmoo_utils/0)).
-:- module(logicmoo_util_bugger_catch,
-    [  % when the predciates are not being moved from file to file the exports will be moved here
-      aina/1,
-         ainz/1,
-         as_clause/3,
-         ain/1,
-         ainz/1,
-         ainz_clause/1,
-         ainz_clause/2,
-         ain/1,
-         safe_univ/2,
-         clause_asserted/2,
-         clause_asserted/1]).  
-
-:- endif.
 
 
 % = :- meta_predicate(catchvvnt(0,?,0)).
@@ -320,6 +298,11 @@ ddmsg_call(D):- ( (ddmsg(ddmsg_call(D)),call(D),ddmsg(ddmsg_exit(D))) *-> true ;
 
 :- meta_predicate if_defined(:).
 :- export(if_defined/1).
+if_defined(C:G):-current_predicate(_,C:G),!,on_x_fail(C:G).
+if_defined(_:G):-current_predicate(_,R:G),!,on_x_fail(R:G).
+if_defined(G):-current_predicate(_,R:G),!,on_x_fail(R:G).
+if_defined(G):-current_predicate(_,G),!,on_x_fail(G).
+if_defined(Goal):- !, ddmsg(warn_undefined(Goal)),!,fail.
 if_defined(Goal):- tlbugger:show_must_go_on,!,if_defined(Goal,((writeln(warn_undefined(Goal))),!,fail)).
 if_defined(Goal):- !, if_defined(Goal,(ddmsg(warn_undefined(Goal)),trace)).
 
@@ -371,9 +354,10 @@ sl_to_filename(W,W).
 
 
 
-current_source_location(F):- clause(current_source_location0(W),Body),on_x_log_fail(Body),sl_to_filename(W,F),!.
+current_source_location(F):- clause(M:current_source_location0(W),Body),on_x_log_fail(M:Body),sl_to_filename(W,F),!.
 current_source_location(F):- F = unknown.
 
+current_source_location0(F):- t_l:current_why_source(F).
 current_source_location0(F:L):-source_location(F,L),!.
 current_source_location0(F:L):-prolog_load_context(file,F),current_input(S),line_position(S,L),!.
 current_source_location0(When):-loading_file(When).
@@ -385,8 +369,7 @@ current_source_location0(module(M)):- '$module'(M,M).
 
 :-export(current_why/1).
 :-module_transparent(current_why/1).
-current_why(F):- t_l:current_why_source(F).
-current_why(F):- t_l:current_local_why(F,_).
+current_why(Why):- t_l:current_local_why(Why,_).
 current_why(F):- current_source_location(F).
 
 
@@ -663,9 +646,9 @@ nop(_).
 
 
 % = :- meta_predicate(cnotrace(0)).
-cnotrace(Goal):- call(Goal).
-:- mpred_trace_less(notrace/1).
-:- '$set_predicate_attribute'(cnotrace(_), hide_childs, 1).
+cnotrace(Goal):- hotrace(Goal).
+:- mpred_trace_less(cnotrace/1).
+:- '$set_predicate_attribute'(cnotrace(_), hide_childs, 0).
 :- '$set_predicate_attribute'(cnotrace(_), trace, 0).
 
 
@@ -679,22 +662,13 @@ thread_leash(+Some):-!, (thread_self(main)->leash(+Some);thread_leash(-Some)).
 thread_leash(-Some):-!, (thread_self(main)->leash(-Some);thread_leash(-Some)).
 thread_leash(Some):-!, (thread_self(main)->leash(+Some);thread_leash(-Some)).
 
-% ((tracing, notrace) -> CC=trace;CC=true), '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,(('$leash'(_, Old),'$visible'(_, OldV),CC),CC)).
-get_hotrace(X,Y):- \+ tracing,!,X=Y.
-get_hotrace(X,Y):- (tracing) -> Y= call_cleanup(true,(rtraceOnError(X),trace),trace); Y=X.
-%get_hotrace(X,Y):- tracing,!,'$visible'(OldV, OldV),notrace,visible(-all),visible(+exception),Y = call_cleanup(show_call(X),cnotrace(('$visible'(_, OldV),trace))).
-%get_hotrace(X,Y):- !,'$visible'(OldV, OldV),notrace,visible(-all),visible(+exception),Y = call_cleanup(X,('$visible'(_, OldV))).
-
-hotrace(X):- notrace(tracing) -> (notrace,call_cleanup(X,trace)) ; X.
-hotrace(Goal):- (get_hotrace(Goal,CGoal)),CGoal.
+hotrace(X):- notrace(tracing) -> (notrace,'$leash'(Old, Old),'$visible'(OldV, OldV),thread_leash(+exception),visible(+all),thread_leash(+all),call_cleanup(X,(('$leash'(_, Old),'$visible'(_, OldV),trace)))) ; X.
+:- trace(hotrace/1, -all).	
 % hotrace(X):- get_hotrace(X,Y),Y.
-:- mpred_trace_less(hotrace/1).
-:- '$set_predicate_attribute'(hotrace(_), hide_childs, 1).
+%:- mpred_trace_less(hotrace/1).
+:- '$set_predicate_attribute'(hotrace(_), hide_childs, 0).
 :- '$set_predicate_attribute'(hotrace(_), trace, 0).
 
-
-%get_hotrace(X):-  visible(+exception),thread_leash(+exception),restore_trace((notrace,X)).
-% hotrace(Goal):-current_predicate(_:logicmoo_bugger_loaded/0)->catchvv((Goal),E,((writeq(E=Goal),rtrace(Goal),trace_or_throw(E=Goal))));Goal.
 
 
 :-export(on_x_fail/1).
@@ -827,11 +801,11 @@ y_must(Y,Goal):- catchvv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail)
 :- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(200), attributes(portray)]).
 :- set_prolog_flag(debugger_show_context,true).
 
-must(Goal):- notrace(get_must(Goal,MGoal)),MGoal.
+must(Goal):- (get_must(Goal,MGoal)),MGoal.
 
 get_must(Goal,Goal):- fail,is_release,!.
 get_must(Goal,CGoal):-  tlbugger:skipMust,!,CGoal = Goal.
-get_must(Goal,CGoal):- skipWrapper,!, CGoal = (Goal *-> true ; ((ddmsg(failed(must(Goal))),trace,Goal))).
+get_must(Goal,CGoal):- skipWrapper,!,trace, CGoal = (Goal *-> true ; ((ddmsg(failed_FFFFFFF(must(Goal))),dumpST,trace,Goal))).
 get_must(Goal,CGoal):- tlbugger:show_must_go_on,!,
  CGoal = ((catchvv(Goal,E,
      notrace(((dumpST,ddmsg(error,sHOW_MUST_go_on_xI__xI__xI__xI__xI_(E,Goal))),badfood(Goal))))

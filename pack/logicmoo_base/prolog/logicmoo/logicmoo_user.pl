@@ -12,11 +12,11 @@
 % Douglas Miles
 */
 
-:- module(logicmoo_user,[]).
-:- multifile '$was_imported_kb_content$'/2.
-:- dynamic '$was_imported_kb_content$'/2.
-:- discontiguous('$was_imported_kb_content$'/2).
-:- module(logicmoo_user).
+% :- module(logicmoo_user,[m1,m2,m3,m4/0]).
+:- multifile '$si$':'$was_imported_kb_content$'/2.
+:- dynamic '$si$':'$was_imported_kb_content$'/2.
+:- discontiguous('$si$':'$was_imported_kb_content$'/2).
+% :- module(logicmoo_user).
 
 
 :- set_prolog_flag(report_error,true).
@@ -38,13 +38,13 @@ m1:- gripe_time(40,ensure_loaded(logicmoo(mpred_online/mpred_www))),if_defined(m
 % :- hook_message_hook.
 :- set_prolog_flag(verbose_autoload,false).
 :- set_prolog_flag(verbose_load,true).
-m9:- (F = mpred/_),foreach(must(lmconf:mpred_is_impl_file(F)),must_det_l((dmsg(list_file_preds(F)),ensure_loaded(F),export_file_preds(F),list_file_preds(F)))).
-
-m2:- rtrace(ensure_mpred_system).
-
-m3:- must(filematch_ext(['',mpred,ocl,moo,plmoo,pl,plt,pro,p,'pl.in',pfc,pfct],logicmoo_user:pfc/mpred,W)),dmsg(W).
+m9   :-asserta_if_new((user:term_expansion(I,O):- lmbase_expansion(term,user,I,O))).
+m31 :-   (F = mpred/_),foreach(must(logicmoo_util_help:mpred_is_impl_file(F)),must_det_l((dmsg(list_file_preds(F)),ensure_loaded(F),export_file_preds(F),list_file_preds(F)))).
+m32:- rtrace(ensure_mpred_system).
+m33:- must(filematch_ext(['',mpred,ocl,moo,plmoo,pl,plt,pro,p,'pl.in',pfc,pfct],logicmoo_user:pfc/mpred,W)),dmsg(W),!.
+m2:- ensure_mpred_file_loaded(pfc/abc).
 m4:- ensure_mpred_file_loaded(pfc/mpred).
-m5:- w_tl(tlbugger:ifHideTrace,(ensure_mpred_file_loaded(pfc/mpred))).
+m3:- make. % w_tl(tlbugger:ifHideTrace,(ensure_mpred_file_loaded(pfc/mpred))).
 
 
 
@@ -55,6 +55,12 @@ end_of_file.
 
 
 
+:- use_module(mpred/mpred_loader).
+% :- trace.
+
+%
+
+% :- enable_mpred_system(kb).
 
 
 
@@ -71,8 +77,8 @@ end_of_file.
 
 %
 
-:- multifile lmconf:startup_option/2. 
-:- dynamic lmconf:startup_option/2. 
+:- was_shared_multifile lmconf:startup_option/2. 
+:- was_dynamic lmconf:startup_option/2. 
 
 :- ensure_loaded(logicmoo_utils).
 
@@ -83,7 +89,7 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 
 
 /*
-:- dynamic   user:file_search_path/2.
+:- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
 :- user:prolog_load_context(directory,Dir),
    %Dir = (DirThis/planner),
@@ -95,11 +101,11 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 :- initialization(user:attach_packs).
 
 % [Required] Load the Logicmoo Library Utils
-% lmconf:mpred_is_impl_file(logicmoo(logicmoo_utils)).
+% logicmoo_util_help:mpred_is_impl_file(logicmoo(logicmoo_utils)).
 
 :- user:file_search_path(logicmoo,_)-> true; (user:prolog_load_context(directory,Dir),asserta(user:file_search_path(logicmoo,Dir))).
 
-:- dynamic(lmconf:isa_pred_now_locked/0).
+:- was_dynamic(lmconf:isa_pred_now_locked/0).
 */
 
 % :- include(mpred/'mpred_header.pi').
@@ -126,7 +132,7 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 % TODO uncomment the next line without breaking it all!
 % lmconf:use_cyc_database.
 
-:-asserta(lmconf:pfcManageHybrids).
+:- asserta(lmconf:pfcManageHybrids).
 
 
 
@@ -137,7 +143,7 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 % Debugging settings
 % ================================================
 
-:-export(is_stable/0).
+:- was_export(is_stable/0).
 
 is_stable:-fail.
 
@@ -165,7 +171,7 @@ xtreme_debug(_).
 sanity(P):- \+ is_recompile, (true; is_release),!,nop(P).
 sanity(P):- on_x_rtrace(hotrace(P)),!.
 sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
-:-meta_predicate(when_debugging(+,0)).
+:- meta_predicate(when_debugging(+,0)).
 when_debugging(What,Call):- debugging(What),!,Call.
 when_debugging(_,_).
 
@@ -187,7 +193,7 @@ when_debugging(_,_).
 :- asserta(t_l:disable_mpred_term_expansions_locally).
 
 % user:goal_expansion(ISA,G) :- compound(ISA),t_l:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
-:- meta_predicate(lmbase_expander(?,?,?,?)).
+:- meta_predicate(mpred_expander(?,?,?,?)).
 :- meta_predicate(lmbase_record_transactions_maybe(?,?)).
 :- meta_predicate(mpred_file_expansion(?,?)).
 
@@ -198,7 +204,7 @@ when_debugging(_,_).
 :- write(ready),nl,flush_output.
 :- prolog.
 :- endif.
-:-   call(with_mfa_of( (dynamic_safe)),user,user,boxlog_to_compile(_D,_E,_F),boxlog_to_compile/3).
+:-  call(with_mfa_of( (dynamic_safe)),user,user,boxlog_to_compile(_D,_E,_F),boxlog_to_compile/3).
 :- retractall(t_l:disable_mpred_term_expansions_locally).
 
 

@@ -144,21 +144,24 @@
             variants_are_equal/3,
             wid/3
           ]).
-:- multifile % (multifile) :-
-        '$included'/4,
+
+:- use_module(logicmoo(util/logicmoo_util_preddefs)).
+
+:- was_shared_multifile 
+        
         agent_call_command/2,
         feature_test/0,
         mud_test/2,
         regression_test/0,
         sanity_test/0,
         type_action_info/3.
-:- dynamic % (dynamic) :-
-        '$included'/4,
+:- was_dynamic 
+        
         wid/3.
 
 :- nodebug(_).
 
-:- dynamic(wid/3).
+:- was_dynamic(wid/3).
 
 % :- use_module(logicmoo(snark/common_logic_sexpr)).
 
@@ -204,17 +207,12 @@
 % SWI Prolog modules do not export operators by default
 % so they must be explicitly placed in the user namespace
 
-:- dynamic   user:file_search_path/2.
+
+:- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(logicmoo,Dir)).
-:- dynamic(lmconf:isa_pred_now_locked/0).
-:- multifile(lmconf:isa_pred_now_locked/0).
-:- multifile(lmconf:type_action_info/3).
-:- multifile(lmconf:agent_call_command/2).
-:- multifile(lmconf:mud_test/2).
-:- multifile(lmconf:sanity_test/0).
-:- multifile(lmconf:regression_test/0).
-:- multifile(lmconf:feature_test/0).
+:- was_dynamic(lmconf:isa_pred_now_locked/0).
+
 
 :- include(logicmoo(mpred/'mpred_header.pi')).
 % :- use_module(logicmoo(pttp/dbase_i_mpred_pttp_testing)). 
@@ -283,8 +281,8 @@ logically_matches(_,A,A).
 
 axiom_lhs_to_rhs(_,poss(beliefs(A,~F1)),~nesc(knows(A,F1))).
 
-:-discontiguous(nnf/5).
-:-discontiguous(axiom_lhs_to_rhs/3).
+:- discontiguous(nnf/5).
+:- discontiguous(axiom_lhs_to_rhs/3).
 %====== drive negation inward ===
 %  nnf(KB,+Fml,+FreeV,-NNF,-Paths)
 %
@@ -959,8 +957,8 @@ flattenConjs(_Extras,I,O):- conjuncts_to_list(I,M),must_maplist(conjuncts_to_lis
 
 
 
-:- export(logical_pos/3).
-:- export(logical_neg/3).
+:- was_export(logical_pos/3).
+:- was_export(logical_neg/3).
 logical_neg(KB,Wff,WffO):- 
   must(nonegate(KB,Wff,Wff1)),nnf(KB,not(Wff1),Wff2),must(nonegate(KB,Wff2,WffO)),!.
 logical_pos(KB,Wff,WffO):- 
@@ -982,7 +980,7 @@ mpred_quf_0(InOut,InOut):- non_compound(InOut),!.
 % mpred_quf_0(In,Out):- current_predicate(db_quf/4),db_quf(change(assert,_Must),In,U,C),conjoin(U,C,Out).
 mpred_quf_0(In,In).
 
-:- export(nonegate/3).
+:- was_export(nonegate/3).
 nonegate(_KB,IO,IO):-!.
 nonegate(KB,List,OutZ):- is_list(List),must_maplist(nonegate(KB),List,OutZ),!.
 nonegate(KB,Fml,OutZ):- simplify_cheap(Fml,Fml2), Fml \=@= Fml2,nonegate(KB,Fml2,OutZ),!.
@@ -1201,7 +1199,7 @@ incorrect_cl(cl(H,B),cl([z_unused(H:-B)],[])).
 
 
 
-:- export(correct_boxlog/4).
+:- was_export(correct_boxlog/4).
 correct_boxlog((CLAU,SES),KB,Why,FlattenedO):- nonvar(SES),conjuncts_to_list((CLAU,SES),CLAUSES),!,correct_boxlog_0(CLAUSES,KB,Why,FlattenedO),!.
 correct_boxlog(CLAUSES,KB,Why,FlattenedO):- (\+ is_list(CLAUSES)),!,correct_boxlog_0([CLAUSES],KB,Why,FlattenedO),!.
 correct_boxlog(BOXLOG,KB,Why,FlattenedS):-correct_boxlog_0(BOXLOG,KB,Why,FlattenedS),!.

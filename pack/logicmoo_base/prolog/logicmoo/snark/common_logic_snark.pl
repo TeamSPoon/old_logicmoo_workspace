@@ -111,7 +111,7 @@
           op(400,yfx,'&'),  
           op(500,yfx,'v')
           ]).
-
+:- use_module(logicmoo(util/logicmoo_util_preddefs)).
 :- meta_predicate 
    % common_logic_snark
    convertAndCall(*,0),
@@ -126,9 +126,9 @@
    % common_logic_snark
    to_nonvars(2,?,?).
 
-:- multifile % (multifile) :-
+:- was_shared_multifile 
         regression_test/0.
-:- dynamic % (dynamic) :-
+:- was_dynamic 
         as_prolog/2,
         elInverse/2,
         kif_test_string/1,
@@ -163,22 +163,22 @@ correct_arities(H,Fml,FmlO):- Fml=..[H,A|ARGS], ARGS\=[_],
 correct_arities(H,Fml,FmlM):- Fml=..[F|ARGS],must_maplist(correct_arities(H),ARGS,ARGSM),FmlM =.. [F|ARGSM].
 
 
-:- export(subsT_each/3).
+:- was_export(subsT_each/3).
 subsT_each(In,[],In):- !.
 subsT_each(In,[KV|TODO],Out):- !,get_kv(KV,X,Y),subst_except(In,X,Y,Mid),!,subsT_each(Mid,TODO,Out),!.
 
-:- dynamic(mudEquals/2).
-:- export(mudEquals/2).
+:- was_dynamic(mudEquals/2).
+:- was_export(mudEquals/2).
 mudEquals(X,Y):- X=Y.
-:- dynamic(skolem/3).
-:- export(skolem/3).
+:- was_dynamic(skolem/3).
+:- was_export(skolem/3).
 skolem(X,Y,_):- X=Y.
 
-:- export(not_mudEquals/2).
-:- dynamic(not_mudEquals/2).
+:- was_export(not_mudEquals/2).
+:- was_dynamic(not_mudEquals/2).
 not_mudEquals(X,Y):- X \= Y.
 
-:- export(type_of_var/3).
+:- was_export(type_of_var/3).
 type_of_var(Fml,Var,Type):- contains_type_lits(Fml,Var,Lits),!,(member(Type,Lits)*->true;Type='Unk').
 :- style_check(+singleton).
 
@@ -242,7 +242,7 @@ as_dlog(Fml,FmlO):- to_dlog_ops(OPS),subsT_each(Fml,OPS,FmlM),!,correct_arities(
 as_symlog(Fml,Fml):- leave_as_is(Fml),!.
 as_symlog(Fml,FmlO):- as_dlog(Fml,FmlM),to_symlog_ops(OPS),subsT_each(FmlM,OPS,FmlM),correct_arities(['v','&'],FmlM,FmlO).
 
-:- dynamic(lmconf:as_prolog/2).
+:- was_dynamic(lmconf:as_prolog/2).
 lmconf:as_prolog(Fml,Fml):- is_ftVar(Fml),!.
 lmconf:as_prolog(Fml,FmlO):- as_symlog(Fml,FmlM),
   to_prolog_ops(OPS),subsT_each(FmlM,OPS,FmlO).
@@ -431,7 +431,7 @@ fresh_varname(F,NewVar):- functor(F,FN,_),!, upcase_atom(FN,FUP),gensym(FUP,VARN
 kif_to_prolog(X,E):- kif_to_boxlog(X,Y),!,list_to_set(Y,S),!,member(E,S).
 
 %====== kif_to_boxlog(+Wff,-NormalClauses):-
-:- export(kif_to_boxlog/2).
+:- was_export(kif_to_boxlog/2).
 % kif_to_boxlog(Wff,Out):- loop_check(kif_to_boxlog(Wff,Out),Out=looped_kb(Wff)).
 kif_to_boxlog(Wff,Out):- why_to_id(rule,Wff,Why), kif_to_boxlog(Wff,Why,Out),!.
 kif_to_boxlog(WffIn,Out):-  why_to_id(rule,WffIn,Why), kif_to_boxlog(all('$VAR'('KB'),'=>'(asserted_t('$VAR'('KB'),WffIn),WffIn)),'$VAR'('KB'),Why,Out).
@@ -440,11 +440,11 @@ kif_to_boxlog(WffIn,NormalClauses):- why_to_id(rule,WffIn,Why), kif_to_boxlog(Wf
 alt_kif_to_boxlog(not( Wff),KB,Why,Out):- !, kif_to_boxlog(not( Wff),KB,Why,Out).
 alt_kif_to_boxlog(Wff,KB,Why,Out):- loop_check(kif_to_boxlog((not(nesc(not(Wff)))),KB,Why,Out),Out=looped_kb(Wff)).
 
-:- export(kif_to_boxlog/3).
+:- was_export(kif_to_boxlog/3).
 kif_to_boxlog(WffIn,Why,Out):-  kif_to_boxlog(WffIn,'$VAR'('KB'),Why,Out),!.
 
 
-:- export(kif_to_boxlog/4).
+:- was_export(kif_to_boxlog/4).
 kif_to_boxlog(I,KB,Why,Flattened):- atom(I),atom_contains(I,('(')),!,
   must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,sexpr_sterm_to_pterm(Wff,PTerm),PTerm\=[_|_],
   kif_to_boxlog(PTerm,KB,Why,Flattened))),!.
@@ -499,7 +499,7 @@ check_is_kb(KB):-ignore('$VAR'('KB')=KB).
 
 add_preconds(X,X):- lmconf:no_rewrites,!.
 add_preconds(X,Z):-
- w_tl(leave_as_is0('CollectionS666666666666666ubsetFn'(_,_)),
+ w_tl(leave_as_is_db('CollectionS666666666666666ubsetFn'(_,_)),
    w_tl(t_l:dont_use_mudEquals,defunctionalize('=>',X,Y))),add_preconds2(Y,Z).
 
 add_preconds2(Wff6667,PreCondPOS):-
@@ -568,7 +568,7 @@ pttp_quantifier(F):- pttp_nnf_pre_clean_functor(F,(all),[]);pttp_nnf_pre_clean_f
 
 should_be_poss(argInst).
 
-:-dynamic(elInverse/2).
+:- was_dynamic(elInverse/2).
 
 clauses_to_boxlog(KB,Why,In,Prolog):- clauses_to_boxlog_0(KB,Why,In,Prolog).
 
@@ -602,9 +602,9 @@ mpred_t_tell_kif(OP2,RULE):-
 
 fix_input_vars(AIn,A):- copy_term(AIn,A),numbervars(A,672,_).
 
-%:- export(show_boxlog/1).
+%:- was_export(show_boxlog/1).
 %assert_boxlog(AIn):- fix_input_vars(AIn,A), as_dlog(A,AA),kif_to_boxlog(AA,B),!,must_maplist(kif_tell_boxes_undef(How,Why),B),!,nl,nl.
-%:- export(show_boxlog2/2).
+%:- was_export(show_boxlog2/2).
 %assert_boxlog2(AIn):- fix_input_vars(AIn,A), with_all_dmsg((kif_to_boxlog(A,B),!,must_maplist(kif_tell_boxes_undef(How,Why),B),!,nl,nl)).
 
 
@@ -615,14 +615,14 @@ boxlog_to_pfc((A,B),C):- !, must_maplist(boxlog_to_pfc,[A,B],[AA,BB]),conjoin(AA
 boxlog_to_pfc(PFCM,PFCO):- boxlog_to_compile(PFCM,PFC),!, subst(PFC,(not),(neg),PFCO).
 
 
-%:- export(tsn/0).
+%:- was_export(tsn/0).
 tsn:- with_all_dmsg(forall(clause(kif,C),must(C))).
 
 % kif:- make.
-:- dynamic(kif_test_string/1).
+:- was_dynamic(kif_test_string/1).
 tkif:- kif_test_string(TODO),kif_io(string(TODO),current_output).
 
-:- multifile(lmconf:sanity_test/0).
+:- was_shared_multifile(lmconf:sanity_test/0).
 lmconf:regression_test:- tsn.
 
 :- thread_local(kif_action_mode/1).
@@ -638,14 +638,14 @@ kif_read(InS,Wff,Vs):- must(l_open_input(InS,In)),
 %= ===== to test program =====-
 % :- ensure_loaded(logicmoo(snark/common_logic_sexpr)).
 
-:- export(kif/0).
+:- was_export(kif/0).
 kif:- current_input(In),current_output(Out),!,kif_io(In,Out).
 
 %open_input(InS,InS):- is_stream(InS),!.
 %open_input(string(InS),In):- text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
 
 
-:- export(kif_io/2).
+:- was_export(kif_io/2).
 kif_io(InS,Out):- 
   l_open_input(InS,In),
    repeat,             
@@ -656,12 +656,12 @@ kif_io(InS,Out):-
            once(kif_process(Wff)),
            Wff == end_of_file)),!.
 
-:- export(why_to_id/3).
+:- was_export(why_to_id/3).
 why_to_id(Term,Wff,IDWhy):- not(atom(Term)),term_to_atom(Term,Atom),!,why_to_id(Atom,Wff,IDWhy).
 why_to_id(Atom,Wff,IDWhy):- wid(IDWhy,Atom,Wff),!.
 why_to_id(Atom,Wff,IDWhy):- must(atomic(Atom)),gensym(Atom,IDWhyI),kb_incr(IDWhyI,IDWhy),assertz_if_new(lmconf:wid(IDWhy,Atom,Wff)).
 
-:- export(kif_process/1).
+:- was_export(kif_process/1).
 kif_process(end_of_file):- !.
 kif_process(prolog):- prolog,!.
 kif_process(Assert):- atom(Assert),retractall(kif_action_mode(_)),asserta(kif_action_mode(Assert)),fmtl(kif_action_mode(Assert)),!.
@@ -676,7 +676,7 @@ kif_process(tell,Wff):- !, kif_tell(Wff).
 kif_process(ask,Wff):- !, kif_ask(Wff).
 kif_process(Other,Wff):- !, wdmsg(error(missing_kif_process(Other,Wff))),!,fail.
 
-:- export(kif_ask_sent/1).
+:- was_export(kif_ask_sent/1).
 kif_ask_sent(Wff):- 
    why_to_id(ask,Wff,Why),
    term_variables(Wff,Vars),
@@ -690,7 +690,7 @@ kif_ask_sent(Wff):-
      retractall_wid(Why)).
 
 
-:- export(kif_ask/1).
+:- was_export(kif_ask/1).
 kif_ask(P <=> Q):- kif_ask_sent(P <=> Q).
 kif_ask(P => Q):- kif_ask_sent(P => Q).
 kif_ask((P v Q)):- kif_ask_sent(((P v Q))).
@@ -700,7 +700,7 @@ kif_ask(Goal0):-  logical_pos(_KB,Goal0,Goal),
 	add_args(Goal0,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],_ProofOut1,Goal1,_),!,
         search(Goal1,60,0,1,3,DepthIn,DepthOut))).
 
-:- export(kif_ask/2).
+:- was_export(kif_ask/2).
 kif_ask(Goal0,ProofOut):- logical_pos(_KB,Goal0,Goal),
     no_repeats(lmconf:(
 	add_args(Goal0,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],ProofOut1,Goal1,_),!,
@@ -716,10 +716,10 @@ local_sterm_to_pterm(Wff,WffO):- sexpr_sterm_to_pterm(Wff,WffO),!.
 
 
 
-:-op(1000,fy,(kif_tell)).
+:- op(1000,fy,(kif_tell)).
 
 /*
-:- export((kif_tell)/2).
+:- was_export((kif_tell)/2).
 
 kif_tell(_,[]).
 kif_tell(Why,[H|T]):- !,must_det_l((kif_tell(Why,H),kb_incr(Why,Why2),kif_tell(Why2,T))).
@@ -728,7 +728,7 @@ kif_tell(Why,Wff):-
       kif_tell_boxes(assert_wfs_def,Why,Wff,Asserts))),!.
 
 
-:-thread_local(t_l:assert_wfs/2).
+:- thread_local(t_l:assert_wfs/2).
 assert_wfs_def(HBINFO,HB):-if_defined(t_l:assert_wfs(HBINFO,HB)),!.
 assert_wfs_def(Why,H):-assert_wfs_fallback(Why,H).
 
@@ -740,7 +740,7 @@ assert_wfs_fallback0(Why, HB):- adjust_kif('$VAR'(KB),HB,HBK),demodal('$VAR'(KB)
 
 */
 
-:-export(kb_incr/2).
+:- was_export(kb_incr/2).
 kb_incr(WffNum1 ,WffNum2):-is_ftVar(WffNum1),trace_or_throw(kb_incr(WffNum1 ,WffNum2)).
 kb_incr(WffNum1 ,WffNum2):-number(WffNum1),WffNum2 is WffNum1 + 1,!.
 %kb_incr(WffNum1 ,WffNum2):-atom(WffNum1),WffNum2=..[WffNum1,0],!.
@@ -773,7 +773,7 @@ kif_tell_boxes1(Why,List):- is_list(List),!,list_to_set(List,[H|T]),must_det_l((
 kif_tell_boxes1(_,z_unused(_)):-!.
 kif_tell_boxes1(Why,AssertI):- must_det_l((simplify_bodies(AssertI,AssertO),kif_tell_boxes3(save_wfs,Why,AssertO))).
 
-:-thread_local(t_l:in_code_Buffer/3).
+:- thread_local(t_l:in_code_Buffer/3).
 
 
 kif_tell_boxes3(How,Why,Assert):- 

@@ -111,7 +111,11 @@ transitive(X,A,B):- once(on_x_debug(call(X,A,R)) -> ( R\=@=A -> transitive_lc(X,
 
 transitive_lc(X,A,B):-transitive_except([],X,A,B).
 
-transitive_except(NotIn,X,A,B):- memberchk_same(A,NotIn)-> (B=A,!) ;((once(on_x_debug(call(X,A,R)) -> ( R\=@=A -> transitive_except([A|NotIn],X,R,B) ; B=R); B=A))),!.
+transitive_except(NotIn,X,A,B):- memberchk_same_two(A,NotIn)-> (B=A,!) ;((once(on_x_debug(call(X,A,R)) -> ( R\=@=A -> transitive_except([A|NotIn],X,R,B) ; B=R); B=A))),!.
+
+memberchk_same_two(X, [Y0|Ys]) :- is_list(Ys),!,C=..[v,Y0|Ys],!, arg(_,C,Y), ( X =@= Y ->  (var(X) -> X==Y ; true)),!.
+memberchk_same_two(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),memberchk_same_two(X, Ys) )).
+
 
 :- meta_predicate no_loop_check(0).
 :- meta_predicate no_loop_check(0,0).
@@ -360,15 +364,4 @@ outside_of_loop_check:- (clause(lmcache:ilc(_),B)->B=(!,fail);true).
 user:goal_expansion(LC,LCOO):- notrace((current_predicate(_:logicmoo_bugger_loaded/0),once(lco_goal_expansion(LC,LCOO)),LC\=@=LCOO)).
 
 
-
-
-mpred_impl_module(logicmoo_utils).
-mpred_impl_module(t_l).
-mpred_impl_module(tlbugger).
-mpred_impl_module(lmcache).
-mpred_impl_module(lmconf).
-mpred_impl_module(logicmoo_varnames).
-mpred_impl_module(M):- lmconf:mpred_is_impl_file(F),make_module_name(F,M).
-mpred_impl_module(M):- current_module(M),atom_concat(logicmoo_utils_,_,M).
-% mpred_impl_module(user).
 

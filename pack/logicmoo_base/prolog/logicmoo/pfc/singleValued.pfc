@@ -46,17 +46,17 @@ mpred_default( user_login(User) ==> host_name(User,isMissing)).
 
 :- listing([full_name/2,host_name/2,user_login/1,user_name_host/3]).
 
-:-must(host_name(robin,isMissing)).
+:- must(host_name(robin,isMissing)).
 
 ==> host_name(robin,rmachine).
 
-:-must(\+ host_name(robin,isMissing)).
+:- must(\+ host_name(robin,isMissing)).
 
 ==> ~host_name(robin,rmachine).
 
-:-must(\+ host_name(robin,rmachine)).
+:- must(\+ host_name(robin,rmachine)).
 
-:-must(host_name(robin,isMissing)).
+:- must(host_name(robin,isMissing)).
 
 
 meta_argtypes(idForTest(tBird,ftTerm)).
@@ -71,24 +71,24 @@ tBird(iPeety).
 end_of_file.
 
 
-:-must(idForTest(iPeety,isMissing)).
+:- must(idForTest(iPeety,isMissing)).
 
 
 idForTest(iTweety,foo1).
 
-:-must(\+ idForTest(iTweety,isMissing)).
+:- must(\+ idForTest(iTweety,isMissing)).
 
-:-must(idForTest(iTweety,foo1)).
+:- must(idForTest(iTweety,foo1)).
 
 
-:-show_call(listing(idForTest)).
+:- show_call(listing(idForTest)).
 
 ==> \+ idForTest(iTweety,foo1).
 
-:-must(idForTest(iTweety,isMissing)).
-:-must(\+ idForTest(iTweety,foo1)).
+:- must(idForTest(iTweety,isMissing)).
+:- must(\+ idForTest(iTweety,foo1)).
 
-:-show_call(listing(idForTest)).
+:- show_call(listing(idForTest)).
 
 
 

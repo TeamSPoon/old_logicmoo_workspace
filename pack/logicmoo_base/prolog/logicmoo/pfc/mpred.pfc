@@ -31,8 +31,8 @@
 */
 
 
-:- dynamic(singleValuedInArg/2).
-:- dynamic(ptReformulatorDirectivePredicate/1).
+:- was_dynamic(singleValuedInArg/2).
+:- was_dynamic(kb:ptReformulatorDirectivePredicate/1).
 
 
 :- 
@@ -42,12 +42,12 @@
           pp_i2tml_now/1,pp_item_html/2,pttp1a_wid/3,pttp_builtin/2,pttp_nnf_pre_clean_functor/3,quasiQuote/1,relax_term/6,retractall_wid/1,ruleRewrite/2,search/7,support_hilog/2,svar_fixvarname/2)))),
  with_pfa(With,((pfcControlled/1,pfcRHS/1,logical_functor_pttp/1,          add_args/15,argIsa_known/3,call_mt_t/11,call_which_t/9,constrain_args_pttp/2,contract_output_proof/2,f_to_mfa/4,get_clause_vars_for_print/2,holds_f_p2/2,input_to_forms/2,is_wrapper_pred/1,lambda/5,mpred_f/1,pp_i2tml_now/1,pp_item_html/2,pttp1a_wid/3,pttp_builtin/2,pttp_nnf_pre_clean_functor/3,
           quasiQuote/1,relax_term/6,retractall_wid/1,ruleRewrite/2,search/7,support_hilog/2,svar_fixvarname/2,tNotForUnboundPredicates/1))),
- with_pfa(With,(((('==>')/1),('bt'/2),('nt'/3),('pk'/3),('pt'/2),('kbp:spftY'/4),
-          (('::::')/2),(('<-')/2),(('<==>')/2),(('==>')/2),(('neg')/1),(('nesc')/1),         ((mpred_action)/1),(fcTmsMode/1),(mpred_halt_signal/1),
-          (mpred_queue/2),(mpred_search/1),(mpred_search_mode/1),(mpred_select/2),(mpred_do_and_undo_method/2),
+ with_pfa(With,(((kbp:bt/3),(kbp:nt/4),(kbp:pk/4),(kbp:pt/3),(kbp:spft/5),(kbp:tms/1),(kbp:hs/1),(kbp:qu/3),(kbp:sm/1),
+          (('==>')/1),(('::::')/2),(('<-')/2),(('<==>')/2),(('==>')/2),(('neg')/1),(('nesc')/1),((mpred_action)/1),
+          (mpred_do_and_undo_method/2),
 	  prologMultiValued/1,prologOrdered/1,prologNegByFailure/1,prologPTTP/1,prologKIF/1,pfcControlled/1,tPredType/1,
            prologHybrid/1,predCanHaveSingletons/1,prologDynamic/1,prologBuiltin/1,prologMacroHead/1,prologListValued/1,prologSingleValued/1,
-          (mpred_halt_signal/2),(pfcControlled/1),(prologDynamic/2),(prologSideEffects/1),(prologSingleValued/1),(singleValuedInArg/2),(prologSideEffects/1,prologMacroHead/1,pfcControlled/1,
+          (kbp:hs/2),(pfcControlled/1),(prologDynamic/2),(prologSideEffects/1),(prologSingleValued/1),(singleValuedInArg/2),(prologSideEffects/1,prologMacroHead/1,pfcControlled/1,
            resolveConflict/1,resolverConflict_robot/1)))),
  with_pfa(With,((mpred_isa/2,arity/2,mpred_module/2))).
 
@@ -57,20 +57,20 @@
 :- op(1050,xfx,'<==>').
 :- op(1100,fx,('==>')).
 :- op(1150,xfx,('::::')).
-:- dynamic(tCol/1).
+:- was_dynamic(tCol/1).
 
               
 :- file_begin(pfc).
 
 
-:- dynamic(subFormat/2).
-:- dynamic(support_hilog/2).
-:- dynamic(mpred_undo_sys/3).
+:- was_dynamic(subFormat/2).
+:- was_dynamic(support_hilog/2).
+:- was_dynamic(mpred_undo_sys/3).
 
 :- include(logicmoo(mpred/'mpred_header.pi')).
 
 :- sanity(mpred_is_silient).
-:- sanity(\+mpred_is_tracing).
+:- sanity(\+mpred_is_tracing_exec).
 
 
 neg(tCol('$VAR')):- cwc,!.
@@ -114,7 +114,7 @@ meta_argtypes(mpred_default(ftAssertable)).
 
 prologSingleValued(C):-cwc,is_ftCompound(C),functor(C,F,_),!,prologSingleValued(F).
 
-:-dynamic(mpred_default/1).
+:- was_dynamic(mpred_default/1).
 
 % here is an example which defines mpred_default facts and rules.  Will it work?
 (mpred_default(P)/mpred_literal(P))  ==>  (~neg(P) ==> P).
@@ -132,6 +132,8 @@ prologSingleValued(C):-cwc,is_ftCompound(C),functor(C,F,_),!,prologSingleValued(
          ==> (P, ~R/(NEW\==DEF), ~neg(Q) ==> Q)).
 
 
+:- mpred_trace_exec.
+
 % seem to need both these rule the second is so we have a on remove hook
 (mpred_default((P ==> Q)/mpred_literal_nv(Q)) ==> (P,  ~neg(Q) ==> Q)).
 (mpred_default((P ==> Q)/mpred_literal_nv(Q)) ==> (P,  ~Q, ~neg(Q) ==> Q)).
@@ -143,24 +145,30 @@ prologSingleValued(C):-cwc,is_ftCompound(C),functor(C,F,_),!,prologSingleValued(
 
 ((mpred_default(P)/(mpred_literal(P),is_ftCompound(P),different_literal(P,_,Q,Test)))  ==> ((~Q/(Test), ~neg(P)) ==> P)).
 
-:-dynamic(foob/1).
+:- was_dynamic(foob/1).
+
 
 if_missing(foob(_),foob(a)).
 
 %(if_missing(H,HH) ==> (H/(H\==HH) ==> {ignore(retract(HH))})).
 (if_missing(H,HH) ==> (~H/(H\==HH) ==> HH)).
 
+% :- start_rtrace,trace.
 :- mpred_test(foob(a)).
+:- prolog.
+
+
 
 foob(b).
+:- prolog.
 
-:-mpred_test(\+foob(a)).
-:-mpred_test(foob(b)).
+:- mpred_test(\+foob(a)).
+:- mpred_test(foob(b)).
 
 ~foob(b).
 
-:-mpred_test(\+foob(b)).
-:-mpred_test(foob(a)).
+:- mpred_test(\+foob(b)).
+:- mpred_test(foob(a)).
 
 % :- prolog. % dometimes stop here ot see if the stest was sane
 
@@ -169,15 +177,15 @@ prologBuiltin(F),arity(F,A)==>{make_builtin(F/A)}.
 prologBuiltin(resolveConflict/1).
 prologBuiltin(mpred_select/2).
 
-:-dynamic(conflict/1).
+:- was_dynamic(conflict/1).
 % a conflict triggers a Prolog action to resolve it.
 conflict(C) ==> {must(with_mpred_trace_exec(resolveConflict(C),\+conflict(C)))}.
 
-:-dynamic(ttTypeType/1).
+:- was_dynamic(ttTypeType/1).
 
 % meta rules to schedule inferencing.
 % resolve conflicts asap
-% mpred_select(conflict(X),W) :- mpred_queue(conflict(X),W).
+% mpred_select(conflict(X),W) :- kbp:qu(umt,conflict(X),W).
 
 
 
@@ -314,7 +322,7 @@ completelyAssertedCollection(prologMacroHead).  % Items read from a file might b
 completelyAssertedCollection(ttPredType).  % Or they might be a predciate declarer
 completelyAssertedCollection(functorDeclares).  % or they might declare other things
 
-:-((mpred_add((completelyAssertedCollection(isEach(tPred,prologMultiValued,prologOrdered,predIsFlag,ttNonGenled,
+:- ((mpred_add((completelyAssertedCollection(isEach(tPred,prologMultiValued,prologOrdered,predIsFlag,ttNonGenled,
  prologNegByFailure,meta_argtypes,prologHybrid,prologPTTP,prologDynamic,prologKIF,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued)))))).
 
 completelyAssertedCollection(ftTerm).
@@ -405,9 +413,9 @@ ttPredType(pfcControlled).
 ttPredType(prologKIF).
 ttPredType(prologBuiltin).
 ttPredType(prologPTTP).
-:-mpred_add( pfcControlled(genlPreds)).
-:-mpred_add( pfcControlled(isa)).
-:-mpred_add(pfcControlled(argIsa)).
+:- mpred_add( pfcControlled(genlPreds)).
+:- mpred_add( pfcControlled(isa)).
+:- mpred_add(pfcControlled(argIsa)).
 
 
 
@@ -515,7 +523,7 @@ completelyAssertedCollection(C)==>completeExtentAsserted(C).
 completeExtentAsserted(genlPreds).
 completeExtentAsserted(defnSufficient).
 
-:-dynamic(ttNotTemporalType/1).
+:- was_dynamic(ttNotTemporalType/1).
 ttNotTemporalType(ftInt).
 %ttNotTemporalType(ftTerm).
 ttNotTemporalType(tCol).
@@ -553,7 +561,7 @@ isa(tRelation,ttAbstractType).
 
 
 
-:-if(load_time_sanity).
+:- if(load_time_sanity).
 
 % :-mpred_trace.
 
@@ -563,19 +571,19 @@ fooBar.
 
 \+ fooBar.
 
-:-mpred_test(\+fooBar).
+:- mpred_test(\+fooBar).
 
 fooBar.
 
-:-mpred_test(fooBar).
+:- mpred_test(fooBar).
 
 %:- start_rtrace.
 neg(fooBar).
 
-:-mpred_test(\+fooBar).
+:- mpred_test(\+fooBar).
 %:- stop_rtrace.
 
-:-endif. % load_time_sanity
+:- endif. % load_time_sanity
 
 
 %P/(is_ftNonvar(P),get_functor(P,F)),afterAdding(F,Do)/is_ftNonvar(Do)==>{call(Do,P)}.
@@ -639,7 +647,7 @@ tCol(ttNonGenled).
 isa('Thing',ttNonGenled).
 isa('CycLTerm',ttNonGenled).
 ==>prologHybrid(quotedIsa(ftTerm,ttFormatType)).
-:-dynamic(quotedIsa/2).
+:- was_dynamic(quotedIsa/2).
 
 isa(I,C):- cwc, mpred_univ(C,I,CI),atom(C),current_predicate(C/1,CI)->call(CI).
 isa(I,C):- cwc, is_asserted(ttFormatType(C)),!, quotedIsa(I,C).
@@ -678,7 +686,7 @@ singleValuedInArg(singleValuedInArg,2).
 
 
 
-:- dynamic(isa/2).
+:- was_dynamic(isa/2).
 
 ttPredType(Prop)==>tCol(Prop).
 
@@ -694,14 +702,14 @@ ttPredType(Prop)==>tCol(Prop).
 ((P/is_ftNonvar(P),{functor(P,F,A),\+ mpred_connective(F), A>1}) ==> {lmconf:agenda_slow_op_enqueue(must(ignore(deduceEachArgType(P))))}).
 % tCol(Col) <==> isa(Col,tCol).
 
-:-dynamic((disjointWith/2,genls/2,isa/2)).
+:- was_dynamic((disjointWith/2,genls/2,isa/2)).
 
 %(disjointWith(P1,P2) , genls(C1,P1)) ==>    disjointWith(C1,P2).
 disjointWith(Sub, Super) ==> disjointWith( Super, Sub).
 disjointWith(ttTemporalType,ttAbstractType).
 
 prologHybrid(typeGenls/2).
-:-add(meta_argtypes(typeGenls(ttTypeType,tCol))).
+:- add(meta_argtypes(typeGenls(ttTypeType,tCol))).
 %(isa(COLTYPEINST,COLTYPE) , typeGenls(COLTYPE,COL)) ==> genls(COLTYPEINST,COL).
 
 typeGenls(ttPredType,tPred).
@@ -709,7 +717,7 @@ typeGenls(ttPredType,tPred).
 
 prologHybrid(argIsa/3).
 
-:-asserta(t_l:pfcExpansion).
+:- asserta(t_l:pfcExpansion).
 
 
 /*
@@ -739,19 +747,19 @@ prologHybrid(argIsa/3).
 tCol(tBird).
 %:-debug.
 %:-rtrace.
-:-mpred_test(dynamic(tBird/1)).
+:- mpred_test(dynamic(tBird/1)).
 
 
 :- endif.
 
 :- meta_predicate(neg(0)).
-:- dynamic(neg(0)).
+:- was_dynamic(neg(0)).
 
-:-dynamic(mpred_module/2).
-:-decl_mpred(mpred_module/2).
+:- was_dynamic(mpred_module/2).
+:- decl_mpred(mpred_module/2).
 
 meta_argtypes(mpred_module(tPred,tPrologModule)).
-:-debug.
+:- debug.
 
 prologHybrid(mpred_module, 2).
 prologMultiValued(mpred_module(tRelation,ftAtom)).
@@ -761,9 +769,9 @@ prologMultiValued(mpred_module(tRelation,ftAtom)).
 % pddlSorts(Type,EList)==> genls(isEach(EList),Type).
 
 
-:-dynamic(argIsa/3).
+:- was_dynamic(argIsa/3).
 
-:-decl_mpred(argIsa/3).
+:- decl_mpred(argIsa/3).
 
 isa(Spec,tCol) ==> arity(Spec,1).
 
@@ -773,7 +781,7 @@ isa(Spec,tCol) ==> arity(Spec,1).
 
 % :-include('mpred_header.pi').
 tCol(tPred).
-:-mpred_test(assert_argIsa(tPred,1,tPred)).
+:- mpred_test(assert_argIsa(tPred,1,tPred)).
 
 
 /*
@@ -791,16 +799,16 @@ equal(A,C),notequal(A,B) ==> notequal(C,B).
 % ((P,Q ==> false) ==> (P ==> neg(Q)), (Q ==> neg(P))).
 
 
-:-export(member/2).
-:-export(arg/3).
-%:-export(mpred_call/1).
+:- was_export(member/2).
+:- was_export(arg/3).
+%:- was_export(mpred_call/1).
 % prologDynamic(cycAssert/2).
-:-export(integer/1).
-% :-export(makeConstant/1).
-% :-export(naf/1).
-:-export(number/1).
-:-export(string/1).
-:-export(var/1).
+:- was_export(integer/1).
+% :- was_export(makeConstant/1).
+% :- was_export(naf/1).
+:- was_export(number/1).
+:- was_export(string/1).
+:- was_export(var/1).
 
 tCol(completeExtentAsserted).
 tCol(ttFormatType).
@@ -879,20 +887,20 @@ isa(vtValue,ttValueType).
 typeGenls(ttValueType,vtValue).
 
 
-:-mpred_test(vtColor(vRed)).
+:- mpred_test(vtColor(vRed)).
 
 
-:-assertz_if_new((argIsa(Prop,N,Type) :- cwc,number(N),argIsa_known(Prop,N,Type),must(ground(argIsa(Prop,N,Type))))).
+:- assertz_if_new((argIsa(Prop,N,Type) :- cwc,number(N),argIsa_known(Prop,N,Type),must(ground(argIsa(Prop,N,Type))))).
 
 argIsa(Prop,N,Type),{number(N)},ttFormatType(Type) ==> argQuotedIsa(Prop,N,Type).
 
 :- discontiguous(prologSingleValued/1).
 :- do_gc.
 
-:-dynamic(mudLabelTypeProps/3).
-:-multifile(mudLabelTypeProps/3).
+:- was_dynamic(mudLabelTypeProps/3).
+:- was_shared_multifile(mudLabelTypeProps/3).
 :- forall(ttPredType(F),must((decl_type(F),add(isa(F,functorDeclares)),add(genls(F,tPred))))).
-:- export(mtForPred/2).
+:- was_export(mtForPred/2).
 
 :- debug,(decl_mpred_hybrid((argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, 
     isa/2,  genls/2, pddlSomethingIsa/2, 
@@ -903,10 +911,10 @@ prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, localityOfObject/2, subForm
    genls/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, 
    completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
 
-:-add(isa(ttFormatType,ttAbstractType)).
-:-discontiguous(subFormat/2).
-:-dynamic(tChannel/1).
-:-multifile(tChannel/1).
+:- add(isa(ttFormatType,ttAbstractType)).
+:- discontiguous(subFormat/2).
+:- was_dynamic(tChannel/1).
+:- was_shared_multifile(tChannel/1).
 
 % mpred_add((I/(mpred_literal(I),fully_expand(_,I,O),I \=@=O )==> ({format('~q~n',[fully_expand(I->O)])},O))).
 
@@ -978,7 +986,7 @@ ttFormatType(ftVoprop).
 % next_test :- sleep(1),pfcReset.
 
 
-% :-dynamic((disjointWith/2,genls/2)).
+% :- was_dynamic((disjointWith/2,genls/2)).
 
 ((singleValuedInArgDefault(P, 2, V), arity(P,2), argIsa(P,1,Most)) ==> relationMostInstance(P,Most,V)).
 
@@ -1127,7 +1135,7 @@ isa(arity,ptBinaryPredicate).
 %((genlPreds(Col1,Col2),(arity(Col1,1);arity(Col2,1)))==>genls(Col1,Col2)).
 %((genls(Col1,Col2),(tPred(Col1);tPred(Col2)))==>genlPreds(Col1,Col2)).
 
-:-mpred_test(mpred_add(tCol('ptUnaryPredicate'))).
+:- mpred_test(mpred_add(tCol('ptUnaryPredicate'))).
 
 % pfcMark(Type,_,F,A)/(integer(A),A>1,F\==arity,Assert=..[Type,F])==>arity(F,A),Assert.
 
@@ -1169,13 +1177,13 @@ specialFunctor('/').
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 /*
-:-mpred_test((expand_props(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O),mpred_add(mpred_default(O)))).
+:- mpred_test((expand_props(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O),mpred_add(mpred_default(O)))).
 
-:-mpred_test((fully_expand(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O),mpred_why(mpred_default(O)))).
+:- mpred_test((fully_expand(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O),mpred_why(mpred_default(O)))).
 */
 :- endif.
 
-:-(mpred_add((((arity(Pred,2),tPred(Pred)) <==> isa(Pred,ptBinaryPredicate))))).
+:- (mpred_add((((arity(Pred,2),tPred(Pred)) <==> isa(Pred,ptBinaryPredicate))))).
 
 % if arity is ever greater than 1 it can never become 1
 % arity(F,A)/(number(A),A>1) ==> neg(arity(F,1)).
@@ -1214,7 +1222,7 @@ relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
 
 
 
-:-mpred_test((fully_expand_goal(_,:-multifile lmconf:create_random_fact/1,O),show_call_failure(O=(:-multifile lmconf:create_random_fact/1)))).
+:- mpred_test((fully_expand_goal(_,:- was_shared_multifile lmconf:create_random_fact/1,O),show_call_failure(O=(:- was_shared_multifile lmconf:create_random_fact/1)))).
 
 tCol(tPred).
 prologHybrid(isa/2).
@@ -1261,8 +1269,8 @@ vtTestType(vTest2).
 
 notAssertable(isFact/1).
 prologHybrid(isFact/1).
-% :- dynamic(added/1).
-added(Added):-kbp:spftY(Added,U,U,_).
+% :- was_dynamic(added/1).
+added(Added):-kbp:spft(umt,Added,U,U,_).
 isFact(A):- cwc, is_ftNonvar(A), ( added(A) ; clause_asserted(A)),not((arg(_,A,V),var(V))).
 
 
@@ -1318,64 +1326,12 @@ argSingleValueDefault(F, N, _)==>singleValuedInArg(F,N).
 mp_test_agr(_,_,_,_,_,_,_,_,_,_).
 
 
-:- if(if_defined(lmconf:startup_option(datalog,sanity))).
-
-:- abolish(c,0).
-:- abolish(a,1).
-:- abolish(b,1).
-:- dynamic((a/1,b/1,c/0)).
-
-==> a(z).
-:-mpred_test(a(z)).
-
-:-mpred_test(a(_)).
-
-~ a(z).
-
-:-mpred_test( neg(a(_))).
-:-mpred_test(\+ a(_)).
-
-~(~(a(z))).
-
-'Ž'(a).
-
-:- op(666,fx,'¯\_(?)_/¯').
-
-:- xlisting(a).
-
-% :-mpred_test(\+ neg(a(_))).
-% :-mpred_test(\+ a(_)).
-
-% U=nt(A,B,C),spft(X,Y,Z),\+ \+
-
-(a(B),d(B),f(B)) ==> b(B).
-(a(B),d(B),e(B)) ==> b(B).
-(a(B),e(B),d(B)) ==> b(B).
-
-d(q).
-% ?- nl,ZU=nt(_,_,_),ZU,spft(X,Y,Z),\+ \+ ZU=Z,nl.
-
-(b(_),e(q)) ==> c.
-(~a(B),~e(B)) ==> q.
-
-a(B)==>d(B).
-
-:- mpred_test(\+c).
-
-==> e(q).
-==> b(q).
-==> a(q).
-
-:- mpred_test(c).
-
-:- endif.
-
-:-mpred_run.
+:- mpred_run.
 
 
-:-mpred_test(predicate_property(mp_test_agr(_,_,_,_,_,_,_,_,_,_),meta_predicate(_))).
+:- mpred_test(predicate_property(mp_test_agr(_,_,_,_,_,_,_,_,_,_),meta_predicate(_))).
 
-:-mpred_test(ensure_loaded('../pfc/zenls.pfct')).
+:- mpred_test(ensure_loaded('../pfc/zenls.pfct')).
 
 :- mpred_test(ensure_loaded('../pfc/singleValued.pfct')).
 

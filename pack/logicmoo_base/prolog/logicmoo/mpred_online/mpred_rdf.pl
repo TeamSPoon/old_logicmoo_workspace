@@ -11,18 +11,18 @@
 %
 */
 
-:-module(mpred_rdf, [mpred_rdf/3,atom_to_qname/2,rdf_object/1,rdf_assert_hook/1,expire_rdf_caches/0 ]).
+:- module(mpred_rdf, [mpred_rdf/3,atom_to_qname/2,rdf_object/1,rdf_assert_hook/1,expire_rdf_caches/0 ]).
 
 
 
-:-multifile(lmconf:expire_one_rdf_cache/0).
+:- was_shared_multifile(lmconf:expire_one_rdf_cache/0).
 
 
-:-multifile(rdf_db:rdf_open_hook/3).
+:- was_shared_multifile(rdf_db:rdf_open_hook/3).
 
 expire_rdf_caches :- forall(clause(expire_one_rdf_cache,Body),must(Body)).
 
-:- multifile(mpred_online:semweb_startup).
+:- was_shared_multifile(mpred_online:semweb_startup).
 
 mpred_online:semweb_startup:- retractall((tlbugger:show_must_go_on)).
 mpred_online:semweb_startup:- expire_rdf_caches.
@@ -67,7 +67,7 @@ rdf_db:rdf_open_hook(_, _, _):- expire_rdf_caches, fail.
 %
 % @param URL Local or global file path or URL of the forms file://, http:// or package://
 %
-:-export(n3_parse/1).
+:- was_export(n3_parse/1).
 
 graph_src(URL,Source):-rdf_current_prefix(Source,URL),!.
 graph_src(URL,Source):-atom_concat(URL,'#',URIH),rdf_current_prefix(Source,URIH),!.
@@ -79,9 +79,9 @@ n3_parse(URL,Options) :-
   
 
 n3_parse_1(URL,Imported,Options) :- catch(n3_parse_2(URL,Imported,Options),E,dmsg(E:n3_parse_1(URL,Imported,Options))).
-:-multifile(owl_file_loaded/1).
-:-dynamic(owl_file_loaded/1).
-:-export(owl_file_loaded/1).
+:- was_shared_multifile(owl_file_loaded/1).
+:- was_dynamic(owl_file_loaded/1).
+:- was_export(owl_file_loaded/1).
 
 n3_parse_2(URL,Imported,Options) :-
 
@@ -143,7 +143,7 @@ mpred_online:semweb_startup:- n3_parse('http://raw.github.com/knowrob/knowrob/ma
 :- public(rdf/3).
 rdf(S,P,O):- show_call(mpred_rdf(S,P,O)).
 
-:-op(1150, fx, (rdf_meta)).   :- rdf_meta
+:- op(1150, fx, (rdf_meta)).   :- rdf_meta
 	rdf(o,o,o),
         rdf_assert_p2q(o,r,o),
         rdf_x(o,r,o,o),
@@ -160,31 +160,31 @@ is_url(S):-not(atom(S)),!,fail.
 is_url(S):-atom_chars(S,Chars),(memberchk(':',Chars);memberchk('/',Chars);memberchk('#',Chars)),!.
 is_url(S):-atom_chars(S,['h'|Chars]),memberchk('/',Chars),!.
 
-:-dynamic(rdf_qname_url_created/3).
+:- was_dynamic(rdf_qname_url_created/3).
 
 % allow rdf_current_resource(knowrob:'Food')
-:-export(rdf_current_resource/1).
+:- was_export(rdf_current_resource/1).
 rdf_current_resource(O):- compound(O),!,O=NS:A, rdf_global_mpred_object(O,URL),(O\=@=URL->rdf_current_resource(URL);rdf_current_qname(NS,A)).
 rdf_current_resource(O):- (rdf_resource(O);rdf_current_predicate(O);rdf_qname_url_created(_,_,O)). % aalready included rdf_subject(O).
 
-:-dynamic(rdf_current_qname_cached/2).
+:- was_dynamic(rdf_current_qname_cached/2).
 
-:-export(rdf_current_qname/2).
+:- was_export(rdf_current_qname/2).
 rdf_current_qname(NS,A):-p2q(_,NS,A).
 rdf_current_qname(NS,A):-rdf_qname_url_created(NS,A,_).
 rdf_current_qname(NS,A):-cache_all_qnames , rdf_current_qname_cached(NS,A).
 
 
-:-export(add_p2q_alias/3).
+:- was_export(add_p2q_alias/3).
 add_p2q_alias(P,NS,N):-asserta(p2q_alias(P,NS,N)),rdf_assert_p2q(P,NS,N).
 
-:-export(rdf_assert_p2q/3).
+:- was_export(rdf_assert_p2q/3).
 % rdf_assert_p2q(P,NS,N) :- must(rdf_assert_x(NS:N, mud:txtAtomName, literal(type(xsd:string, P)))).
 rdf_assert_p2q(PA,NS,N) :- atomic(PA),!,text_to_string(PA,P),must(rdf_assert_x(NS:N, mud:txtAtomName, literal(P))).
 rdf_assert_p2q(PA,NS,N) :- term_string(PA,P),must(rdf_assert_x(NS:N, mud:txtCompoundName, literal(P))).
 
 
-:-dynamic(all_qnames_cached/0).
+:- was_dynamic(all_qnames_cached/0).
 cache_all_qnames:- all_qnames_cached -> check_each_ns ; 
    ( asserta(all_qnames_cached), forall(rdf_current_prefix(NS,_),forall(rdf_resource(X),forall(rdf_global_id(NS:A,X),asserta_if_new(rdf_current_qname_cached(NS,A)))))).
 
@@ -194,9 +194,9 @@ check_each_ns :- rdf_current_prefix(NS,_),not(rdf_current_qname_cached(NS,_)),re
 lmconf:expire_one_rdf_cache :- dmsg(color(red,expire_one_rdf_cache)).
 lmconf:expire_one_rdf_cache :- retractall(all_qnames_cached).
 
-:-lmconf:expire_one_rdf_cache.
+:- lmconf:expire_one_rdf_cache.
 
-:-export(atom_to_qname/2).
+:- was_export(atom_to_qname/2).
 
 atom_to_qname(URL,Q:NAME):-is_url(URL),!,must(url_to_qname(URL,Q,NAME)),!.
 atom_to_qname(P,NS:A):-p2q(P,NS,A),!.
@@ -277,7 +277,7 @@ any_to_prolog(DB,Sx,NS:SI):-atom(Sx),rdf_graph_ns(DB,NS),!,must(SI=Sx).
 any_to_prolog(_,Ss,Sx):-copy_term(Ss,Sx).
 
 
-:-dynamic(p2q_alias/3).
+:- was_dynamic(p2q_alias/3).
 
 p2q(neg,mud,not).
 p2q(~,mud,not).
@@ -314,7 +314,7 @@ qname_to_prolog_1(NS,Name,Atom):-toPropercase(Name,AtomU),!,atom_concat(NS,AtomU
 %any_to_prolog(P,O):-atom_to_qname(P,C),P\=C,!,(any_to_prolog(O,C);O=C).
 
 
-:- dynamic(rdf_alias/3).
+:- was_dynamic(rdf_alias/3).
 cache_rdf_alias(_,URL,URL):- is_url(URL),!.
 cache_rdf_alias(DB,From,To):- sanity(ground(rdf_alias(DB,From,To))),rdf_alias(DB,From,To),!.
 cache_rdf_alias(DB,NS:From,To):- DB==NS,!,asserta(rdf_alias(DB,NS:From,To)),!.
@@ -329,7 +329,7 @@ any_to_rdf(_,Var,V):-var(Var),!,must(copy_term(Var,V)),!.
 %any_to_rdf(DB,DB:From,To):-!,any_to_rdf(DB,From,To).
 %any_to_rdf(_,DB:From,To):-!,any_to_rdf(DB,From,To).
 
-:-export(any_to_rdf/3).
+:- was_export(any_to_rdf/3).
 any_to_rdf(_,U,U):-is_url(U),!.
 any_to_rdf(_,A,Sx):-var(A),format(atom(S),'~w',[(A)]),atom_concat('__bnode',S,Sx),!.
 any_to_rdf(DB,User:B,URL):-not(rdf_current_prefix(User,_)),!,any_to_rdf(DB,prefix_concat(User,B),URL),!.
@@ -432,18 +432,18 @@ rdf_object(L):-is_list(L),!.
 rdf_object(C):-atomic(C).
 rdf_object(O):-ground(O).
 
-:-dynamic(lmconf:using_rdf_mpred_hook).
+:- was_dynamic(lmconf:using_rdf_mpred_hook).
 
-% :-multifile(lmconf:decl_database_hook).
+% :- was_shared_multifile(lmconf:decl_database_hook).
 %OLD lmconf:decl_database_hook(change(assert,_A_or_Z),DBI):- copy_term(DBI,DB), lmconf:using_rdf_mpred_hook,numbervars_with_names(DB),rdf_assert_hook(DB),!.
 
-:-thread_local(t_l:rdf_asserting/2).
+:- thread_local(t_l:rdf_asserting/2).
 
 rdf_assert_ignored(DB):-t_l:rdf_asserting(_,DB),!.
 rdf_assert_ignored(':-'(_)).
 rdf_assert_ignored(G):-not(compound(atom(G))),!.
 rdf_assert_ignored(_):-flag(rdf_assert_hook_max,W,W),W>4000,!.
-rdf_assert_ignored(kbp:spftY(_,_,_,_)).
+rdf_assert_ignored(kbp:spft(umt,_,_,_,_)).
 rdf_assert_ignored(support2(_,_,_)).
 rdf_assert_ignored(support3(_,_,_)).
 rdf_assert_ignored(isa(tCol,tCol)).
@@ -468,8 +468,8 @@ cyc_to_rdf(pathName(A,Dir,String),mudNamed([apathFn,A,Dir],String)).
 cyc_to_rdf(argSingleValueDefault(PAB, 2, V),type_default(A,[P,isThis,V])):-PAB=[P,A,_].
 cyc_to_rdf(argIsa(P,2,D),range(P,D)):-arity(P,2).
 
-:-flag(rdf_assert_hook_max,_,0).
-:-export(rdf_assert_hook/1).
+:- flag(rdf_assert_hook_max,_,0).
+:- was_export(rdf_assert_hook/1).
 rdf_assert_hook(CYC):-not(ground(CYC)),!,copy_term(CYC,O),numbervars_with_names(O),!,rdf_assert_hook(O),!.
 rdf_assert_hook(PSO):-rdf_assert_ignored(PSO),!.
 rdf_assert_hook((A,B)):-!,rdf_assert_hook(A),rdf_assert_hook(B).
@@ -510,20 +510,20 @@ to_rdf_ignore(DB,A,B):-any_to_rdf(DB,A,BB),ignore(B=BB).
 mpred_t_rdf(Sc,rdf:type,CC):- /*o_to_p(CC,Oc),*/clause(t(Oc,Sc),true),any_to_rdf(Oc,CC),!.
 mpred_t_rdf(Sc,Pc,Oc):-t(Pc,Sc,Oc),!.
 
-:-export(rdf_assert_x/3).
+:- was_export(rdf_assert_x/3).
 rdf_assert_x(S,P,O):- rdf_assert_x(S,P,O,mud).
-:-export(rdf_assert_x/4).
+:- was_export(rdf_assert_x/4).
 % rdf_assert_x(S,P,O,DB):-Q=rdf_x(S,P,O,DB),not(ground(Q)),!,Q.
 rdf_assert_x(S,P,O,DB):-
   logOnFailure((
     must(((rdf_to_graph(DB,Gx),!,any_to_rdf(Gx,S,Sx),!,any_to_rdf(Gx,P,Px),!,any_to_rdf(Gx,O,Ox),!))),
       logOnFailure(((must(call(rdf_assert(Sx,Px,Ox,Gx)))))))),!.
 
-:-export(add_spog/4).
+:- was_export(add_spog/4).
 add_spog(S,P,O,DB):- must(spog_to_prolog(S,P,O,DB,REQ)),!,
   (REQ==end_of_file-> true ; w_tl(t_l:rdf_asserting(DB,REQ),add(REQ))),!.
 
-:-export(spog_to_prolog/5).
+:- was_export(spog_to_prolog/5).
 spog_to_prolog(Sx,Px,Ox,Gx,svo(S,P,O)):- hotrace(NeverP=[rdf:rest,rdf:first]),
     must_det_l([rdf_from_graph(Gx,DB),rdf_to_prolog_io(DB,o,Px,P)]),!,
     enforce_never_p(DB,P,NeverP),
@@ -531,9 +531,9 @@ spog_to_prolog(Sx,Px,Ox,Gx,svo(S,P,O)):- hotrace(NeverP=[rdf:rest,rdf:first]),
 spog_to_prolog(_Sx,_Px,_Ox,_Gx,end_of_file).
 
 
-:-export(rdf_x/3).
+:- was_export(rdf_x/3).
 rdf_x(S,P,O):- rdf_x(S,P,O,_MUD).
-:-export(rdf_x/4).
+:- was_export(rdf_x/4).
 rdf_x(S,P,O,DB):-
   (nonvar(DB)->true;rdf_graph(Gx)),
   hotrace(once((to_rdf_io(user,DB,Gx,_Gio),to_rdf_io(Gx,S,Sx,Sio),to_rdf_io(Gx,P,Px,Pio),to_rdf_io(Gx,O,Ox,Oio)))),
@@ -671,14 +671,14 @@ mpred_rdf_has_type(Resource, Class) :-
 		 *	       REGISTER		*
 		 *******************************/
 
-:- multifile
+:- was_shared_multifile
 	cliopatria:entailment/2.
 
 cliopatria:entailment(mpred_rdf, mpred_rdf).
 
 
-:-export(sync_to_rdf/0).
-:-export(sync_from_rdf/0).
+:- was_export(sync_to_rdf/0).
+:- was_export(sync_from_rdf/0).
 
 sync_from_rdf:-dmsg(todo(code_sync_from_rdf)),!.
 sync_from_rdf:-forall(rdf_db:rdf(S,P,O,DB),add_spog(S,P,O,DB)).
@@ -701,7 +701,7 @@ mpred_online:semweb_startup:- must(sync_from_rdf).
 mpred_online:semweb_startup:- must(sync_to_rdf).
 
 
-:- multifile(lmconf:call_OnEachLoad/1).
+:- was_shared_multifile(lmconf:call_OnEachLoad/1).
 mpred_online:semweb_startup:- asserta_if_new(lmconf:call_OnEachLoad(sync_to_rdf)).
 mpred_online:semweb_startup:- asserta_if_new(lmconf:call_OnEachLoad(sync_from_rdf)).
 

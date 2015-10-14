@@ -1,7 +1,7 @@
-:- multifile is_cyckb_t_pred/2.
-:- multifile is_cyckb_t_pred_rename/2.
-:- dynamic is_cyckb_t_pred/2.
-:- dynamic is_cyckb_t_pred_rename/2.
+:- was_shared_multifile is_cyckb_t_pred/2.
+:- was_shared_multifile is_cyckb_t_pred_rename/2.
+:- was_dynamic is_cyckb_t_pred/2.
+:- was_dynamic is_cyckb_t_pred_rename/2.
 
 
 is_cyckb_t_pred_rename(phrase, 2).

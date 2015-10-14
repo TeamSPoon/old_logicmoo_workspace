@@ -28,6 +28,7 @@
             dmsg/3,
           dmsg/1,
           dmsg/2,
+          cls/0,
             dmsg0/1,
             dmsg0/2,
             dmsg1/1,
@@ -48,7 +49,7 @@
             dumpST/3,
             dumpST0/0,
             dumpST00/0,
-            dumpST2/2,
+            dumpST2_broke/2,
             dumpST4/4,
             dumpST9/0,
             dumpST90/0,
@@ -182,7 +183,7 @@
         dumpST/3,
         dumpST0/0,
         dumpST00/0,
-        dumpST2/2,
+        dumpST2_broke/2,
         dumpST4/4,
         dumpST9/0,
         dumpST90/0,
@@ -453,7 +454,8 @@ dmsg(L,F,A):-loggerReFmt(L,LR),loggerFmtReal(LR,F,A).
 :- dynamic tlbugger:dmsg_hook/1.
 :- multifile tlbugger:dmsg_hook/1.
 
-dmsg0(V):- notrace(make_key(V,K)),
+dmsg0(V):-notrace(ignore(dmsg00(V))).
+dmsg00(V):- notrace(make_key(V,K)),
    (tlbugger:in_dmsg(K)-> dmsg5(V);  % format_to_error('~N% ~q~n',[dmsg0(V)]) ;
       asserta(tlbugger:in_dmsg(K),Ref),call_cleanup(dmsg1(V),erase(Ref))).
 
@@ -718,7 +720,7 @@ contrasting_color(_,default).
 :- thread_local(ansi_prop/2).
 
 sgr_on_code(Ctrl,OnCode):-sgr_on_code0(Ctrl,OnCode),!.
-sgr_on_code(Foo,7):- cnotrace((format_to_error('~NMISSING: ~q~n',[sgr_on_code(Foo,7)]))),!. % ,dtrace(sgr_on_code(Foo,7)))).
+sgr_on_code(Foo,7):- notrace((format_to_error('~NMISSING: ~q~n',[sgr_on_code(Foo,7)]))),!. % ,dtrace(sgr_on_code(Foo,7)))).
 
 is_sgr_on_code(Ctrl):-sgr_on_code0(Ctrl,_),!.
 
@@ -780,7 +782,7 @@ msg_to_string(Msg,Str):-sformat(Str,Msg,[],[]),!.
 
 dumpST:- is_hiding_dmsgs,!.
 dumpST:- tlbugger:no_slow_io,!,dumpST0,!.
-dumpST:- loop_check_early(dumpST9,dumpST0).
+dumpST:- loop_check_early(dumpST99,dumpST0).
 % dumpST:- ignore(catch(( w_tl(tlbugger:skipDumpST9,dumpST9)),E,writeq(E))),!.
  
 dumpST0:-loop_check(logicmoo_util_bugger_catch:dumpST00,true),!.
@@ -798,9 +800,10 @@ dumpST00(MaxDepth):-
 :- set_prolog_flag(backtrace_show_lines, true).
 
 dumpST9:- loop_check_early(dumpST90,dumpST0).
-dumpST90:- prolog_current_frame(Frame),dumpST2(Frame,5000),!.
+dumpST90:- prolog_current_frame(Frame),dumpST2_broke(Frame,5000),!.
 
 dumpST(_):- is_hiding_dmsgs,!.
+dumpST(Num):-integer(Num),prolog_current_frame(Frame),dumpST2_broke(Frame,Num),!.
 dumpST(Opts):- dumpST(_,Opts),!.
 
 dumpST(Frame,Opts):-var(Opts),!,dumpST(Frame,5000).
@@ -811,20 +814,20 @@ dumpST(Frame,MaxDepth):-
    ignore(( get_prolog_backtrace(MaxDepth, Trace,[frame(Frame),goal_depth(100)]),
     format_to_error( '% dumpST ~p ~n', [Term]),
     print_prolog_backtrace(ERR, Trace,[subgoal_positions(true)]), nl(ERR), fail)),!.
-dumpST(Frame,MaxDepth):- integer(MaxDepth),(var(Frame)->prolog_current_frame(Frame);true),dumpST2(Frame,MaxDepth).
+dumpST(Frame,MaxDepth):- integer(MaxDepth),(var(Frame)->prolog_current_frame(Frame);true),dumpST2_broke(Frame,MaxDepth).
 dumpST(Frame,Opts):-is_list(Opts),!,dumpST(1,Frame,Opts).
 dumpST(Frame,Opts):-show_call(dumpST(1,Frame,[Opts])).
 
 
-dumpST2(Frame,From-MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[skip_depth(From),max_depth(MaxDepth),numbervars(safe),show([has_alternatives,level,context_module,goal,clause])]),!.
-dumpST2(Frame,MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[max_depth(MaxDepth),numbervars(safe),show([has_alternatives,level,context_module,goal,clause])]),!.
-dumpST2(_,_):- ddmsg(failure(dumpST2/2)),!.
+dumpST2_broke(Frame,From-MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[skip_depth(From),max_depth(MaxDepth),numbervars(safe),show([has_alternatives,level,context_module,goal,clause])]),!.
+dumpST2_broke(Frame,MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[max_depth(MaxDepth),numbervars(safe),show([has_alternatives,level,context_module,goal,clause])]),!.
+dumpST2_broke(_,_):- ddmsg(failure(dumpST2_broke/2)),!.
 
 get_m_opt(Opts,Max_depth,D100,RetVal):-E=..[Max_depth,V],(((member(E,Opts),nonvar(V)))->RetVal=V;RetVal=D100).
 
 :- meta_predicate no_trace_dump(0).
 
-no_trace_dump(G):-cnotrace(G).
+no_trace_dump(G):-notrace(G).
 dumpST(N,Frame,Opts):-
   ignore(prolog_current_frame(Frame)),
   no_trace_dump(( dumpST4(N,Frame,Opts,Out))),
@@ -835,9 +838,11 @@ dumpST(N,Frame,Opts):-
 dumpST(_N,_Frame,_Opts):- dmsg(failed(dumpST/3)),!,notrace(dumpST0),!.
 
 
+neg1_numbervars(Out,_,Out):-!.
 neg1_numbervars(T,-1,T):-!.
-neg1_numbervars(Out,Start,ROut):-copy_term(Out,ROut),integer(Start),!,snumbervars(ROut,Start,_).
-neg1_numbervars(Out,safe,ROut):-copy_term(Out,ROut),snumbervars(ROut).
+neg1_numbervars(Out,Start,ROut):-copy_term(Out,ROut),integer(Start),snumbervars(ROut,Start,_),!.
+neg1_numbervars(Out,safe,ROut):-copy_term(Out,ROut),snumbervars(ROut),!.
+
 
 fdmsg1(txt(S)):-format_to_error(S,[]),!.
 fdmsg1(level=L):-format_to_error('~n(~q)',[L]),!.
@@ -910,6 +915,7 @@ writeFailureLog(E,X):-
 
 %unknown(Old, autoload).
 
+cls:- shell(cls).
 
 :- 'mpred_trace_none'(fmt(_)).
 :- 'mpred_trace_none'(fmt(_,_)).

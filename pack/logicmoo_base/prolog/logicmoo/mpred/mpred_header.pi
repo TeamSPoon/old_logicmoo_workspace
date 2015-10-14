@@ -15,9 +15,9 @@
 :- multifile(system:goal_expansion/2).
 :- multifile(user:term_expansion/2).
 :- multifile(user:goal_expansion/2).
-:- multifile '$was_imported_kb_content$'/2.
-:- dynamic '$was_imported_kb_content$'/2.
-:- discontiguous('$was_imported_kb_content$'/2).
+:- multifile '$si$':'$was_imported_kb_content$'/2.
+:- dynamic '$si$':'$was_imported_kb_content$'/2.
+:- discontiguous('$si$':'$was_imported_kb_content$'/2).
 
 
 :- op(500,fx,'~').
@@ -47,22 +47,72 @@
 :- op(1075,xfx,user:'<==>').
 :- op(1100,xfx,user:'==>').
 :- op(350,xfx,user:'xor').
-:- op(1100,fx,(shared_multifile)).
+:- op(1100,fx,(was_shared_multifile)).
  
 %:- multifile(user_db:grant_openid_server/2).
 
 % HOOKS
 
-:- dynamic(lmconf:hook_mpred_listing/1).
-:- multifile(lmconf:hook_mpred_listing/1).
+:- forall(member(M:F/A,[
 
-:- multifile(mpred_online:semweb_startup/0).
-:- discontiguous(mpred_online:semweb_startup/0).
-
-:- dynamic(module_local_init/0).
-:- discontiguous(module_local_init/0).
-
-
+kbp:bt/3, %kbp
+kbp:nt/4, %kbp
+kbp:pk/4, %kbp
+kbp:pt/3, %kbp
+kbp:spft/5, %kbp
+kbp:tms/1, %kbp
+kbp:hs/1, %kbp
+kbp:qu/3, %kbp
+kbp:sm/1, %kbp
+kbp:hs/2, %kbp
+lmconf:mpred_select/2,
+lmconf:after_mpred_load/0,
+user:portray/1, %user
+% user:prolog_list_goal/1, %user
+% user:prolog_predicate_name/2, %user
+% user:prolog_clause_name/2, %user
+el_assertions:el_holds/4, %el_assertions
+el_assertions:el_holds/5, %el_assertions
+el_assertions:el_holds/6, %el_assertions
+el_assertions:el_holds/7, %el_assertions
+el_assertions:el_holds/8, %el_assertions
+el_assertions:el_holds/9, %el_assertions
+el_assertions:el_holds/10, %el_assertions
+el_assertions:el_holds/11, %el_assertions
+el_assertions:el_holds/12, %el_assertions
+el_assertions:el_holds/13, %el_assertions
+el_assertions:el_holds/14, %el_assertions
+el_assertions:el_holds_pred_impl/1, %el_assertions
+el_assertions:is_cyckb_t_pred/2, %el_assertions
+lmconf:decl_coerce/3, 
+lmconf:hook_coerce/3, 
+lmconf:hook_mpred_listing/1,
+lmconf:hook_one_minute_timer_tick/0,
+lmconf:hook_one_second_timer_tick/0, 
+lmconf:loaded_file_world_time/3, 
+lmconf:module_local_init/0,
+lmconf:mpred_hook_rescan_files/0, 
+lmconf:mpred_provide_read_attributes/3, 
+lmconf:mpred_provide_setup/4, 
+lmconf:mpred_provide_storage_clauses/3, 
+lmconf:mpred_provide_storage_op/2, 
+lmconf:mpred_provide_write_attributes/2, 
+lmconf:mpred_skipped_module/1, 
+lmconf:never_reload_file/1, 
+lmconf:pfcManageHybrids/0, 
+lmconf:sanity_test/0, 
+lmconf:isa_pred_now_locked/0,
+lmconf:type_action_info/3,
+lmconf:agent_call_command/2,
+lmconf:mud_test/2,
+lmconf:sanity_test/0,
+lmconf:regression_test/0,
+lmconf:feature_test/0,
+mpred_online:semweb_startup/0,
+system:goal_expansion/2,
+user:prolog_load_file/2, 
+user:term_expansion/2
+]),(multifile(M:F/A),dynamic(M:F/A),discontiguous(M:F/A))).
 % ================================================
 % Thread Locals
 % ================================================

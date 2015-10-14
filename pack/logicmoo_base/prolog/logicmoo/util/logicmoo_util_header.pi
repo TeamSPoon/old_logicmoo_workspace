@@ -9,13 +9,13 @@
 	user:prolog_list_goal/1,
 	user:prolog_predicate_name/2,
 	user:prolog_clause_name/2,
-        lmconf:mpred_is_impl_file/1.
+        logicmoo_util_help:mpred_is_impl_file/1.
 :- dynamic
 	user:portray/1,
-        lmconf:mpred_is_impl_file.
+        logicmoo_util_help:mpred_is_impl_file.
 
 :- prolog_load_context(source,F), 
-   once(lmconf:mpred_is_impl_file(F);asserta(lmconf:mpred_is_impl_file(F))).
+   once(logicmoo_util_help:mpred_is_impl_file(F);asserta(logicmoo_util_help:mpred_is_impl_file(F))).
 
 % ===================================================================
 % Creates a warning if we are in the incorrect context
@@ -35,7 +35,7 @@ lmconf:logicmoo_utils_separate.
 % % :- style_check(-atom).
 /*
 
-:- dynamic   user:file_search_path/2.
+:- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
 user:file_search_path(pack, '../../../../').
 :- attach_packs.

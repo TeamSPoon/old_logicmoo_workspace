@@ -7,11 +7,11 @@
 
 :- volatile(swish_trace:installed/1).
 
-:- multifile(mpred_online:semweb_startup).
+:- was_shared_multifile(mpred_online:semweb_startup).
 % :- '@'(ensure_loaded(logicmoo(util/logicmoo_util_bugger)),user).
 :- add_to_search_path(swish, '../pack/swish/').
 
-:- dynamic   user:file_search_path/2.
+:- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
 
 
@@ -36,7 +36,7 @@ logicmoo_set_swish_path :-
                  *   CREATE SWISH APPLICATION   *
                  *******************************/
 
-:- multifile
+:- was_shared_multifile
 	pengines:prepare_module/3.
 
 :- logicmoo_set_swish_path.
@@ -86,14 +86,14 @@ assert_sv(P):-!,functor(P,_,A),duplicate_term(P,R),setarg(A,R,_),ignore(retract(
 		 *	      CONFIG		*
 		 *******************************/
 
-:-abolish(swish_config:config,2).
-:-dynamic(swish_config:config/2).
-:- multifile
+:- abolish(swish_config:config,2).
+:- was_dynamic(swish_config:config/2).
+:- was_shared_multifile
 	swish_config:config/2,
 	swish_config:source_alias/2.
 
 
-:-assert_sv((
+:- assert_sv((
    swish_config:config(show_beware,        false),
    swish_config:config(tabled_results,     false),
    swish_config:config(application,        swish),
@@ -116,7 +116,7 @@ assert_sv(P):-!,functor(P,_,A),duplicate_term(P,R),setarg(A,R,_),ignore(retract(
 
 
 
-:-endif.
+:- endif.
 
 :- meta_predicate swish_svgtree:'__aux_maplist/3_filtered_tree+2'(*,*,3,+).
 
@@ -147,8 +147,8 @@ install_bower:- prolog_file_dir(('.'),LPWD),
    process_create(sudo,[bower,install,'--allow-root'],[cwd(LPWD),process(PID)]),
    process_wait(PID,_Status).
 
-:-shell('sudo apt-get install npm nodejs-legacy').
-:-shell('sudo npm install -g bower').
+:- shell('sudo apt-get install npm nodejs-legacy').
+:- shell('sudo npm install -g bower').
 
 :- install_bower.
 % :-shell('bower install').
@@ -161,8 +161,8 @@ you can also download  the  dependencies  as   a  single  zip  file from
 Unpack the zip file, maintaining the directory structure, from the swish
 root directory to create the directory web/bower_components.
 */
-:-shell('wget http://www.swi-prolog.org/download/swish/swish-bower-components.zip').
-:-shell('unzip -o swish-bower-components.zip -d . ').
+:- shell('wget http://www.swi-prolog.org/download/swish/swish-bower-components.zip').
+:- shell('unzip -o swish-bower-components.zip -d . ').
 /*
 
 ### Get the latest SWI-Prolog
@@ -238,9 +238,9 @@ installations you probably want to create   the  minified JavaScript and
 CSS files to reduce network traffic and startup time. You need some more
 tools for that:
 */
-:-shell('npm install -g jsdoc').
-:-shell('npm install -g requirejs').
-:-shell('npm install -g clean-css').
+:- shell('npm install -g jsdoc').
+:- shell('npm install -g requirejs').
+:- shell('npm install -g clean-css').
 
 /*
 You also need GNU make installed as   `make`  and SWI-Prolog as `swipl`.
@@ -248,7 +248,7 @@ With all that in  place,  the   following  command  creates the minified
 versions:
 */
 
-:-shell(make).
+:- shell(make).
 
 /*
 The default main page (`/`)  is   generated  from `lib/page.pl`. It uses

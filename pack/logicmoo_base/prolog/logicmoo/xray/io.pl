@@ -17,7 +17,7 @@
 write_style_header(_):-no_disk,!.
 write_style_header(Stream):-write_clauses(Stream,(:-(style_check(-singleton)))).
 
-:- dynamic(no_disk).
+:- was_dynamic(no_disk).
 no_disk.
 :- retractall(no_disk).
 

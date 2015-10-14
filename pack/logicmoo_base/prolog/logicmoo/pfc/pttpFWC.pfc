@@ -9,12 +9,12 @@ end_of_file.
 :- op(1050,xfx,('<-')).
 :- op(1100,fx,('==>')).
 :- op(1150,xfx,('::::')).
-:- dynamic(tCol/1).
+:- was_dynamic(tCol/1).
 :- op(1050,xfx,('<==')).
 
-:-dynamic('<=='/2).
+:- was_dynamic('<=='/2).
 
-:-dynamic('pet'/2).
+:- was_dynamic('pet'/2).
 
 
 % Source http://www.iflscience.com/editors-blog/solving-einsteins-riddle

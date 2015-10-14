@@ -18,10 +18,10 @@
 
 :- ensure_loaded(base).
 
-:- dynamic(do_model_inits).
+:- was_dynamic(do_model_inits).
 
 do_model_inits.
-:-retractall(do_model_inits). 
+:- retractall(do_model_inits). 
 
 
 %%% ----------------------------------------------------------------------

@@ -24,7 +24,7 @@
             mpred_list_triggers_1/1,
             mpred_list_triggers_nlc/1,
             mpred_list_triggers_types/1,
-            mpred_queue/0,
+            lqu/0,
             mpred_select_justificationNode/3,
             mpred_trace_item/2,
             mpred_why/0,
@@ -53,81 +53,25 @@
             print_db_items_and_neg/3,
             show_pred_info/1,
             show_pred_info_0/1,
-            why/1,
-            whymemory/2
+            why/1            
           ]).
-% autoloading user:portray_clause_pi/2 from /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first
-:- multifile % (multifile) :-
-        '$included'/4,
-        '$load_context_module'/3,
-        hook_mpred_listing/1,
-        mpred_list_triggers/1.
-:- meta_predicate % (meta_predicate) :-
-        mpred_list_triggers_nlc(?).
-:- module_transparent % (module_transparent) :-
-        loop_check_just/1,
-        mpred_ask/2,
-        mpred_classify_facts/4,
-        mpred_command/3,
-        mpred_contains_term/2,
-        mpred_interactive_why/0,
-        mpred_interactive_why/1,
-        mpred_list_triggers/1,
-        mpred_list_triggers_0/1,
-        mpred_list_triggers_1/1,
-        mpred_list_triggers_types/1,
-        mpred_queue/0,
-        mpred_select_justificationNode/3,
-        mpred_trace_item/2,
-        mpred_why/0,
-        mpred_why/1,
-        mpred_why1/1,
-        mpred_whyBrouse/2,
-        mpred_why_command/3,
-        nth_mpred_call/3,
-        pp_facts/0,
-        pp_facts/1,
-        pp_facts/2,
-        pp_item/2,
-        pp_items/2,
-        pp_justification1/2,
-        pp_justifications/2,
-        pp_justifications2/3,
-        pp_rules/0,
-        pp_supports/0,
-        pp_triggers/0,
-        pp_why/1,
-        pppfc/0,
-        print_db_items/1,
-        print_db_items/2,
-        print_db_items/3,
-        print_db_items/4,
-        print_db_items_and_neg/3,
-        show_pred_info/1,
-        show_pred_info_0/1,
-        why/1,
-        whymemory/2.
-:- dynamic % (dynamic) :-
-        '$included'/4,
-        '$load_context_module'/3,
-        hook_mpred_listing/1,
-        mpred_list_triggers/1,
-        whymemory/2.
 
+
+:- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
 :- include('mpred_header.pi').
 
-:- multifile
+:- multifile((
   	user:portray/1,
   	user:prolog_list_goal/1,
   	user:prolog_predicate_name/2,
-  	user:prolog_clause_name/2.
+  	user:prolog_clause_name/2)).
 
 :- dynamic
   	user:portray/1.
 
 
-mpred_queue :- listing(mpred_queue/2).
+lqu :- listing(kbp:qu/3).
 
 
 
@@ -136,7 +80,7 @@ pppfc :-
   pp_rules,
   pp_triggers,
   pp_supports,
-  mpred_queue.
+  lqu.
 
 %= pp_facts ...
 
@@ -157,7 +101,7 @@ pp_facts(P,C) :-
   draw_line.
 
 
-pp_items(Type,[]).
+pp_items(_Type,[]).
 pp_items(Type,[H|T]) :-
   ignore(pp_item(Type,H)),!,
   pp_items(Type,T).
@@ -165,22 +109,22 @@ pp_items(Type,H) :- ignore(pp_item(Type,H)).
 
 
 mpred_trace_item(_,_):- tlbugger:ifHideTrace,!.
-mpred_trace_item(MM,H):- ignore(t_l:mpred_trace_exec-> on_x_rtrace(in_cmt(pp_item(MM,H))); true).
+mpred_trace_item(MM,H):- ignore(mpred_is_tracing(exec)-> on_x_rtrace(in_cmt(pp_item(MM,H))); true).
 
 
    
 pp_item(MM,(H:-B)):- B ==true,pp_item(MM,H).
 pp_item(MM,H):- flag(show_asserions_offered,X,X+1),t_l:print_mode(html),!, (\+ \+ pp_item_html(MM,H)),!.
 
-pp_item(MM,kbp:spftY(KB,P,F,T,W)):-!,
-   w_tl(t_l:current_why_source(W),pp_item(MM,spft(KB,P,F,T))).
+pp_item(MM,kbp:spft(KB,P,F,T,W)):-!,
+   w_tl(t_l:current_why_source(W),pp_item(MM,kbp:spft(KB,P,F,T))).
 
-pp_item(MM,spft(KB,W0,U,U)):- W = (KB:W0),!,pp_item(MM,U:W).
-pp_item(MM,spft(KB,W0,F,U)):- W = (KB:W0),atom(U),!,    fmt('~N%~n',[]),pp_item(MM,U:W), fmt('rule: ~p~n~n', [F]),!.
-pp_item(MM,spft(KB,W0,F,U)):- W = (KB:W0),         !,   fmt('~w~nd:       ~p~nformat:    ~p~n', [MM,W,F]),pp_item(MM,U).
-pp_item(MM,nt(KB,Trigger0,Test,Body)) :- Trigger = (KB:Trigger0), !, fmt('~w n-trigger: ~p~ntest: ~p~nbody: ~p~n', [MM,Trigger,Test,Body]).
-pp_item(MM,pt(KB,F0,Body)):- F = (KB:F0),             !,fmt('~w p-trigger:~n', [MM]), pp_i2tml_now((F:-Body)).
-pp_item(MM,bt(KB,F0,Body)):- F = (KB:F0),             !,fmt('~w b-trigger:~n', [MM]), pp_i2tml_now((F:-Body)).
+pp_item(MM,kbp:spft(KB,W0,U,U)):- W = (KB:W0),!,pp_item(MM,U:W).
+pp_item(MM,kbp:spft(KB,W0,F,U)):- W = (KB:W0),atom(U),!,    fmt('~N%~n',[]),pp_item(MM,U:W), fmt('rule: ~p~n~n', [F]),!.
+pp_item(MM,kbp:spft(KB,W0,F,U)):- W = (KB:W0),         !,   fmt('~w~nd:       ~p~nformat:    ~p~n', [MM,W,F]),pp_item(MM,U).
+pp_item(MM,kbp:nt(KB,Trigger0,Test,Body)) :- Trigger = (KB:Trigger0), !, fmt('~w n-trigger: ~p~ntest: ~p~nbody: ~p~n', [MM,Trigger,Test,Body]).
+pp_item(MM,kbp:pt(KB,F0,Body)):- F = (KB:F0),             !,fmt('~w p-trigger:~n', [MM]), pp_i2tml_now((F:-Body)).
+pp_item(MM,kbp:bt(KB,F0,Body)):- F = (KB:F0),             !,fmt('~w b-trigger:~n', [MM]), pp_i2tml_now((F:-Body)).
 
 
 pp_item(MM,U:W):- !,sformat(S,'~w  ~w:',[MM,U]),!, pp_item(S,W).
@@ -209,7 +153,7 @@ print_db_items(T, I):-
     draw_line.
 
 print_db_items(F/A):-number(A),!,functor(P,F,A),!,print_db_items(P).
-print_db_items(I):- bagof(I,clause_u(I,true),R1),pp_items(Type,R1),!.
+print_db_items(I):- bagof(I,clause_u(I,true),R1),pp_items(_Type,R1),!.
 print_db_items(I):- listing(I),!,nl,nl.
 
 pp_rules :-
@@ -231,7 +175,7 @@ pp_supports :-
   draw_line,
   fmt("Supports ...~n",[]),
   setof((S > P), mpred_get_support(P,S),L),
-  pp_items(Type,L),
+  pp_items('Support',L),
   draw_line.
 
 draw_line:- (t_l:print_mode(H)->true;H=unknown),fmt("~N%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%~n",[]),H=H.
@@ -248,8 +192,8 @@ loop_check_just(G):-loop_check(G,ignore(arg(1,G,[]))).
 
 % ***** predicates for brousing justifications *****
 
-:-dynamic(whymemory/2).
-:-thread_local(t_l:is_mpred_interactive_why/0).
+% :- dynamic(whymemory/2).
+:- thread_local(t_l:is_mpred_interactive_why/0).
 
 :- use_module(library(lists)).
 
@@ -393,13 +337,13 @@ mpred_contains_term(What,Inside):- (\+ \+ once((subst(Inside,What,foundZadooksy,
 
 lmconf:hook_mpred_listing(What):- on_x_rtrace(mpred_list_triggers(What)).
 
-:-thread_local t_l:mpred_list_triggers_disabled.
+:- thread_local t_l:mpred_list_triggers_disabled.
 % listing(L):-w_tl(t_l:mpred_list_triggers_disabled,listing(L)).
 
-mpred_list_triggers(What):-t_l:mpred_list_triggers_disabled,!.
+mpred_list_triggers(_):-t_l:mpred_list_triggers_disabled,!.
 mpred_list_triggers(What):-loop_check(mpred_list_triggers_nlc(What)).
 
-:-meta_predicate(mpred_list_triggers_nlc(?)).
+:- meta_predicate(mpred_list_triggers_nlc(?)).
 
 mpred_list_triggers_nlc(MM:What):-atom(MM),!,MM:mpred_list_triggers(What).
 mpred_list_triggers_nlc(What):-loop_check(mpred_list_triggers_0(What),true).
@@ -429,7 +373,7 @@ mpred_list_triggers_1(neg(What)):-var(What),!.
 mpred_list_triggers_1(neg(_What)):-!.
 mpred_list_triggers_1(What):-var(What),!.
 mpred_list_triggers_1(What):-
-   print_db_items('Supports User',spft_precanonical(P,u,u),spft(P,u,u),What),
+   print_db_items('Supports User',spft_precanonical(P,u,u),kbp:spft(umt,P,u,u),What),
    print_db_items('Forward Facts',(nesc(F)),F,What),
    print_db_items('Forward Rules',(_==>_),What),
  ignore((What\=neg(_),functor(What,IWhat,_),
@@ -442,8 +386,8 @@ mpred_list_triggers_1(What):-
    print_db_items('Triggers Goal',bt(_,_),What),
    print_db_items('Triggers Positive',pt(_,_),What),
    print_db_items('Bidirectional Rules',(_<==>_),What), 
-   dif(A,B),print_db_items('Supports Deduced',spft_precanonical(P,A,B),spft(P,A,B),What),
-   dif(G,u),print_db_items('Supports Nonuser',spft_precanonical(P,G,G),spft(P,G,G),What),
+   dif(A,B),print_db_items('Supports Deduced',spft_precanonical(P,A,B),kbp:spft(umt,P,A,B),What),
+   dif(G,u),print_db_items('Supports Nonuser',spft_precanonical(P,G,G),kbp:spft(umt,P,G,G),What),
    print_db_items('Backchaining Rules',(_<-_),What),
    % print_db_items('Edits',is_disabled_clause(_),What),
    print_db_items('Edits',is_edited_clause(_,_,_),What),
@@ -470,4 +414,6 @@ mpred_list_triggers_1(What):-
    print_db_items('Sources',_:'$mode'(_,_),What),
    !.     
 
+
+:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 

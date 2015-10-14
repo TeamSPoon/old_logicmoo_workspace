@@ -1,10 +1,10 @@
 /*:-abolish(pttp_prove,6).
-:-abolish(search_cost,3).
-:-abolish(search,6).
-:-abolish(make_wrapper,3).
-:-abolish(add_features,2).
-:-abolish(add_args,13).
-:-abolish(query,0).*/
+:- abolish(search_cost,3).
+:- abolish(search,6).
+:- abolish(make_wrapper,3).
+:- abolish(add_features,2).
+:- abolish(add_args,13).
+:- abolish(query,0).*/
 
 :- use_module(library(dra/tabling3/swi_toplevel)).
 

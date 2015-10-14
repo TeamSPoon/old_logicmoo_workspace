@@ -62,10 +62,7 @@
             is_non_unit/1,
             is_sk_functor/1,
             is_sk_unit/1,
-            isa/2,
             is_typef/1,
-            is_unit/1,
-            is_unit_functor/1,
             isa_asserted/2,
             isa_asserted_1/2,
             isa_atom_call/2,
@@ -97,217 +94,26 @@
             type_isa/2,
             was_isa/3,
             was_isa0/3,
-             decided_not_was_isa/2,
-         did_learn_from_name/1,
-         isa_pred_now_locked/0,
-         genls/2,
-         isa_asserted_0/2,
-         lmconf:mpred_provide_storage_clauses/3,
-         tSet/1,
-         tried_guess_types_from_name/1,
-         isa/2,
-         tCol/1,tFunction/1,
-         type_prefix/2,
-         type_suffix/2,
-         functorDeclares/1,
-         completelyAssertedCollection/1,
-         disjointWith/2,ttTemporalType/1,
-         defnSufficient/2,
-         natFunction/2,
-         tPred/1,mpred_univ/1,
-         tRelation/1,new_was_isa/0,
-         ttUnverifiableType/1
+         %    decided_not_was_isa/2,
+         % did_learn_from_name/1,
+         % isa_pred_now_locked/0,
+         % isa_asserted_0/2,
+         new_was_isa/0,
+          type_prefix/2,
+          type_suffix/2
           ]).
+
+:- use_module(logicmoo(util/logicmoo_util_preddefs)).
+
 % autoloading user:portray_clause_pi/2 from /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first
-:- multifile % (multifile) :-
-        '$included'/4,
-        '$load_context_module'/3,
-        completelyAssertedCollection/1,
-        decided_not_was_isa/2,
-        defnSufficient/2,
-        did_learn_from_name/1,
-        disjointWith/2,
-        functorDeclares/1,
-        genls/2,
-        isa/2,
-        isa_asserted_0/2,
-        isa_pred_now_locked/0,
-        module_local_init/0,
-        mpred_univ/1,
-        natFunction/2,
-        new_was_isa/0,
-        tCol/1,
-        tFunction/1,
-        tPred/1,
-        tRelation/1,
-        tSet/1,
-        tried_guess_types_from_name/1,
-        ttTemporalType/1,
-        ttUnverifiableType/1,
-        type_prefix/2,
-        type_suffix/2.
-:- meta_predicate % (meta_predicate) :-
- % mpred_type_isa
-callOr(1,?,?),
-% mpred_type_isa
+:- meta_predicate callOr(1,?,?),
 transitive_P(3,?,?,?),
-% mpred_type_isa
 transitive_P_l_r(3,?,?,?),
-% mpred_type_isa:transitive_P_r_l(3,?,?,?),
 transitive_P_r_l(3,?,?,?),
         assert_isa(+, +).
-:- module_transparent % (module_transparent) :-
-        a/2,
-        assert_compound_isa/3,
-        assert_hasInstance/2,
-        assert_isa_hooked/2,
-        assert_isa_hooked_after/2,
-        assert_isa_i/2,
-        assert_isa_ilc/2,
-        assert_isa_ilc_unchecked/2,
-        assert_isa_reversed/2,
-        assert_isa_safe/2,
-        assert_p_safe/3,
-        assert_subclass/2,
-        assert_subclass_safe/2,
-        asserted_subclass/2,
-        atom_prefix_other/3,
-        atom_type_prefix_other/4,
-        cached_isa/2,
-        callOr/3,
-        chk_ft/1,
-        compound_isa/3,
-        decl_type/1,
-        decl_type_safe/1,
-        decl_type_unsafe/1,
-        define_ft/1,
-        define_ft_0/1,
-        disjointWith0/2,
-        disjointWithT/2,
-        dont_call_type_arity_one/1,
-        get_mpred_arg/3,
-        guess_supertypes/1,
-        guess_supertypes_0/1,
-        guess_types/1,
-        guess_types/2,
-        guess_types_0/2,
-        guess_typetypes/1,
-        guess_typetypes_0/1,
-        has_free_args/1,
-        into_single_class/2,
-        is_Template/1,
-        is_known_false/1,
-        is_known_false0/1,
-        is_known_trew/1,
-        is_known_true/1,
-        is_never_type/1,
-        is_non_skolem/1,
-        is_non_unit/1,
-        is_sk_functor/1,
-        is_sk_unit/1,
-        is_typef/1,
-        is_unit/1,
-        is_unit_functor/1,
-        isa_asserted/2,
-        isa_asserted_1/2,
-        isa_atom_call/2,
-        isa_atom_call_ilc/2,
-        isa_backchaing/2,
-        isa_backchaing_0/2,
-        isa_from_morphology/2,
-        isa_w_type_atom/2,
-        module_local_init/0,
-        mpred_add_guess/1,
-        mpred_provide_storage_clauses/3,
-        mpred_provide_storage_op/2,
-        mpred_types_loaded/0,
-        mpred_univ/3,
-        never_type_f/1,
-        never_type_why/2,
-        noncol_type/1,
-        not_ft/1,
-        not_ft_quick/1,
-        not_mud_isa/2,
-        not_mud_isa/3,
-        not_mud_isa0/2,
-        onLoadPfcRule/1,
-        pfcNeverTrue/1,
-        tCol_gen/1,
-        to_isa_out/3,
-        transitive_P/4,
-        transitive_P_l_r/4,
-        transitive_P_r_l/4,
-        transitive_subclass_or_same/2,
-        type_deduced/2,
-        type_isa/2,
-        was_isa/3,
-        was_isa0/3.
-:- dynamic % (dynamic) :-
-        '$included'/4,
-        '$load_context_module'/3,
-        completelyAssertedCollection/1,
-        decided_not_was_isa/2,
-        defnSufficient/2,
-        did_learn_from_name/1,
-        disjointWith/2,
-        functorDeclares/1,
-        genls/2,
-        isa/2,
-        isa_asserted_0/2,
-        isa_pred_now_locked/0,
-        module_local_init/0,
-        mpred_univ/1,
-        natFunction/2,
-        new_was_isa/0,
-        tCol/1,
-        tFunction/1,
-        tPred/1,
-        tRelation/1,
-        tSet/1,
-        tried_guess_types_from_name/1,
-        ttTemporalType/1,
-        ttUnverifiableType/1,
-        type_prefix/2,
-        type_suffix/2.
 
 :- include('mpred_header.pi').
 
-:- shared_multifile((
-         decided_not_was_isa/2,
-         did_learn_from_name/1,
-         isa_pred_now_locked/0,
-         genls/2,
-         isa_asserted_0/2,
-         module_local_init /0,
-         lmconf:mpred_provide_storage_clauses/3,
-         tSet/1,
-         tried_guess_types_from_name/1,
-         isa/2,
-         tCol/1,tFunction/1,
-         type_prefix/2,
-         type_suffix/2,
-         functorDeclares/1,
-         completelyAssertedCollection/1,
-         disjointWith/2,ttTemporalType/1,
-         defnSufficient/2,
-         natFunction/2,
-         tPred/1,mpred_univ/1,
-         tRelation/1,new_was_isa/0,
-         ttUnverifiableType/1)).
-
-
-
-:- dynamic 
-      decided_not_was_isa/2,
-      did_learn_from_name/1,
-      isa_asserted_0/2,
-      isa_pred_now_locked/0,
-      module_local_init /0,
-      lmconf:mpred_provide_storage_clauses/3,
-      tried_guess_types_from_name/1,
-      new_was_isa/0,
-      type_prefix/2,
-      type_suffix/2.
 
 
 
@@ -331,7 +137,7 @@ assert_hasInstance(T,I):-  sanity(ground(T:I)),mpred_add(isa(I,T)),!,expire_tabl
 % is_typef(F).
 % Checks F for isa(F,tCol).
 % ========================================
-:-export(is_typef/1).
+:- was_export(is_typef/1).
 is_typef(C):-is_ftVar(C),!,fail.
 is_typef(prologSingleValued):-!.
 is_typef(prologSideEffects):-!.
@@ -343,12 +149,12 @@ is_typef(F):- atom(F),current_predicate(isa_from_morphology/2),isa_from_morpholo
 % is_never_type(F).
 % Checks F for not_mudIsa(F,tCol).
 % ========================================
-:-export(is_never_type/1).
+:- was_export(is_never_type/1).
 
 is_never_type(V):-is_ftVar(V),!,fail.
 is_never_type(V):-never_type_why(V,_),!.
 
-a(C,I):-must(atom(C)),G=..[C,I], clause_asserted(G).
+a(C,I):- atom(C),G=..[C,I], clause_asserted(G).
 
 never_type_f(Var):-is_ftVar(Var),!,trace_or_throw(var_never_type(Var)).
 never_type_f(F):-a(tCol,F),!,fail.
@@ -429,8 +235,8 @@ type_prefix(macro,ttMacroType).
 % ========================================
 % was_isa(Goal,I,C) recognises isa/2 and its many alternative forms
 % ========================================
-:- dynamic decided_not_was_isa/2.
-:-export(was_isa/3).
+:- was_dynamic decided_not_was_isa/2.
+:- was_export(was_isa/3).
 was_isa(G,I,C):- fail, \+(current_predicate(_,G)),
   is_ftCompound(G),functor(G,F,_),hotrace(((not(decided_not_was_isa(F,_)),once(was_isa0(G,I,C)-> true;((functor(G,F,1),
   current_source_location(When),asserta_if_new(decided_not_was_isa(F,When)),!,fail)))))).
@@ -465,7 +271,7 @@ not_ft(T):-nonvar(T),not_ft_quick(T),not(a(ttFormatType,T)).
 
 not_ft_quick(T):-nonvar(T),(T=tItem;T=tRegion;T=tCol;T=completelyAssertedCollection;transitive_subclass_or_same(T,tTemporalThing)).
 
-:-export(asserted_subclass/2).
+:- was_export(asserted_subclass/2).
 asserted_subclass(I,T):- ((t_l:useOnlyExternalDBs,!);lmconf:use_cyc_database),(kbp_t([genls,I,T])).
 asserted_subclass(T,ST):- t(genls,T,ST).
 
@@ -486,7 +292,7 @@ into_single_class(A,A).
 % taxonomicPair(isa,genls)
 % ==========================
 
-:-export((transitive_subclass_or_same/2)).
+:- was_export((transitive_subclass_or_same/2)).
 transitive_subclass_or_same(A,B):- (is_ftVar(A),is_ftVar(B)),!,A=B.
 transitive_subclass_or_same(A,A):-nonvar(A).
 transitive_subclass_or_same(A,B):-genls(A,B).
@@ -516,7 +322,7 @@ is_known_true(isa(_,ftTerm)).
 is_known_true(isa(_,ftID)).
 
 
-:-export(is_known_trew/1).
+:- was_export(is_known_trew/1).
 is_known_trew(genls(tRegion,tChannel)).
 is_known_trew(genls('MaleAnimal',tAgent)).
 is_known_trew(genls(prologSingleValued, extentDecidable)).
@@ -535,7 +341,7 @@ is_known_false(C):-has_free_args(C),!,fail.
 is_known_false(F):-is_known_trew(F),!,fail.
 is_known_false(F):-is_known_false0(F),!.
 
-:-export(is_known_false0/1).
+:- was_export(is_known_false0/1).
 is_known_false0(isa(G,Why)):-!,catch(not_mud_isa(G,Why),_,fail).
 % is_known_false0(genls(Type,_)):-arg(_,vv(tCol,tRelation,ttFormatType),Type).
 
@@ -544,18 +350,12 @@ is_non_unit(C):- \+ is_unit(C).
 is_non_skolem(C):- \+ is_sk_unit(C).
 
 is_sk_unit(C):-is_ftCompound(C), C\=(_:-_),get_functor(C,F),is_sk_functor(F),!.
-
-is_unit(C):-is_ftCompound(C),!, C\=(_:-_),C\=ftRest(_),C\=ftListFn(_),get_functor(C,F),is_unit_functor(F).
-is_unit(C):-is_ftNonvar(C).
-
 is_sk_functor(F):- (\+ atom(F)),!,fail.
 is_sk_functor(F):-atom_concat('sk',_,F).
 
-is_unit_functor(F):- (\+ atom(F)),!,fail.
-is_unit_functor(F):-atom_concat('sk',_,F).
-is_unit_functor(F):-atom_concat(_,'Fn',F).
 
-:-export(has_free_args/1).
+
+:- was_export(has_free_args/1).
 has_free_args(C):- sanity(is_ftCompound(C)),arg(_,C,E),is_ftVar(E),!.
 
 % is_known_false(genls(A,B)):-disjointWith(A,B).
@@ -570,7 +370,7 @@ disjointWith0(ttTemporalType,ttNotTemporalType).
 disjointWithT(A,B):-disjointWith0(A,B).
 disjointWithT(B,A):-disjointWith0(A,B).
 
-:-export(not_mud_isa/3).
+:- was_export(not_mud_isa/3).
 %not_mud_isa0(tObj, completelyAssertedCollection).
 %not_mud_isa0(tObj, ttTemporalType).
 %not_mud_isa0(tTemporalThing,ttTemporalType).
@@ -610,13 +410,13 @@ tCol_gen(T):- no_repeats(T,(ttTemporalType(T);completelyAssertedCollection(T);tS
 % ==========================
 % isa_backchaing(i,c)
 % ==========================
-module_local_init:- rtrace(mpred_add((isa(I,T):- cwc,isa_backchaing(I,T)))).
+lmconf:module_local_init:- mpred_add((isa(I,T):- cwc,isa_backchaing(I,T))).
 %a(P,F):-loop_check(isa(F,P)).
 %a(T,I):- lmconf:pfcManageHybrids,clause_safe(isa(I,T),true).
-:-export(isa_backchaing/2).
+:- was_export(isa_backchaing/2).
 
 
-:-export(isa_backchaing_0/2).
+:- was_export(isa_backchaing_0/2).
 isa_backchaing(I,T):- T==ftVar,!,is_ftVar(I).
 isa_backchaing(I,T):- nonvar(I),is_ftVar(I),!,T=ftVar.
 isa_backchaing(_,T):- T==ftProlog,!.
@@ -637,7 +437,7 @@ isa_backchaing_0(I,T):-  sanity(nonvar(I)),isa_asserted(I,AT),transitive_subclas
 % isa_asserted/1
 % ============================================
 
-:-export(type_isa/2).
+:- was_export(type_isa/2).
 
 type_isa(Type,ttTemporalType):-arg(_,vv(tAgent,tItem,tObj,tRegion),Type),!.
 type_isa(ArgIsa,ttPredType):-a(ttPredType,ArgIsa),!.
@@ -666,7 +466,6 @@ compound_isa(_,I,T):- mpred_call(isa_asserted(I,T)).
 isa_asserted(I,C):- ((call_tabled(isa(I,C),no_repeats(loop_check(isa_asserted_0(I,C)))))).
 %isa_asserted(I,CC):-no_repeats((isa_asserted_0(I,C),genls(C,CC))).
 
-:-dynamic(isa_asserted_0/2).
 isa_asserted_0(I,T):-is_known_trew(isa(I,T)).
 isa_asserted_0(F,tCol):-isa_from_morphology(F,Col),atom_concat(_,'Type',Col),arity(F,1).
 %isa_asserted_0([I],T):-nonvar(I),!,isa_asserted_0(I,T).
@@ -725,12 +524,12 @@ cached_isa(I,T):-hotrace(isa_backchaing(I,T)).
 % ============================================
 % decl_type/1
 % ============================================
-:-export(decl_type_safe/1).
+:- was_export(decl_type_safe/1).
 decl_type_safe(T):- is_ftCompound(T),!.
 decl_type_safe(T):- ignore((atom(T),not(never_type_why(T,_)),not(number(T)),decl_type(T))).
 
 
-:-export(decl_type/1).
+:- was_export(decl_type/1).
 decl_type(Var):- is_ftVar(Var),!,trace_or_throw(var_decl_type(Var)).
 decl_type([]):-!.
 decl_type([A]):-!,decl_type(A).
@@ -750,7 +549,7 @@ decl_type_unsafe(Spec):- tCol(Spec)->true;(show_call(mpred_add(tCol(Spec))),gues
 % ========================================
 
 
-:-export(define_ft/1).
+:- was_export(define_ft/1).
 % define_ft(ftListFn(Spec)):- nonvar(Spec),never_type_why(Spec,Why),!,trace_or_throw(never_ft(ftListFn(Spec),Why)).
 define_ft(ftListFn(_)):-!.
 define_ft(Spec):- never_type_why(Spec,Why),!,trace_or_throw(never_ft(never_type_why(Spec,Why))).
@@ -764,18 +563,18 @@ define_ft_0(Spec):- a(ttFormatType,Spec),!.
 define_ft_0(Spec):- a(tCol,Spec),dmsg(once(maybe_coierting_plain_type_to_formattype(Spec))),fail.
 define_ft_0(Spec):- hooked_asserta(isa(Spec,ttFormatType)),(is_ftCompound(Spec)->hooked_asserta(isa(Spec,meta_argtypes));true).
 
-:-export(assert_subclass/2).
+:- was_export(assert_subclass/2).
 assert_subclass(O,T):-assert_subclass_safe(O,T).
 
-:-export(assert_p_safe/3).
+:- was_export(assert_p_safe/3).
 assert_p_safe(P,O,T):-
   ignore((nonvar(O),nonvar(T),nonvar(P),nop((not(chk_ft(O)),not(chk_ft(T)))),mpred_add_guess(t(P,O,T)))).
 
-:-export(assert_subclass_safe/2).
+:- was_export(assert_subclass_safe/2).
 assert_subclass_safe(O,T):-
   ignore((nonvar(O),decl_type_safe(O),nonvar(T),decl_type_safe(T),nonvar(O),nop((not(chk_ft(O)),not(chk_ft(T)))),mpred_add_guess(genls(O,T)))).
 
-:-export(assert_isa_safe/2).
+:- was_export(assert_isa_safe/2).
 assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(O,T))).
 
 %OLD lmconf:decl_database_hook(change(assert,_A_or_Z),genls(S,C)):-decl_type_safe(S),decl_type_safe(C).
@@ -784,8 +583,8 @@ assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(
 %OLD lmconf:decl_database_hook(change(assert,_A_or_Z),isa(W,ttTemporalType)):-decl_type_safe(W). %,call_after_mpred_load(forall(isa(I,W),create_instance(I,W))).
 %OLD lmconf:decl_database_hook(change(assert,_A_or_Z),isa(W,tCol)):- (test_tl(infSupertypeName);true),guess_supertypes(W).
 
-:-dynamic(tried_guess_types_from_name/1).
-:-dynamic(did_learn_from_name/1).
+:- was_dynamic(tried_guess_types_from_name/1).
+:- was_dynamic(did_learn_from_name/1).
 
 guess_types(W):- tried_guess_types_from_name(W),!.
 guess_types(W):- isa_from_morphology(W,What),!,ignore(guess_types(W,What)).
@@ -847,7 +646,7 @@ lmconf:mpred_provide_storage_clauses(H,B,(What)):-fail,isa_lmconf:mpred_provide_
 % ================================================
 % assert_isa/2
 % ================================================
-:-meta_predicate(assert_isa(+,+)).
+:- meta_predicate(assert_isa(+,+)).
 
 assert_isa([I],T):-nonvar(I),!,assert_isa(I,T).
 assert_isa(I,T):-assert_isa_i(I,T),must(sanity((must(is_asserted(isa(I,T)));must(isa_asserted(I,T))))).
@@ -858,7 +657,7 @@ assert_isa_i(_,ftTerm(_)):-!.
 %assert_isa_i(I,PT):- nonvar(PT),a(ttPredType,PT),!,decl_mpred(I,PT),assert_hasInstance(PT,I).
 assert_isa_i(I,T):- skipped_table_call(loop_check(assert_isa_ilc(I,T),loop_check(assert_hasInstance(T,I),dtrace(assert_isa_ilc(I,T))))).
 
-:-export(assert_isa_ilc/2).
+:- was_export(assert_isa_ilc/2).
 % skip formatter cols
 assert_isa_ilc(isKappaFn(_,_),_):-!.
 assert_isa_ilc(_I,T):- member(T,[ftString]),!.
@@ -934,7 +733,7 @@ assert_isa_hooked_after(_,ttFormatType):-!.
 
 /*
 assert_isa_hooked_after(I,T):- not(completelyAssertedCollection(T)),impliedSubClass(T,ST),completelyAssertedCollection(ST),assert_isa(I,ST).
-:-export(impliedSubClass/2).
+:- was_export(impliedSubClass/2).
 impliedSubClass(T,ST):-ground(T:ST),is_known_false(genls(T,ST)),!,fail.
 impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_tabled(isa(T,ST),transitive_subclass(T,ST)).
 */
@@ -946,22 +745,24 @@ impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_ta
 
 
 % :- asserta((lmconf:isa(I,C):-loop_check(isa_backchaing(I,C)))).
-module_local_init:- asserta(('$toplevel':isa(I,C):-lmconf:isa(I,C))).
+lmconf:module_local_init:- asserta(('$toplevel':isa(I,C):-lmconf:isa(I,C))).
 
 mpred_types_loaded.
 
 % ISA QUERY
-module_local_init:- asserta_if_new((system:goal_expansion(ISA,GO) :- \+ t_l:disable_mpred_term_expansions_locally, \+current_predicate(_,ISA),
+lmconf:module_local_init:- asserta_if_new((system:goal_expansion(ISA,GO) :- \+ t_l:disable_mpred_term_expansions_locally, \+current_predicate(_,ISA),
   once((is_ftCompound(ISA),was_isa(ISA,I,C))),t_l:is_calling,show_call(GO=no_repeats(isa(I,C))))).
 % ISA GOAL
 % mpred_system_goal_expansion(G,GO):-G\=isa(_,_),was_isa(G,I,C),GO=isa(I,C).
 % ISA EVER
 %mpred_term_expansion(G,GO):-  \+ t_l:disable_mpred_term_expansions_locally,was_isa(G,I,C),GO=isa(I,C).
 
-module_local_init:-mpred_add(tCol(tCol)).
-module_local_init:-mpred_add(tCol(ttPredType)).
+lmconf:module_local_init:-mpred_add(tCol(tCol)).
+lmconf:module_local_init:-mpred_add(tCol(ttPredType)).
 
 
-:- module_local_init.
+:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
+
+:- lmconf:module_local_init.
 
 

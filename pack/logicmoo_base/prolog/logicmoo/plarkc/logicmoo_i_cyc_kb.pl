@@ -90,13 +90,13 @@
             wkb2/0,
             wkbe/0
           ]).
-:- multifile
-        '$load_context_module'/3,
+:- was_shared_multifile   
         argGenl/3,
         argIsa/3,
         argQuotedIsa/3.
-:- dynamic
-        '$load_context_module'/3,
+:- was_dynamic
+  
+        
         addTiny_added/1,
         argGenl/3,
         argIsa/3,
@@ -112,15 +112,15 @@
 isa_db(I,C):-clause(isa(I,C),true).
 
 
-:- dynamic((exactlyAssertedEL/4,exactlyAssertedEL/5,exactlyAssertedEL/6,exactlyAssertedEL/7)).
-:- dynamic((exactlyAssertedEL_next/4,exactlyAssertedEL_next/5,exactlyAssertedEL_next/6,exactlyAssertedEL_next/7)).
-:- dynamic((exactlyAssertedEL_first/4,exactlyAssertedEL_first/5,exactlyAssertedEL_first/6,exactlyAssertedEL_first/7)).
-:- dynamic(assertedTinyKB_implies_first/4).
-:- dynamic(assertedTinyKB_not_first/3).
-:- dynamic((exactlyAssertedEL_first/5,exactlyAssertedEL_with_vars/5,exactlyAssertedEL_with_vars/6,assertedTinyKB_implies_Already/4)).
+:- was_dynamic((exactlyAssertedEL/4,exactlyAssertedEL/5,exactlyAssertedEL/6,exactlyAssertedEL/7)).
+:- was_dynamic((exactlyAssertedEL_next/4,exactlyAssertedEL_next/5,exactlyAssertedEL_next/6,exactlyAssertedEL_next/7)).
+:- was_dynamic((exactlyAssertedEL_first/4,exactlyAssertedEL_first/5,exactlyAssertedEL_first/6,exactlyAssertedEL_first/7)).
+:- was_dynamic(assertedTinyKB_implies_first/4).
+:- was_dynamic(assertedTinyKB_not_first/3).
+:- was_dynamic((exactlyAssertedEL_first/5,exactlyAssertedEL_with_vars/5,exactlyAssertedEL_with_vars/6,assertedTinyKB_implies_Already/4)).
 
 
-:-dynamic(cycPrepending/2).
+:- was_dynamic(cycPrepending/2).
 cycPrepending(ft,'AssertedAssertion').
 cycPrepending(ft,'Assertion').
 cycPrepending(ft,'Atom').
@@ -221,7 +221,7 @@ cycPrepending(pt,A):-atom(A),atom_contains(A,'Predicate').
 
 
 
-:- dynamic cyc_to_plarkc/2.
+:- was_dynamic cyc_to_plarkc/2.
 
 
 cyc_to_plarkc('between', cycBetween).
@@ -248,7 +248,7 @@ cyc_to_plarkc('dot_holds', 't').
 
 
 
-:-dynamic(mpred_to_cyc/2).
+:- was_dynamic(mpred_to_cyc/2).
 
 mpred_to_cyc(P,C):- cyc_to_plarkc(C,P),!.
 mpred_to_cyc(ftInt,'Integer').
@@ -350,14 +350,14 @@ mpred_to_cyc(vSaturday, 'Saturday').
 
 
 
-:-forall(cycPrepending(AT,A),((atom_concat(AT,A,FT),asserta(mpred_to_cyc(FT,A))))).
+:- forall(cycPrepending(AT,A),((atom_concat(AT,A,FT),asserta(mpred_to_cyc(FT,A))))).
 
 
 notFormatType(tThing).
 notFormatType(tIndividual).
 notFormatType(tInferenceSupportedFunction).
 
-:-forall(notFormatType(NFT),mpred_add(tSet(NFT))).
+:- forall(notFormatType(NFT),mpred_add(tSet(NFT))).
 
 
 expT('SubLExpressionType').
@@ -390,7 +390,7 @@ isRT(X):- tinyKB1(genls(X,'tFunction')).
 maybe_ruleRewrite(I,O):-ruleRewrite(I,O),!.
 maybe_ruleRewrite(IO,IO).
 
-:-dynamic(cyc_to_plarkc/2).
+:- was_dynamic(cyc_to_plarkc/2).
 
 mwkb1:- tell(fooooo0),
       ignore(( tinyKB(D), maybe_ruleRewrite(D,E),format('~q.~n',[tinyKB0(E)]),attvar_op(asserta_if_new,tinyKB0(E)),fail)),
@@ -454,7 +454,7 @@ wkb2:- tell(fooooo2),
       told.
 
 
-:-export(cyc_to_mpred_idiom/2).
+:- was_export(cyc_to_mpred_idiom/2).
 %cyc_to_mpred_idiom(different,dif).
 cyc_to_mpred_idiom(X,X):- \+ atom(X),!,fail.
 cyc_to_mpred_idiom(C,P):-cyc_to_plarkc(C,P),!.
@@ -523,7 +523,7 @@ make_kw_functor(F,A,CYCL,PREFIX):-make_functor_h(CYCL,F,A),CYCL=..[F|ARGS],label
 label_args(_PREFIX,_,[]).
 label_args(PREFIX,N,[ARG|ARGS]):-atom_concat(PREFIX,N,TOARG),ignore(TOARG=ARG),!,N2 is N+1,label_args(PREFIX,N2,ARGS).
 
-:-thread_local thocal:outer_pred_expansion/2.
+:- thread_local thocal:outer_pred_expansion/2.
 
 cyc_to_clif_notify(B,A):- cyc_to_clif(B,A) -> B\=@=A, nop(dmsg(B==A)).
 %cyc_to_clif_entry(I,O):-fail,cyc_to_clif(I,M),!,must((functor(I,FI,_),functor(M,MF,_),FI==MF)),O=M.
@@ -541,12 +541,12 @@ cyc_to_clif(HOLDS,HOLDSOUT):-HOLDS=..[F|HOLDSL],
 
 
 /*
-:-dynamic(argIsa/3).
-:-multifile(argIsa/3).
-:-dynamic(argGenl/3).
-:-multifile(argGenl/3).
-:-dynamic(argQuotedIsa/3).
-:-multifile(argQuotedIsa/3).
+:- was_dynamic(argIsa/3).
+:- was_shared_multifile(argIsa/3).
+:- was_dynamic(argGenl/3).
+:- was_shared_multifile(argGenl/3).
+:- was_dynamic(argQuotedIsa/3).
+:- was_shared_multifile(argQuotedIsa/3).
 isa(I,C):-exactlyAssertedEL(isa,I,C,_,_).
 genls(I,C):-exactlyAssertedEL(genls,I,C,_,_).
 arity(I,C):-exactlyAssertedEL(arity,I,C,_,_).
@@ -644,7 +644,7 @@ needs_indexing(V):-compound(V),arg(_,V,A),not(is_simple_arg(A)),!,fail.
 is_simple_arg(A):-not(compound(A)),!.
 is_simple_arg(A):-functor(A,Simple,_),tEscapeFunction(Simple).
 
-:- dynamic(vtUnreifiableFunction/1).
+:- was_dynamic(vtUnreifiableFunction/1).
 'tEscapeFunction'('TINYKB-ASSERTION').
 'tEscapeFunction'('aQuoteFn').
 'tEscapeFunction'(X):- 'vtUnreifiableFunction'(X).
@@ -661,7 +661,7 @@ is_better_backchained(V):-unnumbervars(V,FOO),(((each_subterm(FOO,SubTerm),nonva
 as_cycl(VP,VE):-subst(VP,('-'),(neg),V0),subst(V0,('v'),(or),V1),subst(V1,('exists'),(thereExists),V2),subst(V2,('&'),(and),VE),!.
 
 
-:-dynamic(addTiny_added/1).
+:- was_dynamic(addTiny_added/1).
 addCycL(V):-addTiny_added(V),!.
 addCycL(V):-into_mpred_form(V,M),V\=@=M,!,addCycL(M),!.
 addCycL(V):-defunctionalize('implies',V,VE),V\=@=VE,!,addCycL(VE).
@@ -687,7 +687,7 @@ addCycL1(V):-asserta(addTiny_added(V)),unnumbervars(V,VE),must(nop(remQueuedTiny
 
 sent_to_conseq(CycLIn,Consequent):- into_mpred_form(CycLIn,CycL), ignore((tiny_support(CycL,_MT,CALL),retract(CALL))),must(cycLToMpred(CycL,Consequent)),!.
 
-:-dynamic(addTiny_added/1).
+:- was_dynamic(addTiny_added/1).
 
 cycLToMpred(V,CP):-into_mpred_form(V,M),V\=@=M,!,cycLToMpred(M,CP),!.
 cycLToMpred(V,CP):-cyc_to_clif(V,VE),V\=@=VE,!,cycLToMpred(VE,CP).
@@ -754,21 +754,21 @@ make_functorskel(F,N,fskel(F,DBASE,Call,I,NList,MtVars,Call2)):-typical_mtvars(M
 %
 % ============================================
 
-:-dynamic(isCycUnavailable_known/1).
-:-dynamic(isCycAvailable_known/0).
+:- was_dynamic(isCycUnavailable_known/1).
+:- was_dynamic(isCycAvailable_known/0).
 
 /*
-:-export(isCycAvailable/0).
+:- was_export(isCycAvailable/0).
 isCycAvailable:-isCycUnavailable_known(_),!,fail.
 isCycAvailable:-isCycAvailable_known,!.
 isCycAvailable:-checkCycAvailablity,isCycAvailable.
 
-:-export(isCycUnavailable/0).
+:- was_export(isCycUnavailable/0).
 isCycUnavailable:-isCycUnavailable_known(_),!.
 isCycUnavailable:-isCycAvailable_known,!,fail.
 isCycUnavailable:-checkCycAvailablity,isCycUnavailable.
 
-:-export(checkCycAvailablity/0).
+:- was_export(checkCycAvailablity/0).
 checkCycAvailablity:- (isCycAvailable_known;isCycUnavailable_known(_)),!.
 checkCycAvailablity:- ccatch((current_predicate(invokeSubL/2),ignore((invokeSubL("(+ 1 1)",R))),(R==2->assert_if_new(isCycAvailable_known);assert_if_new(isCycUnavailable_known(R)))),E,assert_if_new(isCycUnavailable_known(E))),!.
 */

@@ -93,7 +93,7 @@
             xlisting/1,
             xlisting_inner/3
           ]).
-:- multifile        
+:- multifile     
         shared_hide_data/1,
         synth_clause_for/5.
 :- meta_predicate maybe_separate(*,0).
@@ -469,7 +469,7 @@ sourceTextPredicateSource(_):-fail.
 
 :- thread_local(t_l:large_predicates/2).
 
-plisting_1:-plisting(kbp:spftY(_,_,_,_)).
+plisting_1:-plisting(kbp:spft(umt,_,_,_,_)).
 
 synth_clause_for(G,true,0,244,SYNTH):-  bookeepingPredicateXRef(G), cnotrace(( \+ listing_filter(hideMeta))), SYNTH=on_x_fail(G).
 synth_clause_for(G,B,Ref,Size,SYNTH):- cur_predicate(_,G), ((cnotrace(( \+ bookeepingPredicateXRef(G), \+ sourceTextPredicate(G), \+ listing_filter(G))))), 
@@ -532,7 +532,7 @@ term_matches_hb(D,F/A,H,B):-atom(F),var(A),!,term_matches_hb(D,(functor(F);same(
 term_matches_hb(D,F/A,H,B):-var(F),integer(A),!,term_matches_hb(D,(arity(A);same(F/A)),H,B).
 term_matches_hb(D,HO,H,B):- \+ \+ term_matches_unify(D,HO,(H:-B)).
 
-% ?- xlisting((h(depth(0,pt/2)),same(tBird(A)))).
+% ?- xlisting((h(depth(0,pt/3)),same(tBird(A)))).
 
 :- export(term_matches_unify/3).
 term_matches_unify(_R,same(HO),V):-HO=@=V.

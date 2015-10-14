@@ -14,7 +14,7 @@
 :- meta_predicate transfer_predicate(?,0,0).
 :- meta_predicate transTiny(?,0).
 
-:- dynamic(cwtdl_failed/1).
+:- was_dynamic(cwtdl_failed/1).
 
 cwtdl(Goal,DL,TL):- cwc,
   notrace((ignore((stop_rtrace,
@@ -61,8 +61,8 @@ reallyLoadTiny:- mpred_no_trace.
 
 %TODO FIX :-mpred_add((((cycl(X),{must(cyc_to_clif(X,Y))}) ==> clif(Y)))).
 
-:-mpred_no_trace.
-:-mpred_add((((cycl('$VAR'('X')),{must(cyc_to_clif('$VAR'('X'),'$VAR'('Y')))}) ==> clif('$VAR'('Y'))))).
+:- mpred_no_trace.
+:- mpred_add((((cycl('$VAR'('X')),{must(cyc_to_clif('$VAR'('X'),'$VAR'('Y')))}) ==> clif('$VAR'('Y'))))).
 
 % ?-listing(cycl).
 
@@ -78,9 +78,9 @@ tHominid(iExplorer2).
 /*
 :- transTiny(Form,(ground(Form),functor(Form,F,1),F\==neg)).
 
-:-set_gui_debug(false).
-:-set_no_debug.
-:-set_no_debug_thread.
+:- set_gui_debug(false).
+:- set_no_debug.
+:- set_no_debug_thread.
 
 :- transfer_predicate(tinyK8(Form), ( \+ contains_term('$VAR'(_),Form)) , mpred_add((Form))).
 

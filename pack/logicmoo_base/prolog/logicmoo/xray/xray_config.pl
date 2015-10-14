@@ -26,8 +26,8 @@ show_call_value1(N,V):- V -> dmsg(N=V) ; dmsg(N=false).
 
 :- no_lemma_handling,lemma_configuration.   % indicated by lemma_handling_flag
 
-:- dynamic(delta_ordering/1).
-:- dynamic(verbose_flag/0).
+:- was_dynamic(delta_ordering/1).
+:- was_dynamic(verbose_flag/0).
 
 %%% ----------------------------------------------------------------------
 %%% PTTP CONFIGURATION
@@ -146,7 +146,7 @@ no_verbose_mode.
 :- verbose_mode.                         % default is to print proof
 
 %%% verbose predicate, chatting if verbose_mode is turned on
-:-abolish(verbose,1).
+:- abolish(verbose,1).
 verbose(X) :-
 	verbose_flag ->
 	        dmsg(X),nl;

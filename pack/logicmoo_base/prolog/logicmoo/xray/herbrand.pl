@@ -1,11 +1,11 @@
 
 
-:- dynamic(herbrandize).
+:- was_dynamic(herbrandize).
 herbrandize.
 :- retractall(herbrandize).
 
-:- multifile(herbrand/1).
-:- dynamic(herbrand/1).
+:- was_shared_multifile(herbrand/1).
+:- was_dynamic(herbrand/1).
 
 add_herbrand_preds((Head :- Body),(Head :- Body1)) :- herbrandize ,!,
 	herbrandize_variables(Body,[],BodyVars,false,_),

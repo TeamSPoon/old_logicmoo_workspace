@@ -1,9 +1,9 @@
 :-abolish(pttp_prove,6).
-:-abolish(search_cost,3).
-:-abolish(search,6).
-:-abolish(make_wrapper,3).
-:-abolish(add_features,2).
-:-abolish(add_args,13).
+:- abolish(search_cost,3).
+:- abolish(search,6).
+:- abolish(make_wrapper,3).
+:- abolish(add_features,2).
+:- abolish(add_args,13).
 
 
 %%% ****h* PTTP/PTTP-dalit
@@ -43,7 +43,7 @@
 %%%   to replace changed definitions.
 %%% SOURCE
 
-:-abolish(pttp_prove,6).
+:- abolish(pttp_prove,6).
 pttp_prove(Goal,Max,Min,Inc,ProofIn,ProofOut):-dalit_prove(Goal,Max,Min,Inc,ProofIn,ProofOut).
 
 dalit_prove(Goal,Max,Min,Inc,ProofIn,ProofOut) :-
@@ -71,7 +71,7 @@ dalit_prove(Goal,Max) :-
 dalit_prove(Goal) :-
 	dalit_prove(Goal,10000,0,1,[],_).
 
-:-abolish(search_cost,3).
+:- abolish(search_cost,3).
 search_cost(Body,HeadArgs,N):-dalit_search_cost(Body,HeadArgs,N).
 dalit_search_cost(Body,HeadArgs,N) :-
 	Body = dalit_search_cost(M) ->
@@ -92,7 +92,7 @@ dalit_search_cost(Body,HeadArgs,N) :-
 	%true ->
 		N = 1.
 
-:-abolish(search,6).
+:- abolish(search,6).
 search(Goal,Max,Min,Inc,PrevInc,DepthIn):-dalit_search(Goal,Max,Min,Inc,PrevInc,DepthIn).
 
 dalit_search(_Goal,Max,Min,_Inc,_PrevInc,_DepthIn) :-
@@ -108,7 +108,7 @@ dalit_search(Goal,Max,Min,Inc,_PrevInc,DepthIn) :-
 	Min1 is Min + Inc,
 	dalit_search(Goal,Max,Min1,Inc,Inc,DepthIn).
 
-:-abolish(make_wrapper,3).
+:- abolish(make_wrapper,3).
 make_wrapper(Body,HeadArgs,N):-dalit_make_wrapper(Body,HeadArgs,N).
 
 dalit_make_wrapper(_DefinedPreds,[query,0],true) :-
@@ -157,7 +157,7 @@ dalit_make_wrapper(DefinedPreds,[P,N],Result) :-
 query(PosAncestors,NegAncestors,DepthIn,ProofIn,ProofOut) :-
 	int_query(PosAncestors,NegAncestors,DepthIn,ProofIn,ProofOut,query).
 
-:-abolish(add_features,2).
+:- abolish(add_features,2).
 add_features(A,B):-dalit_add_features(A,B).
 
 dalit_add_features((Head :- Body),(Head1 :- Body1)) :-
@@ -204,7 +204,7 @@ dalit_add_features((Head :- Body),(Head1 :- Body1)) :-
 		    L1),
 	Head1 =.. [IntP|L1].
 
-:-abolish(add_args,13).
+:- abolish(add_args,13).
 
 add_args(INFO,Body,PosGoal,GoalAtom,HeadArgs,
          PosAncestors,NegAncestors,

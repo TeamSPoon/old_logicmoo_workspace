@@ -3,8 +3,8 @@
 
 :- use_module(library(settings)).
 
-:- multifile http:location/3.
-:- dynamic   http:location/3.
+:- was_shared_multifile http:location/3.
+:- was_dynamic http:location/3.
 
 :- use_module(library(memfile)).
 :- use_module(logicmoo_base).
@@ -153,7 +153,7 @@ hup(_Signal) :-
 % :- if_startup_script((http_server(http_dispatch, [ port(3050), workers(16) ]), debug(http_request(_)),debug(cm(_)),debug(swish(_)),debug(storage))).
 
 
-:- export(do_semweb_startup/0).
+:- was_export(do_semweb_startup/0).
 do_semweb_startup:-
    predicate_property(mpred_online:semweb_startup,number_of_clauses(N1)),
    forall(clause(mpred_online:semweb_startup,Body,Ref),must(do_ref_job(Body,Ref))),
@@ -183,18 +183,18 @@ do_semweb_startup:-
 % mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(asserta(prolog_debug:debugging(http(X), false, O)))).
 % mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),show_call(asserta(prolog_debug:debugging((X), false, O)))).
 
-:-multifile(pre_file_search_path/2).
+:- was_shared_multifile(pre_file_search_path/2).
 
 % user:pre_file_search_path(_,_):-!,fail.
 
-:- multifile
+:- was_shared_multifile
 	sandbox:safe_primitive/1,		% Goal
 	sandbox:safe_meta_predicate/1,		% Name/Arity
 	sandbox:safe_meta/2,			% Goal, Calls
 	sandbox:safe_global_variable/1,		% Name
 	sandbox:safe_directive/1.		% Module:Goal
 
-:- multifile(prolog:sandbox_allowed_clause/1).
+:- was_shared_multifile(prolog:sandbox_allowed_clause/1).
 
 prolog:sandbox_allowed_clause(Clause):-nonvar(Clause).
 
@@ -221,7 +221,7 @@ normal_verify_predefined_safe_declarations :-
 
 % must sneak around pengines security! (we make it dynamic .. but if it loads before we do we have to kill it)
 :- abolish(sandbox:verify_predefined_safe_declarations,0).
-:- multifile(sandbox:verify_predefined_safe_declarations).
+:- was_shared_multifile(sandbox:verify_predefined_safe_declarations).
 :- asserta(sandbox:verify_predefined_safe_declarations).
 :- asserta((sandbox:safe_primitive(X):-nonvar(X))),!.
 :- asserta((sandbox:safe_primitive(P):-var(P),!,current_predicate(F/A),functor(P,F,A))).
@@ -232,4 +232,4 @@ sandbox:safe_global_variable(V):-nonvar(V).
 sandbox:safe_directive(V):-nonvar(V).
 
 
-:-endif.
+:- endif.

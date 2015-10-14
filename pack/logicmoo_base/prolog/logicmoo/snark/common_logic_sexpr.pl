@@ -2,7 +2,7 @@
 
 
 
-:- dynamic   user:file_search_path/2.
+:- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
 
 :- prolog_load_context(directory,Dir),
@@ -19,7 +19,7 @@
 % % :- use_module(logicmoo(plarkc/mpred_cyc_api)).
 
 
-:-export(fixvars/4).
+:- was_export(fixvars/4).
 
 fixvars(P,_,[],P):-!.
 fixvars(P,N,[V|VARS],PO):-  
@@ -37,8 +37,8 @@ clip_qm(QA,AO):-atom_concat('??',A1,QA),!,atom_concat('_',A1,A),clip_us(A,AO).
 clip_qm(QA,AO):-atom_concat('?',A,QA),!,clip_us(A,AO).
 clip_qm(A,AO):-clip_us(A,AO).
 
-:-meta_predicate(sexpr_sterm_to_pterm(?,?)).
-:-meta_predicate(sexpr_sterm_to_pterm_list(?,?)).
+:- meta_predicate(sexpr_sterm_to_pterm(?,?)).
+:- meta_predicate(sexpr_sterm_to_pterm_list(?,?)).
 sexpr_sterm_to_pterm([S|TERM],PTERM):- (S == ('=>')),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..['=>'|PLIST])),!.
 sexpr_sterm_to_pterm([S|TERM],PTERM):- (S == ('<=>')),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..['<=>'|PLIST])),!.
 sexpr_sterm_to_pterm(VAR,'$VAR'(V)):-atom(VAR),atom_concat('?',_,VAR),clip_qm(VAR,V),!.
@@ -118,19 +118,19 @@ input_to_forms("
       Clause,Vars).
 
 // ==================================================================== */
-:-export(input_to_forms/2).
+:- was_export(input_to_forms/2).
 input_to_forms(FormsOut,Vars):- 
     current_input(In),
     input_to_forms(In, FormsOut,Vars).
 
-:-export(input_to_forms/3).
+:- was_export(input_to_forms/3).
 input_to_forms(In,FormsOut,Vars):-
     (is_stream(In) ->
        with_stream_pos(In,get_input_to_forms(In,FormsOut,Vars));
        get_input_to_forms(In,FormsOut,Vars)).
 
 
-:-export(get_input_to_forms/3).
+:- was_export(get_input_to_forms/3).
 get_input_to_forms(In,FormsOut,Vars):-
     parse_sexpr(In, Forms0)->
     to_untyped(Forms0, Forms1)->
@@ -161,7 +161,7 @@ parse_sexpr(String, Expr) :- string(String),!,string_codes(String,Codes),parse_s
 
 parse_sexpr_codes(Codes, Expr) :- phrase(sexpr(Expr), Codes).
 
-:-export(sexpr//1).
+:- was_export(sexpr//1).
 
 % Use DCG for parser.
 
@@ -196,7 +196,7 @@ sexprs([H|T]) --> sexpr(H), !, sexprs(T).
 sexprs([]) --> [].
 
 
-:-export(sexpr_list//1).
+:- was_export(sexpr_list//1).
 
 sexpr_list([]) --> ")", !.
 sexpr_list(_) --> ".", [C], {\+ sym_char(C)}, !, {fail}.
@@ -245,12 +245,12 @@ sym_char(C) :- C > 32, not(member(C,[34,59,40,41,35,39,44,96])).
 
 
 
-:-thread_local(t_l:s2p/1).
+:- thread_local(t_l:s2p/1).
 
 
 to_unbackquote(I,O):-to_untyped(I,O).
 
-:-export(to_untyped/2).
+:- was_export(to_untyped/2).
 to_untyped(Var,'$VAR'(Name)):-svar(Var,Name),!.
 to_untyped(S,S):- string(S).
 to_untyped(S,S):- number(S).
@@ -281,7 +281,7 @@ remove_incompletes([N=_|Before],CBefore):-var(N),!,
 remove_incompletes([NV|Before],[NV|CBefore]):-
  remove_incompletes(Before,CBefore).
 
-:-export(extract_lvars/3).
+:- was_export(extract_lvars/3).
 extract_lvars(A,B,After):-
      b_getval('$variable_names',Before),
      remove_incompletes(Before,CBefore),!,
@@ -312,7 +312,7 @@ svar(VAR,NameU):-atom(VAR),atom_concat('?',Name,VAR),ok_varname(Name),svar_fixva
 svar(Var,Var):-var(Var),!.
 
 
-:-export(svar_fixvarname/2).
+:- was_export(svar_fixvarname/2).
 svar_fixvarname(SVARIN,UP):- compound(SVARIN),!, SVARIN = '?'(SVAR),!,atom(SVAR), svar_fixvarname(SVAR,UP).
 svar_fixvarname(SVAR,UP):- \+ atom(SVAR),trace,UP=SVAR.
 svar_fixvarname(SVAR,UP):- atom(SVAR)->(ok_varname(SVAR),fix_varcase(SVAR,UP),must(ok_varname(UP)));UP=SVAR.
@@ -324,15 +324,15 @@ fix_varcase0(Word,Word):-upcase_atom(Word,UC),UC=Word,!.
 fix_varcase0(Word,WordC):-downcase_atom(Word,UC),UC=Word,!,name(Word,[F|R]),to_upper(F,U),name(WordC,[U|R]).
 fix_varcase0(Word,Word). % mixed case
 
-:-export(ok_varname/1).
+:- was_export(ok_varname/1).
 ok_varname(Name):- number(Name).
 ok_varname(Name):- atom(Name),atom_codes(Name,[C|_List]),char_type(C,csym).
 
-%:-export(ok_codes_in_varname/1).
+%:- was_export(ok_codes_in_varname/1).
 %ok_codes_in_varname([]).
 %ok_codes_in_varname([C|List]):-!,ok_in_varname(C),ok_codes_in_varname(List).
 
-%:-export(ok_in_varname/1).
+%:- was_export(ok_in_varname/1).
 %ok_in_varname(C):-sym_char(C),\+member(C,`!@#$%^&*?()`).
 
 
@@ -477,7 +477,7 @@ bind_arguments([A|As], [V|Vs], Bs0, Bs) :-
 run(S):-'format'('~n~s~n',[S]),run(S,V),writeq(V).
 
 
-:-meta_predicate(if_script_file_time(0)).
+:- meta_predicate(if_script_file_time(0)).
 
 if_script_file_time(X):-if_startup_script_local(time(X)).
 
@@ -562,11 +562,11 @@ if_startup_script_local(_).
 
 /*
 
-:-export(lmconf:rff/0).
+:- was_export(lmconf:rff/0).
 
 lmconf:rff:-lmconf:rff(wdmsg(n(first)),wdmsg(n(retry)),wdmsg(n(success)),wdmsg(n(failure))).
 
-:-export(lmconf:rff/4).
+:- was_export(lmconf:rff/4).
 lmconf:rff(OnFirst,OnRetry,OnSuccess,OnFailure) :- CU = was(never,first),
   call_cleanup((
     process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure),
@@ -576,7 +576,7 @@ lmconf:rff(OnFirst,OnRetry,OnSuccess,OnFailure) :- CU = was(never,first),
     process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure),
     CU \= was(second, _))).
 
-:-export(process_rff/5).
+:- was_export(process_rff/5).
 process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure):-
    wdmsg(next(CU)),
    once(((CU==was(first,first)->OnFirst;true),

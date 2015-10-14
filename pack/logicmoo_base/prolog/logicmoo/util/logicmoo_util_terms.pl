@@ -55,7 +55,7 @@
          flatten_set/2,
          at_start/1,
          in_thread_and_join/1,
-         in_thread_and_join/2,               
+         in_thread_and_join/2,
          make_list/3,
          throw_if_true_else_fail/2,
          %if_file_exists/1,
@@ -202,7 +202,7 @@
            %exists_file_safe/1,
            %exists_directory_safe/1,
            %eraseall/2,
-           %time_file_safe/2,         
+           %time_file_safe/2,
 
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
@@ -226,14 +226,14 @@ is_proof(P):-compound(P),functor(P,ftProofFn,_).
 
 % What would be a good way to describe the manipulations?
 % Function: maptree func expr many
-% Try applying Lisp function func to various sub-expressions of expr. 
-% Initially, call func with expr itself as an argument. 
-% If this returns an expression which is not equal to expr, apply func again 
-% until eventually it does return expr with no changes. Then, if expr is a function call, 
-% recursively apply func to each of the arguments. This keeps going until no 
-% changes occur anywhere in the expression; this final expression is returned by maptree. 
-% Note that, unlike simplification rules, func functions may not make destructive changes to expr. 
-% If a third argument many is provided, it is an integer which says how many times func may be applied; 
+% Try applying Lisp function func to various sub-expressions of expr.
+% Initially, call func with expr itself as an argument.
+% If this returns an expression which is not equal to expr, apply func again
+% until eventually it does return expr with no changes. Then, if expr is a function call,
+% recursively apply func to each of the arguments. This keeps going until no
+% changes occur anywhere in the expression; this final expression is returned by maptree.
+% Note that, unlike simplification rules, func functions may not make destructive changes to expr.
+% If a third argument many is provided, it is an integer which says how many times func may be applied;
 % the default, as described above, is infinitely many times.
 % = :- meta_predicate(maptree(2,+,-)).
 :- export(maptree/3).
@@ -337,7 +337,7 @@ conjoin_op(OP,C1,C2,C):-C =..[OP,C1,C2].
 
 
 read_each_term(S,CMD,Vs):- atom_string(W,S),atom_to_memory_file(W,MF),
- call_cleanup((open_memory_file(MF,read,Stream,[free_on_close(true)]),     
+ call_cleanup((open_memory_file(MF,read,Stream,[free_on_close(true)]),
       findall(CMD-Vs,(
        repeat,
        catch((clpfd:read_term(Stream,CMD,[double_quotes(string),variable_names(Vs)])),_,CMD=end_of_file),
@@ -353,7 +353,7 @@ each_subterm(B, A):- (compound(B), arg(_, B, C), each_subterm(C, A));A=B.
 
 :- export(each_subterm/3).
 each_subterm(A,Pred,B):- call( Pred,A,B).
-each_subterm(A,Pred,O):- 
+each_subterm(A,Pred,O):-
    compound(A),
    once(  A=[H|T] ;  A=..[H|T] ),
    (each_subterm(H,Pred,O);
@@ -362,7 +362,7 @@ each_subterm(A,Pred,O):-
 
 
 :- dynamic(argNumsTracked/3).
-:- dynamic(argNFound/3).
+%:- dynamic(argNFound/3).
 % :-index(argNFound(1,1,1)).
 
 makeArgIndexes(CateSig):-functor_catch(CateSig,F,_),makeArgIndexes(CateSig,F),!.
@@ -395,7 +395,7 @@ in_thread_and_join(Goal,Status):-thread_create(Goal,ID,[]),thread_join(ID,Status
 
 % Usage: predsubst(+Fml,+Pred,?FmlSk)
 
-predsubst(A,Pred, D):- 
+predsubst(A,Pred, D):-
       ccatch(hotrace(nd_predsubst(A,Pred,D)),_,fail),!.
 predsubst(A,_B,A).
 
@@ -404,9 +404,9 @@ nd_predsubst(  Var, _,Var ) :- var(Var),!.
 nd_predsubst(  P, Pred, P1 ) :- functor_catch(P,_,N),nd_predsubst1( Pred, P, N, P1 ).
 
 nd_predsubst1( _,  P, 0, P  ).
-nd_predsubst1( Pred,  P, N, P1 ) :- N > 0, P =.. [F|Args], 
+nd_predsubst1( Pred,  P, N, P1 ) :- N > 0, P =.. [F|Args],
             nd_predsubst2( Pred,  Args, ArgS ),
-            nd_predsubst2( Pred, [F], [FS] ),  
+            nd_predsubst2( Pred, [F], [FS] ),
             univ_term(P1 , [FS|ArgS]).
 
 
@@ -432,7 +432,7 @@ nd_pred_subst(_Pred,  Var, _,_,Var ) :- var(Var),!.
 nd_pred_subst(Pred,  P, X,Sk, P1 ) :- functor(P,_,N),nd_pred_subst1(Pred, X, Sk, P, N, P1 ).
 
 nd_pred_subst1(_Pred, _,  _, P, 0, P  ).
-nd_pred_subst1(Pred, X, Sk, P, N, P1 ) :- N > 0, univ_term(P , [F|Args]), 
+nd_pred_subst1(Pred, X, Sk, P, N, P1 ) :- N > 0, univ_term(P , [F|Args]),
             nd_pred_subst2(Pred, X, Sk, Args, ArgS ),
             nd_pred_subst2(Pred, X, Sk, [F], [FS] ),
             univ_term(P1 , [FS|ArgS]).
@@ -477,9 +477,9 @@ nd_subst(  Var, _,_,Var ) :- var(Var),!.
 nd_subst(  P, X,Sk, P1 ) :- functor(P,_,N),nd_subst1( X, Sk, P, N, P1 ).
 
 nd_subst1( _,  _, P, 0, P  ).
-nd_subst1( X, Sk, P, N, P1 ) :- N > 0, univ_term(P , [F|Args]), 
+nd_subst1( X, Sk, P, N, P1 ) :- N > 0, univ_term(P , [F|Args]),
             nd_subst2( X, Sk, Args, ArgS ),
-            nd_subst2( X, Sk, [F], [FS] ),  
+            nd_subst2( X, Sk, [F], [FS] ),
             univ_term(P1 , [FS|ArgS]).
 
 nd_subst2( _,  _, [], [] ).
@@ -492,7 +492,7 @@ univ_term(P1,[FS|ArgS]):- compound(FS),!,append_term(FS,ArgS,P1).
 univ_term(P1,[FS|ArgS]):- univ_safe(P1 , [FS|ArgS]).
 
 
-wsubst(A,B,C,D):- 
+wsubst(A,B,C,D):-
       ccatch(hotrace(weak_nd_subst(A,B,C,D)),_,fail),!.
 wsubst(A,_B,_C,A).
 

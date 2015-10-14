@@ -148,7 +148,8 @@ mpred_op_prolog(OP,M:Term):-  trace,!,mpred_mop(M, OP,Term).
 mpred_op_prolog(OP,M:Term):- 
   copy_term(Term, Copy, Gs),
   (Gs==[] -> mpred_mop(M,OP,Term);
-    show_call((as_clause(Copy,H,B),conjoin(maplist(call,Gs),B,NB),trace,mpred_mop(M,OP,(H:-NB))))).
+    show_call((
+      as_clause(Copy,H,B),conjoin(maplist(call,Gs),B,NB),trace,mpred_mop(M,OP,(H:-NB))))).
   
 mpred_op_prolog0(OP,MTerm):- call(OP,MTerm).
 

@@ -14,8 +14,8 @@
 %%                                                                           %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- dynamic(body_hooks_flag/0).
-:- dynamic(pred_hooks_flag/0).
+:- was_dynamic(body_hooks_flag/0).
+:- was_dynamic(pred_hooks_flag/0).
 
 %%% ----------------------------------------------------------------------
 %%% HOOKS CONFIGURATION

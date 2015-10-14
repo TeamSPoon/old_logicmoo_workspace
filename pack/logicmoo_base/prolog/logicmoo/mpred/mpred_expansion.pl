@@ -55,7 +55,6 @@
 */
 :- module(mpred_expansion,
           [ acceptable_xform/2,
-            add_from_file/2,
             alt_calls/1,
             any_op_to_call_op/2,
             as_is_term/1,
@@ -121,10 +120,12 @@
             is_meta_functor/3,
             is_pred_declarer/1,
             is_relation_type/1,
+            infix_op/2,
+          is_unit/1,
+          is_unit_functor/1,
             listToE/2,
             map_f/2,
             mpred_expand/2,
-            mpred_term_expansion_file/0,
             must_expand/1,
             reduce_clause/3,
             same_terms/2,
@@ -138,64 +139,62 @@
             translateListOps/8,
             translateOneArg/8,
             translate_args/9,
-            univ_left/2,
-            univ_left0/3,
-            was_isa_syntax/3
+            was_isa_syntax/3,
+          additiveOp/1,
+          comparitiveOp/1
           ]).
 
 :- meta_predicate 
-   add_from_file(0,*),
    % mpred_expansion
    db_expand_maplist(2,*,*,*,*),
    % mpred_expansion
    simply_functors(2,*,*).
-
-:- (module_transparent acceptable_xform/2, add_from_file/2, alt_calls/1, any_op_to_call_op/2, as_is_term/1, compare_op/4, compound_all_open/1, conjoin_l/3, db_expand_0/3, db_expand_1/3, db_expand_2/3, db_expand_3/3, db_expand_4/3, db_expand_5/3, db_expand_a/3, db_expand_a_noloop/3, db_expand_chain/3, db_expand_final/3, db_expand_maplist/5, db_expand_term/3, db_expand_term0/3, db_expand_up/4, db_op_sentence/4, db_op_simpler/3, db_quf/4, db_quf_l/5, db_quf_l_0/5, demodulize/3, do_expand_args/3, do_expand_args_c/3, do_expand_args_l/3, do_expand_args_pa/4, ex_argIsa/3, expand_goal_correct_argIsa/2, expand_props/3, expand_props/4, expand_to_hb/3, expanded_different/2, expanded_different_1/2, expanded_different_ic/2, expands_on/2, foreach_arg/7, from_univ/4, fully_expand/2, fully_expand/3, fully_expand0/3, fully_expand_clause/3, fully_expand_goal/3, fully_expand_head/3, fully_expand_now/3, fully_expand_warn/3, functor_declares_collectiontype/2, functor_declares_instance/2, functor_declares_instance_0/2, holds_args/2, if_expands_on/3, instTypePropsToType/2, into_functor_form/3, into_functor_form/5, into_mpred_form/2, into_mpred_form6/6, into_mpred_form_ilc/2, is_arity_pred/1, is_meta_functor/3, is_pred_declarer/1, is_relation_type/1, listToE/2, map_f/2, mpred_expand/2, mpred_term_expansion_file/0, must_expand/1, reduce_clause/3, same_terms/2, show_all/1, showall/1, simply_functors/3, to_reduced_hb/4, transform_functor_holds/5, transform_holds/3, transform_holds_3/3, translateListOps/8, translateOneArg/8, translate_args/9, univ_left/2, univ_left0/3, was_isa_syntax/3).
           
 :- include('mpred_header.pi').
+:- use_module(logicmoo(mpred/mpred_type_wff)).
 
-:- shared_multifile(was_chain_rule/1).
-:- shared_multifile ruleRewrite/2.
-:- shared_multifile(ptReformulatorDirectivePredicate/1).
-:- shared_multifile(props/2).
+:- was_shared_multifile(was_chain_rule/1).
+:- was_shared_multifile ruleRewrite/2.
+:- was_shared_multifile(kb:ptReformulatorDirectivePredicate/1).
+:- was_shared_multifile(props/2).
 
 default_te(IF,VAR,VAL):-assertz(te_setting(IF,VAR,VAL)).
 
-:-default_te([source_filetype(pl) ],use_te,file_prolog).
-:-default_te([source_filetype(pfc) ],use_te,file_pfc).
-:-default_te([source_filetype(console) ],use_te,file_prolog).
+:- default_te([source_filetype(pl) ],use_te,file_prolog).
+:- default_te([source_filetype(pfc) ],use_te,file_pfc).
+:- default_te([source_filetype(console) ],use_te,file_prolog).
 
-:-default_te(file_prolog,proccess_directive, proccess_directive).
-:-default_te(file_prolog,compile_clause, compile_clause).
-:-default_te(file_prolog,rule_neck, (head :- body)).
-:-default_te(file_prolog,fact_neck, (head :- true)).
+:- default_te(file_prolog,proccess_directive, proccess_directive).
+:- default_te(file_prolog,compile_clause, compile_clause).
+:- default_te(file_prolog,rule_neck, (head :- body)).
+:- default_te(file_prolog,fact_neck, (head :- true)).
 
-:-default_te(file_pfc, compile_clause, mpred_add).
-:-default_te(file_pfc, expand_clause, fully_expand_clause).
-:-default_te(file_pfc, proccess_directive, proccess_directive).
-:-default_te(file_pfc, fact_neck, (clause <- true)).
-:-default_te(file_pfc, rule_neck, (head :- body)).
+:- default_te(file_pfc, compile_clause, mpred_add).
+:- default_te(file_pfc, expand_clause, fully_expand_clause).
+:- default_te(file_pfc, proccess_directive, proccess_directive).
+:- default_te(file_pfc, fact_neck, (clause <- true)).
+:- default_te(file_pfc, rule_neck, (head :- body)).
 
-:-default_te(file_syspreds,isa_detector, always_fail(i,c)).
-:-default_te(file_syspreds,isa_holder, c(i)).
-:-default_te(file_syspreds,isa_varholder, t(c,i)).  % was isa(i,c).
-:-default_te(file_syspreds,pred_holder, head).  % was isa(i,c).
-:-default_te(file_syspreds,pred_varholder, newhead=..[t,pred|args]).
-:-default_te(file_syspreds,proccess_directive, proccess_directive).
-:-default_te(file_syspreds,compile_clause, compile_clause).
-:-default_te(file_syspreds,rule_neck, (head :- body)).
-:-default_te(file_syspreds,fact_neck, (clause :- true)).
-:-default_te(file_syspreds, expand_clause, (=)).
+:- default_te(file_syspreds,isa_detector, always_fail(i,c)).
+:- default_te(file_syspreds,isa_holder, c(i)).
+:- default_te(file_syspreds,isa_varholder, t(c,i)).  % was isa(i,c).
+:- default_te(file_syspreds,pred_holder, head).  % was isa(i,c).
+:- default_te(file_syspreds,pred_varholder, newhead=..[t,pred|args]).
+:- default_te(file_syspreds,proccess_directive, proccess_directive).
+:- default_te(file_syspreds,compile_clause, compile_clause).
+:- default_te(file_syspreds,rule_neck, (head :- body)).
+:- default_te(file_syspreds,fact_neck, (clause :- true)).
+:- default_te(file_syspreds, expand_clause, (=)).
 
-:-default_te(file_syspreds:pred(*), neck_override, (cwc)).
-:-default_te(file_pfc:pred(*), neck_override, (hybrid)).
-:-default_te(file_prolog:pred(*), neck_override, (hybrid)).
+:- default_te(file_syspreds:pred(*), neck_override, (cwc)).
+:- default_te(file_pfc:pred(*), neck_override, (hybrid)).
+:- default_te(file_prolog:pred(*), neck_override, (hybrid)).
 
-:-default_te((:-)/1, compile_clause, proccess_directive).
-:-default_te((:-)/2, rule_neck, clause).
-:-default_te((=>),use_te, file_pfc).
-:-default_te((<==>),use_te, file_pfc).
-:-default_te((<-),use_te, file_pfc).
+:- default_te((:-)/1, compile_clause, proccess_directive).
+:- default_te((:-)/2, rule_neck, clause).
+:- default_te((=>),use_te, file_pfc).
+:- default_te((<==>),use_te, file_pfc).
+:- default_te((<-),use_te, file_pfc).
 
 /*
 % :- directive:  process_directive, call
@@ -229,10 +228,10 @@ Writing in Prolog is actually really easy for a MUD is when the length's chosen
 % Douglas Miles
 */
 
-:-export(show_all/1).
+:- was_export(show_all/1).
 show_all(Call):-doall((show_call(Call))).
 
-:-export(alt_calls/1).
+:- was_export(alt_calls/1).
 alt_calls(call).
 alt_calls(mpred_call).
 alt_calls(is_asserted).
@@ -304,11 +303,11 @@ db_expand_maplist(FE,List,T,G,O):-findall(M, (member(T,List),call(FE,G,M)), ML),
 %   SIMPLISTIC REWRITE (this is not the PRECANONICALIZER)
 % ================================================
 
-:-export(fully_expand/2).
+:- was_export(fully_expand/2).
 fully_expand(X,Y):-fully_expand(_,X,Y).
 
 
-:-mpred_trace_nochilds(fully_expand/3).
+:- mpred_trace_nochilds(fully_expand/3).
 
 must_expand(/*to_exp*/(_)).
 must_expand(props(_,_)).
@@ -371,6 +370,37 @@ as_is_term('call'(_)).
 as_is_term('{}'(_)).
 as_is_term('ignore'(_)).
 
+:- was_export(infix_op/2).
+infix_op(Op,_):-comparitiveOp(Op).
+infix_op(Op,_):-additiveOp(Op).
+
+:- was_export(comparitiveOp/1).
+comparitiveOp((\=)).
+comparitiveOp((\==)).
+comparitiveOp((=)).
+comparitiveOp((=:=)).
+comparitiveOp((==)).
+comparitiveOp((<)).
+comparitiveOp((>)).
+comparitiveOp((=<)).
+comparitiveOp((>=)).
+
+:- was_export(additiveOp/1).
+additiveOp((is)).
+additiveOp((*)).
+additiveOp(+).
+additiveOp(-).
+additiveOp((/)).
+
+
+is_unit(C):-is_ftCompound(C),!, C\=(_:-_),C\=ftRest(_),C\=ftListFn(_),get_functor(C,F),is_unit_functor(F).
+is_unit(C):-is_ftNonvar(C).
+
+is_unit_functor(F):- (\+ atom(F)),!,fail.
+is_unit_functor(F):-atom_concat('sk',_,F).
+is_unit_functor(F):-atom_concat(_,'Fn',F).
+
+
 /*
 as_is_term(NC):-compound(NC),functor(NC,Op,2),infix_op(Op,_).
 */
@@ -419,6 +449,14 @@ db_expand_final(_, MArg1User, NewMArg1User):- is_ftCompound(MArg1User), fail,
    NewMArg1User=..[M,F/A,Arg2|User],!.
 */
 
+
+is_elist_functor(isList).
+is_elist_functor(ftListfn).
+is_elist_functor(isEach).
+is_elist_functor(isAnd).
+
+as_list(EC,AL):-compound(EC),EC=..[IsEach|List],is_elist_functor(IsEach),as_list(List,AL),!.
+as_list(List,AL):-flatten([List],AL),!.
 
 
 listToE(EL,E):-is_ftNonvar(EL),must((ground(EL),as_list(EL,List))),E=..[isEach|List].
@@ -650,7 +688,7 @@ db_quf_l_0(Op, And,[C|C12],PreO,TemplO):-
   conjoin_l(Pre,Pre2,PreO),
   conjoin_op(And,Next,Templ2,TemplO).
 
-:-export(db_quf/4).
+:- was_export(db_quf/4).
 db_quf(_ ,C,Pretest,Template):- \+ (is_ftCompound(C)),!,must(Pretest=true),must(Template=C).
 db_quf(Op,C,Pretest,Template):-is_ftVar(C),!,trace_or_throw(var_db_quf(Op,C,Pretest,Template)).
 db_quf(_ ,C,Pretest,Template):-as_is_term(C),!,must(Pretest=true),must(Template=C),!.
@@ -720,8 +758,8 @@ compare_op(Type,F,OLD,VAL):-nop(Type),show_call((call(F,OLD,VAL))),!.
 % expanded_different compares fact terms to see if they are different
 % ========================================
 
-:-'$hide'(expanded_different/2).
-:-export(expanded_different/2).
+:- '$hide'(expanded_different/2).
+:- was_export(expanded_different/2).
 
 expanded_different(G0,G1):-call(expanded_different_ic(G0,G1)).
 
@@ -738,7 +776,7 @@ expanded_different_1(G0,G1):- G0 \= G1,!.
 % ========================================
 % into_functor_form/3 (adds a second order functor onto most predicates)
 % ========================================
-:-export(into_functor_form/3).
+:- was_export(into_functor_form/3).
 into_functor_form(HFDS,M:X,O):- atom(M),!,into_functor_form(HFDS,X,O),!.
 into_functor_form(HFDS,X,O):-call((( X=..[F|A],into_functor_form(HFDS, X,F,A,O)))),!.
 
@@ -752,8 +790,8 @@ into_functor_form(Dbase_t,_X,F,A,Call):-Call=..[Dbase_t,F|A].
 % ========================================
 % into_mpred_form/2 (removes a second order functors until the common mpred form is left)
 % ========================================
-:-mpred_trace_nochilds(into_mpred_form/2).
-:-export(into_mpred_form/2).
+:- mpred_trace_nochilds(into_mpred_form/2).
+:- was_export(into_mpred_form/2).
 into_mpred_form(V,VO):- \+ (is_ftCompound(V)),!,VO=V.
 into_mpred_form(M:X,M:O):- atom(M),!,into_mpred_form(X,O),!.
 into_mpred_form(Sent,SentO):-is_ftNonvar(Sent),if_defined(lmconf:ruleRewrite(Sent,SentM),fail),into_mpred_form(SentM,SentO).
@@ -854,9 +892,9 @@ holds_args(HOFDS,FIST):- is_ftCompound(HOFDS),HOFDS=..[H|FIST],is_holds_true(H),
 
 
 
-:- export((do_expand_args/3)).
+:- was_export((do_expand_args/3)).
 
-do_expand_args(_,Term,Term):- compound(Term),functor(Term,F,_),mpred_call_shared(argsQuoted(F)),!.
+do_expand_args(_,Term,Term):- compound(Term),functor(Term,F,_),if_defined(argsQuoted(F)),!.
 do_expand_args(Exp,Term,Out):- compound(Term),!,do_expand_args_c(Exp,Term,Out).
 do_expand_args(_,Term,Term).
 
@@ -906,29 +944,12 @@ db_op_sentence(_Op,Prop,ARGS,C0):- atom(Prop),!, C0=..[Prop|ARGS].
 db_op_sentence(_Op,Prop,ARGS,C0):- C0=..[t,Prop|ARGS].
 
 
-:-export(simply_functors/3).
+:- was_export(simply_functors/3).
 simply_functors(Db_pred,query(HLDS,Must),Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=Simpler,!,call(Db_pred,query(HLDS,Must),Simpler).
 simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=Simpler,!,call(Db_pred,Op,Simpler).
 
 
 % -  dmsg_hook(db_op(query(HLDS,call),holds_t(ft_info,tCol,'$VAR'(_)))):-trace_or_throw(dtrace).
-
-% ================================================
-% add_from_file/2
-% ================================================
-add_from_file(B,_):- contains_singletons(B),trace_or_throw(dtrace),dmsg(todo(add_from_file_contains_singletons(B))),!,fail.
-add_from_file(B,B):- mpred_add(B). % db_op(change(assert,_OldV),B),!.
-
-
-univ_left(Comp,[M:P|List]):- is_ftNonvar(M),univ_left0(M, Comp, [P|List]),!.
-univ_left(Comp,[H,M:P|List]):- is_ftNonvar(M),univ_left0(M,Comp,[H,P|List]),!.
-univ_left(Comp,[P|List]):-lmconf:mpred_user_kb(DBASE), univ_left0(DBASE,Comp,[P|List]),!.
-univ_left0(M,M:Comp,List):- Comp=..List,!.
-
-
-mpred_term_expansion_file.
-
-
 
 
 
@@ -942,8 +963,9 @@ end_of_file.
 :- set_prolog_flag(double_quotes, string). 
 
 % these do not get defined!?
-% :- shared_multifile user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
+% :- was_shared_multifile user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
+:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
 
 
@@ -956,224 +978,4 @@ end_of_file.
 end_of_file.
 end_of_file.
 
-:- if(false).
 
-
-
-:-export((force_expand_head/2,force_head_expansion/2)).
-:-export((force_expand_goal/2)).
-force_expand_head(G,GH) :- force_head_expansion(G,GH),!.
-force_expand_goal(A, B) :- force_expand(expand_goal(A, B)).
-
-:-thread_local inside_clause_expansion/1.
-   
-set_list_len(List,A,NewList):-length(List,LL),A=LL,!,NewList=List.
-set_list_len(List,A,NewList):-length(List,LL),A>LL,length(NewList,A),append(List,_,NewList),!.
-set_list_len(List,A,NewList):-length(NewList,A),append(NewList,_,List),!.
-
-
-is_mpred_prolog(F,_):-get_mpred_prop(F,prologDynamic).
-
-declare_as_code(F,A):-findall(n(File,Line),source_location(File,Line),SL),ignore(inside_clause_expansion(CE)),decl_mpred(F,prologDynamic),decl_mpred(F,info(discoveredInCode(F/A,SL,CE))),!.
-if_mud_asserted(F,A2,_,_Why):-is_mpred_prolog(F,A2),!,fail.
-if_mud_asserted(F,A2,A,Why):-using_holds_db(F,A2,A,Why).
-
-
-is_kb_module(Moo):-atom(Moo),member(Moo,[add,dyn,abox,tbox,kb,opencyc]).
-is_kb_mt_module(Moo):-atom(Moo),member(Moo,[moomt,kbmt,mt]).
-
-:-export(if_use_holds_db/4).
-if_use_holds_db(F,A2,_,_):- is_mpred_prolog(F,A2),!,fail.
-if_use_holds_db(F,A,_,_):-  never_use_holds_db(F,A,_Why),!,fail.
-if_use_holds_db(F,A2,A,Why):- using_holds_db(F,A2,A,Why),!.
-if_use_holds_db(F,A,_,_):- declare_as_code(F,A),fail.
-
-never_use_holds_db(F,N,Why):-trace_or_throw(todo(find_impl,never_use_holds_db(F,N,Why))).
-
-isCycPredArity_Check(F,A):-get_mpred_prop(F,cycPred(A)).
-
-using_holds_db(F,A,_,_):- never_use_holds_db(F,A,_),!,fail.
-using_holds_db(F,A2,A,m2(F,A2,isCycPredArity_Check)):- integer(A2), A is A2-2, A>0, isCycPredArity_Check(F,A),!.
-using_holds_db(F,A,A,tCol(F/A)):- integer(A), tCol(F),!, must(A>0).
-using_holds_db(F,A,A,isCycPredArity_Check):- isCycPredArity_Check(F,A).
-using_holds_db(F,A,A,W):-integer(A),!,fail,trace_or_throw(wont(using_holds_db(F,A,A,W))).
-
-ensure_moo_pred(F,A,_,_):- never_use_holds_db(F,A,Why),!,trace_or_throw(never_use_holds_db(F,A,Why)).
-ensure_moo_pred(F,A,A,is_mpred_prolog):- is_mpred_prolog(F,A),!.
-ensure_moo_pred(F,A,NewA,Why):- using_holds_db(F,A,NewA,Why),!.
-ensure_moo_pred(F,A,A,Why):- dmsg(once(ensure(Why):decl_mpred(F,A))),decl_mpred(F,A).
-
-prepend_module(_:C,M,M:C):-!.
-prepend_module(C,M,M:C).
-
-negate_wrapper(P,N):-is_ftVar(P),trace_or_throw(call(negate_wrapper(P,N))).
-negate_wrapper(Dbase_t,Dbase_f):-negate_wrapper0(Dbase_t,Dbase_f).
-negate_wrapper(Dbase_f,Dbase_t):-negate_wrapper0(Dbase_t,Dbase_f).
-negate_wrapper(P,N):-trace_or_throw(unkown(negate_wrapper(P,N))).
-
-negate_wrapper0(holds_t,holds_f).
-negate_wrapper0(t,dbase_f).
-negate_wrapper0(int_firstOrder,int_not_firstOrder).
-negate_wrapper0(firstOrder,not_firstOrder).
-negate_wrapper0(asserted_dbase_t,asserted_dbase_f).
-negate_wrapper0(Dbase_t,Dbase_f):- atom_concat(Dbase,'_t',Dbase_t),atom_concat(Dbase,'_f',Dbase_f).
-
-:-thread_local hga_wrapper/3.
-hga_wrapper(t,holds_t,t).
-
-get_goal_wrappers(if_use_holds_db, Holds_t , N):- hga_wrapper(_,Holds_t,_),!,negate_wrapper(Holds_t,N),!.
-get_goal_wrappers(if_use_holds_db, holds_t , holds_f).
-
-get_head_wrappers(if_mud_asserted, Holds_t , N):- hga_wrapper(Holds_t,_,_),!,negate_wrapper(Holds_t,N),!.
-get_head_wrappers(if_mud_asserted, t , dbase_f).
-
-get_asserted_wrappers(if_mud_asserted, Holds_t , N):-  hga_wrapper(_,_,Holds_t),!,negate_wrapper(Holds_t,N),!.
-get_asserted_wrappers(if_mud_asserted, t , t).
-
-try_mud_body_expansion(G0,G2):- ((mud_goal_expansion_0(G0,G1),!,expanded_different(G0, G1),!,lmconf:mpred_user_kb(DBASE))),prepend_module(G1,DBASE,G2).
-mud_goal_expansion_0(G1,G2):- ((get_goal_wrappers(If_use_holds_db, Holds_t , Holds_f),!,Holds_t\=nil ,  mud_pred_expansion(If_use_holds_db, Holds_t - Holds_f,G1,G2))).
-
-try_mud_head_expansion(G0,G2):- ((mud_head_expansion_0(G0,G1),!,expanded_different(G0, G1),!,lmconf:mpred_user_kb(DBASE))),prepend_module(G1,DBASE,G2).
-mud_head_expansion_0(G1,G2):- ((get_head_wrappers(If_mud_asserted, Dbase_t , Dbase_f),!,Dbase_t\=nil, mud_pred_expansion(If_mud_asserted, Dbase_t - Dbase_f,G1,G2))),!.
-
-try_mud_asserted_expansion(G0,G2):-  must(is_compiling_sourcecode),    
-  mud_asserted_expansion_0(G0,G1),!,
-   expanded_different(G0, G1),
-   while_capturing_changes(add_from_file(G1,G2),Changes),!,ignore((Changes\==[],dmsg(add(todo(Changes-G2))))).
-mud_asserted_expansion_0(G1,G2):- ((get_asserted_wrappers(If_mud_asserted, Asserted_dbase_t , Asserted_dbase_f),!,Asserted_dbase_t\=nil,mud_pred_expansion(If_mud_asserted, Asserted_dbase_t - Asserted_dbase_f,G1,G2))),!.
-
-:-export(force_clause_expansion/2).
-
-attempt_clause_expansion(B,BR):- is_ftCompound(B), copy_term(B,BC),snumbervars(BC),!, attempt_clause_expansion(B,BC,BR).
-attempt_clause_expansion(_,BC,_):-inside_clause_expansion(BC),!,fail.
-attempt_clause_expansion(B,BC,BR):- 
-    setup_call_cleanup(asserta(inside_clause_expansion(BC)),
-    force_clause_expansion(B,BR),
-    ignore(retract(inside_clause_expansion(BC)))).
-
-force_clause_expansion(':-'(B),':-'(BR)):- !, w_tl(is_compiling_clause,lmconf:expand_goal(B,BR)).
-force_clause_expansion(B,BR):- w_tl(is_compiling_clause,force_expand(force_clause_expansion0(B,BR))).
-
-force_clause_expansion0(M:((H:-B)),R):- !, mud_rule_expansion(M:H,M:B,R),!.
-force_clause_expansion0(((M:H:-B)),R):- !, mud_rule_expansion(M:H,B,R),!.
-force_clause_expansion0(((H:-B)),R):- mud_rule_expansion(H,B,R),!.
-force_clause_expansion0(H,HR):- try_mud_asserted_expansion(H,HR),!.
-force_clause_expansion0(B,BR):- force_head_expansion(B,BR).
-
-force_expand(Goal):-thread_self(ID),w_tl(lmconf:always_expand_on_thread(ID),Goal),!.
-
-
-force_head_expansion(H,HR):- try_mud_head_expansion(H,HR),!.
-force_head_expansion(H,HR):- force_expand(expand_term(H,HR)).
-
-mud_rule_expansion(H,True,HR):-is_true(True),!,force_clause_expansion(H,HR).  
-% mud_rule_expansion(H,B,HB):- pttp_expansions(H,B),pttp_term_expansion((H:-B),HB).
-mud_rule_expansion(H,B,((HR:-BR))):-force_head_expansion(H,HR),force_expand_goal(B,BR),!.
-
-is_term_head(H):- (( \+ \+ (inside_clause_expansion(H0),!,H=H0))),!.
-%is_term_head(_):- inside_clause_expansion(_),!,fail.
-%is_term_head(H):-H=_, is_our_sources(H).
-
-
-is_our_dir(LM):- user:file_search_path(logicmoo,LM0),absolute_file_name(LM0,LM).
-current_loading_file_path(Path):- prolog_load_context(module,M),!,module_property(M,file(Path)).
-current_loading_file_path(Dir):- prolog_load_context(directory,Dir0),!,absolute_file_name(Dir0,Dir).
-
-is_our_sources(_):- current_loading_file_path(Dir),is_our_dir(LM),atom_concat(LM,_,Dir),!.
-is_our_sources(_):- prolog_load_context(module,user),!,not(prolog_load_context(directory,_)).
-
-
-holds_form(G1,HOLDS,G2):-
-      functor_check_univ(G1,F,List),
-      must_det(holds_form0(F,List,HOLDS,G2L)),
-      univ_left(G2,G2L).
-
-holds_form0(F,[P|List],HOLDS,G2L):-
-      (is_holds_true(F) -> (correct_args_length([P|List],NEWARGS),G2L = [HOLDS|NEWARGS]) ;
-      (is_holds_false(F) -> (correct_args_length([P|List],NEWARGS),negate_wrapper(HOLDS,NHOLDS),G2L = [NHOLDS|NEWARGS]) ;
-      correct_args_length([F,P|List],NEWARGS), G2L= [HOLDS|NEWARGS])).
-
-correct_args_length([F|List],[F|NewList]):-
-   length(List,A),
-   must_det(ensure_moo_pred(F,A,NewA,_)),!,            
-      set_list_len(List,NewA,NewList).
-
-
-xcall_form(G1,G2):-must_det(xcall_form0(G1,G2)).
-xcall_form0(G1,G2):-
-      functor_check_univ(G1,F,List),
-      correct_args_length([F|List],NewList),
-      univ_left(G2,NewList),!.
-
-:- meta_predicate mud_pred_expansion(-,-,-,+).
-
-
-mud_pred_expansion(_Prd,_HNH,G1,_):- \+ (is_ftCompound(G1)),!,fail.
-mud_pred_expansion(_Prd,_HNH,_:G1,_):-is_ftVar(G1),!,fail.
-mud_pred_expansion(_Prd,_HNH,_/_,_):-!,fail.
-mud_pred_expansion(_Prd,_HNH,(_,_),_):-!,fail.
-mud_pred_expansion(_Prd,_HNH,_:_/_,_):-!,fail.
-mud_pred_expansion(Prd,HNH,_:M:G1,G2):- atom(M),!,mud_pred_expansion(Prd,HNH,M:G1,G2).
-mud_pred_expansion(_Prd,_HNH,G1,G2):- functor_safe(G1,F,_),xcall_t==F,!,G2 = (G1),!.
-mud_pred_expansion(Pred,NHOLDS - HOLDS, not(G1) ,G2):-!,mud_pred_expansion(Pred,HOLDS - NHOLDS,G1,G2).
-mud_pred_expansion(Pred,NHOLDS - HOLDS, \+(G1) ,G2):-!,mud_pred_expansion(Pred,HOLDS - NHOLDS,G1,G2).
-
-mud_pred_expansion(Pred, HNH, G0 ,G2):-
- functor_safe(G0,F,1),G1=..[F,MP],
- predicate_property(G0, meta_predicate(G1)),
- member(MP,[:,0,1,2,3,4,5,6,7,8,9]),!,
- G0=..[F,Term],
- mud_pred_expansion(Pred, HNH, Term ,Term2),
-  G2=..[F,Term2],!.
-
-
-mud_pred_expansion(Pred,HNH, Moo:G0,G3):- is_ftNonvar(Moo),is_kb_module(Moo),
-   xcall_form(G0,G1),
-   functor_safe(G1,F,A),
-   ensure_moo_pred(F,A,_,_Why),
-   mud_pred_expansion_0(Pred,HNH,G1,G2),!,G2=G3.
-
-mud_pred_expansion(Pred,HNH, Moo:G1,G3):-  is_ftNonvar(Moo),!, mud_pred_expansion_0(Pred,HNH,Moo:G1,G2),!,G2=G3.
-mud_pred_expansion(Pred,HNH,G1,G3):- mud_pred_expansion_0(Pred,HNH,G1,G2),!,G2=G3.
-
-mud_pred_expansion_0(Pred,HNH,_:G1,G2):-!,is_ftCompound(G1),
-   mud_pred_expansion_1(Pred,HNH,G1,G2),!.
-mud_pred_expansion_0(Pred,HNH,G1,G2):-!,is_ftCompound(G1),
-   mud_pred_expansion_1(Pred,HNH,G1,G2),!.
-
-mud_pred_expansion_1(Pred,HNH,G1,G2):-G1=..[F|ArgList],functor_safe(G1,F,A),mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2).
-
-mud_pred_expansion_2(_,Holds,_,HoldsT-HoldsF,_,_):-member(Holds,[HoldsT,HoldsF]),!,fail.
-mud_pred_expansion_2(_,Holds,_,_,_,_):-member(Holds,[',',';']),!,fail.
-
-mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2):-member(F,[':','.']),!,trace_or_throw(mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2)).
-mud_pred_expansion_2(Pred,F,_,HNH,ArgList,G2):- is_holds_true(F),holds_form_l(Pred,ArgList,HNH,G2).
-mud_pred_expansion_2(Pred,F,_,HOLDS - NHOLDS,ArgList,G2):- is_holds_false(F),holds_form_l(Pred,ArgList,NHOLDS - HOLDS,G2).
-% mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2):-is_2nd_order_holds(F),!,trace_or_throw(mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2)).
-mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2):- call(Pred,F,A,_,_),holds_form_l(Pred,[F|ArgList],HNH,G2).
-
-holds_form_l(Pred,[G1],HNH,G2):-
-   is_ftCompound(G1),not(is_list(G1)),!,
-   mud_pred_expansion(Pred,HNH,G1,G2).
-
-holds_form_l(_,G1,HNH,G2):-do_holds_form(G1,HNH,G2).
-
-do_holds_form([F|List],HOLDS - _NHOLDS,G2):-
-   atom(F),
-   G1=..[F|List],
-   holds_form(G1,HOLDS,G2).
-
-do_holds_form([F|List],HOLDS - _NHOLDS,G2):- G2=..[HOLDS,F|List].
-
-
-
-differnt_assert(G1,G2):- /*cnotrace */ (differnt_assert1(G1,G2)),dmsg(differnt_assert(G1,G2)),dtrace.
-
-differnt_assert1(M:G1,G2):-atom(M),!, differnt_assert1(G1,G2).
-differnt_assert1(G1,M:G2):-atom(M),!, differnt_assert1(G1,G2).
-differnt_assert1(G1,G2):- once(into_mpred_form(G1,M1)),G1\=M1,!, differnt_assert1(M1,G2).
-differnt_assert1(G1,G2):- once(into_mpred_form(G2,M2)),G2\=M2,!, differnt_assert1(G1,M2).
-differnt_assert1(G1,G2):- not((G1 =@= G2)).
-
-
-:- endif.

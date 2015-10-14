@@ -12,7 +12,7 @@
 :- module(mpred_agenda,
           [ will_call_after/2,
             add_later/1,
-            after_mpred_load/0,
+            
             after_mpred_load_pass2/0,
             agenda_do_prequery/0,
             agenda_mpred_repropigate/0,
@@ -40,8 +40,6 @@
             finish_processing_dbase/0,
             gather_fact_heads/2,
             kb_db_op/2,
-            loaded_mpred_file/2,
-            loading_mpred_file/2,
             more_to_do/1,
             mpred_one_minute_timer/0,
             mpred_one_second_timer/0,
@@ -68,12 +66,8 @@
             suspend_timers/0,
             tick_every/3,
             time_tick/2,
-            wfAssert/1,
-            call_OnEachLoad/1
+            wfAssert/1            
           ]).
-:- multifile % (multifile) :-
-        lmconf:hook_one_minute_timer_tick/0,
-        lmconf:hook_one_second_timer_tick/0.
 :- meta_predicate 
    agenda_slow_op_enqueue(0),
         call_after_mpred_load(0),
@@ -91,83 +85,23 @@ show_cgoal(0),
 % mpred_agenda
 time_tick(*,0),
         tick_every(?, ?, 0).
-:- module_transparent % (module_transparent) :-
-        add_later/1,
-        after_mpred_load/0,
-        after_mpred_load_pass2/0,
-        agenda_do_prequery/0,
-        agenda_mpred_repropigate/0,
-        agenda_rescan_for_module_ready/0,
-        agenda_rescan_mpred_ops/0,
-        agenda_slow_op_enqueue/1,
-        agenda_slow_op_restart/0,
+
+:- dynamic
         agenda_slow_op_todo/1,
-        assertOnLoad/1,
-        assert_next/2,
-        call_after/2,
-        call_after_mpred_load_slow/1,
-        call_after_next/2,
-        do_all_of/1,
-        do_all_of_ilc/1,
-        do_all_of_when/1,
-        do_call_OnEachLoad/0,
-        do_stuff_of_ilc/1,
-        doing_agenda_slow_op/0,
-        englishServerInterface/1,
-        ensure_at_least_one_region/0,
-        expire_post_change/2,
-        expire_pre_change/2,
-        finish_processing_dbase/0,
-        gather_fact_heads/2,
-        lmconf:hook_one_minute_timer_tick/0,
-        lmconf:hook_one_second_timer_tick/0,
-        kb_db_op/2,
-        loaded_mpred_file/2,
-        loading_mpred_file/2,
-        more_to_do/1,
-        mpred_one_minute_timer/0,
-        mpred_one_second_timer/0,
-        onEachLoad/1,
-        onLoad/1,
-        reduce_fact_heads/4,
-        rerun_database_hooks/0,
-        rescan_all/0,
-        rescan_duplicated_facts/0,
-        rescan_duplicated_facts/2,
-        rescan_duplicated_facts/3,
-        rescan_mpred_facts_local/0,
-        rescan_mpred_loaded/0,
-        rescan_mpred_loaded_pass2/0,
-        rescandb/0,
-        run_database_hooks/2,
-        run_database_hooks_0/2,
-        run_database_hooks_depth_1/2,
-        setTemplate/1,
-        show_cgoal/1,
-        start_one_minute_timer/0,
-        start_one_second_timer/0,
         suspend_timers/0,
-        time_tick/2,
-        wfAssert/1.
-:- dynamic % (dynamic) :-
-        agenda_slow_op_todo/1,
+        will_call_after/2.
+
+/*
+:- was_dynamic((
         doing_agenda_slow_op/0,
         lmconf:hook_one_minute_timer_tick/0,
         lmconf:hook_one_second_timer_tick/0,
         loaded_mpred_file/2,
         loading_mpred_file/2,
-        suspend_timers/0,
-        will_call_after/2,
-        call_OnEachLoad/1.
-
-
-:- meta_predicate tick_every(*,*,0).
-:- meta_predicate register_timer_thread(*,*,0).
-:- shared_multifile(after_mpred_load/0).
-:- shared_multifile(call_OnEachLoad/1).
-:- shared_multifile(will_call_after/2).
-:- shared_multifile(lmconf:hook_one_minute_timer_tick/0).
-:- shared_multifile(lmconf:hook_one_second_timer_tick/0).
+        
+        
+        )).
+*/
 
 
 register_timer_thread(Name,_Seconds,_OnTick):-current_thread(Name,_Status).
@@ -181,8 +115,6 @@ tick_every(Name,Seconds,OnTick):-repeat,sleep(Seconds),catch(OnTick,E,dmsg(cause
 % Agenda system - source file loading
 % ================================================
 
-:- dynamic((loading_mpred_file/2, lmconf:loaded_mpred_file/2)).
-
 after_mpred_load:- not(loading_mpred_file(_,_)),lmconf:loaded_mpred_file(_,_),!.
 
 % when all previous tasks have completed
@@ -191,16 +123,16 @@ after_mpred_load_pass2:- not(lmconf:will_call_after(lmconf:after_mpred_load,_)).
 % call_after_mpred_load(Code):- lmconf:after_mpred_load,!, call_after_next(after_mpred_load_pass2,Code).
 call_after_mpred_load(Code):- call_after_next(lmconf:after_mpred_load,Code).
 
-:-export(rescan_mpred_loaded/0).
+:- was_export(rescan_mpred_loaded/0).
 rescan_mpred_loaded:- ignore((lmconf:after_mpred_load, loop_check(call_after(lmconf:after_mpred_load, true ),true))).
 
-:-export(rescan_mpred_loaded_pass2/0).
+:- was_export(rescan_mpred_loaded_pass2/0).
 rescan_mpred_loaded_pass2:- ignore((lmconf:after_mpred_load, loop_check(call_after(after_mpred_load_pass2,  dmsg(rescan_mpred_loaded_pass2_comlpete)),true))).
 
 % ================================================
 % Agenda system - standard database
 % ================================================
-:-dynamic(suspend_timers/0).
+:- was_dynamic(suspend_timers/0).
 time_tick(Time,Pred):- repeat,sleep(Time), (suspend_timers->true;(once(doall(on_x_log_throw(call_no_cuts(Pred)))))),fail.
 
 lmconf:hook_one_second_timer_tick.
@@ -220,14 +152,14 @@ start_one_minute_timer:-thread_property(_,alias(mpred_one_minute_timer))-> true 
 
 agenda_do_prequery:-!.
 agenda_do_prequery:- loop_check(agenda_rescan_mpred_ops,true),!.
-:-'$hide'(agenda_rescan_mpred_ops/0).
-:-'$hide'(agenda_do_prequery/0).
+:- '$hide'(agenda_rescan_mpred_ops/0).
+:- '$hide'(agenda_do_prequery/0).
 %:- rescan_missing_stubs.
 %:- agenda_rescan_mpred_props.
 
 
-:-export(agenda_slow_op_restart/0).
-:-dynamic(doing_agenda_slow_op/0).
+:- was_export(agenda_slow_op_restart/0).
+:- dynamic(doing_agenda_slow_op/0).
 
 % agenda_slow_op_restart:-!.
 agenda_slow_op_restart:-doing_agenda_slow_op,!.
@@ -238,16 +170,16 @@ agenda_slow_op_restart:-
       ((copy_term(Slow,CopySlow),
           must((is_callable(Slow),must(Slow),ignore(retract(lmconf:agenda_slow_op_todo(CopySlow)))))))))).
 
-:-export(agenda_rescan_mpred_ops/0).
+:- was_export(agenda_rescan_mpred_ops/0).
 agenda_rescan_mpred_ops:- test_tl(agenda_suspend_scans),!.
 agenda_rescan_mpred_ops:- agenda_rescan_for_module_ready,!.
 
-:-thread_local t_l:in_agenda_rescan_for_module_ready/0.
+:- thread_local t_l:in_agenda_rescan_for_module_ready/0.
 agenda_rescan_for_module_ready:- t_l:in_agenda_rescan_for_module_ready,!.
 agenda_rescan_for_module_ready:- w_tl(t_l:in_agenda_rescan_for_module_ready,loop_check(do_all_of(mpred_module_ready),true)).
 
-:-export(agenda_slow_op_todo/1).
-:-dynamic(agenda_slow_op_todo/1).
+:- was_export(agenda_slow_op_todo/1).
+:- was_dynamic(agenda_slow_op_todo/1).
 agenda_slow_op_enqueue(_):-!.
 agenda_slow_op_enqueue(Slow):- test_tl(agenda_slow_op_do_prereqs),!,on_x_rtrace(Slow).
 agenda_slow_op_enqueue(Slow):- assertz_if_new(agenda_slow_op_todo(Slow)),!.
@@ -277,7 +209,7 @@ call_after_next(When,C):- ignore((When,!,do_all_of(When))),assert_next(When,C).
 
 do_all_of_when(When):- ignore((more_to_do(When),When,do_all_of(When))).
 
-:-export(do_all_of/1).
+:- was_export(do_all_of/1).
 do_all_of(When):- ignore(loop_check(do_all_of_ilc(When),true)),!.
 do_all_of_ilc(When):- not(lmconf:will_call_after(When,_)),!.
 do_all_of_ilc(When):-  repeat,do_stuff_of_ilc(When), not(more_to_do(When)).
@@ -292,7 +224,7 @@ do_stuff_of_ilc(When):- lmconf:will_call_after(When,A),!,retract(lmconf:will_cal
 show_cgoal(G):- slow_sanity((stack_check(9600,dmsg(warning(maybe_overflow(stack_lvl)))))),call(G).
 
 
-:-export(add_later/1).
+:- was_export(add_later/1).
 add_later(Fact):- call_after_mpred_load(add(Fact)).
 
 % ========================================
@@ -301,9 +233,9 @@ add_later(Fact):- call_after_mpred_load(add(Fact)).
 %     assert/retract hooks
 % ========================================
 /*
-:- dynamic(lmconf:decl_database_hook/2).
-:- multifile(lmconf:decl_database_hook/2).
-:- export(lmconf:decl_database_hook/2).
+:- was_dynamic(lmconf:decl_database_hook/2).
+:- was_shared_multifile(lmconf:decl_database_hook/2).
+:- was_export(lmconf:decl_database_hook/2).
 :- meta_predicate lmconf:decl_database_hook(?,0).
 */
 % hooks are declared as
@@ -361,12 +293,12 @@ lmconf:hook_one_minute_timer_tick:-agenda_slow_op_restart.
 
 
 %:-meta_predicate(rescandb/0).
-% rescandb:- forall(lmconf:current_world(World),(findall(File,lmconf:loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),mpred_call(finish_processing_world))).
+% rescandb:- forall(current_world(World),(findall(File,lmconf:loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),mpred_call(finish_processing_world))).
 rescandb:- mpred_call(finish_processing_world).
 
 
 
-:-export((agenda_mpred_repropigate/0, rescan_duplicated_facts/0, rerun_database_hooks/0 , gather_fact_heads/2)).
+:- was_export((agenda_mpred_repropigate/0, rescan_duplicated_facts/0, rerun_database_hooks/0 , gather_fact_heads/2)).
 
 agenda_mpred_repropigate:-  loop_check(rescan_mpred_facts_local).
 
@@ -399,8 +331,8 @@ gather_fact_heads(M,H):- (nonvar(M)->true; member(M,[dbase,moo,world,user,hook])
 
 
 /*
-:-export(begin_prolog_source/0).
-:-export(end_prolog_source/0).
+:- was_export(begin_prolog_source/0).
+:- was_export(end_prolog_source/0).
 begin_prolog_source:- must_det(asserta(t_l:in_prolog_source_code)).
 end_prolog_source:- mpred_modify(change( retract,_),t_l:in_prolog_source_code).
 */
@@ -413,9 +345,9 @@ setTemplate(X):-add(X).
 englishServerInterface(SomeEnglish):-dmsg(todo(englishServerInterface(SomeEnglish))).
 
 
-:-export(onLoad/1).
+:- was_export(onLoad/1).
 onLoad(C):-call_after_mpred_load(C).
-:-export(lmconf:onEachLoad/1).
+:- was_export(lmconf:onEachLoad/1).
 onEachLoad(C):-assert_if_new(lmconf:call_OnEachLoad(C)).
 
 
@@ -426,4 +358,5 @@ do_call_OnEachLoad:-forall(call_OnEachLoad(C),doall(C)).
 
 wfAssert(X):-add(X). % add_later(X).
 
+:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 

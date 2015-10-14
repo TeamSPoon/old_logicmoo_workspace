@@ -57,46 +57,6 @@
               isa_pred_l(2,*,*,*),
               map_subterms(2,?,?).
 
-:- multifile % (multifile) :-
-        '$included'/4,
-        '$load_context_module'/3.
-:- module_transparent % (module_transparent) :-
-        add_iza/2,
-        arg_to_var/3,
-        attempt_attribute_args/3,
-        attempt_attribute_args/5,
-        attempt_attribute_one_arg/4,
-        attribs_to_atoms/2,
-        attribs_to_atoms0/2,
-        cmp_memberchk/2,
-        cmp_memberchk0/2,
-        comp_type/3,
-        domain/2,
-        extend_dom/2,
-        extend_domain/2,
-        init_dom/2,
-        inst_isac/2,
-        isa_pred_l/3,
-        isa_pred_l/4,
-        isac/2,
-        isac_chk/2,
-        isac_gen/2,
-        iza_to_isa/2,
-        map_subterms/3,
-        max_isa/3,
-        max_isa_l/2,
-        mdif/2,
-        min_isa/3,
-        min_isa_l/2,
-        promp_yn/2,
-        same/2,
-        same_arg/3,
-        samef/2,
-        to_functor/2,
-        type_size/2.
-:- dynamic % (dynamic) :-
-        '$included'/4,
-        '$load_context_module'/3.
 
 :- include('mpred_header.pi').
 
@@ -179,7 +139,7 @@ attempt_attribute_one_arg(Hint,F,N,A):-attempt_attribute_args(AndOr,argi(F,N),A)
 % mdif(A,B):- tlbugger:attributedVars,!,dif(A,B).
 mdif(A,B):-A\==B.
 
-:-export((samef/2,same/2)).
+:- was_export((samef/2,same/2)).
 same(X,Y):- samef(X,Y),!.
 same(X,Y):- compound(X),arg(1,X,Y),!.
 same(X,Y):- compound(Y),arg(1,Y,X),!.
@@ -191,10 +151,10 @@ to_functor(A,O):-is_ftVar(A),!,A=O.
 to_functor(A,O):-compound(A),get_functor(A,F),!,to_functor(F,O).
 to_functor(A,A).
 
-:-export(arg_to_var/3).
+:- was_export(arg_to_var/3).
 arg_to_var(_Type,_String,_Var).
 
-:-export(same_arg/3).
+:- was_export(same_arg/3).
 
 same_arg(_How,X,Y):-var(X),var(Y),!,X=Y.
 same_arg(equals,X,Y):-!,equals_call(X,Y).
@@ -221,7 +181,7 @@ promp_yn(Fmt,A):- format(Fmt,A),get_single_char(C),C=121.
 
 % :-swi_module(domain, [ domain/2  ]). % Var, ?Domain
 :- use_module(library(ordsets)).
-:-export(domain/2).
+:- was_export(domain/2).
 domain(X, Dom) :-
       var(Dom), !,
       get_attr(X, domain, Dom).
@@ -230,13 +190,13 @@ domain(X, List) :-
       put_attr(Y, domain, Domain),
       X = Y.
 
-:-export(extend_domain/2).
+:- was_export(extend_domain/2).
 extend_domain(X, DomL):- init_dom(X, Dom2), ord_union(Dom2, DomL, NewDomain),put_attr( X, domain, NewDomain ).
 
-:-export(extend_dom/2).
+:- was_export(extend_dom/2).
 extend_dom(X, DomE):-  init_dom(X, Dom2),ord_add_element(Dom2, DomE, NewDomain),put_attr( X, domain, NewDomain ).
 
-:-export(init_dom/2).
+:- was_export(init_dom/2).
 init_dom(X,Dom):-get_attr(X, domain, Dom),!.
 init_dom(X,Dom):-Dom =[_], put_attr(X, domain, Dom),!.
 
@@ -287,7 +247,7 @@ cmp_memberchk0(Item, [X1]) :-
 
 
 
-:-export(isac/2).
+:- was_export(isac/2).
 isac(X, Dom) :-
       var(Dom), !,
       get_attr(X, isac, Dom).
@@ -330,4 +290,6 @@ isac_gen(Y, [H|List]):-isa(Y,H),!,isac_gen(Y, List).
 isac:attribute_goals(X) -->
       { get_attr(X, isac, List) },
       [isac(X, List)].
+
+:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 

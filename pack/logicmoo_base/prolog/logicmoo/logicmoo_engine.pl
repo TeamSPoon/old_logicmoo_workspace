@@ -58,13 +58,14 @@
 */
 :- nodebug(_).
 
+:- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
 % :- use_module(logicmoo_base).
 
 
 % = % :- ensure_loaded(logicmoo(snark/common_logic_kb_hooks)).
 
-:- dynamic(wid/3).
+:- was_dynamic(wid/3).
 
 % :- use_module(  logicmoo(snark/common_logic_sexpr)).
 
@@ -91,24 +92,24 @@
 % SWI Prolog modules do not export operators by default
 % so they must be explicitly placed in the user namespace
 
-:- dynamic   user:file_search_path/2.
+:- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(logicmoo,Dir)).
-:- dynamic(lmconf:isa_pred_now_locked/0).
-:- multifile(lmconf:isa_pred_now_locked/0).
-:- multifile(lmconf:type_action_info/3).
-:- multifile(lmconf:agent_call_command/2).
-:- multifile(lmconf:mud_test/2).
-:- multifile(lmconf:sanity_test/0).
-:- multifile(lmconf:regression_test/0).
-:- multifile(lmconf:feature_test/0).
+:- was_dynamic(lmconf:isa_pred_now_locked/0).
+:- was_shared_multifile(lmconf:isa_pred_now_locked/0).
+:- was_shared_multifile(lmconf:type_action_info/3).
+:- was_shared_multifile(lmconf:agent_call_command/2).
+:- was_shared_multifile(lmconf:mud_test/2).
+:- was_shared_multifile(lmconf:sanity_test/0).
+:- was_shared_multifile(lmconf:regression_test/0).
+:- was_shared_multifile(lmconf:feature_test/0).
 
 :- include(logicmoo(mpred/'mpred_header.pi')).
 
 
 
 
-:- dynamic(kif_pred_head/1).
+:- was_dynamic(kif_pred_head/1).
 :- style_check(-singleton).
 
 kif_pred_head(P):- var(P),!,isa(F,prologKIF),arity(F,A),functor(P,F,A).
@@ -116,12 +117,12 @@ kif_pred_head(P):- get_functor(P,F,_),isa(F,prologKIF).
 kif_pred_head(P):- get_functor(P,F,_),isa(F,prologPTTP).
 
 
-:- dynamic(pttp_pred_head/1).
+:- was_dynamic(pttp_pred_head/1).
 
 pttp_pred_head(P):- var(P),isa(F,prologPTTP),arity(F,A),functor(P,F,A).
 pttp_pred_head(P):- get_functor(P,F,_),isa(F,prologPTTP).
 
-:- multifile(kify_comment/1).
+:- was_shared_multifile(kify_comment/1).
 
 
 pttp_listens_to_head(_OP,P):- pttp_pred_head(P).
@@ -169,7 +170,7 @@ lmconf:mpred_provide_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(St
 
 /*
 
-:- dynamic(lmconf:int_proven_t/10).
+:- was_dynamic(lmconf:int_proven_t/10).
 
 int_proven_t(P, X, Y, E, F, A, B, C, G, D):- t(P,X,Y),
         test_and_decrement_search_cost(A, 0, B),
@@ -177,7 +178,7 @@ int_proven_t(P, X, Y, E, F, A, B, C, G, D):- t(P,X,Y),
         G=[H|I].
 
 
-:- dynamic(lmconf:int_assumed_t/10).
+:- was_dynamic(lmconf:int_assumed_t/10).
 int_assumed_t(P, X, Y, E, F, A, B, C, G, D):- t(P,X,Y),
         test_and_decrement_search_cost(A, 0, B),
         C=[H, [assumed_t(P, X, Y), D, E, F]|I],
@@ -185,7 +186,7 @@ int_assumed_t(P, X, Y, E, F, A, B, C, G, D):- t(P,X,Y),
 
 
 */
-:- dynamic(kif_test_string/1).
+:- was_dynamic(kif_test_string/1).
 kif_test_string_disabled(
 "
 % )
@@ -248,9 +249,9 @@ door(What).
 :- kif_tell(all(P, person(P) => exists(D, dollar(D) & has(P,D)))).
 */
 kif_result(_).
-:- export((kif_test)/1).
+:- was_export((kif_test)/1).
 kif_test(X):-kif_tell(X).
-:-op(1000,fy,(kif_test)).
+:- op(1000,fy,(kif_test)).
 :- assert_until_eof(t_l:canonicalize_types).
 
 :- discontiguous kif_sanity_test_0/0.
@@ -276,7 +277,7 @@ kif_sanity_test_0:-kif_test(p(A,R) & q(A,R)).
 % :- prolog.
 %:- must(((kif_test(isa(F,tPred) => exists(A, (isa(A,ftInt) & arity(F,A))))))).
 
-:-nop(( kif_result(
+:- nop(( kif_result(
 (==> mpred_default((
    tPred(F) ==> 
       {A = skIsIntInPredArg2ofArityFn(F)},arity(F,A) & ftInt(A))
@@ -498,7 +499,7 @@ kif_sanity_test_0:-kif_test '
 
 
 
-:-if((fail)).
+:- if((fail)).
 
 kif_sanity_test_0:-kif_test '
 (implies 
@@ -542,8 +543,8 @@ kif_sanity_test_0:-kif_test '
                        (TheSetOf ?OBJ 
                            (eventOccursAt ?OBJ ?LAND))) directingAgent))))'.
 
-:-endif.
-:-if(if_defined(show_argtype_tests)).
+:- endif.
+:- if(if_defined(show_argtype_tests)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % this rule ...
@@ -635,7 +636,7 @@ kif_sanity_test_0:-kif_test(   argInst(kb_argInst, 1 ,KB) & argInst(has, 1 , A) 
 %   (not_argInst(has, 1, A)):-has(A, B), not_kb_argInst(C, has, 2, B), argInst(has, 2, B), argInst(kb_argInst, 1, C)).
 
 
-:-endif. %if_defined(show_argtype_tests)
+:- endif. %if_defined(show_argtype_tests)
 
 
 kif_sanity_test_0:-kif_test(all(R,isa(R,tAgent) => exists(D, (isa(D,tNose) & mudContains(R,D))))).

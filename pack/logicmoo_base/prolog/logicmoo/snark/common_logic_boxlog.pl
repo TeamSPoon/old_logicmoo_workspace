@@ -55,12 +55,10 @@ additional features that may be added/manipulated in the body
             vg/1,
             vg/3
           ]).
-:- multifile % (multifile) :-
-        '$load_context_module'/3.
-:- dynamic % (dynamic) :-
-        '$load_context_module'/3.
 
 
+
+:- use_module(logicmoo(mpred/mpred_pfc)).
 :- common_logic_boxlog:use_module(library(dialect/hprolog),[]).
 
 is_units_h(A):-maplist(is_unit,A).

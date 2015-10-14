@@ -113,7 +113,7 @@
             world_clear/1
           ]).
 
-:- meta_predicate % (meta_predicate) :-
+:- meta_predicate 
         add(-),
         clr(-),
         del(-),
@@ -152,91 +152,6 @@
    % mpred_storage
    with_logical_functor(*,*,1).
 
-:- multifile % (multifile) :-
-        '$included'/4,
-        lmconf:mpred_provide_storage_op/2.
-:- module_transparent % (module_transparent) :-
-        add_0/1,
-        add_fast/1,
-        call_props/2,
-        clr0/1,
-        compound_functor/2,
-        confirm_hook/1,
-        database_modify_0/2,
-        database_modify_assert/2,
-        db_must_asserta_confirmed_sv/3,
-        deduceEachArgType/1,
-        deduceEachArgType/3,
-        deduceEachArg_WithArgIsa/3,
-        deduceEachArg_WithType/2,
-        del0/1,
-        ensure_dynamic/1,
-        equals_call/2,
-        forall_setof/2,
-        get_body_functor/3,
-        get_pifunctor/2,
-        get_pifunctor/3,
-        get_pifunctor/4,
-        idel/1,
-        if_main/1,
-        implied_skipped/1,
-        infSecondOrderCheck/0,
-        infThirdOrderCheck/0,
-        iprops/2,
-        ireq/1,
-        is_asserted/1,
-        is_asserted/2,
-        is_asserted/3,
-        is_asserted_2/2,
-        is_asserted_2a/2,
-        is_asserted_3/3,
-        is_asserted_3a/3,
-        is_source_proof/1,
-        is_static_pred/1,
-        make_body_clause/3,
-        may_storage_op/2,
-        mdel/1,
-        mpred_modify/2,
-        lmconf:mpred_provide_storage_op/2,
-        lmconf:mpred_provide_storage_op/4,
-        mreq/1,
-        must_storage_op/2,
-        nonground_throw_else_fail/1,
-        not_variant/2,
-        padd/2,
-        padd/3,
-        preq/2,
-        prolog_modify/2,
-        prolog_mpred_provide_storage_op/2,
-        prolog_op/2,
-        prop/3,
-        prop_or/4,
-        requires_storage/2,
-        requires_storage/3,
-        rescan_argIsa/3,
-        rescan_meta_argtypes/1,
-        retract_all/1,
-        side_effect_prone/0,
-        singletons_throw_else_fail/1,
-        skip_is_asserted_expansion/1,
-        special_head/3,
-        special_head0/2,
-        special_wrapper_body/2,
-        special_wrapper_functor/2,
-        test_expand_units/1,
-        upprop/1,
-        upprop/2,
-        use_if_modify_new/0,
-        with_assert_op_override/2,
-        with_fail_is_asserted/2,
-        with_kb_assertions/2,
-        with_logical_functor/3,
-        world_clear/1.
-:- dynamic % (dynamic) :-
-        '$included'/4,
-        lmconf:mpred_provide_storage_op/2.
-
-
 % ========================================
 % Shared Preds
 % ========================================
@@ -244,7 +159,7 @@
 
 
 
-:-export(( (add)/1, clr/1,ireq/1,del/1,  
+:- was_export(( (add)/1, clr/1,ireq/1,del/1,  
   padd/2, padd/3, prop/3, prop_or/4, call_props/2, iprops/2, upprop/2,add/1, ireq/1, mreq/1, upprop/1, req/1, 
   % use_term_listing/2,  
   world_clear/1,  
@@ -319,24 +234,24 @@ side_effect_prone:- \+ t_l:noDBaseMODs(_), t_l:side_effect_ok.
 
 
 
-:-meta_predicate(with_no_modifications(0)).
+:- meta_predicate(with_no_modifications(0)).
 with_no_modifications(CALL):-!,CALL.
 with_no_modifications(CALL):-w_tl(t_l:noDBaseMODs(_),CALL).
 
-:-meta_predicate(with_no_db_hooks(0)).
+:- meta_predicate(with_no_db_hooks(0)).
 with_no_db_hooks(CALL):-!,CALL.
 with_no_db_hooks(CALL):-w_tl(t_l:noDBaseHOOKS(_),CALL).
 
-:-meta_predicate(with_fallbacks(0)).
+:- meta_predicate(with_fallbacks(0)).
 with_fallbacks(CALL):-wno_tl(t_l:infAssertedOnly(_),CALL).
 
-:-meta_predicate(with_fallbacksg(0)).
+:- meta_predicate(with_fallbacksg(0)).
 with_fallbacksg(CALL):-wno_tl(t_l:noRandomValues(_),CALL).
 
-:-meta_predicate(with_no_fallbacksg(0)).
+:- meta_predicate(with_no_fallbacksg(0)).
 with_no_fallbacksg(CALL):-w_tl(t_l:noRandomValues(_),CALL).
 
-:-meta_predicate(with_no_fallbacks(0)).
+:- meta_predicate(with_no_fallbacks(0)).
 with_no_fallbacks(CALL):-w_tl(t_l:infAssertedOnly(_),CALL).
 
 infSecondOrderCheck :- \+ t_l:infInstanceOnly(_), t_l:infSecondOrder.
@@ -411,7 +326,7 @@ fact_checked(Fact,_):- is_known_false0(Fact),!,fail.
 fact_checked(Fact,_):- is_known_trew(Fact),!.
 fact_checked(Fact,Call):- no_loop_check(call_tabled(Call),is_asserted(Fact)).
 
-:-meta_predicate(fact_loop_checked(+,0)).
+:- meta_predicate(fact_loop_checked(+,0)).
 fact_loop_checked(Fact,Call):- no_repeats(fact_checked(Fact,Call)).
 
 
@@ -531,8 +446,8 @@ ireq(C0):- nop(dmsg(ireq(C0))),
   agenda_rescan_for_module_ready,
    no_loop_check(w_tl([+infInstanceOnly(_), +t_l:infAssertedOnly(_),+t_l:noRandomValues(_)],preq(ireq,/*to_exp*/(C0)))).
 
-:-dmsg_hide(req).
-:-dmsg_hide(ireq).
+:- dmsg_hide(req).
+:- dmsg_hide(ireq).
 
 % -  call_props(Obj,QueryPropSpecs)
 call_props(Obj,PropSpecs):- req(props(Obj,PropSpecs)).
@@ -540,18 +455,18 @@ iprops(Obj,PropSpecs):- ireq(/*to_exp*/(props(Obj,PropSpecs))).
 
 
 
-:-export(forall_setof/2).
+:- was_export(forall_setof/2).
 forall_setof(ForEach,Call):-
    findall(ForEach,ForEach,ForEachAll),
    list_to_set(ForEachAll,Set),!,
    ignore(forall(member(ForEach,Set),Call)).
 
 
-:-thread_local add_thread_override/1.
+:- thread_local add_thread_override/1.
 % t_l:add_thread_override(A):-add_from_macropred(A),!.
 
-:-export(((add)/1)).
-:-mpred_trace_nochilds((add)/1).
+:- was_export(((add)/1)).
+:- mpred_trace_nochilds((add)/1).
 add(A):- var(A),!,trace_or_throw(var_add(A)).
 add(end_of_file):-!.
 add(grid_key(KW=COL)):- !, add(typeHasGlyph(COL,KW)).
@@ -577,7 +492,7 @@ implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (t(
 %implied_skipped(Skipped):-lmconf:already_added_this_round(Skipped),(is_asserted(Skipped)).
 
 
-:-export(add_fast/1).
+:- was_export(add_fast/1).
 % -  add(Assertion)
 % mpred_add_fast(C0):- must_det((mpred_add_fast(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(mpred_add_fast(C0)),rtrace(mpred_add_fast(C0)),dtrace(ireq(C0))))))))),!.
 add_fast(Term):-mpred_numbervars_with_names(Term),mpred_modify(change(assert,add), Term),!. % ,xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0)))))),!.
@@ -600,12 +515,12 @@ prop_or(Obj,Prop,Value,OrElse):- one_must(ireq(t(Prop,Obj,Value)),Value=OrElse).
 % db_assert_sv/3
 % ================================================
 
-:-dmsg_hide(db_assert_sv).
+:- dmsg_hide(db_assert_sv).
 
-:-dmsg_hide(mpred_modify).
-:-dmsg_hide(add).
+:- dmsg_hide(mpred_modify).
+:- dmsg_hide(add).
 
-:-dmsg_hide(into_mpred_form).
+:- dmsg_hide(into_mpred_form).
 
 
 /*
@@ -618,17 +533,17 @@ update_single_valued_arg(P,N):- arg(N,P,UPDATE),replace_arg(P,N,OLD,Q),
 /*
 
 % assert_with to change(CA1,CB2) singlevalue pred
-:-export((db_assert_sv/4)).
+:- was_export((db_assert_sv/4)).
 %db_assert_sv(_Must,C,F,A):- throw_if_true_else_fail(contains_singletons(C),db_assert_sv(C,F,A)).
 
 db_assert_sv(C):- get_functor(C,F,A), db_assert_sv(must,C,F,A),!.
 
 db_assert_sv(Must,C,F,A):- ex, ignore(( loop_check(db_assert_sv_ilc(Must,C,F,A),true))).
 
-:-export((db_assert_sv_ilc/4)).
+:- was_export((db_assert_sv_ilc/4)).
 db_assert_sv_ilc(Must,C,F,A):- arg(A,C,UPDATE),is_relative(UPDATE),db_assert_sv_now(Must,C,F,A,UPDATE),!.
 
-:-export(db_assert_sv_now/5).
+:- was_export(db_assert_sv_now/5).
 
 db_assert_sv_now(Must,C,F,A,    +UPDATE):-!,  db_assert_sv_update(Must,C,F,A,+UPDATE).
 db_assert_sv_now(Must,C,F,A,    -UPDATE):-!,  db_assert_sv_update(Must,C,F,A,-UPDATE).
@@ -639,7 +554,7 @@ db_assert_sv_now(Must,C,F,A, -(+(UPDATE))):-!,db_assert_sv_update(Must,C,F,A,-UP
 db_assert_sv_now(Must,C,F,A, +(-(UPDATE))):-  db_assert_sv_update(Must,C,F,A,-UPDATE).
 db_assert_sv_now(Must,C,F,A, REPLACE):- db_assert_sv_replace(Must,C,F,A, REPLACE).
 
-:-export(db_assert_sv_update/5).
+:- was_export(db_assert_sv_update/5).
 db_assert_sv_update(Must,C,F,A,UPDATE):-
    replace_arg(C,A,OLD,COLD),
    % prefer updated values to come from instances but will settle with anything legal
@@ -647,9 +562,9 @@ db_assert_sv_update(Must,C,F,A,UPDATE):-
    update_value(OLD,UPDATE,NEW),!,
    db_assert_sv_replace(Must,C,F,A,NEW),!.
 
-:-export(db_assert_sv_replace/5).
+:- was_export(db_assert_sv_replace/5).
 
-:-style_check(-singleton).
+:- style_check(-singleton).
 % db_assert_sv_replace_noisey_so_disabled
 db_assert_sv_replace(_Must,C,_,A,NEW):- fail,
    replace_arg(C,A,_,CBLANK),
@@ -679,7 +594,7 @@ db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):-
 
 */
 
-:-style_check(+singleton).
+:- style_check(+singleton).
 
 
 equals_call(X,Y):-unify_with_occurs_check(X,Y),!.
@@ -848,4 +763,6 @@ ensure_dynamic(Head):- Head\=isa(_,_),
    (\+ predicate_property(PF,_)->show_call((dynamic(F/A),multifile(F/A),export(F/A)));
    (is_static_pred(PF)-> 
      ((listing(F/A),dmsg(want_to_assert(ensure_dynamic(Head),decl_mpred_prolog(F,A,Head))),nop(dtrace))); true)).
+
+:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 

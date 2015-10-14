@@ -62,7 +62,7 @@ mpred_tidy((P1,P2),(Q1,Q2)) :-
    mpred_tidy(P2,Q2).
 mpred_tidy(A,A) :- !.
 
-:-dynamic(sentence/2).
+:- was_dynamic(sentence/2).
 
 compile_pfcg :-
   ((retract((L -->> R)), mpred_translate_rule((L -->> R), PfcRule));
@@ -88,7 +88,7 @@ parse1([H|T],Id) :-
  parse1(T,Id).
 
 
-:-dynamic(sentences/2).
+:- was_dynamic(sentences/2).
 
 show_sentences(Id) :- show_sentences(Id,_).
 
@@ -122,8 +122,8 @@ make_term(ss(Constituent,Id,String),Term) :-
    Term =.. Term_string.
 
 
-mpred_term_expansion((P -->> Q),(:- mpred_add(Rule))) :-
+is_mpred_term_expansion((P -->> Q),(:- mpred_add(Rule))) :-
   mpred_translate_rule((P -->> Q), Rule).
-mpred_term_expansion((P --*>> Q),(:- mpred_add(Rule))) :-
+is_mpred_term_expansion((P --*>> Q),(:- mpred_add(Rule))) :-
   mpred_translate_rule((P --*>> Q), Rule).
 

@@ -12,9 +12,9 @@
 :- ensure_loaded(logicmoo(mpred/'mpred_header.pi')).
 :- ensure_loaded(dbase_i_mpred_pttp).
 
-:- multifile(pttp_test/2).
+:- was_shared_multifile(pttp_test/2).
 :- discontiguous(pttp_test/2).
-:- multifile(pttp_logic/2).
+:- was_shared_multifile(pttp_logic/2).
 :- discontiguous(pttp_logic/2).
 
 pttp_test(chang_lee_example1,
@@ -58,7 +58,7 @@ pttp_test(chang_lee_example2,
 %%%   this is problem GRP003-1 in TPTP
 %%% SOURCE
 
-:-export(chang_lee_example3/0).
+:- was_export(chang_lee_example3/0).
 pttp_test(chang_lee_example3,
 	((
           p(e,X,X),

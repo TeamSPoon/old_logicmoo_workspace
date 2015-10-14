@@ -17,7 +17,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-:- dynamic   user:file_search_path/2.
+:- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
 :- prolog_load_context(directory,Dir),
    DirFor = xray,
@@ -440,9 +440,9 @@ not_xray:-fail.
 % :- set_flag(print_depth,1000).
 % :- set_flag(variable_names,off).
 
-:- dynamic(count_inferences_pred/1).
-:- dynamic(trace_search_progress_pred/1).
-:- dynamic(compile_proof_printing/0).
+:- was_dynamic(count_inferences_pred/1).
+:- was_dynamic(trace_search_progress_pred/1).
+:- was_dynamic(compile_proof_printing/0).
 
 %%% Sound unification algorithm with occurs check that is called
 %%% by code resulting from the `add_sound_unification' transformation.
@@ -760,7 +760,7 @@ clauses((A , B),L,WffNum) :-
         clauses(B,L2,WffNum2),
         conjoin(L1,L2,L))).
 
-:-abolish(clauses,4).
+:- abolish(clauses,4).
 clauses( (Gamma :- Alpha : Beta) , L , WffNum ) :-
 	!,
         must_det_l((
@@ -1274,7 +1274,7 @@ dont_trace_search :-
 :- trace_search.                        % default is to trace searching
 
 
-:- dynamic(use_sound_unification/1).
+:- was_dynamic(use_sound_unification/1).
 % use_sound_unification(unify_with_occurs_check).
 set_sound_unification(true):-!,set_sound_unification(unify_with_occurs_check).
 set_sound_unification(W):-retractall(use_sound_unification(_)),asserta(use_sound_unification(W)).
@@ -1329,7 +1329,7 @@ add_proof_recording_args(Body,Proof,ProofEnd,Body1) :-
 % ======================================================
 % HEAD+(PosAncestors,NegAncestors,Defaults)  BODY+(PosAncestors,NegAncestors,Defaults)
 % ======================================================
-:- dynamic(use_ancestor_checks/1).
+:- was_dynamic(use_ancestor_checks/1).
 % use_ancestor_checks(unify_with_occurs_check).
 set_ancestor_checks(true):-!,set_ancestor_checks(unify_with_occurs_check).
 set_ancestor_checks(W):-retractall(use_ancestor_checks(_)),asserta(use_ancestor_checks(W)).
@@ -1490,7 +1490,7 @@ procedures_with_tests([[P,N]|Preds],Clauses,Procs) :-
 procedures_with_tests([],_Clauses,true).
 
 
-:- dynamic(compile_complete_search/0).
+:- was_dynamic(compile_complete_search/0).
 compile_complete_search.
 
 :- ensure_loaded(io).
@@ -1699,7 +1699,7 @@ dpttp1(X) :-
 	dpttp1(X,_).
 
 
-:- dynamic(kill_me/1).
+:- was_dynamic(kill_me/1).
 retract_last:- retractall(query(_,_,_,_)), forall(retract(kill_me(C)),retractall(C)).
 
 assert_clause(C,_):-assert(C),assert(kill_me(C)).

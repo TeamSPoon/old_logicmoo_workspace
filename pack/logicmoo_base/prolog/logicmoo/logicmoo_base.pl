@@ -11,14 +11,14 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- module(lmbase,[ensure_mpred_system/0,enable_mpred_system/1,disable_mpred_system/1,lmbase_expansion/4]).
+:- module(lmbase,[ensure_mpred_system/0,enable_mpred_system/1,disable_mpred_system/1]).
 
-:- multifile '$was_imported_kb_content$'/2.
-:- dynamic '$was_imported_kb_content$'/2.
-:- discontiguous('$was_imported_kb_content$'/2).
+:- multifile '$si$':'$was_imported_kb_content$'/2.
+:- dynamic '$si$':'$was_imported_kb_content$'/2.
+:- discontiguous('$si$':'$was_imported_kb_content$'/2).
 
-:- multifile(lmconf:mpred_is_impl_file/1).
-:- dynamic(lmconf:mpred_is_impl_file/1).
+:- multifile(logicmoo_util_help:mpred_is_impl_file/1).
+:- dynamic(logicmoo_util_help:mpred_is_impl_file/1).
 
 
 :- multifile lmconf:startup_option/2. 
@@ -60,19 +60,19 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 % DBASE_T System
 % ================================================
 
-:- multifile(lmconf:mpred_is_impl_file/1).
-:- dynamic(lmconf:mpred_is_impl_file/1).
-lmconf:mpred_is_impl_file(mpred/A):-nonvar(A).
+:- multifile(logicmoo_util_help:mpred_is_impl_file/1).
+:- dynamic(logicmoo_util_help:mpred_is_impl_file/1).
+logicmoo_util_help:mpred_is_impl_file(mpred/A):-nonvar(A).
 
-load_mpred_system(_Ctx):- !.
+load_mpred_system(_Ctx):-  !,use_module(logicmoo(mpred/mpred_loader)).
 load_mpred_system(_Ctx):-  lmconf:mpred_system_kb(Sys),
-   with_mutex(mpred_system_mutex,forall(lmconf:mpred_is_impl_file(File),     
+   with_mutex(mpred_system_mutex,forall(logicmoo_util_help:mpred_is_impl_file(File),     
      (( Sys:use_module(logicmoo_utils),trace, call((Sys:w_tl(t_l:disable_mpred_term_expansions_locally,Sys:ensure_loaded(File)))))))).
 
-:-export(enable_mpred_system/1).
+:- export(enable_mpred_system/1).
 enable_mpred_system(Ctx):- with_mutex(mpred_system_mutex,lmconf:enable_mpred_system0(Ctx)).
 
-:-export(disable_mpred_system/1).
+:- export(disable_mpred_system/1).
 disable_mpred_system(Ctx):- with_mutex(mpred_system_mutex,lmconf:disable_mpred_system0(Ctx)).
 
 :- thread_local t_l:side_effect_ok/0.
@@ -81,29 +81,26 @@ lmconf:enable_mpred_system0(Ctx):- lmconf:mpred_system_status(Ctx,enabled),!.
 lmconf:enable_mpred_system0(Ctx):-    
    retractall(lmconf:mpred_system_status(Ctx,_)),
    load_mpred_system(Ctx),
-   asserta_if_new((user:term_expansion(I,O):- lmbase_expansion(term,user,I,O))),
-   asserta_if_new((system:goal_expansion(I,O):- lmbase_expansion(goal,system,I,O))),
-   asserta_if_new((Ctx:term_expansion(I,O):- lmbase_expansion(term,Ctx,I,O))),
-   asserta_if_new((Ctx:goal_expansion(I,O):- lmbase_expansion(goal,Ctx,I,O))),
+   must(current_predicate(_,mred_loader:mpred_expander(_,_,_,_))),
+   meta_predicate(mpred_loader:mpred_expander(+,+,+,-)),   
+   asserta_if_new((user:term_expansion(I,O):- mpred_expander(term,user,I,O))),
+   asserta_if_new((system:goal_expansion(I,O):- mpred_expander(goal,system,I,O))),
+   asserta_if_new((Ctx:term_expansion(I,O):- mpred_expander(term,Ctx,I,O))),
+   asserta_if_new((Ctx:goal_expansion(I,O):- mpred_expander(goal,Ctx,I,O))),
    asserta(lmconf:mpred_system_status(Ctx,enabled)),
    lmconf:mpred_system_kb(Sys), 
-   Sys:w_tl(t_l:side_effect_ok,doall(Ctx:call_no_cuts(_M:module_local_init))).
+   Sys:w_tl(t_l:side_effect_ok,doall(Ctx:call_no_cuts(_M:lmconf:module_local_init))).
 
 lmconf:disable_mpred_system0(Ctx):- lmconf:mpred_system_status(Ctx,disabled),!.
 lmconf:disable_mpred_system0(Ctx):-    
    retractall(lmconf:mpred_system_status(Ctx,_)),
    asserta(lmconf:mpred_system_status(Ctx,disabled)),
    % one day unload_mpred_system(Ctx),
-   %retractall((user:term_expansion(I,O):- lmbase_expansion(term,user,I,O))),
-   %retractall((system:goal_expansion(I,O):- lmbase_expansion(goal,system,I,O))),
-   retractall((Ctx:term_expansion(I,O):- lmbase_expansion(term,Ctx,I,O))),
-   retractall((Ctx:goal_expansion(I,O):- lmbase_expansion(goal,Ctx,I,O))),!.
+   %retractall((user:term_expansion(I,O):- mpred_expander(term,user,I,O))),
+   %retractall((system:goal_expansion(I,O):- mpred_expander(goal,system,I,O))),
+   retractall((Ctx:term_expansion(I,O):- mpred_expander(term,Ctx,I,O))),
+   retractall((Ctx:goal_expansion(I,O):- mpred_expander(goal,Ctx,I,O))),!.
    
-:- meta_predicate lmbase_expansion(:,+,+,-).
-:- export(lmbase_expansion/4).
-lmbase_expansion(From:Type,To,I,O):- current_predicate(_:mpred_loader_file/0),
-   mpred_loader:lmbase_expander(From:Type,To,I,O),!,I\=@=O.
-
 :- module_transparent ensure_mpred_system/0.
 ensure_mpred_system:- context_module(M),enable_mpred_system(M).
 
@@ -114,4 +111,3 @@ ensure_mpred_system:- context_module(M),enable_mpred_system(M).
 % :- add_library_search_path('./pttp/',[ 'dbase_i_mpred_*.pl']).
 
 
-:- enable_mpred_system(lmconf).

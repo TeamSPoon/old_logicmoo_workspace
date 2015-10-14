@@ -79,7 +79,7 @@
             rescan_mpred_props_ilc/0,
             scan_missing_stubs/1,
             test_call_cut/0,
-            use_ideep_swi/0,
+            
             wff_check_failed/3,
             wff_check_mpred_t_throw/1
           ]).
@@ -97,99 +97,9 @@ must_op(*,0),
 % mpred_stubs
 registerCycPredPlus2(0).
 
-:- multifile % (multifile) :-
-        '$included'/4,
-        lmconf:mpred_provide_setup/4,
-        lmconf:mpred_provide_write_attributes/2,
-        lmconf:mpred_provide_storage_clauses/3.
-:- module_transparent % (module_transparent) :-
-        agenda_rescan_mpred_props/0,
-        assert_mpred_t/1,
-        call_for_literal/3,
-        call_for_literal_db/3,
-        call_for_literal_db0/3,
-        call_for_literal_db00/3,
-        call_for_literal_ideep_ilc/1,
-        call_mpred_body/2,
-        call_mpred_body_ilc/2,
-        call_provided_mpred_storage_op/3,
-        call_rule_db/3,
-        call_wdmsg/2,
-        call_wdmsg/4,
-        constrain_args/1,
-        constrain_args/2,
-        create_stub_body/2,
-        create_stub_body/3,
-        cwdl/2,
-        ensure_universal_stub/1,
-        ensure_universal_stub4/4,
-        ensure_universal_stub5/5,
-        ensure_universal_stub_plus_2/2,
-        ensure_universal_stub_plus_minus_2/2,
-        ensure_universal_stub_plus_minus_2_HIDE/2,
-        erase_mpred_storage_op/1,
-        first_mpred_props/1,
-        get_cc/2,
-        has_storage_stub/1,
-        hybrid_tPredStubImpl/1,
-        is_asserted_mpred_t/1,
-        is_call_op/1,
-        is_mpred_change_op/1,
-        is_mpred_op/1,
-        is_non_call_op/1,
-        is_proc/1,
-        is_same_clauses/2,
-        is_same_clauses/3,
-        is_tCol/1,
-        last_arg_ground/1,
-        last_arg_ground/3,
-        make_builtin/1,
-        maybe_storage_stub/2,
-        missing_stub/1,
-        mpred_missing_stubs/2,
-        mpred_prop_ordered/2,
-        lmconf:mpred_provide_setup/4,
-        lmconf:mpred_provide_storage_clauses/3,
-        mpred_t_call_op/2,
-        lmconf:mpred_provide_storage_op/2,
-        mpred_t_mpred_storage_clauses_facts/3,
-        mpred_t_storage_op/2,
-        mud_call_store_op/2,
-        mustIsa/2,
-        must_have_storage_stub/1,
-        must_op/2,
-        must_same_clauses/2,
-        no_rescans/0,
-        out_of_mpred_t/1,
-        provide_clauses_list/2,
-        really_add_mpred_storage_op/1,
-        registerCycPredPlus2/1,
-        registerCycPredPlus2_3/3,
-        registerCycPredPlus2_3/4,
-        renumbervarZ/2,
-        rescan_missing_stubs/0,
-        rescan_missing_stubs_ilc/0,
-        rescan_mpred_props_ilc/0,
-        scan_missing_stubs/1,
-        test_call_cut/0,
-        use_ideep_swi/0,
-        wff_check_failed/3,
-        wff_check_mpred_t_throw/1.
-:- dynamic % (dynamic) :-
-        '$included'/4,
-        lmconf:mpred_provide_setup/4,
-        lmconf:mpred_provide_storage_clauses/3,
-        use_ideep_swi/0.
 
 :- include('mpred_header.pi').
 
-:- shared_multifile(mpred_manages_unknowns/0).
-:- shared_multifile lmconf:mpred_provide_read_attributes/3.
-:- shared_multifile lmconf:mpred_provide_setup/4.
-:- shared_multifile lmconf:mpred_provide_storage_clauses/3.
-:- shared_multifile lmconf:mpred_provide_storage_op/2.
-:- shared_multifile lmconf:mpred_provide_write_attributes/2.
-:- shared_multifile lmconf:pfcManageHybrids/0.
 
 hybrid_tPredStubImpl(prologHybrid).
 hybrid_tPredStubImpl(prologPTTP).
@@ -381,7 +291,7 @@ is_mpred_op(query(_,_)).
 is_mpred_op(clauses(_)).
 
 % -- CODEBLOCK
-:-export(last_arg_ground/1).
+:- was_export(last_arg_ground/1).
 last_arg_ground(HEAD):-compound(HEAD),functor(HEAD,F,A),last_arg_ground(F, A, HEAD),!.
 last_arg_ground(mud_test,_,_).
 last_arg_ground(_,A,_):-A>2,!.
@@ -434,9 +344,9 @@ scan_missing_stubs(F):-
 mpred_missing_stubs(F,A):-prologHybrid = StubType, hybrid_tPredStubImpl(StubType),arity(F,A),mpred_isa(F,StubType),must(arity(F,A)),not(has_storage_stub(F/A)).
 
 
-:-assertz_if_new(call_OnEachLoad(rescan_missing_stubs)).
+:- assertz_if_new(call_OnEachLoad(rescan_missing_stubs)).
 
-:-export(rescan_missing_stubs/0).
+:- was_export(rescan_missing_stubs/0).
 % rescan_missing_stubs:-no_rescans,!.
 rescan_missing_stubs:-loop_check(time_call(rescan_missing_stubs_ilc),true).
 rescan_missing_stubs_ilc:- once(lmconf:use_cyc_database), once(w_tl(t_l:useOnlyExternalDBs,forall((kb_t(arity(F,A)),A>1,
@@ -445,7 +355,7 @@ rescan_missing_stubs_ilc:- hotrace((doall((mpred_missing_stubs(F,A),arity(F,A),e
 
 no_rescans.
 
-:-export(agenda_rescan_mpred_props/0).
+:- was_export(agenda_rescan_mpred_props/0).
 
 agenda_rescan_mpred_props:- loop_check(rescan_mpred_props_ilc,true).
 rescan_mpred_props_ilc:-no_rescans,!.
@@ -586,7 +496,7 @@ assert_mpred_t(DB):-once(fully_expand(change(assert,add),DB,MP)),DB\=@=MP,!,must
 assert_mpred_t((G1,G2)):-!,assert_mpred_t(G1),assert_mpred_t(G2).
 assert_mpred_t(G):-add_from_file(G).
 
-%:-export(portray_hb/2).
+%:- was_export(portray_hb/2).
 %portray_hb(H,B):- B==true, !, portray_one_line(H).
 %portray_hb(H,B):- portray_one_line((H:-B)).
 
@@ -669,11 +579,11 @@ mpred_t_storage_op(Op,HeadBody):-
      must((mud_call_store_op(Op,DB),sanity(show_call(DB)))),!.
 
 mud_call_store_op(Op,(H:-B)):- is_true(B),!,mud_call_store_op(Op,H).
-mud_call_store_op(Op,t('$was_imported_kb_content$', _, OPRAND)):-!,loop_check(mpred_op(Op,OPRAND),true).
+mud_call_store_op(Op,t('$si$':'$was_imported_kb_content$', _, OPRAND)):-!,loop_check(mpred_op(Op,OPRAND),true).
 mud_call_store_op(Op,OPRAND):- show_call_success(wff_check_failed(Op,OPRAND,_WHY)),!.
 mud_call_store_op(Op,OPRAND):- reduce_mpred_op(Op,Op2),show_call(call(Op2,OPRAND)).
 
-wff_check_failed(_,DB,WHY):- DB =  t('$was_imported_kb_content$', WHY, _Assert).
+wff_check_failed(_,DB,WHY):- DB =  t('$si$':'$was_imported_kb_content$', WHY, _Assert).
 wff_check_mpred_t_throw(DB):- wff_check_failed(_,DB,WHY),trace_or_throw(crazy_mpred_t_was_imported_kb_content(WHY,DB)).
 wff_check_mpred_t_throw(_).
 
@@ -689,7 +599,6 @@ mpred_t_call_op(_,FACT):- get_functor(FACT, F,A), !,
      call_tabled(call_for_literal(F,A,FACT)),!.
 
 
-:- dynamic(use_ideep_swi/0).
 
 % ====================================================
 % call_for_literal/3
@@ -765,7 +674,7 @@ body_call_cyckb(HEAD_T):-el_holds_DISABLED_KB, HEAD_T =.. [t|PLIST], lmconf:use_
 % =====================================
 body_req(HEAD,HEAD_T):- (hook_body_req(HEAD,HEAD_T)).
 
-:-export(body_req_normal/4).
+:- was_export(body_req_normal/4).
 %hook_body_req(HEAD,HEAD_T):- mpred_isa(F,prologPTTP),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
 %hook_body_req(HEAD,HEAD_T):- mpred_isa(F,prologDynamic),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
 hook_body_req(_,_,isa(I,C),_):- !, body_req_isa(I,C).
@@ -776,11 +685,11 @@ hook_body_req(_,_,_ ,HEAD_T):- t_l:useOnlyExternalDBs,!, body_call_cyckb(HEAD_T)
 hook_body_req(HEAD,HEAD_T):-  no_repeats(body_req_normal(HEAD,HEAD_T)).
 
 
-:-export(body_req_normal/4).
+:- was_export(body_req_normal/4).
 body_req_normal(HEAD,HEAD_T):- not(ground(HEAD)),!,no_repeats(HEAD_T,body_req_1(HEAD,HEAD_T)).
 body_req_normal(HEAD,HEAD_T):- body_req_1(HEAD,HEAD_T),!. 
 
-:-export(body_req_1/4).
+:- was_export(body_req_1/4).
 body_req_1(HEAD,HEAD_T):- get_functor(HEAD,F), mpred_isa(F,call_tabled),!, call_tabled(body_req_2(HEAD,HEAD_T)).
 body_req_1(HEAD,HEAD_T):- body_req_2(HEAD,HEAD_T).
 
@@ -806,7 +715,7 @@ foo_b(b1).
 foo_b(b2):-!.
 foo_b(b3):-!.
 
-:-must_det((findall(R,call_no_cuts(foo_b(R)),List),length(List,3))).
+:- must_det((findall(R,call_no_cuts(foo_b(R)),List),length(List,3))).
 */
 
 
@@ -839,7 +748,7 @@ dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-compound(DBASE),!,arg(1,DBASE,F),must_d
 dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-nonvar(F),must(arity(F,N)),make_functorskel(F,N),!,fskel(F,DBASE,PRED,A,RGS,_,_),!.
 */
 
-:-export(registerCycPredPlus2/1).
+:- was_export(registerCycPredPlus2/1).
 
 
 registerCycPredPlus2_3(_CM,M,PI,F/A2):-
@@ -876,10 +785,12 @@ ensure_universal_stub_plus_2(F,A2):-
    decl_mpred_hybrid(M,F,AMinus2).
 
 
-:-abolish(logicmoo_util_database:aina/1).
+:- abolish(logicmoo_util_database:aina/1).
 logicmoo_util_database:aina(G):- mpred_adda(G).
-:-abolish(logicmoo_util_database:ain/1).
+:- abolish(logicmoo_util_database:ain/1).
 logicmoo_util_database:ain(G):- mpred_add(G).
-:-abolish(logicmoo_util_database:ainz/1).
+:- abolish(logicmoo_util_database:ainz/1).
 logicmoo_util_database:ainz(G):- mpred_addz(G).
+
+:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 

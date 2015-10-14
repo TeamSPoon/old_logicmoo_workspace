@@ -128,12 +128,12 @@
           ]).
 % autoloading user:portray_clause_pi/2 from /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first
 :- multifile % (multifile) :-
-        '$included'/4,
-        '$load_context_module'/3,
+        
+        
         double_quotes_was_strings/1,
         string_predicate/1,
         to_string_hook/3.
-:- meta_predicate % (meta_predicate) :-
+:- meta_predicate 
         convert_members(?, ?, ?),
         map_tree_to_list(2, ?, ?),
         toCase(2, ?, ?),
@@ -254,8 +254,8 @@
         vars_to_ucase_0/2.
 
 :- dynamic % (dynamic) :-
-        '$included'/4,
-        '$load_context_module'/3,
+        
+        
         double_quotes_was_strings/1,
         to_string_hook/3.
 

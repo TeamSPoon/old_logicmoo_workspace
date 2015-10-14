@@ -1,4 +1,4 @@
-:- dynamic   user:file_search_path/2.
+:- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
 :- prolog_load_context(directory,Dir),
    DirFor = pttp_new,
@@ -381,9 +381,9 @@ not_xray:-fail.
 % :- set_flag(print_depth,1000).
 % :- set_flag(variable_names,off).
 
-:- dynamic(count_inferences_pred/1).
-:- dynamic(trace_search_progress_pred/1).
-:- dynamic(compile_proof_printing/0).
+:- was_dynamic(count_inferences_pred/1).
+:- was_dynamic(trace_search_progress_pred/1).
+:- was_dynamic(compile_proof_printing/0).
 
 %%% Sound unification algorithm with occurs check that is called
 %%% by code resulting from the `add_sound_unification' transformation.
@@ -795,14 +795,14 @@ procedures_with_ancestor_tests([[P,N]|Preds],Clauses,Procs) :-
 	procedures_with_ancestor_tests(Preds,Clauses,Procs2),
 	conjoin(Proc,Procs2,Procs).
 procedures_with_ancestor_tests([],_Clauses,true).
-:-else.
+:- else.
 procedures_with_ancestor_tests([[P,N]|Preds],Clauses,Procs) :-
         procedure(P,N,Clauses,Proc1),
         ancestor_tests(P,N,Tests),conjoin(Tests,Proc1,Proc),
         procedures_with_ancestor_tests(Preds,Clauses,Procs2),
         conjoin(Proc,Procs2,Procs).
 procedures_with_ancestor_tests([],_Clauses,true).
-:-endif.
+:- endif.
 
 
 query_n(M) :-                             % call query with depth bound M
@@ -1177,7 +1177,7 @@ dont_trace_search :-
 :- trace_search.                        % default is to trace searching
 
 
-:- dynamic(use_sound_unification/1).
+:- was_dynamic(use_sound_unification/1).
 use_sound_unification(unify_with_occurs_check).
 
 add_sound_unification((Head :- Body),(Head1 :- Body1)) :- use_sound_unification(Pred),!,
@@ -1287,7 +1287,7 @@ ancestor_tests(P,N,Result) :-
                 conjoin(C1,C2,Result).
 
 
-:- dynamic(compile_complete_search/0).
+:- was_dynamic(compile_complete_search/0).
 compile_complete_search.
 
 :- ensure_loaded(io).
@@ -1386,7 +1386,7 @@ pttp1(X) :- retract_last,
 %%% ****if* PTTP/pttp2
 %%% SOURCE
 
-:- dynamic(kill_me/1).
+:- was_dynamic(kill_me/1).
 retract_last:- retractall(query(_,_,_,_)), forall(retract(kill_me(C)),retractall(C)).
 
 assert_clause(C,_):-assert(C),assert(kill_me(C)).

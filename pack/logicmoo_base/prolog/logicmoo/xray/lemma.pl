@@ -14,14 +14,14 @@
 %%                                                                           %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- dynamic(dynamic_lemma/3).
-:- dynamic(static_lemma/3).
+:- was_dynamic(dynamic_lemma/3).
+:- was_dynamic(static_lemma/3).
 
-:- dynamic(lemma_handling_flag/0).
+:- was_dynamic(lemma_handling_flag/0).
 
-:- dynamic(lemma_mode_parameter/1).
-:- dynamic(lemma_format_parameter/1).
-:- dynamic(lemma_type_parameter/1).
+:- was_dynamic(lemma_mode_parameter/1).
+:- was_dynamic(lemma_format_parameter/1).
+:- was_dynamic(lemma_type_parameter/1).
 
 %%% ----------------------------------------------------------------------
 %%% LEMMA CONFIGURATION
