@@ -1,4 +1,4 @@
-:-module(common_logic_sexpr,[codelist_to_forms/2,input_to_forms/3,sexpr_sterm_to_pterm_list/2,sexpr_sterm_to_pterm/2,lisp_read_from_input/2,parse_sexpr/2]).
+:-module(common_logic_sexpr,[codelist_to_forms/2,svar_fixvarname/2,input_to_forms/2,input_to_forms/3,sexpr_sterm_to_pterm_list/2,sexpr_sterm_to_pterm/2,lisp_read_from_input/2,parse_sexpr/2]).
 
 
 

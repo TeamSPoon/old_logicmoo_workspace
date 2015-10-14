@@ -674,7 +674,9 @@ index((print_fake_doc), 2, logicmoo_util_help, logicmoo_util_help).
 index((scan_and_list_file_preds), 1, logicmoo_util_help, logicmoo_util_help).
 index((some_flocation), 3, logicmoo_util_help, logicmoo_util_help).
 index((some_location), 3, logicmoo_util_help, logicmoo_util_help).
+index((mpred_type_module), 1, logicmoo_util_help, logicmoo_util_help).
 index((target_module), 2, logicmoo_util_help, logicmoo_util_help).
+index((list_item_per_line), 4, logicmoo_util_help, logicmoo_util_help).
 index((write_modules), 0, logicmoo_util_help, logicmoo_util_help).
 index((helper_name0), 1, logicmoo_util_help, logicmoo_util_help).
 index((is_crossfile_module_0), 1, logicmoo_util_help, logicmoo_util_help).

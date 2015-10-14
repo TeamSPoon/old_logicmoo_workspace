@@ -28,17 +28,17 @@ mpred_is_tracing/1, %kb
 mpred_warnings/1, %kb
 mpred_pfc:never_assert_u/1, %kb
 mpred_pfc:never_retract_u/1, %kb
-mpred_pfc:pfcMark/4, %kb
 mpred_pfc:mpred_is_tracing_exec/0, %kb
 mpred_pfc:use_presently/0, %kb
 */
+pfcMark/4, %kb
 (==>)/1, %kb
 (::::) / 2, %kb
 (<-)/2, %kb
 (<==>)/2, %kb
 (==>)/2, %kb
-neg/1, %kb
-nesc/1, %kb
+(neg)/1, %kb
+(nesc)/1, %kb
 mpred_action/1, %kb
 mpred_do_and_undo_method/2, %kb
 prologMultiValued/1, %kb
@@ -227,10 +227,10 @@ cycPrepending/2, %kb
 decided_not_was_isa/2, %kb
 defnSufficient/2, %kb
 did_learn_from_name/1, %kb
-f_to_mfa/4, %kb
+% f_to_mfa/4, %kb
 formatted_resultIsa/2, %kb
 genls/2, %kb
-get_clause_vars_for_print/2, %kb
+% get_clause_vars_for_print/2, %kb
 holds_f_p2/2, %kb
 is_wrapper_pred/1, %kb
 isa/2, %kb
@@ -248,8 +248,8 @@ mpred_to_cyc/2, %kb
 mpred_univ/1, %kb
 pddlSomethingIsa/2, %kb
 pfcRHS/1, %kb
-pp_i2tml_now/1, %kb
-pp_item_html/2, %kb
+%pp_i2tml_now/1, %kb
+%pp_item_html/2, %kb
 pttp1a_wid/3, %kb
 pttp_builtin/2, %kb
 pttp_nnf_pre_clean_functor/3, %kb
@@ -280,7 +280,6 @@ vtUnreifiableFunction/1, %kb
 /*
 doing_agenda_slow_op/0, %kb
 loaded_mpred_file/2, %kb
-loading_mpred_file/2, %kb
 suspend_timers/0, %kb
 will_call_after/2, %kb
 */
@@ -289,6 +288,7 @@ was_chain_rule/1, %kb
 ptReformulatorDirectivePredicate/1, %kb
 props/2, %kb
 %mpred_list_triggers/1, %kb
+functorDeclares/1,
 whymemory/2, %kb
 prologHybrid/2, %kb
 use_ideep_swi/0, %kb
@@ -298,7 +298,7 @@ current_source_suffix/1, %kb
 function_corisponding_predicate/2, %kb
 cyckb_t/3, %kb
 elInverse/2, %kb
-kif_test_string/1, %kb
+% kif_test_string/1, %kb
 agent_call_command/2, %kb
 feature_test/0, %kb
 type_action_info/3, %kb
@@ -325,11 +325,10 @@ do_kb_export(F/A):-!, kb:multifile(F/A),kb:dynamic(F/A).
 :- module_property(kb, exports(List)),maplist(do_kb_export,List).
 
 :- use_module(logicmoo(mpred/mpred_loader)).
-:- use_module(logicmoo(mpred/'mpred_*.pl')).
-
-% :- use_module(logicmoo(mpred/mpred_pfc)).
+:- use_module(logicmoo(mpred/mpred_pfc)).
 
 /*
+:- use_module(logicmoo(mpred/'mpred_*.pl')).
 
 kb:resolveConflict(C):- cwc, must((resolveConflict0(C),
   show_if_debug(is_resolved(C)),mpred_rem(conflict(C)))).
@@ -367,6 +366,7 @@ arity(F,A):- atom(F), integer(A),current_predicate(F/A),A>1.
 arity(F,1):- atom(F), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
 
 
+kb:current_world(current).
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 

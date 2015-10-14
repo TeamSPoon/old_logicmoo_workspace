@@ -26,7 +26,7 @@
             edit1term/0,
             edit1term/1,
             ensure_webserver/0,
-            f_to_mfa/4,
+            
             find_cl_ref/2,
             find_ref/2,
             fmtimg/2,
@@ -34,7 +34,7 @@
             'functor spec'/4,
             functor_to_color/2,
             functor_to_color/4,
-            get_clause_vars_for_print/2,
+            
             get_http_current_request/1,
             get_http_session/1,
             get_nv_session/3,
@@ -129,7 +129,6 @@
             url_decode_term/2,
             url_encode/2,
             url_encode_term/3,
-            w_get_fa/3,
             with_search_filters/1,
             write_VAR/4,
             write_args/5,
@@ -345,11 +344,6 @@ print_request([H|T]) :-
         format(user_error,'<tr><td>~w<td>~w~n', [Name, Value]),
         print_request(T).
 
-
-f_to_mfa(EF,R,F,A):-w_get_fa(EF,F,A),
-    (((current_predicate(_:F/A),functor(P,F,A),predicate_property(_M:P,imported_from(R)))*->true;
-    current_predicate(_:F/A),functor(P,F,A),source_file(R:P,_SF))),
-    current_predicate(R:F/A).
 
 :- nb_setval(pldoc_options,[ prefer(manual) ]).
 
@@ -976,13 +970,6 @@ name_the_var(Num,Vs,[VIn|More],[N=VIn|VsOut],[N=VIn|Added]):- Num2 is Num +1, NV
   name_the_var(Num2,Vs,More,VsOut,Added).
 
 
-w_get_fa(PI,_F,_A):-is_ftVar(PI),!.
-w_get_fa(F/A,F,A):- !.
-w_get_fa(PI,PI,_A):- atomic(PI),!.
-w_get_fa(PI,F,A):- is_ftCompound(PI),!,functor(PI,F,A).
-w_get_fa(Mask,F,A):-get_functor(Mask,F,A).
-
-
 
 %  II = 56+TTT, rtrace((url_encode(II,EE),url_decode(EE,OO))),writeq(OO),OO=II.
 
@@ -1182,10 +1169,6 @@ pp_i2tml(T):-string(T),format('"~w"',[T]).
 pp_i2tml(clause(H,B,Ref)):- !, w_tl(t_l:current_clause_ref(Ref),pp_i2tml_v((H:-B))).
 pp_i2tml(HB):- find_ref(HB,Ref),!, must(w_tl(t_l:current_clause_ref(Ref),pp_i2tml_v((HB)))).
 pp_i2tml(HB):- w_tl(t_l:current_clause_ref(none),must(pp_i2tml_v((HB)))).
-
-get_clause_vars_for_print(HB,HB):- ground(HB),!.
-get_clause_vars_for_print(I,I):- listing_filter(skipVarnames),!.
-get_clause_vars_for_print(H0,MHB):- get_clause_vars_copy(H0,MHB).
 
 numberlist_at(_,[]).
 numberlist_at(_,[N|More]):- number(N),!,N2 is N+1,numberlist_at(N2,More),!.

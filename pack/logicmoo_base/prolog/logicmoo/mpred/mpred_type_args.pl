@@ -19,6 +19,7 @@
             argIsa_call_7/3,
             argIsa_call_9/3,
             argIsa_ft/3,
+            argIsa_known/3,
             argIsa_op_call/4,
             argisa_nodebug/0,
             as_one_of/2,
@@ -81,7 +82,7 @@
           ]).
 % autoloading user:portray_clause_pi/2 from /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first
 :- was_shared_multifile((         
-        argIsa_known/3,
+        
         coerce/3)).
 /*
 :- dynamic((

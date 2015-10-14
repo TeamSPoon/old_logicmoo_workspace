@@ -95,7 +95,8 @@ cwdl(0,+),
 % mpred_stubs
 must_op(*,0),
 % mpred_stubs
-registerCycPredPlus2(0).
+registerCycPredPlus2(0),
+mpred_stubs:call_provided_mpred_storage_op(*,0,*).
 
 
 :- include('mpred_header.pi').

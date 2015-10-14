@@ -1229,7 +1229,7 @@ cf_to_flattened_clauses_0(KB,Why,NCFsI,FlattenedO):-
    % wdmsgl(cf(NCFs)),
    must_maplist(clauses_to_boxlog(KB,Why),NCFs,ListOfLists),
    flatten([ListOfLists],Flattened),
-   lmconf:as_prolog(Flattened,FlattenedL),
+   as_prolog(Flattened,FlattenedL),
    list_to_set(FlattenedL,FlattenedS),
    must_maplist(demodal_sents(KB),FlattenedS,FlattenedO))),!.
   

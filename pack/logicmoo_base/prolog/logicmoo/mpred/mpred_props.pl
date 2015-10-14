@@ -162,8 +162,8 @@ decl_mpred_hybrid_ilc(CM,M,PI,F/A):-atom(PI),A==0,must(arity(F,_)),not(current_p
 decl_mpred_hybrid_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),loop_check_term(decl_mpred_hybrid_ilc_0(CM,M,PI,F/A),decl_mpred_hybrid_ilc(CM,M,F),true).
 decl_mpred_hybrid_ilc_0(_CM,M,PI,F/A):-
       assert_arity(F,A),
-      add(mpred_module(F,M)),
-      add(prologHybrid(F)),
+      add(kb:mpred_module(F,M)),
+      add(kb:prologHybrid(F)),
       get_cc(PI,NC),
       must(M=user),     
       decl_mpred_mfa(M,F,A),
@@ -176,8 +176,8 @@ decl_mpred_hybrid_ilc_0(_CM,M,PI,F/A):-
 :- op(1120,fx,(decl_mpred_hybrid)).
 
 %prologHybrid(X,Y):-dtrace(prologHybrid(X,Y)).
-:- was_dynamic(prologHybrid(_,_)).
-:- lock_predicate(prologHybrid(_,_)).
+%:- was_dynamic(prologHybrid(_,_)).
+%:- lock_predicate(prologHybrid(_,_)).
 
 % ========================================
 % mpred_props database

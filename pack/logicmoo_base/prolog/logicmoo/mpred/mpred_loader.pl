@@ -514,7 +514,7 @@ mpred_may_expand_module(_):-t_l:mpred_module_expansion(*),!.
 mpred_expand_inside_file_anyways:- loading_source_file(F),!,mpred_expand_inside_file_anyways(F).
 
 mpred_expand_inside_file_anyways(F):- var(F),!,loading_source_file(F),nonvar(F),mpred_expand_inside_file_anyways(F).
-mpred_expand_inside_file_anyways(F):- loading_mpred_file(_,F),!.
+mpred_expand_inside_file_anyways(F):- t_l:loading_mpred_file(_,F),!.
 mpred_expand_inside_file_anyways(F):- registered_mpred_file(F).
 mpred_expand_inside_file_anyways(F):- is_mpred_file(F),must(loading_module(M);source_module(M)), (M=user; \+ lmconf:mpred_skipped_module(M)),!.
 
@@ -966,7 +966,7 @@ user:prolog_load_file(ModuleSpec, Options):- current_predicate(_:mpred_loader_fi
 % probably an autoload (SKIP)
 prolog_load_file_loop_checked(_Module:library(Atom), Options) :- atom(Atom),member(must_be_module(true),Options),member(if(not_loaded),Options),!,fail.
 prolog_load_file_loop_checked(_Module:_Spec, Options) :- member(must_be_module(true),Options),member(if(not_loaded),Options),member(imports([_/_]),Options),!,fail.   
-prolog_load_file_loop_checked(ModuleSpec, Options) :- loop_check(show_call(prolog_load_file_loop_checked_0(ModuleSpec, Options))).
+prolog_load_file_loop_checked(ModuleSpec, Options) :- loop_check(show_call_success(prolog_load_file_loop_checked_0(ModuleSpec, Options))).
 
 prolog_load_file_loop_checked_0(ModuleSpec, Options) :- current_predicate(_,_:exists_file_safe(_)),
    catch(prolog_load_file_nlc(ModuleSpec, Options),E,(nop((trace,prolog_load_file_nlc(ModuleSpec, Options))),throw(E))).
@@ -1109,14 +1109,12 @@ declare_load_dbase(Spec):- forall(no_repeats_old(File,must_locate_file(Spec,File
 
 % :- was_export((is_compiling_sourcecode/1)).
 is_compiling_sourcecode:-is_compiling,!.
-is_compiling_sourcecode:-compiling, current_input(X),not((stream_property(X,file_no(0)))),prolog_load_context(source,F),not((loading_mpred_file(_,_))),F=user,!.
+is_compiling_sourcecode:-compiling, current_input(X),not((stream_property(X,file_no(0)))),prolog_load_context(source,F),\+((t_l:loading_mpred_file(_,_))),F=user,!.
 is_compiling_sourcecode:-compiling,dmsg(system_compiling),!.
 
 :- was_export(load_mpred_files/0).
 load_mpred_files :- forall(registered_mpred_file(File),ensure_mpred_file_loaded(File)).
 
-%:- dynamic(current_world/1).
-kb:current_world(current).
 
 % =======================================================
 % :- meta_predicate show_load_call(0).
@@ -1186,7 +1184,7 @@ force_reload_mpred_file(World,MFileIn):- strip_module(MFileIn,NewModule,_),
    DBASE = DBASE,
    wno_tl(t_l:disable_mpred_term_expansions_locally,
      show_call((call_with_source_module(kb,load_files(kb:File, [if(true),module(kb)]))))),
-   catch((w_tl(loading_mpred_file(World,File),     
+   catch((w_tl(t_l:loading_mpred_file(World,File),     
       load_mpred_on_file_end(World,File))),
     Error,
     (wdmsg(error(Error,File)),retractall(lmconf:loaded_mpred_file(World,File)),

@@ -147,6 +147,7 @@ index((translate_args), 9, mpred_expansion, mpred_expansion).
 index((was_isa_syntax), 3, mpred_expansion, mpred_expansion).
 index((additiveOp), 1, mpred_expansion, mpred_expansion).
 index((comparitiveOp), 1, mpred_expansion, mpred_expansion).
+index((into_plist), 2, mpred_hooks, mpred_hooks).
 index((deducedSimply), 1, mpred_kb_ops, mpred_kb_ops).
 index((how_to_op), 2, mpred_kb_ops, mpred_kb_ops).
 index((is_callable), 1, mpred_kb_ops, mpred_kb_ops).
@@ -176,6 +177,7 @@ index((lqu), 0, mpred_listing, mpred_listing).
 index((mpred_select_justificationNode), 3, mpred_listing, mpred_listing).
 index((mpred_trace_item), 2, mpred_listing, mpred_listing).
 index((mpred_why), 0, mpred_listing, mpred_listing).
+index((get_clause_vars_for_print), 2, mpred_listing, mpred_listing).
 index((mpred_why), 1, mpred_listing, mpred_listing).
 index((mpred_why1), 1, mpred_listing, mpred_listing).
 index((mpred_whyBrouse), 2, mpred_listing, mpred_listing).
@@ -404,6 +406,8 @@ index((fc_eval_action), 2, mpred_pfc, mpred_pfc).
 index((fcnt), 2, mpred_pfc, mpred_pfc).
 index((fcnt0), 2, mpred_pfc, mpred_pfc).
 index((fcpt), 2, mpred_pfc, mpred_pfc).
+index((f_to_mfa), 4, mpred_pfc, mpred_pfc).
+index((w_get_fa), 3, mpred_pfc, mpred_pfc).
 index((fcpt0), 2, mpred_pfc, mpred_pfc).
 index((foreachl_do), 2, mpred_pfc, mpred_pfc).
 index((fwc), 0, mpred_pfc, mpred_pfc).
@@ -922,6 +926,7 @@ index((argIsa_call_6), 3, mpred_type_args, mpred_type_args).
 index((argIsa_call_7), 3, mpred_type_args, mpred_type_args).
 index((argIsa_call_9), 3, mpred_type_args, mpred_type_args).
 index((argIsa_ft), 3, mpred_type_args, mpred_type_args).
+index((argIsa_known), 3, mpred_type_args, mpred_type_args).
 index((argIsa_op_call), 4, mpred_type_args, mpred_type_args).
 index((argisa_nodebug), 0, mpred_type_args, mpred_type_args).
 index((as_one_of), 2, mpred_type_args, mpred_type_args).
@@ -1200,6 +1205,7 @@ index((term_slots), 2, mpred_type_wff, mpred_type_wff).
 index((wrap_in_neg_functor), 3, mpred_type_wff, mpred_type_wff).
 index((registered_module_type), 2, kb, mpred_userkb).
 index((current_world), 1, kb, mpred_userkb).
+index((pfcMark), 4, kb, mpred_userkb).
 index((==>), 1, kb, mpred_userkb).
 index((::::), 2, kb, mpred_userkb).
 index((<-), 2, kb, mpred_userkb).
@@ -1394,10 +1400,8 @@ index((cycPrepending), 2, kb, mpred_userkb).
 index((decided_not_was_isa), 2, kb, mpred_userkb).
 index((defnSufficient), 2, kb, mpred_userkb).
 index((did_learn_from_name), 1, kb, mpred_userkb).
-index((f_to_mfa), 4, kb, mpred_userkb).
 index((formatted_resultIsa), 2, kb, mpred_userkb).
 index((genls), 2, kb, mpred_userkb).
-index((get_clause_vars_for_print), 2, kb, mpred_userkb).
 index((holds_f_p2), 2, kb, mpred_userkb).
 index((is_wrapper_pred), 1, kb, mpred_userkb).
 index((isa), 2, kb, mpred_userkb).
@@ -1413,8 +1417,6 @@ index((mpred_to_cyc), 2, kb, mpred_userkb).
 index((mpred_univ), 1, kb, mpred_userkb).
 index((pddlSomethingIsa), 2, kb, mpred_userkb).
 index((pfcRHS), 1, kb, mpred_userkb).
-index((pp_i2tml_now), 1, kb, mpred_userkb).
-index((pp_item_html), 2, kb, mpred_userkb).
 index((pttp1a_wid), 3, kb, mpred_userkb).
 index((pttp_builtin), 2, kb, mpred_userkb).
 index((pttp_nnf_pre_clean_functor), 3, kb, mpred_userkb).
@@ -1446,6 +1448,7 @@ index((call_OnEachLoad), 1, kb, mpred_userkb).
 index((was_chain_rule), 1, kb, mpred_userkb).
 index((ptReformulatorDirectivePredicate), 1, kb, mpred_userkb).
 index((props), 2, kb, mpred_userkb).
+index((functorDeclares), 1, kb, mpred_userkb).
 index((whymemory), 2, kb, mpred_userkb).
 index((prologHybrid), 2, kb, mpred_userkb).
 index((use_ideep_swi), 0, kb, mpred_userkb).
@@ -1455,7 +1458,6 @@ index((current_source_suffix), 1, kb, mpred_userkb).
 index((function_corisponding_predicate), 2, kb, mpred_userkb).
 index((cyckb_t), 3, kb, mpred_userkb).
 index((elInverse), 2, kb, mpred_userkb).
-index((kif_test_string), 1, kb, mpred_userkb).
 index((agent_call_command), 2, kb, mpred_userkb).
 index((feature_test), 0, kb, mpred_userkb).
 index((type_action_info), 3, kb, mpred_userkb).

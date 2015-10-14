@@ -99,6 +99,7 @@ lmconf:mpred_provide_storage_op/2,
 lmconf:mpred_provide_write_attributes/2, 
 lmconf:mpred_skipped_module/1, 
 lmconf:never_reload_file/1, 
+lmconf:loaded_mpred_file/2,
 lmconf:pfcManageHybrids/0, 
 lmconf:sanity_test/0, 
 lmconf:isa_pred_now_locked/0,
@@ -163,9 +164,13 @@ user:term_expansion/2
 :- thread_local(t_l:infForward).
 :- thread_local(t_l:into_form_code/0).
 :- thread_local(t_l:infSupertypeName/0).
+:- thread_local(t_l:loading_mpred_file/2).
 
 :- style_check(-singleton).
 :- set_prolog_flag(generate_debug_info, true).
 
 
+:- use_module(logicmoo(util/logicmoo_util_preddefs)).
+:- use_module(logicmoo(mpred/mpred_loader)).
+:- use_module(logicmoo(mpred/mpred_userkb)).
 

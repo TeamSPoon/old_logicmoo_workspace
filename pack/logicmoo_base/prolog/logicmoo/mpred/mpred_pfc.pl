@@ -58,6 +58,8 @@
             fcnt/2,
             fcnt0/2,
             fcpt/2,
+          f_to_mfa/4,
+          w_get_fa/3,
             fcpt0/2,
             foreachl_do/2,
             fwc/0,
@@ -571,7 +573,7 @@
 :- was_shared_multifile(singleValuedInArg/2).
 :- was_shared_multifile(prologSideEffects/1).
 
-:- source_location(F,_),asserta(never_registered_mpred_file(F)).
+:- source_location(F,_),asserta(kb:never_registered_mpred_file(F)).
 :- was_dynamic(lmconf:module_local_init/0).
 :- discontiguous(lmconf:module_local_init/0).
 
@@ -648,7 +650,16 @@ is_side_effect_disabled:- t_l:side_effect_ok,!,fail.
 is_side_effect_disabled:- t_l:noDBaseMODs(_),!.
 
 
+          f_to_mfa(EF,R,F,A):-w_get_fa(EF,F,A),
+              (((current_predicate(_:F/A),functor(P,F,A),predicate_property(_M:P,imported_from(R)))*->true;
+              current_predicate(_:F/A),functor(P,F,A),source_file(R:P,_SF))),
+              current_predicate(R:F/A).
 
+w_get_fa(PI,_F,_A):-is_ftVar(PI),!.
+w_get_fa(F/A,F,A):- !.
+w_get_fa(PI,PI,_A):- atomic(PI),!.
+w_get_fa(PI,F,A):- is_ftCompound(PI),!,functor(PI,F,A).
+w_get_fa(Mask,F,A):-get_functor(Mask,F,A).
 
 
 set_prolog_stack_gb(Six):-set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).

@@ -186,7 +186,7 @@ int_assumed_t(P, X, Y, E, F, A, B, C, G, D):- t(P,X,Y),
 
 
 */
-:- was_dynamic(kif_test_string/1).
+:- dynamic(kif_test_string/1).
 kif_test_string_disabled(
 "
 % )

@@ -93,10 +93,10 @@
 :- meta_predicate 
         call_last_is_var(0).
 
-:- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
-:- include('mpred_header.pi').
 :- use_module(logicmoo(mpred/mpred_expansion)).
+:- include('mpred_header.pi').
+
 
 
 subst_except(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
@@ -468,7 +468,7 @@ leave_as_is_functor('kbMark').
 leave_as_is_functor('z_unused').
 leave_as_is_functor('genlMt').
 leave_as_is_functor('{}').
-leave_as_is_functor(F):-if_defined_else(kb:ptReformulatorDirectivePredicate(F),fail).
+leave_as_is_functor(F):-if_defined_else(ptReformulatorDirectivePredicate(F),fail).
 
 prequent(original(_)).
 prequent(mudEquals(_,_)).

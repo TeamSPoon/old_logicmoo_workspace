@@ -94,13 +94,7 @@ time_tick(*,0),
 /*
 :- was_dynamic((
         doing_agenda_slow_op/0,
-        lmconf:hook_one_minute_timer_tick/0,
-        lmconf:hook_one_second_timer_tick/0,
-        loaded_mpred_file/2,
-        loading_mpred_file/2,
-        
-        
-        )).
+        loaded_mpred_file/2)).
 */
 
 
@@ -115,7 +109,7 @@ tick_every(Name,Seconds,OnTick):-repeat,sleep(Seconds),catch(OnTick,E,dmsg(cause
 % Agenda system - source file loading
 % ================================================
 
-after_mpred_load:- not(loading_mpred_file(_,_)),lmconf:loaded_mpred_file(_,_),!.
+after_mpred_load:- \+(t_l:loading_mpred_file(_,_)),lmconf:loaded_mpred_file(_,_),!.
 
 % when all previous tasks have completed
 after_mpred_load_pass2:- not(lmconf:will_call_after(lmconf:after_mpred_load,_)).

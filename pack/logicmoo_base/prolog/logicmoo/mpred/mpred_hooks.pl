@@ -16,7 +16,29 @@
 % Douglas Miles
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_hooks.pl
-:- module(mpred_hooks,[]).
+:- module(mpred_hooks,[into_plist/2]).
+
+
+% ========================================
+% is_holds_true/is_holds_false
+% ========================================
+
+
+:- was_export(into_plist/2).
+into_plist(In,Out):-into_plist_arities(2,12,In,Out).
+
+:- was_export(into_plist_arities/4).
+into_plist_arities(Min,Max,PLIST,PLISTO):- var(PLIST),!,between(Min,Max,X),length(PLIST,X),PLISTO=PLIST.
+into_plist_arities(_,_,[P|LIST],[P|LIST]):-var(P),!.
+into_plist_arities(_,_,[t|PLIST],PLIST):-!.  % t is our versuion of '$holds' or call/N
+into_plist_arities(_,_,plist(P,LIST),[P|LIST]):-!.
+into_plist_arities(_,_,Call,PLIST):-Call=..PLIST. % finally the fallthrue
+
+
+never_mpred_mpred(mpred_isa).
+never_mpred_mpred(isa).
+never_mpred_mpred(arity).
+
 
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
@@ -322,91 +344,6 @@ end_of_file.
         xcall_t/7
           ]).
 
-% autoloading user:portray_clause_pi/2 from /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first
-:- was_shared_multifile((
-        
-        
-        agent_action_queue/3,
-        agent_session/2,
-        agent_text_command/4,
-        asserted_mpred_f/2,
-        asserted_mpred_f/3,
-        asserted_mpred_f/4,
-        asserted_mpred_f/5,
-        asserted_mpred_f/6,
-        asserted_mpred_f/7,
-        asserted_mpred_t/2,
-        asserted_mpred_t/3,
-        asserted_mpred_t/4,
-        asserted_mpred_t/5,
-        asserted_mpred_t/6,
-        asserted_mpred_t/7,
-        assertion_f/1,
-        assertion_t/1,
-        create_random_fact/1,
-        
-        deduce_facts/2,
-        default_type_props/3,
-        fact_always_true/1,
-        fact_is_false/2,
-        fact_maybe_deduced/1,
-        fskel/7,
-        grid_key/1,
-        hooked_random_instance/3,
-        is_edited_clause/3,
-        loaded_external_kbs/0,
-        loading_module_h/1,
-        local_term_anglify/2,
-        mpred_f/2,
-        mpred_f/3,
-        mpred_f/4,
-        mpred_f/5,
-        mpred_f/6,
-        mpred_f/7,
-        mpred_module_ready/0,
-        mudKeyword/2,
-        never_registered_mpred_file/1,
-        now_unused/1,
-        only_if_pttp/0,
-        registered_mpred_file/1,
-        relationMostInstance/3,
-        session_agent/2,
-        session_io/4,
-        startup_option/2,
-        t/1,
-        t/2,
-        t/3,
-        t/4,
-        t/5,
-        t/6,
-        t/7,
-        t/8,
-        t/9,
-        t/10,
-        t/11,
-        tFarthestReachableItem/1,
-        tNearestReachableItem/1,
-        telnet_fmt_shown/3,
-        term_anglify_last/2,
-        term_anglify_np/3,
-        term_anglify_np_last/3,
-        tms_reject_why/2,
-        use_cyc_database/0,
-        use_kif/2,
-        xcall_f/1,
-        xcall_f/2,
-        xcall_f/3,
-        xcall_f/4,
-        xcall_f/5,
-        xcall_f/6,
-        xcall_f/7,
-        xcall_t/1,
-        xcall_t/2,
-        xcall_t/3,
-        xcall_t/4,
-        xcall_t/5,
-        xcall_t/6,
-        xcall_t/7)).
 :- meta_predicate 
         call_f(?, 1, ?),
         call_f(?, 2, ?, ?),
@@ -458,39 +395,6 @@ end_of_file.
         xcall_t(4, ?, ?, ?, ?),
         xcall_t(5, ?, ?, ?, ?, ?),
         xcall_t(6, ?, ?, ?, ?, ?, ?).
-:- was_module_transparent((
-        add_arg_parts_of_speech/4,
-        argIsa_call_or_undressed/4,
-        compute_value/2,
-        compute_value_no_dice/2,
-        flatten_append/3,
-        holds_plist_t/2,
-        holds_relaxed_0_t/4,
-        holds_relaxed_t/3,
-        holds_t/1,
-        holds_t/2,
-        holds_t/3,
-        holds_t/4,
-        holds_t/5,
-        holds_t/8,
-        insert_into/4,
-        into_plist/2,
-        into_plist_arities/4,
-        inverse_args/2,
-        isCycPredArity_ignoreable/2,
-        list_update_op/3,
-        mpred_fact_arity/2,
-        mpred_plist_t/2,
-        never_mpred_mpred/1,
-        prologHybridFact/1,
-        replace_arg/4,
-        replace_nth_arglist/4,
-        replace_nth_ref/5,
-        same_vars/2,
-        t/2,
-        update_value/3,
-        verb_after_arg/3,
-        which_t/1)).
 
 :- was_dynamic((
 
@@ -727,48 +631,6 @@ end_of_file.
 :- was_shared_multifile term_anglify_np/3.
 :- was_shared_multifile term_anglify_np_last/3.
 
-:- meta_predicate xcall_f(0).
-:- meta_predicate xcall_f(1,?).
-:- meta_predicate xcall_f(2,?,?).
-:- meta_predicate xcall_f(3,?,?,?).
-:- meta_predicate xcall_f(4,?,?,?,?).
-:- meta_predicate xcall_f(5,?,?,?,?,?).
-:- meta_predicate xcall_f(6,?,?,?,?,?,?).
-:- meta_predicate xcall_t(0).
-:- meta_predicate xcall_t(1,?).
-:- meta_predicate xcall_t(2,?,?).
-:- meta_predicate xcall_t(3,?,?,?).
-:- meta_predicate xcall_t(4,?,?,?,?).
-:- meta_predicate xcall_t(5,?,?,?,?,?).
-:- meta_predicate xcall_t(6,?,?,?,?,?,?).
-:- meta_predicate call_f(?,1,?).
-:- meta_predicate call_f(?,2,?,?).
-:- meta_predicate call_f(?,3,?,?,?).
-:- meta_predicate call_f(?,4,?,?,?,?).
-:- meta_predicate call_f(?,5,?,?,?,?,?).
-:- meta_predicate call_f(?,6,?,?,?,?,?,?).
-:- meta_predicate call_mt_f(?,2,?,?).
-:- meta_predicate call_mt_f(?,3,?,?,?).
-:- meta_predicate call_mt_f(?,4,?,?,?,?).
-:- meta_predicate call_mt_f(?,5,?,?,?,?,?).
-:- meta_predicate call_mt_f(?,6,?,?,?,?,?,?).
-:- meta_predicate call_mt_t(?,2,?,?).
-:- meta_predicate call_mt_t(?,3,?,?,?).
-:- meta_predicate call_mt_t(?,4,?,?,?,?).
-:- meta_predicate call_mt_t(?,5,?,?,?,?,?).
-:- meta_predicate call_mt_t(?,6,?,?,?,?,?,?).
-:- meta_predicate call_which_t(?,1,?).
-:- meta_predicate call_which_t(?,2,?,?).
-:- meta_predicate call_which_t(?,3,?,?,?).
-:- meta_predicate call_which_t(?,4,?,?,?,?).
-:- meta_predicate call_which_t(?,5,?,?,?,?,?).
-:- meta_predicate call_which_t(?,6,?,?,?,?,?,?).
-
-:- meta_predicate holds_f(5,?,?,?,?,?).
-:- meta_predicate holds_f(6,?,?,?,?,?,?).
-:- meta_predicate holds_t(5,?,?,?,?,?).
-:- meta_predicate holds_t(6,?,?,?,?,?,?).
-
 
 :- was_shared_multifile((t/1,t/2)).
 :- was_shared_multifile((
@@ -829,27 +691,6 @@ tf_result(Call,TF):-(Call->TF=true;TF=fail).
 :- meta_predicate(if_result(0,0)).
 if_result(TF,Call):-(TF->Call;true).
 
-
-
-% ========================================
-% is_holds_true/is_holds_false
-% ========================================
-
-
-:- was_export(into_plist/2).
-into_plist(In,Out):-into_plist_arities(2,12,In,Out).
-
-:- was_export(into_plist_arities/4).
-into_plist_arities(Min,Max,PLIST,PLISTO):- var(PLIST),!,between(Min,Max,X),length(PLIST,X),PLISTO=PLIST.
-into_plist_arities(_,_,[P|LIST],[P|LIST]):-var(P),!.
-into_plist_arities(_,_,[t|PLIST],PLIST):-!.  % t is our versuion of '$holds' or call/N
-into_plist_arities(_,_,plist(P,LIST),[P|LIST]):-!.
-into_plist_arities(_,_,Call,PLIST):-Call=..PLIST. % finally the fallthrue
-
-
-never_mpred_mpred(mpred_isa).
-never_mpred_mpred(isa).
-never_mpred_mpred(arity).
 
 
 % ================================================================================

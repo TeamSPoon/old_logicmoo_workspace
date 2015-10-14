@@ -34,7 +34,7 @@
             clauses_to_boxlog_5/4,
             convertAndCall/2,
             correct_arities/3,
-            elInverse/2,
+            % elInverse/2,
             fix_input_vars/2,
             flatten_or_list/3,
             fmtl/1,
@@ -128,6 +128,7 @@
 
 :- was_shared_multifile 
         regression_test/0.
+/*
 :- was_dynamic 
         as_prolog/2,
         elInverse/2,
@@ -135,6 +136,7 @@
         mudEquals/2,
         not_mudEquals/2,
         skolem/3.
+*/
 
 kif_hook(0=>0).
 kif_hook(0<=>0).
@@ -242,9 +244,8 @@ as_dlog(Fml,FmlO):- to_dlog_ops(OPS),subsT_each(Fml,OPS,FmlM),!,correct_arities(
 as_symlog(Fml,Fml):- leave_as_is(Fml),!.
 as_symlog(Fml,FmlO):- as_dlog(Fml,FmlM),to_symlog_ops(OPS),subsT_each(FmlM,OPS,FmlM),correct_arities(['v','&'],FmlM,FmlO).
 
-:- was_dynamic(lmconf:as_prolog/2).
-lmconf:as_prolog(Fml,Fml):- is_ftVar(Fml),!.
-lmconf:as_prolog(Fml,FmlO):- as_symlog(Fml,FmlM),
+as_prolog(Fml,Fml):- is_ftVar(Fml),!.
+as_prolog(Fml,FmlO):- as_symlog(Fml,FmlM),
   to_prolog_ops(OPS),subsT_each(FmlM,OPS,FmlO).
 
 
@@ -354,7 +355,7 @@ flatten_or_list(_KB,X,[X]).
 
 
 
-fmtl(X):- lmconf:as_prolog(X,XX), fmt(XX).
+fmtl(X):- as_prolog(X,XX), fmt(XX).
 
 write_list([F|R]):- write(F), write('.'), nl, write_list(R).
 write_list([]).
@@ -568,7 +569,7 @@ pttp_quantifier(F):- pttp_nnf_pre_clean_functor(F,(all),[]);pttp_nnf_pre_clean_f
 
 should_be_poss(argInst).
 
-:- was_dynamic(elInverse/2).
+% :- was_dynamic(elInverse/2).
 
 clauses_to_boxlog(KB,Why,In,Prolog):- clauses_to_boxlog_0(KB,Why,In,Prolog).
 
@@ -619,7 +620,7 @@ boxlog_to_pfc(PFCM,PFCO):- boxlog_to_compile(PFCM,PFC),!, subst(PFC,(not),(neg),
 tsn:- with_all_dmsg(forall(clause(kif,C),must(C))).
 
 % kif:- make.
-:- was_dynamic(kif_test_string/1).
+:- dynamic(kif_test_string/1).
 tkif:- kif_test_string(TODO),kif_io(string(TODO),current_output).
 
 :- was_shared_multifile(lmconf:sanity_test/0).
@@ -797,7 +798,7 @@ simplify_bodies((B),(BC)):- must_det_l((conjuncts_to_list(B,RB),simplify_list(_K
 
 simplify_list(KB,RB,BBS):- list_to_set(RB,BB),must_maplist(removeQ(KB),BB,BBO),list_to_set(BBO,BBS).
 
-save_wfs(Why,PrologI):- must_det_l((lmconf:as_prolog(PrologI,Prolog), 
+save_wfs(Why,PrologI):- must_det_l((as_prolog(PrologI,Prolog), 
    w_tl(t_l:current_local_why(Why,Prolog),
    mpred_add_h(save_in_code_buffer,Why,Prolog)))).
 
@@ -896,6 +897,6 @@ boxlog_to_prolog(IN,OUT):-demodal_sents(_KB,IN,M),IN\=@=M,!,boxlog_to_prolog(M,O
 
 
 boxlog_to_prolog( H, HH):- H=..[F|ARGS],!,boxlog_to_prolog(ARGS,ARGSO),!,HH=..[F|ARGSO].
-boxlog_to_prolog(BL,PTTP):- lmconf:as_prolog(BL,PTTP).
+boxlog_to_prolog(BL,PTTP):- as_prolog(BL,PTTP).
 
 

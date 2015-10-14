@@ -28,6 +28,7 @@
             mpred_select_justificationNode/3,
             mpred_trace_item/2,
             mpred_why/0,
+            get_clause_vars_for_print/2,
             mpred_why/1,
             mpred_why1/1,
             mpred_whyBrouse/2,
@@ -114,7 +115,7 @@ mpred_trace_item(MM,H):- ignore(mpred_is_tracing(exec)-> on_x_rtrace(in_cmt(pp_i
 
    
 pp_item(MM,(H:-B)):- B ==true,pp_item(MM,H).
-pp_item(MM,H):- flag(show_asserions_offered,X,X+1),t_l:print_mode(html),!, (\+ \+ pp_item_html(MM,H)),!.
+pp_item(MM,H):- flag(show_asserions_offered,X,X+1),t_l:print_mode(html), ( \+ \+ if_defined(pp_item_html(MM,H))),!.
 
 pp_item(MM,kbp:spft(KB,P,F,T,W)):-!,
    w_tl(t_l:current_why_source(W),pp_item(MM,kbp:spft(KB,P,F,T))).
@@ -123,12 +124,16 @@ pp_item(MM,kbp:spft(KB,W0,U,U)):- W = (KB:W0),!,pp_item(MM,U:W).
 pp_item(MM,kbp:spft(KB,W0,F,U)):- W = (KB:W0),atom(U),!,    fmt('~N%~n',[]),pp_item(MM,U:W), fmt('rule: ~p~n~n', [F]),!.
 pp_item(MM,kbp:spft(KB,W0,F,U)):- W = (KB:W0),         !,   fmt('~w~nd:       ~p~nformat:    ~p~n', [MM,W,F]),pp_item(MM,U).
 pp_item(MM,kbp:nt(KB,Trigger0,Test,Body)) :- Trigger = (KB:Trigger0), !, fmt('~w n-trigger: ~p~ntest: ~p~nbody: ~p~n', [MM,Trigger,Test,Body]).
-pp_item(MM,kbp:pt(KB,F0,Body)):- F = (KB:F0),             !,fmt('~w p-trigger:~n', [MM]), pp_i2tml_now((F:-Body)).
-pp_item(MM,kbp:bt(KB,F0,Body)):- F = (KB:F0),             !,fmt('~w b-trigger:~n', [MM]), pp_i2tml_now((F:-Body)).
+pp_item(MM,kbp:pt(KB,F0,Body)):- F = (KB:F0),             !,fmt('~w p-trigger:~n', [MM]), pp_item('',(F:-Body)).
+pp_item(MM,kbp:bt(KB,F0,Body)):- F = (KB:F0),             !,fmt('~w b-trigger:~n', [MM]), pp_item('',(F:-Body)).
 
 
 pp_item(MM,U:W):- !,sformat(S,'~w  ~w:',[MM,U]),!, pp_item(S,W).
 pp_item(MM,H):- \+ \+ (( get_clause_vars_for_print(H,HH),fmt("~w ~p~N",[MM,HH]))).
+
+get_clause_vars_for_print(HB,HB):- ground(HB),!.
+get_clause_vars_for_print(I,I):- listing_filter(skipVarnames),!.
+get_clause_vars_for_print(H0,MHB):- get_clause_vars_copy(H0,MHB).
 
 mpred_classify_facts([],[],[],[]).
 
