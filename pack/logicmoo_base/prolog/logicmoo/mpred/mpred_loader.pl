@@ -220,10 +220,10 @@ mpred_loader_module_transparent(F/A):-!, mpred_loader:module_transparent(F/A).
 mpred_expander(_,_,I,_):-var(I),!,fail.
 mpred_expander(Type,_DefMod,_I,_O):-  (Type \== term,Type \= _:term ),!,fail.
 mpred_expander(Type,DefMod,end_of_file,O):- !,Type = term, DefMod = user, do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
-mpred_expander(Type,LoaderMod,I,OO):- \+ t_l:disable_px,
- catch((
+mpred_expander(Type,LoaderMod,I,OO):- on_x_debug(mpred_expander0(Type,LoaderMod,I,OO)),must(nonvar(OO)).
 
- nonvar(I), current_predicate(_,_:logicmoo_bugger_loaded),
+mpred_expander0(Type,LoaderMod,I,OO):- \+ t_l:disable_px,
+ nonvar(I),
   I\= '$si$':'$was_imported_kb_content$'(_,_),
   '$module'(UM,UM),
  (I\=(:-(_))), 
@@ -235,7 +235,7 @@ mpred_expander(Type,LoaderMod,I,OO):- \+ t_l:disable_px,
   w_tl(t_l:mpred_already_in_file_expansion(Key),
         (( % trace,
           fully_expand(change(assert,add),I,II),
-           show_if_debug(mpred_expander_now_one(F:L,M,II,O))))),!,I\=@=O,O=OO),_,fail).
+           show_if_debug(mpred_expander_now_one(F:L,M,II,O))))),!,I\=@=O,O=OO.
 
 mpred_expander_now_one(F,M,I,O):- t_l:verify_side_effect_buffer,!,loader_side_effect_verify_only(I,O).
 mpred_expander_now_one(F,M,I,O):- t_l:use_side_effect_buffer,!,loader_side_effect_capture_only(I,O).

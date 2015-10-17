@@ -9,7 +9,7 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_wff.pl
 :- module(mpred_type_wff,
           [ 
-            head_singletons/2, head_singles0/2,
+            head_singletons/2, head_singles0/2,head_singles01/2,
             append_termlist/3,            
             call_last_is_var/1,
 
@@ -498,8 +498,11 @@ is_kif_rule(R):- get_functor(R,F,A),functor(P,F,A),kif_hook(P),!.
 term_slots(Term,Slots):-term_singletons(Term, [],NS, [],S),append(NS,S,Slots).
 
 
+:- export(head_singletons/2).
 head_singletons(Pre,Post):-   hotrace((\+ ignore(show_call_failure( \+ head_singles0(Pre,Post))))).
 :- export(head_singles0/2).
+:- export(head_singles01/2).
+% TODO how to adderess head_singles0(true, if_missing(foob(_G754993), foob(a)))?
 head_singles0(Pre,Post):-is_ftVar(Post),!,head_singles01(Pre,Post).
 head_singles0(_,Post):- \+ compound(Post),!,fail.
 head_singles0(Pre,M:Post):-atom(M),!,head_singles0(Pre,Post).

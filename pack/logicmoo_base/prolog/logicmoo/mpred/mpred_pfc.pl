@@ -712,9 +712,9 @@ record_se:- (t_l:use_side_effect_buffer ; t_l:verify_side_effect_buffer).
 add_side_effect(_,_):- ( \+  record_se ),!.
 add_side_effect(Op,Data):-current_why(Why),assert(t_l:side_effect_buffer(Op,Data,Why)).
 
-attvar_op(Op,Data0):- add_side_effect(Op,Data0),
-   unnumbervars_and_save(Data,Data0),
+attvar_op(Op,Data):- add_side_effect(Op,Data),
    must(nonvar(Op)),
+   unnumbervars_and_save(Data,Data0),
    physical_side_effect(call(Op,Data0)).
 
 erase_w_attvars(Data0,Ref):- physical_side_effect(erase(Ref)),add_side_effect(erase,Data0).
@@ -3270,9 +3270,9 @@ add_reprop(Trig ,Trigger):-
     attvar_op(assertz_if_new,(kbp:qu(umt,repropagate(Trigger),(g,g))))).
 
 
-repropagate(P):- check_context_module,fail.
-repropagate(P):- is_ftVar(P),!.
-repropagate(P):-  (meta_wrapper_rule(P))->repropagate_meta_wrapper_rule(P);fail.
+repropagate(P):-  check_context_module,fail.
+repropagate(P):-  is_ftVar(P),!.
+repropagate(P):-  meta_wrapper_rule(P),!,repropagate_meta_wrapper_rule(P).
 repropagate(P):-  \+ predicate_property(P,_),'$find_predicate'(P,PP),PP\=[],!,forall(member(M:F/A,PP),
                                                           must((functor(Q,F,A),repropagate_1(M:Q)))).
 repropagate(F/A):- atom(F),integer(A),!,functor(P,F,A),!,repropagate(P).

@@ -1256,6 +1256,7 @@ index((to_prefixed), 3, mpred_type_naming, mpred_type_naming).
 index((typename_to_iname0), 3, mpred_type_naming, mpred_type_naming).
 index((head_singletons), 2, mpred_type_wff, mpred_type_wff).
 index((head_singles0), 2, mpred_type_wff, mpred_type_wff).
+index((head_singles01), 2, mpred_type_wff, mpred_type_wff).
 index((append_termlist), 3, mpred_type_wff, mpred_type_wff).
 index((call_last_is_var), 1, mpred_type_wff, mpred_type_wff).
 index((contains_negs), 1, mpred_type_wff, mpred_type_wff).

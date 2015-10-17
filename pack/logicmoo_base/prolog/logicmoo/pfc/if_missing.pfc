@@ -1,5 +1,5 @@
 
-
+:- trace.
 :- mpred_trace_exec.
 
 pfcControlled(if_missing(ftAskable,ftAssertable)).

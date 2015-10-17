@@ -823,7 +823,7 @@ errx:-on_x_debug((ain(tlbugger:dont_skip_bugger),do_gc,dumpST(10))),!.
 :- thread_local(tlbugger:rtracing/0).
 
 %skipWrapper:-!,fail.
-skipWrapper:- tracing, \+ tlbugger:rtracing.
+skipWrapper:- tracing, \+ tlbugger:rtracing,!.
 skipWrapper:- tlbugger:dont_skip_bugger,!,fail.
 skipWrapper:- tlbugger:skip_bugger,!.
 %skipWrapper:- 0 is random(5),!.
