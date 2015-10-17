@@ -1,3 +1,6 @@
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(mpred_pttp_static,[]).
+:- endif.
 
 :- ensure_loaded(logicmoo(mpred/'mpred_header.pi')).
 

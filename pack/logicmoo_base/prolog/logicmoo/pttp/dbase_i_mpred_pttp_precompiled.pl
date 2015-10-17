@@ -1,3 +1,6 @@
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(mpred_pttp_precompiled,[]).
+:- endif.
 
 
 %% subst_each(+In,+List,-Out).

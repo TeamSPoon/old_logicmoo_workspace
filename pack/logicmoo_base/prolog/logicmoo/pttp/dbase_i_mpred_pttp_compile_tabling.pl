@@ -1,3 +1,7 @@
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(mpred_pttp_compile,[]).
+:- endif.
+
 /*:-abolish(pttp_prove,6).
 :- abolish(search_cost,3).
 :- abolish(search,6).

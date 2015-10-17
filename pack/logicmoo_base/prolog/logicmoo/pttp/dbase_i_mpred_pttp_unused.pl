@@ -1,3 +1,7 @@
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(mpred_pttp_unused,[]).
+:- endif.
+
 %%% Adam Farquhar 9/1/95
 %%%
 %%% An interpreted model elimination theorem prover.

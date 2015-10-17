@@ -9,6 +9,9 @@
 % Dec 13, 2035
 %
 */
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(mpred_pttp,[]).
+:- endif.
 
 % :- use_module(logicmoo(mpred/'mpred_header.pi')).
 
