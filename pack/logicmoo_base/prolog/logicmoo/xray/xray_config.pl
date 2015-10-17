@@ -1,3 +1,7 @@
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(xray_xray_config,[]).
+:- endif.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                                                                           %%
 %%      Version:  1.00   Date: 15/03/98   File: xray_config.pl               %%

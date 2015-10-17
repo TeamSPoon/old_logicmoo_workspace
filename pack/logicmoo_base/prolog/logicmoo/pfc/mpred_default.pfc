@@ -30,13 +30,12 @@
 % Douglas Miles
 */
 
-:- op(500,fx,'\+').
+:- op(500,fx,( \+ )).
 :- op(1050,xfx,('<-')).
 :- op(1050,xfx,'<==>').
 :- op(1050,xfx,('<-')).
 :- op(1100,fx,('nesc')).
 :- op(1150,xfx,('::::')).
-:- op(500,fx,'\+').
 :- op(1050,xfx,'<==>').
 :- op(1050,xfx,('<-')).
 :- op(1200,fx,('=>')).
@@ -61,6 +60,7 @@ meta_argtypes(mpred_default(ftAssertable)).
 (mpred_default(P==>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))  ==> ((P, ~R/Test) ==> Q).
 (mpred_default(P==>Q)/nonvar(Q)) ==> (P ==> mpred_default(Q)).
 (mpred_default(P)/mpred_literal_nv(P))  ==>  ( \+neg(P) ==> P).
+(mpred_default((Q <- P))/mpred_literal(Q)) ==> (Q <-(P, ~neg(Q))).
 
 
 

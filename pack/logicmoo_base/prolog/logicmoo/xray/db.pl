@@ -13,6 +13,10 @@
 %%                                                                           %%
 %%                                                                           %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(xray_db,[]).
+:- endif.
+
 
 prolog_clause((Head :- Body),(Head :- Body)) :-
 	functor(Head,Pred,_),

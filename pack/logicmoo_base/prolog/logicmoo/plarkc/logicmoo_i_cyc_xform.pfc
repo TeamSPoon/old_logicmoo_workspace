@@ -21,7 +21,9 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-end_of_file.
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(plarkc_cyc_xform,[]).
+:- endif.
 
 :- op(500,fx,'~').
 :- op(1050,xfx,('==>')).

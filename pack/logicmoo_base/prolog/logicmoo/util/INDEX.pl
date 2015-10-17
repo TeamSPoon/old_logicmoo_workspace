@@ -782,6 +782,8 @@ index((with_mfa), 2, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((make_shared_multifile), 3, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((with_pfa), 2, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((with_pfa), 4, logicmoo_util_preddefs, logicmoo_util_preddefs).
+index((m_m_fa_to_m_p_fa), 4, logicmoo_util_preddefs, logicmoo_util_preddefs).
+index((m_fa_to_m_p_fa), 2, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((with_pfa_single), 4, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((with_pfa_group), 4, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((with_mfa_of), 5, logicmoo_util_preddefs, logicmoo_util_preddefs).

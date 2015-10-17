@@ -16,6 +16,10 @@
 % ===================================================================
 % OPERATOR PRECEDANCE
 % ===================================================================
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(plarkc_cyc_kb_tinykb,[]).
+:- endif.
+
 :- was_dynamic((exactlyAssertedEL/4,exactlyAssertedEL/5,exactlyAssertedEL/6,exactlyAssertedEL/7)).
 :- was_dynamic((exactlyAssertedEL_next/4,exactlyAssertedEL_next/5,exactlyAssertedEL_next/6,exactlyAssertedEL_next/7)).
 :- was_dynamic((exactlyAssertedEL_first/4,exactlyAssertedEL_first/5,exactlyAssertedEL_first/6,exactlyAssertedEL_first/7)).

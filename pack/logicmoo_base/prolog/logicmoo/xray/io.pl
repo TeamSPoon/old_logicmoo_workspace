@@ -13,6 +13,9 @@
 %%                                                                           %%
 %%                                                                           %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(xray_io,[]).
+:- endif.
 
 write_style_header(_):-no_disk,!.
 write_style_header(Stream):-write_clauses(Stream,(:-(style_check(-singleton)))).

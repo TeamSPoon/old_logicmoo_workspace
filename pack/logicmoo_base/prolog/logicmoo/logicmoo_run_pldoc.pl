@@ -1,3 +1,4 @@
+:- module(logicmoo_run_pldoc,[]).
 
 :- if(if_defined(load_mud_www)).
 

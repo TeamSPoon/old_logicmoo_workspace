@@ -56,6 +56,8 @@
             (make_shared_multifile)/3,
             with_pfa/2,
             with_pfa/4,
+            m_m_fa_to_m_p_fa/4,
+            m_fa_to_m_p_fa/2,
             with_pfa_single/4,
             with_pfa_group/4,
             with_mfa_of/5,
@@ -226,8 +228,17 @@ make_shared_multifile(CM, M, PI):- functor(PI,F,A),make_shared_multifile(CM, M, 
 
 :-module_transparent(with_pfa/2).
 with_pfa(With, PI):- context_module_of_file(CM),with_pfa_group(only_3rd(With),CM, user, PI).
+
 :-module_transparent(with_pfa/4).
 with_pfa(With,CM, M, PI):- context_module_of_file(CM),with_pfa_group(only_3rd(With),CM, M, PI).
+
+:-module_transparent(m_m_fa_to_m_p_fa/4).
+m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CM,M,F/A):-!,atom(F),functor(PI,F,A),CM:call(Decl_mpred_hybrid,M,PI,F/A).
+m_m_fa_to_m_p_fa(Decl_mpred_hybrid,CM,M,PI):-functor(PI,F,A),CM:call(Decl_mpred_hybrid,M,PI,F/A).
+
+:-module_transparent(m_fa_to_m_p_fa/2).
+m_fa_to_m_p_fa(Decl_mpred_hybrid,M:FA):- !, m_m_fa_to_m_p_fa(Decl_mpred_hybrid,M,M,FA).
+m_fa_to_m_p_fa(Decl_mpred_hybrid,FA):-  m_m_fa_to_m_p_fa(Decl_mpred_hybrid,M,M,FA).
 
 :-module_transparent(only_3rd/4).
 only_3rd([],_CM, _M, _PI):- !.

@@ -1,3 +1,7 @@
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(xray_pttp_examples,[]).
+:- endif.
+
 %%% ****f* PTTP_Examples/chang_lee_example1
 %%% DESCRIPTION
 %%%   Prove that in an associative system with left and right
@@ -25,6 +29,7 @@
 %%% SEE ALSO
 %%%   chang_lee_example7, chang_lee_example8
 %%% SOURCE
+
 
 chang_lee_example1 :-
 	pttp((

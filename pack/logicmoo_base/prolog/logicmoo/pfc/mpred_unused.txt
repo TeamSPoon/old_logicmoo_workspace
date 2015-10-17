@@ -86,7 +86,7 @@ dividesBetween(tObj,tMassfull,tMassless).
 
 isa(Col1, ttObjectType) ==> ~isa(Col1, ttFormatType).
 
-(neg(isa(I,Super)) <= (disjointWith(Sub, Super),isa(I,Sub))).
+(neg(isa(I,Super)) <- (disjointWith(Sub, Super),isa(I,Sub))).
 % disjointWith(P1,P2) ==> {\+(isa(P1,ttNonGenled)),\+(isa(P2,ttNonGenled))},(neg(isa(C,P1)) <==> isa(C,P2)).
 
 tCol(tCol).
@@ -134,12 +134,12 @@ genls(tPenguin,tBird).
 %((mpred_default(P)/mpred_literal(P), {pfcVerifyMissing(P,F)})) ==>  ((F, ~neg(P)) ==> P).
 %((mpred_default((P ==> Q))/mpred_literal(Q), {pfcVerifyMissing(Q,F)})) ==> ((P, F, ~neg(Q)) ==> Q).
 % % % 
-(mpred_default((Q <= P))/mpred_literal(Q)) ==> (Q <=(P, ~neg(Q))).
-%(mpred_default((P ==> Q))/mpred_literal(Q)) ==> (Q <=(P, ~neg(Q))).
+(mpred_default((Q <- P))/mpred_literal(Q)) ==> (Q <-(P, ~neg(Q))).
+%(mpred_default((P ==> Q))/mpred_literal(Q)) ==> (Q <-(P, ~neg(Q))).
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
-neg(P) <= {pfcVerifyMissing(P,F,Test)},Test,{F\=P}.
-isMissing(P) <= {pfcVerifyMissing(P,F,Test)},Test,{F\=P}.
+neg(P) <- {pfcVerifyMissing(P,F,Test)},Test,{F\=P}.
+isMissing(P) <- {pfcVerifyMissing(P,F,Test)},Test,{F\=P}.
 
 % is this how to define constraints?
 either(P,Q) ==> (neg(P) ==> Q), (neg(Q) ==> P).
@@ -159,8 +159,8 @@ prologHybrid((zDefault/1,tPenguin/1,tFly/1,tBird/1,tCanary/1)).
 'tUnaryPredicate'(zDefault).
 ((zDefault(P/mpred_literal(P)))  ==>  (~neg(P) ==> P)).
 zDefault((P ==> Q))/mpred_literal(Q) ==> ((P, ~neg(Q) ==> Q)).
-%zDefault((P ==> Q))/mpred_literal(Q) ==> (Q <=(P, ~neg(Q))).
-%zDefault((Q <= P))/mpred_literal(Q) ==> (Q <=(P, ~neg(Q))).
+%zDefault((P ==> Q))/mpred_literal(Q) ==> (Q <-(P, ~neg(Q))).
+%zDefault((Q <- P))/mpred_literal(Q) ==> (Q <-(P, ~neg(Q))).
 
 % birds fly by default.
 zDefault((tBird(X) ==> tFly(X))).

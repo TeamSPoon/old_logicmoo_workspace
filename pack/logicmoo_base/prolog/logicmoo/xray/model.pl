@@ -15,6 +15,9 @@
 %%                                                                           %%
 %%                                                                           %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(xray_model,[]).
+:- endif.
 
 :- ensure_loaded(base).
 

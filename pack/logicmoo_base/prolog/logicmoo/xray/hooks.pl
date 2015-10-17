@@ -13,6 +13,9 @@
 %%                                                                           %%
 %%                                                                           %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(xray_hooks,[]).
+:- endif.
 
 :- was_dynamic(body_hooks_flag/0).
 :- was_dynamic(pred_hooks_flag/0).

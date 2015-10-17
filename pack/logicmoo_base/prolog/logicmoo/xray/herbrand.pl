@@ -1,4 +1,7 @@
 
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(xray_herbrand,[]).
+:- endif.
 
 :- was_dynamic(herbrandize).
 herbrandize.

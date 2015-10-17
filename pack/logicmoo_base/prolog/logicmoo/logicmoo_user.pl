@@ -11,8 +11,7 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-
-% :- module(logicmoo_user,[m1,m2,m3,m4/0]).
+:- module(logicmoo_user,[m1,m2,m3,m4/0]).
 :- multifile '$si$':'$was_imported_kb_content$'/2.
 :- dynamic '$si$':'$was_imported_kb_content$'/2.
 :- discontiguous('$si$':'$was_imported_kb_content$'/2).

@@ -55,6 +55,7 @@
 
 :- forall(member(M:F/A,[
 
+kb:argIsa/3, %kb
 kbp:bt/3, %kbp
 kbp:nt/4, %kbp
 kbp:pk/4, %kbp
@@ -114,6 +115,7 @@ system:goal_expansion/2,
 user:prolog_load_file/2, 
 user:term_expansion/2
 ]),(multifile(M:F/A),dynamic(M:F/A),discontiguous(M:F/A))).
+
 % ================================================
 % Thread Locals
 % ================================================
@@ -170,7 +172,7 @@ user:term_expansion/2
 :- style_check(-singleton).
 :- set_prolog_flag(generate_debug_info, true).
 
-
+:- use_module(logicmoo(mpred/mpred_userkb)).
 :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 :- use_module(logicmoo(mpred/mpred_loader)).
 :- use_module(logicmoo(mpred/mpred_userkb)).

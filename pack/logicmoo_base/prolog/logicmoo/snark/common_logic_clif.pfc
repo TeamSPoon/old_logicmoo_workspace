@@ -13,7 +13,7 @@ vim: set filetype=md:
 %
 %  https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.md
 */
-:- module(mpred_clif,[]).
+:- module(common_logic_clif,[]).
 % we are in "prolog" consultation mode
 
 % = % :- ensure_loaded(logicmoo(logicmoo_engine)).

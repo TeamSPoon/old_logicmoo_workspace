@@ -7,6 +7,7 @@
 % Dec 13, 2035
 %
 */
+:- module(logicmoo_run_clio,[]).
 
 % :- use_module(logicmoo_base).
 

@@ -13,6 +13,9 @@
 %%                                                                           %%
 %%                                                                           %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(xray_builtin,[]).
+:- endif.
 
 %%% List of builtin predicates that can appear in clause bodies.
 %%% No extra arguments are added for ancestor goals or depth-first

@@ -6,9 +6,10 @@
 % Dec 13, 2035
 %
 */
+:- module(logicmoo_run_old_pttp,[]).
 
-%:- ensure_loaded(logicmoo_engine).
-%:- ensure_loaded(plarkc/mpred_cyc_kb).
+:- ensure_loaded(logicmoo_engine).
+%:- ensure_loaded(plarkc/logicmoo_i_cyc_kb).
 
 :- meta_predicate cwtdl(0,+,+).
 :- meta_predicate transfer_predicate(?,0,0).

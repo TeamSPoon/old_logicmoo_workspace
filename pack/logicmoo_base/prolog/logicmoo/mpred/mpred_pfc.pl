@@ -993,7 +993,7 @@ is_atom_body_pfa(WAC,P,F,2,Rest):-arg(2,P,E),E==WAC,arg(1,P,Rest),!.
 mpred_is_silient :- ( \+ t_l:mpred_debug_local, \+ mpred_is_tracing_exec, \+ mpred_is_tracing(_)) ,!.
 
 :- meta_predicate(show_if_debug(0)).
-show_if_debug(A):- !,show_call(A).
+% show_if_debug(A):- !,show_call(A).
 show_if_debug(A):- mpred_is_tracing(A) ->show_call(A) ; A.
 
 % ======================= 
@@ -1315,6 +1315,7 @@ if_missing_mask(Q,N,R,dif:dif(Was,NEW)):-
 
 which_missing_argnum(Q,N):-
  must((acyclic_term(Q),is_ftCompound(Q),get_functor(Q,F,A))),
+ F\=t,
   (singleValuedInArg(F,N) -> true;
     ((arg(N,Q,Was),is_ftNonvar(Was)) -> true; N=A)).
 
@@ -1389,7 +1390,6 @@ mpred_remove_old_version(_).
 %    depth or breadth - use the kbp:qu mechanism.
 
 mpred_run_maybe:-!, mpred_run.
-mpred_run_maybe:-!, mpred_run.
 mpred_run_maybe :- (X is random(5)),X<4,!.
 mpred_run_maybe :-
   (\+ kbp:sm(direct)),
@@ -1413,6 +1413,7 @@ mpred_run0.
 
 mpred_step :-
   % if kbp:hs(Signal) is true, reset it and fail, thereby stopping inferencing.
+  kbp:hs(Signal),!,
   mpred_retract_db_type(kbp:hs(Signal)),
   !,
   mpred_warn("Stopping on signal ~p",[Signal]),

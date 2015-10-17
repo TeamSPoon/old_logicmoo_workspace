@@ -1,3 +1,8 @@
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(xray_pttp,[]).
+:- endif.
+
+
 :- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
 :- prolog_load_context(directory,Dir),

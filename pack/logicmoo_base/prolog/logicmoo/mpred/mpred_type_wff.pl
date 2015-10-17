@@ -499,6 +499,7 @@ term_slots(Term,Slots):-term_singletons(Term, [],NS, [],S),append(NS,S,Slots).
 
 
 :- export(head_singletons/2).
+head_singletons(Pre,Post):-  !, hotrace((\+ ignore(must( \+ head_singles0(Pre,Post))))).
 head_singletons(Pre,Post):-   hotrace((\+ ignore(show_call_failure( \+ head_singles0(Pre,Post))))).
 :- export(head_singles0/2).
 :- export(head_singles01/2).
@@ -508,10 +509,12 @@ head_singles0(Pre,Post):-is_ftVar(Post),!,head_singles01(Pre,Post).
 head_singles0(_,Post):- \+ compound(Post),!,fail.
 head_singles0(Pre,M:Post):-atom(M),!,head_singles0(Pre,Post).
 head_singles0(Pre,[Post|More]):-nonvar(Post),!,head_singles0(Pre,Post),head_singles0((Pre,Post),More).
+head_singles0(Pre,'if_missing'(_,Post)):-nonvar(Post),!,head_singles0((Pre,Pre2),Post).
 head_singles0(Pre,'->'(Pre2,Post)):-nonvar(Post),!,head_singles0((Pre,Pre2),Post).
 head_singles0(Pre,'/'(Post,Pre2)):-nonvar(Post),!,head_singles0((Pre,Pre2),Post).
 head_singles0(Pre,rhs(Post)):- nonvar(Post),mpred_rule_hb(Post,Post2,Pre2), !,head_singles0((Pre,Pre2),Post2).
 head_singles0(Pre,mpred_default(Post)):- nonvar(Post),mpred_rule_hb(Post,Post2,Pre2), !,head_singles0((Pre,Pre2),Post2).
+head_singles0(Pre,nt(_,Pre2,Pre3,Post)):-nonvar(Post),!,head_singles0((Pre,Pre2,Pre3),Post).
 head_singles0(Pre,pt(_,Pre2,Post)):-nonvar(Post),!,head_singles0((Pre,Pre2),Post).
 head_singles0(Pre,Post):- nonvar(Post),mpred_rule_hb(Post,Post2,Pre2),Post2\=@=Post,!,head_singles0((Pre,Pre2),Post2).
 head_singles0(Pre,Post):-head_singles01(Pre,Post).

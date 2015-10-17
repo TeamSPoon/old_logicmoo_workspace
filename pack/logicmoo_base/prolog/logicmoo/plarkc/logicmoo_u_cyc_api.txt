@@ -7,13 +7,11 @@
 % Revision:  $Revision: 1.7 $
 % Revised At:   $Date: 2002/07/11 21:57:28 $
 % ===================================================================
-:-module(cyc,[]).
-end_of_file.
-
-:-module(cyc,[lisp_read_codes/2,lisp_read/1,lisp_read/2,getSurface/2,getSurface/3,getSurfaceFromChars/3,getSurfaceFromStream/3]).
-:-if(current_prolog_flag(dialect,swi)).
-:-set_prolog_flag(double_quotes,codes).
-:-endif.
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(cyc,[lisp_read_codes/2,lisp_read/1,lisp_read/2,getSurface/2,getSurface/3,getSurfaceFromChars/3,getSurfaceFromStream/3]).
+:- if(current_prolog_flag(dialect,swi)).
+:- set_prolog_flag(double_quotes,codes).
+:- endif.
 /*
 :-export((
 	 cycInit/0,
@@ -4696,6 +4694,10 @@ valueToCheckMark(Value,'OFF',' ').
 
 %getSurfaceFromTokens(GET,SURF,VARS):-debugOnFailure(s2p(surfFromTokens,GET,SURF,VARS)),!.
 getSurfaceFromTokens(GET,token(GET),_VARS):-!.
+
+
+
+:- endif.
 
 end_of_file.
 

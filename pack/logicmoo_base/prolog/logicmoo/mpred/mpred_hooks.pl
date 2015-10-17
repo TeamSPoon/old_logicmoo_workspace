@@ -623,8 +623,8 @@ loop_check_mpred(Call):- !, fail,not(t_l:infInstanceOnly(_)),loop_check_term(ire
 :- meta_predicate(mpred_pa_call(?,?,0)).
 
 
-mpred_pa_call(F,A,Call):-M=user,var(F),!,arity(F,A),\+tNotForUnboundPredicates(F),M:current_predicate(F/A),on_x_rtrace(M:Call).
-mpred_pa_call(F,A,Call):-M=user,arity(F,A),M:current_predicate(F/A),M:Call.
+mpred_pa_call(F,A,Call):- var(F),!,support_hilog(F,A),\+tNotForUnboundPredicates(F),current_predicate(F,M:_OtherCall),on_x_rtrace(M:Call).
+mpred_pa_call(F,A,Call):-current_predicate(F,M:_OtherCall),M:Call.
 
 mpred_fact_arity(F,A):-arity(F,A),once(mpred_isa(F,prologHybrid);mpred_isa(F,pfcControlled);mpred_isa(F,prologPTTP);mpred_isa(F,prologKIF)).
 

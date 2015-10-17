@@ -14,6 +14,9 @@
 %%                                                                           %%
 %%                                                                           %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+:- if(current_prolog_flag(logicmoo_modules,default)).
+:- module(xray_lemmaflex,[]).
+:- endif.
 
 lemma_runtime_procedures(Result) :-
 	lemmatize_procedure(Lemmatization0),

@@ -736,7 +736,6 @@ prologHybrid(isEach( tCol/1, disjointWith/2, genls/2,genlPreds/2, meta_argtypes/
 prologHybrid(isEach( ttNotTemporalType/1,ttTemporalType/1 )).
 prologHybrid(isEach(genlInverse/2,genlPreds/2)).
 prologHybrid(argIsa/3).
-prologHybrid(singleValuedInArgDefault, 3).
 prologHybrid(disjointWith/2).
 prologHybrid(instTypeProps/3).
 prologHybrid(predProxyAssert,2).
@@ -800,11 +799,13 @@ argIsa(Prop,N,Type),{number(N)},ttFormatType(Type) ==> argQuotedIsa(Prop,N,Type)
 :- was_shared_multifile(mudLabelTypeProps/3).
 :- forall(ttPredType(F),must((decl_type(F),add(isa(F,functorDeclares)),add(genls(F,tPred))))).
 :- was_export(mtForPred/2).
-
-:- debug,kb:(decl_mpred_hybrid(kb:(argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, 
+:- start_rtrace.
+:- debug,trace,kb:(decl_mpred_hybrid(kb:(argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, 
     isa/2,  genls/2, pddlSomethingIsa/2, 
     resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, 
     ttFormatType/1, typeProps/2))).
+
+:- prolog. 
 
 prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, isa/2, 
    genls/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, 
@@ -887,18 +888,12 @@ ttFormatType(ftVoprop).
 
 % :- kb_dynamic((disjointWith/2,genls/2)).
 
-((singleValuedInArgDefault(P, 2, V), arity(P,2), argIsa(P,1,Most)) ==> relationMostInstance(P,Most,V)).
 
 prologHybrid(argQuotedIsa(tRelation,ftInt,ttFormatType)).
 prologHybrid(argIsa(tRelation,ftInt,tCol)).
-prologHybrid(singleValuedInArgDefault(prologSingleValued,ftInt,ftTerm)).
 prologHybrid(formatted_resultIsa(ttFormatType,tCol)).
 
 
-(singleValuedInArgDefault(SingleValued,ArgN,S1)/ground(S1) ==> singleValuedInArg(SingleValued,ArgN)).
-
-{FtInt=2},singleValuedInArgDefault(PrologSingleValued,FtInt,FtTerm),arity(PrologSingleValued,FtInt),
-  argIsa(PrologSingleValued,1,Col)==>relationMostInstance(PrologSingleValued,Col,FtTerm).
 
 prologHybrid(quotedDefnIff(ttFormatType,ftTerm)).
 prologHybrid(defnNecessary(ttFormatType,ftTerm)).

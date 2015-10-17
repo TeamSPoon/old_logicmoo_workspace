@@ -1,9 +1,6 @@
 
 :- file_begin(pfc).
 
-((singleValuedInArgDefault(F, N, DEF),arity(F,A),
-   {functor(Q,F,A),mpred_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg(Q,N,NEW,R)})==> (~R/(NEW\==DEF) ==> Q)).
-
 
 
 
@@ -24,8 +21,6 @@ mpred_default(((prologSingleValued(Pred),arity(Pred,Arity))==> singleValuedInArg
 ((singleValuedInArg(Pred,_))==>(prologSingleValued(Pred))).
 
 singleValuedInArg(singleValuedInArg,2).
-
-
 
 
 
@@ -108,14 +103,20 @@ user_login(finin).
 :- mpred_test(host_name(robin,isMissing)).
 
 
-:- endif.
 
 
-
-end_of_file.
-
+prologHybrid(singleValuedInArgDefault, 3).
+prologHybrid(singleValuedInArgDefault(prologSingleValued,ftInt,ftTerm)).
+((singleValuedInArgDefault(P, 2, V), arity(P,2), argIsa(P,1,Most)) ==> relationMostInstance(P,Most,V)).
+(singleValuedInArgDefault(SingleValued,ArgN,S1)/ground(S1) ==> singleValuedInArg(SingleValued,ArgN)).
+{FtInt=2},singleValuedInArgDefault(PrologSingleValued,FtInt,FtTerm),arity(PrologSingleValued,FtInt),
+  argIsa(PrologSingleValued,1,Col)==>relationMostInstance(PrologSingleValued,Col,FtTerm).
+((singleValuedInArgDefault(F, N, DEF)/is_ftNonvar(DEF), arity(F,A),
+   {functor(P,F,A),replace_arg(P,N,DEF,Q),replace_arg(Q,N,WAS,R)})
+       ==> mpred_default( Q <- ({ground(P)},~R/nonvar(WAS)))).
 
 meta_argtypes(idForTest(tBird,ftTerm)).
+
 
 singleValuedInArgDefault(idForTest,2,isMissing).
 
@@ -124,20 +125,24 @@ tBird(iPeety).
 :- mpred_test(idForTest(iPeety,isMissing)).
 
 
-idForTest(iTweety,foo1).
+idForTest(iTweetyPie,foo1).
 
-:- mpred_test(\+ idForTest(iTweety,isMissing)).
+:- mpred_test(\+ idForTest(iTweetyPie,isMissing)).
 
-:- mpred_test(idForTest(iTweety,foo1)).
+:- mpred_test(idForTest(iTweetyPie,foo1)).
 
+
+:- show_call(listing(idForTest)).
+
+==> \+ idForTest(iTweetyPie,foo1).
+
+:- mpred_test(idForTest(iTweetyPie,isMissing)).
+:- mpred_test(\+ idForTest(iTweetyPie,foo1)).
 
 :- show_call(listing(idForTest)).
 
-==> \+ idForTest(iTweety,foo1).
 
-:- mpred_test(idForTest(iTweety,isMissing)).
-:- mpred_test(\+ idForTest(iTweety,foo1)).
+:- endif.
 
-:- show_call(listing(idForTest)).
 
 
