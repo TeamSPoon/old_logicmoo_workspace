@@ -236,6 +236,7 @@ kb_dynamic/1
 
  ]).
 
+
 :- meta_predicate
         t(?, ?, ?),
         t(?, ?, ?, ?),
@@ -262,8 +263,8 @@ completelyAssertedCollection(prologNegByFailure).
 %t([P|LIST]):- !,mpred_plist_t(P,LIST).
 %t(naf(CALL)):-!,not(t(CALL)).
 %t(not(CALL)):-!,mpred_f(CALL).
-t(X,Y):-isa(Y,X).
-t(CALL):- into_plist_arities(3,10,CALL,[P|LIST]),mpred_plist_t(P,LIST).
+t(X,Y):- cwc, isa(Y,X).
+t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST).
 :- meta_predicate(t(?,?,?,?,?)).
 :- meta_predicate(t(?,?,?,?)).
 :- meta_predicate(t(?,?,?)).
@@ -326,7 +327,12 @@ decl_mpred_multifile(M):- trace_or_throw(depricated(decl_mpred_multifile(M))),
 
 kb_dynamic(F/A):-!,kb_dynamic(kb:F/A).
 kb_dynamic(M:_):- context_module(CM),CM\==kb, must(M==kb),fail.
+kb_dynamic(_:M:FA):-atom(M),!,kb_dynamic(FA).
 kb_dynamic(M:F/A):-!, M:multifile(F/A),M:module_transparent(F/A),M:dynamic(F/A),M:export(F/A),context_module(CM),show_call(CM:import(M:F/A)),show_call(mpred_loader:import(M:F/A)).
+kb_dynamic(M:(FA1,FA2)):-!,kb_dynamic(M:FA1),kb_dynamic(M:FA2).
+kb_dynamic((FA1,FA2)):-!,kb_dynamic(FA1),kb_dynamic(FA2).
+kb_dynamic(M:P):-functor(P,F,A),!,kb_dynamic(M:F/A).
+kb_dynamic(P):-functor(P,F,A),!,kb_dynamic(F/A).
 
 
 mpred_univ(C,I,Head):-atom(C),!,Head=..[C,I],predicate_property(Head,number_of_clauses(_)).

@@ -78,7 +78,7 @@
             load_file_dir/2,
             load_file_some_type/2,
             load_file_term_to_command_or_fail/2,
-            load_file_term_to_command_or_fail/4,
+            mpred_expander_now_physically/4,
             load_init_world/2,
             load_language_file/1,
             load_mpred_files/0,
@@ -98,6 +98,7 @@
             mpred_expander/4,
             mpred_expander_now/2,
             mpred_expander_now_one/4,
+            mpred_expander_now_one_cc/4,
             mpred_implode_varnames/1,
             mpred_loader_file/0,
             mpred_may_expand/0,
@@ -178,7 +179,7 @@
         force_reload_mpred_file(?),
         get_last_time_file(+, +, +),
         load_file_term_to_command_0c(?, ?),
-        load_file_term_to_command_or_fail(?, ?, ?, ?),
+        mpred_expander_now_physically(?, ?, ?, ?),
         load_init_world(+, :),
         module_typed_term_expand(?, ?),
         mpred_expander(+, +, +, -),
@@ -220,37 +221,44 @@ mpred_loader_module_transparent(F/A):-!, mpred_loader:module_transparent(F/A).
 mpred_expander(_,_,I,_):-var(I),!,fail.
 mpred_expander(Type,_DefMod,_I,_O):-  (Type \== term,Type \= _:term ),!,fail.
 mpred_expander(Type,DefMod,end_of_file,O):- !,Type = term, DefMod = user, do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
-mpred_expander(Type,LoaderMod,I,OO):- on_x_debug(mpred_expander0(Type,LoaderMod,I,OO)),must(nonvar(OO)).
+mpred_expander(Type,LoaderMod,I,OO):- \+ t_l:disable_px, on_x_debug(mpred_expander0(Type,LoaderMod,I,O)),must(nonvar(O)),O=OO.
 
-mpred_expander0(Type,LoaderMod,I,OO):- \+ t_l:disable_px,
- nonvar(I),
-  I\= '$si$':'$was_imported_kb_content$'(_,_),
-  '$module'(UM,UM),
- (I\=(:-(_))), 
+mpred_expander0(Type,LoaderMod,I,OO):-
+  I\= '$si$':'$was_imported_kb_content$'(_,_),  
+
   '$set_source_module'(M,M),  
   notrace( \+ mpred_impl_module(M)),
-  (notrace(source_location(F,L))),
+  notrace(source_location(F,L)),'$module'(UM,M),
+  call_cleanup(((
   make_key(mpred_expander_key(F,L,M,UM,Type,LoaderMod,I),Key),
+  w_tl(t_l:current_why_source(F),((
   ( \+ t_l:mpred_already_in_file_expansion(Key) ),
   w_tl(t_l:mpred_already_in_file_expansion(Key),
         (( % trace,
-          fully_expand(change(assert,add),I,II),
-           show_if_debug(mpred_expander_now_one(F:L,M,II,O))))),!,I\=@=O,O=OO.
+           fully_expand(change(assert,add),I,II),
+           mpred_expander_now_one_cc(F,M,II,O))))))))),
+    '$module'(_,UM)),
+  !,I\=@=O,O=OO.
 
+
+mpred_expander_now_one_cc(F,M,(:-(G)),(:-(G))):-!.
+mpred_expander_now_one_cc(F,M,II,O):-show_if_debug(mpred_expander_now_one(F,M,II,O)).
+  
+
+%mpred_expander_now_one(F,M,(:- G),GGG):- !, nonvar(G), once(fully_expand(call,G,GG)),G\=@=GG,GGG=(:- GG),!.
 mpred_expander_now_one(F,M,I,O):- t_l:verify_side_effect_buffer,!,loader_side_effect_verify_only(I,O).
 mpred_expander_now_one(F,M,I,O):- t_l:use_side_effect_buffer,!,loader_side_effect_capture_only(I,O).
-mpred_expander_now_one(F,M,I,O):- load_file_term_to_command_or_fail(F,M,I,O).
+mpred_expander_now_one(F,M,I,O):- mpred_expander_now_physically(F,M,I,O).
 
-load_file_term_to_command_or_fail(F,M,I,OO):-   
+mpred_expander_now_physically(F,M,I,OO):-   
  '$set_source_module'(Old,M),
  call_cleanup(M:((
    must((context_module(CM),CM\==mpred_pfc,CM\==mpred_loader)),
    loop_check(must(load_file_term_to_command_or_fail(I,O))),!,
    I\=@=O,
-  w_tl(t_l:current_why_source(F),((
-   (((t_l:mpred_term_expansion_ok;mpred_expand_inside_file_anyways)-> true ; ((show_load_context,wdmsg(warning,wanted_mpred_term_expansion(I,O))),fail)),
+  (((t_l:mpred_term_expansion_ok;mpred_expand_inside_file_anyways)-> true ; ((show_load_context,wdmsg(warning,wanted_mpred_term_expansion(I,O))),fail)),
    ((O=(:-(CALL))) ->  M:call_file_command(I,CALL,OO,O); 
-        (OO = O)))))))),'$set_source_module'(_,Old)).
+        (OO = O))))),'$set_source_module'(_,Old)).
     
 
 :- module_transparent( xfile_module_term_expansion_pass_3/6).
@@ -758,8 +766,8 @@ transform_opers_1(OP,OTHER):- get_op_alias(OPO,OTHER),OPO=OP,!.
 
 in_mpred_kb_module:- context_module(kb).
 
-load_file_term_to_command_or_fail(X,Y):- 
-   compile_this(M,F,I,How),
+load_file_term_to_command_or_fail(I,Y):- 
+   once(fully_expand(change(assert,add),I,X)),
    expand_term(X,M),!,
    must_load_file_term_to_command(M,Y),!,X\=@=Y.
 
@@ -1229,8 +1237,6 @@ assert_kif_dolce(String):-from_kif_string(String,Forms),dmsg(warn(assert_kif_dol
 finish_processing_world :- load_mpred_files, loop_check(w_tl(t_l:agenda_slow_op_do_prereqs,doall(finish_processing_dbase)),true).
 
 doall_and_fail(Call):- time_call(once(doall(Call))),fail.
-
-
 
 
 

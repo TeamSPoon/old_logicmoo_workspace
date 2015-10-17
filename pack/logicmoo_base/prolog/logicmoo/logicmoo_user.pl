@@ -51,7 +51,8 @@ m3:- b_setval('$variable_names', ['P'=P,'Q'=Q]), R = (==>((P,Q,z(_)),(p(P),q(Q))
 
 
 
-m4:- ensure_mpred_file_loaded(pfc/mpred).
+m4:- ensure_mpred_file_loaded(pfc/autoexec).
+
 %m3:- make. % w_tl(tlbugger:ifHideTrace,(ensure_mpred_file_loaded(pfc/mpred))).
 
 

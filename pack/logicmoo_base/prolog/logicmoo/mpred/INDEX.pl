@@ -396,7 +396,7 @@ index((lang_op_alias), 3, mpred_loader, mpred_loader).
 index((load_file_dir), 2, mpred_loader, mpred_loader).
 index((load_file_some_type), 2, mpred_loader, mpred_loader).
 index((load_file_term_to_command_or_fail), 2, mpred_loader, mpred_loader).
-index((load_file_term_to_command_or_fail), 4, mpred_loader, mpred_loader).
+index((mpred_expander_now_physically), 4, mpred_loader, mpred_loader).
 index((load_init_world), 2, mpred_loader, mpred_loader).
 index((load_language_file), 1, mpred_loader, mpred_loader).
 index((load_mpred_files), 0, mpred_loader, mpred_loader).
@@ -416,6 +416,7 @@ index((mpred_expand_inside_file_anyways), 1, mpred_loader, mpred_loader).
 index((mpred_expander), 4, mpred_loader, mpred_loader).
 index((mpred_expander_now), 2, mpred_loader, mpred_loader).
 index((mpred_expander_now_one), 4, mpred_loader, mpred_loader).
+index((mpred_expander_now_one_cc), 4, mpred_loader, mpred_loader).
 index((mpred_implode_varnames), 1, mpred_loader, mpred_loader).
 index((mpred_loader_file), 0, mpred_loader, mpred_loader).
 index((mpred_may_expand), 0, mpred_loader, mpred_loader).
@@ -529,7 +530,9 @@ index((correctify_support), 2, mpred_pfc, mpred_pfc).
 index((cyclic_break), 1, mpred_pfc, mpred_pfc).
 index((cwc), 0, mpred_pfc, mpred_pfc).
 index((defaultmpred_select), 2, mpred_pfc, mpred_pfc).
+index((if_missing_mask), 3, mpred_pfc, mpred_pfc).
 index((if_missing_mask), 4, mpred_pfc, mpred_pfc).
+index((which_missing_argnum), 2, mpred_pfc, mpred_pfc).
 index((erase_w_attvars), 2, mpred_pfc, mpred_pfc).
 index((exact_args), 1, mpred_pfc, mpred_pfc).
 index((fc_eval_action), 2, mpred_pfc, mpred_pfc).

@@ -51,8 +51,10 @@
             correctify_support/2,
             cyclic_break/1,
             cwc/0,
-            defaultmpred_select/2,
+            defaultmpred_select/2,            
+            if_missing_mask/3,
             if_missing_mask/4,
+            which_missing_argnum/2,
             erase_w_attvars/2,
             exact_args/1,
             fc_eval_action/2,
@@ -1292,13 +1294,29 @@ is_already_supported(P,_S,UU):- clause_asserted_local(kbp:spft(ukb,P,US,UT,_)),m
 % is_already_supported(P,_S):- copy_term_and_varnames(P,PC),sp ftY(PC,_,_),P=@=PC,!.
 
 
+if_missing_mask(Q,R,Test):-
+   which_missing_argnum(Q,N),
+   if_missing_mask(Q,N,R,Test).
 
-if_missing_mask(Q,N,R,Test):- 
+if_missing_mask(Q,N,R,Test):-
+  arg(N,Q,Was),
+  (nonvar(R)-> (which_missing_argnum(R,RN),arg(RN,R,NEW));replace_arg(Q,N,NEW,R)),!,
+   Test=dif:dif(Was,NEW).
+
+/*
+Old version
+if_missing_mask(Q,N,R,dif:dif(Was,NEW)):- 
  must((is_ftNonvar(Q),acyclic_term(Q),acyclic_term(R),functor(Q,F,A),functor(R,F,A))),
   (singleValuedInArg(F,N) -> 
-    (arg(N,Q,Was),Test=dif(Was,NEW),replace_arg(Q,N,NEW,R));
-    ((arg(N,Q,Was),is_ftNonvar(Q)) -> (Test=dif(Was,NEW),replace_arg(Q,N,NEW,R));
-        (N=A,arg(N,Q,Was),Test=dif(Was,NEW),replace_arg(Q,N,NEW,R)))).
+    (arg(N,Q,Was),replace_arg(Q,N,NEW,R));
+    ((arg(N,Q,Was),is_ftNonvar(Was)) -> replace_arg(Q,N,NEW,R);
+        (N=A,arg(N,Q,Was),replace_arg(Q,N,NEW,R)))).
+*/
+
+which_missing_argnum(Q,N):-
+ must((acyclic_term(Q),is_ftCompound(Q),get_functor(Q,F,A))),
+  (singleValuedInArg(F,N) -> true;
+    ((arg(N,Q,Was),is_ftNonvar(Was)) -> true; N=A)).
 
 
 

@@ -1,6 +1,6 @@
 /** <module>
 % =============================================
-% File 'mpred_builtin.pfc'
+% File 'mpred_system.pfc'
 % Purpose: Agent Reactivity for SWI-Prolog
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;
@@ -73,15 +73,16 @@
 :- sanity(\+mpred_is_tracing_exec).
 
 
-
+neg_may_naf(P):- mpred_non_neg_literal(P),get_functor(P,F),clause(prologNegByFailure(F),true),!.
+neg_may_naf(P):- is_ftCompound(P),predicate_property(P,static).
 
 neg(tCol('$VAR')):- cwc,!.
-neg(P):-is_ftCompound(P),predicate_property(P,static), \+ P.
-neg(P):-mpred_non_neg_literal(P),get_functor(P,F),clause(prologNegByFailure(F),true), \+ P.
+neg(P):- cwc, neg_may_naf(P), \+ P.
+neg(Q):- cwc, is_ftNonvar(Q), prologSingleValued(Q),if_missing_mask(Q,R,Test),mpred_call(R),Test.
 
 
-~(~G):- nonvar(G),!, mpred_call(~neg(G)).
-~(G):- mpred_call(neg(G)).
+~(~G):- cwc, nonvar(G),!, mpred_call(~neg(G)).
+~(G):- cwc, mpred_call(neg(G)).
 
 
 prologHybrid(arity/2).
@@ -192,7 +193,7 @@ neg(tCol(C))/completelyAssertedCollection(C)==> \+ completelyAssertedCollection(
   (({    
     functor(Head,F,A),
     % mpred_test(rebuild_pred_into(Head,Head,mpred_add,[+kb:dynamic,+multifile,+discontiguous])),
-    convert_to_dynamic(user,F,A),
+    convert_to_dynamic(kb,F,A),
     must(show_call_failure( \+ static_predicate(Head)))}),
     prologHybrid(F),
     arity(F,A))).
@@ -206,8 +207,8 @@ mpred_mark(S1, S2, F, A)/ground(S1:S2)==>arity(F,A).
 arity(genlPreds,2).
 
 
-prologBuiltin(resolveConflict/1,mpred_module(user)).
-prologBuiltin(mpred_select/2,mpred_module(user)).
+prologBuiltin(resolveConflict/1,mpred_module(kb)).
+prologBuiltin(mpred_select/2,mpred_module(lmconf)).
 %:-start_rtrace.
 prologBuiltin(agent_text_command/4,prologDynamic).
 %tPred(t,prologDynamic).
@@ -317,7 +318,7 @@ tSet(C)==>completelyAssertedCollection(C).
 ttFormatType(C)==> ~completelyAssertedCollection(C).
 
 tCol(C)/(atom(C),TCI=..[C,I]) ==> {decl_type(C)},arity(C,1),mpred_univ(C,I,TCI).
-(tCol(C)/(atom(C),TCI=..[C,I],\+ static_predicate(TCI) )) ==> {kb:dynamic(C/1)}.
+(tCol(C)/(atom(C),TCI=..[C,I],\+ static_predicate(TCI) )) ==> {kb:dynamic(kb:C/1)}.
 (tCol(C)/(atom(C),TCI=..[C,I],\+ static_predicate(TCI), \+completelyAssertedCollection(C))) 
   ==> ((TCI:-cwc,
     ( \+ neg(TCI)),
@@ -362,9 +363,10 @@ ttPredType(pfcControlled).
 ttPredType(prologKIF).
 ttPredType(prologBuiltin).
 ttPredType(prologPTTP).
-:- mpred_add( pfcControlled(genlPreds)).
-:- mpred_add( pfcControlled(isa)).
-:- mpred_add(pfcControlled(argIsa)).
+
+pfcControlled(genlPreds).
+pfcControlled(isa).
+pfcControlled(argIsa).
 
 
 
@@ -377,26 +379,11 @@ ttPredType(prologPTTP).
 %props(iCoffeeCup7,[mudColor(vBlack),mudColor(isEach(vBrown,vBlack)),mudSize(vSmall),mudShape(vCuplike),mudMaterial(vGlass),mudTexture(vSmooth)]).
 
 ==>tSet(tSet).
-/*
-
-
-tSet(P)==>
- ( {get_functor(P,C), functor(Head,C,1),
-  (\+(predicate_property(Head,_))->kb:dynamic(C/1);true),  
-  Head=..[C,_],
- (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
-   functorDeclares(C),
-   pfcControlled(C),
-   arity(C,1),
-   % (isa(I,C)/ground(I:C)==>Head),
-   tCol(C)).
-
-*/
 
 
 tSet(C)==>
  ( {atom(C), functor(Head,C,1),
-  (\+(predicate_property(Head,S1))-> kb:dynamic(C/1); true),  
+  ( \+(predicate_property(Head,S1))-> kb:dynamic(C/1); true),
   Head=..[C,S2],nop((S1:S2)),
  (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
    functorDeclares(C),
@@ -405,8 +392,9 @@ tSet(C)==>
    % (isa(I,C)/ground(I:C)==>Head),
    tCol(C)).
 
+
 ttFormatType(P) ==> {get_functor(P,C), functor(Head,C,1),
-  (\+(predicate_property(Head,S1))->kb:dynamic(C/1);true),  
+  (\+(predicate_property(Head,S1))-> (kb:dynamic(C/1));true),  
   Head=..[C,I],
   nop((S1)),
  (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
@@ -577,11 +565,10 @@ tCol(functorDeclares).
 tCol(ttFormatType).
 
 
+:- ensure_loaded('genls.pfc').
+
 genls(ttSpatialType,ttTemporalType).
 genls(tSpatialThing,tTemporalThing).
-
-
-((genls(X,Y),genls(Y,X),{X\==Y}) ==> {mpred_rem1(genls(X,Y))}).
 
 
 tCol(ttNonGenled).
@@ -1243,10 +1230,5 @@ argSingleValueDefault(F, N, _)==>singleValuedInArg(F,N).
 
 :- endif.
 
-:- mpred_test(ensure_loaded('../pfc/relationAllExists.pfc')).
-
-:- mpred_test(ensure_loaded('../pfc/pttpFWC.pfc')).
-
-:- mpred_test(ensure_loaded('../pfc/singleValued.pfc')).
 
 
