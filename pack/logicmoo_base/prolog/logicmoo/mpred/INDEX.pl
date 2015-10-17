@@ -529,7 +529,7 @@ index((correctify_support), 2, mpred_pfc, mpred_pfc).
 index((cyclic_break), 1, mpred_pfc, mpred_pfc).
 index((cwc), 0, mpred_pfc, mpred_pfc).
 index((defaultmpred_select), 2, mpred_pfc, mpred_pfc).
-index((different_literal), 4, mpred_pfc, mpred_pfc).
+index((if_missing_mask), 4, mpred_pfc, mpred_pfc).
 index((erase_w_attvars), 2, mpred_pfc, mpred_pfc).
 index((exact_args), 1, mpred_pfc, mpred_pfc).
 index((fc_eval_action), 2, mpred_pfc, mpred_pfc).

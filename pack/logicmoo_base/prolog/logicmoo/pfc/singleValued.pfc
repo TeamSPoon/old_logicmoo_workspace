@@ -1,7 +1,12 @@
 
+:- file_begin(pfc).
+
+((singleValuedInArgDefault(F, N, DEF),arity(F,A),
+   {functor(Q,F,A),mpred_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg(Q,N,NEW,R)})==> (~R/(NEW\==DEF) ==> Q)).
+
+:-if(false).
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 
-:- file_begin(pfc).
 
 
 % if we learn that someone has a full name, then we know they are a user_login.
@@ -31,10 +36,7 @@ prologSingleValued(host_name).
 mpred_default( user_login(User) ==> host_name(User,isMissing)).
 
 
-(mpred_default1(P ==> Q),{mpred_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg(Q,N,NEW,R)} ==> (P, ~R/(NEW\==DEF) ==> Q)).
-
-((singleValuedInArgDefault(F, N, DEF),arity(F,A),
-   {functor(Q,F,A),mpred_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg(Q,N,NEW,R)})==> (~R/(NEW\==DEF) ==> Q)).
+% (mpred_default1(P ==> Q),{mpred_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg(Q,N,NEW,R)} ==> (P, ~R/(NEW\==DEF) ==> Q)).
 
 ==> full_name(finin,'Tim Finin').
 
@@ -91,4 +93,4 @@ idForTest(iTweety,foo1).
 :- show_call(listing(idForTest)).
 
 
-
+:- endif.

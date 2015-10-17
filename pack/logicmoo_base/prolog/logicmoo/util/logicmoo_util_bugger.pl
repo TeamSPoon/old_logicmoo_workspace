@@ -1373,7 +1373,7 @@ with_each(_,_,Call):-var(Call),!,trace,randomVars(Call).
 
 with_each(_,_,Call):-skipWrapper,!,Call.
 with_each(BDepth,Wrapper, (X->Y;Z)):- atom(Wrapper),atom_concat('on_f',_,Wrapper),!,(X -> with_each(BDepth,Wrapper,Y) ; with_each(BDepth,Wrapper,Z)).
-with_each(N, Wrapper, Call):- N < 1, call(Wrapper,Call).
+with_each(N, Wrapper, Call):- N < 1, !, call(Wrapper,Call).
 with_each(BDepth,Wrapper, (X->Y;Z)):- with_each(BDepth,Wrapper,X) -> with_each(BDepth,Wrapper,Y) ; with_each(BDepth,Wrapper,Z).
 with_each(PDepth,Wrapper, (X , Y)):- BDepth is PDepth-1, !,(with_each(BDepth,Wrapper,X),with_each(BDepth,Wrapper,Y)).
 with_each(PDepth,Wrapper, [X | Y]):- BDepth is PDepth-1, !,(with_each(BDepth,Wrapper,X),!,with_each(BDepth,Wrapper,Y)).

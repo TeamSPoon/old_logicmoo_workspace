@@ -80,10 +80,12 @@
 (mpred_default((P ==> Q)/mpred_literal_nv(Q)) ==> (P,  ~Q, ~neg(Q) ==> Q)).
 
 (mpred_default((P ==> Q))/mpred_literal_nv(Q)),{functor(Q,_,1)} ==> (P, ~neg(Q) ==> Q).
+
 (mpred_default((P ==> Q))/(mpred_literal(P),\+ mpred_literal(Q))) ==> (P ==> mpred_default(Q)).
 
-%(mpred_default(P)/mpred_each_literal(P,E))  ==>  mpred_default(E).
+% should be done at the canonicalizer
+%  (mpred_default(P)/mpred_each_literal(P,E))  ==>  mpred_default(E).
 
-((mpred_default(P)/(mpred_literal(P),is_ftCompound(P),different_literal(P,_,Q,Test)))  ==> ((~Q/(Test), ~neg(P)) ==> P)).
+((mpred_default(P)/(mpred_literal(P),is_ftCompound(P),if_missing_mask(P,_,Q,Test)))  ==> ((~Q/(Test), ~neg(P)) ==> P)).
 
 

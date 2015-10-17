@@ -52,7 +52,7 @@
             cyclic_break/1,
             cwc/0,
             defaultmpred_select/2,
-            different_literal/4,
+            if_missing_mask/4,
             erase_w_attvars/2,
             exact_args/1,
             fc_eval_action/2,
@@ -1186,8 +1186,7 @@ mpred_add_fast_timed(P0,S):-
        mpred_add_fast_sp(S,P)).
 
 
-mpred_add_fast_sp(S,P):-ground(mpred_add_fast_sp(S,P)),!,mpred_add_fast_sp0(S,P).
-mpred_add_fast_sp(S,P):- ensure_vars_labled(P,P0),mpred_add_fast_sp0(S,P0).
+mpred_add_fast_sp(S,P):- ensure_vars_labled(P,P0),fully_expand(change(assert,add),P0,P1),mpred_add_fast_sp0(S,P1).
 
   
 
@@ -1294,8 +1293,8 @@ is_already_supported(P,_S,UU):- clause_asserted_local(kbp:spft(ukb,P,US,UT,_)),m
 
 
 
-different_literal(Q,N,R,Test):- 
- is_ftNonvar(Q),acyclic_term(Q),acyclic_term(R),functor(Q,F,A),functor(R,F,A),
+if_missing_mask(Q,N,R,Test):- 
+ must((is_ftNonvar(Q),acyclic_term(Q),acyclic_term(R),functor(Q,F,A),functor(R,F,A))),
   (singleValuedInArg(F,N) -> 
     (arg(N,Q,Was),Test=dif(Was,NEW),replace_arg(Q,N,NEW,R));
     ((arg(N,Q,Was),is_ftNonvar(Q)) -> (Test=dif(Was,NEW),replace_arg(Q,N,NEW,R));

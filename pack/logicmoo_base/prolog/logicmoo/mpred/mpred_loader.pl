@@ -234,7 +234,7 @@ mpred_expander(Type,LoaderMod,I,OO):- \+ t_l:disable_px,
   ( \+ t_l:mpred_already_in_file_expansion(Key) ),
   w_tl(t_l:mpred_already_in_file_expansion(Key),
         (( % trace,
-          fully_expand(assert,I,II),
+          fully_expand(change(assert,add),I,II),
            show_if_debug(mpred_expander_now_one(F:L,M,II,O))))),!,I\=@=O,O=OO),_,fail).
 
 mpred_expander_now_one(F,M,I,O):- t_l:verify_side_effect_buffer,!,loader_side_effect_verify_only(I,O).
@@ -878,7 +878,7 @@ stream_pos(File:LineNo):-loading_source_file(File),current_input(S),stream_prope
 
 compile_clause(CL):- make_dynamic(CL),must((assertz_if_new(CL),clause_asserted(CL))).
 
-make_dynamic(C):- compound(C),get_functor(C,F,A),
+make_dynamic(C):- compound(C),get_functor(C,F,A),must(F\=='$VAR'),
   functor(P,F,A),
   ( \+predicate_property(P,_) -> dynamic(F/A) ; (predicate_property(P,dynamic)->true;dynamic_safe(P))),!,
   must((predicate_property(P,dynamic))).

@@ -283,6 +283,8 @@ try_get_body_vars(_).
 
 :- meta_predicate logicmoo_varnames:renumbervars(*,*,*).
 
+:- meta_predicate set_varname(+,*,*).
+:- meta_predicate set_varname(+,*).
 % set_varname(How,B):-var(B),!.
 set_varname(How,B):-var(B),writeq(set_varname(How,B)),nl,trace,trace_or_throw(var_assign_varname_vars(How,B)).
 set_varname(How,N=V):-must(set_varname(How,N,V)),!.
