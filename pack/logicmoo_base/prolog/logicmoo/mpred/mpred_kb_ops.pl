@@ -53,7 +53,7 @@ oncely(Call):-once(Call).
 
 /*
 query(t, req, G):- mpred_call(G).
-query(_, _, Op, G):- dtrace, mpred_call(call(Op,G)).
+query(_, _, Op, G):- dtrace(mpred_call(call(Op,G))).
 once(A,B,C,D):-trace_or_throw(once(A,B,C,D)).
 */
 

@@ -288,7 +288,7 @@ is_asserted_1((H)):- is_static_pred(H),!,show_pred_info(H),dtrace(is_asserted_1(
 
 is_asserted_1(H):- !, w_tl(t_l:infAssertedOnly(H),mpred_call(H)).
 
-%is_asserted_1(argIsa(mpred_isa,2,mpred_isa/2)):- dtrace,!,fail.
+%is_asserted_1(argIsa(mpred_isa,2,mpred_isa/2)):-  trace_or_throw(is_asserted_1(argIsa(mpred_isa,2,mpred_isa/2))),!,fail.
 is_asserted_1(clause(H,B,Ref)):-!,is_asserted_3(H,B,Ref).
 is_asserted_1(clause(H,B)):-!,is_asserted_2(H,B).
 is_asserted_1((H1,H2)):-!,is_asserted_1(H1),is_asserted_1(H2).

@@ -422,7 +422,7 @@ correctAnyType(_, A,Type,AA):-  evaluatableArg(A,Type),dmsg(evaluatableArg(A,Typ
 correctAnyType(Op,A,Type,AA):- var(Type),trace_or_throw(correctAnyType(Op,A,Type,AA)).
 % TODO snags on new tpyes correctAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
 correctAnyType(Op,A,Type,AA):- one_must(correctType(Op,A,Type,AA),A=AA).
-correctAnyType(Op,A,Type,A):- dtrace,dmsg(warn(not(correctAnyType(Op,A,Type)))).
+correctAnyType(Op,A,Type,A):- dtrace(nop(warn(not(correctAnyType(Op,A,Type))))).
 
 
 
@@ -453,7 +453,7 @@ correctType_gripe(Op,A,Type,AA):- fail,atom(Type),must_equals(A,AA),
       dmsg(warning(add(isa(A,Type)))),
       dtrace(add(isa(A,Type))),!.
 
-correctType_gripe(Op,A,C,A):-sanity(ground(A)),dtrace, dmsg(todo(define(correctType(Op,A,C,'ConvertedArg')))),throw(retry(_)).
+correctType_gripe(Op,A,C,A):-sanity(ground(A)),dmsg(todo(define(correctType(Op,A,C,'ConvertedArg')))),throw(retry(_)).
 correctType_gripe(Op,A,Type,NewArg):-trace_or_throw(failure(correctType(Op,A,Type,NewArg))).
 
 :- style_check(+singleton).

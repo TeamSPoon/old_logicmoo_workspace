@@ -72,8 +72,7 @@
             isa_from_morphology/2,
             isa_w_type_atom/2,
             mpred_add_guess/1,
-            mpred_types_loaded/0,
-            mpred_univ/3,
+            mpred_types_loaded/0,            
             never_type_f/1,
             never_type_why/2,
             noncol_type/1,
@@ -97,7 +96,7 @@
          %    decided_not_was_isa/2,
          % did_learn_from_name/1,
          % isa_pred_now_locked/0,
-         % isa_asserted_0/2,
+         isa_asserted_0/2,
          new_was_isa/0,
           type_prefix/2,
           type_suffix/2
@@ -400,7 +399,7 @@ not_mud_isa0(ttTemporalType,tTemporalThing).
 
 not_mud_isa(I,C):-loop_check(not_mud_isa(I,C,_)).
 
-not_mud_isa(F, CAC,Why):- completelyAssertedCollection(CAC),!,atom(CAC),current_predicate(CAC/1),G=..[CAC,F],\+((G)),!,Why=completelyAssertedCollection(CAC).
+not_mud_isa(F, CAC,Why):- completelyAssertedCollection(CAC),!,atom(CAC),current_predicate(_:CAC/1),G=..[CAC,F],\+((G)),!,Why=completelyAssertedCollection(CAC).
 not_mud_isa(I,C,Why):-not_mud_isa0(I,C),Why=not_mud_isa0(I,C).
 not_mud_isa(G,tTemporalThing,Why):- ((a(tCol,G),Why=a(tCol,G));(tPred(G),Why=tPred(G))).
 not_mud_isa(G,tCol,Why):-never_type_why(G,Why).
@@ -482,7 +481,7 @@ isa_asserted_0(I,T):- nonvar(I),nonvar(T),not_mud_isa(I,T),!,fail.
 % isa_asserted_0(I,T):- HEAD= isa(I, T),ruleBackward(HEAD,BODY),trace,call_mpred_body(HEAD,BODY).
 
 isa_asserted_0(I,T):- is_ftVar(T),!,tCol_gen(T),isa(I,T).
-isa_asserted_0(I,T):- atom(T),current_predicate(T/1),G=..[T,I],(predicate_property(G,number_of_clauses(_))->clause(G,true);on_x_cont(G)).
+isa_asserted_0(I,T):- atom(T),current_predicate(T,_:G),G=..[T,I],(predicate_property(G,number_of_clauses(_))->clause(G,true);on_x_cont(G)).
 isa_asserted_0(I,T):- nonvar(I),(  ((is_ftVar(T);chk_ft(T)),if_defined(term_is_ft(I,T)))*->true;type_deduced(I,T) ).
 isa_asserted_0(I,T):- is_ftCompound(I),is_non_unit(I),is_non_skolem(I),!,get_functor(I,F),compound_isa(F,I,T).
 isa_asserted_0(I,T):- nonvar(T),!,isa_asserted_1(I,T).
@@ -688,8 +687,6 @@ get_mpred_arg(N,C,E):-!,is_ftCompound(C),arg(N,C,E).
 is_Template(I):- get_mpred_arg(_,I,Arg1),a(tCol,Arg1).
 
 
-mpred_univ(C,I,Head):-atom(C),!,Head=..[C,I],predicate_property(Head,number_of_clauses(_)).
-
 assert_isa_reversed(T,I):-assert_isa(I,T).
 
 % ================================================
@@ -750,12 +747,12 @@ lmconf:module_local_init:- asserta(('$toplevel':isa(I,C):-lmconf:isa(I,C))).
 mpred_types_loaded.
 
 % ISA QUERY
-lmconf:module_local_init:- asserta_if_new((system:goal_expansion(ISA,GO) :- \+ t_l:disable_mpred_term_expansions_locally, \+current_predicate(_,ISA),
+lmconf:module_local_init:- asserta_if_new((system:goal_expansion(ISA,GO) :- \+ t_l:disable_px, \+current_predicate(_,ISA),
   once((is_ftCompound(ISA),was_isa(ISA,I,C))),t_l:is_calling,show_call(GO=no_repeats(isa(I,C))))).
 % ISA GOAL
 % mpred_system_goal_expansion(G,GO):-G\=isa(_,_),was_isa(G,I,C),GO=isa(I,C).
 % ISA EVER
-%mpred_term_expansion(G,GO):-  \+ t_l:disable_mpred_term_expansions_locally,was_isa(G,I,C),GO=isa(I,C).
+%mpred_term_expansion(G,GO):-  \+ t_l:disable_px,was_isa(G,I,C),GO=isa(I,C).
 
 lmconf:module_local_init:-mpred_add(tCol(tCol)).
 lmconf:module_local_init:-mpred_add(tCol(ttPredType)).

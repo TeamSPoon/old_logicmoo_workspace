@@ -904,8 +904,8 @@ to_word_list_2(Atom,WList):- atom_to_memory_file(Atom,File),open_memory_file(Fil
 to_word_list_2(Input,WList):- open_string(Input,Stream),read_stream_to_arglist(Stream,WList).
 to_word_list_2(Input,Input).
 
-str_contains_all([],_String):- dtrace.
-str_contains_all(_,String):- empty_string(String), dtrace.
+str_contains_all([],String):- dtrace(wdmsg(str_contains_all([],String))).
+str_contains_all(A,String):- empty_string(String), dtrace(str_contains_all(A,String)).
 str_contains_all(A,SL):- string_ci(SL,SLIC),SL\=SLIC,!,str_contains_all(A,SLIC).
 str_contains_all(List,String):-str_contains_all0(List,String).
 

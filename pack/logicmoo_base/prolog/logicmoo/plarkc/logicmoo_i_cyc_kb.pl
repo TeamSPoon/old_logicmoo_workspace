@@ -583,7 +583,7 @@ tinyKB(PO,MT,STR):- %fwc,
   tinyKB_All(PO,MT,STR).
 
 tinyKB_All(V,MT,STR):- tinyAssertion(V,MT,STR).
-tinyKB_All(PO,MT,STR):- current_predicate('TINYKB-ASSERTION'/5),!,
+tinyKB_All(PO,MT,STR):- current_predicate(_:'TINYKB-ASSERTION'/5),!,
     tiny_kb_ASSERTION(PLISTIn,PROPS),
         once((sexpr_sterm_to_pterm(PLISTIn,P),
                memberchk(amt(MT),PROPS),

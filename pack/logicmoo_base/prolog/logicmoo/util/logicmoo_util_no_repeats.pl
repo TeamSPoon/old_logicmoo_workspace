@@ -152,14 +152,14 @@ no_repeats_u(Vs,Call):- CONS = [_], (Call), /*hotrace*/((  CONS=[_|T],
 no_repeats_dc(Vs,Call):- term_variables(Call,CV),term_variables(Vs,VsL),subtract_eq(CV,VsL,NewVs),no_repeats(NewVs,Call).
 */
 
-subtract_eq([], _, []) :- !.
-subtract_eq([A|C], B, D) :-
-        ==(A, B), !,
-        subtract_eq(C, B, D).
-subtract_eq([A|B], C, [A|D]) :-
-        subtract_eq(B, C, D).
+%% subtract_eq(+Set, +Delete, -Result) is det.
+% Delete all elements in Delete from Set. Deletion is based on unification using ==/2. The complexity is |Delete|*|Set|.
 
-
+subtract_eq([],_,[]) :- !.
+subtract_eq([E|Set], Delete, Result) :-
+   subtract_eq(Set, Delete, Mid),
+   (identical_member(E,Delete)-> Result = Mid ; Result = [E|Mid]).
+   
 % ===================================================
 %
 %  no_repeats_av/1 - Filter repeats using coroutining

@@ -130,7 +130,7 @@ user:term_expansion/2
 :- thread_local(t_l:consulting_sources/0).
 :- thread_local(t_l:current_pttp_db_oper/1).
 :- thread_local(t_l:deduceArgTypes/1).
-:- thread_local(t_l:disable_mpred_term_expansions_locally /0).
+:- thread_local(t_l:disable_px /0).
 :- thread_local(t_l:enable_src_loop_checking/0).
 :- thread_local(t_l:in_dynamic_reader/1).
 :- thread_local(t_l:in_prolog_source_code/0).
@@ -165,6 +165,7 @@ user:term_expansion/2
 :- thread_local(t_l:into_form_code/0).
 :- thread_local(t_l:infSupertypeName/0).
 :- thread_local(t_l:loading_mpred_file/2).
+
 
 :- style_check(-singleton).
 :- set_prolog_flag(generate_debug_info, true).

@@ -171,7 +171,8 @@ cc_key(CC,Key):- copy_term_nat(CC,Key),numbervars(Key,0,_),!.
 
 make_key(M:CC,KeyO):- atom(M),!,((ground(CC)->Key=CC ; cc_key(CC,Key))),!,KeyO=Key.
 make_key(CC,KeyO):- ((ground(CC)->Key=CC ; cc_key(CC,Key))),!,KeyO=Key.
-
+:- '$set_predicate_attribute'(make_key(_,_), hide_childs, 1).
+:- '$set_predicate_attribute'(make_key(_,_), trace, 1).
 
 is_loop_checked(Call):-  make_key(Call,Key),!,lmcache:ilc(Key).
 
@@ -361,7 +362,7 @@ outside_of_loop_check:- (clause(lmcache:ilc(_),B)->B=(!,fail);true).
 %system:goal_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
 %system:term_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
 % user:term_expansion(LC,LCOO):-nonvar(LC),(LC=(H:-B)),lco_goal_expansion(B,BE),B\=@=BE,((H:-BE)=LCOO).
-user:goal_expansion(LC,LCOO):- notrace((current_predicate(_:logicmoo_bugger_loaded/0),once(lco_goal_expansion(LC,LCOO)),LC\=@=LCOO)).
+user:goal_expansion(LC,LCOO):- notrace((current_predicate(logicmoo_bugger_loaded/0),once(lco_goal_expansion(LC,LCOO)),LC\=@=LCOO)).
 
 
 

@@ -12,13 +12,16 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_varnames.pl
 :- module(logicmoo_varnames,
           [ ain00/1,
+            count_members_eq/3,
             all_different_vals/1,
             all_different_vals/2,
-            assign_name_equal_var/1,
-            assign_name_equal_var/2,
+            set_varname/2,
+            set_varname/3,
+            write_functor/2,
             atom_subst_frak_0/4,
             logicmoo_varnames:attr_portray_hook/2,
             logicmoo_varnames:attr_unify_hook/2,
+            renumbervars/3,
             b_implode_varnames/1,
             b_implode_varnames0/1,
             bad_varnamez/1,
@@ -30,7 +33,7 @@
             contains_badvarnames/1,
             contains_singletons/1,
             del_attr_type/2,
-            name_vars/2,
+            copy_term_and_varnames/2,
             mpred_numbervars_with_names/1,
             ensure_vars_labled/2,
             ensure_vars_labled_r/2,
@@ -39,8 +42,6 @@
             get_clause_vars/2,
             get_clause_vars_copy/2,
             get_clause_vars_hb_int/2,
-            ignoreN/2,
-            ignoreN0/2,
             imploded_copyvars/2,
             locate_clause_ref/5,
             lock_vars/1,
@@ -72,7 +73,7 @@
             try_get_body_vars/1,
             try_get_head_vars/1,
             try_get_inner_vars/1,
-            try_save1var/2,
+            set_varname/2,
             try_save_vars/1,
             unlock_vars/1,
             v_dif_rest/2,
@@ -100,8 +101,8 @@
 :- module_transparent
             all_different_vals/1,
             all_different_vals/2,
-            assign_name_equal_var/1,
-            assign_name_equal_var/2,
+            set_varname/2,
+            set_varname/3,
             atom_subst_frak_0/4,
             logicmoo_varnames:attr_portray_hook/2,
             logicmoo_varnames:attr_unify_hook/2,
@@ -123,8 +124,6 @@
             get_clause_vars/2,
             get_clause_vars_copy/2,
             get_clause_vars_hb_int/2,
-            ignoreN/2,
-            ignoreN0/2,
             imploded_copyvars/2,
             locate_clause_ref/5,
             lock_vars/1,
@@ -155,7 +154,7 @@
             try_get_body_vars/1,
             try_get_head_vars/1,
             try_get_inner_vars/1,
-            try_save1var/2,
+            set_varname/2,
             try_save_vars/1,
             unlock_vars/1,
             v_dif_rest/2,
@@ -203,7 +202,7 @@ all_different_vals([]):-!.
 all_different_vals(Vs):-all_different_vals(Vs,Vs),!.
 
 all_different_vals([],_):-!.
-all_different_vals([V|Vs],SET):-subtract_eq(SET,V,REST),!,v_dif_rest(V,REST),all_different_vals(Vs,SET).
+all_different_vals([V|Vs],SET):-delete_eq(SET,V,REST),!,v_dif_rest(V,REST),all_different_vals(Vs,SET).
 
 v_dif_rest(V,REST):- not_member_eq(V,REST), when('?='(V,_),not_member_eq(V,REST)).
 
@@ -225,10 +224,11 @@ make_subterm_path(Sub,Term,PathO):-vmust(subterm_path(Sub,Term,Path)),!,PathO=Pa
 subterm_path(Sub,Term,[]):-Sub==Term,!.
 subterm_path(Sub,Term,[arg(N)|Path]):-compound(Term),!,arg(N,Term,TermE),subterm_path(Sub,TermE,Path),!.
 
-:- export(get_clause_vars/1).
-get_clause_vars(_):- t_l:dont_varname,!.
-get_clause_vars(_:V):- var(V),!,ignore((nb_current('$variable_names',Vs),member(N=V0,Vs),V0==V,assign_name_equal_var(N,V))).
-get_clause_vars(MHB):- term_variables(MHB,Vs),must(get_clause_vars(MHB,Vs)).
+get_clause_vars(CV):- hotrace(get_clause_vars_nontraced(CV)).
+:- export(get_clause_vars_nontraced/1).
+get_clause_vars_nontraced(_):- t_l:dont_varname,!.
+get_clause_vars_nontraced(_:V):- var(V),!,ignore((nb_current('$variable_names',Vs),member(N=V0,Vs),V0==V,set_varname(write_functor,N,V))).
+get_clause_vars_nontraced(MHB):- term_variables(MHB,Vs),must(get_clause_vars(MHB,Vs)).
 
 :- '$set_predicate_attribute'(get_clause_vars(_), trace, 1).
 :- '$set_predicate_attribute'(get_clause_vars(_), hide_childs, 1).
@@ -236,18 +236,19 @@ get_clause_vars(MHB):- term_variables(MHB,Vs),must(get_clause_vars(MHB,Vs)).
 del_attr_type(Type,Var):-ignore(del_attr(Var,Type)).
 
 get_clause_vars(_,[]):-!.
-get_clause_vars(MHB,[V|Vs]):- all_different_vals([V|Vs]),vmust((get_clause_vars_copy(MHB,WVARS),!,vmust(MHB=WVARS),unlock_vars(MHB),must(check_varnames(MHB)))),!,maplist(del_attr_type(clpfd),[V|Vs]).
+get_clause_vars(MHB,[V|Vs]):- all_different_vals([V|Vs]),vmust((get_clause_vars_copy(MHB,WVARS),!,
+   vmust(MHB=WVARS),unlock_vars(MHB),must(check_varnames(MHB)))),!,maplist(del_attr_type(when),[V|Vs]).
 get_clause_vars(MHB,Vs):- vmust((get_clause_vars_copy(MHB,WVARS),!,vmust(MHB=WVARS),unlock_vars(MHB),must(check_varnames(Vs)))),!.
 get_clause_vars(_,_):- !.
 
 
 get_clause_vars_copy(HB,HB):- ground(HB),!.
 get_clause_vars_copy(HH,HH):- sub_term(S,HH),compound(S),S='$VAR'(_),!. % already labled
-get_clause_vars_copy(H0,MHB):- must((name_vars(H0,MHB),lock_vars(MHB),as_clause_no_m( MHB,  H, B),
+get_clause_vars_copy(H0,MHB):- must((copy_term_and_varnames(H0,MHB),lock_vars(MHB),as_clause_no_m( MHB,  H, B),
     get_clause_vars_hb_int(H,B))),!.
 
 
-get_clause_vars_hb_int(H,B):- varname_cache:varname_info(H,B,Vs,_),must_maplist(assign_name_equal_var,Vs),!.
+get_clause_vars_hb_int(H,B):- varname_cache:varname_info(H,B,Vs,_),must_maplist(set_varname(write_functor),Vs),!.
 get_clause_vars_hb_int(H,B):- call_return_tf(try_get_body_vars(B),_TF1),call_return_tf(try_get_head_vars(H),_TF2),!.
 
 
@@ -259,19 +260,19 @@ replace_in_string_frak_0(SepChars,Repl,A,C):- atomics_to_string(B,SepChars,A),at
 fix_varcase_name(N,VN):-atom_subst_frak_0(N,'-','_',O),atom_subst_frak_0(O,'?','_',VN).
 
 no_vars_needed(H):- (t_l:dont_varname; ( ground(H) ; \+ compound(H))) ,!.
-try_get_inner_vars(H):- once((functor(H,_,N),arg(N,H,List),member(vars(Vs),List))),is_list(Vs),term_variables(H,VL),must_maplist(assign_name_equal_var,Vs,VL).
+try_get_inner_vars(H):- once((functor(H,_,N),arg(N,H,List),member(vars(Vs),List))),is_list(Vs),term_variables(H,VL),must_maplist(set_varname(write_functor),Vs,VL).
 
 call_return_tf(Call,TF):- ((Call-> TF = t ; TF = nil)).
 
 try_get_head_vars(H):- no_vars_needed(H),!.
-try_get_head_vars(H):- varname_cache:varname_info(H,_,Vs,_),maplist(assign_name_equal_var,Vs),!.
+try_get_head_vars(H):- varname_cache:varname_info(H,_,Vs,_),maplist(set_varname(write_functor),Vs),!.
 try_get_head_vars(H):- try_get_inner_vars(H),!.
-try_get_head_vars(H):- varname_cache:varname_info(_,H,Vs,_),maplist(assign_name_equal_var,Vs),!.
+try_get_head_vars(H):- varname_cache:varname_info(_,H,Vs,_),maplist(set_varname(write_functor),Vs),!.
 
 try_get_body_vars(H):- no_vars_needed(H),!.
-try_get_body_vars(H):- varname_cache:varname_info(_,H,Vs,_),maplist(assign_name_equal_var,Vs),!.
+try_get_body_vars(H):- varname_cache:varname_info(_,H,Vs,_),maplist(set_varname(write_functor),Vs),!.
 try_get_body_vars(H):- try_get_inner_vars(H).
-try_get_body_vars(H):- varname_cache:varname_info(H,_,Vs,_),maplist(assign_name_equal_var,Vs),!.
+try_get_body_vars(H):- varname_cache:varname_info(H,_,Vs,_),maplist(set_varname(write_functor),Vs),!.
 try_get_body_vars((A,B)):-!,try_get_head_vars(A),try_get_head_vars(B).
 try_get_body_vars((A;B)):-!,try_get_head_vars(A),try_get_head_vars(B).
 try_get_body_vars(C):- C=..[_,L],maplist(try_get_body_vars,L).
@@ -280,37 +281,29 @@ try_get_body_vars(_).
 :- multifile(varname_cache:varname_info/4).
 :- dynamic(varname_cache:varname_info/4).
 
-% assign_name_equal_var(B):-var(B),!.
-assign_name_equal_var(B):-var(B),writeq(assign_name_equal_var(B)),nl,trace,trace_or_throw(var_assign_varname_vars(B)).
-assign_name_equal_var(N=V):-must(assign_name_equal_var(N,V)),!.
-assign_name_equal_var(_).
+:- meta_predicate logicmoo_varnames:renumbervars(*,*,*).
 
-assign_name_equal_var(N,V):- (var(V),var(N)),trace_or_throw(var_ignoreq(N,V)).
-%assign_name_equal_var(N,V):-var(N),!, (var(V)->ignore(V=N);ignore(V=N)),!.
-assign_name_equal_var(N,V):-atom(N),var(V),!,ignoreN(N,V).
-assign_name_equal_var(_,'$VAR'(N)):-number(N),!.
-assign_name_equal_var(_,'$VAR'(N)):-atom(N),!.
-assign_name_equal_var(_,NV):-nonvar(NV),NV\='$VAR'(_),!.
-assign_name_equal_var('$VAR'(N),V):- number(N),!,format(atom(VN),'~w',[N]),ignoreN(VN,V).
-assign_name_equal_var('$VAR'(N),V):-atom(N),atom_concat('"?',LS,N),atom_concat(NN,'"',LS),fix_varcase_name(NN,VN),!,ignoreN(VN,V).
-assign_name_equal_var('$VAR'(N),V):-atom(N),ignoreN(N,V).
-assign_name_equal_var(N,V):-atom(N),!,ignoreN(N,V).
+% set_varname(How,B):-var(B),!.
+set_varname(How,B):-var(B),writeq(set_varname(How,B)),nl,trace,trace_or_throw(var_assign_varname_vars(How,B)).
+set_varname(How,N=V):-must(set_varname(How,N,V)),!.
 
-assign_name_equal_var(N,V):-ignore(N=V).
-
-ignoreN('$VAR'(Name),Var):-atom(Name),!,ignoreN(Name,Var).
-ignoreN(N,V):-var(V),var(N),!,V=N.
-ignoreN(Name,Var):- try_save1var(Name,Var),ignoreN0(Name,Var),!.
-
-% ignoreN0(Name,Var):- attvar(Var),put_attr(Var,logicmoo_varnames,Name),!.
-ignoreN0(N,'$VAR'(N)):-atom(N),!.
-ignoreN0(N,V):-ignore(V='$VAR'(N)),!.
-ignoreN0(Name,Var):- vmust(Var = '$VAR'(Name)).
+%set_varname(How,N,V):-var(V),var(N),!,V=N.
+set_varname(How,N,V):- (var(N);var(How)),trace_or_throw(var_var_set_varname(How,N,V)).
+set_varname(_,_,NV):-nonvar(NV),ignore((NV='$VAR'(N),must(number(N);atom(N)))).
+set_varname(How,'$VAR'(Name),V):- !, set_varname(How,Name,V).
+set_varname([How],N,V):- !, set_varname(How,N,V).
+set_varname([How|List],N,V):- !, set_varname(How,N,V),set_varname(List,N,V).
+set_varname(How,N,V):- number(N),!,format(atom(VN),'~w',[N]),set_varname(How,VN,V).
+set_varname(How,N,V):- atom(N),atom_concat('"?',LS,N),atom_concat(NN,'"',LS),fix_varcase_name(NN,VN),!,set_varname(How,VN,V).
+set_varname(write_functor,N,V):- !,ignore('$VAR'(N)=V),!.
+set_varname(write_attribute,N,V):-!,put_attr(V,logicmoo_varnames,N).
+set_varname(Nb_setval,N,V):-nb_current('$variable_names',Vs),!,register_var(N=V,Vs,NewVS),call(Nb_setval,'$variable_names',NewVS).
+set_varname(Nb_setval,N,V):-call(Nb_setval,'$variable_names',[N=V]).
+set_varname(Nb_setval,N,V):- must(call(Nb_setval,N,V)).
+set_varname(_How,_,_).
 
 
-try_save1var(N,V):-nb_current('$variable_names',Vs),!,register_var(N=V,Vs,NewVS),b_setval('$variable_names',NewVS).
-try_save1var(N,V):-b_setval('$variable_names',[N=V]).
-
+write_functor(N,V):-ignore('$VAR'(N)=V),!.
 
 :-export(save_clause_vars/2).
 :-module_transparent(save_clause_vars/1).
@@ -351,20 +344,28 @@ ain00(A):- logicmoo_util_database:clause_asserted(A),!.
 ain00(A):- assertz(A).
 
 
+
 ensure_vars_labled_r(I,O):- 
   once((((nb_current('$variable_names',Vs),Vs\==[])),
    copy_term(I:Vs,O:OVs),
-    must_maplist(assign_name_equal_var,OVs))),
+    must_maplist(set_varname(write_functor),OVs))),
    (O \=@= I ;  ground(O)),!.
 
 ensure_vars_labled_r(I,O):- 
      once((get_clause_vars_copy(I,O),unlock_vars(O))),
      (O \=@= I ;  ground(O)),!.
 
-ensure_vars_labled_r(I,O):- name_vars(I,O),I\=@=O.
+ensure_vars_labled_r(I,O):- copy_term_and_varnames(I,O),I\=@=O.
 
-:-export(name_vars/2).
-name_vars(Term,Named):- ignore((source_variables_lv(AllS))), copy_term(Term+AllS,Named+CAllS),maplist(assign_name_equal_var,CAllS).
+:-export(copy_term_and_varnames/2).
+copy_term_and_varnames(Term,Named):- 
+   notrace((ignore((source_variables_lv(AllS))), copy_term(Term+AllS,Named+CAllS),maplist(set_varname([write_functor,b_setarg]),CAllS))).
+
+renumbervars(How,Term,Named):- 
+   notrace((ignore((source_variables_lv(AllS))), copy_term(Term+AllS,Named+CAllS),maplist(set_varname(How),CAllS))).
+
+
+
 
 source_variables_lv(AllS):-
   (prolog_load_context(variable_names,Vs1);Vs1=[]),
@@ -375,8 +376,23 @@ source_variables_lv(AllS):-
   nb_linkval('$variable_names', AllS).
 
 
-contains_singletons(Term):- not(ground(Term)),call_not_not(((term_variables(Term,Vs),
-   snumbervars4(Term,0,_,[attvar(bind),singletons(true)]),member('$VAR'('_'),Vs)))).
+contain_numbervars(Term):- sub_term(Sub,Term),compound(Sub),Sub='$VAR'(_),!.
+
+
+
+contains_singletons(Term):-contains_singletons(Term,N),N>0. 
+
+contains_singletons(Term,N):-  sanity(\+contain_numbervars(Term)),
+     \+ground(Term),
+     copy_term_nat(Term,Nat),
+     term_variables(Nat,Vs), 
+     numbervars(Nat,0,_,[attvar(bind),singletons(true)]),
+     count_members_eq('$VAR'('_'),Vs,N).
+
+count_members_eq(_,[],0):-!.
+count_members_eq(Find,[E|List],N):- 
+   ( (E == Find) -> N is NN+1 ; NN=N),
+    count_members_eq(Find,List,NN).
 
 % = :- meta_predicate(call_not_not(0)).
 
@@ -527,6 +543,8 @@ read_vars_until_oes_1(F,S):-
 
 :- endif.
 
+
+
 :-export(ensure_vars_labled/2).
 ensure_vars_labled(I,O):-nonvar(O),!,must(ensure_vars_labled(I,M)),!,M=O.
 ensure_vars_labled(I,I):- (t_l:dont_varname;no_vars_needed(I)),!.
@@ -558,7 +576,7 @@ print_numbervars_2(H):- write_term(H,[portrayed(false)]),nl,!.
 
  
 term_expansion_save_vars(HB):- \+ ground(HB),  \+ t_l:dont_varname_te,\+ t_l:dont_varname, \+ current_prolog_flag(xref, true), 
-   current_predicate(_:logicmoo_util_varnames_file/0), current_prolog_flag(mpred_vars,true),  
+   current_predicate(logicmoo_util_varnames_file/0), current_prolog_flag(mpred_vars,true),  
    context_module(M),init_varname_stores(M),logicmoo_util_with_assertions:w_tl([t_l:dont_varname_te,current_prolog_flag(xref, true)],logicmoo_varnames:try_save_vars(M:HB)),!,fail.
 
 maybe_record_scanned_file:-ignore((  fail,source_location(F,_), \+ varname_cache:varname_info_file(F), asserta(varname_cache:varname_info_file(F)))).

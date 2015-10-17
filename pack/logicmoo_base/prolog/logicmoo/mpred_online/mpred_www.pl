@@ -30,7 +30,6 @@
             find_cl_ref/2,
             find_ref/2,
             fmtimg/2,
-            foobar/0,
             'functor spec'/4,
             functor_to_color/2,
             functor_to_color/4,
@@ -145,18 +144,18 @@
             write_tail/2,
             write_term_to_atom_one/2,
             write_variable/1,
+          lmconf:shared_hide_data/1,
+          mpred_www:http_last_request/1,
+          mpred_www:last_item_offered/1
+            /*
             http:location/3,
             http_dispatch:handler/4,
             http_log:log_stream/2,
             http_session:session_data/2,
             http_session:urandom_handle/1,
-            lmconf:shared_hide_data/1,
-            logicmoo_user:'$pldoc'/4,
-            mpred_www:foobar/1,
-            mpred_www:http_last_request/1,
-            mpred_www:last_item_offered/1,
             system:'$init_goal'/3,
             user:file_search_path/2
+            */
           ]).
  :- meta_predicate % cmt :-
         edit1term(0),
@@ -579,9 +578,6 @@ human_language('PortugueseLanguage').
 human_language('SpanishLanguage').
 human_language('ThaiLanguage').
 human_language('de').
-
-:- dynamic(foobar/1).
-foobar:- foobar((_A < _B) > _C).
 
 param_default_value(call,edit1term).
 

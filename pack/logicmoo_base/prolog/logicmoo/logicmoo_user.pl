@@ -21,7 +21,7 @@
 
 :- set_prolog_flag(report_error,true).
 :- set_prolog_flag(fileerrors,false).
-:- set_prolog_flag(access_level,system).
+% :- set_prolog_flag(access_level,system).
 :- set_prolog_flag(debug_on_error,true).
 :- set_prolog_flag(debug,true).
 :- set_prolog_flag(gc,false).
@@ -43,11 +43,19 @@ m31 :-   (F = mpred/_),foreach(must(logicmoo_util_help:mpred_is_impl_file(F)),mu
 m32:- rtrace(ensure_mpred_system).
 m33:- must(filematch_ext(['',mpred,ocl,moo,plmoo,pl,plt,pro,p,'pl.in',pfc,pfct],logicmoo_user:pfc/mpred,W)),dmsg(W),!.
 m2:- ensure_mpred_file_loaded(pfc/abc).
+
+% :-pfc_add(((P,Q,z(_))==>(p(P),q(Q)))).
+m3:- b_setval('$variable_names', ['P'=P,'Q'=Q]), R = (==>((P,Q,z(_)),(p(P),q(Q)))),  renumbervars(write_functor,R,O), writeq(O).
+
+%   b_setval('$variable_names', ['P'=P,'Q'=Q]), R = (==>((P,Q,z(_)),(p(P),q(Q)))), write_term(R,[numbervars(true),protray(_)]),renumbervars_prev(R,O).
+
+
+
 m4:- ensure_mpred_file_loaded(pfc/mpred).
-m3:- make. % w_tl(tlbugger:ifHideTrace,(ensure_mpred_file_loaded(pfc/mpred))).
+%m3:- make. % w_tl(tlbugger:ifHideTrace,(ensure_mpred_file_loaded(pfc/mpred))).
 
 
-
+% :-trace,call((R = (==>((P,Q,z(_)),(p(P),q(Q)))))
 
 
 
@@ -190,7 +198,7 @@ when_debugging(_,_).
 
 
 
-:- asserta(t_l:disable_mpred_term_expansions_locally).
+:- asserta(t_l:disable_px).
 
 % user:goal_expansion(ISA,G) :- compound(ISA),t_l:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
 :- meta_predicate(mpred_expander(?,?,?,?)).
@@ -205,7 +213,7 @@ when_debugging(_,_).
 :- prolog.
 :- endif.
 :-  call(with_mfa_of( (dynamic_safe)),user,user,boxlog_to_compile(_D,_E,_F),boxlog_to_compile/3).
-:- retractall(t_l:disable_mpred_term_expansions_locally).
+:- retractall(t_l:disable_px).
 
 
 :- list_undefined.

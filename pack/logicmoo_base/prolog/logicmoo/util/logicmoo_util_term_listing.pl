@@ -445,7 +445,7 @@ user:prolog_list_goal(Goal):- cnotrace(xlisting(Goal)). % writeq(hello(prolog_li
 :- thread_local(tlbugger:no_buggery_tl/0).
 :- dynamic(lmconf:no_buggery/0).
 
-buggery_ok :- \+ compiling, current_predicate(_:logicmoo_bugger_loaded/0), \+ lmconf:no_buggery, \+ tlbugger:no_buggery_tl.
+buggery_ok :- \+ compiling, current_predicate(logicmoo_bugger_loaded/0), \+ lmconf:no_buggery, \+ tlbugger:no_buggery_tl.
 
 
 :- multifile((synth_clause_for/5)).
@@ -789,7 +789,7 @@ prolog:locate_clauses(A, OutOthers) :-
  w_tl(t_l:in_prolog_locate_clauses(A),
  logicmoo_utils:
  ((  
-   current_predicate(_:logicmoo_bugger_loaded/0),
+   current_predicate(logicmoo_bugger_loaded/0),
    predicate_property(lmconf:hook_mpred_listing(A),number_of_clauses(C)),C>0,
    buggery_ok,
    w_tl(t_l:in_prolog_listing(A), 

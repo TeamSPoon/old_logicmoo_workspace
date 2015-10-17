@@ -71,6 +71,22 @@
             maplist_safe/3,            
             module_functor/4,
 
+          motrace/1,
+            nortrace/0,
+            start_rtrace/0,
+            stop_rtrace/0,
+          ftrace/1, % tells me why a call didn't succeed once
+          save_guitracer/0,
+               restore_guitracer/0,
+               rtrace/0,
+          rtrace/0,
+          hotrace0/1,
+          rtrace/1,  % trace why choice points are left over
+          trace_or_throw/1,
+            trace_or_throw/1,
+            traceafter_call/1,
+          restore_guitracer/0,
+          restore_trace/1,
 
             must/1,
             must_det/1,
@@ -113,20 +129,26 @@
             y_must/2
           ]).
 :- meta_predicate
+        restore_trace(0),
         block(+, :, ?),
         catchvv(0, ?, 0),
         catchvvnt(0, ?, 0),
         ccatch(0, ?, 0),
         cnotrace(0),
         ddmsg_call(0),
+   traceafter_call(0),
         on_x_fail(0),
-        hotrace(0),
-        if_defined(:),
-        if_defined(:, 0),
-        if_defined_else(:, 0),        
         on_x_log_throw(0),
         on_x_log_cont(0),
         on_x_log_fail(0),
+
+   motrace(0),
+   ftrace(0),        
+   rtrace(0),
+   hotrace(0),
+   if_defined(:),
+   if_defined(:, 0),
+   if_defined_else(:, 0),        
 
         must(0),
         must_det(0),
@@ -224,12 +246,12 @@
 % = :- meta_predicate(catchvvnt(0,?,0)).
 catchvvnt(T,E,F):-catchvv(cnotrace(T),E,F).
 
-:- thread_self(X),assert(lmcache:thread_main(user,X)).
+:- thread_self(Goal),assert(lmcache:thread_main(user,Goal)).
 
 is_pdt_like:-thread_property(_,alias(pdt_console_server)).
-is_pdt_like:-lmcache:thread_main(user,X),!,X \= main.
+is_pdt_like:-lmcache:thread_main(user,Goal),!,Goal \= main.
 
-is_main_thread:-lmcache:thread_main(user,X),!,thread_self(X).
+is_main_thread:-lmcache:thread_main(user,Goal),!,thread_self(Goal).
 
 :- thread_local(tlbugger:no_colors/0).
 :- thread_local(t_l:thread_local_current_main_error_stream/1).
@@ -288,9 +310,9 @@ is_hiding_dmsgs:- \+always_show_dmsg, tlbugger:ifHideTrace,!.
 % bugger_debug=false turns off just debugging about the debugger
 % opt_debug=false turns off all the rest of debugging
 % ddmsg(_):-current_prolog_flag(bugger_debug,false),!.
-% ddmsg(D):- current_predicate(wdmsg/1),wdmsg(D),!.
+% ddmsg(D):- current_predicate(_:wdmsg/1),wdmsg(D),!.
 ddmsg(D):- ddmsg('~q',[D]).
-%ddmsg(F,A):- current_predicate(wdmsg/2),wdmsg(F,A),!.
+%ddmsg(F,A):- current_predicate(_:wdmsg/2),wdmsg(F,A),!.
 ddmsg(F,A):- format_to_error(F,A),!.
 ddmsg_call(D):- ( (ddmsg(ddmsg_call(D)),call(D),ddmsg(ddmsg_exit(D))) *-> true ; ddmsg(ddmsg_failed(D))).
 
@@ -385,7 +407,7 @@ loading_file(FIn):- ((source_file0(F) *-> (retractall(t_l:last_source_file(_)),a
 source_file0(F):-source_location(F,_).
 source_file0(F):-prolog_load_context(file, F).
 source_file0(F):-prolog_load_context(source, F).
-source_file0(F):-seeing(X),is_stream(X),stream_property(X,file_name(F)),exists_file(F).
+source_file0(F):-seeing(Goal),is_stream(Goal),stream_property(Goal,file_name(F)),exists_file(F).
 source_file0(F):-prolog_load_context(stream, S),stream_property(S,file_name(F)),exists_file(F).
 source_file0(F):-findall(E,catch((stream_property( S,mode(read)),stream_property(S,file_name(E)),exists_file(E),
   line_count(S,Goal),Goal>0),_,fail),L),last(L,F).
@@ -408,8 +430,9 @@ source_variables([]).
 
 
 :-export( show_source_location/0).
-show_source_location:- notrace((tlbugger:no_slow_io)),!.
-show_source_location:- is_hiding_dmsgs,!.
+%show_source_location:- notrace((tlbugger:no_slow_io)),!.
+%show_source_location:- is_hiding_dmsgs,!.
+show_source_location:- source_location(F,L),!,show_new_src_location(F:L),!.
 show_source_location:- current_source_location(FL),!,show_new_src_location(FL),!.
 show_source_location.
 
@@ -434,7 +457,7 @@ is_ftNonvar(V):- \+ is_ftVar(V).
 
 %================================================================
 % maplist/[2,3]
-% this must succeed  maplist_safe(=,[X,X,X],[1,2,3]).
+% this must succeed  maplist_safe(=,[Goal,Goal,Goal],[1,2,3]).
 % well if its not "maplist" what shall we call it?
 %================================================================
 % so far only the findall version works .. the other runs out of local stack!?
@@ -567,11 +590,11 @@ with_preds(H,M,F,A,PI,Goal):-forall(to_m_f_arity_pi(H,M,F,A,PI),Goal).
 % ===================================================================
 % Substitution based on ==
 % ===================================================================
-% Usage: dbgsubst(+Fml,+X,+Sk,?FmlSk)
+% Usage: dbgsubst(+Fml,+Goal,+Sk,?FmlSk)
 
 :- export(dbgsubst/4).
 dbgsubst(A,B,Goal,A):- B==Goal,!.
-dbgsubst(A,B,Goal,D):-var(A),!,ddmsg(dbgsubst(A,B,Goal,D)),dumpST,dtrace,dbgsubst0(A,B,Goal,D).
+dbgsubst(A,B,Goal,D):-var(A),!,ddmsg(dbgsubst(A,B,Goal,D)),dumpST,dtrace(dbgsubst0(A,B,Goal,D)).
 dbgsubst(A,B,Goal,D):-dbgsubst0(A,B,Goal,D).
 
 dbgsubst0(A,B,Goal,D):- 
@@ -579,18 +602,18 @@ dbgsubst0(A,B,Goal,D):-
 dbgsubst0(A,_B,_C,A).
 
 nd_dbgsubst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
-nd_dbgsubst(  P, X,Sk, P1 ) :- functor_safe(P,_,N),nd_dbgsubst1( X, Sk, P, N, P1 ).
+nd_dbgsubst(  P, Goal,Sk, P1 ) :- functor_safe(P,_,N),nd_dbgsubst1( Goal, Sk, P, N, P1 ).
 
 nd_dbgsubst1( _,  _, P, 0, P  ).
-nd_dbgsubst1( X, Sk, P, N, P1 ) :- N > 0, P =.. [F|Args], 
-            nd_dbgsubst2( X, Sk, Args, ArgS ),
-            nd_dbgsubst2( X, Sk, [F], [FS] ),  
+nd_dbgsubst1( Goal, Sk, P, N, P1 ) :- N > 0, P =.. [F|Args], 
+            nd_dbgsubst2( Goal, Sk, Args, ArgS ),
+            nd_dbgsubst2( Goal, Sk, [F], [FS] ),  
             P1 =.. [FS|ArgS].
 
 nd_dbgsubst2( _,  _, [], [] ).
-nd_dbgsubst2( X, Sk, [A|As], [Sk|AS] ) :- X == A, !, nd_dbgsubst2( X, Sk, As, AS).
-nd_dbgsubst2( X, Sk, [A|As], [A|AS]  ) :- var(A), !, nd_dbgsubst2( X, Sk, As, AS).
-nd_dbgsubst2( X, Sk, [A|As], [Ap|AS] ) :- nd_dbgsubst( A,X,Sk,Ap ),nd_dbgsubst2( X, Sk, As, AS).
+nd_dbgsubst2( Goal, Sk, [A|As], [Sk|AS] ) :- Goal == A, !, nd_dbgsubst2( Goal, Sk, As, AS).
+nd_dbgsubst2( Goal, Sk, [A|As], [A|AS]  ) :- var(A), !, nd_dbgsubst2( Goal, Sk, As, AS).
+nd_dbgsubst2( Goal, Sk, [A|As], [Ap|AS] ) :- nd_dbgsubst( A,Goal,Sk,Ap ),nd_dbgsubst2( Goal, Sk, As, AS).
 nd_dbgsubst2( _X, _Sk, L, L ).
 
 
@@ -644,7 +667,6 @@ nop(_).
 :- thread_local(t_l:session_id/1).
 :- multifile(t_l:session_id/1).
 
-
 % = :- meta_predicate(cnotrace(0)).
 cnotrace(Goal):- hotrace(Goal).
 :- mpred_trace_less(cnotrace/1).
@@ -662,12 +684,109 @@ thread_leash(+Some):-!, (thread_self(main)->leash(+Some);thread_leash(-Some)).
 thread_leash(-Some):-!, (thread_self(main)->leash(-Some);thread_leash(-Some)).
 thread_leash(Some):-!, (thread_self(main)->leash(+Some);thread_leash(-Some)).
 
-hotrace(X):- notrace(tracing) -> (notrace,'$leash'(Old, Old),'$visible'(OldV, OldV),thread_leash(+exception),visible(+all),thread_leash(+all),call_cleanup(X,(('$leash'(_, Old),'$visible'(_, OldV),trace)))) ; X.
-:- trace(hotrace/1, -all).	
-% hotrace(X):- get_hotrace(X,Y),Y.
+:- meta_predicate hotrace0(0).
+hotrace0(Goal):- 
+ 
+  (\+ notrace((tracing, notrace)) ->  
+     (\+ tlbugger:rtracing -> Goal; 
+                              call_cleanup((notrace,Goal,start_rtrace),start_rtrace));
+     (\+ tlbugger:rtracing -> call_cleanup((Goal,trace),trace); 
+                              call_cleanup((Goal,notrace((start_rtrace,trace))),(start_rtrace,trace)))).
+   
+/*
+hotrace0(Goal):- notrace(tlbugger:rtracing) -> Goal ; 
+   (notrace, ((tracing, notrace) -> CC=trace;CC=true), 
+     '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup((start_rtrace,trace,Goal),(notrace,stop_rtrace0,'$leash'(_, Old),'$visible'(_, OldV),CC))).
+
+hotrace0(Goal):- notrace((tracing,notrace)) -> (notrace,'$leash'(OldL, OldL),
+   '$visible'(OldV, OldV),thread_leash(+exception),visible(+all),thread_leash(+all), 
+       call_cleanup(Goal,notrace(('$leash'(_, OldL),'$visible'(_, OldV)))),trace) ; Goal.
+*/
+
+
+hotrace(Goal):- notrace((tracing,notrace)) -> (notrace,'$leash'(OldL, OldL),
+   '$visible'(OldV, OldV),thread_leash(+exception),visible(+all),thread_leash(+all), 
+       call_cleanup(Goal,notrace(('$leash'(_, OldL),'$visible'(_, OldV)))),trace) ; Goal.
+
+:- trace(hotrace/1, -all).       
+% hotrace(Goal):- get_hotrace(Goal,Y),Y.
 %:- mpred_trace_less(hotrace/1).
-:- '$set_predicate_attribute'(hotrace(_), hide_childs, 0).
+:- '$set_predicate_attribute'(hotrace(_), hide_childs, 1).
 :- '$set_predicate_attribute'(hotrace(_), trace, 0).
+
+
+:- thread_local(tlbugger:rtracing/0).
+:- thread_local(tlbugger:no_colors/0).
+
+
+% =========================================================================
+
+
+
+%= :- meta_predicate  restore_trace(0).
+restore_trace(Goal):-  
+    notrace(('$leash'(OldL, OldL),'$visible'(OldV, OldV),
+    (tracing -> CC=(('$leash'(_, OldL),'$visible'(_, OldV),trace)); CC=('$leash'(_, OldL),'$visible'(_, OldV))))),
+    (catch(Goal,E,(CC,throw(E))) *-> CC ; (CC,!,fail)).
+
+
+%= :- meta_predicate  rtrace(0).
+
+rtrace(Goal):- notrace(tlbugger:rtracing) -> Goal ; 
+   (notrace, ((tracing, notrace) -> CC=trace;CC=true), 
+     '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup((start_rtrace,trace,Goal),(notrace,stop_rtrace0,'$leash'(_, Old),'$visible'(_, OldV),CC))).
+
+
+:- '$set_predicate_attribute'(system:call_cleanup(_,_), trace, 0).
+:- '$set_predicate_attribute'(system:call_cleanup(_,_), hide_childs, 1).
+:- '$set_predicate_attribute'(rtrace(_), trace, 0).
+:- '$set_predicate_attribute'(rtrace(_), hide_childs, 0).
+:- '$set_predicate_attribute'(hotrace0(_), trace, 0).
+:- '$set_predicate_attribute'(hotrace0(_), hide_childs, 0).
+
+% = %= :- meta_predicate (motrace(0)).
+motrace(O):-logicmoo_util_bugger_catch:one_must(hotrace(must(O)),(trace,O)).
+
+
+% :- mpred_trace_less(rtrace/1).
+
+%= :- meta_predicate  ftrace(0).
+ftrace(Goal):- restore_trace((
+   visible(-all),visible(+unify),
+   visible(+fail),visible(+exception),
+   thread_leash(-all),thread_leash(+exception),trace,Goal)).
+
+
+trace_or_throw(E):-non_user_console,thread_self(Self),wdmsg(thread_trace_or_throw(Self+E)),
+   current_input(In),   on_x_log_throw(attach_console),set_stream(In,close_on_exec(true)),throw(abort),thread_exit(trace_or_throw(E)).
+trace_or_throw(E):- wdmsg(E),dtrace_msg(throw:-E).
+
+ %:-interactor.
+
+:- '$set_predicate_attribute'(tlbugger:rtracing, trace, 0).
+
+traceafter_call(Goal):- call_cleanup(restore_trace((thread_leash(-all),visible(-all),Goal)),(thread_leash(+call), trace)).
+
+:-thread_local(t_l:wasguitracer/1).
+save_guitracer:- ignore((current_prolog_flag(gui_tracer, GWas),asserta(t_l:wasguitracer(GWas)))).
+restore_guitracer:- ignore((retract(t_l:wasguitracer(GWas)),set_prolog_flag(gui_tracer, GWas))).
+nortrace:- notrace((stop_rtrace,trace)).
+rtrace:- notrace((visible(+all),visible(+unify),visible(+exception),thread_leash(-all),thread_leash(+exception),assert(tlbugger:rtracing),save_guitracer,noguitracer)).
+start_rtrace:- notrace((debug,rtrace,trace)).
+stop_rtrace:-notrace((visible(+all),visible(+unify),visible(+exception),thread_leash(+all),thread_leash(+exception),stop_rtrace0)).
+stop_rtrace0:- notrace((notrace,restore_guitracer,ignore(retract(tlbugger:rtracing)))).
+% :- mpred_trace_less(start_rtrace/0).
+% :- mpred_trace_less(stop_rtrace/0).
+% :- mpred_trace_less(nortrace/0).
+% :- mpred_trace_less(rtrace/0).
+
+:- unlock_predicate(system:notrace/1).
+% :- mpred_trace_less(system:notrace/1).
+% :- if_may_hide('$set_predicate_attribute'(notrace(_), hide_childs, 1)).
+% :- if_may_hide('$set_predicate_attribute'(notrace(_), trace, 0)).
+% :- if_may_hide('$set_predicate_attribute'(system:notrace(_), hide_childs, 1)).
+% :- if_may_hide('$set_predicate_attribute'(system:notrace(_), trace, 0)).
+:- lock_predicate(system:notrace/1).
 
 
 
@@ -733,11 +852,13 @@ must_det(Goal,OnFail):- trace_or_throw(deprecated(must_det(Goal,OnFail))),Goal,!
 must_det(_Call,OnFail):-OnFail.
 
 :- module_transparent(must_det_l/1).
-must_det_l(MGoal):- tlbugger:skipMust,!, MGoal,!.
 must_det_l(MGoal):- strip_module(MGoal,M,Goal),!, must_det_lm(M,Goal).
 
 :- module_transparent(must_det_lm/2).
 must_det_lm(M,Goal):-var(Goal),trace,trace_or_throw(var_must_det_l(M:Goal)),!.
+must_det_lm(M,[Goal]):-!,must_det_lm(M,Goal).
+must_det_lm(M,[Goal|List]):-!,must(M:Goal),!,must_det_lm(M,List).
+must_det_lm(M,Goal):-tlbugger:skip_bugger,!,M:Goal.
 must_det_lm(M,(Goal,List)):-!,must(M:Goal),!,must_det_lm(M,List).
 must_det_lm(M,Goal):- must(M:Goal),!.
 must_det_lm(_,[]):-!.
@@ -801,7 +922,7 @@ y_must(Y,Goal):- catchvv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail)
 :- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(200), attributes(portray)]).
 :- set_prolog_flag(debugger_show_context,true).
 
-must(Goal):- (get_must(Goal,MGoal)),MGoal.
+must(Goal):- notrace(get_must(Goal,MGoal)),!,MGoal.
 
 get_must(Goal,Goal):- fail,is_release,!.
 get_must(Goal,CGoal):-  tlbugger:skipMust,!,CGoal = Goal.
@@ -811,7 +932,7 @@ get_must(Goal,CGoal):- tlbugger:show_must_go_on,!,
      notrace(((dumpST,ddmsg(error,sHOW_MUST_go_on_xI__xI__xI__xI__xI_(E,Goal))),badfood(Goal))))
             *-> true ; notrace((dumpST,ddmsg(error,sHOW_MUST_go_on_failed_F__A__I__L_(Goal)),badfood(Goal))))).
 
-get_must(Goal,CGoal):- !, CGoal = (catch(Goal,E,(notrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),trace,!,fail)) *-> true ; ((ddmsg(failed(must(Goal))),trace,Goal))).
+% get_must(Goal,CGoal):- !, CGoal = (catch(Goal,E,(notrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),trace,!,throw(E))) *-> true ; ((ddmsg(failed(must(Goal))),trace,Goal))).
 get_must(Goal,CGoal):- !, CGoal = on_f_debug(on_x_debug(Goal)).
 get_must(Goal,CGoal):-    
    (CGoal = (catchvv(Goal,E,

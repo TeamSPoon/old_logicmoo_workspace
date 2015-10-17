@@ -7,11 +7,11 @@
             parent_goal/2,
             prolog_frame_match/3,
             relative_frame/3,
-            stack_check/0,
-            stack_check/1,
-            stack_check/2,
-            stack_check_else/2,
-            stack_depth/1
+          stack_check/0,
+          stack_check/1,
+          stack_check/2,
+          stack_check_else/2,
+          stack_depth/1
           ]).
 :- module_transparent
         current_frames/4,
@@ -38,7 +38,11 @@
 */
 stack_depth(Level):-hotrace((prolog_current_frame(Frame),prolog_frame_attribute(Frame,level,Level))).
 
-stack_check:-!.
+
+:-  module_transparent stack_check/0.
+:-  module_transparent stack_check/1.
+:-  module_transparent stack_check_else/3.
+  % st ack_check:-!.
 stack_check:-stack_check(3000).
 stack_check(BreakIfOver):- stack_check_else(BreakIfOver, trace_or_throw(stack_check(BreakIfOver))).
 stack_check(BreakIfOver,Error):- stack_check_else(BreakIfOver, trace_or_throw(stack_check(BreakIfOver,Error))).

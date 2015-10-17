@@ -15,7 +15,7 @@
             add_newvar/2,
             add_newvars/1,
             always_show_dmsg/0,
-            lbl_vars/4,
+            %lbl_vars/6,
 
             mustvv/1,
             name_to_var/3,
@@ -26,9 +26,10 @@
             register_var/4,
             register_var_0/4,
             remove_grounds/2,
-            renumbervars/2,
+            renumbervars_prev/2,
             renumbervars1/2,
             renumbervars1/4,
+            
             samify/2,
             snumbervars/1,
             snumbervars/3,
@@ -50,7 +51,7 @@
 
         module_meta_transparent(:),
         mustvv(0),
-        renumbervars(?, ?),
+        renumbervars_prev(?, ?),
         snumbervars(?),
         snumbervars(*, ?, ?),
         snumbervars(*, ?, ?, ?).
@@ -67,7 +68,7 @@
         add_newvar/2,
         add_newvars/1,
         always_show_dmsg/0,
-        lbl_vars/4,
+        %lbl_vars/6,
         name_to_var/3,
         register_var/3,
         register_var/4,
@@ -95,7 +96,7 @@
 :- meta_predicate contains_singletons(?).
 % Restarting analysis ...
 % Found new meta-predicates in iteration 2 (0.206 sec)
-:- meta_predicate renumbervars(?,?).
+:- meta_predicate renumbervars_prev(?,?).
 :- meta_predicate randomVars(?).
 :- meta_predicate snumbervars(?).
 % Restarting analysis ...
@@ -122,8 +123,8 @@ match_predicates(Spec,M,P,F,A):- '$find_predicate'(Spec,Matches),member(CM:F/A,M
 
 :- module_transparent(if_may_hide/1).
 % = :- meta_predicate(if_may_hide(0)).
-if_may_hide(_G):-!.
-% if_may_hide(G):-G.
+%if_may_hide(_G):-!.
+if_may_hide(G):-G.
 
 :- meta_predicate with_unlocked_pred(:,0).
 with_unlocked_pred(Pred,Goal):-
@@ -149,7 +150,7 @@ with_unlocked_pred(M:Pred,(
 mpred_trace_nochilds(W):- if_may_hide(forall(match_predicates(W,M,Pred,_,_),(
 with_unlocked_pred(M:Pred,(
 '$set_predicate_attribute'(M:Pred, trace, 1),
-'$set_predicate_attribute'(M:Pred, noprofile, 1),
+'$set_predicate_attribute'(M:Pred, noprofile, 0),
 '$set_predicate_attribute'(M:Pred, hide_childs, 1)))))).
 
 :- export(mpred_trace_childs/1).
@@ -185,58 +186,71 @@ term_to_string(I,IS):- grtrace(term_to_atom(I,A)),string_to_atom(IS,A),!.
 :- meta_predicate mustvv(0).
 mustvv(G):-must(G).
 
-:- export(unnumbervars/2).
-unnumbervars(X,YY):- lbl_vars(X,[],Y,_Vs),!, mustvv(YY=Y).
+%:- export(unnumbervars/2).
+% unnumbervars(X,YY):- lbl_vars(_,_,X,[],Y,_Vs),!, mustvv(YY=Y).
 % TODO compare the speed
 % unnumbervars(X,YY):- mustvv(unnumbervars0(X,Y)),!,mustvv(Y=YY).
 
+unnumbervars(X,Y):-
+   with_output_to(string(A),write_term(X,[numbervars(true),character_escapes(true),ignore_ops(true),quoted(true)])),
+   mustvv(atom_to_term(A,Y,_)),!.
+
+unnumbervars_and_save(X,YO):- % trace_or_throw(unnumbervars_and_save(X,YO)),
+ term_variables(X,TV),
+ mustvv((source_variables_l(Vs),
+   with_output_to(string(A),write_term(X,[numbervars(true),variable_names(Vs),character_escapes(true),ignore_ops(true),quoted(true)])))),
+   mustvv(atom_to_term(A,Y,NewVars)),
+   (NewVars==[]-> YO=X ; (length(TV,TVL),length(NewVars,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (add_newvars(NewVars),YO=Y)))).
+
+
+/*
+
+unnumbervars_and_save(X,YO):-
+ term_variables(X,TV),
+ mustvv((source_variables_l(Vs),
+   with_output_to(string(A),write_term(X,[numbervars(true),variable_names(Vs),character_escapes(true),ignore_ops(true),quoted(true)])))),
+   mustvv(atom_to_term(A,Y,NewVars)),
+   (NewVars==[]-> YO=X ; (length(TV,TVL),length(NewVars,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (trace,add_newvars(NewVars),Y=X)))).
 
 
 :- export(unnumbervars_and_save/2).
 unnumbervars_and_save(X,YY):-
-   lbl_vars(X,[],Y,Vs),
+   lbl_vars(_,_,X,[],Y,Vs),
     (Vs==[]->mustvv(X=YY);
-    ( % writeq((lbl_vars(X,Y,Vs))),nl,
+    ( % writeq((lbl_vars(N,NN,X,Y,Vs))),nl,
      save_clause_vars(Y,Vs),mustvv(Y=YY))).
 
-/*
 % todo this slows the system!
 unnumbervars0(X,clause(UH,UB,Ref)):- sanity(nonvar(X)),
   X = clause(H,B,Ref),!,
   mustvv(unnumbervars0((H:-B),(UH:-UB))),!.
 
-unnumbervars0(X,YY):-lbl_vars(X,YY,_Vs).
-*/
-/*
-lbl_vars(X,YY):-
+unnumbervars0(X,YY):-lbl_vars(N,NN,X,YY,_Vs).
+
+lbl_vars(N,NN,X,YY):-
    must_det_l((with_output_to(string(A),write_term(X,[snumbervars(true),character_escapes(true),ignore_ops(true),quoted(true)])),
    atom_to_term(A,Y,_NewVars),!,mustvv(YY=Y))),check_varnames(YY).
-lbl_vars(X,YY,Vs):-!,lbl_vars(X,[],YY,Vs).
+lbl_vars(N,NN,X,YY,Vs):-!,lbl_vars(N,NN,X,[],YY,Vs).
+
+lbl_vars(S1,S1,A,OVs,A,OVs):- atomic(A),!.
+lbl_vars(S1,S1,Var,IVs,Var,OVs):- attvar(Var),get_attr(Var,logicmoo_varnames,Nm), (memberchk(Nm=PreV,IVs)->(OVs=IVs,mustvv(PreV==Var));OVs=[Nm=Var|IVs]).
+lbl_vars(S1,S2,Var,IVs,Var,OVs):- var(Var),!,(\+number(S1)->true;(((member(Nm=PreV,IVs),Var==PreV)->(OVs=IVs,put_attr(Var,logicmoo_varnames,Nm));
+  (format(atom(Nm),'~q',['$VAR'(S1)]),S2 is S1+1,(memberchk(Nm=Var,IVs)->OVs=IVs;OVs=[Nm=Var|IVs]))))).
+
+lbl_vars(S1,S1,NC,OVs,NC,OVs):- ( \+ compound(NC)),!.
+lbl_vars(S1,S1,'$VAR'(Nm),IVs,PreV,OVs):-  atom(Nm), !, must(memberchk(Nm=PreV,IVs)->OVs=IVs;OVs=[Nm=PreV|IVs]).
+lbl_vars(S1,S1,'$VAR'(N0),IVs,PreV,OVs):- (number(N0)->format(atom(Nm),'~q',['$VAR'(N0)]);Nm=N0), (memberchk(Nm=PreV,IVs)->OVs=IVs;OVs=[Nm=PreV|IVs]).
+lbl_vars(S1,S3,[X|XM],IVs,[Y|YM],OVs):-!,lbl_vars(S1,S2,X,IVs,Y,VsM),lbl_vars(S2,S3,XM,VsM,YM,OVs).
+lbl_vars(S1,S2,XXM,VsM,YYM,OVs):- XXM=..[F|XM],lbl_vars(S1,S2,XM,VsM,YM,OVs),!,YYM=..[F|YM].
+
 */
 
-lbl_vars(X,Vs,X,Vs):- ( \+ compound(X)),!.
-lbl_vars('$VAR'(X),IVs,Y,Vs):-!, (memberchk(X=Y,IVs)->Vs=IVs;Vs=[X=Y|IVs]).
-lbl_vars([X|XM],IVs,[Y|YM],Vs):-!,
-  lbl_vars(X,IVs,Y,VsM),
-  lbl_vars(XM,VsM,YM,Vs).
-lbl_vars(XXM,IVs,YYM,Vs):-
-  XXM=..[F,X|XM],
-  lbl_vars(X,IVs,Y,VsM),
-  lbl_vars(XM,VsM,YM,Vs),
-  YYM=..[F,Y|YM].
-
 /*
-lbl_vars(X,YY,Vs):-
+lbl_vars(N,NN,X,YY,Vs):-
  must_det_l((
    with_output_to(codes(A),write_term(X,[numbervars(true),character_escapes(true),ignore_ops(true),quoted(true)])),   
    read_term_from_codes(A,Y,[variable_names(Vs),character_escapes(true),ignore_ops(true)]),!,mustvv(YY=Y),check_varnames(YY))).
 
-unnumbervars_and_save(X,YO):-
- term_variables(X,TV),
- mustvv((source_variables(Vs),
-   with_output_to(string(A),write_term(X,[numbervars(true),variable_names(Vs),character_escapes(true),ignore_ops(true),quoted(true)])))),
-   mustvv(atom_to_term(A,Y,NewVars)),
-   (NewVars==[]-> YO=X ; (length(TV,TVL),length(NewVars,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (trace,add_newvars(NewVars),Y=X)))).
 
 
 
@@ -271,10 +285,10 @@ remove_grounds([N=V|V0s],[N=NV|Vs]):-
    (var(V) -> NV=V ; NV=_ ),
    remove_grounds(V0s,Vs).
 
-% renumbervars(X,X):-ground(X),!.
-renumbervars(X,Y):-renumbervars1(X,[],Y,_),!.
-renumbervars(X,Z):-unnumbervars(X,Y),safe_numbervars(Y,Z),!.
-renumbervars(Y,Z):-safe_numbervars(Y,Z),!.
+% renumbervars_prev(X,X):-ground(X),!.
+renumbervars_prev(X,Y):-renumbervars1(X,[],Y,_),!.
+renumbervars_prev(X,Z):-unnumbervars(X,Y),safe_numbervars(Y,Z),!.
+renumbervars_prev(Y,Z):-safe_numbervars(Y,Z),!.
 
 
 renumbervars1(X,Y):-renumbervars1(X,[],Y,_).
@@ -290,6 +304,7 @@ renumbervars1(XXM,IVs,YYM,Vs):-
   renumbervars1(X,IVs,Y,VsM),
   renumbervars1(XM,VsM,YM,Vs),
   YYM=..[F,Y|YM].
+
 
 
   

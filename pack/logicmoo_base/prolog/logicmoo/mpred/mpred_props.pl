@@ -165,7 +165,7 @@ decl_mpred_hybrid_ilc_0(_CM,M,PI,F/A):-
       add(kb:mpred_module(F,M)),
       add(kb:prologHybrid(F)),
       get_cc(PI,NC),
-      must(M=user),     
+      sanity(show_call_failure(M==kb)),
       decl_mpred_mfa(M,F,A),
       decl_mpred_pi(PI),
       must(lmconf:mpred_provide_setup(call(conjecture),F/A,prologHybrid,_OUT)),
@@ -262,7 +262,7 @@ decl_mpred_0(M:FA,More):-atom(M),!,decl_mpred_0(FA,More),decl_mpred_0(FA,mpred_m
 decl_mpred_0(F,A):-atom(F),number(A),!,assert_arity(F,A).
 decl_mpred_0(F,tPred):-!,assert_hasInstance(tPred,F).
 decl_mpred_0(C,More):-string(C),!,dmsg(trace_or_throw(var_string_decl_mpred(C,More))).
-decl_mpred_0(mudDescription, predProxyRetract):-dtrace(decl_mpred_0(mudDescription, predProxyRetract)).
+decl_mpred_0(mudDescription, predProxyRetract):- trace_or_throw(decl_mpred_0(mudDescription, predProxyRetract)).
 decl_mpred_0(_,meta_argtypes):-!.
 decl_mpred_0(F,meta_argtypes(ArgTypes)):-!,decl_mpred_2(F,meta_argtypes(ArgTypes)).
 decl_mpred_0(C,More):-compound(C),C=..[F,Arg1|PROPS],ttPredType(F),!,ground(Arg1),decl_mpred(Arg1,[F,PROPS,More]).
@@ -305,6 +305,6 @@ add_mpred_prop_gleaned_4(Arg1,_F,_,FRGS):-decl_mpred(Arg1,FRGS).
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
-% user:term_expansion(G,_):- current_predicate(logicmoo_bugger_loaded/0),\+ t_l:disable_mpred_term_expansions_locally, not(t_l:into_form_code),hotrace((once(glean_pred_props_maybe(G)),fail)).
+% user:term_expansion(G,_):- current_predicate(logicmoo_bugger_loaded/0),\+ t_l:disable_px, not(t_l:into_form_code),hotrace((once(glean_pred_props_maybe(G)),fail)).
 
 

@@ -25,7 +25,7 @@
 :- dynamic lmconf:startup_option/2. 
 :- multifile lmconf:mpred_system_status/2.
 :- dynamic lmconf:mpred_system_status/2.
-:- thread_local t_l:disable_mpred_term_expansions_locally/0.
+:- thread_local t_l:disable_px/0.
 
 lmconf:startup_option(datalog,sanity). %  Run datalog sanity tests while starting
 lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
@@ -67,7 +67,7 @@ logicmoo_util_help:mpred_is_impl_file(mpred/A):-nonvar(A).
 load_mpred_system(_Ctx):-  !,use_module(logicmoo(mpred/mpred_loader)).
 load_mpred_system(_Ctx):-  lmconf:mpred_system_kb(Sys),
    with_mutex(mpred_system_mutex,forall(logicmoo_util_help:mpred_is_impl_file(File),     
-     (( Sys:use_module(logicmoo_utils),trace, call((Sys:w_tl(t_l:disable_mpred_term_expansions_locally,Sys:ensure_loaded(File)))))))).
+     (( Sys:use_module(logicmoo_utils),trace, call((Sys:w_tl(t_l:disable_px,Sys:ensure_loaded(File)))))))).
 
 :- export(enable_mpred_system/1).
 enable_mpred_system(Ctx):- with_mutex(mpred_system_mutex,lmconf:enable_mpred_system0(Ctx)).

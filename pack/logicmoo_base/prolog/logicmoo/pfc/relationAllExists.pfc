@@ -7,29 +7,11 @@
 :- op(1050,xfx,('<-')).
 :- op(1100,fx,('==>')).
 :- op(1150,xfx,('::::')).
-:- was_dynamic(tCol/1).
+:- kb_dynamic(tCol/1).
+:- kb_dynamic(tHominid/1).
 
-
-
-:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
-
-isa(iExplorer1,tHumanPlayer).
-isa(iExplorer2,tHumanPlayer).
-genls(tHumanPlayer,tHominid).
-genls(tHumanPlayer,tPlayer).
-genls(tPlayer,tAgent).
-
-isa(iExplorer1,tHominid).
-
-genls(tHumanBody,tBodyPart).
-
-%mudSubPart(iExplorer2, iBody2).
-%mudSubPart(iExplorer1, iHumanBody1).
-
-%isa(iHumanBody1,tHumanBody).
-
-
-:- endif.
+:- kb_dynamic(relationAllOnly/3).
+:- kb_dynamic(ptTransitiveBinaryPredicate/1).
 
 predInterArgIsa(mudSubPart(tBodyPart,tBodyPart)).
 relationAllOnly(mudSubPart,tHumanBody,tBodyPart).
@@ -132,6 +114,28 @@ relationAllExists(Pred,Col1,Col2)/(G=..[Pred,VAL,Value]) ==>
     ((( ~((G,isa(Value,Col2)))) ==> ({Value=skRelationInstanceExistsFn(Pred,VAL,Col2)},isa(Value,Col2), G)))).
 */
 
+
+:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
+
+isa(iExplorer1,tHumanPlayer).
+isa(iExplorer2,tHumanPlayer).
+genls(tHumanPlayer,tHominid).
+genls(tHumanPlayer,tPlayer).
+genls(tPlayer,tAgent).
+
+isa(iExplorer1,tHominid).
+
+
+%mudSubPart(iExplorer2, iBody2).
+%mudSubPart(iExplorer1, iHumanBody1).
+
+%isa(iHumanBody1,tHumanBody).
+
+
+:- endif.
+
+genls(tHumanBody,tBodyPart).
+
 relationAllExists(mudSubPart,tHominid,tHumanBody).
 relationAllExists(mudSubPart,tHumanBody,isEach(tHumanHead,tHumanNeck,tHumanUpperTorso,tHumanLowerTorso,tHumanPelvis,tHumanArms,tHumanLegs)).
 relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
@@ -143,13 +147,15 @@ relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
 
 :- endif.
 
+/*
+have to confirm how *most* works
 ==>
 '(==>
-  (relationInstanceMost ?BINPRED ?THING ?COL)
+  (relationInstanceMost ?BINPRED ?THING ?COL2)
      (=> 
        (isa ?THING ?COL1)        
        (relationExistsMost ?BINPRED ?COL1 ?COL2)))'.
-
+*/
 
 
 isa(skRelationAllExistsFn(P,A,C),C):- nonvar(P),nonvar(A),nonvar(C).
@@ -159,9 +165,9 @@ isa(skRelationAllExistsFn(P,A,C),C):- nonvar(P),nonvar(A),nonvar(C).
 ?- listing(mudSubPart).
 %:-rtrace((isa(Inst,tHumanNeck),mudSubPart(iExplorer1,Inst))).
 %:-rtrace((mudSubPart(iExplorer1,Inst),isa(Inst,tHumanNeck))).
-:- must((isa(Inst,tHumanHair),mudSubPart(iExplorer1,Inst))).
-:- must((mudSubPart(iExplorer1,Inst),isa(Inst,tHumanNeck))).
-:- must((mudSubPart(iExplorer1,Inst),isa(Inst,tHumanHair))).
+%:- must((isa(Inst,tHumanHair),mudSubPart(iExplorer1,Inst))).
+%:- must((mudSubPart(iExplorer1,Inst),isa(Inst,tHumanNeck))).
+%:- must((mudSubPart(iExplorer1,Inst),isa(Inst,tHumanHair))).
 
 ?- listing(mudSubPart).
 

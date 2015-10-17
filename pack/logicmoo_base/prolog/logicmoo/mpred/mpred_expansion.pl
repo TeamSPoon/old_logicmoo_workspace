@@ -323,7 +323,7 @@ same_terms((A:-AA),(B:-BB)):-!,same_terms(A,B),same_terms(AA,BB).
 same_terms(M:A,B):-atom(M),!,same_terms(A,B).
 same_terms(A,M:B):-atom(M),!,same_terms(A,B).
 
-fully_expand(Op,Sent,SentO):- cyclic_break((Sent)), /* cnotrace */ (fully_expand0(Op,Sent,SentO)),cyclic_break((SentO)),!.
+fully_expand(Op,Sent,SentO):- hotrace((cyclic_break((Sent)), /* cnotrace */ (fully_expand0(Op,Sent,SentO)),cyclic_break((SentO)))),!.
 fully_expand0(_,Sent,SentO):- \+(is_ftCompound(Sent)),!,Sent=SentO.
 fully_expand0(Op,Sent,SentO):-must_expand(Sent),!,fully_expand_now(Op,Sent,SentO),!.
 fully_expand0(_,Sent,SentO):-get_functor(Sent,_,A),A\==1,!,Sent=SentO.
@@ -334,7 +334,7 @@ fully_expand_now(_,Sent,SentO):-t_l:infSkipFullExpand,!,must(Sent=SentO).
 fully_expand_now(_,(:-(Sent)),(:-(Sent))):-!.
 fully_expand_now(Op,Sent,SentO):- copy_term(Sent,NoVary),
   cyclic_break((NoVary)),   
- w_tl(t_l:disable_mpred_term_expansions_locally,
+ w_tl(t_l:disable_px,
    must(fully_expand_clause(Op,Sent,BO))),!,must(cnotrace((SentO=BO))),
     must(Sent=@=NoVary),
 
@@ -355,20 +355,21 @@ fully_expand_clause(Op, HB,HHBB):- must((to_reduced_hb(Op,HB,H,B),fully_expand_h
 fully_expand_head(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,transitive_lc(db_expand_term(Op),Sent,SentO))),!.
 fully_expand_goal(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,transitive_lc(db_expand_term(Op),Sent,SentO))),!.
 
+as_is_term(NC):-hotrace(as_is_term0(NC)).
+:- export(as_is_term0/1).
+as_is_term0(NC):- \+(is_ftCompound(NC)),!.
+as_is_term0(NC):-cyclic_term(NC),!,dmsg(cyclic_term(NC)),!.
+as_is_term0('$VAR'(_)):-!.
+as_is_term0('wid'(_,_,_)):-!.
 
-as_is_term(NC):- \+(is_ftCompound(NC)),!.
-as_is_term(NC):-cyclic_term(NC),!,dmsg(cyclic_term(NC)),!.
-as_is_term('$VAR'(_)):-!.
-as_is_term('wid'(_,_,_)):-!.
-
-as_is_term(NC):-is_unit(NC),!.
-as_is_term(M:NC):-atom(M),!,as_is_term(NC).
-as_is_term(NC):-functor(NC,Op,2),infix_op(Op,_).
-%as_is_term(NC):-is_ftVar(NC).
+as_is_term0(NC):-is_unit(NC),!.
+as_is_term0(M:NC):-atom(M),!,as_is_term(NC).
+as_is_term0(NC):-functor(NC,Op,2),infix_op(Op,_).
+%as_is_term0(NC):-is_ftVar(NC).
 %as_is_term(true).
-as_is_term('call'(_)).
-as_is_term('{}'(_)).
-as_is_term('ignore'(_)).
+as_is_term0('call'(_)).
+as_is_term0('{}'(_)).
+as_is_term0('ignore'(_)).
 
 :- was_export(infix_op/2).
 infix_op(Op,_):-comparitiveOp(Op).
@@ -864,7 +865,7 @@ transform_holds_3(HFDS,M:Term,OUT):-atom(M),!,transform_holds_3(HFDS,Term,OUT).
 transform_holds_3(HFDS,[P,A|ARGS],DBASE):- is_ftVar(P),!,DBASE=..[HFDS,P,A|ARGS].
 transform_holds_3(HFDS, ['[|]'|ARGS],DBASE):- trace_or_throw(list_transform_holds_3(HFDS,['[|]'|ARGS],DBASE)).
 transform_holds_3(Op,[SVOFunctor,Obj,Prop|ARGS],OUT):- is_svo_functor(SVOFunctor),!,transform_holds_3(Op,[Prop,Obj|ARGS],OUT).
-transform_holds_3(_,[P|ARGS],[P|ARGS]):- not(atom(P)),!,dmsg(transform_holds_3),trace_or_throw(dtrace).
+transform_holds_3(Op,[P|ARGS],[P|ARGS]):- not(atom(P)),!,dmsg(transform_holds_3),trace_or_throw(transform_holds_3(Op,[P|ARGS],[P|ARGS])).
 transform_holds_3(HFDS,[HOFDS,P,A|ARGS],OUT):- is_holds_true(HOFDS),!,transform_holds_3(HFDS,[P,A|ARGS],OUT).
 transform_holds_3(HFDS,[HOFDS,P,A|ARGS],OUT):- HFDS==HOFDS, !, transform_holds_3(HFDS,[P,A|ARGS],OUT).
 transform_holds_3(_,HOFDS,isa(I,C)):- was_isa_syntax(HOFDS,I,C),!.
@@ -883,7 +884,7 @@ transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[isa(Type)|PROPS])):-
                   is_ftNonvar(Inst), not(Type=props), t(functorDeclares,Type), must_det(not(is_never_type(Type))),!.
 
 transform_holds_3(_,[P,A|ARGS],DBASE):- atom(P),!,DBASE=..[P,A|ARGS].
-transform_holds_3(_,[P,A|ARGS],DBASE):- !, is_ftNonvar(P),dumpST,trace_or_throw(dtrace), DBASE=..[P,A|ARGS].
+transform_holds_3(Op,[P,A|ARGS],DBASE):- !, is_ftNonvar(P),dumpST,trace_or_throw(transform_holds_3(Op,[P,A|ARGS],DBASE)), DBASE=..[P,A|ARGS].
 transform_holds_3(Op,DBASE_T,OUT):- DBASE_T=..[P,A|ARGS],!,transform_holds_3(Op,[P,A|ARGS],OUT).
 
 

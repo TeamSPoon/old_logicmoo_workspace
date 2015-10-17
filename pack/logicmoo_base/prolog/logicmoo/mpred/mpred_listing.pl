@@ -110,7 +110,7 @@ pp_items(Type,H) :- ignore(pp_item(Type,H)).
 
 
 mpred_trace_item(_,_):- tlbugger:ifHideTrace,!.
-mpred_trace_item(MM,H):- ignore(mpred_is_tracing(exec)-> on_x_rtrace(in_cmt(pp_item(MM,H))); true).
+mpred_trace_item(MM,H):- ignore(mpred_is_tracing_exec-> on_x_rtrace(in_cmt(pp_item(MM,H))); true).
 
 
    

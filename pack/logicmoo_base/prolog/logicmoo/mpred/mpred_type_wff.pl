@@ -9,6 +9,7 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_wff.pl
 :- module(mpred_type_wff,
           [ 
+            head_singletons/2, head_singles0/2,
             append_termlist/3,            
             call_last_is_var/1,
 
@@ -86,6 +87,7 @@
             set_is_lit/1,
             subst_except/4,
             term_singletons/2,
+            term_singletons/3,
             term_singletons/5,
             term_slots/2,
             wrap_in_neg_functor/3            
@@ -495,15 +497,37 @@ is_kif_rule(R):- get_functor(R,F,A),functor(P,F,A),kif_hook(P),!.
 :- was_export(term_slots/2).
 term_slots(Term,Slots):-term_singletons(Term, [],NS, [],S),append(NS,S,Slots).
 
+
+head_singletons(Pre,Post):-   hotrace((\+ ignore(show_call_failure( \+ head_singles0(Pre,Post))))).
+:- export(head_singles0/2).
+head_singles0(Pre,Post):-is_ftVar(Post),!,head_singles01(Pre,Post).
+head_singles0(_,Post):- \+ compound(Post),!,fail.
+head_singles0(Pre,M:Post):-atom(M),!,head_singles0(Pre,Post).
+head_singles0(Pre,[Post|More]):-nonvar(Post),!,head_singles0(Pre,Post),head_singles0((Pre,Post),More).
+head_singles0(Pre,'->'(Pre2,Post)):-nonvar(Post),!,head_singles0((Pre,Pre2),Post).
+head_singles0(Pre,'/'(Post,Pre2)):-nonvar(Post),!,head_singles0((Pre,Pre2),Post).
+head_singles0(Pre,rhs(Post)):- nonvar(Post),mpred_rule_hb(Post,Post2,Pre2), !,head_singles0((Pre,Pre2),Post2).
+head_singles0(Pre,mpred_default(Post)):- nonvar(Post),mpred_rule_hb(Post,Post2,Pre2), !,head_singles0((Pre,Pre2),Post2).
+head_singles0(Pre,pt(_,Pre2,Post)):-nonvar(Post),!,head_singles0((Pre,Pre2),Post).
+head_singles0(Pre,Post):- nonvar(Post),mpred_rule_hb(Post,Post2,Pre2),Post2\=@=Post,!,head_singles0((Pre,Pre2),Post2).
+head_singles0(Pre,Post):-head_singles01(Pre,Post).
+head_singles01(Pre,Post):-
+    term_singletons(Post,_,CSingles),
+    term_singletons(Pre,ANonSingle,ASingles),append(ANonSingle,ASingles,AVars),!,    
+    subtract_eq(CSingles,AVars,Bad),!,Bad\==[].
+    
+
 :- was_export(term_singletons/2).
-term_singletons(A,Vs):- term_singletons(A,[],_,[],Vs). 
+term_singletons(A,Vs):- notrace(term_singletons(A,[],_,[],Vs)).
+:- was_export(term_singletons/3).
+term_singletons(Term,NonSingle,Singles):- notrace(term_singletons(Term,[],NonSingle,[],Singles)).
 :- was_export(term_singletons/5).
 term_singletons(Fml, NS,NS, S,S):- atomic(Fml),!.
 term_singletons(Fml, NS,NS, S,S):- identical_member(Fml,NS),!.
 term_singletons(Fml, NS, [Fml|NS], S, NSV):- is_ftVar(Fml),identical_member(Fml,S),!,delete_eq(S,Fml,NSV),!.
 term_singletons(Fml, NS, NS, S, [Fml|S]):- is_ftVar(Fml),!.
 term_singletons([H|T],NS,NSO,S,NSV):- !, term_singletons(H,NS,NSM,S,M),term_singletons(T,NSM,NSO,M,NSV).
-term_singletons(Fml, NS,NSO, S,NSV):- compound(Fml),Fml=..[_,H|T],!, term_singletons(H,NS,NSM,S,M),term_singletons(T,NSM,NSO, M,NSV).
+term_singletons(Fml, NS,NSO, S,NSV):- compound(Fml),Fml=..[_|T],!, term_singletons(T, NS,NSO, S,NSV).
 
 get_kv(X=Y,X,Y):- !.
 get_kv(X-Y,X,Y):- !.
