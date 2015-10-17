@@ -25,7 +25,7 @@ registered_module_type/2,
 % current_op_alias/2,
 % prolog_load_file_loop_checked/2,
 current_world/1,
-pfcMark/4,
+mpred_mark/4,
 (==>)/1,
 (::::) / 2,
 (<-)/2,
@@ -330,7 +330,7 @@ kb_dynamic(M:F/A):-!, M:multifile(F/A),M:module_transparent(F/A),M:dynamic(F/A),
 
 
 mpred_univ(C,I,Head):-atom(C),!,Head=..[C,I],predicate_property(Head,number_of_clauses(_)).
-
+ 
 
 /*
 :- use_module(logicmoo(mpred/'mpred_*.pl')).
@@ -353,7 +353,7 @@ resolverConflict_robot(C) :- cwc, must((mpred_remove3(C),wdmsg("Rem-3 with confl
 never_assert_u(M:Rule,Why):- cwc, atom(M),never_assert_u(Rule,Why).
 % never_assert_u(pt(_,Pre,Post),head_singletons(Pre,Post)):- cwc, head_singletons(Pre,Post).
 never_assert_u(Rule,head_singletons(Pre,Post)):- cwc, once(mpred_rule_hb(Rule,Post,Pre)), head_singletons(Pre,Post).
-never_assert_u(pfcMark(pfcPosTrigger,_,F,A),static(F/A)):-functor(P,F,A),current_predicate(F,M:P),predicate_property(M:P,static).
+never_assert_u(mpred_mark(pfcPosTrigger,_,F,A),static(F/A)):-functor(P,F,A),current_predicate(F,M:P),predicate_property(M:P,static).
 /*
 never_assert_u(pt(_,
        singleValuedInArg(A, _),
@@ -626,7 +626,7 @@ was_was:was_was_once(mpred_is_tracing/1, kb, '/opt/PrologMUD/pack/logicmoo_base/
 was_was:was_was_once(mpred_warnings/1, kb, '/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl', dynamic).
 was_was:was_was_once(never_assert_u/1, kb, '/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl', dynamic).
 was_was:was_was_once(never_retract_u/1, kb, '/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl', dynamic).
-was_was:was_was_once(pfcMark/4, kb, '/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl', dynamic).
+was_was:was_was_once(mpred_mark/4, kb, '/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl', dynamic).
 was_was:was_was_once(mpred_is_tracing_exec/0, kb, '/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl', dynamic).
 was_was:was_was_once(use_presently/0, kb, '/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl', dynamic).
 was_was:was_was_once((==>)/1, kb, '/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl', shared_multifile).

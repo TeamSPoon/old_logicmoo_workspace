@@ -33,6 +33,13 @@
 				Refilter="0"
 				Excludes=""/>
 		</Folder>
+		<Folder Name="../t">
+			<F
+				N="../t/*.pf*"
+				Recurse="1"
+				Refilter="0"
+				Excludes=""/>
+		</Folder>		
 		<F
 			N="*.*"
 			Recurse="1"

@@ -1,0 +1,8 @@
+
+
+:- ensure_loaded('../pfc/mpred_system.pfc').
+
+:- ensure_loaded('../pfc/if_missing.pfc').
+
+:- ensure_loaded('../pfc/mpred_default.pfc').
+

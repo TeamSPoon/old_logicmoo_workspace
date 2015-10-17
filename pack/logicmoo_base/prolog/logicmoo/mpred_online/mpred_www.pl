@@ -1060,7 +1060,7 @@ lmconf:shared_hide_data((H:-
         ;   CALL
         ))):- CALL=@=call(_G19865).
 
-lmconf:shared_hide_data(pfcMark/4):- !,listing_filter(hideMeta).
+lmconf:shared_hide_data(mpred_mark/4):- !,listing_filter(hideMeta).
 
 
 pp_now.

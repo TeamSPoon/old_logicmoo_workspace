@@ -1864,8 +1864,8 @@ support_ok_via_clause_body(H):- get_functor(H,F,A),support_ok_via_clause_body(H,
 support_ok_via_clause_body(_,(\+),1):-!,fail.
 support_ok_via_clause_body(_,F,_):- mpred_call_shared(prologSideEffects(F)),!,fail.
 support_ok_via_clause_body(H,_,_):- \+ predicate_property(H,number_of_clauses(_)),!,fail.
-support_ok_via_clause_body(_,F,A):- mpred_call_shared(pfcMark(pfcRHS,_,F,A)),!,fail.
-support_ok_via_clause_body(_,F,A):- mpred_call_shared(pfcMark(pfcMustFC,_,F,A)),!,fail.
+support_ok_via_clause_body(_,F,A):- mpred_call_shared(mpred_mark(pfcRHS,_,F,A)),!,fail.
+support_ok_via_clause_body(_,F,A):- mpred_call_shared(mpred_mark(pfcMustFC,_,F,A)),!,fail.
 support_ok_via_clause_body(_,F,_):- mpred_call_shared(argsQuoted(F)),!,fail.
 support_ok_via_clause_body(_,F,_):- mpred_call_shared(prologDynamic(F)),!.
 support_ok_via_clause_body(_,F,_):- \+ mpred_call_shared(pfcControlled(F)),!.
@@ -2387,19 +2387,19 @@ mpred_mark_as(Sup,PosNeg,( A ; B), Type):- !, mpred_mark_as(Sup,PosNeg,A, Type),
 mpred_mark_as(Sup,PosNeg,( A ==> B), Type):- !, mpred_mark_as(Sup,PosNeg,A, Type),mpred_mark_as(Sup,PosNeg,B, pfcRHS).
 mpred_mark_as(Sup,PosNeg,P,Type):-get_functor(P,F,A),ignore(mpred_mark_fa_as(Sup,PosNeg,P,F,A,Type)),!.
 
-:- was_dynamic( pfcMark/4).
+:- was_dynamic( mpred_mark/4).
 
 % mpred_mark_fa_as(_,_,_,'\=',2,_):- trace.
-mpred_mark_fa_as(_Sup, PosNeg,_P,F,A,Type):- pfcMark(Type,PosNeg,F,A),!.
+mpred_mark_fa_as(_Sup, PosNeg,_P,F,A,Type):- mpred_mark(Type,PosNeg,F,A),!.
 mpred_mark_fa_as(_Sup,_PosNeg,_P,isa,_,_):- !.
 mpred_mark_fa_as(_Sup,_PosNeg,_P,t,_,_):- !.
 mpred_mark_fa_as(_Sup,_PosNeg,_P,argIsa,N,_):- !,must(N=3).
 mpred_mark_fa_as(_Sup,_PosNeg,_P,arity,N,_):- !,must(N=2).
-mpred_mark_fa_as(_Sup,_PosNeg,_P,pfcMark,N,_):- !,must(N=4).
+mpred_mark_fa_as(_Sup,_PosNeg,_P,mpred_mark,N,_):- !,must(N=4).
 mpred_mark_fa_as(_Sup,_PosNeg,_P,mpred_isa,N,_):- must(N=2).
 mpred_mark_fa_as(_Sup,_PosNeg,_P,_:mpred_isa,N,_):- must(N=2).
 mpred_mark_fa_as(Sup,PosNeg,_P,F,A,Type):- 
-  MARK = pfcMark(Type,PosNeg,F,A),
+  MARK = mpred_mark(Type,PosNeg,F,A),
   check_never_assert(MARK),
   mpred_post_sp_zzz((s(Sup),g),MARK),!.
    
@@ -2407,7 +2407,7 @@ fa_to_p(F,A,P):-integer(A),atom(F),functor(P,F,A),( P \= call_u(_) ),( P \= '$VA
 
 lmconf:hook_one_minute_timer_tick:-mpred_cleanup.
 
-mpred_cleanup:- forall((no_repeats(F-A,(pfcMark(pfcRHS,_,F,A),A>1))),mpred_cleanup(F,A)).
+mpred_cleanup:- forall((no_repeats(F-A,(mpred_mark(pfcRHS,_,F,A),A>1))),mpred_cleanup(F,A)).
 
 mpred_cleanup(F,A):-functor(P,F,A),predicate_property(P,dynamic)->mpred_cleanup_0(P);true.
 
@@ -2444,7 +2444,7 @@ is_reprop_0(X):-functor(X,repropagate,_).
 mpred_non_neg_literal(X):-is_reprop(X),!,fail.
 mpred_non_neg_literal(X):-atom(X),!.
 mpred_non_neg_literal(X):- sanity(stack_check),
-    mpred_positive_literal(X), X \= neg(_), X \= pfcMark(_,_,_,_), X \= conflict(_).
+    mpred_positive_literal(X), X \= neg(_), X \= mpred_mark(_,_,_,_), X \= conflict(_).
 
 mpred_non_neg_literal(X):-is_reprop(X),!,fail.
 mpred_positive_literal(X) :- is_ftNonvar(X),
@@ -2841,8 +2841,8 @@ clause_or_call(H,true):- should_call_for_facts(H),no_repeats(on_x_log_throw(H)).
 should_call_for_facts(H):- get_functor(H,F,A),should_call_for_facts(H,F,A).
 should_call_for_facts(_,F,_):- prologSideEffects(F),!,fail.
 should_call_for_facts(H,_,_):- \+ predicate_property(H,number_of_clauses(_)),!.
-should_call_for_facts(_,F,A):- pfcMark(pfcRHS,_,F,A),!,fail.
-should_call_for_facts(_,F,A):- pfcMark(pfcMustFC,_,F,A),!,fail.
+should_call_for_facts(_,F,A):- mpred_mark(pfcRHS,_,F,A),!,fail.
+should_call_for_facts(_,F,A):- mpred_mark(pfcMustFC,_,F,A),!,fail.
 should_call_for_facts(_,F,_):- prologDynamic(F),!.
 should_call_for_facts(_,F,_):- \+ pfcControlled(F),!.
 
@@ -2999,9 +2999,9 @@ mpred_hide_msg('Adding For Later').
 mpred_hide_msg('Skipped Trigger').
 mpred_hide_msg('Had Support').
 
+% mpred_trace_msg(Msg,Args) :- !, mmsg(Msg,Args).
 % mpred_trace_msg(Msg,_Args) :- mpred_hide_msg(Msg),!.
-mpred_trace_msg(Msg,Args) :- !, mmsg(Msg,Args).
-% mpred_trace_msg(Msg,Args) :- ignore((mpred_is_tracing_exec,!,\+ mpred_is_silient, !, mmsg(Msg,Args),!.
+mpred_trace_msg(Msg,Args) :- ignore((mpred_is_tracing_exec,!,\+ mpred_is_silient, !, mmsg(Msg,Args))),!.
 
 
 

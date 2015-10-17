@@ -1340,7 +1340,7 @@ index((mpred_default), 1, kb, mpred_userkb).
 index((if_missing), 2, kb, mpred_userkb).
 index((registered_module_type), 2, kb, mpred_userkb).
 index((current_world), 1, kb, mpred_userkb).
-index((pfcMark), 4, kb, mpred_userkb).
+index((mpred_mark), 4, kb, mpred_userkb).
 index((==>), 1, kb, mpred_userkb).
 index((::::), 2, kb, mpred_userkb).
 index((<-), 2, kb, mpred_userkb).

@@ -56,6 +56,7 @@
 
 :- kb_dynamic(mpred_default/1).
 
+meta_argtypes(mpred_default(ftAssertable)).
 
 ((mpred_default(P ==> Q),
   {is_ftNonvar(P),mpred_literal_nv(Q),functor(Q,F,A), 
@@ -73,8 +74,6 @@
 % here is an example which defines mpred_default facts and rules.  Will it work?
 (mpred_default(P)/mpred_literal(P))  ==>  (~neg(P) ==> P).
 
-:- mpred_trace_exec.
-
 % seem to need both these rule the second is so we have a on remove hook
 (mpred_default((P ==> Q)/mpred_literal_nv(Q)) ==> (P,  ~neg(Q) ==> Q)).
 (mpred_default((P ==> Q)/mpred_literal_nv(Q)) ==> (P,  ~Q, ~neg(Q) ==> Q)).
@@ -88,4 +87,55 @@
 
 ((mpred_default(P)/(mpred_literal(P),is_ftCompound(P),if_missing_mask(P,_,Q,Test)))  ==> ((~Q/(Test), ~neg(P)) ==> P)).
 
+:- mpred_trace_exec.
+
+
+:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
+
+:- ensure_loaded('genls.pfc').
+
+tCol(tFly).
+tCol(tCanary).
+tCol(tPenguin).
+
+tCol(tBird).
+:- mpred_test(dynamic(tBird/1)).
+:- mpred_test(current_predicate(kb:tBird(_),dynamic)).
+
+genls(tCanary,tBird).
+genls(tPenguin,tBird).
+
+
+
+% chilly is a penguin.
+tPenguin(iChilly).
+
+:-mpred_test((tBird(iChilly))).
+
+:- prolog.
+
+% tweety is a canary.
+tCanary(iTweety).
+
+:-mpred_test((tBird(iTweety))).
+
+
+% birds fly by default.
+(mpred_default(( tBird(X) ==> tFly(X)))).
+
+:-mpred_test((isa(I,tFly),I=iChilly)).
+
+:-mpred_test((tFly(iTweety))).
+:-mpred_test((tFly(iChilly))).
+
+
+% penguins do neg tFly.
+tPenguin(X) ==> neg(tFly(X)).
+
+:-mpred_test((\+ tFly(iChilly))).
+:-mpred_test((neg(tFly(iChilly)))).
+
+
+
+:- endif.
 

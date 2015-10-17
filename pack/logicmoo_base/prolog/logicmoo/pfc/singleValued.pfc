@@ -4,7 +4,33 @@
 ((singleValuedInArgDefault(F, N, DEF),arity(F,A),
    {functor(Q,F,A),mpred_literal_nv(Q),arg(N,Q,DEF),N>1,nonvar(DEF),replace_arg(Q,N,NEW,R)})==> (~R/(NEW\==DEF) ==> Q)).
 
-:-if(false).
+
+
+
+prologSingleValued(C):-cwc,is_ftCompound(C),functor(C,F,_),!,prologSingleValued(F).
+
+% asserting mpred_sv(p,2) causes p/2 to be treated as a mpred_sv, i.e.
+% if p(foo,1)) is a fact and we assert_db p(foo,2), then the forrmer assertion
+% is retracted.
+mpred_sv(Pred,Arity)==> prologSingleValued(Pred),arity(Pred,Arity),singleValuedInArg(Pred,Arity).
+
+% prologSingleValued(Pred),arity(Pred,Arity) ==> hybrid_support(Pred,Arity).
+
+% prologSingleValued(Pred),arity(Pred,Arity), \+ singleValuedInArg(Pred,_) ==> singleValuedInArg(Pred,Arity).
+mpred_default(((prologSingleValued(Pred),arity(Pred,Arity))==> singleValuedInArg(Pred,Arity))).
+
+
+
+((singleValuedInArg(Pred,_))==>(prologSingleValued(Pred))).
+
+singleValuedInArg(singleValuedInArg,2).
+
+
+
+
+
+
+
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 
 
@@ -61,17 +87,19 @@ mpred_default( user_login(User) ==> host_name(User,isMissing)).
 :- must(host_name(robin,isMissing)).
 
 
+
+:- endif.
+
+
+
+end_of_file.
+
+
 meta_argtypes(idForTest(tBird,ftTerm)).
 
 singleValuedInArgDefault(idForTest,2,isMissing).
 
 tBird(iPeety).
-
-:- endif.
-
-
-end_of_file.
-
 
 :- must(idForTest(iPeety,isMissing)).
 
@@ -93,4 +121,3 @@ idForTest(iTweety,foo1).
 :- show_call(listing(idForTest)).
 
 
-:- endif.

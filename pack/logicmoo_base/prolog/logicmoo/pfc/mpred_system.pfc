@@ -31,8 +31,6 @@
 */
 
 
-:- kb_dynamic(singleValuedInArg/2).
-:- kb_dynamic(kb:ptReformulatorDirectivePredicate/1).
 
 /*
 :- 
@@ -60,27 +58,19 @@
 :- op(1150,xfx,('::::')).
 :- kb_dynamic(tCol/1).
 
-              
-:- file_begin(pfc).
 
 :- kb_dynamic(subFormat/2).
+:- kb_dynamic(singleValuedInArg/2).
+:- kb_dynamic(kb:ptReformulatorDirectivePredicate/1).
 :- kb_dynamic(support_hilog/2).
 :- kb_dynamic(mpred_undo_sys/3).
 
 :- include(logicmoo(mpred/'mpred_header.pi')).
 
+:- file_begin(pfc).
+
 :- sanity(mpred_is_silient).
 :- sanity(\+mpred_is_tracing_exec).
-
-% catching of misinterpreations
-(pfcMark(pfcPosTrigger,_,F,A)/(fa_to_p(F,A,P), predicate_property(P,static)))
-  ==> {trace_or_throw(warn(pfcPosTrigger,P,static))}.
-(pfcMark(pfcPosTrigger,_,F,A)/(fa_to_p(F,A,P), \+ predicate_property(P,_))) ==> {kb:dynamic(F/A)}.
-
-
-(pfcMark(pfcNegTrigger,_,F,A)/(fa_to_p(F,A,P), predicate_property(P,static)))
-  ==> {dmsg(warn(pfcNegTrigger,P,static))}.
-(pfcMark(pfcNegTrigger,_,F,A)/(fa_to_p(F,A,P), \+ predicate_property(P,_))) ==> {kb:dynamic(F/A)}.
 
 
 
@@ -124,15 +114,9 @@ argsQuoted({}).
 argsQuoted(second_order).
 % argsQuoted((':-')).
 
-meta_argtypes(mpred_default(ftAssertable)).
 
 % neg(tCol({})).
 
-:- mpred_test(ensure_loaded('../pfc/if_missing.pfc')).
-
-end_of_file.
-
-:- include('fc_default.pfc').
 
 prologBuiltin(F),arity(F,A)==>{make_builtin(F/A)}.
 
@@ -215,9 +199,9 @@ neg(tCol(C))/completelyAssertedCollection(C)==> \+ completelyAssertedCollection(
 
 ((prologHybrid(F),arity(F,A))<==>hybrid_support(F,A)).
 
-pfcMark(pfcPosTrigger, S1, F, A)/ground(S1)==>hybrid_support(F,A).
+mpred_mark(pfcPosTrigger, S1, F, A)/ground(S1)==>hybrid_support(F,A).
 
-pfcMark(S1, S2, F, A)/ground(S1:S2)==>arity(F,A).
+mpred_mark(S1, S2, F, A)/ground(S1:S2)==>arity(F,A).
 
 arity(genlPreds,2).
 
@@ -263,7 +247,7 @@ tSpec(meta_argtypes).  % A specification may be a syntactic description
 
 
 
-   pfcControlled(P),arity(P,A)==>hybrid_support(P,A).
+pfcControlled(P),arity(P,A)==>hybrid_support(P,A).
 
 ttPredType(X)==>tCol(X).
 
@@ -434,7 +418,6 @@ ttFormatType(P) ==> {get_functor(P,C), functor(Head,C,1),
 
 arity(prologMacroHead,1).
 
-% (genls(C,SC)==>(tCol(SC),tCol(C),{repropagate(SC)})).
 
 
 ttPredType(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologHybrid,
@@ -454,28 +437,6 @@ ttPredType(PT)==> {atom(PT),H=..[PT,I]}, (H:-cwc,is_ftCompound(I),get_functor(I,
 isa(pddlSomethingIsa/2, prologHybrid).
 
 arity(argIsa,3).
-
-
-%:-rtrace.
-%genls(X,tPred) <==> ttPredType(X).
-%:-nortrace.
-% sane_transitivity((genls(I,Sub),genls(Sub, Super)),I,Sub,Super)
-(genls(C1,C2),arity(C1,1),arity(C2,1),
-  { 
-   \+((genls(C1,CM),CM\=C1,genls(CM,C2),CM\=C2)),C2\=C1
-    
-   }) ==>
-
-  {
-  get_functor(C1,F1),get_functor(C2,F2),
-    nop(dmsg(wishing_to_add(C1 ==> C2)))},
-    nearestGenls(F1,F2).
-
-nearestGenls(C1,C2)==>
- {get_functor(C1,F1),get_functor(C2,F2),
-   P1 =.. [F1,X],
-    P2 =.. [F2,X],
-    asserta_if_new((P2:-loop_check(P1)))}.
 
 % prologHybrid(F/A)/(atom(F),number(A)) ==> arity(F,A),{must(dynamic_safe(F/A))}.
 
@@ -570,8 +531,8 @@ neg(fooBar).
 %P/(is_ftNonvar(P),get_functor(P,F)),afterAdding(F,Do)/is_ftNonvar(Do)==>{call(Do,P)}.
 %~P/(is_ftNonvar(P),get_functor(P,F)),afterRemoving(F,Do)/is_ftNonvar(Do)==>{call(Do,P)}.
 
-%pfcMark(pfcPosTrigger, _, F, A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A),   afterAdding(F,lambda(P,mpred_enqueue(P,(m,m)))).
-%pfcMark(pfcNegTrigger, _, F, A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A), afterRemoving(F,lambda(P,mpred_enqueue(~P,(m,m)))).
+%mpred_mark(pfcPosTrigger, _, F, A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A),   afterAdding(F,lambda(P,mpred_enqueue(P,(m,m)))).
+%mpred_mark(pfcNegTrigger, _, F, A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A), afterRemoving(F,lambda(P,mpred_enqueue(~P,(m,m)))).
 
 
 :- mpred_no_spy_all.
@@ -641,31 +602,6 @@ completelyAssertedCollection(ttTypeType).
 completelyAssertedCollection(tCol).
 
 
-((completeIsaAsserted(I), isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}) ==> ({dif:dif(Sub, Super)}, isa(I,Super))).
-% (isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}, ~neg(completelyAssertedCollection(Super))) ==> ({dif:dif(Sub, Super)}, isa(I,Super)).
-
-( meta_argtypes(FT), {dif:dif(FT,COL)}, genls(FT, COL),tCol(COL),{not(isa(COL,ttFormatType))}) ==> formatted_resultIsa(FT,COL).
-
-
-prologSingleValued(C):-cwc,is_ftCompound(C),functor(C,F,_),!,prologSingleValued(F).
-
-% asserting mpred_sv(p,2) causes p/2 to be treated as a mpred_sv, i.e.
-% if p(foo,1)) is a fact and we assert_db p(foo,2), then the forrmer assertion
-% is retracted.
-mpred_sv(Pred,Arity)==> prologSingleValued(Pred),arity(Pred,Arity),singleValuedInArg(Pred,Arity).
-
-% prologSingleValued(Pred),arity(Pred,Arity) ==> hybrid_support(Pred,Arity).
-
-% prologSingleValued(Pred),arity(Pred,Arity), \+ singleValuedInArg(Pred,_) ==> singleValuedInArg(Pred,Arity).
-mpred_default(((prologSingleValued(Pred),arity(Pred,Arity))==> singleValuedInArg(Pred,Arity))).
-
-
-
-((singleValuedInArg(Pred,_))==>(prologSingleValued(Pred))).
-
-singleValuedInArg(singleValuedInArg,2).
-
-
 
 :- kb_dynamic(isa/2).
 
@@ -724,11 +660,6 @@ prologHybrid(argIsa/3).
 %:-showTinyAssertions.
 %:-prolog_repl.
 %:-loadTinyAssertions2.
-
-tCol(tBird).
-%:-debug.
-%:-rtrace.
-:- mpred_test(kb:dynamic(tBird/1)).
 
 
 :- endif.
@@ -1118,7 +1049,7 @@ isa(arity,ptBinaryPredicate).
 
 :- mpred_test(mpred_add(tCol('ptUnaryPredicate'))).
 
-% pfcMark(Type,_,F,A)/(integer(A),A>1,F\==arity,Assert=..[Type,F])==>arity(F,A),Assert.
+% mpred_mark(Type,_,F,A)/(integer(A),A>1,F\==arity,Assert=..[Type,F])==>arity(F,A),Assert.
 
 mpred_mark_C(G) ==> {mpred_mark_C(G)}.
 mpred_mark_C(G) :-  map_literals(lambda(P,(get_functor(P,F,A),mpred_add([isa(F,pfcControlled),arity(F,A)]))),G).
@@ -1139,10 +1070,10 @@ pfcControlled(X)/is_ftCompound(X)==>{once(X=(F/A);get_functor(X,F,A)),kb:dynamic
 pfcControlled(C)==>prologHybrid(C).
 
 
-pfcMark(pfcRHS,_,F,A)/(atom(F),integer(A),F\==arity)==>tPred(F),arity(F,A),pfcControlled(F/A).
+mpred_mark(pfcRHS,_,F,A)/(atom(F),integer(A),F\==arity)==>tPred(F),arity(F,A),pfcControlled(F/A).
 
 /*
-pfcMark(pfcRHS,_,F,1)/(fail,atom(F),functor(Head,F,1), 
+mpred_mark(pfcRHS,_,F,1)/(fail,atom(F),functor(Head,F,1), 
  \+ argsQuoted(F),
  \+ prologDynamic(F),
  \+ neg(tCol(F)),
@@ -1252,6 +1183,8 @@ prologHybrid(isFact/1).
 added(Added):-kbp:spft(umt,Added,U,U,_).
 isFact(A):- cwc, is_ftNonvar(A), ( added(A) ; clause_asserted(A)),not((arg(_,A,V),var(V))).
 
+
+end_of_file.
 
 
 % mpred_default(((argIsa(Pred,N,FT),ttFormatType(FT)/(isFact(argIsa(Pred,N,FT)),ground(argIsa(Pred,N,FT))))==>argQuotedIsa(Pred,N,FT))).
