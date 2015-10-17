@@ -200,9 +200,7 @@ neg(tCol(C))/completelyAssertedCollection(C)==> \+ completelyAssertedCollection(
 
 ((prologHybrid(F),arity(F,A))<==>hybrid_support(F,A)).
 
-mpred_mark(pfcPosTrigger, S1, F, A)/ground(S1)==>hybrid_support(F,A).
-
-mpred_mark(S1, S2, F, A)/ground(S1:S2)==>arity(F,A).
+:- ensure_loaded('mpred_markers.pfc').
 
 arity(genlPreds,2).
 
@@ -519,8 +517,6 @@ neg(fooBar).
 %P/(is_ftNonvar(P),get_functor(P,F)),afterAdding(F,Do)/is_ftNonvar(Do)==>{call(Do,P)}.
 %~P/(is_ftNonvar(P),get_functor(P,F)),afterRemoving(F,Do)/is_ftNonvar(Do)==>{call(Do,P)}.
 
-%mpred_mark(pfcPosTrigger, _, F, A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A),   afterAdding(F,lambda(P,mpred_enqueue(P,(m,m)))).
-%mpred_mark(pfcNegTrigger, _, F, A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A), afterRemoving(F,lambda(P,mpred_enqueue(~P,(m,m)))).
 
 
 :- mpred_no_spy_all.
@@ -1031,10 +1027,6 @@ isa(arity,ptBinaryPredicate).
 
 :- mpred_test(mpred_add(tCol('ptUnaryPredicate'))).
 
-% mpred_mark(Type,_,F,A)/(integer(A),A>1,F\==arity,Assert=..[Type,F])==>arity(F,A),Assert.
-
-mpred_mark_C(G) ==> {mpred_mark_C(G)}.
-mpred_mark_C(G) :-  map_literals(lambda(P,(get_functor(P,F,A),mpred_add([isa(F,pfcControlled),arity(F,A)]))),G).
 
 ((pfcControlled(C)/(get_arity(C,F,A),arity(F,A))) ==> support_hilog(F,A)).
 
@@ -1052,16 +1044,6 @@ pfcControlled(X)/is_ftCompound(X)==>{once(X=(F/A);get_functor(X,F,A)),kb:dynamic
 pfcControlled(C)==>prologHybrid(C).
 
 
-mpred_mark(pfcRHS,_,F,A)/(atom(F),integer(A),F\==arity)==>tPred(F),arity(F,A),pfcControlled(F/A).
-
-/*
-mpred_mark(pfcRHS,_,F,1)/(fail,atom(F),functor(Head,F,1), 
- \+ argsQuoted(F),
- \+ prologDynamic(F),
- \+ neg(tCol(F)),
- \+ specialFunctor(F),
- \+ predicate_property(Head,built_in))==>completelyAssertedCollection(F).
-*/
 
 specialFunctor('\\+').
 specialFunctor('/').

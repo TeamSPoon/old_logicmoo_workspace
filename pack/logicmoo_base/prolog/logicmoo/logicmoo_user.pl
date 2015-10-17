@@ -11,7 +11,7 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- module(logicmoo_user,[m1,m2,m3,m4/0]).
+:- module(logicmoo_user,[m1/0,m2/0,m3/0,m4/0]).
 :- multifile '$si$':'$was_imported_kb_content$'/2.
 :- dynamic '$si$':'$was_imported_kb_content$'/2.
 :- discontiguous('$si$':'$was_imported_kb_content$'/2).
@@ -41,7 +41,7 @@ m9   :-asserta_if_new((user:term_expansion(I,O):- lmbase_expansion(term,user,I,O
 m31 :-   (F = mpred/_),foreach(must(logicmoo_util_help:mpred_is_impl_file(F)),must_det_l((dmsg(list_file_preds(F)),ensure_loaded(F),export_file_preds(F),list_file_preds(F)))).
 m32:- rtrace(ensure_mpred_system).
 m33:- must(filematch_ext(['',mpred,ocl,moo,plmoo,pl,plt,pro,p,'pl.in',pfc,pfct],logicmoo_user:pfc/mpred,W)),dmsg(W),!.
-m2:- ensure_mpred_file_loaded(pfc/abc).
+m2:- ensure_mpred_file_loaded(logicmoo(pfc/relationAllExists)).
 
 % :-pfc_add(((P,Q,z(_))==>(p(P),q(Q)))).
 m3:- b_setval('$variable_names', ['P'=P,'Q'=Q]), R = (==>((P,Q,z(_)),(p(P),q(Q)))),  renumbervars(write_functor,R,O), writeq(O).
@@ -54,24 +54,15 @@ m4:- ensure_mpred_file_loaded(pfc/autoexec).
 
 %m3:- make. % w_tl(tlbugger:ifHideTrace,(ensure_mpred_file_loaded(pfc/mpred))).
 
+m5 :- enable_mpred_system(kb).
 
 % :-trace,call((R = (==>((P,Q,z(_)),(p(P),q(Q)))))
+:- use_module(mpred/mpred_loader).
+
 
 
 
 end_of_file.
-
-
-
-:- use_module(mpred/mpred_loader).
-% :- trace.
-
-%
-
-% :- enable_mpred_system(kb).
-
-
-
 
 
 

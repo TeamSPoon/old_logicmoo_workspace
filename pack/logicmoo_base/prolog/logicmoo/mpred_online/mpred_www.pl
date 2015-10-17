@@ -639,7 +639,7 @@ as_ftVars(N='$VAR'(N)):-atomic(N),!.
 as_ftVars(_N=_V).
 as_ftVars(_).
 
-:- use_module(util/logicmoo_util_varnames).
+:- use_module(library(logicmoo/util/logicmoo_util_varnames)).
     
 search4term:- must_det_l((
   maybe_scan_source_files_for_varnames,
