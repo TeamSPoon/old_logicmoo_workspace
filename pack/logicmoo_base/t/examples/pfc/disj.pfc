@@ -1,15 +1,15 @@
 % -*-Prolog-*-
 
-:- op(1050,xfx,('==>')).
+:- op(1050,xfx,('===>')).
 
-(P ==> Q) => 
-  (P => Q),
-  (not(Q) => not(P)).
+(P ===> Q) ==> 
+  (P ==> Q),
+  (not(Q) ==> not(P)).
 
 
-or(P,Q) => 
-  (not(P) => Q),
-  (not(Q) => P).
+or(P,Q) ==> 
+  (not(P) ==> Q),
+  (not(Q) ==> P).
 		
 prove_by_contradiction(P) :- P.
 prove_by_contradiction(P) :-
@@ -18,9 +18,9 @@ prove_by_contradiction(P) :-
   P -> rem(not(P))
     ; (rem(not(P)),fail).
 
-=> or(p,q).
-=> (p ==> x).
-=> (q ==> x).
+==> or(p,q).
+==> (p ===> x).
+==> (q ===> x).
 
 
 % try :- prove_by_contradiction(x).

@@ -95,20 +95,20 @@ pfcVersion(1.2).
 %   Purpose: syntactic sugar for Pfc - operator definitions and term expansions.
 
 :- op(500,fx,'~').
-:- op(1050,xfx,('=>')).
-:- op(1050,xfx,'<=>').
-:- op(1050,xfx,('<=')).
-:- op(1100,fx,('=>')).
+:- op(1050,xfx,('==>')).
+:- op(1050,xfx,'<==>').
+:- op(1050,xfx,('<-')).
+:- op(1100,fx,('==>')).
 :- op(1150,xfx,('::::')).
 
 :- multifile('mpred_term_expansion'/2).
 
-mpred_term_expansion((P=>Q),(:- ain((P=>Q)))).
-%mpred_term_expansion((P=>Q),(:- ain(('<='(Q,P))))).  % speed-up attempt
-mpred_term_expansion(('<='(P,Q)),(:- ain(('<='(P,Q))))).
-mpred_term_expansion((P<=>Q),(:- ain((P<=>Q)))).
+mpred_term_expansion((P==>Q),(:- ain((P==>Q)))).
+%mpred_term_expansion((P==>Q),(:- ain(('<-'(Q,P))))).  % speed-up attempt
+mpred_term_expansion(('<-'(P,Q)),(:- ain(('<-'(P,Q))))).
+mpred_term_expansion((P<==>Q),(:- ain((P<==>Q)))).
 mpred_term_expansion((RuleName :::: Rule),(:- ain((RuleName :::: Rule)))).
-mpred_term_expansion((=>P),(:- ain(P))).
+mpred_term_expansion((==>P),(:- ain(P))).
 
 :- multifile(term_expansion/2).
 term_expansion(A,B):- once(true ; t_l:pfcExpansion), once(mpred_term_expansion(A,B)),A\=@=B.
@@ -127,10 +127,10 @@ term_expansion(A,B):- once(true ; t_l:pfcExpansion), once(mpred_term_expansion(A
 
 :- use_module(library(lists)).
 
-:- dynamic ('=>')/2.
+:- dynamic ('==>')/2.
 :- dynamic ('::::')/2.
-:- dynamic '<=>'/2.
-:- dynamic '<='/2.
+:- dynamic '<==>'/2.
+:- dynamic '<-'/2.
 :- dynamic 'pt'/2.
 :- dynamic 'nt'/3.
 :- dynamic 'bt'/2.
@@ -169,7 +169,7 @@ mpred_default(GeneralTerm,Default) :-
 
 ain(P) :-  ain(P,(pcfUser,pcfUser)).
 
-ain((=>P),S) :- ain(P,S).
+ain((==>P),S) :- ain(P,S).
 
 ain(P,S) :- 
   pfcPost(P,S),
@@ -659,24 +659,24 @@ pfcFwd1(Fact) :-
 %% a rule.
 %% 
 
-fc_rule_check((P=>Q)) :-  
+fc_rule_check((P==>Q)) :-  
   !,  
-  pfcProcessRule(P,Q,(P=>Q)).
-fc_rule_check((Name::::P=>Q)) :- 
+  pfcProcessRule(P,Q,(P==>Q)).
+fc_rule_check((Name::::P==>Q)) :- 
   !,  
-  pfcProcessRule(P,Q,(Name::::P=>Q)).
-fc_rule_check((P<=>Q)) :- 
+  pfcProcessRule(P,Q,(Name::::P==>Q)).
+fc_rule_check((P<==>Q)) :- 
   !, 
-  pfcProcessRule(P,Q,(P<=>Q)), 
-  pfcProcessRule(Q,P,(P<=>Q)).
-fc_rule_check((Name::::P<=>Q)) :- 
+  pfcProcessRule(P,Q,(P<==>Q)), 
+  pfcProcessRule(Q,P,(P<==>Q)).
+fc_rule_check((Name::::P<==>Q)) :- 
   !, 
-  pfcProcessRule(P,Q,((Name::::P<=>Q))), 
-  pfcProcessRule(Q,P,((Name::::P<=>Q))).
+  pfcProcessRule(P,Q,((Name::::P<==>Q))), 
+  pfcProcessRule(Q,P,((Name::::P<==>Q))).
 
-fc_rule_check(('<='(P,Q))) :-
+fc_rule_check(('<-'(P,Q))) :-
   !,
-  pfcDefineBcRule(P,Q,('<='(P,Q))).
+  pfcDefineBcRule(P,Q,('<-'(P,Q))).
 
 fc_rule_check(_).
 
@@ -998,9 +998,9 @@ pfcConnective(';').
 pfcConnective(',').
 pfcConnective('/').
 pfcConnective('|').
-pfcConnective(('=>')).
-pfcConnective(('<=')).
-pfcConnective('<=>').
+pfcConnective(('==>')).
+pfcConnective(('<-')).
+pfcConnective('<==>').
 
 pfcConnective('-').
 pfcConnective('~').
@@ -1077,9 +1077,9 @@ pfcBuildTest(Test,Test).
 
 %% simple typeing for pfc objects
 
-mpred_db_type(('=>'(_,_)),Type) :- !, Type=rule.
-mpred_db_type(('<=>'(_,_)),Type) :- !, Type=rule.
-mpred_db_type(('<='(_,_)),Type) :- !, Type=rule.
+mpred_db_type(('==>'(_,_)),Type) :- !, Type=rule.
+mpred_db_type(('<==>'(_,_)),Type) :- !, Type=rule.
+mpred_db_type(('<-'(_,_)),Type) :- !, Type=rule.
 mpred_db_type(pfcPT3(_,_,_),Type) :- !, Type=trigger.
 mpred_db_type(pt(_,_),Type) :- !, Type=trigger.
 mpred_db_type(nt(_,_,_),Type) :- !,  Type=trigger.
@@ -1253,9 +1253,9 @@ pfcDatabaseTerm(support3/3).
 pfcDatabaseTerm(pt/3).
 pfcDatabaseTerm(bt/3).
 pfcDatabaseTerm(nt/4).
-pfcDatabaseTerm('=>'/2).
-pfcDatabaseTerm('<=>'/2).
-pfcDatabaseTerm('<='/2).
+pfcDatabaseTerm('==>'/2).
+pfcDatabaseTerm('<==>'/2).
+pfcDatabaseTerm('<-'/2).
 pfcDatabaseTerm(mpred_queue/1).
 
 % removes all forward chaining rules and pfcJustification_L from db.
@@ -1357,11 +1357,11 @@ pfcClassifyFacts([H|T],User,[H|Pfc],Rule) :-
   pfcClassifyFacts(T,User,Pfc,Rule).
 
 pfcPrintRules :-
-  bagof((P=>Q),db_clause((P=>Q),true),R1),
+  bagof((P==>Q),db_clause((P==>Q),true),R1),
   pfcPrintitems(R1),
-  bagof((P<=>Q),db_clause((P<=>Q),true),R2),
+  bagof((P<==>Q),db_clause((P<==>Q),true),R2),
   pfcPrintitems(R2),
-  bagof((P<=Q),db_clause((P<=Q),true),R3),
+  bagof((P<-Q),db_clause((P<-Q),true),R3),
   pfcPrintitems(R3).
 
 pfcPrintTriggers :-
@@ -1772,11 +1772,11 @@ mpred_selectJustificationNode(Js,Index,Step) :-
 
 :- mpred_trace.
 :- 
-    ain([(faz(X), ~baz(Y)/{X=:=Y} => fazbaz(X)),
-         (fazbaz(X), go => found(X)),
-	 (found(X), {X>=100} => big(X)),
-	 (found(X), {X>=10,X<100} => medium(X)),
-	 (found(X), {X<10} => little(X)),
+    ain([(faz(X), ~baz(Y)/{X=:=Y} ==> fazbaz(X)),
+         (fazbaz(X), go ==> found(X)),
+	 (found(X), {X>=100} ==> big(X)),
+	 (found(X), {X>=10,X<100} ==> medium(X)),
+	 (found(X), {X<10} ==> little(X)),
 	 faz(1),
 	 goAhead,
 	 baz(2),

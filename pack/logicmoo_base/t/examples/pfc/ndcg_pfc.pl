@@ -13,14 +13,14 @@ term_expansion((P --*>> Q),(:- ain(Rule))) :-
   mpred_translate_rule((P --*>> Q), Rule).
 
 mpred_translate_rule((LP-->>[]),H) :- !, mpred_t_lp(LP,Id,S,S,H).
-mpred_translate_rule((LP-->>RP),(H <= B)):-
+mpred_translate_rule((LP-->>RP),(H <- B)):-
    mpred_t_lp(LP,Id,S,SR,H),
    mpred_t_rp(RP,Id,S,SR,B1),
    mpred_tidy(B1,B).
 
 
 mpred_translate_rule((LP--*>>[]),H) :- !, mpred_t_lp(LP,Id,S,S,H).
-mpred_translate_rule((LP--*>>RP),(B => H)):-
+mpred_translate_rule((LP--*>>RP),(B ==> H)):-
    mpred_t_lp(LP,Id,S,SR,H),
    mpred_t_rp(RP,Id,S,SR,B1),
    mpred_tidy(B1,B).

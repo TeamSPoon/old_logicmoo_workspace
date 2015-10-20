@@ -38,7 +38,7 @@ skolemConstant(sk(_)).
 
 
 % make a Pfc rule to add new facts based on equality info about skolem terms.
-skNoticer(P,Sk,(eq(Sk,X)=>P2)) :- termSubst(Sk,X,P,P2).
+skNoticer(P,Sk,(eq(Sk,X)==>P2)) :- termSubst(Sk,X,P,P2).
   
 
 % list Lisp's subst, but for terms.
@@ -57,7 +57,7 @@ termSubst(Old,New,Term,Term2) :-
   termSubst(Old,New,TermList,TermList2),
   Term2 =.. TermList2.
 
-%:- add((P/( \+P=eq(_,_)) => {skCheck(P,Rules)}, Rules)).
-:- add((P => {skCheck(P,Rules)}, Rules)).
+%:- add((P/( \+P=eq(_,_)) ==> {skCheck(P,Rules)}, Rules)).
+:- add((P ==> {skCheck(P,Rules)}, Rules)).
 
-:- add((eq(X,Y) <=> eq(Y,X))).
+:- add((eq(X,Y) <==> eq(Y,X))).

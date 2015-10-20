@@ -145,7 +145,6 @@ male(P) <=> ~female(P).
 
 
 
-
 parent(GRAND,PARENT),parent(PARENT,CHILD) => grandparent(GRAND,CHILD).
 
 grandparent(X,Y),male(X) <=> grandfather(X,Y).

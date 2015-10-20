@@ -17,14 +17,14 @@
 % 					 (OWNED_BY ?s ?c)))))  
 % 
 
-business_entity(C), officer(C,P) => company(C).
+business_entity(C), officer(C,P) ==> company(C).
 
 company(xyz_corp).
 company(abc_corp).
 
-company(C,) =>
- (officer(C,P) => person(P)),
- (subsidiary(C,C2) => company(C), owned_by(C2,C)).
+company(C,) ==>
+ (officer(C,P) ==> person(P)),
+ (subsidiary(C,C2) ==> company(C), owned_by(C2,C)).
 
  
 

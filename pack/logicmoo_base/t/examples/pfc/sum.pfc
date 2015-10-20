@@ -5,7 +5,7 @@
 % will maintain an assertion sum(S) where S is the sum of all of the values.
 
 
-value(X) => {addToSum(X)}.
+value(X) ==> {addToSum(X)}.
 
 fcUndoMethod(addToSum(X), subFromSum(X)).
 
