@@ -194,6 +194,7 @@
 :- meta_predicate holds_t(5,?,?,?,?,?).
 :- meta_predicate holds_t(6,?,?,?,?,?,?).
 
+:- include('../mpred/mpred_header.pi').
 :-
             op(1150,fx,(was_dynamic)),
             op(1150,fx,(was_multifile)),

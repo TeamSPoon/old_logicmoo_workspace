@@ -272,6 +272,7 @@ index((as_symlog), 2, common_logic_snark, common_logic_snark).
 index((boxlog_to_pfc), 2, common_logic_snark, common_logic_snark).
 index((boxlog_to_prolog), 2, common_logic_snark, common_logic_snark).
 index((check_is_kb), 1, common_logic_snark, common_logic_snark).
+index((clif_to_prolog), 2, common_logic_snark, common_logic_snark).
 index((clauses_to_boxlog), 4, common_logic_snark, common_logic_snark).
 index((clauses_to_boxlog_0), 4, common_logic_snark, common_logic_snark).
 index((clauses_to_boxlog_1), 4, common_logic_snark, common_logic_snark).
@@ -288,6 +289,10 @@ index((get_1_var_name), 3, common_logic_snark, common_logic_snark).
 index((get_constraints), 2, common_logic_snark, common_logic_snark).
 index((get_lits), 2, common_logic_snark, common_logic_snark).
 index((get_var_names), 3, common_logic_snark, common_logic_snark).
+index((is_clif), 1, common_logic_snark, common_logic_snark).
+index((are_clauses_entailed), 1, common_logic_snark, common_logic_snark).
+index((is_prolog_entailed), 1, common_logic_snark, common_logic_snark).
+index((delistify_last_arg), 3, common_logic_snark, common_logic_snark).
 index((kb_incr), 2, common_logic_snark, common_logic_snark).
 index((kif), 0, common_logic_snark, common_logic_snark).
 index((kif_ask), 1, common_logic_snark, common_logic_snark).
@@ -349,3 +354,6 @@ index((wdmsgl_4), 3, common_logic_snark, common_logic_snark).
 index((why_to_id), 3, common_logic_snark, common_logic_snark).
 index((write_list), 1, common_logic_snark, common_logic_snark).
 index((is_entailed), 1, common_logic_snark, common_logic_snark).
+index((is_not_entailed), 1, common_logic_snark, common_logic_snark).
+index((if), 2, common_logic_snark, common_logic_snark).
+index((iif), 2, common_logic_snark, common_logic_snark).

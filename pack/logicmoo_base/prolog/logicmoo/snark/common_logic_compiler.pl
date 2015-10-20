@@ -164,7 +164,7 @@
         
         wid/3.
 
-:- nodebug(_).
+:- include('../mpred/mpred_header.pi').
 
 :- was_dynamic(wid/3).
 
@@ -193,6 +193,7 @@
 %=%    q(X,sk1(X)):- p(X).
 
 
+
 :- op(300,fx,'~').
 :- op(300,fx,'-').
 :- op(400,yfx,'&').  
@@ -215,8 +216,7 @@
 
 :- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
-:- prolog_load_context(directory,Dir),asserta(user:file_search_path(logicmoo,Dir)).
-:- was_dynamic(lmconf:isa_pred_now_locked/0).
+:- prolog_load_context(directory,Dir),asserta(user:file_search_path(snark,Dir)).
 
 
 :- include(logicmoo(mpred/'mpred_header.pi')).

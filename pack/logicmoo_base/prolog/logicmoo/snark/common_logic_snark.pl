@@ -27,6 +27,7 @@
             boxlog_to_pfc/2,
             boxlog_to_prolog/2,
             check_is_kb/1,
+            clif_to_prolog/2,
             clauses_to_boxlog/4,
             clauses_to_boxlog_0/4,
             clauses_to_boxlog_1/4,
@@ -44,6 +45,10 @@
             get_constraints/2,
             get_lits/2,
             get_var_names/3,
+            is_clif/1,
+            are_clauses_entailed/1,
+            is_prolog_entailed/1,
+            delistify_last_arg/3,
             kb_incr/2,
             kif/0,
             kif_ask/1,
@@ -105,12 +110,15 @@
             why_to_id/3,
             write_list/1,
             is_entailed/1,
+            is_not_entailed/1,
           op(300,fx,'-'),
           op(1150,xfx,'=>'),
           op(1150,xfx,'<=>'),
           op(350,xfx,'xor'),
           op(400,yfx,'&'),
-          op(500,yfx,'v')
+          op(500,yfx,'v'),
+          if/2,
+          iif/2
           ]).
 
 :-
@@ -118,7 +126,7 @@
             op(1150,fx,(was_multifile)),
             op(1150,fy,(was_module_transparent)),
             op(1150,fx,(was_export)),
-            op(1150,fx,(was_shared_multifile)).
+            op(1150,fx,(shared_multifile)).
 
 :- meta_predicate
    % common_logic_snark
@@ -134,8 +142,6 @@
    % common_logic_snark
    to_nonvars(2,?,?).
 
-:- was_shared_multifile
-        regression_test/0.
 /*
 :- was_dynamic
         as_prolog/2,
@@ -145,6 +151,13 @@
         not_mudEquals/2,
         skolem/3.
 */
+
+:- dynamic((
+          if/2,
+          iif/2)).
+
+
+:- include('../mpred/mpred_header.pi').
 
 kif_hook(0=>0).
 kif_hook(0<=>0).
@@ -697,7 +710,6 @@ tsn:- with_all_dmsg(forall(clause(kif,C),must(C))).
 :- dynamic(kif_test_string/1).
 tkif:- kif_test_string(TODO),kif_io(string(TODO),current_output).
 
-:- was_shared_multifile(lmconf:sanity_test/0).
 lmconf:regression_test:- tsn.
 
 :- thread_local(t_l:kif_action_mode/1).

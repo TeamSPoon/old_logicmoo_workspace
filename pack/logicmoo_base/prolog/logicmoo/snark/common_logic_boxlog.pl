@@ -59,6 +59,7 @@ additional features that may be added/manipulated in the body
 
 
 :- use_module(logicmoo(mpred/mpred_pfc)).
+:- include('../mpred/mpred_header.pi').
 :- common_logic_boxlog:use_module(library(dialect/hprolog),[]).
 
 is_units_h(A):-maplist(is_unit,A).

@@ -93,14 +93,6 @@
 :- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(logicmoo,Dir)).
-:- was_dynamic(lmconf:isa_pred_now_locked/0).
-:- was_shared_multifile(lmconf:isa_pred_now_locked/0).
-:- was_shared_multifile(lmconf:type_action_info/3).
-:- was_shared_multifile(lmconf:agent_call_command/2).
-:- was_shared_multifile(lmconf:mud_test/2).
-:- was_shared_multifile(lmconf:sanity_test/0).
-:- was_shared_multifile(lmconf:regression_test/0).
-:- was_shared_multifile(lmconf:feature_test/0).
 
 :- include(logicmoo(mpred/'mpred_header.pi')).
 
@@ -120,7 +112,7 @@ kif_pred_head(P):- get_functor(P,F,_),isa(F,prologPTTP).
 pttp_pred_head(P):- var(P),isa(F,prologPTTP),arity(F,A),functor(P,F,A).
 pttp_pred_head(P):- get_functor(P,F,_),isa(F,prologPTTP).
 
-:- was_shared_multifile(kify_comment/1).
+:- shared_multifile(kify_comment/1).
 
 
 pttp_listens_to_head(_OP,P):- pttp_pred_head(P).

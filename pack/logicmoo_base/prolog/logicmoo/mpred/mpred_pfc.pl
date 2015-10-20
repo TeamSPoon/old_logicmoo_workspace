@@ -591,29 +591,21 @@ wlmuser(G):- lmconf:mpred_user_kb(M), M:call(G).
 %   Author : Tim Finin, finin@prc.unisys.com
 %   Purpose: syntactic sugar for Pfc - operator definitions and term expansions.
 
-:- op(500,fx,pfc:'~').
-:- op(1050,xfx,(pfc:'<-')).
-:- op(1050,xfx,pfc:'<==>').
-:- op(1050,xfx,(pfc:'<-')).
-:- op(1100,fx,(pfc:'nesc')).
-:- op(1150,xfx,(pfc:'::::')).
-:- op(500,fx,pfc:'~').
-:- op(1050,xfx,pfc:'<==>').
-:- op(1050,xfx,(pfc:'<-')).
-:- op(1200,fx,(pfc:'=>')).
-:- op(1200,fx,(pfc:'==>')).
-:- op(1100,fx,(pfc:'nesc')).
-:- op(1150,xfx,(pfc:'::::')).
-:- op(300,fx,pfc:'-').
-:- op(600,yfx,pfc:'&').  
-:- op(600,yfx,pfc:'v').
-:- op(1075,xfx,pfc:'<-').
-:- op(1075,xfx,pfc:'<=').
-:- op(1070,xfx,pfc:'=>').
-:- op(1070,xfx,pfc:'<=>').
-:- op(1100,xfx,(pfc:'<==>')).
-:- op(1100,xfx,(pfc:'==>')).
-:- op(350,xfx,pfc:'xor').
+:- op(1150,xfx,'<==>').
+:- op(1070,xfx,'<=>').
+:- op(1070,xfx,'=>').
+:- op(1075,xfx,'<-').
+:- op(1075,xfx,'<=').
+:- op(1170,fx,('nesc')).
+:- op(1150,xfx,('<==>')).
+:- op(1150,fx,('==>')).
+:- op(1150,xfx,('==>')).
+:- op(1170,xfx,('::::')).
+:- op(300,fx,'-').
+:- op(350,xfx,'xor').
+:- op(500,fx,'~').
+:- op(600,yfx,'&').  
+:- op(600,yfx,'v').
 
 :- op(300,fx,user:'~').
 :- op(300,fx,user:'-').
@@ -924,10 +916,10 @@ mpred_rule_hb_0(Outcome,OutcomeO,true):- \+compound(Outcome),!,OutcomeO=Outcome.
 mpred_rule_hb_0((Outcome1,Outcome2),OutcomeO,AnteO):-!,mpred_rule_hb(Outcome1,Outcome1O,Ante1),mpred_rule_hb(Outcome2,Outcome2O,Ante2),
                    conjoin(Outcome1O,Outcome2O,OutcomeO),
                    conjoin(Ante1,Ante2,AnteO).
-mpred_rule_hb_0(Ante1==>Outcome,OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(Outcome<-Ante1,OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(Outcome<==>Ante1,OutcomeO,(Ante1,Ante2)):-mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(Ante1<==>Outcome,OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Ante1==>Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Outcome<-Ante1),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Outcome<==>Ante1),OutcomeO,(Ante1,Ante2)):-mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Ante1<==>Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
 mpred_rule_hb_0(_::::Outcome,OutcomeO,Ante2):-!,mpred_rule_hb_0(Outcome,OutcomeO,Ante2).
 mpred_rule_hb_0(kbp:bt(umt,Outcome,Ante1),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
 mpred_rule_hb_0(kbp:pt(umt,Ante1,Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).

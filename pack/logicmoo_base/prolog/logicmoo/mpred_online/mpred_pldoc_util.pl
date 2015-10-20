@@ -5,7 +5,7 @@
           s_to_html/3
 	  ]).
 
-:- include('mpred_header.pi').
+:- include('../mpred/mpred_header.pi').
 
 % :-use_module(mpred_pldoc_html).
 

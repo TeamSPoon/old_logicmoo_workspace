@@ -1,8 +1,8 @@
 #!/usr/bin/env swipl
 :- if(gethostname(ubuntu)).
-:- user:ensure_loaded(logicmoo_repl).
+:- user:ensure_loaded(library(logicmoo/logicmoo_base)).
 :- else.
-:- user:ensure_loaded(logicmoo_repl).
+:- user:ensure_loaded(library(logicmoo/logicmoo_base)).
 % :- load_files(logicmoo_repl, [if(not_loaded),qcompile(auto)]).
 :- endif.
 

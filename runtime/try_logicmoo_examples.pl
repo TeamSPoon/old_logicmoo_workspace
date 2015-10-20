@@ -105,9 +105,9 @@ prologBuiltin(otherGender/2).
 otherGender(male,female).
 otherGender(female,male).
 
-breeder(X,Y) <=> breeder(Y,X).
+bore_offspring(X,Y) <=> bore_offspring(Y,X).
 
-(breeder(X,Y),gender(X,G1), otherGender(G1,G2))
+(bore_offspring(X,Y),gender(X,G1), otherGender(G1,G2))
      => gender(Y,G2).
 
 
@@ -142,6 +142,7 @@ male(P) <=> ~female(P).
 :- is_entailed(not(mother(M,_Anyone)):- not(female(M))).
 :- is_entailed((parent(M,C):- mother(M,C))).
 :- is_entailed((female(M):- mother(M,_))).
+
 
 
 
@@ -242,7 +243,6 @@ male(skArg1ofFatherFn(trudy)).
 %=    the ~/1 is our negation hook into the inference engine
 :- no_varnaming( mpred_no_chaining(doall((dcall(~male(Who )))))).
 
-:- break.
 
 %= we expect to see at least there mothers here
 %=  succeed(user: ~male(liana)).

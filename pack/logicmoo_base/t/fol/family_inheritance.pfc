@@ -39,13 +39,13 @@ If we obeyed the limitations set forth upon Horn clauses only being "positive" t
 
 
 :- if(gethostname(ubuntu)).
-:- user:ensure_loaded(logicmoo_repl).
+:- user:ensure_loaded(library(logicmoo/logicmoo_base)).
 :- else.
-:- user:ensure_loaded(logicmoo_repl).
+:- user:ensure_loaded(library(logicmoo/logicmoo_base)).
 % :- load_files(logicmoo_repl, [if(not_loaded),qcompile(auto)]).
 :- endif.
 
-:- use_module(logicmoo(snark/common_logic_snark)).
+:- ensure_loaded(logicmoo('pfc/autoexec.pfc')).
 :- ensure_loaded(logicmoo('snark/common_logic_clif.pfc')).
 
 :- debug(mpred).
@@ -105,9 +105,11 @@ prologBuiltin(otherGender/2).
 otherGender(male,female).
 otherGender(female,male).
 
-breeder(X,Y) <=> breeder(Y,X).
+tCol(male).
+:- dynamic((bore_offspring/2, gender/2)).
+bore_offspring(X,Y) <=> bore_offspring(Y,X).
 
-(breeder(X,Y),gender(X,G1), otherGender(G1,G2))
+(bore_offspring(X,Y),gender(X,G1), otherGender(G1,G2))
      => gender(Y,G2).
 
 
@@ -243,7 +245,6 @@ male(skArg1ofFatherFn(trudy)).
 %=    the ~/1 is our negation hook into the inference engine
 :- no_varnaming( mpred_no_chaining(doall((dcall(~male(Who )))))).
 
-:- break.
 
 %= we expect to see at least there mothers here
 %=  succeed(user: ~male(liana)).
