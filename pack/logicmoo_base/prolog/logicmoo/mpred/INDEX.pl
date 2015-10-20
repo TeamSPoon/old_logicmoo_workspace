@@ -3,10 +3,6 @@
     Purpose: Provide index for autoload
 */
 
-index((with_err_to_pred), 2, logicmoo_util_prolog_streams, logicmoo_util_prolog_streams).
-index((with_input_from_pred), 2, logicmoo_util_prolog_streams, logicmoo_util_prolog_streams).
-index((with_output_to_pred), 2, logicmoo_util_prolog_streams, logicmoo_util_prolog_streams).
-index((with_output_to_stream_pred), 4, logicmoo_util_prolog_streams, logicmoo_util_prolog_streams).
 index((will_call_after), 2, mpred_agenda, mpred_agenda).
 index((add_later), 1, mpred_agenda, mpred_agenda).
 index((after_mpred_load_pass2), 0, mpred_agenda, mpred_agenda).
@@ -371,6 +367,7 @@ index((finish_processing_world), 0, mpred_loader, mpred_loader).
 index((force_reload_mpred_file), 1, mpred_loader, mpred_loader).
 index((force_reload_mpred_file), 2, mpred_loader, mpred_loader).
 index((from_kif_string), 2, mpred_loader, mpred_loader).
+index((convert_if_kif_string), 4, mpred_loader, mpred_loader).
 index((get_file_type), 2, mpred_loader, mpred_loader).
 index((get_lang), 1, mpred_loader, mpred_loader).
 index((get_last_time_file), 3, mpred_loader, mpred_loader).
@@ -415,6 +412,7 @@ index((mpred_expander_now_one), 4, mpred_loader, mpred_loader).
 index((mpred_expander_now_one_cc), 4, mpred_loader, mpred_loader).
 index((mpred_implode_varnames), 1, mpred_loader, mpred_loader).
 index((mpred_loader_file), 0, mpred_loader, mpred_loader).
+index((mpred_prolog_only_file), 1, mpred_loader, mpred_loader).
 index((mpred_may_expand), 0, mpred_loader, mpred_loader).
 index((mpred_may_expand_module), 1, mpred_loader, mpred_loader).
 index((mpred_maybe_skip), 1, mpred_loader, mpred_loader).

@@ -520,10 +520,13 @@ read_source_vars(File,In):-
 
 % new method
 read_source_file_vars_1(File):-
+   current_prolog_flag(xref, Was),
+   set_prolog_flag(xref, true),
 	setup_call_cleanup(
 	    prolog_open_source(File, In),
 	    read_source_vars(File,In),
-	    prolog_close_source(In)),!.
+	    (prolog_close_source(In),
+            current_prolog_flag(xref, Was))),!.
 
 :- else.
 
@@ -578,9 +581,9 @@ print_numbervars_2(H):- current_output(S),prolog_listing:portray_clause(S,H,[por
 print_numbervars_2(H):- write_term(H,[portrayed(false)]),nl,!.
 
  
-term_expansion_save_vars(HB):- \+ ground(HB),  \+ t_l:dont_varname_te,\+ t_l:dont_varname, \+ current_prolog_flag(xref, true), 
+term_expansion_save_vars(HB):- \+ ground(HB),  \+ t_l:dont_varname_te,\+ t_l:dont_varname, % \+ current_prolog_flag(xref, true), 
    current_predicate(logicmoo_util_varnames_file/0), current_prolog_flag(mpred_vars,true),  
-   source_context_module(M),init_varname_stores(M),logicmoo_util_with_assertions:w_tl([t_l:dont_varname_te,current_prolog_flag(xref, true)],logicmoo_varnames:try_save_vars(M:HB)),!,fail.
+   source_context_module(M),init_varname_stores(M),logicmoo_util_with_assertions:w_tl([t_l:dont_varname_te],logicmoo_varnames:try_save_vars(M:HB)),!,fail.
 
 maybe_record_scanned_file:-ignore((  fail,source_location(F,_), \+ varname_cache:varname_info_file(F), asserta(varname_cache:varname_info_file(F)))).
 

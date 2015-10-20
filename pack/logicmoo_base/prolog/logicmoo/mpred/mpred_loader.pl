@@ -58,6 +58,7 @@
             force_reload_mpred_file/1,
             force_reload_mpred_file/2,
             from_kif_string/2,
+            convert_if_kif_string/4,
             get_file_type/2,
             get_lang/1,
             get_last_time_file/3,
@@ -102,6 +103,7 @@
             mpred_expander_now_one_cc/4,
             mpred_implode_varnames/1,
             mpred_loader_file/0,
+            mpred_prolog_only_file/1,
             mpred_may_expand/0,
             mpred_may_expand_module/1,
             mpred_maybe_skip/1,
@@ -215,6 +217,8 @@ mpred_loader_module_transparent(F/A):-!, mpred_loader:module_transparent(F/A).
 
 :- thread_local(t_l:mpred_already_in_file_expansion/1).
 
+mpred_prolog_only_file(File):- source_file(File),file_name_extension(_,pl,File), \+ (lmcache:mpred_directive_value(pfc,file,File)).
+mpred_prolog_only_file(File):- never_registered_mpred_file(File),!.
 
 :- use_module(logicmoo(util/logicmoo_util_help)).
 :- use_module(logicmoo(util/logicmoo_util_varnames)).
@@ -229,10 +233,13 @@ mpred_expander(Type,LoaderMod,I,OO):- \+ t_l:disable_px, on_x_debug(mpred_expand
 
 mpred_expander0(Type,LoaderMod,I,OO):-
   I\= '$si$':'$was_imported_kb_content$'(_,_),  
-
+   notrace( \+ current_prolog_flag(xref,true)),
   '$set_source_module'(M,M),  
-  notrace( \+ mpred_impl_module(M)),
-  notrace(source_location(F,L)),'$module'(UM,M),
+  notrace( \+ mpred_prolog_only_module(M)),
+  notrace(source_location(F,L)),
+  notrace( \+ mpred_prolog_only_file(M)),
+  '$module'(UM,M),
+  
   call_cleanup(((
   make_key(mpred_expander_key(F,L,M,UM,Type,LoaderMod,I),Key),
   w_tl(t_l:current_why_source(F),((
@@ -245,16 +252,16 @@ mpred_expander0(Type,LoaderMod,I,OO):-
   !,I\=@=O,O=OO.
 
 
-mpred_expander_now_one_cc(F,M,(:-(G)),(:-(G))):-!.
+mpred_expander_now_one_cc(_,_,(:-(G)),(:-(G))):-!.
 mpred_expander_now_one_cc(F,M,II,O):-show_if_debug(mpred_expander_now_one(F,M,II,O)).
   
 
 %mpred_expander_now_one(F,M,(:- G),GGG):- !, nonvar(G), once(fully_expand(call,G,GG)),G\=@=GG,GGG=(:- GG),!.
-mpred_expander_now_one(F,M,I,O):- t_l:verify_side_effect_buffer,!,loader_side_effect_verify_only(I,O).
-mpred_expander_now_one(F,M,I,O):- t_l:use_side_effect_buffer,!,loader_side_effect_capture_only(I,O).
+mpred_expander_now_one(_,_,I,O):- t_l:verify_side_effect_buffer,!,loader_side_effect_verify_only(I,O).
+mpred_expander_now_one(_,_,I,O):- t_l:use_side_effect_buffer,!,loader_side_effect_capture_only(I,O).
 mpred_expander_now_one(F,M,I,O):- mpred_expander_now_physically(F,M,I,O).
 
-mpred_expander_now_physically(F,M,I,OO):-   
+mpred_expander_now_physically(_F,M,I,OO):-   
  '$set_source_module'(Old,M),
  call_cleanup(M:((
    must((source_context_module(CM),CM\==mpred_pfc,CM\==mpred_loader)),
@@ -266,7 +273,7 @@ mpred_expander_now_physically(F,M,I,OO):-
     
 
 :- module_transparent( xfile_module_term_expansion_pass_3/6).
-xfile_module_term_expansion_pass_3(How,INFO,F,M,AA,O,OO):- 
+xfile_module_term_expansion_pass_3(How,INFO,_F,_M,AA,O,OO):- 
    (O = (:- _) -> OO = O ;
       (How == pl -> OO = O ;
         (add_from_file(O), OO = '$si$':'$was_imported_kb_content$'(AA,INFO)))),!.      
@@ -689,9 +696,9 @@ op_lang(LANG):-retractall(current_op_alias(_,_)),retractall(current_lang(_)),ass
 get_op_alias(OP,ALIAS):-current_op_alias(OP,ALIAS).
 get_op_alias(OP,ALIAS):-get_lang(LANG),lang_op_alias(LANG,OP,ALIAS).
 
-current_op_alias((<==>),dup(impliesF,(','))).
-current_op_alias((=>),==>).
-%current_op_alias((not),(neg)).
+% current_op_alias((<==>),dup(impliesF,(','))).
+% current_op_alias((=>),==>).
+% current_op_alias((not),(neg)).
 current_op_alias( not(:-),neg(:-)).
 current_op_alias( (:-),(:-)).
 
@@ -701,7 +708,7 @@ get_lang(pfc).
 % pfc
 lang_op_alias(pfc,(<==>),(<==>)).
 lang_op_alias(pfc,(==>),==>).
-lang_op_alias(pfc,(<=>),(<==>)).
+% lang_op_alias(pfc,(<=>),(<==>)).
 lang_op_alias(pfc,(<=),(<-)).
 lang_op_alias(pfc,(<-),(<-)).
 lang_op_alias(pfc,(not),(neg)).
@@ -789,14 +796,12 @@ expand_in_mpred_kb_module(I,OO):- load_file_term_to_command_0c(I,O),!,
    ( is_prolog_xform(O) -> (OO = O); OO=  (:- cl_assert(pfc(in_mpred_kb_module),O))),!.
 
 
-
 load_file_term_to_command_0c(I,OO):-
-   is_kif_string(I),must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,
-     must((sexpr_sterm_to_pterm(Wff,O),!,\+ is_list(O))))),must(must_load_file_term_to_command(O,OO)).
+   convert_if_kif_string(I,Wff,Vs,O),
+   must(must_load_file_term_to_command(O,OO)).
 
 load_file_term_to_command_0c(PI,OO):- PI=..[P,I],
-   is_kif_string(I),must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,
-     must((sexpr_sterm_to_pterm(Wff,O),!,\+ is_list(O))))),
+   convert_if_kif_string(I,Wff,Vs,O),
    PO=..[P,O], must(must_load_file_term_to_command(PO,OO)).
 
 load_file_term_to_command_0c(C,O):- compound(C), get_op_alias(OP,ALIAS),
@@ -920,10 +925,14 @@ mpred_process_input_1(T):-try_save_vars(T),mpred_add(T),!.
 mpred_process_input(':-'(T),Vs):- b_setval('$variable_names', Vs),must(T),!.
 mpred_process_input(T,Vs):- expand_term(T,TT),b_setval('$variable_names', Vs),mpred_process_input_1(TT),!.
 
+process_this_script:- current_prolog_flag(xref,true),!.
 process_this_script:- ignore(dcall(why,prolog_load_context(script,_))), prolog_load_context(stream,S), !, must(process_this_script(S)).
+
+process_this_script(_):- current_prolog_flag(xref,true),!.
 process_this_script(S):- at_end_of_stream(S),!.
 process_this_script(S):- repeat,once(process_this_script0(S)),at_end_of_stream(S).
 
+process_this_script0(_):- current_prolog_flag(xref,true),!.
 process_this_script0(S):- at_end_of_stream(S),!.
 process_this_script0(S):- peek_string(S,3,W), W="\n\n\n",get_code(S,_),get_code(S,_),!,process_this_script0(S).
 process_this_script0(S):- peek_string(S,2,W), W="\r\n",get_code(S,_),!,process_this_script0(S).
@@ -1236,6 +1245,8 @@ load_mpred_on_file_end(World,File):-
 
 is_kif_string([]):- !,fail.
 is_kif_string(String):-atomic(String),name(String,Codes), memberchk(40,Codes),memberchk(41,Codes).
+
+convert_if_kif_string(I,Wff,Vs,O):-is_kif_string(I),must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,must((sexpr_sterm_to_pterm(Wff,O),!,\+ is_list(O))))).
 
 from_kif_string(String,Forms) :- must((codelist_to_forms(String,Forms);input_to_forms(string(String),Forms))),!.
 

@@ -28,7 +28,7 @@
             make_module_name/2,
             make_summary/2,
             module_meta_transparent/1,
-            mpred_impl_module/1,
+            mpred_prolog_only_module/1,
             mpred_show_doc/1,
             mpred_show_doc/2,
             mpred_source_file/2,
@@ -51,11 +51,11 @@
 :- meta_predicate logicmoo_util_help:list_item_per_line(0,*,*,*),logicmoo_util_help:list_item_per_line(0,?,?).
 :- (multifile lmconf:sf_known/4).
 :- (module_transparent current_predicate_mfa/3, end_l_sum/2, export_file_preds/0, export_file_preds/1, export_file_preds/6, export_module_preds/0, functor_compare/3, helper_name/1, helper_name0/1, is_crossfile_module_0/1, list_file_preds/0,
-  list_file_preds/1, list_file_preds/2, longer_sumry/2, make_l_summary/2, make_module_name/2, module_meta_transparent/1, mpred_impl_module/1, mpred_source_file/2, name_modes/3, no_location/3, portray_clause_pi_LR/2, portray_clause_pi_UD/2, print_fake_doc/2, scan_and_list_file_preds/1, skip_functor_export_0/1, some_flocation/3, some_location/3, target_module/2, to_comparable_fa0/3, to_mfa_0/4, write_modules/0).
+  list_file_preds/1, list_file_preds/2, longer_sumry/2, make_l_summary/2, make_module_name/2, module_meta_transparent/1, mpred_prolog_only_module/1, mpred_source_file/2, name_modes/3, no_location/3, portray_clause_pi_LR/2, portray_clause_pi_UD/2, print_fake_doc/2, scan_and_list_file_preds/1, skip_functor_export_0/1, some_flocation/3, some_location/3, target_module/2, to_comparable_fa0/3, to_mfa_0/4, write_modules/0).
 :- export((helper_name0/1, is_crossfile_module_0/1, make_summary0/2, mpred_source_file_0/2, skip_functor_export_0/1, to_comparable_fa0/3, to_mfa_0/4)).
 % :- shared_multifile(lmconf:sf_known/4).
 
-:- dynamic(mpred_impl_module/1).
+:- dynamic(mpred_prolog_only_module/1).
 /*
 
   :- use_module(library(pldoc)).
@@ -327,7 +327,7 @@ print_fake_doc(MN,P):-
    target_module(MN,M),
    current_predicate(_,M:P),
    once(to_comparable_fa0(P,F,A)),
-   mpred_impl_module(M),
+   mpred_prolog_only_module(M),
    functor(NameH,F,A),NameH=..[F|NameAs],
    functor(ModeH,F,A),ModeH=..[F|ModeAs],
    functor(DocH,F,A),DocH=..[F|DocAs],
@@ -401,21 +401,21 @@ mpred_show_doc(M,[Title,Info,Info2]):- pldoc_process:doc_comment(M:module(Title)
 %:- ensure_loaded(library(make)).
 
 mpred_type_module(A):- \+ atom(A),!,fail.
-mpred_impl_module(mpred_type_wff).
-mpred_impl_module(logicmoo_varnames).
-mpred_impl_module(common_logic_compiler).
-mpred_impl_module(common_logic_snark).
-mpred_impl_module(common_logic_sexpr).
-mpred_impl_module(M):-atom_concat(mpred_,_,M).
-mpred_impl_module(M):-atom_concat(logicmoo_util,_,M).
-mpred_impl_module(M):-atom_concat(common_logic_,_,M).
-mpred_impl_module(logicmoo_utils).
-mpred_impl_module(t_l).
-mpred_impl_module(tlbugger).
-mpred_impl_module(lmcache).
-mpred_impl_module(lmconf).
-mpred_impl_module(M):- logicmoo_util_help:mpred_is_impl_file(F),make_module_name(F,M).
-mpred_impl_module(M):- current_module(M),atom_concat(logicmoo_utils_,_,M).
-% mpred_impl_module(user). 
+mpred_prolog_only_module(mpred_type_wff).
+mpred_prolog_only_module(logicmoo_varnames).
+mpred_prolog_only_module(common_logic_compiler).
+mpred_prolog_only_module(common_logic_snark).
+mpred_prolog_only_module(common_logic_sexpr).
+mpred_prolog_only_module(M):-atom_concat(mpred_,_,M).
+mpred_prolog_only_module(M):-atom_concat(logicmoo_util,_,M).
+mpred_prolog_only_module(M):-atom_concat(common_logic_,_,M).
+mpred_prolog_only_module(logicmoo_utils).
+mpred_prolog_only_module(t_l).
+mpred_prolog_only_module(tlbugger).
+mpred_prolog_only_module(lmcache).
+mpred_prolog_only_module(lmconf).
+mpred_prolog_only_module(M):- logicmoo_util_help:mpred_is_impl_file(F),make_module_name(F,M).
+mpred_prolog_only_module(M):- current_module(M),atom_concat(logicmoo_utils_,_,M).
+% mpred_prolog_only_module(user). 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 

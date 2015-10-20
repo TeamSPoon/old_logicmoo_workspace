@@ -463,18 +463,18 @@ decl_mpred_multifile(M):- trace_or_throw(depricated(decl_mpred_multifile(M))),
                  export(M:('neg')/1).
 
 :- op(500,fx,kb:'~').
-:- op(1050,xfx,(kb:'<-kb:')).
+:- op(1050,xfx,(kb:'<-')).
 :- op(1050,xfx,kb:'<==>').
-:- op(1050,xfx,(kb:'<-kb:')).
-:- op(1100,fx,(kb:'nesckb:')).
-:- op(1150,xfx,(kb:'::::kb:')).
+:- op(1050,xfx,(kb:'<-')).
+:- op(1100,fx,(kb:'nesc')).
+:- op(1150,xfx,(kb:'::::')).
 :- op(500,fx,kb:'~').
 :- op(1050,xfx,kb:'<==>').
-:- op(1050,xfx,(kb:'<-kb:')).
-:- op(1200,fx,(kb:'=>kb:')).
-:- op(1200,fx,(kb:'==>kb:')).
-:- op(1100,fx,(kb:'nesckb:')).
-:- op(1150,xfx,(kb:'::::kb:')).
+:- op(1050,xfx,(kb:'<-')).
+:- op(1200,fx,(kb:'=>')).
+:- op(1200,fx,(kb:'==>')).
+:- op(1100,fx,(kb:'nesc')).
+:- op(1150,xfx,(kb:'::::')).
 :- op(300,fx,kb:'-').
 :- op(600,yfx,kb:'&').  
 :- op(600,yfx,kb:'v').
@@ -482,8 +482,8 @@ decl_mpred_multifile(M):- trace_or_throw(depricated(decl_mpred_multifile(M))),
 :- op(1075,xfx,kb:'<=').
 :- op(1070,xfx,kb:'=>').
 :- op(1070,xfx,kb:'<=>').
-:- op(1100,xfx,(kb:'<==>kb:')).
-:- op(1100,xfx,(kb:'==>kb:')).
+:- op(1100,xfx,(kb:'<==>')).
+:- op(1100,xfx,(kb:'==>')).
 :- op(350,xfx,kb:'xor').
 
 

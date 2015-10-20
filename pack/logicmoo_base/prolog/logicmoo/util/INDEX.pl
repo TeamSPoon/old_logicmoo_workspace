@@ -669,7 +669,7 @@ index((make_l_summary), 2, logicmoo_util_help, logicmoo_util_help).
 index((make_module_name), 2, logicmoo_util_help, logicmoo_util_help).
 index((make_summary), 2, logicmoo_util_help, logicmoo_util_help).
 index((module_meta_transparent), 1, logicmoo_util_help, logicmoo_util_help).
-index((mpred_impl_module), 1, logicmoo_util_help, logicmoo_util_help).
+index((mpred_prolog_only_module), 1, logicmoo_util_help, logicmoo_util_help).
 index((mpred_show_doc), 1, logicmoo_util_help, logicmoo_util_help).
 index((mpred_show_doc), 2, logicmoo_util_help, logicmoo_util_help).
 index((mpred_source_file), 2, logicmoo_util_help, logicmoo_util_help).
@@ -811,6 +811,10 @@ index((stack_check), 1, logicmoo_util_prolog_frames, logicmoo_util_prolog_frames
 index((stack_check), 2, logicmoo_util_prolog_frames, logicmoo_util_prolog_frames).
 index((stack_check_else), 2, logicmoo_util_prolog_frames, logicmoo_util_prolog_frames).
 index((stack_depth), 1, logicmoo_util_prolog_frames, logicmoo_util_prolog_frames).
+index((with_err_to_pred), 2, logicmoo_util_prolog_streams, logicmoo_util_prolog_streams).
+index((with_input_from_pred), 2, logicmoo_util_prolog_streams, logicmoo_util_prolog_streams).
+index((with_output_to_pred), 2, logicmoo_util_prolog_streams, logicmoo_util_prolog_streams).
+index((with_output_to_stream_pred), 4, logicmoo_util_prolog_streams, logicmoo_util_prolog_streams).
 index((addSpaceBeforeSym), 2, logicmoo_util_strings, logicmoo_util_strings).
 index((all_upper_atom), 1, logicmoo_util_strings, logicmoo_util_strings).
 index((any_to_atom), 2, logicmoo_util_strings, logicmoo_util_strings).

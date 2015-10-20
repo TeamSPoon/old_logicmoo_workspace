@@ -71,6 +71,9 @@ arity(pfclog,1).
   (CLIF/is_clif(CLIF) ==> clif(CLIF))).
 
 
+(CLIF/is_kif_rule(CLIF) ==> clif(CLIF)).
+
+
 end_of_file.
 
 % If you've come here looking for the clif examples please follow this link

@@ -106,10 +106,10 @@
             write_list/1,
             is_entailed/1,
           op(300,fx,'-'),
-          op(600,xfx,'=>'),
-          op(600,xfx,'<=>'),
+          op(1150,xfx,'=>'),
+          op(1150,xfx,'<=>'),
           op(350,xfx,'xor'),
-          op(400,yfx,'&'),  
+          op(400,yfx,'&'),
           op(500,yfx,'v')
           ]).
 
@@ -120,7 +120,7 @@
             op(1150,fx,(was_export)),
             op(1150,fx,(was_shared_multifile)).
 
-:- meta_predicate 
+:- meta_predicate
    % common_logic_snark
    convertAndCall(*,0),
    % common_logic_snark
@@ -134,10 +134,10 @@
    % common_logic_snark
    to_nonvars(2,?,?).
 
-:- was_shared_multifile 
+:- was_shared_multifile
         regression_test/0.
 /*
-:- was_dynamic 
+:- was_dynamic
         as_prolog/2,
         elInverse/2,
         kif_test_string/1,
@@ -150,10 +150,14 @@ kif_hook(0=>0).
 kif_hook(0<=>0).
 kif_hook((0 & 0)).
 kif_hook((0 v 0)).
-kif_hook(0 <- 0).
+% kif_hook(0 <- 0).
 kif_hook(~(0)).
+kif_hook(nesc(0)).
+kif_hook(poss(0)).
+kif_hook(neg(0)).
 kif_hook(not(0)).
 kif_hook(all(+,0)).
+kif_hook(forall(+,0)).
 kif_hook(exists(+,0)).
 kif_hook(if(0,0)).
 kif_hook(iff(0,0)).
@@ -169,7 +173,7 @@ are_clauses_entailed(CL):- unnumbervars(CL,UCL),  !, \+ \+ dcall_failure(why,is_
 
 is_prolog_entailed(UCL):-clause_asserted(UCL),!.
 is_prolog_entailed(UCL):-mpred_call(UCL),!.
- 
+
 member_ele(E,E):- is_ftVar(E),!.
 member_ele([],_):-!,fail.
 member_ele(E,E):- (\+ (compound(E))),!.
@@ -202,7 +206,7 @@ clif_to_prolog(CLIF,PrologO):- cwc,
 
 
 % Sanity Test for expected side-effect entailments
-% why does renumbervars_prev work but not copy_term? 
+% why does renumbervars_prev work but not copy_term?
 is_entailed(CLIF):-
  mpred_no_chaining((
    cwc, sanity((clif_to_prolog(CLIF,Prolog),!,sanity(( \+ \+ (dcall_failure(why,are_clauses_entailed(Prolog))))))))),!.
@@ -238,11 +242,11 @@ correct_arities(H,Fml,FmlM):- Fml=..[F|ARGS],must_maplist(correct_arities(H),ARG
 subsT_each(In,[],In):- !.
 subsT_each(In,[KV|TODO],Out):- !,get_kv(KV,X,Y),subst_except(In,X,Y,Mid),!,subsT_each(Mid,TODO,Out),!.
 
-:- was_dynamic(mudEquals/2).
-:- was_export(mudEquals/2).
+:- dynamic(mudEquals/2).
+:- export(mudEquals/2).
 mudEquals(X,Y):- X=Y.
-:- was_dynamic(skolem/3).
-:- was_export(skolem/3).
+:- dynamic(skolem/3).
+:- export(skolem/3).
 skolem(X,Y,_):- X=Y.
 
 :- was_export(not_mudEquals/2).
@@ -263,7 +267,7 @@ to_dlog_ops([
        ';'='v',
        ','='&',
        '~'='not',
-     '-'='not',      
+     '-'='not',
      'neg'='not',
      'naf'='not',
      'and'='&',
@@ -288,7 +292,7 @@ to_symlog_ops([
 
 to_prolog_ops([
    'v'=';',
-   '&'=',',   
+   '&'=',',
    '=>'='=>',
    '<=>'='<=>',
    '-'='not',
@@ -430,11 +434,11 @@ write_list([F|R]):- write(F), write('.'), nl, write_list(R).
 write_list([]).
 
 numbervars_with_names(Term,CTerm):- ground(Term),!,duplicate_term(Term,CTerm).
-numbervars_with_names(Term,CTerm):- 
+numbervars_with_names(Term,CTerm):-
  must_det_l((
    source_variables_l(NamedVars),!,
    copy_term(Term:NamedVars,CTerm:CNamedVars),
-   term_variables(CTerm,Vars),   
+   term_variables(CTerm,Vars),
    get_var_names(Vars,CNamedVars,Names),
    b_implode_varnames0(Names),
    numbervars(CTerm,91,_,[attvar(skip),singletons(false)]),
@@ -443,11 +447,11 @@ numbervars_with_names(Term,CTerm):-
    remove_grounds(NewCNamedVarsS,NewCNamedVarsSG),
    b_setval('$variable_names',NewCNamedVarsSG))),!.
 
-numbervars_with_names(Term,CTerm):- 
+numbervars_with_names(Term,CTerm):-
  must_det_l((
    source_variables_l(NamedVars),!,
    copy_term(Term:NamedVars,CTerm:CNamedVars),
-   term_variables(CTerm,Vars),   
+   term_variables(CTerm,Vars),
    get_var_names(Vars,CNamedVars,Names),
    b_implode_varnames0(Names),
    numbervars(CTerm,91,_,[attvar(skip),singletons(false)]),
@@ -466,7 +470,7 @@ get_1_var_name(_V,[],_S).
 get_1_var_name(Var,NamedVars,Name):- compound(Var),arg(1,Var,NV),!,get_1_var_name(NV,NamedVars,Name).
 get_1_var_name(Var,NamedVars,Var=NV):-atom(Var),NamedVars=[_|T],nb_setarg(2,NamedVars,[Var=NV|T]),!.
 get_1_var_name(Var,[N=V|_NamedVars],Name=V):-
-     (Var == V -> Name = N ; (Var==Name -> Name=Var ; fail )),!.     
+     (Var == V -> Name = N ; (Var==Name -> Name=Var ; fail )),!.
 get_1_var_name(Var,[_|NamedVars],Name):- get_1_var_name(Var,NamedVars,Name).
 
 
@@ -477,7 +481,7 @@ wdmsgl(NF):- must((get_functor(NF,NAME),!,must(wdmsgl_2(NAME,NF)))).
 
 wdmsgl_2(NAME,NF):- functor(NF,_,_),wdmsgl_3(NAME,&,NF).
 
-wdmsgl_3(NAME,F,NF):- 
+wdmsgl_3(NAME,F,NF):-
    numbervars_with_names(vv(NAME,F,NF),vv(NAME2,F2,NF2)),
    wdmsgl_4(NAME2,F2,NF2).
 
@@ -496,7 +500,7 @@ fresh_varname(F,NewVar):- functor(F,FN,_),!, upcase_atom(FN,FUP),gensym(FUP,VARN
 
 
 
-% kif_to_boxlog('=>'(WffIn,enables(Rule)),'$VAR'('MT2'),complete,Out1), % kif_to_boxlog('=>'(enabled(Rule),WffIn),'$VAR'('KB'),complete,Out).  
+% kif_to_boxlog('=>'(WffIn,enables(Rule)),'$VAR'('MT2'),complete,Out1), % kif_to_boxlog('=>'(enabled(Rule),WffIn),'$VAR'('KB'),complete,Out).
 
 kif_to_prolog(X,E):- kif_to_boxlog(X,Y),!,list_to_set(Y,S),!,member(E,S).
 
@@ -514,10 +518,11 @@ alt_kif_to_boxlog(Wff,KB,Why,Out):- loop_check(kif_to_boxlog((not(nesc(not(Wff))
 kif_to_boxlog(WffIn,Why,Out):-  kif_to_boxlog(WffIn,'$VAR'('KB'),Why,Out),!.
 
 
-:- was_export(kif_to_boxlog/4).
-kif_to_boxlog(I,KB,Why,Flattened):- atom(I),atom_contains(I,('(')),!,
-  must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,sexpr_sterm_to_pterm(Wff,PTerm),PTerm\=[_|_],
-  kif_to_boxlog(PTerm,KB,Why,Flattened))),!.
+:- export(kif_to_boxlog/4).
+
+kif_to_boxlog(I,KB,Why,Flattened):-
+  convert_if_kif_string( I, _Wff, _Vs, PTerm),
+  kif_to_boxlog(PTerm,KB,Why,Flattened), !.
 
 % kif_to_boxlog(WffInIn,KB,Why,FlattenedO):-  as_dlog(WffInIn,WffIn),kif_to_boxlog_0(WffIn,KB,Why,FlattenedO),!.
 
@@ -532,10 +537,10 @@ kif_to_boxlog(HB,KB,Why,FlattenedO):- compound(HB),HB=(HEAD:- BODY),!,
    conjuncts_to_list(HEAD,HEADL),conjuncts_to_list(BODY,BODYL),
    correct_boxlog([cl(HEADL,BODYL)],KB,Why,FlattenedO))).
 
-kif_to_boxlog(WffIn0,KB0,Why0,FlattenedO):-  
+kif_to_boxlog(WffIn0,KB0,Why0,FlattenedO):-
   must_det_l((nl,nl,nl,draw_line,draw_line,draw_line,draw_line)),
   must_det_l((
-    must(numbervars_with_names(WffIn0:KB0:Why0,WffIn:KB:Why)),      
+    must(numbervars_with_names(WffIn0:KB0:Why0,WffIn:KB:Why)),
    ensure_quantifiers(WffIn,Wff),
    wdmsgl(kif(Wff)),
    % KB = WffQ,
@@ -580,7 +585,7 @@ add_poss_to([],Wff6667, Wff6667).
 add_poss_to([PreCond|S],Wff6667, PreCondPOS):-!,
  add_poss_to(PreCond,Wff6667, PreCondM),
  add_poss_to(S,PreCondM, PreCondPOS).
- 
+
 add_poss_to(PreCond,Wff6667, PreCond=>Wff6667):-prequent(PreCond).
 add_poss_to(PreCond,Wff6667, Wff6667):-leave_as_is(PreCond).
 add_poss_to(not(_PreCond),Wff6667, Wff6667).
@@ -654,7 +659,7 @@ clauses_to_boxlog_2(KB, Why,cl([HeadIn],[]),Prolog):- !, (is_lit_atom(HeadIn) ->
 clauses_to_boxlog_2(KB,_Why,cl([HeadIn],BodyIn),(HeadIn:- BodyOut)):-!, must_maplist(logical_pos(KB),BodyIn,Body), list_to_conjuncts(Body,BodyOut),!.
 
 clauses_to_boxlog_2(KB, Why,cl([H,Head|List],BodyIn),Prolog):- trace,
-  findall(Answer,((member(E,[H,Head|List]),delete_eq([H,Head|List],E,RestHead), 
+  findall(Answer,((member(E,[H,Head|List]),delete_eq([H,Head|List],E,RestHead),
      must_maplist(logical_neg(KB),RestHead,RestHeadS),append(RestHeadS,BodyIn,Body),
        clauses_to_boxlog_1(KB,Why,cl([E],Body),Answer))),Prolog),!.
 
@@ -665,7 +670,7 @@ clauses_to_boxlog_5(_KB,_Why,(H:-B),(H:-B)):-!.
 clauses_to_boxlog_5(_KB,_Why,cl([HeadIn],[]),HeadIn):-!.
 clauses_to_boxlog_5(_KB,_Why,In,Prolog):-trace,In=Prolog.
 
-mpred_t_tell_kif(OP2,RULE):- 
+mpred_t_tell_kif(OP2,RULE):-
  w_tl(t_l:current_pttp_db_oper(mud_call_store_op(OP2)),
    (dcall(why,call((must(kif_add(RULE))))))).
 
@@ -716,9 +721,9 @@ kif:- current_input(In),current_output(Out),!,kif_io(In,Out).
 
 
 :- was_export(kif_io/2).
-kif_io(InS,Out):- 
+kif_io(InS,Out):-
   l_open_input(InS,In),
-   repeat,             
+   repeat,
       on_x_rtrace((once((t_l:kif_action_mode(Mode),write(Out,Mode),write(Out,'> '))),
         kif_read(In,Wff,Vs),
          b_setval('$variable_names', Vs),
@@ -747,12 +752,12 @@ kif_process(ask,Wff):- !, kif_ask(Wff).
 kif_process(Other,Wff):- !, wdmsg(error(missing_kif_process(Other,Wff))),!,fail.
 
 :- was_export(kif_ask_sent/1).
-kif_ask_sent(Wff):- 
+kif_ask_sent(Wff):-
    why_to_id(ask,Wff,Why),
    term_variables(Wff,Vars),
    gensym(z_q,ZQ),
    Query=..[ZQ,666|Vars],
-   why_to_id(rule,'=>'(Wff,Query),Why),   
+   why_to_id(rule,'=>'(Wff,Query),Why),
    kif_to_boxlog('=>'(Wff,Query),Why,QueryAsserts),!,
    kif_add_boxes1(Why,QueryAsserts),!,
    call_cleanup(
@@ -793,7 +798,7 @@ local_sterm_to_pterm(Wff,WffO):- sexpr_sterm_to_pterm(Wff,WffO),!.
 
 kif_add(_,[]).
 kif_add(Why,[H|T]):- !,must_det_l((kif_add(Why,H),kb_incr(Why,Why2),kif_add(Why2,T))).
-kif_add(Why,Wff):-  
+kif_add(Why,Wff):-
    must_det_l((kif_to_boxlog(Wff,Why,Asserts),
       kif_add_boxes(assert_wfs_def,Why,Wff,Asserts))),!.
 
@@ -820,9 +825,9 @@ kb_incr(WffNum1 ,WffNum2):-trace_or_throw(kb_incr(WffNum1 ,WffNum2)).
 /*
 kif_add_boxes(How,Why,Wff0,Asserts0):-
  must_det_l((
-  dcall_failure(why,kif_unnumbervars(Asserts0+Wff0,Asserts+Wff)),  
+  dcall_failure(why,kif_unnumbervars(Asserts0+Wff0,Asserts+Wff)),
   %fully_expand(Get1,Get),
-  get_constraints(Wff,Isas), 
+  get_constraints(Wff,Isas),
   kif_add_adding_constraints(Why,Isas,Asserts))),
    findall(HB-WhyHB,retract(t_l:in_code_Buffer(HB,WhyHB,_)),List),
    list_to_set(List,Set),
@@ -846,11 +851,11 @@ kif_add_boxes1(Why,AssertI):- must_det_l((simplify_bodies(AssertI,AssertO),kif_a
 :- thread_local(t_l:in_code_Buffer/3).
 
 
-kif_add_boxes3(How,Why,Assert):- 
+kif_add_boxes3(How,Why,Assert):-
   must_det_l((
   boxlog_to_prolog(Assert,Prolog1),
   defunctionalize(Prolog1,Prolog2),
-  kif_unnumbervars(Prolog2,PTTP), 
+  kif_unnumbervars(Prolog2,PTTP),
   call(How,Why,PTTP))).
 
 kif_unnumbervars(X,YY):-
@@ -867,7 +872,7 @@ simplify_bodies((B),(BC)):- must_det_l((conjuncts_to_list(B,RB),simplify_list(_K
 
 simplify_list(KB,RB,BBS):- list_to_set(RB,BB),must_maplist(removeQ(KB),BB,BBO),list_to_set(BBO,BBS).
 
-save_wfs(Why,PrologI):- must_det_l((as_prolog(PrologI,Prolog), 
+save_wfs(Why,PrologI):- must_det_l((as_prolog(PrologI,Prolog),
    w_tl(t_l:current_local_why(Why,Prolog),
    mpred_add_h(save_in_code_buffer,Why,Prolog)))).
 
@@ -930,7 +935,7 @@ generate_ante([I|VarsA],[T|VarsB],In,Isas):- use_was_isa_h(I,T,ISA), conjoin(In,
 
 get_constraints(T,true):- T==true.
 get_constraints(_,true):- !.
-get_constraints(ListA,Isas):- 
+get_constraints(ListA,Isas):-
      must_det_l((copy_term(ListA,ListB),
       term_variables(ListA,VarsA),
       term_variables(ListB,VarsB),

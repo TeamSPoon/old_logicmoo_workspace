@@ -592,18 +592,18 @@ wlmuser(G):- lmconf:mpred_user_kb(M), M:call(G).
 %   Purpose: syntactic sugar for Pfc - operator definitions and term expansions.
 
 :- op(500,fx,pfc:'~').
-:- op(1050,xfx,(pfc:'<-pfc:')).
+:- op(1050,xfx,(pfc:'<-')).
 :- op(1050,xfx,pfc:'<==>').
-:- op(1050,xfx,(pfc:'<-pfc:')).
-:- op(1100,fx,(pfc:'nescpfc:')).
-:- op(1150,xfx,(pfc:'::::pfc:')).
+:- op(1050,xfx,(pfc:'<-')).
+:- op(1100,fx,(pfc:'nesc')).
+:- op(1150,xfx,(pfc:'::::')).
 :- op(500,fx,pfc:'~').
 :- op(1050,xfx,pfc:'<==>').
-:- op(1050,xfx,(pfc:'<-pfc:')).
-:- op(1200,fx,(pfc:'=>pfc:')).
-:- op(1200,fx,(pfc:'==>pfc:')).
-:- op(1100,fx,(pfc:'nescpfc:')).
-:- op(1150,xfx,(pfc:'::::pfc:')).
+:- op(1050,xfx,(pfc:'<-')).
+:- op(1200,fx,(pfc:'=>')).
+:- op(1200,fx,(pfc:'==>')).
+:- op(1100,fx,(pfc:'nesc')).
+:- op(1150,xfx,(pfc:'::::')).
 :- op(300,fx,pfc:'-').
 :- op(600,yfx,pfc:'&').  
 :- op(600,yfx,pfc:'v').
@@ -611,8 +611,8 @@ wlmuser(G):- lmconf:mpred_user_kb(M), M:call(G).
 :- op(1075,xfx,pfc:'<=').
 :- op(1070,xfx,pfc:'=>').
 :- op(1070,xfx,pfc:'<=>').
-:- op(1100,xfx,(pfc:'<==>pfc:')).
-:- op(1100,xfx,(pfc:'==>pfc:')).
+:- op(1100,xfx,(pfc:'<==>')).
+:- op(1100,xfx,(pfc:'==>')).
 :- op(350,xfx,pfc:'xor').
 
 :- op(300,fx,user:'~').
@@ -1609,8 +1609,7 @@ rem_list([H|T]) :-
   mpred_rem1(H,UU),
   rem_list(T).
 
-mpred_rem1(P,S) :- copy_term_and_varnames(mpred_rem1(P,S),Why),
-  mpred_trace_msg('Removing support',mpred_rem1(P,S)),
+mpred_rem1(P,S) :- copy_term_and_varnames(mpred_rem1(P,S),Why),   
   mpred_rem_support(Why,P,S)
      -> (remove_if_unsupported(Why,P))
       ; mpred_warn("mpred_rem1/2 Could not find support ~p to remove from fact ~p",
@@ -2707,6 +2706,7 @@ mpred_get_support_neg(~ (P),S) :- !, is_ftNonvar(P), mpred_get_support(neg(P),S)
 % There are three of these to try to efficiently handle the cases
 % where some of the arguments are not bound but at least one is.
 
+mpred_rem_support(WhyIn,P,S):- P \= neg(_), mpred_trace_msg('Removing support',mpred_rem_support(WhyIn,P,S)),fail.
 mpred_rem_support(WhyIn,P,(Fact,Trigger)) :- is_ftVar(P),!,copy_term_and_varnames(mpred_rem_support(mpred_rem_support,P,(Fact,Trigger)) ,TheWhy),
   SPFC = kbp:spft(ukb,RP,RFact,RTrigger,_RWhy),
   clause(kbp:spft(ukb,P,Fact,Trigger,_),true,Ref),
