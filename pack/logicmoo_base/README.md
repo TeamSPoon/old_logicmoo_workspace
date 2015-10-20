@@ -20,6 +20,37 @@ Despite Prolog's logic heritage and its use of model elimination in linear logic
 
 Logicmoo’s use of the Prolog Technology Theorem Prover (PTTP) was to overcome the deficiencies while retaining as fully as possible the high performance of well-engineered Prolog systems.
 
+The Prolog Technology Theorem Prover is an extension of Prolog that is complete for the full first­order predicate calculus (Stickel, 1988).   
+It is invoked whenever the facts and rule are described in NNF or CNF into the knowledge base.
+However, when the rules are in Prenix Normal Form (PNF) (thus have quantifiers) they are converted to NNF, SNF and finally CNF and handed back over to PTTP.
+Whenever a formula whose leading quantifier is existential occurs, the formula obtained by removing that quantifier via Skolemization may be generated. 
+
+kif_add/1: the file has a rule or fact, in the form of a predicate of FOPC (First Order Predicate Calculus).  The LogicMOO invokes the PTTP compiler (discussed later) to assert the form to the knowledge base. The
+knowledge base represents the user''s beliefs. Thus, asserting the logical form to the knowledge base amounts to applying the Declarative rule and the Distributivity rule (Axiom B2).
+
+kif_ask/1: the user types in a question, in the form of a predicate of FOPC (First Order Predicate Calculus). The PTTP inference system is then invoked to attempt to  prove the predicate, 
+using the axioms and facts of the knowledge base. This amounts toassuming that the user''s beliefs are closed under logical consequence, i.e., the Closure rule (Axiom B1) is implicitly applied over and over.
+
+LogicMOO/PTTP is unlike all other theorem provers today (except SNARK and CYC) and even the ones claiming to be PTTP''s decendants have been radically simplified to absurdium.
+Here is how is LogicMOO/PTTP: If the proof succeeds, LogicMOO answers ``yes'', and prints out the predicate, instantiating all variables. If there are multiple answers, then it prints all of them. 
+If the proof fails, LogicMOO invokes PTTP to prove the negation of the queried predicate.  If that NEGATED proof succeeds, then LogicMOO answers ``no''; otherwise, LogicMOO answers ``cannot tell, not enough information''.
+
+LogicMOO, therefore, has a restricted capability for reasoning about negation, being able to distinguish between real negation (``P is false'') from negation by failure (``P is not provable'').
+This allows the system to distinguish beliefs that are provably false from beliefs that cannot be proven because of insufficient information. 
+This is an important feature that overcomes the supposed limitations of Prolog.   For example, without this added capability, if a user were to
+ask whether LogicMOO believes that John intended to let the cat out, then LogicMOO would answer ``no''. 
+This answer is misleading because LogicMOO would also answer ``no'' if it were asked if John did not intend to let the cat out.  This is why the system automaically Re-asks the negation.
+
+THE CAVEAT:  Left hand side rules may actually need the same level of analysis?!
+
+Another key feature of LogicMOO infering about what it doesnt yet know, is it can be set to "ask the user" or help guide the user into what types of knowledge it is missing.  That also provides a port through which
+other modules (e.g., a plan recognition system or a modules for NL reference resolution) can enter information. When such modules are not available, the user may simulate this capacity.
+
+is_entailed/1: Detects if an Horn Clause (or fact) is true.   if someone asserts a=>b. this will result in the following two is_entailed(( ~a :- ~b )) and   is_entailed((  b :- a ) ).
+According to classically trained logicians horn clauses cannot start with a negated literal (so to not offend them)  PTTP papers claim we can store "( ~a :- ~b )" as "( not_a :- not_b )" 
+If we obeyed the limitations set forth upon Horn clauses only being "positive" that would remove the unique ability for LogicMOO to deduce what things are impossible. (We couldn''t tell the difference between missing data and true negation)
+
+
 PTTP/XRAY is an implementation of the model elimination theorem-proving procedure that extends Prolog to the full first-order predicate calculus. PTTP differs from Prolog in its use of (1) unification with the occurs check for soundness, (2) depth-first iterative deepening search instead of unbounded depth-first search to make the search strategy complete, and (3) the model elimination inference rule that is added to Prolog inferences to make the inference system complete. PTTP also extends Prolog by providing the capability of printing the proofs it finds. Because PTTP compiles the clauses of a problem, its inference rate is very high. Because PTTP uses depth-first search, its storage requirements are low and term size need not be limited to reduce memory usage at the expense of completeness. PTTP's simple architecture facilitates its adaptation and use in applications.
 
 # PFC Backward-Chaining Rules
