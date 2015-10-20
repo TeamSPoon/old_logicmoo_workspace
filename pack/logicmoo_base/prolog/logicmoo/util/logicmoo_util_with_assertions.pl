@@ -15,18 +15,25 @@
             to_thread_head_1m/4,
             w_tl/2,
             wno_tl/2,
-            wtg/2
+            wtg/2,
+            with_no_x/1
           ]).
 
 :- meta_predicate
         w_tl(:, :),
         wno_tl(0, 0),
+        with_no_x(0),
         wtg(:, 0).
 :- module_transparent
         check_thread_local_1m/1,
         to_thread_head_1m/4.
 
 :- include('logicmoo_util_header.pi').
+
+with_no_x(G):- getenv('DISPLAY',DISP),!,call_cleanup((unsetenv('DISPLAY'),with_no_x(G)),setenv('DISPLAY',DISP)).
+with_no_x(G):- current_prolog_flag(gui,true),!,call_cleanup((set_prolog_flag(gui,false),with_no_x(G)),set_prolog_flag(gui,true)).
+with_no_x(G):- current_prolog_flag(gui_tracer,true),!,call_cleanup((noguitracer,with_no_x(G)),guitracer).
+with_no_x(G):- call(G).
 
 % maybe this one wont use thread local checking
 % = :- meta_predicate(wtg(:,0)).

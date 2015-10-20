@@ -24,7 +24,12 @@ in_logicmoo_repl_source_file.
 :- attach_packs.
 :- initialization(attach_packs).
 
-:-if(\+(exists_source(logicmoo(logicmoo_base)))).
+:- if((exists_source(library(logicmoo/logicmoo_utils)))).
+:- use_module(library(logicmoo/logicmoo_utils)).
+:- use_module(logicmoo(mpred/mpred_pfc)).
+:- use_module(library(logicmoo/logicmoo_user)).
+
+:- else.
 
 fix_pwd :- (exists_directory(runtime) -> working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true)), pwd.
 :- fix_pwd.

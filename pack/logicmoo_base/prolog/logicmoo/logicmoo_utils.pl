@@ -111,7 +111,7 @@ lmconf:logicmoo_scan_autoloads.
 use_libraries(M):- F= (util/_),foreach(logicmoo_util_help:mpred_is_impl_file(F),(writeln(M:use_module(F)),M:ensure_loaded(F))).
 
 :- export(use_libraries/0). 
-use_libraries:- context_module(M),use_libraries(M).
+use_libraries:- source_context_module(M),use_libraries(M).
 
 :- multifile(logicmoo_util_help:mpred_is_impl_file/1).
 :- dynamic(logicmoo_util_help:mpred_is_impl_file/1).

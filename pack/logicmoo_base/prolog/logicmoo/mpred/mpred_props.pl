@@ -57,7 +57,7 @@
             pred_type_test2/2            
           ]).
 
-:- use_module(logicmoo(util/logicmoo_util_preddefs)).
+% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
 
 :- include('mpred_header.pi').
@@ -85,11 +85,11 @@ pred_type_test(H,F,A):- THFA=..[H,F/A],HF=..[H,F],(clause(THFA,true);clause(HF,t
 decl_mpred_pi(PI):-ignore((ground(PI),compound(PI),decl_mpred(PI))).
 :- was_export(decl_mpred_mfa/3).
 decl_mpred_mfa(_,M:F,A):-atom(M),!,decl_mpred_mfa(M,F,A).
-decl_mpred_mfa(M,FF,A):-var(M),!,context_module(M),!,decl_mpred_mfa(M,FF,A).
+decl_mpred_mfa(M,FF,A):-var(M),!,source_context_module(M),!,decl_mpred_mfa(M,FF,A).
 decl_mpred_mfa(M,FF,A):-
    get_functor(FF,F,_),
    must_det_l([
-     ignore((var(M),context_module(M),dmsg(decl_mpred_mfa(M,F,A)))),
+     ignore((var(M),source_context_module(M),dmsg(decl_mpred_mfa(M,F,A)))),
      ignore((nonvar(M),asserta_if_new(mpred_isa(F,mpred_module(M))))),
      assert_arity(F,A),  
      must_det(nonvar(M)),
@@ -166,7 +166,7 @@ decl_mpred_hybrid_ilc_0(_CM,M,PI,F/A):-
       add(kb:mpred_module(F,M)),
       add(kb:prologHybrid(F)),
       get_cc(PI,NC),
-      sanity(show_call_failure(M==kb)),
+      sanity(dcall_failure(why,M==kb)),
       decl_mpred_mfa(M,F,A),
       decl_mpred_pi(PI),
       must(lmconf:mpred_provide_setup(call(conjecture),F/A,prologHybrid,_OUT)),

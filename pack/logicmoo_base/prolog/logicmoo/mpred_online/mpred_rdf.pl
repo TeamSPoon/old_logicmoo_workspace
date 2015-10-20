@@ -141,7 +141,7 @@ mpred_online:semweb_startup:- n3_parse('http://raw.github.com/knowrob/knowrob/ma
 
 
 :- public(rdf/3).
-rdf(S,P,O):- show_call(mpred_rdf(S,P,O)).
+rdf(S,P,O):- dcall(why,mpred_rdf(S,P,O)).
 
 :- op(1150, fx, (rdf_meta)).   :- rdf_meta
 	rdf(o,o,o),
@@ -234,7 +234,7 @@ rdf_global_mpred_object(L,O):-rdf_global_object(L,O).
 
 rdf_create_qname(NS,Name,URL):-rdf_global_mpred_object(NS:Name,URL),rdf_current_resource(URL),!.
 rdf_create_qname(NS,Name,URL):-must(rdf_current_ns(NS,PREFIX)),atom_concat(PREFIX,Name,URL),nop(must(is_url(URL))),asserta(rdf_qname_url_created(NS,Name,URL)).
-   %text_to_string(Name,Label),show_call(rdf_assert(URL,rdfs:label,literal(type(xsd:string, Label)))).
+   %text_to_string(Name,Label),dcall(why,rdf_assert(URL,rdfs:label,literal(type(xsd:string, Label)))).
 
 
 
@@ -476,7 +476,7 @@ rdf_assert_hook((A,B)):-!,rdf_assert_hook(A),rdf_assert_hook(B).
 rdf_assert_hook(CYC):-into_mpred_form(CYC,DIF),CYC\=@=DIF,!,must(rdf_assert_hook(DIF)),!.
 rdf_assert_hook(CYC):-once(cyc_to_rdf(CYC,RDF)),CYC\=@=RDF,!,must(call(rdf_assert_hook(RDF))),!.
 rdf_assert_hook(isa(I,C)):-must((rdf_assert_hook0(isa(I,C)))),!.
-rdf_assert_hook(PSO):-flag(rdf_assert_hook_max,W,W+1),must(show_call(rdf_assert_hook0(PSO))),!.
+rdf_assert_hook(PSO):-flag(rdf_assert_hook_max,W,W+1),must(dcall(why,rdf_assert_hook0(PSO))),!.
 rdf_assert_hook(PSO):-dmsg(once(skipped(rdf_assert_hook(PSO)))).
 
 

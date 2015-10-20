@@ -757,8 +757,7 @@ ftrace(Goal):- restore_trace((
    thread_leash(-all),thread_leash(+exception),trace,Goal)).
 
 
-trace_or_throw(E):-non_user_console,thread_self(Self),wdmsg(thread_trace_or_throw(Self+E)),
-   current_input(In),   on_x_log_throw(attach_console),set_stream(In,close_on_exec(true)),throw(abort),thread_exit(trace_or_throw(E)).
+trace_or_throw(E):- non_user_console,notrace((thread_self(Self),wdmsg(thread_trace_or_throw(Self+E)),!,throw(abort),thread_exit(trace_or_throw(E)))).
 trace_or_throw(E):- wdmsg(E),dtrace_msg(throw:-E).
 
  %:-interactor.
@@ -839,8 +838,7 @@ skipWrapper:- tlbugger:skip_bugger,!.
 
 
 % = :- meta_predicate(one_must(0,0)).
-one_must(MCall,OnFail):- skipWrapper,!, (MCall *->  true ;    OnFail).
-one_must(MCall,OnFail):- strip_module(MCall,M,Goal), '@'(( Goal *->  true ;    OnFail ),M).
+one_must(MCall,OnFail):-  MCall *->  true ; OnFail.
 
 
 must_det(Goal):- must(Goal),!.
@@ -892,8 +890,8 @@ slow_sanity(Goal):- ( tlbugger:skip_use_slow_sanity ; sanity(Goal)),!.
 % sanity(_):-!.
 % sanity(_):-skipWrapper,!.
 sanity(Goal):-bugger_flag(release,true),!,assertion(Goal).
-sanity(Goal):- tlbugger:show_must_go_on,!,ignore(show_call_failure(Goal)).
-sanity(Goal):- ignore(must(show_call_failure(Goal))).
+sanity(Goal):- tlbugger:show_must_go_on,!,ignore(dcall_failure(why,Goal)).
+sanity(Goal):- ignore(must(dcall_failure(why,Goal))).
 
 
 :- export(is_release/0).

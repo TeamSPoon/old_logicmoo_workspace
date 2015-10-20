@@ -13,11 +13,10 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_bugger.pl
 :- module(logicmoo_util_bugger,
           [ 
-            all_module_predicates_are_transparent/1,
-            alldiscontiguous/0,
-            arg_is_transparent/1,
+
             asserta_if_ground/1,
             atom_contains666/2,
+
             bad_idea/0,
             beenCaught/1,
             bin_ecall/4,
@@ -60,9 +59,6 @@
             do_gc1/0,
             do_ref_job/2,
             doHideTrace/4,
-            export_all_preds/0,
-            export_all_preds/1,
-            export_if_noconflict/2,
             fixhotrace/1,
             fmtString/2,
             fmtString/3,
@@ -127,13 +123,6 @@
             meta_interp/2,
             meta_interp_signal/1,
             module_hotrace/1,
-            module_meta_predicates_are_transparent/1,
-            module_predicate/3,
-            module_predicate/4,
-            module_predicates_are_exported/0,
-            module_predicates_are_exported/1,
-            module_predicates_are_exported0/1,
-            module_predicates_are_not_exported_list/2,
             module_stack/2,
             must_assign/1,
             must_assign/2,
@@ -170,7 +159,6 @@
             prolog_must_l/1,
             prolog_must_not/1,
             push_def/1,
-            quiet_all_module_predicates_are_transparent/1,
             randomVars/1,
             real_builtin_predicate/1,
             replace_elements/4,
@@ -187,11 +175,15 @@
             set_yes_debug_thread/0,
             showProfilerStatistics/1,
             show_and_do/1,
-            show_call/1,
-            show_call0/1,
-            show_call_entry/1,
-          show_call_failure/1,
-            show_call_success/1,
+            dcall/2,
+            dcall/1,
+            dcall0/1,
+            dcall_entry/2,
+            dcall_entry/1,
+            dcall_failure/2,
+            dcall_failure/1,
+            dcall_success/2,
+            dcall_success/1,
             show_goal_rethrow/2,
             show_module/1,
             shrink_clause/2,
@@ -216,8 +208,6 @@
             tryCatchIgnore/1,
             tryHide/1,
             unlistify/2,
-            user_ensure_loaded/1,
-            user_use_module/1,
             wdmsg/1,
             wdmsg/2,
             willTrace/0,
@@ -236,6 +226,7 @@
 :- multifile
         logLevel/2.
 :- meta_predicate 
+    do_ref_job(0,*),
         bugger_atom_change(:, -),
         bugger_atom_change(:, 0, +, +, -, -),
         bugger_expand_goal(0, -),
@@ -262,7 +253,7 @@
         gripe_time(+, 0),
         grtrace(0),
         hideTrace(:, -),
-        hidetrace(0),
+        hidetrace(:),
         ifThen(0, 0),
         if_interactive(0),
         if_interactive0(0),
@@ -299,12 +290,19 @@
         rtraceOnError(0),
         set_gui_debug(0),
         showProfilerStatistics(0),
-        show_and_do(0),
-        show_call(:),
-        show_call0(0),
-        show_call_entry(0),
-        show_call_failure(0),
-        show_call_success(0),
+        show_and_do(0),        
+        dcall0(0),
+
+   dcall(+,0),
+   dcall_entry(+,0),
+   dcall_failure(+,0),
+   dcall_success(+,0),
+
+   dcall(0),
+   dcall_entry(0),
+   dcall_failure(0),
+   dcall_success(0),
+
         test_tl(+),
         test_tl(1, +),
         test_tl(+, +, +),
@@ -318,10 +316,7 @@
         with_no_term_expansions(0),
         with_skip_bugger(0).
 :- module_transparent
-                    show_call_failure/1,
-        all_module_predicates_are_transparent/1,
-        alldiscontiguous/0,
-        arg_is_transparent/1,
+                    dcall_failure/1,
         asserta_if_ground/1,
         atom_contains666/2,
         bad_idea/0,
@@ -357,9 +352,6 @@
         do_gc0/0,
         do_gc1/0,
         do_ref_job/2,
-        export_all_preds/0,
-        export_all_preds/1,
-        export_if_noconflict/2,
         fmtString/2,
         fmtString/3,
         format_safe/2,
@@ -400,13 +392,6 @@
         matches_term0/2,
         meta_interp_signal/1,
         module_hotrace/1,
-        module_meta_predicates_are_transparent/1,
-        module_predicate/3,
-        module_predicate/4,
-        module_predicates_are_exported/0,
-        module_predicates_are_exported/1,
-        module_predicates_are_exported0/1,
-        module_predicates_are_not_exported_list/2,
         module_stack/2,
         must_assign/1,
         must_assign/2,
@@ -425,7 +410,6 @@
         predicate_module/2,
         prolog_current_frame_or_parent/2,
         prolog_current_frames/1,
-        quiet_all_module_predicates_are_transparent/1,
         replace_elements/4,
         saveUserInput/0,
         save_guitracer/0,
@@ -451,8 +435,6 @@
         traceAll/0,
         tryHide/1,
         unlistify/2,
-        user_ensure_loaded/1,
-        user_use_module/1,
         wdmsg/1,
         wdmsg/2,
         willTrace/0,
@@ -505,91 +487,6 @@
 
 
 
-:- export((user_ensure_loaded/1)).
-:- module_transparent user_ensure_loaded/1.
-user_ensure_loaded(What):- !, '@'(ensure_loaded(What),'user').
-
-:- module_transparent user_use_module/1.
-% user_use_module(logicmoo(What)):- !, '@'(use_module(logicmoo(What)),'user').
-% user_use_module(library(What)):- !, use_module(library(What)).
-user_use_module(What):- '@'(use_module(What),'user').
-
-
-
-
-export_all_preds:-source_location(File,_Line),module_property(M,file(File)),!,export_all_preds(M).
-
-export_all_preds(ModuleName):-forall(current_predicate(ModuleName:F/A),
-                   ((export(F/A),functor_safe(P,F,A),mpred_trace_nochilds(ModuleName:P)))).
-
-
-
-
-
-
-module_predicate(ModuleName,F,A):-current_predicate(ModuleName:F/A),functor_safe(P,F,A),
-   not((( predicate_property(ModuleName:P,imported_from(IM)),IM\==ModuleName ))).
-
-:- module_transparent(module_predicates_are_exported/0).
-:- module_transparent(module_predicates_are_exported/1).
-:- module_transparent(module_predicates_are_exported0/1).
-
-module_predicates_are_exported:- context_module(CM),module_predicates_are_exported(CM).
-
-module_predicates_are_exported(user):-!,context_module(CM),module_predicates_are_exported0(CM).
-module_predicates_are_exported(Ctx):- module_predicates_are_exported0(Ctx).
-
-module_predicates_are_exported0(user):- !. % dmsg(warn(module_predicates_are_exported(user))).
-module_predicates_are_exported0(ModuleName):-
-   module_property(ModuleName, exports(List)),
-    findall(F/A,
-    (module_predicate(ModuleName,F,A),
-      not(member(F/A,List))), Private),
-   module_predicates_are_not_exported_list(ModuleName,Private).
-
-:- export(export_if_noconflict/2).
-:- module_transparent(export_if_noconflict/2).
-export_if_noconflict(M,F/A):- current_module(M2),M2\=M,module_property(M2,exports(X)),member(F/A,X),dmsg(skipping_export(M2=M:F/A)),!.
-export_if_noconflict(M,F/A):-M:export(F/A).
-
-% module_predicates_are_not_exported_list(ModuleName,Private):- once((length(Private,Len),dmsg(module_predicates_are_not_exported_list(ModuleName,Len)))),fail.
-module_predicates_are_not_exported_list(ModuleName,Private):- forall(member(F/A,Private),export_if_noconflict(ModuleName,F/A)).
-
-
-
-
-
-arg_is_transparent(Arg):- member(Arg,[':','0']).
-arg_is_transparent(0).
-arg_is_transparent(Arg):- number(Arg).
-
-% make meta_predicate's module_transparent
-module_meta_predicates_are_transparent(_):-!.
-module_meta_predicates_are_transparent(ModuleName):-
-    forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),
-      ignore(((predicate_property(ModuleName:P,(meta_predicate( P ))),
-            not(predicate_property(ModuleName:P,(transparent))), (compound(P),arg(_,P,Arg),arg_is_transparent(Arg))),
-                   (nop(dmsg(todo(module_transparent(ModuleName:F/A)))),
-                   (module_transparent(ModuleName:F/A)))))).
-
-:- export(all_module_predicates_are_transparent/1).
-% all_module_predicates_are_transparent(_):-!.
-all_module_predicates_are_transparent(ModuleName):-
-    forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),
-      ignore((
-            not(predicate_property(ModuleName:P,(transparent))),
-                   ( nop(dmsg(todo(module_transparent(ModuleName:F/A))))),
-                   (module_transparent(ModuleName:F/A))))).
-
-quiet_all_module_predicates_are_transparent(_):-!.
-quiet_all_module_predicates_are_transparent(ModuleName):-
-    forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),
-      ignore((
-            not(predicate_property(ModuleName:P,(transparent))),
-                   nop(dmsg(todo(module_transparent(ModuleName:F/A)))),
-                   (module_transparent(ModuleName:F/A))))).
-
-
 % :- if_may_hide(mpred_trace_less(skipWrapper/0)).
 % :- if_may_hide(mpred_trace_less(tracing/0)).
 % :- if_may_hide('$set_predicate_attribute'(tlbugger:skipMust,hide_childs,1)).
@@ -605,7 +502,7 @@ ignore_each(A):-ignore(A).
 	must_maplist(2, ?, ?),
         must_maplist(3, ?, ?, ?).
 
-% 	must_maplist(:Goal, ?List)
+%% 	must_maplist(:Goal, ?List)
 %
 %	True if Goal can successfully  be   applied  on  all elements of
 %	List. Arguments are reordered to gain  performance as well as to
@@ -616,7 +513,7 @@ must_maplist(Goal, [Elem|Tail]) :-
 	must(call(Goal, Elem)),
 	must_maplist(Goal, Tail).
 
-% 	must_maplist(:Goal, ?List1, ?List2)
+%% 	must_maplist(:Goal, ?List1, ?List2)
 %
 %	As must_maplist/2, operating on pairs of elements from two lists.
 must_maplist(_, [], []).
@@ -727,8 +624,6 @@ bad_idea:-fail.
 static_predicate(FA):-once(predicate_property(FA,_)),not(predicate_property(FA,dynamic)).
 */
 
-% = %= :- meta_predicate (show_call_entry(0)).
-show_call_entry(Call):-wdmsg(show_call_entry(Call)),show_call(Call).
 
 % ===================================================================
 % Bugger Term Expansions
@@ -930,7 +825,7 @@ meta_interp(CE,(A*->B;C)):-!,(meta_interp(CE,A)*->meta_interp(CE,B);meta_interp(
 meta_interp(CE,(A,!)):-!,meta_interp(CE,A),!.
 meta_interp(CE,(A,B)):-!,meta_interp(CE,A),meta_interp(CE,B).
 %meta_interp(_CE,!):- !, cut_block(!).
-meta_interp(CE,A):- show_call(call(CE,meta_call(A))).
+meta_interp(CE,A):- dcall(why,call(CE,meta_call(A))).
 
 
 % was_module(Mod,Exports) :- nop(was_module(Mod,Exports)).
@@ -1187,8 +1082,8 @@ singletons(_).
 :- set_prolog_flag(debugger_show_context,true).
 :- set_prolog_flag(trace_gc,true).
 :- set_prolog_flag(debug,true).
-:- set_prolog_flag(gc,true).
 */
+:- set_prolog_flag(gc,true).
 set_optimize(_):- !.
 set_optimize(TF):- set_prolog_flag(gc,TF),set_prolog_flag(last_call_optimisation,TF),set_prolog_flag(optimise,TF).
 
@@ -1258,9 +1153,8 @@ rtraceOnError(C):-
 
 with_skip_bugger(C):-setup_call_cleanup(asserta( tlbugger:skip_bugger,Ref),C,erase(Ref)).
 
-on_x_debug(C):- skipWrapper,!,C.
-on_x_debug(C):- tlbugger:rtracing,!,C.
-on_x_debug(C):- debug,with_each(0,on_x_rtrace,C).
+on_x_debug(C):- !, on_x_rtrace(C).
+on_x_debug(C):- with_each(0,on_x_rtrace,C).
 on_x_rtraceEach(C):-with_each(1,on_x_debug,C).
 on_x_debug_cont(C):-ignore(on_x_debug(C)).
 
@@ -1510,9 +1404,6 @@ showProfilerStatistics(FileMatch):-
 % UTILS
 % ===============================================================================================
 
-alldiscontiguous:-!.
-
-
 if_prolog(swi,G):-call(G). % Run B-Prolog Specifics
 if_prolog(_,_):-!. % Dont run SWI Specificd or others
 
@@ -1520,7 +1411,7 @@ if_prolog(_,_):-!. % Dont run SWI Specificd or others
 % = %= :- meta_predicate (time_call(0)).
 time_call(Call):-
   statistics(runtime,[MSecStart,_]),   
-  ignore(show_call_failure(Call)),
+  ignore(dcall_failure(why,Call)),
   statistics(runtime,[MSecEnd,_]),
    MSec is (MSecEnd-MSecStart),
    Time is MSec/1000,
@@ -1558,23 +1449,28 @@ gripe_time(TooLong,Goal):-statistics(cputime,Start),
 cleanup_strings:-!.
 cleanup_strings:-garbage_collect_atoms.
 
-%= :- meta_predicate  show_call0(0).
-show_call0(C):- C. % on_x_debug(C). % dmsg(show_call(C)),C.      
+% = %= :- meta_predicate (dcall_entry(Why,0)).
+dcall_entry(Why,Call):-debugm(Why,dcall_entry(Call)),dcall(Why,Call).
+dcall_entry(Call):-dcall_entry(mpred,Call).
 
-%= :- meta_predicate  show_call(:).
-show_call(M:ain(A)):-!, show_call0(M:ain(A)),!.
-% show_call(M:must(C)):- !, M:must(C).
-show_call(C):-one_must((show_call0(C),dmsg(succeed(C))),((dmsg(failed_show_call(C)),cleanup_strings,!,fail))).
+%= :- meta_predicate  dcall0(0).
+dcall0(Goal):- Goal. % on_x_debug(Goal). % dmsg(dcall(why,Goal)),Goal.      
 
-%= :- meta_predicate  show_call_failure(0).
-show_call_failure(C):-one_must((show_call0(C)),((dmsg(failed_show_call(C)),dmsg(failed_show_call_failure(C)),cleanup_strings,!,fail))).
+%= :- meta_predicate  dcall(+,0).
+dcall(Why,Goal):- dcall_success(Why,dcall_failure(Why,Goal)).
+dcall(Goal):- dcall(mpred,Goal).
 
-%= :- meta_predicate  show_call_success(0).
-show_call_success(C):- show_call0(C),dmsg(show_call_success_succeeded(C)).
+%= :- meta_predicate  dcall_failure(+,0).
+dcall_failure(Why,Goal):-one_must(dcall0(Goal),(debugm(Why,sc_failed(Why,Goal)),!,fail)).
+dcall_failure(Goal):- dcall_failure(mpred,Goal).
+
+%= :- meta_predicate  dcall_success(why,0).
+dcall_success(Why,Goal):- dcall0(Goal),debugm(Why,sc_success(Why,Goal)).
+dcall_success(Goal):- dcall_success(mpred,Goal).
 
 %= :- meta_predicate  on_f_log_fail(0).
 :- export(on_f_log_fail/1).
-on_f_log_fail(C):-one_must(C,notrace((dmsg(on_f_log_fail(C)),cleanup_strings,!,fail))).
+on_f_log_fail(Goal):-one_must(Goal,notrace((dmsg(on_f_log_fail(Goal)),cleanup_strings,!,fail))).
 
 
 :- dynamic(logLevel/2).
@@ -1619,7 +1515,7 @@ loading_module(M,file(F)):- prolog_load_context(file,F),source_file_property(F,m
 loading_module(M,source(F)):- prolog_load_context(source,F),source_file_property(F,module(M)).
 loading_module(M,prolog_load_context):- prolog_load_context(module,M).
 loading_module(M,stream_property(F)):- stream_property(_X,file_name(F)),source_file_property(F,module(M)).
-loading_module(M,context_module):- context_module(M).
+loading_module(M,source_context_module):- source_context_module(M).
 
 
 prolog_current_frames(Each):- prolog_current_frame(Frame),prolog_current_frame_or_parent(Frame,Each).
@@ -1638,12 +1534,11 @@ module_stack(M,of):- predicate_property(M:of(_,_),imported_from(func)).
 module_stack(M,frame):- prolog_current_frames(Each), prolog_frame_attribute(Each,context_module,M).
 
 
-loading_module(M):- ((loading_module(M,_),M\=user));M=user.
+loading_module(M):- (((loading_module(M,_),M\=user));M=user),!.
 
-show_module(W):-dmsg('<!--':W),ignore((show_call((loading_module(_,_))),fail)),dmsg(W:'-->').
+show_module(W):-dmsg('<!--':W),ignore((dcall(why,(loading_module(_,_))),fail)),dmsg(W:'-->').
 
 
-module_predicate(ModuleName,P,F,A):-current_predicate(ModuleName:F/A),functor_catch(P,F,A), not((( predicate_property(ModuleName:P,imported_from(IM)),IM\==ModuleName ))).
 
 % ========================================================================================
 % Some prologs have a printf() tCol predicate.. so I made up fmtString/fmt in the Cyc code that calls the per-prolog mechaism
@@ -1815,7 +1710,7 @@ in_toplevel :- nth_pi(LF,_:'$load_file'/_),nth_pi(TL,'$toplevel':_/0),!,LF>TL,
 
 :- dynamic(did_ref_job/1).
 do_ref_job(_Body,Ref):-did_ref_job(Ref),!.
-do_ref_job(Body ,Ref):-asserta(did_ref_job(Ref)),!,show_call(Body).
+do_ref_job(Body ,Ref):-asserta(did_ref_job(Ref)),!,dcall(why,Body).
 
 
 % bugger_prolog_exception_hook(error(syntax_error(operator_expected),_),_,_,_).
@@ -1906,9 +1801,9 @@ user:message_hook(Term, Kind, Lines):- (Kind= warning;Kind= error),Term\=syntax_
 
 
 
-:- module_property(user, exports(List)),mpred_trace_childs(List).
+% :- module_property(user, exports(List)),mpred_trace_childs(List).
 
-% :- must((context_module(X),!,X==user)).
+% :- must((source_context_module(X),!,X==user)).
 % :- must(('$set_source_module'(X,X),!,X==user)).
 
 :- '$set_predicate_attribute'(t_l:dont_varname, trace, 0).
@@ -1922,6 +1817,8 @@ user:message_hook(Term, Kind, Lines):- (Kind= warning;Kind= error),Term\=syntax_
 
 :- export(logicmoo_bugger_loaded/0).
 
+:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),logicmoo_util_bugger:export(logicmoo_util_bugger:F/A),logicmoo_util_bugger:module_transparent(logicmoo_util_bugger:F/A))).
+
 logicmoo_bugger_loaded.
 
 %:- all_module_predicates_are_transparent.
@@ -1929,5 +1826,5 @@ logicmoo_bugger_loaded.
 % :- module_meta_predicates_are_transparent(user).
 % :- all_module_predicates_are_transparent(logicmoo_util_bugger_catch).
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
+
 

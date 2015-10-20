@@ -484,9 +484,9 @@ kb_nlit(_KB,Neg):-member(Neg,[(not),(~),(-),(neg)]).
 
 set_is_lit(A):-when(nonvar(A),\+ is_ftVar(A)),!.
 
-non_compound(InOut):- once(not(compound(InOut));is_ftVar(InOut)).
+non_compound(InOut):- once( \+ (compound(InOut));is_ftVar(InOut)).
 
-is_gaf(Gaf):-when(nonvar(Gaf),not(is_kif_rule(Gaf))).
+is_gaf(Gaf):-when(nonvar(Gaf), \+ (is_kif_rule(Gaf))).
 
 :- was_export(is_kif_rule/1).
 is_kif_rule(Var):- is_ftVar(Var),!,fail.
@@ -499,8 +499,8 @@ term_slots(Term,Slots):-term_singletons(Term, [],NS, [],S),append(NS,S,Slots).
 
 
 :- export(head_singletons/2).
-head_singletons(Pre,Post):-  !, hotrace((\+ ignore(must( \+ head_singles0(Pre,Post))))).
-head_singletons(Pre,Post):-   hotrace((\+ ignore(show_call_failure( \+ head_singles0(Pre,Post))))).
+%head_singletons(Pre,Post):-  !, hotrace((\+ ignore(must( \+ head_singles0(Pre,Post))))).
+head_singletons(Pre,Post):-   hotrace((\+ ignore(dcall_failure(why, \+ head_singles0(Pre,Post))))),!,dumpST.
 :- export(head_singles0/2).
 :- export(head_singles01/2).
 % TODO how to adderess head_singles0(true, if_missing(foob(_G754993), foob(a)))?
@@ -518,10 +518,11 @@ head_singles0(Pre,nt(_,Pre2,Pre3,Post)):-nonvar(Post),!,head_singles0((Pre,Pre2,
 head_singles0(Pre,pt(_,Pre2,Post)):-nonvar(Post),!,head_singles0((Pre,Pre2),Post).
 head_singles0(Pre,Post):- nonvar(Post),mpred_rule_hb(Post,Post2,Pre2),Post2\=@=Post,!,head_singles0((Pre,Pre2),Post2).
 head_singles0(Pre,Post):-head_singles01(Pre,Post).
+
 head_singles01(Pre,Post):-
     term_singletons(Post,_,CSingles),
-    term_singletons(Pre,ANonSingle,ASingles),append(ANonSingle,ASingles,AVars),!,    
-    subtract_eq(CSingles,AVars,Bad),!,Bad\==[].
+    term_slots(Pre,PreVars),!,
+    subtract_eq(CSingles,PreVars,Bad),!,Bad\==[].
     
 
 :- was_export(term_singletons/2).
@@ -575,7 +576,7 @@ ensure_quantifiers(Wff:- B,WffO):- B== true,!, ensure_quantifiers(Wff,WffO).
 ensure_quantifiers(Wff:- B,Wff:- B):- !.
 % ensure_quantifiers(Wff,Wff):-!.
 ensure_quantifiers(Wff,WffO):-
- must_det_l((show_call_failure(term_singletons(Wff,[],NS,[],Singles)),
+ must_det_l((dcall_failure(why,term_singletons(Wff,[],NS,[],Singles)),
   put_singles(Wff,'all',Singles,WffM),put_singles(WffM,'all',NS,WffO))).
 
 :- was_shared_multifile(function_corisponding_predicate/2).

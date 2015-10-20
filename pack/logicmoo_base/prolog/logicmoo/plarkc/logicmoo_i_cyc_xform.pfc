@@ -87,7 +87,7 @@ tRelation(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes).
 :- mpred_add(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) ==> functorDeclares(F))).
 (ttFormatType(FT)/is_declarations(FT))==>meta_argtypes(FT).
 
-:- show_call(source_location(_,_)).
+:- dcall(why,source_location(_,_)).
 
 :- must(in_file_expansion;in_file_directive).
 

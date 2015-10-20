@@ -478,7 +478,7 @@ decl_struct(StructDecl):-
   must_det_l((
     compile_argtypes(StructDecl,1,StructPrototype),    
     functor(StructPrototype,StructName,_),
-    show_call(ain(struct_prototype(StructName,StructPrototype))))),!.
+    dcall(decl_struct,ain(struct_prototype(StructName,StructPrototype))))),!.
 
 decl_argtypes(StructDecl):- 
   compile_argtypes(StructDecl,"NotSlotted",_),!.
@@ -530,7 +530,7 @@ ensure_struct(Type,Struct):- nonvar(Struct)->prop_set(sclass,Struct,Type);new_st
 ensure_struct(Type,List,Struct):- must_det_l((ensure_instance(Type,Struct),prop_set_nvlist(Struct,List))).
 
 prop_set_nvlist(Struct,[N=V|More]):-must_det_l((prop_set(N,Struct,V),( More==[]->true;prop_set_nvlist(Struct,More)))).
-prop_get_nvlist(Struct,[N=V|More]):-must_det_l((ignore(show_call_failure(prop_get(N,Struct,V))),( More==[]->true;prop_get_nvlist(Struct,More)))).
+prop_get_nvlist(Struct,[N=V|More]):-must_det_l((ignore(dcall_failure(why,prop_get(N,Struct,V))),( More==[]->true;prop_get_nvlist(Struct,More)))).
 
 new_struct(Type,Struct):- var(Type),!,trace_or_throw(var_new_struct(Type,Struct)).
 new_struct(Type,Struct):- struct_prototype(Type,Struct),!,struct_prototype(Type,Struct).

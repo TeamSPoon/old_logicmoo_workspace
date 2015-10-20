@@ -3,7 +3,7 @@
           [ current_frames/4,
             current_next_frames/4,
             in_pengines/0,
-            parent_frame_attribute/5,
+            find_parent_frame_attribute/5,
             parent_goal/2,
             prolog_frame_match/3,
             relative_frame/3,
@@ -17,7 +17,7 @@
         current_frames/4,
         current_next_frames/4,
         in_pengines/0,
-        parent_frame_attribute/5,
+        find_parent_frame_attribute/5,
         parent_goal/2,
         prolog_frame_match/3,
         relative_frame/3,
@@ -53,12 +53,18 @@ in_pengines:- relative_frame(context_module,pengines,_).
 
 % ?- relative_frame(context_module,X,Y).
 :- export(relative_frame/3).
-relative_frame(Attrib,Term,Nth):- parent_frame_attribute(Attrib,Term,Nth,_RealNth,_FrameNum).
+relative_frame(Attrib,Term,Nth):- find_parent_frame_attribute(Attrib,Term,Nth,_RealNth,_FrameNum).
 
 :- export(parent_goal/2).
-parent_goal(Term,Nth):- fail, parent_frame_attribute(goal,Term,Nth,_RealNth,_FrameNum).
-:- export(parent_frame_attribute/5).
-parent_frame_attribute(Attrib,Term,Nth,RealNth,FrameNum):-hotrace((ignore(Attrib=goal),prolog_current_frame(Frame),
+parent_goal(Goal):-  prolog_current_frame(Frame),prolog_frame_attribute(Frame,parent,PFrame),prolog_frame_attribute(PFrame,parent_goal,Goal).
+parent_goal(Goal,Nth):-  number(Nth),!, prolog_current_frame(Frame),prolog_frame_attribute(Frame,parent,PFrame),nth_parent_goal(PFrame,Goal,Nth).
+parent_goal(Goal,Nth):-  find_parent_frame_attribute(goal,Goal,Nth,_RealNth,_FrameNum).
+
+nth_parent_goal(Frame,Goal,Nth):- Nth>0, Nth2 is Nth-1, prolog_frame_attribute(Frame,parent,PFrame),!,nth_parent_goal(PFrame,Goal,Nth2).
+nth_parent_goal(Frame,Goal,_):- prolog_frame_attribute(Frame,goal,Goal),!.
+
+:- export(find_parent_frame_attribute/5).
+find_parent_frame_attribute(Attrib,Term,Nth,RealNth,FrameNum):-hotrace((ignore(Attrib=goal),prolog_current_frame(Frame),
                                                 current_frames(Frame,Attrib,5,NextList))),!,nth1(Nth,NextList,RealNth-FrameNum-Term).
 
 

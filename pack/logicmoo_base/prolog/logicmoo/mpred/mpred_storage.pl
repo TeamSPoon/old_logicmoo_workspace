@@ -339,7 +339,7 @@ ensure_predicate_reachable(_,_):- fast_mud,!.
 %ensure_predicate_reachable(M,C):-functor(C,F,A),ensure_predicate_reachable(M,C,F,A),fail.
 ensure_predicate_reachable(_,_):- is_release,!.
 ensure_predicate_reachable(M,C):-once((predicate_property(C,imported_from(Other)),M\=Other,
-                                       context_module(CM),
+                                       source_context_module(CM),
                                        dmsg(wrong_import_module(M,Other:C,from(CM))),
                                        ignore(delete_import_module(CM,Other)),
                                        '@'((M:dynamic(C),M:export(C)),M),lmconf:import(M:C))),fail.
@@ -380,7 +380,7 @@ make_body_clause(_Head,Body,Body):-atomic(Body),!.
 make_body_clause(_Head,Body,Body):-special_wrapper_body(Body,_Why),!.
 make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 
-special_head(_,F,Why):-special_head0(F,Why),!,show_call_failure(not(isa(F,prologDynamic))).
+special_head(_,F,Why):-special_head0(F,Why),!,dcall_failure(why,not(isa(F,prologDynamic))).
 special_head0(F,ttPredType):-ttPredType(F),!.
 special_head0(F,functorDeclares):-t(functorDeclares,F),!.
 special_head0(F,prologMacroHead):-t(prologMacroHead,F),!.
@@ -446,9 +446,6 @@ ireq(C0):- nop(dmsg(ireq(C0))),
   agenda_rescan_for_module_ready,
    no_loop_check(w_tl([+infInstanceOnly(_), +t_l:infAssertedOnly(_),+t_l:noRandomValues(_)],preq(ireq,/*to_exp*/(C0)))).
 
-:- dmsg_hide(req).
-:- dmsg_hide(ireq).
-
 % -  call_props(Obj,QueryPropSpecs)
 call_props(Obj,PropSpecs):- req(props(Obj,PropSpecs)).
 iprops(Obj,PropSpecs):- ireq(/*to_exp*/(props(Obj,PropSpecs))).
@@ -494,7 +491,7 @@ implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (t(
 
 :- was_export(add_fast/1).
 % -  add(Assertion)
-% mpred_add_fast(C0):- must_det((mpred_add_fast(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(mpred_add_fast(C0)),rtrace(mpred_add_fast(C0)),dtrace(ireq(C0))))))))),!.
+% mpred_add_fast(C0):- must_det((mpred_add_fast(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),dcall(why,mpred_add_fast(C0)),rtrace(mpred_add_fast(C0)),dtrace(ireq(C0))))))))),!.
 add_fast(Term):-mpred_numbervars_with_names(Term),mpred_modify(change(assert,add), Term),!. % ,xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0)))))),!.
 
 % -  upprop(Obj,PropSpecs) update the properties
@@ -514,13 +511,6 @@ prop_or(Obj,Prop,Value,OrElse):- one_must(ireq(t(Prop,Obj,Value)),Value=OrElse).
 % ================================================
 % db_assert_sv/3
 % ================================================
-
-:- dmsg_hide(db_assert_sv).
-
-:- dmsg_hide(mpred_modify).
-:- dmsg_hide(add).
-
-:- dmsg_hide(into_mpred_form).
 
 
 /*
@@ -588,7 +578,7 @@ db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- unify_with_occurs_chec
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- equals_call(OLD,NEW),!,dmsg(db_assert_sv_same(COLD,'__same__',CNEW)),trace_or_throw(dtrace).
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):-
    dmsg(db_assert_sv(COLD,'__replace__',CNEW)),
-   hotrace((ignore(show_call_failure((clr(COLD), not(ireq(COLD))))))),
+   hotrace((ignore(dcall_failure(why,(clr(COLD), not(ireq(COLD))))))),
    %replace_arg(C,A,_,CBLANK),must_det(clr(CBLANK)),hooked_retractall(CBLANK),   
    db_must_asserta_confirmed_sv(CNEW,A,NEW),!.
 
@@ -669,17 +659,17 @@ hooked_asserta(G):- loop_check(mpred_modify(change(assert,a),G),mpred_adda(G)).
 hooked_assertz(G):- loop_check(mpred_modify(change(assert,z),G),mpred_addz(G)).
 
 hooked_retract(G):-  Op = change(retract,a),
-                   ignore(slow_sanity(ignore(show_call_failure((mpred_op(is_asserted,G)))))),
+                   ignore(slow_sanity(ignore(dcall_failure(why,(mpred_op(is_asserted,G)))))),
                    slow_sanity(not(singletons_throw_else_fail(hooked_retract(G)))),
-                   slow_sanity(ignore(((ground(G), once(show_call_failure((is_asserted(G)))))))),
+                   slow_sanity(ignore(((ground(G), once(dcall_failure(why,(is_asserted(G)))))))),
                    must_storage_op(Op,G),expire_post_change( Op,G),
-                   sanity(ignore(show_call_failure(not_asserted((G))))),
+                   sanity(ignore(dcall_failure(why,not_asserted((G))))),
                    loop_check(run_database_hooks_depth_1(change(retract,a),G),true).
 
 hooked_retractall(G):- Op = change(retract,all),
-                   slow_sanity(ignore(((ground(G), once(show_call_failure((is_asserted(G)))))))),
+                   slow_sanity(ignore(((ground(G), once(dcall_failure(why,(is_asserted(G)))))))),
                    must_storage_op(Op,G),expire_post_change( Op,G),
-                   sanity(ignore(show_call_failure(not_asserted((G))))),
+                   sanity(ignore(dcall_failure(why,not_asserted((G))))),
                    loop_check(run_database_hooks_depth_1(change(retract,all),G),true).
 
 
@@ -760,7 +750,7 @@ ensure_dynamic(':-'(_)):-!.
 ensure_dynamic(Head):- Head\=isa(_,_),
    get_functor(Head,F,A),
    functor(PF,F,A),
-   (\+ predicate_property(PF,_)->show_call((dynamic(F/A),multifile(F/A),export(F/A)));
+   (\+ predicate_property(PF,_)->dcall(why,(dynamic(F/A),multifile(F/A),export(F/A)));
    (is_static_pred(PF)-> 
      ((listing(F/A),dmsg(want_to_assert(ensure_dynamic(Head),decl_mpred_prolog(F,A,Head))),nop(dtrace))); true)).
 

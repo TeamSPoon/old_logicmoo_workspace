@@ -11,7 +11,7 @@
 
 % :- use_module(logicmoo_base).
 
-:- use_module(logicmoo(util/logicmoo_util_preddefs)).
+% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
 :- was_shared_multifile(mpred_online:semweb_startup).
 
@@ -26,7 +26,7 @@
 
 :- was_dynamic(did_do_semweb_startup_late_once).
 do_semweb_startup_late_once:-did_do_semweb_startup_late_once,!.
-do_semweb_startup_late_once:-asserta(did_semweb_startup_late_once),forall(clause(semweb_startup_late,G),must(show_call_failure(G))).
+do_semweb_startup_late_once:-asserta(did_semweb_startup_late_once),forall(clause(semweb_startup_late,G),must(dcall_failure(why,G))).
 
 
 :- use_module(user(user_db)).

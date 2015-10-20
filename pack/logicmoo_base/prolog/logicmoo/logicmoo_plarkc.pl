@@ -19,7 +19,7 @@
 
 cwtdl(Goal,DL,TL):- cwc,
   notrace((ignore((stop_rtrace,
-   (show_call_failure(catch(call_with_time_limit(TL,(((call_with_depth_limit(Goal,DL,DLE),DLE\==depth_limit_exceeded)))),E,(dmsg(E:cwtdl(Goal,DL,TL)),fail)))
+   (dcall_failure(why,catch(call_with_time_limit(TL,(((call_with_depth_limit(Goal,DL,DLE),DLE\==depth_limit_exceeded)))),E,(dmsg(E:cwtdl(Goal,DL,TL)),fail)))
      ->true;
     assert(cwtdl_failed(Goal))))))).
 

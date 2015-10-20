@@ -13,77 +13,24 @@ vim: set filetype=md:
 %
 %  https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.md
 */
+:- if(current_prolog_flag(logicmoo_modules,default)).
 :- module(common_logic_clif,[]).
+:- endif.
 % we are in "prolog" consultation mode
 
 % = % :- ensure_loaded(logicmoo(logicmoo_engine)).
 % = % :- ensure_loaded(mpred_compiler).
 :- enable_mpred_expansion.
 
-are_clauses_entailed(E):-not(compound(E)),!,must(true==E).
-are_clauses_entailed([E|List]):-is_list([E|List]),!,maplist(are_clauses_entailed,[E|List]).
-are_clauses_entailed((C,L)):-!,are_clauses_entailed(C),are_clauses_entailed(L).
-are_clauses_entailed(CL):- unnumbervars(CL,UCL),  !, \+ \+ show_call_failure(is_prolog_entailed(UCL)),!.
-
-is_prolog_entailed(UCL):-clause_asserted(UCL),!.
-is_prolog_entailed(UCL):-mpred_call(UCL),!.
- 
-member_ele(E,E):- (\+ (compound(E))),!.
-member_ele([L|List],E):- is_list([L|List]),!,member(EE,[L|List]),member_ele(EE,E).
-member_ele((H,T),E):- nonvar(H),nonvar(T),!, (member_ele(H,E);member_ele(T,E)).
-member_ele(E,E).
-
-delistify_last_arg(Arg,Pred,Last):-is_list(Arg),!,member(E,Arg),delistify_last_arg(E,Pred,Last).
-delistify_last_arg(Arg,Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARGS),NEWCALL=..[F|NARGS],show_call(NEWCALL),!,member_ele(NEW,Last).
-
-% sanity that mpreds (manage prolog prodicate) are abily to transform
-:- t_l:disable_px->throw(t_l:disable_px);true.
-
-% cwc "code-wise chaining" is always true in Prolog but will throw programming error if evalled in LogicMOO Prover.
-% Use this to mark code and not axiomatic prolog
-
-clif_to_prolog(CLIF,Prolog):-cwc,is_list(CLIF),!,must_maplist(clif_to_prolog,CLIF,Prolog).
-clif_to_prolog((H,CLIF),(T,Prolog)):-cwc,sanity(must(nonvar(H))),!,trace,clif_to_prolog(H,T),clif_to_prolog(CLIF,Prolog).
-clif_to_prolog((H<-B),(H<-B)):- cwc,!.
-clif_to_prolog((P==>Q),(P==>Q)):- cwc,!.
-clif_to_prolog((H:-B),PrologO):- cwc,!,must((show_call_failure(boxlog_to_pfc((H:-B),Prolog)),!,=(Prolog,PrologO))),!.
-clif_to_prolog(CLIF,PrologO):- cwc,
-  % somehow integrate why_to_id(tell,Wff,Why),
-     must_det_l((
-      kif_to_boxlog(CLIF,HORN),
-      boxlog_to_pfc(HORN,Prolog),
-      dmsg(pfc:-Prolog),
-      =(Prolog,PrologO))),!.
-
-
-% Sanity Test for expected side-effect entailments
-% why does renumbervars_prev work but not copy_term? 
-is_entailed(CLIF):-
- mpred_no_chaining((
-   cwc, sanity((clif_to_prolog(CLIF,Prolog),!,sanity(( \+ \+ (show_call_failure(are_clauses_entailed(Prolog))))))))),!.
-
-% Sanity Test for required absence of specific side-effect entailments
-is_not_entailed(CLIF):- cwc, sanity((clif_to_prolog(CLIF,Prolog),show_call_failure(\+ are_clauses_entailed(Prolog)))),!.
-
-:- op(1190,xfx,(:-)).
-:- op(1200,fy,(is_entailed)).
-
-% this defines a recogniser for clif syntax (well stuff that might be safe to send in thru kif_to_boxlog)
-is_clif(all(_,X)):-cwc,compound(X),!,is_clif(X).
-is_clif(forall(_,X)):-cwc,compound(X),!.
-is_clif(CLIF):-cwc,
-  VVs = v(if,iff,clif_forall,all,exists), % implies,equiv,forall
-   (var(CLIF)-> (arg(_,VVs,F),functor(CLIF,F,2));
-     compound(CLIF),functor(CLIF,F,2),arg(_,VVs,F)).
 
 % we ensure we are in "pfc" consultation mode (so the syntax rules will define correctly)
 
 :- file_begin(pfc).
 
 % make sure op alias for '=>' is not overriden
-:- op_alias( (=>),  (=>)).
+:- op_alias((=>),  (=>)).
 
-==> hybrid_support(clif,1).
+==>(hybrid_support(clif,1)).
 
 % whenever we know about clif we''ll use the prolog forward chainging system
 

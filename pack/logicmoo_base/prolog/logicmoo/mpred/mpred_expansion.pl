@@ -57,7 +57,7 @@
           [ acceptable_xform/2,
             alt_calls/1,
             any_op_to_call_op/2,
-            as_is_term/1,
+            as_is_term/1,as_is_term0/1,
             compare_op/4,
             compound_all_open/1,
             conjoin_l/3,
@@ -79,6 +79,7 @@
             db_op_simpler/3,
             db_quf/4,
             db_quf_l/5,
+            cyclic_break/1,
             db_quf_l_0/5,
             default_te/3,
             demodulize/3,
@@ -97,8 +98,8 @@
             expands_on/2,
             foreach_arg/7,
             from_univ/4,
-            fully_expand/2,
             fully_expand/3,
+            fully_expand/2,            
             fully_expand0/3,
             fully_expand_clause/3,
             fully_expand_goal/3,
@@ -129,8 +130,8 @@
             must_expand/1,
             reduce_clause/3,
             same_terms/2,
-            show_all/1,
-            showall/1,
+            show_doall/1,
+            show_doall/1,
             simply_functors/3,
             to_reduced_hb/4,
             transform_functor_holds/5,
@@ -228,8 +229,6 @@ Writing in Prolog is actually really easy for a MUD is when the length's chosen
 % Douglas Miles
 */
 
-:- was_export(show_all/1).
-show_all(Call):-doall((show_call(Call))).
 
 :- was_export(alt_calls/1).
 alt_calls(call).
@@ -240,7 +239,17 @@ alt_calls(req).
 alt_calls(mreq).
 alt_calls(ireq).
 
-showall(Call):- doall(show_call(Call)).
+ :- meta_predicate logicmoo_util_bugger:do_ref_job(0,*).
+ :- meta_predicate mpred_loader:show_bool(0).
+
+ :- meta_predicate mpred_expansion:compare_op(*,2,?,?).
+ :- meta_predicate logicmoo_util_preddefs:only_3rd(1,*,*,*).
+ :- meta_predicate logicmoo_util_preddefs:with_pfa(1,+).
+ :- meta_predicate logicmoo_util_preddefs:with_pfa(1,+,+,+).
+
+
+:- meta_predicate show_doall(0).
+show_doall(Call):- doall(dcall(why,Call)).
 
 is_pred_declarer(P):-functor_declares_instance(P,tPred).
 is_relation_type(tRelation).
@@ -281,6 +290,8 @@ reduce_clause(_,C,C).
 
 to_reduced_hb(Op,HB,HH,BB):-reduce_clause(Op,HB,HHBB),expand_to_hb(HHBB,HH,BB).
 
+cyclic_break(Cyclic):-cyclic_term(Cyclic)->(writeq(cyclic_break(Cyclic)),nl,prolog);true.
+
 /*
 dbase_head_expansion(_,V,V ):-is_ftVar(V),!.
 dbase_head_expansion(Op,H,GG):-correct_negations(Op,H,GG),!.
@@ -303,19 +314,13 @@ db_expand_maplist(FE,List,T,G,O):-findall(M, (member(T,List),call(FE,G,M)), ML),
 %   SIMPLISTIC REWRITE (this is not the PRECANONICALIZER)
 % ================================================
 
-:- was_export(fully_expand/2).
-fully_expand(X,Y):-fully_expand(_,X,Y).
-
-
-:- mpred_trace_nochilds(fully_expand/3).
-
 must_expand(/*to_exp*/(_)).
 must_expand(props(_,_)).
 must_expand(typeProps(_,_)).
 must_expand(G):-functor(G,_,A),!,A==1.
 
 % fully_expand_warn(_,C,C):-!.
-fully_expand_warn(A,B,O):-must(fully_expand(A,B,C)),!,sanity(ignore(show_call_failure(same_terms(B,C)))),(O=C;must(sanity(ignore(show_call_failure(same_terms(O,C)))))),!.
+fully_expand_warn(A,B,O):-must(fully_expand(A,B,C)),!,sanity(ignore(dcall_failure(why,same_terms(B,C)))),(O=C;must(sanity(ignore(dcall_failure(why,same_terms(O,C)))))),!.
 
 same_terms(A,B):-A=@=B,!.
 same_terms(A,A):-!,fail.
@@ -323,7 +328,15 @@ same_terms((A:-AA),(B:-BB)):-!,same_terms(A,B),same_terms(AA,BB).
 same_terms(M:A,B):-atom(M),!,same_terms(A,B).
 same_terms(A,M:B):-atom(M),!,same_terms(A,B).
 
+:- export(fully_expand/3).
 fully_expand(Op,Sent,SentO):- hotrace((cyclic_break((Sent)), /* cnotrace */ (fully_expand0(Op,Sent,SentO)),cyclic_break((SentO)))),!.
+
+:- export(fully_expand/2).
+fully_expand(X,Y):-fully_expand(_,X,Y).
+
+:- mpred_trace_nochilds(fully_expand/3).
+
+
 fully_expand0(_,Sent,SentO):- \+(is_ftCompound(Sent)),!,Sent=SentO.
 fully_expand0(Op,Sent,SentO):-must_expand(Sent),!,fully_expand_now(Op,Sent,SentO),!.
 fully_expand0(_,Sent,SentO):-get_functor(Sent,_,A),A\==1,!,Sent=SentO.
@@ -701,7 +714,7 @@ db_quf(_Op,C,true,C):- C=..[Holds,OBJ|_],is_holds_true(Holds),is_ftVar(OBJ),!.
 db_quf(Op,Sent,D2,D3):- Sent=..[And|C12],C12=[_|_],is_logical_functor(And),!, db_quf_l(Op,And,C12,D2,D3).
 db_quf(Op,C,Pretest,Template):- C=..[Prop,OBJ|ARGS],
       functor(C,Prop,A),
-      show_call_failure(translate_args(Op,Prop,A,OBJ,2,ARGS,NEWARGS,true,Pretest)),
+      dcall_failure(why,translate_args(Op,Prop,A,OBJ,2,ARGS,NEWARGS,true,Pretest)),
       Template =.. [Prop,OBJ|NEWARGS],!.
 db_quf(_Op,C,true,C).
 
@@ -749,7 +762,7 @@ translateListOps(Op,Prop,Obj,Type,VAL,[L|LIST],G,GO2):-
    translateOneArg(Op,Prop,Obj,Type,L,VAL,G,G0),
    translateListOps(Op,Prop,Obj,Type,VAL,LIST,G0,GO2).
 
-compare_op(Type,F,OLD,VAL):-nop(Type),show_call((call(F,OLD,VAL))),!.
+compare_op(Type,F,OLD,VAL):-nop(Type),dcall(why,(call(F,OLD,VAL))),!.
 
 
 % load_motel:- defrole([],time_state,restr(time,period)).
@@ -791,7 +804,6 @@ into_functor_form(Dbase_t,_X,F,A,Call):-Call=..[Dbase_t,F|A].
 % ========================================
 % into_mpred_form/2 (removes a second order functors until the common mpred form is left)
 % ========================================
-:- mpred_trace_nochilds(into_mpred_form/2).
 :- was_export(into_mpred_form/2).
 into_mpred_form(V,VO):- \+ (is_ftCompound(V)),!,VO=V.
 into_mpred_form(M:X,M:O):- atom(M),!,into_mpred_form(X,O),!.
@@ -806,6 +818,8 @@ into_mpred_form(t(P,A,B),O):-atomic(P),!,O=..[P,A,B].
 into_mpred_form(t(P,A,B,C),O):-atomic(P),!,O=..[P,A,B,C].
 into_mpred_form(Var,MPRED):- is_ftVar(Var), trace_or_throw(var_into_mpred_form(Var,MPRED)).
 into_mpred_form(I,O):-loop_check(into_mpred_form_ilc(I,O),O=I). % trace_or_throw(into_mpred_form(I,O))).
+
+:- mpred_trace_nochilds(into_mpred_form/2).
 
 into_mpred_form_ilc([F|Fist],O):-!,G=..[t|[F|Fist]], into_mpred_form(G,O).
 into_mpred_form_ilc(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form6(G,F,P,A,ARGS,O),!.
@@ -957,17 +971,12 @@ simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=S
 
 
 
-end_of_file.
-
-
-:- set_prolog_flag(double_quotes, atom).
-:- set_prolog_flag(double_quotes, string). 
-
 % these do not get defined!?
 % :- was_shared_multifile user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
+end_of_file.
 
 
 

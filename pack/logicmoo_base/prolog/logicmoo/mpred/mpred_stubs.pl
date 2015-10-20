@@ -12,77 +12,83 @@
 
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_stubs.pl
 :- module(mpred_stubs,
-          [ agenda_rescan_mpred_props/0,
-            assert_mpred_t/1,
-            call_for_literal/3,
-            call_for_literal_db/3,
-            call_for_literal_db0/3,
-            call_for_literal_db00/3,
-            call_for_literal_ideep_ilc/1,
-            call_mpred_body/2,
-            call_mpred_body_ilc/2,
-            call_provided_mpred_storage_op/3,
-            call_rule_db/3,
-            call_wdmsg/2,
-            call_wdmsg/4,
-            constrain_args/1,
-            constrain_args/2,
-            create_stub_body/2,
-            create_stub_body/3,
-            cwdl/2,
-            ensure_universal_stub/1,
-            ensure_universal_stub4/4,
-            ensure_universal_stub5/5,
-            ensure_universal_stub_plus_2/2,
-            ensure_universal_stub_plus_minus_2/2,
-            ensure_universal_stub_plus_minus_2_HIDE/2,
-            erase_mpred_storage_op/1,
-            first_mpred_props/1,
-            get_cc/2,
-            has_storage_stub/1,
-            hybrid_tPredStubImpl/1,
-            is_asserted_mpred_t/1,
-            is_call_op/1,
-            is_mpred_change_op/1,
-            is_mpred_op/1,
-            is_non_call_op/1,
-            is_proc/1,
-            is_same_clauses/2,
-            is_same_clauses/3,
-            is_tCol/1,
-            last_arg_ground/1,
-            last_arg_ground/3,
-            make_builtin/1,
-            maybe_storage_stub/2,
-            missing_stub/1,
-            mpred_missing_stubs/2,
-            mpred_prop_ordered/2,
-            mpred_t_call_op/2,
-            lmconf:mpred_provide_storage_op/2,
-            mpred_t_mpred_storage_clauses_facts/3,
-            mpred_t_storage_op/2,
-            mud_call_store_op/2,
-            mustIsa/2,
-            must_have_storage_stub/1,
-            must_op/2,
-            must_same_clauses/2,
-            no_rescans/0,
-            out_of_mpred_t/1,
-            provide_clauses_list/2,
-            really_add_mpred_storage_op/1,
-            registerCycPredPlus2/1,
-            registerCycPredPlus2_3/3,
-            registerCycPredPlus2_3/4,
-            renumbervarZ/2,
-            rescan_missing_stubs/0,
-            rescan_missing_stubs_ilc/0,
-            rescan_mpred_props_ilc/0,
-            scan_missing_stubs/1,
-            test_call_cut/0,
-            
-            wff_check_failed/3,
-            wff_check_mpred_t_throw/1
+          [ 
+agenda_rescan_mpred_props/0,
+assert_mpred_t/1,
+call_for_literal/3,
+call_for_literal_db/3,
+call_for_literal_db0/3,
+call_for_literal_db00/3,
+call_for_literal_ideep_ilc/1,
+call_mpred_body/2,
+call_mpred_body_ilc/2,
+call_provided_mpred_storage_op/3,
+call_rule_db/3,
+call_wdmsg/2,
+call_wdmsg/4,
+constrain_args/1,
+constrain_args/2,
+create_stub_body/2,
+create_stub_body/3,
+cwdl/2,
+ensure_universal_stub/1,
+ensure_universal_stub4/4,
+ensure_universal_stub5/5,
+ensure_universal_stub_plus_2/2,
+ensure_universal_stub_plus_minus_2/2,
+ensure_universal_stub_plus_minus_2_HIDE/2,
+erase_mpred_storage_op/1,
+first_mpred_props/1,
+get_cc/2,
+has_storage_stub/1,
+hybrid_tPredStubImpl/1,
+is_asserted_mpred_t/1,
+is_call_op/1,
+is_mpred_change_op/1,
+is_mpred_op/1,
+is_non_call_op/1,
+is_proc/1,
+is_same_clauses/2,
+is_same_clauses/3,
+is_tCol/1,
+last_arg_ground/1,
+last_arg_ground/3,
+make_builtin/1,
+maybe_storage_stub/2,
+missing_stub/1,
+mpred_missing_stubs/2,
+mpred_prop_ordered/2,
+mpred_t_call_op/2,
+lmconf:mpred_provide_storage_op/2,
+mpred_t_mpred_storage_clauses_facts/3,
+mpred_t_storage_op/2,
+mud_call_store_op/2,
+mustIsa/2,
+must_have_storage_stub/1,
+must_op/2,
+must_same_clauses/2,
+no_rescans/0,
+out_of_mpred_t/1,
+provide_clauses_list/2,
+really_add_mpred_storage_op/1,
+registerCycPredPlus2/1,
+registerCycPredPlus2_3/3,
+registerCycPredPlus2_3/4,
+renumbervarZ/2,
+rescan_missing_stubs/0,
+rescan_missing_stubs_ilc/0,
+rescan_mpred_props_ilc/0,
+scan_missing_stubs/1,
+test_call_cut/0,
+wff_check_failed/3,
+wff_check_mpred_t_throw/1
           ]).
+
+% XXXXXXXXXXXXXXXXXXXXXXXXXx
+% XXXXXXXXXXXXXXXXXXXXXXXXXx
+% XXXXXXXXXXXXXXXXXXXXXXXXXx
+% XXXXXXXXXXXXXXXXXXXXXXXXXx
+
 
 :- meta_predicate
 
@@ -110,7 +116,7 @@ hybrid_tPredStubImpl(prologKIF).
 hybrid_tPredStubImpl(prologEquality).
 
 
-make_builtin(F/A):- show_call_failure((atom(F),integer(A))),
+make_builtin(F/A):- dcall_failure(why,(atom(F),integer(A))),
   w_tl(set_prolog_flag(access_level,system),lock_predicate(F/A)),mpred_add(prologBuiltin(F)),mpred_add(arity(F,A)).
 
 /*
@@ -196,7 +202,7 @@ has_storage_stub(Head):-
       get_pifunctor(Head,PHead,F),
       create_stub_body(PHead,Body),
       lmconf:clause(PHead,Body),
-      (((show_call_failure(predicate_property(PHead,number_of_clauses(1)))),(show_call_failure(predicate_property(PHead,number_of_rules(1)))))
+      (((dcall_failure(has_storage_stub,predicate_property(PHead,number_of_clauses(1)))),(dcall_failure(has_storage_stub,predicate_property(PHead,number_of_rules(1)))))
         -> true; (listing(PHead),trace)),
       !,
       must((mpred_isa(F,predStub(StubType)),
@@ -340,7 +346,7 @@ call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(mpred_isa(F,
 % pass 2
 scan_missing_stubs(F):-
    ignore((forall(mpred_missing_stubs(F,A),
-      (arity(F,A),show_call(ensure_universal_stub(F/A)))))).
+      (arity(F,A),dcall(why,ensure_universal_stub(F/A)))))).
 
 mpred_missing_stubs(F,A):-prologHybrid = StubType, hybrid_tPredStubImpl(StubType),arity(F,A),mpred_isa(F,StubType),must(arity(F,A)),not(has_storage_stub(F/A)).
 
@@ -447,7 +453,7 @@ ensure_universal_stub5(HeadIn,Head,F,A,[]):-!,
    dmsg(compiled_new_predicate(HeadIn)),!.
 
 ensure_universal_stub5(HeadIn,Head,F,A,HBLIST):- mpred_isa(F,prologDynamic), must((StubType = prologHybrid)), !,
-   forall(member(HB,HBLIST),must(show_call(assert_mpred_t(HB)))),!,
+   forall(member(HB,HBLIST),must(dcall(why,assert_mpred_t(HB)))),!,
    expire_dont_add,ex,
   (is_same_clauses(Head,HBLIST)
     ->
@@ -470,7 +476,7 @@ ensure_universal_stub5(HeadIn,Head,F,A,HBLIST):- mpred_isa(F,prologDynamic), mus
 
 
 ensure_universal_stub5(HeadIn,Head,F,A,HBLIST):-  must((StubType = prologHybrid)),
-   forall(member(HB,HBLIST),must(show_call(assert_mpred_t(HB)))),!,
+   forall(member(HB,HBLIST),must(dcall(why,assert_mpred_t(HB)))),!,
    expire_dont_add,ex,
   (is_same_clauses(Head,HBLIST)
     ->
@@ -577,12 +583,12 @@ mpred_t_storage_op(Op,RULE):- mpred_call(is_kif_rule(RULE)),!,
 mpred_t_storage_op(Op,HeadBody):-
     into_functor_form(t,HeadBody,DB),
      % wff_check_mpred_t_throw(DB),
-     must((mud_call_store_op(Op,DB),sanity(show_call(DB)))),!.
+     must((mud_call_store_op(Op,DB),sanity(dcall(why,DB)))),!.
 
 mud_call_store_op(Op,(H:-B)):- is_true(B),!,mud_call_store_op(Op,H).
 mud_call_store_op(Op,t('$si$':'$was_imported_kb_content$', _, OPRAND)):-!,loop_check(mpred_op(Op,OPRAND),true).
-mud_call_store_op(Op,OPRAND):- show_call_success(wff_check_failed(Op,OPRAND,_WHY)),!.
-mud_call_store_op(Op,OPRAND):- reduce_mpred_op(Op,Op2),show_call(call(Op2,OPRAND)).
+mud_call_store_op(Op,OPRAND):- dcall_success(why,wff_check_failed(Op,OPRAND,_WHY)),!.
+mud_call_store_op(Op,OPRAND):- reduce_mpred_op(Op,Op2),dcall(why,call(Op2,OPRAND)).
 
 wff_check_failed(_,DB,WHY):- DB =  t('$si$':'$was_imported_kb_content$', WHY, _Assert).
 wff_check_mpred_t_throw(DB):- wff_check_failed(_,DB,WHY),trace_or_throw(crazy_mpred_t_was_imported_kb_content(WHY,DB)).
@@ -627,8 +633,8 @@ call_for_literal_db00(F,A,HEAD):- loop_check(call_rule_db(F,A,HEAD)).
 call_for_literal_db00(F,A,HEAD):- not(use_kif(HEAD,true)),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(is_asserted_mpred_t(genlPreds(P2,P1)),gp(P1),fail),
    call(t,P2,A1,A2).
 
-is_asserted_mpred_t(HEAD):-t(HEAD)*->true;((show_call_success(out_of_mpred_t(HEAD)))).
-out_of_mpred_t(HEAD):-clause_safe(HEAD,true)*->true;show_call_success(lmconf:fact_always_true(HEAD)).
+is_asserted_mpred_t(HEAD):-t(HEAD)*->true;((dcall_success(why,out_of_mpred_t(HEAD)))).
+out_of_mpred_t(HEAD):-clause_safe(HEAD,true)*->true;dcall_success(why,lmconf:fact_always_true(HEAD)).
 
 
 call_rule_db(F,A,HEAD):- isa(F,completelyAssertedCollection),!,fail.

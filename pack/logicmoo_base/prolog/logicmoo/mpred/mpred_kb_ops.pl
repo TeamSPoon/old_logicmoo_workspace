@@ -37,7 +37,7 @@
 
 :- include('mpred_header.pi').
 
-:- use_module(logicmoo(util/logicmoo_util_preddefs)).
+% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
 
 
@@ -61,15 +61,15 @@ second_order(_,_):-fail.
 
 :- meta_predicate(deducedSimply(0)).
 :- was_export(deducedSimply/1).
-deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not_asserted((Call)),nonvar(Fact),Body,dmsg((deducedSimply2(Call):-Fact)),!,show_call((is_asserted(Fact),ground(Call))).
+deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not_asserted((Call)),nonvar(Fact),Body,dmsg((deducedSimply2(Call):-Fact)),!,dcall(why,(is_asserted(Fact),ground(Call))).
 
-% deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),nonvar(Fact),Body,ground(Call),dmsg((deducedSimply1(Call):-Fact)),show_call((is_asserted(Fact),ground(Call))).
+% deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),nonvar(Fact),Body,ground(Call),dmsg((deducedSimply1(Call):-Fact)),dcall(why,(is_asserted(Fact),ground(Call))).
 
 :- meta_predicate(mpred_op(?,?)).
 mpred_op(Op,     H ):- (var(Op);var(H)),!,trace_or_throw(var_database_call(Op,  H )).
 mpred_op(is_asserted,H):-!,is_asserted(H).
 mpred_op(Op,     H ):- once(fully_expand(Op,H,HH)),H\=@=HH,!,mpred_op(Op, HH).
-mpred_op(neg(_,Op),  H ):- !, show_call(not(mpred_op(Op,  H ))).
+mpred_op(neg(_,Op),  H ):- !, dcall(why,not(mpred_op(Op,  H ))).
 mpred_op(change(assert,Op),H):-!,must(mpred_modify(change(assert,Op),H)),!.
 mpred_op(change(retract,Op),H):-!,must(mpred_modify(change(retract,Op),H)),!.
 mpred_op(query(t,Ireq),  H ):-!, mpred_op(Ireq,H).
@@ -163,10 +163,10 @@ mpred_call((X;Y)):-!,mpred_call(X);mpred_call(Y).
 mpred_call(call(X,Y)):-!,append_term(X,Y,XY),!,mpred_call(XY).
 mpred_call(call(X,Y,Z)):-!,append_term(X,Y,XY),append_term(XY,Z,XYZ),!,mpred_call(XYZ).
 mpred_call(Call):- 
- show_call_success(( t_l:assert_op_override(OvOp), OvOp\=change(assert, _))),fail,
+ dcall_success(mpred_call,(( t_l:assert_op_override(OvOp), OvOp\=change(assert, _))),fail,
    must((reduce_mpred_op(OvOp,OvOpR),lookup_inverted_op(OvOpR,_,OverridePolarity),
      must((Call=..[Was|Apply],lookup_inverted_op(Was,InvertCurrent,_WasPol))),
-   ((OverridePolarity ==('-') -> on_x_rtrace(show_call(apply(InvertCurrent,Apply))) ; on_x_rtrace(show_call(apply(Was,Apply))))))).
+   ((OverridePolarity ==('-') -> on_x_rtrace(dcall(why,apply(InvertCurrent,Apply))) ; on_x_rtrace(dcall(why,apply(Was,Apply)))))))).
 
 mpred_call(Call):- mpred_call_0(Call).
 
@@ -175,7 +175,7 @@ mpred_call_0(Expand):- fully_expand(query(t,mpred_call),Expand,Call), Expand\=@=
 mpred_call_0(Call):- one_must(mpred_call_1(Call),mpred_call_2(Call)).
 */
 mpred_call_1(Call):-current_predicate(_,Call),mpred_call_3(Call).
-mpred_call_1(Call):-clause(prolog_xref:process_directive(D, Q),_),nonvar(D),D=Call,!, show_call((prolog_xref:process_directive(Call,Q),must(nonvar(Q)),fmt(Q))).
+mpred_call_1(Call):-clause(prolog_xref:process_directive(D, Q),_),nonvar(D),D=Call,!, dcall(why,(prolog_xref:process_directive(Call,Q),must(nonvar(Q)),fmt(Q))).
 mpred_call_2(Call):-predicate_property(Call,dynamic),!,is_asserted(Call).
 mpred_call_2(Call):-mpred_call_3(Call).
 

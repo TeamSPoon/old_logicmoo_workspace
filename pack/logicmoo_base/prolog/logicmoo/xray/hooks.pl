@@ -25,9 +25,9 @@
 
 hook_configuration :-
 	dmsg('HOOK CONFIGURATION:'),
-	show_call_value(body_hooks_flag),
+	dcall_value(body_hooks_flag),
 	% dmsg("~N% predicate hook handling"),
-        show_call_value(pred_hooks_flag).
+        dcall_value(pred_hooks_flag).
 
 %%% Hook handling is turned off by no_hook_handling
 

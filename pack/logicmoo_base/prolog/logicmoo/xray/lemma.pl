@@ -32,11 +32,11 @@
 lemma_configuration :-
 	nl,dmsg('LEMMA CONFIGURATION:'),nl,nl,
 	
-	show_call_value(lemma_handling_flag),
+	dcall_value(lemma_handling_flag),
 	ignore((lemma_handling_flag,
-         (show_call_value1(lemma_format,lemma_format_parameter(_)),
-         show_call_value1(lemma_mode,lemma_mode_parameter(_)),
-         show_call_value1(lemma_type,lemma_type_parameter(_))))).
+         (dcall_value1(lemma_format,lemma_format_parameter(_)),
+         dcall_value1(lemma_mode,lemma_mode_parameter(_)),
+         dcall_value1(lemma_type,lemma_type_parameter(_))))).
 
 %%% Lemma handling is turned on by lemma_handling,
 %%% off by no_lemma_handling.

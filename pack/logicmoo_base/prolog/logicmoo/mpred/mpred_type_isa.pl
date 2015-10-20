@@ -102,7 +102,12 @@
           type_suffix/2
           ]).
 
-:- use_module(logicmoo(util/logicmoo_util_preddefs)).
+:-
+            op(1150,fx,(was_dynamic)),
+            op(1150,fx,(was_multifile)),
+            op(1150,fy,(was_module_transparent)),
+            op(1150,fx,(was_export)),
+            op(1150,fx,(was_shared_multifile)).
 
 % autoloading user:portray_clause_pi/2 from /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first
 :- meta_predicate callOr(1,?,?),
@@ -538,7 +543,7 @@ decl_type((A,L)):-!,decl_type(A),decl_type(L).
 decl_type(Spec):- decl_type_unsafe(Spec),!.
 
 decl_type_unsafe(Spec):- never_type_why(Spec,Why),!,trace_or_throw(never_type_why(Spec,Why)).
-decl_type_unsafe(Spec):- tCol(Spec)->true;(show_call(mpred_add(tCol(Spec))),guess_supertypes(Spec)).
+decl_type_unsafe(Spec):- tCol(Spec)->true;(dcall(why,mpred_add(tCol(Spec))),guess_supertypes(Spec)).
 
 
 
@@ -604,7 +609,7 @@ guess_supertypes_0(W):-T=t,to_first_break(W,lower,T,All,upper),to_first_break(Al
    atom_length(Rest,L),!,L>2,i_name(tt,Rest,NewSuper),atom_concat(NewSuper,'Type',SuperTT),mpred_add_guess(isa(SuperTT,ttTypeType)),
   mpred_add_guess(isa(W,SuperTT)),asserta(did_learn_from_name(W)),!,guess_typetypes(SuperTT).
 
-mpred_add_guess(G):-show_call(mpred_add(G,(d,d))).
+mpred_add_guess(G):-dcall(why,mpred_add(G,(d,d))).
 
 guess_typetypes(W):- tried_guess_types_from_name(W),!.
 guess_typetypes(W):- asserta(tried_guess_types_from_name(W)),ignore((atom(W),guess_typetypes_0(W))).
@@ -616,14 +621,14 @@ guess_typetypes_0(TtTypeType):-atom_concat(tt,TypeType,TtTypeType),atom_concat(T
 system:term_expansion(isa(Compound,PredArgTypes),
   (:-dmsg(mpred_add(wizza(Compound,PredArgTypes))))):-
   lmconf:isa_pred_now_locked,
-   ground(Compound:PredArgTypes),show_call(mpred_add(isa(Compound,PredArgTypes))),!.
+   ground(Compound:PredArgTypes),dcall(why,mpred_add(isa(Compound,PredArgTypes))),!.
 */
 
 isa_lmconf:mpred_provide_storage_op(_,_):-!,fail.
 % ISA MODIFY
 isa_lmconf:mpred_provide_storage_op(change(assert,_),G):- was_isa(G,I,C),!,dmsg(assert_isa_from_op(I,C)),!, assert_isa(I,C).
 % ISA MODIFY
-isa_lmconf:mpred_provide_storage_op(change(retract,How),G):- was_isa(G,I,C),!,show_call((with_assert_op_override(change(retract,How),((dmsg(retract_isa(G,I,C)),!, assert_isa(I,C)))))).
+isa_lmconf:mpred_provide_storage_op(change(retract,How),G):- was_isa(G,I,C),!,dcall(why,(with_assert_op_override(change(retract,How),((dmsg(retract_isa(G,I,C)),!, assert_isa(I,C)))))).
 % ISA CALL
 isa_lmconf:mpred_provide_storage_op(call(_),G):- was_isa(G,I,C),!, (isa_backchaing(I,C);a(C,I)).
 % ISA CLAUSES
@@ -665,20 +670,20 @@ assert_isa_ilc(I,T):- not(not(a(T,I))),!.
 assert_isa_ilc(I,T):- hotrace(chk_ft(T)),(is_ftCompound(I)->dmsg(once(dont_assert_c_is_ft(I,T)));dmsg(once(dont_assert_is_ft(I,T)))),rtrace((chk_ft(T))).
 assert_isa_ilc(I,T):- once(decl_type(T)),!,G=..[T,I], mpred_add(G),(not_mud_isa(I,T,Why)->throw(Why);true),!.
 assert_isa_ilc(I,T):- 
-  skipped_table_call(must((assert_isa_ilc_unchecked(I,T),!,show_call_failure(isa_backchaing(I,T))))).
+  skipped_table_call(must((assert_isa_ilc_unchecked(I,T),!,dcall_failure(why,isa_backchaing(I,T))))).
   
 
 assert_isa_ilc_unchecked(I,T):- is_ftCompound(I),is_non_skolem(I),!,must((get_functor(I,F),assert_compound_isa(I,T,F))),!.
-assert_isa_ilc_unchecked(I,tCol):- must(show_call(decl_type(I))).
-assert_isa_ilc_unchecked(I,ttFormatType):- must(show_call(define_ft(I))).
+assert_isa_ilc_unchecked(I,tCol):- must(dcall(why,decl_type(I))).
+assert_isa_ilc_unchecked(I,ttFormatType):- must(dcall(why,define_ft(I))).
 assert_isa_ilc_unchecked(I,T):-   (( \+(isa(I,_)),\+(a(tCol,I))) -> add(tCountable(I)) ; true),
   w_tl([t_l:infSkipArgIsa,t_l:infSkipFullExpand],assert_hasInstance(T,I)).
 
 assert_compound_isa(I,_,_):- is_ftCompound(I), I\=resultIsaFn(_),glean_pred_props_maybe(I),fail.
 assert_compound_isa(I,T,_):- hotrace(chk_ft(T)),dmsg(once(dont_assert_is_ft(I,T))),rtrace((chk_ft(T))).
-%assert_compound_isa(I,T,F):- is_Template(I),!,assert_hasInstance(T,I),show_call(mpred_add(resultIsa(I,T))),assert_hasInstance(T,resultIsaFn(F)).
+%assert_compound_isa(I,T,F):- is_Template(I),!,assert_hasInstance(T,I),dcall(why,mpred_add(resultIsa(I,T))),assert_hasInstance(T,resultIsaFn(F)).
 assert_compound_isa(I,T,F):- ignore((is_Template(I),w_tl(infConfidence(vWeak),assert_predArgTypes(I)))),
-   hooked_asserta(isa(I,T)),assert_hasInstance(T,I),show_call(mpred_add(resultIsa(F,T))),assert_hasInstance(T,resultIsaFn(F)),!.
+   hooked_asserta(isa(I,T)),assert_hasInstance(T,I),dcall(why,mpred_add(resultIsa(F,T))),assert_hasInstance(T,resultIsaFn(F)),!.
    
 
 get_mpred_arg(N,_:C,E):-!,is_ftCompound(C),arg(N,C,E).
@@ -748,7 +753,7 @@ mpred_types_loaded.
 
 % ISA QUERY
 lmconf:module_local_init:- asserta_if_new((system:goal_expansion(ISA,GO) :- \+ t_l:disable_px, \+current_predicate(_,ISA),
-  once((is_ftCompound(ISA),was_isa(ISA,I,C))),t_l:is_calling,show_call(GO=no_repeats(isa(I,C))))).
+  once((is_ftCompound(ISA),was_isa(ISA,I,C))),t_l:is_calling,dcall(why,GO=no_repeats(isa(I,C))))).
 % ISA GOAL
 % mpred_system_goal_expansion(G,GO):-G\=isa(_,_),was_isa(G,I,C),GO=isa(I,C).
 % ISA EVER

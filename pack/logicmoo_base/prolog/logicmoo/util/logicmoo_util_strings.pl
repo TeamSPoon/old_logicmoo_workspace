@@ -326,7 +326,8 @@ clean_out_atom(X,Y):-atom_codes(X,C),clean_codes(C,D),!,atom_codes(X,D),!,Y=X.
 
 all_upper_atom(X):-toUppercase(X,N),!,N=X.
 
-atom_contains(F0,C0):- must((any_to_atom(F0,F),!,any_to_atom(C0,C))),!,sub_string(F,_,_,_,C).
+atom_contains(F,X):-sub_string(F,_,_,_,X).
+% atom_contains(F0,C0):- must((any_to_atom(F0,F),!,any_to_atom(C0,C))),!,sub_string(F,_,_,_,C).
 
 any_to_atom(A,A):-atom(A),!.
 any_to_atom(T,A):-sformat(S,'~w',[T]),atom_string(A,S).
@@ -890,7 +891,7 @@ to_word_list_0(A,WList):-any_to_string(A,String),!,text_to_string(String,Atom),t
 
 read_stream_to_arglist(Input,[]):- at_end_of_stream(Input),!.
 read_stream_to_arglist(Input,[]):- on_x_fail((once(wait_for_input([Input], Inputs, 0.01)),Inputs=[])),!.
-read_stream_to_arglist(Input,[H|T]):-show_call(lisp_read(Input,H,_)),!,(is_ending(H)->T=[];read_stream_to_arglist(Input,T)),!.
+read_stream_to_arglist(Input,[H|T]):-dcall(why,call(lisp_read_from_input(Input,H))),!,(is_ending(H)->T=[];read_stream_to_arglist(Input,T)),!.
 
 is_ending(List):-nonvar(List),(is_list(List)->last(List,whitepace("\n"));List==whitepace("\n")).
 

@@ -4,6 +4,27 @@
           safe_numbervars/1,
           safe_numbervars/2,
 
+                  
+user_ensure_loaded/1,
+user_use_module/1,
+alldiscontiguous/0,
+arg_is_transparent/1,
+all_module_predicates_are_transparent/1,
+alldiscontiguous/0,
+arg_is_transparent/1,
+module_meta_predicates_are_transparent/1,
+module_predicate/3,
+module_predicate/4,
+module_predicates_are_exported/0,
+module_predicates_are_exported/1,
+module_predicates_are_exported0/1,
+module_predicates_are_not_exported_list/2,
+quiet_all_module_predicates_are_transparent/1,
+
+          export_all_preds/0,
+          export_all_preds/1,
+          export_if_noconflict/2,
+
           match_predicates/2,
           match_predicates/5,
           if_may_hide/1,
@@ -19,6 +40,7 @@
 
             mustvv/1,
             name_to_var/3,
+            source_context_module/1,
 
 
             tlbugger:ifHideTrace/0,
@@ -39,6 +61,7 @@
             unnumbervars_and_save/2,
             var_to_name/3
           ]).
+
 :- meta_predicate
 
   if_may_hide(0),
@@ -56,7 +79,23 @@
         snumbervars(*, ?, ?),
         snumbervars(*, ?, ?, ?).
 :- module_transparent
+source_context_module/1,
 
+user_ensure_loaded/1,
+user_use_module/1,
+alldiscontiguous/0,
+arg_is_transparent/1,
+all_module_predicates_are_transparent/1,
+alldiscontiguous/0,
+arg_is_transparent/1,
+module_meta_predicates_are_transparent/1,
+module_predicate/3,
+module_predicate/4,
+module_predicates_are_exported/0,
+module_predicates_are_exported/1,
+module_predicates_are_exported0/1,
+module_predicates_are_not_exported_list/2,
+quiet_all_module_predicates_are_transparent/1,
 
           match_predicates/2,
           match_predicates/5,
@@ -104,7 +143,9 @@
 :- meta_predicate programmer_error(0).
 :- meta_predicate safe_numbervars(*,?).
 
+alldiscontiguous:-!.
 
+source_context_module(CM):-'$set_source_module'(CM,CM).
 
 %================================================================
 % pred tracing 
@@ -397,5 +438,96 @@ snumbervars(Term,Functor,List):- is_list(List),atom(Functor),!,snumbervars(Term,
 snumbervars(Term,Start,End,List):-numbervars(Term,Start,End,List).
 
 
+
+
+
+
+
+module_predicate(ModuleName,P,F,A):-current_predicate(ModuleName:F/A),functor_catch(P,F,A), not((( predicate_property(ModuleName:P,imported_from(IM)),IM\==ModuleName ))).
+
+
+:- export((user_ensure_loaded/1)).
+:- module_transparent user_ensure_loaded/1.
+user_ensure_loaded(What):- !, '@'(ensure_loaded(What),'user').
+
+:- module_transparent user_use_module/1.
+% user_use_module(logicmoo(What)):- !, '@'(use_module(logicmoo(What)),'user').
+% user_use_module(library(What)):- !, use_module(library(What)).
+user_use_module(What):- '@'(use_module(What),'user').
+
+
+
+
+export_all_preds:-source_location(File,_Line),module_property(M,file(File)),!,export_all_preds(M).
+
+export_all_preds(ModuleName):-forall(current_predicate(ModuleName:F/A),
+                   ((export(F/A),functor_safe(P,F,A),mpred_trace_nochilds(ModuleName:P)))).
+
+
+
+
+
+
+module_predicate(ModuleName,F,A):-current_predicate(ModuleName:F/A),functor_safe(P,F,A),
+   not((( predicate_property(ModuleName:P,imported_from(IM)),IM\==ModuleName ))).
+
+:- module_transparent(module_predicates_are_exported/0).
+:- module_transparent(module_predicates_are_exported/1).
+:- module_transparent(module_predicates_are_exported0/1).
+
+module_predicates_are_exported:- source_context_module(CM),module_predicates_are_exported(CM).
+
+module_predicates_are_exported(user):-!,source_context_module(CM),module_predicates_are_exported0(CM).
+module_predicates_are_exported(Ctx):- module_predicates_are_exported0(Ctx).
+
+module_predicates_are_exported0(user):- !. % dmsg(warn(module_predicates_are_exported(user))).
+module_predicates_are_exported0(ModuleName):-
+   module_property(ModuleName, exports(List)),
+    findall(F/A,
+    (module_predicate(ModuleName,F,A),
+      not(member(F/A,List))), Private),
+   module_predicates_are_not_exported_list(ModuleName,Private).
+
+:- export(export_if_noconflict/2).
+:- module_transparent(export_if_noconflict/2).
+export_if_noconflict(M,F/A):- current_module(M2),M2\=M,module_property(M2,exports(X)),member(F/A,X),dmsg(skipping_export(M2=M:F/A)),!.
+export_if_noconflict(M,F/A):-M:export(F/A).
+
+% module_predicates_are_not_exported_list(ModuleName,Private):- once((length(Private,Len),dmsg(module_predicates_are_not_exported_list(ModuleName,Len)))),fail.
+module_predicates_are_not_exported_list(ModuleName,Private):- forall(member(F/A,Private),export_if_noconflict(ModuleName,F/A)).
+
+
+
+
+
+arg_is_transparent(Arg):- member(Arg,[':','^']).
+arg_is_transparent(0).
+arg_is_transparent(Arg):- number(Arg).
+
+% make meta_predicate's module_transparent
+module_meta_predicates_are_transparent(_):-!.
+module_meta_predicates_are_transparent(ModuleName):-
+    forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),
+      ignore(((predicate_property(ModuleName:P,(meta_predicate( P ))),
+            not(predicate_property(ModuleName:P,(transparent))), (compound(P),arg(_,P,Arg),arg_is_transparent(Arg))),
+                   (nop(dmsg(todo(module_transparent(ModuleName:F/A)))),
+                   (module_transparent(ModuleName:F/A)))))).
+
+:- export(all_module_predicates_are_transparent/1).
+% all_module_predicates_are_transparent(_):-!.
+all_module_predicates_are_transparent(ModuleName):-
+    forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),
+      ignore((
+            not(predicate_property(ModuleName:P,(transparent))),
+                   ( nop(dmsg(todo(module_transparent(ModuleName:F/A))))),
+                   (module_transparent(ModuleName:F/A))))).
+
+quiet_all_module_predicates_are_transparent(_):-!.
+quiet_all_module_predicates_are_transparent(ModuleName):-
+    forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),
+      ignore((
+            not(predicate_property(ModuleName:P,(transparent))),
+                   nop(dmsg(todo(module_transparent(ModuleName:F/A)))),
+                   (module_transparent(ModuleName:F/A))))).
 
 % % :- use_module(logicmoo_util_varnames).

@@ -21,9 +21,9 @@
 :- ensure_loaded(hooks).
 :- ensure_loaded(lemma).
 
-show_call_value(V):-show_call_value(V,V).
-show_call_value(N,V):- V -> dmsg(N=true) ; dmsg(N=false).
-show_call_value1(N,V):- V -> dmsg(N=V) ; dmsg(N=false).
+dcall_value(V):-dcall_value(V,V).
+dcall_value(N,V):- V -> dmsg(N=true) ; dmsg(N=false).
+dcall_value1(N,V):- V -> dmsg(N=V) ; dmsg(N=false).
 
 
 :- no_hook_handling,hook_configuration.     % indicated by {pred|body}_hook_flag
@@ -84,13 +84,13 @@ dont_compile_count_inferences :- dont_count_inferences.
 pttp_configuration :-
 	nl,dmsg('PTTP CONFIGURATION:'),nl,
         %(count_inferences_pred(true) ->dmsg('PTTP counts no inferences.');dmsg('PTTP counts inferences!')),
-        show_call_value(count_inferences_pred(_)),
+        dcall_value(count_inferences_pred(_)),
         %(trace_search_progress_pred(nop) ->msg('PTTP does not trace search progress.');dmsg('PTTP traces search progress!')),
-        show_call_value(trace_search_progress_pred(_)),        
+        dcall_value(trace_search_progress_pred(_)),        
         %(compile_proof_printing ->dmsg('PTTP compiles proof printing!');dmsg('PTTP does not compile proof printing.')),
-        show_call_value(compile_proof_printing),
+        dcall_value(compile_proof_printing),
         % (compile_complete_search -> dmsg('PTTP compiles complete search!');dmsg('PTTP does not compile complete search.'))
-        show_call_value(compile_complete_search).
+        dcall_value(compile_complete_search).
 
 
 %%% ----------------------------------------------------------------------
@@ -98,13 +98,13 @@ pttp_configuration :-
 
 xray_configuration_inner :-
 	dmsg('XRay CONFIGURATION:'),
-	show_call_value(delta_ordering(_)),
-	show_call_value(verbose_mode),
-        show_call_value(no_disk),
-        show_call_value(do_model_inits),
-        show_call_value(herbrandize),
-        show_call_value(use_ancestor_checks(_)),        
-        show_call_value(use_sound_unification(_)).
+	dcall_value(delta_ordering(_)),
+	dcall_value(verbose_mode),
+        dcall_value(no_disk),
+        dcall_value(do_model_inits),
+        dcall_value(herbrandize),
+        dcall_value(use_ancestor_checks(_)),        
+        dcall_value(use_sound_unification(_)).
 
 %%% delta_ordering stears the order of admissibility 
 %%% and compatibility checking in delta rules

@@ -65,13 +65,13 @@ iz:iz(X,Y) :-
 iz:attr_portray_hook(variz(L,U),_Var) :-
 	write(iz([L-U])).
 
-% = :- meta_predicate(mshow_call(0)).
+% = :- meta_predicate(mdcall(why,0)).
 
-mshow_call(C):-call(C).
+mdcall(why,C):-call(C).
 
-unifiable_iz(A,B,C):-mshow_call(unifiable(A,B,C)).
+unifiable_iz(A,B,C):-mdcall(why,unifiable(A,B,C)).
 
-not_or_one_fail(OrNode):- mshow_call(or_one_fail(OrNode)).
+not_or_one_fail(OrNode):- mdcall(why,or_one_fail(OrNode)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % types of attributes?
@@ -87,7 +87,7 @@ iz_c_c(X,Y,OrNode) :-
 		( Unifier == [] ->
 			not_or_one_fail(OrNode)
 		;
-			mshow_call(iz_c_c_l(Unifier,OrNode))
+			mdcall(why,iz_c_c_l(Unifier,OrNode))
 		)
 	;
 		or_succeed(OrNode)
@@ -126,7 +126,7 @@ add_ornode(X,Y,OrNode) :-
 add_ornode_var1(X,Y,OrNode) :-
 	( get_attr(X,iz,Attr) ->
 		Attr = variz(V1,V2),
-		show_call(put_attr(X,iz,variz([OrNode-Y|V1],V2)))
+		dcall(why,put_attr(X,iz,variz([OrNode-Y|V1],V2)))
 	;
 		put_attr(X,iz,variz([OrNode-Y],[]))
 	).

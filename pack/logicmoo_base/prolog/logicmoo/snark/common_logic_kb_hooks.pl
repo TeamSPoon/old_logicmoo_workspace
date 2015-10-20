@@ -122,7 +122,7 @@
             xcall_t/9,
             xcall_t/10
           ]).
-:- use_module(logicmoo(util/logicmoo_util_preddefs)).
+% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 :- meta_predicate 
       % common_logic_kb_hooks
       call_f(*,1,?),
@@ -193,6 +193,13 @@
 :- meta_predicate holds_f(6,?,?,?,?,?,?).
 :- meta_predicate holds_t(5,?,?,?,?,?).
 :- meta_predicate holds_t(6,?,?,?,?,?,?).
+
+:-
+            op(1150,fx,(was_dynamic)),
+            op(1150,fx,(was_multifile)),
+            op(1150,fy,(was_module_transparent)),
+            op(1150,fx,(was_export)),
+            op(1150,fx,(was_shared_multifile)).
 
 /*
 :- was_shared_multifile el_assertions:el_holds/4.

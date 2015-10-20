@@ -39,6 +39,7 @@ clip_qm(A,AO):-clip_us(A,AO).
 
 :- meta_predicate(sexpr_sterm_to_pterm(?,?)).
 :- meta_predicate(sexpr_sterm_to_pterm_list(?,?)).
+sexpr_sterm_to_pterm([S,Vars|TERM],PTERM):- nonvar(S),is_quantifier(S),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..[S,Vars|PLIST])),!.
 sexpr_sterm_to_pterm([S|TERM],PTERM):- (S == ('=>')),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..['=>'|PLIST])),!.
 sexpr_sterm_to_pterm([S|TERM],PTERM):- (S == ('<=>')),must_det_l((is_list(TERM),sexpr_sterm_to_pterm_list(TERM,PLIST),PTERM=..['<=>'|PLIST])),!.
 sexpr_sterm_to_pterm(VAR,'$VAR'(V)):-atom(VAR),atom_concat('?',_,VAR),clip_qm(VAR,V),!.
@@ -414,7 +415,7 @@ compile(F0, F) :-
         compile_all(Body0, Body),
         maplist(arg(1), Args0, Args),
         F = [defun,Name,Args|Body]
-    ;   F0 = ['$SYM'(Op)|Args0] -> compile_all(Args0, Args), F = [user(Op)|Args]
+    ;   F0 = ['$SYM'(Op)|Args0] -> compile_all(Args0, Args), F = ['$USER'(Op)|Args]
     ).
 
 eval_all([], [])         --> [].
@@ -449,7 +450,7 @@ eval(while, [Cond|Bs], [])  -->
 eval(defun, [F,As|Body], '$SYM'(F)), [Fs-Vs0] -->
     [Fs0-Vs0],
     { put_assoc(F, Fs0, As-Body, Fs) }.
-eval(user(F), As0, V), [Fs-Vs] -->
+eval('$USER'(F), As0, V), [Fs-Vs] -->
     eval_all(As0, As1),
     [Fs-Vs],
     { empty_assoc(E),

@@ -52,7 +52,7 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 :- dynamic lmconf:mpred_system_kb/1.
 :- retractall(lmconf:mpred_system_kb(_)).
 :- export(lmconf:mpred_system_kb/1).
-:- lmconf:mpred_system_kb(_)->true;(context_module(_M),asserta(lmconf:mpred_system_kb(lmbase))).
+:- lmconf:mpred_system_kb(_)->true;(source_context_module(_M),asserta(lmconf:mpred_system_kb(lmbase))).
 :- import(lmconf:mpred_system_kb/1).
 :- mpred_system_kb(M),dmsg(mpred_system_kb=M).
 
@@ -102,7 +102,7 @@ lmconf:disable_mpred_system0(Ctx):-
    retractall((Ctx:goal_expansion(I,O):- mpred_expander(goal,Ctx,I,O))),!.
    
 :- module_transparent ensure_mpred_system/0.
-ensure_mpred_system:- context_module(M),enable_mpred_system(M).
+ensure_mpred_system:- source_context_module(M),enable_mpred_system(M).
 
 % :- initialization(add_library_search_path('.',[ './mpred/*.pl','./snark/*.pl'])).
 :- add_library_search_path('./mpred/',[ '*.pl']).

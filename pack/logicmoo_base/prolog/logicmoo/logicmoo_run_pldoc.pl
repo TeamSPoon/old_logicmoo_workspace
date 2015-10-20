@@ -1,6 +1,5 @@
-:- module(logicmoo_run_pldoc,[]).
 
-:- if(if_defined(load_mud_www)).
+:- module(logicmoo_run_pldoc,[]).
 
 :- use_module(library(settings)).
 
@@ -18,7 +17,6 @@ swish_highlight:memory_file_line_position(X,Y,Z,A):-dmsg(error(swish_highlight:m
 swish_highlight:memory_file_substring(X,Y,Z,A,B):-dmsg(error(swish_highlight:memory_file_substring(X,Y,Z,A,B))).
 swish_highlight:memory_file_to_string(X,Y):- memory_file_to_codes(X,C),string_codes(Y,C). %  dmsg(error(swish_highlight:memory_file_to_string(X,Y))).
 */
-
 
 :- use_module(library(pldoc)).
 :- use_module(library(http/thread_httpd)).
@@ -109,7 +107,7 @@ doc_file_href(_Options,HREF, HREF).
 pldoc_html:source_button(_File, Options) -->
 	{ pldoc_html:option(files(_Map), Options) }, !.	% generating files
 pldoc_html:source_button(File, _Options) -->
-	{show_call((doc_file_href(Options, File, HREF0),
+	{dcall(why,(doc_file_href(Options, File, HREF0),
          edit_file_href(Options, File, EDIT_HREF0)))},
 
 	html_write:html([
@@ -181,8 +179,8 @@ do_semweb_startup:-
 
 
 % [Optionaly] remove debug noises
-% mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(asserta(prolog_debug:debugging(http(X), false, O)))).
-% mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),show_call(asserta(prolog_debug:debugging((X), false, O)))).
+% mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),dcall(why,asserta(prolog_debug:debugging(http(X), false, O)))).
+% mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),dcall(why,asserta(prolog_debug:debugging((X), false, O)))).
 
 :- was_shared_multifile(pre_file_search_path/2).
 
@@ -232,5 +230,4 @@ sandbox:safe_meta(V,O):-nonvar(V),nonvar(O).
 sandbox:safe_global_variable(V):-nonvar(V).
 sandbox:safe_directive(V):-nonvar(V).
 
-
-:- endif.
+:- gripe_time(40,ensure_loaded(logicmoo(mpred_online/mpred_www))),if_defined(mpred_www:ensure_webserver).

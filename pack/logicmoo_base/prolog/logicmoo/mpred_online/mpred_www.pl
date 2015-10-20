@@ -432,26 +432,26 @@ save_request_in_session(Request):-
 
 
 
-handler_logicmoo_cyclone(_Request):- notrace(((is_goog_bot,!,
+handler_logicmoo_cyclone(Request):- notrace(((is_goog_bot,!,
   format('Content-type: text/html~n~n',[]),
-  format('<!DOCTYPE html><html><head></head><body></body></html>~n~n',[]),flush_output))),!.
+  format('<!DOCTYPE html><html><head></head><body><pre>~q</pre></body></html>~n~n',[Request]),flush_output))),!.
 
-handler_logicmoo_cyclone( Request):-    
-  notrace( call(handler_logicmoo_cyclone_1,Request)),!.
+handler_logicmoo_cyclone(Request):-    
+  notrace(call(handler_logicmoo_cyclone_1,Request)),!.
 
-handler_logicmoo_cyclone_1(Request):- 
- must_det_l((
-   must(save_request_in_session(Request)),
+handler_logicmoo_cyclone_1(Request):-
+ with_no_x((
+ on_x_log_fail((
    format('Content-type: text/html~n~n',[]),
    format('<!DOCTYPE html>',[]),
    flush_output,
+      must(save_request_in_session(Request)),
     % member(request_uri(URI),Request),
-    member(path(PATH),Request),
+      member(path(PATH),Request),
     directory_file_path(_,FCALL,PATH),
    once(get_param_req(call,Call);(current_predicate(FCALL/0),Call=FCALL);get_param_sess(call,Call,edit1term)),
-   (on_x_rtrace(Call)),!,flush_output)),!.
+   notrace(Call),!,flush_output)))).
    
-
 
 write_begin_html(B,BASE,URI):-  
   hmust_l((
@@ -480,7 +480,7 @@ body {
       ignore(URI=''),
       ignore(BASE=''),
      format('<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>',[]),
-     format('<title>~w for ~w</title></head>',[BASE,uri]),
+     format('<title>~w for ~w</title></head>',[BASE,URI]),
      format('<body class="yui-skin-sam">',[]),flush_output)),!.
    
 
@@ -934,7 +934,7 @@ tmw:- w_tl(t_l:print_mode(html),(print((a(_LP):-b([1,2,3,4]))),nl,nl,wid(_,_,KIF
 
 
 
-% II = 56+TTT, ((show_call((url_encode(II,EE),var_property(TTT,name(NNN)),url_decode(EE,OO))))),writeq(OO).
+% II = 56+TTT, ((dcall(why,(url_encode(II,EE),var_property(TTT,name(NNN)),url_decode(EE,OO))))),writeq(OO).
 
 url_encode(B,A):- \+ atom(B),!,term_variables(B,Vars),url_encode_term(B,Vars,O),O=A.
 url_encode(B,A):- atom_concat('\n',BT,B),!,url_encode(BT,A).
@@ -951,7 +951,7 @@ url_encode_term(InTerm,_VsIn,URL):- fail, with_output_to(atom(IRI),portray_claus
 url_encode_term(InTerm,VsIn,URL):-
   nb_current('$variable_names',Prev),
   name_the_var(40,Prev,VsIn,_NewVs,Added),
-  % (NewVs\==Prev ->  show_call(b_setval('$variable_names',NewVs)) ; true),
+  % (NewVs\==Prev ->  dcall(why,b_setval('$variable_names',NewVs)) ; true),
   with_output_to(atom(IRI),write_term('#$'(InTerm:Added),[quoted(true),variable_names(Added),quoted,priority(9)])),
   url_iri(URL,IRI),!.
 

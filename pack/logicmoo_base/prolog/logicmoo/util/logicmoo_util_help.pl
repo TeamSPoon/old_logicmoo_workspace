@@ -231,7 +231,7 @@ export_file_preds:- source_location(S,_),export_file_preds(S),!.
 :- export(export_file_preds/1).
 export_file_preds(_):- current_prolog_flag(xref,true),!.
 export_file_preds(FileMatch):- forall(must(filematch(FileMatch,File)),
- (context_module(NotUser),show_call(NotUser\==user),
+ (source_context_module(NotUser),dcall(why,NotUser\==user),
    forall(must(mpred_source_file(M:P,File)),(functor(P,F,A),must(export_file_preds(NotUser,File,M,P,F,A)))))).
 
 predicate_decl_module(Pred,RM):-current_predicate(_,RM:Pred),\+ predicate_property(RM:Pred,imported_from(_)),must(RM\==user).
@@ -254,7 +254,7 @@ write_modules:- forall(logicmoo_util_help:mpred_is_impl_file(F),(export_file_pre
 export_file_preds(NotUser,S,_,P,F,A):-current_predicate(logicmoo_varnames:F/A),!.
 export_file_preds(NotUser,S,system,P,F,A):-current_predicate(system:F/A),!.
 export_file_preds(NotUser,S,user,P,F,A):-current_predicate(system:F/A),!.
-export_file_preds(NotUser,S,M,P,F,A):- M==user,!,trace,show_call(export_file_preds(NotUser,S,NotUser,P,F,A)).
+export_file_preds(NotUser,S,M,P,F,A):- M==user,!,trace,dcall(why,export_file_preds(NotUser,S,NotUser,P,F,A)).
 export_file_preds(NotUser,S,M,P,F,A):- predicate_decl_module(P,RM),RM\==M,!,export_file_preds(NotUser,S,RM,P,F,A).
 %export_file_preds(NotUser,S,M,P,F,A):- \+ helper_name(F), export(M:F/A), fail.
 export_file_preds(NotUser,S,M,P,F,A):- M:export(M:F/A), fail. % export anyways
@@ -267,8 +267,10 @@ export_file_preds(NotUser,S,M,P,F,A):- must(predicate_property(M:P,transparent))
 :- module_transparent(export_module_preds/0).
 :- export(export_module_preds/0).
 export_module_preds:- current_prolog_flag(xref,true),!.
-export_module_preds:- context_module(M),source_file_property(S,module(M)),export_file_preds(S),forall(source_file_property(S,includes(F,_)),export_file_preds(F)).
+export_module_preds:- source_context_module(M),source_file_property(S,module(M)),export_file_preds(S),forall(source_file_property(S,includes(F,_)),export_file_preds(F)).
 
+
+:- use_module(library(pldoc/doc_pack)).
 
 name_modes(ModeAs:NameAs,ModeAs,NameAs).
 
@@ -279,7 +281,48 @@ name_modes(ModeAs:NameAs,ModeAs,NameAs).
 
 target_module(P,M):-mpred_source_file(P,F),logicmoo_util_help:mpred_is_impl_file(F),make_module_name(F,M).
 
-print_fake_doc(M,P):- 
+make_file_help(F):- \+((atom(F),exists_file(F))),!,forall(filematch(F,S),make_file_help(S)).
+
+make_file_help(File):-
+        read_source_file_vars(File),
+	setup_call_cleanup(
+	    prolog_open_source(File, In),
+	    read_source_help(File,In),
+	    prolog_close_source(In)),!.
+
+read_source_help(File,In):-
+  make_module_name(File,M),
+	repeat,
+	  catch(prolog_read_source_term(In, Term, Expanded, [ variable_names(Vs), syntax_errors(error) , term_position(TermPos) ]),
+		E,(nop((dmsg(E),trace)),fail)),
+          stream_position_data(line_count, TermPos, LineNo),
+	  ignore(save_source_file_help(M, File ,LineNo,Term,Vs)),
+	  (   is_list(Expanded)
+	  ->  member(T, Expanded)
+	  ;   T = Expanded
+	  ),
+	(   T == end_of_file
+	->  !
+	;  (  ignore(save_source_file_help(M, File ,LineNo,T,Vs))),
+	    fail
+	).
+
+save_source_file_help(M, File ,LineNo,Term,_Vs):-
+   strip_module(Term,_MU,PI),
+   get_functor(PI,F,A),
+   use_source_file_help(File:LineNo,M:F/A).
+
+:- dynamic(last_source_file_help/2).
+use_source_file_help(File:_LineNo,M:F/A):- last_source_file_help(File,M:F/A),!.
+use_source_file_help(File:_LineNo,M:F/A):-
+   retractall(last_source_file_help(File,_)),
+   asserta(last_source_file_help(File,M:F/A)),
+   functor(P,F,A),
+   print_fake_doc(M,P).
+   
+
+
+print_fake_doc(MN,P):- 
    scan_source_files_for_varnames,
    target_module(MN,M),
    current_predicate(_,M:P),

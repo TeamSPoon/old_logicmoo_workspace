@@ -172,8 +172,16 @@ user:term_expansion/2
 :- style_check(-singleton).
 :- set_prolog_flag(generate_debug_info, true).
 
-:- use_module(logicmoo(mpred/mpred_userkb)).
-:- use_module(logicmoo(util/logicmoo_util_preddefs)).
-:- use_module(logicmoo(mpred/mpred_loader)).
-:- use_module(logicmoo(mpred/mpred_userkb)).
+
+:-           op(1150,fx,(was_dynamic)),
+          op(1150,fx,(was_multifile)),
+          op(1150,fx,(was_module_transparent)),
+          op(1150,fx,(was_export)),
+          op(1150,fx,(was_shared_multifile)).
+
+
+%:- use_module(logicmoo(mpred/mpred_userkb)).
+% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
+%:- use_module(logicmoo(mpred/mpred_loader)).
+%:- use_module(logicmoo(mpred/mpred_userkb)).
 

@@ -58,7 +58,7 @@
           ]).
 
 
-:- use_module(logicmoo(util/logicmoo_util_preddefs)).
+% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
 :- include('mpred_header.pi').
 
@@ -308,14 +308,14 @@ nth_mpred_call(N,List,Ele):-N2 is N+1,lists:nth0(N2,List,Ele).
 
 show_pred_info(F/A):-integer(A),functor(H,F,A),!,show_pred_info(H).
 show_pred_info(Head):-
-        doall(show_call(no_repeats(isa(Head,_)))),
+        doall(dcall(why,no_repeats(isa(Head,_)))),
         functor(Head,F,_),
-        doall(show_call(no_repeats(isa(F,_)))),
+        doall(dcall(why,no_repeats(isa(F,_)))),
      (current_predicate(_,Head) -> show_pred_info_0(Head); wdmsg(cannot_show_pred_info(Head))),!.
 
 show_pred_info_0(Head):- 
-        doall(show_call(predicate_property(Head,_))),
-        (has_cl(Head)->doall((show_call(clause(Head,_))));hotrace((listing(Head)))),!.
+        doall(dcall(why,predicate_property(Head,_))),
+        (has_cl(Head)->doall((dcall(why,clause(Head,_))));hotrace((listing(Head)))),!.
 
 
 % ===================================================

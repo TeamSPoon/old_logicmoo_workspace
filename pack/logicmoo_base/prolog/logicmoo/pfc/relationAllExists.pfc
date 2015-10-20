@@ -16,6 +16,9 @@
 predInterArgIsa(mudSubPart(tBodyPart,tBodyPart)).
 relationAllOnly(mudSubPart,tHumanBody,tBodyPart).
 
+:- mpred_trace_exec.
+tSet(tHumanBody).
+
 ((relationAllOnly(Pred,Col1,Col2)/(G=..[Pred,VAL,Value])) ==> 
    (isa(VAL,Col1) ==> (( G ==> isa(Value,Col2))))).
 
@@ -43,7 +46,7 @@ ptTransitiveBinaryPredicate(mudSubPart).
 ((transitiveViaArg(PRED,BPRED,3),arity(PRED,3)) /ground(PRED:BPRED)) ==> clif((t(PRED,Z,A,B) , t(BPRED,B,C)) => t(PRED,Z,A,C)).
 ((transitiveViaArgInverse(PRED,BPRED,3),arity(PRED,3))/ground(PRED:BPRED)) ==> clif((t(PRED,Z,A,B) , t(BPRED,C,B)) => t(PRED,Z,A,C)).
 
-(relationAllExists(Pred,Col1,Col2) ==> (ptBinaryPredicate(Pred),tCol(Col2),tCol(Col2))).
+(relationAllExists(Pred,Col1,Col2) ==> (ptBinaryPredicate(Pred),tCol(Col1),tCol(Col2))).
 
 % version that works but not safe
 /*
@@ -70,10 +73,16 @@ relationInstanceExists(Pred,VAL,D_COL) ==>
  ({SK= skRelationInstanceExistsFn(Pred,VAL,D_COL), G1=..[Pred,VAL,Missing],G2=..[Pred,VAL,SK],ISA=..[D_COL,SK]},
   (( ~ (G1/(isa(Missing,D_COL),is_non_skolem(Missing)))) ==> (G2,ISA))).
 
+
+(relationAllExists(Pred,I_COL,D_COL)==> 
+  clif(all(I,exists(D,  t(Pred,I,D) & isa(I,I_COL) & isa(D,D_COL))))).
+
 (relationAllExists(Pred,I_COL,D_COL)==>
  ({SK= skRelationAllExistsFn(Pred,VAL,D_COL), G1=..[Pred,VAL,Missing],G2=..[Pred,VAL,SK],ISA=..[D_COL,SK]},
   (isa(VAL,I_COL) ==> 
     ((((~ (G1/(isa(Missing,D_COL),is_non_skolem(Missing))))) ==> (G2,ISA)))))).
+
+
 
 relationExistsAll(Pred,D_COL,I_COL) ==>
  ({SK= skRelationExistsAllFn(VAL,Pred,D_COL,I_COL), G1=..[Pred,Missing,VAL],G2=..[Pred,SK,VAL],ISA=..[D_COL,SK]},
@@ -134,6 +143,7 @@ isa(iExplorer1,tHominid).
 
 :- endif.
 
+tCol(tHumanBody).
 genls(tHumanBody,tBodyPart).
 
 relationAllExists(mudSubPart,tHominid,tHumanBody).

@@ -36,10 +36,12 @@
             to_prefixed/3,
             typename_to_iname0/3
           ]).
-:- use_module(logicmoo(util/logicmoo_util_preddefs)).
+% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
 
 :- include('mpred_header.pi').
+
+:- dynamic(lmconf:current_source_suffix/1).
 
 % ================================================
 % Naming System

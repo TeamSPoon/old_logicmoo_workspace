@@ -121,7 +121,6 @@ index((unbuiltin_negate), 3, common_logic_compiler, common_logic_compiler).
 index((unbuiltin_negate), 4, common_logic_compiler, common_logic_compiler).
 index((until_op), 1, common_logic_compiler, common_logic_compiler).
 index((variants_are_equal), 3, common_logic_compiler, common_logic_compiler).
-index((wid), 3, common_logic_compiler, common_logic_compiler).
 index((kbp_t), 1, common_logic_kb_hooks, common_logic_kb_hooks).
 index((with_el_holds_disabled), 1, common_logic_kb_hooks, common_logic_kb_hooks).
 index((noGenlPreds), 1, common_logic_kb_hooks, common_logic_kb_hooks).
@@ -299,10 +298,10 @@ index((kif_io), 2, common_logic_snark, common_logic_snark).
 index((kif_process), 1, common_logic_snark, common_logic_snark).
 index((kif_process), 2, common_logic_snark, common_logic_snark).
 index((kif_read), 3, common_logic_snark, common_logic_snark).
-index((kif_tell), 1, common_logic_snark, common_logic_snark).
-index((kif_tell_adding_constraints), 3, common_logic_snark, common_logic_snark).
-index((kif_tell_boxes1), 2, common_logic_snark, common_logic_snark).
-index((kif_tell_boxes3), 3, common_logic_snark, common_logic_snark).
+index((kif_add), 1, common_logic_snark, common_logic_snark).
+index((kif_add_adding_constraints), 3, common_logic_snark, common_logic_snark).
+index((kif_add_boxes1), 2, common_logic_snark, common_logic_snark).
+index((kif_add_boxes3), 3, common_logic_snark, common_logic_snark).
 index((kif_test_string), 1, common_logic_snark, common_logic_snark).
 index((kif_to_boxlog), 2, common_logic_snark, common_logic_snark).
 index((kif_to_boxlog), 3, common_logic_snark, common_logic_snark).
@@ -322,7 +321,7 @@ index((neg_h_if_neg), 2, common_logic_snark, common_logic_snark).
 index((not_mudEquals), 2, common_logic_snark, common_logic_snark).
 index((nots_to), 3, common_logic_snark, common_logic_snark).
 index((numbervars_with_names), 2, common_logic_snark, common_logic_snark).
-index((pttp_quantifier), 1, common_logic_snark, common_logic_snark).
+index((is_quantifier), 1, common_logic_snark, common_logic_snark).
 index((save_in_code_buffer), 2, common_logic_snark, common_logic_snark).
 index((save_wfs), 2, common_logic_snark, common_logic_snark).
 index((should_be_poss), 1, common_logic_snark, common_logic_snark).
@@ -349,3 +348,4 @@ index((wdmsgl_3), 3, common_logic_snark, common_logic_snark).
 index((wdmsgl_4), 3, common_logic_snark, common_logic_snark).
 index((why_to_id), 3, common_logic_snark, common_logic_snark).
 index((write_list), 1, common_logic_snark, common_logic_snark).
+index((is_entailed), 1, common_logic_snark, common_logic_snark).

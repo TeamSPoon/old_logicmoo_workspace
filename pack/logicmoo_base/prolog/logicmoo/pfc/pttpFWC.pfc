@@ -45,8 +45,7 @@
 :- dmsg(begin_abc).
               
 :- file_begin(pfc).
-:- mpred_trace_exec.
-:- mpred_watch.
+
 
 % :- if(if_defined(lmconf:startup_option(datalog,sanity))).
 

@@ -49,7 +49,6 @@
             compute_resolve/3,
             compute_resolve/5,
             correctify_support/2,
-            cyclic_break/1,
             cwc/0,
             defaultmpred_select/2,            
             if_missing_mask/3,
@@ -59,6 +58,7 @@
             exact_args/1,
             fc_eval_action/2,
             fcnt/2,
+            mmsg/2,
             fcnt0/2,
             fcpt/2,
           f_to_mfa/4,
@@ -282,6 +282,7 @@
             mpred_trace_addPrint/2,
             mpred_trace_addPrint_0/2,
             mpred_trace_exec/0,
+            mpred_notrace_exec/0,
             mpred_trace_break/2,
             mpred_trace_msg/1,
             mpred_trace_msg/2,
@@ -454,6 +455,7 @@
       remove_if_unsupported_verbose(*,*,0),
       repropagate_0(0),
       repropagate_1(0),
+      mpred_test(0),
       repropagate_meta_wrapper_rule(0),
       update_single_valued_arg(0,*),
       with_mpred_trace_exec(0).
@@ -470,9 +472,6 @@
       fc_eval_action((*),*),
       foreachl_do((*),*),
       is_resolved((*)),
-      kb:resolveConflict((*)),
-      kb:resolveConflict0((*)),
-      kb:resolverConflict_robot((*)),
       loop_check_nr((*)),
       map_unless(1,:,*,*),
       mpred_add_fast_sp(?,(*)),
@@ -543,7 +542,7 @@
 
 
 :- module_transparent(check_context_module/0).
-check_context_module:- must((context_module(M),M\==mpred_pfc,M\==mpred_loader)).
+check_context_module:- must((source_context_module(M),M\==mpred_pfc,M\==mpred_loader)).
 
 
 :- was_shared_multifile(('==>')/1).
@@ -655,7 +654,7 @@ is_side_effect_disabled:- t_l:side_effect_ok,!,fail.
 is_side_effect_disabled:- t_l:noDBaseMODs(_),!.
 
 
-          f_to_mfa(EF,R,F,A):-w_get_fa(EF,F,A),
+f_to_mfa(EF,R,F,A):-w_get_fa(EF,F,A),
               (((current_predicate(F/A),functor(P,F,A),predicate_property(_M:P,imported_from(R)))*->true;
               current_predicate(F/A),functor(P,F,A),source_file(R:P,_SF))),
               current_predicate(R:F/A).
@@ -841,7 +840,7 @@ exact_args(true).
 % exact_args(C):-source_file(C,I),absolute_source_location_pfc(I).
 
 mpred_is_tautology(Var):-is_ftVar(Var).
-mpred_is_tautology(V):- \+ \+ call((copy_term_nat(V,VC),numbervars(VC),show_call_success(mpred_is_taut(VC)))).
+mpred_is_tautology(V):- \+ \+ call((copy_term_nat(V,VC),numbervars(VC),dcall_success(why,mpred_is_taut(VC)))).
 
 mpred_is_taut(A:-B):-!,mpred_is_taut(B==>A).
 mpred_is_taut(A<-B):-!,mpred_is_taut(B==>A).
@@ -993,8 +992,8 @@ is_atom_body_pfa(WAC,P,F,2,Rest):-arg(2,P,E),E==WAC,arg(1,P,Rest),!.
 mpred_is_silient :- ( \+ t_l:mpred_debug_local, \+ mpred_is_tracing_exec, \+ mpred_is_tracing(_)) ,!.
 
 :- meta_predicate(show_if_debug(0)).
-% show_if_debug(A):- !,show_call(A).
-show_if_debug(A):- mpred_is_tracing(A) ->show_call(A) ; A.
+% show_if_debug(A):- !,dcall(why,A).
+show_if_debug(A):- mpred_is_tracing(A) -> dcall(mpred_is_tracing,A) ; A.
 
 % ======================= 
 % user''s program''s database
@@ -1002,8 +1001,7 @@ show_if_debug(A):- mpred_is_tracing(A) ->show_call(A) ; A.
 % assert_u(arity(prologHybrid,0)):-trace_or_throw(assert_u(arity(prologHybrid,0))).
 % assert_u(X):- \+ (is_ftCompound(X)),!,asserta_u(X,X,0).
 
-assert_u(X):- copy_term_and_varnames(X,Y),\+ \+ ((never_assert_u(X,Why),X=@=Y,trace_or_throw(never_assert_u(X,Why)))).
-assert_u(X):- functor(X,F,A),assert_u(X,F,A).
+assert_u(X):- check_never_assert(X),functor(X,F,A),assert_u(X,F,A).
 
 assert_u(X,F,_):-mpred_call_shared(singleValuedInArg(F,SV)),!,must(update_single_valued_arg(X,SV)),!.
 assert_u(X,F,A):-mpred_call_shared(prologSingleValued(F)),!,must(update_single_valued_arg(X,A)),!.
@@ -1012,16 +1010,14 @@ assert_u(X,F,A):- assertz_u(X,F,A).
 % assert_u(X,F,A):-must(isa(F,prologOrdered) -> assertz_u(X,F,A) ; asserta_u(X,F,A)).
 
 
-% asserta_u(X):- never_assert_u(Y),X=@=Y,trace_or_throw(never_assert_u(Y)).
 % asserta_u(X):- functor(X,F,A),asserta_u(X,F,A).
-
-% asserta_u(X,_,_):- show_call_success(clause_asserted(X)),!.
+% asserta_u(X,_,_):- dcall_success(why,clause_asserted(X)),!.
 % asserta_u(X,_,_):- must((expire_tabled_list(X),show_if_debug(attvar_op(asserta,X)))).
 
 assertz_u(X):- functor(X,F,A),assertz_u(X,F,A).
 
-check_never_assert(X):- ignore(( copy_term_and_varnames(X,Y),never_assert_u(Y,Why),X=@=Y,snumbervars(X),trace_or_throw(never_assert_u(X,Why)))).
-check_never_retract(X):- ignore(( copy_term_and_varnames(X,Y),never_retract_u(Y,Why),X=@=Y,snumbervars(X),trace_or_throw(never_retract_u(X,Why)))).
+check_never_assert(X):- ignore(( copy_term_and_varnames(X,Y),kb:never_assert_u(Y,Why),X=@=Y,snumbervars(X),trace_or_throw(never_assert_u(X,Why)))).
+check_never_retract(X):- ignore(( copy_term_and_varnames(X,Y),kb:never_retract_u(Y,Why),X=@=Y,snumbervars(X),trace_or_throw(never_retract_u(X,Why)))).
 
 assertz_u(X,_,_):- check_never_assert(X), clause_asserted(X),!.
 assertz_u(X,_,_):- must((expire_tabled_list(X),show_if_debug(attvar_op(assertz,X)))).
@@ -1030,9 +1026,9 @@ assertz_u(X,_,_):- must((expire_tabled_list(X),show_if_debug(attvar_op(assertz,X
 retract_u(X):- check_never_retract(X),fail.
 %retract_u(neg(X)):-must(is_ftNonvar(X)),!,retract_eq_quitely_f(neg(X)),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
 %retract_u(kbp:hs(X)):-!,retract_eq_quitely_f(kbp:hs(X)),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
-retract_u(kbp:qu(umt,X,Y)):-!,show_call_failure(retract_eq_quitely_f(kbp:qu(umt,X,Y))),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
-retract_u(neg(X)):-!,show_call_success(retract_eq_quitely_f(neg(X))),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
-retract_u((X)):-!,show_call_success(retract_eq_quitely_f((X))),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
+retract_u(kbp:qu(umt,X,Y)):-!,dcall_failure(why,retract_eq_quitely_f(kbp:qu(umt,X,Y))),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
+retract_u(neg(X)):-!,dcall_success(why,retract_eq_quitely_f(neg(X))),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
+retract_u((X)):-!,dcall_success(why,retract_eq_quitely_f((X))),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
 retract_u(X):-show_if_debug(attvar_op(retract_eq,X)),!,must((expire_tabled_list(X))).
 
 retractall_u(X):-retractall(X),must((expire_tabled_list(X))).
@@ -1237,7 +1233,7 @@ mpred_post_sp_zzz(S,P):-  is_main_thread,!,
      mpred_post_sp_zzzz(S0,P0);mpred_post_sp_zzzz(S,P)),!.
 
 mpred_post_sp_zzz(S,P):- 
-    hotrace(show_call_when(ensure_vars_labled,S:P,S0:P0)),!,
+    hotrace(dcall_when(ensure_vars_labled,S:P,S0:P0)),!,
     mpred_post_sp_zzzz(S0,P0),!.
 
 mpred_post_sp_zzz(S,P):-mpred_post_sp_zzzz(S,P),!.
@@ -1278,8 +1274,9 @@ mpred_post1_sp_1(_,_). % already added
 mpred_post1_sp_1(S,P) :-  mpred_warn("mpred_post1(~p,~p) failed",[P,S]).
 
 with_mpred_trace_exec(P):- w_tl(t_l:mpred_debug_local,w_tl(mpred_is_tracing_exec, must(show_if_debug(P)))).
-% mpred_test(P):- mpred_is_silient,!,show_if_debug(must(P)),!.
-mpred_test(P):- show_call(with_mpred_trace_exec(P)),!.
+
+mpred_test(P):- (true;mpred_is_silient;compiling),!,sanity(P),!.
+mpred_test(P):- dcall(why,with_mpred_trace_exec(P)),!.
 
 clause_asserted_local(kbp:spft(ukb,P,Fact,Trigger,UOldWhy)):-
   clause(kbp:spft(ukb,P,Fact,Trigger,_OldWhy),true,Ref),
@@ -2128,12 +2125,12 @@ trigger_trigger1(Trigger,Body) :-
 %= call_u(Why,F) is true iff F is a fact is true
 %=
 call_u(X):- mpred_call_only_facts(X).
-call_u(Why,X):- show_call((nop(Why),mpred_call_only_facts(X))).
+call_u(Why,X):- dcall(why,(nop(Why),mpred_call_only_facts(X))).
 
 %=
 %= not_cond(Why,F) is true iff F is a fact is not true
 %=
-% not_cond(_Why,X):- show_call_success(mpred_call_0(neg(X))).
+% not_cond(_Why,X):- dcall_success(why,mpred_call_0(neg(X))).
 not_cond(_Why,X):- \+ X.
 
 
@@ -2185,14 +2182,14 @@ mpred_call_with_no_triggers(F) :-
   (is_ftVar(F)    ->  mpred_facts_and_universe(F) ; mpred_call_with_no_triggers_bound(F)).
 
 mpred_call_with_no_triggers_bound(F) :- 
-  show_call_failure(no_side_effects(F)),
+  dcall_failure(mpred_call_with_no_triggers_bound,no_side_effects(F)),
   (\+ current_predicate(_,F) -> fail;call_prologsys(F)).
   %= we check for system predicates as well.
   %has_cl(F) -> (clause_u(F,Condition),(Condition==true->true;call_u(Condition)));
   %call_prologsys(F).
 
 
-mpred_bc_only(G):- mpred_negation(G,Pos),!, show_call(\+ mpred_bc_only(Pos)).
+mpred_bc_only(G):- mpred_negation(G,Pos),!, dcall(why,\+ mpred_bc_only(Pos)).
 mpred_bc_only(G):- !,mpred_call_only_facts(G).
 %mpred_bc_only(G):- loop_check(no_repeats(pfcBC_NoFacts(G))).
 
@@ -2482,8 +2479,6 @@ mpred_connective('-').
 mpred_connective('~').
 mpred_connective('\\+').
 
-cyclic_break(Cyclic):-cyclic_term(Cyclic)->(writeq(cyclic_break(Cyclic)),nl,prolog);true.
-
 process_rule(Lhs,Rhs,Parent_rule) :- 
   copy_term_and_varnames(Parent_rule,Parent_ruleCopy),
   build_rhs((Parent_ruleCopy),Rhs,Rhs2),
@@ -2763,6 +2758,10 @@ mpred_get_trigger_key(Key,Key).
 */
 
 /*
+
+the FOL i get from SUMO, CycL, UMBEL and many *non* RDF ontologies out there.. i convert to Datalog..  evidently my conversion process is unique as it preserves semantics most by the book conversions gave up on. 
+
+
 % TODO not called yet
 %=^L
 %= Get a key from the trigger that will be used as the first argument of
@@ -2789,6 +2788,7 @@ mpred_trigger_key(X,X).
 
 mpred_database_term(kbp:spft/5).
 mpred_database_term(kbp:pk/4).
+mpred_database_term(kbp:pt/3).  % was 3
 mpred_database_term(kbp:bt/3).  % was 3
 mpred_database_term(kbp:nt/4). % was 4
 mpred_database_term('<-'/2).
@@ -2967,6 +2967,7 @@ mpred_no_spy_all :- mpred_no_spy, retractall_i(mpred_is_tracing_exec).
 mpred_no_trace_all :-  retractall_i(mpred_is_tracing_exec).
 mpred_spy_all :- assert_i(mpred_is_tracing_exec).
 mpred_trace_exec :- assert_i(mpred_is_tracing_exec).
+mpred_notrace_exec :- retractall_i(mpred_is_tracing_exec).
 mpred_trace :- mpred_trace(_).
 lmconf:module_local_init:-mpred_no_trace_all.
 
@@ -3098,14 +3099,13 @@ mpred_no_warnings :-
 
 %= *** predicates for exploring supports of a fact *****
 
-
 :- use_module(library(lists)).
 
 justification(F,J) :- supports_f_l(F,J).
 
 justifications(F,Js) :- bagof(J,justification(F,J),Js).
 
-%= baseable(P,L) - is true iff L is a list of "baseable" facts which, taken
+%% baseable(P,L) - is true iff L is a list of "baseable" facts which, taken
 %= together, allows us to deduce P.  A baseable fact is an mpred_axiom (a fact
 %= added by the user or a raw Prolog fact (i.e. one w/o any support))
 %= or an assumption.
@@ -3131,8 +3131,6 @@ mpred_axiom(F) :-
   %mpred_get_support(F,UU);
   %mpred_get_support(F,(g,g));
   mpred_get_support(F,(OTHER,OTHER)).
-
-% mpred_axiom(F) :-  mpred_get_support(F,(U,U)).
 
 %= an assumption is a failed action, i.e. were assuming that our failure to
 %= prove P is a proof of not(P)
@@ -3270,7 +3268,7 @@ cnstrn(X):-term_variables(X,Vs),maplist(cnstrn0(X),Vs),!.
 cnstrn(V,X):-cnstrn0(X,V).
 cnstrn0(X,V):-when(is_ftNonvar(V),X).
 
-rescan_pfc:-forall(clause(lmconf:mpred_hook_rescan_files,Body),show_call_entry(Body)).
+rescan_pfc:-forall(clause(lmconf:mpred_hook_rescan_files,Body),dcall_entry(Why,Body)).
 
 mpred_facts_and_universe(P):- (is_ftVar(P)->pred_head_all(P);true),(meta_wrapper_rule(P)->(no_repeats(on_x_rtrace(P))) ; (no_repeats(on_x_rtrace(P)))).
 

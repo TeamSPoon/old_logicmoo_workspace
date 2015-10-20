@@ -56,7 +56,7 @@
    print_numbervars/1,
             read_source_file_vars/1,
             read_source_file_vars_1/1,
-            read_source_terms/2,
+            read_source_vars/2,
             replace_in_string_frak_0/4,
             save_clause_vars/2,
             save_clause_vars/3,
@@ -64,8 +64,8 @@
             save_file_source_vars/3,
             save_to_clause_ref/3,
             scan_source_files_for_varnames/0,
-            show_call_if_verbose/1,
-            show_call_when/3,
+            dcall_if_verbose/1,
+            dcall_when/3,
             snumbervars4/4,
             snumbervars5/4,
             subterm_path/3,
@@ -91,7 +91,7 @@
         get_clause_vars(:),
         get_clause_vars(:, ?),        
         no_varnaming(0),
-        show_call_when(2, ?, ?),
+        dcall_when(2, ?, ?),
         snumbervars4(*, ?, ?, ?),
         snumbervars5(*, ?, ?, ?),
         try_save_vars(:),
@@ -137,7 +137,7 @@
    print_numbervars/1,
             read_source_file_vars/1,
             read_source_file_vars_1/1,
-            read_source_terms/2,
+            read_source_vars/2,
             replace_in_string_frak_0/4,
             save_clause_vars/2,
             save_clause_vars/3,
@@ -145,8 +145,8 @@
             save_file_source_vars/3,
             save_to_clause_ref/3,
             scan_source_files_for_varnames/0,
-            show_call_if_verbose/1,
-            show_call_when/3,
+            dcall_if_verbose/1,
+            dcall_when/3,
             snumbervars4/4,
             snumbervars5/4,
             subterm_path/3,
@@ -162,6 +162,7 @@
             init_varname_stores/1
  .
 
+ :- meta_predicate logicmoo_varnames:dcall_if_verbose(0).
 :- include('logicmoo_util_header.pi').
 
 :- use_module(library(when)).
@@ -183,7 +184,7 @@
 :- meta_predicate vmust(0).
 vmust(G):-must(G).
 
-show_call_when(P,In,Out):- must(call(P,In,Out)),ignore((In\=@=Out,dmsg((show_call_when(P) :- (In,Out))))).
+dcall_when(P,In,Out):- must(call(P,In,Out)),ignore((In\=@=Out,dmsg((dcall_when(P) :- (In,Out))))).
 
 :- create_prolog_flag(mpred_vars, false, [type(boolean)]).
 :- thread_local(t_l:dont_varname/0).
@@ -485,14 +486,14 @@ scan_source_files_for_varnames:-
  forall(make:modified_file(F),retractall(varname_cache:varname_info_file(F))),
  forall(source_file(F),read_source_file_vars(F)),!.
 
-show_call_if_verbose(G):-!, notrace(G).
-show_call_if_verbose(G):-show_call(G).
+dcall_if_verbose(G):-!, notrace(G).
+dcall_if_verbose(G):-dcall(why,G).
 
 :- dynamic(varname_cache:varname_info_file/1).
 read_source_file_vars(_):- \+ prolog_flag(mpred_vars, true),!.
 read_source_file_vars(F):- \+ ((atom(F),exists_file(F))),!, forall(filematch(F,E),read_source_file_vars(E)).
 read_source_file_vars(F):- clause_asserted(varname_cache:varname_info_file(F)),!.
-read_source_file_vars(F):- asserta(varname_cache:varname_info_file(F,Ref)), catch(show_call_if_verbose(read_source_file_vars_1(F)),E,(dmsg(E),erase(Ref))).
+read_source_file_vars(F):- asserta(varname_cache:varname_info_file(F,Ref)), catch(dcall_if_verbose(read_source_file_vars_1(F)),E,(dmsg(E),erase(Ref))).
 
 save_file_source_vars(_F,end_of_file,_Vs):-!.
 save_file_source_vars(_F,_T,[]):-!.
@@ -500,7 +501,7 @@ save_file_source_vars(F,T,Vs):- b_setval('$variable_names',Vs),!,w_tl(t_l:curren
 
 :- if(true).
 
-read_source_terms(File,In):-
+read_source_vars(File,In):-
 	repeat,
 	  catch(prolog_read_source_term(In, Term, Expanded, [ variable_names(Vs), syntax_errors(error) /*, term_position(TermPos) */ ]),
 		E,(nop((dmsg(E),trace)),fail)),
@@ -521,7 +522,7 @@ read_source_terms(File,In):-
 read_source_file_vars_1(File):-
 	setup_call_cleanup(
 	    prolog_open_source(File, In),
-	    read_source_terms(File,In),
+	    read_source_vars(File,In),
 	    prolog_close_source(In)),!.
 
 :- else.
@@ -579,7 +580,7 @@ print_numbervars_2(H):- write_term(H,[portrayed(false)]),nl,!.
  
 term_expansion_save_vars(HB):- \+ ground(HB),  \+ t_l:dont_varname_te,\+ t_l:dont_varname, \+ current_prolog_flag(xref, true), 
    current_predicate(logicmoo_util_varnames_file/0), current_prolog_flag(mpred_vars,true),  
-   context_module(M),init_varname_stores(M),logicmoo_util_with_assertions:w_tl([t_l:dont_varname_te,current_prolog_flag(xref, true)],logicmoo_varnames:try_save_vars(M:HB)),!,fail.
+   source_context_module(M),init_varname_stores(M),logicmoo_util_with_assertions:w_tl([t_l:dont_varname_te,current_prolog_flag(xref, true)],logicmoo_varnames:try_save_vars(M:HB)),!,fail.
 
 maybe_record_scanned_file:-ignore((  fail,source_location(F,_), \+ varname_cache:varname_info_file(F), asserta(varname_cache:varname_info_file(F)))).
 
@@ -592,7 +593,7 @@ init_varname_stores(M):-
 % :- initialization(maybe_scan_source_files_for_varnames).
 
 prolog:make_hook(before, Files):-forall(member(File,Files),retractall(varname_cache:varname_info_file(File))).
-prolog:make_hook(after, Files):-forall(member(File,Files),show_call(ain00(varname_cache:varname_info_file(File)))).
+prolog:make_hook(after, Files):-forall(member(File,Files),dcall(why,ain00(varname_cache:varname_info_file(File)))).
 
 user:term_expansion(HB,_):- current_prolog_flag(mpred_vars,true),term_expansion_save_vars(HB),fail.
 

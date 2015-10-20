@@ -58,14 +58,12 @@
 */
 :- nodebug(_).
 
-:- use_module(logicmoo(util/logicmoo_util_preddefs)).
+% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
 % :- use_module(logicmoo_base).
 
 
 % = % :- ensure_loaded(logicmoo(snark/common_logic_kb_hooks)).
-
-:- was_dynamic(wid/3).
 
 % :- use_module(  logicmoo(snark/common_logic_sexpr)).
 
@@ -137,7 +135,7 @@ lmconf:mpred_provide_setup(Op,H):- provide_kif_op(Op,H).
 provide_kif_op(change(assert,How),(HeadBody)):- 
    pttp_listens_to_head(change(assert,How),HeadBody),
    why_to_id(provide_kif_op,(HeadBody),ID),
-   kif_tell_boxes1(ID,(HeadBody)).
+   kif_add_boxes1(ID,(HeadBody)).
 
 % OPHOOK CALL
 provide_kif_op(call(How),Head):- 
@@ -201,28 +199,28 @@ room(What).
 
 door(What).
 
-:- kif_tell(a(XX) & b(XX) => c(XX)).
-:- kif_tell(all(R,room(R) => exists(D, (door(D) & has(R,D))))).
-:- kif_tell(loves(Child,fatherFn(Child))).
-:- kif_tell((p => q)).
-:- kif_tell(~p <=> ~q).
-:- kif_tell(p <=> q).
-:- kif_tell(all(P, person(P) => -exists(D, dollar(D) & has(P,D)))).
+:- kif_add(a(XX) & b(XX) => c(XX)).
+:- kif_add(all(R,room(R) => exists(D, (door(D) & has(R,D))))).
+:- kif_add(loves(Child,fatherFn(Child))).
+:- kif_add((p => q)).
+:- kif_add(~p <=> ~q).
+:- kif_add(p <=> q).
+:- kif_add(all(P, person(P) => -exists(D, dollar(D) & has(P,D)))).
 
-:- kif_tell(go(sam) & (go(bill) v go(sally) ) & go(nancy)).
+:- kif_add(go(sam) & (go(bill) v go(sally) ) & go(nancy)).
 
-:- kif_tell(rains_tuesday => wear_rain_gear xor carry_umbrella).
-:- kif_tell(exists(P, (person(P) & all(C, car(C) => ~has(P,C))))).
+:- kif_add(rains_tuesday => wear_rain_gear xor carry_umbrella).
+:- kif_add(exists(P, (person(P) & all(C, car(C) => ~has(P,C))))).
 
 /*
-:- kif_tell(room(R) => exists(D, (door(D) & has(R,D)))).
-:- kif_tell((goes(jane) xor goes(sandra) => goes(bill))).
-:- kif_tell(exists(P, exists(C, (person(P) & car(C) & has(P,C))))).
-:- kif_tell(~all(P,person(P) => exists(C, car(C) & has(P,C)))).
-:- kif_tell((go(sam) & go(bill)) v (go(sally) & go(nancy))).
-:- kif_tell(go(sam) & (go(bill) v go(sally) ) & go(nancy)).
-:- kif_tell(exists(C, course(C) & exists(MT1, midterm(C,MT1) & exists(MT2, midterm(C,MT2) & different(MT1,MT2))))).
-:- kif_tell(exists(C, course(C) & ~exists(MT3, midterm(C,MT3)))).
+:- kif_add(room(R) => exists(D, (door(D) & has(R,D)))).
+:- kif_add((goes(jane) xor goes(sandra) => goes(bill))).
+:- kif_add(exists(P, exists(C, (person(P) & car(C) & has(P,C))))).
+:- kif_add(~all(P,person(P) => exists(C, car(C) & has(P,C)))).
+:- kif_add((go(sam) & go(bill)) v (go(sally) & go(nancy))).
+:- kif_add(go(sam) & (go(bill) v go(sally) ) & go(nancy)).
+:- kif_add(exists(C, course(C) & exists(MT1, midterm(C,MT1) & exists(MT2, midterm(C,MT2) & different(MT1,MT2))))).
+:- kif_add(exists(C, course(C) & ~exists(MT3, midterm(C,MT3)))).
 */
 
 "
@@ -233,7 +231,7 @@ door(What).
 :- told.
 :- dmsg_show(_).
 :- dmsg('i see this').
-:- kif_tell(exists(C, course(C) & ~exists(MT3, midterm(C,MT3)))).
+:- kif_add(exists(C, course(C) & ~exists(MT3, midterm(C,MT3)))).
 :- forall(kif_test_string(TODO),(kif_io(string(TODO),current_output)))
 :- set_no_debug.
 :- notrace.
@@ -241,16 +239,16 @@ door(What).
 
 :- wdmsg('we see this').
 
-:- kif_tell((p => q)).
-:- kif_tell(~p <=> ~q).
-:- kif_tell(tRoom(R) => exists(D, (tDoor(D) & has(R,D)))).
-:- kif_tell(all(P, person(P) => ~(exists(D, dollar(D) & has(P,D))))).
-:- kif_tell(p <=> q).
-:- kif_tell(all(P, person(P) => exists(D, dollar(D) & has(P,D)))).
+:- kif_add((p => q)).
+:- kif_add(~p <=> ~q).
+:- kif_add(tRoom(R) => exists(D, (tDoor(D) & has(R,D)))).
+:- kif_add(all(P, person(P) => ~(exists(D, dollar(D) & has(P,D))))).
+:- kif_add(p <=> q).
+:- kif_add(all(P, person(P) => exists(D, dollar(D) & has(P,D)))).
 */
 kif_result(_).
 :- was_export((kif_test)/1).
-kif_test(X):-kif_tell(X).
+kif_test(X):-kif_add(X).
 :- op(1000,fy,(kif_test)).
 :- assert_until_eof(t_l:canonicalize_types).
 

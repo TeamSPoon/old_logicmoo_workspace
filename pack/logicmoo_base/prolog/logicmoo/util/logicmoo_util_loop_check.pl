@@ -174,7 +174,7 @@ make_key(CC,KeyO):- ((ground(CC)->Key=CC ; cc_key(CC,Key))),!,KeyO=Key.
 :- '$set_predicate_attribute'(make_key(_,_), hide_childs, 1).
 :- '$set_predicate_attribute'(make_key(_,_), trace, 1).
 
-is_loop_checked(Call):-  make_key(Call,Key),!,lmcache:ilc(Key).
+is_loop_checked(Call):-  make_key(Call,Key),!,(lmcache:ilc(Key);lmcache:ilc(Key+_)).
 
 :- meta_predicate logicmoo_utils:loop_check_early(0,0).
 :- export(loop_check_early/2).
@@ -184,8 +184,8 @@ loop_check_early(Call, TODO):- loop_check_term_key(Call,Call, TODO).
 loop_check(Call):- loop_check(Call, fail).
 
 :- export(loop_check/2).
-loop_check(Call, TODO):- !, loop_check_early(Call, TODO).
-% loop_check(Call, TODO):- trace, parent_goal(Term,2)->loop_check_term_key(Call,Term+Call, TODO).
+loop_check(Call, TODO):- !,loop_check_early(Call, TODO).
+loop_check(Call, TODO):- parent_goal(ParentCall,1)->(loop_check_term_key(Call,Call+ParentCall, TODO));loop_check_early(Call, TODO).
 loop_check_term_key(Call,KeyIn,TODO):- make_key(KeyIn,Key) -> loop_check_term(Call,Key,TODO).
 
 
@@ -208,7 +208,7 @@ get_where(B:L):-get_where0(F:L),file_base_name(F,B).
 get_where0(F:L):-source_location(file,F),current_input(S),line_position(S,L),!.
 get_where0(F:L):-source_location(F,L),!.
 get_where0(A:0):-current_input(S),stream_property(S,alias(A)),!.
-get_where0(M:0):-context_module(M),!.
+get_where0(M:0):-source_context_module(M),!.
 get_where0(lmconf:0):-!.
 
 lco_goal_expansion(_,_):-!,fail.
@@ -350,7 +350,7 @@ call_tabled0(Key,Vars,C,List):-call_tabled1(Key,Vars,C,List).
 call_tabled1(Key,Vars,C,List):- asserta(lmcache:maybe_table_key(Key)), findall_nodupes(Vars,C,List),
   ignore((really_can_table,!,
   % if lmcache:maybe_table_key(Key) is now missing that meant a loop_checker had limited some results
-  show_call_failure(retract(lmcache:maybe_table_key(Key))),!,
+  dcall_failure(why,retract(lmcache:maybe_table_key(Key))),!,
   asserta_if_ground(lmcache:call_tabled_cached_results(Key,List)))),!.
 
 really_can_table:- not(test_tl(lmcache:cannot_save_table)),!.

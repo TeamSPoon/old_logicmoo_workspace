@@ -61,7 +61,7 @@ never_assert_u(full_name(finin,isMissing),too_much_forward_chaing).
 
 user_login(joe1).
 
-:- listing([full_name/2,host_name/2,user_login/1]).
+:- sanity(listing([full_name/2,host_name/2,user_login/1])).
 
 :- mpred_test(host_name(joe1,isMissing)).
 
@@ -122,6 +122,8 @@ singleValuedInArgDefault(idForTest,2,isMissing).
 
 tBird(iPeety).
 
+/*
+
 :- mpred_test(idForTest(iPeety,isMissing)).
 
 
@@ -132,14 +134,16 @@ idForTest(iTweetyPie,foo1).
 :- mpred_test(idForTest(iTweetyPie,foo1)).
 
 
-:- show_call(listing(idForTest)).
+:- dcall(why,listing(idForTest)).
 
 ==> \+ idForTest(iTweetyPie,foo1).
 
 :- mpred_test(idForTest(iTweetyPie,isMissing)).
 :- mpred_test(\+ idForTest(iTweetyPie,foo1)).
 
-:- show_call(listing(idForTest)).
+*/
+
+:- dcall(why,listing(idForTest)).
 
 
 :- endif.

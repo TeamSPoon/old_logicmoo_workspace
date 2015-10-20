@@ -141,11 +141,16 @@
             unbuiltin_negate/3,
             unbuiltin_negate/4,
             until_op/1,
-            variants_are_equal/3,
-            wid/3
+            variants_are_equal/3
           ]).
 
-:- use_module(logicmoo(util/logicmoo_util_preddefs)).
+% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
+:-
+            op(1150,fx,(was_dynamic)),
+            op(1150,fx,(was_multifile)),
+            op(1150,fy,(was_module_transparent)),
+            op(1150,fx,(was_export)),
+            op(1150,fx,(was_shared_multifile)).
 
 :- was_shared_multifile 
         
@@ -315,7 +320,7 @@ axiom_lhs_to_rhs(all(Vs,poss(A & B)) ,  ~exists(Vs,nesc(A & B))).
 %   poss(beliefs(A,~F1)) ->  poss(~knows(A,F1)) ->  ~nesc(knows(A,F1))
 nnf(KB,Fin,FreeV,DIA,Paths):-  copy_term(Fin,Fml),axiom_lhs_to_rhs(KB,F1,F2) , 
  \+ \+ (numbervars(Fin,0,_,[attvar(skip)]),logically_matches(KB,Fin,F1)),
-  show_call_success((nop(Fml),logically_matches(KB,Fin,F1))),show_call(nnf(KB,F2,FreeV,DIA,Paths)).
+  dcall_success(nnf,(nop(Fml),logically_matches(KB,Fin,F1))),dcall(why,nnf(KB,F2,FreeV,DIA,Paths)).
 
 nnf(KB,Fin,FreeV,CIR,Paths):- corrected_modal(KB,Fin,cir(CT,F)),
 	nnf(KB,F,FreeV,NNF,Paths), cirRule(KB,cir(CT,NNF), CIR).
@@ -1045,7 +1050,7 @@ mk_skolem(KB, F, X, FreeV, Out):-
    must(skolem_f(KB, F, X, FreeV, Sk)),
    %writeq(freev(Sk,FreeV)),
    must(Out= '=>'({skolem(X,Sk)},F)),
-   !,show_call( asserta((constraintRules(X,Sk,F)))).
+   !,dcall(why, asserta((constraintRules(X,Sk,F)))).
 
 mk_skolem(KB, F, X, FreeV, FmlSk):- 
     must(skolem_f(KB, F, X, FreeV, Sk)), 

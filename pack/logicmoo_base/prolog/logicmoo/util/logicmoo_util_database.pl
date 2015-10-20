@@ -33,7 +33,8 @@ paina/1,pain/1,            painz/1,
             mpred_split_op_data/3,
             retract_eq/1,
             safe_univ/2,
-            safe_univ0/2
+            safe_univ0/2,
+            my_module_sensitive_code/1
           ]).
 :- meta_predicate
         ain(:),
@@ -61,9 +62,12 @@ paina/1,pain/1,            painz/1,
         find_and_call(+, +, ?),
         mpred_mop(+, 1, ?),
         mpred_op_prolog(?, :),
-        mpred_op_prolog0(1,?).
+        mpred_op_prolog0(1,?),
+        my_module_sensitive_code(?).
+
 :- module_transparent
         append_term/3,
+        my_module_sensitive_code/1,
         assertz_new/1,
         call_provider/2,
         clause_eq/3,
@@ -89,15 +93,20 @@ paina/1,pain/1,            painz/1,
 :- export(clause_safe/2).
 
 
+:- meta_predicate my_module_sensitive_code(?).
+my_module_sensitive_code(_E):- source_context_module(CM),writeln(source_context_module=CM).
+
+
 % clause_safe(M:H,B):-!,predicate_property(M:H,number_of_clauses(_)),clause(H,B).
 % clause_safe(H,B):-predicate_property(_:H,number_of_clauses(_)),clause(H,B).
 clause_safe(H,B):-predicate_property(H,number_of_clauses(C)),C>0,clause(H,B).
 
-debugCallWhy(Why, C):- hotrace((notrace,wdmsg(Why))),dtrace(C).
+debugCallWhy(Why, C):- hotrace(wdmsg(Why)),dtrace(C).
+
+on_x_rtrace(C):- notrace((tracing,notrace)),!,trace,C.
 on_x_rtrace(C):- tlbugger:rtracing,!,C.
-% on_x_rtrace(C):- !,C.
-on_x_rtrace(C):- catchvv(C,E,((wdmsg(thrown(E)),trace,rtrace(C)))).
-% on_x_rtrace(C):- catchvv(C,E,call_cleanup(debugCallWhy(thrown(E),C),throw(E))).
+on_x_rtrace(C):- skipWrapper,!,C.
+on_x_rtrace(C):- catchvv(C,E,((wdmsg(on_x_rtrace(E)),trace,rtrace(C),throw(E)))).
 
 :- export(mpred_op_prolog/2).
 :- module_transparent(mpred_op_prolog/2).
@@ -148,7 +157,7 @@ mpred_op_prolog(OP,M:Term):-  trace,!,mpred_mop(M, OP,Term).
 mpred_op_prolog(OP,M:Term):- 
   copy_term(Term, Copy, Gs),
   (Gs==[] -> mpred_mop(M,OP,Term);
-    show_call((
+    dcall(why,(
       as_clause(Copy,H,B),conjoin(maplist(call,Gs),B,NB),trace,mpred_mop(M,OP,(H:-NB))))).
   
 mpred_op_prolog0(OP,MTerm):- call(OP,MTerm).
@@ -238,7 +247,7 @@ clause_eq(C:H0,B,R):- current_predicate(_,M:H0),H=M:H0,predicate_property(H,numb
 
 
 :-export(retract_eq/1).
-retract_eq(HB):-as_clause(HB,H,B),show_call_failure(predicate_property(H,number_of_clauses(_))),clause_asserted(H,B,Ref),erase(Ref).
+retract_eq(HB):-as_clause(HB,H,B),dcall_failure(why,predicate_property(H,number_of_clauses(_))),clause_asserted(H,B,Ref),erase(Ref).
 
 
 :-export(safe_univ/2).
@@ -276,11 +285,11 @@ erase_safe(A,REF):-!,erase_safe(clause(A,true),REF).
 
 erase_safe_now(_,clause(M:A,B),REF):-!,erase_safe_now(M,clause(A,B),REF).
 erase_safe_now(M,clause(A,B),REF):-!,
-   ignore((show_call_success( \+ clause(M:A,B, REF)))),
+   ignore((dcall_success(erase_safe_now, \+ clause(M:A,B, REF)))),
    (((var(REF);
-   show_call_success( \+ nth_clause(A, _Index, REF));   
-   show_call_success(clause_property(REF,erased));
-   show_call_success( \+ clause_property(REF,_))))
+   dcall_success(erase_safe_now, \+ nth_clause(A, _Index, REF));   
+   dcall_success(erase_safe_now, clause_property(REF,erased));
+   dcall_success(erase_safe_now, \+ clause_property(REF,_))))
    -> ddmsg(warn(var_erase_safe(clause(A,B),REF))) ; 
        erase(REF)).
 */

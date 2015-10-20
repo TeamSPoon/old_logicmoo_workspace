@@ -70,7 +70,7 @@ env_mpred_op(OP,P):- var(OP),!,P.
 env_mpred_op(OP,F/A):-integer(A),atom(F),!,functor(P,F,A),!,env_mpred_op(OP,P).
 env_mpred_op(OP,P):- t_l:push_env_ctx, do_prefix_arg(P, ZZ, PP, _Type),P\==PP,!,get_env_ctx(ZZ),call(OP,/*ocluser*/ocl:PP).
 env_mpred_op(OP,P):- functor_h(P,F,A),must(get_mpred_stubType(F,A,ENV)),!,env_mpred_op(ENV,OP,P).
-env_mpred_op(OP,P):- append_term(OP,P,CALL),current_predicate(_,CALL),!,show_call(/*ocluser*/ocl:CALL).
+env_mpred_op(OP,P):- append_term(OP,P,CALL),current_predicate(_,CALL),!,dcall(why,/*ocluser*/ocl:CALL).
 env_mpred_op(OP,P):- trace,trace_or_throw(unk_env_mpred_op(OP,P)).
 
 env_shadow(OP,P):-lmconf:call(OP,P).
@@ -371,7 +371,7 @@ env_assert(F):-!,maybe_show_env_mpred_op(assert(F)).
 env_retract(F):-!,maybe_show_env_mpred_op(retract(F)).
 env_retractall(F):-!,maybe_show_env_mpred_op(retractall(F)).
 maybe_show_env_mpred_op(G):- !,G.
-maybe_show_env_mpred_op(G):- t_l:db_spy -> show_call(G); G.
+maybe_show_env_mpred_op(G):- t_l:db_spy -> dcall(why,G); G.
 
 :- meta_predicate(maybe_show_env_mpred_op(0)).
 

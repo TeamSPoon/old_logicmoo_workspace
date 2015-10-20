@@ -3,6 +3,10 @@
 
 */
 
+:- set_prolog_stack(global, limit(16*10**9)).
+:- set_prolog_stack(local, limit(16*10**9)).
+:- set_prolog_stack(trail, limit(16*10**9)).
+
 :- ensure_loaded(setup_paths).
 
 % ==============================
@@ -11,9 +15,7 @@
 :- asserta(user:load_mud_www).
 :- user:ensure_loaded(library(logicmoo/logicmoo_base)).
 
-:-set_prolog_stack(global, limit(16*10**9)).
-:-set_prolog_stack(local, limit(16*10**9)).
-:-set_prolog_stack(trail, limit(16*10**9)).
+
 :- statistics.
 user:file_search_path(prologmud, library(prologmud)).
 setup_rl_read_history:-
@@ -29,37 +31,42 @@ setup_rl_read_history:-
 
 :- asserta(user:load_mud_www).
 
+
 % [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/)
-:- if_file_exists(user:ensure_loaded(library(eggdrop))).
+:- if(user:exists_source(library(eggdrop))).
+:- ensure_loaded(library(eggdrop)).
 :- eggdrop:egg_go.
 :- initialization((current_predicate(egg_go/0)->egg_go;true),now).
-
+:- endif.
 
 % [Required] Load the Logicmoo Base System
 :- time(user:ensure_loaded(logicmoo(logicmoo_base))).
-:- meta_predicate user:testml(//).
+% :- meta_predicate user:testml(//).
+
 
 
 % [Optionaly] Load the Logicmoo WWW System
 :- if(if_defined(user:load_mud_www)).
-
+/*
 :- (if_file_exists(user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www)))).
 :- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_pldoc)))).
 :- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_swish)))).
 :- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_clio)))).
 
 :- ensure_webserver.
+*/
 :- endif.
 
+:- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_base)))).
+
+:- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_user)))).
 
 % ==============================
 % Load the infernce engine
 % ==============================
 
 % [Required] Load the Logicmoo Backchaining Inference System
-:- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
+% :- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
 
-
-
-
+:-  m1,m4,m1,egg_go.
 

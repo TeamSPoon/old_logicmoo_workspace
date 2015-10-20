@@ -63,11 +63,9 @@ meta_argtypes(mpred_default(ftAssertable)).
 (mpred_default((Q <- P))/mpred_literal(Q)) ==> (Q <-(P, ~neg(Q))).
 
 
-
-:- mpred_trace_exec.
-
-
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
+
+% :- mpred_trace_exec.
 
 :- ensure_loaded('genls.pfc').
 

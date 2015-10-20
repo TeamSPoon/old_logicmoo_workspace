@@ -667,7 +667,7 @@ addCycL(V):-into_mpred_form(V,M),V\=@=M,!,addCycL(M),!.
 addCycL(V):-defunctionalize('implies',V,VE),V\=@=VE,!,addCycL(VE).
 addCycL(V):-cyc_to_clif(V,VE),V\=@=VE,!,addCycL(VE).
 addCycL(V):-is_simple_gaf(V),!,addCycL0(V),!.
-addCycL(V):-kif_to_boxlog(V,VB),boxlog_to_prolog(VB,VP),V\=@=VP,!,as_cycl(VP,VE),show_call(addCycL0(VE)).
+addCycL(V):-kif_to_boxlog(V,VB),boxlog_to_prolog(VB,VP),V\=@=VP,!,as_cycl(VP,VE),dcall(why,addCycL0(VE)).
 addCycL(V):-addCycL0(V),!.
 
 addCycL0(V):-addCycL1(V).
@@ -677,8 +677,8 @@ addCycL1(V):-cyc_to_clif(V,VE),V\=@=VE,!,addCycL0(VE).
 addCycL1((TRUE=>V)):-is_true(TRUE),addCycL0(V),!.
 addCycL1(<=(V , TRUE)):-is_true(TRUE),addCycL0(V),!.
 addCycL1((V :- TRUE)):-is_true(TRUE),addCycL0(V),!.
-addCycL1((V :- A)):- show_call(addCycL0((A => V))).
-addCycL1((A => (V1 , V2))):-not(is_ftVar(V1)),!,show_call(addCycL0((A => V1))) , show_call(addCycL0((A => V2))).
+addCycL1((V :- A)):- dcall(why,addCycL0((A => V))).
+addCycL1((A => (V1 , V2))):-not(is_ftVar(V1)),!,dcall(why,addCycL0((A => V1))) , dcall(why,addCycL0((A => V2))).
 addCycL1((V1 , V2)):-!,addCycL0(V1),addCycL0(V2),!.
 addCycL1([V1 | V2]):-!,addCycL0(V1),addCycL0(V2),!.
 addCycL1(V):-addTiny_added(V),!.
@@ -693,7 +693,7 @@ cycLToMpred(V,CP):-into_mpred_form(V,M),V\=@=M,!,cycLToMpred(M,CP),!.
 cycLToMpred(V,CP):-cyc_to_clif(V,VE),V\=@=VE,!,cycLToMpred(VE,CP).
 cycLToMpred(V,CP):-is_simple_gaf(V),!,cycLToMpred0(V,CP),!.
 cycLToMpred(V,CP):-defunctionalize('implies',V,VE),V\=@=VE,!,cycLToMpred(VE,CP).
-cycLToMpred(V,CP):-kif_to_boxlog(V,VB),boxlog_to_prolog(VB,VP),V\=@=VP,!,as_cycl(VP,VE),show_call(cycLToMpred0(VE,CP)).
+cycLToMpred(V,CP):-kif_to_boxlog(V,VB),boxlog_to_prolog(VB,VP),V\=@=VP,!,as_cycl(VP,VE),dcall(why,cycLToMpred0(VE,CP)).
 cycLToMpred(V,CP):-cycLToMpred0(V,CP),!.
 
 cycLToMpred0(V,CP):-into_mpred_form(V,M),V\=@=M,!,cycLToMpred0(M,CP),!.
@@ -701,7 +701,7 @@ cycLToMpred0(V,CP):-cyc_to_clif(V,VE),V\=@=VE,!,cycLToMpred0(VE,CP).
 cycLToMpred0((TRUE=>V),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
 cycLToMpred0((V <=> TRUE),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
 cycLToMpred0((V :- TRUE),CP):-is_true(TRUE),cycLToMpred0(V,CP),!.
-cycLToMpred0((V :- A),CP):- show_call(cycLToMpred0((A => V),CP)).
+cycLToMpred0((V :- A),CP):- dcall(why,cycLToMpred0((A => V),CP)).
 cycLToMpred0((A => (V1 , V2)),CP):-not(is_ftVar(V1)),!,cycLToMpred0((A=> (V1/consistent(V2))),V1P),cycLToMpred0((A=> (V2/consistent(V1))),V2P) ,!,conjoin(V1P,V2P,CP).
 cycLToMpred0((V1 , V2),CP):-!,cycLToMpred0(V1,V1P),cycLToMpred0(V2,V2P),!,conjoin(V1P,V2P,CP).
 cycLToMpred0([V1 | V2],CP):-!,cycLToMpred0(V1,V1P),cycLToMpred0(V2,V2P),!,conjoin(V1P,V2P,CP).

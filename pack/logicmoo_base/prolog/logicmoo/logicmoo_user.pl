@@ -17,17 +17,17 @@
 :- discontiguous('$si$':'$was_imported_kb_content$'/2).
 % :- module(logicmoo_user).
 
-
+/*
 :- set_prolog_flag(report_error,true).
 :- set_prolog_flag(fileerrors,false).
 % :- set_prolog_flag(access_level,system).
 :- set_prolog_flag(debug_on_error,true).
 :- set_prolog_flag(debug,true).
-:- set_prolog_flag(gc,false).
+% :- set_prolog_flag(gc,false).
 :- set_prolog_flag(optimise,false).
 :- set_prolog_flag(last_call_optimisation,false).
 :- debug.
-
+*/
 
 % :- ensure_loaded(logicmoo_utils).
 :- use_module(logicmoo_base).
@@ -57,8 +57,7 @@ m4:- ensure_mpred_file_loaded(pfc/autoexec).
 m5 :- enable_mpred_system(kb).
 
 % :-trace,call((R = (==>((P,Q,z(_)),(p(P),q(Q)))))
-:- use_module(mpred/mpred_loader).
-
+% :- use_module(mpred/mpred_loader).
 
 
 

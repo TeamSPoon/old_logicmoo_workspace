@@ -27,6 +27,7 @@
             dmsg/3,
           dmsg/1,
           dmsg/2,
+          debugm/2,
           cls/0,
             dmsg0/1,
             dmsg0/2,
@@ -502,11 +503,11 @@ ansifmt(Ctrl,Fmt):- colormsg(Ctrl,Fmt).
 ansifmt(Ctrl,F,A):- colormsg(Ctrl,(format(F,A))).
 
 
+debugm(Why,_Msg):- \+ debugging(mpred),\+ debugging(Why),\+ debugging(mpred(Why)),!.
+debugm(_,Why):- dmsg(Why).
+
 
 % = :- export(colormsg/2).
-
-
-
 colormsg(d,Msg):- mesg_color(Msg,Ctrl),!,colormsg(Ctrl,Msg).
 colormsg(Ctrl,Msg):- ansicall(Ctrl,fmt0(Msg)).
 
@@ -527,7 +528,7 @@ is_tty(Out):- not(tlbugger:no_colors), \+ tlbugger:no_slow_io, is_stream(Out),st
 ansicall(Out,_,Call):- \+ is_tty(Out),!,Call.
 ansicall(_Out,_,Call):- tlbugger:skipDumpST9,!,Call.
 
-% in_pengines:- if_defined(relative_frame(context_module,pengines,_)).
+% in_pengines:- if_defined(relative_frame(source_context_module,pengines,_)).
 
 ansicall(_,_,Call):-tlbugger:no_slow_io,!,Call.
 ansicall(Out,CtrlIn,Call):- once(ansi_control_conv(CtrlIn,Ctrl)),  CtrlIn\=Ctrl,!,ansicall(Out,Ctrl,Call).
