@@ -34,4 +34,13 @@
 				Excludes=".git/;.svn/;*.*~;*~/"/>
 		</Folder>
 	</Files>
+	<Files AutoFolders="DirectoryView">
+		<Folder Name="../../logicmoo_experimental/">
+			<F
+				N="../../logicmoo_experimental/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes=".git/;.svn/;*.*~;*~/"/>
+		</Folder>
+	</Files>
 </Project>
