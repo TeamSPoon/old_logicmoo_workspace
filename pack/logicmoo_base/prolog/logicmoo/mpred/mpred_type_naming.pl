@@ -172,7 +172,7 @@ onSpawn_0(Modality,ClassFact):- ClassFact=..[FunctArgType,Name],
  assert_isa(Inst,FunctArgType),
  assert_isa(Inst,TypeA),
  fully_expand(t(Modality,genls(TypeA,FunctArgType)),TO),
- add(TO),!.
+ ain(TO),!.
 
 onSpawn_0(Modality,ClassFact):- ClassFact=..[Funct|InstADeclB],
   must_det(onSpawn_f_args(Modality,Funct,InstADeclB)).
@@ -181,8 +181,8 @@ onSpawn_f_args(Modality,Funct,List):-
   must(convertSpawnArgs(Funct,1,List,NewList)),
    Later =.. [Funct|NewList],
    fully_expand(t(Modality,Later),TO),
-   add(TO),!. 
-  % call_after_mpred_load_slow(w_tl(deduceArgTypes(Funct), add(Later))))),!.
+   ain(TO),!. 
+  % call_after_mpred_load_slow(w_tl(deduceArgTypes(Funct), ain(Later))))),!.
 
 convertSpawnArgs(_,_,[],[]).
 convertSpawnArgs(Funct,N,[A|List],[O|NewList]):-
@@ -205,7 +205,7 @@ convertToInstance(Name,COLTHING,TypeA):- isa(COLTHING,ttTypeType),createByNameMa
 convertToInstance(Name,COLTHING,TypeA):- genls(COLTHING,tCol),createByNameMangle(Name,_,TypeA),assert_isa(TypeA,COLTHING).
 convertToInstance(Name,FunctArgType,Inst):- createByNameMangle(Name,Inst,TypeA),
   %  assert_isa(Inst,FunctArgType),
-    add(genls(TypeA,FunctArgType)),!.
+    ain(genls(TypeA,FunctArgType)),!.
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 

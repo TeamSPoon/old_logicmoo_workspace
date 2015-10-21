@@ -194,21 +194,22 @@
 
 
 
-:- op(300,fx,'~').
+:- op(500,fx,'~').
+:- op(1199,fx,('==>')).
+:- op(1190,xfx,('::::')).
+:- op(1180,xfx,('==>')).
+:- op(1170,xfx,'<==>').
+:- op(1160,xfx,('<-')).
+:- op(1150,xfx,'=>').
+:- op(1140,xfx,'<=').
+:- op(1130,xfx,'<=>').
+:- op(1100,fx,('nesc')).
 :- op(300,fx,'-').
-:- op(400,yfx,'&').  
-:- op(500,yfx,'v').
-:- op(1075,xfx,'=>').
-:- op(1075,xfx,'<=>').
+:- op(600,yfx,'&'). 
+:- op(600,yfx,'v').
+:- op(1075,xfx,'<-').
 :- op(350,xfx,'xor').
-
-:- op(300,fx,user:'~').
-:- op(300,fx,user:'-').
-:- op(400,yfx,user:'&').  
-:- op(500,yfx,user:'v').
-:- op(1075,xfx,user:'=>').
-:- op(1075,xfx,user:'<=>').
-:- op(350,xfx,user:'xor').
+:- op(1100,fx,(was_shared_multifile)).
 
 % SWI Prolog modules do not export operators by default
 % so they must be explicitly placed in the user namespace
@@ -320,7 +321,7 @@ axiom_lhs_to_rhs(all(Vs,poss(A & B)) ,  ~exists(Vs,nesc(A & B))).
 %   poss(beliefs(A,~F1)) ->  poss(~knows(A,F1)) ->  ~nesc(knows(A,F1))
 nnf(KB,Fin,FreeV,DIA,Paths):-  copy_term(Fin,Fml),axiom_lhs_to_rhs(KB,F1,F2) , 
  \+ \+ (numbervars(Fin,0,_,[attvar(skip)]),logically_matches(KB,Fin,F1)),
-  dcall_success(nnf,(nop(Fml),logically_matches(KB,Fin,F1))),dcall(why,nnf(KB,F2,FreeV,DIA,Paths)).
+  show_success(nnf,(nop(Fml),logically_matches(KB,Fin,F1))),show_call(why,nnf(KB,F2,FreeV,DIA,Paths)).
 
 nnf(KB,Fin,FreeV,CIR,Paths):- corrected_modal(KB,Fin,cir(CT,F)),
 	nnf(KB,F,FreeV,NNF,Paths), cirRule(KB,cir(CT,NNF), CIR).
@@ -1050,7 +1051,7 @@ mk_skolem(KB, F, X, FreeV, Out):-
    must(skolem_f(KB, F, X, FreeV, Sk)),
    %writeq(freev(Sk,FreeV)),
    must(Out= '=>'({skolem(X,Sk)},F)),
-   !,dcall(why, asserta((constraintRules(X,Sk,F)))).
+   !,show_call(why, asserta((constraintRules(X,Sk,F)))).
 
 mk_skolem(KB, F, X, FreeV, FmlSk):- 
     must(skolem_f(KB, F, X, FreeV, Sk)), 

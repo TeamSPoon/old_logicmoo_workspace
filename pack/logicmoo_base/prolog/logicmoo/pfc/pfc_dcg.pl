@@ -71,7 +71,7 @@ mpred_tidy(A,A) :- !.
 compile_pfcg :-
   ((retract((L -->> R)), mpred_translate_rule((L -->> R), PfcRule));
     (retract((L --*>> R)), mpred_translate_rule((L --*>> R), PfcRule))),
-  mpred_add(PfcRule),
+  ain(PfcRule),
   fail.
 compile_pfcg.
 
@@ -84,11 +84,11 @@ parse(Words) :-
 parse(Words,Id) :-
   gen_s_tag(Id),
   parse1(Words,Id),
-  mpred_add(sentence(Id,Words)).
+  ain(sentence(Id,Words)).
 
 parse1([],_) :- !.
 parse1([H|T],Id) :-
- l_do(mpred_add(ss(word(H),Id,([H|T] \\ T)))),
+ l_do(ain(ss(word(H),Id,([H|T] \\ T)))),
  parse1(T,Id).
 
 
@@ -98,7 +98,7 @@ show_sentences(Id) :- show_sentences(Id,_).
 
 show_sentences(Id,Words) :-
   sentence(Id,Words),
-  mpred_call(ss(s(S),Id,(Words \\ []))),
+  req(ss(s(S),Id,(Words \\ []))),
   nl,write(S),
   fail.
 show_sentences(_,_).
@@ -107,7 +107,7 @@ show_sentences(_,_).
 l_do(X) :- call(X) -> true;true.
 
 show(Id,C) :-
-  mpred_call(ss(C,Id,A \\ B)),
+  req(ss(C,Id,A \\ B)),
   append(Words,B,A),
   format("~N%  ~w    :   ~w",[C,Words]),
   fail.
@@ -126,8 +126,8 @@ make_term(ss(Constituent,Id,String),Term) :-
    Term =.. Term_string.
 
 
-is_mpred_term_expansion((P -->> Q),(:- mpred_add(Rule))) :-
+is_mpred_term_expansion((P -->> Q),(:- ain(Rule))) :-
   mpred_translate_rule((P -->> Q), Rule).
-is_mpred_term_expansion((P --*>> Q),(:- mpred_add(Rule))) :-
+is_mpred_term_expansion((P --*>> Q),(:- ain(Rule))) :-
   mpred_translate_rule((P --*>> Q), Rule).
 

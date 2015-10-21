@@ -175,15 +175,15 @@
             set_yes_debug_thread/0,
             showProfilerStatistics/1,
             show_and_do/1,
-            dcall/2,
-            dcall/1,
+            show_call/2,
+            show_call/1,
             dcall0/1,
-            dcall_entry/2,
-            dcall_entry/1,
-            dcall_failure/2,
-            dcall_failure/1,
-            dcall_success/2,
-            dcall_success/1,
+            show_entry/2,
+            show_entry/1,
+            show_failure/2,
+            show_failure/1,
+            show_success/2,
+            show_success/1,
             show_goal_rethrow/2,
             show_module/1,
             shrink_clause/2,
@@ -293,15 +293,15 @@
         show_and_do(0),        
         dcall0(0),
 
-   dcall(+,0),
-   dcall_entry(+,0),
-   dcall_failure(+,0),
-   dcall_success(+,0),
+   show_call(+,0),
+   show_entry(+,0),
+   show_failure(+,0),
+   show_success(+,0),
 
-   dcall(0),
-   dcall_entry(0),
-   dcall_failure(0),
-   dcall_success(0),
+   show_call(0),
+   show_entry(0),
+   show_failure(0),
+   show_success(0),
 
         test_tl(+),
         test_tl(1, +),
@@ -316,7 +316,7 @@
         with_no_term_expansions(0),
         with_skip_bugger(0).
 :- module_transparent
-                    dcall_failure/1,
+                    show_failure/1,
         asserta_if_ground/1,
         atom_contains666/2,
         bad_idea/0,
@@ -825,7 +825,7 @@ meta_interp(CE,(A*->B;C)):-!,(meta_interp(CE,A)*->meta_interp(CE,B);meta_interp(
 meta_interp(CE,(A,!)):-!,meta_interp(CE,A),!.
 meta_interp(CE,(A,B)):-!,meta_interp(CE,A),meta_interp(CE,B).
 %meta_interp(_CE,!):- !, cut_block(!).
-meta_interp(CE,A):- dcall(why,call(CE,meta_call(A))).
+meta_interp(CE,A):- show_call(why,call(CE,meta_call(A))).
 
 
 % was_module(Mod,Exports) :- nop(was_module(Mod,Exports)).
@@ -1215,7 +1215,7 @@ real_builtin_predicate(G):- predicate_property(G,foreign),!.
 real_builtin_predicate(G):- strip_module(G,_,GS),(predicate_property(prolog:GS,built_in);predicate_property(system:GS,built_in)),!.
 real_builtin_predicate(G):- predicate_property(G,built_in),functor(G,F,_), 
    lmconf:mpred_system_kb(M), 
-   (if_defined(M:mpred_isa(F,prologHybrid));if_defined(kb:mpred_isa(F,prologHybrid))).
+   (if_defined(M:mpred_isa(F,prologHybrid));if_defined(baseKB:mpred_isa(F,prologHybrid))).
 
 will_debug_else_throw(E,Goal):- dmsg(bugger(will_debug_else_throw(E,Goal))),grtrace,Goal.
 
@@ -1411,7 +1411,7 @@ if_prolog(_,_):-!. % Dont run SWI Specificd or others
 % = %= :- meta_predicate (time_call(0)).
 time_call(Call):-
   statistics(runtime,[MSecStart,_]),   
-  ignore(dcall_failure(why,Call)),
+  ignore(show_failure(why,Call)),
   statistics(runtime,[MSecEnd,_]),
    MSec is (MSecEnd-MSecStart),
    Time is MSec/1000,
@@ -1449,24 +1449,24 @@ gripe_time(TooLong,Goal):-statistics(cputime,Start),
 cleanup_strings:-!.
 cleanup_strings:-garbage_collect_atoms.
 
-% = %= :- meta_predicate (dcall_entry(Why,0)).
-dcall_entry(Why,Call):-debugm(Why,dcall_entry(Call)),dcall(Why,Call).
-dcall_entry(Call):-dcall_entry(mpred,Call).
+% = %= :- meta_predicate (show_entry(Why,0)).
+show_entry(Why,Call):-debugm(Why,show_entry(Call)),show_call(Why,Call).
+show_entry(Call):-show_entry(mpred,Call).
 
 %= :- meta_predicate  dcall0(0).
-dcall0(Goal):- Goal. % on_x_debug(Goal). % dmsg(dcall(why,Goal)),Goal.      
+dcall0(Goal):- Goal. % on_x_debug(Goal). % dmsg(show_call(why,Goal)),Goal.      
 
-%= :- meta_predicate  dcall(+,0).
-dcall(Why,Goal):- dcall_success(Why,dcall_failure(Why,Goal)).
-dcall(Goal):- dcall(mpred,Goal).
+%= :- meta_predicate  show_call(+,0).
+show_call(Why,Goal):- show_success(Why,show_failure(Why,Goal)).
+show_call(Goal):- show_call(mpred,Goal).
 
-%= :- meta_predicate  dcall_failure(+,0).
-dcall_failure(Why,Goal):-one_must(dcall0(Goal),(debugm(Why,sc_failed(Why,Goal)),!,fail)).
-dcall_failure(Goal):- dcall_failure(mpred,Goal).
+%= :- meta_predicate  show_failure(+,0).
+show_failure(Why,Goal):-one_must(dcall0(Goal),(debugm(Why,sc_failed(Why,Goal)),!,fail)).
+show_failure(Goal):- show_failure(mpred,Goal).
 
-%= :- meta_predicate  dcall_success(why,0).
-dcall_success(Why,Goal):- dcall0(Goal),debugm(Why,sc_success(Why,Goal)).
-dcall_success(Goal):- dcall_success(mpred,Goal).
+%= :- meta_predicate  show_success(why,0).
+show_success(Why,Goal):- dcall0(Goal),debugm(Why,sc_success(Why,Goal)).
+show_success(Goal):- show_success(mpred,Goal).
 
 %= :- meta_predicate  on_f_log_fail(0).
 :- export(on_f_log_fail/1).
@@ -1536,7 +1536,7 @@ module_stack(M,frame):- prolog_current_frames(Each), prolog_frame_attribute(Each
 
 loading_module(M):- (((loading_module(M,_),M\=user));M=user),!.
 
-show_module(W):-dmsg('<!--':W),ignore((dcall(why,(loading_module(_,_))),fail)),dmsg(W:'-->').
+show_module(W):-dmsg('<!--':W),ignore((show_call(why,(loading_module(_,_))),fail)),dmsg(W:'-->').
 
 
 
@@ -1710,7 +1710,7 @@ in_toplevel :- nth_pi(LF,_:'$load_file'/_),nth_pi(TL,'$toplevel':_/0),!,LF>TL,
 
 :- dynamic(did_ref_job/1).
 do_ref_job(_Body,Ref):-did_ref_job(Ref),!.
-do_ref_job(Body ,Ref):-asserta(did_ref_job(Ref)),!,dcall(why,Body).
+do_ref_job(Body ,Ref):-asserta(did_ref_job(Ref)),!,show_call(why,Body).
 
 
 % bugger_prolog_exception_hook(error(syntax_error(operator_expected),_),_,_,_).

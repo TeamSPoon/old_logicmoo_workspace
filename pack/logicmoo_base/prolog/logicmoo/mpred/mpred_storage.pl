@@ -17,8 +17,8 @@
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_storage.pl
 :- module(mpred_storage,
-          [ add/1,
-            add_0/1,
+          [ % ain/1,
+          %  add_0/1,
             add_fast/1,
             call_props/2,
             clr/1,
@@ -70,7 +70,7 @@
             mdel/1,
             mpred_modify/2,
             lmconf:mpred_provide_storage_op/4,
-            mreq/1,
+           % mreq/1,
             must_storage_op/2,
             nonground_throw_else_fail/1,
             not_asserted/1,
@@ -83,7 +83,7 @@
             prolog_op/2,
             prop/3,
             prop_or/4,
-            req/1,
+            %req/1,
             requires_storage/2,
             requires_storage/3,
             rescan_argIsa/3,
@@ -114,7 +114,7 @@
           ]).
 
 :- meta_predicate 
-        add(-),
+        % ain(-),
         clr(-),
         del(-),
         fact_checked(?, 0),
@@ -126,7 +126,7 @@
         is_asserted_1(?),
         is_asserted_eq(?),
         not_asserted(?),
-        req(-),
+        %req(-),
         with_fallbacks(0),
         with_fallbacksg(0),
         with_no_db_hooks(0),
@@ -159,8 +159,11 @@
 
 
 
-:- was_export(( (add)/1, clr/1,ireq/1,del/1,  
-  padd/2, padd/3, prop/3, prop_or/4, call_props/2, iprops/2, upprop/2,add/1, ireq/1, mreq/1, upprop/1, req/1, 
+:- was_export((  clr/1,ireq/1,del/1,  
+  padd/2, padd/3, prop/3, prop_or/4, call_props/2, iprops/2, upprop/2, % ain/1, 
+    ireq/1, % mreq/1, 
+    %(ain)/1,
+    upprop/1, % req/1, 
   % use_term_listing/2,  
   world_clear/1,  
    with_kb_assertions/2)).
@@ -201,11 +204,11 @@ rescan_argIsa(F,N,Type):- ignore(( arity(F,A), functor(M,F,A),forall((clause_ass
 
 deduceEachArgType(Var):- \+ compound(Var),!.
 deduceEachArgType(meta_argtypes(MT)):- !, rescan_meta_argtypes(MT).
-deduceEachArgType(tRelation(M)):-compound(M),functor(M,F,A),add(meta_argtypes(M)),add(tRelation(F)),add(arity(F,A)).
+deduceEachArgType(tRelation(M)):-compound(M),functor(M,F,A),ain(meta_argtypes(M)),ain(tRelation(F)),ain(arity(F,A)).
 deduceEachArgType(M):-functor(M,F,A),M=..[F|ARGS],deduceEachArgType(F,A,ARGS).
 deduceEachArgType(F,_,_):-var(F),!.
 deduceEachArgType(argIsa,3,[_F,_N,_Type]):-!.
-% deduceEachArgType(argIsa,3,[F,N,Type]):- ttFormatType(Type),add(argQuotedIsa(F,N,Type)),!.
+% deduceEachArgType(argIsa,3,[F,N,Type]):- ttFormatType(Type),ain(argQuotedIsa(F,N,Type)),!.
 deduceEachArgType(argIsa,3,[F,N,Type]):- rescan_argIsa(F,N,Type),fail.
 deduceEachArgType(t,_,[F|_]):-var(F),!.
 deduceEachArgType(F,_,[E]):- tCol(F),deduceEachArg_WithType(E,F),!.
@@ -276,7 +279,7 @@ not_asserted(X):- !,(\+ clause(X,true)).
 not_asserted(X):- not(no_loop_check(is_asserted_1(X))).
 is_asserted_eq(HB):- ( \+ \+ no_loop_check(is_asserted_1(HB))).
 
-is_asserted(X):- no_repeats(loop_check(mpred_call(X))).
+is_asserted(X):- no_repeats(loop_check(req(X))).
 is_asserted(X,Y):- no_repeats(loop_check(is_asserted_2(X,Y))).
 is_asserted(X,Y,Z):- no_repeats(loop_check(is_asserted_3(X,Y,Z))).
 
@@ -286,7 +289,7 @@ is_asserted_1(V):-var(V),!,trace_or_throw(var_is_asserted(V)).
 is_asserted_1((H)):- is_static_pred(H),!,show_pred_info(H),dtrace(is_asserted_1((H))).
 %is_asserted_1(HB):-hotrace((fully_expand_warn(is_asserted_1,HB,HHBB))),!,is_asserted_1(HHBB).
 
-is_asserted_1(H):- !, w_tl(t_l:infAssertedOnly(H),mpred_call(H)).
+is_asserted_1(H):- !, w_tl(t_l:infAssertedOnly(H),req(H)).
 
 %is_asserted_1(argIsa(mpred_isa,2,mpred_isa/2)):-  trace_or_throw(is_asserted_1(argIsa(mpred_isa,2,mpred_isa/2))),!,fail.
 is_asserted_1(clause(H,B,Ref)):-!,is_asserted_3(H,B,Ref).
@@ -342,7 +345,7 @@ ensure_predicate_reachable(M,C):-once((predicate_property(C,imported_from(Other)
                                        source_context_module(CM),
                                        dmsg(wrong_import_module(M,Other:C,from(CM))),
                                        ignore(delete_import_module(CM,Other)),
-                                       '@'((M:dynamic(C),M:export(C)),M),lmconf:import(M:C))),fail.
+                                       '@'((M:dynamic(C),M:export(C)),M),lmconf:zz2import(M:C))),fail.
 ensure_predicate_reachable(_,_).
 */
 
@@ -380,7 +383,7 @@ make_body_clause(_Head,Body,Body):-atomic(Body),!.
 make_body_clause(_Head,Body,Body):-special_wrapper_body(Body,_Why),!.
 make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 
-special_head(_,F,Why):-special_head0(F,Why),!,dcall_failure(why,not(isa(F,prologDynamic))).
+special_head(_,F,Why):-special_head0(F,Why),!,show_failure(why,not(isa(F,prologDynamic))).
 special_head0(F,ttPredType):-ttPredType(F),!.
 special_head0(F,functorDeclares):-t(functorDeclares,F),!.
 special_head0(F,prologMacroHead):-t(prologMacroHead,F),!.
@@ -411,7 +414,7 @@ get_body_functor(BDY,BF,A):-get_functor(BDY,BF,A).
 
 % -  del(RetractOne) 
 del(C):- fully_expand(change(retract,a),C,C0),mpred_maptree(del0,C0).
-del0(C0):- mpred_call(C0),!,clr(C0),!.
+del0(C0):- req(C0),!,clr(C0),!.
 del0(C0):- ireq(C0),!,idel(C0),!.
 del0(C0):- mreq(C0),!,mdel(C0),!.
 
@@ -434,10 +437,10 @@ clr0(P):-
 preq(P,C0):- agenda_do_prequery,!,no_repeats(C0,mpred_op(query(t,P),C0)).
 
 % -  req(Query) = Normal query
-req(C0):- nop(dmsg(req(C0))), !,preq(req,/*to_exp*/(C0)).
+req_old2(C0):- nop(dmsg(req(C0))), !,preq(req,/*to_exp*/(C0)).
 
 % -  mreq(Query) = Forced Full query
-mreq(C0):- nop(dmsg(mreq(C0))), agenda_rescan_for_module_ready,
+mreq_old2(C0):- nop(dmsg(mreq(C0))), agenda_rescan_for_module_ready,
    no_loop_check(w_tl([-infInstanceOnly(_),-t_l:infAssertedOnly(_),-t_l:noRandomValues(_)],
      preq(must,/*to_exp*/(C0)))).
 
@@ -462,26 +465,27 @@ forall_setof(ForEach,Call):-
 :- thread_local add_thread_override/1.
 % t_l:add_thread_override(A):-add_from_macropred(A),!.
 
-:- was_export(((add)/1)).
-:- mpred_trace_nochilds((add)/1).
-add(A):- var(A),!,trace_or_throw(var_add(A)).
-add(end_of_file):-!.
-add(grid_key(KW=COL)):- !, add(typeHasGlyph(COL,KW)).
-% add(Term):- unnumbervars(Term,TermE), Term \=@= TermE,!,add(TermE).
-% add(Term):-  forall(do_expand_args(isEach,Term,O),add_0(O)),!.
-add(TermIn):- fully_expand(change(assert,add),TermIn,Term),add_0(Term).
+/*
+:- was_export(((ain)/1)).
+% :- mpred_trace_nochilds((ain)/1).
+ain(A):- throw(depricated), var(A),!,trace_or_throw(var_add(A)).
+ain(end_of_file):-!.
+ain(grid_key(KW=COL)):- !, ain(typeHasGlyph(COL,KW)).
+% ain(Term):- unnumbervars(Term,TermE), Term \=@= TermE,!,ain(TermE).
+% ain(Term):-  forall(do_expand_args(isEach,Term,O),add_0(O)),!.
+ain(TermIn):- fully_expand(change(assert,ain),TermIn,Term),add_0(Term).
 
-add_0(A):- is_ftVar(A),!,trace_or_throw(var_add(A)).
+add_0(A):-  throw(depricated),  is_ftVar(A),!,trace_or_throw(var_add(A)).
 add_0(((H1,H2):-B)):-!,add_0((H1:-B)),add_0((H2:-B)).
 add_0(((H1,H2))):-!,add_0((H1)),add_0((H2)).
 add_0(dynamic(Term)):- !,must(get_arity(Term,F,A)), must(dynamic(F/A)).
 add_0(A):- A =(:-(_Term)), !, must(add_fast(A)).
-% add_0(C0):-check_override(add(C0)),!.
+% add_0(C0):-check_override(ain(C0)),!.
 % add_0(Skipped):- ground(Skipped),implied_skipped(Skipped),!. % ,dmsg(implied_skipped(Skipped)).
-%add_0(C0):- ignore((ground(C0),asserta(lmconf:already_added_this_round(C0)))),!,must(mpred_add_fast(C0)),!.
-add_0(C0):- must(mpred_add_fast(C0)),!.
-add_0(A):-trace_or_throw(fmt('add/1 is failing ~q.',[A])).
-
+%add_0(C0):- ignore((ground(C0),asserta(lmconf:already_added_this_round(C0)))),!,must(ain_fast(C0)),!.
+add_0(C0):- must(ain_fast(C0)),!.
+add_0(A):-trace_or_throw(fmt('ain/1 is failing ~q.',[A])).
+*/
 
 implied_skipped(genls(C0,C0)).
 implied_skipped(props(_,[])).
@@ -490,17 +494,17 @@ implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (t(
 
 
 :- was_export(add_fast/1).
-% -  add(Assertion)
-% mpred_add_fast(C0):- must_det((mpred_add_fast(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),dcall(why,mpred_add_fast(C0)),rtrace(mpred_add_fast(C0)),dtrace(ireq(C0))))))))),!.
-add_fast(Term):-mpred_numbervars_with_names(Term),mpred_modify(change(assert,add), Term),!. % ,xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0)))))),!.
+% -  ain(Assertion)
+% ain_fast(C0):- must_det((ain_fast(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(why,ain_fast(C0)),rtrace(ain_fast(C0)),dtrace(ireq(C0))))))))),!.
+add_fast(Term):-mpred_numbervars_with_names(Term),mpred_modify(change(assert,ain), Term),!. % ,xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0)))))),!.
 
 % -  upprop(Obj,PropSpecs) update the properties
 upprop(Obj,PropSpecs):- upprop(props(Obj,PropSpecs)).
-upprop(C0):- add(C0).
+upprop(C0):- ain(C0).
 % -  padd(Obj,Prop,Value)
-padd(Obj,PropSpecs):- add((props(Obj,PropSpecs))).
+padd(Obj,PropSpecs):- ain((props(Obj,PropSpecs))).
 % -  padd(Obj,Prop,Value)
-padd(Obj,Prop,Value):- add((t(Prop,Obj,Value))).
+padd(Obj,Prop,Value):- ain((t(Prop,Obj,Value))).
 % -  props(Obj,Prop,Value)
 prop(Obj,Prop,Value):- req(t(Prop,Obj,Value)).
 % -  prop_or(Obj,Prop,Value,OrElse)
@@ -578,7 +582,7 @@ db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- unify_with_occurs_chec
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- equals_call(OLD,NEW),!,dmsg(db_assert_sv_same(COLD,'__same__',CNEW)),trace_or_throw(dtrace).
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):-
    dmsg(db_assert_sv(COLD,'__replace__',CNEW)),
-   hotrace((ignore(dcall_failure(why,(clr(COLD), not(ireq(COLD))))))),
+   hotrace((ignore(show_failure(why,(clr(COLD), not(ireq(COLD))))))),
    %replace_arg(C,A,_,CBLANK),must_det(clr(CBLANK)),hooked_retractall(CBLANK),   
    db_must_asserta_confirmed_sv(CNEW,A,NEW),!.
 
@@ -608,7 +612,7 @@ db_must_asserta_confirmed_sv(CNEW,A,NEW):-
    replace_arg(CNEW,A,NOW,CNOW),
    sanity(not(singletons_throw_else_fail(CNEW))),
    mpred_modify(change(assert,sv),CNEW),!,
-   add(CNEW),
+   ain(CNEW),
    sanity(confirm_hook(CNEW:NEW=@=CNOW:NOW)),!.
 
 db_must_asserta_confirmed_sv(CNEW,A,NEW):-dmsg(unconfirmed(db_must_asserta_confirmed_sv(CNEW,A,NEW))).
@@ -641,7 +645,7 @@ database_modify_0(change(assert,AZ),          G):- database_modify_assert(change
 
 % database_modify_assert(change(assert,_),        G):- ( \+ \+ is_asserted(G)),must(variant(G,GG)),!.
 % database_modify_assert(change(assert,AZ),       G):- expire_pre_change(AZ,GG),fail.
-database_modify_assert(change(assert,_AorZ),       G):- !,mpred_add(G).
+database_modify_assert(change(assert,_AorZ),       G):- !,ain(G).
 database_modify_assert(change(assert,AorZ),       G):- 
  get_functor(G,F,_),!,
    (AorZ == a -> hooked_asserta(G);
@@ -654,22 +658,22 @@ database_modify_assert(change(assert,AorZ),       G):-
 % only place ever should actual game database be changed from
 % ========================================
 
-hooked_asserta(G):- loop_check(mpred_modify(change(assert,a),G),mpred_adda(G)).
+hooked_asserta(G):- loop_check(mpred_modify(change(assert,a),G),aina(G)).
 
-hooked_assertz(G):- loop_check(mpred_modify(change(assert,z),G),mpred_addz(G)).
+hooked_assertz(G):- loop_check(mpred_modify(change(assert,z),G),ainz(G)).
 
 hooked_retract(G):-  Op = change(retract,a),
-                   ignore(slow_sanity(ignore(dcall_failure(why,(mpred_op(is_asserted,G)))))),
+                   ignore(slow_sanity(ignore(show_failure(why,(mpred_op(is_asserted,G)))))),
                    slow_sanity(not(singletons_throw_else_fail(hooked_retract(G)))),
-                   slow_sanity(ignore(((ground(G), once(dcall_failure(why,(is_asserted(G)))))))),
+                   slow_sanity(ignore(((ground(G), once(show_failure(why,(is_asserted(G)))))))),
                    must_storage_op(Op,G),expire_post_change( Op,G),
-                   sanity(ignore(dcall_failure(why,not_asserted((G))))),
+                   sanity(ignore(show_failure(why,not_asserted((G))))),
                    loop_check(run_database_hooks_depth_1(change(retract,a),G),true).
 
 hooked_retractall(G):- Op = change(retract,all),
-                   slow_sanity(ignore(((ground(G), once(dcall_failure(why,(is_asserted(G)))))))),
+                   slow_sanity(ignore(((ground(G), once(show_failure(why,(is_asserted(G)))))))),
                    must_storage_op(Op,G),expire_post_change( Op,G),
-                   sanity(ignore(dcall_failure(why,not_asserted((G))))),
+                   sanity(ignore(show_failure(why,not_asserted((G))))),
                    loop_check(run_database_hooks_depth_1(change(retract,all),G),true).
 
 
@@ -690,7 +694,7 @@ may_storage_op(Op,G):-call_no_cuts(lmconf:mpred_provide_storage_op(Op,G)).
 
 :- meta_predicate hooked_asserta(+), hooked_assertz(+), hooked_retract(+), hooked_retractall(+).
 
-:- meta_predicate del(-),clr(-),add(-),req(-).
+:- meta_predicate del(-),clr(-). % ,ain(-). % ,req(-).
 
 % Found new meta-predicates in iteration 1 (0.281 sec)
 %:- meta_predicate mpred_modify(?,?,?,0).
@@ -722,13 +726,13 @@ prolog_op(clauses(Op),G):-!, prolog_op(Op,G).
 prolog_op(is_asserted,(G:-B)):-!,clause_asserted(G,B).
 prolog_op(is_asserted,(G)):-!,clause_asserted(G,true).
 
-prolog_op(conjecture,G):-!, mpred_call(G).
-prolog_op(call,G):-!, mpred_call(G).
+prolog_op(conjecture,G):-!, req(G).
+prolog_op(call,G):-!, req(G).
 prolog_op(Op,G):- reduce_mpred_op(Op,Op2), on_x_rtrace(call(Op2,G)).
 
 
 
-prolog_modify(_Op,(:-(G))):-!, mpred_call(G).
+prolog_modify(_Op,(:-(G))):-!, req(G).
 prolog_modify(change(assert,z),G):- use_if_modify_new,!,assertz_if_new(G).
 prolog_modify(change(assert,a),G):- use_if_modify_new,!,asserta_if_new(G).
 prolog_modify(change(assert,_),G):- use_if_modify_new,!,assert_if_new(G).
@@ -750,7 +754,7 @@ ensure_dynamic(':-'(_)):-!.
 ensure_dynamic(Head):- Head\=isa(_,_),
    get_functor(Head,F,A),
    functor(PF,F,A),
-   (\+ predicate_property(PF,_)->dcall(why,(dynamic(F/A),multifile(F/A),export(F/A)));
+   (\+ predicate_property(PF,_)->show_call(why,(dynamic(F/A),multifile(F/A),export(F/A)));
    (is_static_pred(PF)-> 
      ((listing(F/A),dmsg(want_to_assert(ensure_dynamic(Head),decl_mpred_prolog(F,A,Head))),nop(dtrace))); true)).
 

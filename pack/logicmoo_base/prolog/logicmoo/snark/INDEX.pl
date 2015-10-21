@@ -318,7 +318,7 @@ index((litcost_compare), 4, common_logic_snark, common_logic_snark).
 index((local_pterm_to_sterm), 2, common_logic_snark, common_logic_snark).
 index((local_pterm_to_sterm2), 2, common_logic_snark, common_logic_snark).
 index((local_sterm_to_pterm), 2, common_logic_snark, common_logic_snark).
-index((mpred_add_h), 3, common_logic_snark, common_logic_snark).
+index((ain_h), 3, common_logic_snark, common_logic_snark).
 index((mpred_t_tell_kif), 2, common_logic_snark, common_logic_snark).
 index((mudEquals), 2, common_logic_snark, common_logic_snark).
 index((neg_b_if_neg), 3, common_logic_snark, common_logic_snark).
@@ -355,5 +355,3 @@ index((why_to_id), 3, common_logic_snark, common_logic_snark).
 index((write_list), 1, common_logic_snark, common_logic_snark).
 index((is_entailed), 1, common_logic_snark, common_logic_snark).
 index((is_not_entailed), 1, common_logic_snark, common_logic_snark).
-index((if), 2, common_logic_snark, common_logic_snark).
-index((iif), 2, common_logic_snark, common_logic_snark).

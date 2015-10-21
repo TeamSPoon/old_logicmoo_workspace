@@ -384,7 +384,7 @@ proccess_status(ID,exception(Status),Want):- dmsg(exception(Status, ID,false,Wan
 proccess_status(ID,exited(Other),Want):-dmsg(wierd_proccess_status(ID,exited(Other),Want)),!.
 
 :- meta_predicate in_thread_and_join(0).
-in_thread_and_join(Goal):-thread_create((Goal,deterministic(Det),thread_exit(called(Det,Goal))),ID,[detatched(false)]),thread_join(ID,Status),dcall(why,proccess_status(ID,Status,called(Goal))).
+in_thread_and_join(Goal):-thread_create((Goal,deterministic(Det),thread_exit(called(Det,Goal))),ID,[detatched(false)]),thread_join(ID,Status),show_call(why,proccess_status(ID,Status,called(Goal))).
 :- meta_predicate in_thread_and_join(0,+).
 in_thread_and_join(Goal,Status):-thread_create(Goal,ID,[]),thread_join(ID,Status).
 

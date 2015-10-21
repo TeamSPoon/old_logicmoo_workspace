@@ -71,14 +71,14 @@ prolog:doc_object_page(Obj, Options,A,B) :-  format(user_error,'~n~q~n',[pldoc_m
 
 findallCall(Args,Functor,ICallL,ICallLL):-  findall(Args,call(Functor,Args),ICallL),findall(Functor:C,member(C,ICallL),ICallLL).
 
-sreq(Call):-
+mreq_old(Call):-
  into_mpred_form(Call,MCall),get_functor(MCall,MF),findall(P,pred_info(MF,P),Props),dmsg(props=Props),
    dmsg(call=Call),dmsg(call=MCall),
  % some calls remember deduced fasts and we need to prevent that
  w_tl(readOnlyDatabases,
                 (
            (is_callable(Call)-> findallCall(Call,call,CallL,CallLL) ; (CallL=[];CallLL=[])),
-                 findallCall(Call,mpred_call,MCallL,MCallLL),
+                 findallCall(Call,req,MCallL,MCallLL),
                  findallCall(Call,t,DCallL,DCallLL),
                  findallCall(Call,is_asserted,ACallL,ACallLL),
                  findallCall(Call,req,RCallL,RCallLL),
@@ -87,7 +87,7 @@ sreq(Call):-
    flatten([CallLL,MCallLL,DCallLL,ACallLL,RCallLL,ICallLL],WITHFUNCTOR),
    list_to_set(ALL,SET),
                  showDif(SET,call,CallL,WITHFUNCTOR),
-                 showDif(SET,mpred_call,MCallL,WITHFUNCTOR),
+                 showDif(SET,req,MCallL,WITHFUNCTOR),
                  showDif(SET,t,DCallL,WITHFUNCTOR),
                  showDif(SET,is_asserted,ACallL,WITHFUNCTOR),
                  showDif(SET,req,RCallL,WITHFUNCTOR),

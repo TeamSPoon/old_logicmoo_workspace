@@ -234,11 +234,11 @@ apply_to_conjuncts(Wff,must(P),Wff1) :-!, must(nonvar(P)),
 		append(G,[Wff,Wff1],G1),
 		T1 =.. G1,
 		must((T1)),!.
-apply_to_conjuncts(Wff,dcall(why,P),Wff1) :-!, must(nonvar(P)),
+apply_to_conjuncts(Wff,show_call(why,P),Wff1) :-!, must(nonvar(P)),
 		P =.. G,
 		append(G,[Wff,Wff1],G1),
 		T1 =.. G1,
-		dcall(why,(T1)),!.
+		show_call(why,(T1)),!.
 apply_to_conjuncts(Wff,P,Wff1) :-
 		P =.. G,
 		append(G,[Wff,Wff1],G1),
@@ -252,7 +252,7 @@ apply_to_conjuncts(Wff,P,Wff1) :-
 apply_to_tree([],Wff,Wff) :- !.
 apply_to_tree([P1|PS],Wff,Wff1) :- !,apply_to_tree(P,Wff,Wff0),apply_to_tree(PS,Wff0,Wff1).
 apply_to_tree(must(P),Wff,Wff1) :- must(nonvar(P)),!, must(apply_to_tree(P,Wff,Wff1)).
-apply_to_tree(dcall(why,P),Wff,Wff1) :- must(nonvar(P)),!, dcall(why,apply_to_tree(P,Wff,Wff1)).
+apply_to_tree(show_call(why,P),Wff,Wff1) :- must(nonvar(P)),!, show_call(why,apply_to_tree(P,Wff,Wff1)).
 apply_to_tree(P,Wff,Wff1) :- call(P,Wff,Wff1),!.
 apply_to_tree(P,Wff,Wff) :- \+ compound(Wff),!.
 apply_to_tree(P,Wff,Wff1) :- call(P,Wff,Wff1),!.

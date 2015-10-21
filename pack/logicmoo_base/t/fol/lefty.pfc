@@ -1,19 +1,11 @@
 #!/usr/bin/env swipl
 
-/**
-````
-*/
-
-:- include(pfc_test_header).
-
+:- include('test_header.pfc').
 :- process_this_script.
-
 
 %=  setup pfc
 :- file_begin(pfc).
 
-%=  see logicmoo_i_compiler.pl for more info
-:- set_clause_compile(fwc).
 
 ==> clif(lefty(P)  => ~righty(P)).
 %=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -78,8 +70,6 @@
 :- show_call(example_proven_true( lefty(joe ))).
 
 %= Logical Negation (not by failure)
-:- pfc_trace.
-:- pfc_watch.
 
 %= pat is not righty
 ==> neg(righty(pat)).
@@ -94,6 +84,4 @@
 %= Thus we can deduce he is lefty now 
 :- show_call(example_known_is_success( lefty(pat ))).
 
-
-:-prolog.
 

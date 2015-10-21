@@ -1,4 +1,4 @@
-/* Part of LogicMOO Base Logicmoo Path Setups
+/** <module> Adds autoloading of LogicMOO Utilities predicates
 % ===================================================================
     File:         'logicmoo_utils).'
     Purpose:       To load the logicmoo libraries as needed
@@ -21,11 +21,6 @@
 :- retractall(lmconf:logicmoo_utils_separate).
 :- set_prolog_flag(generate_debug_info, true).
 
-:- multifile(lmconf:mpred_user_kb/1).
-:- dynamic(lmconf:mpred_user_kb/1).
-
-:- multifile(lmconf:mpred_system_kb/1).
-:- dynamic(lmconf:mpred_system_kb/1).
 
 % ======================================================
 % Add Extra file_search_paths
@@ -37,29 +32,52 @@ resolve_dir(Dir,Dir):- is_absolute_file_name(Dir),!,exists_directory(Dir),!.
 resolve_dir(Path,Dir):- (prolog_load_context(directory,SDir);(prolog_load_context(file,File),file_directory_name(File,SDir)),working_directory(SDir,SDir)),
    absolute_file_name(Path,Dir,[relative_to(SDir),file_type(directory)]),exists_directory(Dir).
 
-add_file_search_path(Name,Path):-  resolve_dir(Path,Dir),is_absolute_file_name(Dir), (( \+ user:file_search_path(Name,Dir)) ->asserta(user:file_search_path(Name,Dir));true).
+
+%%	add_file_search_path(+Alias, +WildCard) is det.
+%
+%	Create an alias when it is missing
+%
+%	  ==
+%	  :- add_file_search_path(all_utils, '../*/util/').
+%	  ==
+%
+add_file_search_path(Name,Path):-  resolve_dir(Path,Dir),
+   is_absolute_file_name(Dir), (( \+ user:file_search_path(Name,Dir)) ->asserta(user:file_search_path(Name,Dir));true).
    
 % ======================================================
 % Add Extra pack-ages directory
 % ======================================================
+:- initialization(attach_packs,now).
+:- if( \+ exists_source(pack(logicmoo_base/prolog/logicmoo/logicmoo_utils))).
 :- add_file_search_path(pack,'../../../').
-:- initialization(attach_packs).
-
+:- initialization(attach_packs,now).
+:- endif.
 % ======================================================
 % Save a directory of *this* file into logicmoo(..)
 % And adds the local directories to file search path of logicmoo(..)
 % ======================================================
+:- if( \+ exists_source(logicmoo(logicmoo_utils))).
 :- add_file_search_path(logicmoo,'.').
+:- endif.
 
+%%	add_library_search_path(+Dir, +Patterns:list(atom)) is det.
+%
+%	Create an autoload index INDEX.pl for  Dir by scanning all files
+%	that match any of the file-patterns in Patterns. Typically, this
+%	appears as a directive in MKINDEX.pl.  For example:
+%
+%	  ==
+%	  :- add_library_search_path('../*/util/',[ 'logicmoo_util_*.pl']).
+%	  ==
+%
+add_library_search_path(Path,Masks):- 
+      forall(resolve_dir(Path,Dir), 
+      (make_library_index(Dir, Masks), 
+      (user:library_directory(Dir) -> true ; (asserta(user:library_directory(Dir)), reload_library_index)))).
 
 % ======================================================
 % Add Utils files to autoloads
 % ======================================================
-add_library_search_path(Path,Masks):- 
-      resolve_dir(Path,Dir), 
-      make_library_index(Dir, Masks), 
-      (user:library_directory(Dir) -> true ; (asserta(user:library_directory(Dir)), reload_library_index)).
-
 :- add_library_search_path('./util/',[ 'logicmoo_util_*.pl']).
 
 % ======================================================
@@ -82,7 +100,7 @@ lmconf:logicmoo_pre_release.
 :- notrace.
 :- endif.
 
-lmconf:logicmoo_scan_autoloads.
+lmconf:logicmoo_scan_autoloads:-false.
 
 :- endif.
 % ======================================================
@@ -107,11 +125,11 @@ lmconf:logicmoo_scan_autoloads.
 % ======================================================
 % Included separated logicmoo util files
 % ======================================================
-:- export(use_libraries/1). 
-use_libraries(M):- F= (util/_),foreach(logicmoo_util_help:mpred_is_impl_file(F),(writeln(M:use_module(F)),M:ensure_loaded(F))).
+%:- export(use_libraries/1). 
+%use_libraries(M):- F= (util/_),foreach(logicmoo_util_help:mpred_is_impl_file(F),(writeln(M:use_module(F)),M:ensure_loaded(F))).
 
-:- export(use_libraries/0). 
-use_libraries:- source_context_module(M),use_libraries(M).
+%:- export(use_libraries/0). 
+%use_libraries:- source_context_module(M),use_libraries(M).
 
 :- multifile(logicmoo_util_help:mpred_is_impl_file/1).
 :- dynamic(logicmoo_util_help:mpred_is_impl_file/1).
@@ -136,7 +154,7 @@ use_libraries:- source_context_module(M),use_libraries(M).
  logicmoo_util_help:mpred_is_impl_file(util/logicmoo_util_strings). 
 
 :- thread_local logicmoo_utils_test_tl/0.
-:- w_tl((logicmoo_utils_test_tl:-dmsg(load_util_library)),logicmoo_utils_test_tl).
+:- w_tl((logicmoo_utils_test_tl:-dmsg("Adding logicmoo/utils to autoload path",[])),logicmoo_utils_test_tl).
 
 % ?- logicmoo_util_term_listing:xlisting(get_gtime).
 

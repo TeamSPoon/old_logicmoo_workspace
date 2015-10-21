@@ -30,11 +30,11 @@ set_no_disk:-retractall(no_disk),asserta(no_disk).
 :- set_use_disk.
 
 
-my_format(vdisk(write,KBStream),_,[A]) :- C =.. [KBStream,A],no_disk,!,dcall(why,assert(C)).
+my_format(vdisk(write,KBStream),_,[A]) :- C =.. [KBStream,A],no_disk,!,show_call(why,assert(C)).
 my_format(KBFile,Mode,KBStream):- format(KBFile,Mode,KBStream).
 
-myopen(KBStream,Mode,vdisk(Mode,KBStream)) :- Mode = write, no_disk,!,dynamic(KBStream/1),Call=..[KBStream,A],forall(Call,dcall(why,retractall(A))),abolish(KBStream,1),dynamic(KBStream/1).
-myopen(KBStream,read,vdisk(Mode,KBStream)) :- no_disk,!,dynamic(KBStream/1),Call=..[KBStream,A],forall(Call,dcall(why,retractall(A))).
+myopen(KBStream,Mode,vdisk(Mode,KBStream)) :- Mode = write, no_disk,!,dynamic(KBStream/1),Call=..[KBStream,A],forall(Call,show_call(why,retractall(A))),abolish(KBStream,1),dynamic(KBStream/1).
+myopen(KBStream,read,vdisk(Mode,KBStream)) :- no_disk,!,dynamic(KBStream/1),Call=..[KBStream,A],forall(Call,show_call(why,retractall(A))).
 myopen(KBFile,Mode,KBStream):- open(KBFile,Mode,KBStream).
 
 myclose(vdisk(_Mode,_KBStream)) :- must(no_disk),!.
@@ -46,10 +46,10 @@ my_read_term(Stream,Wff1,Opts):-read_term(Stream,Wff1,Opts).
 
 
 
-% reads the knowledge base from the file 'Name.kb'
+% reads the knowledge base from the file 'Name.baseKB'
 
 read_kb(Name,Wff) :-
-	concatenate(Name,'.kb',KBFile),
+	concatenate(Name,'.baseKB',KBFile),
 	read_clauses(KBFile,Wff).	
 
 read_ckb(Name,Wff) :-
@@ -181,7 +181,7 @@ read_clauses_to_pred(File,Pred) :-
       myopen(File,read,Stream),
       repeat,
 	my_read_term(Stream,Wff1,[cycles(true)]),        
-	(Wff1 \== end_of_file -> (once(must(dcall(why,call(Pred,Wff1)))),fail) ; !),
+	(Wff1 \== end_of_file -> (once(must(show_call(why,call(Pred,Wff1)))),fail) ; !),
         myclose(Stream).
 
 

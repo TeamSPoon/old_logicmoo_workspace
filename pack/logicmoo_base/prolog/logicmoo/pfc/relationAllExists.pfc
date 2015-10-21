@@ -93,6 +93,20 @@ relationExistsInstance(Pred,D_COL,VAL) ==>
  ({SK= skRelationExistsInstanceFn(Pred,D_COL,VAL), G1=..[Pred,Missing,VAL],G2=..[Pred,SK,VAL],ISA=..[D_COL,SK]},
   (( ~ (G1/(isa(Missing,D_COL),is_non_skolem(Missing)))) ==> (G2,ISA))).
 
+
+prologHybrid(relationMostInstance(ptBinaryPredicate,tCol,vtValue)).
+relationMostInstance(BP,_,_)==>ptBinaryPredicate(BP).
+(relationMostInstance(Pred,_,Value),{\+number(Value)},argIsa(Pred,2,Type))==> isa(Value,Type).
+%((relationMostInstance(Pred,Type,Value),{G=..[Pred,Inst,Value],GI=..[Pred,Inst,_]})) ==> (({GI=..[Pred,Inst,_]},isa(Inst,Type), ~GI) ==> G ).
+relationMostInstance(Pred,Type,Value) ==> mpred_default(isa(Inst,Type) ==> t(Pred,Inst,Value)).
+% relationMostInstance(Pred,Type,Value) ==> mpred_default( isa(Inst,Type) ==> ?Pred(Inst,Value) ).
+
+
+
+prologHybrid(relationAllInstance(ptBinaryPredicate,tCol,vtValue)).
+relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
+relationAllInstance(Pred,_,Value),{\+number(Value)},argIsa(Pred,2,Type)==>(isa(Value,Type),isa(Pred,ptRolePredicate)).
+
 relationAllInstance(Pred,I_COL,VAL) ==>
  ({G1=..[Pred,INST,_Missing],G2=..[Pred,INST,VAL]},
   (isa(INST,I_COL) ==> ( ~ G1 ==> G2))).

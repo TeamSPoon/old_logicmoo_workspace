@@ -47,6 +47,7 @@
             pp_triggers/0,
             pp_why/1,
             pppfc/0,
+            whymemory/2,
             print_db_items/1,
             print_db_items/2,
             print_db_items/3,
@@ -71,8 +72,10 @@
 :- dynamic
   	user:portray/1.
 
+:- dynamic(whymemory/2).
 
-lqu :- listing(kbp:qu/3).
+
+lqu :- listing(basePFC:qu/3).
 
 
 
@@ -117,15 +120,15 @@ mpred_trace_item(MM,H):- ignore(mpred_is_tracing_exec-> on_x_rtrace(in_cmt(pp_it
 pp_item(MM,(H:-B)):- B ==true,pp_item(MM,H).
 pp_item(MM,H):- flag(show_asserions_offered,X,X+1),t_l:print_mode(html), ( \+ \+ if_defined(pp_item_html(MM,H))),!.
 
-pp_item(MM,kbp:spft(KB,P,F,T,W)):-!,
-   w_tl(t_l:current_why_source(W),pp_item(MM,kbp:spft(KB,P,F,T))).
+pp_item(MM,basePFC:spft(KB,P,F,T,W)):-!,
+   w_tl(t_l:current_why_source(W),pp_item(MM,basePFC:spft(KB,P,F,T))).
 
-pp_item(MM,kbp:spft(KB,W0,U,U)):- W = (KB:W0),!,pp_item(MM,U:W).
-pp_item(MM,kbp:spft(KB,W0,F,U)):- W = (KB:W0),atom(U),!,    fmt('~N%~n',[]),pp_item(MM,U:W), fmt('rule: ~p~n~n', [F]),!.
-pp_item(MM,kbp:spft(KB,W0,F,U)):- W = (KB:W0),         !,   fmt('~w~nd:       ~p~nformat:    ~p~n', [MM,W,F]),pp_item(MM,U).
-pp_item(MM,kbp:nt(KB,Trigger0,Test,Body)) :- Trigger = (KB:Trigger0), !, fmt('~w n-trigger: ~p~ntest: ~p~nbody: ~p~n', [MM,Trigger,Test,Body]).
-pp_item(MM,kbp:pt(KB,F0,Body)):- F = (KB:F0),             !,fmt('~w p-trigger:~n', [MM]), pp_item('',(F:-Body)).
-pp_item(MM,kbp:bt(KB,F0,Body)):- F = (KB:F0),             !,fmt('~w b-trigger:~n', [MM]), pp_item('',(F:-Body)).
+pp_item(MM,basePFC:spft(KB,W0,U,U)):- W = (KB:W0),!,pp_item(MM,U:W).
+pp_item(MM,basePFC:spft(KB,W0,F,U)):- W = (KB:W0),atom(U),!,    fmt('~N%~n',[]),pp_item(MM,U:W), fmt('rule: ~p~n~n', [F]),!.
+pp_item(MM,basePFC:spft(KB,W0,F,U)):- W = (KB:W0),         !,   fmt('~w~nd:       ~p~nformat:    ~p~n', [MM,W,F]),pp_item(MM,U).
+pp_item(MM,basePFC:nt(KB,Trigger0,Test,Body)) :- Trigger = (KB:Trigger0), !, fmt('~w n-trigger: ~p~ntest: ~p~nbody: ~p~n', [MM,Trigger,Test,Body]).
+pp_item(MM,basePFC:pt(KB,F0,Body)):- F = (KB:F0),             !,fmt('~w p-trigger:~n', [MM]), pp_item('',(F:-Body)).
+pp_item(MM,basePFC:bt(KB,F0,Body)):- F = (KB:F0),             !,fmt('~w b-trigger:~n', [MM]), pp_item('',(F:-Body)).
 
 
 pp_item(MM,U:W):- !,sformat(S,'~w  ~w:',[MM,U]),!, pp_item(S,W).
@@ -197,7 +200,6 @@ loop_check_just(G):-loop_check(G,ignore(arg(1,G,[]))).
 
 % ***** predicates for brousing justifications *****
 
-% :- dynamic(whymemory/2).
 :- thread_local(t_l:is_mpred_interactive_why/0).
 
 :- use_module(library(lists)).
@@ -308,14 +310,14 @@ nth_mpred_call(N,List,Ele):-N2 is N+1,lists:nth0(N2,List,Ele).
 
 show_pred_info(F/A):-integer(A),functor(H,F,A),!,show_pred_info(H).
 show_pred_info(Head):-
-        doall(dcall(why,no_repeats(isa(Head,_)))),
+        doall(show_call(why,no_repeats(isa(Head,_)))),
         functor(Head,F,_),
-        doall(dcall(why,no_repeats(isa(F,_)))),
+        doall(show_call(why,no_repeats(isa(F,_)))),
      (current_predicate(_,Head) -> show_pred_info_0(Head); wdmsg(cannot_show_pred_info(Head))),!.
 
 show_pred_info_0(Head):- 
-        doall(dcall(why,predicate_property(Head,_))),
-        (has_cl(Head)->doall((dcall(why,clause(Head,_))));hotrace((listing(Head)))),!.
+        doall(show_call(why,predicate_property(Head,_))),
+        (has_cl(Head)->doall((show_call(why,clause(Head,_))));hotrace((listing(Head)))),!.
 
 
 % ===================================================
@@ -378,7 +380,7 @@ mpred_list_triggers_1(neg(What)):-var(What),!.
 mpred_list_triggers_1(neg(_What)):-!.
 mpred_list_triggers_1(What):-var(What),!.
 mpred_list_triggers_1(What):-
-   print_db_items('Supports User',spft_precanonical(P,u,u),kbp:spft(umt,P,u,u),What),
+   print_db_items('Supports User',spft_precanonical(P,u,u),basePFC:spft(umt,P,u,u),What),
    print_db_items('Forward Facts',(nesc(F)),F,What),
    print_db_items('Forward Rules',(_==>_),What),
  ignore((What\=neg(_),functor(What,IWhat,_),
@@ -391,8 +393,8 @@ mpred_list_triggers_1(What):-
    print_db_items('Triggers Goal',bt(_,_),What),
    print_db_items('Triggers Positive',pt(_,_),What),
    print_db_items('Bidirectional Rules',(_<==>_),What), 
-   dif(A,B),print_db_items('Supports Deduced',spft_precanonical(P,A,B),kbp:spft(umt,P,A,B),What),
-   dif(G,u),print_db_items('Supports Nonuser',spft_precanonical(P,G,G),kbp:spft(umt,P,G,G),What),
+   dif(A,B),print_db_items('Supports Deduced',spft_precanonical(P,A,B),basePFC:spft(umt,P,A,B),What),
+   dif(G,u),print_db_items('Supports Nonuser',spft_precanonical(P,G,G),basePFC:spft(umt,P,G,G),What),
    print_db_items('Backchaining Rules',(_<-_),What),
    % print_db_items('Edits',is_disabled_clause(_),What),
    print_db_items('Edits',is_edited_clause(_,_,_),What),

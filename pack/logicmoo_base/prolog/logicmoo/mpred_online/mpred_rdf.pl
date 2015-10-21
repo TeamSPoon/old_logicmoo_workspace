@@ -117,8 +117,8 @@ n3_parse_2(URL,Imported,Options) :-
     ; true).
 
 mpred_online:semweb_startup:- n3_parse('http://omeo.googlecode.com/svn/trunk/build/ro-subset.owl').
-mpred_online:semweb_startup:- n3_parse('http://knowrob.org/kb/roboearth.owl').
-mpred_online:semweb_startup:- n3_parse('http://ias.cs.tum.edu/kb/knowrob.owl').
+mpred_online:semweb_startup:- n3_parse('http://knowrob.org/baseKB/roboearth.owl').
+mpred_online:semweb_startup:- n3_parse('http://ias.cs.tum.edu/baseKB/knowrob.owl').
 mpred_online:semweb_startup:- n3_parse('http://raw.github.com/knowrob/knowrob/master/knowrob_omics/rdf/locations.rdf').
 mpred_online:semweb_startup:- n3_parse('http://raw.github.com/knowrob/knowrob/master/knowrob_omics/rdf/roboearth.rdf').
 
@@ -134,14 +134,14 @@ mpred_online:semweb_startup:- n3_parse('http://raw.github.com/knowrob/knowrob/ma
 :- rdf_register_prefix(agents_owl, 'http://onto.ui.sav.sk/agents.owl#',[force(true)]).
 :- rdf_register_prefix(skos, 'http://www.w3.org/2004/02/skos/core#',[force(true)]).
 :- rdf_register_prefix(skosxl,  'http://www.w3.org/2008/05/skos-xl#',[force(true)]).
-:- rdf_register_prefix(knowrob_objects, 'http://ias.cs.tum.edu/kb/knowrob_objects.owl#',[force(true)]).
-:- rdf_register_prefix(knowrob, 'http://ias.cs.tum.edu/kb/knowrob.owl#',[force(true)]).
+:- rdf_register_prefix(knowrob_objects, 'http://ias.cs.tum.edu/baseKB/knowrob_objects.owl#',[force(true)]).
+:- rdf_register_prefix(knowrob, 'http://ias.cs.tum.edu/baseKB/knowrob.owl#',[force(true)]).
 :- rdf_register_prefix(mud,'http://prologmoo.com/onto/mud.owl#',[force(true)]).
 :- rdf_register_ns(mud,'http://prologmoo.com/downloads/mud.ttl#',[force(true)]).
 
 
 :- public(rdf/3).
-rdf(S,P,O):- dcall(why,mpred_rdf(S,P,O)).
+rdf(S,P,O):- show_call(why,mpred_rdf(S,P,O)).
 
 :- op(1150, fx, (rdf_meta)).   :- rdf_meta
 	rdf(o,o,o),
@@ -234,7 +234,7 @@ rdf_global_mpred_object(L,O):-rdf_global_object(L,O).
 
 rdf_create_qname(NS,Name,URL):-rdf_global_mpred_object(NS:Name,URL),rdf_current_resource(URL),!.
 rdf_create_qname(NS,Name,URL):-must(rdf_current_ns(NS,PREFIX)),atom_concat(PREFIX,Name,URL),nop(must(is_url(URL))),asserta(rdf_qname_url_created(NS,Name,URL)).
-   %text_to_string(Name,Label),dcall(why,rdf_assert(URL,rdfs:label,literal(type(xsd:string, Label)))).
+   %text_to_string(Name,Label),show_call(why,rdf_assert(URL,rdfs:label,literal(type(xsd:string, Label)))).
 
 
 
@@ -443,7 +443,7 @@ rdf_assert_ignored(DB):-t_l:rdf_asserting(_,DB),!.
 rdf_assert_ignored(':-'(_)).
 rdf_assert_ignored(G):-not(compound(atom(G))),!.
 rdf_assert_ignored(_):-flag(rdf_assert_hook_max,W,W),W>4000,!.
-rdf_assert_ignored(kbp:spft(umt,_,_,_,_)).
+rdf_assert_ignored(basePFC:spft(umt,_,_,_,_)).
 rdf_assert_ignored(support2(_,_,_)).
 rdf_assert_ignored(support3(_,_,_)).
 rdf_assert_ignored(isa(tCol,tCol)).
@@ -476,7 +476,7 @@ rdf_assert_hook((A,B)):-!,rdf_assert_hook(A),rdf_assert_hook(B).
 rdf_assert_hook(CYC):-into_mpred_form(CYC,DIF),CYC\=@=DIF,!,must(rdf_assert_hook(DIF)),!.
 rdf_assert_hook(CYC):-once(cyc_to_rdf(CYC,RDF)),CYC\=@=RDF,!,must(call(rdf_assert_hook(RDF))),!.
 rdf_assert_hook(isa(I,C)):-must((rdf_assert_hook0(isa(I,C)))),!.
-rdf_assert_hook(PSO):-flag(rdf_assert_hook_max,W,W+1),must(dcall(why,rdf_assert_hook0(PSO))),!.
+rdf_assert_hook(PSO):-flag(rdf_assert_hook_max,W,W+1),must(show_call(why,rdf_assert_hook0(PSO))),!.
 rdf_assert_hook(PSO):-dmsg(once(skipped(rdf_assert_hook(PSO)))).
 
 

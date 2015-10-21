@@ -126,7 +126,7 @@ add_ornode(X,Y,OrNode) :-
 add_ornode_var1(X,Y,OrNode) :-
 	( get_attr(X,iz,Attr) ->
 		Attr = variz(V1,V2),
-		dcall(why,put_attr(X,iz,variz([OrNode-Y|V1],V2)))
+		show_call(why,put_attr(X,iz,variz([OrNode-Y|V1],V2)))
 	;
 		put_attr(X,iz,variz([OrNode-Y],[]))
 	).

@@ -26,7 +26,7 @@
 
 :- was_dynamic(did_do_semweb_startup_late_once).
 do_semweb_startup_late_once:-did_do_semweb_startup_late_once,!.
-do_semweb_startup_late_once:-asserta(did_semweb_startup_late_once),forall(clause(semweb_startup_late,G),must(dcall_failure(why,G))).
+do_semweb_startup_late_once:-asserta(did_semweb_startup_late_once),forall(clause(semweb_startup_late,G),must(show_failure(why,G))).
 
 
 :- use_module(user(user_db)).

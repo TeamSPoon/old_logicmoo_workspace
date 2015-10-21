@@ -111,6 +111,22 @@ boxlog_to_compile((:-),(H:-B),(HH:-(cwc,BBB))):- body_for_pfc((:-),H,HH,B,BB),ma
 boxlog_to_compile((:-),not(H),neg(H)):-  !.
 boxlog_to_compile((:-),H,H):-  !.
 
+:- op(500,fx,'~').
+:- op(1199,fx,('==>')).
+:- op(1190,xfx,('::::')).
+:- op(1180,xfx,('==>')).
+:- op(1170,xfx,'<==>').
+:- op(1160,xfx,('<-')).
+:- op(1150,xfx,'=>').
+:- op(1140,xfx,'<=').
+:- op(1130,xfx,'<=>').
+:- op(1100,fx,('nesc')).
+:- op(300,fx,'-').
+:- op(600,yfx,'&'). 
+:- op(600,yfx,'v').
+:- op(1075,xfx,'<-').
+:- op(350,xfx,'xor').
+:- op(1100,fx,(was_shared_multifile)).
 
 
 boxlog_to_compile(fwc,(not(H):-_),true):- nonvar(H),H = skolem(_,_),!.
@@ -180,7 +196,7 @@ body_for_mpred_2((:-),Head,HeadO,(A/B),(AA,BB)):-!,body_for_mpred_1(Mode,Head,He
 body_for_mpred_2(Mode,Head,HeadO,(A/B),(AA/BB)):-!,body_for_mpred_1(Mode,Head,HeadM,A,AA),body_for_pfc(Mode,HeadM,HeadO,B,BB).
 
 
-body_for_mpred_2((fwc),H,(kb:if_missing(H,HH)),skolem(In,Out),true):-contains_var(In,H),subst(H,In,Out,HH),!.
+body_for_mpred_2((fwc),H,(if_missing(H,HH)),skolem(In,Out),true):-contains_var(In,H),subst(H,In,Out,HH),!.
 body_for_mpred_2(_Mode,neg(Head),neg(Head),skolem(_,_),true).
 %body_for_mpred_2(Mode,H,H,skolem(_,_),true).
 body_for_mpred_2(_Mode,Head,Head,skolem(In,Out),{ignore(In=Out)}).

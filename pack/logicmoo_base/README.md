@@ -3,27 +3,28 @@
 Is probably 10 packages... 
  
 
-# First Order Logic (FOL) declarations in Prolog source code. 
+# Forward chaining macros create smaller self-maintaining codebase.
 
 Prolog, like most logic programming languages, offers depth first backward chaining as the only reasoning scheme. It is well known that sound and complete reasoning systems can be built using either exclusive backward chaining or exclusive forward chaining. Thus, this is not a theoretical problem. It is also well understood how to ``implement'' forward reasoning using an exclusively backward chaining system and vice versa. Thus, this need not be a practical problem. In fact, many of the logic-based languages developed for AI applications allow one to build systems with both forward and backward chaining rules.
-
 There are, however, some interesting and important issues which need to be addresses in order to provide the Prolog programmer with a practical, efficient, and well integrated facility for forward chaining.
-
-# Forward chaining macros create smaller self-maintaining codebase.
 
 This module uses such a facility, written by Tim Finin called PFC, which he has implemented in standard Prolog. The PFC system is a package that provides a forward reasoning capability to be used together with conventional Prolog programs. The PFC inference rules are Prolog terms which are asserted as facts into the regular Prolog database.
 
 The PFC system package provides a forward reasoning capability to be used together with conventional Prolog programs. The PFC inference rules are Prolog terms which are asserted as clauses into the regular Prolog database. When new facts or forward reasoning rules are added to the Prolog database (via a special predicate pfc_add/1, forward reasoning is triggered and additional facts that can be deduced via the application of the forward chaining rules are also added to the database. A simple justification-based truth-maintenance system is provided as well as simple predicates to explore the resulting proof trees.   Additionally this module provides the user with various methods for trying out new techniques of backwards chaining without rewriting their code.
 
-# FIRST ORDER LOGIC 
-Despite Prolog's logic heritage and its use of model elimination in linear logic theorem-proving in projects such as LeanTAP , Prolog fails to qualify as a full general-purpose theorem-proving system. There are three main reasons: (1) Prolog is a programming language and not an inference engine so if we used  the unification algorithm of Prolog for FOL, it is unsound,  (2) Prolog's unbounded depth-first search strategy is inefficient when it is doing complete search, and (3) Prolog's inference system is not complete for non-Horn clauses. Nevertheless, Prolog is quite interesting from a theorem-proving standpoint because of its very high inference rate as compared to conventional theorem-proving programs. 
 
-Logicmoo’s use of the Prolog Technology Theorem Prover (PTTP) was to overcome the deficiencies while retaining as fully as possible the high performance of well-engineered Prolog systems.
 
-The Prolog Technology Theorem Prover is an extension of Prolog that is complete for the full first­order predicate calculus (Stickel, 1988).   
-It is invoked whenever the facts and rule are described in NNF or CNF into the knowledge base.
+# First Order Logic (FOL) declarations in Prolog source code. 
+
+
+Despite Prolog's logic heritage it does not qualify as a full general-purpose theorem-proving system. There are three main reasons: (1) Prolog is a programming language and not an inference engine so if we used the unification algorithm of Prolog for FOL, it is unsound,  (2) Prolog's unbounded depth-first search strategy is inefficient when it is doing complete search, and (3) Prolog's inference system is not complete for non-Horn clauses. Nevertheless, Prolog is quite interesting from a theorem-proving standpoint because of its very high inference rate as compared to conventional theorem-proving programs. 
+
+Logicmoo use of the Prolog Technology Theorem Prover (PTTP) was to overcome the deficiencies while retaining as fully as possible the high performance of well-engineered Prolog systems.
+
+The Prolog Technology Theorem Prover (PTTP) is an extension of Prolog that is complete for the full first order predicate calculus (Stickel, 1988).   
+It is invoked whenever the facts and rule are described in NNF or CNF put into the knowledge base.  And optionally for Horn clauses built by other modules.
 However, when the rules are in Prenix Normal Form (PNF) (thus have quantifiers) they are converted to NNF, SNF and finally CNF and handed back over to PTTP.
-Whenever a formula whose leading quantifier is existential occurs, the formula obtained by removing that quantifier via Skolemization may be generated. 
+Also a formula whose leading quantifier is existential, the formula obtained by removing that quantifier via Closed Skolemization may be generated. 
 
 kif_add/1: the file has a rule or fact, in the form of a predicate of FOPC (First Order Predicate Calculus).  The LogicMOO invokes the PTTP compiler (discussed later) to assert the form to the knowledge base. The
 knowledge base represents the user''s beliefs. Thus, asserting the logical form to the knowledge base amounts to applying the Declarative rule and the Distributivity rule (Axiom B2).
@@ -31,29 +32,29 @@ knowledge base represents the user''s beliefs. Thus, asserting the logical form 
 kif_ask/1: the user types in a question, in the form of a predicate of FOPC (First Order Predicate Calculus). The PTTP inference system is then invoked to attempt to  prove the predicate, 
 using the axioms and facts of the knowledge base. This amounts toassuming that the user''s beliefs are closed under logical consequence, i.e., the Closure rule (Axiom B1) is implicitly applied over and over.
 
-LogicMOO/PTTP is unlike all other theorem provers today (except SNARK and CYC) and even the ones claiming to be PTTP''s decendants have been radically simplified to absurdium.
-Here is how is LogicMOO/PTTP: If the proof succeeds, LogicMOO answers ``yes'', and prints out the predicate, instantiating all variables. If there are multiple answers, then it prints all of them. 
+LogicMOO, because of PTTP, is unlike all other theorem provers today  (Perhaps except SNARK and maybe CYC) 
+Here is how:: If the proof succeeds, LogicMOO answers ``yes'', and prints out the predicate, instantiating all variables. If there are multiple answers, then it prints all of them. 
 If the proof fails, LogicMOO invokes PTTP to prove the negation of the queried predicate.  If that NEGATED proof succeeds, then LogicMOO answers ``no''; otherwise, LogicMOO answers ``cannot tell, not enough information''.
 
-LogicMOO, therefore, has a restricted capability for reasoning about negation, being able to distinguish between real negation (``P is false'') from negation by failure (``P is not provable'').
+LogicMOO, therefore, has the capability for reasoning about negation, being able to distinguish between real negation (``P is false'') from negation by failure (``P is not provable'').
 This allows the system to distinguish beliefs that are provably false from beliefs that cannot be proven because of insufficient information. 
 This is an important feature that overcomes the supposed limitations of Prolog.   For example, without this added capability, if a user were to
 ask whether LogicMOO believes that John intended to let the cat out, then LogicMOO would answer ``no''. 
 This answer is misleading because LogicMOO would also answer ``no'' if it were asked if John did not intend to let the cat out.  This is why the system automaically Re-asks the negation.
 
-THE CAVEAT:  Left hand side rules may actually need the same level of analysis?!
+Sadly all theorem provers since PTTP (include theorem provers said to be based on it) have been simplified to absurdium and cannot do this simple analysis.  The reason? According to classically trained
+logicians horn clauses *cannot* start with a negated literals.   So to not offend them (entirely)  PTTP can store "( ~a :- ~b )" as "( not_a :- not_b )" 
+If we obeyed the classical limitations set forth upon Horn clauses to only being "positive" that would remove the unique ability for LogicMOO to deduce the difference between false and unknown. 
+We are no longer restricted to CWA and the limitations imposed by modern theorem provers and sematic web tools.  I must assume the reason programmers made these sacrifices is they can still solve problems like circuit verifcation without disrupting the post 1980s maintsteam thinking.
 
-Another key feature of LogicMOO infering about what it doesnt yet know, is it can be set to "ask the user" or help guide the user into what types of knowledge it is missing.  That also provides a port through which
-other modules (e.g., a plan recognition system or a modules for NL reference resolution) can enter information. When such modules are not available, the user may simulate this capacity.
+Since LogicMOO can infer the limits it's theoretical knowledge, so it can help guide the user to understand what types of knowledge it is missing.  That also provides a portal through which
+other modules (e.g., a plan recognition system or a modules for NL reference resolution) can enter information. When such modules are not available, the user may simulate this capacity. ("ask the user")
 
-is_entailed/1: Detects if an Horn Clause (or fact) is true.   if someone asserts a=>b. this will result in the following two is_entailed(( ~a :- ~b )) and   is_entailed((  b :- a ) ).
-According to classically trained logicians horn clauses cannot start with a negated literal (so to not offend them)  PTTP papers claim we can store "( ~a :- ~b )" as "( not_a :- not_b )" 
-If we obeyed the limitations set forth upon Horn clauses only being "positive" that would remove the unique ability for LogicMOO to deduce what things are impossible. (We couldn''t tell the difference between missing data and true negation)
+is_entailed/1: Detects if an Horn Clause (or fact) is holograpically existing. Example: assert a=>b. this will result in the following two clauses:   is_entailed(( ~a :- ~b )) and   is_entailed((  b :- a ) ).
 
 
-PTTP/XRAY is an implementation of the model elimination theorem-proving procedure that extends Prolog to the full first-order predicate calculus. PTTP differs from Prolog in its use of (1) unification with the occurs check for soundness, (2) depth-first iterative deepening search instead of unbounded depth-first search to make the search strategy complete, and (3) the model elimination inference rule that is added to Prolog inferences to make the inference system complete. PTTP also extends Prolog by providing the capability of printing the proofs it finds. Because PTTP compiles the clauses of a problem, its inference rate is very high. Because PTTP uses depth-first search, its storage requirements are low and term size need not be limited to reduce memory usage at the expense of completeness. PTTP's simple architecture facilitates its adaptation and use in applications.
-
-# PFC Backward-Chaining Rules
+# Backward-Chaining Rules
+## PFC
 Pfc includes a special kind of backward chaining rule which is used to generate all possible solutions to a goal that is sought in the process of forward chaining.     
 
 
@@ -78,23 +79,6 @@ mother(Ma,X),mother(Ma,Y),{X\==Y}
 
 ````
 
-
-
-# Synopsis
-
-An inference engine is a computer program that tries to derive answers from a knowledge base.  The LogicMOO inference engine (like Cyc) performs general logical deduction (including modus ponens, modus tollens, universal quantification and existential quantification).
-````
-
-% this means that both P and Q can't be true.
-disjoint(P,Q), {current_predciate(_,P),current_predciate(_,Q)}
-  ==>
-  (P ==> not(Q)),
-  (Q ==> not(P)).
-
-````
-
-# Description
-
 The =logicmoo_base= module allows one to use optimal First Order Logic declarations in Prolog code.
 During *development*, these declarations log informative information when values don't match
 expectations.  A typical development environment converts this into a helpful
@@ -103,12 +87,7 @@ stack trace which assists in locating the programing error.
 FOL declarations can be give manually by calling pfc_assert/1.  `logicmoo_base` also inserts
 predicate Mode declarations for you based on your PlDoc structured comments.  
 
-## Why?
-
-We love First order logic!  That's one reason we love Prolog. But
-sometimes we are left disapointed when prolog acts more like a programming language than an inference engine.  
-
-Inference Engines can:
+## Inference Engines can:
 
   * offer documentation to those reading our code
   * help find errors during development

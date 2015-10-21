@@ -891,7 +891,7 @@ to_word_list_0(A,WList):-any_to_string(A,String),!,text_to_string(String,Atom),t
 
 read_stream_to_arglist(Input,[]):- at_end_of_stream(Input),!.
 read_stream_to_arglist(Input,[]):- on_x_fail((once(wait_for_input([Input], Inputs, 0.01)),Inputs=[])),!.
-read_stream_to_arglist(Input,[H|T]):-dcall(why,call(lisp_read_from_input(Input,H))),!,(is_ending(H)->T=[];read_stream_to_arglist(Input,T)),!.
+read_stream_to_arglist(Input,[H|T]):-show_call(why,call(lisp_read_from_input(Input,H))),!,(is_ending(H)->T=[];read_stream_to_arglist(Input,T)),!.
 
 is_ending(List):-nonvar(List),(is_list(List)->last(List,whitepace("\n"));List==whitepace("\n")).
 

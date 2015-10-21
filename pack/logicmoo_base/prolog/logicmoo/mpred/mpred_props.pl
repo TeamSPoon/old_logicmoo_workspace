@@ -126,9 +126,9 @@ decl_mpred_prolog_ilc(CM,M,PI,F/A):-atom(PI),A==0,not(current_predicate(F/A)),!,
 decl_mpred_prolog_ilc(CM,M,PI,F/A):-loop_check_term(decl_mpred_prolog_ilc_0(CM,M,PI,F/A),decl_mpred_prolog_ilc(CM,M,F),true).
 decl_mpred_prolog_ilc_0(_CM,M,PI,F/A):-
       assert_arity(F,A),
-      add(mpred_module(PI,M)),
-      add(mpred_isa(PI,prologDynamic)),
-      add(mpred_isa(PI,predCanHaveSingletons)),!.
+      ain(mpred_module(PI,M)),
+      ain(mpred_isa(PI,prologDynamic)),
+      ain(mpred_isa(PI,predCanHaveSingletons)),!.
 
 
 % ========================================
@@ -163,10 +163,10 @@ decl_mpred_hybrid_ilc(CM,M,PI,F/A):-atom(PI),A==0,must(arity(F,_)),not(current_p
 decl_mpred_hybrid_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),loop_check_term(decl_mpred_hybrid_ilc_0(CM,M,PI,F/A),decl_mpred_hybrid_ilc(CM,M,F),true).
 decl_mpred_hybrid_ilc_0(_CM,M,PI,F/A):-
       assert_arity(F,A),
-      add(kb:mpred_module(F,M)),
-      add(kb:prologHybrid(F)),
+      ain(mpred_module(F,M)),
+      ain(prologHybrid(F)),
       get_cc(PI,NC),
-      sanity(dcall_failure(why,M==kb)),
+      sanity(show_failure(why,M==baseKB)),
       decl_mpred_mfa(M,F,A),
       decl_mpred_pi(PI),
       must(lmconf:mpred_provide_setup(call(conjecture),F/A,prologHybrid,_OUT)),
@@ -189,7 +189,7 @@ decl_mpred_hybrid_ilc_0(_CM,M,PI,F/A):-
 
 
 % mpred_isa(F,prologDynamic):- not(mpred_isa(F,prologHybrid)),(F=ttPredType;(current_predicate(F/1);not(t(F,tCol)))).
-mpred_isa(G,predProxyAssert(add)):- atom(G),prologMacroHead(G).
+mpred_isa(G,predProxyAssert(ain)):- atom(G),prologMacroHead(G).
 mpred_isa(G,predProxyQuery(ireq)):- atom(G),prologMacroHead(G).
 mpred_isa(G,predProxyRetract(del)):- atom(G),prologMacroHead(G).
 */
@@ -217,7 +217,7 @@ assert_arity(argsIsa,2):- trace_or_throw(assert_arity_argsIsa(error,2)).
 assert_arity(F,A):- must_det(good_pred_relation_name(F,A)),fail.
 assert_arity(F,A):- arity(F,A),!.
 assert_arity(F,A):- arity(F,AA), A\=AA,dmsg(trace_or_throw(assert_arity_switched(F,AA->A))),fail.
-assert_arity(F,A):- mpred_add_fast(arity(F,A)).
+assert_arity(F,A):- ain_fast(arity(F,A)).
 
 
 good_pred_relation_name(F,A):-not(bad_pred_relation_name0(F,A)).
@@ -244,6 +244,7 @@ bad_pred_relation_name1(F,A):-arity(F,AO), A \= AO.
 
 :- meta_predicate(decl_mpred(?)).
 decl_mpred((A,B)):-decl_mpred(A),decl_mpred(B).
+decl_mpred(M):-!,kb_dynamic(M).
 decl_mpred(M):-loop_check(with_pi(M,decl_mpred_4),true).
 
 decl_mpred_4(user,prologSingleValued(ARGS),prologSingleValued/1):- compound(ARGS),get_functor(ARGS,F,A),!, decl_mpred(F,[prologArity(A),prologSingleValued,meta_argtypes(ARGS)]),!.
@@ -281,7 +282,7 @@ decl_mpred_2(_,meta_argtypes(FARGS)):- functor(FARGS,_,A),arg(A,FARGS,Arg),var(A
 decl_mpred_2(F,cycPlus2(A)):- ensure_universal_stub_plus_2(F,A).
 
 decl_mpred_2(F,A):-once(lmconf:mpred_provide_write_attributes(F,A)).
-decl_mpred_2(F,Prop):-add(mpred_isa(F,Prop)).
+decl_mpred_2(F,Prop):-ain(mpred_isa(F,Prop)).
 
 decl_mpred(Mt,F,A):-decl_mpred(F,A),ignore((nonvar(Mt),decl_mpred(F,mt(Mt)))).
 decl_mpred_4(_CM,M,PI,F/A):-

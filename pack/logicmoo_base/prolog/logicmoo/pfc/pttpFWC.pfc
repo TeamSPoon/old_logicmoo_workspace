@@ -32,7 +32,7 @@
 
 
 :- was_dynamic(singleValuedInArg/2).
-:- was_dynamic(kb:ptReformulatorDirectivePredicate/1).
+:- was_dynamic(baseKB:ptReformulatorDirectivePredicate/1).
 
 
 :- op(500,fx,'~').
@@ -56,13 +56,13 @@
 
 c.
 
-:- mpred_test(mpred_add(a ==> b)).
+:- mpred_test(ain(a ==> b)).
 % :- start_rtrace,trace.
 a.
 
-:- listing(kbp:_).
+:- listing(basePFC:_).
 :- prolog.
-:- mpred_test(mpred_add(a)).
+:- mpred_test(ain(a)).
 :- mpred_test(a).
 :- mpred_test(b).
 
@@ -106,7 +106,7 @@ a.
 
 
 :- was_dynamic(singleValuedInArg/2).
-:- was_dynamic(kb:ptReformulatorDirectivePredicate/1).
+:- was_dynamic(baseKB:ptReformulatorDirectivePredicate/1).
 
 
 :- op(500,fx,'~').
@@ -129,12 +129,12 @@ a.
 :- abolish(b,1).
 :- was_dynamic((a/1,b/1,c/0)).
 
-:- mpred_test(mpred_add(a(z))).
+:- mpred_test(ain(a(z))).
 
-:- mpred_test(mpred_add(==> a(z))).
+:- mpred_test(ain(==> a(z))).
 :- mpred_test(a(z)).
 
-:- mpred_test(mpred_add(a(z) ==> z(a))).
+:- mpred_test(ain(a(z) ==> z(a))).
 :- mpred_test(z(a)).
 
 :- mpred_test(a(_)).
@@ -156,14 +156,14 @@ a.
 % :-mpred_test(\+ neg(a(_))).
 % :-mpred_test(\+ a(_)).
 
-% U=nt(A,B,C),kbp:spft(umt,X,Y,Z),\+ \+
+% U=nt(A,B,C),basePFC:spft(umt,X,Y,Z),\+ \+
 
 (a(B),d(B),f(B)) ==> b(B).
 (a(B),d(B),e(B)) ==> b(B).
 (a(B),e(B),d(B)) ==> b(B).
 
 d(q).
-% ?- nl,ZU=nt(_,_,_),ZU,kbp:spft(umt,X,Y,Z),\+ \+ ZU=Z,nl.
+% ?- nl,ZU=nt(_,_,_),ZU,basePFC:spft(umt,X,Y,Z),\+ \+ ZU=Z,nl.
 
 (b(_),e(q)) ==> c.
 (~a(B),~e(B)) ==> q.
@@ -311,6 +311,6 @@ nationality(PA, NA) <==
 
 % The question is: who owns the fish?
 
-:- forall((C <== A) ,  (dynamic(C),mpred_add(A ==> C))).
+:- forall((C <== A) ,  (dynamic(C),ain(A ==> C))).
 
 :- prolog.

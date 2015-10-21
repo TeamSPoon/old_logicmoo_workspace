@@ -487,7 +487,7 @@ scan_source_files_for_varnames:-
  forall(source_file(F),read_source_file_vars(F)),!.
 
 dcall_if_verbose(G):-!, notrace(G).
-dcall_if_verbose(G):-dcall(why,G).
+dcall_if_verbose(G):-show_call(why,G).
 
 :- dynamic(varname_cache:varname_info_file/1).
 read_source_file_vars(_):- \+ prolog_flag(mpred_vars, true),!.
@@ -596,7 +596,7 @@ init_varname_stores(M):-
 % :- initialization(maybe_scan_source_files_for_varnames).
 
 prolog:make_hook(before, Files):-forall(member(File,Files),retractall(varname_cache:varname_info_file(File))).
-prolog:make_hook(after, Files):-forall(member(File,Files),dcall(why,ain00(varname_cache:varname_info_file(File)))).
+prolog:make_hook(after, Files):-forall(member(File,Files),show_call(why,ain00(varname_cache:varname_info_file(File)))).
 
 user:term_expansion(HB,_):- current_prolog_flag(mpred_vars,true),term_expansion_save_vars(HB),fail.
 

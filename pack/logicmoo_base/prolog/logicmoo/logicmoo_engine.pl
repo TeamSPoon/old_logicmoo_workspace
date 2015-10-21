@@ -1,5 +1,4 @@
-/** <module> mpred_clausify
-% Provides a prolog database replacement that uses an interpretation of KIF
+/** <module>  Provides a prolog database replacement that uses an interpretation of KIF
 %
 %  t/N
 %  hybridRule/2
@@ -48,54 +47,33 @@
            nnf/3, 
            pnf/3, cf/4,
           tsn/0,
-          op(300,fx,'-'),
-          op(1150,xfx,'=>'),
-          op(1150,xfx,'<=>'),
-          op(350,xfx,'xor'),
-          op(400,yfx,'&'),  
-          op(500,yfx,'v')
         ]). 
-*/
 :- nodebug(_).
+*/
 
-% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
+:- use_module(logicmoo_base).
 
-% :- use_module(logicmoo_base).
-
-
-% = % :- ensure_loaded(logicmoo(snark/common_logic_kb_hooks)).
-
-% :- use_module(  logicmoo(snark/common_logic_sexpr)).
-
-%=%   Convert wffs to list of normal logic clauses
-% :- use_module(   logicmoo(plarkc/mpred_clausify)).
-
-
-:- op(300,fx,'~').
-:- op(300,fx,'-').
-:- op(400,yfx,'&').  
-:- op(500,yfx,'v').
-:- op(1075,xfx,'=>').
-:- op(1075,xfx,'<=>').
-:- op(350,xfx,'xor').
-
-:- op(300,fx,user:'~').
-:- op(300,fx,user:'-').
-:- op(400,yfx,user:'&').  
-:- op(500,yfx,user:'v').
-:- op(1075,xfx,user:'=>').
-:- op(1075,xfx,user:'<=>').
-:- op(350,xfx,user:'xor').
+:- include(logicmoo(mpred/'mpred_header.pi')).
 
 % SWI Prolog modules do not export operators by default
 % so they must be explicitly placed in the user namespace
 
-:- dynamic user:file_search_path/2.
-:- multifile user:file_search_path/2.
-:- prolog_load_context(directory,Dir),asserta(user:file_search_path(logicmoo,Dir)).
-
-:- include(logicmoo(mpred/'mpred_header.pi')).
-
+:- op(500,fx,user:'~').
+:- op(1199,user:fx,('==>')).
+:- op(1190,user:xfx,('::::')).
+:- op(1180,user:xfx,('==>')).
+:- op(1170,user:xfx,'<==>').
+:- op(1160,user:xfx,('<-')).
+:- op(1150,user:xfx,'=>').
+:- op(1140,user:xfx,'<=').
+:- op(1130,user:xfx,'<=>').
+:- op(1100,user:fx,('nesc')).
+:- op(300,user:fx,'-').
+:- op(600,user:yfx,'&'). 
+:- op(600,user:yfx,'v').
+:- op(1075,user:xfx,'<-').
+:- op(350,user:xfx,'xor').
+:- op(1100,user:fx,(was_shared_multifile)).
 
 
 
@@ -605,15 +583,15 @@ kif_sanity_test_0:-kif_test(   argInst(kb_argInst, 1 ,KB) =>  (        has(A,B) 
 kif_sanity_test_0:-kif_test(   argInst(kb_argInst, 1 ,KB) & argInst(has, 1 , A) & argInst(has, 2 , B) =>  (  has(A,B) =>  (kb_argInst(KB, has, 1, A) & kb_argInst(KB, has, 2, B)))).
 
 
-%   mpred_add= (not_has(A, B)):- not_kb_argInst(C, has, 1, A), argInst(has, 2, B), argInst(kb_argInst, 1, C), argInst(has, 1, A)).
+%   ain= (not_has(A, B)):- not_kb_argInst(C, has, 1, A), argInst(has, 2, B), argInst(kb_argInst, 1, C), argInst(has, 1, A)).
 %
-%   mpred_add= (kb_argInst(C, has, 1, A):-has(A, B), argInst(has, 2, B), argInst(kb_argInst, 1, C), argInst(has, 1, A)).
+%   ain= (kb_argInst(C, has, 1, A):-has(A, B), argInst(has, 2, B), argInst(kb_argInst, 1, C), argInst(has, 1, A)).
 %
-%   mpred_add= (not_argInst(has, 2, A)):-has(B, A), not_kb_argInst(C, has, 1, B), argInst(kb_argInst, 1, C), argInst(has, 1, B)).
+%   ain= (not_argInst(has, 2, A)):-has(B, A), not_kb_argInst(C, has, 1, B), argInst(kb_argInst, 1, C), argInst(has, 1, B)).
 %
-%   mpred_add= (not_argInst(kb_argInst, 1, A)):-has(B, C), not_kb_argInst(A, has, 1, B), argInst(has, 2, C), argInst(has, 1, B)).
+%   ain= (not_argInst(kb_argInst, 1, A)):-has(B, C), not_kb_argInst(A, has, 1, B), argInst(has, 2, C), argInst(has, 1, B)).
 %
-%   mpred_add= (not_argInst(has, 1, A)):-has(A, B), not_kb_argInst(C, has, 1, A), argInst(has, 2, B), argInst(kb_argInst, 1, C)).
+%   ain= (not_argInst(has, 1, A)):-has(A, B), not_kb_argInst(C, has, 1, A), argInst(has, 2, B), argInst(kb_argInst, 1, C)).
 %
 %   (not_has(C, A)):- not_kb_argInst(B, has, 2, A), argInst(has, 2, A), argInst(kb_argInst, 1, B), argInst(has, 1, C)).
 %

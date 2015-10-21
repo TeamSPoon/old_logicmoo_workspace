@@ -107,7 +107,7 @@ doc_file_href(_Options,HREF, HREF).
 pldoc_html:source_button(_File, Options) -->
 	{ pldoc_html:option(files(_Map), Options) }, !.	% generating files
 pldoc_html:source_button(File, _Options) -->
-	{dcall(why,(doc_file_href(Options, File, HREF0),
+	{show_call(why,(doc_file_href(Options, File, HREF0),
          edit_file_href(Options, File, EDIT_HREF0)))},
 
 	html_write:html([
@@ -179,8 +179,8 @@ do_semweb_startup:-
 
 
 % [Optionaly] remove debug noises
-% mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),dcall(why,asserta(prolog_debug:debugging(http(X), false, O)))).
-% mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),dcall(why,asserta(prolog_debug:debugging((X), false, O)))).
+% mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(why,asserta(prolog_debug:debugging(http(X), false, O)))).
+% mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),show_call(why,asserta(prolog_debug:debugging((X), false, O)))).
 
 :- was_shared_multifile(pre_file_search_path/2).
 
@@ -231,3 +231,148 @@ sandbox:safe_global_variable(V):-nonvar(V).
 sandbox:safe_directive(V):-nonvar(V).
 
 :- gripe_time(40,ensure_loaded(logicmoo(mpred_online/mpred_www))),if_defined(mpred_www:ensure_webserver).
+
+
+end_of_file.
+
+
+
+
+%
+
+:- multifile '$si$':'$was_imported_kb_content$'/2.
+:- dynamic '$si$':'$was_imported_kb_content$'/2.
+:- discontiguous('$si$':'$was_imported_kb_content$'/2).
+
+:- was_shared_multifile lmconf:startup_option/2. 
+:- was_dynamic lmconf:startup_option/2. 
+
+:- ensure_loaded(logicmoo_utils).
+
+lmconf:startup_option(datalog,sanity). %  Run datalog sanity tests while starting
+lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
+
+
+
+
+/*
+:- dynamic user:file_search_path/2.
+:- multifile user:file_search_path/2.
+:- user:prolog_load_context(directory,Dir),
+   %Dir = (DirThis/planner),
+   DirFor = logicmoo,
+   (( \+ user:file_search_path(DirFor,Dir)) ->asserta(user:file_search_path(DirFor,Dir));true),
+   absolute_file_name('../../../',Y,[relative_to(Dir),file_type(directory)]),
+   (( \+ user:file_search_path(pack,Y)) ->asserta(file_search_path(pack,Y));true).
+:- user:attach_packs.
+:- initialization(user:attach_packs).
+
+% [Required] Load the Logicmoo Library Utils
+% logicmoo_util_help:mpred_is_impl_file(logicmoo(logicmoo_utils)).
+
+:- user:file_search_path(logicmoo,_)-> true; (user:prolog_load_context(directory,Dir),asserta_if_new(user:file_search_path(logicmoo,Dir))).
+
+:- was_dynamic(lmconf:isa_pred_now_locked/0).
+*/
+
+% :- include(mpred/'mpred_header.pi').
+
+
+
+/*
+:- meta_predicate call_mpred_body(*,0).
+:- meta_predicate decl_mpred_hybrid_ilc_0(*,*,0,*).
+:- meta_predicate assert_isa_hooked(0,*).
+*/
+:- meta_predicate t(7,?,?,?,?,?,?,?).
+:- meta_predicate t(6,?,?,?,?,?,?).
+:- meta_predicate t(5,?,?,?,?,?).
+:- meta_predicate t(3,?,?,?).
+:- meta_predicate t(4,?,?,?,?).
+:- meta_predicate t(2,?,?).
+
+
+% ========================================
+% get_mpred_user_kb/1
+% ========================================
+
+% TODO uncomment the next line without breaking it all!
+% lmconf:use_cyc_database.
+
+:- asserta(lmconf:pfcManageHybrids).
+
+
+
+
+
+
+% ================================================
+% Debugging settings
+% ================================================
+
+:- was_export(is_stable/0).
+
+is_stable:-fail.
+
+:- if(current_prolog_flag(optimise,true)).
+is_recompile.
+:- else.
+is_recompile:-fail.
+:- endif.
+
+fast_mud.
+xperimental:-fail.
+xperimental_big_data:-fail.
+
+simple_code :- fail.
+save_in_mpred_t:-true.
+not_simple_code :- \+ simple_code.
+type_error_checking:-false.
+% slow_sanity(A):-nop(A).
+:- meta_predicate xtreme_debug(0).
+xtreme_debug(P):- is_release,!,nop(P).
+xtreme_debug(P):- not_is_release, sanity(P).
+xtreme_debug(_).
+
+:- meta_predicate sanity(0).
+sanity(P):- \+ is_recompile, (true; is_release),!,nop(P).
+sanity(P):- on_x_rtrace(hotrace(P)),!.
+sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
+:- meta_predicate(when_debugging(+,0)).
+when_debugging(What,Call):- debugging(What),!,Call.
+when_debugging(_,_).
+
+% :- asserta(tlbugger:no_colors).
+% :- asserta(tlbugger:show_must_go_on).
+
+:- set_prolog_flag(double_quotes, atom).
+:- set_prolog_flag(double_quotes, string).
+
+% ================================================
+% DBASE_T System
+% ================================================
+:- gripe_time(40,use_module(logicmoo(mpred_online/mpred_www))).
+% user:term_expansion((:-module(Name,List)), :-maplist(export,List)):- atom(Name),atom_concat(mpred_,_,Name).
+% user:term_expansion((:-use_module(Name)), :-true):- atom(Name),atom_concat(mpred_,_,Name).
+
+
+
+:- asserta(t_l:disable_px).
+
+% user:goal_expansion(ISA,G) :- compound(ISA),t_l:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
+:- meta_predicate(mpred_expander(?,?,?,?)).
+:- meta_predicate(lmbase_record_transactions_maybe(?,?)).
+:- meta_predicate(mpred_file_expansion(?,?)).
+
+
+% :- read_source_files.
+% logicmoo_html_needs_debug.
+:- if((lmconf:startup_option(www,sanity),if_defined(logicmoo_html_needs_debug))).
+:- write(ready),nl,flush_output.
+:- prolog.
+:- endif.
+:-  call(with_mfa_of( (dynamic_safe)),user,user,boxlog_to_compile(_D,_E,_F),boxlog_to_compile/3).
+:- retractall(t_l:disable_px).
+
+
+:- list_undefined.

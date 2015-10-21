@@ -105,7 +105,7 @@ max_isa(HintA,HintB,HintO):- conjoin(HintA,HintB,HintO).
 
 
 add_iza(Var,HintA):- var(Var),(get_attr(Var,argisa,HintB)->min_isa(HintA,HintB,Hint);Hint=HintA), put_attr(Var,argisa,Hint).
-add_iza(Var,Hint):- ignore(dcall_failure(why,isa(Var,Hint))).
+add_iza(Var,Hint):- ignore(show_failure(why,isa(Var,Hint))).
 
 :- style_check(-singleton).
 

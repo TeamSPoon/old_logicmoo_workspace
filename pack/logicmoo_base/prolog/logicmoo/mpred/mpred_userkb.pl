@@ -15,7 +15,7 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- module(kb, [
+:- module(baseKB, [
 
 % current_op_alias/2,
 % prolog_load_file_loop_checked/2,
@@ -61,7 +61,6 @@ cyc_to_plarkc/2,
 cyckb_t/3,
 cycPrepending/2,
 decided_not_was_isa/2,
-decl_mpred_multifile/1,
 deduceFromArgTypes/1,
 default_type_props/3,
 defnSufficient/2,
@@ -105,7 +104,6 @@ mpred_module/2,
 mpred_univ/1,
 mpred_univ/3,
 mudKeyword/2,
-never_registered_mpred_file/1,
 now_unused/1,
 only_if_pttp/0,
 pddlSomethingIsa/2,
@@ -132,8 +130,6 @@ pttp1a_wid/3,
 pttp_builtin/2,
 pttp_nnf_pre_clean_functor/3,
 quasiQuote/1,
-registered_module_type/2,
-registered_mpred_file/1,
 relationMostInstance/3,
 relax_term/6,
 resolveConflict/1,
@@ -178,15 +174,12 @@ typeProps/2,
 use_ideep_swi/0,
 vtUnreifiableFunction/1,
 was_chain_rule/1,
-whymemory/2,
 wid/3,
 prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/1,pfcWatched/1,pfcMustFC/1,predIsFlag/1,tPred/1,prologMultiValued/1,
  prologSingleValued/1,prologMacroHead/1,notAssertable/1,prologBuiltin/1,prologDynamic/1,prologOrdered/1,prologNegByFailure/1,prologPTTP/1,prologKIF/1,prologEquality/1,prologPTTP/1,
- prologSideEffects/1,prologHybrid/1,prologListValued/1,
+ prologSideEffects/1,prologHybrid/1,prologListValued/1
 
-kb_dynamic/1,
-make_declared/1,
-make_reachable/2
+
 
  ]).
 
@@ -196,9 +189,7 @@ make_reachable/2
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
 
 :- meta_predicate
-        kb_dynamic(?),
-        make_declared(?),
-        make_reachable(?,?),
+
         t(?, ?, ?),
         t(?, ?, ?, ?),
         t(?, ?, ?, ?, ?),
@@ -246,7 +237,6 @@ cyc_to_plarkc/2,
 cyckb_t/3,
 cycPrepending/2,
 decided_not_was_isa/2,
-decl_mpred_multifile/1,
 deduceFromArgTypes/1,
 default_type_props/3,
 defnSufficient/2,
@@ -265,8 +255,8 @@ is_wrapper_pred/1,
 isa/2,
 isCycAvailable_known/0,
 isCycUnavailable_known/1,
-kb:never_assert_u/2,
-kb:never_retract_u/2,
+baseKB:never_assert_u/2,
+baseKB:never_retract_u/2,
 lambda/5,
 lmconf:mpred_select/2,
 
@@ -290,7 +280,6 @@ mpred_module/2,
 mpred_univ/1,
 mpred_univ/3,
 mudKeyword/2,
-never_registered_mpred_file/1,
 now_unused/1,
 only_if_pttp/0,
 pddlSomethingIsa/2,
@@ -317,8 +306,6 @@ pttp1a_wid/3,
 pttp_builtin/2,
 pttp_nnf_pre_clean_functor/3,
 quasiQuote/1,
-registered_module_type/2,
-registered_mpred_file/1,
 relationMostInstance/3,
 relax_term/6,
 resolveConflict/1,
@@ -363,53 +350,23 @@ typeProps/2,
 use_ideep_swi/0,
 vtUnreifiableFunction/1,
 was_chain_rule/1,
-whymemory/2,
 meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/1,pfcWatched/1,pfcMustFC/1,predIsFlag/1,tPred/1,prologMultiValued/1,pfcBcTrigger/1,
  prologSingleValued/1,prologMacroHead/1,notAssertable/1,prologBuiltin/1,prologDynamic/1,prologOrdered/1,prologNegByFailure/1,prologPTTP/1,prologKIF/1,prologEquality/1,prologPTTP/1,
  prologSideEffects/1,prologHybrid/1,prologListValued/1,
 wid/3)).
 
 :- meta_predicate((
-      kb:resolveConflict((*)),
-      kb:resolveConflict0((*)),
-      kb:resolverConflict_robot((*)))).
+      baseKB:resolveConflict((*)),
+      baseKB:resolveConflict0((*)),
+      baseKB:resolverConflict_robot((*)))).
 
-:- dcall(why,source_context_module(_CM)).
-:- module_property(kb, exports(List)),forall(member(E,List),kb:dynamic(kb:E)).
+:- show_call(why,source_context_module(_CM)).
+:- module_property(baseKB, exports(List)),forall(member(E,List),baseKB:dynamic(baseKB:E)).
+% :- module_property(baseKB, exports(List)),forall(member(E,List),kb_dynamic(E)).
 
-kb_dynamic(F/A):-!,kb_dynamic(kb:F/A).
-kb_dynamic([FA1|FA2]):-!,kb_dynamic(FA1),kb_dynamic(FA2).
-kb_dynamic((FA1,FA2)):-!,kb_dynamic(FA1),kb_dynamic(FA2).
-% kb_dynamic(CM:M:FA):- atom(CM),atom(M),!,(CM==M -> kb_dynamic(M:FA);(CM:kb_dynamic(M:FA))).
-% kb_dynamic(CM:M:F/A):- atom(CM),atom(M),!,(CM==M -> kb_dynamic(M:FA);(CM:kb_dynamic(M:F/A))).
-kb_dynamic(M:(FA1,FA2)):-!,kb_dynamic(M:FA1),kb_dynamic(M:FA2).
-kb_dynamic(M:[FA1|FA2]):-!,kb_dynamic(M:FA1),kb_dynamic(M:FA2).
-kb_dynamic(_:FA):- is_ftVar(FA),!.
-kb_dynamic(_:F/_):- is_ftVar(F),!.
-kb_dynamic(M:F/A):-!,make_declared(M:F/A),source_context_module(CM),make_reachable(CM,M:F/A).
-kb_dynamic(M:P):-functor(P,F,A),!,kb_dynamic(M:F/A).
-kb_dynamic(P):-functor(P,F,A),!,kb_dynamic(F/A).
-
-:- dynamic(kb:arity/2).
-
-make_declared(Test):- \+ \+ ((Test= (_:F/_), is_ftVar(F))),!.
-make_declared(F/_):- is_ftVar(F),!.
-make_declared(M:F/A):- !, M:multifile(M:F/A),M:module_transparent(M:F/A),M:export(M:F/A),functor(P,F,A),(predicate_property(P,dynamic)->true;M:dynamic(M:F/A)).
-make_declared(F/A):- dumpST,trace, source_context_module(CM),make_declared(CM:F/A).
-
-kb:make_reachable(_,Test):- \+ \+ ((Test= (_:F/_), is_ftVar(F))),!.
-:- assert((kb:make_reachable(CM,M:F/A):- must(atom(CM)),must(atom(M)), make_declared(M:F/A), 
-  (CM\==M ->must(CM:(CM:multifile(M:F/A),CM:discontiguous(M:F/A),dcall(why,CM:import(M:F/A))));make_declared(M:F/A)))).
-
-
-/*
-do_kb_export(kb:FA):-!,do_kb_export(FA).
-do_kb_export(M:F/A):-!, M:multifile(M:F/A),M:dynamic(M:F/A),export(M:F/A),kb:import(M:F/A).
-do_kb_export(F/A):-!, kb:multifile(F/A),kb:dynamic(F/A).
-*/
-
-:- module_property(kb, exports(List)),forall(member(E,List),kb_dynamic(E)).
 % :- use_module(mpred_pfc).
+
+:- source_location(F,_),asserta(never_registered_mpred_file(F)).
 
 prologNegByFailure(prologNegByFailure).
 completelyAssertedCollection(prologNegByFailure).
@@ -426,6 +383,17 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 :- meta_predicate(t(?,?,?,?,?)).
 :- meta_predicate(t(?,?,?,?)).
 :- meta_predicate(t(?,?,?)).
+
+
+
+neg_may_naf(P):- mpred_non_neg_literal(P),get_functor(P,F),clause(prologNegByFailure(F),true),!.
+neg_may_naf(P):- is_ftCompound(P),predicate_property(P,static).
+
+neg_in_code(P):-   neg_may_naf(P), \+ P.
+neg_in_code(Q):-  is_ftNonvar(Q), prologSingleValued(Q),if_missing_mask(Q,R,Test),req(R),Test.
+
+tilda_in_code(~(G)):-nonvar(G),!, req(~neg(G)).
+tilda_in_code(G):- req(neg(G)).
 
 
 
@@ -446,49 +414,9 @@ t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6,A7)).
 % :- use_module(logicmoo(mpred/mpred_loader)).
 % :- use_module(logicmoo(mpred/mpred_pfc)).
 
-decl_mpred_multifile(M):- trace_or_throw(depricated(decl_mpred_multifile(M))),
-                 multifile(M:('<-')/2),
-                    multifile(M:('::::')/2),
-                 multifile(M:('<==>'/2)),
-                 multifile(M:(('==>')/2)),
-                 multifile(M:('nesc')/1),
-                 multifile(M:('~')/1),
-                 multifile(M:('neg')/1),
-                 export(M:('<-')/2),
-                    export(M:('::::')/2),
-                 export(M:('<==>'/2)),
-                 export(M:(('==>')/2)),
-                 export(M:('nesc')/1),
-                 export(M:('~')/1),
-                 export(M:('neg')/1).
-
-:- op(500,fx,kb:'~').
-:- op(1050,xfx,(kb:'<-')).
-:- op(1050,xfx,kb:'<==>').
-:- op(1050,xfx,(kb:'<-')).
-:- op(1100,fx,(kb:'nesc')).
-:- op(1150,xfx,(kb:'::::')).
-:- op(500,fx,kb:'~').
-:- op(1050,xfx,kb:'<==>').
-:- op(1050,xfx,(kb:'<-')).
-:- op(1200,fx,(kb:'=>')).
-:- op(1200,fx,(kb:'==>')).
-:- op(1100,fx,(kb:'nesc')).
-:- op(1150,xfx,(kb:'::::')).
-:- op(300,fx,kb:'-').
-:- op(600,yfx,kb:'&').  
-:- op(600,yfx,kb:'v').
-:- op(1075,xfx,kb:'<-').
-:- op(1075,xfx,kb:'<=').
-:- op(1070,xfx,kb:'=>').
-:- op(1070,xfx,kb:'<=>').
-:- op(1100,xfx,(kb:'<==>')).
-:- op(1100,xfx,(kb:'==>')).
-:- op(350,xfx,kb:'xor').
 
 
-
-kb:current_world(current).
+baseKB:current_world(current).
 
 
 mpred_univ(C,I,Head):-atom(C),!,Head=..[C,I],predicate_property(Head,number_of_clauses(_)).
@@ -498,26 +426,41 @@ mpred_univ(C,I,Head):-atom(C),!,Head=..[C,I],predicate_property(Head,number_of_c
 :- use_module(logicmoo(mpred/'mpred_stubs.pl')).
 :- use_module(logicmoo(mpred/'mpred_*.pl')).
 
-kb:resolveConflict(C):- cwc, must((resolveConflict0(C),
+baseKB:resolveConflict(C):- cwc, must((resolveConflict0(C),
   show_if_debug(is_resolved(C)),mpred_rem(conflict(C)))).
-kb:resolveConflict(C) :- cwc,
+baseKB:resolveConflict(C) :- cwc,
   wdmsg("Halting with conflict ~p", [C]),   
   must(mpred_halt(conflict(C))),fail.
 */
 
-resolveConflict0(C) :- cwc, forall(must(mpred_negation_w_neg(C,N)),ignore(dcall_failure(why,(nop(kb:resolveConflict(C)),pp_why(N))))),
-  ignore(dcall_failure(why,(nop(kb:resolveConflict(C)),pp_why(C)))), 
-    doall((mpred_call_shared(resolverConflict_robot(C)),\+ is_resolved(C),!)),
+resolveConflict0(C) :- cwc, forall(must(mpred_negation_w_neg(C,N)),ignore(show_failure(why,(nop(baseKB:resolveConflict(C)),pp_why(N))))),
+  ignore(show_failure(why,(nop(baseKB:resolveConflict(C)),pp_why(C)))), 
+    doall((mreq(resolverConflict_robot(C)),\+ is_resolved(C),!)),
     is_resolved(C),!.
 
 resolverConflict_robot(N) :- cwc, forall(must(mpred_negation_w_neg(N,C)),forall(compute_resolve(C,N,TODO),on_x_rtrace(show_if_debug(TODO)))).
 resolverConflict_robot(C) :- cwc, must((mpred_remove3(C),wdmsg("Rem-3 with conflict ~p", [C]),mpred_run,sanity(\+C))).
 
-never_assert_u(M:Rule,Why):- cwc, atom(M),never_assert_u(Rule,Why).
 % never_assert_u(pt(_,Pre,Post),head_singletons(Pre,Post)):- cwc, head_singletons(Pre,Post).
 never_assert_u(Rule,is_var(Rule)):- cwc, is_ftVar(Rule),!.
 never_assert_u(Rule,head_singletons(Pre,Post)):- cwc, Rule \= (_:-_), once(mpred_rule_hb(Rule,Post,Pre)), head_singletons(Pre,Post).
-never_assert_u(mpred_mark(pfcPosTrigger,_,F,A),static(F/A)):-functor(P,F,A),current_predicate(F,M:P),predicate_property(M:P,static).
+
+never_assert_u(A,B):-never_assert_u0(A,B),trace,never_assert_u0(A,B).
+never_assert_u(M:Rule,Why):- cwc, atom(M),never_assert_u(Rule,Why).
+
+never_assert_u0(mpred_mark(pfcPosTrigger,_,F,A),Why):-
+  functor(P,F,A),
+  ignore(predicate_property(M:P,exported)),
+  current_predicate(_,M:P),
+  ( \+ predicate_property(M:P,imported_from(_))),  
+  is_static_why(M,P,F,A,R),
+  Why = static(M:P-F/A,R).
+
+is_static_why(M,P,_,_,_):- predicate_property(M:P,dynamic),!,fail.
+is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=static(M:F/A).
+
+  
+
 /*
 never_assert_u(pt(_,
        singleValuedInArg(A, _),
@@ -525,10 +468,12 @@ never_assert_u(pt(_,
 */
 
 
-%  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(kbp:pt(umt,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),u)),UN).
-%  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(kbp:pt(umt,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),u)),UN).
+%  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(basePFC:pt(umt,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),u)),UN).
+%  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(basePFC:pt(umt,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),u)),UN).
 
 
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
+
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/autoexec.pfc')).
 

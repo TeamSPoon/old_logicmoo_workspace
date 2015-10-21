@@ -219,7 +219,7 @@ show_cgoal(G):- slow_sanity((stack_check(9600,dmsg(warning(maybe_overflow(stack_
 
 
 :- was_export(add_later/1).
-add_later(Fact):- call_after_mpred_load(add(Fact)).
+add_later(Fact):- call_after_mpred_load(ain(Fact)).
 
 % ========================================
 % run_database_hooks(Type,Hook)
@@ -271,7 +271,7 @@ rescan_all:- doall_and_fail(agenda_slow_op_restart).
 rescan_all:- doall_and_fail(agenda_rescan_mpred_props).
 rescan_all.
 
-ensure_at_least_one_region:- (isa(_,tRegion)->true;add(isa(iRegion1,tRegion))),!.
+ensure_at_least_one_region:- (isa(_,tRegion)->true;ain(isa(iRegion1,tRegion))),!.
 
 % :-meta_predicate(finish_processing_dbase).
 finish_processing_dbase:- do_gc,dmsginfo(begin_finish_processing_dbase),fail.
@@ -287,8 +287,8 @@ lmconf:hook_one_minute_timer_tick:-agenda_slow_op_restart.
 
 
 %:-meta_predicate(rescandb/0).
-% rescandb:- forall(current_world(World),(findall(File,lmconf:loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),mpred_call(finish_processing_world))).
-rescandb:- mpred_call(finish_processing_world).
+% rescandb:- forall(get_mpred_user_kb(World),(findall(File,lmconf:loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),req(finish_processing_world))).
+rescandb:- req(finish_processing_world).
 
 
 
@@ -334,7 +334,7 @@ end_prolog_source:- mpred_modify(change( retract,_),t_l:in_prolog_source_code).
 
 assertOnLoad(X):-add_later(X).
 
-setTemplate(X):-add(X).
+setTemplate(X):-ain(X).
 
 englishServerInterface(SomeEnglish):-dmsg(todo(englishServerInterface(SomeEnglish))).
 
@@ -350,7 +350,7 @@ call_after_mpred_load_slow(A):-dmsg(call_after_mpred_load_slow(A)).
 do_call_OnEachLoad:-forall(call_OnEachLoad(C),doall(C)).
 
 
-wfAssert(X):-add(X). % add_later(X).
+wfAssert(X):-ain(X). % add_later(X).
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 

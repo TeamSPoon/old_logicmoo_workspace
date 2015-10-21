@@ -1,5 +1,7 @@
 % -*-Prolog-*-
 
+:- use_module(library(logicmoo/logicmoo_user)).
+
 skCheck(eq(_,_),[]) :- !.
 
 skCheck(P,Rules) :-

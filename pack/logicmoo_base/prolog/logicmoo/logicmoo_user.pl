@@ -1,22 +1,28 @@
-/** <module> 
-% File used as storage place for all predicates which change as
-% the world is run.
-%
-% props(Obj,height(ObjHt)) == k(height,Obj,ObjHt) == rdf(Obj,height,ObjHt) == height(Obj,ObjHt)
-% padd(Obj,height(ObjHt)) == padd(height,Obj,ObjHt,...) == add(QueryForm)
-% kretract[all](Obj,height(ObjHt)) == kretract[all](Obj,height,ObjHt) == pretract[all](height,Obj,ObjHt) == del[all](QueryForm)
-% keraseall(AnyTerm).
+/** <module> LogicMOO User Modules Setup
 %
 %
 % Dec 13, 2035
 % Douglas Miles
 */
-:- module(logicmoo_user,[m1/0,m2/0,m3/0,m4/0]).
-:- multifile '$si$':'$was_imported_kb_content$'/2.
-:- dynamic '$si$':'$was_imported_kb_content$'/2.
-:- discontiguous('$si$':'$was_imported_kb_content$'/2).
-% :- module(logicmoo_user).
+:- module(logicmoo_user,[ op(500,fx,'~'),
+ op(1199,fx,('==>')),
+ op(1190,xfx,('::::')),
+ op(1180,xfx,('==>')),
+ op(1170,xfx,'<==>'),
+ op(1160,xfx,('<-')),
+ op(1150,xfx,'=>'),
+ op(1140,xfx,'<='),
+ op(1130,xfx,'<=>'),
+ op(1100,fx,('nesc')),
+ op(300,fx,'-'),
+ op(600,yfx,'&'), 
+ op(600,yfx,'v'),
+ op(1075,xfx,'<-'),
+ op(350,xfx,'xor')]).
 
+
+:- add_import_module(logicmoo_user,basePFC,end).
+:- add_import_module(logicmoo_user,baseKB,end).
 /*
 :- set_prolog_flag(report_error,true).
 :- set_prolog_flag(fileerrors,false).
@@ -29,181 +35,42 @@
 :- debug.
 */
 
-% :- ensure_loaded(logicmoo_utils).
 :- use_module(logicmoo_base).
+:- thread_local(t_l:mpred_user_kb/1).
+:- (t_l:mpred_user_kb(M)->true;(source_context_module(M))),set_mpred_user_kb(M),dmsg(user_kb=M).
+%:- ensure_mpred_system.
 
+:-export(m1/0).
 m1:- gripe_time(40,ensure_loaded(logicmoo(mpred_online/mpred_www))),if_defined(mpred_www:ensure_webserver), make,list_undefined.
 
 % :- hook_message_hook.
 :- set_prolog_flag(verbose_autoload,false).
 :- set_prolog_flag(verbose_load,true).
 m9   :-asserta_if_new((user:term_expansion(I,O):- lmbase_expansion(term,user,I,O))).
-m31 :-   (F = mpred/_),foreach(must(logicmoo_util_help:mpred_is_impl_file(F)),must_det_l((dmsg(list_file_preds(F)),ensure_loaded(F),export_file_preds(F),list_file_preds(F)))).
-m32:- rtrace(ensure_mpred_system).
+%m31 :-   (F = mpred/_),foreach(must(logicmoo_util_help:mpred_is_impl_file(F)),must_det_l((dmsg(list_file_preds(F)),ensure_loaded(F),export_file_preds(F),list_file_preds(F)))).
+%m32:- rtrace(ensure_mpred_system).
 m33:- must(filematch_ext(['',mpred,ocl,moo,plmoo,pl,plt,pro,p,'pl.in',pfc,pfct],logicmoo_user:pfc/mpred,W)),dmsg(W),!.
+
+%:-export(m2/0).
 m2:- ensure_mpred_file_loaded(logicmoo(pfc/relationAllExists)).
 
 % :-pfc_add(((P,Q,z(_))==>(p(P),q(Q)))).
+%:-export(m3/0).
 m3:- b_setval('$variable_names', ['P'=P,'Q'=Q]), R = (==>((P,Q,z(_)),(p(P),q(Q)))),  renumbervars(write_functor,R,O), writeq(O).
 
 %   b_setval('$variable_names', ['P'=P,'Q'=Q]), R = (==>((P,Q,z(_)),(p(P),q(Q)))), write_term(R,[numbervars(true),protray(_)]),renumbervars_prev(R,O).
 
 
-
-m4:- ensure_mpred_file_loaded(pfc/autoexec).
+%:-export(m4/0).
+m4:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/autoexec.pfc')).
 
 %m3:- make. % w_tl(tlbugger:ifHideTrace,(ensure_mpred_file_loaded(pfc/mpred))).
 
-m5 :- enable_mpred_system(kb).
+%m5 :- enable_mpred_system(baseKB).
 
 % :-trace,call((R = (==>((P,Q,z(_)),(p(P),q(Q)))))
 % :- use_module(mpred/mpred_loader).
 
+:- m1.
 
 
-end_of_file.
-
-
-
-
-
-
-
-
-
-
-
-%
-
-:- was_shared_multifile lmconf:startup_option/2. 
-:- was_dynamic lmconf:startup_option/2. 
-
-:- ensure_loaded(logicmoo_utils).
-
-lmconf:startup_option(datalog,sanity). %  Run datalog sanity tests while starting
-lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
-
-
-
-
-/*
-:- dynamic user:file_search_path/2.
-:- multifile user:file_search_path/2.
-:- user:prolog_load_context(directory,Dir),
-   %Dir = (DirThis/planner),
-   DirFor = logicmoo,
-   (( \+ user:file_search_path(DirFor,Dir)) ->asserta(user:file_search_path(DirFor,Dir));true),
-   absolute_file_name('../../../',Y,[relative_to(Dir),file_type(directory)]),
-   (( \+ user:file_search_path(pack,Y)) ->asserta(file_search_path(pack,Y));true).
-:- user:attach_packs.
-:- initialization(user:attach_packs).
-
-% [Required] Load the Logicmoo Library Utils
-% logicmoo_util_help:mpred_is_impl_file(logicmoo(logicmoo_utils)).
-
-:- user:file_search_path(logicmoo,_)-> true; (user:prolog_load_context(directory,Dir),asserta(user:file_search_path(logicmoo,Dir))).
-
-:- was_dynamic(lmconf:isa_pred_now_locked/0).
-*/
-
-% :- include(mpred/'mpred_header.pi').
-
-
-
-/*
-:- meta_predicate call_mpred_body(*,0).
-:- meta_predicate decl_mpred_hybrid_ilc_0(*,*,0,*).
-:- meta_predicate assert_isa_hooked(0,*).
-*/
-:- meta_predicate t(7,?,?,?,?,?,?,?).
-:- meta_predicate t(6,?,?,?,?,?,?).
-:- meta_predicate t(5,?,?,?,?,?).
-:- meta_predicate t(3,?,?,?).
-:- meta_predicate t(4,?,?,?,?).
-:- meta_predicate t(2,?,?).
-
-
-% ========================================
-% lmconf:mpred_user_kb/1
-% ========================================
-
-% TODO uncomment the next line without breaking it all!
-% lmconf:use_cyc_database.
-
-:- asserta(lmconf:pfcManageHybrids).
-
-
-
-
-
-
-% ================================================
-% Debugging settings
-% ================================================
-
-:- was_export(is_stable/0).
-
-is_stable:-fail.
-
-:- if(current_prolog_flag(optimise,true)).
-is_recompile.
-:- else.
-is_recompile:-fail.
-:- endif.
-
-fast_mud.
-xperimental:-fail.
-xperimental_big_data:-fail.
-
-simple_code :- fail.
-save_in_mpred_t:-true.
-not_simple_code :- \+ simple_code.
-type_error_checking:-false.
-% slow_sanity(A):-nop(A).
-:- meta_predicate xtreme_debug(0).
-xtreme_debug(P):- is_release,!,nop(P).
-xtreme_debug(P):- not_is_release, sanity(P).
-xtreme_debug(_).
-
-:- meta_predicate sanity(0).
-sanity(P):- \+ is_recompile, (true; is_release),!,nop(P).
-sanity(P):- on_x_rtrace(hotrace(P)),!.
-sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
-:- meta_predicate(when_debugging(+,0)).
-when_debugging(What,Call):- debugging(What),!,Call.
-when_debugging(_,_).
-
-% :- asserta(tlbugger:no_colors).
-% :- asserta(tlbugger:show_must_go_on).
-
-:- set_prolog_flag(double_quotes, atom).
-:- set_prolog_flag(double_quotes, string).
-
-% ================================================
-% DBASE_T System
-% ================================================
-:- gripe_time(40,use_module(logicmoo(mpred_online/mpred_www))).
-% user:term_expansion((:-module(Name,List)), :-maplist(export,List)):- atom(Name),atom_concat(mpred_,_,Name).
-% user:term_expansion((:-use_module(Name)), :-true):- atom(Name),atom_concat(mpred_,_,Name).
-
-
-
-:- asserta(t_l:disable_px).
-
-% user:goal_expansion(ISA,G) :- compound(ISA),t_l:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
-:- meta_predicate(mpred_expander(?,?,?,?)).
-:- meta_predicate(lmbase_record_transactions_maybe(?,?)).
-:- meta_predicate(mpred_file_expansion(?,?)).
-
-
-% :- read_source_files.
-% logicmoo_html_needs_debug.
-:- if((lmconf:startup_option(www,sanity),if_defined(logicmoo_html_needs_debug))).
-:- write(ready),nl,flush_output.
-:- prolog.
-:- endif.
-:-  call(with_mfa_of( (dynamic_safe)),user,user,boxlog_to_compile(_D,_E,_F),boxlog_to_compile/3).
-:- retractall(t_l:disable_px).
-
-
-:- list_undefined.

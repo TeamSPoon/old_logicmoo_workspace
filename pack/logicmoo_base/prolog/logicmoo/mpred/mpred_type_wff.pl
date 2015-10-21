@@ -500,7 +500,7 @@ term_slots(Term,Slots):-term_singletons(Term, [],NS, [],S),append(NS,S,Slots).
 
 :- export(head_singletons/2).
 %head_singletons(Pre,Post):-  !, hotrace((\+ ignore(must( \+ head_singles0(Pre,Post))))).
-head_singletons(Pre,Post):-   hotrace((\+ ignore(dcall_failure(why, \+ head_singles0(Pre,Post))))),!,dumpST.
+head_singletons(Pre,Post):-   hotrace((\+ ignore(show_failure(why, \+ head_singles0(Pre,Post))))),!,dumpST.
 :- export(head_singles0/2).
 :- export(head_singles01/2).
 % TODO how to adderess head_singles0(true, if_missing(foob(_G754993), foob(a)))?
@@ -560,7 +560,7 @@ is_function(_,F,_):- atom_concat(_Was,'Fn',F).
 is_function(_,F,_):- tFunction(F).
 % is_function(_,F,A):- A2 is A+1, current_predicate(F/A2), \+ current_predicate(F/A).
 
-%:- mpred_add(isa(I,C)<=(ttPredType(C),lmconf:isa(I,C))).
+%:- ain(isa(I,C)<=(ttPredType(C),lmconf:isa(I,C))).
 
 is_ftEquality(Term):- is_ftVar(Term),!,fail.
 %is_ftEquality(Term):- get_pred(Term,Pred),is),!,(Pred==mudEquals;genlPreds(Pred,equals);clause_asserted(prologEquality(Pred))),!.
@@ -576,7 +576,7 @@ ensure_quantifiers(Wff:- B,WffO):- B== true,!, ensure_quantifiers(Wff,WffO).
 ensure_quantifiers(Wff:- B,Wff:- B):- !.
 % ensure_quantifiers(Wff,Wff):-!.
 ensure_quantifiers(Wff,WffO):-
- must_det_l((dcall_failure(why,term_singletons(Wff,[],NS,[],Singles)),
+ must_det_l((show_failure(why,term_singletons(Wff,[],NS,[],Singles)),
   put_singles(Wff,'all',Singles,WffM),put_singles(WffM,'all',NS,WffO))).
 
 :- was_shared_multifile(function_corisponding_predicate/2).

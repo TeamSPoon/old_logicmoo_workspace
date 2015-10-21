@@ -1,5 +1,7 @@
 % -*-Prolog-*-
 
+:- use_module(library(logicmoo/logicmoo_user)).
+
 % a very simple example from the kinship domain.
 
 spouse(P1,P2) <==> spouse(P2,P1).

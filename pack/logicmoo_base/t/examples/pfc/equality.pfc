@@ -1,5 +1,7 @@
 % -*-Prolog-*-
 
+:- use_module(library(logicmoo/logicmoo_user)).
+
 %% equality axiomm
 
 equal(A,B) ==> equal(B,A).

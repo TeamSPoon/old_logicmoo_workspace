@@ -18,21 +18,21 @@
 
 % We save the name of the module loading this module
 :- module(logicmoo_util_all,[]).
-
+/*
 :- dynamic(lmconf:logicmoo_utils_separate/0).
 :- retractall(lmconf:logicmoo_utils_separate).
 :- set_prolog_flag(generate_debug_info, true).
 
 
-:- if( \+ current_predicate(lmconfig:mpred_user_kb/1)).
-:- multifile(lmconfig:mpred_user_kb/1).
-:- dynamic(lmconfig:mpred_user_kb/1).
+:- if( \+ current_predicate(lmconfig:get_mpred_user_kb/1)).
+:- multifile(lmconfig:get_mpred_user_kb/1).
+:- dynamic(lmconfig:get_mpred_user_kb/1).
 :- endif.
-:- if( \+ current_predicate(lmconfig:mpred_system_kb/1)).
-:- multifile(lmconfig:mpred_system_kb/1).
-:- dynamic(lmconfig:mpred_system_kb/1).
+:- if( \+ current_predicate(lmconf:mpred_system_kb/1)).
+:- multifile(lmconf:mpred_system_kb/1).
+:- dynamic(lmconf:mpred_system_kb/1).
 :- endif.
-% :- lmconfig:mpred_system_kb(_)->true;('$module'(M,M),asserta(lmconfig:mpred_system_kb(M))).
+% :- lmconf:mpred_system_kb(_)->true;('$module'(M,M),asserta(lmconf:mpred_system_kb(M))).
 
 
 :- dynamic(logicmoo_util_help:mpred_is_impl_file/1).
@@ -40,4 +40,4 @@
 :- volatile(logicmoo_util_help:mpred_is_impl_file/1).
 
 
-
+*/

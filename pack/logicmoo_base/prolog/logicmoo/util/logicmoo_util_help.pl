@@ -57,6 +57,8 @@
 
 :- dynamic(mpred_prolog_only_module/1).
 /*
+*/
+
 
   :- use_module(library(pldoc)).
   :- use_module(library(http/thread_httpd)).
@@ -91,8 +93,6 @@
 :- use_module(library(doc_http)).
 %:- use_module(library(doc_html)).
 :- doc_collect(true).
-
-*/
 
 :- if(exists_source(library(pldoc))).
 :- use_module(library(pldoc), []).
@@ -151,8 +151,8 @@ skip_functor_export_0('$included'/_).
 skip_functor_export_0('$pldoc'/_).
 
 is_crossfile_module_0(lmconf).
-is_crossfile_module_0(kb).
-is_crossfile_module_0(kbp).
+is_crossfile_module_0(baseKB).
+is_crossfile_module_0(basePFC).
 is_crossfile_module_0(user).
 
 to_mfa_0(_,user,SM:FA,SM:FA):-!.
@@ -231,7 +231,7 @@ export_file_preds:- source_location(S,_),export_file_preds(S),!.
 :- export(export_file_preds/1).
 export_file_preds(_):- current_prolog_flag(xref,true),!.
 export_file_preds(FileMatch):- forall(must(filematch(FileMatch,File)),
- (source_context_module(NotUser),dcall(why,NotUser\==user),
+ (source_context_module(NotUser),show_call(why,NotUser\==user),
    forall(must(mpred_source_file(M:P,File)),(functor(P,F,A),must(export_file_preds(NotUser,File,M,P,F,A)))))).
 
 predicate_decl_module(Pred,RM):-current_predicate(_,RM:Pred),\+ predicate_property(RM:Pred,imported_from(_)),must(RM\==user).
@@ -254,7 +254,7 @@ write_modules:- forall(logicmoo_util_help:mpred_is_impl_file(F),(export_file_pre
 export_file_preds(NotUser,S,_,P,F,A):-current_predicate(logicmoo_varnames:F/A),!.
 export_file_preds(NotUser,S,system,P,F,A):-current_predicate(system:F/A),!.
 export_file_preds(NotUser,S,user,P,F,A):-current_predicate(system:F/A),!.
-export_file_preds(NotUser,S,M,P,F,A):- M==user,!,trace,dcall(why,export_file_preds(NotUser,S,NotUser,P,F,A)).
+export_file_preds(NotUser,S,M,P,F,A):- M==user,!,trace,show_call(why,export_file_preds(NotUser,S,NotUser,P,F,A)).
 export_file_preds(NotUser,S,M,P,F,A):- predicate_decl_module(P,RM),RM\==M,!,export_file_preds(NotUser,S,RM,P,F,A).
 %export_file_preds(NotUser,S,M,P,F,A):- \+ helper_name(F), export(M:F/A), fail.
 export_file_preds(NotUser,S,M,P,F,A):- M:export(M:F/A), fail. % export anyways

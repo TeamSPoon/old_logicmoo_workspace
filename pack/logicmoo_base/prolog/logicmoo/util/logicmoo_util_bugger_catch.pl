@@ -324,9 +324,8 @@ if_defined(C:G):-current_predicate(_,C:G),!,on_x_fail(C:G).
 if_defined(_:G):-current_predicate(_,R:G),!,on_x_fail(R:G).
 if_defined(G):-current_predicate(_,R:G),!,on_x_fail(R:G).
 if_defined(G):-current_predicate(_,G),!,on_x_fail(G).
-if_defined(Goal):- !, ddmsg(warn_undefined(Goal)),!,fail.
-if_defined(Goal):- tlbugger:show_must_go_on,!,if_defined(Goal,((writeln(warn_undefined(Goal))),!,fail)).
-if_defined(Goal):- !, if_defined(Goal,(ddmsg(warn_undefined(Goal)),trace)).
+if_defined(Goal):- tlbugger:show_must_go_on,!,if_defined(Goal,((dmsg(warn_undefined(Goal))),!,fail)).
+if_defined(Goal):- !, if_defined(Goal,(dmsg(warn_undefined(Goal)),trace)).
 
 :- meta_predicate if_defined(:,0).
 :- export(if_defined/2).
@@ -890,8 +889,8 @@ slow_sanity(Goal):- ( tlbugger:skip_use_slow_sanity ; sanity(Goal)),!.
 % sanity(_):-!.
 % sanity(_):-skipWrapper,!.
 sanity(Goal):-bugger_flag(release,true),!,assertion(Goal).
-sanity(Goal):- tlbugger:show_must_go_on,!,ignore(dcall_failure(why,Goal)).
-sanity(Goal):- ignore(must(dcall_failure(why,Goal))).
+sanity(Goal):- tlbugger:show_must_go_on,!,ignore(show_failure(why,Goal)).
+sanity(Goal):- ignore(must(show_failure(why,Goal))).
 
 
 :- export(is_release/0).

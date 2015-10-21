@@ -1,5 +1,7 @@
 % -*-Prolog-*-
 
+:- use_module(library(logicmoo/logicmoo_user)).
+
 
 % if we learn that someone has a full name, then we know they are a  'lmbase'.
 full_name(U,_) ==>  'lmbase'(U).
@@ -25,9 +27,9 @@ full_name(User,unknown).
   
 
 
-% the default host_name for a  'lmbase' is 'unknown'.
- 'lmbase'(User),
-~host_name(User,X)/(X\==unknown)
+% the default host_name for a  'lmbase' is 'unknown'. 
+
+'lmbase'(User), ~host_name(User,X)/(X\==unknown)
   ==>
 host_name(User,unknown).
 

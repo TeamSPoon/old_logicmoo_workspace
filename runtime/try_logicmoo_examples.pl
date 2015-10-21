@@ -52,7 +52,6 @@ If we obeyed the limitations set forth upon Horn clauses only being "positive" t
 :- set_prolog_flag(gc,true).
 
 
-dcall_test(G):- must(dcall(G)).
 
 %= define the example language
 example_known_is_success(G):-  G.

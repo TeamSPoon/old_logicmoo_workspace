@@ -136,7 +136,7 @@ frame_to_fmsg(N,Frame,Opts,[nf(noFrame(N,Frame,Opts))]).
 fmsg_rout([]):-!.
 fmsg_rout([fr(E)|_]):- member(goal=GG,E),end_dump(GG),!,ignore(fdmsg(fr(E))),!.
 fmsg_rout([E|RROut]):- ignore(fdmsg(E)),!,fmsg_rout(RROut).
-fmsg_rout(RROut):- dcall(why,forall(member(E,RROut),fdmsg(E))),!.
+fmsg_rout(RROut):- show_call(why,forall(member(E,RROut),fdmsg(E))),!.
 
 neg1_numbervars(T,-1,T):-!.
 neg1_numbervars(Out,false,Out):-!.
@@ -246,7 +246,7 @@ dumptrace(G):- ignore((debug,
  notrace((
   fmt(in_dumptrace(G)),
   wdmsg(WG),
-  dcall_failure(why,get_single_char(C)))),
+  show_failure(why,get_single_char(C)))),
   with_all_dmsg(dumptrace(G,C)),!.
 
 :-meta_predicate(dumptrace(0,+)).

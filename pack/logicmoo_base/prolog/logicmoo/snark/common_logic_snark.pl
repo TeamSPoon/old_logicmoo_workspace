@@ -74,7 +74,7 @@
             local_pterm_to_sterm/2,
             local_pterm_to_sterm2/2,
             local_sterm_to_pterm/2,
-            mpred_add_h/3,
+            ain_h/3,
             mpred_t_tell_kif/2,
             mudEquals/2,
             neg_b_if_neg/3,
@@ -111,14 +111,14 @@
             write_list/1,
             is_entailed/1,
             is_not_entailed/1,
+            % if/2,iif/2,
           op(300,fx,'-'),
           op(1150,xfx,'=>'),
           op(1150,xfx,'<=>'),
           op(350,xfx,'xor'),
           op(400,yfx,'&'),
-          op(500,yfx,'v'),
-          if/2,
-          iif/2
+          op(500,yfx,'v')
+           
           ]).
 
 :-
@@ -127,6 +127,23 @@
             op(1150,fy,(was_module_transparent)),
             op(1150,fx,(was_export)),
             op(1150,fx,(shared_multifile)).
+
+:- op(500,fx,'~').
+:- op(1199,fx,('==>')).
+:- op(1190,xfx,('::::')).
+:- op(1180,xfx,('==>')).
+:- op(1170,xfx,'<==>').
+:- op(1160,xfx,('<-')).
+:- op(1150,xfx,'=>').
+:- op(1140,xfx,'<=').
+:- op(1130,xfx,'<=>').
+:- op(1100,fx,('nesc')).
+:- op(300,fx,'-').
+:- op(600,yfx,'&'). 
+:- op(600,yfx,'v').
+:- op(1075,xfx,'<-').
+:- op(350,xfx,'xor').
+:- op(1100,fx,(was_shared_multifile)).
 
 :- meta_predicate
    % common_logic_snark
@@ -138,7 +155,7 @@
    % common_logic_snark
    kif_add_boxes3(2,?,*),
    % common_logic_snark
-   mpred_add_h(2,?,*),
+   ain_h(2,?,*),
    % common_logic_snark
    to_nonvars(2,?,?).
 
@@ -152,9 +169,7 @@
         skolem/3.
 */
 
-:- dynamic((
-          if/2,
-          iif/2)).
+% :- dynamic((if/2,iif/2)).
 
 
 :- include('../mpred/mpred_header.pi').
@@ -177,26 +192,26 @@ kif_hook(iff(0,0)).
 kif_hook(C):- non_compound(C),!,fail.
 kif_hook(H:- _):- !,nonvar(H),!,kif_hook(H).
 
-
+  
 
 are_clauses_entailed(E):-not(compound(E)),!,must(true==E).
 are_clauses_entailed([E|List]):-is_list([E|List]),!,maplist(are_clauses_entailed,[E|List]).
 are_clauses_entailed((C,L)):-!,are_clauses_entailed(C),are_clauses_entailed(L).
-are_clauses_entailed(CL):- unnumbervars(CL,UCL),  !, \+ \+ dcall_failure(why,is_prolog_entailed(UCL)),!.
+are_clauses_entailed(CL):- unnumbervars(CL,UCL),  !, \+ \+ show_failure(why,is_prolog_entailed(UCL)),!.
 
 is_prolog_entailed(UCL):-clause_asserted(UCL),!.
-is_prolog_entailed(UCL):-mpred_call(UCL),!.
+is_prolog_entailed(UCL):-req(UCL),!.
 
 member_ele(E,E):- is_ftVar(E),!.
 member_ele([],_):-!,fail.
-member_ele(E,E):- (\+ (compound(E))),!.
+member_ele(E,E):- ( \+ (compound(E))),!.
 member_ele([L|List],E):- must(is_list([L|List])),!,member(EE,[L|List]),member_ele(EE,E).
 member_ele((H,T),E):- nonvar(H),nonvar(T),!, (member_ele(H,E);member_ele(T,E)).
 member_ele(E,E).
 
 delistify_last_arg(Arg,Pred,Last):-is_list(Arg),!,member(E,Arg),delistify_last_arg(E,Pred,Last).
-delistify_last_arg(Arg,M:Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARGS),NEWCALL=..[F|NARGS],dcall(why,M:NEWCALL),!,member_ele(NEW,Last).
-delistify_last_arg(Arg,Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARGS),NEWCALL=..[F|NARGS],dcall(why,NEWCALL),!,member_ele(NEW,Last).
+delistify_last_arg(Arg,M:Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARGS),NEWCALL=..[F|NARGS],show_call(why,M:NEWCALL),!,member_ele(NEW,Last).
+delistify_last_arg(Arg,Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARGS),NEWCALL=..[F|NARGS],show_call(why,NEWCALL),!,member_ele(NEW,Last).
 
 % sanity that mpreds (manage prolog prodicate) are abily to transform
 :- t_l:disable_px->throw(t_l:disable_px);true.
@@ -208,7 +223,7 @@ clif_to_prolog(CLIF,Prolog):-cwc,is_list(CLIF),!,must_maplist(clif_to_prolog,CLI
 clif_to_prolog((H,CLIF),(T,Prolog)):-cwc,sanity(must(nonvar(H))),!,trace,clif_to_prolog(H,T),clif_to_prolog(CLIF,Prolog).
 clif_to_prolog((H<-B),(H<-B)):- cwc,!.
 clif_to_prolog((P==>Q),(P==>Q)):- cwc,!.
-clif_to_prolog((H:-B),PrologO):- cwc,!,must((dcall_failure(why,boxlog_to_pfc((H:-B),Prolog)),!,=(Prolog,PrologO))),!.
+clif_to_prolog((H:-B),PrologO):- cwc,!,must((show_failure(why,boxlog_to_pfc((H:-B),Prolog)),!,=(Prolog,PrologO))),!.
 clif_to_prolog(CLIF,PrologO):- cwc,
   % somehow integrate why_to_id(tell,Wff,Why),
      must_det_l((
@@ -222,10 +237,10 @@ clif_to_prolog(CLIF,PrologO):- cwc,
 % why does renumbervars_prev work but not copy_term?
 is_entailed(CLIF):-
  mpred_no_chaining((
-   cwc, sanity((clif_to_prolog(CLIF,Prolog),!,sanity(( \+ \+ (dcall_failure(why,are_clauses_entailed(Prolog))))))))),!.
+   cwc, sanity((clif_to_prolog(CLIF,Prolog),!,sanity(( \+ \+ (show_failure(why,are_clauses_entailed(Prolog))))))))),!.
 
 % Sanity Test for required absence of specific side-effect entailments
-is_not_entailed(CLIF):- cwc, sanity((clif_to_prolog(CLIF,Prolog),dcall_failure(why,\+ are_clauses_entailed(Prolog)))),!.
+is_not_entailed(CLIF):- cwc, sanity((clif_to_prolog(CLIF,Prolog),show_failure(why,\+ are_clauses_entailed(Prolog)))),!.
 
 :- op(1190,xfx,(:-)).
 :- op(1200,fy,(is_entailed)).
@@ -661,7 +676,7 @@ should_be_poss(argInst).
 clauses_to_boxlog(KB,Why,In,Prolog):- clauses_to_boxlog_0(KB,Why,In,Prolog).
 
 
-clauses_to_boxlog_0(KB,Why,In,Prolog):-loop_check(clauses_to_boxlog_1(KB,Why,In,Prolog),dcall(why,(clauses_to_boxlog_5(KB,Why,In,Prolog)))),!.
+clauses_to_boxlog_0(KB,Why,In,Prolog):-loop_check(clauses_to_boxlog_1(KB,Why,In,Prolog),show_call(why,(clauses_to_boxlog_5(KB,Why,In,Prolog)))),!.
 clauses_to_boxlog_0(KB,Why,In,Prolog):-correct_cls(KB,In,Mid),!,clauses_to_boxlog_1(KB,Why,Mid,PrologM),!,Prolog=PrologM.
 
 clauses_to_boxlog_1(KB, Why,In,Prolog):- clauses_to_boxlog_2(KB,Why,In,PrologM),!,must(Prolog=PrologM).
@@ -685,7 +700,7 @@ clauses_to_boxlog_5(_KB,_Why,In,Prolog):-trace,In=Prolog.
 
 mpred_t_tell_kif(OP2,RULE):-
  w_tl(t_l:current_pttp_db_oper(mud_call_store_op(OP2)),
-   (dcall(why,call((must(kif_add(RULE))))))).
+   (show_call(why,call((must(kif_add(RULE))))))).
 
 
 fix_input_vars(AIn,A):- copy_term(AIn,A),numbervars(A,672,_).
@@ -796,7 +811,7 @@ kif_ask(Goal0,ProofOut):- logical_pos(_KB,Goal0,Goal),
 
 kif_add(InS):- atom(InS),must_det_l((kif_read(string(InS),Wff,Vs),b_implode_varnames0(Vs),local_sterm_to_pterm(Wff,Wff0),kif_add(Wff0))),!.
 % kif_add(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),why_to_id(tell,Wff,Why),kif_add(Why,Wff))),!.
-kif_add(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),mpred_add(clif(Wff)))),!.
+kif_add(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),ain(clif(Wff)))),!.
 
 
 local_sterm_to_pterm(Wff,WffO):- sexpr_sterm_to_pterm(Wff,WffO),!.
@@ -837,7 +852,7 @@ kb_incr(WffNum1 ,WffNum2):-trace_or_throw(kb_incr(WffNum1 ,WffNum2)).
 /*
 kif_add_boxes(How,Why,Wff0,Asserts0):-
  must_det_l((
-  dcall_failure(why,kif_unnumbervars(Asserts0+Wff0,Asserts+Wff)),
+  show_failure(why,kif_unnumbervars(Asserts0+Wff0,Asserts+Wff)),
   %fully_expand(Get1,Get),
   get_constraints(Wff,Isas),
   kif_add_adding_constraints(Why,Isas,Asserts))),
@@ -886,7 +901,7 @@ simplify_list(KB,RB,BBS):- list_to_set(RB,BB),must_maplist(removeQ(KB),BB,BBO),l
 
 save_wfs(Why,PrologI):- must_det_l((as_prolog(PrologI,Prolog),
    w_tl(t_l:current_local_why(Why,Prolog),
-   mpred_add_h(save_in_code_buffer,Why,Prolog)))).
+   ain_h(save_in_code_buffer,Why,Prolog)))).
 
 nots_to(H,To,HH):-subst_except(H,neg,To,HH),subst_except(H,-,To,HH),subst_except(H,~,To,HH),subst_except(H,neg,To,HH),!.
 neg_h_if_neg(H,HH):-nots_to(H,'~',HH).
@@ -931,8 +946,8 @@ var_count_num(Term,SharedTest,SharedCount,UnsharedCount):- term_slots(Term,Slots
   length(SharedSlots,SharedCount),
   length(UnsharedSlots,UnsharedCount).
 
-mpred_add_h(How,Why,(H:- B)):- neg_h_if_neg(H,HH), neg_b_if_neg((HH:- B),B,BB),!,call(How,Why,(HH:-BB)).
-mpred_add_h(How,Why,(H)):- neg_h_if_neg(H,HH), call(How,Why,(HH)).
+ain_h(How,Why,(H:- B)):- neg_h_if_neg(H,HH), neg_b_if_neg((HH:- B),B,BB),!,call(How,Why,(HH:-BB)).
+ain_h(How,Why,(H)):- neg_h_if_neg(H,HH), call(How,Why,(HH)).
 
 save_in_code_buffer(_ ,HB):- simp_code(HB,SIMP),t_l:in_code_Buffer(HB,_,SIMP),!.
 save_in_code_buffer(Why,HB):- simp_code(HB,SIMP),assert(t_l:in_code_Buffer(HB,Why,SIMP)).

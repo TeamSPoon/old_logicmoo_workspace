@@ -155,8 +155,7 @@
 :- use_module(logicmoo(mpred/mpred_type_wff)).
 
 :- was_shared_multifile(was_chain_rule/1).
-:- was_shared_multifile ruleRewrite/2.
-:- was_shared_multifile(kb:ptReformulatorDirectivePredicate/1).
+:- was_shared_multifile(baseKB:ptReformulatorDirectivePredicate/1).
 :- was_shared_multifile(props/2).
 
 default_te(IF,VAR,VAL):-assertz(te_setting(IF,VAR,VAL)).
@@ -170,7 +169,7 @@ default_te(IF,VAR,VAL):-assertz(te_setting(IF,VAR,VAL)).
 :- default_te(file_prolog,rule_neck, (head :- body)).
 :- default_te(file_prolog,fact_neck, (head :- true)).
 
-:- default_te(file_pfc, compile_clause, mpred_add).
+:- default_te(file_pfc, compile_clause, ain).
 :- default_te(file_pfc, expand_clause, fully_expand_clause).
 :- default_te(file_pfc, proccess_directive, proccess_directive).
 :- default_te(file_pfc, fact_neck, (clause <- true)).
@@ -232,7 +231,7 @@ Writing in Prolog is actually really easy for a MUD is when the length's chosen
 
 :- was_export(alt_calls/1).
 alt_calls(call).
-alt_calls(mpred_call).
+alt_calls(req).
 alt_calls(is_asserted).
 alt_calls(t).
 alt_calls(req).
@@ -249,7 +248,7 @@ alt_calls(ireq).
 
 
 :- meta_predicate show_doall(0).
-show_doall(Call):- doall(dcall(why,Call)).
+show_doall(Call):- doall(show_call(why,Call)).
 
 is_pred_declarer(P):-functor_declares_instance(P,tPred).
 is_relation_type(tRelation).
@@ -275,7 +274,7 @@ functor_declares_instance_0(P,tCol):- arg(_,s(tCol,tSpec,ttFormatType),P).
 %functor_declares_instance_0(P,tPred):-isa_asserted(P,ttPredType),!.
 %functor_declares_instance_0(P,tCol):-isa_asserted(P,functorDeclares),\+functor_declares_instance_0(P,tPred).
 
-functor_declares_instance_0(P,P):-functorDeclares(P). % arity(P,1),\+((arity(P,N),N>1)).
+functor_declares_instance_0(P,P):- mreq(functorDeclares(P)). % arity(P,1),\+((arity(P,N),N>1)).
 
 functor_declares_collectiontype(typeProps,ttTemporalType).
 
@@ -320,7 +319,7 @@ must_expand(typeProps(_,_)).
 must_expand(G):-functor(G,_,A),!,A==1.
 
 % fully_expand_warn(_,C,C):-!.
-fully_expand_warn(A,B,O):-must(fully_expand(A,B,C)),!,sanity(ignore(dcall_failure(why,same_terms(B,C)))),(O=C;must(sanity(ignore(dcall_failure(why,same_terms(O,C)))))),!.
+fully_expand_warn(A,B,O):-must(fully_expand(A,B,C)),!,sanity(ignore(show_failure(why,same_terms(B,C)))),(O=C;must(sanity(ignore(show_failure(why,same_terms(O,C)))))),!.
 
 same_terms(A,B):-A=@=B,!.
 same_terms(A,A):-!,fail.
@@ -414,14 +413,14 @@ is_unit_functor(F):- (\+ atom(F)),!,fail.
 is_unit_functor(F):-atom_concat('sk',_,F).
 is_unit_functor(F):-atom_concat(_,'Fn',F).
 
-
+get_ruleRewrite(Sent,SentM):- mreq(ruleRewrite(Sent,SentM)).
 /*
 as_is_term(NC):-compound(NC),functor(NC,Op,2),infix_op(Op,_).
 */
 
 db_expand_term(Op,SI,SentO):- loop_check(db_expand_term0(Op,SI,SentO),SI=SentO).
 
-db_expand_term0(_,Sent,SentO):-is_ftNonvar(Sent),copy_term(Sent,NoVary),if_defined(lmconf:ruleRewrite(Sent,SentO),fail),Sent\=@=NoVary,SentO \=@= Sent.
+db_expand_term0(_,Sent,SentO):-is_ftNonvar(Sent),copy_term(Sent,NoVary),get_ruleRewrite(Sent,SentO),Sent\=@=NoVary,SentO \=@= Sent.
 
 db_expand_term0(Op,Sent,SentO):- Op==callable, quasiQuote(QQuote),subst(Sent,QQuote,isEach,MID),Sent\=@=MID,!,db_expand_term(Op,MID,SentO).
 db_expand_term0(Op,Sent,SentO):- db_expand_final(Op ,Sent,SentO),!.
@@ -441,7 +440,7 @@ mpred_expand(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),mpred_dat
 
 db_expand_final(_ ,NC,NC):-as_is_term(NC),!.
 db_expand_final(_, Sent,true):-is_true(Sent).
-db_expand_final(_,Term,Term):- is_ftCompound(Term),functor(Term,F,_),argsQuoted(F),!.
+db_expand_final(_,Term,Term):- is_ftCompound(Term),functor(Term,F,_),req(argsQuoted(F)),!.
 db_expand_final(_, arity(F,A),arity(F,A)):-!.
 db_expand_final(_, tPred(V),tPred(V)):-!.
 db_expand_final(_ ,NC,NC):-functor(NC,_,1),arg(1,NC,T),\+ (is_ftCompound(T)),!.
@@ -500,7 +499,7 @@ db_expand_0(Op,RDF,OUT):- RDF=..[SVO,S,V,O],is_svo_functor(SVO),!,must_det(from_
 db_expand_0(Op,G,OUT):- G=..[Pred,InstFn,VO],InstFn=isInstFn(Type),is_ftNonvar(Type),from_univ(relationMostInstance,Op,[Pred,Type,VO],OUT).
 db_expand_0(Op,G,OUT):- G=..[Pred,InstFn|VO],InstFn=isInstFn(Type),is_ftNonvar(Type),GO=..[Pred,Type|VO],db_expand_0(Op,GO,OUT).
 
-db_expand_0(Op,(mpred_call(CALL)),(mpred_call(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
+db_expand_0(Op,(req(CALL)),(req(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
 db_expand_0(_ ,include(CALL),(load_data_file_now(CALL))):-!.
 
 db_expand_0(Op,=>(G),(GG)):-!,db_expand_0(Op,(G),(GG)).
@@ -545,16 +544,16 @@ db_expand_0(Op,DECL,O):-DECL=..[D,F|Args],functor_declares_instance(D,DType),
 db_expand_0(Op,ClassTemplate,OUT):- ClassTemplate=..[TypePropsFunctor,Inst|Props],
    functor_declares_instance(TypePropsFunctor,PropsIsa),
    \+ compound_all_open(ClassTemplate),
-   mpred_add(isa(PropsIsa,tCol)),
-   mpred_add(isa(Inst,PropsIsa)),
+   ain(isa(PropsIsa,tCol)),
+   ain(isa(Inst,PropsIsa)),
    expand_props(t,Op,props(Inst,[PropsIsa|Props]),OUT),!.
 
 % typeProps(tCrackers,.....).
 db_expand_0(Op,ClassTemplate,OUT):- ClassTemplate=..[TypeTypePropsFunctor,Type|Props],
    functor_declares_collectiontype(TypeTypePropsFunctor,PropsIsa),
    \+ compound_all_open(ClassTemplate),
-   mpred_add(isa(Type,tCol)),
-   mpred_add(isa(Type,PropsIsa)),
+   ain(isa(Type,tCol)),
+   ain(isa(Type,PropsIsa)),
    expand_props(relationMostInstance,Op,props(Type,Props),OUT),!.
 
 % tRegion_inst_template(X, tLivingRoom,.....).
@@ -600,8 +599,8 @@ ex_argIsa(P,N,C):-clause_asserted(argIsa(P,N,C)).
 compound_all_open(C):-compound(C),functor(C,_,A),A>1,\+((arg(_,C,Arg),is_ftNonvar(Arg))),!.
 
 /*
-db_expand_0(Op,MT:Term,MT:O):- is_kb_module(MT),!,w_tl(t_l:caller_module(kb,MT),db_expand_0(Op,Term,O)).
-db_expand_0(Op,DB:Term,DB:O):- lmconf:mpred_user_kb(DB),!,w_tl(t_l:caller_module(db,DB),db_expand_0(Op,Term,O)).
+db_expand_0(Op,MT:Term,MT:O):- is_kb_module(MT),!,w_tl(t_l:caller_module(baseKB,MT),db_expand_0(Op,Term,O)).
+db_expand_0(Op,DB:Term,DB:O):- get_mpred_user_kb(DB),!,w_tl(t_l:caller_module(db,DB),db_expand_0(Op,Term,O)).
 db_expand_0(Op,KB:Term,KB:O):- atom(KB),!,w_tl(t_l:caller_module(prolog,KB),db_expand_0(Op,Term,O)).
 */
 
@@ -615,8 +614,8 @@ demodulize(_ ,HB,HB).
 db_expand_1(_,X,X).
 
 
-db_expand_2(_,Sent,SentO):-is_ftNonvar(Sent),lmconf:ruleRewrite(Sent,SentO),!.
-db_expand_2(change(_,_),Sent,SentO):-is_ftNonvar(Sent),lmconf:ruleRewrite(Sent,SentO),!.
+db_expand_2(_,Sent,SentO):-is_ftNonvar(Sent),get_ruleRewrite(Sent,SentO),!.
+db_expand_2(change(_,_),Sent,SentO):-is_ftNonvar(Sent),get_ruleRewrite(Sent,SentO),!.
 db_expand_2(_,X,X):-!.
 db_expand_2(_ ,NC,NC):- as_is_term(NC),!.
 db_expand_2(Op,Sent,SentO):-loop_check(expand_term(Sent,SentO)),Sent\=@=SentO,!.
@@ -714,7 +713,7 @@ db_quf(_Op,C,true,C):- C=..[Holds,OBJ|_],is_holds_true(Holds),is_ftVar(OBJ),!.
 db_quf(Op,Sent,D2,D3):- Sent=..[And|C12],C12=[_|_],is_logical_functor(And),!, db_quf_l(Op,And,C12,D2,D3).
 db_quf(Op,C,Pretest,Template):- C=..[Prop,OBJ|ARGS],
       functor(C,Prop,A),
-      dcall_failure(why,translate_args(Op,Prop,A,OBJ,2,ARGS,NEWARGS,true,Pretest)),
+      show_failure(why,translate_args(Op,Prop,A,OBJ,2,ARGS,NEWARGS,true,Pretest)),
       Template =.. [Prop,OBJ|NEWARGS],!.
 db_quf(_Op,C,true,C).
 
@@ -762,7 +761,7 @@ translateListOps(Op,Prop,Obj,Type,VAL,[L|LIST],G,GO2):-
    translateOneArg(Op,Prop,Obj,Type,L,VAL,G,G0),
    translateListOps(Op,Prop,Obj,Type,VAL,LIST,G0,GO2).
 
-compare_op(Type,F,OLD,VAL):-nop(Type),dcall(why,(call(F,OLD,VAL))),!.
+compare_op(Type,F,OLD,VAL):-nop(Type),show_call(why,(call(F,OLD,VAL))),!.
 
 
 % load_motel:- defrole([],time_state,restr(time,period)).
@@ -807,7 +806,7 @@ into_functor_form(Dbase_t,_X,F,A,Call):-Call=..[Dbase_t,F|A].
 :- was_export(into_mpred_form/2).
 into_mpred_form(V,VO):- \+ (is_ftCompound(V)),!,VO=V.
 into_mpred_form(M:X,M:O):- atom(M),!,into_mpred_form(X,O),!.
-into_mpred_form(Sent,SentO):-is_ftNonvar(Sent),if_defined(lmconf:ruleRewrite(Sent,SentM),fail),into_mpred_form(SentM,SentO).
+into_mpred_form(Sent,SentO):-is_ftNonvar(Sent),get_ruleRewrite(Sent,SentM),into_mpred_form(SentM,SentO).
 into_mpred_form((H:-B),(HH:-BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H:-B),(HH:-BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H,B),(HH,BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
@@ -893,7 +892,7 @@ transform_holds_3(Op,[Fogical|ARGS],OUT):-
 
 transform_holds_3(_,[props,Obj,Props],props(Obj,Props)).
 transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[isa(Type)|PROPS])):- 
-                  is_ftNonvar(Inst), not(Type=props), mpred_call(tCol(Type)), must_det(not(is_never_type(Type))),!.
+                  is_ftNonvar(Inst), not(Type=props), req(tCol(Type)), must_det(not(is_never_type(Type))),!.
 transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[isa(Type)|PROPS])):- 
                   is_ftNonvar(Inst), not(Type=props), t(functorDeclares,Type), must_det(not(is_never_type(Type))),!.
 

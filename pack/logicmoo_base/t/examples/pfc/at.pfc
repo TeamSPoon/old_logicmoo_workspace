@@ -1,5 +1,8 @@
 % -*-Prolog-*-
 
+:- use_module(library(logicmoo/logicmoo_user)).
+
+
 at(Obj,NewLoc), 
 {(at(Obj,OldLoc), OldLoc\==NewLoc)}
   ==>

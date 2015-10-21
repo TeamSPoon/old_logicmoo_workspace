@@ -1,4 +1,3 @@
-/** <module> 
 % All modules are declared here so that this next lines dont have to be pasted into every file.
 % Since this list will need at least 160 entries to cover the obj classes rooms and commands, 
 % we add the modules here to not waste 160^2 lines of text and having to not 
@@ -8,7 +7,6 @@
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
-*/
 
 
 :- multifile(system:term_expansion/2).
@@ -19,31 +17,22 @@
 :- dynamic '$si$':'$was_imported_kb_content$'/2.
 :- discontiguous('$si$':'$was_imported_kb_content$'/2).
 
-
 :- op(500,fx,'~').
-:- op(1200,xfx,'<==>').
-:- op(1200,fx,('==>')).
-:- op(1195,xfx,('<-')).
-:- op(1070,xfx,'=>').
-:- op(1070,xfx,'<=').
-:- op(1150,xfx,'<=>').
+:- op(1199,fx,('==>')).
+:- op(1190,xfy,('::::')).
+:- op(1180,xfx,('==>')).
+:- op(1170,xfx,'<==>').
+:- op(1160,xfx,('<-')).
+:- op(1150,xfx,'=>').
+:- op(1140,xfx,'<=').
+:- op(1130,xfx,'<=>').
 :- op(1100,fx,('nesc')).
-:- op(1150,xfx,('::::')).
 :- op(300,fx,'-').
 :- op(600,yfx,'&'). 
 :- op(600,yfx,'v').
-:- op(1075,xfx,'<-').
 :- op(350,xfx,'xor').
-:- op(1070,xfx,user:'=>').
-:- op(300,fx,user:'~').
-:- op(300,fx,user:'-').
-:- op(400,yfx,user:'&'). 
-:- op(500,yfx,user:'v').
-:- op(1075,xfx,user:'<-').
-:- op(1075,xfx,user:'<==>').
-:- op(1100,xfx,user:'==>').
-:- op(350,xfx,user:'xor').
 :- op(1100,fx,(was_shared_multifile)).
+
  
 %:- multifile(user_db:grant_openid_server/2).
 
@@ -51,17 +40,17 @@
 
 :- forall(member(M:F/A,[
 
-kb:argIsa/3, %kb
-kbp:bt/3, %kbp
-kbp:nt/4, %kbp
-kbp:pk/4, %kbp
-kbp:pt/3, %kbp
-kbp:spft/5, %kbp
-kbp:tms/1, %kbp
-kbp:hs/1, %kbp
-kbp:qu/3, %kbp
-kbp:sm/1, %kbp
-kbp:hs/2, %kbp
+baseKB:argIsa/3, %baseKB
+basePFC:bt/3, %basePFC
+basePFC:nt/4, %basePFC
+basePFC:pk/4, %basePFC
+basePFC:pt/3, %basePFC
+basePFC:spft/5, %basePFC
+basePFC:tms/1, %basePFC
+basePFC:hs/1, %basePFC
+basePFC:qu/3, %basePFC
+basePFC:sm/1, %basePFC
+basePFC:hs/2, %basePFC
 lmconf:mpred_select/2,
 lmconf:after_mpred_load/0,
 user:portray/1, %user
@@ -150,7 +139,7 @@ lmconf:feature_test/0
 :- thread_local(t_l:inVoProp/0).
 :- thread_local(t_l:is_calling/0).
 :- thread_local(t_l:mpred_loads_file/0).
-:- thread_local(t_l:mpred_mpred_add_loaded/0).
+:- thread_local(t_l:mpred_ain_loaded/0).
 :- thread_local(t_l:mpred_opcall/2).
 :- thread_local(t_l:no_arg_type_error_checking/0).
 :- thread_local(t_l:noDBaseHOOKS/1).
@@ -176,14 +165,14 @@ lmconf:feature_test/0
 :- set_prolog_flag(generate_debug_info, true).
 
 
-:-           op(1150,fx,(was_dynamic)),
+:-        op(1150,fx,(was_dynamic)),
           op(1150,fx,(was_multifile)),
           op(1150,fx,(was_module_transparent)),
           op(1150,fx,(was_export)),
           op(1150,fx,(was_shared_multifile)).
 
 
-%:- use_module(logicmoo(mpred/mpred_userkb)).
+% :- use_module(logicmoo(mpred/mpred_userkb)).
 % :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 %:- use_module(logicmoo(mpred/mpred_loader)).
 %:- use_module(logicmoo(mpred/mpred_userkb)).

@@ -19,7 +19,7 @@
 
 cwtdl(Goal,DL,TL):- cwc,
   notrace((ignore((stop_rtrace,
-   (dcall_failure(why,catch(call_with_time_limit(TL,(((call_with_depth_limit(Goal,DL,DLE),DLE\==depth_limit_exceeded)))),E,(dmsg(E:cwtdl(Goal,DL,TL)),fail)))
+   (show_failure(why,catch(call_with_time_limit(TL,(((call_with_depth_limit(Goal,DL,DLE),DLE\==depth_limit_exceeded)))),E,(dmsg(E:cwtdl(Goal,DL,TL)),fail)))
      ->true;
     assert(cwtdl_failed(Goal))))))).
 
@@ -34,7 +34,7 @@ cwtdl(Goal,DL,TL):- cwc,
 :- must_det(argIsa(genlPreds,2,_)).
 
 transfer_predicate(C,If,Q):-doall((clause(C,true,Ref),If,Q,on_x_log_throw(erase(Ref)))).
-transTiny(Template,If):-transfer_predicate(tinyK8(Template),If,once(mpred_add(Template))).
+transTiny(Template,If):-transfer_predicate(tinyK8(Template),If,once(ain(Template))).
 
 :- mpred_no_trace.
 
@@ -60,10 +60,10 @@ reallyLoadTiny:- mpred_no_trace.
 :- endif.
 
 
-%TODO FIX :-mpred_add((((cycl(X),{must(cyc_to_clif(X,Y))}) ==> clif(Y)))).
+%TODO FIX :-ain((((cycl(X),{must(cyc_to_clif(X,Y))}) ==> clif(Y)))).
 
 :- mpred_no_trace.
-:- mpred_add((((cycl('$VAR'('X')),{must(cyc_to_clif('$VAR'('X'),'$VAR'('Y')))}) ==> clif('$VAR'('Y'))))).
+:- ain((((cycl('$VAR'('X')),{must(cyc_to_clif('$VAR'('X'),'$VAR'('Y')))}) ==> clif('$VAR'('Y'))))).
 
 % ?-listing(cycl).
 
@@ -83,13 +83,13 @@ tHominid(iExplorer2).
 :- set_no_debug.
 :- set_no_debug_thread.
 
-:- transfer_predicate(tinyK8(Form), ( \+ contains_term('$VAR'(_),Form)) , mpred_add((Form))).
+:- transfer_predicate(tinyK8(Form), ( \+ contains_term('$VAR'(_),Form)) , ain((Form))).
 
 :- mpred_trace.
 
 :- set_clause_compile(fwc).
 
-load_later:- notrace((transfer_predicate(tinyK8(Form),writeq(Form),ignore(on_x_log_throw(cwtdl(mpred_add(clif(Form)),500,10)))))).
+load_later:- notrace((transfer_predicate(tinyK8(Form),writeq(Form),ignore(on_x_log_throw(cwtdl(ain(clif(Form)),500,10)))))).
 
 :- mpred_no_trace.
 

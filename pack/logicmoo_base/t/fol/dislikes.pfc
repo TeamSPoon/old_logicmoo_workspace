@@ -1,86 +1,6 @@
 #!/usr/bin/env swipl
 
-/**
-The Prolog Technology Theorem Prover is an extension of Prolog that is complete for the full first­order predicate calculus (Stickel, 1988).   
-It is invoked whenever the facts and rule are described in NNF or CNF into the knowledge base.
-However, when the rules are in Prenix Normal Form (PNF) (thus have quantifiers) they are converted to NNF, SNF and finally CNF and handed back over to PTTP.
-Whenever a formula whose leading quantifier is existential occurs, the formula obtained by removing that quantifier via Skolemization may be generated. 
-
-kif_add/1: the file has a rule or fact, in the form of a predicate of FOPC (First Order Predicate Calculus).  The LogicMOO invokes the PTTP compiler (discussed later) to assert the form to the knowledge base. The
-knowledge base represents the user''s beliefs. Thus, asserting the logical form to the knowledge base amounts to applying the Declarative rule and the Distributivity rule (Axiom B2).
-
-kif_ask/1: the user types in a question, in the form of a predicate of FOPC (First Order Predicate Calculus). The PTTP inference system is then invoked to attempt to  prove the predicate, 
-using the axioms and facts of the knowledge base. This amounts toassuming that the user''s beliefs are closed under logical consequence, i.e., the Closure rule (Axiom B1) is implicitly applied over and over.
-
-LogicMOO/PTTP is unlike all other theorem provers today (except SNARK and CYC) and even the ones claiming to be PTTP''s decendants have been radically simplified to absurdium.
-Here is how is LogicMOO/PTTP: If the proof succeeds, LogicMOO answers ``yes'', and prints out the predicate, instantiating all variables. If there are multiple answers, then it prints all of them. 
-If the proof fails, LogicMOO invokes PTTP to prove the negation of the queried predicate.  If that NEGATED proof succeeds, then LogicMOO answers ``no''; otherwise, LogicMOO answers ``cannot tell, not enough information''.
-
-LogicMOO, therefore, has a restricted capability for reasoning about negation, being able to distinguish between real negation (``P is false'') from negation by failure (``P is not provable'').
-This allows the system to distinguish beliefs that are provably false from beliefs that cannot be proven because of insufficient information. 
-This is an important feature that overcomes the supposed limitations of Prolog.   For example, without this added capability, if a user were to
-ask whether LogicMOO believes that John intended to let the cat out, then LogicMOO would answer ``no''. 
-This answer is misleading because LogicMOO would also answer ``no'' if it were asked if John did not intend to let the cat out.  This is why the system automaically Re-asks the negation.
-
-THE CAVEAT:  Left hand side rules may actually need the same level of analysis?!
-
-Another key feature of LogicMOO infering about what it doesnt yet know, is it can be set to "ask the user" or help guide the user into what types of knowledge it is missing.  That also provides a port through which
-other modules (e.g., a plan recognition system or a modules for NL reference resolution) can enter information. When such modules are not available, the user may simulate this capacity.
-
-is_entailed/1: Detects if an Horn Clause (or fact) is true.   if someone asserts a=>b. this will result in the following two is_entailed(( ~a :- ~b )) and   is_entailed((  b :- a ) ).
-According to classically trained logicians horn clauses cannot start with a negated literal (so to not offend them)  PTTP papers claim we can store "( ~a :- ~b )" as "( not_a :- not_b )" 
-If we obeyed the limitations set forth upon Horn clauses only being "positive" that would remove the unique ability for LogicMOO to deduce what things are impossible. (We couldn''t tell the difference between missing data and true negation)
-
-*/
-
-:- module(kb).
-:- '$set_source_module'(_,kb).
-:- '$module'(_,kb).
-
-
-:- if(gethostname(ubuntu)).
-:- user:ensure_loaded(library(logicmoo/logicmoo_base)).
-:- else.
-:- user:ensure_loaded(library(logicmoo/logicmoo_base)).
-% :- load_files(logicmoo_repl, [if(not_loaded),qcompile(auto)]).
-:- endif.
-
-:- use_module(logicmoo(snark/common_logic_snark)).
-:- ensure_loaded(logicmoo('snark/common_logic_clif.pfc')).
-
-:- debug(mpred).
-:- set_prolog_flag(gc,true).
-
-
-show_call_test(G):- must(show_call(G)).
-
-%= define the example language
-example_known_is_success(G):-  G.
-example_impossible_is_success(G):- neg(G).
-example_known_is_failure(G):-  \+ G.
-example_impossible_is_failure(G):- \+ neg(G).
-
-%= define the four truth values
-example_proven_true(G):- example_known_is_success(G),example_impossible_is_failure(G).
-example_proven_false(G):- example_impossible_is_success(G),example_known_is_failure(G).
-example_inconsistent(G):- example_known_is_success(G),example_impossible_is_success(G).
-example_unknown(G):- example_known_is_failure(G),example_impossible_is_failure(G).
-
-:- multifile shared_hide_data/1.
-%= shared_hide_data(hideMeta):- is_main_thread.
-%= shared_hide_data(hideTriggers):- is_main_thread.
-
-/* 
-LogicMOO in operation :
-In this section we provide a trace of LogicMOO in operation. Input from the user follows the
-standard Prolog prompt (?­) or the LogicMOO prompt (?->); all other text is output from LogicMOO.
-LogicMOO's responses to the questions that are asked illustrate the system's reasoning capabil­
-ities, and demonstrate its ability to derive the beliefs listed that summarizes the results of our data analysis.
-Comments are inserted with "%=" at the begginning and "reprinted".
-We start by sending all axioms to the PTTP compiler, which, in turn, transforms them and prints them
-out.
-*/
-
+:- include('test_header.pfc').
 :- process_this_script.
 
 %=  setup pfc
@@ -93,9 +13,6 @@ out.
 
 
 :- mpred_trace_exec.
-
-(ptSymmetric(Pred) ==> ({atom(Pred),G1=..[Pred,X,Y],G2=..[Pred,Y,X]}, (G1==>G2), (neg(G1)==> neg(G2)))).
-% (isa(Pred, ptSymmetric)==> ((neg(t(Pred, X, Y))==>neg(t(Pred, Y, X))))).
 
 ptSymmetric(love_compatible).
 

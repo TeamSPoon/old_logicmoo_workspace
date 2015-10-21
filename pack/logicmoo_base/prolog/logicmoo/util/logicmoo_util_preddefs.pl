@@ -16,6 +16,7 @@
             convert_to_dynamic/1,
             convert_to_dynamic/3,
             current_predicate_module/2,
+            context_module_of_file/1,
             def_meta_predicate/3,
             dynamic_if_missing/1,
             dynamic_multifile/1,
@@ -195,11 +196,11 @@ context_module_of_file(CM):- source_context_module(CM),!.
 :- meta_predicate((was_shared_multifile(+))).
 
 
-was_shared_multifile(PI):- context_module_of_file(CM),with_pfa_group(save_was(shared_multifile),CM, kb, PI).
-was_dynamic(PI):- context_module_of_file(CM),with_pfa_group(save_was(dynamic),CM, kb, PI).
-was_export(PI):- context_module_of_file(CM),with_pfa_group(save_was(export),CM, kb, PI).
-was_module_transparent(PI):- context_module_of_file(CM),with_pfa_group(save_was(module_transparent),CM, kb, PI).
-was_multifile(PI):- context_module_of_file(CM),with_pfa_group(save_was(multifile),CM, kb, PI).
+was_shared_multifile(PI):- context_module_of_file(CM),with_pfa_group(save_was(shared_multifile),CM, baseKB, PI).
+was_dynamic(PI):- context_module_of_file(CM),with_pfa_group(save_was(dynamic),CM, baseKB, PI).
+was_export(PI):- context_module_of_file(CM),with_pfa_group(save_was(export),CM, baseKB, PI).
+was_module_transparent(PI):- context_module_of_file(CM),with_pfa_group(save_was(module_transparent),CM, baseKB, PI).
+was_multifile(PI):- context_module_of_file(CM),with_pfa_group(save_was(multifile),CM, baseKB, PI).
 
 :-dynamic(was_was:was_was_once/4).
 :-export(was_was:was_was_once/4).
@@ -218,13 +219,13 @@ save_was(Was,CM, M, P):-functor(P,F,A), save_was(Was,CM, M, F/A).
 
 :-module_transparent(make_shared_multifile/3).
 :- export((make_shared_multifile)/3).
-make_shared_multifile(CM, M, F/A):- 
+make_shared_multifile(CM, M, F/A):- trace,
  must_det_l((    
     dynamic_safe(M,F,A), 
    '@'(M:export(M:F/A),M),
    '@'(M:multifile(M:F/A),M),
    '@'(M:multifile(M:F/A),CM),   
-    (CM\==M->CM:import(M:F/A);true))).
+    (CM\==M->CM:rwe54rimport(M:F/A);true))).
 make_shared_multifile(CM, M, PI):- functor(PI,F,A),make_shared_multifile(CM, M, F/A).
 
 :-module_transparent(with_pfa/2).
@@ -245,9 +246,9 @@ m_fa_to_m_p_fa(Decl_mpred_hybrid,FA):-  m_m_fa_to_m_p_fa(Decl_mpred_hybrid,M,M,F
 :-module_transparent(only_3rd/4).
 only_3rd([],_CM, _M, _PI):- !.
 only_3rd([With|List],CM, M, PI):- is_list(List),!,only_3rd(With,CM, M, PI),only_3rd(List,CM, M, PI).
-only_3rd(With,user, user, PI):-!, dcall(with_pi,call(With,PI)).
-only_3rd(With,CM, user, PI):-!, dcall(with_pi,call(With,CM:PI)).
-% only_3rd(With,user, M, PI):-!, dcall(with_pi,call(With,M:PI)).
+only_3rd(With,user, user, PI):-!, show_call(with_pi,call(With,PI)).
+only_3rd(With,CM, user, PI):-!, show_call(with_pi,call(With,CM:PI)).
+% only_3rd(With,user, M, PI):-!, show_call(with_pi,call(With,M:PI)).
 only_3rd(With,CM, M, PI):- CM:call(With,M:PI).
 
 :- multifile(lmconf:mpred_is_decl_called/4).
@@ -372,7 +373,7 @@ get_module_of_4(_P,F,A,M):- current_predicate(M0:F0/A0),F0=F,A0=A,!,M=M0.
 get_module_of_4(P,F,A,M):- trace_or_throw((get_module_of_4(P,F,A,M))).
 
 /*
-get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,lmconf:mpred_user_kb(M).
+get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,get_mpred_user_kb(M).
 get_module_of_4(_P,F,A,_M):-trace, isCycPredArity(F,A),!,fail.
 get_module_of_4(P,F,A,M):- trace, debugCall(get_module_of_4(P,F,A,M)).
 */
@@ -410,24 +411,27 @@ dynamic_safe(MFA):- with_mfa(MFA,dynamic_safe).
 :- module_transparent((((dynamic_safe)/3))).
 
 convert_to_dynamic(M:FA):- !, get_functor(FA,F,A),convert_to_dynamic(M,F,A).
-convert_to_dynamic(FA):- get_functor(FA,F,A), convert_to_dynamic(user,F,A).
+convert_to_dynamic(FA):- strip_module(FA,M,FA0), get_functor(FA0,F,A), convert_to_dynamic(M,F,A).
 
-convert_to_dynamic(M,F,A):-  functor(C,F,A), M:predicate_property(C,dynamic),!.
-convert_to_dynamic(M,F,A):-  M:functor(C,F,A),\+ predicate_property(C,_),!,M:((dynamic(F/A),multifile(F/A),export(F/A))),!.
+convert_to_dynamic(M,F,A):-  functor(C,F,A), predicate_property(M:C,dynamic),!.
+convert_to_dynamic(M,F,A):-  functor(C,F,A),\+ predicate_property(M:C,_),if_defined(kb_dynamic(M:C),(M:((dynamic(M:F/A),multifile(M:F/A),export(M:F/A))))),!.
 convert_to_dynamic(M,F,A):-  functor(C,F,A),findall((C:-B),clause(C,B),List),rebuild_as_dyn(M,C,F,A),maplist(assertz,List),!.
+
+% kb_dynamic = 
+
 
 rebuild_as_dyn(M,C,_,_):- predicate_property(M:C,dynamic),!.
 rebuild_as_dyn(M,C,F,A):- redefine_system_predicate(M:C),M:abolish(F,A),dynamic(M:F/A),multifile(M:F/A),export(F/A),!.
 
 dynamic_safe(M,F,A):- functor(C,F,A),predicate_property(C,imported_from(system)),!,dmsg(warn(predicate_property(M:C,imported_from(system)))).
-dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> dcall(why,convert_to_dynamic(M,F,A)) ; on_x_log_cont((dynamic(M:F/A),multifile(M:F/A)))). % , warn_module_dupes(M,F,A).
+dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> show_call(why,convert_to_dynamic(M,F,A)) ; on_x_log_cont((dynamic(M:F/A),multifile(M:F/A)))). % , warn_module_dupes(M,F,A).
 :- op(1150,fx,lmconf:dynamic_safe).
 
 
 % pred_prop(Spec,DO,TEST,DONT)
 pred_prop((M:F/A),DO,TEST,true):-pred_prop(M:F/A,DO,TEST).
 pred_prop(M:F/A,(lock_predicate(M:F/A)),(built_in),unlock_predicate(M:F/A)).
-pred_prop(M:F/A, (dynamic(M:F/A)) ,(dynamic), dcall(why,compile_predicates([F/A]))).
+pred_prop(M:F/A, (dynamic(M:F/A)) ,(dynamic), show_call(why,compile_predicates([F/A]))).
 
 pred_prop(_,(meta_predicate Spec),(meta_predicate Spec)).
 pred_prop(M:F/A,multifile(M:F/A)	       ,(multifile)).
@@ -453,22 +457,22 @@ rebuild_pred_into(_,NMC,AssertZ,_):-tlbugger:rbuild_pred_impl_cache(NMC,AssertZ)
 rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
   listing(OMC),
   asserta(tlbugger:rbuild_pred_impl_cache(NMC,AssertZ)),
-  dcall(rebuild_pred_into,(predicate_property(OMC,number_of_clauses(_)))),
+  show_call(rebuild_pred_into,(predicate_property(OMC,number_of_clauses(_)))),
   strip_module(OMC, OM, OC),
   strip_module(NMC, NM, NC),
    must_det_l((
       '$set_source_module'(Before, OM),
       functor(NC,NF,A), functor(OC,OF,A),
-      (dcall(why,predicate_property(OMC,number_of_clauses(_)))),
-      must_pi(dcall_failure(why,predicate_property(OMC,number_of_clauses(_)))),
+      (show_call(why,predicate_property(OMC,number_of_clauses(_)))),
+      must_pi(show_failure(why,predicate_property(OMC,number_of_clauses(_)))),
       forall(predicate_property(OC,PP),asserta(tlbugger:rbuild_pred_impl_cache_pp(NC,PP))),
       findall((OC:-B),((clause(OC,B),assertz(pp_clauses((OC:-B))))),List),
       '$set_source_module'(_, NM),
       forall(member(-PP,OtherTraits),retractall(tlbugger:rbuild_pred_impl_cache_pp(NC,PP))),
       forall(member(+PP,OtherTraits),asserta(tlbugger:rbuild_pred_impl_cache_pp(NC,PP))),
       once(tlbugger:rbuild_pred_impl_cache_pp(NC,(built_in))->(redefine_system_predicate(NF/A),unlock_predicate(NF/A));true),
-      dcall(why,must_pi(abolish(NF/A))),
-      dcall(why,must_pi(abolish(NF/A))),
+      show_call(why,must_pi(abolish(NF/A))),
+      show_call(why,must_pi(abolish(NF/A))),
       garbage_collect_clauses,
       ignore(convert_to_dynamic(NM,NF,A)),
       garbage_collect_clauses,

@@ -95,7 +95,7 @@
         lmconf:module_local_init/0)).
 */
 
-assert_argIsa(Prop,N,Type):-dcall_failure(why,mpred_add_fast(argIsa(Prop,N,Type))).
+assert_argIsa(Prop,N,Type):-show_failure(why,ain_fast(argIsa(Prop,N,Type))).
 
 
 assert_predArgTypes(ArgTs):-not(compound(ArgTs)),!.
@@ -103,7 +103,7 @@ assert_predArgTypes(ArgTs):- numbervars(ArgTs,0,_,[functor_name(ftTerm)]),get_fu
 
 assert_predArgTypes_fa(_,ArgTs):- nonvar(ArgTs),ArgTs=(_/_),!.
 assert_predArgTypes_fa(F,ArgTs):- not(is_list(ArgTs)),ArgTs=..[_|ArgsL],!,assert_predArgTypes_fa(F,ArgsL).
-%assert_predArgTypes_fa(F,ArgsList):- clause_asserted(ftAction(F),true),!,dcall(why,must(assert_predArgTypes_from_left(F,1,ArgsList))).
+%assert_predArgTypes_fa(F,ArgsList):- clause_asserted(ftAction(F),true),!,show_call(why,must(assert_predArgTypes_from_left(F,1,ArgsList))).
 assert_predArgTypes_fa(F,ArgsList):- length(ArgsList,L),assert_predArgTypes_l(F,L,ArgsList).
 
 %assert_predArgTypes_l(F,L,ArgsList):- arity(F,A),!,must( (A>=L) -> assert_predArgTypes_from_right(F,A,ArgsList);true).
@@ -127,7 +127,7 @@ term_is_ft(Term,Type):- no_repeats_old(Type,(term_is_ft_how(Term,Was),trans_subf
 
 
 term_is_ft_how(Term,Type):- clause_asserted(quotedDefnIff(Type,Info)),nonvar(Info),
-   (dcall_success(why,(Info='SubLQuoteFn'(LISPSYMBOL),nop(Term+Type+LISPSYMBOL)))->fail;(append_term(Info,Term,CALL),mpred_call(CALL))),!.
+   (show_success(why,(Info='SubLQuoteFn'(LISPSYMBOL),nop(Term+Type+LISPSYMBOL)))->fail;(append_term(Info,Term,CALL),req(CALL))),!.
 term_is_ft_how(Term,Type):- compound(Term),functor(Term,F,A),functor(Type,F,A),
   once((t(meta_argtypes,Type),Type=..[_|Types],Term=..[_|Args],maplist(isa,Args,Types))).
 
@@ -318,7 +318,7 @@ grab_argsIsa_6(Types):- clause_asserted(quotedDefnIff(Types,_)),maybe_argtypes(T
 % grab_argsIsa_6(Types):- current_predicate(get_all_templates/1),get_all_templates(Types),maybe_argtypes(Types).
 
 %argIsa_call_6(F,N,Type):- isa(F,argIsa(N,Type)),nonvar(Type),assert_argIsa(F,N,Type),!.
-argIsa_call_6(F,N,Type):- grab_argsIsa(F,Types),maybe_argtypes(Types),arg(N,Types,Type),dcall_failure(why,(nonvar(Type),assert_argIsa(F,N,Type))),!.
+argIsa_call_6(F,N,Type):- grab_argsIsa(F,Types),maybe_argtypes(Types),arg(N,Types,Type),show_failure(why,(nonvar(Type),assert_argIsa(F,N,Type))),!.
 
 maybe_argtypes(Types):- compound(Types), ground(Types), Types\=(_/_), Types\=(_:_/_), Types\='$VAR'(_).
 
@@ -372,7 +372,7 @@ correctArgsIsa00(Op,[KP,Prop|Args],[KP|AA]):-is_holds_false(KP),!,correctArgsIsa
 correctArgsIsa00(Op,[Prop,ArgI],[Prop,ArgO]):- isa(Prop,tCol),!, correctAnyType(query(ftID,Op),ArgI,Prop,ArgO).
 correctArgsIsa00(Op,[Prop|Args],[Prop|AArgs]):- discoverAndCorrectArgsIsa(Op,Prop,1,Args,AArgs).
 
-discoverAndCorrectArgsIsa(Op,Prop,_,ArgsIn,ArgsOut):- length(ArgsIn,ArgUsed),dcall_failure(why,(mpred_full_arity(Prop,MaxArity),(number(ArgUsed),number(MaxArity),ArgUsed=<MaxArity))),
+discoverAndCorrectArgsIsa(Op,Prop,_,ArgsIn,ArgsOut):- length(ArgsIn,ArgUsed),show_failure(why,(mpred_full_arity(Prop,MaxArity),(number(ArgUsed),number(MaxArity),ArgUsed=<MaxArity))),
     discoverAndCorrectArgsIsa_from_right(Op,Prop,MaxArity,ArgsIn,ArgsOut),!.
 discoverAndCorrectArgsIsa(Op,Prop,N,ArgsIn,ArgsOut):-discoverAndCorrectArgsIsa_from_left(Op,Prop,N,ArgsIn,ArgsOut),!.
 
@@ -393,7 +393,7 @@ discoverAndCorrectArgsIsa_from_left(Op,Prop,N1,[A|Args],Out):-
 
 mpred_full_arity({},A):-trace_or_throw(crazy_mpred_full_arity({}, A)).
 mpred_full_arity(F,A):-arity(F,A),!.
-mpred_full_arity(F,A):-grab_argsIsa(F,Types),maybe_argtypes(Types),dcall(why,(functor(Types,F,A),assert_arity(F,A))),!.
+mpred_full_arity(F,A):-grab_argsIsa(F,Types),maybe_argtypes(Types),show_call(why,(functor(Types,F,A),assert_arity(F,A))),!.
 
 
 
@@ -450,8 +450,8 @@ correctType_gripe(Op,A,Type,AA):- fail,atom(Type),must_equals(A,AA),
       dmsg(todo(isa_assert_type(Type))),
       % decl_type(Type),
       t_l:can_coerce(Op),
-      dmsg(warning(add(isa(A,Type)))),
-      dtrace(add(isa(A,Type))),!.
+      dmsg(warning(ain(isa(A,Type)))),
+      dtrace(ain(isa(A,Type))),!.
 
 correctType_gripe(Op,A,C,A):-sanity(ground(A)),dmsg(todo(define(correctType(Op,A,C,'ConvertedArg')))),throw(retry(_)).
 correctType_gripe(Op,A,Type,NewArg):-trace_or_throw(failure(correctType(Op,A,Type,NewArg))).
@@ -511,11 +511,11 @@ correctType0(_ ,A,Type,AA):- compound(A),not(is_list(A)),atom(Type),functor_safe
 
 correctType0(_ ,A,Type,AA):- compound(Type),contains_var(Type,isThis),
    subst(Type,isThis,A,Call1),subst(Call1,value,AA,Call2),!,
-      dcall(why,(Call2)),ignore(AA=A).
+      show_call(why,(Call2)),ignore(AA=A).
 
 correctType0(_ ,A,Type,AA):- functor(Type,F,A),
-   (A2 is A+2,current_predicate(F/A2)->dcall(why,is_asserted(t(Type,A,AA)));
-   (A1 is A+1,current_predicate(F/A1)->dcall(why,is_asserted(t(Type,A))));
+   (A2 is A+2,current_predicate(F/A2)->show_call(why,is_asserted(t(Type,A,AA)));
+   (A1 is A+1,current_predicate(F/A1)->show_call(why,is_asserted(t(Type,A))));
    fail),ignore(AA=A).
 
 
@@ -581,7 +581,7 @@ must_equals_correct(Op,A,AA):-must(correctArgsIsa(Op,A,AA)).
 
 must_equals(A,AA):-must_det(A=AA).
 
-deduced_is_tCol(A):- (t_l:infSkipArgIsa->true; (t(tCol,A)->true;(fail,mpred_add(isa(A,tCol))))),!.
+deduced_is_tCol(A):- (t_l:infSkipArgIsa->true; (t(tCol,A)->true;(fail,ain(isa(A,tCol))))),!.
 :- style_check(+singleton).
 
 :- was_export(any_to_value/2).
@@ -616,10 +616,10 @@ roll_dice(Rolls,Sided,Bonus,Result):- LessRolls is Rolls-1, roll_dice(LessRolls,
 
 % call_argIsa_ForAssert(F,N,Type):-argIsa_known(F,N,Type),atom(Type),!,not(nonusefull_deduction_type(Type)),tCol(Type).
 
-%:-mpred_add_fast(<=( argIsa(F,N,Isa), asserted_argIsa_known(F,N,Isa))).
-%:-mpred_add_fast(<=( argIsa(F,N,Isa), argIsa_known(F,N,Isa))).
-lmconf:module_local_init:- mpred_add_fast(prologHybrid(formatted_resultIsa/2)).
-lmconf:module_local_init:- mpred_add_fast(prologHybrid(resultIsa/2)).
+%:-ain_fast(<=( argIsa(F,N,Isa), asserted_argIsa_known(F,N,Isa))).
+%:-ain_fast(<=( argIsa(F,N,Isa), argIsa_known(F,N,Isa))).
+lmconf:module_local_init:- ain_fast(prologHybrid(formatted_resultIsa/2)).
+lmconf:module_local_init:- ain_fast(prologHybrid(resultIsa/2)).
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 

@@ -101,30 +101,13 @@
 
 
 
-arity(apathFn,2).
-arity(isKappaFn,2).
-arity(isInstFn,1).
-arity(ftListFn,1).
-arity(xyzFn,4).
-arity(arity,2).
-arity(is_never_type,1).
-arity(argIsa, 3).
-arity(Prop,1):-ttPredType(Prop).
-arity(meta_argtypes,1).
-arity(arity,2).
-arity(is_never_type,1).
-arity(prologSingleValued,1).
-arity('<=>',2).
-arity(F,A):- atom(F), integer(A),current_predicate(F/A),A>1.
-arity(F,1):- atom(F), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('mpred_system.pfc')).
 
-:- ensure_mpred_file_loaded('mpred_system.pfc').
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/if_missing.pfc')).
 
-:- ensure_mpred_file_loaded('../pfc/if_missing.pfc').
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/mpred_default.pfc')).
 
-:- ensure_mpred_file_loaded('../pfc/mpred_default.pfc').
-
-:- ensure_mpred_file_loaded('../pfc/singleValued.pfc').
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/singleValued.pfc')).
 
 % :- ensure_mpred_file_loaded('../pfc/relationAllExists.pfc').
 

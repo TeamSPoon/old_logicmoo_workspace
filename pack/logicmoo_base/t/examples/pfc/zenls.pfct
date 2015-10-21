@@ -1,5 +1,5 @@
 
-:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
+:- use_module(library(logicmoo/logicmoo_user)).
 
 :-file_begin(pfc).
 
@@ -40,6 +40,4 @@ tPenguin(X) ==> neg(tFly(X)).
 :-mpred_test((neg(tFly(iChilly)))).
 
 
-
-:- endif.
 

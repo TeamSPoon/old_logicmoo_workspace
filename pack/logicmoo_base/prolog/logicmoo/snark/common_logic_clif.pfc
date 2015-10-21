@@ -2,7 +2,7 @@
 -*- mode: md;-*- 
 vim: set filetype=md:
 */
-/** <module> special module hooks into the logicmoo engine allow
+/* <module> special module hooks into the logicmoo engine allow
 %   clif syntax to be recocogized via our CycL/KIF handlers 
 % 
 % Logicmoo Project: A LarKC Server written in Prolog
@@ -16,43 +16,30 @@ vim: set filetype=md:
 :- if(current_prolog_flag(logicmoo_modules,default)).
 :- module(common_logic_clif,[]).
 :- endif.
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/autoexec.pfc')).
 :- include('../mpred/mpred_header.pi').
 
-% we are in "prolog" consultation mode
-
-% = % :- ensure_loaded(logicmoo(logicmoo_engine)).
-% = % :- ensure_loaded(mpred_compiler).
-:- enable_mpred_expansion.
-
-
 % we ensure we are in "pfc" consultation mode (so the syntax rules will define correctly)
-
 :- file_begin(pfc).
 
-% make sure op alias for '=>' is not overriden
-:- op_alias((=>),  (=>)).
 
 ==>(hybrid_support(clif,1)).
+==>(hybrid_support(boxlog,1)).
+==>(hybrid_support(pfclog,1)).
 
 % whenever we know about clif we''ll use the prolog forward chainging system
-
-
 % this is broken down to the next 6 clauses
-:- dynamic(clif/1).
 (clif(CLIF) ==> 
    ({ clif_to_prolog(CLIF,PROLOG)},
       % this consequent asserts the new rules
       PROLOG,{slow_sanity(is_entailed(CLIF))})).
-
 
 arity(clif,1).
 arity(boxlog,1).
 arity(pfclog,1).
 
 (clif(CLIF),{delistify_last_arg(CLIF,kif_to_boxlog,PROLOG)}) ==> (boxlog(PROLOG),{slow_sanity(is_entailed(CLIF))}).
-:- dynamic(boxlog/1).
 (boxlog(BOXLOG),{delistify_last_arg(BOXLOG,boxlog_to_pfc,PROLOG)}) ==> pfclog(PROLOG).
-:- dynamic(pfclog/1).
 (pfclog(PROLOG)==>(PROLOG,{slow_sanity(is_entailed(PROLOG))})).
 
 

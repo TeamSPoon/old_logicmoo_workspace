@@ -392,9 +392,6 @@ never_mpred_mpred(arity).
 
 :- was_shared_multifile(grid_key/1).
 
-:- was_shared_multifile(never_registered_mpred_file/1).
-
-:- was_shared_multifile(registered_mpred_file/1).
 
 
 :- was_shared_multifile(use_cyc_database/0).
@@ -440,7 +437,7 @@ mpred_plist_t(P,LIST):- CALL=..[t,P|LIST],on_x_rtrace(CALL).
 :- meta_predicate(loop_check_mpred(?)).
 % loop_check_mpred(Call):- current_predicate(ireq/1), loop_check_term(ireq(Call),loop_check_mpred(Call),fail).
 loop_check_mpred(Call):- !, fail,not(t_l:infInstanceOnly(_)),loop_check_term(ireq(Call),loop_check_mpred(Call),fail).
-% loop_check_mpred(Call):-loop_check(mpred_call(t,Call),fail).
+% loop_check_mpred(Call):-loop_check(req(t,Call),fail).
 
 :- meta_predicate(mpred_pa_call(?,?,0)).
 
@@ -450,7 +447,7 @@ mpred_pa_call(F,A,Call):-current_predicate(F,M:_OtherCall),M:Call.
 
 mpred_fact_arity(F,A):-arity(F,A),once(mpred_isa(F,prologHybrid);mpred_isa(F,pfcControlled);mpred_isa(F,prologPTTP);mpred_isa(F,prologKIF)).
 
-prologHybridFact(G):- (var(G)->(mpred_fact_arity(F,A),functor(G,F,A));true),into_mpred_form(G,M),!,no_repeats(mpred_call(M)).
+prologHybridFact(G):- (var(G)->(mpred_fact_arity(F,A),functor(G,F,A));true),into_mpred_form(G,M),!,no_repeats(req(M)).
 
 isCycPredArity_ignoreable(F,A):- ignore(mpred_isa(F,cycPred(A))),ignore(arity(F,A)).
 

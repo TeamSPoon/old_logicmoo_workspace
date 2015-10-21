@@ -18,8 +18,7 @@
 
 :- include('logicmoo_util_header.pi').
 
-:- multifile(lmconf:mpred_user_kb/1).
-:- dynamic(lmconf:mpred_user_kb/1).
+:- thread_local(t_l:mpred_user_kb/1).
 
 :- multifile(lmconf:mpred_system_kb/1).
 :- dynamic(lmconf:mpred_system_kb/1).
@@ -58,7 +57,7 @@ env_retractall(F/A):- functor(P,F,A),!,env_retractall(P),!.
 env_retractall(P):- must(env_mpred_op(retractall,P)),!.
 */
 
-env_clear(kb(Dom)):-nonvar(Dom),!,env_clear(Dom).
+env_clear(baseKB(Dom)):-nonvar(Dom),!,env_clear(Dom).
 env_clear(Dom):- forall(prop_mpred(Dom,F,A),env_mpred_op(retractall(F/A))).
 env_mpred_op(OP_P):- OP_P=..[OP,P],env_mpred_op(OP,P).
 
@@ -70,7 +69,7 @@ env_mpred_op(OP,P):- var(OP),!,P.
 env_mpred_op(OP,F/A):-integer(A),atom(F),!,functor(P,F,A),!,env_mpred_op(OP,P).
 env_mpred_op(OP,P):- t_l:push_env_ctx, do_prefix_arg(P, ZZ, PP, _Type),P\==PP,!,get_env_ctx(ZZ),call(OP,/*ocluser*/ocl:PP).
 env_mpred_op(OP,P):- functor_h(P,F,A),must(get_mpred_stubType(F,A,ENV)),!,env_mpred_op(ENV,OP,P).
-env_mpred_op(OP,P):- append_term(OP,P,CALL),current_predicate(_,CALL),!,dcall(why,/*ocluser*/ocl:CALL).
+env_mpred_op(OP,P):- append_term(OP,P,CALL),current_predicate(_,CALL),!,show_call(why,/*ocluser*/ocl:CALL).
 env_mpred_op(OP,P):- trace,trace_or_throw(unk_env_mpred_op(OP,P)).
 
 env_shadow(OP,P):-lmconf:call(OP,P).
@@ -82,10 +81,10 @@ in_dyn_pred(_DB,Call):- var(Call),!,get_mp_arity(F,A),functor(Call,F,A),( predic
 in_dyn_pred(_DB,Call):- functor(Call,F,A), get_mp_arity(F,A), predicate_property(Call,_), !, loop_check(Call).
 
 
-get_mp_arity(F,A):- lmconf:mpred_user_kb(M),M:arity(F,A).
+get_mp_arity(F,A):- get_mpred_user_kb(M),M:arity(F,A).
 get_mp_arity(F,A):- lmconf:mpred_system_kb(M),M:mpred_arity(F,A).
 
-prop_mpred(Prop,F,A):- lmconf:mpred_system_kb(M),M:kb:mpred_isa(F,Prop),get_mp_arity(F,A).
+prop_mpred(Prop,F,A):- lmconf:mpred_system_kb(M),M:mpred_isa(F,Prop),get_mp_arity(F,A).
 
 get_mpred_stubType(_,_,dyn):-!.
 get_mpred_stubType(F,A,StubOut):-    
@@ -117,7 +116,7 @@ decl_env_mepred([H],Pred):-!,decl_env_mepred(H,Pred).
 decl_env_mepred([H|T],Pred):-!,decl_env_mepred(H,Pred),decl_env_mepred(T,Pred).
 decl_env_mepred((H,T),Pred):-!,decl_env_mepred(H,Pred),decl_env_mepred(T,Pred).
 
-decl_env_mepred(kb(KB),_):- ain(isa_mpred_user_kb(KB)),fail.
+decl_env_mepred(baseKB(KB),_):- ain(isa_mpred_user_kb(KB)),fail.
 decl_env_mepred(stubType(dyn),Pred):-!, decl_env_mepred(dyn,Pred).
 
 decl_env_mepred(CMPD,Pred):-  fail, compound(CMPD),CMPD=..[_|CMPDL],
@@ -160,7 +159,7 @@ decl_env_mepred_real(Prop,Pred,F,A):-
   (Prop==cache->'$set_pattr'(ocl:Pred, pred, (volatile));true),
   (Prop==dom->(multifile(/*ocluser*/ocl:F/A));true),
   lmconf:export(/*ocluser*/ocl:F/A),
-  if_defined(decl_mpred(Pred,Prop),ain(kb:mpred_isa(F,Prop))),
+  if_defined(decl_mpred(Pred,Prop),ain(baseKB:mpred_isa(F,Prop))),
   ain(isa_kb:mpred_isa(Prop)), ain(get_mp_arity(F,A)),ain(arity(F,A)),!,
   trace,ain(prop_mpred(Prop,F,A)).
 
@@ -371,7 +370,7 @@ env_assert(F):-!,maybe_show_env_mpred_op(assert(F)).
 env_retract(F):-!,maybe_show_env_mpred_op(retract(F)).
 env_retractall(F):-!,maybe_show_env_mpred_op(retractall(F)).
 maybe_show_env_mpred_op(G):- !,G.
-maybe_show_env_mpred_op(G):- t_l:db_spy -> dcall(why,G); G.
+maybe_show_env_mpred_op(G):- t_l:db_spy -> show_call(why,G); G.
 
 :- meta_predicate(maybe_show_env_mpred_op(0)).
 

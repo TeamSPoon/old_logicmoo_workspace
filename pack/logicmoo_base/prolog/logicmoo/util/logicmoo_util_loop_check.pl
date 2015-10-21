@@ -148,7 +148,7 @@ call_t(C):- call(C).
 reduce_make_key(call(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(call_u(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(req(C),O):-!,reduce_make_key(C,O).
-reduce_make_key(mpred_call(C),O):-!,reduce_make_key(C,O).
+reduce_make_key(req(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(must(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(no_repeats(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(no_repeats(_,C),O):-!,reduce_make_key(C,O).
@@ -350,7 +350,7 @@ call_tabled0(Key,Vars,C,List):-call_tabled1(Key,Vars,C,List).
 call_tabled1(Key,Vars,C,List):- asserta(lmcache:maybe_table_key(Key)), findall_nodupes(Vars,C,List),
   ignore((really_can_table,!,
   % if lmcache:maybe_table_key(Key) is now missing that meant a loop_checker had limited some results
-  dcall_failure(why,retract(lmcache:maybe_table_key(Key))),!,
+  show_failure(why,retract(lmcache:maybe_table_key(Key))),!,
   asserta_if_ground(lmcache:call_tabled_cached_results(Key,List)))),!.
 
 really_can_table:- not(test_tl(lmcache:cannot_save_table)),!.

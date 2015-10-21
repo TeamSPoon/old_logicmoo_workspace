@@ -203,6 +203,11 @@
 :- op(1075,xfx,user:'<==>').
 :- op(350,xfx,user:'xor').
 
+
+:- use_module(pldoc(doc_access)).
+:- use_module(pldoc(doc_pack)).
+:- use_module(pldoc(doc_pack)).
+
 :- meta_predicate hmust(0).
 :- meta_predicate hmust_l(0).
 :- meta_predicate with_search_filters(0).
@@ -319,7 +324,7 @@ hmust_l(G):-G.
 
 :- M=pldoc_process,ignore((module_property(M,file(S)),source_file(PI,S),
    \+ ((predicate_property(M:PI,imported_from(U)),U\==M)),
-   functor(PI,F,A),import(F/A),fail)).
+   functor(PI,F,A),zzzimport(F/A),fail)).
 
 
 :- portray_text(false).  % Enable portray of strings
@@ -666,7 +671,7 @@ edit1term:-
    cvt_param_to_term(String,Term,VNs),
    save_in_session(find,Term),
    maplist(as_ftVars,VNs),
-   call_for_terms(forall(mpred_add(Term),pp_item_html('Assert',':-'(VNs,Term))))))),!.
+   call_for_terms(forall(ain(Term),pp_item_html('Assert',':-'(VNs,Term))))))),!.
   
 edit1term:- 
   get_param_req('RETRACT','RETRACT'),!,
@@ -934,7 +939,7 @@ tmw:- w_tl(t_l:print_mode(html),(print((a(_LP):-b([1,2,3,4]))),nl,nl,wid(_,_,KIF
 
 
 
-% II = 56+TTT, ((dcall(why,(url_encode(II,EE),var_property(TTT,name(NNN)),url_decode(EE,OO))))),writeq(OO).
+% II = 56+TTT, ((show_call(why,(url_encode(II,EE),var_property(TTT,name(NNN)),url_decode(EE,OO))))),writeq(OO).
 
 url_encode(B,A):- \+ atom(B),!,term_variables(B,Vars),url_encode_term(B,Vars,O),O=A.
 url_encode(B,A):- atom_concat('\n',BT,B),!,url_encode(BT,A).
@@ -951,7 +956,7 @@ url_encode_term(InTerm,_VsIn,URL):- fail, with_output_to(atom(IRI),portray_claus
 url_encode_term(InTerm,VsIn,URL):-
   nb_current('$variable_names',Prev),
   name_the_var(40,Prev,VsIn,_NewVs,Added),
-  % (NewVs\==Prev ->  dcall(why,b_setval('$variable_names',NewVs)) ; true),
+  % (NewVs\==Prev ->  show_call(why,b_setval('$variable_names',NewVs)) ; true),
   with_output_to(atom(IRI),write_term('#$'(InTerm:Added),[quoted(true),variable_names(Added),quoted,priority(9)])),
   url_iri(URL,IRI),!.
 
@@ -1046,11 +1051,11 @@ indent_nbsp(X,Chars):-XX is X -1,!, indent_nbsp(XX,OutP),!,sformat(Chars,'~w   '
 :- multifile lmconf:shared_hide_data/1.
 
 lmconf:shared_hide_data('$si$':'$was_imported_kb_content$'/2):- !,listing_filter(hideMeta).
-lmconf:shared_hide_data(kbp:spft/5):- !,listing_filter(hideTriggers).
-lmconf:shared_hide_data(kbp:spft/3):- !,listing_filter(hideTriggers).
-lmconf:shared_hide_data(kbp:nt/4):- !,listing_filter(hideTriggers).
-lmconf:shared_hide_data(kbp:pt/3):- !, listing_filter(hideTriggers).
-lmconf:shared_hide_data(kbp:bt/3):- !, listing_filter(hideTriggers).
+lmconf:shared_hide_data(basePFC:spft/5):- !,listing_filter(hideTriggers).
+lmconf:shared_hide_data(basePFC:spft/3):- !,listing_filter(hideTriggers).
+lmconf:shared_hide_data(basePFC:nt/4):- !,listing_filter(hideTriggers).
+lmconf:shared_hide_data(basePFC:pt/3):- !, listing_filter(hideTriggers).
+lmconf:shared_hide_data(basePFC:bt/3):- !, listing_filter(hideTriggers).
 lmconf:shared_hide_data((H:-
  cwc,
         second_order(_,_G19865),
@@ -1189,8 +1194,8 @@ pp_i2tml_0(is_disabled_clause(H)):- pp_i2tml_0((disabled)=H).
 
 % pp_i2tml_0(FET):-fully_expand(assert,FET,NEWFET),FET\=@=NEWFET,!,pp_i2tml_0(NEWFET).
 
-pp_i2tml_0(kbp:spft(umt,P,F,T,W)):-!,
-   w_tl(t_l:current_why_source(W),pp_i2tml_0(kbp:spft(umt,P,F,T))).
+pp_i2tml_0(basePFC:spft(umt,P,F,T,W)):-!,
+   w_tl(t_l:current_why_source(W),pp_i2tml_0(basePFC:spft(umt,P,F,T))).
 
 pp_i2tml_0(spft(P,U,U)):- nonvar(U),!, pp_i2tml_1(P:-asserted_by(U)).
 pp_i2tml_0(spft(P,F,T)):- atom(F),atom(T),!, pp_i2tml_1(P:-asserted_in(F:T)).
