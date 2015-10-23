@@ -7,7 +7,7 @@
 % Dec 13, 2035
 %
 */
-% :-module(mpred_www,[ensure_webserver/0,search4term/0]).
+% :-module(mpred_www,[ensure_mpred_webserver/0,search4term/0]).
 :- module(mpred_www,
           [ action_menu_applied/3,
             action_menu_item/2,
@@ -25,7 +25,7 @@
             do_guitracer/0,
             edit1term/0,
             edit1term/1,
-            ensure_webserver/0,
+            ensure_mpred_webserver/0,
             
             find_cl_ref/2,
             find_ref/2,
@@ -203,10 +203,10 @@
 :- op(1075,xfx,user:'<==>').
 :- op(350,xfx,user:'xor').
 
+:- use_module(library(pldoc)).
+:- use_module(library(pldoc/doc_access)).
+:- use_module(library(pldoc/doc_pack)).
 
-:- use_module(pldoc(doc_access)).
-:- use_module(pldoc(doc_pack)).
-:- use_module(pldoc(doc_pack)).
 
 :- meta_predicate hmust(0).
 :- meta_predicate hmust_l(0).
@@ -217,8 +217,9 @@
 :- meta_predicate show_edit_term(0,*,*).
 :- meta_predicate edit1term(0).
 
-ensure_webserver :- thread_property(_,alias('httpd@3020_1')),!.
-ensure_webserver :- on_x_rtrace(http_server(http_dispatch,[ port(3020), workers(16) ])).
+
+ensure_mpred_webserver(Port) :- format(atom(A),'httpd@~w_1',[Port]),(thread_property(_,alias(A)),!.
+ensure_mpred_webserver(Port) :- on_x_rtrace(http_server(http_dispatch,[ port(Port), workers(16) ])).
 
 :- multifile(http_session:session_data/2).
 :- multifile(system:'$loading_file'/3).
@@ -1879,3 +1880,6 @@ pkif :-
 
 
 :- prolog_load_context(source,File),forall(source_file(M:X,File),(functor(X,F,A),export(M:F/A))).
+
+% :- ensure_mpred_webserver(6767).
+

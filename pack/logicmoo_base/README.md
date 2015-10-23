@@ -214,11 +214,14 @@ http_open:do_open(_Version, Code, Comment, _, _, Parts, _, _) :-
 # 9) Cross reference "live code" from the interweb
 
 ````
-?- ensure_loaded(library(logicmoo/logicmoo_base)).
+?- ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
 Yes.
-?- start_logicmoo_www(6767).
+
+?- ensure_mpred_webserver(6767).
 Yes.
 ````
+
+Goto http://logicmoo.org:3020/logicmoo/   Too see this
 
 
 # 10) no_repeats([+Vars,]:Call)
@@ -228,6 +231,25 @@ Yes.
 X = 3, Y = 2 ;
 X = 1, Y = 4 ;
 X = 2, Y = 1.
+````
+
+# 11) loop_check/1-ing via sourcecode location
+
+````
+?- loop_check(Goal).
+````
+
+
+# 12) loop_check/2-ing via sourcecode location
+
+````
+?- loop_check(Goal,true).  % allow inner call to succeed freely
+````
+
+# 13) loop_check/3-ing via a cookie
+
+````
+?- loop_check(Goal,foo(22),fail).
 ````
 
 
