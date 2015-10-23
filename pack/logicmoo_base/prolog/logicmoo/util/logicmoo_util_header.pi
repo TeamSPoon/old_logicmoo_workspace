@@ -1,22 +1,26 @@
 
+/*
+:- multifile((user:term_expansion/2,system:term_expansion/2)).
+:- dynamic((user:term_expansion/2,system:term_expansion/2)).
+:- multifile((user:goal_expansion/2,system:goal_expansion/2)).
+:- dynamic((user:goal_expansion/2,system:goal_expansion/2)).
 
-:- multifile((term_expansion/2,user:term_expansion/2,system:term_expansion/2)).
-:- dynamic((term_expansion/2,user:term_expansion/2,system:term_expansion/2)).
 
 :- multifile
-        % '$pldoc'/4,
+       % '$pldoc'/4,
 	user:portray/1,
 	user:prolog_list_goal/1,
 	user:prolog_predicate_name/2,
 	user:prolog_clause_name/2,
-        logicmoo_util_help:mpred_is_impl_file/1.
+        lmconf:mpred_is_impl_file/1.
 :- dynamic
 	user:portray/1,
-        logicmoo_util_help:mpred_is_impl_file.
+        lmconf:mpred_is_impl_file/1.
 
-:- prolog_load_context(source,F), 
-   once(logicmoo_util_help:mpred_is_impl_file(F);asserta(logicmoo_util_help:mpred_is_impl_file(F))).
-
+:- (current_prolog_flag(xref,true)->true;(prolog_load_context(source,F),
+   initialization((
+   lmconf:mpred_is_impl_file(F)->true;assertz(lmconf:mpred_is_impl_file(F)))))).
+*/
 % ===================================================================
 % Creates a warning if we are in the incorrect context
 % ===================================================================
@@ -50,26 +54,26 @@ add_pack_dir(UpUp):- prolog_load_context(directory,Dir),
    attach_packs.
 */
 
-/*
-% :- use_module(logicmoo_util_first).
-% :- use_module(logicmoo_util_database).
-% :- use_module(logicmoo_util_bugger_catch).
-% :- use_module(logicmoo_util_with_assertions).
-% :- use_module(logicmoo_util_loop_check).
-% :- use_module(logicmoo_util_dmsg).
-% :- use_module(logicmoo_util_bugger).
-% :- use_module(logicmoo_util_ctx_frame).
-% :- use_module(logicmoo_util_filestreams).
-% :- use_module(logicmoo_util_filesystem).
-% :- use_module(logicmoo_util_multivar).
-% :- use_module(logicmoo_util_no_repeats).
-% :- use_module(logicmoo_util_preddefs).
-% :- use_module(logicmoo_util_prolog_frames).
-% :- use_module(logicmoo_util_prolog_streams).
-% :- use_module(logicmoo_util_term_listing).
-% :- use_module(logicmoo_util_terms).
-% :- use_module(logicmoo_util_strings).
-*/
+
+ :- use_module(logicmoo_util_first).
+ :- use_module(logicmoo_util_database).
+ :- use_module(logicmoo_util_bugger_catch).
+ :- use_module(logicmoo_util_with_assertions).
+ :- use_module(logicmoo_util_loop_check).
+ :- use_module(logicmoo_util_dmsg).
+ :- use_module(logicmoo_util_bugger).
+ :- use_module(logicmoo_util_ctx_frame).
+ :- use_module(logicmoo_util_filestreams).
+ :- use_module(logicmoo_util_filesystem).
+ :- use_module(logicmoo_util_multivar).
+ :- use_module(logicmoo_util_no_repeats).
+ :- use_module(logicmoo_util_preddefs).
+ :- use_module(logicmoo_util_prolog_frames).
+ :- use_module(logicmoo_util_prolog_streams).
+ :- use_module(logicmoo_util_term_listing).
+ :- use_module(logicmoo_util_terms).
+ :- use_module(logicmoo_util_strings).
+
 
 
 

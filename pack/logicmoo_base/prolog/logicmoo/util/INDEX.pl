@@ -998,6 +998,10 @@ index((t2ot_0), 2, logicmoo_util_structs, logicmoo_util_structs).
 index((term_to_ord_term), 2, logicmoo_util_structs, logicmoo_util_structs).
 index((to_datatype), 3, logicmoo_util_structs, logicmoo_util_structs).
 index((b_i), 2, logicmoo_util_term_listing, logicmoo_util_term_listing).
+index((use_listing_vars), 0, logicmoo_util_term_listing, logicmoo_util_term_listing).
+index((use_listing_vars), 1, logicmoo_util_term_listing, logicmoo_util_term_listing).
+index((use_xlisting), 0, logicmoo_util_term_listing, logicmoo_util_term_listing).
+index((use_xlisting), 1, logicmoo_util_term_listing, logicmoo_util_term_listing).
 index((bad_pred), 1, logicmoo_util_term_listing, logicmoo_util_term_listing).
 index((blob_info), 3, logicmoo_util_term_listing, logicmoo_util_term_listing).
 index((bookeepingPredicateXRef), 1, logicmoo_util_term_listing, logicmoo_util_term_listing).

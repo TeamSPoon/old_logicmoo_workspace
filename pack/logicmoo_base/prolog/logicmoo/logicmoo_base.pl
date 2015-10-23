@@ -8,16 +8,16 @@
 :- dynamic '$si$':'$was_imported_kb_content$'/2.
 :- discontiguous('$si$':'$was_imported_kb_content$'/2).
 
-:- multifile(logicmoo_util_help:mpred_is_impl_file/1).
-:- dynamic(logicmoo_util_help:mpred_is_impl_file/1).
+:- multifile(lmconf:mpred_is_impl_file/1).
+:- dynamic(lmconf:mpred_is_impl_file/1).
 
 
 % ========================================
 % lmconf:mpred_system_kb/1
 % ========================================
 s
-:- dynamic(lmconf:mpred_system_kb/1).
 :- multifile(lmconf:mpred_system_kb/1).
+:- dynamic(lmconf:mpred_system_kb/1).
 lmconf:mpred_system_kb(baseKB).
 
 
@@ -38,13 +38,13 @@ lmconf:mpred_system_kb(baseKB).
 % DBASE_T System
 % ================================================
 
-:- multifile(logicmoo_util_help:mpred_is_impl_file/1).
-:- dynamic(logicmoo_util_help:mpred_is_impl_file/1).
-logicmoo_util_help:mpred_is_impl_file(mpred/A):-nonvar(A).
+:- multifile(lmconf:mpred_is_impl_file/1).
+:- dynamic(lmconf:mpred_is_impl_file/1).
+lmconf:mpred_is_impl_file(mpred/A):-nonvar(A).
 
 load_mpred_system(Ctx):-  !,Ctx:use_module(logicmoo(mpred/mpred_userkb)).
 load_mpred_system(Ctx):-  lmconf:mpred_system_kb(Sys),
-   with_mutex(mpred_system_mutex,forall(logicmoo_util_help:mpred_is_impl_file(File),     
+   with_mutex(mpred_system_mutex,forall(lmconf:mpred_is_impl_file(File),     
      (( Ctx:use_module(logicmoo_utils), call((Sys:w_tl(t_l:disable_px,Sys:ensure_loaded(File)))))))).
 
 :- export(enable_mpred_system/1).

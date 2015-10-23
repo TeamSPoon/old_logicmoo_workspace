@@ -268,7 +268,7 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 :- initialization(user:attach_packs).
 
 % [Required] Load the Logicmoo Library Utils
-% logicmoo_util_help:mpred_is_impl_file(logicmoo(logicmoo_utils)).
+% lmconf:mpred_is_impl_file(logicmoo(logicmoo_utils)).
 
 :- user:file_search_path(logicmoo,_)-> true; (user:prolog_load_context(directory,Dir),asserta_if_new(user:file_search_path(logicmoo,Dir))).
 

@@ -1,7 +1,180 @@
 # logicmoo_base
 
-Is probably 10 packages... 
- 
+Is probably 50 packages...  (do not try these before 0.0.11)
+
+# Variable names in listing!
+
+````
+dmiles@gitlab:~$ swipl
+Welcome to SWI-Prolog (Multi-threaded, 64 bits, Version 7.3.9)
+Copyright (c) 1990-2015 University of Amsterdam, VU Amsterdam
+SWI-Prolog comes with ABSOLUTELY NO WARRANTY. This is free software,
+and you are welcome to redistribute it under certain conditions.
+Please visit http://www.swi-prolog.org for details.
+For help, use ?- help(Topic). or ?- apropos(Word).
+?- ensure_loaded(library(logicmoo/logicmoo_utils)).
+% /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/logicmoo_utils.pl:157
+% Adding logicmoo/utils to autoload path
+true.
+
+?- listing(ls).
+shell:ls :-
+        ls('.').
+shell:prolog_listing:ls(A) :-
+        name_to_files(A, B),
+        ls_(B).
+
+true.
+?- use_listing_vars.
+true.
+?- listing(ls).
+shell:ls :-
+        ls('.').
+shell:ls(Spec) :-
+        name_to_files(Spec, Matches),
+        ls_(Matches).
+true.
+````
+
+# Less trace button pushing!
+
+
+````
+?- rtrace(member(X,[1,2,3])).
+   Call: (11) [lists] lists:member(_G3260,[1,2,3])
+   Unify: (11) [lists] lists:member(_G3260,[1,2,3])
+   Exit: (11) [lists] lists:member(1,[1,2,3])
+X = 1 ;
+   Redo: (11) [lists] lists:member(_G3260,[1,2,3])
+   Exit: (11) [lists] lists:member(2,[1,2,3])
+X = 2 ;
+   Redo: (11) [lists] lists:member(_G3260,[1,2,3])
+   Exit: (11) [lists] lists:member(3,[1,2,3])
+X = 3.
+
+````
+
+
+# hotrace/1 fixes notrace/1 determinancy!
+
+
+````
+?- notrace(member(X,[1,2,3])).
+X = 1.
+````
+
+Oops it had an implicit once/1
+
+Dont worry..
+
+````
+?- trace,hotrace(member(X,[1,2,3])).
+X = 1 ;
+X = 2 ;
+X = 3.
+[trace]  ?-
+
+````
+
+(Of course it hides the trace just like trace/1)
+
+
+
+# special assertion/1 predicates  must/1, sanity/1, on_x_rtrace/1 for code you are in the middle of writing 
+
+````
+?- must(true).
+true.
+
+?- must(fail).
+% failed(debugOnFailure0('_catch':on_x_debug(user:fail))).
+in_dumptrace(logicmoo_util_bugger_catch:on_x_debug(user:fail))
+% '_catch':on_x_debug(user:fail).
+(0)$[system] '$c_call_prolog'.  no(clause)
+(1)$[plevel] plevel:'$toplevel'.   %  toplevel.pl:515:
+(2)$[plevel] plevel:'$runtoplevel'.   %  toplevel.pl:529:
+(3)$[plevel] plevel:'$query_loop'.   %  toplevel.pl:574:
+(5)*$[plevel] plevel:'$execute_goal2'(user:must(fail),[]).   %  toplevel.pl:811:
+(6)$[plevel] plevel:residue_vars(user:must(fail),[]).   %  toplevel.pl:831:
+(7)[_catch] '_catch':must(user:fail).   %  logicmoo_util_bugger_catch.pl:922:
+(9)$[bugger] bugger:with_each(0,bugger:debugOnFailure0,'_catch':on_x_debug(user:fail)).   %  logicmoo_util_bugger.pl:1270:
+(11)[_catch] '_catch':one_must(bugger:rtraceOnError('_catch':on_x_debug(user:fail)),bugger:debugCallWhy(failed(debugOnFailure0('_catch':on_x_debug(user:fail))),'_catch':on_x_debug(user:fail))).   %  logicmoo_util_bugger_catch.pl:840:
+(14)[dumpst] dumptrace('_catch':on_x_debug(user:fail)).   %  logicmoo_util_dumpst.pl:241:
+(15)[l_dmsg] l_dmsg:with_all_dmsg(dumpst:dumptrace('_catch':on_x_debug(user:fail),103)).   %  logicmoo_util_dmsg.pl:231:
+(16)[rtions] rtions:w_tl(bugger:tl_always_show_dmsg,l_dmsg:w_tl(set_prolog_flag(opt_debug,true),w_tl(bugger:dmsg_match(show,_G38117),dumpst:dumptrace('_catch':on_x_debug(user:fail),103)))).   %  logicmoo_util_with_assertions.pl:70:
+(17)[system] scc(rtions:asserta(bugger:tl_always_show_dmsg,<clause>(0x1768a40)),l_dmsg:w_tl(set_prolog_flag(opt_debug,true),w_tl(bugger:dmsg_match(show,_G38233),dumpst:dumptrace('_catch':on_x_debug(user:fail),103))),rtions:erase(<clause>(0x1768a40))).   %  init.pl:314:
+(18)$[system] sccc(rtions:asserta(bugger:tl_always_show_dmsg,<clause>(0x1768a40)),l_dmsg:w_tl(set_prolog_flag(opt_debug,true),w_tl(bugger:dmsg_match(show,_G38337),dumpst:dumptrace('_catch':on_x_debug(user:fail),103))),_G38309,rtions:erase(<clause>(0x1768a40))).   %  init.pl:310:
+(19)[rtions] rtions:w_tl(l_dmsg:set_prolog_flag(opt_debug,true),l_dmsg:w_tl(bugger:dmsg_match(show,_G38423),dumpst:dumptrace('_catch':on_x_debug(user:fail),103))).   %  logicmoo_util_with_assertions.pl:61:
+(20)[system] scc(rtions:set_prolog_flag(opt_debug,true),rtions: @(w_tl(bugger:dmsg_match(show,_G38518),dumpst:dumptrace('_catch':on_x_debug(user:fail),103)),logicmoo_util_dmsg),rtions: (filter=unUSED->true;set_prolog_flag(opt_debug,filter))).   %  init.pl:314:
+(21)$[system] sccc(rtions:set_prolog_flag(opt_debug,true),rtions: @(w_tl(bugger:dmsg_match(show,_G38604),dumpst:dumptrace('_catch':on_x_debug(user:fail),103)),logicmoo_util_dmsg),_G38582,rtions: (filter=unUSED->true;set_prolog_flag(opt_debug,filter))).   %  init.pl:310:
+(22)$[rtions] rtions: @(w_tl(bugger:dmsg_match(show,_G38667),dumpst:dumptrace('_catch':on_x_debug(user:fail),103)),logicmoo_util_dmsg).  no(clause)
+(23)[rtions] rtions:w_tl(bugger:dmsg_match(show,_G38739),dumpst:dumptrace('_catch':on_x_debug(user:fail),103)).   %  logicmoo_util_with_assertions.pl:70:
+(24)[system] scc(rtions:asserta(bugger:dmsg_match(show,_G38813),<clause>(0x1768a80)),dumpst:dumptrace('_catch':on_x_debug(user:fail),103),rtions:erase(<clause>(0x1768a80))).   %  init.pl:314:
+(25)$[system] sccc(rtions:asserta(bugger:dmsg_match(show,_G38875),<clause>(0x1768a80)),dumpst:dumptrace('_catch':on_x_debug(user:fail),103),_G38862,rtions:erase(<clause>(0x1768a80))).   %  init.pl:310:
+(26)*[dumpst] dumptrace('_catch':on_x_debug(user:fail),103).   %  logicmoo_util_dumpst.pl:253:
+(27)$[_catch] '_catch':hotrace(dumpst:dumpST(500000000)).   %  logicmoo_util_bugger_catch.pl:706:
+(28)[dumpst] dumpST(500000000).   %  logicmoo_util_dumpst.pl:71:
+(29)[_check] '_check':loop_check_early(dumpst:dumpST9(500000000),dumpst:dumpST0(500000000)).   %  logicmoo_util_loop_check.pl:181:
+(30)[_check] '_check':loop_check_term_key(dumpst:dumpST9(500000000),dumpst:dumpST9(500000000),dumpst:dumpST0(500000000)).   %  logicmoo_util_loop_check.pl:189:
+(31)[_check] '_check':loop_check_term(dumpst:dumpST9(500000000),dumpST9(500000000),dumpst:dumpST0(500000000)).   %  logicmoo_util_loop_check.pl:199:
+(32)[system] scc('_check':asserta(mcache:ilc(dumpST9(500000000)),<clause>(0x1768ad0)),dumpst:dumpST9(500000000),'_check':erase(<clause>(0x1768ad0))).   %  init.pl:314:
+(33)$[system] sccc('_check':asserta(mcache:ilc(dumpST9(500000000)),<clause>(0x1768ad0)),dumpst:dumpST9(500000000),_G39134,'_check':erase(<clause>(0x1768ad0))).   %  init.pl:310:
+(34)[dumpst] dumpST9(500000000).   %  logicmoo_util_dumpst.pl:77:
+in_dumptrace(logicmoo_util_bugger_catch:on_x_debug(user:fail))
+% '_catch':on_x_debug(user:fail).
+
+$    = frames normally hidden
+*    = choice points
+scc? = setup_call_cleanup
+r    = run again unleashed
+
+````
+
+
+# wt_l/2 With Thread Local
+
+````
+?- w_tl((doit:-dmsg("hi")),doit).
+% "hi".
+true.
+````
+
+Even changes and restores non locals like..
+
+````
+?- w_tl(prolog_flag(xref,true),...).
+
+?- w_tl(op(0,xfx,'@'), consult(file_that_dont_like_op)).
+
+````
+
+Comment your output with in_cmt/1 macro
+
+````
+?- in_cmt(listing(in_cmt)).
+% :- meta_predicate logicmoo_util_dmsg:in_cmt(0).
+%
+% logicmoo_util_dmsg:in_cmt(Call) :-
+%       call_cleanup(prepend_each_line('% ', Call), format('~N', [])).
+true.
+````
+
+Use Jan's newly add prolog streams 
+
+````
+
+?- with_output_to_pred(print_as_html_pre,
+    (writeln("hi there"),writeln("how are you?"))).
+
+<pre>hi there
+</pre>
+<pre>how are you?
+</pre>
+
+
+````
+
+
 
 # Forward chaining macros create smaller self-maintaining codebase.
 

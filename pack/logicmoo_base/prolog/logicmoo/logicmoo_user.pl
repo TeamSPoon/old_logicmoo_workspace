@@ -47,7 +47,7 @@ m1:- gripe_time(40,ensure_loaded(logicmoo(mpred_online/mpred_www))),if_defined(m
 :- set_prolog_flag(verbose_autoload,false).
 :- set_prolog_flag(verbose_load,true).
 m9   :-asserta_if_new((user:term_expansion(I,O):- lmbase_expansion(term,user,I,O))).
-%m31 :-   (F = mpred/_),foreach(must(logicmoo_util_help:mpred_is_impl_file(F)),must_det_l((dmsg(list_file_preds(F)),ensure_loaded(F),export_file_preds(F),list_file_preds(F)))).
+%m31 :-   (F = mpred/_),foreach(must(lmconf:mpred_is_impl_file(F)),must_det_l((dmsg(list_file_preds(F)),ensure_loaded(F),export_file_preds(F),list_file_preds(F)))).
 %m32:- rtrace(ensure_mpred_system).
 m33:- must(filematch_ext(['',mpred,ocl,moo,plmoo,pl,plt,pro,p,'pl.in',pfc,pfct],logicmoo_user:pfc/mpred,W)),dmsg(W),!.
 

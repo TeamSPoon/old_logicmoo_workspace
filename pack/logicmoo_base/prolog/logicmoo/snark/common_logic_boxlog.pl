@@ -2,29 +2,59 @@
 /*
 
 modes of compile for (H:-B) are 
- fwc,  = pfc(forward)chain
- bwc,  = pfc(backwards)memoization
- cwc,  = prolog (static or dynamic depending on built_in status)
+ cwc,  = prolog's default (static or dynamic depending on built_in status)
+ fwc,  = pfc(forward)chain  B==>-
+ bwc,  = pfc(backwards)memoization 
  pttp, = pttp iterative deepening
  dra,  = dynamic reording of alternatives (Solid tabling)
+ other(_) Extendable
 
 File mode interpretation (LHS=>RHS) are 
- clif  = Common Logic Interchange Format
- cycl  = CycL
- kif   = Knowledge Interchange Format
+ pl    = Prolog (thus no re-interpretation)
  pfc   = Prolog Forward Chaining
-
-
+ clif  = Common Logic Interchange Format
+ cycl  = CycL 
+ kif   = Knowledge Interchange Format
+ chr   = CHR mode
+ 
 additional features that may be added/manipulated in the body
- ctx
+ ctx 
  lin = argument linearization  via  linearize(lin,(H:-(G,B)),(HH:-BB),[],_,true,G).
- no_repeats (on head vars)
- no_repeats (on body vars)
+ no_repeats/2 (on head vars)
+ no_repeats/2 (on body vars)
  body reording
- unbound argument type containing
- argument typing on exit
+ proof recording
+ variable lifespans are "depth minimized"
+ unbound argument type constaining typing on
+     entry
+     exit
+
+Per-Litteral features
+ t(Pred,Arg1,Arg2,Arg3,...)
+ t(Pred,Arg1,Arg2,Arg3,...,+Ctx)
+ i_c(isa,inst,col)
+ c_c(genls,col1,col2)
+ p_p(genlPreds,inst,col)
+ p_c_c(relationalAllExists...)
+ p_c_u(relationalAllInstance...)
+ p_c_c(relationalAllAll...)  
+
+ u = any
+ i = instances like MTs and people
+ s = strings
+ g = formulas
+ l = lists
+ n = numbers
+ z = specials like 
+ p = preds
+ c = collections
+
+ asserted_
+ impossible_
+ beliefs_
 
 */
+
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_boxlog.pl
 :- module(common_logic_boxlog,
           [ avoidHeadLoop/2,

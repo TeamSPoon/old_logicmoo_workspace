@@ -483,23 +483,23 @@ maybe_scan_source_files_for_varnames.
 scan_source_files_for_varnames:- 
  set_prolog_flag(mpred_vars, true),
  ensure_loaded(library(make)),
- forall(make:modified_file(F),retractall(varname_cache:varname_info_file(F))),
- forall(source_file(F),read_source_file_vars(F)),!.
+ doall((make:modified_file(F),retractall(varname_cache:varname_info_file(F)))),
+ doall((source_file(F),read_source_file_vars(F))),!.
 
 dcall_if_verbose(G):-!, notrace(G).
 dcall_if_verbose(G):-show_call(why,G).
 
+%  list_undefined([module_class([user,system,library,test,development])]).
 :- dynamic(varname_cache:varname_info_file/1).
-read_source_file_vars(_):- \+ prolog_flag(mpred_vars, true),!.
+read_source_file_vars(_):- ( \+ current_prolog_flag(mpred_vars, true)),!.
 read_source_file_vars(F):- \+ ((atom(F),exists_file(F))),!, forall(filematch(F,E),read_source_file_vars(E)).
 read_source_file_vars(F):- clause_asserted(varname_cache:varname_info_file(F)),!.
-read_source_file_vars(F):- asserta(varname_cache:varname_info_file(F,Ref)), catch(dcall_if_verbose(read_source_file_vars_1(F)),E,(dmsg(E),erase(Ref))).
+read_source_file_vars(F):- asserta(varname_cache:varname_info_file(F,Ref)), catch((read_source_file_vars_1(F)),E,(dmsg(E),erase(Ref))).
 
 save_file_source_vars(_F,end_of_file,_Vs):-!.
 save_file_source_vars(_F,_T,[]):-!.
 save_file_source_vars(F,T,Vs):- b_setval('$variable_names',Vs),!,w_tl(t_l:current_why_source(F),save_clause_vars(T,Vs)),!.
 
-:- if(true).
 
 read_source_vars(File,In):-
 	repeat,
@@ -520,7 +520,7 @@ read_source_vars(File,In):-
 
 % new method
 read_source_file_vars_1(File):-
-   current_prolog_flag(xref, Was),
+   once(current_prolog_flag(xref, Was);Was=false),
    set_prolog_flag(xref, true),
 	setup_call_cleanup(
 	    prolog_open_source(File, In),
@@ -528,26 +528,7 @@ read_source_file_vars_1(File):-
 	    (prolog_close_source(In),
             current_prolog_flag(xref, Was))),!.
 
-:- else.
 
-% old method
-read_source_file_vars_1(F):- 
-   catch(((setup_call_cleanup(open(F,S),read_vars_until_oes(F,S),close(S)))),E,(dmsg(E),throw(E))).
-
-read_vars_until_oes(_,S):-at_end_of_stream(S),!.
-read_vars_until_oes(F,S):- repeat,catch(once(read_vars_until_oes_1(F,S)),E,ddmsg(E)),at_end_of_stream(S).
-
-eat_to_term(S):-repeat, \+ eat_to_term_1(S).
-eat_to_term_1(S):-peek_char(S,W),char_type(W,white),get_char(S,_),!.
-eat_to_term_1(S):-line_count(S,C),C=1,peek_char(S,'#'),read_line_to_codes(S,_),!.
-
-read_vars_until_oes_1(_,S):- eat_to_term(S).
-read_vars_until_oes_1(F,S):-
-   line_count(S,C),
-   read_term(S,T,[variable_names(Vs)]),   
-   save_file_source_vars(F:C,T,Vs).
-
-:- endif.
 
 
 

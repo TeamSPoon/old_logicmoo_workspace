@@ -13,6 +13,10 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_term_listing.pl
 :- module(logicmoo_util_term_listing,
           [ b_i/2,
+          use_listing_vars/0,
+          use_listing_vars/1,
+          use_xlisting/0,
+          use_xlisting/1,
             bad_pred/1,
             blob_info/3,
             bookeepingPredicateXRef/1,
@@ -391,7 +395,8 @@ contains_term_unifiable(SearchThis,Find):-compound(SearchThis),functor_safe(Sear
 xlisting([]):-!,listing.
 xlisting(Match):- \+ \+ t_l:no_xlisting(Match),!.
 xlisting(Match):- scan_source_files_for_varnames,is_list(Match),!,maplist(xlisting,Match).
-xlisting(Match):- t_l:in_prolog_listing(Match),!,findall(PI,to_pi(Match,PI),SkipPI),!,mpred_match_listing_skip_pi(Match,[_:varname_info(_,_,_,_)|SkipPI]),!.
+xlisting(Match):- t_l:in_prolog_listing(Match),!,findall(PI,to_pi(Match,PI),SkipPI),!,
+  mpred_match_listing_skip_pi(Match,[_:varname_info(_,_,_,_)|SkipPI]),!.
 xlisting(f(Match)):- !,xlisting_inner(portray_hbr,Match,[_:varname_info(_,_,_,_)]),!.
 
 xlisting(Match):- mpred_match_listing_skip_pi(Match,[]),!. % ,w_tl(t_l:no_xlisting(Match),plisting(Match)),!.
@@ -401,7 +406,8 @@ xlisting(Match):- mpred_match_listing_skip_pi(Match,[]),!. % ,w_tl(t_l:no_xlisti
 :- export(plisting/1).
 :- module_transparent(plisting/1).
 plisting(Match):- w_tl(t_l:no_xlisting(Match),logicmoo_util_term_listing:plisting_0(Match)).
-plisting_0(Match):- findall(G,to_pi(Match,G),Gs),forall(member(H,Gs),ignore((synth_clause_for(H,B,R,_SIZE,SYNTH),SYNTH,once(portray_hbr(H,B,R)),fail))).
+plisting_0(Match):- findall(G,to_pi(Match,G),Gs),
+  forall(member(H,Gs),ignore((synth_clause_for(H,B,R,_SIZE,SYNTH),SYNTH,once(portray_hbr(H,B,R)),fail))).
 
 
 :- export(mpred_match_listing/1).
@@ -445,7 +451,7 @@ user:prolog_list_goal(Goal):- cnotrace(xlisting(Goal)). % writeq(hello(prolog_li
 :- thread_local(tlbugger:no_buggery_tl/0).
 :- dynamic(lmconf:no_buggery/0).
 
-buggery_ok :- \+ compiling, current_predicate(logicmoo_bugger_loaded/0), \+ lmconf:no_buggery, \+ tlbugger:no_buggery_tl.
+buggery_ok :- \+ compiling, current_predicate(_:logicmoo_bugger_loaded/0), \+ lmconf:no_buggery, \+ tlbugger:no_buggery_tl,!.
 
 
 :- multifile((synth_clause_for/5)).
@@ -735,70 +741,61 @@ make_headkey(H,NK):-copy_term(H,NK),numbervars(NK),!.
 
 pp_listing(Pred):- functor_safe(Pred,F,A),functor_safe(FA,F,A),findall(NV,predicate_property(FA,NV),LIST),dmsg((pp(Pred):-LIST)),nl,listing(FA).
 
-:- ensure_loaded(library(listing)).
-
-:- if(fail).
-:- redefine_system_predicate(prolog_listing:list_clauses/2).
-:- abolish(prolog_listing:list_clauses/2).
-
-prolog_listing:list_clauses(Pred, Source) :-
-	strip_module(Pred, Module, Head),
-	(   clause(Pred, Body),
-	    write_module(Module, Source, Head), portray_clause((Head:-Body)),
-	    fail
-	;   true
-	).
-
-write_module(Module, Context, Head) :-
-	hide_module(Module, Context, Head), !.
-write_module(Module, _, _) :-
-	format('~q:', [Module]).
-
-hide_module(system, Module, Head) :-
-	predicate_property(Module:Head, imported_from(M)),
-	predicate_property(system:Head, imported_from(M)), !.
-hide_module(Module, Module, _) :- !.
 
 
-pi_to_head(M:PI, M:Head) :- !,
-	pi_to_head(PI, Head).
-pi_to_head(Name/Arity, Head) :- !,
+pi_to_head_l(M:PI, M:Head) :- !,
+	pi_to_head_l(PI, Head).
+pi_to_head_l(Name/Arity, Head) :- !,
 	functor(Head, Name, Arity).
-pi_to_head(Name//DCGArity, Term) :-
+pi_to_head_l(Name//DCGArity, Term) :-
 	Arity is DCGArity+2,
 	functor(Term, Name, Arity).
-pi_to_head(Head, Head).
+pi_to_head_l(Head, Head).
 
-:- endif.
 
-:- set_prolog_flag(xlisting,false).
+use_xlisting:- use_xlisting(true).
+use_xlisting(TF):- set_prolog_flag(xlisting,TF).
+use_listing_vars:- use_listing_vars(true),scan_source_files_for_varnames.
+use_listing_vars(TF):-set_prolog_flag(listing_vars,TF).
 
 % :- use_module(logicmoo_util_bugger).
 
 
 :- thread_local t_l:in_prolog_locate_clauses/1.
-:- multifile prolog:locate_clauses/2.
 
 :- multifile(lmconf:hook_mpred_listing/1).
 :- dynamic(lmconf:hook_mpred_listing/1).
 
-prolog:locate_clauses(A, OutOthers) :-  
- '@'((
- current_prolog_flag(xlisting,true),
+% Hook that prints additional information about source code
+:- multifile prolog:locate_clauses/2.
+prolog:locate_clauses(A, OutOthers) :- 
+ buggery_ok,
  ( \+ t_l:in_prolog_locate_clauses(A)),
  w_tl(t_l:in_prolog_locate_clauses(A),
- logicmoo_utils:
- ((  
-   current_predicate(logicmoo_bugger_loaded/0),
-   predicate_property(lmconf:hook_mpred_listing(A),number_of_clauses(C)),C>0,
-   buggery_ok,
-   w_tl(t_l:in_prolog_listing(A), 
-     doall(call_no_cuts(lmconf:hook_mpred_listing(A)))),!,
-
-   ((prolog:locate_clauses(A, OutOthers)->true;
-      ( %  catch(user:'$find_predicate'(A, Preds),E,(throw(E);Preds=[])),
-        match_predicates(A,Preds),
-       (Preds==[]->OutOthers=[];fail)))))))),'user').
+ (       
+   w_tl(t_l:in_prolog_listing(A),
+    ( 
+    ignore((predicate_property(lmconf:hook_mpred_listing(A),number_of_clauses(C)),C>0,
+      current_prolog_flag(xlisting,true),doall(call_no_cuts(lmconf:hook_mpred_listing(A))))),    
+   prolog:locate_clauses(A, OutOthers))))),!.
 
 
-% :- use_module(logicmoo_util_bugger).
+% Replacement that prints variables in source code
+prolog_listing_list_clauses(Pred, Source) :-
+       (current_prolog_flag(listing_vars,true)->scan_source_files_for_varnames;true),
+	strip_module(Pred, Module, Head),
+	(   clause(Pred, Body),
+           once(current_prolog_flag(listing_vars,true)->get_clause_vars_copy((Pred:-Body),ForPrint);(ForPrint=((Pred:-Body)),prolog_listing:write_module(Module, Source, Head))),	     
+            prolog_listing:portray_clause(ForPrint),
+	    fail
+	;   true
+	).
+
+
+:- if(true).
+:- ensure_loaded(library(listing)).
+:- redefine_system_predicate(prolog_listing:list_clauses/2).
+:- abolish(prolog_listing:list_clauses/2).
+prolog_listing:list_clauses(Pred, Source):- prolog_listing_list_clauses(Pred, Source).
+:- endif.
+

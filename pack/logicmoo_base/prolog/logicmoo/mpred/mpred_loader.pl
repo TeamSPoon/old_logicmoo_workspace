@@ -1024,7 +1024,7 @@ make_dynamic(C):- compound(C),get_functor(C,F,A),must(F\=='$VAR'),
   ( \+predicate_property(P,_) -> dynamic(F/A) ; (predicate_property(P,dynamic)->true;dynamic_safe(P))),!,
   must((predicate_property(P,dynamic))).
 
-% once(logicmoo_util_help:mpred_is_impl_file(F);asserta(logicmoo_util_help:mpred_is_impl_file(F))).
+% once(lmconf:mpred_is_impl_file(F);asserta(lmconf:mpred_is_impl_file(F))).
 
 %user:goal_expansion(G,OUT):- \+  t_l:disable_px, G\=isa(_,_),(use_was_isa(G,I,C)),!,to_isa_out(I,C,OUT).
 %user:term_expansion(G,OUT):- \+  t_l:disable_px, hotrace(use_was_isa(G,I,C)),!,to_isa_out(I,C,OUT).

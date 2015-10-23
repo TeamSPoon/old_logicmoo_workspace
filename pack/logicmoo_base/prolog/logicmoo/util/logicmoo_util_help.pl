@@ -239,15 +239,15 @@ predicate_decl_module(Pred,RM):-current_predicate(_,RM:Pred),\+ predicate_proper
 
 :- style_check(-singleton).
 
-:- dynamic(logicmoo_util_help:mpred_is_impl_file/1).
-:- multifile(logicmoo_util_help:mpred_is_impl_file/1).
-:- volatile(logicmoo_util_help:mpred_is_impl_file/1).
+:- dynamic(lmconf:mpred_is_impl_file/1).
+:- multifile(lmconf:mpred_is_impl_file/1).
+:- volatile(lmconf:mpred_is_impl_file/1).
 
 :- if(false).
 :- else.
 :- endif.
 
-write_modules:- forall(logicmoo_util_help:mpred_is_impl_file(F),(export_file_preds(F),list_file_preds(F))).
+write_modules:- forall(lmconf:mpred_is_impl_file(F),(export_file_preds(F),list_file_preds(F))).
 
 
 
@@ -275,11 +275,11 @@ export_module_preds:- source_context_module(M),source_file_property(S,module(M))
 name_modes(ModeAs:NameAs,ModeAs,NameAs).
 
 
-:- dynamic(logicmoo_util_help:mpred_is_impl_file/1).
-:- multifile(logicmoo_util_help:mpred_is_impl_file/1).
-:- volatile(logicmoo_util_help:mpred_is_impl_file/1).
+:- dynamic(lmconf:mpred_is_impl_file/1).
+:- multifile(lmconf:mpred_is_impl_file/1).
+:- volatile(lmconf:mpred_is_impl_file/1).
 
-target_module(P,M):-mpred_source_file(P,F),logicmoo_util_help:mpred_is_impl_file(F),make_module_name(F,M).
+target_module(P,M):-mpred_source_file(P,F),lmconf:mpred_is_impl_file(F),make_module_name(F,M).
 
 make_file_help(F):- \+((atom(F),exists_file(F))),!,forall(filematch(F,S),make_file_help(S)).
 
@@ -414,7 +414,7 @@ mpred_prolog_only_module(t_l).
 mpred_prolog_only_module(tlbugger).
 mpred_prolog_only_module(lmcache).
 mpred_prolog_only_module(lmconf).
-mpred_prolog_only_module(M):- logicmoo_util_help:mpred_is_impl_file(F),make_module_name(F,M).
+mpred_prolog_only_module(M):- lmconf:mpred_is_impl_file(F),make_module_name(F,M).
 mpred_prolog_only_module(M):- current_module(M),atom_concat(logicmoo_utils_,_,M).
 % mpred_prolog_only_module(user). 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).

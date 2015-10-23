@@ -35,9 +35,9 @@
 % :- lmconf:mpred_system_kb(_)->true;('$module'(M,M),asserta(lmconf:mpred_system_kb(M))).
 
 
-:- dynamic(logicmoo_util_help:mpred_is_impl_file/1).
-:- multifile(logicmoo_util_help:mpred_is_impl_file/1).
-:- volatile(logicmoo_util_help:mpred_is_impl_file/1).
+:- dynamic(lmconf:mpred_is_impl_file/1).
+:- multifile(lmconf:mpred_is_impl_file/1).
+:- volatile(lmconf:mpred_is_impl_file/1).
 
 
 */
