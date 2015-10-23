@@ -211,6 +211,7 @@ http_open:do_open(_Version, Code, Comment, _, _, Parts, _, _) :-
                     context(_, status(Code, Comment)))).
 
 .....
+````
 
 # 9) Cross reference "live code" from the interweb (uses varnames to)
 
