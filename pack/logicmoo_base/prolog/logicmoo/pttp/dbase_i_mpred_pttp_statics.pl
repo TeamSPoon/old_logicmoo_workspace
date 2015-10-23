@@ -2,7 +2,8 @@
 :- module(mpred_pttp_static,[]).
 :- endif.
 
-:- ensure_loaded(logicmoo(mpred/'mpred_header.pi')).
+:- use_module(library(logicmoo/logicmoo_base)).
+:- use_module(logicmoo(mpred/'mpred_header.pi')).
 
 :- 
  %swi_module(mpred_pttp_statics,[ 

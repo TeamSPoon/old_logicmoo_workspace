@@ -192,6 +192,11 @@
 %=%    r(sk1(X)):- p(X).
 %=%    q(X,sk1(X)):- p(X).
 
+:- use_module(library(logicmoo/logicmoo_base)).
+:- include(logicmoo(mpred/'mpred_header.pi')).
+:- dynamic user:file_search_path/2.
+:- multifile user:file_search_path/2.
+:- prolog_load_context(source,File),file_directory_name(File,Dir),directory_file_path(_,Short,Dir),asserta_if_new(user:file_search_path(Short,Dir)).
 
 
 :- op(500,fx,'~').
@@ -215,12 +220,7 @@
 % so they must be explicitly placed in the user namespace
 
 
-:- dynamic user:file_search_path/2.
-:- multifile user:file_search_path/2.
-:- prolog_load_context(directory,Dir),asserta(user:file_search_path(snark,Dir)).
 
-
-:- include(logicmoo(mpred/'mpred_header.pi')).
 % :- use_module(logicmoo(pttp/dbase_i_mpred_pttp_testing)). 
 % :- use_module(logicmoo(pttp/dbase_i_mpred_pttp)). 
 

@@ -281,7 +281,7 @@ hmust_l(G):-G.
 :- endif.
 :- use_module(library(prolog_xref)).
 
-
+:- use_module(library(logicmoo/logicmoo_base)).
 :- include(logicmoo(mpred/'mpred_header.pi')).
 
 % WANT 

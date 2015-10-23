@@ -12,8 +12,8 @@
 %%% 
 %%% 
 
-% :- '@'(ensure_loaded('../../src_lib/logicmoo_util/logicmoo_util_all'),user).
-:- ensure_loaded(logicmoo(mpred/'mpred_header.pi')).
+:- use_module(library(logicmoo/logicmoo_base)).
+:- use_module(logicmoo(mpred/'mpred_header.pi')).
 :- ensure_loaded(dbase_i_mpred_pttp).
 
 :- was_shared_multifile(pttp_test/2).
