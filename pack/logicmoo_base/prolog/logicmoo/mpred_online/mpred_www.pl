@@ -1432,7 +1432,7 @@ put_string(A,B):- t_l:print_mode(html),!,
 
 put_string(A,B):- put_string0(A,B).
 
-% :-start_rtrace.
+% :-rtrace.
 put_string0([], Q) :-
 	put(Q).
 put_string0([Q|T], Q) :- !,

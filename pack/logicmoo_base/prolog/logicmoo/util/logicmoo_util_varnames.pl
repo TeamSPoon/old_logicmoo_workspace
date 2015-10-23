@@ -434,7 +434,7 @@ imploded_copyvars(C,CT):-vmust((logicmoo_util_bugger_catch:source_variables(Vs),
 check_varnames(Vs):-var(Vs),!.
 check_varnames([]):-!.
 check_varnames([N=V|Vs]):-atom(N),var(V),!,check_varnames(Vs).
-check_varnames(Term):- contains_badvarnames(Term),!,dumpST0,trace,stop_rtrace,trace,!,dtrace(contains_badvarnames(Term)).
+check_varnames(Term):- contains_badvarnames(Term),!,dumpST0,trace,nortrace,trace,!,dtrace(contains_badvarnames(Term)).
 check_varnames(_).
 
 :-meta_predicate(snumbervars4(0,?,?,?)).

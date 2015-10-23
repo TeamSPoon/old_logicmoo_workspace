@@ -138,7 +138,7 @@ true.
 Even changes and restores non locals like..
 
 ````
-?- w_tl(prolog_flag(xref,true),...).
+?- w_tl(set_prolog_flag(xref,true),...).
 
 ?- w_tl(op(0,xfx,'@'), consult(file_that_dont_like_op)).
 
@@ -158,7 +158,6 @@ true.
 # 7) Use Jan's newly add prolog streams 
 
 ````
-
 ?- with_output_to_pred(print_as_html_pre,
     (writeln("hi there"),writeln("how are you?"))).
 
@@ -166,7 +165,6 @@ true.
 </pre>
 <pre>how are you?
 </pre>
-
 ````
 
 

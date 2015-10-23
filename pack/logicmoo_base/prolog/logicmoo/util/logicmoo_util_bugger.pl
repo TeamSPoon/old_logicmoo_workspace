@@ -69,7 +69,6 @@
             functor_h0/3,
             functor_source_file/5,
             functor_source_file0/5,
-            
             gftrace/0,
             gftrace/1,
             ggtrace/0,
@@ -425,8 +424,6 @@
         shrink_clause/2,
         shrink_clause/3,
         singletons/1,
-        start_rtrace/0,
-        stop_rtrace/0,
         test_for_release/1,
         test_for_release_problems/1,
         thread_local_leaks/0,
@@ -608,7 +605,7 @@ define_if_missing(system:atomics_to_string/2, [
   ( system:atomics_to_string(List, String):- new_a2s(List, '', String) ) ]).
 
 new_a2s(List, Separator, String):-catchvv(new_a2s0(List, Separator, String),_,((trace,new_a2s0(List, Separator, String)))).
-new_a2s0(List, Separator, String):- debug,
+new_a2s0(List, Separator, String):-
  (atomic(String) -> (string_to_atom(String,Atom),concat_atom(List, Separator, Atom));
      (concat_atom(List, Separator, Atom),string_to_atom(String,Atom))).
 

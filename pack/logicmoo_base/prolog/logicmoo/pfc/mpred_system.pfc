@@ -179,7 +179,7 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
 % (neg(P)/mpred_non_neg_literal(P) ==> ( {mpred_rem(P)}, (\+P ))).
 (neg(P)/mpred_non_neg_literal(P) ==> \+P ).
 
-%:- start_rtrace.
+%:- rtrace.
 (P/mpred_non_neg_literal(P) ==> (\+neg(P))).
 % a pretty basic conflict.
 %(neg(P)/mpred_non_neg_literal(P), P) ==> conflict(neg(P)).
@@ -229,7 +229,7 @@ arity(genlPreds,2).
 
 prologBuiltin(resolveConflict/1,mpred_module(baseKB)).
 prologBuiltin(mpred_select/2,mpred_module(lmconf)).
-%:-start_rtrace.
+%:-rtrace.
 prologBuiltin(agent_text_command/4,prologDynamic).
 %tPred(t,prologDynamic).
 
@@ -546,11 +546,11 @@ fooBar.
 
 :- mpred_test(fooBar).
 
-%:- start_rtrace.
+%:- rtrace.
 neg(fooBar).
 
 :- mpred_test(\+fooBar).
-%:- stop_rtrace.
+%:- nortrace.
 
 :- mpred_no_spy_all.
 :- endif. % load_time_sanity
@@ -562,7 +562,7 @@ neg(fooBar).
 
 
 
-%:-start_rtrace.
+%:-rtrace.
 (tCol(Inst), {isa_from_morphology(Inst,Type)}) ==> (isa(Inst,Type)).
 
 % HOW TO MAKE THIS FAST?  isa(Inst,Type) <= {isa_from_morphology(Inst,Type)}.
@@ -638,7 +638,7 @@ ttPredType(Prop)==>tCol(Prop).
 %:-add_slow(((arity(Pred,2),argIsa(Pred,2,Col)/(is_ftNonvar(Pred),Col\=ftTerm,tSet(Col)),t(Pred,_,Arg)/is_ftNonvar(Arg)) ==> t(Col,Arg))).
 %(((P/(has_functor(P),get_functor(P,F,A),A\=2,\+prologSideEffects(F),mpred_literal(P)) ==> {lmconf:agenda_slow_op_enqueue(deduceEachArgType(P))}))).
 
-% :-start_rtrace.
+% :-rtrace.
 
 ((P/is_ftNonvar(P),{functor(P,F,A),\+ mpred_connective(F), A>1}) ==> {lmconf:agenda_slow_op_enqueue(must(ignore(deduceEachArgType(P))))}).
 % tCol(Col) <==> isa(Col,tCol).
@@ -837,7 +837,7 @@ argIsa(Prop,N,Type),{number(N)},ttFormatType(Type) ==> argQuotedIsa(Prop,N,Type)
 :- was_export(mtForPred/2).
 
 /*
-:- start_rtrace.
+:- rtrace.
 :- debug,trace,baseKB:(kb_dynamic(baseKB:(argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, 
     isa/2,  genls/2, pddlSomethingIsa/2, 
     resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, 

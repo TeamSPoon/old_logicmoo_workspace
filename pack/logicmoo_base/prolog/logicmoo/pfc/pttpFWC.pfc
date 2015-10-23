@@ -57,7 +57,7 @@
 c.
 
 :- mpred_test(ain(a ==> b)).
-% :- start_rtrace,trace.
+% :- rtrace,trace.
 a.
 
 :- listing(basePFC:_).

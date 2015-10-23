@@ -88,11 +88,13 @@ add_library_search_path(Path,Masks):-
 lmconf:logicmoo_pre_release.
 
 :- if(lmconf:logicmoo_pre_release).
+/*
 :- set_prolog_flag(report_error,true),set_prolog_flag(debug_on_error,true),set_prolog_flag(debug, true).
 :- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(100000)]).
 :- set_prolog_flag(backtrace_show_lines, true).
 :- set_prolog_flag(debugger_show_context,true).
 :- set_prolog_flag(verbose_load,true).
+*/
 
 :- if(current_prolog_flag(gui,true)).
 % :- guitracer.

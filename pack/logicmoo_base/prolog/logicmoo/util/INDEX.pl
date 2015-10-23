@@ -61,9 +61,8 @@ index((maplist_safe), 2, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch)
 index((maplist_safe), 3, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
 index((module_functor), 4, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
 index((motrace), 1, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
+index((rtrace), 0, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
 index((nortrace), 0, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
-index((start_rtrace), 0, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
-index((stop_rtrace), 0, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
 index((ftrace), 1, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
 index((save_guitracer), 0, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
 index((restore_guitracer), 0, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
@@ -76,6 +75,9 @@ index((trace_or_throw), 1, logicmoo_util_bugger_catch, logicmoo_util_bugger_catc
 index((traceafter_call), 1, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
 index((restore_guitracer), 0, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
 index((restore_trace), 1, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
+index((restore_trace), 2, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
+index((push_tracer), 0, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
+index((pop_tracer), 0, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
 index((must), 1, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
 index((must_det), 1, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
 index((must_det), 2, logicmoo_util_bugger_catch, logicmoo_util_bugger_catch).
