@@ -2,7 +2,7 @@
 
 Is probably 50 packages...  (do not try these before 0.0.11)
 
-# Variable names in listing!
+# 1) Variable names in listing!
 
 ````
 dmiles@gitlab:~$ swipl
@@ -36,7 +36,7 @@ shell:ls(Spec) :-
 true.
 ````
 
-# Less trace button pushing!
+# 2) Less trace button pushing!
 
 
 ````
@@ -55,7 +55,7 @@ X = 3.
 ````
 
 
-# hotrace/1 fixes notrace/1 determinancy!
+# 3) hotrace/1 fixes notrace/1 determinancy!
 
 
 ````
@@ -80,7 +80,7 @@ X = 3.
 
 
 
-# special assertion/1 predicates  must/1, sanity/1, on_x_rtrace/1 for code you are in the middle of writing 
+# 4) special assertion/1 predicates  must/1, sanity/1, on_x_rtrace/1 for code you are in the middle of writing 
 
 ````
 ?- must(true).
@@ -131,7 +131,7 @@ r    = run again unleashed
 ````
 
 
-# wt_l/2 With Thread Local
+# 5) wt_l/2 With Thread Local
 
 ````
 ?- w_tl((doit:-dmsg("hi")),doit).
@@ -148,7 +148,7 @@ Even changes and restores non locals like..
 
 ````
 
-Comment your output with in_cmt/1 macro
+# 6) Comment your output with in_cmt/1 macro
 
 ````
 ?- in_cmt(listing(in_cmt)).
@@ -159,7 +159,7 @@ Comment your output with in_cmt/1 macro
 true.
 ````
 
-Use Jan's newly add prolog streams 
+# 7) Use Jan's newly add prolog streams 
 
 ````
 
@@ -173,18 +173,33 @@ Use Jan's newly add prolog streams
 
 
 ````
+# (8)-(45) .....
 
 
 
-# Forward chaining macros create smaller self-maintaining codebase.
+# (46) Defining new Forward chaining/backchaining rules..
 
-Prolog, like most logic programming languages, offers depth first backward chaining as the only reasoning scheme. It is well known that sound and complete reasoning systems can be built using either exclusive backward chaining or exclusive forward chaining. Thus, this is not a theoretical problem. It is also well understood how to ``implement'' forward reasoning using an exclusively backward chaining system and vice versa. Thus, this need not be a practical problem. In fact, many of the logic-based languages developed for AI applications allow one to build systems with both forward and backward chaining rules.
-There are, however, some interesting and important issues which need to be addresses in order to provide the Prolog programmer with a practical, efficient, and well integrated facility for forward chaining.
+````
+spouse(X,Y) ==> spouse(Y,X).
+gender(P,male) <==> male(P).
+gender(P,female) <==> female(P).
+````
 
-This module uses such a facility, written by Tim Finin called PFC, which he has implemented in standard Prolog. The PFC system is a package that provides a forward reasoning capability to be used together with conventional Prolog programs. The PFC inference rules are Prolog terms which are asserted as facts into the regular Prolog database.
+# (47) Defining new Genral Infernce rules..
 
-The PFC system package provides a forward reasoning capability to be used together with conventional Prolog programs. The PFC inference rules are Prolog terms which are asserted as clauses into the regular Prolog database. When new facts or forward reasoning rules are added to the Prolog database (via a special predicate pfc_add/1, forward reasoning is triggered and additional facts that can be deduced via the application of the forward chaining rules are also added to the database. A simple justification-based truth-maintenance system is provided as well as simple predicates to explore the resulting proof trees.   Additionally this module provides the user with various methods for trying out new techniques of backwards chaining without rewriting their code.
+````
+parent(X,Y),female(X) <=> mother(X,Y).
+parent(X,Y),parent(Y,Z) => grandparent(X,Z).
+grandparent(X,Y),male(X) <=> grandfather(X,Y).
+grandparent(X,Y),female(X) <=> grandmother(X,Y).
+mother(Ma,Kid),parent(Kid,GrandKid)
+      =>grandmother(Ma,GrandKid).
+grandparent(X,Y),female(X) <=> grandmother(X,Y).
+parent(X,Y),male(X) <=> father(X,Y).
+mother(Ma,X),mother(Ma,Y),{X\==Y}
+     =>sibling(X,Y).
 
+````
 
 
 # First Order Logic (FOL) declarations in Prolog source code. 
@@ -231,26 +246,16 @@ is_entailed/1: Detects if an Horn Clause (or fact) is holograpically existing. E
 Pfc includes a special kind of backward chaining rule which is used to generate all possible solutions to a goal that is sought in the process of forward chaining.     
 
 
-# Defining new Forward chaining/backchaining rules..
+# Forward chaining macros create smaller self-maintaining codebase.
 
-````
-spouse(X,Y) <==> spouse(Y,X).
-spouse(X,Y),gender(X,G1), {otherGender(G1,G2)}
-     ==> gender(Y,G2).
-gender(P,male) <==> male(P).
-gender(P,female) <==> female(P).
-parent(X,Y),female(X) <==> mother(X,Y).
-parent(X,Y),parent(Y,Z) ==> grandparent(X,Z).
-grandparent(X,Y),male(X) <==> grandfather(X,Y).
-grandparent(X,Y),female(X) <==> grandmother(X,Y).
-mother(Ma,Kid),parent(Kid,GrandKid)
-      ==>grandmother(Ma,GrandKid).
-grandparent(X,Y),female(X) <==> grandmother(X,Y).
-parent(X,Y),male(X) <==> father(X,Y).
-mother(Ma,X),mother(Ma,Y),{X\==Y}
-     ==>sibling(X,Y).
+Prolog, like most logic programming languages, offers depth first backward chaining as the only reasoning scheme. It is well known that sound and complete reasoning systems can be built using either exclusive backward chaining or exclusive forward chaining. Thus, this is not a theoretical problem. It is also well understood how to ``implement'' forward reasoning using an exclusively backward chaining system and vice versa. Thus, this need not be a practical problem. In fact, many of the logic-based languages developed for AI applications allow one to build systems with both forward and backward chaining rules.
+There are, however, some interesting and important issues which need to be addresses in order to provide the Prolog programmer with a practical, efficient, and well integrated facility for forward chaining.
 
-````
+This module uses such a facility, written by Tim Finin called PFC, which he has implemented in standard Prolog. The PFC system is a package that provides a forward reasoning capability to be used together with conventional Prolog programs. The PFC inference rules are Prolog terms which are asserted as facts into the regular Prolog database.
+
+The PFC system package provides a forward reasoning capability to be used together with conventional Prolog programs. The PFC inference rules are Prolog terms which are asserted as clauses into the regular Prolog database. When new facts or forward reasoning rules are added to the Prolog database (via a special predicate pfc_add/1, forward reasoning is triggered and additional facts that can be deduced via the application of the forward chaining rules are also added to the database. A simple justification-based truth-maintenance system is provided as well as simple predicates to explore the resulting proof trees.   Additionally this module provides the user with various methods for trying out new techniques of backwards chaining without rewriting their code.
+
+
 
 The =logicmoo_base= module allows one to use optimal First Order Logic declarations in Prolog code.
 During *development*, these declarations log informative information when values don't match
