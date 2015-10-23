@@ -785,7 +785,9 @@ prolog_listing_list_clauses(Pred, Source) :-
        (current_prolog_flag(listing_vars,true)->scan_source_files_for_varnames;true),
 	strip_module(Pred, Module, Head),
 	(   clause(Pred, Body),
-           once(current_prolog_flag(listing_vars,true)->get_clause_vars_copy((Pred:-Body),ForPrint);(ForPrint=((Pred:-Body)),prolog_listing:write_module(Module, Source, Head))),	     
+           once(current_prolog_flag(listing_vars,true)->
+                         get_clause_vars_copy((Pred:-Body),ForPrint);(ForPrint=((Pred:-Body)),
+                         nop(prolog_listing:write_module(Module, Source, Head)))),
             prolog_listing:portray_clause(ForPrint),
 	    fail
 	;   true

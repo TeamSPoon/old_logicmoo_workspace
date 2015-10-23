@@ -12,13 +12,13 @@
 
 
 compound_or_atom_name_arguments(In,Name,ArgsO):- compound(In),compound_name_arguments(In,Name,ArgsO).
-compound_or_atom_name_arguments(In,Name,ArgsO):- atom(In),Name=In,ArgsO=[].
+compound_or_atom_name_arguments(In,Name,ArgsO):- fail,atom(In),Name=In,ArgsO=[].
 
 
 expand_var_functors(T,VFE,Outer,In,Out):-   
    \+ compound(In)->In=Out;
   (compound_name_arguments(In,Name,Args),
-   (Args==[]->Out=Name;
+   ((Args==[],\+ compound(In))->Out=Name;
       ((Name=VFE,Args=[JustOne] )-> (expand_var_functors(T,VFE,VFE,JustOne,VOut),(functor(VOut,T,_)->Out=VOut;Out=..[VFE,VOut]));
       ( maplist(expand_var_functors(T,VFE,Name),Args,ArgsO),
       ((Name\='[|]',Outer=VFE,atom_codes(Name,[C|_]),code_type(C,prolog_var_start),
@@ -27,12 +27,12 @@ expand_var_functors(T,VFE,Outer,In,Out):-
 
 
 system:term_expansion(I,O):- var_functor_wrap(T),
-          compound(I),functor(I,VFE,_),var_functor_quote(VFE),
+          compound(I),functor(I,VFE,_), % var_functor_quote(VFE),
                      \+ t_l:disable_px,
                        w_tl(t_l:disable_px,expand_var_functors(T,VFE,(:-),I,O)),I\=@=O.
 
 system:goal_expansion(I,O):- var_functor_wrap(T),
-          compound(I),functor(I,VFE,_),var_functor_quote(VFE),
+          compound(I),functor(I,VFE,_), % var_functor_quote(VFE),
                      \+ t_l:disable_px,
                        expand_var_functors(T,VFE,(:-),I,O),I\=@=O.
 

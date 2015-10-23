@@ -10,7 +10,7 @@ Is probably 50 packages...  (do not try these before 0.0.11)
 % Adding logicmoo/utils to autoload path
 ````
 
-# 1) Variable names in listing!
+# 1) Variable names in listing once you use_listing_vars/0.
 
 ````
 ?- listing(ls).
@@ -32,7 +32,7 @@ shell:ls(Spec) :-
 true.
 ````
 
-# 2) Less trace button pushing!
+# 2) Less trace button pushing with rtrace/1.
 
 
 ````
@@ -51,7 +51,7 @@ X = 3.
 ````
 
 
-# 3) hotrace/1 fixes notrace/1 determinancy!
+# 3) hotrace/1 fixes the system:notrace/1 determinancy
 
 
 ````
@@ -127,7 +127,7 @@ r    = run again unleashed
 ````
 
 
-# 5) wt_l/2 With Thread Local
+# 5) With Thread Local w_tl/2
 
 ````
 ?- w_tl((doit:-dmsg("hi")),doit).
@@ -253,8 +253,43 @@ X = 2, Y = 1.
 ````
 
 
+# 14) Crazy filematch/2
 
-100s of more equally usefull utility functions!
+````
+?- filematch(library('*.pl'),X).
+X = '/home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/util/INDEX.pl' ;
+X = '/home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_all.pl' ;
+X = '/home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_bb_env.pl' ;
+````
+
+# 14) HiLog syntax (variables in Predicate place)
+
+````
+?- ensure_loaded(library(logicmoo/util/logicmoo_util_varfunctors)).
+true.
+
+?- set_functor_wrap('$holds').  % what XSB-Prolog uses
+true.
+
+true.
+?- P(a,b) = p(a,b).
+P = p ;
+false
+
+?- must(expand_goal('$'(P(a,b)=p(a,b)),G)),writeln(G).
+true.
+
+````
+
+
+
+300+ more equally usefull utility functions
+
+# xx) logicmoo_util_help Autodocing 
+# xx) logicmoo_util_bb_env Map API logicmoo_util_bb_env
+# xx) Map API logicmoo_util_bb_env
+# xx) Autodocing predicates
+# xx) Autodocing predicates
 
 All so the crown jewel could be written...
 
