@@ -707,7 +707,7 @@ hotrace(Goal):- notrace((tracing,notrace)) -> (notrace,'$leash'(OldL, OldL),
    '$visible'(OldV, OldV),thread_leash(+exception),visible(+all),thread_leash(+all), 
        call_cleanup(Goal,notrace(('$leash'(_, OldL),'$visible'(_, OldV)))),trace) ; Goal.
 
-:- trace(hotrace/1, -all).       
+% :- trace(hotrace/1, -all).       
 % hotrace(Goal):- get_hotrace(Goal,Y),Y.
 %:- mpred_trace_less(hotrace/1).
 :- '$set_predicate_attribute'(hotrace(_), hide_childs, 1).

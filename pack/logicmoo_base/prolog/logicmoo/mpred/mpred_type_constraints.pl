@@ -176,7 +176,6 @@ same_arg(same_or(Pred),I,Sup):- holds_t(Pred,I,Sup),!.
 promp_yn(Fmt,A):- format(Fmt,A),get_single_char(C),C=121.
 
 :- set_prolog_flag(generate_debug_info, true).
-:- debug.
 
 
 % :-swi_module(domain, [ domain/2  ]). % Var, ?Domain

@@ -589,7 +589,7 @@ cur_predicate(SM,MFA,MP):-
   no_repeats(M:F/A,(match_predicates(SEARCH,MFAs),
    
   member(M:F/A,MFAs))),
-   debug,
+   
    must_det_l((
   once(two_mfa(MFA, M,F,A)),
 

@@ -6,23 +6,13 @@ Is probably 50 packages...  (do not try these before 0.0.11)
 
 ````
 ?- ensure_loaded(library(logicmoo/logicmoo_utils)).
+% /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/logicmoo_utils.pl:157
+% Adding logicmoo/utils to autoload path
 ````
 
 # 1) Variable names in listing!
 
 ````
-dmiles@gitlab:~$ swipl
-Welcome to SWI-Prolog (Multi-threaded, 64 bits, Version 7.3.9)
-Copyright (c) 1990-2015 University of Amsterdam, VU Amsterdam
-SWI-Prolog comes with ABSOLUTELY NO WARRANTY. This is free software,
-and you are welcome to redistribute it under certain conditions.
-Please visit http://www.swi-prolog.org for details.
-For help, use ?- help(Topic). or ?- apropos(Word).
-?- ensure_loaded(library(logicmoo/logicmoo_utils)).
-% /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/logicmoo_utils.pl:157
-% Adding logicmoo/utils to autoload path
-true.
-
 ?- listing(ls).
 shell:ls :-
         ls('.').
@@ -177,9 +167,74 @@ true.
 <pre>how are you?
 </pre>
 
+````
+
+
+# 8) Cross reference "live code" from the console
+
+.....
+?- xlisting(throw/1).
+
+pce_principal:pce_home(PceHome) :-
+        throw(error(pce_error(no_home), _)).
+
+
+http_open:do_open(_, Code, _, Lines, Options0, Parts, In, Stream) :-
+        redirect_code(Code),
+        location(Lines, RequestURI), !,
+        debug(http(redirect), 'http_open: redirecting to ~w', [RequestURI]),
+        close(In),
+        parts_uri(Parts, Base),
+        uri_resolve(RequestURI, Base, Redirected),
+        parse_url_ex(Redirected, RedirectedParts),
+        (   redirect_limit_exceeded(Options0, Max)
+        ->  format(atom(Comment),
+                   'max_redirect (~w) limit exceeded',
+                   [Max]),
+            throw(error(permission_error(redirect, http, Redirected),
+                        context(_, Comment)))
+        ;   redirect_loop(RedirectedParts, Options0)
+        ->  throw(error(permission_error(redirect, http, Redirected),
+                        context(_, 'Redirection loop')))
+        ;   true
+        ),
+        redirect_options(Options0, Options),
+        http_open(RedirectedParts, Stream, Options).
+http_open:do_open(_Version, Code, Comment, _, _, Parts, _, _) :-
+        parts_uri(Parts, URI),
+        (   map_error_code(Code, Error)
+        ->  Formal=..[Error, url, URI]
+        ;   Formal=existence_error(url, URI)
+        ),
+        throw(error(Formal,
+                    context(_, status(Code, Comment)))).
+...
+.....
+
+# 9) Cross reference "live code" from the interweb (uses varnames to)
 
 ````
-# (8)-(45) .....
+?- ensure_loaded(library(logicmoo/logicmoo_base)).
+Yes.
+?- start_logicmoo_www(6767).
+Yes.
+````
+
+
+# 10) no_repeats([+Vars,]:Call)
+
+ .....
+?- no_repeats( X , member(X-Y,[3-2,1-4,1-5,2-1])).
+X = 3, Y = 2 ;
+X = 1, Y = 4 ;
+X = 2, Y = 1.
+ .....
+
+
+
+100s of more equally usefull utility functions!
+
+All so the crown jewel could be written...
 
 
 
@@ -190,17 +245,26 @@ true.
 ````
 
 
-# (46) Defining new Forward chaining/backchaining rules..
+# (46) Defining new Forward chaining/backchaining rules
 
 ````
+
+:- file_begin(pfc).
 spouse(X,Y) ==> spouse(Y,X).
 gender(P,male) <==> male(P).
 gender(P,female) <==> female(P).
-````
-
-# (47) Defining new Genral Inference rules..
 
 ````
+
+examples:  https://github.com/TeamSPoon/PrologMUD/tree/master/pack/logicmoo_base/t/examples/pfc
+
+ 
+
+# (47) Defining new General Inference rules
+
+````
+
+:- file_begin(kif).
 parent(X,Y),female(X) <=> mother(X,Y).
 parent(X,Y),parent(Y,Z) => grandparent(X,Z).
 grandparent(X,Y),male(X) <=> grandfather(X,Y).
@@ -213,6 +277,8 @@ mother(Ma,X),mother(Ma,Y),{X\==Y}
      =>sibling(X,Y).
 
 ````
+
+examples:  https://github.com/TeamSPoon/PrologMUD/tree/master/pack/logicmoo_base/t/examples/fol
 
 
 # First Order Logic (FOL) declarations in Prolog source code. 

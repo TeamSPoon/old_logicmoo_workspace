@@ -1421,7 +1421,6 @@ time_call(Call):-
 logger_property(todo,once,true).
 
 
-:- debug(todo).
 
 contains_atom(V,A):-sub_term(VV,V),nonvar(VV),functor_safe(VV,A,_).
 
