@@ -2,6 +2,12 @@
 
 Is probably 50 packages...  (do not try these before 0.0.11)
 
+# Part A - Utilities
+
+````
+?- ensure_loaded(library(logicmoo/logicmoo_utils)).
+````
+
 # 1) Variable names in listing!
 
 ````
@@ -177,6 +183,13 @@ true.
 
 
 
+# Part B - Predicate Calc
+
+````
+?- ensure_loaded(library(logicmoo/logicmoo_base)).
+````
+
+
 # (46) Defining new Forward chaining/backchaining rules..
 
 ````
@@ -185,7 +198,7 @@ gender(P,male) <==> male(P).
 gender(P,female) <==> female(P).
 ````
 
-# (47) Defining new Genral Infernce rules..
+# (47) Defining new Genral Inference rules..
 
 ````
 parent(X,Y),female(X) <=> mother(X,Y).
