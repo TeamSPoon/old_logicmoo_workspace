@@ -213,7 +213,7 @@ http_open:do_open(_Version, Code, Comment, _, _, Parts, _, _) :-
 .....
 ````
 
-# 9) Cross reference "live code" from the interweb (uses varnames to)
+# 9) Cross reference "live code" from the interweb
 
 ````
 ?- ensure_loaded(library(logicmoo/logicmoo_base)).
