@@ -172,7 +172,7 @@ true.
 
 # 8) Cross reference "live code" from the console
 
-.....
+````
 
 ?- xlisting(throw/1).
 
