@@ -173,6 +173,7 @@ true.
 # 8) Cross reference "live code" from the console
 
 .....
+
 ?- xlisting(throw/1).
 
 pce_principal:pce_home(PceHome) :-
@@ -208,7 +209,7 @@ http_open:do_open(_Version, Code, Comment, _, _, Parts, _, _) :-
         ),
         throw(error(Formal,
                     context(_, status(Code, Comment)))).
-...
+
 .....
 
 # 9) Cross reference "live code" from the interweb (uses varnames to)
