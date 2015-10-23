@@ -225,12 +225,12 @@ Yes.
 
 # 10) no_repeats([+Vars,]:Call)
 
- .....
+````
 ?- no_repeats( X , member(X-Y,[3-2,1-4,1-5,2-1])).
 X = 3, Y = 2 ;
 X = 1, Y = 4 ;
 X = 2, Y = 1.
- .....
+````
 
 
 
