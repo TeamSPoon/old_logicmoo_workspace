@@ -26,7 +26,7 @@
             edit1term/0,
             edit1term/1,
             ensure_mpred_webserver/1,
-            
+            ensure_webserver/0,
             find_cl_ref/2,
             find_ref/2,
             fmtimg/2,
@@ -220,6 +220,7 @@
 
 ensure_mpred_webserver(Port) :- format(atom(A),'httpd@~w_1',[Port]),thread_property(_,alias(A)),!.
 ensure_mpred_webserver(Port) :- on_x_rtrace(http_server(http_dispatch,[ port(Port), workers(16) ])).
+ensure_webserver:- ensure_mpred_webserver(3020).
 
 :- multifile(http_session:session_data/2).
 :- multifile(system:'$loading_file'/3).

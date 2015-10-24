@@ -1,5 +1,8 @@
 % -*-Prolog-*-
 
+:- use_module(library(logicmoo/logicmoo_user)).
+:- use_pfc_dcg.
+
 :- dynamic ('-->>')/2.
 :- dynamic ('--*>>')/2.
 

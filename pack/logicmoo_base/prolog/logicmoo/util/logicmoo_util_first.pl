@@ -25,13 +25,13 @@ quiet_all_module_predicates_are_transparent/1,
           export_all_preds/1,
           export_if_noconflict/2,
 
+          if_may_hide/1,
           match_predicates/2,
           match_predicates/5,
-          if_may_hide/1,
-          mpred_trace_less/1,
-          mpred_trace_none/1,
-          mpred_trace_nochilds/1,
           mpred_trace_childs/1,
+          mpred_trace_less/1,
+          mpred_trace_nochilds/1,
+          mpred_trace_none/1,
 
             add_newvar/2,
             add_newvars/1,
@@ -531,3 +531,5 @@ quiet_all_module_predicates_are_transparent(ModuleName):-
                    (module_transparent(ModuleName:F/A))))).
 
 % % :- use_module(logicmoo_util_varnames).
+
+:- mpred_trace_nochilds(is_ftVar/1).

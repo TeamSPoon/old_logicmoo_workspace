@@ -196,6 +196,7 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
         t(5,?,?,?,?,?),
         t(6,?,?,?,?,?,?),
         t(7,?,?,?,?,?,?,?).   
+
 :- dynamic(((::::) / 2,
 (<-)/2,
 (<==>)/2,
@@ -388,11 +389,13 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 
 neg_may_naf(P):- mpred_non_neg_literal(P),get_functor(P,F),clause(prologNegByFailure(F),true),!.
 neg_may_naf(P):- is_ftCompound(P),predicate_property(P,static).
+:- meta_predicate neg_may_naf(0).
 
 neg_in_code(P):-   neg_may_naf(P), \+ P.
 neg_in_code(Q):-  is_ftNonvar(Q), prologSingleValued(Q),if_missing_mask(Q,R,Test),req(R),Test.
+:- meta_predicate neg_in_code(0).
 
-tilda_in_code(~(G)):-nonvar(G),!, req(~neg(G)).
+tilda_in_code(~(G)):-nonvar(G),!, req('~'(neg(G))).
 tilda_in_code(G):- req(neg(G)).
 
 

@@ -1057,8 +1057,6 @@ quotedDefnIff(ftRest(Type),is_rest_of(Type)):- cwc, is_ftNonvar(Type).
 quotedDefnIff(ftListFn(Type),is_list_of(Type)):- cwc, is_ftNonvar(Type).
 quotedDefnIff(ftCodeIs(SomeCode),SomeCode):- cwc, is_ftNonvar(SomeCode).
 
-isa(arity,ptBinaryPredicate).
-
 
 
 % tCol(Type),(ptBinaryPredicate(Pred)/(functor(G,Pred,2),G=..[Pred,isInstFn(Type),Value])), G ==> relationMostInstance(Pred,Type,Value).
@@ -1068,7 +1066,12 @@ isa(arity,ptBinaryPredicate).
 %((genlPreds(Col1,Col2),(arity(Col1,1);arity(Col2,1)))==>genls(Col1,Col2)).
 %((genls(Col1,Col2),(tPred(Col1);tPred(Col2)))==>genlPreds(Col1,Col2)).
 
+tCol(ptBinaryPredicate).
+ttPredType(ptBinaryPredicate).
+
 :- mpred_test(ain(tCol('ptUnaryPredicate'))).
+
+isa(arity,ptBinaryPredicate).
 
 
 ((pfcControlled(C)/(get_arity(C,F,A),arity(F,A))) ==> support_hilog(F,A)).
@@ -1100,7 +1103,7 @@ specialFunctor('/').
 */
 :- endif.
 
-:- (ain((((arity(Pred,2),tPred(Pred)) <==> isa(Pred,ptBinaryPredicate))))).
+arity(Pred,2),tPred(Pred) <==> ptBinaryPredicate(Pred).
 
 % if arity is ever greater than 1 it can never become 1
 % arity(F,A)/(number(A),A>1) ==> neg(arity(F,1)).

@@ -244,7 +244,7 @@ kb_dynamic(P):-functor(P,F,A),!,kb_dynamic(F/A).
 
 make_declared(Test):- \+ \+ ((Test= (_:F/_), is_ftVar(F))),!.
 make_declared(F/_):- is_ftVar(F),!.
-make_declared(M:F/A):- !, dmsg(make_declared(M:F/A)), 
+make_declared(M:F/A):- !, slow_sanity(dmsg(make_declared(M:F/A))),
    M:multifile(M:F/A),M:module_transparent(M:F/A),M:export(M:F/A),functor(P,F,A),
    (predicate_property(P,dynamic)->true;M:dynamic(M:F/A)).
 
@@ -699,37 +699,62 @@ set_mpred_multifle(M):- set_mpred_user_kb(M), asserta(lmcache:mpred_directive_va
 :- thread_local(t_l:mpred_user_kb/1).
 get_mpred_user_kb(Ctx):- must(t_l:mpred_user_kb(Out)),!,must(Ctx=Out).
 set_mpred_user_kb(M):- (t_l:mpred_user_kb(Prev)->true;Prev=M),decl_mpred_user_kb(M),assert_until_eof(t_l:mpred_user_kb(M)),onEndOfFile(set_mpred_user_kb(Prev)).
-decl_mpred_user_kb(M):-                 
-                (default_module(logicmoo_user,M)->true;add_import_module(M,logicmoo_user,end)),
-                 multifile(M:('<-')/2),
-                 multifile(M:('::::')/2),
-                 multifile(M:('<==>'/2)),
-                 multifile(M:(('==>')/2)),
-                 multifile(M:('==>')/1),
-                 multifile(M:('~')/1),
-                 multifile(M:('neg')/1),
-                 export(M:('<-')/2),
-                 export(M:('::::')/2),
-                 export(M:('<==>'/2)),
-                 export(M:('==>')/1),
-                 export(M:(('==>')/2)),
-                 export(M:('~')/1),
-                 export(M:('neg')/1),
-                op(1199,fx,M:('==>')), % assert
-                op(1199,fx,M:('?->')), % ask
-                op(1190,xfy,M:('::::')), % Name something
-                op(1180,xfx,M:('==>')), % Forward chaining
-                op(1170,xfx,M:('<==>')), % Forward and backward chaining
-                op(1160,xfx,M:('<==')), % backward chain PFC sytle
-                op(1160,xfx,M:('<-')), % backward chain PTTP sytle
-                op(1160,xfx,M:('<=')), % backward chain DRA sytle
-                op(1150,xfx,M:('=>')), % Logical implication
-                op(1130,xfx,(M:'<=>')), % Logical bi-implication
-                op(600,yfx,(M:'&')), 
-                op(600,yfx,(M:'v')),
-                op(500,fx,(M:'~')),
-                op(300,fx,(M:'-')),
-                op(350,xfx,(M:'xor')).
+
+decl_mpred_user_kb(M):- M== logicmoo_user,!.
+decl_mpred_user_kb(M):-atom_concat(M,PFC,SM).
+decl_mpred_user_kb(M,SM):-               
+
+   multifile(((SM:bt/3),(SM:nt/4),(SM:pk/4),(SM:pt/3),(SM:spft/5),(SM:tms/1),(SM:hs/1),(SM:qu/3),(SM:sm/1))),
+     dynamic(((SM:bt/3),(SM:nt/4),(SM:pk/4),(SM:pt/3),(SM:spft/5),(SM:tms/1),(SM:hs/1),(SM:qu/3),(SM:sm/1))),
+
+            multifile(M:('<-')/2),
+            multifile(M:('::::')/2),
+            multifile(M:('<==>'/2)),
+            multifile(M:(('==>')/2)),
+            multifile(M:('==>')/1),
+            multifile(M:('~')/1),
+            multifile(M:('neg')/1),
+
+                   dynamic(M:('<-')/2),
+                   dynamic(M:('::::')/2),
+                   dynamic(M:('<==>'/2)),                   
+                   dynamic(M:(('==>')/2)),
+                   dynamic(M:('==>')/1),
+                   dynamic(M:('~')/1),
+                   dynamic(M:('neg')/1),
+
+                   export(M:('<-')/2),
+                   export(M:('::::')/2),
+                   export(M:('<==>'/2)),                   
+                   export(M:(('==>')/2)),
+                   export(M:('==>')/1),
+                   export(M:('~')/1),
+                   export(M:('neg')/1),
+
+            op(1199,fx,M:('==>')), % assert
+            op(1199,fx,M:('?->')), % ask
+            op(1190,xfy,M:('::::')), % Name something
+            op(1180,xfx,M:('==>')), % Forward chaining
+            op(1170,xfx,M:('<==>')), % Forward and backward chaining
+            op(1160,xfx,M:('<==')), % backward chain PFC sytle
+            op(1160,xfx,M:('<-')), % backward chain PTTP sytle
+            op(1160,xfx,M:('<=')), % backward chain DRA sytle
+            op(1150,xfx,M:('=>')), % Logical implication
+            op(1130,xfx,(M:'<=>')), % Logical bi-implication
+            op(600,yfx,(M:'&')), 
+            op(600,yfx,(M:'v')),
+            op(500,fx,(M:'~')),
+            op(300,fx,(M:'-')),
+            op(350,xfx,(M:'xor')),
+%           ( is_support_kb(M) -> true ; add_import_module(M,logicmoo_user,end)),
+            ( is_support_kb(SM) -> true ; add_import_module(SM,basePFC,end)),
+            ( is_support_kb(M) -> true ; add_import_module(M,SM,end)),
+            ( is_support_kb(M) -> true ; add_import_module(M,baseKB,end)),
+            ( is_support_kb(M) -> true ; add_import_module(baseKB,basePFC,end)).
+
+is_support_kb(baseKB).
+is_support_kb(logicmoo_user).
+is_support_kb(basePFC).
 
 
 % ========================================

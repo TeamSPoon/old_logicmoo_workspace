@@ -1,6 +1,6 @@
 #!/usr/bin/env swipl
 
-:- module(family_inheritance,[]).
+:- module(family_inheritance_pfc,[]).
 
 :- include('test_header.pfc').
 :- process_this_script.

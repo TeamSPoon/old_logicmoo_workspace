@@ -4,7 +4,8 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- module(logicmoo_user,[ op(500,fx,'~'),
+:- module(logicmoo_user,
+[op(500,fx,'~'),
  op(1199,fx,('==>')),
  op(1190,xfx,('::::')),
  op(1180,xfx,('==>')),
@@ -21,9 +22,14 @@
  op(350,xfx,'xor')]).
 
 
+:- use_module(logicmoo_base).
+:- thread_local(t_l:mpred_user_kb/1).
+:- (t_l:mpred_user_kb(M)->true;(source_context_module(M))),set_mpred_user_kb(M),dmsg(user_kb=M).
+%:- ensure_mpred_system.
+
+/*
 :- add_import_module(logicmoo_user,basePFC,end).
 :- add_import_module(logicmoo_user,baseKB,end).
-/*
 :- set_prolog_flag(report_error,true).
 :- set_prolog_flag(fileerrors,false).
 % :- set_prolog_flag(access_level,system).
@@ -35,13 +41,9 @@
 :- debug.
 */
 
-:- use_module(logicmoo_base).
-:- thread_local(t_l:mpred_user_kb/1).
-:- (t_l:mpred_user_kb(M)->true;(source_context_module(M))),set_mpred_user_kb(M),dmsg(user_kb=M).
-%:- ensure_mpred_system.
 
-:-export(m1/0).
-m1:- gripe_time(40,ensure_loaded(logicmoo(mpred_online/mpred_www))),if_defined(mpred_www:ensure_webserver), make,list_undefined.
+:-export(checkKB:m1/0).
+checkKB:m1:- gripe_time(40,ensure_loaded(logicmoo(mpred_online/mpred_www))),if_defined(mpred_www:ensure_webserver), make,list_undefined.
 
 % :- hook_message_hook.
 :- set_prolog_flag(verbose_autoload,false).
@@ -71,6 +73,6 @@ m4:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/autoexec.pfc')).
 % :-trace,call((R = (==>((P,Q,z(_)),(p(P),q(Q)))))
 % :- use_module(mpred/mpred_loader).
 
-:- m1.
+:- checkKB:m1.
 
 

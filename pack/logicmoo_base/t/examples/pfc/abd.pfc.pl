@@ -1,4 +1,6 @@
 
+:- module(adb_pfc,[]).
+
 :- use_module(library(logicmoo/logicmoo_user)).
 
 not(P),P ==> contrradiction.

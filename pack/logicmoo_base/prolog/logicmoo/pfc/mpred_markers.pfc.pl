@@ -32,3 +32,10 @@ mpred_mark(pfcRHS,_,F,A)/(atom(F),integer(A),F\==arity)==>tPred(F),arity(F,A),pf
 
 
 
+
+:- meta_predicate(mp_test_agr(?,+,-,*,^,:,0,1,5,9)).
+mp_test_agr(_,_,_,_,_,_,_,_,_,_).
+:- mpred_test(predicate_property(mp_test_agr(_,_,_,_,_,_,_,_,_,_),meta_predicate(_))).
+% becomes         mp_test_agr(+,+,-,?,^,:,0,1,0,0)
+
+

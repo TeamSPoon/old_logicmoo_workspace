@@ -71,6 +71,12 @@
         transitive_except(+, 2, +, -),
         transitive_lc(2, +, -).
 :- meta_predicate(go_as_last(0,0)).
+:- meta_predicate no_loop_check(0).
+:- meta_predicate no_loop_check(0,0).
+:- meta_predicate no_loop_check_term_key(0,?,0).
+:- meta_predicate call_tabled(?,0).
+:- meta_predicate loop_check(0).
+:- meta_predicate loop_check(0,0).
 
 :- export(go_as_last/2).
 :- thread_local lmcache:going_last/1.
@@ -102,11 +108,6 @@ go_as_last(Call1,Call2):- \+ lmcache:going_last(Call1),w_tl(lmcache:going_last(C
 
 :- include('logicmoo_util_header.pi').
 
-:- export(transitive/3).
-% = :- meta_predicate(transitive(2,+,-)).
-% = :- meta_predicate(transitive_lc(2,+,-)).
-% = :- meta_predicate(transitive_except(+,2,+,-)).
-
 transitive(X,A,B):- once(on_x_debug(call(X,A,R)) -> ( R\=@=A -> transitive_lc(X,R,B) ; B=R); B=A),!.
 
 transitive_lc(X,A,B):-transitive_except([],X,A,B).
@@ -117,21 +118,6 @@ memberchk_same_two(X, [Y0|Ys]) :- is_list(Ys),!,C=..[v,Y0|Ys],!, arg(_,C,Y), ( X
 memberchk_same_two(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),memberchk_same_two(X, Ys) )).
 
 
-:- meta_predicate no_loop_check(0).
-:- meta_predicate no_loop_check(0,0).
-:- meta_predicate no_loop_check_term_key(0,?,0).
-:- meta_predicate call_tabled(?,0).
-:- meta_predicate loop_check(0).
-:- meta_predicate loop_check(0,0).
-
-%% = :- meta_predicate((loop_check(0,0))).
-%% = :- meta_predicate((no_loop_check(0,0))).
-%% = :- meta_predicate((no_loop_check(0))).
-%% = :- meta_predicate((no_loop_check(0))).
-% = :- meta_predicate((loop_check_term(0,?,0))).
-% = :- meta_predicate((loop_check_term_key(0,?,0))).
-%% = :- meta_predicate((loop_check(0,0))).
-%% = :- meta_predicate((loop_check(0))).
 
 
 % ===================================================================

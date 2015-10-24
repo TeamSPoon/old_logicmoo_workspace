@@ -1,4 +1,5 @@
 % dcg_pfc: translation of dcg-like grammar rules into pfc rules.
+
 :- if(current_prolog_flag(logicmoo_modules,default)).
 :- module(pfc_dcg,[]).
 :- endif.

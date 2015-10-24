@@ -42,7 +42,6 @@
             callsc/1,
             cli_ntrace/1,
             contains_atom/2,
-            ctrace/0,
             debugFmt/1,
             debugFmtList/1,
             debugFmtList0/2,
@@ -59,7 +58,6 @@
             do_gc1/0,
             do_ref_job/2,
             doHideTrace/4,
-            fixhotrace/1,
             fmtString/2,
             fmtString/3,
             forall_member/3,
@@ -69,10 +67,6 @@
             functor_h0/3,
             functor_source_file/5,
             functor_source_file0/5,
-            gftrace/0,
-            gftrace/1,
-            ggtrace/0,
-            ggtrace/1,
             gmust/2,
             gripe_time/2,
             on_f_debug/1,
@@ -80,8 +74,6 @@
             on_x_debug/1,
             on_x_debug_cont/1,
             on_x_rtraceEach/1,
-            grtrace/0,
-            grtrace/1,
             has_gui_debug/0,
             hideRest/0,
             hideTrace/0,
@@ -222,8 +214,7 @@
      op(1150,fx,(lmconf:was_shared_multifile))
 
           ]).
-:- multifile
-        logLevel/2.
+:- meta_predicate with_skip_bugger(0).
 :- meta_predicate 
     do_ref_job(0,*),
         bugger_atom_change(:, -),
@@ -244,13 +235,9 @@
         on_x_debug_cont(0),
         on_f_debug(0),
         debugOnFailure0(0),
-        fixhotrace(0),
         forall_member(?, ?, 0),
-        gftrace(0),
-        ggtrace(0),
         gmust(0, 0),
         gripe_time(+, 0),
-        grtrace(0),
         hideTrace(:, -),
         hidetrace(:),
         ifThen(0, 0),
@@ -332,7 +319,6 @@
         caller_module/1,
         caller_module/2,
         contains_atom/2,
-        ctrace/0,
         debugFmt/1,
         debugFmtList/1,
         debugFmtList0/2,
@@ -359,9 +345,6 @@
         functor_h0/3,
         functor_source_file/5,
         functor_source_file0/5,
-        gftrace/0,
-        ggtrace/0,
-        grtrace/0,
         has_gui_debug/0,
         hideRest/0,
         hideTrace/0,
@@ -398,7 +381,6 @@
         new_a2s/3,
         new_a2s0/3,
         non_user_console/0,
-        nortrace/0,
         nth_frame/3,
         nth_frame_attribute/5,
         nth_goal/2,
@@ -411,7 +393,6 @@
         prolog_current_frames/1,
         replace_elements/4,
         saveUserInput/0,
-        save_guitracer/0,
         setLogLevel/2,
         set_bugger_flag/2,
         set_no_debug/0,
@@ -442,11 +423,13 @@
         writeSTDERR0/1,
         writeSavedPrompt/0.
 
+:- multifile
+        logLevel/2.
 :- dynamic
         logLevel/2.
 
+:- use_module('logicmoo_util_rtrace').
 :- include('logicmoo_util_header.pi').
-:- use_module(logicmoo_util_dumpst).
 
 
 :- 
@@ -634,19 +617,6 @@ wdmsg(F,X):- ignore(with_all_dmsg(dmsg(F,X))).
 
 prolog_call(Call):-call(Call).
 :- mpred_trace_childs(prolog_call(0)).
-
-% :- mpred_trace_none(system:trace/0).
-% :- mpred_trace_none(system:notrace/0).
-
-% :- mpred_trace_none(system:tracing/0).
-
-%:- ( listing(notrace/1),redefine_system_predicate(system:hotrace(_)), mpred_trace_none(hotrace(0)) ).
-% :- if_may_hide('$set_predicate_attribute'(hotrace(_), trace, 0)).
-% :- if_may_hide('$set_predicate_attribute'(hotrace(_), hide_childs, 1)).
-
-:- export(fixhotrace/1).
-fixhotrace(X):- tracing -> call_cleanup(X,trace) ; call(X).
-% :- mpred_trace_none(fixhotrace(0)).
 
 :- export(hidetrace/1).
 hidetrace(X):- X.
@@ -1256,7 +1226,6 @@ bin_ecall(F,A,asis,true):-member(F/A,[('must')/1]).
 
 
 :- mpred_trace_childs(with_each/2).
-:- mpred_trace_childs(with_each/3).
 
 
 with_each(_,_,Call):-var(Call),!,trace,randomVars(Call).
@@ -1269,6 +1238,8 @@ with_each(BDepth,Wrapper, (X->Y;Z)):- with_each(BDepth,Wrapper,X) -> with_each(B
 with_each(PDepth,Wrapper, (X , Y)):- BDepth is PDepth-1, !,(with_each(BDepth,Wrapper,X),with_each(BDepth,Wrapper,Y)).
 with_each(PDepth,Wrapper, [X | Y]):- BDepth is PDepth-1, !,(with_each(BDepth,Wrapper,X),!,with_each(BDepth,Wrapper,Y)).
 with_each(BDepth,Wrapper,Call):-functor_safe(Call,F,A),prolog_ecall_fa(BDepth,Wrapper,F,A,Call).
+
+:- mpred_trace_childs(with_each/3).
 
 % fake = true
 prolog_ecall_fa(_,_,F,A,Call):-
@@ -1342,6 +1313,7 @@ must_each0([]):-!.
 must_each0([E|List]):-E,must_each0(List).
 
 % :- mpred_trace_childs(logicmoo_util_bugger_catch:one_must/2).
+:- meta_predicate one_must(0,0,0).
 one_must(C1,C2,C3):-one_must(C1,one_must(C2,C3)).
 
 is_deterministic(once(V)):-var(V),trace_or_throw(is_deterministic(var_once(V))).
@@ -1633,36 +1605,15 @@ asserta_if_ground(_).
 % =====================================================================================================================
 :- module_hotrace(user).
 % =====================================================================================================================
-%:- module_hotrace(logicmoo_util_strings).
-% =====================================================================================================================
 
 % :- ignore((source_location(File,_Line),module_property(M,file(File)),!,forall(current_predicate(M:F/A),mpred_trace_childs(M:F/A)))).
 
-:- mpred_trace_childs(prolog_ecall_fa/5).
-:- mpred_trace_childs(with_each/3).
 %:- mpred_trace_childs(must/1).
 %:- mpred_trace_childs(must/2).
 %:- mpred_trace_childs(must_flag/3).
-:- mpred_trace_nochilds(is_ftVar/1).
-:- mpred_trace_childs(hotrace/1).
 
 % though maybe dumptrace
 default_dumptrace(trace).
-
-ggtrace:- default_dumptrace(DDT), ggtrace(DDT).
-ggtrace(Trace):- 
-   thread_leash(-call),((visible(+all),visible(-unify),visible(+exception),
-   thread_leash(-all),thread_leash(+exception),
-   thread_leash(+call))),Trace,notrace(thread_leash(-call)).
-
-gftrace:- default_dumptrace(DDT), gftrace(DDT).
-gftrace(Trace):- 
-   thread_leash(-call),((visible(-all), visible(+fail),visible(+call),visible(+exception),
-   thread_leash(-all),thread_leash(+exception),
-   thread_leash(+call))),Trace,thread_leash(-call).
-
-grtrace:- default_dumptrace(DDT), grtrace(DDT).
-grtrace(Trace):- hotrace(( visible(+all),thread_leash(+all))), Trace.
 
 :- thread_local(is_pushed_def/3).
 
@@ -1822,5 +1773,8 @@ logicmoo_bugger_loaded.
 % :- module_meta_predicates_are_transparent(user).
 % :- all_module_predicates_are_transparent(logicmoo_util_bugger_catch).
 
+
+%:- mpred_trace_childs(prolog_ecall_fa/5).
+%:- mpred_trace_childs(with_each/3).
 
 

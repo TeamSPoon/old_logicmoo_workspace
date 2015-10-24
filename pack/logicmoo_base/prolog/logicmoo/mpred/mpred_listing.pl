@@ -313,7 +313,9 @@ show_pred_info(Head):-
         doall(show_call(why,no_repeats(isa(Head,_)))),
         functor(Head,F,_),
         doall(show_call(why,no_repeats(isa(F,_)))),
-     (current_predicate(_,Head) -> show_pred_info_0(Head); wdmsg(cannot_show_pred_info(Head))),!.
+       ((current_predicate(_,M:Head), (\+ predicate_property(M:Head,imported_from(_))))
+          -> show_pred_info_0(M:Head); 
+             wdmsg(cannot_show_pred_info(M:Head))),!.
 
 show_pred_info_0(Head):- 
         doall(show_call(why,predicate_property(Head,_))),

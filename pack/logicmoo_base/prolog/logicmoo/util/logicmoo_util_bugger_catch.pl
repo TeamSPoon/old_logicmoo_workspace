@@ -30,7 +30,6 @@
             catchvv/3,
             catchvvnt/3,
             ccatch/3,
-            cnotrace/1,
             current_source_location/1,
             current_main_error_stream/1,
             dbgsubst/4,            
@@ -47,8 +46,6 @@
             functor_catch/3,
             functor_safe/3,
             get_must/2,
-            hotrace/0,
-            hotrace/1,
             ib_multi_transparent33/1,
             if_defined/1,
             if_defined/2,
@@ -64,30 +61,15 @@
             keep/2,
             loading_file/1,
             on_x_log_throw/1,
-            on_x_log_throwEach/1,
+            %on_x_log_throwEach/1,
             on_x_log_cont/1,
             on_x_log_fail/1,
             maplist_safe/2,
             maplist_safe/3,            
             module_functor/4,
 
-          motrace/1,
-          rtrace/0,nortrace/0,
-          ftrace/1, % tells me why a call didn't succeed once
-          save_guitracer/0,
-               restore_guitracer/0,
-               rtrace/0,
-          rtrace/0,
-          hotrace0/1,
-          rtrace/1,  % trace why choice points are left over
-          trace_or_throw/1,
             trace_or_throw/1,
-            traceafter_call/1,
-          restore_guitracer/0,
-          restore_trace/1,
-          restore_trace/2,
-          push_tracer/0,
-          pop_tracer/0,
+            trace_or_throw/1,
 
             must/1,
             must_det/1,
@@ -115,7 +97,6 @@
             strip_arity/3,
             strip_f_module/2,
             thread_current_error_stream/1,
-            thread_leash/1,
             throwNoLib/0,
             to_m_f_arity_pi/5,
             to_pi/2,
@@ -130,26 +111,22 @@
             y_must/2
           ]).
 :- meta_predicate
-        restore_trace(0),
-        restore_trace(0,0),
-        block(+, :, ?),
-        catchvv(0, ?, 0),
-        catchvvnt(0, ?, 0),
-        ccatch(0, ?, 0),
-        cnotrace(0),
-        ddmsg_call(0),
-   traceafter_call(0),
-        on_x_fail(0),
-        on_x_log_throw(0),
-        on_x_log_cont(0),
-        on_x_log_fail(0),
-   motrace(0),
-   ftrace(0),        
-   rtrace(0),
-   hotrace(0),
-   if_defined(:),
-   if_defined(:, 0),
-   if_defined_else(:, 0),        
+		block(+, :, ?),
+		catchvv(0, ?, 0),
+		catchvvnt(0, ?, 0),
+		ccatch(0, ?, 0),
+		
+		if_defined(:),
+		if_defined(:, 0),
+		if_defined_else(:, 0),
+		ddmsg_call(0),
+		on_x_fail(0),
+		on_x_log_throw(0),
+		
+		
+		on_x_log_cont(0),
+		on_x_log_fail(0),
+		if_defined_else(:, 0),        
 
         must(0),
         must_det(0),
@@ -167,11 +144,10 @@
         with_main_io(0),
         with_preds(?, ?, ?, ?, ?, 0),
         without_must(0),
-        on_x_log_throwEach(0),
+        %on_x_log_throwEach(0),
         y_must(?, 0). 
 :- module_transparent
         !/1,
-        rtrace/0,nortrace/0,
         addLibraryDir/0,
         as_clause_no_m/3,
         as_clause_w_m/4,
@@ -195,7 +171,6 @@
         functor_catch/3,
         functor_safe/3,
         get_must/2,
-        hotrace/0,
         ib_multi_transparent33/1,
         input_key/1,
         is_ftCompound/1,
@@ -207,17 +182,10 @@
         is_release/0,
         keep/2,
         loading_file/1,
-        on_x_log_throwEach/1,
+        %on_x_log_throwEach/1,
         maplist_safe/2,
         maplist_safe/3,
         module_functor/4,
-
-   match_predicates/2,
-   match_predicates/5,
-   mpred_trace_less/1,
-   mpred_trace_none/1,
-   mpred_trace_nochilds/1,
-   mpred_trace_childs/1,
 
         must_det_lm/2,
         nd_dbgsubst/4,
@@ -236,7 +204,6 @@
         strip_arity/3,
         strip_f_module/2,
         thread_current_error_stream/1,
-        thread_leash/1,
         throwNoLib/0,
         to_m_f_arity_pi/5,
         to_pi0/3,
@@ -244,6 +211,7 @@
 :- dynamic
         is_hiding_dmsgs/0.
 
+:- include('logicmoo_util_header.pi').
 
 % = :- meta_predicate(catchvvnt(0,?,0)).
 catchvvnt(T,E,F):-catchvv(cnotrace(T),E,F).
@@ -640,11 +608,8 @@ Assumes that Goal is true. Prints a stack-dump and traps to the debugger otherwi
 This facility is derived from the assert() macro as used in Goal, renamed
 for obvious reasons.
 */
-:- meta_predicate nodebugx(0).
 :- meta_predicate with_preds(?,?,?,?,?,0).
-:- meta_predicate with_skip_bugger(0).
 
-:- meta_predicate one_must(0,0,0).
 
 :- export(nop/1).
 nop(_).
@@ -668,179 +633,15 @@ nop(_).
 :- thread_local(t_l:session_id/1).
 :- multifile(t_l:session_id/1).
 
-% = :- meta_predicate(cnotrace(0)).
-cnotrace(Goal):- hotrace(Goal).
-:- mpred_trace_less(cnotrace/1).
-:- '$set_predicate_attribute'(cnotrace(_), hide_childs, 0).
-:- '$set_predicate_attribute'(cnotrace(_), trace, 0).
-
-
-hotrace:-notrace.
-%:- export(hotrace/1).
-%% = :- meta_predicate(hotrace(0)).
-% Unlike notrace/1, it allows traceing when excpetions are raised during Goal.
-
-
-thread_leash(+Some):-!, (thread_self(main)->leash(+Some);thread_leash(-Some)).
-thread_leash(-Some):-!, (thread_self(main)->leash(-Some);thread_leash(-Some)).
-thread_leash(Some):-!, (thread_self(main)->leash(+Some);thread_leash(-Some)).
-
-:- meta_predicate hotrace0(0).
-hotrace0(Goal):- 
- 
-  (\+ notrace((tracing, notrace)) ->  
-     (\+ tlbugger:rtracing -> Goal; 
-                              call_cleanup((notrace,Goal,rtrace),rtrace));
-     (\+ tlbugger:rtracing -> call_cleanup((Goal,trace),trace); 
-                              call_cleanup((Goal,notrace((rtrace,trace))),(rtrace,trace)))).
-   
-/*
-hotrace0(Goal):- notrace(tlbugger:rtracing) -> Goal ; 
-   (notrace, ((tracing, notrace) -> CC=trace;CC=true), 
-     '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup((rtrace,trace,Goal),(notrace,stop_rtrace0,'$leash'(_, Old),'$visible'(_, OldV),CC))).
-
-hotrace0(Goal):- notrace((tracing,notrace)) -> (notrace,'$leash'(OldL, OldL),
-   '$visible'(OldV, OldV),thread_leash(+exception),visible(+all),thread_leash(+all), 
-       call_cleanup(Goal,notrace(('$leash'(_, OldL),'$visible'(_, OldV)))),trace) ; Goal.
-*/
-
-
-hotrace(Goal):- notrace((tracing,notrace)) -> ('$leash'(OldL, OldL),
-   '$visible'(OldV, OldV),thread_leash(+exception),visible(+all),thread_leash(+all), 
-       call_cleanup(Goal,notrace(('$leash'(_, OldL),'$visible'(_, OldV)))),trace) ; Goal.
-
-% :- trace(hotrace/1, -all).       
-% hotrace(Goal):- get_hotrace(Goal,Y),Y.
-%:- mpred_trace_less(hotrace/1).
-:- '$set_predicate_attribute'(hotrace(_), hide_childs, 1).
-:- '$set_predicate_attribute'(hotrace(_), trace, 0).
-
-
-:- thread_local(tlbugger:rtracing/0).
 :- thread_local(tlbugger:no_colors/0).
 
 
 % =========================================================================
 
- 
-:-thread_local(t_l:wasguitracer/1).
-:-thread_local(t_l:wastracer/1).
-save_guitracer:- ignore(((current_prolog_flag(gui_tracer, GWas);GWas=false),asserta(t_l:wasguitracer(GWas)))).
-restore_guitracer:- ignore((retract(t_l:wasguitracer(GWas)),set_prolog_flag(gui_tracer, GWas))).
-
-rtrace:- notrace,visible(+all),visible(+exception),thread_leash(-all),thread_leash(+exception). %% save_guitracer,noguitracer
-nortrace:- notrace, visible(+all),visible(+exception),thread_leash(+all),thread_leash(+exception). % restore_guitracer,ignore(retract(tlbugger:rtracing)))).
-
-push_tracer:- get_tracer(Reset),asserta(t_l:wastracer(Reset)),!.
-pop_tracer:- retract(t_l:wastracer(Reset)),!,Reset,!.
-reset_tracer:- ignore(((t_l:wastracer(Reset),Reset))).
- 
-get_tracer(Reset):- 
-    Reset =  (notrace(set_prolog_flag(debug,WasDebug)),CC,'$leash'(_, OldL),'$visible'(_, OldV)),
-    '$leash'(OldL, OldL),'$visible'(OldV, OldV),
-     (current_prolog_flag(debug,true)->WasDebug=true;WasDebug=false),
-     % (tlbugger:rtracing->CC2=rtrace;CC2= nortrace),
-     (tracing -> CC = trace ; CC = notrace),!.
-
-    
-
-%= :- meta_predicate  restore_trace(0).
-restore_trace(Goal):- 
-    setup_call_cleanup(notrace((push_tracer)),(Goal*->notrace((reset_tracer));notrace((!,fail))),notrace(pop_tracer)).
-
-restore_trace(Per,Goal):-  
-    setup_call_cleanup(notrace((push_tracer,Per)),((Goal,notrace)*->(reset_tracer,Per,trace);notrace((!,fail))),pop_tracer).
-
-
-%= :- meta_predicate  rtrace(0).
-% rtrace(Goal):- notrace(tlbugger:rtracing),!, Goal.
-
-rtrace(Goal):- tracing,notrace, '$leash'(OldL, OldL),'$visible'(OldV, OldV),
-   CC = (notrace,'$leash'(_, OldL),trace,'$visible'(_, OldV)),
-   copy_term(CC,CC2),
-   RTRACE = (notrace,visible(+all),thread_leash(-all),thread_leash(+exception),trace),
-   RTRACE,!,
-   call_cleanup(((Goal)*->trace;(notrace,!,fail)),notrace(CC)),(CC2;(notrace,RTRACE,notrace(fail))).
-
-rtrace(Goal):- '$leash'(OldL, OldL),'$visible'(OldV, OldV),
-   CC = (notrace,'$leash'(_, OldL),'$visible'(_, OldV),notrace),
-   RTRACE = (notrace,visible(+all),thread_leash(-all),thread_leash(+exception),trace),
-   call_cleanup(((RTRACE,Goal)*->(notrace,deterministic(DET));(!,notrace,fail)),CC), (notrace(DET==yes)->notrace;(notrace;(RTRACE,notrace(fail)))).
-
-% rtrace(Goal):- notrace(tracing),trace,!,(notrace(tlbugger:rtracing) -> Goal ; (notrace(asserta(tlbugger:rtracing_traced)), restore_trace(rtrace,(trace,Goal)))).
-% rtrace(Goal):- tracing,!, setup_call_cleanup(rtrace,((trace,Goal,notrace)*->(trace)),pop_tracer).
-%rtrace(Goal):- get_tracer(Reset), setup_call_cleanup(rtrace,((trace,Goal,notrace)*->(trace)),Reset),trace.
-
-
-
-/*
-
-rtrace(Goal):- 
- notrace(tlbugger:rtracing) -> Goal;
-  (notrace((push_tracer,notrace)),assert(tlbugger:rtracing),
-    setup_call_cleanup(notrace((rtrace)),(rtrace,(Goal*->notrace((reset_tracer));notrace((!,fail))),notrace((nortrace,pop_tracer)))).
-
-rtrace(Goal):- notrace(tlbugger:rtracing) -> Goal ; (assert(tlbugger:rtracing), restore_trace((rtrace),(Goal))).
-
-*/
-
-:- '$set_predicate_attribute'(system:call_cleanup(_,_), trace, 0).
-:- '$set_predicate_attribute'(system:call_cleanup(_,_), hide_childs, 1).
-:- '$set_predicate_attribute'(system:setup_call_cleanup(_,_,_), trace, 0).
-:- '$set_predicate_attribute'(system:setup_call_cleanup(_,_,_), hide_childs, 1).
-:- '$set_predicate_attribute'(system:setup_call_catcher_cleanup(_,_,_,_), trace, 0).
-:- '$set_predicate_attribute'(system:setup_call_catcher_cleanup(_,_,_,_), hide_childs, 1).
-:- '$set_predicate_attribute'(restore_trace(_,_), trace, 0).
-:- '$set_predicate_attribute'(restore_trace(_,_), hide_childs, 1).
-:- '$set_predicate_attribute'(hotrace0(_), trace, 0).
-:- '$set_predicate_attribute'(hotrace0(_), hide_childs, 0).
-:- '$set_predicate_attribute'(rtrace(_), trace, 0).
-:- '$set_predicate_attribute'(rtrace(_), hide_childs, 1).
-:- '$set_predicate_attribute'(rtrace, trace, 0).
-:- '$set_predicate_attribute'(rtrace, hide_childs, 1).
-:- '$set_predicate_attribute'(nortrace, trace, 0).
-:- '$set_predicate_attribute'(nortrace, hide_childs, 1).
-:- '$set_predicate_attribute'(pop_tracer, trace, 0).
-:- '$set_predicate_attribute'(pop_tracer, hide_childs, 1).
-:- '$set_predicate_attribute'(tlbugger:rtracing, trace, 0).
-:- '$set_predicate_attribute'(system:tracing, trace, 0).
-:- '$set_predicate_attribute'(system:notrace, trace, 0).
-:- '$set_predicate_attribute'(system:trace, trace, 0).
-
-% = %= :- meta_predicate (motrace(0)).
-motrace(O):-logicmoo_util_bugger_catch:one_must(hotrace(must(O)),(trace,O)).
-
-
-% :- mpred_trace_less(rtrace/1).
-
-%= :- meta_predicate  ftrace(0).
-ftrace(Goal):- restore_trace((
-   visible(-all),visible(+unify),
-   visible(+fail),visible(+exception),
-   thread_leash(-all),thread_leash(+exception),trace,Goal)).
-
-
 trace_or_throw(E):- non_user_console,notrace((thread_self(Self),wdmsg(thread_trace_or_throw(Self+E)),!,throw(abort),thread_exit(trace_or_throw(E)))).
 trace_or_throw(E):- wdmsg(E),dtrace_msg(throw:-E).
 
  %:-interactor.
-
-
-traceafter_call(Goal):- call_cleanup(restore_trace((thread_leash(-all),visible(-all),Goal)),(thread_leash(+call), trace)).
-
-% :- mpred_trace_less(rtrace/0).
-% :- mpred_trace_less(nortrace/0).
-% :- mpred_trace_less(nortrace/0).
-% :- mpred_trace_less(rtrace/0).
-
-:- unlock_predicate(system:notrace/1).
-% :- mpred_trace_less(system:notrace/1).
-:- '$set_predicate_attribute'(notrace(_), trace, 0).
-:- '$set_predicate_attribute'(notrace(_), hide_childs, 1).
-% :- if_may_hide('$set_predicate_attribute'(notrace(_), trace, 0)).
-% :- if_may_hide('$set_predicate_attribute'(system:notrace(_), hide_childs, 1)).
-% :- if_may_hide('$set_predicate_attribute'(system:notrace(_), trace, 0)).
-:- lock_predicate(system:notrace/1).
 
 
 
@@ -861,7 +662,7 @@ on_x_log_fail(Goal):- catchvv(Goal,E,(dmsg(E:Goal),fail)).
 :- export(on_x_log_throw/1).
 :- export(on_x_log_cont/1).
 on_x_log_throw(Goal):- catchvv(Goal,E,(ddmsg(on_x_log_throw(E,Goal)),throw(E))).
-on_x_log_throwEach(Goal):-with_each(1,on_x_log_throw,Goal).
+%on_x_log_throwEach(Goal):-with_each(1,on_x_log_throw,Goal).
 on_x_log_cont(Goal):- catchvv((Goal*->true;ddmsg(failed_on_x_log_cont(Goal))),E,ddmsg(E:Goal)).
 
 :- thread_local( tlbugger:skipMust/0).
