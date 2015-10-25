@@ -508,6 +508,7 @@ index((asserta_i), 1, mpred_pfc, mpred_pfc).
 index((assertz_i), 1, mpred_pfc, mpred_pfc).
 index((check_context_module), 0, mpred_pfc, mpred_pfc).
 index((repropagate_2), 1, mpred_pfc, mpred_pfc).
+index((pfc_add), 1, mpred_pfc, mpred_pfc).
 index((assumption), 1, mpred_pfc, mpred_pfc).
 index((assumptions), 2, mpred_pfc, mpred_pfc).
 index((assumptions1), 2, mpred_pfc, mpred_pfc).

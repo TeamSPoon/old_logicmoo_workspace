@@ -460,7 +460,7 @@ never_assert_u(Rule,head_singletons(Pre,Post)):- cwc, Rule \= (_:-_), once(mpred
 never_assert_u(declared(M:F/A),never_declared(M:F/A)):- M:F/A = qrTBox:p/1.
 never_assert_u(A,B):-never_assert_u0(A,B),trace,never_assert_u0(A,B).
 
-never_assert_u(pqr:arity(_,_),is_support(arity/2)):- cwc,!.
+never_assert_u(M:arity(_,_),is_support(arity/2)):- M==pqr,dumpST, trace, cwc,!.
 never_assert_u(M:Rule,Why):- cwc, atom(M),never_assert_u(Rule,Why).
 
 never_assert_u0(mpred_mark(pfcPosTrigger,_,F,A),Why):-

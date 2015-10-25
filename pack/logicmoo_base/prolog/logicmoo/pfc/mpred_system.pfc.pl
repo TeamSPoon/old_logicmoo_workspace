@@ -216,7 +216,7 @@ neg(tCol(C))/completelyAssertedCollection(C)==> \+ completelyAssertedCollection(
      (predicate_property(M:G,dynamic)->true;must(convert_to_dynamic(M,F,A))),
      kb_dynamic(M:F/A),
      discontiguous(M:F/A),
-     must(show_failure(hybrid_support, \+ static_predicate(F/A)))}),
+     show_failure(hybrid_support, \+ static_predicate(F/A))}),
      prologHybrid(F),
     arity(F,A)).
 

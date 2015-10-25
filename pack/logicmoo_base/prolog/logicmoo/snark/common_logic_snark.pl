@@ -237,10 +237,10 @@ clif_to_prolog(CLIF,PrologO):- cwc,
 % why does renumbervars_prev work but not copy_term?
 is_entailed(CLIF):-
  mpred_no_chaining((
-   cwc, sanity((clif_to_prolog(CLIF,Prolog),!,sanity(( \+ \+ (show_failure(why,are_clauses_entailed(Prolog))))))))),!.
+   cwc, clif_to_prolog(CLIF,Prolog),!, \+ \+ are_clauses_entailed(Prolog))),!.
 
 % Sanity Test for required absence of specific side-effect entailments
-is_not_entailed(CLIF):- cwc, sanity((clif_to_prolog(CLIF,Prolog),show_failure(why,\+ are_clauses_entailed(Prolog)))),!.
+is_not_entailed(CLIF):- cwc, clif_to_prolog(CLIF,Prolog), \+ are_clauses_entailed(Prolog).
 
 :- op(1190,xfx,(:-)).
 :- op(1200,fy,(is_entailed)).
@@ -469,7 +469,7 @@ numbervars_with_names(Term,CTerm):-
    term_variables(CTerm,Vars),
    get_var_names(Vars,CNamedVars,Names),
    b_implode_varnames0(Names),
-   numbervars(CTerm,91,_,[attvar(skip),singletons(false)]),
+  % numbervars(CTerm,91,_,[attvar(skip),singletons(false)]),
    append(CNamedVars,NamedVars,NewCNamedVars),
    list_to_set(NewCNamedVars,NewCNamedVarsS),
    remove_grounds(NewCNamedVarsS,NewCNamedVarsSG),
@@ -482,7 +482,7 @@ numbervars_with_names(Term,CTerm):-
    term_variables(CTerm,Vars),
    get_var_names(Vars,CNamedVars,Names),
    b_implode_varnames0(Names),
-   numbervars(CTerm,91,_,[attvar(skip),singletons(false)]),
+  %  numbervars(CTerm,91,_,[attvar(skip),singletons(false)]),
    append(CNamedVars,NamedVars,NewCNamedVars),
    list_to_set(NewCNamedVars,NewCNamedVarsS),
    remove_grounds(NewCNamedVarsS,NewCNamedVarsSG),

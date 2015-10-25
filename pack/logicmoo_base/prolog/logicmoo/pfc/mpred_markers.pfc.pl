@@ -27,16 +27,16 @@ mpred_mark(pfcRHS,_,F,1)/(fail,atom(F),functor(Head,F,1),
 */
 % mpred_mark(Type,_,F,A)/(integer(A),A>1,F\==arity,Assert=..[Type,F])==>arity(F,A),Assert.
 
-mpred_mark_C(G) ==> {mpred_mark_C(G)}.
-mpred_mark_C(G) :-  map_literals(lambda(P,(get_functor(P,F,A),ain([isa(F,pfcControlled),arity(F,A)]))),G).
+mpred_mark_C(G) ==> {map_mpred_mark_C(G)}.
+map_mpred_mark_C(G) :-  map_literals(lambda(P,(get_functor(P,F,A),ain([isa(F,pfcControlled),arity(F,A)]))),G).
 mpred_mark(pfcRHS,_,F,A)/(atom(F),integer(A),F\==arity)==>tPred(F),arity(F,A),pfcControlled(F/A).
 
 
 
 
-:- meta_predicate(mp_test_agr(?,+,-,*,^,:,0,1,5,9)).
-mp_test_agr(_,_,_,_,_,_,_,_,_,_).
-:- mpred_test(predicate_property(mp_test_agr(_,_,_,_,_,_,_,_,_,_),meta_predicate(_))).
+%:- meta_predicate(mp_test_agr(?,+,-,*,^,:,0,1,5,9)).
+%mp_test_agr(_,_,_,_,_,_,_,_,_,_).
+%:- mpred_test(predicate_property(mp_test_agr(_,_,_,_,_,_,_,_,_,_),meta_predicate(_))).
 % becomes         mp_test_agr(+,+,-,?,^,:,0,1,0,0)
 
 

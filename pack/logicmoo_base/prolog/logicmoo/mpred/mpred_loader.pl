@@ -245,7 +245,7 @@ kb_dynamic((FA1,FA2)):-!,kb_dynamic(FA1),kb_dynamic(FA2).
 % kb_dynamic(CM:M:F/A):- atom(CM),atom(M),!,(CM==M -> kb_dynamic(M:FA);(CM:kb_dynamic(M:F/A))).
 kb_dynamic(M:(FA1,FA2)):-!,kb_dynamic(M:FA1),kb_dynamic(M:FA2).
 kb_dynamic(M:[FA1|FA2]):-!,kb_dynamic(M:FA1),kb_dynamic(M:FA2).
-kb_dynamic(M:F/A):-!,make_declared(M:F/A,T),get_user_abox(CM),make_reachable(CM,T:F/A).
+kb_dynamic(M:F/A):-!,must((make_declared(M:F/A,T),get_user_abox(CM),make_reachable(CM,T:F/A))).
 kb_dynamic(M:P):-functor(P,F,A),!,kb_dynamic(M:F/A).
 kb_dynamic(P):-functor(P,F,A),!,kb_dynamic(F/A).
 
@@ -257,9 +257,15 @@ chop_box(Chop,Chop).
 
 maybe_add_import_module(A,A,_):-!.
 maybe_add_import_module(basePFC,baseKB,end):-!.
+maybe_add_import_module(_A,baseKBTBox,end):-!,dumpST,trace,fail.
+
 maybe_add_import_module(A,B,C):-add_import_module(A,B,C),!.
 
-to_tbox(A,baseKB):-is_support_kb(A).
+is_support_kb(baseKB).
+is_support_kb(logicmoo_user).
+is_support_kb(basePFC).
+
+to_tbox(A,T):-is_support_kb(A),!,T=baseKB.
 to_tbox(pqr,pqrTBox).
 to_tbox(pqrABox,pqrTBox).
 to_tbox(pqrSBox,pqrTBox).
@@ -267,12 +273,12 @@ to_tbox(pqrTBox,pqrTBox).
 to_tbox(Chop,Add):-chop_box(Chop,Was),atom_concat(Was,'TBox',Add).
 
 
-to_sbox(A,basePFC):-is_support_kb(A).
+to_sbox(A,T):-is_support_kb(A),!,T=baseKB.
 to_sbox(pqr,pqrSBox).
 to_sbox(pqrABox,pqrSBox).
 to_sbox(pqrTBox,pqrSBox).
 to_sbox(pqrSBox,pqrSBox).
-to_sbox(Chop,Add):-chop_box(Chop,Was),atom_concat(Was,'TBox',Add).
+to_sbox(Chop,Add):-chop_box(Chop,Was),atom_concat(Was,'SBox',Add).
 
 
 to_abox(A,A):-is_support_kb(A).
@@ -310,7 +316,7 @@ make_declared(M:F/A,T):- !,correct_module(M,F,A,T),!,make_declared_now(T:F/A).
 make_declared(F/A,T):- !,correct_module(abox,F,A,T),!,make_declared_now(T:F/A).
 
 make_declared_now(M:F/A):- !, % slow_sanity
-   (dmsg(make_declared(M:F/A))),
+   % debug(make_declared,make_declared(M:F/A)),
    must( \+ ((M:F/A) = (qrTBox:p/1))),
    check_never_assert(declared(M:F/A)),
    M:multifile(M:F/A),M:module_transparent(M:F/A),M:export(M:F/A),functor(P,F,A),
@@ -432,7 +438,7 @@ add_term(Term,Vs):-
 add_from_file(Term):-  
   w_tl(t_l:mpred_already_in_file_expansion(Term),must(ain(Term))).
 
-myDebugOnError(Term):-catch(once(must((Term))),E,(dmsg(error(E,start_myDebugOnError(Term))),trace,rtrace((Term)),dmsginfo(stop_myDebugOnError(E=Term)),trace,Term)).
+myDebugOnError(Term):-catch(once(must((Term))),E,(dmsg(error(E,start_myDebugOnError(Term))),dumpST,trace,rtrace((Term)),dmsginfo(stop_myDebugOnError(E=Term)),trace,Term)).
          
 read_one_term(Term,Vs):- catch(once(( read_term(Term,[double_quotes(string),variable_names(Vs)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
 read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quotes(string),variable_names(Vs)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
@@ -770,7 +776,8 @@ get_user_tbox(T):-get_user_abox(M),to_tbox(M,T).
 get_user_sbox(T):-get_user_abox(M),to_sbox(M,T).
 
 :- thread_local(t_l:user_abox/1).
-get_user_abox(Ctx):- must(t_l:user_abox(Out)),must(Out\=user),!,must(Ctx=Out).
+get_user_abox(Ctx):- (t_l:user_abox(Out)),ignore(sanity(Out\=user)),!,must(Ctx=Out).
+get_user_abox(Ctx):- current_context_module(Out),ignore(sanity(Out\=user)),!,must(Ctx=Out),set_user_abox(Ctx).
 set_user_abox(M):- must(M\=user), (t_l:user_abox(Prev)->true;Prev=M),decl_user_abox(M),assert_until_eof(t_l:user_abox(M)),onEndOfFile(set_user_abox(Prev)).
 
 % set_user_tbox(SM):- get_user_abox(M),ensure_support_module(SM),set_user_tbox(M,SM).
@@ -844,9 +851,6 @@ ensure_tbox_module(M):-
   %           ( is_support_kb(M) -> true ; maybe_add_import_module(M,baseKB,end)).
             
 
-is_support_kb(baseKB).
-is_support_kb(logicmoo_user).
-is_support_kb(basePFC).
 
 
 % ========================================
@@ -879,11 +883,11 @@ disable_mpred_expansion:- (( t_l:disable_px) -> true ;
 
 file_begin(W):-    
   must_det((
-   enable_mpred_expansion, 
+   enable_mpred_expansion,    
    loading_source_file(ISource),
    mpred_ops,
    context_module_of_file(M),
-   decl_user_abox(M),
+   set_user_abox(M),
    op_lang(W),    
    decache_file_type(ISource),
    assert_until_eof(lmcache:mpred_directive_value(W,file,ISource)))),

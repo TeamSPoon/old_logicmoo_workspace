@@ -18,6 +18,7 @@
             assertz_i/1,
             check_context_module/0,
             repropagate_2/1,
+            pfc_add/1,
             assumption/1,
             assumptions/2,
             assumptions1/2,
@@ -549,11 +550,13 @@
         use_presently/0)).
 
 :- module_transparent 
-            repropagate/1,
-            repropagate_0/1,
-            repropagate_1/1,
-            repropagate_meta_wrapper_rule/1,
-
+add_reprop/2,
+            add_side_effect/2,
+            all_closed/1,
+            append_as_first_arg/3,
+            assert_eq_quitely/1,
+            assert_i/1,
+            assert_u/1,
             assert_u/4,
           assertz_u/1,
           assertz_mu/2,
@@ -566,6 +569,7 @@
             assumptions/2,
             assumptions1/2,
             attvar_op/2,
+            with_in_source_context/1,
             baseable/2,
             baseable_list/2,
             brake/1,
@@ -636,8 +640,295 @@
             is_side_effect_disabled/0,
             justification/2,
             justifications/2,
-            loop_check_nr/1.
-
+            loop_check_nr/1,
+            make_uu_remove/1,
+            map_literals/2,
+            map_literals/3,
+            map_unless/4,
+            match_source_ref1/1,
+            maybeSupport/2,
+            meta_wrapper_rule/1,
+            lmconf:module_local_init/0,
+            ain/1,
+            ain/2,
+            mpred_ain/1,
+            mpred_aina/1,
+            mpred_ainz/1,
+            mpred_ainz/2,
+            mpred_ain/2,
+            ain_actiontrace/2,
+            ain_db_to_head/2,
+            ain_fast/1,
+            ain_fast/2,
+            ain_fast_sp/2,
+            ain_fast_sp0/2,
+            ain_fast_timed/2,
+            ain_minfo/1,
+            ain_minfo/2,
+            ain_minfo_2/2,
+            ain_rule0/1,
+            ain_rule_if_rule/1,
+            ain_support/2,
+            ain_t/2,
+            ain_trigger/2,
+            ain_trigger_0/3,
+            aina_i/2,            
+            ainz_i/2,
+            mpred_axiom/1,
+            mpred_bc_only/1,
+            mpred_call_with_no_triggers_uncaugth/1,
+            mpred_bt_pt_combine/3,
+            req/1,
+            mpred_call_0/1,
+            mpred_call_1/3,
+            mpred_call_only_facts/1,
+            mpred_call_only_facts/2,
+            mreq/1,
+            mpred_call_t_exact/1,
+            mpred_call_with_no_triggers/1,
+            mpred_call_with_no_triggers_bound/1,
+            mpred_child/2,
+            mpred_children/2,
+            mpred_clause/3,
+            mpred_clause_i/1,
+            mpred_clause_is_asserted/2,
+            mpred_clause_is_asserted_hb_nonunify/2,
+            mpred_cleanup/0,
+            mpred_cleanup/2,
+            mpred_cleanup_0/1,
+            mpred_compile_rhsTerm/3,
+            mpred_connective/1,
+            mpred_current/0,
+            mpred_current_db/1,
+            mpred_current_op_support/1,
+            mpred_database_item/1,
+            mpred_database_term/1,
+            mpred_db_type/2,
+            mpred_deep_support/2,
+            mpred_deep_support0/2,
+            mpred_define_bc_rule/3,
+            mpred_descendant/2,
+            mpred_descendant1/3,
+            mpred_descendants/2,
+            mpred_each_literal/2,
+            mpred_enqueue/2,
+            mpred_error/1,
+            mpred_error/2,
+            mpred_eval_lhs/2,
+            mpred_eval_lhs0/2,
+            mpred_eval_rhs1/2,
+            mpred_eval_rhs_0/2,
+            mpred_fact/1,
+            mpred_fact/2,
+            mpred_facts/1,
+            mpred_facts/2,
+            mpred_facts/3,
+            mpred_facts_and_universe/1,
+            mpred_facts_only/1,
+            mpred_file_expansion_0/2,
+            mpred_freeLastArg/2,
+            mpred_fwd/1,
+            mpred_fwd/2,
+            mpred_fwd1/2,
+            mpred_fwd2/2,
+            mpred_get_support/2,
+            mpred_get_support_neg/2,
+            mpred_get_support_one/2,
+            mpred_get_support_precanonical/2,
+            mpred_get_support_precanonical_plus_more/2,
+            mpred_get_support_via_clause_db/2,
+            mpred_get_support_via_sentence/2,
+            mpred_get_trigger_quick/1,
+            mpred_had_support/2,
+            mpred_halt/0,
+            mpred_halt/1,
+            mpred_halt/2,
+            mpred_hide_msg/1,
+            mpred_ignored/1,
+            mpred_init_i/2,
+            mpred_is_builtin/1,
+            mpred_is_info/1,
+            mpred_is_silient/0,
+            mpred_is_taut/1,
+            mpred_is_tautology/1,
+            mpred_is_tracing_exec/0,
+            mpred_literal/1,
+            mpred_literal_nv/1,
+            mpred_maptree/2,
+            mpred_maptree/3,
+            mpred_mark_as/4,
+            mpred_mark_fa_as/6,
+            mpred_mpred_file/0,
+            mpred_negated_literal/1,
+            mpred_negated_literal/2,
+            mpred_negation/2,
+            mpred_negation_w_neg/2,
+            mpred_nf/2,
+            mpred_nf1/2,
+            mpred_nf1_negation/2,
+            mpred_nf_negation/2,
+            mpred_nf_negations/2,
+            mpred_no_chaining/1,
+            mpred_no_spy/0,
+            mpred_no_spy/1,
+            mpred_no_spy/3,
+            mpred_no_spy_all/0,
+            mpred_no_trace/0,
+            mpred_no_trace_all/0,
+            mpred_no_warnings/0,
+            mpred_no_watch/0,
+            mpred_non_neg_literal/1,
+            mpred_pbody/5,
+            mpred_pbody_f/5,
+            mpred_positive_literal/1,
+            mpred_post/2,
+            mpred_post1/2,
+            mpred_post1_sp_0/2,
+            mpred_post1_sp_1/2,
+            mpred_post_sp/2,
+            mpred_post_sp_zzz/2,
+            mpred_post_sp_zzzz/2,
+            mpred_prove_neg/1,
+            
+            pfc_provide_storage_op/2,
+            mpred_rem/1,
+            mpred_rem1/1,
+            mpred_rem1/2,
+            mpred_rem2/1,
+            mpred_rem2a/1,
+            mpred_rem2a/2,
+            mpred_rem_actiontrace/2,
+            mpred_rem_support/3,
+            mpred_remove3/1,
+            mpred_remove_old_version/1,
+            mpred_remove_supports_f_l/2,
+            mpred_remove_supports_quietly/1,
+            mpred_reset/0,
+            mpred_retract_db_type/1,
+            mpred_retract_db_type/2,
+            mpred_retract_or_warn_i/1,
+            mpred_retract_support_relations/2,
+            mpred_rewrap_h/2,
+            mpred_rule_hb/3,
+            mpred_rule_hb_0/3,
+            mpred_run/0,
+            mpred_run0/0,
+            mpred_run_maybe/0,
+            mpred_scan_tms/1,
+            mpred_slow_search/0,
+            mpred_is_spying/2,
+            mpred_spy/1,
+            mpred_spy/2,
+            mpred_spy/3,
+            mpred_spy1/3,
+            mpred_spy_all/0,
+            mpred_step/0,
+            mpred_step0/0,
+            mpred_test/1,
+            mpred_tms_supported/2,
+            mpred_tms_supported/3,
+            mpred_tms_supported0/3,
+            mpred_trace/0,
+            mpred_trace/1,
+            mpred_trace/2,
+            mpred_trace_add/2,
+            mpred_trace_addPrint/2,
+            mpred_trace_addPrint_0/2,
+            mpred_trace_exec/0,
+            mpred_notrace_exec/0,
+            mpred_trace_break/2,
+            mpred_trace_msg/1,
+            mpred_trace_msg/2,
+            mpred_trace_rem/2,
+            mpred_is_tracing/1,
+            mpred_undo/2,
+            mpred_undo_e/2,
+            mpred_undo_u/2,
+            mpred_unfwc/1,
+            mpred_unfwc1/1,
+            mpred_unfwc_check_triggers/2,
+            mpred_union/3,
+            mpred_unique_i/1,
+            mpred_unique_u/1,
+            mpred_untrace/0,
+            mpred_untrace/1,
+            mpred_update_literal/4,
+            mpred_user_fact/1,
+            mpred_warn/0,
+            mpred_warn/1,
+            mpred_warn/2,
+            mpred_warnings/0,
+            mpred_warnings/1,
+            mpred_watch/0,
+            mpred_wff/3,
+            mpred_wfflist/2,
+            no_side_effects/1,
+            nompred_warn/0,
+            nonfact_metawrapper/1,
+            not_cond/2,
+            pfcBC_Cache/1,
+            pfcBC_NoFacts/1,
+            pfcBC_NoFacts_TRY/1,
+            pfcVerifyMissing/3,
+            pfcVersion/1,
+            pfcl_do/1,
+            physical_side_effect/1,
+            pred_all/1,
+            pred_head/2,
+            pred_head_all/1,
+            pred_r0/1,
+            pred_t0/1,
+            pred_u0/1,
+            pred_u1/1,
+            pred_u2/1,
+            process_rule/3,
+            record_se/0,
+            reduce_clause_from_fwd/2,
+            rem_list/1,
+            remove_if_unsupported/2,
+            remove_if_unsupported_verbose/3,
+            remove_selection/2,
+   repropagate/1,
+   repropagate_0/1,
+   repropagate_1/1,
+   repropagate_meta_wrapper_rule/1,
+            rescan_pfc/0,
+            baseKB:resolveConflict0/1,
+            retract_eq_quitely/1,
+            retract_eq_quitely_f/1,
+            retract_i/1,
+            retract_t/1,
+            retract_u/1,
+            retractall_i/1,
+            retractall_u/1,
+            rewritten_metawrapper/1,
+            ruleBackward/2,
+            ruleBackward0/2,
+            select_next_fact/2,
+            set_prolog_stack_gb/1,
+            should_call_for_facts/1,
+            should_call_for_facts/3,
+            show_if_debug/1,
+            spft_precanonical/3,
+            sub_term_eq/2,
+            sub_term_v/2,
+            support_ok_via_clause_body/1,
+            support_ok_via_clause_body/3,
+            supports_f_l/2,
+            to_addable_form/2,
+            to_addable_form_wte/3,
+            to_predicate_isas/2,
+            to_predicate_isas0/2,
+            to_predicate_isas_each/2,
+            trigger_supports_f_l/2,
+            undoable/1,
+            update_single_valued_arg/2,
+            use_presently/0,
+            user_atom/1,
+            wac/0,
+            wellFounded/2,
+            with_mpred_trace_exec/1,
+            wlmuser/1.
 :- module_transparent(check_context_module/0).
 check_context_module:- must((source_context_module(M),M\==mpred_pfc,M\==mpred_loader)).
 check_real_context_module:- must((context_module(M),M\==mpred_pfc,M\==mpred_loader)).
@@ -871,11 +1162,11 @@ reduce_clause_from_fwd((H,B),(HH,BB)):-!,reduce_clause_from_fwd(H,HH),reduce_cla
 reduce_clause_from_fwd(H,H).
 
 
-to_addable_form(I,I):-is_ftVar(I),!.
-to_addable_form(I,OOO):-is_list(I),!,must_maplist(to_addable_form,I,O),flatten(O,OO),!,reduce_clause_from_fwd(OO,OOO).
-to_addable_form(I,OO):- current_predicate(mpred_term_expansion_file/0),once(fully_expand(_,I,II)),!,
- once((into_mpred_form(II,M),to_predicate_isas_each(M,O))),!,reduce_clause_from_fwd(O,OO).
-to_addable_form(I,O):- bagof(M,do_expand_args(isEachAF,I,M),IM),list_to_conjuncts(IM,M),to_predicate_isas_each(M,O),!.
+to_addable_form(I,I):- is_ftVar(I),!.
+to_addable_form(I,OOO):-is_list(I),!,must_maplist(to_addable_form,I,O),flatten(O,OO),!,must(reduce_clause_from_fwd(OO,OOO)).
+to_addable_form(I,OO):- current_predicate(_:mpred_term_expansion_file/0),must(fully_expand(pfc,I,II)),!,
+ must((into_mpred_form(II,M),to_predicate_isas_each(M,O))),!,reduce_clause_from_fwd(O,OO).
+to_addable_form(I,O):- must((bagof(M,do_expand_args(isEachAF,I,M),IM))),list_to_conjuncts(IM,M),to_predicate_isas_each(M,O),!.
 
 
 % I =((P,Q)==>(p(P),q(Q))) , findall(O,baseKB:do_expand_args(isEachAF,I,O),L).
@@ -1235,18 +1526,20 @@ lmconf:module_local_init:- must((mpred_init_i(basePFC:tms(_), basePFC:tms(cycles
 lmconf:module_local_init:- mpred_init_i(basePFC:sm(_), basePFC:sm(direct)).
 
 % aliases
-mpred_ain(G):-ain(G).
-mpred_ain(G,S):-ain(G,S).
-mpred_ainz(G):-ain(G).
+
+mpred_ain(G):-pfc_add(G).
+mpred_ainz(G):-pfc_add(G).
+mpred_aina(G):-pfc_add(G).
+
+mpred_ain(G,S):- ain(G,S).
 mpred_ainz(G,S):-ain(G,S).
-mpred_aina(G):-ain(G).
 mpred_aina(G,S):-ain(G,S).
 
 %= ain/2 and mpred_post/2 are the main ways to assert_db new clauses into the
 %= database and have forward reasoning done.
 
 %= ain(P,S) asserts P into the user''s dataBase with support from S.
-ain(P) :-  check_context_module,
+pfc_add(P) :-  check_context_module,
   ain_fast(P).
 
 ain(P,S) :- 
@@ -1283,19 +1576,18 @@ ain_fast_sp0(S,P) :-
 %ain_fast_sp(_,_).
 ain_fast_sp0(P,S) :- mpred_error("ain_fast(~p,~p) failed",[P,S]).
 
-
-
-:- abolish(logicmoo_util_database:aina/1).
-:- abolish(logicmoo_util_database:ain/1).
-:- abolish(logicmoo_util_database:ainz/1).
-logicmoo_util_database:aina(G):- mpred_aina(G).
-logicmoo_util_database:ain(G):- mpred_ain(G).
-logicmoo_util_database:ainz(G):- mpred_ainz(G).
-:- module_transparent(logicmoo_util_database:aina/1).
-:- module_transparent(logicmoo_util_database:ain/1).
-:- module_transparent(logicmoo_util_database:ainz/1).
-
-
+:-module_transparent(mpred_ain/1).
+:-module_transparent(mpred_aina/1).
+:-module_transparent(mpred_ainz/1).
+:-module_transparent(logicmoo_util_database:ain/1).
+:-module_transparent(logicmoo_util_database:aina/1).
+:-module_transparent(logicmoo_util_database:ainz/1).
+:-multifile(logicmoo_util_database:ain/1).
+:-multifile(logicmoo_util_database:aina/1).
+:-multifile(logicmoo_util_database:ainz/1).
+:-asserta((logicmoo_util_database:ainz(G):- !, with_in_source_context(mpred_ainz(G)))).
+:-asserta((logicmoo_util_database:ain(G):- !, with_in_source_context(mpred_ain(G)))).
+:-asserta((logicmoo_util_database:aina(G):- !, with_in_source_context(mpred_aina(G)))).
 
 % mpred_post(+Ps,+S) tries to assert a fact or set of fact to the database.  For
 % each fact (or the singelton) mpred_post1 is called. It always succeeds.
@@ -3397,7 +3689,7 @@ repropagate(P):-  \+ predicate_property(P,_),'$find_predicate'(P,PP),PP\=[],!,fo
 repropagate(F/A):- atom(F),integer(A),!,functor(P,F,A),!,repropagate(P).
 repropagate(F/A):- atom(F),is_ftVar(A),!,repropagate(F).
 
-repropagate(P):-  \+ predicate_property(_:P,_),trace,dmsg(undefined_repropagate(P)),!,fail.
+repropagate(P):-  \+ predicate_property(_:P,_),dumpST,trace,dmsg(undefined_repropagate(P)),!,fail.
 repropagate(P):-  repropagate_0(P).
 
 repropagate_0(P):- loop_check(with_in_source_context(repropagate_1(P)),true).

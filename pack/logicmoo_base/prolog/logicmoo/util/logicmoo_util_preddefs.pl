@@ -185,7 +185,7 @@ make_transparent(_CM,M,PI,F/A):-
 
 
 :-module_transparent(context_module_of_file/1).
-context_module_of_file(CM):- prolog_load_context(source,F), make_module_name(F,CM),current_module(CM),!.
+context_module_of_file(CM):- prolog_load_context(source,F), make_module_name(F,CM),current_module(CM0),CM==CM0,!.
 context_module_of_file(CM):- '$set_source_module'(CM,CM),!.
 context_module_of_file(CM):- source_context_module(CM),!.
 

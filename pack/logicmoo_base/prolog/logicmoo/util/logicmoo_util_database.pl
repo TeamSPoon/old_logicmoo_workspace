@@ -209,6 +209,12 @@ paina(N):-call_provider(paina(N)).
 painz(N):-call_provider(painz(N)).
 
 
+:-module_transparent(ain/1).
+:-module_transparent(aina/1).
+:-module_transparent(ainz/1).
+:-dynamic(ain/1).
+:-dynamic(aina/1).
+:-dynamic(ainz/1).
 ain(N):- call_provider(pain(N)).
 aina(N):-call_provider(paina(N)).
 ainz(N):-call_provider(painz(N)).

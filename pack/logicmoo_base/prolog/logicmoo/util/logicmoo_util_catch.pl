@@ -385,7 +385,7 @@ source_file0(F):-findall(E,catch((stream_property( S,mode(read)),stream_property
 source_variables_l(AllS):-
   (prolog_load_context(variable_names,Vs1);Vs1=[]),
   (nb_current('$variable_names', Vs2);Vs2=[]),
-  % notrace(catch((parent_goal('$toplevel':'$execute_goal2'(_, Vs3),_);Vs3=[]),E,(writeq(E),Vs3=[]))),
+  notrace(catch((parent_goal('$toplevel':'$execute_goal2'(_, Vs3),_);Vs3=[]),E,(writeq(E),Vs3=[]))),
   ignore(Vs3=[]),
   append(Vs1,Vs2,Vs12),append(Vs12,Vs3,All),!,list_to_set(All,AllS),
   nb_linkval('$variable_names', AllS).
@@ -787,8 +787,8 @@ get_must(Goal,CGoal):- tlbugger:show_must_go_on,!,
      notrace(((dumpST,ddmsg(error,sHOW_MUST_go_on_xI__xI__xI__xI__xI_(E,Goal))),badfood(Goal))))
             *-> true ; notrace((dumpST,ddmsg(error,sHOW_MUST_go_on_failed_F__A__I__L_(Goal)),badfood(Goal))))).
 
-% get_must(Goal,CGoal):- !, CGoal = (catchv(Goal,E,(notrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),trace,!,throw(E))) *-> true ; ((ddmsg(failed(must(Goal))),trace,Goal))).
-get_must(Goal,CGoal):- !, CGoal = on_x_rtrace(Goal) *-> true; debugCallWhy(failed(on_f_debug(Goal)),Goal).
+get_must(Goal,CGoal):- !, (CGoal = (on_x_rtrace(Goal) *-> true; debugCallWhy(failed(on_f_debug(Goal)),Goal))).
+get_must(Goal,CGoal):- !, CGoal = (catchv(Goal,E,(notrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),trace,!,throw(E))) *-> true ; ((ddmsg(failed(must(Goal))),trace,Goal))).
 get_must(Goal,CGoal):-    
    (CGoal = (catchv(Goal,E,
      (dumpST,ddmsg(error,must_xI_(E,Goal)),set_prolog_flag(debug_on_error,true),

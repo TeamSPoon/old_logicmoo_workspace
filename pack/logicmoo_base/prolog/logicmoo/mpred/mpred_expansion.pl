@@ -590,7 +590,7 @@ db_expand_0(_ ,HB,HB).
 is_arity_pred(argIsa).
 is_arity_pred(arity).
 
-map_f(M:F,FO):-atom(M),map_f(F,FO).
+map_f(M:F,M:FO):-atom(M),map_f(F,FO).
 map_f(mpred_isa,isa).
 map_f(props,isa).
 map_f(F,F):-!.
@@ -791,7 +791,7 @@ expanded_different_1(G0,G1):- G0 \= G1,!.
 % into_functor_form/3 (adds a second order functor onto most predicates)
 % ========================================
 :- was_export(into_functor_form/3).
-into_functor_form(HFDS,M:X,O):- atom(M),!,into_functor_form(HFDS,X,O),!.
+into_functor_form(HFDS,M:X,M:O):- atom(M),!,into_functor_form(HFDS,X,O),!.
 into_functor_form(HFDS,X,O):-call((( X=..[F|A],into_functor_form(HFDS, X,F,A,O)))),!.
 
 % TODO finish negations
@@ -875,7 +875,7 @@ transform_holds_3(_,A,A):- \+ (is_ftCompound(A)),!.
 transform_holds_3(_,props(Obj,Props),props(Obj,Props)):-!.
 %transform_holds_3(Op,Sent,OUT):-Sent=..[And|C12],is_logical_functor(And),!,maplist(transform_holds_3(Op),C12,O12),OUT=..[And|O12].
 transform_holds_3(_,A,A):-functor_catch(A,F,N), predicate_property(A,_),mpred_isa(F,arity(N)),!.
-transform_holds_3(HFDS,M:Term,OUT):-atom(M),!,transform_holds_3(HFDS,Term,OUT).
+transform_holds_3(HFDS,M:Term,M:OUT):-atom(M),!,transform_holds_3(HFDS,Term,OUT).
 transform_holds_3(HFDS,[P,A|ARGS],DBASE):- is_ftVar(P),!,DBASE=..[HFDS,P,A|ARGS].
 transform_holds_3(HFDS, ['[|]'|ARGS],DBASE):- trace_or_throw(list_transform_holds_3(HFDS,['[|]'|ARGS],DBASE)).
 transform_holds_3(Op,[SVOFunctor,Obj,Prop|ARGS],OUT):- is_svo_functor(SVOFunctor),!,transform_holds_3(Op,[Prop,Obj|ARGS],OUT).
@@ -910,16 +910,16 @@ holds_args(HOFDS,FIST):- is_ftCompound(HOFDS),HOFDS=..[H|FIST],is_holds_true(H),
 :- was_export((do_expand_args/3)).
 
 do_expand_args(_,Term,Term):- compound(Term),functor(Term,F,_),if_defined(argsQuoted(F)),!.
-do_expand_args(Exp,Term,Out):- compound(Term),!,do_expand_args_c(Exp,Term,Out).
+do_expand_args(Exp,Term,Out):- compound(Term),!,must(do_expand_args_c(Exp,Term,Out)).
 do_expand_args(_,Term,Term).
 
-do_expand_args_c(Exp,[L|IST],Out):- !,do_expand_args_l(Exp,[L|IST],Out).
+do_expand_args_c(Exp,[L|IST],Out):- !,must(do_expand_args_l(Exp,[L|IST],Out)).
 do_expand_args_c(Exp,Term,Out):- Term=..[P|ARGS],do_expand_args_pa(Exp,P,ARGS,Out).
 
 do_expand_args_pa(Exp,Exp,ARGS,Out):- !,member(Out,ARGS).
 do_expand_args_pa(Exp,P,ARGS,Out):- do_expand_args_l(Exp,ARGS,EARGS), Out=..[P|EARGS].
 
-do_expand_args_l(_,A,A):- var(A),!.
+do_expand_args_l(_,A,A):- is_ftVar(A),!.
 do_expand_args_l(_,[],[]):- !.
 do_expand_args_l(Exp,[A|RGS],[E|ARGS]):- do_expand_args(Exp,A,E),do_expand_args_l(Exp,RGS,ARGS).
 
