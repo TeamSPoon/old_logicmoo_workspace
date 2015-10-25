@@ -369,6 +369,7 @@ fully_expand_goal(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,transitive_lc(db
 
 as_is_term(NC):-hotrace(as_is_term0(NC)).
 :- export(as_is_term0/1).
+as_is_term0(M:NC):-atom(M),is_ftVar(NC),!.
 as_is_term0(NC):- \+(is_ftCompound(NC)),!.
 as_is_term0(NC):-cyclic_term(NC),!,dmsg(cyclic_term(NC)),!.
 as_is_term0('$VAR'(_)):-!.
@@ -600,7 +601,7 @@ compound_all_open(C):-compound(C),functor(C,_,A),A>1,\+((arg(_,C,Arg),is_ftNonva
 
 /*
 db_expand_0(Op,MT:Term,MT:O):- is_kb_module(MT),!,w_tl(t_l:caller_module(baseKB,MT),db_expand_0(Op,Term,O)).
-db_expand_0(Op,DB:Term,DB:O):- get_mpred_user_kb(DB),!,w_tl(t_l:caller_module(db,DB),db_expand_0(Op,Term,O)).
+db_expand_0(Op,DB:Term,DB:O):- get_user_abox(DB),!,w_tl(t_l:caller_module(db,DB),db_expand_0(Op,Term,O)).
 db_expand_0(Op,KB:Term,KB:O):- atom(KB),!,w_tl(t_l:caller_module(prolog,KB),db_expand_0(Op,Term,O)).
 */
 

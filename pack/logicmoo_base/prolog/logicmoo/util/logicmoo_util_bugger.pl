@@ -46,7 +46,7 @@
             debugFmtList/1,
             debugFmtList0/2,
             debugFmtList1/2,
-            debugOnFailure0/1,
+            on_f_debug/1,
             debugOnFailureEach/1,
             default_dumptrace/1,
             default_ecall/3,
@@ -153,8 +153,7 @@
             randomVars/1,
             real_builtin_predicate/1,
             replace_elements/4,
-            rmust_det/1,
-            rtraceOnError/1,
+            rmust_det/1,            
             saveUserInput/0,
             setLogLevel/2,
             set_bugger_flag/2,
@@ -234,7 +233,7 @@
         on_x_debug(0),
         on_x_debug_cont(0),
         on_f_debug(0),
-        debugOnFailure0(0),
+        on_f_debug(0),
         forall_member(?, ?, 0),
         gmust(0, 0),
         gripe_time(+, 0),
@@ -273,7 +272,6 @@
         randomVars(0),
         real_builtin_predicate(0),
         rmust_det(0),
-        rtraceOnError(0),
         set_gui_debug(0),
         showProfilerStatistics(0),
         show_and_do(0),        
@@ -587,7 +585,7 @@ define_if_missing(system:atomics_to_string/3, [
 define_if_missing(system:atomics_to_string/2, [
   ( system:atomics_to_string(List, String):- new_a2s(List, '', String) ) ]).
 
-new_a2s(List, Separator, String):-catchvv(new_a2s0(List, Separator, String),_,((trace,new_a2s0(List, Separator, String)))).
+new_a2s(List, Separator, String):-catchv(new_a2s0(List, Separator, String),_,((trace,new_a2s0(List, Separator, String)))).
 new_a2s0(List, Separator, String):-
  (atomic(String) -> (string_to_atom(String,Atom),concat_atom(List, Separator, Atom));
      (concat_atom(List, Separator, Atom),string_to_atom(String,Atom))).
@@ -695,12 +693,12 @@ bugger_expand_goal(T,_):- fail,dmsg(bugger_expand_goal(T)),fail.
 bugger_expand_term(T,_):- fail, dmsg(bugger_expand_term(T)),fail.
 
 :- export(format_safe/2).
-format_safe(A,B):-catchvv(format(A,B),E,(dumpST,dtrace_msg(E:format(A,B)))).
+format_safe(A,B):-catchv(format(A,B),E,(dumpST,dtrace_msg(E:format(A,B)))).
 
 % = %= :- meta_predicate (bugger_term_expansion(:,-)).
 bugger_term_expansion(CM:T,TT):- compound(T),  tlbugger:use_bugger_expansion,!,bugger_term_expansion(CM,T,TT).
 % = %= :- meta_predicate (bugger_term_expansion(+,+,-)).
-bugger_term_expansion(CM,T,T3):- once(bugger_t_expansion(CM,T,T2)),T\==T2,!,nop(dmsg(T\==T2)),catchvv(expand_term(T2,T3),_,fail).
+bugger_term_expansion(CM,T,T3):- once(bugger_t_expansion(CM,T,T2)),T\==T2,!,nop(dmsg(T\==T2)),catchv(expand_term(T2,T3),_,fail).
 
 %      expand_goal(G,G2):- compound(G),bugger_expand_goal(G,G2),!.
 
@@ -899,7 +897,7 @@ set_no_debug_thread:-
 :- if(exists_source(library(gui_tracer))).
 %= :- meta_predicate  set_gui_debug(0).
 set_gui_debug(TF):- current_prolog_flag(gui,true),!,
-   ((TF, has_gui_debug,set_yes_debug, ignore((use_module(library(gui_tracer)),catchvv(guitracer,_,true)))) 
+   ((TF, has_gui_debug,set_yes_debug, ignore((use_module(library(gui_tracer)),catchv(guitracer,_,true)))) 
      -> set_prolog_flag(gui_tracer, true) ;
         set_prolog_flag(gui_tracer, false)).
 :- endif.
@@ -967,7 +965,7 @@ hideTrace:-
    once/1,
    ','/2,
    catch/3,
-   catchvv/3,
+   catchv/3,
    member/2], -all),
 
   hideTrace(setup_call_catcher_cleanup/4,-all),
@@ -1015,7 +1013,7 @@ hideTraceMP(M,F/A,T):-!,hideTraceMFA(M,F,A,T),!.
 hideTraceMP(M,P,T):-functor_safe(P,F,0),trace,hideTraceMFA(M,F,_A,T),!.
 hideTraceMP(M,P,T):-functor_safe(P,F,A),hideTraceMFA(M,F,A,T),!.
 
-tryCatchIgnore(MFA):- catchvv(MFA,_E,true). % dmsg(tryCatchIgnoreError(MFA:E))),!.
+tryCatchIgnore(MFA):- catchv(MFA,_E,true). % dmsg(tryCatchIgnoreError(MFA:E))),!.
 tryCatchIgnore(_MFA):- !. % dmsg(tryCatchIgnoreFailed(MFA)).
 
 % tryHide(_MFA):-showHiddens,!.
@@ -1037,7 +1035,7 @@ doHideTrace(M,F,A,ATTRIB):- tryHide(M:F/A),!,
 
 ctrace:-willTrace->trace;notrace.
 
-buggeroo:-hideTrace,traceAll,atom_concat(guit,racer,TRACER), catchvv(call(TRACER),_,true),debug,list_undefined.
+buggeroo:-hideTrace,traceAll,atom_concat(guit,racer,TRACER), catchv(call(TRACER),_,true),debug,list_undefined.
 
 singletons(_).
 
@@ -1099,56 +1097,51 @@ prolog_must(Call):-must(Call).
 
 
 % gmust is must with sanity
-gmust(True,Call):-catchvv((Call,(True->true;throw(retry(gmust(True,Call))))),retry(gmust(True,_)),(trace,Call,True)).
+gmust(True,Call):-catchv((Call,(True->true;throw(retry(gmust(True,Call))))),retry(gmust(True,_)),(trace,Call,True)).
 
 % must is used declaring the predicate must suceeed
 
 on_f_throw(Call):-one_must(Call,throw(on_f_throw(Call))).
-on_x_cont(CX):-ignore(catchvv(CX,_,true)).
+on_x_cont(CX):-ignore(catchv(CX,_,true)).
 
 % pause_trace(_):- hotrace(((debug,visible(+all),thread_leash(+exception),thread_leash(+call)))),trace.
 
-%debugCall(C):-hotrace,dmsg(debugCall(C)),dumpST, pause_trace(errored(C)),ggtrace,C.
-%debugCallF(C):-hotrace,dmsg(debugCallF(C)),dumpST, pause_trace(failed(C)),gftrace,C.
-
-:- export(rtraceOnError/1).
-rtraceOnError(C):-
-  catchvv(
-       with_skip_bugger( C ),
-   E,(dmsg(rtraceOnError(E=C)),thread_leash(+call),trace,thread_leash(+exception),thread_leash(+all),rtrace(with_skip_bugger( C )),dmsg(E=C),thread_leash(+call),dtrace)).
+%debugCall(Goal):-hotrace,dmsg(debugCall(Goal)),dumpST, pause_trace(errored(Goal)),ggtrace,Goal.
+%debugCallF(Goal):-hotrace,dmsg(debugCallF(Goal)),dumpST, pause_trace(failed(Goal)),gftrace,Goal.
 
 
-with_skip_bugger(C):-setup_call_cleanup(asserta( tlbugger:skip_bugger,Ref),C,erase(Ref)).
+with_skip_bugger(Goal):-setup_call_cleanup(asserta( tlbugger:skip_bugger,Ref),Goal,erase(Ref)).
 
-on_x_debug(C):- !, on_x_rtrace(C).
-on_x_debug(C):- with_each(0,on_x_rtrace,C).
-on_x_rtraceEach(C):-with_each(1,on_x_debug,C).
-on_x_debug_cont(C):-ignore(on_x_debug(C)).
+on_x_debug(Goal):- !, on_x_rtrace(Goal).
+on_x_debug(Goal):- with_each(0,on_x_rtrace,Goal).
+on_x_rtraceEach(Goal):-with_each(1,on_x_debug,Goal).
+on_x_debug_cont(Goal):-ignore(on_x_debug(Goal)).
 
 with_each(WrapperGoal):- WrapperGoal=..[Wrapper,Goal],with_each(Wrapper,Goal).
 with_each(Wrapper,Goal):-with_each(1,Wrapper,Goal).
 
-on_f_debug(C):-with_each(0,debugOnFailure0,C).
-debugOnFailure0(C):- one_must(rtraceOnError(C),debugCallWhy(failed(debugOnFailure0(C)),C)).
-debugOnFailureEach(C):-with_each(1,on_f_debug,C).
-on_f_debug_ignore(C):-ignore(on_f_debug(C)).
 
-logOnFailure0(C):- one_must(C,(dmsg(on_f_log_fail(C)),fail)).
-logOnFailureEach(C):-with_each(1,on_f_log_fail,C).
-on_f_log_ignore(C):-ignore(logOnFailure0(on_x_log_throw(C))).
+on_f_debug(Goal):-  Goal *-> true; debugCallWhy(failed(on_f_debug(Goal)),Goal).
+
+debugOnFailureEach(Goal):-with_each(1,on_f_debug,Goal).
+on_f_debug_ignore(Goal):-ignore(on_f_debug(Goal)).
+
+logOnFailure0(Goal):- one_must(Goal,(dmsg(on_f_log_fail(Goal)),fail)).
+logOnFailureEach(Goal):-with_each(1,on_f_log_fail,Goal).
+on_f_log_ignore(Goal):-ignore(logOnFailure0(on_x_log_throw(Goal))).
 
 
-%debugOnFailure0(X):-ctrace,X.
-%debugOnFailure0(X):-catchvv(X,E,(writeFailureLog(E,X),throw(E))).
+%on_f_debug(Goal):-ctrace,Goal.
+%on_f_debug(Goal):-catchv(Goal,E,(writeFailureLog(E,Goal),throw(E))).
 %on_f_throw/1 is like Java/C's assert/1
-%debugOnFailure1(Module,CALL):-trace,on_f_debug(Module:CALL),!.
-%debugOnFailure1(arg_domains,CALL):-!,on_f_log_fail(CALL),!.
+%debugOnFailure1(Module,Goal):-trace,on_f_debug(Module:Goal),!.
+%debugOnFailure1(arg_domains,Goal):-!,on_f_log_fail(Goal),!.
 
-beenCaught(must(Call)):- !, beenCaught(Call).
+beenCaught(must(Goal)):- !, beenCaught(Goal).
 beenCaught((A,B)):- !,beenCaught(A),beenCaught(B).
-beenCaught(Call):- fail, predicate_property(Call,number_of_clauses(_Count)), clause(Call,(_A,_B)),!,clause(Call,Body),beenCaught(Body).
-beenCaught(Call):- catchvv(once(Call),E,(dmsg(caugth(Call,E)),beenCaught(Call))),!.
-beenCaught(Call):- traceAll,dmsg(tracing(Call)),debug,trace,Call.
+beenCaught(Goal):- fail, predicate_property(Goal,number_of_clauses(_Count)), clause(Goal,(_A,_B)),!,clause(Goal,Body),beenCaught(Body).
+beenCaught(Goal):- catchv(once(Goal),E,(dmsg(caugth(Goal,E)),beenCaught(Goal))),!.
+beenCaught(Goal):- traceAll,dmsg(tracing(Goal)),debug,trace,Goal.
 
 
 % = %= :- meta_predicate (with_no_term_expansions(0)).
@@ -1303,7 +1296,7 @@ programmer_error(E):-trace, randomVars(E),dmsg('~q~n',[error(E)]),trace,randomVa
 % must(C):- ( 1 is random(4)) -> rmust_det(C) ; C.
 
 rmust_det(C):- C *-> true ; dtrace(C).
-% rmust_det(C)-  catchvv((C *-> true ; debugCallWhy(failed(must(C)),C)),E,debugCallWhy(thrown(E),C)).
+% rmust_det(C)-  catchv((C *-> true ; debugCallWhy(failed(must(C)),C)),E,debugCallWhy(thrown(E),C)).
 
 must_each(List):-var(List),trace_or_throw(var_must_each(List)).
 must_each([List]):-!,must(List).
@@ -1312,7 +1305,7 @@ must_each0(List):-var(List),trace_or_throw(var_must_each(List)).
 must_each0([]):-!.
 must_each0([E|List]):-E,must_each0(List).
 
-% :- mpred_trace_childs(logicmoo_util_bugger_catch:one_must/2).
+% :- mpred_trace_childs(logicmoo_util_catch:one_must/2).
 :- meta_predicate one_must(0,0,0).
 one_must(C1,C2,C3):-one_must(C1,one_must(C2,C3)).
 
@@ -1410,8 +1403,8 @@ gripe_time(TooLong,Goal):-statistics(cputime,Start),
   (Goal*->Success=true;Success=fail),
   once((statistics(cputime,End),
    Elapse is End-Start,
-(Elapse>TooLong -> dmsg(gripe_time(warn(Elapse>TooLong),Goal)); true))),!,
-   Success.
+(Elapse>TooLong -> dmsg(gripe_time(warn(Elapse>TooLong),Goal)); true))),
+  Success.
 
 
 cleanup_strings:-!.
@@ -1425,7 +1418,7 @@ show_entry(Call):-show_entry(mpred,Call).
 dcall0(Goal):- Goal. % on_x_debug(Goal). % dmsg(show_call(why,Goal)),Goal.      
 
 %= :- meta_predicate  show_call(+,0).
-show_call(Why,Goal):- show_success(Why,show_failure(Why,Goal)).
+show_call(Why,Goal):- show_success(Why,Goal)*->true;(dmsg(show_failure(Why,Goal)),!,fail).
 show_call(Goal):- show_call(mpred,Goal).
 
 %= :- meta_predicate  show_failure(+,0).
@@ -1527,7 +1520,7 @@ writeOverwritten:-assert(isConsoleOverwritten_bugger).
 writeErrMsg(Out,E):- message_to_string(E,S),fmt(Out,'<cycml:error>~s</cycml:error>\n',[S]),!.
 writeErrMsg(Out,E,Goal):- message_to_string(E,S),fmt(Out,'<cycml:error>goal "~q" ~s</cycml:error>\n',[Goal,S]),!.
 writeFileToStream(Dest,Filename):-
-    catchvv((
+    catchv((
     open(Filename,'r',Input),
     repeat,
         get_code(Input,Char),
@@ -1542,7 +1535,7 @@ writeFileToStream(Dest,Filename):-
 % =================================================================================
 % Utils
 % =================================================================================
-% test_call(G):-writeln(G),ignore(once(catchvv(G,E,writeln(E)))).
+% test_call(G):-writeln(G),ignore(once(catchv(G,E,writeln(E)))).
 
 debugFmtList(ListI):-hotrace((copy_term(ListI,List),debugFmtList0(List,List0),randomVars(List0),dmsg(List0))),!.
 debugFmtList0([],[]):-!.
@@ -1719,7 +1712,7 @@ user:message_hook(Term, Kind, Lines):- (Kind= warning;Kind= error),Term\=syntax_
 :- user:use_module(library(prolog_stack)).
 
 %user:prolog_exception_hook(A,B,C,D):- fail,
-%   once(copy_term(A,AA)),catchvv(( once(bugger_prolog_exception_hook(AA,B,C,D))),_,fail),fail.
+%   once(copy_term(A,AA)),catchv(( once(bugger_prolog_exception_hook(AA,B,C,D))),_,fail),fail.
 
 % :- mpred_trace_less('$syspreds':thread_leash/1).
 %:-mpred_trace_less(thread_leash/1).
@@ -1771,7 +1764,7 @@ logicmoo_bugger_loaded.
 %:- all_module_predicates_are_transparent.
 %:- module_predicates_are_exported.
 % :- module_meta_predicates_are_transparent(user).
-% :- all_module_predicates_are_transparent(logicmoo_util_bugger_catch).
+% :- all_module_predicates_are_transparent(logicmoo_util_catch).
 
 
 %:- mpred_trace_childs(prolog_ecall_fa/5).

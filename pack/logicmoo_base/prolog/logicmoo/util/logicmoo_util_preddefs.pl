@@ -313,7 +313,7 @@ def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 remove_pred(_,_,_):-!.
 remove_pred(_,F,A):-member(_:F/A,[_:delete_common_prefix/4]),!.
 remove_pred(M,F,A):- functor(P,F,A),
-  (current_predicate(M:F/A) -> ignore((catchvv(redefine_system_predicate(M:P),_,true),abolish(M:F,A)));true),
+  (current_predicate(M:F/A) -> ignore((catchv(redefine_system_predicate(M:P),_,true),abolish(M:F,A)));true),
   M:asserta((P:- wdmsg(error(P)),throw(permission_error(M:F/A)))).
 
 
@@ -373,7 +373,7 @@ get_module_of_4(_P,F,A,M):- current_predicate(M0:F0/A0),F0=F,A0=A,!,M=M0.
 get_module_of_4(P,F,A,M):- trace_or_throw((get_module_of_4(P,F,A,M))).
 
 /*
-get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,get_mpred_user_kb(M).
+get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,get_user_abox(M).
 get_module_of_4(_P,F,A,_M):-trace, isCycPredArity(F,A),!,fail.
 get_module_of_4(P,F,A,M):- trace, debugCall(get_module_of_4(P,F,A,M)).
 */

@@ -10,17 +10,19 @@
             assert_eq_quitely/1,
             assert_i/1,
             assert_u/1,
-            assert_u/3,
+            assert_u/4,
+          assertz_u/1,
+          assertz_mu/2,
             % mpred_select/2,
             asserta_i/1,
             assertz_i/1,
-            assertz_u/1,
             check_context_module/0,
-            assertz_u/3,
+            repropagate_2/1,
             assumption/1,
             assumptions/2,
             assumptions1/2,
             attvar_op/2,
+            with_in_source_context/1,
             baseable/2,
             baseable_list/2,
             brake/1,
@@ -339,10 +341,10 @@
             remove_if_unsupported/2,
             remove_if_unsupported_verbose/3,
             remove_selection/2,
-            repropagate/1,
-            repropagate_0/1,
-            repropagate_1/1,
-            repropagate_meta_wrapper_rule/1,
+   repropagate/1,
+   repropagate_0/1,
+   repropagate_1/1,
+   repropagate_meta_wrapper_rule/1,
             rescan_pfc/0,
             baseKB:resolveConflict0/1,
             retract_eq_quitely/1,
@@ -485,6 +487,7 @@
       ain_rule_if_rule((*)),
       mpred_bc_only((*)),
       req((*)),
+      with_in_source_context((*)),
       mpred_call_0((*)),
       mpred_call_only_facts(*,(*)),
       mpred_call_only_facts((*)),
@@ -545,10 +548,101 @@
         mpred_is_tracing_exec/0,
         use_presently/0)).
 
+:- module_transparent 
+            repropagate/1,
+            repropagate_0/1,
+            repropagate_1/1,
+            repropagate_meta_wrapper_rule/1,
+
+            assert_u/4,
+          assertz_u/1,
+          assertz_mu/2,
+            % mpred_select/2,
+            asserta_i/1,
+            assertz_i/1,
+            check_context_module/0,
+            repropagate_2/1,
+            assumption/1,
+            assumptions/2,
+            assumptions1/2,
+            attvar_op/2,
+            baseable/2,
+            baseable_list/2,
+            brake/1,
+            build_code_test/3,
+            build_consequent/3,
+            build_neg_test/4,
+            build_rhs/3,
+            build_rule/3,
+            build_trigger/4,
+            bwc/0,
+            call_i/1,
+            call_prologsys/1,
+            call_u/1,
+            call_u/2,
+            call_with_bc_triggers/1,
+            clause_asserted_local/1,
+            clause_i/2,
+            clause_i/3,
+            clause_or_call/2,
+            clause_u/2,
+            clause_u/3,
+            cnstrn/1,
+            cnstrn/2,
+            cnstrn0/2,
+            code_sentence_op/1,
+            compute_resolve/3,
+            compute_resolve/5,
+            correctify_support/2,
+            cwc/0,
+            defaultmpred_select/2,            
+            if_missing_mask/3,
+            if_missing_mask/4,
+            which_missing_argnum/2,
+            erase_w_attvars/2,
+            exact_args/1,
+            fc_eval_action/2,
+            fcnt/2,
+            mmsg/2,
+            fcnt0/2,
+            fcpt/2,
+          f_to_mfa/4,
+          fa_to_p/3,
+          w_get_fa/3,
+            fcpt0/2,
+            foreachl_do/2,
+            fwc/0,            
+            fwd_ok/1,
+            get_fa/3,
+            get_next_fact/2,
+            get_source_ref/1,
+            get_source_ref1/1,
+            get_why/4,
+            has_body_atom/2,
+            has_cl/1,
+            has_db_clauses/1,
+            has_functor/1,
+            is_action_body/1,
+            is_already_supported/3,
+            is_bc_body/1,
+            is_disabled_clause/1,
+            is_fc_body/1,
+            is_mpred_action/1,
+            is_relative/1,
+            is_reprop/1,
+            is_reprop_0/1,
+            is_resolved/1,
+            is_retract_first/1,
+            is_side_effect_disabled/0,
+            justification/2,
+            justifications/2,
+            loop_check_nr/1.
 
 :- module_transparent(check_context_module/0).
 check_context_module:- must((source_context_module(M),M\==mpred_pfc,M\==mpred_loader)).
+check_real_context_module:- must((context_module(M),M\==mpred_pfc,M\==mpred_loader)).
 
+with_in_source_context(Goal):- source_context_module(M)-> M:call(Goal).
 
 :- was_shared_multifile(('==>')/1).
 :- was_shared_multifile(basePFC:bt/3).
@@ -589,7 +683,7 @@ check_context_module:- must((source_context_module(M),M\==mpred_pfc,M\==mpred_lo
 % ======================= mpred_file('pfcsyntax').	% operator declarations.
 :- was_module_transparent(wlmuser/1).
 :- was_export(wlmuser/1).
-wlmuser(G):- get_mpred_user_kb(M), M:call(G).
+wlmuser(G):- get_user_abox(M), M:call(G).
 
 %   File   : pfcsyntax.pl
 %   Author : Tim Finin, finin@prc.unisys.com
@@ -988,26 +1082,27 @@ show_if_debug(A):- mpred_is_tracing(A) -> show_call(mpred_is_tracing,A) ; A.
 % assert_u(arity(prologHybrid,0)):-trace_or_throw(assert_u(arity(prologHybrid,0))).
 % assert_u(X):- \+ (is_ftCompound(X)),!,asserta_u(X,X,0).
 
-assert_u(X):- check_never_assert(X),functor(X,F,A),assert_u(X,F,A).
+assert_u(M:X):- !,functor(X,F,A),assert_u(M,X,F,A).
+assert_u(X):- functor(X,F,A),assert_u(abox,X,F,A).
 
-assert_u(X,F,_):-mreq(singleValuedInArg(F,SV)),!,must(update_single_valued_arg(X,SV)),!.
-assert_u(X,F,A):-mreq(prologSingleValued(F)),!,must(update_single_valued_arg(X,A)),!.
-% assert_u(X,F,A):-must(isa(F,prologAssertAOrdered) -> asserta_u(X,F,A) ; assertz_u(X,F,A)).
-assert_u(X,F,A):- assertz_u(X,F,A).
-% assert_u(X,F,A):-must(isa(F,prologOrdered) -> assertz_u(X,F,A) ; asserta_u(X,F,A)).
+assert_u(M,X,F,_):-mreq(singleValuedInArg(F,SV)),!,must(update_single_valued_arg(X,SV)),!.
+assert_u(M,X,F,A):-mreq(prologSingleValued(F)),!,must(update_single_valued_arg(X,A)),!.
+% assert_u(M,X,F,A):-must(isa(F,prologAssertAOrdered) -> asserta_u(M,X) ; assertz_u(M,X)).
+% assert_u(M,X,F,A):-must(isa(F,prologOrdered)        -> assertz_u(M,X) ; asserta_u(M,X)).
+assert_u(M,X,_,_):- assertz_mu(M,X).
 
 
-% asserta_u(X):- functor(X,F,A),asserta_u(X,F,A).
-% asserta_u(X,_,_):- show_success(why,clause_asserted(X)),!.
-% asserta_u(X,_,_):- must((expire_tabled_list(X),show_if_debug(attvar_op(asserta,X)))).
-
-assertz_u(X):- functor(X,F,A),assertz_u(X,F,A).
 
 check_never_assert(X):- ignore(( copy_term_and_varnames(X,Y),req(never_assert_u(Y,Why)),X=@=Y,snumbervars(X),trace_or_throw(never_assert_u(X,Why)))).
 check_never_retract(X):- ignore(( copy_term_and_varnames(X,Y),req(never_retract_u(Y,Why)),X=@=Y,snumbervars(X),trace_or_throw(never_retract_u(X,Why)))).
 
-assertz_u(X,_,_):- check_never_assert(X), clause_asserted(X),!.
-assertz_u(X,_,_):- must((expire_tabled_list(X),show_if_debug(attvar_op(assertz,X)))).
+
+assertz_u(M:X):-!,functor(X,F,A),assertz_mu(M,X).
+assertz_u(X):- functor(X,F,A),assertz_mu(abox,X).
+
+assertz_mu(M,X):- correct_module(M,X,T),T\==M,!,assertz_mu(T,X).
+assertz_mu(M,X):- check_never_assert(M:X), clause_asserted(M:X),!.
+assertz_mu(M,X):- must((expire_tabled_list(M:X),show_call(attvar_op(assertz,M:X)))).
 
 
 retract_u(X):- check_never_retract(X),fail.
@@ -1019,8 +1114,8 @@ retract_u((X)):-!,show_success(why,retract_eq_quitely_f((X))),must((expire_table
 retract_u(X):-show_if_debug(attvar_op(retract_eq,X)),!,must((expire_tabled_list(X))).
 
 retractall_u(X):-retractall(X),must((expire_tabled_list(X))).
-clause_u(H,B):- must(H\==true),catchvv(clause(H,B),_,fail).
-clause_u(H,B,Ref):-must(H\==true),catchvv(clause(H,B,Ref),_,fail).
+clause_u(H,B):- must(H\==true),catchv(clause(H,B),_,fail).
+clause_u(H,B,Ref):-must(H\==true),catchv(clause(H,B,Ref),_,fail).
 
 mpred_update_literal(P,N,Q,R):-
     arg(N,P,UPDATE),call(replace_arg(P,N,OLD,Q)),
@@ -1033,7 +1128,7 @@ update_single_valued_arg(P,N):-
   arg(N,P,UPDATE),
   replace_arg(P,N,OLD,Q),
   current_why(Why),
-  get_mpred_user_kb(M), 
+  get_user_abox(M), 
   M:get_source_ref1(U),
   must_det_l((
      attvar_op(assert_if_new,
@@ -1151,7 +1246,7 @@ mpred_aina(G,S):-ain(G,S).
 %= database and have forward reasoning done.
 
 %= ain(P,S) asserts P into the user''s dataBase with support from S.
-ain(P) :- 
+ain(P) :-  check_context_module,
   ain_fast(P).
 
 ain(P,S) :- 
@@ -1187,6 +1282,18 @@ ain_fast_sp0(S,P) :-
      (mpred_post_sp_zzz(S,P),mpred_trace_msg(looped_outcome((P))))),!.
 %ain_fast_sp(_,_).
 ain_fast_sp0(P,S) :- mpred_error("ain_fast(~p,~p) failed",[P,S]).
+
+
+
+:- abolish(logicmoo_util_database:aina/1).
+:- abolish(logicmoo_util_database:ain/1).
+:- abolish(logicmoo_util_database:ainz/1).
+logicmoo_util_database:aina(G):- mpred_aina(G).
+logicmoo_util_database:ain(G):- mpred_ain(G).
+logicmoo_util_database:ainz(G):- mpred_ainz(G).
+:- module_transparent(logicmoo_util_database:aina/1).
+:- module_transparent(logicmoo_util_database:ain/1).
+:- module_transparent(logicmoo_util_database:ainz/1).
 
 
 
@@ -1918,7 +2025,8 @@ mpred_fwd2(Fact0,_Sup) :-
 %=
 
 % ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),(ground(Fact)->must(once(Fact));doall(show_if_debug(must(Fact)))),fail.
-ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),(ground(Fact)->must(once(Fact));doall(show_if_debug(must(Fact)))),!.
+% ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),(ground(Fact)->must(once(Fact));doall(show_if_debug(must(Fact)))),!.
+ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),doall(show_if_debug(must(with_in_source_context(Fact)))),!.
 ain_rule_if_rule(Fact):- must(ain_rule0(Fact)),!.
 
 ain_rule0((P==>Q)) :-
@@ -2129,7 +2237,7 @@ not_cond(_Why,X):- \+ X.
 %= Note that this has the side effect [maybe] of catching unsupported facts and
 %= assigning them support from God. (g,g)
 %=
-req(G):-  on_x_rtrace(no_repeats(loop_check(mpred_call_0(G),fail))).
+req(G):-  ((loop_check(mpred_call_0(G),fail))).
 mpred_call_only_facts(F):- on_x_rtrace(no_repeats(loop_check(mpred_call_0(F),fail))). 
 mpred_call_only_facts(_Why,F):- on_x_rtrace(no_repeats(loop_check(mpred_call_0(F),fail))). 
 
@@ -2170,7 +2278,7 @@ mpred_call_with_no_triggers(F) :-
   %= this (is_ftVar(F)) is probably not advisable due to extreme inefficiency.
   (is_ftVar(F)    ->  mpred_facts_and_universe(F) ; mpred_call_with_no_triggers_bound(F)).
 
-mpred_call_with_no_triggers_bound(F):- on_x_rtrace(mpred_call_with_no_triggers_uncaugth(F)).
+mpred_call_with_no_triggers_bound(F):- mpred_call_with_no_triggers_uncaugth(F).
 
 mpred_call_with_no_triggers_uncaugth(F) :- 
   show_failure(mpred_call_with_no_triggers_bound,no_side_effects(F)),
@@ -3262,7 +3370,7 @@ cnstrn0(X,V):-when(is_ftNonvar(V),X).
 
 rescan_pfc:-forall(clause(lmconf:mpred_hook_rescan_files,Body),show_entry(Why,Body)).
 
-mpred_facts_and_universe(P):- (is_ftVar(P)->pred_head_all(P);true),(meta_wrapper_rule(P)->(no_repeats(on_x_rtrace(P))) ; (no_repeats(on_x_rtrace(P)))).
+mpred_facts_and_universe(P):- (is_ftVar(P)->pred_head_all(P);true),(meta_wrapper_rule(P)->(no_repeats(wlmuser(P))) ; (no_repeats(wlmuser(P)))).
 
 add_reprop(_Trig,Var):- is_ftVar(Var), !. % trace_or_throw(add_reprop(Trig,Var)).
 add_reprop(_Trig,neg(Var)):- is_ftVar(Var),!.
@@ -3280,29 +3388,36 @@ add_reprop(Trig ,Trigger):-
 
 
 repropagate(P):-  check_context_module,fail.
+%repropagate(P):-  check_real_context_module,fail.
+
 repropagate(P):-  is_ftVar(P),!.
-repropagate(P):-  meta_wrapper_rule(P),!,repropagate_meta_wrapper_rule(P).
+repropagate(P):-  meta_wrapper_rule(P),!,with_in_source_context(repropagate_meta_wrapper_rule(P)).
 repropagate(P):-  \+ predicate_property(P,_),'$find_predicate'(P,PP),PP\=[],!,forall(member(M:F/A,PP),
                                                           must((functor(Q,F,A),repropagate_1(M:Q)))).
 repropagate(F/A):- atom(F),integer(A),!,functor(P,F,A),!,repropagate(P).
 repropagate(F/A):- atom(F),is_ftVar(A),!,repropagate(F).
 
-repropagate(P):-  \+ predicate_property(P,_),dmsg(undefined_repropagate(P)),!,fail.
-repropagate(P):-  must(repropagate_0(P)).
+repropagate(P):-  \+ predicate_property(_:P,_),trace,dmsg(undefined_repropagate(P)),!,fail.
+repropagate(P):-  repropagate_0(P).
 
-repropagate_0(P):- loop_check(repropagate_1(P),true).
+repropagate_0(P):- loop_check(with_in_source_context(repropagate_1(P)),true).
 
 :- thread_local t_l:is_repropagating/1.
 
 repropagate_1(P):- is_ftVar(P),!.
 repropagate_1(USER:P):- USER==user,!,repropagate_1(P).
 repropagate_1((P/_)):-!,repropagate_1(P).
-repropagate_1(P):-
+
+repropagate_1(P):- with_in_source_context(repropagate_2(P)).
+
+:- export(repropagate_2/1).
+:- module_transparent(repropagate_2/1).
+repropagate_2(P):-
  forall(mpred_facts_and_universe(P),
-  w_tl(t_l:is_repropagating(P),
-  ignore((
-   once(fwd_ok(P)),
-   mpred_fwd(P))))).
+     w_tl(t_l:is_repropagating(P),
+     ignore((
+      once(fwd_ok(P)),
+      mpred_fwd(P))))).
 
 % repropagate_meta_wrapper_rule(P==>_):- !, repropagate(P).
 repropagate_meta_wrapper_rule(P):-repropagate_1(P).
@@ -3314,7 +3429,7 @@ fwd_ok(clif(_)).
 % fwd_ok(_).
 % fwd_ok(P):-must(ground(P)),!.
 
-mpred_facts_only(P):- (is_ftVar(P)->(pred_head_all(P),\+ meta_wrapper_rule(P));true),(no_repeats(on_x_rtrace(P))).
+mpred_facts_only(P):- (is_ftVar(P)->(pred_head_all(P),\+ meta_wrapper_rule(P));true),no_repeats(P).
 
 :- thread_local(t_l:in_rescan_mpred_hook/0).
 lmconf:mpred_hook_rescan_files:- forall(mpred_facts_and_universe(P),w_tl(t_l:in_rescan_mpred_hook,mpred_fwd(P))).
@@ -3332,6 +3447,6 @@ lmconf:mpred_hook_rescan_files:- forall(pred_head(pred_u0,P),
 
 mpred_mpred_file. 
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
+:- source_location(S,_),prolog_load_context(module,M),forall(source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A),M:export(M:F/A))).
 
 % :- doall(lmconf:module_local_init).

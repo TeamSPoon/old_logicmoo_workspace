@@ -396,7 +396,7 @@ in_thread_and_join(Goal,Status):-thread_create(Goal,ID,[]),thread_join(ID,Status
 % Usage: predsubst(+Fml,+Pred,?FmlSk)
 
 predsubst(A,Pred, D):-
-      ccatch(hotrace(nd_predsubst(A,Pred,D)),_,fail),!.
+      catchv(hotrace(nd_predsubst(A,Pred,D)),_,fail),!.
 predsubst(A,_B,A).
 
 nd_predsubst(  Var, Pred,SUB ) :- call(Pred,Var,SUB).
@@ -423,7 +423,7 @@ nd_predsubst2( _, L, L ).
 /*
 % Usage: subst(+Pred,+Fml,+X,+Sk,?FmlSk)
 
-pred_subst(Pred,A,B,C,D):-  ccatch(hotrace(nd_pred_subst(Pred,A,B,C,D)),E,(dumpST,dmsg(E:nd_pred_subst(Pred,A,B,C,D)),fail)),!.
+pred_subst(Pred,A,B,C,D):-  catchv(hotrace(nd_pred_subst(Pred,A,B,C,D)),E,(dumpST,dmsg(E:nd_pred_subst(Pred,A,B,C,D)),fail)),!.
 pred_subst(_,A,_B,_C,A).
 
 nd_pred_subst(Pred,  Var, VarS,SUB,SUB ) :- call(Pred, Var,VarS),!.
@@ -468,7 +468,7 @@ univ_safe(P,L):- must_det(is_list(L)),on_x_debug((P=..L)).
 
 % :- mpred_trace_nochilds(subst/4).
 
-subst(A,B,C,D):-  hotrace((ccatch(hotrace(nd_subst(A,B,C,D)),E,(dumpST,dmsg(E:nd_subst(A,B,C,D)),fail)))),!.
+subst(A,B,C,D):-  hotrace((catchv(hotrace(nd_subst(A,B,C,D)),E,(dumpST,dmsg(E:nd_subst(A,B,C,D)),fail)))),!.
 subst(A,_B,_C,A).
 
 nd_subst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
@@ -493,7 +493,7 @@ univ_term(P1,[FS|ArgS]):- univ_safe(P1 , [FS|ArgS]).
 
 
 wsubst(A,B,C,D):-
-      ccatch(hotrace(weak_nd_subst(A,B,C,D)),_,fail),!.
+      catchv(hotrace(weak_nd_subst(A,B,C,D)),_,fail),!.
 wsubst(A,_B,_C,A).
 
 weak_nd_subst(  Var, VarS,SUB,SUB ) :- nonvar(Var),Var=VarS,!.
@@ -569,8 +569,8 @@ at_start(Goal):-
 	->
 	     true
 	;
-	     ccatch(
-		 (assert(at_started(Named2)),debugOnFailure0((Goal))),
+	     catchv(
+		 (assert(at_started(Named2)),on_f_debug((Goal))),
 		 E,
 		 (retractall(at_started(Named2)),trace_or_throw(E)))
 	).
@@ -648,13 +648,13 @@ dynamic_load_pl(PLNAME):- % unload_file(PLNAME),
    line_count(In,Lineno),
    % double_quotes(_DQBool)
    Options = [variables(_Vars),variable_names(_VarNames),singletons(_Singletons),comment(_Comment)],
-   catchvv((read_term(In,Term,[syntax_errors(error)|Options])),E,(dmsg(E),fail)),
+   catchv((read_term(In,Term,[syntax_errors(error)|Options])),E,(dmsg(E),fail)),
    load_term(Term,[line_count(Lineno),file(PLNAME),stream(In)|Options]),
    Term==end_of_file,
    close(In).
 
 load_term(E,_Options):- E == end_of_file, !.
-load_term(Term,Options):-catchvv(load_term2(Term,Options),E,(dmsg(error(load_term(Term,Options,E))),throw_safe(E))).
+load_term(Term,Options):-catchv(load_term2(Term,Options),E,(dmsg(error(load_term(Term,Options,E))),throw_safe(E))).
 
 load_term2(':-'(Term),Options):-!,load_dirrective(Term,Options),!.
 load_term2(:-(H,B),Options):-!,load_assert(H,B,Options).

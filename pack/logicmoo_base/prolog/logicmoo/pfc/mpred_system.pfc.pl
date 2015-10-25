@@ -209,7 +209,7 @@ neg(tCol(C))/completelyAssertedCollection(C)==> \+ completelyAssertedCollection(
 ((hybrid_support(F,A)/(F\='$VAR',atom(F),integer(A), \+ prologDynamic(F),\+ static_predicate(F/A))) ==>
   ({    
     functor(G,F,A),
-     (var(M)->t_l:mpred_user_kb(M);true),
+     (var(M)->t_l:user_abox(M);true),
      (var(M)->predicate_property(M:G,exported);true),
      (var(M)->ignore(( current_predicate(F,M:G), \+ predicate_property(M:G,imported_from(_))));true),
      % mpred_test(rebuild_pred_into(G,G,ain,[+dynamic,+multifile,+discontiguous])),         

@@ -61,7 +61,7 @@ disable_mpred_system(Module):- with_mutex(mpred_system_mutex,lmconf:disable_mpre
 
 lmconf:enable_mpred_system0(Module):- lmconf:mpred_system_status(Module,enabled),!.
 lmconf:enable_mpred_system0(Module):- 
-   set_mpred_user_kb(Module),
+   set_user_abox(Module),
    retractall(lmconf:mpred_system_status(Module,_)),
    load_mpred_system(Module),
    must(current_predicate(_,mred_loader:mpred_expander(_,_,_,_))),

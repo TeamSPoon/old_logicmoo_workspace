@@ -168,12 +168,15 @@ simplify_goal_printed(setup_call_catcher_cleanup,sccc).
 simplify_goal_printed(setup_call_cleanup,scc).
 simplify_goal_printed(call_cleanup,cc).
 simplify_goal_printed(A,'...'(SA)):- atom(A),atom_concat('/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/',SA,A),!.
+simplify_goal_printed(A,'...'(SA)):- atom(A),atom_concat('/home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/',SA,A),!.
+simplify_goal_printed(A,'...'(SA)):- atom(A),atom_concat('/home/dmiles/lib/swipl/pack/logicmoo_base/t/',SA,A),!.
+% simplify_goal_printed(A,'...'(SA)):- atom(A),atom_concat('/',_,A),!,directory_file_path(_,SA,A),!.
 simplify_goal_printed(GOAL=A,AS):-goal==GOAL,!,simplify_goal_printed(A,AS).
 simplify_goal_printed(Var,Var):- \+ compound(Var),!.
 simplify_goal_printed(term_position(_,_,_,_,_),'$..term_position/4..$').
 %simplify_goal_printed(user:G,GS):-!,simplify_goal_printed(G,GS).
 simplify_goal_printed(system:G,GS):-!,simplify_goal_printed(G,GS).
-%simplify_goal_printed(catchvv(G,_,_),GS):-!,simplify_goal_printed(G,GS).
+%simplify_goal_printed(catchv(G,_,_),GS):-!,simplify_goal_printed(G,GS).
 %simplify_goal_printed(catch(G,_,_),GS):-!,simplify_goal_printed(G,GS).
 simplify_goal_printed('<meta-call>'(G),GS):-!,simplify_goal_printed(G,GS).
 simplify_goal_printed(must_det_lm(M,G),GS):-!,simplify_goal_printed(M:must_det_l(G),GS).
@@ -192,7 +195,7 @@ getPFA1(Frame,clause,Goal):-getPFA2(Frame,clause,ClRef),clauseST(ClRef,Goal),!.
 getPFA1(Frame,Ctrl,Ctrl=Goal):-getPFA2(Frame,Ctrl,Goal),!.
 getPFA1(_,Ctrl,no(Ctrl)).
 
-getPFA2(Frame,Ctrl,Goal):- catchvv((prolog_frame_attribute(Frame,Ctrl,Goal)),E,Goal=[error(Ctrl,E)]),!.
+getPFA2(Frame,Ctrl,Goal):- catchv((prolog_frame_attribute(Frame,Ctrl,Goal)),E,Goal=[error(Ctrl,E)]),!.
 
 clauseST(ClRef,clause=Goal):- findall(V,(member(Prop,[file(V),line_count(V)]),clause_property(ClRef,Prop)),Goal).
 
@@ -239,7 +242,7 @@ to_wmsg(G,WG):- (G=WG).
 dumptrace(G):- non_user_console,!,trace_or_throw(dumptrace(G)).
 dumptrace(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dumptrace(G)),setup_call_cleanup(notrace,(leash(+call),dumptrace(G)),trace).
 dumptrace(G):- ignore((debug,
- catchvv(attach_console,_,true),
+ catchv(attach_console,_,true),
  leash(+exception),visible(+exception))),fresh_line,
  (repeat,(tracing -> (!,fail) ; true)),
  to_wmsg(G,WG),
@@ -250,23 +253,24 @@ dumptrace(G):- ignore((debug,
   with_all_dmsg(dumptrace(G,C)),!.
 
 :-meta_predicate(dumptrace(0,+)).
-dumptrace(_,0'g):-hotrace(dumpST(500000000)),!,fail.
-dumptrace(_,0'G):-notrace(dumpST0(500000000)),!,fail.
-dumptrace(G,0'l):- 
+dumptrace(_,0'g):-!,hotrace(dumpST(500000000)),!,fail.
+dumptrace(_,0'G):-!,notrace(dumpST0(500000000)),!,fail.
+dumptrace(G,0'l):-!, 
   restore_trace(( notrace(ggtrace),G)),!,notrace.
-dumptrace(G,0's):-hotrace(ggtrace),!,(hotrace(G)*->true;true).
-dumptrace(G,0'S):- wdmsg(skipping(G)),!.
-dumptrace(G,0'x):- wdmsg(skipping(G)),!.
-dumptrace(G,0'i):-hotrace(ggtrace),!,ignore(G).
-dumptrace(_,0'b):-debug,prolog,!,fail.
-dumptrace(_,0'a):-abort,!,fail.
-dumptrace(_,0'x):-must((lex,ex)),!,fail.
-dumptrace(_,0'e):-halt(1),!.
-dumptrace(G,0'l):-visible(+all),show_and_do(rtrace(G)).
+dumptrace(G,0's):-!,hotrace(ggtrace),!,(hotrace(G)*->true;true).
+dumptrace(G,0'S):-!, wdmsg(skipping(G)),!.
+dumptrace(G,0'x):-!, wdmsg(skipping(G)),!.
+dumptrace(G,0'i):-!,hotrace(ggtrace),!,ignore(G).
+dumptrace(_,0'b):-!,debug,prolog,!,fail.
+dumptrace(_,0'a):-!,abort,!,fail.
+dumptrace(_,0'x):-!,must((lex,ex)),!,fail.
+dumptrace(_,0'e):-!,halt(1),!.
+dumptrace(_,0'm):-!,make,fail.
+dumptrace(G,0'l):-!,visible(+all),show_and_do(rtrace(G)).
 dumptrace(G,0'c):-!, show_and_do((G))*->true;true.
-dumptrace(G,0'r):- notrace,(rtrace((G,notrace))),!,fail.
-dumptrace(G,0'f):- notrace,(ftrace((G,notrace))),!,fail.
-dumptrace(G,0't):-visible(+all),leash(+all),trace,!,G.
+dumptrace(G,0'r):-!, notrace,(rtrace((G,notrace))),!,fail.
+dumptrace(G,0'f):-!, notrace,(ftrace((G,notrace))),!,fail.
+dumptrace(G,0't):-!,visible(+all),leash(+all),trace,!,G.
 dumptrace(G,10):-!,dumptrace_ret(G).
 dumptrace(G,13):-!,dumptrace_ret(G).
 dumptrace(_,C):-fmt(unused_keypress(C)),!,fail.

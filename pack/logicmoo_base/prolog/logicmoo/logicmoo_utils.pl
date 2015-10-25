@@ -137,7 +137,7 @@ lmconf:logicmoo_scan_autoloads:-false.
 :- dynamic(lmconf:mpred_is_impl_file/1).
  lmconf:mpred_is_impl_file(util/logicmoo_util_first).
  lmconf:mpred_is_impl_file(util/logicmoo_util_database).
- lmconf:mpred_is_impl_file(util/logicmoo_util_bugger_catch).
+ lmconf:mpred_is_impl_file(util/logicmoo_util_catch).
  lmconf:mpred_is_impl_file(util/logicmoo_util_with_assertions).
  lmconf:mpred_is_impl_file(util/logicmoo_util_loop_check).
  lmconf:mpred_is_impl_file(util/logicmoo_util_dmsg).

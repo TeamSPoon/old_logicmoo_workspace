@@ -11,8 +11,8 @@
 % ===================================================================
 */
 
-% File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_bugger_catch.pl
-:- module(logicmoo_util_bugger_catch,
+% File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_catch.pl
+:- module(logicmoo_util_catch,
           [ !/1,
             addLibraryDir/0,
             source_variables_l/1,
@@ -27,9 +27,8 @@
             block/3,
             bubbled_ex/1,
             bubbled_ex_check/1,
-            catchvv/3,
+            catchv/3,
             catchvvnt/3,
-            ccatch/3,
             current_source_location/1,
             current_main_error_stream/1,
             dbgsubst/4,            
@@ -112,9 +111,9 @@
           ]).
 :- meta_predicate
 		block(+, :, ?),
-		catchvv(0, ?, 0),
+		catchv(0, ?, 0),
 		catchvvnt(0, ?, 0),
-		ccatch(0, ?, 0),
+		catchv(0, ?, 0),
 		
 		if_defined(:),
 		if_defined(:, 0),
@@ -214,7 +213,7 @@
 :- include('logicmoo_util_header.pi').
 
 % = :- meta_predicate(catchvvnt(0,?,0)).
-catchvvnt(T,E,F):-catchvv(cnotrace(T),E,F).
+catchvvnt(T,E,F):-catchv(cnotrace(T),E,F).
 
 :- thread_self(Goal),assert(lmcache:thread_main(user,Goal)).
 
@@ -458,35 +457,35 @@ strip_f_module(P,FA):- is_list(P),catch(text_to_string(P,S),_,fail),!,atom_strin
 strip_f_module(P,FA):- hotrace(string(P);atomic(P)), atom_string(F,P),!,F=FA.
 strip_f_module(P,P).
 
-% use ccatch/3 to replace catch/3 works around SWI specific issues arround using $abort/0 and block/3
+% use catchv/3 to replace catch/3 works around SWI specific issues arround using $abort/0 and block/3
 % (catch/3 allows you to have these exceptions bubble up past your catch block handlers)
-% = :- meta_predicate((catchvv(0, ?, 0))).
-% = :- meta_predicate((ccatch(0, ?, 0))).
-:- export((ccatch/3,catchvv/3)).
+% = :- meta_predicate((catchv(0, ?, 0))).
+% = :- meta_predicate((catchv(0, ?, 0))).
+:- export((catchv/3,catchv/3)).
 
 bubbled_ex(block(_,_)).
 bubbled_ex('$aborted').
 bubbled_ex_check(E):- ( \+ bubbled_ex(E)),!.
 bubbled_ex_check(E):-throw(E).
 
-ccatch(Goal,E,Recovery):- nonvar(E) -> catch(Goal,E,Recovery); % normal mode (the user knows what they want)
+catchv(Goal,E,Recovery):- nonvar(E) -> catch(Goal,E,Recovery); % normal mode (the user knows what they want)
                          catch(Goal,E,(bubbled_ex_check(E),Recovery)). % prevents promiscous mode
 
-catchvv(Goal,E,Recovery):- catch(Goal,E,(bubbled_ex_check(E),Recovery)). % prevents promiscous mode
+% catchv(Goal,E,Recovery):- catch(Goal,E,(bubbled_ex_check(E),Recovery)). % prevents promiscous mode
 
 
-%:- mpred_trace_nochilds(_,catchvv,3,0,0).
+%:- mpred_trace_nochilds(_,catchv,3,0,0).
 
 
 :- export(functor_catch/3).
-functor_catch(P,F,A):- catch(functor(P,F,A),_,compound_name_arity(P,F,A)).
+functor_catch(P,F,A):- catchv(functor(P,F,A),_,compound_name_arity(P,F,A)).
 % functor_catch(F,F,0):-atomic(F),!.
-% functor_catch(P,F,A):-ccatch(compound_name_arity(P,F,A),E,(trace,ddmsg(E:functor(P,F,A)),trace)).
+% functor_catch(P,F,A):-catchv(compound_name_arity(P,F,A),E,(trace,ddmsg(E:functor(P,F,A)),trace)).
 
 
 :- export(functor_safe/3).
-functor_safe(P,F,A):- catch(functor(P,F,A),_,compound_name_arity(P,F,A)).
-% functor_safe(P,F,A):- catch(compound_name_arity(P,F,A),_,functor(P,F,A)).
+functor_safe(P,F,A):- catchv(functor(P,F,A),_,compound_name_arity(P,F,A)).
+% functor_safe(P,F,A):- catchv(compound_name_arity(P,F,A),_,functor(P,F,A)).
 /*
 % functor_safe(P,F,A):-var(P),A==0,compound_name_arguments(P,F,[]),!.
 functor_safe(P,F,A):-var(P),A==0,!,P=F,!.
@@ -567,7 +566,7 @@ dbgsubst(A,B,Goal,D):-var(A),!,ddmsg(dbgsubst(A,B,Goal,D)),dumpST,dtrace(dbgsubs
 dbgsubst(A,B,Goal,D):-dbgsubst0(A,B,Goal,D).
 
 dbgsubst0(A,B,Goal,D):- 
-      catchvv(hotrace(nd_dbgsubst(A,B,Goal,D)),E,(dumpST,ddmsg(E:nd_dbgsubst(A,B,Goal,D)),fail)),!.
+      catchv(hotrace(nd_dbgsubst(A,B,Goal,D)),E,(dumpST,ddmsg(E:nd_dbgsubst(A,B,Goal,D)),fail)),!.
 dbgsubst0(A,_B,_C,A).
 
 nd_dbgsubst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
@@ -646,7 +645,7 @@ trace_or_throw(E):- wdmsg(E),dtrace_msg(throw:-E).
 
 
 :-export(on_x_fail/1).
-on_x_fail(Goal):- catchvv(Goal,_,fail).
+on_x_fail(Goal):- catchv(Goal,_,fail).
 
 
 % false = hide this wrapper
@@ -654,16 +653,16 @@ showHiddens:-true.
 
 :- meta_predicate on_x_log_fail(0).
 :- export(on_x_log_fail/1).
-on_x_log_fail(Goal):- catchvv(Goal,E,(dmsg(E:Goal),fail)).
+on_x_log_fail(Goal):- catchv(Goal,E,(dmsg(E:Goal),fail)).
 
 
 % -- CODEBLOCK
 
 :- export(on_x_log_throw/1).
 :- export(on_x_log_cont/1).
-on_x_log_throw(Goal):- catchvv(Goal,E,(ddmsg(on_x_log_throw(E,Goal)),throw(E))).
+on_x_log_throw(Goal):- catchv(Goal,E,(ddmsg(on_x_log_throw(E,Goal)),throw(E))).
 %on_x_log_throwEach(Goal):-with_each(1,on_x_log_throw,Goal).
-on_x_log_cont(Goal):- catchvv((Goal*->true;ddmsg(failed_on_x_log_cont(Goal))),E,ddmsg(E:Goal)).
+on_x_log_cont(Goal):- catchv((Goal*->true;ddmsg(failed_on_x_log_cont(Goal))),E,ddmsg(E:Goal)).
 
 :- thread_local( tlbugger:skipMust/0).
 %MAIN tlbugger:skipMust.
@@ -768,7 +767,7 @@ without_must(Goal):- w_tl(tlbugger:skipMust,Goal).
 % -- CODEBLOCK
 :- export(y_must/2).
 :- meta_predicate (y_must(?,0)).
-y_must(Y,Goal):- catchvv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail)) *-> true ; dtrace(y_must(Y,Goal)).
+y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail)) *-> true ; dtrace(y_must(Y,Goal)).
 
 % -- CODEBLOCK
 :- export(must/1).
@@ -776,20 +775,22 @@ y_must(Y,Goal):- catchvv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail)
 :- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(200), attributes(portray)]).
 :- set_prolog_flag(debugger_show_context,true).
 
+:- meta_predicate(must(0)).
+%must(Call):-(repeat, (catchv(Call,E,(dmsg(E:Call),debug,fail)) *-> true ; (ignore(ftrace(Call)),leash(+all),repeat,wdmsg(failed(Call)),trace,Call)),!).
 must(Goal):- notrace(get_must(Goal,MGoal)),!,MGoal.
 
 get_must(Goal,Goal):- fail,is_release,!.
 get_must(Goal,CGoal):-  tlbugger:skipMust,!,CGoal = Goal.
 get_must(Goal,CGoal):- skipWrapper,!,trace, CGoal = (Goal *-> true ; ((ddmsg(failed_FFFFFFF(must(Goal))),dumpST,trace,Goal))).
 get_must(Goal,CGoal):- tlbugger:show_must_go_on,!,
- CGoal = ((catchvv(Goal,E,
+ CGoal = ((catchv(Goal,E,
      notrace(((dumpST,ddmsg(error,sHOW_MUST_go_on_xI__xI__xI__xI__xI_(E,Goal))),badfood(Goal))))
             *-> true ; notrace((dumpST,ddmsg(error,sHOW_MUST_go_on_failed_F__A__I__L_(Goal)),badfood(Goal))))).
 
-% get_must(Goal,CGoal):- !, CGoal = (catch(Goal,E,(notrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),trace,!,throw(E))) *-> true ; ((ddmsg(failed(must(Goal))),trace,Goal))).
-get_must(Goal,CGoal):- !, CGoal = on_f_debug(on_x_debug(Goal)).
+% get_must(Goal,CGoal):- !, CGoal = (catchv(Goal,E,(notrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),trace,!,throw(E))) *-> true ; ((ddmsg(failed(must(Goal))),trace,Goal))).
+get_must(Goal,CGoal):- !, CGoal = on_x_rtrace(Goal) *-> true; debugCallWhy(failed(on_f_debug(Goal)),Goal).
 get_must(Goal,CGoal):-    
-   (CGoal = (catchvv(Goal,E,
+   (CGoal = (catchv(Goal,E,
      (dumpST,ddmsg(error,must_xI_(E,Goal)),set_prolog_flag(debug_on_error,true),
          ignore_each((rtrace(Goal),nortrace,trace,dtrace(Goal),badfood(Goal)))))
          *-> true ; (dumpST,ignore_each(((trace,dtrace(must_failed_F__A__I__L_(Goal),Goal),badfood(Goal))))))).

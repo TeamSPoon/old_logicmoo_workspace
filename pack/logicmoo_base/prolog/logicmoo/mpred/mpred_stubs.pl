@@ -10,6 +10,7 @@
 %
 */
 
+
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_stubs.pl
 :- module(mpred_stubs,
           [ 
@@ -104,6 +105,76 @@ must_op(*,0),
 registerCycPredPlus2(0),
 mpred_stubs:call_provided_mpred_storage_op(*,0,*).
 
+:- module_transparent
+agenda_rescan_mpred_props/0,
+assert_mpred_t/1,
+call_for_literal/3,
+call_for_literal_db/3,
+call_for_literal_db0/3,
+call_for_literal_db00/3,
+call_for_literal_ideep_ilc/1,
+call_mpred_body/2,
+call_mpred_body_ilc/2,
+call_provided_mpred_storage_op/3,
+call_rule_db/3,
+call_wdmsg/2,
+call_wdmsg/4,
+constrain_args/1,
+constrain_args/2,
+create_stub_body/2,
+create_stub_body/3,
+cwdl/2,
+ensure_universal_stub/1,
+ensure_universal_stub4/4,
+ensure_universal_stub5/5,
+ensure_universal_stub_plus_2/2,
+ensure_universal_stub_plus_minus_2/2,
+ensure_universal_stub_plus_minus_2_HIDE/2,
+erase_mpred_storage_op/1,
+first_mpred_props/1,
+get_cc/2,
+has_storage_stub/1,
+hybrid_tPredStubImpl/1,
+is_asserted_mpred_t/1,
+is_call_op/1,
+is_mpred_change_op/1,
+is_mpred_op/1,
+is_non_call_op/1,
+is_proc/1,
+is_same_clauses/2,
+is_same_clauses/3,
+is_tCol/1,
+last_arg_ground/1,
+last_arg_ground/3,
+make_builtin/1,
+maybe_storage_stub/2,
+missing_stub/1,
+mpred_missing_stubs/2,
+mpred_prop_ordered/2,
+mpred_t_call_op/2,
+lmconf:mpred_provide_storage_op/2,
+mpred_t_mpred_storage_clauses_facts/3,
+mpred_t_storage_op/2,
+mud_call_store_op/2,
+mustIsa/2,
+must_have_storage_stub/1,
+must_op/2,
+must_same_clauses/2,
+no_rescans/0,
+out_of_mpred_t/1,
+provide_clauses_list/2,
+really_add_mpred_storage_op/1,
+registerCycPredPlus2/1,
+registerCycPredPlus2_3/3,
+registerCycPredPlus2_3/4,
+renumbervarZ/2,
+rescan_missing_stubs/0,
+rescan_missing_stubs_ilc/0,
+rescan_mpred_props_ilc/0,
+scan_missing_stubs/1,
+test_call_cut/0,
+wff_check_failed/3,
+wff_check_mpred_t_throw/1.
 
 :- include('mpred_header.pi').
 
@@ -117,7 +188,10 @@ hybrid_tPredStubImpl(prologEquality).
 
 
 make_builtin(F/A):- show_failure(why,(atom(F),integer(A))),
-  w_tl(set_prolog_flag(access_level,system),lock_predicate(F/A)),ain(prologBuiltin(F)),ain(arity(F,A)).
+  w_tl(set_prolog_flag(access_level,system),lock_predicate(F/A)),
+  check_context_module,
+    ain(prologBuiltin(F)),ain(arity(F,A)).
+
 
 /*
 1 = single value
@@ -788,16 +862,9 @@ ensure_universal_stub_plus_2(F,A2):-
    AMinus2 is A2 -2,
    assert_if_new((HEAD:-HEADMinus2)),!,
   % compile_predicates([HEAD]),
-   get_mpred_user_kb(M),
+   get_user_abox(M),
    decl_mpred_hybrid(M,F,AMinus2).
 
 
-:- abolish(logicmoo_util_database:aina/1).
-logicmoo_util_database:aina(G):- mpred_aina(G).
-:- abolish(logicmoo_util_database:ain/1).
-logicmoo_util_database:ain(G):- mpred_ain(G).
-:- abolish(logicmoo_util_database:ainz/1).
-logicmoo_util_database:ainz(G):- mpred_ainz(G).
-
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
+:- source_location(S,_),prolog_load_context(module,M),forall(source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A),M:export(M:F/A))).
 

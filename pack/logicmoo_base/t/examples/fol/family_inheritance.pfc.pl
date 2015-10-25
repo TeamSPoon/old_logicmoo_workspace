@@ -1,9 +1,9 @@
 #!/usr/bin/env swipl
 
-:- module(family_inheritance_pfc,[]).
+:- module(fi,[]).
 
 :- include('test_header.pfc').
-:- process_this_script.
+% :- process_this_script.
 
 %=  setup pfc
 :- file_begin(pfc).
@@ -20,14 +20,12 @@
 %= ````
 %= logic tests...
 %= ````
-
+:- debug(mpred).
+:- mpred_trace_exec.
 
 prologBuiltin(otherGender/2).
 otherGender(male,female).
 otherGender(female,male).
-
-:- debug(mpred).
-:- mpred_trace_exec.
 
 tCol(male).
 :- dynamic((bore_offspring/2, gender/2)).

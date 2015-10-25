@@ -728,8 +728,8 @@ msg_to_string(Msg,Str):-sformat(Str,Msg,[],[]),!.
 withFormatter(Lang,From,Vars,SForm):- t_l:formatter_hook(Lang,From,Vars,SForm),!.
 withFormatter(_Lang,From,_Vars,SForm):-sformat(SForm,'~w',[From]).
 
-flush_output_safe:-ignore(catchvv(flush_output,_,true)).
-flush_output_safe(X):-ignore(catchvv(flush_output(X),_,true)).
+flush_output_safe:-ignore(catchv(flush_output,_,true)).
+flush_output_safe(X):-ignore(catchv(flush_output(X),_,true)).
 
 writeFailureLog(E,X):-
   thread_current_error_stream(ERR),

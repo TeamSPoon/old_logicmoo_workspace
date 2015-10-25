@@ -18,7 +18,7 @@
 
 :- include('logicmoo_util_header.pi').
 
-:- thread_local(t_l:mpred_user_kb/1).
+:- thread_local(t_l:user_abox/1).
 
 :- multifile(lmconf:mpred_system_kb/1).
 :- dynamic(lmconf:mpred_system_kb/1).
@@ -81,7 +81,8 @@ in_dyn_pred(_DB,Call):- var(Call),!,get_mp_arity(F,A),functor(Call,F,A),( predic
 in_dyn_pred(_DB,Call):- functor(Call,F,A), get_mp_arity(F,A), predicate_property(Call,_), !, loop_check(Call).
 
 
-get_mp_arity(F,A):- get_mpred_user_kb(M),M:arity(F,A).
+get_mp_arity(F,A):- get_user_abox(M),if_defined(M:arity(F,A)).
+get_mp_arity(F,A):- get_user_tbox(M),if_defined(M:arity(F,A)).
 get_mp_arity(F,A):- lmconf:mpred_system_kb(M),M:mpred_arity(F,A).
 
 prop_mpred(Prop,F,A):- lmconf:mpred_system_kb(M),M:mpred_isa(F,Prop),get_mp_arity(F,A).
@@ -116,7 +117,7 @@ decl_env_mepred([H],Pred):-!,decl_env_mepred(H,Pred).
 decl_env_mepred([H|T],Pred):-!,decl_env_mepred(H,Pred),decl_env_mepred(T,Pred).
 decl_env_mepred((H,T),Pred):-!,decl_env_mepred(H,Pred),decl_env_mepred(T,Pred).
 
-decl_env_mepred(baseKB(KB),_):- ain(isa_mpred_user_kb(KB)),fail.
+decl_env_mepred(baseKB(KB),_):- ain(isa_user_abox(KB)),fail.
 decl_env_mepred(stubType(dyn),Pred):-!, decl_env_mepred(dyn,Pred).
 
 decl_env_mepred(CMPD,Pred):-  fail, compound(CMPD),CMPD=..[_|CMPDL],

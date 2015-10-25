@@ -424,7 +424,7 @@ b_implode_varnames(_):-!.
 b_implode_varnames0([]):-!.
 b_implode_varnames0([N=V|Vs]):- ignore((V='$VAR'(N);V=N)),b_implode_varnames0(Vs),!.
 
-imploded_copyvars(C,CT):-vmust((logicmoo_util_bugger_catch:source_variables(Vs),copy_term(C-Vs,CT-VVs),b_implode_varnames(VVs))),!.
+imploded_copyvars(C,CT):-vmust((logicmoo_util_catch:source_variables(Vs),copy_term(C-Vs,CT-VVs),b_implode_varnames(VVs))),!.
 
 
 

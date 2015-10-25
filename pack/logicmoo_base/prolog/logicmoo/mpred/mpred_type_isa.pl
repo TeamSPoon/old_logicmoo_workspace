@@ -587,7 +587,7 @@ assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(
 %OLD lmconf:decl_database_hook(change(assert,_A_or_Z),isa(W,ttTemporalType)):-decl_type_safe(W). %,call_after_mpred_load(forall(isa(I,W),create_instance(I,W))).
 %OLD lmconf:decl_database_hook(change(assert,_A_or_Z),isa(W,tCol)):- (test_tl(infSupertypeName);true),guess_supertypes(W).
 
-:- was_dynamic(tried_guess_types_from_name/1).
+%:- was_dynamic(tried_guess_types_from_name/1).
 :- was_dynamic(did_learn_from_name/1).
 
 guess_types(W):- tried_guess_types_from_name(W),!.

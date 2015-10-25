@@ -24,9 +24,9 @@
 :- set_prolog_flag(generate_debug_info, true).
 
 
-:- if( \+ current_predicate(lmconfig:get_mpred_user_kb/1)).
-:- multifile(lmconfig:get_mpred_user_kb/1).
-:- dynamic(lmconfig:get_mpred_user_kb/1).
+:- if( \+ current_predicate(lmconfig:get_user_abox/1)).
+:- multifile(lmconfig:get_user_abox/1).
+:- dynamic(lmconfig:get_user_abox/1).
 :- endif.
 :- if( \+ current_predicate(lmconf:mpred_system_kb/1)).
 :- multifile(lmconf:mpred_system_kb/1).

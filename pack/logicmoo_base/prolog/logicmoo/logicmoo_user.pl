@@ -23,8 +23,8 @@
 
 
 :- use_module(logicmoo_base).
-:- thread_local(t_l:mpred_user_kb/1).
-:- (t_l:mpred_user_kb(M)->true;(source_context_module(M))),set_mpred_user_kb(M),dmsg(user_kb=M).
+:- thread_local(t_l:user_abox/1).
+%:- (t_l:user_abox(M)->true;(source_context_module(M))),set_user_abox(M),dmsg(user_kb=M).
 %:- ensure_mpred_system.
 
 /*
@@ -73,6 +73,6 @@ m4:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/autoexec.pfc')).
 % :-trace,call((R = (==>((P,Q,z(_)),(p(P),q(Q)))))
 % :- use_module(mpred/mpred_loader).
 
-:- checkKB:m1.
+% :- checkKB:m1.
 
 

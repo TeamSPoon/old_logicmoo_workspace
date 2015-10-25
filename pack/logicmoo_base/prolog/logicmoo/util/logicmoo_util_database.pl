@@ -22,7 +22,6 @@ paina/1,pain/1,            painz/1,
             clause_eq/3,
             clause_safe/2,
             debugCallWhy/2,
-            on_x_rtrace/1,
             erase_safe/2,
             eraseall/2,
             find_and_call/1,
@@ -57,7 +56,6 @@ paina/1,pain/1,            painz/1,
         clause_asserted(:, ?, -),
         clause_safe(?, ?),
         debugCallWhy(?, 0),
-        on_x_rtrace(0),
         eraseall(+, +),
         find_and_call(+, +, ?),
         mpred_mop(+, 1, ?),
@@ -102,11 +100,6 @@ my_module_sensitive_code(_E):- source_context_module(CM),writeln(source_context_
 clause_safe(H,B):-predicate_property(H,number_of_clauses(C)),C>0,clause(H,B).
 
 debugCallWhy(Why, C):- hotrace(wdmsg(Why)),dtrace(C).
-
-on_x_rtrace(C):- notrace((tracing,notrace)),!,trace,C.
-on_x_rtrace(C):- tlbugger:rtracing,!,C.
-on_x_rtrace(C):- skipWrapper,!,C.
-on_x_rtrace(C):- catchvv(C,E,((wdmsg(on_x_rtrace(E)),trace,rtrace(C),throw(E)))).
 
 :- export(mpred_op_prolog/2).
 :- module_transparent(mpred_op_prolog/2).
@@ -258,7 +251,7 @@ safe_univ0(Call,[M:L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
 safe_univ0(M:Call,[L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
 safe_univ0(Call,[L|List]):- not(is_list(Call)),sanity(atom(L);compound(Call)), Call =..[L|List],!,warn_bad_functor(L).
 safe_univ0([L|List],[L|List]):- var(List),atomic(Call),!,grtrace,Call =.. [L|List],warn_bad_functor(L).
-safe_univ0(Call,[L|List]):- sanity(atom(L);compound(Call)),ccatch(Call =.. [L|List],E,(dumpST,'format'('~q~n',[E=safe_univ(Call,List)]))),warn_bad_functor(L).
+safe_univ0(Call,[L|List]):- sanity(atom(L);compound(Call)),catchv(Call =.. [L|List],E,(dumpST,'format'('~q~n',[E=safe_univ(Call,List)]))),warn_bad_functor(L).
 
 :- export(append_term/3).
 append_term(T,I,HEAD):-atom(T),HEAD=..[T,I],!.

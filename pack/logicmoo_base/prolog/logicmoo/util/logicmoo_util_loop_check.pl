@@ -255,8 +255,8 @@ retract_can_table :- retractall(maybe_table_key(_)).
 :- export(lmconf:already_added_this_round/1).
 expire_dont_add:-retractall(lmconf:already_added_this_round(_)),mpred_expire_caches(all),nop(dmsg(expire_dont_add)).
 
-lex:-listing(lmcache:ilc(_)),forall(current_predicate(lmcache:F/A),listing(lmcache:F/A)),catchvv(listing(lmconf:already_added_this_round),_,true).
-(ex):-mpred_expire_caches(_),retractall(lmcache:ilc(_)),dmsg_showall(_),forall(current_predicate(lmcache:F/A),(functor(RA,F,A),retractall(RA))),catchvv(expire_dont_add,_,true).
+lex:-listing(lmcache:ilc(_)),forall(current_predicate(lmcache:F/A),listing(lmcache:F/A)),catchv(listing(lmconf:already_added_this_round),_,true).
+(ex):-mpred_expire_caches(_),retractall(lmcache:ilc(_)),dmsg_showall(_),forall(current_predicate(lmcache:F/A),(functor(RA,F,A),retractall(RA))),catchv(expire_dont_add,_,true).
 
 mpred_expire_caches(A):-doall(call_no_cuts(must(lmconf:mpred_on_expire_caches(A)))).
 

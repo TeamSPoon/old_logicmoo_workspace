@@ -1,7 +1,8 @@
 #!/usr/bin/env swipl
 
+:- module(dislikes,[]).
 :- include('test_header.pfc').
-:- process_this_script.
+% :- process_this_script.
 
 %=  setup pfc
 :- file_begin(pfc).

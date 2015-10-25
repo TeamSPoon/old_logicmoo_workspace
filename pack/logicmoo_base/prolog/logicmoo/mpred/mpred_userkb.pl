@@ -27,6 +27,9 @@
 (==>)/2,
 (neg)/1,
 (nesc)/1,
+tilda_in_code/1,
+neg_may_naf/1,
+naf_in_code/1,
 add_args/15,
 addTiny_added/1,
 agent_call_command/2,
@@ -80,6 +83,7 @@ isa/2,
 isCycAvailable_known/0,
 isCycUnavailable_known/1,
 never_assert_u/2,
+never_assert_u0/2,
 never_retract_u/2,
 lambda/5,
 lmconf:mpred_select/2,
@@ -97,10 +101,8 @@ mpred_f/4,
 mpred_f/5,
 mpred_f/6,
 mpred_f/7,
-mpred_isa/2,
-mpred_manages_unknowns/0,
-mpred_mark/4,
 mpred_module/2,
+mpred_manages_unknowns/0,
 mpred_univ/1,
 mpred_univ/3,
 mudKeyword/2,
@@ -108,6 +110,8 @@ now_unused/1,
 only_if_pttp/0,
 pddlSomethingIsa/2,
 pfcControlled/1,
+mpred_isa/2,
+mpred_mark/4,
 pfcRHS/1,
 predCanHaveSingletons/1,
 prologBuiltin/1,
@@ -361,13 +365,29 @@ wid/3)).
       baseKB:resolveConflict0((*)),
       baseKB:resolverConflict_robot((*)))).
 
+
+:- meta_predicate neg_may_naf(0).
+:- export(neg_may_naf/1).
+neg_may_naf(P):- mpred_non_neg_literal(P),get_functor(P,F),clause(prologNegByFailure(F),true),!.
+neg_may_naf(P):- is_ftCompound(P),predicate_property(P,static).
+
+:- meta_predicate neg_in_code(0).
+:- export(neg_in_code/1).
+neg_in_code(P):-   neg_may_naf(P), \+ P.
+neg_in_code(Q):-  is_ftNonvar(Q), prologSingleValued(Q),if_missing_mask(Q,R,Test),req(R),Test.
+
+:- meta_predicate tilda_in_code(0).
+:- export(tilda_in_code/1).
+tilda_in_code(~(G)):-nonvar(G),!, req('~'(neg(G))).
+tilda_in_code(G):- req(neg(G)).
+
 :- show_call(why,source_context_module(_CM)).
 :- module_property(baseKB, exports(List)),forall(member(E,List),baseKB:dynamic(baseKB:E)).
 % :- module_property(baseKB, exports(List)),forall(member(E,List),kb_dynamic(E)).
 
 % :- use_module(mpred_pfc).
 
-:- source_location(F,_),asserta(never_registered_mpred_file(F)).
+:- source_location(F,_),asserta(lmconf:never_registered_mpred_file(F)).
 
 prologNegByFailure(prologNegByFailure).
 completelyAssertedCollection(prologNegByFailure).
@@ -387,16 +407,6 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 
 
 
-neg_may_naf(P):- mpred_non_neg_literal(P),get_functor(P,F),clause(prologNegByFailure(F),true),!.
-neg_may_naf(P):- is_ftCompound(P),predicate_property(P,static).
-:- meta_predicate neg_may_naf(0).
-
-neg_in_code(P):-   neg_may_naf(P), \+ P.
-neg_in_code(Q):-  is_ftNonvar(Q), prologSingleValued(Q),if_missing_mask(Q,R,Test),req(R),Test.
-:- meta_predicate neg_in_code(0).
-
-tilda_in_code(~(G)):-nonvar(G),!, req('~'(neg(G))).
-tilda_in_code(G):- req(neg(G)).
 
 
 
@@ -447,8 +457,10 @@ resolverConflict_robot(C) :- cwc, must((mpred_remove3(C),wdmsg("Rem-3 with confl
 % never_assert_u(pt(_,Pre,Post),head_singletons(Pre,Post)):- cwc, head_singletons(Pre,Post).
 never_assert_u(Rule,is_var(Rule)):- cwc, is_ftVar(Rule),!.
 never_assert_u(Rule,head_singletons(Pre,Post)):- cwc, Rule \= (_:-_), once(mpred_rule_hb(Rule,Post,Pre)), head_singletons(Pre,Post).
-
+never_assert_u(declared(M:F/A),never_declared(M:F/A)):- M:F/A = qrTBox:p/1.
 never_assert_u(A,B):-never_assert_u0(A,B),trace,never_assert_u0(A,B).
+
+never_assert_u(pqr:arity(_,_),is_support(arity/2)):- cwc,!.
 never_assert_u(M:Rule,Why):- cwc, atom(M),never_assert_u(Rule,Why).
 
 never_assert_u0(mpred_mark(pfcPosTrigger,_,F,A),Why):-
@@ -479,4 +491,4 @@ never_assert_u(pt(_,
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
 :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/autoexec.pfc')).
-
+:- add_import_module(baseKB,basePFC,end).

@@ -293,7 +293,7 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 
 
 % ========================================
-% get_mpred_user_kb/1
+% get_user_abox/1
 % ========================================
 
 % TODO uncomment the next line without breaking it all!

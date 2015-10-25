@@ -240,7 +240,7 @@ body_for_mpred_2(_Mode,Head,Head,A,{A}):-prologBuiltin(A),!.
 body_for_mpred_2(_Mode,Head,Head,A,A).
 
 reduce_literal(A,A):-is_ftVar(A).
-reduce_literal(neg(different(P3, R3)),mudEquals(P3, R3)).
+reduce_literal(neg(different(P3, R3)),not_different(P3, R3)).
 reduce_literal(neg(mudEquals(P3, R3)),different(P3, R3)).
 reduce_literal(neg(skolem(P3, R3)),different(P3, R3)).
 reduce_literal(neg(termOfUnit(P3, R3)),different(P3, R3)).

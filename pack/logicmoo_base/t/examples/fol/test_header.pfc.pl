@@ -6,8 +6,9 @@
 :- absolute_file_name('../../prolog',Dir),asserta(user:file_search_path(library,Dir)).
 :- endif.
 
-:- thread_local(t_l:mpred_user_kb/1).
-:- (t_l:mpred_user_kb(M)->true;context_module(M),asserta(t_l:mpred_user_kb(M))),writeln(user_kb=M).
+:- ensure_loaded(library(logicmoo/logicmoo_utils)).
+:- thread_local(t_l:user_abox/1).
+:- (t_l:user_abox(M)->true;(context_module_of_file(M),asserta(t_l:user_abox(M)))),!,writeln(user_kb=M).
 
 :- if(gethostname(ubuntu)).
 :- ensure_loaded(library(logicmoo/logicmoo_user)).
@@ -18,8 +19,8 @@
 
 :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded(logicmoo(snark/'common_logic_clif.pfc'))).
 
-show_test(G):- get_mpred_user_kb(KB),must(show_call(KB:G)).
-show_call_test(G):- get_mpred_user_kb(KB),must(show_call(KB:G)).
+show_test(G):- get_user_abox(KB),must(show_call(KB:G)).
+show_call_test(G):- get_user_abox(KB),must(show_call(KB:G)).
 
 
 %= define the example language
