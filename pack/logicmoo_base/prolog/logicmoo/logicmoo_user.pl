@@ -22,8 +22,8 @@
  op(350,xfx,'xor')]).
 
 
-:- use_module(logicmoo_base).
-:- thread_local(t_l:user_abox/1).
+:- baseKB:use_module(logicmoo_base).
+:- baseKB:thread_local(t_l:user_abox/1).
 %:- (t_l:user_abox(M)->true;(source_context_module(M))),set_user_abox(M),dmsg(user_kb=M).
 %:- ensure_mpred_system.
 
@@ -75,7 +75,7 @@ m4:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/autoexec.pfc')).
 
 % :- checkKB:m1.
 
-:- w_tl(t_l:user_abox(baseKB), baseKB:( checkKB:m1 )).
+:- baseKB:w_tl(t_l:user_abox(baseKB), baseKB:( checkKB:m1 )).
 
 % :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded(logicmoo(snark/'common_logic_clif.pfc'))).
 

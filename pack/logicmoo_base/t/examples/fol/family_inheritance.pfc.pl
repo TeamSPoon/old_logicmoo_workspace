@@ -4,7 +4,7 @@
 
 % :- include('test_header.pfc').
 :- use_module(library(logicmoo/logicmoo_user)).
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded(logicmoo(snark/'common_logic_clif.pfc'))).
+:- baseKB:with_ukb(baseKB,baseKB:ensure_mpred_file_loaded(logicmoo(snark/'common_logic_clif.pfc'))).
 
 :- begin_pfc.
 
@@ -21,6 +21,7 @@
 must_is_entailed(G):- must(is_entailed(G)).
 
 
+show_test(G):- get_user_abox(KB),printAll(must(KB:G)).
 
 %= ````
 %= logic tests...
@@ -48,7 +49,7 @@ male(P) <=> ~female(P).
 
 
 % seven rules
-:- kif_add(((parent(M,C) & female(M)) <=> mother(M,C))).
+(((parent(M,C) & female(M)) <=> mother(M,C))).
 
 
 
@@ -102,11 +103,10 @@ human(trudy).
 never_retract_u(human(trudy)).
 
 
-
 % :- kif_add(forall(p,exists([m,f], if(human(p), (mother(m,p) & father(f,p)))))).
-forall(p,exists([m,f], if(human(p), (mother(m,p) & father(f,p)))))
+forall(p,exists([m,f], if(human(p), (mother(m,p) & father(f,p))))).
 
-:- doall(show_call(father(_,trudy))).
+:- printAll(must(father(_,trudy))).
 
 
 mother(trudy,eileen).
@@ -159,7 +159,7 @@ Justifications for grandparent(trudy,douglas):
 
 
 %= so far no males "asserted" in the KB
-:- doall(show_call(male(Who ))).
+:- show_test(((male(Who ))).
 /*
 OUTPUT WAS..
 male(skArg1ofFatherFn(pam)).
@@ -186,7 +186,7 @@ male(skArg1ofFatherFn(trudy)).
 %= thus ~/1 is tnot/1 of XSB ?!?
 
 %= there ar explicly non females
-:- doall(show_call(~ female(Who ))).
+:- show_test(((~ female(Who ))).
 
 %= ensure skolems are made or destroyed
 
@@ -203,18 +203,16 @@ father(douglas,zaltana).
 
 :- mpred_why(grandparent(trudy,douglas)).
 
-show_test(G):- get_user_abox(KB),must(show_call(KB:G)).
-
 % :- mpred_trace_exec.
-:- doall(show_test(mother(Female,Who))).
+:- show_test((mother(Female,Who))).
 
-:- doall(show_test(father(Male,Who))).
+:- show_test(father(Male,Who)).
 
-% :- doall(show_test(male(Who))).
+% :- show_test((male(Who))).
 
-% :- doall(show_test(female(Who))).
+% :- show_test((female(Who))).
 
-:- doall(show_test(siblings(Who,AndWho))).
+:- show_test((siblings(Who,AndWho))).
 
 %= human(P) => (female(P) v male(P)).
 if(gendered_human(P), (female(P) v male(P))).

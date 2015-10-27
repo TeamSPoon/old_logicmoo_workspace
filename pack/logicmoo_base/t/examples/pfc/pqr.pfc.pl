@@ -1,6 +1,8 @@
 :- module(pqr,[]).
 
-:- use_module(library(logicmoo/logicmoo_user)).
+
+% :- qcompile(library(logicmoo/logicmoo_user)).
+:- baseKB:use_module(library('logicmoo/logicmoo_user.qlf')).
 
 :- begin_pfc.
 
@@ -14,5 +16,4 @@ q(X) ==> r(X).
 
 :- must(r(2)).
 
-
-
+  

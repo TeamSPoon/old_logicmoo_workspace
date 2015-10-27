@@ -208,7 +208,8 @@ mpred_interactive_why:- w_tl(t_l:is_mpred_interactive_why,mpred_why).
 
 mpred_why :-
   whymemory(P,_),
-  mpred_why(P).
+  mpred_why(P),!.
+mpred_why.
 
 why(N) :- mpred_why(N).
 

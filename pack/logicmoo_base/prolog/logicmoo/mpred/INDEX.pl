@@ -503,6 +503,8 @@ index((assert_i), 1, mpred_pfc, mpred_pfc).
 index((assert_u), 1, mpred_pfc, mpred_pfc).
 index((assert_u), 4, mpred_pfc, mpred_pfc).
 index((assertz_u), 1, mpred_pfc, mpred_pfc).
+index((check_never_assert), 1, mpred_pfc, mpred_pfc).
+index((check_never_retract), 1, mpred_pfc, mpred_pfc).
 index((assertz_mu), 2, mpred_pfc, mpred_pfc).
 index((asserta_i), 1, mpred_pfc, mpred_pfc).
 index((assertz_i), 1, mpred_pfc, mpred_pfc).

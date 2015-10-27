@@ -12,6 +12,8 @@
             assert_u/1,
             assert_u/4,
           assertz_u/1,
+          check_never_assert/1,
+          check_never_retract/1,
           assertz_mu/2,
             % mpred_select/2,
             asserta_i/1,
@@ -2224,7 +2226,7 @@ mpred_wff(F,_,How) :-
   !.
 
 mpred_wff(F,Descendants,wff(Supporters)) :-
-  % first make sure we aren't in a loop.
+  % first make sure we aren''t in a loop.
   (\+ memberchk(F,Descendants)),
   % find a justification.
   supports_f_l(F,Supporters),
@@ -2257,12 +2259,14 @@ mpred_get_support_via_sentence(Var,_):-is_ftVar(Var),!,fail.
 mpred_get_support_via_sentence((A,B),(FC,TC)):-!, mpred_get_support_precanonical_plus_more(A,(FA,TA)),mpred_get_support_precanonical_plus_more(B,(FB,TB)),conjoin(FA,FB,FC),conjoin(TA,TB,TC).
 mpred_get_support_via_sentence(true,g):-!.
 
+
 mpred_get_support_via_clause_db(\+ P,OUT):- mpred_get_support_via_clause_db(neg(P),OUT).
 mpred_get_support_via_clause_db(\+ P,(naf(g),g)):- !, predicate_property(P,number_of_clauses(_)),\+ clause(P,_Body).
 mpred_get_support_via_clause_db(P,OUT):- predicate_property(P,number_of_clauses(N)),N>0,
    clause(P,Body),(Body==true->Sup=(g);
     (support_ok_via_clause_body(P),mpred_get_support_precanonical_plus_more(Body,Sup))),
    OUT=(Sup,g).
+
 
 support_ok_via_clause_body(_H):-!,fail.
 support_ok_via_clause_body(H):- get_functor(H,F,A),support_ok_via_clause_body(H,F,A).
@@ -2301,7 +2305,7 @@ mpred_fwd(P,S) :- mpred_fwd1(P,S),!.
 mpred_fwd1(Fact,Sup) :- gripe_time(0.80,mpred_fwd2(Fact,Sup)),!.
 
 mpred_fwd2(Fact,Sup) :- cyclic_term(Fact;Sup),writeq(mpred_fwd2_cyclic_term(Fact;Sup)),!.
-mpred_fwd2(Fact0,_Sup) :-
+mpred_fwd2(Fact0,_Sup):-
   once(must(ain_rule_if_rule(Fact0))),
   unnumbervars(Fact0,Fact),
   copy_term(Fact,F),
@@ -2318,7 +2322,8 @@ mpred_fwd2(Fact0,_Sup) :-
 
 % ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),(ground(Fact)->must(once(Fact));doall(show_if_debug(must(Fact)))),fail.
 % ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),(ground(Fact)->must(once(Fact));doall(show_if_debug(must(Fact)))),!.
-ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),doall(show_if_debug(must(with_in_source_context(Fact)))),!.
+ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),
+    doall(show_if_debug(with_in_source_context(Fact))),!.
 ain_rule_if_rule(Fact):- must(ain_rule0(Fact)),!.
 
 ain_rule0((P==>Q)) :-
