@@ -391,25 +391,16 @@ This module uses such a facility, written by Tim Finin called PFC, which he has 
 
 The PFC system package provides a forward reasoning capability to be used together with conventional Prolog programs. The PFC inference rules are Prolog terms which are asserted as clauses into the regular Prolog database. When new facts or forward reasoning rules are added to the Prolog database (via a special predicate pfc_add/1, forward reasoning is triggered and additional facts that can be deduced via the application of the forward chaining rules are also added to the database. A simple justification-based truth-maintenance system is provided as well as simple predicates to explore the resulting proof trees.   Additionally this module provides the user with various methods for trying out new techniques of backwards chaining without rewriting their code.
 
-
-
 The =logicmoo_base= module allows one to use optimal First Order Logic declarations in Prolog code.
 During *development*, these declarations log informative information when values don't match
 expectations.  A typical development environment converts this into a helpful
 stack trace which assists in locating the programing error.
 
-FOL declarations can be give manually by calling pfc_assert/1.  `logicmoo_base` also inserts
-predicate Mode declarations for you based on your PlDoc structured comments.  
-
-## Inference Engines can:
-
-  * offer documentation to those reading our code
-  * help find errors during development
-  * structure our thinking during development
-  * provide a place to persist content tests 
 
 
 ````
+
+You may have noticed that Logicmoo defines {}/1 as a escape construct for bypassing the FOL's salient body goals. 
 
 % this means that both P and Q can't be true.
 disjoint(P,Q), {current_predciate(_,P),current_predciate(_,Q)}
@@ -419,34 +410,11 @@ disjoint(P,Q), {current_predciate(_,P),current_predciate(_,Q)}
 
 ````
 
-You may have noticed that Logicmoo defines {}/1 as a escape construct for bypassing the FOL's salient body goals. 
 
 
 As exemplified above, this is the same control construct that is used in grammar rules for bypassing the expansion of rule body goals when a rule is converted into a clause. 
 Both control constructs can be combined in order to call a goal from a grammar rule body, while bypassing at the same time the Prolog compiler. Consider the following example:
 
-
-
-
-
-# Runtime Loop checking.  @loop_check(+:Goal)
-
-````
-````
-
-
-# Lexical @with_assertions(+:ThreadLocal,+:Goal).
-
-
-````
-````
-
-
-# Online Prolog current state cross referencer.  
-````
-?- start_logicmoo_www(11111).
-
-````
 
 # S-Expr reader utilities
 
@@ -458,17 +426,6 @@ The abiliity to use CLIF/KIF/CycL Etc
 ````
 ````
 
-
-# Changes in this Version
-
-  * Fix packaging error
-
-# Installation
-
-Using SWI-Prolog 6.3.16 or later:
-
-    $ swipl
-    1 ?- pack_install(logicmoo_base).
-
 Source code available and pull requests accepted on GitHub:
 https://github.com/TeamSPoon/PrologMUD/tree/master/pack/logicmoo_base
+
