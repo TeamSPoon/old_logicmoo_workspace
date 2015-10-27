@@ -366,7 +366,7 @@ This is an important feature that overcomes the supposed limitations of Prolog. 
 ask whether LogicMOO believes that John intended to let the cat out, then LogicMOO would answer ``no''. 
 This answer is misleading because LogicMOO would also answer ``no'' if it were asked if John did not intend to let the cat out.  This is why the system automaically Re-asks the negation.
 
-Sadly all theorem provers since PTTP (include theorem provers said to be based on it) have been simplified to absurdium and cannot do this simple analysis.  The reason? According to classically trained
+Sadly all theorem provers since PTTP (include theorem provers said to be based on it) have been simplified to to no longer do this simple analysis.  The reason? According to classically trained
 logicians horn clauses *cannot* start with a negated literals.   So to not offend them (entirely)  PTTP can store "( ~a :- ~b )" as "( not_a :- not_b )" 
 If we obeyed the classical limitations set forth upon Horn clauses to only being "positive" that would remove the unique ability for LogicMOO to deduce the difference between false and unknown. 
 We are no longer restricted to CWA and the limitations imposed by modern theorem provers and sematic web tools.  I must assume the reason programmers made these sacrifices is they can still solve problems like circuit verifcation without disrupting the post 1980s maintsteam thinking.
@@ -381,10 +381,8 @@ is_entailed/1: Detects if an Horn Clause (or fact) is holograpically existing. E
 ## PFC
 Pfc includes a special kind of backward chaining rule which is used to generate all possible solutions to a goal that is sought in the process of forward chaining.     
 
-
-# Forward chaining macros create smaller self-maintaining codebase.
-
-Prolog, like most logic programming languages, offers depth first backward chaining as the only reasoning scheme. It is well known that sound and complete reasoning systems can be built using either exclusive backward chaining or exclusive forward chaining. Thus, this is not a theoretical problem. It is also well understood how to ``implement'' forward reasoning using an exclusively backward chaining system and vice versa. Thus, this need not be a practical problem. In fact, many of the logic-based languages developed for AI applications allow one to build systems with both forward and backward chaining rules.
+# Forward chaining macros
+It is well known that sound and complete reasoning systems can be built using either exclusive backward chaining or exclusive forward chaining. Thus, this is not a theoretical problem. It is also well understood how to ``implement'' forward reasoning using an exclusively backward chaining system and vice versa. Thus, this need not be a practical problem. In fact, many of the logic-based languages developed for AI applications allow one to build systems with both forward and backward chaining rules.
 There are, however, some interesting and important issues which need to be addresses in order to provide the Prolog programmer with a practical, efficient, and well integrated facility for forward chaining.
 
 This module uses such a facility, written by Tim Finin called PFC, which he has implemented in standard Prolog. The PFC system is a package that provides a forward reasoning capability to be used together with conventional Prolog programs. The PFC inference rules are Prolog terms which are asserted as facts into the regular Prolog database.
@@ -395,7 +393,6 @@ The =logicmoo_base= module allows one to use optimal First Order Logic declarati
 During *development*, these declarations log informative information when values don't match
 expectations.  A typical development environment converts this into a helpful
 stack trace which assists in locating the programing error.
-
 
 
 ````
@@ -411,7 +408,6 @@ disjoint(P,Q), {current_predciate(_,P),current_predciate(_,Q)}
 ````
 
 
-
 As exemplified above, this is the same control construct that is used in grammar rules for bypassing the expansion of rule body goals when a rule is converted into a clause. 
 Both control constructs can be combined in order to call a goal from a grammar rule body, while bypassing at the same time the Prolog compiler. Consider the following example:
 
@@ -421,11 +417,5 @@ Both control constructs can be combined in order to call a goal from a grammar r
 The abiliity to use CLIF/KIF/CycL Etc
 
 
-# External predicate proxies 
-
-````
-````
-
 Source code available and pull requests accepted on GitHub:
 https://github.com/TeamSPoon/PrologMUD/tree/master/pack/logicmoo_base
-
