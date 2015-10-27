@@ -754,7 +754,7 @@ expanded_already_functor(_:NV):-nonvar(NV),!,expanded_already_functor(NV).
 
 % system:goal_expansion(N,mpred_prove_neg(P)):-fail,mpred_from_negation_plus_holder(N,P),show_failure(why,mpred_isa(P,pfcControlled)).
 
-mpred_ops:-  op(500,fx,('~')),op(500,fx,('neg')),op(1075,xfx,('==>')), op(1075,xfx,('<==>')),op(1075,xfx,('<-')), op(1100,fx,('nesc')), op(1150,xfx,('::::')).
+mpred_ops:-  op(500,fx,('~')),op(500,fx,('~')),op(1075,xfx,('==>')), op(1075,xfx,('<==>')),op(1075,xfx,('<-')), op(1100,fx,('nesc')), op(1150,xfx,('::::')).
 mpred_dcg_ops:-  op(400,yfx,('\\\\')),op(1200,xfx,('-->>')),op(1200,xfx,('--*>>')), op(1200,xfx,('<<--')).
 
 :- thread_local(mpred_ain_loaded).
@@ -818,7 +818,7 @@ ensure_tbox_module(M):-
             multifile(M:(('==>')/2)),
             multifile(M:('==>')/1),
             multifile(M:('~')/1),
-            multifile(M:('neg')/1),
+            multifile(M:('~')/1),
 
                    dynamic(M:('<-')/2),
                    dynamic(M:('::::')/2),
@@ -826,7 +826,7 @@ ensure_tbox_module(M):-
                    dynamic(M:(('==>')/2)),
                    dynamic(M:('==>')/1),
                    dynamic(M:('~')/1),
-                   dynamic(M:('neg')/1),
+                   dynamic(M:('~')/1),
 
                    export(M:('<-')/2),
                    export(M:('::::')/2),
@@ -834,7 +834,7 @@ ensure_tbox_module(M):-
                    export(M:(('==>')/2)),
                    export(M:('==>')/1),
                    export(M:('~')/1),
-                   export(M:('neg')/1),
+                   export(M:('~')/1),
 
             op(1199,fx,M:('==>')), % assert
             op(1199,fx,M:('?->')), % ask
@@ -925,8 +925,8 @@ get_op_alias(OP,ALIAS):-get_lang(LANG),lang_op_alias(LANG,OP,ALIAS).
 
 % current_op_alias((<==>),dup(impliesF,(','))).
 % current_op_alias((=>),==>).
-% current_op_alias((not),(neg)).
-current_op_alias( not(:-),neg(:-)).
+% current_op_alias((not),(~)).
+current_op_alias( not(:-),~(:-)).
 current_op_alias( (:-),(:-)).
 
 get_lang(LANG):-t_l:current_lang(LANG),!.
@@ -938,35 +938,35 @@ lang_op_alias(pfc,(==>),==>).
 % lang_op_alias(pfc,(<=>),(<==>)).
 lang_op_alias(pfc,(<=),(<-)).
 lang_op_alias(pfc,(<-),(<-)).
-lang_op_alias(pfc,(not),(neg)).
-lang_op_alias(pfc,not(:-),neg(:-)).
+lang_op_alias(pfc,(not),(~)).
+lang_op_alias(pfc,not(:-),~(:-)).
 lang_op_alias(pfc,(:-),(:-)).
 % lang_op_alias(pfc,(A=B),{(A=B)}).
 % kif
 lang_op_alias(kif,(<==>),(<==>)).
 lang_op_alias(kif,(==>),==>).
-lang_op_alias(kif,(not),(neg)).
-lang_op_alias(kif,(~),(neg)).
+lang_op_alias(kif,(not),(~)).
+lang_op_alias(kif,(~),(~)).
 lang_op_alias(kif,(=>),(if)).
 lang_op_alias(kif,(<=>),(iff)).
-lang_op_alias(kif, not(':-'),neg('<-')).
+lang_op_alias(kif, not(':-'),~('<-')).
 lang_op_alias(kif,(:-),rev(==>)).
 % cyc
 lang_op_alias(cyc,(<==>),(<==>)).
 lang_op_alias(cyc,(==>),==>).
 lang_op_alias(cyc,(implies),(if)).
 lang_op_alias(cyc,(equiv),(iff)).
-lang_op_alias(cyc, not(':-'),neg('<-')).
+lang_op_alias(cyc, not(':-'),~('<-')).
 lang_op_alias(cyc,(:-),rev(==>)).
 % prolog
 lang_op_alias(prolog,(<==>),(<==>)).
 lang_op_alias(prolog,(==>),==>).
-lang_op_alias(prolog, not(':-'),neg('<-')).
+lang_op_alias(prolog, not(':-'),~('<-')).
 lang_op_alias(prolog,(:-),(:-)).
 lang_op_alias(prolog,(<=),(<=)).
 lang_op_alias(prolog,(<-),(<-)).
 
-transform_opers(LANG,PFCM,PFCO):- w_tl(t_l:current_lang(LANG),((transitive_lc(transform_opers_0,PFCM,PFC),!, subst(PFC,(not),(neg),PFCO)))).
+transform_opers(LANG,PFCM,PFCO):- w_tl(t_l:current_lang(LANG),((transitive_lc(transform_opers_0,PFCM,PFC),!, subst(PFC,(not),(~),PFCO)))).
 
 :- op(500,fx,'~').
 :- op(1199,fx,('==>')).
@@ -1007,13 +1007,13 @@ transform_opers_0(implies(A,B),implies(AA,BB)):- !, must_maplist(transform_opers
 transform_opers_0(equiv(A,B),equiv(AA,BB)):- !, must_maplist(transform_opers_0,[A,B],[AA,BB]).
 transform_opers_0((B:-A),OUTPUT):- !, must_maplist(transform_opers_0,[A,B],[AA,BB]),=((BB:-AA),OUTPUT).
 transform_opers_0(not(A),OUTPUT):- !, must_maplist(transform_opers_0,[A],[AA]),=(not(AA),OUTPUT).
-transform_opers_0(not(A),C):- !, transform_opers_0(neg(A),C).
+transform_opers_0(not(A),C):- !, transform_opers_0(~(A),C).
 %transform_opers_0((A),OUTPUT):- !, must_maplist(transform_opers_0,[A],[AA]),=((AA),OUTPUT).
 transform_opers_0(O,O).
 
 transform_opers_1(not(AB),(BBAA)):- get_op_alias(not(OP),rev(OTHER)), atom(OP),atom(OTHER),AB=..[OP,A,B],!, must_maplist(transform_opers_0,[A,B],[AA,BB]),BBAA=..[OTHER,BB,AA].
 transform_opers_1(not(AB),(BOTH)):- get_op_alias(not(OP),dup(OTHER,AND)),atom(OTHER), atom(OP),AB=..[OP,A,B],!, must_maplist(transform_opers_0,[A,B],[AA,BB]),AABB=..[OTHER,AA,BB],BBAA=..[OTHER,BB,AA],BOTH=..[AND,AABB,BBAA].
-transform_opers_1(not(AB),neg(NEG)):- get_op_alias(not(OP),neg(OTHER)),atom(OTHER), atom(OP),AB=..[OP|ABL],!, must_maplist(transform_opers_0,ABL,AABB),NEG=..[OTHER|AABB].
+transform_opers_1(not(AB),~(NEG)):- get_op_alias(not(OP),~(OTHER)),atom(OTHER), atom(OP),AB=..[OP|ABL],!, must_maplist(transform_opers_0,ABL,AABB),NEG=..[OTHER|AABB].
 transform_opers_1(not(AB),(RESULT)):- get_op_alias(not(OP),(OTHER)), atom(OP),atom(OTHER),AB=..[OP|ABL],!, must_maplist(transform_opers_0,ABL,AABB),RESULT=..[OTHER|AABB].
 transform_opers_1((AB),(BBAA)):- get_op_alias(OP,rev(OTHER)), atom(OP),atom(OTHER),AB=..[OP,A,B],!, must_maplist(transform_opers_0,[A,B],[AA,BB]),BBAA=..[OTHER,BB,AA].
 transform_opers_1((AB),(BOTH)):- get_op_alias(OP,dup(OTHER,AND)), atom(OP),atom(OTHER),AB=..[OP,A,B],!, must_maplist(transform_opers_0,[A,B],[AA,BB]),AABB=..[OTHER,AA,BB],BBAA=..[OTHER,BB,AA],BOTH=..[AND,AABB,BBAA].
@@ -1069,7 +1069,7 @@ mpred_term_expansion((('==>'(Q))),(:- cl_assert(pfc(fwc),('=>'(Q))))).
 mpred_term_expansion(((nesc(Q))),(:- cl_assert(pfc(fwc),nesc(Q)))).
 mpred_term_expansion(('<-'(P,Q)),(:- cl_assert(pfc(bwc),('<-'(P,Q))))).
 mpred_term_expansion(('<==>'(P,Q)),(:- cl_assert(pfc(bwc),(P<==>Q)))).
-mpred_term_expansion(neg(Q),(:- cl_assert(pfc(fwc),neg(Q)))).
+mpred_term_expansion(~(Q),(:- cl_assert(pfc(fwc),~(Q)))).
 mpred_term_expansion(~(Q),(:- cl_assert(pfc(fwc),~(Q)))).
 
 mpred_term_expansion(if(P,Q),(:- cl_assert(kif(fwc),if(P,Q)))).

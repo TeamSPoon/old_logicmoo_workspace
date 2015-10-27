@@ -944,9 +944,9 @@ check_real_context_module:- must((context_module(M),M\==mpred_pfc,M\==mpred_load
 :- was_shared_multifile(('<-')/2).
 :- was_shared_multifile(('<==>')/2).
 :- was_shared_multifile(('==>')/2).
-:- was_shared_multifile(('neg')/1).
+:- was_shared_multifile(('~')/1).
 :- was_shared_multifile(('nesc')/1).
-:- was_shared_multifile((('neg'))/1).
+:- was_shared_multifile((('~'))/1).
 :- was_shared_multifile((mpred_action)/1).
 :- was_shared_multifile(basePFC:tms/1).
 :- was_shared_multifile(basePFC:hs/1).
@@ -980,7 +980,7 @@ with_umt(Goal):- source_context_module(M) -> M:call(Goal).
 %   Author : Tim Finin, finin@prc.unisys.com
 %   Purpose: syntactic sugar for Pfc - operator definitions and term expansions.
 
-:- op(500,fx,'~').
+:- op(500,fx,'-').
 :- op(1199,fx,('==>')).
 :- op(1190,xfx,('::::')).
 :- op(1180,xfx,('==>')).
@@ -1071,7 +1071,7 @@ mpred_is_builtin(P):-predicate_property(P,built_in).
 /*
 compiled(F/A):- was_dynamic(F/A),compile_predicates([F/A]).
 :- compiled(('nesc')/1).
-:- compiled(('neg')/1).
+:- compiled(('~')/1).
 :- compiled(('<-')/2).
 :- compiled(('==>')/2).
 :- compiled(('::::')/2).
@@ -1095,7 +1095,7 @@ erase_w_attvars(Data0,Ref):- physical_side_effect(erase(Ref)),add_side_effect(er
 
 
 :- thread_local(t_l:no_physical_side_effects/0).
-physical_side_effect(PSE):- is_side_effect_disabled,!,mpred_warn('no_physical_side_effects ~p',PSE).
+physical_side_effect(PSE):- is_side_effect_disabled,!,mpred_warn('no_physical_side_effects -p',PSE).
 physical_side_effect(PSE):- PSE.
 mpred_no_chaining(Goal):- w_tl(t_l:no_physical_side_effects,call(Goal)).
 
@@ -1135,8 +1135,8 @@ to_addable_form_wte(Why,I,O):-atom(I),atom_contains(I,'('),must_det_l((input_to_
 to_addable_form_wte(_,X,X):-mreq(as_is_term(X)),!.
 to_addable_form_wte(Why,nesc(I),O):-!,to_addable_form_wte(Why,I,O).
 to_addable_form_wte(Why,USER:I,O):-USER==user,!,to_addable_form_wte(Why,I,O).
-to_addable_form_wte(_Why,neg(USER:P0),neg(P0)):-USER==user,!.
-to_addable_form_wte(_Why,neg(P0),neg(P0)):-!.
+to_addable_form_wte(_Why,~(USER:P0),~(P0)):-USER==user,!.
+to_addable_form_wte(_Why,~(P0),~(P0)):-!.
 to_addable_form_wte(assert,(H:-B),(H:-B)):-B\==true,!.
 to_addable_form_wte(Why,(CUT,P0),(CUT,P)):-mpred_is_builtin(CUT),!,to_addable_form_wte(Why,P0,P).
 to_addable_form_wte(Why,P0,P):-
@@ -1318,8 +1318,8 @@ ain_minfo(How,(B==>H)):- !,ain_minfo(How,(H:-infoF(B==>H))),!,ain_minfo_2(How,(B
 ain_minfo(How,(B<==>H)):- !,ain_minfo(How,(H:-infoF(B<==>H))),!,ain_minfo(How,(B:-infoF(B<==>H))),!.
 ain_minfo(How,((A,B):-INFOC)):-mpred_is_info(INFOC),(is_ftNonvar(A);is_ftNonvar(B)),!,ain_minfo(How,((A):-INFOC)),ain_minfo(How,((B):-INFOC)),!.
 ain_minfo(How,((A;B):-INFOC)):-mpred_is_info(INFOC),(is_ftNonvar(A);is_ftNonvar(B)),!,ain_minfo(How,((A):-INFOC)),ain_minfo(How,((B):-INFOC)),!.
-ain_minfo(How,(~(A):-infoF(C))):-is_ftNonvar(C),is_ftNonvar(A),!,ain_minfo(How,((A):-infoF((C)))). % attvar_op(How,(~(A):-infoF(C))).
-ain_minfo(How,(neg(A):-infoF(C))):-is_ftNonvar(C),is_ftNonvar(A),!,ain_minfo(How,((A):-infoF((C)))). % attvar_op(How,(~(A):-infoF(C))).
+ain_minfo(How,(-(A):-infoF(C))):-is_ftNonvar(C),is_ftNonvar(A),!,ain_minfo(How,((A):-infoF((C)))). % attvar_op(How,(-(A):-infoF(C))).
+ain_minfo(How,(~(A):-infoF(C))):-is_ftNonvar(C),is_ftNonvar(A),!,ain_minfo(How,((A):-infoF((C)))). % attvar_op(How,(-(A):-infoF(C))).
 ain_minfo(How,(A:-INFOC)):-is_ftNonvar(INFOC),INFOC= mpred_bc_only(A),!,attvar_op(How,(A:-INFOC)),!.
 ain_minfo(How,basePFC:bt(umt,H,_)):-!,attvar_op(How,(H:-mpred_bc_only(H))).
 ain_minfo(How,basePFC:nt(umt,H,Test,Body)):-!,attvar_op(How,(H:-fail,basePFC:nt(umt,H,Test,Body))).
@@ -1397,11 +1397,11 @@ assertz_mu(M,X):- must((expire_tabled_list(M:X),show_call(attvar_op(assertz,M:X)
 
 
 retract_u(X):- check_never_retract(X),fail.
-%retract_u(neg(X)):-must(is_ftNonvar(X)),!,retract_eq_quitely_f(neg(X)),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
-%retract_u(basePFC:hs(X)):-!,retract_eq_quitely_f(basePFC:hs(X)),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
-retract_u(basePFC:qu(umt,X,Y)):-!,show_failure(why,retract_eq_quitely_f(basePFC:qu(umt,X,Y))),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
-retract_u(neg(X)):-!,show_success(why,retract_eq_quitely_f(neg(X))),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
-retract_u((X)):-!,show_success(why,retract_eq_quitely_f((X))),must((expire_tabled_list(neg(X)))),must((expire_tabled_list((X)))).
+%retract_u(~(X)):-must(is_ftNonvar(X)),!,retract_eq_quitely_f(~(X)),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
+%retract_u(basePFC:hs(X)):-!,retract_eq_quitely_f(basePFC:hs(X)),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
+retract_u(basePFC:qu(umt,X,Y)):-!,show_failure(why,retract_eq_quitely_f(basePFC:qu(umt,X,Y))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
+retract_u(~(X)):-!,show_success(why,retract_eq_quitely_f(~(X))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
+retract_u((X)):-!,show_success(why,retract_eq_quitely_f((X))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
 retract_u(X):-show_if_debug(attvar_op(retract_eq,X)),!,must((expire_tabled_list(X))).
 
 retractall_u(X):-retractall(X),must((expire_tabled_list(X))).
@@ -1491,12 +1491,12 @@ mpred_maptree(Pred,H,S):-apply(Pred,[H|S]).
 
 
 
-%example pfcVerifyMissing(mpred_isa(I,D), mpred_isa(I,C), ((mpred_isa(I,C), {D==C});~mpred_isa(I,C))). 
-%example pfcVerifyMissing(mudColor(I,D), mudColor(I,C), ((mudColor(I,C), {D==C});~mudColor(I,C))). 
+%example pfcVerifyMissing(mpred_isa(I,D), mpred_isa(I,C), ((mpred_isa(I,C), {D==C});-mpred_isa(I,C))). 
+%example pfcVerifyMissing(mudColor(I,D), mudColor(I,C), ((mudColor(I,C), {D==C});-mudColor(I,C))). 
 
 pfcVerifyMissing(GC, GO, ((GO, {D==C});\+ GO) ):-  GC=..[F,A|Args],append(Left,[D],Args),append(Left,[C],NewArgs),GO=..[F,A|NewArgs],!.
 
-%example mpred_freeLastArg(mpred_isa(I,C),neg(mpred_isa(I,C))):-is_ftNonvar(C),!.
+%example mpred_freeLastArg(mpred_isa(I,C),~(mpred_isa(I,C))):-is_ftNonvar(C),!.
 %example mpred_freeLastArg(mpred_isa(I,C),(mpred_isa(I,F),C\=F)):-!.
 mpred_freeLastArg(G,GG):- G=..[F,A|Args],append(Left,[_],Args),append(Left,[_],NewArgs),GG=..[F,A|NewArgs],!.
 mpred_freeLastArg(_G,false).
@@ -1574,7 +1574,7 @@ ain_fast_sp0(S,P) :-
      aining(OutcomeO),
      (mpred_post_sp_zzz(S,P),mpred_trace_msg(looped_outcome((P))))),!.
 %ain_fast_sp(_,_).
-ain_fast_sp0(P,S) :- mpred_error("ain_fast(~p,~p) failed",[P,S]).
+ain_fast_sp0(P,S) :- mpred_error("ain_fast(-p,-p) failed",[P,S]).
 
 :-module_transparent(mpred_ain/1).
 :-module_transparent(mpred_aina/1).
@@ -1632,9 +1632,9 @@ mpred_post_sp_zzzz(S,(P1,P2)) :- !,mpred_post_sp_zzzz(S,(P1)),mpred_post_sp_zzzz
 mpred_post_sp_zzzz(S,[P1]) :- !,mpred_post_sp_zzzz(S,(P1)).
 mpred_post_sp_zzzz(S,[P1|P2]) :- !,mpred_post_sp_zzzz(S,(P1)),mpred_post_sp_zzzz(S,(P2)).
 mpred_post_sp_zzzz(S, \+ P) :-!,doall(mpred_rem2a(P,S)),!,mpred_undo((\+),P).
-mpred_post_sp_zzzz(S, ~(P)) :-!,mpred_post_sp_zzzz(S, neg( P)).
-mpred_post_sp_zzzz(S, not(P)) :-!,mpred_post_sp_zzzz(S, neg( P)).
-mpred_post_sp_zzzz(S, neg(P)) :-doall(mpred_rem2a(P,S)),mpred_undo((\+),P),fail.
+mpred_post_sp_zzzz(S, -(P)) :-!,mpred_post_sp_zzzz(S, ~( P)).
+mpred_post_sp_zzzz(S, not(P)) :-!,mpred_post_sp_zzzz(S, ~( P)).
+mpred_post_sp_zzzz(S, ~(P)) :-doall(mpred_rem2a(P,S)),mpred_undo((\+),P),fail.
 mpred_post_sp_zzzz(_S,P) :- once((notrace(mpred_is_tautology(P)),wdmsg(trace_or_throw(todo(error(mpred_is_tautology(P))))))),show_load_context,fail.
 
 % only do loop check if it's already supported
@@ -1642,7 +1642,7 @@ mpred_post_sp_zzzz(_S,P) :- once((notrace(mpred_is_tautology(P)),wdmsg(trace_or_
 mpred_post_sp_zzzz(S,P) :- is_ftCompound(P), arg(SV,P,V),is_relative(V),must((mpred_update_literal(P,SV,Q,R),mpred_post_sp_zzzz(S,R))),(Q=R->true;mpred_undo(update,Q)).
 mpred_post_sp_zzzz(S,P) :- is_already_supported(P,S,_How),must(loop_check(mpred_post1_sp_0(S,P),mpred_post1_sp_1(S,P))),!. % ,mpred_enqueue(P,S).
 
-mpred_post_sp_zzzz(S,neg(P)) :-!, mpred_post1_sp_0(S,neg(P)),mpred_run,!,assert_u(neg(P)).
+mpred_post_sp_zzzz(S,~(P)) :-!, mpred_post1_sp_0(S,~(P)),mpred_run,!,assert_u(~(P)).
 
 mpred_post_sp_zzzz(S,P) :- mpred_post1_sp_0(S,P).
 
@@ -1661,7 +1661,7 @@ mpred_post1_sp_1(S,P):- P\==true,
   !.
 
 mpred_post1_sp_1(_,_). % already added
-mpred_post1_sp_1(S,P) :-  mpred_warn("mpred_post1(~p,~p) failed",[P,S]).
+mpred_post1_sp_1(S,P) :-  mpred_warn("mpred_post1(-p,-p) failed",[P,S]).
 
 with_mpred_trace_exec(P):- w_tl(t_l:mpred_debug_local,w_tl(mpred_is_tracing_exec, must(show_if_debug(P)))).
 
@@ -1749,7 +1749,7 @@ mpred_enqueue(P,S) :-
 	Mode=depth   -> aina_i(basePFC:qu(umt,P,S),S) ;
 	Mode=breadth -> ainz_i(basePFC:qu(umt,P,S),S) ;
 	% else
-          otherwise           -> mpred_warn("Unrecognized basePFC:sm mode: ~p", Mode))
+          otherwise           -> mpred_warn("Unrecognized basePFC:sm mode: -p", Mode))
      ; mpred_warn("No basePFC:sm mode").
 
 
@@ -1759,7 +1759,7 @@ mpred_remove_old_version((Identifier::::Body)) :-
   % this should never happen.
   is_ftVar(identifier),
   !,
-  mpred_warn("variable used as an  rule name in ~p :::: ~p",
+  mpred_warn("variable used as an  rule name in -p :::: -p",
           [Identifier,Body]).
 
 
@@ -1803,7 +1803,7 @@ mpred_step :-
   basePFC:hs(Signal),!,
   mpred_retract_db_type(basePFC:hs(Signal)),
   !,
-  mpred_warn("Stopping on signal ~p",[Signal]),
+  mpred_warn("Stopping on signal -p",[Signal]),
   fail.
 mpred_step:-loop_check(mpred_step0,true).
 
@@ -1824,7 +1824,7 @@ remove_selection(P,S) :-
   mpred_remove_supports_quietly(basePFC:qu(umt,P,S)),
   !.
 remove_selection(P,S) :-
-  brake(wdmsg("pfc:get_next_fact - selected fact not on Queue: ~p (~p)",
+  brake(wdmsg("pfc:get_next_fact - selected fact not on Queue: -p (-p)",
                [P,S])).
 
 
@@ -1851,9 +1851,9 @@ mpred_halt(Format) :- mpred_halt(Format,[]).
 mpred_halt(Format,Args) :-
   sformat(S,Format,Args),
   !,
-  in_cmt((wdmsg('~s',[S]))),
+  in_cmt((wdmsg('-s',[S]))),
   (basePFC:hs(Signal) ->
-       mpred_warn("mpred_halt finds basePFC:hs(Signal) already set to ~p",[Signal])
+       mpred_warn("mpred_halt finds basePFC:hs(Signal) already set to -p",[Signal])
      ; assert_i(basePFC:hs(S))).
 
 
@@ -1894,7 +1894,7 @@ ain_trigger_0(_Trig,basePFC:bt(umt,Trigger,Body),Support) :- !,
      % WAS mpred_bt_pt_combine(Trigger,Body).
    mpred_bt_pt_combine(Trigger,Body,Support).
 
-ain_trigger_0(Trig,X,Support) :- mpred_warn("Unrecognized trigger to aintrigger: ~p for ~p",[ain_trigger(X,Support),Trig]).
+ain_trigger_0(Trig,X,Support) :- mpred_warn("Unrecognized trigger to aintrigger: -p for -p",[ain_trigger(X,Support),Trig]).
 
 
 mpred_bt_pt_combine(Head,Body,Support) :-
@@ -1953,7 +1953,7 @@ mpred_retract_db_type(rule,X) :-
 mpred_retract_db_type(trigger,X) :-
   retract_t(X)
     -> mpred_unfwc(X)
-     ; mpred_warn("Trigger not found to mpred_retract_db_type: ~p",[X]).
+     ; mpred_warn("Trigger not found to mpred_retract_db_type: -p",[X]).
 
 mpred_retract_db_type(action,X) :- mpred_rem_actiontrace(mpred_retract_db_type,X).
 
@@ -2002,7 +2002,7 @@ rem_list([H|T]) :-
 mpred_rem1(P,S) :- copy_term_and_varnames(mpred_rem1(P,S),Why),   
   mpred_rem_support(Why,P,S)
      -> (remove_if_unsupported(Why,P))
-      ; mpred_warn("mpred_rem1/2 Could not find support ~p to remove from fact ~p",
+      ; mpred_warn("mpred_rem1/2 Could not find support -p to remove from fact -p",
                 [S,P]).
 
 %=
@@ -2045,11 +2045,11 @@ mpred_remove3(F) :-
 
 mpred_remove_supports_f_l(Why,F) :-
   mpred_rem_support(Why,F,S),
-  (S=(z,z)->true;mpred_trace_msg("~p was supported by ~p",[F,S])),
+  (S=(z,z)->true;mpred_trace_msg("-p was supported by -p",[F,S])),
   fail.
 mpred_remove_supports_f_l(Why,F) :- fail,
   mpred_rem_support(Why,F,S),nonvar(S),
-  (S=(z,z)->true;mpred_warn("WARN: ~p was still supported by ~p",[F,S])),
+  (S=(z,z)->true;mpred_warn("WARN: -p was still supported by -p",[F,S])),
   fail.
 mpred_remove_supports_f_l(_,_).
 
@@ -2072,7 +2072,7 @@ mpred_undo(Why,basePFC:pk(umt,Key,Head,Body)) :-
   !,
   (retract_i(basePFC:pk(umt,Key,Head,Body))
     -> mpred_unfwc(basePFC:pt(umt,Head,Body))
-     ; mpred_warn("for ~p \nTrigger not found to retract basePFC:pk=~p: ~p",[Why,Key,basePFC:pt(umt,Head,Body)])).
+     ; mpred_warn("for -p \nTrigger not found to retract basePFC:pk=-p: -p",[Why,Key,basePFC:pt(umt,Head,Body)])).
 
 mpred_undo(Why,basePFC:pt(umt,Head,Body)) :- 
   % undo a positive trigger.
@@ -2080,7 +2080,7 @@ mpred_undo(Why,basePFC:pt(umt,Head,Body)) :-
   !,
   (retract_i(basePFC:pt(umt,Head,Body))
     -> mpred_unfwc(basePFC:pt(umt,Head,Body))
-     ; mpred_warn("for ~p:\nTrigger not found to retract: ~p",[Why,basePFC:pt(umt,Head,Body)])).
+     ; mpred_warn("for -p:\nTrigger not found to retract: -p",[Why,basePFC:pt(umt,Head,Body)])).
 
 
 mpred_undo(Why,basePFC:bt(umt,Head,Body)) :- 
@@ -2090,7 +2090,7 @@ mpred_undo(Why,basePFC:bt(umt,Head,Body)) :-
   dtrace(attvar_op(retractall,(Head:-mpred_bc_only(Head)))),
   (retract_i(basePFC:bt(umt,Head,Body))
     -> mpred_unfwc(basePFC:bt(umt,Head,Body))
-     ; mpred_warn("for ~p:\nTrigger not found to retract: ~p",[Why,basePFC:bt(umt,Head,Body)])).
+     ; mpred_warn("for -p:\nTrigger not found to retract: -p",[Why,basePFC:bt(umt,Head,Body)])).
 
 
 mpred_undo(Why,basePFC:nt(umt,Head,Condition,Body)) :-
@@ -2098,7 +2098,7 @@ mpred_undo(Why,basePFC:nt(umt,Head,Condition,Body)) :-
   !,
   (retract_i(basePFC:nt(umt,Head,Condition,Body))
     -> mpred_unfwc(basePFC:nt(umt,Head,Condition,Body))
-     ; mpred_trace_msg("for ~p:\nTrigger not found to retract: ~p",[Why,basePFC:nt(umt,Head,Condition,Body)])).
+     ; mpred_trace_msg("for -p:\nTrigger not found to retract: -p",[Why,basePFC:nt(umt,Head,Condition,Body)])).
 
 mpred_undo(Why,Fact):- mpred_undo_u(Why,Fact)*->true;mpred_undo_e(Why,Fact).
 
@@ -2109,8 +2109,8 @@ mpred_undo_u(Why,Fact) :-
      mpred_unfwc1(Fact).
 
 mpred_undo_e(Why,Fact) :- 
-    % (Fact\=neg(_)->cnotrace(mpred_trace_msg("mpred_undo_e ; Fact not found in user db: ~p",[Fact]));true),
-     (Fact\=neg(_)->mpred_trace_rem(Why,Fact);true),
+    % (Fact\= ~(_)->cnotrace(mpred_trace_msg("mpred_undo_e ; Fact not found in user db: -p",[Fact]));true),
+     (Fact\= ~(_)->mpred_trace_rem(Why,Fact);true),
      mpred_unfwc(Fact).
 
 
@@ -2158,7 +2158,7 @@ remove_if_unsupported_verbose(Why,TMS,P) :- (\+ ground(P) -> mpred_trace_msg(war
 
 
 remove_if_unsupported(Why,P) :- is_ftVar(P),!,trace_or_throw(warn(var_remove_if_unsupported(Why,P))).
-remove_if_unsupported(Why,P) :- ((\+ ground(P), P \= (_:-_) , P \= neg(_) ) -> mpred_trace_msg(warn(nonground_remove_if_unsupported(Why,P))) ;true),
+remove_if_unsupported(Why,P) :- ((\+ ground(P), P \= (_:-_) , P \= ~(_) ) -> mpred_trace_msg(warn(nonground_remove_if_unsupported(Why,P))) ;true),
    (((mpred_tms_supported(local,P,How),How\=unknown(_)) -> mpred_trace_msg(still_supported(How,Why,local,P)) ; (  mpred_undo(Why,P)))),
    mpred_run.
 
@@ -2258,7 +2258,7 @@ mpred_get_support_via_sentence((A,B),(FC,TC)):-!, mpred_get_support_precanonical
 mpred_get_support_via_sentence(true,g):-!.
 
 
-mpred_get_support_via_clause_db(\+ P,OUT):- mpred_get_support_via_clause_db(neg(P),OUT).
+mpred_get_support_via_clause_db(\+ P,OUT):- mpred_get_support_via_clause_db(~(P),OUT).
 mpred_get_support_via_clause_db(\+ P,(naf(g),g)):- !, predicate_property(P,number_of_clauses(_)),\+ clause(P,_Body).
 mpred_get_support_via_clause_db(P,OUT):- predicate_property(P,number_of_clauses(N)),N>0,
    clause(P,Body),(Body==true->Sup=(g);
@@ -2382,8 +2382,8 @@ fcnt0(_Fact,F) :-
 
 mpred_define_bc_rule(Head,Body,Parent_rule) :-
   (\+ mpred_literal(Head)),
-  mpred_warn("Malformed backward chaining rule.  ~p not atomic.",[(Head:-Body)]),
-  mpred_warn("rule: ~p",[Parent_rule]),
+  mpred_warn("Malformed backward chaining rule.  -p not atomic.",[(Head:-Body)]),
+  mpred_warn("rule: -p",[Parent_rule]),
  % !,
   dtrace(mpred_define_bc_rule(Head,Body,Parent_rule)),
   fail.
@@ -2434,7 +2434,7 @@ mpred_eval_lhs0(X,Support) :-
 %  mpred_eval_lhs(X,Support).
 
 mpred_eval_lhs0(X,Why) :-
-  mpred_warn("Unrecognized item found in trigger body, namely ~p.",[mpred_eval_lhs0(X,Why)]),!.
+  mpred_warn("Unrecognized item found in trigger body, namely -p.",[mpred_eval_lhs0(X,Why)]),!.
 
 
 %=
@@ -2477,7 +2477,7 @@ mpred_eval_rhs1(Assertion,Support) :-
  mpred_post1(Assertion,Support),!.
 
 mpred_eval_rhs1(X,_) :-
-  mpred_warn("Malformed rhs of a rule: ~p",[X]).
+  mpred_warn("Malformed rhs of a rule: -p",[X]).
 
 
 %=
@@ -2523,14 +2523,14 @@ call_u(Why,X):- show_call(why,(nop(Why),mpred_call_only_facts(X))).
 %=
 %= not_cond(Why,F) is true iff F is a fact is not true
 %=
-% not_cond(_Why,X):- show_success(why,mpred_call_0(neg(X))).
+% not_cond(_Why,X):- show_success(why,mpred_call_0(~(X))).
 not_cond(_Why,X):- \+ X.
 
 
-neg(PQ):- cwc, neg_in_code(PQ).
-neg(tCol('$VAR')).
+~(PQ):- cwc, neg_in_code(PQ).
+~(tCol('$VAR')).
 
-~(G):- cwc, tilda_in_code(G).
+-(G):- cwc, tilda_in_code(G).
 
 :- meta_predicate neg_may_naf(0).
 :- export(neg_may_naf/1).
@@ -2544,8 +2544,8 @@ neg_in_code(Q):-  is_ftNonvar(Q), prologSingleValued(Q),if_missing_mask(Q,R,Test
 
 :- meta_predicate tilda_in_code(0).
 :- export(tilda_in_code/1).
-tilda_in_code(~(G)):-nonvar(G),!, req('~'(neg(G))).
-tilda_in_code(G):- req(neg(G)).
+tilda_in_code(-(G)):-nonvar(G),!, req('-'(~(G))).
+tilda_in_code(G):- req(~(G)).
 
 
 %=
@@ -2698,9 +2698,9 @@ mpred_nf1(NegTerm,NF) :-
   !,
   mpred_nf1_negation(Term,NF).
 
-mpred_nf1(~((P,Q)),NF) :-
- mpred_nf1(~P,NP),
- mpred_nf1(~Q,NQ),
+mpred_nf1(-((P,Q)),NF) :-
+ mpred_nf1(-P,NP),
+ mpred_nf1(-Q,NQ),
  !,
  mpred_nf1(((NP/Q);(NQ/P)),NF).
 
@@ -2727,9 +2727,9 @@ mpred_nf1(P,[P]) :-
 
 %=% shouln't we have something to catch the rest as errors?
 mpred_nf1(Term,[Term]) :-
-  mpred_warn("mpred_nf doesn't know how to normalize ~p",[Term]),!,fail.
+  mpred_warn("mpred_nf doesn't know how to normalize -p",[Term]),!,fail.
 
-mpred_negation_w_neg(neg(P),P):-is_ftNonvar(P),!.
+mpred_negation_w_neg(~(P),P):-is_ftNonvar(P),!.
 mpred_negation_w_neg(P,NF):-mpred_nf1_negation(P,NF).
 
 %= mpred_nf1_negation(P,NF) is true if NF is the normal form of \+P.
@@ -2754,7 +2754,7 @@ mpred_nf1_negation(P,[\+P]).
 
 
 %= mpred_nf_negations(List2,List) sweeps through List2 to produce List,
-%= changing ~{...} to {\+...}
+%= changing -{...} to {\+...}
 %=% ? is this still needed? tmpred_wff 3/16/90
 
 mpred_nf_negations(X,X) :- !.  % I think not! tmpred_wff 3/27/90
@@ -2767,11 +2767,11 @@ mpred_nf_negations([H1|T1],[H2|T2]) :-
 
 mpred_nf_negation(Form,{\+ X}) :-
   is_ftNonvar(Form),
-  Form=(~({X})),
+  Form=(-({X})),
   !.
 mpred_nf_negation(Form,{\+ X}) :-
   is_ftNonvar(Form),
-  Form=(neg({X})),
+  Form=(~({X})),
   !.
 mpred_nf_negation(X,X).
 
@@ -2783,7 +2783,7 @@ mpred_nf_negation(X,X).
 build_rhs(_Sup,X,[X]) :-
   is_ftVar(X),
   !.
-build_rhs(_Sup,neg(X),[neg(X)]) :-
+build_rhs(_Sup,~(X),[~(X)]) :-
   is_ftVar(X),
   !.
 
@@ -2807,10 +2807,10 @@ mpred_compile_rhsTerm(Sup,I,O):-to_addable_form_wte(mpred_compile_rhsTerm,I,O), 
 
 mpred_mark_as(_,_,P,_):- is_ftVar(P),!.
 
-mpred_mark_as(Sup,_PosNeg,neg(P),Type):-!,mpred_mark_as(Sup,neg,P,Type).
-mpred_mark_as(Sup,_PosNeg,\+(P),Type):-!,mpred_mark_as(Sup,neg,P,Type).
-mpred_mark_as(Sup,_PosNeg,-(P),Type):-!,mpred_mark_as(Sup,neg,P,Type).
-mpred_mark_as(Sup,_PosNeg,~(P),Type):-!,mpred_mark_as(Sup,neg,P,Type).
+mpred_mark_as(Sup,_PosNeg,~(P),Type):-!,mpred_mark_as(Sup,~,P,Type).
+mpred_mark_as(Sup,_PosNeg,\+(P),Type):-!,mpred_mark_as(Sup,~,P,Type).
+mpred_mark_as(Sup,_PosNeg,-(P),Type):-!,mpred_mark_as(Sup,~,P,Type).
+mpred_mark_as(Sup,_PosNeg,-(P),Type):-!,mpred_mark_as(Sup,~,P,Type).
 mpred_mark_as(Sup,PosNeg,( P / _ ),Type):- !, mpred_mark_as(Sup,PosNeg,P,Type).
 mpred_mark_as(_Sup,_PosNeg,'{}'(  _P ), _Type):- !. % , mpred_mark_as(Sup,PosNeg,P,Type).
 mpred_mark_as(_Sup,_PosNeg,( _ :- _ ),_Type):-!.
@@ -2851,7 +2851,7 @@ mpred_cleanup_0(P):- findall(P-B-Ref,clause(P,B,Ref),L),forall(member(P-B-Ref,L)
 %= mpred_negation(N,P) is true if N is a negated term and P is the term
 %= with the negation operator stripped.
 
-mpred_negation((~P),P).
+mpred_negation((-P),P).
 mpred_negation((-P),P).
 mpred_negation((\+(P)),P).
 
@@ -2870,13 +2870,13 @@ mpred_literal(X) :- mpred_positive_literal(X),!.
 mpred_literal(X) :- is_ftVar(X),!.
 
 is_reprop(X):- compound(X),is_reprop_0(X).
-is_reprop_0(neg(X)):-!,is_reprop(X).
+is_reprop_0(~(X)):-!,is_reprop(X).
 is_reprop_0(X):-functor(X,repropagate,_).
 
 mpred_non_neg_literal(X):-is_reprop(X),!,fail.
 mpred_non_neg_literal(X):-atom(X),!.
 mpred_non_neg_literal(X):- sanity(stack_check),
-    mpred_positive_literal(X), X \= neg(_), X \= mpred_mark(_,_,_,_), X \= conflict(_).
+    mpred_positive_literal(X), X \= ~(_), X \= mpred_mark(_,_,_,_), X \= conflict(_).
 
 mpred_non_neg_literal(X):-is_reprop(X),!,fail.
 mpred_positive_literal(X) :- is_ftNonvar(X),
@@ -2892,7 +2892,7 @@ mpred_connective(('<-')).
 mpred_connective('<==>').
 
 mpred_connective('-').
-mpred_connective('~').
+mpred_connective('-').
 mpred_connective('\\+').
 
 process_rule(Lhs,Rhs,Parent_rule) :- 
@@ -2957,7 +2957,7 @@ build_trigger(Support,[T|Triggers],Consequent,basePFC:pt(umt,T,X)) :-
 %=
 %= builds the test used in a negative trigger (basePFC:nt/4).  This test is a
 %= conjunction of the check than no matching facts are in the db and any
-%= additional test specified in the rule attached to this ~ term.
+%= additional test specified in the rule attached to this - term.
 %=
 
 build_neg_test(Support,T,Testin,Testout) :-  % must(sanity(is_ftNonvar(T))),
@@ -2975,9 +2975,9 @@ build_code_test(_,Test,Test).
 
 code_sentence_op(Var):-is_ftVar(Var),!,fail.
 code_sentence_op(rhs(_)).
-code_sentence_op(neg(_)).
-code_sentence_op(-(_)).
 code_sentence_op(~(_)).
+code_sentence_op(-(_)).
+code_sentence_op(-(_)).
 code_sentence_op(\+(_)).
 code_sentence_op(call_u(_)).
 code_sentence_op(call_u(_,_)).
@@ -3112,27 +3112,27 @@ ain_support(P,(Fact,Trigger)) :-
 ain_support(P,FT) :- trace_or_throw(failed_ain_support(P,FT)).
 
 
-mpred_get_support(not(P),(Fact,Trigger)) :- is_ftNonvar(P),!, mpred_get_support(neg(P),(Fact,Trigger)).
+mpred_get_support(not(P),(Fact,Trigger)) :- is_ftNonvar(P),!, mpred_get_support(~(P),(Fact,Trigger)).
 mpred_get_support(P,(Fact,Trigger)) :- basePFC:spft(ukb,P,Fact,Trigger,_)*->true;(is_ftNonvar(P),mpred_get_support_neg(P,(Fact,Trigger))).
 
-% dont mpred_get_support_neg(\+ neg(P),(Fact,Trigger)) :- sp ftY((P),Fact,Trigger).
-mpred_get_support_neg(\+ (P),S) :- !, is_ftNonvar(P), mpred_get_support(neg(P),S).
-mpred_get_support_neg(~ (P),S) :- !, is_ftNonvar(P), mpred_get_support(neg(P),S).
+% dont mpred_get_support_neg(\+ ~(P),(Fact,Trigger)) :- sp ftY((P),Fact,Trigger).
+mpred_get_support_neg(\+ (P),S) :- !, is_ftNonvar(P), mpred_get_support(~(P),S).
+mpred_get_support_neg(- (P),S) :- !, is_ftNonvar(P), mpred_get_support(~(P),S).
 
 
 % There are three of these to try to efficiently handle the cases
 % where some of the arguments are not bound but at least one is.
 
-mpred_rem_support(WhyIn,P,S):- P \= neg(_), mpred_trace_msg('Removing support',mpred_rem_support(WhyIn,P,S)),fail.
+mpred_rem_support(WhyIn,P,S):- P \= ~(_), mpred_trace_msg('Removing support',mpred_rem_support(WhyIn,P,S)),fail.
 mpred_rem_support(WhyIn,P,(Fact,Trigger)) :- is_ftVar(P),!,copy_term_and_varnames(mpred_rem_support(mpred_rem_support,P,(Fact,Trigger)) ,TheWhy),
   SPFC = basePFC:spft(ukb,RP,RFact,RTrigger,_RWhy),
   clause(basePFC:spft(ukb,P,Fact,Trigger,_),true,Ref),
   ((clause(SPFC,true,Ref),
      ( spftV(RP,RFact,RTrigger) =@= spftV(P,Fact,Trigger) -> 
         erase_w_attvars(clause(SPFC,true,Ref),Ref); 
-       (mpred_trace_msg(<=(TheWhy,~SPFC)),nop(mpred_retract_or_warn_i(spftVVVVVVV(P,Fact,Trigger))),nop(trace))),
+       (mpred_trace_msg(<=(TheWhy,-SPFC)),nop(mpred_retract_or_warn_i(spftVVVVVVV(P,Fact,Trigger))),nop(trace))),
    (is_ftVar(P)->trace_or_throw(is_ftVar(P));remove_if_unsupported_verbose(WhyIn,local,P)))).
-mpred_rem_support(Why,(\+ N) , S):- mpred_rem_support(Why,neg(N),S).
+mpred_rem_support(Why,(\+ N) , S):- mpred_rem_support(Why,~(N),S).
 mpred_rem_support(_Why,P,(Fact,Trigger)):-mpred_retract_or_warn_i(basePFC:spft(ukb,P,Fact,Trigger,_)).
 
 /*
@@ -3225,7 +3225,7 @@ mpred_reset :-
   fail.
 mpred_reset :-
   mpred_database_item(T),
-  mpred_error("Pfc database not empty after mpred_reset, e.g., ~p.",[T]).
+  mpred_error("Pfc database not empty after mpred_reset, e.g., -p.",[T]).
 mpred_reset.
 
 % true if there is some pfc crud still in the database.
@@ -3234,9 +3234,9 @@ mpred_database_item(Term) :-
   functor(Term,P,A),
   clause_u(Term,_).
 
-mpred_retract_or_warn_i(X) :- retract_i(X),mpred_trace_msg("Success retract: ~p.",[X]),!.
-mpred_retract_or_warn_i(X) :- \+ \+ X =basePFC:spft(ukb,neg(_),_,_,_),!.
-mpred_retract_or_warn_i(X) :- ground(X),mpred_trace_msg("Couldn't retract ~p.",[X]),!.
+mpred_retract_or_warn_i(X) :- retract_i(X),mpred_trace_msg("Success retract: -p.",[X]),!.
+mpred_retract_or_warn_i(X) :- \+ \+ X =basePFC:spft(ukb,~(_),_,_,_),!.
+mpred_retract_or_warn_i(X) :- ground(X),mpred_trace_msg("Couldn't retract -p.",[X]),!.
 mpred_retract_or_warn_i(_).
 
 % ======================= mpred_file('pfcdebug').	% debugging aids (e.g. tracing).
@@ -3347,15 +3347,15 @@ mpred_trace_addPrint_0(P,S) :-
   !,
   must(S=(F,T)),
   (F==T
-       -> mpred_trace_msg("Adding (~p) ~p ",[F,P])
-        ; (((mpred_trace_msg("Adding (:) ~p    <-------- ~n (~p <-TF-> ~p)",[P,(T),(F)]))))).
+       -> mpred_trace_msg("Adding (-p) -p ",[F,P])
+        ; (((mpred_trace_msg("Adding (:) -p    <-------- -n (-p <-TF-> -p)",[P,(T),(F)]))))).
 
 mpred_trace_addPrint_0(_,_).
 
 
 mpred_trace_break(P,_S) :-
   mpred_is_spying(P,add) ->
-   ((\+ \+ wdmsg("Breaking on ain(~p)",[P])),
+   ((\+ \+ wdmsg("Breaking on ain(-p)",[P])),
     break)
    ; true.
 
@@ -3373,10 +3373,10 @@ mpred_trace_rem(Why,basePFC:nt(umt,Head,Condition,Body)) :-
 
 mpred_trace_rem(Why,P) :-
   ((mpred_is_tracing(P);mpred_is_tracing(Why))
-     -> (mpred_trace_msg('Removing (~p) ~p.',[Why,P]))
+     -> (mpred_trace_msg('Removing (-p) -p.',[Why,P]))
       ; true),
   ((mpred_is_spying(P,rem);mpred_is_spying(P,Why))
-     -> (in_cmt(wdmsg("Breaking on remove(~p,~p)",[Why,P])), break)
+     -> (in_cmt(wdmsg("Breaking on remove(-p,-p)",[Why,P])), break)
    ; true),!.
 
 
@@ -3427,7 +3427,7 @@ mpred_untrace(Form) :- retractall_i(mpred_is_tracing(Form)).
 
 
 % if the correct flag is set, trace exection of Pfc
-mpred_trace_msg(Msg) :- mpred_trace_msg('~p.',[Msg]),!.
+mpred_trace_msg(Msg) :- mpred_trace_msg('-p.',[Msg]),!.
 
 mmsg(Msg,Args):- is_list(Args) -> wdmsg(Msg, Args) ; pp_item(Msg, Args).
 
@@ -3621,8 +3621,8 @@ compute_resolve(NewerP,OlderQ,Resolve):-
    compute_resolve(NewerP,OlderQ,S1,S2,Resolve).
 
 
-is_resolved(C):- Why= is_resolved, mpred_call_only_facts(Why,C),\+mpred_call_only_facts(Why,neg(C)).
-is_resolved(C):- Why= is_resolved, mpred_call_only_facts(Why,neg(C)),\+mpred_call_only_facts(Why,C).
+is_resolved(C):- Why= is_resolved, mpred_call_only_facts(Why,C),\+mpred_call_only_facts(Why,~(C)).
+is_resolved(C):- Why= is_resolved, mpred_call_only_facts(Why,~(C)),\+mpred_call_only_facts(Why,C).
 
 :- must(nop(_)).
 
@@ -3632,7 +3632,7 @@ pred_head(Type,P):- no_repeats_u(P,(call(Type,P),\+ nonfact_metawrapper(P),is_ft
 
 pred_head_all(P):- pred_head(pred_all,P).
 
-nonfact_metawrapper(neg(_)).
+nonfact_metawrapper(~(_)).
 nonfact_metawrapper(basePFC:pt(umt,_,_)).
 nonfact_metawrapper(basePFC:bt(umt,_,_)).
 nonfact_metawrapper(basePFC:nt(umt,_,_,_)).
@@ -3674,8 +3674,8 @@ pred_t0(P):-mreq(basePFC:bt(umt,P,_)).
 pred_t0(P):-mreq(basePFC:nt(umt,P,_,_)).
 pred_t0(P):-mreq(basePFC:spft(ukb,P,_,_,_)).
 pred_t0(P):- mreq('nesc'(P)).
+%pred_r0(-(P)):- mreq(-(P)).
 %pred_r0(~(P)):- mreq(~(P)).
-%pred_r0(neg(P)):- mreq(neg(P)).
 
 pred_r0(P==>Q):- mreq(P==>Q).
 pred_r0(P<==>Q):- mreq(P<==>Q).
@@ -3690,10 +3690,10 @@ rescan_pfc:-forall(clause(lmconf:mpred_hook_rescan_files,Body),show_entry(Why,Bo
 mpred_facts_and_universe(P):- (is_ftVar(P)->pred_head_all(P);true),(meta_wrapper_rule(P)->(no_repeats(with_umt(P))) ; (no_repeats(with_umt(P)))).
 
 add_reprop(_Trig,Var):- is_ftVar(Var), !. % trace_or_throw(add_reprop(Trig,Var)).
-add_reprop(_Trig,neg(Var)):- is_ftVar(Var),!.
-% CREATES ERROR!!!  add_reprop(_Trig,neg(_Var)):-!.
-add_reprop(_Trig,neg(repropagate(Var))):- \+ is_ftVar(Var),!.
-add_reprop(_Trig,repropagate(neg(Var))):- \+ is_ftVar(Var),!.
+add_reprop(_Trig,~(Var)):- is_ftVar(Var),!.
+% CREATES ERROR!!!  add_reprop(_Trig,~(_Var)):-!.
+add_reprop(_Trig,~(repropagate(Var))):- \+ is_ftVar(Var),!.
+add_reprop(_Trig,repropagate(~(Var))):- \+ is_ftVar(Var),!.
 add_reprop(_Trig,repropagate(Var)):- \+ is_ftVar(Var),!.
 % add_reprop(_Trig,_):-!.
 add_reprop(Trig,(H:-B)):- trace_or_throw(add_reprop(Trig,(H:-B))).

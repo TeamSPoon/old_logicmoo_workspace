@@ -1377,6 +1377,7 @@ index((asserted_mpred_t), 2, baseKB, mpred_userkb).
 index((asserted_mpred_t), 3, baseKB, mpred_userkb).
 index((asserted_mpred_t), 4, baseKB, mpred_userkb).
 index((asserted_mpred_t), 5, baseKB, mpred_userkb).
+index((hybrid_support), 2, baseKB, mpred_userkb).
 index((asserted_mpred_t), 6, baseKB, mpred_userkb).
 index((asserted_mpred_t), 7, baseKB, mpred_userkb).
 index((assertion_f), 1, baseKB, mpred_userkb).

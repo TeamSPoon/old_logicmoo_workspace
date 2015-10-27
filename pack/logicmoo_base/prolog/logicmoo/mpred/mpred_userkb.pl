@@ -48,6 +48,7 @@ asserted_mpred_t/2,
 asserted_mpred_t/3,
 asserted_mpred_t/4,
 asserted_mpred_t/5,
+hybrid_support/2,
 asserted_mpred_t/6,
 asserted_mpred_t/7,
 assertion_f/1,
@@ -202,6 +203,7 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
         t(7,?,?,?,?,?,?,?).   
 
 :- dynamic(((::::) / 2,
+hybrid_support/2,
 (<-)/2,
 (<==>)/2,
 (==>)/1,

@@ -17,14 +17,15 @@
 % [pdel/pclr](Obj,[height(ObjHt)]) == [del/clr](height,Obj,ObjHt) == [del/clr]svo(Obj,height,ObjHt) == [del/clr](height(Obj,ObjHt))
 % keraseall(AnyTerm).
 %
-%         ANTECEEDANT                                   CONSEQUENT
+%                      ANTECEEDANT                                   CONSEQUENT
 %
-%         P = test nesc_true                         assert(P),retract(neg(P))
-%       \+ P = test not_nesc_true                     disable(P), assert(neg(P)),retract(P)
-%    neg(P) = test false/impossible                  make_impossible(P), assert(neg(P))
-%    \+neg(P) = test possible (via not impossible)     enable(P),make_possible(P),retract(neg(P))
-%  \+neg(P) = test impossiblity is unknown           remove_neg(P),retract(neg(P))
-%     \+(P) = test naf(P)                            retract(P)
+%         P =         test nesc true                         assert(P),retract(~P) , enable(P).
+%       ~ P =         test nesc false                        assert(~P),retract(P), disable(P)
+%
+%   ~ ~(P) =         test possible (via not impossible)      retract( ~(P)), enable(P).
+%  \+ ~(P) =         test impossiblity is unknown            retract( ~(P))
+%   ~ \+(P) =        same as P                               same as P
+%     \+(P) =        test naf(P)                             retract(P)
 %
 % Dec 13, 2035
 % Douglas Miles
@@ -54,8 +55,8 @@ meta_argtypes(mpred_default(ftAssertable)).
 
 (mpred_default(P==>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))  ==> ((P, ~R/Test) ==> Q).
 (mpred_default(P==>Q)/nonvar(Q)) ==> (P ==> mpred_default(Q)).
-(mpred_default(P)/mpred_literal_nv(P))  ==>  ( \+neg(P) ==> P).
-(mpred_default((Q <- P))/mpred_literal(Q)) ==> (Q <-(P, ~neg(Q))).
+(mpred_default(P)/mpred_literal_nv(P))  ==>  ( \+ ~(P) ==> P).
+(mpred_default((Q <- P))/mpred_literal(Q)) ==> (Q <-(P, \+ ~(Q))).
 
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).

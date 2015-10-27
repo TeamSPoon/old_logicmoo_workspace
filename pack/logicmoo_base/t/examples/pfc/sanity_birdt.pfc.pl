@@ -8,13 +8,13 @@
 %
 %                      ANTECEEDANT                                   CONSEQUENT
 %
-%         P =         test nesc_true                         assert(P),retract(neg(P))
-%       ~ P =         test not_nesc_true                     disable(P), assert(neg(P)),retract(P)
-%    neg(P) =         test false/impossible                  make_impossible(P), assert(neg(P))
-%   ~neg(P) =         test possible (via not impossible)     enable(P),make_possible(P),retract(neg(P))
-%  \+neg(P) =         test impossiblity is unknown           remove_neg(P),retract(neg(P))
-%  
-%     \+(P) = test naf(P)                            retract(P)
+%         P =         test nesc true                         assert(P),retract(~P) , enable(P).
+%       ~ P =         test nesc false                        assert(~P),retract(P), disable(P)
+%
+%   ~ ~(P) =         test possible (via not impossible)      retract( ~(P)), enable(P).
+%  \+ ~(P) =         test impossiblity is unknown            retract( ~(P))
+%   ~ \+(P) =        same as P                               same as P
+%     \+(P) =        test naf(P)                             retract(P)
 %
 % Dec 13, 2035
 % Douglas Miles
@@ -44,39 +44,42 @@ genls(tPenguin,tBird).
 :- dmsg("chilly is a penguin.").
 tPenguin(iChilly).
 
-:-mpred_test((tBird(iChilly))).
+:- mpred_test((tBird(iChilly))).
 
 
 
 :- dmsg("tweety is a canary.").
 tCanary(iTweety).
 
-:-mpred_test((tBird(iTweety))).
+:- mpred_test((tBird(iTweety))).
 
 
 :- dmsg("birds fly by default.").
 mpred_default(( tBird(X) ==> tFly(X))).
 
 :- dmsg("make sure chilly can fly").
-:-mpred_test((isa(I,tFly),I=iChilly)).
+:- mpred_test((isa(I,tFly),I=iChilly)).
 
 :- dmsg("make sure tweety can fly (and again chilly)").
-:-mpred_test((tFly(iTweety))).
-:-mpred_test((tFly(iChilly))).
+:- mpred_test((tFly(iTweety))).
+:- mpred_test((tFly(iChilly))).
 
 
 :- dmsg("penguins do not tFly.").
-tPenguin(X) ==> neg(tFly(X)).   
+tPenguin(X) ==>  ~(tFly(X)).   
 
 :- dmsg("confirm chilly now cant fly").
-:-mpred_test((\+ tFly(iChilly))).
-:-mpred_test((neg(tFly(iChilly)))).
+:- mpred_test((\+ tFly(iChilly))).
+:- mpred_test(( ~ tFly(iChilly))).
 
+%= repropigate that chilly was a bird again
 tBird(iChilly).
 
+%= this helps show the real differnce in ~ and \+ 
+:- dmsg("confirm chilly still does not fly").
+:- mpred_test((\+ tFly(iChilly))).
 :- dmsg("confirm chilly still cant fly").
-:-mpred_test((\+ tFly(iChilly))).
-:-mpred_test((neg(tFly(iChilly)))).
+:- mpred_test(( ~ tFly(iChilly))).
 
 /*
 
@@ -84,26 +87,33 @@ This wounld be a good TMS test it should throw.. but right now it passes wrongly
 tFly(iChilly).
 
 :- dmsg("confirm chilly is flying penguin").
-:-mpred_test(( tFly(iChilly))).
-:-mpred_test(( tPenguin(iChilly))).
-:-mpred_test((\+ neg(tFly(iChilly)))).
+:- mpred_test(( tFly(iChilly))).
+:- mpred_test(( tPenguin(iChilly))).
+:- mpred_test((\+ ~tFly(iChilly))).
 
 \+ tFly(iChilly).
 
 :- dmsg("confirm chilly is a normal penguin who cant fly").
-:-mpred_test((\+ tFly(iChilly))).
+:- mpred_test((\+ tFly(iChilly))).
 
 % fails rightly
-:-mpred_test(( tPenguin(iChilly))).
+:- mpred_test(( tPenguin(iChilly))).
 
 */
 
 :- dmsg("chilly is no longer a penguin").
 \+ tPenguin(iChilly).
 
+:- mpred_test(( \+ tPenguin(iChilly))).
+
+:- dmsg("chilly is still a bird").
+:- mpred_test((tBird(iChilly))).
+
+:- repropagate(tBird(iChilly)).
+
 :- dmsg("confirm chilly is flying bird").
-:-mpred_test(( tFly(iChilly))).
-:-mpred_test(( \+ tPenguin(iChilly))).
-:-mpred_test((\+ neg(tFly(iChilly)))).
+:- mpred_test(( tFly(iChilly))).
+:- mpred_test(( \+ tPenguin(iChilly))).
+:- mpred_test(( \+ ~ tFly(iChilly))).
 
 

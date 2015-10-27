@@ -21,7 +21,7 @@ mpred_mark(pfcRHSR, S1, F, A)/ground(S1)==>hybrid_support(F,A).
 mpred_mark(pfcRHS,_,F,1)/(fail,atom(F),functor(Head,F,1), 
  \+ argsQuoted(F),
  \+ prologDynamic(F),
- \+ neg(tCol(F)),
+ \+ ~(tCol(F)),
  \+ specialFunctor(F),
  \+ predicate_property(Head,built_in))==>completelyAssertedCollection(F).
 */

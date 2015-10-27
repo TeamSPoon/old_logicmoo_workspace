@@ -27,7 +27,7 @@ nearestGenls(C1,C2)==>
 % (genls(C,SC)==>(tCol(SC),tCol(C),{repropagate(SC)})).
 
 ((completeIsaAsserted(I), isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}) ==> ({dif:dif(Sub, Super)}, isa(I,Super))).
-% (isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}, ~neg(completelyAssertedCollection(Super))) ==> ({dif:dif(Sub, Super)}, isa(I,Super)).
+% (isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}, \+ ~(completelyAssertedCollection(Super))) ==> ({dif:dif(Sub, Super)}, isa(I,Super)).
 
 
 ( meta_argtypes(FT), {dif:dif(FT,COL)}, genls(FT, COL),tCol(COL),{not(isa(COL,ttFormatType))}) ==> formatted_resultIsa(FT,COL).

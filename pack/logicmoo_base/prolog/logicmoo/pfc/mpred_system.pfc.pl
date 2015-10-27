@@ -17,14 +17,15 @@
 % [pdel/pclr](Obj,[height(ObjHt)]) == [del/clr](height,Obj,ObjHt) == [del/clr]svo(Obj,height,ObjHt) == [del/clr](height(Obj,ObjHt))
 % keraseall(AnyTerm).
 %
-%         ANTECEEDANT                                   CONSEQUENT
+%                      ANTECEEDANT                                   CONSEQUENT
 %
-%         P = test nesc_true                         assert(P),retract(neg(P))
-%       ~ P = test not_nesc_true                     disable(P), assert(neg(P)),retract(P)
-%    neg(P) = test false/impossible                  make_impossible(P), assert(neg(P))
-%   ~neg(P) = test possible (via not impossible)     enable(P),make_possible(P),retract(neg(P))
-%  \+neg(P) = test impossiblity is unknown           remove_neg(P),retract(neg(P))
-%     \+(P) = test naf(P)                            retract(P)
+%         P =         test nesc true                         assert(P),retract(~P) , enable(P).
+%       ~ P =         test nesc false                        assert(~P),retract(P), disable(P)
+%
+%   ~ ~(P) =         test possible (via not impossible)      retract( ~(P)), enable(P).
+%  \+ ~(P) =         test impossiblity is unknown            retract( ~(P))
+%   ~ \+(P) =        same as P                               same as P
+%     \+(P) =        test naf(P)                             retract(P)
 %
 % Dec 13, 2035
 % Douglas Miles
@@ -43,7 +44,7 @@
 % with_pfa(With,((pfcControlled/1,pfcRHS/1,logical_functor_pttp/1,          add_args/15,argIsa_known/3,call_mt_t/11,call_which_t/9,constrain_args_pttp/2,contract_output_proof/2,get_clause_vars_for_print/2,holds_f_p2/2,input_to_forms/2,is_wrapper_pred/1,lambda/5,mpred_f/1,pp_i2tml_now/1,pp_item_html/2,pttp1a_wid/3,pttp_builtin/2,pttp_nnf_pre_clean_functor/3,
 %          quasiQuote/1,relax_term/6,retractall_wid/1,ruleRewrite/2,search/7,support_hilog/2,svar_fixvarname/2,tNotForUnboundPredicates/1))),
  with_pfa(With,(((basePFC:bt/3),(basePFC:nt/4),(basePFC:pk/4),(basePFC:pt/3),(basePFC:spft/5),(basePFC:tms/1),(basePFC:hs/1),(basePFC:qu/3),(basePFC:sm/1),
-          (('==>')/1),(('::::')/2),(('<-')/2),(('<==>')/2),(('==>')/2),(('neg')/1),(('nesc')/1),((mpred_action)/1),
+          (('==>')/1),(('::::')/2),(('<-')/2),(('<==>')/2),(('==>')/2),(('~')/1),(('nesc')/1),((mpred_action)/1),
           (mpred_do_and_undo_method/2),
 	  prologMultiValued/1,prologOrdered/1,prologNegByFailure/1,prologPTTP/1,prologKIF/1,pfcControlled/1,tPredType/1,
            prologHybrid/1,predCanHaveSingletons/1,prologDynamic/1,prologBuiltin/1,prologMacroHead/1,prologListValued/1,prologSingleValued/1,
@@ -127,7 +128,7 @@ argsQuoted(second_order).
 % argsQuoted((':-')).
 
 
-% neg(tCol({})).
+% ~(tCol({})).
 
 
 prologBuiltin(F),arity(F,A)==>{make_builtin(F/A)}.
@@ -158,33 +159,33 @@ mpred_undo_sys(P, WhenAdded, WhenRemoved) ==> (P ==> {WhenAdded}), mpred_do_and_
 % 
 comment(isa,"Instance of").
 
-neg(tCol(genlPreds)).
+~(tCol(genlPreds)).
 
-neg(singleValuedInArg(arity,2)).
-neg(prologSingleValued(arity)).
-neg(prologSingleValued(support_hilog)).
+~(singleValuedInArg(arity,2)).
+~(prologSingleValued(arity)).
+~(prologSingleValued(support_hilog)).
 
-neg(arity(argIsa,1)).
+~(arity(argIsa,1)).
 arity(pddlObjects,2).
 
 meta_argtypes(support_hilog(tRelation,ftInt)).
 
 % remove conflicts early 
-% (neg(P)/mpred_non_neg_literal(P) ==> ( {mpred_rem(P)}, (\+P ))).
-(neg(P)/mpred_non_neg_literal(P) ==> \+P ).
+% (~(P)/mpred_non_neg_literal(P) ==> ( {mpred_rem(P)}, (\+P ))).
+(~(P)/mpred_non_neg_literal(P) ==> \+P ).
 
 %:- rtrace.
-(P/mpred_non_neg_literal(P) ==> (\+neg(P))).
+(P/mpred_non_neg_literal(P) ==> (\+ ~(P))).
 % a pretty basic conflict.
-%(neg(P)/mpred_non_neg_literal(P), P) ==> conflict(neg(P)).
-%(P/mpred_non_neg_literal(P), neg(P)) ==> conflict(P).
+%(~(P)/mpred_non_neg_literal(P), P) ==> conflict(~(P)).
+%(P/mpred_non_neg_literal(P), ~(P)) ==> conflict(P).
 
 prologHybrid(genls/2).
 
-((tPred(F),arity(F,A)/(integer(A),A>1), ~prologBuiltin(F)) ==> (neg(tCol(F)),support_hilog(F,A))).
+((tPred(F),arity(F,A)/(integer(A),A>1), ~prologBuiltin(F)) ==> (~(tCol(F)),support_hilog(F,A))).
 
 
-neg(tCol(C))/completelyAssertedCollection(C)==> \+ completelyAssertedCollection(C).
+~(tCol(C))/completelyAssertedCollection(C)==> \+ completelyAssertedCollection(C).
 
 :- kb_dynamic(support_hilog/2).
 
@@ -237,7 +238,7 @@ never_assert_u(vtVerb(BAD),vtVerbError):-fail,BAD=='[|]'.
 never_assert_u(prologSingleValued(BAD),var_prologSingleValued(BAD)):-is_ftVar(BAD).
 
 never_retract_u(X,is_ftVar(X)):-is_ftVar(X).
-never_retract_u(neg(X),is_ftVar(X)):-is_ftVar(X).
+never_retract_u(~(X),is_ftVar(X)):-is_ftVar(X).
 never_retract_u(human(trudy),sanity_test).
 never_retract_u(tHumanHair(skRelationAllExistsFn(mudSubPart, skRelationAllExistsFn(mudSubPart, skRelationAllExistsFn(mudSubPart, iExplorer1, tHumanBody), tHumanHead), tHumanHair)),sanity_test).
 never_retract_u((father(skArg1ofFatherFn(trudy), trudy)),sanity_test).
@@ -353,7 +354,7 @@ tCol(C)/(atom(C),TCI=..[C,I]) ==> {decl_type(C)},arity(C,1),mpred_univ(C,I,TCI).
 (tCol(C)/(atom(C), \+ static_predicate(C/1) )) ==> {kb_dynamic(C/1)}.
 (tCol(C)/(atom(C),TCI=..[C,I],\+ static_predicate(C/1), \+completelyAssertedCollection(C))) 
   ==> ((TCI:-cwc,
-    ( \+ neg(TCI)),
+    ( \+ ~(TCI)),
     isa_backchaing(I,C))).
 
 % (tInferInstanceFromArgType(Col),tCol(Col)/i_name('',Col,ColName),tPred(Prop)/i_name('',Prop,PropName),{ColName=PropName}==> tInferInstanceFromArgType(Prop)).
@@ -376,14 +377,14 @@ completelyAssertedCollection(isEach(tCol,tPred,pfcControlled)).
 ttPredType(C)==>completelyAssertedCollection(C).
 
 
-neg(ttFormatType(prologEquality)).
+~(ttFormatType(prologEquality)).
 ttPredType(prologEquality).
 tSpec(prologEquality).
 prologEquality(mudEquals).
 prologEquality(('=')).
 prologEquality(('==')).
 
-neg(isa((','), prologEquality)).
+~(isa((','), prologEquality)).
 
 tCol(isEach(tCol,tPred,pfcControlled)).
 tCol(meta_argtypes).
@@ -430,7 +431,7 @@ ttFormatType(P) ==> {get_functor(P,C), functor(Head,C,1),
   Head=..[C,I],
   nop((S1)),
  (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
-   neg(functorDeclares(C)),
+   ~(functorDeclares(C)),
    % isa(C,prologDynamic),
    arity(C,1),
    ((Head)/predicate_property(Head,dynamic)==>{ignore(retract(Head))}),
@@ -512,7 +513,7 @@ tCol(vtDirection).
 disjointWith(Sub, Super) ==> disjointWith( Super, Sub).
 disjointWith(ttTemporalType,ttAbstractType).
 
-(ptSymmetric(Pred) ==> ({atom(Pred),G1=..[Pred,X,Y],G2=..[Pred,Y,X]}, (G1==>G2), (neg(G1)==> neg(G2)))).
+(ptSymmetric(Pred) ==> ({atom(Pred),G1=..[Pred,X,Y],G2=..[Pred,Y,X]}, (G1==>G2), (~(G1)==> ~(G2)))).
 
 
 tCol(tNotForUnboundPredicates).
@@ -561,9 +562,9 @@ completelyAssertedCollection(completelyAssertedCollection).
 
 % dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 
-% disjointWith(P1,P2) ==> ((neg(isa(C,P1))) <==> isa(C,P2)).
+% disjointWith(P1,P2) ==> ((~(isa(C,P1))) <==> isa(C,P2)).
 
-% isa(Col1, ttObjectType) ==> neg(isa(Col1, ttFormatType)).
+% isa(Col1, ttObjectType) ==> ~(isa(Col1, ttFormatType)).
 
 tCol(tCol).
 tCol(tPred).
@@ -663,8 +664,8 @@ prologHybrid(argIsa/3).
 
 :- endif.
 
-:- meta_predicate(neg(0)).
-:- kb_dynamic(neg(0)).
+:- meta_predicate(~(0)).
+:- kb_dynamic(~(0)).
 
 :- kb_dynamic(mpred_module/2).
 :- decl_mpred(mpred_module/2).
@@ -705,9 +706,9 @@ equal(A,C),notequal(A,B) ==> notequal(C,B).
 */
 
 % is this how to define constraints?
-% either(P,Q) ==> (neg(P) ==> Q), (neg(Q) ==> P).
-(either(P,Q) ==> ((neg(P) <==> Q), (neg(Q) <==> P))).
-% ((P,Q ==> false) ==> (P ==> neg(Q)), (Q ==> neg(P))).
+% either(P,Q) ==> (~(P) ==> Q), (~(Q) ==> P).
+(either(P,Q) ==> ((~(P) <==> Q), (~(Q) <==> P))).
+% ((P,Q ==> false) ==> (P ==> ~(Q)), (Q ==> ~(P))).
 
 
 :- was_export(member/2).
@@ -732,7 +733,7 @@ arity(typeProps,2).
 
 
 
-% :- decl_mpred_pfc neg/1.
+% :- decl_mpred_pfc ~/1.
 prologHybrid(isEach( tCol/1, disjointWith/2, genls/2,genlPreds/2, meta_argtypes/1)).
 
 :- ignore(show_failure(why,arity(typeProps,2))).
@@ -1082,7 +1083,7 @@ specialFunctor('/').
 arity(Pred,2),tPred(Pred) <==> ptBinaryPredicate(Pred).
 
 % if arity is ever greater than 1 it can never become 1
-% arity(F,A)/(number(A),A>1) ==> neg(arity(F,1)).
+% arity(F,A)/(number(A),A>1) ==> ~(arity(F,1)).
 
 completelyAssertedCollection(ptBinaryPredicate).
 
