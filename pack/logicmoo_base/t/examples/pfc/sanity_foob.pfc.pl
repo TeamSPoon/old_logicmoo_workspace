@@ -5,8 +5,12 @@
 % Dec 13, 2035
 % Douglas Miles
 */
+:- module(foobm,[]).
 
-:- use_module(library(logicmoo/logicmoo_user)).
+:- baseKB:use_module(library(logicmoo/logicmoo_user)).
+
+:- begin_pfc.
+
 
 if_missing(foob(_),foob(a)).
 
