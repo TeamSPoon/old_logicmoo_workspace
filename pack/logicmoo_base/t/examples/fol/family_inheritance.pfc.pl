@@ -159,7 +159,9 @@ Justifications for grandparent(trudy,douglas):
 
 
 %= so far no males "asserted" in the KB
-:- show_test(((male(Who ))).
+
+:- show_test(male(Who)).
+
 /*
 OUTPUT WAS..
 male(skArg1ofFatherFn(pam)).
@@ -185,8 +187,8 @@ male(skArg1ofFatherFn(trudy)).
 
 %= thus ~/1 is tnot/1 of XSB ?!?
 
-%= there ar explicly non females
-:- show_test(((~ female(Who ))).
+%= there are explicly non females
+:- show_test(~(female(Who))).
 
 %= ensure skolems are made or destroyed
 

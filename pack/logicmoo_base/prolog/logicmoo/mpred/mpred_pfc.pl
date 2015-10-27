@@ -2552,7 +2552,7 @@ mpred_call_0((C1,C2)):-!,mpred_call_0(C1),mpred_call_0(C2).
 mpred_call_0(call(X)):- !, mpred_call_0(X).
 mpred_call_0(\+(X)):- !, \+ mpred_call_0(X).
 mpred_call_0(call_u(X)):- !, mpred_call_0(X).
-mpred_call_0(G):-strip_module(G,M,P),functor(G,F,A),mpred_call_1(M,P,F).
+mpred_call_0(G):-  with_in_source_context(( strip_module(G,M,P),functor(G,F,A),mpred_call_1(M,P,F))).
 
 
 mpred_call_1(_,G,_):- is_side_effect_disabled,!,mpred_call_with_no_triggers(G).

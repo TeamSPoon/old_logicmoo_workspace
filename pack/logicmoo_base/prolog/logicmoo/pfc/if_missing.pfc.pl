@@ -8,19 +8,6 @@ pfcControlled(if_missing(ftAskable,ftAssertable)).
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 
-if_missing(foob(_),foob(a)).
-
-:- mpred_test(foob(a)).
-
-foob(b).
-
-:- mpred_test(\+foob(a)).
-:- mpred_test(foob(b)).
-
-~foob(b).
-
-:- mpred_test(\+foob(b)).
-:- mpred_test(foob(a)).
-
+:- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'foob.pfc')).
 
 :- endif.

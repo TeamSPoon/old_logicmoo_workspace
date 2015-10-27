@@ -20,9 +20,9 @@
 %         ANTECEEDANT                                   CONSEQUENT
 %
 %         P = test nesc_true                         assert(P),retract(neg(P))
-%       \+ P = test not_nesc_true                     disable(P), assert(neg(P)),retract(P)
+%       ~ P = test not_nesc_true                     disable(P), assert(neg(P)),retract(P)
 %    neg(P) = test false/impossible                  make_impossible(P), assert(neg(P))
-%    \+neg(P) = test possible (via not impossible)     enable(P),make_possible(P),retract(neg(P))
+%   ~neg(P) = test possible (via not impossible)     enable(P),make_possible(P),retract(neg(P))
 %  \+neg(P) = test impossiblity is unknown           remove_neg(P),retract(neg(P))
 %     \+(P) = test naf(P)                            retract(P)
 %
@@ -30,37 +30,41 @@
 % Douglas Miles
 */
 
+:- use_module(library(logicmoo/logicmoo_user)).
+
 :- op(500,fx,'~').
-:- op(1199,fx,('==>')).
-:- op(1190,xfx,('::::')).
-:- op(1180,xfx,('==>')).
-:- op(1170,xfx,'<==>').
-:- op(1160,xfx,('<-')).
-:- op(1150,xfx,'=>').
-:- op(1140,xfx,'<=').
-:- op(1130,xfx,'<=>').
-:- op(1100,fx,('nesc')).
-:- op(300,fx,'-').
-:- op(600,yfx,'&'). 
-:- op(600,yfx,'v').
-:- op(1075,xfx,'<-').
-:- op(350,xfx,'xor').
-:- op(1100,fx,(was_shared_multifile)).
+:- op(1050,xfx,('==>')).
+:- op(1050,xfx,'<==>').
+:- op(1100,fx,('==>')).
+:- op(1150,xfx,('::::')).
+
+:- dmsg(begin_abc).
+              
+:- file_begin(pfc).
 
 
-:- kb_dynamic(mpred_default/1).
+:- abolish(a,0).
+:- abolish(c,0).
+:- abolish(b,0).
+:- was_dynamic((a/0,b/0,c/0)).
 
-meta_argtypes(mpred_default(ftAssertable)).
+c.
 
-(mpred_default(P==>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))  ==> ((P, ~R/Test) ==> Q).
-(mpred_default(P==>Q)/nonvar(Q)) ==> (P ==> mpred_default(Q)).
-(mpred_default(P)/mpred_literal_nv(P))  ==>  ( \+neg(P) ==> P).
-(mpred_default((Q <- P))/mpred_literal(Q)) ==> (Q <-(P, ~neg(Q))).
+:- mpred_test(ain(a ==> b)).
+
+a.
+
+:- listing(basePFC:_).
+:- prolog.
+:- mpred_test(ain(a)).
+:- mpred_test(a).
+:- mpred_test(b).
+
+:- prolog.
+% :- endif.
 
 
-:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 
-:- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'birdt.pfc')).
 
-:- endif.
+
 

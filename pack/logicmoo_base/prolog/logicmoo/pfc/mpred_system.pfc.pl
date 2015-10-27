@@ -532,27 +532,9 @@ isa(tRelation,ttAbstractType).
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 
-% :-mpred_trace.
+:- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'neg_sanity.pfc')).
 
-neg(fooBar).
 
-fooBar.
-
-\+ fooBar.
-
-:- mpred_test(\+fooBar).
-
-fooBar.
-
-:- mpred_test(fooBar).
-
-%:- rtrace.
-neg(fooBar).
-
-:- mpred_test(\+fooBar).
-%:- nortrace.
-
-:- mpred_no_spy_all.
 :- endif. % load_time_sanity
 
 

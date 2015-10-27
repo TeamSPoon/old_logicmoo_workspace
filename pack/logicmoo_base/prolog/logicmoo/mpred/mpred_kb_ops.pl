@@ -143,11 +143,12 @@ lookup_inverted_op(asserta_new,retract,+).
 %:- was_dynamic(naf/1).
 :- meta_predicate(naf(0)).
 :- was_export(naf/1).
-naf(Goal):-not(req(Goal)).
+naf(Goal):- (\+ req(Goal)).
 
 :- meta_predicate(is_callable(0)).
 :- was_export(is_callable/1).
 is_callable(C):-current_predicate(_,C),!.
+
 /*
 :- meta_predicate(export(0)).
 :- meta_predicate(req(0)).
