@@ -1,11 +1,11 @@
 %
 %  PFC is a language extension for prolog.. there is so much that can be done in this language extension to Prolog
 %
+%
 % props(Obj,[height(ObjHt)]) == t(height,Obj,ObjHt) == rdf(Obj,height,ObjHt) == t(height(Obj,ObjHt)).
 % padd(Obj,[height(ObjHt)]) == prop_set(height,Obj,ObjHt,...) == ain(height(Obj,ObjHt))
 % [pdel/pclr](Obj,[height(ObjHt)]) == [del/clr](height,Obj,ObjHt) == [del/clr]svo(Obj,height,ObjHt) == [del/clr](height(Obj,ObjHt))
-% keraseall(AnyTerm).
-%
+% keraseall(AnyTerm). 
 %                      ANTECEEDANT                                   CONSEQUENT
 %
 %         P =         test nesc_true                         assert(P),retract(neg(P))
@@ -55,7 +55,7 @@ tCanary(iTweety).
 
 
 :- dmsg("birds fly by default.").
-mpred_default(( tBird(X) ==> tFly(X))).
+mpred_default(( tBird(X) => tFly(X))).
 
 :- dmsg("make sure chilly can fly").
 :-mpred_test((isa(I,tFly),I=iChilly)).
@@ -66,7 +66,7 @@ mpred_default(( tBird(X) ==> tFly(X))).
 
 
 :- dmsg("penguins do not tFly.").
-tPenguin(X) ==> neg(tFly(X)).   
+tPenguin(X) => ~tFly(X).
 
 :- dmsg("confirm chilly now cant fly").
 :-mpred_test((\+ tFly(iChilly))).
@@ -80,7 +80,7 @@ tBird(iChilly).
 
 /*
 
-This wounld be a good TMS test it should throw.. but right now it passes wrongly
+% This would be a good TMS test it should throw.. but right now it passes wrongly
 tFly(iChilly).
 
 :- dmsg("confirm chilly is flying penguin").
