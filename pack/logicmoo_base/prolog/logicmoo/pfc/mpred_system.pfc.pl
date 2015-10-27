@@ -96,12 +96,6 @@ arity(F,1):- atom(F), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
 :- sanity(\+mpred_is_tracing_exec).
 
 
-neg(PQ):- cwc, neg_in_code(PQ).
-neg(tCol('$VAR')).
-
-~(G):- cwc, tilda_in_code(G).
-
-
 prologHybrid(arity/2).
 
 

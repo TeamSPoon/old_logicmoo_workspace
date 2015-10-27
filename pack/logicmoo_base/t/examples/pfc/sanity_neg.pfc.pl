@@ -5,13 +5,19 @@
 % Dec 13, 2035
 % Douglas Miles
 */
+:- module(sanity_neg,[]).
 
 :- use_module(library(logicmoo/logicmoo_user)).
 
+:- begin_pfc.
 
-% :-mpred_trace.
+:- process_this_script.
+
+:- dynamic(fooBar/0).
 
 neg(fooBar).
+
+:- mpred_test(neg(fooBar)).
 
 fooBar.
 

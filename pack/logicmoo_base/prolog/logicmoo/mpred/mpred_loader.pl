@@ -265,11 +265,14 @@ is_support_kb(baseKB).
 is_support_kb(logicmoo_user).
 is_support_kb(basePFC).
 
+no_separate_tbox.
+
 to_tbox(A,T):-is_support_kb(A),!,T=baseKB.
 to_tbox(pqr,pqrTBox).
 to_tbox(pqrABox,pqrTBox).
 to_tbox(pqrSBox,pqrTBox).
 to_tbox(pqrTBox,pqrTBox).
+to_tbox(Chop,Chop):- no_separate_tbox,!.
 to_tbox(Chop,Add):-chop_box(Chop,Was),atom_concat(Was,'TBox',Add).
 
 
@@ -278,10 +281,12 @@ to_sbox(pqr,pqrSBox).
 to_sbox(pqrABox,pqrSBox).
 to_sbox(pqrTBox,pqrSBox).
 to_sbox(pqrSBox,pqrSBox).
+to_sbox(Chop,Chop):- no_separate_tbox,!.
 to_sbox(Chop,Add):-chop_box(Chop,Was),atom_concat(Was,'SBox',Add).
 
 
 to_abox(A,A):-is_support_kb(A).
+to_abox(Chop,Chop):- no_separate_tbox,!.
 to_abox(pqr,pqr).
 to_abox(pqrABox,pqr).
 to_abox(pqrTBox,pqr).
@@ -776,9 +781,9 @@ get_user_tbox(T):-get_user_abox(M),to_tbox(M,T).
 get_user_sbox(T):-get_user_abox(M),to_sbox(M,T).
 
 :- thread_local(t_l:user_abox/1).
-get_user_abox(Ctx):- (t_l:user_abox(Out)),ignore(sanity(Out\=user)),!,must(Ctx=Out).
-get_user_abox(Ctx):- current_context_module(Out),ignore(sanity(Out\=user)),!,must(Ctx=Out),set_user_abox(Ctx).
-set_user_abox(M):- must(M\=user), (t_l:user_abox(Prev)->true;Prev=M),decl_user_abox(M),assert_until_eof(t_l:user_abox(M)),onEndOfFile(set_user_abox(Prev)).
+get_user_abox(Ctx):- (t_l:user_abox(Out)),ignore(show_failure(Out\=user)),!,must(Ctx=Out).
+get_user_abox(Ctx):- current_context_module(Out),ignore(show_failure(Out\=user)),!,must(Ctx=Out),set_user_abox(Ctx).
+set_user_abox(M):- ignore(show_failure(M\=user)), (t_l:user_abox(Prev)->true;Prev=M),decl_user_abox(M),assert_until_eof(t_l:user_abox(M)),onEndOfFile(set_user_abox(Prev)).
 
 % set_user_tbox(SM):- get_user_abox(M),ensure_support_module(SM),set_user_tbox(M,SM).
 

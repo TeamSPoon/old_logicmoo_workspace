@@ -25,7 +25,7 @@
             assumptions/2,
             assumptions1/2,
             attvar_op/2,
-            with_in_source_context/1,
+            with_umt/1,
             baseable/2,
             baseable_list/2,
             brake/1,
@@ -383,8 +383,7 @@
             user_atom/1,
             wac/0,
             wellFounded/2,
-            with_mpred_trace_exec/1,
-            wlmuser/1
+            with_mpred_trace_exec/1
         
           ]).
 /*
@@ -490,7 +489,7 @@
       ain_rule_if_rule((*)),
       mpred_bc_only((*)),
       req((*)),
-      with_in_source_context((*)),
+      with_umt((*)),
       mpred_call_0((*)),
       mpred_call_only_facts(*,(*)),
       mpred_call_only_facts((*)),
@@ -571,7 +570,6 @@ add_reprop/2,
             assumptions/2,
             assumptions1/2,
             attvar_op/2,
-            with_in_source_context/1,
             baseable/2,
             baseable_list/2,
             brake/1,
@@ -930,12 +928,11 @@ add_reprop/2,
             wac/0,
             wellFounded/2,
             with_mpred_trace_exec/1,
-            wlmuser/1.
+            with_umt/1.
 :- module_transparent(check_context_module/0).
 check_context_module:- must((source_context_module(M),M\==mpred_pfc,M\==mpred_loader)).
 check_real_context_module:- must((context_module(M),M\==mpred_pfc,M\==mpred_loader)).
 
-with_in_source_context(Goal):- source_context_module(M)-> M:call(Goal).
 
 :- was_shared_multifile(('==>')/1).
 :- was_shared_multifile(basePFC:bt/3).
@@ -974,9 +971,10 @@ with_in_source_context(Goal):- source_context_module(M)-> M:call(Goal).
 :- include('mpred_header.pi').
 
 % ======================= mpred_file('pfcsyntax').	% operator declarations.
-:- was_module_transparent(wlmuser/1).
-:- was_export(wlmuser/1).
-wlmuser(G):- get_user_abox(M), M:call(G).
+:- was_module_transparent(with_umt/1).
+:- was_export(with_umt/1).
+with_umt(G):- get_user_abox(M),!, M:call(G).
+with_umt(Goal):- source_context_module(M) -> M:call(Goal).
 
 %   File   : pfcsyntax.pl
 %   Author : Tim Finin, finin@prc.unisys.com
@@ -1587,9 +1585,9 @@ ain_fast_sp0(P,S) :- mpred_error("ain_fast(~p,~p) failed",[P,S]).
 :-multifile(logicmoo_util_database:ain/1).
 :-multifile(logicmoo_util_database:aina/1).
 :-multifile(logicmoo_util_database:ainz/1).
-:-asserta((logicmoo_util_database:ainz(G):- !, with_in_source_context(mpred_ainz(G)))).
-:-asserta((logicmoo_util_database:ain(G):- !, with_in_source_context(mpred_ain(G)))).
-:-asserta((logicmoo_util_database:aina(G):- !, with_in_source_context(mpred_aina(G)))).
+:-asserta((logicmoo_util_database:ainz(G):- !, with_umt(mpred_ainz(G)))).
+:-asserta((logicmoo_util_database:ain(G):- !, with_umt(mpred_ain(G)))).
+:-asserta((logicmoo_util_database:aina(G):- !, with_umt(mpred_aina(G)))).
 
 % mpred_post(+Ps,+S) tries to assert a fact or set of fact to the database.  For
 % each fact (or the singelton) mpred_post1 is called. It always succeeds.
@@ -2323,7 +2321,7 @@ mpred_fwd2(Fact0,_Sup):-
 % ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),(ground(Fact)->must(once(Fact));doall(show_if_debug(must(Fact)))),fail.
 % ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),(ground(Fact)->must(once(Fact));doall(show_if_debug(must(Fact)))),!.
 ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),
-    doall(show_if_debug(with_in_source_context(Fact))),!.
+    doall(show_if_debug(with_umt(Fact))),!.
 ain_rule_if_rule(Fact):- must(ain_rule0(Fact)),!.
 
 ain_rule0((P==>Q)) :-
@@ -2529,12 +2527,34 @@ call_u(Why,X):- show_call(why,(nop(Why),mpred_call_only_facts(X))).
 not_cond(_Why,X):- \+ X.
 
 
+neg(PQ):- cwc, neg_in_code(PQ).
+neg(tCol('$VAR')).
+
+~(G):- cwc, tilda_in_code(G).
+
+:- meta_predicate neg_may_naf(0).
+:- export(neg_may_naf/1).
+neg_may_naf(P):- mpred_non_neg_literal(P),get_functor(P,F),clause(prologNegByFailure(F),true),!.
+neg_may_naf(P):- is_ftCompound(P),predicate_property(P,static).
+
+:- meta_predicate neg_in_code(0).
+:- export(neg_in_code/1).
+neg_in_code(P):-   neg_may_naf(P), \+ P.
+neg_in_code(Q):-  is_ftNonvar(Q), prologSingleValued(Q),if_missing_mask(Q,R,Test),req(R),Test.
+
+:- meta_predicate tilda_in_code(0).
+:- export(tilda_in_code/1).
+tilda_in_code(~(G)):-nonvar(G),!, req('~'(neg(G))).
+tilda_in_code(G):- req(neg(G)).
+
+
 %=
 %= mpred_call_only_facts(+Why,:F) is true iff F is a fact available for forward chaining.
 %= Note that this has the side effect [maybe] of catching unsupported facts and
 %= assigning them support from God. (g,g)
 %=
-req(G):-  ((loop_check(mpred_call_0(G),fail))).
+req(G):- loop_check(mpred_call_0(G),fail).
+
 mpred_call_only_facts(F):- on_x_rtrace(no_repeats(loop_check(mpred_call_0(F),fail))). 
 mpred_call_only_facts(_Why,F):- on_x_rtrace(no_repeats(loop_check(mpred_call_0(F),fail))). 
 
@@ -2552,7 +2572,7 @@ mpred_call_0((C1,C2)):-!,mpred_call_0(C1),mpred_call_0(C2).
 mpred_call_0(call(X)):- !, mpred_call_0(X).
 mpred_call_0(\+(X)):- !, \+ mpred_call_0(X).
 mpred_call_0(call_u(X)):- !, mpred_call_0(X).
-mpred_call_0(G):-  with_in_source_context(( strip_module(G,M,P),functor(G,F,A),mpred_call_1(M,P,F))).
+mpred_call_0(G):-  with_umt(( strip_module(G,M,P),functor(G,F,A),mpred_call_1(M,P,F))).
 
 
 mpred_call_1(_,G,_):- is_side_effect_disabled,!,mpred_call_with_no_triggers(G).
@@ -2586,8 +2606,8 @@ mpred_call_with_no_triggers_uncaugth(F) :-
 
 
 mpred_bc_only(G):- mpred_negation(G,Pos),!, show_call(why,\+ mpred_bc_only(Pos)).
-mpred_bc_only(G):- !,mpred_call_only_facts(G).
-%mpred_bc_only(G):- loop_check(no_repeats(pfcBC_NoFacts(G))).
+mpred_bc_only(G):- loop_check(no_repeats(pfcBC_NoFacts(G))).
+mpred_bc_only(G):- mpred_call_only_facts(G).
 
 %%
 %= pfcBC_NoFacts(F) is true iff F is a fact available for backward chaining ONLY.
@@ -2600,9 +2620,9 @@ pfcBC_NoFacts(F):- pfcBC_NoFacts_TRY(F)*-> true ; (mpred_slow_search,pfcBC_Cache
 mpred_slow_search.
 
 
-ruleBackward(F,Condition):-ruleBackward0(F,Condition),functor(Condition,F,_),\+ arg(_,F,v(call_prologsys,call_u)).
+ruleBackward(R,Condition):- with_umt(( ruleBackward0(R,Condition),functor(Condition,F,_),\+ arg(_,v(call_prologsys,call_u),F))).
 %ruleBackward0(F,Condition):-clause_u(F,Condition),\+ (is_true(Condition);mpred_is_info(Condition)).
-ruleBackward0(F,Condition):-'<-'(F,Condition),\+ (is_true(Condition);mpred_is_info(Condition)).
+ruleBackward0(F,Condition):- with_umt((  '<-'(F,Condition),\+ (is_true(Condition);mpred_is_info(Condition)) )).
 
 %:- was_dynamic('{}'/1).
 %{X}:-dmsg(legacy({X})),call_prologsys(X).
@@ -3667,7 +3687,7 @@ cnstrn0(X,V):-when(is_ftNonvar(V),X).
 
 rescan_pfc:-forall(clause(lmconf:mpred_hook_rescan_files,Body),show_entry(Why,Body)).
 
-mpred_facts_and_universe(P):- (is_ftVar(P)->pred_head_all(P);true),(meta_wrapper_rule(P)->(no_repeats(wlmuser(P))) ; (no_repeats(wlmuser(P)))).
+mpred_facts_and_universe(P):- (is_ftVar(P)->pred_head_all(P);true),(meta_wrapper_rule(P)->(no_repeats(with_umt(P))) ; (no_repeats(with_umt(P)))).
 
 add_reprop(_Trig,Var):- is_ftVar(Var), !. % trace_or_throw(add_reprop(Trig,Var)).
 add_reprop(_Trig,neg(Var)):- is_ftVar(Var),!.
@@ -3688,7 +3708,7 @@ repropagate(P):-  check_context_module,fail.
 %repropagate(P):-  check_real_context_module,fail.
 
 repropagate(P):-  is_ftVar(P),!.
-repropagate(P):-  meta_wrapper_rule(P),!,with_in_source_context(repropagate_meta_wrapper_rule(P)).
+repropagate(P):-  meta_wrapper_rule(P),!,with_umt(repropagate_meta_wrapper_rule(P)).
 repropagate(P):-  \+ predicate_property(P,_),'$find_predicate'(P,PP),PP\=[],!,forall(member(M:F/A,PP),
                                                           must((functor(Q,F,A),repropagate_1(M:Q)))).
 repropagate(F/A):- atom(F),integer(A),!,functor(P,F,A),!,repropagate(P).
@@ -3697,7 +3717,7 @@ repropagate(F/A):- atom(F),is_ftVar(A),!,repropagate(F).
 repropagate(P):-  \+ predicate_property(_:P,_),dumpST,trace,dmsg(undefined_repropagate(P)),!,fail.
 repropagate(P):-  repropagate_0(P).
 
-repropagate_0(P):- loop_check(with_in_source_context(repropagate_1(P)),true).
+repropagate_0(P):- loop_check(with_umt(repropagate_1(P)),true).
 
 :- thread_local t_l:is_repropagating/1.
 
@@ -3705,7 +3725,7 @@ repropagate_1(P):- is_ftVar(P),!.
 repropagate_1(USER:P):- USER==user,!,repropagate_1(P).
 repropagate_1((P/_)):-!,repropagate_1(P).
 
-repropagate_1(P):- with_in_source_context(repropagate_2(P)).
+repropagate_1(P):- with_umt(repropagate_2(P)).
 
 :- export(repropagate_2/1).
 :- module_transparent(repropagate_2/1).

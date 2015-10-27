@@ -77,5 +77,5 @@ m4:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/autoexec.pfc')).
 
 :- baseKB:w_tl(t_l:user_abox(baseKB), baseKB:( checkKB:m1 )).
 
-% :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded(logicmoo(snark/'common_logic_clif.pfc'))).
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded(logicmoo(snark/'common_logic_clif.pfc'))).
 

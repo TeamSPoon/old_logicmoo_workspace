@@ -20,13 +20,13 @@
 % current_op_alias/2,
 % prolog_load_file_loop_checked/2,
 
-(::::) / 2,
-(<-)/2,
-(<==>)/2,
-(==>)/1,
-(==>)/2,
-(neg)/1,
-(nesc)/1,
+% (::::) / 2,
+% (<-)/2,
+% (<==>)/2,
+% (==>)/1,
+% (==>)/2,
+% (neg)/1,
+% (nesc)/1,
 tilda_in_code/1,
 neg_may_naf/1,
 naf_in_code/1,
@@ -364,22 +364,6 @@ wid/3)).
       baseKB:resolveConflict((*)),
       baseKB:resolveConflict0((*)),
       baseKB:resolverConflict_robot((*)))).
-
-
-:- meta_predicate neg_may_naf(0).
-:- export(neg_may_naf/1).
-neg_may_naf(P):- mpred_non_neg_literal(P),get_functor(P,F),clause(prologNegByFailure(F),true),!.
-neg_may_naf(P):- is_ftCompound(P),predicate_property(P,static).
-
-:- meta_predicate neg_in_code(0).
-:- export(neg_in_code/1).
-neg_in_code(P):-   neg_may_naf(P), \+ P.
-neg_in_code(Q):-  is_ftNonvar(Q), prologSingleValued(Q),if_missing_mask(Q,R,Test),req(R),Test.
-
-:- meta_predicate tilda_in_code(0).
-:- export(tilda_in_code/1).
-tilda_in_code(~(G)):-nonvar(G),!, req('~'(neg(G))).
-tilda_in_code(G):- req(neg(G)).
 
 :- show_call(why,source_context_module(_CM)).
 :- module_property(baseKB, exports(List)),forall(member(E,List),baseKB:dynamic(baseKB:E)).

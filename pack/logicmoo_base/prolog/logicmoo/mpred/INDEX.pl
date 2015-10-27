@@ -515,7 +515,7 @@ index((assumption), 1, mpred_pfc, mpred_pfc).
 index((assumptions), 2, mpred_pfc, mpred_pfc).
 index((assumptions1), 2, mpred_pfc, mpred_pfc).
 index((attvar_op), 2, mpred_pfc, mpred_pfc).
-index((with_in_source_context), 1, mpred_pfc, mpred_pfc).
+index((with_umt), 1, mpred_pfc, mpred_pfc).
 index((baseable), 2, mpred_pfc, mpred_pfc).
 index((baseable_list), 2, mpred_pfc, mpred_pfc).
 index((brake), 1, mpred_pfc, mpred_pfc).
@@ -871,7 +871,6 @@ index((user_atom), 1, mpred_pfc, mpred_pfc).
 index((wac), 0, mpred_pfc, mpred_pfc).
 index((wellFounded), 2, mpred_pfc, mpred_pfc).
 index((with_mpred_trace_exec), 1, mpred_pfc, mpred_pfc).
-index((wlmuser), 1, mpred_pfc, mpred_pfc).
 index((add_mpred_prop_gleaned), 2, mpred_props, mpred_props).
 index((add_mpred_prop_gleaned_4), 4, mpred_props, mpred_props).
 index((assert_arity), 2, mpred_props, mpred_props).
@@ -1357,13 +1356,6 @@ index((term_singletons), 3, mpred_type_wff, mpred_type_wff).
 index((term_singletons), 5, mpred_type_wff, mpred_type_wff).
 index((term_slots), 2, mpred_type_wff, mpred_type_wff).
 index((wrap_in_neg_functor), 3, mpred_type_wff, mpred_type_wff).
-index((::::), 2, baseKB, mpred_userkb).
-index((<-), 2, baseKB, mpred_userkb).
-index((<==>), 2, baseKB, mpred_userkb).
-index((==>), 1, baseKB, mpred_userkb).
-index((==>), 2, baseKB, mpred_userkb).
-index((neg), 1, baseKB, mpred_userkb).
-index((nesc), 1, baseKB, mpred_userkb).
 index((tilda_in_code), 1, baseKB, mpred_userkb).
 index((neg_may_naf), 1, baseKB, mpred_userkb).
 index((naf_in_code), 1, baseKB, mpred_userkb).
