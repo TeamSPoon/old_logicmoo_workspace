@@ -3,9 +3,9 @@
 % -*-Prolog-*-
 % here is an example which defines default facts and rules.  Will it work?
 
-(default(P)/mpred_literal(P))  ==>  (~not(P) ==> P).
+(default(P)/mpred_literal(P))  ==>  (~( ~P) ==> P).
 
-default((P ==> Q))/mpred_literal(Q) ==> (P, ~not(Q) ==> Q).
+default((P ==> Q))/mpred_literal(Q) ==> (P, ~( ~Q) ==> Q).
 
 % birds fly by default.
 ==> default((bird(X) ==> fly(X))).
@@ -22,7 +22,7 @@ zisa(C1,C2) ==>
 ==> zisa(penguin,bird).
 
 % penguins do not fly.
-penguin(X) ==> not(fly(X)).
+penguin(X) ==> ( ~fly(X)).
 
 % chilly is a penguin.
 ==> penguin(chilly).

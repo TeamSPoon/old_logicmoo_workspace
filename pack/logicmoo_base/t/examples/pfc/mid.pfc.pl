@@ -9,10 +9,10 @@
 % a man can only love one woman.
 loves(M,W1), woman(W1), woman(W2)/W1\==W2
   ==>
-  not(loves(M,W2)).
+  ( ~loves(M,W2)).
 
 % unrequited love leads to suicide.
-loves(P1,P2),not(loves(P2,P1))
+loves(P1,P2),( ~loves(P2,P1))
   ==> kills(P1,P1).
 
 % a jealous lover kills his competitor in love.
@@ -30,9 +30,9 @@ tragedy ==> contradiction.
 ==> woman(hermia).
 ==> woman(helena).
 
-not(loves(demitrius,hermia)) ==> loves(demitrius,helena).
+( ~loves(demitrius,hermia)) ==> loves(demitrius,helena).
 
-not(loves(lysander,hermia)) ==> loves(lysander,helena).
+( ~loves(lysander,hermia)) ==> loves(lysander,helena).
 
 ==> jealous(lysander).
 ==> loves(hermia,lysander).

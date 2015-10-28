@@ -22,7 +22,7 @@ resolveConflict(C) :-
 mpred_select(conflict(X),S) :- mpred_queue(conflict(X),S).
   
 % a pretty basic conflict.
-not(P), P ==> conflict(P).
+( ~P), P ==> conflict(P).
 
 
 % Devices behave as intended unless they are faulty.
@@ -74,7 +74,7 @@ isa(X,gizmo) ==>
 
 test_b1(X) :- 
   add([isa(X,gizmo),
-       observed(not(lit(bulb(X))))]).
+       observed(( ~lit(bulb(X))))]).
 
 
 

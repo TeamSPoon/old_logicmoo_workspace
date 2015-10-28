@@ -34,10 +34,10 @@ lit(X) ==> notequal(voltage(t1(X)),voltage(t2(X))).
 
 
 % a pretty basic conflict.
-not(P), P ==> conflict(P).
+( ~P), P ==> conflict(P).
 
 % this doesn't work anyomore. twf.
-% voltage(T,V) ==> (not(voltage(T,V2)) <- {\+V=:=V2}).
+% voltage(T,V) ==> (( ~voltage(T,V2)) <- {\+V=:=V2}).
 
 % It is a conflict if a terminal has two different voltages.
 voltage(T,V1), voltage(T,V2)/( \+V1=:=V2) ==> conflict(two_voltages(T,V1,V2)).
@@ -98,8 +98,8 @@ isa(X,gizmo) ==>
 
 test_bs(X) :- 
   add([isa(X,gizmo),
-       observed(not(lit(b1(X)))),
-       observed(not(lit(b2(X)))),
+       observed(( ~lit(b1(X)))),
+       observed(( ~lit(b2(X)))),
        observed(lit(b3(X)))]).
 
 

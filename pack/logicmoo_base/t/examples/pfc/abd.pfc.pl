@@ -3,14 +3,14 @@
 
 :- use_module(library(logicmoo/logicmoo_user)).
 
-not(P),P ==> contrradiction.
+( ~P),P ==> contrradiction.
 
-bird(X), ~not(fly(X)) ==> fly(X).
+bird(X), ~( ~fly(X)) ==> fly(X).
 
 penguin(X) ==> bird(X).
 
-penguin(X) ==> not(fly(X)).
+penguin(X) ==> ( ~fly(X)).
 
-bird(X), injured(X) ==> not(fly(X)).
+bird(X), injured(X) ==> ( ~fly(X)).
 
-bird(X), dead(X) ==> not(fly(X)).
+bird(X), dead(X) ==> ( ~fly(X)).

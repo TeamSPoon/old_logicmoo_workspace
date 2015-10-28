@@ -12,8 +12,8 @@ tell(A1,A2,P).
 
 bel(A1,desire(A2,knowif(A2,P))),
 self(A1),
-bel(A1,not(P))
+bel(A1,( ~P))
 ==>
-tell(A1,A2,not(P)).
+tell(A1,A2,( ~P)).
 
 

@@ -3,16 +3,16 @@
 % -*-Prolog-*-
 % here is an interesting rule!
 
-not(P), P ==> contradiction(P).
+( ~P), P ==> contradiction(P).
 
 contradiction(P) ==> 
-  {format('~n% contradiction - both ~w and not(~w) added.~n',[P,P])}.
+  {format('~n% contradiction - both ~w and ( ~~w) added.~n',[P,P])}.
 
 % this means that both P and Q can't be true.
 disjoint(P,Q)
   ==>
-  (P ==> not(Q)),
-  (Q ==> not(P)).
+  (P ==> ( ~Q)),
+  (Q ==> ( ~P)).
 
 ==> disjoint(male(P), female(P)).
 
