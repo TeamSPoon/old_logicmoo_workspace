@@ -77,7 +77,7 @@ tHominid(iExplorer2).
 
 
 /*
-:- transTiny(Form,(ground(Form),functor(Form,F,1),F\==neg)).
+:- transTiny(Form,(ground(Form),functor(Form,F,1),F\== ~)).
 
 :- set_gui_debug(false).
 :- set_no_debug.

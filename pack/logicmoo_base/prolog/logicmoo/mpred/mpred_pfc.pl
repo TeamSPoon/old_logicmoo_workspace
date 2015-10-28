@@ -2072,7 +2072,7 @@ mpred_undo(Why,basePFC:pk(umt,Key,Head,Body)) :-
   !,
   (retract_i(basePFC:pk(umt,Key,Head,Body))
     -> mpred_unfwc(basePFC:pt(umt,Head,Body))
-     ; mpred_warn("for ~p \nTrigger not found to retract basePFC:pk=~p: ~p",[Why,Key,basePFC:pt(umt,Head,Body)])).
+     ; mpred_warn("for ~p \nTrigger not found to retract basePFC:pk= ~p: ~p",[Why,Key,basePFC:pt(umt,Head,Body)])).
 
 mpred_undo(Why,basePFC:pt(umt,Head,Body)) :- 
   % undo a positive trigger.

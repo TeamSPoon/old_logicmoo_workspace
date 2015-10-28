@@ -182,7 +182,7 @@ kif_hook((0 v 0)).
 kif_hook(~(0)).
 kif_hook(nesc(0)).
 kif_hook(poss(0)).
-kif_hook(neg(0)).
+kif_hook(~(0)).
 kif_hook(not(0)).
 kif_hook(all(+,0)).
 kif_hook(forall(+,0)).
@@ -296,7 +296,7 @@ to_dlog_ops([
        ','='&',
        '~'='not',
      '-'='not',
-     'neg'='not',
+     '~'='not',
      'naf'='not',
      'and'='&',
       'or'='v',
@@ -362,7 +362,7 @@ adjust_kif0(_,V,V):- is_ftVar(V),!.
 adjust_kif0(_,A,A):- \+ compound(A),!.
 
 adjust_kif0(KB,~(Kif),(KifO)):- !,adjust_kif0(KB,not(Kif),KifO).
-adjust_kif0(KB,neg(Kif),(KifO)):- !,adjust_kif0(KB,not(Kif),KifO).
+adjust_kif0(KB,~(Kif),(KifO)):- !,adjust_kif0(KB,not(Kif),KifO).
 adjust_kif0(KB,\+(Kif),(KifO)):- !,adjust_kif0(KB,not(Kif),KifO).
 
 
@@ -715,7 +715,7 @@ fix_input_vars(AIn,A):- copy_term(AIn,A),numbervars(A,672,_).
 
 boxlog_to_pfc(PFCM,PFC):- is_list(PFCM),must_maplist(boxlog_to_pfc,PFCM,PFC).
 boxlog_to_pfc((A,B),C):- !, must_maplist(boxlog_to_pfc,[A,B],[AA,BB]),conjoin(AA,BB,C).
-boxlog_to_pfc(PFCM,PFCO):- boxlog_to_compile(PFCM,PFC),!, subst(PFC,(not),(neg),PFCO).
+boxlog_to_pfc(PFCM,PFCO):- boxlog_to_compile(PFCM,PFC),!, subst(PFC,(not),(~),PFCO).
 
 
 %:- was_export(tsn/0).
@@ -903,7 +903,7 @@ save_wfs(Why,PrologI):- must_det_l((as_prolog(PrologI,Prolog),
    w_tl(t_l:current_local_why(Why,Prolog),
    ain_h(save_in_code_buffer,Why,Prolog)))).
 
-nots_to(H,To,HH):-subst_except(H,neg,To,HH),subst_except(H,-,To,HH),subst_except(H,~,To,HH),subst_except(H,neg,To,HH),!.
+nots_to(H,To,HH):-subst_except(H,~,To,HH),subst_except(H,-,To,HH),subst_except(H,~,To,HH),subst_except(H,~,To,HH),!.
 neg_h_if_neg(H,HH):-nots_to(H,'~',HH).
 neg_b_if_neg(HBINFO,B,BBB):-nots_to(B,'~',BB),sort_body(HBINFO,BB,BBB),!.
 
@@ -973,7 +973,7 @@ get_constraints(ListA,Isas):-
 
 boxlog_to_prolog(IN,OUT):-notrace(leave_as_is(IN)),!,IN=OUT.
 boxlog_to_prolog(IN,OUT):-once(demodal_sents('$VAR'('KB'),IN,MID)),IN\=@=MID,!,boxlog_to_prolog(MID,OUT).
-boxlog_to_prolog(IN,OUT):-once(subst_except(IN,neg,~,MID)),IN\=@=MID,!,boxlog_to_prolog(MID,OUT).
+boxlog_to_prolog(IN,OUT):-once(subst_except(IN,~,~,MID)),IN\=@=MID,!,boxlog_to_prolog(MID,OUT).
 boxlog_to_prolog(IN,OUT):-once(subst_except(IN,poss,possible_t,MID)),IN\=@=MID,!,boxlog_to_prolog(MID,OUT).
 boxlog_to_prolog(H, HH):-is_list(H),!,must_maplist(boxlog_to_prolog,H,HH).
 
@@ -986,12 +986,12 @@ boxlog_to_prolog((H ; B),(HH ; BB)):- !,boxlog_to_prolog(H,HH),boxlog_to_prolog(
 boxlog_to_prolog(H,O):- H=..[N,nesc(F)],kb_nlit(_,N),nonvar(F),!,HH=..[N,F],boxlog_to_prolog(HH,O).
 
 /*
-boxlog_to_prolog(nesc(not(F)),O):- nonvar(F),!,boxlog_to_prolog(neg(F),O).
+boxlog_to_prolog(nesc(not(F)),O):- nonvar(F),!,boxlog_to_prolog(~(F),O).
 boxlog_to_prolog(nesc(F),O):- nonvar(F),!,boxlog_to_prolog(F,O).
 boxlog_to_prolog(not(nesc(F)),O):- nonvar(F),!,boxlog_to_prolog(naf(F),O).
 boxlog_to_prolog(~poss(F),O):-nonvar(F),!,boxlog_to_prolog(not_poss(F),O).
 boxlog_to_prolog(not(H),not(HH)):- !,boxlog_to_prolog(H,HH).
-boxlog_to_prolog(not(F),neg(O)):- nonvar(F),!,boxlog_to_prolog(F,O).
+boxlog_to_prolog(not(F),~(O)):- nonvar(F),!,boxlog_to_prolog(F,O).
 */
 
 boxlog_to_prolog(IN,OUT):-demodal_sents(_KB,IN,M),IN\=@=M,!,boxlog_to_prolog(M,OUT).

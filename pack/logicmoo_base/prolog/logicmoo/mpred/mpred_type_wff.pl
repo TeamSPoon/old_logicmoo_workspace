@@ -320,7 +320,7 @@ non_assertable(WW,notAssertable(Why)):- compound(WW),get_functor(WW,F),mpred_isa
 % ===============================================================================================
 
 is_logical_functor(And):-hotrace(is_logical_functor0(And)).
-is_logical_functor0(X):-atom(X),member(X,[',',';',xor,'\\+',neg]).
+is_logical_functor0(X):-atom(X),member(X,[',',';',xor,'\\+',~]).
 is_logical_functor0(X):-call_if_defined(logical_functor_pttp(X)).
 is_logical_functor0(And):-member(And,[(,),(;),('<-'),('=>'),('<=>'),(':-'),(and),nop]).
 
@@ -480,7 +480,7 @@ prequent(argInst(_,_,_)).
 prequent(G):-functor(G,call_builtin,_).
 prequent(G):-functor(G,not_call_builtin,_).
 
-kb_nlit(_KB,Neg):-member(Neg,[(not),(~),(-),(neg)]).
+kb_nlit(_KB,Neg):-member(Neg,[(not),(~),(-),(~)]).
 
 set_is_lit(A):-when(nonvar(A),\+ is_ftVar(A)),!.
 

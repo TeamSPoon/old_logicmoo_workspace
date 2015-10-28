@@ -38,7 +38,7 @@
 
 genls(_Sub, Super) ==> tCol(Super).
 genls(Sub, _Super) ==> tCol(Sub).
-% use backchain instead (isa(I,Sub), disjointWith(Sub, Super)) ==> neg(isa(I,Super)).
+% use backchain instead (isa(I,Sub), disjointWith(Sub, Super)) ==> ~(isa(I,Super)).
 
 */
 
@@ -67,7 +67,7 @@ genls(Sub, _Super) ==> tCol(Sub).
 
 % argQuotedIsa(Pred, N, FT) <=  (argIsa(Pred, N, Type),genls(Type,FT),ttFormatType(FT)).
 
-% consistent(CycL) <= cycLToMpred(neg(CycL),Consequent),not(pfcCall(Consequent)). 
+% consistent(CycL) <= cycLToMpred(~(CycL),Consequent),not(pfcCall(Consequent)). 
 
 ==>tinyPredTypeActive('expansion').
 ==>tinyPredTypeActive('collectionExpansion').

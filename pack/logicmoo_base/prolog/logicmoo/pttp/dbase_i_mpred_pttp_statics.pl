@@ -731,7 +731,7 @@ pttp1a_wid(ID,X,XX):-pttp1a_wid_0(ID,X,X0),
 
 pttp1a_wid_0(ID,X,X0) :-    
  must_det_l((
-        subst(X , neg,-,XX1),
+        subst(X , ~,-,XX1),
         subst(XX1,~,-,XX2),
         subst(XX2,not,-,XX3),
 	% write('PTTP input formulas:'),        
@@ -1407,7 +1407,7 @@ pttp_nnf_pre_clean_functor(or,(;),[]).
 % pttp_nnf_pre_clean_functor('::',(:),[]).
 pttp_nnf_pre_clean_functor(~,(-),[]).
 pttp_nnf_pre_clean_functor(not,(-),[]).
-pttp_nnf_pre_clean_functor(neg,(-),[]).
+pttp_nnf_pre_clean_functor(~,(-),[]).
 pttp_nnf_pre_clean_functor(implies,(=>),[]).
 pttp_nnf_pre_clean_functor(imp,(=>),[]).
 pttp_nnf_pre_clean_functor(equiv,(<=>),[]).

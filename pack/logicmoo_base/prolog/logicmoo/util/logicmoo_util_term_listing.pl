@@ -345,7 +345,7 @@ lmconf:shared_hide_data(wid):- listing_filter(hideMeta).
 listing_filter(P):-cnotrace(hide_data0(P)).
 
 hide_data0(P):-var(P),!,fail.
-hide_data0(neg(_)):-!,fail.
+hide_data0(~(_)):-!,fail.
 hide_data0(hideMeta):-listing_filter(showAll),!,fail.
 hide_data0(P):-t_l:tl_hide_data(P),!.
 hide_data0(P):-lmconf:shared_hide_data(P),!.

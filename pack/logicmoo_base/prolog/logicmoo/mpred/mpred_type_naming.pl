@@ -150,12 +150,12 @@ create_from_type(OType,Name,Type):- sanity(var(Name)),
 
 
 modality(mpred_default, [usually],[]).
-modality(neg , [cannot],[can]).
+modality(~ , [cannot],[can]).
 modality(mpred_default,[sometimes],[]).
 modality(can,[can],[be]).
 modality(possibly,[either],[]).
-modality(neg,[not],[]).
-modality(neg,[never],[]).
+modality(~,[not],[]).
+modality(~,[never],[]).
 
 
 onSpawn(A):-A==true,!.

@@ -171,7 +171,7 @@ pp_rules :-
    print_db_items("Bi-conditional Rules",(_ <=> _)),
    print_db_items("Backchaining Rules",(_ <- _)),
    print_db_items("Positive Facts",(nesc(_))),
-   print_db_items("Negative Facts",(neg(_))).
+   print_db_items("Negative Facts",(~(_))).
 
 pp_triggers :-
      print_db_items("Positive hideTriggers",pt(_,_)),
@@ -359,8 +359,8 @@ mpred_list_triggers_nlc(MM:What):-atom(MM),!,MM:mpred_list_triggers(What).
 mpred_list_triggers_nlc(What):-loop_check(mpred_list_triggers_0(What),true).
 
 mpred_list_triggers_0(What):-get_pi(What,PI),PI\=@=What,mpred_list_triggers(PI).
-mpred_list_triggers_0(What):-nonvar(What),What=neg(Then),!, \+ \+ mpred_list_triggers_1(Then), \+ \+ mpred_list_triggers_1(What).
-mpred_list_triggers_0(What):- \+ \+  mpred_list_triggers_1(neg(What)), \+ \+ mpred_list_triggers_1(What).
+mpred_list_triggers_0(What):-nonvar(What),What= ~(Then),!, \+ \+ mpred_list_triggers_1(Then), \+ \+ mpred_list_triggers_1(What).
+mpred_list_triggers_0(What):- \+ \+  mpred_list_triggers_1(~(What)), \+ \+ mpred_list_triggers_1(What).
 
 mpred_list_triggers_types('Triggers').
 mpred_list_triggers_types('Instances').
@@ -375,18 +375,18 @@ mpred_list_triggers_types('Sources').
 mpred_list_triggers_types('Supports').
 mpred_list_triggers_types('Edits').
 
-% print_db_items_and_neg(Title,Fact,What):-nonvar(Fact),Fact=neg(_),!,fail.
+% print_db_items_and_neg(Title,Fact,What):-nonvar(Fact),Fact= ~(_),!,fail.
 print_db_items_and_neg(Title,Fact,What):-print_db_items(Title,Fact,What).
-print_db_items_and_neg(Title,Fact,What):-print_db_items(Title,neg(Fact),What).
+print_db_items_and_neg(Title,Fact,What):-print_db_items(Title,~(Fact),What).
 
-mpred_list_triggers_1(neg(What)):-var(What),!.
-mpred_list_triggers_1(neg(_What)):-!.
+mpred_list_triggers_1(~(What)):-var(What),!.
+mpred_list_triggers_1(~(_What)):-!.
 mpred_list_triggers_1(What):-var(What),!.
 mpred_list_triggers_1(What):-
    print_db_items('Supports User',spft_precanonical(P,u,u),basePFC:spft(umt,P,u,u),What),
    print_db_items('Forward Facts',(nesc(F)),F,What),
    print_db_items('Forward Rules',(_==>_),What),
- ignore((What\=neg(_),functor(What,IWhat,_),
+ ignore((What\= ~(_),functor(What,IWhat,_),
    print_db_items_and_neg('Instance Of',isa(IWhat,_),IWhat),
    print_db_items_and_neg('Instances: ',isa(_,IWhat),IWhat),
    print_db_items_and_neg('Subclass Of',genls(IWhat,_),IWhat),
@@ -403,7 +403,7 @@ mpred_list_triggers_1(What):-
    print_db_items('Edits',is_edited_clause(_,_,_),What),
    print_db_items('Instances',isa(_,_),What),
    print_db_items('Subclasses',genls(_,_),What),
-   print_db_items('Negative Facts',neg(_),What),
+   print_db_items('Negative Facts',~(_),What),
 
    print_db_items('ArgTypes',argGenls(_,_,_),What),
    print_db_items('ArgTypes',argIsa(_,_,_),What),

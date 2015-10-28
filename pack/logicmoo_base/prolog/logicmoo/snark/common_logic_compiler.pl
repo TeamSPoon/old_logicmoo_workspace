@@ -550,8 +550,8 @@ is_lit_atom(IN):- subst_except(IN,'&','*',M),subst_except(M,'v','*',O),!,O==IN.
 mnf(Var,Var):-leave_as_is(Var),!.
 mnf(Fml,Out):-boxRule(_,Fml,M),Fml\=M,mnf(M,Out).
 mnf(Fml,Out):-diaRule(_,Fml,M),Fml\=M,mnf(M,Out).
-mnf(poss(DBT,A=>B),Out):- diaRule(_,poss(DBT,v( neg(-,B),A)),M),mnf(M,Out).
-mnf(nesc(DBT,A=>B),Out):- mnf(v( neg(-,nesc(DBT, B)), nesc(DBT,A)),M),mnf(M,Out).
+mnf(poss(DBT,A=>B),Out):- diaRule(_,poss(DBT,v( ~(-,B),A)),M),mnf(M,Out).
+mnf(nesc(DBT,A=>B),Out):- mnf(v( ~(-,nesc(DBT, B)), nesc(DBT,A)),M),mnf(M,Out).
 mnf([F|Fml],Out):- arg(_,v((v),(&),(=>),(<=>)),F),mnf(Fml,NNF),Out =..[F| NNF].
 mnf(Var,Var):-!.
 */
@@ -562,7 +562,7 @@ mnf(Var,Var):-!.
 
 % poss(P=>Q)  ===>   poss( - Q v P ) ===>   poss(- Q) v poss(P)  ===>   - nesc(Q) v poss(P)   ===>      poss(P)=>nesc(Q)  
 
-% poss(DBT,v( neg(-,B),A)) => -nesc(q & -p)
+% poss(DBT,v( ~(-,B),A)) => -nesc(q & -p)
 
 third_order(asserted_t).
 
@@ -637,7 +637,7 @@ ct_op(nextly).
 %ct_op(asserted_t).
 
 neg_op(not).
-neg_op(neg).
+neg_op(~).
 neg_op(~).
 neg_op(-).
 neg_op(\+).
@@ -874,7 +874,7 @@ demodal(KB, poss(b_d(KB2,_,X),F), HH):-KB\==KB2,XF =..[X,KB2,F],!,demodal(KB2,XF
 demodal(KB, nesc(b_d(KB,X,_),F),   HH):- XF =..[X,F], !,demodal(KB,XF, HH).
 demodal(KB, poss(b_d(KB,_,X),F),   HH):- XF =..[X,F], !,demodal(KB,XF, HH).
 
-demodal(KB,neg(H),not(HH)):- nonvar(H),demodal(KB,H,HH).
+demodal(KB,~(H),not(HH)):- nonvar(H),demodal(KB,H,HH).
 demodal(KB,nesc(F), HH):- !,demodal(KB,F, HH).
 demodal(KB,not(H),not(HH)):- nonvar(H),demodal(KB,H,HH).
 

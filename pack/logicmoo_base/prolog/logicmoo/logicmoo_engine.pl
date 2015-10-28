@@ -634,7 +634,7 @@ kif_sanity_test_0:- kif_test(not(and(omitArgIsa(RELN, N), argIsa(RELN, N, _THING
 
 kif_sanity_test_0:- kif_result((tNotFly(X):-tPengin(X))).
    % we prove we dont yet know if something not a pengiun when we call notFly and it fails
-kif_sanity_test_0:- kif_result((  neg(tPengin(A)) :-  ~tNotFly(A)  )).
+kif_sanity_test_0:- kif_result((  ~(tPengin(A)) :-  ~tNotFly(A)  )).
 
 default_logic_uses:-uses_logic(logicmoo_kb_refution).
 

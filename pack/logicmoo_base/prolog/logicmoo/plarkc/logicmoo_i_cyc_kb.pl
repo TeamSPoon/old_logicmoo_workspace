@@ -461,7 +461,7 @@ cyc_to_mpred_idiom(C,P):-cyc_to_plarkc(C,P),!.
 cyc_to_mpred_idiom(M,P):-mpred_to_cyc(P,M),!.
 cyc_to_mpred_idiom(equiv,(<=>)).
 cyc_to_mpred_idiom(implies,(=>)). 
-cyc_to_mpred_idiom(not,(neg)).
+cyc_to_mpred_idiom(not,(~)).
 cyc_to_mpred_idiom(X,X):- name(X,[S|_]),char_type(S,lower),!.
 cyc_to_mpred_idiom(X,X):-upcase_atom(X,U),X==U,!.
 cyc_to_mpred_idiom(C,PM):- atom(C),  
@@ -658,7 +658,7 @@ is_better_backchained(CycL):-functor(CycL,F,_),isa_db(F,'SentenceOperator').
 is_better_backchained(V):-unnumbervars(V,FOO),(((each_subterm(FOO,SubTerm),nonvar(SubTerm),isa_db(SubTerm,tAvoidForwardChain)))),!.
 
 
-as_cycl(VP,VE):-subst(VP,('-'),(neg),V0),subst(V0,('v'),(or),V1),subst(V1,('exists'),(thereExists),V2),subst(V2,('&'),(and),VE),!.
+as_cycl(VP,VE):-subst(VP,('-'),(~),V0),subst(V0,('v'),(or),V1),subst(V1,('exists'),(thereExists),V2),subst(V2,('&'),(and),VE),!.
 
 
 :- was_dynamic(addTiny_added/1).

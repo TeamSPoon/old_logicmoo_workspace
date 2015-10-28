@@ -69,7 +69,7 @@ deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not_asserted((Call)),
 mpred_op(Op,     H ):- (var(Op);var(H)),!,trace_or_throw(var_database_call(Op,  H )).
 mpred_op(is_asserted,H):-!,is_asserted(H).
 mpred_op(Op,     H ):- once(fully_expand(Op,H,HH)),H\=@=HH,!,mpred_op(Op, HH).
-mpred_op(neg(_,Op),  H ):- !, show_call(why,not(mpred_op(Op,  H ))).
+mpred_op(~(_,Op),  H ):- !, show_call(why,not(mpred_op(Op,  H ))).
 mpred_op(change(assert,Op),H):-!,must(mpred_modify(change(assert,Op),H)),!.
 mpred_op(change(retract,Op),H):-!,must(mpred_modify(change(retract,Op),H)),!.
 mpred_op(query(t,Ireq),  H ):-!, mpred_op(Ireq,H).
@@ -77,9 +77,9 @@ mpred_op(query(Dbase_t,_Ireq),  H ):-!, mpred_op(Dbase_t,H).
 mpred_op(call(Op),H):-!,mpred_op(Op,H).
 mpred_op(Op,((include(A)))):- wno_tl(t_l:already_in_file_term_expansion,mpred_op(Op,((load_data_file(A))))),!.
 mpred_op(Op, call(H)):- nonvar(H),!, mpred_op(Op,H).
-mpred_op(Op,  not(H)):- nonvar(H),!, mpred_op(neg(not,Op),H).
-mpred_op(Op,'\\+'(H)):- nonvar(H),!, mpred_op(neg(('\\+'),Op),H).
-mpred_op(Op,    ~(H)):- nonvar(H),!, mpred_op(neg(~,Op),H).
+mpred_op(Op,  not(H)):- nonvar(H),!, mpred_op(~(not,Op),H).
+mpred_op(Op,'\\+'(H)):- nonvar(H),!, mpred_op(~(('\\+'),Op),H).
+mpred_op(Op,    ~(H)):- nonvar(H),!, mpred_op(~(~,Op),H).
 mpred_op(Op,     {H}):- nonvar(H),!, mpred_op(Op,H).
 
 mpred_op(must,Call):- !,must(mpred_op(req,Call)).

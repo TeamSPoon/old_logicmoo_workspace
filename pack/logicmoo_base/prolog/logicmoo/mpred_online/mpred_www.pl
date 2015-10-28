@@ -777,8 +777,8 @@ format('
    format('</pre>',[]),
    write_end_html,!.
 
-show_iframe(URL,Name,Value):- format('<iframe width="100%" height="800" frameborder="0" scrolling="yes" marginheight="0" marginwidth="0" allowtransparency=true id="main" name="main" style="width:100%;height:800" src="~w?~w=~w"></iframe>',[URL,Name,Value]).
-show_iframe(URL):- format('<iframe width="100%" height="800" frameborder="0" scrolling="yes" marginheight="0" marginwidth="0" allowtransparency=true id="main" name="main" style="width:100%;height:800" src="search4term?find=~w"></iframe>',[URL]).
+show_iframe(URL,Name,Value):- format('<iframe width="100%" height="800" frameborder="0" scrolling="yes" marginheight="0" marginwidth="0" allowtransparency=true id="main" name="main" style="width:100%;height:800" src="~w?~w= ~w"></iframe>',[URL,Name,Value]).
+show_iframe(URL):- format('<iframe width="100%" height="800" frameborder="0" scrolling="yes" marginheight="0" marginwidth="0" allowtransparency=true id="main" name="main" style="width:100%;height:800" src="search4term?find= ~w"></iframe>',[URL]).
   
 show_search_filtersTop(BR):- write(BR).
 
@@ -1034,7 +1034,7 @@ term_to_pretty_string(H,HS):-
 fmtimg(N,Alt):- t_l:print_mode(html),!,
  make_quotable(Alt,AltQ),
  url_encode(Alt,AltS),
- format('~N<a href="?call=edit1term&term=~w" target="_parent"><img src="/pixmaps/~w.gif" alt="~w" title="~w"><a>',[AltS,N,AltQ,AltQ]).
+ format('~N<a href="?call=edit1term&term= ~w" target="_parent"><img src="/pixmaps/~w.gif" alt="~w" title="~w"><a>',[AltS,N,AltQ,AltQ]).
 fmtimg(_,_).
 
 
@@ -1262,7 +1262,7 @@ functor_to_color(G,_,_,'cyc-logo-3-t'):-predicate_property(G,built_in).
 functor_to_color(_,-,_,red).
 functor_to_color(_,not,_,red).
 functor_to_color(_,~,_,red).
-functor_to_color(_,neg,_,red).
+functor_to_color(_,~,_,red).
 
 functor_to_color(_,(<==>),_,'plus-purple').
 functor_to_color(_,(<-),_,purple).
@@ -1296,7 +1296,7 @@ write_atom_link(W,C,N):-compound(C),get_functor(C,F,A),!,write_atom_link(W,F/A,N
 write_atom_link(W,_,N):- must(nonvar(W)),\+ t_l:print_mode(html),write_term_to_atom_one(W,N),!.
 write_atom_link(W,A,N):- nonvar(W),catch((term_to_pretty_string(A,AQ),
    url_encode(AQ,URL),
-   format(W,'<a href="?f=~w">~w</a>',[URL,AQ])),_,write_term_to_atom_one(W,N)).
+   format(W,'<a href="?f= ~w">~w</a>',[URL,AQ])),_,write_term_to_atom_one(W,N)).
 
 write_term_to_atom_one(atom(A),Term):-format(atom(A),'~q',[Term]).
 
@@ -1431,7 +1431,7 @@ put_string0([H|T]) :-
 
 put_string(A,B):- t_l:print_mode(html),!,
   with_output_to(atom(S),put_string0(A,B)),
-  url_iri(URL,S),format('<a href="?f=~w">~w</a>',[URL,S]).
+  url_iri(URL,S),format('<a href="?f= ~w">~w</a>',[URL,S]).
 
 put_string(A,B):- put_string0(A,B).
 

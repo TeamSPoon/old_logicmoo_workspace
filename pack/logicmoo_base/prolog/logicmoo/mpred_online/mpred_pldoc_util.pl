@@ -51,7 +51,7 @@ prolog:doc_object_page_footer(Obj,_) --> { not(lmconf:html_listed(Obj)) },!,pldo
 
 %prolog:doc_page_header(A,B) --> {format(user_error,'~n~q~n',[doc_page_header(A, B)]),fail}.
 %prolog:doc_object_summary(A,B,C,D) :- format(user_error,'~n~q~n',[doc_object_summary(A, B,C,D)]),dumpST(10),fail.
-%prolog:doc_object_href(A,B) :- format(user_error,'~n+++++++++++++++========================~q~n',[doc_object_href(A, B)]),dumpST(10),fail.
+%prolog:doc_object_href(A,B) :- format(user_error,'~n+++++++++++++++======================== ~q~n',[doc_object_href(A, B)]),dumpST(10),fail.
 
 :- was_shared_multifile prolog:doc_is_public_object/1.
 

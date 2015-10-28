@@ -172,7 +172,7 @@ same_arg(same_or(isa),I,Sup):- !, holds_t(Sup,I),!.
 same_arg(same_or(_Pred),X,Y):- same_arg(equals,X,Y).
 same_arg(same_or(Pred),I,Sup):- holds_t(Pred,I,Sup),!.
 
-% same_arg(I,X):- promp_yn('~nSame Objects: ~q==~q ?',[I,X]).
+% same_arg(I,X):- promp_yn('~nSame Objects: ~q== ~q ?',[I,X]).
 promp_yn(Fmt,A):- format(Fmt,A),get_single_char(C),C=121.
 
 :- set_prolog_flag(generate_debug_info, true).
