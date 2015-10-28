@@ -25,9 +25,9 @@ show_call_test(G):- get_user_abox(KB),must(show_call(KB:G)).
 
 %= define the example language
 example_known_is_success(G):-  G.
-example_impossible_is_success(G):- neg(G).
+example_impossible_is_success(G):-  ~(G).
 example_known_is_failure(G):-  \+ G.
-example_impossible_is_failure(G):- \+ neg(G).
+example_impossible_is_failure(G):- \+  ~(G).
 
 %= define the four truth values
 example_proven_true(G):- example_known_is_success(G),example_impossible_is_failure(G).

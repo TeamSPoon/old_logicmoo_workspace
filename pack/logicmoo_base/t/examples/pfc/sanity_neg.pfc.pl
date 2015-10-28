@@ -15,9 +15,9 @@
 
 :- dynamic(fooBar/0).
 
-~(fooBar).
+~fooBar.
 
-:- mpred_test(~(fooBar)).
+:- mpred_test(~fooBar).
 
 fooBar.
 
@@ -30,7 +30,7 @@ fooBar.
 :- mpred_test(fooBar).
 
 %:- rtrace.
-~(fooBar).
+~fooBar.
 
 :- mpred_test(\+fooBar).
 %:- nortrace.

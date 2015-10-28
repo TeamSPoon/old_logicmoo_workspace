@@ -69,7 +69,7 @@
 :- trace.
 ~ a(z).
 
-:- mpred_test( neg(a(_))).
+:- mpred_test(  ~(a(_))).
 :- mpred_test(\+ a(_)).
 
 ~(~(a(z))).
@@ -80,7 +80,7 @@
 
 :- xlisting(a).
 
-% :-mpred_test(\+ neg(a(_))).
+% :-mpred_test(\+  ~(a(_))).
 % :-mpred_test(\+ a(_)).
 
 % U=nt(A,B,C),basePFC:spft(umt,X,Y,Z),\+ \+

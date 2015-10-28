@@ -33,11 +33,11 @@ tCanary(iTweety).
 :-mpred_test((tFly(iChilly))).
 
 
-% penguins do neg tFly.
-tPenguin(X) ==> neg(tFly(X)).
+% penguins do  ~ tFly.
+tPenguin(X) ==>  ~(tFly(X)).
 
 :-mpred_test((\+ tFly(iChilly))).
-:-mpred_test((neg(tFly(iChilly)))).
+:-mpred_test(( ~(tFly(iChilly)))).
 
 
 

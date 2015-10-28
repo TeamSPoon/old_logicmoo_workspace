@@ -6,19 +6,19 @@
 
 (P ===> Q) ==> 
   (P ==> Q),
-  (not(Q) ==> not(P)).
+  ( ~Q ==>  ~P).
 
 
 or(P,Q) ==> 
-  (not(P) ==> Q),
-  (not(Q) ==> P).
+  ( ~P ==> Q),
+  ( ~Q ==> P).
 		
 prove_by_contradiction(P) :- P.
 prove_by_contradiction(P) :-
-  \+ (not(P) ; P),
-  add(not(P)),
-  P -> rem(not(P))
-    ; (rem(not(P)),fail).
+  \+ ( ~P ; P),
+  add( ~P),
+  P -> rem( ~P)
+    ; (rem( ~P),fail).
 
 ==> or(p,q).
 ==> (p ===> x).

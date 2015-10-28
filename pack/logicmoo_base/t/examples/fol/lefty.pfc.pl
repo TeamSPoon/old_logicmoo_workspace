@@ -22,9 +22,9 @@
 %=       [ (not(righty(P)):-lefty(P)), (not(lefty(P)):-righty(P))].
 %=
 %=
-%= succeed(user:boxlog_to_pfc((not(righty(P)):-lefty(P)), (lefty(P), {is_unit(P)}==>neg(righty(P))))).
+%= succeed(user:boxlog_to_pfc((not(righty(P)):-lefty(P)), (lefty(P), {is_unit(P)}==> ~(righty(P))))).
 %=
-%= succeed(user:boxlog_to_pfc((not(lefty(P)):-righty(P)), (righty(P), {is_unit(P)}==>neg(lefty(P))))).
+%= succeed(user:boxlog_to_pfc((not(lefty(P)):-righty(P)), (righty(P), {is_unit(P)}==> ~(lefty(P))))).
 %=
 %=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -55,11 +55,11 @@
 %=       ].
 %=
 %=
-%= succeed(user:boxlog_to_pfc((righty(P):-handwriter(P), not(lefty(P))), (handwriter(P), neg(lefty(P)), {is_unit(P)}==>righty(P)))).
+%= succeed(user:boxlog_to_pfc((righty(P):-handwriter(P), not(lefty(P))), (handwriter(P),  ~(lefty(P)), {is_unit(P)}==>righty(P)))).
 %=
-%= succeed(user:boxlog_to_pfc((lefty(P):-handwriter(P), not(righty(P))), (handwriter(P), neg(righty(P)), {is_unit(P)}==>lefty(P)))).
+%= succeed(user:boxlog_to_pfc((lefty(P):-handwriter(P), not(righty(P))), (handwriter(P),  ~(righty(P)), {is_unit(P)}==>lefty(P)))).
 %=
-%= succeed(user:boxlog_to_pfc((not(handwriter(P)):-not(righty(P)), not(lefty(P))), (neg(righty(P)), neg(lefty(P)), {is_unit(P)}==>neg(handwriter(P))))).
+%= succeed(user:boxlog_to_pfc((not(handwriter(P)):-not(righty(P)), not(lefty(P))), ( ~(righty(P)),  ~(lefty(P)), {is_unit(P)}==> ~(handwriter(P))))).
 %=
 %=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -72,7 +72,7 @@
 %= Logical Negation (not by failure)
 
 %= pat is not righty
-==> neg(righty(pat)).
+==>  ~(righty(pat)).
 
 %= We check that we cannot prove Pat is lefty.
 %= Thus a query to ?- lefty(pat ). 

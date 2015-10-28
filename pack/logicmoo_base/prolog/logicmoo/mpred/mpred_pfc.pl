@@ -1015,7 +1015,7 @@ mreq(G):- if_defined_else(G,fail).
 
 LogicMOO is mixing Mark Stickel's PTTP (prolog techn theorem prover) to create horn clauses that 
  PFC forwards and helps maintain in visible states )  in prolog knowledge baseable.. We use basePFC:spft/5 to track deductions
-Research-wise LogicMOO has a main purpose is to prove that grounded negations (of contrapostives) are of first class in importance in helping
+Research~wise LogicMOO has a main purpose is to prove that grounded negations (of contrapostives) are of first class in importance in helping
 with Wff checking/TMS 
 Also alows an inference engine constrain search.. PFC became important since it helps memoize and close off (terminate) transitive closures
 
@@ -1095,7 +1095,7 @@ erase_w_attvars(Data0,Ref):- physical_side_effect(erase(Ref)),add_side_effect(er
 
 
 :- thread_local(t_l:no_physical_side_effects/0).
-physical_side_effect(PSE):- is_side_effect_disabled,!,mpred_warn('no_physical_side_effects -p',PSE).
+physical_side_effect(PSE):- is_side_effect_disabled,!,mpred_warn('no_physical_side_effects ~p',PSE).
 physical_side_effect(PSE):- PSE.
 mpred_no_chaining(Goal):- w_tl(t_l:no_physical_side_effects,call(Goal)).
 
@@ -1574,7 +1574,7 @@ ain_fast_sp0(S,P) :-
      aining(OutcomeO),
      (mpred_post_sp_zzz(S,P),mpred_trace_msg(looped_outcome((P))))),!.
 %ain_fast_sp(_,_).
-ain_fast_sp0(P,S) :- mpred_error("ain_fast(-p,-p) failed",[P,S]).
+ain_fast_sp0(P,S) :- mpred_error("ain_fast(~p,~p) failed",[P,S]).
 
 :-module_transparent(mpred_ain/1).
 :-module_transparent(mpred_aina/1).
@@ -1661,7 +1661,7 @@ mpred_post1_sp_1(S,P):- P\==true,
   !.
 
 mpred_post1_sp_1(_,_). % already added
-mpred_post1_sp_1(S,P) :-  mpred_warn("mpred_post1(-p,-p) failed",[P,S]).
+mpred_post1_sp_1(S,P) :-  mpred_warn("mpred_post1(~p,~p) failed",[P,S]).
 
 with_mpred_trace_exec(P):- w_tl(t_l:mpred_debug_local,w_tl(mpred_is_tracing_exec, must(show_if_debug(P)))).
 
@@ -1749,7 +1749,7 @@ mpred_enqueue(P,S) :-
 	Mode=depth   -> aina_i(basePFC:qu(umt,P,S),S) ;
 	Mode=breadth -> ainz_i(basePFC:qu(umt,P,S),S) ;
 	% else
-          otherwise           -> mpred_warn("Unrecognized basePFC:sm mode: -p", Mode))
+          otherwise           -> mpred_warn("Unrecognized basePFC:sm mode: ~p", Mode))
      ; mpred_warn("No basePFC:sm mode").
 
 
@@ -1759,7 +1759,7 @@ mpred_remove_old_version((Identifier::::Body)) :-
   % this should never happen.
   is_ftVar(identifier),
   !,
-  mpred_warn("variable used as an  rule name in -p :::: -p",
+  mpred_warn("variable used as an  rule name in ~p :::: ~p",
           [Identifier,Body]).
 
 
@@ -1803,7 +1803,7 @@ mpred_step :-
   basePFC:hs(Signal),!,
   mpred_retract_db_type(basePFC:hs(Signal)),
   !,
-  mpred_warn("Stopping on signal -p",[Signal]),
+  mpred_warn("Stopping on signal ~p",[Signal]),
   fail.
 mpred_step:-loop_check(mpred_step0,true).
 
@@ -1824,7 +1824,7 @@ remove_selection(P,S) :-
   mpred_remove_supports_quietly(basePFC:qu(umt,P,S)),
   !.
 remove_selection(P,S) :-
-  brake(wdmsg("pfc:get_next_fact - selected fact not on Queue: -p (-p)",
+  brake(wdmsg("pfc:get_next_fact - selected fact not on Queue: ~p (~p)",
                [P,S])).
 
 
@@ -1853,7 +1853,7 @@ mpred_halt(Format,Args) :-
   !,
   in_cmt((wdmsg('-s',[S]))),
   (basePFC:hs(Signal) ->
-       mpred_warn("mpred_halt finds basePFC:hs(Signal) already set to -p",[Signal])
+       mpred_warn("mpred_halt finds basePFC:hs(Signal) already set to ~p",[Signal])
      ; assert_i(basePFC:hs(S))).
 
 
@@ -1894,7 +1894,7 @@ ain_trigger_0(_Trig,basePFC:bt(umt,Trigger,Body),Support) :- !,
      % WAS mpred_bt_pt_combine(Trigger,Body).
    mpred_bt_pt_combine(Trigger,Body,Support).
 
-ain_trigger_0(Trig,X,Support) :- mpred_warn("Unrecognized trigger to aintrigger: -p for -p",[ain_trigger(X,Support),Trig]).
+ain_trigger_0(Trig,X,Support) :- mpred_warn("Unrecognized trigger to aintrigger: ~p for ~p",[ain_trigger(X,Support),Trig]).
 
 
 mpred_bt_pt_combine(Head,Body,Support) :-
@@ -1953,7 +1953,7 @@ mpred_retract_db_type(rule,X) :-
 mpred_retract_db_type(trigger,X) :-
   retract_t(X)
     -> mpred_unfwc(X)
-     ; mpred_warn("Trigger not found to mpred_retract_db_type: -p",[X]).
+     ; mpred_warn("Trigger not found to mpred_retract_db_type: ~p",[X]).
 
 mpred_retract_db_type(action,X) :- mpred_rem_actiontrace(mpred_retract_db_type,X).
 
@@ -2002,7 +2002,7 @@ rem_list([H|T]) :-
 mpred_rem1(P,S) :- copy_term_and_varnames(mpred_rem1(P,S),Why),   
   mpred_rem_support(Why,P,S)
      -> (remove_if_unsupported(Why,P))
-      ; mpred_warn("mpred_rem1/2 Could not find support -p to remove from fact -p",
+      ; mpred_warn("mpred_rem1/2 Could not find support ~p to remove from fact ~p",
                 [S,P]).
 
 %=
@@ -2045,11 +2045,11 @@ mpred_remove3(F) :-
 
 mpred_remove_supports_f_l(Why,F) :-
   mpred_rem_support(Why,F,S),
-  (S=(z,z)->true;mpred_trace_msg("-p was supported by -p",[F,S])),
+  (S=(z,z)->true;mpred_trace_msg("~p was supported by ~p",[F,S])),
   fail.
 mpred_remove_supports_f_l(Why,F) :- fail,
   mpred_rem_support(Why,F,S),nonvar(S),
-  (S=(z,z)->true;mpred_warn("WARN: -p was still supported by -p",[F,S])),
+  (S=(z,z)->true;mpred_warn("WARN: ~p was still supported by ~p",[F,S])),
   fail.
 mpred_remove_supports_f_l(_,_).
 
@@ -2072,7 +2072,7 @@ mpred_undo(Why,basePFC:pk(umt,Key,Head,Body)) :-
   !,
   (retract_i(basePFC:pk(umt,Key,Head,Body))
     -> mpred_unfwc(basePFC:pt(umt,Head,Body))
-     ; mpred_warn("for -p \nTrigger not found to retract basePFC:pk=-p: -p",[Why,Key,basePFC:pt(umt,Head,Body)])).
+     ; mpred_warn("for ~p \nTrigger not found to retract basePFC:pk=~p: ~p",[Why,Key,basePFC:pt(umt,Head,Body)])).
 
 mpred_undo(Why,basePFC:pt(umt,Head,Body)) :- 
   % undo a positive trigger.
@@ -2080,7 +2080,7 @@ mpred_undo(Why,basePFC:pt(umt,Head,Body)) :-
   !,
   (retract_i(basePFC:pt(umt,Head,Body))
     -> mpred_unfwc(basePFC:pt(umt,Head,Body))
-     ; mpred_warn("for -p:\nTrigger not found to retract: -p",[Why,basePFC:pt(umt,Head,Body)])).
+     ; mpred_warn("for ~p:\nTrigger not found to retract: ~p",[Why,basePFC:pt(umt,Head,Body)])).
 
 
 mpred_undo(Why,basePFC:bt(umt,Head,Body)) :- 
@@ -2090,7 +2090,7 @@ mpred_undo(Why,basePFC:bt(umt,Head,Body)) :-
   dtrace(attvar_op(retractall,(Head:-mpred_bc_only(Head)))),
   (retract_i(basePFC:bt(umt,Head,Body))
     -> mpred_unfwc(basePFC:bt(umt,Head,Body))
-     ; mpred_warn("for -p:\nTrigger not found to retract: -p",[Why,basePFC:bt(umt,Head,Body)])).
+     ; mpred_warn("for ~p:\nTrigger not found to retract: ~p",[Why,basePFC:bt(umt,Head,Body)])).
 
 
 mpred_undo(Why,basePFC:nt(umt,Head,Condition,Body)) :-
@@ -2098,7 +2098,7 @@ mpred_undo(Why,basePFC:nt(umt,Head,Condition,Body)) :-
   !,
   (retract_i(basePFC:nt(umt,Head,Condition,Body))
     -> mpred_unfwc(basePFC:nt(umt,Head,Condition,Body))
-     ; mpred_trace_msg("for -p:\nTrigger not found to retract: -p",[Why,basePFC:nt(umt,Head,Condition,Body)])).
+     ; mpred_trace_msg("for ~p:\nTrigger not found to retract: ~p",[Why,basePFC:nt(umt,Head,Condition,Body)])).
 
 mpred_undo(Why,Fact):- mpred_undo_u(Why,Fact)*->true;mpred_undo_e(Why,Fact).
 
@@ -2109,7 +2109,7 @@ mpred_undo_u(Why,Fact) :-
      mpred_unfwc1(Fact).
 
 mpred_undo_e(Why,Fact) :- 
-    % (Fact\= ~(_)->cnotrace(mpred_trace_msg("mpred_undo_e ; Fact not found in user db: -p",[Fact]));true),
+    % (Fact\= ~(_)->cnotrace(mpred_trace_msg("mpred_undo_e ; Fact not found in user db: ~p",[Fact]));true),
      (Fact\= ~(_)->mpred_trace_rem(Why,Fact);true),
      mpred_unfwc(Fact).
 
@@ -2382,8 +2382,8 @@ fcnt0(_Fact,F) :-
 
 mpred_define_bc_rule(Head,Body,Parent_rule) :-
   (\+ mpred_literal(Head)),
-  mpred_warn("Malformed backward chaining rule.  -p not atomic.",[(Head:-Body)]),
-  mpred_warn("rule: -p",[Parent_rule]),
+  mpred_warn("Malformed backward chaining rule.  ~p not atomic.",[(Head:-Body)]),
+  mpred_warn("rule: ~p",[Parent_rule]),
  % !,
   dtrace(mpred_define_bc_rule(Head,Body,Parent_rule)),
   fail.
@@ -2434,7 +2434,7 @@ mpred_eval_lhs0(X,Support) :-
 %  mpred_eval_lhs(X,Support).
 
 mpred_eval_lhs0(X,Why) :-
-  mpred_warn("Unrecognized item found in trigger body, namely -p.",[mpred_eval_lhs0(X,Why)]),!.
+  mpred_warn("Unrecognized item found in trigger body, namely ~p.",[mpred_eval_lhs0(X,Why)]),!.
 
 
 %=
@@ -2477,7 +2477,7 @@ mpred_eval_rhs1(Assertion,Support) :-
  mpred_post1(Assertion,Support),!.
 
 mpred_eval_rhs1(X,_) :-
-  mpred_warn("Malformed rhs of a rule: -p",[X]).
+  mpred_warn("Malformed rhs of a rule: ~p",[X]).
 
 
 %=
@@ -2727,7 +2727,7 @@ mpred_nf1(P,[P]) :-
 
 %=% shouln't we have something to catch the rest as errors?
 mpred_nf1(Term,[Term]) :-
-  mpred_warn("mpred_nf doesn't know how to normalize -p",[Term]),!,fail.
+  mpred_warn("mpred_nf doesn't know how to normalize ~p",[Term]),!,fail.
 
 mpred_negation_w_neg(~(P),P):-is_ftNonvar(P),!.
 mpred_negation_w_neg(P,NF):-mpred_nf1_negation(P,NF).
@@ -3225,7 +3225,7 @@ mpred_reset :-
   fail.
 mpred_reset :-
   mpred_database_item(T),
-  mpred_error("Pfc database not empty after mpred_reset, e.g., -p.",[T]).
+  mpred_error("Pfc database not empty after mpred_reset, e.g., ~p.",[T]).
 mpred_reset.
 
 % true if there is some pfc crud still in the database.
@@ -3234,9 +3234,9 @@ mpred_database_item(Term) :-
   functor(Term,P,A),
   clause_u(Term,_).
 
-mpred_retract_or_warn_i(X) :- retract_i(X),mpred_trace_msg("Success retract: -p.",[X]),!.
+mpred_retract_or_warn_i(X) :- retract_i(X),mpred_trace_msg("Success retract: ~p.",[X]),!.
 mpred_retract_or_warn_i(X) :- \+ \+ X =basePFC:spft(ukb,~(_),_,_,_),!.
-mpred_retract_or_warn_i(X) :- ground(X),mpred_trace_msg("Couldn't retract -p.",[X]),!.
+mpred_retract_or_warn_i(X) :- ground(X),mpred_trace_msg("Couldn't retract ~p.",[X]),!.
 mpred_retract_or_warn_i(_).
 
 % ======================= mpred_file('pfcdebug').	% debugging aids (e.g. tracing).
@@ -3347,15 +3347,15 @@ mpred_trace_addPrint_0(P,S) :-
   !,
   must(S=(F,T)),
   (F==T
-       -> mpred_trace_msg("Adding (-p) -p ",[F,P])
-        ; (((mpred_trace_msg("Adding (:) -p    <-------- -n (-p <-TF-> -p)",[P,(T),(F)]))))).
+       -> mpred_trace_msg("Adding (~p) ~p ",[F,P])
+        ; (((mpred_trace_msg("Adding (:) ~p    <-------- -n (~p <-TF-> ~p)",[P,(T),(F)]))))).
 
 mpred_trace_addPrint_0(_,_).
 
 
 mpred_trace_break(P,_S) :-
   mpred_is_spying(P,add) ->
-   ((\+ \+ wdmsg("Breaking on ain(-p)",[P])),
+   ((\+ \+ wdmsg("Breaking on ain(~p)",[P])),
     break)
    ; true.
 
@@ -3373,10 +3373,10 @@ mpred_trace_rem(Why,basePFC:nt(umt,Head,Condition,Body)) :-
 
 mpred_trace_rem(Why,P) :-
   ((mpred_is_tracing(P);mpred_is_tracing(Why))
-     -> (mpred_trace_msg('Removing (-p) -p.',[Why,P]))
+     -> (mpred_trace_msg('Removing (~p) ~p.',[Why,P]))
       ; true),
   ((mpred_is_spying(P,rem);mpred_is_spying(P,Why))
-     -> (in_cmt(wdmsg("Breaking on remove(-p,-p)",[Why,P])), break)
+     -> (in_cmt(wdmsg("Breaking on remove(~p,~p)",[Why,P])), break)
    ; true),!.
 
 
@@ -3427,7 +3427,7 @@ mpred_untrace(Form) :- retractall_i(mpred_is_tracing(Form)).
 
 
 % if the correct flag is set, trace exection of Pfc
-mpred_trace_msg(Msg) :- mpred_trace_msg('-p.',[Msg]),!.
+mpred_trace_msg(Msg) :- mpred_trace_msg('~p.',[Msg]),!.
 
 mmsg(Msg,Args):- is_list(Args) -> wdmsg(Msg, Args) ; pp_item(Msg, Args).
 

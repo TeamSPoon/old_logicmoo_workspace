@@ -122,8 +122,8 @@ get_op_alias_compile(_,fwc).
 
 boxlog_to_compile(H,OUTPUT):- get_op_alias_compile((:-),TYPE),!,must((boxlog_to_compile(TYPE,H,OUTPUTM))),!,OUTPUTM=OUTPUT.
 
-boxlog_to_compile(_,(H:-(Cwc,B)),(H:-(Cwc,B))):-Cwc == cwc,!.
-boxlog_to_compile(Mode,(H:-(Cwc,B)),(H:-(Cwc,B))):-Mode==Cwc,!.
+boxlog_to_compile(_,(H:-(Cwc,B)),(H:-(Cwc,B))):- Cwc == cwc,!.
+boxlog_to_compile(Mode,(H:-(Cwc,B)),(H:-(Cwc,B))):- Mode == Cwc,!.
 boxlog_to_compile(cwc,H,OUTPUT):-!, boxlog_to_compile((:-),H,OUTPUT).
 boxlog_to_compile(==>,H,OUTPUT):-!, boxlog_to_compile(fwc,H,OUTPUT).
 boxlog_to_compile(=>,H,OUTPUT):-!, boxlog_to_compile(fwc,H,OUTPUT).
@@ -141,7 +141,7 @@ boxlog_to_compile((:-),(H:-B),(HH:-(cwc,BBB))):- body_for_pfc((:-),H,HH,B,BB),ma
 boxlog_to_compile((:-),not(H),neg(H)):-  !.
 boxlog_to_compile((:-),H,H):-  !.
 
-:- op(500,fx,'~').
+:- op(300,fx,'~').
 :- op(1199,fx,('==>')).
 :- op(1190,xfx,('::::')).
 :- op(1180,xfx,('==>')).
