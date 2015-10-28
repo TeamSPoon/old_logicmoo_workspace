@@ -25,18 +25,18 @@ subclass(Super,Sub),
 
 disjoint(C1,C2) ==> disjoint(C2,C1).
 
-( ~subsume(C1,C2)) <- subclass(C2,C1).
+ ~subsumes(C1,C2) <- subclass(C2,C1).
 
-( ~subsumes(C1,C2)) <- disjoint(C1,C2).
+ ~subsumes(C1,C2) <- disjoint(C1,C2).
 
-( ~subsumes(C1,C2)) <-
+ ~subsumes(C1,C2) <-
   % we can't infer that C1 subsumes C2 if C1 has a role that C2 doen't.
   role(C1,R),
   \+ role(C2,R).
 
-( ~subsumes(C1,C2)) <-
+ ~subsumes(C1,C2) <-
   % we can't infer that C1 subsumes C2 if C1 has a role a type that...
   type(C1,R,T1),
   type(C2,R,T2),
-  ( ~subsume(T1,T2)).
+  ~subsume(T1,T2).
 

@@ -8,13 +8,13 @@
 %
 %                      ANTECEEDANT                                   CONSEQUENT
 %
-%         P =         test nesc true                         assert(P),retract(~P) , enable(P).
-%       ~P =         test nesc false                        assert(~P),retract(P), disable(P)
+%        P =         test nesc true                         assert(P),retract(~P) , enable(P).
+%       ~P =         test nesc false                        assert(~P),retract(P), disable(P).
 %
-%   ~~(P) =         test possible (via not impossible)      retract( ~(P)), enable(P).
-%  \+ ~(P) =         test impossiblity is unknown            retract( ~(P))
+%   ~ ~(P) =         test possible (via not impossible)      retract(~P), enable(P).
+%  \+ ~(P) =         test impossiblity is unknown            retract(~P).
 %   ~\+(P) =        same as P                               same as P
-%     \+(P) =        test naf(P)                             retract(P)
+%    \+(P) =        test naf(P)                             retract(P)
 %
 % Dec 13, 2035
 % Douglas Miles
@@ -55,7 +55,7 @@ tCanary(iTweety).
 
 
 :- dmsg("birds fly by default.").
-mpred_default(( tBird(X) ==> tFly(X))).
+mpred_default(( tBird(X) => tFly(X))).
 
 :- dmsg("make sure chilly can fly").
 :- mpred_test((isa(I,tFly),I=iChilly)).
@@ -66,7 +66,7 @@ mpred_default(( tBird(X) ==> tFly(X))).
 
 
 :- dmsg("penguins do not tFly.").
-tPenguin(X) ==>  ~tFly(X). 
+tPenguin(X) =>  ~tFly(X). 
 
 :- dmsg("confirm chilly now cant fly").
 :- mpred_test((\+ tFly(iChilly))).
@@ -102,7 +102,10 @@ tFly(iChilly).
 */
 
 :- dmsg("chilly is no longer a penguin").
-:- trace.
+:- debug(mpred).
+
+:- mpred_trace_exec.
+
 \+ tPenguin(iChilly).
 
 :- mpred_test(( \+ tPenguin(iChilly))).

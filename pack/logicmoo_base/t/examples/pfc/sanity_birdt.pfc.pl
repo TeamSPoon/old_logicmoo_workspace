@@ -8,13 +8,13 @@
 %
 %                      ANTECEEDANT                                   CONSEQUENT
 %
-%         P =         test nesc true                         assert(P),retract(~P) , enable(P).
-%       ~P =         test nesc false                        assert(~P),retract(P), disable(P)
+%        P =         test nesc true                         assert(P),retract(~P) , enable(P).
+%       ~P =         test nesc false                        assert(~P),retract(P), disable(P).
 %
-%   ~~(P) =         test possible (via not impossible)      retract( ~(P)), enable(P).
-%  \+ ~(P) =         test impossiblity is unknown            retract( ~(P))
+%   ~ ~(P) =         test possible (via not impossible)      retract(~P), enable(P).
+%  \+ ~(P) =         test impossiblity is unknown            retract(~P).
 %   ~\+(P) =        same as P                               same as P
-%     \+(P) =        test naf(P)                             retract(P)
+%    \+(P) =        test naf(P)                             retract(P)
 %
 % Dec 13, 2035
 % Douglas Miles

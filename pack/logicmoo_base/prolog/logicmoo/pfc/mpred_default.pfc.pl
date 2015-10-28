@@ -56,12 +56,15 @@ meta_argtypes(mpred_default(ftAssertable)).
 (mpred_default(P==>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))  ==> ((P, ~R/Test) ==> Q).
 (mpred_default(P==>Q)/nonvar(Q)) ==> (P ==> mpred_default(Q)).
 (mpred_default(P)/mpred_literal_nv(P))  ==>  ( \+ ~(P) ==> P).
+
 (mpred_default((Q <- P))/mpred_literal(Q)) ==> (Q <-(P, \+ ~(Q))).
+%(mpred_default(P=>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))  ==> ((P, ~R/Test) => Q).
+%(mpred_default(P=>Q)/nonvar(Q)) ==> (P => mpred_default(Q)).
 
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 
-:- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'birdt.pfc')).
+% :- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'sanity_birdt.pfc')).
 
 :- endif.
 

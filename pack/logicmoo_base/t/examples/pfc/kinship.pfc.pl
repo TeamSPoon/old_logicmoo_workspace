@@ -1,5 +1,6 @@
 % -*-Prolog-*-
 
+:- use_module(library(logicmoo/logicmoo_user)).
 
 :- shared_multifile otherGender/2.
 

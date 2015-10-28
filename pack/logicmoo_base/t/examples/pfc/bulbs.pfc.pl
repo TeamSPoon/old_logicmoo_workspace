@@ -34,7 +34,7 @@ lit(X) ==> notequal(voltage(t1(X)),voltage(t2(X))).
 
 
 % a pretty basic conflict.
-( ~P), P ==> conflict(P).
+ ~P, P ==> conflict(P).
 
 % this doesn't work anyomore. twf.
 % voltage(T,V) ==> (( ~voltage(T,V2)) <- {\+V=:=V2}).

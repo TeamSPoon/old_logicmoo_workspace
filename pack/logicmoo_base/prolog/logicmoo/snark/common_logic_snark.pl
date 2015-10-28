@@ -179,10 +179,10 @@ kif_hook(0<=>0).
 kif_hook((0 & 0)).
 kif_hook((0 v 0)).
 % kif_hook(0 <- 0).
-kif_hook(~(0)).
+kif_hook(neg(0)).
 kif_hook(nesc(0)).
 kif_hook(poss(0)).
-kif_hook(~(0)).
+% kif_hook(~(0)).
 kif_hook(not(0)).
 kif_hook(all(+,0)).
 kif_hook(forall(+,0)).
@@ -811,7 +811,7 @@ kif_ask(Goal0,ProofOut):- logical_pos(_KB,Goal0,Goal),
 
 kif_add(InS):- atom(InS),must_det_l((kif_read(string(InS),Wff,Vs),b_implode_varnames0(Vs),local_sterm_to_pterm(Wff,Wff0),kif_add(Wff0))),!.
 % kif_add(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),why_to_id(tell,Wff,Why),kif_add(Why,Wff))),!.
-kif_add(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),ain(clif(Wff)))),!.
+kif_add(WffIn):- trace,must_det_l((numbervars_with_names(WffIn,Wff),ain(clif(Wff)))),!.
 
 
 local_sterm_to_pterm(Wff,WffO):- sexpr_sterm_to_pterm(Wff,WffO),!.
