@@ -174,22 +174,24 @@
 
 :- include('../mpred/mpred_header.pi').
 
-kif_hook(0=>0).
-kif_hook(0<=>0).
-kif_hook((0 & 0)).
-kif_hook((0 v 0)).
-% kif_hook(0 <- 0).
-kif_hook(neg(0)).
-kif_hook(nesc(0)).
-kif_hook(poss(0)).
-% kif_hook(~(0)).
-kif_hook(not(0)).
-kif_hook(all(+,0)).
-kif_hook(forall(+,0)).
-kif_hook(exists(+,0)).
-kif_hook(if(0,0)).
-kif_hook(iff(0,0)).
+
 kif_hook(C):- non_compound(C),!,fail.
+kif_hook(_=>_).
+kif_hook(_<=>_).
+kif_hook((_ & _)).
+kif_hook((_ v _)).
+kif_hook(nesc(_)).
+kif_hook(poss(_)).
+kif_hook(all(_,_)).
+kif_hook(forall(_,_)).
+kif_hook(exists(_,_)).
+kif_hook(if(_,_)).
+kif_hook(iff(_,_)).
+% uncommented theis next line break sanity_tbird
+kif_hook(not(H)):- !,nonvar(H),!,kif_hook(H).
+kif_hook( \+ (H)):- !,nonvar(H),!,kif_hook(H).
+kif_hook(~(H)):- !,nonvar(H),!,kif_hook(H).
+kif_hook(H <- _):- !,nonvar(H),!,kif_hook(H).
 kif_hook(H:- _):- !,nonvar(H),!,kif_hook(H).
 
   

@@ -490,8 +490,7 @@ is_gaf(Gaf):-when(nonvar(Gaf), \+ (is_kif_rule(Gaf))).
 
 :- was_export(is_kif_rule/1).
 is_kif_rule(Var):- is_ftVar(Var),!,fail.
-% is_kif_rule(_:- _):- !.
-is_kif_rule(R):- get_functor(R,F,A),functor(P,F,A),kif_hook(P),!.
+is_kif_rule(R):- kif_hook(R),!.
 
 
 :- was_export(term_slots/2).
