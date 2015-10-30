@@ -1553,11 +1553,15 @@ ain_fast('$si$':'$was_imported_kb_content$'(_, _)<-THIS):-is_ftNonvar(THIS),!.
 ain_fast(P0):-
   must(get_source_ref(S)), ain_fast(P0,S).
 
-ain_fast(nesc(P),S) :- is_ftNonvar(P),!,ain_fast(P,S).
 
+ain_fast(nesc(P),S) :- is_ftNonvar(P),!,ain_fast(P,S).
 ain_fast(P0,S):- gripe_time(0.6,ain_fast_timed(P0,S)).
 
-ain_fast_timed(P0,S):-
+ain_fast_timed(P0,S):- '$module'(user,user),'$set_source_module'(user,user),!,
+  '$module'(WM,baseKB),'$set_source_module'(WS,baseKB),
+   call_cleanup((ain_fast_timed(P0,S)),(('$module'(_,WM),'$set_source_module'(_,WS)))).
+
+ain_fast_timed(P0,S):- 
   must(to_addable_form_wte(assert,P0,P)),
       (is_list(P)
         ->must_maplist(ain_fast_sp(S),P);

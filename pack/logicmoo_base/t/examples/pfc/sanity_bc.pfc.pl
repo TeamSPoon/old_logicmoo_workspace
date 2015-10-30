@@ -4,7 +4,7 @@
 % Dec 13, 2035
 % Douglas Miles
 
-:- module(sanity_bc,[]).
+% :- module(sanity_bc,[]).
 
 :- use_module(library(logicmoo/logicmoo_user)).
 

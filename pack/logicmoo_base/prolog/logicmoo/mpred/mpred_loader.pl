@@ -16,7 +16,7 @@
             assert_until_eof/1,
             decl_user_abox/1,
             import_shared_pred/3,
-            import_to_user0/1,
+            import_to_user0/3,
             set_user_abox/1,
             get_user_abox/1,
             get_user_tbox/1,
@@ -923,15 +923,16 @@ import_shared_pred(M,BaseKB,P):-
   must( \+ predicate_property(BaseKB:P,exported)),
   import_to_user(M:P).
 
-import_to_user(P):-must(import_to_user0(P)).
-import_to_user0(M:F/A):-!,functor(P,F,A),
+import_to_user(P):- '$module'(MM,MM),'$set_source_module'(SM,SM),must(import_to_user0(MM,SM,P)).
+import_to_user0(user,user,M:FA):- '$module'(_,M),'$set_source_module'(_,M),!,import_to_user(M:FA).
+import_to_user0(_MM,_SM,M:F/A):-!,functor(P,F,A),
   U=logicmoo_user_pants,
   user:catch(mpred_op_prolog(pain,((U:P:- user:loop_check_nr(M:P)))),E,dmsg(import_shared_pred(U:F/A:-M:F/A)=E)),
   U:export(U:F/A),
   catch(user:import(U:F/A),_,true),
   user:import(U:F/A).
-import_to_user0(M:P):-!,functor(P,F,A),import_to_user(M:F/A).
-import_to_user0(P):-t_l:user_abox(M),import_to_user(M:P).
+import_to_user0(MM,SM,M:P):-!,functor(P,F,A),import_to_user0(MM,SM,M:F/A).
+import_to_user0(MM,SM,P):-t_l:user_abox(M),import_to_user0(MM,SM,M:P).
 
 ensure_imports(baseKB):-!.
 ensure_imports(M):-ensure_imports_tbox(M,baseKB).
@@ -999,7 +1000,7 @@ file_begin(W):-
    context_module_of_file(M),
    (t_l:user_abox(AM)->true;AM=SM),
    best_module([AM,SM,CM,FM,M],ABox),
-   dmsg(best_module([AM,SM,CM,FM,M],ABox)),
+   % dmsg(best_module([AM,SM,CM,FM,M],ABox)),
    set_user_abox(ABox),
    op_lang(W),   
    decache_file_type(ISource),

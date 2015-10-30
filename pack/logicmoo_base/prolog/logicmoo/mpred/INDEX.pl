@@ -327,7 +327,7 @@ index((assert_kif_dolce), 1, mpred_loader, mpred_loader).
 index((assert_until_eof), 1, mpred_loader, mpred_loader).
 index((decl_user_abox), 1, mpred_loader, mpred_loader).
 index((import_shared_pred), 3, mpred_loader, mpred_loader).
-index((import_to_user0), 1, mpred_loader, mpred_loader).
+index((import_to_user0), 3, mpred_loader, mpred_loader).
 index((set_user_abox), 1, mpred_loader, mpred_loader).
 index((get_user_abox), 1, mpred_loader, mpred_loader).
 index((get_user_tbox), 1, mpred_loader, mpred_loader).
