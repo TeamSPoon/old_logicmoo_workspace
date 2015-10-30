@@ -8,7 +8,7 @@
 
 :- ensure_loaded(library(logicmoo/logicmoo_utils)).
 :- thread_local(t_l:user_abox/1).
-:- (t_l:user_abox(M)->true;(context_module_of_file(M),asserta(t_l:user_abox(M)))),!,writeln(user_kb=M).
+:- (t_l:user_abox(M)->true;(context_module_of_file(M),asserta(t_l:user_abox(M)))),!,writeln(user_abox=M).
 
 :- if(gethostname(ubuntu)).
 :- ensure_loaded(library(logicmoo/logicmoo_user)).

@@ -20,7 +20,7 @@ lh:with_ukb_snark(KB,G):-w_tl(t_l:user_abox(KB),baseKB:G).
 :- add_import_module(baseKB,system,end).
 :- lh:with_ukb_snark(baseKB,baseKB:use_module(baseKB:logicmoo_base)).
 % :- my_loader(ML),system:use_module(ML:logicmoo_base).
-%:- (t_l:user_abox(M)->true;(source_context_module(M))),set_user_abox(M),dmsg(user_kb=M).
+%:- (t_l:user_abox(M)->true;(source_context_module(M))),set_user_abox(M),dmsg(user_abox=M).
 %:- ensure_mpred_system.
 
 /*

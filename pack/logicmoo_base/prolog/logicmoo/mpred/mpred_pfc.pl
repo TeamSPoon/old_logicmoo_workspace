@@ -25,6 +25,7 @@
             assumptions/2,
             assumptions1/2,
             {}/1,
+            neg_in_code/1,
             attvar_op/2,
             with_umt/1,
             baseable/2,
@@ -934,12 +935,19 @@ check_context_module:- must((source_context_module(M),M\==mpred_pfc,M\==mpred_lo
 check_real_context_module:- must((context_module(M),M\==mpred_pfc,M\==mpred_loader)).
 
 
-:- shared_multifile(('==>')/1).
 :- shared_multifile(basePFC:bt/3).
 :- shared_multifile(basePFC:nt/4).
 :- shared_multifile(basePFC:pk/4).
 :- shared_multifile(basePFC:pt/3).
 :- shared_multifile(basePFC:spft/5).
+:- shared_multifile(basePFC:tms/1).
+:- shared_multifile(basePFC:hs/1).
+:- shared_multifile(basePFC:qu/3).
+:- shared_multifile(basePFC:sm/1).
+:- shared_multifile(basePFC:sm/1).
+:- shared_multifile(mpred_do_and_undo_method/2).
+/*
+:- shared_multifile(('==>')/1).
 :- shared_multifile(('::::')/2).
 :- shared_multifile(('<-')/2).
 :- shared_multifile(('<==>')/2).
@@ -947,13 +955,8 @@ check_real_context_module:- must((context_module(M),M\==mpred_pfc,M\==mpred_load
 :- shared_multifile(('~')/1).
 :- shared_multifile(('nesc')/1).
 :- shared_multifile((('~'))/1).
+*/
 :- shared_multifile((mpred_action)/1).
-:- shared_multifile(basePFC:tms/1).
-:- shared_multifile(basePFC:hs/1).
-:- shared_multifile(basePFC:qu/3).
-:- shared_multifile(basePFC:sm/1).
-:- shared_multifile(basePFC:sm/1).
-:- shared_multifile(mpred_do_and_undo_method/2).
 :- foreach(arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttPredType,
      prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),P),
    ((shared_multifile(baseKB:P/1)))).
@@ -1376,8 +1379,8 @@ show_if_debug(A):- mpred_is_tracing(A) -> show_call(mpred_is_tracing,A) ; A.
 assert_u(M:X):- !,functor(X,F,A),assert_u(M,X,F,A).
 assert_u(X):- functor(X,F,A),assert_u(abox,X,F,A).
 
-assert_u(M,X,F,_):-mreq(singleValuedInArg(F,SV)),!,must(update_single_valued_arg(X,SV)),!.
-assert_u(M,X,F,A):-mreq(prologSingleValued(F)),!,must(update_single_valued_arg(X,A)),!.
+assert_u(_M,X,F,_):-mreq(singleValuedInArg(F,SV)),!,must(update_single_valued_arg(X,SV)),!.
+assert_u(_M,X,F,A):-mreq(prologSingleValued(F)),!,must(update_single_valued_arg(X,A)),!.
 % assert_u(M,X,F,A):-must(isa(F,prologAssertAOrdered) -> asserta_u(M,X) ; assertz_u(M,X)).
 % assert_u(M,X,F,A):-must(isa(F,prologOrdered)        -> assertz_u(M,X) ; asserta_u(M,X)).
 assert_u(M,X,_,_):- assertz_mu(M,X).
@@ -1388,8 +1391,8 @@ check_never_assert(X):- ignore(( copy_term_and_varnames(X,Y),req(never_assert_u(
 check_never_retract(X):- ignore(( copy_term_and_varnames(X,Y),req(never_retract_u(Y,Why)),X=@=Y,snumbervars(X),trace_or_throw(never_retract_u(X,Why)))).
 
 
-assertz_u(M:X):-!,functor(X,F,A),assertz_mu(M,X).
-assertz_u(X):- functor(X,F,A),assertz_mu(abox,X).
+assertz_u(M:X):-!,assertz_mu(M,X).
+assertz_u(X):- assertz_mu(abox,X).
 
 assertz_mu(M,X):- correct_module(M,X,T),T\==M,!,assertz_mu(T,X).
 assertz_mu(M,X):- check_never_assert(M:X), clause_asserted(M:X),!.
@@ -1653,6 +1656,7 @@ mpred_post1_sp_0(S,P) :-
 
 mpred_post1_sp_1(S,P):- P\==true,
   mpred_unique_u(P),
+  must(import_to_user(P)),
   must(assert_u(P)),!,
   must(mpred_trace_add(P,S)),
   !,
@@ -1884,14 +1888,15 @@ ain_trigger_0(_Trig,basePFC:nt(umt,Trigger,Test,Body),Support) :- !,
              mpred_eval_lhs(Body,
              ((\+Trigger),basePFC:nt(umt,TriggerCopy,Test,Body))).
 
-
-ain_trigger_0(_Trig,basePFC:bt(umt,Trigger,Body),Support) :- !,
+ain_trigger_0(_Trig,basePFC:bt(umt,Trigger,Body),Support) :- 
+ must((
   mpred_trace_msg('Adding For Later',basePFC:bt(umt,Trigger,Body)),
    must(ain_t(basePFC:bt(umt,Trigger,Body),Support)),
       attvar_op(assertz_if_new,((Trigger:-mpred_bc_only(Trigger)))),!,
+      import_to_user(Trigger),
       must(mpred_mark_as(Support,p,Trigger,pfcBcTrigger)),
      % WAS mpred_bt_pt_combine(Trigger,Body).
-   mpred_bt_pt_combine(Trigger,Body,Support).
+   mpred_bt_pt_combine(Trigger,Body,Support))),!.
 
 ain_trigger_0(Trig,X,Support) :- mpred_warn("Unrecognized trigger to aintrigger: ~p for ~p",[ain_trigger(X,Support),Trig]).
 
@@ -1968,6 +1973,7 @@ ain_db_type(X) :-
 
 ain_db_type(fact,X) :-
   mpred_unique_u(X),
+  import_to_user(X),
   must(assert_u(X)),!.
 ain_db_type(rule,X) :-
   mpred_unique_i(X),
@@ -2392,6 +2398,7 @@ mpred_define_bc_rule(Head,Body,Parent_rule) :-
 mpred_define_bc_rule(Head,Body,Parent_rule) :- 
   copy_term_and_varnames(Parent_rule,Parent_ruleCopy),
   attvar_op(assert_if_new,(Head:-mpred_bc_only(Head))),
+  must(import_to_user(Head)),
   build_rhs(Head,Head,Rhs),
   foreachl_do(mpred_nf(Body,Lhs),
        (build_trigger(Parent_ruleCopy,Lhs,rhs(Rhs),Trigger),
@@ -2530,14 +2537,13 @@ not_cond(_Why,X):- \+ X.
 
 '{}'(G):-req(G).
 
-:- meta_predicate neg_in_code(0).
+:- meta_predicate neg_in_code(*).
 :- export(neg_in_code/1).
+neg_in_code(G):-var(G),!,fail.
+neg_in_code(req(G)):- !,~G.
 neg_in_code(~(G)):- nonvar(G),!, \+ ~G.
-neg_in_code(P):-   neg_may_naf(P), \+ P.
-neg_in_code(Q):-  is_ftNonvar(Q), prologSingleValued(Q),if_missing_mask(Q,R,Test),req(R),Test.
-
-~(G):- cwc, neg_in_code(G).
-~(tCol('$VAR')).
+neg_in_code(G):-   neg_may_naf(G), \+ G.
+neg_in_code(G):-  is_ftNonvar(G), prologSingleValued(G),must((if_missing_mask(G,R,Test),nonvar(R))),req(R),Test.
 
 
 :- meta_predicate neg_may_naf(0).
@@ -2571,7 +2577,7 @@ mpred_call_0((C1,C2)):-!,mpred_call_0(C1),mpred_call_0(C2).
 mpred_call_0(call(X)):- !, mpred_call_0(X).
 mpred_call_0(\+(X)):- !, \+ mpred_call_0(X).
 mpred_call_0(call_u(X)):- !, mpred_call_0(X).
-mpred_call_0(G):- strip_module(G,M,P),functor(G,F,A),mpred_call_1(M,P,F).
+mpred_call_0(G):- strip_module(G,M,P),must(nonvar(P)),functor(P,F,_),mpred_call_1(M,P,F).
 
 
 mpred_call_1(_,G,_):- is_side_effect_disabled,!,mpred_call_with_no_triggers(G).
@@ -2581,7 +2587,7 @@ mpred_call_1(M,G,F):-  (ground(G); \+ current_predicate(_,M:G) ; \+ (predicate_p
                  \+ current_predicate(F,M:G),\+ current_predicate(_,_:G),
                  doall(show_call(predicate_property(_UM:G,_PP))),
                  debug(mpred),
-                 must(show_call(kb_dynamic(M:G))),!,fail.
+                 must(show_call(kb_dynamic(M:G))),import_to_user(M:G),!,fail.
 mpred_call_1(_,G,_):- mpred_call_with_no_triggers(G).
 
 
@@ -2818,7 +2824,7 @@ mpred_mark_as(Sup,Pos,~(P),Type):- pos_2_neg(Pos,Neg),!,mpred_mark_as(Sup,Neg,P,
 mpred_mark_as(Sup,Pos,-(P),Type):- pos_2_neg(Pos,Neg),!,mpred_mark_as(Sup,Neg,P,Type).
 mpred_mark_as(Sup,PosNeg,[P|PL],Type):- is_list([P|PL]), !,must_maplist(mpred_mark_as_ml(Sup,PosNeg,Type),[P|PL]).
 mpred_mark_as(Sup,PosNeg,( P / CC ),Type):- !, mpred_mark_as(Sup,PosNeg,P,Type),mpred_mark_as(Sup,PosNeg,( CC ),pfcCallCode).
-mpred_mark_as(Sup,PosNeg,'{}'(  CC ), Type):- mpred_mark_as(Sup,PosNeg,( CC ),pfcCallCode).
+mpred_mark_as(Sup,PosNeg,'{}'(  CC ), _Type):- mpred_mark_as(Sup,PosNeg,( CC ),pfcCallCode).
 mpred_mark_as(Sup,PosNeg,( A , B), Type):- !, mpred_mark_as(Sup,PosNeg,A, Type),mpred_mark_as(Sup,PosNeg,B, Type).
 mpred_mark_as(Sup,PosNeg,( A ; B), Type):- !, mpred_mark_as(Sup,PosNeg,A, Type),mpred_mark_as(Sup,PosNeg,B, Type).
 mpred_mark_as(Sup,PosNeg,( A ==> B), Type):- !, mpred_mark_as(Sup,PosNeg,A, Type),mpred_mark_as(Sup,PosNeg,B, pfcRHS).
@@ -3693,7 +3699,7 @@ cnstrn(X):-term_variables(X,Vs),maplist(cnstrn0(X),Vs),!.
 cnstrn(V,X):-cnstrn0(X,V).
 cnstrn0(X,V):-when(is_ftNonvar(V),X).
 
-rescan_pfc:-forall(clause(lmconf:mpred_hook_rescan_files,Body),show_entry(Why,Body)).
+rescan_pfc:-forall(clause(lmconf:mpred_hook_rescan_files,Body),show_entry(rescan_pfc,Body)).
 
 mpred_facts_and_universe(P):- (is_ftVar(P)->pred_head_all(P);true),req(P). % (meta_wrapper_rule(P)->req(P) ; req(P)).
 
@@ -3712,7 +3718,7 @@ add_reprop(Trig ,Trigger):-
     attvar_op(assertz_if_new,(basePFC:qu(umt,repropagate(Trigger),(g,g))))).
 
 
-repropagate(P):-  check_context_module,fail.
+repropagate(_):-  check_context_module,fail.
 %repropagate(P):-  check_real_context_module,fail.
 
 repropagate(P):-  is_ftVar(P),!.

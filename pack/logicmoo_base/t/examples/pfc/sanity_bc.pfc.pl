@@ -6,9 +6,15 @@
 
 :- module(sanity_bc,[]).
 
-:- baseKB:use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo/logicmoo_user)).
 
 :- begin_pfc.
+
+:- dynamic(bc_q/1).
+
+:- debug(mpred).
+:- mpred_trace_exec.
+
 
 bc_q(N) <- bc_p(N).
 

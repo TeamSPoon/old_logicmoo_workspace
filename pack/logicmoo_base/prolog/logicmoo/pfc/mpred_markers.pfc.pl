@@ -4,6 +4,7 @@
 % catching of misinterpreations
 (mpred_mark(pfcPosTrigger,_,F,A)/(fa_to_p(F,A,P), predicate_property(P,static))) ==> {trace_or_throw(warn(pfcPosTrigger,P,static))}.
 (mpred_mark(pfcNegTrigger,_,F,A)/(fa_to_p(F,A,P), predicate_property(P,static))) ==> {dmsg(warn(pfcNegTrigger,P,static))}.
+(mpred_mark(pfcBcTrigger,_,F,A)/(fa_to_p(F,A,P), predicate_property(P,static))) ==> {dmsg(warn(pfcNegTrigger,P,static))}.
 
 
 %(mpred_mark(pfcPosTrigger,_,F,A)/(fa_to_p(F,A,P), \+ predicate_property(P,_))) ==> {kb_dynamic(tbox:F/A)}.
@@ -11,9 +12,16 @@
 
 
 mpred_mark(S1, S2, F, A)/ground(S1:S2)==>arity(F,A).
-mpred_mark(pfcPosTrigger, S1, F, A)/ground(S1)==>hybrid_support(F,A).
-mpred_mark(pfcNegTrigger, S1, F, A)/ground(S1)==>hybrid_support(F,A).
-mpred_mark(pfcRHSR, S1, F, A)/ground(S1)==>hybrid_support(F,A).
+mpred_mark(pfcPosTrigger, S1, F, A)/ground(S1)==>marker_supported(F,A).
+mpred_mark(pfcNegTrigger, S1, F, A)/ground(S1)==>marker_supported(F,A).
+mpred_mark(pfcBcTrigger, S1, F, A)/ground(S1)==>marker_supported(F,A).
+mpred_mark(pfcRHSR, S1, F, A)/ground(S1)==>marker_supported(F,A).
+mpred_mark(pfcCreates, S1, F, A)/ground(S1)==>marker_supported(F,A).
+
+
+marker_supported(F,A)==>hybrid_support(F,A).
+marker_supported(F,A)==>{t_l:user_abox(M)->import_to_user(M:F/A)}.
+
 
 %mpred_mark(pfcPosTrigger, _, F, A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A),   afterAdding(F,lambda(P,mpred_enqueue(P,(m,m)))).
 %mpred_mark(pfcNegTrigger, _, F, A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A), afterRemoving(F,lambda(P,mpred_enqueue(~P,(m,m)))).

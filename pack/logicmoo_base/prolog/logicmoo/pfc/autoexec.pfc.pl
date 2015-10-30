@@ -112,6 +112,13 @@
 
 :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../snark/common_logic_clif.pfc')).
 
+:-multifile(lmconf:locked_baseKB/0).
+:-dynamic(lmconf:locked_baseKB/0).
+:- asserta((lmconf:locked_baseKB)).
+
+%:- retractall(t_l:user_abox(_)).
+%:- asserta(t_l:user_abox(logicmoo_user_pants)).
+
 % :- ensure_mpred_file_loaded('../pfc/relationAllExists.pfc').
 
 % :- mpred_test(ensure_loaded('../pfc/pttpFWC.pfc')).

@@ -802,13 +802,13 @@ kif_ask((P v Q)):- kif_ask_sent(((P v Q))).
 kif_ask((P & Q)):- kif_ask_sent((P & Q)).
 kif_ask(Goal0):-  logical_pos(_KB,Goal0,Goal),
     no_repeats(lmconf:(
-	add_args(Goal0,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],_ProofOut1,Goal1,_),!,
+	if_defined(add_args(Goal0,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],_ProofOut1,Goal1,_)),!,
         search(Goal1,60,0,1,3,DepthIn,DepthOut))).
 
 :- was_export(kif_ask/2).
 kif_ask(Goal0,ProofOut):- logical_pos(_KB,Goal0,Goal),
     no_repeats(lmconf:(
-	add_args(Goal0,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],ProofOut1,Goal1,_),!,
+	if_defined(add_args(Goal0,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],ProofOut1,Goal1,_)),!,
         search(Goal1,60,0,1,3,DepthIn,DepthOut),
         contract_output_proof(ProofOut1,ProofOut))).
 

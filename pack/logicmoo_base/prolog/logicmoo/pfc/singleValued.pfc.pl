@@ -20,6 +20,7 @@ mpred_default(((prologSingleValued(Pred),arity(Pred,Arity))==> singleValuedInArg
 
 ((singleValuedInArg(Pred,_))==>(prologSingleValued(Pred))).
 
+
 singleValuedInArg(singleValuedInArg,2).
 
 

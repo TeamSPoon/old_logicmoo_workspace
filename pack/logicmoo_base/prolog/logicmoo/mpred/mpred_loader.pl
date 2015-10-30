@@ -16,11 +16,15 @@
             assert_until_eof/1,
             decl_user_abox/1,
             import_shared_pred/3,
+            import_to_user0/1,
             set_user_abox/1,
             get_user_abox/1,
             get_user_tbox/1,
             get_user_sbox/1,
             is_box_module/2,
+            import_to_user/1,
+            best_module/2,
+            not_boot_module/1,
             maybe_add_import_module/3,
             to_sbox/2,
             to_tbox/2,
@@ -334,8 +338,10 @@ make_declared_now(M:F/A):-
    debug(make_declared,'~p',make_declared_now(M:F/A)),
    sanity( \+ ((M:F/A) = (qrTBox:p/1))),
    check_never_assert(declared(M:F/A)),
+   import_to_user(M:F/A),
    functor(P,F,A),(predicate_property(P,dynamic)->true;M:dynamic(M:F/A)),
    M:multifile(M:F/A),M:module_transparent(M:F/A),!.
+   
    % M:export(M:F/A)
 
 make_reachable(_,Test):- \+ \+ ((Test= (_:F/_), is_ftVar(F))),!.
@@ -430,8 +436,10 @@ xfile_module_term_expansion_pass_3(How,INFO,_F,_M,AA,O,OO):-
 :- thread_local((t_l:use_side_effect_buffer , t_l:verify_side_effect_buffer)).
 
 mpred_expander_now(I,O):- 
-  must(if_defined(current_source_location(FL),source_location(FL,_))),
-   w_tl(t_l:current_why_source(FL),mpred_expander_now_one(F,M,I,OO)).
+ '$set_source_module'(M,M),
+  must(if_defined(current_source_location(F),source_location(F,_))),
+   w_tl(t_l:current_why_source(F), 
+     mpred_expander_now_one(F,M,I,O)).
 
 show_bool(G):-ignore(show_call(why,G)).
 
@@ -839,6 +847,7 @@ ensure_tbox_module(M):-  (M==baseKB->trace_or_throw(bad_ensure_tbox_module(M));t
             multifile(M:('~')/1),
             multifile(M:('nesc')/1),
             
+            
             dynamic(M:('<-')/2),
             dynamic(M:('::::')/2),
             dynamic(M:('<==>'/2)),                   
@@ -846,7 +855,8 @@ ensure_tbox_module(M):-  (M==baseKB->trace_or_throw(bad_ensure_tbox_module(M));t
             dynamic(M:('==>')/1),
             dynamic(M:('~')/1),
             dynamic(M:('nesc')/1),
-            
+
+            /*
             export(M:('<-')/2),
             export(M:('::::')/2),
             export(M:('<==>'/2)),                   
@@ -854,6 +864,7 @@ ensure_tbox_module(M):-  (M==baseKB->trace_or_throw(bad_ensure_tbox_module(M));t
             export(M:('==>')/1),
             export(M:('~')/1),
             export(M:('nesc')/1),
+            */
 
             op(1199,fx,M:('==>')), % assert
             op(1199,fx,M:('?->')), % ask
@@ -906,8 +917,21 @@ is_box_module(user,abox).
 
 import_shared_pred(baseKB,_,_):-!.
 import_shared_pred(M,BaseKB,P):- 
-  catch(assertz_if_new((M:P:-BaseKB:P)),E,(functor(P,F,A),dmsg(import_shared_pred(M:F/A:-BaseKB:F/A)=E))),
-  must( \+ predicate_property(BaseKB:P,exported)).
+  functor(P,F,A),
+  %dynamic(BaseKB:F/A),
+  user:catch(mpred_op_prolog(pain,((M:P:- user:BaseKB:P))),E,dmsg(import_shared_pred(M:F/A:-BaseKB:F/A)=E)),
+  must( \+ predicate_property(BaseKB:P,exported)),
+  import_to_user(M:P).
+
+import_to_user(P):-must(import_to_user0(P)).
+import_to_user0(M:F/A):-!,functor(P,F,A),
+  U=logicmoo_user_pants,
+  user:catch(mpred_op_prolog(pain,((U:P:- user:loop_check_nr(M:P)))),E,dmsg(import_shared_pred(U:F/A:-M:F/A)=E)),
+  U:export(U:F/A),
+  catch(user:import(U:F/A),_,true),
+  user:import(U:F/A).
+import_to_user0(M:P):-!,functor(P,F,A),import_to_user(M:F/A).
+import_to_user0(P):-t_l:user_abox(M),import_to_user(M:P).
 
 ensure_imports(baseKB):-!.
 ensure_imports(M):-ensure_imports_tbox(M,baseKB).
@@ -915,20 +939,24 @@ ensure_imports(M):-ensure_imports_tbox(M,baseKB).
 :-multifile(lmcache:is_ensured_imports_tbox/2).
 :-dynamic(lmcache:is_ensured_imports_tbox/2).
 
+skip_user(M):-
+  system:add_import_module(M,system,end),  
+  ignore(system:delete_import_module(M,user)).
+  %ignore(system:delete_import_module(user,system)).
+  %asserta((M:import(P):-system:import(P))),
+  
+
 ensure_imports_tbox(M,BaseKB):-
   lmcache:is_ensured_imports_tbox(M,BaseKB),!.
 ensure_imports_tbox(M,BaseKB):-
   asserta(lmcache:is_ensured_imports_tbox(M,BaseKB)),
   mpred_loader:
   must_det((
-   maybe_add_import_module(BaseKB,mpred_loader,end),
-   maybe_add_import_module(BaseKB,system,end),
+   %maybe_add_import_module(BaseKB,mpred_loader,end),
+   %maybe_add_import_module(M,mpred_loader,end),
    forall((system:current_module(IM), \+ mpred_loader:is_box_module(IM,_)),maybe_add_import_module(M,IM,end)),
-   forall((system:current_module(IM),\+ mpred_loader:is_box_module(IM,_)),maybe_add_import_module(BaseKB,IM,end)),   
-  ignore(system:delete_import_module(user,M)),
-  ignore(system:delete_import_module(M,user)),
-  asserta((M:import(P):-system:import(P))),
-  system:add_import_module(M,system,end),  
+   forall((system:current_module(IM),\+ mpred_loader:is_box_module(IM,_)),maybe_add_import_module(BaseKB,IM,end)),
+   % mpred_loader:skip_user(BaseKB),
    %ignore(system:delete_import_module(user,BaseKB)),
    %ignore(system:delete_import_module(BaseKB,user)),
    ignore(system:delete_import_module(M,BaseKB)),
@@ -937,28 +965,50 @@ ensure_imports_tbox(M,BaseKB):-
    % maybe_add_import_module(user,BaseKB,end),
    % maybe_add_import_module(BaseKB,system,end),
   %= maybe_add_import_module(M,user,end),
-   % maybe_add_import_module(M,BaseKB,end),
-   ignore(system:delete_import_module(M,user)),
-   system:add_import_module(user,M,end),
-   ignore(system:delete_import_module(user,system)), % gets from M now
+   %maybe_add_import_module(BaseKB,M,end),
+   %mpred_loader:skip_user(M),
+   %=ignore(system:delete_import_module(M,user)),
+   %=system:add_import_module(user,M,end),
+   %=ignore(system:delete_import_module(user,system)), % gets from M now
    !)).
 
+:-multifile(lmconf:locked_baseKB/0).
+:-dynamic(lmconf:locked_baseKB/0).
+
+not_boot_module(ABox):-
+  ABox\==mpred_loader,
+  ABox\==mpred_system,
+  ABox\==mpred_markers,
+  ABox\==singleValued,
+  ABox\==genls,
+  ABox\==if_missing,
+  ABox\==common_logic_clif,
+  ABox\==mpred_default.
+
+best_module(List,ABox):-member(ABox,List),ABox\==user,not_boot_module(ABox), \+ is_system_box(ABox),!.
+best_module(List,ABox):-member(ABox,List),ABox\==user,not_boot_module(ABox),!.
+best_module(_List,baseKB):-!.
 
 file_begin(W):-
-   '$module'(CM,CM),
+  '$module'(CM,CM),
+  '$set_source_module'(SM,SM),
   must_det((
    onEndOfFile(module(CM)),
-   enable_mpred_expansion,    
-   loading_source_file(ISource),
-   mpred_ops,
+   loading_source_file(ISource),   
+   make_module_name(ISource,FM),
    context_module_of_file(M),
-   set_user_abox(M),
+   (t_l:user_abox(AM)->true;AM=SM),
+   best_module([AM,SM,CM,FM,M],ABox),
+   dmsg(best_module([AM,SM,CM,FM,M],ABox)),
+   set_user_abox(ABox),
    op_lang(W),   
    decache_file_type(ISource),
    assert_until_eof(lmcache:mpred_directive_value(W,file,ISource)))),
    must_det(( loading_source_file(Source),decache_file_type(Source),asserta(lmcache:mpred_directive_value(W,file,Source)))),
-   ensure_imports(M),
-   module(M).
+   ensure_imports(ABox),
+   module(ABox),
+   enable_mpred_expansion,
+   mpred_ops.
 
 file_end(W):- must_det(( loading_source_file(ISource),decache_file_type(ISource),ignore(retract(lmcache:mpred_directive_value(W,file,ISource))))),  
   must_det(( loading_source_file(Source),decache_file_type(Source),ignore(retract(lmcache:mpred_directive_value(W,file,Source))))).
@@ -1212,6 +1262,7 @@ compile_clause(CL):- make_dynamic(CL),must((assertz_if_new(CL),clause_asserted(C
 make_dynamic(C):- compound(C),get_functor(C,F,A),must(F\=='$VAR'),
   functor(P,F,A),
   ( \+predicate_property(P,_) -> kb_dynamic(F/A) ; (predicate_property(P,dynamic)->true;dynamic_safe(P))),!,
+  import_to_user(F/A),
   must((predicate_property(P,dynamic))).
 
 % once(lmconf:mpred_is_impl_file(F);asserta(lmconf:mpred_is_impl_file(F))).

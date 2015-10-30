@@ -28,10 +28,10 @@ wrap_shared(t,2,req).
 
 system_goal_expansion_sd(T,_):-var(T),!,fail.
 system_goal_expansion_sd(M:T,M:I):-!,system_goal_expansion_sd(T,I).
-system_goal_expansion_sd(T,call(How,T)):- functor(T,F,A),wrap_shared(F,A,How),safe_wrap(T,How,I).
+system_goal_expansion_sd(T,I):- functor(T,F,A),wrap_shared(F,A,How),safe_wrap(T,How,I).
 
 safe_wrap(I,_,if_defined(I)):- current_prolog_flag(xref,true),!,numbervars(I).
-safe_wrap(I,How,call(How,T)).
+safe_wrap(I,How,call(How,I)).
 
 decl_shared((A,B)):-!,decl_shared(A),!,decl_shared(B),!.
 decl_shared([A|B]):-!,decl_shared(A),!,decl_shared(B),!.
@@ -44,5 +44,5 @@ decl_shared(M):-atom(M),!,asserta_if_new(logicmoo_util_shared_dynamic:wrap_share
 :- decl_shared(t).
 :- decl_shared(meta_argtypes/1).
 
-system:goal_expansion(I,O):- system_goal_expansion_sd(I,O).
+system:goal_expansion(I,O):- source_location(_,_), system_goal_expansion_sd(I,O).
 

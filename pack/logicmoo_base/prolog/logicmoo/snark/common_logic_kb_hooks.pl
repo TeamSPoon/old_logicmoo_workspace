@@ -442,7 +442,7 @@ kbp_t_list(PLIST):- apply(cyckb_t,PLIST).
 
 :- was_export(kbp_t_list/2). 
 % kbp_t_list(PLIST,t(PLIST)):- t_l:useDbase_t,  t(PLIST).
-kbp_t_list(PLIST,Proof):- kbp_t_list(PLIST,_,Proof).
+kbp_t_list(PLIST,Proof):- kbp_t_list(PLIST,_A,Proof).
 
 % 
 %  current_predicate(F/A),functor(P,F,A),predicate_property(P,number_of_clauses(N)),dif(B,true), clause(P, B, Ref),B\=(!,_), B=true.

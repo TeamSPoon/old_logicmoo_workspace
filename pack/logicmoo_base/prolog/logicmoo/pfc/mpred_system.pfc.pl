@@ -205,6 +205,7 @@ prologHybrid(genls/2).
      (var(M)->ignore(( current_predicate(F,M:G), \+ predicate_property(M:G,imported_from(_))));true),
      % mpred_test(rebuild_pred_into(G,G,ain,[+dynamic,+multifile,+discontiguous])),         
      (predicate_property(M:G,dynamic)->true;must(convert_to_dynamic(M,F,A))),
+     import_to_user(M:G),
      kb_dynamic(M:F/A),
      discontiguous(M:F/A),
      show_failure(hybrid_support, \+ static_predicate(F/A))}),

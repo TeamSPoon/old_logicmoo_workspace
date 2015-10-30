@@ -17,7 +17,7 @@
 */
 :- module(baseKB, []).
 
-
+:-dynamic(base_kb_pred_list/1).
 base_kb_pred_list([
 % current_op_alias/2,
 % prolog_load_file_loop_checked/2,
@@ -191,6 +191,9 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 :- meta_predicate(t(?,?,?,?,?)).
 :- meta_predicate(t(?,?,?,?)).
 :- meta_predicate(t(?,?,?)).
+
+:-asserta((~(G):- cwc, neg_in_code(G))).
+~(tCol('$VAR')).
 
 % baseKB:import(I):-system:import(baseKB:I).
 
