@@ -1889,7 +1889,7 @@ ain_trigger_0(_Trig,basePFC:bt(umt,Trigger,Body),Support) :- !,
   mpred_trace_msg('Adding For Later',basePFC:bt(umt,Trigger,Body)),
    must(ain_t(basePFC:bt(umt,Trigger,Body),Support)),
       attvar_op(assertz_if_new,((Trigger:-mpred_bc_only(Trigger)))),!,
-      must(mpred_mark_as(Support,b,Trigger,pfcBcTrigger)),
+      must(mpred_mark_as(Support,p,Trigger,pfcBcTrigger)),
      % WAS mpred_bt_pt_combine(Trigger,Body).
    mpred_bt_pt_combine(Trigger,Body,Support).
 
@@ -2803,25 +2803,27 @@ build_rhs(Sup,X,[X2]) :-
 
 mpred_compile_rhsTerm(_Sup,P,P):-is_ftVar(P),!.
 mpred_compile_rhsTerm(Sup,(P/C),((P0:-C0))) :- !,mpred_compile_rhsTerm(Sup,P,P0),build_code_test(Sup,C,C0),!.
-mpred_compile_rhsTerm(Sup,I,O):-to_addable_form_wte(mpred_compile_rhsTerm,I,O), must(\+ \+ mpred_mark_as(Sup,r,O,pfcRHSR)),!.
+mpred_compile_rhsTerm(Sup,I,O):-to_addable_form_wte(mpred_compile_rhsTerm,I,O), must(\+ \+ mpred_mark_as(Sup,p,O,pfcRHSR)),!.
 
 :- export(mpred_mark_as_ml/4).
 mpred_mark_as_ml(Sup,PosNeg,Type,P):- mpred_mark_as(Sup,PosNeg,P,Type).
 
+pos_2_neg(p,n):-!.
+pos_2_neg(n,p):-!.
+pos_2_neg(P,~(P)).
 
 mpred_mark_as(_,_,P,_):- is_ftVar(P),!.
-
-mpred_mark_as(Sup,_PosNeg,~(P),Type):-!,mpred_mark_as(Sup,~,P,Type).
+mpred_mark_as(Sup,PosNeg,\+(P),Type):-!,mpred_mark_as(Sup,PosNeg,P,Type).
+mpred_mark_as(Sup,Pos,~(P),Type):- pos_2_neg(Pos,Neg),!,mpred_mark_as(Sup,Neg,P,Type).
+mpred_mark_as(Sup,Pos,-(P),Type):- pos_2_neg(Pos,Neg),!,mpred_mark_as(Sup,Neg,P,Type).
 mpred_mark_as(Sup,PosNeg,[P|PL],Type):- is_list([P|PL]), !,must_maplist(mpred_mark_as_ml(Sup,PosNeg,Type),[P|PL]).
-mpred_mark_as(Sup,_PosNeg,\+(P),Type):-!,mpred_mark_as(Sup,~,P,Type).
-mpred_mark_as(Sup,_PosNeg,-(P),Type):-!,mpred_mark_as(Sup,~,P,Type).
-mpred_mark_as(Sup,_PosNeg,-(P),Type):-!,mpred_mark_as(Sup,~,P,Type).
-mpred_mark_as(Sup,PosNeg,( P / _ ),Type):- !, mpred_mark_as(Sup,PosNeg,P,Type).
-mpred_mark_as(_Sup,_PosNeg,'{}'(  _P ), _Type):- !. % , mpred_mark_as(Sup,PosNeg,P,Type).
-mpred_mark_as(_Sup,_PosNeg,( _ :- _ ),_Type):-!.
+mpred_mark_as(Sup,PosNeg,( P / CC ),Type):- !, mpred_mark_as(Sup,PosNeg,P,Type),mpred_mark_as(Sup,PosNeg,( CC ),pfcCallCode).
+mpred_mark_as(Sup,PosNeg,'{}'(  CC ), Type):- mpred_mark_as(Sup,PosNeg,( CC ),pfcCallCode).
 mpred_mark_as(Sup,PosNeg,( A , B), Type):- !, mpred_mark_as(Sup,PosNeg,A, Type),mpred_mark_as(Sup,PosNeg,B, Type).
 mpred_mark_as(Sup,PosNeg,( A ; B), Type):- !, mpred_mark_as(Sup,PosNeg,A, Type),mpred_mark_as(Sup,PosNeg,B, Type).
 mpred_mark_as(Sup,PosNeg,( A ==> B), Type):- !, mpred_mark_as(Sup,PosNeg,A, Type),mpred_mark_as(Sup,PosNeg,B, pfcRHS).
+%mpred_mark_as(_Sup,_PosNeg,( _ :- _ ),_Type):-!.
+mpred_mark_as(Sup,PosNeg,( P :- CC ),Type):- !, mpred_mark_as(Sup,PosNeg,P,Type),mpred_mark_as(Sup,PosNeg,( CC ),pfcCallCode).
 mpred_mark_as(Sup,PosNeg,P,Type):-get_functor(P,F,A),ignore(mpred_mark_fa_as(Sup,PosNeg,P,F,A,Type)),!.
 
 :- was_dynamic( mpred_mark/4).

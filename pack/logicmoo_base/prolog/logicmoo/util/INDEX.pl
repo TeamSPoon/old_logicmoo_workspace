@@ -813,6 +813,7 @@ index((thread_leash), 1, logicmoo_util_rtrace, logicmoo_util_rtrace).
 index((traceafter_call), 1, logicmoo_util_rtrace, logicmoo_util_rtrace).
 index((wrap_shared), 3, logicmoo_util_shared_dynamic, logicmoo_util_shared_dynamic).
 index((decl_shared), 1, logicmoo_util_shared_dynamic, logicmoo_util_shared_dynamic).
+index((system_goal_expansion_sd), 2, logicmoo_util_shared_dynamic, logicmoo_util_shared_dynamic).
 index((addSpaceBeforeSym), 2, logicmoo_util_strings, logicmoo_util_strings).
 index((all_upper_atom), 1, logicmoo_util_strings, logicmoo_util_strings).
 index((any_to_atom), 2, logicmoo_util_strings, logicmoo_util_strings).

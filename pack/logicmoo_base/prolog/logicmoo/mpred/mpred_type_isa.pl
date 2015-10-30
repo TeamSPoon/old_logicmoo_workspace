@@ -654,7 +654,7 @@ lmconf:mpred_provide_storage_clauses(H,B,(What)):-fail,isa_lmconf:mpred_provide_
 :- meta_predicate(assert_isa(+,+)).
 
 assert_isa([I],T):-nonvar(I),!,assert_isa(I,T).
-assert_isa(I,T):-assert_isa_i(I,T),must(sanity((must(is_asserted(isa(I,T)));must(isa_asserted(I,T))))).
+assert_isa(I,T):-sanity(nonvar(I)),sanity(nonvar(T)),assert_isa_i(I,T),must(sanity((must(is_asserted(isa(I,T)));must(isa_asserted(I,T))))).
 
 %assert_isa_i(I,T):- once(sanity(not(singletons_throw_else_fail(assert_isa(I,T))))),fail.
 assert_isa_i(_,ftTerm):-!.

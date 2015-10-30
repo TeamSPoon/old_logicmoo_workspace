@@ -326,14 +326,13 @@ index((assert_kif), 1, mpred_loader, mpred_loader).
 index((assert_kif_dolce), 1, mpred_loader, mpred_loader).
 index((assert_until_eof), 1, mpred_loader, mpred_loader).
 index((decl_user_abox), 1, mpred_loader, mpred_loader).
-index((import_shared_pred), 2, mpred_loader, mpred_loader).
+index((import_shared_pred), 3, mpred_loader, mpred_loader).
 index((set_user_abox), 1, mpred_loader, mpred_loader).
 index((get_user_abox), 1, mpred_loader, mpred_loader).
 index((get_user_tbox), 1, mpred_loader, mpred_loader).
 index((get_user_sbox), 1, mpred_loader, mpred_loader).
 index((is_box_module), 2, mpred_loader, mpred_loader).
 index((maybe_add_import_module), 3, mpred_loader, mpred_loader).
-index((shared_kb_pred), 1, mpred_loader, mpred_loader).
 index((to_sbox), 2, mpred_loader, mpred_loader).
 index((to_tbox), 2, mpred_loader, mpred_loader).
 index((to_abox), 2, mpred_loader, mpred_loader).

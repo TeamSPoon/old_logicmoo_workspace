@@ -13,7 +13,7 @@
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_structs.pl
 :- module(logicmoo_util_shared_dynamic,
-          [ wrap_shared/3, decl_shared/1 ]).
+          [ wrap_shared/3, decl_shared/1,system_goal_expansion_sd/2 ]).
 
 :- dynamic(wrap_shared/3).
 
@@ -26,7 +26,12 @@
 wrap_shared(isa,2,req).
 wrap_shared(t,2,req).
 
-system:goal_expansion(T,call(How,T)):-functor(T,F,A),wrap_shared(F,A,How),!. % ,dmsg(call(How,T)).
+system_goal_expansion_sd(T,_):-var(T),!,fail.
+system_goal_expansion_sd(M:T,M:I):-!,system_goal_expansion_sd(T,I).
+system_goal_expansion_sd(T,call(How,T)):- functor(T,F,A),wrap_shared(F,A,How),safe_wrap(T,How,I).
+
+safe_wrap(I,_,if_defined(I)):- current_prolog_flag(xref,true),!,numbervars(I).
+safe_wrap(I,How,call(How,T)).
 
 decl_shared((A,B)):-!,decl_shared(A),!,decl_shared(B),!.
 decl_shared([A|B]):-!,decl_shared(A),!,decl_shared(B),!.
@@ -38,3 +43,6 @@ decl_shared(M):-atom(M),!,asserta_if_new(logicmoo_util_shared_dynamic:wrap_share
 :- decl_shared(arity).
 :- decl_shared(t).
 :- decl_shared(meta_argtypes/1).
+
+system:goal_expansion(I,O):- system_goal_expansion_sd(I,O).
+

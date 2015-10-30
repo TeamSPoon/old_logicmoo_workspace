@@ -15,14 +15,13 @@
             assert_kif_dolce/1,
             assert_until_eof/1,
             decl_user_abox/1,
-            import_shared_pred/2,
+            import_shared_pred/3,
             set_user_abox/1,
             get_user_abox/1,
             get_user_tbox/1,
             get_user_sbox/1,
             is_box_module/2,
             maybe_add_import_module/3,
-            shared_kb_pred/1,
             to_sbox/2,
             to_tbox/2,
             to_abox/2,
@@ -359,7 +358,7 @@ with_ukb(KB,G):-w_tl(t_l:user_abox(KB),G).
 % lmconf:use_cyc_database.
 
 mpred_loader_module_transparent(mpred_loader:F/A):-!,mpred_loader_module_transparent(F/A).
-mpred_loader_module_transparent(M:F/A):-!, M:module_transparent(M:F/A), system:import(M:F/A).
+mpred_loader_module_transparent(M:F/A):-!, M:module_transparent(M:F/A),trace, system:import(M:F/A).
 mpred_loader_module_transparent(F/A):-!, mpred_loader:module_transparent(F/A).
 
 :- module_property(mpred_loader, exports(List)),maplist(mpred_loader_module_transparent,List).
@@ -904,30 +903,44 @@ disable_mpred_expansion:- (( t_l:disable_px) -> true ;
 is_box_module(M,tbox):- is_system_box(M).
 is_box_module(user,abox).
 
-shared_kb_pred(P):- current_predicate(_,baseKB:P),\+predicate_property(baseKB:P,imported_from(_)).
 
-import_shared_pred(baseKB,_):-!.
-import_shared_pred(M,P):-catch(assertz_if_new((M:P:-baseKB:P)),E,(functor(P,F,A),dmsg(import_shared_pred(F/A)=E))).
+import_shared_pred(baseKB,_,_):-!.
+import_shared_pred(M,BaseKB,P):- 
+  catch(assertz_if_new((M:P:-BaseKB:P)),E,(functor(P,F,A),dmsg(import_shared_pred(M:F/A:-BaseKB:F/A)=E))),
+  must( \+ predicate_property(BaseKB:P,exported)).
 
 ensure_imports(baseKB):-!.
-ensure_imports(M):-
+ensure_imports(M):-ensure_imports_tbox(M,baseKB).
+
+:-multifile(lmcache:is_ensured_imports_tbox/2).
+:-dynamic(lmcache:is_ensured_imports_tbox/2).
+
+ensure_imports_tbox(M,BaseKB):-
+  lmcache:is_ensured_imports_tbox(M,BaseKB),!.
+ensure_imports_tbox(M,BaseKB):-
+  asserta(lmcache:is_ensured_imports_tbox(M,BaseKB)),
   mpred_loader:
   must_det((
-   maybe_add_import_module(baseKB,mpred_loader,end),
-   maybe_add_import_module(baseKB,system,end),
+   maybe_add_import_module(BaseKB,mpred_loader,end),
+   maybe_add_import_module(BaseKB,system,end),
    forall((system:current_module(IM), \+ mpred_loader:is_box_module(IM,_)),maybe_add_import_module(M,IM,end)),
-   forall((system:current_module(IM),\+ mpred_loader:is_box_module(IM,_)),maybe_add_import_module(baseKB,IM,end)),
- %=  ignore(system:delete_import_module(user,M)),
- %=  ignore(system:delete_import_module(M,user)),
-   %ignore(system:delete_import_module(user,baseKB)),
-   %ignore(system:delete_import_module(baseKB,user)),
-   ignore(system:delete_import_module(M,baseKB)),
-   ignore(system:delete_import_module(baseKB,M)),
-   forall(shared_kb_pred(P),import_shared_pred(M,P)),
-   % maybe_add_import_module(user,baseKB,end),
-   % maybe_add_import_module(baseKB,system,end),
+   forall((system:current_module(IM),\+ mpred_loader:is_box_module(IM,_)),maybe_add_import_module(BaseKB,IM,end)),   
+  ignore(system:delete_import_module(user,M)),
+  ignore(system:delete_import_module(M,user)),
+  asserta((M:import(P):-system:import(P))),
+  system:add_import_module(M,system,end),  
+   %ignore(system:delete_import_module(user,BaseKB)),
+   %ignore(system:delete_import_module(BaseKB,user)),
+   ignore(system:delete_import_module(M,BaseKB)),
+   ignore(system:delete_import_module(BaseKB,M)),
+   forall((prolog:current_predicate(_,BaseKB:P),\+predicate_property(BaseKB:P,imported_from(_))),mpred_loader:import_shared_pred(M,BaseKB,P)),
+   % maybe_add_import_module(user,BaseKB,end),
+   % maybe_add_import_module(BaseKB,system,end),
   %= maybe_add_import_module(M,user,end),
-   % maybe_add_import_module(M,baseKB,end),
+   % maybe_add_import_module(M,BaseKB,end),
+   ignore(system:delete_import_module(M,user)),
+   system:add_import_module(user,M,end),
+   ignore(system:delete_import_module(user,system)), % gets from M now
    !)).
 
 

@@ -221,10 +221,10 @@ save_was(Was,CM, M, P):-functor(P,F,A), save_was(Was,CM, M, F/A).
 :- export((make_shared_multifile)/3).
 
 
-make_shared_multifile(_, baseKB, F/A):-decl_shared(F/A),!.
-make_shared_multifile(_, basePFC, _):-!.
+make_shared_multifile(_, baseKB, F/A):- decl_shared(F/A),!.
 make_shared_multifile(CM, t_l, F/A):-!,CM:thread_local(t_l:F/A).
-make_shared_multifile(CM, lmconf, F/A):-!,CM:dynamic(lmconf:F/A),!,CM:multifile(lmconf:F/A).
+% make_shared_multifile(_, basePFC, _):-!.
+make_shared_multifile(CM, M, F/A):-!,M:dynamic(M:F/A),!,M:multifile(M:F/A),!,CM:multifile(M:F/A).
 
 make_shared_multifile(CM, M, F/A):- 
  dmsg(make_shared_multifile(CM, M, F/A)),

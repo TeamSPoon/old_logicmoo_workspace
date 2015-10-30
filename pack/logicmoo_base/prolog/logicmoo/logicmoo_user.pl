@@ -42,11 +42,13 @@ fix_ops_for(CM):-
  op(300,fx,CM:('~')),
  op(300,fx,CM:('-')).
 
+:- fix_ops_for(user).
 :- logicmoo_user:user_module_uses(M,CM),fix_ops_for(M),fix_ops_for(CM).
 
-:- fix_ops_for(user).
 
 :- baseKB:use_module(baseKB:logicmoo_snark).
 
 % in case something changed
 :- logicmoo_user:user_module_uses(M,CM),'$module'(_,M),'$set_source_module'(_,CM).
+
+:- sanity( \+predicate_property(baseKB:_,exported)).
