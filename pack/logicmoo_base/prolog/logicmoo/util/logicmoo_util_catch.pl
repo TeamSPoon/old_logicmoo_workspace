@@ -366,8 +366,8 @@ current_why(F):- current_source_location(F).
 % source_module(M):-!,M=u.
 :-export(source_module/1).
 source_module(M):-nonvar(M),source_module(M0),!,M0=M.
-source_module(M):-loading_module(M),!.
 source_module(M):-'$set_source_module'(M,   M),!.
+source_module(M):-loading_module(M),!.
 
 :- thread_local(t_l:last_source_file/1).
 :- export(loading_file/1).

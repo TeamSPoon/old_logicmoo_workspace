@@ -20,7 +20,7 @@ ainz_pttp(A):-if_defined(ainz(A),assertz_new(A)).
 %:- was_export(internal_functor/1).
 %:- was_export(was_pttp_functor/1).
 %:- was_dynamic(was_pttp_functor/1).
-:- was_shared_multifile(lmconf:wid/3).
+:- shared_multifile(lmconf:wid/3).
 :- was_dynamic(lmconf:wid/3).
 :- was_export(int_query/7).
 :- was_dynamic(int_query/7).
@@ -270,7 +270,7 @@ gripe_pttp_failure(Test):- pttp_test_fails_is_ok(Test),!.
 gripe_pttp_failure(Test):- dmsg(gripe_pttp_failure(Test)),!.
 gripe_pttp_failure(Test):- ignore(pttp_test_took(Test, failure, Time)),trace_or_throw(pttp_test_took(Test, failure, Time)).
 
-:- was_shared_multifile(lmconf:sanity_test/0).
+:- shared_multifile(lmconf:sanity_test/0).
 % lmconf:sanity_test :- do_pttp_tests.
 
 
@@ -282,7 +282,7 @@ isNegOf(N1,N):-dtrace(not(isNegOf(N1,N))),isNegOf(N,N1).
 
 
 
-:- was_shared_multifile was_pttp_functor/3.
+:- shared_multifile was_pttp_functor/3.
 :- was_dynamic was_pttp_functor/3.
 
 

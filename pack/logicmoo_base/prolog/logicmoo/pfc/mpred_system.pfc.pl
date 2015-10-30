@@ -33,6 +33,8 @@
 
 :- include(logicmoo(mpred/'mpred_header.pi')).
 
+
+
 /*
 :- 
  With = kb_dynamic, % [multifile,kb_dynamic,discontiguous],
@@ -46,7 +48,7 @@
  with_pfa(With,(((basePFC:bt/3),(basePFC:nt/4),(basePFC:pk/4),(basePFC:pt/3),(basePFC:spft/5),(basePFC:tms/1),(basePFC:hs/1),(basePFC:qu/3),(basePFC:sm/1),
           (('==>')/1),(('::::')/2),(('<-')/2),(('<==>')/2),(('==>')/2),(('~')/1),(('nesc')/1),((mpred_action)/1),
           (mpred_do_and_undo_method/2),
-	  prologMultiValued/1,prologOrdered/1,prologNegByFailure/1,prologPTTP/1,prologKIF/1,pfcControlled/1,tPredType/1,
+	  prologMultiValued/1,prologOrdered/1,prologNegByFailure/1,prologPTTP/1,prologKIF/1,pfcControlled/1,ttPredType/1,
            prologHybrid/1,predCanHaveSingletons/1,prologDynamic/1,prologBuiltin/1,prologMacroHead/1,prologListValued/1,prologSingleValued/1,
           (basePFC:hs/2),(pfcControlled/1),(prologDynamic/2),(prologSideEffects/1),(prologSingleValued/1),(singleValuedInArg/2),(prologSideEffects/1,prologMacroHead/1,pfcControlled/1,
            resolveConflict/1,resolverConflict_robot/1)))),
@@ -54,16 +56,8 @@
  with_pfa(With,((baseKB:vtColor/1))).
  */
 
-:- file_begin(pfc).
 % :-  dynamic((disjointWith/2,genls/2,isa/2,argIsa/3)).
 % :- baseKB:discontiguous((disjointWith/2,genls/2,isa/2,argIsa/3,typeGenls/2)).
-
-:- op(500,fx,'~').
-:- op(1050,xfx,('=>')).
-:- op(1050,fx,('<-')).
-:- op(1050,xfx,'<==>').
-:- op(1100,fx,('==>')).
-:- op(1150,xfx,('::::')).
 
 
 
@@ -73,6 +67,8 @@
 :- kb_dynamic(ptReformulatorDirectivePredicate/1).
 :- kb_dynamic(support_hilog/2).
 :- kb_dynamic(mpred_undo_sys/3).
+
+:- file_begin(pfc).
 
 :- dynamic(arity/2).
 arity(apathFn,2).
@@ -784,21 +780,39 @@ ttFormatType(ftSpec).
 ttFormatType(ftCallable).
 ttFormatType(ftPercent).
 
+:- dynamic(vtColor/1).
 isa(vRed,vtColor).
 
 completelyAssertedCollection(vtValue).
 
 
+:- system:op(1199,fx,baseKB:('==>')).
+:- system:op(1190,xfx,baseKB:('::::')).
+:- system:op(1180,xfx,baseKB:('==>')).
+:- system:op(1170,xfx,baseKB:('<==>')).
+:- system:op(1160,xfx,baseKB:('<-')).
+
+:- system:op(1150,xfx,baseKB:('=>')).
+:- system:op(1140,xfx,baseKB:('<=')).
+:- system:op(1130,xfx,baseKB:('<=>')).
+
+
+:-  system:op(600,yfx,baseKB:('&')).
+:-  system:op(600,yfx,baseKB:('v')).
+:-  system:op(350,xfx,baseKB:('xor')).
+:-  system:op(300,fx,baseKB:('~')).
+:-  system:op(300,fx,baseKB:('-')).
 
 isa(vtColor,ttValueType).
-isa(X,ttValueType)==> (genls(X,vtValue),completelyAssertedCollection(X)).
+
+isa(X,ttValueType) ==> genls(X,vtValue).
+isa(X,ttValueType) ==> completelyAssertedCollection(X).
 
 isa(vtValue,ttValueType).
 
 typeGenls(ttValueType,vtValue).
 
-
-:- mpred_test(baseKB:vtColor(vRed)).
+:- mpred_test((vtColor(vRed))).
 
 
 :- assertz_if_new((argIsa(Prop,N,Type) :- cwc,number(N),argIsa_known(Prop,N,Type),must(ground(argIsa(Prop,N,Type))))).
@@ -809,7 +823,7 @@ argIsa(Prop,N,Type),{number(N)},ttFormatType(Type) ==> argQuotedIsa(Prop,N,Type)
 :- do_gc.
 
 :- kb_dynamic(mudLabelTypeProps/3).
-:- was_shared_multifile(mudLabelTypeProps/3).
+:- shared_multifile(mudLabelTypeProps/3).
 :- forall(ttPredType(F),must((decl_type(F),ain(isa(F,functorDeclares)),ain(genls(F,tPred))))).
 :- was_export(mtForPred/2).
 
@@ -830,7 +844,7 @@ prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, localityOfObject/2, subForm
 :- ain(isa(ttFormatType,ttAbstractType)).
 :- discontiguous(subFormat/2).
 :- kb_dynamic(tChannel/1).
-:- was_shared_multifile(tChannel/1).
+:- shared_multifile(tChannel/1).
 
 % ain((I/(mpred_literal(I),fully_expand(_,I,O),I \=@=O )==> ({format('~q~n',[fully_expand(I->O)])},O))).
 
@@ -1112,7 +1126,7 @@ prologHybrid(resultIsa/2).
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 
-:- mpred_test((fully_expand_goal(_,:- was_shared_multifile lmconf:create_random_fact/1,O),show_failure(why,O=(:- was_shared_multifile lmconf:create_random_fact/1)))).
+:- mpred_test((fully_expand_goal(_,:- shared_multifile lmconf:create_random_fact/1,O),show_failure(why,O=(:- shared_multifile lmconf:create_random_fact/1)))).
 
 % :- sanity(test_expand_units(tCol(_A))).
 

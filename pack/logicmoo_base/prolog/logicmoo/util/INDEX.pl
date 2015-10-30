@@ -730,7 +730,7 @@ index((context_module_of_file), 1, logicmoo_util_preddefs, logicmoo_util_preddef
 index((def_meta_predicate), 3, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((dynamic_if_missing), 1, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((dynamic_multifile), 1, logicmoo_util_preddefs, logicmoo_util_preddefs).
-index((was_shared_multifile), 1, logicmoo_util_preddefs, logicmoo_util_preddefs).
+index((shared_multifile), 1, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((dynamic_safe), 1, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((dynamic_safe), 3, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((dynamic_transparent), 1, logicmoo_util_preddefs, logicmoo_util_preddefs).
@@ -757,7 +757,7 @@ index((was_dynamic), 1, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((was_multifile), 1, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((was_module_transparent), 1, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((was_export), 1, logicmoo_util_preddefs, logicmoo_util_preddefs).
-index((was_shared_multifile), 1, logicmoo_util_preddefs, logicmoo_util_preddefs).
+index((shared_multifile), 1, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((with_mfa), 2, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((make_shared_multifile), 3, logicmoo_util_preddefs, logicmoo_util_preddefs).
 index((with_pfa), 2, logicmoo_util_preddefs, logicmoo_util_preddefs).
@@ -811,6 +811,8 @@ index((on_x_rtrace), 1, logicmoo_util_rtrace, logicmoo_util_rtrace).
 index((hotrace), 1, logicmoo_util_rtrace, logicmoo_util_rtrace).
 index((thread_leash), 1, logicmoo_util_rtrace, logicmoo_util_rtrace).
 index((traceafter_call), 1, logicmoo_util_rtrace, logicmoo_util_rtrace).
+index((wrap_shared), 3, logicmoo_util_shared_dynamic, logicmoo_util_shared_dynamic).
+index((decl_shared), 1, logicmoo_util_shared_dynamic, logicmoo_util_shared_dynamic).
 index((addSpaceBeforeSym), 2, logicmoo_util_strings, logicmoo_util_strings).
 index((all_upper_atom), 1, logicmoo_util_strings, logicmoo_util_strings).
 index((any_to_atom), 2, logicmoo_util_strings, logicmoo_util_strings).

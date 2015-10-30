@@ -1,4 +1,4 @@
-/** <module>
+/* <module>
 % =============================================
 % File 'mpred_builtin.pfc'
 % Purpose: Agent Reactivity for SWI-Prolog
@@ -31,25 +31,27 @@
 % Douglas Miles
 */
 
-:- op(500,fx,'~').
-:- op(1199,fx,('==>')).
-:- op(1190,xfx,('::::')).
-:- op(1180,xfx,('==>')).
-:- op(1170,xfx,'<==>').
-:- op(1160,xfx,('<-')).
-:- op(1150,xfx,'=>').
-:- op(1140,xfx,'<=').
-:- op(1130,xfx,'<=>').
-:- op(1100,fx,('nesc')).
-:- op(300,fx,'-').
-:- op(600,yfx,'&'). 
-:- op(600,yfx,'v').
-:- op(1075,xfx,'<-').
-:- op(350,xfx,'xor').
-:- op(1100,fx,(was_shared_multifile)).
+:-
+ op(1199,fx,('==>')), 
+ op(1190,xfx,('::::')),
+ op(1180,xfx,('==>')),
+ op(1170,xfx,'<==>'),  
+ op(1160,xfx,('<-')),
+ op(1150,xfx,'=>'),
+ op(1140,xfx,'<='),
+ op(1130,xfx,'<=>'), 
+ op(600,yfx,'&'), 
+ op(600,yfx,'v'),
+ op(350,xfx,'xor'),
+ op(300,fx,'~'),
+ op(300,fx,'-').
+
+:- file_begin(pfc).
+
+:- op(1100,fx,(shared_multifile)).
 
 
-:- kb_dynamic(mpred_default/1).
+:- dynamic(mpred_default/1).
 
 meta_argtypes(mpred_default(ftAssertable)).
 

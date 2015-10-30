@@ -179,30 +179,35 @@
 :- use_module(library(http/http_server_files)).
 
 
-:- op(500,fx,'~').
-:- op(1050,xfx,'<==>').
-:- op(1050,xfx,('<-')).
-:- op(1200,fx,('=>')).
-:- op(1200,fx,('==>')).
-:- op(1100,fx,('nesc')).
-:- op(1150,xfx,('::::')).
-:- op(300,fx,'-').
-:- op(600,yfx,'&').  
-:- op(600,yfx,'v').
-:- op(1075,xfx,'<-').
-:- op(1075,xfx,'<-').
-:- op(1070,xfx,'=>').
-:- op(1150,xfx,'<=>').
-:- op(1100,xfx,('<==>')).
-:- op(1100,xfx,('==>')).
-:- op(350,xfx,'xor').
-:- op(300,fx,user:'~').
-:- op(300,fx,user:'-').
-:- op(400,yfx,user:'&').  
-:- op(500,yfx,user:'v').
-:- op(1075,xfx,user:'<-').
-:- op(1075,xfx,user:'<==>').
-:- op(350,xfx,user:'xor').
+:-
+ op(1199,fx,('==>')), 
+ op(1190,xfx,('::::')),
+ op(1180,xfx,('==>')),
+ op(1170,xfx,'<==>'),  
+ op(1160,xfx,('<-')),
+ op(1150,xfx,'=>'),
+ op(1140,xfx,'<='),
+ op(1130,xfx,'<=>'), 
+ op(600,yfx,'&'), 
+ op(600,yfx,'v'),
+ op(350,xfx,'xor'),
+ op(300,fx,'~'),
+ op(300,fx,'-').
+:- user:((
+ op(1199,fx,('==>')), 
+ op(1190,xfx,('::::')),
+ op(1180,xfx,('==>')),
+ op(1170,xfx,'<==>'),  
+ op(1160,xfx,('<-')),
+ op(1150,xfx,'=>'),
+ op(1140,xfx,'<='),
+ op(1130,xfx,'<=>'), 
+ op(600,yfx,'&'), 
+ op(600,yfx,'v'),
+ op(350,xfx,'xor'),
+ op(300,fx,'~'),
+ op(300,fx,'-'))).
+
 
 :- use_module(library(pldoc)).
 :- use_module(library(pldoc/doc_access)).

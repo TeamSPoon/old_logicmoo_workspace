@@ -24,6 +24,7 @@
             assumption/1,
             assumptions/2,
             assumptions1/2,
+            {}/1,
             attvar_op/2,
             with_umt/1,
             baseable/2,
@@ -213,6 +214,7 @@
             mpred_maptree/2,
             mpred_maptree/3,
             mpred_mark_as/4,
+            mpred_mark_as_ml/4,
             mpred_mark_fa_as/6,
             mpred_mpred_file/0,
             mpred_negated_literal/1,
@@ -349,7 +351,7 @@
    repropagate_1/1,
    repropagate_meta_wrapper_rule/1,
             rescan_pfc/0,
-            baseKB:resolveConflict0/1,
+            
             retract_eq_quitely/1,
             retract_eq_quitely_f/1,
             retract_i/1,
@@ -387,13 +389,14 @@
         
           ]).
 /*
-:- was_shared_multifile    
+:- shared_multifile    
         lmconf:hook_one_minute_timer_tick/0,
         lmconf:infoF/1,
         lmconf:mpred_hook_rescan_files/0,
         baseKB:resolveConflict/1,
         baseKB:resolverConflict_robot/1.
 */
+
 :- meta_predicate 
       attvar_op(1,*),
       brake(0),
@@ -406,9 +409,7 @@
       fc_eval_action(0,*),
       foreachl_do(0,*),
       is_resolved(0),
-      baseKB:resolveConflict(0),
-      baseKB:resolveConflict0(0),
-      baseKB:resolverConflict_robot(0),
+      % baseKB:resolveConflict(0),baseKB:resolveConflict0(0),baseKB:resolverConflict_robot(0),
       loop_check_nr(0),
       map_unless(1,:,*,*),
       ain_fast_sp(?,0),
@@ -463,7 +464,7 @@
       remove_if_unsupported_verbose(*,*,0),
       repropagate_0(0),
       repropagate_1(0),
-      mpred_test(0),
+      mpred_test(*),
       repropagate_meta_wrapper_rule(0),
       update_single_valued_arg(0,*),
       with_mpred_trace_exec(0).
@@ -551,7 +552,7 @@
         use_presently/0)).
 
 :- module_transparent 
-add_reprop/2,
+            add_reprop/2,
             add_side_effect/2,
             all_closed/1,
             append_as_first_arg/3,
@@ -893,7 +894,6 @@ add_reprop/2,
    repropagate_1/1,
    repropagate_meta_wrapper_rule/1,
             rescan_pfc/0,
-            baseKB:resolveConflict0/1,
             retract_eq_quitely/1,
             retract_eq_quitely_f/1,
             retract_i/1,
@@ -934,36 +934,36 @@ check_context_module:- must((source_context_module(M),M\==mpred_pfc,M\==mpred_lo
 check_real_context_module:- must((context_module(M),M\==mpred_pfc,M\==mpred_loader)).
 
 
-:- was_shared_multifile(('==>')/1).
-:- was_shared_multifile(basePFC:bt/3).
-:- was_shared_multifile(basePFC:nt/4).
-:- was_shared_multifile(basePFC:pk/4).
-:- was_shared_multifile(basePFC:pt/3).
-:- was_shared_multifile(basePFC:spft/5).
-:- was_shared_multifile(('::::')/2).
-:- was_shared_multifile(('<-')/2).
-:- was_shared_multifile(('<==>')/2).
-:- was_shared_multifile(('==>')/2).
-:- was_shared_multifile(('~')/1).
-:- was_shared_multifile(('nesc')/1).
-:- was_shared_multifile((('~'))/1).
-:- was_shared_multifile((mpred_action)/1).
-:- was_shared_multifile(basePFC:tms/1).
-:- was_shared_multifile(basePFC:hs/1).
-:- was_shared_multifile(basePFC:qu/3).
-:- was_shared_multifile(basePFC:sm/1).
-:- was_shared_multifile(basePFC:sm/1).
-:- was_shared_multifile(mpred_do_and_undo_method/2).
-:- foreach(arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,tPredType,
+:- shared_multifile(('==>')/1).
+:- shared_multifile(basePFC:bt/3).
+:- shared_multifile(basePFC:nt/4).
+:- shared_multifile(basePFC:pk/4).
+:- shared_multifile(basePFC:pt/3).
+:- shared_multifile(basePFC:spft/5).
+:- shared_multifile(('::::')/2).
+:- shared_multifile(('<-')/2).
+:- shared_multifile(('<==>')/2).
+:- shared_multifile(('==>')/2).
+:- shared_multifile(('~')/1).
+:- shared_multifile(('nesc')/1).
+:- shared_multifile((('~'))/1).
+:- shared_multifile((mpred_action)/1).
+:- shared_multifile(basePFC:tms/1).
+:- shared_multifile(basePFC:hs/1).
+:- shared_multifile(basePFC:qu/3).
+:- shared_multifile(basePFC:sm/1).
+:- shared_multifile(basePFC:sm/1).
+:- shared_multifile(mpred_do_and_undo_method/2).
+:- foreach(arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttPredType,
      prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),P),
-   ((was_shared_multifile(baseKB:P/1)))).
-:- was_shared_multifile(basePFC:hs/2).
-:- was_shared_multifile(pfcControlled/1).
-:- was_shared_multifile(prologDynamic/2).
-:- was_shared_multifile(prologSideEffects/1).
-:- was_shared_multifile(prologSingleValued/1).
-:- was_shared_multifile(singleValuedInArg/2).
-:- was_shared_multifile(prologSideEffects/1).
+   ((shared_multifile(baseKB:P/1)))).
+:- shared_multifile(basePFC:hs/2).
+:- shared_multifile(pfcControlled/1).
+:- shared_multifile(prologDynamic/2).
+:- shared_multifile(prologSideEffects/1).
+:- shared_multifile(prologSingleValued/1).
+:- shared_multifile(singleValuedInArg/2).
+:- shared_multifile(prologSideEffects/1).
 
 :- was_dynamic(lmconf:module_local_init/0).
 :- discontiguous(lmconf:module_local_init/0).
@@ -980,22 +980,22 @@ with_umt(Goal):- source_context_module(M) -> M:call(Goal).
 %   Author : Tim Finin, finin@prc.unisys.com
 %   Purpose: syntactic sugar for Pfc - operator definitions and term expansions.
 
-:- op(500,fx,'-').
-:- op(1199,fx,('==>')).
-:- op(1190,xfx,('::::')).
-:- op(1180,xfx,('==>')).
-:- op(1170,xfx,'<==>').
-:- op(1160,xfx,('<-')).
-:- op(1150,xfx,'=>').
-:- op(1140,xfx,'<=').
-:- op(1130,xfx,'<=>').
-:- op(1100,fx,('nesc')).
-:- op(300,fx,'-').
-:- op(600,yfx,'&'). 
-:- op(600,yfx,'v').
-:- op(1075,xfx,'<-').
-:- op(350,xfx,'xor').
-:- op(1100,fx,(was_shared_multifile)).
+:-
+ op(1199,fx,('==>')), 
+ op(1190,xfx,('::::')),
+ op(1180,xfx,('==>')),
+ op(1170,xfx,'<==>'),  
+ op(1160,xfx,('<-')),
+ op(1150,xfx,'=>'),
+ op(1140,xfx,'<='),
+ op(1130,xfx,'<=>'), 
+ op(600,yfx,'&'), 
+ op(600,yfx,'v'),
+ op(350,xfx,'xor'),
+ op(300,fx,'~'),
+ op(300,fx,'-').
+
+:- op(1100,fx,(shared_multifile)).
 
 
 
@@ -1040,11 +1040,11 @@ w_get_fa(Mask,F,A):-get_functor(Mask,F,A).
 
 set_prolog_stack_gb(Six):-set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
 lmconf:module_local_init:-set_prolog_stack_gb(16).
-:- was_shared_multifile(lmconf:mpred_hook_rescan_files/0).
+:- shared_multifile(lmconf:mpred_hook_rescan_files/0).
 :- was_dynamic(lmconf:mpred_hook_rescan_files/0).
 :- was_dynamic(use_presently/0).
 % used to annotate a predciate to indicate PFC support
-:- was_shared_multifile(infoF/1).
+:- shared_multifile(infoF/1).
 :- was_dynamic(infoF/1).
 :- was_export(infoF/1).
 
@@ -1231,7 +1231,7 @@ is_retract_first(one).
 is_retract_first(a).
 
 pfc_provide_storage_op(Op,(I1,I2)):-!,pfc_provide_storage_op(Op,I1),pfc_provide_storage_op(Op,I2).
-pfc_provide_storage_op(Op,(nesc (P))):-!,pfc_provide_storage_op(Op,P).
+pfc_provide_storage_op(Op,(nesc(P))):-!,pfc_provide_storage_op(Op,P).
 %pfc_provide_storage_op(change(assert,_AorZ),Fact):- loop_check_nr(ainPreTermExpansion(Fact)).
 % pfcRem1 to just get the first
 pfc_provide_storage_op(change(retract,OneOrA),FactOrRule):- is_retract_first(OneOrA),!,
@@ -1444,7 +1444,7 @@ assertz_prologsys(X):-attvar_op(assertz,X).
 clause_prologsys(H,B):-clause(H,B).
 clause_prologsys(H,B,Ref):-clause(H,B,Ref).
 */
-call_prologsys(X):-call(X).
+call_prologsys(X):-with_umt(X).
 
 % ======================= 
 % internal bookkeeping
@@ -1550,8 +1550,7 @@ ain_fast('$si$':'$was_imported_kb_content$'(_, _)<-THIS):-is_ftNonvar(THIS),!.
 ain_fast(P0):-
   must(get_source_ref(S)), ain_fast(P0,S).
 
-ain_fast((nesc P),S) :- is_ftNonvar(P),!,
-  ain_fast(P,S).
+ain_fast(nesc(P),S) :- is_ftNonvar(P),!,ain_fast(P,S).
 
 ain_fast(P0,S):- gripe_time(0.6,ain_fast_timed(P0,S)).
 
@@ -1665,8 +1664,8 @@ mpred_post1_sp_1(S,P) :-  mpred_warn("mpred_post1(~p,~p) failed",[P,S]).
 
 with_mpred_trace_exec(P):- w_tl(t_l:mpred_debug_local,w_tl(mpred_is_tracing_exec, must(show_if_debug(P)))).
 
-mpred_test(P):- (true;mpred_is_silient;compiling),!,sanity(P),!.
-mpred_test(P):- show_call(why,with_mpred_trace_exec(P)),!.
+mpred_test(P):- (mpred_is_silient;compiling),!,sanity(req(P)),!.
+mpred_test(P):- show_call(with_mpred_trace_exec(req(P))),!.
 
 clause_asserted_local(basePFC:spft(ukb,P,Fact,Trigger,UOldWhy)):-
   clause(basePFC:spft(ukb,P,Fact,Trigger,_OldWhy),true,Ref),
@@ -1841,7 +1840,7 @@ select_next_fact(P,S) :-
 % the mpred_default selection predicate takes the item at the froint of the queue.
 defaultmpred_select(P,S) :- basePFC:qu(umt,P,S),!.
 
-:- was_shared_multifile(basePFC:hs/1).
+:- shared_multifile(basePFC:hs/1).
 
 % mpred_halt stops the forward chaining.
 mpred_halt :-  mpred_halt("",[]).
@@ -2268,20 +2267,22 @@ mpred_get_support_via_clause_db(P,OUT):- predicate_property(P,number_of_clauses(
 
 support_ok_via_clause_body(_H):-!,fail.
 support_ok_via_clause_body(H):- get_functor(H,F,A),support_ok_via_clause_body(H,F,A).
+
 support_ok_via_clause_body(_,(\+),1):-!,fail.
-support_ok_via_clause_body(_,F,_):- mreq(prologSideEffects(F)),!,fail.
+support_ok_via_clause_body(_,F,_):- req(prologSideEffects(F)),!,fail.
 support_ok_via_clause_body(H,_,_):- \+ predicate_property(H,number_of_clauses(_)),!,fail.
-support_ok_via_clause_body(_,F,A):- mreq(mpred_mark(pfcRHS,_,F,A)),!,fail.
-support_ok_via_clause_body(_,F,A):- mreq(mpred_mark(pfcMustFC,_,F,A)),!,fail.
-support_ok_via_clause_body(_,F,_):- mreq(argsQuoted(F)),!,fail.
-support_ok_via_clause_body(_,F,_):- mreq(prologDynamic(F)),!.
-support_ok_via_clause_body(_,F,_):- \+ mreq(pfcControlled(F)),!.
+support_ok_via_clause_body(_,F,A):- req(mpred_mark(pfcRHS,_,F,A)),!,fail.
+support_ok_via_clause_body(_,F,A):- req(mpred_mark(pfcMustFC,_,F,A)),!,fail.
+support_ok_via_clause_body(_,F,_):- req(argsQuoted(F)),!,fail.
+support_ok_via_clause_body(_,F,_):- req(prologDynamic(F)),!.
+support_ok_via_clause_body(_,F,_):- \+ req(pfcControlled(F)),!.
 
 
 mpred_get_support_precanonical(F,Sup):-to_addable_form_wte(mpred_get_support_precanonical,F,P),mpred_get_support(P,Sup).
 spft_precanonical(F,SF,ST):-to_addable_form_wte(spft_precanonical,F,P),!,basePFC:spft(ukb,P,SF,ST,_).
 
 trigger_supports_f_l(U,[]) :- match_source_ref1(U),!.
+
 trigger_supports_f_l(Trigger,[Fact|MoreFacts]) :-
   mpred_get_support_precanonical_plus_more(Trigger,(Fact,AnotherTrigger)),
   trigger_supports_f_l(AnotherTrigger,MoreFacts).
@@ -2321,7 +2322,7 @@ mpred_fwd2(Fact0,_Sup):-
 % ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),(ground(Fact)->must(once(Fact));doall(show_if_debug(must(Fact)))),fail.
 % ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),(ground(Fact)->must(once(Fact));doall(show_if_debug(must(Fact)))),!.
 ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),
-    doall(show_if_debug(with_umt(Fact))),!.
+    doall(show_if_debug(with_umt(req(Fact)))),!.
 ain_rule_if_rule(Fact):- must(ain_rule0(Fact)),!.
 
 ain_rule0((P==>Q)) :-
@@ -2527,25 +2528,23 @@ call_u(Why,X):- show_call(why,(nop(Why),mpred_call_only_facts(X))).
 not_cond(_Why,X):- \+ X.
 
 
-~(PQ):- cwc, neg_in_code(PQ).
+'{}'(G):-req(G).
+
+:- meta_predicate neg_in_code(0).
+:- export(neg_in_code/1).
+neg_in_code(~(G)):- nonvar(G),!, \+ ~G.
+neg_in_code(P):-   neg_may_naf(P), \+ P.
+neg_in_code(Q):-  is_ftNonvar(Q), prologSingleValued(Q),if_missing_mask(Q,R,Test),req(R),Test.
+
+~(G):- cwc, neg_in_code(G).
 ~(tCol('$VAR')).
 
--(G):- cwc, tilda_in_code(G).
 
 :- meta_predicate neg_may_naf(0).
 :- export(neg_may_naf/1).
 neg_may_naf(P):- mpred_non_neg_literal(P),get_functor(P,F),clause(prologNegByFailure(F),true),!.
 neg_may_naf(P):- is_ftCompound(P),predicate_property(P,static).
 
-:- meta_predicate neg_in_code(0).
-:- export(neg_in_code/1).
-neg_in_code(P):-   neg_may_naf(P), \+ P.
-neg_in_code(Q):-  is_ftNonvar(Q), prologSingleValued(Q),if_missing_mask(Q,R,Test),req(R),Test.
-
-:- meta_predicate tilda_in_code(0).
-:- export(tilda_in_code/1).
-tilda_in_code(-(G)):-nonvar(G),!, req('-'(~(G))).
-tilda_in_code(G):- req(~(G)).
 
 
 %=
@@ -2572,20 +2571,23 @@ mpred_call_0((C1,C2)):-!,mpred_call_0(C1),mpred_call_0(C2).
 mpred_call_0(call(X)):- !, mpred_call_0(X).
 mpred_call_0(\+(X)):- !, \+ mpred_call_0(X).
 mpred_call_0(call_u(X)):- !, mpred_call_0(X).
-mpred_call_0(G):-  with_umt(( strip_module(G,M,P),functor(G,F,A),mpred_call_1(M,P,F))).
+mpred_call_0(G):- strip_module(G,M,P),functor(G,F,A),mpred_call_1(M,P,F).
 
 
 mpred_call_1(_,G,_):- is_side_effect_disabled,!,mpred_call_with_no_triggers(G).
 
 mpred_call_1(M,G,F):-  (ground(G); \+ current_predicate(_,M:G) ; \+ (predicate_property(M:G,clause_count(CC)),CC>1)), (\+  is_side_effect_disabled),
                 ignore((loop_check(call_with_bc_triggers(M:G)),maybeSupport(G,(g,g)),fail)),
-                (\+ current_predicate(F,M:G),\+ current_predicate(_,_:G),doall(show_call(predicate_property(M:G,PP))),dumpST,break,trace,kb_dynamic(G),!,fail).
+                 \+ current_predicate(F,M:G),\+ current_predicate(_,_:G),
+                 doall(show_call(predicate_property(_UM:G,_PP))),
+                 debug(mpred),
+                 must(show_call(kb_dynamic(M:G))),!,fail.
 mpred_call_1(_,G,_):- mpred_call_with_no_triggers(G).
 
 
 :- thread_local t_l:infBackChainPrevented/1.
 
-call_with_bc_triggers(P) :- functor(P,F,A), \+t_l:infBackChainPrevented(F/A), 
+call_with_bc_triggers(P) :- functor(P,F,A), \+ t_l:infBackChainPrevented(F/A), 
   mpred_get_trigger_quick(basePFC:bt(umt,P,Trigger)),
   no_repeats(mpred_get_support(basePFC:bt(umt,P,Trigger),S)),
   once(no_side_effects(P)),
@@ -2655,7 +2657,7 @@ mpred_ignored(isa(_,argIsaFn(_, _))).
 has_cl(H):-predicate_property(H,number_of_clauses(_)).
 
 % an action is undoable if there exists a method for undoing it.
-undoable(A) :- mpred_do_and_undo_method(A,_).
+undoable(A) :- req(mpred_do_and_undo_method(A,_)).
 
 %=
 %=
@@ -2803,11 +2805,14 @@ mpred_compile_rhsTerm(_Sup,P,P):-is_ftVar(P),!.
 mpred_compile_rhsTerm(Sup,(P/C),((P0:-C0))) :- !,mpred_compile_rhsTerm(Sup,P,P0),build_code_test(Sup,C,C0),!.
 mpred_compile_rhsTerm(Sup,I,O):-to_addable_form_wte(mpred_compile_rhsTerm,I,O), must(\+ \+ mpred_mark_as(Sup,r,O,pfcRHSR)),!.
 
+:- export(mpred_mark_as_ml/4).
+mpred_mark_as_ml(Sup,PosNeg,Type,P):- mpred_mark_as(Sup,PosNeg,P,Type).
 
 
 mpred_mark_as(_,_,P,_):- is_ftVar(P),!.
 
 mpred_mark_as(Sup,_PosNeg,~(P),Type):-!,mpred_mark_as(Sup,~,P,Type).
+mpred_mark_as(Sup,PosNeg,[P|PL],Type):- is_list([P|PL]), !,must_maplist(mpred_mark_as_ml(Sup,PosNeg,Type),[P|PL]).
 mpred_mark_as(Sup,_PosNeg,\+(P),Type):-!,mpred_mark_as(Sup,~,P,Type).
 mpred_mark_as(Sup,_PosNeg,-(P),Type):-!,mpred_mark_as(Sup,~,P,Type).
 mpred_mark_as(Sup,_PosNeg,-(P),Type):-!,mpred_mark_as(Sup,~,P,Type).
@@ -2822,14 +2827,15 @@ mpred_mark_as(Sup,PosNeg,P,Type):-get_functor(P,F,A),ignore(mpred_mark_fa_as(Sup
 :- was_dynamic( mpred_mark/4).
 
 % mpred_mark_fa_as(_,_,_,'\=',2,_):- trace.
-mpred_mark_fa_as(_Sup, PosNeg,_P,F,A,Type):- mpred_mark(Type,PosNeg,F,A),!.
 mpred_mark_fa_as(_Sup,_PosNeg,_P,isa,_,_):- !.
 mpred_mark_fa_as(_Sup,_PosNeg,_P,t,_,_):- !.
 mpred_mark_fa_as(_Sup,_PosNeg,_P,argIsa,N,_):- !,must(N=3).
 mpred_mark_fa_as(_Sup,_PosNeg,_P,arity,N,_):- !,must(N=2).
 mpred_mark_fa_as(_Sup,_PosNeg,_P,mpred_mark,N,_):- !,must(N=4).
 mpred_mark_fa_as(_Sup,_PosNeg,_P,mpred_isa,N,_):- must(N=2).
+mpred_mark_fa_as(_Sup,_PosNeg,_P,'[|]',N,_):- trace,must(N=2).
 mpred_mark_fa_as(_Sup,_PosNeg,_P,_:mpred_isa,N,_):- must(N=2).
+mpred_mark_fa_as(_Sup, PosNeg,_P,F,A,Type):- req(mpred_mark(Type,PosNeg,F,A)),!.
 mpred_mark_fa_as(Sup,PosNeg,_P,F,A,Type):- 
   MARK = mpred_mark(Type,PosNeg,F,A),
   check_never_assert(MARK),
@@ -3213,7 +3219,7 @@ mpred_database_term('==>'/2).
 mpred_database_term('<==>'/2).
 mpred_database_term(basePFC:qu/3).
 
-:- forall(mpred_database_term(T),was_shared_multifile(T)).
+:- forall(mpred_database_term(T),shared_multifile(T)).
 
 
 % removes all forward chaining rules and justifications from db.
@@ -3270,11 +3276,11 @@ clause_or_call(isa(I,C),true):-!,req(isa_asserted(I,C)).
 clause_or_call(genls(I,C),true):-!,on_x_log_throw(req(genls(I,C))).
 clause_or_call(H,B):- clause(src_edit(_Before,H),B).
 clause_or_call(H,B):- predicate_property(H,number_of_clauses(C)),predicate_property(H,number_of_rules(R)),((R*2<C) -> (clause(H,B)*->!;fail) ; clause(H,B)).
-clause_or_call(H,true):- should_call_for_facts(H),no_repeats(on_x_log_throw(H)).
+clause_or_call(H,true):- req(should_call_for_facts(H)),no_repeats(on_x_log_throw(H)).
 
 
 % as opposed to simply using clause(H,true).
-should_call_for_facts(H):- get_functor(H,F,A),should_call_for_facts(H,F,A).
+should_call_for_facts(H):- get_functor(H,F,A),with_umt(should_call_for_facts(H,F,A)).
 should_call_for_facts(_,F,_):- prologSideEffects(F),!,fail.
 should_call_for_facts(H,_,_):- \+ predicate_property(H,number_of_clauses(_)),!.
 should_call_for_facts(_,F,A):- mpred_mark(pfcRHS,_,F,A),!,fail.
@@ -3687,7 +3693,7 @@ cnstrn0(X,V):-when(is_ftNonvar(V),X).
 
 rescan_pfc:-forall(clause(lmconf:mpred_hook_rescan_files,Body),show_entry(Why,Body)).
 
-mpred_facts_and_universe(P):- (is_ftVar(P)->pred_head_all(P);true),(meta_wrapper_rule(P)->(no_repeats(with_umt(P))) ; (no_repeats(with_umt(P)))).
+mpred_facts_and_universe(P):- (is_ftVar(P)->pred_head_all(P);true),req(P). % (meta_wrapper_rule(P)->req(P) ; req(P)).
 
 add_reprop(_Trig,Var):- is_ftVar(Var), !. % trace_or_throw(add_reprop(Trig,Var)).
 add_reprop(_Trig,~(Var)):- is_ftVar(Var),!.
@@ -3714,7 +3720,7 @@ repropagate(P):-  \+ predicate_property(P,_),'$find_predicate'(P,PP),PP\=[],!,fo
 repropagate(F/A):- atom(F),integer(A),!,functor(P,F,A),!,repropagate(P).
 repropagate(F/A):- atom(F),is_ftVar(A),!,repropagate(F).
 
-repropagate(P):-  \+ predicate_property(_:P,_),dumpST,trace,dmsg(undefined_repropagate(P)),!,fail.
+repropagate(P):-  \+ predicate_property(_:P,_),dmsg(undefined_repropagate(P)),dumpST,dtrace,!,fail.
 repropagate(P):-  repropagate_0(P).
 
 repropagate_0(P):- loop_check(with_umt(repropagate_1(P)),true).
@@ -3730,11 +3736,8 @@ repropagate_1(P):- with_umt(repropagate_2(P)).
 :- export(repropagate_2/1).
 :- module_transparent(repropagate_2/1).
 repropagate_2(P):-
- forall(mpred_facts_and_universe(P),
-     w_tl(t_l:is_repropagating(P),
-     ignore((
-      once(fwd_ok(P)),
-      mpred_fwd(P))))).
+ doall((mpred_facts_and_universe(P),
+    w_tl(t_l:is_repropagating(P),ignore((once(fwd_ok(P)),mpred_fwd(P)))))).
 
 % repropagate_meta_wrapper_rule(P==>_):- !, repropagate(P).
 repropagate_meta_wrapper_rule(P):-repropagate_1(P).

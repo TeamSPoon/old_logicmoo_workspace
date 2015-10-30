@@ -96,7 +96,7 @@
         call_last_is_var(0).
 
 
-:- use_module(logicmoo(mpred/mpred_expansion)).
+:- use_module(mpred_expansion).
 :- include('mpred_header.pi').
 
 
@@ -117,26 +117,26 @@ append_termlist(Call,EList,CallE):-must((compound(Call),is_list(EList))), Call=.
 % Logic Preds Shared
 % ========================================
 
-:- was_export(is_svo_functor/1).
+%= %= :- was_export(is_svo_functor/1).
 is_svo_functor(Prop):- hotrace((atom(Prop),arg(_,svo(svo,prop,valueOf,rdf),Prop))).
 
-:- was_export(hilog_functor/1).
+%= %= :- was_export(hilog_functor/1).
 hilog_functor(true_t).
 
-:- was_export(is_holds_true_not_hilog/1).
+%= %= :- was_export(is_holds_true_not_hilog/1).
 is_holds_true_not_hilog(HOFDS):-is_holds_true(HOFDS),\+ hilog_functor(HOFDS).
 
-:- was_export(is_holds_true/1).
+%= %= :- was_export(is_holds_true/1).
 is_holds_true(Prop):- hotrace((atom(Prop),is_holds_true0(Prop))),!.
 
 % k,p,..
 is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,t,t,asserted_mpred_t,assertion_t,true_t,assertion,secondOrder,firstOrder),Prop).
 % is_holds_true0(Prop):-atom_concat(_,'_t',Prop).
 
-:- was_export(is_2nd_order_holds/1).
+%= %= :- was_export(is_2nd_order_holds/1).
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 
-:- was_export(is_holds_false/1).
+%= %= :- was_export(is_holds_false/1).
 is_holds_false(Prop):-hotrace((atom(Prop),is_holds_false0(Prop))).
 
 is_holds_false0(Prop):-member(Prop,[not,nholds,holds_f,mpred_f,aint,assertion_f,not_true_t,asserted_mpred_f,retraction,not_secondOrder,not_firstOrder]).
@@ -330,11 +330,11 @@ is_logical_functor0(And):-member(And,[(,),(;),('<-'),('=>'),('<=>'),(':-'),(and)
 is_neg(not(_)).
 is_pos(One):- get_functor(One,F),!,not(is_log_op(F)).
 
-:- was_export(is_log_sent/1).
+%= %= :- was_export(is_log_sent/1).
 is_log_sent(S):- get_functor(S,F,_),is_log_op(F).
 
 not_log_op(OP):- not(is_log_op(OP)).
-:- was_export(is_log_op/1).
+%= %= :- was_export(is_log_op/1).
 is_log_op(OP):- atomic(OP),to_dlog_ops(OPS),!,(member(OP=_,OPS);member(_=OP,OPS)).
 
 % % :- use_module(logicmoo(plarkc/mpred_kif)).
@@ -357,7 +357,7 @@ call_last_is_var(MCall):- strip_module(MCall,M,Call),
    
 
 
-:- was_export(defunctionalize/2).
+%= %= :- was_export(defunctionalize/2).
 defunctionalize(Wff,WffO):- w_tl(t_l:dont_use_mudEquals,defunctionalize(',',Wff,WffO)).
 defunctionalize(OP,Wff,WffO):- call_last_is_var(defunctionalize(OP,Wff,WffO)).
 defunctionalize(_ ,Wff,Wff):- \+ compound(Wff),!.
@@ -488,12 +488,12 @@ non_compound(InOut):- once( \+ (compound(InOut));is_ftVar(InOut)).
 
 is_gaf(Gaf):-when(nonvar(Gaf), \+ (is_kif_rule(Gaf))).
 
-:- was_export(is_kif_rule/1).
+%= %= :- was_export(is_kif_rule/1).
 is_kif_rule(Var):- is_ftVar(Var),!,fail.
 is_kif_rule(R):- kif_hook(R),!.
 
 
-:- was_export(term_slots/2).
+%= %= :- was_export(term_slots/2).
 term_slots(Term,Slots):-term_singletons(Term, [],NS, [],S),append(NS,S,Slots).
 
 
@@ -524,11 +524,11 @@ head_singles01(Pre,Post):-
     subtract_eq(CSingles,PreVars,Bad),!,Bad\==[].
     
 
-:- was_export(term_singletons/2).
+%= %= :- was_export(term_singletons/2).
 term_singletons(A,Vs):- notrace(term_singletons(A,[],_,[],Vs)).
-:- was_export(term_singletons/3).
+%= %= :- was_export(term_singletons/3).
 term_singletons(Term,NonSingle,Singles):- notrace(term_singletons(Term,[],NonSingle,[],Singles)).
-:- was_export(term_singletons/5).
+%= %= :- was_export(term_singletons/5).
 term_singletons(Fml, NS,NS, S,S):- atomic(Fml),!.
 term_singletons(Fml, NS,NS, S,S):- identical_member(Fml,NS),!.
 term_singletons(Fml, NS, [Fml|NS], S, NSV):- is_ftVar(Fml),identical_member(Fml,S),!,delete_eq(S,Fml,NSV),!.
@@ -578,8 +578,8 @@ ensure_quantifiers(Wff,WffO):-
  must_det_l((show_failure(why,term_singletons(Wff,[],NS,[],Singles)),
   put_singles(Wff,'all',Singles,WffM),put_singles(WffM,'all',NS,WffO))).
 
-:- was_shared_multifile(function_corisponding_predicate/2).
-:- was_dynamic(function_corisponding_predicate/2).
+%= :- shared_multifile(function_corisponding_predicate/2).
+%= :- was_dynamic(function_corisponding_predicate/2).
 
 get_pred(Pred,F):- get_functor(Pred,F).
 

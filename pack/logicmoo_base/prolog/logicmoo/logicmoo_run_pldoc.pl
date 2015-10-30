@@ -3,7 +3,7 @@
 
 :- use_module(library(settings)).
 
-:- was_shared_multifile http:location/3.
+:- shared_multifile http:location/3.
 :- was_dynamic http:location/3.
 
 :- use_module(library(memfile)).
@@ -182,18 +182,18 @@ do_semweb_startup:-
 % mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(why,asserta(prolog_debug:debugging(http(X), false, O)))).
 % mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),show_call(why,asserta(prolog_debug:debugging((X), false, O)))).
 
-:- was_shared_multifile(pre_file_search_path/2).
+:- shared_multifile(pre_file_search_path/2).
 
 % user:pre_file_search_path(_,_):-!,fail.
 
-:- was_shared_multifile
+:- shared_multifile
 	sandbox:safe_primitive/1,		% Goal
 	sandbox:safe_meta_predicate/1,		% Name/Arity
 	sandbox:safe_meta/2,			% Goal, Calls
 	sandbox:safe_global_variable/1,		% Name
 	sandbox:safe_directive/1.		% Module:Goal
 
-:- was_shared_multifile(prolog:sandbox_allowed_clause/1).
+:- shared_multifile(prolog:sandbox_allowed_clause/1).
 
 prolog:sandbox_allowed_clause(Clause):-nonvar(Clause).
 
@@ -220,7 +220,7 @@ normal_verify_predefined_safe_declarations :-
 
 % must sneak around pengines security! (we make it dynamic .. but if it loads before we do we have to kill it)
 :- abolish(sandbox:verify_predefined_safe_declarations,0).
-:- was_shared_multifile(sandbox:verify_predefined_safe_declarations).
+:- shared_multifile(sandbox:verify_predefined_safe_declarations).
 :- asserta(sandbox:verify_predefined_safe_declarations).
 :- asserta((sandbox:safe_primitive(X):-nonvar(X))),!.
 :- asserta((sandbox:safe_primitive(P):-var(P),!,current_predicate(F/A),functor(P,F,A))).
@@ -244,8 +244,8 @@ end_of_file.
 :- dynamic '$si$':'$was_imported_kb_content$'/2.
 :- discontiguous('$si$':'$was_imported_kb_content$'/2).
 
-:- was_shared_multifile lmconf:startup_option/2. 
-:- was_dynamic lmconf:startup_option/2. 
+:- multifile lmconf:startup_option/2. 
+:- dynamic lmconf:startup_option/2. 
 
 :- ensure_loaded(logicmoo_utils).
 

@@ -13,14 +13,18 @@ vim: set filetype=md:
 %
 %  https://github.com/TeamSPoon/PrologMUD/blob/master/runtime/try_logicmoo_examples.md
 */
+
 :- if(current_prolog_flag(logicmoo_modules,default)).
 :- module(common_logic_clif,[]).
 :- endif.
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/autoexec.pfc')).
-:- include('../mpred/mpred_header.pi').
+
+% :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/autoexec.pfc')).
+
+:- file_begin(pfc).
+
+% :- include('../mpred/mpred_header.pi').
 
 % we ensure we are in "pfc" consultation mode (so the syntax rules will define correctly)
-:- file_begin(pfc).
 
 
 ==>(hybrid_support(clif,1)).

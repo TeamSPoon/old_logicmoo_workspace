@@ -152,11 +152,12 @@
    simply_functors(2,*,*).
           
 :- include('mpred_header.pi').
-:- use_module(logicmoo(mpred/mpred_type_wff)).
+:- use_module(mpred_type_wff).
+:- use_module(mpred_pfc).
 
-:- was_shared_multifile(was_chain_rule/1).
-:- was_shared_multifile(baseKB:ptReformulatorDirectivePredicate/1).
-:- was_shared_multifile(props/2).
+%= :- shared_multifile(was_chain_rule/1).
+%= :- shared_multifile(baseKB:ptReformulatorDirectivePredicate/1).
+%= :- shared_multifile(props/2).
 
 default_te(IF,VAR,VAL):-assertz(te_setting(IF,VAR,VAL)).
 
@@ -229,7 +230,7 @@ Writing in Prolog is actually really easy for a MUD is when the length's chosen
 */
 
 
-:- was_export(alt_calls/1).
+%=  :- was_export(alt_calls/1).
 alt_calls(call).
 alt_calls(req).
 alt_calls(is_asserted).
@@ -333,7 +334,7 @@ fully_expand(Op,Sent,SentO):- hotrace((cyclic_break((Sent)), /* cnotrace */ (ful
 :- export(fully_expand/2).
 fully_expand(X,Y):-fully_expand(_,X,Y).
 
-:- mpred_trace_nochilds(fully_expand/3).
+%:- mpred_trace_nochilds(fully_expand/3).
 
 
 fully_expand0(_,Sent,SentO):- \+(is_ftCompound(Sent)),!,Sent=SentO.
@@ -341,6 +342,10 @@ fully_expand0(Op,Sent,SentO):-must_expand(Sent),!,fully_expand_now(Op,Sent,SentO
 fully_expand0(_,Sent,SentO):-get_functor(Sent,_,A),A\==1,!,Sent=SentO.
 fully_expand0(Op,Sent,SentO):-fully_expand_now(Op,Sent,SentO),!.
 
+is_stripped_module(user).
+is_stripped_module(baseKB).
+
+fully_expand_now(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,fully_expand_now(Op,Sent,SentO).
 fully_expand_now(_,Sent,SentO):- \+ (is_ftCompound(Sent)),!,Sent=SentO.
 fully_expand_now(_,Sent,SentO):-t_l:infSkipFullExpand,!,must(Sent=SentO).
 fully_expand_now(_,(:-(Sent)),(:-(Sent))):-!.
@@ -384,11 +389,11 @@ as_is_term0('call'(_)).
 as_is_term0('{}'(_)).
 as_is_term0('ignore'(_)).
 
-:- was_export(infix_op/2).
+%=  :- was_export(infix_op/2).
 infix_op(Op,_):-comparitiveOp(Op).
 infix_op(Op,_):-additiveOp(Op).
 
-:- was_export(comparitiveOp/1).
+%=  :- was_export(comparitiveOp/1).
 comparitiveOp((\=)).
 comparitiveOp((\==)).
 comparitiveOp((=)).
@@ -399,7 +404,7 @@ comparitiveOp((>)).
 comparitiveOp((=<)).
 comparitiveOp((>=)).
 
-:- was_export(additiveOp/1).
+%=  :- was_export(additiveOp/1).
 additiveOp((is)).
 additiveOp((*)).
 additiveOp(+).
@@ -439,6 +444,7 @@ mpred_expand(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),mpred_dat
    PfcRule=[F|Args],maplist(fully_expand_goal(is_asserted),Args,ArgsO),!,Out=..[F|ArgsO].
 
 
+db_expand_final(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,db_expand_final(Op,Sent,SentO).
 db_expand_final(_ ,NC,NC):-as_is_term(NC),!.
 db_expand_final(_, Sent,true):-is_true(Sent).
 db_expand_final(_,Term,Term):- is_ftCompound(Term),functor(Term,F,_),req(argsQuoted(F)),!.
@@ -508,6 +514,8 @@ db_expand_0(Op,(G,B),(GGBB)):-!,db_expand_0(Op,G,GG),db_expand_0(Op,B,BB),conjoi
 db_expand_0(Op,(G;B),(GG;BB)):-!,db_expand_0(Op,G,GG),db_expand_0(Op,B,BB).
 db_expand_0(Op,(G:-B),(GG:-BB)):-!,db_expand_0(Op,G,GG),fully_expand_goal(Op,B,BB).
 db_expand_0(_,Term,CL):- findall(O,do_expand_args(isEach,Term,O),L),L\=@=[Term],!,list_to_conjuncts(L,CL).
+
+db_expand_0(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,db_expand_0(Op,Sent,SentO).
 
 
 db_expand_0(Op,pddlSomethingIsa(I,EL),O):- listToE(EL,E),db_expand_0(Op,isa(I,E),O).
@@ -702,7 +710,7 @@ db_quf_l_0(Op, And,[C|C12],PreO,TemplO):-
   conjoin_l(Pre,Pre2,PreO),
   conjoin_op(And,Next,Templ2,TemplO).
 
-:- was_export(db_quf/4).
+%=  :- was_export(db_quf/4).
 db_quf(_ ,C,Pretest,Template):- \+ (is_ftCompound(C)),!,must(Pretest=true),must(Template=C).
 db_quf(Op,C,Pretest,Template):-is_ftVar(C),!,trace_or_throw(var_db_quf(Op,C,Pretest,Template)).
 db_quf(_ ,C,Pretest,Template):-as_is_term(C),!,must(Pretest=true),must(Template=C),!.
@@ -773,7 +781,7 @@ compare_op(Type,F,OLD,VAL):-nop(Type),show_call(why,(call(F,OLD,VAL))),!.
 % ========================================
 
 :- '$hide'(expanded_different/2).
-:- was_export(expanded_different/2).
+%=  :- was_export(expanded_different/2).
 
 expanded_different(G0,G1):-call(expanded_different_ic(G0,G1)).
 
@@ -790,7 +798,7 @@ expanded_different_1(G0,G1):- G0 \= G1,!.
 % ========================================
 % into_functor_form/3 (adds a second order functor onto most predicates)
 % ========================================
-:- was_export(into_functor_form/3).
+%=  :- was_export(into_functor_form/3).
 into_functor_form(HFDS,M:X,M:O):- atom(M),!,into_functor_form(HFDS,X,O),!.
 into_functor_form(HFDS,X,O):-call((( X=..[F|A],into_functor_form(HFDS, X,F,A,O)))),!.
 
@@ -804,7 +812,7 @@ into_functor_form(Dbase_t,_X,F,A,Call):-Call=..[Dbase_t,F|A].
 % ========================================
 % into_mpred_form/2 (removes a second order functors until the common mpred form is left)
 % ========================================
-:- was_export(into_mpred_form/2).
+%=  :- was_export(into_mpred_form/2).
 into_mpred_form(V,VO):- \+ (is_ftCompound(V)),!,VO=V.
 into_mpred_form(M:X,M:O):- atom(M),!,into_mpred_form(X,O),!.
 into_mpred_form(Sent,SentO):-is_ftNonvar(Sent),get_ruleRewrite(Sent,SentM),into_mpred_form(SentM,SentO).
@@ -819,7 +827,7 @@ into_mpred_form(t(P,A,B,C),O):-atomic(P),!,O=..[P,A,B,C].
 into_mpred_form(Var,MPRED):- is_ftVar(Var), trace_or_throw(var_into_mpred_form(Var,MPRED)).
 into_mpred_form(I,O):-loop_check(into_mpred_form_ilc(I,O),O=I). % trace_or_throw(into_mpred_form(I,O))).
 
-:- mpred_trace_nochilds(into_mpred_form/2).
+%:- mpred_trace_nochilds(into_mpred_form/2).
 
 into_mpred_form_ilc([F|Fist],O):-!,G=..[t|[F|Fist]], into_mpred_form(G,O).
 into_mpred_form_ilc(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form6(G,F,P,A,ARGS,O),!.
@@ -882,7 +890,7 @@ transform_holds_3(Op,[SVOFunctor,Obj,Prop|ARGS],OUT):- is_svo_functor(SVOFunctor
 transform_holds_3(Op,[P|ARGS],[P|ARGS]):- not(atom(P)),!,dmsg(transform_holds_3),trace_or_throw(transform_holds_3(Op,[P|ARGS],[P|ARGS])).
 transform_holds_3(HFDS,[HOFDS,P,A|ARGS],OUT):- is_holds_true(HOFDS),!,transform_holds_3(HFDS,[P,A|ARGS],OUT).
 transform_holds_3(HFDS,[HOFDS,P,A|ARGS],OUT):- HFDS==HOFDS, !, transform_holds_3(HFDS,[P,A|ARGS],OUT).
-transform_holds_3(_,HOFDS,isa(I,C)):- was_isa_syntax(HOFDS,I,C),!.
+transform_holds_3(_,HOFDS,isa(I,C)) :- was_isa_syntax(HOFDS,I,C),!.
 transform_holds_3(_,[Type,Inst],isa(Inst,Type)):-is_ftNonvar(Type),isa(Type,tCol),!.
 transform_holds_3(_,HOFDS,isa(I,C)):- holds_args(HOFDS,[ISA,I,C]),ISA==isa,!.
 
@@ -907,9 +915,10 @@ holds_args(HOFDS,FIST):- is_ftCompound(HOFDS),HOFDS=..[H|FIST],is_holds_true(H),
 
 
 
-:- was_export((do_expand_args/3)).
+%=  :- was_export((do_expand_args/3)).
 
-do_expand_args(_,Term,Term):- compound(Term),functor(Term,F,_),if_defined(argsQuoted(F)),!.
+do_expand_args(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,do_expand_args(Op,Sent,SentO).
+do_expand_args(_,Term,Term):- compound(Term),functor(Term,F,_),if_defined_else(argsQuoted(F),fail),!.
 do_expand_args(Exp,Term,Out):- compound(Term),!,must(do_expand_args_c(Exp,Term,Out)).
 do_expand_args(_,Term,Term).
 
@@ -959,7 +968,7 @@ db_op_sentence(_Op,Prop,ARGS,C0):- atom(Prop),!, C0=..[Prop|ARGS].
 db_op_sentence(_Op,Prop,ARGS,C0):- C0=..[t,Prop|ARGS].
 
 
-:- was_export(simply_functors/3).
+%=  :- was_export(simply_functors/3).
 simply_functors(Db_pred,query(HLDS,Must),Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=Simpler,!,call(Db_pred,query(HLDS,Must),Simpler).
 simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=Simpler,!,call(Db_pred,Op,Simpler).
 
@@ -972,7 +981,7 @@ simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=S
 
 
 % these do not get defined!?
-% :- was_shared_multifile user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
+% %= :- shared_multifile user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 

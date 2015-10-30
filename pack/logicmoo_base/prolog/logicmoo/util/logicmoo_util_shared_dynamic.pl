@@ -1,0 +1,40 @@
+/* Part of LogicMOO Base logicmoo_util_bb_env
+% Provides a prolog database *env*
+% ===================================================================
+% File '$FILENAME.pl'
+% Purpose: An Implementation in SWI-Prolog of certain debugging tools
+% Maintainer: Douglas Miles
+% Contact: $Author: dmiles $@users.sourceforge.net ;
+% Version: '$FILENAME.pl' 1.0.0
+% Revision: $Revision: 1.1 $
+% Revised At:  $Date: 2002/07/11 21:57:28 $
+% Licience: LGPL
+% ===================================================================
+*/
+% File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_structs.pl
+:- module(logicmoo_util_shared_dynamic,
+          [ wrap_shared/3, decl_shared/1 ]).
+
+:- dynamic(wrap_shared/3).
+
+%:- multifile(user:goal_expansion/2).
+%:- dynamic(user:goal_expansion/2).
+%user:goal_expansion(T,_):-dmsg(uge(T)),fail.
+:- multifile(system:goal_expansion/2).
+:- dynamic(system:goal_expansion/2).
+
+wrap_shared(isa,2,req).
+wrap_shared(t,2,req).
+
+system:goal_expansion(T,call(How,T)):-functor(T,F,A),wrap_shared(F,A,How),!. % ,dmsg(call(How,T)).
+
+decl_shared((A,B)):-!,decl_shared(A),!,decl_shared(B),!.
+decl_shared([A|B]):-!,decl_shared(A),!,decl_shared(B),!.
+decl_shared([A]):-!,decl_shared(A),!.
+decl_shared(F/A):-!,asserta_if_new(logicmoo_util_shared_dynamic:wrap_shared(F,A,req)).
+decl_shared(M:F/A):-!,asserta_if_new(logicmoo_util_shared_dynamic:wrap_shared(F,A,M:req)).
+decl_shared(M):-atom(M),!,asserta_if_new(logicmoo_util_shared_dynamic:wrap_shared(M,_,req)).
+
+:- decl_shared(arity).
+:- decl_shared(t).
+:- decl_shared(meta_argtypes/1).

@@ -9,7 +9,7 @@
 
 % :-use_module(mpred_pldoc_html).
 
-:- was_shared_multifile
+:- shared_multifile
 	prolog:doc_object_summary/4,	% Object, ?Category, ?Section, ?Summary
 	prolog:doc_object_page//2,	% +Object, +Options
 	prolog:doc_nav_tree//2,		% +Object, +Options
@@ -53,12 +53,12 @@ prolog:doc_object_page_footer(Obj,_) --> { not(lmconf:html_listed(Obj)) },!,pldo
 %prolog:doc_object_summary(A,B,C,D) :- format(user_error,'~n~q~n',[doc_object_summary(A, B,C,D)]),dumpST(10),fail.
 %prolog:doc_object_href(A,B) :- format(user_error,'~n+++++++++++++++======================== ~q~n',[doc_object_href(A, B)]),dumpST(10),fail.
 
-:- was_shared_multifile prolog:doc_is_public_object/1.
+:- shared_multifile prolog:doc_is_public_object/1.
 
 
 /*
 :- abolish(prolog:doc_object_page/4).
-:- was_shared_multifile prolog:doc_object_page//2.
+:- shared_multifile prolog:doc_object_page//2.
 % prolog:doc_object_page(Obj, Options,A,B) :-  format(user_error,'~n~q~n',[mpred_object_page(Obj, Options)]), mpred_object_page(Obj, Options,A,B),!.
 prolog:doc_object_page(Obj, Options,A,B) :-  format(user_error,'~n~q~n',[pldoc_man:man_page(Obj, Options)]), pldoc_man:man_page(Obj, [no_manual(fail), footer(false)|Options],A,B).
 */

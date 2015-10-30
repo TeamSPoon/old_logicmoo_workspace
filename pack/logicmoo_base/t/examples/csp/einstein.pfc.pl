@@ -1,4 +1,4 @@
-/** <module>
+/* <module>
 % =============================================
 % File 'mpred_builtin.pfc'
 % Purpose: Agent Reactivity for SWI-Prolog
@@ -31,22 +31,18 @@
 % Douglas Miles
 */
 
+:- module(zebra,[]).
 
+:- use_module(library(logicmoo/logicmoo_user)).
 
 :- file_begin(pfc).
 
-:- op(500,fx,'~').
-:- op(1050,xfx,('=>')).
-:- op(1050,xfx,'<=>').
-:- op(1050,xfx,('<-')).
-:- op(1100,fx,('==>')).
-:- op(1150,xfx,('::::')).
-:- was_dynamic(tCol/1).
-:- op(1050,xfx,('<==')).
+:- prolog.
 
-:- was_dynamic('<=='/2).
+:- system:op(1050,xfx,('<==')).
 
-:- was_dynamic('pet'/2).
+:- dynamic(('<==')/2).
+:- dynamic(('pet')/2).
 
 
 % Source http://www.iflscience.com/editors-blog/solving-einsteins-riddle
@@ -121,7 +117,7 @@ drink(P, beer) <== smoke(P, bluemasters).
 nationality(P, german) <== trait(P, smoke, prince).
 
 % 14. The Norwegian lives next to the blue house. 
-lives(H, P) <== nationality(P, norwegian), nextto(HA, HB), colored(HB, blue).
+lives(H, P) <== nationality(P, norwegian), nextto(H, B), colored(B, blue).
 
 % 15. The owner who smokes Blends lives next to the one who drinks water. 
 lives(H, P) <== smoke(P, blend), nextto(H, N), lives(N, PB), drink(PB, water).
@@ -161,4 +157,4 @@ nationality(PA, NA) <==
 
 :- forall((C <== A) ,  (dynamic(C),ain(A ==> C))).
 
-:- prolog.
+

@@ -200,20 +200,20 @@
             op(1150,fx,(was_multifile)),
             op(1150,fy,(was_module_transparent)),
             op(1150,fx,(was_export)),
-            op(1150,fx,(was_shared_multifile)).
+            op(1150,fx,(shared_multifile)).
 
 /*
-:- was_shared_multifile el_assertions:el_holds/4.
-:- was_shared_multifile el_assertions:el_holds/5.
-:- was_shared_multifile el_assertions:el_holds/6.
-:- was_shared_multifile el_assertions:el_holds/7.
-:- was_shared_multifile el_assertions:el_holds/8.
-:- was_shared_multifile el_assertions:el_holds/9.
-:- was_shared_multifile el_assertions:el_holds/10.
-:- was_shared_multifile el_assertions:el_holds/11.
-:- was_shared_multifile el_assertions:el_holds/12.
-:- was_shared_multifile el_assertions:el_holds/13.
-:- was_shared_multifile el_assertions:el_holds/14.
+:- shared_multifile el_assertions:el_holds/4.
+:- shared_multifile el_assertions:el_holds/5.
+:- shared_multifile el_assertions:el_holds/6.
+:- shared_multifile el_assertions:el_holds/7.
+:- shared_multifile el_assertions:el_holds/8.
+:- shared_multifile el_assertions:el_holds/9.
+:- shared_multifile el_assertions:el_holds/10.
+:- shared_multifile el_assertions:el_holds/11.
+:- shared_multifile el_assertions:el_holds/12.
+:- shared_multifile el_assertions:el_holds/13.
+:- shared_multifile el_assertions:el_holds/14.
 
 
 
@@ -234,30 +234,30 @@
 
 */
 
-:- meta_predicate xcall_t(1,?).
-:- meta_predicate xcall_t(6,?,?,?,?,?,?).
-:- meta_predicate xcall_f(1,?).
-:- meta_predicate holds_f(5,?,?,?,?,?).
-:- meta_predicate xcall_t(4,?,?,?,?).
-:- meta_predicate xcall_f(4,?,?,?,?).
-:- meta_predicate call_which_t(*,5,?,?,?,?,?).
-:- meta_predicate xcall_t(2,?,?).
-:- meta_predicate xcall_f(6,?,?,?,?,?,?).
-:- meta_predicate xcall_t(3,?,?,?).
-:- meta_predicate xcall_t(0).
-:- meta_predicate call_which_t(*,6,?,?,?,?,?,?).
-:- meta_predicate xcall_f(0).
-:- meta_predicate xcall_t(5,?,?,?,?,?).
 
-:- meta_predicate holds_relaxed_0_f(*,4,?,?).
-:- meta_predicate call_mt_f(*,5,?,?,?,?,?).
-:- meta_predicate holds_f(1,?).
-:- meta_predicate call_mt_f(*,3,?,?,?).
-:- meta_predicate call_f(*,5,?,?,?,?,?).
-:- meta_predicate holds_f(6,?,?,?,?,?,?).
 :- meta_predicate call_f(*,2,?,?).
-:- meta_predicate call_mt_f(*,2,?,?).
 :- meta_predicate call_f(*,3,?,?,?).
+:- meta_predicate call_f(*,5,?,?,?,?,?).
+:- meta_predicate call_mt_f(*,2,?,?).
+:- meta_predicate call_mt_f(*,3,?,?,?).
+:- meta_predicate call_mt_f(*,5,?,?,?,?,?).
+:- meta_predicate call_which_t(*,5,?,?,?,?,?).
+:- meta_predicate call_which_t(*,6,?,?,?,?,?,?).
+:- meta_predicate holds_f(1,?).
+:- meta_predicate holds_f(5,?,?,?,?,?).
+:- meta_predicate holds_f(6,?,?,?,?,?,?).
+:- meta_predicate holds_relaxed_0_f(*,4,?,?).
+:- meta_predicate xcall_f(0).
+:- meta_predicate xcall_f(1,?).
+:- meta_predicate xcall_f(4,?,?,?,?).
+:- meta_predicate xcall_f(6,?,?,?,?,?,?).
+:- meta_predicate xcall_t(0).
+:- meta_predicate xcall_t(1,?).
+:- meta_predicate xcall_t(2,?,?).
+:- meta_predicate xcall_t(3,?,?,?).
+:- meta_predicate xcall_t(4,?,?,?,?).
+:- meta_predicate xcall_t(5,?,?,?,?,?).
+:- meta_predicate xcall_t(6,?,?,?,?,?,?).
 
 
 :- was_dynamic el_assertions:el_holds/4.
@@ -275,8 +275,8 @@
 :- meta_predicate call_whichlist_t(?,0,?).
 :- meta_predicate with_kb_assertions_matching(?,?,0).
 
-:- was_shared_multifile el_assertions:el_holds_pred_impl/1.
-:- was_shared_multifile el_assertions:is_cyckb_t_pred/2.
+:- shared_multifile el_assertions:el_holds_pred_impl/1.
+:- shared_multifile el_assertions:is_cyckb_t_pred/2.
 :- was_dynamic el_assertions:el_holds_pred_impl/1.
 :- was_dynamic el_assertions:is_cyckb_t_pred/2.
 :- dynamic cyckb_t/3.

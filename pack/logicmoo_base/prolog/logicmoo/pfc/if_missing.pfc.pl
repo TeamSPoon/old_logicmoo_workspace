@@ -1,5 +1,8 @@
 
 
+:- file_begin(pfc).
+
+
 pfcControlled(if_missing(ftAskable,ftAssertable)).
 
 % this should have been ok

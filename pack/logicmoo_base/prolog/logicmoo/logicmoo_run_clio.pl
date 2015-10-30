@@ -13,14 +13,14 @@
 
 % :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
-:- was_shared_multifile(mpred_online:semweb_startup).
+:- shared_multifile(mpred_online:semweb_startup).
 
 :- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.
 
 :- if(if_defined(load_mud_www)).
 
-:- was_shared_multifile prolog:message/3.
+:- shared_multifile prolog:message/3.
 % I WISH I COULD DO :- was_dynamic prolog:message/3.
 %prolog:message(git(update_versions),A,A):-!.
 
@@ -32,7 +32,7 @@ do_semweb_startup_late_once:-asserta(did_semweb_startup_late_once),forall(clause
 :- use_module(user(user_db)).
 
 :- was_dynamic http:location/3.
-:- was_shared_multifile http:location/3.
+:- shared_multifile http:location/3.
 
 :- file_search_path(cliopatria,SP),
    exists_directory(SP),

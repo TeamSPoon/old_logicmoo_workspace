@@ -210,7 +210,7 @@
             writeOverwritten/0,
             writeSTDERR0/1,
             writeSavedPrompt/0,
-     op(1150,fx,(lmconf:was_shared_multifile))
+     op(1150,fx,(lmconf:shared_multifile))
 
           ]).
 :- meta_predicate with_skip_bugger(0).
@@ -431,7 +431,7 @@
 
 
 :- 
-      op(1150,fx,(lmconf:was_shared_multifile)),
+      op(1150,fx,(lmconf:shared_multifile)),
       op(1150,fx,meta_predicate),
       op(1150,fx,thread_local).
 

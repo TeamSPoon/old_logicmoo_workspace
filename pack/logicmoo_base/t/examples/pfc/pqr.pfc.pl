@@ -2,7 +2,7 @@
 
 
 % :- qcompile(library(logicmoo/logicmoo_user)).
-:- baseKB:use_module(library('logicmoo/logicmoo_user.qlf')).
+:- baseKB:use_module(library('logicmoo/logicmoo_user')).
 
 :- begin_pfc.
 

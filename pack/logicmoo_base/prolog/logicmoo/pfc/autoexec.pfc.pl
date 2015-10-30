@@ -110,6 +110,8 @@
 
 :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/singleValued.pfc')).
 
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../snark/common_logic_clif.pfc')).
+
 % :- ensure_mpred_file_loaded('../pfc/relationAllExists.pfc').
 
 % :- mpred_test(ensure_loaded('../pfc/pttpFWC.pfc')).

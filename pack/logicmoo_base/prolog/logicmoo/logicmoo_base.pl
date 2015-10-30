@@ -1,4 +1,4 @@
-/** <module> LogicMOO Base FOL/PFC Setup
+/* <module> LogicMOO Base FOL/PFC Setup
 % Dec 13, 2035
 % Douglas Miles
 */
@@ -11,21 +11,31 @@
 :- multifile(lmconf:mpred_is_impl_file/1).
 :- dynamic(lmconf:mpred_is_impl_file/1).
 
-
-% ========================================
-% lmconf:mpred_system_kb/1
-% ========================================
-s
-:- multifile(lmconf:mpred_system_kb/1).
-:- dynamic(lmconf:mpred_system_kb/1).
-lmconf:mpred_system_kb(baseKB).
-
+:- source_location(F,_),asserta(lmconf:never_registered_mpred_file(F)).
 
 :- multifile lmconf:startup_option/2. 
 :- dynamic lmconf:startup_option/2. 
 :- multifile lmconf:mpred_system_status/2.
 :- dynamic lmconf:mpred_system_status/2.
 :- thread_local t_l:disable_px/0.
+
+:- multifile(lmconf:mpred_system_kb/1).
+:- dynamic(lmconf:mpred_system_kb/1).
+
+:- use_module(logicmoo_utils).
+% :- initialization(add_library_search_path('.',[ './mpred/*.pl','./snark/*.pl'])).
+:-dmsg("Adding logicmoo/[mpred,snark] to autoload path",[]).
+:- add_library_search_path('./mpred/',[ '*.pl']).
+:- add_library_search_path('./snark/',[ '*.pl']).
+% :- add_library_search_path('./plarkc/',[ '*.pl']).
+% :- add_library_search_path('./pttp/',[ 'dbase_i_mpred_*.pl']).
+
+% ========================================
+% lmconf:mpred_system_kb/1
+% ========================================
+
+lmconf:mpred_system_kb(baseKB).
+
 
 % lmconf:startup_option(datalog,sanity). %  Run datalog sanity tests while starting
 % lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
@@ -87,13 +97,6 @@ lmconf:disable_mpred_system0(Module):-
 %% ensure_mpred_system is det.
 % Ensure the "managed predicate" system and subsystems are available
 ensure_mpred_system:- source_context_module(M),enable_mpred_system(M).
-
-% :- initialization(add_library_search_path('.',[ './mpred/*.pl','./snark/*.pl'])).
-:-dmsg("Adding logicmoo/[mpred,snark] to autoload path",[]).
-:- add_library_search_path('./mpred/',[ '*.pl']).
-:- add_library_search_path('./snark/',[ '*.pl']).
-% :- add_library_search_path('./plarkc/',[ '*.pl']).
-% :- add_library_search_path('./pttp/',[ 'dbase_i_mpred_*.pl']).
 
 
 :- lmconf:mpred_system_kb(M),dmsg(system_kb=M).

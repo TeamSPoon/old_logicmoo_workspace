@@ -7,7 +7,7 @@
 herbrandize.
 :- retractall(herbrandize).
 
-:- was_shared_multifile(herbrand/1).
+:- shared_multifile(herbrand/1).
 :- was_dynamic(herbrand/1).
 
 add_herbrand_preds((Head :- Body),(Head :- Body1)) :- herbrandize ,!,

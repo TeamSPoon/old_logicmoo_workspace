@@ -1,5 +1,6 @@
 
 
+:- file_begin(pfc).
 
 ((genls(X,Y),genls(Y,X),{X\==Y}) ==> {mpred_rem1(genls(X,Y))}).
 

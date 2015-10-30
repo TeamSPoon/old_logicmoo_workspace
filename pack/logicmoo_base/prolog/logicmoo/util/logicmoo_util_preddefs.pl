@@ -20,7 +20,7 @@
             def_meta_predicate/3,
             dynamic_if_missing/1,
             dynamic_multifile/1,
-            (was_shared_multifile)/1,            
+            (shared_multifile)/1,            
             (dynamic_safe)/1,
             (dynamic_safe)/3,
             dynamic_transparent/1,
@@ -47,7 +47,7 @@
              (was_multifile)/1,
              (was_module_transparent)/1,
              (was_export)/1,
-             (was_shared_multifile)/1,
+             (shared_multifile)/1,
             with_mfa/2,            
             (make_shared_multifile)/3,
             with_pfa/2,
@@ -191,12 +191,12 @@ context_module_of_file(CM):- source_context_module(CM),!.
 
 :- op(1150,fx,lmconf:dynamic_safe).
 
-:- export((was_shared_multifile)/1).
-:- module_transparent((was_shared_multifile)/1).
-:- meta_predicate((was_shared_multifile(+))).
+:- export((shared_multifile)/1).
+:- module_transparent((shared_multifile)/1).
+:- meta_predicate((shared_multifile(+))).
 
 
-was_shared_multifile(PI):- context_module_of_file(CM),with_pfa_group(save_was(shared_multifile),CM, baseKB, PI).
+shared_multifile(PI):- context_module_of_file(CM),with_pfa_group(make_shared_multifile,CM, baseKB, PI).
 was_dynamic(PI):- context_module_of_file(CM),with_pfa_group(save_was(dynamic),CM, baseKB, PI).
 was_export(PI):- context_module_of_file(CM),with_pfa_group(save_was(export),CM, baseKB, PI).
 was_module_transparent(PI):- context_module_of_file(CM),with_pfa_group(save_was(module_transparent),CM, baseKB, PI).
@@ -219,13 +219,21 @@ save_was(Was,CM, M, P):-functor(P,F,A), save_was(Was,CM, M, F/A).
 
 :-module_transparent(make_shared_multifile/3).
 :- export((make_shared_multifile)/3).
-make_shared_multifile(CM, M, F/A):- trace,
+
+
+make_shared_multifile(_, baseKB, F/A):-decl_shared(F/A),!.
+make_shared_multifile(_, basePFC, _):-!.
+make_shared_multifile(CM, t_l, F/A):-!,CM:thread_local(t_l:F/A).
+make_shared_multifile(CM, lmconf, F/A):-!,CM:dynamic(lmconf:F/A),!,CM:multifile(lmconf:F/A).
+
+make_shared_multifile(CM, M, F/A):- 
+ dmsg(make_shared_multifile(CM, M, F/A)),
  must_det_l((    
     dynamic_safe(M,F,A), 
    '@'(M:export(M:F/A),M),
    '@'(M:multifile(M:F/A),M),
    '@'(M:multifile(M:F/A),CM),   
-    (CM\==M->CM:rwe54rimport(M:F/A);true))).
+    (CM\==M->CM:import(M:F/A);true))).
 make_shared_multifile(CM, M, PI):- functor(PI,F,A),make_shared_multifile(CM, M, F/A).
 
 :-module_transparent(with_pfa/2).

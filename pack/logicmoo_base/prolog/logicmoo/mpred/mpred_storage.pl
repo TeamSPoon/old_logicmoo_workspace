@@ -384,14 +384,14 @@ make_body_clause(_Head,Body,Body):-special_wrapper_body(Body,_Why),!.
 make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 
 special_head(_,F,Why):-special_head0(F,Why),!,show_failure(why,not(isa(F,prologDynamic))).
-special_head0(F,ttPredType):-ttPredType(F),!.
-special_head0(F,functorDeclares):-t(functorDeclares,F),!.
-special_head0(F,prologMacroHead):-t(prologMacroHead,F),!.
-special_head0(F,pfcControlled):-t(pfcControlled,F),!.
+special_head0(F,ttPredType):-a(ttPredType,F),!.
+special_head0(F,functorDeclares):-a(functorDeclares,F),!.
+special_head0(F,prologMacroHead):-a(prologMacroHead,F),!.
+special_head0(F,pfcControlled):-a(pfcControlled,F),!.
 special_head0(isa,isa).
-special_head0(F,tCol):-t(tCol,F),!.
-special_head0(F,prologHybrid):-t(prologHybrid,F).
-special_head0(F,pfcControlled):-t(pfcControlled,F).
+special_head0(F,tCol):-a(tCol,F),!.
+special_head0(F,prologHybrid):-a(prologHybrid,F).
+special_head0(F,pfcControlled):-a(pfcControlled,F).
 
 
 
@@ -680,8 +680,8 @@ hooked_retractall(G):- Op = change(retract,all),
 
 lmconf:mpred_provide_storage_op(Op,G):- get_functor(G,F,A),lmconf:mpred_provide_storage_op(Op,G,F,A).
 
-lmconf:mpred_provide_storage_op(Op,G, F,_A):- t(pfcControlled,F),!,loop_check(prolog_mpred_provide_storage_op(Op,G)).
-lmconf:mpred_provide_storage_op(Op,G, F,_A):- t(prologDynamic,F),!,loop_check(lmconf:mpred_provide_storage_op(Op,G)).
+lmconf:mpred_provide_storage_op(Op,G, F,_A):- a(pfcControlled,F),!,loop_check(prolog_mpred_provide_storage_op(Op,G)).
+lmconf:mpred_provide_storage_op(Op,G, F,_A):- a(prologDynamic,F),!,loop_check(lmconf:mpred_provide_storage_op(Op,G)).
 lmconf:mpred_provide_storage_op(Op,G,_F,_A):- loop_check(prolog_mpred_provide_storage_op(Op,G)).
 
 %lmconf:mpred_provide_storage_op(Op,G):- (loop_check(isa_lmconf:mpred_provide_storage_op(Op,G))).

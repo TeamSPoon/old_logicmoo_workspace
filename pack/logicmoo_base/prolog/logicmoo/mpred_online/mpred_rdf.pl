@@ -15,14 +15,14 @@
 
 
 
-:- was_shared_multifile(lmconf:expire_one_rdf_cache/0).
+:- shared_multifile(lmconf:expire_one_rdf_cache/0).
 
 
-:- was_shared_multifile(rdf_db:rdf_open_hook/3).
+:- shared_multifile(rdf_db:rdf_open_hook/3).
 
 expire_rdf_caches :- forall(clause(expire_one_rdf_cache,Body),must(Body)).
 
-:- was_shared_multifile(mpred_online:semweb_startup).
+:- shared_multifile(mpred_online:semweb_startup).
 
 mpred_online:semweb_startup:- retractall((tlbugger:show_must_go_on)).
 mpred_online:semweb_startup:- expire_rdf_caches.
@@ -79,7 +79,7 @@ n3_parse(URL,Options) :-
   
 
 n3_parse_1(URL,Imported,Options) :- catch(n3_parse_2(URL,Imported,Options),E,dmsg(E:n3_parse_1(URL,Imported,Options))).
-:- was_shared_multifile(owl_file_loaded/1).
+:- shared_multifile(owl_file_loaded/1).
 :- was_dynamic(owl_file_loaded/1).
 :- was_export(owl_file_loaded/1).
 
@@ -434,7 +434,7 @@ rdf_object(O):-ground(O).
 
 :- was_dynamic(lmconf:using_rdf_mpred_hook).
 
-% :- was_shared_multifile(lmconf:decl_database_hook).
+% :- shared_multifile(lmconf:decl_database_hook).
 %OLD lmconf:decl_database_hook(change(assert,_A_or_Z),DBI):- copy_term(DBI,DB), lmconf:using_rdf_mpred_hook,numbervars_with_names(DB),rdf_assert_hook(DB),!.
 
 :- thread_local(t_l:rdf_asserting/2).
@@ -671,7 +671,7 @@ mpred_rdf_has_type(Resource, Class) :-
 		 *	       REGISTER		*
 		 *******************************/
 
-:- was_shared_multifile
+:- shared_multifile
 	cliopatria:entailment/2.
 
 cliopatria:entailment(mpred_rdf, mpred_rdf).
@@ -701,7 +701,7 @@ mpred_online:semweb_startup:- must(sync_from_rdf).
 mpred_online:semweb_startup:- must(sync_to_rdf).
 
 
-:- was_shared_multifile(lmconf:call_OnEachLoad/1).
+:- shared_multifile(lmconf:call_OnEachLoad/1).
 mpred_online:semweb_startup:- asserta_if_new(lmconf:call_OnEachLoad(sync_to_rdf)).
 mpred_online:semweb_startup:- asserta_if_new(lmconf:call_OnEachLoad(sync_from_rdf)).
 

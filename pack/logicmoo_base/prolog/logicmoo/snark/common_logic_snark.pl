@@ -128,22 +128,23 @@
             op(1150,fx,(was_export)),
             op(1150,fx,(shared_multifile)).
 
-:- op(500,fx,'~').
-:- op(1199,fx,('==>')).
-:- op(1190,xfx,('::::')).
-:- op(1180,xfx,('==>')).
-:- op(1170,xfx,'<==>').
-:- op(1160,xfx,('<-')).
-:- op(1150,xfx,'=>').
-:- op(1140,xfx,'<=').
-:- op(1130,xfx,'<=>').
-:- op(1100,fx,('nesc')).
-:- op(300,fx,'-').
-:- op(600,yfx,'&'). 
-:- op(600,yfx,'v').
-:- op(1075,xfx,'<-').
-:- op(350,xfx,'xor').
-:- op(1100,fx,(was_shared_multifile)).
+:-
+ op(1199,fx,('==>')), 
+ op(1190,xfx,('::::')),
+ op(1180,xfx,('==>')),
+ op(1170,xfx,'<==>'),  
+ op(1160,xfx,('<-')),
+ op(1150,xfx,'=>'),
+ op(1140,xfx,'<='),
+ op(1130,xfx,'<=>'), 
+ op(600,yfx,'&'), 
+ op(600,yfx,'v'),
+ op(350,xfx,'xor'),
+ op(300,fx,'~'),
+ op(300,fx,'-').
+
+
+:- op(1100,fx,(shared_multifile)).
 
 :- meta_predicate
    % common_logic_snark
@@ -222,7 +223,7 @@ delistify_last_arg(Arg,Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARG
 % Use this to mark code and not axiomatic prolog
 
 clif_to_prolog(CLIF,Prolog):-cwc,is_list(CLIF),!,must_maplist(clif_to_prolog,CLIF,Prolog).
-clif_to_prolog((H,CLIF),(T,Prolog)):-cwc,sanity(must(nonvar(H))),!,trace,clif_to_prolog(H,T),clif_to_prolog(CLIF,Prolog).
+clif_to_prolog((H,CLIF),(T,Prolog)):-cwc,sanity(must(nonvar(H))),!,clif_to_prolog(H,T),clif_to_prolog(CLIF,Prolog).
 clif_to_prolog((H<-B),(H<-B)):- cwc,!.
 clif_to_prolog((P==>Q),(P==>Q)):- cwc,!.
 clif_to_prolog((H:-B),PrologO):- cwc,!,must((show_failure(why,boxlog_to_pfc((H:-B),Prolog)),!,=(Prolog,PrologO))),!.
@@ -688,12 +689,12 @@ clauses_to_boxlog_2(KB, Why,cl([],BodyIn),  Prolog):- !, (is_lit_atom(BodyIn) ->
 clauses_to_boxlog_2(KB, Why,cl([HeadIn],[]),Prolog):- !, (is_lit_atom(HeadIn) -> Prolog=HeadIn ; (kif_to_boxlog(HeadIn,KB,Why,Prolog))).
 clauses_to_boxlog_2(KB,_Why,cl([HeadIn],BodyIn),(HeadIn:- BodyOut)):-!, must_maplist(logical_pos(KB),BodyIn,Body), list_to_conjuncts(Body,BodyOut),!.
 
-clauses_to_boxlog_2(KB, Why,cl([H,Head|List],BodyIn),Prolog):- trace,
+clauses_to_boxlog_2(KB, Why,cl([H,Head|List],BodyIn),Prolog):- 
   findall(Answer,((member(E,[H,Head|List]),delete_eq([H,Head|List],E,RestHead),
      must_maplist(logical_neg(KB),RestHead,RestHeadS),append(RestHeadS,BodyIn,Body),
        clauses_to_boxlog_1(KB,Why,cl([E],Body),Answer))),Prolog),!.
 
-clauses_to_boxlog_2(_KB,_Why,(H:-B),(H:-B)):- trace,!.
+clauses_to_boxlog_2(_KB,_Why,(H:-B),(H:-B)):- !.
 
 clauses_to_boxlog_5(KB, Why,In,Prolog):- is_list(In),!,must_maplist(clauses_to_boxlog_5(KB,Why),In,Prolog).
 clauses_to_boxlog_5(_KB,_Why,(H:-B),(H:-B)):-!.
@@ -813,7 +814,7 @@ kif_ask(Goal0,ProofOut):- logical_pos(_KB,Goal0,Goal),
 
 kif_add(InS):- atom(InS),must_det_l((kif_read(string(InS),Wff,Vs),b_implode_varnames0(Vs),local_sterm_to_pterm(Wff,Wff0),kif_add(Wff0))),!.
 % kif_add(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),why_to_id(tell,Wff,Why),kif_add(Why,Wff))),!.
-kif_add(WffIn):- trace,must_det_l((numbervars_with_names(WffIn,Wff),ain(clif(Wff)))),!.
+kif_add(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),ain(clif(Wff)))),!.
 
 
 local_sterm_to_pterm(Wff,WffO):- sexpr_sterm_to_pterm(Wff,WffO),!.

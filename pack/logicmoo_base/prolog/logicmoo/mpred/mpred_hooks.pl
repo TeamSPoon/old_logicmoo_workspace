@@ -57,6 +57,7 @@ call_which_t/5,
 call_which_t/6,
 call_which_t/7,
 call_which_t/8,
+call_which_t/9,
 compute_value/2,
 compute_value_no_dice/2,
 create_random_fact/1,
@@ -94,7 +95,6 @@ inverse_args/2,
 isCycPredArity_ignoreable/2,
 list_update_op/3,
 loaded_external_kbs/0,
-loading_module_h/1,
 local_term_anglify/2,
 loop_check_mpred/1,
 mpred_fact_arity/2,
@@ -226,6 +226,7 @@ call_which_t/5,
 call_which_t/6,
 call_which_t/7,
 call_which_t/8,
+call_which_t/9,
 compute_value/2,
 compute_value_no_dice/2,
 create_random_fact/1,
@@ -263,7 +264,6 @@ inverse_args/2,
 isCycPredArity_ignoreable/2,
 list_update_op/3,
 loaded_external_kbs/0,
-loading_module_h/1,
 local_term_anglify/2,
 loop_check_mpred/1,
 mpred_fact_arity/2,
@@ -344,71 +344,71 @@ never_mpred_mpred(arity).
 
 :- include('mpred_header.pi').
 
-:- was_shared_multifile agent_action_queue/3.
+:- shared_multifile agent_action_queue/3.
 
 
-:- was_shared_multifile create_random_fact/1.
-% :- was_shared_multifile decl_database_hook/2.
-:- was_shared_multifile deduce_facts/2.
-:- was_shared_multifile default_type_props/3.
-:- was_shared_multifile fact_always_true/1.
-:- was_shared_multifile fact_maybe_deduced/1.
-:- was_shared_multifile tms_reject_why/2.
-:- was_shared_multifile fskel/7.
-:- was_shared_multifile hooked_random_instance/3.
+:- shared_multifile create_random_fact/1.
+% :- shared_multifile decl_database_hook/2.
+:- shared_multifile deduce_facts/2.
+:- shared_multifile default_type_props/3.
+:- shared_multifile fact_always_true/1.
+:- shared_multifile fact_maybe_deduced/1.
+:- shared_multifile tms_reject_why/2.
+:- shared_multifile fskel/7.
+:- shared_multifile hooked_random_instance/3.
 
-:- was_shared_multifile now_unused/1.
+:- shared_multifile now_unused/1.
 
-:- was_shared_multifile session_io/4, session_agent/2, agent_session/2, telnet_fmt_shown/3, agent_action_queue/3.
-
-
-
-
-:- was_shared_multifile(startup_option/2).
-:- was_shared_multifile(is_edited_clause/3).
+:- shared_multifile session_io/4, session_agent/2, agent_session/2, telnet_fmt_shown/3, agent_action_queue/3.
 
 
 
 
-:- was_shared_multifile use_cyc_database/0.
-:- was_shared_multifile agent_session/2.
-
-:- was_shared_multifile fact_is_false/2.
-% :- was_shared_multifile kbp_t_list_prehook/2.
+:- shared_multifile(lmconf:startup_option/2).
+:- shared_multifile(is_edited_clause/3).
 
 
 
 
-:- was_shared_multifile mudKeyword/2.
-:- was_shared_multifile only_if_pttp/0.
-:- was_shared_multifile relationMostInstance/3.
+:- shared_multifile use_cyc_database/0.
+:- shared_multifile agent_session/2.
 
-
-:- was_shared_multifile tFarthestReachableItem/1.
-:- was_shared_multifile tNearestReachableItem/1.
-:- was_shared_multifile use_kif/2.
-
-:- was_shared_multifile(agent_text_command/4).
-
-:- was_shared_multifile(grid_key/1).
+:- shared_multifile fact_is_false/2.
+% :- shared_multifile kbp_t_list_prehook/2.
 
 
 
-:- was_shared_multifile(use_cyc_database/0).
-% :- was_shared_multifile decl_database_hook/2.
+
+:- shared_multifile mudKeyword/2.
+:- shared_multifile only_if_pttp/0.
+:- shared_multifile relationMostInstance/3.
 
 
-:- was_shared_multifile(mpred_module_ready).
+:- shared_multifile tFarthestReachableItem/1.
+:- shared_multifile tNearestReachableItem/1.
+:- shared_multifile use_kif/2.
 
-:- was_shared_multifile loaded_external_kbs/0.
+:- shared_multifile(agent_text_command/4).
 
-:- was_shared_multifile loading_module_h/1.
-:- was_shared_multifile local_term_anglify/2.
+:- shared_multifile(grid_key/1).
 
 
-:- was_shared_multifile term_anglify_last/2.
-:- was_shared_multifile term_anglify_np/3.
-:- was_shared_multifile term_anglify_np_last/3.
+
+:- shared_multifile(use_cyc_database/0).
+% :- shared_multifile decl_database_hook/2.
+
+
+:- shared_multifile(mpred_module_ready).
+
+:- shared_multifile loaded_external_kbs/0.
+
+:- shared_multifile loading_module/1.
+:- shared_multifile local_term_anglify/2.
+
+
+:- shared_multifile term_anglify_last/2.
+:- shared_multifile term_anglify_np/3.
+:- shared_multifile term_anglify_np_last/3.
 
 
 

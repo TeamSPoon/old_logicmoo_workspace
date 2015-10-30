@@ -191,7 +191,7 @@ list_file_preds(S,FM):-
    portray_clause_pi_LR( thread_local,ThreadLocal),subtract(Dynamic,ThreadLocal,DynamicL),   
    portray_clause_pi_LR( export,Non_Exports),
    portray_clause_pi_LR( dynamic,Dynamic),
-   portray_clause_pi_LR( was_shared_multifile,DynamicL),
+   portray_clause_pi_LR( shared_multifile,DynamicL),
    portray_clause_pi_LR( volatile,Volatile))),!.
    
 

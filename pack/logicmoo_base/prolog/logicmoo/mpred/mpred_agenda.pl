@@ -228,7 +228,7 @@ add_later(Fact):- call_after_mpred_load(ain(Fact)).
 % ========================================
 /*
 :- was_dynamic(lmconf:decl_database_hook/2).
-:- was_shared_multifile(lmconf:decl_database_hook/2).
+:- shared_multifile(lmconf:decl_database_hook/2).
 :- was_export(lmconf:decl_database_hook/2).
 :- meta_predicate lmconf:decl_database_hook(?,0).
 */

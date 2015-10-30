@@ -81,7 +81,7 @@
             trans_subft/2
           ]).
 % autoloading user:portray_clause_pi/2 from /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first
-:- was_shared_multifile((         
+:- shared_multifile((         
         
         coerce/3)).
 /*
@@ -143,7 +143,7 @@ is_boolean(vFalse).
 
 is_declarations(C):-compound(C),ground(C),!, (\+ (arg(_,C,T), \+ is_spec(T))).
 
-is_spec(T):-tCol(T)->true;is_declarations(T).
+is_spec(T):- req(tCol(T))->true;is_declarations(T).
 
 is_rest([_|Term]):-not(is_list(Term)).
 is_rest_of(_Type,[_|Term]):-not(is_list(Term)).
@@ -180,7 +180,7 @@ is_ftText(Arg):- text_to_string_safe(Arg,_),!.
 is_ftText(Arg):- functor(Arg,S,_),resultIsa(S,ftText).
 
 :- was_dynamic(coerce/3).
-:- was_shared_multifile(coerce/3).
+:- shared_multifile(coerce/3).
 :- was_export(coerce/4).
 coerce(What,Type,NewThing,_Else):-coerce(What,Type,NewThing),!.
 coerce(_ ,_,     NewThing,Else):- NewThing = Else.
@@ -445,7 +445,7 @@ correctAnyTypeOrFail(Op,A,Type,AA):- w_tl(tlbugger:skipMust,checkAnyType(Op,A,Ty
 
 
 :- thread_local t_l:can_coerce/1.
-correctType_gripe(Op,A,Fmt,AA):- t(ttFormatType,Fmt),!,trace_or_throw(correctType(is_ft_correctFormatType(Op,A,Fmt,AA))).
+correctType_gripe(Op,A,Fmt,AA):- a(ttFormatType,Fmt),!,trace_or_throw(correctType(is_ft_correctFormatType(Op,A,Fmt,AA))).
 correctType_gripe(Op,A,Type,AA):- fail,atom(Type),must_equals(A,AA),
       dmsg(todo(isa_assert_type(Type))),
       % decl_type(Type),
@@ -555,7 +555,7 @@ correctType0(Op,Args,Types,NewArgs):-compound(Args), compound(Types),
    correctAnyType(Op,ArgsL,TypesL,NewArgsL).
 
 correctType0(Op,A,Fmt,AA):- trans_subft(Fmt,Code),Fmt\=Code,loop_check(correctType0(Op,A,Code,AA)).
-correctType0(Op,A,Super,AA):- t(ttFormatType,Super),req(genls(Sub,Super)),Sub\=Super,loop_check(correctType0(Op,A,Sub,AA)).
+correctType0(Op,A,Super,AA):- a(ttFormatType,Super),req(genls(Sub,Super)),Sub\=Super,loop_check(correctType0(Op,A,Sub,AA)).
 
 correctType0(Op,Arg,Props,NewArg):- compound(Props),
    Props=..[F|TypesL],

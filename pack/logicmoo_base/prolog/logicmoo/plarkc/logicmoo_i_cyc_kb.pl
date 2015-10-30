@@ -90,7 +90,7 @@
             wkb2/0,
             wkbe/0
           ]).
-:- was_shared_multifile   
+:- shared_multifile   
         argGenl/3,
         argIsa/3,
         argQuotedIsa/3.
@@ -542,11 +542,11 @@ cyc_to_clif(HOLDS,HOLDSOUT):-HOLDS=..[F|HOLDSL],
 
 /*
 :- was_dynamic(argIsa/3).
-:- was_shared_multifile(argIsa/3).
+:- shared_multifile(argIsa/3).
 :- was_dynamic(argGenl/3).
-:- was_shared_multifile(argGenl/3).
+:- shared_multifile(argGenl/3).
 :- was_dynamic(argQuotedIsa/3).
-:- was_shared_multifile(argQuotedIsa/3).
+:- shared_multifile(argQuotedIsa/3).
 isa(I,C):-exactlyAssertedEL(isa,I,C,_,_).
 genls(I,C):-exactlyAssertedEL(genls,I,C,_,_).
 arity(I,C):-exactlyAssertedEL(arity,I,C,_,_).

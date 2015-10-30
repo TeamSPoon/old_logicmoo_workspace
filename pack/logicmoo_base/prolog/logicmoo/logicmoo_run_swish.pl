@@ -7,7 +7,7 @@
 
 :- volatile(swish_trace:installed/1).
 
-:- was_shared_multifile(mpred_online:semweb_startup).
+:- shared_multifile(mpred_online:semweb_startup).
 % :- '@'(ensure_loaded(logicmoo(util/logicmoo_util_bugger)),user).
 :- add_to_search_path(swish, '../pack/swish/').
 
@@ -36,7 +36,7 @@ logicmoo_set_swish_path :-
                  *   CREATE SWISH APPLICATION   *
                  *******************************/
 
-:- was_shared_multifile
+:- shared_multifile
 	pengines:prepare_module/3.
 
 :- logicmoo_set_swish_path.
@@ -88,7 +88,7 @@ assert_sv(P):-!,functor(P,_,A),duplicate_term(P,R),setarg(A,R,_),ignore(retract(
 
 :- abolish(swish_config:config,2).
 :- was_dynamic(swish_config:config/2).
-:- was_shared_multifile
+:- shared_multifile
 	swish_config:config/2,
 	swish_config:source_alias/2.
 

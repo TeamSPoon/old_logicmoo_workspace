@@ -58,22 +58,22 @@
 % SWI Prolog modules do not export operators by default
 % so they must be explicitly placed in the user namespace
 
-:- op(500,fx,user:'~').
-:- op(1199,user:fx,('==>')).
-:- op(1190,user:xfx,('::::')).
-:- op(1180,user:xfx,('==>')).
-:- op(1170,user:xfx,'<==>').
-:- op(1160,user:xfx,('<-')).
-:- op(1150,user:xfx,'=>').
-:- op(1140,user:xfx,'<=').
-:- op(1130,user:xfx,'<=>').
-:- op(1100,user:fx,('nesc')).
-:- op(300,user:fx,'-').
-:- op(600,user:yfx,'&'). 
-:- op(600,user:yfx,'v').
-:- op(1075,user:xfx,'<-').
-:- op(350,user:xfx,'xor').
-:- op(1100,user:fx,(was_shared_multifile)).
+:-
+ op(1199,fx,('==>')), 
+ op(1190,xfx,('::::')),
+ op(1180,xfx,('==>')),
+ op(1170,xfx,'<==>'),  
+ op(1160,xfx,('<-')),
+ op(1150,xfx,'=>'),
+ op(1140,xfx,'<='),
+ op(1130,xfx,'<=>'), 
+ op(600,yfx,'&'), 
+ op(600,yfx,'v'),
+ op(350,xfx,'xor'),
+ op(300,fx,'~'),
+ op(300,fx,'-').
+
+:- op(1100,user:fx,(shared_multifile)).
 
 
 

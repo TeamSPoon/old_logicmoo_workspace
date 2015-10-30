@@ -2,8 +2,8 @@
 :- module(plarkc_cyc_kb_preds,[]).
 :- endif.
 
-:- was_shared_multifile is_cyckb_t_pred/2.
-:- was_shared_multifile is_cyckb_t_pred_rename/2.
+:- shared_multifile is_cyckb_t_pred/2.
+:- shared_multifile is_cyckb_t_pred_rename/2.
 :- was_dynamic is_cyckb_t_pred/2.
 :- was_dynamic is_cyckb_t_pred_rename/2.
 
