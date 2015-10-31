@@ -37,10 +37,10 @@
 %= immediately
 :- set_clause_compile(fwc).
 
-must_is_entailed(G):- must(is_entailed(G)).
+must_is_entailed(G):- cwc, must(is_entailed(G)).
 
 
-show_test(G):- get_user_abox(KB),printAll(must(KB:G)).
+show_test(G):- cwc, get_user_abox(KB),printAll(must(KB:G)).
 
 %= ````
 %= logic tests...

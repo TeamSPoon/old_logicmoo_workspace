@@ -35,8 +35,12 @@
 
 :- use_module(library(logicmoo/logicmoo_user)).
 
+:- op(600,xfx, (/\)).
+
 :- file_begin(pfc).
 
+% add this to our vocab
+props((/\),ftSentenceOp,tLogicalConjunction).
 
 % Source http://www.iflscience.com/editors-blog/solving-einsteins-riddle
 
@@ -44,65 +48,63 @@
 row_ord(house1, house2). row_ord(house2, house3). row_ord(house3, house4). row_ord(house4, house5).
 
 % forward chain these into houses
-row_ord(HA, HB) ==> house(HA) ^ house(HB).
-
-% nextto/2 is symmetric
-nextto(HA, HB) <- (row_ord(HA, HB); row_ord(HB, HA)).
-
+row_ord(HA, HB) ==> house(HA) /\ house(HB).
 
 %= In each house lives a person with a unique nationality.
 % we write this in SUMO
 all(H,
  exists(P,
   (house(H) => 
-    (person(P) ^ lives(P, H) ^ unique(U,nationality(P,U)))))).
+    (person(P) /\ lives(P, H) /\ unique(U,nationality(P,U)))))).
 
 
 % Helper functions
 % 
+% nextto/2 is symmetric
+nextto(HA, HB) <- (row_ord(HA, HB); row_ord(HB, HA)).
 %
-% helper - next door house (symmetricalness was inherited from nextto/2)
-lives(P, H) ^ nextto(H, HB) => lives_nextto_house(P,HB).
-
+% next door house (symmetricalness was inherited from nextto/2)
+lives(P, H) /\ nextto(H, HB) => lives_nextto_house(P,HB).
+% 
 % helper - next door neighbours (symmetricalness was inherited from lives_nextto_house/2)
-lives_nextto_house(P,HB) ^ lives(PB, HB) => next_door_neighbours(P,PB).
+lives_nextto_house(P,HB) /\ lives(PB, HB) => next_door_neighbours(P,PB).
 
 
 
 % Other facts:
 % 
 % 1. The Brit lives in the red house. 
-nationality(P, brit) => lives(P, H) ^ colored(H, red).
+nationality(P, brit) => lives(P, H) /\ colored(H, red).
 
 % 2. The Swede keeps dogs as pets. 
 nationality(P, swedish) => pet(P, dog).
 
 % 3. The Dane drinks tea. 
-nationality(P, danish) ^ drink(P, tea).
+nationality(P, danish) /\ drink(P, tea).
 
 % 4. The green house is on the immediate left of the white house. 
-colored(L, green) ^ row_ord(L, R) ^ colored(R, white).
+colored(L, green) /\ row_ord(L, R) /\ colored(R, white).
 
 % 5. The green house's owner drinks coffee. 
-lives(P, H) ^ colored(H, green) ^ drink(P, coffee).
+lives(P, H) /\ colored(H, green) /\ drink(P, coffee).
 
 % 6. The owner who smokes Pall Mall rears birds. 
-smoke(P, pallmall) ^ pet(P, bird).
+smoke(P, pallmall) /\ pet(P, bird).
 
 % 7. The owner of the yellow house smokes Dunhill. 
-lives(P, H) ^ colored(H, yellow) ^ smoke(P, dunhill).
+lives(P, H) /\ colored(H, yellow) /\ smoke(P, dunhill).
 
 % 8. The owner living in the center house drinks milk. 
-lives(P, house3) ^ drink(P, milk).
+lives(P, house3) /\ drink(P, milk).
 
 % 9. The Norwegian lives in the first house. 
 nationality(P, norwegian) => lives(P, house1).
 
 % 10. The owner who smokes Blends lives next to the one who keeps cats. 
-smoke(P, blend) ^ next_door_neighbours(P,PB) ^ pet(PB, cat).
+smoke(P, blend) /\ next_door_neighbours(P,PB) /\ pet(PB, cat).
 
 % 11. The owner who keeps the horse lives next to the one who smokes Dunhill. 
-pet(P, horse) ^ next_door_neighbours(P,PB) ^ smoke(PB, dunhill).
+pet(P, horse) /\ next_door_neighbours(P,PB) /\ smoke(PB, dunhill).
 
 % 12. The owner who smokes Bluemasters drinks beer. 
 smoke(P, bluemasters) => drink(P, beer).
@@ -111,10 +113,10 @@ smoke(P, bluemasters) => drink(P, beer).
 nationality(P, german) => trait(P, smoke, prince).
 
 % 14. The Norwegian lives next to the blue house. 
-nationality(P, norwegian) ^ lives_nextto_house(P, H) ^ colored(H, blue).
+nationality(P, norwegian) /\ lives_nextto_house(P, H) /\ colored(H, blue).
 
 % 15. The owner who smokes Blends lives next to the one who drinks water. 
-smoke(P, blend) => (next_door_neighbours(P,PB) ^ drink(PB, water)).
+smoke(P, blend) => (next_door_neighbours(P,PB) /\ drink(PB, water)).
 
 
 % The five owners drink a certain type of beverage, smoke a certain brand of
@@ -123,11 +125,11 @@ smoke(P, blend) => (next_door_neighbours(P,PB) ^ drink(PB, water)).
 trait(drink). trait(smoke). trait(pet).
 trait(nationality). % we add nationality 
 
-different_insts(person,PA,PB) ^ trait(Trait) ^ Trait(PA,What) => Trait(PA,What).
+different_insts(person,PA,PB) /\ trait(Trait) /\ Trait(PA,What) => Trait(PA,What).
 
 % No owners have the same pet, smoke the same
 % brand of cigar, or drink the same beverage.
-different_insts(person,PA,PB) ^ trait(Trait) ^ Trait(PA,What) => ~Trait(PB,What).
+different_insts(person,PA,PB) /\ trait(Trait) /\ Trait(PA,What) => ~Trait(PB,What).
 
 
 
@@ -135,16 +137,16 @@ different_insts(person,PA,PB) ^ trait(Trait) ^ Trait(PA,What) => ~Trait(PB,What)
 % 
 %
 % same representation, (tested with quotedIsa/2) they may be eaier compared
-same_repr(HA,HB) <- quotedIsa(HA, QCLASS) ^ quotedIsa(HB, QCLASS).
+same_repr(HA,HB) <- quotedIsa(HA, QCLASS) /\ quotedIsa(HB, QCLASS).
 
 % different is when two terms of the same class using the same representation
-different_insts(HCLASS,HA,HB) <- {dif:dif(HA , HB)} ^ isa(HA, HCLASS) ^ same_repr(HA,HB) ^ isa(HB, HCLASS)).
+different_insts(HCLASS,HA,HB) <- {dif:dif(HA , HB)} /\ isa(HA, HCLASS) /\ same_repr(HA,HB) /\ isa(HB, HCLASS)).
 
 % different is when two terms of the same class using the same representation
 different(HA,HB) <- different_insts(_HCLASS, HA,HB).
 
 % no two houses are the same color
-different_insts(house,HA,HB) ^ colored(HA, C) => ~colored(HB, C)
+different_insts(house,HA,HB) /\ colored(HA, C) => ~colored(HB, C)
 % … five different colors
 color(red). color(green). color(white). color(yellow). color(blue).
 
@@ -152,7 +154,7 @@ color(red). color(green). color(white). color(yellow). color(blue).
  other examples might be...
 
      % or any two people have differnt same trait values
-     dif_people(PA,PB) ^ trait(Trait) ^ Trait(PA,WhatA) ^ Trait(PB,WhatB) => different(WhatA,WhatB).
+     dif_people(PA,PB) /\ trait(Trait) /\ Trait(PA,WhatA) /\ Trait(PB,WhatB) => different(WhatA,WhatB).
 */      
 
 

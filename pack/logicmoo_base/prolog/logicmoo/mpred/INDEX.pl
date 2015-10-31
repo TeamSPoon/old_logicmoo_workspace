@@ -1308,6 +1308,7 @@ index((get_isa0), 3, mpred_type_wff, mpred_type_wff).
 index((get_kv), 3, mpred_type_wff, mpred_type_wff).
 index((get_pred), 2, mpred_type_wff, mpred_type_wff).
 index((hilog_functor), 1, mpred_type_wff, mpred_type_wff).
+index((logical_functor_pttp), 1, mpred_type_wff, mpred_type_wff).
 index((isBodyConnective), 1, mpred_type_wff, mpred_type_wff).
 index((isEntityFunction), 3, mpred_type_wff, mpred_type_wff).
 index((isEntitySlot), 1, mpred_type_wff, mpred_type_wff).
@@ -1344,7 +1345,6 @@ index((is_holds_true_not_hilog), 1, mpred_type_wff, mpred_type_wff).
 index((is_kif_rule), 1, mpred_type_wff, mpred_type_wff).
 index((is_log_op), 1, mpred_type_wff, mpred_type_wff).
 index((is_log_sent), 1, mpred_type_wff, mpred_type_wff).
-index((is_logical_functor), 1, mpred_type_wff, mpred_type_wff).
 index((is_logical_functor0), 1, mpred_type_wff, mpred_type_wff).
 index((is_modal), 2, mpred_type_wff, mpred_type_wff).
 index((is_neg), 1, mpred_type_wff, mpred_type_wff).

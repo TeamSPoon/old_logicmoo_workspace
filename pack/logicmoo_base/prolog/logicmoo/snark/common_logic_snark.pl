@@ -177,6 +177,10 @@
 
 
 kif_hook(C):- non_compound(C),!,fail.
+kif_hook(H :- _):- !,fail.
+kif_hook(H <- _):- !,fail.
+kif_hook(_ ==> _):- !,fail.
+kif_hook(_ <==> _):- !,fail.
 kif_hook(_=>_).
 kif_hook(_<=>_).
 kif_hook((_ & _)).
@@ -192,8 +196,7 @@ kif_hook(iff(_,_)).
 kif_hook(not(H)):- !,nonvar(H),!,kif_hook(H).
 kif_hook( \+ H):- !,nonvar(H),!,kif_hook(H).
 kif_hook( ~  H):- !,nonvar(H),!,kif_hook(H).
-kif_hook(H <- _):- !,nonvar(H),!,kif_hook(H).
-kif_hook(H :- _):- !,nonvar(H),!,kif_hook(H).
+kif_hook(C):- C=..[F|_],is_sentence_functor(F).
   
 
 are_clauses_entailed(E):-not(compound(E)),!,must(true==E).
@@ -216,7 +219,7 @@ delistify_last_arg(Arg,M:Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NA
 delistify_last_arg(Arg,Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARGS),NEWCALL=..[F|NARGS],show_call(why,NEWCALL),!,member_ele(NEW,Last).
 
 % sanity that mpreds (manage prolog prodicate) are abily to transform
-:- t_l:disable_px->throw(t_l:disable_px);true.
+%:- t_l:disable_px->throw(t_l:disable_px);true.
 
 % cwc "code-wise chaining" is always true in Prolog but will throw programming error if evalled in LogicMOO Prover.
 % Use this to mark code and not axiomatic prolog

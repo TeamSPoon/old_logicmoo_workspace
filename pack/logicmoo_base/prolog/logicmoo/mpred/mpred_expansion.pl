@@ -643,7 +643,7 @@ db_expand_4(_ ,NC,NC):- as_is_term(NC),!.
 db_expand_4(Op,Sent,SentO):-db_quf(Op,Sent,Pretest,Template),(Pretest==true-> SentO = Template ; SentO = (Pretest,Template)),!.
 
 
-is_meta_functor(Sent,F,List):-is_ftCompound(Sent),Sent=..[F|List],(predicate_property(Sent,meta_predicate(_));is_logical_functor(F);F==pfcDefault),!.
+is_meta_functor(Sent,F,List):-is_ftCompound(Sent),Sent=..[F|List],(predicate_property(Sent,meta_predicate(_));is_sentence_functor(F);F==pfcDefault),!.
 
 db_expand_5(Op,t(Sent),SentO):- is_ftNonvar(Sent),db_expand_5(Op,Sent,SentO).
 db_expand_5(_,A,B):-A=B,!.
@@ -672,7 +672,7 @@ expand_props(Op,Term,OUT):-expand_props(_,Op,Term,OUT).
 
 expand_props(Prefix,_,Sent,OUT):- \+ (is_ftCompound(Sent)),!,OUT=Sent.
 %expand_props(Prefix,PLOP,Term,OUT):- stack_check,(is_ftVar(Op);is_ftVar(Term)),!,trace_or_throw(var_expand_units(Op,Term,OUT)).
-expand_props(Prefix,PLOP,Sent,OUT):-Sent=..[And|C12],is_logical_functor(And),!,maplist(expand_props(Prefix,Op),C12,O12),OUT=..[And|O12].
+expand_props(Prefix,PLOP,Sent,OUT):-Sent=..[And|C12],is_sentence_functor(And),!,maplist(expand_props(Prefix,Op),C12,O12),OUT=..[And|O12].
 expand_props(Prefix,PLOP,props(Obj,Open),props(Obj,Open)):- is_ftVar(Open),!. % ,trace_or_throw(expand_props(Prefix,PLOP,props(Obj,Open))->OUT).
 expand_props(Prefix,_ ,props(Obj,List),ftID(Obj)):- List==[],!.
 expand_props(Prefix,PLOP,props(Obj,[P]),OUT):- is_ftNonvar(P),!,expand_props(Prefix,PLOP,props(Obj,P),OUT).
@@ -719,7 +719,7 @@ db_quf(Op,M:C,Pretest,M:Template):-atom(M),!,must(db_quf(Op,C,Pretest,Template))
 
 db_quf(Op,C,Pretest,Template):- C=..[Holds,OBJ|ARGS],is_holds_true(Holds),atom(OBJ),!,C1=..[OBJ|ARGS],must(db_quf(Op,C1,Pretest,Template)).
 db_quf(_Op,C,true,C):- C=..[Holds,OBJ|_],is_holds_true(Holds),is_ftVar(OBJ),!.
-db_quf(Op,Sent,D2,D3):- Sent=..[And|C12],C12=[_|_],is_logical_functor(And),!, db_quf_l(Op,And,C12,D2,D3).
+db_quf(Op,Sent,D2,D3):- Sent=..[And|C12],C12=[_|_],is_sentence_functor(And),!, db_quf_l(Op,And,C12,D2,D3).
 db_quf(Op,C,Pretest,Template):- C=..[Prop,OBJ|ARGS],
       functor(C,Prop,A),
       show_failure(why,translate_args(Op,Prop,A,OBJ,2,ARGS,NEWARGS,true,Pretest)),
@@ -881,7 +881,7 @@ transform_functor_holds(Op,_,ArgIn,_,ArgOut):- transform_holds(Op,ArgIn,ArgOut),
 
 transform_holds_3(_,A,A):- \+ (is_ftCompound(A)),!.
 transform_holds_3(_,props(Obj,Props),props(Obj,Props)):-!.
-%transform_holds_3(Op,Sent,OUT):-Sent=..[And|C12],is_logical_functor(And),!,maplist(transform_holds_3(Op),C12,O12),OUT=..[And|O12].
+%transform_holds_3(Op,Sent,OUT):-Sent=..[And|C12],is_sentence_functor(And),!,maplist(transform_holds_3(Op),C12,O12),OUT=..[And|O12].
 transform_holds_3(_,A,A):-functor_catch(A,F,N), predicate_property(A,_),mpred_isa(F,arity(N)),!.
 transform_holds_3(HFDS,M:Term,M:OUT):-atom(M),!,transform_holds_3(HFDS,Term,OUT).
 transform_holds_3(HFDS,[P,A|ARGS],DBASE):- is_ftVar(P),!,DBASE=..[HFDS,P,A|ARGS].
@@ -895,7 +895,7 @@ transform_holds_3(_,[Type,Inst],isa(Inst,Type)):-is_ftNonvar(Type),isa(Type,tCol
 transform_holds_3(_,HOFDS,isa(I,C)):- holds_args(HOFDS,[ISA,I,C]),ISA==isa,!.
 
 transform_holds_3(Op,[Fogical|ARGS],OUT):-  
-         call(call,is_logical_functor(Fogical)),!,sanity(not(is_svo_functor(Fogical))),
+         call(call,is_sentence_functor(Fogical)),!,sanity(not(is_svo_functor(Fogical))),
          must_det(foreach_arg(ARGS,1,ArgIn,ArgN,ArgOut,transform_functor_holds(Op,Fogical,ArgIn,ArgN,ArgOut),FARGS)),
          OUT=..[Fogical|FARGS].
 

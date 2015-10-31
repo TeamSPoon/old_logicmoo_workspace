@@ -85,7 +85,6 @@ isCycUnavailable_known/1,
 lambda/5,
 lmconf:mpred_select/2,
 localityOfObject/2,
-logical_functor_pttp/1,
 meta_argtypes/1,
 mpred_action/1,
 mpred_default/1, % pfc

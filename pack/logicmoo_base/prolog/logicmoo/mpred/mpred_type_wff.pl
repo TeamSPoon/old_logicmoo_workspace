@@ -30,6 +30,7 @@
             get_pred/2,
             hilog_functor/1,
 
+            logical_functor_pttp/1,
             isBodyConnective/1,
             isEntityFunction/3,
             isEntitySlot/1,
@@ -66,7 +67,6 @@
             is_kif_rule/1,
             is_log_op/1,
             is_log_sent/1,
-            is_logical_functor/1,
             is_logical_functor0/1,
             is_modal/2,
             is_neg/1,
@@ -257,6 +257,7 @@ isQualifiedAndVarAndUnifiable(Denotation,BaseType,NValue):-
 % ===============================================================================================
 % ===============================================================================================
 
+:- dynamic(isBodyConnective/1).
 isBodyConnective(Funct):-atom_concat(_,'_',Funct),!.
 isBodyConnective(Funct):-atom_concat('t~',_,Funct),!.
 isBodyConnective(Funct):-atom_concat('f~',_,Funct),!.
@@ -304,7 +305,7 @@ isNonCompound(string(Var)):-!.
 % ===============================================================================================
 % ===============================================================================================
 
-logical_functor_ft(F):-is_logical_functor(F).
+logical_functor_ft(F):-is_sentence_functor(F).
 logical_functor_ft((':-')).
 logical_functor_ft((',')).
 
@@ -319,10 +320,55 @@ non_assertable(WW,notAssertable(Why)):- compound(WW),get_functor(WW,F),mpred_isa
 % ===============================================================================================
 % ===============================================================================================
 
-is_logical_functor(And):-hotrace(is_logical_functor0(And)).
+
+is_sentence_functor(And):-hotrace(is_logical_functor0(And)).
+
+is_logical_functor0(&).
+is_logical_functor0(v).
+is_logical_functor0(exists).
+is_logical_functor0(all).
 is_logical_functor0(X):-atom(X),member(X,[',',';',xor,'\\+',~]).
 is_logical_functor0(X):-call_if_defined(logical_functor_pttp(X)).
+is_logical_functor0(X):-call_if_defined(is_quantifier(X)).
 is_logical_functor0(And):-member(And,[(,),(;),('<-'),('=>'),('<=>'),(':-'),(and),nop]).
+
+:- was_export(logical_functor_pttp/1).
+
+logical_functor_pttp(X):-not(atom(X)),!,fail.
+logical_functor_pttp(props):-!,fail.
+logical_functor_pttp(X):-pttp_nnf_pre_clean_functor(A,B,_),(X==A;X==B),!.
+logical_functor_pttp(&).
+logical_functor_pttp(~).
+logical_functor_pttp(<=>).
+logical_functor_pttp(=>).
+logical_functor_pttp(v).
+
+pttp_nnf_pre_clean_functor('&',(,),[]).
+pttp_nnf_pre_clean_functor('v',(;),[]).
+pttp_nnf_pre_clean_functor(and,(,),[]).
+pttp_nnf_pre_clean_functor(('/\\'), (,),[]).
+pttp_nnf_pre_clean_functor(or,(;),[]).
+pttp_nnf_pre_clean_functor(('\\/'),(;),[]).
+% pttp_nnf_pre_clean_functor('::',(:),[]).
+pttp_nnf_pre_clean_functor(~,(-),[]).
+pttp_nnf_pre_clean_functor(not,(-),[]).
+pttp_nnf_pre_clean_functor(~,(-),[]).
+pttp_nnf_pre_clean_functor(implies,(=>),[]).
+pttp_nnf_pre_clean_functor(imp,(=>),[]).
+pttp_nnf_pre_clean_functor(equiv,(<=>),[]).
+%pttp_nnf_pre_clean_functor(->,(=>),[]).
+pttp_nnf_pre_clean_functor(entailed_from,(:-),[]).
+pttp_nnf_pre_clean_functor(implied_by,(:-),[]).
+pttp_nnf_pre_clean_functor(forAll,(all),[]).
+pttp_nnf_pre_clean_functor(thereExists,(ex),[]).
+pttp_nnf_pre_clean_functor(forall,(all),[]).
+pttp_nnf_pre_clean_functor(exists,(ex),[]).
+pttp_nnf_pre_clean_functor(A,A,[]):-atom(A).
+pttp_nnf_pre_clean_functor(A,A,[]).
+
+pttp_nnf_post_clean_functor('&',',').
+pttp_nnf_post_clean_functor('v',';').
+
 
 % ===============================================================================================
 % ===============================================================================================
@@ -436,10 +482,6 @@ is_colection_name(_,-,_):- !,fail.
 is_colection_name(IT,T,TT):- atom_length(T,TL),TL>2,not(atom_contains(T,'_')),not(predicate_property(IT,_)),to_iname(T,TT).
 
 
-is_sentence_functor(&).
-is_sentence_functor(v).
-is_sentence_functor(exists).
-is_sentence_functor(all).
 
 
 leave_as_is(V):- \+ compound(V),!.

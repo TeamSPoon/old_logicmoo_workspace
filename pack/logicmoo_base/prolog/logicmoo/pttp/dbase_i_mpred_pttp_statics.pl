@@ -1389,40 +1389,7 @@ pttp_nnf_post_clean(C,CC,Vars):-
    pttp_nnf_post_clean(B,BB,Vars),
    CC=..[AA|BB],!.
 
-:- was_export(logical_functor_pttp/1).
 
-logical_functor_pttp(X):-not(atom(X)),!,fail.
-logical_functor_pttp(props):-!,fail.
-logical_functor_pttp(X):-pttp_nnf_pre_clean_functor(A,B,_),(X==A;X==B),!.
-logical_functor_pttp(&).
-logical_functor_pttp(~).
-logical_functor_pttp(<=>).
-logical_functor_pttp(=>).
-logical_functor_pttp(v).
-
-pttp_nnf_pre_clean_functor('&',(,),[]).
-pttp_nnf_pre_clean_functor('v',(;),[]).
-pttp_nnf_pre_clean_functor(and,(,),[]).
-pttp_nnf_pre_clean_functor(or,(;),[]).
-% pttp_nnf_pre_clean_functor('::',(:),[]).
-pttp_nnf_pre_clean_functor(~,(-),[]).
-pttp_nnf_pre_clean_functor(not,(-),[]).
-pttp_nnf_pre_clean_functor(~,(-),[]).
-pttp_nnf_pre_clean_functor(implies,(=>),[]).
-pttp_nnf_pre_clean_functor(imp,(=>),[]).
-pttp_nnf_pre_clean_functor(equiv,(<=>),[]).
-%pttp_nnf_pre_clean_functor(->,(=>),[]).
-pttp_nnf_pre_clean_functor(entailed_from,(:-),[]).
-pttp_nnf_pre_clean_functor(implied_by,(:-),[]).
-pttp_nnf_pre_clean_functor(forAll,(all),[]).
-pttp_nnf_pre_clean_functor(thereExists,(ex),[]).
-pttp_nnf_pre_clean_functor(forall,(all),[]).
-pttp_nnf_pre_clean_functor(exists,(ex),[]).
-pttp_nnf_pre_clean_functor(A,A,[]):-atom(A).
-pttp_nnf_pre_clean_functor(A,A,[]).
-
-pttp_nnf_post_clean_functor('&',',').
-pttp_nnf_post_clean_functor('v',';').
 
 pttp_nnf(Fml,FreeV,CleanNNF,Paths):-
    pttp_nnf_pre_clean(sent,Fml,Clean,FreeV),
