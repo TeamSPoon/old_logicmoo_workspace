@@ -184,6 +184,8 @@ kif_hook(_ <==> _):- !,fail.
 kif_hook(_=>_).
 kif_hook(_<=>_).
 kif_hook((_ & _)).
+kif_hook((_ /\ _)).
+kif_hook((_ \/ _)).
 kif_hook((_ v _)).
 kif_hook(nesc(_)).
 kif_hook(poss(_)).
@@ -196,7 +198,7 @@ kif_hook(iff(_,_)).
 kif_hook(not(H)):- !,nonvar(H),!,kif_hook(H).
 kif_hook( \+ H):- !,nonvar(H),!,kif_hook(H).
 kif_hook( ~  H):- !,nonvar(H),!,kif_hook(H).
-kif_hook(C):- C=..[F|_],is_sentence_functor(F).
+kif_hook(C):- C=..[F,A|_],is_sentence_functor(F),!,kif_hook(A).
   
 
 are_clauses_entailed(E):-not(compound(E)),!,must(true==E).
@@ -302,9 +304,12 @@ to_dlog_ops([
        '~'='not',
      '-'='not',
      '~'='not',
+    'not'='not',
      'naf'='not',
      'and'='&',
+     '/\\'='&',
       'or'='v',
+      '\\/'='v',
       ':-'=':-',
  'implies'='=>',
    'if'='=>',

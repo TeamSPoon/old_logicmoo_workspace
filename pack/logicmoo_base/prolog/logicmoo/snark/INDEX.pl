@@ -18,6 +18,7 @@ index((did_use_hack), 1, common_logic_boxlog, common_logic_boxlog).
 index((get_op_alias_compile), 2, common_logic_boxlog, common_logic_boxlog).
 index((get_reln), 2, common_logic_boxlog, common_logic_boxlog).
 index((is_unit), 2, common_logic_boxlog, common_logic_boxlog).
+index((is_unit), 0, common_logic_boxlog, common_logic_boxlog).
 index((is_unit), 3, common_logic_boxlog, common_logic_boxlog).
 index((is_unit), 4, common_logic_boxlog, common_logic_boxlog).
 index((is_units_b), 1, common_logic_boxlog, common_logic_boxlog).

@@ -72,6 +72,7 @@ Per-Litteral features
             get_op_alias_compile/2,
             get_reln/2,
             is_unit/2,
+            is_unit/0,
             is_unit/3,
             is_unit/4,
             is_units_b/1,
@@ -95,6 +96,7 @@ Per-Litteral features
 is_units_h(A):-maplist(is_unit,A).
 is_units_b(A):-maplist(is_unit,A).
 % is_unit(A):-is_unit(A).
+is_unit.
 is_unit(A,B):-is_unit(A),is_unit(B).
 is_unit(A,B,C):-is_unit(A),is_unit(B),is_unit(C).
 is_unit(A,B,C,D):-is_unit(A),is_unit(B),is_unit(C),is_unit(D).
@@ -193,17 +195,21 @@ correct_mode((:-),{M},O):-!,correct_mode((:-),M,O).
 correct_mode(Mode,(A,B),O):-!,correct_mode(Mode,A,AA),correct_mode(Mode,B,BB),conjoin_body(AA,BB,O).
 correct_mode(_,O,O).
 
-body_for_pfc(Mode,Head,NewNewHead,I,O):-reduce_literal(Head,NewHead),!,body_for_mpred_1(Mode,NewHead,NewNewHead,I,O).
+body_for_pfc(Mode,Head,NewNewHead,I,O):-reduce_literal(Head,NewHead),!,body_for_mpred_1(Mode,NewHead,NewNewHead,I,O),!.
 body_for_pfc(Mode,Head,NewHead,B,BB):- body_for_mpred_1(Mode,Head,NewHead,B,BB),!.
 
-body_for_mpred_1(Mode,Head,HeadO,C,CO):- (Mode ==(:-);Mode==(cwc);Mode==(<-)),overlaping(C,Head,Avoid),
-    body_for_mpred_1(Mode,Head,HeadM,{Avoid},AA),body_for_mpred_2(Mode,HeadM,HeadO,C,BB),!,conjoin_body(AA,BB,CM),correct_mode(Mode,CM,CO).
+body_for_mpred_1(Mode,Head,HeadO,C,CO):- (Mode ==(:-);Mode==(cwc);Mode==(<-)),
+    overlaping(C,Head,Avoid),
+    body_for_mpred_1(Mode,Head,HeadM,zzAvoidHeadLoop,AA),
+    body_for_mpred_2(Mode,HeadM,HeadO,C,BB),!,
+    subst(AA,zzAvoidHeadLoop,{Avoid},AAA),
+       conjoin_body(AAA,BB,CM),correct_mode(Mode,CM,CO).
 body_for_mpred_1(Mode,Head,NewNewHead,I,O):-body_for_mpred_2(Mode,Head,NewNewHead,I,M),correct_mode(Mode,M,O).
 
+
+overlaping(C,Head,Avoid):- (is_ftVar(C);is_ftVar(Head)),!,Avoid=avoidHeadLoop(C,Head).
 overlaping(~(C),Head,Avoid):-is_ftNonvar(C),!,overlaping(C,Head,Avoid).
 overlaping(C,~(Head),Avoid):-is_ftNonvar(Head),!,overlaping(C,Head,Avoid).
-overlaping(C,~(Head),Avoid):- fail,is_ftNonvar(Head),!,overlaping(C,Head,Avoid).
-overlaping(~C,(Head),Avoid):- fail,is_ftNonvar(Head),!,overlaping(C,Head,Avoid).
 overlaping(C,Head,Avoid):-is_ftNonvar(Head),is_ftNonvar(C), compound(C),compound(Head),once((get_reln(C,FC),get_reln(Head,HC))),!,overlapingFunctors(FC,HC),!,Avoid=avoidHeadLoop(C,Head).
 
 overlapingFunctors(FC,HC):- (\+ \+ FC=HC),!.
@@ -213,14 +219,15 @@ overlapingFunctors(_,t):-!.
 get_reln(C,F):-var(C),!,F=_.
 get_reln(C,F):-is_ftVar(C),!,F=_.
 get_reln(~(C),RO):-nonvar(C),!,get_reln(C,RO).
-get_reln(~(C),RO):-nonvar(C),!,get_reln(C,RO).
+get_reln(not(C),RO):-nonvar(C),!,get_reln(C,RO).
+get_reln(\+(C),RO):-nonvar(C),!,get_reln(C,RO).
 get_reln('{}'(C),RO):-nonvar(C),!,get_reln(C,RO).
 get_reln(C,RO):-get_functor(C,F),
   (F==t->
      (arg(1,C,R),(is_ftVar(R)->RO=t;RO=R));
      RO=F),!.
 
-avoidHeadLoop(C,Head):- ground(C),(C\=Head),\+ is_loop_checked(C).
+avoidHeadLoop(C,Head):- stack_check, ground(C),(C\=Head),\+ is_loop_checked(C).
 
 body_for_mpred_2(_Mode,Head,Head,A,A):-is_ftVar(A).
 body_for_mpred_2(Mode,Head,HeadO,(A,B), C):-!,body_for_mpred_1(Mode,Head,HeadM,A,AA),body_for_pfc(Mode,HeadM,HeadO,B,BB),conjoin_body(AA,BB,C).

@@ -30,12 +30,15 @@
 % Dec 13, 2035
 % Douglas Miles
 */
+% swipl -g "ensure_loaded(pack(logicmoo_base/t/examples/csp/'einstein.pfc'))."
 
 :- module(zebra,[]).
 
 :- use_module(library(logicmoo/logicmoo_user)).
 
-:- op(600,xfx, (/\)).
+:- op(600,xfy, (/\)).
+:- op(0,xfx,'=>').
+:- op(1150,xfy,'=>').
 
 :- file_begin(pfc).
 
@@ -48,20 +51,24 @@ props((/\),ftSentenceOp,tLogicalConjunction).
 row_ord(house1, house2). row_ord(house2, house3). row_ord(house3, house4). row_ord(house4, house5).
 
 % forward chain these into houses
-row_ord(HA, HB) ==> house(HA) /\ house(HB).
+row_ord(HA, HB) ==> (house(HA) , house(HB)).
 
 %= In each house lives a person with a unique nationality.
 % we write this in SUMO
+
 all(H,
  exists(P,
+  exists(U,
   (house(H) => 
-    (person(P) /\ lives(P, H) /\ unique(U,nationality(P,U)))))).
+    (person(P) /\ lives(P, H) /\ unique(U,nationality(P,U))))))).
 
+% SANITY count the persons (shouild be 5)
+% :- sanity(( findall(P,person(P),L),length(L,5))).
 
 % Helper functions
 % 
 % nextto/2 is symmetric
-nextto(HA, HB) <- (row_ord(HA, HB); row_ord(HB, HA)).
+nextto(HA, HB) :- (row_ord(HA, HB); row_ord(HB, HA)).
 %
 % next door house (symmetricalness was inherited from nextto/2)
 lives(P, H) /\ nextto(H, HB) => lives_nextto_house(P,HB).
@@ -125,13 +132,32 @@ smoke(P, blend) => (next_door_neighbours(P,PB) /\ drink(PB, water)).
 trait(drink). trait(smoke). trait(pet).
 trait(nationality). % we add nationality 
 
-different_insts(person,PA,PB) /\ trait(Trait) /\ Trait(PA,What) => Trait(PA,What).
+:- if(true).  % No HiLog
+
+all(P,
+ all(Trait,
+   exists(Value,
+    person(P) => (trait(Trait) =>  t(Trait,P,Value))))).
+
+% No owners have the same pet, smoke the same
+% brand of cigar, or drink the same beverage.
+different_insts(person,PA,PB) /\ trait(Trait) /\ t(Trait,PA,What) => ~t(Trait,PB,What).
+
+:- else. % Yes HiLog
+
+:- set_functor_wrap(t).
+% the '&' functor next means to expand uppercase 
+
+all(P,
+ all(Trait,
+   exists(Value,
+    person(P) => (trait(Trait) =>  Trait(P,Value))))).
 
 % No owners have the same pet, smoke the same
 % brand of cigar, or drink the same beverage.
 different_insts(person,PA,PB) /\ trait(Trait) /\ Trait(PA,What) => ~Trait(PB,What).
 
-
+:- endif. % End HiLog
 
 % Helper functions
 % 
@@ -140,13 +166,13 @@ different_insts(person,PA,PB) /\ trait(Trait) /\ Trait(PA,What) => ~Trait(PB,Wha
 same_repr(HA,HB) <- quotedIsa(HA, QCLASS) /\ quotedIsa(HB, QCLASS).
 
 % different is when two terms of the same class using the same representation
-different_insts(HCLASS,HA,HB) <- {dif:dif(HA , HB)} /\ isa(HA, HCLASS) /\ same_repr(HA,HB) /\ isa(HB, HCLASS)).
+different_insts(HCLASS,HA,HB) <- {dif:dif(HA , HB)} /\ isa(HA, HCLASS) /\ same_repr(HA,HB) /\ isa(HB, HCLASS).
 
 % different is when two terms of the same class using the same representation
 different(HA,HB) <- different_insts(_HCLASS, HA,HB).
 
 % no two houses are the same color
-different_insts(house,HA,HB) /\ colored(HA, C) => ~colored(HB, C)
+different_insts(house,HA,HB) /\ colored(HA, C) => ~colored(HB, C).
 % … five different colors
 color(red). color(green). color(white). color(yellow). color(blue).
 

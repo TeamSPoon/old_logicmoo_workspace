@@ -19,7 +19,7 @@ expand_var_functors(T,VFE,Outer,In,Out):-
    \+ compound(In)->In=Out;
   (compound_name_arguments(In,Name,Args),
    ((Args==[],\+ compound(In))->Out=Name;
-      ((Name=VFE,Args=[JustOne] )-> (expand_var_functors(T,VFE,VFE,JustOne,VOut),(functor(VOut,T,_)->Out=VOut;Out=..[VFE,VOut]));
+      ((Name=VFE,Args=[JustOne] )-> (expand_var_functors(T,VFE,VFE,JustOne,VOut),((nonvar(VOut),functor(VOut,T,_))->Out=VOut;Out=..[VFE,VOut]));
       ( maplist(expand_var_functors(T,VFE,Name),Args,ArgsO),
       ((Name\='[|]',Outer=VFE,atom_codes(Name,[C|_]),code_type(C,prolog_var_start),
          nb_getval('$variable_names', Vs),(member(Name=Var,Vs)->true;b_setval('$variable_names', [Name=Var|Vs])))
@@ -29,12 +29,12 @@ expand_var_functors(T,VFE,Outer,In,Out):-
 system:term_expansion(I,O):- var_functor_wrap(T),
           compound(I),functor(I,VFE,_), % var_functor_quote(VFE),
                      \+ t_l:disable_px,
-                       w_tl(t_l:disable_px,expand_var_functors(T,VFE,(:-),I,O)),I\=@=O.
+                       must((w_tl(t_l:disable_px,expand_var_functors(T,VFE,(:-),I,O)))),I\=@=O.
 
 system:goal_expansion(I,O):- var_functor_wrap(T),
           compound(I),functor(I,VFE,_), % var_functor_quote(VFE),
                      \+ t_l:disable_px,
-                       expand_var_functors(T,VFE,(:-),I,O),I\=@=O.
+                       must((expand_var_functors(T,VFE,(:-),I,O))),I\=@=O.
 
 save_allow_variable_name_as_functor:- (was_allow_variable_name_as_functor(_)->true;current_prolog_flag(allow_variable_name_as_functor,Was),asserta(was_allow_variable_name_as_functor(Was))).
 restore_allow_variable_name_as_functor:-current_prolog_flag(allow_variable_name_as_functor,Was),asserta(was_allow_variable_name_as_functor(Was)).

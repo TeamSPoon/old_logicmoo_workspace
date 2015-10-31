@@ -66,7 +66,7 @@ i_name_lc(OType,IType):-typename_to_iname0('',OType,IOType),!,string_equal_ci(IO
 
 to_iname(T,T):-!.
 to_iname(T,TT):-not(current_predicate(i_name/3)),!,T=TT.
-to_iname(T,TT):-is_ftVar(T)->TT=T;(not_log_op(T),i_name(t,T,TT)).
+to_iname(T,TT):- (is_ftVar(T) -> TT=T; (not_log_op(T),i_name(t,T,TT))).
 
 
 toUpperCamelcase(Type,TypeUC):-toCamelcase(Type,TypeUC). % ,toPropercase(TypeC,TypeUC),!.
