@@ -51,7 +51,8 @@ nextto(HA, HB) <- (row_ord(HA, HB); row_ord(HB, HA)).
 
 
 %= In each house lives a person with a unique nationality.
-forall(H,
+% we write this in SUMO
+all(H,
  exists(P,
   (house(H) => 
     (person(P) ^ lives(P, H) ^ unique(U,nationality(P,U)))))).
