@@ -193,7 +193,7 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 :- meta_predicate(t(?,?,?)).
 
 :-asserta((~(G):- cwc, neg_in_code(G))).
-~(tCol('$VAR')).
+~tCol('$VAR').
 
 % baseKB:import(I):-system:import(baseKB:I).
 

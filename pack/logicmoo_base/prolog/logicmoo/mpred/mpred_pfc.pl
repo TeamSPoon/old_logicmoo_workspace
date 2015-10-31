@@ -1542,7 +1542,7 @@ mpred_aina(G,S):-ain(G,S).
 %= database and have forward reasoning done.
 
 %= ain(P,S) asserts P into the user''s dataBase with support from S.
-pfc_add(P) :-  check_context_module,
+pfc_add(P) :- 
   ain_fast(P).
 
 ain(P,S) :- 
@@ -1559,9 +1559,9 @@ ain_fast(P0,S):- gripe_time(0.6,ain_fast_timed(P0,S)).
 
 ain_fast_timed(P0,S):- '$module'(user,user),'$set_source_module'(user,user),!,
   '$module'(WM,baseKB),'$set_source_module'(WS,baseKB),
-   call_cleanup((ain_fast_timed(P0,S)),(('$module'(_,WM),'$set_source_module'(_,WS)))).
+   call_cleanup(ain_fast_timed(P0,S),('$module'(_,WM),'$set_source_module'(_,WS))).
 
-ain_fast_timed(P0,S):- 
+ain_fast_timed(P0,S):- check_context_module,
   must(to_addable_form_wte(assert,P0,P)),
       (is_list(P)
         ->must_maplist(ain_fast_sp(S),P);
@@ -2546,8 +2546,8 @@ not_cond(_Why,X):- \+ X.
 neg_in_code(G):-var(G),!,fail.
 neg_in_code(req(G)):- !,~G.
 neg_in_code(~(G)):- nonvar(G),!, \+ ~G.
-neg_in_code(G):-   neg_may_naf(G), \+ G.
-neg_in_code(G):-  is_ftNonvar(G), prologSingleValued(G),must((if_missing_mask(G,R,Test),nonvar(R))),req(R),Test.
+neg_in_code(G):-   neg_may_naf(G), \+ with_umt(G).
+neg_in_code(G):-  is_ftNonvar(G), prologSingleValued(G),must((if_missing_mask(G,R,Test),nonvar(R))),req(R),with_umt(Test).
 
 
 :- meta_predicate neg_may_naf(0).

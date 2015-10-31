@@ -1100,6 +1100,7 @@ index((assert_predArgTypes_l), 3, mpred_type_args, mpred_type_args).
 index((asserted_argIsa_known), 3, mpred_type_args, mpred_type_args).
 index((atom_to_value), 2, mpred_type_args, mpred_type_args).
 index((checkAnyType), 4, mpred_type_args, mpred_type_args).
+index((clause_umt), 1, mpred_type_args, mpred_type_args).
 index((coerce), 4, mpred_type_args, mpred_type_args).
 index((correctAnyType), 4, mpred_type_args, mpred_type_args).
 index((correctAnyTypeOrFail), 4, mpred_type_args, mpred_type_args).

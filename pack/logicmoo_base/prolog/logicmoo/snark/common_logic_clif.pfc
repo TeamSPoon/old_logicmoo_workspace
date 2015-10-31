@@ -20,36 +20,40 @@ vim: set filetype=md:
 
 % :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/autoexec.pfc')).
 
-:- file_begin(pfc).
-
 % :- include('../mpred/mpred_header.pi').
 
 % we ensure we are in "pfc" consultation mode (so the syntax rules will define correctly)
+:- file_begin(pfc).
 
 
-==>(hybrid_support(clif,1)).
-==>(hybrid_support(boxlog,1)).
-==>(hybrid_support(pfclog,1)).
+/*
 
 % whenever we know about clif we''ll use the prolog forward chainging system
 % this is broken down to the next 6 clauses
+
 (clif(CLIF) ==> 
    ({ clif_to_prolog(CLIF,PROLOG)},
       % this consequent asserts the new rules
       PROLOG,{slow_sanity(is_entailed(CLIF))})).
 
+*/
+
+
+
 arity(clif,1).
 arity(boxlog,1).
 arity(pfclog,1).
+ ==>(hybrid_support(clif,1)).
+ ==>(hybrid_support(boxlog,1)).
+ ==>(hybrid_support(pfclog,1)).
 
-(clif(CLIF),{delistify_last_arg(CLIF,kif_to_boxlog,PROLOG)}) ==> (boxlog(PROLOG),{slow_sanity(is_entailed(CLIF))}).
+(clif(CLIF),{delistify_last_arg(CLIF,kif_to_boxlog,BOXLOG)}) ==> (boxlog(BOXLOG),{slow_sanity(is_entailed(CLIF))}).
 (boxlog(BOXLOG),{delistify_last_arg(BOXLOG,boxlog_to_pfc,PROLOG)}) ==> pfclog(PROLOG).
 (pfclog(PROLOG)==>(PROLOG,{slow_sanity(is_entailed(PROLOG))})).
 
-
 /*
 
-% this is accomplished by the previous 6 clauses
+% these next 6 clauses is now accomplished by the previous 3 clauses
 
 (clif(CLIF),{member_ele(CLIF,E)}) ==> clif1(E).
 (clif1(CLIF),{kif_to_boxlog(CLIF,PROLOG)}) ==> boxlog(PROLOG).
@@ -59,7 +63,9 @@ arity(pfclog,1).
 
 (pfclog(CLIF),{member_ele(CLIF,E)}) ==> pfclog1(E).
 (pfclog1(PROLOG)==>(PROLOG,{is_entailed(PROLOG)})).
+
 */
+
 
 % we create code syntax listeners for [if,iff,clif_forall,all,exists]/2s
 ({is_clif(CLIF)} ==>

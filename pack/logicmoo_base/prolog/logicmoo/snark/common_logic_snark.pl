@@ -188,13 +188,12 @@ kif_hook(forall(_,_)).
 kif_hook(exists(_,_)).
 kif_hook(if(_,_)).
 kif_hook(iff(_,_)).
-% uncommented theis next line break sanity_tbird
+% uncommenting these next 3 lines may break sanity_birdt test
 kif_hook(not(H)):- !,nonvar(H),!,kif_hook(H).
-kif_hook( \+ (H)):- !,nonvar(H),!,kif_hook(H).
-kif_hook(~(H)):- !,nonvar(H),!,kif_hook(H).
+kif_hook( \+ H):- !,nonvar(H),!,kif_hook(H).
+kif_hook( ~  H):- !,nonvar(H),!,kif_hook(H).
 kif_hook(H <- _):- !,nonvar(H),!,kif_hook(H).
-kif_hook(H:- _):- !,nonvar(H),!,kif_hook(H).
-
+kif_hook(H :- _):- !,nonvar(H),!,kif_hook(H).
   
 
 are_clauses_entailed(E):-not(compound(E)),!,must(true==E).

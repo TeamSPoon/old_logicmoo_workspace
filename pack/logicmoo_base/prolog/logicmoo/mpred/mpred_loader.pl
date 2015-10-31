@@ -690,8 +690,8 @@ compile_this(M,F,C,must_compile_special):- must_compile_special_clause(C),t_l:mp
 compile_this(_,_,_,pl).
 
 :- was_module_transparent(mpred_may_expand).
-mpred_may_expand:-loading_source_file(F),inside_file(pfc).
-mpred_may_expand:-loading_source_file(F),inside_file(mpred).
+mpred_may_expand:-loading_source_file(_F),inside_file(pfc).
+mpred_may_expand:-loading_source_file(_F),inside_file(mpred).
 mpred_may_expand:-must(loading_module(M)),mpred_may_expand_module(M),!,mpred_expand_inside_file_anyways.
 
 mpred_may_expand_module(M):-lmconf:mpred_skipped_module(M),!,fail.
@@ -991,25 +991,24 @@ best_module(List,ABox):-member(ABox,List),ABox\==user,not_boot_module(ABox),!.
 best_module(_List,baseKB):-!.
 
 file_begin(W):-
+  must_det((
   '$module'(CM,CM),
   '$set_source_module'(SM,SM),
-  must_det((
    onEndOfFile(module(CM)),
-   loading_source_file(ISource),   
-   make_module_name(ISource,FM),
+   (loading_source_file(Source)->true;Source=CM),
+   make_module_name(Source,FM),
    context_module_of_file(M),
    (t_l:user_abox(AM)->true;AM=SM),
    best_module([AM,SM,CM,FM,M],ABox),
    % dmsg(best_module([AM,SM,CM,FM,M],ABox)),
    set_user_abox(ABox),
    op_lang(W),   
-   decache_file_type(ISource),
-   assert_until_eof(lmcache:mpred_directive_value(W,file,ISource)))),
-   must_det(( loading_source_file(Source),decache_file_type(Source),asserta(lmcache:mpred_directive_value(W,file,Source)))),
+   assert_until_eof(lmcache:mpred_directive_value(W,file,Source)),
+   decache_file_type(Source),
    ensure_imports(ABox),
    module(ABox),
    enable_mpred_expansion,
-   mpred_ops.
+   mpred_ops)).
 
 file_end(W):- must_det(( loading_source_file(ISource),decache_file_type(ISource),ignore(retract(lmcache:mpred_directive_value(W,file,ISource))))),  
   must_det(( loading_source_file(Source),decache_file_type(Source),ignore(retract(lmcache:mpred_directive_value(W,file,Source))))).
@@ -1323,7 +1322,7 @@ process_this_script0(S):- read_term(S,T,[variable_names(Vs)]),b_setval('$variabl
 %  dyn - all terms are sent to ain/1 (even ones defined conflictingly)
 
 :- thread_local(t_l:pretend_loading_file/1).
-loading_source_file(F):-once(t_l:pretend_loading_file(F);prolog_load_context(source,F);loading_file(F)).
+loading_source_file(F):-once(t_l:pretend_loading_file(F);prolog_load_context(source,F);loading_file(F);'$module'(F,F)).
 
 
 :- dynamic(lmconf:never_reload_file/1).
@@ -1334,12 +1333,6 @@ load_language_file(Name0):-
    w_tl([(user:term_expansion(_,_):-!,fail),(user:goal_expansion(_,_):-!,fail),(system:term_expansion(_,_):-!,fail),(system:goal_expansion(_,_):-!,fail)],
      gripe_time(1,(lmconf:load_files(Name,[qcompile(auto),register(false),if(not_loaded  )])->asserta(lmconf:never_reload_file(Name));retract(lmconf:never_reload_file(Name)))))))),!.
  
-
-:- shared_multifile(user:prolog_load_file/2).
-:- dynamic(user:prolog_load_file/2).
-
-user:prolog_load_file(ModuleSpec, Options):- current_predicate(_,_:mpred_loader_file),
-  \+ never_load_special(ModuleSpec, Options),  catch(prolog_load_file_loop_checked(ModuleSpec, Options),E,((trace,prolog_load_file_loop_checked(ModuleSpec, Options),throw(E)))).
 
 
 never_load_special(_, Options) :-memberchk(must_be_module(true),Options).
@@ -1714,6 +1707,12 @@ pop_predicates(M:F/A,STATE):- functor(H,F,A),forall(member((H:-B),STATE),M:asser
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
+
+:- multifile(user:prolog_load_file/2).
+:- dynamic(user:prolog_load_file/2).
+
+user:prolog_load_file(ModuleSpec, Options):- current_predicate(_,_:mpred_loader_file),
+  \+ never_load_special(ModuleSpec, Options),  catch(prolog_load_file_loop_checked(ModuleSpec, Options),E,((trace,prolog_load_file_loop_checked(ModuleSpec, Options),throw(E)))).
 
 
 mpred_loader_file.
