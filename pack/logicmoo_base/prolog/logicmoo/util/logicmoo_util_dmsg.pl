@@ -22,21 +22,18 @@
             colormsg/2,
             contrasting_color/2,
             defined_message_color/2,
-            dfmt/1,
-            dfmt/2,
-            dmsg/3,
-          dmsg/1,
-          dmsg/2,
-          debugm/2,
-          cls/0,
-            dmsg0/1,
-            dmsg0/2,
+
+            dfmt/1,dfmt/2,
+            debugm/1,debugm/2,
+            dmsg/1,dmsg/2,dmsg/3,
+          
+            cls/0,
+            dmsg0/1,dmsg0/2,
             dmsg1/1,
             dmsg2/1,
             dmsg3/1,
             dmsg4/1,
-            dmsg5/1,
-            dmsg5/2,
+            dmsg5/1,dmsg5/2,
             dmsg_hide/1,
             dmsg_hides_message/1,
             dmsg_show/1,
@@ -47,12 +44,8 @@
             fg_color/2,
             flush_output_safe/0,
             flush_output_safe/1,
-            fmt/1,
-            fmt/2,
-            fmt/3,
-            fmt0/1,
-            fmt0/2,
-            fmt0/3,
+            fmt/1,fmt/2,fmt/3,
+            fmt0/1,fmt0/2,fmt0/3,
             fmt9/1,
             fmt_ansi/1,
             fmt_or_pp/1,
@@ -254,7 +247,6 @@ dmsg_hide(Term):-set_prolog_flag(opt_debug,filter),must(nonvar(Term)),aina( tlbu
 dmsg_show(isValueMissing):-!,set_prolog_flag(opt_debug,true).
 dmsg_show(Term):-set_prolog_flag(opt_debug,filter),aina( tlbugger:dmsg_match(showing,Term)),ignore(retractall( tlbugger:dmsg_match(hidden,Term))),debug(Term).
 dmsg_showall(Term):-ignore(retractall( tlbugger:dmsg_match(hidden,Term))).
-
 
 indent_e(0):-!.
 indent_e(X):- X > 20, XX is X-20,!,indent_e(XX).
@@ -503,8 +495,9 @@ ansifmt(Ctrl,Fmt):- colormsg(Ctrl,Fmt).
 ansifmt(Ctrl,F,A):- colormsg(Ctrl,(format(F,A))).
 
 
-debugm(Why,_Msg):- \+ debugging(mpred),\+ debugging(Why),\+ debugging(mpred(Why)),!.
-debugm(_,Why):- dmsg(Why).
+debugm(X):-get_functor(X,F),debugm(F,X).
+debugm(Why,Msg):- \+ debugging(mpred), \+ debugging(Why), \+ debugging(mpred(Why)),!, debug(Why,'~N~p~n',[Msg]).
+debugm(Why,Msg):- dmsg(Why:Msg),!,debug(Why,'~N~p~n',[Msg]).
 
 
 % = :- export(colormsg/2).
