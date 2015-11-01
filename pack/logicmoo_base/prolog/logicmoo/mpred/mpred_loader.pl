@@ -930,7 +930,7 @@ import_shared_pred(M,BaseKB,P):-
 import_to_user(P):- '$module'(MM,MM),'$set_source_module'(SM,SM),must(import_to_user0(MM,SM,P)).
 import_to_user0(user,user,M:FA):- '$module'(_,M),'$set_source_module'(_,M),!,import_to_user(M:FA).
 import_to_user0(_MM,_SM,M:F/A):-!,functor(P,F,A),
-  U=logicmoo_user_pants,
+  U=logicmoo_user,
   user:catch(mpred_op_prolog(pain,((U:P:- user:loop_check_nr(M:P)))),E,dmsg(import_shared_pred(U:F/A:-M:F/A)=E)),
   U:export(U:F/A),
   catch(user:import(U:F/A),_,true),
