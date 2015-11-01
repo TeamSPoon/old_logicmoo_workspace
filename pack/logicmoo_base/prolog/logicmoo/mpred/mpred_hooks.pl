@@ -443,7 +443,7 @@ loop_check_mpred(Call):- !, fail,not(t_l:infInstanceOnly(_)),loop_check_term(ire
 
 
 mpred_pa_call(F,A,Call):- var(F),!,support_hilog(F,A),\+tNotForUnboundPredicates(F),current_predicate(F,M:_OtherCall),on_x_rtrace(M:Call).
-mpred_pa_call(F,A,Call):-current_predicate(F,M:_OtherCall),M:Call.
+mpred_pa_call(F,_,Call):-current_predicate(F,M:_OtherCall),M:Call.
 
 mpred_fact_arity(F,A):-arity(F,A),once(mpred_isa(F,prologHybrid);mpred_isa(F,pfcControlled);mpred_isa(F,prologPTTP);mpred_isa(F,prologKIF)).
 

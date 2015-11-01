@@ -174,9 +174,9 @@ pp_rules :-
    print_db_items("Negative Facts",(~(_))).
 
 pp_triggers :-
-     print_db_items("Positive hideTriggers",pt(_,_)),
-     print_db_items("Negative hideTriggers", nt(_,_,_)),
-     print_db_items("Goal hideTriggers",bt(_,_)).
+     print_db_items("Positive hideTriggers",pt(_,_,_)),
+     print_db_items("Negative hideTriggers", nt(_,_,_,_)),
+     print_db_items("Goal hideTriggers",bt(_,_,_)).
 
 pp_supports :-
   % temporary hack.
@@ -392,9 +392,9 @@ mpred_list_triggers_1(What):-
    print_db_items_and_neg('Subclass Of',genls(IWhat,_),IWhat),
    print_db_items_and_neg('Subclasses: ',genls(_,IWhat),IWhat))),
    print_db_items('PFC Watches', mpred_mark(_,_,_,_),What),
-   print_db_items('Triggers Negative', nt(_,_,_),What),
-   print_db_items('Triggers Goal',bt(_,_),What),
-   print_db_items('Triggers Positive',pt(_,_),What),
+   print_db_items('Triggers Negative', nt(_,_,_,_),What),
+   print_db_items('Triggers Goal',bt(_,_,_),What),
+   print_db_items('Triggers Positive',pt(_,_,_),What),
    print_db_items('Bidirectional Rules',(_<==>_),What), 
    dif(A,B),print_db_items('Supports Deduced',spft_precanonical(P,A,B),basePFC:spft(umt,P,A,B),What),
    dif(G,u),print_db_items('Supports Nonuser',spft_precanonical(P,G,G),basePFC:spft(umt,P,G,G),What),

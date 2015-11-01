@@ -1,4 +1,4 @@
-/** <module> 
+/* <module> 
 % ===================================================================
 % File 'mpred_type_constraints.pl'
 % Purpose: For Emulation of OpenCyc for SWI-Prolog
@@ -29,7 +29,7 @@
             cmp_memberchk/2,
             cmp_memberchk0/2,
             comp_type/3,
-            domain/2,
+            dom/2,
             extend_dom/2,
             extend_domain/2,
             init_dom/2,
@@ -51,14 +51,50 @@
             same_arg/3,
             samef/2,
             to_functor/2,
-            type_size/2
+            type_size/2,
+
+            dom_lbl/1, dom_member/1,
+
+            lazy/1,lazy/2,
+            weaken/1,weaken/2,thaw/1
           ]).
  :- meta_predicate isa_pred_l(2,*,*),
               isa_pred_l(2,*,*,*),
               map_subterms(2,?,?).
 
+:- meta_predicate
+  thaw(?),
+  lazy(0),
+  weaken(0),
+  weaken(0,0),
+  lazy(?,0).
+
 
 :- include('mpred_header.pi').
+
+
+
+boxlog_goal_expansion(weaken(G),GG):-!,weaken_goal(G,GG).
+boxlog_goal_expansion(G,_):- % \+ source_location(_,_),
+  wdmsg(g_s(G)),fail.
+
+weaken(G):- weaken_goal(G,GG) -> GG.
+
+weaken_goal(G,GGG):- copy_term(G,GG,Gs),G=GG,G=..[_|ARGS],weaken_args(GG,1,ARGS),   GGG=(GG,maplist(dom_member,Gs)).
+
+weaken_arg(G,N,A):- dom(AA,[A]),!,setarg(N,G,AA).
+weaken_arg(G,N,A):- (var(A)->true;(dom(AA,[A]),setarg(N,G,AA))).
+
+weaken_args(G,N,[A]):-weaken_arg(G,N,A),!.
+weaken_args(G,N,[A|RGS]):-weaken_arg(G,N,A),N2 is N + 1,weaken_args(G,N2,RGS).
+
+lazy(G):- term_variables(G,Vs),(Vs==[]->G;lazy(Vs,G)).
+lazy([V],G):-!,freeze(V,G).
+lazy([V|Vs],G):-freeze(V,G),!,lazy(Vs,G).
+
+thaw(G):- call_residue_vars(G,_).
+
+
 
 
 attribs_to_atoms(ListA,List):-map_subterms(attribs_to_atoms0,ListA,List).
@@ -109,6 +145,10 @@ add_iza(Var,Hint):- ignore(show_failure(why,isa(Var,Hint))).
 
 :- style_check(-singleton).
 
+dom_lbl(X):-copy_term(X,X,Gs),maplist(dom_member,Gs).
+
+dom_member(dom(X,List)):-!,member(X,List).
+dom_member(G):-G.
 
 attempt_attribute_args(AndOr,Hint,Var):- var(Var),add_iza(Var,Hint),!.
 attempt_attribute_args(AndOr,Hint,Grnd):-ground(Grnd),!.
@@ -178,49 +218,49 @@ promp_yn(Fmt,A):- format(Fmt,A),get_single_char(C),C=121.
 :- set_prolog_flag(generate_debug_info, true).
 
 
-% :-swi_module(domain, [ domain/2  ]). % Var, ?Domain
+% :-swi_module(dom, [ dom/2  ]). % Var, ?Domain
 :- use_module(library(ordsets)).
-:- was_export(domain/2).
-domain(X, Dom) :-
+:- was_export(dom/2).
+dom(X, Dom) :-
       var(Dom), !,
-      get_attr(X, domain, Dom).
-domain(X, List) :-
+      get_attr(X, dom, Dom).
+dom(X, List) :-
       list_to_ord_set(List, Domain),
-      put_attr(Y, domain, Domain),
+      put_attr(Y, dom, Domain),
       X = Y.
 
 :- was_export(extend_domain/2).
-extend_domain(X, DomL):- init_dom(X, Dom2), ord_union(Dom2, DomL, NewDomain),put_attr( X, domain, NewDomain ).
+extend_domain(X, DomL):- init_dom(X, Dom2), ord_union(Dom2, DomL, NewDomain),put_attr( X, dom, NewDomain ).
 
 :- was_export(extend_dom/2).
-extend_dom(X, DomE):-  init_dom(X, Dom2),ord_add_element(Dom2, DomE, NewDomain),put_attr( X, domain, NewDomain ).
+extend_dom(X, DomE):-  init_dom(X, Dom2),ord_add_element(Dom2, DomE, NewDomain),put_attr( X, dom, NewDomain ).
 
 :- was_export(init_dom/2).
-init_dom(X,Dom):-get_attr(X, domain, Dom),!.
-init_dom(X,Dom):-Dom =[_], put_attr(X, domain, Dom),!.
+init_dom(X,Dom):-get_attr(X, dom, Dom),!.
+init_dom(X,Dom):-Dom =[_], put_attr(X, dom, Dom),!.
 
 % An attributed variable with attribute value Domain has been
 % assigned the value Y
-domain:attr_unify_hook(Domain, Y) :-
-   ( get_attr(Y, domain, Dom2)
+dom:attr_unify_hook(Domain, Y) :-
+   ( get_attr(Y, dom, Dom2)
    -> ord_intersection(Domain, Dom2, NewDomain),
    ( NewDomain == []
    -> fail
    ; NewDomain = [Value]
    -> Y = Value
-   ; put_attr(Y, domain, NewDomain)
+   ; put_attr(Y, dom, NewDomain)
    )
    ; var(Y)
-   -> put_attr( Y, domain, Domain )
+   -> put_attr( Y, dom, Domain )
    ; (\+ \+ (cmp_memberchk(Y, Domain)))
 ).
 
 
 
 % Translate attributes from this module to residual goals
-domain:attribute_goals(X) -->
-      { get_attr(X, domain, List) },
-      [domain(X, List)].
+dom:attribute_goals(X) -->
+      { get_attr(X, dom, List) },
+      [dom(X, List)].
 
 
 cmp_memberchk(X,Y):-numbervars(X,0,_,[attvars(skip)]),member(X,Y),!.
@@ -250,12 +290,11 @@ cmp_memberchk0(Item, [X1]) :-
 isac(X, Dom) :-
       var(Dom), !,
       get_attr(X, isac, Dom).
-isac(X, List) :-
-      list_to_ord_set(List, Domain),
-      put_attr(Y, isac, Domain),
+isac(X, Domain) :-
+      put_attr(Y, isac, Domain),!,
       X = Y.
 
-type_size(C,S):-isa(C,completeExtentKnown),!,setof(E,isa(E,C),L),length(L,S).
+type_size(C,S):-a(completeExtentKnown,C),!,setof(E,isa(E,C),L),length(L,S).
 type_size(C,1000000):-isa(C,ttFormatType),!.
 type_size(_,1000).
 
@@ -263,11 +302,11 @@ comp_type(Comp,Col1,Col2):-type_size(Col1,S1),type_size(Col2,S2),compare(Comp,S1
 
 inst_isac(X, List):- predsort(comp_type,List,SList),isac_gen(X,SList).
 
-% An attributed variable with attribute value Domain has been
+% An attributed variable with attribute value DVar has been
 % assigned the value Y
-isac:attr_unify_hook(Domain, Y):-
+isac:attr_unify_hook(DVar, Y):-
    ( get_attr(Y, isac, Dom2)
-   -> ord_union(Domain, Dom2, NewDomain),
+   -> ord_union(DVar, Dom2, NewDomain),
    ( (fail,NewDomain == [])
    -> fail
    ; (fail,NewDomain = [Value])
@@ -275,8 +314,8 @@ isac:attr_unify_hook(Domain, Y):-
    ; put_attr(Y, isac, NewDomain)
    )
    ; var(Y)
-   -> put_attr( Y, isac, Domain )
-   ;  isac_chk(Y,Domain)).
+   -> put_attr( Y, isac, DVar )
+   ;  isac_chk(Y,DVar)).
 
 isac_chk(E,Cs):-once(isac_gen(E,Cs)).
 
@@ -291,4 +330,8 @@ isac:attribute_goals(X) -->
       [isac(X, List)].
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
+
+system:goal_expansion(G,O):-nonvar(G),boxlog_goal_expansion(G,O).
+
+:- trace.
 

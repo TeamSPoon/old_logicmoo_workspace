@@ -11,6 +11,6 @@ pfcControlled(if_missing(ftAskable,ftAssertable)).
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 
-:- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'foob.pfc')).
+:- ensure_loaded(pack(logicmoo_base/t/examples/pfc/'sanity_foob.pfc')).
 
 :- endif.

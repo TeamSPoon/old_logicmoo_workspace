@@ -70,7 +70,7 @@
             mdel/1,
             mpred_modify/2,
             lmconf:mpred_provide_storage_op/4,
-           % mreq/1,
+           % req/1,
             must_storage_op/2,
             nonground_throw_else_fail/1,
             not_asserted/1,
@@ -161,7 +161,7 @@
 
 :- was_export((  clr/1,ireq/1,del/1,  
   padd/2, padd/3, prop/3, prop_or/4, call_props/2, iprops/2, upprop/2, % ain/1, 
-    ireq/1, % mreq/1, 
+    ireq/1, % req/1, 
     %(ain)/1,
     upprop/1, % req/1, 
   % use_term_listing/2,  
@@ -416,12 +416,12 @@ get_body_functor(BDY,BF,A):-get_functor(BDY,BF,A).
 del(C):- fully_expand(change(retract,a),C,C0),mpred_maptree(del0,C0).
 del0(C0):- req(C0),!,clr(C0),!.
 del0(C0):- ireq(C0),!,idel(C0),!.
-del0(C0):- mreq(C0),!,mdel(C0),!.
+del0(C0):- req(C0),!,mdel(C0),!.
 
 idel(C0):- dmsg(idel(C0)),mpred_modify(change( retract,a),C0), sanity(ireq(C0)->(dmsg(warn(incomplete_I_DEL(C0))),fail);true),!.
 idel(C0):- dmsg(warn(failed(idel(C0)))),!,fail.
 
-mdel(C0):- dmsg(mdel(C0)),mpred_modify(change( retract,one),C0), sanity(mreq(C0)->(dmsg(warn(incomplete_M_DEL(C0))),fail);true),!.
+mdel(C0):- dmsg(mdel(C0)),mpred_modify(change( retract,one),C0), sanity(req(C0)->(dmsg(warn(incomplete_M_DEL(C0))),fail);true),!.
 mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 
 % -  clr(Retractall)
@@ -439,8 +439,8 @@ preq(P,C0):- agenda_do_prequery,!,no_repeats(C0,mpred_op(query(t,P),C0)).
 % -  req(Query) = Normal query
 req_old2(C0):- nop(dmsg(req(C0))), !,preq(req,/*to_exp*/(C0)).
 
-% -  mreq(Query) = Forced Full query
-mreq_old2(C0):- nop(dmsg(mreq(C0))), agenda_rescan_for_module_ready,
+% -  req(Query) = Forced Full query
+mreq_old2(C0):- nop(dmsg(req(C0))), agenda_rescan_for_module_ready,
    no_loop_check(w_tl([-infInstanceOnly(_),-t_l:infAssertedOnly(_),-t_l:noRandomValues(_)],
      preq(must,/*to_exp*/(C0)))).
 
@@ -552,7 +552,7 @@ db_assert_sv_now(Must,C,F,A, REPLACE):- db_assert_sv_replace(Must,C,F,A, REPLACE
 db_assert_sv_update(Must,C,F,A,UPDATE):-
    replace_arg(C,A,OLD,COLD),
    % prefer updated values to come from instances but will settle with anything legal
-   hotrace(must((once(ireq(COLD);mreq(COLD)),ground(COLD)))),
+   hotrace(must((once(ireq(COLD);req(COLD)),ground(COLD)))),
    update_value(OLD,UPDATE,NEW),!,
    db_assert_sv_replace(Must,C,F,A,NEW),!.
 
@@ -603,7 +603,7 @@ confirm_hook(CNEW:NEW=@=CNOW:NOW):-
 
 confirm_hook(CNEW:NEW=@=CNOW:NOW):-
    dmsg(warn(failed_i_a_req(CNOW,expected(CNEW)))),   
-   dtrace((sanity((mreq(CNOW),(CNEW:NEW=@=CNOW:NOW))))),!.
+   dtrace((sanity((req(CNOW),(CNEW:NEW=@=CNOW:NOW))))),!.
 
 
 

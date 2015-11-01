@@ -236,7 +236,7 @@ alt_calls(req).
 alt_calls(is_asserted).
 alt_calls(t).
 alt_calls(req).
-alt_calls(mreq).
+alt_calls(req).
 alt_calls(ireq).
 
  :- meta_predicate logicmoo_util_bugger:do_ref_job(0,*).
@@ -275,7 +275,7 @@ functor_declares_instance_0(P,tCol):- arg(_,s(tCol,tSpec,ttFormatType),P).
 %functor_declares_instance_0(P,tPred):-isa_asserted(P,ttPredType),!.
 %functor_declares_instance_0(P,tCol):-isa_asserted(P,functorDeclares),\+functor_declares_instance_0(P,tPred).
 
-functor_declares_instance_0(P,P):- mreq(functorDeclares(P)). % arity(P,1),\+((arity(P,N),N>1)).
+functor_declares_instance_0(P,P):- req(functorDeclares(P)). % arity(P,1),\+((arity(P,N),N>1)).
 
 functor_declares_collectiontype(typeProps,ttTemporalType).
 
@@ -419,7 +419,7 @@ is_unit_functor(F):- (\+ atom(F)),!,fail.
 is_unit_functor(F):-atom_concat('sk',_,F).
 is_unit_functor(F):-atom_concat(_,'Fn',F).
 
-get_ruleRewrite(Sent,SentM):- mreq(ruleRewrite(Sent,SentM)).
+get_ruleRewrite(Sent,SentM):- req(ruleRewrite(Sent,SentM)).
 /*
 as_is_term(NC):-compound(NC),functor(NC,Op,2),infix_op(Op,_).
 */

@@ -941,7 +941,7 @@ current_line_position(Out,LP):-stream_property(Out,position( Y)),stream_position
 tmw:- w_tl(t_l:print_mode(html),
  (rok_portray_clause(a(LP)),
   rok_portray_clause((a(LP):-b([1,2,3,4]))),
-  nl,nl,wid(_,_,KIF),
+  nl,nl,with_umt(wid(_,_,KIF)),
   KIF=(_=>_),nl,nl,print(KIF),listing(print_request/1))),!.
 tmw:- w_tl(t_l:print_mode(html),(print((a(_LP):-b([1,2,3,4]))),nl,nl,wid(_,_,KIF),KIF=(_=>_),nl,nl,print(KIF),listing(print_request/1))),!.
 
@@ -1210,9 +1210,9 @@ pp_i2tml_0(spft(P,F,T)):- atom(F),atom(T),!, pp_i2tml_1(P:-asserted_in(F:T)).
 pp_i2tml_0(spft(P,F,T)):- atom(T),!,  pp_i2tml_1(((P):-  T:'t-deduced',F)). 
 pp_i2tml_0(spft(P,F,T)):- atom(F),!,  pp_i2tml_1(((P):-  F:'f-deduced',T)). 
 pp_i2tml_0(spft(P,F,T)):- !, pp_i2tml_1((P:- ( 'deduced-from'=F,  (rule_why = T)))).
-pp_i2tml_0(nt(Trigger,Test,Body)) :- !, pp_i2tml_1(proplst(['n-trigger'=Trigger , format=Test  ,  (body = (Body))])).
-pp_i2tml_0(pt(Trigger,Body)):-      pp_i2tml_1(proplst(['p-trigger'=Trigger , ( body = Body)])).
-pp_i2tml_0(bt(Trigger,Body)):-      pp_i2tml_1(proplst(['b-trigger'=Trigger ,  ( body = Body)])).
+pp_i2tml_0(nt(_,Trigger,Test,Body)) :- !, pp_i2tml_1(proplst(['n-trigger'=Trigger , format=Test  ,  (body = (Body))])).
+pp_i2tml_0(pt(_,Trigger,Body)):-      pp_i2tml_1(proplst(['p-trigger'=Trigger , ( body = Body)])).
+pp_i2tml_0(bt(_,Trigger,Body)):-      pp_i2tml_1(proplst(['b-trigger'=Trigger ,  ( body = Body)])).
 
 pp_i2tml_0(proplst([N=V|Val])):- is_list(Val),!, pp_i2tml_1(N:-([clause=V|Val])).
 pp_i2tml_0(proplst(Val)):-!, pp_i2tml_1(:-(proplst(Val))).

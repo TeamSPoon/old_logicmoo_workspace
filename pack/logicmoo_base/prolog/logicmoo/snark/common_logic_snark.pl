@@ -83,6 +83,7 @@
             nots_to/3,
             numbervars_with_names/2,
             is_quantifier/1,
+            pfc_for_print/2,
             save_in_code_buffer/2,
             save_wfs/2,
             should_be_poss/1,
@@ -90,7 +91,7 @@
             simple_negate_literal/3,
             simplify_bodies/2,
             simplify_list/3,
-            skolem/3,
+            skolem_in_code/2,skolem_in_code/3,
             sort_body/3,
             sort_body_0/3,
             subsT_each/3,
@@ -166,8 +167,8 @@
         elInverse/2,
         kif_test_string/1,
         mudEquals/2,
-        not_mudEquals/2,
-        skolem/3.
+        not_mudEquals/2.
+        
 */
 
 % :- dynamic((if/2,iif/2)).
@@ -177,8 +178,8 @@
 
 
 kif_hook(C):- non_compound(C),!,fail.
-kif_hook(H :- _):- !,fail.
-kif_hook(H <- _):- !,fail.
+kif_hook(_H :- _):- !,fail.
+kif_hook(_H <- _):- !,fail.
 kif_hook(_ ==> _):- !,fail.
 kif_hook(_ <==> _):- !,fail.
 kif_hook(_=>_).
@@ -204,9 +205,9 @@ kif_hook(C):- C=..[F,A|_],is_sentence_functor(F),!,kif_hook(A).
 are_clauses_entailed(E):-not(compound(E)),!,must(true==E).
 are_clauses_entailed([E|List]):-is_list([E|List]),!,maplist(are_clauses_entailed,[E|List]).
 are_clauses_entailed((C,L)):-!,are_clauses_entailed(C),are_clauses_entailed(L).
-are_clauses_entailed(CL):- unnumbervars(CL,UCL),  !, \+ \+ show_failure(why,is_prolog_entailed(UCL)),!.
+are_clauses_entailed(CL):- unnumbervars(CL,UCL), \+ \+ (clause_asserted(CL);(unnumbervars(CL,UCL),is_prolog_entailed(UCL))),!.
 
-is_prolog_entailed(UCL):-clause_asserted(UCL),!.
+is_prolog_entailed(UCL):-show_failure(clause_asserted(UCL)),!.
 is_prolog_entailed(UCL):-req(UCL),!.
 
 member_ele(E,E):- is_ftVar(E),!.
@@ -236,9 +237,15 @@ clif_to_prolog(CLIF,PrologO):- cwc,
      must_det_l((
       kif_to_boxlog(CLIF,HORN),
       boxlog_to_pfc(HORN,Prolog),
-      dmsg(pfc:-Prolog),
+      pfc_for_print(Prolog,PrintPFC),
+      dmsg(pfc:-PrintPFC),
       =(Prolog,PrologO))),!.
 
+pfc_for_print(Prolog,PrintPFC):-is_list(Prolog),!,maplist(pfc_for_print,Prolog,PrintPFC).
+pfc_for_print(==>(P,if_missing(R,Q)),(Q :- (fwc, w_missing(R), P))):-!.
+pfc_for_print(if_missing(R,Q),(Q :- (fwc, w_missing(R)))):-!.
+pfc_for_print(==>(P,Q),(Q:-fwc, P)):-!.
+pfc_for_print(Prolog,PrintPFC):- =(Prolog,PrintPFC).
 
 % Sanity Test for expected side-effect entailments
 % why does renumbervars_prev work but not copy_term?
@@ -280,13 +287,14 @@ subsT_each(In,[KV|TODO],Out):- !,get_kv(KV,X,Y),subst_except(In,X,Y,Mid),!,subsT
 :- dynamic(mudEquals/2).
 :- export(mudEquals/2).
 mudEquals(X,Y):- X=Y.
-:- dynamic(skolem/3).
-:- export(skolem/3).
-skolem(X,Y,_):- X=Y.
+
+
+skolem_in_code(X,Y):- ignore(X=Y).
+skolem_in_code(X,_,Fml):- when('?='(X,_),skolem_in_code(X,Fml)).
 
 :- was_export(not_mudEquals/2).
 :- was_dynamic(not_mudEquals/2).
-not_mudEquals(X,Y):- X \= Y.
+not_mudEquals(X,Y):- neq(X,Y).
 
 :- was_export(type_of_var/3).
 type_of_var(Fml,Var,Type):- contains_type_lits(Fml,Var,Lits),!,(member(Type,Lits)*->true;Type='Unk').
@@ -472,18 +480,27 @@ write_list([F|R]):- write(F), write('.'), nl, write_list(R).
 write_list([]).
 
 numbervars_with_names(Term,CTerm):- ground(Term),!,duplicate_term(Term,CTerm).
+
 numbervars_with_names(Term,CTerm):-
  must_det_l((
-   source_variables_l(NamedVars),!,
+   source_variables_l(NamedVars),
+   copy_term(Term:NamedVars,CTerm:CNamedVars),
+   b_implode_varnames0(CNamedVars))),!.
+
+
+ numbervars_with_names(Term,CTerm):-
+  must_det_l((
+   source_variables_l(NamedVars),
    copy_term(Term:NamedVars,CTerm:CNamedVars),
    term_variables(CTerm,Vars),
-   get_var_names(Vars,CNamedVars,Names),
+   call((trace,get_var_names(Vars,CNamedVars,Names))),
    b_implode_varnames0(Names),
   % numbervars(CTerm,91,_,[attvar(skip),singletons(false)]),
    append(CNamedVars,NamedVars,NewCNamedVars),
    list_to_set(NewCNamedVars,NewCNamedVarsS),
    remove_grounds(NewCNamedVarsS,NewCNamedVarsSG),
    b_setval('$variable_names',NewCNamedVarsSG))),!.
+
 
 numbervars_with_names(Term,CTerm):-
  must_det_l((
@@ -770,8 +787,8 @@ kif_io(InS,Out):-
 
 :- was_export(why_to_id/3).
 why_to_id(Term,Wff,IDWhy):- not(atom(Term)),term_to_atom(Term,Atom),!,why_to_id(Atom,Wff,IDWhy).
-why_to_id(Atom,Wff,IDWhy):- wid(IDWhy,Atom,Wff),!.
-why_to_id(Atom,Wff,IDWhy):- must(atomic(Atom)),gensym(Atom,IDWhyI),kb_incr(IDWhyI,IDWhy),assertz_if_new(lmconf:wid(IDWhy,Atom,Wff)).
+why_to_id(Atom,Wff,IDWhy):- with_umt(wid(IDWhy,Atom,Wff)),!.
+why_to_id(Atom,Wff,IDWhy):- must(atomic(Atom)),gensym(Atom,IDWhyI),kb_incr(IDWhyI,IDWhy),assertz_if_new(wid(IDWhy,Atom,Wff)).
 
 :- was_export(kif_process/1).
 kif_process(end_of_file):- !.

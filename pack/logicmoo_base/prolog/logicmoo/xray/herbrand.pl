@@ -175,14 +175,14 @@ instance(Vars,Cons,Clause) :-
 	member(V,Cons),
 	instance(V1s,Cons,Clause).
 
-skolem([],Term,Term).
-skolem([Var|Vars],Term,SkTerm) :-
-	skolem(Vars,Term,Term1),
+skolem_x([],Term,Term).
+skolem_x([Var|Vars],Term,SkTerm) :-
+	skolem_x(Vars,Term,Term1),
 	SkTerm=(Var^Term1).
 
 instances(Clause,Terms,Instances) :-
 	variablize_clause(Clause,Vars),
-	skolem(Vars,instance(Vars,Terms,Clause),DoIt),
+	skolem_x(Vars,instance(Vars,Terms,Clause),DoIt),
 	setof(Clause,DoIt,Instances).
 
 instantiation([],_,[]) :-

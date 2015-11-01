@@ -685,7 +685,6 @@
             mpred_call_1/3,
             mpred_call_only_facts/1,
             mpred_call_only_facts/2,
-            mreq/1,
             mpred_call_t_exact/1,
             mpred_call_with_no_triggers/1,
             mpred_call_with_no_triggers_bound/1,
@@ -1196,8 +1195,8 @@ to_predicate_isas0(C,CO):-C=..[F|CL],must_maplist(to_predicate_isas0,CL,CLO),!,C
 
 :- source_location(F,_),asserta(absolute_source_location_pfc(F)).
 exact_args(Q):-is_ftVar(Q),!,fail.
-exact_args(Q):- mreq(argsQuoted(Q)).
-exact_args(Q):-is_ftCompound(Q),functor(Q,F,_),mreq(argsQuoted(F)).
+exact_args(Q):- req(argsQuoted(Q)).
+exact_args(Q):-is_ftCompound(Q),functor(Q,F,_),req(argsQuoted(F)).
 exact_args(second_order(_,_)).
 exact_args(call(_)).
 exact_args(asserted(_)).
@@ -2108,6 +2107,9 @@ mpred_undo(Why,basePFC:nt(umt,Head,Condition,Body)) :-
   (retract_i(basePFC:nt(umt,Head,Condition,Body))
     -> mpred_unfwc(basePFC:nt(umt,Head,Condition,Body))
      ; mpred_trace_msg("for ~p:\nTrigger not found to retract: ~p",[Why,basePFC:nt(umt,Head,Condition,Body)])).
+
+mpred_undo(Why,( \+ ~Fact)):- mpred_undo(Why, Fact),fail.
+mpred_undo(Why,   ~(~Fact)):- mpred_undo(Why, Fact),fail.
 
 mpred_undo(Why,Fact):- mpred_undo_u(Why,Fact)*->true;mpred_undo_e(Why,Fact).
 
@@ -3651,16 +3653,16 @@ pred_head(Type,P):- no_repeats_u(P,(call(Type,P),\+ nonfact_metawrapper(P),is_ft
 pred_head_all(P):- pred_head(pred_all,P).
 
 nonfact_metawrapper(~(_)).
-nonfact_metawrapper(basePFC:pt(umt,_,_)).
-nonfact_metawrapper(basePFC:bt(umt,_,_)).
-nonfact_metawrapper(basePFC:nt(umt,_,_,_)).
-nonfact_metawrapper(basePFC:spft(ukb,_,_,_,_)).
+nonfact_metawrapper(basePFC:pt(_,_,_)).
+nonfact_metawrapper(basePFC:bt(_,_,_)).
+nonfact_metawrapper(basePFC:nt(_,_,_,_)).
+nonfact_metawrapper(basePFC:spft(_,_,_,_,_)).
 nonfact_metawrapper(added(_)).
 % we use the arity 1 forms is why 
 nonfact_metawrapper(term_expansion(_,_)).
 nonfact_metawrapper(P):- \+ current_predicate(_,P).
 nonfact_metawrapper(P):- functor(P,F,_), 
-   (mreq(prologSideEffects(F));mreq(tNotForUnboundPredicates(F))).
+   (req(prologSideEffects(F));req(tNotForUnboundPredicates(F))).
 nonfact_metawrapper(P):-rewritten_metawrapper(P).
 
 rewritten_metawrapper(_):-!,fail.

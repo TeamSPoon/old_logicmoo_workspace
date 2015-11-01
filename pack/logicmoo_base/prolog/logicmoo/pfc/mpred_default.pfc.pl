@@ -31,33 +31,20 @@
 % Douglas Miles
 */
 
-:-
- op(1199,fx,('==>')), 
- op(1190,xfx,('::::')),
- op(1180,xfx,('==>')),
- op(1170,xfx,'<==>'),  
- op(1160,xfx,('<-')),
- op(1150,xfx,'=>'),
- op(1140,xfx,'<='),
- op(1130,xfx,'<=>'), 
- op(600,yfx,'&'), 
- op(600,yfx,'v'),
- op(350,xfx,'xor'),
- op(300,fx,'~'),
- op(300,fx,'-').
 
 :- file_begin(pfc).
-
-:- op(1100,fx,(shared_multifile)).
-
 
 :- dynamic(mpred_default/1).
 
 meta_argtypes(mpred_default(ftAssertable)).
 
-(mpred_default(P==>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))  ==> ((P, ~R/Test) ==> Q).
-(mpred_default(P==>Q)/nonvar(Q)) ==> (P ==> mpred_default(Q)).
-(mpred_default(P)/mpred_literal_nv(P))  ==>  ( \+ ~(P) ==> P).
+mpred_default(P==>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test))  ==> ((P, (~R)/Test ) ==> Q).
+mpred_default(P==>Q)/nonvar(Q) ==> (P ==> mpred_default(Q)).
+mpred_default(P)/mpred_literal_nv(P)  ==>  (( \+ ~P ) ==> P ).
+
+
+mpred_default(Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)) ==> ( (~R)/Test ==> Q ).
+% mpred_default(Q) ==> if_missing(Q,Q).
 
 (mpred_default((Q <- P))/mpred_literal(Q)) ==> (Q <-(P, \+ ~(Q))).
 %(mpred_default(P=>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))  ==> ((P, ~R/Test) => Q).

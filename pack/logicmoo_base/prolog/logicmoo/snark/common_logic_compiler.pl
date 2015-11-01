@@ -134,7 +134,6 @@
             skolem_f/5,
             skolem_fn/6,
             skolem_fn_shared/6,
-            skolem_setting/1,
             third_order/1,
             to_poss/2,
             to_regular_cl/4,
@@ -160,13 +159,9 @@
         regression_test/0,
         sanity_test/0,
         type_action_info/3.
-:- was_dynamic 
-        
-        wid/3.
 
 :- include('../mpred/mpred_header.pi').
 
-:- was_dynamic(wid/3).
 
 % :- use_module(logicmoo(snark/common_logic_sexpr)).
 
@@ -258,20 +253,35 @@
 to_poss(poss(BDT,X),poss(BDT,X)):-nonvar(X),!.
 to_poss(X,poss(X)):-!.
 
+
+:- thread_local(t_l:current_form/1).
+
 :- style_check(+singleton).
 %=% Negation Normal Form
-
 % Usage: nnf(+KB,+Fml, ?NNF)
-nnf(KB,Fml,NNF):-   
-   nnf(KB,Fml,[],NNF,_),!.
+% nnf(KB,Fml,NNF):- \+ ground(Fml),numbervars_with_names(Fml,FmlNV),nnf0(KB,FmlNV,NNF).
+nnf(KB,FmlNV,NNF):- nnf0(KB,FmlNV,NNF).
 
-skolem_setting(shared).
-%skolem_setting(label).
-%skolem_setting(nnf).
-%skolem_setting(removeQ).
-%skolem_setting(eliminate).
-%skolem_setting(ignore).
-%skolem_setting(leavein).
+nnf0(KB,Fml,NNF):- 
+ % ignore(KB='$VAR'('KB')),
+   w_tl(t_l:current_form(Fml),nnf(KB,Fml,[],NNF,_)),!.
+
+:- thread_local(t_l:skolem_setting/1).
+is_skolem_setting(S):- t_l:skolem_setting(SS)->S=SS;S=in_nnf.
+%t_l:skolem_setting(attvar).
+%t_l:skolem_setting(in_nnf).
+%t_l:skolem_setting(shared).
+%t_l:skolem_setting(label).
+%t_l:skolem_setting(removeQ).
+%t_l:skolem_setting(eliminate).
+%t_l:skolem_setting(ignore).
+
+nnf_dnf(KB,Fml,DNF):-
+ w_tl(t_l:skolem_setting(ignore),
+  (removeQ(KB,Fml,FmlUQ),
+   nnf(KB,FmlUQ,NNF),
+   dnf(KB,NNF,DNF))).
+
 
 % get_quantifier_isa(TypedX,X,Col).
 get_quantifier_isa(_,_,_):-fail.
@@ -364,33 +374,45 @@ nnf(KB,exists(TypedX,NNF),FreeV,FmlO,Paths):- get_quantifier_isa(TypedX,X,Col),
 
 
 % ==== quantifiers ========
+nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(attvar),
+   list_to_set([X|FreeV],NewVars),
+    term_slots(Fml+NewVars,Slots),
+    delete_eq(Slots,X,SlotsV1),
+    delete_eq(SlotsV1,KB,SlotsV2),
+    must(t_l:current_form(OrigFml)),
+    SlotsV3 =.. [sk|SlotsV2],
+    nnf_dnf(KB,OrigFml,DNF),
+    nnf(KB,(skolem(X,SlotsV3,DNF)=>Fml),NewVars,NNF,Paths),!.
+
+
+% ==== quantifiers ========
 nnf(KB,all(X,NNF),FreeV,all(X,NNF2),Paths):-  
      list_to_set([X|FreeV],NewVars),
       nnf(KB,NNF,NewVars,NNF2,Paths).
 
 nnf(KB,exists(X,Fml),FreeV,NNF,Paths):-  \+ contains_var(X,Fml),!,nnf(KB,Fml,FreeV,NNF,Paths).
 
-nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- skolem_setting(nnf),!, wdmsg(nnf(skolemizing(exists(X,Fml)))),
+nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(in_nnf),!, wdmsg(nnf(skolemizing(exists(X,Fml)))),
    must(mk_skolem(KB,Fml,X,FreeV,FmlSk)),
    must(nnf(KB,FmlSk,FreeV,NNF,Paths)).
 
 % exists(X,nesc(f(X)))  ->  exists(X,not(poss(not(f(X))))) ->  not(poss(not(f(X))))
 % nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- nnf(KB,not(poss(b_d(KB,nesc,poss),not(Fml))),FreeV,NNF,Paths).
 
-nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- skolem_setting(label),
+nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(label),
    nnf_label(KB,exists(X,Fml),FreeV,NNF,Paths),!.
 
-nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- skolem_setting(shared),
+nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(shared),
    nnf_shared(KB,exists(X,Fml),FreeV,NNF,Paths),!.
 
 
-nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- skolem_setting(ignore),
+nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(ignore),
    list_to_set([X|FreeV],NewVars),
     nnf(KB,Fml,NewVars,NNF,Paths).
 
-nnf(KB,exists(X,Fml),FreeV,exists(X,NNF),Paths):- (skolem_setting(removeQ);skolem_setting(leave)),
+nnf(KB,exists(X,Fml),FreeV,exists(X,NNF),Paths):- (is_skolem_setting(removeQ);is_skolem_setting(attvar)),
    list_to_set([X|FreeV],NewVars),
-    nnf(KB,Fml,NewVars,NNF,Paths).
+    nnf(KB,Fml,NewVars,NNF,Paths),!.
 
 
 nnf(KB,atleast(1,X,Fml),FreeV,NNF,Paths):- !,
@@ -654,7 +676,6 @@ b_d_p(always,sometimes).
 %=%
 %=%  Conjunctive Normal Form (CNF) : assumes Fml in NNF
 %=%
-
 % Usage: cnf(KB, +NNF, ?CNF )
 cnf(KB,A,B):- convertAndCall(as_dlog,cnf(KB,A,B)).
 cnf(_KB,AS_IS,       AS_IS):-leave_as_is(AS_IS),!.
@@ -668,6 +689,7 @@ cnf1(KB, v(P, RIGHT), &(P1,Q1) ):- nonvar_unify(RIGHT , &(Q,R)), !, cnf1(KB, v(P
 cnf1(_KB, CNF,                 CNF).
 
 nonvar_unify(NONVAR,UNIFY):- \+ leave_as_is(NONVAR),  NONVAR=UNIFY.
+
 %=%
 %=% Disjunctive Normal Form (DNF) : assumes Fml in NNF
 %=%
@@ -832,7 +854,7 @@ removeQ(KB, not(poss(BDT, (F))),Vars, XF):- !,removeQ(KB, nesc(BDT, not(F)),Vars
 removeQ(KB, nesc(BDT, not(F)),Vars, XF):- !,removeQ(KB, not(poss(BDT, F)),Vars, XF).
 removeQ(KB, poss(BDT, not(F)),Vars, XF):- !,removeQ(KB, not(nesc(BDT, F)),Vars, XF).
 
-removeQ(KB,  exists(X,F),Vars, HH):- skolem_setting(removeQ),!,wdmsg(removeQ(skolemizing(exists(X,F)))),
+removeQ(KB,  exists(X,F),Vars, HH):- is_skolem_setting(removeQ),!,wdmsg(removeQ(skolemizing(exists(X,F)))),
 	mk_skolem(KB,F,X,Vars,Fsk),
 	removeQ(KB,Fsk,Vars, HH).
 
@@ -1061,9 +1083,9 @@ mk_skolem(KB, F, X, FreeV, FmlSk):-
 
 skolem_f(KB, F, X, FreeVIn, Sk):- 
        must_det_l((
-         delete_eq(FreeVIn,KB,FreeV0),
-         delete_eq(FreeV0,X,FreeV),
-         list_to_set(FreeV,FreeVSet),
+        delete_eq(FreeVIn,KB,FreeV0),
+        delete_eq(FreeV0,X,FreeV),
+        list_to_set(FreeV,FreeVSet),
 	contains_var_lits(F,X,LitsList),
         mk_skolem_name(KB,X,LitsList,'',SK),
         concat_atom(['sk',SK,'Fn'],Fun),

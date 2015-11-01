@@ -90,7 +90,7 @@
 (a(B),e(B),d(B)) ==> b(B).
 
 d(q).
-% ?- nl,ZU=nt(_,_,_),ZU,basePFC:spft(umt,X,Y,Z),\+ \+ ZU=Z,nl.
+% ?- nl,ZU=nt(_,_,_),ZU,basePFC:spft(UMT,X,Y,Z),\+ \+ ZU=Z,nl.
 
 (b(_),e(q)) ==> c.
 (~a(B),~e(B)) ==> q.

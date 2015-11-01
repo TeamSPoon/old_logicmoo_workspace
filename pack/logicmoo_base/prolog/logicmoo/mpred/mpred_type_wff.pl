@@ -31,6 +31,7 @@
             hilog_functor/1,
 
             logical_functor_pttp/1,
+            pttp_nnf_pre_clean_functor/3,
             isBodyConnective/1,
             isEntityFunction/3,
             isEntitySlot/1,
@@ -598,7 +599,7 @@ is_function(_,F,_):- atom_concat('sk',_Was,F),!,fail.
 is_function(P,_,_):- leave_as_is(P),!,fail.
 is_function(_,F,_):- is_log_op(F),!,fail.
 is_function(_,F,_):- atom_concat(_Was,'Fn',F).
-is_function(_,F,_):- tFunction(F).
+is_function(_,F,_):- a(tFunction,F).
 % is_function(_,F,A):- A2 is A+1, current_predicate(F/A2), \+ current_predicate(F/A).
 
 %:- ain(isa(I,C)<=(ttPredType(C),lmconf:isa(I,C))).

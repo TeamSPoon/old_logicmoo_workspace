@@ -15,6 +15,7 @@
             assert_kif_dolce/1,
             assert_until_eof/1,
             decl_user_abox/1,
+            set_current_module/1,
             import_shared_pred/3,
             import_to_user0/3,
             set_user_abox/1,
@@ -164,6 +165,7 @@
             simplify_why_r/4,
             stream_pos/1,
             term_expand_local_each/5,
+            to_box_type0/3,
             transform_opers/3,
             use_file_type_loader/2,
             use_was_isa/3,
@@ -313,9 +315,11 @@ to_abox(pqrSBox,pqrABox).
 to_abox(Chop,Add):-chop_box(Chop,Add),!.
 to_abox(Chop,Add):-chop_box(Chop,Was),atom_concat(Was,'ABox',Add).
 
-to_box_type(M,abox,T):-!,to_abox(M,T).
-to_box_type(M,tbox,T):-!,to_tbox(M,T).
-to_box_type(M,sbox,T):-!,to_sbox(M,T).
+:- export(to_box_type0/3).
+to_box_type(M,B,T):-must(to_box_type0(M,B,TT)),!,T=TT.
+to_box_type0(M,abox,T):-!,to_abox(M,T).
+to_box_type0(M,tbox,T):-!,to_tbox(M,T).
+to_box_type0(M,sbox,T):-!,to_sbox(M,T).
 
 correct_module(M,X,T):-functor(X,F,A),must(correct_module(M,F,A,T)),!.
 
@@ -992,23 +996,27 @@ best_module(_List,baseKB):-!.
 
 file_begin(W):-
   must_det((
-  '$module'(CM,CM),
-  '$set_source_module'(SM,SM),
+            '$module'(CM,CM),
+            '$set_source_module'(SM,SM),
    onEndOfFile(module(CM)),
    (loading_source_file(Source)->true;Source=CM),
    make_module_name(Source,FM),
    context_module_of_file(M),
    (t_l:user_abox(AM)->true;AM=SM),
-   best_module([AM,SM,CM,FM,M],ABox),
-   % dmsg(best_module([AM,SM,CM,FM,M],ABox)),
+   best_module([AM,SM,CM,FM,M],ABoxMaybe),
+   dmsg(best_module([AM,SM,CM,FM,M],ABoxMaybe)),
+   (t_l:user_abox(ABox)->true;ABox=ABoxMaybe),
    set_user_abox(ABox),
+   dmsg(set_user_abox(ABox)),
    op_lang(W),   
    assert_until_eof(lmcache:mpred_directive_value(W,file,Source)),
    decache_file_type(Source),
    ensure_imports(ABox),
-   module(ABox),
+   set_current_module(ABox),
    enable_mpred_expansion,
    mpred_ops)).
+
+set_current_module(ABox):- module(ABox),'$module'(_,ABox),'$set_source_module'(_,ABox).
 
 file_end(W):- must_det(( loading_source_file(ISource),decache_file_type(ISource),ignore(retract(lmcache:mpred_directive_value(W,file,ISource))))),  
   must_det(( loading_source_file(Source),decache_file_type(Source),ignore(retract(lmcache:mpred_directive_value(W,file,Source))))).
@@ -1234,11 +1242,11 @@ mpred_term_expansion(Fact,(:- ((cl_assert(Dir,Fact))))):- load_file_term_to_comm
 
 
       % Specific "*PREDICATE CLASS*" based default
-      load_file_term_to_command_2(pfc(pred_type),Fact,Output):- get_functor(Fact,F,A),mreq(ttPredType(F)),Output='$si$':'$was_imported_kb_content$'(Fact,ttPredType(F)),!.
-      load_file_term_to_command_2(pfc(func_decl),Fact,Output):- get_functor(Fact,F,A),mreq(functorDeclares(F)),Output='$si$':'$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
-      load_file_term_to_command_2(pfc(macro_head),Fact,Output):- get_functor(Fact,F,A),mreq(prologMacroHead(F)),Output='$si$':'$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
-      load_file_term_to_command_2(pfc(mpred_ctrl),Fact,Output):- get_functor(Fact,F,A),mreq(pfcControlled(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
-      load_file_term_to_command_2(pfc(hybrid),Fact,Output):- get_functor(Fact,F,A),mreq(prologHybrid(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
+      load_file_term_to_command_2(pfc(pred_type),Fact,Output):- get_functor(Fact,F,A),req(ttPredType(F)),Output='$si$':'$was_imported_kb_content$'(Fact,ttPredType(F)),!.
+      load_file_term_to_command_2(pfc(func_decl),Fact,Output):- get_functor(Fact,F,A),req(functorDeclares(F)),Output='$si$':'$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
+      load_file_term_to_command_2(pfc(macro_head),Fact,Output):- get_functor(Fact,F,A),req(prologMacroHead(F)),Output='$si$':'$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
+      load_file_term_to_command_2(pfc(mpred_ctrl),Fact,Output):- get_functor(Fact,F,A),req(pfcControlled(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
+      load_file_term_to_command_2(pfc(hybrid),Fact,Output):- get_functor(Fact,F,A),req(prologHybrid(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
       load_file_term_to_command_2(pfc(pl),Fact,Output):- get_functor(Fact,F,A),(a(prologDynamic,F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
       load_file_term_to_command_2(mpred(in_mpred_kb_module),Fact,Output):- in_mpred_kb_module,Output=Fact,!.
 
@@ -1364,7 +1372,7 @@ prolog_load_file_nlc(Module:Spec, Options):- thread_self(TID), \+ is_main_thread
    nop(wdmsg(warn(error(skip_prolog_load_file_nlc(wrong_thread(TID):-thread(Module:Spec, Options)))))),!,fail,dumpST.
 
 prolog_load_file_nlc(Module:DirName, Options):-  atom(DirName), is_directory(DirName)->
-  current_predicate('load_file_dir'/2)->loop_check(show_call(why,call(load_file_dir,Module:DirName, Options))).
+  current_predicate(_,_:'load_file_dir'/2)->loop_check(show_call(why,call(load_file_dir,Module:DirName, Options))).
 
 prolog_load_file_nlc(Module:Spec, Options):- absolute_file_name(Spec,AFN,[extensions(['pl'])]), 
    (Spec\==AFN),exists_file_safe(AFN),!,prolog_load_file_nlc(Module:AFN, Options).
@@ -1403,7 +1411,7 @@ load_file_dir(Module:DirName, Options):- fail,
   foreach((member(F,Files),
             file_name_extension(_,Ext,F),
             guess_file_type_loader(Ext,Loader),
-            current_predicate(Loader/2),
+            current_predicate(_,_:Loader/2),
             directory_file_path(DirName,F,FileName)),
       (user:prolog_load_file(Module:FileName, Options),TF=true)),
      nonvar(TF).
@@ -1448,7 +1456,7 @@ with_mpred_expansions(Goal):-
 :- meta_predicate(ensure_loaded_no_mpreds(0)).
 ensure_loaded_no_mpreds(F):-with_no_mpred_expansions(forall(must_locate_file(F,L),ensure_loaded(L))).
 
-use_was_isa(G,I,C):-call((current_predicate(mpred_types_loaded/0),if_defined(was_isa_syntax(G,I,C)))).
+use_was_isa(G,I,C):-call((current_predicate(_,_:mpred_types_loaded/0),if_defined(was_isa_syntax(G,I,C)))).
 
 current_context_module(Ctx):-lmconf:loading_module(Ctx),!.
 current_context_module(Ctx):-source_context_module(Ctx).

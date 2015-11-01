@@ -17,9 +17,7 @@
             how_to_op/2,
             is_callable/1,
             lookup_inverted_op/3,
-            mpred_call_1/1,
-            mpred_call_2/1,
-            mpred_call_3/1,
+         %    mpred_call_1/1,mpred_call_2/1,mpred_call_3/1,
             mpred_op/2,
             naf/1,
             oncely/1,
@@ -174,7 +172,7 @@ req(Call):- mpred_call_0(Call).
 mpred_call_0(Call):-predicate_property(Call,foreign),!,on_x_rtrace(Call).
 mpred_call_0(Expand):- fully_expand(query(t,req),Expand,Call), Expand\=@=Call, !, loop_check(req(Call),mpred_call_3(Call)).
 mpred_call_0(Call):- one_must(mpred_call_1(Call),mpred_call_2(Call)).
-*/
+
 mpred_call_1(Call):-current_predicate(_,Call),mpred_call_3(Call).
 mpred_call_1(Call):-clause(prolog_xref:process_directive(D, Q),_),nonvar(D),D=Call,!, show_call(why,(prolog_xref:process_directive(Call,Q),must(nonvar(Q)),fmt(Q))).
 mpred_call_2(Call):-predicate_property(Call,dynamic),!,is_asserted(Call).
@@ -188,4 +186,4 @@ mpred_call_2(Call):-mpred_call_3(Call).
 
 mpred_call_3(Call):-on_x_rtrace(loop_check(if_defined(Call))).
 
-
+*/

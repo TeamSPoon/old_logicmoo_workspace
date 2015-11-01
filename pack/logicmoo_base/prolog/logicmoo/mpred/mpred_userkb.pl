@@ -117,6 +117,7 @@ resultIsa/2,
 retractall_wid/1,
 ruleRewrite/2,
 search/7,
+skolem/2,skolem/3,
 singleValuedInArg/2,
 subFormat/2,
 support_hilog/2,
@@ -197,7 +198,8 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 % baseKB:import(I):-system:import(baseKB:I).
 
 
-
+skolem(X,SK):-skolem_in_code(X,SK).
+skolem(X,Vs,SK):-skolem_in_code(X,Vs,SK).
 
 
 t(P,A1,A2):- mpred_pa_call(P,2,call(P,A1,A2)).
@@ -238,7 +240,7 @@ baseKB:resolveConflict(C) :- cwc,
 
 resolveConflict0(C) :- cwc, forall(must(mpred_negation_w_neg(C,N)),ignore(show_failure(why,(nop(baseKB:resolveConflict(C)),pp_why(N))))),
   ignore(show_failure(why,(nop(baseKB:resolveConflict(C)),pp_why(C)))), 
-    doall((mreq(resolverConflict_robot(C)),\+ is_resolved(C),!)),
+    doall((req(resolverConflict_robot(C)),\+ is_resolved(C),!)),
     is_resolved(C),!.
 
 resolverConflict_robot(N) :- cwc, forall(must(mpred_negation_w_neg(N,C)),forall(compute_resolve(C,N,TODO),on_x_rtrace(show_if_debug(TODO)))).
@@ -253,7 +255,7 @@ never_assert_u(A,B):-never_assert_u0(A,B),trace,never_assert_u0(A,B).
 never_assert_u(M:arity(_,_),is_support(arity/2)):- M==pqr,dumpST, trace, cwc,!.
 never_assert_u(M:Rule,Why):- cwc, atom(M),never_assert_u(Rule,Why).
 
-never_assert_u0(mpred_mark(pfcPosTrigger,_,F,A),Why):-
+never_assert_u0(mpred_mark(pfcPosTrigger,_,F,A),Why):- fail,
   functor(P,F,A),
   ignore(predicate_property(M:P,exported)),
   current_predicate(_,M:P),
@@ -273,8 +275,8 @@ never_assert_u(pt(_,
 */
 
 
-%  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(basePFC:pt(umt,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),u)),UN).
-%  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(basePFC:pt(umt,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),u)),UN).
+%  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(basePFC:pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),u)),UN).
+%  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(basePFC:pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),u)),UN).
 
 
 

@@ -20,8 +20,7 @@ ainz_pttp(A):-if_defined(ainz(A),assertz_new(A)).
 %:- was_export(internal_functor/1).
 %:- was_export(was_pttp_functor/1).
 %:- was_dynamic(was_pttp_functor/1).
-:- shared_multifile(lmconf:wid/3).
-:- was_dynamic(lmconf:wid/3).
+:- shared_multifile(wid/3).
 :- was_export(int_query/7).
 :- was_dynamic(int_query/7).
 :- was_export(int_not_query/7).
@@ -126,17 +125,17 @@ pttp_assert_int_wid_for_conjuncts(ID,Y,_):- must(pttp_assert_int_wid(ID,Y)).
 
 % -- CODEBLOCK
 :- was_export(save_wid/3).
-save_wid(IDWhy,Atom,Wff):-must(Atom\=','),to_numbered_ground(lmconf:wid(IDWhy,Atom,Wff),Assert),show_failure(why,ainz_pttp(Assert)).
+save_wid(IDWhy,Atom,Wff):-must(Atom\=','),to_numbered_ground(wid(IDWhy,Atom,Wff),Assert),show_failure(why,ainz_pttp(Assert)).
 
 to_numbered_ground(I,O):-ground(I)->I=O;(copy_term(I,M),numbervars(M,766,_,[functor_name('$VAR')]),O=M->true;trace_or_throw(to_numbered_ground(I,O))).
 
 % -- CODEBLOCK
-clauses_wid(ID,ID:R,F,Y,Ref):-atomic(ID),!,nonvar(ID),clause(lmconf:wid(ID:R,F,Y),true,Ref).
-clauses_wid(ID,ID,F,Y,Ref):-clause(lmconf:wid(ID,F,Y),true,Ref).
+clauses_wid(ID,ID:R,F,Y,Ref):-atomic(ID),!,nonvar(ID),clause(wid(ID:R,F,Y),true,Ref).
+clauses_wid(ID,ID,F,Y,Ref):-clause(wid(ID,F,Y),true,Ref).
 
 % -- CODEBLOCK
 :- was_export(retract_if_no_wids/1).
-retract_if_no_wids(Y):- \+ lmconf:wid(_,_,Y) -> retractall_matches(Y) ; true.
+retract_if_no_wids(Y):- \+ wid(_,_,Y) -> retractall_matches(Y) ; true.
 
 % -- CODEBLOCK
 :- was_export(is_wid_key/2).
@@ -205,7 +204,8 @@ portray_clause_0(  AB  ):- portray_clause(user_output,(AB),[numbervars(true)]).
 
 % -- CODEBLOCK
 :- was_export(clear_pttp/0).
-clear_pttp:- eraseall(int_query,_),eraseall(int_not_query,_),
+clear_pttp:- 
+  eraseall(int_query,_),eraseall(int_not_query,_),
   forall(wid(ID,_/_,_),retractall(wid(ID,_,_))),
   forall(was_pttp_functor(internal,F,A),(abolish(F,A),dynamic(F/A))).
 
@@ -367,15 +367,15 @@ pttp_assert_int_wid(ID,YB):- must((get_functor(YB,F,A),renumbervars_a(YB,Y),pttp
 pttp_assert_int_wid04(_,Y,_,_):- static_predicate(Y,Why),must( dmsg(error(warn(static_predicate(Y,Why))))),!.
 pttp_assert_int_wid04(_,_,F,A):- was_pttp_functor(external,F,A),!.
 pttp_assert_int_wid04(_,Y,F,A):- not(internal_functor(F)),add_functor(external,F/A),assertz_unumbered(Y),!.
-pttp_assert_int_wid04(ID,Y,F,A):- show_success(why,lmconf:wid(ID,F/A,Y)),!.
-%pttp_assert_int_wid04(ID,Y,F,A):- fail, once((must((must((renumbervars_a(Y,BB),nonvar(BB))),pred_subst(is_wid_key,BB,_,_,YCheck),nonvar(YCheck),BB \=@= YCheck)))),lmconf:wid(_,F/A,YCheck),!,ainz_pttp(lmconf:wid(ID,F/A,Y)),!.
-pttp_assert_int_wid04(ID,Y,F,A):- lmconf:wid(_,_,Y),!,ainz_pttp(lmconf:wid(ID,F/A,Y)),!.
-pttp_assert_int_wid04(ID,Y,F,A):- ainz_pttp(lmconf:wid(ID,F/A,Y)),add_functor(internal,F/A),!,assertz_unumbered(Y),!.
+pttp_assert_int_wid04(ID,Y,F,A):- show_success(why,wid(ID,F/A,Y)),!.
+%pttp_assert_int_wid04(ID,Y,F,A):- fail, once((must((must((renumbervars_a(Y,BB),nonvar(BB))),pred_subst(is_wid_key,BB,_,_,YCheck),nonvar(YCheck),BB \=@= YCheck)))),wid(_,F/A,YCheck),!,ainz_pttp(wid(ID,F/A,Y)),!.
+pttp_assert_int_wid04(ID,Y,F,A):- wid(_,_,Y),!,ainz_pttp(wid(ID,F/A,Y)),!.
+pttp_assert_int_wid04(ID,Y,F,A):- ainz_pttp(wid(ID,F/A,Y)),add_functor(internal,F/A),!,assertz_unumbered(Y),!.
 /*
 pttp_assert_int_wid04(ID,Y,F,A):- 
    static_predicate(Y,Why)-> (trace,wdmsg(warn(error(static_predicate(Y,Why))))); 
     must(show_failure(why,assertz_unumbered(Y)),
-    must((not(internal_functor(F))-> add_functor(external,F/A); (ainz_pttp(lmconf:wid(ID,F/A,Y)),add_functor(internal,F/A)))))
+    must((not(internal_functor(F))-> add_functor(external,F/A); (ainz_pttp(wid(ID,F/A,Y)),add_functor(internal,F/A)))))
 */
 
 :- use_module(dbase_i_mpred_pttp_statics).

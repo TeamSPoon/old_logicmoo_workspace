@@ -84,10 +84,7 @@ Per-Litteral features
             reduce_literal/2,
             set_clause_compile/1,
             vg/1,
-            vg/3
-          ]).
-
-
+            vg/3]).
 
 :- use_module(logicmoo(mpred/mpred_pfc)).
 :- include('../mpred/mpred_header.pi').
@@ -136,7 +133,7 @@ boxlog_to_compile(rev(=>),H,OUTPUT):-!, boxlog_to_compile(fwc,H,OUTPUT).
 boxlog_to_compile(~(WHAT),(not(H):-B),OUTPUT):-!, boxlog_to_compile(WHAT,(not(H):-B),OUTPUT).
 boxlog_to_compile(~(WHAT),not(H),OUTPUT):-!, boxlog_to_compile(WHAT,not(H),OUTPUT).
 
-boxlog_to_compile((:-),(not(H):-_),true):- nonvar(H),prologBuiltin(H),!.
+boxlog_to_compile((:-),(not(H):-B),unused_true((not(H):-B))):- nonvar(H),prologBuiltin(H),!.
 boxlog_to_compile((:-),(not(H):-B),(HH:-(cwc,BBB))):-body_for_pfc((:-),~(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_compile((:-),(H:-B),OUT):-pfcControlled(H),boxlog_to_compile((bwc),(H:-B),OUT),!.
 boxlog_to_compile((:-),(H:-B),(HH:-(cwc,BBB))):- body_for_pfc((:-),H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
@@ -161,14 +158,14 @@ boxlog_to_compile((:-),H,H):-  !.
 :- op(1100,fx,(shared_multifile)).
 
 
-boxlog_to_compile(fwc,(not(H):-_),true):- nonvar(H),H = skolem(_,_),!.
+boxlog_to_compile(fwc,(not(H):-B),unused_true((not(H):-B))):- nonvar(H),H = skolem(_,_),!.
 boxlog_to_compile(fwc,(not(H):-B),OUT):- term_slots(H,HV),term_slots(B,BV), HV\==BV,!,boxlog_to_compile(bwc,(not(H):-B),OUT).
 boxlog_to_compile(fwc,(not(H):-B),(BBB==>HH)):- body_for_pfc(fwc,~(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_compile(fwc,(H:-B),(BBB==>HH)):- body_for_pfc(fwc,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_compile(fwc,not(H),~(H)):-  !.
 boxlog_to_compile(fwc,H,H):-  !.
 
-boxlog_to_compile(bwc,(not(H):-_),true):- nonvar(H),H = skolem(_,_),!.
+boxlog_to_compile(bwc,(not(H):-B),unused_true((not(H):-B))):- nonvar(H),H = skolem(_,_),!.
 boxlog_to_compile(bwc,(not(H):-B),(HH<-BBB)):-body_for_pfc(<-,~(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_compile(bwc,(H:-B),OUT):-pfcRHS(H),term_slots(H,HV),term_slots(B,BV), HV==BV,boxlog_to_compile((fwc),(H:-B),OUT),!.
 boxlog_to_compile(bwc,(H:-B),(HH<-BBB)):- body_for_pfc(<-,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
@@ -262,3 +259,4 @@ reduce_literal(A,A).
 can_use_hack(two_implications):-!,fail.
 can_use_hack(_).
 did_use_hack(X):-wdmsg(did_use_hack(X)).
+

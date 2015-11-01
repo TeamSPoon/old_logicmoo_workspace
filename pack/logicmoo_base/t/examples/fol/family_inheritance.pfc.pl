@@ -23,14 +23,13 @@
 % :- include('test_header.pfc').
 :- use_module(library(logicmoo/logicmoo_user)).
 
-:- baseKB:with_ukb(baseKB,baseKB:ensure_mpred_file_loaded(logicmoo(snark/'common_logic_clif.pfc'))).
-
+:- set_user_abox(baseKB).
+%=  setup pfc
+:- set_current_module(baseKB).
 :- begin_pfc.
+:- sanity(get_user_abox(baseKB)).
 
 :- process_this_script.
-
-%=  setup pfc
-:- file_begin(pfc).
 
 %= save compiled clauses using forward chaining storage (by default)
 %= we are using forward chaining just so any logical errors, performance and program bugs manefest
@@ -122,8 +121,8 @@ human(trudy).
 never_retract_u(human(trudy)).
 
 
-% :- kif_add(forall(p,exists([m,f], if(human(p), (mother(m,p) & father(f,p)))))).
-forall(p,exists([m,f], if(human(p), (mother(m,p) & father(f,p))))).
+%  
+forall(c,exists([m,f], if(human(c), (mother(m,c) & father(f,c))))).
 
 :- printAll(must(father(_,trudy))).
 
@@ -212,6 +211,9 @@ male(skArg1ofFatherFn(trudy)).
 %= ensure skolems are made or destroyed
 
 father(robert,eileen).
+
+:- sanity(\+ baseKB:father(skArg1ofFatherFn(eileen), eileen) ).
+
 siblings(douglas,cassiopea).
 father(douglas,sophiaWebb).
 father(douglas,skylar).
