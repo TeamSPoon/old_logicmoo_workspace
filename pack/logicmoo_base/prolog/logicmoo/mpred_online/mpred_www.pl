@@ -1202,8 +1202,8 @@ pp_i2tml_0(is_disabled_clause(H)):- pp_i2tml_0((disabled)=H).
 
 % pp_i2tml_0(FET):-fully_expand(assert,FET,NEWFET),FET\=@=NEWFET,!,pp_i2tml_0(NEWFET).
 
-pp_i2tml_0(basePFC:spft(umt,P,F,T,W)):-!,
-   w_tl(t_l:current_why_source(W),pp_i2tml_0(basePFC:spft(umt,P,F,T))).
+pp_i2tml_0(basePFC:spft('$ABOX',P,F,T,W)):-!,
+   w_tl(t_l:current_why_source(W),pp_i2tml_0(basePFC:spft('$ABOX',P,F,T))).
 
 pp_i2tml_0(spft(P,U,U)):- nonvar(U),!, pp_i2tml_1(P:-asserted_by(U)).
 pp_i2tml_0(spft(P,F,T)):- atom(F),atom(T),!, pp_i2tml_1(P:-asserted_in(F:T)).

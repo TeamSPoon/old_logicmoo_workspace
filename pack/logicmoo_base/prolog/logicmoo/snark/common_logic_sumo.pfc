@@ -1,5 +1,5 @@
 :- if(current_prolog_flag(logicmoo_modules,default)).
-:- module(umt.[]).
+:- module('$ABOX'.[]).
 :- endif.
 :- include('../mpred/mpred_header.pi').
 

@@ -546,7 +546,7 @@ head_singletons(Pre,Post):-   hotrace((\+ ignore(show_failure(why, \+ head_singl
 :- export(head_singles0/2).
 :- export(head_singles01/2).
 % TODO how to adderess head_singles0(true, if_missing(foob(_G754993), foob(a)))?
-% also should fix  (head_singles0(true, nt(umt, foob(_G764659),  (call_u(foob(_G764666)), foob(_G764666)\==foob(a)), rhs([foob(a)]))))).
+% also should fix  (head_singles0(true, nt('$ABOX', foob(_G764659),  (call_u(foob(_G764666)), foob(_G764666)\==foob(a)), rhs([foob(a)]))))).
 head_singles0(Pre,Post):-is_ftVar(Post),!,head_singles01(Pre,Post).
 head_singles0(_,Post):- \+ compound(Post),!,fail.
 head_singles0(Pre,M:Post):-atom(M),!,head_singles0(Pre,Post).

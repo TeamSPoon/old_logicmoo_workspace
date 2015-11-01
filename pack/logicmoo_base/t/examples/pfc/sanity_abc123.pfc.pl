@@ -83,7 +83,7 @@
 % :-mpred_test(\+  ~(a(_))).
 % :-mpred_test(\+ a(_)).
 
-% U=nt(A,B,C),basePFC:spft(umt,X,Y,Z),\+ \+
+% U=nt(A,B,C),basePFC:spft('$ABOX',X,Y,Z),\+ \+
 
 (a(B),d(B),f(B)) ==> b(B).
 (a(B),d(B),e(B)) ==> b(B).

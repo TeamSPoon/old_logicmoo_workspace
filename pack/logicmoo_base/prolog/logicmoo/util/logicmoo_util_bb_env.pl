@@ -11,10 +11,78 @@
 % Licience: LGPL
 % ===================================================================
 */
-:- if(current_predicate(logicmoo_utils:combine_logicmoo_utils/0)).
-:- module(logicmoo_util_bb_env,
-    [  % when the predciates are not being moved from file to file the exports will be moved here
-      ]).
+:- if(current_predicate(_:combine_logicmoo_utils/0)).
+:- module(logicmoo_util_bb_env, [
+abolish_and_make_static/2,
+add_push_prefix_arg/4,
+bb:'$sourcefile_info_env'/1,
+clause_to_hb/3,
+clause_to_hb0/3,
+decl_env_mepred/2,
+decl_env_mepred_dom/2,
+decl_env_mepred_fa/4,
+decl_env_mepred_real/4,
+decl_env_mepred_task/2,
+do_prefix_arg/4,
+env_1_info/2,
+env_assert/1,
+env_asserta/1,
+env_call/1,
+env_clear/1,
+env_consult/1,
+env_get/1,
+env_info/1,
+env_info/2,
+env_learn_pred/2,
+env_meta_term/1,
+env_mpred_op/1,
+env_mpred_op/2,
+env_mpred_op/3,
+env_mpred_op_1/3,
+env_predinfo/2,
+env_push_args/4,
+env_push_argsA/4,
+env_recorded/2,
+env_retract/1,
+env_retractall/1,
+env_set/1,
+env_shadow/2,
+env_source_file/1,
+env_term_expansion/2,
+get_env_ctx/1,
+get_env_expected_ctx/1,
+get_env_source_ctx/2,
+get_mp_arity/2,
+get_mpred_stubType/3,
+harvest_preds/2,
+hb_to_clause/3,
+hb_to_clause0/3,
+in_dyn/2,
+in_dyn_pred/2,
+is_expanded_file/1,
+lg_op2/3 
+lmconf:decl_env_mepred/2,
+lmconf:mpred_system_kb/1,
+ppi/1,
+pred_1_info/4,
+prop_mpred/3,
+push_prefix_arg/4,
+term_expansion_add_context/5
+]).
+
+ :- meta_predicate % cmt :-
+        env_call(+),
+        env_consult(:),
+        env_mpred_op(1, :),
+        env_mpred_op(?, 1, :),
+        env_mpred_op_1(?, 1, :),
+        env_shadow(1, ?).
+:- (multifile bb:'$sourcefile_info_env'/1, lmconf:mpred_system_kb/1, env_push_args/4).
+:- (module_transparent env_consult/1, env_mpred_op/2, env_mpred_op/3, env_mpred_op_1/3, env_shadow/2).
+:- export((clause_to_hb0/3, env_mpred_op_1/3, hb_to_clause0/3, lg_op2/3)).
+:- (dynamic bb:'$sourcefile_info_env'/1, lmconf:mpred_system_kb/1, env_push_args/4, env_source_file/1, in_dyn/2).
+:- shared_multifile((bb:'$sourcefile_info_env'/1, lmconf:mpred_system_kb/1, env_push_args/4, env_source_file/1, in_dyn/2)).
+:- endif.
 
 :- include('logicmoo_util_header.pi').
 
@@ -24,8 +92,8 @@
 :- dynamic(lmconf:mpred_system_kb/1).
 
 :- thread_local(t_l:push_env_ctx).
-:- dynamic(bb:'$env_info'/1).
-:- multifile(bb:'$env_info'/1).
+:- dynamic(bb:'$sourcefile_info_env'/1).
+:- multifile(bb:'$sourcefile_info_env'/1).
 
 :- meta_predicate(env_call(+)).
 
@@ -273,7 +341,8 @@ push_prefix_arg(Pred,Type,Prefix,Pred ):-env_push_argsA(_,Type,Prefix,Pred),!,mu
 push_prefix_arg(Pred,Type,Prefix,Pred1):-env_push_argsA(Pred,Type,Prefix,Pred1),!.
 
 add_push_prefix_arg((F/A),Type,Prefix,Pred1):-must(integer(A)),!,functor(Pred,F,A),add_push_prefix_arg(Pred,Type,Prefix,Pred1).
-add_push_prefix_arg(Pred,Type,Prefix,Pred1):- must(atom(Type)),Pred=..[F|ARGS],Pred1=..[F,Prefix|ARGS],ain(env_push_args(Pred,Type,Prefix,Pred1)),!.
+add_push_prefix_arg(Pred,Type,Prefix,Pred1):- must(atom(Type)),Pred=..[F|ARGS],Pred1=..[F,Prefix|ARGS],
+   ain(env_push_args(Pred,Type,Prefix,Pred1)),!.
 
 
 term_expansion_add_context(_NeedIt,_Ctx,_,B,B):- var(B),!.
@@ -300,7 +369,8 @@ clause_to_hb0((:-B),true,B).
 clause_to_hb0((H),H,true).
 
 :- export(env_term_expansion/2).
-env_term_expansion(HB,OUT):- t_l:push_env_ctx,!,
+env_term_expansion(HB,OUT):- 
+ t_l:push_env_ctx,!,
   must_det_l((
    clause_to_hb(HB,H,B),
    term_expansion_add_context(BNeedIt,Ctx,(:-),B,BB),
@@ -312,8 +382,8 @@ env_term_expansion(HB,OUT):- t_l:push_env_ctx,!,
    hb_to_clause(HH,BBB,OUT),!.
 
 
-env_term_expansion(HB,bb:'$env_info'(OUT)):-  HB\=(:-_), end_of_file\==HB, clause_to_hb(HB,H,B),
-  is_ocl_expanded_file,must(ain((H:-B))),
+env_term_expansion(HB,bb:'$sourcefile_info_env'(OUT)):-  HB\=(:-_), end_of_file\==HB, clause_to_hb(HB,H,B),
+  is_expanded_file(ocl),must(ain((H:-B))),
   hb_to_clause(H,B,OUT),!.
 
 
@@ -335,19 +405,20 @@ get_env_ctx(_ChameleonWorld).
 :- add_push_prefix_arg(get_tasks/3,dom,_,_).
 :- add_push_prefix_arg(domain_name/1,dom,_,_).
 
-is_env_expanded_file:- loading_file(File),!,once(file_name_extension(_,ocl,File);env_source_file(File)),!.
-
-is_ocl_expanded_file:- loading_file(File),file_name_extension(_,ocl,File).
+is_expanded_file(ocl):- loading_file(File),!,once(file_name_extension(_,ocl,File);env_source_file(File)),!.
    
 /*
-user:term_expansion(A,B):- nonvar(A), A\==end_of_file, is_env_expanded_file,
+
+user:term_expansion(A,B):- nonvar(A), A\==end_of_file, is_expanded_file(ocl),
   env_term_expansion(A,B),
   must(nonvar(B)),A\=@=B.
+
 */
 
 
 
 /*
+
 env_mpred_op(ENV,OP_P):- throw(trace),simplest(ENV),!,OP_P.
 env_mpred_op(ENV,call(P)):-env_mpred_op(ENV,call,P).
 env_mpred_op(ENV,assert(P)):-env_mpred_op(ENV,assert,P).

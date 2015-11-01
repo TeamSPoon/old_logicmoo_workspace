@@ -383,7 +383,7 @@ mpred_list_triggers_1(~(What)):-var(What),!.
 mpred_list_triggers_1(~(_What)):-!.
 mpred_list_triggers_1(What):-var(What),!.
 mpred_list_triggers_1(What):-
-   print_db_items('Supports User',spft_precanonical(P,u,u),basePFC:spft(umt,P,u,u),What),
+   print_db_items('Supports User',spft_precanonical(P,u,u),basePFC:spft('$ABOX',P,u,u),What),
    print_db_items('Forward Facts',(nesc(F)),F,What),
    print_db_items('Forward Rules',(_==>_),What),
  ignore((What\= ~(_),functor(What,IWhat,_),
@@ -396,8 +396,8 @@ mpred_list_triggers_1(What):-
    print_db_items('Triggers Goal',bt(_,_,_),What),
    print_db_items('Triggers Positive',pt(_,_,_),What),
    print_db_items('Bidirectional Rules',(_<==>_),What), 
-   dif(A,B),print_db_items('Supports Deduced',spft_precanonical(P,A,B),basePFC:spft(umt,P,A,B),What),
-   dif(G,u),print_db_items('Supports Nonuser',spft_precanonical(P,G,G),basePFC:spft(umt,P,G,G),What),
+   dif(A,B),print_db_items('Supports Deduced',spft_precanonical(P,A,B),basePFC:spft('$ABOX',P,A,B),What),
+   dif(G,u),print_db_items('Supports Nonuser',spft_precanonical(P,G,G),basePFC:spft('$ABOX',P,G,G),What),
    print_db_items('Backchaining Rules',(_<-_),What),
    % print_db_items('Edits',is_disabled_clause(_),What),
    print_db_items('Edits',is_edited_clause(_,_,_),What),

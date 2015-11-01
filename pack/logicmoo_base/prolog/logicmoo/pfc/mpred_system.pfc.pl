@@ -139,7 +139,7 @@ conflict(C) ==> {must(with_mpred_trace_exec(resolveConflict(C),\+conflict(C)))}.
 
 % meta rules to schedule inferencing.
 % resolve conflicts asap
-% mpred_select(conflict(X),W) :- basePFC:qu(umt,conflict(X),W).
+% mpred_select(conflict(X),W) :- basePFC:qu('$ABOX',conflict(X),W).
 
 
 
@@ -1164,7 +1164,7 @@ vtTestType(vTest2).
 notAssertable(isFact/1).
 prologHybrid(isFact/1).
 % :- kb_dynamic(added/1).
-:-asserta((added(Added):-basePFC:spft(umt,Added,U,U,_))).
+:-asserta((added(Added):-basePFC:spft('$ABOX',Added,U,U,_))).
 isFact(A):- cwc, is_ftNonvar(A), ( added(A) ; clause_asserted(A)),not((arg(_,A,V),var(V))).
 
 

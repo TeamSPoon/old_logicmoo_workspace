@@ -1303,12 +1303,12 @@ mpred_rule_hb_0((Outcome<-Ante1),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcom
 mpred_rule_hb_0((Outcome<==>Ante1),OutcomeO,(Ante1,Ante2)):-mpred_rule_hb(Outcome,OutcomeO,Ante2).
 mpred_rule_hb_0((Ante1<==>Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
 mpred_rule_hb_0(_::::Outcome,OutcomeO,Ante2):-!,mpred_rule_hb_0(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(basePFC:bt(umt,Outcome,Ante1),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(basePFC:pt(umt,Ante1,Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(basePFC:pk(umt,Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(basePFC:nt(umt,Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0(basePFC:bt('$ABOX',Outcome,Ante1),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0(basePFC:pt('$ABOX',Ante1,Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0(basePFC:pk('$ABOX',Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0(basePFC:nt('$ABOX',Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
 mpred_rule_hb_0(basePFC:spft(ukb,Outcome,Ante1a,Ante1b,_),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
-mpred_rule_hb_0(basePFC:qu(umt,Outcome,_),OutcomeO,Ante2):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0(basePFC:qu('$ABOX',Outcome,_),OutcomeO,Ante2):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
 % mpred_rule_hb_0(pfc Default(Outcome),OutcomeO,Ante2):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
 mpred_rule_hb_0((Outcome:-Ante),Outcome,Ante):-!.
 mpred_rule_hb_0(Outcome,Outcome,true).
@@ -1323,9 +1323,9 @@ ain_minfo(How,((A;B):-INFOC)):-mpred_is_info(INFOC),(is_ftNonvar(A);is_ftNonvar(
 ain_minfo(How,(-(A):-infoF(C))):-is_ftNonvar(C),is_ftNonvar(A),!,ain_minfo(How,((A):-infoF((C)))). % attvar_op(How,(-(A):-infoF(C))).
 ain_minfo(How,(~(A):-infoF(C))):-is_ftNonvar(C),is_ftNonvar(A),!,ain_minfo(How,((A):-infoF((C)))). % attvar_op(How,(-(A):-infoF(C))).
 ain_minfo(How,(A:-INFOC)):-is_ftNonvar(INFOC),INFOC= mpred_bc_only(A),!,attvar_op(How,(A:-INFOC)),!.
-ain_minfo(How,basePFC:bt(umt,H,_)):-!,attvar_op(How,(H:-mpred_bc_only(H))).
-ain_minfo(How,basePFC:nt(umt,H,Test,Body)):-!,attvar_op(How,(H:-fail,basePFC:nt(umt,H,Test,Body))).
-ain_minfo(How,basePFC:pt(umt,H,Body)):-!,attvar_op(How,(H:-fail,basePFC:pt(umt,H,Body))).
+ain_minfo(How,basePFC:bt('$ABOX',H,_)):-!,attvar_op(How,(H:-mpred_bc_only(H))).
+ain_minfo(How,basePFC:nt('$ABOX',H,Test,Body)):-!,attvar_op(How,(H:-fail,basePFC:nt('$ABOX',H,Test,Body))).
+ain_minfo(How,basePFC:pt('$ABOX',H,Body)):-!,attvar_op(How,(H:-fail,basePFC:pt('$ABOX',H,Body))).
 ain_minfo(How,(A0:-INFOC0)):- mpred_is_info(INFOC0), copy_term_and_varnames((A0:-INFOC0),(A:-INFOC)),!,must((mpred_rewrap_h(A,AA),imploded_copyvars((AA:-INFOC),ALLINFO), attvar_op(How,(ALLINFO)))),!.
 %ain_minfo(How,G):-mpred_trace_msg(skipped_add_meta_facts(How,G)).
 ain_minfo(_,_).
@@ -1401,7 +1401,7 @@ assertz_mu(M,X):- must((expire_tabled_list(M:X),show_call(attvar_op(assertz,M:X)
 retract_u(X):- check_never_retract(X),fail.
 %retract_u(~(X)):-must(is_ftNonvar(X)),!,retract_eq_quitely_f(~(X)),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
 %retract_u(basePFC:hs(X)):-!,retract_eq_quitely_f(basePFC:hs(X)),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
-retract_u(basePFC:qu(umt,X,Y)):-!,show_failure(why,retract_eq_quitely_f(basePFC:qu(umt,X,Y))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
+retract_u(basePFC:qu('$ABOX',X,Y)):-!,show_failure(why,retract_eq_quitely_f(basePFC:qu('$ABOX',X,Y))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
 retract_u(~(X)):-!,show_success(why,retract_eq_quitely_f(~(X))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
 retract_u((X)):-!,show_success(why,retract_eq_quitely_f((X))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
 retract_u(X):-show_if_debug(attvar_op(retract_eq,X)),!,must((expire_tabled_list(X))).
@@ -1752,8 +1752,8 @@ mpred_unique_i(P) :-
 mpred_enqueue(P,S) :-
   must(mreq(basePFC:sm(Mode));Mode=direct)
     -> (Mode=direct  -> must(mpred_fwd(P,S)) ;
-	Mode=depth   -> aina_i(basePFC:qu(umt,P,S),S) ;
-	Mode=breadth -> ainz_i(basePFC:qu(umt,P,S),S) ;
+	Mode=depth   -> aina_i(basePFC:qu('$ABOX',P,S),S) ;
+	Mode=breadth -> ainz_i(basePFC:qu('$ABOX',P,S),S) ;
 	% else
           otherwise           -> mpred_warn("Unrecognized basePFC:sm mode: ~p", Mode))
      ; mpred_warn("No basePFC:sm mode").
@@ -1826,8 +1826,8 @@ get_next_fact(P,WS) :-
   remove_selection(P,WS).
 
 remove_selection(P,S) :-
-  mpred_retract_db_type(basePFC:qu(umt,P,S)),
-  mpred_remove_supports_quietly(basePFC:qu(umt,P,S)),
+  mpred_retract_db_type(basePFC:qu('$ABOX',P,S)),
+  mpred_remove_supports_quietly(basePFC:qu('$ABOX',P,S)),
   !.
 remove_selection(P,S) :-
   brake(wdmsg("pfc:get_next_fact - selected fact not on Queue: ~p (~p)",
@@ -1845,7 +1845,7 @@ select_next_fact(P,S) :-
   !.
 
 % the mpred_default selection predicate takes the item at the froint of the queue.
-defaultmpred_select(P,S) :- basePFC:qu(umt,P,S),!.
+defaultmpred_select(P,S) :- basePFC:qu('$ABOX',P,S),!.
 
 :- shared_multifile(basePFC:hs/1).
 
@@ -1874,27 +1874,27 @@ ain_trigger(Trig,Support) :- arg(1,Trig,Term),
 
 ain_trigger_0(_Trig,TriggerBody,Support) :- mpred_had_support(TriggerBody,Support),!,mpred_trace_msg('Had Support',TriggerBody).
 
-ain_trigger_0(Trig,basePFC:pt(umt,Trigger,Body),Support) :-
+ain_trigger_0(Trig,basePFC:pt('$ABOX',Trigger,Body),Support) :-
   !,  
-  mpred_trace_msg('Adding For Later',basePFC:pt(umt,Trigger,Body)),
-  (clause_asserted(basePFC:pt(umt,Trigger,Body)) -> ! ;   
-     (( ain_t(basePFC:pt(umt,Trigger,Body),Support),
+  mpred_trace_msg('Adding For Later',basePFC:pt('$ABOX',Trigger,Body)),
+  (clause_asserted(basePFC:pt('$ABOX',Trigger,Body)) -> ! ;   
+     (( ain_t(basePFC:pt('$ABOX',Trigger,Body),Support),
         (must(mpred_mark_as(Support,p,Trigger,pfcPosTrigger))),
         add_reprop(Trig,Trigger)))).
 
-ain_trigger_0(_Trig,basePFC:nt(umt,Trigger,Test,Body),Support) :- !,
-  mpred_trace_msg('Adding For Later',basePFC:nt(umt,Trigger,Test,Body)),
+ain_trigger_0(_Trig,basePFC:nt('$ABOX',Trigger,Test,Body),Support) :- !,
+  mpred_trace_msg('Adding For Later',basePFC:nt('$ABOX',Trigger,Test,Body)),
    must(mpred_mark_as(Support,n,Trigger,pfcNegTrigger)),
         copy_term_and_varnames(Trigger,TriggerCopy),!,
-        ain_t(basePFC:nt(umt,TriggerCopy,Test,Body),Support),
+        ain_t(basePFC:nt('$ABOX',TriggerCopy,Test,Body),Support),
           (not_cond(basePFC:nt,Test)),           
              mpred_eval_lhs(Body,
-             ((\+Trigger),basePFC:nt(umt,TriggerCopy,Test,Body))).
+             ((\+Trigger),basePFC:nt('$ABOX',TriggerCopy,Test,Body))).
 
-ain_trigger_0(_Trig,basePFC:bt(umt,Trigger,Body),Support) :- 
+ain_trigger_0(_Trig,basePFC:bt('$ABOX',Trigger,Body),Support) :- 
  must((
-  mpred_trace_msg('Adding For Later',basePFC:bt(umt,Trigger,Body)),
-   must(ain_t(basePFC:bt(umt,Trigger,Body),Support)),
+  mpred_trace_msg('Adding For Later',basePFC:bt('$ABOX',Trigger,Body)),
+   must(ain_t(basePFC:bt('$ABOX',Trigger,Body),Support)),
       attvar_op(assertz_if_new,((Trigger:-mpred_bc_only(Trigger)))),!,
       import_to_user(Trigger),
       must(mpred_mark_as(Support,p,Trigger,pfcBcTrigger)),
@@ -1907,7 +1907,7 @@ ain_trigger_0(Trig,X,Support) :- mpred_warn("Unrecognized trigger to aintrigger:
 mpred_bt_pt_combine(Head,Body,Support) :-
   %= a backward trigger (basePFC:bt) was just added with head and Body and support Support
   %= find any basePFC:pt''s with unifying heads and assert the instantied basePFC:bt body.
-  mpred_get_trigger_quick(basePFC:pt(umt,Head,_PtBody)),
+  mpred_get_trigger_quick(basePFC:pt('$ABOX',Head,_PtBody)),
   mpred_eval_lhs(Body,Support),
   fail.
 mpred_bt_pt_combine(_,_,_) :- !.
@@ -1943,9 +1943,9 @@ mpred_retract_db_type(X) :-
   !.
 
 
-mpred_retract_db_type(_,basePFC:qu(umt,P,S)) :-
-  doall(retract_u(basePFC:qu(umt,P,_))),
-  ignore(mpred_unfwc(basePFC:qu(umt,P,S))).
+mpred_retract_db_type(_,basePFC:qu('$ABOX',P,S)) :-
+  doall(retract_u(basePFC:qu('$ABOX',P,_))),
+  ignore(mpred_unfwc(basePFC:qu('$ABOX',P,S))).
 
 
 mpred_retract_db_type(fact,X) :-
@@ -2074,39 +2074,39 @@ mpred_undo(Why,mpred_action(A)) :-
   !,
   mpred_rem_actiontrace(Why,mpred_action(A)).
 
-mpred_undo(Why,basePFC:pk(umt,Key,Head,Body)) :-
+mpred_undo(Why,basePFC:pk('$ABOX',Key,Head,Body)) :-
   % undo a positive trigger.
   %
   !,
-  (retract_i(basePFC:pk(umt,Key,Head,Body))
-    -> mpred_unfwc(basePFC:pt(umt,Head,Body))
-     ; mpred_warn("for ~p \nTrigger not found to retract basePFC:pk= ~p: ~p",[Why,Key,basePFC:pt(umt,Head,Body)])).
+  (retract_i(basePFC:pk('$ABOX',Key,Head,Body))
+    -> mpred_unfwc(basePFC:pt('$ABOX',Head,Body))
+     ; mpred_warn("for ~p \nTrigger not found to retract basePFC:pk= ~p: ~p",[Why,Key,basePFC:pt('$ABOX',Head,Body)])).
 
-mpred_undo(Why,basePFC:pt(umt,Head,Body)) :- 
+mpred_undo(Why,basePFC:pt('$ABOX',Head,Body)) :- 
   % undo a positive trigger.
   %
   !,
-  (retract_i(basePFC:pt(umt,Head,Body))
-    -> mpred_unfwc(basePFC:pt(umt,Head,Body))
-     ; mpred_warn("for ~p:\nTrigger not found to retract: ~p",[Why,basePFC:pt(umt,Head,Body)])).
+  (retract_i(basePFC:pt('$ABOX',Head,Body))
+    -> mpred_unfwc(basePFC:pt('$ABOX',Head,Body))
+     ; mpred_warn("for ~p:\nTrigger not found to retract: ~p",[Why,basePFC:pt('$ABOX',Head,Body)])).
 
 
-mpred_undo(Why,basePFC:bt(umt,Head,Body)) :- 
+mpred_undo(Why,basePFC:bt('$ABOX',Head,Body)) :- 
   % undo a backchaining trigger.
   %
   !,
   dtrace(attvar_op(retractall,(Head:-mpred_bc_only(Head)))),
-  (retract_i(basePFC:bt(umt,Head,Body))
-    -> mpred_unfwc(basePFC:bt(umt,Head,Body))
-     ; mpred_warn("for ~p:\nTrigger not found to retract: ~p",[Why,basePFC:bt(umt,Head,Body)])).
+  (retract_i(basePFC:bt('$ABOX',Head,Body))
+    -> mpred_unfwc(basePFC:bt('$ABOX',Head,Body))
+     ; mpred_warn("for ~p:\nTrigger not found to retract: ~p",[Why,basePFC:bt('$ABOX',Head,Body)])).
 
 
-mpred_undo(Why,basePFC:nt(umt,Head,Condition,Body)) :-
+mpred_undo(Why,basePFC:nt('$ABOX',Head,Condition,Body)) :-
   % undo a negative trigger.
   !,
-  (retract_i(basePFC:nt(umt,Head,Condition,Body))
-    -> mpred_unfwc(basePFC:nt(umt,Head,Condition,Body))
-     ; mpred_trace_msg("for ~p:\nTrigger not found to retract: ~p",[Why,basePFC:nt(umt,Head,Condition,Body)])).
+  (retract_i(basePFC:nt('$ABOX',Head,Condition,Body))
+    -> mpred_unfwc(basePFC:nt('$ABOX',Head,Condition,Body))
+     ; mpred_trace_msg("for ~p:\nTrigger not found to retract: ~p",[Why,basePFC:nt('$ABOX',Head,Condition,Body)])).
 
 mpred_undo(Why,( \+ ~Fact)):- mpred_undo(Why, Fact),fail.
 mpred_undo(Why,   ~(~Fact)):- mpred_undo(Why, Fact),fail.
@@ -2142,9 +2142,9 @@ mpred_unfwc1(F) :-
 mpred_unfwc_check_triggers(_Sup,F) :-
   mpred_db_type(F,fact),
   copy_term_and_varnames(F,Fcopy),
-  mpred_get_trigger_quick(basePFC:nt(umt,Fcopy,Condition,Action)),
+  mpred_get_trigger_quick(basePFC:nt('$ABOX',Fcopy,Condition,Action)),
   (not_cond(basePFC:nt,Condition)),
-  G = mpred_eval_lhs(Action,((\+F),basePFC:nt(umt,F,Condition,Action))),
+  G = mpred_eval_lhs(Action,((\+F),basePFC:nt('$ABOX',F,Condition,Action))),
   loop_check(G,mpred_trace_msg(unfwc_caught_loop(G))),
   fail.
 mpred_unfwc_check_triggers(_Sup,_).
@@ -2208,7 +2208,7 @@ mpred_deep_support(How,M):-loop_check(mpred_deep_support0(How,M),fail).
 
 mpred_deep_support0(user_atom(U),(U,U)):-user_atom(U),!.
 mpred_deep_support0(How,(A==>_)):-!,mpred_deep_support(How,A).
-mpred_deep_support0(basePFC:pt(umt,HowA,HowB),basePFC:pt(umt,A,B)):-!,mpred_deep_support(HowA,A),mpred_deep_support(HowB,B).
+mpred_deep_support0(basePFC:pt('$ABOX',HowA,HowB),basePFC:pt('$ABOX',A,B)):-!,mpred_deep_support(HowA,A),mpred_deep_support(HowB,B).
 mpred_deep_support0(HowA->HowB,(A->B)):-!,mpred_deep_support(HowA,A),mpred_deep_support(HowB,B).
 mpred_deep_support0(HowA/HowB,(A/B)):-!,mpred_deep_support(HowA,A),mpred_deep_support(HowB,B).
 mpred_deep_support0((HowA,HowB),(A,B)):-!,mpred_deep_support(HowA,A),mpred_deep_support(HowB,B).
@@ -2365,26 +2365,26 @@ fcpt(Fact,F):- fcpt0(Fact,F)*->fail;nop(mpred_trace_msg(no_pt(Fact,F))).
 fcpt(_,_).
 
 fcpt0(Fact,F) :- 
-  mpred_get_trigger_quick(basePFC:pt(umt,F,Body)),
-  (mpred_eval_lhs(Body,(Fact,basePFC:pt(umt,F,Body)))
-    *-> mpred_trace_msg('Using Trigger',basePFC:pt(umt,F,Body));
-      (mpred_trace_msg('Skipped Trigger',basePFC:pt(umt,F,Body)),fail)).
+  mpred_get_trigger_quick(basePFC:pt('$ABOX',F,Body)),
+  (mpred_eval_lhs(Body,(Fact,basePFC:pt('$ABOX',F,Body)))
+    *-> mpred_trace_msg('Using Trigger',basePFC:pt('$ABOX',F,Body));
+      (mpred_trace_msg('Skipped Trigger',basePFC:pt('$ABOX',F,Body)),fail)).
   
 
 fcpt0(Fact,F) :- use_presently,
-  mpred_get_trigger_quick(basePFC:pt(umt,presently(F),Body)),
-  pp_item('Found presently ',basePFC:pt(umt,F,Body)),
-  mpred_eval_lhs(Body,(presently(Fact),basePFC:pt(umt,presently(F),Body))).
+  mpred_get_trigger_quick(basePFC:pt('$ABOX',presently(F),Body)),
+  pp_item('Found presently ',basePFC:pt('$ABOX',F,Body)),
+  mpred_eval_lhs(Body,(presently(Fact),basePFC:pt('$ABOX',presently(F),Body))).
 
 fcnt(Fact,F):- fcnt0(Fact,F)*->fail;nop(mpred_trace_msg(no_spft_nt(Fact,F))).
 fcnt(_,_).
 
 fcnt0(_Fact,F) :- 
-  basePFC:spft(ukb,X,_,basePFC:nt(umt,F,Condition,Body),_Why),
+  basePFC:spft(ukb,X,_,basePFC:nt('$ABOX',F,Condition,Body),_Why),
   (call_u(Condition) *-> 
-   (mpred_trace_msg('Using Trigger'(X),basePFC:nt(umt,F,Condition,Body)),
-      mpred_rem1(X,(_,basePFC:nt(umt,F,Condition,Body))),fail);
-      (mpred_trace_msg('Unused Trigger'(X),basePFC:nt(umt,F,Condition,Body)),fail)).
+   (mpred_trace_msg('Using Trigger'(X),basePFC:nt('$ABOX',F,Condition,Body)),
+      mpred_rem1(X,(_,basePFC:nt('$ABOX',F,Condition,Body))),fail);
+      (mpred_trace_msg('Unused Trigger'(X),basePFC:nt('$ABOX',F,Condition,Body)),fail)).
 
 
 
@@ -2408,8 +2408,8 @@ mpred_define_bc_rule(Head,Body,Parent_rule) :-
   build_rhs(Head,Head,Rhs),
   foreachl_do(mpred_nf(Body,Lhs),
        (build_trigger(Parent_ruleCopy,Lhs,rhs(Rhs),Trigger),
-       % can be mpred_post_sp(basePFC:bt(umt,Head,Trigger),(Parent_ruleCopy,U))
-         ((get_source_ref1(U),ain_fast(basePFC:bt(umt,Head,Trigger),(Parent_ruleCopy,U)))))).
+       % can be mpred_post_sp(basePFC:bt('$ABOX',Head,Trigger),(Parent_ruleCopy,U))
+         ((get_source_ref1(U),ain_fast(basePFC:bt('$ABOX',Head,Trigger),(Parent_ruleCopy,U)))))).
         
 
 contains_ftVar(Term):- sub_term(Sub,Term),compound(Sub),Sub='$VAR'(_).
@@ -2518,13 +2518,13 @@ trigger_trigger1(presently(Trigger),Body) :- use_presently,
   is_ftNonvar(Trigger),!,
   copy_term_and_varnames(Trigger,TriggerCopy),
   no_repeats(call_u(Trigger)),
-  mpred_eval_lhs(Body,(presently(Trigger),basePFC:pt(umt,presently(TriggerCopy),Body))),
+  mpred_eval_lhs(Body,(presently(Trigger),basePFC:pt('$ABOX',presently(TriggerCopy),Body))),
   fail.
 
 trigger_trigger1(Trigger,Body) :-
   copy_term_and_varnames(Trigger,TriggerCopy),
   no_repeats(mpred_call_only_facts(Trigger)),
-  mpred_eval_lhs(Body,(Trigger,basePFC:pt(umt,TriggerCopy,Body))),
+  mpred_eval_lhs(Body,(Trigger,basePFC:pt('$ABOX',TriggerCopy,Body))),
   fail.
 */
 
@@ -2600,8 +2600,8 @@ mpred_call_1(_,G,_):- mpred_call_with_no_triggers(G).
 :- thread_local t_l:infBackChainPrevented/1.
 
 call_with_bc_triggers(P) :- functor(P,F,A), \+ t_l:infBackChainPrevented(F/A), 
-  mpred_get_trigger_quick(basePFC:bt(umt,P,Trigger)),
-  no_repeats(mpred_get_support(basePFC:bt(umt,P,Trigger),S)),
+  mpred_get_trigger_quick(basePFC:bt('$ABOX',P,Trigger)),
+  no_repeats(mpred_get_support(basePFC:bt('$ABOX',P,Trigger),S)),
   once(no_side_effects(P)),
   wno_tl(t_l:infBackChainPrevented(F/A),mpred_eval_lhs(Trigger,S)).
 
@@ -2930,25 +2930,25 @@ build_rule(Lhs,Rhs,Support) :-
 build_trigger(Support,[],Consequent,ConsequentO):- 
       build_consequent(Support,Consequent,ConsequentO).
 
-build_trigger(Support,[V|Triggers],Consequent,basePFC:pt(umt,V,X)) :-
+build_trigger(Support,[V|Triggers],Consequent,basePFC:pt('$ABOX',V,X)) :-
   is_ftVar(V),
   !,
   build_trigger(Support,Triggers,Consequent,X).
 
-build_trigger(Support,[added(T)|Triggers],Consequent,basePFC:pt(umt,T,X)) :-
+build_trigger(Support,[added(T)|Triggers],Consequent,basePFC:pt('$ABOX',T,X)) :-
   !,
   build_code_test(Support,ground(T),Test2),
   build_trigger(Support,[{Test2}|Triggers],Consequent,X).
 
 
 
-build_trigger(Support,[(T1/Test)|Triggers],Consequent,basePFC:nt(umt,T2,Test2,X)) :-
+build_trigger(Support,[(T1/Test)|Triggers],Consequent,basePFC:nt('$ABOX',T2,Test2,X)) :-
   is_ftNonvar(T1),mpred_negation(T1,T2),
   !,
   build_neg_test(Support,T2,Test,Test2),
   build_trigger(Support,Triggers,Consequent,X).
 
-build_trigger(Support,[(T1)|Triggers],Consequent,basePFC:nt(umt,T2,Test,X)) :-
+build_trigger(Support,[(T1)|Triggers],Consequent,basePFC:nt('$ABOX',T2,Test,X)) :-
   mpred_negation(T1,T2),
   !,
   build_neg_test(Support,T2,true,Test),
@@ -2958,7 +2958,7 @@ build_trigger(Support,[{Test}|Triggers],Consequent,(Test->X)) :-
   !,
   build_trigger(Support,Triggers,Consequent,X).
 
-build_trigger(Support,[T/Test|Triggers],Consequent,basePFC:pt(umt,T,X)) :-
+build_trigger(Support,[T/Test|Triggers],Consequent,basePFC:pt('$ABOX',T,X)) :-
   !,
   build_code_test(Support,Test,Test2),
   build_trigger(Support,[{Test2}|Triggers],Consequent,X).
@@ -2968,7 +2968,7 @@ build_trigger(Support,[T/Test|Triggers],Consequent,basePFC:pt(umt,T,X)) :-
 %  !,
 %  build_trigger(Support,Triggers,Consequent,X).
 
-build_trigger(Support,[T|Triggers],Consequent,basePFC:pt(umt,T,X)) :-
+build_trigger(Support,[T|Triggers],Consequent,basePFC:pt('$ABOX',T,X)) :-
   !,
   build_trigger(Support,Triggers,Consequent,X).
 
@@ -3021,10 +3021,10 @@ mpred_db_type(('<-'(_,_)),Type) :- !, Type=rule.
 mpred_db_type(('<==>'(_,_)),Type) :- !, Type=rule.
 mpred_db_type(('==>'(_,_)),Type) :- !, Type=rule.
 mpred_db_type((':-'(_,_)),Type) :- !, Type=rule.
-mpred_db_type(basePFC:pk(umt,_,_,_),Type) :- !, Type=trigger.
-mpred_db_type(basePFC:pt(umt,_,_),Type) :- !, Type=trigger.
-mpred_db_type(basePFC:nt(umt,_,_,_),Type) :- !,  Type=trigger.
-mpred_db_type(basePFC:bt(umt,_,_),Type) :- !,  Type=trigger.
+mpred_db_type(basePFC:pk('$ABOX',_,_,_),Type) :- !, Type=trigger.
+mpred_db_type(basePFC:pt('$ABOX',_,_),Type) :- !, Type=trigger.
+mpred_db_type(basePFC:nt('$ABOX',_,_,_),Type) :- !,  Type=trigger.
+mpred_db_type(basePFC:bt('$ABOX',_,_),Type) :- !,  Type=trigger.
 mpred_db_type(mpred_action(_),Type) :- !, Type=action.
 mpred_db_type((('::::'(_,X))),Type) :- is_ftNonvar(X),!, mpred_db_type(X,Type).
 mpred_db_type(_,fact) :-
@@ -3188,9 +3188,9 @@ is_relative(*(X)):- \+ is_ftVar(X).
 %=
 %= Arg1 is a trigger.  Key is the best term to index it on.
 
-mpred_get_trigger_key(basePFC:pt(umt,Key,_),Key).
-mpred_get_trigger_key(basePFC:pk(umt,Key,_,_),Key).
-mpred_get_trigger_key(basePFC:nt(umt,Key,_,_),Key).
+mpred_get_trigger_key(basePFC:pt('$ABOX',Key,_),Key).
+mpred_get_trigger_key(basePFC:pk('$ABOX',Key,_,_),Key).
+mpred_get_trigger_key(basePFC:nt('$ABOX',Key,_,_),Key).
 mpred_get_trigger_key(Key,Key).
 */
 
@@ -3346,13 +3346,13 @@ mpred_trace_add(P) :-
   mpred_trace_add(P,(o,o)).
 */
 /*
-mpred_trace_add(basePFC:bt(umt,Head,Body)) :-
+mpred_trace_add(basePFC:bt('$ABOX',Head,Body)) :-
   % hack for now - never trace triggers.
   !.
-mpred_trace_add(basePFC:pt(umt,Head,Body)) :-
+mpred_trace_add(basePFC:pt('$ABOX',Head,Body)) :-
   % hack for now - never trace triggers.
   !.
-mpred_trace_add(basePFC:nt(umt,Head,Condition,Body)) :-
+mpred_trace_add(basePFC:nt('$ABOX',Head,Condition,Body)) :-
   % hack for now - never trace triggers.
   !.
 */
@@ -3380,13 +3380,13 @@ mpred_trace_break(P,_S) :-
    ; true.
 
 /*
-mpred_trace_rem(Why,basePFC:bt(umt,Head,Body)) :-
+mpred_trace_rem(Why,basePFC:bt('$ABOX',Head,Body)) :-
   % hack for now - never trace triggers.
   !.
-mpred_trace_rem(Why,basePFC:pt(umt,Head,Body)) :-
+mpred_trace_rem(Why,basePFC:pt('$ABOX',Head,Body)) :-
   % hack for now - never trace triggers.
   !.
-mpred_trace_rem(Why,basePFC:nt(umt,Head,Condition,Body)) :-
+mpred_trace_rem(Why,basePFC:nt('$ABOX',Head,Condition,Body)) :-
   % hack for now - never trace triggers.
   !.
 */
@@ -3689,9 +3689,9 @@ pred_u2(P):-clause(arity(F,A),true),functor(P,F,A),has_db_clauses(P).
 
 has_db_clauses(P):- predicate_property(P,number_of_clauses(NC)),\+ predicate_property(P,number_of_rules(NC)), \+ \+ clause(P,true).
 
-pred_t0(P):-mreq(basePFC:pt(umt,P,_)).
-pred_t0(P):-mreq(basePFC:bt(umt,P,_)).
-pred_t0(P):-mreq(basePFC:nt(umt,P,_,_)).
+pred_t0(P):-mreq(basePFC:pt('$ABOX',P,_)).
+pred_t0(P):-mreq(basePFC:bt('$ABOX',P,_)).
+pred_t0(P):-mreq(basePFC:nt('$ABOX',P,_,_)).
 pred_t0(P):-mreq(basePFC:spft(ukb,P,_,_,_)).
 pred_t0(P):- mreq('nesc'(P)).
 %pred_r0(-(P)):- mreq(-(P)).
@@ -3721,7 +3721,7 @@ add_reprop(Trig,(H:-B)):- trace_or_throw(add_reprop(Trig,(H:-B))).
 
 add_reprop(Trig ,Trigger):-
   w_tl(t_l:current_why_source(Trig),
-    attvar_op(assertz_if_new,(basePFC:qu(umt,repropagate(Trigger),(g,g))))).
+    attvar_op(assertz_if_new,(basePFC:qu('$ABOX',repropagate(Trigger),(g,g))))).
 
 
 repropagate(_):-  check_context_module,fail.

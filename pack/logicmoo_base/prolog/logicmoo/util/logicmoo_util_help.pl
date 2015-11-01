@@ -26,6 +26,10 @@
             longer_sumry/2,
             make_l_summary/2,
             make_module_name/2,
+            make_file_help/1,
+            read_source_help/2,
+            save_source_file_help/5,
+            
             make_summary/2,
             module_meta_transparent/1,
             mpred_prolog_only_module/1,
@@ -368,6 +372,9 @@ longer_sumry(fmt,'Format').
 longer_sumry(pred,'Predicate').
 longer_sumry(var,'Variable').
 
+
+%  make_file_help(library(logicmoo/logicmoo_user)).
+%  list_file_preds(library(logicmoo/util/logicmoo_util_bb_env)).
 
 
 % find normal docs
