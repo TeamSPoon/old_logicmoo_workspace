@@ -233,6 +233,7 @@ body_for_mpred_2((:-),Head,HeadO,(A/B),(AA,BB)):-!,body_for_mpred_1(Mode,Head,He
 body_for_mpred_2(Mode,Head,HeadO,(A/B),(AA/BB)):-!,body_for_mpred_1(Mode,Head,HeadM,A,AA),body_for_pfc(Mode,HeadM,HeadO,B,BB).
 
 
+body_for_mpred_2((fwc),H,(if_missing(H,HH)),{skolem(In,Out)},true):-contains_var(In,H),subst(H,In,Out,HH),!.
 body_for_mpred_2((fwc),H,(if_missing(H,HH)),skolem(In,Out),true):-contains_var(In,H),subst(H,In,Out,HH),!.
 body_for_mpred_2(_Mode,~(Head),~(Head),skolem(_,_),true).
 %body_for_mpred_2(Mode,H,H,skolem(_,_),true).
@@ -247,13 +248,15 @@ body_for_mpred_2(_Mode,Head,Head,A,{A}):-prologBuiltin(A),!.
 body_for_mpred_2(_Mode,Head,Head,A,A).
 
 reduce_literal(A,A):-is_ftVar(A).
+reduce_literal(~A,~A):-is_ftVar(A).
 reduce_literal(~(different(P3, R3)),not_different(P3, R3)).
 reduce_literal(~(mudEquals(P3, R3)),different(P3, R3)).
 reduce_literal(~(skolem(P3, R3)),different(P3, R3)).
 reduce_literal(~(termOfUnit(P3, R3)),different(P3, R3)).
 reduce_literal(~(equals(P3, R3)),different(P3, R3)).
 reduce_literal(termOfUnit(P3, R3),skolem(P3, R3)).
-reduce_literal(~(A),~ A).
+reduce_literal(~({A}),AA):- reduce_literal(~A,AA), AA \=@= ~A,!.
+reduce_literal(~(A),~ A):-!.
 reduce_literal(A,A).
 
 can_use_hack(two_implications):-!,fail.

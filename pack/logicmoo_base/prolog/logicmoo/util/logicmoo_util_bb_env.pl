@@ -60,7 +60,7 @@ hb_to_clause/3,
 hb_to_clause0/3,
 in_dyn/2,
 in_dyn_pred/2,
-is_expanded_file/1,
+inside_file/1,
 lg_op2/3,
 ppi/1,
 pred_1_info/4,
@@ -410,11 +410,11 @@ get_env_ctx(_ChameleonWorld).
 :- add_push_prefix_arg(get_tasks/3,dom,_,_).
 :- add_push_prefix_arg(domain_name/1,dom,_,_).
 
-is_expanded_file(ocl):- loading_file(File),!,once(file_name_extension(_,ocl,File);env_source_file(File)),!.
+inside_file(ocl):- loading_file(File),!,once(file_name_extension(_,ocl,File);env_source_file(File)),!.
    
 /*
 
-user:term_expansion(A,B):- nonvar(A), A\==end_of_file, is_expanded_file(ocl),
+user:term_expansion(A,B):- nonvar(A), A\==end_of_file, inside_file(ocl),
   env_term_expansion(A,B),
   must(nonvar(B)),A\=@=B.
 

@@ -29,16 +29,16 @@ vim: set filetype=md:
 
 % whenever we know about clif we''ll use the prolog forward chainging system
 % this is broken down to the next 6 clauses
-
+/*
 (clif(CLIF) ==> 
    ({ clif_to_prolog(CLIF,PROLOG)},
       % this consequent asserts the new rules
       PROLOG,{slow_sanity(is_entailed(CLIF))})).
+*/
 
 
 
 
-/*
 arity(clif,1).
 arity(boxlog,1).
 arity(pfclog,1).
@@ -49,7 +49,7 @@ arity(pfclog,1).
 (clif(CLIF),{delistify_last_arg(CLIF,kif_to_boxlog,BOXLOG)}) ==> (boxlog(BOXLOG),{slow_sanity(is_entailed(CLIF))}).
 (boxlog(BOXLOG),{delistify_last_arg(BOXLOG,boxlog_to_pfc,PROLOG)}) ==> pfclog(PROLOG).
 (pfclog(PROLOG)==>(PROLOG,{slow_sanity(is_entailed(PROLOG))})).
-*/
+
 
 /*
 
@@ -72,12 +72,14 @@ arity(pfclog,1).
   (CLIF/is_clif(CLIF) ==> clif(CLIF))).
 
 
-%(CLIF/is_kif_rule(CLIF) ==> clif(CLIF)).
+(CLIF/is_kif_rule(CLIF) ==> clif(CLIF)).
+
+/*
 (CLIF/is_kif_rule(CLIF) ==> 
    ({ clif_to_prolog(CLIF,PROLOG)},
       % this consequent asserts the new rules
       PROLOG,{slow_sanity(is_entailed(CLIF))})).
-
+*/
 
 
 end_of_file.
