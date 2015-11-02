@@ -315,7 +315,7 @@ logical_functor_ft((',')).
 
 non_assertable(WW,isVar(WW)):- var(WW),!.
 non_assertable(_:WW,Why):- !,non_assertable(WW,Why).
-non_assertable(WW,notAssertable(Why)):- compound(WW),get_functor(WW,F),mpred_isa(F,notAssertable(Why)),!.
+non_assertable(W,notAssertable(F)):- compound(W),get_functor(W,F),a(notAssertable,F).
 % non_assertable(WW,Why):- db_prop_add
 
 % ===============================================================================================
@@ -636,7 +636,7 @@ function_to_predicate(Function,NewVar,PredifiedFunction):-
 
 function_to_predicate(Function,NewVar,PredifiedFunction):- 
   Function=..[F|ARGS],
-  function_corisponding_predicate(F,P),
+  req(function_corisponding_predicate(F,P)),
   fresh_varname(Function,NewVar),
   PredifiedFunction=..[P,NewVar|ARGS],!.
 

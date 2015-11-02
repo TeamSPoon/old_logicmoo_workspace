@@ -46,6 +46,7 @@
 :- file_begin(pfc).
 
 
+:- dynamic(full_name/2).
 
 
 % These tests mix singleValuedInArg and mpred_default/1 is differnt ways

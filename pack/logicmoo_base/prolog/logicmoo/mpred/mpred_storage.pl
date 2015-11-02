@@ -144,7 +144,7 @@
    % mpred_storage
    if_main(0),
    % mpred_storage
-   is_asserted(0),
+   is_asserted(:),
    % mpred_storage
    singletons_throw_else_fail(0),
    % mpred_storage
