@@ -30,31 +30,7 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- module(zebra,[]).
-
-m1:a1.
-m2:a2.
-m3:a3.
-m4:a4.
-
-m1:b.
-m2:b.
-m3:b.
-m4:b.
-
-m2:c.
-m3:c.
-m4:c.
-
-get_prime(E):-
- member(E,[111, 113, 129, 131, 137, 141, 143, 153, 161, 179, 203, 207, 213, 221, 237, 239, 243, 251, 267, 269, 273, 281, 287, 293, 297, 309, 311]).
-
-:-add_import_module(m1,m2,end).
-:-add_import_module(m2,m3,end).
-:-add_import_module(m3,m4,end).
-
-:- module(m1).
-
+:
 % swipl -g "ensure_loaded(pack(logicmoo_base/t/examples/csp/'einstein.pfc'))."
 
 :- use_module(library(logicmoo/logicmoo_user)).
