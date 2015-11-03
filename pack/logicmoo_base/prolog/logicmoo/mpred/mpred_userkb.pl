@@ -90,7 +90,7 @@ mpred_action/1,
 mpred_default/1, % pfc
 mpred_do_and_undo_method/2,
 mpred_isa/2,
-mpred_manages_unknowns/0,
+%mpred_manages_unknowns/0,
 mpred_mark/4,
 mpred_module/2,
 mpred_univ/1,

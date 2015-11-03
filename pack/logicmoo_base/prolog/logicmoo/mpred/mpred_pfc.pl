@@ -60,6 +60,7 @@ call_with_bc_triggers/1,
 check_context_module/0,
 check_never_assert/1,
 check_never_retract/1,
+mpred_bc_only0/1,
 clause_asserted_local/1,
 clause_i/2,
 clause_i/3,
@@ -419,7 +420,7 @@ with_umt/1,
       ain_minfo(1,*),
       ain_minfo_2(1,*),
       ain_rule_if_rule(0),
-      mpred_bc_only(0),
+      mpred_bc_only(:),
       req(0),
       mpred_call_0(0),
       mpred_call_only_facts(*,0),
@@ -490,7 +491,7 @@ with_umt/1,
       ain_minfo(1,*),
       ain_minfo_2(1,*),
       ain_rule_if_rule((*)),
-      mpred_bc_only((*)),
+      mpred_bc_only((:)),
       req((*)),
       with_umt((*)),
       mpred_call_0((*)),
@@ -605,6 +606,7 @@ get_user_abox_ignore(A):-ignore(get_user_abox(A)).
 % ======================= mpred_file('pfcsyntax').	% operator declarations.
 :- was_module_transparent(with_umt/1).
 :- was_export(with_umt/1).
+with_umt(ABOX,G):- w_tl(t_l:user_abox(ABOX),ABOX:call(ABOX:G)).
 with_umt(G):- get_user_abox(M),!, M:call(M:G).
 with_umt(Goal):- source_context_module(M) -> M:call(Goal).
 
@@ -2256,10 +2258,10 @@ mpred_call_with_no_triggers_uncaugth(MF) :-  strip_module(MF,_,F),
   %has_cl(F) -> (clause_u(F,Condition),(Condition==true->true;call_u(Condition)));
   %call_prologsys(F).
 
-
-mpred_bc_only(G):- mpred_negation(G,Pos),!, show_call(why,\+ mpred_bc_only(Pos)).
-mpred_bc_only(G):- loop_check(no_repeats(pfcBC_NoFacts(G))).
-mpred_bc_only(G):- mpred_call_only_facts(G).
+mpred_bc_only(M:G):- with_umt(M,mpred_bc_only0(G)).
+mpred_bc_only0(G):- mpred_negation(G,Pos),!, show_call(why,\+ mpred_bc_only(Pos)).
+mpred_bc_only0(G):- loop_check(no_repeats(pfcBC_NoFacts(G))).
+mpred_bc_only0(G):- mpred_call_only_facts(G).
 
 %%
 %= pfcBC_NoFacts(F) is true iff F is a fact available for backward chaining ONLY.
@@ -3358,6 +3360,7 @@ rescan_pfc:-forall(clause(lmconf:mpred_hook_rescan_files,Body),show_entry(rescan
 
 mpred_facts_and_universe(P):- (is_ftVar(P)->pred_head_all(P);true),req(P). % (meta_wrapper_rule(P)->req(P) ; req(P)).
 
+% add_reprop(_,_):-!.
 add_reprop(_Trig,Var):- is_ftVar(Var), !. % trace_or_throw(add_reprop(Trig,Var)).
 add_reprop(_Trig,~(Var)):- is_ftVar(Var),!.
 % CREATES ERROR!!!  add_reprop(_Trig,~(_Var)):-!.

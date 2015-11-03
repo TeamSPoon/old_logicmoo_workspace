@@ -50,8 +50,9 @@ fix_ops_for(CM):-
 %:- system:initialization(mpred_www:ensure_mpred_webserver(3020)).
 
 % in case something changed
-
 :- system:((logicmoo_user_base:user_module_uses(M,CM)->(('$module'(_,M),'$set_source_module'(_,CM)));true)).
+
+:- nop((autoload,scan_source_files_for_varnames)).
 
 :- sanity( \+predicate_property(baseKB:_,exported)).
 

@@ -386,14 +386,14 @@ mpred_prolog_only_file(File):- lmconf:never_registered_mpred_file(File),!.
 % mpred_expander(_,_,I,OO):-thread_self(X),X\==main,!,I=OO.
 % not actual function
 mpred_expander(_,_,I,_):-var(I),!,fail.
+mpred_expander(_,_,_,_):- notrace( current_prolog_flag(xref,true);t_l:disable_px),!,fail.
 mpred_expander(Type,_DefMod,_I,_O):-  (Type \== term,Type \= _:term ),!,fail.
 mpred_expander(Type,DefMod,end_of_file,O):- !,Type = term, DefMod = user, do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
 mpred_expander(Type,LoaderMod,I,OO):- \+ t_l:disable_px, on_x_debug(mpred_expander0(Type,LoaderMod,I,O)),must(nonvar(O)),O=OO.
 
 mpred_expander0(Type,LoaderMod,I,OO):-
   I\= '$si$':'$was_imported_kb_content$'(_,_),  
-   notrace( \+ current_prolog_flag(xref,true)),
-  '$set_source_module'(M,M),  
+   '$set_source_module'(M,M),  
   notrace( \+ mpred_prolog_only_module(M)),
   notrace(source_location(F,L)),
   notrace( \+ mpred_prolog_only_file(F)),
