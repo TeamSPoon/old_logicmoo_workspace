@@ -668,7 +668,7 @@ prologHybrid(argIsa/3).
 :- decl_mpred(mpred_module/2).
 
 meta_argtypes(mpred_module(tPred,tPrologModule)).
-:- debug.
+
 
 prologHybrid(mpred_module, 2).
 prologMultiValued(mpred_module(tRelation,ftAtom)).
@@ -741,7 +741,7 @@ prologHybrid(isEach( tCol/1, disjointWith/2, genls/2,genlPreds/2, meta_argtypes/
 :- ain((genls(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,prologDynamic,prologBuiltin,prologKIF,prologMacroHead,prologListValued,prologSingleValued),tPred))).
 :- assert_hasInstance(tCol,tCol).
 :- file_begin(pfc).
-:- debug.
+
 %TODO FIX :- decl_mpred(tDeleted(ftID),[predIsFlag]).
 prologHybrid(isEach( ttNotTemporalType/1,ttTemporalType/1 )).
 prologHybrid(isEach(genlInverse/2,genlPreds/2)).
@@ -1165,7 +1165,8 @@ notAssertable(isFact/1).
 prologHybrid(isFact/1).
 % :- kb_dynamic(added/1).
 :-asserta((added(Added):-basePFC:spft('$ABOX',Added,U,U,_))).
-isFact(A):- cwc, is_ftNonvar(A), ( added(A) ; clause_asserted(A)),not((arg(_,A,V),var(V))).
+% isFact(A):- cwc, is_ftNonvar(A), ( added(A) ; clause_asserted(A)),not((arg(_,A,V),var(V))).
+isFact(A):- cwc, is_ftNonvar(A), ( added(A) ; is_asserted(A)),not((arg(_,A,V),var(V))).
 
 
 

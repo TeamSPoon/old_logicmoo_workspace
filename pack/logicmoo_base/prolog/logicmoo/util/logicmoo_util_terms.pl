@@ -1,4 +1,4 @@
-/* <module> Logicmoo Path Setups
+/*  Logicmoo Path Setups
 
    $Id$
 

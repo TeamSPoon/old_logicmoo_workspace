@@ -1,4 +1,4 @@
-/** <module> LogicMOO User Modules Setup
+/*  LogicMOO User Modules Setup
 %
 %
 % Dec 13, 2035
@@ -43,12 +43,16 @@ fix_ops_for(CM):-
  op(300,fx,CM:('-')).
 
 :- fix_ops_for(user).
-:- logicmoo_user_base:user_module_uses(M,CM),fix_ops_for(M),fix_ops_for(CM).
-
+:- logicmoo_user_base:user_module_uses(M,CM),!,fix_ops_for(M),fix_ops_for(CM),writeln(user_module_uses(M,CM)).
 
 :- baseKB:use_module(baseKB:logicmoo_snark).
+%:- ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
+%:- system:initialization(mpred_www:ensure_mpred_webserver(3020)).
 
 % in case something changed
-:- logicmoo_user_base:user_module_uses(M,CM),'$module'(_,M),'$set_source_module'(_,CM).
+
+:- system:((logicmoo_user_base:user_module_uses(M,CM)->(('$module'(_,M),'$set_source_module'(_,CM)));true)).
 
 :- sanity( \+predicate_property(baseKB:_,exported)).
+
+

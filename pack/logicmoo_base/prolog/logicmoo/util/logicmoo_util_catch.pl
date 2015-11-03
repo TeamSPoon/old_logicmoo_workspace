@@ -344,13 +344,13 @@ sl_to_filename(W,W).
 
 
 
-current_source_location(F):- clause(M:current_source_location0(W),Body),on_x_log_fail(M:Body),sl_to_filename(W,F),!.
+current_source_location(F):- clause(M:current_source_location0(W),Body),catchv(M:Body,_,fail),sl_to_filename(W,F),!.
 current_source_location(F):- F = unknown.
 
 current_source_location0(F):- t_l:current_why_source(F).
 current_source_location0(F:L):-source_location(F,L),!.
 current_source_location0(F:L):-prolog_load_context(file,F),current_input(S),line_position(S,L),!.
-current_source_location0(When):-loading_file(When).
+current_source_location0(F):-loading_file(F).
 current_source_location0(F:L):- current_filesource(F),ignore((prolog_load_context(stream,S),!,line_count(S,L))),!.
 current_source_location0(F:L):- prolog_load_context(file,F),!,ignore((prolog_load_context(stream,S),!,line_count(S,L))),!.
 current_source_location0(module(M)):-source_module(M),!.

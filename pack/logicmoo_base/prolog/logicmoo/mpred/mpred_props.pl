@@ -1,4 +1,4 @@
-/** <module> 
+/* 
 % ===================================================================
 % File 'mpred_db_preds.pl'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
@@ -197,7 +197,7 @@ mpred_isa(G,predProxyRetract(del)):- atom(G),prologMacroHead(G).
 
 
 get_mpred_prop(F,_A,P):-get_mpred_prop(F,P).
-get_mpred_prop(F,P):- mpred_isa(F,P).
+get_mpred_prop(F,P):- mreq(mpred_isa(F,P)).
 
 :- was_export(listprolog/0).
 listprolog:-listing(mpred_isa(_,prologDynamic)).

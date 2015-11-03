@@ -1,5 +1,5 @@
 % =======================================================
-/** <module> 
+/* 
 % This is mainly used by the moo_loader but also needed everywhere
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog

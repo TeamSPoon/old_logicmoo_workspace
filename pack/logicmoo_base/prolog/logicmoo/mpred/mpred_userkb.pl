@@ -1,4 +1,4 @@
-/* <module> 
+/*  
 % ===================================================================
 % File 'mpred_db_preds.pl'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
@@ -175,6 +175,7 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 
 
 :- import_module_to_user(logicmoo_user).
+:- initialization(import_module_to_user(logicmoo_user)).
 
 
 % :- module_property(baseKB, exports(List)),forall(member(E,List),kb_dynamic(E)).
@@ -290,4 +291,4 @@ is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=
 :- source_location(S,_),forall(source_file(M:H,S),(functor(H,F,A),module_transparent(M:F/A))).
 
 :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/autoexec.pfc')).
-:- add_import_module(baseKB,basePFC,end).
+:- initialization(add_import_module(baseKB,basePFC,end)).

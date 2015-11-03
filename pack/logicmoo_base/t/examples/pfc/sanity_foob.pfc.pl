@@ -1,16 +1,14 @@
-/** <module>
 %
 %  PFC is a language extension for prolog.. there is so much that can be done in this language extension to Prolog
 %
 % Dec 13, 2035
 % Douglas Miles
-*/
+
 :- module(foobm,[]).
 
-:- baseKB:use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo/logicmoo_user)).
 
 :- begin_pfc.
-
 
 if_missing(foob(_),foob(a)).
 

@@ -1,4 +1,4 @@
-/** <module>  Provides a prolog database replacement that uses an interpretation of KIF
+/*  Provides a prolog database replacement that uses an interpretation of KIF
 %
 %  t/N
 %  hybridRule/2

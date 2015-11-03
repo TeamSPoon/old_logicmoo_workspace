@@ -167,7 +167,7 @@ boxlog_to_compile(fwc,H,H):-  !.
 
 boxlog_to_compile(bwc,(not(H):-B),unused_true((not(H):-B))):- nonvar(H),H = skolem(_,_),!.
 boxlog_to_compile(bwc,(not(H):-B),(HH<-BBB)):-body_for_pfc(<-,~(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
-boxlog_to_compile(bwc,(H:-B),OUT):-pfcRHS(H),term_slots(H,HV),term_slots(B,BV), HV==BV,boxlog_to_compile((fwc),(H:-B),OUT),!.
+boxlog_to_compile(bwc,(H:-B),OUT):- a(pfcRHS,H),term_slots(H,HV),term_slots(B,BV), HV==BV,boxlog_to_compile((fwc),(H:-B),OUT),!.
 boxlog_to_compile(bwc,(H:-B),(HH<-BBB)):- body_for_pfc(<-,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_compile(bwc,not(H),~(H)):-  !.
 boxlog_to_compile(bwc,H,H):-  !.

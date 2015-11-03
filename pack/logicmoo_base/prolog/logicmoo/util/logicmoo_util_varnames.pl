@@ -1,4 +1,4 @@
-/* <module> Logicmoo Debug Tools
+/*  Logicmoo Debug Tools
 % ===================================================================
 % File 'logicmoo_util_varnames.pl'
 % Purpose: An Implementation in SWI-Prolog of certain debugging tools
@@ -484,6 +484,7 @@ scan_source_files_for_varnames:-
  set_prolog_flag(mpred_vars, true),
  ensure_loaded(library(make)),
  doall((make:modified_file(F),retractall(varname_cache:varname_info_file(F)))),
+ doall((filematch(swi('boot/*.pl'),F),read_source_file_vars(F))),
  doall((source_file(F),read_source_file_vars(F))),!.
 
 dcall_if_verbose(G):-!, notrace(G).

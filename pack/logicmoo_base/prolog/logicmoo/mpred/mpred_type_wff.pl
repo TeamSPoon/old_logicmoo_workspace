@@ -292,7 +292,7 @@ isEntitySlot(Term):-isEntityFunction(Term,FnT,ArgsT),!.
 
 isEntityFunction(Term,FnT,ArgsT):-isSlot(Term),!,fail.
 isEntityFunction(Term,FnT,ArgsT):-atomic(Term),!,fail.
-isEntityFunction(Term,FnT,ArgsT):-Term=..[FnT|ArgsT],isa(FnT,'Function'),!.
+isEntityFunction(Term,FnT,ArgsT):-Term=..[FnT|ArgsT],is_function(FnT).
 
 % ===============================================================================================
 % ===============================================================================================

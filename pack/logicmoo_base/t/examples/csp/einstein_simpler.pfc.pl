@@ -1,4 +1,4 @@
-/* <module>
+/* 
 % =============================================
 % File 'mpred_builtin.pfc'
 % Purpose: Agent Reactivity for SWI-Prolog

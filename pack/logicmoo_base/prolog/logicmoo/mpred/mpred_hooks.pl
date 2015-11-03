@@ -1,4 +1,4 @@
-/** <module> 
+/* 
 % ===================================================================
 % File 'mpred_db_preds.pl'
 % Purpose: Emulation of OpenCyc for SWI-Prolog

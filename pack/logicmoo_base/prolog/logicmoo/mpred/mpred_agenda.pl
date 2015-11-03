@@ -1,5 +1,5 @@
 % =======================================================
-/** <module> 
+/* 
 % This Agenda System is mainly used by the mpred_loader but also needed everywhere
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog

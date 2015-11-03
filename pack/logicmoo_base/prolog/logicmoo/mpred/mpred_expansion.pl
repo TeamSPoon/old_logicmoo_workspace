@@ -1,4 +1,4 @@
-/* <module> 
+/*  
 % ===================================================================
 % File 'dbase_c_term_expansion'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
@@ -428,7 +428,7 @@ db_expand_term(Op,SI,SentO):- loop_check(db_expand_term0(Op,SI,SentO),SI=SentO).
 
 db_expand_term0(_,Sent,SentO):-is_ftNonvar(Sent),copy_term(Sent,NoVary),get_ruleRewrite(Sent,SentO),Sent\=@=NoVary,SentO \=@= Sent.
 
-db_expand_term0(Op,Sent,SentO):- Op==callable, quasiQuote(QQuote),subst(Sent,QQuote,isEach,MID),Sent\=@=MID,!,db_expand_term(Op,MID,SentO).
+db_expand_term0(Op,Sent,SentO):- Op==callable, mreq(quasiQuote(QQuote)),subst(Sent,QQuote,isEach,MID),Sent\=@=MID,!,db_expand_term(Op,MID,SentO).
 db_expand_term0(Op,Sent,SentO):- db_expand_final(Op ,Sent,SentO),!.
 db_expand_term0(Op,Sent,SentO):- is_meta_functor(Sent,F,List),F\=t,!,maplist(fully_expand_goal(Op),List,ListO),List\=@=ListO,SentO=..[F|ListO].
 %db_expand_term(_ ,NC,OUT):-mpred_expand(NC,OUT),NC\=@=OUT,!.
@@ -603,7 +603,7 @@ map_f(mpred_isa,isa).
 map_f(props,isa).
 map_f(F,F):-!.
 
-ex_argIsa(P,N,C):-clause_asserted(argIsa(P,N,C)).
+ex_argIsa(P,N,C):- clause(_:argIsa(P,N,C),true).
 
 compound_all_open(C):-compound(C),functor(C,_,A),A>1,\+((arg(_,C,Arg),is_ftNonvar(Arg))),!.
 

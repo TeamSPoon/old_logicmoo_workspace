@@ -1,4 +1,4 @@
-/** <module> 
+/* 
 % ===================================================================
 % File 'mpred_cyc_kb.pl'
 % Purpose: Emulation of OpenCyc for SWI-Prolog

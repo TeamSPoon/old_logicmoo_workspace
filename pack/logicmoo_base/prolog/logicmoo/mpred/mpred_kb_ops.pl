@@ -1,4 +1,4 @@
-/** <module> 
+/* 
 % File used as storage place for all predicates which change as
 % the world is run.
 %

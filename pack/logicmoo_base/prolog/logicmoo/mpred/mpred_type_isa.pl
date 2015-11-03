@@ -1,4 +1,4 @@
-/** <module> 
+/* 
 % File used as storage place for all predicates which change as
 % the world is run.
 %
@@ -158,7 +158,7 @@ is_typef(F):- atom(F),current_predicate(isa_from_morphology/2),isa_from_morpholo
 is_never_type(V):-is_ftVar(V),!,fail.
 is_never_type(V):-never_type_why(V,_),!.
 
-a(C,I):- atom(C),G=..[C,I], clause_asserted(G).
+a(C,I):- atom(C),G=..[C,I], (clause(_:G,true);clause(_:isa(I,C),true)).
 
 never_type_f(Var):-is_ftVar(Var),!,trace_or_throw(var_never_type(Var)).
 never_type_f(F):-a(tCol,F),!,fail.

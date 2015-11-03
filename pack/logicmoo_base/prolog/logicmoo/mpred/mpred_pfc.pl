@@ -1183,7 +1183,7 @@ ain_fast(P0):-
 
 
 ain_fast(nesc(P),S) :- is_ftNonvar(P),!,ain_fast(P,S).
-ain_fast(P0,S):- gripe_time(0.6,ain_fast_timed(P0,S)).
+ain_fast(P0,S):- gripe_time(1.6,ain_fast_timed(P0,S)).
 
 ain_fast_timed(P0,S):- '$module'(user,user),'$set_source_module'(user,user),!,
   '$module'(WM,baseKB),'$set_source_module'(WS,baseKB),
@@ -1796,14 +1796,14 @@ mpred_retract_support_relations(_,_).
 
 remove_if_unsupported_verbose(Why,TMS,P) :- is_ftVar(P),!,trace_or_throw(warn(var_remove_if_unsupported_verbose(Why,TMS,P))).
 remove_if_unsupported_verbose(Why,TMS,P) :- (\+ ground(P) -> mpred_trace_msg(warn(ng_remove_if_unsupported_verbose(Why,TMS,P))) ;true),
-   (((mpred_tms_supported(TMS,P,How),How\=unknown(_)) -> mpred_trace_msg(v_still_supported(How,Why,TMS,P)) ; (  mpred_undo(Why,P)))),
-   mpred_run.
+   (((mpred_tms_supported(TMS,P,How),How\=unknown(_)) -> mpred_trace_msg(v_still_supported(How,Why,TMS,P)) ; (  mpred_undo(Why,P)))).
+   % mpred_run.
 
 
 remove_if_unsupported(Why,P) :- is_ftVar(P),!,trace_or_throw(warn(var_remove_if_unsupported(Why,P))).
 remove_if_unsupported(Why,P) :- ((\+ ground(P), P \= (_:-_) , P \= ~(_) ) -> mpred_trace_msg(warn(nonground_remove_if_unsupported(Why,P))) ;true),
-   (((mpred_tms_supported(local,P,How),How\=unknown(_)) -> mpred_trace_msg(still_supported(How,Why,local,P)) ; (  mpred_undo(Why,P)))),
-   mpred_run.
+   (((mpred_tms_supported(local,P,How),How\=unknown(_)) -> mpred_trace_msg(still_supported(How,Why,local,P)) ; (  mpred_undo(Why,P)))),!.
+   % mpred_run.
 
 
 %= mpred_tms_supported(+P,-How) succeeds if P is "supported". What "How" means
@@ -1945,7 +1945,7 @@ mpred_fwd(P,S) :- mpred_fwd1(P,S),!.
 
 %=
 % mpred_fwd1(+P) forward chains for a single fact.
-mpred_fwd1(Fact,Sup) :- gripe_time(0.80,mpred_fwd2(Fact,Sup)),!.
+mpred_fwd1(Fact,Sup) :- gripe_time(1.80,mpred_fwd2(Fact,Sup)),!.
 
 mpred_fwd2(Fact,Sup) :- cyclic_term(Fact;Sup),writeq(mpred_fwd2_cyclic_term(Fact;Sup)),!.
 mpred_fwd2(Fact0,_Sup):-
@@ -2232,11 +2232,11 @@ mpred_call_1(_,G,_):- mpred_call_with_no_triggers(G).
 
 :- thread_local t_l:infBackChainPrevented/1.
 
-call_with_bc_triggers(P) :- functor(P,F,A), \+ t_l:infBackChainPrevented(F/A), 
+call_with_bc_triggers(P) :- get_functor(P,F,A), \+ t_l:infBackChainPrevented(F/A), 
   mpred_get_trigger_quick(ABOX,basePFC:bt(ABOX,P,Trigger)),
   no_repeats(mpred_get_support(basePFC:bt(ABOX,P,Trigger),S)),
   once(no_side_effects(P)),
-  wno_tl(t_l:infBackChainPrevented(F/A),mpred_eval_lhs(Trigger,S)).
+  w_tl(t_l:infBackChainPrevented(F/A),mpred_eval_lhs(Trigger,S)).
 
 mpred_call_with_no_triggers(F) :- 
   %= this (is_ftVar(F)) is probably not advisable due to extreme inefficiency.

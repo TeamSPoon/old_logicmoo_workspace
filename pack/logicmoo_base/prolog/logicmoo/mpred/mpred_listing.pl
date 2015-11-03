@@ -1,5 +1,5 @@
 % =======================================================
-/** <module> 
+/* 
 %
 %= predicates to examine the state of pfc 
 % interactively exploring Pfc justifications.

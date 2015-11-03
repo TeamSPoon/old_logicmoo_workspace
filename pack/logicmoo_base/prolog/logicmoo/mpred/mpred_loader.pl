@@ -1,4 +1,4 @@
-/** <module> 
+/* 
 % Game loading Utils
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog
@@ -931,18 +931,22 @@ import_shared_pred(M,BaseKB,P):-
   import_to_user(M:P).
 
 import_to_user(P):- '$module'(MM,MM),'$set_source_module'(SM,SM),must(import_to_user0(MM,SM,P)).
-import_to_user0(user,user,M:FA):- '$module'(_,M),'$set_source_module'(_,M),!,import_to_user(M:FA).
+import_to_user0(user,user,M:FA):- must(M\==user),!, call_from_module(M,import_to_user(M:FA)).
+import_to_user0(M,SM, user:FA):- M\==SM,dmsg(warn(import_to_user0(M,SM, user:FA))),fail.
 import_to_user0(_MM,_SM,M:F/A):-!,functor(P,F,A),
    U=logicmoo_user,
    user:catch(mpred_op_prolog(pain,((U:P:- user:loop_check_nr(M:P)))),E,dmsg(import_shared_pred(U:F/A:-M:F/A)=E)),
    user:export(U:F/A),
-   catch(user:import(U:F/A),_,true).
-  %user:import(U:F/A).
+   catch(user:import(U:F/A),_,true),user:import(U:F/A).
 import_to_user0(MM,SM,M:P):-!,functor(P,F,A),import_to_user0(MM,SM,M:F/A).
-import_to_user0(MM,SM,P):-t_l:user_abox(M),import_to_user0(MM,SM,M:P).
+import_to_user0(MM,SM,P):- t_l:user_abox(M),import_to_user0(MM,SM,M:P).
 
-import_module_to_user(M):- import_module(user,M),!.
-import_module_to_user(M):-ignore((delete_import_module(M,user))),add_import_module(user,M,end).
+import_module_to_user(M):- default_module(user,M),!.
+import_module_to_user(M):- ignore(delete_import_module(M,user)),
+                           add_import_module(M,system,end),
+                           add_import_module(user,M,end),
+                           % find system thru M
+                           ignore(delete_import_module(user,system)).
 
 ensure_imports(baseKB):-!.
 ensure_imports(M):-ensure_imports_tbox(M,baseKB).
@@ -956,7 +960,7 @@ skip_user(M):-
   %ignore(system:delete_import_module(user,system)).
   %asserta((M:import(P):-system:import(P))),
   
-
+ensure_imports_tbox(M,BaseKB):-M==BaseKB,!.
 ensure_imports_tbox(M,BaseKB):-
   lmcache:is_ensured_imports_tbox(M,BaseKB),!.
 ensure_imports_tbox(M,BaseKB):-
@@ -1005,23 +1009,25 @@ file_begin(W):-
             '$module'(CM,CM),
             '$set_source_module'(SM,SM),
    onEndOfFile(module(CM)),
+   onEndOfFile('$set_source_module'(_,SM)),
+   onEndOfFile('$module'(_,CM)),
    (loading_source_file(Source)->true;Source=CM),
    make_module_name(Source,FM),
    context_module_of_file(M),
    (t_l:user_abox(AM)->true;AM=SM),
-   best_module([AM,SM,CM,FM,M],ABoxMaybe),
-   debugm(best_module([AM,SM,CM,FM,M],ABoxMaybe)),
-   (t_l:user_abox(ABox)->true;ABox=ABoxMaybe),
+   best_module([AM,SM,CM,FM,M],ABox),   
    set_user_abox(ABox),
-   debugm(set_user_abox(ABox)),
+   set_current_module(ABox),
+   ABox:mpred_ops,
+   dmsg(best_module(W-[AM,SM,CM,FM,M],ABox)),
    op_lang(W),   
    assert_until_eof(lmcache:mpred_directive_value(W,file,Source)),
    decache_file_type(Source),
    ensure_imports(ABox),
-   set_current_module(ABox),
    enable_mpred_expansion,
-   mpred_ops)).
+   SM:mpred_ops)).
 
+set_current_module(user):- set_current_module(baseKB).
 set_current_module(ABox):- module(ABox),'$module'(_,ABox),'$set_source_module'(_,ABox).
 
 file_end(W):- must_det(( loading_source_file(ISource),decache_file_type(ISource),ignore(retract(lmcache:mpred_directive_value(W,file,ISource))))),  
@@ -1271,7 +1277,7 @@ mpred_term_expansion(Fact,(:- ((cl_assert(pfc(expand_file),Fact))))):-
 
 stream_pos(File:LineNo):-loading_source_file(File),current_input(S),stream_property(S, position(Position)), !,stream_position_data(line_count, Position, LineNo),!.
 
-compile_clause(CL):- make_dynamic(CL),must((assertz_if_new(CL),clause_asserted(CL))).
+compile_clause(CL):- must((make_dynamic(CL),assertz_if_new(CL),clause_asserted(CL))).
 
 make_dynamic(C):- compound(C),get_functor(C,F,A),must(F\=='$VAR'),
   functor(P,F,A),
@@ -1554,7 +1560,11 @@ must_locate_file(FileIn,File):-
   must(filematch_ext(['','mpred','ocl','moo','plmoo','pl','plt','pro','p','pl.in','pfc','pfct'],FileIn,File)).
 
 
-
+:- meta_predicate call_from_module(+,0).
+call_from_module(NewModule,Goal):-
+   '$module'(OldCModule, NewModule),
+   '$set_source_module'(OldModule, NewModule),
+   call_with_module(NewModule,call_cleanup('@'(Goal,NewModule),('$set_source_module'(_, OldModule),'$module'(_, OldCModule)))).
 
 :- meta_predicate call_with_source_module(+,0).
 call_with_source_module(NewModule,Goal):-

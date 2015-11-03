@@ -1,4 +1,4 @@
-/* <module> 
+/*  
 % ===================================================================
 % File 'mpred_type_constraints.pl'
 % Purpose: For Emulation of OpenCyc for SWI-Prolog
@@ -56,17 +56,19 @@
             dom_lbl/1, dom_member/1,
 
             lazy/1,lazy/2,
-            weaken/1,weaken/2,thaw/1
+            weaken/1,weaken_goal/2,thaw/1
           ]).
  :- meta_predicate isa_pred_l(2,*,*),
               isa_pred_l(2,*,*,*),
-              map_subterms(2,?,?).
+              map_subterms(2,?,?),
+              dom_member(0),
+              boxlog_goal_expansion(*,*).
 
 :- meta_predicate
   thaw(?),
   lazy(0),
   weaken(0),
-  weaken(0,0),
+  weaken_goal(0,0),
   lazy(?,0).
 
 
@@ -75,8 +77,10 @@
 
 
 boxlog_goal_expansion(weaken(G),GG):-!,weaken_goal(G,GG).
+/* 
 boxlog_goal_expansion(G,_):- % \+ source_location(_,_),
   wdmsg(g_s(G)),fail.
+*/
 
 weaken(G):- weaken_goal(G,GG) -> GG.
 
@@ -333,5 +337,4 @@ isac:attribute_goals(X) -->
 
 system:goal_expansion(G,O):-nonvar(G),boxlog_goal_expansion(G,O).
 
-:- trace.
 

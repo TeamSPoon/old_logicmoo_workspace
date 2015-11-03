@@ -604,7 +604,7 @@ mpred_t_mpred_storage_clauses_facts(H,true,t(H)):-compound(H),!,current_predicat
 % mpred_t_mpred_storage_clauses_rules(H,B,'<=>'):-'<=>'(B,HH),each_subterm(HH,SubTerm),compound(SubTerm),SubTerm = H.
 
 
-lmconf:mpred_provide_storage_op(Op,HB):-hotrace(demodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),(F==t;mpred_isa(F,prologHybrid)), must(is_mpred_op(Op)), 
+lmconf:mpred_provide_storage_op(Op,HB):-hotrace(demodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),(F==t;a(prologHybrid,F)), must(is_mpred_op(Op)), 
     w_tl(t_l:already_in_file_term_expansion,mpred_t_storage_op(Op,HeadBody)).
 
 % ====================================================

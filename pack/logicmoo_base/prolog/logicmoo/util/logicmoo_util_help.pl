@@ -1,4 +1,4 @@
-/* <module> Logicmoo Debug Tools
+/*  Logicmoo Debug Tools
 % ===================================================================
 % File 'logicmoo_util_help.pl'
 % Purpose: An Implementation in SWI-Prolog of certain debugging tools
