@@ -171,6 +171,11 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 :- show_call(why,source_context_module(_CM)).
 :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),baseKB:dynamic(baseKB:E)).
 :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),decl_shared(E)).
+:- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),import_to_user(baseKB:E)).
+
+
+:- import_module_to_user(logicmoo_user).
+
 
 % :- module_property(baseKB, exports(List)),forall(member(E,List),kb_dynamic(E)).
 
@@ -254,8 +259,15 @@ never_assert_u(Rule,head_singletons(Pre,Post)):- cwc, Rule \= (_:-_), once(mpred
 never_assert_u(declared(M:F/A),never_declared(M:F/A)):- M:F/A = qrTBox:p/1.
 never_assert_u(A,B):-never_assert_u0(A,B),trace,never_assert_u0(A,B).
 
-never_assert_u(M:arity(_,_),is_support(arity/2)):- M==pqr,dumpST, trace, cwc,!.
+% never_assert_u(M:arity(_,_),is_support(arity/2)):- M==pqr,dumpST, trace, cwc,!.
 never_assert_u(M:Rule,Why):- cwc, atom(M),never_assert_u(Rule,Why).
+
+/*
+never_assert_u(pt(_,
+       singleValuedInArg(A, _),
+       (trace->rhs([{trace}, prologSingleValued(B)]))),singletons):- trace,A\=B,trace.
+*/
+
 
 never_assert_u0(mpred_mark(pfcPosTrigger,_,F,A),Why):- fail,
   functor(P,F,A),
@@ -269,13 +281,6 @@ is_static_why(M,P,_,_,_):- predicate_property(M:P,dynamic),!,fail.
 is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=static(M:F/A).
 
   
-
-/*
-never_assert_u(pt(_,
-       singleValuedInArg(A, _),
-       (trace->rhs([{trace}, prologSingleValued(B)]))),singletons):- trace,A\=B,trace.
-*/
-
 
 %  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(basePFC:pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),u)),UN).
 %  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(basePFC:pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),u)),UN).

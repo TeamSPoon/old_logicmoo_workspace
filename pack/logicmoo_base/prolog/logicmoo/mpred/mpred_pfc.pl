@@ -604,7 +604,7 @@ get_user_abox_ignore(A):-ignore(get_user_abox(A)).
 % ======================= mpred_file('pfcsyntax').	% operator declarations.
 :- was_module_transparent(with_umt/1).
 :- was_export(with_umt/1).
-with_umt(G):- get_user_abox(M),!, M:call(G).
+with_umt(G):- get_user_abox(M),!, M:call(M:G).
 with_umt(Goal):- source_context_module(M) -> M:call(Goal).
 
 %   File   : pfcsyntax.pl
@@ -1006,8 +1006,8 @@ show_if_debug(A):- mpred_is_tracing(A) -> show_call(mpred_is_tracing,A) ; A.
 assert_u(M:X):- !,functor(X,F,A),assert_u(M,X,F,A).
 assert_u(X):- functor(X,F,A),assert_u(abox,X,F,A).
 
-assert_u(_M,X,F,_):-mreq(singleValuedInArg(F,SV)),!,must(update_single_valued_arg(X,SV)),!.
-assert_u(_M,X,F,A):-mreq(prologSingleValued(F)),!,must(update_single_valued_arg(X,A)),!.
+assert_u(_M,X,F,_):- req(singleValuedInArg(F,SV)),!,must(update_single_valued_arg(X,SV)),!.
+assert_u(_M,X,F,A):- req(prologSingleValued(F)),!,must(update_single_valued_arg(X,A)),!.
 % assert_u(M,X,F,A):-must(isa(F,prologAssertAOrdered) -> asserta_u(M,X) ; assertz_u(M,X)).
 % assert_u(M,X,F,A):-must(isa(F,prologOrdered)        -> assertz_u(M,X) ; asserta_u(M,X)).
 assert_u(M,X,_,_):- assertz_mu(M,X).
@@ -3336,7 +3336,7 @@ pred_t0(ABOX,P):-mreq(basePFC:bt(ABOX,P,_)).
 pred_t0(ABOX,P):-mreq(basePFC:nt(ABOX,P,_,_)).
 pred_t0(ABOX,P):-mreq(basePFC:spft(ABOX,P,_,_,_)).
 
-%pred_r0(-(P)):- mreq(-(P)).
+%pred_r0(-(P)):- req(-(P)).
 %pred_r0(~(P)):- mreq(~(P)).
 
 pred_r0(P==>Q):- mreq(P==>Q).

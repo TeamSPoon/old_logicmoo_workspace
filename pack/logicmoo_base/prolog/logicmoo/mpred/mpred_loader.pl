@@ -12,6 +12,7 @@
           [ add_from_file/1,
             add_term/2,
             assert_kif/1,
+            import_module_to_user/1,
             assert_kif_dolce/1,
             assert_until_eof/1,
             decl_user_abox/1,
@@ -840,7 +841,9 @@ decl_user_abox(M):-     sanity(atom(M)),
 
 
 ensure_tbox_module(M):- sanity(atom(M)),M== logicmoo_user,!.
-ensure_tbox_module(baseKB).
+
+ensure_tbox_module(baseKB) :- !.
+ensure_tbox_module(user)   :- !.
 ensure_tbox_module(M):-  (M==baseKB->trace_or_throw(bad_ensure_tbox_module(M));true),
   M:((
             multifile(M:('<-')/2),
@@ -930,13 +933,16 @@ import_shared_pred(M,BaseKB,P):-
 import_to_user(P):- '$module'(MM,MM),'$set_source_module'(SM,SM),must(import_to_user0(MM,SM,P)).
 import_to_user0(user,user,M:FA):- '$module'(_,M),'$set_source_module'(_,M),!,import_to_user(M:FA).
 import_to_user0(_MM,_SM,M:F/A):-!,functor(P,F,A),
-  U=logicmoo_user,
-  user:catch(mpred_op_prolog(pain,((U:P:- user:loop_check_nr(M:P)))),E,dmsg(import_shared_pred(U:F/A:-M:F/A)=E)),
-  U:export(U:F/A),
-  catch(user:import(U:F/A),_,true),
-  user:import(U:F/A).
+   U=logicmoo_user,
+   user:catch(mpred_op_prolog(pain,((U:P:- user:loop_check_nr(M:P)))),E,dmsg(import_shared_pred(U:F/A:-M:F/A)=E)),
+   user:export(U:F/A),
+   catch(user:import(U:F/A),_,true).
+  %user:import(U:F/A).
 import_to_user0(MM,SM,M:P):-!,functor(P,F,A),import_to_user0(MM,SM,M:F/A).
 import_to_user0(MM,SM,P):-t_l:user_abox(M),import_to_user0(MM,SM,M:P).
+
+import_module_to_user(M):- import_module(user,M),!.
+import_module_to_user(M):-ignore((delete_import_module(M,user))),add_import_module(user,M,end).
 
 ensure_imports(baseKB):-!.
 ensure_imports(M):-ensure_imports_tbox(M,baseKB).
@@ -1714,7 +1720,6 @@ push_predicates(M:F/A,STATE):- functor(H,F,A),findall((H:-B), (M:clause(H,B,Ref)
 pop_predicates(M:F/A,STATE):- functor(H,F,A),forall(member((H:-B),STATE),M:assert((H:-B))).
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
-
 
 :- multifile(user:prolog_load_file/2).
 :- dynamic(user:prolog_load_file/2).
