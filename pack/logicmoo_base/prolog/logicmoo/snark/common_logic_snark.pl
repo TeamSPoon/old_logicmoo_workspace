@@ -282,7 +282,19 @@ correct_arities(H,Fml,FmlM):- Fml=..[F|ARGS],must_maplist(correct_arities(H),ARG
 
 :- was_export(subsT_each/3).
 subsT_each(In,[],In):- !.
-subsT_each(In,[KV|TODO],Out):- !,get_kv(KV,X,Y),subst_except(In,X,Y,Mid),!,subsT_each(Mid,TODO,Out),!.
+% subsT_each(In,[KV|TODO],Out):- !,get_kv(KV,X,Y),subst_except(In,X,Y,Mid),!,subsT_each(Mid,TODO,Out),!.
+subsT_each(In,[KV|TODO],Out):- subst_except_l(In,[KV|TODO],Out).
+
+subst_except_l(  Var, _,Var ) :- is_ftVar(Var),!.
+% subst_except_l(  Var, _,Var ) :- leave_as_is(Var),!.
+subst_except_l(  N, List,V ) :- member(N=V,List),!.
+subst_except_l(  Var, _,Var ) :- \+compound(Var),!.
+subst_except_l([H|T],List,[HH|TT]):- !,
+   subst_except_l(H,List,HH),
+   subst_except_l(T,List,TT).
+subst_except_l(HT,List,HHTT):- HT=..FARGS,subst_except_l(FARGS,List,[FM|MARGS]),
+   (atom(FM)->HHTT=..[FM|MARGS];append_termlist(FM,MARGS,HHTT)).
+
 
 :- dynamic(mudEquals/2).
 :- export(mudEquals/2).
@@ -370,12 +382,11 @@ as_prolog(Fml,FmlO):- as_symlog(Fml,FmlM),
 
 
 
-adjust_kif(KB,Kif,KifO):-must(adjust_kif0(KB,Kif,KifO)),!.
+adjust_kif(KB,Kif,KifO):- as_dlog(Kif,KifM),must(adjust_kif0(KB,KifM,KifO)),!.
 
 % Converts to syntax that NNF/DNF/CNF/removeQ like
 
 
-adjust_kif0(KB,I,O):- as_dlog(I,M),I\=@=M,!,adjust_kif0(KB,M,O).
 adjust_kif0(_,V,V):- is_ftVar(V),!.
 adjust_kif0(_,A,A):- \+ compound(A),!.
 

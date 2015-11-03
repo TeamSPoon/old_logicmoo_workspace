@@ -102,6 +102,7 @@
 
 
 
+subst_except( SUB, Var, VarS,SUB ) :- Var==VarS,!.
 subst_except(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
 subst_except(  Var, _,_,Var ) :- \+compound(Var),!.
 subst_except(  Var, _,_,Var ) :- leave_as_is(Var),!.
@@ -485,17 +486,22 @@ is_colection_name(IT,T,TT):- atom_length(T,TL),TL>2,not(atom_contains(T,'_')),no
 
 
 
+leave_as_is(V):- is_ftVar(V),!.
 leave_as_is(V):- \+ compound(V),!.
 leave_as_is((_ :-_ )):-!,fail.
 leave_as_is((_;_)):-!,fail.
 leave_as_is((_/_)):-!,fail.
-leave_as_is(V):-compound(V),leave_as_is_db(V),!.
+leave_as_is([_|_]):-!,fail.
+leave_as_is(not(_)):-!,fail.
+leave_as_is(~_):-!,fail.
+leave_as_is(V):-leave_as_is_db(V),!.
+
+
 
 leave_as_is_db('$VAR'(_)).
 leave_as_is_db('aNARTFn'(_)).
 leave_as_is_db('comment'(_,_)).
 
-leave_as_is_db(C):-get_functor(C,F),leave_as_is_functor(F).
 leave_as_is_db(infer_by(_)).
 leave_as_is_db(b_d(_,_,_)).
 leave_as_is_db(ct(_,_)).
@@ -503,6 +509,7 @@ leave_as_is_db(ct(_,_)).
 leave_as_is_db(ignore(_)).
 leave_as_is_db(isa(_,_)).
 leave_as_is_db(P):-prequent(P).
+leave_as_is_db(C):-get_functor(C,F),leave_as_is_functor(F).
 
 
 leave_as_is_functor(Atom):- \+ atom(Atom),!,fail.
@@ -513,7 +520,8 @@ leave_as_is_functor('kbMark').
 leave_as_is_functor('z_unused').
 leave_as_is_functor('genlMt').
 leave_as_is_functor('{}').
-leave_as_is_functor(F):-if_defined_else(ptReformulatorDirectivePredicate(F),fail).
+leave_as_is_functor(F):-a(argsQuoted,F).
+leave_as_is_functor(F):-a(ptReformulatorDirectivePredicate,F).
 
 prequent(original(_)).
 prequent(mudEquals(_,_)).

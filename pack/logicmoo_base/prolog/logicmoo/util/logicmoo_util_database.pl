@@ -16,6 +16,8 @@ paina/1,pain/1,            painz/1,
             assertz_new/1,
             call_provider/1,
             call_provider/2,
+            clause_true/1,
+            modulize_head/2,
             clause_asserted/1,
             clause_asserted/2,
             clause_asserted/3,
@@ -26,7 +28,7 @@ paina/1,pain/1,            painz/1,
             eraseall/2,
             find_and_call/1,
             find_and_call/3,
-            get_current_lmconf:mpred_provider/3,
+            lmconf:mpred_provider/3,
             mpred_mop/3,
             mpred_op_prolog/2,
             mpred_split_op_data/3,
@@ -72,7 +74,7 @@ paina/1,pain/1,            painz/1,
         erase_safe/2,
         find_and_call/1,
         lmconf:first_lmconf:mpred_provider/3,
-        get_current_lmconf:mpred_provider/3,
+        lmconf:mpred_provider/3,
         mpred_split_op_data/3,
         retract_eq/1,
         safe_univ/2,
@@ -177,18 +179,18 @@ eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(cla
 :-dynamic(lmconf:next_lmconf:mpred_provider/2).
 :-multifile(lmconf:first_lmconf:mpred_provider/2).
 :-multifile(lmconf:next_lmconf:mpred_provider/2).
-get_current_lmconf:mpred_provider(OP,Term,PROVIDER):- t_l:lmconf:mpred_provider(OP,Term,PROVIDER).
-get_current_lmconf:mpred_provider(_,_,PROVIDER):- t_l:current_lmconf:mpred_provider(PROVIDER).
-get_current_lmconf:mpred_provider(OP,Term,PROVIDER):- lmconf:first_lmconf:mpred_provider(OP,Term,PROVIDER).
+lmconf:mpred_provider(OP,Term,PROVIDER):- t_l:lmconf:mpred_provider(OP,Term,PROVIDER).
+lmconf:mpred_provider(_,_,PROVIDER):- t_l:current_lmconf:mpred_provider(PROVIDER).
+lmconf:mpred_provider(OP,Term,PROVIDER):- lmconf:first_lmconf:mpred_provider(OP,Term,PROVIDER).
 
 lmconf:first_lmconf:mpred_provider(_,_,mpred_op_prolog).
 
 :- meta_predicate call_provider(?).
 call_provider(P):-mpred_split_op_data(P,OP,Term),call_provider(OP,Term).
 
-call_provider(OP,Term):- must(get_current_lmconf:mpred_provider(OP,Term,PROVIDER)),!,call(PROVIDER,OP,Term).
+call_provider(OP,Term):- must(lmconf:mpred_provider(OP,Term,PROVIDER)),!,call(PROVIDER,OP,Term).
 
-call_provider(OP,Term):- must(get_current_lmconf:mpred_provider(OP,Term,PROVIDER)),!,
+call_provider(OP,Term):- must(lmconf:mpred_provider(OP,Term,PROVIDER)),!,
    (loop_check_early(call(PROVIDER,OP,Term),fail)*->true;
    (loop_check_early(must(lmconf:next_lmconf:mpred_provider(PROVIDER,NEXT)),NEXT=mpred_op_prolog),!,PROVIDER\=NEXT,call(NEXT,OP,Term))).
 
@@ -238,6 +240,21 @@ clause_asserted(H,B):-clause_asserted(H,B,_).
 % clause_asserted(H,B,Ref):- predicate_property(H,number_of_clauses(N))-> N>0   -> (clause(H, B, Ref), clause(Head, Body, Ref),  (B =@= Body), (H =@= Head)),!.
 :-meta_predicate(clause_asserted(:,?,-)).
 clause_asserted(H,B,Ref):-clause_eq(H,B,Ref).
+
+:-meta_predicate(clause_true(?)).
+
+clause_true(M:G):-!,clause(M:G,true)*->true;(current_module(M),clause(M:G,true)).
+clause_true(G):-!, (current_module(M),clause(M:G,true)).
+clause_true(M:G):-predicate_property(M:G,number_of_clauses(_)),!,clause(M:G,true).
+clause_true(_:G):-!,predicate_property(M:G,number_of_clauses(_)),clause(M:G,true).
+clause_true(G):-!,predicate_property(M:G,number_of_clauses(_)),clause(M:G,true).
+
+:-meta_predicate(modulize_head(?,?)).
+
+%modulize_head(_:G,O:G):- !, no_repeats_old(O,(current_module(M),'$get_predicate_attribute'(M:G, imported, O))).
+modulize_head(R:G,M:G):- !, (M=R; (current_predicate(_,M:G),M\==R)),\+ predicate_property(M:G,imported_from(_)).
+modulize_head(G,O:G):- !, no_repeats_old(O,(current_module(M),'$get_predicate_attribute'(M:G, imported, O))).
+modulize_head(G,M:G):- current_predicate(_,M:G),\+ predicate_property(M:G,imported_from(_)).
 
 :-export(clause_eq/3).
 %clause_eq(H,B,R):-clause(H,B,R),clause(RH,RB,R),term_variables(RH:RB,RVs),term_variables(H:B,Vs).

@@ -125,6 +125,7 @@ memberchk_pred_rev(Pred, X, [Y|Ys]) :- (   call(Pred,Y,X) -> true ;   (nonvar(Ys
 
 :- export(no_repeats_old/2).
 :- meta_predicate no_repeats_old(+,0).
+no_repeats_old(Vs,Call):- ground(Vs),!,Call,!.
 no_repeats_old(Vs,Call):- CONS = [_], (Call), cnotrace(( \+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T], nb_setarg(2, CONS, [CVs|T]))).
 
 % mcs_t2(A,B) :- call(lambda(X, [Y|Ys], (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),reenter_lambda(X, Ys) ))),A,B).

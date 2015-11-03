@@ -201,7 +201,7 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 :- meta_predicate(t(?,?,?)).
 
 :-asserta((~(G):- cwc, neg_in_code(G))).
-~tCol('$VAR').
+~(tCol('$VAR')).
 
 % baseKB:import(I):-system:import(baseKB:I).
 
@@ -290,5 +290,4 @@ is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=
 
 :- source_location(S,_),forall(source_file(M:H,S),(functor(H,F,A),module_transparent(M:F/A))).
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/autoexec.pfc')).
 :- initialization(add_import_module(baseKB,basePFC,end)).

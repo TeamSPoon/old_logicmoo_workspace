@@ -100,6 +100,7 @@ ensure_mpred_system:- source_context_module(M),enable_mpred_system(M).
 
 
 :- lmconf:mpred_system_kb(M),dmsg(system_kb=M).
+:- baseKB:use_module(library(logicmoo/mpred/mpred_userkb)).
 
 end_of_file.
 

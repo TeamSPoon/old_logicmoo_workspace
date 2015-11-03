@@ -29,7 +29,7 @@
             bubbled_ex_check/1,
             catchv/3,
             catchvvnt/3,
-            current_source_location/1,
+            current_source_location/1,current_source_location0/1,
             current_main_error_stream/1,
             dbgsubst/4,            
             dbgsubst0/4,
@@ -344,7 +344,7 @@ sl_to_filename(W,W).
 
 
 
-current_source_location(F):- clause(M:current_source_location0(W),Body),catchv(M:Body,_,fail),sl_to_filename(W,F),!.
+current_source_location(F):- clause(logicmoo_util_catch:current_source_location0(W),Body),catchv(Body,_,fail),sl_to_filename(W,F),!.
 current_source_location(F):- F = unknown.
 
 current_source_location0(F):- t_l:current_why_source(F).
@@ -383,12 +383,13 @@ source_file0(F):-findall(E,catch((stream_property( S,mode(read)),stream_property
 
 :-export(source_variables_l/1).
 source_variables_l(AllS):-
+ notrace((
   (prolog_load_context(variable_names,Vs1);Vs1=[]),
   (nb_current('$variable_names', Vs2);Vs2=[]),
   notrace(catch((parent_goal('$toplevel':'$execute_goal2'(_, Vs3),_);Vs3=[]),E,(writeq(E),Vs3=[]))),
   ignore(Vs3=[]),
   append(Vs1,Vs2,Vs12),append(Vs12,Vs3,All),!,list_to_set(All,AllS),
-  nb_linkval('$variable_names', AllS).
+  nb_linkval('$variable_names', AllS))).
 
 
 source_variables(Vs):- (((prolog_load_context(variable_names,Vs),Vs\==[]);
@@ -742,16 +743,19 @@ slow_sanity(Goal):- ( tlbugger:skip_use_slow_sanity ; sanity(Goal)),!.
 
 % sanity is used for type checking (is not required)
 % sanity(Goal):-!.
-% sanity(_):-!.
+
 % sanity(_):-skipWrapper,!.
-sanity(Goal):-bugger_flag(release,true),!,assertion(Goal).
+sanity(_):- is_release,!.
+sanity(Goal):- bugger_flag(release,true),!,assertion(Goal).
 sanity(Goal):- tlbugger:show_must_go_on,!,ignore(show_failure(why,Goal)).
 sanity(Goal):- ignore(must(show_failure(why,Goal))).
 
 
 :- export(is_release/0).
+is_release:- !.
 is_release :- \+ not_is_release.
 :- export(not_is_release/0).
+not_is_release:- !,fail.
 not_is_release :- 1 is random(4).
 
 
@@ -779,7 +783,7 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 %must(Call):-(repeat, (catchv(Call,E,(dmsg(E:Call),debug,fail)) *-> true ; (ignore(ftrace(Call)),leash(+all),repeat,wdmsg(failed(Call)),trace,Call)),!).
 must(Goal):- notrace(get_must(Goal,MGoal)),!,MGoal.
 
-get_must(Goal,Goal):- fail,is_release,!.
+get_must(Goal,Goal):-  is_release,!.
 get_must(Goal,CGoal):-  tlbugger:skipMust,!,CGoal = Goal.
 get_must(Goal,CGoal):- skipWrapper,!,trace, CGoal = (Goal *-> true ; ((ddmsg(failed_FFFFFFF(must(Goal))),dumpST,trace,Goal))).
 get_must(Goal,CGoal):- tlbugger:show_must_go_on,!,

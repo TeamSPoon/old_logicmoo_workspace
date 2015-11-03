@@ -554,6 +554,7 @@ with_umt/1,
         use_presently/0)).
 
 :- module_transparent(check_context_module/0).
+check_context_module:- is_release,!.
 check_context_module:- must((source_context_module(M),M\==mpred_pfc,M\==mpred_loader)).
 check_real_context_module:- must((context_module(M),M\==mpred_pfc,M\==mpred_loader)).
 
@@ -872,8 +873,8 @@ pfc_provide_storage_op(change(retract,OneOrA),FactOrRule):- is_retract_first(One
 pfc_provide_storage_op(change(retract,all),FactOrRule):- loop_check_nr(mpred_rem2(FactOrRule)),!.
 % pfc_provide_storage_op(is_asserted,FactOrRule):- is_ftNonvar(FactOrRule),!,loop_check_nr(clause_i(FactOrRule)).
 
-mpred_clause_is_asserted_hb_nonunify(H,B):- clause( ==>( B , H) , true).
-mpred_clause_is_asserted_hb_nonunify(H,B):- clause( <-( H , B) , true).
+mpred_clause_is_asserted_hb_nonunify(H,B):- clause_true( ==>( B , H) ).
+mpred_clause_is_asserted_hb_nonunify(H,B):- clause_true( <-( H , B) ).
 mpred_clause_is_asserted_hb_nonunify(_,_):-!,fail.
 mpred_clause_is_asserted_hb_nonunify(G, T   ):- T==true,!,hotrace(mpred_rule_hb(G,H,B)),G\=@=H,!,mpred_clause_is_asserted(H,B).
 mpred_clause_is_asserted_hb_nonunify(H,(T,B)):- T==true,!,mpred_clause_is_asserted_hb_nonunify(H,B).
@@ -882,7 +883,7 @@ mpred_clause_is_asserted_hb_nonunify(H,B):- clause_u( <-( H , B) , true).
 mpred_clause_is_asserted_hb_nonunify(H,B):- mpred_clause_is_asserted(H,B).
 
 mpred_clause_is_asserted(H,B):- is_ftVar(H),is_ftNonvar(B),!,fail.
-mpred_clause_is_asserted(H,B):- has_cl(H) -> clause(H,B) ; mpred_clause_is_asserted_hb_nonunify(H,B).
+mpred_clause_is_asserted(H,B):- modulize_head(H,HH), (has_cl(HH) -> clause(HH,B) ; mpred_clause_is_asserted_hb_nonunify(H,B)).
 %mpred_clause_is_asserted(H,B,Ref):- clause_u(H,B,Ref).
 
 
@@ -1189,7 +1190,8 @@ ain_fast_timed(P0,S):- '$module'(user,user),'$set_source_module'(user,user),!,
   '$module'(WM,baseKB),'$set_source_module'(WS,baseKB),
    call_cleanup(ain_fast_timed(P0,S),('$module'(_,WM),'$set_source_module'(_,WS))).
 
-ain_fast_timed(P0,S):- check_context_module,
+ain_fast_timed(P00,S):- check_context_module,
+  strip_module(P00,_,P0),  
   must(to_addable_form_wte(assert,P0,P)),
       (is_list(P)
         ->must_maplist(ain_fast_sp(S),P);
@@ -1197,7 +1199,9 @@ ain_fast_timed(P0,S):- check_context_module,
 
 
 % a really common example is people want unbound predicate backchaining .. that is to query the predicates witha  varaible where the predciate is 
-ain_fast_sp(S,P):- ensure_vars_labled(P,P0),fully_expand(change(assert,add),P0,P1),ain_fast_sp0(S,P1).
+ain_fast_sp(S,P0):- 
+  strip_module(P0,_,P),
+  ensure_vars_labled(P,P0),fully_expand(change(assert,add),P0,P1),ain_fast_sp0(S,P1).
 
   
 
@@ -1303,7 +1307,7 @@ with_mpred_trace_exec(P):- w_tl(t_l:mpred_debug_local,w_tl(mpred_is_tracing_exec
 mpred_test(P):- (mpred_is_silient;compiling),!,sanity(req(P)),!.
 mpred_test(P):- show_call(with_mpred_trace_exec(req(P))),!.
 
-clause_asserted_local(basePFC:spft(ABOX,P,Fact,Trigger,UOldWhy)):-
+clause_asserted_local(basePFC:spft(ABOX,P,Fact,Trigger,UOldWhy)):-!,
   clause(basePFC:spft(ABOX,P,Fact,Trigger,_OldWhy),true,Ref),
   clause(basePFC:spft(ABOX,UP,UFact,UTrigger,UOldWhy),true,Ref),
   (((UP=@=P,UFact=@=Fact,UTrigger=@=Trigger))).
@@ -1762,7 +1766,7 @@ mpred_undo_e(Why,Fact) :-
 %= participates in and check the things that they support to see if they
 %= should stay in the database or should also be removed.
 
-mpred_unfwc(F) :-
+mpred_unfwc(MF) :- strip_module(MF,_,F),
   mpred_retract_support_relations(mpred_unfwc(F),F),
   mpred_unfwc1(F).
 
@@ -1771,7 +1775,8 @@ mpred_unfwc1(F) :-
   % is this really the right place for mpred_run<?
   mpred_run_maybe.
 
-mpred_unfwc_check_triggers(_Sup,F) :-
+mpred_unfwc_check_triggers(_Sup,MF) :- 
+ strip_module(MF,_,F),
   mpred_db_type(F,fact),
   copy_term_and_varnames(F,Fcopy),
   mpred_get_trigger_quick(ABOX,basePFC:nt(ABOX,Fcopy,Condition,Action)),
@@ -1913,13 +1918,9 @@ support_ok_via_clause_body(_H):-!,fail.
 support_ok_via_clause_body(H):- get_functor(H,F,A),support_ok_via_clause_body(H,F,A).
 
 support_ok_via_clause_body(_,(\+),1):-!,fail.
-support_ok_via_clause_body(_,F,_):- req(prologSideEffects(F)),!,fail.
-support_ok_via_clause_body(H,_,_):- \+ predicate_property(H,number_of_clauses(_)),!,fail.
-support_ok_via_clause_body(_,F,A):- req(mpred_mark(pfcRHS,_,F,A)),!,fail.
-support_ok_via_clause_body(_,F,A):- req(mpred_mark(pfcMustFC,_,F,A)),!,fail.
 support_ok_via_clause_body(_,F,_):- req(argsQuoted(F)),!,fail.
-support_ok_via_clause_body(_,F,_):- req(prologDynamic(F)),!.
-support_ok_via_clause_body(_,F,_):- \+ req(pfcControlled(F)),!.
+support_ok_via_clause_body(H,F,A):- should_call_for_facts(H,F,A).
+
 
 
 mpred_get_support_precanonical(F,Sup):-to_addable_form_wte(mpred_get_support_precanonical,F,P),mpred_get_support(P,Sup).
@@ -2199,7 +2200,7 @@ neg_may_naf(P):- is_ftCompound(P),predicate_property(P,static).
 %=
 req(G):- loop_check(mpred_call_0(G),fail).
 
-mpred_call_only_facts(F):- on_x_rtrace(no_repeats(loop_check(mpred_call_0(F),fail))). 
+mpred_call_only_facts(MF) :-  strip_module(MF,_,F), on_x_rtrace(no_repeats(loop_check(mpred_call_0(F),fail))). 
 mpred_call_only_facts(_Why,F):- on_x_rtrace(no_repeats(loop_check(mpred_call_0(F),fail))). 
 
 
@@ -2216,12 +2217,16 @@ mpred_call_0((C1,C2)):-!,mpred_call_0(C1),mpred_call_0(C2).
 mpred_call_0(call(X)):- !, mpred_call_0(X).
 mpred_call_0(\+(X)):- !, \+ mpred_call_0(X).
 mpred_call_0(call_u(X)):- !, mpred_call_0(X).
-mpred_call_0(G):- strip_module(G,M,P),must(nonvar(P)),functor(P,F,_),mpred_call_1(M,P,F).
+
+mpred_call_0(M:P):-!,sanity(nonvar(P)),functor(P,F,_),mpred_call_1(M,P,F).
+mpred_call_0(G):- strip_module(G,M,P),sanity(nonvar(P)),functor(P,F,_),mpred_call_1(M,P,F).
 
 
 mpred_call_1(_,G,_):- is_side_effect_disabled,!,mpred_call_with_no_triggers(G).
 
-mpred_call_1(M,G,F):-  (ground(G); \+ current_predicate(_,M:G) ; \+ (predicate_property(M:G,clause_count(CC)),CC>1)), (\+  is_side_effect_disabled),
+mpred_call_1(M,G,F):- sanity(\+  is_side_effect_disabled),
+               (ground(G); \+ current_predicate(_,M:G) ; \+ (predicate_property(M:G,number_of_clauses(CC)),CC>1)), 
+    
                 ignore((loop_check(call_with_bc_triggers(M:G)),maybeSupport(G,(g,g)),fail)),
                  \+ current_predicate(F,M:G),\+ current_predicate(_,_:G),
                  doall(show_call(predicate_property(_UM:G,_PP))),
@@ -2232,19 +2237,19 @@ mpred_call_1(_,G,_):- mpred_call_with_no_triggers(G).
 
 :- thread_local t_l:infBackChainPrevented/1.
 
-call_with_bc_triggers(P) :- get_functor(P,F,A), \+ t_l:infBackChainPrevented(F/A), 
+call_with_bc_triggers(MP) :- strip_module(MP,_,P), functor(P,F,A), \+ t_l:infBackChainPrevented(F/A), 
   mpred_get_trigger_quick(ABOX,basePFC:bt(ABOX,P,Trigger)),
   no_repeats(mpred_get_support(basePFC:bt(ABOX,P,Trigger),S)),
   once(no_side_effects(P)),
   w_tl(t_l:infBackChainPrevented(F/A),mpred_eval_lhs(Trigger,S)).
 
-mpred_call_with_no_triggers(F) :- 
+mpred_call_with_no_triggers(MF) :-  strip_module(MF,_,F),
   %= this (is_ftVar(F)) is probably not advisable due to extreme inefficiency.
   (is_ftVar(F)    ->  mpred_facts_and_universe(F) ; mpred_call_with_no_triggers_bound(F)).
 
 mpred_call_with_no_triggers_bound(F):- mpred_call_with_no_triggers_uncaugth(F).
 
-mpred_call_with_no_triggers_uncaugth(F) :- 
+mpred_call_with_no_triggers_uncaugth(MF) :-  strip_module(MF,_,F),
   show_failure(mpred_call_with_no_triggers_bound,no_side_effects(F)),
   (\+ current_predicate(_,F) -> fail;call_prologsys(F)).
   %= we check for system predicates as well.
@@ -2524,7 +2529,7 @@ mpred_literal(X) :- is_ftVar(X),!.
 
 is_reprop(X):- compound(X),is_reprop_0(X).
 is_reprop_0(~(X)):-!,is_reprop(X).
-is_reprop_0(X):-functor(X,repropagate,_).
+is_reprop_0(X):-get_functor(X,repropagate,_).
 
 mpred_non_neg_literal(X):-is_reprop(X),!,fail.
 mpred_non_neg_literal(X):-atom(X),!.
@@ -2533,7 +2538,7 @@ mpred_non_neg_literal(X):- sanity(stack_check),
 
 mpred_non_neg_literal(X):-is_reprop(X),!,fail.
 mpred_positive_literal(X) :- is_ftNonvar(X),
-  functor(X,F,_),
+  get_functor(X,F,_),
   \+ mpred_connective(F).
 
 mpred_connective(';').
@@ -2934,14 +2939,15 @@ clause_or_call(H,true):- req(should_call_for_facts(H)),no_repeats(on_x_log_throw
 
 % as opposed to simply using clause(H,true).
 should_call_for_facts(H):- get_functor(H,F,A),with_umt(should_call_for_facts(H,F,A)).
-should_call_for_facts(_,F,_):- prologSideEffects(F),!,fail.
-should_call_for_facts(H,_,_):- \+ predicate_property(H,number_of_clauses(_)),!.
-should_call_for_facts(_,F,A):- mpred_mark(pfcRHS,_,F,A),!,fail.
-should_call_for_facts(_,F,A):- mpred_mark(pfcMustFC,_,F,A),!,fail.
-should_call_for_facts(_,F,_):- prologDynamic(F),!.
-should_call_for_facts(_,F,_):- \+ pfcControlled(F),!.
+should_call_for_facts(_,F,_):- a(prologSideEffects,F),!,fail.
+should_call_for_facts(H,_,_):- modulize_head(H,HH), \+ predicate_property(HH,number_of_clauses(_)),!.
+should_call_for_facts(_,F,A):- clause_true(mpred_mark(pfcRHS,_,F,A)),!,fail.
+should_call_for_facts(_,F,A):- clause_true(mpred_mark(pfcMustFC,_,F,A)),!,fail.
+should_call_for_facts(_,F,_):- a(prologDynamic,F),!.
+should_call_for_facts(_,F,_):- \+ a(pfcControlled,F),!.
 
-no_side_effects(S):- get_functor(S,F), (req(prologSideEffects(F))-> (\+ is_side_effect_disabled);true).
+
+no_side_effects(P):-  (\+ is_side_effect_disabled->true;(get_functor(P,F,_),a(prologSideEffects,F))).
 
 is_disabled_clause(C):-req(is_edited_clause(C,_,New)),memberchk((disabled),New).
 
@@ -3300,8 +3306,8 @@ nonfact_metawrapper(added(_)).
 % we use the arity 1 forms is why 
 nonfact_metawrapper(term_expansion(_,_)).
 nonfact_metawrapper(P):- \+ current_predicate(_,P).
-nonfact_metawrapper(P):- functor(P,F,_), 
-   (req(prologSideEffects(F));req(tNotForUnboundPredicates(F))).
+nonfact_metawrapper(P):- get_functor(P,F,_), 
+   (a(prologSideEffects,F);a(tNotForUnboundPredicates,F)).
 nonfact_metawrapper(P):-rewritten_metawrapper(P).
 
 rewritten_metawrapper(_):-!,fail.
@@ -3324,9 +3330,10 @@ pred_u1(P):-a(pfcControlled,F),arity(F,A),functor(P,F,A).
 pred_u1(P):-a(prologHybrid,F),arity(F,A),functor(P,F,A).
 pred_u1(P):-a(prologDynamic,F),arity(F,A),functor(P,F,A).
 pred_u2(P):-support_hilog(F,A),functor(P,F,A),has_db_clauses(P).
-pred_u2(P):-clause(arity(F,A),true),functor(P,F,A),has_db_clauses(P).
+pred_u2(P):-clause_true(arity(F,A)),functor(P,F,A),has_db_clauses(P).
 
-has_db_clauses(P):- predicate_property(P,number_of_clauses(NC)),\+ predicate_property(P,number_of_rules(NC)), \+ \+ clause(P,true).
+
+has_db_clauses(PI):-modulize_head(PI,P),predicate_property(P,number_of_clauses(NC)),\+ predicate_property(P,number_of_rules(NC)), \+ \+ clause(P,true).
 
 pred_t0(P):- get_user_abox_ignore(ABOX),pred_t0(ABOX,P).
 pred_t0(P):- mreq('nesc'(P)).
