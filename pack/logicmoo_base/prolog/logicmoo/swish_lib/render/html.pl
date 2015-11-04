@@ -1,4 +1,4 @@
-/** <module> swish_render_html
+/* <module> swish_render_html
 % Provides HTML Rendering in SWISH
 %
 %
@@ -16,7 +16,7 @@
 
 :- register_renderer(html, "Render html representations").
 
-/** <module> SWISH html renderer
+/* <module> SWISH html renderer
 
 */
 

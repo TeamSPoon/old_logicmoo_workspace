@@ -830,12 +830,12 @@ set_user_tbox(M,SM):-
 
 
 decl_user_abox(M):-     sanity(atom(M)),
-                        asserta_if_new(mpred_loader:is_box_module(T,abox)),
+                        asserta_if_new(mpred_loader:is_box_module(M,abox)),
                         to_tbox(M,T),
                         asserta_if_new(mpred_loader:is_box_module(T,tbox)),
                         ensure_tbox_module(T),
                         to_sbox(M,S),
-                        asserta_if_new(mpred_loader:is_box_module(T,sbox)),!.
+                        asserta_if_new(mpred_loader:is_box_module(S,sbox)),!.
                         
                         
 
@@ -1005,9 +1005,9 @@ best_module(List,ABox):-member(ABox,List),ABox\==user,not_boot_module(ABox),!.
 best_module(_List,baseKB):-!.
 
 file_begin(W):-
-  must_det((
-            '$module'(CM,CM),
-            '$set_source_module'(SM,SM),
+ must_det_l((
+   '$module'(CM,CM),
+   '$set_source_module'(SM,SM),
    onEndOfFile(module(CM)),
    onEndOfFile('$set_source_module'(_,SM)),
    onEndOfFile('$module'(_,CM)),
@@ -1015,11 +1015,11 @@ file_begin(W):-
    make_module_name(Source,FM),
    context_module_of_file(M),
    (t_l:user_abox(AM)->true;AM=SM),
-   best_module([AM,SM,CM,FM,M],ABox),   
-   set_user_abox(ABox),
+   best_module([AM,SM,CM,FM,M],ABox),
+   dmsg(best_module(W-[AM,SM,CM,FM,M],ABox)),
+   must(set_user_abox(ABox)),
    set_current_module(ABox),
    ABox:mpred_ops,
-   dmsg(best_module(W-[AM,SM,CM,FM,M],ABox)),
    op_lang(W),   
    assert_until_eof(lmcache:mpred_directive_value(W,file,Source)),
    decache_file_type(Source),

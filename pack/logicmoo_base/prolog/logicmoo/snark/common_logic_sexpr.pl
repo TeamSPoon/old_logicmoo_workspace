@@ -29,7 +29,7 @@ fixvars(P,N,[V|VARS],PO):-
    %  nb_getval('$variable_names', Vs),
   %   append(Vs,[Name=Var],NVs),
   %   nb_setval('$variable_names', NVs),
-     N2 is N + 1,fixvars(PM,N2,VARS,PO).
+     N2 is N + 1, fixvars(PM,N2,VARS,PO).
 
 
 clip_us(A,AO):-concat_atom(L,'-',A),concat_atom(L,'_',AO).

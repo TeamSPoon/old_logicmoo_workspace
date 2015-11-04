@@ -1757,9 +1757,11 @@ user:message_hook(Term, Kind, Lines):- (Kind= warning;Kind= error),Term\=syntax_
 
 :- export(logicmoo_bugger_loaded/0).
 
+logicmoo_bugger_loaded.
+
+:- source_location(S,_),prolog_load_context(module,M),forall(source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A),M:export(M:F/A))).
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),logicmoo_util_bugger:export(logicmoo_util_bugger:F/A),logicmoo_util_bugger:module_transparent(logicmoo_util_bugger:F/A))).
 
-logicmoo_bugger_loaded.
 
 %:- all_module_predicates_are_transparent.
 %:- module_predicates_are_exported.

@@ -20,8 +20,7 @@ paina/1,pain/1,            painz/1,
             modulize_head/2,
             clause_asserted/1,
             clause_asserted/2,
-            clause_asserted/3,
-            clause_eq/3,
+            clause_asserted/3,   
             clause_safe/2,
             debugCallWhy/2,
             erase_safe/2,
@@ -70,7 +69,7 @@ paina/1,pain/1,            painz/1,
         my_module_sensitive_code/1,
         assertz_new/1,
         call_provider/2,
-        clause_eq/3,
+        clause_asserted/3,
         erase_safe/2,
         find_and_call/1,
         lmconf:first_lmconf:mpred_provider/3,
@@ -135,15 +134,15 @@ find_and_call(_:G):-current_predicate(_,R:G),!,on_x_rtrace(R:G).
 find_and_call(G):-current_predicate(_,G),!,on_x_rtrace(G).
 find_and_call(G):-current_predicate(_,R:G),!,on_x_rtrace(R:G).
 
-ain0(N):-clause_asserted(N)->true;mpred_op_prolog(assert,N).
+ain0(N):-notrace(clause_asserted(N))->true;mpred_op_prolog(assert,N).
 
 :- export(mpred_op_prolog/2).
 :- module_transparent(mpred_op_prolog/2).
 :- meta_predicate mpred_op_prolog(?,:).
-mpred_op_prolog(ain0,N):- !,(clause_asserted(N)->true;mpred_op_prolog0(assert,N)).
-mpred_op_prolog(paina,N):-!,(clause_asserted(N)->true;mpred_op_prolog0(asserta,N)).
-mpred_op_prolog(painz,N):-!,(clause_asserted(N)->true;mpred_op_prolog0(assertz,N)).
-mpred_op_prolog(pain,N):- !,(clause_asserted(N)->true;mpred_op_prolog0(assert,N)).
+mpred_op_prolog(ain0,N):- !,(notrace(clause_asserted(N))->true;mpred_op_prolog0(assert,N)).
+mpred_op_prolog(paina,N):-!,(notrace(clause_asserted(N))->true;mpred_op_prolog0(asserta,N)).
+mpred_op_prolog(painz,N):-!,(notrace(clause_asserted(N))->true;mpred_op_prolog0(assertz,N)).
+mpred_op_prolog(pain,N):- !,(notrace(clause_asserted(N))->true;mpred_op_prolog0(assert,N)).
 mpred_op_prolog(aina,N):- !,(clause_asserted(N)->true;mpred_op_prolog0(asserta,N)).
 mpred_op_prolog(ainz,N):- !,(clause_asserted(N)->true;mpred_op_prolog0(assertz,N)).
 mpred_op_prolog(ain,N):-  !,(clause_asserted(N)->true;mpred_op_prolog0(assert,N)).
@@ -234,20 +233,12 @@ clause_asserted(C):- as_clause(C,H,B),clause_asserted(H,B).
 
 :-export(clause_asserted/2).
 :-meta_predicate(clause_asserted(:,?)).
-clause_asserted(H,B):-clause_asserted(H,B,_).
+clause_asserted(H,B):-clause_asserted(H,B,_),!.
 
 :-export(clause_asserted/3).
-% clause_asserted(H,B,Ref):- predicate_property(H,number_of_clauses(N))-> N>0   -> (clause(H, B, Ref), clause(Head, Body, Ref),  (B =@= Body), (H =@= Head)),!.
 :-meta_predicate(clause_asserted(:,?,-)).
-clause_asserted(H,B,Ref):-clause_eq(H,B,Ref).
+clause_asserted(M:H,B,R):- clause(M:H,B,R),clause(M:CH,CB,R),(CH:-CB)=@=(H:-B).
 
-:-meta_predicate(clause_true(?)).
-
-clause_true(M:G):-!,clause(M:G,true)*->true;(current_module(M),clause(M:G,true)).
-clause_true(G):-!, (current_module(M),clause(M:G,true)).
-clause_true(M:G):-predicate_property(M:G,number_of_clauses(_)),!,clause(M:G,true).
-clause_true(_:G):-!,predicate_property(M:G,number_of_clauses(_)),clause(M:G,true).
-clause_true(G):-!,predicate_property(M:G,number_of_clauses(_)),clause(M:G,true).
 
 :-meta_predicate(modulize_head(?,?)).
 
@@ -256,14 +247,17 @@ modulize_head(R:G,M:G):- !, (M=R; (current_predicate(_,M:G),M\==R)),\+ predicate
 modulize_head(G,O:G):- !, no_repeats_old(O,(current_module(M),'$get_predicate_attribute'(M:G, imported, O))).
 modulize_head(G,M:G):- current_predicate(_,M:G),\+ predicate_property(M:G,imported_from(_)).
 
-:-export(clause_eq/3).
-%clause_eq(H,B,R):-clause(H,B,R),clause(RH,RB,R),term_variables(RH:RB,RVs),term_variables(H:B,Vs).
-clause_eq(H,B,R):- predicate_property(H,number_of_clauses(N)),!,N>0,copy_term(H:B,CHB),clause(H,B,R),CHB=@=H:B.
-clause_eq(C:H0,B,R):- current_predicate(_,M:H0),H=M:H0,predicate_property(H,number_of_clauses(N)),N>0,!,copy_term(H:B,CHB),C:clause(H,B,R),CHB=@=H:B.
 
+:-meta_predicate(clause_true(?)).
+
+clause_true(M:G):-!,clause(M:G,true)*->true;(current_module(M2),clause(M2:G,true)).
+clause_true(G):-!, (current_module(M),clause(M:G,true)).
+clause_true(M:G):-predicate_property(M:G,number_of_clauses(_)),!,clause(M:G,true).
+clause_true(_:G):-!,predicate_property(M:G,number_of_clauses(_)),clause(M:G,true).
+clause_true(G):-!,predicate_property(M:G,number_of_clauses(_)),clause(M:G,true).
 
 :-export(retract_eq/1).
-retract_eq(HB):-as_clause(HB,H,B),show_failure(why,predicate_property(H,number_of_clauses(_))),clause_asserted(H,B,Ref),erase(Ref).
+retract_eq(HB):-as_clause(HB,H,B),show_failure(modulize_head(H,MH)),clause_asserted(MH,B,Ref),erase(Ref).
 
 
 :-export(safe_univ/2).
@@ -310,4 +304,5 @@ erase_safe_now(M,clause(A,B),REF):-!,
        erase(REF)).
 */
 
+:- source_location(S,_),prolog_load_context(module,M),doall((source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A),M:export(M:F/A)))).
 

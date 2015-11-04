@@ -752,11 +752,12 @@ sanity(Goal):- ignore(must(show_failure(why,Goal))).
 
 
 :- export(is_release/0).
-is_release:- !.
+is_release:- !,fail.
 is_release :- \+ not_is_release.
 :- export(not_is_release/0).
-not_is_release:- !,fail.
-not_is_release :- 1 is random(4).
+not_is_release:- 1 is random(4).
+not_is_release:- \+ is_release.
+
 
 
 :- thread_local tlbugger:show_must_go_on/0.
@@ -783,13 +784,12 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 %must(Call):-(repeat, (catchv(Call,E,(dmsg(E:Call),debug,fail)) *-> true ; (ignore(ftrace(Call)),leash(+all),repeat,wdmsg(failed(Call)),trace,Call)),!).
 must(Goal):- notrace(get_must(Goal,MGoal)),!,MGoal.
 
-get_must(Goal,Goal):-  is_release,!.
-get_must(Goal,CGoal):-  tlbugger:skipMust,!,CGoal = Goal.
-get_must(Goal,CGoal):- skipWrapper,!,trace, CGoal = (Goal *-> true ; ((ddmsg(failed_FFFFFFF(must(Goal))),dumpST,trace,Goal))).
+get_must(Goal,CGoal):-  (is_release;tlbugger:skipMust),!,CGoal = Goal.
+get_must(Goal,CGoal):- skipWrapper,!, CGoal = (Goal *-> true ; ((ddmsg(failed_FFFFFFF(must(Goal))),dumpST,trace,Goal))).
 get_must(Goal,CGoal):- tlbugger:show_must_go_on,!,
  CGoal = ((catchv(Goal,E,
      notrace(((dumpST,ddmsg(error,sHOW_MUST_go_on_xI__xI__xI__xI__xI_(E,Goal))),badfood(Goal))))
-            *-> true ; notrace((dumpST,ddmsg(error,sHOW_MUST_go_on_failed_F__A__I__L_(Goal)),badfood(Goal))))).
+            *-> true ; notrace((dumpST,wdmsg(error,sHOW_MUST_go_on_failed_F__A__I__L_(Goal)),badfood(Goal))))).
 
 get_must(Goal,CGoal):- !, (CGoal = (on_x_rtrace(Goal) *-> true; debugCallWhy(failed(on_f_debug(Goal)),Goal))).
 get_must(Goal,CGoal):- !, CGoal = (catchv(Goal,E,(notrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),trace,!,throw(E))) *-> true ; ((ddmsg(failed(must(Goal))),trace,Goal))).
@@ -801,4 +801,6 @@ get_must(Goal,CGoal):-
 
 :- 'mpred_trace_none'(ddmsg(_)).
 :- 'mpred_trace_none'(ddmsg(_,_)).
+
+:- source_location(S,_),prolog_load_context(module,M),forall(source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A),M:export(M:F/A))).
 

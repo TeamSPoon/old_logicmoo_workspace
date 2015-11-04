@@ -7,7 +7,8 @@ pfcControlled(if_missing(ftAskable,ftAssertable)).
 
 % this should have been ok
 % (if_missing(Missing,Create) ==> ((\+ Missing/(Missing\==Create), \+ Create , \+ ~(Create)) ==> Create)).
-(if_missing(Missing,Create) ==> ((\+ Missing/(Missing\==Create) ) ==> Create)).
+if_missing(Missing,Create) ==> 
+ ( ( \+ (Missing/(Missing\=@=Create))) ==> Create).
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 

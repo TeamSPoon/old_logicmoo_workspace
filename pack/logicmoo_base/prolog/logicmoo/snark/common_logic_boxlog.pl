@@ -71,6 +71,7 @@ Per-Litteral features
             did_use_hack/1,
             get_op_alias_compile/2,
             get_reln/2,
+            head_for_skolem/3,
             is_unit/2,
             is_unit/0,
             is_unit/3,
@@ -80,6 +81,8 @@ Per-Litteral features
             make_must_ground/3,
             make_vg/4,
             overlaping/3,
+            isk/2,
+            isk_bind/3,
             overlapingFunctors/2,
             reduce_literal/2,
             set_clause_compile/1,
@@ -157,7 +160,6 @@ boxlog_to_compile((:-),H,H):-  !.
 
 :- op(1100,fx,(shared_multifile)).
 
-
 boxlog_to_compile(fwc,(not(H):-B),unused_true((not(H):-B))):- nonvar(H),H = skolem(_,_),!.
 boxlog_to_compile(fwc,(not(H):-B),OUT):- term_slots(H,HV),term_slots(B,BV), HV\==BV,!,boxlog_to_compile(bwc,(not(H):-B),OUT).
 boxlog_to_compile(fwc,(not(H):-B),(BBB==>HH)):- body_for_pfc(fwc,~(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
@@ -167,7 +169,7 @@ boxlog_to_compile(fwc,H,H):-  !.
 
 boxlog_to_compile(bwc,(not(H):-B),unused_true((not(H):-B))):- nonvar(H),H = skolem(_,_),!.
 boxlog_to_compile(bwc,(not(H):-B),(HH<-BBB)):-body_for_pfc(<-,~(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
-boxlog_to_compile(bwc,(H:-B),OUT):- a(pfcRHS,H),term_slots(H,HV),term_slots(B,BV), HV==BV,boxlog_to_compile((fwc),(H:-B),OUT),!.
+boxlog_to_compile(bwc,(H:-B),OUT):- a(pfcRHS,H),term_slots(H,HV),term_slots(B,BV),HV==BV,boxlog_to_compile((fwc),(H:-B),OUT),!.
 boxlog_to_compile(bwc,(H:-B),(HH<-BBB)):- body_for_pfc(<-,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
 boxlog_to_compile(bwc,not(H),~(H)):-  !.
 boxlog_to_compile(bwc,H,H):-  !.
@@ -226,15 +228,26 @@ get_reln(C,RO):-get_functor(C,F),
 
 avoidHeadLoop(C,Head):- stack_check, ground(C),(C\=Head),\+ is_loop_checked(C).
 
+
+isk(Var,SK):- ignore((=(Var,SK))),!.
+isk(Var,SK):- when('?='(Var,Val),isk_bind(Var,Val,SK)).
+isk_bind(Var,Val,SK):-show_call(dom(Var,[Val,SK])).
+
+% Like this one better but it breaks things
+% head_for_skolem(H,if_missing(H,pfclog((HH:-isk(NewOut,SK)))),skolem(In,SK)):-contains_var(In,H),subst(H,In,NewOut,HH),!.
+% 
+% ugly but works
+head_for_skolem(H,if_missing(H,HH),skolem(In,NewOut)):- contains_var(In,H),subst(H,In,NewOut,HH),!.
+
+
 body_for_mpred_2(_Mode,Head,Head,A,A):-is_ftVar(A).
 body_for_mpred_2(Mode,Head,HeadO,(A,B), C):-!,body_for_mpred_1(Mode,Head,HeadM,A,AA),body_for_pfc(Mode,HeadM,HeadO,B,BB),conjoin_body(AA,BB,C).
 body_for_mpred_2(Mode,Head,HeadO,(A;B),(AA;BB)):-!,body_for_mpred_1(Mode,Head,HeadM,A,AA),body_for_pfc(Mode,HeadM,HeadO,B,BB).
 body_for_mpred_2((:-),Head,HeadO,(A/B),(AA,BB)):-!,body_for_mpred_1(Mode,Head,HeadM,A,AA),body_for_pfc(Mode,HeadM,HeadO,B,BB).
 body_for_mpred_2(Mode,Head,HeadO,(A/B),(AA/BB)):-!,body_for_mpred_1(Mode,Head,HeadM,A,AA),body_for_pfc(Mode,HeadM,HeadO,B,BB).
 
-
-body_for_mpred_2((fwc),H,(if_missing(H,HH)),{skolem(In,Out)},true):-contains_var(In,H),subst(H,In,Out,HH),!.
-body_for_mpred_2((fwc),H,(if_missing(H,HH)),skolem(In,Out),true):-contains_var(In,H),subst(H,In,Out,HH),!.
+body_for_mpred_2((fwc),H,HEAD,{skolem(In,NewOut)},true):- head_for_skolem(H,HEAD,skolem(In,NewOut)),!.
+body_for_mpred_2((fwc),H,HEAD,skolem(In,NewOut),true):- head_for_skolem(H,HEAD,skolem(In,NewOut)).
 body_for_mpred_2(_Mode,~(Head),~(Head),skolem(_,_),true).
 %body_for_mpred_2(Mode,H,H,skolem(_,_),true).
 body_for_mpred_2(_Mode,Head,Head,skolem(In,Out),{ignore(In=Out)}).

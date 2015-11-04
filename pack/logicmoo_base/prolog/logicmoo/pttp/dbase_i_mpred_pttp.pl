@@ -1,4 +1,4 @@
-/** <module> mpred_pttp
+/* <module> mpred_pttp
 % Provides a prolog database replacent that uses PTTP
 %
 %  wid/3

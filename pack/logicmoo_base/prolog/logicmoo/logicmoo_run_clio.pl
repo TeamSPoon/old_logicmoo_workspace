@@ -1,4 +1,4 @@
-/** <module> mpred_www
+/* <module> mpred_www
 % Provides /logicmoo runtime preds browsing
 %
 %

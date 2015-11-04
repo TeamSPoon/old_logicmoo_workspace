@@ -1,4 +1,4 @@
-/** <module> mpred_stubs.
+/* <module> mpred_stubs.
 % Provides a prolog dabase in these predicates...
 %
 %  Manages the hybrid_tPredStubImpl/1 in various files

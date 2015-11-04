@@ -1,4 +1,4 @@
-/** <module>
+/* <module>
 % =============================================
 % File 'autoexec.pfc'
 % Purpose: Agent Reactivity for SWI-Prolog

@@ -766,6 +766,6 @@ lmconf:module_local_init:-ain(tCol(ttPredType)).
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
-:- lmconf:module_local_init.
+:- doall((lmconf:module_local_init)).
 
 

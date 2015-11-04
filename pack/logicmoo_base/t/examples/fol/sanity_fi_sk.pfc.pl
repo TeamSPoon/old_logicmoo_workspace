@@ -2,7 +2,6 @@
 
 :- module(sanity_fi,[]).
 
-
 :-
  op(1199,fx,('==>')), 
  op(1190,xfx,('::::')),
@@ -23,14 +22,10 @@ show_test(G):- cwc, get_user_abox(KB),printAll(must(KB:G)).
 
 :- op(1100,fx,(shared_multifile)).
 
-% :- include('test_header.pfc').
 :- use_module(library(logicmoo/logicmoo_user)).
 
-:- set_user_abox(baseKB).
 %=  setup pfc
-:- set_current_module(baseKB).
 :- begin_pfc.
-:- sanity(get_user_abox(baseKB)).
 
 :- process_this_script.
 

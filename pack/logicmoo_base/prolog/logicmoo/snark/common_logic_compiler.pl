@@ -1,4 +1,4 @@
-/** <module> mpred_clausify
+/* <module> mpred_clausify
 % Provides a prolog database replacement that uses an interpretation of KIF
 %
 %  t/N

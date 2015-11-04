@@ -248,7 +248,7 @@ source_to_txt(S,Out,Opts):-
 
 :- thread_local nohtml/0.
 
-/** <module> HTML source pretty-printer
+/* <module> HTML source pretty-printer
 
 This module colourises Prolog  source  using   HTML+CSS  using  the same
 cross-reference based technology as used by PceEmacs.

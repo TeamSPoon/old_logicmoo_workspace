@@ -1,4 +1,4 @@
-/** <module>
+/* <module>
 % =============================================
 % File 'mpred_system.pfc'
 % Purpose: Agent Reactivity for SWI-Prolog
@@ -589,7 +589,8 @@ isa('CycLTerm',ttNonGenled).
 ==>prologHybrid(quotedIsa(ftTerm,ttFormatType)).
 :- kb_dynamic(quotedIsa/2).
 
-isa(I,C):- cwc, mpred_univ(C,I,CI),atom(C),current_predicate(C,M:CI)->call(M:CI).
+isa(I,C):- cwc, mpred_univ(C,I,CI),atom(C),(current_predicate(C,M:CI),\+ predicate_property(M:CI,imported_form(_))), req(call(M:CI)).
+isa(I,C):- isa_backchaing(I,C).
 isa(I,C):- cwc, is_asserted(ttFormatType(C)),!, quotedIsa(I,C).
 quotedIsa(I,C):- cwc, term_is_ft(I,C).
 dif_in_arg(P,N,Q):- cwc, ground(P),P=..[F|ARGS],arg(N,P,B),Q=..[F|ARGS],nb_setarg(N,Q,A),dif(A,B).

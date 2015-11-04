@@ -1,4 +1,4 @@
-/** <module> Adds autoloading of LogicMOO Utilities predicates
+/* <module> Adds autoloading of LogicMOO Utilities predicates
 % ===================================================================
     File:         'logicmoo_utils).'
     Purpose:       To load the logicmoo libraries as needed

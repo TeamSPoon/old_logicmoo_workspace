@@ -1,4 +1,4 @@
-/** <module> mpred_www
+/* <module> mpred_www
 % Provides /logicmoo runtime preds browsing
 %
 %
@@ -7,7 +7,7 @@
 % Dec 13, 2035
 %
 */
-% :-module(mpred_www,[ensure_mpred_webserver/0,search4term/0]).
+% :-module(mpred_www,[ensure_webserver/0,search4term/0]).
 :- module(mpred_www,
           [ action_menu_applied/3,
             action_menu_item/2,
@@ -25,7 +25,7 @@
             do_guitracer/0,
             edit1term/0,
             edit1term/1,
-            ensure_mpred_webserver/1,
+            ensure_webserver/1,
             
             ensure_webserver/0,
             find_cl_ref/2,
@@ -224,9 +224,9 @@
 :- meta_predicate edit1term(0).
 
 
-ensure_mpred_webserver(Port) :- format(atom(A),'httpd@~w_1',[Port]),thread_property(_,alias(A)),!.
-ensure_mpred_webserver(Port) :- on_x_rtrace(http_server(http_dispatch,[ port(Port), workers(16) ])).
-ensure_webserver:- ensure_mpred_webserver(3020).
+ensure_webserver(Port) :- format(atom(A),'httpd@~w_1',[Port]),thread_property(_,alias(A)),!.
+ensure_webserver(Port) :- on_x_rtrace(http_server(http_dispatch,[ port(Port), workers(16) ])).
+ensure_webserver:- ensure_webserver(3020).
 
 :- multifile(http_session:session_data/2).
 :- multifile(system:'$loading_file'/3).
@@ -1888,5 +1888,5 @@ pkif :-
 
 :- prolog_load_context(source,File),forall(source_file(M:X,File),(functor(X,F,A),export(M:F/A))).
 
-% :- ensure_mpred_webserver(6767).
+% :- ensure_webserver(6767).
 

@@ -1,4 +1,4 @@
-/** <module> mpred_kif
+/* <module> mpred_kif
 % Provides a specific compilation API for KIF axioms
 %
 
@@ -242,8 +242,8 @@ clif_to_prolog(CLIF,PrologO):- cwc,
       =(Prolog,PrologO))),!.
 
 pfc_for_print(Prolog,PrintPFC):-is_list(Prolog),!,maplist(pfc_for_print,Prolog,PrintPFC).
-pfc_for_print(==>(P,if_missing(R,Q)),(Q :- (fwc, w_missing(R), P))):-!.
-pfc_for_print(if_missing(R,Q),(Q :- (fwc, w_missing(R)))):-!.
+%pfc_for_print(==>(P,if_missing(R,Q)),(Q :- (fwc, naf(R), P))):-!.
+%pfc_for_print(if_missing(R,Q),(Q :- (fwc, naf(R)))):-!.
 pfc_for_print(==>(P,Q),(Q:-fwc, P)):-!.
 pfc_for_print(Prolog,PrintPFC):- =(Prolog,PrintPFC).
 

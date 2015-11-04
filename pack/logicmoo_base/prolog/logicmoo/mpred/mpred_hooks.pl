@@ -305,7 +305,7 @@ xcall_t/7
 )).
 % :- registerCycPredPlus2([genlPreds/4,genlInverse/4,localityOfObject/4]).
 
-/** <module> mpred_mpred_t
+/* <module> mpred_mpred_t
 % Provides a prolog dabase in these predicates...
 %
 %  t/N

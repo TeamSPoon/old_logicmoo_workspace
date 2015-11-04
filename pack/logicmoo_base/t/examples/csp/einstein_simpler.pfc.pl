@@ -30,7 +30,14 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:
+/*
+
+ exists(X, lives(X, green) /\ drinks(X, coffee)).
+
+  
+
+*/
+
 % swipl -g "ensure_loaded(pack(logicmoo_base/t/examples/csp/'einstein.pfc'))."
 
 :- use_module(library(logicmoo/logicmoo_user)).

@@ -1,4 +1,4 @@
-/** <module> mpred_mpred_t
+/* <module> mpred_mpred_t
 % Provides a prolog dabase in these predicates...
 %
 %  t/N
@@ -27,7 +27,7 @@ expire_rdf_caches :- forall(clause(expire_one_rdf_cache,Body),must(Body)).
 mpred_online:semweb_startup:- retractall((tlbugger:show_must_go_on)).
 mpred_online:semweb_startup:- expire_rdf_caches.
 
-/** <module> MUD STORE
+/* <module> MUD STORE
 
 Installed to the ClioPatria SeRQL and SPARQL server
 
