@@ -221,38 +221,98 @@
 % = :- meta_predicate(with_show_dmsg(*,0)).
 
 
+
+% 	 	 
+%% with_all_dmsg( :GoalCall) is semidet.
+%
+% Using All (debug)message.
+%
 with_all_dmsg(Call):-
    w_tl(tlbugger:tl_always_show_dmsg,
      w_tl(set_prolog_flag(opt_debug,true),
        w_tl( tlbugger:dmsg_match(show,_),Call))).
 
 
+
+% 	 	 
+%% with_show_dmsg( ?TypeShown, :GoalCall) is semidet.
+%
+% Using Show (debug)message.
+%
 with_show_dmsg(TypeShown,Call):-
   w_tl(set_prolog_flag(opt_debug,filter),
      w_tl( tlbugger:dmsg_match(showing,TypeShown),Call)).
 
 % = :- meta_predicate(with_no_dmsg(0)).
+
+% 	 	 
+%% with_no_dmsg( :GoalCall) is semidet.
+%
+% Using No (debug)message.
+%
 with_no_dmsg(Call):- always_show_dmsg,!,Call.
 with_no_dmsg(Call):-w_tl(set_prolog_flag(opt_debug,false),Call).
+
+% 	 	 
+%% with_no_dmsg( ?TypeUnShown, :GoalCall) is semidet.
+%
+% Using No (debug)message.
+%
 with_no_dmsg(TypeUnShown,Call):-w_tl(set_prolog_flag(opt_debug,filter),
   w_tl( tlbugger:dmsg_match(hidden,TypeUnShown),Call)).
 
 % dmsg_hides_message(_):- !,fail.
+
+% 	 	 
+%% dmsg_hides_message( ?C) is semidet.
+%
+% (debug)message Hides Message.
+%
 dmsg_hides_message(_):- current_prolog_flag(opt_debug,false),!.
 dmsg_hides_message(_):- current_prolog_flag(opt_debug,true),!,fail.
 dmsg_hides_message(C):-  tlbugger:dmsg_match(HideShow,Matcher),matches_term(Matcher,C),!,HideShow=hidden.
 
+
+% 	 	 
+%% dmsg_hide( ?Term) is semidet.
+%
+% (debug)message Hide.
+%
 dmsg_hide(isValueMissing):-!,set_prolog_flag(opt_debug,false).
 dmsg_hide(Term):-set_prolog_flag(opt_debug,filter),must(nonvar(Term)),aina( tlbugger:dmsg_match(hidden,Term)),retractall( tlbugger:dmsg_match(showing,Term)),nodebug(Term).
+
+% 	 	 
+%% dmsg_show( ?Term) is semidet.
+%
+% (debug)message Show.
+%
 dmsg_show(isValueMissing):-!,set_prolog_flag(opt_debug,true).
 dmsg_show(Term):-set_prolog_flag(opt_debug,filter),aina( tlbugger:dmsg_match(showing,Term)),ignore(retractall( tlbugger:dmsg_match(hidden,Term))),debug(Term).
+
+% 	 	 
+%% dmsg_showall( ?Term) is semidet.
+%
+% (debug)message Showall.
+%
 dmsg_showall(Term):-ignore(retractall( tlbugger:dmsg_match(hidden,Term))).
 
+
+% 	 	 
+%% indent_e( ?X) is semidet.
+%
+% Indent E.
+%
 indent_e(0):-!.
 indent_e(X):- X > 20, XX is X-20,!,indent_e(XX).
 indent_e(X):- catchvvnt((X < 2),_,true),write(' '),!.
 indent_e(X):-XX is X -1,!,write(' '), indent_e(XX).
 
+
+% 	 	 
+%% dmsg_text_to_string_safe( ?Expr, ?Forms) is semidet.
+%
+% (debug)message Text Converted To String Safely Paying Attention To Corner Cases.
+%
 dmsg_text_to_string_safe(Expr,Forms):-on_x_fail(text_to_string(Expr,Forms)).
 
 % ===================================================================
@@ -261,22 +321,70 @@ dmsg_text_to_string_safe(Expr,Forms):-on_x_fail(text_to_string(Expr,Forms)).
 :- multifile term_to_message_string/2.
 :- dynamic term_to_message_string/2.
 
+
+% 	 	 
+%% fmt0( ?X, ?Y, ?Z) is semidet.
+%
+% Format Primary Helper.
+%
 fmt0(user_error,F,A):-!,current_main_error_stream(Err),!,format(Err,F,A).
 fmt0(current_error,F,A):-!,thread_current_error_stream(Err),!,format(Err,F,A).
 fmt0(X,Y,Z):-catchvvnt((format(X,Y,Z),flush_output_safe(X)),E,dfmt(E:format(X,Y))).
+
+% 	 	 
+%% fmt0( ?X, ?Y) is semidet.
+%
+% Format Primary Helper.
+%
 fmt0(X,Y):-catchvvnt((format(X,Y),flush_output_safe),E,dfmt(E:format(X,Y))).
+
+% 	 	 
+%% fmt0( ?X) is semidet.
+%
+% Format Primary Helper.
+%
 fmt0(X):- (atomic(X);is_list(X)), dmsg_text_to_string_safe(X,S),!,format('~w',[S]),!.
 fmt0(X):- (atom(X) -> catchvvnt((format(X,[]),flush_output_safe),E,dmsg(E)) ; (term_to_message_string(X,M) -> 'format'('~q~N',[M]);fmt_or_pp(X))).
+
+% 	 	 
+%% fmt( ?X) is semidet.
+%
+% Format.
+%
 fmt(X):-fresh_line,fmt_ansi(fmt0(X)).
+
+% 	 	 
+%% fmt( ?X, ?Y) is semidet.
+%
+% Format.
+%
 fmt(X,Y):- fresh_line,fmt_ansi(fmt0(X,Y)),!.
+
+% 	 	 
+%% fmt( ?X, ?Y, ?Z) is semidet.
+%
+% Format.
+%
 fmt(X,Y,Z):- fmt_ansi(fmt0(X,Y,Z)),!.
 
+
+% 	 	 
+%% fmt9( ?Msg) is semidet.
+%
+% Fmt9.
+%
 fmt9(fmt0(F,A)):-on_x_fail(fmt0(F,A)),!.
 fmt9(Msg):- if_defined_else(portray_clause_w_vars(Msg),print(Msg)).
 
 % :-reexport(library(ansi_term)).
 :- use_module(library(ansi_term)).
 
+
+% 	 	 
+%% tst_fmt is semidet.
+%
+% Tst Format.
+%
 tst_fmt:- make,
  findall(R,(clause(ansi_term:sgr_code(R, _),_),ground(R)),List),
  ignore((
@@ -291,26 +399,80 @@ tst_fmt:- make,
   ansi_term:ansi_format(C,' ~q ~n',[C]),fail)).
 
 
+
+% 	 	 
+%% fmt_ansi( :GoalCall) is semidet.
+%
+% Format Ansi.
+%
 fmt_ansi(Call):-ansicall([reset,bold,hfg(white),bg(black)],Call).
 
+
+% 	 	 
+%% fmt_portray_clause( ?X) is semidet.
+%
+% Format Portray Clause.
+%
 fmt_portray_clause(X):- renumbervars_prev(X,Y),!, portray_clause(Y).
 
+
+% 	 	 
+%% fmt_or_pp( ?X) is semidet.
+%
+% Format Or Pretty Print.
+%
 fmt_or_pp(portray((X:-Y))):-!,fmt_portray_clause((X:-Y)),!.
 fmt_or_pp(portray(X)):-!,functor_safe(X,F,A),fmt_portray_clause((pp(F,A):-X)),!.
 fmt_or_pp(X):-format('~q~N',[X]).
 
+
+% 	 	 
+%% with_output_to_console( :GoalX) is semidet.
+%
+% Using Output Converted To Console.
+%
 with_output_to_console(X):- current_main_error_stream(Err),with_output_to_stream(Err,X).
+
+% 	 	 
+%% with_output_to_main( :GoalX) is semidet.
+%
+% Using Output Converted To Main.
+%
 with_output_to_main(X):- current_main_error_stream(Err),with_output_to_stream(Err,X).
 
+
+% 	 	 
+%% dfmt( ?X) is semidet.
+%
+% Dfmt.
+%
 dfmt(X):- thread_current_error_stream(Err),with_output_to_stream(Err,fmt(X)).
+
+% 	 	 
+%% dfmt( ?X, ?Y) is semidet.
+%
+% Dfmt.
+%
 dfmt(X,Y):- thread_current_error_stream(Err), with_output_to_stream(Err,fmt(X,Y)).
 
+
+% 	 	 
+%% with_output_to_stream( ?Stream, :GoalGoal) is semidet.
+%
+% Using Output Converted To Stream.
+%
 with_output_to_stream(Stream,Goal):-
     current_output(Saved),
    setup_call_cleanup(set_output(Stream),
          Goal,
          set_output(Saved)).
 
+
+% 	 	 
+%% to_stderror( :GoalCall) is semidet.
+%
+% Converted To Stderror.
+%
 to_stderror(Call):- thread_current_error_stream(Err), with_output_to_stream(Err,Call).
 
 
@@ -321,20 +483,56 @@ to_stderror(Call):- thread_current_error_stream(Err), with_output_to_stream(Err,
 
 :- thread_local tlbugger:is_with_dmsg/1.
 
+
+% 	 	 
+%% with_dmsg( ?Functor, :GoalGoal) is semidet.
+%
+% Using (debug)message.
+%
 with_dmsg(Functor,Goal):-
    w_tl(t_l:is_with_dmsg(Functor),Goal).
 
 
 :- use_module(library(listing)).
+
+% 	 	 
+%% sformat( ?Str, ?Msg, ?Vs, ?Opts) is semidet.
+%
+% Sformat.
+%
 sformat(Str,Msg,Vs,Opts):- nonvar(Msg),functor_safe(Msg,':-',_),!,with_output_to(string(Str),portray_clause_w_vars(user_output,Msg,Vs,Opts)).
 sformat(Str,Msg,Vs,Opts):- with_output_to(chars(Codes),(current_output(CO),portray_clause_w_vars(CO,':-'(Msg),Vs,Opts))),append([_,_,_],PrintCodes,Codes),'sformat'(Str,'   ~s',[PrintCodes]),!.
 
 
+
+% 	 	 
+%% portray_clause_w_vars( ?Out, ?Msg, ?Vs, ?Options) is semidet.
+%
+% Portray Clause W Variables.
+%
 portray_clause_w_vars(Out,Msg,Vs,Options):- \+ \+ ((prolog_listing:do_portray_clause(Out,Msg,[variable_names(Vs),numbervars(true),character_escapes(true),quoted(true)|Options]))),!.
+
+% 	 	 
+%% portray_clause_w_vars( ?Msg, ?Vs, ?Options) is semidet.
+%
+% Portray Clause W Variables.
+%
 portray_clause_w_vars(Msg,Vs,Options):- portray_clause_w_vars(current_output,Msg,Vs,Options).
+
+% 	 	 
+%% portray_clause_w_vars( ?Msg, ?Options) is semidet.
+%
+% Portray Clause W Variables.
+%
 portray_clause_w_vars(Msg,Options):- source_variables_lwv(Vs),portray_clause_w_vars(current_output,Msg,Vs,Options).
 
 
+
+% 	 	 
+%% source_variables_lwv( ?AllS) is semidet.
+%
+% Source Variables Lwv.
+%
 source_variables_lwv(AllS):-
   (prolog_load_context(variable_names,Vs1);Vs1=[]),
   (nb_current('$variable_names', Vs2);Vs2=[]),
@@ -343,23 +541,66 @@ source_variables_lwv(AllS):-
   append(Vs1,Vs2,Vs12),append(Vs12,Vs3,All),!,list_to_set(All,AllS),
   nb_linkval('$variable_names', AllS).
 
+
+% 	 	 
+%% system:export( :PRED1VALUE1) is semidet.
+%
+% Hook To [system:export/1] For Module Logicmoo_util_dmsg.
+% Export.
+%
 export(portray_clause_w_vars/1).
+
+% 	 	 
+%% portray_clause_w_vars( ?Msg) is semidet.
+%
+% Portray Clause W Variables.
+%
 portray_clause_w_vars(Msg):- portray_clause_w_vars(Msg,[]),!.
 :- 'mpred_trace_none'(portray_clause_w_vars(_)).
 
+
+% 	 	 
+%% print_prepended( ?Pre, ?S) is semidet.
+%
+% Print Prepended.
+%
 print_prepended(Pre,S):-atom_concat(L,' ',S),!,print_prepended(Pre,L).
 print_prepended(Pre,S):-atom_concat(L,'\n',S),!,print_prepended(Pre,L).
 print_prepended(Pre,S):-atom_concat('\n',L,S),!,print_prepended(Pre,L).
 print_prepended(Pre,S):-atomics_to_string(L,'\n',S),print_prepended_lines(Pre,L).
+
+% 	 	 
+%% print_prepended_lines( ?VALUE1, :Term_G11003) is semidet.
+%
+% Print Prepended Lines.
+%
 print_prepended_lines(_Pre,[]):- format('~N',[]).
 print_prepended_lines(Pre,[H|T]):-format('~N~w~w',[Pre,H]),print_prepended_lines(Pre,T).
 
 
 % in_cmt(Call):- tlbugger:no_slow_io,!,format('~N/*~n',[]),call_cleanup(Call,format('~N*/~n',[])).
+
+% 	 	 
+%% in_cmt( :GoalCall) is semidet.
+%
+% In Comment.
+%
 in_cmt(Call):- call_cleanup(prepend_each_line('% ',Call),format('~N',[])).
 
+
+% 	 	 
+%% with_current_indent( :GoalCall) is semidet.
+%
+% Using Current Indent.
+%
 with_current_indent(Call):- get_indent_level(Indent), indent_to_spaces(Indent,Space),prepend_each_line(Space,Call).
 
+
+% 	 	 
+%% indent_to_spaces( :PRED3N, ?Out) is semidet.
+%
+% Indent Converted To Spaces.
+%
 indent_to_spaces(1,' '):-!.
 indent_to_spaces(0,''):-!.
 indent_to_spaces(2,'  '):-!.
@@ -367,12 +608,36 @@ indent_to_spaces(3,'   '):-!.
 indent_to_spaces(N,Out):- 1 is N rem 2,!, N1 is N-1, indent_to_spaces(N1,Spaces),atom_concat(' ',Spaces,Out).
 indent_to_spaces(N,Out):- N2 is N div 2, indent_to_spaces(N2,Spaces),atom_concat(Spaces,Spaces,Out).
 
+
+% 	 	 
+%% prepend_each_line( ?Pre, :GoalCall) is semidet.
+%
+% Prepend Each Line.
+%
 prepend_each_line(Pre,Call):-with_output_to(string(Str),Call)*->once(print_prepended(Pre,Str)).
 
 :- meta_predicate if_color_debug(0).
 :- meta_predicate if_color_debug(0,0).
+
+% 	 	 
+%% if_color_debug is semidet.
+%
+% If Color Debug.
+%
 if_color_debug:-current_prolog_flag(dmsg_color,true).
+
+% 	 	 
+%% if_color_debug( :GoalCall) is semidet.
+%
+% If Color Debug.
+%
 if_color_debug(Call):- if_color_debug(Call, true).
+
+% 	 	 
+%% if_color_debug( :GoalCall, :GoalUnColor) is semidet.
+%
+% If Color Debug.
+%
 if_color_debug(Call,UnColor):- if_color_debug->Call;UnColor.
 
 
@@ -389,31 +654,91 @@ if_color_debug(Call,UnColor):- if_color_debug->Call;UnColor.
 :- multifile(tlbugger:no_slow_io/0).
 %:- asserta(tlbugger:no_slow_io).
 
+
+% 	 	 
+%% dmsg( ?C) is semidet.
+%
+% (debug)message.
+%
 dmsg(C):- notrace((tlbugger:no_slow_io,!,writeln(dmsg(C)))).
 dmsg(V):- if_defined_else(dmsg0(V),ddmsg(V)).
 %dmsg(F,A):- notrace((tlbugger:no_slow_io,on_x_fail(format(atom(S),F,A))->writeln(dmsg(S));writeln(dmsg_fail(F,A)))),!.
+
+% 	 	 
+%% dmsg( ?F, ?A) is semidet.
+%
+% (debug)message.
+%
 dmsg(F,A):- if_defined_else(dmsg0(F,A),ddmsg(F,A)).
 
 
+
+% 	 	 
+%% dmsginfo( ?V) is semidet.
+%
+% Dmsginfo.
+%
 dmsginfo(V):-dmsg(info(V)).
+
+% 	 	 
+%% dmsg0( ?F, ?A) is semidet.
+%
+% (debug)message Primary Helper.
+%
 dmsg0(_,_):- is_hiding_dmsgs,!.
 dmsg0(F,A):- is_sgr_on_code(F),!,dmsg(ansi(F,A)).
 dmsg0(F,A):- dmsg(fmt0(F,A)).
+
+% 	 	 
+%% vdmsg( ?L, ?F) is semidet.
+%
+% Vdmsg.
+%
 vdmsg(L,F):-loggerReFmt(L,LR),loggerFmtReal(LR,F,[]).
+
+% 	 	 
+%% dmsg( ?L, ?F, ?A) is semidet.
+%
+% (debug)message.
+%
 dmsg(L,F,A):-loggerReFmt(L,LR),loggerFmtReal(LR,F,A).
 
 :- thread_local(tlbugger:in_dmsg/1).
 :- dynamic tlbugger:dmsg_hook/1.
 :- multifile tlbugger:dmsg_hook/1.
 
+
+% 	 	 
+%% dmsg0( ?V) is semidet.
+%
+% (debug)message Primary Helper.
+%
 dmsg0(V):-notrace(ignore(dmsg00(V))).
+
+% 	 	 
+%% dmsg00( ?V) is semidet.
+%
+% (debug)message Primary Helper Primary Helper.
+%
 dmsg00(V):-simplify_goal_printed(V,VV),dmsg000(VV),!.
+
+% 	 	 
+%% dmsg000( ?V) is semidet.
+%
+% (debug)message Primary Helper Primary Helper Primary Helper.
+%
 dmsg000(V):-
    notrace(make_key(V,K)),
    (tlbugger:in_dmsg(K)-> dmsg5(V);  % format_to_error('~N% ~q~n',[dmsg0(V)]) ;
       asserta(tlbugger:in_dmsg(K),Ref),call_cleanup(dmsg1(V),erase(Ref))).
 
 % = :- export(dmsg1/1).
+
+% 	 	 
+%% dmsg1( ?V) is semidet.
+%
+% (debug)message Secondary Helper.
+%
 dmsg1(V):- tlbugger:is_with_dmsg(FP),!,FP=..FPL,append(FPL,[V],VVL),VV=..VVL,once(dmsg1(VV)).
 dmsg1(_):- \+ always_show_dmsg, is_hiding_dmsgs,!.
 dmsg1(V):- var(V),!,dmsg1(warn(dmsg_var(V))).
@@ -422,6 +747,12 @@ dmsg1(NC):- tlbugger:skipDMsg,!,loop_check_early(dmsg2(NC),format_to_error('~N% 
 dmsg1(V):- w_tl(tlbugger:skipDMsg,((once(dmsg2(V)), ignore((tlbugger:dmsg_hook(V),fail))))).
 
 % = :- export(dmsg2/1).
+
+% 	 	 
+%% dmsg2( :TermNC) is semidet.
+%
+% (debug)message Extended Helper.
+%
 dmsg2(NC):- cyclic_term(NC),!,format_to_error('~N% ~q~n',[dmsg_cyclic_term_2]).
 dmsg2(skip_dmsg(_)):-!.
 %dmsg2(C):- \+ always_show_dmsg, dmsg_hides_message(C),!.
@@ -433,6 +764,12 @@ dmsg2(ansi(Ctrl,Msg)):- !, ansicall(Ctrl,dmsg3(Msg)).
 dmsg2(color(Ctrl,Msg)):- !, ansicall(Ctrl,dmsg3(Msg)).
 dmsg2(Msg):- mesg_color(Msg,Ctrl),ansicall(Ctrl,dmsg3(Msg)).
 
+
+% 	 	 
+%% dmsg3( ?C) is semidet.
+%
+% Dmsg3.
+%
 dmsg3(C):- tlbugger:no_slow_io,!,writeln(dmsg3(C)).
 dmsg3(C):-
   ((functor_safe(C,Topic,_),debugging(Topic,_True_or_False),logger_property(Topic,once,true),!,
@@ -440,14 +777,38 @@ dmsg3(C):-
 
 dmsg3(C):-dmsg4(C),!.
 
+
+% 	 	 
+%% dmsg4( ?Msg) is semidet.
+%
+% Dmsg4.
+%
 dmsg4(_):- notrace(show_source_location),fail.
 % dmsg4(C):- not(ground(C)),copy_term(C,Stuff), snumbervars(Stuff),!,dmsg5(Stuff).
 dmsg4(Msg):-dmsg5(Msg).
 
+
+% 	 	 
+%% dmsg5( ?Msg) is semidet.
+%
+% Dmsg5.
+%
 dmsg5(Msg):- to_stderror(in_cmt(fmt9(Msg))).
+
+% 	 	 
+%% dmsg5( ?Msg, ?Args) is semidet.
+%
+% Dmsg5.
+%
 dmsg5(Msg,Args):- dmsg5(fmt0(Msg,Args)).
 
 
+
+% 	 	 
+%% get_indent_level( :PRED2Max) is semidet.
+%
+% Get Indent Level.
+%
 get_indent_level(Max) :- if_prolog(swi,((prolog_current_frame(Frame),prolog_frame_attribute(Frame,level,FD)))),Depth is FD div 5,Max is min(Depth,40),!.
 get_indent_level(2):-!.
 
@@ -490,23 +851,65 @@ ansifmt(Stream, _Attr, Format, Args) :- 'format'(Stream, Format, Args).
 :- use_module(library(ansi_term)).
 
 % = :- export(ansifmt/2).
+
+% 	 	 
+%% ansifmt( ?Ctrl, ?Fmt) is semidet.
+%
+% Ansifmt.
+%
 ansifmt(Ctrl,Fmt):- colormsg(Ctrl,Fmt).
 % = :- export(ansifmt/3).
+
+% 	 	 
+%% ansifmt( ?Ctrl, ?F, ?A) is semidet.
+%
+% Ansifmt.
+%
 ansifmt(Ctrl,F,A):- colormsg(Ctrl,(format(F,A))).
 
 
+
+% 	 	 
+%% debugm( ?X) is semidet.
+%
+% Debugm.
+%
 debugm(X):-get_functor(X,F),debugm(F,X).
+
+% 	 	 
+%% debugm( ?Why, ?Msg) is semidet.
+%
+% Debugm.
+%
 debugm(Why,Msg):- \+ debugging(mpred), \+ debugging(Why), \+ debugging(mpred(Why)),!, debug(Why,'~N~p~n',[Msg]).
 debugm(Why,Msg):- dmsg(Why:Msg),!,debug(Why,'~N~p~n',[Msg]).
 
 
 % = :- export(colormsg/2).
+
+% 	 	 
+%% colormsg( ?Ctrl, ?Msg) is semidet.
+%
+% Colormsg.
+%
 colormsg(d,Msg):- mesg_color(Msg,Ctrl),!,colormsg(Ctrl,Msg).
 colormsg(Ctrl,Msg):- ansicall(Ctrl,fmt0(Msg)).
 
 % = :- export(ansicall/2).
+
+% 	 	 
+%% ansicall( ?Ctrl, :GoalCall) is semidet.
+%
+% Ansicall.
+%
 ansicall(Ctrl,Call):- hotrace((current_output(Out), ansicall(Out,Ctrl,Call))).
 
+
+% 	 	 
+%% ansi_control_conv( ?Ctrl, ?CtrlO) is semidet.
+%
+% Ansi Control Conv.
+%
 ansi_control_conv(Ctrl,CtrlO):-tlbugger:no_slow_io,!,flatten([Ctrl],CtrlO),!.
 ansi_control_conv([],[]):-!.
 ansi_control_conv([H|T],HT):-!,ansi_control_conv(H,HH),!,ansi_control_conv(T,TT),!,flatten([HH,TT],HT),!.
@@ -516,8 +919,20 @@ ansi_control_conv(Color,Ctrl):- ansi_term:ansi_color(Color,_),!,ansi_control_con
 ansi_control_conv(Ctrl,CtrlO):-flatten([Ctrl],CtrlO),!.
 
 
+
+% 	 	 
+%% is_tty( ?Out) is semidet.
+%
+% If Is A Tty.
+%
 is_tty(Out):- not(tlbugger:no_colors), \+ tlbugger:no_slow_io, is_stream(Out),stream_property(Out,tty(true)).
 
+
+% 	 	 
+%% ansicall( ?Out, ?UPARAM2, :GoalCall) is semidet.
+%
+% Ansicall.
+%
 ansicall(Out,_,Call):- \+ is_tty(Out),!,Call.
 ansicall(_Out,_,Call):- tlbugger:skipDumpST9,!,Call.
 
@@ -529,10 +944,22 @@ ansicall(_,_,Call):- if_defined_else(in_pengines,fail),!,Call.
 ansicall(Out,Ctrl,Call):-
    retractall(tlbugger:last_used_color(_)),asserta(tlbugger:last_used_color(Ctrl)),ansicall0(Out,Ctrl,Call),!.
 
+
+% 	 	 
+%% ansicall0( ?Out, ?Ctrl, :GoalCall) is semidet.
+%
+% Ansicall Primary Helper.
+%
 ansicall0(Out,[Ctrl|Set],Call):-!, ansicall0(Out,Ctrl,ansicall0(Out,Set,Call)).
 ansicall0(_,[],Call):-!,Call.
 ansicall0(Out,Ctrl,Call):-if_color_debug(ansicall1(Out,Ctrl,Call),keep_line_pos(Out, Call)).
 
+
+% 	 	 
+%% ansicall1( ?Out, ?Ctrl, :GoalCall) is semidet.
+%
+% Ansicall Secondary Helper.
+%
 ansicall1(Out,Ctrl,Call):-
    must(sgr_code_on_off(Ctrl, OnCode, OffCode)),!,
      keep_line_pos(Out, (format(Out, '\e[~wm', [OnCode]))),
@@ -553,6 +980,13 @@ ansicall(S,Set,Call):-
 
 
 
+
+% 	 	 
+%% ansi_term:keep_line_pos( ?S, :GoalG) is semidet.
+%
+% Hook To [ansi_term:keep_line_pos/2] For Module Logicmoo_util_dmsg.
+% Keep Line Pos.
+%
 keep_line_pos(S, G) :-
        (stream_property(S, position(Pos)) ->
 	(stream_position_data(line_position, Pos, LPos),
@@ -565,11 +999,23 @@ keep_line_pos(S, G) :-
 
 %tlbugger:term_color0(retract,magenta).
 %tlbugger:term_color0(retractall,magenta).
+
+% 	 	 
+%% term_color0( ?VALUE1, ?VALUE2) is semidet.
+%
+% Term Color Primary Helper.
+%
 tlbugger:term_color0(assertz,hfg(green)).
 tlbugger:term_color0(ainz,hfg(green)).
 tlbugger:term_color0(aina,hfg(green)).
 tlbugger:term_color0(mpred_op,hfg(blue)).
 
+
+% 	 	 
+%% mesg_color( :TermT, ?C) is semidet.
+%
+% Mesg Color.
+%
 mesg_color(_,[reset]):-tlbugger:no_slow_io,!.
 mesg_color(T,C):-var(T),!,nop(dumpST),!,C=[blink(slow),fg(red),hbg(black)],!.
 mesg_color(T,C):-is_sgr_on_code(T),!,C=T.
@@ -593,12 +1039,24 @@ mesg_color(T,C):-nonvar(T),defined_message_color(F,C),matches_term(F,T),!.
 mesg_color(T,C):-functor_h0(T,F,_),!,functor_color(F,C),!.
 
 
+
+% 	 	 
+%% f_word( ?T, ?A) is semidet.
+%
+% Functor Word.
+%
 f_word("",""):-!.
 f_word(T,A):-concat_atom(List,' ',T),member(A,List),atom_length(A,L),L>0,!.
 f_word(T,A):-concat_atom(List,'_',T),member(A,List),atom_length(A,L),L>0,!.
 f_word(T,A):- string_to_atom(T,P),sub_atom(P,0,10,_,A),A\==P,!.
 f_word(T,A):- string_to_atom(T,A),!.
 
+
+% 	 	 
+%% mesg_arg1( :TermT, ?TT) is semidet.
+%
+% Mesg Argument Secondary Helper.
+%
 mesg_arg1(T,_TT):-var(T),!,fail.
 mesg_arg1(_:T,C):-nonvar(T),!,mesg_arg1(T,C).
 mesg_arg1(T,TT):-not(compound(T)),!,T=TT.
@@ -609,16 +1067,34 @@ mesg_arg1(T,C):-compound(T),arg(1,T,F),!,nonvar(F),mesg_arg1(F,C).
 % = :- export(defined_message_color/2).
 :- dynamic(defined_message_color/2).
 
+
+% 	 	 
+%% defined_message_color( ?A, ?B) is semidet.
+%
+% Defined Message Color.
+%
 defined_message_color(todo,[fg(red),bg(black),underline]).
 %defined_message_color(error,[fg(red),hbg(black),bold]).
 defined_message_color(warn,[fg(black),hbg(red),bold]).
 defined_message_color(A,B):-tlbugger:term_color0(A,B).
 
 
+
+% 	 	 
+%% predef_functor_color( ?F, ?C) is semidet.
+%
+% Predef Functor Color.
+%
 predef_functor_color(F,C):- defined_message_color(F,C),!.
 predef_functor_color(F,C):- defined_message_color(F/_,C),!.
 predef_functor_color(F,C):- tlbugger:term_color0(F,C),!.
 
+
+% 	 	 
+%% functor_color( ?F, ?C) is semidet.
+%
+% Functor Color.
+%
 functor_color(F,C):- predef_functor_color(F,C),!.
 functor_color(F,C):- next_color(C),ignore(on_x_fail(assertz(tlbugger:term_color0(F,C)))),!.
 
@@ -627,13 +1103,31 @@ functor_color(F,C):- next_color(C),ignore(on_x_fail(assertz(tlbugger:term_color0
 
 % tlbugger:last_used_color(pink).
 
+
+% 	 	 
+%% last_used_fg_color( ?LFG) is semidet.
+%
+% Last Used Fg Color.
+%
 last_used_fg_color(LFG):-tlbugger:last_used_color(LU),fg_color(LU,LFG),!.
 last_used_fg_color(default).
 
+
+% 	 	 
+%% good_next_color( ?C) is semidet.
+%
+% Good Next Color.
+%
 good_next_color(C):-var(C),!,trace_or_throw(var_good_next_color(C)),!.
 good_next_color(C):- last_used_fg_color(LFG),fg_color(C,FG),FG\=LFG,!.
 good_next_color(C):- not(unliked_ctrl(C)).
 
+
+% 	 	 
+%% unliked_ctrl( ?X) is semidet.
+%
+% Unliked Ctrl.
+%
 unliked_ctrl(fg(blue)).
 unliked_ctrl(fg(black)).
 unliked_ctrl(fg(red)).
@@ -641,11 +1135,23 @@ unliked_ctrl(bg(white)).
 unliked_ctrl(hbg(white)).
 unliked_ctrl(X):-is_list(X),member(E,X),nonvar(E),unliked_ctrl(E).
 
+
+% 	 	 
+%% fg_color( ?LU, ?FG) is semidet.
+%
+% Fg Color.
+%
 fg_color(LU,FG):-member(fg(FG),LU),FG\=white,!.
 fg_color(LU,FG):-member(hfg(FG),LU),FG\=white,!.
 fg_color(_,default).
 
 % = :- export(random_color/1).
+
+% 	 	 
+%% random_color( ?VALUE1) is semidet.
+%
+% Random Color.
+%
 random_color([reset,M,FG,BG,font(Font)]):-Font is random(8),
   findall(Cr,ansi_term:ansi_color(Cr, _),L),
   random_member(E,L),
@@ -655,15 +1161,39 @@ random_color([reset,M,FG,BG,font(Font)]):-Font is random(8),
 
 
 % = :- export(tst_color/0).
+
+% 	 	 
+%% tst_color is semidet.
+%
+% Tst Color.
+%
 tst_color:- make, ignore((( between(1,20,_),random_member(Call,[colormsg(C,cm(C)),dmsg(color(C,dm(C))),ansifmt(C,C)]),next_color(C),Call,fail))).
 % = :- export(tst_color/1).
+
+% 	 	 
+%% tst_color( ?C) is semidet.
+%
+% Tst Color.
+%
 tst_color(C):- make,colormsg(C,C).
 
 % = :- export(next_color/1).
+
+% 	 	 
+%% next_color( :TermC) is semidet.
+%
+% Next Color.
+%
 next_color(C):- between(1,10,_), random_color(C), good_next_color(C),!.
 next_color([underline|C]):- random_color(C),!.
 
 % = :- export(contrasting_color/2).
+
+% 	 	 
+%% contrasting_color( ?VALUE1, ?VALUE2) is semidet.
+%
+% Contrasting Color.
+%
 contrasting_color(white,black).
 contrasting_color(A,default):-atom(A),A \= black.
 contrasting_color(fg(C),bg(CC)):-!,contrasting_color(C,CC),!.
@@ -674,15 +1204,39 @@ contrasting_color(_,default).
 
 :- thread_local(ansi_prop/2).
 
+
+% 	 	 
+%% sgr_on_code( ?Ctrl, :PRED7OnCode) is semidet.
+%
+% Sgr Whenever Code.
+%
 sgr_on_code(Ctrl,OnCode):-sgr_on_code0(Ctrl,OnCode),!.
 sgr_on_code(Foo,7):- notrace((format_to_error('~NMISSING: ~q~n',[sgr_on_code(Foo,7)]))),!. % ,dtrace(sgr_on_code(Foo,7)))).
 
+
+% 	 	 
+%% is_sgr_on_code( ?Ctrl) is semidet.
+%
+% If Is A Sgr Whenever Code.
+%
 is_sgr_on_code(Ctrl):-sgr_on_code0(Ctrl,_),!.
 
+
+% 	 	 
+%% sgr_on_code0( ?Ctrl, :PRED6OnCode) is semidet.
+%
+% Sgr Whenever Code Primary Helper.
+%
 sgr_on_code0(Ctrl,OnCode):- ansi_term:sgr_code(Ctrl,OnCode).
 sgr_on_code0(blink, 6).
 sgr_on_code0(-Ctrl,OffCode):-  nonvar(Ctrl), sgr_off_code(Ctrl,OffCode).
 
+
+% 	 	 
+%% sgr_off_code( ?Ctrl, :GoalOnCode) is semidet.
+%
+% Sgr Off Code.
+%
 sgr_off_code(Ctrl,OnCode):-ansi_term:off_code(Ctrl,OnCode),!.
 sgr_off_code(- Ctrl,OnCode):- nonvar(Ctrl), sgr_on_code(Ctrl,OnCode),!.
 sgr_off_code(fg(_), CurFG):- (ansi_prop(fg,CurFG)->true;CurFG=39),!.
@@ -702,10 +1256,22 @@ sgr_off_code(overlined, 55).
 sgr_off_code(_,0).
 
 
+
+% 	 	 
+%% sgr_code_on_off( ?Ctrl, ?OnCode, ?OffCode) is semidet.
+%
+% Sgr Code Whenever Off.
+%
 sgr_code_on_off(Ctrl,OnCode,OffCode):-sgr_on_code(Ctrl,OnCode),sgr_off_code(Ctrl,OffCode),!.
 sgr_code_on_off(Ctrl,OnCode,OffCode):-sgr_on_code(Ctrl,OnCode),sgr_off_code(Ctrl,OffCode),!.
 
 
+
+% 	 	 
+%% msg_to_string( :TermVar, ?Str) is semidet.
+%
+% Msg Converted To String.
+%
 msg_to_string(Var,Str):-var(Var),!,sformat(Str,'~q',[Var]),!.
 msg_to_string(portray(Msg),Str):- with_output_to(string(Str),portray_clause_w_vars(user_output,Msg,[],[])),!.
 msg_to_string(pp(Msg),Str):- sformat(Str,Msg,[],[]),!.
@@ -718,12 +1284,36 @@ msg_to_string(Msg,Str):-sformat(Str,Msg,[],[]),!.
 
 :- thread_local t_l:formatter_hook/4.
 
+
+% 	 	 
+%% withFormatter( ?Lang, ?From, ?Vars, ?SForm) is semidet.
+%
+% Using Formatter.
+%
 withFormatter(Lang,From,Vars,SForm):- t_l:formatter_hook(Lang,From,Vars,SForm),!.
 withFormatter(_Lang,From,_Vars,SForm):-sformat(SForm,'~w',[From]).
 
+
+% 	 	 
+%% flush_output_safe is semidet.
+%
+% Flush Output Safely Paying Attention To Corner Cases.
+%
 flush_output_safe:-ignore(catchv(flush_output,_,true)).
+
+% 	 	 
+%% flush_output_safe( ?X) is semidet.
+%
+% Flush Output Safely Paying Attention To Corner Cases.
+%
 flush_output_safe(X):-ignore(catchv(flush_output(X),_,true)).
 
+
+% 	 	 
+%% writeFailureLog( ?E, ?X) is semidet.
+%
+% Write Failure Log.
+%
 writeFailureLog(E,X):-
   thread_current_error_stream(ERR),
 		(fmt(ERR,'\n% error: ~q ~q\n',[E,X]),flush_output_safe(ERR),!,
@@ -732,6 +1322,12 @@ writeFailureLog(E,X):-
 
 %unknown(Old, autoload).
 
+
+% 	 	 
+%% cls is semidet.
+%
+% Clauses.
+%
 cls:- shell(cls).
 
 :- 'mpred_trace_none'(fmt(_)).

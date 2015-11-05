@@ -17,7 +17,8 @@
 :- dynamic lmconf:startup_option/2. 
 :- multifile lmconf:mpred_system_status/2.
 :- dynamic lmconf:mpred_system_status/2.
-:- thread_local t_l:disable_px/0.
+:- multifile(t_l:disable_px/0).
+:- thread_local(t_l:disable_px/0).
 
 :- multifile(lmconf:mpred_system_kb/1).
 :- dynamic(lmconf:mpred_system_kb/1).
@@ -30,10 +31,18 @@
 % :- add_library_search_path('./plarkc/',[ '*.pl']).
 % :- add_library_search_path('./pttp/',[ 'dbase_i_mpred_*.pl']).
 
+
 % ========================================
 % lmconf:mpred_system_kb/1
 % ========================================
 
+
+% 	 	 
+%% lmconf:mpred_system_kb( ?VALUE1) is semidet.
+%
+% Hook To [lmconf:mpred_system_kb/1] For Module Logicmoo_base.
+% Managed Predicate System Knowledge Base.
+%
 lmconf:mpred_system_kb(baseKB).
 
 
@@ -50,8 +59,21 @@ lmconf:mpred_system_kb(baseKB).
 
 :- multifile(lmconf:mpred_is_impl_file/1).
 :- dynamic(lmconf:mpred_is_impl_file/1).
+
+% 	 	 
+%% lmconf:mpred_is_impl_file( ?VALUE1) is semidet.
+%
+% Hook To [lmconf:mpred_is_impl_file/1] For Module Logicmoo_base.
+% Managed Predicate If Is A Implimentation File.
+%
 lmconf:mpred_is_impl_file(mpred/A):-nonvar(A).
 
+
+% 	 	 
+%% load_mpred_system( ?Ctx) is semidet.
+%
+% Load Managed Predicate System.
+%
 load_mpred_system(Ctx):-  !,Ctx:use_module(logicmoo(mpred/mpred_userkb)).
 load_mpred_system(Ctx):-  lmconf:mpred_system_kb(Sys),
    with_mutex(mpred_system_mutex,forall(lmconf:mpred_is_impl_file(File),     
@@ -60,15 +82,34 @@ load_mpred_system(Ctx):-  lmconf:mpred_system_kb(Sys),
 :- export(enable_mpred_system/1).
 %% enable_mpred_system(+Module) is det.
 % Begin considering forward and meta programming rules into a Prolog module.
+
+% 	 	 
+%% enable_mpred_system( ?Module) is semidet.
+%
+% Enable Managed Predicate System.
+%
 enable_mpred_system(Module):- with_mutex(mpred_system_mutex,lmconf:enable_mpred_system0(Module)).
 
 :- export(disable_mpred_system/1).
 %% disable_mpred_system(+Module) is det.
 % Disable tasks that considering forward and meta programming rules into a Prolog module.
+
+% 	 	 
+%% disable_mpred_system( ?Module) is semidet.
+%
+% Disable Managed Predicate System.
+%
 disable_mpred_system(Module):- with_mutex(mpred_system_mutex,lmconf:disable_mpred_system0(Module)).
 
 :- thread_local t_l:side_effect_ok/0.
 
+
+% 	 	 
+%% lmconf:enable_mpred_system0( ?Module) is semidet.
+%
+% Hook To [lmconf:enable_mpred_system0/1] For Module Logicmoo_base.
+% Enable Managed Predicate System Primary Helper.
+%
 lmconf:enable_mpred_system0(Module):- lmconf:mpred_system_status(Module,enabled),!.
 lmconf:enable_mpred_system0(Module):- 
    set_user_abox(Module),
@@ -83,6 +124,13 @@ lmconf:enable_mpred_system0(Module):-
    asserta(lmconf:mpred_system_status(Module,enabled)),
    Module:w_tl(t_l:side_effect_ok,doall(Module:call_no_cuts(lmconf:module_local_init))).
 
+
+% 	 	 
+%% lmconf:disable_mpred_system0( ?Module) is semidet.
+%
+% Hook To [lmconf:disable_mpred_system0/1] For Module Logicmoo_base.
+% Disable Managed Predicate System Primary Helper.
+%
 lmconf:disable_mpred_system0(Module):- lmconf:mpred_system_status(Module,disabled),!.
 lmconf:disable_mpred_system0(Module):-    
    retractall(lmconf:mpred_system_status(Module,_)),
@@ -96,6 +144,12 @@ lmconf:disable_mpred_system0(Module):-
 :- module_transparent ensure_mpred_system/0.
 %% ensure_mpred_system is det.
 % Ensure the "managed predicate" system and subsystems are available
+
+% 	 	 
+%% ensure_mpred_system is semidet.
+%
+% Ensure Managed Predicate System.
+%
 ensure_mpred_system:- source_context_module(M),enable_mpred_system(M).
 
 

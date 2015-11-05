@@ -177,6 +177,12 @@
 :- include('../mpred/mpred_header.pi').
 
 
+
+% 	 	 
+%% kif_hook( :TermC) is semidet.
+%
+% Knowledge Interchange Format Hook.
+%
 kif_hook(C):- non_compound(C),!,fail.
 kif_hook(_H :- _):- !,fail.
 kif_hook(_H <- _):- !,fail.
@@ -202,14 +208,32 @@ kif_hook( ~  H):- !,nonvar(H),!,kif_hook(H).
 kif_hook(C):- C=..[F,A|_],is_sentence_functor(F),!,kif_hook(A).
   
 
+
+% 	 	 
+%% are_clauses_entailed( :TermE) is semidet.
+%
+% Are Clauses Entailed.
+%
 are_clauses_entailed(E):-not(compound(E)),!,must(true==E).
 are_clauses_entailed([E|List]):-is_list([E|List]),!,maplist(are_clauses_entailed,[E|List]).
 are_clauses_entailed((C,L)):-!,are_clauses_entailed(C),are_clauses_entailed(L).
 are_clauses_entailed(CL):- unnumbervars(CL,UCL), \+ \+ (clause_asserted(CL);(unnumbervars(CL,UCL),is_prolog_entailed(UCL))),!.
 
+
+% 	 	 
+%% is_prolog_entailed( ?UCL) is semidet.
+%
+% If Is A Prolog Entailed.
+%
 is_prolog_entailed(UCL):-show_failure(clause_asserted(UCL)),!.
 is_prolog_entailed(UCL):-req(UCL),!.
 
+
+% 	 	 
+%% member_ele( ?E, ?E) is semidet.
+%
+% Member Ele.
+%
 member_ele(E,E):- is_ftVar(E),!.
 member_ele([],_):-!,fail.
 member_ele(E,E):- ( \+ (compound(E))),!.
@@ -217,6 +241,12 @@ member_ele([L|List],E):- must(is_list([L|List])),!,member(EE,[L|List]),member_el
 member_ele((H,T),E):- nonvar(H),nonvar(T),!, (member_ele(H,E);member_ele(T,E)).
 member_ele(E,E).
 
+
+% 	 	 
+%% delistify_last_arg( ?Arg, :TermPred, ?Last) is semidet.
+%
+% Delistify Last Argument.
+%
 delistify_last_arg(Arg,Pred,Last):-is_list(Arg),!,member(E,Arg),delistify_last_arg(E,Pred,Last).
 delistify_last_arg(Arg,M:Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARGS),NEWCALL=..[F|NARGS],show_call(why,M:NEWCALL),!,member_ele(NEW,Last).
 delistify_last_arg(Arg,Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARGS),NEWCALL=..[F|NARGS],show_call(why,NEWCALL),!,member_ele(NEW,Last).
@@ -227,6 +257,12 @@ delistify_last_arg(Arg,Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARG
 % cwc "code-wise chaining" is always true in Prolog but will throw programming error if evalled in LogicMOO Prover.
 % Use this to mark code and not axiomatic prolog
 
+
+% 	 	 
+%% clif_to_prolog( :TermCLIF, ?Prolog) is semidet.
+%
+% Ieee Standard Common Logic Interchange Format Version Converted To Prolog.
+%
 clif_to_prolog(CLIF,Prolog):-cwc,is_list(CLIF),!,must_maplist(clif_to_prolog,CLIF,Prolog).
 clif_to_prolog((H,CLIF),(T,Prolog)):-cwc,sanity(must(nonvar(H))),!,clif_to_prolog(H,T),clif_to_prolog(CLIF,Prolog).
 clif_to_prolog((H<-B),(H<-B)):- cwc,!.
@@ -241,6 +277,12 @@ clif_to_prolog(CLIF,PrologO):- cwc,
       dmsg(pfc:-PrintPFC),
       =(Prolog,PrologO))),!.
 
+
+% 	 	 
+%% pfc_for_print( ?Prolog, ?PrintPFC) is semidet.
+%
+% Prolog Forward Chaining For Print.
+%
 pfc_for_print(Prolog,PrintPFC):-is_list(Prolog),!,maplist(pfc_for_print,Prolog,PrintPFC).
 %pfc_for_print(==>(P,if_missing(R,Q)),(Q :- (fwc, naf(R), P))):-!.
 %pfc_for_print(if_missing(R,Q),(Q :- (fwc, naf(R)))):-!.
@@ -249,17 +291,35 @@ pfc_for_print(Prolog,PrintPFC):- =(Prolog,PrintPFC).
 
 % Sanity Test for expected side-effect entailments
 % why does renumbervars_prev work but not copy_term?
+
+% 	 	 
+%% is_entailed( ?CLIF) is semidet.
+%
+% If Is A Entailed.
+%
 is_entailed(CLIF):-
  mpred_no_chaining((
    cwc, clif_to_prolog(CLIF,Prolog),!, \+ \+ are_clauses_entailed(Prolog))),!.
 
 % Sanity Test for required absence of specific side-effect entailments
+
+% 	 	 
+%% is_not_entailed( ?CLIF) is semidet.
+%
+% If Is A Not Entailed.
+%
 is_not_entailed(CLIF):- cwc, clif_to_prolog(CLIF,Prolog), \+ are_clauses_entailed(Prolog).
 
 :- op(1190,xfx,(:-)).
 :- op(1200,fy,(is_entailed)).
 
 % this defines a recogniser for clif syntax (well stuff that might be safe to send in thru kif_to_boxlog)
+
+% 	 	 
+%% is_clif( :TermCLIF) is semidet.
+%
+% If Is A Ieee Standard Common Logic Interchange Format Version.
+%
 is_clif(all(_,X)):-cwc,compound(X),!,is_clif(X).
 is_clif(forall(_,X)):-cwc,compound(X),!.
 is_clif(CLIF):-cwc,
@@ -270,6 +330,12 @@ is_clif(CLIF):-cwc,
 
 :- style_check(+singleton).
 
+
+% 	 	 
+%% correct_arities( ?VALUE1, ?FmlO, ?FmlO) is semidet.
+%
+% Correct Arities.
+%
 correct_arities(_,FmlO,FmlO):-leave_as_is(FmlO),!.
 correct_arities([],Fml,Fml):-!.
 correct_arities([H|B],Fml,FmlO):-!,correct_arities(H,Fml,FmlM),correct_arities(B,FmlM,FmlO).
@@ -281,10 +347,22 @@ correct_arities(H,Fml,FmlM):- Fml=..[F|ARGS],must_maplist(correct_arities(H),ARG
 
 
 :- was_export(subsT_each/3).
+
+% 	 	 
+%% subsT_each( ?VALUE1, :Term_G27481, ?VALUE3) is semidet.
+%
+% Subs True Stucture Each.
+%
 subsT_each(In,[],In):- !.
 % subsT_each(In,[KV|TODO],Out):- !,get_kv(KV,X,Y),subst_except(In,X,Y,Mid),!,subsT_each(Mid,TODO,Out),!.
 subsT_each(In,[KV|TODO],Out):- subst_except_l(In,[KV|TODO],Out).
 
+
+% 	 	 
+%% subst_except_l( :TermVar, ?VALUE2, :TermVar) is semidet.
+%
+% Subst Except (list Version).
+%
 subst_except_l(  Var, _,Var ) :- is_ftVar(Var),!.
 % subst_except_l(  Var, _,Var ) :- leave_as_is(Var),!.
 subst_except_l(  N, List,V ) :- member(N=V,List),!.
@@ -298,21 +376,57 @@ subst_except_l(HT,List,HHTT):- HT=..FARGS,subst_except_l(FARGS,List,[FM|MARGS]),
 
 :- dynamic(mudEquals/2).
 :- export(mudEquals/2).
+
+% 	 	 
+%% mudEquals( ?X, ?Y) is semidet.
+%
+% Application Equals.
+%
 mudEquals(X,Y):- X=Y.
 
 
+
+% 	 	 
+%% skolem_in_code( ?X, ?Y) is semidet.
+%
+% Skolem In Code.
+%
 skolem_in_code(X,Y):- ignore(X=Y).
+
+% 	 	 
+%% skolem_in_code( ?X, ?VALUE2, ?Fml) is semidet.
+%
+% Skolem In Code.
+%
 skolem_in_code(X,_,Fml):- when('?='(X,_),skolem_in_code(X,Fml)).
 
 :- was_export(not_mudEquals/2).
 :- was_dynamic(not_mudEquals/2).
+
+% 	 	 
+%% not_mudEquals( ?X, ?Y) is semidet.
+%
+% Not Application Equals.
+%
 not_mudEquals(X,Y):- neq(X,Y).
 
 :- was_export(type_of_var/3).
+
+% 	 	 
+%% type_of_var( ?Fml, ?Var, ?Type) is semidet.
+%
+% Type Of Variable.
+%
 type_of_var(Fml,Var,Type):- contains_type_lits(Fml,Var,Lits),!,(member(Type,Lits)*->true;Type='Unk').
 :- style_check(+singleton).
 
 
+
+% 	 	 
+%% to_dlog_ops( ?VALUE1) is semidet.
+%
+% Converted To Datalog Oper.s.
+%
 to_dlog_ops([
        'theExists'='exists',
        'thereExists'='exists',
@@ -340,6 +454,12 @@ to_dlog_ops([
       '=>'='=>',
      '<=>'='<=>']).
 
+
+% 	 	 
+%% to_symlog_ops( ?VALUE1) is semidet.
+%
+% Converted To Symlog Oper.s.
+%
 to_symlog_ops([
    ';'='v',
    ','='&',
@@ -348,6 +468,12 @@ to_symlog_ops([
    '~'='-',
    ':-'=':-']).
 
+
+% 	 	 
+%% to_prolog_ops( ?VALUE1) is semidet.
+%
+% Converted To Prolog Oper.s.
+%
 to_prolog_ops([
    'v'=';',
    '&'=',',
@@ -357,24 +483,54 @@ to_prolog_ops([
    ':-'=':-']).
 
 
+
+% 	 	 
+%% to_nonvars( :PRED2Type, ?IN, ?IN) is semidet.
+%
+% Converted To Nonvars.
+%
 to_nonvars(_Type,IN,IN):- is_ftVar(IN),!.
 to_nonvars(_,Fml,Fml):- leave_as_is(Fml),!.
 to_nonvars(Type,IN,OUT):- is_list(IN),!,must_maplist(to_nonvars(Type),IN,OUT),!.
 to_nonvars(Type,IN,OUT):- call(Type,IN,OUT),!.
 
 
+
+% 	 	 
+%% convertAndCall( ?Type, :GoalCall) is semidet.
+%
+% Convert And Call.
+%
 convertAndCall(Type,Call):- fail,Call=..[F|IN],must_maplist(to_nonvars(Type),IN,OUT), IN \=@= OUT, !, must(apply(F,OUT)).
 convertAndCall(_Type,Call):-call_last_is_var(Call).
 
+
+% 	 	 
+%% as_dlog( ?Fml, ?Fml) is semidet.
+%
+% Converted To Datalog.
+%
 as_dlog(Fml,Fml):- leave_as_is(Fml),!.
 as_dlog(Fml,FmlO):- to_dlog_ops(OPS),subsT_each(Fml,OPS,FmlM),!,correct_arities(['v','&'],FmlM,FmlO).
 
 
 
 
+
+% 	 	 
+%% as_symlog( ?Fml, ?Fml) is semidet.
+%
+% Converted To Symlog.
+%
 as_symlog(Fml,Fml):- leave_as_is(Fml),!.
 as_symlog(Fml,FmlO):- as_dlog(Fml,FmlM),to_symlog_ops(OPS),subsT_each(FmlM,OPS,FmlM),correct_arities(['v','&'],FmlM,FmlO).
 
+
+% 	 	 
+%% as_prolog( ?Fml, ?Fml) is semidet.
+%
+% Converted To Prolog.
+%
 as_prolog(Fml,Fml):- is_ftVar(Fml),!.
 as_prolog(Fml,FmlO):- as_symlog(Fml,FmlM),
   to_prolog_ops(OPS),subsT_each(FmlM,OPS,FmlO).
@@ -382,11 +538,23 @@ as_prolog(Fml,FmlO):- as_symlog(Fml,FmlM),
 
 
 
+
+% 	 	 
+%% adjust_kif( ?KB, ?Kif, ?KifO) is semidet.
+%
+% Adjust Knowledge Interchange Format.
+%
 adjust_kif(KB,Kif,KifO):- as_dlog(Kif,KifM),must(adjust_kif0(KB,KifM,KifO)),!.
 
 % Converts to syntax that NNF/DNF/CNF/removeQ like
 
 
+
+% 	 	 
+%% adjust_kif0( ?VALUE1, ?V, ?V) is semidet.
+%
+% Adjust Knowledge Interchange Format Primary Helper.
+%
 adjust_kif0(_,V,V):- is_ftVar(V),!.
 adjust_kif0(_,A,A):- \+ compound(A),!.
 
@@ -421,6 +589,12 @@ adjust_kif0(_,A,A):-leave_as_is(A),!.
 adjust_kif0(KB,Kif,KifO):- Kif=..[F|ARGS],adjust_kif0(KB,F,ARGS,KifO),!.
 adjust_kif0(KB,PAB,PABO):- PAB=..[P|AB],must_maplist(adjust_kif0(KB),AB,ABO),PABO=..[P|ABO].
 
+
+% 	 	 
+%% adjust_kif0( ?KB, ?Not_P, :TermARGS, ?O) is semidet.
+%
+% Adjust Knowledge Interchange Format Primary Helper.
+%
 adjust_kif0(KB,call_builtin,ARGS,O):-!,PARGS=..ARGS,adjust_kif0(KB,PARGS,O),!.
 adjust_kif0(KB,true_t,[F|LIST],O3):-atom(F),!,PARGS=..[F|LIST],adjust_kif0(KB,(PARGS),O3),!.
 adjust_kif0(KB,not_true_t,[F|LIST],O3):-atom(F),!,PARGS=..[F|LIST],adjust_kif0(KB,not(PARGS),O3),!.
@@ -441,14 +615,32 @@ adjust_kif0(KB,W,[P,A,R|GS],O):-is_wrapper_pred(W),PARGS=..[P,A,R|GS],adjust_kif
 adjust_kif0(KB,F,ARGS,O):-KIF=..[F|ARGS],length(ARGS,L),L>2,adjust_kif0(KB,KIF,F,ARGS,Conj),KIF\=@=Conj,!,adjust_kif0(KB,Conj,O).
 % adjust_kif0(KB,W,[A],O):-is_wrapper_pred(W),adjust_kif(KB,A,O),!.
 
+
+% 	 	 
+%% adjust_kif0( ?KB, ?KIF, ?OP, ?ARGS, ?Conj) is semidet.
+%
+% Adjust Knowledge Interchange Format Primary Helper.
+%
 adjust_kif0(KB,KIF,OP,ARGS,Conj):-must_maplist(adjust_kif(KB),ARGS,ABO),adjust_kif5(KB,KIF,OP,ABO,Conj).
 
+
+% 	 	 
+%% adjust_kif5( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5) is semidet.
+%
+% Adjust Kif5.
+%
 adjust_kif5(_KB,_KIF,',',ARGS,Conj):- list_to_conjuncts('&',ARGS,Conj).
 adjust_kif5(_,_,';',ARGS,Conj):-list_to_conjuncts('v',ARGS,Conj).
 adjust_kif5(_,_,'&',ARGS,Conj):-list_to_conjuncts('&',ARGS,Conj).
 adjust_kif5(_,_,'v',ARGS,Conj):-list_to_conjuncts('v',ARGS,Conj).
 
 
+
+% 	 	 
+%% local_pterm_to_sterm( ?P, ?S) is semidet.
+%
+% Local Pterm Converted To Sterm.
+%
 local_pterm_to_sterm(P,['$VAR'(S)]):- if_defined(mpred_sexp_reader:svar(P,S)),!.
 local_pterm_to_sterm(P,['$VAR'(S)]):- if_defined(mpred_sexp_reader:lvar(P,S)),!.
 local_pterm_to_sterm(P,[P]):- leave_as_is(P),!.
@@ -468,6 +660,12 @@ local_pterm_to_sterm(P,S):-subst_except(P,'v',';',Q),P\=@=Q,!,local_pterm_to_ste
 local_pterm_to_sterm(P,[Q]):-P=..[F|ARGS],maplist(local_pterm_to_sterm2,ARGS,QARGS),Q=..[F|QARGS].
 local_pterm_to_sterm(P,[P]).
 
+
+% 	 	 
+%% local_pterm_to_sterm2( ?P, ?Q) is semidet.
+%
+% Local Pterm Converted To Sterm Extended Helper.
+%
 local_pterm_to_sterm2(P,Q):-local_pterm_to_sterm(P,PP),([Q]=PP;Q=PP),!.
 
 
@@ -476,6 +674,12 @@ local_pterm_to_sterm2(P,Q):-local_pterm_to_sterm(P,PP),([Q]=PP;Q=PP),!.
 
 
 %======  make a sequence out of a disjunction =====
+
+% 	 	 
+%% flatten_or_list( ?A, ?B, ?C) is semidet.
+%
+% Flatten Or List.
+%
 flatten_or_list(A,B,C):- convertAndCall(as_symlog,flatten_or_list(A,B,C)).
 flatten_or_list(KB,v(X , Y), F):- !,
    flatten_or_list(KB,X,A),
@@ -485,11 +689,29 @@ flatten_or_list(_KB,X,[X]).
 
 
 
+
+% 	 	 
+%% fmtl( ?X) is semidet.
+%
+% Fmtl.
+%
 fmtl(X):- as_prolog(X,XX), fmt(XX).
 
+
+% 	 	 
+%% write_list( ?VALUE1) is semidet.
+%
+% Write List.
+%
 write_list([F|R]):- write(F), write('.'), nl, write_list(R).
 write_list([]).
 
+
+% 	 	 
+%% numbervars_with_names( ?Term, ?CTerm) is semidet.
+%
+% Numbervars Using Names.
+%
 numbervars_with_names(Term,CTerm):- ground(Term),!,duplicate_term(Term,CTerm).
 
 numbervars_with_names(Term,CTerm):-
@@ -526,11 +748,23 @@ numbervars_with_names(Term,CTerm):-
    remove_grounds(NewCNamedVarsS,NewCNamedVarsSG),
    b_setval('$variable_names',NewCNamedVarsSG))),!.
 
+
+% 	 	 
+%% get_var_names( :Term_G27552, ?VALUE2, :Term_G28188) is semidet.
+%
+% Get Variable Names.
+%
 get_var_names([],_,[]).
 get_var_names([V|Vars],NamedVars,[S|SNames]):-
     get_1_var_name(V,NamedVars,S),
     get_var_names(Vars,NamedVars,SNames).
 
+
+% 	 	 
+%% get_1_var_name( ?Var, :TermNamedVars, ?Name) is semidet.
+%
+% get  Secondary Helper Variable name.
+%
 get_1_var_name(_V,[],_S).
 
 get_1_var_name(Var,NamedVars,Name):- compound(Var),arg(1,Var,NV),!,get_1_var_name(NV,NamedVars,Name).
@@ -540,13 +774,31 @@ get_1_var_name(Var,[N=V|_NamedVars],Name=V):-
 get_1_var_name(Var,[_|NamedVars],Name):- get_1_var_name(Var,NamedVars,Name).
 
 
+
+% 	 	 
+%% wdmsgl( ?CNF) is semidet.
+%
+% Wdmsgl.
+%
 wdmsgl(CNF):- compound(CNF),CNF=..[NAME,NF],!,must(wdmsgl(NAME:-NF)).
 wdmsgl(CNF):- mpred_trace_item('',CNF),!.
 wdmsgl(NF):- must((get_functor(NF,NAME),!,must(wdmsgl_2(NAME,NF)))).
 
 
+
+% 	 	 
+%% wdmsgl_2( ?NAME, ?NF) is semidet.
+%
+% wdmsgl  Extended Helper.
+%
 wdmsgl_2(NAME,NF):- functor(NF,_,_),wdmsgl_3(NAME,&,NF).
 
+
+% 	 	 
+%% wdmsgl_3( ?NAME, ?F, ?NF) is semidet.
+%
+% Wdmsgl Helper Number 3..
+%
 wdmsgl_3(NAME,F,NF):-
    numbervars_with_names(vv(NAME,F,NF),vv(NAME2,F2,NF2)),
    wdmsgl_4(NAME2,F2,NF2).
@@ -554,10 +806,22 @@ wdmsgl_3(NAME,F,NF):-
 %wdmsgl_4(NAME,F,NF):- is_list(NF),!,list_to_set(NF,NS),must_maplist(wdmsgl_4(NAME,F),NS).
 %wdmsgl_4(NAME,F,NF):- compound(NF),NF=..[FF,A,B],FF=F,is_ftNonvar(A),is_ftNonvar(B),!,must_maplist(wdmsgl_4(NAME,F),[A,B]).
 % wdmsgl_4(NAME,_,NF):- as_symlog(NF,NF2), with_all_dmsg(display_form(KB,NAME:-NF2)).
+
+% 	 	 
+%% wdmsgl_4( ?NAME, ?VALUE2, ?NF) is semidet.
+%
+% Wdmsgl Helper Number 4..
+%
 wdmsgl_4(NAME,_,NF):- as_symlog(NF,NF2), with_all_dmsg(display_form(_KB,(NAME:-NF2))).
 
 
 
+
+% 	 	 
+%% fresh_varname( :TermF, ?NewVar) is semidet.
+%
+% Fresh Varname.
+%
 fresh_varname(F,NewVar):-is_ftVar(F),NewVar=F.
 fresh_varname(F,NewVar):-var(F),fresh_varname('mudEquals',NewVar).
 fresh_varname([F0|_],NewVar):-!,fresh_varname(F0,NewVar).
@@ -568,24 +832,54 @@ fresh_varname(F,NewVar):- functor(F,FN,_),!, upcase_atom(FN,FUP),gensym(FUP,VARN
 
 % kif_to_boxlog('=>'(WffIn,enables(Rule)),'$VAR'('MT2'),complete,Out1), % kif_to_boxlog('=>'(enabled(Rule),WffIn),'$VAR'('KB'),complete,Out).
 
+
+% 	 	 
+%% kif_to_prolog( ?X, ?E) is semidet.
+%
+% Knowledge Interchange Format Converted To Prolog.
+%
 kif_to_prolog(X,E):- kif_to_boxlog(X,Y),!,list_to_set(Y,S),!,member(E,S).
 
 %====== kif_to_boxlog(+Wff,-NormalClauses):-
 :- was_export(kif_to_boxlog/2).
 % kif_to_boxlog(Wff,Out):- loop_check(kif_to_boxlog(Wff,Out),Out=looped_kb(Wff)).
+
+% 	 	 
+%% kif_to_boxlog( ?Wff, ?Out) is semidet.
+%
+% Knowledge Interchange Format Converted To Datalog.
+%
 kif_to_boxlog(Wff,Out):- why_to_id(rule,Wff,Why), kif_to_boxlog(Wff,Why,Out),!.
 kif_to_boxlog(WffIn,Out):-  why_to_id(rule,WffIn,Why), kif_to_boxlog(all('$VAR'('KB'),'=>'(asserted_t('$VAR'('KB'),WffIn),WffIn)),'$VAR'('KB'),Why,Out),!.
 kif_to_boxlog(WffIn,NormalClauses):- why_to_id(rule,WffIn,Why), kif_to_boxlog(WffIn,'$VAR'('KB'),Why,NormalClauses).
 
+
+% 	 	 
+%% alt_kif_to_boxlog( ?Wff, ?KB, ?Why, ?Out) is semidet.
+%
+% Alt Knowledge Interchange Format Converted To Datalog.
+%
 alt_kif_to_boxlog(not( Wff),KB,Why,Out):- !, kif_to_boxlog(not( Wff),KB,Why,Out).
 alt_kif_to_boxlog(Wff,KB,Why,Out):- loop_check(kif_to_boxlog((not(nesc(not(Wff)))),KB,Why,Out),Out=looped_kb(Wff)).
 
 :- was_export(kif_to_boxlog/3).
+
+% 	 	 
+%% kif_to_boxlog( ?WffIn, ?Why, ?Out) is semidet.
+%
+% Knowledge Interchange Format Converted To Datalog.
+%
 kif_to_boxlog(WffIn,Why,Out):-  kif_to_boxlog(WffIn,'$VAR'('KB'),Why,Out),!.
 
 
 :- export(kif_to_boxlog/4).
 
+
+% 	 	 
+%% kif_to_boxlog( ?I, ?KB, ?Why, ?Flattened) is semidet.
+%
+% Knowledge Interchange Format Converted To Datalog.
+%
 kif_to_boxlog(I,KB,Why,Flattened):-
   convert_if_kif_string( I, _Wff, _Vs, PTerm),
   kif_to_boxlog(PTerm,KB,Why,Flattened), !.
@@ -633,20 +927,51 @@ kif_to_boxlog(WffIn0,KB0,Why0,FlattenedO):-
    correct_boxlog(FlattenedM,KB,Why,FlattenedO))).
 
 
+
+% 	 	 
+%% lmconf:no_rewrites is semidet.
+%
+% Hook To [lmconf:no_rewrites/0] For Module Common_logic_snark.
+% No Rewrites.
+%
 lmconf:no_rewrites.
 
 
+
+% 	 	 
+%% check_is_kb( ?KB) is semidet.
+%
+% Check If Is A Knowledge Base.
+%
 check_is_kb(KB):-ignore('$VAR'('KB')=KB).
 
+
+% 	 	 
+%% add_preconds( ?X, ?X) is semidet.
+%
+% Add Preconds.
+%
 add_preconds(X,X):- lmconf:no_rewrites,!.
 add_preconds(X,Z):-
  w_tl(leave_as_is_db('CollectionS666666666666666ubsetFn'(_,_)),
    w_tl(t_l:dont_use_mudEquals,defunctionalize('=>',X,Y))),add_preconds2(Y,Z).
 
+
+% 	 	 
+%% add_preconds2( ?Wff6667, ?PreCondPOS) is semidet.
+%
+% Add Preconds Extended Helper.
+%
 add_preconds2(Wff6667,PreCondPOS):-
    must_det_l((get_lits(Wff6667,PreCond),list_to_set(PreCond,PreCondS),
      add_poss_to(PreCondS,Wff6667, PreCondPOS))).
 
+
+% 	 	 
+%% add_poss_to( ?PreCond, ?Wff6667, ?Wff6667) is semidet.
+%
+% Add Possibility Converted To.
+%
 add_poss_to([],Wff6667, Wff6667).
 add_poss_to([PreCond|S],Wff6667, PreCondPOS):-!,
  add_poss_to(PreCond,Wff6667, PreCondM),
@@ -658,6 +983,12 @@ add_poss_to(not(_PreCond),Wff6667, Wff6667).
 add_poss_to(PreCond,Wff6667, (poss(PreCond)=>Wff6667)).
 
 
+
+% 	 	 
+%% add_nesc( ?X, ?X) is semidet.
+%
+% Add Necesity.
+%
 add_nesc(X,X):-!.
 
 add_nesc(IN,OUT):-is_list(IN),must_maplist(add_nesc,IN,OUT),!.
@@ -681,6 +1012,12 @@ add_nesc(IN,nesc(IN)).
 
 % add_poss(Wff666,Wff666):-!.
 % add_poss(X,X):-!.
+
+% 	 	 
+%% add_poss( ?PQ, ?PQ) is semidet.
+%
+% Add Possibility.
+%
 add_poss(PQ,PQ):- var(PQ),!.
 add_poss(PQ,PQO):- PQ=..[F,V,Q],is_quantifier(F),add_poss(Q,QQ),PQO=..[F,V,QQ],!.
 add_poss(Wff666,true):-leave_as_is(Wff666),!.
@@ -693,6 +1030,12 @@ add_poss(IN,poss(IN)).
 % shall X => can X
 % shall ~ X => ~ can X
 % ~ shall X => can ~ X
+
+% 	 	 
+%% get_lits( ?PQ, ?QQ) is semidet.
+%
+% Get Literals.
+%
 get_lits(PQ,[]):- var(PQ),!.
 get_lits(PQ,QQ):- PQ=..[F,_Vs,Q],is_quantifier(F),get_lits(Q,QQ).
 get_lits(Wff666,[Wff666]):-leave_as_is(Wff666),!.
@@ -702,23 +1045,65 @@ get_lits(beliefs(WHO,IN),NOUT):-get_lits(IN,OUT),must_maplist(simple_negate_lite
 get_lits(IN,OUTLF):-IN=..[F|INL],logical_functor_pttp(F),!,must_maplist(get_lits,INL,OUTL),flatten(OUTL,OUTLF).
 get_lits(IN,[IN]).
 
+
+% 	 	 
+%% simple_negate_literal( ?F, ?FX, ?X) is semidet.
+%
+% Simple Negate Literal.
+%
 simple_negate_literal(F,FX,X):-FX=..FXL,F=..FL,append(FL,[X],FXL),!.
 simple_negate_literal(F,X,FX):-append_term(F,X,FX).
 
+
+% 	 	 
+%% is_quantifier( ?F) is semidet.
+%
+% If Is A Quantifier.
+%
 is_quantifier(F):- pttp_nnf_pre_clean_functor(F,(all),[]);pttp_nnf_pre_clean_functor(F,(ex),[]).
 
+
+% 	 	 
+%% should_be_poss( ?VALUE1) is semidet.
+%
+% Should Be Possibility.
+%
 should_be_poss(argInst).
 
 % :- was_dynamic(elInverse/2).
 
+
+% 	 	 
+%% clauses_to_boxlog( ?KB, ?Why, ?In, ?Prolog) is semidet.
+%
+% Clauses Converted To Datalog.
+%
 clauses_to_boxlog(KB,Why,In,Prolog):- clauses_to_boxlog_0(KB,Why,In,Prolog).
 
 
+
+% 	 	 
+%% clauses_to_boxlog_0( ?KB, ?Why, ?In, ?Prolog) is semidet.
+%
+% clauses Converted To Datalog  Primary Helper.
+%
 clauses_to_boxlog_0(KB,Why,In,Prolog):-loop_check(clauses_to_boxlog_1(KB,Why,In,Prolog),show_call(why,(clauses_to_boxlog_5(KB,Why,In,Prolog)))),!.
 clauses_to_boxlog_0(KB,Why,In,Prolog):-correct_cls(KB,In,Mid),!,clauses_to_boxlog_1(KB,Why,Mid,PrologM),!,Prolog=PrologM.
 
+
+% 	 	 
+%% clauses_to_boxlog_1( ?KB, ?Why, ?In, ?Prolog) is semidet.
+%
+% clauses Converted To Datalog  Secondary Helper.
+%
 clauses_to_boxlog_1(KB, Why,In,Prolog):- clauses_to_boxlog_2(KB,Why,In,PrologM),!,must(Prolog=PrologM).
 
+
+% 	 	 
+%% clauses_to_boxlog_2( ?KB, ?Why, :TermIn, ?Prolog) is semidet.
+%
+% clauses Converted To Datalog  Extended Helper.
+%
 clauses_to_boxlog_2(KB, Why,In,Prolog):- is_list(In),!,must_maplist(clauses_to_boxlog_1(KB,Why),In,Prolog).
 clauses_to_boxlog_2(KB, Why,cl([],BodyIn),  Prolog):- !, (is_lit_atom(BodyIn) -> clauses_to_boxlog_1(KB,Why,cl([inconsistentKB(KB)],BodyIn),Prolog);  (trace,kif_to_boxlog(not(BodyIn),KB,Why,Prolog))).
 clauses_to_boxlog_2(KB, Why,cl([HeadIn],[]),Prolog):- !, (is_lit_atom(HeadIn) -> Prolog=HeadIn ; (kif_to_boxlog(HeadIn,KB,Why,Prolog))).
@@ -731,16 +1116,34 @@ clauses_to_boxlog_2(KB, Why,cl([H,Head|List],BodyIn),Prolog):-
 
 clauses_to_boxlog_2(_KB,_Why,(H:-B),(H:-B)):- !.
 
+
+% 	 	 
+%% clauses_to_boxlog_5( ?KB, ?Why, ?In, ?Prolog) is semidet.
+%
+% Clauses Converted To Datalog Helper Number 5..
+%
 clauses_to_boxlog_5(KB, Why,In,Prolog):- is_list(In),!,must_maplist(clauses_to_boxlog_5(KB,Why),In,Prolog).
 clauses_to_boxlog_5(_KB,_Why,(H:-B),(H:-B)):-!.
 clauses_to_boxlog_5(_KB,_Why,cl([HeadIn],[]),HeadIn):-!.
 clauses_to_boxlog_5(_KB,_Why,In,Prolog):-trace,In=Prolog.
 
+
+% 	 	 
+%% mpred_t_tell_kif( ?OP2, ?RULE) is semidet.
+%
+% Managed Predicate True Structure Canonicalize And Store Knowledge Interchange Format.
+%
 mpred_t_tell_kif(OP2,RULE):-
  w_tl(t_l:current_pttp_db_oper(mud_call_store_op(OP2)),
    (show_call(why,call((must(kif_add(RULE))))))).
 
 
+
+% 	 	 
+%% fix_input_vars( ?AIn, ?A) is semidet.
+%
+% Fix Input Variables.
+%
 fix_input_vars(AIn,A):- copy_term(AIn,A),numbervars(A,672,_).
 
 %:- was_export(show_boxlog/1).
@@ -751,18 +1154,43 @@ fix_input_vars(AIn,A):- copy_term(AIn,A),numbervars(A,672,_).
 
 
 
+
+% 	 	 
+%% boxlog_to_pfc( :TermPFCM, ?PFC) is semidet.
+%
+% Datalog Converted To Prolog Forward Chaining.
+%
 boxlog_to_pfc(PFCM,PFC):- is_list(PFCM),must_maplist(boxlog_to_pfc,PFCM,PFC).
 boxlog_to_pfc((A,B),C):- !, must_maplist(boxlog_to_pfc,[A,B],[AA,BB]),conjoin(AA,BB,C).
 boxlog_to_pfc(PFCM,PFCO):- boxlog_to_compile(PFCM,PFC),!, subst(PFC,(not),(~),PFCO).
 
 
 %:- was_export(tsn/0).
+
+% 	 	 
+%% tsn is semidet.
+%
+% Tsn.
+%
 tsn:- with_all_dmsg(forall(clause(kif,C),must(C))).
 
 % kif:- make.
 :- dynamic(kif_test_string/1).
+
+% 	 	 
+%% tkif is semidet.
+%
+% Tkif.
+%
 tkif:- kif_test_string(TODO),kif_io(string(TODO),current_output).
 
+
+% 	 	 
+%% lmconf:regression_test is semidet.
+%
+% Hook To [lmconf:regression_test/0] For Module Common_logic_snark.
+% Regression Test.
+%
 lmconf:regression_test:- tsn.
 
 :- thread_local(t_l:kif_action_mode/1).
@@ -771,6 +1199,12 @@ lmconf:regression_test:- tsn.
 :- thread_local(t_l:kif_reader_mode/1).
 :- asserta_if_new(t_l:kif_reader_mode(lisp)).
 
+
+% 	 	 
+%% kif_read( ?InS, ?Wff, ?Vs) is semidet.
+%
+% Knowledge Interchange Format Read.
+%
 kif_read(InS,Wff,Vs):- must(l_open_input(InS,In)),
   must(((t_l:kif_reader_mode(lisp) ,without_must( catch(input_to_forms(In,Wff,Vs),E,(dmsg(E:kif_read_input_to_forms(In,Wff,Vs)),fail)))) *-> true ;
       catch(read_term(In,Wff,[module(user),double_quotes(string),variable_names(Vs)]),E,(dmsg(E:kif_read_term_to_forms(In,Wff,Vs)),fail)))).
@@ -779,6 +1213,12 @@ kif_read(InS,Wff,Vs):- must(l_open_input(InS,In)),
 % :- ensure_loaded(logicmoo(snark/common_logic_sexpr)).
 
 :- was_export(kif/0).
+
+% 	 	 
+%% kif is semidet.
+%
+% Knowledge Interchange Format.
+%
 kif:- current_input(In),current_output(Out),!,kif_io(In,Out).
 
 %open_input(InS,InS):- is_stream(InS),!.
@@ -786,6 +1226,12 @@ kif:- current_input(In),current_output(Out),!,kif_io(In,Out).
 
 
 :- was_export(kif_io/2).
+
+% 	 	 
+%% kif_io( ?InS, ?Out) is semidet.
+%
+% Knowledge Interchange Format Input/output.
+%
 kif_io(InS,Out):-
   l_open_input(InS,In),
    repeat,
@@ -797,16 +1243,34 @@ kif_io(InS,Out):-
            Wff == end_of_file)),!.
 
 :- was_export(why_to_id/3).
+
+% 	 	 
+%% why_to_id( ?Term, ?Wff, ?IDWhy) is semidet.
+%
+% Generation Of Proof Converted To Id.
+%
 why_to_id(Term,Wff,IDWhy):- not(atom(Term)),term_to_atom(Term,Atom),!,why_to_id(Atom,Wff,IDWhy).
 why_to_id(Atom,Wff,IDWhy):- with_umt(wid(IDWhy,Atom,Wff)),!.
 why_to_id(Atom,Wff,IDWhy):- must(atomic(Atom)),gensym(Atom,IDWhyI),kb_incr(IDWhyI,IDWhy),assertz_if_new(wid(IDWhy,Atom,Wff)).
 
 :- was_export(kif_process/1).
+
+% 	 	 
+%% kif_process( :GoalAssert) is semidet.
+%
+% Knowledge Interchange Format Process.
+%
 kif_process(end_of_file):- !.
 kif_process(prolog):- prolog,!.
 kif_process(Assert):- atom(Assert),retractall(t_l:kif_action_mode(_)),asserta(t_l:kif_action_mode(Assert)),fmtl(t_l:kif_action_mode(Assert)),!.
 kif_process(Wff):- t_l:kif_action_mode(Mode),kif_process(Mode,Wff),!.
 
+
+% 	 	 
+%% kif_process( ?Other, :GoalWff) is semidet.
+%
+% Knowledge Interchange Format Process.
+%
 kif_process(_,':-'(Wff)):- !, kif_process(call,Wff).
 kif_process(_,'?-'(Wff)):- !, kif_ask(Wff).
 kif_process(_,'ask'(Wff)):- !, kif_ask(Wff).
@@ -817,6 +1281,12 @@ kif_process(ask,Wff):- !, kif_ask(Wff).
 kif_process(Other,Wff):- !, wdmsg(error(missing_kif_process(Other,Wff))),!,fail.
 
 :- was_export(kif_ask_sent/1).
+
+% 	 	 
+%% kif_ask_sent( ?VALUE1) is semidet.
+%
+% Knowledge Interchange Format Complete Inference Sentence.
+%
 kif_ask_sent(Wff):-
    why_to_id(ask,Wff,Why),
    term_variables(Wff,Vars),
@@ -831,6 +1301,12 @@ kif_ask_sent(Wff):-
 
 
 :- was_export(kif_ask/1).
+
+% 	 	 
+%% kif_ask( :Term_G6911) is semidet.
+%
+% Knowledge Interchange Format Complete Inference.
+%
 kif_ask(P <=> Q):- kif_ask_sent(P <=> Q).
 kif_ask(P => Q):- kif_ask_sent(P => Q).
 kif_ask((P v Q)):- kif_ask_sent(((P v Q))).
@@ -841,17 +1317,35 @@ kif_ask(Goal0):-  logical_pos(_KB,Goal0,Goal),
         search(Goal1,60,0,1,3,DepthIn,DepthOut))).
 
 :- was_export(kif_ask/2).
+
+% 	 	 
+%% kif_ask( ?VALUE1, ?VALUE2) is semidet.
+%
+% Knowledge Interchange Format Complete Inference.
+%
 kif_ask(Goal0,ProofOut):- logical_pos(_KB,Goal0,Goal),
     no_repeats(lmconf:(
 	if_defined(add_args(Goal0,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],ProofOut1,Goal1,_)),!,
         search(Goal1,60,0,1,3,DepthIn,DepthOut),
         contract_output_proof(ProofOut1,ProofOut))).
 
+
+% 	 	 
+%% kif_add( ?InS) is semidet.
+%
+% Knowledge Interchange Format Add.
+%
 kif_add(InS):- atom(InS),must_det_l((kif_read(string(InS),Wff,Vs),b_implode_varnames0(Vs),local_sterm_to_pterm(Wff,Wff0),kif_add(Wff0))),!.
 % kif_add(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),why_to_id(tell,Wff,Why),kif_add(Why,Wff))),!.
 kif_add(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),ain(clif(Wff)))),!.
 
 
+
+% 	 	 
+%% local_sterm_to_pterm( ?Wff, ?WffO) is semidet.
+%
+% Local Sterm Converted To Pterm.
+%
 local_sterm_to_pterm(Wff,WffO):- sexpr_sterm_to_pterm(Wff,WffO),!.
 
 
@@ -881,6 +1375,12 @@ assert_wfs_fallback0(Why, HB):- adjust_kif('$VAR'(KB),HB,HBK),demodal('$VAR'(KB)
 */
 
 :- was_export(kb_incr/2).
+
+% 	 	 
+%% kb_incr( ?WffNum1, ?WffNum2) is semidet.
+%
+% Knowledge Base Incr.
+%
 kb_incr(WffNum1 ,WffNum2):-is_ftVar(WffNum1),trace_or_throw(kb_incr(WffNum1 ,WffNum2)).
 kb_incr(WffNum1 ,WffNum2):-number(WffNum1),WffNum2 is WffNum1 + 1,!.
 %kb_incr(WffNum1 ,WffNum2):-atom(WffNum1),WffNum2=..[WffNum1,0],!.
@@ -900,6 +1400,12 @@ kif_add_boxes(How,Why,Wff0,Asserts0):-
       call(How,WhyHB,HB)).
 */
 
+
+% 	 	 
+%% kif_add_adding_constraints( ?Why, ?Isas, :TermGet1Get2) is semidet.
+%
+% Knowledge Interchange Format Add Adding Constraints.
+%
 kif_add_adding_constraints(Why,Isas,Get1Get2):- var(Get1Get2),!,trace_or_throw(var_kif_add_isa_boxes(Why,Isas,Get1Get2)).
 kif_add_adding_constraints(Why,Isas,(Get1,Get2)):- !,kif_add_adding_constraints(Why,Isas,Get1),kb_incr(Why,Why2),kif_add_adding_constraints(Why2,Isas,Get2).
 kif_add_adding_constraints(Why,Isas,[Get1|Get2]):- !,kif_add_adding_constraints(Why,Isas,Get1),kb_incr(Why,Why2),kif_add_adding_constraints(Why2,Isas,Get2).
@@ -908,6 +1414,12 @@ kif_add_adding_constraints(_,_,z_unused(_)):-!.
 kif_add_adding_constraints(Why,Isas,((H:- B))):- conjoin(Isas,B,BB), kif_add_boxes1(Why,(H:- BB)).
 kif_add_adding_constraints(Why,Isas,((H))):- kif_add_boxes1(Why,(H:- Isas)).
 
+
+% 	 	 
+%% kif_add_boxes1( ?Why, ?List) is semidet.
+%
+% Knowledge Interchange Format Add Boxes Secondary Helper.
+%
 kif_add_boxes1(_,[]).
 kif_add_boxes1(Why,List):- is_list(List),!,list_to_set(List,[H|T]),must_det_l((kif_add_boxes1(Why,H),kb_incr(Why,Why2),kif_add_boxes1(Why2,T))).
 kif_add_boxes1(_,z_unused(_)):-!.
@@ -916,6 +1428,12 @@ kif_add_boxes1(Why,AssertI):- must_det_l((simplify_bodies(AssertI,AssertO),kif_a
 :- thread_local(t_l:in_code_Buffer/3).
 
 
+
+% 	 	 
+%% kif_add_boxes3( :PRED2How, ?Why, ?Assert) is semidet.
+%
+% Knowledge Interchange Format Add Boxes3.
+%
 kif_add_boxes3(How,Why,Assert):-
   must_det_l((
   boxlog_to_prolog(Assert,Prolog1),
@@ -923,6 +1441,12 @@ kif_add_boxes3(How,Why,Assert):-
   kif_unnumbervars(Prolog2,PTTP),
   call(How,Why,PTTP))).
 
+
+% 	 	 
+%% kif_unnumbervars( ?X, ?YY) is semidet.
+%
+% Knowledge Interchange Format Unnumbervars.
+%
 kif_unnumbervars(X,YY):-
  must_det_l((
    with_output_to(string(A),write_term(X,[character_escapes(true),ignore_ops(true),quoted(true)])),
@@ -931,23 +1455,71 @@ kif_unnumbervars(X,YY):-
    add_newvars(NamedVars))).
 
 
+
+% 	 	 
+%% simplify_bodies( ?B, ?BC) is semidet.
+%
+% Simplify Bodies.
+%
 simplify_bodies((H:- B),(H:- BC)):- must_det_l((conjuncts_to_list(B,RB),simplify_list(_KB,RB,BB),list_to_conjuncts(BB,BC))).
 simplify_bodies((B),(BC)):- must_det_l((conjuncts_to_list(B,RB),simplify_list(_KB,RB,BB),list_to_conjuncts(BB,BC))).
 
 
+
+% 	 	 
+%% simplify_list( ?KB, ?RB, ?BBS) is semidet.
+%
+% Simplify List.
+%
 simplify_list(KB,RB,BBS):- list_to_set(RB,BB),must_maplist(removeQ(KB),BB,BBO),list_to_set(BBO,BBS).
 
+
+% 	 	 
+%% save_wfs( ?Why, ?PrologI) is semidet.
+%
+% Save Well-founded Semantics Version.
+%
 save_wfs(Why,PrologI):- must_det_l((as_prolog(PrologI,Prolog),
    w_tl(t_l:current_local_why(Why,Prolog),
    ain_h(save_in_code_buffer,Why,Prolog)))).
 
+
+% 	 	 
+%% nots_to( ?H, ?To, ?HH) is semidet.
+%
+% Negations Converted To.
+%
 nots_to(H,To,HH):-subst_except(H,~,To,HH),subst_except(H,-,To,HH),subst_except(H,~,To,HH),subst_except(H,~,To,HH),!.
+
+% 	 	 
+%% neg_h_if_neg( ?H, ?HH) is semidet.
+%
+% Negated Head If Negated.
+%
 neg_h_if_neg(H,HH):-nots_to(H,'~',HH).
+
+% 	 	 
+%% neg_b_if_neg( ?HBINFO, ?B, ?BBB) is semidet.
+%
+% Negated Backtackable If Negated.
+%
 neg_b_if_neg(HBINFO,B,BBB):-nots_to(B,'~',BB),sort_body(HBINFO,BB,BBB),!.
 
 
+
+% 	 	 
+%% sort_body( ?HBINFO, ?BB, ?BBB) is semidet.
+%
+% Sort Body.
+%
 sort_body(HBINFO,BB,BBB):-sort_body_0(HBINFO,BB,BBB),(BBB=@=BB->true; (expand_to_hb(HBINFO,H,_),nop(dmsg([(H:-BB),'=>',(H:-BBB)])))).
 
+
+% 	 	 
+%% sort_body_0( ?VALUE1, ?SORTED, ?SORTED) is semidet.
+%
+% sort body  Primary Helper.
+%
 sort_body_0(_,SORTED,SORTED):-leave_as_is(SORTED).
 sort_body_0(HBINFO,(A,B),SORTED):-!,conjuncts_to_list((A,B),List),
    must_maplist(sort_body_0(HBINFO),List,ListIn),
@@ -959,10 +1531,22 @@ sort_body_0(HBINFO,(A;B),SORTED):-!,disjuncts_to_list((A;B),List),
    list_to_conjuncts((;),SortedL,SORTED).
 sort_body_0(_,SORTED,SORTED).
 
+
+% 	 	 
+%% litcost_compare( ?HBINFO, ?Comp, ?A, ?B) is semidet.
+%
+% Litcost Compare.
+%
 litcost_compare(_,=,A,B):- A=@=B,!.
 litcost_compare(HBINFO,Comp,A,B):-lit_cost(HBINFO,A,AC),lit_cost(HBINFO,B,BC),compare(CompC,AC,BC),
   (CompC\== (=) -> CompC = Comp ; Comp = (<)).
 
+
+% 	 	 
+%% lit_cost( ?HBINFO, ?A, :GoalAC) is semidet.
+%
+% Literal Cost.
+%
 lit_cost(_,A,9):-isSlot(A).
 lit_cost(_,A,0):- \+ compound(A),!.
 lit_cost(HBINFO,A,AC):- A=..[F,ARG], is_log_op(F),!,lit_cost(HBINFO,ARG,AC0),!,
@@ -974,30 +1558,72 @@ lit_cost(HBINFO,A,AC):- expand_to_hb(HBINFO,H,B),
   var_count_num(A,B,VC,Singles),
   AC is Singles*3 + VC + UH - SH.
 
+
+% 	 	 
+%% simp_code( ?A, ?A) is semidet.
+%
+% Simp Code.
+%
 simp_code(HB,(H:-BS)):-expand_to_hb(HB,H,B),conjuncts_to_list(B,BL),sort(BL,BS),!.
 simp_code(A,A).
 
 
+
+% 	 	 
+%% var_count_num( ?Term, ?SharedTest, ?SharedCount, ?UnsharedCount) is semidet.
+%
+% Variable Count Num.
+%
 var_count_num(Term,SharedTest,SharedCount,UnsharedCount):- term_slots(Term,Slots),term_slots(SharedTest,TestSlots),
   subtract(Slots,TestSlots,UnsharedSlots),
   subtract(Slots,UnsharedSlots,SharedSlots),
   length(SharedSlots,SharedCount),
   length(UnsharedSlots,UnsharedCount).
 
+
+% 	 	 
+%% ain_h( :PRED2How, ?Why, ?H) is semidet.
+%
+% Assert If New Head.
+%
 ain_h(How,Why,(H:- B)):- neg_h_if_neg(H,HH), neg_b_if_neg((HH:- B),B,BB),!,call(How,Why,(HH:-BB)).
 ain_h(How,Why,(H)):- neg_h_if_neg(H,HH), call(How,Why,(HH)).
 
+
+% 	 	 
+%% save_in_code_buffer( ?VALUE1, ?HB) is semidet.
+%
+% Save In Code Buffer.
+%
 save_in_code_buffer(_ ,HB):- simp_code(HB,SIMP),t_l:in_code_Buffer(HB,_,SIMP),!.
 save_in_code_buffer(Why,HB):- simp_code(HB,SIMP),assert(t_l:in_code_Buffer(HB,Why,SIMP)).
 
+
+% 	 	 
+%% use_was_isa_h( ?I, :TermT, ?ISA) is semidet.
+%
+% use was  (isa/2) Head.
+%
 use_was_isa_h(_,ftTerm,true):- !.
 use_was_isa_h(_,argi(mudEquals,_),true):- !.
 use_was_isa_h(_,argi(skolem,_),true):- !.
 use_was_isa_h(I,T,ISA):- to_isa_out(I,T,ISA),!.
 
+
+% 	 	 
+%% generate_ante( :Term_G5812, :Term_G5941, ?VALUE3, ?VALUE4) is semidet.
+%
+% Generate Ante.
+%
 generate_ante([],[],InOut,InOut).
 generate_ante([I|VarsA],[T|VarsB],In,Isas):- use_was_isa_h(I,T,ISA), conjoin(In,ISA,Mid),generate_ante(VarsA,VarsB,Mid,Isas).
 
+
+% 	 	 
+%% get_constraints( ?ListA, ?Isas) is semidet.
+%
+% Get Constraints.
+%
 get_constraints(T,true):- T==true.
 get_constraints(_,true):- !.
 get_constraints(ListA,Isas):-
@@ -1009,6 +1635,12 @@ get_constraints(ListA,Isas):-
       generate_ante(VarsA,VarsB,true,Isas))).
 
 
+
+% 	 	 
+%% boxlog_to_prolog( :TermIN, :TermOUT) is semidet.
+%
+% Datalog Converted To Prolog.
+%
 boxlog_to_prolog(IN,OUT):-notrace(leave_as_is(IN)),!,IN=OUT.
 boxlog_to_prolog(IN,OUT):-once(demodal_sents('$VAR'('KB'),IN,MID)),IN\=@=MID,!,boxlog_to_prolog(MID,OUT).
 boxlog_to_prolog(IN,OUT):-once(subst_except(IN,~,~,MID)),IN\=@=MID,!,boxlog_to_prolog(MID,OUT).

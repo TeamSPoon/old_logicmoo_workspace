@@ -20,6 +20,12 @@
         test2/1.
 
 
+
+% 	 	 
+%% on_x_fail_priv( :GoalGoal) is semidet.
+%
+% If there If Is A an exception in  :Goal goal then fail priv.
+%
 on_x_fail_priv(Goal):- catch(Goal,_,fail).
 
 :- use_module(library(prolog_stream)).
@@ -70,6 +76,12 @@ on_x_fail_priv(Goal):- catch(Goal,_,fail).
 :- meta_predicate(tl_with_prolog_streams:stream_write(?,?)).
 
 :- meta_predicate(with_output_to_pred(1,0)).
+
+% 	 	 
+%% with_output_to_pred( :PRED1Callback, :GoalGoal) is semidet.
+%
+% Using Output Converted To Predicate.
+%
 with_output_to_pred(Callback,Goal):-
   current_output(Prev),
     with_output_to_stream_pred(Callback,Stream,
@@ -79,15 +91,33 @@ with_output_to_pred(Callback,Goal):-
        (set_stream(Prev,  alias(user_output)),
        set_stream(Prev,  alias(current_output)))).
  
+
+% 	 	 
+%% with_err_to_pred( :PRED1Callback, :GoalGoal) is semidet.
+%
+% Using Err Converted To Predicate.
+%
 with_err_to_pred(Callback,Goal):-
   thread_current_error_stream(Err),
     with_output_to_stream_pred(Callback,Stream,
       (set_stream(Stream, alias(user_error)), Goal),
        set_stream(Err, alias(user_error))).
 
+
+% 	 	 
+%% some_test is semidet.
+%
+% Some Test.
+%
 some_test :- dynamic(received_chars/1).
 
 
+
+% 	 	 
+%% with_output_to_stream_pred( :PRED1Callback, -Stream, :GoalGoal, :GoalExit) is semidet.
+%
+% Using Output Converted To Stream Predicate.
+%
 with_output_to_stream_pred(Callback,Stream,Goal,Exit):- 
   open_prolog_stream(tl_with_prolog_streams, write, Stream, []),
   call_cleanup((
@@ -104,6 +134,12 @@ with_output_to_stream_pred(Callback,Stream,Goal,Exit):-
 
 
 % test predciate to receive char codes
+
+% 	 	 
+%% buffer_chars( ?N) is semidet.
+%
+% Buffer Chars.
+%
 buffer_chars(end_of_file):-!,assertz(received_chars(end_of_file)).
 buffer_chars(N):-number(N),!,char_code(C,N),assertz(received_chars(C)).
 buffer_chars(C):-name(C,Chars),maplist(buffer_chars,Chars).
@@ -156,6 +192,12 @@ some_test :- with_output_to_pred(dmsg, (current_output(Out),forall(stream_proper
 % dmsg: stream_property(<stream>(0x232b8a0),newline(posix)).
 % dmsg: stream_property(<stream>(0x232b8a0),representation_errors(error)).
 
+
+% 	 	 
+%% l_prolog_streams is semidet.
+%
+% (list Version) Prolog Streams.
+%
 l_prolog_streams.
 
 
@@ -172,6 +214,12 @@ l_prolog_streams.
 :- thread_local(tl_with_prolog_streams:stream_read/2).
 :- meta_predicate(tl_with_prolog_streams:stream_read(?,?)).
 :- meta_predicate(prolog_stream:open_prolog_stream(?,?,?,?)).
+
+% 	 	 
+%% with_input_from_pred( :PRED1Callback, :GoalGoal) is semidet.
+%
+% Using Input Converted From Predicate.
+%
 with_input_from_pred(Callback,Goal):-
  current_input(Old),
  call_cleanup((
@@ -186,6 +234,12 @@ with_input_from_pred(Callback,Goal):-
  set_input(Old)).
 
 % our test callback
+
+% 	 	 
+%% read_received( ?A) is semidet.
+%
+% Read Received.
+%
 read_received(A):- A == end_of_file,!. %  Dmiles was lazy
 read_received(C):- retract(received_chars(A)), (A==end_of_file -> C="" ; C =A).
 read_received("").
@@ -241,6 +295,12 @@ some_test :- with_input_from_pred(=(hi), \+ at_end_of_stream(current_input)).
 
 
 % Test 1
+
+% 	 	 
+%% test1_0( ?In) is semidet.
+%
+% test Secondary Helper  Primary Helper.
+%
 test1_0(In) :-
         repeat,
                get_char(In, Char),
@@ -258,6 +318,12 @@ some_test :- with_input_from_pred(read_received, test1_0(current_input)).
 
 
 % Test 2 is indeed asks much, but still is reasonable
+
+% 	 	 
+%% test2( ?In) is semidet.
+%
+% Test Extended Helper.
+%
 test2(In) :-
         repeat,
             (   at_end_of_stream(In)

@@ -28,6 +28,12 @@
 :- dynamic(user:file_search_path/2).
 :- multifile(user:file_search_path/2).
 
+
+% 	 	 
+%% resolve_dir( ?Dir, ?Dir) is semidet.
+%
+% Resolve Dir.
+%
 resolve_dir(Dir,Dir):- is_absolute_file_name(Dir),!,exists_directory(Dir),!.
 resolve_dir(Path,Dir):- (prolog_load_context(directory,SDir);(prolog_load_context(file,File),file_directory_name(File,SDir)),working_directory(SDir,SDir)),
    absolute_file_name(Path,Dir,[relative_to(SDir),file_type(directory)]),exists_directory(Dir).
@@ -40,6 +46,12 @@ resolve_dir(Path,Dir):- (prolog_load_context(directory,SDir);(prolog_load_contex
 %	  ==
 %	  :- add_file_search_path(all_utils, '../*/util/').
 %	  ==
+%
+
+% 	 	 
+%% add_file_search_path( ?Name, ?Path) is semidet.
+%
+% Add File Search Path.
 %
 add_file_search_path(Name,Path):-  resolve_dir(Path,Dir),
    is_absolute_file_name(Dir), (( \+ user:file_search_path(Name,Dir)) ->asserta(user:file_search_path(Name,Dir));true).
@@ -70,6 +82,12 @@ add_file_search_path(Name,Path):-  resolve_dir(Path,Dir),
 %	  :- add_library_search_path('../*/util/',[ 'logicmoo_util_*.pl']).
 %	  ==
 %
+
+% 	 	 
+%% add_library_search_path( ?Path, ?Masks) is semidet.
+%
+% Add Library Search Path.
+%
 add_library_search_path(Path,Masks):- 
       forall(resolve_dir(Path,Dir), 
       (make_library_index(Dir, Masks), 
@@ -85,6 +103,13 @@ add_library_search_path(Path,Masks):-
 % ======================================================
 :- dynamic(lmconf:logicmoo_scan_autoloads/0).
 :- dynamic(lmconf:logicmoo_pre_release/0).
+
+% 	 	 
+%% lmconf:logicmoo_pre_release is semidet.
+%
+% Hook To [lmconf:logicmoo_pre_release/0] For Module Logicmoo_utils.
+% Logicmoo Pre Release.
+%
 lmconf:logicmoo_pre_release.
 
 :- if(lmconf:logicmoo_pre_release).
@@ -102,6 +127,13 @@ lmconf:logicmoo_pre_release.
 :- notrace.
 :- endif.
 
+
+% 	 	 
+%% lmconf:logicmoo_scan_autoloads is semidet.
+%
+% Hook To [lmconf:logicmoo_scan_autoloads/0] For Module Logicmoo_utils.
+% Logicmoo Scan Autoloads.
+%
 lmconf:logicmoo_scan_autoloads:-false.
 
 :- endif.
@@ -135,6 +167,13 @@ lmconf:logicmoo_scan_autoloads:-false.
 
 :- multifile(lmconf:mpred_is_impl_file/1).
 :- dynamic(lmconf:mpred_is_impl_file/1).
+
+% 	 	 
+%% lmconf:mpred_is_impl_file( ?VALUE1) is semidet.
+%
+% Hook To [lmconf:mpred_is_impl_file/1] For Module Logicmoo_utils.
+% Managed Predicate If Is A Implimentation File.
+%
  lmconf:mpred_is_impl_file(util/logicmoo_util_first).
  lmconf:mpred_is_impl_file(util/logicmoo_util_database).
  lmconf:mpred_is_impl_file(util/logicmoo_util_catch).

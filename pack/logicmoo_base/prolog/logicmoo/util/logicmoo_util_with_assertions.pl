@@ -30,6 +30,12 @@
 
 :- include('logicmoo_util_header.pi').
 
+
+% 	 	 
+%% with_no_x( :GoalG) is semidet.
+%
+% Using No X.
+%
 with_no_x(G):- getenv('DISPLAY',DISP),!,call_cleanup((unsetenv('DISPLAY'),with_no_x(G)),setenv('DISPLAY',DISP)).
 with_no_x(G):- current_prolog_flag(gui,true),!,call_cleanup((set_prolog_flag(gui,false),with_no_x(G)),set_prolog_flag(gui,true)).
 with_no_x(G):- current_prolog_flag(gui_tracer,true),!,call_cleanup((noguitracer,with_no_x(G)),guitracer).
@@ -37,10 +43,22 @@ with_no_x(G):- call(G).
 
 % maybe this one wont use thread local checking
 % = :- meta_predicate(wtg(:,0)).
+
+% 	 	 
+%% wtg( ?CALL1, :GoalGOAL2) is semidet.
+%
+% Wtg.
+%
 wtg(M:With,Call):- w_tl(M:With,Call).
 
 % = :- meta_predicate(w_tl(:,0)).
 
+
+% 	 	 
+%% w_tl( ?CALL1, ?CALL2) is semidet.
+%
+% W Thread Local.
+%
 w_tl(_:[],Call):- !,Call.
 w_tl(M:[With|MORE],Call):- !,w_tl(M:With,w_tl(M:MORE,Call)).
 w_tl(M:(With,MORE),Call):- !,w_tl(M:With,w_tl(M:MORE,Call)).
@@ -74,6 +92,12 @@ w_tl(WM:THeadWM,CM:Call):-
             setup_call_cleanup(asserta(M:HAssert,REF),CM:Call,erase(REF))).
 
 
+
+% 	 	 
+%% wno_tl( :GoalUHead, :GoalCall) is semidet.
+%
+% Wno Thread Local.
+%
 wno_tl(UHead,Call):- w_tl((UHead :- !,fail),Call).
 
 /*
@@ -83,6 +107,12 @@ wno_tl(UHead,Call):-
        setup_call_cleanup(hotrace(M:asserta(HAssert,REF)),Call,M:erase_safe(HAssert,REF)).
 */
 
+
+% 	 	 
+%% to_thread_head_1m( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
+%
+% Converted To Thread Head 1m.
+%
 to_thread_head_1m((H:-B),TL,HO,(HH:-B)):-!,to_thread_head_1m(H,TL,HO,HH),!.
 to_thread_head_1m(lmconf:Head,lmconf,lmconf:Head,Head):- !.
 to_thread_head_1m(TL:Head,TL,TL:Head,Head):-!, check_thread_local_1m(TL:Head).
@@ -91,6 +121,12 @@ to_thread_head_1m(lmconf:Head,user,lmconf:Head,Head):- !.
 to_thread_head_1m(Head,t_l,t_l:Head,Head):-!,check_thread_local_1m(t_l:Head).
 to_thread_head_1m(Head,tlbugger,tlbugger:Head,Head):-check_thread_local_1m(tlbugger:Head).
 
+
+% 	 	 
+%% check_thread_local_1m( ?TLHead) is semidet.
+%
+% Check Thread Local 1m.
+%
 check_thread_local_1m(_):-!.
 check_thread_local_1m(t_l:_):-!.
 check_thread_local_1m(tlbugger:_):-!.

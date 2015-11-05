@@ -49,7 +49,6 @@
 :- include('logicmoo_util_header.pi').
 :- endif.
 
-
 % ===================================================================
 
 :- thread_local  tlbugger:attributedVars.
@@ -58,6 +57,12 @@
 
 :- export(must_not_repeat/1).
 % = :- meta_predicate(must_not_repeat(0)).
+
+% 	 	 
+%% must_not_repeat( :GoalC) is semidet.
+%
+% Must Be Successfull Not Repeat.
+%
 must_not_repeat(C):-call(C).
 
 % ===================================================
@@ -75,6 +80,12 @@ must_not_repeat(C):-call(C).
 
 
 
+
+% 	 	 
+%% no_repeats_av is semidet.
+%
+% No Repeats Attributed Variables.
+%
 no_repeats_av:-tlbugger:attributedVars.
 
 :- export(no_repeats/1).
@@ -82,6 +93,12 @@ no_repeats_av:-tlbugger:attributedVars.
 
 % no_repeats(Call):- tlbugger:old_no_repeats,!, no_repeats_old(Call).
 %no_repeats(Call):- no_repeats_av,!,no_repeats_av(Call).
+
+% 	 	 
+%% no_repeats( :GoalCall) is semidet.
+%
+% No Repeats.
+%
 no_repeats(Call):- no_repeats_old(Call).
 
 
@@ -89,6 +106,12 @@ no_repeats(Call):- no_repeats_old(Call).
 :- meta_predicate no_repeats(+,0).
 %no_repeats(Vs,Call):- tlbugger:old_no_repeats,!,no_repeats_old(Vs,Call).
 %no_repeats(Vs,Call):- no_repeats_av,!,no_repeats_av(Vs,Call).
+
+% 	 	 
+%% no_repeats( +Vs, :GoalCall) is semidet.
+%
+% No Repeats.
+%
 no_repeats(Vs,Call):- no_repeats_old(Vs,Call).
 
 /*
@@ -110,21 +133,51 @@ no_repeats_dif(Vs,Call):- dif(Vs,_), get_attr(Vs,dif,vardif(CONS,_)),!,
 % ===================================================
 :- export(no_repeats_old/1).
 :- meta_predicate no_repeats_old(0).
+
+% 	 	 
+%% no_repeats_old( :GoalCall) is semidet.
+%
+% No Repeats Old.
+%
 no_repeats_old(Call):- no_repeats_old(Call,Call).
 
 
 % :- use_module(rec_lambda).
 
+
+% 	 	 
+%% memberchk_same( ?VALUE1, :Term_G26780) is semidet.
+%
+% Memberchk Same.
+%
 memberchk_same(X, [Y0|Ys]) :- is_list(Ys),!,C=..[v,Y0|Ys],!, arg(_,C,Y), ( X =@= Y ->  (var(X) -> X==Y ; true)),!.
 memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),memberchk_same(X, Ys) )).
 
+
+% 	 	 
+%% memberchk_pred( :PRED2VALUE1, ?UPARAM2, ?UPARAM3) is semidet.
+%
+% Memberchk Predicate.
+%
 memberchk_pred(Pred, X, [Y0|Ys]) :- is_list(Ys),C=..[v,Y0|Ys],!, arg(_,C,Y), call(Pred,X,Y),!.
 memberchk_pred(Pred, X, [Y|Ys]) :- (   call(Pred,X,Y) -> true ;   (nonvar(Ys),memberchk_pred(Pred, X, Ys) )).
+
+% 	 	 
+%% memberchk_pred_rev( :PRED2VALUE1, ?UPARAM2, ?UPARAM3) is semidet.
+%
+% Memberchk Predicate Rev.
+%
 memberchk_pred_rev(Pred, X, [Y0|Ys]) :- is_list(Ys),C=..[v,Y0|Ys],!, arg(_,C,Y), call(Pred,Y,X),!.
 memberchk_pred_rev(Pred, X, [Y|Ys]) :- (   call(Pred,Y,X) -> true ;   (nonvar(Ys),memberchk_pred_rev(Pred,X, Ys) )).
 
 :- export(no_repeats_old/2).
 :- meta_predicate no_repeats_old(+,0).
+
+% 	 	 
+%% no_repeats_old( +Vs, :GoalCall) is semidet.
+%
+% No Repeats Old.
+%
 no_repeats_old(Vs,Call):- ground(Vs),!,Call,!.
 no_repeats_old(Vs,Call):- CONS = [_], (Call), cnotrace(( \+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T], nb_setarg(2, CONS, [CVs|T]))).
 
@@ -141,6 +194,12 @@ no_repeats_t(Vs,Call):- CONS = [_], (Call), (( \+ call(lambda(X, [Y|Ys], (   X =
 
 :- export(no_repeats_u/2).
 :- meta_predicate no_repeats_u(+,0).
+
+% 	 	 
+%% no_repeats_u( +Vs, :GoalCall) is semidet.
+%
+% No Repeats For User Code.
+%
 no_repeats_u(Vs,Call):- CONS = [_], (Call), /*hotrace*/((  CONS=[_|T],
     \+ memberchk_pred_rev(subsumes_term,Vs,T), copy_term(Vs,CVs), nb_setarg(2, CONS, [CVs|T]))).
 
@@ -156,6 +215,12 @@ no_repeats_dc(Vs,Call):- term_variables(Call,CV),term_variables(Vs,VsL),subtract
 %% subtract_eq(+Set, +Delete, -Result) is det.
 % Delete all elements in Delete from Set. Deletion is based on unification using ==/2. The complexity is |Delete|*|Set|.
 
+
+% 	 	 
+%% subtract_eq( :Term_G24147, ?VALUE2, ?VALUE3) is semidet.
+%
+% Subtract Using (==/2) (or =@=/2) ).
+%
 subtract_eq([],_,[]) :- !.
 subtract_eq([E|Set], Delete, Result) :-
    subtract_eq(Set, Delete, Mid),
@@ -214,6 +279,12 @@ no_repeats_av(
 :- meta_predicate succeeds_n_times(0, -).
 % =========================================================================
 
+
+% 	 	 
+%% succeeds_n_times( :GoalGoal, -Times) is semidet.
+%
+% Succeeds N Times.
+%
 succeeds_n_times(Goal, Times) :-
         Counter = counter(0),
         (   Goal,
@@ -228,6 +299,12 @@ succeeds_n_times(Goal, Times) :-
 
 :- export(no_repeats_findall5/5).
 :- meta_predicate no_repeats_findall5(+,0,-,-,-).
+
+% 	 	 
+%% no_repeats_findall5( +Vs, :GoalCall, -ExitDET, -USE, -NEW) is semidet.
+%
+% No Repeats Findall5.
+%
 no_repeats_findall5(Vs,Call,ExitDET,USE,NEW):-
    (((HOLDER = fa([]),
    Call,arg(1,HOLDER,CONS),
@@ -246,6 +323,12 @@ no_repeats_findall5(Vs,Call,ExitDET,USE,NEW):-
 
 :- export(no_repeats_save/4).
 :- meta_predicate no_repeats_save(+,0,-,-).
+
+% 	 	 
+%% no_repeats_save( +Vs, :GoalCall, -Saved, -USE) is semidet.
+%
+% No Repeats Save.
+%
 no_repeats_save(Vs,Call,Saved,USE):-
  SavedHolder = saved(_),
   no_repeats_findall5(Vs,Call,ExitDET,USE,NEW),
@@ -254,6 +337,12 @@ no_repeats_save(Vs,Call,Saved,USE):-
 
 :- export(no_repeats_save/2).
 :- meta_predicate no_repeats_save(+,0).
+
+% 	 	 
+%% no_repeats_save( +Vs, :GoalCall) is semidet.
+%
+% No Repeats Save.
+%
 no_repeats_save(Vs,Call):-
   call_cleanup(
    (( no_repeats_save(Vs,Call,SavedList,USE),
@@ -263,6 +352,12 @@ no_repeats_save(Vs,Call):-
 
 :- export(no_repeats_findall_r/5).
 :- meta_predicate no_repeats_findall_r(+,0,-,-,-).
+
+% 	 	 
+%% no_repeats_findall_r( +Vs, :GoalCall, -CONS, -ExitDET, -List) is semidet.
+%
+% No Repeats Findall R.
+%
 no_repeats_findall_r(Vs,Call,CONS,ExitDET,List):-
    CONS = [ExitDET],
    (Call,once(( \+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T],List=[CVs|T], nb_linkarg(2, CONS, List)))),
@@ -270,6 +365,12 @@ no_repeats_findall_r(Vs,Call,CONS,ExitDET,List):-
 
 
 
+
+% 	 	 
+%% term( :PRED-1VALUE1, :PRED1VALUE2) is semidet.
+%
+% Term.
+%
 term((-7), 3).
 term(2,10).
 term((-8), 5).

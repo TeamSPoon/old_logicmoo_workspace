@@ -143,8 +143,20 @@ quiet_all_module_predicates_are_transparent/1,
 :- meta_predicate programmer_error(0).
 :- meta_predicate safe_numbervars(*,?).
 
+
+% 	 	 
+%% alldiscontiguous is semidet.
+%
+% Alldiscontiguous.
+%
 alldiscontiguous:-!.
 
+
+% 	 	 
+%% source_context_module( ?CM) is semidet.
+%
+% Source Context Module.
+%
 source_context_module(CM):-'$set_source_module'(CM,CM).
 
 %================================================================
@@ -153,9 +165,21 @@ source_context_module(CM):-'$set_source_module'(CM,CM).
 
 % = :- meta_predicate('match_predicates'(:,-)).
 
+
+% 	 	 
+%% match_predicates( ?MSpec, -MatchesO) is semidet.
+%
+% Match Predicates.
+%
 match_predicates(M:Spec,Preds):- catch('$find_predicate'(M:Spec, Preds),_,catch('$find_predicate'(Spec, Preds),_,catch('$find_predicate'(lmconf:Spec, Preds),_,fail))),!.
 match_predicates(MSpec,MatchesO):- catch('$dwim':'$find_predicate'(MSpec,Matches),_,Matches=[]),!,MatchesO=Matches.
 
+
+% 	 	 
+%% match_predicates( ?Spec, -M, -P, -F, -A) is semidet.
+%
+% Match Predicates.
+%
 match_predicates(_:[],_M,_P,_F,_A):-!,fail.
 match_predicates(IM:(ASpec,BSpec),M,P,F,A):-!, (match_predicates(IM:(ASpec),M,P,F,A);match_predicates(IM:(BSpec),M,P,F,A)).
 match_predicates(IM:[ASpec|BSpec],M,P,F,A):-!, (match_predicates(IM:(ASpec),M,P,F,A);match_predicates(IM:(BSpec),M,P,F,A)).
@@ -165,9 +189,21 @@ match_predicates(Spec,M,P,F,A):- '$find_predicate'(Spec,Matches),member(CM:F/A,M
 :- module_transparent(if_may_hide/1).
 % = :- meta_predicate(if_may_hide(0)).
 %if_may_hide(_G):-!.
+
+% 	 	 
+%% if_may_hide( :GoalG) is semidet.
+%
+% If May Hide.
+%
 if_may_hide(G):-G.
 
 :- meta_predicate with_unlocked_pred(:,0).
+
+% 	 	 
+%% with_unlocked_pred( ?Pred, :GoalGoal) is semidet.
+%
+% Using Unlocked Predicate.
+%
 with_unlocked_pred(Pred,Goal):-
    (predicate_property(Pred,foreign)-> true ;
   (
@@ -176,6 +212,12 @@ with_unlocked_pred(Pred,Goal):-
    catch(Goal,_,true),'$set_predicate_attribute'(Pred, system, 1))))).
 
 :- export(mpred_trace_less/1).
+
+% 	 	 
+%% mpred_trace_less( ?W) is semidet.
+%
+% Managed Predicate  Trace less.
+%
 mpred_trace_less(W):- if_may_hide(forall(match_predicates(W,M,Pred,_,_),(
 with_unlocked_pred(M:Pred,(
   '$set_predicate_attribute'(M:Pred, noprofile, 1),
@@ -183,11 +225,23 @@ with_unlocked_pred(M:Pred,(
   (A==0 -> '$set_predicate_attribute'(M:Pred, trace, 0);'$set_predicate_attribute'(M:Pred, trace, 1))))))).
 
 :- export(mpred_trace_none/1).
+
+% 	 	 
+%% mpred_trace_none( ?W) is semidet.
+%
+% Managed Predicate  Trace none.
+%
 mpred_trace_none(W):- (forall(match_predicates(W,M,Pred,F,A),
 with_unlocked_pred(M:Pred,(
 ('$hide'(M:F/A),'$set_predicate_attribute'(M:Pred, hide_childs, 1),noprofile(M:F/A),nospy(M:Pred)))))).
 
 :- export(mpred_trace_nochilds/1).
+
+% 	 	 
+%% mpred_trace_nochilds( ?W) is semidet.
+%
+% Managed Predicate  Trace nochilds.
+%
 mpred_trace_nochilds(W):- if_may_hide(forall(match_predicates(W,M,Pred,_,_),(
 with_unlocked_pred(M:Pred,(
 '$set_predicate_attribute'(M:Pred, trace, 1),
@@ -195,12 +249,24 @@ with_unlocked_pred(M:Pred,(
 '$set_predicate_attribute'(M:Pred, hide_childs, 1)))))).
 
 :- export(mpred_trace_childs/1).
+
+% 	 	 
+%% mpred_trace_childs( ?W) is semidet.
+%
+% Managed Predicate  Trace childs.
+%
 mpred_trace_childs(W) :- if_may_hide(forall(match_predicates(W,M,Pred,_,_),(
 with_unlocked_pred(M:Pred,(
 '$set_predicate_attribute'(M:Pred, trace, 0),
 '$set_predicate_attribute'(M:Pred, noprofile, 1),
 '$set_predicate_attribute'(M:Pred, hide_childs, 0)))))).   
 
+
+% 	 	 
+%% mpred_trace_all( ?W) is semidet.
+%
+% Managed Predicate  Trace all.
+%
 mpred_trace_all(W) :- forall(match_predicates(W,M,Pred,_,A),( 
  with_unlocked_pred(M:Pred,(
  (A==0 -> '$set_predicate_attribute'(M:Pred, trace, 0);'$set_predicate_attribute'(M:Pred, trace, 1)),
@@ -216,15 +282,33 @@ mpred_trace_all(W) :- forall(match_predicates(W,M,Pred,_,A),(
 :- export(tlbugger:ifHideTrace/0).
 :- thread_local(tlbugger:ifHideTrace/0).
 :- thread_local(tlbugger:tl_always_show_dmsg).
+
+% 	 	 
+%% always_show_dmsg is semidet.
+%
+% Always Show (debug)message.
+%
 always_show_dmsg:- thread_self(main).
 always_show_dmsg:- tlbugger:tl_always_show_dmsg.
 
+
+% 	 	 
+%% term_to_string( ?IS, ?I) is semidet.
+%
+% Term Converted To String.
+%
 term_to_string(IS,I):- on_x_fail(term_string(IS,I)),!.
 term_to_string(I,IS):- on_x_fail(string_to_atom(IS,I)),!.
 term_to_string(I,IS):- grtrace(term_to_atom(I,A)),string_to_atom(IS,A),!.
 
 
 :- meta_predicate mustvv(0).
+
+% 	 	 
+%% mustvv( :GoalG) is semidet.
+%
+% Mustvv.
+%
 mustvv(G):-must(G).
 
 %:- export(unnumbervars/2).
@@ -232,10 +316,22 @@ mustvv(G):-must(G).
 % TODO compare the speed
 % unnumbervars(X,YY):- mustvv(unnumbervars0(X,Y)),!,mustvv(Y=YY).
 
+
+% 	 	 
+%% unnumbervars( ?X, ?Y) is semidet.
+%
+% Unnumbervars.
+%
 unnumbervars(X,Y):-
    with_output_to(string(A),write_term(X,[numbervars(true),character_escapes(true),ignore_ops(true),quoted(true)])),
    mustvv(atom_to_term(A,Y,_)),!.
 
+
+% 	 	 
+%% unnumbervars_and_save( ?X, ?YO) is semidet.
+%
+% Unnumbervars And Save.
+%
 unnumbervars_and_save(X,YO):- % trace_or_throw(unnumbervars_and_save(X,YO)),
  term_variables(X,TV),
  mustvv((source_variables_l(Vs),
@@ -304,10 +400,22 @@ unnumbervars_and_copy(X,YO):-
 */
 
 %add_newvars(_):-!.
+
+% 	 	 
+%% add_newvars( :TermVs) is semidet.
+%
+% Add Newvars.
+%
 add_newvars(Vs):- (var(Vs);Vs=[]),!.
 add_newvars([N=V|Vs]):- add_newvar(N,V),!,add_newvars(Vs).
 
 
+
+% 	 	 
+%% add_newvar( ?VALUE1, ?V) is semidet.
+%
+% Add Newvar.
+%
 add_newvar(_,V):-nonvar(V),!.
 add_newvar(N,_):-var(N),!.
 add_newvar('A',_):-!.
@@ -318,6 +426,12 @@ add_newvar(N,V):-
   remove_grounds(V0s,Vs),
  once((member(NN=Was,Vs),N==NN,var(Was),var(V),(Was=V))-> (V0s==Vs->true;nb_linkval('$variable_names',Vs)); nb_linkval('$variable_names',[N=V|Vs])).
 
+
+% 	 	 
+%% remove_grounds( :TermVs, :TermVs) is semidet.
+%
+% Remove Grounds.
+%
 remove_grounds(Vs,Vs):-var(Vs),!.
 remove_grounds([],[]):-!.
 remove_grounds([N=V|NewCNamedVarsS],NewCNamedVarsSG):-
@@ -327,13 +441,31 @@ remove_grounds([N=V|V0s],[N=NV|Vs]):-
    remove_grounds(V0s,Vs).
 
 % renumbervars_prev(X,X):-ground(X),!.
+
+% 	 	 
+%% renumbervars_prev( ?X, ?Y) is semidet.
+%
+% Renumbervars Prev.
+%
 renumbervars_prev(X,Y):-renumbervars1(X,[],Y,_),!.
 renumbervars_prev(X,Z):-unnumbervars(X,Y),safe_numbervars(Y,Z),!.
 renumbervars_prev(Y,Z):-safe_numbervars(Y,Z),!.
 
 
+
+% 	 	 
+%% renumbervars1( ?X, ?Y) is semidet.
+%
+% Renumbervars Secondary Helper.
+%
 renumbervars1(X,Y):-renumbervars1(X,[],Y,_).
 
+
+% 	 	 
+%% renumbervars1( :TermV, ?IVs, :TermX, ?Vs) is semidet.
+%
+% Renumbervars Secondary Helper.
+%
 renumbervars1(V,IVs,'$VAR'(X),Vs):- var(V), sformat(atom(X),'~w_RNV',[V]), !, (memberchk(X=V,IVs)->Vs=IVs;Vs=[X=V|IVs]).
 renumbervars1(X,Vs,X,Vs):- ( \+ compound(X)),!.
 renumbervars1('$VAR'(V),IVs,Y,Vs):- sformat(atom(X),'~w_VAR',[V]), !, (memberchk(X=Y,IVs)->Vs=IVs;Vs=[X=Y|IVs]).
@@ -354,14 +486,32 @@ renumbervars1(XXM,IVs,YYM,Vs):-
 % Each prolog has a specific way it could unnumber the result of a safe_numbervars
 % ========================================================================================
 % 7676767
+
+% 	 	 
+%% safe_numbervars( ?E, ?EE) is semidet.
+%
+% Safely Paying Attention To Corner Cases Numbervars.
+%
 safe_numbervars(E,EE):-duplicate_term(E,EE),
   get_gtime(G),numbervars(EE,G,End,[attvar(skip),functor_name('$VAR'),singletons(true)]),
   term_variables(EE,AttVars),
   numbervars(EE,End,_,[attvar(skip),functor_name('$VAR'),singletons(true)]),
   forall(member(V,AttVars),(copy_term(V,VC,Gs),V='$VAR'(VC=Gs))),check_varnames(EE).
 
+
+% 	 	 
+%% get_gtime( ?GG) is semidet.
+%
+% Get Gtime.
+%
 get_gtime(GG):- get_time(T),convert_time(T,_A,_B,_C,_D,_E,_F,G),GG is (floor(G) rem 500).
 
+
+% 	 	 
+%% safe_numbervars( ?EE) is semidet.
+%
+% Safely Paying Attention To Corner Cases Numbervars.
+%
 safe_numbervars(EE):-get_gtime(G),numbervars(EE,G,_End,[attvar(skip),functor_name('$VAR'),singletons(true)]),check_varnames(EE).
 
 
@@ -372,11 +522,29 @@ safe_numbervars(EE):-get_gtime(G),numbervars(EE,G,_End,[attvar(skip),functor_nam
 %   During copying one has to remeber copies of variables which can be used further during copying.
 %   Therefore the register of variable copies is maintained.
 %
+
+% 	 	 
+%% register_var( :Term_G27214, ?VALUE2, ?VALUE3) is semidet.
+%
+% Register Variable.
+%
 register_var(N=V,IN,OUT):- (var(N)->true;register_var(N,IN,V,OUT)),!.
 
+
+% 	 	 
+%% register_var( ?N, ?T, ?V, ?OUTO) is semidet.
+%
+% Register Variable.
+%
 register_var(N,T,V,OUTO):-register_var_0(N,T,V,OUT),mustvv(OUT=OUTO),!.
 register_var(N,T,V,O):-append(T,[N=V],O),!.
 
+
+% 	 	 
+%% register_var_0( ?N, ?T, ?V, ?OUT) is semidet.
+%
+% register Variable  Primary Helper.
+%
 register_var_0(N,T,V,OUT):- atom(N),is_list(T),member(NI=VI,T),atom(NI),N=NI,V=@=VI,samify(V,VI),!,OUT=T.
 register_var_0(N,T,V,OUT):- atom(N),is_list(T),member(NI=VI,T),atom(NI),N=NI,V=VI,!,OUT=T.
 
@@ -399,13 +567,31 @@ register_var_0(N,T,V,OUT):- var(N),
 
 
 % different variables (now merged)
+
+% 	 	 
+%% samify( ?V, ?V0) is semidet.
+%
+% Samify.
+%
 samify(V,V0):-var(V),var(V0),!,mustvv(V=V0).
 samify(V,V0):-mustvv(V=@=V0),V=V0. 
 
+
+% 	 	 
+%% var_to_name( ?VALUE1, :Term_G24547, ?VALUE3) is semidet.
+%
+% Variable Converted To Name.
+%
 var_to_name(V,[N=V0|T],N):-
     V==V0 -> true ;          % same variables
     var_to_name(V,T,N).
 
+
+% 	 	 
+%% name_to_var( ?N, :TermT, ?V) is semidet.
+%
+% Name Converted To Variable.
+%
 name_to_var(N,T,V):- var(N),!,var_to_name(N,T,V).
 name_to_var(N,[N0=V0|T],V):- 
    N0==N -> samify(V,V0) ; name_to_var(N,T,V).
@@ -425,9 +611,21 @@ bugger_name_variables([Var|Vars]):-
 
 */
 :- export(snumbervars/1).
+
+% 	 	 
+%% snumbervars( ?Term) is semidet.
+%
+% Snumbervars.
+%
 snumbervars(Term):-snumbervars(Term,0,_).
 
 :- export(snumbervars/3).
+
+% 	 	 
+%% snumbervars( ?Term, ?Start, ?End) is semidet.
+%
+% Snumbervars.
+%
 snumbervars(Term,Start,End):- integer(Start),var(End),!,snumbervars(Term,Start,End,[]).
 snumbervars(Term,Start,List):- integer(Start),is_list(List),!,snumbervars(Term,Start,_,List).
 snumbervars(Term,Functor,Start):- integer(Start),atom(Functor),!,snumbervars(Term,Start,_End,[functor_name(Functor)]).
@@ -435,6 +633,12 @@ snumbervars(Term,Functor,List):- is_list(List),atom(Functor),!,snumbervars(Term,
 
 
 :- export(snumbervars/4).
+
+% 	 	 
+%% snumbervars( ?Term, ?Start, ?End, ?List) is semidet.
+%
+% Snumbervars.
+%
 snumbervars(Term,Start,End,List):-numbervars(Term,Start,End,List).
 
 
@@ -443,23 +647,53 @@ snumbervars(Term,Start,End,List):-numbervars(Term,Start,End,List).
 
 
 
+
+% 	 	 
+%% module_predicate( ?ModuleName, ?P, ?F, ?A) is semidet.
+%
+% Module Predicate.
+%
 module_predicate(ModuleName,P,F,A):-current_predicate(ModuleName:F/A),functor_catch(P,F,A), not((( predicate_property(ModuleName:P,imported_from(IM)),IM\==ModuleName ))).
 
 
 :- export((user_ensure_loaded/1)).
 :- module_transparent user_ensure_loaded/1.
+
+% 	 	 
+%% user_ensure_loaded( ?What) is semidet.
+%
+% User Ensure Loaded.
+%
 user_ensure_loaded(What):- !, '@'(ensure_loaded(What),'user').
 
 :- module_transparent user_use_module/1.
 % user_use_module(logicmoo(What)):- !, '@'(use_module(logicmoo(What)),'user').
 % user_use_module(library(What)):- !, use_module(library(What)).
+
+% 	 	 
+%% user_use_module( ?What) is semidet.
+%
+% User Use Module.
+%
 user_use_module(What):- '@'(use_module(What),'user').
 
 
 
 
+
+% 	 	 
+%% export_all_preds is semidet.
+%
+% Export All Predicates.
+%
 export_all_preds:-source_location(File,_Line),module_property(M,file(File)),!,export_all_preds(M).
 
+
+% 	 	 
+%% export_all_preds( ?ModuleName) is semidet.
+%
+% Export All Predicates.
+%
 export_all_preds(ModuleName):-forall(current_predicate(ModuleName:F/A),
                    ((export(F/A),functor_safe(P,F,A),mpred_trace_nochilds(ModuleName:P)))).
 
@@ -468,6 +702,12 @@ export_all_preds(ModuleName):-forall(current_predicate(ModuleName:F/A),
 
 
 
+
+% 	 	 
+%% module_predicate( ?ModuleName, ?F, ?A) is semidet.
+%
+% Module Predicate.
+%
 module_predicate(ModuleName,F,A):-current_predicate(ModuleName:F/A),functor_safe(P,F,A),
    not((( predicate_property(ModuleName:P,imported_from(IM)),IM\==ModuleName ))).
 
@@ -475,11 +715,29 @@ module_predicate(ModuleName,F,A):-current_predicate(ModuleName:F/A),functor_safe
 :- module_transparent(module_predicates_are_exported/1).
 :- module_transparent(module_predicates_are_exported0/1).
 
+
+% 	 	 
+%% module_predicates_are_exported is semidet.
+%
+% Module Predicates Are Exported.
+%
 module_predicates_are_exported:- source_context_module(CM),module_predicates_are_exported(CM).
 
+
+% 	 	 
+%% module_predicates_are_exported( ?Ctx) is semidet.
+%
+% Module Predicates Are Exported.
+%
 module_predicates_are_exported(user):-!,source_context_module(CM),module_predicates_are_exported0(CM).
 module_predicates_are_exported(Ctx):- module_predicates_are_exported0(Ctx).
 
+
+% 	 	 
+%% module_predicates_are_exported0( ?ModuleName) is semidet.
+%
+% Module Predicates Are Exported Primary Helper.
+%
 module_predicates_are_exported0(user):- !. % dmsg(warn(module_predicates_are_exported(user))).
 module_predicates_are_exported0(ModuleName):-
    module_property(ModuleName, exports(List)),
@@ -490,21 +748,45 @@ module_predicates_are_exported0(ModuleName):-
 
 :- export(export_if_noconflict/2).
 :- module_transparent(export_if_noconflict/2).
+
+% 	 	 
+%% export_if_noconflict( ?VALUE1, :Term_G14150) is semidet.
+%
+% Export If Noconflict.
+%
 export_if_noconflict(M,F/A):- current_module(M2),M2\=M,module_property(M2,exports(X)),member(F/A,X),dmsg(skipping_export(M2=M:F/A)),!.
 export_if_noconflict(M,F/A):-M:export(F/A).
 
 % module_predicates_are_not_exported_list(ModuleName,Private):- once((length(Private,Len),dmsg(module_predicates_are_not_exported_list(ModuleName,Len)))),fail.
+
+% 	 	 
+%% module_predicates_are_not_exported_list( ?ModuleName, ?Private) is semidet.
+%
+% Module Predicates Are Not Exported List.
+%
 module_predicates_are_not_exported_list(ModuleName,Private):- forall(member(F/A,Private),export_if_noconflict(ModuleName,F/A)).
 
 
 
 
 
+
+% 	 	 
+%% arg_is_transparent( :GoalArg) is semidet.
+%
+% Argument If Is A Transparent.
+%
 arg_is_transparent(Arg):- member(Arg,[':','^']).
 arg_is_transparent(0).
 arg_is_transparent(Arg):- number(Arg).
 
 % make meta_predicate's module_transparent
+
+% 	 	 
+%% module_meta_predicates_are_transparent( ?ModuleName) is semidet.
+%
+% Module Meta Predicates Are Transparent.
+%
 module_meta_predicates_are_transparent(_):-!.
 module_meta_predicates_are_transparent(ModuleName):-
     forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),
@@ -515,6 +797,12 @@ module_meta_predicates_are_transparent(ModuleName):-
 
 :- export(all_module_predicates_are_transparent/1).
 % all_module_predicates_are_transparent(_):-!.
+
+% 	 	 
+%% all_module_predicates_are_transparent( ?ModuleName) is semidet.
+%
+% All Module Predicates Are Transparent.
+%
 all_module_predicates_are_transparent(ModuleName):-
     forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),
       ignore((
@@ -522,6 +810,12 @@ all_module_predicates_are_transparent(ModuleName):-
                    ( nop(dmsg(todo(module_transparent(ModuleName:F/A))))),
                    (module_transparent(ModuleName:F/A))))).
 
+
+% 	 	 
+%% quiet_all_module_predicates_are_transparent( ?ModuleName) is semidet.
+%
+% Quiet All Module Predicates Are Transparent.
+%
 quiet_all_module_predicates_are_transparent(_):-!.
 quiet_all_module_predicates_are_transparent(ModuleName):-
     forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)),

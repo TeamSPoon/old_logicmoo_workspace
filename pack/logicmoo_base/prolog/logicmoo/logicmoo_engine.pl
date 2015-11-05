@@ -41,17 +41,10 @@
 %=    exists(X,A)
 %=    atleast(X,N,A)
 %=    atmost(X,N,A)
-/*
-:- module(logicmoo_engine, 
-          [ 
-           nnf/3, 
-           pnf/3, cf/4,
-          tsn/0,
-        ]). 
-:- nodebug(_).
-*/
 
-:- use_module(logicmoo_base).
+:- module(logicmoo_engine, [ tsn/0 ] ). 
+
+:- use_module(library(logicmoo/logicmoo_user)).
 
 :- include(logicmoo(mpred/'mpred_header.pi')).
 

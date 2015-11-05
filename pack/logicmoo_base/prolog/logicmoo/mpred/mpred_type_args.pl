@@ -96,32 +96,80 @@
         lmconf:module_local_init/0)).
 */
 
+
+% 	 	 
+%% assert_argIsa( ?Prop, ?N, ?Type) is semidet.
+%
+% assert Argument  (isa/2).
+%
 assert_argIsa(Prop,N,Type):-show_failure(why,ain_fast(argIsa(Prop,N,Type))).
 
 
+
+% 	 	 
+%% assert_predArgTypes( ?ArgTs) is semidet.
+%
+% assert Predicate Argument  Types.
+%
 assert_predArgTypes(ArgTs):-not(compound(ArgTs)),!.
 assert_predArgTypes(ArgTs):- numbervars(ArgTs,0,_,[functor_name(ftTerm)]),get_functor(ArgTs,F),assert_predArgTypes_fa(F,ArgTs).
 
+
+% 	 	 
+%% assert_predArgTypes_fa( ?VALUE1, ?ArgTs) is semidet.
+%
+% assert Predicate Argument  Types Functor-Arity.
+%
 assert_predArgTypes_fa(_,ArgTs):- nonvar(ArgTs),ArgTs=(_/_),!.
 assert_predArgTypes_fa(F,ArgTs):- not(is_list(ArgTs)),ArgTs=..[_|ArgsL],!,assert_predArgTypes_fa(F,ArgsL).
 %assert_predArgTypes_fa(F,ArgsList):- clause_umt(ftAction(F),true),!,show_call(why,must(assert_predArgTypes_from_left(F,1,ArgsList))).
 assert_predArgTypes_fa(F,ArgsList):- length(ArgsList,L),assert_predArgTypes_l(F,L,ArgsList).
 
 %assert_predArgTypes_l(F,L,ArgsList):- arity(F,A),!,must( (A>=L) -> assert_predArgTypes_from_right(F,A,ArgsList);true).
+
+% 	 	 
+%% assert_predArgTypes_l( ?F, ?L, ?ArgsList) is semidet.
+%
+% assert Predicate Argument  Types (List version).
+%
 assert_predArgTypes_l(F,L,ArgsList):- must(assert_predArgTypes_from_right(F,L,ArgsList)).
 
 
+
+% 	 	 
+%% assert_predArgTypes_from_right( ?F, ?A, :TermArgsList) is semidet.
+%
+% assert Predicate Argument  Types Converted From right.
+%
 assert_predArgTypes_from_right(_,_,[]):-!.
 assert_predArgTypes_from_right(_,_,(_/_)):-!.
 assert_predArgTypes_from_right(F,A,ArgsList):-append(Left,[Last],ArgsList),assert_argIsa(F,A,Last),!,Am1 is A -1, assert_predArgTypes_from_right(F,Am1,Left).
 
+
+% 	 	 
+%% assert_predArgTypes_from_left( ?VALUE1, ?VALUE2, :Term_G16890) is semidet.
+%
+% assert Predicate Argument  Types Converted From left.
+%
 assert_predArgTypes_from_left(_,_,[]):-!.
 assert_predArgTypes_from_left(F,A,[Type|ArgsList]):-assert_argIsa(F,A,Type),!,Ap1 is A + 1,assert_predArgTypes_from_left(F,Ap1,ArgsList).
 
+
+% 	 	 
+%% clause_umt( ?C) is semidet.
+%
+% Clause User Microtheory.
+%
 clause_umt(M:C):-!,clause(M:C,true).
 clause_umt(C):-with_umt(clause(C,true)).
 clause_umt(C):-!,clause(_:C,true).
 
+
+% 	 	 
+%% term_is_ft( :TermTerm, :TermType) is semidet.
+%
+% Term If Is A Format Type.
+%
 term_is_ft(Term,Type):- is_ftVar(Term),!,member(Type,[ftVar,ftProlog]).
 term_is_ft(_ANY,Type):- Type==ftVar,!,fail.
 term_is_ft([T|Term],ftListFn(Type)):-is_list_of(Type,[T|Term]).
@@ -129,6 +177,12 @@ term_is_ft(_ANY,Type):- nonvar(Type),(ttFormatType==Type;(\+ ttFormatType(Type))
 term_is_ft(Term,Type):- no_repeats_old(Type,(term_is_ft_how(Term,Was),trans_subft(Was,Type))).
 
 
+
+% 	 	 
+%% term_is_ft_how( ?Term, ?Type) is semidet.
+%
+% Term If Is A Format Type How.
+%
 term_is_ft_how(Term,Type):- clause_umt(quotedDefnIff(Type,Info)),nonvar(Info),
    (show_success(why,(Info='SubLQuoteFn'(LISPSYMBOL),nop(Term+Type+LISPSYMBOL)))-> 
                  fail;
@@ -137,22 +191,70 @@ term_is_ft_how(Term,Type):- clause_umt(quotedDefnIff(Type,Info)),nonvar(Info),
 term_is_ft_how(Term,Type):- compound(Term),functor(Term,F,A),functor(Type,F,A),
   once((t(meta_argtypes,Type),Type=..[_|Types],Term=..[_|Args],maplist(isa,Args,Types))).
 
+
+% 	 	 
+%% trans_subft( ?FT, ?FT) is semidet.
+%
+% Trans Subft.
+%
 trans_subft(FT,FT).
 trans_subft(FT,Sub):-clause_umt(subFormat(FT,Sub)).
 trans_subft(FT,Sub):-clause_umt(subFormat(FT,A)),clause_umt(subFormat(A,Sub)).
 trans_subft(FT,Sub):-clause_umt(subFormat(FT,A)),clause_umt(subFormat(A,B)),clause_umt(subFormat(B,Sub)).
 
+
+% 	 	 
+%% is_id( ?ID) is semidet.
+%
+% If Is A Id.
+%
 is_id(ID):-atom(ID)->true;(compound(ID),arg(1,ID,A),is_id(A)).
+
+% 	 	 
+%% is_boolean( ?VALUE1) is semidet.
+%
+% If Is A Boolean.
+%
 is_boolean(isMissing):-!,fail.
 is_boolean(vTrue).
 is_boolean(vFalse).
 
+
+% 	 	 
+%% is_declarations( ?C) is semidet.
+%
+% If Is A Declarations.
+%
 is_declarations(C):-compound(C),ground(C),!, (\+ (arg(_,C,T), \+ is_spec(T))).
 
+
+% 	 	 
+%% is_spec( ?T) is semidet.
+%
+% If Is A Spec.
+%
 is_spec(T):- req(tCol(T))->true;is_declarations(T).
 
+
+% 	 	 
+%% is_rest( :Term_G2079) is semidet.
+%
+% If Is A Rest.
+%
 is_rest([_|Term]):-not(is_list(Term)).
+
+% 	 	 
+%% is_rest_of( ?VALUE1, :Term_G8706) is semidet.
+%
+% If Is A Rest Of.
+%
 is_rest_of(_Type,[_|Term]):-not(is_list(Term)).
+
+% 	 	 
+%% is_list_of( ?Type, :TermTerm) is semidet.
+%
+% If Is A List Of.
+%
 is_list_of(Type,Term):- is_rest(Term),!,Type=ftRest.
 is_list_of(Type,[T|Term]):-term_is_ft(T,Type),maplist(is_list_of(Type),Term).
 
@@ -167,6 +269,12 @@ colsOverlap(AT,AT).
 
 */
 
+
+% 	 	 
+%% pl_arg_type( ?Arg, ?Type) is semidet.
+%
+% Pl Argument Type.
+%
 pl_arg_type(Arg,Type):- 
       var(Arg) -> Type =ftVar;
       integer(Arg) -> Type =ftInteger;
@@ -180,6 +288,12 @@ pl_arg_type(Arg,Type):-
          Arg = Type.
 
 
+
+% 	 	 
+%% is_ftText( ?Arg) is semidet.
+%
+% If Is A Format Type Text.
+%
 is_ftText(Arg):-string(Arg),!.
 is_ftText(Arg):- \+ compound(Arg),!,fail.
 is_ftText(Arg):- text_to_string_safe(Arg,_),!.
@@ -188,18 +302,42 @@ is_ftText(Arg):- functor(Arg,S,_),resultIsa(S,ftText).
 :- was_dynamic(coerce/3).
 :- shared_multifile(coerce/3).
 :- was_export(coerce/4).
+
+% 	 	 
+%% coerce( ?VALUE1, ?VALUE2, ?NewThing, ?Else) is semidet.
+%
+% Coerce.
+%
 coerce(What,Type,NewThing,_Else):-coerce(What,Type,NewThing),!.
 coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 
 
+
+% 	 	 
+%% mpred_arity_pred( ?P) is semidet.
+%
+% Managed Predicate Arity Predicate.
+%
 mpred_arity_pred(P):- nonvar(P),arg(_,a(arity,arity,arityMax,arityMin),P).
 mpred_arity_pred(arity).
 
+
+% 	 	 
+%% as_one_of( ?VALUE1, ?VALUE2) is semidet.
+%
+% Converted To One Of.
+%
 as_one_of(Types,Type):-nonvar(Type),tCol(Type),!,member(Type,Types).
 as_one_of([Type],TypeO):-!,same_arg(same_or(genls),Type,TypeO).
 as_one_of(Types,isOneOf(Types)).
 
 
+
+% 	 	 
+%% argIsa_op_call( ?Op, :TermFunc, ?N, ?Type) is semidet.
+%
+% Argument  (isa/2) Oper. call.
+%
 argIsa_op_call(Op,_:F,N,Type):-!,argIsa_op_call(Op,F,N,Type),!.
 argIsa_op_call(Op,F/_,N,Type):- !,argIsa_op_call(Op,F,N,Type),!.
 argIsa_op_call(Op,Func,N,Type):- compound(Func),!,functor(Func,F,_),argIsa_op_call(Op,F,N,Type),!.
@@ -207,10 +345,22 @@ argIsa_op_call(_,F,N,Type):-hotrace((loop_check((argIsa_known(F,N,Type),!),Type=
 
 
 :- was_export(argIsa_known/3).
+
+% 	 	 
+%% argIsa_known( ?F, ?N, ?Type) is semidet.
+%
+% Argument  (isa/2) known.
+%
 argIsa_known(F/_,N,Type):-nonvar(F),!,argIsa_known(F,N,Type).
 argIsa_known(F,N,Type):-  one_must(asserted_argIsa_known(F,N,Type),argIsa_call_7(F,N,Type)).
 
 
+
+% 	 	 
+%% asserted_argIsa_known( ?F, ?N, ?Type) is semidet.
+%
+% asserted Argument  (isa/2) known.
+%
 asserted_argIsa_known(F/_,N,Type):-nonvar(F),!,asserted_argIsa_known(F,N,Type).
 asserted_argIsa_known(F,N,Type):- argIsa_call_0(F,N,Type).
 asserted_argIsa_known(F,N,Type):- var(F),!,tRelation(F),asserted_argIsa_known(F,N,Type).
@@ -218,16 +368,34 @@ asserted_argIsa_known(F,N,Type):- arity(F,1),!,N=1,Type=F.
 asserted_argIsa_known(F,N,Type):- var(N),arity(F,A),!,between(1,A,N),asserted_argIsa_known(F,N,Type).
 asserted_argIsa_known(F,N,Type):- argIsa_call_6(F,N,Type),!.
 
+
+% 	 	 
+%% to_format_type( ?COL, ?FT) is semidet.
+%
+% Converted To Format Type.
+%
 to_format_type(FT,FT):-t(ttFormatType,FT),!.
 to_format_type(COL,FT):- clause_umt(formatted_resultIsa(FT,COL)),!.
 to_format_type(COL,FT):- clause_umt(resultIsa(FT,COL)),t(ttFormatType,FT),!.
 to_format_type(COL,ftTerm(COL)).
 
+
+% 	 	 
+%% argIsa_ft( ?F, ?N, ?FTO) is semidet.
+%
+% Argument  (isa/2) Format Type.
+%
 argIsa_ft(F/_,N,Type):-nonvar(F),!,argIsa_ft(F,N,Type).
 argIsa_ft(F,N,FTO):-must((argIsa_known(F,N,FT),to_format_type(FT,FTO))),!.
 
 
 :- was_export(argIsa_call_0/3).
+
+% 	 	 
+%% argIsa_call_0( ?F, ?N, ?Type) is semidet.
+%
+% Argument  (isa/2) call  Primary Helper.
+%
 argIsa_call_0(F/_,N,Type):-nonvar(F),!,argIsa_call_0(F,N,Type).
 argIsa_call_0(F,N,Type):- clause(t(argIsa,F,N,Type),true).
 argIsa_call_0(F,N,Type):- clause(argIsa(F,N,Type),true).
@@ -304,6 +472,12 @@ argIsa_call_0(F,N,ftAskable):- atom(F), current_predicate(F/A),between(1,A,N),fu
 % argIsa_call_0(HILOG,_,term):-hilog_functor(HILOG).
 
 
+
+% 	 	 
+%% argIsa_call_3( ?VALUE1, ?VALUE2) is semidet.
+%
+% Argument  (isa/2) call Helper number 3..
+%
 argIsa_call_3(WP,tPred):-member(WP,[predProxyRetract,predProxyAssert,predProxyQuery,genlInverse]).
 argIsa_call_3(disjointWith,tCol).
 argIsa_call_3(ftFormFn,ftTerm).
@@ -311,23 +485,59 @@ argIsa_call_3(mudTermAnglify,ftTerm).
 argIsa_call_3(genls,tCol).
 argIsa_call_3(subFormat,ttFormatType).
 
+
+% 	 	 
+%% argisa_nodebug is semidet.
+%
+% Argument (isa/2) Nodebug.
+%
 argisa_nodebug:-!.
 
+
+% 	 	 
+%% grab_argsIsa( ?F, ?Types) is semidet.
+%
+% grab Arguments  (isa/2).
+%
 grab_argsIsa(resultIsa,resultIsa(tFunction,tCol)).
 %grab_argsIsa(P, A):-P=='$si$':'$was_imported_kb_content$',trace_or_throw(crazy_grab_argsIsa('$si$':'$was_imported_kb_content$', A)).
 %grab_argsIsa(P, A):-P=={}, trace_or_throw(crazy_grab_argsIsa({}, A)).
 grab_argsIsa(F,Types):- grab_argsIsa_6(Types),get_functor(Types,F0),F0==F,!,assert_predArgTypes_fa(F,Types).
 
+
+% 	 	 
+%% grab_argsIsa_6( ?Types) is semidet.
+%
+% grab Arguments  (isa/2) Helper number 6..
+%
 grab_argsIsa_6(Types):- meta_argtypes(Types).
 grab_argsIsa_6(mudColor(tSpatialThing, vtColor)).
 grab_argsIsa_6(Types):- clause_umt(quotedDefnIff(Types,_)),maybe_argtypes(Types).
 % grab_argsIsa_6(Types):- current_predicate(get_all_templates/1),get_all_templates(Types),maybe_argtypes(Types).
 
 %argIsa_call_6(F,N,Type):- isa(F,argIsa(N,Type)),nonvar(Type),assert_argIsa(F,N,Type),!.
+
+% 	 	 
+%% argIsa_call_6( ?F, ?N, ?Type) is semidet.
+%
+% Argument  (isa/2) call Helper number 6..
+%
 argIsa_call_6(F,N,Type):- grab_argsIsa(F,Types),maybe_argtypes(Types),arg(N,Types,Type),show_failure(why,(nonvar(Type),assert_argIsa(F,N,Type))),!.
 
+
+% 	 	 
+%% maybe_argtypes( ?Types) is semidet.
+%
+% Maybe Argument Types.
+%
 maybe_argtypes(Types):- compound(Types), ground(Types), Types\=(_/_), Types\=(_:_/_), Types\='$VAR'(_).
 
+
+% 	 	 
+%% argIsa_call_7( ?Prop, ?N1, ?Type) is semidet.
+%
+% Argument  (isa/2) call Helper number 7..
+%
 argIsa_call_7(Prop,N1,Type):- nonvar(Type),!,argIsa_call_7(Prop,N1,WType),!,genls(WType,Type).
 argIsa_call_7(Pred,N,ftVoprop):-number(N),arity(Pred,A),N>A,!.
 argIsa_call_7(_,_,ftTerm):- argisa_nodebug,!.
@@ -336,6 +546,12 @@ argIsa_call_7(F,_,ftTerm):-member(F/_, [argIsa/3,predProxyAssert/2,negate_wrappe
                                 pt/_,rhs/_,nt/_,bt/_,bracket/3]),!.
 argIsa_call_7(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa(Prop,N1,'Second_Order_TYPE')))),dumpST,dtrace,Type=argIsaFn(Prop,N1),!.
 argIsa_call_7(Prop,N1,Type):- argIsa_call_9(Prop,N1,Type).
+
+% 	 	 
+%% argIsa_call_9( ?Prop, ?N1, ?Type) is semidet.
+%
+% Argument  (isa/2) call Helper number 9..
+%
 argIsa_call_9(_,_,Type):- argisa_nodebug,!,genls(ftTerm,Type).
 argIsa_call_9(Prop,N1,Type):- arity(Prop,Arity),dmsg(todo(define(argIsa_known_a(Prop,N1,'_TYPE')))),number(Arity),number(N1),must(N1=<Arity),Type=argIsaFn(Prop,N1),!.
 argIsa_call_9(Prop,N1,Type):- dmsg(todo(define(argIsa_known_b(Prop,N1,'_TYPE')))),trace,Type=argIsaFn(Prop,N1),!.
@@ -343,9 +559,21 @@ argIsa_call_9(_,_,ftTerm).
 
 
 :- was_export(correctArgsIsa/2).
+
+% 	 	 
+%% correctArgsIsa( ?In, ?Out) is semidet.
+%
+% correct Arguments  (isa/2).
+%
 correctArgsIsa(In,Out):- correctArgsIsa(query(must,t),In,Out),!.
 
 :- was_export(correctArgsIsa/3).
+
+% 	 	 
+%% correctArgsIsa( ?VALUE1, :TermNC, :TermNC) is semidet.
+%
+% correct Arguments  (isa/2).
+%
 correctArgsIsa(_,NC,NC):-not(compound(NC)),!.
 correctArgsIsa(_,NC,NC):-as_is_term(NC),!.
 correctArgsIsa(_,G,G):- (\+ t_l:infMustArgIsa), (is_release; bad_idea; skipWrapper;  t_l:infSkipArgIsa),!.
@@ -362,14 +590,38 @@ correctArgsIsa(Op,G,GG):- correctArgsIsa0(Op,G,GG),nonvar(GG),!.
 correctArgsIsa(Op,G,GG):- grtrace,correctArgsIsa0(Op,G,GG).
 
 :- was_export(correctArgsIsa/4).
+
+% 	 	 
+%% correctArgsIsa( ?Op, ?A, ?Type, ?AA) is semidet.
+%
+% correct Arguments  (isa/2).
+%
 correctArgsIsa(Op,A,Type,AA):- trace_or_throw(warn(not(correctArgsIsa(Op,A,Type,AA)))).
 
+
+% 	 	 
+%% list_to_callform( ?ARGS, ?Functor, ?CALL) is semidet.
+%
+% List Converted To Callform.
+%
 list_to_callform([P|ARGS],_,CALL):-atom(P),!,CALL=..[P|ARGS].
 list_to_callform(ARGS,Functor,CALL):-CALL=..[Functor|ARGS].
 
+
+% 	 	 
+%% correctArgsIsa0( ?Op, ?A, ?RESULTC) is semidet.
+%
+% correct Arguments  (isa/2) Primary Helper.
+%
 correctArgsIsa0(Op,[PRED|ARGS],RESULT):-!,correctArgsIsa00(Op,[PRED|ARGS],RESULT).
 correctArgsIsa0(Op,A,RESULTC):-A=..[PRED|ARGS],!,correctArgsIsa00(Op,[PRED|ARGS],RESULT), list_to_callform(RESULT,t,RESULTC).
 
+
+% 	 	 
+%% correctArgsIsa00( ?VALUE1, :Term_G22760, :Term_G22889) is semidet.
+%
+% correct Arguments  (isa/2) Primary Helper Primary Helper.
+%
 correctArgsIsa00(_ ,[Prop|Args],AA):-stack_check(1000), var(Prop),!,AA=[Prop|Args].
 correctArgsIsa00(Op,[KP,Prop|Args],AA):-is_holds_true(KP),!,correctArgsIsa00(Op,[Prop|Args],AA).
 correctArgsIsa00(Op,[KP,Prop|Args],[KP|AArgs]):-logical_functor_ft(KP),!,correctAnyType(Op,[Prop|Args],ftListFn(ftAskable),AArgs).
@@ -378,10 +630,22 @@ correctArgsIsa00(Op,[KP,Prop|Args],[KP|AA]):-is_holds_false(KP),!,correctArgsIsa
 correctArgsIsa00(Op,[Prop,ArgI],[Prop,ArgO]):- isa(Prop,tCol),!, correctAnyType(query(ftID,Op),ArgI,Prop,ArgO).
 correctArgsIsa00(Op,[Prop|Args],[Prop|AArgs]):- discoverAndCorrectArgsIsa(Op,Prop,1,Args,AArgs).
 
+
+% 	 	 
+%% discoverAndCorrectArgsIsa( ?Op, ?Prop, ?VALUE3, ?ArgsIn, ?ArgsOut) is semidet.
+%
+% discover and correct Arguments  (isa/2).
+%
 discoverAndCorrectArgsIsa(Op,Prop,_,ArgsIn,ArgsOut):- length(ArgsIn,ArgUsed),show_failure(why,(mpred_full_arity(Prop,MaxArity),(number(ArgUsed),number(MaxArity),ArgUsed=<MaxArity))),
     discoverAndCorrectArgsIsa_from_right(Op,Prop,MaxArity,ArgsIn,ArgsOut),!.
 discoverAndCorrectArgsIsa(Op,Prop,N,ArgsIn,ArgsOut):-discoverAndCorrectArgsIsa_from_left(Op,Prop,N,ArgsIn,ArgsOut),!.
 
+
+% 	 	 
+%% discoverAndCorrectArgsIsa_from_right( ?Op, ?Prop, ?N1, ?In, ?Out) is semidet.
+%
+% discover and correct Arguments  (isa/2) Converted From right.
+%
 discoverAndCorrectArgsIsa_from_right(_O,_Prop,_N1,[],[]):-!.
 discoverAndCorrectArgsIsa_from_right(Op,Prop,N1,In,Out):- append(Args,[A],In),
    must((argIsa_op_call(Op,Prop,N1,Type),correctAnyType(Op,A,Type,AA))),
@@ -389,6 +653,12 @@ discoverAndCorrectArgsIsa_from_right(Op,Prop,N1,In,Out):- append(Args,[A],In),
    discoverAndCorrectArgsIsa_from_right(Op,Prop,N2,Args,AArgs),
    append(AArgs,[AA],Out).
 
+
+% 	 	 
+%% discoverAndCorrectArgsIsa_from_left( ?VALUE1, ?VALUE2, ?VALUE3, :Term_G22483, ?VALUE5) is semidet.
+%
+% discover and correct Arguments  (isa/2) Converted From left.
+%
 discoverAndCorrectArgsIsa_from_left(_O,_Prop,_N1,[],[]):-!.
 discoverAndCorrectArgsIsa_from_left(Op,Prop,N1,[A|Args],Out):-
    must((argIsa_op_call(Op,Prop,N1,Type),correctAnyType(Op,A,Type,AA))),
@@ -397,12 +667,24 @@ discoverAndCorrectArgsIsa_from_left(Op,Prop,N1,[A|Args],Out):-
     Out = [AA|AArgs].
 
 
+
+% 	 	 
+%% mpred_full_arity( ?F, ?A) is semidet.
+%
+% Managed Predicate Full Arity.
+%
 mpred_full_arity({},A):-trace_or_throw(crazy_mpred_full_arity({}, A)).
 mpred_full_arity(F,A):-arity(F,A),!.
 mpred_full_arity(F,A):-grab_argsIsa(F,Types),maybe_argtypes(Types),show_call(why,(functor(Types,F,A),assert_arity(F,A))),!.
 
 
 
+
+% 	 	 
+%% is_ephemeral( :TermVar) is semidet.
+%
+% If Is A Ephemeral.
+%
 is_ephemeral(Var):-var(Var),!,fail.
 is_ephemeral(isMissing).
 is_ephemeral(isOptional(_,_)).
@@ -411,15 +693,39 @@ is_ephemeral(isOneOf(_)).
 
 :- was_export(correctAnyType/4).
 
+
+% 	 	 
+%% is_valuespec( ?G) is semidet.
+%
+% If Is A Valuespec.
+%
 is_valuespec(G):-is_ephemeral(G).
 is_valuespec(G):-t(tCol,G).
 is_valuespec(FT):-t(ttFormatType,FT).
 is_valuespec(G):-evaluatableArg(G,_).
 
+
+% 	 	 
+%% evaluatableArg( ?AA, ?VALUE2) is semidet.
+%
+% Evaluatable Argument.
+%
 evaluatableArg(AA,_):-compound(AA),get_functor(AA,F),!,evaluatableFunctor(F).
+
+% 	 	 
+%% evaluatableFunctor( ?VALUE1) is semidet.
+%
+% Evaluatable Functor.
+%
 evaluatableFunctor(isRandom).
 evaluatableFunctor(isOptional).
 
+
+% 	 	 
+%% correctAnyType( ?VALUE1, ?A, ?VALUE3, ?A) is semidet.
+%
+% Correct Any Type.
+%
 correctAnyType(_,A,_,A):-is_release.
 
 correctAnyType(_, A,_Type,AA):- is_ftVar(A),sanity(var(AA)),must_det(A=AA),!.
@@ -435,6 +741,12 @@ correctAnyType(Op,A,Type,A):- dtrace(nop(warn(not(correctAnyType(Op,A,Type))))).
 %  @set mudMoveDist 4
 
 :- was_export(correctFormatType/4).
+
+% 	 	 
+%% correctFormatType( ?Op, ?A, ?Type, ?AA) is semidet.
+%
+% Correct Format Type.
+%
 correctFormatType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),sanity(var(AA)),must_det(A==AA),!.
 correctFormatType(Op,A,Type,AA):- var(Type),trace_or_throw(correctFormatType(Op,A,Type,AA)).
 correctFormatType(Op,A,Type,AA):- correctType(Op,A,Type,AA),sanity(nonvar(AA)),!.
@@ -443,14 +755,32 @@ correctFormatType(Op,A,Type,A):- dmsg(todo(not(correctFormatType(Op,A,Type)))),f
 
 :- was_export(checkAnyType/4).
 
+
+% 	 	 
+%% checkAnyType( ?Op, ?A, ?Type, ?AA) is semidet.
+%
+% Check Any Type.
+%
 checkAnyType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),sanity(var(AA)),must_det(A==AA),!.
 checkAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
 
+
+% 	 	 
+%% correctAnyTypeOrFail( ?Op, ?A, ?Type, ?AA) is semidet.
+%
+% Correct Any Type Or Fail.
+%
 correctAnyTypeOrFail(Op,A,Type,AA):- w_tl(tlbugger:skipMust,checkAnyType(Op,A,Type,AA)).
 
 
 
 :- thread_local t_l:can_coerce/1.
+
+% 	 	 
+%% correctType_gripe( ?Op, ?A, ?Fmt, ?AA) is semidet.
+%
+% Correct Type Gripe.
+%
 correctType_gripe(Op,A,Fmt,AA):- a(ttFormatType,Fmt),!,trace_or_throw(correctType(is_ft_correctFormatType(Op,A,Fmt,AA))).
 correctType_gripe(Op,A,Type,AA):- fail,atom(Type),must_equals(A,AA),
       dmsg(todo(isa_assert_type(Type))),
@@ -464,11 +794,29 @@ correctType_gripe(Op,A,Type,NewArg):-trace_or_throw(failure(correctType(Op,A,Typ
 
 :- style_check(+singleton).
 
+
+% 	 	 
+%% is_renamed_to( ?A, ?AA) is semidet.
+%
+% If Is A Renamed Converted To.
+%
 is_renamed_to(A,AA):- fail,atomic(A),not(A=[];A='';A=""),not(atom_concat(_,'Table',A)),not(atom_concat(_,'table',A)),
     atom_concat(Base,'able',A),atom_length(Base,AL),AL>2,!,atom_concat(Base,'Able',AA).
 
+
+% 	 	 
+%% correctType( ?Op, ?A, ?Type, ?AA) is semidet.
+%
+% Correct Type.
+%
 correctType(Op,A,Type,AA):-correctType0(Op,A,Type,AA).
 
+
+% 	 	 
+%% correctType0( ?Op, :TermA, :TermType, :TermAA) is semidet.
+%
+% Correct Type Primary Helper.
+%
 correctType0(change(_,_),A,T,AA):- A==T,!,must_equals(A,AA).
 correctType0(_ ,A,T,AA):- A==T,!,must_equals(A,AA).
 correctType0(Op,A,Type,AA):- var(Type),trace_or_throw(correctType0(Op,A,Type,AA)).
@@ -579,18 +927,48 @@ correctType0(_ ,A,T,AA):- get_functor(A,F),clause_umt(resultIsa(F,T)),must_det(A
 correctType0(_ ,A,T,AA):- get_functor(A,F),clause_umt(formatted_resultIsa(F,T)),must_det(A=AA),!.
 
 
+
+% 	 	 
+%% correctTypeArg( ?Op, ?Type, ?A, ?AA) is semidet.
+%
+% Correct Type Argument.
+%
 correctTypeArg(Op,Type,A,AA):-correctType(Op,A,Type,AA).
 
+
+% 	 	 
+%% must_equals_correct( ?Op, ?A, ?AA) is semidet.
+%
+% Must Be Successfull Equals Correct.
+%
 must_equals_correct(Op,A,AA):-must(correctArgsIsa(Op,A,AA)).
 
 % :- style_check(+singleton).
 
+
+% 	 	 
+%% must_equals( ?A, ?AA) is semidet.
+%
+% Must Be Successfull Equals.
+%
 must_equals(A,AA):-must_det(A=AA).
 
+
+% 	 	 
+%% deduced_is_tCol( ?VALUE1) is semidet.
+%
+% Deduced If Is A True Structure Col.
+%
 deduced_is_tCol(A):- (t_l:infSkipArgIsa->true; (t(tCol,A)->true;(fail,ain(isa(A,tCol))))),!.
 :- style_check(+singleton).
 
 :- was_export(any_to_value/2).
+
+% 	 	 
+%% any_to_value( ?Var, ?Var) is semidet.
+%
+% Any Converted To Value.
+%
 any_to_value(Var,Var):-var(Var),!.
 any_to_value(V,Term):-atom(V),!,atom_to_value(V,Term).
 any_to_value(A,V):-any_to_number(A,V).
@@ -599,12 +977,24 @@ any_to_value(A,A).
 :- was_export(correctArgsIsa/3).
 
 :- was_export(any_to_number/2).
+
+% 	 	 
+%% any_to_number( :TermN, ?N) is semidet.
+%
+% Any Converted To Number.
+%
 any_to_number(N,N):- number(N),!.
 any_to_number(ftDice(A,B,C),N):- ground(A),roll_dice(A,B,C,N),!.
 any_to_number(A,N):-atom(A),atom_to_value(A,V),A\=V,any_to_number(V,N).
 any_to_number(A,N):- catch(number_string(N,A),_,fail).
 
 :- was_export(atom_to_value/2).
+
+% 	 	 
+%% atom_to_value( ?V, :TermTerm) is semidet.
+%
+% Atom Converted To Value.
+%
 atom_to_value(V,Term):-not(atom(V)),!,any_to_value(V,Term).
 % 56
 atom_to_value(V,Term):- catch((read_term_from_atom(V,Term,[variable_names([])])),_,fail),!.
@@ -614,9 +1004,21 @@ atom_to_value(V,ftDice(T1,T2,-T3)):- atomic_list_concat_safe([D1,'d',D2,'-',D3],
 
 
 
+
+% 	 	 
+%% any_to_relation( ?A, ?F) is semidet.
+%
+% Any Converted To Relation.
+%
 any_to_relation(A,F):-atomic(A),!,any_to_atom(A,F).
 any_to_relation(A,F):-functor_h(A,F).
 
+
+% 	 	 
+%% roll_dice( ?Rolls, ?VALUE2, ?Bonus, ?Result) is semidet.
+%
+% Roll Dice.
+%
 roll_dice(Rolls,_,Bonus,Result):- Rolls < 0, !, Result is Bonus.
 roll_dice(Rolls,Sided,Bonus,Result):- LessRolls is Rolls-1, roll_dice(LessRolls,Sided, Bonus + random(Sided) +1, Result).
 
@@ -624,6 +1026,13 @@ roll_dice(Rolls,Sided,Bonus,Result):- LessRolls is Rolls-1, roll_dice(LessRolls,
 
 %:-ain_fast(<=( argIsa(F,N,Isa), asserted_argIsa_known(F,N,Isa))).
 %:-ain_fast(<=( argIsa(F,N,Isa), argIsa_known(F,N,Isa))).
+
+% 	 	 
+%% lmconf:module_local_init is semidet.
+%
+% Hook To [lmconf:module_local_init/0] For Module Mpred_type_args.
+% Module Local Init.
+%
 lmconf:module_local_init:- ain_fast(prologHybrid(formatted_resultIsa/2)).
 lmconf:module_local_init:- ain_fast(prologHybrid(resultIsa/2)).
 

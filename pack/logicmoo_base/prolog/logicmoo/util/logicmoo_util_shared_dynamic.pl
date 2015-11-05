@@ -23,16 +23,40 @@
 :- multifile(system:goal_expansion/2).
 :- dynamic(system:goal_expansion/2).
 
+
+% 	 	 
+%% wrap_shared( ?VALUE1, :PRED2VALUE2, ?VALUE3) is semidet.
+%
+% Wrap Shared.
+%
 wrap_shared(isa,2,req).
 wrap_shared(t,2,req).
 
+
+% 	 	 
+%% system_goal_expansion_sd( :TermT, :Term_G5614) is semidet.
+%
+% System Goal Expansion Sd.
+%
 system_goal_expansion_sd(T,_):-var(T),!,fail.
 system_goal_expansion_sd(M:T,M:I):-!,system_goal_expansion_sd(T,I).
 system_goal_expansion_sd(T,I):- functor(T,F,A),wrap_shared(F,A,How),safe_wrap(T,How,I).
 
+
+% 	 	 
+%% safe_wrap( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%
+% Safely Paying Attention To Corner Cases Wrap.
+%
 safe_wrap(I,_,if_defined(I)):- current_prolog_flag(xref,true),!,numbervars(I).
 safe_wrap(I,How,call(How,I)).
 
+
+% 	 	 
+%% decl_shared( :TermM) is semidet.
+%
+% Declare Shared.
+%
 decl_shared((A,B)):-!,decl_shared(A),!,decl_shared(B),!.
 decl_shared([A|B]):-!,decl_shared(A),!,decl_shared(B),!.
 decl_shared([A]):-!,decl_shared(A),!.
@@ -44,5 +68,12 @@ decl_shared(M):-atom(M),!,asserta_if_new(logicmoo_util_shared_dynamic:wrap_share
 :- decl_shared(t).
 :- decl_shared(meta_argtypes/1).
 
+
+% 	 	 
+%% system:goal_expansion( ?Math, ?MathGoal) is semidet.
+%
+% Hook To [system:goal_expansion/2] For Module Logicmoo_util_shared_dynamic.
+% Goal Expansion.
+%
 system:goal_expansion(I,O):- source_location(_,_), system_goal_expansion_sd(I,O).
 
