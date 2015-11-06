@@ -320,7 +320,7 @@ get_b_dnf(DNFA,DNFAO):- length(DNFA,L),atom_concat(and,L,Pred),!,DNFAO=..[Pred|D
 
 
 % 	 	 
-%% get_dnf_props( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5, :Term_G9596) is semidet.
+%% get_dnf_props( ?TRUTH, ?VALUE2, ?DNFC, ?VARS, ?MT, :TermDNFCO) is semidet.
 %
 % Get Disjunctive Normal Form Props.
 %
@@ -330,7 +330,7 @@ get_dnf_props(TRUTH,DNFA,DNFC,VARS,MT,[dnf(ca,(DNFCO<DNFAO))|PROPS]):-!,get_prop
 
 
 % 	 	 
-%% get_props( ?VALUE1, ?VALUE2, ?VALUE3, :Term_G16527) is semidet.
+%% get_props( ?TRUTH, ?VARS, ?VALUE3, :TermVARSP) is semidet.
 %
 % Get Props.
 %
@@ -341,7 +341,7 @@ get_props(':TRUE-MON',VARS,MT,[amt(MT),str(':MONOTONIC'),truth(':TRUE')|VARSP]):
 get_props(':FALSE-MON',VARS,MT,[amt(MT),str(':MONOTONIC'),truth(':FALSE')|VARSP]):-get_varsp(VARS,VARSP),!.
 
 % 	 	 
-%% get_varsp( ?VALUE1, ?VALUE2) is semidet.
+%% get_varsp( ?VARS, ?VARS) is semidet.
 %
 % Get Varsp.
 %
@@ -554,7 +554,7 @@ noGenlPreds(_).
 :- link_to_holds_list(cyckb_t,cyckb_t_via_genlPreds).
 
 % 	 	 
-%% cyckb_t_via_genlPreds( :Term_G22022) is semidet.
+%% cyckb_t_via_genlPreds( :TermGP) is semidet.
 %
 % Cyckb True Structure Via Genl Predicates.
 %
@@ -644,7 +644,7 @@ kbp_t_list_0(PLIST,Props,Proof):- between(4,12,N), length(PLIST,N),kbp_t_list_1(
 
 
 % 	 	 
-%% kbp_t_list_1( ?VALUE1, :Term_G17057, ?VALUE3) is semidet.
+%% kbp_t_list_1( ?PLIST, :TermMT, ?Proof) is semidet.
 %
 % Knowledge Base P- True Structure list  Secondary Helper.
 %
@@ -673,7 +673,7 @@ kb_mt(C,t):- t_l:useDbase_t, t(C).
 
 
 % 	 	 
-%% proof_from_clause( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% proof_from_clause( ?Head, ?VALUE2, ?Head) is semidet.
 %
 % Proof Converted From Clause.
 %
@@ -886,7 +886,7 @@ callable_tf(F,A):- functor_safe(P,F,A),predicate_property(P,_),!.
 
 
 % 	 	 
-%% call_whichlist_t( ?UPARAM1, :GoalGOAL2, ?UPARAM3) is semidet.
+%% call_whichlist_t( ?UPARAM1, :GoalGOAL2, ?List) is semidet.
 %
 % Call Whichlist True Stucture.
 %
@@ -897,7 +897,7 @@ call_whichlist_t(dac(_,_,_,holds_t),CALL,_):- holds_t(CALL).
 
 
 % 	 	 
-%% mpred_hooks:call_which_t( ?DBS, ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7) is semidet.
+%% call_which_t( ?DBS, ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7) is semidet.
 %
 % Hook To [mpred_hooks:call_which_t/9] For Module Common_logic_kb_hooks.
 % Call Which True Stucture.
@@ -907,7 +907,7 @@ call_which_t(dac(_,_,_,h),P,A1,A2,A3,A4,A5,A6,A7):- holds_t(P,A1,A2,A3,A4,A5,A6,
 
 
 % 	 	 
-%% mpred_hooks:call_which_t( ?UPARAM1, :PRED6VALUE2, ?UPARAM3, ?UPARAM4, ?UPARAM5, ?UPARAM6, ?UPARAM7, ?UPARAM8) is semidet.
+%% call_which_t( ?UPARAM1, :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
 %
 % Hook To [mpred_hooks:call_which_t/8] For Module Common_logic_kb_hooks.
 % Call Which True Stucture.
@@ -919,7 +919,7 @@ call_which_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4,A5,A6):- holds_t(P,A1,A2,A3,A4,A5,
 
 
 % 	 	 
-%% mpred_hooks:call_which_t( ?UPARAM1, :PRED5VALUE2, ?UPARAM3, ?UPARAM4, ?UPARAM5, ?UPARAM6, ?UPARAM7) is semidet.
+%% call_which_t( ?UPARAM1, :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
 %
 % Hook To [mpred_hooks:call_which_t/7] For Module Common_logic_kb_hooks.
 % Call Which True Stucture.
@@ -931,7 +931,7 @@ call_which_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4,A5):- holds_t(P,A1,A2,A3,A4,A5).
 
 
 % 	 	 
-%% mpred_hooks:call_which_t( ?UPARAM1, :PRED4VALUE2, ?UPARAM3, ?UPARAM4, ?UPARAM5, ?UPARAM6) is semidet.
+%% call_which_t( ?UPARAM1, :PRED4P, ?A1, ?A2, ?A3, ?A4) is semidet.
 %
 % Hook To [mpred_hooks:call_which_t/6] For Module Common_logic_kb_hooks.
 % Call Which True Stucture.
@@ -943,7 +943,7 @@ call_which_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4):- holds_t(P,A1,A2,A3,A4).
 
 
 % 	 	 
-%% mpred_hooks:call_which_t( ?UPARAM1, :PRED3VALUE2, ?UPARAM3, ?UPARAM4, ?UPARAM5) is semidet.
+%% call_which_t( ?UPARAM1, :PRED3P, ?A1, ?A2, ?A3) is semidet.
 %
 % Hook To [mpred_hooks:call_which_t/5] For Module Common_logic_kb_hooks.
 % Call Which True Stucture.
@@ -955,7 +955,7 @@ call_which_t(dac(_,_,_,holds_t),P,A1,A2,A3):- holds_t(P,A1,A2,A3).
 
 
 % 	 	 
-%% mpred_hooks:call_which_t( ?UPARAM1, :PRED2VALUE2, ?UPARAM3, ?UPARAM4) is semidet.
+%% call_which_t( ?UPARAM1, :PRED2P, ?A1, ?A2) is semidet.
 %
 % Hook To [mpred_hooks:call_which_t/4] For Module Common_logic_kb_hooks.
 % Call Which True Stucture.
@@ -967,7 +967,7 @@ call_which_t(dac(_,_,_,holds_t),P,A1,A2):- holds_t(P,A1,A2).
 
 
 % 	 	 
-%% mpred_hooks:call_which_t( ?UPARAM1, :PRED1VALUE2, ?UPARAM3) is semidet.
+%% call_which_t( ?UPARAM1, :PRED1P, ?A1) is semidet.
 %
 % Hook To [mpred_hooks:call_which_t/3] For Module Common_logic_kb_hooks.
 % Call Which True Stucture.
@@ -979,14 +979,14 @@ call_which_t(dac(_,_,_,holds_t),P,A1):- holds_t(P,A1).
 
 
 % 	 	 
-%% call_mt_t( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5, ?VALUE6, ?VALUE7, ?VALUE8, ?VALUE9, ?VALUE10, ?VALUE11) is semidet.
+%% call_mt_t( ?VALUE1, ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7, ?A8, ?A9) is semidet.
 %
 % Call User Microtheory True Stucture.
 %
 call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable_tf(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],xcall_t(CALL).
 
 % 	 	 
-%% mpred_hooks:call_mt_t( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5, ?VALUE6, ?VALUE7, ?VALUE8, ?VALUE9, ?VALUE10) is semidet.
+%% call_mt_t( ?VALUE1, ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7, ?A8) is semidet.
 %
 % Hook To [mpred_hooks:call_mt_t/10] For Module Common_logic_kb_hooks.
 % Call User Microtheory True Stucture.
@@ -994,7 +994,7 @@ call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable_tf(P,9),CALL=..
 call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8):- callable_tf(P,8),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],xcall_t(CALL).
 
 % 	 	 
-%% mpred_hooks:call_mt_t( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5, ?VALUE6, ?VALUE7, ?VALUE8, ?VALUE9) is semidet.
+%% call_mt_t( ?VALUE1, ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7) is semidet.
 %
 % Hook To [mpred_hooks:call_mt_t/9] For Module Common_logic_kb_hooks.
 % Call User Microtheory True Stucture.
@@ -1002,7 +1002,7 @@ call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8):- callable_tf(P,8),CALL=..[P,
 call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],xcall_t(CALL).
 
 % 	 	 
-%% mpred_hooks:call_mt_t( ?UPARAM1, :PRED6VALUE2, ?UPARAM3, ?UPARAM4, ?UPARAM5, ?UPARAM6, ?UPARAM7, ?UPARAM8) is semidet.
+%% call_mt_t( ?UPARAM1, :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
 %
 % Hook To [mpred_hooks:call_mt_t/8] For Module Common_logic_kb_hooks.
 % Call User Microtheory True Stucture.
@@ -1010,7 +1010,7 @@ call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),CALL=..[P,A1,
 call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_t(P,A1,A2,A3,A4,A5,A6).
 
 % 	 	 
-%% mpred_hooks:call_mt_t( ?UPARAM1, :PRED5VALUE2, ?UPARAM3, ?UPARAM4, ?UPARAM5, ?UPARAM6, ?UPARAM7) is semidet.
+%% call_mt_t( ?UPARAM1, :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
 %
 % Hook To [mpred_hooks:call_mt_t/7] For Module Common_logic_kb_hooks.
 % Call User Microtheory True Stucture.
@@ -1018,7 +1018,7 @@ call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_t(P,A1,A2,
 call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_t(P,A1,A2,A3,A4,A5).
 
 % 	 	 
-%% mpred_hooks:call_mt_t( ?UPARAM1, :PRED4VALUE2, ?UPARAM3, ?UPARAM4, ?UPARAM5, ?UPARAM6) is semidet.
+%% call_mt_t( ?UPARAM1, :PRED4P, ?A1, ?A2, ?A3, ?A4) is semidet.
 %
 % Hook To [mpred_hooks:call_mt_t/6] For Module Common_logic_kb_hooks.
 % Call User Microtheory True Stucture.
@@ -1026,7 +1026,7 @@ call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_t(P,A1,A2,A3,
 call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_t(P,A1,A2,A3,A4).
 
 % 	 	 
-%% mpred_hooks:call_mt_t( ?UPARAM1, :PRED3VALUE2, ?UPARAM3, ?UPARAM4, ?UPARAM5) is semidet.
+%% call_mt_t( ?UPARAM1, :PRED3P, ?A1, ?A2, ?A3) is semidet.
 %
 % Hook To [mpred_hooks:call_mt_t/5] For Module Common_logic_kb_hooks.
 % Call User Microtheory True Stucture.
@@ -1034,7 +1034,7 @@ call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_t(P,A1,A2,A3,A4)
 call_mt_t(dac(_,_,_,mt),P,A1,A2,A3):- callable_tf(P,3),xcall_t(P,A1,A2,A3).
 
 % 	 	 
-%% mpred_hooks:call_mt_t( ?UPARAM1, :PRED2VALUE2, ?UPARAM3, ?UPARAM4) is semidet.
+%% call_mt_t( ?UPARAM1, :PRED2P, ?A1, ?A2) is semidet.
 %
 % Hook To [mpred_hooks:call_mt_t/4] For Module Common_logic_kb_hooks.
 % Call User Microtheory True Stucture.
@@ -1064,7 +1064,7 @@ xcall_t(P,A1,A2,A3,A4,A5,A6,A7,A8):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],call(CAL
 xcall_t(P,A1,A2,A3,A4,A5,A6,A7):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7],call(CALL).
 
 % 	 	 
-%% mpred_hooks:xcall_t( :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
+%% xcall_t( :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
 %
 % Hook To [mpred_hooks:xcall_t/7] For Module Common_logic_kb_hooks.
 % Extended Call True Stucture.
@@ -1072,7 +1072,7 @@ xcall_t(P,A1,A2,A3,A4,A5,A6,A7):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7],call(CALL).
 xcall_t(P,A1,A2,A3,A4,A5,A6):- call(P,A1,A2,A3,A4,A5,A6).
 
 % 	 	 
-%% mpred_hooks:xcall_t( :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
+%% xcall_t( :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
 %
 % Hook To [mpred_hooks:xcall_t/6] For Module Common_logic_kb_hooks.
 % Extended Call True Stucture.
@@ -1080,7 +1080,7 @@ xcall_t(P,A1,A2,A3,A4,A5,A6):- call(P,A1,A2,A3,A4,A5,A6).
 xcall_t(P,A1,A2,A3,A4,A5):- call(P,A1,A2,A3,A4,A5).
 
 % 	 	 
-%% mpred_hooks:xcall_t( :PRED4P, ?A1, ?A2, ?A3, ?A4) is semidet.
+%% xcall_t( :PRED4P, ?A1, ?A2, ?A3, ?A4) is semidet.
 %
 % Hook To [mpred_hooks:xcall_t/5] For Module Common_logic_kb_hooks.
 % Extended Call True Stucture.
@@ -1088,7 +1088,7 @@ xcall_t(P,A1,A2,A3,A4,A5):- call(P,A1,A2,A3,A4,A5).
 xcall_t(P,A1,A2,A3,A4):- call(P,A1,A2,A3,A4).
 
 % 	 	 
-%% mpred_hooks:xcall_t( :PRED3P, ?A1, ?A2, ?A3) is semidet.
+%% xcall_t( :PRED3P, ?A1, ?A2, ?A3) is semidet.
 %
 % Hook To [mpred_hooks:xcall_t/4] For Module Common_logic_kb_hooks.
 % Extended Call True Stucture.
@@ -1096,7 +1096,7 @@ xcall_t(P,A1,A2,A3,A4):- call(P,A1,A2,A3,A4).
 xcall_t(P,A1,A2,A3):- call(P,A1,A2,A3).
 
 % 	 	 
-%% mpred_hooks:xcall_t( :PRED2P, ?A1, ?A2) is semidet.
+%% xcall_t( :PRED2P, ?A1, ?A2) is semidet.
 %
 % Hook To [mpred_hooks:xcall_t/3] For Module Common_logic_kb_hooks.
 % Extended Call True Stucture.
@@ -1104,7 +1104,7 @@ xcall_t(P,A1,A2,A3):- call(P,A1,A2,A3).
 xcall_t(P,A1,A2):- call(P,A1,A2).
 
 % 	 	 
-%% mpred_hooks:xcall_t( :PRED1P, ?A1) is semidet.
+%% xcall_t( :PRED1P, ?A1) is semidet.
 %
 % Hook To [mpred_hooks:xcall_t/2] For Module Common_logic_kb_hooks.
 % Extended Call True Stucture.
@@ -1112,7 +1112,7 @@ xcall_t(P,A1,A2):- call(P,A1,A2).
 xcall_t(P,A1):- call(P,A1).
 
 % 	 	 
-%% mpred_hooks:xcall_t( :GoalP) is semidet.
+%% xcall_t( :GoalP) is semidet.
 %
 % Hook To [mpred_hooks:xcall_t/1] For Module Common_logic_kb_hooks.
 % Extended Call True Stucture.
@@ -1151,7 +1151,7 @@ which_f(dac(d,no_a,no_c,no_mt)).
 
 
 % 	 	 
-%% mpred_hooks:holds_f( ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7) is semidet.
+%% holds_f( ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7) is semidet.
 %
 % Hook To [mpred_hooks:holds_f/8] For Module Common_logic_kb_hooks.
 % Holds False.
@@ -1159,7 +1159,7 @@ which_f(dac(d,no_a,no_c,no_mt)).
 holds_f(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),which_f(DBS),(call_f(DBS,P,A1,A2,A3,A4,A5,A6,A7);call_mt_f(DBS,P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_f([P,A1,A2,A3,A4,A5,A6,A7])).
 
 % 	 	 
-%% mpred_hooks:holds_f( :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
+%% holds_f( :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
 %
 % Hook To [mpred_hooks:holds_f/7] For Module Common_logic_kb_hooks.
 % Holds False.
@@ -1167,7 +1167,7 @@ holds_f(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),which_f(DBS),(c
 holds_f(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),which_f(DBS),(call_f(DBS,P,A1,A2,A3,A4,A5,A6);call_mt_f(DBS,P,A1,A2,A3,A4,A5,A6,_,_)).
 
 % 	 	 
-%% mpred_hooks:holds_f( :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
+%% holds_f( :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
 %
 % Hook To [mpred_hooks:holds_f/6] For Module Common_logic_kb_hooks.
 % Holds False.
@@ -1175,7 +1175,7 @@ holds_f(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),which_f(DBS),(call
 holds_f(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),which_f(DBS),(call_f(DBS,P,A1,A2,A3,A4,A5);call_mt_f(DBS,P,A1,A2,A3,A4,A5,_,_)).
 
 % 	 	 
-%% mpred_hooks:holds_f( ?P, ?A1, ?A2, ?A3, ?A4) is semidet.
+%% holds_f( ?P, ?A1, ?A2, ?A3, ?A4) is semidet.
 %
 % Hook To [mpred_hooks:holds_f/5] For Module Common_logic_kb_hooks.
 % Holds False.
@@ -1183,7 +1183,7 @@ holds_f(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),which_f(DBS),(call_f(
 holds_f(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),which_f(DBS),(call_f(DBS,P,A1,A2,A3,A4);call_mt_f(DBS,P,A1,A2,A3,A4,_,_)).
 
 % 	 	 
-%% mpred_hooks:holds_f( ?P, ?A1, ?A2, ?A3) is semidet.
+%% holds_f( ?P, ?A1, ?A2, ?A3) is semidet.
 %
 % Hook To [mpred_hooks:holds_f/4] For Module Common_logic_kb_hooks.
 % Holds False.
@@ -1191,7 +1191,7 @@ holds_f(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),which_f(DBS),(call_f(DBS
 holds_f(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),which_f(DBS),(call_f(DBS,P,A1,A2,A3);call_mt_f(DBS,P,A1,A2,A3,_,_)).
 
 % 	 	 
-%% mpred_hooks:holds_f( ?P, ?A1, ?A2) is semidet.
+%% holds_f( ?P, ?A1, ?A2) is semidet.
 %
 % Hook To [mpred_hooks:holds_f/3] For Module Common_logic_kb_hooks.
 % Holds False.
@@ -1199,7 +1199,7 @@ holds_f(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),which_f(DBS),(call_f(DBS,P,
 holds_f(P,A1,A2):- holds_relaxed_f(P,A1,A2).
 
 % 	 	 
-%% mpred_hooks:holds_f( :PRED1P, ?A1) is semidet.
+%% holds_f( :PRED1P, ?A1) is semidet.
 %
 % Hook To [mpred_hooks:holds_f/2] For Module Common_logic_kb_hooks.
 % Holds False.
@@ -1226,7 +1226,7 @@ holds_relaxed_0_f(DBS,P,A1,A2):- call_mt_f(DBS,P,A1,A2,_,_).
 
 
 % 	 	 
-%% mpred_hooks:holds_f( :TermCALL) is semidet.
+%% holds_f( :TermCALL) is semidet.
 %
 % Hook To [mpred_hooks:holds_f/1] For Module Common_logic_kb_hooks.
 % Holds False.
@@ -1262,7 +1262,7 @@ mpred_f(List):- holds_f(List).
 call_f(_,P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),List= [P,A1,A2,A3,A4,A5,A6,A7], CALL=..List,(assertion_f(List);mpred_f(CALL);xcall_f(CALL)).
 
 % 	 	 
-%% mpred_hooks:call_f( ?UPARAM1, :PRED6VALUE2, ?UPARAM3, ?UPARAM4, ?UPARAM5, ?UPARAM6, ?UPARAM7, ?UPARAM8) is semidet.
+%% call_f( ?UPARAM1, :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
 %
 % Hook To [mpred_hooks:call_f/8] For Module Common_logic_kb_hooks.
 % Call False.
@@ -1272,7 +1272,7 @@ call_f(dac(_,a,_,_),P,A1,A2,A3,A4,A5,A6):- assertion_f([P,A1,A2,A3,A4,A5,A6]).
 call_f(dac(_,_,c,_),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_f(P,A1,A2,A3,A4,A5,A6).
 
 % 	 	 
-%% mpred_hooks:call_f( ?UPARAM1, :PRED5VALUE2, ?UPARAM3, ?UPARAM4, ?UPARAM5, ?UPARAM6, ?UPARAM7) is semidet.
+%% call_f( ?UPARAM1, :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
 %
 % Hook To [mpred_hooks:call_f/7] For Module Common_logic_kb_hooks.
 % Call False.
@@ -1282,7 +1282,7 @@ call_f(dac(_,a,_,_),P,A1,A2,A3,A4,A5):- assertion_f([P,A1,A2,A3,A4,A5]).
 call_f(dac(_,_,c,_),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_f(P,A1,A2,A3,A4,A5).
 
 % 	 	 
-%% mpred_hooks:call_f( ?UPARAM1, :PRED4VALUE2, ?UPARAM3, ?UPARAM4, ?UPARAM5, ?UPARAM6) is semidet.
+%% call_f( ?UPARAM1, :PRED4P, ?A1, ?A2, ?A3, ?A4) is semidet.
 %
 % Hook To [mpred_hooks:call_f/6] For Module Common_logic_kb_hooks.
 % Call False.
@@ -1292,7 +1292,7 @@ call_f(dac(_,a,_,_),P,A1,A2,A3,A4):- assertion_f([P,A1,A2,A3,A4]).
 call_f(dac(_,_,c,_),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_f(P,A1,A2,A3,A4).
 
 % 	 	 
-%% mpred_hooks:call_f( ?UPARAM1, :PRED3VALUE2, ?UPARAM3, ?UPARAM4, ?UPARAM5) is semidet.
+%% call_f( ?UPARAM1, :PRED3P, ?A1, ?A2, ?A3) is semidet.
 %
 % Hook To [mpred_hooks:call_f/5] For Module Common_logic_kb_hooks.
 % Call False.
@@ -1302,7 +1302,7 @@ call_f(dac(_,a,_,_),P,A1,A2,A3):- assertion_f([P,A1,A2,A3]).
 call_f(dac(_,_,c,_),P,A1,A2,A3):- callable_tf(P,3),xcall_f(P,A1,A2,A3).
 
 % 	 	 
-%% mpred_hooks:call_f( ?UPARAM1, :PRED2VALUE2, ?UPARAM3, ?UPARAM4) is semidet.
+%% call_f( ?UPARAM1, :PRED2P, ?A1, ?A2) is semidet.
 %
 % Hook To [mpred_hooks:call_f/4] For Module Common_logic_kb_hooks.
 % Call False.
@@ -1312,7 +1312,7 @@ call_f(dac(_,a,_,_),P,A1,A2):- assertion_f([P,A1,A2]).
 call_f(dac(_,_,c,_),P,A1,A2):- callable_tf(P,2),xcall_f(P,A1,A2).
 
 % 	 	 
-%% mpred_hooks:call_f( ?UPARAM1, :PRED1VALUE2, ?UPARAM3) is semidet.
+%% call_f( ?UPARAM1, :PRED1P, ?A1) is semidet.
 %
 % Hook To [mpred_hooks:call_f/3] For Module Common_logic_kb_hooks.
 % Call False.
@@ -1323,14 +1323,14 @@ call_f(dac(_,_,c,_),P,A1):- callable_tf(P,1),xcall_f(P,A1).
 
 
 % 	 	 
-%% call_mt_f( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5, ?VALUE6, ?VALUE7, ?VALUE8, ?VALUE9, ?VALUE10, ?VALUE11) is semidet.
+%% call_mt_f( ?VALUE1, ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7, ?A8, ?A9) is semidet.
 %
 % Call User Microtheory False.
 %
 call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable_tf(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],xcall_f(CALL).
 
 % 	 	 
-%% mpred_hooks:call_mt_f( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5, ?VALUE6, ?VALUE7, ?VALUE8, ?VALUE9, ?VALUE10) is semidet.
+%% call_mt_f( ?VALUE1, ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7, ?A8) is semidet.
 %
 % Hook To [mpred_hooks:call_mt_f/10] For Module Common_logic_kb_hooks.
 % Call User Microtheory False.
@@ -1338,7 +1338,7 @@ call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable_tf(P,9),CALL=..
 call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8):- callable_tf(P,8),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],xcall_f(CALL).
 
 % 	 	 
-%% mpred_hooks:call_mt_f( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5, ?VALUE6, ?VALUE7, ?VALUE8, ?VALUE9) is semidet.
+%% call_mt_f( ?VALUE1, ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7) is semidet.
 %
 % Hook To [mpred_hooks:call_mt_f/9] For Module Common_logic_kb_hooks.
 % Call User Microtheory False.
@@ -1346,7 +1346,7 @@ call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8):- callable_tf(P,8),CALL=..[P,
 call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],xcall_f(CALL).
 
 % 	 	 
-%% mpred_hooks:call_mt_f( ?UPARAM1, :PRED6VALUE2, ?UPARAM3, ?UPARAM4, ?UPARAM5, ?UPARAM6, ?UPARAM7, ?UPARAM8) is semidet.
+%% call_mt_f( ?UPARAM1, :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
 %
 % Hook To [mpred_hooks:call_mt_f/8] For Module Common_logic_kb_hooks.
 % Call User Microtheory False.
@@ -1354,7 +1354,7 @@ call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),CALL=..[P,A1,
 call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_f(P,A1,A2,A3,A4,A5,A6).
 
 % 	 	 
-%% mpred_hooks:call_mt_f( ?UPARAM1, :PRED5VALUE2, ?UPARAM3, ?UPARAM4, ?UPARAM5, ?UPARAM6, ?UPARAM7) is semidet.
+%% call_mt_f( ?UPARAM1, :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
 %
 % Hook To [mpred_hooks:call_mt_f/7] For Module Common_logic_kb_hooks.
 % Call User Microtheory False.
@@ -1362,7 +1362,7 @@ call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_f(P,A1,A2,
 call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_f(P,A1,A2,A3,A4,A5).
 
 % 	 	 
-%% mpred_hooks:call_mt_f( ?UPARAM1, :PRED4VALUE2, ?UPARAM3, ?UPARAM4, ?UPARAM5, ?UPARAM6) is semidet.
+%% call_mt_f( ?UPARAM1, :PRED4P, ?A1, ?A2, ?A3, ?A4) is semidet.
 %
 % Hook To [mpred_hooks:call_mt_f/6] For Module Common_logic_kb_hooks.
 % Call User Microtheory False.
@@ -1370,7 +1370,7 @@ call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_f(P,A1,A2,A3,
 call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_f(P,A1,A2,A3,A4).
 
 % 	 	 
-%% mpred_hooks:call_mt_f( ?UPARAM1, :PRED3VALUE2, ?UPARAM3, ?UPARAM4, ?UPARAM5) is semidet.
+%% call_mt_f( ?UPARAM1, :PRED3P, ?A1, ?A2, ?A3) is semidet.
 %
 % Hook To [mpred_hooks:call_mt_f/5] For Module Common_logic_kb_hooks.
 % Call User Microtheory False.
@@ -1378,7 +1378,7 @@ call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_f(P,A1,A2,A3,A4)
 call_mt_f(dac(_,_,_,mt),P,A1,A2,A3):- callable_tf(P,3),xcall_f(P,A1,A2,A3).
 
 % 	 	 
-%% mpred_hooks:call_mt_f( ?UPARAM1, :PRED2VALUE2, ?UPARAM3, ?UPARAM4) is semidet.
+%% call_mt_f( ?UPARAM1, :PRED2P, ?A1, ?A2) is semidet.
 %
 % Hook To [mpred_hooks:call_mt_f/4] For Module Common_logic_kb_hooks.
 % Call User Microtheory False.
@@ -1408,7 +1408,7 @@ xcall_f(P,A1,A2,A3,A4,A5,A6,A7,A8):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],\+ xcall
 xcall_f(P,A1,A2,A3,A4,A5,A6,A7):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7],\+ xcall_t(CALL).
 
 % 	 	 
-%% mpred_hooks:xcall_f( :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
+%% xcall_f( :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
 %
 % Hook To [mpred_hooks:xcall_f/7] For Module Common_logic_kb_hooks.
 % Extended Call False.
@@ -1416,7 +1416,7 @@ xcall_f(P,A1,A2,A3,A4,A5,A6,A7):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7],\+ xcall_t(CAL
 xcall_f(P,A1,A2,A3,A4,A5,A6):- \+ xcall_t(P,A1,A2,A3,A4,A5,A6).
 
 % 	 	 
-%% mpred_hooks:xcall_f( :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
+%% xcall_f( :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
 %
 % Hook To [mpred_hooks:xcall_f/6] For Module Common_logic_kb_hooks.
 % Extended Call False.
@@ -1424,7 +1424,7 @@ xcall_f(P,A1,A2,A3,A4,A5,A6):- \+ xcall_t(P,A1,A2,A3,A4,A5,A6).
 xcall_f(P,A1,A2,A3,A4,A5):- \+ xcall_t(P,A1,A2,A3,A4,A5).
 
 % 	 	 
-%% mpred_hooks:xcall_f( :PRED4P, ?A1, ?A2, ?A3, ?A4) is semidet.
+%% xcall_f( :PRED4P, ?A1, ?A2, ?A3, ?A4) is semidet.
 %
 % Hook To [mpred_hooks:xcall_f/5] For Module Common_logic_kb_hooks.
 % Extended Call False.
@@ -1432,7 +1432,7 @@ xcall_f(P,A1,A2,A3,A4,A5):- \+ xcall_t(P,A1,A2,A3,A4,A5).
 xcall_f(P,A1,A2,A3,A4):- \+ xcall_t(P,A1,A2,A3,A4).
 
 % 	 	 
-%% mpred_hooks:xcall_f( :PRED3P, ?A1, ?A2, ?A3) is semidet.
+%% xcall_f( :PRED3P, ?A1, ?A2, ?A3) is semidet.
 %
 % Hook To [mpred_hooks:xcall_f/4] For Module Common_logic_kb_hooks.
 % Extended Call False.
@@ -1440,7 +1440,7 @@ xcall_f(P,A1,A2,A3,A4):- \+ xcall_t(P,A1,A2,A3,A4).
 xcall_f(P,A1,A2,A3):- \+ xcall_t(P,A1,A2,A3).
 
 % 	 	 
-%% mpred_hooks:xcall_f( :PRED2P, ?A1, ?A2) is semidet.
+%% xcall_f( :PRED2P, ?A1, ?A2) is semidet.
 %
 % Hook To [mpred_hooks:xcall_f/3] For Module Common_logic_kb_hooks.
 % Extended Call False.
@@ -1448,7 +1448,7 @@ xcall_f(P,A1,A2,A3):- \+ xcall_t(P,A1,A2,A3).
 xcall_f(P,A1,A2):- \+ xcall_t(P,A1,A2).
 
 % 	 	 
-%% mpred_hooks:xcall_f( :PRED1P, ?A1) is semidet.
+%% xcall_f( :PRED1P, ?A1) is semidet.
 %
 % Hook To [mpred_hooks:xcall_f/2] For Module Common_logic_kb_hooks.
 % Extended Call False.
@@ -1456,7 +1456,7 @@ xcall_f(P,A1,A2):- \+ xcall_t(P,A1,A2).
 xcall_f(P,A1):- \+ xcall_t(P,A1).
 
 % 	 	 
-%% mpred_hooks:xcall_f( :GoalP) is semidet.
+%% xcall_f( :GoalP) is semidet.
 %
 % Hook To [mpred_hooks:xcall_f/1] For Module Common_logic_kb_hooks.
 % Extended Call False.
@@ -1465,7 +1465,7 @@ xcall_f(P):- \+ xcall_t(P).
 
 
 % 	 	 
-%% assertion_f( :Term_G5955) is semidet.
+%% assertion_f( :TermAH) is semidet.
 %
 % Assertion False.
 %

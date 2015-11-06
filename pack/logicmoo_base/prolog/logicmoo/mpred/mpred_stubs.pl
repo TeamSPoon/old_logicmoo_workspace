@@ -195,7 +195,7 @@ hybrid_tPredStubImpl(prologEquality).
 
 
 % 	 	 
-%% make_builtin( :Term_G17195) is semidet.
+%% make_builtin( :TermF) is semidet.
 %
 % Make Builtin.
 %
@@ -336,7 +336,7 @@ create_stub_body(Head,Stub):-create_stub_body(call(conjecture),Head,Stub).
 % return fail to cut and fail
 
 % 	 	 
-%% create_stub_body( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% create_stub_body( ?VALUE1, ?Head, ?Stub) is semidet.
 %
 % Create Stub Body.
 %
@@ -473,7 +473,7 @@ is_non_call_op(Op):-is_mpred_op(Op),not(is_call_op(Op)).
 % -- CODEBLOCK
 
 % 	 	 
-%% is_mpred_change_op( :Term_G12689) is semidet.
+%% is_mpred_change_op( :TermARG1) is semidet.
 %
 % If Is A Managed Predicate Change Oper..
 %
@@ -513,7 +513,7 @@ last_arg_ground(_,A,HEAD):-arg(A,HEAD,Arg),!,ground(Arg).
 
 
 % 	 	 
-%% call_provided_mpred_storage_op( ?UPARAM1, :GoalGOAL2, ?UPARAM3) is semidet.
+%% call_provided_mpred_storage_op( ?UPARAM1, :GoalH, ?UPARAM3) is semidet.
 %
 % Call Provided Managed Predicate Storage Oper..
 %
@@ -561,7 +561,7 @@ call_wdmsg(P,DB):- get_functor(DB,F,A), call_wdmsg(P,DB,F,A).
 
 
 % 	 	 
-%% call_wdmsg( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
+%% call_wdmsg( ?P, ?DB, ?VALUE3, ?A) is semidet.
 %
 % Call Wdmsg.
 %
@@ -651,7 +651,7 @@ rescan_mpred_props_ilc.
 
 
 % 	 	 
-%% first_mpred_props( :Term_G1848) is semidet.
+%% first_mpred_props( :TermARG1) is semidet.
 %
 % First Managed Predicate Props.
 %
@@ -698,7 +698,7 @@ get_cc(PI,NC):-provide_clauses_list(PI,HBLISTO),length(HBLISTO,NC).
 % ==============================
 
 % 	 	 
-%% lmconf:mpred_provide_setup( ?Op, ?HeadIn, ?StubType, ?OUT) is semidet.
+%% mpred_provide_setup( ?Op, ?HeadIn, ?StubType, ?OUT) is semidet.
 %
 % Hook To [lmconf:mpred_provide_setup/4] For Module Mpred_stubs.
 % Managed Predicate Provide Setup.
@@ -844,7 +844,7 @@ assert_mpred_t(G):-add_from_file(G).
 
 
 % 	 	 
-%% lmconf:hook_mpred_listing( ?What) is semidet.
+%% hook_mpred_listing( ?What) is semidet.
 %
 % Hook To [lmconf:hook_mpred_listing/1] For Module Mpred_stubs.
 % Hook Managed Predicate Listing.
@@ -858,7 +858,7 @@ lmconf:hook_mpred_listing(Match):- fail,
       
 
 % 	 	 
-%% lmconf:mpred_provide_storage_clauses( ?H, ?B, ?What) is semidet.
+%% mpred_provide_storage_clauses( ?H, ?B, ?What) is semidet.
 %
 % Hook To [lmconf:mpred_provide_storage_clauses/3] For Module Mpred_stubs.
 % Managed Predicate Provide Storage Clauses.
@@ -885,7 +885,7 @@ mpred_t_mpred_storage_clauses_facts(H,true,t(H)):-compound(H),!,current_predicat
 
 
 % 	 	 
-%% lmconf:mpred_provide_storage_op( ?Op, ?G) is semidet.
+%% mpred_provide_storage_op( ?Op, ?G) is semidet.
 %
 % Hook To [lmconf:mpred_provide_storage_op/2] For Module Mpred_stubs.
 % Managed Predicate Provide Storage Oper..
@@ -1128,7 +1128,7 @@ constrain_args(HEAD):-HEAD=..[P|ARGS],constrain_args(P,ARGS).
 
 
 % 	 	 
-%% constrain_args( ?VALUE1, ?VALUE2) is semidet.
+%% constrain_args( ?P, ?AR) is semidet.
 %
 % Constrain Arguments.
 %
@@ -1234,7 +1234,7 @@ dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-nonvar(F),must(arity(F,N)),make_functor
 
 
 % 	 	 
-%% registerCycPredMtWhy_3( ?VALUE1, ?VALUE2, ?VALUE3, :Term_G12350) is semidet.
+%% registerCycPredMtWhy_3( ?CM, ?M, ?PI, :TermF) is semidet.
 %
 % Register Cyc Predicate User Microtheory Generation Of Proof Helper Number 3..
 %
@@ -1243,7 +1243,7 @@ registerCycPredMtWhy_3(_CM,M,PI,F/A2):-
 
 
 % 	 	 
-%% registerCycPredMtWhy_3( ?VALUE1, ?VALUE2, :Term_G6682) is semidet.
+%% registerCycPredMtWhy_3( ?M, ?PI, :TermF) is semidet.
 %
 % Register Cyc Predicate User Microtheory Generation Of Proof Helper Number 3..
 %

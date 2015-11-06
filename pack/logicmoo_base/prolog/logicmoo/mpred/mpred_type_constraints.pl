@@ -78,7 +78,7 @@
 
 
 % 	 	 
-%% boxlog_goal_expansion( ?UPARAM1, ?UPARAM2) is semidet.
+%% boxlog_goal_expansion( ?G, ?GG) is semidet.
 %
 % Datalog Goal Expansion.
 %
@@ -115,7 +115,7 @@ weaken_arg(G,N,A):- (var(A)->true;(dom(AA,[A]),setarg(N,G,AA))).
 
 
 % 	 	 
-%% weaken_args( ?VALUE1, ?VALUE2, :Term_G6291) is semidet.
+%% weaken_args( ?G, ?N, :TermA) is semidet.
 %
 % Weaken Arguments.
 %
@@ -131,7 +131,7 @@ weaken_args(G,N,[A|RGS]):-weaken_arg(G,N,A),N2 is N + 1,weaken_args(G,N2,RGS).
 lazy(G):- term_variables(G,Vs),(Vs==[]->G;lazy(Vs,G)).
 
 % 	 	 
-%% lazy( ?UPARAM1, :GoalGOAL2) is semidet.
+%% lazy( ?V, :GoalG) is semidet.
 %
 % Lazy.
 %
@@ -182,16 +182,16 @@ iza_to_isa(AA,AB):-must(AA=AB).
 
 
 % 	 	 
-%%  ?VALUE1--> ?VALUE2 is semidet.
+%%  ?V--> ?V is semidet.
 %
 % -->.
 %
 argisa:attribute_goals(_) --> [true].
 
 % 	 	 
-%% predopts_analysis:attr_unify_hook( ?X, ?Other) is semidet.
+%% attr_unify_hook( ?X, ?Other) is semidet.
 %
-% Hook To [predopts_analysis:attr_unify_hook/2] For Module Mpred_type_constraints.
+% Hook To [dom:attr_unify_hook/2] For Module Mpred_type_constraints.
 % Attr Unify Hook.
 %
 argisa:attr_unify_hook(_, _).
@@ -232,7 +232,7 @@ isa_pred_l(Pred,List,ListO):-isa_pred_l(Pred,List,List,ListO).
 
 
 % 	 	 
-%% isa_pred_l( :PRED2VALUE1, ?UPARAM2, ?UPARAM3, ?UPARAM4) is semidet.
+%% isa_pred_l( :PRED2Pred, ?UPARAM2, ?List, ?UPARAM4) is semidet.
 %
 %  (isa/2) Predicate (List version).
 %
@@ -314,7 +314,7 @@ attempt_attribute_args(AndOr,Hint,Term):- Term=..[F|ARGS],!,attempt_attribute_ar
 
 
 % 	 	 
-%% attempt_attribute_args( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, :Term_G20988) is semidet.
+%% attempt_attribute_args( ?AndOr, ?Hint, ?F, ?N, :TermARG5) is semidet.
 %
 % Attempt Attribute Arguments.
 %
@@ -499,7 +499,7 @@ dom:attribute_goals(X) -->
 cmp_memberchk(X,Y):-numbervars(X,0,_,[attvars(skip)]),member(X,Y),!.
 
 % 	 	 
-%% cmp_memberchk0( ?VALUE1, :Term_G6329) is semidet.
+%% cmp_memberchk0( ?Item, :TermX1) is semidet.
 %
 % Cmp Memberchk Primary Helper.
 %
@@ -590,7 +590,7 @@ isac_chk(E,Cs):-once(isac_gen(E,Cs)).
 
 
 % 	 	 
-%% isac_gen( ?VALUE1, :Term_G5246) is semidet.
+%% isac_gen( ?VALUE1, :TermARG2) is semidet.
 %
 % Isac Gen.
 %
@@ -608,7 +608,7 @@ isac:attribute_goals(X) -->
 
 
 % 	 	 
-%% system:goal_expansion( ?Math, ?MathGoal) is semidet.
+%% goal_expansion( ?Math, ?MathGoal) is semidet.
 %
 % Hook To [system:goal_expansion/2] For Module Mpred_type_constraints.
 % Goal Expansion.

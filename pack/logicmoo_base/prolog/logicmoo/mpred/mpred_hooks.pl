@@ -638,7 +638,7 @@ holds_plist_t(P,LIST):- apply(holds_t,[P|LIST]).
 :- was_export(inverse_args/2).
 
 % 	 	 
-%% inverse_args( ?VALUE1, ?VALUE2) is semidet.
+%% inverse_args( ?AR, ?GS) is semidet.
 %
 % Inverse Arguments.
 %
@@ -676,7 +676,7 @@ replace_arg(C,A,VAR,CC):- C=..FARGS,replace_nth_arglist(FARGS,A,VAR,FARGO),!,CC=
 :- mpred_trace_nochilds(replace_nth_arglist/4).
 
 % 	 	 
-%% replace_nth_arglist( :Term_G30432, ?VALUE2, ?VALUE3, :Term_G31575) is semidet.
+%% replace_nth_arglist( :TermARG1, ?VALUE2, ?VAR, :TermVAR) is semidet.
 %
 % Replace Nth Arglist.
 %
@@ -688,7 +688,7 @@ replace_nth_arglist([T|FARGS],A,VAR,[T|FARGO]):-
 
 
 % 	 	 
-%% replace_nth_ref( :Term_G6530, ?VALUE2, ?VALUE3, ?VALUE4, :Term_G8180) is semidet.
+%% replace_nth_ref( :TermARG1, ?N, ?OldVar, ?NewVar, :TermARG5) is semidet.
 %
 % Replace Nth Ref.
 %
@@ -716,7 +716,7 @@ update_value(_,NEW,NEWV):- compute_value_no_dice(NEW,NEWV),!.
 
 
 % 	 	 
-%% flatten_append( ?L, ?R, ?O) is semidet.
+%% flatten_append( ?First, ?Last, ?Out) is semidet.
 %
 % Flatten Append.
 %
@@ -724,7 +724,7 @@ flatten_append(First,Last,Out):-flatten([First],FirstF),flatten([Last],LastF),ap
 
 
 % 	 	 
-%% list_update_op( ?VALUE1, :Term_G24349, ?VALUE3) is semidet.
+%% list_update_op( ?OLDI, :TermX, ?NEW) is semidet.
 %
 % List Update Oper..
 %
@@ -752,7 +752,7 @@ compute_value(NEW,NEW).
 
 
 % 	 	 
-%% insert_into( :Term_G10604, ?VALUE2, ?VALUE3, :Term_G11747) is semidet.
+%% insert_into( :TermARGS, ?VALUE2, ?Insert, :TermInsert) is semidet.
 %
 % Insert Converted To.
 %
@@ -764,7 +764,7 @@ insert_into([Carry|ARGS],After,Insert,[Carry|NEWARGS]):-
 
 
 % 	 	 
-%% add_arg_parts_of_speech( ?VALUE1, ?VALUE2, :Term_G18025, :Term_G18154) is semidet.
+%% add_arg_parts_of_speech( ?F, ?N, :TermARG3, :TermARG4) is semidet.
 %
 % Add Argument Parts Of Speech.
 %

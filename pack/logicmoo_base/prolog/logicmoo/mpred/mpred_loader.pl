@@ -374,7 +374,7 @@ to_abox(Chop,Add):-chop_box(Chop,Was),atom_concat(Was,'ABox',Add).
 to_box_type(M,B,T):-must(to_box_type0(M,B,TT)),!,T=TT.
 
 % 	 	 
-%% to_box_type0( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% to_box_type0( ?M, ?VALUE2, ?T) is semidet.
 %
 % Converted To Datalog Type Primary Helper.
 %
@@ -405,7 +405,7 @@ correct_module(MT,_,_,MT):-!.
 
 
 % 	 	 
-%% box_type( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% box_type( ?F, ?A, ?VALUE3) is semidet.
 %
 % Datalog Type.
 %
@@ -425,7 +425,7 @@ make_declared(F/A,T):- !,correct_module(abox,F,A,T),!,make_declared_now(T:F/A).
 
 
 % 	 	 
-%% make_declared_now( :Term_G15186) is semidet.
+%% make_declared_now( :TermM) is semidet.
 %
 % Make Declared Now.
 %
@@ -449,7 +449,7 @@ make_reachable(_,Test):- \+ \+ ((Test= (_:F/_), is_ftVar(F))),!.
 make_reachable(CM,M:F/A):-  must(atom(CM)),must(atom(M)), make_declared(M:F/A,TT), !,import_predicate(CM,TT:F/A).
 
 % 	 	 
-%% make_reachable( :Term_G24003) is semidet.
+%% make_reachable( :TermF) is semidet.
 %
 % Make Reachable.
 %
@@ -457,7 +457,7 @@ make_reachable(F/A):- dumpST,trace, source_context_module(CM),make_declared(CM:F
 
 
 % 	 	 
-%% import_predicate( ?VALUE1, :Term_G30743) is semidet.
+%% import_predicate( ?CM, :TermM) is semidet.
 %
 % Import Predicate.
 %
@@ -484,7 +484,7 @@ with_ukb(KB,G):-w_tl(t_l:user_abox(KB),G).
 
 
 % 	 	 
-%% mpred_loader_module_transparent( ?UPARAM1) is semidet.
+%% mpred_loader_module_transparent( ?F) is semidet.
 %
 % Managed Predicate Loader Module Transparent.
 %
@@ -925,7 +925,7 @@ loader_term_expansion(CL,EXP):-
 :- dynamic(lmconf:mpred_skipped_module/1).
 
 % 	 	 
-%% lmconf:mpred_skipped_module( ?VALUE1) is semidet.
+%% mpred_skipped_module( ?VALUE1) is semidet.
 %
 % Hook To [lmconf:mpred_skipped_module/1] For Module Mpred_loader.
 % Managed Predicate Skipped Module.
@@ -1115,7 +1115,7 @@ was_exported_content(I,CALL,Output):-Output='$si$':'$was_imported_kb_content$'(I
 
 
 % 	 	 
-%% lmconf:mpred_provide_clauses( ?H, ?B, ?What) is semidet.
+%% mpred_provide_clauses( ?H, ?B, ?What) is semidet.
 %
 % Hook To [lmconf:mpred_provide_clauses/3] For Module Mpred_loader.
 % Managed Predicate Provide Clauses.
@@ -1185,7 +1185,7 @@ do_end_of_file_actions_real:- which_file(F),
 
 
 % 	 	 
-%% mpred_implode_varnames( :Term_G16819) is semidet.
+%% mpred_implode_varnames( :TermN) is semidet.
 %
 % Managed Predicate Implode Varnames.
 %
@@ -1211,7 +1211,7 @@ mpred_maybe_skip(M):- asserta_if_new(lmconf:mpred_skipped_module(M)),!.
 
 
 % 	 	 
-%% expanded_already_functor( :Term_G24006) is semidet.
+%% expanded_already_functor( :TermARG1) is semidet.
 %
 % Expanded Already Functor.
 %
@@ -1252,7 +1252,7 @@ mpred_dcg_ops:-  op(400,yfx,('\\\\')),op(1200,xfx,('-->>')),op(1200,xfx,('--*>>'
 % TODO DISABLE THIS NEXT CLAUSE LATER
 
 % 	 	 
-%% mpred_directive_expansion( ?VALUE1, ?VALUE2) is semidet.
+%% mpred_directive_expansion( ?VALUE1, ?M) is semidet.
 %
 % Managed Predicate Directive Expansion.
 %
@@ -1492,7 +1492,7 @@ disable_mpred_expansion:- (( t_l:disable_px) -> true ;
 
 
 % 	 	 
-%% is_box_module( ?VALUE1, ?VALUE2) is semidet.
+%% is_box_module( ?M, ?VALUE2) is semidet.
 %
 % If Is A Datalog Module.
 %
@@ -1696,7 +1696,7 @@ inside_file(W) :- loading_source_file(Source),!,lmcache:mpred_directive_value(W,
 
 
 % 	 	 
-%% arithmetic:term_expansion( :TermFDecl, ?Clause) is semidet.
+%% term_expansion( :TermFDecl, ?Clause) is semidet.
 %
 % Hook To [arithmetic:term_expansion/2] For Module Mpred_loader.
 % Term Expansion.
@@ -1892,7 +1892,7 @@ load_file_term_to_command_or_fail(I,Y):-
 
 
 % 	 	 
-%% is_prolog_xform( :Term_G7700) is semidet.
+%% is_prolog_xform( :TermV) is semidet.
 %
 % If Is A Prolog Xform.
 %
@@ -1999,7 +1999,7 @@ mpred_term_expansion(Fact,Output):- load_file_term_to_command_1(_Dir,Fact,C),mus
 
 
 % 	 	 
-%% load_file_term_to_command_1b( ?VALUE1, :Term_G21109, :Term_G21238) is semidet.
+%% load_file_term_to_command_1b( ?VALUE1, :TermH, :TermH) is semidet.
 %
 % Load File Term Converted To Command 1b.
 %
@@ -2057,7 +2057,7 @@ mpred_term_expansion(Fact,(:- ((cl_assert(Dir,Fact))))):- load_file_term_to_comm
       % Specific "*PREDICATE CLASS*" based default
 
 % 	 	 
-%% load_file_term_to_command_2( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% load_file_term_to_command_2( ?VALUE1, ?Fact, ?Output) is semidet.
 %
 % load file term Converted To command  Extended Helper.
 %
@@ -2084,7 +2084,7 @@ mpred_term_expansion(Fact,(:- ((cl_assert(pfc(expand_file),Fact))))):-
 
 
 % 	 	 
-%% stream_pos( :Term_G3100) is semidet.
+%% stream_pos( :TermFile) is semidet.
 %
 % Stream Pos.
 %
@@ -2224,7 +2224,7 @@ load_language_file(Name0):-
 
 
 % 	 	 
-%% never_load_special( :Term_G17470, ?Options) is semidet.
+%% never_load_special( :TermARG1, ?Options) is semidet.
 %
 % Never Load Special.
 %
@@ -2258,7 +2258,7 @@ prolog_load_file_loop_checked_0(ModuleSpec, Options) :- current_predicate(_,_:ex
 
 
 % 	 	 
-%% prolog_load_file_nlc( :Term_G5901, ?VALUE2) is semidet.
+%% prolog_load_file_nlc( :TermModule, ?Options) is semidet.
 %
 % Prolog Load File Nlc.
 %
@@ -2290,7 +2290,7 @@ prolog_load_file_nlc(Module:Spec, Options):- term_to_atom(Spec,String),member(S,
 
 
 % 	 	 
-%% prolog_load_file_nlc_0( :Term_G11142, ?VALUE2) is semidet.
+%% prolog_load_file_nlc_0( :TermModule, ?Options) is semidet.
 %
 % prolog load file nlc  Primary Helper.
 %
@@ -2323,7 +2323,7 @@ guess_file_type_loader(Ext,Pred):- atom(Ext),
 
 
 % 	 	 
-%% load_file_dir( :Term_G21465, ?VALUE2) is semidet.
+%% load_file_dir( :TermModule, ?Options) is semidet.
 %
 % Load File Dir.
 %
@@ -2353,7 +2353,7 @@ use_file_type_loader(plmoo,ensure_mpred_file_consulted).
 
 
 % 	 	 
-%% ensure_prolog_file_consulted( :Term_G5516, ?VALUE2) is semidet.
+%% ensure_prolog_file_consulted( :TermM, ?Options) is semidet.
 %
 % Ensure Prolog File Consulted.
 %
@@ -2361,7 +2361,7 @@ ensure_prolog_file_consulted(M:File,Options):-must(load_files(M:File,Options)),!
 
 
 % 	 	 
-%% ensure_mpred_file_consulted( :Term_G10608, ?VALUE2) is semidet.
+%% ensure_mpred_file_consulted( :TermM, ?Options) is semidet.
 %
 % Ensure Managed Predicate File Consulted.
 %
@@ -2372,7 +2372,7 @@ ensure_mpred_file_consulted(M:File,Options):-
 
 
 % 	 	 
-%% load_file_some_type( :Term_G15592, ?VALUE2) is semidet.
+%% load_file_some_type( :TermM, ?Options) is semidet.
 %
 % Load File Some Type.
 %
@@ -2873,7 +2873,7 @@ convert_side_effect_0a(I,I).
 
 
 % 	 	 
-%% convert_side_effect_0b( :Term_G15008, ?VALUE2) is semidet.
+%% convert_side_effect_0b( :TermOpData, ?Result) is semidet.
 %
 % Convert Side Effect 0b.
 %
@@ -2900,7 +2900,7 @@ convert_side_effect_0c(OpData,Reproduce):- trace_or_throw(unknown_convert_side_e
 % todo
 
 % 	 	 
-%% convert_side_effect_buggy( ?VALUE1, ?VALUE2) is semidet.
+%% convert_side_effect_buggy( ?H, ?HB) is semidet.
 %
 % Convert Side Effect Buggy.
 %
@@ -2912,21 +2912,21 @@ convert_side_effect_buggy(OpData,( (  error_op(OpData)))):-dmsg(unknown_convert_
 
 
 % 	 	 
-%% clear_predicates( :Term_G2928) is semidet.
+%% clear_predicates( :TermM) is semidet.
 %
 % Clear Predicates.
 %
 clear_predicates(M:H):- forall(M:clause(H,_,Ref),erase(Ref)).
 
 % 	 	 
-%% push_predicates( :Term_G9417, ?VALUE2) is semidet.
+%% push_predicates( :TermM, ?STATE) is semidet.
 %
 % Push Predicates.
 %
 push_predicates(M:F/A,STATE):- functor(H,F,A),findall((H:-B), (M:clause(H,B,Ref),erase(Ref)), STATE).
 
 % 	 	 
-%% pop_predicates( :Term_G14621, ?VALUE2) is semidet.
+%% pop_predicates( :TermM, ?STATE) is semidet.
 %
 % Pop Predicates.
 %
@@ -2939,7 +2939,7 @@ pop_predicates(M:F/A,STATE):- functor(H,F,A),forall(member((H:-B),STATE),M:asser
 
 
 % 	 	 
-%% user:prolog_load_file( ?ModuleSpec, ?Options) is semidet.
+%% prolog_load_file( ?ModuleSpec, ?Options) is semidet.
 %
 % Hook To [user:prolog_load_file/2] For Module Mpred_loader.
 % Prolog Load File.

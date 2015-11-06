@@ -199,7 +199,7 @@ with_mfa(P  ,Pred3):- with_pi(P,with_mfa_of(Pred3)).
 % = :- meta_predicate(with_mfa_of(3,+,+,+,+)).
 
 % 	 	 
-%% with_mfa_of( :PRED3VALUE1, +OUT2, +OUT3, +OUT4, +OUT5) is semidet.
+%% with_mfa_of( :PRED3Pred3, +CM, +M, +P, +F) is semidet.
 %
 % Using Module-functor-arity Of.
 %
@@ -214,7 +214,7 @@ with_mfa_of(Pred3,_CM,M,_P,F/A):-M:call(Pred3,M,F,A).
 
 
 % 	 	 
-%% make_transparent( ?VALUE1, ?VALUE2, ?VALUE3, :Term_G21208) is semidet.
+%% make_transparent( ?CM, ?M, ?PI, :TermF) is semidet.
 %
 % Make Transparent.
 %
@@ -407,7 +407,7 @@ to_canonical_mpi(P,MPI):- strip_module(P,M,PI),add_mi(M,PI,MPI).
 
 
 % 	 	 
-%% add_mi( ?VALUE1, ?VALUE2, :Term_G22515) is semidet.
+%% add_mi( ?M, ?P, :TermM) is semidet.
 %
 % Add Mi.
 %
@@ -532,7 +532,7 @@ current_predicate_module(P,M):-!,functor_safe(P,F,A),(current_predicate(M:F/A);c
 
 
 % 	 	 
-%% dynamic_multifile( :Term_G13163) is semidet.
+%% dynamic_multifile( :TermPred) is semidet.
 %
 % Dynamic Multifile.
 %
@@ -571,7 +571,7 @@ multi_transparent(X):-functor_catch(X,F,A),multi_transparent(F/A),!.
 
 
 % 	 	 
-%% dynamic_if_missing( :Term_G24223) is semidet.
+%% dynamic_if_missing( :TermF) is semidet.
 %
 % Dynamic If Missing.
 %
@@ -709,7 +709,7 @@ dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> show_call(why,convert_to_dynam
 % pred_prop(Spec,DO,TEST,DONT)
 
 % 	 	 
-%% pred_prop( :Term_G7696, :Term_G7825, ?VALUE3, ?VALUE4) is semidet.
+%% pred_prop( :TermM, :TermDO, ?TEST, ?VALUE4) is semidet.
 %
 % Predicate Prop.
 %
@@ -719,7 +719,7 @@ pred_prop(M:F/A, (dynamic(M:F/A)) ,(dynamic), show_call(why,compile_predicates([
 
 
 % 	 	 
-%% pred_prop( :Term_G13103, :Term_G13232, ?VALUE3) is semidet.
+%% pred_prop( :TermARG1, :TermSpec, ?Spec) is semidet.
 %
 % Predicate Prop.
 %

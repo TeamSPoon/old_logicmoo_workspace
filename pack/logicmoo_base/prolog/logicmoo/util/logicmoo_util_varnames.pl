@@ -14,8 +14,11 @@
           [ ain00/1,
             count_members_eq/3,
             all_different_vals/1,
+            all_different_vars/1,
             all_different_vals/2,
             get_random_headvars/1,
+            get_random_headvars/4,
+            get_1head_arg_var/5,
             term_slots/2,
           term_singletons/2,
           term_singletons/3,
@@ -232,21 +235,27 @@ not_member_eq(E,REST):- \+ identical_member(E,REST).
 % all_different_vals(_):- t_l:dont_varname,!.
 
 % 	 	 
-%% all_different_vals( ?Vs) is semidet.
+%% all_different_vals( ?Term) is semidet.
 %
 % All Different Vals.
 %
-all_different_vals([_]):-!.
-all_different_vals([]):-!.
-all_different_vals(Vs):-all_different_vals(Vs,Vs),!.
+all_different_vals(Term):-term_slots(Term,Slots),!,all_different_vals(Slots,Slots).
+
+% 	 	 
+%% all_different_vars( ?A) is semidet.
+%
+% All Different Variables.
+%
+all_different_vars(A):-all_different_vals(A,A).
 
 
 % 	 	 
-%% all_different_vals( :Term_G25914, ?VALUE2) is semidet.
+%% all_different_vals( :TermV, ?SET) is semidet.
 %
 % All Different Vals.
 %
 all_different_vals([],_):-!.
+all_different_vals([_],_):-!.
 all_different_vals([V|Vs],SET):-delete_eq(SET,V,REST),!,v_dif_rest(V,REST),all_different_vals(Vs,SET).
 
 
@@ -263,10 +272,10 @@ v_dif_rest(V,REST):- not_member_eq(V,REST), when('?='(V,_),not_member_eq(V,REST)
 %
 % Lock Variables.
 %
-lock_vars(Var):-atomic(Var),!.
 lock_vars(Var):-var(Var),!,when:when(nonvar(Var),Var='$VAR'(_)).
 lock_vars('$VAR'(_)):-!.
 lock_vars([X|XM]):-!,lock_vars(X),lock_vars(XM),!.
+lock_vars(Var):- atomic(Var),!.
 lock_vars(XXM):-XXM=..[_,X|XM],lock_vars(X),lock_vars(XM).
 
 
@@ -276,9 +285,9 @@ lock_vars(XXM):-XXM=..[_,X|XM],lock_vars(X),lock_vars(XM).
 % Unlock Variables.
 %
 unlock_vars(Var):-var(Var),!,del_attr(Var,when).
-unlock_vars(Var):-atomic(Var),!.
 unlock_vars('$VAR'(_)):-!.
 unlock_vars([X|XM]):-!,unlock_vars(X),unlock_vars(XM),!.
+unlock_vars(Var):-atomic(Var),!.
 unlock_vars(XXM):-XXM=..[_,X|XM],unlock_vars(X),unlock_vars(XM).
 
 
@@ -292,7 +301,7 @@ make_subterm_path(Sub,Term,PathO):-vmust(subterm_path(Sub,Term,Path)),!,PathO=Pa
 
 
 % 	 	 
-%% subterm_path( ?VALUE1, ?VALUE2, :Term_G25237) is semidet.
+%% subterm_path( ?Sub, ?Term, :TermARG3) is semidet.
 %
 % Subterm Path.
 %
@@ -348,9 +357,21 @@ get_clause_vars(_,_):- !.
 % Get Clause Variables Copy.
 %
 get_clause_vars_copy(HB,HB):- ground(HB),!.
-get_clause_vars_copy(HH,HH):- sub_term(S,HH),compound(S),S='$VAR'(_),!. % already labled
-get_clause_vars_copy(H0,MHB):- must((copy_term_and_varnames(H0,MHB),lock_vars(MHB),as_clause_no_m( MHB,  H, B),
+% get_clause_vars_copy(HH,HH):- sub_term(S,HH),compound(S),S='$VAR'(_),!. % already labled
+get_clause_vars_copy(H0,MHB):- 
+    source_variables_lv(AllS),
+    must((copy_term(H0+AllS,MHB+CAllS),
+    term_slots(MHB,Slots),
+    all_different_vars(Slots),
+    lock_vars(Slots),
+    as_clause_no_m( MHB,  H, B),
+    must_maplist(set_varname(write_functor),CAllS),
     get_clause_vars_hb_int(H,B))),!.
+
+get_clause_vars_copy(H0,MHB):- 
+    must((copy_term_and_varnames(H0,MHB),lock_vars(MHB),as_clause_no_m( MHB,  H, B),
+    get_clause_vars_hb_int(H,B))),!.
+
 
 
 
@@ -406,7 +427,7 @@ try_get_inner_vars(H):- once((functor(H,_,N),arg(N,H,List),member(vars(Vs),List)
 
 
 % 	 	 
-%% mpred_type_wff:term_slots( ?Term, ?Slots) is semidet.
+%% term_slots( ?Term, ?Slots) is semidet.
 %
 % Hook To [mpred_type_wff:term_slots/2] For Module Logicmoo_varnames.
 % Term Slots.
@@ -415,7 +436,7 @@ term_slots(Term,Slots):-term_singletons(Term, [],NS, [],S),append(NS,S,Slots).
 
 
 % 	 	 
-%% mpred_type_wff:term_singletons( ?A, ?Vs) is semidet.
+%% term_singletons( ?A, ?Vs) is semidet.
 %
 % Hook To [mpred_type_wff:term_singletons/2] For Module Logicmoo_varnames.
 % Term Singletons.
@@ -424,7 +445,7 @@ term_singletons(A,Vs):- notrace(term_singletons(A,[],_,[],Vs)).
 %= %= :- was_export(term_singletons/3).
 
 % 	 	 
-%% mpred_type_wff:term_singletons( ?Term, ?NonSingle, ?Singles) is semidet.
+%% term_singletons( ?Term, ?NonSingle, ?Singles) is semidet.
 %
 % Hook To [mpred_type_wff:term_singletons/3] For Module Logicmoo_varnames.
 % Term Singletons.
@@ -433,7 +454,7 @@ term_singletons(Term,NonSingle,Singles):- notrace(term_singletons(Term,[],NonSin
 %= %= :- was_export(term_singletons/5).
 
 % 	 	 
-%% mpred_type_wff:term_singletons( :TermFml, ?NS, ?NS, ?S, ?S) is semidet.
+%% term_singletons( :TermFml, ?NS, ?NS, ?S, ?S) is semidet.
 %
 % Hook To [mpred_type_wff:term_singletons/5] For Module Logicmoo_varnames.
 % Term Singletons.
@@ -454,6 +475,16 @@ term_singletons(Fml, NS,NSO, S,NSV):- compound(Fml),Fml=..[_|T],!, term_singleto
 call_return_tf(Call,TF):- ((Call-> TF = t ; TF = nil)).
 
 
+
+% 	 	 
+%% try_get_varname_cache( ?H) is semidet.
+%
+% Try Get Varname Cache.
+%
+try_get_varname_cache(H):- no_vars_needed(H),!.
+try_get_varname_cache(H):- varname_cache:varname_info(H,_,Vs,_),maplist(set_varname(write_functor),Vs),!.
+try_get_varname_cache(H):- varname_cache:varname_info(_,H,Vs,_),maplist(set_varname(write_functor),Vs),!.
+
 % 	 	 
 %% try_get_head_vars( ?H) is semidet.
 %
@@ -461,8 +492,18 @@ call_return_tf(Call,TF):- ((Call-> TF = t ; TF = nil)).
 %
 try_get_head_vars(H):- no_vars_needed(H),!.
 try_get_head_vars(H):- varname_cache:varname_info(H,_,Vs,_),maplist(set_varname(write_functor),Vs),!.
-try_get_head_vars(H):- try_get_inner_vars(H),!.
+try_get_head_vars(H):- try_get_inner_vars(H).
 try_get_head_vars(H):- varname_cache:varname_info(_,H,Vs,_),maplist(set_varname(write_functor),Vs),!.
+try_get_head_vars(B):- must(get_random_headvars(B)),!.
+
+
+
+% 	 	 
+%% try_varname_infos( ?H) is semidet.
+%
+% Try Varname Infos.
+%
+try_varname_infos(H):- varname_cache:varname_info(H,_,Vs,_),maplist(set_varname(write_functor),Vs),!.
 
 
 % 	 	 
@@ -470,26 +511,37 @@ try_get_head_vars(H):- varname_cache:varname_info(_,H,Vs,_),maplist(set_varname(
 %
 % Get Random Headvars.
 %
-get_random_headvars(H):- term_slots(H,HVs),all_different_vals(HVs),functor(H,F,A),get_random_headvars(H,F,1,A).
+get_random_headvars(H):- \+ compound(H),!.
+get_random_headvars(H):- functor(H,F,A),get_random_headvars(H,F,A,A).
 
 
 % 	 	 
-%% get_random_headvars( ?H, ?F, ?N, ?A) is semidet.
+%% get_random_headvars( ?H, ?F, ?A, ?N) is semidet.
 %
 % Get Random Headvars.
 %
-get_random_headvars(H,F,N,A):- N > A,!.
-get_random_headvars(H,F,N,A):- arg(N,H,HA),get_1head_arg_var(H,F,N,A,HA),!,N2 is N+1,get_random_headvars(H,F,N2,A).
+get_random_headvars(_H,_F,A,N):- (N < 1 ; N>A),!.
+get_random_headvars( H, F,A,N):- arg(N,H,HA),get_1head_arg_var(H,F,N,A,HA),N2 is N-1,get_random_headvars(H,F,A,N2).
 
 
 % 	 	 
-%% get_1head_arg_var( ?H, ?F, ?N, ?A, ?NA) is semidet.
+%% get_1head_arg_var( ?H, ?F, ?N, ?A, ?HA) is semidet.
 %
 % Get 1head Argument Variable.
 %
-get_1head_arg_var(H,F,N,A,HA):- nonvar(HA),!.
-get_1head_arg_var(H,F,N,A,HA):- functor(HH,F,A),arg(N,HH,HA),lock_vars(HA),try_get_head_vars(HH),!.
-   
+get_1head_arg_var(_H,F,N,A,HA):- 
+ ignore(nonvar(HA)->true;
+ ( functor(HH,F,A),arg(N,HH,COMP),try_get_varname_cache(HH),sub_ft_var(HA,COMP))).
+ 
+
+% 	 	 
+%% sub_ft_var( ?HA, ?COMP) is semidet.
+%
+% Sub Format Type Variable.
+%
+sub_ft_var(HA,COMP):- 
+  (is_ftVar(COMP)-> HA=COMP; (compound(COMP),arg(_,COMP,FTVAR),sub_ft_var(HA,FTVAR))).
+
 
 % 	 	 
 %% try_get_body_vars( :TermH) is semidet.
@@ -498,11 +550,12 @@ get_1head_arg_var(H,F,N,A,HA):- functor(HH,F,A),arg(N,HH,HA),lock_vars(HA),try_g
 %
 try_get_body_vars(H):- no_vars_needed(H),!.
 try_get_body_vars(H):- varname_cache:varname_info(_,H,Vs,_),maplist(set_varname(write_functor),Vs),!.
-try_get_body_vars(H):- try_get_inner_vars(H).
+try_get_body_vars(H):- try_get_inner_vars(H),!.
 try_get_body_vars(H):- varname_cache:varname_info(H,_,Vs,_),maplist(set_varname(write_functor),Vs),!.
 try_get_body_vars((A,B)):-!,try_get_head_vars(A),try_get_head_vars(B).
 try_get_body_vars((A;B)):-!,try_get_head_vars(A),try_get_head_vars(B).
 try_get_body_vars(C):- C=..[_,L],maplist(try_get_body_vars,L).
+try_get_body_vars(B):- must(get_random_headvars(B)),!.
 try_get_body_vars(_).
 
 :- multifile(varname_cache:varname_info/4).
@@ -728,7 +781,7 @@ contains_singletons(Term,N):-  sanity(\+contain_numbervars(Term)),
 
 
 % 	 	 
-%% count_members_eq( ?VALUE1, :Term_G22571, ?VALUE3) is semidet.
+%% count_members_eq( ?Find, :TermE, ?N) is semidet.
 %
 % Count Members Using (==/2) (or =@=/2) ).
 %
@@ -776,7 +829,7 @@ mpred_numbervars_with_names(Term):- term_variables(Term,Vars),mpred_name_variabl
 
 
 % 	 	 
-%% mpred_name_variables( :Term_G18693) is semidet.
+%% mpred_name_variables( :TermVar) is semidet.
 %
 % Managed Predicate Name Variables.
 %
@@ -799,7 +852,7 @@ mpred_name_variables([Var|Vars]):-
 b_implode_varnames(_):-!.
 
 % 	 	 
-%% b_implode_varnames0( :Term_G25769) is semidet.
+%% b_implode_varnames0( :TermN) is semidet.
 %
 % Backtackable Implode Varnames Primary Helper.
 %
@@ -860,9 +913,9 @@ snumbervars5(Term,Start,End,List):-must_det_l((integer(Start),is_list(List), num
 
 
 % 	 	 
-%% predopts_analysis:attr_unify_hook( ?X, ?Other) is semidet.
+%% attr_unify_hook( ?X, ?Other) is semidet.
 %
-% Hook To [predopts_analysis:attr_unify_hook/2] For Module Logicmoo_varnames.
+% Hook To [dom:attr_unify_hook/2] For Module Logicmoo_varnames.
 % Attr Unify Hook.
 %
 logicmoo_varnames:attr_unify_hook(_,_).
@@ -870,12 +923,13 @@ logicmoo_varnames:attr_unify_hook(_,_).
 % 	 	 
 %% attr_portray_hook( ?Value, ?Var) is semidet.
 %
+% Hook To [logicmoo_util_structs:attr_portray_hook/2] For Module Logicmoo_varnames.
 % Attr Portray Hook.
 %
 logicmoo_varnames:attr_portray_hook(Value, _Var) :- nonvar(Value),!,writeq('?'(Value)).
 
 % 	 	 
-%% logicmoo_varnames:portray_attvar( ?Var) is semidet.
+%% portray_attvar( ?Var) is semidet.
 %
 % Hook To [logicmoo_varnames:portray_attvar/1] For Module Logicmoo_varnames.
 % Portray Attribute Variable.
@@ -891,9 +945,9 @@ logicmoo_varnames:portray_attvar(Var) :-
 
 
 % 	 	 
-%% predicate_options:attribute_goals( ?X, ?In, ?Out) is semidet.
+%% attribute_goals( ?X, ?In, ?Out) is semidet.
 %
-% Hook To [predicate_options:attribute_goals/3] For Module Logicmoo_varnames.
+% Hook To [dom:attribute_goals/3] For Module Logicmoo_varnames.
 % Attribute Goals.
 %
 attribute_goals(A, B, E) :-
@@ -1034,7 +1088,7 @@ ensure_vars_labled(I,I).
 :- multifile(user:portray/1).
 
 % 	 	 
-%% user:portray( :TermObj) is semidet.
+%% portray( :TermObj) is semidet.
 %
 % Hook To [user:portray/1] For Module Logicmoo_varnames.
 % Portray.
@@ -1125,7 +1179,7 @@ logicmoo_util_varnames_file.
 
 
 % 	 	 
-%% prolog:make_hook( ?VALUE1, ?VALUE2) is semidet.
+%% make_hook( ?VALUE1, ?Files) is semidet.
 %
 % Hook To [prolog:make_hook/2] For Module Logicmoo_varnames.
 % Make Hook.
@@ -1134,7 +1188,7 @@ prolog:make_hook(before, Files):-forall(member(File,Files),retractall(varname_ca
 prolog:make_hook(after, Files):-forall(member(File,Files),show_call(why,ain00(varname_cache:varname_info_file(File)))).
 
 % 	 	 
-%% arithmetic:term_expansion( :TermFDecl, ?Clause) is semidet.
+%% term_expansion( :TermFDecl, ?Clause) is semidet.
 %
 % Hook To [arithmetic:term_expansion/2] For Module Logicmoo_varnames.
 % Term Expansion.

@@ -295,6 +295,7 @@ always_show_dmsg:- tlbugger:tl_always_show_dmsg.
 % 	 	 
 %% term_to_string( ?IS, ?I) is semidet.
 %
+% Hook To [pldoc_html:term_to_string/2] For Module Logicmoo_util_first.
 % Term Converted To String.
 %
 term_to_string(IS,I):- on_x_fail(term_string(IS,I)),!.
@@ -524,7 +525,7 @@ safe_numbervars(EE):-get_gtime(G),numbervars(EE,G,_End,[attvar(skip),functor_nam
 %
 
 % 	 	 
-%% register_var( :Term_G27214, ?VALUE2, ?VALUE3) is semidet.
+%% register_var( :TermN, ?IN, ?OUT) is semidet.
 %
 % Register Variable.
 %
@@ -578,7 +579,7 @@ samify(V,V0):-mustvv(V=@=V0),V=V0.
 
 
 % 	 	 
-%% var_to_name( ?VALUE1, :Term_G24547, ?VALUE3) is semidet.
+%% var_to_name( ?V, :TermN, ?N) is semidet.
 %
 % Variable Converted To Name.
 %
@@ -750,7 +751,7 @@ module_predicates_are_exported0(ModuleName):-
 :- module_transparent(export_if_noconflict/2).
 
 % 	 	 
-%% export_if_noconflict( ?VALUE1, :Term_G14150) is semidet.
+%% export_if_noconflict( ?M, :TermF) is semidet.
 %
 % Export If Noconflict.
 %

@@ -437,7 +437,7 @@ when_defined(Goal):-if_defined(Goal,true).
 % = :- meta_predicate(to_pi(?,?)).
 
 % 	 	 
-%% to_pi( ?UPARAM1, ?UPARAM2) is semidet.
+%% to_pi( ?P, ?M) is semidet.
 %
 % Converted To Predicate Indicator.
 %
@@ -813,7 +813,7 @@ functor_safe_compound(P,F,A):- strip_f_module(P,P0),strip_f_module(F,F0),!,funct
 :- meta_predicate block(+, :, ?). 
 
 % 	 	 
-%% ifprolog:block( +Name, ?Goal, ?Var) is semidet.
+%% block( +Name, ?Goal, ?Var) is semidet.
 %
 % Hook To [ifprolog:block/3] For Module Logicmoo_util_catch.
 % Block.

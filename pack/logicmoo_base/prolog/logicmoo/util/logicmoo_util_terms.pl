@@ -270,7 +270,7 @@ maptree(Pred,I,O):- I=..[F|IL], (maplist(maptree(Pred),[F|IL],[FO|OL])),
 :- export(disjuncts_to_list/2).
 
 % 	 	 
-%% disjuncts_to_list( ?VALUE1, ?VALUE2) is semidet.
+%% disjuncts_to_list( ?Var, ?Var) is semidet.
 %
 % Disjuncts Converted To List.
 %
@@ -294,7 +294,7 @@ disjuncts_to_list(Lit,[Lit]).
 :- export(conjuncts_to_list/2).
 
 % 	 	 
-%% conjuncts_to_list( ?VALUE1, ?VALUE2) is semidet.
+%% conjuncts_to_list( ?Var, ?Var) is semidet.
 %
 % Conjuncts Converted To List.
 %
@@ -339,7 +339,7 @@ pred_juncts_to_list(F,AB,ABL):-AB=..[F,A|ABB],
   append(AL,BL,ABL).
 
 % 	 	 
-%% pred_juncts_to_list( ?VALUE1, ?VALUE2) is semidet.
+%% pred_juncts_to_list( ?A, ?ABL) is semidet.
 %
 % Predicate Juncts Converted To List.
 %
@@ -362,7 +362,7 @@ list_to_conjuncts(I,O):-list_to_conjuncts((,),I,O).
 :- export(list_to_conjuncts/3).
 
 % 	 	 
-%% list_to_conjuncts( ?VALUE1, ?V, ?V) is semidet.
+%% list_to_conjuncts( ?VALUE1, ?H, ?H) is semidet.
 %
 % List Converted To Conjuncts.
 %
@@ -486,7 +486,7 @@ flatten_dedupe(Percepts0,Percepts):-
 
 
 % 	 	 
-%% proccess_status( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% proccess_status( ?VALUE1, ?Det, ?Goal2) is semidet.
 %
 % Proccess Status.
 %
@@ -556,7 +556,7 @@ nd_predsubst1( Pred,  P, N, P1 ) :- N > 0, P =.. [F|Args],
 
 
 % 	 	 
-%% nd_predsubst2( :PRED2VALUE1, ?L, ?L) is semidet.
+%% nd_predsubst2( :PRED2Pred, ?L, ?L) is semidet.
 %
 % Nd Predsubst Extended Helper.
 %
@@ -676,7 +676,7 @@ nd_subst2( _X, _Sk, L, L ).
 
 
 % 	 	 
-%% univ_term( ?VALUE1, :Term_G6465) is semidet.
+%% univ_term( ?P1, :TermFS) is semidet.
 %
 % Univ Term.
 %
@@ -730,7 +730,7 @@ weak_nd_subst2( _X, _Sk, L, L ).
 
 
 % 	 	 
-%% make_list( ?VALUE1, ?VALUE2, :Term_G12981) is semidet.
+%% make_list( ?E, ?VALUE2, :TermE) is semidet.
 %
 % Make List.
 %
@@ -757,7 +757,7 @@ remove_dupes(In,Out):-remove_dupes(In,Out,[]).
 
 
 % 	 	 
-%% remove_dupes( :Term_G26952, :Term_G27081, ?VALUE3) is semidet.
+%% remove_dupes( :TermI, :TermOut, ?Shown) is semidet.
 %
 % Remove Dupes.
 %
@@ -867,7 +867,7 @@ list_to_set_safe([A|AA],BB):- (not(not(lastMember2(A,AA))) -> list_to_set_safe(A
 
 
 % 	 	 
-%% term_parts( ?VALUE1, :Term_G11156) is semidet.
+%% term_parts( ?A, :TermA) is semidet.
 %
 % Term Parts.
 %
@@ -877,7 +877,7 @@ term_parts(Comp,[P/A|TERMS]):- functor_catch(Comp,P,A), Comp=..[P|List],term_par
 
 
 % 	 	 
-%% term_parts_l( :Term_G15569, ?VALUE2) is semidet.
+%% term_parts_l( :TermVar, ?Var) is semidet.
 %
 % Term Parts (list Version).
 %
@@ -931,7 +931,7 @@ list_retain([_|List],Pred,Retained):- list_retain(List,Pred,Retained).
 :- export(identical_member/2).
 
 % 	 	 
-%% identical_member( ?VALUE1, :Term_G15876) is semidet.
+%% identical_member( ?X, :TermY) is semidet.
 %
 % Identical Member.
 %
@@ -952,7 +952,7 @@ identical_member(X,[_|L]) :-
 delete_eq(A,B,C):-pred_delete(==,A,B,C).
 
 % 	 	 
-%% pred_delete( :PRED2VALUE1, ?UPARAM2, ?UPARAM3, ?UPARAM4) is semidet.
+%% pred_delete( :PRED2Pred, ?A, ?B, ?D) is semidet.
 %
 % Predicate Delete.
 %

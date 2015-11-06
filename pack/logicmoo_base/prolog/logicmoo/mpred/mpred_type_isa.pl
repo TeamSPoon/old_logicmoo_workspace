@@ -474,7 +474,7 @@ is_known_true(isa(_,ftID)).
 :- was_export(is_known_trew/1).
 
 % 	 	 
-%% is_known_trew( :Term_G5896) is semidet.
+%% is_known_trew( :TermF) is semidet.
 %
 % If Is A Known Trew.
 %
@@ -511,7 +511,7 @@ is_known_false(F):-is_known_false0(F),!.
 :- was_export(is_known_false0/1).
 
 % 	 	 
-%% is_known_false0( :Term_G16543) is semidet.
+%% is_known_false0( :TermG) is semidet.
 %
 % If Is A Known False Primary Helper.
 %
@@ -651,7 +651,7 @@ tCol_gen(T):- no_repeats(T,req(ttTemporalType(T);completelyAssertedCollection(T)
 % ==========================
 
 % 	 	 
-%% lmconf:module_local_init is semidet.
+%% module_local_init is semidet.
 %
 % Hook To [lmconf:module_local_init/0] For Module Mpred_type_isa.
 % Module Local Init.
@@ -699,7 +699,7 @@ isa_backchaing_0(I,T):-  sanity(nonvar(I)),isa_asserted(I,AT),transitive_subclas
 
 
 % 	 	 
-%% type_isa( ?VALUE1, ?VALUE2) is semidet.
+%% type_isa( ?Type, ?VALUE2) is semidet.
 %
 % type  (isa/2).
 %
@@ -729,7 +729,7 @@ atom_type_prefix_other(Inst,Type,Suffix,Other):-atom(Inst),type_suffix(Suffix,Ty
 
 
 % 	 	 
-%% onLoadPfcRule( :Term_G18671) is semidet.
+%% onLoadPfcRule( :TermInst) is semidet.
 %
 % Whenever Load Prolog Forward Chaining Rule.
 %
@@ -1072,7 +1072,7 @@ system:term_expansion(isa(Compound,PredArgTypes),
 
 
 % 	 	 
-%% lmconf:mpred_provide_storage_op( ?Op, ?G) is semidet.
+%% mpred_provide_storage_op( ?Op, ?G) is semidet.
 %
 % Hook To [lmconf:mpred_provide_storage_op/2] For Module Mpred_type_isa.
 % Managed Predicate Provide Storage Oper..
@@ -1087,7 +1087,7 @@ isa_lmconf:mpred_provide_storage_op(call(_),G):- was_isa(G,I,C),!, (isa_backchai
 % ISA CLAUSES
 
 % 	 	 
-%% lmconf:mpred_provide_storage_clauses( ?H, ?B, ?What) is semidet.
+%% mpred_provide_storage_clauses( ?H, ?B, ?What) is semidet.
 %
 % Hook To [lmconf:mpred_provide_storage_clauses/3] For Module Mpred_type_isa.
 % Managed Predicate Provide Storage Clauses.

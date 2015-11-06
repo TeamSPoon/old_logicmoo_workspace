@@ -169,7 +169,7 @@ make_must_ground(H,BB,VG):-
 
 
 % 	 	 
-%% make_vg( ?VALUE1, ?VALUE2, ?VALUE3, :Term_G7581) is semidet.
+%% make_vg( ?VALUE1, ?Shared, ?VALUE3, :TermS) is semidet.
 %
 % Make Vg.
 %
@@ -264,7 +264,7 @@ boxlog_to_compile(TYPE,H,OUTPUT):-     !,boxlog_to_compile2(TYPE,H,true,OUTPUT).
 
 
 % 	 	 
-%% boxlog_to_compile2( ?VALUE1, ?VALUE2, ?VALUE3, :Term_G7418) is semidet.
+%% boxlog_to_compile2( ?TYPE, ?H, ?BB, :TermH) is semidet.
 %
 % Datalog Converted To Compile Extended Helper.
 %
@@ -395,7 +395,7 @@ isk_bind(Var,Val,SK):-show_call(dom(Var,[Val,SK])).
 % ugly but works
 
 % 	 	 
-%% head_for_skolem( ?VALUE1, :Term_G15775, :Term_G15904) is semidet.
+%% head_for_skolem( ?H, :TermH, :TermIn) is semidet.
 %
 % Head For Skolem.
 %

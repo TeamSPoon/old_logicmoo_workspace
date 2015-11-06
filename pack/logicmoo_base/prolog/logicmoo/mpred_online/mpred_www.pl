@@ -369,7 +369,7 @@ hmust_l(G):-G.
 
 
 % 	 	 
-%% http:location( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% location( ?VALUE1, ?Root, ?VALUE3) is semidet.
 %
 % Hook To [http:location/3] For Module Mpred_www.
 % Location.
@@ -377,7 +377,7 @@ hmust_l(G):-G.
 http:location(pixmaps, root(pixmaps), []).
 
 % 	 	 
-%% user:file_search_path( ?VALUE1, ?VALUE2) is semidet.
+%% file_search_path( ?VALUE1, ?Dir) is semidet.
 %
 % Hook To [user:file_search_path/2] For Module Mpred_www.
 % File Search Path.
@@ -390,7 +390,7 @@ user:file_search_path(pixmaps, logicmoo('mpred_online/pixmaps')).
 
 
 % 	 	 
-%% print_request( :Term_G3396) is semidet.
+%% print_request( :TermH) is semidet.
 %
 % Print Request.
 %
@@ -898,7 +898,7 @@ show_select1(Name,Pred):-
 
 
 % 	 	 
-%% as_ftVars( :Term_G3838) is semidet.
+%% as_ftVars( :TermN) is semidet.
 %
 % Converted To Format Type Variables.
 %
@@ -1319,7 +1319,7 @@ reply_object_sub_page(Obj) :- phrase(object_sub_page(Obj, []), HTML), print_html
 
 
 % 	 	 
-%%  ?VALUE1--> ?VALUE2 is semidet.
+%%  ?V--> ?V is semidet.
 %
 % -->.
 %
@@ -1446,7 +1446,7 @@ url_encode_term(InTerm,VsIn,URL):-
 
 
 % 	 	 
-%% member_open( ?VALUE1, :Term_G12439) is semidet.
+%% member_open( ?C, :TermB) is semidet.
 %
 % Member Open.
 %
@@ -1454,7 +1454,7 @@ member_open(C, [B|A]) :-  (nonvar(B),B=C) ; (nonvar(A),member_open(C, A)).
 
 
 % 	 	 
-%% name_the_var( ?VALUE1, ?VALUE2, :Term_G19242, :Term_G19371, :Term_G19500) is semidet.
+%% name_the_var( ?Num, ?Vs, :TermARG3, :TermVs, :TermARG5) is semidet.
 %
 % Name The Variable.
 %
@@ -1507,7 +1507,7 @@ url_decode_term(A,T):-
 
 
 % 	 	 
-%% tovl( :Term_G6700, :Term_G6829, :Term_G6958) is semidet.
+%% tovl( :TermK, :TermV, :TermK) is semidet.
 %
 % Tovl.
 %
@@ -1608,7 +1608,7 @@ indent_nbsp(X,Chars):-XX is X -1,!, indent_nbsp(XX,OutP),!,sformat(Chars,'~w   '
 
 
 % 	 	 
-%% lmconf:shared_hide_data( :PRED4VALUE1) is semidet.
+%% shared_hide_data( :PRED4VALUE1) is semidet.
 %
 % Hook To [lmconf:shared_hide_data/1] For Module Mpred_www.
 % Shared Hide Data.
@@ -1838,7 +1838,7 @@ pp_i2tml(HB):- w_tl(t_l:current_clause_ref(none),must(pp_i2tml_v((HB)))).
 
 
 % 	 	 
-%% numberlist_at( ?VALUE1, :Term_G17304) is semidet.
+%% numberlist_at( ?VALUE1, :TermN) is semidet.
 %
 % Numberlist When.
 %
@@ -1952,7 +1952,7 @@ functor_to_color(_G,green):-!.
 
 
 % 	 	 
-%% functor_to_color( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
+%% functor_to_color( ?G, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
 %
 % Functor Converted To Color.
 %
@@ -2028,7 +2028,7 @@ write_atom_link(W,A,N):- nonvar(W),catch((term_to_pretty_string(A,AQ),
 
 
 % 	 	 
-%% write_term_to_atom_one( :Term_G20033, ?VALUE2) is semidet.
+%% write_term_to_atom_one( :TermA, ?Term) is semidet.
 %
 % Write Term Converted To Atom One.
 %
@@ -2153,7 +2153,7 @@ portable_writeq(Term) :-
 
 
 % 	 	 
-%% maybe_paren( ?VALUE1, ?VALUE2, ?VALUE3, ?C, ?C) is semidet.
+%% maybe_paren( ?P, ?Prio, ?Char, ?C, ?C) is semidet.
 %
 % Maybe Paren.
 %
@@ -2197,7 +2197,7 @@ maybe_space(_, _).
 put_string(B):-put_string0(B).
 
 % 	 	 
-%% put_string0( :Term_G25958) is semidet.
+%% put_string0( :TermH) is semidet.
 %
 % Put String Primary Helper.
 %
@@ -2226,7 +2226,7 @@ put_string(A,B):- put_string0(A,B).
 % :-rtrace.
 
 % 	 	 
-%% put_string0( :Term_G11222, ?VALUE2) is semidet.
+%% put_string0( :TermARG1, ?Q) is semidet.
 %
 % Put String Primary Helper.
 %
@@ -2326,7 +2326,7 @@ write_out(Term, Style, Prio, Ci, Co) :-
 
 
 % 	 	 
-%% write_out( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5, ?VALUE6, ?VALUE7) is semidet.
+%% write_out( ?VALUE1, ?F, ?Term, ?Style, ?Prio, ?Ci, ?Co) is semidet.
 %
 % Write Out.
 %
@@ -2432,7 +2432,7 @@ write_atom(Atom, Style, Ci, Co) :-
 
 
 % 	 	 
-%% classify_name( :Term_G28803, ?VALUE2) is semidet.
+%% classify_name( :TermH, ?VALUE2) is semidet.
 %
 % Classify Name.
 %
@@ -2446,7 +2446,7 @@ classify_name([H|T], other) :-
 
 
 % 	 	 
-%% classify_alpha_tail( :Term_G3651) is semidet.
+%% classify_alpha_tail( :TermH) is semidet.
 %
 % Classify Alpha Tail.
 %
@@ -2461,7 +2461,7 @@ classify_alpha_tail([H|T]) :-
 
 
 % 	 	 
-%% classify_other_tail( :Term_G7054) is semidet.
+%% classify_other_tail( :TermH) is semidet.
 %
 % Classify Other Tail.
 %
@@ -2586,7 +2586,7 @@ portable_listing(_).
 
 
 % 	 	 
-%% functor spec( ?VALUE1, ?VALUE2, :GoalGOAL3, :PRED255VALUE4) is semidet.
+%% functor spec( ?Name, ?Name, :GoalLow, :PRED255High) is semidet.
 %
 % Functor Spec.
 %
@@ -2681,7 +2681,7 @@ rok_portray_clause((Pred)) :-
 
 
 % 	 	 
-%% list magic( ?VALUE1, ?VALUE2) is semidet.
+%% list magic( ?VALUE1, ?C) is semidet.
 %
 % List Magic.
 %

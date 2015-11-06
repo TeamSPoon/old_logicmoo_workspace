@@ -526,7 +526,7 @@ logical_functor_ft((',')).
 
 
 % 	 	 
-%% non_assertable( :Term_G12345, ?VALUE2) is semidet.
+%% non_assertable( :TermWW, ?WW) is semidet.
 %
 % Not Assertable.
 %
@@ -581,7 +581,7 @@ logical_functor_pttp(v).
 
 
 % 	 	 
-%% pttp_nnf_pre_clean_functor( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% pttp_nnf_pre_clean_functor( ?A, ?A, ?VALUE3) is semidet.
 %
 % Pttp Negated Normal Form Pre Clean Functor.
 %
@@ -623,7 +623,7 @@ pttp_nnf_post_clean_functor('v',';').
 
 
 % 	 	 
-%% is_neg( :Term_G7447) is semidet.
+%% is_neg( :TermARG1) is semidet.
 %
 % If Is A Negated.
 %
@@ -665,7 +665,7 @@ is_log_op(OP):- atomic(OP),to_dlog_ops(OPS),!,(member(OP=_,OPS);member(_=OP,OPS)
 
 
 % 	 	 
-%% put_singles( ?VALUE1, ?VALUE2, :Term_G7183, ?VALUE4) is semidet.
+%% put_singles( ?Wff, ?VALUE2, :TermARG3, ?Wff) is semidet.
 %
 % Put Singles.
 %
@@ -750,7 +750,7 @@ defunctionalize(_,Wff,Wff).
 
 
 % 	 	 
-%% correct_negations( ?VALUE1, :Term_G28103, ?VALUE3) is semidet.
+%% correct_negations( ?Op, :TermX, ?O) is semidet.
 %
 % Correct Negations.
 %
@@ -763,7 +763,7 @@ correct_negations(Op,(\+({X})),O):-nonvar(X),wrap_in_neg_functor(Op,X,O).
 
 
 % 	 	 
-%% wrap_in_neg_functor( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% wrap_in_neg_functor( ?VALUE1, ?X, ?X) is semidet.
 %
 % Wrap In Negated Functor.
 %

@@ -45,7 +45,7 @@ with_no_x(G):- call(G).
 % = :- meta_predicate(wtg(:,0)).
 
 % 	 	 
-%% wtg( ?CALL1, :GoalGOAL2) is semidet.
+%% wtg( ?M, :GoalCall) is semidet.
 %
 % Wtg.
 %
@@ -55,7 +55,7 @@ wtg(M:With,Call):- w_tl(M:With,Call).
 
 
 % 	 	 
-%% w_tl( ?CALL1, ?CALL2) is semidet.
+%% w_tl( ?CALL1, ?Call) is semidet.
 %
 % W Thread Local.
 %
@@ -109,7 +109,7 @@ wno_tl(UHead,Call):-
 
 
 % 	 	 
-%% to_thread_head_1m( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
+%% to_thread_head_1m( ?H, ?TL, ?HO, ?HH) is semidet.
 %
 % Converted To Thread Head 1m.
 %

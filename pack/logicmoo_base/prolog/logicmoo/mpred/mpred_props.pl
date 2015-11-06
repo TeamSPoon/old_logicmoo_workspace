@@ -178,7 +178,7 @@ decl_mpred_prolog(CM,M,PI,FA):- loop_check(must(decl_mpred_prolog_ilc(CM,M,PI,FA
 
 
 % 	 	 
-%% decl_mpred_prolog_ilc( ?VALUE1, ?VALUE2, ?VALUE3, :Term_G8330) is semidet.
+%% decl_mpred_prolog_ilc( ?CM, ?M, ?PI, :TermF) is semidet.
 %
 % Declare Managed Predicate Prolog Inside Of Loop Checking.
 %
@@ -186,7 +186,7 @@ decl_mpred_prolog_ilc(CM,M,PI,F/A):-atom(PI),A==0,not(current_predicate(F/A)),!,
 decl_mpred_prolog_ilc(CM,M,PI,F/A):-loop_check_term(decl_mpred_prolog_ilc_0(CM,M,PI,F/A),decl_mpred_prolog_ilc(CM,M,F),true).
 
 % 	 	 
-%% decl_mpred_prolog_ilc_0( ?VALUE1, ?VALUE2, ?VALUE3, :Term_G15505) is semidet.
+%% decl_mpred_prolog_ilc_0( ?CM, ?M, ?PI, :TermF) is semidet.
 %
 % Declare Managed Predicate prolog Inside Of Loop Checking  Primary Helper.
 %
@@ -249,7 +249,7 @@ decl_mpred_hybrid(CM,M,PIN,FA):- unnumbervars(PIN,PI),loop_check(must(decl_mpred
 
 
 % 	 	 
-%% decl_mpred_hybrid_ilc( ?VALUE1, ?VALUE2, ?VALUE3, :Term_G14644) is semidet.
+%% decl_mpred_hybrid_ilc( ?CM, ?M, ?PIN, :TermF) is semidet.
 %
 % Declare Managed Predicate Hybrid Inside Of Loop Checking.
 %
@@ -259,7 +259,7 @@ decl_mpred_hybrid_ilc(CM,M,PI,F/A):-atom(PI),A==0,must(arity(F,_)),not(current_p
 decl_mpred_hybrid_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),loop_check_term(decl_mpred_hybrid_ilc_0(CM,M,PI,F/A),decl_mpred_hybrid_ilc(CM,M,F),true).
 
 % 	 	 
-%% decl_mpred_hybrid_ilc_0( ?VALUE1, ?VALUE2, ?VALUE3, :Term_G22527) is semidet.
+%% decl_mpred_hybrid_ilc_0( ?CM, ?M, ?PI, :TermF) is semidet.
 %
 % Declare Managed Predicate hybrid Inside Of Loop Checking  Primary Helper.
 %
@@ -411,7 +411,7 @@ decl_mpred(M):-loop_check(with_pi(M,decl_mpred_4),true).
 
 
 % 	 	 
-%% decl_mpred_4( ?VALUE1, ?VALUE2, :Term_G24007) is semidet.
+%% decl_mpred_4( ?VALUE1, ?ARGS, :TermARG3) is semidet.
 %
 % Declare Managed Predicate Helper Number 4..
 %
@@ -479,7 +479,7 @@ decl_mpred_2(F,Prop):-ain(mpred_isa(F,Prop)).
 decl_mpred(Mt,F,A):-decl_mpred(F,A),ignore((nonvar(Mt),decl_mpred(F,mt(Mt)))).
 
 % 	 	 
-%% decl_mpred_4( ?VALUE1, ?VALUE2, ?VALUE3, :Term_G26746) is semidet.
+%% decl_mpred_4( ?CM, ?M, ?PI, :TermF) is semidet.
 %
 % Declare Managed Predicate Helper Number 4..
 %
@@ -525,7 +525,7 @@ add_mpred_prop_gleaned(M:Arg1,FRGS):-atom(M),!,add_mpred_prop_gleaned(Arg1,FRGS)
 add_mpred_prop_gleaned(Arg1,FRGS):-functor_check_univ(Arg1,F,ARGSISA),add_mpred_prop_gleaned_4(Arg1,F,ARGSISA,FRGS).
 
 % 	 	 
-%% add_mpred_prop_gleaned_4( ?Arg1, ?F, ?VALUE3, ?FRGS) is semidet.
+%% add_mpred_prop_gleaned_4( ?Arg1, ?F, ?ARG, ?FRGS) is semidet.
 %
 % Add Managed Predicate Prop Gleaned Helper Number 4..
 %

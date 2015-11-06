@@ -252,7 +252,7 @@
 
 
 % 	 	 
-%% to_poss( ?VALUE1, ?VALUE2) is semidet.
+%% to_poss( ?BDT, ?BDT) is semidet.
 %
 % Converted To Possibility.
 %
@@ -339,7 +339,7 @@ logically_matches(_,A,A).
 
 
 % 	 	 
-%% axiom_lhs_to_rhs( ?VALUE1, :Term_G26825, :Term_G26954) is semidet.
+%% axiom_lhs_to_rhs( ?VALUE1, :TermA, :TermA) is semidet.
 %
 % Axiom Left-hand-side Converted To Right-hand-side.
 %
@@ -384,7 +384,7 @@ nnf(KB,Fin,FreeV,BOX,Paths):- corrected_modal(KB,Fin,nesc(BDT,F)),
 %   poss(A & B) ->  all(Vs,poss(A & B)) ->  ~exists(Vs,nesc(A & B))
 
 % 	 	 
-%% axiom_lhs_to_rhs( :Term_G11524, :Term_G11653) is semidet.
+%% axiom_lhs_to_rhs( :TermVs, :TermVs) is semidet.
 %
 % Axiom Left-hand-side Converted To Right-hand-side.
 %
@@ -734,7 +734,7 @@ corrected_modal(KB,IN,OUTM):-
 
 
 % 	 	 
-%% corrected_modal0( ?VALUE1, ?Var, :Term_G28070) is semidet.
+%% corrected_modal0( ?VALUE1, ?Var, :TermARG3) is semidet.
 %
 % Corrected Modal Primary Helper.
 %
@@ -1192,7 +1192,7 @@ modal2sent(H,HH ):- H=..[F|ARGS],!,must_maplist(modal2sent,ARGS,ARGSO),!,HH=..[F
 
 
 % 	 	 
-%% clausify( ?KB, ?VALUE2, ?C, ?C) is semidet.
+%% clausify( ?KB, ?P, ?C, ?C) is semidet.
 %
 % Clausify.
 %
@@ -1227,7 +1227,7 @@ inclause(_KB, P,  A1, A, B,  B ):-
 
 
 % 	 	 
-%% notin( ?VALUE1, ?VALUE2) is semidet.
+%% notin( ?X, ?Y) is semidet.
 %
 % Notin.
 %
@@ -1237,7 +1237,7 @@ notin(_,[]).
 
 
 % 	 	 
-%% putin( ?VALUE1, :Term_G18717, :Term_G18846) is semidet.
+%% putin( ?X, :TermARG2, :TermX) is semidet.
 %
 % Putin.
 %
@@ -1256,7 +1256,7 @@ simplify_atom(H,H).
 
 
 % 	 	 
-%% to_regular_cl( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
+%% to_regular_cl( ?KB, ?H1, ?Has, ?H1) is semidet.
 %
 % Converted To Regular Clause.
 %
@@ -1268,7 +1268,7 @@ to_regular_cl(_KB,HL,BL,[cl(HL,BL)]).
 
 
 % 	 	 
-%% expand_cl( ?VALUE1, :Term_G6003, ?VALUE3) is semidet.
+%% expand_cl( ?KB, :TermARG2, ?VALUE3) is semidet.
 %
 % Expand Clause.
 %
@@ -1280,7 +1280,7 @@ expand_cl(KB,[cl(H,B)|O],OOut):-
 
 
 % 	 	 
-%% make_clause_set( ?VALUE1, :Term_G11762, ?VALUE3) is semidet.
+%% make_clause_set( ?Extras, :TermARG2, ?VALUE3) is semidet.
 %
 % Make Clause Set.
 %
@@ -1325,7 +1325,7 @@ make_each(Extras,Conj,E):- member(One,Conj), make_1_cl(Extras,One,Conj,E).
 
 
 % 	 	 
-%% make_1_cl( ?VALUE1, ?VALUE2, ?VALUE3, :Term_G13932) is semidet.
+%% make_1_cl( ?Extras, ?One, ?Conj, :TermOne) is semidet.
 %
 % make  Secondary Helper Clause.
 %
@@ -1385,7 +1385,7 @@ negate_one(KB,Wff,WffO):- logical_neg(KB,Wff,WffO).
 negate(KB,X,Z):- must(defunctionalize(X,Y)), must_det(negate0(KB,Y,Z)).
 
 % 	 	 
-%% negate0( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% negate0( ?VALUE1, ?X, ?X) is semidet.
 %
 % Negate Primary Helper.
 %
@@ -1448,7 +1448,7 @@ unbuiltin_negate(_KB,Fml,Out):- once(negate(KB,Fml,Neg)),negate(KB,Neg,Out),!.
 
 
 % 	 	 
-%% nnf_label( ?VALUE1, :Term_G24390, ?VALUE3, ?VALUE4, ?VALUE5) is semidet.
+%% nnf_label( ?KB, :TermX, ?FreeV, ?NNF, ?Paths) is semidet.
 %
 % Negated Normal Form Label.
 %
@@ -1466,7 +1466,7 @@ nnf_label(KB,exists(X,Fml),FreeV,NNF,Paths):-
 
 
 % 	 	 
-%% nnf_shared( ?VALUE1, :Term_G7783, ?VALUE3, ?VALUE4, ?VALUE5) is semidet.
+%% nnf_shared( ?KB, :TermX, ?FreeV, ?NNF, ?Paths) is semidet.
 %
 % Negated Normal Form Shared.
 %
@@ -1636,7 +1636,7 @@ same_var(Var,Fml):- Var==Fml,!.
 
 
 % 	 	 
-%% removes_literal( :Term_G4847, :Term_G4976) is semidet.
+%% removes_literal( :TermX, :TermX) is semidet.
 %
 % Removes Literal.
 %
@@ -1665,7 +1665,7 @@ delete_sublits(H0,B,HH):- delete_eq(H0,B,H1),delete_eq(H1,B,H2),delete_eq(H2,B,H
 
 
 % 	 	 
-%% flatten_clauses( ?VALUE1, ?VALUE2) is semidet.
+%% flatten_clauses( ?H, ?HHTT) is semidet.
 %
 % Flatten Clauses.
 %
@@ -1733,7 +1733,7 @@ correct_cls0(KB,H,O):-correct_cls0(KB,(H:-true),O).
 
 
 % 	 	 
-%% incorrect_cl( :Term_G5226, ?VALUE2) is semidet.
+%% incorrect_cl( :TermH, ?H) is semidet.
 %
 % Incorrect Clause.
 %

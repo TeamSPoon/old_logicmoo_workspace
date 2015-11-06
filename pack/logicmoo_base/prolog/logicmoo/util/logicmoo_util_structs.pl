@@ -228,15 +228,15 @@ record_onto_var(AttribName,AV,Value):-
 
 
 % 	 	 
-%% predopts_analysis:attr_unify_hook( ?X, ?Other) is semidet.
+%% attr_unify_hook( ?X, ?Other) is semidet.
 %
-% Hook To [predopts_analysis:attr_unify_hook/2] For Module Logicmoo_util_structs.
+% Hook To [neq:attr_unify_hook/2] For Module Logicmoo_util_structs.
 % Attr Unify Hook.
 %
 attr_unify_hook(_,_).
 
 % 	 	 
-%% logicmoo_varnames:attr_portray_hook( ?Value, ?Var) is semidet.
+%% attr_portray_hook( ?Value, ?Var) is semidet.
 %
 % Hook To [logicmoo_varnames:attr_portray_hook/2] For Module Logicmoo_util_structs.
 % Attr Portray Hook.
@@ -309,7 +309,7 @@ prop_get(Name,mutable(Dict),Value):-!,nonvar(Dict),prop_get(Name,Dict,Value).
 :-meta_predicate(sisctus_key(:,-)).
 
 % 	 	 
-%% sisctus_key( ?CALL1, -IN2) is semidet.
+%% sisctus_key( ?Module, -Atom) is semidet.
 %
 % Sisctus Key.
 %
@@ -657,7 +657,7 @@ struct_sclass(Struct,SC):-functor(Struct,F,_),(dict_functor(F)->prop_get(sclass,
 
 
 % 	 	 
-%% member_arg_convert( ?VALUE1, ?Name, ?VALUE3, ?Value, ?Value) is semidet.
+%% member_arg_convert( ?Type, ?Named, ?VALUE3, ?UnConverted, ?UnConverted) is semidet.
 %
 % Member Argument Convert.
 %
@@ -702,7 +702,7 @@ decl_struct(StructDecl):-
   must_det_l((
     compile_argtypes(StructDecl,1,StructPrototype),    
     functor(StructPrototype,StructName,_),
-    show_call(decl_struct,ain(struct_prototype(StructName,StructPrototype))))),!.
+    show_call(ain(struct_prototype(StructName,StructPrototype))))),!.
 
 
 % 	 	 
@@ -735,7 +735,7 @@ compile_argtypes(StructDecl,Loc,StructPrototype):-
 
 
 % 	 	 
-%% compile_struct_slots( ?VALUE1, ?VALUE2, :Term_G7878, :Term_G8007, :Term_G8136, :Term_G8265) is semidet.
+%% compile_struct_slots( ?StructType, ?Loc, :TermParam, :TermName, :TermDatatype, :TermInit) is semidet.
 %
 % Compile Struct Slots.
 %
@@ -776,7 +776,7 @@ extract_struct_parameter(Def,Name,Name,Def).
    
 
 % 	 	 
-%% lmconf:module_local_init is semidet.
+%% module_local_init is semidet.
 %
 % Hook To [lmconf:module_local_init/0] For Module Logicmoo_util_structs.
 % Module Local Init.
@@ -816,18 +816,18 @@ ensure_struct(Type,List,Struct):- must_det_l((ensure_instance(Type,Struct),prop_
 
 
 % 	 	 
-%% prop_set_nvlist( ?VALUE1, :Term_G20673) is semidet.
+%% prop_set_nvlist( ?Struct, :TermN) is semidet.
 %
 % Prop Set Nvlist.
 %
 prop_set_nvlist(Struct,[N=V|More]):-must_det_l((prop_set(N,Struct,V),( More==[]->true;prop_set_nvlist(Struct,More)))).
 
 % 	 	 
-%% prop_get_nvlist( ?VALUE1, :Term_G25933) is semidet.
+%% prop_get_nvlist( ?Struct, :TermN) is semidet.
 %
 % Prop Get Nvlist.
 %
-prop_get_nvlist(Struct,[N=V|More]):-must_det_l((ignore(show_failure(why,prop_get(N,Struct,V))),( More==[]->true;prop_get_nvlist(Struct,More)))).
+prop_get_nvlist(Struct,[N=V|More]):-must_det_l((ignore(show_call_failure(why,prop_get(N,Struct,V))),( More==[]->true;prop_get_nvlist(Struct,More)))).
 
 
 % 	 	 
@@ -845,7 +845,7 @@ new_struct(Type,[sclass=Type]):-!.
 
 
 % 	 	 
-%% datatype_to_init( ?VALUE1, ?VALUE2) is semidet.
+%% datatype_to_init( ?VALUE1, ?NewArg) is semidet.
 %
 % Datatype Converted To Init.
 %

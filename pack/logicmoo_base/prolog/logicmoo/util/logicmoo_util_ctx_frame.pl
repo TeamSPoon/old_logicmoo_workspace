@@ -167,7 +167,7 @@ makeLocalContext(Name,Ctx):-makeLocalContext1(Name,Ctx),!,setCtxValue(ctx,Ctx,Na
 
 
 % 	 	 
-%% makeLocalContext1( ?VALUE1, :Term_G21024) is semidet.
+%% makeLocalContext1( ?Gensym_Key, :TermGensym_Key) is semidet.
 %
 % Make Local Context Secondary Helper.
 %
@@ -285,7 +285,7 @@ checkCtx(Ctx):-makeLocalContext(broken,Ctx),!.
 get_ctx_frame_holder(Ctx,Name,R):-compound(Ctx),get_ctx_frame_holder1(Ctx,Name,R).
 
 % 	 	 
-%% get_ctx_frame_holder1( :Term_G6432, ?VALUE2, ?VALUE3) is semidet.
+%% get_ctx_frame_holder1( :TermARG1, ?Name, ?R) is semidet.
 %
 % Get Context Frame Holder Secondary Helper.
 %
@@ -355,7 +355,7 @@ get_ctx_holderFreeSpot1(Ctx,NamedValue,Destruct):-functor(Ctx,F,A),!,get_ctx_hol
 
 
 % 	 	 
-%% get_ctx_holderFreeSpot1( ?VALUE1, ?VALUE2, :PRED2VALUE3, ?VALUE4, ?VALUE5) is semidet.
+%% get_ctx_holderFreeSpot1( ?Ctx, ?VALUE2, :PRED2VALUE3, ?NamedValue, ?Ctx) is semidet.
 %
 % Get Context Holder Free Spot Secondary Helper.
 %
@@ -450,7 +450,7 @@ delete_safe([H|List],E,[H|Rest]):-delete_safe(List,E,Rest).
 
 
 % 	 	 
-%% getKeyValue( ?VALUE1, :Term_G6498) is semidet.
+%% getKeyValue( ?FullList, :TermN) is semidet.
 %
 % Get Key Value.
 %
@@ -505,7 +505,7 @@ to_open_list(Closed,Closed,Open,FullList) :- append(Closed,Open,FullList),!.
 
 
 % 	 	 
-%% revappend_0( :Term_G6271, ?VALUE2, ?VALUE3) is semidet.
+%% revappend_0( :TermARG1, ?Ys, ?Ys) is semidet.
 %
 % revappend  Primary Helper.
 %

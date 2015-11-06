@@ -15,6 +15,7 @@
             summary_ending/2,
             autodoc_case/2,
             attempt_head_modes/1,
+            fixda2/4,
             attempt_head_modes_0/3,
             autodoc_output_path/2,
             great_clause/2,
@@ -30,9 +31,9 @@
             notes_to_better_text/3,
             autodoc_magic/1,
             copy_until_line/2,
-            fixup_doc_args/4,            
-            fixup_doc_arg/4,
-            flatten_append/3,
+            fixup_doc_args/5,       
+            fixda/4,
+            flatten_text/3,
             helper_name/1,
             list_file_preds/0,
             list_file_preds/1,
@@ -238,7 +239,7 @@ list_file_preds:- source_location(S,_),list_file_preds(S).
 
 
 % 	 	 
-%% skip_functor_export_0( :Term_G26087) is semidet.
+%% skip_functor_export_0( :TermARG1) is semidet.
 %
 % skip functor export  Primary Helper.
 %
@@ -259,7 +260,7 @@ is_crossfile_module_0(user).
 
 
 % 	 	 
-%% to_mfa_0( ?VALUE1, ?VALUE2, :Term_G10252, :Term_G10381) is semidet.
+%% to_mfa_0( ?VALUE1, ?VALUE2, :TermSM, :TermSM) is semidet.
 %
 % Converted To Module-Functor-Arity  Primary Helper.
 %
@@ -327,7 +328,7 @@ list_file_preds(S,FM):-
 % = :- meta_predicate(module_meta_transparent(:)).
 
 % 	 	 
-%% module_meta_transparent( :Term_G2966) is semidet.
+%% module_meta_transparent( :TermM) is semidet.
 %
 % Module Meta Transparent.
 %
@@ -344,7 +345,7 @@ module_meta_transparent(_).
 :- export(mpred_source_file_0/2).
 
 % 	 	 
-%% mpred_source_file( :Term_G9193, ?VALUE2) is semidet.
+%% mpred_source_file( :TermM, ?S) is semidet.
 %
 % Managed Predicate Source File.
 %
@@ -352,7 +353,7 @@ mpred_source_file(M:P,S):- !, source_file(M:P,S).
 mpred_source_file(M:P,S):- no_repeats(mpred_source_file_0(M:P,S)).
 
 % 	 	 
-%% mpred_source_file_0( :Term_G14196, ?VALUE2) is semidet.
+%% mpred_source_file_0( :TermM, ?S) is semidet.
 %
 % Managed Predicate source file  Primary Helper.
 %
@@ -478,7 +479,7 @@ export_module_preds:- source_context_module(M),source_file_property(S,module(M))
 
 
 % 	 	 
-%% merge_mode_and_varname( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% merge_mode_and_varname( ?ModeAs, ?NameAs, ?ModeAs) is semidet.
 %
 % Merge Pred Mode And Varname.
 %
@@ -527,14 +528,16 @@ autodoc_file(File):- ( \+ atom(File) ; \+ exists_file(File) ), !,
    forall(must(filematch(File,E)),autodoc_file(E)).
 
 
-autodoc_file(File):-  
+autodoc_file(File):- 
   setup_call_cleanup(
    tell(user_error),
- must_det_l((
-   show_call(_,autodoc_output_path(File,PlDocFile)),
+  (( show_call(_,autodoc_output_path(File,PlDocFile)),
    read_source_file_vars(File),
    retractall(t_l:last_predicate_help_shown(_,_,_)),
    retractall(t_l:last_source_file_help_shown(File,_,_)),
+w_tl(set_prolog_flag(xref,false),
+ w_tl(t_l:disable_px,
+ must_det_l((
    make_module_name(File,M),
    M:convert_to_dynamic(M,'$pldoc',4),
    setup_call_cleanup(tell(PlDocFile),
@@ -544,7 +547,7 @@ autodoc_file(File):-
 	    prolog_open_source(File, In),
 	    autodoc_stream(LineByLineStream,File,In),
 	    prolog_close_source(In)),
-        (copy_until_line(LineByLineStream,999999999999), close(LineByLineStream))),told))),told),!.
+        (copy_until_line(LineByLineStream,999999999999), close(LineByLineStream))),told))))))),told),!.
 
 
 % 	 	 
@@ -573,7 +576,7 @@ autodoc_stream(LineByLineStream,File,In):-
           stream_position_data(line_count, TermPos, Start),
           line_count(In,End),
 	(   Term == end_of_file
-	->  ! ; 
+	-> (copy_until_line(LineByLineStream,999999999999), !) ; 
           (  must(autodoc_stream_data(LineByLineStream,M, File,Start-End,Term, Expanded,Vs)),
              fail)).
 
@@ -636,7 +639,7 @@ echo_one_line_or_skip_autodoc(Src):- read_line_to_codes(Src,Codes),format('~s~n'
 
 
 % 	 	 
-%% autodoc_stream_data( ?VALUE1, ?VALUE2, ?VALUE3, :Term_G8935, ?VALUE5, ?VALUE6, ?VALUE7) is semidet.
+%% autodoc_stream_data( ?Src, ?M, ?File, :TermFrom_To, ?Was, ?Expanded, ?Vs) is semidet.
 %
 % Autodoc Stream Data.
 %
@@ -669,7 +672,7 @@ autodoc_stream_pred(FromLine,File,P):-!,get_functor(P,F,A),autodoc_stream_pred(F
 
 
 % 	 	 
-%% autodoc_pred( ?VALUE1, :Term_G22089) is semidet.
+%% autodoc_pred( ?M, :TermM) is semidet.
 %
 % Autodoc Predicate.
 %
@@ -687,7 +690,10 @@ autodoc_pred(M,M:P0):-
    functor(ModeM,F,A),ModeM=..[F|ModeAsM],
    functor(NameO,F,A),NameO=..[F|NameAsO],   
    functor(ModeO,F,A),ModeO=..[F|ModeAsO],
+   lock_vars(NameAs),
+   all_different_vars(['$VAR'('_')|NameAs]),
    attempt_head_vnames(M:NameH),
+
    unlock_vars(NameAs),
    attempt_head_modes(M:ModeH),
    functor(P,F,A),
@@ -697,16 +703,18 @@ autodoc_pred(M,M:P0):-
    maplist(merge_mode_and_varname,ModeAs,NameAs,DocAs),
    maplist(merge_mode_and_varname,ModeAsM,NameAsM,DocAsM),
    maplist(merge_mode_and_varname,ModeAsO,NameAsO,DocAsO),
-   all_different_vals(NameAs),
-   all_different_vals(NameAsM),
-   all_different_vals(NameAsO),
    
+   all_different_vars(['$VAR'('_')|NameAsM]),
+   all_different_vars(['$VAR'('_')|NameAsO]),
+ 
    
-   fixup_doc_args(P,1,DocAs,DocAsM),
+   fixup_doc_args(fixda,P,1,DocAs,DocAsM),
 
    maplist(ignored_assignment(''),ModeAs),
    
-   fixup_doc_args(P,1,DocAsM,DocAsO),
+   fixup_doc_args(fixda,P,1,DocAsM,DocAsO),
+
+   fixup_doc_args(fixda2,P,1,DocAsM,DocAsO),
 
    maplist(fix_doc_args_for_write,DocAsO,DocAsOW),
 
@@ -722,7 +730,7 @@ autodoc_pred(M,M:P0):-
    t_l:file_loc(FileFromLine),
    asserta(M:'$pldoc'(F/A, FileFromLine, Summary,Summary)),
    autodoc_magic(Starter),
-   format('~N~s%% ~w is semidet.\n%\n% ~w.\n%\n',[Starter,PrefixedDocH, Summary]))),!.
+   format('~N~s%% ~w is semidet.\n%\n% ~w.\n%\n',[Starter,HDocAsNew, Summary]))),!.
 
 
 
@@ -759,23 +767,16 @@ fix_doc_args_for_write(A,A).
 
 
 % 	 	 
-%% attempt_head_vnames( :Term_G6958) is semidet.
+%% attempt_head_vnames( :TermARG1) is semidet.
 %
 % Attempt Head Vnames.
 %
 attempt_head_vnames(_:NameH):-
-   NameH=..[_|NameAs], 
-   all_different_vals(NameAs),
-   lock_vars(NameH), 
-   attempt_head_varnames_0(NameH),!.
+   attempt_head_varnames_0(NameH), get_random_headvars(NameH),!.
 attempt_head_vnames(_:NameH):-
-   NameH=..[_|NameAs],
-   all_different_vals(NameAs),
-   attempt_head_varnames_0(NameH),!.
+    get_random_headvars(NameH),!.
 attempt_head_vnames(_:NameH):-
-   lock_vars(NameH), 
-   attempt_head_varnames_0(NameH),!.
-
+   attempt_head_varnames_0(NameH).
 
 % 	 	 
 %% attempt_head_varnames_0( ?NameH) is semidet.
@@ -785,8 +786,7 @@ attempt_head_vnames(_:NameH):-
 attempt_head_varnames_0(NameH):- \+ compound(NameH),!.
 attempt_head_varnames_0(NameH):- try_get_head_vars(NameH),ground(NameH),\+ ((arg(_,NameH,'$VAR'(Named)),atom(Named),upcase_atom(Named,UNamed),atom_contains(UNamed,'VAR'))), !.
 attempt_head_varnames_0(NameH):- try_get_head_vars(NameH),ground(NameH),!.
-attempt_head_varnames_0(NameH):- try_get_head_vars(NameH),!.
-attempt_head_varnames_0(NameH):- get_random_headvars(NameH),!.
+attempt_head_varnames_0(NameH):- get_clause_vars(NameH),!.
 
 
 
@@ -796,6 +796,7 @@ attempt_head_varnames_0(NameH):- get_random_headvars(NameH),!.
 %
 % Attempt Head Pred Modes.
 %
+attempt_head_modes(M:ModeH):- clause(M:'$mode'(ModeH, _Det),true),!.
 attempt_head_modes(M:ModeH):- predicate_property(M:ModeH,meta_predicate(ModeH)),!.
 attempt_head_modes(_:ModeH):- predicate_property(_:ModeH,meta_predicate(ModeH)),!.
 attempt_head_modes(M:ModeH):- predicate_property(M:ModeH,number_of_clauses(Nth)),attempt_head_modes_0(Nth,Nth,M:ModeH),!.
@@ -804,7 +805,7 @@ attempt_head_modes(NotFound):-dmsg(attempt_head_modes(NotFound)),!.
 
 
 % 	 	 
-%% attempt_head_modes_0( ?VALUE1, ?VALUE2, :Term_G21748) is semidet.
+%% attempt_head_modes_0( ?VALUE1, ?VALUE2, :TermM) is semidet.
 %
 % attempt head Pred Modes  Primary Helper.
 %
@@ -817,7 +818,7 @@ attempt_head_modes_0(_,_,M:ModeH):-!,clause(M:ModeH,_),!.
    
 
 % 	 	 
-%% great_clause( :Term_G4957, ?VALUE2) is semidet.
+%% great_clause( :TermM, ?Ref) is semidet.
 %
 % Great Clause.
 %
@@ -826,29 +827,37 @@ great_clause(M:ModeH,Ref):- term_variables(ModeH,Vs1),clause(M:ModeH,_,Ref),term
 
 
 % 	 	 
-%% fixup_doc_args( ?VALUE1, ?VALUE2, :Term_G11777, :Term_G11906) is semidet.
+%% fixup_doc_args( ?Pred, ?P, ?N, :TermDoc, :TermODoc) is semidet.
 %
 % Fixup Document Arguments.
 %
-fixup_doc_args(_,_,[],[]):-!.
-fixup_doc_args(P,N,[Doc|As],[ODoc|OAs]):-
-  fixup_doc_arg(P,N,Doc,ODoc),
-  !,N2 is N+1, fixup_doc_args(P,N2,As,OAs).
+fixup_doc_args(_,_,_,[],[]):-!.
+fixup_doc_args(Pred,P,N,[Doc|As],[ODoc|OAs]):-
+  call(Pred,P,N,Doc,ODoc),
+  !,N2 is N+1, fixup_doc_args(Pred,P,N2,As,OAs).
 
 
 % 	 	 
-%% fixup_doc_arg( ?VALUE1, ?VALUE2, :Term_G18457, :Term_G18586) is semidet.
+%% fixda( ?P, ?N, :TermMode, :TermARG4) is semidet.
 %
-% Fixup Document Argument.
+% Fixda.
 %
-fixup_doc_arg(P,N,Mode:_,_):- sanity(Mode\==system),fail.
-fixup_doc_arg(P,N,Mode:Name,ModeO:NameO):-compound(Mode),functor(Mode,_,A),arg(A,Mode,NMode),!,fixup_doc_arg(P,N,NMode:Name,ModeO:NameO).
-fixup_doc_arg(P,N,Mode:NameV,ModeO:NameO):-compound(NameV),arg(1,NameV,Name),!,fixup_doc_arg(P,N,Mode:Name,ModeO:NameO).
-fixup_doc_arg(P,N,Mode:NameV,ModeO:NameO):-atom(NameV),atom_concat('_',Name,NameV),!,fixup_doc_arg(P,N,Mode:Name,ModeO:NameO).
-fixup_doc_arg(P,N,Mode:Name,Mode:Name):-ground(Mode:Name),!.
-fixup_doc_arg(P,N,Mode:Name,Mode:Name):-var(Mode),nonvar(Name),name_to_mode(P,N,Name,Mode),!.
-fixup_doc_arg(P,N,Mode:Name,Mode:Name):-nonvar(Mode),var(Name),must_det_l((mode_to_name(P,N,Mode,MName),atom_concat(MName,N,VarName),must(Name='$VAR'(VarName)))),!.
-fixup_doc_arg(P,N,Mode:Name,Mode:Name).
+fixda(P,N,Mode:_,_):- sanity(Mode\==system),fail.
+fixda(P,N,Mode:Name,ModeO:NameO):-compound(Mode),functor(Mode,_,A),arg(A,Mode,NMode),!,fixda(P,N,NMode:Name,ModeO:NameO).
+fixda(P,N,Mode:NameV,ModeO:NameO):-compound(NameV),arg(1,NameV,Name),!,fixda(P,N,Mode:Name,ModeO:NameO).
+fixda(P,N,Mode:NameV,ModeO:NameO):-atom(NameV),atom_concat('_',Name,NameV),!,fixda(P,N,Mode:Name,ModeO:NameO).
+fixda(P,N,Mode:Name,Mode:Name):-ground(Mode:Name),!.
+fixda(P,N,Mode:Name,Mode:Name):-var(Mode),nonvar(Name),name_to_mode(P,N,Name,Mode),!.
+fixda(P,N,Mode:Name,Mode:Name):-nonvar(Mode),var(Name),must_det_l((mode_to_name(P,N,Mode,MName),atom_concat(MName,N,VarName),must(Name='$VAR'(VarName)))),!.
+fixda(P,N,Mode:Name,Mode:Name).
+
+
+% 	 	 
+%% fixda2( ?P, ?N, :TermMode, :TermModeOO) is semidet.
+%
+% Fixda Extended Helper.
+%
+fixda2(P,N,Mode:Name,ModeOO:NameOO):-ignore((atom_concat('ARG',N,NameV),'$VAR'(NameV)=NameO,fixda(P,N,Mode:NameO,ModeOO:NameOO))).
 
 
 % 	 	 
@@ -918,7 +927,7 @@ prefixed_module(_M,MN,DocH,MN:DocH).
 
 
 % 	 	 
-%% system_pred( :Term_G19528) is semidet.
+%% system_pred( :TermM2) is semidet.
 %
 % System Predicate.
 %
@@ -959,7 +968,7 @@ make_summary0(Args,F,Text):- must_det_l((make_l_summary(Args,F,TextM),notes_to_b
 
 
 % 	 	 
-%% for_m_make_summary( ?VALUE1, ?P, ?TextOO) is semidet.
+%% for_m_make_summary( ?For, ?P, ?TextOO) is semidet.
 %
 % For Module Make Summary.
 %
@@ -998,10 +1007,10 @@ make_l_summary_lc(Args,H,[HL,'Types']):- atom(H),atom_concat(L,'types',H),make_l
 make_l_summary_lc(Args,H,[HL,'(isa/2)']):- atom(H),atom_concat(L,'isa',H),make_l_summary(Args,L,HL),!.
 make_l_summary_lc(Args,H,[HL,'Extended Helper']):- atom(H),atom_concat(L,'2',H),make_l_summary(Args,L,HL),!.
 make_l_summary_lc(Args,H,HL):- atom(H),atom_chars(H,Chars),append(Left,[N],Chars), char_type(N,digit),atom_number(N,Num),atom_chars(H,Left),make_l_summary(Args,[Left,Num],HL),!.
-make_l_summary_lc(Args,[H1,H2|T],OUT):- append(Left,[A],[H1,H2|T]),summary_ending(A,H),flatten_append(Left,[H],AGAIN),make_l_summary(Args,AGAIN,OUT),!.
+make_l_summary_lc(Args,[H1,H2|T],OUT):- append(Left,[A],[H1,H2|T]),summary_ending(A,H),flatten_text(Left,[H],AGAIN),make_l_summary(Args,AGAIN,OUT),!.
 make_l_summary_lc(Args,name(N),E):- !,(arg(N,Args,_:E);arg(N,Args,E)),!.
-make_l_summary_lc(Args,AGAIN,OUT):- summary_start(Left,H),flatten([Left],LLeft),append(LLeft,Rest,AGAIN),!,flatten_append(H,Rest,New),make_l_summary(Args,New,OUT),!.
-make_l_summary_lc(Args,[H|T],WO):-!,must_det_l((make_l_summary(Args,H,HL),make_l_summary(Args,T,TL),flatten_append(HL,TL,WO))).
+make_l_summary_lc(Args,AGAIN,OUT):- summary_start(Left,H),flatten([Left],LLeft),append(LLeft,Rest,AGAIN),!,flatten_text(H,Rest,New),make_l_summary(Args,New,OUT),!.
+make_l_summary_lc(Args,[H|T],WO):-!,must_det_l((make_l_summary(Args,H,HL),make_l_summary(Args,T,TL),flatten_text(HL,TL,WO))).
 make_l_summary_lc(Args,F,Text):- atom(F),atomic_list_concat(WL,'_',F),length(WL,LL),LL>1,make_l_summary(Args,WL,Text),!.
 make_l_summary_lc(Args,F,Text):- atom(F),atomic_list_concat(WL,' ',F),length(WL,LL),LL>1,make_l_summary(Args,WL,Text),!.
 make_l_summary_lc(Args,H,HL):- atom_chars(H,Chars),append(Left,[L,U|MORE],Chars),
@@ -1037,12 +1046,11 @@ summary_ending(E,H):-number(E),atomic_list_concat(['Helper number ',E,'.'],'',H)
 
 
 % 	 	 
-%% mpred_hooks:flatten_append( ?L, ?R, ?O) is semidet.
+%% flatten_text( ?L, ?R, ?O) is semidet.
 %
-% Hook To [mpred_hooks:flatten_append/3] For Module Logicmoo_util_help.
-% Flatten Append.
+% Flatten Text.
 %
-flatten_append(L,R,O):-must((sanity(var(O)),flatten([L,R],O))).
+flatten_text(L,R,O):-must((sanity(var(O)),flatten([L,R],O))).
 
 
 
@@ -1198,7 +1206,7 @@ mpred_show_doc(What):- match_predicates(What, Preds), Preds\==[], Preds\==[What]
 
 
 % 	 	 
-%% mpred_show_doc( ?VALUE1, ?VALUE2) is semidet.
+%% mpred_show_doc( ?M, ?PI) is semidet.
 %
 % Managed Predicate Show Document.
 %

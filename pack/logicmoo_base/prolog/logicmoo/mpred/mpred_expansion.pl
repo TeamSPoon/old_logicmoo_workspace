@@ -336,7 +336,7 @@ functor_declares_collectiontype(typeProps,ttTemporalType).
 instTypePropsToType(instTypeProps,ttSpatialType).
 
 % 	 	 
-%% expand_to_hb( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% expand_to_hb( ?HH, ?HH, ?BB) is semidet.
 %
 % Expand Converted To Head+body.
 %
@@ -479,7 +479,7 @@ is_stripped_module(baseKB).
 
 
 % 	 	 
-%% fully_expand_now( ?VALUE1, :TermSent, :TermSentO) is semidet.
+%% fully_expand_now( ?Op, :TermSent, :TermSentO) is semidet.
 %
 % Fully Expand Now.
 %
@@ -668,7 +668,7 @@ mpred_expand(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),mpred_dat
 
 
 % 	 	 
-%% db_expand_final( ?VALUE1, :TermNC, ?NC) is semidet.
+%% db_expand_final( ?Op, :TermNC, ?NC) is semidet.
 %
 % Database Expand Final.
 %
@@ -730,7 +730,7 @@ listToE(EL,E):-is_ftNonvar(EL),must((ground(EL),as_list(EL,List))),E=..[isEach|L
 
 
 % 	 	 
-%% db_expand_chain( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% db_expand_chain( ?VALUE1, ?M, ?PO) is semidet.
 %
 % Database Expand Chain.
 %
@@ -977,7 +977,7 @@ is_meta_functor(Sent,F,List):-is_ftCompound(Sent),Sent=..[F|List],(predicate_pro
 
 
 % 	 	 
-%% db_expand_5( ?VALUE1, ?A, ?B) is semidet.
+%% db_expand_5( ?Op, ?A, ?B) is semidet.
 %
 % Database Expand Helper Number 5..
 %
@@ -1026,7 +1026,7 @@ expand_props(Op,Term,OUT):-expand_props(_,Op,Term,OUT).
 
 
 % 	 	 
-%% expand_props( ?Prefix, ?VALUE2, ?Sent, ?OUT) is semidet.
+%% expand_props( ?Prefix, ?VALUE2, ?Sent, ?Sent) is semidet.
 %
 % Expand Props.
 %
@@ -1077,7 +1077,7 @@ db_quf_l(Op,And,C12,Pre2,Templ2):-db_quf_l_0(Op,And,C12,Pre2,Templ2).
 
 
 % 	 	 
-%% db_quf_l_0( ?VALUE1, ?VALUE2, :Term_G8113, ?VALUE4, ?VALUE5) is semidet.
+%% db_quf_l_0( ?Op, ?And, :TermC, ?D2, ?D3) is semidet.
 %
 % Database quf (List version)  Primary Helper.
 %
@@ -1112,7 +1112,7 @@ db_quf(_Op,C,true,C).
 
 
 % 	 	 
-%% translate_args( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5, :Term_G26147, :Term_G26276, ?VALUE8, ?VALUE9) is semidet.
+%% translate_args( ?O, ?Prop, ?A, ?OBJ, ?N, :TermARG6, :TermARG7, ?GIN, ?GIN) is semidet.
 %
 % Translate Arguments.
 %
@@ -1163,7 +1163,7 @@ translateOneArg(_O,_Prop,_Obj,Type,ATOMIC,ATOMICUSE,G,(G,ignore(same_arg(tCol(Ty
 
 
 % 	 	 
-%% translateListOps( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5, :Term_G20196, ?VALUE7, ?VALUE8) is semidet.
+%% translateListOps( ?O, ?Prop, ?Obj, ?Type, ?VAL, :TermARG6, ?G, ?G) is semidet.
 %
 % Translate List Oper.s.
 %
@@ -1417,7 +1417,7 @@ holds_args(HOFDS,FIST):- is_ftCompound(HOFDS),HOFDS=..[H|FIST],is_holds_true(H),
 
 
 % 	 	 
-%% do_expand_args( ?VALUE1, ?Term, ?Term) is semidet.
+%% do_expand_args( ?Op, ?Term, ?Term) is semidet.
 %
 % Do Expand Arguments.
 %
@@ -1503,7 +1503,7 @@ expand_goal_correct_argIsa(A,B):- expand_goal(A,B).
 % db_op_simpler(query(HLDS,_),MODULE:C0,req(call,MODULE:C0)):- atom(MODULE), is_ftNonvar(C0),not(not(predicate_property(C0,_PP))),!. % , functor_catch(C0,F,A), dmsg(todo(unmodulize(F/A))), %trace_or_throw(module_form(MODULE:C0)), %   db_op(Op,C0).
 
 % 	 	 
-%% db_op_simpler( ?VALUE1, ?VALUE2, :Term_G7222) is semidet.
+%% db_op_simpler( ?VALUE1, ?VALUE2, :TermARG3) is semidet.
 %
 % Database Oper. Simpler.
 %

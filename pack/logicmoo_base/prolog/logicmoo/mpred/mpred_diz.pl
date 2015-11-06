@@ -105,7 +105,7 @@ extend_zornode(OrNode,N,List,Vars) :-
 
 
 % 	 	 
-%% diz_c_c_l_aux( :Term_G23042, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
+%% diz_c_c_l_aux( :TermARG1, ?VALUE2, ?List, ?List) is semidet.
 %
 % Diz Class Class (list Version) Aux.
 %
@@ -159,9 +159,9 @@ add_zornode_var2(X,Y,OrNode) :-
 
 
 % 	 	 
-%% predopts_analysis:attr_unify_hook( :TermX, ?Other) is semidet.
+%% attr_unify_hook( :TermX, ?Other) is semidet.
 %
-% Hook To [predopts_analysis:attr_unify_hook/2] For Module Neq.
+% Hook To [dom:attr_unify_hook/2] For Module Neq.
 % Attr Unify Hook.
 %
 attr_unify_hook(vardiz(V1,V2),Other) :-
@@ -188,7 +188,7 @@ attr_unify_hook(vardiz(V1,V2),Other) :-
 
 
 % 	 	 
-%% remove_obsoletez( :Term_G28702, ?VALUE2, ?VALUE3) is semidet.
+%% remove_obsoletez( :TermN, ?X, ?L) is semidet.
 %
 % Remove Obsoletez.
 %
@@ -202,7 +202,7 @@ remove_obsoletez([N-Y|T], X, L) :-
 
 
 % 	 	 
-%% reverse_lookupz( :Term_G5719, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
+%% reverse_lookupz( :TermN, ?Value, ?Nodes, ?Rest) is semidet.
 %
 % Reverse Lookupz.
 %
@@ -219,7 +219,7 @@ reverse_lookupz([N-X|NXs],Value,Nodes,Rest) :-
 
 
 % 	 	 
-%% verify_compoundz( :Term_G11547, ?VALUE2) is semidet.
+%% verify_compoundz( :TermOrNode, ?X) is semidet.
 %
 % Verify Compoundz.
 %
@@ -254,7 +254,7 @@ zor_succeed(OrNode) :-
 
 
 % 	 	 
-%% zor_one_failz( :Term_G17904) is semidet.
+%% zor_one_failz( :TermN) is semidet.
 %
 % Zor One Failz.
 %
@@ -285,7 +285,7 @@ zor_one_fail(OrNode) :-
 
 
 % 	 	 
-%% del_zor_diz( :Term_G25765) is semidet.
+%% del_zor_diz( :TermX) is semidet.
 %
 % Remove/erase Zor Diz.
 %
@@ -318,7 +318,7 @@ cleanup_dead_znode(X) :-
 
 
 % 	 	 
-%% filter_dead_zorz( :Term_G9411, ?VALUE2) is semidet.
+%% filter_dead_zorz( :TermOr, ?List) is semidet.
 %
 % Filter Dead Zorz.
 %
@@ -341,7 +341,7 @@ filter_dead_zorz([Or-Y|Rest],List) :-
 
 
 % 	 	 
-%%  ?VALUE1--> ?VALUE2 is semidet.
+%%  ?V--> ?V is semidet.
 %
 % -->.
 %
@@ -383,7 +383,7 @@ mydiz(Xs0, Ys0) -->
 
 
 % 	 	 
-%% split_equals_list( :Term_G14651, :Term_G14780, :Term_G14909) is semidet.
+%% split_equals_list( :TermA, :TermA, :TermB) is semidet.
 %
 % Split Equals List.
 %

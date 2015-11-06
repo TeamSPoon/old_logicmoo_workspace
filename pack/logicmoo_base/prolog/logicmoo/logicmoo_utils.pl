@@ -105,7 +105,7 @@ add_library_search_path(Path,Masks):-
 :- dynamic(lmconf:logicmoo_pre_release/0).
 
 % 	 	 
-%% lmconf:logicmoo_pre_release is semidet.
+%% logicmoo_pre_release is semidet.
 %
 % Hook To [lmconf:logicmoo_pre_release/0] For Module Logicmoo_utils.
 % Logicmoo Pre Release.
@@ -129,7 +129,7 @@ lmconf:logicmoo_pre_release.
 
 
 % 	 	 
-%% lmconf:logicmoo_scan_autoloads is semidet.
+%% logicmoo_scan_autoloads is semidet.
 %
 % Hook To [lmconf:logicmoo_scan_autoloads/0] For Module Logicmoo_utils.
 % Logicmoo Scan Autoloads.
@@ -169,7 +169,7 @@ lmconf:logicmoo_scan_autoloads:-false.
 :- dynamic(lmconf:mpred_is_impl_file/1).
 
 % 	 	 
-%% lmconf:mpred_is_impl_file( ?VALUE1) is semidet.
+%% mpred_is_impl_file( ?A) is semidet.
 %
 % Hook To [lmconf:mpred_is_impl_file/1] For Module Logicmoo_utils.
 % Managed Predicate If Is A Implimentation File.

@@ -736,7 +736,7 @@ w_get_fa(Mask,F,A):-get_functor(Mask,F,A).
 set_prolog_stack_gb(Six):-set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
 
 % 	 	 
-%% lmconf:module_local_init is semidet.
+%% module_local_init is semidet.
 %
 % Hook To [lmconf:module_local_init/0] For Module Mpred_pfc.
 % Module Local Init.
@@ -853,7 +853,7 @@ mpred_no_chaining(Goal):- w_tl(t_l:no_physical_side_effects,call(Goal)).
 % TODO ISSUE https://github.com/TeamSPoon/PrologMUD/issues/7
 
 % 	 	 
-%% match_source_ref1( :Term_G2307) is semidet.
+%% match_source_ref1( :TermARG1) is semidet.
 %
 % Match Source Ref Secondary Helper.
 %
@@ -861,7 +861,7 @@ match_source_ref1(u):-!.
 match_source_ref1(u(_)).
 
 % 	 	 
-%% make_uu_remove( :Term_G5750) is semidet.
+%% make_uu_remove( :TermU) is semidet.
 %
 % Make Uu Remove.
 %
@@ -871,7 +871,7 @@ make_uu_remove((U,U)):-match_source_ref1(U).
 :- was_export(get_source_ref/1).
 
 % 	 	 
-%% get_source_ref1( ?VALUE1) is semidet.
+%% get_source_ref1( ?Mt) is semidet.
 %
 % Get Source Ref Secondary Helper.
 %
@@ -881,7 +881,7 @@ get_source_ref1(u(Mt)):-current_why(Mt),!.
 get_source_ref1(u(Mt)):-Mt=mt.
 
 % 	 	 
-%% get_source_ref( :Term_G12916) is semidet.
+%% get_source_ref( :TermU) is semidet.
 %
 % Get Source Ref.
 %
@@ -1080,7 +1080,7 @@ mpred_is_tautology(V):- \+ \+ call((copy_term_nat(V,VC),numbervars(VC),show_succ
 
 
 % 	 	 
-%% mpred_is_taut( :Term_G24373) is semidet.
+%% mpred_is_taut( :TermA) is semidet.
 %
 % Managed Predicate If Is A Taut.
 %
@@ -1114,7 +1114,7 @@ is_retract_first(a).
 
 
 % 	 	 
-%% pfc_provide_storage_op( ?UPARAM1, ?UPARAM2) is semidet.
+%% pfc_provide_storage_op( ?Op, ?I1) is semidet.
 %
 % Prolog Forward Chaining Provide Storage Oper..
 %
@@ -1159,7 +1159,7 @@ mpred_clause_is_asserted(H,B):- modulize_head(H,HH), (has_cl(HH) -> clause(HH,B)
 
 
 % 	 	 
-%% lmconf:mpred_provide_storage_clauses( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
+%% mpred_provide_storage_clauses( ?VALUE1, ?H, ?B, ?Proof) is semidet.
 %
 % Hook To [lmconf:mpred_provide_storage_clauses/4] For Module Mpred_pfc.
 % Managed Predicate Provide Storage Clauses.
@@ -1193,7 +1193,7 @@ mpred_pbody(H,B,R,B,asserted(R,(H:-B))).
 
 
 % 	 	 
-%% get_why( ?VALUE1, ?VALUE2, ?VALUE3, :Term_G26977) is semidet.
+%% get_why( ?VALUE1, ?CL, ?R, :TermR) is semidet.
 %
 % Get Generation Of Proof.
 %
@@ -1241,7 +1241,7 @@ mpred_rule_hb(Outcome,OutcomeO,AnteO):-hotrace((mpred_rule_hb_0(Outcome,OutcomeO
 
 
 % 	 	 
-%% mpred_rule_hb_0( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% mpred_rule_hb_0( ?Outcome, ?OutcomeO, ?VALUE3) is semidet.
 %
 % Managed Predicate rule Head+Body  Primary Helper.
 %
@@ -1274,7 +1274,7 @@ mpred_rule_hb_0(Outcome,Outcome,true).
 ain_minfo(G):-ain_minfo(assertz_if_new,G).
 
 % 	 	 
-%% ain_minfo( :PRED1VALUE1, ?UPARAM2) is semidet.
+%% ain_minfo( :PRED1How, ?H) is semidet.
 %
 % Assert If New Metainformation.
 %
@@ -1305,7 +1305,7 @@ ain_minfo_2(How,G):-ain_minfo(How,G).
 
 
 % 	 	 
-%% mpred_is_info( :Term_G15725) is semidet.
+%% mpred_is_info( :TermC) is semidet.
 %
 % Managed Predicate If Is A Info.
 %
@@ -1697,7 +1697,7 @@ mpred_maptree(Pred,H,S):-apply(Pred,[H|S]).
 
 
 % 	 	 
-%% pfcVerifyMissing( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% pfcVerifyMissing( ?GC, ?GO, ?GO) is semidet.
 %
 % Prolog Forward Chaining Verify Missing.
 %
@@ -1733,7 +1733,7 @@ pfcVersion(6.6).
 
 
 % 	 	 
-%% correctify_support( ?VALUE1, ?VALUE2) is semidet.
+%% correctify_support( ?S, ?S) is semidet.
 %
 % Correctify Support.
 %
@@ -2046,7 +2046,7 @@ mpred_test(P):- show_call(with_mpred_trace_exec(req(P))),!.
 
 
 % 	 	 
-%% clause_asserted_local( :Term_G19554) is semidet.
+%% clause_asserted_local( :TermABOX) is semidet.
 %
 % Clause Asserted Local.
 %
@@ -2200,7 +2200,7 @@ mpred_enqueue(P,S) :-
 
 
 % 	 	 
-%% mpred_remove_old_version( :Term_G15724) is semidet.
+%% mpred_remove_old_version( :TermIdentifier) is semidet.
 %
 % Managed Predicate Remove Old Version.
 %
@@ -2485,7 +2485,7 @@ ain_actiontrace(Action,Support) :-
 
 
 % 	 	 
-%% mpred_rem_actiontrace( ?VALUE1, :Term_G15011) is semidet.
+%% mpred_rem_actiontrace( ?VALUE1, :TermARG2) is semidet.
 %
 % Managed Predicate Remove/erase Action Trace.
 %
@@ -2515,7 +2515,7 @@ mpred_retract_db_type(X) :-
 
 
 % 	 	 
-%% mpred_retract_db_type( ?VALUE1, ?VALUE2) is semidet.
+%% mpred_retract_db_type( ?VALUE1, ?ABOX) is semidet.
 %
 % Managed Predicate Retract Database Type.
 %
@@ -2587,7 +2587,7 @@ mpred_rem1(P) :-
 
 
 % 	 	 
-%% rem_list( :Term_G6313) is semidet.
+%% rem_list( :TermH) is semidet.
 %
 % Remove/erase List.
 %
@@ -2897,7 +2897,7 @@ mpred_tms_supported(How,_P,unknown(How)).
 
 
 % 	 	 
-%% mpred_tms_supported0( ?UPARAM1, ?UPARAM2, ?UPARAM3) is semidet.
+%% mpred_tms_supported0( ?UPARAM1, ?P, ?How) is semidet.
 %
 % Managed Predicate Truth Maintainence/wff Supported Primary Helper.
 %
@@ -2941,7 +2941,7 @@ mpred_deep_support(How,M):-loop_check(mpred_deep_support0(How,M),fail).
 
 
 % 	 	 
-%% mpred_deep_support0( ?UPARAM1, ?UPARAM2) is semidet.
+%% mpred_deep_support0( ?U, ?U) is semidet.
 %
 % Managed Predicate Deep Support Primary Helper.
 %
@@ -2998,7 +2998,7 @@ mpred_wff(F,Descendants,wff(Supporters)) :-
 
 
 % 	 	 
-%% mpred_wfflist( :Term_G5026, ?VALUE2) is semidet.
+%% mpred_wfflist( :TermX, ?L) is semidet.
 %
 % Managed Predicate Wfflist.
 %
@@ -3014,7 +3014,7 @@ mpred_wfflist([X|Rest],L) :-
 
 
 % 	 	 
-%% supports_f_l( ?VALUE1, :Term_G10526) is semidet.
+%% supports_f_l( ?F, :TermFact) is semidet.
 %
 % Supports Functor (list Version).
 %
@@ -3102,7 +3102,7 @@ spft_precanonical(F,SF,ST):- to_addable_form_wte(spft_precanonical,F,P),!,get_us
 
 
 % 	 	 
-%% trigger_supports_f_l( ?VALUE1, :Term_G30098) is semidet.
+%% trigger_supports_f_l( ?U, :TermARG2) is semidet.
 %
 % Trigger Supports Functor (list Version).
 %
@@ -3183,7 +3183,7 @@ ain_rule_if_rule(Fact):- must(ain_rule0(Fact)),!.
 
 
 % 	 	 
-%% ain_rule0( :Term_G23167) is semidet.
+%% ain_rule0( :TermP) is semidet.
 %
 % Assert If New Rule Primary Helper.
 %
@@ -3357,7 +3357,7 @@ mpred_eval_lhs0(X,Why) :-
 
 
 % 	 	 
-%% mpred_eval_rhs_0( ?VALUE1, :Term_G19802, ?VALUE3) is semidet.
+%% mpred_eval_rhs_0( ?DIR, :TermARG2, ?VALUE3) is semidet.
 %
 % Managed Predicate eval Right-Hand-Side  Primary Helper.
 %
@@ -3369,7 +3369,7 @@ mpred_eval_rhs_0(DIR,[Head|Tail],Support) :-
 
 
 % 	 	 
-%% mpred_eval_rhs1( +DIR, ?X, ?VALUE3) is semidet.
+%% mpred_eval_rhs1( +DIR, ?X, ?Support) is semidet.
 %
 % Managed Predicate Eval Right-hand-side Secondary Helper.
 %
@@ -3632,7 +3632,7 @@ mpred_call_with_no_triggers_uncaugth(MF) :-  strip_module(MF,_,F),
 
 
 % 	 	 
-%% mpred_bc_only( ?CALL1) is semidet.
+%% mpred_bc_only( ?M) is semidet.
 %
 % Managed Predicate Backchaining Only.
 %
@@ -3851,7 +3851,7 @@ mpred_negation_w_neg(P,NF):-mpred_nf1_negation(P,NF).
 %= mpred_nf1_negation(P,NF) is true if NF is the normal form of \+P.
 
 % 	 	 
-%% mpred_nf1_negation( ?VALUE1, ?VALUE2) is semidet.
+%% mpred_nf1_negation( ?P, ?P) is semidet.
 %
 % Managed Predicate Normal Form Secondary Helper Negation.
 %
@@ -3916,7 +3916,7 @@ mpred_nf_negation(X,X).
 
 
 % 	 	 
-%% build_rhs( ?VALUE1, :Term_G15316, :Term_G15445) is semidet.
+%% build_rhs( ?Sup, :TermX, :TermX) is semidet.
 %
 % Build Right-hand-side.
 %
@@ -3960,7 +3960,7 @@ mpred_mark_as_ml(Sup,PosNeg,Type,P):- mpred_mark_as(Sup,PosNeg,P,Type).
 
 
 % 	 	 
-%% pos_2_neg( ?VALUE1, ?VALUE2) is semidet.
+%% pos_2_neg( ?P, ?P) is semidet.
 %
 % pos  Extended Helper Negated.
 %
@@ -4021,7 +4021,7 @@ fa_to_p(F,A,P):-integer(A),atom(F),functor(P,F,A),( P \= call_u(_) ),( P \= '$VA
 
 
 % 	 	 
-%% lmconf:hook_one_minute_timer_tick is semidet.
+%% hook_one_minute_timer_tick is semidet.
 %
 % Hook To [lmconf:hook_one_minute_timer_tick/0] For Module Mpred_pfc.
 % Hook One Minute Timer Tick.
@@ -4060,7 +4060,7 @@ mpred_cleanup_0(P):- findall(P-B-Ref,clause(P,B,Ref),L),forall(member(P-B-Ref,L)
 
 
 % 	 	 
-%% mpred_negation( ?VALUE1, ?VALUE2) is semidet.
+%% mpred_negation( ?P, ?P) is semidet.
 %
 % Managed Predicate Negation.
 %
@@ -4194,7 +4194,7 @@ build_rule(Lhs,Rhs,Support) :-
 
 
 % 	 	 
-%% build_trigger( ?VALUE1, :Term_G28790, ?VALUE3, :Term_G29426) is semidet.
+%% build_trigger( ?Support, :TermARG2, ?Consequent, :TermConsequentO) is semidet.
 %
 % Build Trigger.
 %
@@ -4320,7 +4320,7 @@ build_consequent(_ ,Test,Test).
 
 
 % 	 	 
-%% mpred_db_type( ?VALUE1, ?VALUE2) is semidet.
+%% mpred_db_type( ?VALUE1, ?Type) is semidet.
 %
 % Managed Predicate Database Type.
 %
@@ -4449,7 +4449,7 @@ pfcl_do(_).
 
 
 % 	 	 
-%% mpred_union( :Term_G13273, ?VALUE2, :Term_G13909) is semidet.
+%% mpred_union( :TermARG1, ?L, :TermL) is semidet.
 %
 % Managed Predicate Union.
 %
@@ -4476,7 +4476,7 @@ mpred_union([Head|Tail],L,[Head|Tail2]) :-
 %= mpred_had_support(+Fact,+Support)
 
 % 	 	 
-%% mpred_had_support( ?VALUE1, :Term_G19079) is semidet.
+%% mpred_had_support( ?P, :TermFact) is semidet.
 %
 % Managed Predicate Had Support.
 %
@@ -4516,7 +4516,7 @@ ain_support(P,FT) :- trace_or_throw(failed_ain_support(P,FT)).
 
 
 % 	 	 
-%% mpred_get_support( ?VALUE1, :Term_G29428) is semidet.
+%% mpred_get_support( ?P, :TermFact) is semidet.
 %
 % Managed Predicate Get Support.
 %
@@ -4528,7 +4528,7 @@ mpred_get_support(P,(Fact,Trigger)) :-
 % dont mpred_get_support_neg(\+ ~(P),(Fact,Trigger)) :- sp ftY((P),Fact,Trigger).
 
 % 	 	 
-%% mpred_get_support_neg( :Term_G5278, ?VALUE2) is semidet.
+%% mpred_get_support_neg( :TermP, ?S) is semidet.
 %
 % Managed Predicate Get Support Negated.
 %
@@ -5319,7 +5319,7 @@ baseable(F,L) :-
 
 
 % 	 	 
-%% baseable_list( :Term_G9638, ?VALUE2) is semidet.
+%% baseable_list( :TermX, ?L) is semidet.
 %
 % Baseable List.
 %
@@ -5368,7 +5368,7 @@ assumptions(X,L) :-
 
 
 % 	 	 
-%% assumptions1( :Term_G26092, ?VALUE2) is semidet.
+%% assumptions1( :TermX, ?L) is semidet.
 %
 % Assumptions Secondary Helper.
 %
@@ -5448,7 +5448,7 @@ mpred_descendants(P,L) :-
 
 
 % 	 	 
-%% compute_resolve( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5) is semidet.
+%% compute_resolve( ?NewerP, ?OlderQ, ?SU, ?SU, ?OlderQ) is semidet.
 %
 % Compute Resolve.
 %
@@ -5539,7 +5539,7 @@ rewritten_metawrapper(C):-is_ftCompound(C),functor(C,t,_).
 
 
 % 	 	 
-%% meta_wrapper_rule( :Term_G2282) is semidet.
+%% meta_wrapper_rule( :TermARG1) is semidet.
 %
 % Meta Wrapper Rule.
 %
@@ -5619,7 +5619,7 @@ pred_t0(ABOX,P):-mreq(basePFC:spft(ABOX,P,_,_,_)).
 
 
 % 	 	 
-%% pred_r0( :Term_G6909) is semidet.
+%% pred_r0( :TermP) is semidet.
 %
 % Predicate R Primary Helper.
 %
@@ -5777,7 +5777,7 @@ mpred_facts_only(P):- (is_ftVar(P)->(pred_head_all(P),\+ meta_wrapper_rule(P));t
 :- thread_local(t_l:in_rescan_mpred_hook/0).
 
 % 	 	 
-%% lmconf:mpred_hook_rescan_files is semidet.
+%% mpred_hook_rescan_files is semidet.
 %
 % Hook To [lmconf:mpred_hook_rescan_files/0] For Module Mpred_pfc.
 % Managed Predicate Hook Rescan Files.

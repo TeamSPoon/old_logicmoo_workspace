@@ -229,7 +229,7 @@ printFrame(N,Frame,Opts):-
 
 
 % 	 	 
-%% frame_to_fmsg( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
+%% frame_to_fmsg( ?N, ?Frame, ?Opts, ?N) is semidet.
 %
 % Frame Converted To Functor Message.
 %
@@ -342,7 +342,7 @@ getPFA(Frame,Ctrl,Goal):-getPFA1(Frame,Ctrl,Goal).
 
 
 % 	 	 
-%% getPFA1( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% getPFA1( ?Frame, ?Txt, ?Txt) is semidet.
 %
 % Get Pred Functor A Secondary Helper.
 %
@@ -361,7 +361,7 @@ getPFA2(Frame,Ctrl,Goal):- catchv((prolog_frame_attribute(Frame,Ctrl,Goal)),E,Go
 
 
 % 	 	 
-%% clauseST( ?VALUE1, :Term_G23665) is semidet.
+%% clauseST( ?ClRef, :TermGoal) is semidet.
 %
 % Clause S True Stucture.
 %
@@ -459,7 +459,7 @@ dumptrace(G):- ignore((debug,
 :-meta_predicate(dumptrace(0,+)).
 
 % 	 	 
-%% dumptrace( :GoalGOAL1, +C) is semidet.
+%% dumptrace( :GoalG, +C) is semidet.
 %
 % Dump Trace.
 %

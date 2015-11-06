@@ -123,7 +123,7 @@ tick_every(Name,Seconds,OnTick):-repeat,sleep(Seconds),catch(OnTick,E,dmsg(cause
 
 
 % 	 	 
-%% lmconf:after_mpred_load is semidet.
+%% after_mpred_load is semidet.
 %
 % Hook To [lmconf:after_mpred_load/0] For Module Mpred_agenda.
 % After Managed Predicate Load.
@@ -180,7 +180,7 @@ time_tick(Time,Pred):- repeat,sleep(Time), (suspend_timers->true;(once(doall(on_
 
 
 % 	 	 
-%% lmconf:hook_one_second_timer_tick is semidet.
+%% hook_one_second_timer_tick is semidet.
 %
 % Hook To [lmconf:hook_one_second_timer_tick/0] For Module Mpred_agenda.
 % Hook One Second Timer Tick.
@@ -206,7 +206,7 @@ start_one_second_timer:-thread_property(_,alias(mpred_one_second_timer))-> true 
 
 
 % 	 	 
-%% lmconf:hook_one_minute_timer_tick is semidet.
+%% hook_one_minute_timer_tick is semidet.
 %
 % Hook To [lmconf:hook_one_minute_timer_tick/0] For Module Mpred_agenda.
 % Hook One Minute Timer Tick.

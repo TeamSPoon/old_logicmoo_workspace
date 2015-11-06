@@ -155,9 +155,8 @@ SWI-Prolog installation directory.
 
 
 % 	 	 
-%% thread_httpd:make_socket_hook( ?VALUE1, :Term_G21452, ?VALUE3) is semidet.
+%% make_socket_hook( ?Port, :TermM, ?Options) is semidet.
 %
-% Hook To [thread_httpd:make_socket_hook/3] For Module Logicmoo_util_filestreams.
 % Make Socket Hook.
 %
 thread_httpd:make_socket_hook(Port, M:Options0, Options) :-
@@ -178,9 +177,8 @@ thread_httpd:make_socket_hook(Port, M:Options0, Options) :-
 
 
 % 	 	 
-%% thread_httpd:make_socket( ?Port, ?Options0, ?Options) is semidet.
+%% make_socket( ?Port, ?Options0, ?Options) is semidet.
 %
-% Hook To [thread_httpd:make_socket/3] For Module Logicmoo_util_filestreams.
 % Make Socket.
 %
 make_socket(_Port, Socket, Options) :-
@@ -198,9 +196,8 @@ make_socket(Port, Socket, _Options) :-
 
 
 % 	 	 
-%% thread_httpd:accept_hook( ?Goal, ?Options) is semidet.
+%% accept_hook( ?Goal, ?Options) is semidet.
 %
-% Hook To [thread_httpd:accept_hook/2] For Module Logicmoo_util_filestreams.
 % Accept Hook.
 %
 thread_httpd:accept_hook(Goal, Options) :-
@@ -214,9 +211,8 @@ thread_httpd:accept_hook(Goal, Options) :-
 
 
 % 	 	 
-%% thread_httpd:open_client_hook( :Term_G13743, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5) is semidet.
+%% open_client_hook( :TermSSL, ?Goal, ?In, ?Out, ?Peer) is semidet.
 %
-% Hook To [thread_httpd:open_client_hook/5] For Module Logicmoo_util_filestreams.
 % Open Client Hook.
 %
 thread_httpd:open_client_hook(ssl_client(SSL, Client, Goal, Peer),
@@ -252,7 +248,7 @@ ssl_failed(Read, Write, E) :-
 
 
 % 	 	 
-%% http:http_protocol_hook( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5) is semidet.
+%% http_protocol_hook( ?VALUE1, ?Parts, ?PlainStreamPair, ?StreamPair, ?Options) is semidet.
 %
 % Hook To [http:http_protocol_hook/5] For Module Logicmoo_util_filestreams.
 % Http Protocol Hook.
@@ -288,7 +284,7 @@ ssl_protocol_hook(Parts, PlainStreamPair, StreamPair, Options) :-
 
 
 % 	 	 
-%% http:open_options( ?Parts, ?Options) is semidet.
+%% open_options( ?Parts, ?Options) is semidet.
 %
 % Hook To [http:open_options/2] For Module Logicmoo_util_filestreams.
 % Open Options.
@@ -306,7 +302,7 @@ http:open_options(Parts, Options) :-
 
 
 % 	 	 
-%% http:http_connection_over_proxy( :Term_G20607, ?VALUE2, :Term_G21243, ?VALUE4, ?VALUE5, ?VALUE6) is semidet.
+%% http_connection_over_proxy( :TermProxyHost, ?Parts, :TermHost, ?StreamPair, ?Options, ?Options) is semidet.
 %
 % Hook To [http:http_connection_over_proxy/6] For Module Logicmoo_util_filestreams.
 % Http Connection Over Proxy.

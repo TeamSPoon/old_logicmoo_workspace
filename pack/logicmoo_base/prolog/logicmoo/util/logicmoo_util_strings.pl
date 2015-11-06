@@ -739,7 +739,7 @@ to_first_break(Text,LType,Left,Right,RType):- string_codes(Text,[C|Codes]), !,to
 
 
 % 	 	 
-%% to_first_break_w( :Term_G7799, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5, ?VALUE6) is semidet.
+%% to_first_break_w( :TermARG1, ?SoFar, ?Some, ?Left, ?VALUE5, ?VALUE6) is semidet.
 %
 % Converted To First Break W.
 %
@@ -778,7 +778,7 @@ unquoteAtom(Atom,New):-concat_atom_safe(LIST,'"',Atom),concat_atom_safe(LIST,'',
 
 
 % 	 	 
-%% is_charlist( :Term_G21515) is semidet.
+%% is_charlist( :TermX) is semidet.
 %
 % If Is A Charlist.
 %
@@ -787,7 +787,7 @@ is_charlist([X|T]):-atom(X),not(number(X)),atom_length(X,1),is_charlist(T),!.
 
 
 % 	 	 
-%% is_codelist( :Term_G25173) is semidet.
+%% is_codelist( :TermA) is semidet.
 %
 % If Is A Codelist.
 %
@@ -833,7 +833,7 @@ escapeString(R,RS):- (string(R);is_list(R)) ,string_to_atom(R,A),atom_codes(A,Co
 
 
 % 	 	 
-%% escapeCodes( ?VALUE1, ?VALUE2, :Term_G20136, :Term_G20265) is semidet.
+%% escapeCodes( ?Escaped, ?EscapeChar, :TermARG3, :TermARG4) is semidet.
 %
 % Escape Codes.
 %
@@ -1046,7 +1046,7 @@ splt_words_0(S,Terms,Var):-any_to_atom(S,Atom),!,splt_words_0_atom(Atom,Terms,Va
 
 
 % 	 	 
-%% splt_words_0_atom( ?VALUE1, :Term_G17415, ?VALUE3) is semidet.
+%% splt_words_0_atom( ?Atom, :TermTerm, ?Vars) is semidet.
 %
 % splt words  Primary Helper atom.
 %
@@ -1065,7 +1065,7 @@ splt_words_0_atom(Atom,[L0|ListO],Vars):-atomic_list_concat([L0,L1|List],' ',Ato
 
 
 % 	 	 
-%% merge_vars( :Term_G22671, ?VALUE2, :Term_G23307) is semidet.
+%% merge_vars( :TermNewVars, ?VALUE2, :TermNewVars) is semidet.
 %
 % Merge Variables.
 %
@@ -1088,7 +1088,7 @@ vars_to_ucase(Vars,[_|List]):- vars_to_ucase(Vars,List).
 
 
 % 	 	 
-%% vars_to_ucase_0( :Term_G5726, ?VALUE2) is semidet.
+%% vars_to_ucase_0( :TermN, ?List) is semidet.
 %
 % Variables Converted To ucase  Primary Helper.
 %
@@ -1138,7 +1138,7 @@ atomSplit(Atom,Words,[Space|AtomO]):-hotrace((var(Atom),ground(Words),!,atomic_l
 
 
 % 	 	 
-%% atomSplit2( :Term_G26863, :Term_G26992, ?VALUE3) is semidet.
+%% atomSplit2( :TermARG1, :TermARG2, ?List) is semidet.
 %
 % Atom Split Extended Helper.
 %
@@ -1153,7 +1153,7 @@ atomSplit2([W|S],[W|Words],List):-atomSplit2(S,Words,List),!.
 
 
 % 	 	 
-%% interleave( :Term_G6227, ?VALUE2, :Term_G6863) is semidet.
+%% interleave( :TermARG1, ?Space, :TermSpace) is semidet.
 %
 % Interleave.
 %
@@ -1479,7 +1479,7 @@ replace_periods(A,S):-
 
 
 % 	 	 
-%% to_list_of_sents( ?VALUE1, ?VALUE2) is semidet.
+%% to_list_of_sents( ?WList, ?FirstSent) is semidet.
 %
 % Converted To List Of Sentences.
 %
@@ -1533,7 +1533,7 @@ to_word_list_0(A,WList):-any_to_string(A,String),!,text_to_string(String,Atom),t
 
 
 % 	 	 
-%% read_stream_to_arglist( ?VALUE1, :Term_G15284) is semidet.
+%% read_stream_to_arglist( ?Input, :TermARG2) is semidet.
 %
 % Read Stream Converted To Arglist.
 %
@@ -1584,7 +1584,7 @@ str_contains_all(List,String):-str_contains_all0(List,String).
 
 
 % 	 	 
-%% str_contains_all0( :Term_G10168, ?VALUE2) is semidet.
+%% str_contains_all0( :TermA, ?String) is semidet.
 %
 % Str Contains All Primary Helper.
 %

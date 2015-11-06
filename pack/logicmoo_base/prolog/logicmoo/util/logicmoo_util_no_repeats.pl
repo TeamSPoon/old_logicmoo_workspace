@@ -146,7 +146,7 @@ no_repeats_old(Call):- no_repeats_old(Call,Call).
 
 
 % 	 	 
-%% memberchk_same( ?VALUE1, :Term_G26780) is semidet.
+%% memberchk_same( ?X, :TermY0) is semidet.
 %
 % Memberchk Same.
 %
@@ -155,7 +155,7 @@ memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar
 
 
 % 	 	 
-%% memberchk_pred( :PRED2VALUE1, ?UPARAM2, ?UPARAM3) is semidet.
+%% memberchk_pred( :PRED2Pred, ?X, ?Y0) is semidet.
 %
 % Memberchk Predicate.
 %
@@ -163,7 +163,7 @@ memberchk_pred(Pred, X, [Y0|Ys]) :- is_list(Ys),C=..[v,Y0|Ys],!, arg(_,C,Y), cal
 memberchk_pred(Pred, X, [Y|Ys]) :- (   call(Pred,X,Y) -> true ;   (nonvar(Ys),memberchk_pred(Pred, X, Ys) )).
 
 % 	 	 
-%% memberchk_pred_rev( :PRED2VALUE1, ?UPARAM2, ?UPARAM3) is semidet.
+%% memberchk_pred_rev( :PRED2Pred, ?X, ?Y0) is semidet.
 %
 % Memberchk Predicate Rev.
 %
@@ -217,7 +217,7 @@ no_repeats_dc(Vs,Call):- term_variables(Call,CV),term_variables(Vs,VsL),subtract
 
 
 % 	 	 
-%% subtract_eq( :Term_G24147, ?VALUE2, ?VALUE3) is semidet.
+%% subtract_eq( :TermE, ?Delete, ?Result) is semidet.
 %
 % Subtract Using (==/2) (or =@=/2) ).
 %

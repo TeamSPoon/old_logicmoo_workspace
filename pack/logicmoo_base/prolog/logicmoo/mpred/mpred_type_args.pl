@@ -147,7 +147,7 @@ assert_predArgTypes_from_right(F,A,ArgsList):-append(Left,[Last],ArgsList),asser
 
 
 % 	 	 
-%% assert_predArgTypes_from_left( ?VALUE1, ?VALUE2, :Term_G16890) is semidet.
+%% assert_predArgTypes_from_left( ?F, ?A, :TermType) is semidet.
 %
 % assert Predicate Argument  Types Converted From left.
 %
@@ -237,14 +237,14 @@ is_spec(T):- req(tCol(T))->true;is_declarations(T).
 
 
 % 	 	 
-%% is_rest( :Term_G2079) is semidet.
+%% is_rest( :TermARG1) is semidet.
 %
 % If Is A Rest.
 %
 is_rest([_|Term]):-not(is_list(Term)).
 
 % 	 	 
-%% is_rest_of( ?VALUE1, :Term_G8706) is semidet.
+%% is_rest_of( ?Type, :TermARG2) is semidet.
 %
 % If Is A Rest Of.
 %
@@ -323,7 +323,7 @@ mpred_arity_pred(arity).
 
 
 % 	 	 
-%% as_one_of( ?VALUE1, ?VALUE2) is semidet.
+%% as_one_of( ?Type, ?TypeO) is semidet.
 %
 % Converted To One Of.
 %
@@ -474,7 +474,7 @@ argIsa_call_0(F,N,ftAskable):- atom(F), current_predicate(F/A),between(1,A,N),fu
 
 
 % 	 	 
-%% argIsa_call_3( ?VALUE1, ?VALUE2) is semidet.
+%% argIsa_call_3( ?WP, ?VALUE2) is semidet.
 %
 % Argument  (isa/2) call Helper number 3..
 %
@@ -618,7 +618,7 @@ correctArgsIsa0(Op,A,RESULTC):-A=..[PRED|ARGS],!,correctArgsIsa00(Op,[PRED|ARGS]
 
 
 % 	 	 
-%% correctArgsIsa00( ?VALUE1, :Term_G22760, :Term_G22889) is semidet.
+%% correctArgsIsa00( ?VALUE1, :TermProp, :TermAA) is semidet.
 %
 % correct Arguments  (isa/2) Primary Helper Primary Helper.
 %
@@ -655,7 +655,7 @@ discoverAndCorrectArgsIsa_from_right(Op,Prop,N1,In,Out):- append(Args,[A],In),
 
 
 % 	 	 
-%% discoverAndCorrectArgsIsa_from_left( ?VALUE1, ?VALUE2, ?VALUE3, :Term_G22483, ?VALUE5) is semidet.
+%% discoverAndCorrectArgsIsa_from_left( ?O, ?Prop, ?N1, :TermARG4, ?VALUE5) is semidet.
 %
 % discover and correct Arguments  (isa/2) Converted From left.
 %
@@ -1028,7 +1028,7 @@ roll_dice(Rolls,Sided,Bonus,Result):- LessRolls is Rolls-1, roll_dice(LessRolls,
 %:-ain_fast(<=( argIsa(F,N,Isa), argIsa_known(F,N,Isa))).
 
 % 	 	 
-%% lmconf:module_local_init is semidet.
+%% module_local_init is semidet.
 %
 % Hook To [lmconf:module_local_init/0] For Module Mpred_type_args.
 % Module Local Init.

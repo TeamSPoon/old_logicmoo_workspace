@@ -194,7 +194,7 @@ get_clause_vars_for_print(H0,MHB):- get_clause_vars_copy(H0,MHB).
 
 
 % 	 	 
-%% mpred_classify_facts( :Term_G24154, ?VALUE2, :Term_G24790, ?VALUE4) is semidet.
+%% mpred_classify_facts( :TermH, ?User, :TermPfc, ?H) is semidet.
 %
 % Managed Predicate Classify Facts.
 %
@@ -449,7 +449,7 @@ pp_justifications(P,Js) :-
 
 
 % 	 	 
-%% pp_justification1( :Term_G24213, ?VALUE2) is semidet.
+%% pp_justification1( :TermJ, ?N) is semidet.
 %
 % Pretty Print Justification Secondary Helper.
 %
@@ -464,7 +464,7 @@ pp_justification1([J|Js],N) :-
 
 
 % 	 	 
-%% pp_justifications2( :Term_G5284, ?VALUE2, ?VALUE3) is semidet.
+%% pp_justifications2( :TermC, ?JustNo, ?StepNo) is semidet.
 %
 % Pretty Print Justifications Extended Helper.
 %
@@ -509,7 +509,7 @@ nth_mpred_call(N,List,Ele):-N2 is N+1,lists:nth0(N2,List,Ele).
 
 
 % 	 	 
-%% show_pred_info( ?VALUE1) is semidet.
+%% show_pred_info( ?F) is semidet.
 %
 % Show Predicate Info.
 %
@@ -575,7 +575,7 @@ mpred_contains_term(What,Inside):- (\+ \+ once((subst(Inside,What,foundZadooksy,
 
 
 % 	 	 
-%% lmconf:hook_mpred_listing( ?What) is semidet.
+%% hook_mpred_listing( ?What) is semidet.
 %
 % Hook To [lmconf:hook_mpred_listing/1] For Module Mpred_listing.
 % Hook Managed Predicate Listing.

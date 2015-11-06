@@ -312,7 +312,7 @@ onSpawn_f_args(Modality,Funct,List):-
 
 
 % 	 	 
-%% convertSpawnArgs( ?VALUE1, ?VALUE2, :Term_G17462, :Term_G17591) is semidet.
+%% convertSpawnArgs( ?Funct, ?N, :TermA, :TermO) is semidet.
 %
 % Convert Spawn Arguments.
 %

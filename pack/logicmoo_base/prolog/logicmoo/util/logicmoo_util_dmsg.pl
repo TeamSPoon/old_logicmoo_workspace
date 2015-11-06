@@ -543,7 +543,7 @@ source_variables_lwv(AllS):-
 
 
 % 	 	 
-%% system:export( :PRED1VALUE1) is semidet.
+%% export( :PRED1VALUE1) is semidet.
 %
 % Hook To [system:export/1] For Module Logicmoo_util_dmsg.
 % Export.
@@ -570,7 +570,7 @@ print_prepended(Pre,S):-atom_concat('\n',L,S),!,print_prepended(Pre,L).
 print_prepended(Pre,S):-atomics_to_string(L,'\n',S),print_prepended_lines(Pre,L).
 
 % 	 	 
-%% print_prepended_lines( ?VALUE1, :Term_G11003) is semidet.
+%% print_prepended_lines( ?Pre, :TermARG2) is semidet.
 %
 % Print Prepended Lines.
 %
@@ -982,7 +982,7 @@ ansicall(S,Set,Call):-
 
 
 % 	 	 
-%% ansi_term:keep_line_pos( ?S, :GoalG) is semidet.
+%% keep_line_pos( ?S, :GoalG) is semidet.
 %
 % Hook To [ansi_term:keep_line_pos/2] For Module Logicmoo_util_dmsg.
 % Keep Line Pos.
@@ -1148,7 +1148,7 @@ fg_color(_,default).
 % = :- export(random_color/1).
 
 % 	 	 
-%% random_color( ?VALUE1) is semidet.
+%% random_color( ?M) is semidet.
 %
 % Random Color.
 %
@@ -1190,7 +1190,7 @@ next_color([underline|C]):- random_color(C),!.
 % = :- export(contrasting_color/2).
 
 % 	 	 
-%% contrasting_color( ?VALUE1, ?VALUE2) is semidet.
+%% contrasting_color( ?A, ?VALUE2) is semidet.
 %
 % Contrasting Color.
 %

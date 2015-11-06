@@ -218,7 +218,7 @@ mstatistics:-
 
 
 % 	 	 
-%% current_atom_or_blob( ?VALUE1, ?VALUE2) is semidet.
+%% current_atom_or_blob( ?X, ?VALUE2) is semidet.
 %
 % Current Atom Or Blob.
 %
@@ -230,7 +230,7 @@ current_atom_or_blob(X,flag):-current_key(X).
 
 
 % 	 	 
-%% blob_info( ?VALUE1, :Term_G25813, :Term_G25942) is semidet.
+%% blob_info( ?A, :TermARG2, :TermA) is semidet.
 %
 % Blob Info.
 %
@@ -377,7 +377,7 @@ searchable_of_clause(H,List):-searchable_of_clause_0(H,List).
 
 
 % 	 	 
-%% searchable_of_clause_0( ?VALUE1, :Term_G15498) is semidet.
+%% searchable_of_clause_0( ?C, :TermARG2) is semidet.
 %
 % searchable of clause  Primary Helper.
 %
@@ -389,7 +389,7 @@ searchable_of_clause_0(C,[funct(F,A),F|List]):- C=..[F,H|T],functor(C,F,A),searc
 
 
 % 	 	 
-%% searchable_of_clause_1( :Term_G19747, ?VALUE2) is semidet.
+%% searchable_of_clause_1( :TermH, ?List) is semidet.
 %
 % searchable of clause  Secondary Helper.
 %
@@ -550,7 +550,7 @@ save_search_ref_tl(Ref,Atomic):-nb_setval(Atomic,[Ref]).
 
 
 % 	 	 
-%% lmconf:shared_hide_data( :PRED4VALUE1) is semidet.
+%% shared_hide_data( :PRED4VALUE1) is semidet.
 %
 % Hook To [lmconf:shared_hide_data/1] For Module Logicmoo_util_term_listing.
 % Shared Hide Data.
@@ -586,7 +586,7 @@ hide_data0(M:P):- atom(M),(listing_filter(M);hide_data0(P)).
 :- meta_predicate unify_listing(:).
 
 % 	 	 
-%% unify_listing( ?CALL1) is semidet.
+%% unify_listing( ?Cntxt) is semidet.
 %
 % Unify Listing.
 %
@@ -619,7 +619,7 @@ unify_listing_header(_Cntxt:_FileMatch,_F,_A).
 :- meta_predicate unify_listing(:,?,?).
 
 % 	 	 
-%% unify_listing( ?CALL1, ?UPARAM2, ?UPARAM3) is semidet.
+%% unify_listing( ?Cntxt, ?F, ?A) is semidet.
 %
 % Unify Listing.
 %
@@ -752,7 +752,7 @@ xlisting_inner(Pred,Match,SkipPI):-
 :- multifile user:prolog_list_goal/1.
 
 % 	 	 
-%% user:prolog_list_goal( :TermGoal) is semidet.
+%% prolog_list_goal( :TermGoal) is semidet.
 %
 % Hook To [user:prolog_list_goal/1] For Module Logicmoo_util_term_listing.
 % Prolog List Goal.
@@ -780,7 +780,7 @@ buggery_ok :- \+ compiling, current_predicate(_:logicmoo_bugger_loaded/0), \+ lm
 % bookeepingPredicate(M:G):- member(M:F/A,[M:'$exported_op'/3]),current_module(M),functor(G,F,A),once(predicate_property(M:G,_)).
 
 % 	 	 
-%% bookeepingPredicateXRef( :Term_G23293) is semidet.
+%% bookeepingPredicateXRef( :TermARG1) is semidet.
 %
 % Bookeeping Predicate X Ref.
 %
@@ -788,7 +788,7 @@ bookeepingPredicateXRef(file_search_path(_,_)).
 bookeepingPredicateXRef(_:G):-member(F/A,[xref_defined/3,xref_called/3,xref_exported/2]),functor(G,F,A).
 
 % 	 	 
-%% predicateUsesCall( :Term_G3421) is semidet.
+%% predicateUsesCall( :TermARG1) is semidet.
 %
 % Predicate Uses Call.
 %
@@ -798,7 +798,7 @@ predicateUsesCall(_:G):-
 
 
 % 	 	 
-%% sourceTextPredicate( ?VALUE1) is semidet.
+%% sourceTextPredicate( ?M) is semidet.
 %
 % Source Text Predicate.
 %
@@ -841,7 +841,7 @@ synth_clause_for(G,  B, Ref,Size, SYNTH):- \+ listing_filter(skipLarge), gripe_t
  
 
 % 	 	 
-%% synth_clause_for_l2( :Term_G29189, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5) is semidet.
+%% synth_clause_for_l2( :TermM, ?B, ?Ref, ?Size, ?SYNTH) is semidet.
 %
 % Synth Clause For (list Version) Extended Helper.
 %
@@ -851,7 +851,7 @@ synth_clause_for_l2(M:H,B,Ref,Size,SYNTH):-
 
 
 % 	 	 
-%% synth_clause_for_large( ?VALUE1, ?VALUE2, ?VALUE3, :Term_G10194, :GoalGOAL5, ?VALUE6) is semidet.
+%% synth_clause_for_large( ?M, ?B, ?Ref, :TermKeySorted, :GoalSize, ?M) is semidet.
 %
 % Synth Clause For Large.
 %
@@ -864,7 +864,7 @@ synth_clause_for_large(M:H,B,Ref,KeySorted,Size,m_clause(M,H,B,Ref)):-
 :- export((synth_clause_ref/5)).
 
 % 	 	 
-%% synth_clause_ref( :Term_G16338, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5) is semidet.
+%% synth_clause_ref( :TermARG1, ?B, ?Ref, ?Size, ?CALL) is semidet.
 %
 % Synth Clause Ref.
 %
@@ -935,7 +935,7 @@ term_matches_hb(D,HO,H,B):- \+ \+ term_matches_unify(D,HO,(H:-B)).
 :- export(term_matches_unify/3).
 
 % 	 	 
-%% term_matches_unify( :GoalR, ?VALUE2, ?V) is semidet.
+%% term_matches_unify( :GoalR, ?V, ?V) is semidet.
 %
 % Term Matches Unify.
 %
@@ -967,7 +967,7 @@ nonvar_search(F/A):-!,nonvar(F),nonvar(A).
 
 
 % 	 	 
-%% cur_predicate( :Term_G22291, :Term_G22420) is semidet.
+%% cur_predicate( :TermM, :TermM) is semidet.
 %
 % Cur Predicate.
 %
@@ -1147,7 +1147,7 @@ mp(_,P,MP):-MP=P.
 :- export(bad_pred/1).
 
 % 	 	 
-%% bad_pred( :Term_G3153) is semidet.
+%% bad_pred( :TermM) is semidet.
 %
 % Bad Predicate.
 %
@@ -1312,7 +1312,7 @@ use_listing_vars(TF):-set_prolog_flag(listing_vars,TF).
 :- multifile prolog:locate_clauses/2.
 
 % 	 	 
-%% prolog:locate_clauses( ?A, ?OutOthers) is semidet.
+%% locate_clauses( ?A, ?OutOthers) is semidet.
 %
 % Hook To [prolog:locate_clauses/2] For Module Logicmoo_util_term_listing.
 % Locate Clauses.
@@ -1355,7 +1355,7 @@ prolog_listing_list_clauses(Pred, Source) :-
 :- abolish(prolog_listing:list_clauses/2).
 
 % 	 	 
-%% prolog_listing:list_clauses( ?Pred, ?Source) is semidet.
+%% list_clauses( ?Pred, ?Source) is semidet.
 %
 % Hook To [prolog_listing:list_clauses/2] For Module Logicmoo_util_term_listing.
 % List Clauses.

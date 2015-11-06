@@ -294,7 +294,7 @@ if_main(G):-(thread_self(M),lmcache:thread_main(_,M))->G ; true.
 
 
 % 	 	 
-%% deduceEachArg_WithArgIsa( ?VALUE1, ?VALUE2, :Term_G10150) is semidet.
+%% deduceEachArg_WithArgIsa( ?F, ?N, :TermA) is semidet.
 %
 % deduce each Argument With Argument  (isa/2).
 %
@@ -598,7 +598,7 @@ nonground_throw_else_fail(C):- not_is_release,not(ground(C)),!,( (test_tl(t_l:al
 
 
 % 	 	 
-%% with_logical_functor( ?UPARAM1, ?UPARAM2, :PRED1VALUE3) is semidet.
+%% with_logical_functor( ?UPARAM1, ?G, :PRED1Call) is semidet.
 %
 % Using Logical Functor.
 %
@@ -662,7 +662,7 @@ make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 special_head(_,F,Why):-special_head0(F,Why),!,show_failure(why,not(isa(F,prologDynamic))).
 
 % 	 	 
-%% special_head0( ?VALUE1, ?VALUE2) is semidet.
+%% special_head0( ?F, ?VALUE2) is semidet.
 %
 % Special Head Primary Helper.
 %
@@ -861,7 +861,7 @@ add_0(A):-trace_or_throw(fmt('ain/1 is failing ~q.',[A])).
 
 
 % 	 	 
-%% implied_skipped( ?VALUE1) is semidet.
+%% implied_skipped( ?C0) is semidet.
 %
 % Implied Skipped.
 %
@@ -1024,7 +1024,7 @@ equals_call(X,Y):-compound(X),compound(Y),once((correctArgsIsa(X,XX),correctArgs
 
 
 % 	 	 
-%% confirm_hook( :Term_G21744) is semidet.
+%% confirm_hook( :TermCNEW) is semidet.
 %
 % Confirm Hook.
 %
@@ -1091,7 +1091,7 @@ mpred_modify(Op,                 G):- trace_or_throw(unknown_database_modify(Op,
 
 
 % 	 	 
-%% database_modify_0( ?VALUE1, ?VALUE2) is semidet.
+%% database_modify_0( ?Op, ?M) is semidet.
 %
 % database modify  Primary Helper.
 %
@@ -1109,7 +1109,7 @@ database_modify_0(change(assert,AZ),          G):- database_modify_assert(change
 % database_modify_assert(change(assert,AZ),       G):- expire_pre_change(AZ,GG),fail.
 
 % 	 	 
-%% database_modify_assert( :Term_G23445, ?VALUE2) is semidet.
+%% database_modify_assert( :TermAorZ, ?G) is semidet.
 %
 % Database Modify Assert.
 %
@@ -1172,7 +1172,7 @@ hooked_retractall(G):- Op = change(retract,all),
 
 
 % 	 	 
-%% lmconf:mpred_provide_storage_op( ?Op, ?G) is semidet.
+%% mpred_provide_storage_op( ?Op, ?G) is semidet.
 %
 % Hook To [lmconf:mpred_provide_storage_op/2] For Module Mpred_storage.
 % Managed Predicate Provide Storage Oper..
@@ -1181,7 +1181,7 @@ lmconf:mpred_provide_storage_op(Op,G):- get_functor(G,F,A),lmconf:mpred_provide_
 
 
 % 	 	 
-%% lmconf:mpred_provide_storage_op( ?Op, ?G, ?F, ?A) is semidet.
+%% mpred_provide_storage_op( ?Op, ?G, ?F, ?A) is semidet.
 %
 % Hook To [lmconf:mpred_provide_storage_op/4] For Module Mpred_storage.
 % Managed Predicate Provide Storage Oper..

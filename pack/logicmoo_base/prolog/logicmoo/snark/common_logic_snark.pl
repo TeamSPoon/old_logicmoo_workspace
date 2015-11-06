@@ -349,7 +349,7 @@ correct_arities(H,Fml,FmlM):- Fml=..[F|ARGS],must_maplist(correct_arities(H),ARG
 :- was_export(subsT_each/3).
 
 % 	 	 
-%% subsT_each( ?VALUE1, :Term_G27481, ?VALUE3) is semidet.
+%% subsT_each( ?In, :TermARG2, ?In) is semidet.
 %
 % Subs True Stucture Each.
 %
@@ -625,7 +625,7 @@ adjust_kif0(KB,KIF,OP,ARGS,Conj):-must_maplist(adjust_kif(KB),ARGS,ABO),adjust_k
 
 
 % 	 	 
-%% adjust_kif5( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5) is semidet.
+%% adjust_kif5( ?KB, ?KIF, ?VALUE3, ?ARGS, ?Conj) is semidet.
 %
 % Adjust Kif5.
 %
@@ -699,7 +699,7 @@ fmtl(X):- as_prolog(X,XX), fmt(XX).
 
 
 % 	 	 
-%% write_list( ?VALUE1) is semidet.
+%% write_list( ?F) is semidet.
 %
 % Write List.
 %
@@ -750,7 +750,7 @@ numbervars_with_names(Term,CTerm):-
 
 
 % 	 	 
-%% get_var_names( :Term_G27552, ?VALUE2, :Term_G28188) is semidet.
+%% get_var_names( :TermV, ?NamedVars, :TermS) is semidet.
 %
 % Get Variable Names.
 %
@@ -929,7 +929,7 @@ kif_to_boxlog(WffIn0,KB0,Why0,FlattenedO):-
 
 
 % 	 	 
-%% lmconf:no_rewrites is semidet.
+%% no_rewrites is semidet.
 %
 % Hook To [lmconf:no_rewrites/0] For Module Common_logic_snark.
 % No Rewrites.
@@ -1186,7 +1186,7 @@ tkif:- kif_test_string(TODO),kif_io(string(TODO),current_output).
 
 
 % 	 	 
-%% lmconf:regression_test is semidet.
+%% regression_test is semidet.
 %
 % Hook To [lmconf:regression_test/0] For Module Common_logic_snark.
 % Regression Test.
@@ -1303,7 +1303,7 @@ kif_ask_sent(Wff):-
 :- was_export(kif_ask/1).
 
 % 	 	 
-%% kif_ask( :Term_G6911) is semidet.
+%% kif_ask( :TermP) is semidet.
 %
 % Knowledge Interchange Format Complete Inference.
 %
@@ -1611,7 +1611,7 @@ use_was_isa_h(I,T,ISA):- to_isa_out(I,T,ISA),!.
 
 
 % 	 	 
-%% generate_ante( :Term_G5812, :Term_G5941, ?VALUE3, ?VALUE4) is semidet.
+%% generate_ante( :TermARG1, :TermARG2, ?InOut, ?InOut) is semidet.
 %
 % Generate Ante.
 %

@@ -141,7 +141,7 @@ transitive_except(NotIn,X,A,B):- memberchk_same_two(A,NotIn)-> (B=A,!) ;((once(o
 
 
 % 	 	 
-%% memberchk_same_two( ?VALUE1, :Term_G13565) is semidet.
+%% memberchk_same_two( ?X, :TermY0) is semidet.
 %
 % Memberchk Same Two.
 %
@@ -307,14 +307,14 @@ can_fail(G):-not(G=true),not(G=must(_)).
 % get_where(When)
 
 % 	 	 
-%% get_where( :Term_G22285) is semidet.
+%% get_where( :TermB) is semidet.
 %
 % Get Where.
 %
 get_where(B:L):-get_where0(F:L),file_base_name(F,B).
 
 % 	 	 
-%% get_where0( :GoalGOAL1) is semidet.
+%% get_where0( :GoalF) is semidet.
 %
 % Get Where Primary Helper.
 %
@@ -615,7 +615,7 @@ outside_of_loop_check:- (clause(lmcache:ilc(_),B)->B=(!,fail);true).
 % user:term_expansion(LC,LCOO):-nonvar(LC),(LC=(H:-B)),lco_goal_expansion(B,BE),B\=@=BE,((H:-BE)=LCOO).
 
 % 	 	 
-%% system:goal_expansion( ?Math, ?MathGoal) is semidet.
+%% goal_expansion( ?Math, ?MathGoal) is semidet.
 %
 % Hook To [system:goal_expansion/2] For Module Logicmoo_util_loop_check.
 % Goal Expansion.

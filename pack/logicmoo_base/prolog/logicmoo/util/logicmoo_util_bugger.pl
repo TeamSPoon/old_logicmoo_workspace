@@ -506,7 +506,7 @@ ignore_each(A):-ignore(A).
 
 
 % 	 	 
-%% must_maplist( :PRED1VALUE1, ?UPARAM2) is semidet.
+%% must_maplist( :PRED1Goal, ?Elem) is semidet.
 %
 % Must Be Successfull Maplist.
 %
@@ -520,7 +520,7 @@ must_maplist(Goal, [Elem|Tail]) :-
 %	As must_maplist/2, operating on pairs of elements from two lists.
 
 % 	 	 
-%% must_maplist( :PRED2VALUE1, ?UPARAM2, ?UPARAM3) is semidet.
+%% must_maplist( :PRED2Goal, ?Elem1, ?Elem2) is semidet.
 %
 % Must Be Successfull Maplist.
 %
@@ -531,7 +531,7 @@ must_maplist( Goal, [Elem1|Tail1], [Elem2|Tail2]) :-
 
 
 % 	 	 
-%% must_maplist( :PRED3VALUE1, ?UPARAM2, ?UPARAM3, ?UPARAM4) is semidet.
+%% must_maplist( :PRED3Goal, ?Elem1, ?Elem2, ?Elem3) is semidet.
 %
 % Must Be Successfull Maplist.
 %
@@ -651,7 +651,7 @@ set_prolog_flag(N,V):- current_prolog_flag(N,VV),!,
 
 
 % 	 	 
-%% define_if_missing( :PRED3VALUE1, ?VALUE2) is semidet.
+%% define_if_missing( :PRED3M, ?List) is semidet.
 %
 % Define If Missing.
 %
@@ -810,7 +810,7 @@ bugger_atom_change0(_CM,T,_F,FH,FA,FF):- current_predicate_module(T,M1),atom_con
 % = %= :- meta_predicate (bugger_atom_change(:,(-))).
 
 % 	 	 
-%% bugger_atom_change( ?CALL1, -IN2) is semidet.
+%% bugger_atom_change( ?CM, -TT) is semidet.
 %
 % Logic Moo Debugger Atom Change.
 %
@@ -840,7 +840,7 @@ differnt_modules(User2,User1):- User1 \== User2.
 % = %= :- meta_predicate (bugger_goal_expansion(:,-)).
 
 % 	 	 
-%% bugger_goal_expansion( ?CALL1, -IN2) is semidet.
+%% bugger_goal_expansion( ?CM, -TT) is semidet.
 %
 % Logic Moo Debugger Goal Expansion.
 %
@@ -884,7 +884,7 @@ format_safe(A,B):-catchv(format(A,B),E,(dumpST,dtrace_msg(E:format(A,B)))).
 % = %= :- meta_predicate (bugger_term_expansion(:,-)).
 
 % 	 	 
-%% bugger_term_expansion( ?CALL1, -IN2) is semidet.
+%% bugger_term_expansion( ?CM, -TT) is semidet.
 %
 % Logic Moo Debugger Term Expansion.
 %
@@ -994,9 +994,8 @@ shrink_clause( HB,HB).
 %	with Rest. Element comparision is done using ==/2.
 
 % 	 	 
-%% hprolog:list_difference_eq( :Term_G6160, ?VALUE2, ?VALUE3) is semidet.
+%% list_difference_eq( :TermX, ?Ys, ?L) is semidet.
 %
-% Hook To [hprolog:list_difference_eq/3] For Module Logicmoo_util_bugger.
 % List Difference Using (==/2) (or =@=/2) ).
 %
 list_difference_eq([],_,[]).
@@ -1008,7 +1007,7 @@ list_difference_eq([X|Xs],Ys,L) :-
  	).
 
 % 	 	 
-%% list_difference_eq_memberchk_eq( ?VALUE1, :Term_G12214) is semidet.
+%% list_difference_eq_memberchk_eq( ?X, :TermY) is semidet.
 %
 % List Difference Using (==/2) (or =@=/2) ) Memberchk Using (==/2) (or =@=/2) ).
 %
@@ -1019,7 +1018,7 @@ list_difference_eq_memberchk_eq(X, [Y|Ys]) :- (  X == Y -> true ;  list_differen
 
 
 % 	 	 
-%% meta_interp_signal( :Term_G13956) is semidet.
+%% meta_interp_signal( :TermV) is semidet.
 %
 % Meta Interp Signal.
 %
@@ -1056,7 +1055,7 @@ meta_interp(CE,A):- show_call(why,call(CE,meta_call(A))).
 
 
 % 	 	 
-%% bugger_flag( :Term_G22044) is semidet.
+%% bugger_flag( :TermF) is semidet.
 %
 % Logic Moo Debugger Flag.
 %
@@ -1108,7 +1107,7 @@ once_if_ground(Call,!):-once(Call).
 
 
 % 	 	 
-%% to_list_of( ?VALUE1, :Term_G19843, ?VALUE3) is semidet.
+%% to_list_of( ?VALUE1, :TermRest, ?Rest) is semidet.
 %
 % Converted To List Of.
 %
@@ -1600,7 +1599,7 @@ forall_member(C,C1,Call):-forall(member(C,C1),once(Call)).
 
 
 % 	 	 
-%% must_assign( :Term_G25847) is semidet.
+%% must_assign( :TermFrom) is semidet.
 %
 % Must Be Successfull Assign.
 %
@@ -1798,7 +1797,7 @@ kill_term_expansion:-
 
 
 % 	 	 
-%% local_predicate( ?P, :Term_G24162) is semidet.
+%% local_predicate( ?P, :TermARG2) is semidet.
 %
 % Local Predicate.
 %
@@ -1897,7 +1896,7 @@ on_prolog_ecall_override(_F,_A,_Var, Value, Value).
 
 
 % 	 	 
-%% bin_ecall( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
+%% bin_ecall( ?F, ?A, ?VALUE3, ?VALUE4) is semidet.
 %
 % Bin Ecall.
 %
@@ -1984,7 +1983,7 @@ prolog_ecall_fa(_,Wrapper,_F,_A,Call):-
 
 
 % 	 	 
-%% replace_elements( :Term_G27815, ?VALUE2, ?VALUE3, :Term_G28958) is semidet.
+%% replace_elements( :TermA, ?A, ?B, :TermB) is semidet.
 %
 % Replace Elements.
 %
@@ -2143,7 +2142,7 @@ showProfilerStatistics(FileMatch):-
 
 
 % 	 	 
-%% if_prolog( ?UPARAM1, :GoalGOAL2) is semidet.
+%% if_prolog( ?UPARAM1, :GoalG) is semidet.
 %
 % If Prolog.
 %
@@ -2377,7 +2376,7 @@ loggerFmtReal(S,F,A):-
 
 
 % 	 	 
-%% loading_module( ?VALUE1, ?VALUE2) is semidet.
+%% loading_module( ?M, ?U) is semidet.
 %
 % Loading Module.
 %
@@ -2418,7 +2417,7 @@ prolog_current_frame_or_parent(Frame,Each):- Each=Frame;
 caller_module(Module):-caller_module(Module,v(function_expansion,func,user,'$toplevel','$apply','$expand')).
 
 % 	 	 
-%% t_l:caller_module( ?Module, ?Skipped) is semidet.
+%% caller_module( ?Module, ?Skipped) is semidet.
 %
 % Hook To [t_l:caller_module/2] For Module Logicmoo_util_bugger.
 % Caller Module.
@@ -2428,7 +2427,7 @@ caller_module(Module,Skipped):- module_stack(Module,_), \+ arg(_,Skipped,Module)
 :- module_transparent(module_stack(-,-)).
 
 % 	 	 
-%% module_stack( ?VALUE1, ?VALUE2) is semidet.
+%% module_stack( ?M, ?VALUE2) is semidet.
 %
 % Module Stack.
 %
@@ -2550,7 +2549,7 @@ writeFileToStream(Dest,Filename):-
 debugFmtList(ListI):-hotrace((copy_term(ListI,List),debugFmtList0(List,List0),randomVars(List0),dmsg(List0))),!.
 
 % 	 	 
-%% debugFmtList0( :Term_G9834, :Term_G9963) is semidet.
+%% debugFmtList0( :TermA, :TermB) is semidet.
 %
 % Debug Format List Primary Helper.
 %

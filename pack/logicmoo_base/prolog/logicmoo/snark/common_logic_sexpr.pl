@@ -23,7 +23,7 @@
 
 
 % 	 	 
-%% fixvars( ?VALUE1, ?VALUE2, :Term_G9442, ?VALUE4) is semidet.
+%% fixvars( ?P, ?VALUE2, :TermARG3, ?P) is semidet.
 %
 % Fixvars.
 %
@@ -229,7 +229,7 @@ parse_sexpr_codes(Codes, Expr) :- phrase(sexpr(Expr), Codes).
 
 
 % 	 	 
-%%  ?VALUE1--> ?VALUE2 is semidet.
+%%  ?V--> ?V is semidet.
 %
 % -->.
 %
@@ -374,7 +374,7 @@ to_untyped(ExprI,ExprO):- ExprI=..Expr,
 
 
 % 	 	 
-%% remove_incompletes( :Term_G27344, :Term_G27473) is semidet.
+%% remove_incompletes( :TermN, :TermCBefore) is semidet.
 %
 % Remove Incompletes.
 %
@@ -517,7 +517,7 @@ stream_source_typed(I,Expr):-   l_open_input(I,In),
 
 
 % 	 	 
-%% lowcase( :Term_G26367, :Term_G26496) is semidet.
+%% lowcase( :TermC1, :TermC2) is semidet.
 %
 % Lowcase.
 %
@@ -575,7 +575,7 @@ run(Program, Values) :-
 
 
 % 	 	 
-%% unfunc( :Term_G14984, :Term_G15113) is semidet.
+%% unfunc( :TermS, :TermS) is semidet.
 %
 % Unfunc.
 %
@@ -587,7 +587,7 @@ unfunc([Q0|Qs0], [Q|Qs]) :- unfunc(Q0, Q), unfunc(Qs0, Qs).
 
 
 % 	 	 
-%% fold( :Term_G20343, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
+%% fold( :TermARG1, ?VALUE2, ?V, ?V) is semidet.
 %
 % Fold.
 %
@@ -688,7 +688,7 @@ goal_truth(Goal, T) --> { Goal -> T = t ; T = [] }.
 
 
 % 	 	 
-%% bind_arguments( :Term_G10577, :Term_G10706, ?VALUE3, ?VALUE4) is semidet.
+%% bind_arguments( :TermARG1, :TermARG2, ?Bs, ?Bs) is semidet.
 %
 % Bind Arguments.
 %

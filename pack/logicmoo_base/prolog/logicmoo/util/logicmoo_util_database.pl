@@ -189,7 +189,7 @@ ain0(N):-notrace(clause_asserted(N))->true;mpred_op_prolog(assert,N).
 :- meta_predicate mpred_op_prolog(?,:).
 
 % 	 	 
-%% mpred_op_prolog( ?UPARAM1, ?CALL2) is semidet.
+%% mpred_op_prolog( ?UPARAM1, ?N) is semidet.
 %
 % Managed Predicate Oper. Prolog.
 %
@@ -246,7 +246,7 @@ eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(cla
 :-multifile(lmconf:next_lmconf:mpred_provider/2).
 
 % 	 	 
-%% lmconf:mpred_provider( ?OP, ?Term, ?PROVIDER) is semidet.
+%% mpred_provider( ?OP, ?Term, ?PROVIDER) is semidet.
 %
 % Hook To [lmconf:mpred_provider/3] For Module Logicmoo_util_database.
 % Managed Predicate Provider.
@@ -388,7 +388,7 @@ ainz_clause(H,B):- clause_asserted(H,B)->true;call_provider(assertz((H:-B))).
 
 
 % 	 	 
-%% as_clause( ?UPARAM1, ?UPARAM2, ?UPARAM3) is semidet.
+%% as_clause( ?M, ?M, ?B) is semidet.
 %
 % Converted To Clause.
 %
@@ -420,7 +420,7 @@ clause_asserted(H,B):-clause_asserted(H,B,_),!.
 :-meta_predicate(clause_asserted(:,?,-)).
 
 % 	 	 
-%% clause_asserted( ?CALL1, ?UPARAM2, -IN3) is semidet.
+%% clause_asserted( ?M, ?B, -R) is semidet.
 %
 % Clause Asserted.
 %
@@ -432,7 +432,7 @@ clause_asserted(M:H,B,R):- clause(M:H,B,R),clause(M:CH,CB,R),(CH:-CB)=@=(H:-B).
 %modulize_head(_:G,O:G):- !, no_repeats_old(O,(current_module(M),'$get_predicate_attribute'(M:G, imported, O))).
 
 % 	 	 
-%% modulize_head( ?UPARAM1, ?UPARAM2) is semidet.
+%% modulize_head( ?R, ?M) is semidet.
 %
 % Modulize Head.
 %
@@ -476,7 +476,7 @@ safe_univ(Call,List):-hotrace(safe_univ0(Call,List)),!.
 
 
 % 	 	 
-%% safe_univ0( ?VALUE1, :Term_G6705) is semidet.
+%% safe_univ0( ?M, :TermN) is semidet.
 %
 % Safely Paying Attention To Corner Cases Univ Primary Helper.
 %

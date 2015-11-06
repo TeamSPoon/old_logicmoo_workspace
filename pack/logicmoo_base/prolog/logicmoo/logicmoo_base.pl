@@ -38,7 +38,7 @@
 
 
 % 	 	 
-%% lmconf:mpred_system_kb( ?VALUE1) is semidet.
+%% mpred_system_kb( ?VALUE1) is semidet.
 %
 % Hook To [lmconf:mpred_system_kb/1] For Module Logicmoo_base.
 % Managed Predicate System Knowledge Base.
@@ -61,7 +61,7 @@ lmconf:mpred_system_kb(baseKB).
 :- dynamic(lmconf:mpred_is_impl_file/1).
 
 % 	 	 
-%% lmconf:mpred_is_impl_file( ?VALUE1) is semidet.
+%% mpred_is_impl_file( ?A) is semidet.
 %
 % Hook To [lmconf:mpred_is_impl_file/1] For Module Logicmoo_base.
 % Managed Predicate If Is A Implimentation File.
@@ -105,7 +105,7 @@ disable_mpred_system(Module):- with_mutex(mpred_system_mutex,lmconf:disable_mpre
 
 
 % 	 	 
-%% lmconf:enable_mpred_system0( ?Module) is semidet.
+%% enable_mpred_system0( ?Module) is semidet.
 %
 % Hook To [lmconf:enable_mpred_system0/1] For Module Logicmoo_base.
 % Enable Managed Predicate System Primary Helper.
@@ -126,7 +126,7 @@ lmconf:enable_mpred_system0(Module):-
 
 
 % 	 	 
-%% lmconf:disable_mpred_system0( ?Module) is semidet.
+%% disable_mpred_system0( ?Module) is semidet.
 %
 % Hook To [lmconf:disable_mpred_system0/1] For Module Logicmoo_base.
 % Disable Managed Predicate System Primary Helper.

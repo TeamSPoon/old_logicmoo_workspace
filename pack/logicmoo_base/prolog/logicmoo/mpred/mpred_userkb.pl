@@ -233,9 +233,8 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 :-asserta((~(G):- cwc, neg_in_code(G))).
 
 % 	 	 
-%% mpred_pfc: ~( ?VALUE1) is semidet.
+%% ~( ?VALUE1) is semidet.
 %
-% Hook To [mpred_pfc: ~ / 1] For Module Basekb.
 % ~.
 %
 ~(tCol('$VAR')).
@@ -366,7 +365,7 @@ resolverConflict_robot(C) :- cwc, must((mpred_remove3(C),wdmsg("Rem-3 with confl
 % never_assert_u(pt(_,Pre,Post),head_singletons(Pre,Post)):- cwc, head_singletons(Pre,Post).
 
 % 	 	 
-%% never_assert_u( :Term_G9607, ?VALUE2) is semidet.
+%% never_assert_u( :TermRule, ?Rule) is semidet.
 %
 % Never Assert For User Code.
 %
@@ -387,7 +386,7 @@ never_assert_u(pt(_,
 
 
 % 	 	 
-%% never_assert_u0( :Term_G15357, ?VALUE2) is semidet.
+%% never_assert_u0( :TermARG1, ?Why) is semidet.
 %
 % Never Assert For User Code Primary Helper.
 %

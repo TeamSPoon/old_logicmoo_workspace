@@ -212,7 +212,7 @@ filematch_ext(Ext,FileIn,File):-
 :- export(enumerate_files/2).
 
 % 	 	 
-%% enumerate_files( ?CALL1, -IN2) is semidet.
+%% enumerate_files( ?CALL1, -Result) is semidet.
 %
 % Enumerate Files.
 %
@@ -354,7 +354,7 @@ concat_paths(ParentIn,Child,Result):- filematch(ParentIn,Parent),
 :- export(concat_paths/2).
 
 % 	 	 
-%% concat_paths( :Term_G18887, ?VALUE2) is semidet.
+%% concat_paths( :TermJoined, ?Result) is semidet.
 %
 % Concat Paths.
 %
@@ -654,7 +654,7 @@ time_file_safe(F,INNER_XML):-exists_file_safe(F),!,time_file(F,INNER_XML).
 :- meta_predicate(if_file_exists(:)).
 
 % 	 	 
-%% if_file_exists( ?CALL1) is semidet.
+%% if_file_exists( ?M) is semidet.
 %
 % If File Exists.
 %

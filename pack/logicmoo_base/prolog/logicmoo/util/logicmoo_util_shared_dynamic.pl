@@ -34,7 +34,7 @@ wrap_shared(t,2,req).
 
 
 % 	 	 
-%% system_goal_expansion_sd( :TermT, :Term_G5614) is semidet.
+%% system_goal_expansion_sd( :TermT, :TermARG2) is semidet.
 %
 % System Goal Expansion Sd.
 %
@@ -44,7 +44,7 @@ system_goal_expansion_sd(T,I):- functor(T,F,A),wrap_shared(F,A,How),safe_wrap(T,
 
 
 % 	 	 
-%% safe_wrap( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% safe_wrap( ?I, ?VALUE2, ?I) is semidet.
 %
 % Safely Paying Attention To Corner Cases Wrap.
 %
@@ -70,7 +70,7 @@ decl_shared(M):-atom(M),!,asserta_if_new(logicmoo_util_shared_dynamic:wrap_share
 
 
 % 	 	 
-%% system:goal_expansion( ?Math, ?MathGoal) is semidet.
+%% goal_expansion( ?Math, ?MathGoal) is semidet.
 %
 % Hook To [system:goal_expansion/2] For Module Logicmoo_util_shared_dynamic.
 % Goal Expansion.
