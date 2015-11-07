@@ -12,7 +12,7 @@
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_term_listing.pl
 :- module(logicmoo_util_term_listing,
-          [ b_i/2,
+          [ blob_count/2,
           use_listing_vars/0,
           use_listing_vars/1,
           use_xlisting/0,
@@ -114,7 +114,7 @@
         unify_listing_header(:, ?, ?),
         xlisting_inner(3, +, +).
 :- module_transparent
-        b_i/2,
+        blob_count/2,
         bad_pred/1,
         blob_info/3,
         bookeepingPredicateXRef/1,
@@ -195,7 +195,8 @@
 
 :- export(mstatistics/0).
 
-% 	 	 
+%= 	 	 
+
 %% mstatistics is semidet.
 %
 % Mstatistics.
@@ -211,13 +212,14 @@ mstatistics:-
   OdC is O/C,
   OdA is (A/1000)*39,
   PerAtom is (Mm/A),
-  b_i(L,NA),
+  blob_count(L,NA),
   save_atoms,
   fmt((stack/clauses/mem/new + O/C/T-Tm/NA = c(OdC)/a(OdA-AM-PerAtom))),!,
   (NA<1000->fmt(L);true).
 
 
-% 	 	 
+%= 	 	 
+
 %% current_atom_or_blob( ?X, ?VALUE2) is semidet.
 %
 % Current Atom Or Blob.
@@ -229,7 +231,8 @@ current_atom_or_blob(X,key):-current_key(X).
 current_atom_or_blob(X,flag):-current_key(X).
 
 
-% 	 	 
+%= 	 	 
+
 %% blob_info( ?A, :TermARG2, :TermA) is semidet.
 %
 % Blob Info.
@@ -244,34 +247,38 @@ blob_info(A,blob((record)),blob(A,T,Y)):-T=(record),with_output_to(string(Y),pri
 % blob_info(A,blob(T),blob(A,T,Y)):-with_output_to(string(Y),prolog_term_view:emit_term(A, [])).
 blob_info(A,blob(T),blob(A,T)).
 
-:- export(saved_current_atom/2).
-:- dynamic(saved_current_atom/2).
-:- export(new_atoms/2).
+:- export(tlbugger:saved_current_atom/2).
+:- dynamic(tlbugger:saved_current_atom/2).
+:- export(tlbugger:new_atoms/2).
 
-% 	 	 
+%= 	 	 
+
 %% new_atoms( ?X, ?Type) is semidet.
 %
 % New Atoms.
 %
-new_atoms(X,Type):-current_atom_or_blob(X,Type),not(saved_current_atom(X,Type)).
+new_atoms(X,Type):-current_atom_or_blob(X,Type),\+(tlbugger:saved_current_atom(X,Type)).
 :- export(save_atoms/0).
 
-% 	 	 
+%= 	 	 
+
 %% save_atoms is semidet.
 %
 % Save Atoms.
 %
-save_atoms:-forall(new_atoms(X,Type),assert(saved_current_atom(X,Type))).
-:- export(b_i/2).
+save_atoms:-forall(new_atoms(X,Type),assert(tlbugger:saved_current_atom(X,Type))).
+:- export(blob_count/2).
 
-% 	 	 
-%% b_i( ?L, ?NA) is semidet.
+%= 	 	 
+
+%% blob_count( ?L, ?NA) is semidet.
 %
 % Backtackable For Internal Interface.
 %
-b_i(L,NA):-findall(W,(new_atoms(X,Type),once(blob_info(X,Type,W))),LL),list_to_set(LL,L),length(L,NA).
+blob_count(L,NA):-findall(W,(new_atoms(X,Type),once(blob_info(X,Type,W))),LL),list_to_set(LL,L),length(L,NA).
 
-% 	 	 
+%= 	 	 
+
 %% print_record_properties( ?Record, ?Out) is semidet.
 %
 % Print Record Properties.
@@ -285,7 +292,8 @@ print_record_properties(Record, Out) :-
 	).
 
 
-% 	 	 
+%= 	 	 
+
 %% print_clause_properties( ?REF, ?Out) is semidet.
 %
 % Print Clause Properties.
@@ -299,7 +307,8 @@ print_clause_properties(REF, Out) :-
 	).
 
 
-% 	 	 
+%= 	 	 
+
 %% make_searchable_index( ?PI) is semidet.
 %
 % Make Searchable Index.
@@ -307,14 +316,16 @@ print_clause_properties(REF, Out) :-
 make_searchable_index(PI):- forall(to_pi(PI,H),forall(clause(H,B,Ref),make_searchable_ref((H:-B),Ref))).
 
 
-% 	 	 
+%= 	 	 
+
 %% m_clause( ?M, ?H, ?B, ?R) is semidet.
 %
 % Module Clause.
 %
 m_clause(M,H,B,R):- catch(m_clause0(M,H,B,R),E,R=missing(M,H,B,E)).
 
-% 	 	 
+%= 	 	 
+
 %% m_clause_no_missing( ?M, ?H, ?B, ?R) is semidet.
 %
 % Module Clause No Missing.
@@ -322,7 +333,8 @@ m_clause(M,H,B,R):- catch(m_clause0(M,H,B,R),E,R=missing(M,H,B,E)).
 m_clause_no_missing(M,H,B,R):- catch(m_clause0(M,H,B,R),_,fail).
 
 
-% 	 	 
+%= 	 	 
+
 %% m_clause0( ?M, ?H, ?B, ?R) is semidet.
 %
 % Module Clause Primary Helper.
@@ -334,7 +346,8 @@ m_clause0(M,H,B,R):- atom(M),!, clause(H,M:B,R).
 :- thread_local(t_l:tl_hide_data/1).
 
 
-% 	 	 
+%= 	 	 
+
 %% clause_ref( ?HB, ?Ref) is semidet.
 %
 % Clause Ref.
@@ -342,21 +355,24 @@ m_clause0(M,H,B,R):- atom(M),!, clause(H,M:B,R).
 clause_ref(HB,Ref):-as_clause_w_m( HB, M, H, B),m_clause_no_missing(M,H,B,Ref).
 
 
-% 	 	 
+%= 	 	 
+
 %% make_searchable( ?HB) is semidet.
 %
 % Make Searchable.
 %
 make_searchable(HB):- must(clause_ref(HB,Ref)),make_searchable_ref(HB,Ref).
 
-% 	 	 
+%= 	 	 
+
 %% make_searchable_ref( ?HB, ?Ref) is semidet.
 %
 % Make Searchable Ref.
 %
 make_searchable_ref(HB,Ref):-searchable_of_clause(HB,List),make_searchable_list_ref(List,Ref).
 
-% 	 	 
+%= 	 	 
+
 %% make_searchable_list_ref( ?List, ?Ref) is semidet.
 %
 % Make Searchable List Ref.
@@ -364,7 +380,8 @@ make_searchable_ref(HB,Ref):-searchable_of_clause(HB,List),make_searchable_list_
 make_searchable_list_ref(List,Ref):- maplist(save_search_ref(Ref),List).
 
 
-% 	 	 
+%= 	 	 
+
 %% searchable_of_clause( :TermH, ?List) is semidet.
 %
 % Searchable Of Clause.
@@ -376,7 +393,8 @@ searchable_of_clause(':-'(H,B),List):-!,searchable_of_clause_1(H,[B],List).
 searchable_of_clause(H,List):-searchable_of_clause_0(H,List).
 
 
-% 	 	 
+%= 	 	 
+
 %% searchable_of_clause_0( ?C, :TermARG2) is semidet.
 %
 % searchable of clause  Primary Helper.
@@ -388,7 +406,8 @@ searchable_of_clause_0([H|T],[F|List]):- L=[H|T],!,functor(L,F,_),searchable_of_
 searchable_of_clause_0(C,[funct(F,A),F|List]):- C=..[F,H|T],functor(C,F,A),searchable_of_clause_1(H,T,List).
 
 
-% 	 	 
+%= 	 	 
+
 %% searchable_of_clause_1( :TermH, ?List) is semidet.
 %
 % searchable of clause  Secondary Helper.
@@ -397,7 +416,8 @@ searchable_of_clause_1([],[]).
 searchable_of_clause_1([H|T],List):-searchable_of_clause_1(H,T,List).
 
 
-% 	 	 
+%= 	 	 
+
 %% searchable_of_clause_1( ?H, ?T, ?List) is semidet.
 %
 % searchable of clause  Secondary Helper.
@@ -407,7 +427,8 @@ searchable_of_clause_1(H,T,List):-searchable_of_clause_0(H,List1),searchable_of_
 
 :- dynamic(search_refs_use_recorded/0).
 
-% 	 	 
+%= 	 	 
+
 %% search_refs_use_recorded is semidet.
 %
 % Search Refs Use Recorded.
@@ -415,7 +436,8 @@ searchable_of_clause_1(H,T,List):-searchable_of_clause_0(H,List1),searchable_of_
 search_refs_use_recorded.
 
 
-% 	 	 
+%= 	 	 
+
 %% searchable_terms( ?T) is semidet.
 %
 % Searchable Terms.
@@ -425,7 +447,8 @@ searchable_terms(T):-unify_in_thread(main,searchable_terms_tl(T)).
  
 :- use_module(library(dialect/ifprolog),[]).
 
-% 	 	 
+%= 	 	 
+
 %% searchable_terms_tl( ?T) is semidet.
 %
 % Searchable Terms Thread Local.
@@ -434,14 +457,16 @@ searchable_terms_tl(T):- ifprolog:current_global(Key),unmake_search_key(Key,T).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% make_search_key( ?E, ?Atomic) is semidet.
 %
 % Make Search Key.
 %
 make_search_key(E,Atomic):-E=..L,atomic_list_concat(['$search'|L],'%',Atomic).
 
-% 	 	 
+%= 	 	 
+
 %% unmake_search_key( ?Atomic, ?E) is semidet.
 %
 % Unmake Search Key.
@@ -449,7 +474,8 @@ make_search_key(E,Atomic):-E=..L,atomic_list_concat(['$search'|L],'%',Atomic).
 unmake_search_key(Atomic,E):-atomic_list_concat(['$search'|L],'%',Atomic),E=..L.
 
 
-% 	 	 
+%= 	 	 
+
 %% get_search_ref( ?E, ?Results) is semidet.
 %
 % Get Search Ref.
@@ -457,7 +483,8 @@ unmake_search_key(Atomic,E):-atomic_list_concat(['$search'|L],'%',Atomic),E=..L.
 get_search_ref(E,Results):-make_search_key(E,Atomic),get_search_ref0(Atomic,Results).
 
 
-% 	 	 
+%= 	 	 
+
 %% get_search_ref0( ?Atomic, ?Results) is semidet.
 %
 % Get Search Ref Primary Helper.
@@ -467,7 +494,8 @@ get_search_ref0(Atomic,Results):- unify_in_thread(main,once(get_search_ref_tl(At
 
 
 
-% 	 	 
+%= 	 	 
+
 %% unify_in_thread( +Thread, :GoalGoal) is semidet.
 %
 % Unify In Thread.
@@ -482,7 +510,8 @@ unify_in_thread(Thread,Goal):-
          message_queue_destroy(Id)).
 
 
-% 	 	 
+%= 	 	 
+
 %% process_unify_in_thread( ?Message, ?Goal) is semidet.
 %
 % Process Unify In Thread.
@@ -493,7 +522,8 @@ process_unify_in_thread(result(Goal0),Goal1):-!,Goal0=Goal1.
 process_unify_in_thread(Message,Goal):-throw(unknown_process_unify_in_thread(Message,Goal)).
 
 
-% 	 	 
+%= 	 	 
+
 %% unify_in_thread_tl( ?Id, :GoalGoal) is semidet.
 %
 % Unify In Thread Thread Local.
@@ -501,7 +531,8 @@ process_unify_in_thread(Message,Goal):-throw(unknown_process_unify_in_thread(Mes
 unify_in_thread_tl(Id,Goal):- catch((forall(Goal,thread_send_message(Id,result(Goal))),thread_send_message(Id,failed(Goal))), E,thread_send_message(Id,thrown(E))).
 
 
-% 	 	 
+%= 	 	 
+
 %% get_search_ref_tl( ?Atomic, ?Refs) is semidet.
 %
 % Get Search Ref Thread Local.
@@ -509,7 +540,8 @@ unify_in_thread_tl(Id,Goal):- catch((forall(Goal,thread_send_message(Id,result(G
 get_search_ref_tl(Atomic,Refs):- nb_current(Atomic,Refs)->true;Refs=[].
 
 
-% 	 	 
+%= 	 	 
+
 %% save_search_ref( ?Ref, ?E) is semidet.
 %
 % Save Search Ref.
@@ -517,7 +549,8 @@ get_search_ref_tl(Atomic,Refs):- nb_current(Atomic,Refs)->true;Refs=[].
 save_search_ref(Ref,E):-make_search_key(E,Atomic),save_search_ref_0(Ref,Atomic).
 
 
-% 	 	 
+%= 	 	 
+
 %% save_search_ref_0( ?Ref, ?Atomic) is semidet.
 %
 % save search ref  Primary Helper.
@@ -526,7 +559,8 @@ save_search_ref_0(Ref,Atomic):- search_refs_use_recorded,!, save_search_ref_reco
 save_search_ref_0(Ref,Atomic):- thread_signal(main,save_search_ref_tl(Ref,Atomic)).
 
 
-% 	 	 
+%= 	 	 
+
 %% save_search_ref_recorded( ?Ref, ?Atomic) is semidet.
 %
 % Save Search Ref Recorded.
@@ -535,7 +569,8 @@ save_search_ref_recorded(Ref,Atomic):-recorded(Atomic,Ref),!.
 save_search_ref_recorded(Ref,Atomic):-recordz(Atomic,Ref).
 
 
-% 	 	 
+%= 	 	 
+
 %% save_search_ref_tl( ?Ref, ?Atomic) is semidet.
 %
 % Save Search Ref Thread Local.
@@ -549,10 +584,10 @@ save_search_ref_tl(Ref,Atomic):-nb_setval(Atomic,[Ref]).
 :- multifile lmconf:shared_hide_data/1.
 
 
-% 	 	 
-%% shared_hide_data( :PRED4VALUE1) is semidet.
+%= 	 	 
+
+%% shared_hide_data( ?VALUE1) is semidet.
 %
-% Hook To [lmconf:shared_hide_data/1] For Module Logicmoo_util_term_listing.
 % Shared Hide Data.
 %
 lmconf:shared_hide_data(lmcache:varname_info/4):- !,listing_filter(hideMeta).
@@ -560,7 +595,8 @@ lmconf:shared_hide_data(lmcache:_):- listing_filter(hideMeta).
 lmconf:shared_hide_data(wid):- listing_filter(hideMeta).
 
 
-% 	 	 
+%= 	 	 
+
 %% listing_filter( ?P) is semidet.
 %
 % Listing Filter.
@@ -568,7 +604,8 @@ lmconf:shared_hide_data(wid):- listing_filter(hideMeta).
 listing_filter(P):-cnotrace(hide_data0(P)).
 
 
-% 	 	 
+%= 	 	 
+
 %% hide_data0( :TermP) is semidet.
 %
 % Hide Data Primary Helper.
@@ -585,7 +622,8 @@ hide_data0(M:P):- atom(M),(listing_filter(M);hide_data0(P)).
 
 :- meta_predicate unify_listing(:).
 
-% 	 	 
+%= 	 	 
+
 %% unify_listing( ?Cntxt) is semidet.
 %
 % Unify Listing.
@@ -595,7 +633,8 @@ unify_listing(Cntxt:Pred):-functor_safe(Pred,F,A),unify_listing(Cntxt:Pred,F,A),
 
 :- meta_predicate unify_listing_header(:).
 
-% 	 	 
+%= 	 	 
+
 %% unify_listing_header( ?Pred) is semidet.
 %
 % Unify Listing Header.
@@ -604,7 +643,8 @@ unify_listing_header(Pred):-functor_safe(Pred,F,A),unify_listing_header(Pred,F,A
 
 :- meta_predicate unify_listing_header(:,?,?).
 
-% 	 	 
+%= 	 	 
+
 %% unify_listing_header( ?CntxtPred, ?F, ?A) is semidet.
 %
 % Unify Listing Header.
@@ -618,7 +658,8 @@ unify_listing_header(_Cntxt:_FileMatch,_F,_A).
 
 :- meta_predicate unify_listing(:,?,?).
 
-% 	 	 
+%= 	 	 
+
 %% unify_listing( ?Cntxt, ?F, ?A) is semidet.
 %
 % Unify Listing.
@@ -626,14 +667,16 @@ unify_listing_header(_Cntxt:_FileMatch,_F,_A).
 unify_listing(Cntxt:Pred,F,A):- unify_listing_header(Cntxt:Pred,F,A), Cntxt:printAll(Pred).
 
 
-% 	 	 
+%= 	 	 
+
 %% printAll( :GoalCall) is semidet.
 %
 % Print All.
 %
 printAll(Call):-printAll(Call,Call).
 
-% 	 	 
+%= 	 	 
+
 %% printAll( :GoalCall, ?Print) is semidet.
 %
 % Print All.
@@ -658,7 +701,8 @@ contains_term_unifiable(SearchThis,Find):-compound(SearchThis),functor_safe(Sear
 :- export(xlisting/1).
 :- module_transparent(xlisting/1).
 
-% 	 	 
+%= 	 	 
+
 %% xlisting( ?Match) is semidet.
 %
 % Xlisting.
@@ -677,14 +721,16 @@ xlisting(Match):- mpred_match_listing_skip_pi(Match,[]),!. % ,w_tl(t_l:no_xlisti
 :- export(plisting/1).
 :- module_transparent(plisting/1).
 
-% 	 	 
+%= 	 	 
+
 %% plisting( ?Match) is semidet.
 %
 % Plisting.
 %
 plisting(Match):- w_tl(t_l:no_xlisting(Match),logicmoo_util_term_listing:plisting_0(Match)).
 
-% 	 	 
+%= 	 	 
+
 %% plisting_0( ?Match) is semidet.
 %
 % plisting  Primary Helper.
@@ -695,7 +741,8 @@ plisting_0(Match):- findall(G,to_pi(Match,G),Gs),
 
 :- export(mpred_match_listing/1).
 
-% 	 	 
+%= 	 	 
+
 %% mpred_match_listing( ?Match) is semidet.
 %
 % Managed Predicate Match Listing.
@@ -704,7 +751,8 @@ mpred_match_listing(Match):- mpred_match_listing_skip_pi(Match,[]).
 :- export(mpred_match_listing_skip_pi/2).
 :- meta_predicate mpred_match_listing_skip_pi(+,+).
 
-% 	 	 
+%= 	 	 
+
 %% mpred_match_listing_skip_pi( +Match, +SkipPI) is semidet.
 %
 % Managed Predicate Match Listing Skip Predicate Indicator.
@@ -719,7 +767,8 @@ mpred_match_listing_skip_pi(Match,SkipPI):-
 
 
 
-% 	 	 
+%= 	 	 
+
 %% get_matcher_code( ?Match, ?H, ?B, ?MATCHER) is semidet.
 %
 % Get Matcher Code.
@@ -729,7 +778,8 @@ get_matcher_code(Match,H,B,MATCHER):-  MATCHER = term_matches_hb(Match,H,B).
 
 :- meta_predicate xlisting_inner(3,+,+).
 
-% 	 	 
+%= 	 	 
+
 %% xlisting_inner( :PRED3Pred, +Match, +SkipPI) is semidet.
 %
 % Xlisting Inner.
@@ -751,7 +801,8 @@ xlisting_inner(Pred,Match,SkipPI):-
 
 :- multifile user:prolog_list_goal/1.
 
-% 	 	 
+%= 	 	 
+
 %% prolog_list_goal( :TermGoal) is semidet.
 %
 % Hook To [user:prolog_list_goal/1] For Module Logicmoo_util_term_listing.
@@ -766,7 +817,8 @@ user:prolog_list_goal(Goal):- cnotrace(xlisting(Goal)). % writeq(hello(prolog_li
 :- dynamic(lmconf:no_buggery/0).
 
 
-% 	 	 
+%= 	 	 
+
 %% buggery_ok is semidet.
 %
 % Buggery Ok.
@@ -779,7 +831,8 @@ buggery_ok :- \+ compiling, current_predicate(_:logicmoo_bugger_loaded/0), \+ lm
 
 % bookeepingPredicate(M:G):- member(M:F/A,[M:'$exported_op'/3]),current_module(M),functor(G,F,A),once(predicate_property(M:G,_)).
 
-% 	 	 
+%= 	 	 
+
 %% bookeepingPredicateXRef( :TermARG1) is semidet.
 %
 % Bookeeping Predicate X Ref.
@@ -787,7 +840,8 @@ buggery_ok :- \+ compiling, current_predicate(_:logicmoo_bugger_loaded/0), \+ lm
 bookeepingPredicateXRef(file_search_path(_,_)).
 bookeepingPredicateXRef(_:G):-member(F/A,[xref_defined/3,xref_called/3,xref_exported/2]),functor(G,F,A).
 
-% 	 	 
+%= 	 	 
+
 %% predicateUsesCall( :TermARG1) is semidet.
 %
 % Predicate Uses Call.
@@ -797,7 +851,8 @@ predicateUsesCall(_:G):-
             source_file/2,current_prolog_flag/2,current_op/3]),functor(G,F,A).
 
 
-% 	 	 
+%= 	 	 
+
 %% sourceTextPredicate( ?M) is semidet.
 %
 % Source Text Predicate.
@@ -810,7 +865,8 @@ sourceTextPredicate(M:G):- source_file((M:el_holds(_,_,_,_,_,_,_)),F) -> source_
 sourceTextPredicate(_):-fail.
 
 
-% 	 	 
+%= 	 	 
+
 %% sourceTextPredicateSource( ?VALUE1) is semidet.
 %
 % Source Text Predicate Source.
@@ -820,7 +876,8 @@ sourceTextPredicateSource(_):-fail.
 :- thread_local(t_l:large_predicates/2).
 
 
-% 	 	 
+%= 	 	 
+
 %% plisting_1 is semidet.
 %
 % plisting  Secondary Helper.
@@ -828,7 +885,8 @@ sourceTextPredicateSource(_):-fail.
 plisting_1:-plisting(basePFC:spft('$ABOX',_,_,_,_)).
 
 
-% 	 	 
+%= 	 	 
+
 %% synth_clause_for( ?G, ?B, :GoalRef, :PRED222Size, ?SYNTH) is semidet.
 %
 % Synth Clause For.
@@ -840,7 +898,8 @@ synth_clause_for(G,true,0,222, SYNTH):-  sourceTextPredicate(G), \+ listing_filt
 synth_clause_for(G,  B, Ref,Size, SYNTH):- \+ listing_filter(skipLarge), gripe_time(10,synth_clause_for_l2(G,B,Ref,Size,SYNTH)).
  
 
-% 	 	 
+%= 	 	 
+
 %% synth_clause_for_l2( :TermM, ?B, ?Ref, ?Size, ?SYNTH) is semidet.
 %
 % Synth Clause For (list Version) Extended Helper.
@@ -850,7 +909,8 @@ synth_clause_for_l2(M:H,B,Ref,Size,SYNTH):-
   synth_clause_for_large(M:H,B,Ref,KeySorted,Size,SYNTH).
 
 
-% 	 	 
+%= 	 	 
+
 %% synth_clause_for_large( ?M, ?B, ?Ref, :TermKeySorted, :GoalSize, ?M) is semidet.
 %
 % Synth Clause For Large.
@@ -863,7 +923,8 @@ synth_clause_for_large(M:H,B,Ref,KeySorted,Size,m_clause(M,H,B,Ref)):-
 
 :- export((synth_clause_ref/5)).
 
-% 	 	 
+%= 	 	 
+
 %% synth_clause_ref( :TermARG1, ?B, ?Ref, ?Size, ?CALL) is semidet.
 %
 % Synth Clause Ref.
@@ -879,7 +940,8 @@ synth_clause_ref(M:H,B,Ref,Size, SYNTH):- predicate_property(M:H,number_of_claus
 
 
 
-% 	 	 
+%= 	 	 
+
 %% synth_in_listing( ?MH) is semidet.
 %
 % Synth In Listing.
@@ -891,14 +953,16 @@ synth_in_listing(MH):- ( \+ listing_filter(MH), \+ sourceTextPredicateSource(MH)
 
 
 
-% 	 	 
+%= 	 	 
+
 %% term_matches_hb( ?HO, ?H, ?B) is semidet.
 %
 % Term Matches Head+body.
 %
 term_matches_hb(HO,H,B):-term_matches_hb(999,HO,H,B).
 
-% 	 	 
+%= 	 	 
+
 %% term_matches_hb( ?VALUE1, :TermVar, ?VALUE3, ?VALUE4) is semidet.
 %
 % Term Matches Head+body.
@@ -934,7 +998,8 @@ term_matches_hb(D,HO,H,B):- \+ \+ term_matches_unify(D,HO,(H:-B)).
 
 :- export(term_matches_unify/3).
 
-% 	 	 
+%= 	 	 
+
 %% term_matches_unify( :GoalR, ?V, ?V) is semidet.
 %
 % Term Matches Unify.
@@ -950,7 +1015,8 @@ term_matches_unify(R,HO,V):- RR is R -1, compound_name_arguments(V,F,ARGS),membe
 
 
 
-% 	 	 
+%= 	 	 
+
 %% nonvar_search( :TermV) is semidet.
 %
 % Nonvar Search.
@@ -966,7 +1032,8 @@ nonvar_search(F/A):-!,nonvar(F),nonvar(A).
 :- export((cur_predicate)/2).
 
 
-% 	 	 
+%= 	 	 
+
 %% cur_predicate( :TermM, :TermM) is semidet.
 %
 % Cur Predicate.
@@ -1023,7 +1090,8 @@ to_mp(P,_,P):-nonvar(P),!.
 
 :- export(ok_show/1).
 
-% 	 	 
+%= 	 	 
+
 %% ok_show( ?P) is semidet.
 %
 % Ok Show.
@@ -1037,7 +1105,8 @@ ok_show(P):-not(bad_pred(P)).
 % we redfine list_undefined/1 .. this is the old version
 :- export(scansrc_list_undefined/1).
 
-% 	 	 
+%= 	 	 
+
 %% scansrc_list_undefined( ?A) is semidet.
 %
 % Scansrc List Undefined.
@@ -1048,7 +1117,8 @@ scansrc_list_undefined(A):- real_list_undefined(A).
 
 :- export(real_list_undefined/1).
 
-% 	 	 
+%= 	 	 
+
 %% real_list_undefined( ?A) is semidet.
 %
 % Real List Undefined.
@@ -1068,7 +1138,8 @@ real_list_undefined(A):-
 
 :- export(mmake/0).
 
-% 	 	 
+%= 	 	 
+
 %% mmake is semidet.
 %
 % Mmake.
@@ -1078,21 +1149,24 @@ mmake:- lmcache:thread_main(user,Main),!,thread_signal(Main,catch(((ignore(updat
 
 :- export(update_changed_files/0).
 
-% 	 	 
+%= 	 	 
+
 %% update_changed_files is semidet.
 %
 % Update Changed Files.
 %
 update_changed_files:-!,thread_signal(main,update_changed_files0).
 
-% 	 	 
+%= 	 	 
+
 %% update_changed_files0 is semidet.
 %
 % Update Changed Files Primary Helper.
 %
 update_changed_files0 :- current_main_error_stream(Err),with_output_to(Err,update_changed_files1).
 
-% 	 	 
+%= 	 	 
+
 %% update_changed_files1 is semidet.
 %
 % Update Changed Files Secondary Helper.
@@ -1118,7 +1192,8 @@ update_changed_files1 :-
 :- export(remove_undef_search/0).
 % check:list_undefined:-real_list_undefined([]).
 
-% 	 	 
+%= 	 	 
+
 %% remove_undef_search is semidet.
 %
 % Remove Undef Search.
@@ -1135,7 +1210,8 @@ remove_undef_search:- ((
 
 
 
-% 	 	 
+%= 	 	 
+
 %% mp( ?M, ?P, ?MP) is semidet.
 %
 % Module Goal.
@@ -1146,7 +1222,8 @@ mp(_,P,MP):-MP=P.
 
 :- export(bad_pred/1).
 
-% 	 	 
+%= 	 	 
+
 %% bad_pred( :TermM) is semidet.
 %
 % Bad Predicate.
@@ -1162,7 +1239,8 @@ bad_pred(M:P):-!,atom(M),bad_pred(P).
 :- export(portray_hb/2).
 
 
-% 	 	 
+%= 	 	 
+
 %% portray_hbr( :TermH, :TermB, ?R) is semidet.
 %
 % Portray Hbr.
@@ -1179,7 +1257,8 @@ portray_hbr(H,B,R):-nonvar(R),catch((clause_property(R,_),fail),_,portray_hbr(H,
 portray_hbr(H,B,_):-portray_hb(H,B),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% portray_hb( ?H, ?B) is semidet.
 %
 % Portray Head+body.
@@ -1191,7 +1270,8 @@ portray_hb(H,B):- portray_one_line((H:-B)), format('~N').
 :- thread_local(lmconf:portray_one_line_hook/1).
 
 
-% 	 	 
+%= 	 	 
+
 %% portray_one_line( ?H) is semidet.
 %
 % Portray One Line.
@@ -1207,14 +1287,16 @@ portray_one_line(H):- writeq(H),write('.'),nl,!.
 
 :- thread_local t_l:last_portray_key/1.
 
-% 	 	 
+%= 	 	 
+
 %% maybe_separate( ?H, :GoalHow) is semidet.
 %
 % Maybe Separate.
 %
 maybe_separate(H,How):-make_headkey(H,HK),maybe_separate_0(HK,How).
 
-% 	 	 
+%= 	 	 
+
 %% maybe_separate_0( ?NK, :GoalHow) is semidet.
 %
 % maybe separate  Primary Helper.
@@ -1229,7 +1311,8 @@ maybe_separate_0(NK,How):-
          asserta(t_l:last_portray_key(NK))),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% make_headkey( :TermH, :TermNK) is semidet.
 %
 % Make Headkey.
@@ -1246,7 +1329,8 @@ make_headkey(H,NK):-copy_term(H,NK),numbervars(NK),!.
 
 
 
-% 	 	 
+%= 	 	 
+
 %% pp_listing( ?Pred) is semidet.
 %
 % Pretty Print Listing.
@@ -1256,7 +1340,8 @@ pp_listing(Pred):- functor_safe(Pred,F,A),functor_safe(FA,F,A),findall(NV,predic
 
 
 
-% 	 	 
+%= 	 	 
+
 %% pi_to_head_l( ?Head, ?Head) is semidet.
 %
 % Predicate Indicator Converted To Head (list Version).
@@ -1272,32 +1357,37 @@ pi_to_head_l(Head, Head).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% use_xlisting is semidet.
 %
 % Use Xlisting.
 %
 use_xlisting:- use_xlisting(true).
 
-% 	 	 
+%= 	 	 
+
 %% use_xlisting( ?TF) is semidet.
 %
 % Use Xlisting.
 %
 use_xlisting(TF):- set_prolog_flag(xlisting,TF).
 
-% 	 	 
+%= 	 	 
+
 %% use_listing_vars is semidet.
 %
 % Use Listing Variables.
 %
 use_listing_vars:- use_listing_vars(true),scan_for_varnames.
 
-% 	 	 
+%= 	 	 
+
 %% use_listing_vars( ?TF) is semidet.
 %
 % Use Listing Variables.
 %
+use_listing_vars(TF):-var(TF),current_prolog_flag(listing_vars,TF).
 use_listing_vars(TF):-set_prolog_flag(listing_vars,TF).
 
 % :- use_module(logicmoo_util_bugger).
@@ -1311,7 +1401,8 @@ use_listing_vars(TF):-set_prolog_flag(listing_vars,TF).
 % Hook that prints additional information about source code
 :- multifile prolog:locate_clauses/2.
 
-% 	 	 
+%= 	 	 
+
 %% locate_clauses( ?A, ?OutOthers) is semidet.
 %
 % Hook To [prolog:locate_clauses/2] For Module Logicmoo_util_term_listing.
@@ -1331,35 +1422,50 @@ prolog:locate_clauses(A, OutOthers) :-
 
 % Replacement that prints variables in source code
 
-% 	 	 
+%= 	 	 
+
 %% prolog_listing_list_clauses( ?Pred, ?Source) is semidet.
 %
 % Prolog Listing List Clauses.
 %
-prolog_listing_list_clauses(Pred, Source) :-
-       (current_prolog_flag(listing_vars,true)->scan_for_varnames;true),
-	strip_module(Pred, Module, Head),
-	(   clause(Pred, Body),
-           once(current_prolog_flag(listing_vars,true)->
-                         get_clause_vars_copy((Pred:-Body),ForPrint);(ForPrint=((Pred:-Body)),
-                         nop(prolog_listing:write_module(Module, Source, Head)))),
+prolog_listing_list_clauses(PredIn, Source) :-  current_prolog_flag(listing_vars,true),!,
+       scan_for_varnames,
+       strip_module(PredIn, ModuleIn, Head),   
+      ((current_predicate(_,Module:Head), \+ predicate_property(Module:Head,imported_from(_)))-> true ; Module=ModuleIn),
+       Pred = Module:Head,
+      (current_prolog_flag(listing_docs,true)-> autodoc_pred(Module,Pred); true),
+       (    clause(Pred, Body),
+            get_clause_vars_copy((Head:-Body),ForPrint),
+            prolog_listing:write_module(Module, Source, Head),
             prolog_listing:portray_clause(ForPrint),
 	    fail
 	;   true
 	).
 
+% System Version 7.3.9
+prolog_listing_list_clauses(PredIn, Source) :-
+        strip_module(PredIn, ModuleIn, Head),
+        ((current_predicate(_,Module:Head), \+ predicate_property(Module:Head,imported_from(_)))-> true ; Module=ModuleIn),
+        Pred = Module:Head,
+	(   clause(Pred, Body),
+	    prolog_listing:write_module(Module, Source, Head),
+	    prolog_listing:portray_clause((Head:-Body)),
+	    fail
+	;   true
+	).
 
 :- if(true).
+
 :- ensure_loaded(library(listing)).
 :- redefine_system_predicate(prolog_listing:list_clauses/2).
 :- abolish(prolog_listing:list_clauses/2).
 
-% 	 	 
-%% list_clauses( ?Pred, ?Source) is semidet.
+%% list_clauses( ?Pred, ?Context) is semidet.
 %
-% Hook To [prolog_listing:list_clauses/2] For Module Logicmoo_util_term_listing.
+% Override of [prolog_listing:list_clauses/2] For variable name printing and otehr attributes.
 % List Clauses.
 %
-prolog_listing:list_clauses(Pred, Source):- prolog_listing_list_clauses(Pred, Source).
+prolog_listing:list_clauses(Pred, Context):- prolog_listing_list_clauses(Pred, Context).
+
 :- endif.
 

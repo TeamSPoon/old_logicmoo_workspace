@@ -23,35 +23,40 @@
 
 
 
-% 	 	 
+%= 	 	 
+
 %% nobind0( ?X) is semidet.
 %
 % Nobind Primary Helper.
 %
 nobind0(X):- when((?=(X, Y);?=(X, X);?=(X, xx);nonvar(X)),unbind(X,Y)).
 
-% 	 	 
+%= 	 	 
+
 %% nobind1( ?X) is semidet.
 %
 % Nobind Secondary Helper.
 %
 nobind1(X):- multi(X,Y),freeze(X,unbind(X,Y)),put_attr(X, multi,[x(X)]), when((?=(X, Y);nonvar(X)),unbind(X,Y)).
 
-% 	 	 
+%= 	 	 
+
 %% nobind2( ?X) is semidet.
 %
 % Nobind Extended Helper.
 %
 nobind2(X):- when(?=(X, X),unbind(X,_)).
 
-% 	 	 
+%= 	 	 
+
 %% project_attributes( ?QueryVars, ?ResidualVars) is semidet.
 %
 % Project Attributes.
 %
 project_attributes(QueryVars, ResidualVars):-fmsg(project_attributes(QueryVars, ResidualVars)).
 
-% 	 	 
+%= 	 	 
+
 %% verify_attributes( ?Var, ?Other, ?Goals) is semidet.
 %
 % Verify Attributes.
@@ -59,7 +64,8 @@ project_attributes(QueryVars, ResidualVars):-fmsg(project_attributes(QueryVars, 
 verify_attributes(Var, Other, Goals) :- fmsg(verify_attributes(Var, Other, Goals)).
 
 
-% 	 	 
+%= 	 	 
+
 %% attr_unify_hook( ?X, ?Other) is semidet.
 %
 % Hook To [dom:attr_unify_hook/2] For Module Logicmoo_util_multivar.
@@ -69,7 +75,8 @@ attr_unify_hook(X, Other) :-  fmsg(attr_unify_hook(X, Other)).
 attr_unify_hook(mdif(V1,V2),Other) :- dif_attr_unify_hook(mdif(V1,V2),Other).
 
 
-% 	 	 
+%= 	 	 
+
 %% attribute_goals( ?X, ?In, ?Out) is semidet.
 %
 % Hook To [dom:attribute_goals/3] For Module Logicmoo_util_multivar.
@@ -77,7 +84,8 @@ attr_unify_hook(mdif(V1,V2),Other) :- dif_attr_unify_hook(mdif(V1,V2),Other).
 %
 attribute_goals(X,In,Out) :- get_attr(X, multi, List), fmsg(attribute_goals(X,In,Out,multi, List)), fail.
 
-% 	 	 
+%= 	 	 
+
 %%  ?V--> ?V is semidet.
 %
 % -->.
@@ -88,14 +96,16 @@ attribute_goals(X) -->
 
 
 
-% 	 	 
+%= 	 	 
+
 %% fmsg( ?D) is semidet.
 %
 % Functor Message.
 %
 fmsg(D):-format('~N',[]),writeq(dmsg(D)),nl,dumpST,!,fail.
 
-% 	 	 
+%= 	 	 
+
 %% fdmsg_and_fail( ?D) is semidet.
 %
 % Fdmsg And Fail.
@@ -104,7 +114,8 @@ fdmsg_and_fail(D):-format('~N',[]),writeq(D),nl,!,fail.
 
 
 
-% 	 	 
+%= 	 	 
+
 %% uhook( ?Module, ?AttVal, ?Value) is semidet.
 %
 % Hook To [logicmoo_util_multivar:uhook/3] For Module Logicmoo_util_multivar.
@@ -124,7 +135,8 @@ fdmsg_and_fail(D):-format('~N',[]),writeq(D),nl,!,fail.
 
 
 
-% 	 	 
+%= 	 	 
+
 %% $wakeup( ?Multi) is semidet.
 %
 % Hook To [logicmoo_util_multivar: $wakeup/1] For Module Logicmoo_util_multivar.
@@ -138,7 +150,8 @@ fdmsg_and_fail(D):-format('~N',[]),writeq(D),nl,!,fail.
 
 
 
-% 	 	 
+%= 	 	 
+
 %% unbind( ?X, ?Y) is semidet.
 %
 % Unbind.
@@ -146,7 +159,8 @@ fdmsg_and_fail(D):-format('~N',[]),writeq(D),nl,!,fail.
 unbind(X,Y):- writeq(X=Y),dumpST.
 
 
-% 	 	 
+%= 	 	 
+
 %% test_nb is semidet.
 %
 % Test Non Backtackable.
@@ -168,7 +182,8 @@ X = _G56.
 	portray_attvar/1.
 
 
-% 	 	 
+%= 	 	 
+
 %% portray_attvar( ?Var) is semidet.
 %
 % Hook To [logicmoo_varnames:portray_attvar/1] For Module Logicmoo_util_multivar.
@@ -185,7 +200,8 @@ X = _G56.
 :- use_module(library(ordsets)).
 
 
-% 	 	 
+%= 	 	 
+
 %% domain( ?X, ?Dom) is semidet.
 %
 % Domain.
@@ -202,7 +218,8 @@ domain(X, List) :-
 %       assigned the value Y
 
 
-% 	 	 
+%= 	 	 
+
 %% domain_attr_unify_hook( ?Domain, ?Y) is semidet.
 %
 % Domain Attr Unify Hook.
@@ -234,14 +251,16 @@ domain_attribute_goals(X) -->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% 	 	 
+%= 	 	 
+
 %% multi( ?X) is semidet.
 %
 % Multi.
 %
 multi(X) :- ignore(fdmsg_and_fail(multi_t(X))), dif_c_c(X,zNotz,_).
 
-% 	 	 
+%= 	 	 
+
 %% multi( ?X, ?Y) is semidet.
 %
 % Multi.
@@ -253,7 +272,8 @@ multi(X,Y) :- ignore(fdmsg_and_fail(multi_t(X,Y))), X \== Y,  dif_c_c(X,Y,_).
 %%	node(Parent,Children,Variables,Counter)
 
 
-% 	 	 
+%= 	 	 
+
 %% dif_c_c( ?X, ?Y, ?OrNode) is semidet.
 %
 % Hook To [dif:dif_c_c/3] For Module Logicmoo_util_multivar.
@@ -276,7 +296,8 @@ dif_c_c(X,Y,OrNode) :-
 
 
 
-% 	 	 
+%= 	 	 
+
 %% dif_c_c_l( ?Unifier, ?OrNode) is semidet.
 %
 % Hook To [dif:dif_c_c_l/2] For Module Logicmoo_util_multivar.
@@ -288,7 +309,8 @@ dif_c_c_l(Unifier,OrNode) :-
 	dif_c_c_l_aux(Unifier,OrNode,List,Tail).
 
 
-% 	 	 
+%= 	 	 
+
 %% extend_ornode( ?OrNode, ?N, ?List, ?Vars) is semidet.
 %
 % Hook To [dif:extend_ornode/4] For Module Logicmoo_util_multivar.
@@ -305,7 +327,8 @@ extend_ornode(OrNode,N,List,Vars) :-
 	put_attr(OrNode,multi,node(O,List)).
 
 
-% 	 	 
+%= 	 	 
+
 %% dif_c_c_l_aux( :TermARG1, ?VALUE2, ?List, ?List) is semidet.
 %
 % Hook To [dif:dif_c_c_l_aux/4] For Module Logicmoo_util_multivar.
@@ -318,7 +341,8 @@ dif_c_c_l_aux([X=Y|Unifier],OrNode,List,Tail) :-
 	dif_c_c_l_aux(Unifier,OrNode,Rest,Tail).
 
 
-% 	 	 
+%= 	 	 
+
 %% add_ornode( ?X, ?Y, ?OrNode) is semidet.
 %
 % Hook To [dif:add_ornode/3] For Module Logicmoo_util_multivar.
@@ -333,7 +357,8 @@ add_ornode(X,Y,OrNode) :-
 	).
 
 
-% 	 	 
+%= 	 	 
+
 %% add_ornode_var1( ?X, ?Y, ?OrNode) is semidet.
 %
 % Hook To [dif:add_ornode_var1/3] For Module Logicmoo_util_multivar.
@@ -348,7 +373,8 @@ add_ornode_var1(X,Y,OrNode) :-
 	).
 
 
-% 	 	 
+%= 	 	 
+
 %% add_ornode_var2( ?X, ?Y, ?OrNode) is semidet.
 %
 % Hook To [dif:add_ornode_var2/3] For Module Logicmoo_util_multivar.
@@ -364,7 +390,8 @@ add_ornode_var2(X,Y,OrNode) :-
 
 
 
-% 	 	 
+%= 	 	 
+
 %% dif_attr_unify_hook( ?V1, ?Other) is semidet.
 %
 % Dif Attr Unify Hook.
@@ -392,7 +419,8 @@ dif_attr_unify_hook(mdif(V1,V2),Other) :-
 	).
 
 
-% 	 	 
+%= 	 	 
+
 %% remove_obsolete( :TermN, ?X, ?L) is semidet.
 %
 % Hook To [dif:remove_obsolete/3] For Module Logicmoo_util_multivar.
@@ -407,7 +435,8 @@ remove_obsolete([N-Y|T], X, L) :-
         ).
 
 
-% 	 	 
+%= 	 	 
+
 %% reverse_lookups( :TermN, ?Value, ?Nodes, ?Rest) is semidet.
 %
 % Hook To [dif:reverse_lookups/4] For Module Logicmoo_util_multivar.
@@ -425,7 +454,8 @@ reverse_lookups([N-X|NXs],Value,Nodes,Rest) :-
 	reverse_lookups(NXs,Value,RNodes,RRest).
 
 
-% 	 	 
+%= 	 	 
+
 %% verify_compounds( :TermOrNode, ?X) is semidet.
 %
 % Hook To [dif:verify_compounds/2] For Module Logicmoo_util_multivar.
@@ -444,7 +474,8 @@ verify_compounds([OrNode-Y|Rest],X) :-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% 	 	 
+%= 	 	 
+
 %% or_succeed( ?OrNode) is semidet.
 %
 % Hook To [dif:or_succeed/1] For Module Logicmoo_util_multivar.
@@ -462,7 +493,8 @@ or_succeed(OrNode) :-
 	).
 
 
-% 	 	 
+%= 	 	 
+
 %% or_one_fails( :TermN) is semidet.
 %
 % Hook To [dif:or_one_fails/1] For Module Logicmoo_util_multivar.
@@ -474,7 +506,8 @@ or_one_fails([N|Ns]) :-
 	or_one_fails(Ns).
 
 
-% 	 	 
+%= 	 	 
+
 %% or_one_fail( ?OrNode) is semidet.
 %
 % Hook To [dif:or_one_fail/1] For Module Logicmoo_util_multivar.
@@ -495,7 +528,8 @@ or_one_fail(OrNode) :-
 	).
 
 
-% 	 	 
+%= 	 	 
+
 %% del_or_dif( :TermX) is semidet.
 %
 % Hook To [dif:del_or_dif/1] For Module Logicmoo_util_multivar.
@@ -508,7 +542,8 @@ del_or_dif([X=Y|Xs]) :-
 	del_or_dif(Xs).
 
 
-% 	 	 
+%= 	 	 
+
 %% cleanup_dead_nodes( ?X) is semidet.
 %
 % Hook To [dif:cleanup_dead_nodes/1] For Module Logicmoo_util_multivar.
@@ -530,7 +565,8 @@ cleanup_dead_nodes(X) :-
 	).
 
 
-% 	 	 
+%= 	 	 
+
 %% filter_dead_ors( :TermOr, ?List) is semidet.
 %
 % Hook To [dif:filter_dead_ors/2] For Module Logicmoo_util_multivar.
@@ -586,7 +622,8 @@ mydif(Xs0, Ys0) --> [multi(X,Y)],
           X =.. [f|Xs], Y =.. [f|Ys] }.
 
 
-% 	 	 
+%= 	 	 
+
 %% eqs_lefts_rights( :TermA, :TermA, :TermB) is semidet.
 %
 % Hook To [dif:eqs_lefts_rights/3] For Module Logicmoo_util_multivar.

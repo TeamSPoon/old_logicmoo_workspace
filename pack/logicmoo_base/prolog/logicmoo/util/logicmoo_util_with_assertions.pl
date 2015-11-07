@@ -31,7 +31,8 @@
 :- include('logicmoo_util_header.pi').
 
 
-% 	 	 
+%= 	 	 
+
 %% with_no_x( :GoalG) is semidet.
 %
 % Using No X.
@@ -44,7 +45,8 @@ with_no_x(G):- call(G).
 % maybe this one wont use thread local checking
 % = :- meta_predicate(wtg(:,0)).
 
-% 	 	 
+%= 	 	 
+
 %% wtg( ?M, :GoalCall) is semidet.
 %
 % Wtg.
@@ -54,7 +56,8 @@ wtg(M:With,Call):- w_tl(M:With,Call).
 % = :- meta_predicate(w_tl(:,0)).
 
 
-% 	 	 
+%= 	 	 
+
 %% w_tl( ?CALL1, ?Call) is semidet.
 %
 % W Thread Local.
@@ -93,7 +96,8 @@ w_tl(WM:THeadWM,CM:Call):-
 
 
 
-% 	 	 
+%= 	 	 
+
 %% wno_tl( :GoalUHead, :GoalCall) is semidet.
 %
 % Wno Thread Local.
@@ -108,7 +112,8 @@ wno_tl(UHead,Call):-
 */
 
 
-% 	 	 
+%= 	 	 
+
 %% to_thread_head_1m( ?H, ?TL, ?HO, ?HH) is semidet.
 %
 % Converted To Thread Head 1m.
@@ -122,7 +127,8 @@ to_thread_head_1m(Head,t_l,t_l:Head,Head):-!,check_thread_local_1m(t_l:Head).
 to_thread_head_1m(Head,tlbugger,tlbugger:Head,Head):-check_thread_local_1m(tlbugger:Head).
 
 
-% 	 	 
+%= 	 	 
+
 %% check_thread_local_1m( ?TLHead) is semidet.
 %
 % Check Thread Local 1m.

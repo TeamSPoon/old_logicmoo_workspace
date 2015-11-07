@@ -8,35 +8,31 @@
 */
 :- module(logicmoo_snark,[]).
 
-
 :- thread_local(t_l:user_abox/1).
+
+% 	 	 
+%% with_ukb_snark( ?VALUE1, ?VALUE2) is semidet.
+%
+% Hook To [lh:with_ukb_snark/2] For Module Logicmoo_snark.
+% Using Ukb Snark.
+%
 lh:with_ukb_snark(KB,G):-w_tl(t_l:user_abox(KB),baseKB:G).
 
 %:- use_module(logicmoo_utils).
 %:- system:initialization(use_listing_vars).
 
-:- baseKB:ensure_loaded(baseKB:mpred/mpred_loader).
 :- add_import_module(baseKB,system,end).
 :- initialization(add_import_module(baseKB,system,end)).
 :- lh:with_ukb_snark(baseKB,baseKB:use_module(baseKB:logicmoo_base)).
-% :- my_loader(ML),system:use_module(ML:logicmoo_base).
-%:- (t_l:user_abox(M)->true;(source_context_module(M))),set_user_abox(M),dmsg(user_abox=M).
-%:- ensure_mpred_system.
-
-/*
-:- set_prolog_flag(report_error,true).
-:- set_prolog_flag(fileerrors,false).
-% :- set_prolog_flag(access_level,system).
-:- set_prolog_flag(debug_on_error,true).
-:- set_prolog_flag(debug,true).
-% :- set_prolog_flag(gc,false).
-:- set_prolog_flag(optimise,false).
-:- set_prolog_flag(last_call_optimisation,false).
-:- debug.
-*/
-
 
 :-export(checkKB:m1/0).
+
+% 	 	 
+%% m1 is semidet.
+%
+% Hook To [checkkb:m1/0] For Module Logicmoo_snark.
+% Module Secondary Helper.
+%
 checkKB:m1:- gripe_time(40,baseKB:ensure_loaded(baseKB:logicmoo(mpred_online/mpred_www))),if_defined(mpred_www:ensure_webserver), make,list_undefined.
 
 % :- hook_message_hook.

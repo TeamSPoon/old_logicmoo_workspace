@@ -71,7 +71,8 @@
 
 
 
-% 	 	 
+%= 	 	 
+
 %% pred_type_test( ?H, ?F) is semidet.
 %
 % Predicate Type Test.
@@ -81,7 +82,8 @@ pred_type_test(H,F):- \+ compound(F), !,atom(F),THFA=..[H,F/_],clause(THFA,true)
 pred_type_test(H,P):-functor(P,F,A),!,THFA=..[H,F/A],HF=..[H,F],(clause(THFA,true);clause(HF,true)).
 
 
-% 	 	 
+%= 	 	 
+
 %% pred_type_test2( ?T, :TermP) is semidet.
 %
 % Predicate Type Test Extended Helper.
@@ -91,7 +93,8 @@ pred_type_test2(T,F/A):-!,atom(F),arity(F,A),!,pred_type_test(T,F,A).
 pred_type_test2(T,P):-functor(P,F,A),!,pred_type_test(T,F,A).
 
 
-% 	 	 
+%= 	 	 
+
 %% pred_type_test( ?H, ?F, ?A) is semidet.
 %
 % Predicate Type Test.
@@ -101,7 +104,8 @@ pred_type_test(H,F,A):- THFA=..[H,F/A],HF=..[H,F],(clause(THFA,true);clause(HF,t
 
 
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_pi( ?PI) is semidet.
 %
 % Declare Managed Predicate Predicate Indicator.
@@ -109,7 +113,8 @@ pred_type_test(H,F,A):- THFA=..[H,F/A],HF=..[H,F],(clause(THFA,true);clause(HF,t
 decl_mpred_pi(PI):-ignore((ground(PI),compound(PI),decl_mpred(PI))).
 :- was_export(decl_mpred_mfa/3).
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_mfa( ?M, ?FF, ?A) is semidet.
 %
 % Declare Managed Predicate Module-functor-arity.
@@ -138,7 +143,8 @@ decl_mpred_mfa(M,FF,A):-
 :- was_export(decl_mpred_prolog/1).
 :- meta_predicate(decl_mpred_prolog(?)).
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_prolog( ?A) is semidet.
 %
 % Declare Managed Predicate Prolog.
@@ -149,7 +155,8 @@ decl_mpred_prolog(P):- with_pi(P,decl_mpred_prolog).
 
 :- was_export(decl_mpred_prolog/3).
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_prolog( ?M, ?F, ?A) is semidet.
 %
 % Declare Managed Predicate Prolog.
@@ -157,7 +164,8 @@ decl_mpred_prolog(P):- with_pi(P,decl_mpred_prolog).
 decl_mpred_prolog(M,F,A):-integer(A),!,must(functor(PI,F,A)),decl_mpred_prolog(M,PI,F/A).
 decl_mpred_prolog(M,PI,FA):- must(decl_mpred_prolog(_,M,PI,FA)).
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_prolog( ?F, ?A) is semidet.
 %
 % Declare Managed Predicate Prolog.
@@ -169,7 +177,8 @@ decl_mpred_prolog(F,Other):- decl_mpred(F,Other),
      decl_mpred_prolog(F0/A).
 :- was_export(decl_mpred_prolog/4).
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_prolog( ?CM, ?M, ?PI, ?FA) is semidet.
 %
 % Declare Managed Predicate Prolog.
@@ -177,7 +186,8 @@ decl_mpred_prolog(F,Other):- decl_mpred(F,Other),
 decl_mpred_prolog(CM,M,PI,FA):- loop_check(must(decl_mpred_prolog_ilc(CM,M,PI,FA)),true).
 
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_prolog_ilc( ?CM, ?M, ?PI, :TermF) is semidet.
 %
 % Declare Managed Predicate Prolog Inside Of Loop Checking.
@@ -185,7 +195,8 @@ decl_mpred_prolog(CM,M,PI,FA):- loop_check(must(decl_mpred_prolog_ilc(CM,M,PI,FA
 decl_mpred_prolog_ilc(CM,M,PI,F/A):-atom(PI),A==0,not(current_predicate(F/A)),!,must(arity(F,_)),forall((arity(F,AA),AA\=0),(functor(PIA,F,AA),decl_mpred_prolog_ilc(CM,M,PIA,F/AA))).
 decl_mpred_prolog_ilc(CM,M,PI,F/A):-loop_check_term(decl_mpred_prolog_ilc_0(CM,M,PI,F/A),decl_mpred_prolog_ilc(CM,M,F),true).
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_prolog_ilc_0( ?CM, ?M, ?PI, :TermF) is semidet.
 %
 % Declare Managed Predicate prolog Inside Of Loop Checking  Primary Helper.
@@ -206,7 +217,8 @@ decl_mpred_prolog_ilc_0(_CM,M,PI,F/A):-
 
 :- meta_predicate(decl_mpred_hybrid(?)).
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_hybrid( ?A) is semidet.
 %
 % Declare Managed Predicate Hybrid.
@@ -218,7 +230,8 @@ decl_mpred_hybrid(P):- with_pi(P,decl_mpred_hybrid).
 
 :- was_export((decl_mpred_hybrid)/3).
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_hybrid( ?M, ?F, ?A) is semidet.
 %
 % Declare Managed Predicate Hybrid.
@@ -227,7 +240,8 @@ decl_mpred_hybrid(M,F,A):-integer(A),!,must(functor(PI,F,A)),decl_mpred_hybrid(M
 decl_mpred_hybrid(M,PI,FA):- must(decl_mpred_hybrid(_,M,PI,FA)).
 
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_hybrid( ?F, ?A) is semidet.
 %
 % Declare Managed Predicate Hybrid.
@@ -240,7 +254,8 @@ decl_mpred_hybrid(F,Other):- decl_mpred(F,Other),
 
 :- was_export((decl_mpred_hybrid)/4).
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_hybrid( ?CM, ?M, ?PIN, ?FA) is semidet.
 %
 % Declare Managed Predicate Hybrid.
@@ -248,7 +263,8 @@ decl_mpred_hybrid(F,Other):- decl_mpred(F,Other),
 decl_mpred_hybrid(CM,M,PIN,FA):- unnumbervars(PIN,PI),loop_check(must(decl_mpred_hybrid_ilc(CM,M,PI,FA)),true).
 
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_hybrid_ilc( ?CM, ?M, ?PIN, :TermF) is semidet.
 %
 % Declare Managed Predicate Hybrid Inside Of Loop Checking.
@@ -258,7 +274,8 @@ decl_mpred_hybrid_ilc(CM,M,PI,F/A):-atom(PI),A==0,must(arity(F,_)),not(current_p
 
 decl_mpred_hybrid_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),loop_check_term(decl_mpred_hybrid_ilc_0(CM,M,PI,F/A),decl_mpred_hybrid_ilc(CM,M,F),true).
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_hybrid_ilc_0( ?CM, ?M, ?PI, :TermF) is semidet.
 %
 % Declare Managed Predicate hybrid Inside Of Loop Checking  Primary Helper.
@@ -299,14 +316,16 @@ mpred_isa(G,predProxyRetract(del)):- atom(G),prologMacroHead(G).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% get_mpred_prop( ?F, ?A, ?P) is semidet.
 %
 % Get Managed Predicate Prop.
 %
 get_mpred_prop(F,_A,P):-get_mpred_prop(F,P).
 
-% 	 	 
+%= 	 	 
+
 %% get_mpred_prop( ?F, ?P) is semidet.
 %
 % Get Managed Predicate Prop.
@@ -315,7 +334,8 @@ get_mpred_prop(F,P):- mreq(mpred_isa(F,P)).
 
 :- was_export(listprolog/0).
 
-% 	 	 
+%= 	 	 
+
 %% listprolog is semidet.
 %
 % Listprolog.
@@ -324,7 +344,8 @@ listprolog:-listing(mpred_isa(_,prologDynamic)).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% get_arity( :TermTerm, ?F, ?A) is semidet.
 %
 % Get Arity.
@@ -335,7 +356,8 @@ get_arity(M:FA,F,A):-atom(M),!,get_arity(FA,F,A).
 get_arity(FA,F,A):- get_functor(FA,F,A),must(A>0).
 
 
-% 	 	 
+%= 	 	 
+
 %% ensure_arity( ?VALUE1, ?VALUE2) is semidet.
 %
 % Ensure Arity.
@@ -343,7 +365,8 @@ get_arity(FA,F,A):- get_functor(FA,F,A),must(A>0).
 ensure_arity(F,A):- one_must(arity(F,A),one_must((current_predicate(F/A),(A>0),assert_arity(F,A)),(ground(F:A),(A>0),assert_arity(F,A)))),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% assert_arity( ?F, :PRED2A) is semidet.
 %
 % Assert Arity.
@@ -359,7 +382,8 @@ assert_arity(F,A):- ain_fast(arity(F,A)).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% good_pred_relation_name( ?F, ?A) is semidet.
 %
 % Good Predicate Relation Name.
@@ -367,7 +391,8 @@ assert_arity(F,A):- ain_fast(arity(F,A)).
 good_pred_relation_name(F,A):-not(bad_pred_relation_name0(F,A)).
 
 
-% 	 	 
+%= 	 	 
+
 %% bad_pred_relation_name0( ?V, ?VALUE2) is semidet.
 %
 % Bad Predicate Relation Name Primary Helper.
@@ -380,7 +405,8 @@ bad_pred_relation_name0('{}',_).
 bad_pred_relation_name0(',',_).
 bad_pred_relation_name0('[|]',_).
 
-% 	 	 
+%= 	 	 
+
 %% bad_pred_relation_name1( ?X, ?Y) is semidet.
 %
 % Bad Predicate Relation Name Secondary Helper.
@@ -400,7 +426,8 @@ bad_pred_relation_name1(F,A):-arity(F,AO), A \= AO.
 
 :- meta_predicate(decl_mpred(?)).
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred( ?M) is semidet.
 %
 % Declare Managed Predicate.
@@ -410,7 +437,8 @@ decl_mpred(M):-!,kb_dynamic(M).
 decl_mpred(M):-loop_check(with_pi(M,decl_mpred_4),true).
 
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_4( ?VALUE1, ?ARGS, :TermARG3) is semidet.
 %
 % Declare Managed Predicate Helper Number 4..
@@ -424,7 +452,8 @@ decl_mpred_4(M,PI,F/A):-
 
 :- was_export((decl_mpred)/2).
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred( ?C, ?A) is semidet.
 %
 % Declare Managed Predicate.
@@ -433,7 +462,8 @@ decl_mpred(C,A):- integer(A),!,decl_mpred(C/A).
 decl_mpred(C,More):- ignore(loop_check(decl_mpred_0(C,More),true)).
 
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_0( ?C, :TermMore) is semidet.
 %
 % Declare Managed Predicate  Primary Helper.
@@ -456,7 +486,8 @@ decl_mpred_0(F,T):-doall(( decl_mpred_2(F,T) )).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_2( ?F, ?A) is semidet.
 %
 % Declare Managed Predicate  Extended Helper.
@@ -471,14 +502,16 @@ decl_mpred_2(F,A):-once(lmconf:mpred_provide_write_attributes(F,A)).
 decl_mpred_2(F,Prop):-ain(mpred_isa(F,Prop)).
 
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred( ?Mt, ?F, ?A) is semidet.
 %
 % Declare Managed Predicate.
 %
 decl_mpred(Mt,F,A):-decl_mpred(F,A),ignore((nonvar(Mt),decl_mpred(F,mt(Mt)))).
 
-% 	 	 
+%= 	 	 
+
 %% decl_mpred_4( ?CM, ?M, ?PI, :TermF) is semidet.
 %
 % Declare Managed Predicate Helper Number 4..
@@ -488,7 +521,8 @@ decl_mpred_4(_CM,M,PI,F/A):-
 
 
 
-% 	 	 
+%= 	 	 
+
 %% functor_check_univ( ?G1, ?F, ?List) is semidet.
 %
 % Functor Check Univ.
@@ -498,7 +532,8 @@ functor_check_univ(G1,F,List):-must_det(compound(G1)),must_det(G1 \= _:_),must_d
 
 :- was_export(glean_pred_props_maybe/1).
 
-% 	 	 
+%= 	 	 
+
 %% glean_pred_props_maybe( ?G) is semidet.
 %
 % Glean Predicate Props Maybe.
@@ -507,7 +542,8 @@ glean_pred_props_maybe(_:G):-!,compound(G),w_tl(infConfidence(vWeak),forall(glea
 glean_pred_props_maybe(G):-compound(G),w_tl(infConfidence(vWeak),forall(glean_pred_props_maybe_some(G),true)).
 
 
-% 	 	 
+%= 	 	 
+
 %% glean_pred_props_maybe_some( ?VALUE1) is semidet.
 %
 % Glean Predicate Props Maybe Some.
@@ -516,7 +552,8 @@ glean_pred_props_maybe_some(G):-compound(G),G=..[F,Arg1|RGS],ttPredType(F),add_m
 % glean_pred_props_maybe_some(G):-arg(_,G,Arg1),compound(Arg1),arg(_,Arg1,Col),t(tCol,Col),w_tl(infConfidence(vWeak),assert_predArgTypes(Arg1)).
 
 
-% 	 	 
+%= 	 	 
+
 %% add_mpred_prop_gleaned( ?Arg1, ?FRGS) is semidet.
 %
 % Add Managed Predicate Prop Gleaned.
@@ -524,7 +561,8 @@ glean_pred_props_maybe_some(G):-compound(G),G=..[F,Arg1|RGS],ttPredType(F),add_m
 add_mpred_prop_gleaned(M:Arg1,FRGS):-atom(M),!,add_mpred_prop_gleaned(Arg1,FRGS).
 add_mpred_prop_gleaned(Arg1,FRGS):-functor_check_univ(Arg1,F,ARGSISA),add_mpred_prop_gleaned_4(Arg1,F,ARGSISA,FRGS).
 
-% 	 	 
+%= 	 	 
+
 %% add_mpred_prop_gleaned_4( ?Arg1, ?F, ?ARG, ?FRGS) is semidet.
 %
 % Add Managed Predicate Prop Gleaned Helper Number 4..

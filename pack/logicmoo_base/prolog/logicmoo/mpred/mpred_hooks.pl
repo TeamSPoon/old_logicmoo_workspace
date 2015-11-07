@@ -327,7 +327,8 @@ xcall_t/7
 
 :- was_export(into_plist/2).
 
-% 	 	 
+%= 	 	 
+
 %% into_plist( ?In, ?Out) is semidet.
 %
 % Converted To Plist.
@@ -336,7 +337,8 @@ into_plist(In,Out):-into_plist_arities(2,12,In,Out).
 
 :- was_export(into_plist_arities/4).
 
-% 	 	 
+%= 	 	 
+
 %% into_plist_arities( ?Min, ?Max, ?PLIST, ?PLISTO) is semidet.
 %
 % Converted To Plist Arities.
@@ -349,7 +351,8 @@ into_plist_arities(_,_,Call,PLIST):-Call=..PLIST. % finally the fallthrue
 
 
 
-% 	 	 
+%= 	 	 
+
 %% never_mpred_mpred( ?VALUE1) is semidet.
 %
 % Never Managed Predicate Managed Predicate.
@@ -433,7 +436,8 @@ never_mpred_mpred(arity).
 
 :- meta_predicate(tf_result(0,+)).
 
-% 	 	 
+%= 	 	 
+
 %% tf_result( :GoalCall, +TF) is semidet.
 %
 % True/false Result.
@@ -441,7 +445,8 @@ never_mpred_mpred(arity).
 tf_result(Call,TF):-(Call->TF=true;TF=fail).
 :- meta_predicate(if_result(0,0)).
 
-% 	 	 
+%= 	 	 
+
 %% if_result( :GoalTF, :GoalCall) is semidet.
 %
 % If Result.
@@ -455,7 +460,8 @@ if_result(TF,Call):-(TF->Call;true).
 % ================================================================================
 
 
-% 	 	 
+%= 	 	 
+
 %% mpred_plist_t( ?P, :TermLIST) is semidet.
 %
 % Managed Predicate Plist True Stucture.
@@ -473,7 +479,8 @@ mpred_plist_t(P,LIST):- CALL=..[t,P|LIST],on_x_rtrace(CALL).
 :- meta_predicate(loop_check_mpred(?)).
 % loop_check_mpred(Call):- current_predicate(ireq/1), loop_check_term(ireq(Call),loop_check_mpred(Call),fail).
 
-% 	 	 
+%= 	 	 
+
 %% loop_check_mpred( ?Call) is semidet.
 %
 % Loop Check Managed Predicate.
@@ -485,7 +492,8 @@ loop_check_mpred(Call):- !, fail,not(t_l:infInstanceOnly(_)),loop_check_term(ire
 
 
 
-% 	 	 
+%= 	 	 
+
 %% mpred_fa_call( ?F, ?UPARAM2, :GoalCall) is semidet.
 %
 % Managed Predicate Functor-arity Call.
@@ -494,7 +502,8 @@ mpred_fa_call(F,A,Call):- var(F),!,support_hilog(F,A),\+tNotForUnboundPredicates
 mpred_fa_call(F,_,Call):-current_predicate(F,M:_OtherCall),M:Call.
 
 
-% 	 	 
+%= 	 	 
+
 %% mpred_fact_arity( ?VALUE1, ?VALUE2) is semidet.
 %
 % Managed Predicate Fact Arity.
@@ -502,7 +511,8 @@ mpred_fa_call(F,_,Call):-current_predicate(F,M:_OtherCall),M:Call.
 mpred_fact_arity(F,A):-arity(F,A),once(mpred_isa(F,prologHybrid);mpred_isa(F,pfcControlled);mpred_isa(F,prologPTTP);mpred_isa(F,prologKIF)).
 
 
-% 	 	 
+%= 	 	 
+
 %% prologHybridFact( ?G) is semidet.
 %
 % Prolog Hybrid Fact.
@@ -510,7 +520,8 @@ mpred_fact_arity(F,A):-arity(F,A),once(mpred_isa(F,prologHybrid);mpred_isa(F,pfc
 prologHybridFact(G):- (var(G)->(mpred_fact_arity(F,A),functor(G,F,A));true),into_mpred_form(G,M),!,no_repeats(req(M)).
 
 
-% 	 	 
+%= 	 	 
+
 %% isCycPredArity_ignoreable( ?VALUE1, ?VALUE2) is semidet.
 %
 % If Is A Cyc Predicate Arity Ignoreable.
@@ -518,7 +529,8 @@ prologHybridFact(G):- (var(G)->(mpred_fact_arity(F,A),functor(G,F,A));true),into
 isCycPredArity_ignoreable(F,A):- ignore(mpred_isa(F,cycPred(A))),ignore(arity(F,A)).
 
 
-% 	 	 
+%= 	 	 
+
 %% which_t( ?VALUE1) is semidet.
 %
 % Which True Stucture.
@@ -526,14 +538,16 @@ isCycPredArity_ignoreable(F,A):- ignore(mpred_isa(F,cycPred(A))),ignore(arity(F,
 which_t(dac(d,a_notnow,c,no_fallback)).
 
 
-% 	 	 
+%= 	 	 
+
 %% holds_t( ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7) is semidet.
 %
 % Holds True Stucture.
 %
 holds_t(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),which_t(DBS),(call_which_t(DBS,P,A1,A2,A3,A4,A5,A6,A7);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_t([P,A1,A2,A3,A4,A5,A6,A7])).
 
-% 	 	 
+%= 	 	 
+
 %% holds_t( :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
 %
 % Holds True Stucture.
@@ -541,7 +555,8 @@ holds_t(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),which_t(DBS),(c
 holds_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),which_t(DBS),(call_which_t(DBS,P,A1,A2,A3,A4,A5,A6);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,_,_)).
 
 
-% 	 	 
+%= 	 	 
+
 %% holds_t( :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
 %
 % Holds True Stucture.
@@ -549,14 +564,16 @@ holds_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),which_t(DBS),(call
 holds_t(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),which_t(DBS),(call_which_t(DBS,P,A1,A2,A3,A4,A5);call_mt_t(DBS,P,A1,A2,A3,A4,A5,_,_)).
 
 
-% 	 	 
+%= 	 	 
+
 %% holds_t( ?P, ?A1, ?A2, ?A3, ?A4) is semidet.
 %
 % Holds True Stucture.
 %
 holds_t(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),which_t(DBS),(call_which_t(DBS,P,A1,A2,A3,A4);call_mt_t(DBS,P,A1,A2,A3,A4,_,_)).
 
-% 	 	 
+%= 	 	 
+
 %% holds_t( ?P, ?A1, ?A2, ?A3) is semidet.
 %
 % Holds True Stucture.
@@ -564,14 +581,16 @@ holds_t(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),which_t(DBS),(call_which
 holds_t(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),which_t(DBS),(call_which_t(DBS,P,A1,A2,A3);call_mt_t(DBS,P,A1,A2,A3,_,_)).
 %holds_t(P,A1,A2):- hotrace(holds_relaxed_t(P,A1,A2)).
 
-% 	 	 
+%= 	 	 
+
 %% holds_t( ?P, ?A1, ?A2) is semidet.
 %
 % Holds True Stucture.
 %
 holds_t(P,A1,A2):- isCycPredArity_ignoreable(P,2),which_t(DBS),(call_which_t(DBS,P,A1,A2);call_mt_t(DBS,P,A1,A2,_,_)).
 
-% 	 	 
+%= 	 	 
+
 %% holds_t( ?P, ?A1) is semidet.
 %
 % Holds True Stucture.
@@ -581,7 +600,8 @@ holds_t(P,A1):- isCycPredArity_ignoreable(P,1),which_t(DBS),(call_which_t(DBS,P,
 
 % holds_relaxed_t(P,A1,A2):-var(A1),var(A2),!,t(P,A1,A2).
 
-% 	 	 
+%= 	 	 
+
 %% holds_relaxed_t( ?P, ?A1, ?A2) is semidet.
 %
 % Holds Relaxed True Stucture.
@@ -592,7 +612,8 @@ holds_relaxed_t(P,A1,A2):-
          holds_relaxed_0_t(DBS,PR,R1,R2).
 
 
-% 	 	 
+%= 	 	 
+
 %% holds_relaxed_0_t( ?DBS, ?P, ?A1, ?A2) is semidet.
 %
 % holds relaxed  Primary Helper True Stucture.
@@ -609,7 +630,8 @@ holds_relaxed_0_t(_DBS,P,A1,A2):- ground((P,A1)), TEMPL=..[P,T1,_],t(argSingleVa
 */
 
 
-% 	 	 
+%= 	 	 
+
 %% holds_t( :TermCALL) is semidet.
 %
 % Holds True Stucture.
@@ -621,7 +643,8 @@ holds_t(not(CALL)):- !, holds_f(CALL).
 holds_t(CALL):- '=..'(CALL,PLIST),holds_t(PLIST).
 
 
-% 	 	 
+%= 	 	 
+
 %% holds_plist_t( ?P, ?LIST) is semidet.
 %
 % Holds Plist True Stucture.
@@ -637,7 +660,8 @@ holds_plist_t(P,LIST):- apply(holds_t,[P|LIST]).
 
 :- was_export(inverse_args/2).
 
-% 	 	 
+%= 	 	 
+
 %% inverse_args( ?AR, ?GS) is semidet.
 %
 % Inverse Arguments.
@@ -649,7 +673,8 @@ inverse_args([P,A,R,G,S],[S,A,R,G,P]):-!.
 
 :- was_export(same_vars/2).
 
-% 	 	 
+%= 	 	 
+
 %% same_vars( ?T1, ?T2) is semidet.
 %
 % Same Variables.
@@ -657,7 +682,8 @@ inverse_args([P,A,R,G,S],[S,A,R,G,P]):-!.
 same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
 
 
-% 	 	 
+%= 	 	 
+
 %% replace_arg( ?C, :PRED3A, ?VAR, ?CC) is semidet.
 %
 % Replace Argument.
@@ -675,7 +701,8 @@ replace_arg(C,A,VAR,CC):- C=..FARGS,replace_nth_arglist(FARGS,A,VAR,FARGO),!,CC=
 % Replace the Nth (1-based) element of a list.
 :- mpred_trace_nochilds(replace_nth_arglist/4).
 
-% 	 	 
+%= 	 	 
+
 %% replace_nth_arglist( :TermARG1, ?VALUE2, ?VAR, :TermVAR) is semidet.
 %
 % Replace Nth Arglist.
@@ -687,7 +714,8 @@ replace_nth_arglist([T|FARGS],A,VAR,[T|FARGO]):-
 
 
 
-% 	 	 
+%= 	 	 
+
 %% replace_nth_ref( :TermARG1, ?N, ?OldVar, ?NewVar, :TermARG5) is semidet.
 %
 % Replace Nth Ref.
@@ -701,7 +729,8 @@ replace_nth_ref([Carry|ARGS],Which,OldVar,NewVar,[Carry|NEWARGS]):-
 
 :- mpred_trace_nochilds(update_value/3).
 
-% 	 	 
+%= 	 	 
+
 %% update_value( ?OLD, ?NEW, ?NEXT) is semidet.
 %
 % Update Value.
@@ -715,7 +744,8 @@ update_value(OLDI,X,NEW):- number(X),X<0,compute_value(OLDI,OLD),number(OLD),cat
 update_value(_,NEW,NEWV):- compute_value_no_dice(NEW,NEWV),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% flatten_append( ?First, ?Last, ?Out) is semidet.
 %
 % Flatten Append.
@@ -723,7 +753,8 @@ update_value(_,NEW,NEWV):- compute_value_no_dice(NEW,NEWV),!.
 flatten_append(First,Last,Out):-flatten([First],FirstF),flatten([Last],LastF),append(FirstF,LastF,Out),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% list_update_op( ?OLDI, :TermX, ?NEW) is semidet.
 %
 % List Update Oper..
@@ -732,7 +763,8 @@ list_update_op(OLDI,+X,NEW):-flatten_append(OLDI,X,NEW),!.
 list_update_op(OLDI,-X,NEW):-flatten([OLDI],OLD),flatten([X],XX),!,list_difference_eq(OLD,XX,NEW),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% compute_value_no_dice( ?NEW, ?NEW) is semidet.
 %
 % Compute Value No Dice.
@@ -741,7 +773,8 @@ compute_value_no_dice(NEW,NEW):- compound(NEW),functor_catch(NEW,ftDice,_),!.
 compute_value_no_dice(NEW,NEWV):-compute_value(NEW,NEWV).
 
 
-% 	 	 
+%= 	 	 
+
 %% compute_value( ?NEW, ?NEWV) is semidet.
 %
 % Compute Value.
@@ -751,7 +784,8 @@ compute_value(NEW,NEWV):-catch(any_to_value(NEW,NEWV),_,fail),!.
 compute_value(NEW,NEW).
 
 
-% 	 	 
+%= 	 	 
+
 %% insert_into( :TermARGS, ?VALUE2, ?Insert, :TermInsert) is semidet.
 %
 % Insert Converted To.
@@ -763,7 +797,8 @@ insert_into([Carry|ARGS],After,Insert,[Carry|NEWARGS]):-
 
 
 
-% 	 	 
+%= 	 	 
+
 %% add_arg_parts_of_speech( ?F, ?N, :TermARG3, :TermARG4) is semidet.
 %
 % Add Argument Parts Of Speech.
@@ -772,7 +807,8 @@ add_arg_parts_of_speech(_F,_N,[],[]).
 add_arg_parts_of_speech(F,N,[A|ARGS0],[ARG|ARGS]):-argIsa_call_or_undressed(F,N,A,ARG),N1 is N+1, add_arg_parts_of_speech(F,N1,ARGS0,ARGS).
 
 
-% 	 	 
+%= 	 	 
+
 %% argIsa_call_or_undressed( ?F, ?N, ?Obj, ?Obj) is semidet.
 %
 % Argument  (isa/2) call or undressed.
@@ -781,7 +817,8 @@ argIsa_call_or_undressed(F,N,Obj,fN(Obj,Type)):- argIsa_call_0(F,N,Type),!.
 argIsa_call_or_undressed(_F,_N,Obj,Obj).
 
 
-% 	 	 
+%= 	 	 
+
 %% verb_after_arg( ?VALUE1, ?VALUE2, :PRED1VALUE3) is semidet.
 %
 % Verb After Argument.

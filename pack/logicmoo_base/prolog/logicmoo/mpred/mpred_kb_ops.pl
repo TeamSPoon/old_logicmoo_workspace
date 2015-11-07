@@ -43,7 +43,8 @@
 :- meta_predicate(oncely(0)).
 :- was_export(oncely/1).
 
-% 	 	 
+%= 	 	 
+
 %% oncely( :GoalCall) is semidet.
 %
 % Oncely.
@@ -62,7 +63,8 @@ once(A,B,C,D):-trace_or_throw(once(A,B,C,D)).
 */
 
 
-% 	 	 
+%= 	 	 
+
 %% second_order( ?VALUE1, ?VALUE2) is semidet.
 %
 % Second Order.
@@ -72,7 +74,8 @@ second_order(_,_):-fail.
 :- meta_predicate(deducedSimply(0)).
 :- was_export(deducedSimply/1).
 
-% 	 	 
+%= 	 	 
+
 %% deducedSimply( :GoalCall) is semidet.
 %
 % Deduced Simply.
@@ -83,7 +86,8 @@ deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not_asserted((Call)),
 
 :- meta_predicate(mpred_op(?,?)).
 
-% 	 	 
+%= 	 	 
+
 %% mpred_op( ?Op, ?H) is semidet.
 %
 % Managed Predicate Oper..
@@ -116,7 +120,8 @@ mpred_op(_,C):- req(C).
 
 :- was_export(whenAnd/2).
 
-% 	 	 
+%= 	 	 
+
 %% whenAnd( :GoalA, :GoalB) is semidet.
 %
 % When And.
@@ -129,7 +134,8 @@ whenAnd(A,B):-A,ground(B),once(B).
 % ========================================
 
 
-% 	 	 
+%= 	 	 
+
 %% reduce_mpred_op( ?Op, ?Op2) is semidet.
 %
 % Reduce Managed Predicate Oper..
@@ -138,7 +144,8 @@ reduce_mpred_op(Op,Op2):-must(hotrace(transitive(how_to_op,Op,Op2))),!.
 reduce_mpred_op(A,A).
 
 
-% 	 	 
+%= 	 	 
+
 %% how_to_op( ?HowOP, ?HowOP) is semidet.
 %
 % How Converted To Oper..
@@ -167,7 +174,8 @@ how_to_op(HowOP,HowOP).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% lookup_inverted_op( ?VALUE1, ?VALUE2, +OUT3) is semidet.
 %
 % Lookup Inverted Oper..
@@ -190,7 +198,8 @@ lookup_inverted_op(asserta_new,retract,+).
 :- meta_predicate(naf(0)).
 :- was_export(naf/1).
 
-% 	 	 
+%= 	 	 
+
 %% naf( :GoalGoal) is semidet.
 %
 % Negation-By-Faliure.
@@ -200,7 +209,8 @@ naf(Goal):- (\+ req(Goal)).
 :- meta_predicate(is_callable(0)).
 :- was_export(is_callable/1).
 
-% 	 	 
+%= 	 	 
+
 %% is_callable( :GoalC) is semidet.
 %
 % If Is A Callable.

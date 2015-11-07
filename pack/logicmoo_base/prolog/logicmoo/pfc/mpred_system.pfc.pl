@@ -219,6 +219,13 @@ prologHybrid(genls/2).
 arity(genlPreds,2).
 
 
+
+%= 	 	 
+
+%% prologBuiltin( ?ARG1, ?ARG2) is semidet.
+%
+% Prolog Builtin.
+%
 prologBuiltin(resolveConflict/1,mpred_module(baseKB)).
 prologBuiltin(mpred_select/2,mpred_module(lmconf)).
 %:-rtrace.
@@ -952,6 +959,13 @@ prologMultiValued('<-'(ftAssertable,ftAskable)).
 prologMultiValued('==>'(ftAskable,ftAssertable)).
 prologNegByFailure(predArgMulti(prologMultiValued,ftInt)).
 prologNegByFailure(tDeleted(ftID)).
+
+%= 	 	 
+
+%% prologSingleValued( ?ARG1, ?ARG2) is semidet.
+%
+% Prolog Single Valued.
+%
 prologSingleValued(predInstMax(ftID,prologSingleValued,ftInt),prologHybrid).
 prologSingleValued(predTypeMax(prologSingleValued,tCol,ftInt),prologHybrid).
 resultIsa(txtFormatFn,ftText).
@@ -1123,103 +1137,3 @@ prologHybrid(isa/2).
 tCol(predIsFlag).
 tCol(prologDynamic).
 prologHybrid(formatted_resultIsa/2).
-prologHybrid(resultIsa/2).
-
-
-:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
-
-:- mpred_test((fully_expand_goal(_,:- shared_multifile lmconf:create_random_fact/1,O),show_failure(why,O=(:- shared_multifile lmconf:create_random_fact/1)))).
-
-% :- sanity(test_expand_units(tCol(_A))).
-
-% :- sanity(test_expand_units(number(_A))).
-
-% :- sanity((writeq(tCol(_A)),nl)).
-
-
-tCol(vtTestType).
-
-:- mpred_test(must_compile_special_clause(vtTestType(vTest1))).
-
-vtTestType(vTest1).
-vtTestType(vTest2).
-
-%:-mpred_test(not(tPred(prologHybrid))).
-% prologHybrid(function_corisponding_predicate(tFunction,tPred)).
-
-:- sanity(tCol(tCol)).
-
-:- mpred_test(agenda_rescan_for_module_ready).
-
-:- mpred_test(must_compile_special_clause(tCol(tCol))).
-
-:- mpred_test(must_compile_special_clause(isa(_,_))).
-:- mpred_test(must_compile_special_clause(not(_))).
-
-:- mpred_test(source_location(_,_)).
-
-:- mpred_test(in_file_expansion;in_file_directive).
-
-:- endif.
-
-notAssertable(isFact/1).
-prologHybrid(isFact/1).
-% :- kb_dynamic(added/1).
-:-asserta((added(Added):-basePFC:spft('$ABOX',Added,U,U,_))).
-% isFact(A):- cwc, is_ftNonvar(A), ( added(A) ; clause_asserted(A)),not((arg(_,A,V),var(V))).
-isFact(A):- cwc, is_ftNonvar(A), ( added(A) ; is_asserted(A)),not((arg(_,A,V),var(V))).
-
-
-
-% mpred_default(((argIsa(Pred,N,FT),ttFormatType(FT)/(isFact(argIsa(Pred,N,FT)),ground(argIsa(Pred,N,FT))))==>argQuotedIsa(Pred,N,FT))).
-mpred_default(((genlPreds(Child,Parent),argIsa(Parent,N,FT))==>argIsa(Child,N,FT))).
-mpred_default(((genlPreds(Child,Parent),argQuotedIsa(Parent,N,FT)/ground(argIsa(Parent,N,FT)))==>argQuotedIsa(Child,N,FT))).
-
-
-makeArgConstraint(I,TCol)==>{
-     concat_atom([result,I],'',ResultIsa),ain(argIsa(ResultIsa,1,tFunction)),ain(argIsa(ResultIsa,2,TCol)),
-     concat_atom([arg,I],'',ArgIsa),ain(argIsa(ArgIsa,1,tRelation)),ain(argIsa(ArgIsa,2,ftInt)),ain(argIsa(ArgIsa,3,TCol)),
-     doall((between(1,6,N),concat_atom([arg,N,I],'',ArgNIsa),
-     ain(argIsa(ArgNIsa,1,tRelation)),ain(argIsa(ArgNIsa,2,TCol)),  
-     CArgNIsa =.. [ArgNIsa,Pred,Col],
-     CArgIsa =.. [ArgIsa,Pred,N,Col],
-     %ain((CArgNIsa<==>CArgIsa)),
-     ain_fast(ruleRewrite(CArgNIsa,CArgIsa))
-     ))}.
-
-makeArgConstraint('Isa',tCol).
-makeArgConstraint('Genl',tCol).
-makeArgConstraint('QuotedIsa',ttFormatType).
-makeArgConstraint('Format',ftTerm).
-makeArgConstraint('SometimesIsa',tCol).
-
-argFormat(arity,2,vSetTheFormat).
-
-% {Arity=2},arity(Pred,Arity),(argIsa(Pred,Arity,ftInt)/(A=ftInt;A=ftPercent))==>singleValuedInArg(Pred,Arity).
-mpred_default((arity(Pred,2),argIsa(Pred,2,ftInt))==>singleValuedInArg(Pred,2)).
-
-argFormat(P,S,vSingleEntry)<==>singleValuedInArg(P,S).
-argFormat(P,S,vSetTheFormat)<==> ~singleValuedInArg(P,S).
-
-((arity(Pred,2),argIsa(Pred,2,ftPercent))==>singleValuedInArg(Pred,2)).
-
-
-argSingleValueDefault(F, N, _)==>singleValuedInArg(F,N).
-
-
-((singleValuedInArg(F,N),arity(F,A),{atom(F),integer(N),integer(A),functor(P,F,A),\+ is_ftEquality(P)}) ==> 
-  (made_update_single_valued_arg(P,N),
-   (P ==> {update_single_valued_arg(P,N)}))).
-
-
-:- mpred_run.
-
-:- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
-
-
-% :- rescan_pfc.
-
-:- endif.
-
-
-

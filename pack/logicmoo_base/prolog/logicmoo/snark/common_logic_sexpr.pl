@@ -22,7 +22,8 @@
 :- was_export(fixvars/4).
 
 
-% 	 	 
+%= 	 	 
+
 %% fixvars( ?P, ?VALUE2, :TermARG3, ?P) is semidet.
 %
 % Fixvars.
@@ -39,14 +40,16 @@ fixvars(P,N,[V|VARS],PO):-
 
 
 
-% 	 	 
+%= 	 	 
+
 %% clip_us( ?A, ?AO) is semidet.
 %
 % Clip Us.
 %
 clip_us(A,AO):-concat_atom(L,'-',A),concat_atom(L,'_',AO).
 
-% 	 	 
+%= 	 	 
+
 %% clip_qm( ?QA, ?AO) is semidet.
 %
 % Clip Qm.
@@ -58,7 +61,8 @@ clip_qm(A,AO):-clip_us(A,AO).
 :- meta_predicate(sexpr_sterm_to_pterm(?,?)).
 :- meta_predicate(sexpr_sterm_to_pterm_list(?,?)).
 
-% 	 	 
+%= 	 	 
+
 %% sexpr_sterm_to_pterm( ?VAR, ?V) is semidet.
 %
 % S-expression Sterm Converted To Pterm.
@@ -78,7 +82,8 @@ sexpr_sterm_to_pterm([S|TERM],PTERM):- atomic(S),sexpr_sterm_to_pterm_list(TERM,
 sexpr_sterm_to_pterm(VAR,VAR).
 
 
-% 	 	 
+%= 	 	 
+
 %% sexpr_sterm_to_pterm_list( ?VAR, ?VAR) is semidet.
 %
 % S-expression Sterm Converted To Pterm List.
@@ -151,7 +156,8 @@ input_to_forms("
 // ==================================================================== */
 :- was_export(input_to_forms/2).
 
-% 	 	 
+%= 	 	 
+
 %% input_to_forms( ?FormsOut, ?Vars) is semidet.
 %
 % Input Converted To Forms.
@@ -162,7 +168,8 @@ input_to_forms(FormsOut,Vars):-
 
 :- was_export(input_to_forms/3).
 
-% 	 	 
+%= 	 	 
+
 %% input_to_forms( ?In, ?FormsOut, ?Vars) is semidet.
 %
 % Input Converted To Forms.
@@ -175,7 +182,8 @@ input_to_forms(In,FormsOut,Vars):-
 
 :- was_export(get_input_to_forms/3).
 
-% 	 	 
+%= 	 	 
+
 %% get_input_to_forms( ?In, ?FormsOut, ?Vars) is semidet.
 %
 % Get Input Converted To Forms.
@@ -201,7 +209,8 @@ get_input_to_forms(In,FormsOut,Vars):-
    Parsing
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-% 	 	 
+%= 	 	 
+
 %% parse_sexpr( :TermS, ?Expr) is semidet.
 %
 % Parse S-expression.
@@ -215,7 +224,8 @@ parse_sexpr(text(String), Expr) :- string_codes(String,Codes),parse_sexpr_codes(
 parse_sexpr(String, Expr) :- string(String),!,string_codes(String,Codes),parse_sexpr_codes(Codes, Expr).
 
 
-% 	 	 
+%= 	 	 
+
 %% parse_sexpr_codes( ?Codes, ?Expr) is semidet.
 %
 % Parse S-expression Codes.
@@ -228,10 +238,7 @@ parse_sexpr_codes(Codes, Expr) :- phrase(sexpr(Expr), Codes).
 
 
 
-% 	 	 
-%%  ?V--> ?V is semidet.
-%
-% -->.
+%%  sexpr(L)// is semidet.
 %
 sexpr(L)                      --> sblank,sexpr(L).
 sexpr(L)                      --> "(", !, swhite, sexpr_list(L), swhite.
@@ -254,7 +261,8 @@ swhite --> sblank.
 swhite --> [].
 
 
-% 	 	 
+%= 	 	 
+
 %% eoln( :PRED10VALUE1) is semidet.
 %
 % Eoln.
@@ -311,7 +319,8 @@ cdigit(N) --> [C], {C >= 48, C =<57, N is C-48}.
 % . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-% 	 	 
+%= 	 	 
+
 %% sexpr( ?E, ?C, ?X, ?Z) is semidet.
 %
 % S-Expression.
@@ -320,7 +329,8 @@ sexpr(E,C,X,Z) :- swhite([C|X],Y), sexpr(E,Y,Z).
 
 % dquote semicolon parens  hash qquote  comma backquote
 
-% 	 	 
+%= 	 	 
+
 %% sym_char( ?C) is semidet.
 %
 % Sym Char.
@@ -334,7 +344,8 @@ sym_char(C) :- C > 32, not(member(C,[34,59,40,41,35,39,44,96])).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% to_unbackquote( ?I, ?O) is semidet.
 %
 % Converted To Unbackquote.
@@ -343,7 +354,8 @@ to_unbackquote(I,O):-to_untyped(I,O).
 
 :- was_export(to_untyped/2).
 
-% 	 	 
+%= 	 	 
+
 %% to_untyped( :TermVar, :TermName) is semidet.
 %
 % Converted To Untyped.
@@ -373,7 +385,8 @@ to_untyped(ExprI,ExprO):- ExprI=..Expr,
 
 
 
-% 	 	 
+%= 	 	 
+
 %% remove_incompletes( :TermN, :TermCBefore) is semidet.
 %
 % Remove Incompletes.
@@ -386,7 +399,8 @@ remove_incompletes([NV|Before],[NV|CBefore]):-
 
 :- was_export(extract_lvars/3).
 
-% 	 	 
+%= 	 	 
+
 %% extract_lvars( ?A, ?B, ?After) is semidet.
 %
 % Extract Lvars.
@@ -398,7 +412,8 @@ extract_lvars(A,B,After):-
 
 % copy_lvars( VAR,Vars,VAR,Vars):- var(VAR),!.
 
-% 	 	 
+%= 	 	 
+
 %% copy_lvars( :TermVAR, ?Vars, :TermNV, ?NVars) is semidet.
 %
 % Copy Lvars.
@@ -418,7 +433,8 @@ copy_lvars(Term,Vars,NTerm,NVars):-
     (copy_lvars(Args,Vars,NArgs,NVars), NTerm=..[F|NArgs])).  
 
 
-% 	 	 
+%= 	 	 
+
 %% svar( ?Var, ?NameU) is semidet.
 %
 % Svar.
@@ -435,7 +451,8 @@ svar(Var,Var):-var(Var),!.
 
 :- was_export(svar_fixvarname/2).
 
-% 	 	 
+%= 	 	 
+
 %% svar_fixvarname( ?SVARIN, ?UP) is semidet.
 %
 % Svar Fixvarname.
@@ -445,14 +462,16 @@ svar_fixvarname(SVAR,UP):- \+ atom(SVAR),trace,UP=SVAR.
 svar_fixvarname(SVAR,UP):- atom(SVAR)->(ok_varname(SVAR),fix_varcase(SVAR,UP),must(ok_varname(UP)));UP=SVAR.
 
 
-% 	 	 
+%= 	 	 
+
 %% fix_varcase( ?I, ?O) is semidet.
 %
 % Fix Varcase.
 %
 fix_varcase(I,O):-fix_varcase0(I,M),atom_subst(M,'-','_',O).
 
-% 	 	 
+%= 	 	 
+
 %% fix_varcase0( ?Word, ?WordC) is semidet.
 %
 % Fix Varcase Primary Helper.
@@ -465,7 +484,8 @@ fix_varcase0(Word,Word). % mixed case
 
 :- was_export(ok_varname/1).
 
-% 	 	 
+%= 	 	 
+
 %% ok_varname( ?Name) is semidet.
 %
 % Ok Varname.
@@ -482,7 +502,8 @@ ok_varname(Name):- atom(Name),atom_codes(Name,[C|_List]),char_type(C,csym).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% atom_upper( ?A, ?U) is semidet.
 %
 % Atom Upper.
@@ -490,14 +511,16 @@ ok_varname(Name):- atom(Name),atom_codes(Name,[C|_List]),char_type(C,csym).
 atom_upper(A,U):-string_upper(A,S),atom_string(U,S).
 
 
-% 	 	 
+%= 	 	 
+
 %% lisp_read_from_input( ?Forms) is semidet.
 %
 % Lisp Read Converted From Input.
 %
 lisp_read_from_input(Forms):-lisp_read_from_input(current_input,Forms),!.
 
-% 	 	 
+%= 	 	 
+
 %% lisp_read_from_input( ?I, ?Forms) is semidet.
 %
 % Lisp Read Converted From Input.
@@ -505,7 +528,8 @@ lisp_read_from_input(Forms):-lisp_read_from_input(current_input,Forms),!.
 lisp_read_from_input(I,Forms):-stream_source_typed(I,Type),!,must(to_untyped(Type,Forms)).
 
 
-% 	 	 
+%= 	 	 
+
 %% stream_source_typed( ?I, ?Expr) is semidet.
 %
 % Stream Source Typed.
@@ -516,7 +540,8 @@ stream_source_typed(I,Expr):-   l_open_input(I,In),
 
 
 
-% 	 	 
+%= 	 	 
+
 %% lowcase( :TermC1, :TermC2) is semidet.
 %
 % Lowcase.
@@ -525,7 +550,8 @@ lowcase([],[]).
 lowcase([C1|T1],[C2|T2]) :- lowercase(C1,C2), lowcase(T1,T2).
 
 
-% 	 	 
+%= 	 	 
+
 %% lowercase( ?C1, ?C2) is semidet.
 %
 % Lowercase.
@@ -550,7 +576,8 @@ lowercase(C,C).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% codelist_to_forms( ?AsciiCodesList, ?FormsOut) is semidet.
 %
 % Codelist Converted To Forms.
@@ -560,7 +587,8 @@ codelist_to_forms(AsciiCodesList,FormsOut):-
     compile_all(Forms0, FormsOut),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% run( ?Program, ?Values) is semidet.
 %
 % Run.
@@ -574,7 +602,8 @@ run(Program, Values) :-
     maplist(unfunc, Values0, Values).
 
 
-% 	 	 
+%= 	 	 
+
 %% unfunc( :TermS, :TermS) is semidet.
 %
 % Unfunc.
@@ -586,7 +615,8 @@ unfunc([], []).
 unfunc([Q0|Qs0], [Q|Qs]) :- unfunc(Q0, Q), unfunc(Qs0, Qs).
 
 
-% 	 	 
+%= 	 	 
+
 %% fold( :TermARG1, ?VALUE2, ?V, ?V) is semidet.
 %
 % Fold.
@@ -595,7 +625,8 @@ fold([], _, V, '$NUMBER'(V)).
 fold(['$NUMBER'(F)|Fs], Op, V0, V) :- E =.. [Op,V0,F], V1 is E, fold(Fs, Op, V1, V).
 
 
-% 	 	 
+%= 	 	 
+
 %% compile_all( ?Fs0, ?Fs) is semidet.
 %
 % Compile All.
@@ -609,7 +640,8 @@ compile_all(Fs0, Fs) :- maplist(compile, Fs0, Fs).
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-% 	 	 
+%= 	 	 
+
 %% compile( ?F0, ?F) is semidet.
 %
 % Compile.
@@ -687,7 +719,8 @@ eval(if, [Cond,Then|Else], Value) -->
 goal_truth(Goal, T) --> { Goal -> T = t ; T = [] }.
 
 
-% 	 	 
+%= 	 	 
+
 %% bind_arguments( :TermARG1, :TermARG2, ?Bs, ?Bs) is semidet.
 %
 % Bind Arguments.
@@ -698,7 +731,8 @@ bind_arguments([A|As], [V|Vs], Bs0, Bs) :-
     bind_arguments(As, Vs, Bs1, Bs).
 
 
-% 	 	 
+%= 	 	 
+
 %% run( ?S) is semidet.
 %
 % Run.
@@ -709,7 +743,8 @@ run(S):-'format'('~n~s~n',[S]),run(S,V),writeq(V).
 :- meta_predicate(if_script_file_time(0)).
 
 
-% 	 	 
+%= 	 	 
+
 %% if_script_file_time( :GoalX) is semidet.
 %
 % If Script File Time.
@@ -717,7 +752,8 @@ run(S):-'format'('~n~s~n',[S]),run(S,V),writeq(V).
 if_script_file_time(X):-if_startup_script_local(time(X)).
 
 
-% 	 	 
+%= 	 	 
+
 %% if_startup_script_local( ?VALUE1) is semidet.
 %
 % If Startup Script Local.

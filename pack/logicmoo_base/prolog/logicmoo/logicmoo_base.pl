@@ -37,7 +37,8 @@
 % ========================================
 
 
-% 	 	 
+%= 	 	 
+
 %% mpred_system_kb( ?VALUE1) is semidet.
 %
 % Hook To [lmconf:mpred_system_kb/1] For Module Logicmoo_base.
@@ -60,7 +61,8 @@ lmconf:mpred_system_kb(baseKB).
 :- multifile(lmconf:mpred_is_impl_file/1).
 :- dynamic(lmconf:mpred_is_impl_file/1).
 
-% 	 	 
+%= 	 	 
+
 %% mpred_is_impl_file( ?A) is semidet.
 %
 % Hook To [lmconf:mpred_is_impl_file/1] For Module Logicmoo_base.
@@ -69,7 +71,8 @@ lmconf:mpred_system_kb(baseKB).
 lmconf:mpred_is_impl_file(mpred/A):-nonvar(A).
 
 
-% 	 	 
+%= 	 	 
+
 %% load_mpred_system( ?Ctx) is semidet.
 %
 % Load Managed Predicate System.
@@ -83,7 +86,8 @@ load_mpred_system(Ctx):-  lmconf:mpred_system_kb(Sys),
 %% enable_mpred_system(+Module) is det.
 % Begin considering forward and meta programming rules into a Prolog module.
 
-% 	 	 
+%= 	 	 
+
 %% enable_mpred_system( ?Module) is semidet.
 %
 % Enable Managed Predicate System.
@@ -94,7 +98,8 @@ enable_mpred_system(Module):- with_mutex(mpred_system_mutex,lmconf:enable_mpred_
 %% disable_mpred_system(+Module) is det.
 % Disable tasks that considering forward and meta programming rules into a Prolog module.
 
-% 	 	 
+%= 	 	 
+
 %% disable_mpred_system( ?Module) is semidet.
 %
 % Disable Managed Predicate System.
@@ -104,7 +109,8 @@ disable_mpred_system(Module):- with_mutex(mpred_system_mutex,lmconf:disable_mpre
 :- thread_local t_l:side_effect_ok/0.
 
 
-% 	 	 
+%= 	 	 
+
 %% enable_mpred_system0( ?Module) is semidet.
 %
 % Hook To [lmconf:enable_mpred_system0/1] For Module Logicmoo_base.
@@ -125,7 +131,8 @@ lmconf:enable_mpred_system0(Module):-
    Module:w_tl(t_l:side_effect_ok,doall(Module:call_no_cuts(lmconf:module_local_init))).
 
 
-% 	 	 
+%= 	 	 
+
 %% disable_mpred_system0( ?Module) is semidet.
 %
 % Hook To [lmconf:disable_mpred_system0/1] For Module Logicmoo_base.
@@ -145,7 +152,8 @@ lmconf:disable_mpred_system0(Module):-
 %% ensure_mpred_system is det.
 % Ensure the "managed predicate" system and subsystems are available
 
-% 	 	 
+%= 	 	 
+
 %% ensure_mpred_system is semidet.
 %
 % Ensure Managed Predicate System.

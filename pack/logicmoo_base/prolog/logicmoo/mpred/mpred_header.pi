@@ -40,7 +40,6 @@
 % HOOKS
 
 :- forall(member(M:F/A,[
-
 basePFC:bt/3, %basePFC
 basePFC:hs/1, %basePFC
 basePFC:hs/2, %basePFC
@@ -96,7 +95,6 @@ user:prolog_load_file/2,
 %user:prolog_clause_name/2,
 %user:prolog_list_goal/1,
 %user:prolog_predicate_name/2,
-
 user:term_expansion/2,user:goal_expansion/2,system:term_expansion/2,system:goal_expansion/2]),(multifile(M:F/A),dynamic(M:F/A),discontiguous(M:F/A))).
 
 % ================================================

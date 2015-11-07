@@ -22,7 +22,8 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% 	 	 
+%= 	 	 
+
 %% neq( ?X, ?Y) is semidet.
 %
 % Negated Equality.
@@ -32,7 +33,8 @@ neq(X,Y) :-
 	diz_c_c(X,Y,_).
 
 
-% 	 	 
+%= 	 	 
+
 %% diz( ?X, ?Y) is semidet.
 %
 % Diz.
@@ -47,7 +49,8 @@ diz(X,Y) :-
 %%	znode(Parent,Children,Variables,Counter)
 
 
-% 	 	 
+%= 	 	 
+
 %% diz_unifiable( ?X, ?Y, ?Us) is semidet.
 %
 % Diz Unifiable.
@@ -59,7 +62,8 @@ diz_unifiable(X, Y, Us) :-
 	).
 
 
-% 	 	 
+%= 	 	 
+
 %% diz_c_c( ?X, ?Y, ?OrNode) is semidet.
 %
 % Diz Class Class.
@@ -77,7 +81,8 @@ diz_c_c(X,Y,OrNode) :-
 
 
 
-% 	 	 
+%= 	 	 
+
 %% diz_c_c_l( ?Unifier, ?OrNode) is semidet.
 %
 % Diz Class Class (list Version).
@@ -88,7 +93,8 @@ diz_c_c_l(Unifier,OrNode) :-
 	diz_c_c_l_aux(Unifier,OrNode,List,Tail).
 
 
-% 	 	 
+%= 	 	 
+
 %% extend_zornode( ?OrNode, ?N, ?List, ?Vars) is semidet.
 %
 % Extend Zornode.
@@ -104,7 +110,8 @@ extend_zornode(OrNode,N,List,Vars) :-
 	put_attr(OrNode,neq,znode(O,List)).
 
 
-% 	 	 
+%= 	 	 
+
 %% diz_c_c_l_aux( :TermARG1, ?VALUE2, ?List, ?List) is semidet.
 %
 % Diz Class Class (list Version) Aux.
@@ -116,7 +123,8 @@ diz_c_c_l_aux([X=Y|Unifier],OrNode,List,Tail) :-
 	diz_c_c_l_aux(Unifier,OrNode,Rest,Tail).
 
 
-% 	 	 
+%= 	 	 
+
 %% add_zornode( ?X, ?Y, ?OrNode) is semidet.
 %
 % Add Zornode.
@@ -130,7 +138,8 @@ add_zornode(X,Y,OrNode) :-
 	).
 
 
-% 	 	 
+%= 	 	 
+
 %% add_zornode_var1( ?X, ?Y, ?OrNode) is semidet.
 %
 % Add Zornode Variable Secondary Helper.
@@ -144,7 +153,8 @@ add_zornode_var1(X,Y,OrNode) :-
 	).
 
 
-% 	 	 
+%= 	 	 
+
 %% add_zornode_var2( ?X, ?Y, ?OrNode) is semidet.
 %
 % Add Zornode Variable Extended Helper.
@@ -158,7 +168,8 @@ add_zornode_var2(X,Y,OrNode) :-
 	).
 
 
-% 	 	 
+%= 	 	 
+
 %% attr_unify_hook( :TermX, ?Other) is semidet.
 %
 % Hook To [dom:attr_unify_hook/2] For Module Neq.
@@ -187,7 +198,8 @@ attr_unify_hook(vardiz(V1,V2),Other) :-
 	).
 
 
-% 	 	 
+%= 	 	 
+
 %% remove_obsoletez( :TermN, ?X, ?L) is semidet.
 %
 % Remove Obsoletez.
@@ -201,7 +213,8 @@ remove_obsoletez([N-Y|T], X, L) :-
         ).
 
 
-% 	 	 
+%= 	 	 
+
 %% reverse_lookupz( :TermN, ?Value, ?Nodes, ?Rest) is semidet.
 %
 % Reverse Lookupz.
@@ -218,7 +231,8 @@ reverse_lookupz([N-X|NXs],Value,Nodes,Rest) :-
 	reverse_lookupz(NXs,Value,RNodes,RRest).
 
 
-% 	 	 
+%= 	 	 
+
 %% verify_compoundz( :TermOrNode, ?X) is semidet.
 %
 % Verify Compoundz.
@@ -236,7 +250,8 @@ verify_compoundz([OrNode-Y|Rest],X) :-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% 	 	 
+%= 	 	 
+
 %% zor_succeed( ?OrNode) is semidet.
 %
 % Zor Succeed.
@@ -253,7 +268,8 @@ zor_succeed(OrNode) :-
 	).
 
 
-% 	 	 
+%= 	 	 
+
 %% zor_one_failz( :TermN) is semidet.
 %
 % Zor One Failz.
@@ -264,7 +280,8 @@ zor_one_failz([N|Ns]) :-
 	zor_one_failz(Ns).
 
 
-% 	 	 
+%= 	 	 
+
 %% zor_one_fail( ?OrNode) is semidet.
 %
 % Zor One Fail.
@@ -284,7 +301,8 @@ zor_one_fail(OrNode) :-
 	).
 
 
-% 	 	 
+%= 	 	 
+
 %% del_zor_diz( :TermX) is semidet.
 %
 % Remove/erase Zor Diz.
@@ -296,7 +314,8 @@ del_zor_diz([X=Y|Xs]) :-
 	del_zor_diz(Xs).
 
 
-% 	 	 
+%= 	 	 
+
 %% cleanup_dead_znode( ?X) is semidet.
 %
 % Cleanup Dead Znode.
@@ -317,7 +336,8 @@ cleanup_dead_znode(X) :-
 	).
 
 
-% 	 	 
+%= 	 	 
+
 %% filter_dead_zorz( :TermOr, ?List) is semidet.
 %
 % Filter Dead Zorz.
@@ -340,12 +360,10 @@ filter_dead_zorz([Or-Y|Rest],List) :-
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-% 	 	 
-%%  ?V--> ?V is semidet.
+%%  attribute_goals(Var)// is semidet.
 %
-% -->.
 %
-attribute_goalz(Var) -->
+attribute_goals(Var) -->
 	(   { get_attr(Var, neq, vardiz(Ors,_)) } ->
 	    zor_znode(Ors, Var)
 	;   zor_node(Var)
@@ -382,7 +400,8 @@ mydiz(Xs0, Ys0) -->
         ).
 
 
-% 	 	 
+%= 	 	 
+
 %% split_equals_list( :TermA, :TermA, :TermB) is semidet.
 %
 % Split Equals List.

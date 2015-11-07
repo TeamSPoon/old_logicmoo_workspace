@@ -50,7 +50,8 @@
 
 
 
-% 	 	 
+%= 	 	 
+
 %% dump_st is semidet.
 %
 % Dump Stack Trace.
@@ -58,21 +59,24 @@
 dump_st:- dumpST0(10).
 
 
-% 	 	 
+%= 	 	 
+
 %% dumpST0 is semidet.
 %
 % Dump S True Stucture Primary Helper.
 %
 dumpST0:-notrace(dumpST0(800)),!.
 
-% 	 	 
+%= 	 	 
+
 %% dumpST0( ?Opts) is semidet.
 %
 % Dump S True Stucture Primary Helper.
 %
 dumpST0(Opts):- prolog_current_frame(Frame),dumpST0(Frame,Opts).
 
-% 	 	 
+%= 	 	 
+
 %% dumpST0( ?Frame, ?MaxDepth) is semidet.
 %
 % Dump S True Stucture Primary Helper.
@@ -88,14 +92,16 @@ dumpST0(Frame,MaxDepth):- ignore(MaxDepth=5000),Term = dumpST(MaxDepth),
 
 % dumpstack_arguments.
 
-% 	 	 
+%= 	 	 
+
 %% dumpST is semidet.
 %
 % Dump S True Stucture.
 %
 dumpST:- notrace(dumpST1).
 
-% 	 	 
+%= 	 	 
+
 %% dumpST1 is semidet.
 %
 % Dump S True Stucture Secondary Helper.
@@ -105,7 +111,8 @@ dumpST1:- tlbugger:no_slow_io,!,dumpST0,!.
 dumpST1:- tlbugger:ifHideTrace,!.
 dumpST1:- loop_check_early(dumpST9,dumpST0).
 
-% 	 	 
+%= 	 	 
+
 %% dumpST( ?Depth) is semidet.
 %
 % Dump S True Stucture.
@@ -113,7 +120,8 @@ dumpST1:- loop_check_early(dumpST9,dumpST0).
 dumpST(Depth):- loop_check_early(dumpST9(Depth),dumpST0(Depth)).
 
 
-% 	 	 
+%= 	 	 
+
 %% get_m_opt( ?Opts, ?Max_depth, ?D100, ?RetVal) is semidet.
 %
 % Get Module Opt.
@@ -122,14 +130,16 @@ get_m_opt(Opts,Max_depth,D100,RetVal):-E=..[Max_depth,V],(((member(E,Opts),nonva
 
 
 
-% 	 	 
+%= 	 	 
+
 %% dumpST9 is semidet.
 %
 % Dump S T9.
 %
 dumpST9:- notrace((prolog_current_frame(Frame), dumpST9(Frame,5000))).
 
-% 	 	 
+%= 	 	 
+
 %% dumpST9( ?Depth) is semidet.
 %
 % Dump S T9.
@@ -137,7 +147,8 @@ dumpST9:- notrace((prolog_current_frame(Frame), dumpST9(Frame,5000))).
 dumpST9(Depth):- prolog_current_frame(Frame), dumpST9(Frame,Depth).
 
 
-% 	 	 
+%= 	 	 
+
 %% dumpST9( ?Frame, :TermMaxDepth) is semidet.
 %
 % Dump S T9.
@@ -149,7 +160,8 @@ dumpST9(Frame,List):- is_list(List),dumpST_now(Frame,[show([level,has_alternativ
 
 
 
-% 	 	 
+%= 	 	 
+
 %% drain_framelist( ?Opts) is semidet.
 %
 % Drain Framelist.
@@ -157,7 +169,8 @@ dumpST9(Frame,List):- is_list(List),dumpST_now(Frame,[show([level,has_alternativ
 drain_framelist(Opts):- repeat, \+ drain_framelist_ele(Opts).
 
 
-% 	 	 
+%= 	 	 
+
 %% drain_framelist_ele( ?Opts) is semidet.
 %
 % Drain Framelist Ele.
@@ -170,7 +183,8 @@ drain_framelist_ele(Opts):-
         
 
 
-% 	 	 
+%= 	 	 
+
 %% dumpST_now( ?FrameIn, ?Opts) is semidet.
 %
 % Dump S True Stucture Now.
@@ -192,7 +206,8 @@ dumpST_now(FrameIn,Opts):-
    drain_framelist(Opts),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% dumpST_now_reversed( ?FrameIn, ?Opts) is semidet.
 %
 % Dump S True Stucture Now Reversed.
@@ -211,7 +226,8 @@ dumpST_now_reversed(FrameIn,Opts):-
      (!))).
 
 
-% 	 	 
+%= 	 	 
+
 %% pushFrame( ?N, ?Frame, ?Opts) is semidet.
 %
 % Push Frame.
@@ -219,7 +235,8 @@ dumpST_now_reversed(FrameIn,Opts):-
 pushFrame(N,Frame,_Opts):- nb_getval('$current_stack_frame_list',Current),nb_setval('$current_stack_frame_list',[N-Frame|Current]).
 
 
-% 	 	 
+%= 	 	 
+
 %% printFrame( ?N, ?Frame, ?Opts) is semidet.
 %
 % Print Frame.
@@ -228,7 +245,8 @@ printFrame(N,Frame,Opts):-
   must(frame_to_fmsg(N,Frame,Opts,Out)),must(fmsg_rout(Out)),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% frame_to_fmsg( ?N, ?Frame, ?Opts, ?N) is semidet.
 %
 % Frame Converted To Functor Message.
@@ -242,7 +260,8 @@ frame_to_fmsg(N,Frame,Opts,[nf(noFrame(N,Frame,Opts))]).
  
 
 
-% 	 	 
+%= 	 	 
+
 %% fmsg_rout( :TermRROut) is semidet.
 %
 % Functor Message Rout.
@@ -253,7 +272,8 @@ fmsg_rout([E|RROut]):- ignore(fdmsg(E)),!,fmsg_rout(RROut).
 fmsg_rout(RROut):- show_call(why,forall(member(E,RROut),fdmsg(E))),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% neg1_numbervars( ?Out, ?Start, :GoalROut) is semidet.
 %
 % Negated Secondary Helper Numbervars.
@@ -265,7 +285,8 @@ neg1_numbervars(Out,Start,ROut):-copy_term(Out,ROut),integer(Start),!,snumbervar
 neg1_numbervars(Out,safe,ROut):-copy_term(Out,ROut),safe_numbervars(ROut).
 
 
-% 	 	 
+%= 	 	 
+
 %% fdmsg1( ?G) is semidet.
 %
 % Fdmsg Secondary Helper.
@@ -284,7 +305,8 @@ fdmsg1(M):-dmsg(failed_fdmsg1(M)).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% simplify_m( ?G, ?M) is semidet.
 %
 % Simplify Module.
@@ -292,7 +314,8 @@ fdmsg1(M):-dmsg(failed_fdmsg1(M)).
 simplify_m(G,M):-atom(G),sub_atom(G,_,6,0,M),!.
 simplify_m(G,G).
 
-% 	 	 
+%= 	 	 
+
 %% fdmsg( ?M) is semidet.
 %
 % Fdmsg.
@@ -302,7 +325,8 @@ fdmsg(M):-ddmsg(failed_fdmsg(M)).
 
 :-export(simplify_goal_printed/2).
 
-% 	 	 
+%= 	 	 
+
 %% simplify_goal_printed( :TermVar, :TermVar) is semidet.
 %
 % Simplify Goal Printed.
@@ -332,7 +356,8 @@ simplify_goal_printed(G,GS):- G=..[F|A],maplist(simplify_goal_printed,[F|A],AA),
 
 
 
-% 	 	 
+%= 	 	 
+
 %% getPFA( ?Frame, ?Ctrl, ?Goal) is semidet.
 %
 % Get Pred Functor A.
@@ -341,7 +366,8 @@ getPFA(Frame,[L|List],Goal):- !,findall(R, (member(A,[L|List]),getPFA1(Frame,A,R
 getPFA(Frame,Ctrl,Goal):-getPFA1(Frame,Ctrl,Goal).
 
 
-% 	 	 
+%= 	 	 
+
 %% getPFA1( ?Frame, ?Txt, ?Txt) is semidet.
 %
 % Get Pred Functor A Secondary Helper.
@@ -352,7 +378,8 @@ getPFA1(Frame,Ctrl,Ctrl=Goal):-getPFA2(Frame,Ctrl,Goal),!.
 getPFA1(_,Ctrl,no(Ctrl)).
 
 
-% 	 	 
+%= 	 	 
+
 %% getPFA2( ?Frame, ?Ctrl, ?Goal) is semidet.
 %
 % Get Pred Functor A Extended Helper.
@@ -360,7 +387,8 @@ getPFA1(_,Ctrl,no(Ctrl)).
 getPFA2(Frame,Ctrl,Goal):- catchv((prolog_frame_attribute(Frame,Ctrl,Goal)),E,Goal=[error(Ctrl,E)]),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% clauseST( ?ClRef, :TermGoal) is semidet.
 %
 % Clause S True Stucture.
@@ -375,7 +403,8 @@ clauseST(ClRef,Goal = HB):- ignore(((clause(Head, Body, ClRef),copy_term(((Head 
 :- thread_local(tlbugger:ifCanTrace/0).
 
 
-% 	 	 
+%= 	 	 
+
 %% end_dump( :TermGG) is semidet.
 %
 % End Dump.
@@ -389,7 +418,8 @@ end_dump(GG):-compound(GG),functor(GG,F,_),atom_concat(dump,_,F).
 % =====================
 
 
-% 	 	 
+%= 	 	 
+
 %% dtrace is semidet.
 %
 % (debug) Trace.
@@ -399,7 +429,8 @@ dtrace:- dtrace(wdmsg("DUMP_TRACE/0")).
 :- thread_local(has_auto_trace/1).
 :-meta_predicate(dtrace(0)).
 
-% 	 	 
+%= 	 	 
+
 %% dtrace( :GoalG) is semidet.
 %
 % (debug) Trace.
@@ -414,7 +445,8 @@ dtrace(G):- G.
 
 :-meta_predicate(dtrace(+,?)).
 
-% 	 	 
+%= 	 	 
+
 %% dtrace( +MSG, ?G) is semidet.
 %
 % (debug) Trace.
@@ -422,7 +454,8 @@ dtrace(G):- G.
 dtrace(MSG,G):-wdmsg(MSG),dtrace(G).
 
 
-% 	 	 
+%= 	 	 
+
 %% to_wmsg( :TermG, :TermWG) is semidet.
 %
 % Converted To Wmsg.
@@ -438,7 +471,8 @@ to_wmsg(G,WG):- (G=WG).
 % =====================
 :-meta_predicate(dumptrace(?)).
 
-% 	 	 
+%= 	 	 
+
 %% dumptrace( ?G) is semidet.
 %
 % Dump Trace.
@@ -458,7 +492,8 @@ dumptrace(G):- ignore((debug,
 
 :-meta_predicate(dumptrace(0,+)).
 
-% 	 	 
+%= 	 	 
+
 %% dumptrace( :GoalG, +C) is semidet.
 %
 % Dump Trace.
@@ -486,7 +521,8 @@ dumptrace(G,13):-!,dumptrace_ret(G).
 dumptrace(_,C):-fmt(unused_keypress(C)),!,fail.
 % )))))))))))))) %
 
-% 	 	 
+%= 	 	 
+
 %% dumptrace_ret( ?G) is semidet.
 %
 % Dump Trace Ret.

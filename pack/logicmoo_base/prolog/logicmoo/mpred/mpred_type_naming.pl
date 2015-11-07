@@ -50,7 +50,8 @@
 % if SuggestedName was 'food666' it'd like the SuggestedClass to be 'food' and the stystem name will remain 'food666'
 % if SuggestedName was 'food' it'd like the SuggestedClass to be 'food' and the stystem name will become a gensym like 'food1'
 
-% 	 	 
+%= 	 	 
+
 %% create_meta( ?SuggestedName, ?SuggestedClass, ?BaseClass, ?SystemName) is semidet.
 %
 % Create Meta.
@@ -68,7 +69,8 @@ create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
 
 :- was_export(i_name_lc/2).
 
-% 	 	 
+%= 	 	 
+
 %% i_name_lc( ?OType, ?IType) is semidet.
 %
 % Instance Name Not Loop Checked.
@@ -77,7 +79,8 @@ i_name_lc(OType,IType):-typename_to_iname0('',OType,IOType),!,string_equal_ci(IO
 
 
 
-% 	 	 
+%= 	 	 
+
 %% to_iname( ?T, ?T) is semidet.
 %
 % Converted To Iname.
@@ -88,7 +91,8 @@ to_iname(T,TT):- (is_ftVar(T) -> TT=T; (not_log_op(T),i_name(t,T,TT))).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% toUpperCamelcase( ?Type, ?TypeUC) is semidet.
 %
 % Converted To Upper Camelcase.
@@ -96,7 +100,8 @@ to_iname(T,TT):- (is_ftVar(T) -> TT=T; (not_log_op(T),i_name(t,T,TT))).
 toUpperCamelcase(Type,TypeUC):-toCamelcase(Type,TypeUC). % ,toPropercase(TypeC,TypeUC),!.
 :- was_export(i_name/2).
 
-% 	 	 
+%= 	 	 
+
 %% i_name( ?OType, ?IType) is semidet.
 %
 % Instance Name.
@@ -104,7 +109,8 @@ toUpperCamelcase(Type,TypeUC):-toCamelcase(Type,TypeUC). % ,toPropercase(TypeC,T
 i_name(OType,IType):-typename_to_iname0('',OType,IOType),!,IOType=IType.
 :- was_export(i_name/3).
 
-% 	 	 
+%= 	 	 
+
 %% i_name( ?I, ?OType, ?IType) is semidet.
 %
 % Instance Name.
@@ -114,7 +120,8 @@ i_name(I,OType,IType):-typename_to_iname0(I,OType,IOType),!,IOType=IType.
 :- was_export(typename_to_iname0/3).
 
 
-% 	 	 
+%= 	 	 
+
 %% typename_to_iname0( ?I, ?OType, ?IType) is semidet.
 %
 % Typename Converted To Iname Primary Helper.
@@ -126,7 +133,8 @@ typename_to_iname0(I,Type,IType):-nonvar(Type),toUpperCamelcase(Type,UType),atom
 :- was_export(split_name_type/3).
 :- '$hide'(split_name_type/3).
 
-% 	 	 
+%= 	 	 
+
 %% split_name_type( ?Suggest, ?InstName, ?Type) is semidet.
 %
 % Split Name Type.
@@ -134,7 +142,8 @@ typename_to_iname0(I,Type,IType):-nonvar(Type),toUpperCamelcase(Type,UType),atom
 split_name_type(Suggest,InstName,Type):- must_det(split_name_type_0(Suggest,NewInstName,NewType)),!,must((NewInstName=InstName,NewType=Type)),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% split_name_type_0( ?S, ?P, ?C) is semidet.
 %
 % split name type  Primary Helper.
@@ -150,7 +159,8 @@ split_name_type_0(C,P,C):- var(P),atom(C),i_name(i,C,I),gensym(I,P),!.
 
 
 
-% 	 	 
+%= 	 	 
+
 %% toCamelAtom0( :TermA, ?O) is semidet.
 %
 % Converted To Camel Atom Primary Helper.
@@ -161,7 +171,8 @@ toCamelAtom0(A,O):-toPropercase(A,O),!.
 
 
 
-% 	 	 
+%= 	 	 
+
 %% to_prefixed( ?Prefix, ?I, ?O) is semidet.
 %
 % Converted To Prefixed.
@@ -170,7 +181,8 @@ to_prefixed(Prefix,I,O):-to_atomic_name(I,i_name(Prefix),O).
 
 :- meta_predicate to_atomic_name(?,2,?).
 
-% 	 	 
+%= 	 	 
+
 %% to_atomic_name( ?I, :PRED2Pred, ?O) is semidet.
 %
 % Converted To Atomic Name.
@@ -184,7 +196,8 @@ to_atomic_name(Name,Pred,O):- call(Pred,Name,O).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% createByNameMangle( ?Name, ?IDA, ?InstAO) is semidet.
 %
 % Create By Name Mangle.
@@ -192,7 +205,8 @@ to_atomic_name(Name,Pred,O):- call(Pred,Name,O).
 createByNameMangle(Name,IDA,InstAO):-must(createByNameMangle0(Name,IDA,InstAO)),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% createByNameMangle0( ?S, ?I, ?C) is semidet.
 %
 % Create By Name Mangle Primary Helper.
@@ -208,7 +222,8 @@ createByNameMangle0(OType,Name,Type):-create_from_type(OType,Name,Type),!.
 createByNameMangle0(Name,IDA,Name):- gensym(Name,IDA), englishServerInterface([actCreate,Name,IDA]).
 
 
-% 	 	 
+%= 	 	 
+
 %% createByNameMangle_compound( ?Name, ?Name, ?Type) is semidet.
 %
 % Create By Name Mangle Compound.
@@ -220,7 +235,8 @@ createByNameMangle_compound(Name,Inst,Type):- functor_catch(Name,Type,A),must(A=
 :- was_dynamic(lmconf:current_source_suffix/1).
 
 
-% 	 	 
+%= 	 	 
+
 %% get_source_suffix( ?SS) is semidet.
 %
 % Get Source Suffix.
@@ -231,7 +247,8 @@ get_source_suffix('7').
 
 
 
-% 	 	 
+%= 	 	 
+
 %% create_from_type( ?OType, ?Name, ?Type) is semidet.
 %
 % Create Converted From Type.
@@ -252,7 +269,8 @@ create_from_type(OType,Name,Type):- sanity(var(Name)),
 
 
 
-% 	 	 
+%= 	 	 
+
 %% modality( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
 %
 % Modality.
@@ -267,7 +285,8 @@ modality(~,[never],[]).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% onSpawn( :TermA) is semidet.
 %
 % Whenever Spawn.
@@ -277,7 +296,8 @@ onSpawn((A,B)):-!,onSpawn(A),onSpawn(B).
 onSpawn(ClassFact):-fully_expand(ClassFact,ClassFactO),!,onSpawn_0(t,ClassFactO).
 
 
-% 	 	 
+%= 	 	 
+
 %% onSpawn_0( ?Modality, ?ClassFact) is semidet.
 %
 % Whenever spawn  Primary Helper.
@@ -298,7 +318,8 @@ onSpawn_0(Modality,ClassFact):- ClassFact=..[Funct|InstADeclB],
   must_det(onSpawn_f_args(Modality,Funct,InstADeclB)).
 
 
-% 	 	 
+%= 	 	 
+
 %% onSpawn_f_args( ?Modality, ?Funct, ?List) is semidet.
 %
 % Whenever Spawn Functor Arguments.
@@ -311,7 +332,8 @@ onSpawn_f_args(Modality,Funct,List):-
   % call_after_mpred_load_slow(w_tl(deduceArgTypes(Funct), ain(Later))))),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% convertSpawnArgs( ?Funct, ?N, :TermA, :TermO) is semidet.
 %
 % Convert Spawn Arguments.
@@ -323,7 +345,8 @@ convertSpawnArgs(Funct,N,[A|List],[O|NewList]):-
  convertSpawnArgs(Funct,N2,List,NewList),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% convertOneSpawnArg( ?VALUE1, ?VALUE2, ?O, ?O) is semidet.
 %
 % Convert One Spawn Argument.
@@ -335,7 +358,8 @@ convertOneSpawnArg(Funct,N,isInstFn(A),O):-spawnOneSpawnArg(Funct,N,A,O).
 convertOneSpawnArg(Funct,N,A,O):-spawnOneSpawnArg(Funct,N,A,O).
 
 
-% 	 	 
+%= 	 	 
+
 %% spawnOneSpawnArg( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
 %
 % Spawn One Spawn Argument.
@@ -345,7 +369,8 @@ spawnOneSpawnArg(Funct,N,Name,Inst):-
     must(convertToInstance(Name,FunctArgType,Inst)),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% convertToInstance( ?Name, ?FunctArgType, ?Inst) is semidet.
 %
 % Convert Converted To Instance.

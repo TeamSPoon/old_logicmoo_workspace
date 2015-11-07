@@ -214,7 +214,8 @@
 
 % = :- meta_predicate(catchvvnt(0,?,0)).
 
-% 	 	 
+%= 	 	 
+
 %% catchvvnt( :GoalT, ?E, :GoalF) is semidet.
 %
 % Catchvvnt.
@@ -224,7 +225,8 @@ catchvvnt(T,E,F):-catchv(cnotrace(T),E,F).
 :- thread_self(Goal),assert(lmcache:thread_main(user,Goal)).
 
 
-% 	 	 
+%= 	 	 
+
 %% is_pdt_like is semidet.
 %
 % If Is A Pdt Like.
@@ -233,7 +235,8 @@ is_pdt_like:-thread_property(_,alias(pdt_console_server)).
 is_pdt_like:-lmcache:thread_main(user,Goal),!,Goal \= main.
 
 
-% 	 	 
+%= 	 	 
+
 %% is_main_thread is semidet.
 %
 % If Is A Main Thread.
@@ -248,7 +251,8 @@ is_main_thread:-lmcache:thread_main(user,Goal),!,thread_self(Goal).
 
 % = :- meta_predicate(with_main_error_to_output(0)).
 
-% 	 	 
+%= 	 	 
+
 %% with_main_error_to_output( :GoalGoal) is semidet.
 %
 % Using Main Error Converted To Output.
@@ -259,7 +263,8 @@ with_main_error_to_output(Goal):-
    
 
 
-% 	 	 
+%= 	 	 
+
 %% thread_current_error_stream( ?Err) is semidet.
 %
 % Thread Current Error Stream.
@@ -268,7 +273,8 @@ thread_current_error_stream(Err):- t_l:thread_local_current_main_error_stream(Er
 thread_current_error_stream(Err):-thread_self(ID),thread_current_error_stream(ID,Err).
 
 
-% 	 	 
+%= 	 	 
+
 %% current_main_error_stream( ?Err) is semidet.
 %
 % Current Main Error Stream.
@@ -277,14 +283,16 @@ current_main_error_stream(Err):- t_l:thread_local_current_main_error_stream(Err)
 current_main_error_stream(Err):-lmcache:thread_main(user,ID),thread_current_error_stream(ID,Err).
 
 
-% 	 	 
+%= 	 	 
+
 %% format_to_error( ?F, ?A) is semidet.
 %
 % Format Converted To Error.
 %
 format_to_error(F,A):-current_main_error_stream(Err),!,format(Err,F,A).
 
-% 	 	 
+%= 	 	 
+
 %% fresh_line_to_err is semidet.
 %
 % Fresh Line Converted To Err.
@@ -296,7 +304,8 @@ fresh_line_to_err:- cnotrace((flush_output_safe,current_main_error_stream(Err),f
 :- volatile(thread_current_input/2).
 :- volatile(thread_current_error_stream/2).
 
-% 	 	 
+%= 	 	 
+
 %% save_streams is semidet.
 %
 % Save Streams.
@@ -304,7 +313,8 @@ fresh_line_to_err:- cnotrace((flush_output_safe,current_main_error_stream(Err),f
 save_streams:- thread_self(ID), save_streams(ID).
 
 
-% 	 	 
+%= 	 	 
+
 %% save_streams( ?ID) is semidet.
 %
 % Save Streams.
@@ -316,7 +326,8 @@ save_streams(ID):-
 
 % = :- meta_predicate(with_main_input(0)).
 
-% 	 	 
+%= 	 	 
+
 %% with_main_input( :GoalGoal) is semidet.
 %
 % Using Main Input.
@@ -329,7 +340,8 @@ with_main_input(Goal):-
     setup_call_cleanup(set_prolog_IO(In,OutPrev,Err),Goal,set_prolog_IO(InPrev,OutPrev,ErrPrev)).
 
 
-% 	 	 
+%= 	 	 
+
 %% with_main_io( :GoalGoal) is semidet.
 %
 % Using Main Input/output.
@@ -346,7 +358,8 @@ with_main_input(Goal):-
 
 :- dynamic(is_hiding_dmsgs).
 
-% 	 	 
+%= 	 	 
+
 %% is_hiding_dmsgs is semidet.
 %
 % If Is A Hiding (debug)messages.
@@ -359,7 +372,8 @@ is_hiding_dmsgs:- \+always_show_dmsg, tlbugger:ifHideTrace,!.
 % ddmsg(_):-current_prolog_flag(bugger_debug,false),!.
 % ddmsg(D):- current_predicate(_:wdmsg/1),wdmsg(D),!.
 
-% 	 	 
+%= 	 	 
+
 %% ddmsg( ?D) is semidet.
 %
 % Ddmsg.
@@ -367,14 +381,16 @@ is_hiding_dmsgs:- \+always_show_dmsg, tlbugger:ifHideTrace,!.
 ddmsg(D):- ddmsg('~q',[D]).
 %ddmsg(F,A):- current_predicate(_:wdmsg/2),wdmsg(F,A),!.
 
-% 	 	 
+%= 	 	 
+
 %% ddmsg( ?F, ?A) is semidet.
 %
 % Ddmsg.
 %
 ddmsg(F,A):- format_to_error(F,A),!.
 
-% 	 	 
+%= 	 	 
+
 %% ddmsg_call( :GoalD) is semidet.
 %
 % Ddmsg Call.
@@ -386,7 +402,8 @@ ddmsg_call(D):- ( (ddmsg(ddmsg_call(D)),call(D),ddmsg(ddmsg_exit(D))) *-> true ;
 :- meta_predicate if_defined(:).
 :- export(if_defined/1).
 
-% 	 	 
+%= 	 	 
+
 %% if_defined( ?G) is semidet.
 %
 % If Defined.
@@ -401,7 +418,8 @@ if_defined(Goal):- !, if_defined(Goal,(dmsg(warn_undefined(Goal)),trace)).
 :- meta_predicate if_defined(:,0).
 :- export(if_defined/2).
 
-% 	 	 
+%= 	 	 
+
 %% if_defined( ?Goal, :GoalElse) is semidet.
 %
 % If Defined.
@@ -412,7 +430,8 @@ if_defined(_:Goal,Else):-current_predicate(_,OM:Goal)->OM:Goal;(writeln(warn_und
 :- meta_predicate if_defined_else(:,0).
 :- export(if_defined_else/2).
 
-% 	 	 
+%= 	 	 
+
 %% if_defined_else( ?Goal, :GoalElse) is semidet.
 %
 % If Defined Else.
@@ -423,7 +442,8 @@ if_defined_else(_:Goal,Else):-current_predicate(_,OM:Goal)->OM:Goal;Else.
 :- meta_predicate when_defined(:).
 :- export(when_defined/1).
 
-% 	 	 
+%= 	 	 
+
 %% when_defined( ?Goal) is semidet.
 %
 % When Defined.
@@ -436,7 +456,8 @@ when_defined(Goal):-if_defined(Goal,true).
 
 % = :- meta_predicate(to_pi(?,?)).
 
-% 	 	 
+%= 	 	 
+
 %% to_pi( ?P, ?M) is semidet.
 %
 % Converted To Predicate Indicator.
@@ -448,7 +469,8 @@ to_pi(M:Find,M:PI):-!,current_module(M),to_pi0(M,Find,M:PI).
 to_pi(Find,M:PI):-current_module(M),to_pi0(M,Find,M:PI).
 
 
-% 	 	 
+%= 	 	 
+
 %% to_pi0( ?M, :TermFind, :TermPI) is semidet.
 %
 % Converted To Predicate Indicator Primary Helper.
@@ -460,7 +482,8 @@ to_pi0(M,Find,PI):-get_pi(Find,PI0),!,(PI0\=(_:_)->(current_module(M),PI=(M:PI0)
 
 :- thread_local(t_l:last_src_loc/2).
 
-% 	 	 
+%= 	 	 
+
 %% input_key( ?K) is semidet.
 %
 % Input Key.
@@ -468,7 +491,8 @@ to_pi0(M,Find,PI):-get_pi(Find,PI0),!,(PI0\=(_:_)->(current_module(M),PI=(M:PI0)
 input_key(K):-thread_self(K).
    
 
-% 	 	 
+%= 	 	 
+
 %% show_new_src_location( ?FL) is semidet.
 %
 % Show New Src Location.
@@ -476,7 +500,8 @@ input_key(K):-thread_self(K).
 show_new_src_location(FL):-input_key(K),show_new_src_location(K,FL).
 
 
-% 	 	 
+%= 	 	 
+
 %% show_new_src_location( ?K, ?FL) is semidet.
 %
 % Show New Src Location.
@@ -489,7 +514,8 @@ show_new_src_location(K,FL):- retractall(t_l:last_src_loc(K,_)),format_to_error(
 :- thread_local(t_l:current_why_source/1).
 
 
-% 	 	 
+%= 	 	 
+
 %% sl_to_filename( ?W, ?W) is semidet.
 %
 % Sl Converted To Filename.
@@ -501,7 +527,8 @@ sl_to_filename(W,W).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% current_source_location( ?F) is semidet.
 %
 % Current Source Location.
@@ -510,7 +537,8 @@ current_source_location(F):- clause(logicmoo_util_catch:current_source_location0
 current_source_location(F):- F = unknown.
 
 
-% 	 	 
+%= 	 	 
+
 %% current_source_location0( :TermF) is semidet.
 %
 % Current Source Location Primary Helper.
@@ -528,7 +556,8 @@ current_source_location0(module(M)):- '$module'(M,M).
 :-export(current_why/1).
 :-module_transparent(current_why/1).
 
-% 	 	 
+%= 	 	 
+
 %% current_why( ?Why) is semidet.
 %
 % Current Generation Of Proof.
@@ -540,7 +569,8 @@ current_why(F):- current_source_location(F).
 % source_module(M):-!,M=u.
 :-export(source_module/1).
 
-% 	 	 
+%= 	 	 
+
 %% source_module( ?M) is semidet.
 %
 % Source Module.
@@ -552,14 +582,16 @@ source_module(M):-loading_module(M),!.
 :- thread_local(t_l:last_source_file/1).
 :- export(loading_file/1).
 
-% 	 	 
+%= 	 	 
+
 %% loading_file( ?FIn) is semidet.
 %
 % Loading File.
 %
 loading_file(FIn):- ((source_file0(F) *-> (retractall(t_l:last_source_file(_)),asserta(t_l:last_source_file(F))) ; (fail,t_l:last_source_file(F)))),!,F=FIn.
 
-% 	 	 
+%= 	 	 
+
 %% source_file0( ?F) is semidet.
 %
 % Source File Primary Helper.
@@ -575,7 +607,8 @@ source_file0(F):-findall(E,catch((stream_property( S,mode(read)),stream_property
 
 :-export(source_variables_l/1).
 
-% 	 	 
+%= 	 	 
+
 %% source_variables_l( ?AllS) is semidet.
 %
 % Source Variables (list Version).
@@ -591,7 +624,8 @@ source_variables_l(AllS):-
 
 
 
-% 	 	 
+%= 	 	 
+
 %% source_variables( ?Vs) is semidet.
 %
 % Source Variables.
@@ -606,7 +640,8 @@ source_variables([]).
 %show_source_location:- notrace((tlbugger:no_slow_io)),!.
 %show_source_location:- is_hiding_dmsgs,!.
 
-% 	 	 
+%= 	 	 
+
 %% show_source_location is semidet.
 %
 % Show Source Location.
@@ -620,21 +655,24 @@ show_source_location.
 
 :-export( as_clause_no_m/3).
 
-% 	 	 
+%= 	 	 
+
 %% as_clause_no_m( ?MHB, ?H, ?B) is semidet.
 %
 % Converted To Clause No Module.
 %
 as_clause_no_m( MHB,  H, B):- strip_module(MHB,_M,HB), as_clause( HB,  MH, MB),strip_module(MH,_M2H,H),strip_module(MB,_M2B,B).
 
-% 	 	 
+%= 	 	 
+
 %% as_clause_w_m( ?MHB, ?M, ?H, ?B) is semidet.
 %
 % Converted To Clause W Module.
 %
 as_clause_w_m(MHB, M, H, B):-  as_clause_w_m(MHB, M1H, H, B, M2B), (M1H==user->M2B=M;M1H=M).
 
-% 	 	 
+%= 	 	 
+
 %% as_clause_w_m( ?MHB, ?M1H, ?H, ?B, ?M2B) is semidet.
 %
 % Converted To Clause W Module.
@@ -643,7 +681,8 @@ as_clause_w_m(MHB, M1H, H, B, M2B):-  as_clause( MHB,  MH, MB),strip_module(MH,M
 
 :- export(is_ftCompound/1).
 
-% 	 	 
+%= 	 	 
+
 %% is_ftCompound( ?Goal) is semidet.
 %
 % If Is A Format Type Compound.
@@ -652,7 +691,8 @@ is_ftCompound(Goal):-compound(Goal),Goal\='$VAR'(_).
 
 :- export(is_ftVar/1).
 
-% 	 	 
+%= 	 	 
+
 %% is_ftVar( :TermV) is semidet.
 %
 % If Is A Format Type Variable.
@@ -662,7 +702,8 @@ is_ftVar('$VAR'(_)).
 
 :- export(is_ftNonvar/1).
 
-% 	 	 
+%= 	 	 
+
 %% is_ftNonvar( ?V) is semidet.
 %
 % If Is A Format Type Nonvar.
@@ -681,7 +722,8 @@ is_ftNonvar(V):- \+ is_ftVar(V).
    maplist_safe/3)).
 
 
-% 	 	 
+%= 	 	 
+
 %% maplist_safe( ?Pred, ?LIST) is semidet.
 %
 % Maplist Safely Paying Attention To Corner Cases.
@@ -691,7 +733,8 @@ maplist_safe(Pred,LIST):-findall(E,(member(E,LIST), on_f_debug(apply(Pred,[E])))
 % though this should been fine %  maplist_safe(Pred,[A|B]):- copy_term(Pred+A, Pred0+A0), on_f_debug(once(call(Pred0,A0))),     maplist_safe(Pred,B),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% maplist_safe( ?Pred, ?LISTIN, ?LIST) is semidet.
 %
 % Maplist Safely Paying Attention To Corner Cases.
@@ -704,7 +747,8 @@ maplist_safe(Pred,LISTIN, LIST):-!, findall(EE, ((member(E,LISTIN),on_f_debug(ap
 
 :- export(bad_functor/1).
 
-% 	 	 
+%= 	 	 
+
 %% bad_functor( ?L) is semidet.
 %
 % Bad Functor.
@@ -713,7 +757,8 @@ bad_functor(L) :- arg(_,v('|','.',[],':','/'),L).
 
 :- export(warn_bad_functor/1).
 
-% 	 	 
+%= 	 	 
+
 %% warn_bad_functor( ?L) is semidet.
 %
 % Warn Bad Functor.
@@ -722,7 +767,8 @@ warn_bad_functor(L):-ignore((hotrace(bad_functor(L)),!,trace,nop(ddmsg(bad_funct
 
 :- export(strip_f_module/2).
 
-% 	 	 
+%= 	 	 
+
 %% strip_f_module( ?P, ?PA) is semidet.
 %
 % Strip Functor Module.
@@ -741,7 +787,8 @@ strip_f_module(P,P).
 :- export((catchv/3,catchv/3)).
 
 
-% 	 	 
+%= 	 	 
+
 %% bubbled_ex( ?VALUE1) is semidet.
 %
 % Bubbled Ex.
@@ -749,7 +796,8 @@ strip_f_module(P,P).
 bubbled_ex(block(_,_)).
 bubbled_ex('$aborted').
 
-% 	 	 
+%= 	 	 
+
 %% bubbled_ex_check( ?E) is semidet.
 %
 % Bubbled Ex Check.
@@ -758,7 +806,8 @@ bubbled_ex_check(E):- ( \+ bubbled_ex(E)),!.
 bubbled_ex_check(E):-throw(E).
 
 
-% 	 	 
+%= 	 	 
+
 %% catchv( :GoalGoal, ?E, :GoalRecovery) is semidet.
 %
 % Catchv.
@@ -774,7 +823,8 @@ catchv(Goal,E,Recovery):- nonvar(E) -> catch(Goal,E,Recovery); % normal mode (th
 
 :- export(functor_catch/3).
 
-% 	 	 
+%= 	 	 
+
 %% functor_catch( ?P, ?F, ?A) is semidet.
 %
 % Functor Catch.
@@ -786,7 +836,8 @@ functor_catch(P,F,A):- catchv(functor(P,F,A),_,compound_name_arity(P,F,A)).
 
 :- export(functor_safe/3).
 
-% 	 	 
+%= 	 	 
+
 %% functor_safe( ?P, ?F, ?A) is semidet.
 %
 % Functor Safely Paying Attention To Corner Cases.
@@ -812,36 +863,40 @@ functor_safe_compound(P,F,A):- strip_f_module(P,P0),strip_f_module(F,F0),!,funct
 % block(test, (repeat, !(test), fail))).
 :- meta_predicate block(+, :, ?). 
 
-% 	 	 
+%= 	 	 
+
 %% block( +Name, ?Goal, ?Var) is semidet.
 %
-% Hook To [ifprolog:block/3] For Module Logicmoo_util_catch.
 % Block.
 %
 block(Name, Goal, Var) :- Goal, keep(Name, Var).	% avoid last-call and GC 
 
-% 	 	 
+%= 	 	 
+
 %% keep( ?VALUE1, ?VALUE2) is semidet.
 %
 % Keep.
 %
 keep(_, _).  
 
-% 	 	 
+%= 	 	 
+
 %% set_block_exit( ?Name, ?Value) is semidet.
 %
 % Set Block Exit.
 %
 set_block_exit(Name, Value) :-  prolog_current_frame(Frame),  prolog_frame_attribute(Frame, parent_goal,  mcall:block(Name, _, Value)). 
 
-% 	 	 
+%= 	 	 
+
 %% block( ?Name, ?Goal) is semidet.
 %
 % Block.
 %
 block(Name, Goal) :-  block(Name, Goal, Var),  (   Var == !  ->  !  ;   true  ). 
 
-% 	 	 
+%= 	 	 
+
 %% !( ?Name) is semidet.
 %
 % !.
@@ -860,7 +915,8 @@ block(Name, Goal) :-  block(Name, Goal, Var),  (   Var == !  ->  !  ;   true  ).
 % hasLibrarySupport :- absolute_file_name('logicmoo_util_library.pl',File),exists_file(File).
 
 
-% 	 	 
+%= 	 	 
+
 %% throwNoLib is semidet.
 %
 % Throw No Lib.
@@ -871,7 +927,8 @@ throwNoLib:- trace,absolute_file_name('.',Here), buggerFile(BuggerFile), listing
 :- abolish(buggerDir/1),prolog_load_context(directory,D),asserta(buggerDir(D)).
 
 
-% 	 	 
+%= 	 	 
+
 %% addLibraryDir is semidet.
 %
 % Add Library Dir.
@@ -887,7 +944,8 @@ addLibraryDir :- buggerDir(Here),atom_concat(Here,'/..',UpOne), absolute_file_na
 
 
 
-% 	 	 
+%= 	 	 
+
 %% ib_multi_transparent33( ?MT) is semidet.
 %
 % Ib Multi Transparent33.
@@ -895,7 +953,8 @@ addLibraryDir :- buggerDir(Here),atom_concat(Here,'/..',UpOne), absolute_file_na
 ib_multi_transparent33(MT):-multifile(MT),module_transparent(MT),dynamic_safe(MT).
 
 
-% 	 	 
+%= 	 	 
+
 %% dif_safe( ?Agent, ?Obj) is semidet.
 %
 % Dif Safely Paying Attention To Corner Cases.
@@ -905,7 +964,8 @@ dif_safe(Agent,Obj):- Agent\==Obj.
 
 % hide Pred from tracing
 
-% 	 	 
+%= 	 	 
+
 %% to_m_f_arity_pi( ?Term, ?M, ?F, ?A, ?PI) is semidet.
 %
 % Converted To Module Functor Arity Predicate Indicator.
@@ -916,7 +976,8 @@ to_m_f_arity_pi(F/A,_M,F,A,PI):-functor_safe(PI,F,A),!.
 to_m_f_arity_pi(PI,_M,F,A,PI):-functor_safe(PI,F,A).
 
 
-% 	 	 
+%= 	 	 
+
 %% with_preds( ?H, ?M, ?F, ?A, ?PI, :GoalGoal) is semidet.
 %
 % Using Predicates.
@@ -936,7 +997,8 @@ with_preds(H,M,F,A,PI,Goal):-forall(to_m_f_arity_pi(H,M,F,A,PI),Goal).
 
 :- export(dbgsubst/4).
 
-% 	 	 
+%= 	 	 
+
 %% dbgsubst( ?A, ?B, ?Goal, ?A) is semidet.
 %
 % Dbgsubst.
@@ -946,7 +1008,8 @@ dbgsubst(A,B,Goal,D):-var(A),!,ddmsg(dbgsubst(A,B,Goal,D)),dumpST,dtrace(dbgsubs
 dbgsubst(A,B,Goal,D):-dbgsubst0(A,B,Goal,D).
 
 
-% 	 	 
+%= 	 	 
+
 %% dbgsubst0( ?A, ?B, ?Goal, ?D) is semidet.
 %
 % Dbgsubst Primary Helper.
@@ -956,7 +1019,8 @@ dbgsubst0(A,B,Goal,D):-
 dbgsubst0(A,_B,_C,A).
 
 
-% 	 	 
+%= 	 	 
+
 %% nd_dbgsubst( ?Var, ?VarS, ?SUB, ?SUB) is semidet.
 %
 % Nd Dbgsubst.
@@ -965,7 +1029,8 @@ nd_dbgsubst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
 nd_dbgsubst(  P, Goal,Sk, P1 ) :- functor_safe(P,_,N),nd_dbgsubst1( Goal, Sk, P, N, P1 ).
 
 
-% 	 	 
+%= 	 	 
+
 %% nd_dbgsubst1( ?Goal, ?Sk, ?P, ?N, ?P1) is semidet.
 %
 % Nd Dbgsubst Secondary Helper.
@@ -977,7 +1042,8 @@ nd_dbgsubst1( Goal, Sk, P, N, P1 ) :- N > 0, P =.. [F|Args],
             P1 =.. [FS|ArgS].
 
 
-% 	 	 
+%= 	 	 
+
 %% nd_dbgsubst2( ?X, ?Sk, ?L, ?L) is semidet.
 %
 % Nd Dbgsubst Extended Helper.
@@ -994,7 +1060,8 @@ nd_dbgsubst2( _X, _Sk, L, L ).
 % Module Utils
 %=========================================
 
-% 	 	 
+%= 	 	 
+
 %% module_functor( ?PredImpl, ?Module, ?Pred, ?Arity) is semidet.
 %
 % Module Functor.
@@ -1002,7 +1069,8 @@ nd_dbgsubst2( _X, _Sk, L, L ).
 module_functor(PredImpl,Module,Pred,Arity):-strip_module(PredImpl,Module,NewPredImpl),strip_arity(NewPredImpl,Pred,Arity).
 
 
-% 	 	 
+%= 	 	 
+
 %% strip_arity( ?PredImpl, ?Pred, ?Arity) is semidet.
 %
 % Strip Arity.
@@ -1028,7 +1096,8 @@ for obvious reasons.
 
 :- export(nop/1).
 
-% 	 	 
+%= 	 	 
+
 %% nop( ?VALUE1) is semidet.
 %
 % Nop.
@@ -1060,7 +1129,8 @@ nop(_).
 % =========================================================================
 
 
-% 	 	 
+%= 	 	 
+
 %% trace_or_throw( ?E) is semidet.
 %
 %  Trace or throw.
@@ -1074,7 +1144,8 @@ trace_or_throw(E):- wdmsg(E),dtrace_msg(throw:-E).
 
 :-export(on_x_fail/1).
 
-% 	 	 
+%= 	 	 
+
 %% on_x_fail( :GoalGoal) is semidet.
 %
 % If there If Is A an exception in  :Goal goal then fail.
@@ -1084,7 +1155,8 @@ on_x_fail(Goal):- catchv(Goal,_,fail).
 
 % false = hide this wrapper
 
-% 	 	 
+%= 	 	 
+
 %% showHiddens is semidet.
 %
 % Show Hiddens.
@@ -1094,7 +1166,8 @@ showHiddens:-true.
 :- meta_predicate on_x_log_fail(0).
 :- export(on_x_log_fail/1).
 
-% 	 	 
+%= 	 	 
+
 %% on_x_log_fail( :GoalGoal) is semidet.
 %
 % If there If Is A an exception in  :Goal goal then log fail.
@@ -1107,7 +1180,8 @@ on_x_log_fail(Goal):- catchv(Goal,E,(dmsg(E:Goal),fail)).
 :- export(on_x_log_throw/1).
 :- export(on_x_log_cont/1).
 
-% 	 	 
+%= 	 	 
+
 %% on_x_log_throw( :GoalGoal) is semidet.
 %
 % If there If Is A an exception in  :Goal goal then log throw.
@@ -1115,7 +1189,8 @@ on_x_log_fail(Goal):- catchv(Goal,E,(dmsg(E:Goal),fail)).
 on_x_log_throw(Goal):- catchv(Goal,E,(ddmsg(on_x_log_throw(E,Goal)),throw(E))).
 %on_x_log_throwEach(Goal):-with_each(1,on_x_log_throw,Goal).
 
-% 	 	 
+%= 	 	 
+
 %% on_x_log_cont( :GoalGoal) is semidet.
 %
 % If there If Is A an exception in  :Goal goal then log cont.
@@ -1128,7 +1203,8 @@ on_x_log_cont(Goal):- catchv((Goal*->true;ddmsg(failed_on_x_log_cont(Goal))),E,d
 
 :- export(errx/0).
 
-% 	 	 
+%= 	 	 
+
 %% errx is semidet.
 %
 % Errx.
@@ -1142,7 +1218,8 @@ errx:-on_x_debug((ain(tlbugger:dont_skip_bugger),do_gc,dumpST(10))),!.
 
 %skipWrapper:-!,fail.
 
-% 	 	 
+%= 	 	 
+
 %% skipWrapper is semidet.
 %
 % Skip Wrapper.
@@ -1164,7 +1241,8 @@ skipWrapper:- tlbugger:skip_bugger,!.
 
 % = :- meta_predicate(one_must(0,0)).
 
-% 	 	 
+%= 	 	 
+
 %% one_must( :GoalMCall, :GoalOnFail) is semidet.
 %
 % One Must Be Successfull.
@@ -1173,7 +1251,8 @@ one_must(MCall,OnFail):-  MCall *->  true ; OnFail.
 
 
 
-% 	 	 
+%= 	 	 
+
 %% must_det( :GoalGoal) is semidet.
 %
 % Must Be Successfull Deterministic.
@@ -1181,7 +1260,8 @@ one_must(MCall,OnFail):-  MCall *->  true ; OnFail.
 must_det(Goal):- must(Goal),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% one_must_det( :GoalGoal, :GoalOnFail) is semidet.
 %
 % One Must Be Successfull Deterministic.
@@ -1190,7 +1270,8 @@ one_must_det(Goal,_OnFail):-Goal,!.
 one_must_det(_Call,OnFail):-OnFail,!.
 
 
-% 	 	 
+%= 	 	 
+
 %% must_det( :GoalGoal, :GoalOnFail) is semidet.
 %
 % Must Be Successfull Deterministic.
@@ -1200,7 +1281,8 @@ must_det(_Call,OnFail):-OnFail.
 
 :- module_transparent(must_det_l/1).
 
-% 	 	 
+%= 	 	 
+
 %% must_det_l( :GoalMGoal) is semidet.
 %
 % Must Be Successfull Deterministic (list Version).
@@ -1209,7 +1291,8 @@ must_det_l(MGoal):- strip_module(MGoal,M,Goal),!, must_det_lm(M,Goal).
 
 :- module_transparent(must_det_lm/2).
 
-% 	 	 
+%= 	 	 
+
 %% must_det_lm( ?M, :TermGoal) is semidet.
 %
 % Must Be Successfull Deterministic Lm.
@@ -1225,7 +1308,8 @@ must_det_lm(M,[Goal|List]):-!,must(M:Goal),!,must_det_lm(M,List).
 
 :- module_transparent(det_lm/2).
 
-% 	 	 
+%= 	 	 
+
 %% det_lm( ?M, ?Goal) is semidet.
 %
 % Deterministic Lm.
@@ -1235,7 +1319,8 @@ det_lm(M,Goal):-M:Goal,!.
 
 :- module_transparent(must_l/1).
 
-% 	 	 
+%= 	 	 
+
 %% must_l( :GoalGoal) is semidet.
 %
 % Must Be Successfull (list Version).
@@ -1252,7 +1337,8 @@ must_l(Goal):- must(Goal).
 % thread locals should defaults to false  tlbugger:skip_use_slow_sanity.
 
 
-% 	 	 
+%= 	 	 
+
 %% slow_sanity( :GoalGoal) is semidet.
 %
 % Slow Optional Sanity Checking.
@@ -1269,7 +1355,8 @@ slow_sanity(Goal):- ( tlbugger:skip_use_slow_sanity ; sanity(Goal)),!.
 
 % sanity(_):-skipWrapper,!.
 
-% 	 	 
+%= 	 	 
+
 %% sanity( :GoalGoal) is semidet.
 %
 % Optional Sanity Checking.
@@ -1282,7 +1369,8 @@ sanity(Goal):- ignore(must(show_failure(why,Goal))).
 
 :- export(is_release/0).
 
-% 	 	 
+%= 	 	 
+
 %% is_release is semidet.
 %
 % If Is A Release.
@@ -1291,7 +1379,8 @@ is_release:- !,fail.
 is_release :- \+ not_is_release.
 :- export(not_is_release/0).
 
-% 	 	 
+%= 	 	 
+
 %% not_is_release is semidet.
 %
 % Not If Is A Release.
@@ -1303,7 +1392,8 @@ not_is_release:- \+ is_release.
 
 :- thread_local tlbugger:show_must_go_on/0.
 
-% 	 	 
+%= 	 	 
+
 %% badfood( ?MCall) is semidet.
 %
 % Badfood.
@@ -1315,7 +1405,8 @@ badfood(MCall):- numbervars(MCall,0,_,[functor_name('VAR_______________________x
 % = :- meta_predicate(without_must(0)).
 
 
-% 	 	 
+%= 	 	 
+
 %% without_must( :GoalGoal) is semidet.
 %
 % Without Must Be Successfull.
@@ -1326,7 +1417,8 @@ without_must(Goal):- w_tl(tlbugger:skipMust,Goal).
 :- export(y_must/2).
 :- meta_predicate (y_must(?,0)).
 
-% 	 	 
+%= 	 	 
+
 %% y_must( ?Y, :GoalGoal) is semidet.
 %
 % Y Must Be Successfull.
@@ -1342,7 +1434,8 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 :- meta_predicate(must(0)).
 %must(Call):-(repeat, (catchv(Call,E,(dmsg(E:Call),debug,fail)) *-> true ; (ignore(ftrace(Call)),leash(+all),repeat,wdmsg(failed(Call)),trace,Call)),!).
 
-% 	 	 
+%= 	 	 
+
 %% must( :GoalGoal) is semidet.
 %
 % Must Be Successfull.
@@ -1350,7 +1443,8 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 must(Goal):- notrace(get_must(Goal,MGoal)),!,MGoal.
 
 
-% 	 	 
+%= 	 	 
+
 %% get_must( ?Goal, ?CGoal) is semidet.
 %
 % Get Must Be Successfull.

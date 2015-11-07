@@ -169,7 +169,8 @@
    with_kb_assertions/2)).
 
 
-% 	 	 
+%= 	 	 
+
 %% compound_functor( ?Compound, ?F) is semidet.
 %
 % Compound Functor.
@@ -177,7 +178,8 @@
 compound_functor(Compound,F):-compound(Compound),nonvar(Compound),get_functor(Compound,F).
 
 
-% 	 	 
+%= 	 	 
+
 %% not_variant( ?G, ?GG) is semidet.
 %
 % Not Variant.
@@ -195,7 +197,8 @@ not_variant(G,GG):-
 
 % TODO: canonicalize clauses first!
 
-% 	 	 
+%= 	 	 
+
 %% with_kb_assertions( ?With, :GoalCall) is semidet.
 %
 % Using Knowledge Base Assertions.
@@ -207,7 +210,8 @@ with_kb_assertions(With,Call):-
 
 
 
-% 	 	 
+%= 	 	 
+
 %% world_clear( ?Named) is semidet.
 %
 % World Clear.
@@ -217,14 +221,16 @@ world_clear(Named):-fmt('Clearing world database: ~q.~n',[Named]).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% get_pifunctor( ?Head, ?PHead) is semidet.
 %
 % Get Pifunctor.
 %
 get_pifunctor(Head,PHead):-must(get_pifunctor(Head,PHead,_,_)).
 
-% 	 	 
+%= 	 	 
+
 %% get_pifunctor( ?Head, ?PHead, ?F) is semidet.
 %
 % Get Pifunctor.
@@ -232,7 +238,8 @@ get_pifunctor(Head,PHead):-must(get_pifunctor(Head,PHead,_,_)).
 get_pifunctor(Head,PHead,F):-must(get_pifunctor(Head,PHead,F,_)).
 
 
-% 	 	 
+%= 	 	 
+
 %% get_pifunctor( ?Head, ?PHead, ?F, ?A) is semidet.
 %
 % Get Pifunctor.
@@ -242,14 +249,16 @@ get_pifunctor(Head,PHead,F,A):-get_functor(Head,F,A),functor(PHead,F,A),ignore(P
 get_pifunctor(Head,PHead,F,A):-atom(Head),ensure_arity(Head,A),!,get_pifunctor(Head/A,PHead,F,A).
 
 
-% 	 	 
+%= 	 	 
+
 %% rescan_meta_argtypes( ?MT) is semidet.
 %
 % Rescan Meta Argument Types.
 %
 rescan_meta_argtypes(MT):- functor(MT,F,A),functor(M,F,A),MT=..[F|ARGST],M=..[F|ARGS],forall(clause_asserted(M,_),maplist(deduceEachArg_WithType,ARGS,ARGST)),!.
 
-% 	 	 
+%= 	 	 
+
 %% rescan_argIsa( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
 %
 % rescan Argument  (isa/2).
@@ -257,7 +266,8 @@ rescan_meta_argtypes(MT):- functor(MT,F,A),functor(M,F,A),MT=..[F|ARGST],M=..[F|
 rescan_argIsa(F,N,Type):- ignore(( arity(F,A), functor(M,F,A),forall((clause_asserted(M,_),arg(N,M,E)),deduceEachArg_WithType(E,Type)))),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% deduceEachArgType( ?Var) is semidet.
 %
 % Deduce Each Argument Type.
@@ -267,7 +277,8 @@ deduceEachArgType(meta_argtypes(MT)):- !, rescan_meta_argtypes(MT).
 deduceEachArgType(tRelation(M)):-compound(M),functor(M,F,A),ain(meta_argtypes(M)),ain(tRelation(F)),ain(arity(F,A)).
 deduceEachArgType(M):-functor(M,F,A),M=..[F|ARGS],deduceEachArgType(F,A,ARGS).
 
-% 	 	 
+%= 	 	 
+
 %% deduceEachArgType( ?F, ?VALUE2, ?VALUE3) is semidet.
 %
 % Deduce Each Argument Type.
@@ -285,7 +296,8 @@ deduceEachArgType(F,_,ARGS):-deduceEachArg_WithArgIsa(F,1,ARGS).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% if_main( :GoalG) is semidet.
 %
 % If Main.
@@ -293,7 +305,8 @@ deduceEachArgType(F,_,ARGS):-deduceEachArg_WithArgIsa(F,1,ARGS).
 if_main(G):-(thread_self(M),lmcache:thread_main(_,M))->G ; true.
 
 
-% 	 	 
+%= 	 	 
+
 %% deduceEachArg_WithArgIsa( ?F, ?N, :TermA) is semidet.
 %
 % deduce each Argument With Argument  (isa/2).
@@ -303,7 +316,8 @@ deduceEachArg_WithArgIsa(F,N,[A|RGS]):- ignore((clause_asserted(argIsa(F,N,Type)
    N2 is N+1,deduceEachArg_WithArgIsa(F,N2,RGS),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% deduceEachArg_WithType( ?M, ?VALUE2) is semidet.
 %
 % Deduce Each Argument With Type.
@@ -318,7 +332,8 @@ deduceEachArg_WithType(M,MT):-isa(M,MT),!.
 deduceEachArg_WithType(M,MT):- assert_isa_safe(M,MT),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% side_effect_prone is semidet.
 %
 % Side Effect Prone.
@@ -329,7 +344,8 @@ side_effect_prone:- \+ t_l:noDBaseMODs(_), t_l:side_effect_ok.
 
 :- meta_predicate(with_no_modifications(0)).
 
-% 	 	 
+%= 	 	 
+
 %% with_no_modifications( :GoalCALL) is semidet.
 %
 % Using No Modifications.
@@ -339,7 +355,8 @@ with_no_modifications(CALL):-w_tl(t_l:noDBaseMODs(_),CALL).
 
 :- meta_predicate(with_no_db_hooks(0)).
 
-% 	 	 
+%= 	 	 
+
 %% with_no_db_hooks( :GoalCALL) is semidet.
 %
 % Using No Database Hooks.
@@ -349,7 +366,8 @@ with_no_db_hooks(CALL):-w_tl(t_l:noDBaseHOOKS(_),CALL).
 
 :- meta_predicate(with_fallbacks(0)).
 
-% 	 	 
+%= 	 	 
+
 %% with_fallbacks( :GoalCALL) is semidet.
 %
 % Using Fallbacks.
@@ -358,7 +376,8 @@ with_fallbacks(CALL):-wno_tl(t_l:infAssertedOnly(_),CALL).
 
 :- meta_predicate(with_fallbacksg(0)).
 
-% 	 	 
+%= 	 	 
+
 %% with_fallbacksg( :GoalCALL) is semidet.
 %
 % Using Fallbacksg.
@@ -367,7 +386,8 @@ with_fallbacksg(CALL):-wno_tl(t_l:noRandomValues(_),CALL).
 
 :- meta_predicate(with_no_fallbacksg(0)).
 
-% 	 	 
+%= 	 	 
+
 %% with_no_fallbacksg( :GoalCALL) is semidet.
 %
 % Using No Fallbacksg.
@@ -376,7 +396,8 @@ with_no_fallbacksg(CALL):-w_tl(t_l:noRandomValues(_),CALL).
 
 :- meta_predicate(with_no_fallbacks(0)).
 
-% 	 	 
+%= 	 	 
+
 %% with_no_fallbacks( :GoalCALL) is semidet.
 %
 % Using No Fallbacks.
@@ -384,7 +405,8 @@ with_no_fallbacksg(CALL):-w_tl(t_l:noRandomValues(_),CALL).
 with_no_fallbacks(CALL):-w_tl(t_l:infAssertedOnly(_),CALL).
 
 
-% 	 	 
+%= 	 	 
+
 %% infSecondOrderCheck is semidet.
 %
 % Inf Second Order Check.
@@ -392,7 +414,8 @@ with_no_fallbacks(CALL):-w_tl(t_l:infAssertedOnly(_),CALL).
 infSecondOrderCheck :- \+ t_l:infInstanceOnly(_), t_l:infSecondOrder.
 
 
-% 	 	 
+%= 	 	 
+
 %% infThirdOrderCheck is semidet.
 %
 % Inf Third Order Check.
@@ -407,7 +430,8 @@ infThirdOrderCheck :- fail, infSecondOrderCheck, not(t_l:noRandomValues(_)).
 :- thread_local t_l:fail_is_asserted/1.
 
 
-% 	 	 
+%= 	 	 
+
 %% with_fail_is_asserted( ?Temp, ?Goal) is semidet.
 %
 % Using Fail If Is A Asserted.
@@ -420,7 +444,8 @@ with_fail_is_asserted(Temp,Goal):-w_tl(t_l:fail_is_asserted(Temp),Goal).
 :- meta_predicate not_asserted(?).
 
 
-% 	 	 
+%= 	 	 
+
 %% not_asserted( ?X) is semidet.
 %
 % Not Asserted.
@@ -428,7 +453,8 @@ with_fail_is_asserted(Temp,Goal):-w_tl(t_l:fail_is_asserted(Temp),Goal).
 not_asserted(X):- !,(\+ clause(X,true)).
 not_asserted(X):- not(no_loop_check(is_asserted_1(X))).
 
-% 	 	 
+%= 	 	 
+
 %% is_asserted_eq( ?HB) is semidet.
 %
 % If Is A Asserted Using (==/2) (or =@=/2) ).
@@ -436,21 +462,24 @@ not_asserted(X):- not(no_loop_check(is_asserted_1(X))).
 is_asserted_eq(HB):- ( \+ \+ no_loop_check(is_asserted_1(HB))).
 
 
-% 	 	 
+%= 	 	 
+
 %% is_asserted( ?X) is semidet.
 %
 % If Is A Asserted.
 %
 is_asserted(X):- no_repeats(loop_check(req(X))).
 
-% 	 	 
+%= 	 	 
+
 %% is_asserted( ?X, ?Y) is semidet.
 %
 % If Is A Asserted.
 %
 is_asserted(X,Y):- no_repeats(loop_check(is_asserted_2(X,Y))).
 
-% 	 	 
+%= 	 	 
+
 %% is_asserted( ?X, ?Y, ?Z) is semidet.
 %
 % If Is A Asserted.
@@ -458,7 +487,8 @@ is_asserted(X,Y):- no_repeats(loop_check(is_asserted_2(X,Y))).
 is_asserted(X,Y,Z):- no_repeats(loop_check(is_asserted_3(X,Y,Z))).
 
 
-% 	 	 
+%= 	 	 
+
 %% is_asserted_1( ?V) is semidet.
 %
 % If Is A asserted  Secondary Helper.
@@ -481,7 +511,8 @@ is_asserted_1((H1;H2)):-!,is_asserted_1(H1);is_asserted_1(H2).
 is_asserted_1(HB):-expand_to_hb(HB,H,B),!,is_asserted_2(H,B).
 
 
-% 	 	 
+%= 	 	 
+
 %% skip_is_asserted_expansion( ?VALUE1) is semidet.
 %
 % Skip If Is A Asserted Expansion.
@@ -490,7 +521,8 @@ skip_is_asserted_expansion(_).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% is_asserted_2( ?H, ?B) is semidet.
 %
 % If Is A asserted  Extended Helper.
@@ -500,7 +532,8 @@ is_asserted_2(H,B):-  skip_is_asserted_expansion(H),!,is_asserted_2a(H,B).
 is_asserted_2(H,B):-hotrace((fully_expand_warn(is_asserted_2,(H:-B),CL),expand_to_hb(CL,HH,BB))),!,is_asserted_2a(HH,BB).
 
 
-% 	 	 
+%= 	 	 
+
 %% is_asserted_2a( ?H, ?B) is semidet.
 %
 % If Is A Asserted 2a.
@@ -509,7 +542,8 @@ is_asserted_2a(H,B):-lmconf:pfcManageHybrids,!,mpred_clause_is_asserted(H,B).
 is_asserted_2a(H,B):-call_no_cuts(lmconf:mpred_provide_storage_clauses(H,B,_Ref)),not(hotrace(special_wrapper_body(B,_))).
 
 
-% 	 	 
+%= 	 	 
+
 %% is_asserted_3( ?H, ?B, ?Ref) is semidet.
 %
 % If Is A Asserted Helper Number 3..
@@ -519,7 +553,8 @@ is_asserted_3(H,B,Ref):- skip_is_asserted_expansion(H), !,is_asserted_3a(H,B,Ref
 is_asserted_3(H,B,Ref):-hotrace((fully_expand_warn(is_asserted_3,(H:-B),CL),expand_to_hb(CL,HH,BB))),is_asserted_3a(HH,BB,Ref).
 
 
-% 	 	 
+%= 	 	 
+
 %% is_asserted_3a( ?H, ?B, ?Ref) is semidet.
 %
 % If Is A Asserted 3a.
@@ -527,7 +562,8 @@ is_asserted_3(H,B,Ref):-hotrace((fully_expand_warn(is_asserted_3,(H:-B),CL),expa
 is_asserted_3a(H,B,Ref):-call_no_cuts(lmconf:mpred_provide_storage_clauses(H,B,Ref)),not(hotrace(special_wrapper_body(B,_))).
 
 
-% 	 	 
+%= 	 	 
+
 %% is_source_proof( ?VALUE1) is semidet.
 %
 % If Is A Source Proof.
@@ -541,7 +577,8 @@ is_source_proof(_).
 :- meta_predicate(fact_checked(?,0)).
 
 
-% 	 	 
+%= 	 	 
+
 %% fact_checked( ?Fact, :GoalCall) is semidet.
 %
 % Fact Checked.
@@ -553,7 +590,8 @@ fact_checked(Fact,Call):- no_loop_check(call_tabled(Call),is_asserted(Fact)).
 
 :- meta_predicate(fact_loop_checked(+,0)).
 
-% 	 	 
+%= 	 	 
+
 %% fact_loop_checked( +Fact, :GoalCall) is semidet.
 %
 % Fact Loop Checked.
@@ -578,14 +616,16 @@ ensure_predicate_reachable(_,_).
 */
 
 
-% 	 	 
+%= 	 	 
+
 %% singletons_throw_else_fail( :GoalC) is semidet.
 %
 % Singletons Throw Else Fail.
 %
 singletons_throw_else_fail(C):- fail,not_is_release,contains_singletons(C),!,(test_tl(t_l:already_in_file_term_expansion) -> (dmsg(contains_singletons(C))); dmsg(trace_or_throw(contains_singletons(C)))),fail.
 
-% 	 	 
+%= 	 	 
+
 %% nonground_throw_else_fail( ?C) is semidet.
 %
 % Nonground Throw Else Fail.
@@ -597,7 +637,8 @@ nonground_throw_else_fail(C):- not_is_release,not(ground(C)),!,( (test_tl(t_l:al
 % ================================================
 
 
-% 	 	 
+%= 	 	 
+
 %% with_logical_functor( ?UPARAM1, ?G, :PRED1Call) is semidet.
 %
 % Using Logical Functor.
@@ -610,7 +651,8 @@ with_logical_functor(And,[G|T],Call):-
 
 
 
-% 	 	 
+%= 	 	 
+
 %% requires_storage( ?C, ?Why) is semidet.
 %
 % Requires Storage.
@@ -619,7 +661,8 @@ requires_storage((Head :- Body),Why):- nonvar(Head),!, requires_storage(Head,Bod
 requires_storage(C,Why):- requires_storage(C,true,Why).
 
 
-% 	 	 
+%= 	 	 
+
 %% requires_storage( ?G, ?VALUE2, ?Why) is semidet.
 %
 % Requires Storage.
@@ -629,7 +672,8 @@ requires_storage(_,_,t_l:consulting_sources):-t_l:consulting_sources,mpred_may_e
 % requires_storage(_,_,t_l:consulting_sources):-t_l:consulting_sources,in_file_expansion.
 
 
-% 	 	 
+%= 	 	 
+
 %% special_wrapper_functor( ?VALUE1, ?VALUE2) is semidet.
 %
 % Special Wrapper Functor.
@@ -644,7 +688,8 @@ special_wrapper_functor(loop_check_term,meta).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% make_body_clause( ?Head, ?Body, ?Body) is semidet.
 %
 % Make Body Clause.
@@ -654,14 +699,16 @@ make_body_clause(_Head,Body,Body):-special_wrapper_body(Body,_Why),!.
 make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 
 
-% 	 	 
+%= 	 	 
+
 %% special_head( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
 %
 % Special Head.
 %
 special_head(_,F,Why):-special_head0(F,Why),!,show_failure(why,not(isa(F,prologDynamic))).
 
-% 	 	 
+%= 	 	 
+
 %% special_head0( ?F, ?VALUE2) is semidet.
 %
 % Special Head Primary Helper.
@@ -678,7 +725,8 @@ special_head0(F,pfcControlled):-a(pfcControlled,F).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% special_wrapper_body( ?W, ?Why) is semidet.
 %
 % Special Wrapper Body.
@@ -686,7 +734,8 @@ special_head0(F,pfcControlled):-a(pfcControlled,F).
 special_wrapper_body(W,Why):-get_body_functor(W,F,_),!,special_wrapper_functor(F,Why).
 
 
-% 	 	 
+%= 	 	 
+
 %% get_body_functor( :TermBDY, ?BF, ?A) is semidet.
 %
 % Get Body Functor.
@@ -708,14 +757,16 @@ get_body_functor(BDY,BF,A):-get_functor(BDY,BF,A).
 
 % -  del(RetractOne) 
 
-% 	 	 
+%= 	 	 
+
 %% del( -C) is semidet.
 %
 % Remove/erase.
 %
 del(C):- fully_expand(change(retract,a),C,C0),mpred_maptree(del0,C0).
 
-% 	 	 
+%= 	 	 
+
 %% del0( :GoalC0) is semidet.
 %
 % Remove/erase Primary Helper.
@@ -725,7 +776,8 @@ del0(C0):- ireq(C0),!,idel(C0),!.
 del0(C0):- req(C0),!,mdel(C0),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% idel( ?C0) is semidet.
 %
 % Idel.
@@ -734,7 +786,8 @@ idel(C0):- dmsg(idel(C0)),mpred_modify(change( retract,a),C0), sanity(ireq(C0)->
 idel(C0):- dmsg(warn(failed(idel(C0)))),!,fail.
 
 
-% 	 	 
+%= 	 	 
+
 %% mdel( ?C0) is semidet.
 %
 % Mdel.
@@ -745,7 +798,8 @@ mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 % -  clr(Retractall)
 % clr(C0):- dmsg(clr(C0)),fail,mpred_modify(change(retract,all),/*to_exp*/(C0)),sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
 
-% 	 	 
+%= 	 	 
+
 %% clr( -P) is semidet.
 %
 % Remove/erase.
@@ -754,7 +808,8 @@ clr(P):- agenda_do_prequery,
   fully_expand(change(retract,all),P,PL),mpred_maptree(clr0,PL).
 
 
-% 	 	 
+%= 	 	 
+
 %% clr0( :GoalP) is semidet.
 %
 % Remove/erase Primary Helper.
@@ -765,7 +820,8 @@ clr0(P):-
 
 % -  preq(Query) = query with P note
 
-% 	 	 
+%= 	 	 
+
 %% preq( ?P, ?C0) is semidet.
 %
 % Preq.
@@ -774,7 +830,8 @@ preq(P,C0):- agenda_do_prequery,!,no_repeats(C0,mpred_op(query(t,P),C0)).
 
 % -  req(Query) = Normal query
 
-% 	 	 
+%= 	 	 
+
 %% req_old2( ?C0) is semidet.
 %
 % Req Old Extended Helper.
@@ -783,7 +840,8 @@ req_old2(C0):- nop(dmsg(req(C0))), !,preq(req,/*to_exp*/(C0)).
 
 % -  req(Query) = Forced Full query
 
-% 	 	 
+%= 	 	 
+
 %% mreq_old2( ?C0) is semidet.
 %
 % Mreq Old Extended Helper.
@@ -794,7 +852,8 @@ mreq_old2(C0):- nop(dmsg(req(C0))), agenda_rescan_for_module_ready,
 
 % -  ireq(Query) = Normal query (May not use second order logic) (must be asserted on isntance) (used mainly by 2nd order logic to avoid looping)
 
-% 	 	 
+%= 	 	 
+
 %% ireq( ?C0) is semidet.
 %
 % Ireq.
@@ -805,14 +864,16 @@ ireq(C0):- nop(dmsg(ireq(C0))),
 
 % -  call_props(Obj,QueryPropSpecs)
 
-% 	 	 
+%= 	 	 
+
 %% call_props( ?Obj, ?PropSpecs) is semidet.
 %
 % Call Props.
 %
 call_props(Obj,PropSpecs):- req(props(Obj,PropSpecs)).
 
-% 	 	 
+%= 	 	 
+
 %% iprops( ?Obj, ?PropSpecs) is semidet.
 %
 % Iprops.
@@ -823,7 +884,8 @@ iprops(Obj,PropSpecs):- ireq(/*to_exp*/(props(Obj,PropSpecs))).
 
 :- was_export(forall_setof/2).
 
-% 	 	 
+%= 	 	 
+
 %% forall_setof( :GoalForEach, :GoalCall) is semidet.
 %
 % Forall Setof.
@@ -860,7 +922,8 @@ add_0(A):-trace_or_throw(fmt('ain/1 is failing ~q.',[A])).
 */
 
 
-% 	 	 
+%= 	 	 
+
 %% implied_skipped( ?C0) is semidet.
 %
 % Implied Skipped.
@@ -875,7 +938,8 @@ implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (t(
 % -  ain(Assertion)
 % ain_fast(C0):- must_det((ain_fast(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(why,ain_fast(C0)),rtrace(ain_fast(C0)),dtrace(ireq(C0))))))))),!.
 
-% 	 	 
+%= 	 	 
+
 %% add_fast( ?Term) is semidet.
 %
 % Add Fast.
@@ -884,14 +948,16 @@ add_fast(Term):-mpred_numbervars_with_names(Term),mpred_modify(change(assert,ain
 
 % -  upprop(Obj,PropSpecs) update the properties
 
-% 	 	 
+%= 	 	 
+
 %% upprop( ?Obj, ?PropSpecs) is semidet.
 %
 % Upprop.
 %
 upprop(Obj,PropSpecs):- upprop(props(Obj,PropSpecs)).
 
-% 	 	 
+%= 	 	 
+
 %% upprop( ?C0) is semidet.
 %
 % Upprop.
@@ -899,7 +965,8 @@ upprop(Obj,PropSpecs):- upprop(props(Obj,PropSpecs)).
 upprop(C0):- ain(C0).
 % -  padd(Obj,Prop,Value)
 
-% 	 	 
+%= 	 	 
+
 %% padd( ?Obj, ?PropSpecs) is semidet.
 %
 % Padd.
@@ -907,7 +974,8 @@ upprop(C0):- ain(C0).
 padd(Obj,PropSpecs):- ain((props(Obj,PropSpecs))).
 % -  padd(Obj,Prop,Value)
 
-% 	 	 
+%= 	 	 
+
 %% padd( ?Obj, ?Prop, ?Value) is semidet.
 %
 % Padd.
@@ -915,7 +983,8 @@ padd(Obj,PropSpecs):- ain((props(Obj,PropSpecs))).
 padd(Obj,Prop,Value):- ain((t(Prop,Obj,Value))).
 % -  props(Obj,Prop,Value)
 
-% 	 	 
+%= 	 	 
+
 %% prop( ?Obj, ?Prop, ?Value) is semidet.
 %
 % Prop.
@@ -923,7 +992,8 @@ padd(Obj,Prop,Value):- ain((t(Prop,Obj,Value))).
 prop(Obj,Prop,Value):- req(t(Prop,Obj,Value)).
 % -  prop_or(Obj,Prop,Value,OrElse)
 
-% 	 	 
+%= 	 	 
+
 %% prop_or( ?Obj, ?Prop, ?Value, ?OrElse) is semidet.
 %
 % Prop Or.
@@ -1012,7 +1082,8 @@ db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):-
 
 
 
-% 	 	 
+%= 	 	 
+
 %% equals_call( ?X, ?Y) is semidet.
 %
 % Equals Call.
@@ -1023,7 +1094,8 @@ equals_call(X,Y):-once((to_word_list(X,XX),to_word_list(Y,YY))),unify_with_occur
 equals_call(X,Y):-compound(X),compound(Y),once((correctArgsIsa(X,XX),correctArgsIsa(Y,YY))),unify_with_occurs_check(XX,YY),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% confirm_hook( :TermCNEW) is semidet.
 %
 % Confirm Hook.
@@ -1041,7 +1113,8 @@ confirm_hook(CNEW:NEW=@=CNOW:NOW):-
 
 % Expect CNEW to be what is found
 
-% 	 	 
+%= 	 	 
+
 %% db_must_asserta_confirmed_sv( :GoalCNEW, ?A, ?NEW) is semidet.
 %
 % Database Must Be Successfull Asserta Confirmed Sv.
@@ -1056,7 +1129,8 @@ db_must_asserta_confirmed_sv(CNEW,A,NEW):-
 db_must_asserta_confirmed_sv(CNEW,A,NEW):-dmsg(unconfirmed(db_must_asserta_confirmed_sv(CNEW,A,NEW))).
 
 
-% 	 	 
+%= 	 	 
+
 %% with_assert_op_override( ?Op, ?Call) is semidet.
 %
 % Using Assert Oper. Override.
@@ -1064,7 +1138,8 @@ db_must_asserta_confirmed_sv(CNEW,A,NEW):-dmsg(unconfirmed(db_must_asserta_confi
 with_assert_op_override(Op,Call):-w_tl(t_l:assert_op_override(Op),Call).
 
 
-% 	 	 
+%= 	 	 
+
 %% test_expand_units( ?IN) is semidet.
 %
 % Test Expand Units.
@@ -1074,7 +1149,8 @@ test_expand_units(IN):-fully_expand(query(t,must),IN,OUT),dmsg(test_expand_units
 
 
 
-% 	 	 
+%= 	 	 
+
 %% mpred_modify( ?Op, ?G) is semidet.
 %
 % Managed Predicate Modify.
@@ -1090,7 +1166,8 @@ mpred_modify(Op,                 G):- trace_or_throw(unknown_database_modify(Op,
 
 
 
-% 	 	 
+%= 	 	 
+
 %% database_modify_0( ?Op, ?M) is semidet.
 %
 % database modify  Primary Helper.
@@ -1108,7 +1185,8 @@ database_modify_0(change(assert,AZ),          G):- database_modify_assert(change
 % database_modify_assert(change(assert,_),        G):- ( \+ \+ is_asserted(G)),must(variant(G,GG)),!.
 % database_modify_assert(change(assert,AZ),       G):- expire_pre_change(AZ,GG),fail.
 
-% 	 	 
+%= 	 	 
+
 %% database_modify_assert( :TermAorZ, ?G) is semidet.
 %
 % Database Modify Assert.
@@ -1127,7 +1205,8 @@ database_modify_assert(change(assert,AorZ),       G):-
 % ========================================
 
 
-% 	 	 
+%= 	 	 
+
 %% hooked_asserta( +G) is semidet.
 %
 % Hooked Asserta.
@@ -1135,7 +1214,8 @@ database_modify_assert(change(assert,AorZ),       G):-
 hooked_asserta(G):- loop_check(mpred_modify(change(assert,a),G),aina(G)).
 
 
-% 	 	 
+%= 	 	 
+
 %% hooked_assertz( +G) is semidet.
 %
 % Hooked Assertz.
@@ -1143,7 +1223,8 @@ hooked_asserta(G):- loop_check(mpred_modify(change(assert,a),G),aina(G)).
 hooked_assertz(G):- loop_check(mpred_modify(change(assert,z),G),ainz(G)).
 
 
-% 	 	 
+%= 	 	 
+
 %% hooked_retract( +G) is semidet.
 %
 % Hooked Retract.
@@ -1157,7 +1238,8 @@ hooked_retract(G):-  Op = change(retract,a),
                    loop_check(run_database_hooks_depth_1(change(retract,a),G),true).
 
 
-% 	 	 
+%= 	 	 
+
 %% hooked_retractall( +G) is semidet.
 %
 % Hooked Retractall.
@@ -1171,16 +1253,18 @@ hooked_retractall(G):- Op = change(retract,all),
 
 
 
-% 	 	 
-%% mpred_provide_storage_op( ?Op, ?G) is semidet.
+%= 	 	 
+
+%% mpred_provide_storage_op( :TermOp, ?G) is semidet.
 %
-% Hook To [lmconf:mpred_provide_storage_op/2] For Module Mpred_storage.
+% Hook To [isa_lmconf:mpred_provide_storage_op/2] For Module Mpred_storage.
 % Managed Predicate Provide Storage Oper..
 %
 lmconf:mpred_provide_storage_op(Op,G):- get_functor(G,F,A),lmconf:mpred_provide_storage_op(Op,G,F,A).
 
 
-% 	 	 
+%= 	 	 
+
 %% mpred_provide_storage_op( ?Op, ?G, ?F, ?A) is semidet.
 %
 % Hook To [lmconf:mpred_provide_storage_op/4] For Module Mpred_storage.
@@ -1194,7 +1278,8 @@ lmconf:mpred_provide_storage_op(Op,G,_F,_A):- loop_check(prolog_mpred_provide_st
 %lmconf:mpred_provide_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(lmconf:mpred_provide_storage_clauses(G,true,_Proof))).
 
 
-% 	 	 
+%= 	 	 
+
 %% must_storage_op( ?Op, ?G) is semidet.
 %
 % Must Be Successfull Storage Oper..
@@ -1202,7 +1287,8 @@ lmconf:mpred_provide_storage_op(Op,G,_F,_A):- loop_check(prolog_mpred_provide_st
 must_storage_op(Op,G):- doall(must(may_storage_op(Op,G))).
 
 
-% 	 	 
+%= 	 	 
+
 %% may_storage_op( ?Op, ?G) is semidet.
 %
 % May Storage Oper..
@@ -1223,7 +1309,8 @@ may_storage_op(Op,G):-call_no_cuts(lmconf:mpred_provide_storage_op(Op,G)).
 
 %retract_all((G:-B)) :-!, forall(clause(G,B,Ref),erase(Ref)).
 
-% 	 	 
+%= 	 	 
+
 %% retract_all( ?HB) is semidet.
 %
 % Retract All.
@@ -1232,7 +1319,8 @@ retract_all(HB) :- ignore((retract(HB),fail)).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% is_static_pred( ?Head) is semidet.
 %
 % If Is A Static Predicate.
@@ -1243,7 +1331,8 @@ is_static_pred(Head):- predicate_property(Head,_), !, \+ (predicate_property(Hea
 is_static_pred(Head):-  predicate_property(Head,meta_predicate),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% prolog_mpred_provide_storage_op( ?VALUE1, ?VALUE2) is semidet.
 %
 % Prolog Managed Predicate Provide Storage Oper..
@@ -1251,14 +1340,16 @@ is_static_pred(Head):-  predicate_property(Head,meta_predicate),!.
 prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),mpred_isa(F,prologDynamic),!, prolog_op(Op,G).
 prolog_mpred_provide_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),not(mpred_isa(F,prologHybrid)),!,current_predicate(_,G), prolog_op(Op,G).
 
-% 	 	 
+%= 	 	 
+
 %% use_if_modify_new is semidet.
 %
 % Use If Modify New.
 %
 use_if_modify_new:- current_predicate(assert_if_new/1).
 
-% 	 	 
+%= 	 	 
+
 %% prolog_op( ?Op, ?G) is semidet.
 %
 % Prolog Oper..
@@ -1281,7 +1372,8 @@ prolog_op(Op,G):- reduce_mpred_op(Op,Op2), on_x_rtrace(call(Op2,G)).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% prolog_modify( ?Op, ?G) is semidet.
 %
 % Prolog Modify.
@@ -1300,7 +1392,8 @@ prolog_modify(change(retract,_),G):-!,retract(G).
 prolog_modify(Op,G):- reduce_mpred_op(Op,Op2), mud_call_store_op(Op2,G).
 
 
-% 	 	 
+%= 	 	 
+
 %% ensure_dynamic( :TermVar) is semidet.
 %
 % Ensure Dynamic.

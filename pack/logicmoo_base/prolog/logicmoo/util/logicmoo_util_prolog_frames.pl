@@ -37,7 +37,8 @@
 :- mpred_trace_nochilds(stack_check/2).
 */
 
-% 	 	 
+%= 	 	 
+
 %% stack_depth( ?Level) is semidet.
 %
 % Stack Depth.
@@ -50,28 +51,32 @@ stack_depth(Level):-hotrace((prolog_current_frame(Frame),prolog_frame_attribute(
 :-  module_transparent stack_check_else/3.
   % st ack_check:-!.
 
-% 	 	 
+%= 	 	 
+
 %% stack_check is semidet.
 %
 % Stack Check.
 %
 stack_check:-stack_check(3000).
 
-% 	 	 
+%= 	 	 
+
 %% stack_check( ?BreakIfOver) is semidet.
 %
 % Stack Check.
 %
 stack_check(BreakIfOver):- stack_check_else(BreakIfOver, trace_or_throw(stack_check(BreakIfOver))).
 
-% 	 	 
+%= 	 	 
+
 %% stack_check( ?BreakIfOver, ?Error) is semidet.
 %
 % Stack Check.
 %
 stack_check(BreakIfOver,Error):- stack_check_else(BreakIfOver, trace_or_throw(stack_check(BreakIfOver,Error))).
 
-% 	 	 
+%= 	 	 
+
 %% stack_check_else( ?BreakIfOver, ?Call) is semidet.
 %
 % Stack Check Else.
@@ -80,7 +85,8 @@ stack_check_else(BreakIfOver,Call):- stack_depth(Level) ,  ( Level < BreakIfOver
 
 
 
-% 	 	 
+%= 	 	 
+
 %% in_pengines is semidet.
 %
 % In Pengines.
@@ -90,7 +96,8 @@ in_pengines:- relative_frame(context_module,pengines,_).
 % ?- relative_frame(context_module,X,Y).
 :- export(relative_frame/3).
 
-% 	 	 
+%= 	 	 
+
 %% relative_frame( ?Attrib, ?Term, ?Nth) is semidet.
 %
 % Relative Frame.
@@ -99,14 +106,16 @@ relative_frame(Attrib,Term,Nth):- find_parent_frame_attribute(Attrib,Term,Nth,_R
 
 :- export(parent_goal/2).
 
-% 	 	 
+%= 	 	 
+
 %% parent_goal( ?Goal) is semidet.
 %
 % Parent Goal.
 %
 parent_goal(Goal):-  prolog_current_frame(Frame),prolog_frame_attribute(Frame,parent,PFrame),prolog_frame_attribute(PFrame,parent_goal,Goal).
 
-% 	 	 
+%= 	 	 
+
 %% parent_goal( ?Goal, ?Nth) is semidet.
 %
 % Parent Goal.
@@ -115,7 +124,8 @@ parent_goal(Goal,Nth):-  number(Nth),!, prolog_current_frame(Frame),prolog_frame
 parent_goal(Goal,Nth):-  find_parent_frame_attribute(goal,Goal,Nth,_RealNth,_FrameNum).
 
 
-% 	 	 
+%= 	 	 
+
 %% nth_parent_goal( ?Frame, ?Goal, ?Nth) is semidet.
 %
 % Nth Parent Goal.
@@ -125,7 +135,8 @@ nth_parent_goal(Frame,Goal,_):- prolog_frame_attribute(Frame,goal,Goal),!.
 
 :- export(find_parent_frame_attribute/5).
 
-% 	 	 
+%= 	 	 
+
 %% find_parent_frame_attribute( ?Attrib, ?Term, ?Nth, ?RealNth, ?FrameNum) is semidet.
 %
 % Find Parent Frame Attribute.
@@ -135,7 +146,8 @@ find_parent_frame_attribute(Attrib,Term,Nth,RealNth,FrameNum):-hotrace((ignore(A
 
 
 
-% 	 	 
+%= 	 	 
+
 %% prolog_frame_match( ?Frame, :TermAttrib, :TermTerm) is semidet.
 %
 % Prolog Frame Match.
@@ -148,7 +160,8 @@ prolog_frame_match(Frame,[I|IL],[O|OL]):-!,prolog_frame_match(Frame,I,O),!,prolo
 prolog_frame_match(Frame,Attrib,Term):-prolog_frame_attribute(Frame,Attrib,Term).
 
 
-% 	 	 
+%= 	 	 
+
 %% current_frames( ?Frame, ?Attrib, :GoalN, ?NextList) is semidet.
 %
 % Current Frames.
@@ -157,7 +170,8 @@ current_frames(Frame,Attrib,N,NextList):- N>0, N2 is N-1,prolog_frame_attribute(
 current_frames(Frame,Attrib,0,NextList):- current_next_frames(Attrib,1,Frame,NextList).
 
 
-% 	 	 
+%= 	 	 
+
 %% current_next_frames( ?Attrib, ?Nth, ?Frame, ?NextList) is semidet.
 %
 % Current Next Frames.

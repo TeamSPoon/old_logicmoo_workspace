@@ -152,15 +152,14 @@
    simply_functors(2,*,*).
           
 :- include('mpred_header.pi').
-:- use_module(mpred_type_wff).
-:- use_module(mpred_pfc).
 
 %= :- shared_multifile(was_chain_rule/1).
 %= :- shared_multifile(baseKB:ptReformulatorDirectivePredicate/1).
 %= :- shared_multifile(props/2).
 
 
-% 	 	 
+%= 	 	 
+
 %% default_te( ?IF, ?VAR, ?VAL) is semidet.
 %
 % Default Te.
@@ -238,7 +237,8 @@ Writing in Prolog is actually really easy for a MUD is when the length's chosen
 
 %=  :- was_export(alt_calls/1).
 
-% 	 	 
+%= 	 	 
+
 %% alt_calls( ?VALUE1) is semidet.
 %
 % Alt Calls.
@@ -262,7 +262,8 @@ alt_calls(ireq).
 
 :- meta_predicate show_doall(0).
 
-% 	 	 
+%= 	 	 
+
 %% show_doall( :GoalCall) is semidet.
 %
 % Show Doall.
@@ -270,14 +271,16 @@ alt_calls(ireq).
 show_doall(Call):- doall(show_call(why,Call)).
 
 
-% 	 	 
+%= 	 	 
+
 %% is_pred_declarer( ?P) is semidet.
 %
 % If Is A Predicate Declarer.
 %
 is_pred_declarer(P):-functor_declares_instance(P,tPred).
 
-% 	 	 
+%= 	 	 
+
 %% is_relation_type( ?P) is semidet.
 %
 % If Is A Relation Type.
@@ -288,14 +291,16 @@ is_relation_type(tPred).
 is_relation_type(P):-is_pred_declarer(P).
 
 
-% 	 	 
+%= 	 	 
+
 %% functor_declares_instance( ?F, ?C) is semidet.
 %
 % Functor Declares Instance.
 %
 functor_declares_instance(F,C):-functor_declares_instance_0(F,C0),!,C=C0,F\=C.
 
-% 	 	 
+%= 	 	 
+
 %% functor_declares_instance_0( ?P, ?P) is semidet.
 %
 % functor declares instance  Primary Helper.
@@ -320,7 +325,8 @@ functor_declares_instance_0(P,tCol):- arg(_,s(tCol,tSpec,ttFormatType),P).
 functor_declares_instance_0(P,P):- req(functorDeclares(P)). % arity(P,1),\+((arity(P,N),N>1)).
 
 
-% 	 	 
+%= 	 	 
+
 %% functor_declares_collectiontype( ?VALUE1, ?VALUE2) is semidet.
 %
 % Functor Declares Collectiontype.
@@ -328,14 +334,16 @@ functor_declares_instance_0(P,P):- req(functorDeclares(P)). % arity(P,1),\+((ari
 functor_declares_collectiontype(typeProps,ttTemporalType).
 
 
-% 	 	 
+%= 	 	 
+
 %% instTypePropsToType( ?VALUE1, ?VALUE2) is semidet.
 %
 % Inst Type Props Converted To Type.
 %
 instTypePropsToType(instTypeProps,ttSpatialType).
 
-% 	 	 
+%= 	 	 
+
 %% expand_to_hb( ?HH, ?HH, ?BB) is semidet.
 %
 % Expand Converted To Head+body.
@@ -344,7 +352,8 @@ expand_to_hb((HH:-BB),HH,BB):-!.
 expand_to_hb(HH,HH,true).
 
 
-% 	 	 
+%= 	 	 
+
 %% reduce_clause( ?Op, ?C, ?HB) is semidet.
 %
 % Reduce Clause.
@@ -355,7 +364,8 @@ reduce_clause(Op,(C:- B),HB):- is_true(B),!,reduce_clause(Op,C,HB).
 reduce_clause(_,C,C).
 
 
-% 	 	 
+%= 	 	 
+
 %% to_reduced_hb( ?Op, ?HB, ?HH, ?BB) is semidet.
 %
 % Converted To Reduced Head+body.
@@ -363,7 +373,8 @@ reduce_clause(_,C,C).
 to_reduced_hb(Op,HB,HH,BB):-reduce_clause(Op,HB,HHBB),expand_to_hb(HHBB,HH,BB).
 
 
-% 	 	 
+%= 	 	 
+
 %% cyclic_break( ?Cyclic) is semidet.
 %
 % Cyclic Break.
@@ -381,7 +392,8 @@ dbase_head_expansion(_,V,V).
 % ================================================
 
 
-% 	 	 
+%= 	 	 
+
 %% any_op_to_call_op( ?VALUE1, ?VALUE2) is semidet.
 %
 % Any Oper. Converted To Call Oper..
@@ -389,7 +401,8 @@ dbase_head_expansion(_,V,V).
 any_op_to_call_op(_,call(conjecture)).
 
 
-% 	 	 
+%= 	 	 
+
 %% db_expand_maplist( :PRED2FE, ?List, ?T, ?G, ?O) is semidet.
 %
 % Database Expand Maplist.
@@ -405,7 +418,8 @@ db_expand_maplist(FE,List,T,G,O):-findall(M, (member(T,List),call(FE,G,M)), ML),
 % ================================================
 
 
-% 	 	 
+%= 	 	 
+
 %% must_expand( :TermG) is semidet.
 %
 % Must Be Successfull Expand.
@@ -417,7 +431,8 @@ must_expand(G):-functor(G,_,A),!,A==1.
 
 % fully_expand_warn(_,C,C):-!.
 
-% 	 	 
+%= 	 	 
+
 %% fully_expand_warn( ?A, ?B, ?O) is semidet.
 %
 % Fully Expand Warn.
@@ -425,7 +440,8 @@ must_expand(G):-functor(G,_,A),!,A==1.
 fully_expand_warn(A,B,O):-must(fully_expand(A,B,C)),!,sanity(ignore(show_failure(why,same_terms(B,C)))),(O=C;must(sanity(ignore(show_failure(why,same_terms(O,C)))))),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% same_terms( ?A, :TermB) is semidet.
 %
 % Same Terms.
@@ -438,7 +454,8 @@ same_terms(A,M:B):-atom(M),!,same_terms(A,B).
 
 :- export(fully_expand/3).
 
-% 	 	 
+%= 	 	 
+
 %% fully_expand( ?Op, ?Sent, ?SentO) is semidet.
 %
 % Fully Expand.
@@ -447,7 +464,8 @@ fully_expand(Op,Sent,SentO):- hotrace((cyclic_break((Sent)), /* cnotrace */ (ful
 
 :- export(fully_expand/2).
 
-% 	 	 
+%= 	 	 
+
 %% fully_expand( ?X, ?Y) is semidet.
 %
 % Fully Expand.
@@ -458,7 +476,8 @@ fully_expand(X,Y):-fully_expand(_,X,Y).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% fully_expand0( ?VALUE1, ?Sent, ?SentO) is semidet.
 %
 % Fully Expand Primary Helper.
@@ -469,7 +488,8 @@ fully_expand0(_,Sent,SentO):-get_functor(Sent,_,A),A\==1,!,Sent=SentO.
 fully_expand0(Op,Sent,SentO):-fully_expand_now(Op,Sent,SentO),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% is_stripped_module( ?VALUE1) is semidet.
 %
 % If Is A Stripped Module.
@@ -478,7 +498,8 @@ is_stripped_module(user).
 is_stripped_module(baseKB).
 
 
-% 	 	 
+%= 	 	 
+
 %% fully_expand_now( ?Op, :TermSent, :TermSentO) is semidet.
 %
 % Fully Expand Now.
@@ -497,7 +518,8 @@ fully_expand_now(Op,Sent,SentO):- copy_term(Sent,NoVary),
     (Sent \=@= lmconf:SentO), dmsg(fully_expand(Op,(Sent --> SentO)))))))),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% fully_expand_clause( ?VALUE1, :TermSent, ?SentO) is semidet.
 %
 % Fully Expand Clause.
@@ -514,14 +536,16 @@ fully_expand_clause(Op,(H:-B),Out):- !,fully_expand_head(Op,H,HH),fully_expand_g
 fully_expand_clause(Op, HB,HHBB):- must((to_reduced_hb(Op,HB,H,B),fully_expand_head(Op,H,HH),!,fully_expand_goal(Op,B,BB),!,reduce_clause(Op,(HH:-BB),HHBB))),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% fully_expand_head( ?Op, ?Sent, ?SentO) is semidet.
 %
 % Fully Expand Head.
 %
 fully_expand_head(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,transitive_lc(db_expand_term(Op),Sent,SentO))),!.
 
-% 	 	 
+%= 	 	 
+
 %% fully_expand_goal( ?Op, ?Sent, ?SentO) is semidet.
 %
 % Fully Expand Goal.
@@ -529,7 +553,8 @@ fully_expand_head(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,transitive_lc(db
 fully_expand_goal(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,transitive_lc(db_expand_term(Op),Sent,SentO))),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% as_is_term( ?NC) is semidet.
 %
 % Converted To If Is A Term.
@@ -537,7 +562,8 @@ fully_expand_goal(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,transitive_lc(db
 as_is_term(NC):-hotrace(as_is_term0(NC)).
 :- export(as_is_term0/1).
 
-% 	 	 
+%= 	 	 
+
 %% as_is_term0( :TermNC) is semidet.
 %
 % Converted To If Is A Term Primary Helper.
@@ -559,7 +585,8 @@ as_is_term0('ignore'(_)).
 
 %=  :- was_export(infix_op/2).
 
-% 	 	 
+%= 	 	 
+
 %% infix_op( ?Op, ?VALUE2) is semidet.
 %
 % Infix Oper..
@@ -569,7 +596,8 @@ infix_op(Op,_):-additiveOp(Op).
 
 %=  :- was_export(comparitiveOp/1).
 
-% 	 	 
+%= 	 	 
+
 %% comparitiveOp( ?VALUE1) is semidet.
 %
 % Comparitive Oper..
@@ -586,7 +614,8 @@ comparitiveOp((>=)).
 
 %=  :- was_export(additiveOp/1).
 
-% 	 	 
+%= 	 	 
+
 %% additiveOp( ?VALUE1) is semidet.
 %
 % Additive Oper..
@@ -599,7 +628,8 @@ additiveOp((/)).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% is_unit( ?C) is semidet.
 %
 % If Is A Unit.
@@ -608,7 +638,8 @@ is_unit(C):-is_ftCompound(C),!, C\=(_:-_),C\=ftRest(_),C\=ftListFn(_),get_functo
 is_unit(C):-is_ftNonvar(C).
 
 
-% 	 	 
+%= 	 	 
+
 %% is_unit_functor( ?F) is semidet.
 %
 % If Is A Unit Functor.
@@ -618,7 +649,8 @@ is_unit_functor(F):-atom_concat('sk',_,F).
 is_unit_functor(F):-atom_concat(_,'Fn',F).
 
 
-% 	 	 
+%= 	 	 
+
 %% get_ruleRewrite( ?Sent, ?SentM) is semidet.
 %
 % Get Rule Rewrite.
@@ -629,7 +661,8 @@ as_is_term(NC):-compound(NC),functor(NC,Op,2),infix_op(Op,_).
 */
 
 
-% 	 	 
+%= 	 	 
+
 %% db_expand_term( ?Op, ?SI, ?SentO) is semidet.
 %
 % Database Expand Term.
@@ -637,7 +670,8 @@ as_is_term(NC):-compound(NC),functor(NC,Op,2),infix_op(Op,_).
 db_expand_term(Op,SI,SentO):- loop_check(db_expand_term0(Op,SI,SentO),SI=SentO).
 
 
-% 	 	 
+%= 	 	 
+
 %% db_expand_term0( ?VALUE1, ?Sent, ?SentO) is semidet.
 %
 % Database Expand Term Primary Helper.
@@ -657,7 +691,8 @@ db_expand_term0(Op,SI,SentO):-
        transitive_lc(db_expand_5(Op),S5,SentO).
 
 
-% 	 	 
+%= 	 	 
+
 %% mpred_expand( ?PfcRule, ?Out) is semidet.
 %
 % Managed Predicate Expand.
@@ -667,7 +702,8 @@ mpred_expand(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),mpred_dat
 
 
 
-% 	 	 
+%= 	 	 
+
 %% db_expand_final( ?Op, :TermNC, ?NC) is semidet.
 %
 % Database Expand Final.
@@ -699,7 +735,8 @@ db_expand_final(_, MArg1User, NewMArg1User):- is_ftCompound(MArg1User), fail,
 
 
 
-% 	 	 
+%= 	 	 
+
 %% is_elist_functor( ?VALUE1) is semidet.
 %
 % If Is A Elist Functor.
@@ -710,7 +747,8 @@ is_elist_functor(isEach).
 is_elist_functor(isAnd).
 
 
-% 	 	 
+%= 	 	 
+
 %% as_list( ?EC, ?AL) is semidet.
 %
 % Converted To List.
@@ -720,7 +758,8 @@ as_list(List,AL):-flatten([List],AL),!.
 
 
 
-% 	 	 
+%= 	 	 
+
 %% listToE( ?EL, ?E) is semidet.
 %
 % List Converted To E.
@@ -729,7 +768,8 @@ listToE(EL,E):-is_ftNonvar(EL),must((ground(EL),as_list(EL,List))),E=..[isEach|L
 
 
 
-% 	 	 
+%= 	 	 
+
 %% db_expand_chain( ?VALUE1, ?M, ?PO) is semidet.
 %
 % Database Expand Chain.
@@ -746,7 +786,8 @@ db_expand_chain(_,isa(I,Not),INot):-Not==not,!,INot =.. [Not,I].
 db_expand_chain(_,('nesc'(P)),P) :- !.
 
 
-% 	 	 
+%= 	 	 
+
 %% db_expand_a( ?A, ?B, ?C) is semidet.
 %
 % Database Expand A.
@@ -754,7 +795,8 @@ db_expand_chain(_,('nesc'(P)),P) :- !.
 db_expand_a(Op ,(S1,S2),SentO):-db_expand_a(Op ,S1,S1O),db_expand_a(Op ,S2,S2O),conjoin_l(S1O,S2O,SentO),!.
 db_expand_a(A,B,C):- loop_check_term(db_expand_0(A,B,C),db_expand_0(A,B,C),trace_or_throw(loop_check(db_expand_0(A,B,C)))),!.
 
-% 	 	 
+%= 	 	 
+
 %% db_expand_a_noloop( ?A, ?B, ?C) is semidet.
 %
 % Database Expand A Noloop.
@@ -762,7 +804,8 @@ db_expand_a(A,B,C):- loop_check_term(db_expand_0(A,B,C),db_expand_0(A,B,C),trace
 db_expand_a_noloop(A,B,C):- loop_check_term(db_expand_0(A,B,C),db_expand_0(A,B,C),B=C),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% db_expand_0( ?Op, ?Sent, ?SentO) is semidet.
 %
 % Database expand  Primary Helper.
@@ -811,6 +854,7 @@ db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..  [D,C|Args],is_ftCompound(C),functo
   (\+((arg(_,C,Arg),is_ftVar(Arg))) -> O = (meta_argtypes(C),M) ; (O= (M))).
 
 
+:- trace.
 db_expand_0(Op,DECL,O):-DECL=..[D,F,A1|Args],functor_declares_instance(D,DType),not((arity(D,N),N>1)),
    %\+ is_relation_type(DType),
    expand_props(Prefix,Op,props(F,[DType,D,A1|Args]),O),!.
@@ -866,7 +910,8 @@ db_expand_0(Op,IN,OUT):- IN=..[F|Args],maplist(db_expand_0(Op),Args,ArgsO),map_f
 db_expand_0(_ ,HB,HB).
 
 
-% 	 	 
+%= 	 	 
+
 %% is_arity_pred( ?VALUE1) is semidet.
 %
 % If Is A Arity Predicate.
@@ -875,7 +920,8 @@ is_arity_pred(argIsa).
 is_arity_pred(arity).
 
 
-% 	 	 
+%= 	 	 
+
 %% map_f( ?F, ?F) is semidet.
 %
 % Map False.
@@ -886,7 +932,8 @@ map_f(props,isa).
 map_f(F,F):-!.
 
 
-% 	 	 
+%= 	 	 
+
 %% ex_argIsa( ?P, ?N, ?C) is semidet.
 %
 % ex Argument  (isa/2).
@@ -894,7 +941,8 @@ map_f(F,F):-!.
 ex_argIsa(P,N,C):- clause(_:argIsa(P,N,C),true).
 
 
-% 	 	 
+%= 	 	 
+
 %% compound_all_open( ?C) is semidet.
 %
 % Compound All Open.
@@ -910,7 +958,8 @@ db_expand_0(Op,KB:Term,KB:O):- atom(KB),!,w_tl(t_l:caller_module(prolog,KB),db_e
 % db_expand_0(query(HLDS,Must),props(Obj,Props)):- is_ftNonvar(Obj),is_ftVar(Props),!,gather_props_for(query(HLDS,Must),Obj,Props).
 
 
-% 	 	 
+%= 	 	 
+
 %% demodulize( ?Op, ?H, ?HH) is semidet.
 %
 % Demodulize.
@@ -921,7 +970,8 @@ demodulize(Op,H,HH):-is_ftCompound(H),H=..[F|HL],!,must_maplist(demodulize(Op),H
 demodulize(_ ,HB,HB).
 
 
-% 	 	 
+%= 	 	 
+
 %% db_expand_1( ?VALUE1, ?X, ?X) is semidet.
 %
 % Database expand  Secondary Helper.
@@ -930,7 +980,8 @@ db_expand_1(_,X,X).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% db_expand_2( ?VALUE1, ?Sent, ?SentO) is semidet.
 %
 % Database expand  Extended Helper.
@@ -943,7 +994,8 @@ db_expand_2(Op,Sent,SentO):-loop_check(expand_term(Sent,SentO)),Sent\=@=SentO,!.
 
 
 
-% 	 	 
+%= 	 	 
+
 %% db_expand_3( ?VALUE1, ?A, ?B) is semidet.
 %
 % Database Expand Helper Number 3..
@@ -956,7 +1008,8 @@ db_expand_3(_Op,Sent,SentO):-once(transform_holds(t,Sent,SentO)).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% db_expand_4( ?VALUE1, ?A, ?B) is semidet.
 %
 % Database Expand Helper Number 4..
@@ -968,7 +1021,8 @@ db_expand_4(Op,Sent,SentO):-db_quf(Op,Sent,Pretest,Template),(Pretest==true-> Se
 
 
 
-% 	 	 
+%= 	 	 
+
 %% is_meta_functor( ?Sent, ?F, ?List) is semidet.
 %
 % If Is A Meta Functor.
@@ -976,7 +1030,8 @@ db_expand_4(Op,Sent,SentO):-db_quf(Op,Sent,Pretest,Template),(Pretest==true-> Se
 is_meta_functor(Sent,F,List):-is_ftCompound(Sent),Sent=..[F|List],(predicate_property(Sent,meta_predicate(_));is_sentence_functor(F);F==pfcDefault),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% db_expand_5( ?Op, ?A, ?B) is semidet.
 %
 % Database Expand Helper Number 5..
@@ -996,7 +1051,8 @@ db_expand_5(_,A,B):-A=B.
 
 
 
-% 	 	 
+%= 	 	 
+
 %% from_univ( ?Prefix, ?Op, :TermMORE, ?Out) is semidet.
 %
 % Converted From Univ.
@@ -1008,7 +1064,8 @@ from_univ(Prefix,Op,[PROP|MORE],Out):-atom(PROP),!,Mid=..[PROP|MORE],db_expand_u
 from_univ(Prefix,_,In,Out):-Mid=..[t|In],!,db_expand_up(Prefix,Op,Mid,Out).
 
 
-% 	 	 
+%= 	 	 
+
 %% db_expand_up( ?Prefix, ?Op, ?Mid, ?OOUT) is semidet.
 %
 % Database Expand Up.
@@ -1017,7 +1074,8 @@ db_expand_up(Prefix,Op,Mid,OOUT):- db_expand_a_noloop(Op,Mid,Out), is_ftCompound
 db_expand_up(_,Op,Mid,Out):- db_expand_a_noloop(Op,Mid,Out).
 
 
-% 	 	 
+%= 	 	 
+
 %% expand_props( ?Op, ?Term, ?OUT) is semidet.
 %
 % Expand Props.
@@ -1025,7 +1083,8 @@ db_expand_up(_,Op,Mid,Out):- db_expand_a_noloop(Op,Mid,Out).
 expand_props(Op,Term,OUT):-expand_props(_,Op,Term,OUT).
 
 
-% 	 	 
+%= 	 	 
+
 %% expand_props( ?Prefix, ?VALUE2, ?Sent, ?Sent) is semidet.
 %
 % Expand Props.
@@ -1057,7 +1116,8 @@ expand_props(Prefix,Op,ClassTemplate,OUT):- ClassTemplate=..[props,Inst,Second,T
 expand_props(Prefix,_,Sent,Sent).
 
 
-% 	 	 
+%= 	 	 
+
 %% conjoin_l( ?A, :TermAA, ?C) is semidet.
 %
 % Conjoin (list Version).
@@ -1067,7 +1127,8 @@ conjoin_l(A,(AA,B),C):-A==AA,!,conjoin_l(A,B,C).
 conjoin_l(A,B,C):-conjoin(A,B,C).
 
 
-% 	 	 
+%= 	 	 
+
 %% db_quf_l( ?Op, ?And, ?C12, ?Pre2, ?Templ2) is semidet.
 %
 % Database Quf (list Version).
@@ -1076,7 +1137,8 @@ db_quf_l(Op,And,[C],D2,D4):- !, db_quf(Op,C,D2,D3),!,D4=..[And,D3].
 db_quf_l(Op,And,C12,Pre2,Templ2):-db_quf_l_0(Op,And,C12,Pre2,Templ2).
 
 
-% 	 	 
+%= 	 	 
+
 %% db_quf_l_0( ?Op, ?And, :TermC, ?D2, ?D3) is semidet.
 %
 % Database quf (List version)  Primary Helper.
@@ -1090,7 +1152,8 @@ db_quf_l_0(Op, And,[C|C12],PreO,TemplO):-
 
 %=  :- was_export(db_quf/4).
 
-% 	 	 
+%= 	 	 
+
 %% db_quf( ?VALUE1, ?C, ?Pretest, ?Template) is semidet.
 %
 % Database Quf.
@@ -1111,7 +1174,8 @@ db_quf(Op,C,Pretest,Template):- C=..[Prop,OBJ|ARGS],
 db_quf(_Op,C,true,C).
 
 
-% 	 	 
+%= 	 	 
+
 %% translate_args( ?O, ?Prop, ?A, ?OBJ, ?N, :TermARG6, :TermARG7, ?GIN, ?GIN) is semidet.
 %
 % Translate Arguments.
@@ -1126,7 +1190,8 @@ translate_args(Op,Prop,A,OBJ,N1,[ARG|S],[NEW|ARGS],GIN,GOALS):-
 
 % ftVar
 
-% 	 	 
+%= 	 	 
+
 %% translateOneArg( ?Op, ?Prop, ?Obj, ?Type, ?VAR, ?VAR, ?G, ?G) is semidet.
 %
 % Translate One Argument.
@@ -1162,7 +1227,8 @@ translateOneArg(_O,_Prop,_Obj,_Type,NART,NART,G,G):-!. % <- makes us skip the ne
 translateOneArg(_O,_Prop,_Obj,Type,ATOMIC,ATOMICUSE,G,(G,ignore(same_arg(tCol(Type),ATOMIC,ATOMICUSE)))).
 
 
-% 	 	 
+%= 	 	 
+
 %% translateListOps( ?O, ?Prop, ?Obj, ?Type, ?VAL, :TermARG6, ?G, ?G) is semidet.
 %
 % Translate List Oper.s.
@@ -1173,7 +1239,8 @@ translateListOps(Op,Prop,Obj,Type,VAL,[L|LIST],G,GO2):-
    translateListOps(Op,Prop,Obj,Type,VAL,LIST,G0,GO2).
 
 
-% 	 	 
+%= 	 	 
+
 %% compare_op( ?Type, :PRED2F, ?OLD, ?VAL) is semidet.
 %
 % Compare Oper..
@@ -1192,7 +1259,8 @@ compare_op(Type,F,OLD,VAL):-nop(Type),show_call(why,(call(F,OLD,VAL))),!.
 %=  :- was_export(expanded_different/2).
 
 
-% 	 	 
+%= 	 	 
+
 %% expanded_different( ?G0, ?G1) is semidet.
 %
 % Expanded Different.
@@ -1200,7 +1268,8 @@ compare_op(Type,F,OLD,VAL):-nop(Type),show_call(why,(call(F,OLD,VAL))),!.
 expanded_different(G0,G1):-call(expanded_different_ic(G0,G1)).
 
 
-% 	 	 
+%= 	 	 
+
 %% expanded_different_ic( ?G0, ?G1) is semidet.
 %
 % Expanded Different Ic.
@@ -1210,7 +1279,8 @@ expanded_different_ic(G0,G1):-expanded_different_1(G0,G1),!.
 expanded_different_ic(G0,G1):- G0\==G1.
 
 
-% 	 	 
+%= 	 	 
+
 %% expanded_different_1( ?G0, :TermG1) is semidet.
 %
 % expanded different  Secondary Helper.
@@ -1226,7 +1296,8 @@ expanded_different_1(G0,G1):- G0 \= G1,!.
 % ========================================
 %=  :- was_export(into_functor_form/3).
 
-% 	 	 
+%= 	 	 
+
 %% into_functor_form( ?HFDS, ?X, ?O) is semidet.
 %
 % Converted To Functor Form.
@@ -1236,7 +1307,8 @@ into_functor_form(HFDS,X,O):-call((( X=..[F|A],into_functor_form(HFDS, X,F,A,O))
 
 % TODO finish negations
 
-% 	 	 
+%= 	 	 
+
 %% into_functor_form( ?Dbase_t, ?X, ?Dbase_t, ?A, ?X) is semidet.
 %
 % Converted To Functor Form.
@@ -1252,7 +1324,8 @@ into_functor_form(Dbase_t,_X,F,A,Call):-Call=..[Dbase_t,F|A].
 % ========================================
 %=  :- was_export(into_mpred_form/2).
 
-% 	 	 
+%= 	 	 
+
 %% into_mpred_form( :TermV, ?VO) is semidet.
 %
 % Converted To Managed Predicate Form.
@@ -1274,7 +1347,8 @@ into_mpred_form(I,O):-loop_check(into_mpred_form_ilc(I,O),O=I). % trace_or_throw
 %:- mpred_trace_nochilds(into_mpred_form/2).
 
 
-% 	 	 
+%= 	 	 
+
 %% into_mpred_form_ilc( ?G, ?O) is semidet.
 %
 % Converted To Managed Predicate Form Inside Of Loop Checking.
@@ -1285,7 +1359,8 @@ into_mpred_form_ilc(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form6(G,F,
 % TODO confirm negations
 
 
-% 	 	 
+%= 	 	 
+
 %% was_isa_syntax( ?G, ?VALUE2, ?VALUE3) is semidet.
 %
 % was  (isa/2) syntax.
@@ -1297,7 +1372,8 @@ was_isa_syntax(a(C,I),I,C):-!.
 was_isa_syntax(G,I,C):-was_isa(G,I,C).
 
 
-% 	 	 
+%= 	 	 
+
 %% into_mpred_form6( ?X, ?H, ?P, ?N, ?A, ?O) is semidet.
 %
 % Converted To Managed Predicate Form6.
@@ -1322,7 +1398,8 @@ into_mpred_form6(G,F,_,_,_,G):-nop(dmsg(warn(unknown_mpred_type(F,G)))).
 % acceptable_xform/2 (when the form is a isa/2, do a validity check)
 % ========================================
 
-% 	 	 
+%= 	 	 
+
 %% acceptable_xform( ?From, ?To) is semidet.
 %
 % Acceptable Xform.
@@ -1333,7 +1410,8 @@ acceptable_xform(From,To):- From \=@= To,  (To = isa(I,C) -> was_isa_syntax(From
 % transform_holds(Functor,In,Out)
 % ========================================
 
-% 	 	 
+%= 	 	 
+
 %% transform_holds( ?H, ?In, ?Out) is semidet.
 %
 % Transform Holds.
@@ -1344,7 +1422,8 @@ transform_holds(H,In,Out):- once(transform_holds_3(H,In,Out)),!,ignore((In\=Out,
 % foreach_arg/7 
 %  is a maping predicate
 
-% 	 	 
+%= 	 	 
+
 %% foreach_arg( :TermARGS, ?N, ?ArgIn, ?ArgN, ?ArgOut, ?Call, :TermARGS) is semidet.
 %
 % Foreach Argument.
@@ -1357,7 +1436,8 @@ foreach_arg([ArgIn1|ARGS],ArgN1,ArgIn,ArgN,ArgOut,Call1,[ArgOut1|ARGSO]):-
       foreach_arg(ARGS,ArgN2,ArgIn,ArgN,ArgOut,Call,ARGSO).
 
 
-% 	 	 
+%= 	 	 
+
 %% transform_functor_holds( ?VALUE1, ?F, ?ArgInOut, ?N, ?ArgInOut) is semidet.
 %
 % Transform Functor Holds.
@@ -1366,7 +1446,8 @@ transform_functor_holds(_,F,ArgInOut,N,ArgInOut):- once(argIsa_ft(F,N,FT)),FT=ft
 transform_functor_holds(Op,_,ArgIn,_,ArgOut):- transform_holds(Op,ArgIn,ArgOut),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% transform_holds_3( ?VALUE1, :TermA, ?A) is semidet.
 %
 % Transform Holds Helper Number 3..
@@ -1403,7 +1484,8 @@ transform_holds_3(Op,DBASE_T,OUT):- DBASE_T=..[P,A|ARGS],!,transform_holds_3(Op,
 
 
 
-% 	 	 
+%= 	 	 
+
 %% holds_args( ?HOFDS, ?FIST) is semidet.
 %
 % Holds Arguments.
@@ -1416,7 +1498,8 @@ holds_args(HOFDS,FIST):- is_ftCompound(HOFDS),HOFDS=..[H|FIST],is_holds_true(H),
 %=  :- was_export((do_expand_args/3)).
 
 
-% 	 	 
+%= 	 	 
+
 %% do_expand_args( ?Op, ?Term, ?Term) is semidet.
 %
 % Do Expand Arguments.
@@ -1427,7 +1510,8 @@ do_expand_args(Exp,Term,Out):- compound(Term),!,must(do_expand_args_c(Exp,Term,O
 do_expand_args(_,Term,Term).
 
 
-% 	 	 
+%= 	 	 
+
 %% do_expand_args_c( ?Exp, ?Term, ?Out) is semidet.
 %
 % Do Expand Arguments Class.
@@ -1436,7 +1520,8 @@ do_expand_args_c(Exp,[L|IST],Out):- !,must(do_expand_args_l(Exp,[L|IST],Out)).
 do_expand_args_c(Exp,Term,Out):- Term=..[P|ARGS],do_expand_args_pa(Exp,P,ARGS,Out).
 
 
-% 	 	 
+%= 	 	 
+
 %% do_expand_args_pa( ?Exp, ?Exp, ?ARGS, ?Out) is semidet.
 %
 % Do Expand Arguments Pa.
@@ -1445,7 +1530,8 @@ do_expand_args_pa(Exp,Exp,ARGS,Out):- !,member(Out,ARGS).
 do_expand_args_pa(Exp,P,ARGS,Out):- do_expand_args_l(Exp,ARGS,EARGS), Out=..[P|EARGS].
 
 
-% 	 	 
+%= 	 	 
+
 %% do_expand_args_l( ?VALUE1, :TermA, :TermA) is semidet.
 %
 % Do Expand Arguments (list Version).
@@ -1464,14 +1550,16 @@ do_expand_args_l(Exp,[A|RGS],[E|ARGS]):- do_expand_args(Exp,A,E),do_expand_args_
 %  expand_goal_correct_argIsa/2
 % ================================================
 
-% 	 	 
+%= 	 	 
+
 %% expands_on( ?EachOf, ?Term) is semidet.
 %
 % Expands Whenever.
 %
 expands_on(EachOf,Term):-subst(Term,EachOf,foooz,Term2),!,Term2\=Term,not((do_expand_args(EachOf,Term,O),O = Term)).
 
-% 	 	 
+%= 	 	 
+
 %% if_expands_on( ?EachOf, ?Term, ?Call) is semidet.
 %
 % If Expands Whenever.
@@ -1493,7 +1581,8 @@ db_reop_l(Op,DATA):-no_loop_check(db_op0(Op,DATA)).
 
 % expand_goal_correct_argIsa(A,A):-simple_code,!.
 
-% 	 	 
+%= 	 	 
+
 %% expand_goal_correct_argIsa( ?A, ?B) is semidet.
 %
 % expand goal correct Argument  (isa/2).
@@ -1502,7 +1591,8 @@ expand_goal_correct_argIsa(A,B):- expand_goal(A,B).
 
 % db_op_simpler(query(HLDS,_),MODULE:C0,req(call,MODULE:C0)):- atom(MODULE), is_ftNonvar(C0),not(not(predicate_property(C0,_PP))),!. % , functor_catch(C0,F,A), dmsg(todo(unmodulize(F/A))), %trace_or_throw(module_form(MODULE:C0)), %   db_op(Op,C0).
 
-% 	 	 
+%= 	 	 
+
 %% db_op_simpler( ?VALUE1, ?VALUE2, :TermARG3) is semidet.
 %
 % Database Oper. Simpler.
@@ -1511,7 +1601,8 @@ db_op_simpler(_,TypeTerm,props(Inst,[isa(Type)|PROPS])):- TypeTerm=..[Type,Inst|
 
 
 
-% 	 	 
+%= 	 	 
+
 %% db_op_sentence( ?Op, ?Prop, ?ARGS, ?C0) is semidet.
 %
 % Database Oper. Sentence.
@@ -1522,7 +1613,8 @@ db_op_sentence(_Op,Prop,ARGS,C0):- C0=..[t,Prop|ARGS].
 
 %=  :- was_export(simply_functors/3).
 
-% 	 	 
+%= 	 	 
+
 %% simply_functors( :PRED2Db_pred, ?Op, ?Wild) is semidet.
 %
 % Simply Functors.

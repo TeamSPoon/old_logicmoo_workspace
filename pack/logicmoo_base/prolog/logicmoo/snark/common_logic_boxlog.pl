@@ -89,19 +89,20 @@ Per-Litteral features
             vg/1,
             vg/3]).
 
-:- use_module(logicmoo(mpred/mpred_pfc)).
 :- include('../mpred/mpred_header.pi').
 :- common_logic_boxlog:use_module(library(dialect/hprolog),[]).
 
 
-% 	 	 
+%= 	 	 
+
 %% is_units_h( ?A) is semidet.
 %
 % If Is A Units Head.
 %
 is_units_h(A):-maplist(is_unit,A).
 
-% 	 	 
+%= 	 	 
+
 %% is_units_b( ?A) is semidet.
 %
 % If Is A Units Backtackable.
@@ -109,28 +110,32 @@ is_units_h(A):-maplist(is_unit,A).
 is_units_b(A):-maplist(is_unit,A).
 % is_unit(A):-is_unit(A).
 
-% 	 	 
+%= 	 	 
+
 %% is_unit is semidet.
 %
 % If Is A Unit.
 %
 is_unit.
 
-% 	 	 
+%= 	 	 
+
 %% is_unit( ?A, ?B) is semidet.
 %
 % If Is A Unit.
 %
 is_unit(A,B):-is_unit(A),is_unit(B).
 
-% 	 	 
+%= 	 	 
+
 %% is_unit( ?A, ?B, ?C) is semidet.
 %
 % If Is A Unit.
 %
 is_unit(A,B,C):-is_unit(A),is_unit(B),is_unit(C).
 
-% 	 	 
+%= 	 	 
+
 %% is_unit( ?A, ?B, ?C, ?D) is semidet.
 %
 % If Is A Unit.
@@ -140,21 +145,24 @@ is_unit(A,B,C,D):-is_unit(A),is_unit(B),is_unit(C),is_unit(D).
 % might trace down when it is not
 % vg(G):-var(G),!,fail.
 
-% 	 	 
+%= 	 	 
+
 %% vg( ?G) is semidet.
 %
 % Vg.
 %
 vg(G):- (ground(G); ( compound(G), \+ (arg(_,G,E),var(E)))),!.
 
-% 	 	 
+%= 	 	 
+
 %% vg( ?VALUE1, ?B, ?C) is semidet.
 %
 % Vg.
 %
 vg(_,B,C):-vg(B),vg(C).
 
-% 	 	 
+%= 	 	 
+
 %% make_must_ground( ?H, ?BB, ?VG) is semidet.
 %
 % Make Must Be Successfull Ground.
@@ -168,7 +176,8 @@ make_must_ground(H,BB,VG):-
    make_vg(UBBVs,Shared,UHVs,VG),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% make_vg( ?VALUE1, ?Shared, ?VALUE3, :TermS) is semidet.
 %
 % Make Vg.
@@ -178,7 +187,8 @@ make_vg(_,Shared,_,{(S)}):-  S=..[is_unit|Shared],!.
 make_vg(B,S,H,{(CB,CS,CH)}):- CB=..[is_units_b,B],CS=..[is_unit|S],CH=..[is_units_h,H].
 
 
-% 	 	 
+%= 	 	 
+
 %% set_clause_compile( ?TYPE) is semidet.
 %
 % Set Clause Compile.
@@ -186,7 +196,8 @@ make_vg(B,S,H,{(CB,CS,CH)}):- CB=..[is_units_b,B],CS=..[is_unit|S],CH=..[is_unit
 set_clause_compile(TYPE):-op_alias((:-),TYPE).
 
 
-% 	 	 
+%= 	 	 
+
 %% get_op_alias_compile( ?I, ?O) is semidet.
 %
 % Get Oper. Alias Compile.
@@ -195,7 +206,8 @@ get_op_alias_compile(I,O):-get_op_alias(I,O),( I== (:-)),( O\== (:-)),!.
 get_op_alias_compile(_,fwc).
 
 
-% 	 	 
+%= 	 	 
+
 %% boxlog_to_compile( ?H, ?OUTPUT) is semidet.
 %
 % Datalog Converted To Compile.
@@ -203,7 +215,8 @@ get_op_alias_compile(_,fwc).
 boxlog_to_compile(H,OUTPUT):- get_op_alias_compile((:-),TYPE),!,must((boxlog_to_compile(TYPE,H,OUTPUTM))),!,OUTPUTM=OUTPUT.
 
 
-% 	 	 
+%= 	 	 
+
 %% boxlog_to_compile( ?TYPE, :TermH, ?OUTPUT) is semidet.
 %
 % Datalog Converted To Compile.
@@ -263,7 +276,8 @@ boxlog_to_compile(TYPE,not(H),OUTPUT):-  !,boxlog_to_compile2(TYPE,not(H),true,O
 boxlog_to_compile(TYPE,H,OUTPUT):-     !,boxlog_to_compile2(TYPE,H,true,OUTPUT).
 
 
-% 	 	 
+%= 	 	 
+
 %% boxlog_to_compile2( ?TYPE, ?H, ?BB, :TermH) is semidet.
 %
 % Datalog Converted To Compile Extended Helper.
@@ -273,7 +287,8 @@ boxlog_to_compile2(TYPE,H,BB,(H:-OUTPUT)):- conjoin_maybe(TYPE,BB,OUTPUT).
 boxlog_to_compile2(TYPE,H,BB,(H:-OUTPUT)):- conjoin_maybe(TYPE,BB,OUTPUT).
 
 
-% 	 	 
+%= 	 	 
+
 %% conjoin_body( ?H, :TermBB, ?C) is semidet.
 %
 % Conjoin Body.
@@ -283,7 +298,8 @@ conjoin_body({H},({BB},D),O):-conjoin_body(H,BB,C),conjoin_body({C},D,O).
 conjoin_body(H,(BB,D),O):-conjoin_body(H,BB,C),conjoin_body(C,D,O).
 conjoin_body(H,BB,C):-conjoin(H,BB,C).
 
-% 	 	 
+%= 	 	 
+
 %% conjoin_maybe( ?TYPE, ?BB, ?OUTPUT) is semidet.
 %
 % Conjoin Maybe.
@@ -292,7 +308,8 @@ conjoin_maybe(_X,true,true):-!.
 conjoin_maybe(TYPE,BB,OUTPUT):-conjoin(TYPE,BB,OUTPUT).
 
 
-% 	 	 
+%= 	 	 
+
 %% correct_mode( ?VALUE1, ?O, ?O) is semidet.
 %
 % Correct Pred Mode.
@@ -303,7 +320,8 @@ correct_mode(Mode,(A,B),O):-!,correct_mode(Mode,A,AA),correct_mode(Mode,B,BB),co
 correct_mode(_,O,O).
 
 
-% 	 	 
+%= 	 	 
+
 %% body_for_pfc( ?Mode, ?Head, ?NewNewHead, ?I, ?O) is semidet.
 %
 % Body For Prolog Forward Chaining.
@@ -312,7 +330,8 @@ body_for_pfc(Mode,Head,NewNewHead,I,O):-reduce_literal(Head,NewHead),!,body_for_
 body_for_pfc(Mode,Head,NewHead,B,BB):- body_for_mpred_1(Mode,Head,NewHead,B,BB),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% body_for_mpred_1( ?Mode, ?Head, ?HeadO, ?C, ?CO) is semidet.
 %
 % body for Managed Predicate  Secondary Helper.
@@ -327,7 +346,8 @@ body_for_mpred_1(Mode,Head,NewNewHead,I,O):-body_for_mpred_2(Mode,Head,NewNewHea
 
 
 
-% 	 	 
+%= 	 	 
+
 %% overlaping( ?C, ?Head, ?Avoid) is semidet.
 %
 % Overlaping.
@@ -338,7 +358,8 @@ overlaping(C,~(Head),Avoid):-is_ftNonvar(Head),!,overlaping(C,Head,Avoid).
 overlaping(C,Head,Avoid):-is_ftNonvar(Head),is_ftNonvar(C), compound(C),compound(Head),once((get_reln(C,FC),get_reln(Head,HC))),!,overlapingFunctors(FC,HC),!,Avoid=avoidHeadLoop(C,Head).
 
 
-% 	 	 
+%= 	 	 
+
 %% overlapingFunctors( ?FC, ?HC) is semidet.
 %
 % Overlaping Functors.
@@ -348,7 +369,8 @@ overlapingFunctors(t,_):-!.
 overlapingFunctors(_,t):-!.
 
 
-% 	 	 
+%= 	 	 
+
 %% get_reln( ?C, ?F) is semidet.
 %
 % Get Reln.
@@ -365,7 +387,8 @@ get_reln(C,RO):-get_functor(C,F),
      RO=F),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% avoidHeadLoop( ?C, ?Head) is semidet.
 %
 % Avoid Head Loop.
@@ -374,7 +397,8 @@ avoidHeadLoop(C,Head):- stack_check, ground(C),(C\=Head),\+ is_loop_checked(C).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% isk( ?Var, ?SK) is semidet.
 %
 % Isk.
@@ -382,7 +406,8 @@ avoidHeadLoop(C,Head):- stack_check, ground(C),(C\=Head),\+ is_loop_checked(C).
 isk(Var,SK):- ignore((=(Var,SK))),!.
 isk(Var,SK):- when('?='(Var,Val),isk_bind(Var,Val,SK)).
 
-% 	 	 
+%= 	 	 
+
 %% isk_bind( ?Var, ?Val, ?SK) is semidet.
 %
 % Isk Bind.
@@ -394,7 +419,8 @@ isk_bind(Var,Val,SK):-show_call(dom(Var,[Val,SK])).
 % 
 % ugly but works
 
-% 	 	 
+%= 	 	 
+
 %% head_for_skolem( ?H, :TermH, :TermIn) is semidet.
 %
 % Head For Skolem.
@@ -403,7 +429,8 @@ head_for_skolem(H,if_missing(H,HH),skolem(In,NewOut)):- contains_var(In,H),subst
 
 
 
-% 	 	 
+%= 	 	 
+
 %% body_for_mpred_2( ?Mode, ?Head, ?Head, ?A, ?A) is semidet.
 %
 % body for Managed Predicate  Extended Helper.
@@ -429,7 +456,8 @@ body_for_mpred_2(_Mode,Head,Head,A,{A}):-prologBuiltin(A),!.
 body_for_mpred_2(_Mode,Head,Head,A,A).
 
 
-% 	 	 
+%= 	 	 
+
 %% reduce_literal( ?A, ?A) is semidet.
 %
 % Reduce Literal.
@@ -447,7 +475,8 @@ reduce_literal(~(A),~ A):-!.
 reduce_literal(A,A).
 
 
-% 	 	 
+%= 	 	 
+
 %% can_use_hack( ?VALUE1) is semidet.
 %
 % Can Use Hack.
@@ -455,7 +484,8 @@ reduce_literal(A,A).
 can_use_hack(two_implications):-!,fail.
 can_use_hack(_).
 
-% 	 	 
+%= 	 	 
+
 %% did_use_hack( ?X) is semidet.
 %
 % Did Use Hack.

@@ -5,6 +5,7 @@
 % Douglas Miles
 */
 :- if(('$set_source_module'(CM,CM),'$module'(M,M),asserta(logicmoo_user_base:user_module_uses(M,CM)))).
+:- endif.
 :- module(logicmoo_user_base,
  [
  fix_ops_for/1,
@@ -22,11 +23,17 @@
  op(350,xfx,'xor'),
  op(300,fx,'~'),
  op(300,fx,'-')]).
-:- endif.
+
+
 
 :- multifile(logicmoo_user_base:user_module_uses/2).
 :- dynamic(logicmoo_user_base:user_module_uses/2).
 
+% 	 	 
+%% fix_ops_for( ?VALUE1) is semidet.
+%
+% Fix Oper.s For.
+%
 fix_ops_for(CM):-
  op(1199,fx,CM:('==>')), 
  op(1190,xfx,CM:('::::')),
@@ -44,9 +51,24 @@ fix_ops_for(CM):-
 
 :- fix_ops_for(user).
 
-:- baseKB:use_module(baseKB:logicmoo_snark).
+
+/*
+:- set_prolog_flag(report_error,true).
+:- set_prolog_flag(fileerrors,false).
+% :- set_prolog_flag(access_level,system).
+:- set_prolog_flag(debug_on_error,true).
+:- set_prolog_flag(debug,true).
+% :- set_prolog_flag(gc,false).
+:- set_prolog_flag(optimise,false).
+:- set_prolog_flag(last_call_optimisation,false).
+:- debug.
+*/
+
 :- ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
 :- system:initialization(mpred_www:ensure_webserver(3020)).
+:- mpred_www:ensure_webserver(3020).
+
+:- baseKB:use_module(baseKB:logicmoo_snark).
 
 % in case something changed
 :- logicmoo_user_base:user_module_uses(M,CM),!,fix_ops_for(M),fix_ops_for(CM),dmsg(user_module_uses(M,CM)).

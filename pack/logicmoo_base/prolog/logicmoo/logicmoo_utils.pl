@@ -29,7 +29,8 @@
 :- multifile(user:file_search_path/2).
 
 
-% 	 	 
+%= 	 	 
+
 %% resolve_dir( ?Dir, ?Dir) is semidet.
 %
 % Resolve Dir.
@@ -48,7 +49,8 @@ resolve_dir(Path,Dir):- (prolog_load_context(directory,SDir);(prolog_load_contex
 %	  ==
 %
 
-% 	 	 
+%= 	 	 
+
 %% add_file_search_path( ?Name, ?Path) is semidet.
 %
 % Add File Search Path.
@@ -83,7 +85,8 @@ add_file_search_path(Name,Path):-  resolve_dir(Path,Dir),
 %	  ==
 %
 
-% 	 	 
+%= 	 	 
+
 %% add_library_search_path( ?Path, ?Masks) is semidet.
 %
 % Add Library Search Path.
@@ -104,7 +107,8 @@ add_library_search_path(Path,Masks):-
 :- dynamic(lmconf:logicmoo_scan_autoloads/0).
 :- dynamic(lmconf:logicmoo_pre_release/0).
 
-% 	 	 
+%= 	 	 
+
 %% logicmoo_pre_release is semidet.
 %
 % Hook To [lmconf:logicmoo_pre_release/0] For Module Logicmoo_utils.
@@ -128,7 +132,8 @@ lmconf:logicmoo_pre_release.
 :- endif.
 
 
-% 	 	 
+%= 	 	 
+
 %% logicmoo_scan_autoloads is semidet.
 %
 % Hook To [lmconf:logicmoo_scan_autoloads/0] For Module Logicmoo_utils.
@@ -168,7 +173,8 @@ lmconf:logicmoo_scan_autoloads:-false.
 :- multifile(lmconf:mpred_is_impl_file/1).
 :- dynamic(lmconf:mpred_is_impl_file/1).
 
-% 	 	 
+%= 	 	 
+
 %% mpred_is_impl_file( ?A) is semidet.
 %
 % Hook To [lmconf:mpred_is_impl_file/1] For Module Logicmoo_utils.

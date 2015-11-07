@@ -138,7 +138,8 @@
 % :-ensure_loaded((logicmoo_util_bugger)).
 
 
-% 	 	 
+%= 	 	 
+
 %% currentContext( ?Name, ?X) is semidet.
 %
 % Current Context.
@@ -150,7 +151,8 @@ currentContext(Name,X):-hotrace(makeLocalContext(Name,X)),!.
 :- dynamic(no_cyclic_terms).
 
 
-% 	 	 
+%= 	 	 
+
 %% no_cyclic_terms is semidet.
 %
 % No Cyclic Terms.
@@ -158,7 +160,8 @@ currentContext(Name,X):-hotrace(makeLocalContext(Name,X)),!.
 no_cyclic_terms.
 
 
-% 	 	 
+%= 	 	 
+
 %% makeLocalContext( ?Name, ?Ctx) is semidet.
 %
 % Make Local Context.
@@ -166,7 +169,8 @@ no_cyclic_terms.
 makeLocalContext(Name,Ctx):-makeLocalContext1(Name,Ctx),!,setCtxValue(ctx,Ctx,Name),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% makeLocalContext1( ?Gensym_Key, :TermGensym_Key) is semidet.
 %
 % Make Local Context Secondary Helper.
@@ -179,7 +183,8 @@ makeLocalContext1(Gensym_Key, [frame(Gensym_Key,no_destructor,[assoc(AL)|_])|_])
 
 
 
-% 	 	 
+%= 	 	 
+
 %% unwrapValue( ?HValue, ?TValue) is semidet.
 %
 % Unwrap Value.
@@ -188,7 +193,8 @@ unwrapValue(HValue,TValue):-TValue==deleted,!,not(unwrapValue1(HValue,_)),!.
 unwrapValue(HValue,TValue):-unwrapValue1(HValue,Value),!,TValue=Value.
 
 
-% 	 	 
+%= 	 	 
+
 %% unwrapValue1( ?Value, ?Value) is semidet.
 %
 % Unwrap Value Secondary Helper.
@@ -198,7 +204,8 @@ unwrapValue1(deleted,_):-!,fail.
 unwrapValue1(Value,Value):-!.
 
 
-% 	 	 
+%= 	 	 
+
 %% bestSetterFn( ?Value, ?OuterSetter, ?OuterSetter) is semidet.
 %
 % Best Setter Function.
@@ -207,7 +214,8 @@ bestSetterFn(v(_,Setter,_),_OuterSetter,Setter):-!.
 bestSetterFn(_Value,OuterSetter,OuterSetter).
 
 
-% 	 	 
+%= 	 	 
+
 %% getCtxValue( ?Name, ?Ctx, ?Value) is semidet.
 %
 % Get Context Value.
@@ -216,7 +224,8 @@ getCtxValue(Name,Ctx,Value):-checkCtx(Ctx), hotrace(( get_ctx_holder(Ctx,Holder)
 getCtxValue(Name,CtxI,Value):-checkCtx(CtxI),lastMemberCtx(Ctx,CtxI),hotrace(( get_ctx_holder(Ctx,Holder),get_o_value(Name,Holder,HValue,_Setter),!, unwrapValue(HValue,Value))),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% setCtxValue( ?Name, ?Ctx, ?Value) is semidet.
 %
 % Set Context Value.
@@ -225,14 +234,16 @@ setCtxValue(Name,Ctx,Value):-checkCtx(Ctx),get_ctx_holder(Ctx,Holder),get_o_valu
 setCtxValue(Name,Ctx,Value):-checkCtx(Ctx),addCtxValue1(Name,Ctx,Value),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% addCtxValue( ?Name, ?Ctx, ?Value) is semidet.
 %
 % Add Context Value.
 %
 addCtxValue(Name,Ctx,Value):-checkCtx(Ctx),addCtxValue1(Name,Ctx,Value),!.
 
-% 	 	 
+%= 	 	 
+
 %% addCtxValue1( ?Name, ?Ctx, ?Value) is semidet.
 %
 % Add Context Value Secondary Helper.
@@ -240,7 +251,8 @@ addCtxValue(Name,Ctx,Value):-checkCtx(Ctx),addCtxValue1(Name,Ctx,Value),!.
 addCtxValue1(Name,Ctx,Value):-get_ctx_holderFreeSpot(Ctx,Name=v(Value,Setter,Destructor),Destructor),!,ignore(Setter=no_setter(Name)).
 
 
-% 	 	 
+%= 	 	 
+
 %% remCtxValue( ?Name, ?Ctx, ?Value) is semidet.
 %
 % Remove/erase Context Value.
@@ -249,7 +261,8 @@ remCtxValue(Name,Ctx,_Value):-checkCtx(Ctx),setCtxValue(Name,Ctx,deleted),!.
 
 
 
-% 	 	 
+%= 	 	 
+
 %% pushCtxFrame( ?Name, ?Ctx, ?NewValues) is semidet.
 %
 % Push Context Frame.
@@ -257,7 +270,8 @@ remCtxValue(Name,Ctx,_Value):-checkCtx(Ctx),setCtxValue(Name,Ctx,deleted),!.
 pushCtxFrame(Name,Ctx,NewValues):-checkCtx(Ctx),get_ctx_holderFreeSpot(Ctx,Holder,GuestDest),!,Holder=frame(Name,GuestDest,NewValues).
 
 
-% 	 	 
+%= 	 	 
+
 %% popCtxFrame( ?Name, ?Ctx, ?PrevValues) is semidet.
 %
 % Pop Context Frame.
@@ -265,7 +279,8 @@ pushCtxFrame(Name,Ctx,NewValues):-checkCtx(Ctx),get_ctx_holderFreeSpot(Ctx,Holde
 popCtxFrame(Name,Ctx,PrevValues):-checkCtx(Ctx),get_ctx_frame_holder(Ctx,Name,Frame),Frame = frame(Name,Destructor,PrevValues),Destructor,!.
 
 
-% 	 	 
+%= 	 	 
+
 %% checkCtx( ?Ctx) is semidet.
 %
 % Check Context.
@@ -277,14 +292,16 @@ checkCtx(Ctx):-makeLocalContext(broken,Ctx),!.
 %%% get the frame holder
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% 	 	 
+%= 	 	 
+
 %% get_ctx_frame_holder( ?Ctx, ?Name, ?R) is semidet.
 %
 % Get Context Frame Holder.
 %
 get_ctx_frame_holder(Ctx,Name,R):-compound(Ctx),get_ctx_frame_holder1(Ctx,Name,R).
 
-% 	 	 
+%= 	 	 
+
 %% get_ctx_frame_holder1( :TermARG1, ?Name, ?R) is semidet.
 %
 % Get Context Frame Holder Secondary Helper.
@@ -301,14 +318,16 @@ get_ctx_frame_holder1([H|T],Name,R):- nonvar(H), !, ( get_ctx_frame_holder(T,Nam
 %%% get_ctx_holder(+Ctx, -PlaceToSearch),
 
 
-% 	 	 
+%= 	 	 
+
 %% get_ctx_holder( ?Ctx, ?R) is semidet.
 %
 % Get Context Holder.
 %
 get_ctx_holder(Ctx,R):-compound(Ctx),get_ctx_holder1(Ctx,R).
 
-% 	 	 
+%= 	 	 
+
 %% get_ctx_holder1( ?Ctx, ?Ctx) is semidet.
 %
 % Get Context Holder Secondary Helper.
@@ -327,7 +346,8 @@ get_ctx_holder1(Ctx,Ctx).
 %%% get_ctx_holderFreeSpot(+Ctx, -Put_NV, -CallToRemoveNV)
 
 
-% 	 	 
+%= 	 	 
+
 %% get_ctx_holderFreeSpot( ?Ctx, ?NamedValue, ?Destruct) is semidet.
 %
 % Get Context Holder Free Spot.
@@ -336,7 +356,8 @@ get_ctx_holderFreeSpot(Ctx,NamedValue,no_destructor(holder)):-no_cyclic_terms,!,
 get_ctx_holderFreeSpot(Ctx,NamedValue,Destruct):-get_ctx_holderFreeSpot0(Ctx,NamedValue,Destruct).
 
 
-% 	 	 
+%= 	 	 
+
 %% get_ctx_holderFreeSpot0( ?Ctx, ?NamedValue, ?Destruct) is semidet.
 %
 % Get Context Holder Free Spot Primary Helper.
@@ -344,7 +365,8 @@ get_ctx_holderFreeSpot(Ctx,NamedValue,Destruct):-get_ctx_holderFreeSpot0(Ctx,Nam
 get_ctx_holderFreeSpot0(Ctx,NamedValue,Destruct):-compound(Ctx),get_ctx_holderFreeSpot1(Ctx,NamedValue,Destruct).
 
 
-% 	 	 
+%= 	 	 
+
 %% get_ctx_holderFreeSpot1( :TermCtx, ?NamedValue, ?Destruct) is semidet.
 %
 % Get Context Holder Free Spot Secondary Helper.
@@ -354,7 +376,8 @@ get_ctx_holderFreeSpot1(frame(Key,_Inner_Dest,Ctx),NamedValue,Destruct):- nonvar
 get_ctx_holderFreeSpot1(Ctx,NamedValue,Destruct):-functor(Ctx,F,A),!,get_ctx_holderFreeSpot1(Ctx,F,A,NamedValue,Destruct).
 
 
-% 	 	 
+%= 	 	 
+
 %% get_ctx_holderFreeSpot1( ?Ctx, ?VALUE2, :PRED2VALUE3, ?NamedValue, ?Ctx) is semidet.
 %
 % Get Context Holder Free Spot Secondary Helper.
@@ -371,7 +394,8 @@ get_ctx_holderFreeSpot1(Ctx,'.',2,NamedValue,Destruct):-arg(2,Ctx,Try2),get_ctx_
 %%% find the value holder associated with a keyname
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% 	 	 
+%= 	 	 
+
 %% get_ctx_value( ?Name, ?Ctx, ?Value, ?Setter) is semidet.
 %
 % Get Context Value.
@@ -379,7 +403,8 @@ get_ctx_holderFreeSpot1(Ctx,'.',2,NamedValue,Destruct):-arg(2,Ctx,Try2),get_ctx_
 get_ctx_value(Name,Ctx,Value,Setter):-nonvar(Name),var(Value),get_o_value(Name,Ctx,Value,OuterSetter),bestSetterFn(Value,OuterSetter,Setter).
 
 
-% 	 	 
+%= 	 	 
+
 %% get_o_value( ?Name, ?Ctx, ?Value, ?Setter) is semidet.
 %
 % Get Output Value.
@@ -388,14 +413,16 @@ get_o_value(Name,Ctx,Value,no_setter(Name)):-no_cyclic_terms,!,get_o_value0(Name
 get_o_value(Name,Ctx,Value,Setter):-hotrace(get_o_value0(Name,Ctx,Value,Setter)),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% get_o_value0( ?Name, ?Ctx, ?Value, ?Setter) is semidet.
 %
 % Get Output Value Primary Helper.
 %
 get_o_value0(Name,Ctx,Value,Setter):-compound(Ctx),get_o_value1(Name,Ctx,Value,Setter).
 
-% 	 	 
+%= 	 	 
+
 %% get_o_value1( ?Name, :TermPred, ?Value, ?Setter) is semidet.
 %
 % Get Output Value Secondary Helper.
@@ -406,7 +433,8 @@ get_o_value1(Name,[H|T],Value,Setter):- !,(get_o_value0(Name,T,Value,Setter);get
 get_o_value1(Name,Pred,Value,Setter):-functor(Pred,F,A),!,get_n_value(Name,Pred,F,A,Value,Setter).
 
 
-% 	 	 
+%= 	 	 
+
 %% get_n_value( ?Name, ?Name, ?F, :PRED2A, ?Value, ?VALUE6) is semidet.
 %
 % Get N Value.
@@ -420,7 +448,8 @@ get_n_value(Name,Pred,Dash,2,Value,nb_setarg(2,Pred)):-arg(1,Pred,Name),member(D
 
 
 
-% 	 	 
+%= 	 	 
+
 %% lastMemberCtx( ?E, :TermList) is semidet.
 %
 % Last Member Context.
@@ -429,7 +458,8 @@ lastMemberCtx(_E,List):-var(List),!,fail.
 lastMemberCtx(E,[H|List]):-lastMemberCtx(E,List);E=H.
 
 
-% 	 	 
+%= 	 	 
+
 %% lastMemberCtx( ?E, ?List, ?Rest) is semidet.
 %
 % Last Member Context.
@@ -437,7 +467,8 @@ lastMemberCtx(E,[H|List]):-lastMemberCtx(E,List);E=H.
 lastMemberCtx(E,List,Rest):-lastMemberCtx(E,List),!,delete_safe(List,E,Rest),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% delete_safe( :TermList, ?E, :TermRest) is semidet.
 %
 % Delete Safely Paying Attention To Corner Cases.
@@ -449,7 +480,8 @@ delete_safe([H|List],E,[H|Rest]):-delete_safe(List,E,Rest).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% getKeyValue( ?FullList, :TermN) is semidet.
 %
 % Get Key Value.
@@ -457,7 +489,8 @@ delete_safe([H|List],E,[H|Rest]):-delete_safe(List,E,Rest).
 getKeyValue(FullList,N=V):-lastMemberCtx(N=V,FullList),!.
 %%addKeyValue(FullList,N=V):-nonvar(N),!,append(_Closed,[N=V|_],FullList),!.
 
-% 	 	 
+%= 	 	 
+
 %% addKeyValue( ?FullList, ?NV) is semidet.
 %
 % Add Key Value.
@@ -472,7 +505,8 @@ addKeyValue(FullList,NV):- must((not(ground(FullList)),nonvar(NV))),append(_Clos
 :- multifile evil_term/3.
 :- dynamic evil_term/3.
 
-% 	 	 
+%= 	 	 
+
 %% evil_term( ?Ctx, ?Before, ?After) is semidet.
 %
 % Evil Term.
@@ -480,7 +514,8 @@ addKeyValue(FullList,NV):- must((not(ground(FullList)),nonvar(NV))),append(_Clos
 evil_term(_Ctx,Before,After):-hideIfNeeded(Before,After),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% hideIfNeeded( ?I, ?I) is semidet.
 %
 % Hide If Needed.
@@ -494,7 +529,8 @@ hideIfNeeded(I,I):-!.
 
 
 
-% 	 	 
+%= 	 	 
+
 %% to_open_list( ?FullList, ?Closed, ?Open, ?FullList) is semidet.
 %
 % Converted To Open List.
@@ -504,7 +540,8 @@ to_open_list(Closed,Closed,Open,FullList) :- append(Closed,Open,FullList),!.
 
 
 
-% 	 	 
+%= 	 	 
+
 %% revappend_0( :TermARG1, ?Ys, ?Ys) is semidet.
 %
 % revappend  Primary Helper.
@@ -513,7 +550,8 @@ revappend_0([], Ys, Ys).
 revappend_0([X|Xs], Ys, Zs) :- revappend_0(Xs, [X|Ys], Zs).
 
 
-% 	 	 
+%= 	 	 
+
 %% reverseA( ?Xs, ?Ys) is semidet.
 %
 % Reverse A.
@@ -521,7 +559,8 @@ revappend_0([X|Xs], Ys, Zs) :- revappend_0(Xs, [X|Ys], Zs).
 reverseA(Xs,Ys) :- revappend_0(Xs,[],Ys).
 
 
-% 	 	 
+%= 	 	 
+
 %% appendAttributes( ?Ctx, ?L, ?R, ?AA) is semidet.
 %
 % Append Attributes.
@@ -529,7 +568,8 @@ reverseA(Xs,Ys) :- revappend_0(Xs,[],Ys).
 appendAttributes(_Ctx,L,R,AA):-hotrace((mergeAppend0(L,R,A),list_to_set_safe(A,AA))),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% mergeAppend0( :TermL, ?R, ?R) is semidet.
 %
 % Merge Append Primary Helper.
@@ -542,14 +582,16 @@ mergeAppend0([L|LL],R,A):-eqmember(L,R),mergeAppend0(LL,R,A).
 mergeAppend0(L,R,A):-append(L,R,A).
 
 
-% 	 	 
+%= 	 	 
+
 %% eqmember( ?E, ?List) is semidet.
 %
 % Eqmember.
 %
 eqmember(E,List):-copy_term_numvars(E:List,E0:List0),member(E0,List0).
 
-% 	 	 
+%= 	 	 
+
 %% copy_term_numvars( ?OLD, ?NEW) is semidet.
 %
 % Copy Term Numvars.

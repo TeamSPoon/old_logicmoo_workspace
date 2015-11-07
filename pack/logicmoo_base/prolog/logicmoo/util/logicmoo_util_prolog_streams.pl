@@ -21,7 +21,8 @@
 
 
 
-% 	 	 
+%= 	 	 
+
 %% on_x_fail_priv( :GoalGoal) is semidet.
 %
 % If there If Is A an exception in  :Goal goal then fail priv.
@@ -77,7 +78,8 @@ on_x_fail_priv(Goal):- catch(Goal,_,fail).
 
 :- meta_predicate(with_output_to_pred(1,0)).
 
-% 	 	 
+%= 	 	 
+
 %% with_output_to_pred( :PRED1Callback, :GoalGoal) is semidet.
 %
 % Using Output Converted To Predicate.
@@ -92,7 +94,8 @@ with_output_to_pred(Callback,Goal):-
        set_stream(Prev,  alias(current_output)))).
  
 
-% 	 	 
+%= 	 	 
+
 %% with_err_to_pred( :PRED1Callback, :GoalGoal) is semidet.
 %
 % Using Err Converted To Predicate.
@@ -104,7 +107,8 @@ with_err_to_pred(Callback,Goal):-
        set_stream(Err, alias(user_error))).
 
 
-% 	 	 
+%= 	 	 
+
 %% some_test is semidet.
 %
 % Some Test.
@@ -113,7 +117,8 @@ some_test :- dynamic(received_chars/1).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% with_output_to_stream_pred( :PRED1Callback, -Stream, :GoalGoal, :GoalExit) is semidet.
 %
 % Using Output Converted To Stream Predicate.
@@ -135,7 +140,8 @@ with_output_to_stream_pred(Callback,Stream,Goal,Exit):-
 
 % test predciate to receive char codes
 
-% 	 	 
+%= 	 	 
+
 %% buffer_chars( ?N) is semidet.
 %
 % Buffer Chars.
@@ -193,7 +199,8 @@ some_test :- with_output_to_pred(dmsg, (current_output(Out),forall(stream_proper
 % dmsg: stream_property(<stream>(0x232b8a0),representation_errors(error)).
 
 
-% 	 	 
+%= 	 	 
+
 %% l_prolog_streams is semidet.
 %
 % (list Version) Prolog Streams.
@@ -215,7 +222,8 @@ l_prolog_streams.
 :- meta_predicate(tl_with_prolog_streams:stream_read(?,?)).
 :- meta_predicate(prolog_stream:open_prolog_stream(?,?,?,?)).
 
-% 	 	 
+%= 	 	 
+
 %% with_input_from_pred( :PRED1Callback, :GoalGoal) is semidet.
 %
 % Using Input Converted From Predicate.
@@ -235,7 +243,8 @@ with_input_from_pred(Callback,Goal):-
 
 % our test callback
 
-% 	 	 
+%= 	 	 
+
 %% read_received( ?A) is semidet.
 %
 % Read Received.
@@ -296,7 +305,8 @@ some_test :- with_input_from_pred(=(hi), \+ at_end_of_stream(current_input)).
 
 % Test 1
 
-% 	 	 
+%= 	 	 
+
 %% test1_0( ?In) is semidet.
 %
 % test Secondary Helper  Primary Helper.
@@ -319,7 +329,8 @@ some_test :- with_input_from_pred(read_received, test1_0(current_input)).
 
 % Test 2 is indeed asks much, but still is reasonable
 
-% 	 	 
+%= 	 	 
+
 %% test2( ?In) is semidet.
 %
 % Test Extended Helper.

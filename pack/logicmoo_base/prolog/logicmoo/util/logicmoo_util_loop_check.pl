@@ -82,7 +82,8 @@
 :- thread_local lmcache:going_last/1.
 % go_as_last(Call1,Call2):- \+ lmcache:going_last(Call1),w_tl(lmcache:going_last(Call1), (Call1->true;(must(catch(Call2,_,fail))))),!.
 
-% 	 	 
+%= 	 	 
+
 %% go_as_last( :GoalCall1, :GoalCall2) is semidet.
 %
 % Go Converted To Last.
@@ -116,7 +117,8 @@ go_as_last(Call1,Call2):- \+ lmcache:going_last(Call1),w_tl(lmcache:going_last(C
 :- include('logicmoo_util_header.pi').
 
 
-% 	 	 
+%= 	 	 
+
 %% transitive( :PRED2X, +A, -B) is semidet.
 %
 % Transitive.
@@ -124,7 +126,8 @@ go_as_last(Call1,Call2):- \+ lmcache:going_last(Call1),w_tl(lmcache:going_last(C
 transitive(X,A,B):- once(on_x_debug(call(X,A,R)) -> ( R\=@=A -> transitive_lc(X,R,B) ; B=R); B=A),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% transitive_lc( :PRED2X, +A, -B) is semidet.
 %
 % Transitive Not Loop Checked.
@@ -132,7 +135,8 @@ transitive(X,A,B):- once(on_x_debug(call(X,A,R)) -> ( R\=@=A -> transitive_lc(X,
 transitive_lc(X,A,B):-transitive_except([],X,A,B).
 
 
-% 	 	 
+%= 	 	 
+
 %% transitive_except( +NotIn, :PRED2X, +A, -B) is semidet.
 %
 % Transitive Except.
@@ -140,7 +144,8 @@ transitive_lc(X,A,B):-transitive_except([],X,A,B).
 transitive_except(NotIn,X,A,B):- memberchk_same_two(A,NotIn)-> (B=A,!) ;((once(on_x_debug(call(X,A,R)) -> ( R\=@=A -> transitive_except([A|NotIn],X,R,B) ; B=R); B=A))),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% memberchk_same_two( ?X, :TermY0) is semidet.
 %
 % Memberchk Same Two.
@@ -160,7 +165,8 @@ memberchk_same_two(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (no
 % call_t(C0):-reduce_make_key(C0,C),!,table(C),!,query(C).
 % call_t(C0):-query(C).
 
-% 	 	 
+%= 	 	 
+
 %% call_t( :GoalC) is semidet.
 %
 % Call True Stucture.
@@ -169,7 +175,8 @@ call_t(C):- call(C).
 
 :- meta_predicate reduce_make_key(+,-).
 
-% 	 	 
+%= 	 	 
+
 %% reduce_make_key( +O, -O) is semidet.
 %
 % Reduce Make Key.
@@ -196,7 +203,8 @@ reduce_make_key(O,O).
 
 
 
-% 	 	 
+%= 	 	 
+
 %% cc_key( ?CC, ?Key) is semidet.
 %
 % Cc Key.
@@ -205,7 +213,8 @@ cc_key(CC,Key):- cyclic_term(CC),!,trace,copy_term_nat(CC,CKey),numbervars(CKey,
 cc_key(CC,Key):- copy_term_nat(CC,Key),numbervars(Key,0,_),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% make_key( ?CC, ?KeyO) is semidet.
 %
 % Make Key.
@@ -216,7 +225,8 @@ make_key(CC,KeyO):- ((ground(CC)->Key=CC ; cc_key(CC,Key))),!,KeyO=Key.
 :- '$set_predicate_attribute'(make_key(_,_), trace, 1).
 
 
-% 	 	 
+%= 	 	 
+
 %% is_loop_checked( ?Call) is semidet.
 %
 % If Is A Loop Checked.
@@ -226,7 +236,8 @@ is_loop_checked(Call):-  make_key(Call,Key),!,(lmcache:ilc(Key);lmcache:ilc(Key+
 :- meta_predicate logicmoo_utils:loop_check_early(0,0).
 :- export(loop_check_early/2).
 
-% 	 	 
+%= 	 	 
+
 %% loop_check_early( :GoalCall, :GoalTODO) is semidet.
 %
 % Loop Check Early.
@@ -235,7 +246,8 @@ loop_check_early(Call, TODO):- loop_check_term_key(Call,Call, TODO).
 
 :- export(loop_check/1).
 
-% 	 	 
+%= 	 	 
+
 %% loop_check( :GoalCall) is semidet.
 %
 % Loop Check.
@@ -244,7 +256,8 @@ loop_check(Call):- loop_check(Call, fail).
 
 :- export(loop_check/2).
 
-% 	 	 
+%= 	 	 
+
 %% loop_check( :GoalCall, :GoalTODO) is semidet.
 %
 % Loop Check.
@@ -252,7 +265,8 @@ loop_check(Call):- loop_check(Call, fail).
 loop_check(Call, TODO):- !,loop_check_early(Call, TODO).
 loop_check(Call, TODO):- parent_goal(ParentCall,1)->(loop_check_term_key(Call,Call+ParentCall, TODO));loop_check_early(Call, TODO).
 
-% 	 	 
+%= 	 	 
+
 %% loop_check_term_key( :GoalCall, ?KeyIn, :GoalTODO) is semidet.
 %
 % Loop Check Term Key.
@@ -261,7 +275,8 @@ loop_check_term_key(Call,KeyIn,TODO):- make_key(KeyIn,Key) -> loop_check_term(Ca
 
 
 
-% 	 	 
+%= 	 	 
+
 %% no_loop_check( :GoalCall) is semidet.
 %
 % No Loop Check.
@@ -269,7 +284,8 @@ loop_check_term_key(Call,KeyIn,TODO):- make_key(KeyIn,Key) -> loop_check_term(Ca
 no_loop_check(Call):- no_loop_check(Call, fail).
 :- export(no_loop_check/2).
 
-% 	 	 
+%= 	 	 
+
 %% no_loop_check( :GoalCall, :GoalTODO) is semidet.
 %
 % No Loop Check.
@@ -277,7 +293,8 @@ no_loop_check(Call):- no_loop_check(Call, fail).
 no_loop_check(Call, TODO):- !, no_loop_check_term_key(Call,Call,TODO).
 %no_loop_check(Call, TODO):- parent_goal(Term,2)->no_loop_check_term_key(Call,Term+Call, TODO).
 
-% 	 	 
+%= 	 	 
+
 %% no_loop_check_term_key( :GoalCall, ?KeyIn, :GoalTODO) is semidet.
 %
 % No Loop Check Term Key.
@@ -286,7 +303,8 @@ no_loop_check_term_key(Call,KeyIn,TODO):- make_key(KeyIn,Key) -> wno_tl(lmcache:
 
 
 
-% 	 	 
+%= 	 	 
+
 %% loop_check_term( :GoalCall, ?Key, :GoalTODO) is semidet.
 %
 % Loop Check Term.
@@ -297,7 +315,8 @@ loop_check_term(Call,Key,TODO):- TT = lmcache:ilc(Key),
    ((can_fail(TODO)->retract_can_table;true),call(TODO)) ).
 
 
-% 	 	 
+%= 	 	 
+
 %% can_fail( ?G) is semidet.
 %
 % Can Fail.
@@ -306,14 +325,16 @@ can_fail(G):-not(G=true),not(G=must(_)).
 
 % get_where(When)
 
-% 	 	 
+%= 	 	 
+
 %% get_where( :TermB) is semidet.
 %
 % Get Where.
 %
 get_where(B:L):-get_where0(F:L),file_base_name(F,B).
 
-% 	 	 
+%= 	 	 
+
 %% get_where0( :GoalF) is semidet.
 %
 % Get Where Primary Helper.
@@ -326,7 +347,8 @@ get_where0(lmconf:0):-!.
 
 % lco_goal_expansion(_,_):-!,fail.
 
-% 	 	 
+%= 	 	 
+
 %% lco_goal_expansion( :TermB, :TermA) is semidet.
 %
 % Lco Goal Expansion.
@@ -377,7 +399,8 @@ call_no_cuts_loop_checked(Call, TODO):- clause(Call,Body),make_key(Body,Key),loo
 :- thread_local lmcache:maybe_table_key/1.
 
 
-% 	 	 
+%= 	 	 
+
 %% retract_can_table is semidet.
 %
 % Retract Can Table.
@@ -393,7 +416,8 @@ retract_can_table :- retractall(maybe_table_key(_)).
 :- dynamic(lmconf:already_added_this_round/1).
 :- export(lmconf:already_added_this_round/1).
 
-% 	 	 
+%= 	 	 
+
 %% expire_dont_add is semidet.
 %
 % Expire Dont Add.
@@ -401,14 +425,16 @@ retract_can_table :- retractall(maybe_table_key(_)).
 expire_dont_add:-retractall(lmconf:already_added_this_round(_)),mpred_expire_caches(all),nop(dmsg(expire_dont_add)).
 
 
-% 	 	 
+%= 	 	 
+
 %% lex is semidet.
 %
 % Lex.
 %
 lex:-listing(lmcache:ilc(_)),forall(current_predicate(lmcache:F/A),listing(lmcache:F/A)),catchv(listing(lmconf:already_added_this_round),_,true).
 
-% 	 	 
+%= 	 	 
+
 %% ex is semidet.
 %
 % Ex.
@@ -416,7 +442,8 @@ lex:-listing(lmcache:ilc(_)),forall(current_predicate(lmcache:F/A),listing(lmcac
 (ex):-mpred_expire_caches(_),retractall(lmcache:ilc(_)),dmsg_showall(_),forall(current_predicate(lmcache:F/A),(functor(RA,F,A),retractall(RA))),catchv(expire_dont_add,_,true).
 
 
-% 	 	 
+%= 	 	 
+
 %% mpred_expire_caches( ?A) is semidet.
 %
 % Managed Predicate Expire Caches.
@@ -427,7 +454,8 @@ mpred_expire_caches(A):-doall(call_no_cuts(must(lmconf:mpred_on_expire_caches(A)
 :-asserta((lmconf:mpred_on_expire_caches(A):-expire_tabled_list(A))).
 
 
-% 	 	 
+%= 	 	 
+
 %% expire_tabled_list( ?V) is semidet.
 %
 % Expire Tabled List.
@@ -439,7 +467,8 @@ expire_tabled_list(T):- atoms_of_0(T,A1), CT= lmcache:call_tabled_cached_results
   any_term_overlap_atoms_of(A1,Key))),retractall(CT)),fail)).
 
 
-% 	 	 
+%= 	 	 
+
 %% any_term_overlap_atoms_of( ?A1, ?T2) is semidet.
 %
 % Any Term Overlap Atoms Of.
@@ -447,7 +476,8 @@ expire_tabled_list(T):- atoms_of_0(T,A1), CT= lmcache:call_tabled_cached_results
 any_term_overlap_atoms_of(A1,T2):-atoms_of_0(T2,A2),!,member(A,A1),member(A,A2),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% any_term_overlap( ?T1, ?T2) is semidet.
 %
 % Any Term Overlap.
@@ -457,7 +487,8 @@ any_term_overlap(T1,T2):- atoms_of_0(T1,A1),atoms_of_0(T2,A2),!,member(A,A1),mem
 % = :- meta_predicate(make_tabled_perm(0)).
 
 
-% 	 	 
+%= 	 	 
+
 %% make_tabled_perm( :GoalCall) is semidet.
 %
 % Make Tabled Perm.
@@ -473,7 +504,8 @@ make_tabled_perm(Call):- must(really_can_table),must(outside_of_loop_check),
 
 
 
-% 	 	 
+%= 	 	 
+
 %% atoms_of_0( :TermC, ?L) is semidet.
 %
 % atoms of  Primary Helper.
@@ -495,21 +527,24 @@ atoms_of_0(C,L):-C=..CL,atoms_of_0(CL,L),!.
 :- thread_local lmcache:cannot_use_any_tables/0.
 
 
-% 	 	 
+%= 	 	 
+
 %% skipped_table_call( :GoalCall) is semidet.
 %
 % Skipped Table Call.
 %
 skipped_table_call(Call):- cannot_use_tables(cannot_table_call(Call)).
 
-% 	 	 
+%= 	 	 
+
 %% cannot_table_call( :GoalCall) is semidet.
 %
 % Cannot Table Call.
 %
 cannot_table_call(Call):- w_tl( lmcache:cannot_save_table,Call).
 
-% 	 	 
+%= 	 	 
+
 %% cannot_use_tables( :GoalCall) is semidet.
 %
 % Cannot Use Tables.
@@ -517,14 +552,16 @@ cannot_table_call(Call):- w_tl( lmcache:cannot_save_table,Call).
 cannot_use_tables(Call):- w_tl( lmcache:cannot_use_any_tables,Call).
 
 
-% 	 	 
+%= 	 	 
+
 %% call_tabled( :GoalA) is semidet.
 %
 % Call Tabled.
 %
 call_tabled(A):-call_tabled(A,A).
 
-% 	 	 
+%= 	 	 
+
 %% call_tabled( ?Key, :GoalC) is semidet.
 %
 % Call Tabled.
@@ -534,7 +571,8 @@ call_tabled(Key,findall(Vars,C,List)):- !,call_setof_tabled(Key,Vars,C,List).
 call_tabled(Key,C):- sanity(nonvar(C)), term_variables(C,Vars),!,call_vars_tabled(Key,Vars,C).
 
 
-% 	 	 
+%= 	 	 
+
 %% call_vars_tabled( ?Key, ?Vars, :GoalC) is semidet.
 %
 % Call Variables Tabled.
@@ -542,7 +580,8 @@ call_tabled(Key,C):- sanity(nonvar(C)), term_variables(C,Vars),!,call_vars_table
 call_vars_tabled(Key,Vars,C):- call_setof_tabled(Key,Vars,C,Set),!,member(Vars,Set).
 
 
-% 	 	 
+%= 	 	 
+
 %% call_setof_tabled( ?KeyIn, ?Vars, :GoalC, -List) is semidet.
 %
 % Call Setof Tabled.
@@ -550,7 +589,8 @@ call_vars_tabled(Key,Vars,C):- call_setof_tabled(Key,Vars,C,Set),!,member(Vars,S
 call_setof_tabled(KeyIn,Vars,C,List):- make_key(KeyIn+Vars,Key),call_tabled0(Key,Vars,C,List).
 
 
-% 	 	 
+%= 	 	 
+
 %% findall_nodupes( ?Vs, :GoalC, -List) is semidet.
 %
 % Findall Nodupes.
@@ -564,7 +604,8 @@ findall_nodupes(Vs,C,L):- findall(Vs,no_repeats_old(Vs,call_t(C)),L).
 % = :- meta_predicate(call_tabled1(?,?,?,?)).
 %call_tabled0(Key,Vars,C,List):- lmcache:maybe_table_key(Key),dmsg(looped_findall_nodupes(Vars,C,List)),fail.
 
-% 	 	 
+%= 	 	 
+
 %% call_tabled0( ?Key, ?UPARAM2, ?UPARAM3, ?List) is semidet.
 %
 % Call Tabled Primary Helper.
@@ -581,7 +622,8 @@ call_tabled0(Key,Vars,C,List):- outside_of_loop_check,!, findall_nodupes(Vars,C,
 call_tabled0(Key,Vars,C,List):-call_tabled1(Key,Vars,C,List).
 
 
-% 	 	 
+%= 	 	 
+
 %% call_tabled1( ?Key, ?Vars, ?C, ?List) is semidet.
 %
 % Call Tabled Secondary Helper.
@@ -593,7 +635,8 @@ call_tabled1(Key,Vars,C,List):- asserta(lmcache:maybe_table_key(Key)), findall_n
   asserta_if_ground(lmcache:call_tabled_cached_results(Key,List)))),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% really_can_table is semidet.
 %
 % Really Can Table.
@@ -601,7 +644,8 @@ call_tabled1(Key,Vars,C,List):- asserta(lmcache:maybe_table_key(Key)), findall_n
 really_can_table:- not(test_tl(lmcache:cannot_save_table)),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% outside_of_loop_check is semidet.
 %
 % Outside Of Loop Check.
@@ -614,8 +658,9 @@ outside_of_loop_check:- (clause(lmcache:ilc(_),B)->B=(!,fail);true).
 %system:term_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
 % user:term_expansion(LC,LCOO):-nonvar(LC),(LC=(H:-B)),lco_goal_expansion(B,BE),B\=@=BE,((H:-BE)=LCOO).
 
-% 	 	 
-%% goal_expansion( ?Math, ?MathGoal) is semidet.
+%= 	 	 
+
+%% goal_expansion( ?LC, ?LCOO) is semidet.
 %
 % Hook To [system:goal_expansion/2] For Module Logicmoo_util_loop_check.
 % Goal Expansion.

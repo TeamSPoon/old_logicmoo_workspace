@@ -53,7 +53,8 @@
 :- export(with_stream_pos/2).
 % = :- meta_predicate(with_stream_pos(+,0)).
 
-% 	 	 
+%= 	 	 
+
 %% with_stream_pos( +In, :GoalCall) is semidet.
 %
 % Using Stream Pos.
@@ -70,7 +71,8 @@ with_stream_pos(In,Call):-
 :- export(l_open_input0/2).
 :- export(l_open_input1/2).
 
-% 	 	 
+%= 	 	 
+
 %% l_open_input( ?InS, ?In) is semidet.
 %
 % (list Version) Open Input.
@@ -78,7 +80,8 @@ with_stream_pos(In,Call):-
 l_open_input(InS,In):-once(must(l_open_input0(InS,In))).
 
 
-% 	 	 
+%= 	 	 
+
 %% l_open_input0( ?In, ?InS) is semidet.
 %
 % (list Version) Open Input Primary Helper.
@@ -89,7 +92,8 @@ l_open_input0(Filename,In) :- \+ is_list(Filename),nonvar(Filename),filematch(Fi
 l_open_input0(InS,In):-!,open_string(InS,In).
 
 
-% 	 	 
+%= 	 	 
+
 %% l_open_input1( :TermInS, ?In) is semidet.
 %
 % (list Version) Open Input Secondary Helper.
@@ -154,9 +158,11 @@ SWI-Prolog installation directory.
 %	@see thread_httpd:accept_hook/2 handles the corresponding accept
 
 
-% 	 	 
+%= 	 	 
+
 %% make_socket_hook( ?Port, :TermM, ?Options) is semidet.
 %
+% Hook To [thread_httpd:make_socket_hook/3] For Module Logicmoo_util_filestreams.
 % Make Socket Hook.
 %
 thread_httpd:make_socket_hook(Port, M:Options0, Options) :-
@@ -176,9 +182,11 @@ thread_httpd:make_socket_hook(Port, M:Options0, Options) :-
 		  ].
 
 
-% 	 	 
-%% make_socket( ?Port, ?Options0, ?Options) is semidet.
+%= 	 	 
+
+%% make_socket( ?Port, ?Socket, ?Options) is semidet.
 %
+% Hook To [thread_httpd:make_socket/3] For Module Logicmoo_util_filestreams.
 % Make Socket.
 %
 make_socket(_Port, Socket, Options) :-
@@ -195,9 +203,11 @@ make_socket(Port, Socket, _Options) :-
 %	Implement the accept for HTTPS connections.
 
 
-% 	 	 
+%= 	 	 
+
 %% accept_hook( ?Goal, ?Options) is semidet.
 %
+% Hook To [thread_httpd:accept_hook/2] For Module Logicmoo_util_filestreams.
 % Accept Hook.
 %
 thread_httpd:accept_hook(Goal, Options) :-
@@ -210,9 +220,11 @@ thread_httpd:accept_hook(Goal, Options) :-
 	thread_send_message(Queue, ssl_client(SSL, Client, Goal, Peer)).
 
 
-% 	 	 
+%= 	 	 
+
 %% open_client_hook( :TermSSL, ?Goal, ?In, ?Out, ?Peer) is semidet.
 %
+% Hook To [thread_httpd:open_client_hook/5] For Module Logicmoo_util_filestreams.
 % Open Client Hook.
 %
 thread_httpd:open_client_hook(ssl_client(SSL, Client, Goal, Peer),
@@ -224,7 +236,8 @@ thread_httpd:open_client_hook(ssl_client(SSL, Client, Goal, Peer),
 	      ssl_failed(Read, Write, E)).
 
 
-% 	 	 
+%= 	 	 
+
 %% ssl_failed( ?Read, ?Write, ?E) is semidet.
 %
 % Ssl Failed.
@@ -247,7 +260,8 @@ ssl_failed(Read, Write, E) :-
 %	`cacert_file(system(root_certificates))` to ssl_context/3.
 
 
-% 	 	 
+%= 	 	 
+
 %% http_protocol_hook( ?VALUE1, ?Parts, ?PlainStreamPair, ?StreamPair, ?Options) is semidet.
 %
 % Hook To [http:http_protocol_hook/5] For Module Logicmoo_util_filestreams.
@@ -257,7 +271,8 @@ http:http_protocol_hook(https, Parts, PlainStreamPair, StreamPair, Options):-
 	ssl_protocol_hook(Parts, PlainStreamPair, StreamPair, Options).
 
 
-% 	 	 
+%= 	 	 
+
 %% ssl_protocol_hook( ?Parts, ?PlainStreamPair, ?StreamPair, ?Options) is semidet.
 %
 % Ssl Protocol Hook.
@@ -283,7 +298,8 @@ ssl_protocol_hook(Parts, PlainStreamPair, StreamPair, Options) :-
 %	root certificate database for validating an SSL certificate.
 
 
-% 	 	 
+%= 	 	 
+
 %% open_options( ?Parts, ?Options) is semidet.
 %
 % Hook To [http:open_options/2] For Module Logicmoo_util_filestreams.
@@ -301,7 +317,8 @@ http:open_options(Parts, Options) :-
 %	port 443
 
 
-% 	 	 
+%= 	 	 
+
 %% http_connection_over_proxy( :TermProxyHost, ?Parts, :TermHost, ?StreamPair, ?Options, ?Options) is semidet.
 %
 % Hook To [http:http_connection_over_proxy/6] For Module Logicmoo_util_filestreams.
@@ -320,7 +337,8 @@ http:http_connection_over_proxy(proxy(ProxyHost, ProxyPort), Parts,
 :- use_module(library(http/http_open),[]).
 
 
-% 	 	 
+%= 	 	 
+
 %% negotiate_http_connect( ?StreamPair, ?Address) is semidet.
 %
 % Negotiate Http Connect.
@@ -338,7 +356,8 @@ negotiate_http_connect(StreamPair, Address):-
 
 :- multifile(package_path/2).
 
-% 	 	 
+%= 	 	 
+
 %% package_path( ?Pkg, ?PkgPath) is semidet.
 %
 % Package Path.
@@ -347,7 +366,8 @@ package_path(Pkg,PkgPath):-expand_file_search_path(pack(Pkg),PkgPathN),exists_di
 package_path(Pkg,PkgPath):-atom(Pkg),T=..[Pkg,'.'],expand_file_search_path(T,PkgPathN),exists_directory(PkgPathN),normalize_path(PkgPathN,PkgPath).
 
 
-% 	 	 
+%= 	 	 
+
 %% file_to_stream_ssl_verify( ?SSL, ?ProblemCert, ?AllCerts, ?FirstCert, ?Error) is semidet.
 %
 % File Converted To Stream Ssl Verify.
@@ -355,7 +375,8 @@ package_path(Pkg,PkgPath):-atom(Pkg),T=..[Pkg,'.'],expand_file_search_path(T,Pkg
 file_to_stream_ssl_verify(_SSL, _ProblemCert, _AllCerts, _FirstCert, _Error) :- !.
 :- export(text_to_stream/2).
 
-% 	 	 
+%= 	 	 
+
 %% text_to_stream( ?Text, ?Stream) is semidet.
 %
 % Text Converted To Stream.
@@ -363,7 +384,8 @@ file_to_stream_ssl_verify(_SSL, _ProblemCert, _AllCerts, _FirstCert, _Error) :- 
 text_to_stream(Text,Stream):-text_to_string(Text,String),string_codes(String,Codes),open_codes_stream(Codes,Stream).
 :- export(file_to_stream/2).
 
-% 	 	 
+%= 	 	 
+
 %% file_to_stream( :TermStreamIn, ?Stream) is semidet.
 %
 % File Converted To Stream.
@@ -394,7 +416,8 @@ file_to_stream(Spec,Stream):-file_to_stream(match(Spec),Stream).
 
 :- export(copy_stream/2).
 
-% 	 	 
+%= 	 	 
+
 %% copy_stream( ?HTTP_Stream, ?Stream) is semidet.
 %
 % Copy Stream.

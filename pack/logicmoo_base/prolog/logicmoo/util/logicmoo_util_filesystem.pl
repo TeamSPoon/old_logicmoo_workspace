@@ -143,14 +143,16 @@
 
 :- meta_predicate(with_filematch(0)).
 
-% 	 	 
+%= 	 	 
+
 %% with_filematch( :GoalG) is semidet.
 %
 % Using Filematch.
 %
 with_filematch(G):- expand_wfm(G,GG),!,GG.
 
-% 	 	 
+%= 	 	 
+
 %% with_filematches( ?G) is semidet.
 %
 % Using Filematches.
@@ -158,7 +160,8 @@ with_filematch(G):- expand_wfm(G,GG),!,GG.
 with_filematches(G):- forall(expand_wfm(G,GG),GG).
 
 
-% 	 	 
+%= 	 	 
+
 %% expand_wfm( ?G, ?GG) is semidet.
 %
 % Expand Wfm.
@@ -170,14 +173,16 @@ expand_wfm(G,GG):- must((sub_term(Sub, G),compound(Sub),Sub=wfm(F))),
 :- export(current_filesource/1).
 :- export(current_filedir/1).
 
-% 	 	 
+%= 	 	 
+
 %% current_filedir( ?D) is semidet.
 %
 % Current Filedir.
 %
 current_filedir(D):- no_repeats([D],(current_filesource(F),file_directory_name(F,D))).
 
-% 	 	 
+%= 	 	 
+
 %% current_filesource( ?F) is semidet.
 %
 % Current Filesource.
@@ -188,7 +193,8 @@ current_filesource(F):-stream_property(_,file_name(F)).
 :- export(filematch/2).
 :- meta_predicate(filematch(:,-)).
 
-% 	 	 
+%= 	 	 
+
 %% filematch( ?Spec, -Result) is semidet.
 %
 % Filematch.
@@ -200,7 +206,8 @@ filematch(Spec,Result):-  enumerate_files(Spec,Result).
 :- meta_predicate(filematch_ext(+,:,-)).
 :- export(filematch_ext/3).
 
-% 	 	 
+%= 	 	 
+
 %% filematch_ext( +Ext, ?FileIn, -File) is semidet.
 %
 % Filematch Ext.
@@ -211,7 +218,8 @@ filematch_ext(Ext,FileIn,File):-
 :- meta_predicate(enumerate_files(:,-)).
 :- export(enumerate_files/2).
 
-% 	 	 
+%= 	 	 
+
 %% enumerate_files( ?CALL1, -Result) is semidet.
 %
 % Enumerate Files.
@@ -223,7 +231,8 @@ enumerate_files(M:Spec,Result):-
 :- meta_predicate(enumerate_files(:,-)).
 :- export(enumerate_m_files/3).
 
-% 	 	 
+%= 	 	 
+
 %% enumerate_m_files( ?M, ?Mask, ?File1) is semidet.
 %
 % Enumerate Module Files.
@@ -232,7 +241,8 @@ enumerate_m_files(user, Mask,File1):-!,enumerate_files0(Mask,File1).
 enumerate_m_files(M, Mask,File1):- enumerate_files0(Mask,File1)*->true;enumerate_m_files_mscoped(M, Mask,File1).
 
 
-% 	 	 
+%= 	 	 
+
 %% enumerate_m_files_mscoped( ?M, ?Mask, ?File1) is semidet.
 %
 % Enumerate Module Files Mscoped.
@@ -246,7 +256,8 @@ enumerate_m_files_mscoped(M, Mask,File1):-
 
 :- export(enumerate_files0/2).
 
-% 	 	 
+%= 	 	 
+
 %% enumerate_files0( ?Mask, ?File1) is semidet.
 %
 % Enumerate Files Primary Helper.
@@ -258,7 +269,8 @@ enumerate_files0(Spec,Result):- to_filename(Spec,Result).
 enumerate_files0(Mask,File1):-  (current_dirs(D),filematch3(D,Mask,File1)).
 
 
-% 	 	 
+%= 	 	 
+
 %% enumerate_files00( ?Spec, ?Result) is semidet.
 %
 % Enumerate Files Primary Helper Primary Helper.
@@ -269,7 +281,8 @@ enumerate_files00(Spec,Result):- enumerate_files1(Spec,M),enumerate_files2(M,Res
 
 :- export(filematch3/3).
 
-% 	 	 
+%= 	 	 
+
 %% filematch3( ?RelativeTo, ?Mask, ?File1) is semidet.
 %
 % Filematch3.
@@ -283,7 +296,8 @@ filematch3(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1Matched,[file_ty
 
 :- export(enumerate_files2/2).
 
-% 	 	 
+%= 	 	 
+
 %% enumerate_files2( ?Spec, ?Result) is semidet.
 %
 % Enumerate Files Extended Helper.
@@ -292,7 +306,8 @@ enumerate_files2(Spec,Result):-sub_atom(Spec,_,1,_,'*') -> enumerate_files1(Spec
 
 :- export(enumerate_files1/2).
 
-% 	 	 
+%= 	 	 
+
 %% enumerate_files1( :TermAtom, ?Result) is semidet.
 %
 % Enumerate Files Secondary Helper.
@@ -308,7 +323,8 @@ enumerate_files1(Atom,Result):- atomic(Atom),once((member(Sep,['/**/','/**','**'
 
 :- export(expand_file_name_safe/2).
 
-% 	 	 
+%= 	 	 
+
 %% expand_file_name_safe( ?I, ?O) is semidet.
 %
 % Expand File Name Safely Paying Attention To Corner Cases.
@@ -322,7 +338,8 @@ expand_file_name_safe(I,L):-
 
 :- export(exists_file_or_dir/1).
 
-% 	 	 
+%= 	 	 
+
 %% exists_file_or_dir( ?X) is semidet.
 %
 % Exists File Or Dir.
@@ -330,7 +347,8 @@ expand_file_name_safe(I,L):-
 exists_file_or_dir(X):- nonvar(X),( X=(_:F)->exists_file_or_dir(F); (atomic(X),once((catch(exists_file(X),E,(fmt(E:X),fail));is_directory(X))))).
 :- export(is_directory/1).
 
-% 	 	 
+%= 	 	 
+
 %% is_directory( ?X) is semidet.
 %
 % If Is A Directory.
@@ -339,7 +357,8 @@ is_directory(X):-exists_directory(X).
 
 :- export(concat_paths/3).
 
-% 	 	 
+%= 	 	 
+
 %% concat_paths( ?ParentIn, ?Child, ?Result) is semidet.
 %
 % Concat Paths.
@@ -353,7 +372,8 @@ concat_paths(ParentIn,Child,Result):- filematch(ParentIn,Parent),
 
 :- export(concat_paths/2).
 
-% 	 	 
+%= 	 	 
+
 %% concat_paths( :TermJoined, ?Result) is semidet.
 %
 % Concat Paths.
@@ -365,14 +385,16 @@ concat_paths([ParentIn,Child|MORE],Result):- concat_paths(ParentIn,Child,ResultM
 :- thread_local(t_l:search_first_dir/1).
 
 
-% 	 	 
+%= 	 	 
+
 %% current_dirs( ?DO) is semidet.
 %
 % Current Dirs.
 %
 current_dirs(DO):- no_repeats(DO,(current_dirs0(D),(atom_concat(DO,'/',D)->true;DO=D))).
 
-% 	 	 
+%= 	 	 
+
 %% current_dirs0( ?D) is semidet.
 %
 % Current Dirs Primary Helper.
@@ -392,7 +414,8 @@ current_dirs0('.').
 :- export(to_filename/2).
 :- thread_local(t_l:default_extension/1).
 
-% 	 	 
+%= 	 	 
+
 %% to_filename( ?FileName, ?AFN) is semidet.
 %
 % Converted To Filename.
@@ -410,7 +433,8 @@ to_filename( FileName, AFN ) :-
 
 :- export(prolog_file_dir/1).
 
-% 	 	 
+%= 	 	 
+
 %% prolog_file_dir( ?Here) is semidet.
 %
 % Prolog File Dir.
@@ -419,7 +443,8 @@ prolog_file_dir(Here):- prolog_load_context(file, HereF),file_directory_name(Her
 prolog_file_dir(Here):- working_directory(Here,Here).
 :- export(prolog_file_dir/2).
 
-% 	 	 
+%= 	 	 
+
 %% prolog_file_dir( ?Rel, ?ABSF) is semidet.
 %
 % Prolog File Dir.
@@ -428,28 +453,32 @@ prolog_file_dir(Rel,ABSF):-prolog_file_dir(Here),absolute_file_name(Rel,ABSF,[re
 prolog_file_dir(Rel,ABSF):-prolog_file_dir(Here),absolute_file_name(Rel,ABSF,[relative_to(Here),expand(true)]),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% remove_search_path( ?Alias, ?Abs) is semidet.
 %
 % Remove Search Path.
 %
 remove_search_path(Alias, Abs) :- ignore((clause(user:file_search_path(Alias, AbsW),true,Ref),same_file(Abs,AbsW),erase(Ref),fail)).
 
-% 	 	 
+%= 	 	 
+
 %% add_to_search_path_first( ?Alias, ?Abs) is semidet.
 %
 % Add Converted To Search Path First.
 %
 add_to_search_path_first(Alias, Abs) :- remove_search_path(Alias, Abs), asserta(user:file_search_path(Alias, Abs)).
 
-% 	 	 
+%= 	 	 
+
 %% add_to_search_path_last( ?Alias, ?Abs) is semidet.
 %
 % Add Converted To Search Path Last.
 %
 add_to_search_path_last(Alias, Abs) :- remove_search_path(Alias, Abs), assertz(user:file_search_path(Alias, Abs)).
 
-% 	 	 
+%= 	 	 
+
 %% in_search_path( ?Alias, ?Abs) is semidet.
 %
 % In Search Path.
@@ -458,7 +487,8 @@ in_search_path(Alias, Abs) :- user:file_search_path(Alias,Was),same_file(Abs,Was
 
 
 
-% 	 	 
+%= 	 	 
+
 %% add_to_search_path( ?Alias, ?Abs) is semidet.
 %
 % Add Converted To Search Path.
@@ -466,7 +496,8 @@ in_search_path(Alias, Abs) :- user:file_search_path(Alias,Was),same_file(Abs,Was
 add_to_search_path(Alias, Abs):- add_to_search_path(add_to_search_path_last, Alias, Abs).
 :- meta_predicate add_to_search_path(2,?,?).
 
-% 	 	 
+%= 	 	 
+
 %% add_to_search_path( :PRED2How, ?Alias, ?Abs) is semidet.
 %
 % Add Converted To Search Path.
@@ -479,7 +510,8 @@ add_to_search_path(How, Alias, Abs) :- is_absolute_file_name(Abs) -> call(How,Al
 
 % Was this our startup file?
 
-% 	 	 
+%= 	 	 
+
 %% if_startup_script is semidet.
 %
 % If Startup Script.
@@ -490,7 +522,8 @@ if_startup_script:- prolog_load_context(source, HereF),file_base_name(HereF,Here
 
 :- meta_predicate(if_startup_script(0)).
 
-% 	 	 
+%= 	 	 
+
 %% if_startup_script( :GoalCall) is semidet.
 %
 % If Startup Script.
@@ -499,7 +532,8 @@ if_startup_script(Call):-if_startup_script->Call;true.
 
 :- export(normalize_path/2).
 
-% 	 	 
+%= 	 	 
+
 %% normalize_path( ?Where, ?WhereF3) is semidet.
 %
 % Normalize Path.
@@ -508,7 +542,8 @@ normalize_path(Where,WhereF3):-absolute_file_name(Where,WhereF),prolog_to_os_fil
 normalize_path(Where,WhereF2):-clip_dir_sep(Where,WhereF2).
 
 
-% 	 	 
+%= 	 	 
+
 %% clip_dir_sep( ?Where, ?WhereF2) is semidet.
 %
 % Clip Dir Sep.
@@ -519,7 +554,8 @@ clip_dir_sep(Where,Where):-!.
 
 
 
-% 	 	 
+%= 	 	 
+
 %% my_absolute_file_name( ?F, ?A) is semidet.
 %
 % My Absolute File Name.
@@ -531,7 +567,8 @@ my_absolute_file_name(F,A):-catch(absolute_file_name(F,A),_,fail),!.
 
 
 
-% 	 	 
+%= 	 	 
+
 %% join_path_if_needed( ?A, ?B, ?C) is semidet.
 %
 % Join Path If Needed.
@@ -539,7 +576,8 @@ my_absolute_file_name(F,A):-catch(absolute_file_name(F,A),_,fail),!.
 join_path_if_needed(A,B,C):-exists_directory(B)->B=C;directory_file_path(A,B,C).
 
 
-% 	 	 
+%= 	 	 
+
 %% locally_to_dir( ?Locally, ?Dir) is semidet.
 %
 % Locally Converted To Dir.
@@ -558,7 +596,8 @@ locally_to_dir(Directory,Dir):-my_absolute_file_name(Directory,Dir),exists_direc
 
 
 
-% 	 	 
+%= 	 	 
+
 %% local_directory_search_combined( ?X) is semidet.
 %
 % Local Directory Search Combined.
@@ -568,7 +607,8 @@ local_directory_search_combined(X):-local_directory_search_combined2(X).
 % for now dont do the concat 3 version
 local_directory_search_combined(PL):-local_directory_search_combined2(A),local_directory_search(B),join_path(A,B,PL),exists_directory_safe(PL).
 
-% 	 	 
+%= 	 	 
+
 %% local_directory_search_combined2( ?PL) is semidet.
 %
 % Local Directory Search Combined Extended Helper.
@@ -587,7 +627,8 @@ local_directory_search_combined2(PL):-local_directory_search(A),local_directory_
 %local_directory_search('../src_modules'). % for big modules
 %local_directory_search('../src_webui').  % for web UI modules
 
-% 	 	 
+%= 	 	 
+
 %% local_directory_search( ?VALUE1) is semidet.
 %
 % Local Directory Search.
@@ -601,28 +642,32 @@ local_directory_search('../src_mud').  % for vetted src of the MUD
 
 
 
-% 	 	 
+%= 	 	 
+
 %% exists_dirf( ?X) is semidet.
 %
 % Exists Dirf.
 %
 exists_dirf(X):-atomic(X),(exists_file(X);exists_directory(X)).
 
-% 	 	 
+%= 	 	 
+
 %% atom_concat_safe( ?L, ?R, ?A) is semidet.
 %
 % Atom Concat Safely Paying Attention To Corner Cases.
 %
 atom_concat_safe(L,R,A):- ((atom(A),(atom(L);atom(R))) ; ((atom(L),atom(R)))), !, atom_concat(L,R,A),!.
 
-% 	 	 
+%= 	 	 
+
 %% exists_file_safe( ?File) is semidet.
 %
 % Exists File Safely Paying Attention To Corner Cases.
 %
 exists_file_safe(File):- hotrace((nonvar(File),(File=(_:F)->exists_file_safe(F);(atomic(File),exists_file(File))))).
 
-% 	 	 
+%= 	 	 
+
 %% exists_directory_safe( ?File) is semidet.
 %
 % Exists Directory Safely Paying Attention To Corner Cases.
@@ -634,14 +679,16 @@ concat_atom_safe(List,Sep,Atom):-atom(Atom),!,concat_atom(ListM,Sep,Atom),!,List
 concat_atom_safe(List,Sep,Atom):- concat_atom(List,Sep,Atom),!.
 */
 
-% 	 	 
+%= 	 	 
+
 %% upcase_atom_safe( ?A, ?B) is semidet.
 %
 % Upcase Atom Safely Paying Attention To Corner Cases.
 %
 upcase_atom_safe(A,B):-atom(A),upcase_atom(A,B),!.
 
-% 	 	 
+%= 	 	 
+
 %% time_file_safe( ?F, ?INNER_XML) is semidet.
 %
 % Time File Safely Paying Attention To Corner Cases.
@@ -653,7 +700,8 @@ time_file_safe(F,INNER_XML):-exists_file_safe(F),!,time_file(F,INNER_XML).
 
 :- meta_predicate(if_file_exists(:)).
 
-% 	 	 
+%= 	 	 
+
 %% if_file_exists( ?M) is semidet.
 %
 % If File Exists.
@@ -668,7 +716,8 @@ if_file_exists(M:Call):- arg(1,Call,File),(filematch(File,_)-> must((filematch(F
 % =================================================================================
 
 
-% 	 	 
+%= 	 	 
+
 %% global_pathname( ?B, ?A) is semidet.
 %
 % Global Pathname.
@@ -677,7 +726,8 @@ global_pathname(B,A):-absolute_file_name(B,A),!.
 global_pathname(B,A):-relative_pathname(B,A).
 
 
-% 	 	 
+%= 	 	 
+
 %% relative_pathname( ?Path, ?Relative) is semidet.
 %
 % Relative Pathname.
@@ -689,7 +739,8 @@ relative_pathname(Path,Relative):-absolute_file_name(Path,[relative_to('./')],Ab
 relative_pathname(Path,Relative):-canonical_pathname(Path,Relative),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% canonical_pathname( ?Absolute, ?AbsoluteB) is semidet.
 %
 % Canonical Pathname.
@@ -705,7 +756,8 @@ canonical_pathname(Absolute,AbsoluteB):-prolog_to_os_filename(AbsoluteA,Absolute
 
 
 
-% 	 	 
+%= 	 	 
+
 %% join_path( ?CurrentDir, ?Filename, ?Name) is semidet.
 %
 % Join Path.
@@ -718,7 +770,8 @@ join_path(CurrentDir,Filename,Name):-
 :- module_transparent current_directory_search/1.
 
 
-% 	 	 
+%= 	 	 
+
 %% atom_ensure_endswtih( ?A, ?E, ?A) is semidet.
 %
 % Atom Ensure Endswtih.
@@ -729,7 +782,8 @@ atom_ensure_endswtih(A,E,O):-atom(A),atom(O),atom_concat(A,E,O),!.
 atom_ensure_endswtih(A,O,O):-atom(A),atom(O),!.
 
 
-% 	 	 
+%= 	 	 
+
 %% os_to_prolog_filename( ?OS, ?PL) is semidet.
 %
 % Outputs Converted To Prolog Filename.

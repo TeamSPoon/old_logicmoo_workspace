@@ -214,8 +214,9 @@
 % :- struct_datatype(_,_) -> true; true.
 
 
-% 	 	 
-%% record_onto_var( ?AttribName, ?AV, ?Value) is semidet.
+%= 	 	 
+
+%% record_onto_var( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
 %
 % Record Onto Variable.
 %
@@ -227,16 +228,18 @@ record_onto_var(AttribName,AV,Value):-
 
 
 
-% 	 	 
-%% attr_unify_hook( ?X, ?Other) is semidet.
+%= 	 	 
+
+%% attr_unify_hook( ?VALUE1, ?VALUE2) is semidet.
 %
-% Hook To [neq:attr_unify_hook/2] For Module Logicmoo_util_structs.
+% Hook To [prolog_metainference:attr_unify_hook/2] For Module Logicmoo_util_structs.
 % Attr Unify Hook.
 %
 attr_unify_hook(_,_).
 
-% 	 	 
-%% attr_portray_hook( ?Value, ?Var) is semidet.
+%= 	 	 
+
+%% attr_portray_hook( ?VALUE1, ?VALUE2) is semidet.
 %
 % Hook To [logicmoo_varnames:attr_portray_hook/2] For Module Logicmoo_util_structs.
 % Attr Portray Hook.
@@ -245,8 +248,9 @@ attr_portray_hook(Value, _Var) :- nonvar(Value),!,write((Value)).
 
 
 
-% 	 	 
-%% record_var_names( :TermV) is semidet.
+%= 	 	 
+
+%% record_var_names( :TermARG1) is semidet.
 %
 % Record Variable Names.
 %
@@ -256,8 +260,9 @@ record_var_names(List):-is_list(List),!,maplist(record_var_names,List).
 record_var_names(Comp):-functor(Comp,_,A),arg(A,Comp,E),!,record_var_names(E).
 
 
-% 	 	 
-%% record_var_names( ?ATTVAR, ?Value) is semidet.
+%= 	 	 
+
+%% record_var_names( ?VALUE1, ?VALUE2) is semidet.
 %
 % Record Variable Names.
 %
@@ -265,8 +270,9 @@ record_var_names(ATTVAR,Value):-record_onto_var(varname,ATTVAR,Value).
 
 
 
-% 	 	 
-%% record_var_type( ?ATTVAR, ?Type) is semidet.
+%= 	 	 
+
+%% record_var_type( ?VALUE1, ?VALUE2) is semidet.
 %
 % Record Variable Type.
 %
@@ -308,24 +314,27 @@ prop_get(Name,mutable(Dict),Value):-!,nonvar(Dict),prop_get(Name,Dict,Value).
 */
 :-meta_predicate(sisctus_key(:,-)).
 
-% 	 	 
-%% sisctus_key( ?Module, -Atom) is semidet.
+%= 	 	 
+
+%% sisctus_key( ?CALL1, -IN2) is semidet.
 %
 % Sisctus Key.
 %
 sisctus_key(Module:Key, Atom) :- atom(Module), !,atomic(Key),atomic_list_concat([Module, Key], :, Atom).
 
 
-% 	 	 
-%% prop_get( ?Call) is semidet.
+%= 	 	 
+
+%% prop_get( ?VALUE1) is semidet.
 %
 % Prop Get.
 %
 prop_get(Call):- Call=..[P,A,B],prop_get(P,A,B).
 
 
-% 	 	 
-%% prop_get( ?Name, ?Dict, ?Value) is semidet.
+%= 	 	 
+
+%% prop_get( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
 %
 % Prop Get.
 %
@@ -338,8 +347,9 @@ prop_get(Name, Struct,  Value):- Name \= extraprops, prop_get(extraprops, Struct
 prop_get(Name,_Struct, Value):-gvar_get(Name,  Value).
 
 
-% 	 	 
-%% gvar_get( ?Name, ?Value) is semidet.
+%= 	 	 
+
+%% gvar_get( ?VALUE1, ?VALUE2) is semidet.
 %
 % Gvar Get.
 %
@@ -347,8 +357,9 @@ gvar_get(Name,  Value):- sisctus_key(Name,N),nb_current(N,ValueV),!,Value=ValueV
 gvar_get(Name,  Value):- nb_current(Name,Value).
 
 
-% 	 	 
-%% gvar_put( ?Name, ?Value) is semidet.
+%= 	 	 
+
+%% gvar_put( ?VALUE1, ?VALUE2) is semidet.
 %
 % Gvar Put.
 %
@@ -358,16 +369,18 @@ gvar_put(Name,  Value):- nb_setval(Name,Value).
 
 
 
-% 	 	 
-%% key_match( ?Name, ?N) is semidet.
+%= 	 	 
+
+%% key_match( ?VALUE1, ?VALUE2) is semidet.
 %
 % Key Match.
 %
 key_match(Name,N):-atom(N), (Name=N -> true ; atom_concat(':',Name,N)).
 
 
-% 	 	 
-%% prop_get_try( ?VALUE1, ?Dict, ?VALUE3, ?VALUE4) is semidet.
+%= 	 	 
+
+%% prop_get_try( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
 %
 % Prop Get Try.
 %
@@ -378,8 +391,9 @@ prop_get_try(Name, Dict,   Value, Ref):- prop_get_map(Name, Dict, Value),!,must(
 prop_get_try(Name, STRUCT,  Value, Ref):- STRUCT = mutable(Struct), !, prop_get_try(Name, Struct,  Value, Ref).
 
 
-% 	 	 
-%% prop_get_map( ?VALUE1, :TermDict, ?VALUE3) is semidet.
+%= 	 	 
+
+%% prop_get_map( ?VALUE1, :TermARG2, ?VALUE3) is semidet.
 %
 % Prop Get Map.
 %
@@ -401,8 +415,9 @@ prop_get_map(Name, Struct,  Value):- member_loc(StructName,Name,N), functor(Stru
 
 
 
-% 	 	 
-%% prop_put_extra_extra( ?Struct, ?More) is semidet.
+%= 	 	 
+
+%% prop_put_extra_extra( ?VALUE1, ?VALUE2) is semidet.
 %
 % Prop Put Extra Extra.
 %
@@ -411,8 +426,9 @@ prop_put_extra_extra(Struct,More):- must_det_l((prop_get(extraprops,Struct,Extra
 
 
 
-% 	 	 
-%% prop_set( ?Call) is semidet.
+%= 	 	 
+
+%% prop_set( ?VALUE1) is semidet.
 %
 % Prop Set.
 %
@@ -420,8 +436,9 @@ prop_set(Call):- Call=..[P,A,B],prop_set(P,A,B).
 
 
 
-% 	 	 
-%% prop_set( ?Name, ?Dict, ?Value) is semidet.
+%= 	 	 
+
+%% prop_set( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
 %
 % Prop Set.
 %
@@ -433,8 +450,9 @@ prop_set(Name,Dict,Value):-
     must(((prop_set_try(Name,Dict,Value, NewDict ),NewDict==Dict))).
 
 
-% 	 	 
-%% prop_set_try( ?Name, ?Dict, ?Value, ?VALUE4) is semidet.
+%= 	 	 
+
+%% prop_set_try( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
 %
 % Prop Set Try.
 %
@@ -451,8 +469,9 @@ prop_set_try( Name,Dict,Value, NewDict) :- is_dict(Dict),!,prop_set_dict_real(Na
 
 
 
-% 	 	 
-%% prop_set_map( ?Name, ?Dict, ?Value) is semidet.
+%= 	 	 
+
+%% prop_set_map( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
 %
 % Prop Set Map.
 %
@@ -477,8 +496,9 @@ prop_set_map(Name,Dict,Value):- functor(Dict,StructName,_),
 
 
 
-% 	 	 
-%% prop_set_dict_real( ?Name, ?Dict, ?Value, ?Dict) is semidet.
+%= 	 	 
+
+%% prop_set_dict_real( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE2) is semidet.
 %
 % Prop Set Dict Real.
 %
@@ -486,15 +506,17 @@ prop_set_dict_real(Name,Dict,Value, Dict):-  get_dict(Name,Dict,Old),!, (Value==
 prop_set_dict_real(Name,Dict,Value, NewDict):- put_dict(Name,Dict,Value,NewDict).
 
 
-% 	 	 
-%% nb_set_pairlist( ?Name, ?List, ?Value) is semidet.
+%= 	 	 
+
+%% nb_set_pairlist( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
 %
 % Non Backtackable Set Pairlist.
 %
 nb_set_pairlist(Name,List,Value):- must(List=[_|_]), must(nb_set_pairlist0(Name,List,Value)).
 
-% 	 	 
-%% nb_set_pairlist0( ?Name, ?List, ?Value) is semidet.
+%= 	 	 
+
+%% nb_set_pairlist0( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
 %
 % Non Backtackable Set Pairlist Primary Helper.
 %
@@ -505,16 +527,18 @@ nb_set_pairlist0(Name,List,Value):-
            nb_set_pairlist0(Name,T,Value))).
 
 
-% 	 	 
-%% nb_set_s2list( ?Name, ?List, ?Value, ?NewList) is semidet.
+%= 	 	 
+
+%% nb_set_s2list( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
 %
 % Non Backtackable Set S2list.
 %
 nb_set_s2list(Name,List,Value,NewList):- must(List=[_|_]), must(nb_set_s2list0(Name,List,Value,NewList)).
 
 
-% 	 	 
-%% nb_set_s2list0( ?Name, ?LIST, ?Value, ?LIST) is semidet.
+%= 	 	 
+
+%% nb_set_s2list0( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE2) is semidet.
 %
 % Non Backtackable Set S2list Primary Helper.
 %
@@ -528,8 +552,9 @@ nb_set_s2list0(Name,LIST,Value,NEWLIST):-
 
 
 
-% 	 	 
-%% prop_merge( :TermName, ?Struct, ?ValueIn) is semidet.
+%= 	 	 
+
+%% prop_merge( :TermARG1, ?VALUE2, ?VALUE3) is semidet.
 %
 % Prop Merge.
 %
@@ -547,16 +572,18 @@ prop_merge(Name,Struct,ValueIn):- term_to_ord_term(ValueIn,Value),
 %
 
 
-% 	 	 
-%% term_to_ord_term( ?Term, ?OrdTerm) is semidet.
+%= 	 	 
+
+%% term_to_ord_term( ?VALUE1, ?VALUE2) is semidet.
 %
 % Term Converted To Ord Term.
 %
 term_to_ord_term(Term, OrdTerm):-t2ot(Term, OrdTerm).
 
 
-% 	 	 
-%% t2ot( ?A, ?A) is semidet.
+%= 	 	 
+
+%% t2ot( ?VALUE1, ?VALUE1) is semidet.
 %
 % T2ot.
 %
@@ -566,8 +593,9 @@ t2ot(T, OTO):-t2ot_0(T, OT),(T==OT->OTO=T;OTO=OT).
 
 
 
-% 	 	 
-%% t2ot_0( ?T, ?OT) is semidet.
+%= 	 	 
+
+%% t2ot_0( ?VALUE1, ?VALUE2) is semidet.
 %
 % t2ot  Primary Helper.
 %
@@ -594,8 +622,9 @@ t2ot_0(T, OT):-
 
 
 
-% 	 	 
-%% merge_values( ?Var, ?Value, ?Value) is semidet.
+%= 	 	 
+
+%% merge_values( ?VALUE1, ?VALUE3, ?VALUE3) is semidet.
 %
 % Merge Values.
 %
@@ -606,8 +635,9 @@ merge_values(Old,Value,New):-is_list(Old),!,(is_list(Value)->ord_union(Old,Value
 merge_values(Old,Value,[Value,Old]).
 
 
-% 	 	 
-%% nb_setarg_ex( ?Name, ?Struct, ?New) is semidet.
+%= 	 	 
+
+%% nb_setarg_ex( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
 %
 % Non Backtackable Setarg Ex.
 %
@@ -615,7 +645,8 @@ nb_setarg_ex(Name,Struct,New):-(var(Name);var(Struct);var(New)),!,trace,trace_or
 nb_setarg_ex(Name,Struct,New):-arg(Name,Struct,Old),nb_setarg(Name,Struct,New),ignore(Old=New).
 
 
-% 	 	 
+%= 	 	 
+
 %% member_datatype( ?VALUE1, ?VALUE2) is semidet.
 %
 % Member Datatype.
@@ -623,7 +654,8 @@ nb_setarg_ex(Name,Struct,New):-arg(Name,Struct,Old),nb_setarg(Name,Struct,New),i
 member_datatype(prototype,compound).
 
 
-% 	 	 
+%= 	 	 
+
 %% by_name_datatype( ?VALUE1, ?VALUE2) is semidet.
 %
 % By Name Datatype.
@@ -643,8 +675,9 @@ by_name_datatype(preconditions, sorted).
 % member_arg_convert(+StructName,+Name,?N,+Value,-NewValue).
 
 
-% 	 	 
-%% struct_sclass( ?Struct, ?SC) is semidet.
+%= 	 	 
+
+%% struct_sclass( ?VALUE1, ?VALUE2) is semidet.
 %
 % Struct Sclass.
 %
@@ -656,8 +689,9 @@ struct_sclass(Struct,SC):-prop_get(sclass,Struct,SC).
 struct_sclass(Struct,SC):-functor(Struct,F,_),(dict_functor(F)->prop_get(sclass,Struct,SC);SC=F).
 
 
-% 	 	 
-%% member_arg_convert( ?Type, ?Named, ?VALUE3, ?UnConverted, ?UnConverted) is semidet.
+%= 	 	 
+
+%% member_arg_convert( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE4) is semidet.
 %
 % Member Argument Convert.
 %
@@ -674,15 +708,17 @@ member_arg_convert(_Type,_Named,_,UnConverted,UnConverted).
 
 
 
-% 	 	 
-%% if_changed( ?Value, ?NewValue, ?NewValueO) is semidet.
+%= 	 	 
+
+%% if_changed( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
 %
 % If Changed.
 %
 if_changed(Value,NewValue,NewValueO):- must((NewValue=@=Value -> NewValueO=Value ; NewValueO=NewValue)).
 
 
-% 	 	 
+%= 	 	 
+
 %% to_datatype( ?Type, ?Value, ?Value) is semidet.
 %
 % Converted To Datatype.
@@ -693,8 +729,9 @@ to_datatype(_Type,Value,Value).
 
 
 
-% 	 	 
-%% decl_struct( ?StructDecl) is semidet.
+%= 	 	 
+
+%% decl_struct( ?VALUE1) is semidet.
 %
 % Declare Struct.
 %
@@ -705,8 +742,9 @@ decl_struct(StructDecl):-
     show_call(ain(struct_prototype(StructName,StructPrototype))))),!.
 
 
-% 	 	 
-%% decl_argtypes( ?StructDecl) is semidet.
+%= 	 	 
+
+%% decl_argtypes( ?VALUE1) is semidet.
 %
 % Declare Argument Types.
 %
@@ -714,8 +752,9 @@ decl_argtypes(StructDecl):-
   compile_argtypes(StructDecl,"NotSlotted",_),!.
 
 
-% 	 	 
-%% compile_argtypes( ?StructDecl, ?Loc, ?StructPrototype) is semidet.
+%= 	 	 
+
+%% compile_argtypes( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
 %
 % Compile Argument Types.
 %
@@ -734,8 +773,9 @@ compile_argtypes(StructDecl,Loc,StructPrototype):-
 
 
 
-% 	 	 
-%% compile_struct_slots( ?StructType, ?Loc, :TermParam, :TermName, :TermDatatype, :TermInit) is semidet.
+%= 	 	 
+
+%% compile_struct_slots( ?VALUE1, ?VALUE2, :TermARG3, :TermARG4, :TermARG5, :TermARG6) is semidet.
 %
 % Compile Struct Slots.
 %
@@ -749,8 +789,9 @@ compile_struct_slots(StructType,Loc,[Param|ARGS],[Name|ArgNames],[Datatype|Datat
 
 
 
-% 	 	 
-%% extract_struct_parameter( ?Def, ?Decl, ?Name, ?Datatype, ?Init) is semidet.
+%= 	 	 
+
+%% extract_struct_parameter( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4, ?VALUE5) is semidet.
 %
 % Extract Struct Parameter.
 %
@@ -765,8 +806,9 @@ extract_struct_parameter(Def,Decl,Name,Datatype,Init):-
    datatype_to_init(Datatype,Init).
 
 
-% 	 	 
-%% extract_struct_parameter( ?Def, ?Decl, ?Name, ?Type) is semidet.
+%= 	 	 
+
+%% extract_struct_parameter( ?VALUE1, ?VALUE2, ?VALUE2, ?VALUE1) is semidet.
 %
 % Extract Struct Parameter.
 %
@@ -775,7 +817,8 @@ extract_struct_parameter(_Def,Decl,Name,Type):-Decl=..[Type,Name],!.
 extract_struct_parameter(Def,Name,Name,Def).
    
 
-% 	 	 
+%= 	 	 
+
 %% module_local_init is semidet.
 %
 % Hook To [lmconf:module_local_init/0] For Module Logicmoo_util_structs.
@@ -785,53 +828,60 @@ lmconf:module_local_init:- ain('==>'(struct_decl(StructDecl),decl_struct(StructD
 
 
 
-% 	 	 
-%% ensure_instance( ?Type, ?Struct) is semidet.
+%= 	 	 
+
+%% ensure_instance( ?VALUE1, ?VALUE2) is semidet.
 %
 % Ensure Instance.
 %
 ensure_instance(Type,Struct):-ensure_struct(Type,Struct).
 
-% 	 	 
-%% ensure_instance( ?Type, ?List, ?Struct) is semidet.
+%= 	 	 
+
+%% ensure_instance( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
 %
 % Ensure Instance.
 %
 ensure_instance(Type,List,Struct):-ensure_struct(Type,List,Struct).
 
 
-% 	 	 
-%% ensure_struct( ?Type, ?Struct) is semidet.
+%= 	 	 
+
+%% ensure_struct( ?VALUE1, ?VALUE2) is semidet.
 %
 % Ensure Struct.
 %
 ensure_struct(Type,Struct):- nonvar(Struct)->prop_set(sclass,Struct,Type);new_struct(Type,Struct).
 
-% 	 	 
-%% ensure_struct( ?Type, ?List, ?Struct) is semidet.
+%= 	 	 
+
+%% ensure_struct( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
 %
 % Ensure Struct.
 %
 ensure_struct(Type,List,Struct):- must_det_l((ensure_instance(Type,Struct),prop_set_nvlist(Struct,List))).
 
 
-% 	 	 
-%% prop_set_nvlist( ?Struct, :TermN) is semidet.
+%= 	 	 
+
+%% prop_set_nvlist( ?VALUE1, :TermARG2) is semidet.
 %
 % Prop Set Nvlist.
 %
 prop_set_nvlist(Struct,[N=V|More]):-must_det_l((prop_set(N,Struct,V),( More==[]->true;prop_set_nvlist(Struct,More)))).
 
-% 	 	 
-%% prop_get_nvlist( ?Struct, :TermN) is semidet.
+%= 	 	 
+
+%% prop_get_nvlist( ?VALUE1, :TermARG2) is semidet.
 %
 % Prop Get Nvlist.
 %
 prop_get_nvlist(Struct,[N=V|More]):-must_det_l((ignore(show_call_failure(why,prop_get(N,Struct,V))),( More==[]->true;prop_get_nvlist(Struct,More)))).
 
 
-% 	 	 
-%% new_struct( ?Type, ?Struct) is semidet.
+%= 	 	 
+
+%% new_struct( ?VALUE1, ?VALUE2) is semidet.
 %
 % New Struct.
 %
@@ -844,8 +894,9 @@ new_struct(Type,[sclass=Type]):-!.
 
 
 
-% 	 	 
-%% datatype_to_init( ?VALUE1, ?NewArg) is semidet.
+%= 	 	 
+
+%% datatype_to_init( ?VALUE1, ?VALUE2) is semidet.
 %
 % Datatype Converted To Init.
 %
