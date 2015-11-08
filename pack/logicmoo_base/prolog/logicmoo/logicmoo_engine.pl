@@ -44,7 +44,7 @@
 
 :- module(logicmoo_engine, [ tsn/0 ] ). 
 
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 :- include(logicmoo(mpred/'mpred_header.pi')).
 

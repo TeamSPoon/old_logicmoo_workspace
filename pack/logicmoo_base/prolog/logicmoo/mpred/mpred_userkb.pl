@@ -15,7 +15,9 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- module(baseKB, []).
+
+% DW> ... but is there a reason why "Absurdity" is the word used for something that doesn't exist?  SOWA> It's stronger than that.  The absurd type is defined by axioms that are contradictory.  Therefore, by definition, nothing of that type can exist. 
+:- module(baseKB, []). % mpred_userkb_file/0
 
 :- include('mpred_header.pi').
 
@@ -259,6 +261,7 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 %
 skolem(X,SK):-skolem_in_code(X,SK).
 
+
 %= 	 	 
 
 %% skolem( ?X, ?Vs, ?SK) is semidet.
@@ -436,7 +439,12 @@ is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=
 %  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(basePFC:pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),u)),UN).
 
 
-
 :- source_location(S,_),forall(source_file(M:H,S),(functor(H,F,A),module_transparent(M:F/A))).
-
+:- add_import_module(baseKB,basePFC,end).
 :- initialization(add_import_module(baseKB,basePFC,end)).
+
+mpred_userkb_file.
+
+
+
+

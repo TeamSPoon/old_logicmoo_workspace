@@ -79,7 +79,8 @@
             term_is_ft/2,
             term_is_ft_how/2,
             to_format_type/2,
-            trans_subft/2
+            trans_subft/2,
+            mpred_type_args_file/0
           ]).
 % autoloading user:portray_clause_pi/2 from /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first
 :- shared_multifile((         
@@ -1105,4 +1106,4 @@ lmconf:module_local_init:- ain_fast(prologHybrid(formatted_resultIsa/2)).
 lmconf:module_local_init:- ain_fast(prologHybrid(resultIsa/2)).
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
-
+mpred_type_args_file.

@@ -54,7 +54,8 @@
             listprolog/0,
             pred_type_test/2,
             pred_type_test/3,
-            pred_type_test2/2            
+            pred_type_test2/2,
+            mpred_props_file/0
           ]).
 
 % :- use_module(logicmoo(util/logicmoo_util_preddefs)).
@@ -575,4 +576,4 @@ add_mpred_prop_gleaned_4(Arg1,_F,_,FRGS):-decl_mpred(Arg1,FRGS).
 
 % user:term_expansion(G,_):- current_predicate(logicmoo_bugger_loaded/0),\+ t_l:disable_px, not(t_l:into_form_code),hotrace((once(glean_pred_props_maybe(G)),fail)).
 
-
+mpred_props_file.

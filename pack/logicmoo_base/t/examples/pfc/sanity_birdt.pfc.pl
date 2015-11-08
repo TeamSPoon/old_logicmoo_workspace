@@ -21,7 +21,7 @@
 
 :- module(sanity_birdt,[]).
 
-:- baseKB:use_module(library(logicmoo/logicmoo_user)).
+:- baseKB:use_module(library(logicmoo_user)).
 
 :- begin_pfc.
 

@@ -78,7 +78,7 @@
             functor_h/3,
             get_functor/2,
             get_functor/3,
-            identical_member/2,
+            identical_memberchk/2,
             in_thread_and_join/1,
             in_thread_and_join/2,
             is_proof/1,
@@ -158,8 +158,7 @@
         dynamic_load_pl/1,
         each_subterm/2,
         flatten_dedupe/2,
-        flatten_set/2,
-        identical_member/2,
+        flatten_set/2,       
         is_proof/1,
         is_true/1,
         lastMember2/2,
@@ -487,7 +486,7 @@ makeArgIndexes(CateSig):-functor_catch(CateSig,F,_),makeArgIndexes(CateSig,F),!.
 %
 makeArgIndexes(CateSig,F):- argNumsTracked(F,Atom,Number),arg(Number,CateSig,Arg), nonvar(Arg),
      % Number<10, nonvar(Arg),atom_number(Atom,Number),
-     ain(argNFound(F,Atom,Arg)),fail.
+     assert_if_new(argNFound(F,Atom,Arg)),fail.
 makeArgIndexes(_NEW,_F).
 
 
@@ -981,19 +980,19 @@ list_retain([],_Pred,[]):-!.
 list_retain([R|List],Pred,[R|Retained]):- call(Pred,R),!, list_retain(List,Pred,Retained).
 list_retain([_|List],Pred,Retained):- list_retain(List,Pred,Retained).
 
-:- export(identical_member/2).
+:- export(identical_memberchk/2).
 
 %= 	 	 
 
-%% identical_member( ?X, :TermY) is semidet.
+%% identical_memberchk( ?X, :TermY) is semidet.
 %
 % Identical Member.
 %
-identical_member(X,[Y|_])  :-
+identical_memberchk(X,[Y|_])  :-
 	X == Y,
 	!.
-identical_member(X,[_|L]) :-
-	'identical_member'(X,L).
+identical_memberchk(X,[_|L]) :-
+	identical_memberchk(X,L).
 
 :- export(delete_eq/3).
 :- export(pred_delete/4).

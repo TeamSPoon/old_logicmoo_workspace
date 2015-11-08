@@ -235,7 +235,7 @@ no_repeats_dc(Vs,Call):- term_variables(Call,CV),term_variables(Vs,VsL),subtract
 subtract_eq([],_,[]) :- !.
 subtract_eq([E|Set], Delete, Result) :-
    subtract_eq(Set, Delete, Mid),
-   (identical_member(E,Delete)-> Result = Mid ; Result = [E|Mid]).
+   (identical_memberchk(E,Delete)-> Result = Mid ; Result = [E|Mid]).
    
 % ===================================================
 %

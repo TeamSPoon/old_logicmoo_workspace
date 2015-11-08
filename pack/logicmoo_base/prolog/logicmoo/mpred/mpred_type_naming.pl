@@ -34,7 +34,8 @@
             to_atomic_name/3,
             to_iname/2,
             to_prefixed/3,
-            typename_to_iname0/3
+            typename_to_iname0/3,
+            mpred_type_naming_file/0
           ]).
 % :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 
@@ -384,3 +385,4 @@ convertToInstance(Name,FunctArgType,Inst):- createByNameMangle(Name,Inst,TypeA),
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
+mpred_type_naming_file.

@@ -40,7 +40,7 @@
 
 % swipl -g "ensure_loaded(pack(logicmoo_base/t/examples/csp/'einstein.pfc'))."
 
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 :- op(600,xfy, (/\)).
 :- op(0,xfx,'=>').

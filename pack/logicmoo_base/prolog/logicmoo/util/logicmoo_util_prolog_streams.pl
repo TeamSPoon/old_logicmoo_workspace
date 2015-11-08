@@ -4,7 +4,8 @@
           [ with_err_to_pred/2,
             with_input_from_pred/2,
             with_output_to_pred/2,
-            with_output_to_stream_pred/4
+            with_output_to_stream_pred/4,
+            set_error_stream/1
           ]).
 :- meta_predicate
         with_err_to_pred(1, 0),
@@ -92,20 +93,24 @@ with_output_to_pred(Callback,Goal):-
             with_output_to(Stream,Goal)),
        (set_stream(Prev,  alias(user_output)),
        set_stream(Prev,  alias(current_output)))).
- 
 
-%= 	 	 
 
-%% with_err_to_pred( :PRED1Callback, :GoalGoal) is semidet.
+set_error_stream(Err):- current_input(In),current_output(Out),
+      set_stream(Err,alias(user_error)),
+      set_prolog_IO(In,Out,Err).
+
+%% with_err_to_pred( :PRED1Callback, :Goal) is semidet.
 %
 % Using Err Converted To Predicate.
 %
 with_err_to_pred(Callback,Goal):-
-  thread_current_error_stream(Err),
+  must(thread_current_error_stream(Prev)),
     with_output_to_stream_pred(Callback,Stream,
-      (set_stream(Stream, alias(user_error)), Goal),
-       set_stream(Err, alias(user_error))).
+        (set_error_stream(Stream),Goal),
+          set_error_stream(Prev)).
 
+
+some_test :- with_err_to_pred(format_to_error('~s'),ls).
 
 %= 	 	 
 
@@ -131,9 +136,9 @@ with_output_to_stream_pred(Callback,Stream,Goal,Exit):-
    asserta(((lmconf:is_prolog_stream(Stream))),Ref3),
     % catch so we will not exception on a closed stream
     % set_stream(Stream, buffer(line)),
-    set_stream(Stream, buffer(false)),
+    % set_stream(Stream, buffer(false)),
     % set_stream(Stream, buffer_size(0)),    
-    % set_stream(Stream, close_on_exec(false)),    
+    set_stream(Stream, close_on_exec(false)),    
     call_cleanup((call_cleanup(Goal,catch(flush_output(Stream),_,true))),(erase(Ref),erase(Ref2),erase(Ref3)))),
   Exit). % Not decided that a with_output_to_pred/2 should call close of not (flush gets the job done equally as well as closing)
 
@@ -347,5 +352,6 @@ test2(In) :-
 % TODO
 % :- with_input_from_pred(read_received, test2(current_input)).
 
+some_test :- writeln(done).
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).

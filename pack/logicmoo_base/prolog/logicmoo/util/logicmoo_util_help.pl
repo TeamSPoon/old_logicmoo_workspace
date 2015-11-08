@@ -91,7 +91,6 @@
 /*
 */
 
-
   :- use_module(library(pldoc)).
   :- use_module(library(http/thread_httpd)).
   :- use_module(library(http/http_parameters)).
@@ -547,7 +546,7 @@ autodoc_output_path(File,PlDocFile):-
          (PlDocFile1\==PlDocFile0->PlDocFile=PlDocFile1;PlDocFile=user))),
    (PlDocFile == user -> true ;(file_directory_name(PlDocFile,Dir),make_directory_path(Dir))),!.
 
-% autodoc_file(library(logicmoo/logicmoo_user)). 
+% autodoc_file(library(logicmoo_user)). 
 %  list_file_preds(library(logicmoo/util/logicmoo_util_bb_env)).
 
 
@@ -1327,8 +1326,9 @@ mpred_prolog_only_module(t_l).
 mpred_prolog_only_module(tlbugger).
 mpred_prolog_only_module(lmcache).
 mpred_prolog_only_module(lmconf).
-mpred_prolog_only_module(M):- lmconf:mpred_is_impl_file(F),make_module_name(F,M).
+
 mpred_prolog_only_module(M):- current_module(M),atom_concat(logicmoo_utils_,_,M).
+% mpred_prolog_only_module(M):- lmconf:mpred_is_impl_file(F),make_module_name(F,M).
 % mpred_prolog_only_module(user). 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 

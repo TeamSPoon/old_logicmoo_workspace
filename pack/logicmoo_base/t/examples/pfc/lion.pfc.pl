@@ -6,7 +6,7 @@
 %% causes(action,state,new_state).
 %% can(state,action).
 
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 
 %% rules for how the world evolves:

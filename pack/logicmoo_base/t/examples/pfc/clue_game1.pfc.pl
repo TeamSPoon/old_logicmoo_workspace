@@ -1,4 +1,4 @@
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 player(tim).
 player(janet).

@@ -1,6 +1,6 @@
 % -*-Prolog-*-
 
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 
 % if we learn that someone has a full name, then we know they are a  'lmbase'.

@@ -56,7 +56,7 @@ end_of_file.
 
 :- module(was,[was/2]).
 :- use_module(library(lists)).
-:- set_prolog_flag(generate_debug_info, false).
+:- set_prolog_flag(generate_debug_info, true).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 was:was(X,Y) :-

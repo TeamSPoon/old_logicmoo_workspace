@@ -571,5 +571,5 @@ erase_safe_now(M,clause(A,B),REF):-!,
        erase(REF)).
 */
 
-:- source_location(S,_),prolog_load_context(module,M),doall((source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A),M:export(M:F/A)))).
+:- source_location(S,_),prolog_load_context(module,M),!,ignore((source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A)),M:export(M:F/A),fail)).
 

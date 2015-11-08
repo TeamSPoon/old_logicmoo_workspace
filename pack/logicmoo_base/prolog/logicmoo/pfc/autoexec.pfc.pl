@@ -104,15 +104,15 @@
 
 :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('mpred_system.pfc')).
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/if_missing.pfc')).
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('if_missing.pfc')).
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/mpred_default.pfc')).
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('mpred_default.pfc')).
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/singleValued.pfc')).
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('singleValued.pfc')).
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../snark/common_logic_clif.pfc')).
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('logicmoo/snark/common_logic_clif.pfc')).
 
-% :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('../pfc/relationAllExists.pfc')).
+% :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('relationAllExists.pfc')).
 
 :-multifile(lmconf:locked_baseKB/0).
 :-dynamic(lmconf:locked_baseKB/0).
@@ -121,6 +121,6 @@
 %:- retractall(t_l:user_abox(_)).
 %:- asserta(t_l:user_abox(logicmoo_user)).
 
-% :- mpred_test(ensure_loaded('../pfc/pttpFWC.pfc')).
+% :- mpred_test(ensure_loaded('pttpFWC.pfc')).
 
 

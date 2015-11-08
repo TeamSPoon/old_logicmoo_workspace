@@ -25,9 +25,9 @@
 
 :- use_module(logicmoo_utils).
 % :- initialization(add_library_search_path('.',[ './mpred/*.pl','./snark/*.pl'])).
-:-dmsg("Adding logicmoo/[mpred,snark] to autoload path",[]).
-:- add_library_search_path('./mpred/',[ '*.pl']).
-:- add_library_search_path('./snark/',[ '*.pl']).
+:- dmsg("Adding logicmoo/[mpred,snark] to autoload path",[]).
+:- add_library_search_path('./logicmoo/mpred/',[ '*.pl']).
+:- add_library_search_path('./logicmoo/snark/',[ '*.pl']).
 % :- add_library_search_path('./plarkc/',[ '*.pl']).
 % :- add_library_search_path('./pttp/',[ 'dbase_i_mpred_*.pl']).
 
@@ -128,7 +128,7 @@ lmconf:enable_mpred_system0(Module):-
    asserta_if_new((Module:term_expansion(I,O):- mpred_expander(term,Module,I,O))),
    asserta_if_new((Module:goal_expansion(I,O):- mpred_expander(goal,Module,I,O))),
    asserta(lmconf:mpred_system_status(Module,enabled)),
-   Module:w_tl(t_l:side_effect_ok,doall(Module:call_no_cuts(lmconf:module_local_init))).
+   trace,Module:w_tl(t_l:side_effect_ok,doall(Module:call_no_cuts(lmconf:module_local_init))).
 
 
 %= 	 	 

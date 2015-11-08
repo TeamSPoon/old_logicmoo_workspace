@@ -110,7 +110,8 @@
             with_no_fallbacks/1,
             with_no_fallbacksg/1,
             with_no_modifications/1,
-            world_clear/1
+            world_clear/1,
+            mpred_storage_file/0
           ]).
 
 :- meta_predicate 
@@ -1412,4 +1413,4 @@ ensure_dynamic(Head):- Head\=isa(_,_),
      ((listing(F/A),dmsg(want_to_assert(ensure_dynamic(Head),decl_mpred_prolog(F,A,Head))),nop(dtrace))); true)).
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
-
+mpred_storage_file.

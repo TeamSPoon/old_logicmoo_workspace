@@ -1,5 +1,5 @@
 
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 % this example works in a serial Pfc, but has problems in a parallel one.
 

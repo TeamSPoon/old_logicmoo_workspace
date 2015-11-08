@@ -181,13 +181,10 @@
             lmconf:never_reload_file/1,
             mpred_loader:always_expand_on_thread/1,
             t_l:current_lang/1,
-            current_op_alias/2,
-
             kb_dynamic/1,
-make_declared/2,
-make_reachable/2,
-import_predicate/2,
-
+            make_declared/2,
+            make_reachable/2,
+            import_predicate/2,
             lmconf:mpred_skipped_module/1,
             prolog_load_file_loop_checked/2,
 %            registered_module_type/2,
@@ -241,11 +238,9 @@ import_predicate/2,
 %:- dynamic((registered_module_type/2, current_op_alias/2, lmconf:mpred_skipped_module/1, prolog_load_file_loop_checked/2, lmcache:mpred_directive_value/3, get_user_abox/1, lmconf:loaded_file_world_time/3, lmconf:never_reload_file/1, mpred_loader:always_expand_on_thread/1, mpred_loader:t_l:current_lang/1, mpred_loader:current_op_alias/2, mpred_loader:get_user_abox/1, mpred_loader:disable_mpred_term_expansions_globally/0, lmconf:loaded_file_world_time/3, mpred_loader:mpred_directive_value/3, mpred_loader:lmconf:mpred_skipped_module/1, mpred_loader:never_reload_file/1, mpred_loader:prolog_load_file_loop_checked/2, mpred_loader:registered_module_type/2, t_l:disable_mpred_term_expansions_globally/0, user:prolog_load_file/2, user:term_expansion/2)).
 %:- dynamic(registered_module_type/2).        
 
-:- use_module(library(logicmoo/logicmoo_utils)).
 
 :- lmconf:dynamic((lmconf:registered_mpred_file/1,lmconf:never_registered_mpred_file/1,lmconf:registered_module_type/2)).
 :- multifile((lmconf:registered_mpred_file/1,lmconf:never_registered_mpred_file/1,lmconf:registered_module_type/2)).
-:- source_location(F,_),asserta(lmconf:never_registered_mpred_file(F)).
 
 
 
@@ -485,7 +480,6 @@ import_predicate(CM,M:F/A):- CM:multifile(M:F/A),CM:discontiguous(M:F/A),show_ca
 
 
 
-:- use_module(mpred_expansion).
 :- include('mpred_header.pi').
 :- include('mpred_prolog_file').
 
@@ -523,7 +517,8 @@ mpred_loader_module_transparent(F/A):-!, mpred_loader:module_transparent(F/A).
 %
 % Managed Predicate Prolog Only File.
 %
-mpred_prolog_only_file(File):- source_file(File),file_name_extension(_,pl,File), \+ (lmcache:mpred_directive_value(pfc,file,File)).
+mpred_prolog_only_file(File):- file_name_extension(_,pi,File),!.
+mpred_prolog_only_file(File):- file_name_extension(_,pl,File), \+ (lmcache:mpred_directive_value(pfc,file,File)).
 mpred_prolog_only_file(File):- lmconf:never_registered_mpred_file(File),!.
 
 %:- use_module(library(logicmoo/util/logicmoo_util_help)).
@@ -556,11 +551,12 @@ mpred_expander(Type,LoaderMod,I,OO):- \+ t_l:disable_px, on_x_debug(mpred_expand
 mpred_expander0(Type,LoaderMod,I,OO):-
   I\= '$si$':'$was_imported_kb_content$'(_,_),  
    '$set_source_module'(M,M),  
-  notrace( \+ mpred_prolog_only_module(M)),
-  notrace(source_location(F,L)),
-  notrace( \+ mpred_prolog_only_file(F)),
+   source_location(F,L),
+   \+ mpred_prolog_only_file(F),
+   must(\+ mpred_prolog_only_module(M)),
   '$module'(UM,M),
-  
+   
+
   call_cleanup(((
   make_key(mpred_expander_key(F,L,M,UM,Type,LoaderMod,I),Key),
   w_tl(t_l:current_why_source(F),((
@@ -1055,7 +1051,10 @@ is_mpred_file(F):- asserta(lmconf:never_registered_mpred_file(F)),!,fail.
 %
 % Decache File Type.
 %
-decache_file_type(F):- lmconf:retractall(lmconf:registered_mpred_file(F)),retractall(lmconf:never_registered_mpred_file(F)).
+decache_file_type(F):- 
+  retractall(lmconf:mpred_is_impl_file(F)),
+  retractall(lmconf:registered_mpred_file(F)),
+  retractall(lmconf:never_registered_mpred_file(F)).
 
 
 %= 	 	 

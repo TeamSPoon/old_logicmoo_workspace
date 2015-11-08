@@ -23,7 +23,7 @@ lh:with_ukb_snark(KB,G):-w_tl(t_l:user_abox(KB),baseKB:G).
 
 :- add_import_module(baseKB,system,end).
 :- initialization(add_import_module(baseKB,system,end)).
-:- lh:with_ukb_snark(baseKB,baseKB:use_module(baseKB:logicmoo_base)).
+% :- lh:with_ukb_snark(baseKB,baseKB:use_module(baseKB:logicmoo_base)).
 
 :-export(checkKB:m1/0).
 
@@ -56,9 +56,8 @@ checkKB:m1:- gripe_time(40,baseKB:ensure_loaded(baseKB:logicmoo(mpred_online/mpr
 
 %m5 :- enable_mpred_system(baseKB).
 
-% :- lh:with_ukb_snark(baseKB,baseKB:w_tl(t_l:user_abox(baseKB), baseKB:( checkKB:m1 ))).
 
 :- lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:logicmoo(pfc/'autoexec.pfc'))).
-% :- lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:logicmoo(snark/'common_logic_clif.pfc'))).
+
 
 

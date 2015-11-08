@@ -68,7 +68,7 @@ decl_shared(F/A):-!,asserta_if_new(logicmoo_util_shared_dynamic:wrap_shared(F,A,
 decl_shared(M:F/A):-!,asserta_if_new(logicmoo_util_shared_dynamic:wrap_shared(F,A,M:req)).
 decl_shared(M):-atom(M),!,asserta_if_new(logicmoo_util_shared_dynamic:wrap_shared(M,_,req)).
 
-:- decl_shared(arity).
+:- decl_shared(arity/2).
 :- decl_shared(t).
 :- decl_shared(meta_argtypes/1).
 

@@ -8,8 +8,7 @@
 
 add_reprop/2,
 add_side_effect/2,
-ain/1,
-ain/2,
+ain/1,ain/2,
 ain_actiontrace/2,
 ain_db_to_head/2,
 ain_fast/1,
@@ -217,7 +216,7 @@ mpred_maptree/3,
 mpred_mark_as/4,
 mpred_mark_as_ml/4,
 mpred_mark_fa_as/6,
-mpred_mpred_file/0,
+mpred_pfc_file/0,
 mpred_negated_literal/1,
 mpred_negated_literal/2,
 mpred_negation/2,
@@ -545,7 +544,6 @@ with_umt/1,
       update_single_valued_arg((*),*),
       with_mpred_trace_exec((*)))).
 
-:- use_module(logicmoo(mpred/mpred_pfc)).
 :- dynamic((
         mpred_hide_msg/1,
         mpred_is_spying/2,
@@ -2017,6 +2015,8 @@ ain_fast_sp0(P,S) :- mpred_error("ain_fast(~p,~p) failed",[P,S]).
 :-asserta((logicmoo_util_database:ainz(G):- !, with_umt(mpred_ainz(G)))).
 :-asserta((logicmoo_util_database:ain(G):- !, with_umt(mpred_ain(G)))).
 :-asserta((logicmoo_util_database:aina(G):- !, with_umt(mpred_aina(G)))).
+
+ain(G):- !, with_umt(mpred_ain(G)).
 
 % mpred_post(+Ps,+S) tries to assert a fact or set of fact to the database.  For
 % each fact (or the singelton) mpred_post1 is called. It always succeeds.
@@ -6178,14 +6178,13 @@ lmconf:mpred_hook_rescan_files:- forall(pred_head(pred_u0,P),
 :- retractall(mpred_is_tracing(_)).
 
 
-%= 	 	 
-
-%% mpred_mpred_file is semidet.
-%
-% Managed Predicate Managed Predicate File.
-%
-mpred_mpred_file. 
-
 :- source_location(S,_),prolog_load_context(module,M),forall(source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A),M:export(M:F/A))).
+
+
+%% mpred_pfc_file is semidet.
+%
+% Managed Predicate Forward Chaining File.
+%
+mpred_pfc_file. 
 
 % :- doall(lmconf:module_local_init).

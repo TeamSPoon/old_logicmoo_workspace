@@ -1,6 +1,6 @@
 % -*-Prolog-*-
 
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 %% a simple Pfc example - the three bulb problem (see DeKleer and
 %% Williams, IJCAI89)

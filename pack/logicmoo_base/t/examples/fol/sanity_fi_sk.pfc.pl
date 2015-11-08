@@ -22,7 +22,7 @@ show_test(G):- cwc, get_user_abox(KB),printAll(must(KB:G)).
 
 :- op(1100,fx,(shared_multifile)).
 
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 %=  setup pfc
 :- begin_pfc.

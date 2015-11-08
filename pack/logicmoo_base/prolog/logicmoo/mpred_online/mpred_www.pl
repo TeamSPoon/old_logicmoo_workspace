@@ -147,7 +147,8 @@
             write_variable/1,
           lmconf:shared_hide_data/1,
           mpred_www:http_last_request/1,
-          mpred_www:last_item_offered/1
+          mpred_www:last_item_offered/1,
+          mpred_www_file/0
             /*
             http:location/3,
             http_dispatch:handler/4,
@@ -177,7 +178,7 @@
 
 
 :- use_module(library(http/http_server_files)).
-:- use_module(library(logicmoo/logicmoo_base)).
+:- use_module(library(logicmoo_base)).
 :- include(logicmoo(mpred/'mpred_header.pi')).
 
 
@@ -2946,5 +2947,6 @@ pkif :-
 
 :- prolog_load_context(source,File),forall(source_file(M:X,File),(functor(X,F,A),export(M:F/A))).
 
+mpred_www_file.
 % :- ensure_webserver(6767).
 

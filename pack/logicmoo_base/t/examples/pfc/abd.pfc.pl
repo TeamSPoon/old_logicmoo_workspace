@@ -1,7 +1,7 @@
 
 :- module(adb_pfc,[]).
 
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
  ~P,P ==> contrradiction.
 

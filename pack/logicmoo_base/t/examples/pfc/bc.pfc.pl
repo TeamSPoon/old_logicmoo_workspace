@@ -1,6 +1,6 @@
 % -*-Prolog-*-
   
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 ==> fact(0,1).
 ==> fact(1,1).

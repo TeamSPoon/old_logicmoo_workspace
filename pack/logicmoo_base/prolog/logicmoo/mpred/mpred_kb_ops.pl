@@ -23,7 +23,8 @@
             oncely/1,
             reduce_mpred_op/2,
             second_order/2,
-            whenAnd/2
+            whenAnd/2,
+          mpred_kb_ops_file/0
           ]).
 :- meta_predicate 
         deducedSimply(0),
@@ -217,43 +218,4 @@ naf(Goal):- (\+ req(Goal)).
 %
 is_callable(C):-current_predicate(_,C),!.
 
-/*
-:- meta_predicate(export(0)).
-:- meta_predicate(req(0)).
-:- meta_predicate(mpred_call_0(0)).
-:- meta_predicate(mpred_call_1(0)).
-:- meta_predicate(mpred_call_2(0)).
-:- meta_predicate(mpred_call_3(0)).
-:- was_export(req/1).
-req(V):-var(V),trace_or_throw(var_mpred_call(V)).
-req(call(X)):-!,req(X).
-req((X,Y)):-!,req(X),req(Y).
-req((X;Y)):-!,req(X);req(Y).
-req(call(X,Y)):-!,append_term(X,Y,XY),!,req(XY).
-req(call(X,Y,Z)):-!,append_term(X,Y,XY),append_term(XY,Z,XYZ),!,req(XYZ).
-req(Call):- 
- show_success(req,(( t_l:assert_op_override(OvOp), OvOp\=change(assert, _))),fail,
-   must((reduce_mpred_op(OvOp,OvOpR),lookup_inverted_op(OvOpR,_,OverridePolarity),
-     must((Call=..[Was|Apply],lookup_inverted_op(Was,InvertCurrent,_WasPol))),
-   ((OverridePolarity ==('-') -> on_x_rtrace(show_call(why,apply(InvertCurrent,Apply))) ; on_x_rtrace(show_call(why,apply(Was,Apply)))))))).
-
-req(Call):- mpred_call_0(Call).
-
-mpred_call_0(Call):-predicate_property(Call,foreign),!,on_x_rtrace(Call).
-mpred_call_0(Expand):- fully_expand(query(t,req),Expand,Call), Expand\=@=Call, !, loop_check(req(Call),mpred_call_3(Call)).
-mpred_call_0(Call):- one_must(mpred_call_1(Call),mpred_call_2(Call)).
-
-mpred_call_1(Call):-current_predicate(_,Call),mpred_call_3(Call).
-mpred_call_1(Call):-clause(prolog_xref:process_directive(D, Q),_),nonvar(D),D=Call,!, show_call(why,(prolog_xref:process_directive(Call,Q),must(nonvar(Q)),fmt(Q))).
-mpred_call_2(Call):-predicate_property(Call,dynamic),!,is_asserted(Call).
-mpred_call_2(Call):-mpred_call_3(Call).
-
-% https://gist.githubusercontent.com/vwood/662109/raw/dce9e9ce9505443a82834cdc86163773a0dccc0c/ecldemo.c
-
-
-
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
-
-mpred_call_3(Call):-on_x_rtrace(loop_check(if_defined(Call))).
-
-*/
+mpred_kb_ops_file.

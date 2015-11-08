@@ -97,6 +97,12 @@ user:prolog_load_file/2,
 %user:prolog_predicate_name/2,
 user:term_expansion/2,user:goal_expansion/2,system:term_expansion/2,system:goal_expansion/2]),(multifile(M:F/A),dynamic(M:F/A),discontiguous(M:F/A))).
 
+:- (current_prolog_flag(xref,true)->true;
+   (prolog_load_context(source,F),
+   initialization((
+   (lmconf:never_registered_mpred_file(F)->true;assertz(lmconf:never_registered_mpred_file(F))),
+   (lmconf:mpred_is_impl_file(F)->true;assertz(lmconf:mpred_is_impl_file(F)))),now))).
+
 % ================================================
 % Thread Locals
 % ================================================
@@ -162,8 +168,5 @@ user:term_expansion/2,user:goal_expansion/2,system:term_expansion/2,system:goal_
           op(1150,fx,(shared_multifile)).
 
 
-% :- use_module(logicmoo(mpred/mpred_userkb)).
-% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
-%:- use_module(logicmoo(mpred/mpred_loader)).
-%:- use_module(logicmoo(mpred/mpred_userkb)).
+
 

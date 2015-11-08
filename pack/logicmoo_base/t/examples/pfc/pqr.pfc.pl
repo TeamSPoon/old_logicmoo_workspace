@@ -1,8 +1,8 @@
 :- module(pqr,[]).
 
 
-% :- qcompile(library(logicmoo/logicmoo_user)).
-:- use_module(library('logicmoo/logicmoo_user')).
+% :- qcompile(library(logicmoo_user)).
+:- use_module(library('logicmoo_user')).
 
 :- begin_pfc.
 

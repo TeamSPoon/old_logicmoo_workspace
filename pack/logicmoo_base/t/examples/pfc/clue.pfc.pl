@@ -1,4 +1,4 @@
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 % has(Player,Card)
 % ask(Player,Set).

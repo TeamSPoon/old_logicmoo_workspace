@@ -56,7 +56,8 @@
             dom_lbl/1, dom_member/1,
 
             lazy/1,lazy/2,
-            weaken/1,weaken_goal/2,thaw/1
+            weaken/1,weaken_goal/2,thaw/1,
+            mpred_type_constraints_file/0
           ]).
  :- meta_predicate isa_pred_l(2,*,*),
               isa_pred_l(2,*,*,*),
@@ -152,10 +153,16 @@ lazy([V|Vs],G):-freeze(V,G),!,lazy(Vs,G).
 %
 % Thaw.
 %
-thaw(G):- call_residue_vars(G,_).
+thaw(G):- call_residue_vars(G,Vs),maplist(melt,Vs).
 
 
+%= 	 	 
 
+%% thaw( ?G) is semidet.
+%
+% Thaw.
+%
+melt(V):-frozen(V,G),call(G).
 
 
 %= 	 	 
@@ -648,8 +655,8 @@ isac:attribute_goals(X) -->
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
+mpred_type_constraints_file.
 
-%= 	 	 
 
 %% goal_expansion( ?LC, ?LCOO) is semidet.
 %

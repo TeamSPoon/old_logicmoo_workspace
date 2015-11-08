@@ -12,7 +12,7 @@
 %%% 
 %%% 
 
-:- use_module(library(logicmoo/logicmoo_base)).
+:- use_module(library(logicmoo_base)).
 :- use_module(logicmoo(mpred/'mpred_header.pi')).
 :- ensure_loaded(dbase_i_mpred_pttp).
 

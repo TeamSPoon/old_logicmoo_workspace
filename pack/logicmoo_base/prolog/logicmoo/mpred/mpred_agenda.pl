@@ -66,7 +66,8 @@
             suspend_timers/0,
             tick_every/3,
             time_tick/2,
-            wfAssert/1            
+            wfAssert/1,
+            mpred_agenda_file/0
           ]).
 :- meta_predicate 
    agenda_slow_op_enqueue(0),
@@ -742,3 +743,4 @@ wfAssert(X):-ain(X). % add_later(X).
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
+mpred_agenda_file.

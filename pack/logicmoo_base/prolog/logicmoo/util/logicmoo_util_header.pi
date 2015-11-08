@@ -46,7 +46,7 @@ lmconf:logicmoo_utils_separate.
 user:file_search_path(pack, '../../../../').
 :- attach_packs.
 :- initialization(attach_packs).
-:- lmconf:use_module(logicmoo(logicmoo_utils)).
+:- use_module(logicmoo(logicmoo_utils)).
 
 add_pack_dir(UpUp):- prolog_load_context(directory,Dir),   
    DirFor = logicmoo,
@@ -54,9 +54,10 @@ add_pack_dir(UpUp):- prolog_load_context(directory,Dir),
    absolute_file_name(UpUp,Y,[relative_to(Dir),file_type(directory)]),
    (( \+ file_search_path(pack,Y)) ->asserta(file_search_path(pack,Y));true),
    attach_packs.
+
 */
 
-
+/*
  :- use_module(logicmoo_util_first).
  :- use_module(logicmoo_util_database).
  :- use_module(logicmoo_util_dumpst).
@@ -77,7 +78,7 @@ add_pack_dir(UpUp):- prolog_load_context(directory,Dir),
  :- use_module(logicmoo_util_term_listing).
  :- use_module(logicmoo_util_terms).
  :- use_module(logicmoo_util_strings).
-
+*/
 
 
 

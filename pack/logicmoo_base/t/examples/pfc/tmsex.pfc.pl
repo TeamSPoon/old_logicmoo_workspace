@@ -1,5 +1,5 @@
 
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 p(X) ==> q(X).
 q(X), r(X) ==> s(X).

@@ -63,7 +63,7 @@ add_file_search_path(Name,Path):-  resolve_dir(Path,Dir),
 % ======================================================
 :- initialization(attach_packs,now).
 :- if( \+ exists_source(pack(logicmoo_base/prolog/logicmoo/logicmoo_utils))).
-:- add_file_search_path(pack,'../../../').
+:- add_file_search_path(pack,'../../').
 :- initialization(attach_packs,now).
 :- endif.
 % ======================================================
@@ -71,7 +71,7 @@ add_file_search_path(Name,Path):-  resolve_dir(Path,Dir),
 % And adds the local directories to file search path of logicmoo(..)
 % ======================================================
 :- if( \+ exists_source(logicmoo(logicmoo_utils))).
-:- add_file_search_path(logicmoo,'.').
+:- add_file_search_path(logicmoo,'./logicmoo/').
 :- endif.
 
 %%	add_library_search_path(+Dir, +Patterns:list(atom)) is det.
@@ -99,7 +99,7 @@ add_library_search_path(Path,Masks):-
 % ======================================================
 % Add Utils files to autoloads
 % ======================================================
-:- add_library_search_path('./util/',[ 'logicmoo_util_*.pl']).
+:- add_library_search_path('./logicmoo/util/',[ 'logicmoo_util_*.pl']).
 
 % ======================================================
 % Pre-release Sanity tests
@@ -180,25 +180,25 @@ lmconf:logicmoo_scan_autoloads:-false.
 % Hook To [lmconf:mpred_is_impl_file/1] For Module Logicmoo_utils.
 % Managed Predicate If Is A Implimentation File.
 %
- lmconf:mpred_is_impl_file(util/logicmoo_util_first).
- lmconf:mpred_is_impl_file(util/logicmoo_util_database).
- lmconf:mpred_is_impl_file(util/logicmoo_util_catch).
- lmconf:mpred_is_impl_file(util/logicmoo_util_with_assertions).
- lmconf:mpred_is_impl_file(util/logicmoo_util_loop_check).
- lmconf:mpred_is_impl_file(util/logicmoo_util_dmsg).
- lmconf:mpred_is_impl_file(util/logicmoo_util_bugger).
- lmconf:mpred_is_impl_file(util/logicmoo_util_ctx_frame).
- lmconf:mpred_is_impl_file(util/logicmoo_util_filestreams).
- lmconf:mpred_is_impl_file(util/logicmoo_util_filesystem).
- lmconf:mpred_is_impl_file(util/logicmoo_util_multivar).
- lmconf:mpred_is_impl_file(util/logicmoo_util_no_repeats).
- lmconf:mpred_is_impl_file(util/logicmoo_util_preddefs).
- lmconf:mpred_is_impl_file(util/logicmoo_util_prolog_frames).
- lmconf:mpred_is_impl_file(util/logicmoo_util_prolog_streams).
- lmconf:mpred_is_impl_file(util/logicmoo_util_term_listing).
- lmconf:mpred_is_impl_file(util/logicmoo_util_terms).
- lmconf:mpred_is_impl_file(util/logicmoo_util_varnames). 
- lmconf:mpred_is_impl_file(util/logicmoo_util_strings). 
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_first).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_database).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_catch).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_with_assertions).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_loop_check).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_dmsg).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_bugger).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_ctx_frame).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_filestreams).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_filesystem).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_multivar).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_no_repeats).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_preddefs).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_prolog_frames).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_prolog_streams).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_term_listing).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_terms).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_varnames). 
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_strings). 
 
 :- thread_local logicmoo_utils_test_tl/0.
 :- w_tl((logicmoo_utils_test_tl:-dmsg("Adding logicmoo/utils to autoload path",[])),logicmoo_utils_test_tl).

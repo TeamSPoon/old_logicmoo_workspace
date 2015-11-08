@@ -282,7 +282,7 @@
    show_failure(+,0),
    show_success(+,0),
 
-   show_call(0),
+   show_call(:),
    show_entry(0),
    show_failure(0),
    show_success(0),
@@ -426,7 +426,7 @@
 :- dynamic
         logLevel/2.
 
-:- use_module('logicmoo_util_rtrace').
+% :- use_module('logicmoo_util_rtrace').
 :- include('logicmoo_util_header.pi').
 
 
@@ -2407,13 +2407,12 @@ dcall0(Goal):- Goal. % on_x_debug(Goal). % dmsg(show_call(why,Goal)),Goal.
 %
 show_call(Why,Goal):- show_success(Why,Goal)*->true;(dmsg(show_failure(Why,Goal)),!,fail).
 
-%= 	 	 
 
-%% show_call( :GoalGoal) is semidet.
+%% show_call( :Goal) is semidet.
 %
 % Show Call.
 %
-show_call(Goal):- show_call(mpred,Goal).
+show_call(Why:Goal):- show_call(Why,Why:Goal).
 
 %= :- meta_predicate  show_failure(+,0).
 

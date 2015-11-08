@@ -39,19 +39,9 @@
          dcgReorder/4
 	 ]).
 
+:- include('logicmoo_util_header.pi').
 % :- use_module(logicmoo(logicmoo_utils)).
 % :- use_module(logicmoo_util_strings).
-
-/*
-:- '@'((use_module((logicmoo_util_library)),
-        use_module((logicmoo_util_bugger)),        
-         use_module((logicmoo_util_ctx_frame)),
-         use_module((logicmoo_util_strings)),
-         use_module((logicmoo_util_terms))),'user').
-*/
-%:- else.
-:- include('logicmoo_util_header.pi').
-%:- endif.
 
  
 :- meta_predicate dcgLeftOfMid(?,//,?,?).

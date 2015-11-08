@@ -71,6 +71,7 @@
 :- file_begin(pfc).
 
 :- dynamic(arity/2).
+
 arity(apathFn,2).
 arity(isKappaFn,2).
 arity(isInstFn,1).

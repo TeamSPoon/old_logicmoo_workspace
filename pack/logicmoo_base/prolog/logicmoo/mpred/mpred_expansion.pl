@@ -142,7 +142,8 @@
             translate_args/9,
             was_isa_syntax/3,
           additiveOp/1,
-          comparitiveOp/1
+          comparitiveOp/1,
+          mpred_expansion_file/0
           ]).
 
 :- meta_predicate 
@@ -854,7 +855,7 @@ db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..  [D,C|Args],is_ftCompound(C),functo
   (\+((arg(_,C,Arg),is_ftVar(Arg))) -> O = (meta_argtypes(C),M) ; (O= (M))).
 
 
-:- trace.
+
 db_expand_0(Op,DECL,O):-DECL=..[D,F,A1|Args],functor_declares_instance(D,DType),not((arity(D,N),N>1)),
    %\+ is_relation_type(DType),
    expand_props(Prefix,Op,props(F,[DType,D,A1|Args]),O),!.
@@ -864,19 +865,19 @@ db_expand_0(Op,DECL,O):-DECL=..[D,F|Args],functor_declares_instance(D,DType),
 
 
 %  room_template(iLivingRoom7,.....).
-db_expand_0(Op,ClassTemplate,OUT):- ClassTemplate=..[TypePropsFunctor,Inst|Props],
+db_expand_0(Op,ClassTemplate,(tCol(PropsIsa),isa(Inst,PropsIsa),OUT)):- ClassTemplate=..[TypePropsFunctor,Inst|Props],
    functor_declares_instance(TypePropsFunctor,PropsIsa),
    \+ compound_all_open(ClassTemplate),
-   ain(isa(PropsIsa,tCol)),
-   ain(isa(Inst,PropsIsa)),
+   %ain(isa(PropsIsa,tCol)),
+   %ain(isa(Inst,PropsIsa)),
    expand_props(t,Op,props(Inst,[PropsIsa|Props]),OUT),!.
 
 % typeProps(tCrackers,.....).
-db_expand_0(Op,ClassTemplate,OUT):- ClassTemplate=..[TypeTypePropsFunctor,Type|Props],
+db_expand_0(Op,ClassTemplate,(tCol(PropsIsa),isa(Inst,PropsIsa),OUT)):- ClassTemplate=..[TypeTypePropsFunctor,Type|Props],
    functor_declares_collectiontype(TypeTypePropsFunctor,PropsIsa),
    \+ compound_all_open(ClassTemplate),
-   ain(isa(Type,tCol)),
-   ain(isa(Type,PropsIsa)),
+   %ain(isa(Type,tCol)),
+   %ain(isa(Type,PropsIsa)),
    expand_props(relationMostInstance,Op,props(Type,Props),OUT),!.
 
 % tRegion_inst_template(X, tLivingRoom,.....).
@@ -1105,7 +1106,7 @@ expand_props(Prefix,PLOP,props(Obj,PropVal),(PropVal2,{OPVAL})):- PropVal=..[Op,
 expand_props(Prefix,PLOP,props(Obj,PropVal),OUT):- safe_univ(PropVal,[Prop,NonVar|Val]),Obj==NonVar,!,from_univ(Prefix,PLOP,[Prop,Obj|Val],OUT).
 expand_props(Prefix,PLOP,props(Obj,PropVal),OUT):- PropVal=..[Op,Pred|Val],comparitiveOp(Op),
    not(comparitiveOp(Pred)),!,OPVAL=..[Op|Val],PropVal2=..[Pred,OPVAL],
-    expand_props(Op,props(Obj,PropVal2),OUT),!.
+    expand_props(Prefix,Op,props(Obj,PropVal2),OUT),!.
 expand_props(Prefix,PLOP,props(Obj,PropVal),OUT):- PropVal=..[Prop|Val],not(infix_op(Prop,_)),!,from_univ(Prefix,PLOP,[Prop,Obj|Val],OUT).
 expand_props(Prefix,PLOP,props(Obj,PropVal),OUT):- PropVal=..[Prop|Val],!,dtrace(from_univ(Prefix,PLOP,[Prop,Obj|Val],OUT)).
 expand_props(Prefix,PLOP,props(Obj,Open),props(Obj,Open)):- trace_or_throw(expand_props(Prefix,PLOP,props(Obj,Open))->OUT).
@@ -1635,16 +1636,4 @@ simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=S
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
-end_of_file.
-
-
-
-
-end_of_file.
-
-end_of_file.
-end_of_file.
-end_of_file.
-end_of_file.
-
-
+mpred_expansion_file.

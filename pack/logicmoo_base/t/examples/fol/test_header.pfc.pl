@@ -1,6 +1,6 @@
 #!/usr/bin/env swipl
 
-:- if( \+ exists_source(library(logicmoo/logicmoo_base))).
+:- if( \+ exists_source(library(logicmoo_base))).
 :- dynamic(user:file_search_path/2).
 :- multifile(user:file_search_path/2).
 :- absolute_file_name('../../prolog',Dir),asserta(user:file_search_path(library,Dir)).
@@ -11,9 +11,9 @@
 :- (t_l:user_abox(M)->true;(context_module_of_file(M),asserta(t_l:user_abox(M)))),!,writeln(user_abox=M).
 
 :- if(gethostname(ubuntu)).
-:- ensure_loaded(library(logicmoo/logicmoo_user)).
+:- ensure_loaded(library(logicmoo_user)).
 :- else.
-:- ensure_loaded(library(logicmoo/logicmoo_user)).
+:- ensure_loaded(library(logicmoo_user)).
 % :- load_files(logicmoo_repl, [if(not_loaded),qcompile(auto)]).
 :- endif.
 

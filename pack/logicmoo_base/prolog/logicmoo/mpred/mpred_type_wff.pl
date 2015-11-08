@@ -87,17 +87,13 @@
             put_singles/4,
             set_is_lit/1,
             subst_except/4,
-            term_singletons/2,
-            term_singletons/3,
-            term_singletons/5,
-            term_slots/2,
-            wrap_in_neg_functor/3            
+            wrap_in_neg_functor/3,
+            mpred_type_wff_file/0
           ]).
 :- meta_predicate 
         call_last_is_var(0).
 
 
-:- use_module(mpred_expansion).
 :- include('mpred_header.pi').
 
 
@@ -1091,40 +1087,6 @@ head_singles01(Pre,Post):-
     term_singletons(Post,_,CSingles),
     term_slots(Pre,PreVars),!,
     subtract_eq(CSingles,PreVars,Bad),!,Bad\==[].
-    
-
-%= %= :- was_export(term_singletons/2).
-
-%= 	 	 
-
-%% term_singletons( ?A, ?Vs) is semidet.
-%
-% Term Singletons.
-%
-term_singletons(A,Vs):- notrace(term_singletons(A,[],_,[],Vs)).
-%= %= :- was_export(term_singletons/3).
-
-%= 	 	 
-
-%% term_singletons( ?Term, ?NonSingle, ?Singles) is semidet.
-%
-% Term Singletons.
-%
-term_singletons(Term,NonSingle,Singles):- notrace(term_singletons(Term,[],NonSingle,[],Singles)).
-%= %= :- was_export(term_singletons/5).
-
-%= 	 	 
-
-%% term_singletons( :TermFml, ?NS, ?NS, ?S, ?S) is semidet.
-%
-% Term Singletons.
-%
-term_singletons(Fml, NS,NS, S,S):- atomic(Fml),!.
-term_singletons(Fml, NS,NS, S,S):- identical_member(Fml,NS),!.
-term_singletons(Fml, NS, [Fml|NS], S, NSV):- is_ftVar(Fml),identical_member(Fml,S),!,delete_eq(S,Fml,NSV),!.
-term_singletons(Fml, NS, NS, S, [Fml|S]):- is_ftVar(Fml),!.
-term_singletons([H|T],NS,NSO,S,NSV):- !, term_singletons(H,NS,NSM,S,M),term_singletons(T,NSM,NSO,M,NSV).
-term_singletons(Fml, NS,NSO, S,NSV):- compound(Fml),Fml=..[_|T],!, term_singletons(T, NS,NSO, S,NSV).
 
 
 %= 	 	 
@@ -1241,3 +1203,4 @@ function_to_predicate(Function,NewVar,mudEquals(NewVar,Function)):- \+ t_l:dont_
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
+mpred_type_wff_file.

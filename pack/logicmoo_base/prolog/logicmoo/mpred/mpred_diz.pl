@@ -16,7 +16,7 @@
 %   Added support for current_prolog_flag(occurs_check, error) case
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- module(neq,[neq/2]).
+:- module(neq,[neq/2,mpred_diz_file/0]).
 :- use_module(library(lists)).
 :- set_prolog_flag(generate_debug_info, true).
 
@@ -409,3 +409,5 @@ mydiz(Xs0, Ys0) -->
 split_equals_list([], [], []).
 split_equals_list([A=B|ABs], [A|As], [B|Bs]) :-
         split_equals_list(ABs, As, Bs).
+
+mpred_diz_file.

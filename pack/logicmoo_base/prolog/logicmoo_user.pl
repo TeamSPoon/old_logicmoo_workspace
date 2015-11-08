@@ -65,10 +65,10 @@ fix_ops_for(CM):-
 */
 
 :- ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
-:- system:initialization(mpred_www:ensure_webserver(3020)).
-:- mpred_www:ensure_webserver(3020).
+% :- system:initialization(mpred_www:ensure_webserver(3020)).
+% :- mpred_www:ensure_webserver(3020).
 
-:- baseKB:use_module(baseKB:logicmoo_snark).
+:- baseKB:use_module(baseKB:logicmoo/logicmoo_snark).
 
 % in case something changed
 :- logicmoo_user_base:user_module_uses(M,CM),!,fix_ops_for(M),fix_ops_for(CM),dmsg(user_module_uses(M,CM)).

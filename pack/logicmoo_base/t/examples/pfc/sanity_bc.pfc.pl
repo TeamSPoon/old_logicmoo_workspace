@@ -6,7 +6,7 @@
 
 % :- module(sanity_bc,[]).
 
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 :- begin_pfc.
 

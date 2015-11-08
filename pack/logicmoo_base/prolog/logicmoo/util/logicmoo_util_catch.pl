@@ -270,8 +270,10 @@ with_main_error_to_output(Goal):-
 % Thread Current Error Stream.
 %
 thread_current_error_stream(Err):- t_l:thread_local_current_main_error_stream(Err),!.
-thread_current_error_stream(Err):-thread_self(ID),thread_current_error_stream(ID,Err).
-
+thread_current_error_stream(Err):- thread_self(ID),thread_current_error_stream(ID,Err),!.
+thread_current_error_stream(Err):- stream_property(Err,alias(current_error)),!.
+thread_current_error_stream(Err):- stream_property(Err,alias(user_error)),!.
+thread_current_error_stream(Err):- current_main_error_stream(Err),!.
 
 %= 	 	 
 
@@ -280,8 +282,10 @@ thread_current_error_stream(Err):-thread_self(ID),thread_current_error_stream(ID
 % Current Main Error Stream.
 %
 current_main_error_stream(Err):- t_l:thread_local_current_main_error_stream(Err),!.
-current_main_error_stream(Err):-lmcache:thread_main(user,ID),thread_current_error_stream(ID,Err).
-
+current_main_error_stream(Err):- lmcache:thread_main(user,ID),thread_current_error_stream(ID,Err).
+current_main_error_stream(Err):- thread_current_error_stream(main,Err).
+current_main_error_stream(Err):- stream_property(Err,alias(user_error)),!.
+current_main_error_stream(Err):- stream_property(Err,alias(current_error)),!.
 
 %= 	 	 
 

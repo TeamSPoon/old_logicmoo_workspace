@@ -33,7 +33,7 @@
 
 :- module(sanity_sv,[]).
 
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 :- op(500,fx,'~').
 :- op(1050,xfx,('==>')).

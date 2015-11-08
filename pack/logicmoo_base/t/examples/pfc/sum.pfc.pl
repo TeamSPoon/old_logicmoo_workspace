@@ -1,6 +1,6 @@
 % -*-Prolog-*-
 
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 % this Pfc example shows how to maintain a sum.	
 % Given a set of asssertions matching value(N), this rule

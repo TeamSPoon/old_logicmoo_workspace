@@ -1,6 +1,6 @@
 
 
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 
 bel(A1,desire(A2,know(A2,bel(A1,P))))

@@ -1,4 +1,4 @@
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 % is this how to define constraints?
 

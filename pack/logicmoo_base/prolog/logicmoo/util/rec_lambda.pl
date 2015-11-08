@@ -142,7 +142,7 @@ ctn(I,O):-copy_term(I,O).
 
 :- discontiguous(rec_lambda:term_expansion/2).
 
-term_expansion((H :- (recval(A,FC),B)), (H:-nb_current(Key,FC),!,B)):-functor(H,(reenter_lambda),A),atom_concat('$rec_lambda_',A,Key).
+term_expansion((H :- (recval(A,FC),B)), (H:-nb_current(Key,FC),!,B)):- functor(H,(reenter_lambda),A),atom_concat('$rec_lambda_',A,Key),!.
 
 reenter_lambda :-recval(0,FC),call(FC).
 reenter_lambda(V1):-recval(1,FC),call(FC,V1).
@@ -175,7 +175,7 @@ lambda(T1,T2,T3,T4,FC,A1,A2,A3,A4):-  H=lambda(T1,T2,T3,T4,FC), copy_term(H,TC),
 
 
 
-term_expansion((H:-B),(H :- (ctn(HC,HCC),b_setval(Key,HCC),B))):-functor(H,(^),A2),A is A2-2,H=..[F,V1,Goal|_],HC=..[F,V1,Goal],atom_concat('$rec_lambda_',A,Key).
+term_expansion((H:-B),(H :- (ctn(HC,HCC),b_setval(Key,HCC),B))):-functor(H,(^),A2),A is A2-2,H=..[F,V1,Goal|_],HC=..[F,V1,Goal],atom_concat('$rec_lambda_',A,Key),!.
 
 % ^(V1,Goal,V1) :-  b_setval('$rec_lambda_1',^(V1,Goal)), no_hat_call(Goal).
 ^(V1,Goal,V1) :-  
@@ -203,7 +203,7 @@ term_expansion((H:-B),(H :- (ctn(HC,HCC),b_setval(Key,HCC),B))):-functor(H,(^),A
 	\(5,?,?,?,?,?),
 	\(6,?,?,?,?,?,?).
 
-term_expansion((H:-B),(H :- (ctn(HC,HCC),b_setval(Key,HCC),B))):-functor(H,( \),A1),A is A1-1, atom_concat('$rec_lambda_',A,Key),H=..[F,FC|_],HC=..[F,FC].
+term_expansion((H:-B),(H :- (ctn(HC,HCC),b_setval(Key,HCC),B))):-functor(H,( \),A1),A is A1-1, atom_concat('$rec_lambda_',A,Key),H=..[F,FC|_],HC=..[F,FC],!.
 
 \(FC) :-
    ctn(FC,C),no_hat_call(C).
@@ -229,7 +229,7 @@ term_expansion((H:-B),(H :- (ctn(HC,HCC),b_setval(Key,HCC),B))):-functor(H,( \),
 	+\(?,5,?,?,?,?,?),
 	+\(?,6,?,?,?,?,?,?).
 
-term_expansion((H:-B),(H :- (ctn(HC,HCC),b_setval(Key,HCC),B))):-functor(H,(+\),A2),A is A2-2, atom_concat('$rec_lambda_',A,Key),H=..[F,GV,FC|_],HC=..[F,GV,FC].
+term_expansion((H:-B),(H :- (ctn(HC,HCC),b_setval(Key,HCC),B))):-functor(H,(+\),A2),A is A2-2, atom_concat('$rec_lambda_',A,Key),H=..[F,GV,FC|_],HC=..[F,GV,FC],!.
 
 +\(GV,FC) :-
    ctn(GV+FC,GV+C),no_hat_call(C).

@@ -82,7 +82,8 @@ rescan_mpred_props_ilc/0,
 scan_missing_stubs/1,
 test_call_cut/0,
 wff_check_failed/3,
-wff_check_mpred_t_throw/1
+wff_check_mpred_t_throw/1,
+mpred_stubs_file/0
           ]).
 
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
@@ -1376,3 +1377,4 @@ ensure_universal_stub_plus_mt_why(F,A2):-
 
 :- source_location(S,_),prolog_load_context(module,M),forall(source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A),M:export(M:F/A))).
 
+mpred_stubs_file.

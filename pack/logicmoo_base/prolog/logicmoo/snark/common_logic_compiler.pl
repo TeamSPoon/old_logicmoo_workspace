@@ -187,7 +187,7 @@
 %=%    r(sk1(X)):- p(X).
 %=%    q(X,sk1(X)):- p(X).
 
-:- use_module(library(logicmoo/logicmoo_base)).
+:- use_module(library(logicmoo_base)).
 :- include(logicmoo(mpred/'mpred_header.pi')).
 :- dynamic user:file_search_path/2.
 :- multifile user:file_search_path/2.

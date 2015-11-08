@@ -233,7 +233,7 @@ no_varnaming(G):-w_tl(t_l:dont_varname,G).
 % Not Member Using (==/2) (or =@=/2) ).
 %
 not_member_eq(_,[]):-!.
-not_member_eq(E,REST):- \+ identical_member(E,REST).
+not_member_eq(E,REST):- \+ identical_memberchk(E,REST).
 
 % all_different_vals(_):- t_l:dont_varname,!.
 
@@ -486,8 +486,8 @@ term_singletons(Term,NonSingle,Singles):- notrace(term_singletons(Term,[],NonSin
 % Term Singletons.
 %
 term_singletons(Fml, NS,NS, S,S):- atomic(Fml),!.
-term_singletons(Fml, NS,NS, S,S):- identical_member(Fml,NS),!.
-term_singletons(Fml, NS, [Fml|NS], S, NSV):- is_ftVar(Fml),identical_member(Fml,S),!,delete_eq(S,Fml,NSV),!.
+term_singletons(Fml, NS,NS, S,S):- identical_memberchk(Fml,NS),!.
+term_singletons(Fml, NS, [Fml|NS], S, NSV):- is_ftVar(Fml),identical_memberchk(Fml,S),!,delete_eq(S,Fml,NSV),!.
 term_singletons(Fml, NS, NS, S, [Fml|S]):- is_ftVar(Fml),!.
 term_singletons([H|T],NS,NSO,S,NSV):- !, term_singletons(H,NS,NSM,S,M),term_singletons(T,NSM,NSO,M,NSV).
 term_singletons(Fml, NS,NSO, S,NSV):- compound(Fml),Fml=..[_|T],!, term_singletons(T, NS,NSO, S,NSV).
@@ -1246,9 +1246,7 @@ maybe_record_scanned_file:-ignore((  fail,source_location(F,_), \+ varname_cache
 % Init Varname Storages.
 %
 init_varname_stores(_):- !.
-init_varname_stores(M):- 
-   M:use_module(logicmoo_util_with_assertions),
-   M:use_module(logicmoo_util_varnames).
+% init_varname_stores(M):- M:use_module(logicmoo_util_with_assertions), M:use_module(logicmoo_util_varnames).
 
 
 :- initialization(maybe_scan_source_files_for_varnames).

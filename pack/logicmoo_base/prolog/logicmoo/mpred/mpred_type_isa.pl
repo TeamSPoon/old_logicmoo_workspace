@@ -99,7 +99,8 @@
          isa_asserted_0/2,
          new_was_isa/0,
           type_prefix/2,
-          type_suffix/2
+          type_suffix/2,
+          mpred_type_isa_file/0
           ]).
 
 :-
@@ -1378,6 +1379,7 @@ lmconf:module_local_init:-ain(tCol(ttPredType)).
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
-:- doall((lmconf:module_local_init)).
+mpred_type_isa_file.
+
 
 

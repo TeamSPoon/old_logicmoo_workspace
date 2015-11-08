@@ -55,7 +55,8 @@
             print_db_items_and_neg/3,
             show_pred_info/1,
             show_pred_info_0/1,
-            why/1            
+            why/1,
+            mpred_listing_file/0
           ]).
 
 
@@ -743,3 +744,4 @@ mpred_list_triggers_1(What):-
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
+mpred_listing_file.

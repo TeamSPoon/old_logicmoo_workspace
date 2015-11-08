@@ -578,7 +578,7 @@ save_search_ref_recorded(Ref,Atomic):-recordz(Atomic,Ref).
 save_search_ref_tl(Ref,Atomic):-nb_current(Atomic,Refs),(member(Ref,Refs)->true;nb_setval(Atomic,[Ref|Refs])).
 save_search_ref_tl(Ref,Atomic):-nb_setval(Atomic,[Ref]).
 
-% that is    CL=beliefs(we,loves(joe,turkey)), asserta(C,Ref),forall(find_each_atom(CL,A),(ain(idexed_atom(A)),asserta(atom_index(A,Ref)))).
+% that is    CL=beliefs(we,loves(joe,turkey)), asserta(C,Ref),forall(find_each_atom(CL,A),(assert_if_new(idexed_atom(A)),asserta(atom_index(A,Ref)))).
 
 
 :- multifile lmconf:shared_hide_data/1.
@@ -1389,8 +1389,6 @@ use_listing_vars:- use_listing_vars(true),scan_for_varnames.
 %
 use_listing_vars(TF):-var(TF),current_prolog_flag(listing_vars,TF).
 use_listing_vars(TF):-set_prolog_flag(listing_vars,TF).
-
-% :- use_module(logicmoo_util_bugger).
 
 
 :- thread_local t_l:in_prolog_locate_clauses/1.

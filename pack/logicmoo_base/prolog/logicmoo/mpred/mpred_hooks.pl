@@ -132,8 +132,9 @@ xcall_t/3,
 xcall_t/4,
 xcall_t/5,
 xcall_t/6,
-xcall_t/7
-          ]).
+xcall_t/7,
+mpred_hooks_file/0
+]).
 
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
 % XXXXXXXXXXXXXXXXXXXXXXXXXx
@@ -827,3 +828,4 @@ verb_after_arg(_,_,1).
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
+mpred_hooks_file.

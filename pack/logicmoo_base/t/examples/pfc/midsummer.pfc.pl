@@ -1,5 +1,5 @@
 
-:- use_module(library(logicmoo/logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
 %this will require a better tms to work!
 
