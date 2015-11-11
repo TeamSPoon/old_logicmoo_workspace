@@ -6064,14 +6064,14 @@ mpred_facts_and_universe(P):- (is_ftVar(P)->pred_head_all(P);true),req(P). % (me
 %
 % Add Reprop.
 %
-add_reprop(_Trig,Var):- is_ftVar(Var), !. % trace_or_throw(add_reprop(Trig,Var)).
+add_reprop(_Trig,Var):- is_ftVar(Var), !. % trace_or_throw(var_add_reprop(Trig,Var)).
 add_reprop(_Trig,~(Var)):- is_ftVar(Var),!.
 % CREATES ERROR!!!  add_reprop(_Trig,~(_Var)):-!.
 add_reprop(_Trig,~(repropagate(Var))):- \+ is_ftVar(Var),!.
 add_reprop(_Trig,repropagate(~(Var))):- \+ is_ftVar(Var),!.
 add_reprop(_Trig,repropagate(Var)):- \+ is_ftVar(Var),!.
 % add_reprop(_Trig,_):-!.
-add_reprop(Trig,(H:-B)):- trace_or_throw(add_reprop(Trig,(H:-B))).
+add_reprop(Trig,(H:-B)):- trace_or_throw(bad_add_reprop(Trig,(H:-B))).
 
 % add_reprop(_Trig ,Trigger):- !, w_tl(t_l:current_why_source(Trig),  mpred_enqueue(repropagate(Trigger),(g,g))).
 add_reprop( Trig ,Trigger):- 
