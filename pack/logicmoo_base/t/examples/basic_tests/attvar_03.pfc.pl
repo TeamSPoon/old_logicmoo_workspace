@@ -27,9 +27,10 @@
 :- debug(mpred).
 :- mpred_trace_exec.
 
+sk_in(avar([vn='Ex',sk='SKF-666'])).
+
 sk_in(Ex)==>sk_out(Ex).
 
-sk_in(avar([vn='Ex',sk='SKF-666'])).
 
 :- must((sk_out(Ex),get_attr(Ex,sk,What),What='SKF-666')).
 

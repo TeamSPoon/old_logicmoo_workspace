@@ -17,6 +17,9 @@
 
 :- read_skolems(true).
 
+:- debug(mpred).
+:- mpred_trace_exec.
+
 my_sk(avar([vn='Ex',sk='SKF-666'])).
 
 :- must((my_sk(Ex),get_attr(Ex,sk,What),What='SKF-666')).

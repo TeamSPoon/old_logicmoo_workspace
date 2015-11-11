@@ -7,7 +7,9 @@
 
 :- module(sanity_if_missong_01,[]).
 
-:- use_module(library(logicmoo_user)).
+:- use_module(library(logicmoo_base)).
+
+:- dynamic(foob/1).
 
 :- begin_pfc.
 

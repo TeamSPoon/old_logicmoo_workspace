@@ -5486,7 +5486,7 @@ mpred_hide_msg('Had Support').
 %
 % Managed Predicate  Trace msg.
 %
-mpred_trace_msg(Msg,Args) :- ignore((mpred_is_tracing_exec,!,\+ mpred_is_silient, !, mmsg(Msg,Args))),!.
+mpred_trace_msg(Msg,Args) :- ignore((mpred_is_tracing_exec, !, mmsg(Msg,Args))),!.
 
 
 

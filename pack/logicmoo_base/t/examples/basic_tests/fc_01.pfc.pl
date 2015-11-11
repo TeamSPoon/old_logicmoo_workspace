@@ -12,9 +12,9 @@
 
 :- use_module(library(logicmoo_base)).
 
-:- dmsg(begin_abc).
               
 :- file_begin(pfc).
+
 
 :- abolish(a,0).
 :- abolish(b,0).
@@ -22,6 +22,9 @@
 
 :- debug(mpred).
 :- mpred_trace_exec.
+:- mpred_is_tracing_exec.
+
+:- mpred_trace_msg(beginxxxxxxxxxxxxxxxxXXXXXXXXXXXXXXXXXXXXXXXXxxxxxxxxxxxxxxxxxxxxxxxx_abc).
 
 a.
 a ==> b.

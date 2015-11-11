@@ -614,7 +614,6 @@ print_prepended_lines(_Pre,[]):- format('~N',[]).
 print_prepended_lines(Pre,[H|T]):-format('~N~w~w',[Pre,H]),print_prepended_lines(Pre,T).
 
 
-% in_cmt(Call):- tlbugger:no_slow_io,!,format('~N/*~n',[]),call_cleanup(Call,format('~N*/~n',[])).
 
 %= 	 	 
 
@@ -622,6 +621,8 @@ print_prepended_lines(Pre,[H|T]):-format('~N~w~w',[Pre,H]),print_prepended_lines
 %
 % In Comment.
 %
+
+% in_cmt(Call):- tlbugger:no_slow_io,!,format('~N/*~n',[]),call_cleanup(Call,format('~N*/~n',[])).
 in_cmt(Call):- call_cleanup(prepend_each_line('% ',Call),format('~N',[])).
 
 
