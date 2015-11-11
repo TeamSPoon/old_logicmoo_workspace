@@ -47,7 +47,7 @@
 :- module(common_logic_compiler,         
           [ 
            nnf/3, 
-           pnf/3, cf/4,
+           pnf/3, cf/5,
           op(300,fx,'-'),
           op(1150,xfx,'=>'),
           op(1150,xfx,'<=>'),
@@ -59,7 +59,6 @@
             axiom_lhs_to_rhs/3,
             b_d_p/2,
             boxRule/3,
-            cf/4,
             cf_to_flattened_clauses/4,
             cf_to_flattened_clauses_0/4,
             cirRule/3,
@@ -266,7 +265,7 @@ to_poss(X,poss(X)):-!.
 :- style_check(+singleton).
 %=% Negation Normal Form
 % Usage: nnf(+KB,+Fml, ?NNF)
-% nnf(KB,Fml,NNF):- \+ ground(Fml),numbervars_with_names(Fml,FmlNV),nnf0(KB,FmlNV,NNF).
+% nnf(KB,Fml,NNF):- \+ ground(Fml),unnumbervars_with_names(Fml,FmlNV),nnf0(KB,FmlNV,NNF).
 
 %= 	 	 
 
@@ -274,7 +273,10 @@ to_poss(X,poss(X)):-!.
 %
 % Negated Normal Form.
 %
-nnf(KB,FmlNV,NNF):- nnf0(KB,FmlNV,NNF).
+nnf(KB,FmlNV,NNF):-
+  must(unnumbervars_with_names((KB,FmlNV),(KB0,FmlNV0))),
+   must( \+ contains_dvar(KB0:FmlNV0)),
+   nnf0(KB0,FmlNV0,NNF).
 
 
 %= 	 	 
@@ -295,9 +297,12 @@ nnf0(KB,Fml,NNF):-
 %
 % If Is A Skolem Setting.
 %
-is_skolem_setting(S):- t_l:skolem_setting(SS)->S=SS;S=in_nnf.
+
+is_skolem_setting_default(in_nnf).
+is_skolem_setting(S):- t_l:skolem_setting(SS)->S=SS;is_skolem_setting_default(S).
 %t_l:skolem_setting(attvar).
 %t_l:skolem_setting(in_nnf).
+%t_l:skolem_setting(combine(=>)).
 %t_l:skolem_setting(shared).
 %t_l:skolem_setting(label).
 %t_l:skolem_setting(removeQ).
@@ -335,6 +340,7 @@ get_quantifier_isa(_,_,_):-fail.
 %
 % Logically Matches.
 %
+logically_matches(_KB,_A,_B):-!,fail.
 logically_matches(KB,A,B):-nonvar(KB),!,logically_matches(_KB,A,B).
 logically_matches(_,A,B):- (var(A);var(B)),!,A=B.
 logically_matches(KB,all(_,A),B):-!,logically_matches(KB,A,B).
@@ -401,8 +407,8 @@ nnf(KB,Fin,FreeV,BOX,Paths):- corrected_modal(KB,Fin,nesc(BDT,F)),
 axiom_lhs_to_rhs(all(Vs,poss(A & B)) ,  ~exists(Vs,nesc(A & B))).
 
 %   poss(beliefs(A,~F1)) ->  poss(~knows(A,F1)) ->  ~nesc(knows(A,F1))
-nnf(KB,Fin,FreeV,DIA,Paths):-  copy_term(Fin,Fml),axiom_lhs_to_rhs(KB,F1,F2) , 
- \+ \+ (numbervars(Fin,0,_,[attvar(skip)]),logically_matches(KB,Fin,F1)),
+nnf(KB,Fin,FreeV,DIA,Paths):-  fail, copy_term(Fin,Fml),axiom_lhs_to_rhs(KB,F1,F2) , 
+ \+ \+ (numbervars(Fin,0,_,[attvar(bind)]),logically_matches(KB,Fin,F1)),
   show_success(nnf,(nop(Fml),logically_matches(KB,Fin,F1))),show_call(why,nnf(KB,F2,FreeV,DIA,Paths)).
 
 nnf(KB,Fin,FreeV,CIR,Paths):- corrected_modal(KB,Fin,cir(CT,F)),
@@ -444,8 +450,10 @@ nnf(KB,exists(TypedX,NNF),FreeV,FmlO,Paths):- get_quantifier_isa(TypedX,X,Col),
      nnf(KB,exists(X,isa(X,Col)=>NNF),FreeV,FmlO,Paths).
 
 
+
+
 % ==== quantifiers ========
-nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(attvar),
+nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(attvar), trace,
    list_to_set([X|FreeV],NewVars),
     term_slots(Fml+NewVars,Slots),
     delete_eq(Slots,X,SlotsV1),
@@ -453,7 +461,7 @@ nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(attvar),
     must(t_l:current_form(OrigFml)),
     SlotsV3 =.. [sk|SlotsV2],
     nnf_dnf(KB,OrigFml,DNF),
-    nnf(KB,(skolem(X,SlotsV3,DNF)=>Fml),NewVars,NNF,Paths),!.
+    nnf(KB,(~skolem(X,SlotsV3,DNF) v Fml),NewVars,NNF,Paths),!.
 
 
 % ==== quantifiers ========
@@ -463,7 +471,7 @@ nnf(KB,all(X,NNF),FreeV,all(X,NNF2),Paths):-
 
 nnf(KB,exists(X,Fml),FreeV,NNF,Paths):-  \+ contains_var(X,Fml),!,nnf(KB,Fml,FreeV,NNF,Paths).
 
-nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(in_nnf),!, wdmsg(nnf(skolemizing(exists(X,Fml)))),
+nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(in_nnf),!, wdmsg(nnf(skolemizing(exists(X,Fml),with(FreeV)))),
    must(mk_skolem(KB,Fml,X,FreeV,FmlSk)),
    must(nnf(KB,FmlSk,FreeV,NNF,Paths)).
 
@@ -577,7 +585,6 @@ nnf(KB,Fml,FreeV,NNF,Paths):- !,
 */   
 
 nnf(KB,not(Fml),FreeV,NNF,Paths):- nonvar(Fml),   
-   must(KB\=info_by(_)),
 	(Fml = (not(A)) -> invert_modal(A,Fml1);
          Fml = (nesc(BDT,F)) -> Fml1 = poss(BDT,not(F));
 	 Fml = (poss(BDT,F)) -> Fml1 = nesc(BDT,not(F));
@@ -1025,27 +1032,15 @@ pnf(_KB,          PNF, _,       PNF ).
 
 % cf(Why,KB,A,B,C):- convertAndCall(as_dlog,cf(Why,KB,A,B,C)).
 
-%= 	 	 
 
-%% cf( ?Why, ?KB, ?PNF, ?SET) is semidet.
+%% cf( ?Why, ?KB, ?Original, ?PNF, ?CLAUSESET) is semidet.
 %
-% Cf.
+% Convert to Clausal Form
 %
-cf(Why,KB,PNF, LIST):- fail, !,
- must_det_l((
-  removeQ(KB,PNF,[], UnQ),  
-  cnf(KB,UnQ,CNF),
-  boxlog_to_prolog(CNF,PTTP0),
-  clean_repeats_d(PTTP0,PTTP),
-  wdmsg(cnf:-PTTP),
-  call((pttp1a_wid(Why,PTTP,O),O\=true)),
-  conjuncts_to_list(O,LISTM),LISTM\=[],
-  sort(LISTM,LIST),
-  wdmsg(pttp:-LIST))),!.
 
-
-cf(Why,KB,PNF, SET):- 
+cf(Why,KB,_Original,PNF, FlattenedO):- 
  must_det_l((
+  check_kif_varnames(PNF),
   removeQ(KB,PNF,[], UnQ),
   cnf(KB,UnQ,CNF0),!,
   nnf(KB,CNF0,[],CNF,_),
@@ -1054,7 +1049,19 @@ cf(Why,KB,PNF, SET):-
   make_clause_set([infer_by(Why)],Conj,EachClause),
   must_maplist(correct_cls(KB),EachClause,SOO),
   expand_cl(KB,SOO,SOOO))),
-  sort(SOOO,SET))).
+  sort(SOOO,SET),
+  cf_to_flattened_clauses(KB,Why,SET,Flattened),
+  list_to_set(Flattened,FlattenedM),!,
+  correct_boxlog(FlattenedM,KB,Why,FlattenedO),
+  pfc_for_print(FlattenedO,PrintPFC),
+  wdmsg(boxlog:-PrintPFC))).
+
+
+check_kif_varnames(KIF):-check_varnames(KIF),fail.
+check_kif_varnames(KIF):-ground(KIF),!.
+%check_kif_varnames(KIF):-show_call(term_attvars(KIF,Vs)),Vs\==[].
+check_kif_varnames(_KIF):-!.
+      
 
 
 
@@ -1111,7 +1118,6 @@ removeQ_LC(KB, MID,FreeV,OUT):-loop_check(removeQ(KB, MID,FreeV,OUT)).
 %
 removeQ(_,Var,_ ,Var):- leave_as_is(Var),!.
 
-removeQ(KB, IN,FreeV,OUT):-var(KB),!,check_is_kb(KB),removeQ(KB, IN,FreeV,OUT).
 removeQ(KB, IN,FreeV,OUT):-  once(simplify_cheap(IN,MID)), IN\=@=MID, removeQ_LC(KB, MID,FreeV,OUT),!.
 
 removeQ(KB, not(NN),Vars, XF):- nonvar(NN),NN=not(F), invert_modal(F,FI),!, removeQ(KB,  FI,Vars, XF) .
@@ -1585,37 +1591,36 @@ skolem_bad(Fml,X,FreeV,FmlSk):-
 %
 % Make Skolem.
 %
-mk_skolem(KB, F, X, FreeV, Out):-  fail,
-   must(skolem_f(KB, F, X, FreeV, Sk)),
-   subst_except(F,X,Sk,Out).
 
-mk_skolem(KB, F, X, FreeV, Out):-  
-   must(skolem_f(KB, F, X, FreeV, Sk)),
-   %writeq(freev(Sk,FreeV)),
-   must(Out= '=>'({skolem(X,Sk)},F)),
-   !,show_call(why, asserta((constraintRules(X,Sk,F)))).
+mk_skolem(KB, Fml, X, FreeV, FmlOut):-  
+   must(skolem_f(KB, Fml, X, FreeV, Sk)),   
+   must(FmlOut= Fml),
+   !,show_call(why, asserta((constraintRules(X,Sk,Fml)))),
+   form_sk(X,Fml).
 
 mk_skolem(KB, F, X, FreeV, FmlSk):- 
     must(skolem_f(KB, F, X, FreeV, Sk)), 
     must(subst_except(F, X, Sk, FmlSk)),!.
 
 
-
-%= 	 	 
+  	 
 
 %% skolem_f( ?KB, ?F, ?X, ?FreeVIn, ?Sk) is semidet.
 %
-% Skolem False.
+% Skolem Function.
 %
-skolem_f(KB, F, X, FreeVIn, Sk):- 
+skolem_f(KB, F, X, FreeVIn, SkF):- 
        must_det_l((
         delete_eq(FreeVIn,KB,FreeV0),
         delete_eq(FreeV0,X,FreeV),
         list_to_set(FreeV,FreeVSet),
 	contains_var_lits(F,X,LitsList),
         mk_skolem_name(KB,X,LitsList,'',SK),
-        concat_atom(['sk',SK,'Fn'],Fun),
-	Sk =..[Fun|FreeVSet])).
+        atom_concat(SK,'_',SKU),
+        gensym(SKU,SKN),
+        concat_atom(['sk',SKN,'Fn'],Fun),
+	SkF =..[Fun|FreeVSet])),
+        put_attr(X,sk,SkF).
 
 
 %= 	 	 
@@ -1624,7 +1629,7 @@ skolem_f(KB, F, X, FreeVIn, Sk):-
 %
 % Skolem Function.
 %
-skolem_fn(KB, F, X, FreeVIn,Fun, FreeVSet):- 
+skolem_fn(KB, F, X, FreeVIn,Fun, FreeVSet):- dtrace,
        must_det_l((
          delete_eq(FreeVIn,KB,FreeV0),
          delete_eq(FreeV0,X,FreeV),
@@ -1700,6 +1705,7 @@ mk_skolem_name(KB,Var,Fml,SIn,SOut):- Fml=..[F,VX],same_var(Var,VX),!,mk_skolem_
 mk_skolem_name(KB,Var,Fml,SIn,SOut):- Fml=..[F,Other,VX|_],same_var(Var,VX),!,type_of_var(KB,Other,OtherType),
    mk_skolem_name(KB,Var,[OtherType,'Arg2Of',F],SIn,SOut).
 mk_skolem_name(KB,Var,Fml,SIn,SOut):- Fml=..[F,VX|_],same_var(Var,VX),!,mk_skolem_name(KB,Var,['Arg1Of',F],SIn,SOut).
+mk_skolem_name(KB,Var,Fml,SIn,SOut):- Fml=..[F,_,VX|_],same_var(Var,VX),!,mk_skolem_name(KB,Var,['Arg2Of',F],SIn,SOut).
 mk_skolem_name(KB,Var,Fml,SIn,SOut):- Fml=..[F|_],!,mk_skolem_name(KB,Var,['ArgNOf',F],SIn,SOut).
 
 % same_var(Var,Fml):- not(not(Var=Fml)),!.
@@ -1895,4 +1901,4 @@ cf_to_flattened_clauses_0(KB,Why,NCFsI,FlattenedO):-
    list_to_set(FlattenedL,FlattenedS),
    must_maplist(demodal_sents(KB),FlattenedS,FlattenedO))),!.
   
-
+:- autoload.

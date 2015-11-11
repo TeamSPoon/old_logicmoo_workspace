@@ -435,7 +435,7 @@ rdf_object(O):-ground(O).
 :- was_dynamic(lmconf:using_rdf_mpred_hook).
 
 % :- shared_multifile(lmconf:decl_database_hook).
-%OLD lmconf:decl_database_hook(change(assert,_A_or_Z),DBI):- copy_term(DBI,DB), lmconf:using_rdf_mpred_hook,numbervars_with_names(DB),rdf_assert_hook(DB),!.
+%OLD lmconf:decl_database_hook(change(assert,_A_or_Z),DBI):- copy_term(DBI,DB), lmconf:using_rdf_mpred_hook,unnumbervars_with_names(DB),rdf_assert_hook(DB),!.
 
 :- thread_local(t_l:rdf_asserting/2).
 
@@ -470,7 +470,7 @@ cyc_to_rdf(argIsa(P,2,D),range(P,D)):-arity(P,2).
 
 :- flag(rdf_assert_hook_max,_,0).
 :- was_export(rdf_assert_hook/1).
-rdf_assert_hook(CYC):-not(ground(CYC)),!,copy_term(CYC,O),numbervars_with_names(O),!,rdf_assert_hook(O),!.
+rdf_assert_hook(CYC):-not(ground(CYC)),!,copy_term(CYC,O),unnumbervars_with_names(O),!,rdf_assert_hook(O),!.
 rdf_assert_hook(PSO):-rdf_assert_ignored(PSO),!.
 rdf_assert_hook((A,B)):-!,rdf_assert_hook(A),rdf_assert_hook(B).
 rdf_assert_hook(CYC):-into_mpred_form(CYC,DIF),CYC\=@=DIF,!,must(rdf_assert_hook(DIF)),!.

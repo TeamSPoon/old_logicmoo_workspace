@@ -46,9 +46,9 @@
             get_lits/2,
             get_var_names/3,
             is_clif/1,
-            are_clauses_entailed/1,
-            is_prolog_entailed/1,
-            delistify_last_arg/3,
+          are_clauses_entailed/1,
+          is_prolog_entailed/1,
+          delistify_last_arg/3,
             kb_incr/2,
             kif/0,
             kif_ask/1,
@@ -81,7 +81,7 @@
             neg_h_if_neg/2,
             not_mudEquals/2,
             nots_to/3,
-            numbervars_with_names/2,
+            unnumbervars_with_names/2,
             is_quantifier/1,
             pfc_for_print/2,
             save_in_code_buffer/2,
@@ -146,6 +146,10 @@
 
 
 :- op(1100,fx,(shared_multifile)).
+
+:- module_transparent(( are_clauses_entailed/1,
+            is_prolog_entailed/1,
+            delistify_last_arg/3)).
 
 :- meta_predicate
    % common_logic_snark
@@ -216,22 +220,26 @@ kif_hook(C):- C=..[F,A|_],is_sentence_functor(F),!,kif_hook(A).
 %
 % Are Clauses Entailed.
 %
-are_clauses_entailed(E):-not(compound(E)),!,must(true==E).
-are_clauses_entailed([E|List]):-is_list([E|List]),!,maplist(are_clauses_entailed,[E|List]).
+are_clauses_entailed(E):-not(compound(E)),!,must(true==E;[]==E).
+are_clauses_entailed([E|List]):-!,are_clauses_entailed(E),are_clauses_entailed(List).
 are_clauses_entailed((C,L)):-!,are_clauses_entailed(C),are_clauses_entailed(L).
-are_clauses_entailed(CL):- unnumbervars(CL,UCL), \+ \+ (clause_asserted(CL);(unnumbervars(CL,UCL),is_prolog_entailed(UCL))),!.
+are_clauses_entailed(CL):- \+ \+ (unnumbervars(CL,UCL),with_umt(is_prolog_entailed(UCL))),!.
 
 
-%= 	 	 
-
-%% is_prolog_entailed( ?UCL) is semidet.
+%% is_prolog_entailed( ?Prolog) is semidet.
 %
-% If Is A Prolog Entailed.
+% True if the "Prolog" clause is asserted
 %
+is_prolog_entailed(UCL):-clause_asserted(UCL),!.
+is_prolog_entailed(UCL):-clause(UCL,B),is_attr_bind(B),must(B).
+is_prolog_entailed(UCL):-clause(UCL,B,Ref),(B\==true->must(B);(trace,clause(HH,BB,Ref),dmsg(BB:-(UCL,HH)))),!.
 is_prolog_entailed(UCL):-show_failure(clause_asserted(UCL)),!.
-is_prolog_entailed(UCL):-req(UCL),!.
+is_prolog_entailed(UCL):-trace,req(UCL),!.
 
-
+is_attr_bind(B):-var(B),!.
+is_attr_bind(_:B):-!,is_attr_bind(B).
+is_attr_bind((_,B)):-!,is_attr_bind(B).
+is_attr_bind(B):-compound(B),functor(B,attr_bind,_).
 %= 	 	 
 
 %% member_ele( ?E, ?E) is semidet.
@@ -274,14 +282,13 @@ clif_to_prolog((H,CLIF),(T,Prolog)):-cwc,sanity(must(nonvar(H))),!,clif_to_prolo
 clif_to_prolog((H<-B),(H<-B)):- cwc,!.
 clif_to_prolog((P==>Q),(P==>Q)):- cwc,!.
 clif_to_prolog((H:-B),PrologO):- cwc,!,must((show_failure(why,boxlog_to_pfc((H:-B),Prolog)),!,=(Prolog,PrologO))),!.
-clif_to_prolog(CLIF,PrologO):- cwc,
+clif_to_prolog(CLIF,Prolog):- cwc,
   % somehow integrate why_to_id(tell,Wff,Why),
      must_det_l((
-      kif_to_boxlog(CLIF,HORN),
-      boxlog_to_pfc(HORN,Prolog),
-      pfc_for_print(Prolog,PrintPFC),
-      dmsg(pfc:-PrintPFC),
-      =(Prolog,PrologO))),!.
+      kif_to_boxlog(CLIF,BOXLOG),
+      boxlog_to_pfc(BOXLOG,Prolog),
+      (BOXLOG=@=Prolog -> true; (pfc_for_print(Prolog,PrintPFC),wdmsg(pfc:-PrintPFC))))),!.
+      
 
 
 %= 	 	 
@@ -745,20 +752,22 @@ write_list([]).
 
 %= 	 	 
 
-%% numbervars_with_names( ?Term, ?CTerm) is semidet.
+%% unnumbervars_with_names( ?Term, ?CTerm) is semidet.
 %
 % Numbervars Using Names.
 %
-numbervars_with_names(Term,CTerm):- ground(Term),!,duplicate_term(Term,CTerm).
 
-numbervars_with_names(Term,CTerm):-
+unnumbervars_with_names(Term,CTerm):- !, must(unnumbervars(Term,CTerm)),!.
+unnumbervars_with_names(Term,CTerm):- ground(Term),!,duplicate_term(Term,CTerm).
+
+unnumbervars_with_names(Term,CTerm):-
  must_det_l((
    source_variables_l(NamedVars),
    copy_term(Term:NamedVars,CTerm:CNamedVars),
    b_implode_varnames0(CNamedVars))),!.
 
 
- numbervars_with_names(Term,CTerm):-
+ unnumbervars_with_names(Term,CTerm):-
   must_det_l((
    source_variables_l(NamedVars),
    copy_term(Term:NamedVars,CTerm:CNamedVars),
@@ -769,10 +778,10 @@ numbervars_with_names(Term,CTerm):-
    append(CNamedVars,NamedVars,NewCNamedVars),
    list_to_set(NewCNamedVars,NewCNamedVarsS),
    remove_grounds(NewCNamedVarsS,NewCNamedVarsSG),
-   b_setval('$variable_names',NewCNamedVarsSG))),!.
+   put_variable_names(NewCNamedVarsSG))),!.
 
 
-numbervars_with_names(Term,CTerm):-
+unnumbervars_with_names(Term,CTerm):-
  must_det_l((
    source_variables_l(NamedVars),!,
    copy_term(Term:NamedVars,CTerm:CNamedVars),
@@ -783,7 +792,7 @@ numbervars_with_names(Term,CTerm):-
    append(CNamedVars,NamedVars,NewCNamedVars),
    list_to_set(NewCNamedVars,NewCNamedVarsS),
    remove_grounds(NewCNamedVarsS,NewCNamedVarsSG),
-   b_setval('$variable_names',NewCNamedVarsSG))),!.
+   put_variable_names(NewCNamedVarsSG))),!.
 
 
 %= 	 	 
@@ -842,7 +851,7 @@ wdmsgl_2(NAME,NF):- functor(NF,_,_),wdmsgl_3(NAME,&,NF).
 % Wdmsgl Helper Number 3..
 %
 wdmsgl_3(NAME,F,NF):-
-   numbervars_with_names(vv(NAME,F,NF),vv(NAME2,F2,NF2)),
+   unnumbervars_with_names(vv(NAME,F,NF),vv(NAME2,F2,NF2)),
    wdmsgl_4(NAME2,F2,NF2).
 
 %wdmsgl_4(NAME,F,NF):- is_list(NF),!,list_to_set(NF,NS),must_maplist(wdmsgl_4(NAME,F),NS).
@@ -940,16 +949,19 @@ kif_to_boxlog(I,KB,Why,Flattened):-
 %kif_to_boxlog((Wff:- B),KB,Why,Flattened):- is_true(B),!, kif_to_boxlog(Wff,KB,Why,Flattened),!.
 %kif_to_boxlog(Wff,KB,Why,Out):- adjust_kif(KB,Wff,M),Wff \=@= M ,!,kif_to_boxlog(M,KB,Why,Out).
 
-kif_to_boxlog(HB,KB,Why,FlattenedO):- compound(HB),HB=(HEAD:- BODY),!,
+kif_to_boxlog(HB,KB,Why,FlattenedO):- unnumbervars((HB,KB,Why),(HB0,KB0,Why0)),
+  must(kif_to_boxlog_attvars(HB0,KB0,Why0,FlattenedO)).
+  
+kif_to_boxlog_attvars(HB,KB,Why,FlattenedO):- compound(HB),HB=(HEAD:- BODY),!,
   must_det_l((
    check_is_kb(KB),
    conjuncts_to_list(HEAD,HEADL),conjuncts_to_list(BODY,BODYL),
    correct_boxlog([cl(HEADL,BODYL)],KB,Why,FlattenedO))).
 
-kif_to_boxlog(WffIn0,KB0,Why0,FlattenedO):-
+kif_to_boxlog_attvars(WffIn0,KB0,Why0,FlattenedO):-
   must_det_l((nl,nl,nl,draw_line,draw_line,draw_line,draw_line)),
   must_det_l((
-    must(numbervars_with_names(WffIn0:KB0:Why0,WffIn:KB:Why)),
+    must(unnumbervars_with_names(WffIn0:KB0:Why0,WffIn:KB:Why)),
    ensure_quantifiers(WffIn,Wff),
    wdmsgl(kif(Wff)),
    % KB = WffQ,
@@ -970,10 +982,7 @@ kif_to_boxlog(WffIn0,KB0,Why0,FlattenedO):-
    %wdmsgl(pnf(PNF)),
    %save_wid(Why,kif,Wff),
    %save_wid(Why,pkif,Wff6669),
-   cf(Why,KB,PNF,NCFsI),!,
-   cf_to_flattened_clauses(KB,Why,NCFsI,Flattened),
-   list_to_set(Flattened,FlattenedM),!,
-   correct_boxlog(FlattenedM,KB,Why,FlattenedO))).
+   cf(Why,KB,Wff6669,PNF,FlattenedO))).
 
 
 
@@ -994,6 +1003,7 @@ lmconf:no_rewrites.
 %
 % Check If Is A Knowledge Base.
 %
+check_is_kb(KB):-attvar(KB),!.
 check_is_kb(KB):-ignore('$VAR'('KB')=KB).
 
 
@@ -1311,7 +1321,7 @@ kif_io(InS,Out):-
    repeat,
       on_x_rtrace((once((t_l:kif_action_mode(Mode),write(Out,Mode),write(Out,'> '))),
         kif_read(In,Wff,Vs),
-         b_setval('$variable_names', Vs),
+         put_variable_names( Vs),
            portray_clause(Out,Wff,[variable_names(Vs),quoted(true)]),
            once(kif_process(Wff)),
            Wff == end_of_file)),!.
@@ -1417,8 +1427,8 @@ kif_ask(Goal0,ProofOut):- logical_pos(_KB,Goal0,Goal),
 % Knowledge Interchange Format Add.
 %
 kif_add(InS):- atom(InS),must_det_l((kif_read(string(InS),Wff,Vs),b_implode_varnames0(Vs),local_sterm_to_pterm(Wff,Wff0),kif_add(Wff0))),!.
-% kif_add(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),why_to_id(tell,Wff,Why),kif_add(Why,Wff))),!.
-kif_add(WffIn):- must_det_l((numbervars_with_names(WffIn,Wff),ain(clif(Wff)))),!.
+% kif_add(WffIn):- must_det_l((unnumbervars_with_names(WffIn,Wff),why_to_id(tell,Wff,Why),kif_add(Why,Wff))),!.
+kif_add(WffIn):- must_det_l((unnumbervars_with_names(WffIn,Wff),ain(clif(Wff)))),!.
 
 
 
@@ -1534,6 +1544,7 @@ kif_add_boxes3(How,Why,Assert):-
 %
 % Knowledge Interchange Format Unnumbervars.
 %
+kif_unnumbervars(X,YY):-unnumbervars(X,YY),!.
 kif_unnumbervars(X,YY):-
  must_det_l((
    with_output_to(string(A),write_term(X,[character_escapes(true),ignore_ops(true),quoted(true)])),
@@ -1775,5 +1786,6 @@ boxlog_to_prolog(IN,OUT):-demodal_sents(_KB,IN,M),IN\=@=M,!,boxlog_to_prolog(M,O
 boxlog_to_prolog( H, HH):- H=..[F|ARGS],!,boxlog_to_prolog(ARGS,ARGSO),!,HH=..[F|ARGSO].
 boxlog_to_prolog(BL,PTTP):- as_prolog(BL,PTTP).
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
+:- source_location(S,_),forall((source_file(H,S),once((clause(H,B),B\=true))),(functor(H,F,A),module_transparent(F/A))).
+:- source_location(S,_),forall((source_file(H,S),functor(H,F,A),\+atom_concat('$',_,F)),export(F/A)).
 

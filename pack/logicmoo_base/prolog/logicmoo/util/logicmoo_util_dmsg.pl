@@ -200,7 +200,6 @@
         term_color0/2.
 
 
-
 :- if(current_predicate(logicmoo_utils:combine_logicmoo_utils/0)).
 :- module(logicmoo_util_dmsg,
 [  % when the predciates are not being moved from file to file the exports will be moved here
@@ -841,7 +840,6 @@ dmsg3(C):-dmsg4(C),!.
 % Dmsg4.
 %
 dmsg4(_):- notrace(show_source_location),fail.
-% dmsg4(C):- not(ground(C)),copy_term(C,Stuff), snumbervars(Stuff),!,dmsg5(Stuff).
 dmsg4(Msg):-dmsg5(Msg).
 
 
@@ -937,7 +935,8 @@ ansifmt(Ctrl,F,A):- colormsg(Ctrl,(format(F,A))).
 %
 % Debugm.
 %
-debugm(X):-get_functor(X,F),debugm(F,X).
+debugm(X):-compound(X),functor(X,F,_),!,debugm(F,X).
+debugm(X):-debugm(X,X).
 
 %= 	 	 
 
@@ -1437,6 +1436,9 @@ cls:- shell(cls).
 :- 'mpred_trace_none'(dmsg(_)).
 :- 'mpred_trace_none'(dmsg(_,_)).
 
+:- use_module(library(random)).
+:- use_module(logicmoo_util_varnames).
+:- autoload.
 
  
 

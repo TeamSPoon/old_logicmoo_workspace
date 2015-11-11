@@ -4,11 +4,12 @@
             ain0/1,
             aina/1,
             ainz/1,
+            attr_bind/1,
 paina/1,pain/1,            painz/1,
             ainz_clause/1,
             ainz_clause/2,
             append_term/3,
-            as_clause/3,
+            expand_to_hb/3,
             assert_if_new/1,
             asserta_if_new/1,
             asserta_new/1,
@@ -34,6 +35,7 @@ paina/1,pain/1,            painz/1,
             retract_eq/1,
             safe_univ/2,
             safe_univ0/2,
+            clausify_attributes/2,
             my_module_sensitive_code/1
           ]).
 :- meta_predicate
@@ -46,7 +48,7 @@ paina/1,pain/1,            painz/1,
         ainz(:),
         ainz_clause(:),
         ainz_clause(:, ?),
-        as_clause(?, ?, ?),
+        expand_to_hb(?, ?, ?),
         assert_if_new(:),
         asserta_if_new(:),
         asserta_new(:),
@@ -215,7 +217,7 @@ mpred_op_prolog(OP,M:Term):-
   copy_term(Term, Copy, Gs),
   (Gs==[] -> mpred_mop(M,OP,Term);
     show_call(why,(
-      as_clause(Copy,H,B),conjoin(maplist(call,Gs),B,NB),trace,mpred_mop(M,OP,(H:-NB))))).
+      expand_to_hb(Copy,H,B),conjoin(maplist(call,Gs),B,NB),trace,mpred_mop(M,OP,(H:-NB))))).
   
 
 %= 	 	 
@@ -227,11 +229,11 @@ mpred_op_prolog(OP,M:Term):-
 mpred_op_prolog0(OP,MTerm):- call(OP,MTerm).
 
 % peekAttributes/2,pushAttributes/2,pushCateElement/2.
-:- module_transparent((aina/1,ain/1,ainz/1,ain0/1,ainz_clause/1,ainz_clause/2,clause_asserted/2,as_clause/2,clause_asserted/1,eraseall/2)).
-:- module_transparent((asserta_new/1,asserta_if_new/1,assertz_new/1,assertz_if_new/1,assert_if_new/1)). % ,assertz_if_new_clause/1,assertz_if_new_clause/2,clause_asserted/2,as_clause/2,clause_asserted/1,eraseall/2)).
+:- module_transparent((aina/1,ain/1,ainz/1,ain0/1,ainz_clause/1,ainz_clause/2,clause_asserted/2,expand_to_hb/2,clause_asserted/1,eraseall/2)).
+:- module_transparent((asserta_new/1,asserta_if_new/1,assertz_new/1,assertz_if_new/1,assert_if_new/1)). % ,assertz_if_new_clause/1,assertz_if_new_clause/2,clause_asserted/2,expand_to_hb/2,clause_asserted/1,eraseall/2)).
 
 :- meta_predicate paina(:),pain(:),painz(:),ain0(:),ainz_clause(:),ainz_clause(:,?).
-:- meta_predicate clause_asserted(:,?),as_clause(?,?,?),clause_asserted(:),eraseall(+,+).
+:- meta_predicate clause_asserted(:,?),expand_to_hb(?,?,?),clause_asserted(:),eraseall(+,+).
 
 % aina(NEW):-ignore((retract(NEW),fail)),asserta(NEW).
 % ainz(NEW):-ignore((retract(NEW),fail)),assertz(NEW).
@@ -403,7 +405,7 @@ ainz(N):-call_provider(painz(N)).
 %
 % Ainz Clause.
 %
-ainz_clause(C):- as_clause(C,H,B),ainz_clause(H,B).
+ainz_clause(C):- expand_to_hb(C,H,B),ainz_clause(H,B).
 
 %= 	 	 
 
@@ -414,15 +416,33 @@ ainz_clause(C):- as_clause(C,H,B),ainz_clause(H,B).
 ainz_clause(H,B):- clause_asserted(H,B)->true;call_provider(assertz((H:-B))).
 
 
-%= 	 	 
 
-%% as_clause( ?M, ?M, ?B) is semidet.
+%% expand_to_hb( ?Clause, ?H, ?B) is semidet.
 %
-% Converted To Clause.
+% Split a Head+Body from Clause.
 %
-as_clause( M:((H :- B)),M:H,B):-!.
-as_clause( ((H :- B)),H,B):-!.
-as_clause( H,  H,  true).
+expand_to_hb( Var, H, B):- var(Var),!,when(nnvar(Var),expand_to_hb( Var, H, B)).
+expand_to_hb( M:((H :- B)),M:H,B):-!.
+expand_to_hb( ((H :- B)),H,B):-!.
+expand_to_hb( H,  H,  true).
+
+clausify_attributes(Data,THIS):- 
+   copy_term(Data,Data0,Extra),   
+   (Extra == [] -> THIS = Data ; (hb_to_clause(Data0,attr_bind(Extra),THIS))).
+
+:- module_transparent attr_bind/1.
+attr_bind(G):-must_det_l(G).
+
+
+%% hb_to_clause( ?H, ?B, ?Clause ) is semidet.
+%
+% Join a Head+Body To Clause.
+%
+hb_to_clause(H,B,H):- B==true,!.
+hb_to_clause((H:-B1),B2,(H:-(B1,B2))):-!.
+hb_to_clause(H,B,(H:-B)).
+
+
 
 :-export(clause_asserted/1).
 :-meta_predicate(clause_asserted(:)).
@@ -433,7 +453,7 @@ as_clause( H,  H,  true).
 %
 % Clause Asserted.
 %
-clause_asserted(C):- as_clause(C,H,B),clause_asserted(H,B).
+clause_asserted(C):- expand_to_hb(C,H,B),clause_asserted(H,B).
 
 :-export(clause_asserted/2).
 :-meta_predicate(clause_asserted(:,?)).
@@ -473,6 +493,8 @@ modulize_head(G,O:G):- !, no_repeats_old(O,(current_module(M),'$get_predicate_at
 modulize_head(G,M:G):- current_predicate(_,M:G),\+ predicate_property(M:G,imported_from(_)).
 
 
+
+
 :-meta_predicate(clause_true(?)).
 
 
@@ -483,7 +505,7 @@ modulize_head(G,M:G):- current_predicate(_,M:G),\+ predicate_property(M:G,import
 % Clause True.
 %
 clause_true(M:G):-!,clause(M:G,true)*->true;(current_module(M2),clause(M2:G,true)).
-clause_true(G):-!, (current_module(M),clause(M:G,true)).
+clause_true(G):- !, notrace((current_module(M), \+ \+  clause(M:G,_,_))),!, clause(M:G,true).
 clause_true(M:G):-predicate_property(M:G,number_of_clauses(_)),!,clause(M:G,true).
 clause_true(_:G):-!,predicate_property(M:G,number_of_clauses(_)),clause(M:G,true).
 clause_true(G):-!,predicate_property(M:G,number_of_clauses(_)),clause(M:G,true).
@@ -496,7 +518,7 @@ clause_true(G):-!,predicate_property(M:G,number_of_clauses(_)),clause(M:G,true).
 %
 % Retract Using (==/2) (or =@=/2) ).
 %
-retract_eq(HB):-as_clause(HB,H,B),show_failure(modulize_head(H,MH)),clause_asserted(MH,B,Ref),erase(Ref).
+retract_eq(HB):-expand_to_hb(HB,H,B),show_failure(modulize_head(H,MH)),clause_asserted(MH,B,Ref),erase(Ref).
 
 
 :-export(safe_univ/2).

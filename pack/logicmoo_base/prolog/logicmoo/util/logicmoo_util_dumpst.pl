@@ -18,6 +18,7 @@
           dumptrace_ret/1,
           drain_framelist/1,
           drain_framelist_ele/1,
+          printable_variable_name/2,
           dump_st/0,
           to_wmsg/2,
           simplify_goal_printed/2,
@@ -327,11 +328,25 @@ fdmsg(M):-ddmsg(failed_fdmsg(M)).
 
 %= 	 	 
 
+printable_variable_name(Var, Name) :- nonvar(Var),Var='$VAR'(_),format(atom(Name),"'$Var'(~q)",Var).
+printable_variable_name(Var, Name) :- nonvar(Var),format(atom(Name),"'$NONVAR'(~q)",Var).
+printable_variable_name(Var,Name):- (get_attr(Var, vn, Name1);get_attr(Var, varnames, Name1)),
+ (var_property(Var,name(Name2))-> (Name1==Name2-> atom_concat('?$',Name1,Name) ; Name=(Name1:Name2)); atom_concat('?',Name1,Name)),!.
+printable_variable_name(Var,Name):- var_property(Var,name(Name1)),!,atom_concat('$',Name1,Name).
+printable_variable_name(Var,Name):- b_getval('$variable_names',Vs),member(Name1=V,Vs),V==Var,!,atom_concat('$',Name1,Name).
+printable_variable_name(Var, Name) :- format(atom(Name),'#~w',Var).
+ 
+
+
+
 %% simplify_goal_printed( :TermVar, :TermVar) is semidet.
 %
 % Simplify Goal Printed.
 %
-simplify_goal_printed(Var,Var):- is_ftVar(Var),!.
+
+simplify_goal_printed(Var,Name):- get_attrs(Var,att(vn, _, [])),printable_variable_name(Var, Name),!.
+simplify_goal_printed(Var,'$avar'(Name,ATTRS)):- get_attrs(Var,ATTRS),printable_variable_name(Var,Name),!.
+simplify_goal_printed(Var,Name):- is_ftVar(Var),!,printable_variable_name(Var, Name).
 simplify_goal_printed(setup_call_catcher_cleanup,sccc).
 simplify_goal_printed(setup_call_cleanup,scc).
 simplify_goal_printed(call_cleanup,cc).
@@ -339,13 +354,15 @@ simplify_goal_printed(A,'...'(SA)):- atom(A),atom_concat('/opt/PrologMUD/pack/lo
 simplify_goal_printed(A,'...'(SA)):- atom(A),atom_concat('/home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/',SA,A),!.
 simplify_goal_printed(A,'...'(SA)):- atom(A),atom_concat('/home/dmiles/lib/swipl/pack/logicmoo_base/t/',SA,A),!.
 % simplify_goal_printed(A,'...'(SA)):- atom(A),atom_concat('/',_,A),!,directory_file_path(_,SA,A),!.
-simplify_goal_printed(GOAL=A,AS):-goal==GOAL,!,simplify_goal_printed(A,AS).
+simplify_goal_printed(GOAL=A,AS):- goal==GOAL,!,simplify_goal_printed(A,AS).
 simplify_goal_printed(Var,Var):- \+ compound(Var),!.
 simplify_goal_printed(term_position(_,_,_,_,_),'$..term_position/4..$').
 %simplify_goal_printed(user:G,GS):-!,simplify_goal_printed(G,GS).
-simplify_goal_printed(system:G,GS):-!,simplify_goal_printed(G,GS).
+%simplify_goal_printed(system:G,GS):-!,simplify_goal_printed(G,GS).
 %simplify_goal_printed(catchv(G,_,_),GS):-!,simplify_goal_printed(G,GS).
 %simplify_goal_printed(catch(G,_,_),GS):-!,simplify_goal_printed(G,GS).
+%simplify_goal_printed(skolem(V,N,_F),GS):-!,simplify_goal_printed(skeq(V,N,'..'),GS).
+
 simplify_goal_printed('<meta-call>'(G),GS):-!,simplify_goal_printed(G,GS).
 simplify_goal_printed(must_det_lm(M,G),GS):-!,simplify_goal_printed(M:must_det_l(G),GS).
 simplify_goal_printed(call(G),GS):-!,simplify_goal_printed(G,GS).

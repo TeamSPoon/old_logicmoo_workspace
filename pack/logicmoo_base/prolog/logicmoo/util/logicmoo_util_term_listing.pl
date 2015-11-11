@@ -1426,11 +1426,9 @@ prolog:locate_clauses(A, OutOthers) :-
 %
 % Prolog Listing List Clauses.
 %
-prolog_listing_list_clauses(PredIn, Source) :-  current_prolog_flag(listing_vars,true),!,
+prolog_listing_list_clauses(Pred, Source) :-  current_prolog_flag(listing_vars,true),!,
        scan_for_varnames,
-       strip_module(PredIn, ModuleIn, Head),   
-      ((current_predicate(_,Module:Head), \+ predicate_property(Module:Head,imported_from(_)))-> true ; Module=ModuleIn),
-       Pred = Module:Head,
+       strip_module(Pred, Module, Head),   
       (current_prolog_flag(listing_docs,true)-> autodoc_pred(Module,Pred); true),
        (    clause(Pred, Body),
             get_clause_vars_copy((Head:-Body),ForPrint),
@@ -1441,16 +1439,15 @@ prolog_listing_list_clauses(PredIn, Source) :-  current_prolog_flag(listing_vars
 	).
 
 % System Version 7.3.9
-prolog_listing_list_clauses(PredIn, Source) :-
-        strip_module(PredIn, ModuleIn, Head),
-        ((current_predicate(_,Module:Head), \+ predicate_property(Module:Head,imported_from(_)))-> true ; Module=ModuleIn),
-        Pred = Module:Head,
+prolog_listing_list_clauses(Pred, Source) :-
+  prolog_listing:
+  ((      strip_module(Pred, Module, Head),
 	(   clause(Pred, Body),
-	    prolog_listing:write_module(Module, Source, Head),
-	    prolog_listing:portray_clause((Head:-Body)),
+	    write_module(Module, Source, Head),
+	    portray_clause((Head:-Body)),
 	    fail
 	;   true
-	).
+	))).
 
 :- if(true).
 

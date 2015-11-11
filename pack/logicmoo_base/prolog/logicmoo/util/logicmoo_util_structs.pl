@@ -13,8 +13,8 @@
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_structs.pl
 :- module(logicmoo_util_structs,
-          [ attr_portray_hook/2,
-            attr_unify_hook/2,
+          [ % attr_portray_hook/2,
+            % attr_unify_hook/2,
             by_name_datatype/2,
             compile_argtypes/3,
             compile_struct_slots/6,
@@ -83,8 +83,6 @@
 :- meta_predicate
         sisctus_key(:, -).
 :- module_transparent
-        attr_portray_hook/2,
-        attr_unify_hook/2,
         by_name_datatype/2,
         compile_argtypes/3,
         compile_struct_slots/6,
@@ -227,27 +225,6 @@ record_onto_var(AttribName,AV,Value):-
  (prop_get(AttribName,Dict,_)->true;prop_set(AttribName,Dict,AV)))).
 
 
-
-%= 	 	 
-
-%% attr_unify_hook( ?VALUE1, ?VALUE2) is semidet.
-%
-% Hook To [prolog_metainference:attr_unify_hook/2] For Module Logicmoo_util_structs.
-% Attr Unify Hook.
-%
-attr_unify_hook(_,_).
-
-%= 	 	 
-
-%% attr_portray_hook( ?VALUE1, ?VALUE2) is semidet.
-%
-% Hook To [logicmoo_varnames:attr_portray_hook/2] For Module Logicmoo_util_structs.
-% Attr Portray Hook.
-%
-attr_portray_hook(Value, _Var) :- nonvar(Value),!,write((Value)).
-
-
-
 %= 	 	 
 
 %% record_var_names( :TermARG1) is semidet.
@@ -266,7 +243,7 @@ record_var_names(Comp):-functor(Comp,_,A),arg(A,Comp,E),!,record_var_names(E).
 %
 % Record Variable Names.
 %
-record_var_names(ATTVAR,Value):-record_onto_var(varname,ATTVAR,Value).
+record_var_names(ATTVAR,Value):-record_onto_var(vn,ATTVAR,Value).
 
 
 

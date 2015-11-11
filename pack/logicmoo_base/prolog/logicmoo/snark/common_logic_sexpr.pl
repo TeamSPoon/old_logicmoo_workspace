@@ -35,7 +35,7 @@ fixvars(P,N,[V|VARS],PO):-
      subst(PM0,'$VAR'(Name),Var,PM),
    %  nb_getval('$variable_names', Vs),
   %   append(Vs,[Name=Var],NVs),
-  %   nb_setval('$variable_names', NVs),
+  %   nput_variable_names( NVs),
      N2 is N + 1, fixvars(PM,N2,VARS,PO).
 
 

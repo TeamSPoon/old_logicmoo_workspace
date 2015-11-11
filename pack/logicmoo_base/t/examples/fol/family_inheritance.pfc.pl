@@ -29,10 +29,10 @@ otherGender(female,male).
 
 tCol(male).
 :- dynamic((bore_offspring/2, gender/2)).
-bore_offspring(X,Y) <=> bore_offspring(Y,X).
+bore_offspring(C,P) <=> bore_offspring(C,P).
 
-(bore_offspring(X,Y),gender(X,G1), otherGender(G1,G2))
-     => gender(Y,G2).
+(bore_offspring(C,P),gender(P,G1), otherGender(G1,G2))
+     => gender(C,G2).
 
 
 gender(P,male) <=> male(P).
@@ -44,52 +44,50 @@ male(P) <=> ~female(P).
 
 
 % seven rules
-(((parent(M,C) & female(M)) <=> mother(M,C))).
+(((parent(C,M) & female(M)) <=> mother(C,M))).
 
 
+% ((parent(C,M) & female(M)) <=> mother(C,M)).
+:- must_is_entailed(((parent(C,M) & female(M)) <=> mother(C,M))).
 
-% ((parent(M,C) & female(M)) <=> mother(M,C)).
-:- must_is_entailed(((parent(M,C) & female(M)) <=> mother(M,C))).
 
-
-:- must_is_entailed(((parent(M,C) & female(M)) => mother(M,C))).
-%       [ (not(female(M)):-not(mother(M, C)), parent(M, C)),
-%         (not(parent(M, C)):-not(mother(M, C)), female(M)),
-%         (mother(M, C):-parent(M, C), female(M))
+:- must_is_entailed(((parent(C,M) & female(M)) => mother(C,M))).
+%       [ (not(female(M)):-not(mother(C,M)), parent(C,M)),
+%         (not(parent(C,M)):-not(mother(C,M)), female(M)),
+%         (mother(C,M):-parent(C,M), female(M))
 %       ].
 
-:- must_is_entailed((mother(M,C) => (parent(M,C) & female(M)))).
+:- must_is_entailed((mother(C,M) => (parent(C,M) & female(M)))).
 %       [ (female(M):-mother(M, _C)),
-%         (not(mother(M, _C)):-not(female(M))),
-%         (not(mother(M, C)):-not(parent(M, C))),
-%         (parent(M, C):-mother(M, C))
+%         (not(mother(_C,M)):-not(female(M))),
+%         (not(mother(C,M)):-not(parent(C,M))),
+%         (parent(C,M):-mother(C,M))
 %       ].
 
 
-:- must_is_entailed(not(mother(M,C)):- not(parent(M,C))).
-:- must_is_entailed(not(mother(M,_Anyone)):- not(female(M))).
-:- must_is_entailed((parent(M,C):- mother(M,C))).
-:- must_is_entailed((female(M):- mother(M,_))).
+:- must_is_entailed(not(mother(C,M)):- not(parent(C,M))).
+:- must_is_entailed(not(mother(_Anyone, M)):- not(female(M))).
+:- must_is_entailed((parent(C,M):- mother(C,M))).
+:- must_is_entailed((female(M):- mother(_,M))).
 
 
 
 
-parent(GRAND,PARENT),parent(PARENT,CHILD) => grandparent(GRAND,CHILD).
+parent(PARENT,GRAND),parent(CHILD,PARENT) => grandparent(CHILD,GRAND).
 
-grandparent(X,Y),male(X) <=> grandfather(X,Y).
-grandparent(X,Y),female(X) <=> grandmother(X,Y).
-mother(Ma,Kid),parent(Kid,GrandKid)
-      =>grandmother(Ma,GrandKid).
-grandparent(X,Y),female(X) <=> grandmother(X,Y).
+grandparent(C,G),male(G) <=> grandfather(C,G).
+grandparent(C,G),female(G) <=> grandmother(C,G).
+mother(P,G),parent(GrandKid,P)=>grandmother(GrandKid,G).
+father(P,G),parent(GrandKid,P)=>grandfather(GrandKid,G).
 
 
-parent(X,Y),male(X) <=> father(X,Y).
-parent(Ma,X),parent(Ma,Y),different(X,Y) =>siblings(X,Y).
-parent(P1,P2) => ancestor(P1,P2).
-(parent(P1,P2), ancestor(P2,P3)) => ancestor(P1,P3).
-(ancestor(P1,P2), ancestor(P2,P3)) => ancestor(P1,P3).
+parent(C,P),male(P) <=> father(C,P).
+parent(C,P),female(P) <=> mother(C,P).
+parent(X,P),parent(Y,P),different(X,Y) =>siblings(X,Y).
+parent(C,P) => ancestor(C,P).
+ancestor(C,P), ancestor(P,G) => ancestor(C,G).
 
-mother(eileen,douglas).
+mother(douglas,eileen).
 
 %= trudy is human
 human(trudy).
@@ -97,26 +95,29 @@ human(trudy).
 %= catch a regression bug that may couse trudy to lose human assertion
 never_retract_u(human(trudy)).
 
+:- debug(_).
 
 %  
-forall(c,exists([m,f], if(human(c), (mother(m,c) & father(f,c))))).
+forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f))))).
 
-:- printAll(must(father(_,trudy))).
+:- printAll(must(father(trudy,_))).
 
 
-mother(trudy,eileen).
-((human(P1),ancestor(P1,P2))=>human(P2)).
+mother(eileen,trudy).
+
+% ((human(P1),ancestor(P1,P2))=>human(P2)).
+((human(P1),ancestor(P2,P1))=>human(P2)).
 % :- listing([ancestor,human,parent]).
 %=:- wdmsg("press Ctrl-D to resume.").
 %=:- prolog.
 
-grandmother(trudy,douglas).
+% grandmother(douglas,trudy).
 
-mother(trudy,robby).
-mother(trudy,liana).
-mother(liana,matt).
-mother(liana,liz).
-mother(trudy,pam).
+mother(robby,trudy).
+mother(liana,trudy).
+mother(matt,liana).
+mother(liz,liana).
+mother(pam,trudy).
 
 
 %= human(trudy) supports anscesteral rule that her decendants are humans as well .. therefore ..
@@ -124,26 +125,30 @@ mother(trudy,pam).
 
 
 ?- mpred_why(human(douglas)).
+
 /*
 
 
 Justifications for human(douglas):
-    1.1 ancestor(trudy,douglas)
-    1.2 human(trudy)
-    1.3 human(trudy),ancestor(trudy,douglas),{vg(s(douglas))}==>human(douglas)
-    2.1 ancestor(eileen,douglas)
-    2.2 human(eileen)
-    2.3 human(eileen),ancestor(eileen,douglas),{vg(s(douglas))}==>human(douglas)
+    1.1 ancestor(douglas,eileen)
+    1.2 human(eileen)
+    1.3 human(_G45653),ancestor(_G45658,_G45653),{is_unit(_G45658)}==>human(_G45658)
+    2.1 ancestor(douglas,trudy)
+    2.2 human(trudy)
+    2.3 human(_G45616),ancestor(_G45621,_G45616),{is_unit(_G45621)}==>human(_G45621)
 
+*/
 
-:- mpred_why(grandparent(trudy,douglas)).
+:- mpred_why(grandparent(douglas,trudy)).
 
-Justifications for grandparent(trudy,douglas):
-    1.1 grandmother(trudy,douglas)
-    1.2 grandmother(trudy,douglas),{vg(s(douglas,trudy))}==>grandparent(trudy,douglas)
-    2.1 parent(eileen,douglas)
-    2.2 parent(trudy,eileen)
-    2.3 parent(trudy,eilee.),parent(eileen,douglas),{vg(s(douglas,trudy))}==>grandparent(trudy,douglas)
+/*
+
+Justifications for grandparent(douglas,trudy):
+    1.1 parent(douglas,eileen)
+    1.2 parent(eileen,trudy)
+    1.3 parent(_G11217,_G11218),parent(_G11223,_G11217),{is_unit(_G11218,_G11223)}==>grandparent(_G11223,_G11218)
+    2.1 grandmother(douglas,trudy)
+    2.2 grandmother(_G6160,_G6161),{is_unit(_G6161,_G6160)}==>grandparent(_G6160,_G6161)
 
 */
 
@@ -187,26 +192,26 @@ male(skArg1ofFatherFn(trudy)).
 
 %= ensure skolems are made or destroyed
 
-father(robert,eileen).
+father(eileen,robert).
 
-:- sanity(\+ baseKB:father(skArg1ofFatherFn(eileen), eileen) ).
+:- sanity(\+ baseKB:father( eileen, skArg2ofFather_1Fn(eileen))).
 
 siblings(douglas,cassiopea).
-father(douglas,sophiaWebb).
-father(douglas,skylar).
-father(douglas,sophiaWisdom).
-father(douglas,zaltana).
+father(sophiaWebb,douglas).
+father(skylar,douglas).
+father(sophiaWisdom,douglas).
+father(zaltana,douglas).
 
 :- must_is_entailed(human(douglas)).
 
 :- mpred_why(human(douglas)).
 
-:- mpred_why(grandparent(trudy,douglas)).
+:- mpred_why(grandparent(douglas,robert)).
 
 % :- mpred_trace_exec.
-:- show_test((mother(Female,Who))).
+:- show_test((mother(Who,Female))).
 
-:- show_test(father(Male,Who)).
+:- show_test(father(Who,Male)).
 
 % :- show_test((male(Who))).
 
@@ -216,6 +221,9 @@ father(douglas,zaltana).
 
 %= human(P) => (female(P) v male(P)).
 if(gendered_human(P), (female(P) v male(P))).
+
+
+
 
 
 

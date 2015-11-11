@@ -38,15 +38,17 @@
 
 */
 
-% swipl -g "ensure_loaded(pack(logicmoo_base/t/examples/csp/'einstein.pfc'))."
+% swipl -g "ensure_loaded(pack(logicmoo_base/t/examples/csp/'einstein_simpler.pfc'))."
 
 :- use_module(library(logicmoo_user)).
+
+:- file_begin(pfc).
 
 :- op(600,xfy, (/\)).
 :- op(0,xfx,'=>').
 :- op(1150,xfy,'=>').
 
-:- file_begin(pfc).
+never_assert_u(boxlog((lives(A, _):-neighbor(A, _))),singletons).
 
 % add this to our vocab
 props((/\),ftSentenceOp,tLogicalConjunction).
@@ -56,9 +58,6 @@ props((/\),ftSentenceOp,tLogicalConjunction).
 %= There are five houses in a row.
 exists(H1,exists(H2,exists(H3,exists(H4,exists(H5,
   leftof(H1, H2) /\ leftof(H2, H3) /\ leftof(H3, H4) /\ leftof(H4, H5)))))).
-
-% forward chain these into houses
-leftof(HA, HB) ==> (house(HA) , house(HB)).
 
 %= In each house lives a person with a unique nationality.
 % we write this in SUMO
@@ -77,12 +76,20 @@ meta_argtypes(smokes(person,brand)).
 meta_argtypes(drinks(person,beverage)).
 meta_argtypes(leftof(house,house)).
 
-position(P1,I1) /\ lives(P1,H1) /\ leftof(H1,H2) /\ { plus(I1 1, I2) } /\ position(P2,I2) /\ lives(P2,H2).
+exists([P1,I1,I2,P2,H1,H2],
+  ((position(P1,I1) /\ lives(P1,H1) /\ leftof(H1,H2) /\ ({plus(I1, 1, I2)}) /\ position(P2,I2) /\ lives(P2,H2)))).
 
 % Other facts:
 % 
 %= 1. The Brit lives in the red house. 
 lives(englishman, red).
+
+:- break.
+
+% forward chain these into houses
+leftof(HA, HB) ==> (house(HA) , house(HB)).
+
+:- break.
 
 %= 2. The Swede keeps dogs as pets. 
 pet(swede, dogs).

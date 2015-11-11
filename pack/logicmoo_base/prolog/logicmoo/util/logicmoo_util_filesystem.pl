@@ -329,8 +329,9 @@ enumerate_files1(Atom,Result):- atomic(Atom),once((member(Sep,['/**/','/**','**'
 %
 % Expand File Name Safely Paying Attention To Corner Cases.
 %
-expand_file_name_safe(I,O):-catch(expand_file_name(I,O),_,fail),O\=[],!.
-expand_file_name_safe(I,[O]):-catch(expand_file_search_path(I,O),_,fail),!.
+expand_file_name_safe(I,O):-var(I),trace_or_throw(expand_file_name_safe(I,O)),!.
+expand_file_name_safe(I,O):- \+ compound(I), catch(expand_file_name(I,O),_,fail),O\=[],!.
+expand_file_name_safe(I,[O]):- catch(expand_file_search_path(I,O),_,fail),!.
 expand_file_name_safe(I,L):- 
   findall(O,
     (absolute_file_name(I,O,[expand(true),solutions(all)]);absolute_file_name(I,O,[expand(true),solutions(all),file_type(directory)])),

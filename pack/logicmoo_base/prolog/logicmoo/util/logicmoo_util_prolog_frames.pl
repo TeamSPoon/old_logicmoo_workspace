@@ -112,7 +112,7 @@ relative_frame(Attrib,Term,Nth):- find_parent_frame_attribute(Attrib,Term,Nth,_R
 %
 % Parent Goal.
 %
-parent_goal(Goal):-  prolog_current_frame(Frame),prolog_frame_attribute(Frame,parent,PFrame),prolog_frame_attribute(PFrame,parent_goal,Goal).
+parent_goal(Goal):-  hotrace((prolog_current_frame(Frame),prolog_frame_attribute(Frame,parent,PFrame),prolog_frame_attribute(PFrame,parent_goal,Goal))).
 
 %= 	 	 
 
@@ -130,8 +130,8 @@ parent_goal(Goal,Nth):-  find_parent_frame_attribute(goal,Goal,Nth,_RealNth,_Fra
 %
 % Nth Parent Goal.
 %
-nth_parent_goal(Frame,Goal,Nth):- Nth>0, Nth2 is Nth-1, prolog_frame_attribute(Frame,parent,PFrame),!,nth_parent_goal(PFrame,Goal,Nth2).
-nth_parent_goal(Frame,Goal,_):- prolog_frame_attribute(Frame,goal,Goal),!.
+nth_parent_goal(Frame,Goal,Nth):- Nth>0, Nth2 is Nth-1, prolog_frame_attribute(Frame,parent,PFrame),!,notrace((nth_parent_goal(PFrame,Goal,Nth2))).
+nth_parent_goal(Frame,Goal,_):- notrace((prolog_frame_attribute(Frame,goal,Goal))),!.
 
 :- export(find_parent_frame_attribute/5).
 
@@ -176,7 +176,7 @@ current_frames(Frame,Attrib,0,NextList):- current_next_frames(Attrib,1,Frame,Nex
 %
 % Current Next Frames.
 %
-current_next_frames(Attrib,Nth,Frame,[Nth-Frame-Term|NextList]):- prolog_frame_match(Frame,Attrib,Term), !,
+current_next_frames(Attrib,Nth,Frame,[Nth-Frame-Term|NextList]):- notrace((prolog_frame_match(Frame,Attrib,Term))), !,
    (prolog_frame_attribute(Frame,parent,ParentFrame) -> 
     ( Nth2 is Nth+1, current_next_frames(Attrib,Nth2, ParentFrame,NextList));
          NextList=[]).

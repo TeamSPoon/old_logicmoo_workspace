@@ -665,7 +665,7 @@ show_source_location.
 %
 % Converted To Clause No Module.
 %
-as_clause_no_m( MHB,  H, B):- strip_module(MHB,_M,HB), as_clause( HB,  MH, MB),strip_module(MH,_M2H,H),strip_module(MB,_M2B,B).
+as_clause_no_m( MHB,  H, B):- strip_module(MHB,_M,HB), expand_to_hb( HB,  MH, MB),strip_module(MH,_M2H,H),strip_module(MB,_M2B,B).
 
 %= 	 	 
 
@@ -681,7 +681,7 @@ as_clause_w_m(MHB, M, H, B):-  as_clause_w_m(MHB, M1H, H, B, M2B), (M1H==user->M
 %
 % Converted To Clause W Module.
 %
-as_clause_w_m(MHB, M1H, H, B, M2B):-  as_clause( MHB,  MH, MB),strip_module(MH,M1H,H),strip_module(MB,M2B,B).
+as_clause_w_m(MHB, M1H, H, B, M2B):-  expand_to_hb( MHB,  MH, MB),strip_module(MH,M1H,H),strip_module(MB,M2B,B).
 
 :- export(is_ftCompound/1).
 

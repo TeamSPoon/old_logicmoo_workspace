@@ -37,21 +37,32 @@ show_test(G):- cwc, get_user_abox(KB),printAll(must(KB:G)).
 %= ````
 %= logic tests...
 %= ````
-%:- debug(mpred).
+:- debug(mpred).
+:- debug(mpred(_)).
 
 %= trudy is human
 human(trudy).
 human(eileen).
 human(douglas).
-mother(trudy,eileen).
-mother(eileen,douglas).
+mother(eileen,trudy).
+mother(douglas,eileen).
 
 %= catch a regression bug that may couse trudy to lose human assertion
 never_retract_u(human(trudy)).
+never_assert_u(mother(trudy,_)).
+never_assert_u(mother(trudy,das)).
 
-forall(c,exists([m,f], if(human(c), (mother(m,c) & father(f,c))))).
 
-:- must(\+ mother(skArg1ofMotherFn(_),eileen)).
+never_assert_u(father(_,_)).
+never_retract_u(father(_,_)).
+
+:- mpred_trace_exec.
+
+forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f))))).
+
+:- must(clif(forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f))))))).
+
+:- must(\+ mother(eileen,skArg1ofMother_1Fn(_))).
 
 :- printAll(must(father(_,_))).
 :- printAll(must(mother(_,_))).

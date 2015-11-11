@@ -22,7 +22,7 @@ expand_var_functors(T,VFE,Outer,In,Out):-
       ((Name=VFE,Args=[JustOne] )-> (expand_var_functors(T,VFE,VFE,JustOne,VOut),((nonvar(VOut),functor(VOut,T,_))->Out=VOut;Out=..[VFE,VOut]));
       ( maplist(expand_var_functors(T,VFE,Name),Args,ArgsO),
       ((Name\='[|]',Outer=VFE,atom_codes(Name,[C|_]),code_type(C,prolog_var_start),
-         nb_getval('$variable_names', Vs),(member(Name=Var,Vs)->true;b_setval('$variable_names', [Name=Var|Vs])))
+         nb_getval('$variable_names', Vs),(member(Name=Var,Vs)->true;put_variable_names( [Name=Var|Vs])))
            -> Out=..[T,Var|ArgsO];  (Args==ArgsO->(Out=In);compound_name_arguments(Out,Name,ArgsO))))))).
 
 
@@ -64,7 +64,7 @@ expand_var_functors(T,VFE,Outer,In,Out):-
       ((Name=VFE,Args=[JustOne] )-> (expand_var_functors(T,VFE,VFE,JustOne,VOut),(functor(VOut,t,_)->Out=VOut;Out=..[VFE,VOut]));
       ( maplist(expand_var_functors(T,VFE,Name),Args,ArgsO),
       ((Name\='[|]',Outer=VFE,atom_codes(Name,[C|_]),code_type(C,prolog_var_start),
-         nb_getval('$variable_names', Vs),(member(Name=Var,Vs)->true;b_setval('$variable_names', [Name=Var|Vs])))
+         nb_getval('$variable_names', Vs),(member(Name=Var,Vs)->true;put_variable_names( [Name=Var|Vs])))
            -> Out=..[t,Var|ArgsO];  (Args==ArgsO->(Out=In);compound_name_arguments(Out,Name,ArgsO))))))).
 
 

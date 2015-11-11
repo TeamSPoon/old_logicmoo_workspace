@@ -65,7 +65,7 @@
 :- include('mpred_header.pi').
 
 :- multifile((
-  	user:portray/1,
+              user:portray/1,
   	user:prolog_list_goal/1,
   	user:prolog_predicate_name/2,
   	user:prolog_clause_name/2)).

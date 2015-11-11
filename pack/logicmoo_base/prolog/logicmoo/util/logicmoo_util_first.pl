@@ -3,8 +3,11 @@
           [ 
           safe_numbervars/1,
           safe_numbervars/2,
+          put_variable_names/1,
+          nput_variable_names/1,
+          check_variable_names/2,
 
-                  
+                  unnumbervars4/4,
 user_ensure_loaded/1,
 user_use_module/1,
 alldiscontiguous/0,
@@ -51,6 +54,7 @@ quiet_all_module_predicates_are_transparent/1,
             renumbervars_prev/2,
             renumbervars1/2,
             renumbervars1/4,
+            add_var_to_env/2,
             
             samify/2,
             snumbervars/1,
@@ -123,6 +127,7 @@ quiet_all_module_predicates_are_transparent/1,
         some_location/3,
         term_to_string/2,
         unnumbervars/2,
+        add_var_to_env/2,
    safe_numbervars/1,
    safe_numbervars/2,
         unnumbervars_and_save/2,
@@ -332,16 +337,38 @@ mustvv(G):-must(G).
 % unnumbervars(X,YY):- mustvv(unnumbervars0(X,Y)),!,mustvv(Y=YY).
 
 
+
+
+add_var_to_env(Name,Var):- nb_current('$variable_names',Vs),!,
+  check_variable_names(Vs,VsIn),
+   add_var_to_list(Name,Var,VsIn,NewName,NewVar,NewVs),
+   (NewName\==Name -> put_attr(Var, vn, NewName) ; true),
+   (NewVar \==Var  -> put_attr(NewVar, vn, Name) ; true),
+   (NewVs  \==Vs   -> put_variable_names(NewVs) ; true).
+   
+
+%% add_var_to_list(Name,Var,Vs,NewName,NewVar,NewVs) is det.
+add_var_to_list(Name,Var,Vs,NewName,NewVar,NewVs):- member(N0=V0,Vs), Var==V0,!,
+            (Name==N0 -> ( NewName=Name,NewVar=Var, NewVs=Vs ) ;  ( NewName=N0,NewVar=Var,NewVs=[Name=Var|Vs])),!.
+add_var_to_list(Name,Var,Vs,NewName,NewVar,NewVs):- member(Name=_,Vs),
+              gensym(Name,NameAgain),\+ member(NameAgain=_,Vs),
+              NewName=NameAgain,NewVar=Var, NewVs=[NameAgain=Var|Vs],!.
+add_var_to_list(Name,Var,Vs,NewName,NewVar,NewVs):-  NewName=Name,NewVar=Var,NewVs=[Name=Var|Vs],!.
+
+
 %= 	 	 
 
 %% unnumbervars( ?X, ?Y) is semidet.
 %
 % Unnumbervars.
 %
-unnumbervars(X,Y):-
-   with_output_to(string(A),write_term(X,[numbervars(true),character_escapes(true),ignore_ops(true),quoted(true)])),
-   mustvv(atom_to_term(A,Y,_)),!.
+unnumbervars(X,Y):- unnumbervars_and_save(X,Y).
 
+
+put_variable_names(NewVs):- check_variable_names(NewVs,Checked),call(b_setval,'$variable_names',Checked).
+nput_variable_names(NewVs):- check_variable_names(NewVs,Checked),call(nb_setval,'$variable_names',Checked).
+
+check_variable_names(I,O):- \+ member(free=_,I) -> O=I ; trace_or_throw(bad_check_variable_names(I)).
 
 %= 	 	 
 
@@ -349,13 +376,30 @@ unnumbervars(X,Y):-
 %
 % Unnumbervars And Save.
 %
-unnumbervars_and_save(X,YO):- % trace_or_throw(unnumbervars_and_save(X,YO)),
+% unnumbervars_and_save(X,YO):- \+ ((sub_term(V,X),compound(V),'$VAR'(_)=V)),!,YO=X.
+unnumbervars_and_save(X,YO):- hotrace(must(unnumbervars4(X,[],_,YO))),!.
+/*
+unnumbervars_and_save(X,YO):- nb_getval('$variable_names',Vs),unnumbervars4(X,Vs,NewVs,YO),!,
+   (NewVs  \==Vs   -> put_variable_names(NewVs) ; true).
+unnumbervars_and_save(X,YO):-
  term_variables(X,TV),
  mustvv((source_variables_l(Vs),
    with_output_to(string(A),write_term(X,[numbervars(true),variable_names(Vs),character_escapes(true),ignore_ops(true),quoted(true)])))),
-   mustvv(atom_to_term(A,Y,NewVars)),
-   (NewVars==[]-> YO=X ; (length(TV,TVL),length(NewVars,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (add_newvars(NewVars),YO=Y)))).
+   mustvv(atom_to_term(A,Y,NewVs)),
+   (NewVs==[]-> YO=X ; (length(TV,TVL),length(NewVs,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (add_newvars(NewVs),YO=Y)))).
+*/
 
+%% unnumbervars4(TermIn,VsIn,NewVs,TermOut) is det.
+%
+% Unnumbervars And Save.
+%
+unnumbervars4(Var,Vs,Vs,Var):- \+ compound(Var),!.
+unnumbervars4([I|TermIn],VsIn,NewVs,[O|TermOut]):- !,unnumbervars4(I,VsIn,VsM,O),unnumbervars4(TermIn,VsM,NewVs,TermOut).
+unnumbervars4('$VAR'(Name),VsIn,NewVs,Var):- nonvar(Name),!, (member(Name=Var,VsIn)->NewVs=VsIn;NewVs=[Name=Var|VsIn]),!,put_attr(Var,vn,Name).
+unnumbervars4(PTermIn,VsIn,NewVs,PTermOut):- PTermIn=..[F|TermIn],unnumbervars4(TermIn,VsIn,NewVs,TermOut),PTermOut=..[F|TermOut].
+   
+
+ 
 
 /*
 
@@ -363,8 +407,8 @@ unnumbervars_and_save(X,YO):-
  term_variables(X,TV),
  mustvv((source_variables_l(Vs),
    with_output_to(string(A),write_term(X,[numbervars(true),variable_names(Vs),character_escapes(true),ignore_ops(true),quoted(true)])))),
-   mustvv(atom_to_term(A,Y,NewVars)),
-   (NewVars==[]-> YO=X ; (length(TV,TVL),length(NewVars,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (trace,add_newvars(NewVars),Y=X)))).
+   mustvv(atom_to_term(A,Y,NewVs)),
+   (NewVs==[]-> YO=X ; (length(TV,TVL),length(NewVs,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (trace,add_newvars(NewVs),Y=X)))).
 
 
 :- export(unnumbervars_and_save/2).
@@ -412,8 +456,8 @@ unnumbervars_and_copy(X,YO):-
  term_variables(X,TV),
  mustvv((source_variables(Vs),
    with_output_to(string(A),write_term(X,[numbervars(true),variable_names(Vs),character_escapes(true),ignore_ops(true),quoted(true)])))),
-   mustvv(atom_to_term(A,Y,NewVars)),
-   (NewVars==[]-> YO=X ; (length(TV,TVL),length(NewVars,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (trace,add_newvars(NewVars),Y=X)))).
+   mustvv(atom_to_term(A,Y,NewVs)),
+   (NewVs==[]-> YO=X ; (length(TV,TVL),length(NewVs,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (trace,add_newvars(NewVs),Y=X)))).
 */
 
 %add_newvars(_):-!.
@@ -425,7 +469,7 @@ unnumbervars_and_copy(X,YO):-
 % Add Newvars.
 %
 add_newvars(Vs):- (var(Vs);Vs=[]),!.
-add_newvars([N=V|Vs]):- add_newvar(N,V),!,add_newvars(Vs).
+add_newvars([N=V|Vs]):- add_newvar(N,V), (var(V)->put_attr(V,vn,N);true), !,add_newvars(Vs).
 
 
 

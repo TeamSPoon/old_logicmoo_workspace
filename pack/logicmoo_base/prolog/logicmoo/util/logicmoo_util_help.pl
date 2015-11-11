@@ -556,14 +556,17 @@ autodoc_output_path(File,PlDocFile):-
 %
 % Autodoc File.
 %
-autodoc_file(File):- var(File),scan_for_varnames,!,no_repeats(varname_cache:varname_info_file(File)),autodoc_file(File).
+autodoc_file(File):- var(File),!,no_repeats(varname_cache:varname_info_file(File)),autodoc_file(File).
 autodoc_file(*):-!, autodoc_files.
 autodoc_file(module(M)):- !,autodoc_module(M).
 autodoc_file(File):- ( \+ atom(File) ; \+ exists_file(File) ), !,
    forall(must(filematch(File,E)),autodoc_file(E)).
 
 
+
 autodoc_file(File):- 
+  scan_for_varnames,
+  use_listing_vars,
   setup_call_cleanup(
    tell(user_error),
   (( show_call(_,autodoc_output_path(File,PlDocFile)),
@@ -756,7 +759,7 @@ autodoc_pred(M,M:P0):-
    
    fixup_doc_args(fixda,P,1,DocAs,DocAsM),
 
-   maplist(ignored_assignment(''),ModeAs),
+   % maplist(ignored_assignment(''),ModeAs),
    
    fixup_doc_args(fixda,P,1,DocAsM,DocAsO),
 
@@ -804,6 +807,7 @@ ignored_assignment(A,B):-ignore(A=B).
 %
 % Fix Document Arguments For Write.
 %
+fix_doc_args_for_write(Var:A,SF):- var(Var),format(atom(SF),' ?~w',[A]).
 fix_doc_args_for_write((*):A,SF):-format(atom(SF),' :Term~w',[A]).
 fix_doc_args_for_write((0):A,SF):-format(atom(SF),' :Goal~w',[A]).
 fix_doc_args_for_write((I):A,SF):-integer(I),format(atom(SF),' :PRED~w~w',[I,A]).
@@ -899,6 +903,7 @@ fixup_doc_args(Pred,P,N,[Doc|As],[ODoc|OAs]):-
 %
 % Fixda.
 %
+
 fixda(P,N,Mode:_,_):- sanity(Mode\==system),fail.
 fixda(P,N,Mode:Name,ModeO:NameO):-compound(Mode),functor(Mode,_,A),arg(A,Mode,NMode),!,fixda(P,N,NMode:Name,ModeO:NameO).
 fixda(P,N,Mode:NameV,ModeO:NameO):-compound(NameV),arg(1,NameV,Name),!,fixda(P,N,Mode:Name,ModeO:NameO).
@@ -924,13 +929,19 @@ fixda2(P,N,Mode:Name,ModeOO:NameOO):-ignore((atom_concat('ARG',N,NameV),'$VAR'(N
 %
 % Pred Mode Converted To Name.
 %
-mode_to_name(P,N,Mode,Name):-var(Mode),var(Name),!,Name='PARAM',name_to_mode(P,N,Name,Mode).
-mode_to_name(P,N,Mode,Name):-var(Mode),nonvar(Name),!,name_to_mode(P,N,Name,Mode).
 mode_to_name(P,N,Mode,Name):-nonvar(Mode),nonvar(Name),!.
+mode_to_name(P,N,Mode,Name):-var(Name),var(Mode),!.
+mode_to_name(P,N,Mode,Name):-var(Mode),nonvar(Name),!,name_to_mode(P,N,Name,Mode).
 mode_to_name(P,N,Mode,Name):-mode_to_name0(Mode,Name),!.
-mode_to_name(P,N,Comp,'LIST'):- is_list(Comp), \+ \+ Comp=[_|_],!.
-mode_to_name(P,N,Comp,'TERM'):- compound(Comp).
-mode_to_name(P,N,I, Name):- number(N),atom_concat('PRED',N,Name).
+mode_to_name(P,N,Mode,Name):-nonvar(Mode),value_to_name(P,N,Mode,Name),!.
+
+value_to_name(P,N,Comp,'VAR'):- var(Comp),!.
+value_to_name(P,N,Comp,Comp):- atom(Comp),atom_length(Comp,L),L>1, \+ bad_varnamez(Comp),!.
+value_to_name(P,N,Comp,NAME):- text_to_string_safe(Comp,Str),string_to_atom(Str,Atom),atom_length(Atom,L),L>1,\+ bad_varnamez(Atom),NAME=Atom.
+value_to_name(P,N,Comp,'LIST'):- is_list(Comp), \+ \+ Comp=[_|_],!.
+value_to_name(P,N,Comp,'ATOM'):- atom(Comp),!.
+value_to_name(P,N,Comp,'STRING'):- string(Comp),!.
+value_to_name(P,N,Comp,'TERM'):- compound(Comp).
 
 %= 	 	 
 
@@ -944,7 +955,9 @@ mode_to_name0(:,'CALL').
 mode_to_name0(+,'OUT').
 mode_to_name0(?,'UPARAM').
 mode_to_name0(-,'IN').
-mode_to_name0(_,'VALUE').
+mode_to_name0(I,Name):- number(I),atom_concat('PRED',I,Name).
+
+% mode_to_name0(_,'VALUE').
 
 %= 	 	 
 

@@ -924,7 +924,7 @@ leave_as_is((_/_)):-!,fail.
 leave_as_is([_|_]):-!,fail.
 leave_as_is(not(_)):-!,fail.
 leave_as_is(~_):-!,fail.
-leave_as_is(V):-leave_as_is_db(V),!.
+leave_as_is(V):-loop_check(leave_as_is_db(V)),!.
 
 
 
@@ -946,7 +946,7 @@ leave_as_is_db(ct(_,_)).
 leave_as_is_db(ignore(_)).
 leave_as_is_db(isa(_,_)).
 leave_as_is_db(P):-prequent(P).
-leave_as_is_db(C):-get_functor(C,F),leave_as_is_functor(F).
+leave_as_is_db(C):-get_functor(C,F),loop_check(leave_as_is_functor(F)).
 
 
 
@@ -964,8 +964,8 @@ leave_as_is_functor('kbMark').
 leave_as_is_functor('z_unused').
 leave_as_is_functor('genlMt').
 leave_as_is_functor('{}').
-leave_as_is_functor(F):-a(argsQuoted,F).
-leave_as_is_functor(F):-a(ptReformulatorDirectivePredicate,F).
+leave_as_is_functor(F):-loop_check(a(argsQuoted,F)).
+leave_as_is_functor(F):-loop_check(a(ptReformulatorDirectivePredicate,F)).
 
 
 %= 	 	 
@@ -980,6 +980,7 @@ prequent(skolem(_,_)).
 prequent(different(_,_)).
 prequent(argInst(_,_,_)).
 prequent(G):-functor(G,call_builtin,_).
+prequent(G):-functor(G,req,_).
 prequent(G):-functor(G,not_call_builtin,_).
 
 
@@ -1028,6 +1029,7 @@ is_gaf(Gaf):-when(nonvar(Gaf), \+ (is_kif_rule(Gaf))).
 %
 is_kif_rule(Var):- is_ftVar(Var),!,fail.
 is_kif_rule(R):- kif_hook(R),!.
+is_kif_rule(R):- is_clif(R),!.
 
 
 %= %= :- was_export(term_slots/2).
@@ -1126,10 +1128,10 @@ is_function(_,'aNARTFn',_):- !,fail.
 is_function(_,'CollectionSubsetFn',_).
 is_function(_,'aCollectionSubsetFn',_).
 is_function(_,F,_):- atom_concat('sk',_Was,F),!,fail.
-is_function(P,_,_):- leave_as_is(P),!,fail.
-is_function(_,F,_):- is_log_op(F),!,fail.
+is_function(P,_,_):- loop_check(leave_as_is(P)),!,fail.
+is_function(_,F,_):- loop_check(is_log_op(F)),!,fail.
 is_function(_,F,_):- atom_concat(_Was,'Fn',F).
-is_function(_,F,_):- a(tFunction,F).
+is_function(_,F,_):- loop_check(a(tFunction,F)).
 % is_function(_,F,A):- A2 is A+1, current_predicate(F/A2), \+ current_predicate(F/A).
 
 %:- ain(isa(I,C)<=(ttPredType(C),lmconf:isa(I,C))).

@@ -51,7 +51,6 @@ fix_ops_for(CM):-
 
 :- fix_ops_for(user).
 
-:- prolog_ide(debug_monitor).
 
 /*
 :- set_prolog_flag(report_error,true).
@@ -66,8 +65,8 @@ fix_ops_for(CM):-
 */
 
 :- ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
-:- system:initialization(mpred_www:ensure_webserver(3040)).
-:- mpred_www:ensure_webserver(3040).
+:- system:initialization(mpred_www:ensure_webserver(3020)).
+:- mpred_www:ensure_webserver(3020).
 
 :- baseKB:use_module(baseKB:logicmoo/logicmoo_snark).
 
@@ -75,9 +74,10 @@ fix_ops_for(CM):-
 :- logicmoo_user_base:user_module_uses(M,CM),!,fix_ops_for(M),fix_ops_for(CM),dmsg(user_module_uses(M,CM)).
 :- system:((logicmoo_user_base:user_module_uses(M,CM)->(('$module'(_,M),'$set_source_module'(_,CM)));true)).
 
-:-  use_listing_vars.
 :- nop((autoload,scan_for_varnames)).
 
 :- sanity( \+predicate_property(baseKB:_,exported)).
 
+:- use_module(library(eggdrop)).
+:- egg_go.
 

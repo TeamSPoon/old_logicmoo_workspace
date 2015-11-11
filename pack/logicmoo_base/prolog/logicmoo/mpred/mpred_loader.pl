@@ -51,7 +51,6 @@
             convert_side_effect/3,
             convert_side_effect_buggy/2,
             current_context_module/1,
-            current_op_alias/2,
             % cwc/0,
             decache_file_type/1,
             mpred_process_input_1/1,
@@ -674,7 +673,7 @@ show_load_context:-
 %
 add_term(end_of_file,_):-!.
 add_term(Term,Vs):- 
-   b_setval('$variable_names', Vs),
+   put_variable_names( Vs),
     add_from_file(Term).
 
 
@@ -1383,9 +1382,11 @@ get_user_sbox(T):-get_user_abox(M),to_sbox(M,T).
 %
 % Get User Abox.
 %
-get_user_abox(Ctx):- (t_l:user_abox(Out)),ignore(show_failure(Out\=user)),!,must(Ctx=Out).
-get_user_abox(Ctx):- current_context_module(Out),ignore(show_failure(Out\=user)),!,must(Ctx=Out),set_user_abox(Ctx).
+get_user_abox(Ctx):- (t_l:user_abox(Out)),user_m_check(Out),!,must(Ctx=Out).
+get_user_abox(Ctx):- current_context_module(Out),user_m_check(Out),!,must(Ctx=Out),set_user_abox(Ctx).
 
+
+user_m_check(_Out).
 
 %= 	 	 
 
@@ -1393,7 +1394,7 @@ get_user_abox(Ctx):- current_context_module(Out),ignore(show_failure(Out\=user))
 %
 % Set User Abox.
 %
-set_user_abox(M):- ignore(show_failure(M\=user)), (t_l:user_abox(Prev)->true;Prev=M),
+set_user_abox(M):- user_m_check(M), (t_l:user_abox(Prev)->true;Prev=M),
    decl_user_abox(M),assert_until_eof(t_l:user_abox(M)),onEndOfFile(reset_user_abox(Prev)),!.
 
 
@@ -1628,11 +1629,14 @@ import_to_user(P):- '$module'(MM,MM),'$set_source_module'(SM,SM),must(import_to_
 %
 import_to_user0(user,user,M:FA):- must(M\==user),!, call_from_module(M,import_to_user(M:FA)).
 import_to_user0(M,SM, user:FA):- M\==SM,dmsg(warn(import_to_user0(M,SM, user:FA))),fail.
-import_to_user0(_MM,_SM,M:F/A):-!,functor(P,F,A),
-   U=logicmoo_user,
-   user:catch(mpred_op_prolog(pain,((U:P:- user:loop_check_nr(M:P)))),E,dmsg(import_shared_pred(U:F/A:-M:F/A)=E)),
+import_to_user0(_MM,_SM,M:F/A):- functor(P,F,A),
+ U=logicmoo_user,
+ Rule = ((U:P:- user:loop_check_nr(M:P))),
+ (clause_asserted(Rule)-> true; 
+  ((
+   user:catch(mpred_op_prolog(pain,Rule),E,dmsg(import_shared_pred(U:F/A:-M:F/A)=E)),
    user:export(U:F/A),
-   catch(user:import(U:F/A),_,true),user:import(U:F/A).
+   catch(user:import(U:F/A),_,true)))).
 import_to_user0(MM,SM,M:P):-!,functor(P,F,A),import_to_user0(MM,SM,M:F/A).
 import_to_user0(MM,SM,P):- t_l:user_abox(M),import_to_user0(MM,SM,M:P).
 
@@ -2278,8 +2282,8 @@ mpred_process_input_1(T):-try_save_vars(T),ain(T),!.
 %
 % Managed Predicate Process Input.
 %
-mpred_process_input(':-'(T),Vs):- b_setval('$variable_names', Vs),must(T),!.
-mpred_process_input(T,Vs):- expand_term(T,TT),b_setval('$variable_names', Vs),mpred_process_input_1(TT),!.
+mpred_process_input(':-'(T),Vs):- put_variable_names( Vs),must(T),!.
+mpred_process_input(T,Vs):- expand_term(T,TT),put_variable_names( Vs),mpred_process_input_1(TT),!.
 
 
 %= 	 	 
@@ -2318,7 +2322,7 @@ process_this_script0(S):- peek_code(S,W),member(W,`\n`),get_code(S,P),put(P),!,p
 process_this_script0(S):- peek_code(S,W),member(W,` \t\r`),get_code(S,_),!,process_this_script0(S).
 process_this_script0(S):- peek_string(S,2,W),W="%=",!,read_line_to_string(S,String),format('~N~s~n',[String]).
 process_this_script0(S):- peek_string(S,1,W),W="%",!,read_line_to_string(S,_String).
-process_this_script0(S):- read_term(S,T,[variable_names(Vs)]),b_setval('$variable_names', Vs),format('~N~n',[]),portray_one_line(T),format('~N~n',[]),!,
+process_this_script0(S):- read_term(S,T,[variable_names(Vs)]),put_variable_names( Vs),format('~N~n',[]),portray_one_line(T),format('~N~n',[]),!,
   must(mpred_process_input(T,Vs)).
 
 
@@ -2595,8 +2599,8 @@ use_was_isa(G,I,C):-call((current_predicate(_,_:mpred_types_loaded/0),if_defined
 %
 % Current Context Module.
 %
-current_context_module(Ctx):-lmconf:loading_module(Ctx),!.
-current_context_module(Ctx):-source_context_module(Ctx).
+current_context_module(Ctx):-notrace((lmconf:loading_module(Ctx))),!.
+current_context_module(Ctx):-notrace((source_context_module(Ctx))).
 
 % ========================================
 % register_module_type/end_module_type
@@ -2897,7 +2901,7 @@ is_kif_string(String):-atomic(String),name(String,Codes), memberchk(40,Codes),me
 %
 % Convert If Knowledge Interchange Format String.
 %
-convert_if_kif_string(I,Wff,Vs,O):-is_kif_string(I),must_det_l((input_to_forms(atom(I),Wff,Vs),b_setval('$variable_names',Vs),!,must((sexpr_sterm_to_pterm(Wff,O),!,\+ is_list(O))))).
+convert_if_kif_string(I,Wff,Vs,O):-is_kif_string(I),must_det_l((input_to_forms(atom(I),Wff,Vs),put_variable_names(Vs),!,must((sexpr_sterm_to_pterm(Wff,O),!,\+ is_list(O))))).
 
 
 %= 	 	 

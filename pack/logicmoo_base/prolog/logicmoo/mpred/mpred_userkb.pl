@@ -30,7 +30,6 @@
 % Base Knowledge Base Predicate List.
 %
 base_kb_pred_list([
-% current_op_alias/2,
 % prolog_load_file_loop_checked/2,
  (::::)/2,
  (<-)/2,

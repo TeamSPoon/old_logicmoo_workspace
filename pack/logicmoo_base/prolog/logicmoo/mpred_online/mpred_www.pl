@@ -1518,7 +1518,7 @@ url_encode_term(InTerm,_VsIn,URL):- fail, with_output_to(atom(IRI),portray_claus
 url_encode_term(InTerm,VsIn,URL):-
   nb_current('$variable_names',Prev),
   name_the_var(40,Prev,VsIn,_NewVs,Added),
-  % (NewVs\==Prev ->  show_call(why,b_setval('$variable_names',NewVs)) ; true),
+  % (NewVs\==Prev ->  show_call(why,put_variable_names(NewVs)) ; true),
   with_output_to(atom(IRI),write_term('#$'(InTerm:Added),[quoted(true),variable_names(Added),quoted,priority(9)])),
   url_iri(URL,IRI),!.
 
@@ -1583,7 +1583,7 @@ url_decode_term(A,T):-
     merge_key_vals(B,Vs2,Merge),
     nb_current('$variable_names',Env),
     merge_key_vals(Env,Merge,New),
-    b_setval('$variable_names',New),!.
+    put_variable_names(New),!.
 
 
 

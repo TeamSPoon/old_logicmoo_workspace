@@ -282,7 +282,7 @@
    show_failure(+,0),
    show_success(+,0),
 
-   show_call(:),
+   show_call(0),
    show_entry(0),
    show_failure(0),
    show_success(0),
@@ -2412,7 +2412,7 @@ show_call(Why,Goal):- show_success(Why,Goal)*->true;(dmsg(show_failure(Why,Goal)
 %
 % Show Call.
 %
-show_call(Why:Goal):- show_call(Why,Why:Goal).
+show_call(Goal):- strip_module(Goal,Why,_),show_call(Why,Goal).
 
 %= :- meta_predicate  show_failure(+,0).
 

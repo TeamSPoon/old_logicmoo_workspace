@@ -91,7 +91,6 @@
             expand_goal_correct_argIsa/2,
             expand_props/3,
             expand_props/4,
-            expand_to_hb/3,
             expanded_different/2,
             expanded_different_1/2,
             expanded_different_ic/2,
@@ -343,15 +342,6 @@ functor_declares_collectiontype(typeProps,ttTemporalType).
 %
 instTypePropsToType(instTypeProps,ttSpatialType).
 
-%= 	 	 
-
-%% expand_to_hb( ?HH, ?HH, ?BB) is semidet.
-%
-% Expand Converted To Head+body.
-%
-expand_to_hb((HH:-BB),HH,BB):-!.
-expand_to_hb(HH,HH,true).
-
 
 %= 	 	 
 
@@ -455,13 +445,6 @@ same_terms(A,M:B):-atom(M),!,same_terms(A,B).
 
 :- export(fully_expand/3).
 
-%= 	 	 
-
-%% fully_expand( ?Op, ?Sent, ?SentO) is semidet.
-%
-% Fully Expand.
-%
-fully_expand(Op,Sent,SentO):- hotrace((cyclic_break((Sent)), /* cnotrace */ (fully_expand0(Op,Sent,SentO)),cyclic_break((SentO)))),!.
 
 :- export(fully_expand/2).
 
@@ -475,6 +458,14 @@ fully_expand(X,Y):-fully_expand(_,X,Y).
 
 %:- mpred_trace_nochilds(fully_expand/3).
 
+
+%= 	 	 
+
+%% fully_expand( ?Op, ?Sent, ?SentO) is semidet.
+%
+% Fully Expand.
+%
+fully_expand(Op,Sent,SentO):- hotrace((cyclic_break((Sent)), with_no_kif_var_coroutines(((fully_expand0(Op,Sent,SentO)),cyclic_break((SentO)))))),!.
 
 
 %= 	 	 
@@ -560,7 +551,7 @@ fully_expand_goal(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,transitive_lc(db
 %
 % Converted To If Is A Term.
 %
-as_is_term(NC):-hotrace(as_is_term0(NC)).
+as_is_term(NC):- notrace(as_is_term0(NC)).
 :- export(as_is_term0/1).
 
 %= 	 	 
@@ -1044,7 +1035,7 @@ db_expand_5(_Op,Sent,SentO):-once(subst(Sent,mpred_isa,isa,SentO)).
 % db_expand_5(_Op,Sent,SentO):-once(to_predicate_isas(Sent,SentO)).
 db_expand_5(Op,{Sent},{SentO}):-!, fully_expand_goal(Op,Sent,SentO).
 db_expand_5(_ ,NC,NC):- as_is_term(NC),!.
-db_expand_5(_,A,A):-unnumbervars(A,U),A\=@=U.
+% db_expand_5(_,A,A):-unnumbervars(A,U),A\=@=U.
 db_expand_5(Op,Sent,SentO):-current_predicate(correctArgsIsa/3),arg(2,Sent,Arg),is_ftNonvar(Arg),get_functor(Sent,F),asserted_argIsa_known(F,2,_),!,
   correctArgsIsa(Op,Sent,SentO),!.
 db_expand_5(_,A,B):-lmconf:pfcManageHybrids,!,A=B.
@@ -1343,7 +1334,7 @@ into_mpred_form(t(P,A),O):-atomic(P),!,O=..[P,A].
 into_mpred_form(t(P,A,B),O):-atomic(P),!,O=..[P,A,B].
 into_mpred_form(t(P,A,B,C),O):-atomic(P),!,O=..[P,A,B,C].
 into_mpred_form(Var,MPRED):- is_ftVar(Var), trace_or_throw(var_into_mpred_form(Var,MPRED)).
-into_mpred_form(I,O):-loop_check(into_mpred_form_ilc(I,O),O=I). % trace_or_throw(into_mpred_form(I,O))).
+into_mpred_form(I,O):-notrace(loop_check(into_mpred_form_ilc(I,O),O=I)). % trace_or_throw(into_mpred_form(I,O))).
 
 %:- mpred_trace_nochilds(into_mpred_form/2).
 

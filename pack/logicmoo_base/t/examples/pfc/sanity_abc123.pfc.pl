@@ -32,29 +32,30 @@
 */
 
 
-:- was_dynamic(singleValuedInArg/2).
-:- was_dynamic(baseKB:ptReformulatorDirectivePredicate/1).
-
-
 :- op(500,fx,'~').
 :- op(1050,xfx,('==>')).
 :- op(1050,xfx,'<==>').
 :- op(1100,fx,('==>')).
 :- op(1150,xfx,('::::')).
-:- was_dynamic(tCol/1).
 
-:- dmsg(begin_abc).
+:- use_module(library(logicmoo_user)).
+
+:- dmsg(begin_abc123).
               
 :- file_begin(pfc).
+
+:- dynamic(tCol/1).
+:- dynamic(singleValuedInArg/2).
+:- dynamic(baseKB:ptReformulatorDirectivePredicate/1).
+
 :- mpred_trace_exec.
 :- mpred_watch.
 
-% :- if(if_defined(lmconf:startup_option(datalog,sanity))).
 
 :- abolish(c,0).
 :- abolish(a,1).
 :- abolish(b,1).
-:- was_dynamic((a/1,b/1,c/0)).
+:- dynamic((a/1,b/1,c/0)).
 
 :- mpred_test(ain(a(z))).
 
@@ -66,7 +67,7 @@
 
 :- mpred_test(a(_)).
 
-:- trace.
+
 ~ a(z).
 
 :- mpred_test(  ~(a(_))).
@@ -76,7 +77,7 @@
 
 'Ž'(a).
 
-:- op(666,fx,'¯\_(?)_/¯').
+:- op(666,fx,('¯\\_(?)_/¯')).
 
 :- xlisting(a).
 

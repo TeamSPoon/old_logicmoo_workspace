@@ -76,6 +76,12 @@ Per-Litteral features
             is_unit/0,
             is_unit/3,
             is_unit/4,
+            is_unit/5,
+            is_unit/6,
+            is_unit/7,
+            is_unit/8,
+            is_unit/9,
+            is_unit/10,
             is_units_b/1,
             is_units_h/1,
             make_must_ground/3,
@@ -141,6 +147,12 @@ is_unit(A,B,C):-is_unit(A),is_unit(B),is_unit(C).
 % If Is A Unit.
 %
 is_unit(A,B,C,D):-is_unit(A),is_unit(B),is_unit(C),is_unit(D).
+is_unit(A,B,C,D,E):-is_unit(A,B,C,D),is_unit(E).
+is_unit(A,B,C,D,E,F):-is_unit(A,B,C,D),is_unit(E,F).
+is_unit(A,B,C,D,E,F,G):-is_unit(A,B,C,D),is_unit(E,F,G).
+is_unit(A,B,C,D,E,F,G,H):-is_unit(A,B,C,D),is_unit(E,F,G,H).
+is_unit(A,B,C,D,E,F,G,H,I):-is_unit(A,B,C,D),is_unit(E,F,G,H,I).
+is_unit(A,B,C,D,E,F,G,H,I,J):-is_unit(A,B,C,D),is_unit(E,F,G,H,I,J).
 
 % might trace down when it is not
 % vg(G):-var(G),!,fail.
