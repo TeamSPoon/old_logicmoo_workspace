@@ -77,6 +77,7 @@ read_skolems(TF):- set_prolog_flag(read_attvars,TF).
 %
 system_goal_expansion_sd(T,O):-var(T),!,current_prolog_flag(read_attvars,true),must(expand_to_attvars(T,T,O)),O\=@=T,!,debugm(xform(T --> O)).
 system_goal_expansion_sd(T,_):- \+ compound(T),!,fail.
+system_goal_expansion_sd('varname_info'(_,_,_,_),_):-!,fail.
 system_goal_expansion_sd(M:T,M:I):-compound(T),functor(T,F,A),wrap_shared(F,A,How),safe_wrap(T,How,I).
 system_goal_expansion_sd(T,I):-compound(T),functor(T,F,A),wrap_shared(F,A,How),safe_wrap(T,How,I).
 system_goal_expansion_sd(T,O):-current_prolog_flag(read_attvars,true),must(expand_to_attvars(T,T,O)),O\=@=T,!,debugm(xform(T --> O)).
@@ -84,7 +85,9 @@ system_goal_expansion_sd(T,O):-current_prolog_flag(read_attvars,true),must(expan
 
 system_term_expansion_sd(T,O):- var(T),!,current_prolog_flag(read_attvars,true),must(expand_to_attvars(T,T,O)),O\=@=T,!,debugm(xform(T --> O)).
 system_term_expansion_sd(T,_):- \+ compound(T),!,fail.
+system_term_expansion_sd('varname_info'(_,_,_,_),_):-!,fail.
 system_term_expansion_sd(M:T,M:I):-!,system_term_expansion_sd(T,I).
+system_term_expansion_sd('$was_imported_kb_content$'(I,II),O):-!,serialize_attvars('$was_imported_kb_content$'(I,II),O),!.
 system_term_expansion_sd(T,O):- current_prolog_flag(read_attvars,true),must(expand_to_attvars(T,T,O)),O\=@=T,!,debugm(xform(T --> O)).
 %system_term_expansion_sd(T,T,_):- debugm(sge(T)),fail.
 

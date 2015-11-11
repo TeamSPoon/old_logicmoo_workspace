@@ -31,41 +31,24 @@
 % Douglas Miles
 */
 
-:- use_module(library(logicmoo_user)).
+%  cls ; kill -9 %1 ; swipl -g "ensure_loaded(pack(logicmoo_base/t/examples/base/'sanity_abc.pfc'))."
 
-:- op(500,fx,'~').
-:- op(1050,xfx,('==>')).
-:- op(1050,xfx,'<==>').
-:- op(1100,fx,('==>')).
-:- op(1150,xfx,('::::')).
+
+:- use_module(library(logicmoo_base)).
 
 :- dmsg(begin_abc).
               
 :- file_begin(pfc).
 
-
 :- abolish(a,0).
-:- abolish(c,0).
 :- abolish(b,0).
-:- was_dynamic((a/0,b/0,c/0)).
+:- dynamic((a/0,b/0)).
 
-c.
 
 :- mpred_test(ain(a ==> b)).
-
 a.
 
-:- listing(basePFC:_).
-:- prolog.
-:- mpred_test(ain(a)).
 :- mpred_test(a).
 :- mpred_test(b).
-
-:- prolog.
-% :- endif.
-
-
-
-
 
 
