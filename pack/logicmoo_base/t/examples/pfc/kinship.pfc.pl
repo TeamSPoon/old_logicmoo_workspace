@@ -1,5 +1,8 @@
 % -*-Prolog-*-
 
+% a hybrid knowledge system SHOIQD to integrate the description logic SHOIQ and nonmonotonic rules preserving decidability. We first define the syntax of the integrated knowledge base and then introduce it's semantic based on well founded semantic. Next, we develop a new algorithm to answer queries over the knowledge base.
+%  i keep trying to divide the code between 1) Prolog (pfc), 2) SUMO (snark), 3) CYC (plark) compat, 4) PrologMUD 
+
 :- use_module(library(logicmoo_user)).
 
 :- shared_multifile otherGender/2.

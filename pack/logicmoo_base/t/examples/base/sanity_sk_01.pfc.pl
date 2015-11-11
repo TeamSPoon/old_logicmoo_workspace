@@ -2,6 +2,8 @@
 
 :- module(sanity_ks_two,[]).
 
+% :- use_module(library(logicmoo_user)).
+
 :- use_module(library(logicmoo_utils)).
 :- use_module(library(logicmoo_base)).
 
@@ -15,10 +17,8 @@
 
 :- read_skolems(true).
 
-sk_in(avar([vn='Ex',sk='SKF-666'])).
+my_sk(avar([vn='Ex',sk='SKF-666'])).
 
-sk_in(Ex)==>sk_out(Ex).
-
-:- must((sk_out(Ex),get_attr(Ex,sk,What),What='SKF-666')).
+:- must((my_sk(Ex),get_attr(Ex,sk,What),What='SKF-666')).
 
 
