@@ -303,9 +303,9 @@ was_multifile(PI):- context_module_of_file(CM),with_pfa_group(save_was(multifile
 :-dynamic(was_was:was_was_once/4).
 :-export(was_was:was_was_once/4).
 :-multifile(was_was:was_was_once/4).
-:-dynamic(was_was:skip/2).
-:-export(was_was:skip/2).
-:-multifile(was_was:skip/2).
+:-dynamic(was_was:skip_def/2).
+:-export(was_was:skip_def/2).
+:-multifile(was_was:skip_def/2).
 
 
 %= 	 	 
@@ -315,8 +315,8 @@ was_multifile(PI):- context_module_of_file(CM),with_pfa_group(save_was(multifile
 % Save Was.
 %
 save_was(_,_,_,_).
-save_was(_,_, M, F/A):- was_was:skip(F/A,M),!.
-save_was(export,_, M, F/A):- !,retractall(was_was:was_was_once(F/A,M,_,_)),!,assert_if_new(was_was:skip(F/A,M)),!.
+save_was(_,_, M, F/A):- was_was:skip_def(F/A,M),!.
+save_was(export,_, M, F/A):- !,retractall(was_was:was_was_once(F/A,M,_,_)),!,assert_if_new(was_was:skip_def(F/A,M)),!.
 save_was(module_transparent,_, _, _):- !.
 save_was(_,CM, M, F/A):-  on_x_cont(M:dynamic(F/A)), on_x_cont(CM:dynamic(F/A)), on_x_cont(M:multifile(F/A)), on_x_cont(CM:multifile(F/A)),fail.
 save_was(Was,CM, M, F/A):- !, once(source_location(File,_);File=CM),assert_if_new(was_was:was_was_once(F/A,M,File,Was)),!.

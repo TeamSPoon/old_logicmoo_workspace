@@ -2170,7 +2170,8 @@ with_mpred_trace_exec(P):- w_tl(t_l:mpred_debug_local,w_tl(mpred_is_tracing_exec
 %
 % Managed Predicate Test.
 %
-mpred_test(P):- (mpred_is_silient;compiling),!,sanity(req(P)),!.
+mpred_test(_):- compiling,!.
+mpred_test(P):- \+ mpred_is_tracing_exec,!,sanity(req(P)),!.
 mpred_test(P):- show_call(with_mpred_trace_exec(req(P))),!.
 
 
@@ -3780,19 +3781,25 @@ mpred_call_only_facts(_Why,F):- on_x_rtrace(no_repeats(loop_check(mpred_call_0(F
 %
 mpred_call_0(Var):-is_ftVar(Var),!,mpred_call_with_no_triggers(Var).
 mpred_call_0(U:X):-U==user,!,mpred_call_0(X).
-mpred_call_0(t(A,B)):-(atom(A)->true;no_repeats(arity(A,1))),ABC=..[A,B],mpred_call_0(ABC).
-mpred_call_0(isa(B,A)):-(atom(A)->true;no_repeats(tCol(A))),ABC=..[A,B],mpred_call_0(ABC).
-%mpred_call_0(t(A,B)):-!,(atom(A)->true;no_repeats(arity(A,1))),ABC=..[A,B],mpred_call_0(ABC).
-mpred_call_0(t(A,B,C)):-!,(atom(A)->true;no_repeats(arity(A,2))),ABC=..[A,B,C],mpred_call_0(ABC).
-mpred_call_0(t(A,B,C,D)):-!,(atom(A)->true;no_repeats(arity(A,3))),ABC=..[A,B,C,D],mpred_call_0(ABC).
-mpred_call_0(t(A,B,C,D,E)):-!,(atom(A)->true;no_repeats(arity(A,4))),ABC=..[A,B,C,D,E],mpred_call_0(ABC).
+mpred_call_0(t(A,B)):-(atom(A)->true;(no_repeats(arity(A,1)),atom(A))),ABC=..[A,B],mpred_call_0(ABC).
+mpred_call_0(isa(B,A)):-(atom(A)->true;(no_repeats(tCol(A)),atom(A))),ABC=..[A,B],mpred_call_0(ABC).
+%mpred_call_0(t(A,B)):-!,(atom(A)->true;(no_repeats(arity(A,1)),atom(A))),ABC=..[A,B],mpred_call_0(ABC).
+mpred_call_0(t(A,B,C)):-!,(atom(A)->true;(no_repeats(arity(A,2)),atom(A))),ABC=..[A,B,C],mpred_call_0(ABC).
+mpred_call_0(t(A,B,C,D)):-!,(atom(A)->true;(no_repeats(arity(A,3)),atom(A))),ABC=..[A,B,C,D],mpred_call_0(ABC).
+mpred_call_0(t(A,B,C,D,E)):-!,(atom(A)->true;(no_repeats(arity(A,4)),atom(A))),ABC=..[A,B,C,D,E],mpred_call_0(ABC).
 mpred_call_0((C1,C2)):-!,mpred_call_0(C1),mpred_call_0(C2).
+mpred_call_0((C1;C2)):-!,(mpred_call_0(C1);mpred_call_0(C2)).
+mpred_call_0((C1->C2;C3)):-!,(mpred_call_0(C1)->mpred_call_0(C2);mpred_call_0(C3)).
+mpred_call_0((C1*->C2;C3)):-!,(mpred_call_0(C1)*->mpred_call_0(C2);mpred_call_0(C3)).
+mpred_call_0((C1->C2)):-!,(mpred_call_0(C1)->mpred_call_0(C2)).
+mpred_call_0((C1*->C2)):-!,(mpred_call_0(C1)*->mpred_call_0(C2)).
 mpred_call_0(call(X)):- !, mpred_call_0(X).
 mpred_call_0(\+(X)):- !, \+ mpred_call_0(X).
 mpred_call_0(call_u(X)):- !, mpred_call_0(X).
 mpred_call_0(asserta(X)):- !, aina(X).
 mpred_call_0(assertz(X)):- !, ainz(X).
 mpred_call_0(assert(X)):- !, ain(X).
+mpred_call_0(retract(X)):- !, mpred_rem(X).
 
 mpred_call_0(M:P):-!,sanity(nonvar(P)),functor(P,F,_),mpred_call_1(M,P,F).
 mpred_call_0(G):- strip_module(G,M,P),sanity(nonvar(P)),functor(P,F,_),mpred_call_1(M,P,F).
@@ -6197,12 +6204,12 @@ lmconf:mpred_hook_rescan_files:- forall(pred_head(pred_u0,P),
 
 :- logicmoo_util_shared_dynamic:asserta_if_new((ereq(G):- !, req(G))).
 :- ignore((logicmoo_util_shared_dynamic:retract((ereq(G):- find_and_call(G))),fail)).
-:- logicmoo_util_shared_dynamic:listing(ereq/1).
+% :- logicmoo_util_shared_dynamic:listing(ereq/1).
 
 
 :- source_location(S,_),prolog_load_context(module,M),forall(source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A),M:export(M:F/A))).
 
-%% mpred_pfc_file is semidet.
+%% mpred_pfc_file is det.
 %
 % Managed Predicate Forward Chaining File.
 %

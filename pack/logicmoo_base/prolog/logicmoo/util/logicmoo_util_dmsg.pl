@@ -574,14 +574,8 @@ source_variables_lwv(AllS):-
   nb_linkval('$variable_names', AllS).
 
 
-%= 	 	 
 
-%% export( :PRED1VALUE1) is semidet.
-%
-% Hook To [system:export/1] For Module Logicmoo_util_dmsg.
-% Export.
-%
-export(portray_clause_w_vars/1).
+:- export(portray_clause_w_vars/1).
 
 %= 	 	 
 

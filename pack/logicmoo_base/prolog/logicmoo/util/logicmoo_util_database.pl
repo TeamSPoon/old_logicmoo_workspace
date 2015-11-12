@@ -430,6 +430,7 @@ clausify_attributes(Data,THIS):-
    copy_term(Data,Data0,Extra),   
    (Extra == [] -> THIS = Data ; (hb_to_clause(Data0,attr_bind(Extra),THIS))).
 
+:- meta_predicate attr_bind(0).
 :- module_transparent attr_bind/1.
 attr_bind(G):-must_det_l(G).
 

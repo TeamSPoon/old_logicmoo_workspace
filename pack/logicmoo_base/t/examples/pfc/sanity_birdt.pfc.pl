@@ -30,7 +30,6 @@ tCol(tFly).
 tCol(tCanary).
 tCol(tPenguin).
 
-
 tCol(tBird).
 
 
@@ -45,7 +44,6 @@ genls(tPenguin,tBird).
 tPenguin(iChilly).
 
 :- mpred_test((tBird(iChilly))).
-
 
 
 :- dmsg("tweety is a canary.").
@@ -70,9 +68,12 @@ tPenguin(X) ==>  ~tFly(X).
 
 :- dmsg("confirm chilly now cant fly").
 :- mpred_test((\+ tFly(iChilly))).
-:- mpred_test(( ~tFly(iChilly))).
+:- mpred_test(( ~ tFly(iChilly))).
 
 %= repropigate that chilly was a bird again
+
+% :- trace.
+
 tBird(iChilly).
 
 %= this helps show the real differnce in ~and \+ 
@@ -83,7 +84,7 @@ tBird(iChilly).
 
 /*
 
-This wounld be a good TMS test it should throw.. but right now it passes wrongly
+% This wounld be a good TMS test it should throw.. but right now it passes wrongly
 tFly(iChilly).
 
 :- dmsg("confirm chilly is flying penguin").
@@ -91,7 +92,7 @@ tFly(iChilly).
 :- mpred_test(( tPenguin(iChilly))).
 :- mpred_test((\+ ~tFly(iChilly))).
 
-\+ tFly(iChilly).
+\+ tFly(iChilly). 
 
 :- dmsg("confirm chilly is a normal penguin who cant fly").
 :- mpred_test((\+ tFly(iChilly))).
@@ -101,16 +102,23 @@ tFly(iChilly).
 
 */
 
-:- dmsg("chilly is no longer a penguin (hopefly the assertion above about him being a bird wont be removed)").
-
+:- debug(_).
+:- nodebug(http(_)).
 :- debug(mpred).
 :- mpred_trace_exec.
-:- mpred_is_tracing_exec.
+
+
+:- dmsg("chilly is no longer a penguin (hopefly the assertion above about him being a bird wont be removed)").
+
+:- trace.
+
+:- mpred_test(tBird(iChilly)).
 
 never_retract_u(tBird(iChilly)).
 
 \+ tPenguin(iChilly).
 
+:- mpred_test((tBird(iChilly))).
 :- mpred_test(( \+ tPenguin(iChilly))).
 
 :- dmsg("chilly is still a bird").

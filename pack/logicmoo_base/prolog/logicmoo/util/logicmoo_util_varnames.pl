@@ -186,13 +186,13 @@
 %	Assign a name to a variable. Succeeds   silently if Var is not a
 %	variable (anymore).
 
-name_variable(Var, Name) :-
-	var(Var), !,
+name_variable(Var, Name) :- var(Var), !,
 	put_attr(Var, vn, Name),
         add_var_to_env(Name,Var).
-name_variable(VAR, Name) :- VAR='$VAR'(Var), !,
-   (Name==Var -> true ; trace_or_throw(name_variable(VAR, Name))),!.
 
+% name_variable('$VAR'(Var), Name):- Name==Var, !.
+name_variable('$VAR'(Var), Name):- var(Var),Name=Var,!. 
+name_variable('$VAR'(Var), Name) :- nonvar(Var), (Name==Var -> true ; trace_or_throw(numbervars_name_variable(Var, Name))),!.
 name_variable(_, _).
 
 
@@ -229,6 +229,7 @@ attribute_goals(Var) --> {variable_name(Var, Name)},[name_variable(Var,Name)].
 :- export(attribute_goals/3).
 
  	 
+:- thread_local(t_l:no_kif_var_coroutines/0).
 
 %% attr_unify_hook( ?X, ?Other) is semidet.
 %

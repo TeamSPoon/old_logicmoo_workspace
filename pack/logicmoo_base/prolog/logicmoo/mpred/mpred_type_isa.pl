@@ -496,7 +496,7 @@ is_known_true(isa(_,ftTerm)).
 is_known_true(isa(_,ftID)).
 
 
-:- was_export(is_known_trew/1).
+:- dynamic(is_known_trew/1).
 
 %= 	 	 
 
@@ -514,6 +514,7 @@ is_known_trew(genls(ttFormatType,ttNotTemporalType)).
 is_known_trew(genls(meta_argtypes,tRelation)).
 is_known_trew(genls(tFunction,tRelation)).
 is_known_trew(genls(F,tPred)):-a(ttPredType,F).
+is_known_trew(isa(_,_)):-fail.
 is_known_trew(disjointWith(A,B)):-disjointWithT(A,B).
 
 

@@ -444,8 +444,19 @@ search_refs_use_recorded.
 %
 searchable_terms(T):-search_refs_use_recorded,!,current_key(Key),unmake_search_key(Key,T).
 searchable_terms(T):-unify_in_thread(main,searchable_terms_tl(T)).
- 
-:- use_module(library(dialect/ifprolog),[]).
+
+% load statistics to keep ifprolog from overriding time/1.
+:- use_module(library(dialect/ifprolog),[current_global/1]).
+:- abolish(system:time/1).
+:- use_module(library(statistics),[time/1]).
+
+/*
+:- meta_predicate current_global_ifprolog(:).
+
+current_global_ifprolog(A:B) :-
+        atomic_list_concat([A, :, B], C)
+        nb_current(B, _).
+*/
 
 %= 	 	 
 

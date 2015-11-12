@@ -22,7 +22,7 @@
 
 % :- process_this_script.
 
-:- read_skolems(true).
+:- read_attvars(true).
 
 :- debug(mpred).
 :- mpred_trace_exec.
