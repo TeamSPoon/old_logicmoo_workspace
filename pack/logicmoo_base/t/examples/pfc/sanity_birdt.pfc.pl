@@ -101,9 +101,14 @@ tFly(iChilly).
 
 */
 
-:- dmsg("chilly is no longer a penguin").
+:- dmsg("chilly is no longer a penguin (hopefly the assertion above about him being a bird wont be removed)").
+
 :- debug(mpred).
 :- mpred_trace_exec.
+:- mpred_is_tracing_exec.
+
+never_retract_u(tBird(iChilly)).
+
 \+ tPenguin(iChilly).
 
 :- mpred_test(( \+ tPenguin(iChilly))).

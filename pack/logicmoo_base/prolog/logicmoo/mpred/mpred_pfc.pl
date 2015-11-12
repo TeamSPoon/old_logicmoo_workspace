@@ -6136,7 +6136,7 @@ repropagate_1(P):- with_umt(repropagate_2(P)).
 %
 repropagate_2(P):-
  doall((no_repeats((mpred_facts_and_universe(P))),
-    w_tl(t_l:is_repropagating(P),ignore((once(fwd_ok(P)),mpred_fwd(P)))))).
+    w_tl(t_l:is_repropagating(P),ignore((once(show_failure(fwd_ok(P))),show_call(mpred_fwd(P))))))).
 
 % repropagate_meta_wrapper_rule(P==>_):- !, repropagate(P).
 
@@ -6148,7 +6148,6 @@ repropagate_2(P):-
 %
 repropagate_meta_wrapper_rule(P):-repropagate_1(P).
 
-% fwd_ok(_):-!.
 
 %= 	 	 
 
@@ -6156,12 +6155,13 @@ repropagate_meta_wrapper_rule(P):-repropagate_1(P).
 %
 % Forward Repropigated Ok.
 %
+fwd_ok(_):-!.
 fwd_ok(P):-ground(P),!.
 fwd_ok(if_missing(_,_)).
 fwd_ok(idForTest(_,_)).
 fwd_ok(clif(_)).
 fwd_ok(pfclog(_)).
-fwd_ok(X):-compound(X),arg(_,X,E),compound(E),functor(E,(:-),_).
+fwd_ok(X):-compound(X),arg(_,X,E),compound(E),functor(E,(:-),_),!.
 % fwd_ok(P):-must(ground(P)),!.
 
 

@@ -242,6 +242,10 @@ tNotForUnboundPredicates(member).
 never_assert_u(vtVerb(BAD),vtVerbError):-fail,BAD=='[|]'.
 never_assert_u(prologSingleValued(BAD),var_prologSingleValued(BAD)):-is_ftVar(BAD).
 
+never_assert_u(A,test_sanity(A)):-never_assert_u(A).
+
+never_retract_u(A,test_sanity(A)):-never_retract_u(A).
+
 never_retract_u(X,is_ftVar(X)):-is_ftVar(X).
 never_retract_u(~(X),is_ftVar(X)):-is_ftVar(X).
 never_retract_u(human(trudy),sanity_test).
