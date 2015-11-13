@@ -5,7 +5,7 @@
 :- begin_pfc.
 
 %= simply retract (so we can re-deduce)
-\+ human(douglas).
+==> \+ human(douglas).
 
 %= confirm no inheritance twoards father
 :- must(\+ father(douglas,_)).

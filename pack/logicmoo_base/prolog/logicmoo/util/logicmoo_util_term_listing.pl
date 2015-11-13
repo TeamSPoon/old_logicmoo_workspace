@@ -21,6 +21,7 @@
             blob_info/3,
             bookeepingPredicateXRef/1,
             buggery_ok/0,
+            prolog_listing_portray_clause/3,
             clause_ref/2,
             cur_predicate/2,
             current_atom_or_blob/2,
@@ -692,7 +693,7 @@ printAll(Call):-printAll(Call,Call).
 %
 % Print All.
 %
-printAll(Call,Print):- flag(printAll,_,0), forall((Call,flag(printAll,N,N+1)),portray_clause(Print)),fail.
+printAll(Call,Print):- flag(printAll,_,0), forall((Call,flag(printAll,N,N+1)),portray_clause_w_vars(Print)),fail.
 printAll(_Call,Print):- flag(printAll,PA,0),format('~n /* found ~q for ~q. ~n */ ~n',[PA,Print]).
 
 
@@ -1469,24 +1470,17 @@ prolog_listing_list_clauses(Pred, Source) :-
 :- meta_predicate prolog_listing:portray_clause(+,+,:).
 :- prolog_listing:export(prolog_listing:portray_clause/3).
 
-% Fav
-prolog_listing:portray_clause(Stream, Term, M:Options) :- fail,
-	must_be(list, Options),
-	meta_options(is_meta, M:Options, QOptions),
-	\+ \+ ( % must(serialize_attvars(Term, Copy)),
-                =(Term, Copy),
-		% numbervars(Copy, 0, _,[ singletons(true), attvar(Skip)]),
-		prolog_listing:do_portray_clause(Stream, Copy, QOptions)
-	      ),!.
 
 % Safe
-prolog_listing:portray_clause(Stream, Term, M:Options) :-
+prolog_listing_portray_clause(Stream, Term, M:Options) :- fail,
 	must_be(list, Options),
 	meta_options(is_meta, M:Options, QOptions),
 	\+ \+ ( must(serialize_attvars(Term, Copy)),
 		% numbervars(Copy, 0, _,[ singletons(true), attvar(Skip)]),
                 prolog_listing:do_portray_clause(Stream, Copy, QOptions)
 	      ),!.
+
+% prolog_listing:portray_clause(Stream, Term, M:Options) :- logicmoo_util_term_listing:prolog_listing_portray_clause(Stream, Term, M:Options).
 
 % Original
 prolog_listing:portray_clause(Stream, Term, M:Options) :-

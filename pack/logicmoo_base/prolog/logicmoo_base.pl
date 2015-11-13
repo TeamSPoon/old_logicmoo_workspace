@@ -162,90 +162,9 @@ ensure_mpred_system:- source_context_module(M),enable_mpred_system(M).
 
 
 :- lmconf:mpred_system_kb(M),dmsg(system_kb=M).
+
 :- baseKB:use_module(library(logicmoo/mpred/mpred_userkb)).
 
-end_of_file.
 
-Warning: at runtime using assert/1, use :- dynamic Name/Arity.
-Warning:
-Warning: common_logic_boxlog:pfcRHS/1, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_boxlog.pl:170:35: 26-th clause of common_logic_boxlog:boxlog_to_compile/3
-Warning: common_logic_compiler:pttp1a_wid/3, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_compiler.pl:802:5: 1-st clause of common_logic_compiler:cf/4
-Warning: common_logic_compiler:pttp_builtin/2, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_compiler.pl:1019:43: 2-nd clause of common_logic_compiler:unbuiltin_negate/4
-Warning: common_logic_snark:is_wrapper_pred/1, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_snark.pl:429:32: 14-th clause of common_logic_snark:adjust_kif0/4
-Warning: common_logic_snark:retractall_wid/1, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_snark.pl:819:5: 1-st clause of common_logic_snark:kif_ask_sent/1
-Warning: lmconf:contract_output_proof/2, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_snark.pl:837:8: 1-st clause of common_logic_snark:kif_ask/2
-Warning: lmconf:search/7, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_snark.pl:830:8: 5-th clause of common_logic_snark:kif_ask/1
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_snark.pl:836:8: 1-st clause of common_logic_snark:kif_ask/2
-Warning: mpred_pfc:mpred_mark/4, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl:2495:40: 1-st clause of mpred_pfc:mpred_cleanup/0
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl:2939:26: 3-th clause of mpred_pfc:should_call_for_facts/3
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl:2940:26: 4-th clause of mpred_pfc:should_call_for_facts/3
-Warning: mpred_pfc:support_hilog/2, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl:3326:7: 1-st clause of mpred_pfc:pred_u2/1
-Warning: mpred_pfc:tCol/1, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl:2210:50: 4-th clause of mpred_pfc:mpred_call_0/1
-Warning: mpred_pfc:~/1, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl:2182:24: 2-nd clause of mpred_pfc:neg_in_code/1
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl:2183:36: 3-th clause of mpred_pfc:neg_in_code/1
-Warning: mpred_storage:mpred_isa/2, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_storage.pl:715:70: 1-st clause of mpred_storage:prolog_mpred_provide_storage_op/2
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_storage.pl:716:74: 2-nd clause of mpred_storage:prolog_mpred_provide_storage_op/2
-Warning: mpred_storage:tCol/1, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_storage.pl:214:29: 5-th clause of mpred_storage:deduceEachArgType/3
-Warning: mpred_storage:ttFormatType/1, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_storage.pl:232:42: 6-th clause of mpred_storage:deduceEachArg_WithType/2
-Warning: mpred_type_args:genls/2, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_args.pl:331:76: 1-st clause of mpred_type_args:argIsa_call_7/3
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_args.pl:339:43: 1-st clause of mpred_type_args:argIsa_call_9/3
-Warning: mpred_type_args:isa/2, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_args.pl:137: 2-nd clause of mpred_type_args:term_is_ft_how/2
-Warning: mpred_type_args:resultIsa/2, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_args.pl:186:34: 4-th clause of mpred_type_args:is_ftText/1
-Warning: mpred_type_args:tCol/1, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_args.pl:300:74: 51-th clause of mpred_type_args:argIsa_call_0/3
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_args.pl:198:36: 1-st clause of mpred_type_args:as_one_of/2
-Warning: mpred_type_args:tRelation/1, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_args.pl:216:43: 3-th clause of mpred_type_args:asserted_argIsa_known/3
-Warning: mpred_type_args:ttFormatType/1, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_args.pl:128:61: 4-th clause of mpred_type_args:term_is_ft/2
-Warning: mpred_type_constraints:argIsa/3, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_constraints.pl:176:39: 1-st clause of mpred_type_constraints:attempt_attribute_one_arg/4
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_constraints.pl:178:39: 3-th clause of mpred_type_constraints:attempt_attribute_one_arg/4
-Warning: mpred_type_constraints:argQuotedIsa/3, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_constraints.pl:177:39: 2-nd clause of mpred_type_constraints:attempt_attribute_one_arg/4
-Warning: mpred_type_constraints:genls/2, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_constraints.pl:141:29: 2-nd clause of mpred_type_constraints:max_isa/3
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_constraints.pl:142:29: 3-th clause of mpred_type_constraints:max_isa/3
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_constraints.pl:125:34: 1-st clause of mpred_type_constraints:max_isa_l/2
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_constraints.pl:135:29: 2-nd clause of mpred_type_constraints:min_isa/3
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_constraints.pl:136:29: 3-th clause of mpred_type_constraints:min_isa/3
-Warning: mpred_type_constraints:lambda/5, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_constraints.pl:124:34: 1-st clause of mpred_type_constraints:min_isa_l/2
-Warning: mpred_type_constraints:tCol/1, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_constraints.pl:167:55: 11-th clause of mpred_type_constraints:attempt_attribute_args/3
-Warning: mpred_type_isa:decided_not_was_isa/2, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_isa.pl:191:44: 7-th clause of mpred_type_isa:never_type_why/2
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_isa.pl:246:48: 1-st clause of mpred_type_isa:was_isa/3
-Warning: mpred_type_isa:genls/2, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_isa.pl:502:96: 6-th clause of mpred_type_isa:isa_asserted_1/2
-Warning: mpred_type_isa:tCol/1, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_isa.pl:601:28: 1-st clause of mpred_type_isa:guess_types_0/2
-Warning: mpred_type_isa:tPred/1, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_isa.pl:410:64: 3-th clause of mpred_type_isa:not_mud_isa/3
-Warning: mpred_type_naming:argIsa/3, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_naming.pl:200:9: 1-st clause of mpred_type_naming:spawnOneSpawnArg/4
-Warning: mpred_type_naming:genls/2, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_naming.pl:205:41: 3-th clause of mpred_type_naming:convertToInstance/3
-Warning: mpred_type_naming:mudKeyword/2, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_naming.pl:122:31: 7-th clause of mpred_type_naming:createByNameMangle0/3
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_naming.pl:108:42: 3-th clause of mpred_type_naming:to_atomic_name/3
-Warning: mpred_type_naming:tCol/1, which is referenced by
-Warning:        /home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_type_naming.pl:169:1: 2-nd clause of mpred_type_naming:onSpawn_0/2
+
 

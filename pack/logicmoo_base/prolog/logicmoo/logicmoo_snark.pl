@@ -57,14 +57,38 @@ checkKB:m1:- gripe_time(40,baseKB:ensure_loaded(baseKB:logicmoo(mpred_online/mpr
 %m5 :- enable_mpred_system(baseKB).
 
 
-:- lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:logicmoo(pfc/'autoexec.pfc'))).
+:- use_listing_vars.
+:- autoload([verbose(false)]).
 
-:- tell('baseKB_autoexec.pfc'), 
-   format('~N:- ~q.~n',[mpred_module(basePFC)]),
+mpred_restore_file(File):- 
+ must_det_l((   
+   absolute_file_name(File,AFN),
+   (exists_file(AFN)->lh:ensure_loaded(AFN);true),
+   lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:logicmoo(pfc/'autoexec.pfc'))),
+   forall(lmconf:loaded_file_world_time(N,_,_),lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:N))),
+   tell(AFN), 
+   format('~N:- ~q.~n',['$set_source_module'(_,basePFC)]),
+   format('~N:- style_check(-singleton).'),  
    listing(basePFC:_),
-   format('~N:- ~q.~n',[mpred_module(baseKB)]),
-   listing(baseKB:_),
-   told.
+   flush_output,
+   format('~N:- style_check(-singleton).'),
+   format('~N:- ~q.~n',['$set_source_module'(_,baseKB)]),
+   ignore((
+   cur_predicate(_,baseKB:H),
+   once((prolog_listing:list_declarations(baseKB:H,baseKB))),
+   clause(baseKB:H,B,R), 
+   once(clause_property(R,file(AFN));\+clause_property(R,file(_))),
+   ignore(once(get_clause_vars(H:-B))),
+   prolog_listing:portray_clause((H:-B)),
+   flush_output,
+   fail)),!,
+      format('~N:- ~q.~n',['$set_source_module'(_,lmconf)]),
+      format('~N:- style_check(-singleton).~n'),
+      listing(lmconf:loaded_file_world_time/3),
+      flush_output,
+   told)).
 
+
+:- mpred_restore_file('baseKB_autoexec.pl').
 
 

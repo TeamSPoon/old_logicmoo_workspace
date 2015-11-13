@@ -1,6 +1,6 @@
 /*  
 % ===================================================================
-% File 'mpred_db_preds.pl'
+% File 'mpred_userkb.pl'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;
@@ -17,11 +17,15 @@
 */
 
 % DW> ... but is there a reason why "Absurdity" is the word used for something that doesn't exist?  SOWA> It's stronger than that.  The absurd type is defined by axioms that are contradictory.  Therefore, by definition, nothing of that type can exist. 
-:- module(baseKB, []). % mpred_userkb_file/0
+:- module(mpred_userkb, [mpred_userkb_file/0]).
 
 :- include('mpred_header.pi').
 
-:-dynamic(base_kb_pred_list/1).
+mpred_userkb_file.
+
+:- '$set_source_module'(_,baseKB).
+
+:- dynamic(base_kb_pred_list/1).
 
 %= 	 	 
 
@@ -156,6 +160,7 @@ use_ideep_swi/0,
 vtUnreifiableFunction/1,
 was_chain_rule/1,
 wid/3,
+never_assert_u/2,
 prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/1,pfcWatched/1,pfcMustFC/1,predIsFlag/1,tPred/1,prologMultiValued/1,
  prologSingleValued/1,prologMacroHead/1,notAssertable/1,prologBuiltin/1,prologDynamic/1,prologOrdered/1,prologNegByFailure/1,prologPTTP/1,prologKIF/1,prologEquality/1,prologPTTP/1,
  prologSideEffects/1,prologHybrid/1,prologListValued/1]).
@@ -240,7 +245,7 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 :- meta_predicate(t(?,?,?,?)).
 :- meta_predicate(t(?,?,?)).
 
-:-asserta((~(G):- cwc, neg_in_code(G))).
+:-asserta_if_new((~(G):- cwc, neg_in_code(G))).
 
 %= 	 	 
 
@@ -328,11 +333,6 @@ t(P,A1,A2,A3,A4,A5,A6,A7):- mpred_fa_call(P,7,call(P,A1,A2,A3,A4,A5,A6,A7)).
 t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6,A7)).
 
 
-% :- use_module(logicmoo(mpred/mpred_loader)).
-% :- use_module(logicmoo(mpred/mpred_pfc)).
-
-
-
 
 %= 	 	 
 
@@ -394,6 +394,8 @@ resolverConflict_robot(C) :- cwc, must((mpred_remove3(C),wdmsg("Rem-3 with confl
 %
 % Never Assert For User Code.
 %
+:- dynamic((never_assert_u/2)).
+:- multifile((never_assert_u/2)).
 never_assert_u(Rule,is_var(Rule)):- cwc, is_ftVar(Rule),!.
 never_assert_u(Rule,head_singletons(Pre,Post)):- cwc, Rule \= (_:-_), once(mpred_rule_hb(Rule,Post,Pre)), head_singletons(Pre,Post).
 never_assert_u(declared(M:F/A),never_declared(M:F/A)):- M:F/A = qrTBox:p/1.
@@ -419,11 +421,11 @@ never_assert_u(pt(_,
 never_assert_u0(mpred_mark(pfcPosTrigger,_,F,A),Why):- fail,
   functor(P,F,A),
   ignore(predicate_property(M:P,exported)),
-  current_predicate(_,M:P),
-  ( \+ predicate_property(M:P,imported_from(_))),  
+  defined_predicate(M:P),  
   is_static_why(M,P,F,A,R),
   Why = static(M:P-F/A,R).
 
+defined_predicate(M:P):- (current_predicate(_,M:P),( \+ predicate_property(M:P,imported_from(_)))).
 
 %= 	 	 
 
@@ -444,7 +446,6 @@ is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=
 :- add_import_module(baseKB,basePFC,end).
 :- initialization(add_import_module(baseKB,basePFC,end)).
 
-mpred_userkb_file.
 
 
 

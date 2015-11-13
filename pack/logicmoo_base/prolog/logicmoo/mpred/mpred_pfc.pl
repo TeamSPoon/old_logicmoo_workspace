@@ -5,6 +5,7 @@
 :- module(mpred_pfc,
           [ 
 
+mpred_run_resume/0,mpred_run_pause/0,
 
 add_reprop/2,
 add_side_effect/2,
@@ -15,6 +16,8 @@ ain_fast/1,
 ain_fast/2,
 ain_fast_sp/2,
 ain_fast_sp0/2,
+without_running/1,
+with_search_mode/2,
 ain_fast_timed/2,
 ain_minfo/1,
 ain_minfo/2,
@@ -24,6 +27,7 @@ ain_rule_if_rule/1,
 ain_support/2,
 % ain_t/2,
 ain_ts/2,
+mpred_remove_file_support/1,
 ain_trigger/2,
 ain_trigger_0/3,
 ain_trigger_1/3,
@@ -254,10 +258,10 @@ mpred_rem2/1,
 mpred_rem2a/1,
 mpred_rem2a/2,
 mpred_rem_actiontrace/2,
-mpred_rem_support/3,
-mpred_remove3/1,
+mpred_support_db_rem/3,
+mpred_remove4/1,
 mpred_remove_old_version/1,
-mpred_remove_supports_f_l/2,
+mpred_remove_supports/2,
 mpred_remove_supports_quietly/1,
 mpred_reset/0,
 mpred_retract_db_type/1,
@@ -340,7 +344,7 @@ pred_u2/1,
 process_rule/3,
 record_se/0,
 reduce_clause_from_fwd/2,
-rem_list/1,
+each_in_list/3,
 remove_if_unsupported/2,
 remove_if_unsupported_verbose/3,
 remove_selection/2,
@@ -387,6 +391,7 @@ wac/0,
 wellFounded/2,
 which_missing_argnum/2,
 with_mpred_trace_exec/1,
+with_no_mpred_trace_exec/1,
 with_umt/1,
 {}/1,
           wac/0]).
@@ -447,8 +452,8 @@ with_umt/1,
       mpred_rem2(0),
       mpred_rem2a(0),
       mpred_rem2a(0,?),
-      mpred_rem_support(*,0,*),
-      mpred_remove_supports_f_l(*,0),
+      mpred_support_db_rem(*,0,*),
+      mpred_remove_supports(*,0),
       mpred_remove_supports_quietly(0),
       mpred_scan_tms(0),
       mpred_tms_supported(*,0,?),
@@ -463,6 +468,7 @@ with_umt/1,
       physical_side_effect(0),
       pred_head(1,*),
       remove_if_unsupported(*,0),
+      with_search_mode(+,0),
       remove_if_unsupported_verbose(*,*,0),
       repropagate_0(0),
       repropagate_1(0),
@@ -502,6 +508,7 @@ with_umt/1,
       mpred_deep_support0(*,(*)),
       mpred_enqueue((*),?),
       mpred_fact(*,(*)),
+      without_running(0),
       mpred_facts_and_universe((*)),
       mpred_facts_only((*)),
       mpred_fwd((*)),
@@ -520,8 +527,8 @@ with_umt/1,
       mpred_rem2((*)),
       mpred_rem2a((*)),
       mpred_rem2a((*),?),
-      mpred_rem_support(*,(*),*),
-      mpred_remove_supports_f_l(*,(*)),
+      mpred_support_db_rem(*,(*),*),
+      mpred_remove_supports(*,(*)),
       mpred_remove_supports_quietly((*)),
       mpred_scan_tms((*)),
       mpred_tms_supported(*,(*),?),
@@ -529,6 +536,7 @@ with_umt/1,
       mpred_tms_supported0(*,(*),?),
       mpred_update_literal(*,*,(*),*),
       not_cond(*,(*)),
+      each_in_list(2,*,*),
       pfc_provide_storage_op(*,(*)),
       pfcBC_Cache((*)),
       pfcBC_NoFacts((*)),
@@ -541,7 +549,8 @@ with_umt/1,
       repropagate_1((*)),
       repropagate_meta_wrapper_rule((*)),
       update_single_valued_arg((*),*),
-      with_mpred_trace_exec((*)))).
+      with_mpred_trace_exec((*)),
+      with_no_mpred_trace_exec((*)))).
 
 :- dynamic((
         mpred_hide_msg/1,
@@ -642,6 +651,10 @@ with_umt(ABOX,G):- w_tl(t_l:user_abox(ABOX),ABOX:call(ABOX:G)).
 %
 with_umt(G):- get_user_abox(M),!, M:call(M:G).
 with_umt(Goal):- source_context_module(M) -> M:call(Goal).
+
+
+with_search_mode(Mode,Goal):- w_tl(t_l:mpred_search_mode(Mode),Goal).
+
 
 %   File   : pfcsyntax.pl
 %   Author : Tim Finin, finin@prc.unisys.com
@@ -1936,7 +1949,7 @@ mpred_aina(G,S):-ain(G,S).
 % Prolog Forward Chaining Add.
 %
 pfc_add(P) :- 
-  ain_fast(P).
+  ain_fast(P),mpred_run.
 
 
 %= 	 	 
@@ -1946,7 +1959,7 @@ pfc_add(P) :-
 % Assert If New.
 %
 ain(P,S) :- 
-  ain_fast(P,S).
+  ain_fast(P,S),mpred_run.
 
 
 
@@ -2014,7 +2027,7 @@ ain_fast_sp(S,P0):-
 %
 ain_fast_sp0(S,P) :-
    mpred_rule_hb(P,OutcomeO,_),!,
-     loop_check_term((mpred_post_sp_zzz(S,P),mpred_run),
+     loop_check_term(mpred_post_sp_zzz(S,P),
      aining(OutcomeO),
      (mpred_post_sp_zzz(S,P),mpred_trace_msg(looped_outcome((P))))),!.
 %ain_fast_sp(_,_).
@@ -2112,9 +2125,11 @@ mpred_post_sp_zzz(S,P):-mpred_post_sp_zzzz(S,P),!.
 mpred_post_sp_zzzz(S,(P1,P2)) :- !,mpred_post_sp_zzzz(S,(P1)),mpred_post_sp_zzzz(S,(P2)).
 mpred_post_sp_zzzz(S,[P1]) :- !,mpred_post_sp_zzzz(S,(P1)).
 mpred_post_sp_zzzz(S,[P1|P2]) :- !,mpred_post_sp_zzzz(S,(P1)),mpred_post_sp_zzzz(S,(P2)).
-mpred_post_sp_zzzz(S, \+ P) :-!,doall(mpred_rem2a(P,S)),!,mpred_undo((\+),P).
+
+mpred_post_sp_zzzz(S, not(P)) :-!,mpred_post_sp_zzzz(S, \+( P)).
+mpred_post_sp_zzzz(S, \+ P) :- must(is_ftNonvar(P)),!, doall(mpred_rem2a(P,S)),!,mpred_undo((\+),P).
+
 mpred_post_sp_zzzz(S, -(P)) :-!,mpred_post_sp_zzzz(S, ~( P)).
-mpred_post_sp_zzzz(S, not(P)) :-!,mpred_post_sp_zzzz(S, ~( P)).
 mpred_post_sp_zzzz(S, ~(P)) :-doall(mpred_rem2a(P,S)),mpred_undo((\+),P),fail.
 mpred_post_sp_zzzz(_S,P) :- once((notrace(mpred_is_tautology(P)),wdmsg(trace_or_throw(todo(error(mpred_is_tautology(P))))))),show_load_context,fail.
 
@@ -2123,7 +2138,7 @@ mpred_post_sp_zzzz(_S,P) :- once((notrace(mpred_is_tautology(P)),wdmsg(trace_or_
 mpred_post_sp_zzzz(S,P) :- is_ftCompound(P), arg(SV,P,V),is_relative(V),must((mpred_update_literal(P,SV,Q,R),mpred_post_sp_zzzz(S,R))),(Q=R->true;mpred_undo(update,Q)).
 mpred_post_sp_zzzz(S,P) :- is_already_supported(P,S,_How),must(loop_check(mpred_post1_sp_0(S,P),mpred_post1_sp_1(S,P))),!. % ,mpred_enqueue(P,S).
 
-mpred_post_sp_zzzz(S,~(P)) :-!, mpred_post1_sp_0(S,~(P)),mpred_run,!,assert_u(~(P)).
+mpred_post_sp_zzzz(S,~(P)) :-!, mpred_post1_sp_0(S,~(P)),!,assert_u(~(P)).
 
 mpred_post_sp_zzzz(S,P) :- mpred_post1_sp_0(S,P).
 
@@ -2167,6 +2182,12 @@ mpred_post1_sp_1(S,P) :-  mpred_warn("mpred_post1(~p,~p) failed",[P,S]).
 % Using Managed Predicate  Trace exec.
 %
 with_mpred_trace_exec(P):- w_tl(t_l:mpred_debug_local,w_tl(mpred_is_tracing_exec, must(show_if_debug(P)))).
+
+%% with_mpred_trace_exec( ?P) is semidet.
+%
+% Without Trace exec.
+%
+with_no_mpred_trace_exec(P):- wno_tl(t_l:mpred_debug_local,wno_tl(mpred_is_tracing_exec, must(show_if_debug(P)))).
 
 
 %= 	 	 
@@ -2325,31 +2346,31 @@ mpred_unique_i(P) :-
 
 % mpred_enqueue(P,S) :- !,get_user_abox_umt(ABOX),ainz_i(basePFC:qu(ABOX,P,S),S).
 
-%= 	 	 
 
-%% mpred_enqueue( ?P, ?S) is semidet.
+%% mpred_enqueue(+P,+S) is det.
 %
-% Managed Predicate Enqueue.
+%  Enqueue P with support S
 %
 mpred_enqueue(P,S) :-
- get_user_abox_umt(ABOX),
-  (must(mreq(basePFC:sm(Mode));Mode=direct)
+   (get_search_mode(Mode,P,S),get_user_abox_umt(ABOX))
     -> (Mode=direct  -> must(mpred_fwd(P,S)) ;
 	Mode=depth   -> aina_i(basePFC:qu(ABOX,P,S),S) ;
 	Mode=breadth -> ainz_i(basePFC:qu(ABOX,P,S),S) ;
 	% else
           otherwise           -> mpred_warn("Unrecognized basePFC:sm mode: ~p", Mode))
-     ; mpred_warn("No basePFC:sm mode")).
+     ; mpred_warn("No basePFC:sm mode").
 
 
-% if there is a rule of the form Identifier ::: Rule then delete it.
 
+get_search_mode(Mode,_P,_S):- t_l:mpred_search_mode(Mode),!.
+get_search_mode(Mode,_P,_S):- Mode=direct,!.
+get_search_mode(Mode,_P,_S):- Mode=breadth,!.
+get_search_mode(Mode,_P,_S):- must(mreq(basePFC:sm(Mode))),!.
 
-%= 	 	 
 
 %% mpred_remove_old_version( :TermIdentifier) is semidet.
 %
-% Managed Predicate Remove Old Version.
+% if there is a rule of the form Identifier ::: Rule then delete it.
 %
 mpred_remove_old_version((Identifier::::Body)) :-
   % this should never happen.
@@ -2367,20 +2388,21 @@ mpred_remove_old_version((Identifier::::Body)) :-
   !.
 mpred_remove_old_version(_).
 
-% mpred_run compute the deductive closure of the current database.
+
+mpred_run_pause:- asserta(t_l:mpred_run_paused).
+mpred_run_resume:- retractall(t_l:mpred_run_paused).
+
+without_running(G):- (t_l:mpred_run_paused->G;w_tl(t_l:mpred_run_pause,G)).
+
+%% mpred_run is det.
+%
+% mpred_run computes the deductive closure of the current database.
 % How this is done depends on the searching mode:
 %    direct -  fc has already done the job.
 %    depth or breadth - use the basePFC:qu mechanism.
-
-%= 	 	 
-
-%% mpred_run is semidet.
 %
-% Managed Predicate Run.
-%
-mpred_run :- (\+ basePFC:sm(direct)),!,repeat, (\+ mpred_step ),!.
-mpred_run :- !,repeat, (\+ mpred_step ),!.
-mpred_run.
+mpred_run :- repeat, \+ mpred_step, !.
+
 
 
 %mpred_run_queued:- repeat,sleep(1.0),mpred_run,fail.
@@ -2396,6 +2418,7 @@ mpred_run.
 %
 % Managed Predicate Step.
 %
+mpred_step :- t_l:mpred_run_paused,!,fail.
 mpred_step :-
   % if basePFC:hs(Signal) is true, reset it and fail, thereby stopping inferencing.
   basePFC:hs(Signal),!,
@@ -2552,23 +2575,6 @@ ain_trigger_0(Trig,basePFC:pt(_ABOX,Trigger,_Body),Support) :-!,
    mpred_mark_as(Support,p,Trigger,pfcPosTrigger),
    add_reprop(Trig,Trigger).
 
-
-ain_trigger_0(Trig,basePFC:nt(ABOX,Trigger,Test,Body),Support) :- !,
- get_user_abox_umt(ABOX),
-  (must(mpred_mark_as(Support,n,Trigger,pfcNegTrigger)),
-         copy_term_and_varnames(Trigger,TriggerCopy),!,
-         ain_ts(basePFC:nt(ABOX,TriggerCopy,Test,Body),Support)),
-  run_nt(ABOX,Trigger,TriggerCopy,Test,Body),
-  nop(add_reprop(Trig, Trigger)).
-
-ain_trigger_0(Trig,basePFC:nt(ABOX,Trigger,Test,Body),Support) :- !,
-  must(mpred_mark_as(Support,n,Trigger,pfcNegTrigger)),
-  copy_term_and_varnames(Trigger,TriggerCopy),!,
- % assert_i(basePFC:nt(ABOX,TriggerCopy,Test,Body)),
-  run_nt(ABOX,Trigger,TriggerCopy,Test,Body),
-  add_reprop(Trig, Trigger).
-
-
 ain_trigger_0(_Trig,basePFC:bt(ABOX,Trigger,Body),Support) :- 
  must((
    must(ain_ts(basePFC:bt(ABOX,Trigger,Body),Support)),
@@ -2586,6 +2592,14 @@ ain_trigger_0(_Trig,basePFC:bt(_ABOX,Trigger,Body),Support) :- !,
      % WAS mpred_bt_pt_combine(Trigger,Body).
   mpred_bt_pt_combine(Trigger,Body,Support).
 
+
+ain_trigger_0(Trig,basePFC:nt(ABOX,Trigger,Test,Body),Support) :- !,
+ get_user_abox_umt(ABOX),
+  (must(mpred_mark_as(Support,n,Trigger,pfcNegTrigger)),
+         copy_term_and_varnames(Trigger,TriggerCopy),!,
+         ain_ts(basePFC:nt(ABOX,TriggerCopy,Test,Body),Support)),
+  run_nt(ABOX,Trigger,TriggerCopy,Test,Body),
+  nop(add_reprop(Trig, Trigger)).
 
 ain_trigger_0(Trig,X,Support) :- mpred_warn("Unrecognized trigger to aintrigger: ~p for ~p",[ain_trigger(X,Support),Trig]).
 
@@ -2726,159 +2740,121 @@ ain_db_type(trigger,X) :-
   assert_t(X).
 ain_db_type(action,_Action) :- !.
 */
+%% each_in_list(+P2,+HT,+S) semidet.
+%
+% Call P(E,S). each Element in the list.
+%
+each_in_list(P,[H|T],S) :-
+  % mpred_rem1 
+  call(P,H,S),
+  each_in_list(P,T,S).
 
-%= mpred_rem1(P,S) removes support S from P and checks to see if P is still supported.
-%= If it is not, then the fact is retracted from the database and any support
-%= relationships it participated in removed.
 
-
-%= 	 	 
 
 %% mpred_rem1( ?List) is semidet.
 %
-% Managed Predicate Remove/erase Secondary Helper.
+% mpred_rem1/1 is the user''s interface - it withdraws user support for P.
 %
-mpred_rem1(List) :-
-  % iterate down the list of facts to be mpred_rem1'ed.
-  is_ftNonvar(List),
-  List=[_|_],!,
-  with_umt((rem_list(List))).
-
-mpred_rem1(pfclog(P)) :- nonvar(P),ignore((mpred_rem1(P))), rtrace(retract_eq_quitely(P)),fail.
-
 mpred_rem1(P) :-
-  % mpred_rem1/1 is the user''s interface - it withdraws user support for P.
   make_uu_remove(UU),
   mpred_rem1(P,UU).
 
 
-%= 	 	 
-
-%% rem_list( :TermH) is semidet.
-%
-% Remove/erase List.
-%
-rem_list([H|T]) :-
-  % mpred_rem1 each element in the list.
-  make_uu_remove(UU),
-  mpred_rem1(H,UU),
-  rem_list(T).
-
-
-%= 	 	 
-
 %% mpred_rem1( ?P, ?S) is semidet.
 %
-% Managed Predicate Remove/erase Secondary Helper.
+% Removes support S from P and checks to see if P is still supported.
+% If it is not, then the fact is retracted from the database and any support
+% relationships it participated in removed.
 %
+mpred_rem1(List,S) :-
+  % iterate down the list of facts to be mpred_rem1'ed.
+  is_ftNonvar(List),
+  List=[_|_],!,
+  each_in_list(mpred_rem1,List,S).
+mpred_rem1(pfclog(P),S) :- nonvar(P),ignore((mpred_rem1(P,S))), retract_eq_quitely(P),fail.
 mpred_rem1(P,S) :- 
  with_umt((copy_term_and_varnames(mpred_rem1(P,S),Why),   
-  mpred_rem_support(Why,P,S)
+  mpred_support_db_rem(Why,P,S)
      -> (remove_if_unsupported(Why,P))
       ; mpred_warn("mpred_rem1/2 Could not find support ~p to remove from fact ~p",
                 [S,P]))).
 
-%=
-%= mpred_rem2 is like mpred_rem1, but if P is still in the DB after removing the
-%= user''s support, it is retracted by more forceful means (e.g. remove).
-%=
 
 
-%= 	 	 
+%% mpred_rem2( ?P) is semidet.
+%
+% Ensure it is unasserted
+%
+mpred_rem2(P):- mpred_rem2a(P),mpred_unfwc(P).      
+mpred_rem(P):- mpred_rem2a(P),mpred_unfwc(P).      
+
 
 %% mpred_rem2a( ?P) is semidet.
 %
-% Managed Predicate Rem2a.
+% mpred_rem2a is like mpred_rem1, but if P is still in the DB after removing the
+% user''s support, it is retracted by more forceful means (e.g. remove).
 %
 mpred_rem2a(P) :- 
- with_umt((mpred_run,
   % mpred_rem2/1 is the user''s interface - it withdraws user support for P.
   make_uu_remove(UU),
-  mpred_rem2a(P,UU))).
+  mpred_rem2a(P,UU).
 
-
-%= 	 	 
 
 %% mpred_rem2a( ?P, ?S) is semidet.
 %
-% Managed Predicate Rem2a.
+% mpred_rem2a is like mpred_rem1, but if P is still in the DB after removing the
+% S support, it is retracted by more forceful means (e.g. remove).
 %
-mpred_rem2a(P,S) :- with_umt((
+mpred_rem2a(List,S) :-
+  % iterate down the list of facts to be mpred_rem1'ed.
+  is_ftNonvar(List),
+  List=[_|_],!,
+  each_in_list(mpred_rem2a,List,S).
+mpred_rem2a(P,S) :- 
+ with_umt((
   mpred_rem1(P,S),
   % used to say mpred_call_only_facts(Why,P) but that meant it was 
   % was no_repeats(( mpred_call_with_triggers(P);mpred_call_with_no_triggers(Why,P)))
   (( mpred_call_only_facts(mpred_rem2a,P) )  
-     -> (mpred_remove3(P))
+     -> (mpred_remove4(P))
       ; true))).
 
 % prev way
 % mpred_rem2(P):-!,mpred_rem2a(P).
 % new way
 
-%= 	 	 
-
-%% mpred_rem2( ?P) is semidet.
+%% mpred_remove4( ?F) is semidet.
 %
-% Managed Predicate Remove/erase Extended Helper.
+% retracts fact F from the DB and removes any dependent facts
 %
-mpred_rem2(P):- with_umt((mpred_rem2a(P),mpred_unfwc(P))).
-
-% help us choose
-
-%= 	 	 
-
-%% mpred_rem( ?P) is semidet.
-%
-% Managed Predicate Remove/erase.
-%
-mpred_rem(P) :- with_umt((mpred_rem2a(P),mpred_unfwc(P))).
-
-
-%=
-%= mpred_remove3(+F) retracts fact F from the DB and removes any dependent facts */
-%=
-
-
-%= 	 	 
-
-%% mpred_remove3( ?F) is semidet.
-%
-% Managed Predicate Remove3.
-%
-mpred_remove3(F) :-
+mpred_remove4(F) :-
  with_umt((
-  show_if_debug(mpred_remove_supports_f_l(mpred_remove3(F),F)),
-  mpred_undo(mpred_remove3(F),F))).
+  show_if_debug(mpred_remove_supports(mpred_remove4(F),F)),
+  mpred_undo(mpred_remove4(F),F))).
 
 
-% removes any remaining supports for fact F, complaining as it goes.
 
-
-%= 	 	 
-
-%% mpred_remove_supports_f_l( ?Why, ?F) is semidet.
+%% mpred_remove_supports( ?Why, ?F) is semidet.
 %
-% Managed Predicate Remove Supports Functor (list Version).
+% Will remove any remaining supports for fact F, complaining as it goes.
 %
-mpred_remove_supports_f_l(Why,F) :-
-  mpred_rem_support(Why,F,S),
+mpred_remove_supports(Why,F) :-
+  mpred_support_db_rem(Why,F,S),
   (S=(z,z)->true;mpred_trace_msg("~p was supported by ~p",[F,S])),
   fail.
-mpred_remove_supports_f_l(Why,F) :- fail,
-  mpred_rem_support(Why,F,S),nonvar(S),
+mpred_remove_supports(Why,F) :- fail,
+  mpred_support_db_rem(Why,F,S),nonvar(S),
   (S=(z,z)->true;mpred_warn("WARN: ~p was still supported by ~p",[F,S])),
   fail.
-mpred_remove_supports_f_l(_,_).
+mpred_remove_supports(_,_).
 
-
-%= 	 	 
 
 %% mpred_remove_supports_quietly( ?F) is semidet.
 %
-% Managed Predicate Remove Supports Quietly.
+% Will remove any remaining supports for fact F, uncomplainingly
 %
 mpred_remove_supports_quietly(F) :-
-  mpred_rem_support(mpred_remove_supports_quietly,F,_),
+  mpred_support_db_rem(mpred_remove_supports_quietly,F,_),
   fail.
 mpred_remove_supports_quietly(_).
 
@@ -2886,11 +2862,9 @@ mpred_remove_supports_quietly(_).
 
 
 
-%= 	 	 
-
 %% mpred_undo( ?Why, :TermFact) is semidet.
 %
-% Managed Predicate Undo.
+% Undose any resulting deductions
 %
 mpred_undo(Why,mpred_action(A)) :-
   % undo an action by finding a method and successfully executing it.
@@ -2938,7 +2912,6 @@ mpred_undo(Why,   ~(~Fact)):- mpred_undo(Why, Fact),fail.
 mpred_undo(Why,Fact):- mpred_undo_u(Why,Fact)*->true;mpred_undo_e(Why,Fact).
 
 
-%= 	 	 
 
 %% mpred_undo_u( ?Why, ?Fact) is semidet.
 %
@@ -2963,21 +2936,19 @@ mpred_undo_e(Why,Fact) :-
      mpred_unfwc(Fact).
 
 
-%= mpred_unfwc(P) "un-forward-chains" from fact f.  That is, fact F has just
-%= been removed from the database, so remove all support relations it
-%= participates in and check the things that they support to see if they
-%= should stay in the database or should also be removed.
 
-
-%= 	 	 
-
-%% mpred_unfwc( ?MF) is semidet.
+%% mpred_unfwc(+Fact) is semidet.
 %
-% Managed Predicate Unfwc.
+% mpred_unfwc(Fact) "un-forward-chains" from fact Fact.  That is, fact Fact has just
+% been removed from the database, so remove all support relations it
+% participates in and check the things that they support to see if they
+% should stay in the database or should also be removed.
 %
-mpred_unfwc(MF) :- strip_module(MF,_,F),
-  mpred_retract_support_relations(mpred_unfwc(F),F),
-  mpred_unfwc1(F).
+mpred_unfwc(UnFact) :-   
+  strip_module(UnFact,_,Fact),
+  mpred_retract_support_relations(why(mpred_unfwc(Fact)),Fact),
+  mpred_unfwc1(Fact).
+  
 
 
 %= 	 	 
@@ -2994,12 +2965,12 @@ mpred_unfwc1(F) :-
 
 %= 	 	 
 
-%% mpred_unfwc_check_triggers( ?Sup, ?MF) is semidet.
+%% mpred_unfwc_check_triggers( ?Sup, ?Clause) is semidet.
 %
 % Managed Predicate Unfwc Check Triggers.
 %
-mpred_unfwc_check_triggers(_Sup,MF) :- 
- strip_module(MF,_,F),
+mpred_unfwc_check_triggers(_Sup,Clause) :- 
+ strip_module(Clause,_,F),
   mpred_db_type(F,fact),
   copy_term_and_varnames(F,Fcopy),
   mpred_get_trigger_quick(ABOX,basePFC:nt(ABOX,Fcopy,Condition,Action)),
@@ -3018,9 +2989,9 @@ mpred_unfwc_check_triggers(_Sup,_).
 %
 mpred_retract_support_relations(Why,Fact) :-
   mpred_db_type(Fact,Type),
-  (Type=trigger -> mpred_rem_support(Why,P,(_,Fact)) ;
+  (Type=trigger -> mpred_support_db_rem(Why,P,(_,Fact)) ;
     % non trigger
-    mpred_rem_support(Why,P,(Fact,_))),
+    mpred_support_db_rem(Why,P,(Fact,_))),
   remove_if_unsupported(Why,P),
   fail.
 mpred_retract_support_relations(_,_).
@@ -3042,6 +3013,9 @@ remove_if_unsupported_verbose(Why,TMS,P) :-
    % mpred_run.
 
 
+mpred_remove_file_support(File):- 
+  forall(filematch(File,Match),
+      forall(basePFC:spft(ABOX, W, U, U, Match),forall(retract_i(basePFC:spft(ABOX, W, U, U, Match)),mpred_rem2(W)))).
 
 %= 	 	 
 
@@ -3340,7 +3314,7 @@ mpred_fwd(P):- get_source_ref(UU), mpred_fwd(P,UU).
 %
 mpred_fwd([H|T],S) :- !, mpred_fwd1(H,S), mpred_fwd(T,S).
 mpred_fwd([],_) :- !.
-mpred_fwd(P,S) :- mpred_fwd1(P,S),!.
+mpred_fwd(P,S) :- copy_term(P:S,P0:S0),mpred_fwd1(P0,S0),!.
 
 %=
 % mpred_fwd1(+P) forward chains for a single fact.
@@ -3354,8 +3328,8 @@ mpred_fwd(P,S) :- mpred_fwd1(P,S),!.
 mpred_fwd1(Fact,Sup) :- gripe_time(24.80,mpred_fwd2(Fact,Sup)),!.
 
 
-% unnumbervars_equals(A,B):- =(A,BO),!,BO=B.
-unnumbervars_equals(A,B):-unnumbervars(A,B).
+unnumbervars_equals(A,B):- =(A,BO),!,BO=B.
+% unnumbervars_equals(A,B):-unnumbervars(A,B).
 
 %= 	 	 
 
@@ -3371,8 +3345,7 @@ mpred_fwd2(Fact0,_Sup):-
   % check positive triggers
   once(must(fcpt(Fact,F))),
   % check negative triggers
-  once(must(fcnt(Fact,F))),
-  mpred_run.
+  once(must(fcnt(Fact,F))).
 
 
 %=
@@ -3534,8 +3507,8 @@ contains_ftVar(Term):- sub_term(Sub,Term),compound(Sub),Sub='$VAR'(_).
 % Managed Predicate Eval Left-hand-side.
 %
 mpred_eval_lhs(P,S):-
-  unnumbervars_equals(mpred_eval_lhs(P,S),mpred_eval_lhs(P0,S0)),
-    loop_check(mpred_eval_lhs0(P0,S0)).
+  unnumbervars_equals(+(P,S),+(P0,S0)),
+    mpred_eval_lhs0(P0,S0).
 
 
 %= 	 	 
@@ -3760,11 +3733,11 @@ req(G):- loop_check(mpred_call_0(G),fail).
 
 %= 	 	 
 
-%% mpred_call_only_facts( ?MF) is semidet.
+%% mpred_call_only_facts( ?Clause) is semidet.
 %
 % Managed Predicate Call Only Facts.
 %
-mpred_call_only_facts(MF) :-  strip_module(MF,_,F), on_x_rtrace(no_repeats(loop_check(mpred_call_0(F),fail))). 
+mpred_call_only_facts(Clause) :-  strip_module(Clause,_,F), on_x_rtrace(no_repeats(loop_check(mpred_call_0(F),fail))). 
 
 %= 	 	 
 
@@ -3803,7 +3776,7 @@ mpred_call_0(call_u(X)):- !, mpred_call_0(X).
 mpred_call_0(asserta(X)):- !, aina(X).
 mpred_call_0(assertz(X)):- !, ainz(X).
 mpred_call_0(assert(X)):- !, ain(X).
-mpred_call_0(retract(X)):- !, mpred_rem(X).
+mpred_call_0(retract(X)):- !, mpred_rem2(X).
 
 mpred_call_0(M:P):-!,sanity(nonvar(P)),functor(P,F,_),mpred_call_1(M,P,F).
 mpred_call_0(G):- strip_module(G,M,P),sanity(nonvar(P)),functor(P,F,_),mpred_call_1(M,P,F).
@@ -3847,11 +3820,11 @@ call_with_bc_triggers(MP) :- strip_module(MP,_,P), functor(P,F,A), \+ t_l:infBac
 
 %= 	 	 
 
-%% mpred_call_with_no_triggers( ?MF) is semidet.
+%% mpred_call_with_no_triggers( ?Clause) is semidet.
 %
 % Managed Predicate Call Using No Triggers.
 %
-mpred_call_with_no_triggers(MF) :-  strip_module(MF,_,F),
+mpred_call_with_no_triggers(Clause) :-  strip_module(Clause,_,F),
   %= this (is_ftVar(F)) is probably not advisable due to extreme inefficiency.
   (is_ftVar(F)    ->  mpred_facts_and_universe(F) ; mpred_call_with_no_triggers_bound(F)).
 
@@ -3867,11 +3840,11 @@ mpred_call_with_no_triggers_bound(F):- mpred_call_with_no_triggers_uncaugth(F).
 
 %= 	 	 
 
-%% mpred_call_with_no_triggers_uncaugth( ?MF) is semidet.
+%% mpred_call_with_no_triggers_uncaugth( ?Clause) is semidet.
 %
 % Managed Predicate Call Using No Triggers Uncaugth.
 %
-mpred_call_with_no_triggers_uncaugth(MF) :-  strip_module(MF,_,F),
+mpred_call_with_no_triggers_uncaugth(Clause) :-  strip_module(Clause,_,F),
   show_failure(mpred_call_with_no_triggers_bound,no_side_effects(F)),
   (\+ current_predicate(_,F) -> fail;call_prologsys(F)).
   %= we check for system predicates as well.
@@ -4281,7 +4254,7 @@ mpred_mark_fa_as(_Sup, PosNeg,_P,F,A,Type):- req(mpred_mark(Type,PosNeg,F,A)),!.
 mpred_mark_fa_as(Sup,PosNeg,_P,F,A,Type):- 
   MARK = mpred_mark(Type,PosNeg,F,A),
   check_never_assert(MARK),
-  mpred_post_sp_zzz((s(Sup),g),MARK),!.
+  with_no_mpred_trace_exec(with_search_mode(direct,mpred_fwd1(MARK,(s(Sup),g)))),!.
    
 
 %= 	 	 
@@ -4816,8 +4789,6 @@ ain_support(P,FT) :- trace_or_throw(failed_ain_support(P,FT)).
 
 
 
-%= 	 	 
-
 %% mpred_get_support( ?P, :TermFact) is semidet.
 %
 % Managed Predicate Get Support.
@@ -4827,9 +4798,7 @@ mpred_get_support(P,(Fact,Trigger)) :-
   get_user_abox_umt(ABOX),
     (basePFC:spft(ABOX,P,Fact,Trigger,_)*->true;(is_ftNonvar(P),mpred_get_support_neg(P,(Fact,Trigger)))).
 
-% dont mpred_get_support_neg(\+ ~(P),(Fact,Trigger)) :- sp ftY((P),Fact,Trigger).
 
-%= 	 	 
 
 %% mpred_get_support_neg( :TermP, ?S) is semidet.
 %
@@ -4837,22 +4806,19 @@ mpred_get_support(P,(Fact,Trigger)) :-
 %
 mpred_get_support_neg(\+ (P),S) :- !, is_ftNonvar(P), mpred_get_support(~(P),S).
 mpred_get_support_neg(- (P),S) :- !, is_ftNonvar(P), mpred_get_support(~(P),S).
+% dont mpred_get_support_neg(\+ ~(P),(Fact,Trigger)) :- sp ftY((P),Fact,Trigger).
 
 
-% There are three of these to try to efficiently handle the cases
+
+%% mpred_support_db_rem( ?WhyIn, ?P, ?S) is semidet.
+%
+% There were three of these to try to efficiently handle the cases
 % where some of the arguments are not bound but at least one is.
-
-
-%= 	 	 
-
-%% mpred_rem_support( ?WhyIn, ?P, ?S) is semidet.
 %
-% Managed Predicate Remove/erase Support.
-%
-mpred_rem_support(WhyIn,P,S):- P \= ~(_), mpred_trace_msg('Removing',mpred_rem_support(WhyIn,P,S)),fail.
-mpred_rem_support(WhyIn,P,(Fact,Trigger)) :- is_ftVar(P),!,
+mpred_support_db_rem(WhyIn,P,S):- P \= ~(_), mpred_trace_msg('Removing',mpred_support_db_rem(WhyIn,P,S)),fail.
+mpred_support_db_rem(WhyIn,P,(Fact,Trigger)) :- is_ftVar(P),!,
   get_user_abox_umt(ABOX),
-  copy_term_and_varnames(mpred_rem_support(mpred_rem_support,P,(Fact,Trigger)) ,TheWhy),
+  copy_term_and_varnames(mpred_support_db_rem(mpred_support_db_rem,P,(Fact,Trigger)) ,TheWhy),
   SPFC = basePFC:spft(ABOX,RP,RFact,RTrigger,_RWhy),
   clause_i(basePFC:spft(ABOX,P,Fact,Trigger,_),true,Ref),
   ((clause_i(SPFC,true,Ref),
@@ -4860,8 +4826,8 @@ mpred_rem_support(WhyIn,P,(Fact,Trigger)) :- is_ftVar(P),!,
         erase_w_attvars(clause(SPFC,true,Ref),Ref); 
        (mpred_trace_msg(<=(TheWhy,-SPFC)),nop(mpred_retract_or_warn_i(spftVVVVVVV(P,Fact,Trigger))),nop(trace))),
    (is_ftVar(P)->trace_or_throw(is_ftVar(P));remove_if_unsupported_verbose(WhyIn,local,P)))).
-mpred_rem_support(Why,(\+ N) , S):- mpred_rem_support(Why,~(N),S).
-mpred_rem_support(_Why,P,(Fact,Trigger)):-get_user_abox_umt(ABOX),mpred_retract_or_warn_i(basePFC:spft(ABOX,P,Fact,Trigger,_)).
+mpred_support_db_rem(Why,(\+ N) , S):- mpred_support_db_rem(Why,~(N),S).
+mpred_support_db_rem(_Why,P,(Fact,Trigger)):-get_user_abox_umt(ABOX),mpred_retract_or_warn_i(basePFC:spft(ABOX,P,Fact,Trigger,_)).
 
 /*
 % TODO not called yet
@@ -5825,11 +5791,11 @@ mpred_descendants(P,L) :-
 %
 % Compute Resolve.
 %
-compute_resolve(NewerP,OlderQ,SU,SU,(mpred_remove3(OlderQ),ain(NewerP,S),mpred_rem1(conflict(NewerP)))):-
+compute_resolve(NewerP,OlderQ,SU,SU,(mpred_remove4(OlderQ),ain(NewerP,S),mpred_rem1(conflict(NewerP)))):-
   must(correctify_support(SU,S)),
   wdmsg(compute_resolve(newer(NewerP-S)>older(OlderQ-S))).
 compute_resolve(NewerP,OlderQ,S1,[U],Resolve):-compute_resolve(OlderQ,NewerP,[U2],S1,Resolve),match_source_ref1(U),match_source_ref1(U2),!.
-compute_resolve(NewerP,OlderQ,SU,S2,(mpred_remove3(OlderQ),ain(NewerP,S1),mpred_rem1(conflict(NewerP)))):-
+compute_resolve(NewerP,OlderQ,SU,S2,(mpred_remove4(OlderQ),ain(NewerP,S1),mpred_rem1(conflict(NewerP)))):-
   must(correctify_support(SU,S1)),
   wdmsg(compute_resolve((NewerP-S1)>(OlderQ-S2))).
 
@@ -6079,10 +6045,14 @@ add_reprop(Trig,(H:-B)):- trace_or_throw(bad_add_reprop(Trig,(H:-B))).
 % add_reprop(_Trig ,Trigger):- !, w_tl(t_l:current_why_source(Trig),  mpred_enqueue(repropagate(Trigger),(g,g))).
 add_reprop( Trig ,Trigger):- 
   w_tl(t_l:current_why_source(Trig),
+    (
+     mpred_fwd(repropagate(Trigger),Trig))),!.
+
+
+add_reprop( Trig ,Trigger):- 
+  w_tl(t_l:current_why_source(Trig),
     (get_user_abox_umt(ABOX),
      attvar_op(assertz_if_new,(basePFC:qu(ABOX,repropagate(Trigger),(g,g)))))).
-   
-
 
 
 %= 	 	 

@@ -111,7 +111,7 @@ forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f))))).
 % ((human(P1),ancestor(P1,P2))=>human(P2)).
 ((human(P1),ancestor(P2,P1))=>human(P2)).
 
-:- rtrace(ain(mother(eileen,trudy))).
+:- (ain(mother(eileen,trudy))).
 :- printAll(must(mother(eileen,_))).
 :- printAll(must(ancestor(eileen,_))).
 

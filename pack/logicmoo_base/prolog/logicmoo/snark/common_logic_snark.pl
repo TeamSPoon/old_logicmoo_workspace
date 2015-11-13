@@ -260,8 +260,8 @@ member_ele(E,E).
 % Delistify Last Argument.
 %
 delistify_last_arg(Arg,Pred,Last):-is_list(Arg),!,member(E,Arg),delistify_last_arg(E,Pred,Last).
-delistify_last_arg(Arg,M:Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARGS),NEWCALL=..[F|NARGS],show_call(why,M:NEWCALL),!,member_ele(NEW,Last).
-delistify_last_arg(Arg,Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARGS),NEWCALL=..[F|NARGS],show_call(why,NEWCALL),!,member_ele(NEW,Last).
+delistify_last_arg(Arg,M:Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARGS),NEWCALL=..[F|NARGS],show_failure(M:NEWCALL),!,member_ele(NEW,Last).
+delistify_last_arg(Arg,Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARGS),NEWCALL=..[F|NARGS],show_failure(NEWCALL),!,member_ele(NEW,Last).
 
 % sanity that mpreds (manage prolog prodicate) are abily to transform
 %:- t_l:disable_px->throw(t_l:disable_px);true.
@@ -302,28 +302,25 @@ pfc_for_print(Prolog,PrintPFC):-is_list(Prolog),!,maplist(pfc_for_print,Prolog,P
 pfc_for_print(==>(P,Q),(Q:-fwc, P)):-!.
 pfc_for_print(Prolog,PrintPFC):- =(Prolog,PrintPFC).
 
-% Sanity Test for expected side-effect entailments
-% why does renumbervars_prev work but not copy_term?
-
-%= 	 	 
 
 %% is_entailed( ?CLIF) is semidet.
 %
 % If Is A Entailed.
+%   A good sanity Test for expected side-effect entailments
+%   
 %
-is_entailed(CLIF):-
+is_entailed(CLIF):- 
+ cwc, mpred_run,
  mpred_no_chaining((
-   cwc, clif_to_prolog(CLIF,Prolog),!, \+ \+ are_clauses_entailed(Prolog))),!.
+   clif_to_prolog(CLIF,Prolog),!, \+ \+ are_clauses_entailed(Prolog))),!.
 
-% Sanity Test for required absence of specific side-effect entailments
-
-%= 	 	 
 
 %% is_not_entailed( ?CLIF) is semidet.
 %
 % If Is A Not Entailed.
+%  A good sanity Test for required absence of specific side-effect entailments
 %
-is_not_entailed(CLIF):- cwc, clif_to_prolog(CLIF,Prolog), \+ are_clauses_entailed(Prolog).
+is_not_entailed(CLIF):- cwc, mpred_no_chaining((clif_to_prolog(CLIF,Prolog), \+ are_clauses_entailed(Prolog))).
 
 :- op(1190,xfx,(:-)).
 :- op(1200,fy,(is_entailed)).
