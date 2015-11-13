@@ -827,25 +827,18 @@ add_side_effect(Op,Data):-current_why(Why),assert(t_l:side_effect_buffer(Op,Data
 
 %= 	 	 
 
-%% attvar_op( :PRED1Op, ?Data) is semidet.
+%% attvar_op( +:PRED1, ?Data) is semidet.
 %
 % Attribute Variable Oper..
 %
 
-attvar_op(Op,Data):- atom(Op),\+ atom_concat(assert,_,Op),!,
-   clausify_attributes(Data,DataA),
-   (DataA==Data->true;dmsg(clausify_attributes(Data,DataA))),
-   add_side_effect(Op,DataA),
-   unnumbervars_and_save(DataA,Data0),  !, 
-   trace,physical_side_effect(call(Op,Data0)).
-
-
-attvar_op(Op,Data):- 
-   sanity(nonvar(Op)),
-   clausify_attributes(Data,DataA),
-   add_side_effect(Op,DataA),
-   unnumbervars_and_save(DataA,Data0),   
-   physical_side_effect(call(Op,Data0)).
+attvar_op(Op,Data):- strip_module(Op,_,OpA), must(atom(OpA)),add_side_effect(Op,Data),
+   unnumbervars_and_save(Data,Data0),
+   clausify_attributes(Data0,DataA),
+   ((DataA==Data)->
+    physical_side_effect(call(Op,Data0));
+     (nop(dmsg(clausify_attributes(Data,DataA))),
+      physical_side_effect(call(Op,DataA)))),!.
 
 
 %= 	 	 
@@ -1684,7 +1677,7 @@ assertz_i(X):- check_never_assert(X), attvar_op(assertz_if_new,X).
 %
 % Retract For Internal Interface.
 %
-retract_i(X):- check_never_retract(X), attvar_op(retract,X).
+retract_i(X):- check_never_retract(X),attvar_op(retract,X).
 
 %= 	 	 
 
@@ -1697,7 +1690,10 @@ clause_i(H,B):- clause_i(H,B,_).
  
 clause_asserted_i(HB):- expand_to_hb(HB,H,B),clause_asserted_i(H,B,_).
 clause_asserted_i(H,B):- clause_asserted_i(H,B,_).
-clause_asserted_i(H,B,Ref):- clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B).
+
+clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B).
+
+% clause_asserted_i(H,B,Ref):- clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B).
 %= 	 	 
 
 %% clause_i( ?H, ?B, ?Ref) is semidet.
@@ -1964,7 +1960,7 @@ ain_fast(P0):-
 %
 % Assert If New Fast.
 %
-ain_fast(nesc(P),S) :- is_ftNonvar(P),!,ain_fast(P,S).
+ain_fast(nesc(P),S) :- nonvar(P),!,ain_fast(P,S).
 ain_fast(P0,S):- gripe_time(23.6,ain_fast_timed(P0,S)).
 
 
@@ -1978,7 +1974,8 @@ ain_fast_timed(P0,S):- '$module'(user,user),'$set_source_module'(user,user),!,
   '$module'(WM,baseKB),'$set_source_module'(WS,baseKB),
    call_cleanup(ain_fast_timed(P0,S),('$module'(_,WM),'$set_source_module'(_,WS))).
 
-ain_fast_timed(P00,S):- check_context_module,
+ain_fast_timed(P000,S0):- check_context_module,
+  unnumbervars(P000:S0,P00:S),
   strip_module(P00,_,P0),  
   must(to_addable_form_wte(assert,P0,P)),
       (is_list(P)

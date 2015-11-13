@@ -350,9 +350,11 @@ add_var_to_env(Name,Var):- nb_current('$variable_names',Vs),!,
 %% add_var_to_list(Name,Var,Vs,NewName,NewVar,NewVs) is det.
 add_var_to_list(Name,Var,Vs,NewName,NewVar,NewVs):- member(N0=V0,Vs), Var==V0,!,
             (Name==N0 -> ( NewName=Name,NewVar=Var, NewVs=Vs ) ;  ( NewName=N0,NewVar=Var,NewVs=[Name=Var|Vs])),!.
+% a current name but points to a diffentrt var
 add_var_to_list(Name,Var,Vs,NewName,NewVar,NewVs):- member(Name=_,Vs),
-              gensym(Name,NameAgain),\+ member(NameAgain=_,Vs),
-              NewName=NameAgain,NewVar=Var, NewVs=[NameAgain=Var|Vs],!.
+              length(Vs,Len),atom_concat(Name,Len,NameAgain0),( \+ member(NameAgain0=_,Vs)-> NameAgain0=NameAgain ; gensym(Name,NameAgain)),
+              NewName=NameAgain,NewVar=Var, 
+              NewVs=[NewName=NewVar|Vs],!.
 add_var_to_list(Name,Var,Vs,NewName,NewVar,NewVs):-  NewName=Name,NewVar=Var,NewVs=[Name=Var|Vs],!.
 
 
@@ -376,8 +378,10 @@ check_variable_names(I,O):- \+ member(free=_,I) -> O=I ; trace_or_throw(bad_chec
 %
 % Unnumbervars And Save.
 %
-% unnumbervars_and_save(X,YO):- \+ ((sub_term(V,X),compound(V),'$VAR'(_)=V)),!,YO=X.
+
 unnumbervars_and_save(X,YO):- hotrace(must(unnumbervars4(X,[],_,YO))),!.
+% unnumbervars_and_save(X,YO):- \+ ((sub_term(V,X),compound(V),'$VAR'(_)=V)),!,YO=X.
+
 /*
 unnumbervars_and_save(X,YO):- nb_getval('$variable_names',Vs),unnumbervars4(X,Vs,NewVs,YO),!,
    (NewVs  \==Vs   -> put_variable_names(NewVs) ; true).

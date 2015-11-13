@@ -59,5 +59,12 @@ checkKB:m1:- gripe_time(40,baseKB:ensure_loaded(baseKB:logicmoo(mpred_online/mpr
 
 :- lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:logicmoo(pfc/'autoexec.pfc'))).
 
+:- tell('baseKB_autoexec.pfc'), 
+   format('~N:- ~q.~n',[mpred_module(basePFC)]),
+   listing(basePFC:_),
+   format('~N:- ~q.~n',[mpred_module(baseKB)]),
+   listing(baseKB:_),
+   told.
+
 
 

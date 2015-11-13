@@ -437,7 +437,7 @@ split_attrs(B,true,B):-var(B),!.
 split_attrs(A,A,true):- is_attr_bind(A),!.
 split_attrs(true,true,true):-!.
 split_attrs(_:AB,A,B):- split_attrs(AB,A,B),!.
-split_attrs(M:AB,A,MB):- !,split_attrs(AB,A,B),to_mod_if_needed(M,B,MB).
+split_attrs(M:AB,A,MB):- !,split_attrs(AB,A,B),to_mod_if_needed(M,B,MB),!.
 split_attrs((B,A),A,B):- is_attr_bind(A),!.
 split_attrs((A,B),A,B):- is_attr_bind(A),!.
 split_attrs((L,B),AB,(L,R)):- !,split_attrs(B,AB,R).

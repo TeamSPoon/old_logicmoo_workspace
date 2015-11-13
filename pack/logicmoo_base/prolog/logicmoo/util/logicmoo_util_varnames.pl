@@ -174,7 +174,7 @@
             try_save_vars/1,
             unlock_vars/1,
             v_dif_rest/2,
-            name_variable/2, variable_name/2,
+            % name_variable/2, variable_name/2,
             vmust/1,            
             init_varname_stores/1
  .
@@ -186,13 +186,17 @@
 %	Assign a name to a variable. Succeeds   silently if Var is not a
 %	variable (anymore).
 
-name_variable(Var, Name) :- var(Var), !,
-	put_attr(Var, vn, Name),
-        add_var_to_env(Name,Var).
 
-% name_variable('$VAR'(Var), Name):- Name==Var, !.
-name_variable('$VAR'(Var), Name):- var(Var),Name=Var,!. 
-name_variable('$VAR'(Var), Name) :- nonvar(Var), (Name==Var -> true ; trace_or_throw(numbervars_name_variable(Var, Name))),!.
+
+name_variable(Var, Name1) :- get_attr(Var,vn,Name2), 
+        combine_names(Name1,Name2,Name),
+	put_attr(Var, vn, Name). % add_var_to_env(Name,Var),!.
+name_variable(Var, Name) :- var(Var), !,
+	put_attr(Var, vn, Name). 
+
+name_variable('$VAR'(Var), Name):- Name==Var, !.
+name_variable('$VAR'(Var), Name):- var(Var),Name=Var,!.
+% name_variable('$VAR'(Var), Name) :- trace_or_throw(numbervars_name_variable(Var, Name)),!.
 name_variable(_, _).
 
 
@@ -218,7 +222,7 @@ vn:project_attributes(QueryVars, ResidualVars):-nop(dmsg(vn:proj_attrs(vn,QueryV
 %  Hook To [dom:attribute_goals/3] For Module Logicmoo_varnames.
 %  Attribute Goals.
 %
-attribute_goals(Var) --> {variable_name(Var, Name)},[name_variable(Var,Name)].
+vn:attribute_goals(Var) --> {variable_name(Var, Name)},[name_variable(Var,Name)].
 
 
 :- public ((attr_unify_hook/2,attr_portray_hook/2)).
