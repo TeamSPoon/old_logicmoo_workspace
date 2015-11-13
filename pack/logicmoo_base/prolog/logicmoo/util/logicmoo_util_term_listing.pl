@@ -1334,7 +1334,7 @@ make_headkey(M:F/_, M:F):-atom(F).
 make_headkey(F  /_, _:F):-atom(F).
 make_headkey(M:H,M:NK):-nonvar(M),make_headkey(H,NK),!.
 make_headkey(H,NK):-compound(H),functor(H,NK,_).
-make_headkey(H,NK):-copy_term(H,NK),numbervars(NK),!.
+make_headkey(H,NK):-copy_term_nat(H,NK),numbervars(NK),!.
 
 
 
@@ -1463,6 +1463,43 @@ prolog_listing_list_clauses(Pred, Source) :-
 :- if(true).
 
 :- ensure_loaded(library(listing)).
+
+:- redefine_system_predicate(prolog_listing:portray_clause/3).
+:- abolish(prolog_listing:portray_clause/3).
+:- meta_predicate prolog_listing:portray_clause(+,+,:).
+:- prolog_listing:export(prolog_listing:portray_clause/3).
+
+% Fav
+prolog_listing:portray_clause(Stream, Term, M:Options) :- fail,
+	must_be(list, Options),
+	meta_options(is_meta, M:Options, QOptions),
+	\+ \+ ( % must(serialize_attvars(Term, Copy)),
+                =(Term, Copy),
+		% numbervars(Copy, 0, _,[ singletons(true), attvar(Skip)]),
+		prolog_listing:do_portray_clause(Stream, Copy, QOptions)
+	      ),!.
+
+% Safe
+prolog_listing:portray_clause(Stream, Term, M:Options) :-
+	must_be(list, Options),
+	meta_options(is_meta, M:Options, QOptions),
+	\+ \+ ( must(serialize_attvars(Term, Copy)),
+		% numbervars(Copy, 0, _,[ singletons(true), attvar(Skip)]),
+                prolog_listing:do_portray_clause(Stream, Copy, QOptions)
+	      ),!.
+
+% Original
+prolog_listing:portray_clause(Stream, Term, M:Options) :-
+	must_be(list, Options),
+	meta_options(is_meta, M:Options, QOptions),
+	\+ \+ ( copy_term_nat(Term, Copy),
+		numbervars(Copy, 0, _,
+			   [ singletons(true)
+			   ]),
+		prolog_listing:do_portray_clause(Stream, Copy, QOptions)
+	      ).
+
+:- set_prolog_flag(gc,false).
 :- redefine_system_predicate(prolog_listing:list_clauses/2).
 :- abolish(prolog_listing:list_clauses/2).
 

@@ -2,18 +2,13 @@
 
 :- include('sanity_fi_sk.pfc').
 
-:- debug(req).
-:- mpred_trace_exec.
-
-:- process_this_script.
+:- begin_pfc.
 
 %= simply retract (so we can re-deduce)
 \+ human(douglas).
 
 %= confirm no inheritance twoards father
-:- must(\+ father(_,douglas)).
-
-:- prolog.
+:- must(\+ father(douglas,_)).
 
 %= catch a regression bug that may couse trudy to lose human assertion
 never_retract_u(human(trudy)).

@@ -138,7 +138,6 @@ mpred_call_0/1,
 mpred_call_1/3,
 mpred_call_only_facts/1,
 mpred_call_only_facts/2,
-mpred_call_t_exact/1,
 mpred_call_with_no_triggers/1,
 mpred_call_with_no_triggers_bound/1,
 mpred_call_with_no_triggers_uncaugth/1,
@@ -832,13 +831,21 @@ add_side_effect(Op,Data):-current_why(Why),assert(t_l:side_effect_buffer(Op,Data
 % Attribute Variable Oper..
 %
 
-attvar_op(Op,Data):- strip_module(Op,_,OpA), must(atom(OpA)),add_side_effect(Op,Data),
+attvar_op(Op,Data):- strip_module(Op,_,OpA), sanity((atom(OpA))),
+   add_side_effect(Op,Data),
    unnumbervars_and_save(Data,Data0),
    clausify_attributes(Data0,DataA),
-   ((DataA==Data)->
-    physical_side_effect(call(Op,Data0));
-     (nop(dmsg(clausify_attributes(Data,DataA))),
-      physical_side_effect(call(Op,DataA)))),!.
+   (==(Data0,DataA)->
+     physical_side_effect(call(Op,DataA));
+
+   ((atom_concat(asse,_,OpA) -> physical_side_effect(call(Op,DataA)));
+   ((
+    % nop((expand_to_hb(DataA,H,B),split_attrs(B,BA,G))),
+     
+    physical_side_effect(call(Op,DataA))
+
+    )))).
+    
 
 
 %= 	 	 
@@ -1106,7 +1113,7 @@ exact_args(true).
 % Managed Predicate If Is A Tautology.
 %
 mpred_is_tautology(Var):-is_ftVar(Var).
-mpred_is_tautology(V):- \+ \+ call((copy_term_nat(V,VC),numbervars(VC),show_success(why,mpred_is_taut(VC)))).
+mpred_is_tautology(V):- copy_term_nat(V,VC),numbervars(VC),show_success(mpred_is_taut(VC)).
 
 
 %= 	 	 
@@ -1115,6 +1122,7 @@ mpred_is_tautology(V):- \+ \+ call((copy_term_nat(V,VC),numbervars(VC),show_succ
 %
 % Managed Predicate If Is A Taut.
 %
+mpred_is_taut(A):-var(A),!.
 mpred_is_taut(A:-B):-!,mpred_is_taut(B==>A).
 mpred_is_taut(A<-B):-!,mpred_is_taut(B==>A).
 mpred_is_taut(A<==>B):-!,(mpred_is_taut(A==>B);mpred_is_taut(B==>A)).
@@ -1509,7 +1517,7 @@ assert_u(M,X,_,_):- assertz_mu(M,X).
 %
 % Check Never Assert.
 %
-check_never_assert(X):- hotrace(ignore(( copy_term_and_varnames(X,Y),req(never_assert_u(Y,Why)),X=@=Y,snumbervars(X),trace_or_throw(never_assert_u(X,Why))))).
+check_never_assert(X):- hotrace(ignore(( copy_term_and_varnames(X,Y),req(never_assert_u(Y,Why)),X=@=Y,trace_or_throw(never_assert_u(X,Why))))).
 
 %= 	 	 
 
@@ -1517,7 +1525,7 @@ check_never_assert(X):- hotrace(ignore(( copy_term_and_varnames(X,Y),req(never_a
 %
 % Check Never Retract.
 %
-check_never_retract(X):- hotrace(ignore(( copy_term_and_varnames(X,Y),req(never_retract_u(Y,Why)),X=@=Y,snumbervars(X),trace_or_throw(never_retract_u(X,Why))))).
+check_never_retract(X):- hotrace(ignore(( copy_term_and_varnames(X,Y),req(never_retract_u(Y,Why)),X=@=Y,trace_or_throw(never_retract_u(X,Why))))).
 
 
 
@@ -1687,13 +1695,6 @@ retract_i(X):- check_never_retract(X),attvar_op(retract,X).
 %
 clause_i(H,B):- clause_i(H,B,_).
 
- 
-clause_asserted_i(HB):- expand_to_hb(HB,H,B),clause_asserted_i(H,B,_).
-clause_asserted_i(H,B):- clause_asserted_i(H,B,_).
-
-clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B).
-
-% clause_asserted_i(H,B,Ref):- clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B).
 %= 	 	 
 
 %% clause_i( ?H, ?B, ?Ref) is semidet.
@@ -1702,6 +1703,13 @@ clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B
 %
 clause_i(H,B,Ref):- clause(H,AB,Ref),must(split_attrs(AB,A,B0)->A),B=B0.
 
+
+ 
+clause_asserted_i(HB):- expand_to_hb(HB,H,B),clause_asserted_i(H,B,_).
+clause_asserted_i(H,B):- clause_asserted_i(H,B,_).
+clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B).
+
+% clause_asserted_i(H,B,Ref):- clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B).
 
 
 %= 	 	 
@@ -1995,7 +2003,6 @@ ain_fast_sp(S,P0):-
   strip_module(P0,_,P),
   ensure_vars_labled(P,P0),fully_expand(change(assert,add),P0,P1),ain_fast_sp0(S,P1).
 
-  
 
 % ain_fast_sp(S,P->Q) :-!,ain_fast_sp(S,P==>Q).
 
@@ -4632,20 +4639,12 @@ mpred_db_type(_,fact) :-
 
 
 
-%= 	 	 
-
-%% mpred_call_t_exact( ?Trigger) is semidet.
-%
-% Managed Predicate Call True Structure Exact.
-%
-mpred_call_t_exact(Trigger) :- copy_term_and_varnames(Trigger,Copy),arg(1,Trigger,ABOX), mpred_get_trigger_quick(ABOX,Trigger),Trigger=@=Copy.
-
 
 %= 	 	 
 
 %% retract_t( ?Trigger) is semidet.
 %
-% Retract True Stucture.
+% Retract Trigger Stucture.
 %
 retract_t(Trigger) :- arg(1,Trigger,ABOX),retract_i(basePFC:spft(ABOX,Trigger,_,_,_)),ignore(retract_i(Trigger)).
 
@@ -5309,7 +5308,7 @@ mpred_spy_all :- assert_i(mpred_is_tracing_exec).
 %
 % Managed Predicate  Trace exec.
 %
-mpred_trace_exec :- assert_i(mpred_is_tracing_exec).
+mpred_trace_exec :- assert_i(mpred_is_tracing_exec),set_prolog_flag(gc,false).
 
 %= 	 	 
 
@@ -5587,7 +5586,7 @@ mpred_warn(Msg,Args) :-
  ignore((
   sformat(S, Msg,Args),
   show_source_location,
-  wdmsg(pfc(warn(S))))),!,trace.
+  wdmsg(pfc(warn(S))))),!.
 
 mpred_warn(Msg,Args) :-
  ignore((

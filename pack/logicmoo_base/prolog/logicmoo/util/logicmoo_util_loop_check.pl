@@ -210,7 +210,7 @@ reduce_make_key(O,O).
 % Cc Key.
 %
 cc_key(CC,Key):- cyclic_term(CC),!,trace,copy_term_nat(CC,CKey),numbervars(CKey,0,_),format(atom(Key),'~w',[CKey]),!.
-cc_key(CC,Key):- copy_term_nat(CC,Key),numbervars(Key,0,_),!.
+cc_key(CC,O):- copy_term_nat(CC,Key),numbervars(Key,0,_),!,Key=O.
 
 
 %= 	 	 

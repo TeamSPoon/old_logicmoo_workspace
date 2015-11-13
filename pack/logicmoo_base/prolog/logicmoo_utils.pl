@@ -148,7 +148,7 @@ lmconf:logicmoo_scan_autoloads:-false.
 
 :- if(lmconf:logicmoo_scan_autoloads).
 :- set_prolog_flag(verbose_autoload, false).
-:- autoload.
+:- autoload([verbose(false)]).
 :- set_prolog_flag(verbose_autoload, true).
 :- endif.
 

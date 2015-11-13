@@ -36,7 +36,6 @@
             convertAndCall/2,
             correct_arities/3,
             % elInverse/2,
-            fix_input_vars/2,
             flatten_or_list/3,
             fmtl/1,
             fresh_varname/2,
@@ -67,6 +66,7 @@
             kif_to_boxlog/2,
             kif_to_boxlog/3,
             kif_to_boxlog/4,
+            kif_to_boxlog_attvars/4,
             kif_to_prolog/2,
             kif_unnumbervars/2,
             lit_cost/3,
@@ -220,7 +220,9 @@ kif_hook(C):- C=..[F,A|_],is_sentence_functor(F),!,kif_hook(A).
 %
 % Are Clauses Entailed.
 %
-are_clauses_entailed(E):-not(compound(E)),!,must(true==E;[]==E).
+% 
+are_clauses_entailed(E):-var(E),!,fail.
+are_clauses_entailed([]):-!.
 are_clauses_entailed([E|List]):-!,are_clauses_entailed(E),are_clauses_entailed(List).
 are_clauses_entailed((C,L)):-!,are_clauses_entailed(C),are_clauses_entailed(L).
 are_clauses_entailed(CL):- \+ \+ (unnumbervars(CL,UCL),with_umt(is_prolog_entailed(UCL))),!.
@@ -952,7 +954,8 @@ kif_to_boxlog(HB,KB,Why,FlattenedO):- unnumbervars((HB,KB,Why),(HB0,KB0,Why0)),
 kif_to_boxlog_attvars(HB,KB,Why,FlattenedO):- compound(HB),HB=(HEAD:- BODY),!,
   must_det_l((
    check_is_kb(KB),
-   conjuncts_to_list(HEAD,HEADL),conjuncts_to_list(BODY,BODYL),
+   conjuncts_to_list(HEAD,HEADL),
+   conjuncts_to_list(BODY,BODYL),
    correct_boxlog([cl(HEADL,BODYL)],KB,Why,FlattenedO))).
 
 kif_to_boxlog_attvars(WffIn0,KB0,Why0,FlattenedO):-
@@ -1211,24 +1214,6 @@ mpred_t_tell_kif(OP2,RULE):-
    (show_call(why,call((must(kif_add(RULE))))))).
 
 
-
-%= 	 	 
-
-%% fix_input_vars( ?AIn, ?A) is semidet.
-%
-% Fix Input Variables.
-%
-fix_input_vars(AIn,A):- copy_term(AIn,A),numbervars(A,672,_).
-
-%:- was_export(show_boxlog/1).
-%assert_boxlog(AIn):- fix_input_vars(AIn,A), as_dlog(A,AA),kif_to_boxlog(AA,B),!,must_maplist(kif_add_boxes_undef(How,Why),B),!,nl,nl.
-%:- was_export(show_boxlog2/2).
-%assert_boxlog2(AIn):- fix_input_vars(AIn,A), with_all_dmsg((kif_to_boxlog(A,B),!,must_maplist(kif_add_boxes_undef(How,Why),B),!,nl,nl)).
-
-
-
-
-
 %= 	 	 
 
 %% boxlog_to_pfc( :TermPFCM, ?PFC) is semidet.
@@ -1240,7 +1225,7 @@ boxlog_to_pfc((A,B),C):- !, must_maplist(boxlog_to_pfc,[A,B],[AA,BB]),conjoin(AA
 boxlog_to_pfc(PFCM,PFCO):- boxlog_to_compile(PFCM,PFC),!, subst(PFC,(not),(~),PFCO).
 
 
-%:- was_export(tsn/0).
+
 
 %= 	 	 
 

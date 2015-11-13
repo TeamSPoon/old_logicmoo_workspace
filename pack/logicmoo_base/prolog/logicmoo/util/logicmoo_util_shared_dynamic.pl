@@ -81,7 +81,7 @@ system_goal_expansion_safe_wrap(T,I):-compound(T),functor(T,F,A),wrap_shared(F,A
 %
 % Safely Paying Attention To Corner Cases Wrap.
 %
-safe_wrap(I,_,if_defined(I)):- current_prolog_flag(xref,true),!,fail,numbervars(I).
+safe_wrap(I,_,if_defined(I)):- current_prolog_flag(xref,true),!,fail.
 safe_wrap(I,How,call(How,I)).
 
 

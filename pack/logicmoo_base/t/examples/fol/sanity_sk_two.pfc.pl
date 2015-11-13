@@ -2,10 +2,7 @@
 
 :- module(sanity_ks_two,[]).
 
-% :- use_module(library(logicmoo_user)).
-
-:- use_module(library(logicmoo_utils)).
-:- use_module(library(logicmoo_base)).
+:- use_module(library(logicmoo_user)).
 
 :- mpred_pfc_file.
 
@@ -14,11 +11,10 @@
 :- begin_pfc.
 
 
+% Basicly is this.. forall(C, forall(G, grandparent(C,G) => exists(P, (parent(P,G) & parent(C,P))))).
 forall(C, forall(G, exists(P,  grandparent(C,G) => (parent(C,P) & (parent(P,G)))))).
-
-% forall(C, forall(G, grandparent(C,G) => exists(P, (parent(P,G) & parent(C,P))))).
 
 grandparent(douglas,trudy).
 
-% parent(douglas,eileen).
+:- must(parent(douglas,_X)).
 

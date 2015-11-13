@@ -29,16 +29,15 @@ mother(eileen,trudy).
 
 %= catch a regression bug that may couse trudy to lose human assertion
 never_retract_u(human(trudy)).
-never_retract_u(father(_,_)).
 never_assert_u(mother(trudy,das)).
 
 %= these we want but i am trigging some breakpoints
-never_assert_u(father(_,_)).
-never_assert_u(mother(trudy,_)).
+% never_assert_u(father(_,_)).
+% never_assert_u(mother(trudy,_)).
 
 :- mpred_trace_exec.
 
-forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f))))).
+clif(forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f)))))).
 
 :- must(clif(forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f))))))).
 

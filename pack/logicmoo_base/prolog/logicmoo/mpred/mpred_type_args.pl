@@ -115,7 +115,7 @@ assert_argIsa(Prop,N,Type):-show_failure(why,ain_fast(argIsa(Prop,N,Type))).
 % assert Predicate Argument  Types.
 %
 assert_predArgTypes(ArgTs):-not(compound(ArgTs)),!.
-assert_predArgTypes(ArgTs):- numbervars(ArgTs,0,_,[functor_name(ftTerm)]),get_functor(ArgTs,F),assert_predArgTypes_fa(F,ArgTs).
+assert_predArgTypes(ArgTs):- numbervars(ArgTs,0,_,[functor_name(ftTerm),attvar(skip)]),get_functor(ArgTs,F),assert_predArgTypes_fa(F,ArgTs).
 
 
 %= 	 	 

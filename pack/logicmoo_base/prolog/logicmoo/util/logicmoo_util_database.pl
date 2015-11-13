@@ -3,12 +3,15 @@
           [ ain/1,
             ain0/1,
             aina/1,
-            split_attrs/3,is_attr_bind/1,
             ainz/1,
-            attr_bind/1,
-paina/1,pain/1,            painz/1,
-            ainz_clause/1,
-            ainz_clause/2,
+
+            attr_bind/1,attr_bind/2,attr_bind_complete/1,
+            split_attrs/3,is_attr_bind/1,
+
+            paina/1,pain/1,painz/1,
+
+            ainz_clause/1,ainz_clause/2,
+
             append_term/3,
             expand_to_hb/3,
             assert_if_new/1,
@@ -427,6 +430,12 @@ expand_to_hb( M:((H :- B)),M:H,B):-!.
 expand_to_hb( ((H :- B)),H,B):-!.
 expand_to_hb( H,  H,  true).
 
+
+clausify_attributes(M:Data,M:THIS):- nonvar(M),!, clausify_attributes(Data,THIS).
+clausify_attributes((Data:-B),THIS):- B==true,!,clausify_attributes(Data,THIS).
+clausify_attributes((Data:-B),THIS):- !,
+   copy_term((Data:-B),(Data0:-B0),Extra),   
+   (Extra == [] -> (THIS = (Data:-B)) ; (hb_to_clause(Data0,(attr_bind(Extra),B0),THIS))).
 clausify_attributes(Data,THIS):- 
    copy_term(Data,Data0,Extra),   
    (Extra == [] -> THIS = Data ; (hb_to_clause(Data0,attr_bind(Extra),THIS))).
@@ -437,6 +446,8 @@ split_attrs(B,true,B):-var(B),!.
 split_attrs(A,A,true):- is_attr_bind(A),!.
 split_attrs(true,true,true):-!.
 split_attrs(_:AB,A,B):- split_attrs(AB,A,B),!.
+
+split_attrs(attr_bind(G,Call),attr_bind(G),(Call,attr_bind(G))):- !.
 split_attrs(M:AB,A,MB):- !,split_attrs(AB,A,B),to_mod_if_needed(M,B,MB),!.
 split_attrs((B,A),A,B):- is_attr_bind(A),!.
 split_attrs((A,B),A,B):- is_attr_bind(A),!.
@@ -447,9 +458,15 @@ is_attr_bind(B):-var(B),!,fail.
 is_attr_bind(_:B):-!,compound(B),functor(B,attr_bind,_).
 is_attr_bind(B):-compound(B),functor(B,attr_bind,_).
 
+:- meta_predicate attr_bind(0,0).
+:- module_transparent attr_bind/2.
 :- meta_predicate attr_bind(0).
 :- module_transparent attr_bind/1.
+:- meta_predicate attr_bind_complete(0).
+:- module_transparent attr_bind_complete/1.
 attr_bind(G):-must_det_l(G).
+attr_bind_complete(G):-must_det_l(G).
+attr_bind(G,Call):-must_det_l(G),(Call==true->true;(Call,attr_bind_complete(G))).
 
 
 %% hb_to_clause( ?H, ?B, ?Clause ) is semidet.
@@ -457,6 +474,7 @@ attr_bind(G):-must_det_l(G).
 % Join a Head+Body To Clause.
 %
 hb_to_clause(H,B,H):- B==true,!.
+hb_to_clause(M:(H:-B1),B2,(M:H:- (B2,B1))):-!.
 hb_to_clause((H:-B1),B2,(H:- (B2,B1))):-!.
 hb_to_clause(H,B,(H:-B)).
 

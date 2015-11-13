@@ -28,6 +28,7 @@
             write_functor/2,
             atom_subst_frak_0/4,
             arg_varname/3,
+            variable_name_or_ref/2,
             attr_portray_hook/2,
             attr_unify_hook/2,
             renumbervars/3,
@@ -206,7 +207,10 @@ name_variable(_, _).
 %
 %	True if Var has been assigned Name.
 
-variable_name(Var, Name) :- (get_attr(Var, vn, Name);var_property(Var,name(Name));get_attr(Var, varnames, Name)),!.
+variable_name(Var, Name) :- must(var(Var)),(get_attr(Var, vn, Name);var_property(Var,name(Name));get_attr(Var, varnames, Name)),!.
+
+variable_name_or_ref(Var, Name) :- var(Var), variable_name(Var, Name),!.
+variable_name_or_ref(Var, Name) :- format(atom(Name),'~q',[Var]).
 
 
 %% project_attributes( ?QueryVars, ?ResidualVars) is semidet.
@@ -222,7 +226,8 @@ vn:project_attributes(QueryVars, ResidualVars):-nop(dmsg(vn:proj_attrs(vn,QueryV
 %  Hook To [dom:attribute_goals/3] For Module Logicmoo_varnames.
 %  Attribute Goals.
 %
-vn:attribute_goals(Var) --> {variable_name(Var, Name)},[name_variable(Var,Name)].
+vn:attribute_goals(_Var) --> [].
+% vn:attribute_goals(Var) --> {variable_name(Var, Name)},[name_variable(Var,Name)].
 
 
 :- public ((attr_unify_hook/2,attr_portray_hook/2)).
@@ -738,7 +743,7 @@ set_varname(How,N=V):-must(set_varname(How,N,V)),!.
 %
 % Set Varname.
 %
-set_varname(How,N,V):- (var(N);var(How)),trace_or_throw(var_var_set_varname(How,N,V)).
+set_varname(How,N,V):- (var(How);var(N)),trace_or_throw(var_var_set_varname(How,N,V)).
 set_varname(_,_,NV):-nonvar(NV),ignore((NV='$VAR'(N),must(number(N);atom(N)))).
 set_varname(How,'$VAR'(Name),V):- !, set_varname(How,Name,V).
 set_varname([How],N,V):- !, set_varname(How,N,V).

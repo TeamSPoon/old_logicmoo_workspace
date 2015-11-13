@@ -12,6 +12,7 @@
 :- module(logicmoo_util_attvar_reader, [
           expand_to_attvars/2,
           serialize_attvars/2,
+          put_dyn_attrs/2,
           read_attvars/1,read_attvars/0,
           system_term_expansion_attvars/2,
           expand_to_attvars/3]).
@@ -45,8 +46,9 @@ expand_to_attvars(C,A):- C=..[F|Args],maplist(expand_to_attvars,Args,OArgs),A=..
 
 
 serialize_var(V,'$VAR'(Name)):- get_attrs(V, att(vn, Name, [])),!.
-serialize_var(V,avar(V,S)):- get_attrs(V, S),!.
-serialize_var(V,'$VAR'(N)):- b_getval('$variable_names',Vs),member(N=V0,Vs),V==V0,!.
+serialize_var(V,avar('$VAR'(N),SO)):- variable_name_or_ref(V,N),get_attrs(V, S),!,put_attrs(TEMP,S),del_attr(TEMP,vn),!,get_attrs(TEMP, SO),!.
+serialize_var(V,'$VAR'(N)):-  variable_name_or_ref(V,N).
+serialize_var(V,avar(S)):- get_attrs(V, S),!.
 serialize_var(V,V).
 
 serialize_attvars(V,S):- var(V),serialize_var(V,S),!.
@@ -57,7 +59,7 @@ serialize_attvars(avar(N,A),avar(N,A)):-!.
 serialize_attvars(C,A):- C=..[F|Args],maplist(serialize_attvars,Args,OArgs),A=..[F|OArgs].
 
 
-
+:- meta_predicate put_dyn_attrs(*,0).
 put_dyn_attrs(_,S):-must(nonvar(S)),fail.
 put_dyn_attrs(V,S):- S= att(_,_,_),!, put_attrs(V,S).
 put_dyn_attrs(_V,[]):- !.

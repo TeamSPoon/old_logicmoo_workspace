@@ -395,8 +395,8 @@ renumbervarZ(H,GGG):-copy_term(H,GG),unnumbervars(GG,GGG),numbervars(GGG,0,_).
 % If Is A Same Clauses.
 %
 is_same_clauses(Head,NEWHBLISTN,HBLISTN):-
-   maplist(renumbervarZ,HBLISTN,HBLIST),
-   maplist(renumbervarZ,NEWHBLISTN,NEWHBLIST),
+   must_maplist(renumbervarZ,HBLISTN,HBLIST),
+   must_maplist(renumbervarZ,NEWHBLISTN,NEWHBLIST),
    sort(NEWHBLIST,NEWHBLISTS),
    sort(HBLIST,HBLISTS),
    length(NEWHBLIST,LN),

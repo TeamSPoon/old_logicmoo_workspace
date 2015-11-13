@@ -160,9 +160,9 @@ hotrace:-notrace.
 %
 % Thread Leash.
 %
-thread_leash(+Some):-!, (thread_self(main)->leash(+Some);thread_leash(-Some)).
-thread_leash(-Some):-!, (thread_self(main)->leash(-Some);thread_leash(-Some)).
-thread_leash(Some):-!, (thread_self(main)->leash(+Some);thread_leash(-Some)).
+thread_leash(-Some):-!, notrace(thread_self(main)->leash(-Some);thread_leash(-Some)).
+thread_leash(+Some):-!, notrace(thread_self(main)->leash(+Some);thread_leash(-Some)).
+thread_leash(Some):-!, notrace(thread_self(main)->leash(Some);thread_leash(Some)).
 
 :- export(hotrace0/1).
 :- meta_predicate hotrace0(0).
@@ -173,7 +173,7 @@ thread_leash(Some):-!, (thread_self(main)->leash(+Some);thread_leash(-Some)).
 %
 % Ho Trace Primary Helper.
 %
-hotrace0(Goal):- 
+hotrace(Goal):- 
  
   (\+ notrace((tracing, notrace)) ->  
      (\+ tlbugger:rtracing -> Goal; 
@@ -190,7 +190,8 @@ hotrace0(Goal):-
 %
 % Ho Trace.
 %
-hotrace(Goal):- notrace((tracing,notrace)) -> ('$leash'(OldL, OldL),
+hotrace0(Goal):- notrace((tracing,notrace)) -> 
+ ('$leash'(OldL, OldL),
    '$visible'(OldV, OldV),thread_leash(+exception),visible(+all),thread_leash(+all), 
        call_cleanup(Goal,notrace(('$leash'(_, OldL),'$visible'(_, OldV)))),trace) ; Goal.
 
@@ -453,5 +454,5 @@ fixhotrace(X):- tracing -> call_cleanup(X,trace) ; call(X).
 on_x_rtrace(C):- 
  notrace(skipWrapper;tracing;(tlbugger:rtracing))-> C;
    catchv(C,E,
-     (wdmsg(on_x_rtrace(E)),catchv(rtrace(with_skip_bugger(C)),E,wdmsg(E)),leash(+all),dumptrace(C))).
+     (wdmsg(on_x_rtrace(E)),catchv(rtrace(with_skip_bugger(C)),E,wdmsg(E)),dumptrace(C))).
 

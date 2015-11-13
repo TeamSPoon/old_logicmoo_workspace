@@ -94,19 +94,29 @@ human(trudy).
 
 %= catch a regression bug that may couse trudy to lose human assertion
 never_retract_u(human(trudy)).
+never_retract_u(human(eileen)).
 
 :- debug(_).
+:- mpred_trace_exec.
 
 %  
 forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f))))).
 
+:- mpred_run.
+
 :- printAll(must(father(trudy,_))).
 
-
-mother(eileen,trudy).
+:- mpred_run.
 
 % ((human(P1),ancestor(P1,P2))=>human(P2)).
 ((human(P1),ancestor(P2,P1))=>human(P2)).
+
+:- rtrace(ain(mother(eileen,trudy))).
+:- printAll(must(mother(eileen,_))).
+:- printAll(must(ancestor(eileen,_))).
+
+% lol.. i have a frame problm in my solver.. whenever     forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f))))).  ((human(P1),ancestor(P2,P1))=>human(P2)). human(douglas). I now have a skolemation of a mother who is human .. i my mothers children are human (thus i am) .. but while i am adding a named mother.. the skolem mother loses her assertion and is deduced nonhuman 
+
 % :- listing([ancestor,human,parent]).
 %=:- wdmsg("press Ctrl-D to resume.").
 %=:- prolog.
@@ -208,7 +218,6 @@ father(zaltana,douglas).
 
 :- mpred_why(grandparent(douglas,robert)).
 
-% :- mpred_trace_exec.
 :- show_test((mother(Who,Female))).
 
 :- show_test(father(Who,Male)).
