@@ -11,19 +11,19 @@
 %        P =         test nesc true                         assert(P),retract(~P) , enable(P).
 %       ~P =         test nesc false                        assert(~P),retract(P), disable(P).
 %
-%   ~ ~(P) =         test possible (via not impossible)      retract(~P), enable(P).
-%  \+ ~(P) =         test impossiblity is unknown            retract(~P).
-%   ~\+(P) =        same as P                               same as P
-%    \+(P) =        test naf(P)                             retract(P)
+%   ~ ~(P) =        rewrite_to \+ ~(P)                      rewrite_to \+ ~(P) 
+%  ~ \+(P) =        rewrite_to     (P)                      rewrite_to     (P) 
+%  \+ ~(P) =        test impossiblity is unknown            retract(~P).
+%    \+(P) =        test P is unknown                       retract(P)
 %
 % Dec 13, 2035
 % Douglas Miles
 
 :- module(sanity_birdt,[]).
 
-:- baseKB:use_module(library(logicmoo_user)).
+:- use_module(library(logicmoo_user)).
 
-:- begin_pfc.
+:- file_begin(pfc).
 
 
 tCol(tFly).
@@ -63,6 +63,9 @@ mpred_default(( tBird(X) ==> tFly(X))).
 :- mpred_test((tFly(iChilly))).
 
 
+never_retract_u(tBird(iChilly)).
+
+
 :- dmsg("penguins do not tFly.").
 tPenguin(X) ==>  ~tFly(X). 
 
@@ -70,17 +73,17 @@ tPenguin(X) ==>  ~tFly(X).
 :- mpred_test((\+ tFly(iChilly))).
 :- mpred_test(( ~ tFly(iChilly))).
 
-%= repropigate that chilly was a bird again
-
-% :- trace.
+%= repropigate that chilly was a bird again (actualy this asserts)
 
 tBird(iChilly).
 
-%= this helps show the real differnce in ~and \+ 
+:- listing(tBird/1).
+
+%= the dmsg explains the difference between \+ and ~
 :- dmsg("confirm chilly still does not fly").
-:- mpred_test((\+ tFly(iChilly))).
+:- mpred_test(( \+ tFly(iChilly))).
 :- dmsg("confirm chilly still cant fly").
-:- mpred_test(( ~tFly(iChilly))).
+:- mpred_test(( ~  tFly(iChilly))).
 
 /*
 
@@ -102,17 +105,15 @@ tFly(iChilly).
 
 */
 
-:- debug(_).
-:- nodebug(http(_)).
-:- debug(mpred).
-:- mpred_trace_exec.
-
-
 :- dmsg("chilly is no longer a penguin (hopefly the assertion above about him being a bird wont be removed)").
 
-:- trace.
+
+:- debug(_).
+:- mpred_trace_exec.
 
 :- mpred_test(tBird(iChilly)).
+
+:- trace.
 
 never_retract_u(tBird(iChilly)).
 

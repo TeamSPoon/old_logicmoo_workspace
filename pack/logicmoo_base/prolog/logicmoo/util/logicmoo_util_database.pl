@@ -3,6 +3,7 @@
           [ ain/1,
             ain0/1,
             aina/1,
+            split_attrs/3,is_attr_bind/1,
             ainz/1,
             attr_bind/1,
 paina/1,pain/1,            painz/1,
@@ -430,6 +431,22 @@ clausify_attributes(Data,THIS):-
    copy_term(Data,Data0,Extra),   
    (Extra == [] -> THIS = Data ; (hb_to_clause(Data0,attr_bind(Extra),THIS))).
 
+to_mod_if_needed(M,B,MB):- B==true-> MB=B ; MB = M:B.
+
+split_attrs(B,true,B):-var(B),!.
+split_attrs(A,A,true):- is_attr_bind(A),!.
+split_attrs(true,true,true):-!.
+split_attrs(_:AB,A,B):- split_attrs(AB,A,B),!.
+split_attrs(M:AB,A,MB):- !,split_attrs(AB,A,B),to_mod_if_needed(M,B,MB).
+split_attrs((B,A),A,B):- is_attr_bind(A),!.
+split_attrs((A,B),A,B):- is_attr_bind(A),!.
+split_attrs((L,B),AB,(L,R)):- !,split_attrs(B,AB,R).
+split_attrs(AB,true,AB).
+
+is_attr_bind(B):-var(B),!,fail.
+is_attr_bind(_:B):-!,compound(B),functor(B,attr_bind,_).
+is_attr_bind(B):-compound(B),functor(B,attr_bind,_).
+
 :- meta_predicate attr_bind(0).
 :- module_transparent attr_bind/1.
 attr_bind(G):-must_det_l(G).
@@ -440,7 +457,7 @@ attr_bind(G):-must_det_l(G).
 % Join a Head+Body To Clause.
 %
 hb_to_clause(H,B,H):- B==true,!.
-hb_to_clause((H:-B1),B2,(H:-(B1,B2))):-!.
+hb_to_clause((H:-B1),B2,(H:- (B2,B1))):-!.
 hb_to_clause(H,B,(H:-B)).
 
 

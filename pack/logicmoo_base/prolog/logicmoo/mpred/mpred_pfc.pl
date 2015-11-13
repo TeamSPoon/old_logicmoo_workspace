@@ -1697,15 +1697,16 @@ clause_i(H,B):- clause_i(H,B,_).
  
 clause_asserted_i(HB):- expand_to_hb(HB,H,B),clause_asserted_i(H,B,_).
 clause_asserted_i(H,B):- clause_asserted_i(H,B,_).
-clause_asserted_i(H,B,Ref):- clause_i(H,B,Ref), (clause(HH,_,Ref),HH=@=H).
+clause_asserted_i(H,B,Ref):- clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B).
 %= 	 	 
 
 %% clause_i( ?H, ?B, ?Ref) is semidet.
 %
 % Clause For Internal Interface.
 %
-clause_i(H,B,Ref):- var(B),!,clause(H,B,Ref).
-clause_i(H,B,Ref):- ((B==true -> (clause(H,BB,Ref),BB) ;(clause(H,(B,BB),Ref),BB))).
+clause_i(H,B,Ref):- clause(H,AB,Ref),must(split_attrs(AB,A,B0)->A),B=B0.
+
+
 
 %= 	 	 
 
@@ -2424,8 +2425,7 @@ get_next_fact(P,WS) :-
 %
 remove_selection(P,S) :-
  get_user_abox_umt(ABOX),
-  clause(basePFC:qu(ABOX,P,S),B,Ref),
-  must(B),erase(Ref),!.
+  clause(basePFC:qu(ABOX,P,S),B,Ref),must(B),erase(Ref),!.
 remove_selection(P,S) :-
   brake(wdmsg("pfc:get_next_fact - selected fact not on Queue: ~p (~p)",
                [P,S])).
@@ -3254,7 +3254,7 @@ mpred_get_support_via_sentence(true,g):-!.
 mpred_get_support_via_clause_db(\+ P,OUT):- mpred_get_support_via_clause_db(~(P),OUT).
 mpred_get_support_via_clause_db(\+ P,(naf(g),g)):- !, predicate_property(P,number_of_clauses(_)),\+ clause(P,_Body).
 mpred_get_support_via_clause_db(P,OUT):- predicate_property(P,number_of_clauses(N)),N>0,
-   clause(P,Body),(Body==true->Sup=(g);
+   clause_i(P,Body),(Body==true->Sup=(g);
     (support_ok_via_clause_body(P),mpred_get_support_precanonical_plus_more(Body,Sup))),
    OUT=(Sup,g).
 
@@ -3734,7 +3734,7 @@ neg_in_code(G):-  is_ftNonvar(G), prologSingleValued(G),must((if_missing_mask(G,
 %
 % Negated May Negation-by-faliure.
 %
-neg_may_naf(P):- mpred_non_neg_literal(P),get_functor(P,F),clause(prologNegByFailure(F),true),!.
+neg_may_naf(P):- mpred_non_neg_literal(P),get_functor(P,F),clause_i(prologNegByFailure(F),true),!.
 neg_may_naf(P):- is_ftCompound(P),predicate_property(P,static).
 
 
@@ -5057,7 +5057,7 @@ clause_or_call(M:H,B):-is_ftVar(M),!,no_repeats(M:F/A,(f_to_mfa(H,M,F,A))),M:cla
 clause_or_call(isa(I,C),true):-!,req(isa_asserted(I,C)).
 clause_or_call(genls(I,C),true):-!,on_x_log_throw(req(genls(I,C))).
 clause_or_call(H,B):- clause(src_edit(_Before,H),B).
-clause_or_call(H,B):- predicate_property(H,number_of_clauses(C)),predicate_property(H,number_of_rules(R)),((R*2<C) -> (clause(H,B)*->!;fail) ; clause(H,B)).
+clause_or_call(H,B):- predicate_property(H,number_of_clauses(C)),predicate_property(H,number_of_rules(R)),((R*2<C) -> (clause_i(H,B)*->!;fail) ; clause_i(H,B)).
 clause_or_call(H,true):- req(should_call_for_facts(H)),no_repeats(on_x_log_throw(H)).
 
 

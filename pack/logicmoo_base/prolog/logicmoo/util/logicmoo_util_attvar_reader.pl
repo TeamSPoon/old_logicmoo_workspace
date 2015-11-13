@@ -63,7 +63,7 @@ put_dyn_attrs(V,S):- S= att(_,_,_),!, put_attrs(V,S).
 put_dyn_attrs(_V,[]):- !.
 put_dyn_attrs(V,[H|T]):- !, put_dyn_attrs(V,H),put_dyn_attrs(V,T).
 put_dyn_attrs(V,M=AV):- ensure_attr_setup(M),!, must(put_attr(V,M,AV)).
-put_dyn_attrs(_V,MAV):- must(req(MAV)),!.
+put_dyn_attrs(_V,MAV):- MAV,!.
 
 ensure_attr_setup(M):- current_predicate(M:attribute_goals/3),!.
 ensure_attr_setup(M):- assert((M:attribute_goals(V,[put_attr(V,M,A)|R],R):- get_attr(V, M,A))).

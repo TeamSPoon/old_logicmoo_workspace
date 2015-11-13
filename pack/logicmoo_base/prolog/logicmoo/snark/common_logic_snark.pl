@@ -231,15 +231,12 @@ are_clauses_entailed(CL):- \+ \+ (unnumbervars(CL,UCL),with_umt(is_prolog_entail
 % True if the "Prolog" clause is asserted
 %
 is_prolog_entailed(UCL):-clause_asserted(UCL),!.
-is_prolog_entailed(UCL):-clause(UCL,B),is_attr_bind(B),must(B).
+is_prolog_entailed(UCL):-clause(UCL,B),split_attrs(B,A,BB),must(A),BB.
 is_prolog_entailed(UCL):-clause(UCL,B,Ref),(B\==true->must(B);(trace,clause(HH,BB,Ref),dmsg(BB:-(UCL,HH)))),!.
 is_prolog_entailed(UCL):-show_failure(clause_asserted(UCL)),!.
 is_prolog_entailed(UCL):-trace,req(UCL),!.
 
-is_attr_bind(B):-var(B),!.
-is_attr_bind(_:B):-!,is_attr_bind(B).
-is_attr_bind((_,B)):-!,is_attr_bind(B).
-is_attr_bind(B):-compound(B),functor(B,attr_bind,_).
+
 %= 	 	 
 
 %% member_ele( ?E, ?E) is semidet.
