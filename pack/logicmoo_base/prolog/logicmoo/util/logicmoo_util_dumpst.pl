@@ -327,7 +327,7 @@ fdmsg(M):-ddmsg(failed_fdmsg(M)).
 :-export(simplify_goal_printed/2).
 
 %= 	 	 
-
+printable_variable_name(Var, Name) :- nonvar(Name),!,must(printable_variable_name(Var, NameO)),!,Name=NameO.
 printable_variable_name(Var, Name) :- nonvar(Var),Var='$VAR'(_),format(atom(Name),"'$Var'(~q)",Var).
 printable_variable_name(Var, Name) :- nonvar(Var),format(atom(Name),"'$NONVAR'(~q)",Var).
 printable_variable_name(Var,Name):- (get_attr(Var, vn, Name1);get_attr(Var, varnames, Name1)),
@@ -345,7 +345,7 @@ printable_variable_name(Var, Name) :- format(atom(Name),'#~w',Var).
 %
 
 simplify_goal_printed(Var,Name):- get_attrs(Var,att(vn, _, [])),printable_variable_name(Var, Name),!.
-simplify_goal_printed(Var,'$avar'(Name,ATTRS)):- get_attrs(Var,ATTRS),printable_variable_name(Var,Name),!.
+simplify_goal_printed(Var,'$avar'(Name,ATTRS)):- get_attrs(Var,ATTRS),must(printable_variable_name(Var,Name)),!.
 simplify_goal_printed(Var,Name):- is_ftVar(Var),!,printable_variable_name(Var, Name).
 simplify_goal_printed(setup_call_catcher_cleanup,sccc).
 simplify_goal_printed(setup_call_cleanup,scc).

@@ -844,6 +844,7 @@ add_side_effect(Op,Data):-current_why(Why),assert(t_l:side_effect_buffer(Op,Data
 % Attribute Variable Oper..
 %
 
+
 attvar_op(Op,Data):- strip_module(Op,_,OpA), sanity((atom(OpA))),
    add_side_effect(Op,Data),
    unnumbervars_and_save(Data,Data0),
@@ -3838,7 +3839,6 @@ mpred_call_with_no_triggers(Clause) :-  strip_module(Clause,_,F),
 mpred_call_with_no_triggers_bound(F):- mpred_call_with_no_triggers_uncaugth(F).
 
 
-%= 	 	 
 
 %% mpred_call_with_no_triggers_uncaugth( ?Clause) is semidet.
 %
@@ -6042,13 +6042,16 @@ add_reprop(_Trig,repropagate(Var)):- \+ is_ftVar(Var),!.
 % add_reprop(_Trig,_):-!.
 add_reprop(Trig,(H:-B)):- trace_or_throw(bad_add_reprop(Trig,(H:-B))).
 
-% add_reprop(_Trig ,Trigger):- !, w_tl(t_l:current_why_source(Trig),  mpred_enqueue(repropagate(Trigger),(g,g))).
+% instant 
+add_reprop(Trig ,Trigger):- !, w_tl(t_l:current_why_source(Trig),  repropagate(Trigger)).
+
+% settings
 add_reprop( Trig ,Trigger):- 
   w_tl(t_l:current_why_source(Trig),
     (
      mpred_fwd(repropagate(Trigger),Trig))),!.
 
-
+% delayed
 add_reprop( Trig ,Trigger):- 
   w_tl(t_l:current_why_source(Trig),
     (get_user_abox_umt(ABOX),

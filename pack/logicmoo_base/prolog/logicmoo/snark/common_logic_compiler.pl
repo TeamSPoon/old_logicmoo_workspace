@@ -77,6 +77,7 @@
             ct_op/1,
             delete_sublits/3,
             demodal/3,
+            is_skolem_setting/1,
             demodal_sents/3,
             diaRule/3,
             display_form/2,
@@ -298,8 +299,10 @@ nnf0(KB,Fml,NNF):-
 % If Is A Skolem Setting.
 %
 
+% is_skolem_setting_default(push_skolem).
 is_skolem_setting_default(in_nnf).
 is_skolem_setting(S):- t_l:skolem_setting(SS)->S=SS;is_skolem_setting_default(S).
+%t_l:skolem_setting(push_skolem).
 %t_l:skolem_setting(attvar).
 %t_l:skolem_setting(in_nnf).
 %t_l:skolem_setting(combine(=>)).
@@ -377,10 +380,11 @@ axiom_lhs_to_rhs(_,poss(beliefs(A,~F1)),~nesc(knows(A,F1))).
 %
 % Negated Normal Form.
 %
-nnf(_KB,Lit,FreeV,Lit,1):- is_ftVar(Lit),!,ignore(FreeV=[Lit]).
+nnf(_KB,Lit,FreeV,Lit,1):- var(Lit),!,ignore(FreeV=[Lit]).
+%nnf(_KB,Lit,FreeV,Lit,1):- is_ftVar(Lit),!,trace_or_throw(bad_numbervars(Lit)),ignore(FreeV=[Lit]).
 nnf(KB,Lit,FreeV,Pos,Paths):- is_ftVar(Lit),!,nnf(KB,true_t(Lit),FreeV,Pos,Paths).
-
-nnf(_,Var, _ ,Var,1):- leave_as_is(Var),!.
+nnf(_KB,Fml,_,Fml,1):- \+ compound(Fml), !.
+nnf(KB,Fml,FreeV,FmlO,N):- leave_as_is(Fml),!, nop(( nnf_lit(KB,Fml,FreeV,FmlO,N))).
 
 nnf(KB,Lit,FreeV,Pos,1):- is_ftVar(Lit),!,wdmsg(warn(nnf(KB,Lit,FreeV,Pos,1))),Pos=true_t(Lit).
 
@@ -412,7 +416,7 @@ nnf(KB,Fin,FreeV,DIA,Paths):-  fail, copy_term(Fin,Fml),axiom_lhs_to_rhs(KB,F1,F
   show_success(nnf,(nop(Fml),logically_matches(KB,Fin,F1))),show_call(why,nnf(KB,F2,FreeV,DIA,Paths)).
 
 nnf(KB,Fin,FreeV,CIR,Paths):- corrected_modal(KB,Fin,cir(CT,F)),
-	nnf(KB,F,FreeV,NNF,Paths), cirRule(KB,cir(CT,NNF), CIR).
+	nnf(KB,F,FreeV,NNF,Paths), cirRule(KB,cir(CT,NNF), CIR),!.
 
 % A until B means it B starts after the ending of A
 axiom_lhs_to_rhs(KB,startsAfterEndingOf(B,A),until(CT,A,B)):- share_scopes(KB,CT),!,set_is_lit(A),set_is_lit(B),!.
@@ -470,6 +474,10 @@ nnf(KB,all(X,NNF),FreeV,all(X,NNF2),Paths):-
       nnf(KB,NNF,NewVars,NNF2,Paths).
 
 nnf(KB,exists(X,Fml),FreeV,NNF,Paths):-  \+ contains_var(X,Fml),!,nnf(KB,Fml,FreeV,NNF,Paths).
+
+nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(push_skolem),!, wdmsg(nnf(skolemizing(push_skolem,exists(X,Fml)))),
+   push_skolem(X,true),
+   must(nnf(KB,Fml,FreeV,NNF,Paths)).
 
 nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(in_nnf),!, wdmsg(nnf(skolemizing(exists(X,Fml),with(FreeV)))),
    must(mk_skolem(KB,Fml,X,FreeV,FmlSk)),
@@ -571,7 +579,7 @@ nnf(KB,Fml,FreeV,NNF,Paths):-
    nnf(KB,Fml1,FreeV,NNF,Paths).
 
 % ~until(Future,Current) -> ( always(~Current) v until(~Current,(~Future & ~Current)))
-nnf(KB,Fml,FreeV,NNF,Paths):- !,
+nnf(KB,Fml,FreeV,NNF,Paths):- 
    logically_matches(KB,Fml,~until(Future,Current)),
    nnf(KB,not(Future),FreeV,NNFuture,_),
    nnf(KB,not(Current),FreeV,NNCurrent,_),
@@ -610,19 +618,20 @@ nnf(KB,Fml,FreeV,NNF,Paths):-
 	(Fml = '=>'(A,B) -> Fml1 = v(not(A), B );         
 	 Fml = '<=>'(A,B) -> Fml1 = v(&(A, B), &(not(A), not(B)) );
          Fml = '<=>'(A,B) -> Fml1 = v('=>'(A, B), '=>'(B, A) )
-	), nnf(KB,Fml1,FreeV,NNF,Paths).
+	),!, nnf(KB,Fml1,FreeV,NNF,Paths).
 
-nnf(_,not(Fml),_FreeV,not(Fml),1):- is_ftVar(Fml),!.
+nnf(_,not(Fml),_FreeV,not(Fml),1):- is_ftVar(Fml),!,push_dom(Fml,ftSentence).
 % nnf(KB,Fml,_,Fml,1):- Fml=..[F,KB,_],third_order(F),!.
+
+
 nnf(KB,[F|ARGS],FreeV,[F2|ARGS2],N):- !,
    nnf(KB,F,FreeV,F2,N1),
-   nnf(KB,ARGS,FreeV,ARGS2,N2),N is N1 + N2.
+   nnf(KB,ARGS,FreeV,ARGS2,N2),
+   N is N1 + N2 - 1.
 
-nnf(KB,Fml,FreeV,FmlO,N):- 
-   Fml=..[F|ARGS],
-   nnf(KB,ARGS,FreeV,FARGS,N1),
-   ARGS\=@=FARGS,!,Fml2=..[F|FARGS],
-   nnf(KB,Fml2,FreeV,FmlO,N2),N is N1 + N2.
+nnf(KB,Fml,FreeV,Out,Paths):- Fml=..[F|FmlA], 
+   arg(_,v((v),(&),(=>),(<=>)),F),!,
+   nnf(KB,FmlA,FreeV,NNF,Paths),Out =..[F| NNF],!.
 
 nnf(KB,Fml,FreeV,FmlO,N):- 
    arg(_,Fml,Arg),is_function(Arg),
@@ -639,10 +648,35 @@ nnf(KB,Fml,FreeV,Out,Path):- Fml=..[F,A],third_order(F),
 % nnf(KB, IN,FreeV,OUT,Paths):- simplify_cheap(IN,MID),IN\=MID,nnf(KB, MID,FreeV,OUT,Paths).
 nnf(KB,[F|Fml],FreeV,Out,Paths):- arg(_,v((v),(&),(=>),(<=>)),F),nnf(KB,Fml,FreeV,NNF,Paths),Out =..[F| NNF],!.
 % nnf(_KB , IN,[],OUT,1):- mnf(IN,OUT),IN\=OUT,!.
-nnf(KB,Fml,_,FmlO,1):- nonegate(KB,Fml,FmlO),!.
+nnf(KB,Fml,FreeV,FmlO,N):- must((nonegate(KB,Fml,FmlM),nnf_lit(KB,FmlM,FreeV,FmlO,N))).
 nnf(_KB,Fml,_,Fml,1):-!.
 
+nnf(KB,Fml,FreeV,FmlO,N):- 
+   Fml=..[F|ARGS],
+   nnf(KB,ARGS,FreeV,FARGS,N1),
+   ARGS\=@=FARGS,!,Fml2=..[F|FARGS],
+   nnf(KB,Fml2,FreeV,FmlO,N2),N is N1 + N2.
 
+nnf_lit(KB,all(X,Fml),FreeV,all(X,FmlO),N):- nonvar(Fml),!,nnf_lit(KB,Fml,FreeV,FmlO,N).
+nnf_lit(KB,not(Fml),FreeV,not(FmlO),N):- nonvar(Fml),!,nnf_lit(KB,Fml,FreeV,FmlO,N).
+
+nnf_lit(KB,Fml,FreeV,FmlO,N):- 
+   Fml=..[F|ARGS],
+   nnf_args(F,1,KB,ARGS,FreeV,FARGS,N1),sanity(N1==1),
+   Fml2=..[F|FARGS],
+   (Fml2\=@=Fml -> ((nnf_lit(KB,Fml2,FreeV,FmlO,N2),N is (N1 + N2 -1 )));
+      (FmlO=Fml,N=1)).
+
+nnf_args(F,N,KB,[A],FreeV,[FA],N1):- 
+ push_dom(A,argIsaFn(F,N)),
+  nnf(KB,A,FreeV,FA,N1),!.
+
+nnf_args(F,N,KB,[A|RGS],FreeV,[FA|ARGS],N3):- 
+ push_dom(A,argIsaFn(F,N)),
+  nnf(KB,A,FreeV,FA,N1), 
+  NPlus1 is N + 1,
+  nnf_args(F,NPlus1,KB,RGS,FreeV,ARGS,N2),
+  N3 is (N1 + N2 -1).
 
 %= 	 	 
 

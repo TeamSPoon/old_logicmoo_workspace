@@ -16,10 +16,13 @@
             all_different_vals/1,
             all_different_vars/1,
             all_different_vals/2,
+            del_each_attr/2,
             get_random_headvars/1,
             get_random_headvars/4,
             get_1head_arg_var/5,
             term_slots/2,
+            never_bound/1,
+            ensure_named/1,
           term_singletons/2,
           term_singletons/3,
           term_singletons/5,
@@ -226,8 +229,8 @@ vn:project_attributes(QueryVars, ResidualVars):-nop(dmsg(vn:proj_attrs(vn,QueryV
 %  Hook To [dom:attribute_goals/3] For Module Logicmoo_varnames.
 %  Attribute Goals.
 %
+vn:attribute_goals(Var) --> {variable_name(Var, Name)},[name_variable(Var,Name)],!.
 vn:attribute_goals(_Var) --> [].
-% vn:attribute_goals(Var) --> {variable_name(Var, Name)},[name_variable(Var,Name)].
 
 
 :- public ((attr_unify_hook/2,attr_portray_hook/2)).
@@ -250,12 +253,15 @@ vn:attr_unify_hook(Name1, Var):- var(Var),!,put_attr(Var, vn, Name1).
 vn:attr_unify_hook(_Form, _OtherValue):- t_l:no_kif_var_coroutines,!,fail.
 vn:attr_unify_hook(_Form, _OtherValue):-!.
 
-
+combine_names(Name1,Name2,Name1):-Name1==Name2,!.
 combine_names(Name1,Name2,Name):- 
  ((atom_concat(_,Name1,Name2);atom_concat(Name1,_,Name2)) -> Name=Name2 ; (
    ((atom_concat(Name2,_,Name1);atom_concat(_,Name2,Name1)) -> Name=Name1 ; (
    atomic_list_concat([Name2,'_',Name1],Name))))).
 
+
+ensure_named(V):-get_attr(V,vn,_),!.
+ensure_named(V):-var(V),b_getval('$variable_names',Vs),member(N=NV,Vs),V==NV,!,put_attr(V,vn,N).
 
 %= 	 	 
 
@@ -379,7 +385,10 @@ all_different_vals([V|Vs],SET):-delete_eq(SET,V,REST),!,v_dif_rest(V,REST),all_d
 %
 % V Dif Rest.
 %
-v_dif_rest(V,REST):- not_member_eq(V,REST), when('?='(V,_),not_member_eq(V,REST)).
+%v_dif_rest(_,_):-!.
+v_dif_rest(_,[]):-!.
+%v_dif_rest(V,[H|REST]):- dif:dif(V,H),!,v_dif_rest(V,REST).
+v_dif_rest(V,REST):- must(not_member_eq(V,REST)), when:when('?='(V,_),not_member_eq(V,REST)).
 
 
 %= 	 	 
@@ -389,10 +398,8 @@ v_dif_rest(V,REST):- not_member_eq(V,REST), when('?='(V,_),not_member_eq(V,REST)
 % Lock Variables.
 %
 lock_vars(Var):-var(Var),!,when:when(nonvar(Var),Var='$VAR'(_)).
-lock_vars('$VAR'(_)):-!.
-lock_vars([X|XM]):-!,lock_vars(X),lock_vars(XM),!.
-lock_vars(Var):- atomic(Var),!.
-lock_vars(XXM):-XXM=..[_,X|XM],lock_vars(X),lock_vars(XM).
+lock_vars(Var):-var(Var),!,only_stars(Var). 
+lock_vars(Term):-term_variables(Term,Vs),maplist(lock_vars,Vs).
 
 
 %= 	 	 
@@ -401,11 +408,10 @@ lock_vars(XXM):-XXM=..[_,X|XM],lock_vars(X),lock_vars(XM).
 %
 % Unlock Variables.
 %
-unlock_vars(Var):-var(Var),!,del_attr(Var,when).
-unlock_vars('$VAR'(_)):-!.
-unlock_vars([X|XM]):-!,unlock_vars(X),unlock_vars(XM),!.
-unlock_vars(Var):-atomic(Var),!.
-unlock_vars(XXM):-XXM=..[_,X|XM],unlock_vars(X),unlock_vars(XM).
+
+unlock_vars( Var):-var(Var),!,del_attr(Var,when),del_attr(Var,eq),del_attr(Var,dif).
+unlock_vars(Term):-term_attvars(Term,Vs),maplist(unlock_vars,Vs).
+
 
 
 
@@ -1216,6 +1222,19 @@ read_source_file_vars_1(File):-
 
 :-export(ensure_vars_labled/2).
 
+
+mfree:attr_unify_hook(This,That):-get_attr(That,eq,Thats),Thats==This,!.
+mfree:attr_unify_hook(This,That):-get_attrs(That,Thats),get_attrs(This,Value),Thats==Value,!.
+never_bound(V):- var(V),!,put_attr(V,eq,_).
+never_bound(_).
+
+star:attr_unify_hook(This,That):-This==That.
+star:attr_unify_hook(_,That):-compound(That),That='$VAR'(Atom),nonvar(Atom).
+only_stars(V):- var(V),!,put_attr(V,star,V).
+only_stars(_).
+
+del_each_attr(M,V):-del_attr(V,M).
+
 %= 	 	 
 
 %% ensure_vars_labled( ?I, ?O) is semidet.
@@ -1224,6 +1243,7 @@ read_source_file_vars_1(File):-
 %
 ensure_vars_labled(I,O):-nonvar(O),!,must(ensure_vars_labled(I,M)),!,M=O.
 ensure_vars_labled(I,I):- (t_l:dont_varname;no_vars_needed(I)),!.
+% ensure_vars_labled(I,I):- term_variables(I,Vs),maplist(never_bound,Vs),!.
 % ensure_vars_labled(I,I):- !.
 % ensure_vars_labled(I,OO):- acyclic_term(O),term_variables(I,Vs),all_different_vals(Vs),ensure_vars_labled_r(I,O),vmust(acyclic_term(O)),!,OO=O.
 ensure_vars_labled(I,OO):- acyclic_term(O),term_variables(I,Vs),ensure_vars_labled_r(I,O),\+ \+ ((I=O,vmust(all_different_vals(Vs)))),!,vmust(acyclic_term(O)),!,OO=O.

@@ -11,15 +11,17 @@
 
 :- debug(_).
 :- nodebug(http(_)).
+:- mpred_trace_exec.
 :- begin_pfc.
 
-% :- process_this_script.
+argsQuoted(my_sk).
 
 :- read_attvars(true).
 
-:- debug(mpred).
-:- mpred_trace_exec.
-
+:- visible(+all).
+:- leash(-all).
+:- leash(+exception).
+:- trace.
 my_sk(avar([vn='Ex',sk='SKF-666'])).
 
 :- must((my_sk(Ex),get_attr(Ex,sk,What),What='SKF-666')).

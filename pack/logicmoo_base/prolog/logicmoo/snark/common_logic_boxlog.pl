@@ -224,7 +224,10 @@ get_op_alias_compile(_,fwc).
 %
 % Datalog Converted To Compile.
 %
-boxlog_to_compile(H,OUTPUT):- get_op_alias_compile((:-),TYPE),!,must((boxlog_to_compile(TYPE,H,OUTPUTM))),!,OUTPUTM=OUTPUT.
+boxlog_to_compile(H,OUTPUT):- get_op_alias_compile((:-),TYPE),!,
+  lock_vars(H),
+  must((boxlog_to_compile(TYPE,H,OUTPUTM))),!,OUTPUTM=OUTPUT,
+  unlock_vars(OUTPUT).
 
 
 %= 	 	 
@@ -233,6 +236,7 @@ boxlog_to_compile(H,OUTPUT):- get_op_alias_compile((:-),TYPE),!,must((boxlog_to_
 %
 % Datalog Converted To Compile.
 %
+
 boxlog_to_compile(_,(H:-(Cwc,B)),(H:-(Cwc,B))):- Cwc == cwc,!.
 boxlog_to_compile(Mode,(H:-(Cwc,B)),(H:-(Cwc,B))):- Mode == Cwc,!.
 boxlog_to_compile(cwc,H,OUTPUT):-!, boxlog_to_compile((:-),H,OUTPUT).

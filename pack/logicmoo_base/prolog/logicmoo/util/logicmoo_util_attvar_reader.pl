@@ -29,16 +29,15 @@
 :- use_module(logicmoo_util_dmsg).
 
 
-get_name_or_fail(V):-get_attr(V,vn,_),!.
-get_name_or_fail(V):-var(V),b_getval('$variable_names',Vs),member(N=NV,Vs),V==NV,!,put_attr(V,vn,N).
 
 expand_to_attvars(_,I,O):- expand_to_attvars(I,O).
 
-expand_to_attvars( V,V):- var(V),ignore(get_name_or_fail(V)),!.
+expand_to_attvars( V,O):- nonvar(O),!,must(expand_to_attvars( V,M)),!,must(M=O).
+expand_to_attvars( V,O):- var(V), ensure_named(V),!,V=O.
 expand_to_attvars(IO,IO):- \+ compound(IO),!.
-expand_to_attvars(avar(S),V):- nonvar(S),!, show_call(put_dyn_attrs(V,S)),ignore(get_name_or_fail(V)).
+expand_to_attvars(avar(S),V):- nonvar(S),!, show_call(put_dyn_attrs(V,S)),ignore(ensure_named(V)).
 expand_to_attvars(avar(V,_),V):- nonvar(V),!.
-expand_to_attvars(avar(V,S),V):- nonvar(S),!, show_call(put_dyn_attrs(V,S)),ignore(get_name_or_fail(V)).
+expand_to_attvars(avar(V,S),V):- var(V),nonvar(S),!, show_call(put_dyn_attrs(V,S)),ignore(ensure_named(V)).
 expand_to_attvars('$VAR'(N),'$VAR'(N)):- \+ atom(N),!.
 expand_to_attvars('$VAR'(N),V):- b_getval('$variable_names',Vs),member(N=V,Vs),!,put_attr(V,vn,N),!.
 expand_to_attvars('$VAR'(N),V):- b_getval('$variable_names',Vs),put_variable_names([N=V|Vs]),!,put_attr(V,vn,N),!.
@@ -59,16 +58,18 @@ serialize_attvars(avar(N,A),avar(N,A)):-!.
 serialize_attvars(C,A):- C=..[F|Args],maplist(serialize_attvars,Args,OArgs),A=..[F|OArgs].
 
 
-:- meta_predicate put_dyn_attrs(*,0).
-put_dyn_attrs(_,S):-must(nonvar(S)),fail.
+:- meta_predicate put_dyn_attrs(*,?).
+put_dyn_attrs(V,S):- var(S),!,thread_or_throw(bad_put_dyn_attrs(V,S)),!.
 put_dyn_attrs(V,S):- S= att(_,_,_),!, put_attrs(V,S).
+put_dyn_attrs(V,M:AV):- atom(M),!, M:put_dyn_attrs(V,AV).
+put_dyn_attrs(V,M=AV):- atom(M),!, ensure_attr_setup(M),!, must(put_attr(V,M,AV)).
 put_dyn_attrs(_V,[]):- !.
-put_dyn_attrs(V,[H|T]):- !, put_dyn_attrs(V,H),put_dyn_attrs(V,T).
-put_dyn_attrs(V,M=AV):- ensure_attr_setup(M),!, must(put_attr(V,M,AV)).
+put_dyn_attrs(V,List):- is_list(List),!, maplist(put_dyn_attrs(V),List),!.
+put_dyn_attrs(V,[H|T]):- !, put_dyn_attrs(V,H),put_dyn_attrs(V,T),!.
 put_dyn_attrs(_V,MAV):- must(MAV),!.
 
-ensure_attr_setup(M):- current_predicate(M:attribute_goals/3),!.
-ensure_attr_setup(M):- assert((M:attribute_goals(V,[put_attr(V,M,A)|R],R):- get_attr(V, M,A))).
+ensure_attr_setup(M):- atom(M),current_predicate(attribute_goals,M:attribute_goals(_,_,_)),!.
+ensure_attr_setup(M):- atom(M),assert_if_new((M:attribute_goals(V,[put_attr(V,M,A)|R],R):- get_attr(V, M,A))).
 
 
 

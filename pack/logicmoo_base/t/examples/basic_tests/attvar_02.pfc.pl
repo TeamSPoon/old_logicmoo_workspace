@@ -26,8 +26,16 @@
 
 :- debug(mpred).
 :- mpred_trace_exec.
+:- autoload.
 
+:- visible(+all).
+:- leash(-all).
+:- leash(+exception).
 sk_in(Ex)==>sk_out(Ex).
+
+:- visible(+all).
+:- leash(-all).
+:- leash(+exception).
 
 sk_in(avar([vn='Ex',sk='SKF-666'])).
 

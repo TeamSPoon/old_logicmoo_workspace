@@ -13,6 +13,8 @@
 :- module(common_logic_skolem,
 	  [ form_sk/2,
 	    sk_form/2,
+            push_skolem/2,push_skolem/3,
+            push_dom/2,push_dom/3,
             skolem_unify/2,
             with_no_kif_var_coroutines/1
 	  ]).
@@ -36,6 +38,16 @@ form_sk(Sk, Form) :-
 form_sk(_, _).
 
 
+push_skolem(X,Form2):-push_skolem(X,Form2,_Merged).
+push_skolem(X,Form2,Merged):-get_attr(X,sk,Form1),merge_forms(Form1,Form2,Merged),put_attr(X,sk,Merged),!.
+push_skolem(X,Form2,Form2):-put_attr(X,sk,Form2).
+
+push_dom(_,_):- \+ is_skolem_setting(push_skolem),!.
+push_dom(X,Form2):-push_dom(X,Form2,_Merged).
+push_dom(X,Form2,Merged):-get_attr(X,dom,Form1),merge_forms(Form1,Form2,Merged),put_attr(X,dom,Merged),!.
+push_dom(X,Form2,Form2):- (nonvar(X) -> true ; put_attr(X,dom,Form2)).
+
+
 %%	sk_form(+Sk, -Form) is semidet.
 %
 %	True if Sk has been assigned Form.
@@ -45,9 +57,11 @@ sk_form(Sk, Form) :- get_attr(Sk, sk, Form).
 sk:attr_unify_hook(Form, OtherValue):-OtherValue==Form,!.
 sk:attr_unify_hook(_Form, _OtherValue):- t_l:no_kif_var_coroutines,!,fail.
 
-sk:attr_unify_hook(Form, OtherValue):- get_attr(OtherValue, sk, Form2),Form2=@=Form,!.
-sk:attr_unify_hook(Form, OtherValue):- get_attr(OtherValue, sk, Form2),merge_forms(Form,Form2,Merged),put_attr(OtherValue,sk,Merged).
-sk:attr_unify_hook(Form, Var):- var(Var),!, put_attr(Var, sk, Form).
+% BEST 
+sk:attr_unify_hook(Form, OtherValue):- var(OtherValue),!,push_skolem(OtherValue,Form).
+%sk:attr_unify_hook(Form, OtherValue):- get_attr(OtherValue, sk, Form2),Form2=@=Form,!.
+%sk:attr_unify_hook(Form, OtherValue):- get_attr(OtherValue, sk, Form2),merge_forms(Form,Form2,Merged),put_attr(OtherValue,sk,Merged).
+%sk:attr_unify_hook(Form, Var):- var(Var),!, put_attr(Var, sk, Form).
 sk:attr_unify_hook(Form, sk(Form2)):- !, merge_forms(Form,Form2,Merged),skolem_test(Merged).
 sk:attr_unify_hook(Form, OtherValue):- skolem_unify(OtherValue,Form).
 
@@ -67,9 +81,10 @@ sk:attribute_goals(Sk) --> {sk_form(Sk, Form)},[form_sk(Sk,Form)].
 
 skolem_test(_):- !.
 skolem_test(Form):- show_call(req(Form)).
+
 skolem_unify(_Var,Form):- skolem_test(Form).
 
-merge_forms(A,B,A):- A==B,!,wdmsg(qqqqqqqqqqqqqqqseeeeeeeeeeeee_merge_forms(A)),!.
-merge_forms(A,B,A):- A==B,!,wdmsg(qqqqqqqqqqqqqqqseeeeeeeeeeeee_merge_forms(A)),!.
+merge_forms(A,B,A):- A==B,!.
 merge_forms(A,B,A):- A=B,!,wdmsg(seeeeeeeeeeeee_merge_forms(A,B)),!.
 merge_forms(A,B,(A,B)):- wdmsg(sksksksskskskssksksksskskskssksksks_merge_forms(A,B)),!.
+
