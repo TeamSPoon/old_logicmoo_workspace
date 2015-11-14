@@ -14,6 +14,11 @@
 :- mpred_trace_exec.
 :- begin_pfc.
 
+:- visible(+all).
+:- leash(-all).
+:- leash(+exception).
+:- trace.
+
 argsQuoted(my_sk).
 
 :- read_attvars(true).
@@ -22,7 +27,13 @@ argsQuoted(my_sk).
 :- leash(-all).
 :- leash(+exception).
 :- trace.
+
 my_sk(avar([vn='Ex',sk='SKF-666'])).
+
+:- visible(+all).
+:- leash(-all).
+:- leash(+exception).
+:- trace.
 
 :- must((my_sk(Ex),get_attr(Ex,sk,What),What='SKF-666')).
 
