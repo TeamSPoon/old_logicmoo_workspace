@@ -5,8 +5,11 @@
 :- module(mpred_pfc,
           [ 
 
+          all_different_head_vals/1,all_different_head_vals_2/2,
+
 mpred_run_resume/0,mpred_run_pause/0,
 
+put_clause_ref/2,
 add_reprop/2,
 add_side_effect/2,
 ain/1,ain/2,
@@ -846,8 +849,9 @@ add_side_effect(Op,Data):-current_why(Why),assert(t_l:side_effect_buffer(Op,Data
 
 
 attvar_op(Op,Data):- strip_module(Op,_,OpA), sanity((atom(OpA))),
-   add_side_effect(Op,Data),
+   add_side_effect(Op,Data),   
    unnumbervars_and_save(Data,Data0),
+   all_different_head_vals(Data0),
    clausify_attributes(Data0,DataA),
    (==(Data0,DataA)->
      physical_side_effect(call(Op,DataA));
@@ -1286,7 +1290,8 @@ mpred_pbody_f(H,CL,R,fail,infoF(CL)):- trace_or_throw(mpred_pbody_f(H,CL,R)).
 sub_term_eq(H,HH):-H==HH,!.
 sub_term_eq(H,HH):-each_subterm(HH,ST),ST==H,!.
 
-%= 	 	 
+
+
 
 %% sub_term_v( ?H, ?HH) is semidet.
 %
@@ -1296,7 +1301,29 @@ sub_term_v(H,HH):-H=@=HH,!.
 sub_term_v(H,HH):-each_subterm(HH,ST),ST=@=H,!.
 
 
-%= 	 	 
+
+%% all_different_head_vals(+Clause) is det.
+%
+% Enforces All Different Head Vals.
+%
+all_different_head_vals(HB):- (\+ compound(HB) ; ground(HB)),!.
+all_different_head_vals(HB):- 
+  mpred_rule_hb(HB,H,B),
+  term_slots(H,Slots),  
+  (Slots==[]->
+     all_different_head_vals(B);
+    (lock_vars(Slots),all_different_head_vals_2(H,Slots),unlock_vars(Slots))),!.
+  
+
+all_different_head_vals_2(_H,[]):-!.
+all_different_head_vals_2(H,[A,R|EST]):-arg(_,H,E1),E1 ==A,dif(A,E2),arg(_,H,E2),\+ contains_var(A,E2),all_different_vals(dif_matrix,[A,E2,R|EST]),!.
+all_different_head_vals_2(_H,[A,B|C]):-all_different_vals(dif_matrix,[A,B|C]),!.
+all_different_head_vals_2(HB,_):- \+ compound(HB),!.
+all_different_head_vals_2(H,[A]):-arg(_,H,E1),E1 ==A, H=..[_|ARGS], all_different_vals(dif_matrix,ARGS),!.
+all_different_head_vals_2(H,[A]):-arg(_,H,E1),E1 ==A,  arg(_,H,E2), A\==E2, \+ contains_var(A,E2), dif(A,E2),!.
+all_different_head_vals_2(H,[A]):-arg(_,H,E1),E1\==A, compound(E1), contains_var(A,E1), all_different_head_vals_2(E1,[A]),!.
+all_different_head_vals_2(_,_).
+   	 
 
 %% mpred_rule_hb( ?Outcome, ?OutcomeO, ?AnteO) is semidet.
 %
@@ -1305,8 +1332,6 @@ sub_term_v(H,HH):-each_subterm(HH,ST),ST=@=H,!.
 mpred_rule_hb(Outcome,OutcomeO,AnteO):-hotrace((mpred_rule_hb_0(Outcome,OutcomeO,Ante),mpred_rule_hb_0(Ante,AnteO,_))),!.
 :-mpred_trace_nochilds(mpred_rule_hb/3).
 
-
-%= 	 	 
 
 %% mpred_rule_hb_0( ?Outcome, ?OutcomeO, ?VALUE3) is semidet.
 %
@@ -1318,7 +1343,14 @@ mpred_rule_hb_0((Outcome1,Outcome2),OutcomeO,AnteO):-!,mpred_rule_hb(Outcome1,Ou
                    conjoin(Outcome1O,Outcome2O,OutcomeO),
                    conjoin(Ante1,Ante2,AnteO).
 mpred_rule_hb_0((Ante1==>Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Ante1=>Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Ante1->Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
+% mpred_rule_hb_0((Outcome/Ante1),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0(rhs(Outcome),OutcomeO,Ante2):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0({Outcome},OutcomeO,Ante2):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
 mpred_rule_hb_0((Outcome<-Ante1),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Ante1 & Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
+mpred_rule_hb_0((Ante1 , Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
 mpred_rule_hb_0((Outcome<==>Ante1),OutcomeO,(Ante1,Ante2)):-mpred_rule_hb(Outcome,OutcomeO,Ante2).
 mpred_rule_hb_0((Ante1<==>Outcome),OutcomeO,(Ante1,Ante2)):-!,mpred_rule_hb(Outcome,OutcomeO,Ante2).
 mpred_rule_hb_0(_::::Outcome,OutcomeO,Ante2):-!,mpred_rule_hb_0(Outcome,OutcomeO,Ante2).
@@ -1715,13 +1747,15 @@ clause_i(H,B):- clause_i(H,B,_).
 %
 % Clause For Internal Interface.
 %
-clause_i(H,B,Ref):- clause(H,AB,Ref),must(split_attrs(AB,A,B0)->A),B=B0.
+clause_i(H,B,Ref):- clause(H,AB,Ref), (must(split_attrs(AB,A,B0)->A),B=B0),term_attvars(H:AB,Vs),maplist(put_clause_ref(Ref),Vs).
 
-
+put_clause_ref(Ref,V):- !, nop(put_clause_ref(Ref,V)).
+put_clause_ref(Ref,V):-put_attr(V,cref,Ref).
  
 clause_asserted_i(HB):- expand_to_hb(HB,H,B),clause_asserted_i(H,B,_).
 clause_asserted_i(H,B):- clause_asserted_i(H,B,_).
-clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B).
+% clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
+clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,A,B),!, clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
 
 % clause_asserted_i(H,B,Ref):- clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B).
 

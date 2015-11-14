@@ -13,15 +13,17 @@
 :- module(vn,
           [ ain00/1,
             count_members_eq/3,
-            all_different_vals/1,
             all_different_vars/1,
+            all_different_vals/1,
             all_different_vals/2,
+            all_disjoint_in_sets/3,
             del_each_attr/2,
             get_random_headvars/1,
             get_random_headvars/4,
             get_1head_arg_var/5,
             term_slots/2,
             never_bound/1,
+            dif_matrix/2,
             ensure_named/1,
           term_singletons/2,
           term_singletons/3,
@@ -115,6 +117,8 @@
         snumbervars4(*, ?, ?, ?),
         snumbervars5(*, ?, ?, ?),
         try_save_vars(:),
+        all_different_vals(2,*),
+        all_disjoint_in_sets(2,*,*),
         init_varname_stores(?),
         vmust(0).
 
@@ -229,16 +233,16 @@ vn:project_attributes(QueryVars, ResidualVars):-nop(dmsg(vn:proj_attrs(vn,QueryV
 %  Hook To [dom:attribute_goals/3] For Module Logicmoo_varnames.
 %  Attribute Goals.
 %
-vn:attribute_goals(Var) --> {variable_name(Var, Name)},[name_variable(Var,Name)],!.
+% vn:attribute_goals(Var) --> {variable_name(Var, Name)},[name_variable(Var,Name)],!.
 vn:attribute_goals(_Var) --> [].
 
 
-:- public ((attr_unify_hook/2,attr_portray_hook/2)).
+%:- public ((attr_unify_hook/2,attr_portray_hook/2)).
 % :- public portray_attvar/1.
 % :- export(portray_attvar/1).
-:- export(attr_unify_hook/2).
-:- export(attr_portray_hook/2).
-:- export(attribute_goals/3).
+%:- export(attr_unify_hook/2).
+%:- export(attr_portray_hook/2).
+%:- export(attribute_goals/3).
 
  	 
 :- thread_local(t_l:no_kif_var_coroutines/0).
@@ -248,7 +252,8 @@ vn:attribute_goals(_Var) --> [].
 % Hook To [dom:attr_unify_hook/2] For Module Logicmoo_varnames.
 % Attr Unify Hook.
 %
-vn:attr_unify_hook(Name1, Var):- get_attr(Var, vn, Name2),!,combine_names(Name1,Name2,Name),(Name2==Name->true;put_attr(Var,vn,Name)).
+vn:attr_unify_hook(Name1, Var):- get_attr(Var, vn, Name2),!,Name1==Name2.
+% vn:attr_unify_hook(Name1, Var):- get_attr(Var, vn, Name2),!,combine_names(Name1,Name2,Name),(Name2==Name->true;put_attr(Var,vn,Name)).
 vn:attr_unify_hook(Name1, Var):- var(Var),!,put_attr(Var, vn, Name1).
 vn:attr_unify_hook(_Form, _OtherValue):- t_l:no_kif_var_coroutines,!,fail.
 vn:attr_unify_hook(_Form, _OtherValue):-!.
@@ -257,7 +262,7 @@ combine_names(Name1,Name2,Name1):-Name1==Name2,!.
 combine_names(Name1,Name2,Name):- 
  ((atom_concat(_,Name1,Name2);atom_concat(Name1,_,Name2)) -> Name=Name2 ; (
    ((atom_concat(Name2,_,Name1);atom_concat(_,Name2,Name1)) -> Name=Name1 ; (
-   atomic_list_concat([Name2,'_',Name1],Name))))).
+   (gtrace,atomic_list_concat([Name2,'_',Name1],Name)))))).
 
 
 ensure_named(V):-get_attr(V,vn,_),!.
@@ -349,49 +354,61 @@ no_varnaming(G):-w_tl(t_l:dont_varname,G).
 not_member_eq(_,[]):-!.
 not_member_eq(E,REST):- \+ identical_memberchk(E,REST).
 
-% all_different_vals(_):- t_l:dont_varname,!.
 
 %= 	 	 
 
-%% all_different_vals( ?Term) is semidet.
+%% all_different_vals(+P2, ?Term) is semidet.
 %
 % All Different Vals.
 %
-all_different_vals(Term):-term_slots(Term,Slots),!,all_different_vals(Slots,Slots).
+all_different_vals(Term):-all_different_vals(dif_matrix,Term).
 
-%= 	 	 
 
 %% all_different_vars( ?A) is semidet.
 %
 % All Different Variables.
 %
-all_different_vars(A):-all_different_vals(A,A).
+all_different_vars(_):- t_l:dont_varname,!.
+all_different_vars(A):-all_disjoint_in_sets(dif_matrix,A,A),!.
+all_different_vars(A):-all_different_vals(v_dif_rest,A),!.
 
 
-%= 	 	 
 
-%% all_different_vals( :TermV, ?SET) is semidet.
+%% all_different_vals(+:PRED2, +Term) is semidet.
 %
 % All Different Vals.
 %
-all_different_vals([],_):-!.
-all_different_vals([_],_):-!.
-all_different_vals([V|Vs],SET):-delete_eq(SET,V,REST),!,v_dif_rest(V,REST),all_different_vals(Vs,SET).
+all_different_vals(Pred,Term):- 
+  (is_list(Term)-> Slots = Term ; term_slots(Term,Slots)),!,
+                                 all_disjoint_in_sets(Pred,Slots,Slots).
 
+%% all_different_vals(+:PRED2, +SET1, +SET2) is semidet.
+%
+% All Different Vals.
+%
+all_disjoint_in_sets(_,[],_):-!.
+all_disjoint_in_sets(_,[_],_):-!.
+all_disjoint_in_sets(P,[V|Vs],SET):-delete_eq(SET,V,REST),!,call(P,V,REST),all_disjoint_in_sets(P,Vs,SET).
 
-%= 	 	 
 
 %% v_dif_rest( ?V, ?REST) is semidet.
 %
-% V Dif Rest.
+% V not_member_eq Rest.
 %
-%v_dif_rest(_,_):-!.
-v_dif_rest(_,[]):-!.
-%v_dif_rest(V,[H|REST]):- dif:dif(V,H),!,v_dif_rest(V,REST).
-v_dif_rest(V,REST):- must(not_member_eq(V,REST)), when:when('?='(V,_),not_member_eq(V,REST)).
+v_dif_rest(V,REST):- when:when('?='(V,_),not_member_eq(V,REST)).
 
 
-%= 	 	 
+%% dif_matrix( ?V, ?REST) is semidet.
+%
+% V dif Rest of
+%
+dif_matrix(List,V):- is_list(List),!,list_to_set(List,SET), maplist(dif_matrix(V),SET).
+dif_matrix(V,List):- is_list(List),!,list_to_set(List,SET), maplist(dif_matrix_hopfully(V),SET).
+dif_matrix(A,B):- dif_matrix_hopfully(A,B).
+dif_matrix_hopfully(A,B):-A==B,!.
+dif_matrix_hopfully(A,B):- dif:dif(A,B),!.
+
+
 
 %% lock_vars( :TermVar) is semidet.
 %
@@ -399,7 +416,7 @@ v_dif_rest(V,REST):- must(not_member_eq(V,REST)), when:when('?='(V,_),not_member
 %
 lock_vars(Var):-var(Var),!,when:when(nonvar(Var),Var='$VAR'(_)).
 lock_vars(Var):-var(Var),!,only_stars(Var). 
-lock_vars(Term):-term_variables(Term,Vs),maplist(lock_vars,Vs).
+lock_vars(Term):-term_variables(Term,Vs),maplist(lock_vars,Vs),all_different_vars(Vs).
 
 
 %= 	 	 
@@ -475,7 +492,7 @@ del_attr_type(Type,Var):-ignore(del_attr(Var,Type)).
 % Get Clause Variables.
 %
 get_clause_vars(_,[]):-!.
-get_clause_vars(MHB,[V|Vs]):- all_different_vals([V|Vs]),vmust((get_clause_vars_copy(MHB,WVARS),!,
+get_clause_vars(MHB,[V|Vs]):- all_different_vars([V|Vs]),vmust((get_clause_vars_copy(MHB,WVARS),!,
    vmust(MHB=WVARS),unlock_vars(MHB),nop(sanity(check_varnames(MHB))))),!,
    maplist(del_attr_type(when),[V|Vs]).
 get_clause_vars(MHB,Vs):- vmust((get_clause_vars_copy(MHB,WVARS),!,vmust(MHB=WVARS),unlock_vars(MHB),must(check_varnames(Vs)))),!.
@@ -495,7 +512,7 @@ get_clause_vars_copy(H0,MHB):-
     source_variables_lv(AllS),
     must((copy_term(H0+AllS,MHB+CAllS),
     term_slots(MHB,Slots),
-    all_different_vars(Slots),
+   % all_different_vars(Slots),
     lock_vars(Slots),
     as_clause_no_m( MHB,  H, B),
     must_maplist(set_varname(write_functor),CAllS),
@@ -877,6 +894,7 @@ ain00(A):- assertz(A).
 %
 % Ensure Variables Labled R.
 %
+ensure_vars_labled_r(I,I):-!. 
 ensure_vars_labled_r(I,O):- 
   once((((nb_current('$variable_names',Vs),Vs\==[])),
    copy_term(I:Vs,O:OVs),
@@ -1245,9 +1263,8 @@ ensure_vars_labled(I,O):-nonvar(O),!,must(ensure_vars_labled(I,M)),!,M=O.
 ensure_vars_labled(I,I):- (t_l:dont_varname;no_vars_needed(I)),!.
 % ensure_vars_labled(I,I):- term_variables(I,Vs),maplist(never_bound,Vs),!.
 % ensure_vars_labled(I,I):- !.
-% ensure_vars_labled(I,OO):- acyclic_term(O),term_variables(I,Vs),all_different_vals(Vs),ensure_vars_labled_r(I,O),vmust(acyclic_term(O)),!,OO=O.
-ensure_vars_labled(I,OO):- acyclic_term(O),term_variables(I,Vs),ensure_vars_labled_r(I,O),\+ \+ ((I=O,vmust(all_different_vals(Vs)))),!,vmust(acyclic_term(O)),!,OO=O.
-ensure_vars_labled(I,OO):- acyclic_term(O),ensure_vars_labled_r(I,O),vmust(acyclic_term(O)),!,OO=O.
+ensure_vars_labled(I,OO):- acyclic_term(O),term_variables(I,Vs),all_different_vals(Vs),ensure_vars_labled_r(I,O),vmust(acyclic_term(O)),!,OO=O.
+ensure_vars_labled(I,OO):- vmust(acyclic_term(I)),term_variables(I,Vs),all_different_vars(Vs),ensure_vars_labled_r(I,O),vmust(acyclic_term(O)),!,OO=O.
 ensure_vars_labled(I,I).
 
 % :- prolog_load_context(module,M),source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),'$set_predicate_attribute'(M:H, hide_childs, 1),module_transparent(F/A))).

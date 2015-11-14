@@ -454,9 +454,9 @@ split_attrs((A,B),A,B):- is_attr_bind(A),!.
 split_attrs((L,B),AB,(L,R)):- !,split_attrs(B,AB,R).
 split_attrs(AB,true,AB).
 
-is_attr_bind(B):-var(B),!,fail.
+is_attr_bind(B):- \+ compound(B),!,fail.
+is_attr_bind(B):- functor(B,attr_bind,_).
 is_attr_bind(_:B):-!,compound(B),functor(B,attr_bind,_).
-is_attr_bind(B):-compound(B),functor(B,attr_bind,_).
 
 :- meta_predicate attr_bind(0,0).
 :- module_transparent attr_bind/2.

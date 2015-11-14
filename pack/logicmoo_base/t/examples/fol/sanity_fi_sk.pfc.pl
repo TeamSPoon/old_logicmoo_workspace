@@ -1,7 +1,17 @@
 #!/usr/bin/env swipl
 
 :- module(sanity_fi_sk,[]).
-
+:- nodebug(_).
+:- use_module(library(gui_tracer)).
+:- noguitracer.
+:- guitracer.
+:- debug.
+:- visible(+all).
+:- leash(-all).
+:- leash(+exception).
+:- ((trace,ls)).
+:- notrace(leash(+all)).
+:- notrace.
 :- use_module(library(logicmoo_user)).
 
 %=  setup pfc
@@ -17,8 +27,6 @@
 %= ````
 %= logic tests...
 %= ````
-:- debug(mpred).
-:- debug(mpred(_)).
 
 %= trudy is human
 human(trudy).

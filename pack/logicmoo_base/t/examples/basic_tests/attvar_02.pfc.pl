@@ -24,23 +24,14 @@
 
 :- read_attvars(true).
 
-:- debug(mpred).
-:- mpred_trace_exec.
-:- autoload.
-
-:- visible(+all).
-:- leash(-all).
-:- leash(+exception).
 sk_in(Ex)==>sk_out(Ex).
-
-:- visible(+all).
-:- leash(-all).
-:- leash(+exception).
 
 sk_in(avar([vn='Ex',sk='SKF-666'])).
 
+sk_in(fl(X,Y,X,Y)).
+
 :- must((sk_out(Ex),get_attr(Ex,sk,What),What='SKF-666')).
 
-
+:- prolog_load_context(module,M),module(M).
 
 

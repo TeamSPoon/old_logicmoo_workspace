@@ -15,7 +15,7 @@
 %=
 %= Copyright (C) 1999 Anthony A. Aaby <aabyan@wwc.edu>
 %= Copyright (C) 2006-2007 Stasinos Konstantopoulos <stasinos@users.sourceforge.net>
-%= Douglas R. Miles <logicmoo@gmail.com>
+%=               1999-2015 Douglas R. Miles <logicmoo@gmail.com>
 %=
 %= This program is free software; you can redistribute it and/or modify
 %= it under the terms of the GNU General Public License as published by
@@ -287,8 +287,9 @@ nnf(KB,FmlNV,NNF):-
 % Negated Normal Form Primary Helper.
 %
 nnf0(KB,Fml,NNF):- 
+ copy_term(Fml,Original),
  % ignore(KB='$VAR'('KB')),
-   w_tl(t_l:current_form(Fml),nnf(KB,Fml,[],NNF,_)),!.
+   w_tl(t_l:current_form(Original),nnf(KB,Fml,[],NNF,_)),!.
 
 :- thread_local(t_l:skolem_setting/1).
 
