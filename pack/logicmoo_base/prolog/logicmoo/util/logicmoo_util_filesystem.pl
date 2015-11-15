@@ -249,7 +249,7 @@ enumerate_m_files(M, Mask,File1):- enumerate_files0(Mask,File1)*->true;enumerate
 %
 enumerate_m_files_mscoped(M, Mask,File1):- 
   findall(t_l:search_first_dir(Dir),
-   (((M\=user,file_search_path(M,SP),expand_file_search_path(SP,Dir));((module_property(M, file(File)),directory_file_path(Dir,_,File)))),
+   (((M\=user,user:file_search_path(M,SP),expand_file_search_path(SP,Dir));((module_property(M, file(File)),directory_file_path(Dir,_,File)))),
    exists_directory(Dir)),List),
   list_to_set(List,Set),
   w_tl(Set,enumerate_files0(Mask,File1)).
@@ -316,7 +316,7 @@ enumerate_files1(Atom,Result):- atomic(Atom),not(is_absolute_file_name(Atom)),at
 enumerate_files1(Spec,Result):- exists_file_or_dir(Spec),!,Result=Spec.
 enumerate_files1(P/C,Result):- !,concat_paths(P,C,Result).
 enumerate_files1(Spec,Result):- expand_file_name_safe(Spec,ResultList),member(Result,ResultList).
-enumerate_files1(Spec,Result):- file_search_path(Spec,Result).
+enumerate_files1(Spec,Result):- user:file_search_path(Spec,Result).
 enumerate_files1(Spec,Result):- expand_file_search_path(Spec,Result).
 enumerate_files1(Spec,Result):- absolute_file_name(Spec,Result).
 enumerate_files1(Atom,Result):- atomic(Atom),once((member(Sep,['/**/','/**','**']),atomic_list_concat([B,A|R],Sep,Atom))),concat_paths([B,'**',A|R],Result).

@@ -849,7 +849,7 @@ buggery_ok :- \+ compiling, current_predicate(_:logicmoo_bugger_loaded/0), \+ lm
 %
 % Bookeeping Predicate X Ref.
 %
-bookeepingPredicateXRef(file_search_path(_,_)).
+bookeepingPredicateXRef(_:file_search_path(_,_)).
 bookeepingPredicateXRef(_:G):-member(F/A,[xref_defined/3,xref_called/3,xref_exported/2]),functor(G,F,A).
 
 %= 	 	 

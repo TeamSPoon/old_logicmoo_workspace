@@ -655,13 +655,18 @@ holds_plist_t(P,LIST):- apply(holds_t,[P|LIST]).
 
 
 
+
+
+
+
+
 % =======================================================
 % term utils
 % =======================================================
 
 :- was_export(inverse_args/2).
 
-%= 	 	 
+
 
 %% inverse_args( ?AR, ?GS) is semidet.
 %
@@ -674,7 +679,7 @@ inverse_args([P,A,R,G,S],[S,A,R,G,P]):-!.
 
 :- was_export(same_vars/2).
 
-%= 	 	 
+
 
 %% same_vars( ?T1, ?T2) is semidet.
 %
@@ -683,7 +688,7 @@ inverse_args([P,A,R,G,S],[S,A,R,G,P]):-!.
 same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
 
 
-%= 	 	 
+
 
 %% replace_arg( ?C, :PRED3A, ?VAR, ?CC) is semidet.
 %
@@ -702,7 +707,7 @@ replace_arg(C,A,VAR,CC):- C=..FARGS,replace_nth_arglist(FARGS,A,VAR,FARGO),!,CC=
 % Replace the Nth (1-based) element of a list.
 :- mpred_trace_nochilds(replace_nth_arglist/4).
 
-%= 	 	 
+
 
 %% replace_nth_arglist( :TermARG1, ?VALUE2, ?VAR, :TermVAR) is semidet.
 %
@@ -715,7 +720,7 @@ replace_nth_arglist([T|FARGS],A,VAR,[T|FARGO]):-
 
 
 
-%= 	 	 
+
 
 %% replace_nth_ref( :TermARG1, ?N, ?OldVar, ?NewVar, :TermARG5) is semidet.
 %
@@ -730,7 +735,7 @@ replace_nth_ref([Carry|ARGS],Which,OldVar,NewVar,[Carry|NEWARGS]):-
 
 :- mpred_trace_nochilds(update_value/3).
 
-%= 	 	 
+
 
 %% update_value( ?OLD, ?NEW, ?NEXT) is semidet.
 %
@@ -745,7 +750,7 @@ update_value(OLDI,X,NEW):- number(X),X<0,compute_value(OLDI,OLD),number(OLD),cat
 update_value(_,NEW,NEWV):- compute_value_no_dice(NEW,NEWV),!.
 
 
-%= 	 	 
+
 
 %% flatten_append( ?First, ?Last, ?Out) is semidet.
 %
@@ -754,7 +759,7 @@ update_value(_,NEW,NEWV):- compute_value_no_dice(NEW,NEWV),!.
 flatten_append(First,Last,Out):-flatten([First],FirstF),flatten([Last],LastF),append(FirstF,LastF,Out),!.
 
 
-%= 	 	 
+
 
 %% list_update_op( ?OLDI, :TermX, ?NEW) is semidet.
 %
@@ -764,7 +769,7 @@ list_update_op(OLDI,+X,NEW):-flatten_append(OLDI,X,NEW),!.
 list_update_op(OLDI,-X,NEW):-flatten([OLDI],OLD),flatten([X],XX),!,list_difference_eq(OLD,XX,NEW),!.
 
 
-%= 	 	 
+
 
 %% compute_value_no_dice( ?NEW, ?NEW) is semidet.
 %
@@ -774,7 +779,7 @@ compute_value_no_dice(NEW,NEW):- compound(NEW),functor_catch(NEW,ftDice,_),!.
 compute_value_no_dice(NEW,NEWV):-compute_value(NEW,NEWV).
 
 
-%= 	 	 
+
 
 %% compute_value( ?NEW, ?NEWV) is semidet.
 %
@@ -785,7 +790,7 @@ compute_value(NEW,NEWV):-catch(any_to_value(NEW,NEWV),_,fail),!.
 compute_value(NEW,NEW).
 
 
-%= 	 	 
+
 
 %% insert_into( :TermARGS, ?VALUE2, ?Insert, :TermInsert) is semidet.
 %
@@ -798,7 +803,7 @@ insert_into([Carry|ARGS],After,Insert,[Carry|NEWARGS]):-
 
 
 
-%= 	 	 
+
 
 %% add_arg_parts_of_speech( ?F, ?N, :TermARG3, :TermARG4) is semidet.
 %
@@ -808,7 +813,7 @@ add_arg_parts_of_speech(_F,_N,[],[]).
 add_arg_parts_of_speech(F,N,[A|ARGS0],[ARG|ARGS]):-argIsa_call_or_undressed(F,N,A,ARG),N1 is N+1, add_arg_parts_of_speech(F,N1,ARGS0,ARGS).
 
 
-%= 	 	 
+
 
 %% argIsa_call_or_undressed( ?F, ?N, ?Obj, ?Obj) is semidet.
 %
@@ -818,13 +823,22 @@ argIsa_call_or_undressed(F,N,Obj,fN(Obj,Type)):- argIsa_call_0(F,N,Type),!.
 argIsa_call_or_undressed(_F,_N,Obj,Obj).
 
 
-%= 	 	 
+
 
 %% verb_after_arg( ?VALUE1, ?VALUE2, :PRED1VALUE3) is semidet.
 %
 % Verb After Argument.
 %
 verb_after_arg(_,_,1).
+
+
+
+
+
+
+
+
+
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 

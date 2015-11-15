@@ -38,16 +38,25 @@
 
 meta_argtypes(mpred_default(ftAssertable)).
 
-mpred_default(P==>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test))  ==> ((P, (~R)/Test ) ==> Q).
-mpred_default(P==>Q)/nonvar(Q) ==> (P ==> mpred_default(Q)).
-mpred_default(P)/mpred_literal_nv(P)  ==>  (( \+ ~P ) ==> P ).
+% BWD chaining
+mpred_default((Q <- P))/mpred_literal(Q) ==> (Q <-(P, \+ ~(Q))).
+
+% FWD chaining
+mpred_default(P==>Q)/nonvar(Q) ==> (((P ==> mpred_default(Q)))).
+% mpred_default(P==>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test))  ==> ((P, (\+ R)/Test ) ==> Q).
+
+% NEG chaining
+mpred_default(~Q)/nonvar(Q)  ==>  (( \+ Q ) ==> ~ Q ).
+
+% POS chaining
+mpred_default(Q)/mpred_positive_literal(Q)  ==>  ( \+(~Q)  ==> Q ).
+mpred_default(Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)) ==> ( (\ +R/Test ) ==> Q ).
 
 
-mpred_default(Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)) ==> ( (~R)/Test ==> Q ).
+
 % mpred_default(Q) ==> if_missing(Q,Q).
 
-(mpred_default((Q <- P))/mpred_literal(Q)) ==> (Q <-(P, \+ ~(Q))).
-%(mpred_default(P=>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))  ==> ((P, ~R/Test) => Q).
+%(mpred_default(P=>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))  ==> ((P, \+ R/Test) => Q).
 %(mpred_default(P=>Q)/nonvar(Q)) ==> (P => mpred_default(Q)).
 
 

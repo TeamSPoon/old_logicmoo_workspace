@@ -88,6 +88,8 @@
             set_is_lit/1,
             subst_except/4,
             wrap_in_neg_functor/3,
+
+
             mpred_type_wff_file/0
           ]).
 :- meta_predicate 
@@ -99,7 +101,7 @@
 
 
 
-%= 	 	 
+
 
 %% subst_except( :TermSUB, ?Var, ?VarS, :TermSUB) is semidet.
 %
@@ -116,7 +118,7 @@ subst_except(HT,B,A,HHTT):- HT=..FARGS,subst_except(FARGS,B,A,[FM|MARGS]),
    (atom(FM)->HHTT=..[FM|MARGS];append_termlist(FM,MARGS,HHTT)).
 
 
-%= 	 	 
+
 
 %% append_termlist( ?Call, ?EList, ?CallE) is semidet.
 %
@@ -131,7 +133,7 @@ append_termlist(Call,EList,CallE):-must((compound(Call),is_list(EList))), Call=.
 
 %= %= :- was_export(is_svo_functor/1).
 
-%= 	 	 
+
 
 %% is_svo_functor( ?Prop) is semidet.
 %
@@ -141,7 +143,7 @@ is_svo_functor(Prop):- hotrace((atom(Prop),arg(_,svo(svo,prop,valueOf,rdf),Prop)
 
 %= %= :- was_export(hilog_functor/1).
 
-%= 	 	 
+
 
 %% hilog_functor( ?VALUE1) is semidet.
 %
@@ -151,7 +153,7 @@ hilog_functor(true_t).
 
 %= %= :- was_export(is_holds_true_not_hilog/1).
 
-%= 	 	 
+
 
 %% is_holds_true_not_hilog( ?HOFDS) is semidet.
 %
@@ -161,7 +163,7 @@ is_holds_true_not_hilog(HOFDS):-is_holds_true(HOFDS),\+ hilog_functor(HOFDS).
 
 %= %= :- was_export(is_holds_true/1).
 
-%= 	 	 
+
 
 %% is_holds_true( ?Prop) is semidet.
 %
@@ -171,7 +173,7 @@ is_holds_true(Prop):- hotrace((atom(Prop),is_holds_true0(Prop))),!.
 
 % k,p,..
 
-%= 	 	 
+
 
 %% is_holds_true0( ?Prop) is semidet.
 %
@@ -182,7 +184,7 @@ is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,t,t,asserted_mpred_t,assertion_t,t
 
 %= %= :- was_export(is_2nd_order_holds/1).
 
-%= 	 	 
+
 
 %% is_2nd_order_holds( ?Prop) is semidet.
 %
@@ -192,7 +194,7 @@ is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 
 %= %= :- was_export(is_holds_false/1).
 
-%= 	 	 
+
 
 %% is_holds_false( ?Prop) is semidet.
 %
@@ -201,7 +203,7 @@ is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 is_holds_false(Prop):-hotrace((atom(Prop),is_holds_false0(Prop))).
 
 
-%= 	 	 
+
 
 %% is_holds_false0( ?Prop) is semidet.
 %
@@ -219,7 +221,7 @@ is_holds_false0(Prop):-member(Prop,[not,nholds,holds_f,mpred_f,aint,assertion_f,
 :- thread_local t_l:override_hilog/1.
 
 
-%= 	 	 
+
 
 %% current_hilog( ?Dbase_t) is semidet.
 %
@@ -233,7 +235,7 @@ current_hilog(t).
 % EXPORTS
 % ===================================================================
 
-%= 	 	 
+
 
 %% isNonVar( ?Denotation) is semidet.
 %
@@ -246,7 +248,7 @@ isNonVar(Denotation):-not(isSlot(Denotation)).
 
 :- if(\+ current_predicate(isSlot/1)).
 
-%= 	 	 
+
 
 %% isSlot( ?Denotation) is semidet.
 %
@@ -256,7 +258,7 @@ isSlot(Denotation):-((isVarProlog(Denotation);isVarObject(Denotation))),!.
 :- endif.
 
 
-%= 	 	 
+
 
 %% isSlot( ?Denotation, ?Denotation) is semidet.
 %
@@ -269,7 +271,7 @@ isSlot(Denotation,PrologVar):- isVarObject(Denotation,PrologVar),!.
 % ===============================================================================================
 
 
-%= 	 	 
+
 
 %% isHiddenSlot( ?Term) is semidet.
 %
@@ -281,7 +283,7 @@ isHiddenSlot(_Term):-fail.
 % ===============================================================================================
 
 
-%= 	 	 
+
 
 %% isVarProlog( ?A) is semidet.
 %
@@ -293,7 +295,7 @@ isVarProlog(A):-((var(A);A='$VAR'(_))).
 % ===============================================================================================
 
 
-%= 	 	 
+
 
 %% isVarObject( ?Denotation) is semidet.
 %
@@ -304,7 +306,7 @@ isVarObject(Denotation):-((
 		  arg(1,Denotation,Value),!,isSlot(Value))).
 
 
-%= 	 	 
+
 
 %% isVarObject( ?Denotation, ?Value) is semidet.
 %
@@ -318,7 +320,7 @@ isVarObject(Denotation,Value):-((
 % ===============================================================================================
 	
 
-%= 	 	 
+
 
 %% isObject( ?Denotation, ?BaseType) is semidet.
 %
@@ -334,7 +336,7 @@ isObject(Denotation,BaseType):-
 % ===============================================================================================
 
 
-%= 	 	 
+
 
 %% isQualifiableAsClass( :TermAtom) is semidet.
 %
@@ -344,7 +346,7 @@ isQualifiableAsClass(Atom):-atom(Atom),!.
 isQualifiableAsClass('$Class'(Atom,_)):-atom(Atom),!.
 
 
-%= 	 	 
+
 
 %% isQualifiableAs( ?Denotation, ?BaseType, ?Value) is semidet.
 %
@@ -358,7 +360,7 @@ isQualifiableAs(Denotation,BaseType,Value):-
 % ===============================================================================================
 
 
-%= 	 	 
+
 
 %% isQualifiedAs( ?Denotation, ?VALUE2, ?VALUE3) is semidet.
 %
@@ -368,7 +370,7 @@ isQualifiedAs(Denotation,_,_):-not(compound(Denotation)),!,fail.
 isQualifiedAs(Denotation,BaseType,Value):-
 		  isQualifiedAs(Denotation,BaseType,Value,_SubType).
 
-%= 	 	 
+
 
 %% isQualifiedAs( ?Denotation, ?BaseType, ?Value, ?SubType) is semidet.
 %
@@ -385,7 +387,7 @@ isQualifiedAs(Denotation,BaseType,Value,SubType):-
 :- style_check(-singleton).
 
 
-%= 	 	 
+
 
 %% lastImproperMember( ?Default, ?Default, :TermList) is semidet.
 %
@@ -402,7 +404,7 @@ lastImproperMember(Default,SubType,[_|Rest]):-
 % ===============================================================================================
 
 
-%= 	 	 
+
 
 %% isQualifiedAndKnownAs( ?Denotation, ?BaseType, ?Value) is semidet.
 %
@@ -416,7 +418,7 @@ isQualifiedAndKnownAs(Denotation,BaseType,Value):-
 % ===============================================================================================
 
 
-%= 	 	 
+
 
 %% isQualifiedAndVarAs( ?Denotation, ?BaseType, ?Value) is semidet.
 %
@@ -430,7 +432,7 @@ isQualifiedAndVarAs(Denotation,BaseType,Value):-
 % ===============================================================================================
 
 
-%= 	 	 
+
 
 %% isQualifiedAndVarAndUnifiable( ?Denotation, ?BaseType, ?NValue) is semidet.
 %
@@ -446,7 +448,7 @@ isQualifiedAndVarAndUnifiable(Denotation,BaseType,NValue):-
 
 :- dynamic(isBodyConnective/1).
 
-%= 	 	 
+
 
 %% isBodyConnective( ?Funct) is semidet.
 %
@@ -458,7 +460,7 @@ isBodyConnective(Funct):-atom_concat('f~',_,Funct),!.
 isBodyConnective(Funct):-member(Funct,[and,or,until,',',';',':-',unless,xor,holdsDuring]). % Other Propositional Wrhtml_appers
 
 
-%= 	 	 
+
 
 %% isEntityref( ?Var, ?Var) is semidet.
 %
@@ -472,7 +474,7 @@ isEntityref(Term,A):-Term=..[F,A,B],!,atom_concat('$',_,F),!.
 % ===============================================================================================
 
 
-%= 	 	 
+
 
 %% isLiteralTerm( :TermA) is semidet.
 %
@@ -482,7 +484,7 @@ isLiteralTerm(A):-isLiteralTerm_util(A),!.
 isLiteralTerm(not(A)):-isLiteralTerm_util(A),!.
 
 
-%= 	 	 
+
 
 %% isLiteralTerm_util( ?A) is semidet.
 %
@@ -498,7 +500,7 @@ isLiteralTerm_util(A):-string(A).
 % ===============================================================================================
 
 
-%= 	 	 
+
 
 %% isEntitySlot( ?Term) is semidet.
 %
@@ -512,7 +514,7 @@ isEntitySlot(Term):-isEntityFunction(Term,FnT,ArgsT),!.
 % ===============================================================================================
 
 
-%= 	 	 
+
 
 %% isEntityFunction( ?Term, ?FnT, ?ArgsT) is semidet.
 %
@@ -526,7 +528,7 @@ isEntityFunction(Term,FnT,ArgsT):-Term=..[FnT|ArgsT],is_function(FnT).
 % ===============================================================================================
 
 
-%= 	 	 
+
 
 %% isNonCompound( :TermVar) is semidet.
 %
@@ -542,7 +544,7 @@ isNonCompound(string(Var)):-!.
 % ===============================================================================================
 
 
-%= 	 	 
+
 
 %% logical_functor_ft( ?F) is semidet.
 %
@@ -556,7 +558,7 @@ logical_functor_ft((',')).
 % ===============================================================================================
 
 
-%= 	 	 
+
 
 %% non_assertable( :TermWW, ?WW) is semidet.
 %
@@ -572,7 +574,7 @@ non_assertable(W,notAssertable(F)):- compound(W),get_functor(W,F),a(notAssertabl
 
 
 
-%= 	 	 
+
 
 %% is_sentence_functor( ?And) is semidet.
 %
@@ -581,7 +583,7 @@ non_assertable(W,notAssertable(F)):- compound(W),get_functor(W,F),a(notAssertabl
 is_sentence_functor(And):-hotrace(is_logical_functor0(And)).
 
 
-%= 	 	 
+
 
 %% is_logical_functor0( ?X) is semidet.
 %
@@ -599,7 +601,7 @@ is_logical_functor0(And):-member(And,[(,),(;),('<-'),('=>'),('<=>'),(':-'),(and)
 :- was_export(logical_functor_pttp/1).
 
 
-%= 	 	 
+
 
 %% logical_functor_pttp( ?X) is semidet.
 %
@@ -615,7 +617,7 @@ logical_functor_pttp(=>).
 logical_functor_pttp(v).
 
 
-%= 	 	 
+
 
 %% pttp_nnf_pre_clean_functor( ?A, ?A, ?VALUE3) is semidet.
 %
@@ -645,7 +647,7 @@ pttp_nnf_pre_clean_functor(A,A,[]):-atom(A).
 pttp_nnf_pre_clean_functor(A,A,[]).
 
 
-%= 	 	 
+
 
 %% pttp_nnf_post_clean_functor( ?VALUE1, ?VALUE2) is semidet.
 %
@@ -659,7 +661,7 @@ pttp_nnf_post_clean_functor('v',';').
 % ===============================================================================================
 
 
-%= 	 	 
+
 
 %% is_neg( :TermARG1) is semidet.
 %
@@ -667,7 +669,7 @@ pttp_nnf_post_clean_functor('v',';').
 %
 is_neg(not(_)).
 
-%= 	 	 
+
 
 %% is_pos( ?One) is semidet.
 %
@@ -677,7 +679,7 @@ is_pos(One):- get_functor(One,F),!,not(is_log_op(F)).
 
 %= %= :- was_export(is_log_sent/1).
 
-%= 	 	 
+
 
 %% is_log_sent( ?S) is semidet.
 %
@@ -686,7 +688,7 @@ is_pos(One):- get_functor(One,F),!,not(is_log_op(F)).
 is_log_sent(S):- get_functor(S,F,_),is_log_op(F).
 
 
-%= 	 	 
+
 
 %% not_log_op( ?OP) is semidet.
 %
@@ -695,7 +697,7 @@ is_log_sent(S):- get_functor(S,F,_),is_log_op(F).
 not_log_op(OP):- not(is_log_op(OP)).
 %= %= :- was_export(is_log_op/1).
 
-%= 	 	 
+
 
 %% is_log_op( ?OP) is semidet.
 %
@@ -706,7 +708,7 @@ is_log_op(OP):- atomic(OP),to_dlog_ops(OPS),!,(member(OP=_,OPS);member(_=OP,OPS)
 % % :- use_module(logicmoo(plarkc/mpred_kif)).
 
 
-%= 	 	 
+
 
 %% put_singles( ?Wff, ?VALUE2, :TermARG3, ?Wff) is semidet.
 %
@@ -723,7 +725,7 @@ put_singles(Wff,Exists,[S|Singles],NewWff):-
 
 :- meta_predicate(call_last_is_var(0)).
 
-%= 	 	 
+
 
 %% call_last_is_var( :GoalMCall) is semidet.
 %
@@ -739,7 +741,7 @@ call_last_is_var(MCall):- strip_module(MCall,M,Call),
 
 %= %= :- was_export(defunctionalize/2).
 
-%= 	 	 
+
 
 %% defunctionalize( ?Wff, ?WffO) is semidet.
 %
@@ -747,7 +749,7 @@ call_last_is_var(MCall):- strip_module(MCall,M,Call),
 %
 defunctionalize(Wff,WffO):- w_tl(t_l:dont_use_mudEquals,defunctionalize(',',Wff,WffO)).
 
-%= 	 	 
+
 
 %% defunctionalize( ?OP, ?Wff, ?WffO) is semidet.
 %
@@ -795,7 +797,7 @@ defunctionalize(_,Wff,Wff).
 
 
 
-%= 	 	 
+
 
 %% correct_negations( ?Op, :TermX, ?O) is semidet.
 %
@@ -809,7 +811,7 @@ correct_negations(Op,(assertable_not({X})),O):-nonvar(X),wrap_in_neg_functor(Op,
 correct_negations(Op,(\+({X})),O):-nonvar(X),wrap_in_neg_functor(Op,X,O).
 
 
-%= 	 	 
+
 
 %% wrap_in_neg_functor( ?VALUE1, ?X, ?X) is semidet.
 %
@@ -822,7 +824,7 @@ wrap_in_neg_functor(callable,X, (\+(X))).
 
 
 
-%= 	 	 
+
 
 %% contains_no_negs( ?X) is semidet.
 %
@@ -831,7 +833,7 @@ wrap_in_neg_functor(callable,X, (\+(X))).
 contains_no_negs(X):- \+ contains_negs(X).
 
 
-%= 	 	 
+
 
 %% contains_negs( ?X) is semidet.
 %
@@ -841,7 +843,7 @@ contains_negs(X):-sub_term(Sub, X),compound(Sub),Sub=not(_).
 
 
 
-%= 	 	 
+
 
 %% is_modal( ?MODAL, ?VALUE2) is semidet.
 %
@@ -852,7 +854,7 @@ is_modal(MODAL,BDT):- (MODAL = nesc(BDT,_) ; MODAL = poss(BDT,_)),!,nonvar(BDT).
 is_modal(MODAL,BDT):- arg(_,MODAL,ARG),is_modal(ARG,BDT).
 
 
-%= 	 	 
+
 
 %% contains_var_lits( ?Fml, ?Var, ?Lits) is semidet.
 %
@@ -861,7 +863,7 @@ is_modal(MODAL,BDT):- arg(_,MODAL,ARG),is_modal(ARG,BDT).
 contains_var_lits(Fml,Var,Lits):- findall(Lit,contains_t_var(Fml,Var,Lit),Lits).
 
 
-%= 	 	 
+
 
 %% contains_type_lits( ?Fml, ?Var, ?Lits) is semidet.
 %
@@ -869,7 +871,7 @@ contains_var_lits(Fml,Var,Lits):- findall(Lit,contains_t_var(Fml,Var,Lit),Lits).
 %
 contains_type_lits(Fml,Var,Lits):- findall(T,(contains_t_var(Fml,Var,Lit),get_isa(Lit,O,T),same_var(O,Var)),Lits).
 
-%= 	 	 
+
 
 %% contains_t_var( ?Fml, ?Var, ?Term) is semidet.
 %
@@ -879,7 +881,7 @@ contains_t_var(Fml,Var,Term):- each_subterm(Fml,Term),compound(Term),arg(_,Term,
 
 
 
-%= 	 	 
+
 
 %% get_isa( ?Lit, ?I, ?TT) is semidet.
 %
@@ -887,7 +889,7 @@ contains_t_var(Fml,Var,Term):- each_subterm(Fml,Term),compound(Term),arg(_,Term,
 %
 get_isa(Lit,I,TT):- compound(Lit),get_isa0(Lit,I,TT).
 
-%= 	 	 
+
 
 %% get_isa0( ?IT, ?I, ?TT) is semidet.
 %
@@ -897,7 +899,7 @@ get_isa0(isa(I,T),I,TT):- to_iname(T,TT),!.
 get_isa0(IT,I,TT):- IT=..[T,I],is_colection_name(IT,T,TT),!.
 
 
-%= 	 	 
+
 
 %% is_colection_name( ?IT, ?T, ?TT) is semidet.
 %
@@ -910,7 +912,7 @@ is_colection_name(IT,T,TT):- atom_length(T,TL),TL>2,not(atom_contains(T,'_')),no
 
 
 
-%= 	 	 
+
 
 %% leave_as_is( :TermV) is semidet.
 %
@@ -931,7 +933,7 @@ leave_as_is(V):-loop_check(leave_as_is_db(V)),!.
 
 
 
-%= 	 	 
+
 
 %% leave_as_is_db( :TermP) is semidet.
 %
@@ -952,7 +954,7 @@ leave_as_is_db(C):-get_functor(C,F),loop_check(leave_as_is_functor(F)).
 
 
 
-%= 	 	 
+
 
 %% leave_as_is_functor( ?Atom) is semidet.
 %
@@ -970,7 +972,7 @@ leave_as_is_functor(F):-loop_check(a(argsQuoted,F)).
 leave_as_is_functor(F):-loop_check(a(ptReformulatorDirectivePredicate,F)).
 
 
-%= 	 	 
+
 
 %% prequent( :TermG) is semidet.
 %
@@ -986,7 +988,7 @@ prequent(G):-functor(G,req,_).
 prequent(G):-functor(G,not_call_builtin,_).
 
 
-%= 	 	 
+
 
 %% kb_nlit( ?KB, ?Neg) is semidet.
 %
@@ -995,7 +997,7 @@ prequent(G):-functor(G,not_call_builtin,_).
 kb_nlit(_KB,Neg):-member(Neg,[(not),(~),(-),(~)]).
 
 
-%= 	 	 
+
 
 %% set_is_lit( ?A) is semidet.
 %
@@ -1004,7 +1006,7 @@ kb_nlit(_KB,Neg):-member(Neg,[(not),(~),(-),(~)]).
 set_is_lit(A):-when(nonvar(A),\+ is_ftVar(A)),!.
 
 
-%= 	 	 
+
 
 %% non_compound( ?InOut) is semidet.
 %
@@ -1013,7 +1015,7 @@ set_is_lit(A):-when(nonvar(A),\+ is_ftVar(A)),!.
 non_compound(InOut):- once( \+ (compound(InOut));is_ftVar(InOut)).
 
 
-%= 	 	 
+
 
 %% is_gaf( ?Gaf) is semidet.
 %
@@ -1023,7 +1025,7 @@ is_gaf(Gaf):-when(nonvar(Gaf), \+ (is_kif_rule(Gaf))).
 
 %= %= :- was_export(is_kif_rule/1).
 
-%= 	 	 
+
 
 %% is_kif_rule( ?Var) is semidet.
 %
@@ -1036,7 +1038,7 @@ is_kif_rule(R):- is_clif(R),!.
 
 %= %= :- was_export(term_slots/2).
 
-%= 	 	 
+
 
 %% term_slots( ?Term, ?Slots) is semidet.
 %
@@ -1048,7 +1050,7 @@ term_slots(Term,Slots):-term_singletons(Term, [],NS, [],S),append(NS,S,Slots).
 :- export(head_singletons/2).
 %head_singletons(Pre,Post):-  !, hotrace((\+ ignore(must( \+ head_singles0(Pre,Post))))).
 
-%= 	 	 
+
 
 %% head_singletons( ?Pre, ?Post) is semidet.
 %
@@ -1060,7 +1062,7 @@ head_singletons(Pre,Post):-   hotrace((\+ ignore(show_failure(why, \+ head_singl
 % TODO how to adderess head_singles0(true, if_missing(foob(_G754993), foob(a)))?
 % also should fix  (head_singles0(true, nt('$ABOX', foob(_G764659),  (call_u(foob(_G764666)), foob(_G764666)\==foob(a)), rhs([foob(a)]))))).
 
-%= 	 	 
+
 
 %% head_singles0( ?Pre, :TermPost) is semidet.
 %
@@ -1081,7 +1083,7 @@ head_singles0(Pre,Post):- nonvar(Post),mpred_rule_hb(Post,Post2,Pre2),Post2\=@=P
 head_singles0(Pre,Post):-head_singles01(Pre,Post).
 
 
-%= 	 	 
+
 
 %% head_singles01( ?Pre, ?Post) is semidet.
 %
@@ -1093,7 +1095,7 @@ head_singles01(Pre,Post):-
     subtract_eq(CSingles,PreVars,Bad),!,Bad\==[].
 
 
-%= 	 	 
+
 
 %% get_kv( ?KV, ?X, ?Y) is semidet.
 %
@@ -1106,7 +1108,7 @@ get_kv(KV,X,Y):- arg(1,KV,X),arg(2,KV,Y),!.
 
 
 
-%= 	 	 
+
 
 %% is_function( ?F) is semidet.
 %
@@ -1118,7 +1120,7 @@ is_function(Function):- compound(Function),get_functor(Function,F,A),is_function
 
 
 
-%= 	 	 
+
 
 %% is_function( ?VALUE1, ?F, ?VALUE3) is semidet.
 %
@@ -1139,7 +1141,7 @@ is_function(_,F,_):- loop_check(a(tFunction,F)).
 %:- ain(isa(I,C)<=(ttPredType(C),lmconf:isa(I,C))).
 
 
-%= 	 	 
+
 
 %% is_ftEquality( :TermTerm) is semidet.
 %
@@ -1156,7 +1158,7 @@ is_ftEquality(termOfUnit(_,_)).
 
 
 
-%= 	 	 
+
 
 %% ensure_quantifiers( ?Wff, ?WffO) is semidet.
 %
@@ -1173,7 +1175,7 @@ ensure_quantifiers(Wff,WffO):-
 %= :- was_dynamic(function_corisponding_predicate/2).
 
 
-%= 	 	 
+
 
 %% get_pred( ?Pred, ?F) is semidet.
 %
@@ -1185,7 +1187,7 @@ get_pred(Pred,F):- get_functor(Pred,F).
 
 
 
-%= 	 	 
+
 
 %% function_to_predicate( ?Function, ?NewVar, ?PredifiedFunction) is semidet.
 %

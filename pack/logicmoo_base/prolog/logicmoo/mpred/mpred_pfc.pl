@@ -25,6 +25,7 @@ ain_fast_timed/2,
 ain_minfo/1,
 ain_minfo/2,
 ain_minfo_2/2,
+fixed_negations/2,
 ain_rule0/1,
 ain_rule_if_rule/1,
 ain_support/2,
@@ -37,6 +38,7 @@ ain_trigger_1/3,
 run_nt/5,
 aina_i/2,            
 ainz_i/2,
+fix_negations/2,
 all_closed/1,
 append_as_first_arg/3,
 assert_eq_quitely/1,
@@ -777,7 +779,7 @@ mpred_is_builtin(P):-predicate_property(P,built_in).
 */
 
 :- use_module(library(lists)).
-:- meta_predicate with_mpred_trace_exec(*).
+:- meta_predicate with_mpred_trace_exec(0).
 
 % :- use_module(library(dra/tabling3/swi_toplevel)).
 
@@ -909,6 +911,26 @@ mpred_each_literal(P,P). %:-conjuncts_to_list(P,List),member(E,List).
 
 
 
+is_nc_as_is(P) :- \+ compound(P),!.
+is_nc_as_is(P):- is_ftVar(P),!.
+
+fixed_negations(I,O):-notrace((fix_negations(I,O),!,I\=@=O)).
+fix_negations(P0,P0):- is_nc_as_is(P0),!.
+fix_negations(~(P0),~(P0)):- is_nc_as_is(P0),!.
+fix_negations(\+(P0),\+(P0)):- is_nc_as_is(P0),!.
+fix_negations(~(~I),O):- !, fix_negations(\+(~I),O).
+fix_negations(~not(I),O):- !, fix_negations(\+(~I),O).
+fix_negations(~~(I),O):- functor(~~(I),~~,1),!, fix_negations(\+(~I),O).
+fix_negations(not(I),O):- !, fix_negations(\+(I),O).
+fix_negations(~(I),~(O)):- !, fix_negations(I,O).
+fix_negations(\+(I),\+(O)):- !, fix_negations(I,O).
+% fix_negations(C,C):-exact_args(C),!.
+fix_negations([H|T],[HH|TT]):-!,fix_negations(H,HH),fix_negations(T,TT),!.
+fix_negations(C,CO):-C=..[F|CL],must_maplist(fix_negations,CL,CLO),!,CO=..[F|CLO].
+
+
+
+
 %% to_addable_form_wte( ?Why, :TermI, :TermO) is semidet.
 %
 % Converted To Addable Form Wte.
@@ -922,15 +944,13 @@ to_addable_form_wte(Why,I,O):-atom(I),atom_contains(I,'('),must_det_l((input_to_
 to_addable_form_wte(_,X,X):-mreq(as_is_term(X)),!.
 to_addable_form_wte(Why,nesc(I),O):-!,to_addable_form_wte(Why,I,O).
 to_addable_form_wte(Why,USER:I,O):-USER==user,!,to_addable_form_wte(Why,I,O).
-to_addable_form_wte(_Why,~(USER:P0),~(P0)):-USER==user,!.
-to_addable_form_wte(_Why,~(P0),~(P0)):-!.
+to_addable_form_wte(Why,I,O):- fixed_negations(I,M),to_addable_form_wte(Why,M,O).
 to_addable_form_wte(assert,(H:-B),(H:-B)):-B\==true,!.
-to_addable_form_wte(Why,(CUT,P0),(CUT,P)):-mpred_is_builtin(CUT),!,to_addable_form_wte(Why,P0,P).
-to_addable_form_wte(Why,P0,P):-
+to_addable_form_wte(Why,(CUT0,P0),(CUT,P)):-to_addable_form_wte(Why,CUT0,CUT),!,to_addable_form_wte(Why,P0,P).
+% to_addable_form_wte(Why,(CUT,P0),(CUT,P)):-mpred_is_builtin(CUT),!,to_addable_form_wte(Why,P0,P).
+to_addable_form_wte(Why,P0,P):- notrace((
     once(cnotrace(to_addable_form(P0,P));must(to_addable_form(P0,P))),
-    ignore((((P0\=@=P,P0\=isa(_,_)),mpred_trace_msg((to_addable_form(Why):-[P0,P]))))),!.
-
-
+    ignore((((P0\=@=P,P0\=isa(_,_)),mpred_trace_msg((to_addable_form(Why):-[P0,P]))))))),!.
 
 
 %% retract_eq_quitely( ?H) is semidet.
@@ -962,6 +982,7 @@ assert_eq_quitely(H):- attvar_op(assert_if_new,H).
 reduce_clause_from_fwd(H,H):- (\+is_ftCompound(H)),!.
 reduce_clause_from_fwd((H:-B),HH):-B==true,reduce_clause_from_fwd(H,HH).
 reduce_clause_from_fwd((B==>H),HH):-B==true,reduce_clause_from_fwd(H,HH).
+reduce_clause_from_fwd(I,O):- fixed_negations(I,M),reduce_clause_from_fwd(M,O).
 reduce_clause_from_fwd((==>H),HH):-!,reduce_clause_from_fwd(H,HH).
 reduce_clause_from_fwd((H<- B),HH):-B==true,reduce_clause_from_fwd(H,HH).
 reduce_clause_from_fwd((B<==> H),HH):-B==true,reduce_clause_from_fwd(H,HH).
@@ -977,8 +998,10 @@ reduce_clause_from_fwd(H,H).
 %
 to_addable_form(I,I):- is_ftVar(I),!.
 to_addable_form(I,OOO):-is_list(I),!,must_maplist(to_addable_form,I,O),flatten(O,OO),!,must(reduce_clause_from_fwd(OO,OOO)).
+
 to_addable_form(I,OO):- current_predicate(_:mpred_expansion_file/0),must(fully_expand(pfc,I,II)),!,
  must((into_mpred_form(II,M),to_predicate_isas_each(M,O))),!,reduce_clause_from_fwd(O,OO).
+
 to_addable_form(I,O):- must((bagof(M,do_expand_args(isEachAF,I,M),IM))),list_to_conjuncts(IM,M),to_predicate_isas_each(M,O),!.
 
 :-mpred_expansion_file.
@@ -1031,6 +1054,7 @@ to_predicate_isas0(C,CO):-C=..[F|CL],must_maplist(to_predicate_isas0,CL,CLO),!,C
 % Exact Arguments.
 %
 exact_args(Q):-is_ftVar(Q),!,fail.
+exact_args(argsQuoted(_)):-!,fail.
 exact_args(Q):- req(argsQuoted(Q)).
 exact_args(Q):-is_ftCompound(Q),functor(Q,F,_),req(argsQuoted(F)).
 exact_args(second_order(_,_)).
@@ -1374,11 +1398,12 @@ is_atom_body_pfa(WAC,P,F,2,Rest):-arg(2,P,E),E==WAC,arg(1,P,Rest),!.
 
 :- thread_local(t_l:mpred_debug_local/0).
 
-%% mpred_is_silient is semidet.
+%% mpred_is_silient is det.
 %
-% PFC If Is A Silient.
+% If Is A Silient.
 %
-mpred_is_silient :- ( \+ t_l:mpred_debug_local, \+ mpred_is_tracing_exec, \+ mpred_is_tracing(_)) ,!.
+mpred_is_silient :- ( \+ t_l:mpred_debug_local, \+ mpred_is_tracing_exec, \+ mpred_is_tracing(_), current_prolog_flag(debug,false), is_release) ,!.
+
 
 :- meta_predicate(show_if_debug(0)).
 % show_if_debug(A):- !,show_call(why,A).
@@ -1913,19 +1938,22 @@ mpred_post_sp_zzz(S,P):-
 mpred_post_sp_zzz(S,P):-mpred_post_sp_zzzz(S,P),!.
 
 
+
+
 %% mpred_post_sp_zzzz( ?S, ?P) is semidet.
 %
 % PFC Post Sp Zzzz.
 %
+mpred_post_sp_zzzz(S, Var):-is_ftVar(Var),!,trace_or_throw(var_mpred_post_sp_zzzz(S, Var)).
 mpred_post_sp_zzzz(S,(P1,P2)) :- !,mpred_post_sp_zzzz(S,(P1)),mpred_post_sp_zzzz(S,(P2)).
 mpred_post_sp_zzzz(S,[P1]) :- !,mpred_post_sp_zzzz(S,(P1)).
 mpred_post_sp_zzzz(S,[P1|P2]) :- !,mpred_post_sp_zzzz(S,(P1)),mpred_post_sp_zzzz(S,(P2)).
 
-mpred_post_sp_zzzz(S, not(P)) :-!,mpred_post_sp_zzzz(S, \+( P)).
-mpred_post_sp_zzzz(S, \+ P) :- must(is_ftNonvar(P)),!, doall(mpred_rem2a(P,S)),!,mpred_undo((\+),P).
+mpred_post_sp_zzzz(S,NEG) :- fixed_negations(NEG,NEGO),!,mpred_post_sp_zzzz(S,NEGO).
 
-mpred_post_sp_zzzz(S, -(P)) :-!,mpred_post_sp_zzzz(S, ~( P)).
-mpred_post_sp_zzzz(S, ~(P)) :-doall(mpred_rem2a(P,S)),mpred_undo((\+),P),fail.
+mpred_post_sp_zzzz(S, \+ P) :- must(is_ftNonvar(P)),!, doall(mpred_rem2a(P,S)),!,mpred_undo((\+),P).
+mpred_post_sp_zzzz(S, ~(P)) :- nonvar(P),doall(mpred_rem2a(P,S)),mpred_undo((\+),P),fail.
+
 mpred_post_sp_zzzz(_S,P) :- once((notrace(mpred_is_tautology(P)),wdmsg(trace_or_throw(todo(error(mpred_is_tautology(P))))))),show_load_context,fail.
 
 % only do loop check if it's already supported
@@ -1983,9 +2011,13 @@ with_no_mpred_trace_exec(P):- wno_tl(t_l:mpred_debug_local,wno_tl(mpred_is_traci
 %
 % PFC Test.
 %
-mpred_test(_):- compiling,!.
-mpred_test(P):- \+ mpred_is_tracing_exec,!,sanity(req(P)),!.
-mpred_test(P):- show_call(with_mpred_trace_exec(req(P))),!.
+mpred_test(_):- (compiling; current_prolog_flag(xref,true)),!.
+mpred_test(P):- mpred_is_silient,!,sanity(req(P)),!.
+mpred_test(P):- (show_call(with_mpred_trace_exec(req(P))) -> why_was_true(P) ; ((why_was_true( \+( P )),!,fail))).
+
+why_was_true(P):- mpred_why(P),!.
+why_was_true(P):- dmsg(justfied_true(P)),!.
+
 
 
 %% clause_asserted_local( :TermABOX) is semidet.
@@ -2868,14 +2900,16 @@ mpred_wfflist([X|Rest],L) :-
 %
 supports_f_l(F,[Fact|MoreFacts]) :-
   mpred_get_support_precanonical_plus_more(F,(Fact,Trigger)),
-  trigger_supports_f_l(Trigger,MoreFacts).
+  must(trigger_supports_f_l(Trigger,MoreFacts)).
 
 
 %% mpred_get_support_precanonical_plus_more( ?P, ?Sup) is semidet.
 %
 % PFC Get Support Precanonical Plus More.
 %
-mpred_get_support_precanonical_plus_more(P,Sup):-mpred_get_support_one(P,Sup)*->true;((to_addable_form_wte(mpred_get_support_precanonical_plus_more,P,PE),P\=@=PE,mpred_get_support_one(PE,Sup))).
+mpred_get_support_precanonical_plus_more(P,Sup):-mpred_get_support_one(P,Sup)*->true;
+  ((to_addable_form_wte(mpred_get_support_precanonical_plus_more,P,PE),!,
+    P\=@=PE,mpred_get_support_one(PE,Sup))).
 
 %% mpred_get_support_one( ?P, ?Sup) is semidet.
 %
@@ -2893,6 +2927,7 @@ mpred_get_support_one(P,Sup):- mpred_get_support(P,Sup)*->true;
 mpred_get_support_via_sentence(Var,_):-is_ftVar(Var),!,fail.
 mpred_get_support_via_sentence((A,B),(FC,TC)):-!, mpred_get_support_precanonical_plus_more(A,(FA,TA)),mpred_get_support_precanonical_plus_more(B,(FB,TB)),conjoin(FA,FB,FC),conjoin(TA,TB,TC).
 mpred_get_support_via_sentence(true,g):-!.
+mpred_get_support_via_sentence(G,req(G)):- req(G).
 
 
 
@@ -2946,10 +2981,11 @@ spft_precanonical(F,SF,ST):- to_addable_form_wte(spft_precanonical,F,P),!,get_us
 % Trigger Supports Functor (list Version).
 %
 trigger_supports_f_l(U,[]) :- match_source_ref1(U),!.
+trigger_supports_f_l(U,[]) :- atom(U),!.
 
 trigger_supports_f_l(Trigger,[Fact|MoreFacts]) :-
   mpred_get_support_precanonical_plus_more(Trigger,(Fact,AnotherTrigger)),
-  trigger_supports_f_l(AnotherTrigger,MoreFacts).
+  must(trigger_supports_f_l(AnotherTrigger,MoreFacts)).
 
 
 %=
@@ -2990,7 +3026,8 @@ unnumbervars_equals(A,B):- =(A,BO),!,BO=B.
 %
 % PFC Forward Repropigated Extended Helper.
 %
-mpred_fwd2(Fact,Sup) :- cyclic_term(Fact;Sup),writeq(mpred_fwd2_cyclic_term(Fact;Sup)),!.
+mpred_fwd2(Fact,Sup) :- fixed_negations(Fact,M),!,mpred_fwd2(M,Sup).
+mpred_fwd2(Fact,Sup) :- cyclic_term(Fact;Sup),writeq(mpred_fwd2_cyclic_term(Fact;Sup)),!,trace_or_throw(mpred_fwd2_cyclic_term(Fact;Sup)).
 mpred_fwd2(Fact0,_Sup):-
   once(must(ain_rule_if_rule(Fact0))),
   unnumbervars_equals(Fact0,Fact),  
@@ -3013,6 +3050,7 @@ mpred_fwd2(Fact0,_Sup):-
 %
 % Assert If New Rule If Rule.
 %
+ain_rule_if_rule(Fact) :- fixed_negations(Fact,M),!,ain_rule_if_rule(M).
 ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),
     doall(show_if_debug(with_umt(req(Fact)))),!.
 ain_rule_if_rule(Fact):- must(ain_rule0(Fact)),!.
@@ -3360,6 +3398,7 @@ mpred_call_only_facts(_Why,F):- on_x_rtrace(no_repeats(loop_check(mpred_call_0(F
 % PFC call  Primary Helper.
 %
 mpred_call_0(Var):-is_ftVar(Var),!,mpred_call_with_no_triggers(Var).
+mpred_call_0(M):-fixed_negations(M,O),!,mpred_call_0(O).
 mpred_call_0(U:X):-U==user,!,mpred_call_0(X).
 mpred_call_0(t(A,B)):-(atom(A)->true;(no_repeats(arity(A,1)),atom(A))),ABC=..[A,B],mpred_call_0(ABC).
 mpred_call_0(isa(B,A)):-(atom(A)->true;(no_repeats(tCol(A)),atom(A))),ABC=..[A,B],mpred_call_0(ABC).
@@ -3374,6 +3413,7 @@ mpred_call_0((C1*->C2;C3)):-!,(mpred_call_0(C1)*->mpred_call_0(C2);mpred_call_0(
 mpred_call_0((C1->C2)):-!,(mpred_call_0(C1)->mpred_call_0(C2)).
 mpred_call_0((C1*->C2)):-!,(mpred_call_0(C1)*->mpred_call_0(C2)).
 mpred_call_0(call(X)):- !, mpred_call_0(X).
+mpred_call_0(req(X)):- !, mpred_call_0(X).
 mpred_call_0(\+(X)):- !, \+ mpred_call_0(X).
 mpred_call_0(call_u(X)):- !, mpred_call_0(X).
 mpred_call_0(asserta(X)):- !, aina(X).
@@ -3714,6 +3754,7 @@ mpred_nf_negation(X,X).
 %
 % Build Right-hand-side.
 %
+
 build_rhs(_Sup,X,[X]) :-
   is_ftVar(X),
   !.
@@ -3740,7 +3781,7 @@ build_rhs(Sup,X,[X2]) :-
 %
 mpred_compile_rhsTerm(_Sup,P,P):-is_ftVar(P),!.
 mpred_compile_rhsTerm(Sup,(P/C),((P0:-C0))) :- !,mpred_compile_rhsTerm(Sup,P,P0),build_code_test(Sup,C,C0),!.
-mpred_compile_rhsTerm(Sup,I,O):-to_addable_form_wte(mpred_compile_rhsTerm,I,O), must(\+ \+ mpred_mark_as(Sup,p,O,pfcRHSR)),!.
+mpred_compile_rhsTerm(Sup,I,O):-to_addable_form_wte(mpred_compile_rhsTerm,I,O), must(\+ \+ mpred_mark_as(Sup,p,O,pfcRHS)),!.
 
 :- export(mpred_mark_as_ml/4).
 
@@ -3765,15 +3806,17 @@ pos_2_neg(P,~(P)).
 % PFC Mark Converted To.
 %
 mpred_mark_as(_,_,P,_):- is_ftVar(P),!.
-mpred_mark_as(Sup,PosNeg,\+(P),Type):-!,mpred_mark_as(Sup,PosNeg,P,Type).
+mpred_mark_as(Sup,Pos,\+(P),Type):- pos_2_neg(Pos,Neg),!,mpred_mark_as(Sup,Neg,P,Type).
 mpred_mark_as(Sup,Pos,~(P),Type):- pos_2_neg(Pos,Neg),!,mpred_mark_as(Sup,Neg,P,Type).
 mpred_mark_as(Sup,Pos,-(P),Type):- pos_2_neg(Pos,Neg),!,mpred_mark_as(Sup,Neg,P,Type).
+mpred_mark_as(Sup,Pos,not(P),Type):- pos_2_neg(Pos,Neg),!,mpred_mark_as(Sup,Neg,P,Type).
 mpred_mark_as(Sup,PosNeg,[P|PL],Type):- is_list([P|PL]), !,must_maplist(mpred_mark_as_ml(Sup,PosNeg,Type),[P|PL]).
 mpred_mark_as(Sup,PosNeg,( P / CC ),Type):- !, mpred_mark_as(Sup,PosNeg,P,Type),mpred_mark_as(Sup,PosNeg,( CC ),pfcCallCode).
 mpred_mark_as(Sup,PosNeg,'{}'(  CC ), _Type):- mpred_mark_as(Sup,PosNeg,( CC ),pfcCallCode).
 mpred_mark_as(Sup,PosNeg,( A , B), Type):- !, mpred_mark_as(Sup,PosNeg,A, Type),mpred_mark_as(Sup,PosNeg,B, Type).
 mpred_mark_as(Sup,PosNeg,( A ; B), Type):- !, mpred_mark_as(Sup,PosNeg,A, Type),mpred_mark_as(Sup,PosNeg,B, Type).
 mpred_mark_as(Sup,PosNeg,( A ==> B), Type):- !, mpred_mark_as(Sup,PosNeg,A, Type),mpred_mark_as(Sup,PosNeg,B, pfcRHS).
+mpred_mark_as(Sup,PosNeg,( B <- A), Type):- !, mpred_mark_as(Sup,PosNeg,A, Type),mpred_mark_as(Sup,PosNeg,B, pfcRHS).
 %mpred_mark_as(_Sup,_PosNeg,( _ :- _ ),_Type):-!.
 mpred_mark_as(Sup,PosNeg,( P :- CC ),Type):- !, mpred_mark_as(Sup,PosNeg,P,Type),mpred_mark_as(Sup,PosNeg,( CC ),pfcCallCode).
 mpred_mark_as(Sup,PosNeg,P,Type):-get_functor(P,F,A),ignore(mpred_mark_fa_as(Sup,PosNeg,P,F,A,Type)),!.
@@ -3798,7 +3841,8 @@ mpred_mark_fa_as(_Sup, PosNeg,_P,F,A,Type):- req(mpred_mark(Type,PosNeg,F,A)),!.
 mpred_mark_fa_as(Sup,PosNeg,_P,F,A,Type):- 
   MARK = mpred_mark(Type,PosNeg,F,A),
   check_never_assert(MARK),
-  with_no_mpred_trace_exec(with_search_mode(direct,mpred_fwd1(MARK,(s(Sup),g)))),!.
+  with_no_mpred_trace_exec(ain(MARK,(s(Sup),g))).
+  % with_no_mpred_trace_exec(with_search_mode(direct,mpred_fwd2(MARK,(s(Sup),g)))),!.
    
 
 %% fa_to_p( ?F, ?A, ?P) is semidet.
@@ -3961,6 +4005,7 @@ process_rule(Lhs,Rhs,Parent_rule) :-
 %
 build_rule(Lhs,Rhs,Support) :-
   build_trigger(Support,Lhs,Rhs,Trigger),
+   mpred_mark_as(Support,p,Lhs,pfcLHS),
    cyclic_break((Lhs,Rhs,Support,Trigger)),
   mpred_eval_lhs(Trigger,Support).
 
@@ -5314,10 +5359,10 @@ add_reprop(_Trig,repropagate(Var)):- \+ is_ftVar(Var),!.
 add_reprop(Trig,(H:-B)):- trace_or_throw(bad_add_reprop(Trig,(H:-B))).
 
 % instant 
-add_reprop(Trig ,Trigger):- !, w_tl(t_l:current_why_source(Trig),  repropagate(Trigger)).
+add_reprop(Trig ,Trigger):- fail, !, w_tl(t_l:current_why_source(Trig),  repropagate(Trigger)).
 
 % settings
-add_reprop( Trig ,Trigger):- 
+add_reprop( Trig ,Trigger):- fail,
   w_tl(t_l:current_why_source(Trig),
     (
      mpred_fwd(repropagate(Trigger),Trig))),!.
@@ -5326,7 +5371,7 @@ add_reprop( Trig ,Trigger):-
 add_reprop( Trig ,Trigger):- 
   w_tl(t_l:current_why_source(Trig),
     (get_user_abox_umt(ABOX),
-     attvar_op(assertz_if_new,(basePFC:qu(ABOX,repropagate(Trigger),(g,g)))))).
+     show_call(attvar_op(assertz_if_new,(basePFC:qu(ABOX,repropagate(Trigger),(Trig,g))))))).
 
 
 %% repropagate( :TermP) is semidet.

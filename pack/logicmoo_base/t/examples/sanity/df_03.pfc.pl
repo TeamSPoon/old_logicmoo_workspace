@@ -9,6 +9,7 @@
 :- module(sanity,[]).
 
 :- use_module(library(logicmoo_base)).
+
 :- begin_pfc.
 
 :- dynamic((most/1,mostly/1)).
@@ -25,27 +26,25 @@ most(P==>Q)/nonvar(Q) ==> (P ==> most(Q)).
 most(~P)/nonvar(P)  ==>  (( \+ P ) ==> ~ P ).
 
 % POS chaining
-most(P)/mpred_positive_literal(P)  ==>  mostly(P).
+most(P)/mpred_positive_literal(P)  ==>  ( ~~P  ==> P ).
 
 
 
-mostly(P) ==> (( \+ ~P ) ==> P ).
-mostly(P)/(if_missing_mask(P,Q,Test)) ==> ( (~Q/Test) ==> P ).
-mostly(P)/(if_missing_mask(P,Q,Test)) ==> ( ( (\+ Q)/Test) ==> P ).
+% mostly(P) ==> (( \+ ~P ) ==> P ).
+% mostly(P)/(if_missing_mask(P,Q,Test)) ==> ( ( \+ Q/Test) ==> P ).
 
 % mostly(Q) ==> if_missing(Q,Q).
 
 :-dynamic((a/1,b/1,c/1)).
 
+b(1).
 a(X) ==> c(X).
-most(c(X) ==> b(X)) .
+most(c(X) ==> ~b(X)) .
 a(1).
 
 
 :- listing([a/1,b/1,c/1,(==>)/2,most/1,mostly/1,pt,nt,bt]).
 
-:- mpred_test(b(1)).
-
-:- mpred_why(b(1)).
+:- mpred_test( \+(~(b(1))) ).
 
 

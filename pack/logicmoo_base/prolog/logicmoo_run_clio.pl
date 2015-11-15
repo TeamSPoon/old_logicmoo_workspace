@@ -34,9 +34,9 @@ do_semweb_startup_late_once:-asserta(did_semweb_startup_late_once),forall(clause
 :- was_dynamic http:location/3.
 :- shared_multifile http:location/3.
 
-:- file_search_path(cliopatria,SP),
+:- user:file_search_path(cliopatria,SP),
    exists_directory(SP),
-   writeq(file_search_path(cliopatria,SP)),nl.
+   writeq(user:file_search_path(cliopatria,SP)),nl.
    %set_setting_default(cliopatria_binding:path, SP).
    %save_settings('moo_settings.db').
    %%setting(cliopatria_binding:path, atom, SP, 'Path to root of cliopatria install'),!.

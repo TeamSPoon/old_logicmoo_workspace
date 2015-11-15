@@ -44,8 +44,8 @@ arity(pfclog,1).
 
 
 
-%((clif(CLIF)) ==> ({delistify_last_arg(CLIF,kif_to_boxlog,BOXLOG),mpred_run_pause},boxlog(BOXLOG),{mpred_run_resume,deterministic(true),mpred_run,slow_sanity(is_entailed(CLIF))})).
-((clif(CLIF),{delistify_last_arg(CLIF,kif_to_boxlog,BOXLOG)}) ==> (boxlog(BOXLOG),{slow_sanity(is_entailed(CLIF))})).
+((clif(CLIF)) ==> ({delistify_last_arg(CLIF,kif_to_boxlog,BOXLOG),mpred_run_pause},boxlog(BOXLOG),{mpred_run_resume,deterministic(true),mpred_run,slow_sanity(is_entailed(CLIF))})).
+%((clif(CLIF),{delistify_last_arg(CLIF,kif_to_boxlog,BOXLOG)}) ==> (boxlog(BOXLOG),{mpred_run,slow_sanity(is_entailed(CLIF))})).
 (boxlog(BOXLOG),{delistify_last_arg(BOXLOG,boxlog_to_pfc,PROLOG)}) ==> pfclog(PROLOG).
 % pfclog(PROLOG) ==> {without_running(ain(PROLOG,(pfclog(PROLOG),u)))}.
 % {all_different_head_vals(PROLOG)},

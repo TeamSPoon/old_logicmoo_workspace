@@ -26,7 +26,7 @@ most(P==>Q)/nonvar(Q) ==> (P ==> most(Q)).
 most(~P)/nonvar(P)  ==>  (( \+ P ) ==> ~ P ).
 
 % POS chaining
-most(P)/mpred_positive_literal(P)  ==>  (( \+ ~P ) ==> P ).
+most(P)/mpred_positive_literal(P)  ==>  ( ~~P  ==> P ).
 
 
 
@@ -38,14 +38,13 @@ most(P)/mpred_positive_literal(P)  ==>  (( \+ ~P ) ==> P ).
 :-dynamic((a/1,b/1,c/1)).
 
 a(X) ==> c(X).
-most(c(X) ==> b(X)) .
+most(c(X) ==> ~b(X)) .
 a(1).
-~b(1).
+
 
 :- listing([a/1,b/1,c/1,(==>)/2,most/1,mostly/1,pt,nt,bt]).
 
-:- mpred_test(\+ b(1)).
+:- mpred_test(~b(1)).
 
-:- mpred_why(b(1)).
 
 

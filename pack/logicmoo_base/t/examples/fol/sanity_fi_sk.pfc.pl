@@ -48,6 +48,8 @@ never_assert_u(mother(trudy,das)).
 
 :- mpred_trace_exec.
 
+:- dynamic(father/2).
+
 clif(forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f)))))).
 
 :- must(clif(forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f))))))).

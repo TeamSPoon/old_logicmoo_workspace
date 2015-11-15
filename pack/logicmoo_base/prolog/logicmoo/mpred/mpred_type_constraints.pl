@@ -78,7 +78,7 @@
 
 
 
-%= 	 	 
+
 
 %% boxlog_goal_expansion( ?G, ?GG) is semidet.
 %
@@ -91,7 +91,7 @@ boxlog_goal_expansion(G,_):- % \+ source_location(_,_),
 */
 
 
-%= 	 	 
+
 
 %% weaken( :GoalG) is semidet.
 %
@@ -100,7 +100,7 @@ boxlog_goal_expansion(G,_):- % \+ source_location(_,_),
 weaken(G):- weaken_goal(G,GG) -> GG.
 
 
-%= 	 	 
+
 
 %% weaken_goal( :GoalG, :GoalGGG) is semidet.
 %
@@ -109,7 +109,7 @@ weaken(G):- weaken_goal(G,GG) -> GG.
 weaken_goal(G,GGG):- copy_term(G,GG,Gs),G=GG,G=..[_|ARGS],weaken_args(GG,1,ARGS),   GGG=(GG,maplist(dom_member,Gs)).
 
 
-%= 	 	 
+
 
 %% weaken_arg( ?G, ?N, ?A) is semidet.
 %
@@ -119,7 +119,7 @@ weaken_arg(G,N,A):- dom(AA,[A]),!,setarg(N,G,AA).
 weaken_arg(G,N,A):- (var(A)->true;(dom(AA,[A]),setarg(N,G,AA))).
 
 
-%= 	 	 
+
 
 %% weaken_args( ?G, ?N, :TermA) is semidet.
 %
@@ -129,7 +129,7 @@ weaken_args(G,N,[A]):-weaken_arg(G,N,A),!.
 weaken_args(G,N,[A|RGS]):-weaken_arg(G,N,A),N2 is N + 1,weaken_args(G,N2,RGS).
 
 
-%= 	 	 
+
 
 %% lazy( :GoalG) is semidet.
 %
@@ -137,7 +137,7 @@ weaken_args(G,N,[A|RGS]):-weaken_arg(G,N,A),N2 is N + 1,weaken_args(G,N2,RGS).
 %
 lazy(G):- term_variables(G,Vs),(Vs==[]->G;lazy(Vs,G)).
 
-%= 	 	 
+
 
 %% lazy( ?V, :GoalG) is semidet.
 %
@@ -147,7 +147,7 @@ lazy([V],G):-!,freeze(V,G).
 lazy([V|Vs],G):-freeze(V,G),!,lazy(Vs,G).
 
 
-%= 	 	 
+
 
 %% thaw( ?G) is semidet.
 %
@@ -156,16 +156,16 @@ lazy([V|Vs],G):-freeze(V,G),!,lazy(Vs,G).
 thaw(G):- call_residue_vars(G,Vs),maplist(melt,Vs).
 
 
-%= 	 	 
 
-%% thaw( ?G) is semidet.
+
+%% melt( ?G) is semidet.
 %
-% Thaw.
+% melt.
 %
 melt(V):-frozen(V,G),call(G).
 
 
-%= 	 	 
+
 
 %% attribs_to_atoms( ?ListA, ?List) is semidet.
 %
@@ -174,7 +174,7 @@ melt(V):-frozen(V,G),call(G).
 attribs_to_atoms(ListA,List):-map_subterms(attribs_to_atoms0,ListA,List).
 
 
-%= 	 	 
+
 
 %% map_subterms( :PRED2Pred, ?I, ?O) is semidet.
 %
@@ -186,7 +186,7 @@ map_subterms(Pred,I,O):-compound(I),!,I=..IL,maplist(map_subterms(Pred),IL,OL),O
 map_subterms(_Pred,IO,IO).
 
 
-%= 	 	 
+
 
 %% iza_to_isa( :TermAA, :TermAB) is semidet.
 %
@@ -204,7 +204,7 @@ iza_to_isa(AA,AB):-must(AA=AB).
 %
 argisa:attribute_goals(_) --> [true].
 
-%= 	 	 
+
 
 %% attr_unify_hook( ?X, ?Other) is semidet.
 %
@@ -214,7 +214,7 @@ argisa:attribute_goals(_) --> [true].
 argisa:attr_unify_hook(_, _).
 
 
-%= 	 	 
+
 
 %% attribs_to_atoms0( ?Var, ?Isa) is semidet.
 %
@@ -225,7 +225,7 @@ attribs_to_atoms0(O,O):-not(compound(O)).
 
 
 
-%= 	 	 
+
 
 %% min_isa_l( ?List, ?ListO) is semidet.
 %
@@ -233,7 +233,7 @@ attribs_to_atoms0(O,O):-not(compound(O)).
 %
 min_isa_l(List,ListO):-isa_pred_l(lambda(Y,X,genls(X,Y)),List,ListO).
 
-%= 	 	 
+
 
 %% max_isa_l( ?List, ?ListO) is semidet.
 %
@@ -243,7 +243,7 @@ max_isa_l(List,ListO):-isa_pred_l(genls,List,ListO).
 
 
 
-%= 	 	 
+
 
 %% isa_pred_l( :PRED2Pred, ?List, ?ListO) is semidet.
 %
@@ -252,7 +252,7 @@ max_isa_l(List,ListO):-isa_pred_l(genls,List,ListO).
 isa_pred_l(Pred,List,ListO):-isa_pred_l(Pred,List,List,ListO).
 
 
-%= 	 	 
+
 
 %% isa_pred_l( :PRED2Pred, ?UPARAM2, ?List, ?UPARAM4) is semidet.
 %
@@ -263,7 +263,7 @@ isa_pred_l(Pred,[X|L],List,O):-member(Y,List),X\=Y,call(Pred,X,Y),!,isa_pred_l(P
 isa_pred_l(Pred,[X|L],List,[X|O]):-isa_pred_l(Pred,L,List,O).
 
 
-%= 	 	 
+
 
 %% min_isa( :TermHintA, ?HintA, ?HintA) is semidet.
 %
@@ -276,7 +276,7 @@ min_isa((A,B),HintC,HintO):- min_isa(A,HintC,HintA),min_isa(B,HintC,HintB),conjo
 min_isa(HintA,HintB,HintO):- conjoin(HintA,HintB,HintO).
 
 
-%= 	 	 
+
 
 %% max_isa( :TermHintA, ?HintA, ?HintA) is semidet.
 %
@@ -290,7 +290,7 @@ max_isa(HintA,HintB,HintO):- conjoin(HintA,HintB,HintO).
 
 
 
-%= 	 	 
+
 
 %% add_iza( ?Var, ?HintA) is semidet.
 %
@@ -302,7 +302,7 @@ add_iza(Var,Hint):- ignore(show_failure(why,isa(Var,Hint))).
 :- style_check(-singleton).
 
 
-%= 	 	 
+
 
 %% dom_lbl( ?X) is semidet.
 %
@@ -311,7 +311,7 @@ add_iza(Var,Hint):- ignore(show_failure(why,isa(Var,Hint))).
 dom_lbl(X):-copy_term(X,X,Gs),maplist(dom_member,Gs).
 
 
-%= 	 	 
+
 
 %% dom_member( :GoalG) is semidet.
 %
@@ -321,7 +321,7 @@ dom_member(dom(X,List)):-!,member(X,List).
 dom_member(G):-G.
 
 
-%= 	 	 
+
 
 %% attempt_attribute_args( ?AndOr, ?Hint, :TermVar) is semidet.
 %
@@ -341,7 +341,7 @@ attempt_attribute_args(AndOr,Hint,Term):- Term=..[F,A],tCol(F),!,attempt_attribu
 attempt_attribute_args(AndOr,Hint,Term):- Term=..[F|ARGS],!,attempt_attribute_args(AndOr,Hint,F,1,ARGS).
 
 
-%= 	 	 
+
 
 %% attempt_attribute_args( ?AndOr, ?Hint, ?F, ?N, :TermARG5) is semidet.
 %
@@ -354,7 +354,7 @@ attempt_attribute_args(AndOr,Hint,t,N,[A|ARGS]):-not(atom(A)),!.
 attempt_attribute_args(AndOr,Hint,F,N,[A|ARGS]):-attempt_attribute_one_arg(Hint,F,N,A),N2 is N+1,attempt_attribute_args(AndOr,Hint,F,N2,ARGS).
 
 
-%= 	 	 
+
 
 %% attempt_attribute_one_arg( ?Hint, ?F, ?N, ?A) is semidet.
 %
@@ -369,7 +369,7 @@ attempt_attribute_one_arg(Hint,F,N,A):-attempt_attribute_args(AndOr,argi(F,N),A)
 
 % mdif(A,B):- tlbugger:attributedVars,!,dif(A,B).
 
-%= 	 	 
+
 
 %% mdif( ?A, ?B) is semidet.
 %
@@ -379,7 +379,7 @@ mdif(A,B):-A\==B.
 
 :- was_export((samef/2,same/2)).
 
-%= 	 	 
+
 
 %% same( ?X, ?Y) is semidet.
 %
@@ -391,7 +391,7 @@ same(X,Y):- compound(Y),arg(1,Y,X),!.
 
 
 
-%= 	 	 
+
 
 %% samef( ?X, ?Y) is semidet.
 %
@@ -400,7 +400,7 @@ same(X,Y):- compound(Y),arg(1,Y,X),!.
 samef(X,Y):- hotrace(((to_functor(X,XF),to_functor(Y,YF),(XF=YF->true;string_equal_ci(XF,YF))))).
 
 
-%= 	 	 
+
 
 %% to_functor( ?A, ?O) is semidet.
 %
@@ -412,7 +412,7 @@ to_functor(A,A).
 
 :- was_export(arg_to_var/3).
 
-%= 	 	 
+
 
 %% arg_to_var( ?Type, ?String, ?Var) is semidet.
 %
@@ -423,7 +423,7 @@ arg_to_var(_Type,_String,_Var).
 :- was_export(same_arg/3).
 
 
-%= 	 	 
+
 
 %% same_arg( ?How, ?X, ?Y) is semidet.
 %
@@ -447,7 +447,7 @@ same_arg(same_or(Pred),I,Sup):- holds_t(Pred,I,Sup),!.
 
 % same_arg(I,X):- promp_yn('~nSame Objects: ~q== ~q ?',[I,X]).
 
-%= 	 	 
+
 
 %% promp_yn( ?Fmt, ?A) is semidet.
 %
@@ -462,7 +462,7 @@ promp_yn(Fmt,A):- format(Fmt,A),get_single_char(C),C=121.
 :- use_module(library(ordsets)).
 :- was_export(dom/2).
 
-%= 	 	 
+
 
 %% dom( ?X, ?Dom) is semidet.
 %
@@ -478,7 +478,7 @@ dom(X, List) :-
 
 :- was_export(extend_domain/2).
 
-%= 	 	 
+
 
 %% extend_domain( ?X, ?DomL) is semidet.
 %
@@ -488,7 +488,7 @@ extend_domain(X, DomL):- init_dom(X, Dom2), ord_union(Dom2, DomL, NewDomain),put
 
 :- was_export(extend_dom/2).
 
-%= 	 	 
+
 
 %% extend_dom( ?X, ?DomE) is semidet.
 %
@@ -498,7 +498,7 @@ extend_dom(X, DomE):-  init_dom(X, Dom2),ord_add_element(Dom2, DomE, NewDomain),
 
 :- was_export(init_dom/2).
 
-%= 	 	 
+
 
 %% init_dom( ?X, ?Dom) is semidet.
 %
@@ -532,7 +532,7 @@ dom:attribute_goals(X) -->
 
 
 
-%= 	 	 
+
 
 %% cmp_memberchk( ?X, ?Y) is semidet.
 %
@@ -540,7 +540,7 @@ dom:attribute_goals(X) -->
 %
 cmp_memberchk(X,Y):-numbervars(X,0,_,[attvars(skip)]),member(X,Y),!.
 
-%= 	 	 
+
 
 %% cmp_memberchk0( ?Item, :TermX1) is semidet.
 %
@@ -570,7 +570,7 @@ cmp_memberchk0(Item, [X1]) :-
 
 :- was_export(isac/2).
 
-%= 	 	 
+
 
 %% isac( ?X, ?Dom) is semidet.
 %
@@ -584,7 +584,7 @@ isac(X, Domain) :-
       X = Y.
 
 
-%= 	 	 
+
 
 %% type_size( ?VALUE1, :PRED1000VALUE2) is semidet.
 %
@@ -595,7 +595,7 @@ type_size(C,1000000):-isa(C,ttFormatType),!.
 type_size(_,1000).
 
 
-%= 	 	 
+
 
 %% comp_type( ?Comp, ?Col1, ?Col2) is semidet.
 %
@@ -604,7 +604,7 @@ type_size(_,1000).
 comp_type(Comp,Col1,Col2):-type_size(Col1,S1),type_size(Col2,S2),compare(Comp,S1,S2).
 
 
-%= 	 	 
+
 
 %% inst_isac( ?X, ?List) is semidet.
 %
@@ -628,7 +628,7 @@ isac:attr_unify_hook(DVar, Y):-
    ;  isac_chk(Y,DVar)).
 
 
-%= 	 	 
+
 
 %% isac_chk( ?E, ?Cs) is semidet.
 %
@@ -637,7 +637,7 @@ isac:attr_unify_hook(DVar, Y):-
 isac_chk(E,Cs):-once(isac_gen(E,Cs)).
 
 
-%= 	 	 
+
 
 %% isac_gen( ?VALUE1, :TermARG2) is semidet.
 %

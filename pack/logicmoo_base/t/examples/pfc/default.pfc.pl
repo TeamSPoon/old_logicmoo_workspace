@@ -7,7 +7,7 @@
 
 (default(P)/mpred_literal(P))  ==>  (~( ~P) ==> P).
 
-default((P ==> Q))/mpred_literal(Q) ==> (P, ~( ~Q) ==> Q).
+default((P ==> Q))/mpred_literal(Q) ==> (P, \+( ~Q) ==> Q).
 
 % birds fly by default.
 ==> default((bird(X) ==> fly(X))).

@@ -51,9 +51,9 @@ user:file_search_path(pack, '../../../../').
 
 add_pack_dir(UpUp):- prolog_load_context(directory,Dir),   
    DirFor = logicmoo,
-   (( \+ file_search_path(DirFor,Dir)) ->asserta(file_search_path(DirFor,Dir));true),
+   (( \+ user:file_search_path(DirFor,Dir)) ->asserta(user:file_search_path(DirFor,Dir));true),
    absolute_file_name(UpUp,Y,[relative_to(Dir),file_type(directory)]),
-   (( \+ file_search_path(pack,Y)) ->asserta(file_search_path(pack,Y));true),
+   (( \+ user:file_search_path(pack,Y)) ->asserta(user:file_search_path(pack,Y));true),
    attach_packs.
 
 */

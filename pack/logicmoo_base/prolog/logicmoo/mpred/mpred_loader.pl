@@ -19,6 +19,7 @@
             set_current_module/1,
             import_shared_pred/3,
             import_to_user0/3,
+            import_to_user_mfa0/3,
             set_user_abox/1,
             get_user_abox/1,
             get_user_tbox/1,
@@ -1621,15 +1622,14 @@ import_shared_pred(M,BaseKB,P):-
 %
 import_to_user(P):- '$module'(MM,MM),'$set_source_module'(SM,SM),must(import_to_user0(MM,SM,P)).
 
-%= 	 	 
-
-%% import_to_user0( ?MM, ?SM, :TermP) is semidet.
-%
-% Import Converted To User Primary Helper.
-%
 import_to_user0(user,user,M:FA):- must(M\==user),!, call_from_module(M,import_to_user(M:FA)).
 import_to_user0(M,SM, user:FA):- M\==SM,dmsg(warn(import_to_user0(M,SM, user:FA))),fail.
-import_to_user0(_MM,_SM,M:F/A):- functor(P,F,A),
+import_to_user0(MM,SM,M:F/A):- !,import_to_user_mfa0(MM,SM,M:F/A).
+import_to_user0(MM,SM,M:P):-!,functor(P,F,A),import_to_user_mfa0(MM,SM,M:F/A).
+import_to_user0(MM,SM,P):- t_l:user_abox(M),import_to_user0(MM,SM,M:P).
+
+import_to_user_mfa0(_MM,_SM,_M:F/A):- current_predicate(system:F/A),!.
+import_to_user_mfa0(_MM,_SM,M:F/A):- functor(P,F,A),
  U=logicmoo_user,
  Rule = ((U:P:- user:loop_check_nr(M:P))),
  (clause_asserted(Rule)-> true; 
@@ -1637,9 +1637,6 @@ import_to_user0(_MM,_SM,M:F/A):- functor(P,F,A),
    user:catch(mpred_op_prolog(pain,Rule),E,dmsg(import_shared_pred(U:F/A:-M:F/A)=E)),
    user:export(U:F/A),
    catch(user:import(U:F/A),_,true)))).
-import_to_user0(MM,SM,M:P):-!,functor(P,F,A),import_to_user0(MM,SM,M:F/A).
-import_to_user0(MM,SM,P):- t_l:user_abox(M),import_to_user0(MM,SM,M:P).
-
 
 %= 	 	 
 

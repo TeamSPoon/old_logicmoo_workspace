@@ -113,8 +113,6 @@ tFly(iChilly).
 
 :- mpred_test(tBird(iChilly)).
 
-:- trace.
-
 never_retract_u(tBird(iChilly)).
 
 \+ tPenguin(iChilly).

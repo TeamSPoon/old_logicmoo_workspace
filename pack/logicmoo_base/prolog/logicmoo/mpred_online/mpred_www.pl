@@ -384,7 +384,7 @@ http:location(pixmaps, root(pixmaps), []).
 
 %= 	 	 
 
-%% file_search_path( ?ARG1, ?ARG2) is semidet.
+%% user:file_search_path( ?ARG1, ?ARG2) is semidet.
 %
 % Hook To [user:file_search_path/2] For Module Mpred_www.
 % File Search Path.

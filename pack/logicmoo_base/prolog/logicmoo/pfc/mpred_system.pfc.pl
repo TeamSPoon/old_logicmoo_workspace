@@ -90,7 +90,7 @@ arity(F,A):- atom(F), integer(A),current_predicate(F/A),A>1.
 arity(F,1):- atom(F), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
 
 
-:- sanity(mpred_is_silient).
+:- ignore(show_call(mpred_is_silient)).
 :- sanity(\+mpred_is_tracing_exec).
 
 
@@ -363,7 +363,7 @@ tCol(C)/(atom(C),TCI=..[C,I]) ==> {decl_type(C)},arity(C,1),mpred_univ(C,I,TCI).
 (tCol(C)/(atom(C), \+ static_predicate(C/1) )) ==> {kb_dynamic(C/1)}.
 (tCol(C)/(atom(C),TCI=..[C,I],\+ static_predicate(C/1), \+completelyAssertedCollection(C))) 
   ==> ((TCI:-cwc,
-    ( \+ ~(TCI)),
+    lazy(( \+ ~(TCI))),
     isa_backchaing(I,C))).
 
 % (tInferInstanceFromArgType(Col),tCol(Col)/i_name('',Col,ColName),tPred(Prop)/i_name('',Prop,PropName),{ColName=PropName}==> tInferInstanceFromArgType(Prop)).

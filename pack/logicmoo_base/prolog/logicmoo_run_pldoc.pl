@@ -263,7 +263,7 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
    DirFor = logicmoo,
    (( \+ user:file_search_path(DirFor,Dir)) ->asserta(user:file_search_path(DirFor,Dir));true),
    absolute_file_name('../../../',Y,[relative_to(Dir),file_type(directory)]),
-   (( \+ user:file_search_path(pack,Y)) ->asserta(file_search_path(pack,Y));true).
+   (( \+ user:file_search_path(pack,Y)) ->asserta(user:file_search_path(pack,Y));true).
 :- user:attach_packs.
 :- initialization(user:attach_packs).
 
