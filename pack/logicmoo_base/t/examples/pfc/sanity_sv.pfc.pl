@@ -49,7 +49,7 @@
 :- dynamic(full_name/2).
 
 
-% These tests mix singleValuedInArg and mpred_default/1 is differnt ways
+% These tests mix singleValuedInArg and mdefault/1 is differnt ways
 
 
 % if we learn that something has a full name, then we guess it is a user_login object.  (in our version of reality)
@@ -70,13 +70,13 @@ host_name(U,_) ==> user_login(U).
 % the default full_name for a user_login is 'isMissing'.
 %user_login(User), ~full_name(User,X)/(X\=isMissing)==>full_name(User,isMissing).
 prologSingleValued(full_name).
-mpred_default( user_login(User) ==> full_name(User,isMissing)).  
+mdefault( user_login(User) ==> full_name(User,isMissing)).  
 
 
 % the default host_name for a user_login is 'isMissing'.
 %user_login(User), ~host_name(User,X)/(X\==isMissing) ==> host_name(User,isMissing).
 prologSingleValued(host_name).
-mpred_default( user_login(User) ==> host_name(User,isMissing)).
+mdefault( user_login(User) ==> host_name(User,isMissing)).
 
 
 never_assert_u(full_name(finin,isMissing),too_much_forward_chaing).

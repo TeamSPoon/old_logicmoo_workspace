@@ -1,6 +1,8 @@
 
 :- file_begin(pfc).
 
+
+
 :- op(500,fx,'~').
 :- op(1050,xfx,('==>')).
 :- op(1050,xfx,'<==>').
@@ -98,8 +100,8 @@ prologHybrid(relationMostInstance(ptBinaryPredicate,tCol,vtValue)).
 relationMostInstance(BP,_,_)==>ptBinaryPredicate(BP).
 (relationMostInstance(Pred,_,Value),{\+number(Value)},argIsa(Pred,2,Type))==> isa(Value,Type).
 %((relationMostInstance(Pred,Type,Value),{G=..[Pred,Inst,Value],GI=..[Pred,Inst,_]})) ==> (({GI=..[Pred,Inst,_]},isa(Inst,Type), ~GI) ==> G ).
-relationMostInstance(Pred,Type,Value) ==> mpred_default(isa(Inst,Type) ==> t(Pred,Inst,Value)).
-% relationMostInstance(Pred,Type,Value) ==> mpred_default( isa(Inst,Type) ==> ?Pred(Inst,Value) ).
+relationMostInstance(Pred,Type,Value) ==> mdefault(isa(Inst,Type) ==> t(Pred,Inst,Value)).
+% relationMostInstance(Pred,Type,Value) ==> mdefault( isa(Inst,Type) ==> ?Pred(Inst,Value) ).
 
 
 

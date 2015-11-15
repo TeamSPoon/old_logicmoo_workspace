@@ -101,7 +101,7 @@ mpred_fact_arity/2,
 mpred_module_ready/0,
 mpred_fa_call/3,
 mpred_plist_t/2,
-never_mpred_mpred/1,
+never_mpred_tcall/1,
 prologHybridFact/1,
 replace_arg/4,
 replace_nth_arglist/4,
@@ -228,14 +228,11 @@ call_which_t/6,
 call_which_t/7,
 call_which_t/8,
 call_which_t/9,
-compute_value/2,
-compute_value_no_dice/2,
 create_random_fact/1,
 deduce_facts/2,
 fact_always_true/1,
 fact_is_false/2,
 fact_maybe_deduced/1,
-flatten_append/3,
 fskel/7,
 holds_f/1,
 holds_f/2,
@@ -257,26 +254,34 @@ holds_t/6,
 holds_t/7,
 holds_t/8,
 hooked_random_instance/3,
+isCycPredArity_ignoreable/2,
+loaded_external_kbs/0,
+local_term_anglify/2,
+mpred_fact_arity/2,
+mpred_module_ready/0,
+/*
 if_result/2,
 insert_into/4,
 into_plist/2,
 into_plist_arities/4,
 inverse_args/2,
-isCycPredArity_ignoreable/2,
-list_update_op/3,
-loaded_external_kbs/0,
-local_term_anglify/2,
-loop_check_mpred/1,
-mpred_fact_arity/2,
-mpred_module_ready/0,
 mpred_fa_call/3,
 mpred_plist_t/2,
-never_mpred_mpred/1,
+list_update_op/3,
+loop_check_mpred/1,
+compute_value/2,
+compute_value_no_dice/2,
+*/
+never_mpred_tcall/1,
+/*
 prologHybridFact/1,
+flatten_append/3,
 replace_arg/4,
 replace_nth_arglist/4,
 replace_nth_ref/5,
 same_vars/2,
+update_value/3,
+*/
 session_agent/2,
 session_io/4,
 telnet_fmt_shown/3,
@@ -285,7 +290,6 @@ term_anglify_np/3,
 term_anglify_np_last/3,
 tf_result/2,
 tms_reject_why/2,
-update_value/3,
 use_cyc_database/0,
 use_kif/2,
 verb_after_arg/3,
@@ -354,13 +358,13 @@ into_plist_arities(_,_,Call,PLIST):-Call=..PLIST. % finally the fallthrue
 
 %= 	 	 
 
-%% never_mpred_mpred( ?VALUE1) is semidet.
+%% never_mpred_tcall( ?VALUE1) is semidet.
 %
 % Never Managed Predicate Managed Predicate.
 %
-never_mpred_mpred(mpred_isa).
-never_mpred_mpred(isa).
-never_mpred_mpred(arity).
+never_mpred_tcall(mpred_isa).
+never_mpred_tcall(isa).
+never_mpred_tcall(arity).
 
 
 
@@ -472,7 +476,7 @@ mpred_plist_t(P,LIST):-var(P),!,is_list(LIST),CALL=..[t,P|LIST],on_x_rtrace((CAL
 mpred_plist_t(t,[P|LIST]):-!, mpred_plist_t(P,LIST).
 mpred_plist_t(mpred_isa,[C,_A,I]):-!,ground(I:C),mpred_isa(C,I).
 mpred_plist_t(isa,[I,C]):-!,t(C,I).
-mpred_plist_t(P,_):-never_mpred_mpred(P),!,fail.
+mpred_plist_t(P,_):-never_mpred_tcall(P),!,fail.
 mpred_plist_t(P,[L|IST]):-is_holds_true(P),!,mpred_plist_t(L,IST).
 mpred_plist_t(P,LIST):-is_holds_false(P),!,mpred_f(LIST).
 mpred_plist_t(P,LIST):- CALL=..[t,P|LIST],on_x_rtrace(CALL).

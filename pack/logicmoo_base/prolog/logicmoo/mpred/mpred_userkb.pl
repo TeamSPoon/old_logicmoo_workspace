@@ -101,7 +101,7 @@ mpred_select/2,
 localityOfObject/2,
 meta_argtypes/1,
 mpred_action/1,
-mpred_default/1, % pfc
+mdefault/1, % pfc
 mpred_do_and_undo_method/2,
 mpred_isa/2,
 %mpred_manages_unknowns/0,
@@ -401,8 +401,19 @@ never_assert_u(Rule,head_singletons(Pre,Post)):- cwc, Rule \= (_:-_), once(mpred
 never_assert_u(declared(M:F/A),never_declared(M:F/A)):- M:F/A = qrTBox:p/1.
 never_assert_u(A,B):-never_assert_u0(A,B),trace,never_assert_u0(A,B).
 
+
+never_assert_u(declared(P),Why):- functor(P,F,A),F\=(:),F\=(/),never_assert_u(declared(F/A),Why).
+never_assert_u(declared(mpred_run_resume/0),cuz).
+never_assert_u(declared(decl_type/1),cuz).
+never_assert_u(declared(is_clif/1),cuz).
+
+never_assert_u(declared(_:FA),Why):-never_assert_u(declared(FA),Why).
+never_assert_u(_:declared(_:FA),Why):-never_assert_u(declared(FA),Why).
+never_assert_u(_:declared(FA),Why):-never_assert_u(declared(FA),Why).
+
 % never_assert_u(M:arity(_,_),is_support(arity/2)):- M==pqr,dumpST, trace, cwc,!.
 never_assert_u(M:Rule,Why):- cwc, atom(M),never_assert_u(Rule,Why).
+
 
 /*
 never_assert_u(pt(_,

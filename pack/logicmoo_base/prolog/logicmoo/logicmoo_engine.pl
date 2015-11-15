@@ -223,7 +223,7 @@ kif_sanity_test_0:-kif_test(p(A,R) & q(A,R)).
 
 
 :- kif_result(
-(=> mpred_default((
+(=> mdefault((
    room(R) => 
       {D = skIsDoorInRoomArg2ofHasFn(R)},has(R,D) & door(D))))).
 
@@ -239,7 +239,7 @@ kif_sanity_test_0:-kif_test(p(A,R) & q(A,R)).
 %:- must(((kif_test(isa(F,tPred) => exists(A, (isa(A,ftInt) & arity(F,A))))))).
 
 :- nop(( kif_result(
-(==> mpred_default((
+(==> mdefault((
    tPred(F) ==> 
       {A = skIsIntInPredArg2ofArityFn(F)},arity(F,A) & ftInt(A))
  ))))).

@@ -884,7 +884,7 @@ db_expand_0(Op,ClassTemplate,(isa(NewInst,Type)=>OUT)):- ClassTemplate=..[Functo
 % tRegion_template(tLivingRoom,.....).
 db_expand_0(Op,typeProps(C,Props),(isa(I,C)=>OOUT)):- (is_ftNonvar(C);is_ftNonvar(Props)), expand_props(Prefix,Op,props(I,Props),OUT),trace,list_to_conjuncts(OUT,OUTC),conjuncts_to_list(OUTC,OUTL),
    ISEACH=..[isEach|OUTL],
-  db_expand_term(Op,mpred_default(ISEACH),OOUT).
+  db_expand_term(Op,mdefault(ISEACH),OOUT).
 
 */
 

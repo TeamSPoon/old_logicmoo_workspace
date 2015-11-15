@@ -1076,7 +1076,7 @@ head_singles0(Pre,'if_missing'(_,Post)):-nonvar(Post),!,head_singles0((Pre,Pre2)
 head_singles0(Pre,'->'(Pre2,Post)):-nonvar(Post),!,head_singles0((Pre,Pre2),Post).
 head_singles0(Pre,'/'(Post,Pre2)):-nonvar(Post),!,head_singles0((Pre,Pre2),Post).
 head_singles0(Pre,rhs(Post)):- nonvar(Post),mpred_rule_hb(Post,Post2,Pre2), !,head_singles0((Pre,Pre2),Post2).
-head_singles0(Pre,mpred_default(Post)):- nonvar(Post),mpred_rule_hb(Post,Post2,Pre2), !,head_singles0((Pre,Pre2),Post2).
+head_singles0(Pre,mdefault(Post)):- nonvar(Post),mpred_rule_hb(Post,Post2,Pre2), !,head_singles0((Pre,Pre2),Post2).
 head_singles0(Pre,nt(_,Pre2,Pre3,Post)):-nonvar(Post),!,head_singles0((Pre,Pre2,Pre3),Post).
 head_singles0(Pre,pt(_,Pre2,Post)):-nonvar(Post),!,head_singles0((Pre,Pre2),Post).
 head_singles0(Pre,Post):- nonvar(Post),mpred_rule_hb(Post,Post2,Pre2),Post2\=@=Post,!,head_singles0((Pre,Pre2),Post2).

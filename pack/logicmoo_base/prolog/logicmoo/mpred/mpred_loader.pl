@@ -17,10 +17,12 @@
             assert_until_eof/1,
             decl_user_abox/1,
             set_current_module/1,
+            set_mpred_module/1,
             import_shared_pred/3,
             import_to_user0/3,
-            import_to_user_mfa0/3,
+            import_to_user_mfa0/4,
             set_user_abox/1,
+            predicate_is_undefined_fa/2,
             get_user_abox/1,
             get_user_tbox/1,
             get_user_sbox/1,
@@ -246,7 +248,7 @@
 
 
 
-%= 	 	 
+
 
 %% kb_dynamic( ?P) is semidet.
 %
@@ -267,7 +269,7 @@ kb_dynamic(P):-functor(P,F,A),!,kb_dynamic(F/A).
 
 
 
-%= 	 	 
+
 
 %% chop_box( ?Chop, ?Was) is semidet.
 %
@@ -279,7 +281,7 @@ chop_box(Chop,Was):-atom_concat(Was,'SBox',Chop),!.
 chop_box(Chop,Chop).
 
 
-%= 	 	 
+
 
 %% maybe_add_import_module( ?A, ?A, ?VALUE3) is semidet.
 %
@@ -294,7 +296,7 @@ maybe_add_import_module(user, baseKB, end):-!.
 maybe_add_import_module(A,B,C):- catch(add_import_module(A,B,C),_,logicmoo_util_dmsg:dmsg(failed(maybe_add_import_module(A,B,C)))),!.
 
 
-%= 	 	 
+
 
 %% is_system_box( ?VALUE1) is semidet.
 %
@@ -306,7 +308,7 @@ is_system_box(basePFC).
 % is_system_box(user).
 
 
-%= 	 	 
+
 
 %% no_separate_boxes is semidet.
 %
@@ -315,7 +317,7 @@ is_system_box(basePFC).
 no_separate_boxes.
 
 
-%= 	 	 
+
 
 %% to_tbox( ?A, ?T) is semidet.
 %
@@ -331,7 +333,7 @@ to_tbox(Chop,Add):-chop_box(Chop,Was),atom_concat(Was,'TBox',Add).
 
 
 
-%= 	 	 
+
 
 %% to_sbox( ?A, ?T) is semidet.
 %
@@ -347,7 +349,7 @@ to_sbox(Chop,Add):-chop_box(Chop,Was),atom_concat(Was,'SBox',Add).
 
 
 
-%= 	 	 
+
 
 %% to_abox( ?A, ?A) is semidet.
 %
@@ -369,7 +371,7 @@ to_abox(Chop,Add):-chop_box(Chop,Was),atom_concat(Was,'ABox',Add).
 
 :- export(to_box_type0/3).
 
-%= 	 	 
+
 
 %% to_box_type( ?M, ?B, ?T) is semidet.
 %
@@ -377,7 +379,7 @@ to_abox(Chop,Add):-chop_box(Chop,Was),atom_concat(Was,'ABox',Add).
 %
 to_box_type(M,B,T):-must(to_box_type0(M,B,TT)),!,T=TT.
 
-%= 	 	 
+
 
 %% to_box_type0( ?M, ?VALUE2, ?T) is semidet.
 %
@@ -388,7 +390,7 @@ to_box_type0(M,tbox,T):-!,to_tbox(M,T).
 to_box_type0(M,sbox,T):-!,to_sbox(M,T).
 
 
-%= 	 	 
+
 
 %% correct_module( ?M, ?X, ?T) is semidet.
 %
@@ -397,7 +399,7 @@ to_box_type0(M,sbox,T):-!,to_sbox(M,T).
 correct_module(M,X,T):-functor(X,F,A),must(correct_module(M,F,A,T)),!.
 
 
-%= 	 	 
+
 
 %% correct_module( ?M, ?F, ?A, ?T) is semidet.
 %
@@ -411,7 +413,7 @@ correct_module(MT,_,_,MT):-!.
 
 
 
-%= 	 	 
+
 
 %% box_type( ?F, ?A, ?VALUE3) is semidet.
 %
@@ -421,7 +423,7 @@ box_type(F,A,tbox):-current_predicate(baseKB:F/A).
 % box_type(F,A,sbox):-current_predicate(basePFC:F/A).
 
 
-%= 	 	 
+
 
 %% make_declared( ?Test, -IN2) is semidet.
 %
@@ -433,24 +435,24 @@ make_declared(M:F/A,T):- !,correct_module(M,F,A,T),!,make_declared_now(T:F/A).
 make_declared(F/A,T):- !,correct_module(abox,F,A,T),!,make_declared_now(T:F/A).
 
 
-%= 	 	 
+
 
 %% make_declared_now( :TermM) is semidet.
 %
 % Make Declared Now.
 %
-make_declared_now(M:F/A):- 
+make_declared_now(M:F/A):-!,
    debug(make_declared,'~p',make_declared_now(M:F/A)),
    sanity( \+ ((M:F/A) = (qrTBox:p/1))),
    check_never_assert(declared(M:F/A)),
-   import_to_user(M:F/A),
+   discontiguous(M:F/A),
    functor(P,F,A),(predicate_property(P,dynamic)->true;M:dynamic(M:F/A)),
-   M:multifile(M:F/A),M:module_transparent(M:F/A),!.
-   
-   % M:export(M:F/A)
+   M:multifile(M:F/A),M:module_transparent(M:F/A),
+   import_to_user(M:F/A),  !.
+make_declared_now(M:P):-functor(P,F,A),!,make_declared_now(M:F/A). 
 
 
-%= 	 	 
+
 
 %% make_reachable( ?UPARAM1, ?Test) is semidet.
 %
@@ -459,7 +461,7 @@ make_declared_now(M:F/A):-
 make_reachable(_,Test):- \+ \+ ((Test= (_:F/_), is_ftVar(F))),!.
 make_reachable(CM,M:F/A):-  must(atom(CM)),must(atom(M)), make_declared(M:F/A,TT), !,import_predicate(CM,TT:F/A).
 
-%= 	 	 
+
 
 %% make_reachable( :TermF) is semidet.
 %
@@ -468,7 +470,7 @@ make_reachable(CM,M:F/A):-  must(atom(CM)),must(atom(M)), make_declared(M:F/A,TT
 make_reachable(F/A):- dumpST,trace, source_context_module(CM),make_declared(CM:F/A,_).
 
 
-%= 	 	 
+
 
 %% import_predicate( ?CM, :TermM) is semidet.
 %
@@ -476,7 +478,7 @@ make_reachable(F/A):- dumpST,trace, source_context_module(CM),make_declared(CM:F
 %
 import_predicate(CM,M:_):- CM==M,!.
 import_predicate(CM,M:_):- default_module(CM,M),!.
-import_predicate(CM,M:F/A):- CM:multifile(M:F/A),CM:discontiguous(M:F/A),show_call(why,nop(CM:z333import(M:F/A))).
+import_predicate(CM,M:F/A):- show_call(nop(CM:z333import(M:F/A))),CM:multifile(M:F/A),CM:discontiguous(M:F/A).
 
 
 
@@ -484,7 +486,7 @@ import_predicate(CM,M:F/A):- CM:multifile(M:F/A),CM:discontiguous(M:F/A),show_ca
 :- include('mpred_prolog_file').
 
 
-%= 	 	 
+
 
 %% with_ukb( +KB, :GoalG) is semidet.
 %
@@ -496,7 +498,7 @@ with_ukb(KB,G):-w_tl(t_l:user_abox(KB),G).
 % lmconf:use_cyc_database.
 
 
-%= 	 	 
+
 
 %% mpred_loader_module_transparent( ?F) is semidet.
 %
@@ -511,7 +513,7 @@ mpred_loader_module_transparent(F/A):-!, mpred_loader:module_transparent(F/A).
 :- thread_local(t_l:mpred_already_in_file_expansion/1).
 
 
-%= 	 	 
+
 
 %% mpred_prolog_only_file( ?File) is semidet.
 %
@@ -528,7 +530,7 @@ mpred_prolog_only_file(File):- lmconf:never_registered_mpred_file(File),!.
 % mpred_expander(_,_,I,OO):-thread_self(X),X\==main,!,I=OO.
 % not actual function
 
-%= 	 	 
+
 
 %% mpred_expander( +OUT1, +OUT2, +I, -IN4) is semidet.
 %
@@ -542,7 +544,7 @@ mpred_expander(Type,DefMod,end_of_file,O):- !,Type = term, DefMod = user, do_end
 mpred_expander(Type,LoaderMod,I,OO):- \+ t_l:disable_px, on_x_debug(mpred_expander0(Type,LoaderMod,I,O)),must(nonvar(O)),O=OO.
 
 
-%= 	 	 
+
 
 %% mpred_expander0( ?Type, ?LoaderMod, ?I, ?OO) is semidet.
 %
@@ -569,7 +571,7 @@ mpred_expander0(Type,LoaderMod,I,OO):-
   !,I\=@=O,O=OO.
 
 
-%= 	 	 
+
 
 %% mpred_expander_now_one_cc( ?VALUE1, ?VALUE2, :TermA, :TermA) is semidet.
 %
@@ -583,7 +585,7 @@ mpred_expander_now_one_cc(F,M,II,O):-show_if_debug(mpred_expander_now_one(F,M,II
 
 %mpred_expander_now_one(F,M,(:- G),GGG):- !, nonvar(G), once(fully_expand(call,G,GG)),G\=@=GG,GGG=(:- GG),!.
 
-%= 	 	 
+
 
 %% mpred_expander_now_one( ?VALUE1, ?VALUE2, ?I, ?O) is semidet.
 %
@@ -594,7 +596,7 @@ mpred_expander_now_one(_,_,I,O):- t_l:use_side_effect_buffer,!,loader_side_effec
 mpred_expander_now_one(F,M,I,O):- mpred_expander_now_physically(F,M,I,O).
 
 
-%= 	 	 
+
 
 %% mpred_expander_now_physically( ?F, ?M, ?I, ?OO) is semidet.
 %
@@ -613,7 +615,7 @@ mpred_expander_now_physically(_F,M,I,OO):-
 
 :- module_transparent( xfile_module_term_expansion_pass_3/6).
 
-%= 	 	 
+
 
 %% xfile_module_term_expansion_pass_3( ?How, ?INFO, ?F, ?M, ?AA, ?O, ?OO) is semidet.
 %
@@ -627,7 +629,7 @@ xfile_module_term_expansion_pass_3(How,INFO,_F,_M,AA,O,OO):-
 :- thread_local((t_l:use_side_effect_buffer , t_l:verify_side_effect_buffer)).
 
 
-%= 	 	 
+
 
 %% mpred_expander_now( +I, -O) is semidet.
 %
@@ -640,7 +642,7 @@ mpred_expander_now(I,O):-
      mpred_expander_now_one(F,M,I,O)).
 
 
-%= 	 	 
+
 
 %% show_bool( :GoalG) is semidet.
 %
@@ -649,7 +651,7 @@ mpred_expander_now(I,O):-
 show_bool(G):-ignore(show_call(why,G)).
 
 
-%= 	 	 
+
 
 %% show_load_context is semidet.
 %
@@ -666,7 +668,7 @@ show_load_context:-
 
 
 
-%= 	 	 
+
 
 %% add_term( ?Term, ?Vs) is semidet.
 %
@@ -679,7 +681,7 @@ add_term(Term,Vs):-
 
 
 
-%= 	 	 
+
 
 %% add_from_file( ?Term) is semidet.
 %
@@ -689,7 +691,7 @@ add_from_file(Term):-
   w_tl(t_l:mpred_already_in_file_expansion(Term),must(ain(Term))).
 
 
-%= 	 	 
+
 
 %% myDebugOnError( :GoalTerm) is semidet.
 %
@@ -698,7 +700,7 @@ add_from_file(Term):-
 myDebugOnError(Term):-catch(once(must((Term))),E,(dmsg(error(E,start_myDebugOnError(Term))),dumpST,trace,rtrace((Term)),dmsginfo(stop_myDebugOnError(E=Term)),trace,Term)).
          
 
-%= 	 	 
+
 
 %% read_one_term( ?Term, ?Vs) is semidet.
 %
@@ -706,7 +708,7 @@ myDebugOnError(Term):-catch(once(must((Term))),E,(dmsg(error(E,start_myDebugOnEr
 %
 read_one_term(Term,Vs):- catch(once(( read_term(Term,[double_quotes(string),variable_names(Vs)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
 
-%= 	 	 
+
 
 %% read_one_term( ?Stream, ?Term, ?Vs) is semidet.
 %
@@ -720,7 +722,7 @@ read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quote
 
 :- was_export(etrace/0).
 
-%= 	 	 
+
 
 %% etrace is semidet.
 %
@@ -733,7 +735,7 @@ etrace:-leash(-all),leash(+exception),trace.
 :- export(t_l:on_eof/2).
 
 
-%= 	 	 
+
 
 %% which_file( ?F) is semidet.
 %
@@ -743,7 +745,7 @@ which_file(F):- prolog_load_context(source,F) -> true; once(loading_source_file(
 
 :- export(onEndOfFile/1).
 
-%= 	 	 
+
 
 %% onEndOfFile( ?Call) is semidet.
 %
@@ -752,7 +754,7 @@ which_file(F):- prolog_load_context(source,F) -> true; once(loading_source_file(
 onEndOfFile(Call):- which_file(F), asserta(t_l:on_eof(F,Call)).
 
 
-%= 	 	 
+
 
 %% assert_until_eof( ?F) is semidet.
 %
@@ -766,7 +768,7 @@ assert_until_eof(F):- must_det_l((loading_source_file(File),asserta(F),asserta((
 
 % gload:- ensure_mpred_file_loaded(savedb),!.
 
-%= 	 	 
+
 
 %% gload is semidet.
 %
@@ -776,7 +778,7 @@ gload:- ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.mpred')).
 
 %:-meta_predicate(savedb/0).
 
-%= 	 	 
+
 
 %% savedb is semidet.
 %
@@ -786,7 +788,7 @@ savedb:-!.
 savedb:- on_x_rtrace(rsavedb),!.
 %:-meta_predicate(rsavedb/0).
 
-%= 	 	 
+
 
 %% rsavedb is semidet.
 %
@@ -801,7 +803,7 @@ rsavedb:-
 
 
 
-%= 	 	 
+
 
 %% make_db_listing is semidet.
 %
@@ -823,7 +825,7 @@ make_db_listing:-
 
 
 
-%= 	 	 
+
 
 %% hdr_debug( ?F, ?A) is semidet.
 %
@@ -835,7 +837,7 @@ hdr_debug(F,A):-'format'(F,A).
 
 
 
-%= 	 	 
+
 
 %% module_typed_term_expand( ?X, ?UPARAM2) is semidet.
 %
@@ -847,7 +849,7 @@ module_typed_term_expand(_:B1,B2):-!,module_typed_term_expand(B1,B2),!.
 module_typed_term_expand(X,Y):- compound(X),loading_module(CM),functor_catch(X,F,A),module_typed_term_expand(CM,X,F,A,Y).
 
 
-%= 	 	 
+
 
 %% module_typed_term_expand( ?CM, ?X, ?F, ?A, ?Y) is semidet.
 %
@@ -856,7 +858,7 @@ module_typed_term_expand(X,Y):- compound(X),loading_module(CM),functor_catch(X,F
 module_typed_term_expand(CM,X,F,A,Y):-findall(Y,term_expand_local_each(CM,X,F,A,Y),Ys), Ys == [],!,fail.  
 
 
-%= 	 	 
+
 
 %% term_expand_local_each( ?VALUE1, ?VALUE2, ?F, ?A, ?VALUE5) is semidet.
 %
@@ -875,7 +877,7 @@ term_expand_local_each(CM,X,F,A,X):-lmconf:registered_module_type(CM,dynamic),dy
 % ========================================
 
 
-%= 	 	 
+
 
 %% include_mpred_files( ?Mask) is semidet.
 %
@@ -889,7 +891,7 @@ module(M,Preds):-
     forall(member(P,Preds),export(P)).
 */
 
-%= 	 	 
+
 
 %% scan_updates is semidet.
 %
@@ -924,7 +926,7 @@ check_term_expansions:- not(do_term_expansions).
 
 
 
-%= 	 	 
+
 
 %% loader_term_expansion( ?CL, ?EXP) is semidet.
 %
@@ -971,7 +973,7 @@ loader_term_expansion(CL,EXP):-
 
 :- dynamic(lmconf:mpred_skipped_module/1).
 
-%= 	 	 
+
 
 %% mpred_skipped_module( ?VALUE1) is semidet.
 %
@@ -997,7 +999,7 @@ lmconf:mpred_skipped_module(eggdrop).
 %is_fc_body(P):- cnotrace(fwc==P ; (compound(P),arg(1,P,E),is_fc_body(E))),!.
 %is_bc_body(P):- cnotrace(bwc==P ; (compound(P),arg(1,P,E),is_bc_body(E))),!.
 
-%= 	 	 
+
 
 %% is_code_body( ?P) is semidet.
 %
@@ -1008,7 +1010,7 @@ is_code_body(P):- cnotrace(cwc==P ; (compound(P),arg(1,P,E),is_code_body(E))),!.
 
 :- meta_predicate(with_source_module(:,(*))).
 
-%= 	 	 
+
 
 %% with_source_module( ?M, ?CALL) is semidet.
 %
@@ -1018,7 +1020,7 @@ with_source_module(M:_,CALL):- !, setup_call_cleanup('$set_source_module'(Old, M
 with_source_module(M,CALL):- setup_call_cleanup('$set_source_module'(Old, M),CALL,'$set_source_module'(_, Old)).
 
 
-%= 	 	 
+
 
 %% get_file_type( ?File, ?Type) is semidet.
 %
@@ -1029,7 +1031,7 @@ get_file_type(File,Type):-lmcache:mpred_directive_value(Type,_,File).
 get_file_type(File,Type):-file_name_extension(_,Type,File).
 
 
-%= 	 	 
+
 
 %% is_mpred_file( ?F) is semidet.
 %
@@ -1045,7 +1047,7 @@ is_mpred_file(F):- is_mpred_file0(F),!,asserta(lmconf:registered_mpred_file(F)),
 is_mpred_file(F):- asserta(lmconf:never_registered_mpred_file(F)),!,fail.
 
 
-%= 	 	 
+
 
 %% decache_file_type( ?F) is semidet.
 %
@@ -1057,7 +1059,7 @@ decache_file_type(F):-
   retractall(lmconf:never_registered_mpred_file(F)).
 
 
-%= 	 	 
+
 
 %% is_mpred_file0( ?F) is semidet.
 %
@@ -1068,7 +1070,7 @@ is_mpred_file0(F):- inside_file(pfc),!,loading_source_file(F).
 is_mpred_file0(F):- file_name_extension(_,WAS,F),WAS\=pl,WAS\= '',WAS\=chr,!.
 
 
-%= 	 	 
+
 
 %% must_compile_special_clause( ?CL) is semidet.
 %
@@ -1086,7 +1088,7 @@ must_compile_special_clause(CL):- \+ t_l:disable_px,
 :- thread_local(t_l:mpred_module_expansion/1).
 
 
-%= 	 	 
+
 
 %% mpred_use_module( ?M) is semidet.
 %
@@ -1098,7 +1100,7 @@ mpred_use_module(M):- must(atom(M)),retractall(lmconf:mpred_skipped_module(M)),s
 % DETECT PREDS THAT NEED SPECIAL STORAGE 
 % ================================================================================
 
-%= 	 	 
+
 
 %% compile_this( ?M, ?F, ?C, ?O) is semidet.
 %
@@ -1117,7 +1119,7 @@ compile_this(_,_,_,pl).
 
 :- was_module_transparent(mpred_may_expand).
 
-%= 	 	 
+
 
 %% mpred_may_expand is semidet.
 %
@@ -1128,7 +1130,7 @@ mpred_may_expand:-loading_source_file(_F),inside_file(mpred).
 mpred_may_expand:-must(loading_module(M)),mpred_may_expand_module(M),!,mpred_expand_inside_file_anyways.
 
 
-%= 	 	 
+
 
 %% mpred_may_expand_module( ?M) is semidet.
 %
@@ -1143,7 +1145,7 @@ mpred_may_expand_module(_):-t_l:mpred_module_expansion(*),!.
 
 
 
-%= 	 	 
+
 
 %% mpred_expand_inside_file_anyways is semidet.
 %
@@ -1152,7 +1154,7 @@ mpred_may_expand_module(_):-t_l:mpred_module_expansion(*),!.
 mpred_expand_inside_file_anyways:- loading_source_file(F),!,mpred_expand_inside_file_anyways(F).
 
 
-%= 	 	 
+
 
 %% mpred_expand_inside_file_anyways( ?F) is semidet.
 %
@@ -1164,7 +1166,7 @@ mpred_expand_inside_file_anyways(F):- lmconf:registered_mpred_file(F).
 mpred_expand_inside_file_anyways(F):- is_mpred_file(F),must(loading_module(M);source_module(M)), (M=user; \+ lmconf:mpred_skipped_module(M)),!.
 
 
-%= 	 	 
+
 
 %% was_exported_content( ?I, ?CALL, ?Output) is semidet.
 %
@@ -1179,7 +1181,7 @@ was_exported_content(I,CALL,Output):-Output='$si$':'$was_imported_kb_content$'(I
 
 
 
-%= 	 	 
+
 
 %% mpred_provide_clauses( ?H, ?B, ?What) is semidet.
 %
@@ -1189,7 +1191,7 @@ was_exported_content(I,CALL,Output):-Output='$si$':'$was_imported_kb_content$'(I
 lmconf:mpred_provide_clauses(H,B,(What)):- !.
 
 
-%= 	 	 
+
 
 %% show_interesting_cl( ?Dir, ?VALUE2) is semidet.
 %
@@ -1201,7 +1203,7 @@ show_interesting_cl(Dir,P):- loading_source_file(File),get_file_type(File,Type),
 
 :- meta_predicate(cl_assert(?,?)).
 
-%= 	 	 
+
 
 %% cl_assert( ?Dir, ?P) is semidet.
 %
@@ -1215,7 +1217,7 @@ cl_assert(_Code,P):- !, show_if_debug(ain(P)).
 :- meta_predicate(call_file_command(?,?,?,?)).
 %call_file_command(_,cl_assert(pl,OO),OO,_):-!,show_interesting_cl(pl,OO).
 
-%= 	 	 
+
 
 %% call_file_command( ?I, ?CALL, ?OO, ?O) is semidet.
 %
@@ -1225,7 +1227,7 @@ call_file_command(I,cl_assert(OTHER,OO),OO,I):- inside_file(kif),is_kif_rule(OO)
 call_file_command(I,CALL,OO,O):- (current_predicate(_,CALL) -> ((must(call(CALL)),was_exported_content(I,CALL,OO))); OO=O).
 
 
-%= 	 	 
+
 
 %% in_include_file is semidet.
 %
@@ -1235,7 +1237,7 @@ in_include_file:- prolog_load_context(file,F),!, \+ prolog_load_context(source,F
 
 % ensure we only process onEndOfFile directive at the end of the actual source files
 
-%= 	 	 
+
 
 %% do_end_of_file_actions( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4) is semidet.
 %
@@ -1245,7 +1247,7 @@ do_end_of_file_actions(_,_,_,_):- in_include_file,!.
 do_end_of_file_actions(term,_,_,_):- must(loading_source_file(F)),do_end_of_file_actions_real.
 
 
-%= 	 	 
+
 
 %% do_end_of_file_actions_real is semidet.
 %
@@ -1256,7 +1258,7 @@ do_end_of_file_actions_real:- which_file(F),
 
 
 
-%= 	 	 
+
 
 %% mpred_implode_varnames( :TermN) is semidet.
 %
@@ -1269,7 +1271,7 @@ mpred_implode_varnames([N=V|Vs]):-V='$VAR'(N),mpred_implode_varnames(Vs),!.
 
 % must skip already loaded modules (we remember these so make/0 doesnt break)
 
-%= 	 	 
+
 
 %% mpred_maybe_skip( ?M) is semidet.
 %
@@ -1284,7 +1286,7 @@ mpred_maybe_skip(M):- asserta_if_new(lmconf:mpred_skipped_module(M)),!.
 
 
 
-%= 	 	 
+
 
 %% expanded_already_functor( :TermARG1) is semidet.
 %
@@ -1308,7 +1310,7 @@ expanded_already_functor(_:NV):-nonvar(NV),!,expanded_already_functor(NV).
 % system:goal_expansion(N,mpred_prove_neg(P)):-fail,mpred_from_negation_plus_holder(N,P),show_failure(why,mpred_isa(P,pfcControlled)).
 
 
-%= 	 	 
+
 
 %% mpred_ops is semidet.
 %
@@ -1316,7 +1318,7 @@ expanded_already_functor(_:NV):-nonvar(NV),!,expanded_already_functor(NV).
 %
 mpred_ops:-  op(500,fx,('~')),op(500,fx,('~')),op(1075,xfx,('==>')), op(1075,xfx,('<==>')),op(1075,xfx,('<-')), op(1100,fx,('nesc')), op(1150,xfx,('::::')).
 
-%= 	 	 
+
 
 %% mpred_dcg_ops is semidet.
 %
@@ -1328,7 +1330,7 @@ mpred_dcg_ops:-  op(400,yfx,('\\\\')),op(1200,xfx,('-->>')),op(1200,xfx,('--*>>'
 
 % TODO DISABLE THIS NEXT CLAUSE LATER
 
-%= 	 	 
+
 
 %% mpred_directive_expansion( ?VALUE1, ?M) is semidet.
 %
@@ -1343,7 +1345,8 @@ mpred_directive_expansion(mpred_module,(asserta(lmcache:mpred_directive_value(pf
 mpred_directive_expansion(mpred_multifile,include(logicmoo(mpred/'mpred_header.pi'))):- context_module_of_file(M),set_mpred_multifle(M).
 
 
-%= 	 	 
+set_mpred_module(M):- asserta(lmcache:mpred_directive_value(pfc,module,M)),'$set_source_module'(_,M).
+
 
 %% set_mpred_multifle( ?M) is semidet.
 %
@@ -1359,7 +1362,7 @@ set_mpred_multifle(M):- set_user_abox(M), asserta(lmcache:mpred_directive_value(
 % ========================================
 
 
-%= 	 	 
+
 
 %% get_user_tbox( ?T) is semidet.
 %
@@ -1367,7 +1370,7 @@ set_mpred_multifle(M):- set_user_abox(M), asserta(lmcache:mpred_directive_value(
 %
 get_user_tbox(T):-get_user_abox(M),to_tbox(M,T).
 
-%= 	 	 
+
 
 %% get_user_sbox( ?T) is semidet.
 %
@@ -1377,7 +1380,7 @@ get_user_sbox(T):-get_user_abox(M),to_sbox(M,T).
 
 :- thread_local(t_l:user_abox/1).
 
-%= 	 	 
+
 
 %% get_user_abox( ?Ctx) is semidet.
 %
@@ -1389,7 +1392,7 @@ get_user_abox(Ctx):- current_context_module(Out),user_m_check(Out),!,must(Ctx=Ou
 
 user_m_check(_Out).
 
-%= 	 	 
+
 
 %% set_user_abox( ?M) is semidet.
 %
@@ -1399,7 +1402,7 @@ set_user_abox(M):- user_m_check(M), (t_l:user_abox(Prev)->true;Prev=M),
    decl_user_abox(M),assert_until_eof(t_l:user_abox(M)),onEndOfFile(reset_user_abox(Prev)),!.
 
 
-%= 	 	 
+
 
 %% reset_user_abox( ?M) is semidet.
 %
@@ -1412,7 +1415,7 @@ reset_user_abox(M):- ignore(show_failure(M\=user)),retractall(t_l:user_abox(Prev
 
 
 
-%= 	 	 
+
 
 %% ensure_support_module( ?SM) is semidet.
 %
@@ -1425,7 +1428,7 @@ ensure_support_module(SM):-
 
 
 
-%= 	 	 
+
 
 %% set_user_tbox( ?M, ?SM) is semidet.
 %
@@ -1436,7 +1439,7 @@ set_user_tbox(M,SM):-
 
 
 
-%= 	 	 
+
 
 %% decl_user_abox( ?M) is semidet.
 %
@@ -1454,7 +1457,7 @@ decl_user_abox(M):-     sanity(atom(M)),
 
 
 
-%= 	 	 
+
 
 %% ensure_tbox_module( ?M) is semidet.
 %
@@ -1521,7 +1524,7 @@ ensure_tbox_module(M):-  (M==baseKB->trace_or_throw(bad_ensure_tbox_module(M));t
 :- dynamic(always_expand_on_thread/1).
 :- thread_local is_compiling_clause/0.
 
-%= 	 	 
+
 
 %% is_compiling is semidet.
 %
@@ -1533,7 +1536,7 @@ is_compiling:-is_compiling_clause;compiling.
 :- style_check(-discontiguous).
 
 
-%= 	 	 
+
 
 %% begin_pfc is semidet.
 %
@@ -1541,7 +1544,7 @@ is_compiling:-is_compiling_clause;compiling.
 %
 begin_pfc:-file_begin(pfc).
 
-%= 	 	 
+
 
 %% mpred_begin is semidet.
 %
@@ -1549,7 +1552,7 @@ begin_pfc:-file_begin(pfc).
 %
 mpred_begin:-file_begin(pfc).
 
-%= 	 	 
+
 
 %% dyn_begin is semidet.
 %
@@ -1557,7 +1560,7 @@ mpred_begin:-file_begin(pfc).
 %
 dyn_begin:-file_begin(dyn).
 
-%= 	 	 
+
 
 %% dyn_end is semidet.
 %
@@ -1566,7 +1569,7 @@ dyn_begin:-file_begin(dyn).
 dyn_end:-file_end(dyn).
 
 
-%= 	 	 
+
 
 %% enable_mpred_expansion is semidet.
 %
@@ -1577,7 +1580,7 @@ enable_mpred_expansion:- (( \+ t_l:disable_px) -> true ;
                  onEndOfFile(asserta_if_new(t_l:disable_px)))).
 
 
-%= 	 	 
+
 
 %% disable_mpred_expansion is semidet.
 %
@@ -1588,7 +1591,7 @@ disable_mpred_expansion:- (( t_l:disable_px) -> true ;
                  onEndOfFile(retractall(t_l:disable_px)))).
 
 
-%= 	 	 
+
 
 %% is_box_module( ?M, ?VALUE2) is semidet.
 %
@@ -1599,7 +1602,7 @@ is_box_module(user,abox).
 
 
 
-%= 	 	 
+
 
 %% import_shared_pred( ?M, ?BaseKB, ?P) is semidet.
 %
@@ -1614,7 +1617,11 @@ import_shared_pred(M,BaseKB,P):-
   import_to_user(M:P).
 
 
-%= 	 	 
+predicate_is_undefined_fa(F,A):-
+  \+ current_predicate(_:F/A),
+  \+ predicate_property(_:F/A,exported),
+  \+ predicate_property(_:F/A,static).
+
 
 %% import_to_user( ?P) is semidet.
 %
@@ -1624,12 +1631,21 @@ import_to_user(P):- '$module'(MM,MM),'$set_source_module'(SM,SM),must(import_to_
 
 import_to_user0(user,user,M:FA):- must(M\==user),!, call_from_module(M,import_to_user(M:FA)).
 import_to_user0(M,SM, user:FA):- M\==SM,dmsg(warn(import_to_user0(M,SM, user:FA))),fail.
-import_to_user0(MM,SM,M:F/A):- !,import_to_user_mfa0(MM,SM,M:F/A).
-import_to_user0(MM,SM,M:P):-!,functor(P,F,A),import_to_user_mfa0(MM,SM,M:F/A).
+import_to_user0(MM,SM,M:F/A):- !,functor(P,F,A),import_to_user_mfa0(MM,SM,P,M:F/A).
+import_to_user0(MM,SM,M:P):-!,functor(P,F,A),import_to_user_mfa0(MM,SM,P,M:F/A).
 import_to_user0(MM,SM,P):- t_l:user_abox(M),import_to_user0(MM,SM,M:P).
 
-import_to_user_mfa0(_MM,_SM,_M:F/A):- current_predicate(system:F/A),!.
-import_to_user_mfa0(_MM,_SM,M:F/A):- functor(P,F,A),
+
+import_to_user_mfa0(_MM,_SM,_P,_M:F/A):- current_predicate(system:F/A),!.
+import_to_user_mfa0(_MM,_SM,P,_M:_F/_A):- predicate_property(P,static),!.
+import_to_user_mfa0(_MM,_SM,P,_M:_F/_A):- predicate_property(P,exported),!.
+import_to_user_mfa0(_MM,_SM,P,_M:_F/_A):- predicate_property(P,imported_from(_)),!.
+import_to_user_mfa0(_MM,_SM,_P,M:F/A):- check_never_assert(declared(M:F/A)),fail.
+import_to_user_mfa0(_MM,_SM,decl_type(A),baseKB:decl_type/1):-trace_or_throw(basd_import_to_user_mfa0(baseKB:decl_type/1)).
+
+
+
+import_to_user_mfa0(_MM,_SM,_,M:F/A):- functor(P,F,A), 
  U=logicmoo_user,
  Rule = ((U:P:- user:loop_check_nr(M:P))),
  (clause_asserted(Rule)-> true; 
@@ -1638,7 +1654,7 @@ import_to_user_mfa0(_MM,_SM,M:F/A):- functor(P,F,A),
    user:export(U:F/A),
    catch(user:import(U:F/A),_,true)))).
 
-%= 	 	 
+
 
 %% import_module_to_user( ?M) is semidet.
 %
@@ -1652,7 +1668,7 @@ import_module_to_user(M):- ignore(delete_import_module(M,user)),
                            ignore(delete_import_module(user,system)).
 
 
-%= 	 	 
+
 
 %% ensure_imports( ?M) is semidet.
 %
@@ -1665,7 +1681,7 @@ ensure_imports(M):-ensure_imports_tbox(M,baseKB).
 :-dynamic(lmcache:is_ensured_imports_tbox/2).
 
 
-%= 	 	 
+
 
 %% skip_user( ?M) is semidet.
 %
@@ -1678,7 +1694,7 @@ skip_user(M):-
   %asserta((M:import(P):-system:import(P))),
   
 
-%= 	 	 
+
 
 %% ensure_imports_tbox( ?M, ?BaseKB) is semidet.
 %
@@ -1715,7 +1731,7 @@ ensure_imports_tbox(M,BaseKB):-
 :-dynamic(lmconf:locked_baseKB/0).
 
 
-%= 	 	 
+
 
 %% not_boot_module( ?ABox) is semidet.
 %
@@ -1723,16 +1739,16 @@ ensure_imports_tbox(M,BaseKB):-
 %
 not_boot_module(ABox):-
   ABox\==mpred_loader,
-  ABox\==mpred_system,
-  ABox\==mpred_markers,
-  ABox\==singleValued,
-  ABox\==genls,
-  ABox\==if_missing,
+  ABox\==boot_system,
+  ABox\==system_markers,
+  ABox\==system_singleValued,
+  ABox\==system_genls,
+  ABox\==system_if_missing,
   ABox\==common_logic_clif,
-  ABox\==mpred_default.
+  ABox\==system_mdefault.
 
 
-%= 	 	 
+
 
 %% best_module( ?List, ?ABox) is semidet.
 %
@@ -1743,7 +1759,7 @@ best_module(List,ABox):-member(ABox,List),ABox\==user,not_boot_module(ABox),!.
 best_module(_List,baseKB):-!.
 
 
-%= 	 	 
+
 
 %% file_begin( ?W) is semidet.
 %
@@ -1773,17 +1789,17 @@ file_begin(W):-
    SM:mpred_ops)).
 
 
-%= 	 	 
+
 
 %% set_current_module( ?ABox) is semidet.
 %
 % Set Current Module.
 %
-set_current_module(user):- set_current_module(baseKB).
+set_current_module(user):- set_mpred_module(baseKB),!.
 set_current_module(ABox):- module(ABox),'$module'(_,ABox),'$set_source_module'(_,ABox).
 
 
-%= 	 	 
+
 
 %% file_end( ?W) is semidet.
 %
@@ -1793,7 +1809,7 @@ file_end(W):- must_det(( loading_source_file(ISource),decache_file_type(ISource)
   must_det(( loading_source_file(Source),decache_file_type(Source),ignore(retract(lmcache:mpred_directive_value(W,file,Source))))).
 
 
-%= 	 	 
+
 
 %% inside_file( ?W) is semidet.
 %
@@ -1805,7 +1821,7 @@ inside_file(W) :- loading_source_file(Source),!,lmcache:mpred_directive_value(W,
 
 
 
-%= 	 	 
+
 
 %% term_expansion( :TermFDecl, ?Clause) is semidet.
 %
@@ -1824,7 +1840,7 @@ user:term_expansion((:- DIR),O):- atom(DIR), mpred_directive_expansion(DIR,OO),!
 % :- ensure_loaded(logicmoo(snark/common_logic_sexpr)).
 
 
-%= 	 	 
+
 
 %% op_alias( ?OP, ?OTHER) is semidet.
 %
@@ -1832,7 +1848,7 @@ user:term_expansion((:- DIR),O):- atom(DIR), mpred_directive_expansion(DIR,OO),!
 %
 op_alias(OP,OTHER):-retractall(current_op_alias(OP,_)),asserta(current_op_alias(OP,OTHER)).
 
-%= 	 	 
+
 
 %% op_lang( ?LANG) is semidet.
 %
@@ -1842,7 +1858,7 @@ op_lang(LANG):-retractall(current_op_alias(_,_)), retract(t_l:current_lang(Was))
 op_lang(LANG):- assert_until_eof(t_l:current_lang(LANG)).
 
 
-%= 	 	 
+
 
 %% get_op_alias( ?OP, ?ALIAS) is semidet.
 %
@@ -1855,7 +1871,7 @@ get_op_alias(OP,ALIAS):-get_lang(LANG),lang_op_alias(LANG,OP,ALIAS).
 % current_op_alias((=>),==>).
 % current_op_alias((not),(~)).
 
-%= 	 	 
+
 
 %% current_op_alias( ?VALUE1, ?VALUE2) is semidet.
 %
@@ -1865,7 +1881,7 @@ current_op_alias( not(:-),~(:-)).
 current_op_alias( (:-),(:-)).
 
 
-%= 	 	 
+
 
 %% get_lang( ?LANG) is semidet.
 %
@@ -1876,7 +1892,7 @@ get_lang(pfc).
 
 % pfc
 
-%= 	 	 
+
 
 %% lang_op_alias( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
 %
@@ -1916,7 +1932,7 @@ lang_op_alias(prolog,(<=),(<=)).
 lang_op_alias(prolog,(<-),(<-)).
 
 
-%= 	 	 
+
 
 %% transform_opers( ?LANG, ?PFCM, ?PFCO) is semidet.
 %
@@ -1942,7 +1958,7 @@ transform_opers(LANG,PFCM,PFCO):- w_tl(t_l:current_lang(LANG),((transitive_lc(tr
 :- op(1100,fx,(shared_multifile)).
 
 
-%= 	 	 
+
 
 %% transform_opers_0( ?AIS, ?AIS) is semidet.
 %
@@ -1975,7 +1991,7 @@ transform_opers_0(not(A),C):- !, transform_opers_0(~(A),C).
 transform_opers_0(O,O).
 
 
-%= 	 	 
+
 
 %% transform_opers_1( ?AB, ?BBAA) is semidet.
 %
@@ -1992,7 +2008,7 @@ transform_opers_1(OP,OTHER):- get_op_alias(OPO,OTHER),OPO=OP,!.
 
 %% Possibly should term expand since we are in the userKb modules
 
-%= 	 	 
+
 
 %% in_mpred_kb_module is semidet.
 %
@@ -2001,7 +2017,7 @@ transform_opers_1(OP,OTHER):- get_op_alias(OPO,OTHER),OPO=OP,!.
 in_mpred_kb_module:- source_context_module(MT),fail,get_user_abox(MT).
 
 
-%= 	 	 
+
 
 %% load_file_term_to_command_or_fail( ?I, ?Y) is semidet.
 %
@@ -2013,7 +2029,7 @@ load_file_term_to_command_or_fail(I,Y):-
    must_load_file_term_to_command(M,Y),!.
 
 
-%= 	 	 
+
 
 %% is_prolog_xform( :TermV) is semidet.
 %
@@ -2025,7 +2041,7 @@ is_prolog_xform((:-(V,_))):-!,nonvar(V).
 is_prolog_xform(_:(:-(V,_))):-!,nonvar(V).
 
 
-%= 	 	 
+
 
 %% must_load_file_term_to_command( ?I, ?O) is semidet.
 %
@@ -2036,7 +2052,7 @@ must_load_file_term_to_command(I,O):- must(load_file_term_to_command_0c(I,O)),!.
 
 
 
-%= 	 	 
+
 
 %% expand_in_mpred_kb_module( ?I, ?O) is semidet.
 %
@@ -2048,7 +2064,7 @@ expand_in_mpred_kb_module(I,OO):- load_file_term_to_command_0c(I,O),!,
 
 
 
-%= 	 	 
+
 
 %% load_file_term_to_command_0c( ?I, ?OO) is semidet.
 %
@@ -2070,7 +2086,7 @@ load_file_term_to_command_0c(C,O):- get_lang(LANG),transform_opers(LANG,C,M),C\=
 load_file_term_to_command_0c(C,O):- hotrace(ensure_vars_labled(C,M)), must_mpred_term_expansion_2(M,O),!.
 
 
-%= 	 	 
+
 
 %% must_mpred_term_expansion_2( ?M, ?O) is semidet.
 %
@@ -2082,7 +2098,7 @@ must_mpred_term_expansion_2(M,O):- must(mpred_term_expansion(M,O)),!.
 
 
 
-%= 	 	 
+
 
 %% mpred_term_expansion( ?Fact, ?Output) is semidet.
 %
@@ -2114,7 +2130,7 @@ mpred_term_expansion(Fact,(:- cl_assert(pl,Fact))):- get_functor(Fact,F,_A),(a(p
 mpred_term_expansion(Fact,Output):- load_file_term_to_command_1(_Dir,Fact,C),must(mpred_term_expansion(C,Output)),!.
 
 
-%= 	 	 
+
 
 %% load_file_term_to_command_1( ?Type, :TermIn, :TermOut) is semidet.
 %
@@ -2127,7 +2143,7 @@ mpred_term_expansion(Fact,Output):- load_file_term_to_command_1(_Dir,Fact,C),mus
       load_file_term_to_command_1(Type,In,Out):-load_file_term_to_command_1b(Type,In,Out),!.
 
 
-%= 	 	 
+
 
 %% load_file_term_to_command_1b( ?VALUE1, :TermH, :TermH) is semidet.
 %
@@ -2143,7 +2159,7 @@ mpred_term_expansion(Fact,Output):- load_file_term_to_command_1(_Dir,Fact,C),mus
 
 
 
-%= 	 	 
+
 
 %% can_be_dynamic( ?H) is semidet.
 %
@@ -2152,7 +2168,7 @@ mpred_term_expansion(Fact,Output):- load_file_term_to_command_1(_Dir,Fact,C),mus
 can_be_dynamic(H):- \+ is_static_pred(H), \+ predicate_property(H,static),  \+ predicate_property(H,meta_predicate(_)).
 
 
-%= 	 	 
+
 
 %% pl_to_mpred_syntax_h( ?A, ?PFC_A) is semidet.
 %
@@ -2160,7 +2176,7 @@ can_be_dynamic(H):- \+ is_static_pred(H), \+ predicate_property(H,static),  \+ p
 %
 pl_to_mpred_syntax_h(A,PFC_A):- must(pl_to_mpred_syntax0(A,PFC_A)),!, PFC_A \= '{}'(_).
 
-%= 	 	 
+
 
 %% pl_to_mpred_syntax( ?A, ?PFC_A) is semidet.
 %
@@ -2169,7 +2185,7 @@ pl_to_mpred_syntax_h(A,PFC_A):- must(pl_to_mpred_syntax0(A,PFC_A)),!, PFC_A \= '
 pl_to_mpred_syntax(A,PFC_A):- must(pl_to_mpred_syntax0(A,PFC_A)),!.
 
 
-%= 	 	 
+
 
 %% pl_to_mpred_syntax0( ?A, ?A) is semidet.
 %
@@ -2190,7 +2206,7 @@ mpred_term_expansion(Fact,(:- ((cl_assert(Dir,Fact))))):- load_file_term_to_comm
 
       % Specific "*PREDICATE CLASS*" based default
 
-%= 	 	 
+
 
 %% load_file_term_to_command_2( ?VALUE1, ?Fact, ?Output) is semidet.
 %
@@ -2218,7 +2234,7 @@ mpred_term_expansion(Fact,(:- ((cl_assert(pfc(expand_file),Fact))))):-
 */
 
 
-%= 	 	 
+
 
 %% stream_pos( :TermFile) is semidet.
 %
@@ -2227,7 +2243,7 @@ mpred_term_expansion(Fact,(:- ((cl_assert(pfc(expand_file),Fact))))):-
 stream_pos(File:LineNo):-loading_source_file(File),current_input(S),stream_property(S, position(Position)), !,stream_position_data(line_count, Position, LineNo),!.
 
 
-%= 	 	 
+
 
 %% compile_clause( ?CL) is semidet.
 %
@@ -2236,7 +2252,7 @@ stream_pos(File:LineNo):-loading_source_file(File),current_input(S),stream_prope
 compile_clause(CL):- must((make_dynamic(CL),assertz_if_new(CL),clause_asserted(CL))).
 
 
-%= 	 	 
+
 
 %% make_dynamic( ?C) is semidet.
 %
@@ -2262,7 +2278,7 @@ make_dynamic(C):- compound(C),get_functor(C,F,A),must(F\=='$VAR'),
 
 
 
-%= 	 	 
+
 
 %% mpred_process_input_1( :TermT) is semidet.
 %
@@ -2273,7 +2289,7 @@ mpred_process_input_1('?-'(TT)):-!,doall(must(TT)),!.
 mpred_process_input_1('$si$':'$was_imported_kb_content$'(_,_)):-!.
 mpred_process_input_1(T):-try_save_vars(T),ain(T),!.
 
-%= 	 	 
+
 
 %% mpred_process_input( ?T, ?Vs) is semidet.
 %
@@ -2283,7 +2299,7 @@ mpred_process_input(':-'(T),Vs):- put_variable_names( Vs),must(T),!.
 mpred_process_input(T,Vs):- expand_term(T,TT),put_variable_names( Vs),mpred_process_input_1(TT),!.
 
 
-%= 	 	 
+
 
 %% process_this_script is semidet.
 %
@@ -2293,7 +2309,7 @@ process_this_script:- current_prolog_flag(xref,true),!.
 process_this_script:- ignore(show_call(why,prolog_load_context(script,_))), prolog_load_context(stream,S), !, must(process_this_script(S)).
 
 
-%= 	 	 
+
 
 %% process_this_script( ?S) is semidet.
 %
@@ -2304,7 +2320,7 @@ process_this_script(S):- at_end_of_stream(S),!.
 process_this_script(S):- repeat,once(process_this_script0(S)),at_end_of_stream(S).
 
 
-%= 	 	 
+
 
 %% process_this_script0( ?S) is semidet.
 %
@@ -2336,7 +2352,7 @@ process_this_script0(S):- read_term(S,T,[variable_names(Vs)]),put_variable_names
 
 :- thread_local(t_l:pretend_loading_file/1).
 
-%= 	 	 
+
 
 %% loading_source_file( ?F) is semidet.
 %
@@ -2348,7 +2364,7 @@ loading_source_file(F):-once(t_l:pretend_loading_file(F);prolog_load_context(sou
 :- dynamic(lmconf:never_reload_file/1).
 
 
-%= 	 	 
+
 
 %% load_language_file( ?Name0) is semidet.
 %
@@ -2363,7 +2379,7 @@ load_language_file(Name0):-
 
 
 
-%= 	 	 
+
 
 %% never_load_special( :TermARG1, ?Options) is semidet.
 %
@@ -2380,7 +2396,7 @@ never_load_special(_Module:_Spec, Options) :- member(must_be_module(true),Option
 
 % probably an autoload (SKIP)
 
-%= 	 	 
+
 
 %% prolog_load_file_loop_checked( ?ModuleSpec, ?Options) is semidet.
 %
@@ -2390,7 +2406,7 @@ prolog_load_file_loop_checked(ModuleSpec, Options) :- never_load_special(ModuleS
 prolog_load_file_loop_checked(ModuleSpec, Options) :- loop_check(show_success(prolog_load_file,prolog_load_file_loop_checked_0(ModuleSpec, Options))).
 
 
-%= 	 	 
+
 
 %% prolog_load_file_loop_checked_0( ?ModuleSpec, ?Options) is semidet.
 %
@@ -2400,7 +2416,7 @@ prolog_load_file_loop_checked_0(ModuleSpec, Options) :- current_predicate(_,_:ex
    catch(prolog_load_file_nlc(ModuleSpec, Options),E,(nop((trace,prolog_load_file_nlc(ModuleSpec, Options))),throw(E))).
 
 
-%= 	 	 
+
 
 %% prolog_load_file_nlc( :TermModule, ?Options) is semidet.
 %
@@ -2433,7 +2449,7 @@ prolog_load_file_nlc(Module:Spec, Options):- term_to_atom(Spec,String),member(S,
   nonvar(TF).
 
 
-%= 	 	 
+
 
 %% prolog_load_file_nlc_0( :TermModule, ?Options) is semidet.
 %
@@ -2456,7 +2472,7 @@ prolog_load_file_nlc_0(Module:FileName, Options):- fail, fail, fail, fail, fail,
   guess_file_type_loader(Ext,Loader)-> loop_check(call(Loader,Module:FileName, Options)).
 
 
-%= 	 	 
+
 
 %% guess_file_type_loader( ?Ext, ?Loader) is semidet.
 %
@@ -2468,7 +2484,7 @@ guess_file_type_loader(Ext,Pred):- atom(Ext),
    current_predicate(Pred/2).
 
 
-%= 	 	 
+
 
 %% load_file_dir( :TermModule, ?Options) is semidet.
 %
@@ -2488,7 +2504,7 @@ load_file_dir(Module:DirName, Options):- fail,
 
 
 
-%= 	 	 
+
 
 %% use_file_type_loader( ?VALUE1, ?VALUE2) is semidet.
 %
@@ -2500,7 +2516,7 @@ use_file_type_loader(plmoo,ensure_mpred_file_consulted).
 % use_file_type_loader(pl,ensure_prolog_file_consulted).
 
 
-%= 	 	 
+
 
 %% ensure_prolog_file_consulted( :TermM, ?Options) is semidet.
 %
@@ -2509,7 +2525,7 @@ use_file_type_loader(plmoo,ensure_mpred_file_consulted).
 ensure_prolog_file_consulted(M:File,Options):-must(load_files(M:File,Options)),!.
 
 
-%= 	 	 
+
 
 %% ensure_mpred_file_consulted( :TermM, ?Options) is semidet.
 %
@@ -2521,7 +2537,7 @@ ensure_mpred_file_consulted(M:File,Options):-
                     load_files(M:File,Options))))),!.
 
 
-%= 	 	 
+
 
 %% load_file_some_type( :TermM, ?Options) is semidet.
 %
@@ -2533,7 +2549,7 @@ load_file_some_type(M:File,Options):-must(load_files(M:File,Options)),!.
 
 
 
-%= 	 	 
+
 
 %% disable_mpreds_in_current_file is semidet.
 %
@@ -2545,7 +2561,7 @@ disable_mpreds_in_current_file:- loading_source_file(F),show_call(why,asserta((t
 :- was_export(with_no_mpred_expansions/1).
 :- meta_predicate(with_no_mpred_expansions(0)).
 
-%= 	 	 
+
 
 %% with_no_mpred_expansions( :GoalGoal) is semidet.
 %
@@ -2559,7 +2575,7 @@ with_no_mpred_expansions(Goal):-
 :- was_export(with_mpred_expansions/1).
 :- meta_predicate(with_mpred_expansions(0)).
 
-%= 	 	 
+
 
 %% with_mpred_expansions( :GoalGoal) is semidet.
 %
@@ -2572,7 +2588,7 @@ with_mpred_expansions(Goal):-
 :- was_export(ensure_loaded_no_mpreds/1).
 :- meta_predicate(ensure_loaded_no_mpreds(0)).
 
-%= 	 	 
+
 
 %% ensure_loaded_no_mpreds( :GoalF) is semidet.
 %
@@ -2581,7 +2597,7 @@ with_mpred_expansions(Goal):-
 ensure_loaded_no_mpreds(F):-with_no_mpred_expansions(forall(must_locate_file(F,L),ensure_loaded(L))).
 
 
-%= 	 	 
+
 
 %% use_was_isa( ?G, ?I, ?C) is semidet.
 %
@@ -2590,7 +2606,7 @@ ensure_loaded_no_mpreds(F):-with_no_mpred_expansions(forall(must_locate_file(F,L
 use_was_isa(G,I,C):-call((current_predicate(_,_:mpred_types_loaded/0),if_defined(was_isa_syntax(G,I,C)))).
 
 
-%= 	 	 
+
 
 %% current_context_module( ?Ctx) is semidet.
 %
@@ -2606,7 +2622,7 @@ current_context_module(Ctx):-notrace((source_context_module(Ctx))).
 :- shared_multifile(lmconf:registered_module_type/2).
 
 
-%= 	 	 
+
 
 %% register_module_type( ?Type) is semidet.
 %
@@ -2614,7 +2630,7 @@ current_context_module(Ctx):-notrace((source_context_module(Ctx))).
 %
 register_module_type(Type):-current_context_module(CM),register_module_type(CM,Type).
 
-%= 	 	 
+
 
 %% register_module_type( ?CM, ?Types) is semidet.
 %
@@ -2625,7 +2641,7 @@ register_module_type(CM,Type):-asserta_new(lmconf:registered_module_type(CM,Type
 
 :- was_export(end_module_type/2).
 
-%= 	 	 
+
 
 %% end_module_type( ?Type) is semidet.
 %
@@ -2633,7 +2649,7 @@ register_module_type(CM,Type):-asserta_new(lmconf:registered_module_type(CM,Type
 %
 end_module_type(Type):-current_context_module(CM),end_module_type(CM,Type).
 
-%= 	 	 
+
 
 %% end_module_type( ?CM, ?Type) is semidet.
 %
@@ -2663,7 +2679,7 @@ ensure_mpred_file_loaded(M:F0,List):-
 
 :- was_export(declare_load_dbase/1).
 
-%= 	 	 
+
 
 %% declare_load_dbase( ?Spec) is semidet.
 %
@@ -2673,7 +2689,7 @@ declare_load_dbase(Spec):- forall(no_repeats_old(File,must_locate_file(Spec,File
 
 % :- was_export((is_compiling_sourcecode/1)).
 
-%= 	 	 
+
 
 %% is_compiling_sourcecode is semidet.
 %
@@ -2685,7 +2701,7 @@ is_compiling_sourcecode:-compiling,dmsg(system_compiling),!.
 
 :- was_export(load_mpred_files/0).
 
-%= 	 	 
+
 
 %% load_mpred_files is semidet.
 %
@@ -2704,7 +2720,7 @@ load_mpred_files :- forall(lmconf:registered_mpred_file(File),ensure_mpred_file_
 :- meta_predicate(lmconf:loaded_file_world_time(+,+,+)).
 :- meta_predicate(get_last_time_file(+,+,+)).
 
-%= 	 	 
+
 
 %% get_last_time_file( +FileIn, +World, +LastTime) is semidet.
 %
@@ -2717,7 +2733,7 @@ get_last_time_file(_,_,0).
 
 :- meta_predicate(load_init_world(+,:)).
 
-%= 	 	 
+
 
 %% load_init_world( +World, ?File) is semidet.
 %
@@ -2734,7 +2750,7 @@ load_init_world(World,File):-
 :- meta_predicate(ensure_mpred_file_loaded(:)).
 
 
-%= 	 	 
+
 
 %% ensure_mpred_file_loaded( ?MFileIn) is semidet.
 %
@@ -2750,7 +2766,7 @@ ensure_mpred_file_loaded(MFileIn):- strip_module(MFileIn,M,_),
 
 :- meta_predicate(ensure_mpred_file_loaded(+,:)).
 
-%= 	 	 
+
 
 %% ensure_mpred_file_loaded( +World, ?FileIn) is semidet.
 %
@@ -2760,7 +2776,7 @@ ensure_mpred_file_loaded(World,FileIn):-
   w_tl(get_user_abox(World),ensure_mpred_file_loaded(FileIn)).
 
 
-%= 	 	 
+
 
 %% must_locate_file( ?FileIn, ?File) is semidet.
 %
@@ -2772,7 +2788,7 @@ must_locate_file(FileIn,File):-
 
 :- meta_predicate call_from_module(+,0).
 
-%= 	 	 
+
 
 %% call_from_module( +NewModule, :GoalGoal) is semidet.
 %
@@ -2785,7 +2801,7 @@ call_from_module(NewModule,Goal):-
 
 :- meta_predicate call_with_source_module(+,0).
 
-%= 	 	 
+
 
 %% call_with_source_module( +NewModule, :GoalGoal) is semidet.
 %
@@ -2796,7 +2812,7 @@ call_with_source_module(NewModule,Goal):-
    call_with_module(NewModule,call_cleanup('@'(Goal,NewModule),'$set_source_module'(_, OldModule))).
 :- meta_predicate call_with_module(+,0).
 
-%= 	 	 
+
 
 %% call_with_module( +NewModule, :GoalGoal) is semidet.
 %
@@ -2808,7 +2824,7 @@ call_with_module(NewModule,Goal):-
 
 :- meta_predicate(ensure_mpred_file_loaded(:)).
 
-%= 	 	 
+
 
 %% force_reload_mpred_file( ?FileIn) is semidet.
 %
@@ -2818,7 +2834,7 @@ force_reload_mpred_file(FileIn):-
   must((get_user_abox(World),force_reload_mpred_file(World,FileIn))).
 
 
-%= 	 	 
+
 
 %% force_reload_mpred_file( ?World, ?MFileIn) is semidet.
 %
@@ -2847,7 +2863,7 @@ force_reload_mpred_file(World,MFileIn):- strip_module(MFileIn,NewModule,_),
 
 :- was_export(load_mpred_on_file_end/2).
 
-%= 	 	 
+
 
 %% load_mpred_on_file_end( ?World, ?File) is semidet.
 %
@@ -2883,7 +2899,7 @@ load_mpred_on_file_end(World,File):-
 */
 
 
-%= 	 	 
+
 
 %% is_kif_string( ?String) is semidet.
 %
@@ -2893,7 +2909,7 @@ is_kif_string([]):- !,fail.
 is_kif_string(String):-atomic(String),name(String,Codes), memberchk(40,Codes),memberchk(41,Codes).
 
 
-%= 	 	 
+
 
 %% convert_if_kif_string( ?I, ?Wff, ?Vs, ?O) is semidet.
 %
@@ -2902,7 +2918,7 @@ is_kif_string(String):-atomic(String),name(String,Codes), memberchk(40,Codes),me
 convert_if_kif_string(I,Wff,Vs,O):-is_kif_string(I),must_det_l((input_to_forms(atom(I),Wff,Vs),put_variable_names(Vs),!,must((sexpr_sterm_to_pterm(Wff,O),!,\+ is_list(O))))).
 
 
-%= 	 	 
+
 
 %% from_kif_string( ?String, ?Forms) is semidet.
 %
@@ -2911,7 +2927,7 @@ convert_if_kif_string(I,Wff,Vs,O):-is_kif_string(I),must_det_l((input_to_forms(a
 from_kif_string(String,Forms) :- must((codelist_to_forms(String,Forms);input_to_forms(string(String),Forms))),!.
 
 
-%= 	 	 
+
 
 %% assert_kif( ?String) is semidet.
 %
@@ -2920,7 +2936,7 @@ from_kif_string(String,Forms) :- must((codelist_to_forms(String,Forms);input_to_
 assert_kif(String):- from_kif_string(String,Forms),dmsg(warn(assert_kif(Forms))),!.
 
 
-%= 	 	 
+
 
 %% assert_kif_dolce( ?String) is semidet.
 %
@@ -2932,7 +2948,7 @@ assert_kif_dolce(String):-from_kif_string(String,Forms),dmsg(warn(assert_kif_dol
 :- meta_predicate(doall_and_fail(0)).
 
 
-%= 	 	 
+
 
 %% finish_processing_world is semidet.
 %
@@ -2941,7 +2957,7 @@ assert_kif_dolce(String):-from_kif_string(String,Forms),dmsg(warn(assert_kif_dol
 finish_processing_world :- load_mpred_files, loop_check(w_tl(t_l:agenda_slow_op_do_prereqs,doall(finish_processing_dbase)),true).
 
 
-%= 	 	 
+
 
 %% doall_and_fail( :GoalCall) is semidet.
 %
@@ -2952,7 +2968,7 @@ doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 
 
 
-%= 	 	 
+
 
 %% loader_side_effect_verify_only( ?I, ?Supposed) is semidet.
 %
@@ -2971,7 +2987,7 @@ loader_side_effect_verify_only(I,Supposed):-
     pop_predicates(t_l:side_effect_buffer/3,STATE),!.
 
 
-%= 	 	 
+
 
 %% loader_side_effect_capture_only( ?I, ?ActualSupposed) is semidet.
 %
@@ -2988,7 +3004,7 @@ loader_side_effect_capture_only(I,ActualSupposed):-
 
 
 
-%= 	 	 
+
 
 %% collect_expansions( ?Why, ?I, ?I) is semidet.
 %
@@ -3002,7 +3018,7 @@ collect_expansions(NWhy,_I, TODO):- findall(ReproduceSWhy,
    must_det_l( list_to_conjuncts(TODOs,TODO)).
 
 
-%= 	 	 
+
 
 %% simplify_why_r( ?Reproduce, ?Why, ?NWhy, :TermReproduce) is semidet.
 %
@@ -3015,7 +3031,7 @@ simplify_why_r(Reproduce,Why,_,Reproduce:SWhy):-simplify_why(Why,SWhy),!.
 :- meta_predicate(convert_side_effect(?,+,-)).
 
 
-%= 	 	 
+
 
 %% simplify_why( ?Why, ?SWhy) is semidet.
 %
@@ -3028,7 +3044,7 @@ simplify_why(Why,SWhy):- atom(Why),!,directory_file_path(_,SWhy,Why).
 simplify_why(Why,Why).
 
 
-%= 	 	 
+
 
 %% convert_side_effect( ?C, +A, -SE) is semidet.
 %
@@ -3038,7 +3054,7 @@ convert_side_effect(M:C,A,SE):- Call=..[C,A],!,convert_side_effect(M:Call,SE).
 convert_side_effect(C,A,SE):- Call=..[C,A],!,convert_side_effect(Call,SE).
 
 
-%= 	 	 
+
 
 %% convert_side_effect( ?I, ?OO) is semidet.
 %
@@ -3048,7 +3064,7 @@ convert_side_effect(suppose(OO), suppose(Result)):- convert_side_effect_0a(OO,Re
 convert_side_effect(I,OO):-convert_side_effect_0c(I,O),((O=(N-_V),number(N))->OO=O;OO=O),!.
 
 
-%= 	 	 
+
 
 %% convert_side_effect_0a( ?I, ?O) is semidet.
 %
@@ -3063,7 +3079,7 @@ convert_side_effect_0a(I,O):-convert_side_effect_0b(I,O),!.
 convert_side_effect_0a(I,I).
 
 
-%= 	 	 
+
 
 %% convert_side_effect_0b( :TermOpData, ?Result) is semidet.
 %
@@ -3080,7 +3096,7 @@ convert_side_effect_0b(assert_if_new(Data),Result):-!,convert_side_effect_0a(ass
 convert_side_effect_0b(assert(Data),Result):-!,convert_side_effect_0a(assertz(Data),Result).
 
 
-%= 	 	 
+
 
 %% convert_side_effect_0c( ?OpData, ?Reproduce) is semidet.
 %
@@ -3092,7 +3108,7 @@ convert_side_effect_0c(OpData,Reproduce):- trace_or_throw(unknown_convert_side_e
 
 % todo
 
-%= 	 	 
+
 
 %% convert_side_effect_buggy( ?H, ?HB) is semidet.
 %
@@ -3105,7 +3121,7 @@ convert_side_effect_buggy(OpData,( (  error_op(OpData)))):-dmsg(unknown_convert_
 
 
 
-%= 	 	 
+
 
 %% clear_predicates( :TermM) is semidet.
 %
@@ -3113,7 +3129,7 @@ convert_side_effect_buggy(OpData,( (  error_op(OpData)))):-dmsg(unknown_convert_
 %
 clear_predicates(M:H):- forall(M:clause(H,_,Ref),erase(Ref)).
 
-%= 	 	 
+
 
 %% push_predicates( :TermM, ?STATE) is semidet.
 %
@@ -3121,7 +3137,7 @@ clear_predicates(M:H):- forall(M:clause(H,_,Ref),erase(Ref)).
 %
 push_predicates(M:F/A,STATE):- functor(H,F,A),findall((H:-B), (M:clause(H,B,Ref),erase(Ref)), STATE).
 
-%= 	 	 
+
 
 %% pop_predicates( :TermM, ?STATE) is semidet.
 %
@@ -3135,7 +3151,7 @@ pop_predicates(M:F/A,STATE):- functor(H,F,A),forall(member((H:-B),STATE),M:asser
 :- dynamic(user:prolog_load_file/2).
 
 
-%= 	 	 
+
 
 %% prolog_load_file( ?ModuleSpec, ?Options) is semidet.
 %
@@ -3147,7 +3163,7 @@ user:prolog_load_file(ModuleSpec, Options):- current_predicate(_,_:mpred_loader_
 
 
 
-%= 	 	 
+
 
 %% mpred_loader_file is semidet.
 %

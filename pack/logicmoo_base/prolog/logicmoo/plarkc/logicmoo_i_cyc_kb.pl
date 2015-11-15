@@ -667,7 +667,7 @@ addCycL(V):-into_mpred_form(V,M),V\=@=M,!,addCycL(M),!.
 addCycL(V):-defunctionalize('implies',V,VE),V\=@=VE,!,addCycL(VE).
 addCycL(V):-cyc_to_clif(V,VE),V\=@=VE,!,addCycL(VE).
 addCycL(V):-is_simple_gaf(V),!,addCycL0(V),!.
-addCycL(V):-kif_to_boxlog(V,VB),boxlog_to_prolog(VB,VP),V\=@=VP,!,as_cycl(VP,VE),show_call(why,addCycL0(VE)).
+addCycL(V):-kif_to_boxlog(V,VB),boxlog_to_pfc(VB,VP),V\=@=VP,!,as_cycl(VP,VE),show_call(why,addCycL0(VE)).
 addCycL(V):-addCycL0(V),!.
 
 addCycL0(V):-addCycL1(V).
@@ -693,7 +693,7 @@ cycLToMpred(V,CP):-into_mpred_form(V,M),V\=@=M,!,cycLToMpred(M,CP),!.
 cycLToMpred(V,CP):-cyc_to_clif(V,VE),V\=@=VE,!,cycLToMpred(VE,CP).
 cycLToMpred(V,CP):-is_simple_gaf(V),!,cycLToMpred0(V,CP),!.
 cycLToMpred(V,CP):-defunctionalize('implies',V,VE),V\=@=VE,!,cycLToMpred(VE,CP).
-cycLToMpred(V,CP):-kif_to_boxlog(V,VB),boxlog_to_prolog(VB,VP),V\=@=VP,!,as_cycl(VP,VE),show_call(why,cycLToMpred0(VE,CP)).
+cycLToMpred(V,CP):-kif_to_boxlog(V,VB),boxlog_to_pfc(VB,VP),V\=@=VP,!,as_cycl(VP,VE),show_call(why,cycLToMpred0(VE,CP)).
 cycLToMpred(V,CP):-cycLToMpred0(V,CP),!.
 
 cycLToMpred0(V,CP):-into_mpred_form(V,M),V\=@=M,!,cycLToMpred0(M,CP),!.

@@ -1,6 +1,8 @@
 
 :- file_begin(pfc).
 
+:- set_mpred_module(baseKB).
+
 
 
 
@@ -14,7 +16,7 @@ mpred_sv(Pred,Arity)==> prologSingleValued(Pred),arity(Pred,Arity),singleValuedI
 % prologSingleValued(Pred),arity(Pred,Arity) ==> hybrid_support(Pred,Arity).
 
 % prologSingleValued(Pred),arity(Pred,Arity), \+ singleValuedInArg(Pred,_) ==> singleValuedInArg(Pred,Arity).
-mpred_default(((prologSingleValued(Pred),arity(Pred,Arity))==> singleValuedInArg(Pred,Arity))).
+mdefault(((prologSingleValued(Pred),arity(Pred,Arity))==> singleValuedInArg(Pred,Arity))).
 
 
 
@@ -33,7 +35,7 @@ prologHybrid(singleValuedInArgDefault(prologSingleValued,ftInt,ftTerm)).
   argIsa(PrologSingleValued,1,Col)==>relationMostInstance(PrologSingleValued,Col,FtTerm).
 ((singleValuedInArgDefault(F, N, DEF)/is_ftNonvar(DEF), arity(F,A),
    {functor(P,F,A),replace_arg(P,N,DEF,Q),replace_arg(Q,N,WAS,R)})
-       ==> mpred_default( Q <- ({ground(P)},~R/nonvar(WAS)))).
+       ==> mdefault( Q <- ({ground(P)},~R/nonvar(WAS)))).
 
 
 

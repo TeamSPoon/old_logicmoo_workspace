@@ -276,9 +276,9 @@ create_from_type(OType,Name,Type):- sanity(var(Name)),
 %
 % Modality.
 %
-modality(mpred_default, [usually],[]).
+modality(mdefault, [usually],[]).
 modality(~ , [cannot],[can]).
-modality(mpred_default,[sometimes],[]).
+modality(mdefault,[sometimes],[]).
 modality(can,[can],[be]).
 modality(possibly,[either],[]).
 modality(~,[not],[]).

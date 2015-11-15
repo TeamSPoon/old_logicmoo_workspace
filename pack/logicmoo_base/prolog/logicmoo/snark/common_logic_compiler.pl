@@ -33,7 +33,7 @@
 %=
 %= FORMULA SYNTAX
 %=
-%= not(A)
+%=  ~( A)
 %= &(F, F)
 %= v(F, F)
 %= '=>'(F, F)
@@ -460,7 +460,17 @@ nnf(KB,exists(TypedX,NNF),FreeV,FmlO,Paths):- get_quantifier_isa(TypedX,X,Col),
 % ==== quantifiers ========
 nnf(KB,exists(X,Fml),FreeV,NNF,Paths):-  \+ contains_var(X,Fml),!,trace,nnf(KB,Fml,FreeV,NNF,Paths).
 
-nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- % is_skolem_setting(attvar),!,
+nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(in_nnf),!,
+ must_det_l((
+   list_to_set([X|FreeV],NewVars),
+    term_slots(NewVars,Slots),
+    delete_eq(Slots,X,SlotsV1),
+    delete_eq(SlotsV1,KB,SlotsV2),
+    skolem_f(KB, Fml, X, SlotsV2, SkF),
+    push_skolem(X,SkF),
+    nnf(KB,Fml,NewVars,NNF,Paths))),!.
+
+nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(in_nnf_implies),!,
  must_det_l((
    list_to_set([X|FreeV],NewVars),
     term_slots(NewVars,Slots),
@@ -479,12 +489,12 @@ nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(push_skolem),!, wdmsg(
    push_skolem(X,true),
    must(nnf(KB,Fml,FreeV,NNF,Paths)).
 
-nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(in_nnf),!, wdmsg(nnf(skolemizing(exists(X,Fml),with(FreeV)))),
+nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(old_mk_skolem),!, wdmsg(nnf(skolemizing(exists(X,Fml),with(FreeV)))),
    must(mk_skolem(KB,Fml,X,FreeV,FmlSk)),
    must(nnf(KB,FmlSk,FreeV,NNF,Paths)).
 
-% exists(X,nesc(f(X)))  ->  exists(X,not(poss(not(f(X))))) ->  not(poss(not(f(X))))
-% nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- nnf(KB,not(poss(b_d(KB,nesc,poss),not(Fml))),FreeV,NNF,Paths).
+% exists(X,nesc(f(X)))  ->  exists(X, ~( poss( ~( f(X))))) ->   ~( poss( ~( f(X))))
+% nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- nnf(KB, ~( poss(b_d(KB,nesc,poss), ~( Fml))),FreeV,NNF,Paths).
 
 nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(label),
    nnf_label(KB,exists(X,Fml),FreeV,NNF,Paths),!.
@@ -514,7 +524,7 @@ nnf(KB,atmost(1,X,Fml),FreeV,NNF,Paths):-
 	!,
         subst_except(Fml,X,Y,FmlY),
         subst_except(Fml,X,Z,FmlZ),
-	nnf(KB,not(&(exists(Y,FmlY),exists(Z,FmlZ))),FreeV,NNF,Paths).
+	nnf(KB, ~( &(exists(Y,FmlY),exists(Z,FmlZ))),FreeV,NNF,Paths).
 nnf(KB,atmost(N,X,Fml),FreeV,NNF,Paths):- 
 	!,
         subst_except(Fml,X,Y,FmlY),
@@ -522,13 +532,13 @@ nnf(KB,atmost(N,X,Fml),FreeV,NNF,Paths):-
 	nnf(KB,&(exists(Y,FmlY),atmost(NewN,X,Fml)),FreeV,NNF,Paths).
 
 
-nnf(KB,not(xor(X , Y)),FreeV,NNF,Paths):-
+nnf(KB, ~( xor(X , Y)),FreeV,NNF,Paths):-
    !,
-   nnf(KB,v(&(X , Y) , &(not(X) , not(Y))),FreeV,NNF,Paths).
+   nnf(KB,v(&(X , Y) , &( ~( X) ,  ~( Y))),FreeV,NNF,Paths).
    
 nnf(KB,xor(X , Y),FreeV,NNF,Paths):-
    !,
-   nnf(KB,&(v(X , Y) , v(not(X) , not(Y))),FreeV,NNF,Paths).
+   nnf(KB,&(v(X , Y) , v( ~( X) ,  ~( Y))),FreeV,NNF,Paths).
    
 nnf(KB,(C => &(A,B)),FreeV,NNFO,PathsO):- 
 	nnf(KB,A,FreeV,NNF1,Paths1),contains_no_negs(NNF1),
@@ -581,8 +591,8 @@ nnf(KB,Fml,FreeV,NNF,Paths):-
 % ~until(Future,Current) -> ( always(~Current) v until(~Current,(~Future & ~Current)))
 nnf(KB,Fml,FreeV,NNF,Paths):- 
    logically_matches(KB,Fml,~until(Future,Current)),
-   nnf(KB,not(Future),FreeV,NNFuture,_),
-   nnf(KB,not(Current),FreeV,NNCurrent,_),
+   nnf(KB, ~( Future),FreeV,NNFuture,_),
+   nnf(KB, ~( Current),FreeV,NNCurrent,_),
    Fml1 = v(always(NNCurrent), until(CT,NNCurrent,&(NNFuture,NNCurrent))),
    nnf(KB,Fml1,FreeV,NNF,Paths).
    
@@ -592,35 +602,35 @@ nnf(KB,Fml,FreeV,NNF,Paths):- !,
    nnf(KB,next(~Future),FreeV,NNF,Paths).
 */   
 
-nnf(KB,not(Fml),FreeV,NNF,Paths):- nonvar(Fml),   
-	(Fml = (not(A)) -> invert_modal(A,Fml1);
-         Fml = (nesc(BDT,F)) -> Fml1 = poss(BDT,not(F));
-	 Fml = (poss(BDT,F)) -> Fml1 = nesc(BDT,not(F));
-	 Fml = (cir(CT,F)) -> Fml1 = cir(CT,not(F));
+nnf(KB, ~( Fml),FreeV,NNF,Paths):- nonvar(Fml),   
+	(Fml = ( ~( A)) -> invert_modal(A,Fml1);
+         Fml = (nesc(BDT,F)) -> Fml1 = poss(BDT, ~( F));
+	 Fml = (poss(BDT,F)) -> Fml1 = nesc(BDT, ~( F));
+	 Fml = (cir(CT,F)) -> Fml1 = cir(CT, ~( F));
 	 Fml = (until(CT,A,B)) -> 
-            (nnf(KB,not(A),FreeV,NNA,_), nnf(KB,not(B),FreeV,NNB,_),Fml1 = v(always(CT,NNB), until(CT,NNB,&(NNA,NNB))));
+            (nnf(KB, ~( A),FreeV,NNA,_), nnf(KB, ~( B),FreeV,NNB,_),Fml1 = v(always(CT,NNB), until(CT,NNB,&(NNA,NNB))));
              
-	 Fml = (all(X,F)) -> Fml1 = exists(X,not(F));
-	 Fml = (exists(X,F)) -> Fml1 = all(X,not(F));
+	 Fml = (all(X,F)) -> Fml1 = exists(X, ~( F));
+	 Fml = (exists(X,F)) -> Fml1 = all(X, ~( F));
 
 	 Fml = (atleast(N,X,F)) -> Fml1 = atmost(N,X,F);
 	 Fml = (atmost(N,X,F)) -> Fml1 = atleast(N,X,F);
 
-	 Fml = (v(A,B)) -> Fml1 = &(not(A), not(B) );
-	 Fml = (&(A,B)) -> Fml1 = v(not(A), not(B) );
-	 Fml = ('=>'(A,B)) -> Fml1 = &(A, not(B) );
-	 Fml = ('<=>'(A,B)) -> Fml1 = v(&(A, not(B)) , &(not(A), B) )
+	 Fml = (v(A,B)) -> Fml1 = &( ~( A),  ~( B) );
+	 Fml = (&(A,B)) -> Fml1 = v( ~( A),  ~( B) );
+	 Fml = ('=>'(A,B)) -> Fml1 = &(A,  ~( B) );
+	 Fml = ('<=>'(A,B)) -> Fml1 = v(&(A,  ~( B)) , &( ~( A), B) )
 	),!,
         share_scopes(KB,BDT),share_scopes(KB,CT),!,
 	nnf(KB,Fml1,FreeV,NNF,Paths).
 
 nnf(KB,Fml,FreeV,NNF,Paths):-  
-	(Fml = '=>'(A,B) -> Fml1 = v(not(A), B );         
-	 Fml = '<=>'(A,B) -> Fml1 = v(&(A, B), &(not(A), not(B)) );
+	(Fml = '=>'(A,B) -> Fml1 = v( ~( A), B );         
+	 Fml = '<=>'(A,B) -> Fml1 = v(&(A, B), &( ~( A),  ~( B)) );
          Fml = '<=>'(A,B) -> Fml1 = v('=>'(A, B), '=>'(B, A) )
 	),!, nnf(KB,Fml1,FreeV,NNF,Paths).
 
-nnf(_,not(Fml),_FreeV,not(Fml),1):- is_ftVar(Fml),!,push_dom(Fml,ftSentence).
+nnf(_, ~( Fml),_FreeV, ~( Fml),1):- is_ftVar(Fml),!,push_dom(Fml,ftSentence).
 % nnf(KB,Fml,_,Fml,1):- Fml=..[F,KB,_],third_order(F),!.
 
 
@@ -652,7 +662,7 @@ nnf(KB,Fml,FreeV,FmlO,N):- must((nonegate(KB,Fml,FmlM),nnf_lit(KB,FmlM,FreeV,Fml
 nnf(_KB,Fml,_,Fml,1):-!.
 
 nnf_lit(KB,all(X,Fml),FreeV,all(X,FmlO),N):- nonvar(Fml),!,nnf_lit(KB,Fml,FreeV,FmlO,N).
-nnf_lit(KB,not(Fml),FreeV,not(FmlO),N):- nonvar(Fml),!,nnf_lit(KB,Fml,FreeV,FmlO,N).
+nnf_lit(KB, ~( Fml),FreeV, ~( FmlO),N):- nonvar(Fml),!,nnf_lit(KB,Fml,FreeV,FmlO,N).
 
 nnf_lit(KB,Fml,FreeV,FmlO,N3):- 
    Fml=..[F|ARGS],
@@ -719,7 +729,7 @@ third_order(asserted_t).
 %
 boxRule(_KB,BOX, BOX):-leave_as_is(BOX),!.
 boxRule(KB,nesc(BDT,&(A,B)), &(BA,BB)):- nonvar(A),!, boxRule(KB,nesc(BDT,A),BA), boxRule(KB,nesc(BDT,B),BB).
-boxRule(KB,nesc(BDT, IN), BOX):- \+ is_lit_atom(IN), share_scopes(KB,BDT), nnf(KB,not(nesc(BDT, not(IN))),BOX).
+boxRule(KB,nesc(BDT, IN), BOX):- \+ is_lit_atom(IN), share_scopes(KB,BDT), nnf(KB, ~( nesc(BDT,  ~( IN))),BOX).
 boxRule(_KB,BOX, BOX).
  
 
@@ -859,7 +869,7 @@ neg_op(not).
 neg_op(~).
 neg_op(~).
 neg_op(-).
-neg_op(\+).
+neg_op('\\+').
 
 
 %= 	 	 
@@ -957,12 +967,12 @@ simplify_cheap(nesc(BDT,OUT),OUT):- !,nonvar(OUT),is_modal(OUT,BDT),!.
 simplify_cheap(poss(BDT,nesc(BDT,IN)),OUT):- simplify_cheap_must(poss(BDT,IN),OUT).
 simplify_cheap(poss(BDT,poss(BDT,IN)),OUT):- simplify_cheap_must(poss(BDT,IN),OUT).
 simplify_cheap(nesc(BDT,poss(BDT,IN)),OUT):- simplify_cheap_must(poss(BDT,IN),OUT).
-% simplify_cheap(not(not(IN)),OUT):- simplify_cheap_must(IN,OUT).
-simplify_cheap(not( poss(BDT, poss(BDT, F))), not(F)):-nonvar(F),!.
+% simplify_cheap( ~(  ~( IN)),OUT):- simplify_cheap_must(IN,OUT).
+simplify_cheap( ~(  poss(BDT, poss(BDT, F))),  ~( F)):-nonvar(F),!.
 simplify_cheap(poss(BDT, poss(BDT, F)),  poss(BDT, F)):-nonvar(F),!.
-simplify_cheap(not(poss(_, not( F))), F):-nonvar(F),!.
-%simplify_cheap(IN,-OUT):- IN = not(poss(BDT,OUT)), is_modal(OUT,BDT),!.
-%simplify_cheap(IN,-OUT):- IN = not(nesc(BDT,OUT)), \+is_modal(OUT,BDT),!.
+simplify_cheap( ~( poss(_,  ~(  F))), F):-nonvar(F),!.
+%simplify_cheap(IN,-OUT):- IN =  ~( poss(BDT,OUT)), is_modal(OUT,BDT),!.
+%simplify_cheap(IN,-OUT):- IN =  ~( nesc(BDT,OUT)), \+is_modal(OUT,BDT),!.
 
 
 %= 	 	 
@@ -1074,17 +1084,16 @@ cf(Why,KB,_Original,PNF, FlattenedO):-
   cnf(KB,UnQ,CNF0),!,
   nnf(KB,CNF0,[],CNF,_),
   wdmsg(cnf:-CNF),
- call(( conjuncts_to_list(CNF,Conj),
-  make_clause_set([infer_by(Why)],Conj,EachClause),
+ call(( conjuncts_to_list(CNF,Conj), make_clause_set([infer_by(Why)],Conj,EachClause),
   must_maplist(correct_cls(KB),EachClause,SOO),
   expand_cl(KB,SOO,SOOO))),
   sort(SOOO,SET),
   cf_to_flattened_clauses(KB,Why,SET,Flattened),
   list_to_set(Flattened,FlattenedM),!,
   correct_boxlog(FlattenedM,KB,Why,FlattenedO),
-  pfc_for_print(FlattenedO,PrintPFC),
-  wdmsg(boxlog:-PrintPFC))).
-
+  pfc_for_print(FlattenedO,PrintPFC),wdmsg(boxlog:-PrintPFC),
+  boxlog_to_pfc(FlattenedO,PFCPreview),
+  pfc_for_print(PFCPreview,PrintPFCPreview),wdmsg(preview:-PrintPFCPreview))),!.
 
 check_kif_varnames(KIF):-check_varnames(KIF),fail.
 check_kif_varnames(KIF):-ground(KIF),!.
@@ -1149,19 +1158,19 @@ removeQ(_,Var,_ ,Var):- leave_as_is(Var),!.
 
 removeQ(KB, IN,FreeV,OUT):-  once(simplify_cheap(IN,MID)), IN\=@=MID, removeQ_LC(KB, MID,FreeV,OUT),!.
 
-removeQ(KB, not(NN),Vars, XF):- nonvar(NN),NN=not(F), invert_modal(F,FI),!, removeQ(KB,  FI,Vars, XF) .
+removeQ(KB,  ~( NN),Vars, XF):- nonvar(NN),NN= ~( F), invert_modal(F,FI),!, removeQ(KB,  FI,Vars, XF) .
 removeQ(KB, all(X,F),Vars, HH):- !,  removeQ(KB,F,[X|Vars], RQ0),RQ0=HH.
 
 /*
-removeQ(KB, not(nesc(BDT, not(F))),Vars, XF):- !,removeQ_LC(KB, poss(BDT, F),Vars, XF).
-removeQ(KB, not(poss(BDT, not(F))),Vars, XF):- !,removeQ_LC(KB, nesc(BDT, F),Vars, XF).
+removeQ(KB,  ~( nesc(BDT,  ~( F))),Vars, XF):- !,removeQ_LC(KB, poss(BDT, F),Vars, XF).
+removeQ(KB,  ~( poss(BDT,  ~( F))),Vars, XF):- !,removeQ_LC(KB, nesc(BDT, F),Vars, XF).
 
-removeQ(KB, not(nesc(BDT, (F))),Vars, XF):- !,removeQ(KB, poss(BDT, not(F)),Vars, XF).
-removeQ(KB, not(poss(BDT, (F))),Vars, XF):- !,removeQ(KB, nesc(BDT, not(F)),Vars, XF).
+removeQ(KB,  ~( nesc(BDT, (F))),Vars, XF):- !,removeQ(KB, poss(BDT,  ~( F)),Vars, XF).
+removeQ(KB,  ~( poss(BDT, (F))),Vars, XF):- !,removeQ(KB, nesc(BDT,  ~( F)),Vars, XF).
 */
 
-removeQ(KB, nesc(BDT, not(F)),Vars, XF):- !,removeQ(KB, not(poss(BDT, F)),Vars, XF).
-removeQ(KB, poss(BDT, not(F)),Vars, XF):- !,removeQ(KB, not(nesc(BDT, F)),Vars, XF).
+removeQ(KB, nesc(BDT,  ~( F)),Vars, XF):- !,removeQ(KB,  ~( poss(BDT, F)),Vars, XF).
+removeQ(KB, poss(BDT,  ~( F)),Vars, XF):- !,removeQ(KB,  ~( nesc(BDT, F)),Vars, XF).
 
 removeQ(KB,  exists(X,F),Vars, HH):- is_skolem_setting(removeQ),!,wdmsg(removeQ(skolemizing(exists(X,F)))),
 	mk_skolem(KB,F,X,Vars,Fsk),
@@ -1176,7 +1185,7 @@ removeQ(KB,     [ H|B ],Vars, [ HH|BB ] ):- !,removeQ(KB,H, Vars, HH ),removeQ(K
 %removeQ(KB, H, Vars, HH ):- functor(H,F,1),adjust_kif(KB,H,MM),H\=@=MM,!, removeQ(KB, MM, Vars, HH ).
 
 %removeQ(KB, H, Vars,HH ):- functor(H,F,1),kb_nlit(KB,F),once(nnf(KB,H,MM)),H\=@=MM,  removeQ_LC(KB, MM, Vars, HH ).
-removeQ(KB, H,  Vars,HH ):- H = not( _), once(nnf(KB,H,MM)),H\=@=MM,  removeQ_LC(KB, MM, Vars, HH ).
+removeQ(KB, H,  Vars,HH ):- H =  ~(  _), once(nnf(KB,H,MM)),H\=@=MM,  removeQ_LC(KB, MM, Vars, HH ).
 
 removeQ(KB, H, Vars, HH ):- convertAndCall(as_dlog,removeQ(KB,H, Vars, HH )).
 
@@ -1225,7 +1234,7 @@ demodal_sents(KB,I,O):- must_det_l((demodal(KB,I,M),modal2sent(M,O))).
 demodal(KB,In,Prolog):- call_last_is_var(demodal(KB,In,Prolog)),!.
 demodal(_KB,Var, Var):- cnotrace(leave_as_is(Var)),!.
 demodal(KB,[H|T],[HH|TT]):- !, demodal(KB,H,HH),demodal(KB,T,TT).
-demodal(KB, not(H), not(HH)):-!, demodal(KB,H, HH),!.
+demodal(KB,  ~( H),  ~( HH)):-!, demodal(KB,H, HH),!.
 
 demodal(KB, nesc(b_d(KB2,X,_),F), HH):-KB\==KB2,XF =..[X,KB2,F],!,demodal(KB2,XF, HH).
 demodal(KB, poss(b_d(KB2,_,X),F), HH):-KB\==KB2,XF =..[X,KB2,F],!,demodal(KB2,XF, HH).
@@ -1233,9 +1242,9 @@ demodal(KB, poss(b_d(KB2,_,X),F), HH):-KB\==KB2,XF =..[X,KB2,F],!,demodal(KB2,XF
 demodal(KB, nesc(b_d(KB,X,_),F),   HH):- XF =..[X,F], !,demodal(KB,XF, HH).
 demodal(KB, poss(b_d(KB,_,X),F),   HH):- XF =..[X,F], !,demodal(KB,XF, HH).
 
-demodal(KB,~(H),not(HH)):- nonvar(H),demodal(KB,H,HH).
+demodal(KB,~(H), ~( HH)):- nonvar(H),demodal(KB,H,HH).
 demodal(KB,nesc(F), HH):- !,demodal(KB,F, HH).
-demodal(KB,not(H),not(HH)):- nonvar(H),demodal(KB,H,HH).
+demodal(KB, ~( H), ~( HH)):- nonvar(H),demodal(KB,H,HH).
 
 demodal(KB,H,HH ):- H=..[F|ARGS],!,must_maplist(demodal(KB),ARGS,ARGSO),!,HH=..[F|ARGSO].
 
@@ -1298,8 +1307,8 @@ inclause(KB, v(P,Q), A, A1, B, B1 ):-
 	!,
 	inclause(KB, P, A2, A1, B2, B1 ),
 	inclause(KB, Q, A,  A2, B,  B2 ).
-inclause(KB, not( PP) , A,  A, B1, B ):- 
-        negate(KB, not( PP),P),
+inclause(KB,  ~(  PP) , A,  A, B1, B ):- 
+        negate(KB,  ~(  PP),P),
 	!,
 	notin(P, A ),
 	putin(P, B, B1 ).
@@ -1452,7 +1461,7 @@ flattenConjs(_Extras,I,O):- conjuncts_to_list(I,M),must_maplist(conjuncts_to_lis
 % Logical Negated.
 %
 logical_neg(KB,Wff,WffO):- 
-  must(nonegate(KB,Wff,Wff1)),nnf(KB,not(Wff1),Wff2),must(nonegate(KB,Wff2,WffO)),!.
+  must(nonegate(KB,Wff,Wff1)),nnf(KB, ~( Wff1),Wff2),must(nonegate(KB,Wff2,WffO)),!.
 
 %= 	 	 
 
@@ -1489,8 +1498,8 @@ negate(KB,X,Z):- must(defunctionalize(X,Y)), must_det(negate0(KB,Y,Z)).
 %
 % Negate Primary Helper.
 %
-negate0(_,not(X),X).
-negate0(_,X,not(X)).
+negate0(_, ~( X),X).
+negate0(_,X, ~( X)).
 
 
 
@@ -1737,7 +1746,7 @@ mk_skolem_name(KB,Var,Fml,SIn,SOut):- Fml=..[F,VX|_],same_var(Var,VX),!,mk_skole
 mk_skolem_name(KB,Var,Fml,SIn,SOut):- Fml=..[F,_,VX|_],same_var(Var,VX),!,mk_skolem_name(KB,Var,['Arg2Of',F],SIn,SOut).
 mk_skolem_name(KB,Var,Fml,SIn,SOut):- Fml=..[F|_],!,mk_skolem_name(KB,Var,['ArgNOf',F],SIn,SOut).
 
-% same_var(Var,Fml):- not(not(Var=Fml)),!.
+% same_var(Var,Fml):-  ~(  ~( Var=Fml)),!.
 
 %= 	 	 
 
@@ -1824,27 +1833,27 @@ correct_cls0(KB,cl(H,B),O):- list_to_set(H,HH),HH\=@=H,!,correct_cls(KB,cl(HH,B)
 correct_cls0(KB,cl(H,B),O):- list_to_set(B,BB),BB\=@=B,!,correct_cls(KB,cl(H,BB),O).
 
 /*
-correct_cls0(_,cl([not(poss(H))],B),cl([z_unused(~pos(H:-B))],[])):-member(not(H),B),!.
-correct_cls0(KB,cl([not(poss(H))],B),O):- correct_cls0(KB,cl([not((H))],B),O).
-correct_cls0(KB,cl([not(H)],B),O):- delete_sublits(B,poss(H),BB),BB\=@=B,!,correct_cls(KB,cl([not(H)],BB),O).
-correct_cls0(KB,cl([not(H)],B),O):- delete_sublits(B,(H),BB),BB\=@=B,!,correct_cls(KB,cl([not(H)],BB),O).
+correct_cls0(_,cl([ ~( poss(H))],B),cl([z_unused(~pos(H:-B))],[])):-member( ~( H),B),!.
+correct_cls0(KB,cl([ ~( poss(H))],B),O):- correct_cls0(KB,cl([ ~( (H))],B),O).
+correct_cls0(KB,cl([ ~( H)],B),O):- delete_sublits(B,poss(H),BB),BB\=@=B,!,correct_cls(KB,cl([ ~( H)],BB),O).
+correct_cls0(KB,cl([ ~( H)],B),O):- delete_sublits(B,(H),BB),BB\=@=B,!,correct_cls(KB,cl([ ~( H)],BB),O).
 correct_cls0(KB,cl([H],B),O):- delete_sublits(B,H,BB),BB\=@=B,!,correct_cls(KB,cl([H],BB),O).
-correct_cls0(KB,cl([H],B),O):- delete_sublits(B,not(H),BB),BB\=@=B,!,correct_cls(KB,cl([H],BB),O).
+correct_cls0(KB,cl([H],B),O):- delete_sublits(B, ~( H),BB),BB\=@=B,!,correct_cls(KB,cl([H],BB),O).
 
-correct_cls0(KB,cl(H,B),O):- member(E,B),E=poss(not(_)),delete_sublits(B,E,BB),BB\=@=B,!,correct_cls(KB,cl(H,BB),O).
-correct_cls0(KB,cl(H,B),O):- member(E,B),E=nesc(not(P)),delete_sublits(B,E,BB),BB\=@=B,!,correct_cls(KB,cl(H,[not(P)|BB]),O).
+correct_cls0(KB,cl(H,B),O):- member(E,B),E=poss( ~( _)),delete_sublits(B,E,BB),BB\=@=B,!,correct_cls(KB,cl(H,BB),O).
+correct_cls0(KB,cl(H,B),O):- member(E,B),E=nesc( ~( P)),delete_sublits(B,E,BB),BB\=@=B,!,correct_cls(KB,cl(H,[ ~( P)|BB]),O).
 correct_cls0(KB,cl(H,B),O):- member(E,B),delete_sublits(B,poss(E),BB),BB\=@=B,!,correct_cls(KB,cl(H,BB),O).
-correct_cls0(KB,cl(H,B),O):- member(not(E),B),delete_sublits(B,poss(E),BB),BB\=@=B,!,correct_cls(KB,cl(H,BB),O).
-correct_cls0(KB,cl(H,B),O):- member(not(E),B),delete_sublits(B,E,BB),BB\=@=B,!,correct_cls(KB,cl(H,BB),O).
-correct_cls0(KB,cl(H,B),O):- member(nesc(not(E)),B),delete_sublits(B,poss(E),BB),BB\=@=B,!,correct_cls(KB,cl(H,BB),O).
+correct_cls0(KB,cl(H,B),O):- member( ~( E),B),delete_sublits(B,poss(E),BB),BB\=@=B,!,correct_cls(KB,cl(H,BB),O).
+correct_cls0(KB,cl(H,B),O):- member( ~( E),B),delete_sublits(B,E,BB),BB\=@=B,!,correct_cls(KB,cl(H,BB),O).
+correct_cls0(KB,cl(H,B),O):- member(nesc( ~( E)),B),delete_sublits(B,poss(E),BB),BB\=@=B,!,correct_cls(KB,cl(H,BB),O).
 
 % correct_cls0(KB,cl([(poss(H))],B),O):- correct_cls0(KB,cl([((H))],B),O).
 
-correct_cls0(_,cl(H,B),O):- member(E,B),member(not(E),B),!,incorrect_cl(cl(H,B),O).
+correct_cls0(_,cl(H,B),O):- member(E,B),member( ~( E),B),!,incorrect_cl(cl(H,B),O).
 
 correct_cls0(_,cl([nesc((H))],B),cl([z_unused(nesc(H:-B))],[])):-member((H),B),!.
-correct_cls0(KB,cl([nesc((H))],B),O):- delete_sublits(B,not(H),BB),BB\=@=B,!,correct_cls(KB,cl([(H)],BB),O).
-correct_cls0(KB,cl([not((H))],B),O):- correct_cls(KB,cl([not(poss(H))],B),O).
+correct_cls0(KB,cl([nesc((H))],B),O):- delete_sublits(B, ~( H),BB),BB\=@=B,!,correct_cls(KB,cl([(H)],BB),O).
+correct_cls0(KB,cl([ ~( (H))],B),O):- correct_cls(KB,cl([ ~( poss(H))],B),O).
 */
 
 correct_cls0(_KB,cl(H,B),O):- !,O=cl(H,B).

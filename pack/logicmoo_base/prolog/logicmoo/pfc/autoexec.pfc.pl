@@ -100,19 +100,20 @@
          op(700,xfx,('==')).
 
 
+:- set_mpred_module(baseKB).
 
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('mpred_system.pfc')).
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('boot_system.pfc')).
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('if_missing.pfc')).
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('system_if_missing.pfc')).
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('mpred_default.pfc')).
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('system_mdefault.pfc')).
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('singleValued.pfc')).
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('system_singleValued.pfc')).
 
 :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('logicmoo/snark/common_logic_clif.pfc')).
 
-% :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('relationAllExists.pfc')).
+% :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('user_relationAllExists.pfc')).
 
 :-multifile(lmconf:locked_baseKB/0).
 :-dynamic(lmconf:locked_baseKB/0).

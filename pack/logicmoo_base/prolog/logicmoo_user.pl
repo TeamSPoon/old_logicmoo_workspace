@@ -4,12 +4,11 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- if(('$set_source_module'(CM,CM),'$module'(M,M),asserta(logicmoo_user_base:user_module_uses(M,CM)))).
+:- if(('$set_source_module'(CM,CM),'$module'(M,M),logicmoo_user_base:asserta(user_module_uses(M,CM)))).
 :- endif.
 :- module(logicmoo_user_base,
  [
  fix_ops_for/1,
- user_module_uses/2,
  op(1199,fx,('==>')), 
  op(1190,xfx,('::::')),
  op(1180,xfx,('==>')),

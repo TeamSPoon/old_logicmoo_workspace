@@ -61,9 +61,11 @@ Per-Litteral features
             body_for_mpred_1/5,
             body_for_mpred_2/5,
             body_for_pfc/5,
-            boxlog_to_compile/2,
-            boxlog_to_compile/3,
-            boxlog_to_compile2/4,
+          boxlog_to_pfc/2,
+          boxlog_to_pfc_pass_1/2,
+          boxlog_to_pfc_pass_2/3,
+          boxlog_to_pfc_pass_4/2,
+            boxlog_to_pfc_pass_3/4,
             can_use_hack/1,
             conjoin_body/3,
             conjoin_maybe/3,
@@ -97,6 +99,23 @@ Per-Litteral features
 
 :- include('../mpred/mpred_header.pi').
 :- common_logic_boxlog:use_module(library(dialect/hprolog),[]).
+
+:-
+ op(1199,fx,('==>')), 
+ op(1190,xfx,('::::')),
+ op(1180,xfx,('==>')),
+ op(1170,xfx,'<==>'),  
+ op(1160,xfx,('<-')),
+ op(1150,xfx,'=>'),
+ op(1140,xfx,'<='),
+ op(1130,xfx,'<=>'), 
+ op(600,yfx,'&'), 
+ op(600,yfx,'v'),
+ op(350,xfx,'xor'),
+ op(300,fx,'~'),
+ op(300,fx,'-').
+
+:- op(1100,fx,(shared_multifile)).
 
 
 %= 	 	 
@@ -154,7 +173,7 @@ is_unit(A,B,C,D,E,F,G,H):-is_unit(A,B,C,D),is_unit(E,F,G,H).
 is_unit(A,B,C,D,E,F,G,H,I):-is_unit(A,B,C,D),is_unit(E,F,G,H,I).
 is_unit(A,B,C,D,E,F,G,H,I,J):-is_unit(A,B,C,D),is_unit(E,F,G,H,I,J).
 
-% might trace down when it is not
+% might trace down when it is ~
 % vg(G):-var(G),!,fail.
 
 %= 	 	 
@@ -218,89 +237,84 @@ get_op_alias_compile(I,O):-get_op_alias(I,O),( I== (:-)),( O\== (:-)),!.
 get_op_alias_compile(_,fwc).
 
 
-%= 	 	 
 
-%% boxlog_to_compile( ?H, ?OUTPUT) is semidet.
+%% boxlog_to_pfc( :TermPFCM, ?PFC) is semidet.
+%
+% Datalog Converted To Prolog Forward Chaining.
+%
+boxlog_to_pfc(PFCM,PFC):- is_list(PFCM),must_maplist(boxlog_to_pfc,PFCM,PFC).
+boxlog_to_pfc((A,B),C):- !, must_maplist(boxlog_to_pfc,[A,B],[AA,BB]),conjoin(AA,BB,C).
+boxlog_to_pfc(BOXLOG,PFCO):- subst(BOXLOG,(not),(~),BOXLOGM),must(boxlog_to_pfc_pass_1(BOXLOGM,PFC)),!,subst(PFC,(not),(~),PFCO).
+
+
+%% boxlog_to_pfc_pass_1( ?H, ?OUTPUT) is semidet.
 %
 % Datalog Converted To Compile.
 %
-boxlog_to_compile(H,OUTPUT):- get_op_alias_compile((:-),TYPE),!,
+boxlog_to_pfc_pass_1(H0,OUTPUT):-
+  subst(H0,('not'),('~'),H),
+  get_op_alias_compile((:-),TYPE),!,
   lock_vars(H),
-  must((boxlog_to_compile(TYPE,H,OUTPUTM))),!,OUTPUTM=OUTPUT,
+  must((boxlog_to_pfc_pass_2(TYPE,H,OUTPUTM))),!,OUTPUTM=OUTPUT,
   unlock_vars(OUTPUT).
 
+	 
 
-%= 	 	 
-
-%% boxlog_to_compile( ?TYPE, :TermH, ?OUTPUT) is semidet.
+%% boxlog_to_pfc_pass_2( ?TYPE, :TermH, ?OUTPUT) is semidet.
 %
 % Datalog Converted To Compile.
 %
 
-boxlog_to_compile(_,(H:-(Cwc,B)),(H:-(Cwc,B))):- Cwc == cwc,!.
-boxlog_to_compile(Mode,(H:-(Cwc,B)),(H:-(Cwc,B))):- Mode == Cwc,!.
-boxlog_to_compile(cwc,H,OUTPUT):-!, boxlog_to_compile((:-),H,OUTPUT).
-boxlog_to_compile(==>,H,OUTPUT):-!, boxlog_to_compile(fwc,H,OUTPUT).
-boxlog_to_compile(=>,H,OUTPUT):-!, boxlog_to_compile(fwc,H,OUTPUT).
-boxlog_to_compile(<=,H,OUTPUT):-!, boxlog_to_compile(fwc,H,OUTPUT).
-boxlog_to_compile(<-,H,OUTPUT):-!, boxlog_to_compile(bwc,H,OUTPUT).
-boxlog_to_compile(rev(==>),H,OUTPUT):-!, boxlog_to_compile(fwc,H,OUTPUT).
-boxlog_to_compile(rev(=>),H,OUTPUT):-!, boxlog_to_compile(fwc,H,OUTPUT).
-boxlog_to_compile(~(WHAT),(not(H):-B),OUTPUT):-!, boxlog_to_compile(WHAT,(not(H):-B),OUTPUT).
-boxlog_to_compile(~(WHAT),not(H),OUTPUT):-!, boxlog_to_compile(WHAT,not(H),OUTPUT).
+boxlog_to_pfc_pass_2(Why,I,O):-nonvar(O),!,boxlog_to_pfc_pass_2(Why,I,M),!,mustvv(M=O).
+boxlog_to_pfc_pass_2(_,(H:-(Cwc,B)),(H:-(Cwc,B))):- Cwc == cwc,!.
+boxlog_to_pfc_pass_2(Mode,(H:-(Cwc,B)),(H:-(Cwc,B))):- Mode == Cwc,!.
+boxlog_to_pfc_pass_2(cwc,H,OUTPUT):-!, boxlog_to_pfc_pass_2((:-),H,OUTPUT).
+boxlog_to_pfc_pass_2(==>,H,OUTPUT):-!, boxlog_to_pfc_pass_2(fwc,H,OUTPUT).
+boxlog_to_pfc_pass_2(=>,H,OUTPUT):-!, boxlog_to_pfc_pass_2(fwc,H,OUTPUT).
+boxlog_to_pfc_pass_2(<=,H,OUTPUT):-!, boxlog_to_pfc_pass_2(fwc,H,OUTPUT).
+boxlog_to_pfc_pass_2(<-,H,OUTPUT):-!, boxlog_to_pfc_pass_2(bwc,H,OUTPUT).
+boxlog_to_pfc_pass_2(rev(==>),H,OUTPUT):-!, boxlog_to_pfc_pass_2(fwc,H,OUTPUT).
+boxlog_to_pfc_pass_2(rev(=>),H,OUTPUT):-!, boxlog_to_pfc_pass_2(fwc,H,OUTPUT).
+boxlog_to_pfc_pass_2(~(WHAT),(~(H):-B),OUTPUT):-!, boxlog_to_pfc_pass_2(WHAT,(~(H):-B),OUTPUT).
+boxlog_to_pfc_pass_2(~(WHAT),~(H),OUTPUT):-!, boxlog_to_pfc_pass_2(WHAT,~(H),OUTPUT).
 
-boxlog_to_compile((:-),(not(H):-B),unused_true((not(H):-B))):- nonvar(H),prologBuiltin(H),!.
-boxlog_to_compile((:-),(not(H):-B),(HH:-(cwc,BBB))):-body_for_pfc((:-),~(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
-boxlog_to_compile((:-),(H:-B),OUT):-pfcControlled(H),boxlog_to_compile((bwc),(H:-B),OUT),!.
-boxlog_to_compile((:-),(H:-B),(HH:-(cwc,BBB))):- body_for_pfc((:-),H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
-boxlog_to_compile((:-),not(H),~(H)):-  !.
-boxlog_to_compile((:-),H,H):-  !.
+boxlog_to_pfc_pass_2((:-),(~(H):-B),unused_true((~(H):-B))):- nonvar(H),prologBuiltin(H),!.
+boxlog_to_pfc_pass_2((:-),(~(H):-B),(HH:-(cwc,BBB))):-body_for_pfc((:-),~(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_pfc_pass_2((:-),(H:-B),OUT):-pfcControlled(H),boxlog_to_pfc_pass_2((bwc),(H:-B),OUT),!.
+boxlog_to_pfc_pass_2((:-),(H:-B),(HH:-(cwc,BBB))):- body_for_pfc((:-),H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_pfc_pass_2((:-),~(H),~(H)):-  !.
+boxlog_to_pfc_pass_2((:-),H,H):-  !.
 
-:-
- op(1199,fx,('==>')), 
- op(1190,xfx,('::::')),
- op(1180,xfx,('==>')),
- op(1170,xfx,'<==>'),  
- op(1160,xfx,('<-')),
- op(1150,xfx,'=>'),
- op(1140,xfx,'<='),
- op(1130,xfx,'<=>'), 
- op(600,yfx,'&'), 
- op(600,yfx,'v'),
- op(350,xfx,'xor'),
- op(300,fx,'~'),
- op(300,fx,'-').
 
-:- op(1100,fx,(shared_multifile)).
 
-boxlog_to_compile(fwc,(not(H):-B),unused_true((not(H):-B))):- nonvar(H),H = skolem(_,_),!.
-boxlog_to_compile(fwc,(not(H):-B),OUT):- term_slots(H,HV),term_slots(B,BV), HV\==BV,!,boxlog_to_compile(bwc,(not(H):-B),OUT).
-boxlog_to_compile(fwc,(not(H):-B),(BBB==>HH)):- body_for_pfc(fwc,~(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
-boxlog_to_compile(fwc,(H:-B),(BBB==>HH)):- body_for_pfc(fwc,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
-boxlog_to_compile(fwc,not(H),~(H)):-  !.
-boxlog_to_compile(fwc,H,H):-  !.
+boxlog_to_pfc_pass_2(fwc,(~(H):-B),unused_true((~(H):-B))):- nonvar(H),H = skolem(_,_),!.
+boxlog_to_pfc_pass_2(fwc,(~(H):-B),OUT):- term_slots(H,HV),term_slots(B,BV), HV\==BV,!,boxlog_to_pfc_pass_2(bwc,(~(H):-B),OUT).
+boxlog_to_pfc_pass_2(fwc,(~(H):-B),(BBB==>HH)):- body_for_pfc(fwc,~(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_pfc_pass_2(fwc,(H:-B),(BBB==>HH)):- body_for_pfc(fwc,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_pfc_pass_2(fwc,~(H),~(H)):-  !.
+boxlog_to_pfc_pass_2(fwc,H,H):-  !.
 
-boxlog_to_compile(bwc,(not(H):-B),unused_true((not(H):-B))):- nonvar(H),H = skolem(_,_),!.
-boxlog_to_compile(bwc,(not(H):-B),(HH<-BBB)):-body_for_pfc(<-,~(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
-boxlog_to_compile(bwc,(H:-B),OUT):- a(pfcRHS,H),term_slots(H,HV),term_slots(B,BV),HV==BV,boxlog_to_compile((fwc),(H:-B),OUT),!.
-boxlog_to_compile(bwc,(H:-B),(HH<-BBB)):- body_for_pfc(<-,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
-boxlog_to_compile(bwc,not(H),~(H)):-  !.
-boxlog_to_compile(bwc,H,H):-  !.
+boxlog_to_pfc_pass_2(bwc,(~(H):-B),unused_true((~(H):-B))):- nonvar(H),H = skolem(_,_),!.
+boxlog_to_pfc_pass_2(bwc,(~(H):-B),(HH<-BBB)):-body_for_pfc(<-,~(H),HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_pfc_pass_2(bwc,(H:-B),OUT):- a(pfcRHS,H),term_slots(H,HV),term_slots(B,BV),HV==BV,boxlog_to_pfc_pass_2((fwc),(H:-B),OUT),!.
+boxlog_to_pfc_pass_2(bwc,(H:-B),(HH<-BBB)):- body_for_pfc(<-,H,HH,B,BB),make_must_ground(HH,BB,MMG),conjoin_body(BB,MMG,BBB).
+boxlog_to_pfc_pass_2(bwc,~(H),~(H)):-  !.
+boxlog_to_pfc_pass_2(bwc,H,H):-  !.
 
-boxlog_to_compile(TYPE,(H:-BB),OUTPUT):- !,boxlog_to_compile2(TYPE,H,BB,OUTPUT).
-boxlog_to_compile(TYPE,not(H),OUTPUT):-  !,boxlog_to_compile2(TYPE,not(H),true,OUTPUT).
-boxlog_to_compile(TYPE,H,OUTPUT):-     !,boxlog_to_compile2(TYPE,H,true,OUTPUT).
+boxlog_to_pfc_pass_2(TYPE,(H:-BB),OUTPUT):- !,boxlog_to_pfc_pass_3(TYPE,H,BB,OUTPUT).
+boxlog_to_pfc_pass_2(TYPE,~(H),OUTPUT):-  !,boxlog_to_pfc_pass_3(TYPE,~(H),true,OUTPUT).
+boxlog_to_pfc_pass_2(TYPE,H,OUTPUT):-     !,boxlog_to_pfc_pass_3(TYPE,H,true,OUTPUT).
 
 
 %= 	 	 
 
-%% boxlog_to_compile2( ?TYPE, ?H, ?BB, :TermH) is semidet.
+%% boxlog_to_pfc_pass_3( ?TYPE, ?H, ?BB, :TermH) is semidet.
 %
 % Datalog Converted To Compile Extended Helper.
 %
-boxlog_to_compile2(TYPE,not(H),BB,(~(H):-OUTPUT)):-!,conjoin_maybe(TYPE,BB,OUTPUT).
-boxlog_to_compile2(TYPE,H,BB,(H:-OUTPUT)):- conjoin_maybe(TYPE,BB,OUTPUT).
-boxlog_to_compile2(TYPE,H,BB,(H:-OUTPUT)):- conjoin_maybe(TYPE,BB,OUTPUT).
+boxlog_to_pfc_pass_3(TYPE,~(H),BB,(~(H):-OUTPUT)):-!,conjoin_maybe(TYPE,BB,OUTPUT).
+boxlog_to_pfc_pass_3(TYPE,H,BB,(H:-OUTPUT)):- conjoin_maybe(TYPE,BB,OUTPUT).
+boxlog_to_pfc_pass_3(TYPE,H,BB,(H:-OUTPUT)):- conjoin_maybe(TYPE,BB,OUTPUT).
 
 
 %= 	 	 
@@ -394,7 +408,7 @@ overlapingFunctors(_,t):-!.
 get_reln(C,F):-var(C),!,F=_.
 get_reln(C,F):-is_ftVar(C),!,F=_.
 get_reln(~(C),RO):-nonvar(C),!,get_reln(C,RO).
-get_reln(not(C),RO):-nonvar(C),!,get_reln(C,RO).
+get_reln(~(C),RO):-nonvar(C),!,get_reln(C,RO).
 get_reln(\+(C),RO):-nonvar(C),!,get_reln(C,RO).
 get_reln('{}'(C),RO):-nonvar(C),!,get_reln(C,RO).
 get_reln(C,RO):-get_functor(C,F),
@@ -445,17 +459,23 @@ head_for_skolem(H,if_missing(H,HH),skolem(In,NewOut)):- contains_var(In,H),subst
 
 
 
-%= 	 	 
 
-%% body_for_mpred_2( ?Mode, ?Head, ?Head, ?A, ?A) is semidet.
+%% body_for_mpred_2( +Mode, +Head, -NewHead, +BodyIn, -NewBody) is semidet.
 %
-% body for Managed Predicate  Extended Helper.
+%  Make a NewHead and a NewBody for +Mode using Head+Body
 %
-body_for_mpred_2(_Mode,Head,Head,A,A):-is_ftVar(A).
+body_for_mpred_2(_Mode,Head,Head,A,A):- must(\+ is_ftVar(A)),fail.
+body_for_mpred_2(_Mode,Head,Head,A,A):-is_ftVar(A),!,must(\+ is_ftVar(Head)).
+
+% body_for_mpred_2(_Mode,if_missing(A,B),if_missing(A,B),Body,Body):-!.
+
 body_for_mpred_2(Mode,Head,HeadO,(A,B), C):-!,body_for_mpred_1(Mode,Head,HeadM,A,AA),body_for_pfc(Mode,HeadM,HeadO,B,BB),conjoin_body(AA,BB,C).
 body_for_mpred_2(Mode,Head,HeadO,(A;B),(AA;BB)):-!,body_for_mpred_1(Mode,Head,HeadM,A,AA),body_for_pfc(Mode,HeadM,HeadO,B,BB).
 body_for_mpred_2((:-),Head,HeadO,(A/B),(AA,BB)):-!,body_for_mpred_1(Mode,Head,HeadM,A,AA),body_for_pfc(Mode,HeadM,HeadO,B,BB).
 body_for_mpred_2(Mode,Head,HeadO,(A/B),(AA/BB)):-!,body_for_mpred_1(Mode,Head,HeadM,A,AA),body_for_pfc(Mode,HeadM,HeadO,B,BB).
+
+body_for_mpred_2((fwc),H,HEAD,I,O):- H\=if_missing(_,_), sub_term(Var,H),attvar(Var),get_attr(Var,sk,Sk),subst(H,Var,NewVar,NewH),head_for_skolem(NewH,SKHEAD,skolem(NewVar,Sk)), !,
+   body_for_mpred_2((fwc),SKHEAD,HEAD,I,O).
 
 body_for_mpred_2((fwc),H,HEAD,{skolem(In,NewOut)},true):- head_for_skolem(H,HEAD,skolem(In,NewOut)),!.
 body_for_mpred_2((fwc),H,HEAD,skolem(In,NewOut),true):- head_for_skolem(H,HEAD,skolem(In,NewOut)).
@@ -466,7 +486,7 @@ body_for_mpred_2(_Mode,Head,Head,poss(X),{loop_check(\+ ~(X),true)}).
 % body_for_mpred_2(Mode,Head,Head,skolem(In,Out),{(In=Out;when('nonvar'(In),ignore((In=Out))))}).
 % body_for_mpred_2(Mode,Head,Head,skolem(In,Out),{when((?=(In,_);nonvar(In)),ignore(Out=In))}).
 body_for_mpred_2(Mode,Head,NewHead,B,BBB):- once(reduce_literal(B,BB)),B\=@=BB,!,body_for_mpred_1(Mode,Head,NewHead,BB,BBB).
-body_for_mpred_2(_Mode,Head,Head,not(A),~(A)):-!.
+body_for_mpred_2(_Mode,Head,Head,~(A),~(A)):-!.
 body_for_mpred_2(_Mode,Head,Head,different(A,B),{dif:dif(A,B)}).
 body_for_mpred_2(_Mode,Head,Head,A,{A}):-prologBuiltin(A),!.
 body_for_mpred_2(_Mode,Head,Head,A,A).
@@ -507,4 +527,43 @@ can_use_hack(_).
 % Did Use Hack.
 %
 did_use_hack(X):-wdmsg(did_use_hack(X)).
+
+
+
+
+
+%= 	 	 
+
+%% boxlog_to_pfc_pass_4( :TermIN, :TermOUT) is semidet.
+%
+% Datalog Converted To Prolog.
+%
+boxlog_to_pfc_pass_4(IN,OUT):-notrace(leave_as_is(IN)),!,IN=OUT.
+boxlog_to_pfc_pass_4(H, HH):-is_list(H),!,must_maplist(boxlog_to_pfc_pass_4,H,HH).
+boxlog_to_pfc_pass_4(IN,OUT):-once(demodal_sents('$VAR'('KB'),IN,MID)),IN\=@=MID,!,boxlog_to_pfc_pass_4(MID,OUT).
+boxlog_to_pfc_pass_4(IN,OUT):-once(subst_except(IN,not,~,MID)),IN\=@=MID,!,boxlog_to_pfc_pass_4(MID,OUT).
+boxlog_to_pfc_pass_4(IN,OUT):-once(subst_except(IN,poss,possible_t,MID)),IN\=@=MID,!,boxlog_to_pfc_pass_4(MID,OUT).
+
+boxlog_to_pfc_pass_4((V:- TRUE),VE):- is_true(TRUE),boxlog_to_pfc_pass_4(V,VE),!.
+boxlog_to_pfc_pass_4((H:- B),(HH:- BB)):- !,boxlog_to_pfc_pass_4(H,HH),boxlog_to_pfc_pass_4(B,BB).
+boxlog_to_pfc_pass_4((H & B),(HH , BB)):- !,boxlog_to_pfc_pass_4(H,HH),boxlog_to_pfc_pass_4(B,BB).
+boxlog_to_pfc_pass_4((H v B),(HH ; BB)):- !,boxlog_to_pfc_pass_4(H,HH),boxlog_to_pfc_pass_4(B,BB).
+boxlog_to_pfc_pass_4((H , B),(HH , BB)):- !,boxlog_to_pfc_pass_4(H,HH),boxlog_to_pfc_pass_4(B,BB).
+boxlog_to_pfc_pass_4((H ; B),(HH ; BB)):- !,boxlog_to_pfc_pass_4(H,HH),boxlog_to_pfc_pass_4(B,BB).
+boxlog_to_pfc_pass_4(H,O):- H=..[N,nesc(F)],kb_nlit(_,N),nonvar(F),!,HH=..[N,F],boxlog_to_pfc_pass_4(HH,O).
+
+/*
+boxlog_to_pfc_pass_4(nesc( ~(F)),O):- nonvar(F),!,boxlog_to_pfc_pass_4(~(F),O).
+boxlog_to_pfc_pass_4(nesc(F),O):- nonvar(F),!,boxlog_to_pfc_pass_4(F,O).
+boxlog_to_pfc_pass_4( ~(nesc(F)),O):- nonvar(F),!,boxlog_to_pfc_pass_4(naf(F),O).
+boxlog_to_pfc_pass_4(~poss(F),O):-nonvar(F),!,boxlog_to_pfc_pass_4(not_poss(F),O).
+boxlog_to_pfc_pass_4( ~(H), ~(HH)):- !,boxlog_to_pfc_pass_4(H,HH).
+boxlog_to_pfc_pass_4( ~(F),~(O)):- nonvar(F),!,boxlog_to_pfc_pass_4(F,O).
+*/
+
+boxlog_to_pfc_pass_4(IN,OUT):-demodal_sents(_KB,IN,M),IN\=@=M,!,boxlog_to_pfc_pass_4(M,OUT).
+
+
+boxlog_to_pfc_pass_4( H, HH):- H=..[F|ARGS],!,boxlog_to_pfc_pass_4(ARGS,ARGSO),!,HH=..[F|ARGSO].
+boxlog_to_pfc_pass_4(BL,PTTP):- as_prolog(BL,PTTP).
 

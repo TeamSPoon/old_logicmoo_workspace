@@ -29,7 +29,8 @@ otherGender(female,male).
 
 tCol(male).
 :- dynamic((bore_offspring/2, gender/2)).
-bore_offspring(C,P) <=> bore_offspring(C,P).
+
+bore_offspring(P2,P1) <=> bore_offspring(P1,P2).
 
 (bore_offspring(C,P),gender(P,G1), otherGender(G1,G2))
      => gender(C,G2).

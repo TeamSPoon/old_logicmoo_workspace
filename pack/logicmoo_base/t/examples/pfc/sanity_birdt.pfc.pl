@@ -53,7 +53,7 @@ tCanary(iTweety).
 
 
 :- dmsg("birds fly by default.").
-mpred_default(( tBird(X) ==> tFly(X))).
+mdefault(( tBird(X) ==> tFly(X))).
 
 :- dmsg("make sure chilly can fly").
 :- mpred_test((isa(I,tFly),I=iChilly)).

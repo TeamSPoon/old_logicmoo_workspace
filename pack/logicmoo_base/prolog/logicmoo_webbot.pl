@@ -72,7 +72,7 @@ fix_ops_for(CM):-
 
 % in case something changed
 :- logicmoo_user_base:user_module_uses(M,CM),!,fix_ops_for(M),fix_ops_for(CM),dmsg(user_module_uses(M,CM)).
-:- system:((logicmoo_user_base:user_module_uses(M,CM)->(('$module'(_,M),'$set_source_module'(_,CM)));true)).
+:- ((logicmoo_user_base:user_module_uses(M,CM)->((system:'$module'(_,M),system:'$set_source_module'(_,CM)));true)).
 
 :- nop((autoload,scan_for_varnames)).
 

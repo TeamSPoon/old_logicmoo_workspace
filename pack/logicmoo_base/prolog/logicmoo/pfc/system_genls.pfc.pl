@@ -2,6 +2,8 @@
 
 :- file_begin(pfc).
 
+:- set_mpred_module(baseKB).
+
 ((genls(X,Y),genls(Y,X),{X\==Y}) ==> {mpred_rem1(genls(X,Y))}).
 
 %:-rtrace.

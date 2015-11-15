@@ -33,6 +33,7 @@
 
 :- include(logicmoo(mpred/'mpred_header.pi')).
 
+:- set_mpred_module(baseKB).
 
 
 /*
@@ -202,20 +203,18 @@ prologHybrid(genls/2).
   ({    
     functor(G,F,A),
      (var(M)->t_l:user_abox(M);true),
-     (var(M)->predicate_property(M:G,exported);true),
      (var(M)->ignore(( current_predicate(F,M:G), \+ predicate_property(M:G,imported_from(_))));true),
+     (var(M)->predicate_property(M:G,exported);true),
      % mpred_test(rebuild_pred_into(G,G,ain,[+dynamic,+multifile,+discontiguous])),         
-     (predicate_property(M:G,dynamic)->true;must(convert_to_dynamic(M,F,A))),
-     import_to_user(M:G),
+     % (predicate_property(M:G,dynamic)->true;must(convert_to_dynamic(M,F,A))),
      kb_dynamic(M:F/A),
-     discontiguous(M:F/A),
      show_failure(hybrid_support, \+ static_predicate(F/A))}),
      prologHybrid(F),
     arity(F,A)).
 
 ((prologHybrid(F),arity(F,A))<==>hybrid_support(F,A)).
 
-:- ensure_loaded('mpred_markers.pfc').
+:- ensure_loaded('system_markers.pfc').
 
 arity(genlPreds,2).
 
@@ -588,7 +587,7 @@ tCol(functorDeclares).
 tCol(ttFormatType).
 
 
-:- ensure_loaded('genls.pfc').
+:- ensure_loaded('system_genls.pfc').
 
 genls(ttSpatialType,ttTemporalType).
 genls(tSpatialThing,tTemporalThing).
@@ -1109,9 +1108,9 @@ specialFunctor('/').
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 /*
-:- mpred_test((expand_props(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O),ain(mpred_default(O)))).
+:- mpred_test((expand_props(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O),ain(mdefault(O)))).
 
-:- mpred_test((fully_expand(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O),mpred_why(mpred_default(O)))).
+:- mpred_test((fully_expand(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O),mpred_why(mdefault(O)))).
 */
 :- endif.
 

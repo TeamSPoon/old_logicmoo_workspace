@@ -34,30 +34,32 @@
 
 :- file_begin(pfc).
 
-:- dynamic(mpred_default/1).
+:- set_mpred_module(baseKB).
 
-meta_argtypes(mpred_default(ftAssertable)).
+:- dynamic(mdefault/1).
+
+meta_argtypes(mdefault(ftAssertable)).
 
 % BWD chaining
-mpred_default((Q <- P))/mpred_literal(Q) ==> (Q <-(P, \+ ~(Q))).
+mdefault((Q <- P))/mpred_literal(Q) ==> (Q <-(P, \+ ~(Q))).
 
 % FWD chaining
-mpred_default(P==>Q)/nonvar(Q) ==> (((P ==> mpred_default(Q)))).
-% mpred_default(P==>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test))  ==> ((P, (\+ R)/Test ) ==> Q).
+mdefault(P==>Q)/nonvar(Q) ==> (((P ==> mdefault(Q)))).
+% mdefault(P==>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test))  ==> ((P, (\+ R)/Test ) ==> Q).
 
 % NEG chaining
-mpred_default(~Q)/nonvar(Q)  ==>  (( \+ Q ) ==> ~ Q ).
+mdefault(~Q)/nonvar(Q)  ==>  (( \+ Q ) ==> ~ Q ).
 
 % POS chaining
-mpred_default(Q)/mpred_positive_literal(Q)  ==>  ( \+(~Q)  ==> Q ).
-mpred_default(Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)) ==> ( (\ +R/Test ) ==> Q ).
+mdefault(Q)/mpred_positive_literal(Q)  ==>  ( \+(~Q)  ==> Q ).
+mdefault(Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)) ==> ( (\ +R/Test ) ==> Q ).
 
 
 
-% mpred_default(Q) ==> if_missing(Q,Q).
+% mdefault(Q) ==> if_missing(Q,Q).
 
-%(mpred_default(P=>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))  ==> ((P, \+ R/Test) => Q).
-%(mpred_default(P=>Q)/nonvar(Q)) ==> (P => mpred_default(Q)).
+%(mdefault(P=>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))  ==> ((P, \+ R/Test) => Q).
+%(mdefault(P=>Q)/nonvar(Q)) ==> (P => mdefault(Q)).
 
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
