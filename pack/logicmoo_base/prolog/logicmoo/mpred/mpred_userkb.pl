@@ -384,7 +384,7 @@ resolveConflict0(C) :- cwc, forall(must(mpred_negation_w_neg(C,N)),ignore(show_f
 % Resolver Conflict Robot.
 %
 resolverConflict_robot(N) :- cwc, forall(must(mpred_negation_w_neg(N,C)),forall(compute_resolve(C,N,TODO),on_x_rtrace(show_if_debug(TODO)))).
-resolverConflict_robot(C) :- cwc, must((mpred_remove3(C),wdmsg("Rem-3 with conflict ~p", [C]),mpred_run,sanity(\+C))).
+resolverConflict_robot(C) :- cwc, must((mpred_remove4(C),wdmsg("Rem-3 with conflict ~p", [C]),mpred_run,sanity(\+C))).
 
 % never_assert_u(pt(_,Pre,Post),head_singletons(Pre,Post)):- cwc, head_singletons(Pre,Post).
 

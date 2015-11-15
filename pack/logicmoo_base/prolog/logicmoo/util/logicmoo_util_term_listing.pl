@@ -1474,7 +1474,7 @@ prolog_listing_list_clauses(Pred, Source) :-
 % Safe
 prolog_listing_portray_clause(Stream, Term, M:Options) :- fail,
 	must_be(list, Options),
-	meta_options(is_meta, M:Options, QOptions),
+	prolog_listing:meta_options(is_meta, M:Options, QOptions),
 	\+ \+ ( must(serialize_attvars(Term, Copy)),
 		% numbervars(Copy, 0, _,[ singletons(true), attvar(Skip)]),
                 prolog_listing:do_portray_clause(Stream, Copy, QOptions)

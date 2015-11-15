@@ -59,7 +59,7 @@ serialize_attvars(C,A):- C=..[F|Args],maplist(serialize_attvars,Args,OArgs),A=..
 
 
 :- meta_predicate put_dyn_attrs(*,?).
-put_dyn_attrs(V,S):- var(S),!,thread_or_throw(bad_put_dyn_attrs(V,S)),!.
+put_dyn_attrs(V,S):- var(S),!,trace_or_throw(bad_put_dyn_attrs(V,S)),!.
 put_dyn_attrs(V,S):- S= att(_,_,_),!, put_attrs(V,S).
 put_dyn_attrs(V,M:AV):- atom(M),!, M:put_dyn_attrs(V,AV).
 put_dyn_attrs(V,M=AV):- atom(M),!, ensure_attr_setup(M),!, must(put_attr(V,M,AV)).

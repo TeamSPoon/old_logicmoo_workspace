@@ -918,6 +918,8 @@ is_colection_name(IT,T,TT):- atom_length(T,TL),TL>2,not(atom_contains(T,'_')),no
 %
 leave_as_is(V):- is_ftVar(V),!.
 leave_as_is(V):- \+ compound(V),!.
+leave_as_is(poss(_,_)):-!,fail.
+leave_as_is((_,_)):-!,fail.
 leave_as_is((_ :-_ )):-!,fail.
 leave_as_is((_;_)):-!,fail.
 leave_as_is((_/_)):-!,fail.
