@@ -101,9 +101,9 @@ system_goal_expansion_attvars('varname_info'(_,_,_,_),_):-!,fail.
 system_goal_expansion_attvars(T,O):-must(expand_to_attvars(T,T,O)),O\=@=T,!,debugm(xform(T --> O)).
 
 
-system:term_expansion(I,O):- current_prolog_flag(read_attvars,true), system_term_expansion_attvars(I,O) -> I\=@=O.
+system:term_expansion(I,O):- current_prolog_flag(read_attvars,true), \+ current_prolog_flag(xref,true), system_term_expansion_attvars(I,O) -> I\=@=O.
 
-system:goal_expansion(I,O):- current_prolog_flag(read_attvars,true), system_goal_expansion_attvars(I,O) -> I\=@=O.
+system:goal_expansion(I,O):- current_prolog_flag(read_attvars,true), \+ current_prolog_flag(xref,true), system_goal_expansion_attvars(I,O) -> I\=@=O.
 
 
 

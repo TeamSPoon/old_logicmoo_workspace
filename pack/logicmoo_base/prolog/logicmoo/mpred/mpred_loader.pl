@@ -2380,8 +2380,8 @@ never_load_special(_Module:_Spec, Options) :- member(must_be_module(true),Option
 
 :- use_module(logicmoo(util/logicmoo_util_filesystem)).
 :- dynamic(prolog_load_file_loop_checked/2).
-% probably an autoload (SKIP)
 
+% probably an autoload (SKIP)
 
 %= 	 	 
 

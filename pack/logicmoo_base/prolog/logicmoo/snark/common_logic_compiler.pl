@@ -460,7 +460,7 @@ nnf(KB,exists(TypedX,NNF),FreeV,FmlO,Paths):- get_quantifier_isa(TypedX,X,Col),
 % ==== quantifiers ========
 nnf(KB,exists(X,Fml),FreeV,NNF,Paths):-  \+ contains_var(X,Fml),!,trace,nnf(KB,Fml,FreeV,NNF,Paths).
 
-nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(attvar),!,
+nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- % is_skolem_setting(attvar),!,
  must_det_l((
    list_to_set([X|FreeV],NewVars),
     term_slots(NewVars,Slots),
@@ -654,23 +654,24 @@ nnf(_KB,Fml,_,Fml,1):-!.
 nnf_lit(KB,all(X,Fml),FreeV,all(X,FmlO),N):- nonvar(Fml),!,nnf_lit(KB,Fml,FreeV,FmlO,N).
 nnf_lit(KB,not(Fml),FreeV,not(FmlO),N):- nonvar(Fml),!,nnf_lit(KB,Fml,FreeV,FmlO,N).
 
-nnf_lit(KB,Fml,FreeV,FmlO,N):- 
+nnf_lit(KB,Fml,FreeV,FmlO,N3):- 
    Fml=..[F|ARGS],
-   nnf_args(F,1,KB,ARGS,FreeV,FARGS,N1),sanity(N1==1),
+   nnf_args(Fml,F,1,KB,ARGS,FreeV,FARGS,N1),
    Fml2=..[F|FARGS],
-   (Fml2\=@=Fml -> ((nnf_lit(KB,Fml2,FreeV,FmlO,N2),N is (N1 + N2 -1 )));
-      (FmlO=Fml,N=1)).
+   (Fml2 \=@= Fml -> 
+     ((nnf(KB,Fml2,FreeV,FmlO,N2),N3 is (N1 + N2 -1 )));
+      must((FmlO=Fml2, N3 is N1))).
+nnf_args(_Sent,_F,_N,_KB,[],_FreeV,[],0):- !.
 
-nnf_args(F,N,KB,[A],FreeV,[FA],N1):- 
+nnf_args(Sent,F,N,KB,[A|RGS],FreeV,[FA|ARGS],N3):-  
  push_dom(A,argIsaFn(F,N)),
-  nnf(KB,A,FreeV,FA,N1),!.
-
-nnf_args(F,N,KB,[A|RGS],FreeV,[FA|ARGS],N3):- 
- push_dom(A,argIsaFn(F,N)),
-  nnf(KB,A,FreeV,FA,N1), 
+ must((nnf(KB,A,FreeV,FA,N1),number(N1))),
+ push_dom(FA,argIsaFn(F,N)),
+ annote(lit,FA,Sent),
   NPlus1 is N + 1,
-  nnf_args(F,NPlus1,KB,RGS,FreeV,ARGS,N2),
-  N3 is (N1 + N2 -1).
+  nnf_args(Sent,F,NPlus1,KB,RGS,FreeV,ARGS,N2),
+  must(N3 is (N1 + N2 -1)).
+
 
 
 %% is_lit_atom( ?IN) is semidet.

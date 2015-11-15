@@ -473,8 +473,9 @@ pp_why(P):-must((
 % Pretty Print Justifications.
 %
 pp_justifications(P,Js) :-
-  fmt("Justifications for ~w:",[P]),
-  must(pp_justification1(Js,1)).
+  fmt("% Justifications for ~w:",[P]),
+  in_cmt(must(pp_justification1(Js,1))),
+  fmt('~N~n',[]),!.
 
 
 %= 	 	 
@@ -502,9 +503,11 @@ pp_justification1([J|Js],N) :-
 pp_justifications2([],_,_).
 
 pp_justifications2([C|Rest],JustNo,StepNo) :-  
+  (StepNo==1->fmt('~N~n',[]);true),
   fmt("    ~w.~w ~w",[JustNo,StepNo,C]),
   StepNext is 1+StepNo,
   loop_check_just(pp_justifications2(Rest,JustNo,StepNext)).
+  
 
 
 %= 	 	 

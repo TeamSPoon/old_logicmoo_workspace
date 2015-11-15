@@ -71,9 +71,9 @@ mpred_load_restore_file(File):-
   time_file(File,Time),
   qcompile(File),
   ensure_loaded(File),
-   ((\+ (lmconf:loaded_file_world_time(N,_,NewTime),NewTime>Time))->true ;
+   ((\+ (lmconf:loaded_file_world_time(N,_,NewTime),NewTime>=Time)) ->true ;
     (
-    forall((lmconf:loaded_file_world_time(N,_,NewTime),NewTime>Time),lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:N))),
+    ignore((lmconf:loaded_file_world_time(N,_,NewTime),NewTime>Time,lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:N)),fail)),
     mpred_save_restore_file(File))))),!.
 
 
@@ -100,7 +100,8 @@ mpred_save_restore_file(File):-
       format('~N:- style_check(-singleton).~n'),
       listing(lmconf:loaded_file_world_time/3),
       flush_output,
-   told)).
+   told)),!.
+  
 
 
 :- mpred_load_restore_file('baseKB_autoexec.pl').

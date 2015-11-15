@@ -36,7 +36,7 @@ human(trudy).
 human(eileen).
 human(douglas).
 mother(douglas,eileen).
-mother(eileen,trudy).
+
 
 %= catch a regression bug that may couse trudy to lose human assertion
 never_retract_u(human(trudy)).
@@ -52,7 +52,11 @@ clif(forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f)))))).
 
 :- must(clif(forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f))))))).
 
+mother(eileen,trudy).
+
 :- must(\+ mother(eileen,skArg1ofMother_1Fn(_))).
+
+:- ain(father(douglas,russ)).
 
 :- printAll(must(father(_,_))).
 :- printAll(must(mother(_,_))).
