@@ -1631,7 +1631,7 @@ mk_skolem(KB, Fml, X, FreeV, FmlOut):-
    must(skolem_f(KB, Fml, X, FreeV, Sk)),   
    must(FmlOut= Fml),
    !,show_call(why, asserta((constraintRules(X,Sk,Fml)))),
-   form_sk(X,Fml).
+   form_sk(X,Sk).
 
 mk_skolem(KB, F, X, FreeV, FmlSk):- 
     must(skolem_f(KB, F, X, FreeV, Sk)), 
