@@ -22,6 +22,7 @@ ain_fast_sp/2,
 ain_fast_sp0/2,
 ain_fast_timed/2,
 ain_minfo/1,
+mpred_retry/1,
 ain_minfo/2,
 ain_minfo_2/2,
 ain_rule0/1,
@@ -410,6 +411,7 @@ without_running/1,
 
 :- meta_predicate 
       attvar_op(1,*),
+      mpred_retry(0),
       brake(0),
       call_i(0),
       call_prologsys(0),
@@ -3203,7 +3205,7 @@ mpred_eval_lhs0(X,Support) :-
   cyclic_break((X)),  
   mpred_db_type(X,trigger),
   !,
-  ain_trigger(X,Support),
+  doall(show_call(ain_trigger(X,Support))),
   !.
 
 %mpred_eval_lhs0(snip(X),Support) :-
@@ -3213,6 +3215,8 @@ mpred_eval_lhs0(X,Support) :-
 mpred_eval_lhs0(X,Why) :-
   mpred_warn("Unrecognized item found in trigger body, namely ~p.",[mpred_eval_lhs0(X,Why)]),!.
 
+
+mpred_retry(G):- fail;G.
 
 %=
 %= eval something on the RHS of a rule.
@@ -3237,12 +3241,12 @@ mpred_eval_rhs_0(DIR,[Head|Tail],Support) :-
 mpred_eval_rhs1(+,{Action},Support) :-
  % evaluable Prolog code.
  !,
- fc_eval_action(Action,Support),!.
+ fc_eval_action(Action,Support).
 
 mpred_eval_rhs1(+,mpred_action(Action),Support) :-
  % evaluable Prolog code.
  !,
- fc_eval_action(Action,Support),!.
+ fc_eval_action(Action,Support).
 
 mpred_eval_rhs1(+,P,_Support) :-
  % predicate to remove.
@@ -3253,7 +3257,7 @@ mpred_eval_rhs1(+,P,_Support) :-
 mpred_eval_rhs1(DIR,[X|Xrest],Support) :-
  % embedded sublist.
  !,
- mpred_eval_rhs_0(DIR,[X|Xrest],Support),!.
+ mpred_eval_rhs_0(DIR,[X|Xrest],Support).
 
 mpred_eval_rhs1(+,added(Assertion),Support) :-
  % an assertion to be added.
