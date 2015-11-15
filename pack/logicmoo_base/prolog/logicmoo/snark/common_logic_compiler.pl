@@ -460,16 +460,15 @@ nnf(KB,exists(TypedX,NNF),FreeV,FmlO,Paths):- get_quantifier_isa(TypedX,X,Col),
 % ==== quantifiers ========
 nnf(KB,exists(X,Fml),FreeV,NNF,Paths):-  \+ contains_var(X,Fml),!,trace,nnf(KB,Fml,FreeV,NNF,Paths).
 
-nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(attvar), trace,
+nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(attvar),!,
+ must_det_l((
    list_to_set([X|FreeV],NewVars),
-    term_slots(Fml+NewVars,Slots),
+    term_slots(NewVars,Slots),
     delete_eq(Slots,X,SlotsV1),
     delete_eq(SlotsV1,KB,SlotsV2),
-    must(t_l:current_form(OrigFml)),
-    SlotsV3 =.. [sk|SlotsV2],
-    nnf_dnf(KB,OrigFml,DNF),
-    nnf(KB,(~skolem(X,SlotsV3,DNF) v Fml),NewVars,NNF,Paths),!.
-
+    skolem_f(KB, Fml, X, SlotsV2, SkF),
+    push_skolem(X,SkF),
+    nnf(KB,(~skolem(X,SkF) v Fml),NewVars,NNF,Paths))),!.
 
 % ==== quantifiers ========
 nnf(KB,all(X,NNF),FreeV,all(X,NNF2),Paths):-  
