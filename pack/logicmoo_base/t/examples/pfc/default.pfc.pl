@@ -3,6 +3,8 @@
 % -*-Prolog-*-
 % here is an example which defines default facts and rules.  Will it work?
 
+:- begin_pfc.
+
 (default(P)/mpred_literal(P))  ==>  (~( ~P) ==> P).
 
 default((P ==> Q))/mpred_literal(Q) ==> (P, ~( ~Q) ==> Q).
@@ -29,3 +31,10 @@ penguin(X) ==> ( ~fly(X)).
 
 % tweety is a canary.
 ==> canary(tweety).
+
+
+:- mpred_test(~fly(chilly)).
+
+:- mpred_test(fly(tweety)).
+
+

@@ -1,8 +1,7 @@
 :- module(pqr,[]).
 
 
-% :- qcompile(library(logicmoo_user)).
-:- use_module(library('logicmoo_user')).
+:- use_module(library(logicmoo_base)).
 
 :- begin_pfc.
 
@@ -10,10 +9,10 @@
 p(X) ==> q(X).
 q(X) ==> r(X).
 
-:- must(r(1)).
+:- mpred_test(r(1)).
 
 ==> p(2).
 
-:- must(r(2)).
+:- mpred_test(r(2)).
 
   
