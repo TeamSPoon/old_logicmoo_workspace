@@ -958,8 +958,9 @@ dnf1(_KB,DNF,                  DNF ).
 %
 % Simplify Cheap.
 %
+simplify_cheap(IN,OUT):-nonvar(OUT),!,simplify_cheap(IN,M),!,OUT=M.
 simplify_cheap(IN,IN):- leave_as_is(IN),!.
-simplify_cheap(IN,OUT):- IN = nesc(BDT,OUT),is_modal(OUT,BDT),!.
+simplify_cheap(nesc(BDT,OUT),OUT):- !,nonvar(OUT),is_modal(OUT,BDT),!.
 simplify_cheap(poss(BDT,nesc(BDT,IN)),OUT):- simplify_cheap_must(poss(BDT,IN),OUT).
 simplify_cheap(poss(BDT,poss(BDT,IN)),OUT):- simplify_cheap_must(poss(BDT,IN),OUT).
 simplify_cheap(nesc(BDT,poss(BDT,IN)),OUT):- simplify_cheap_must(poss(BDT,IN),OUT).

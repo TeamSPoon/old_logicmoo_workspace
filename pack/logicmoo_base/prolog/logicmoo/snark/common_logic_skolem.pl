@@ -14,7 +14,8 @@
 	  [ form_sk/2,
 	    sk_form/2,
             push_skolem/2,push_skolem/3,
-            push_dom/2,push_dom/3,
+            push_dom/2,push_annote/4,
+            annote/3,
             skolem_unify/2,
             with_no_kif_var_coroutines/1
 	  ]).
@@ -43,9 +44,13 @@ push_skolem(X,Form2,Merged):-get_attr(X,sk,Form1),merge_forms(Form1,Form2,Merged
 push_skolem(X,Form2,Form2):-put_attr(X,sk,Form2).
 
 push_dom(_,_):- \+ is_skolem_setting(push_skolem),!.
-push_dom(X,Form2):-push_dom(X,Form2,_Merged).
-push_dom(X,Form2,Merged):-get_attr(X,dom,Form1),merge_forms(Form1,Form2,Merged),put_attr(X,dom,Merged),!.
-push_dom(X,Form2,Form2):- (nonvar(X) -> true ; put_attr(X,dom,Form2)).
+push_dom(X,Form2):-push_annote(dom, X,Form2,_Merged).
+
+annote(_,_,_):- \+ is_skolem_setting(push_skolem),!.
+annote(Dom,X,Form2):-annote(Dom,X,Form2,_).
+
+push_annote(Dom,X,Form2,Merged):-get_attr(X,Dom,Form1),merge_forms(Form1,Form2,Merged),put_attr(X,Dom,Merged),!.
+push_annote(Dom,X,Form2,Form2):- (nonvar(X) -> true ; put_attr(X,Dom,Form2)).
 
 
 %%	sk_form(+Sk, -Form) is semidet.
@@ -86,5 +91,5 @@ skolem_unify(_Var,Form):- skolem_test(Form).
 
 merge_forms(A,B,A):- A==B,!.
 merge_forms(A,B,A):- A=B,!,wdmsg(seeeeeeeeeeeee_merge_forms(A,B)),!.
-merge_forms(A,B,(A,B)):- wdmsg(sksksksskskskssksksksskskskssksksks_merge_forms(A,B)),!.
+merge_forms(A,B,C):- flatten([A,B],AB),list_to_set(AB,C).
 

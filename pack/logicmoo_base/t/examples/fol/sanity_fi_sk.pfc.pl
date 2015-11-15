@@ -1,6 +1,7 @@
 #!/usr/bin/env swipl
 
 :- module(sanity_fi_sk,[]).
+/*
 :- nodebug(_).
 :- use_module(library(gui_tracer)).
 :- noguitracer.
@@ -9,9 +10,11 @@
 :- visible(+all).
 :- leash(-all).
 :- leash(+exception).
-:- ((trace,ls)).
+%:- ((trace,ls)).
+:- noguitracer.
 :- notrace(leash(+all)).
 :- notrace.
+*/
 :- use_module(library(logicmoo_user)).
 
 %=  setup pfc
