@@ -75,8 +75,6 @@ fix_ops_for(CM):-
 :- logicmoo_user_base:user_module_uses(M,CM),!,fix_ops_for(M),fix_ops_for(CM),dmsg(user_module_uses(M,CM)).
 :- system:((logicmoo_user_base:user_module_uses(M,CM)->(('$module'(_,M),'$set_source_module'(_,CM)));true)).
 
-:-  use_listing_vars.
-:- nop((autoload,scan_for_varnames)).
 
 :- sanity( \+predicate_property(baseKB:_,exported)).
 

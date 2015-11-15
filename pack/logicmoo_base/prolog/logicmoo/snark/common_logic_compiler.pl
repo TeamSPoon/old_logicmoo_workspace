@@ -381,11 +381,12 @@ axiom_lhs_to_rhs(_,poss(beliefs(A,~F1)),~nesc(knows(A,F1))).
 %
 % Negated Normal Form.
 %
+nnf(KB,Lit,FreeV,LitO,N):-nonvar(LitO),!,nnf(KB,Lit,FreeV,LitM,N),!,LitM=LitO.
 nnf(_KB,Lit,FreeV,Lit,1):- var(Lit),!,ignore(FreeV=[Lit]).
 %nnf(_KB,Lit,FreeV,Lit,1):- is_ftVar(Lit),!,trace_or_throw(bad_numbervars(Lit)),ignore(FreeV=[Lit]).
 nnf(KB,Lit,FreeV,Pos,Paths):- is_ftVar(Lit),!,nnf(KB,true_t(Lit),FreeV,Pos,Paths).
 nnf(_KB,Fml,_,Fml,1):- \+ compound(Fml), !.
-nnf(KB,Fml,FreeV,FmlO,N):- leave_as_is(Fml),!, nop(( nnf_lit(KB,Fml,FreeV,FmlO,N))).
+nnf(_KB,Fml,_,Fml,1):- leave_as_is(Fml), !. 
 
 nnf(KB,Lit,FreeV,Pos,1):- is_ftVar(Lit),!,wdmsg(warn(nnf(KB,Lit,FreeV,Pos,1))),Pos=true_t(Lit).
 
@@ -456,8 +457,9 @@ nnf(KB,exists(TypedX,NNF),FreeV,FmlO,Paths):- get_quantifier_isa(TypedX,X,Col),
 
 
 
-
 % ==== quantifiers ========
+nnf(KB,exists(X,Fml),FreeV,NNF,Paths):-  \+ contains_var(X,Fml),!,trace,nnf(KB,Fml,FreeV,NNF,Paths).
+
 nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(attvar), trace,
    list_to_set([X|FreeV],NewVars),
     term_slots(Fml+NewVars,Slots),
@@ -473,8 +475,6 @@ nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(attvar), trace,
 nnf(KB,all(X,NNF),FreeV,all(X,NNF2),Paths):-  
      list_to_set([X|FreeV],NewVars),
       nnf(KB,NNF,NewVars,NNF2,Paths).
-
-nnf(KB,exists(X,Fml),FreeV,NNF,Paths):-  \+ contains_var(X,Fml),!,nnf(KB,Fml,FreeV,NNF,Paths).
 
 nnf(KB,exists(X,Fml),FreeV,NNF,Paths):- is_skolem_setting(push_skolem),!, wdmsg(nnf(skolemizing(push_skolem,exists(X,Fml)))),
    push_skolem(X,true),
@@ -646,17 +646,11 @@ nnf(KB,Fml,FreeV,Out,Path):- Fml=..[F,A],third_order(F),
   Fml2=..[F,KB,NNF1],nnf(KB,Fml2,FreeV,Out,Path2),Path is Path1+Path2.
 */
 
-% nnf(KB, IN,FreeV,OUT,Paths):- simplify_cheap(IN,MID),IN\=MID,nnf(KB, MID,FreeV,OUT,Paths).
+% nnf(KB, IN,FreeV,OUT,Paths):- simplify_cheap(IN,MID),IN\=@=MID,nnf(KB, MID,FreeV,OUT,Paths).
 nnf(KB,[F|Fml],FreeV,Out,Paths):- arg(_,v((v),(&),(=>),(<=>)),F),nnf(KB,Fml,FreeV,NNF,Paths),Out =..[F| NNF],!.
 % nnf(_KB , IN,[],OUT,1):- mnf(IN,OUT),IN\=OUT,!.
 nnf(KB,Fml,FreeV,FmlO,N):- must((nonegate(KB,Fml,FmlM),nnf_lit(KB,FmlM,FreeV,FmlO,N))).
 nnf(_KB,Fml,_,Fml,1):-!.
-
-nnf(KB,Fml,FreeV,FmlO,N):- 
-   Fml=..[F|ARGS],
-   nnf(KB,ARGS,FreeV,FARGS,N1),
-   ARGS\=@=FARGS,!,Fml2=..[F|FARGS],
-   nnf(KB,Fml2,FreeV,FmlO,N2),N is N1 + N2.
 
 nnf_lit(KB,all(X,Fml),FreeV,all(X,FmlO),N):- nonvar(Fml),!,nnf_lit(KB,Fml,FreeV,FmlO,N).
 nnf_lit(KB,not(Fml),FreeV,not(FmlO),N):- nonvar(Fml),!,nnf_lit(KB,Fml,FreeV,FmlO,N).
@@ -679,7 +673,6 @@ nnf_args(F,N,KB,[A|RGS],FreeV,[FA|ARGS],N3):-
   nnf_args(F,NPlus1,KB,RGS,FreeV,ARGS,N2),
   N3 is (N1 + N2 -1).
 
-%= 	 	 
 
 %% is_lit_atom( ?IN) is semidet.
 %

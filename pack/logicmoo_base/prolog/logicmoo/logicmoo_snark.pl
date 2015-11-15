@@ -57,15 +57,29 @@ checkKB:m1:- gripe_time(40,baseKB:ensure_loaded(baseKB:logicmoo(mpred_online/mpr
 %m5 :- enable_mpred_system(baseKB).
 
 
-:- use_listing_vars.
-:- autoload([verbose(false)]).
+%:- use_listing_vars.
+%:- autoload([verbose(false)]).
+%:- use_listing_vars.
+%:- nop((autoload,scan_for_varnames)).
 
-mpred_restore_file(File):- 
+mpred_load_restore_file(File):- absolute_file_name(File,AFN),AFN\=File,!,mpred_load_restore_file(AFN).
+mpred_load_restore_file(File):- \+ exists_file(File),
+  lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:logicmoo(pfc/'autoexec.pfc'))),
+  mpred_save_restore_file(File),!.
+mpred_load_restore_file(File):-
+  must_det_l((
+  time_file(File,Time),
+  qcompile(File),
+  ensure_loaded(File),
+   ((\+ (lmconf:loaded_file_world_time(N,_,NewTime),NewTime>Time))->true ;
+    (
+    forall((lmconf:loaded_file_world_time(N,_,NewTime),NewTime>Time),lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:N))),
+    mpred_save_restore_file(File))))),!.
+
+
+mpred_save_restore_file(File):- 
  must_det_l((   
-   absolute_file_name(File,AFN),
-   (exists_file(AFN)->lh:ensure_loaded(AFN);true),
-   lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:logicmoo(pfc/'autoexec.pfc'))),
-   forall(lmconf:loaded_file_world_time(N,_,_),lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:N))),
+  absolute_file_name(File,AFN),
    tell(AFN), 
    format('~N:- ~q.~n',['$set_source_module'(_,basePFC)]),
    format('~N:- style_check(-singleton).'),  
@@ -89,6 +103,6 @@ mpred_restore_file(File):-
    told)).
 
 
-:- mpred_restore_file('baseKB_autoexec.pl').
+:- mpred_load_restore_file('baseKB_autoexec.pl').
 
 
