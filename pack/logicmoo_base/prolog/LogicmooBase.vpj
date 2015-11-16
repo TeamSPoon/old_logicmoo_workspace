@@ -35,18 +35,20 @@
 		</Folder>
 		<Folder Name="../t">
 			<F
-				N="../t/*.pf*"
-				Recurse="1"
-				Refilter="0"
-				Excludes=""/>
-		</Folder>
-		<Folder Name="../t">
-			<F
 				N="../t/*.m**"
 				Recurse="1"
 				Refilter="0"
 				Excludes=""/>
-		</Folder>		
+			<F
+				N="../t/*.pf*"
+				Recurse="1"
+				Excludes=".git"/>
+			<F
+				N="../t/*.pl"
+				Recurse="1"
+				Refilter="0"
+				Excludes=".git"/>
+		</Folder>
 		<F
 			N="*.*"
 			Recurse="1"

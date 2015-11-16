@@ -80,7 +80,8 @@
             nots_to/3,
             unnumbervars_with_names/2,
             is_quantifier/1,
-            pfc_for_print/2,
+            pfc_for_print_left/2,
+            pfc_for_print_right/2,
             save_in_code_buffer/2,
             save_wfs/2,
             should_be_poss/1,
@@ -283,21 +284,28 @@ kif_to_pfc(CLIF,Prolog):- cwc,
      must_det_l((
       kif_to_boxlog(CLIF,BOXLOG),
       boxlog_to_pfc(BOXLOG,Prolog),
-      (BOXLOG=@=Prolog -> true; (pfc_for_print(Prolog,PrintPFC),wdmsg(pfc:-PrintPFC))))),!.
+      (BOXLOG=@=Prolog -> true; (pfc_for_print_left(Prolog,PrintPFC),wdmsg(pfc:-PrintPFC))))),!.
       
 
 
-%= 	 	 
+%% pfc_for_print_left( ?Prolog, ?PrintPFC) is semidet.
+%
+% Prolog Backward Chaining Print.
+%
+pfc_for_print_left(Prolog,PrintPFC):-is_list(Prolog),!,maplist(pfc_for_print_left,Prolog,PrintPFC).
+%pfc_for_print_left(==>(P,if_missing(R,Q)),(Q :- (fwc, naf(R), P))):-!.
+%pfc_for_print_left(if_missing(R,Q),(Q :- (fwc, naf(R)))):-!.
+pfc_for_print_left(==>(P,Q),(Q:-fwc, P)):-!.
+pfc_for_print_left(Prolog,PrintPFC):- =(Prolog,PrintPFC).
 
-%% pfc_for_print( ?Prolog, ?PrintPFC) is semidet.
+%% pfc_for_print_right( ?Prolog, ?PrintPFC) is semidet.
 %
-% Prolog Forward Chaining For Print.
+% Prolog Forward Chaining Print.
 %
-pfc_for_print(Prolog,PrintPFC):-is_list(Prolog),!,maplist(pfc_for_print,Prolog,PrintPFC).
-%pfc_for_print(==>(P,if_missing(R,Q)),(Q :- (fwc, naf(R), P))):-!.
-%pfc_for_print(if_missing(R,Q),(Q :- (fwc, naf(R)))):-!.
-pfc_for_print(==>(P,Q),(Q:-fwc, P)):-!.
-pfc_for_print(Prolog,PrintPFC):- =(Prolog,PrintPFC).
+pfc_for_print_right(Prolog,PrintPFC):-is_list(Prolog),!,maplist(pfc_for_print_right,Prolog,PrintPFC).
+pfc_for_print_right('<-'(Q,P),'->'(P, Q)):-!.
+pfc_for_print_right(Prolog,PrintPFC):- =(Prolog,PrintPFC).
+
 
 
 %% is_entailed( ?CLIF) is semidet.

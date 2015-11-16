@@ -1091,9 +1091,9 @@ cf(Why,KB,_Original,PNF, FlattenedO):-
   cf_to_flattened_clauses(KB,Why,SET,Flattened),
   list_to_set(Flattened,FlattenedM),!,
   correct_boxlog(FlattenedM,KB,Why,FlattenedO),
-  pfc_for_print(FlattenedO,PrintPFC),wdmsg(boxlog:-PrintPFC),
+  pfc_for_print_left(FlattenedO,PrintPFC),wdmsg(boxlog:-PrintPFC),
   boxlog_to_pfc(FlattenedO,PFCPreview),
-  pfc_for_print(PFCPreview,PrintPFCPreview),wdmsg(preview:-PrintPFCPreview))),!.
+  pfc_for_print_right(PFCPreview,PrintPFCPreview),wdmsg(preview:-PrintPFCPreview))),!.
 
 check_kif_varnames(KIF):-check_varnames(KIF),fail.
 check_kif_varnames(KIF):-ground(KIF),!.

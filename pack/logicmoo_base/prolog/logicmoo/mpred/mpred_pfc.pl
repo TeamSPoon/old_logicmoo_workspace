@@ -2377,6 +2377,13 @@ ain_trigger_0(Trig,basePFC:nt(ABOX,Trigger,Test,Body),Support) :- !,
 ain_trigger_0(Trig,X,Support) :- mpred_warn("Unrecognized trigger to aintrigger: ~p for ~p",[ain_trigger(X,Support),Trig]).
 
 
+%% mpred_get_trigger_quick( ?ABOX, ?Trigger) is semidet.
+%
+% PFC Get Trigger Incomplete, But Fast, Version.
+%
+mpred_get_trigger_quick(ABOX,Trigger) :- ignore(get_user_abox_umt(ABOX)), 
+   (clause_i(basePFC:spft(ABOX,Trigger,_,_,_),true)*->true; (ABOX:clause_i(Trigger,true))).
+
 
 %% run_nt( ?ABOX, ?Trigger, ?TriggerCopy, ?Test, ?Body) is semidet.
 %
@@ -2400,15 +2407,6 @@ mpred_bt_pt_combine(Head,Body,Support) :-
   mpred_eval_lhs(Body,Support),
   fail.
 mpred_bt_pt_combine(_,_,_) :- !.
-
-
-
-%% mpred_get_trigger_quick( ?ABOX, ?Trigger) is semidet.
-%
-% PFC Get Trigger Incomplete, But Fast, Version.
-%
-mpred_get_trigger_quick(ABOX,Trigger) :- ignore(get_user_abox_umt(ABOX)), 
-   (ABOX:clause_i(Trigger,true)*->true;clause_i(basePFC:spft(ABOX,Trigger,_,_,_),true)).
 
 %=
 %=
@@ -2657,8 +2655,8 @@ mpred_undo(Why,basePFC:nt(ABOX,Head,Condition,Body)) :-
      ; mpred_trace_msg("for ~p:\nTrigger not found to retract: ~p",[Why,basePFC:nt(ABOX,Head,Condition,Body)])),
   mpred_unfwc(basePFC:nt(ABOX,Head,Condition,Body)).
 
-mpred_undo(Why,( \+ ~Fact)):- mpred_undo(Why, Fact),fail.
-mpred_undo(Why,   ~(~Fact)):- mpred_undo(Why, Fact),fail.
+mpred_undo(Why,( \+ ~Fact)):- is_ftNonvar(Fact), mpred_undo(Why, Fact),fail.
+mpred_undo(Why,   ~(~Fact)):-  is_ftNonvar(Fact), mpred_undo(Why, Fact),fail.
 
 mpred_undo(Why,Fact):- mpred_undo_u(Why,Fact)*->true;mpred_undo_e(Why,Fact).
 
@@ -2671,7 +2669,7 @@ mpred_undo_u(Why,Fact) :-
   retract_u(Fact),
      must(mpred_trace_rem(Why,Fact)),
      mpred_unfwc1(Fact).
-
+mpred_undo_u(Why,Fact):-mpred_undo_e(Why,Fact).
 
 %% mpred_undo_e( ?Why, ?Fact) is semidet.
 %
@@ -2695,7 +2693,6 @@ mpred_unfwc(UnFact) :-
   mpred_unfwc1(Fact).
   
 
-
 %% mpred_unfwc1( ?F) is semidet.
 %
 % PFC Unfwc Secondary Helper.
@@ -2716,7 +2713,7 @@ mpred_unfwc_check_triggers(_Sup,Clause) :-
   copy_term_and_varnames(F,Fcopy),
   mpred_get_trigger_quick(ABOX,basePFC:nt(ABOX,Fcopy,Condition,Action)),
   (not_cond(basePFC:nt,Condition)),
-  G = mpred_eval_lhs(Action,((\+F),basePFC:nt(ABOX,F,Condition,Action))),
+    G = mpred_eval_lhs(Action,((\+F),basePFC:nt(ABOX,F,Condition,Action))),
   loop_check(G,mpred_trace_msg(unfwc_caught_loop(G))),
   fail.
 mpred_unfwc_check_triggers(_Sup,_).

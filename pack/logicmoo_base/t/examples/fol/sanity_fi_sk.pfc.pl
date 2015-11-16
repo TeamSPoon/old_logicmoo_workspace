@@ -55,10 +55,10 @@ clif(forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f)))))).
 :- must(clif(forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f))))))).
 
 mother(eileen,trudy).
+father(eileen,bob).
 
 :- must(\+ mother(eileen,skArg1ofMother_1Fn(_))).
 
-:- ain(father(douglas,russ)).
 
 :- printAll(must(father(_,_))).
 :- printAll(must(mother(_,_))).

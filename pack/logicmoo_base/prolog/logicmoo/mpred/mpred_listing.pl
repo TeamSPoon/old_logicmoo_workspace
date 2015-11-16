@@ -25,6 +25,7 @@
             mpred_list_triggers_nlc/1,
             mpred_list_triggers_types/1,
             lqu/0,
+            pp_filtered/1,
             mpred_select_justificationNode/3,
             mpred_trace_item/2,
             mpred_why/0,
@@ -46,7 +47,7 @@
             pp_supports/0,
             pp_triggers/0,
             pp_why/1,
-            pppfc/0,
+            pp_all/0,
             whymemory/2,
             print_db_items/1,
             print_db_items/2,
@@ -90,11 +91,11 @@ lqu :- listing(basePFC:qu/3).
 
 %= 	 	 
 
-%% pppfc is semidet.
+%% pp_all is semidet.
 %
-% Pppfc.
+% Pretty Print All.
 %
-pppfc :-
+pp_all :-
   pp_facts,
   pp_rules,
   pp_triggers,
@@ -133,11 +134,11 @@ pp_facts(P,C) :-
   mpred_classify_facts(L,User,Pfc,_Rule),
   draw_line,
   fmt("User added facts:",[]),
-  pp_items(Type,User),
+  pp_items(user,User),
   draw_line,
   draw_line,
   fmt("Pfc added facts:",[]),
-  pp_items(Type,Pfc),
+  pp_items(system,Pfc),
   draw_line.
 
 
@@ -148,7 +149,7 @@ pp_facts(P,C) :-
 %
 % Pretty Print Items.
 %
-pp_items(_Type,[]).
+pp_items(_Type,[]):-!.
 pp_items(Type,[H|T]) :-
   ignore(pp_item(Type,H)),!,
   pp_items(Type,T).
@@ -174,6 +175,7 @@ mpred_trace_item(MM,H):- ignore(mpred_is_tracing_exec-> on_x_rtrace(in_cmt(pp_it
 %
 % Pretty Print Item.
 %
+pp_item(_M,H):-pp_filtered(H),!.
 pp_item(MM,(H:-B)):- B ==true,pp_item(MM,H).
 pp_item(MM,H):- flag(show_asserions_offered,X,X+1),t_l:print_mode(html), ( \+ \+ if_defined(pp_item_html(MM,H))),!.
 
@@ -234,9 +236,9 @@ mpred_classify_facts([H|T],User,[H|Pfc],Rule) :-
 %
 print_db_items(T, I):- 
     draw_line, 
-    fmt("~w ...~n",[T]),
+    fmt("~N~w ...~n",[T]),
     print_db_items(I),
-    draw_line.
+    draw_line,!.
 
 
 %= 	 	 
@@ -246,8 +248,10 @@ print_db_items(T, I):-
 % Print Database Items.
 %
 print_db_items(F/A):-number(A),!,functor(P,F,A),!,print_db_items(P).
-print_db_items(I):- bagof(I,clause_u(I,true),R1),pp_items(_Type,R1),!.
-print_db_items(I):- listing(I),!,nl,nl.
+print_db_items(I):- bagof(I,with_umt(clause_u(I,true)),R1),pp_items((:),R1),R1\==[],!.
+print_db_items(I):- bagof(I,with_umt(clause_i(I,true)),R1),pp_items((:),R1),R1\==[],!.
+print_db_items(I):- \+ current_predicate(_,I),!. 
+print_db_items(I):- catch( ('$find_predicate'(I,_),with_umt(listing(I))),_,true),!,nl,nl.
 
 
 %= 	 	 
@@ -259,10 +263,10 @@ print_db_items(I):- listing(I),!,nl,nl.
 pp_rules :-
    print_db_items("Forward Rules",(_ ==> _)),
    print_db_items("Bidirectional Rules",(_ <==> _)), 
-   print_db_items("implication Rules",(_ => _)),
+   print_db_items("Implication Rules",(_ => _)),
    print_db_items("Bi-conditional Rules",(_ <=> _)),
    print_db_items("Backchaining Rules",(_ <- _)),
-   print_db_items("Positive Facts",(nesc(_))),
+   print_db_items("Positive Facts",(==>(_))),
    print_db_items("Negative Facts",(~(_))).
 
 
@@ -273,9 +277,9 @@ pp_rules :-
 % Pretty Print Triggers.
 %
 pp_triggers :-
-     print_db_items("Positive hideTriggers",pt(_,_,_)),
-     print_db_items("Negative hideTriggers", nt(_,_,_,_)),
-     print_db_items("Goal hideTriggers",bt(_,_,_)).
+     print_db_items("Positive triggers",pt(_,_,_)),
+     print_db_items("Negative triggers", nt(_,_,_,_)),
+     print_db_items("Goal triggers",bt(_,_,_)).
 
 
 %= 	 	 
@@ -287,13 +291,18 @@ pp_triggers :-
 pp_supports :-
   % temporary hack.
   draw_line,
-  fmt("Supports ...~n",[]),
-  setof((S > P), mpred_get_support(P,S),L),
+  fmt("Supports ...~n",[]), 
+  setof((P =< S), (mpred_get_support(P,S), \+ pp_filtered(P)),L),
   pp_items('Support',L),
-  draw_line.
+  draw_line,!.
 
 
-%= 	 	 
+pp_filtered(P):-var(P),!,fail.
+pp_filtered(_:P):- !, pp_filtered(P).
+pp_filtered(P):- functor(P,F,A),F\==(/),!,pp_filtered(F/A).
+pp_filtered(F/A):-F==mpred_mark.
+
+
 
 %% draw_line is semidet.
 %
