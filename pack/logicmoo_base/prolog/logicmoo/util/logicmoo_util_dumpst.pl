@@ -457,6 +457,7 @@ dtrace:- dtrace(wdmsg("DUMP_TRACE/0")).
 % (debug) Trace.
 %
 dtrace(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dtrace(G)),setup_call_cleanup(notrace,(leash(+call),dtrace(G)),trace).
+dtrace(G):- notrace((once(((G=dmsg(GG);G=_:dmsg(GG);G=GG),nonvar(GG))),wdmsg(GG),fail)).
 dtrace(G):- has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G). 
 %dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,dumpST.
 %dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,dumpST.

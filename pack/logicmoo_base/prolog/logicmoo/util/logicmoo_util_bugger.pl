@@ -729,7 +729,7 @@ static_predicate(FA):-once(predicate_property(FA,_)),not(predicate_property(FA,d
 %
 % Wdmsg.
 %
-wdmsg(X):- ignore(hotrace(with_all_dmsg(dmsg(X)))).
+wdmsg(X):- notrace(ignore(hotrace(with_all_dmsg(dmsg(X))))).
 
 %= 	 	 
 
@@ -737,7 +737,7 @@ wdmsg(X):- ignore(hotrace(with_all_dmsg(dmsg(X)))).
 %
 % Wdmsg.
 %
-wdmsg(F,X):- ignore(with_all_dmsg(dmsg(F,X))).
+wdmsg(F,X):- notrace(ignore(with_all_dmsg(dmsg(F,X)))).
 
 
 %= 	 	 

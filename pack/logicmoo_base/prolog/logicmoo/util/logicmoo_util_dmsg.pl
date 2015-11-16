@@ -930,8 +930,8 @@ ansifmt(Ctrl,F,A):- colormsg(Ctrl,(format(F,A))).
 %
 % Debugm.
 %
-debugm(X):-compound(X),functor(X,F,_),!,debugm(F,X).
-debugm(X):-debugm(X,X).
+debugm(X):-notrace((compound(X),functor(X,F,_),!,debugm(F,X))).
+debugm(X):-notrae((debugm(X,X))).
 
 %= 	 	 
 
@@ -939,8 +939,8 @@ debugm(X):-debugm(X,X).
 %
 % Debugm.
 %
-debugm(Why,Msg):- \+ debugging(mpred), \+ debugging(Why), \+ debugging(mpred(Why)),!, debug(Why,'~N~p~n',[Msg]).
-debugm(Why,Msg):- dmsg(Why:Msg),!,debug(Why,'~N~p~n',[Msg]).
+debugm(Why,Msg):- notrace(( \+ debugging(mpred), \+ debugging(Why), \+ debugging(mpred(Why)),!, debug(Why,'~N~p~n',[Msg]))),!.
+debugm(Why,Msg):- notrace(( dmsg(Why:Msg),!,debug(Why,'~N~p~n',[Msg]))),!.
 
 
 % = :- export(colormsg/2).

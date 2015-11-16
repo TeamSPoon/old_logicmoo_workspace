@@ -14,7 +14,6 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_structs.pl
 :- module(logicmoo_util_shared_dynamic,
           [
-          wrap_shared/3,
           decl_shared/1,
           system_goal_expansion_safe_wrap/2,
           ereq/1,
@@ -22,7 +21,7 @@
           is_user_module/0]).
 
 
-:- dynamic(wrap_shared/3).
+:- dynamic(wsh_w:wrap_shared/3).
 
 %:- multifile(user:goal_expansion/2).
 %:- dynamic(user:goal_expansion/2).
@@ -47,6 +46,8 @@ dbreq(C):- ereq(C).
 %
 % Wrap Shared.
 %
+
+wrap_shared(_,_,_):-!,fail.
 wrap_shared(isa,2,ereq).
 wrap_shared(t,_,ereq).
 %wrap_shared(call,_,ereq).
@@ -73,7 +74,7 @@ is_user_module :- prolog_load_context(module,user).
 % System Goal Expansion Sd.
 %
 system_goal_expansion_safe_wrap(T,_):- \+ compound(T),!,fail.
-system_goal_expansion_safe_wrap(M:T,M:I):-!,compound(T),functor(T,F,A),wrap_shared(F,A,How),safe_wrap(T,How,I).
+system_goal_expansion_safe_wrap(M:T,M:I):-!,compound(T),functor(T,F,A),wsh_w:wrap_shared(F,A,How),safe_wrap(T,How,I).
 system_goal_expansion_safe_wrap(T,I):-compound(T),functor(T,F,A),wrap_shared(F,A,How),safe_wrap(T,How,I).
 
 
@@ -93,9 +94,9 @@ safe_wrap(I,How,call(How,I)).
 decl_shared((A,B)):-!,decl_shared(A),!,decl_shared(B),!.
 decl_shared([A|B]):-!,decl_shared(A),!,decl_shared(B),!.
 decl_shared([A]):-!,decl_shared(A),!.
-decl_shared(F/A):-!,asserta_if_new(logicmoo_util_shared_dynamic:wrap_shared(F,A,ereq)).
-decl_shared(M:F/A):-!,asserta_if_new(logicmoo_util_shared_dynamic:wrap_shared(F,A,M:ereq)).
-decl_shared(M):-atom(M),!,asserta_if_new(logicmoo_util_shared_dynamic:wrap_shared(M,_,ereq)).
+decl_shared(F/A):-!,asserta_if_new(wsh_w:wrap_shared(F,A,ereq)).
+decl_shared(M:F/A):-!,asserta_if_new(wsh_w:wrap_shared(F,A,M:ereq)).
+decl_shared(M):-atom(M),!,asserta_if_new(wsh_w:wrap_shared(M,_,ereq)).
 
 :- decl_shared(arity/2).
 :- decl_shared(t).
