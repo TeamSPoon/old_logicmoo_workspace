@@ -16,6 +16,7 @@
             autodoc_case/2,
             attempt_head_modes/1,
             fixda2/4,
+            read_once/5,
             attempt_head_modes_0/3,
             autodoc_output_path/2,
             great_clause/2,
@@ -602,7 +603,8 @@ autodoc_module(M):-
 
 
 
-%= 	 	 
+read_once(In, Term, Expanded, Vs,TermPos):- (prolog_read_source_term(In, Term, Expanded, [ variable_names(Vs), syntax_errors(error) , term_position(TermPos) ])).
+
 
 %% autodoc_stream( ?LineByLineStream, ?File, ?In) is semidet.
 %
@@ -611,8 +613,10 @@ autodoc_module(M):-
 autodoc_stream(LineByLineStream,File,In):-
   make_module_name(File,M),
 	repeat,          
-	  catch(prolog_read_source_term(In, Term, Expanded, [ variable_names(Vs), syntax_errors(error) , term_position(TermPos) ]),
-		E,(call((dmsg(E),trace)),fail)),
+	  catch((           
+            stream_property(In,position(Pos)),
+            read_once(In, Term, Expanded, Vs,TermPos)),
+		E,(call((nop(set_stream_position(In,Pos)),dmsg(E),notrace,trace,rtrace(read_once(In, Term, Expanded, Vs,TermPos)))),fail)),
           stream_position_data(line_count, TermPos, Start),
           line_count(In,End),
 	(   Term == end_of_file
@@ -892,8 +896,8 @@ great_clause(M:ModeH,Ref):- term_variables(ModeH,Vs1),clause(M:ModeH,_,Ref),term
 %
 fixup_doc_args(_,_,_,[],[]):-!.
 fixup_doc_args(Pred,P,N,[Doc|As],[ODoc|OAs]):-
-  call(Pred,P,N,Doc,ODoc),
-  !,N2 is N+1, fixup_doc_args(Pred,P,N2,As,OAs).
+  must(ignore(call(Pred,P,N,Doc,ODoc))),
+  !,N2 is N+1, must(fixup_doc_args(Pred,P,N2,As,OAs)).
 
 :- style_check(-singleton).
 
@@ -905,13 +909,14 @@ fixup_doc_args(Pred,P,N,[Doc|As],[ODoc|OAs]):-
 %
 
 fixda(P,N,Mode:_,_):- sanity(Mode\==system),fail.
-fixda(P,N,Mode:Name,ModeO:NameO):-compound(Mode),functor(Mode,_,A),arg(A,Mode,NMode),!,fixda(P,N,NMode:Name,ModeO:NameO).
-fixda(P,N,Mode:NameV,ModeO:NameO):-compound(NameV),arg(1,NameV,Name),!,fixda(P,N,Mode:Name,ModeO:NameO).
-fixda(P,N,Mode:NameV,ModeO:NameO):-atom(NameV),atom_concat('_',Name,NameV),!,fixda(P,N,Mode:Name,ModeO:NameO).
+fixda(P,N,Mode:Name,ModeO:NameO):-compound(Mode),functor(Mode,_,A),arg(A,Mode,NMode),fixda(P,N,NMode:Name,ModeO:NameO),!.
+fixda(P,N,Mode:NameV,ModeO:NameO):-compound(NameV),arg(1,NameV,Name),fixda(P,N,Mode:Name,ModeO:NameO),!.
+fixda(P,N,Mode:NameV,ModeO:NameO):-atom(NameV),atom_concat('_',Name,NameV),fixda(P,N,Mode:Name,ModeO:NameO),!.
 fixda(P,N,Mode:Name,Mode:Name):-ground(Mode:Name),!.
 fixda(P,N,Mode:Name,Mode:Name):-var(Mode),nonvar(Name),name_to_mode(P,N,Name,Mode),!.
-fixda(P,N,Mode:Name,Mode:Name):-nonvar(Mode),var(Name),must_det_l((mode_to_name(P,N,Mode,MName),atom_concat(MName,N,VarName),must(Name='$VAR'(VarName)))),!.
-fixda(P,N,Mode:Name,Mode:Name).
+fixda(P,N,Mode:Name,Mode:Name):-nonvar(Mode),var(Name),once(((mode_to_name(P,N,Mode,MName),atom_concat(MName,N,VarName),must(Name='$VAR'(VarName))))),!.
+fixda(P,N,Mode:Name,Mode:Name):-!.
+fixda(P,N,ModeName,ModeName):-!.
 
 
 %= 	 	 

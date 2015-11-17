@@ -23,16 +23,18 @@
             call_provider/2,
             clause_true/1,
             modulize_head/2,
-            clause_asserted/1,
-            clause_asserted/2,
-            clause_asserted/3,   
+
+            clause_asserted/1,clause_asserted/2,clause_asserted/3,
+            clause_asserted_i/1,clause_asserted_i/2,clause_asserted_i/3,
+            clause_i/1,clause_i/2,clause_i/3,
+
             clause_safe/2,
             debugCallWhy/2,
             erase_safe/2,
             eraseall/2,
             find_and_call/1,
             find_and_call/3,
-            lmconf:mpred_provider/3,
+            std_provider/3,
             mpred_mop/3,
             mpred_op_prolog/2,
             mpred_split_op_data/3,
@@ -78,8 +80,8 @@
         clause_asserted/3,
         erase_safe/2,
         find_and_call/1,
-        lmconf:first_lmconf:mpred_provider/3,
-        lmconf:mpred_provider/3,
+        lmconf:first_std_provider/3,
+        std_provider/3,
         mpred_split_op_data/3,
         retract_eq/1,
         safe_univ/2,
@@ -255,25 +257,25 @@ eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall
 eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,B,X),erase_safe(clause(M:C,B,X),X))).
 
 
-:-thread_local(t_l:lmconf:mpred_provider/3).
-:-thread_local(t_l:current_lmconf:mpred_provider/1).
-:-dynamic(lmconf:first_lmconf:mpred_provider/2).
-:-dynamic(lmconf:next_lmconf:mpred_provider/2).
-:-multifile(lmconf:first_lmconf:mpred_provider/2).
-:-multifile(lmconf:next_lmconf:mpred_provider/2).
+:-thread_local(t_l:std_provider/3).
+:-thread_local(t_l:current_std_provider/1).
+:-dynamic(lmconf:first_std_provider/2).
+:-dynamic(lmconf:next_std_provider/2).
+:-multifile(lmconf:first_std_provider/2).
+:-multifile(lmconf:next_std_provider/2).
 
 %= 	 	 
 
 %% mpred_provider( ?OP, ?Term, ?PROVIDER) is semidet.
 %
-% Hook To [lmconf:mpred_provider/3] For Module Logicmoo_util_database.
+% Hook To [std_provider/3] For Module Logicmoo_util_database.
 % Managed Predicate Provider.
 %
-lmconf:mpred_provider(OP,Term,PROVIDER):- t_l:lmconf:mpred_provider(OP,Term,PROVIDER).
-lmconf:mpred_provider(_,_,PROVIDER):- t_l:current_lmconf:mpred_provider(PROVIDER).
-lmconf:mpred_provider(OP,Term,PROVIDER):- lmconf:first_lmconf:mpred_provider(OP,Term,PROVIDER).
+std_provider(OP,Term,PROVIDER):- t_l:std_provider(OP,Term,PROVIDER).
+std_provider(_,_,PROVIDER):- t_l:current_std_provider(PROVIDER).
+std_provider(OP,Term,PROVIDER):- lmconf:first_std_provider(OP,Term,PROVIDER).
 
-lmconf:first_lmconf:mpred_provider(_,_,mpred_op_prolog).
+lmconf:first_std_provider(_,_,mpred_op_prolog).
 
 :- meta_predicate call_provider(?).
 
@@ -292,11 +294,11 @@ call_provider(P):-mpred_split_op_data(P,OP,Term),call_provider(OP,Term).
 %
 % Call Provider.
 %
-call_provider(OP,Term):- must(lmconf:mpred_provider(OP,Term,PROVIDER)),!,call(PROVIDER,OP,Term).
+call_provider(OP,Term):- must(std_provider(OP,Term,PROVIDER)),!,call(PROVIDER,OP,Term).
 
-call_provider(OP,Term):- must(lmconf:mpred_provider(OP,Term,PROVIDER)),!,
+call_provider(OP,Term):- must(std_provider(OP,Term,PROVIDER)),!,
    (loop_check_early(call(PROVIDER,OP,Term),fail)*->true;
-   (loop_check_early(must(lmconf:next_lmconf:mpred_provider(PROVIDER,NEXT)),NEXT=mpred_op_prolog),!,PROVIDER\=NEXT,call(NEXT,OP,Term))).
+   (loop_check_early(must(lmconf:next_std_provider(PROVIDER,NEXT)),NEXT=mpred_op_prolog),!,PROVIDER\=NEXT,call(NEXT,OP,Term))).
 
 :- meta_predicate assert_if_new(:).
 
@@ -440,6 +442,8 @@ clausify_attributes(Data,THIS):-
    copy_term(Data,Data0,Extra),   
    (Extra == [] -> THIS = Data ; (hb_to_clause(Data0,attr_bind(Extra),THIS))).
 
+
+
 to_mod_if_needed(M,B,MB):- B==true-> MB=B ; MB = M:B.
 
 split_attrs(B,true,B):-var(B),!.
@@ -479,6 +483,9 @@ hb_to_clause((H:-B1),B2,(H:- (B2,B1))):-!.
 hb_to_clause(H,B,(H:-B)).
 
 
+assert_i(HB):-clausify_attributes(HB,CL),assert(CL).
+asserta_i(HB):-clausify_attributes(HB,CL),asserta(CL).
+assertz_i(HB):-clausify_attributes(HB,CL),assertz(CL).
 
 :-export(clause_asserted/1).
 :-meta_predicate(clause_asserted(:)).
@@ -527,6 +534,27 @@ clause_asserted(M:H,B,R):- clause(M:H,B,R),clause(M:CH,CB,R),(CH:-CB)=@=(H:-B).
 modulize_head(R:G,M:G):- !, (M=R; (current_predicate(_,M:G),M\==R)),\+ predicate_property(M:G,imported_from(_)).
 modulize_head(G,O:G):- !, no_repeats_old(O,(current_module(M),'$get_predicate_attribute'(M:G, imported, O))).
 modulize_head(G,M:G):- current_predicate(_,M:G),\+ predicate_property(M:G,imported_from(_)).
+
+
+put_clause_ref(Ref,V):- !, nop(put_clause_ref(Ref,V)).
+put_clause_ref(Ref,V):-put_attr(V,cref,Ref).
+
+
+clause_asserted_i(HB):- expand_to_hb(HB,H,B),clause_asserted_i(H,B,_).
+clause_asserted_i(H,B):- clause_asserted_i(H,B,_).
+% clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
+clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,A,B),!, clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
+
+
+%% clause_i( ?H, ?B, ?Ref) is semidet.
+%
+% Clause For Internal Interface.
+%
+clause_i(HB):- expand_to_hb(HB,H,B),clause_i(H,B,_).
+clause_i(H,B):- clause_i(H,B,_).
+% clause_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
+% clause_i(H,B,Ref):- clause(H,AB,Ref), (must(split_attrs(AB,A,B0)->A),B=B0).
+clause_i(H0,B0,Ref):- copy_term_nat(H0,H),clause(H,B,Ref),split_attrs(BC,AV,B)-> AV -> H=H0 -> B=B0.
 
 
 

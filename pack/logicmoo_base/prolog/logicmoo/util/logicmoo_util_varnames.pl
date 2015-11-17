@@ -266,7 +266,7 @@ combine_names(Name1,Name2,Name):-
 
 
 ensure_named(V):-get_attr(V,vn,_),!.
-ensure_named(V):-var(V),b_getval('$variable_names',Vs),member(N=NV,Vs),V==NV,!,put_attr(V,vn,N).
+ensure_named(V):-var(V),(nb_current('$variable_names', Vs)->true;Vs=[]),member(N=NV,Vs),V==NV,!,put_attr(V,vn,N).
 
 %= 	 	 
 

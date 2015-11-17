@@ -635,7 +635,7 @@ source_variables_l(AllS):-
 % Source Variables.
 %
 source_variables(Vs):- (((prolog_load_context(variable_names,Vs),Vs\==[]);
-   (b_getval('$variable_names', Vs),Vs\==[]))),!.
+   (nb_current('$variable_names', Vs),Vs\==[]))),!.
 source_variables(Vars):-var(Vars),parent_goal('$toplevel':'$execute_goal2'(_, Vars),_),!.
 source_variables([]).
 

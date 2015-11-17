@@ -931,7 +931,7 @@ ansifmt(Ctrl,F,A):- colormsg(Ctrl,(format(F,A))).
 % Debugm.
 %
 debugm(X):-notrace((compound(X),functor(X,F,_),!,debugm(F,X))).
-debugm(X):-notrae((debugm(X,X))).
+debugm(X):-notrace((debugm(X,X))).
 
 %= 	 	 
 

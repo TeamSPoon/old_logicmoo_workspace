@@ -47,7 +47,7 @@ dbreq(C):- ereq(C).
 % Wrap Shared.
 %
 
-wrap_shared(_,_,_):-!,fail.
+% wrap_shared(_,_,_):-!,fail.
 wrap_shared(isa,2,ereq).
 wrap_shared(t,_,ereq).
 %wrap_shared(call,_,ereq).

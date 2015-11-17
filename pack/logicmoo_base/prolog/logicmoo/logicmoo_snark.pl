@@ -76,6 +76,15 @@ mpred_load_restore_file(File):-
     ignore((lmconf:loaded_file_world_time(N,_,NewTime),NewTime>Time,lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:N)),fail)),
     mpred_save_restore_file(File))))),!.
 
+mpred_save_resore_predicate(M:H,AFN):-
+   functor(H,F,A),
+   format('~N:- multifile(~q:(~q)/~q).~n',[M,F,A]),
+   once((prolog_listing:list_declarations(M:H,M))),
+   clause(M:H,B,R), 
+   once(clause_property(R,file(AFN));\+clause_property(R,file(_))),
+   ignore(once(get_clause_vars(H:-B))),
+   prolog_listing:portray_clause((H:-B)).
+
 
 mpred_save_restore_file(File):- 
  must_det_l((   
@@ -89,11 +98,7 @@ mpred_save_restore_file(File):-
    format('~N:- ~q.~n',['$set_source_module'(_,baseKB)]),
    ignore((
    cur_predicate(_,baseKB:H),
-   once((prolog_listing:list_declarations(baseKB:H,baseKB))),
-   clause(baseKB:H,B,R), 
-   once(clause_property(R,file(AFN));\+clause_property(R,file(_))),
-   ignore(once(get_clause_vars(H:-B))),
-   prolog_listing:portray_clause((H:-B)),
+    mpred_save_resore_predicate(baseKB:H,AFN),
    flush_output,
    fail)),!,
       format('~N:- ~q.~n',['$set_source_module'(_,lmconf)]),

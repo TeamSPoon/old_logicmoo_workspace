@@ -383,7 +383,7 @@ unnumbervars_and_save(X,YO):- hotrace(must(unnumbervars4(X,[],_,YO))),!.
 % unnumbervars_and_save(X,YO):- \+ ((sub_term(V,X),compound(V),'$VAR'(_)=V)),!,YO=X.
 
 /*
-unnumbervars_and_save(X,YO):- nb_getval('$variable_names',Vs),unnumbervars4(X,Vs,NewVs,YO),!,
+unnumbervars_and_save(X,YO):- (nb_current('$variable_names', Vs)->true;Vs=[]),unnumbervars4(X,Vs,NewVs,YO),!,
    (NewVs  \==Vs   -> put_variable_names(NewVs) ; true).
 unnumbervars_and_save(X,YO):-
  term_variables(X,TV),
@@ -398,9 +398,11 @@ unnumbervars_and_save(X,YO):-
 % Unnumbervars And Save.
 %
 unnumbervars4(Var,Vs,Vs,Var):- \+ compound(Var),!.
+unnumbervars4((I,TermIn),VsIn,NewVs,(O,TermOut)):- !,unnumbervars4(I,VsIn,VsM,O),unnumbervars4(TermIn,VsM,NewVs,TermOut).
+unnumbervars4((I:TermIn),VsIn,NewVs,(O:TermOut)):- !,unnumbervars4(I,VsIn,VsM,O),unnumbervars4(TermIn,VsM,NewVs,TermOut).
 unnumbervars4([I|TermIn],VsIn,NewVs,[O|TermOut]):- !,unnumbervars4(I,VsIn,VsM,O),unnumbervars4(TermIn,VsM,NewVs,TermOut).
 unnumbervars4('$VAR'(Name),VsIn,NewVs,Var):- nonvar(Name),!, (member(Name=Var,VsIn)->NewVs=VsIn;NewVs=[Name=Var|VsIn]),!,put_attr(Var,vn,Name).
-unnumbervars4(PTermIn,VsIn,NewVs,PTermOut):- PTermIn=..[F|TermIn],unnumbervars4(TermIn,VsIn,NewVs,TermOut),PTermOut=..[F|TermOut].
+unnumbervars4(PTermIn,VsIn,NewVs,PTermOut):- compound_name_arguments(PTermIn,F,TermIn),unnumbervars4(TermIn,VsIn,NewVs,TermOut),compound_name_arguments(PTermOut,F,TermOut).
    
 
  
@@ -489,7 +491,7 @@ add_newvar('A',_):-!.
 add_newvar('B',_):-!.
 add_newvar(N,_):- atom(N),atom_concat('_',_,N),!.
 add_newvar(N,V):- 
-  b_getval('$variable_names', V0s),
+  (nb_current('$variable_names', V0s)->true;V0s=[]),
   remove_grounds(V0s,Vs),
  once((member(NN=Was,Vs),N==NN,var(Was),var(V),(Was=V))-> (V0s==Vs->true;nb_linkval('$variable_names',Vs)); nb_linkval('$variable_names',[N=V|Vs])).
 
@@ -627,7 +629,7 @@ register_var_0(N,T,V,OUT):- atom(N),is_list(T),member(NI=VI,T),atom(NI),N=NI,V=V
 
 register_var_0(N,T,V,OUT):- mustvv(nonvar(N)),
    ((name_to_var(N,T,VOther)-> mustvv((OUT=T,samify(V,VOther)));
-     (once(nb_getval('$variable_names',Before);Before=[]),
+     ((nb_current('$variable_names', Before)->true;Before=[]),
       (name_to_var(N,Before,VOther)  -> mustvv((samify(V,VOther),OUT= [N=V|T]));
          (var_to_name(V,T,_OtherName)                  -> OUT= [N=V|T];
            (var_to_name(V,Before,_OtherName)              -> OUT= [N=V|T];fail)))))),!.
@@ -635,7 +637,7 @@ register_var_0(N,T,V,OUT):- mustvv(nonvar(N)),
 
 register_var_0(N,T,V,OUT):- var(N),
    (var_to_name(V,T,N)                -> OUT=T;
-     (once(nb_getval('$variable_names',Before);Before=[]),
+     ((nb_current('$variable_names', Before)->true;Before=[]),
           (var_to_name(V,Before,N)   -> OUT= [N=V|T];
                OUT= [N=V|T]))),!.
 

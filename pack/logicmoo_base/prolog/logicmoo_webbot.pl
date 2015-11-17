@@ -30,7 +30,7 @@
 :- dynamic(logicmoo_user_base:user_module_uses/2).
 
 % 	 	 
-%% fix_ops_for( ?VALUE1) is semidet.
+% fix_ops_for( ?VALUE1) is semidet.
 %
 % Fix Oper.s For.
 %

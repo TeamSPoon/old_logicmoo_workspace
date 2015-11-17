@@ -39,9 +39,9 @@ expand_to_attvars(avar(S),V):- nonvar(S),!, show_call(put_dyn_attrs(V,S)),ignore
 expand_to_attvars(avar(V,_),V):- nonvar(V),!.
 expand_to_attvars(avar(V,S),V):- var(V),nonvar(S),!, show_call(put_dyn_attrs(V,S)),ignore(ensure_named(V)).
 expand_to_attvars('$VAR'(N),'$VAR'(N)):- \+ atom(N),!.
-expand_to_attvars('$VAR'(N),V):- b_getval('$variable_names',Vs),member(N=V,Vs),!,put_attr(V,vn,N),!.
-expand_to_attvars('$VAR'(N),V):- b_getval('$variable_names',Vs),put_variable_names([N=V|Vs]),!,put_attr(V,vn,N),!.
-expand_to_attvars(C,A):- C=..[F|Args],maplist(expand_to_attvars,Args,OArgs),A=..[F|OArgs].
+expand_to_attvars('$VAR'(N),V):- nb_current('$variable_names',Vs),member(N=V,Vs),!,put_attr(V,vn,N),!.
+expand_to_attvars('$VAR'(N),V):- nb_current('$variable_names',Vs),put_variable_names([N=V|Vs]),!,put_attr(V,vn,N),!.
+expand_to_attvars(C,A):- compound_name_arguments(C,F,Args),maplist(expand_to_attvars,Args,OArgs),compound_name_arguments(A,F,OArgs).
 
 
 serialize_var(V,'$VAR'(Name)):- get_attrs(V, att(vn, Name, [])),!.
@@ -55,7 +55,8 @@ serialize_attvars(IO,IO):- \+ compound(IO),!.
 serialize_attvars('$VAR'(N),'$VAR'(N)):- !.
 serialize_attvars(avar(N),avar(N)):-!.
 serialize_attvars(avar(N,A),avar(N,A)):-!.
-serialize_attvars(C,A):- C=..[F|Args],maplist(serialize_attvars,Args,OArgs),A=..[F|OArgs].
+serialize_attvars(C,A):- compound_name_arguments(C,F,Args),maplist(serialize_attvars,Args,OArgs),compound_name_arguments(A,F,OArgs).
+
 
 
 :- meta_predicate put_dyn_attrs(*,?).

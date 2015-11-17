@@ -91,7 +91,7 @@ stack_check_else(BreakIfOver,Call):- stack_depth(Level) ,  ( Level < BreakIfOver
 %
 % In Pengines.
 %
-in_pengines:- relative_frame(context_module,pengines,_).
+in_pengines:- notrace(relative_frame(context_module,pengines,_)).
 
 % ?- relative_frame(context_module,X,Y).
 :- export(relative_frame/3).

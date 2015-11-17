@@ -509,7 +509,8 @@ atomic_concat(A,B,C,Out):-atomic_list_concat_safe([A,B,C],Out).
 %
 % No Case Change.
 %
-noCaseChange(VAR):- if_defined(isSlot(VAR)),!.
+noCaseChange(VAR):- is_ftVar(VAR),!.
+% noCaseChange(VAR):- if_defined(isSlot(VAR)),!.
 noCaseChange([]):-!.
 noCaseChange(MiXed):-atom(MiXed),atom_concat('#$',_,MiXed),!.
 noCaseChange(c(_)):-!.

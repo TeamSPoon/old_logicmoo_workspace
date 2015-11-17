@@ -333,7 +333,7 @@ printable_variable_name(Var, Name) :- nonvar(Var),format(atom(Name),"'$NONVAR'(~
 printable_variable_name(Var,Name):- (get_attr(Var, vn, Name1);get_attr(Var, varnames, Name1)),
  (var_property(Var,name(Name2))-> (Name1==Name2-> atom_concat('?$',Name1,Name) ; Name=(Name1:Name2)); atom_concat('?',Name1,Name)),!.
 printable_variable_name(Var,Name):- var_property(Var,name(Name1)),!,atom_concat('$',Name1,Name).
-printable_variable_name(Var,Name):- b_getval('$variable_names',Vs),member(Name1=V,Vs),V==Var,!,atom_concat('$',Name1,Name).
+printable_variable_name(Var,Name):- (nb_current('$variable_names', Vs)->true;Vs=[]),member(Name1=V,Vs),V==Var,!,atom_concat('$',Name1,Name).
 printable_variable_name(Var, Name) :- format(atom(Name),'#~w',Var).
  
 

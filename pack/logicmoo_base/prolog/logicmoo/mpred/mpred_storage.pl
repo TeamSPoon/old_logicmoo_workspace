@@ -816,7 +816,7 @@ clr(P):- agenda_do_prequery,
 % Remove/erase Primary Helper.
 %
 clr0(P):- 
-  forall(on_x_rtrace(P), ((forall( mpred_rem2(P), true)),nop((sanity((not(mpred_tms_supported(local,P)),must(\+(P)))))))).
+  forall(on_x_rtrace(P), ((forall( mpred_remove(P), true)),nop((sanity((not(mpred_tms_supported(local,P)),must(\+(P)))))))).
 
 
 % -  preq(Query) = query with P note

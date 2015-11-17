@@ -244,6 +244,9 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 :- meta_predicate(t(?,?,?,?,?)).
 :- meta_predicate(t(?,?,?,?)).
 :- meta_predicate(t(?,?,?)).
+:- meta_predicate logicmoo_user:t(5,?,?,?,?,?).
+:- meta_predicate logicmoo_user:t(7,?,?,?,?,?,?,?).
+:- meta_predicate logicmoo_user:t(6,?,?,?,?,?,?).
 
 :-asserta_if_new((~(G):- cwc, neg_in_code(G))).
 
@@ -358,7 +361,7 @@ mpred_univ(C,I,Head):-atom(C),!,Head=..[C,I],predicate_property(Head,number_of_c
 :- use_module(logicmoo(mpred/'mpred_*.pl')).
 
 baseKB:resolveConflict(C):- cwc, must((resolveConflict0(C),
-  show_if_debug(is_resolved(C)),mpred_rem(conflict(C)))).
+  show_if_debug(is_resolved(C)),mpred_remove(conflict(C)))).
 baseKB:resolveConflict(C) :- cwc,
   wdmsg("Halting with conflict ~p", [C]),   
   must(mpred_halt(conflict(C))),fail.
@@ -384,7 +387,7 @@ resolveConflict0(C) :- cwc, forall(must(mpred_negation_w_neg(C,N)),ignore(show_f
 % Resolver Conflict Robot.
 %
 resolverConflict_robot(N) :- cwc, forall(must(mpred_negation_w_neg(N,C)),forall(compute_resolve(C,N,TODO),on_x_rtrace(show_if_debug(TODO)))).
-resolverConflict_robot(C) :- cwc, must((mpred_remove4(C),wdmsg("Rem-3 with conflict ~p", [C]),mpred_run,sanity(\+C))).
+resolverConflict_robot(C) :- cwc, must((mpred_remove(C),wdmsg("Rem-3 with conflict ~p", [C]),mpred_run,sanity(\+C))).
 
 % never_assert_u(pt(_,Pre,Post),head_singletons(Pre,Post)):- cwc, head_singletons(Pre,Post).
 

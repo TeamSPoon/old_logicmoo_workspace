@@ -15,14 +15,15 @@
 
 % this should have been ok
 % (if_missing(Missing,Create) ==> ((\+ Missing/(Missing\==Create), \+ Create , \+ ~(Create)) ==> Create)).
-if_missing(Missing,Create) ==> 
- ( ( \+ (Missing/(Missing\=@=Create))) ==> Create).
+
+if_missing(Missing,Create) ==>  
+   ( ( \+ Missing/(Missing\=@=Create)) ==> Create).
 
 if_missing(foob(_),foob(a)).
 
 :- mpred_test(foob(a)).
 
-foob(b).
+==>foob(b).
 
 :- mpred_test(\+foob(a)).
 :- mpred_test(foob(b)).

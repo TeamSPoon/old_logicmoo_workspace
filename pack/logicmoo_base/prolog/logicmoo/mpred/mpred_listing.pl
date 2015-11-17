@@ -47,7 +47,7 @@
             pp_supports/0,
             pp_triggers/0,
             pp_why/1,
-            pp_all/0,
+            pp_DB/0,
             whymemory/2,
             print_db_items/1,
             print_db_items/2,
@@ -87,15 +87,15 @@
 lqu :- listing(basePFC:qu/3).
 
 
-
+ 
 
 %= 	 	 
 
-%% pp_all is semidet.
+%% pp_DB is semidet.
 %
 % Pretty Print All.
 %
-pp_all :-
+pp_DB :-
   pp_facts,
   pp_rules,
   pp_triggers,

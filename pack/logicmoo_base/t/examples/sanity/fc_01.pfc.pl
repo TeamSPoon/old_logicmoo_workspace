@@ -1,4 +1,4 @@
-#!/usr/bin/env swipl
+% #!/usr/bin/env swipl
 %
 %  PFC is a language extension for prolog.. there is so much that can be done in this language extension to Prolog
 %
@@ -15,6 +15,7 @@
               
 :- file_begin(pfc).
 
+:- autoload.
 
 :- abolish(a,0).
 :- abolish(b,0).
@@ -26,8 +27,12 @@
 
 :- mpred_trace_msg(beginxxxxxxxxxxxxxxxxXXXXXXXXXXXXXXXXXXXXXXXXxxxxxxxxxxxxxxxxxxxxxxxx_abc).
 
-a.
+:- mpred_ain((a ==> b)).
+:- rtrace(mpred_ain(a)).
+
 a ==> b.
+
+:- pp_DB.
 
 :- mpred_test(a).
 :- mpred_test(b).
