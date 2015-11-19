@@ -1444,7 +1444,7 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 %
 % Must Be Successfull.
 %
-must(Goal):- notrace(get_must(Goal,MGoal)),!,MGoal.
+must(Goal):- must_be(nonvar,Goal), notrace(get_must(Goal,MGoal)),!,MGoal.
 
 
 %= 	 	 
@@ -1453,6 +1453,7 @@ must(Goal):- notrace(get_must(Goal,MGoal)),!,MGoal.
 %
 % Get Must Be Successfull.
 %
+get_must(notrace(Goal),CGoal):- !,get_must((notrace(Goal)*->true;Goal),CGoal).
 get_must(Goal,CGoal):-  (is_release;tlbugger:skipMust),!,CGoal = Goal.
 get_must(Goal,CGoal):- skipWrapper,!, CGoal = (Goal *-> true ; ((ddmsg(failed_FFFFFFF(must(Goal))),dumpST,trace,Goal))).
 get_must(Goal,CGoal):- tlbugger:show_must_go_on,!,

@@ -7,7 +7,7 @@
 :- use_listing_vars.
 
 % :- set_prolog_flag(umt_local,false).
-:- use_module(library(mpred_pfc_d)).
+:- use_module(library(logicmoo/mpred/mpred_pfc_d)).
 
 
 :- cls.
