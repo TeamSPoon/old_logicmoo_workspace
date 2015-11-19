@@ -10,8 +10,9 @@
 % Licience: LGPL
 % ===================================================================
 */
-:- if(true).
 :- module(mpred_pfc, [
+
+/*
 
 mpred_call_0/1,fix_negations/2,
 is_side_effect_disabled/0,
@@ -22,24 +23,19 @@ mpred_withdraw1/2,
 
 
 
-          all_different_head_vals/1,all_different_head_vals_2/2,
+all_different_head_vals/1,all_different_head_vals_2/2,
 
 
 mpred_run_resume/0,mpred_run_pause/0,
 
- to_addable_form_wte/3,
- with_mpred_trace_exec/1,
- to_predicate_isas_each/2,
- to_addable_form/2,
- attvar_op/2,
- no_side_effects/1,
- mpred_rule_hb_0/3,
- retract_eq_quitely_f/1,
- mpred_fwc0/1,
- mpred_remove1/2,
- mpred_non_neg_literal/1,
-ain_fast/1,
-assert_u/1,
+to_addable_form_wte/3,
+with_mpred_trace_exec/1,
+to_predicate_isas_each/2,
+to_addable_form/2,
+attvar_op/2,
+no_side_effects/1,
+mpred_rule_hb_0/3,
+retract_eq_quitely_f/1,
 check_context_module/0,
 check_never_assert/1,
 clause_or_call/2,
@@ -63,17 +59,12 @@ mpred_rule_hb/3,
 mreq/1,
 neg_in_code/1,
 req/1,
-retract_u/1,
-retractall_u/1,
 ruleBackward/2,
 show_if_debug/1,
 %spft/5,
-supporters_list/2,
-with_umt/1,
-with_each_list/3,
-with_each_list/2,
 mpred_is_silient/0,
 
+*/
 
   call_u/1,
   mpred_ain/1,mpred_ain/1,mpred_ain/2,
@@ -111,36 +102,20 @@ mpred_is_silient/0,
 
   mpred_run/0,mpred_test/1,mpred_test_fok/1,
 
-  call_u/1,call_u2/1,asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,clause_u/2,clause_u/3,get_umt/1,lookup_u/1,
+  call_u/1,call_u2/1,asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,clause_u/2,clause_u/3,get_user_abox/1,lookup_u/1,
 
           call_in_mi/1,get_search_mode/3,mpred_rem_support_if_exists/2,get_tms_mode/2,call_u2/1,
 
   stop_trace/1,
   select_next_fact/1,supporters_list/2,triggerSupports/2,trigger_trigger/3,well_founded/1,well_founded_list/2,
-  % c_umt/1,
+  % user_abox/1,
   do_assumpts/2,mpred_do_fcnt/2,mpred_do_fcpt/2,mpred_fwc1/1,mpred_do_rule/1,mpred_descendant1/3,mpred_eval_rhs1/2,mpred_nf1/2,
   mpred_post1/2,mpred_withdraw/1,mpred_withdraw/2,mpred_remove/1,mpred_remove/2,mpred_pp_cur_justification1/2,mpred_pp_cur_justifications2/3,mpred_spy1/3,
   mpred_unfwc1/1,mpred_why1/1,mpred_blast/1,trigger_trigger1/2  ]).
 
-/*
-:- (multifile user:term_expansion/2).
-:- module_transparent (( bagof_or_nil/3,brake/1,fc_eval_action/2,foreachl_do/2,mpred_CALL/2,
-  mpred_fact/2,pfcl_do/1  )).
-:- export(( do_assumpts/2,fcnt/2,fcpt/2,mpred_fwc1/1,mpred_ain_rule_if_rule/1,mpred_descendant1/3,mpred_eval_rhs1/2,mpred_nf1/2,
-  mpred_post1/2,mpred_withdraw/1,mpred_withdraw/2,mpred_remove/1,mpred_remove/2,mpred_pp_cur_justification1/2,mpred_pp_cur_justifications2/3,mpred_spy1/3,
-  mpred_unfwc1/1,mpred_why1/1,mpred_blast/1,trigger_trigger1/2  )).
-:- dynamic ((  (::::)/2, (<-)/2, (<==>)/2, (==>)/2,basePFC:bt/3,foob/1,if_missing/2,basePFC:hs/0,
-  mpred_action/2,mpred_database/1,mpred_debugging/0,mpred_do_and_undo_method/2,get_mpred_is_tracing/1,mpred_is_tracing_exec/0,basePFC:qu/1,basePFC:sm/1,
-  mpred_select_hook/1,mpred_spied/2,basePFC:tms/1,mpred_warnings/1,basePFC:nt/4,basePFC:pt/3,basePFC:spft/5,
-  why_buffer/2  )).
-:- multifile((  (::::)/2, (<-)/2, (<==>)/2, (==>)/2,basePFC:bt/3,foob/1,if_missing/2,basePFC:hs/0,
-  mpred_action/2,mpred_database/1,mpred_debugging/0,mpred_do_and_undo_method/2,get_mpred_is_tracing/1,mpred_is_tracing_exec/0,basePFC:qu/1,basePFC:sm/1,
-  mpred_select_hook/1,mpred_spied/2,basePFC:tms/1,mpred_warnings/1,basePFC:nt/4,basePFC:pt/3,basePFC:spft/5,user:term_expansion/2,
-  why_buffer/2  )).
-*/
 
  :- meta_predicate 
-      get_umt(-),
+      get_user_abox(-),
       with_each_item(2,+,+),
       with_each_item(1,+),
       pfcl_do(0),
@@ -162,13 +137,16 @@ mpred_is_silient/0,
       brake(0),
       bagof_or_nil(?,^,-).
 
+:- use_module(library(logicmoo_utils)).
+:- use_listing_vars.
+
 :- module_transparent(mpred_pfc_d:(call_u)/1).
 
 :- module_transparent(( bagof_or_nil/3,brake/1,call_u/1,fc_eval_action/2,foreachl_do/2,mpred_CALL/2,mpred_fact/2,pfcl_do/1,
  call_u/1,asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,clause_u/2,clause_u/3,
  mpred_handle_why_command/2,mpred_run/0,mpred_test/1,mpred_test_fok/1,
 
-                        call_u/1,get_umt/1,
+                        call_u/1,get_user_abox/1,
                         mpred_ain/1,mpred_ain/1,mpred_ain/2,
                         action_is_undoable/1,
                         mpred_assumption/1,mpred_assumptions/2,mpred_axiom/1,bagof_or_nil/3,bases_union/2,brake/1,build_rhs/2,
@@ -221,15 +199,14 @@ mpred_is_silient/0,
  mpred_why/1,supporters_list/2, mpred_justification/2  )).
 
 
- 
-:- thread_local(t_l:c_umt/1).
+:- thread_local(t_l:user_abox/1).
 
 set_umt(M):- must(atom(M)),
  (
   '$set_source_module'(_,M),'$module'(_,M)),
     % add_import_module(M,pfc,end),
    forall(mpred_database_term(F/A),(M:dynamic(M:F/A),M:discontiguous(M:F/A),M:multifile(M:F/A))),
-   retractall(t_l:c_umt(_M)),asserta(t_l:c_umt(M)).
+   retractall(t_l:user_abox(_M)),asserta(t_l:user_abox(M)).
 
 setup_mpred_support(M):-
  must(atom(M)),
@@ -252,8 +229,6 @@ setup_mpred_support(M):-
   M:dynamic(M:PREDS),M:multifile(M:PREDS).
 
 
-:- include(mpred_pfc_utils).
-:- source_location(S,_),prolog_load_context(module,M),forall(source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A),M:export(M:F/A))).
 
 % =================================================
 % ==============  UTILS BEGIN        ==============
@@ -263,14 +238,14 @@ setup_mpred_support(M):-
 %
 % Rule Backward.
 %
-ruleBackward(R,Condition):- with_umt(( ruleBackward0(R,Condition),functor(Condition,F,_),\+ arg(_,v(call_prologsys,call_u),F))).
+ruleBackward(R,Condition):- call_u(( ruleBackward0(R,Condition),functor(Condition,F,_),\+ arg(_,v(call_prologsys,call_u),F))).
 %ruleBackward0(F,Condition):-clause_u(F,Condition),\+ (is_true(Condition);mpred_is_info(Condition)).
 
 %% ruleBackward0( ?F, ?Condition) is semidet.
 %
 % Rule Backward Primary Helper.
 %
-ruleBackward0(F,Condition):- with_umt((  '<-'(F,Condition),\+ (is_true(Condition);mpred_is_info(Condition)) )).
+ruleBackward0(F,Condition):- call_u((  '<-'(F,Condition),\+ (is_true(Condition);mpred_is_info(Condition)) )).
 
 
 
@@ -292,33 +267,61 @@ setup_mpred_ops:-
 :- setup_mpred_ops.
 
 
-get_source_ref((X,X)):- get_source_ref1(X).
-get_source_ref1(M):- (get_umt(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
+% TODO ISSUE https://github.com/TeamSPoon/PrologMUD/issues/7
+:- was_export(get_source_ref/1).
+
+%% check_context_module is semidet.
+%
+% Check Context Module. (throws if it turns out wrong)
+%
+check_context_module:- is_release,!.
+check_context_module:- sanity((source_context_module(M1),get_user_abox(M2),must(M1==M2))).
+
+%% check_real_context_module is semidet.
+%
+% Check Real Context Module (throws if it turns out wrong)
+%
+check_real_context_module:- is_release,!.
+check_real_context_module:- sanity((context_module(M1),get_user_abox(M2),must(M1==M2))).
+
+
+%% get_source_ref1( ?Mt) is semidet.
+%
+% Get Source Ref Secondary Helper.
+%
+get_source_ref1(_):- check_context_module,fail.
+get_source_ref1(M):- (get_user_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))),!.
+get_source_ref1(u(Mt)):-current_why(Mt),!.
+get_source_ref1(u(Mt)):-Mt=mt.
+
+%% get_source_ref( :TermU) is semidet.
+%
+% Get Source Ref.
+%
+get_source_ref((U,U)):- get_source_ref1(U).
 
 % not just user modules
-% get_umt(C):- !, C = fred.
-get_umt(C):- t_l:c_umt(C).
-get_umt(C):- '$set_source_module'(C,C).
-% get_umt(mpred_pfc_d).
+% get_user_abox(C):- !, C = fred.
+get_user_abox(C):- t_l:user_abox(C),!.
+get_user_abox(C):- '$set_source_module'(C,C).
 
 
 
 
 
-:- if(true).
 
 listing_u(P):-call_u(xlisting(P)).
-assert_u(A0):- strip_module(A0,_,A),get_umt(M),assert(M:A).
-asserta_u(A0):- strip_module(A0,_,A), get_umt(M),asserta(M:A).
-assertz_u(A0):- strip_module(A0,_,A), get_umt(M),assertz(M:A).
+assert_u(A0):- strip_module(A0,_,A),get_user_abox(M),assert(M:A).
+asserta_u(A0):- strip_module(A0,_,A), get_user_abox(M),asserta(M:A).
+assertz_u(A0):- strip_module(A0,_,A), get_user_abox(M),assertz(M:A).
 retract_u(M:(H:-B)):- atom(M),!, clause_u(H,B,R),erase(R).
 retract_u((H:-B)):-!, clause_u(H,B,R),erase(R).
 retract_u(H0):- strip_module(H0,_,H),!, clause_u(H,true,R),erase(R).
 retractall_u(H):- forall(clause_u(H,_,R),erase(R)).
 clause_u(H,B):- clause_u(H,B,_).
 
-clause_u(_:H,B,R):- !, get_umt(M), M:clause(H,B,R).
-clause_u(H,B,R):- get_umt(M), M:clause(M:H,B,R).
+clause_u(_:H,B,R):- !, get_user_abox(M), M:clause(H,B,R).
+clause_u(H,B,R):- get_user_abox(M), M:clause(M:H,B,R).
 
 lookup_u(Trigger):-  clause_u(Trigger,B),call(B).
 lookup_u(Trigger,Ref):-  clause_u(Trigger,B,Ref),call(B).
@@ -331,7 +334,7 @@ call_u(G0):-
 
 call_u2(G0):-
   strip_module(G0,WM,G),
-  get_umt(U),  
+  get_user_abox(U),  
   must(current_predicate(_,U:G)->(CALL=U:G);(current_predicate(_,WM:G0)->CALL=WM:G0; fail)),
  '$set_source_module'(S,U),
  '$module'(M,U),
@@ -339,20 +342,20 @@ call_u2(G0):-
      ('$set_source_module'(_,S),'$module'(_,M))).
 
 
-:- else.
+/*
 
 listing_u(P):-call_u(xlisting(P)).
-assert_u(A0):- strip_module(A0,_,A),get_umt(M),assert_i(M:A).
-asserta_u(A0):- strip_module(A0,_,A), get_umt(M),asserta_i(M:A).
-assertz_u(A0):- strip_module(A0,_,A), get_umt(M),assertz_i(M:A).
+assert_u(A0):- strip_module(A0,_,A),get_user_abox(M),assert_i(M:A).
+asserta_u(A0):- strip_module(A0,_,A), get_user_abox(M),asserta_i(M:A).
+assertz_u(A0):- strip_module(A0,_,A), get_user_abox(M),assertz_i(M:A).
 retract_u(M:(H:-B)):- atom(M),!, clause_u(H,B,R),erase(R).
 retract_u((H:-B)):-!, clause_u(H,B,R),erase(R).
 retract_u(H0):- strip_module(H0,_,H),!, clause_u(H,true,R),erase(R).
 retractall_u(H):- forall(clause_u(H,_,R),erase(R)).
 clause_u(H,B):- clause_u(H,B,_).
 
-clause_u(_:H,B,R):- !, get_umt(M), M:clause_i(H,B,R).
-clause_u(H,B,R):- get_umt(M), M:clause_i(M:H,B,R).
+clause_u(_:H,B,R):- !, get_user_abox(M), M:clause_i(H,B,R).
+clause_u(H,B,R):- get_user_abox(M), M:clause_i(M:H,B,R).
 
 lookup_u(Trigger):-  clause_u(Trigger,B),call(B).
 lookup_u(Trigger,Ref):-  clause_u(Trigger,B,Ref),call(B).
@@ -365,14 +368,14 @@ call_u(G0):-
 
 call_u2(G0):-
   strip_module(G0,WM,G),
-  get_umt(U),  
+  get_user_abox(U),  
   must(current_predicate(_,U:G)->(CALL=U:G);(current_predicate(_,WM:G0)->CALL=WM:G0; fail)),
  '$set_source_module'(S,U),
  '$module'(M,U),
   call_cleanup(CALL,
      ('$set_source_module'(_,S),'$module'(_,M))).
 
-:- endif.
+*/
 
 isSlot(V):- is_ftVar(V).
 
@@ -512,7 +515,7 @@ mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]).
 
 ain_fast(P):- get_source_ref(UU), ain_fast(P,UU).
 ain_fast(P,S):- 
-  with_each_list(mpred_post1,P,S),
+  with_each_item(mpred_post1,P,S),
   mpred_run.
 
 
@@ -1619,12 +1622,7 @@ mpred_retract_i_or_warn(X):-
 %   Updated:
 %   Purpose: provides predicates for examining the database and debugginh 
 %   for Pfc.
-/*
-:- dynamic mpred_is_tracing_pred/1.
-:- dynamic mpred_is_spying_pred/2.
-:- dynamic mpred_is_tracing_exec/0.
-:- dynamic mpred_warnings/1.
-*/
+
 :- mpred_set_default(mpred_warnings(_), mpred_warnings(true)).
 
 
@@ -2261,12 +2259,13 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :-multifile(logicmoo_util_database:ain/1).
 :-multifile(logicmoo_util_database:aina/1).
 :-multifile(logicmoo_util_database:ainz/1).
-:-asserta((logicmoo_util_database:ainz(G):- !, with_umt(mpred_ainz(G)))).
-:-asserta((logicmoo_util_database:ain(G):- !, with_umt(mpred_ain(G)))).
-:-asserta((logicmoo_util_database:aina(G):- !, with_umt(mpred_aina(G)))).
+
+:-asserta_new((logicmoo_util_database:ainz(G):- !, call(mpred_pfc:mpred_ainz,G))).
+:-asserta_new((logicmoo_util_database:ain(G):- !, call(mpred_pfc:mpred_ain,G))).
+:-asserta_new((logicmoo_util_database:aina(G):- !, call(mpred_pfc:mpred_aina,G))).
 
 % :- mpred_set_default(mpred_warnings(_), mpred_warnings(true)).
-:- asserta_u(mpred_warnings(true)).
+% :- asserta_u(mpred_warnings(true)).
 
 
 :- module_transparent((mpred_clause_u)/1).
@@ -2279,7 +2278,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((mpred_test_fok)/1).
 :- module_transparent((mpred_test)/1).
 :- module_transparent((set_umt)/1).
-:- module_transparent((get_umt)/1).
+:- module_transparent((get_user_abox)/1).
 :- module_transparent((get_source_ref1)/1).
 :- module_transparent((get_source_ref)/1).
 :- module_transparent((setup_mpred_ops)/0).
@@ -2287,6 +2286,11 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((call_u)/1).
 :- module_transparent((mpred_BC)/1).
 :- module_transparent((mpred_BC_w_cache)/1).
+ :- module_transparent((justifications)/2).
+ :- module_transparent((ain_fast)/2).
+ :- module_transparent((ain_fast)/1).
+ :- module_transparent((ruleBackward0)/2).
+ :- module_transparent((ruleBackward)/2).
 
 
 
@@ -2299,23 +2303,18 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 
 :- must(mpred_reset).
 
+% :- include('mpred_pfc_utils.pi').
 
-:- use_module(library(logicmoo_utils)).
-:- use_listing_vars.
 
-% local_testing
-
-:- endif.
-
-end_of_file.
 
 % local_testing
-% :- use_module(library(pfc)).
+
+
 
 :- mpred_reset.
- 
 
-:- get_umt(M),M:dynamic((current_ooZz/1,default_ooZz/1,if_mooZz/2)).
+
+:- get_user_abox(M),M:dynamic((current_ooZz/1,default_ooZz/1,if_mooZz/2)).
 
 :- mpred_trace.
 :- mpred_watch.

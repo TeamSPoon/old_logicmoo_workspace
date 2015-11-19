@@ -543,8 +543,11 @@ put_clause_ref(Ref,V):-put_attr(V,cref,Ref).
 
 clause_asserted_i(HB):- expand_to_hb(HB,H,B),clause_asserted_i(H,B,_).
 clause_asserted_i(H,B):- clause_asserted_i(H,B,_).
-% clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
-clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,A,B),!, clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
+% clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,
+%  clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
+clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,A,B),!, 
+  clause_i(H,B,Ref), 
+ (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
 
 
 %% clause_i( ?H, ?B, ?Ref) is semidet.

@@ -1,21 +1,28 @@
 
-:- module(fred_test01,[]).
+
+
+:- module(red_test01,[]).
+
+:- use_module(library(logicmoo_utils)).
+
+%:- cls.
 
 % :- set_prolog_flag(umt_local,true).
 
 :- use_module(library(logicmoo_utils)).
 :- use_listing_vars.
 
+
 % :- set_prolog_flag(umt_local,false).
-:- use_module(library(logicmoo/mpred/mpred_pfc_d)).
+:- use_module(library(logicmoo/mpred/mpred_pfc)).
 
 
-:- cls.
 :- mpred_reset.
 
 
+
 :- dynamic((current_ooTt/1,default_ooTt/1,if_mooTt/2)).
-:- get_umt(M),M:dynamic((current_ooTt/1,default_ooTt/1,if_mooTt/2)).
+:- get_user_abox(M),M:dynamic((current_ooTt/1,default_ooTt/1,if_mooTt/2)).
 
 :- mpred_trace.
 :- mpred_watch.
@@ -47,7 +54,7 @@
 
 :- mpred_ain(~ current_ooTt(fooTt)).
 
-:- pp_DB.
+:- pp_cur_DB.
 
 :- mpred_test(~current_ooTt(fooTt)).
 
