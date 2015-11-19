@@ -48,7 +48,7 @@
             pp_triggers/0,
             pp_why/1,
             pp_DB/0,
-            whymemory/2,
+            why_buffer/2,
             print_db_items/1,
             print_db_items/2,
             print_db_items/3,
@@ -74,7 +74,7 @@
 :- dynamic
   	user:portray/1.
 
-:- dynamic(whymemory/2).
+:- dynamic(why_buffer/2).
 
 
 
@@ -350,7 +350,7 @@ mpred_interactive_why:- w_tl(t_l:is_mpred_interactive_why,mpred_why).
 % Managed Predicate Generation Of Proof.
 %
 mpred_why :-
-  whymemory(P,_),
+  why_buffer(P,_),
   mpred_why(P),!.
 mpred_why.
 
@@ -382,13 +382,13 @@ mpred_interactive_why(N):- w_tl(t_l:is_mpred_interactive_why,mpred_why(N)).
 mpred_why(N) :-
   number(N),
   !,
-  whymemory(P,Js),
+  why_buffer(P,Js),
   mpred_why_command(N,P,Js).
 
 mpred_why(P) :-
   no_repeats(justifications(P,Js)),
-  retractall_i(whymemory(_,_)),
-  assert_i(whymemory(P,Js)),!,
+  retractall_u(why_buffer(_,_)),
+  assert_u(why_buffer(P,Js)),!,
   mpred_whyBrouse(P,Js).
 
 

@@ -5,6 +5,8 @@
             aina/1,
             ainz/1,
 
+
+
             attr_bind/1,attr_bind/2,attr_bind_complete/1,
             split_attrs/3,is_attr_bind/1,
 
@@ -27,6 +29,9 @@
             clause_asserted/1,clause_asserted/2,clause_asserted/3,
             clause_asserted_i/1,clause_asserted_i/2,clause_asserted_i/3,
             clause_i/1,clause_i/2,clause_i/3,
+            assert_i/1,asserta_i/1,assertz_i/1,
+            retract_i/1,retractall_i/1,
+
 
             clause_safe/2,
             debugCallWhy/2,
@@ -483,10 +488,6 @@ hb_to_clause((H:-B1),B2,(H:- (B2,B1))):-!.
 hb_to_clause(H,B,(H:-B)).
 
 
-assert_i(HB):-clausify_attributes(HB,CL),assert(CL).
-asserta_i(HB):-clausify_attributes(HB,CL),asserta(CL).
-assertz_i(HB):-clausify_attributes(HB,CL),assertz(CL).
-
 :-export(clause_asserted/1).
 :-meta_predicate(clause_asserted(:)).
 
@@ -554,7 +555,12 @@ clause_i(HB):- expand_to_hb(HB,H,B),clause_i(H,B,_).
 clause_i(H,B):- clause_i(H,B,_).
 % clause_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
 % clause_i(H,B,Ref):- clause(H,AB,Ref), (must(split_attrs(AB,A,B0)->A),B=B0).
-clause_i(H0,B0,Ref):- copy_term_nat(H0,H),clause(H,B,Ref),split_attrs(BC,AV,B)-> AV -> H=H0 -> B=B0.
+clause_i(H0,B0,Ref):- copy_term_nat(H0,H),clause(H,BC,Ref),split_attrs(BC,AV,B)-> AV -> H=H0 -> B=B0.
+assert_i(HB):-clausify_attributes(HB,CL),assert(CL).
+asserta_i(HB):-clausify_attributes(HB,CL),asserta(CL).
+assertz_i(HB):-clausify_attributes(HB,CL),assertz(CL).
+retract_i(HB):-expand_to_hb(HB,H,B),(clause_i(H,B,Ref)*->erase(Ref)).
+retractall_i(H):-expand_to_hb(H,HH,_),forall(clause_i(HH,_,Ref),erase(Ref)).
 
 
 

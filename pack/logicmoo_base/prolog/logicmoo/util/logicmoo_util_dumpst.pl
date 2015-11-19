@@ -20,6 +20,7 @@
           drain_framelist_ele/1,
           printable_variable_name/2,
           dump_st/0,
+          with_source_module/1,
           to_wmsg/2,
           simplify_goal_printed/2,
           dumpST/0,dumpST/1,dumpST1/0,
@@ -29,7 +30,8 @@
    ]).
 
 :-  meta_predicate dumptrace_ret(?),
-  neg1_numbervars(?, ?, 0).
+  neg1_numbervars(?, ?, 0),
+  with_source_module(0).
 
 
 
@@ -488,6 +490,12 @@ to_wmsg(dmsg(G),WG):-!, to_wmsg(G,WG).
 to_wmsg(wdmsg(G),WG):-!, to_wmsg(G,WG).
 to_wmsg(G,WG):- (G=WG).
 
+
+with_source_module(G):-
+  '$set_source_module'(M,M),'$module'(WM,M),
+  call_cleanup(G,'$module'(_,WM)).
+   
+
 % =====================
 % dumptrace/1/2
 % =====================
@@ -510,7 +518,7 @@ dumptrace(G):- ignore((debug,
   fmt(in_dumptrace(G)),
   wdmsg(WG),
   show_failure(why,get_single_char(C)))),
-  with_all_dmsg(dumptrace(G,C)),!.
+  with_all_dmsg(with_source_module(dumptrace(G,C))),!.
 
 :-meta_predicate(dumptrace(0,+)).
 
@@ -528,7 +536,7 @@ dumptrace(G,0's):-!,hotrace(ggtrace),!,(hotrace(G)*->true;true).
 dumptrace(G,0'S):-!, wdmsg(skipping(G)),!.
 dumptrace(G,0'x):-!, wdmsg(skipping(G)),!.
 dumptrace(G,0'i):-!,hotrace(ggtrace),!,ignore(G).
-dumptrace(_,0'b):-!,debug,prolog,!,fail.
+dumptrace(_,0'b):-!,debug,break,!,fail.
 dumptrace(_,0'a):-!,abort,!,fail.
 dumptrace(_,0'x):-!,must((lex,ex)),!,fail.
 dumptrace(_,0'e):-!,halt(1),!.

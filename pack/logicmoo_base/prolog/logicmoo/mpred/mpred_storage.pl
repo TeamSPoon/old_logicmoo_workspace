@@ -764,7 +764,7 @@ get_body_functor(BDY,BF,A):-get_functor(BDY,BF,A).
 %
 % Remove/erase.
 %
-del(C):- fully_expand(change(retract,a),C,C0),mpred_maptree(del0,C0).
+del(C):- fully_expand(change(retract,a),C,C0),map_first_arg(del0,C0).
 
 %= 	 	 
 
@@ -806,7 +806,7 @@ mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 % Remove/erase.
 %
 clr(P):- agenda_do_prequery,
-  fully_expand(change(retract,all),P,PL),mpred_maptree(clr0,PL).
+  fully_expand(change(retract,all),P,PL),map_first_arg(clr0,PL).
 
 
 %= 	 	 

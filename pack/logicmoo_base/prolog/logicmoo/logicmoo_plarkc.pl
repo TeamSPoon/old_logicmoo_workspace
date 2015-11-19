@@ -45,11 +45,11 @@ reallyLoadTiny:- transTiny(genls(X,Y),((X\=ftAtomicTerm,ground((X,Y))))).
 reallyLoadTiny:- mpred_trace.
 reallyLoadTiny:- transTiny(genls(X,Y),((ground((X,Y))))).
 %TODO_VERIFY_STILL_UNNEEDED :- retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
-%TODO_VERIFY_STILL_UNNEEDED :- mpred_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
+%TODO_VERIFY_STILL_UNNEEDED :- mpred_withdraw(genls(ftAtomicTerm,ftClosedAtomicTerm)).
 reallyLoadTiny:- transTiny(genlMt(X,Y),writeq((X,Y))).
 reallyLoadTiny:- transTiny(ttFormatType(X),ground(X)).
 
-%TODO_VERIFY_STILL_UNNEEDED :-mpred_rem1(genls(ftAtomicTerm,ftClosedAtomicTerm)).
+%TODO_VERIFY_STILL_UNNEEDED :-mpred_withdraw(genls(ftAtomicTerm,ftClosedAtomicTerm)).
 
 %TODO_VERIFY_STILL_UNNEEDED :-retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
 reallyLoadTiny:- mpred_no_trace.

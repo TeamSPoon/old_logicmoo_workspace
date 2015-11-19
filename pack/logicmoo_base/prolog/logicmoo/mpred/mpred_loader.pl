@@ -1640,7 +1640,7 @@ import_to_user_mfa0(_MM,_SM,_P,_M:F/A):- current_predicate(system:F/A),!.
 import_to_user_mfa0(_MM,_SM,P,_M:_F/_A):- predicate_property(P,static),!.
 import_to_user_mfa0(_MM,_SM,P,_M:_F/_A):- predicate_property(P,exported),!.
 import_to_user_mfa0(_MM,_SM,P,_M:_F/_A):- predicate_property(P,imported_from(_)),!.
-import_to_user_mfa0(_MM,_SM,_P,M:F/A):- check_never_assert(declared(M:F/A)),fail.
+import_to_user_mfa0(_MM,_SM,_P,M:F/A):- current_predicate(check_never_assert/1),check_never_assert(declared(M:F/A)),fail.
 import_to_user_mfa0(_MM,_SM,decl_type(A),baseKB:decl_type/1):-trace_or_throw(basd_import_to_user_mfa0(baseKB:decl_type/1)).
 
 

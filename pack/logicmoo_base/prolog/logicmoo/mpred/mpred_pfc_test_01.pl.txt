@@ -1,0 +1,56 @@
+
+:- module(fred_test01,[]).
+
+% :- set_prolog_flag(umt_local,true).
+
+:- use_module(library(logicmoo_utils)).
+:- use_listing_vars.
+
+% :- set_prolog_flag(umt_local,false).
+:- use_module(library(mpred_pfc_d)).
+
+
+:- cls.
+:- mpred_reset.
+
+
+:- dynamic((current_ooTt/1,default_ooTt/1,if_mooTt/2)).
+:- get_umt(M),M:dynamic((current_ooTt/1,default_ooTt/1,if_mooTt/2)).
+
+:- mpred_trace.
+:- mpred_watch.
+
+% this should have been ok
+% (if_mooTt(Missing,Create) ==> ((\+ Missing/(Missing\==Create), \+ Create , \+ ~(Create)) ==> Create)).
+:- mpred_ain((if_mooTt(Missing,Create) ==> 
+ ( ( \+ Missing/(Missing\=@=Create)) ==> Create))).
+
+:- mpred_ain((default_ooTt(X) ==> if_mooTt(current_ooTt(_),current_ooTt(X)))).
+
+:- mpred_ain(default_ooTt(defaultValueTt)).
+
+:- mpred_test(current_ooTt(defaultValueTt)).
+
+:- (mpred_ain(current_ooTt(fooTt))).
+
+:- mpred_test(\+current_ooTt(defaultValueTt)).
+
+:- (mpred_ain(\+ current_ooTt(fooTt))).
+
+:- mpred_test(current_ooTt(defaultValueTt)).
+
+:- (mpred_withdraw( default_ooTt(defaultValueTt) )).
+
+:- listing([current_ooTt,default_ooTt]).
+
+:- mpred_test( \+current_ooTt(defaultValueTt)).
+
+:- mpred_ain(~ current_ooTt(fooTt)).
+
+:- pp_DB.
+
+:- mpred_test(~current_ooTt(fooTt)).
+
+:- mpred_ain(default_ooTt(defaultValueTt)).
+
+:- mpred_test(current_ooTt(defaultValueTt)).

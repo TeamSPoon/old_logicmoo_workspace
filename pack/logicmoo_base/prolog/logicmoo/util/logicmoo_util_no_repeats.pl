@@ -22,7 +22,8 @@
             subtract_eq/3,
             succeeds_n_times/2,
             nr_test/2,
-            no_repeats_var/1
+            no_repeats_var/1,
+            loop_check_nr/1
           ]).
 :- meta_predicate
         memberchk_pred(2, ?, ?),
@@ -37,6 +38,7 @@
         no_repeats_save(+, 0),
         no_repeats_save(+, 0, -, -),
         no_repeats_u(+, 0),
+        loop_check_nr(0),
         succeeds_n_times(0, -).
 :- module_transparent
         memberchk_same/2,
@@ -44,6 +46,13 @@
         subtract_eq/3,
         nr_test/2.
 
+      
+
+%% loop_check_nr( ?CL) is semidet.
+%
+% Loop Check Nr.
+%
+loop_check_nr(CL):- loop_check(no_repeats(CL)).
 
 
 :- if(current_predicate(logicmoo_utils:combine_logicmoo_utils/0)).

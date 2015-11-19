@@ -1000,7 +1000,7 @@ edit1term:-
    cvt_param_to_term(String,Term,VNs),
    save_in_session(find,Term),
    maplist(as_ftVars,VNs),
-   call_for_terms(forall(mpred_rem1(Term),pp_item_html('Retract',':-'(VNs,Term))))))),!.
+   call_for_terms(forall(mpred_withdraw(Term),pp_item_html('Retract',':-'(VNs,Term))))))),!.
   
 edit1term:- 
  must_det_l((

@@ -390,6 +390,7 @@ fmt(X,Y,Z):- fmt_ansi(fmt0(X,Y,Z)),!.
 % Fmt9.
 %
 fmt9(fmt0(F,A)):-on_x_fail(fmt0(F,A)),!.
+fmt9(Msg):- catch(((string(Msg);atom(Msg)),format(Msg,[x1,x2,x3])),_,fail),!.
 fmt9(Msg):- if_defined_else(portray_clause_w_vars(Msg),print(Msg)).
 
 % :-reexport(library(ansi_term)).
