@@ -92,7 +92,7 @@ mpred_save_restore_file(File):-
    tell(AFN), 
    format('~N:- ~q.~n',['$set_source_module'(_,basePFC)]),
    format('~N:- style_check(-singleton).'),  
-   listing(basePFC:_),
+   listing(_),
    flush_output,
    format('~N:- style_check(-singleton).'),
    format('~N:- ~q.~n',['$set_source_module'(_,baseKB)]),

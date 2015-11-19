@@ -56,14 +56,14 @@
 % :-mpred_test(\+  ~(a(_))).
 % :-mpred_test(\+ a(_)).
 
-% U=nt(A,B,C),basePFC:spft('$ABOX',X,Y,Z),\+ \+
+% U=nt(A,B,C),spft('$ABOX',X,Y,Z),\+ \+
 
 (a(B),d(B),f(B)) ==> b(B).
 (a(B),d(B),e(B)) ==> b(B).
 (a(B),e(B),d(B)) ==> b(B).
 
 d(q).
-% ?- nl,ZU=nt(_,_,_),ZU,basePFC:spft(UMT,X,Y,Z),\+ \+ ZU=Z,nl.
+% ?- nl,ZU=nt(_,_,_),ZU,spft(UMT,X,Y,Z),\+ \+ ZU=Z,nl.
 
 (b(_),e(q)) ==> c.
 (~a(B),~e(B)) ==> q.

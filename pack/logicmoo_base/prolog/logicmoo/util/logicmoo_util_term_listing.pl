@@ -894,7 +894,7 @@ sourceTextPredicateSource(_):-fail.
 %
 % plisting  Secondary Helper.
 %
-plisting_1:-plisting(basePFC:spft('$ABOX',_,_,_,_)).
+plisting_1:-plisting(spft('$ABOX',_,_,_,_)).
 
 
 %= 	 	 

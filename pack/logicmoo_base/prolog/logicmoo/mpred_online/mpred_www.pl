@@ -1705,11 +1705,11 @@ indent_nbsp(X,Chars):-XX is X -1,!, indent_nbsp(XX,OutP),!,sformat(Chars,'~w   '
 % Shared Hide Data.
 %
 lmconf:shared_hide_data('$si$':'$was_imported_kb_content$'/2):- !,listing_filter(hideMeta).
-lmconf:shared_hide_data(basePFC:spft/5):- !,listing_filter(hideTriggers).
-lmconf:shared_hide_data(basePFC:spft/3):- !,listing_filter(hideTriggers).
-lmconf:shared_hide_data(basePFC:nt/4):- !,listing_filter(hideTriggers).
-lmconf:shared_hide_data(basePFC:pt/3):- !, listing_filter(hideTriggers).
-lmconf:shared_hide_data(basePFC:bt/3):- !, listing_filter(hideTriggers).
+lmconf:shared_hide_data(spft/5):- !,listing_filter(hideTriggers).
+lmconf:shared_hide_data(spft/3):- !,listing_filter(hideTriggers).
+lmconf:shared_hide_data(nt/4):- !,listing_filter(hideTriggers).
+lmconf:shared_hide_data(pt/3):- !, listing_filter(hideTriggers).
+lmconf:shared_hide_data(bt/3):- !, listing_filter(hideTriggers).
 lmconf:shared_hide_data((_:-
  cwc,
         second_order(_,_G19865),
@@ -1988,8 +1988,8 @@ pp_i2tml_0(is_disabled_clause(H)):- pp_i2tml_0((disabled)=H).
 
 % pp_i2tml_0(FET):-fully_expand(assert,FET,NEWFET),FET\=@=NEWFET,!,pp_i2tml_0(NEWFET).
 
-pp_i2tml_0(basePFC:spft(ABOX,P,F,T,W)):-!,
-   w_tl(t_l:current_why_source(W),pp_i2tml_0(basePFC:spft(ABOX,P,F,T))).
+pp_i2tml_0(spft(ABOX,P,F,T,W)):-!,
+   w_tl(t_l:current_why_source(W),pp_i2tml_0(spft(ABOX,P,F,T))).
 
 pp_i2tml_0(spft(P,U,U)):- nonvar(U),!, pp_i2tml_1(P:-asserted_by(U)).
 pp_i2tml_0(spft(P,F,T)):- atom(F),atom(T),!, pp_i2tml_1(P:-asserted_in(F:T)).

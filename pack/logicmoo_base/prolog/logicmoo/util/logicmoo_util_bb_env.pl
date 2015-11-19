@@ -332,7 +332,7 @@ env_get(Call):-Call=..[P,V],!,gvar_get(P,V).
 
 env_meta_term(t(env_call,env_assert,env_asserta,env_retract,env_retractall)).
 
-% basePFC:nt
+% nt
 
 env_push_argsA(Pred, Type,Prefix,Pred1 ):-t_l:push_env_ctx, env_push_args(Pred, Type,Prefix,Pred1 ).
 
@@ -420,12 +420,12 @@ user:term_expansion(A,B):- nonvar(A), A\==end_of_file, inside_file(ocl),
 
 */
 
-:- env_term_expansion((mpred_undo(Why,basePFC:nt('$ABOX',Head,Condition,Body)) :-
+:- env_term_expansion((mpred_undo(Why,nt('$ABOX',Head,Condition,Body)) :-
   % undo a negative trigger.
   !,
-  (retract_i(basePFC:nt('$ABOX',Head,Condition,Body))
-    -> mpred_unfwc(basePFC:nt('$ABOX',Head,Condition,Body))
-     ; mpred_trace_msg("for ~p:\nTrigger not found to retract: ~p",[Why,basePFC:nt('$ABOX',Head,Condition,Body)]))),OOO),
+  (retract_i(nt('$ABOX',Head,Condition,Body))
+    -> mpred_unfwc(nt('$ABOX',Head,Condition,Body))
+     ; mpred_trace_msg("for ~p:\nTrigger not found to retract: ~p",[Why,nt('$ABOX',Head,Condition,Body)]))),OOO),
               wdmsg(OOO).
 
 /*

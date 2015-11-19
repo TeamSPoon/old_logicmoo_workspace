@@ -40,16 +40,16 @@
 % HOOKS
 
 :- forall(member(M:F/A,[
-basePFC:bt/3, %basePFC
-basePFC:hs/1, %basePFC
-basePFC:hs/2, %basePFC
-basePFC:nt/4, %basePFC
-basePFC:pk/4, %basePFC
-basePFC:pt/3, %basePFC
-basePFC:qu/3, %basePFC
-basePFC:sm/1, %basePFC
-basePFC:spft/5, %basePFC
-basePFC:tms/1, %basePFC
+bt/3, %basePFC
+hs/1, %basePFC
+hs/2, %basePFC
+nt/4, %basePFC
+pk/4, %basePFC
+pt/3, %basePFC
+qu/3, %basePFC
+sm/1, %basePFC
+spft/5, %basePFC
+tms/1, %basePFC
 el_assertions:el_holds/10, %el_assertions
 el_assertions:el_holds/11, %el_assertions
 el_assertions:el_holds/12, %el_assertions

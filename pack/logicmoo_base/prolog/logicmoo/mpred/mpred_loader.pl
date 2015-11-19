@@ -420,7 +420,7 @@ correct_module(MT,_,_,MT):-!.
 % Datalog Type.
 %
 box_type(F,A,tbox):-current_predicate(baseKB:F/A).
-% box_type(F,A,sbox):-current_predicate(basePFC:F/A).
+% box_type(F,A,sbox):-current_predicate(F/A).
 
 
 

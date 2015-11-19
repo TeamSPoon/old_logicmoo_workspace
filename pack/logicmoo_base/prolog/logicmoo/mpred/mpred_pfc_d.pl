@@ -129,13 +129,13 @@ mpred_is_silient/0,
 :- export(( do_assumpts/2,fcnt/2,fcpt/2,mpred_fwc1/1,mpred_ain_rule_if_rule/1,mpred_descendant1/3,mpred_eval_rhs1/2,mpred_nf1/2,
   mpred_post1/2,mpred_withdraw/1,mpred_withdraw/2,mpred_remove/1,mpred_remove/2,mpred_pp_cur_justification1/2,mpred_pp_cur_justifications2/3,mpred_spy1/3,
   mpred_unfwc1/1,mpred_why1/1,mpred_blast/1,trigger_trigger1/2  )).
-:- dynamic ((  (::::)/2, (<-)/2, (<==>)/2, (==>)/2,basePFC:bt/3,foob/1,if_missing/2,basePFC:hs/0,
-  mpred_action/2,mpred_database/1,mpred_debugging/0,mpred_do_and_undo_method/2,get_mpred_is_tracing/1,mpred_is_tracing_exec/0,basePFC:qu/1,basePFC:sm/1,
-  mpred_select_hook/1,mpred_spied/2,basePFC:tms/1,mpred_warnings/1,basePFC:nt/4,basePFC:pt/3,basePFC:spft/5,
+:- dynamic ((  (::::)/2, (<-)/2, (<==>)/2, (==>)/2,bt/3,foob/1,if_missing/2,hs/0,
+  mpred_action/2,mpred_database/1,mpred_debugging/0,mpred_do_and_undo_method/2,get_mpred_is_tracing/1,mpred_is_tracing_exec/0,qu/1,sm/1,
+  mpred_select_hook/1,mpred_spied/2,tms/1,mpred_warnings/1,nt/4,pt/3,spft/5,
   why_buffer/2  )).
-:- multifile((  (::::)/2, (<-)/2, (<==>)/2, (==>)/2,basePFC:bt/3,foob/1,if_missing/2,basePFC:hs/0,
-  mpred_action/2,mpred_database/1,mpred_debugging/0,mpred_do_and_undo_method/2,get_mpred_is_tracing/1,mpred_is_tracing_exec/0,basePFC:qu/1,basePFC:sm/1,
-  mpred_select_hook/1,mpred_spied/2,basePFC:tms/1,mpred_warnings/1,basePFC:nt/4,basePFC:pt/3,basePFC:spft/5,user:term_expansion/2,
+:- multifile((  (::::)/2, (<-)/2, (<==>)/2, (==>)/2,bt/3,foob/1,if_missing/2,hs/0,
+  mpred_action/2,mpred_database/1,mpred_debugging/0,mpred_do_and_undo_method/2,get_mpred_is_tracing/1,mpred_is_tracing_exec/0,qu/1,sm/1,
+  mpred_select_hook/1,mpred_spied/2,tms/1,mpred_warnings/1,nt/4,pt/3,spft/5,user:term_expansion/2,
   why_buffer/2  )).
 */
 
