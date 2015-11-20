@@ -50,7 +50,7 @@ annote(Dom,X,Form2):-annote(Dom,X,Form2,_).
 
 annote(_,X,IO,IO):- nonvar(X),!.
 annote(_,_,IO,IO):- \+ is_skolem_setting(push_skolem),!.
-annote(_,X,Form2,Form2):- var(X), freeze(X,(ground(X)->show_call(for(X),lazy(req(Form2)));true)).
+annote(_,X,Form2,Form2):- var(X), freeze(X,(ground(X)->show_call(for(X),lazy(call_u(Form2)));true)).
 annote(Dom,X,Form2,Merged):-get_attr(X,Dom,Form1),merge_forms(Form1,Form2,Merged),put_attr(X,Dom,Merged),!.
 annote(Dom,X,Form2,Form2):- put_attr(X,Dom,Form2).
 
@@ -87,7 +87,7 @@ user:portray(Sk) :- get_attr(Sk, sk, Form), !, printable_variable_name(Sk,Name),
 sk:attribute_goals(Sk) --> {sk_form(Sk, Form)},[form_sk(Sk,Form)].
 
 skolem_test(_):- !.
-skolem_test(Form):- show_call(req(Form)).
+skolem_test(Form):- show_call(call_u(Form)).
 
 skolem_unify(_Var,Form):- skolem_test(Form).
 

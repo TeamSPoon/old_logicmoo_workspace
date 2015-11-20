@@ -1188,7 +1188,7 @@ xcall_t(P):- call(P).
 % Assertion True Stucture.
 %
 assertion_t(Call):- lmconf:use_cyc_database,!,w_tl(t_l:useOnlyExternalDBs,kb_t(Call)).
-% assertion_t(Call):- w_tl(t_l:useOnlyExternalDBs,loop_check(req(Call))).
+% assertion_t(Call):- w_tl(t_l:useOnlyExternalDBs,loop_check(call_u(Call))).
 
 % ================================================================================
 % end holds_t

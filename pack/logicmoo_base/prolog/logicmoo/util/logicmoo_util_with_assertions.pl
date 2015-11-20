@@ -16,7 +16,8 @@
             w_tl/2,
             wno_tl/2,
             wtg/2,
-            with_no_x/1
+            with_no_x/1,
+            with_each_item/3
           ]).
 
 :- meta_predicate
@@ -29,6 +30,19 @@
         to_thread_head_1m/4.
 
 :- include('logicmoo_util_header.pi').
+
+:- meta_predicate with_each_item(:,+,+).
+%% with_each_item(+P2,+EleList,+ArgList) is semidet.
+%
+% Call apply(P,[Ele|ArgList]) on each Ele(ment) in the EleList.
+%
+% EleList is a  List, a Conjuction Terms or a single element.
+%
+with_each_item(P,HV,S):- var(HV),!, apply(P,[HV|S]).
+with_each_item(P,M:HT,S) :- !, must_be(atom,M), M:with_each_item(P,HT,S).
+with_each_item(P,[H|T],S) :- !, apply(P,[H|S]), with_each_item(P,T,S).
+with_each_item(P,(H,T),S) :- !, with_each_item(P,H,S), with_each_item(P,T,S).
+with_each_item(P,H,S) :- apply(P,[H|S]).
 
 
 %= 	 	 

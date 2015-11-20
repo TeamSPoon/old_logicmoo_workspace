@@ -234,7 +234,7 @@ is_prolog_entailed(UCL):-clause_asserted(UCL),!.
 is_prolog_entailed(UCL):-clause(UCL,B),split_attrs(B,A,BB),must(A),BB.
 is_prolog_entailed(UCL):-clause(UCL,B,Ref),(B\==true->must(B);(trace,clause(HH,BB,Ref),dmsg(BB:-(UCL,HH)))),!.
 is_prolog_entailed(UCL):-show_failure(clause_asserted(UCL)),!.
-is_prolog_entailed(UCL):-trace,req(UCL),!.
+is_prolog_entailed(UCL):-trace,call_u(UCL),!.
 
 
 %= 	 	 
@@ -766,7 +766,7 @@ write_list([]).
 % Numbervars Using Names.
 %
 
-unnumbervars_with_names(Term,CTerm):- !, must(unnumbervars(Term,CTerm)),!.
+unnumbervars_with_names(Term,CTerm):- !, must(notrace(unnumbervars(Term,CTerm))),!.
 unnumbervars_with_names(Term,CTerm):- ground(Term),!,duplicate_term(Term,CTerm).
 
 unnumbervars_with_names(Term,CTerm):-
@@ -947,7 +947,8 @@ kif_to_boxlog(I,KB,Why,Flattened):-
 %kif_to_boxlog((Wff:- B),KB,Why,Flattened):- is_true(B),!, kif_to_boxlog(Wff,KB,Why,Flattened),!.
 %kif_to_boxlog(Wff,KB,Why,Out):- adjust_kif(KB,Wff,M),Wff \=@= M ,!,kif_to_boxlog(M,KB,Why,Out).
 
-kif_to_boxlog(HB,KB,Why,FlattenedO):- unnumbervars((HB,KB,Why),(HB0,KB0,Why0)),
+kif_to_boxlog(HB,KB,Why,FlattenedO):- 
+ unnumbervars((HB,KB,Why),(HB0,KB0,Why0)),
   must(kif_to_boxlog_attvars(HB0,KB0,Why0,FlattenedO)),!.
 
 kif_to_boxlog_attvars(kif(HB),KB,Why,FlattenedO):-!,kif_to_boxlog_attvars(HB,KB,Why,FlattenedO).

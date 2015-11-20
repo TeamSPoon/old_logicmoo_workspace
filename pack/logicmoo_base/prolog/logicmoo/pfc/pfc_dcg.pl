@@ -99,7 +99,7 @@ show_sentences(Id) :- show_sentences(Id,_).
 
 show_sentences(Id,Words) :-
   sentence(Id,Words),
-  req(ss(s(S),Id,(Words \\ []))),
+  call_u(ss(s(S),Id,(Words \\ []))),
   nl,write(S),
   fail.
 show_sentences(_,_).
@@ -108,7 +108,7 @@ show_sentences(_,_).
 l_do(X) :- call(X) -> true;true.
 
 show(Id,C) :-
-  req(ss(C,Id,A \\ B)),
+  call_u(ss(C,Id,A \\ B)),
   append(Words,B,A),
   format("~N%  ~w    :   ~w",[C,Words]),
   fail.

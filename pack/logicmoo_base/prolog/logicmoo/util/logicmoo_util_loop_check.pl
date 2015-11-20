@@ -183,8 +183,8 @@ call_t(C):- call(C).
 %
 reduce_make_key(call(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(call_u(C),O):-!,reduce_make_key(C,O).
-reduce_make_key(req(C),O):-!,reduce_make_key(C,O).
-reduce_make_key(req(C),O):-!,reduce_make_key(C,O).
+reduce_make_key(call_u(C),O):-!,reduce_make_key(C,O).
+reduce_make_key(call_u(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(must(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(no_repeats(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(no_repeats(_,C),O):-!,reduce_make_key(C,O).

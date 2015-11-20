@@ -984,7 +984,7 @@ prequent(skolem(_,_)).
 prequent(different(_,_)).
 prequent(argInst(_,_,_)).
 prequent(G):-functor(G,call_builtin,_).
-prequent(G):-functor(G,req,_).
+prequent(G):-functor(G,call_u,_).
 prequent(G):-functor(G,not_call_builtin,_).
 
 
@@ -1201,7 +1201,7 @@ function_to_predicate(Function,NewVar,PredifiedFunction):-
 
 function_to_predicate(Function,NewVar,PredifiedFunction):- 
   Function=..[F|ARGS],
-  req(function_corisponding_predicate(F,P)),
+  call_u(function_corisponding_predicate(F,P)),
   fresh_varname(Function,NewVar),
   PredifiedFunction=..[P,NewVar|ARGS],!.
 

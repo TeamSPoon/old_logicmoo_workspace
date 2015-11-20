@@ -164,7 +164,7 @@ pp_items(Type,H) :- ignore(pp_item(Type,H)).
 % Managed Predicate  Trace item.
 %
 mpred_trace_item(_,_):- tlbugger:ifHideTrace,!.
-mpred_trace_item(MM,H):- ignore(mpred_is_tracing_exec-> on_x_rtrace(in_cmt(pp_item(MM,H))); true).
+mpred_trace_item(MM,H):- ignore(lookup_u(mpred_is_tracing_exec)-> on_x_rtrace(in_cmt(pp_item(MM,H))); true).
 
 
    
@@ -300,7 +300,7 @@ pp_supports :-
 pp_filtered(P):-var(P),!,fail.
 pp_filtered(_:P):- !, pp_filtered(P).
 pp_filtered(P):- functor(P,F,A),F\==(/),!,pp_filtered(F/A).
-pp_filtered(F/A):-F==mpred_mark.
+pp_filtered(F/_):-F==mpred_mark.
 
 
 

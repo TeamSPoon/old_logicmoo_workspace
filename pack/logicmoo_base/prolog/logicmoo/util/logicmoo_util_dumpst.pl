@@ -548,6 +548,10 @@ dumptrace(G,0'f):-!, notrace,(ftrace((G,notrace))),!,fail.
 dumptrace(G,0't):-!,visible(+all),leash(+all),trace,!,G.
 dumptrace(G,10):-!,dumptrace_ret(G).
 dumptrace(G,13):-!,dumptrace_ret(G).
+dumptrace(G,Code):- number(Code),char_code(Char,Code),!,dumptrace(G,Char).
+dumptrace(_G,'p'):- in_cmt(if_defined(pp_cur_DB,fail)),!,fail.
+
+
 dumptrace(_,C):-fmt(unused_keypress(C)),!,fail.
 % )))))))))))))) %
 

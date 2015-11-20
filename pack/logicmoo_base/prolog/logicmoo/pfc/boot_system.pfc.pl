@@ -600,7 +600,7 @@ isa('CycLTerm',ttNonGenled).
 ==>prologHybrid(quotedIsa(ftTerm,ttFormatType)).
 :- kb_dynamic(quotedIsa/2).
 
-isa(I,C):- cwc, mpred_univ(C,I,CI),atom(C),(current_predicate(C,M:CI),\+ predicate_property(M:CI,imported_form(_))), req(call(M:CI)).
+isa(I,C):- cwc, mpred_univ(C,I,CI),atom(C),(current_predicate(C,M:CI),\+ predicate_property(M:CI,imported_form(_))), call_u(call(M:CI)).
 isa(I,C):- isa_backchaing(I,C).
 isa(I,C):- cwc, is_asserted(ttFormatType(C)),!, quotedIsa(I,C).
 quotedIsa(I,C):- cwc, term_is_ft(I,C).
@@ -722,7 +722,7 @@ equal(A,C),notequal(A,B) ==> notequal(C,B).
 
 :- was_export(member/2).
 :- was_export(arg/3).
-%:- was_export(req/1).
+%:- was_export(call_u/1).
 % prologDynamic(cycAssert/2).
 :- was_export(integer/1).
 % :- was_export(makeConstant/1).
@@ -746,7 +746,7 @@ arity(typeProps,2).
 prologHybrid(isEach( tCol/1, disjointWith/2, genls/2,genlPreds/2, meta_argtypes/1)).
 
 :- ignore(show_failure(why,arity(typeProps,2))).
-:- mpred_test(req(arity(typeProps,2))).
+:- mpred_test(call_u(arity(typeProps,2))).
 :- ain((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,predCanHaveSingletons,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),1,tPred))).
 :- ain((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologHybrid,prologPTTP,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),2,ftListFn(ftVoprop)))).
 :- ain((isa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),functorDeclares))).

@@ -23,6 +23,8 @@
             contrasting_color/2,
             defined_message_color/2,
 
+            format_to_message/3, 
+            
             dfmt/1,dfmt/2,
             debugm/1,debugm/2,
             dmsg/1,dmsg/2,dmsg/3,
@@ -382,6 +384,13 @@ fmt(X,Y):- fresh_line,fmt_ansi(fmt0(X,Y)),!.
 %
 fmt(X,Y,Z):- fmt_ansi(fmt0(X,Y,Z)),!.
 
+
+
+:- module_transparent((format_to_message)/3).
+format_to_message(Format,Args,Info):- 
+   is_list(Args)-> 
+     format(string(Info),Format,Args);
+     format(string(Info),'~N~p <> ~p~n',[Format,Args]).
 
 %= 	 	 
 

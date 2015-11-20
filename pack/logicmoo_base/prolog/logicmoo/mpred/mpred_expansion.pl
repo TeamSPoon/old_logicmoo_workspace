@@ -244,11 +244,11 @@ Writing in Prolog is actually really easy for a MUD is when the length's chosen
 % Alt Calls.
 %
 alt_calls(call).
-alt_calls(req).
+alt_calls(call_u).
 alt_calls(is_asserted).
 alt_calls(t).
-alt_calls(req).
-alt_calls(req).
+alt_calls(call_u).
+alt_calls(call_u).
 alt_calls(ireq).
 
  :- meta_predicate logicmoo_util_bugger:do_ref_job(0,*).
@@ -322,7 +322,7 @@ functor_declares_instance_0(P,tCol):- arg(_,s(tCol,tSpec,ttFormatType),P).
 %functor_declares_instance_0(P,tPred):-isa_asserted(P,ttPredType),!.
 %functor_declares_instance_0(P,tCol):-isa_asserted(P,functorDeclares),\+functor_declares_instance_0(P,tPred).
 
-functor_declares_instance_0(P,P):- req(functorDeclares(P)). % arity(P,1),\+((arity(P,N),N>1)).
+functor_declares_instance_0(P,P):- call_u(functorDeclares(P)). % arity(P,1),\+((arity(P,N),N>1)).
 
 
 %= 	 	 
@@ -649,7 +649,7 @@ is_unit_functor(F):-atom_concat(_,'Fn',F).
 %
 % Get Rule Rewrite.
 %
-get_ruleRewrite(Sent,SentM):- req(ruleRewrite(Sent,SentM)).
+get_ruleRewrite(Sent,SentM):- call_u(ruleRewrite(Sent,SentM)).
 /*
 as_is_term(NC):-compound(NC),functor(NC,Op,2),infix_op(Op,_).
 */
@@ -705,7 +705,7 @@ mpred_expand(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),mpred_dat
 db_expand_final(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,db_expand_final(Op,Sent,SentO).
 db_expand_final(_ ,NC,NC):-as_is_term(NC),!.
 db_expand_final(_, Sent,true):-is_true(Sent).
-db_expand_final(_,Term,Term):- is_ftCompound(Term),functor(Term,F,_),req(argsQuoted(F)),!.
+db_expand_final(_,Term,Term):- is_ftCompound(Term),functor(Term,F,_),call_u(argsQuoted(F)),!.
 db_expand_final(_, arity(F,A),arity(F,A)):-!.
 db_expand_final(_, tPred(V),tPred(V)):-!.
 db_expand_final(_ ,NC,NC):-functor(NC,_,1),arg(1,NC,T),\+ (is_ftCompound(T)),!.
@@ -813,7 +813,7 @@ db_expand_0(Op,RDF,OUT):- RDF=..[SVO,S,V,O],is_svo_functor(SVO),!,must_det(from_
 db_expand_0(Op,G,OUT):- G=..[Pred,InstFn,VO],InstFn=isInstFn(Type),is_ftNonvar(Type),from_univ(relationMostInstance,Op,[Pred,Type,VO],OUT).
 db_expand_0(Op,G,OUT):- G=..[Pred,InstFn|VO],InstFn=isInstFn(Type),is_ftNonvar(Type),GO=..[Pred,Type|VO],db_expand_0(Op,GO,OUT).
 
-db_expand_0(Op,(req(CALL)),(req(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
+db_expand_0(Op,(call_u(CALL)),(call_u(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
 db_expand_0(_ ,include(CALL),(load_data_file_now(CALL))):-!.
 
 db_expand_0(Op,=>(G),(GG)):-!,db_expand_0(Op,(G),(GG)).
@@ -1468,7 +1468,7 @@ transform_holds_3(Op,[Fogical|ARGS],OUT):-
 
 transform_holds_3(_,[props,Obj,Props],props(Obj,Props)).
 transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[isa(Type)|PROPS])):- 
-                  is_ftNonvar(Inst), not(Type=props), req(tCol(Type)), must_det(not(is_never_type(Type))),!.
+                  is_ftNonvar(Inst), not(Type=props), call_u(tCol(Type)), must_det(not(is_never_type(Type))),!.
 transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[isa(Type)|PROPS])):- 
                   is_ftNonvar(Inst), not(Type=props), t(functorDeclares,Type), must_det(not(is_never_type(Type))),!.
 
@@ -1583,7 +1583,7 @@ db_reop_l(Op,DATA):-no_loop_check(db_op0(Op,DATA)).
 %
 expand_goal_correct_argIsa(A,B):- expand_goal(A,B).
 
-% db_op_simpler(query(HLDS,_),MODULE:C0,req(call,MODULE:C0)):- atom(MODULE), is_ftNonvar(C0),not(not(predicate_property(C0,_PP))),!. % , functor_catch(C0,F,A), dmsg(todo(unmodulize(F/A))), %trace_or_throw(module_form(MODULE:C0)), %   db_op(Op,C0).
+% db_op_simpler(query(HLDS,_),MODULE:C0,call_u(call,MODULE:C0)):- atom(MODULE), is_ftNonvar(C0),not(not(predicate_property(C0,_PP))),!. % , functor_catch(C0,F,A), dmsg(todo(unmodulize(F/A))), %trace_or_throw(module_form(MODULE:C0)), %   db_op(Op,C0).
 
 %= 	 	 
 

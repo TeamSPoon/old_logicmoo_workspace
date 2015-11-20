@@ -491,7 +491,7 @@ mpred_plist_t(P,LIST):- CALL=..[t,P|LIST],on_x_rtrace(CALL).
 % Loop Check Managed Predicate.
 %
 loop_check_mpred(Call):- !, fail,not(t_l:infInstanceOnly(_)),loop_check_term(ireq(Call),loop_check_mpred(Call),fail).
-% loop_check_mpred(Call):-loop_check(req(t,Call),fail).
+% loop_check_mpred(Call):-loop_check(call_u(t,Call),fail).
 
 :- meta_predicate(mpred_fa_call(?,?,0)).
 
@@ -522,7 +522,7 @@ mpred_fact_arity(F,A):-arity(F,A),once(mpred_isa(F,prologHybrid);mpred_isa(F,pfc
 %
 % Prolog Hybrid Fact.
 %
-prologHybridFact(G):- (var(G)->(mpred_fact_arity(F,A),functor(G,F,A));true),into_mpred_form(G,M),!,no_repeats(req(M)).
+prologHybridFact(G):- (var(G)->(mpred_fact_arity(F,A),functor(G,F,A));true),into_mpred_form(G,M),!,no_repeats(call_u(M)).
 
 
 %= 	 	 
@@ -631,7 +631,7 @@ holds_relaxed_0_t(dac(_,a,_,_),P,A1,A2):- assertion_t([P,A1,A2]).
 holds_relaxed_0_t(dac(d,_,_,_),P,A1,A2):- t(P,A1,A2).
 holds_relaxed_0_t(dac(_,_,_,h),P,A1,A2):- call_which_t(DBS,P,A1,A2).
 holds_relaxed_0_t(DBS,P,A1,A2):- call_mt_t(DBS,P,A1,A2,_,_).
-holds_relaxed_0_t(_DBS,P,A1,A2):- ground((P,A1)), TEMPL=..[P,T1,_],t(argSingleValueDefault,TEMPL,2,A2),req(isa(A1,T1)),!.
+holds_relaxed_0_t(_DBS,P,A1,A2):- ground((P,A1)), TEMPL=..[P,T1,_],t(argSingleValueDefault,TEMPL,2,A2),call_u(isa(A1,T1)),!.
 */
 
 

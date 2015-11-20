@@ -12,6 +12,7 @@
 :- module(logicmoo_util_strings,
           [ addSpaceBeforeSym/2,
             all_upper_atom/1,
+            isSlot/1,
             any_to_atom/2,
             any_to_string/2,
             any_to_string1/2,
@@ -501,6 +502,8 @@ atomic_concat(A,B,C,Out):-atomic_list_concat_safe([A,B,C],Out).
 % ===========================================================
 % CASE CHANGE
 % ===========================================================
+
+isSlot(V):- is_ftVar(V).
 
 
 %= 	 	 

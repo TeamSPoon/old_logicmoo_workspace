@@ -3198,3 +3198,107 @@ supporters_list(F,[Fact|MoreFacts]) :-
   mpred_get_support_precanonical_plus_more(F,(Fact,Trigger)),
   must(trigger_supporters_list(Trigger,MoreFacts)).
 */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:- must(mpred_reset).
+
+
+:- if(current_module(mpred_loader)).
+:- wdmsg("Already loaded mpred_loader!").
+:- endif.
+
+
+% local_testing
+
+
+
+
+
+
+:- get_user_abox(M),M:dynamic((current_ooZz/1,default_ooZz/1,if_mooZz/2)).
+
+:- mpred_trace.
+:- mpred_watch.
+:- mpred_reset.
+
+:- mpred_ain(default_ooZz(booZz)).
+
+:- call_u(default_ooZz(booZz)).
+
+:- call_u(default_ooZz(booZz)).
+
+:- mpred_why(default_ooZz(booZz)).
+
+:- mpred_test(default_ooZz(booZz)).
+
+:- pp_cur_DB.
+
+:- mpred_ain(\+default_ooZz(booZz)).
+
+:- pp_cur_DB.
+
+
+% this should have been ok
+% (if_mooZz(Missing,Create) ==> ((\+ Missing/(Missing\==Create), \+ Create , \+ ~(Create)) ==> Create)).
+:- ((mpred_ain((if_mooZz(Missing,Create) ==> 
+ ( ( \+ Missing/(Missing\=@=Create)) ==> Create))))).
+
+:- mpred_ain((default_ooZz(X) ==> if_mooZz(current_ooZz(_),current_ooZz(X)))).
+
+:- mpred_ain(default_ooZz(booZz)).
+
+:- mpred_test(current_ooZz(booZz)).
+
+% :- pp_cur_DB.
+
+:- (mpred_ain(current_ooZz(fooZz))).
+
+:- mpred_test(\+current_ooZz(booZz)).
+
+:- (mpred_ain(\+ current_ooZz(fooZz))).
+
+:- mpred_test(current_ooZz(booZz)).
+
+:- (mpred_withdraw( default_ooZz(booZz) )).
+
+:- listing([current_ooZz,default_ooZz]).
+
+:- mpred_test( \+current_ooZz(booZz)).
+
+:- mpred_ain(~ current_ooZz(fooZz)).
+
+% :- pp_cur_DB.
+
+:- mpred_test(~current_ooZz(fooZz)).
+
+:- mpred_ain(default_ooZz(booZz)).
+
+:- mpred_test(current_ooZz(booZz)).
+
+:- mpred_reset.
+
+
+

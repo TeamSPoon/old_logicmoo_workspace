@@ -78,19 +78,19 @@ mreq_old(Call):-
  w_tl(readOnlyDatabases,
                 (
            (is_callable(Call)-> findallCall(Call,call,CallL,CallLL) ; (CallL=[];CallLL=[])),
-                 findallCall(Call,req,MCallL,MCallLL),
+                 findallCall(Call,call_u,MCallL,MCallLL),
                  findallCall(Call,t,DCallL,DCallLL),
                  findallCall(Call,is_asserted,ACallL,ACallLL),
-                 findallCall(Call,req,RCallL,RCallLL),
+                 findallCall(Call,call_u,RCallL,RCallLL),
                  findallCall(Call,ireq,ICallL,ICallLL))),
    flatten([CallL,MCallL,DCallL,ACallL,RCallL,ICallL],ALL),
    flatten([CallLL,MCallLL,DCallLL,ACallLL,RCallLL,ICallLL],WITHFUNCTOR),
    list_to_set(ALL,SET),
                  showDif(SET,call,CallL,WITHFUNCTOR),
-                 showDif(SET,req,MCallL,WITHFUNCTOR),
+                 showDif(SET,call_u,MCallL,WITHFUNCTOR),
                  showDif(SET,t,DCallL,WITHFUNCTOR),
                  showDif(SET,is_asserted,ACallL,WITHFUNCTOR),
-                 showDif(SET,req,RCallL,WITHFUNCTOR),
+                 showDif(SET,call_u,RCallL,WITHFUNCTOR),
                  showDif(SET,ireq,ICallL,WITHFUNCTOR).
 
 showDif(SET,Named,LIST,_WITHFUNCTOR):-

@@ -593,12 +593,12 @@ call_wdmsg(P,DB):- get_functor(DB,F,A), call_wdmsg(P,DB,F,A).
 %
 % Call Wdmsg.
 %
-call_wdmsg(P,DB,t,_A):-!, append_term(P,DB,CALL),dmsg((CALL)),req(CALL).
-call_wdmsg(P,MP,F,A):- mpred_isa(F,prologHybrid),must(A>1),into_functor_form(t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,req(CALL).
+call_wdmsg(P,DB,t,_A):-!, append_term(P,DB,CALL),dmsg((CALL)),call_u(CALL).
+call_wdmsg(P,MP,F,A):- mpred_isa(F,prologHybrid),must(A>1),into_functor_form(t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,call_u(CALL).
 call_wdmsg(P,MP,F,A):-  (\+ mpred_isa(F,prologDynamic)), (\+ mpred_isa(F,prologBuiltin)), decl_mpred_hybrid(F/A), into_functor_form(t,MP,DB),!, 
-  append_term(P,DB,CALL),dmsg(info(CALL)),!,req(CALL).
-call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(mpred_isa(F,prologDynamic);mpred_isa(F,prologBuiltin)),!,req(CALL).
-%call_wdmsg(P,DB,S,_):-  dtrace((append_term(P,DB,CALL),dmsg((CALL)),req(CALL))).
+  append_term(P,DB,CALL),dmsg(info(CALL)),!,call_u(CALL).
+call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(mpred_isa(F,prologDynamic);mpred_isa(F,prologBuiltin)),!,call_u(CALL).
+%call_wdmsg(P,DB,S,_):-  dtrace((append_term(P,DB,CALL),dmsg((CALL)),call_u(CALL))).
 
 
 % ================================================================================
@@ -981,13 +981,13 @@ mpred_t_storage_op(Op,(Head:-Body)):- \+ use_kif(Head,Body),
 
 % PTTP RULE HOOK   
 mpred_t_storage_op(Op,(Head:-Body)):- 
-   req(use_kif(Head,Body)),!, 
+   call_u(use_kif(Head,Body)),!, 
    reduce_mpred_op(Op,Op2), 
    CALL0 = (call(Op2,ruleBackward(Head,Body))), % remember outside of KIF just in case
    must(((CALL0,mpred_t_tell_kif(Op2,(Head:-Body))))),!.
 
 % KIF RULE HOOK   
-mpred_t_storage_op(Op,RULE):- req(is_kif_rule(RULE)),!,
+mpred_t_storage_op(Op,RULE):- call_u(is_kif_rule(RULE)),!,
   reduce_mpred_op(Op,Op2),
   mpred_t_tell_kif(Op2,RULE),!.
 

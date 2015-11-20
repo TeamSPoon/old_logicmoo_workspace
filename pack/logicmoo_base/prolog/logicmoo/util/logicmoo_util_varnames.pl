@@ -12,6 +12,7 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_varnames.pl
 :- module(vn,
           [ ain00/1,
+            contains_ftVar/1,
             count_members_eq/3,
             all_different_vars/1,
             all_different_vals/1,
@@ -369,7 +370,7 @@ all_different_vals(Term):-all_different_vals(dif_matrix,Term).
 % All Different Variables.
 %
 all_different_vars(_):- t_l:dont_varname,!.
-all_different_vars(A):-all_disjoint_in_sets(dif_matrix,A,A),!.
+all_different_vars(A):-must(notrace((all_disjoint_in_sets(dif_matrix,A,A)))),!.
 all_different_vars(A):-all_different_vals(v_dif_rest,A),!.
 
 
@@ -379,8 +380,8 @@ all_different_vars(A):-all_different_vals(v_dif_rest,A),!.
 % All Different Vals.
 %
 all_different_vals(Pred,Term):- 
-  (is_list(Term)-> Slots = Term ; term_slots(Term,Slots)),!,
-                                 all_disjoint_in_sets(Pred,Slots,Slots).
+ must(notrace(( (is_list(Term)-> Slots = Term ; term_slots(Term,Slots)),!,
+                                 all_disjoint_in_sets(Pred,Slots,Slots)))).
 
 %% all_different_vals(+:PRED2, +SET1, +SET2) is semidet.
 %
@@ -416,7 +417,7 @@ dif_matrix_hopfully(A,B):- dif:dif(A,B),!.
 %
 lock_vars(Var):-var(Var),!,when:when(nonvar(Var),Var='$VAR'(_)).
 lock_vars(Var):-var(Var),!,only_stars(Var). 
-lock_vars(Term):-term_variables(Term,Vs),maplist(lock_vars,Vs),all_different_vars(Vs).
+lock_vars(Term):- must(notrace((term_variables(Term,Vs),maplist(lock_vars,Vs),all_different_vars(Vs)))).
 
 
 %= 	 	 
@@ -427,7 +428,7 @@ lock_vars(Term):-term_variables(Term,Vs),maplist(lock_vars,Vs),all_different_var
 %
 
 unlock_vars( Var):-var(Var),!,del_attr(Var,when),del_attr(Var,eq),del_attr(Var,dif).
-unlock_vars(Term):-term_attvars(Term,Vs),maplist(unlock_vars,Vs).
+unlock_vars(Term):- must(notrace((term_attvars(Term,Vs),maplist(unlock_vars,Vs)))).
 
 
 
@@ -886,6 +887,12 @@ ain00(A):- logicmoo_util_database:clause_asserted(A),!.
 ain00(A):- assertz(A).
 
 
+%% contains_ftVar( +Term) is semidet.
+%
+% Contains Format Type Variable.
+%
+contains_ftVar(Term):- sub_term(Sub,Term),compound(Sub),Sub='$VAR'(_).
+
 
 
 %= 	 	 
@@ -915,7 +922,7 @@ ensure_vars_labled_r(I,O):- copy_term_and_varnames(I,O),I\=@=O.
 %
 % Copy Term And Varnames.
 %
-copy_term_and_varnames(Term,Named):- unnumbervars(Term,UNV),copy_term(UNV,Named),!.
+copy_term_and_varnames(Term,Named):- notrace((unnumbervars(Term,UNV),copy_term(UNV,Named))),!.
 copy_term_and_varnames(Term,Named):-
    notrace((ignore((source_variables_lv(AllS))), copy_term(Term+AllS,Named+CAllS),maplist(set_varname([write_functor,b_setarg]),CAllS))).
 

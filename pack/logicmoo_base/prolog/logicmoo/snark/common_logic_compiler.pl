@@ -275,7 +275,7 @@ to_poss(X,poss(X)):-!.
 % Negated Normal Form.
 %
 nnf(KB,FmlNV,NNF):-
-  must(unnumbervars_with_names((KB,FmlNV),(KB0,FmlNV0))),
+  must(notrace(unnumbervars_with_names((KB,FmlNV),(KB0,FmlNV0)))),
    must( \+ contains_dvar(KB0:FmlNV0)),
    nnf0(KB0,FmlNV0,NNF).
 

@@ -207,7 +207,7 @@ mpred_halt/1,
 mpred_halt/2,
 mpred_hide_msg/1,
 mpred_ignored/1,
-mpred_init_i/2,
+mpred_set_default/2,
 mpred_is_builtin/1,
 mpred_is_info/1,
 mpred_is_silient/0,
@@ -355,7 +355,7 @@ repropagate_0/1,
 repropagate_1/1,
 repropagate_2/1,
 repropagate_meta_wrapper_rule/1,
-req/1,
+call_u/1,
 rescan_pfc/0,
 retract_eq_quitely/1,
 retract_eq_quitely_f/1,
@@ -431,7 +431,7 @@ without_running/1,
       ain_minfo_2(1,*),
       ain_rule_if_rule(0),
       mpred_bc_only(:),
-      req(0),
+      call_u(0),
       mpred_call_0(0),
       mpred_call_only_facts(*,0),
       mpred_call_only_facts(0),
@@ -503,7 +503,7 @@ without_running/1,
       ain_minfo_2(1,*),
       ain_rule_if_rule((*)),
       mpred_bc_only((:)),
-      req((*)),
+      call_u((*)),
       with_umt((*)),
       mpred_call_0((*)),
       mpred_call_only_facts(*,(*)),
@@ -1056,8 +1056,8 @@ to_predicate_isas0(C,CO):-C=..[F|CL],must_maplist(to_predicate_isas0,CL,CLO),!,C
 %
 exact_args(Q):-is_ftVar(Q),!,fail.
 exact_args(argsQuoted(_)):-!,fail.
-exact_args(Q):- req(argsQuoted(Q)).
-exact_args(Q):-is_ftCompound(Q),functor(Q,F,_),req(argsQuoted(F)).
+exact_args(Q):- call_u(argsQuoted(Q)).
+exact_args(Q):-is_ftCompound(Q),functor(Q,F,_),call_u(argsQuoted(F)).
 exact_args(second_order(_,_)).
 exact_args(call(_)).
 exact_args(asserted(_)).
@@ -1403,7 +1403,7 @@ is_atom_body_pfa(WAC,P,F,2,Rest):-arg(2,P,E),E==WAC,arg(1,P,Rest),!.
 %
 % If Is A Silient.
 %
-mpred_is_silient :- ( \+ t_l:mpred_debug_local, \+ mpred_is_tracing_exec, \+ mpred_is_tracing(_), current_prolog_flag(debug,false), is_release) ,!.
+mpred_is_silient :- ( \+ t_l:mpred_debug_local, \+ mpred_is_tracing_exec, \+ mpred_is_tracing_pred(_), current_prolog_flag(debug,false), is_release) ,!.
 
 
 :- meta_predicate(show_if_debug(0)).
@@ -1413,7 +1413,7 @@ mpred_is_silient :- ( \+ t_l:mpred_debug_local, \+ mpred_is_tracing_exec, \+ mpr
 %
 % Show If Debug.
 %
-show_if_debug(A):- get_mpred_is_tracing(A) -> show_call(mpred_is_tracing,A) ; A.
+show_if_debug(A):- get_mpred_is_tracing(A) -> show_call(mpred_is_tracing_pred,A) ; A.
 
 % ======================= 
 % user''s program''s database
@@ -1434,8 +1434,8 @@ assert_u(X):- functor(X,F,A),assert_u(abox,X,F,A).
 %
 % Assert For User Code.
 %
-assert_u(_M,X,F,_):- req(singleValuedInArg(F,SV)),!,must(update_single_valued_arg(X,SV)),!.
-assert_u(_M,X,F,A):- req(prologSingleValued(F)),!,must(update_single_valued_arg(X,A)),!.
+assert_u(_M,X,F,_):- call_u(singleValuedInArg(F,SV)),!,must(update_single_valued_arg(X,SV)),!.
+assert_u(_M,X,F,A):- call_u(prologSingleValued(F)),!,must(update_single_valued_arg(X,A)),!.
 % assert_u(M,X,F,A):-must(isa(F,prologAssertAOrdered) -> asserta_u(M,X) ; assertz_u(M,X)).
 % assert_u(M,X,F,A):-must(isa(F,prologOrdered)        -> assertz_u(M,X) ; asserta_u(M,X)).
 assert_u(M,X,_,_):- assertz_mu(M,X).
@@ -1447,14 +1447,14 @@ assert_u(M,X,_,_):- assertz_mu(M,X).
 %
 % Check Never Assert.
 %
-check_never_assert(X):- hotrace((( copy_term_and_varnames(X,Y),req(never_assert_u(Y,Why)),X=@=Y,trace_or_throw(never_assert_u(X,Why))))),fail.
-check_never_assert(X):- hotrace(ignore(( copy_term_and_varnames(X,Y),req(never_assert_u(Y)),X=@=Y,trace_or_throw(never_assert_u(X))))).
+check_never_assert(X):- hotrace((( copy_term_and_varnames(X,Y),call_u(never_assert_u(Y,Why)),X=@=Y,trace_or_throw(never_assert_u(X,Why))))),fail.
+check_never_assert(X):- hotrace(ignore(( copy_term_and_varnames(X,Y),call_u(never_assert_u(Y)),X=@=Y,trace_or_throw(never_assert_u(X))))).
 
 %% check_never_retract( ?X) is semidet.
 %
 % Check Never Retract.
 %
-check_never_retract(X):- hotrace(ignore(( copy_term_and_varnames(X,Y),req(never_retract_u(Y,Why)),X=@=Y,trace_or_throw(never_retract_u(X,Why))))).
+check_never_retract(X):- hotrace(ignore(( copy_term_and_varnames(X,Y),call_u(never_retract_u(Y,Why)),X=@=Y,trace_or_throw(never_retract_u(X,Why))))).
 
 
 
@@ -1535,7 +1535,7 @@ update_single_valued_arg(P,N):-
   must_det_l((
      attvar_op(assert_if_new,
      spft(ABOX,P,U,U,Why)),
-     (req(P)->true;(assertz_u(P))),
+     (call_u(P)->true;(assertz_u(P))),
      doall((
           clause_i(Q,true,E),
           UPDATE \== OLD,
@@ -1725,23 +1725,23 @@ correctify_support([U],S):-correctify_support(U,S).
 
 %=% initialization of global assertons
 
-%= lmconf:mpred_init_i/1 initialized a global assertion.
-%=  lmconf:mpred_init_i(P,Q) - if there is any fact unifying with P, then do
+%= lmconf:mpred_set_default/1 initialized a global assertion.
+%=  lmconf:mpred_set_default(P,Q) - if there is any fact unifying with P, then do
 %=  nothing, else assert_db Q.
 
 
-%% mpred_init_i( ?GeneralTerm, ?Default) is semidet.
+%% mpred_set_default( ?GeneralTerm, ?Default) is semidet.
 %
 % PFC Init For Internal Interface.
 %
-mpred_init_i(GeneralTerm,Default) :- ((
+mpred_set_default(GeneralTerm,Default) :- ((
   clause_i(GeneralTerm,true) -> true ; assert_i(Default))).
 
 %= tms is one of {none,local,cycles} and controles the tms alg.
-lmconf:module_local_init:- must((mpred_init_i(tms(_), tms(cycles)))).
+lmconf:module_local_init:- must((mpred_set_default(tms(_), tms(cycles)))).
 
 % Pfc Search strategy. sm(X) where X is one of {direct,depth,breadth}
-lmconf:module_local_init:- mpred_init_i(sm(_), sm(direct)).
+lmconf:module_local_init:- mpred_set_default(sm(_), sm(direct)).
 
 % aliases
 
@@ -2006,7 +2006,8 @@ with_mpred_trace_exec(P):- w_tl(t_l:mpred_debug_local,w_tl(mpred_is_tracing_exec
 %
 % Without Trace exec.
 %
-with_no_mpred_trace_exec(P):- wno_tl(t_l:mpred_debug_local,wno_tl(mpred_is_tracing_exec, must(show_if_debug(P)))).
+with_no_mpred_trace_exec(P):- get_user_abox(M),
+   wno_tl(t_l:mpred_debug_local,wno_tl(M:mpred_is_tracing_exec, must(show_if_debug(P)))).
 
 
 %% mpred_test( ?P) is semidet.
@@ -2014,8 +2015,8 @@ with_no_mpred_trace_exec(P):- wno_tl(t_l:mpred_debug_local,wno_tl(mpred_is_traci
 % PFC Test.
 %
 mpred_test(_):- (compiling; current_prolog_flag(xref,true)),!.
-mpred_test(P):- mpred_is_silient,!,sanity(req(P)),!.
-mpred_test(P):- (show_call(with_mpred_trace_exec(req(P))) -> why_was_true(P) ; ((why_was_true( \+( P )),!,fail))).
+mpred_test(P):- mpred_is_silient,!,sanity(call_u(P)),!.
+mpred_test(P):- (show_call(with_mpred_trace_exec(call_u(P))) -> why_was_true(P) ; ((why_was_true( \+( P )),!,fail))).
 
 why_was_true(P):- mpred_why(P),!.
 why_was_true(P):- dmsg(justfied_true(P)),!.
@@ -2256,7 +2257,7 @@ remove_selection(P,S) :-
 % Select Next Fact.
 %
 select_next_fact(P,S) :-
-  req(mpred_select(P,S)),
+  call_u(mpred_select(P,S)),
   !.
 select_next_fact(P,S) :-
   defaultmpred_select(P,S),
@@ -2847,48 +2848,6 @@ mpred_deep_support0(user_atom(P),P):-user_atom(P),!.
 mpred_deep_support0(mpred_call_only_facts((P)),P):-mpred_call_only_facts(P).
 
 
-%=
-%= a fact is well founded if it is supported by the user
-%= or by a set of facts and a rules, all of which are well founded.
-%=
-
-
-%% well_founded( ?Fact, ?How) is semidet.
-%
-% Well Founded.
-%
-well_founded(Fact,How) :- mpred_wff(Fact,[],How).
-
-
-%% mpred_wff( ?F, ?VALUE2, :TermHow) is semidet.
-%
-% PFC Well-formed Formula.
-%
-mpred_wff(F,_,How) :-
-  % supported by user (mpred_axiom) or an "absent" fact (assumption).
-  ((mpred_axiom(F),How =mpred_axiom(F) ); (assumption(F),How=assumption(F))),
-  !.
-
-mpred_wff(F,Descendants,wff(Supporters)) :-
-  % first make sure we aren''t in a loop.
-  (\+ memberchk(F,Descendants)),
-  % find a justification.
-  supporters_list(F,Supporters),
-  % all of whose members are well founded.
-  mpred_wfflist(Supporters,[F|Descendants]),
-  !.
-
-%= mpred_wfflist(L) simply maps mpred_wff over the list.
-
-
-%% mpred_wfflist( :TermX, ?L) is semidet.
-%
-% PFC Wfflist.
-%
-mpred_wfflist([],_).
-mpred_wfflist([X|Rest],L) :-
-  mpred_wff(X,L,_How),
-  mpred_wfflist(Rest,L).
 
 % supporters_list(+F,-ListofSupporters) where ListOfSupports is a list of the
 % supports for one justification for fact F -- i.e. a list of facts which,
@@ -2929,7 +2888,7 @@ mpred_get_support_one(P,Sup):- mpred_get_support(P,Sup)*->true;
 mpred_get_support_via_sentence(Var,_):-is_ftVar(Var),!,fail.
 mpred_get_support_via_sentence((A,B),(FC,TC)):-!, mpred_get_support_precanonical_plus_more(A,(FA,TA)),mpred_get_support_precanonical_plus_more(B,(FB,TB)),conjoin(FA,FB,FC),conjoin(TA,TB,TC).
 mpred_get_support_via_sentence(true,g):-!.
-mpred_get_support_via_sentence(G,req(G)):- req(G).
+mpred_get_support_via_sentence(G,call_u(G)):- call_u(G).
 
 
 
@@ -2959,7 +2918,7 @@ support_ok_via_clause_body(H):- get_functor(H,F,A),support_ok_via_clause_body(H,
 % Support Ok Via Clause Body.
 %
 support_ok_via_clause_body(_,(\+),1):-!,fail.
-support_ok_via_clause_body(_,F,_):- req(argsQuoted(F)),!,fail.
+support_ok_via_clause_body(_,F,_):- call_u(argsQuoted(F)),!,fail.
 support_ok_via_clause_body(H,F,A):- should_call_for_facts(H,F,A).
 
 
@@ -3054,7 +3013,7 @@ mpred_fwd2(Fact0,_Sup):-
 %
 ain_rule_if_rule(Fact) :- fixed_negations(Fact,M),!,ain_rule_if_rule(M).
 ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),
-    doall(show_if_debug(with_umt(req(Fact)))),!.
+    doall(show_if_debug(with_umt(call_u(Fact)))),!.
 ain_rule_if_rule(Fact):- must(ain_rule0(Fact)),!.
 
 
@@ -3343,7 +3302,7 @@ not_cond(_Why,X):- \+ X.
 %
 % {}.
 %
-'{}'(G):-req(G).
+'{}'(G):-call_u(G).
 
 :- meta_predicate neg_in_code(*).
 :- export(neg_in_code/1).
@@ -3353,10 +3312,10 @@ not_cond(_Why,X):- \+ X.
 % Negated In Code.
 %
 neg_in_code(G):-var(G),!,fail.
-neg_in_code(req(G)):- !,~G.
+neg_in_code(call_u(G)):- !,~G.
 neg_in_code(~(G)):- nonvar(G),!, \+ ~G.
 neg_in_code(G):-   neg_may_naf(G), \+ with_umt(G).
-neg_in_code(G):-  is_ftNonvar(G), prologSingleValued(G),must((if_missing_mask(G,R,Test),nonvar(R))),req(R),with_umt(Test).
+neg_in_code(G):-  is_ftNonvar(G), prologSingleValued(G),must((if_missing_mask(G,R,Test),nonvar(R))),call_u(R),with_umt(Test).
 
 
 :- meta_predicate neg_may_naf(0).
@@ -3375,11 +3334,11 @@ neg_may_naf(P):- is_ftCompound(P),predicate_property(P,static).
 %= assigning them support from God. (g,g)
 %=
 
-%% req( ?G) is semidet.
+%% call_u( ?G) is semidet.
 %
 % Req.
 %
-req(G):- loop_check(mpred_call_0(G),fail).
+call_u(G):- loop_check(mpred_call_0(G),fail).
 
 
 %% mpred_call_only_facts( ?Clause) is semidet.
@@ -3417,7 +3376,7 @@ mpred_call_0((C1*->C2;C3)):-!,(mpred_call_0(C1)*->mpred_call_0(C2);mpred_call_0(
 mpred_call_0((C1->C2)):-!,(mpred_call_0(C1)->mpred_call_0(C2)).
 mpred_call_0((C1*->C2)):-!,(mpred_call_0(C1)*->mpred_call_0(C2)).
 mpred_call_0(call(X)):- !, mpred_call_0(X).
-mpred_call_0(req(X)):- !, mpred_call_0(X).
+mpred_call_0(call_u(X)):- !, mpred_call_0(X).
 mpred_call_0(\+(X)):- !, \+ mpred_call_0(X).
 mpred_call_0(call_u(X)):- !, mpred_call_0(X).
 mpred_call_0(asserta(X)):- !, aina(X).
@@ -3598,7 +3557,7 @@ has_cl(H):-predicate_property(H,number_of_clauses(_)).
 %
 % Undoable.
 %
-undoable(A) :- req(mpred_do_and_undo_method(A,_)).
+undoable(A) :- call_u(mpred_do_and_undo_method(A,_)).
 
 %=
 %=
@@ -3841,7 +3800,7 @@ mpred_mark_fa_as(_Sup,_PosNeg,_P,mpred_mark,N,_):- !,must(N=4).
 mpred_mark_fa_as(_Sup,_PosNeg,_P,mpred_isa,N,_):- must(N=2).
 mpred_mark_fa_as(_Sup,_PosNeg,_P,'[|]',N,_):- trace,must(N=2).
 mpred_mark_fa_as(_Sup,_PosNeg,_P,_:mpred_isa,N,_):- must(N=2).
-mpred_mark_fa_as(_Sup, PosNeg,_P,F,A,Type):- req(mpred_mark(Type,PosNeg,F,A)),!.
+mpred_mark_fa_as(_Sup, PosNeg,_P,F,A,Type):- call_u(mpred_mark(Type,PosNeg,F,A)),!.
 mpred_mark_fa_as(Sup,PosNeg,_P,F,A,Type):- 
   MARK = mpred_mark(Type,PosNeg,F,A),
   check_never_assert(MARK),
@@ -4480,17 +4439,17 @@ mpred_retract_or_warn_i(_).
 %   for Pfc.
 
 :- dynamic mpred_is_spying/2.
-:- thread_local mpred_is_tracing/1.
+:- thread_local mpred_is_tracing_pred/1.
 :- dynamic mpred_warnings/1.
 
 
-%% mpred_is_tracing( ?VALUE1) is semidet.
+%% mpred_is_tracing_pred( ?VALUE1) is semidet.
 %
 % PFC If Is A Tracing.
 %
 get_mpred_is_tracing(_):- mpred_is_tracing_exec ; t_l:mpred_debug_local.
 
-lmconf:module_local_init:- lmconf:mpred_init_i(mpred_warnings(_), mpred_warnings(true)).
+lmconf:module_local_init:- lmconf:mpred_set_default(mpred_warnings(_), mpred_warnings(true)).
 
 
 
@@ -4512,11 +4471,11 @@ get_fa(Mask,F,A):-get_functor(Mask,F,A).
 % Clause Or Call.
 %
 clause_or_call(M:H,B):-is_ftVar(M),!,no_repeats(M:F/A,(f_to_mfa(H,M,F,A))),M:clause_or_call(H,B).
-clause_or_call(isa(I,C),true):-!,req(isa_asserted(I,C)).
-clause_or_call(genls(I,C),true):-!,on_x_log_throw(req(genls(I,C))).
+clause_or_call(isa(I,C),true):-!,call_u(isa_asserted(I,C)).
+clause_or_call(genls(I,C),true):-!,on_x_log_throw(call_u(genls(I,C))).
 clause_or_call(H,B):- clause(src_edit(_Before,H),B).
 clause_or_call(H,B):- predicate_property(H,number_of_clauses(C)),predicate_property(H,number_of_rules(R)),((R*2<C) -> (clause_i(H,B)*->!;fail) ; clause_i(H,B)).
-clause_or_call(H,true):- req(should_call_for_facts(H)),no_repeats(on_x_log_throw(H)).
+clause_or_call(H,true):- call_u(should_call_for_facts(H)),no_repeats(on_x_log_throw(H)).
 
 
 % as opposed to simply using clause(H,true).
@@ -4551,7 +4510,7 @@ no_side_effects(P):-  (\+ is_side_effect_disabled->true;(get_functor(P,F,_),a(pr
 %
 % If Is A Disabled Clause.
 %
-is_disabled_clause(C):-req(is_edited_clause(C,_,New)),memberchk((disabled),New).
+is_disabled_clause(C):-call_u(is_edited_clause(C,_,New)),memberchk((disabled),New).
 
 %= mpred_fact(P) is true if fact P was asserted into the database via ain.
 
@@ -4751,7 +4710,7 @@ lmconf:module_local_init:-mpred_no_trace_all.
 % PFC Trace.
 %
 mpred_trace(Form) :-
-  assert_i(mpred_is_tracing(Form)).
+  assert_i(mpred_is_tracing_pred(Form)).
 
 
 %% mpred_trace( ?Form, ?Condition) is semidet.
@@ -4759,7 +4718,7 @@ mpred_trace(Form) :-
 % PFC Trace.
 %
 mpred_trace(Form,Condition) :-
-  assert_i((mpred_is_tracing(Form) :- Condition)).
+  assert_i((mpred_is_tracing_pred(Form) :- Condition)).
 
 
 %% mpred_spy( ?Form) is semidet.
@@ -4838,7 +4797,7 @@ mpred_untrace :- mpred_untrace(_).
 %
 % PFC Un Trace.
 %
-mpred_untrace(Form) :- retractall_i(mpred_is_tracing(Form)).
+mpred_untrace(Form) :- retractall_i(mpred_is_tracing_pred(Form)).
 
 % needed:  mpred_trace_rule(Name)  ...
 
@@ -5303,7 +5262,7 @@ pred_t0(ABOX,P):-mreq(bt(ABOX,P,_)).
 pred_t0(ABOX,P):-mreq(nt(ABOX,P,_,_)).
 pred_t0(ABOX,P):-mreq(spft(ABOX,P,_,_,_)).
 
-%pred_r0(-(P)):- req(-(P)).
+%pred_r0(-(P)):- call_u(-(P)).
 %pred_r0(~(P)):- mreq(~(P)).
 
 
@@ -5346,7 +5305,7 @@ rescan_pfc:-forall(clause(lmconf:mpred_hook_rescan_files,Body),show_entry(rescan
 %
 % PFC Facts And Universe.
 %
-mpred_facts_and_universe(P):- (is_ftVar(P)->pred_head_all(P);true),req(P). % (meta_wrapper_rule(P)->req(P) ; req(P)).
+mpred_facts_and_universe(P):- (is_ftVar(P)->pred_head_all(P);true),call_u(P). % (meta_wrapper_rule(P)->call_u(P) ; call_u(P)).
 
 %add_reprop(_,_):-!.
 
@@ -5474,9 +5433,9 @@ lmconf:mpred_hook_rescan_files:- forall(pred_head(pred_u0,P),
 
 :- retractall(t_l:mpred_debug_local).
 :- retractall(mpred_is_tracing_exec).
-:- retractall(mpred_is_tracing(_)).
+:- retractall(mpred_is_tracing_pred(_)).
 
-:- logicmoo_util_shared_dynamic:asserta_if_new((ereq(G):- !, req(G))).
+:- logicmoo_util_shared_dynamic:asserta_if_new((ereq(G):- !, call_u(G))).
 :- ignore((logicmoo_util_shared_dynamic:retract((ereq(G):- find_and_call(G))),fail)).
 % :- logicmoo_util_shared_dynamic:listing(ereq/1).
 
@@ -5490,4 +5449,52 @@ lmconf:mpred_hook_rescan_files:- forall(pred_head(pred_u0,P),
 mpred_pfc_file. 
 
 % :- doall(lmconf:module_local_init).
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ TO PROLOG NORMAL DATABASE
+
+listing_u(P):-call_u(xlisting(P)).
+assert_u(A0):- strip_module(A0,_,A),get_user_abox(M),assert(M:A).
+asserta_u(A0):- strip_module(A0,_,A), get_user_abox(M),asserta(M:A).
+assertz_u(A0):- strip_module(A0,_,A), get_user_abox(M),assertz(M:A).
+retract_u(M:(H:-B)):- atom(M),!, clause_u(H,B,R),erase(R).
+retract_u((H:-B)):-!, clause_u(H,B,R),erase(R).
+retract_u(H0):- strip_module(H0,_,H),!, clause_u(H,true,R),erase(R).
+retractall_u(H):- forall(clause_u(H,_,R),erase(R)).
+clause_u(H,B):- clause_u(H,B,_).
+
+clause_u(_:H,B,R):- !, get_user_abox(M), M:clause(H,B,R).
+clause_u(H,B,R):- get_user_abox(M), M:clause(M:H,B,R).
+
+
+call_u(G0):-
+  strip_module(G0,_,G),functor(G,F,A),
+  (memberchk(F/A,[(',')/2])->
+  mpred_CALL(call_u,G);
+  with_umt(G0)).
+
+with_umt(G0):-
+  strip_module(G0,WM,G),
+  get_user_abox(U),  
+  must(current_predicate(_,U:G)->(CALL=U:G);(current_predicate(_,WM:G0)->CALL=WM:G0; fail)),
+ '$set_source_module'(S,U),
+ '$module'(M,U),
+  call_cleanup(CALL,
+     ('$set_source_module'(_,S),'$module'(_,M))).
+
+listing_u(P):-call_u(xlisting(P)).
+
+*/
 

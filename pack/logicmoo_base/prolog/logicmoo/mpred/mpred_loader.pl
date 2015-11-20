@@ -10,6 +10,7 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_loader.pl
 :- module(mpred_loader,
           [ add_from_file/1,
+            user_m_check/1,
             add_term/2,
             assert_kif/1,
             import_module_to_user/1,
@@ -23,7 +24,7 @@
             import_to_user_mfa0/4,
             set_user_abox/1,
             predicate_is_undefined_fa/2,
-            get_user_abox/1,
+            
             get_user_tbox/1,
             get_user_sbox/1,
             is_box_module/2,
@@ -177,7 +178,7 @@
             with_no_mpred_expansions/1,
             with_source_module/2,
             lmcache:mpred_directive_value/3,
-%            get_user_abox/1,
+
             lmconf:loaded_file_world_time/3,
             lmconf:mpred_provide_clauses/3,
             lmconf:never_reload_file/1,
@@ -200,9 +201,8 @@
             convert_side_effect_0c/2, is_mpred_file0/1, load_file_term_to_command_0c/2, load_file_term_to_command_1/3, 
             load_file_term_to_command_1b/3, load_file_term_to_command_2/3, mpred_process_input_1/1, must_mpred_term_expansion_2/2, pl_to_mpred_syntax0/2, process_this_script0/1, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc_0/2, transform_opers_0/2, transform_opers_1/2, xfile_module_term_expansion_pass_3/7
           ]).
- :- meta_predicate % cmt :-
-
-         kb_dynamic(?),
+ :- meta_predicate
+        kb_dynamic(?),
         make_declared(?,-),
         make_reachable(?,?),
         call_file_command(?, ?, ?, ?),
@@ -210,6 +210,7 @@
         call_with_source_module(+, 0),
         with_ukb(+, 0),
         cl_assert(?, ?),
+        show_bool(0),
         convert_side_effect(?, +, -),
         doall_and_fail(0),
         ensure_loaded_no_mpreds(0),
@@ -323,6 +324,7 @@ no_separate_boxes.
 %
 % Converted To Tbox.
 %
+to_tbox(Chop,Chop):- no_separate_boxes,!.
 to_tbox(A,T):-sanity((nonvar(A),var(T))),is_system_box(A),!,T=baseKB.
 to_tbox(pqr,pqrTBox).
 to_tbox(pqrABox,pqrTBox).
@@ -339,6 +341,7 @@ to_tbox(Chop,Add):-chop_box(Chop,Was),atom_concat(Was,'TBox',Add).
 %
 % Converted To Sbox.
 %
+to_sbox(Chop,Chop):- no_separate_boxes,!.
 to_sbox(A,T):-sanity((nonvar(A),var(T))),is_system_box(A),!,T=baseKB.
 to_sbox(pqr,pqrSBox).
 to_sbox(pqrABox,pqrSBox).
@@ -1382,14 +1385,6 @@ get_user_sbox(T):-get_user_abox(M),to_sbox(M,T).
 
 
 
-%% get_user_abox( ?Ctx) is semidet.
-%
-% Get User Abox.
-%
-get_user_abox(Ctx):- (t_l:user_abox(Out)),user_m_check(Out),!,must(Ctx=Out).
-get_user_abox(Ctx):- current_context_module(Out),user_m_check(Out),!,must(Ctx=Out),set_user_abox(Ctx).
-
-
 user_m_check(_Out).
 
 
@@ -2212,11 +2207,11 @@ mpred_term_expansion(Fact,(:- ((cl_assert(Dir,Fact))))):- load_file_term_to_comm
 %
 % load file term Converted To command  Extended Helper.
 %
-      load_file_term_to_command_2(pfc(pred_type),Fact,Output):- get_functor(Fact,F,A),req(ttPredType(F)),Output='$si$':'$was_imported_kb_content$'(Fact,ttPredType(F)),!.
-      load_file_term_to_command_2(pfc(func_decl),Fact,Output):- get_functor(Fact,F,A),req(functorDeclares(F)),Output='$si$':'$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
-      load_file_term_to_command_2(pfc(macro_head),Fact,Output):- get_functor(Fact,F,A),req(prologMacroHead(F)),Output='$si$':'$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
-      load_file_term_to_command_2(pfc(mpred_ctrl),Fact,Output):- get_functor(Fact,F,A),req(pfcControlled(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
-      load_file_term_to_command_2(pfc(hybrid),Fact,Output):- get_functor(Fact,F,A),req(prologHybrid(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
+      load_file_term_to_command_2(pfc(pred_type),Fact,Output):- get_functor(Fact,F,A),call_u(ttPredType(F)),Output='$si$':'$was_imported_kb_content$'(Fact,ttPredType(F)),!.
+      load_file_term_to_command_2(pfc(func_decl),Fact,Output):- get_functor(Fact,F,A),call_u(functorDeclares(F)),Output='$si$':'$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
+      load_file_term_to_command_2(pfc(macro_head),Fact,Output):- get_functor(Fact,F,A),call_u(prologMacroHead(F)),Output='$si$':'$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
+      load_file_term_to_command_2(pfc(mpred_ctrl),Fact,Output):- get_functor(Fact,F,A),call_u(pfcControlled(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
+      load_file_term_to_command_2(pfc(hybrid),Fact,Output):- get_functor(Fact,F,A),call_u(prologHybrid(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
       load_file_term_to_command_2(pfc(pl),Fact,Output):- get_functor(Fact,F,A),(a(prologDynamic,F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
       load_file_term_to_command_2(mpred(in_mpred_kb_module),Fact,Output):- in_mpred_kb_module,Output=Fact,!.
 

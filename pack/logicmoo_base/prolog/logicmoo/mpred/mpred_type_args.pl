@@ -196,7 +196,7 @@ term_is_ft(Term,Type):- no_repeats_old(Type,(term_is_ft_how(Term,Was),trans_subf
 term_is_ft_how(Term,Type):- clause_umt(quotedDefnIff(Type,Info)),nonvar(Info),
    (show_success(why,(Info='SubLQuoteFn'(LISPSYMBOL),nop(Term+Type+LISPSYMBOL)))-> 
                  fail;
-                 (append_term(Info,Term,CALL),req(CALL))),!.
+                 (append_term(Info,Term,CALL),call_u(CALL))),!.
 
 term_is_ft_how(Term,Type):- compound(Term),functor(Term,F,A),functor(Type,F,A),
   once((t(meta_argtypes,Type),Type=..[_|Types],Term=..[_|Args],maplist(isa,Args,Types))).
@@ -248,7 +248,7 @@ is_declarations(C):-compound(C),ground(C),!, (\+ (arg(_,C,T), \+ is_spec(T))).
 %
 % If Is A Spec.
 %
-is_spec(T):- req(tCol(T))->true;is_declarations(T).
+is_spec(T):- call_u(tCol(T))->true;is_declarations(T).
 
 
 %= 	 	 
@@ -968,7 +968,7 @@ correctType0(Op,Args,Types,NewArgs):-compound(Args), compound(Types),
    correctAnyType(Op,ArgsL,TypesL,NewArgsL).
 
 correctType0(Op,A,Fmt,AA):- trans_subft(Fmt,Code),Fmt\=Code,loop_check(correctType0(Op,A,Code,AA)).
-correctType0(Op,A,Super,AA):- a(ttFormatType,Super),req(genls(Sub,Super)),Sub\=Super,loop_check(correctType0(Op,A,Sub,AA)).
+correctType0(Op,A,Super,AA):- a(ttFormatType,Super),call_u(genls(Sub,Super)),Sub\=Super,loop_check(correctType0(Op,A,Sub,AA)).
 
 correctType0(Op,Arg,Props,NewArg):- compound(Props),
    Props=..[F|TypesL],

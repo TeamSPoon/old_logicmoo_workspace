@@ -364,7 +364,7 @@ add_var_to_list(Name,Var,Vs,NewName,NewVar,NewVs):-  NewName=Name,NewVar=Var,New
 %
 % Unnumbervars.
 %
-unnumbervars(X,Y):- unnumbervars_and_save(X,Y).
+unnumbervars(X,Y):- must(notrace(unnumbervars_and_save(X,Y))).
 
 
 put_variable_names(NewVs):- check_variable_names(NewVs,Checked),call(b_setval,'$variable_names',Checked).
@@ -379,7 +379,7 @@ check_variable_names(I,O):- \+ member(free=_,I) -> O=I ; trace_or_throw(bad_chec
 % Unnumbervars And Save.
 %
 
-unnumbervars_and_save(X,YO):- hotrace(must(unnumbervars4(X,[],_,YO))),!.
+unnumbervars_and_save(X,YO):- must(notrace(unnumbervars4(X,[],_,YO))),!.
 % unnumbervars_and_save(X,YO):- \+ ((sub_term(V,X),compound(V),'$VAR'(_)=V)),!,YO=X.
 
 /*

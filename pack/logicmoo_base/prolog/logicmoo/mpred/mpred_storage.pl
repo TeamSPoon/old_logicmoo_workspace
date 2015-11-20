@@ -70,7 +70,7 @@
             mdel/1,
             mpred_modify/2,
             lmconf:mpred_provide_storage_op/4,
-           % req/1,
+           % call_u/1,
             must_storage_op/2,
             nonground_throw_else_fail/1,
             not_asserted/1,
@@ -83,7 +83,7 @@
             prolog_op/2,
             prop/3,
             prop_or/4,
-            %req/1,
+            %call_u/1,
             requires_storage/2,
             requires_storage/3,
             rescan_argIsa/3,
@@ -127,7 +127,7 @@
         is_asserted_1(?),
         is_asserted_eq(?),
         not_asserted(?),
-        %req(-),
+        %call_u(-),
         with_fallbacks(0),
         with_fallbacksg(0),
         with_no_db_hooks(0),
@@ -162,9 +162,9 @@
 
 :- was_export((  clr/1,ireq/1,del/1,  
   padd/2, padd/3, prop/3, prop_or/4, call_props/2, iprops/2, upprop/2, % ain/1, 
-    ireq/1, % req/1, 
+    ireq/1, % call_u/1, 
     %(ain)/1,
-    upprop/1, % req/1, 
+    upprop/1, % call_u/1, 
   % use_term_listing/2,  
   world_clear/1,  
    with_kb_assertions/2)).
@@ -469,7 +469,7 @@ is_asserted_eq(HB):- ( \+ \+ no_loop_check(is_asserted_1(HB))).
 %
 % If Is A Asserted.
 %
-is_asserted(X):- no_repeats(loop_check(req(X))).
+is_asserted(X):- no_repeats(loop_check(call_u(X))).
 
 %= 	 	 
 
@@ -500,7 +500,7 @@ is_asserted_1(V):-var(V),!,trace_or_throw(var_is_asserted(V)).
 is_asserted_1((H)):- is_static_pred(H),!,show_pred_info(H),dtrace(is_asserted_1((H))).
 %is_asserted_1(HB):-hotrace((fully_expand_warn(is_asserted_1,HB,HHBB))),!,is_asserted_1(HHBB).
 
-is_asserted_1(H):- !, w_tl(t_l:infAssertedOnly(H),req(H)).
+is_asserted_1(H):- !, w_tl(t_l:infAssertedOnly(H),call_u(H)).
 
 %is_asserted_1(argIsa(mpred_isa,2,mpred_isa/2)):-  trace_or_throw(is_asserted_1(argIsa(mpred_isa,2,mpred_isa/2))),!,fail.
 is_asserted_1(clause(H,B,Ref)):-!,is_asserted_3(H,B,Ref).
@@ -772,9 +772,9 @@ del(C):- fully_expand(change(retract,a),C,C0),map_first_arg(del0,C0).
 %
 % Remove/erase Primary Helper.
 %
-del0(C0):- req(C0),!,clr(C0),!.
+del0(C0):- call_u(C0),!,clr(C0),!.
 del0(C0):- ireq(C0),!,idel(C0),!.
-del0(C0):- req(C0),!,mdel(C0),!.
+del0(C0):- call_u(C0),!,mdel(C0),!.
 
 
 %= 	 	 
@@ -793,7 +793,7 @@ idel(C0):- dmsg(warn(failed(idel(C0)))),!,fail.
 %
 % Mdel.
 %
-mdel(C0):- dmsg(mdel(C0)),mpred_modify(change( retract,one),C0), sanity(req(C0)->(dmsg(warn(incomplete_M_DEL(C0))),fail);true),!.
+mdel(C0):- dmsg(mdel(C0)),mpred_modify(change( retract,one),C0), sanity(call_u(C0)->(dmsg(warn(incomplete_M_DEL(C0))),fail);true),!.
 mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 
 % -  clr(Retractall)
@@ -829,7 +829,7 @@ clr0(P):-
 %
 preq(P,C0):- agenda_do_prequery,!,no_repeats(C0,mpred_op(query(t,P),C0)).
 
-% -  req(Query) = Normal query
+% -  call_u(Query) = Normal query
 
 %= 	 	 
 
@@ -837,9 +837,9 @@ preq(P,C0):- agenda_do_prequery,!,no_repeats(C0,mpred_op(query(t,P),C0)).
 %
 % Req Old Extended Helper.
 %
-req_old2(C0):- nop(dmsg(req(C0))), !,preq(req,/*to_exp*/(C0)).
+req_old2(C0):- nop(dmsg(call_u(C0))), !,preq(call_u,/*to_exp*/(C0)).
 
-% -  req(Query) = Forced Full query
+% -  call_u(Query) = Forced Full query
 
 %= 	 	 
 
@@ -847,7 +847,7 @@ req_old2(C0):- nop(dmsg(req(C0))), !,preq(req,/*to_exp*/(C0)).
 %
 % Mreq Old Extended Helper.
 %
-mreq_old2(C0):- nop(dmsg(req(C0))), agenda_rescan_for_module_ready,
+mreq_old2(C0):- nop(dmsg(call_u(C0))), agenda_rescan_for_module_ready,
    no_loop_check(w_tl([-infInstanceOnly(_),-t_l:infAssertedOnly(_),-t_l:noRandomValues(_)],
      preq(must,/*to_exp*/(C0)))).
 
@@ -871,7 +871,7 @@ ireq(C0):- nop(dmsg(ireq(C0))),
 %
 % Call Props.
 %
-call_props(Obj,PropSpecs):- req(props(Obj,PropSpecs)).
+call_props(Obj,PropSpecs):- call_u(props(Obj,PropSpecs)).
 
 %= 	 	 
 
@@ -990,7 +990,7 @@ padd(Obj,Prop,Value):- ain((t(Prop,Obj,Value))).
 %
 % Prop.
 %
-prop(Obj,Prop,Value):- req(t(Prop,Obj,Value)).
+prop(Obj,Prop,Value):- call_u(t(Prop,Obj,Value)).
 % -  prop_or(Obj,Prop,Value,OrElse)
 
 %= 	 	 
@@ -1043,7 +1043,7 @@ db_assert_sv_now(Must,C,F,A, REPLACE):- db_assert_sv_replace(Must,C,F,A, REPLACE
 db_assert_sv_update(Must,C,F,A,UPDATE):-
    replace_arg(C,A,OLD,COLD),
    % prefer updated values to come from instances but will settle with anything legal
-   hotrace(must((once(ireq(COLD);req(COLD)),ground(COLD)))),
+   hotrace(must((once(ireq(COLD);call_u(COLD)),ground(COLD)))),
    update_value(OLD,UPDATE,NEW),!,
    db_assert_sv_replace(Must,C,F,A,NEW),!.
 
@@ -1108,7 +1108,7 @@ confirm_hook(CNEW:NEW=@=CNOW:NOW):-
 
 confirm_hook(CNEW:NEW=@=CNOW:NOW):-
    dmsg(warn(failed_i_a_req(CNOW,expected(CNEW)))),   
-   dtrace((sanity((req(CNOW),(CNEW:NEW=@=CNOW:NOW))))),!.
+   dtrace((sanity((call_u(CNOW),(CNEW:NEW=@=CNOW:NOW))))),!.
 
 
 
@@ -1299,7 +1299,7 @@ may_storage_op(Op,G):-call_no_cuts(lmconf:mpred_provide_storage_op(Op,G)).
 
 :- meta_predicate hooked_asserta(+), hooked_assertz(+), hooked_retract(+), hooked_retractall(+).
 
-:- meta_predicate del(-),clr(-). % ,ain(-). % ,req(-).
+:- meta_predicate del(-),clr(-). % ,ain(-). % ,call_u(-).
 
 % Found new meta-predicates in iteration 1 (0.281 sec)
 %:- meta_predicate mpred_modify(?,?,?,0).
@@ -1366,8 +1366,8 @@ prolog_op(clauses(Op),G):-!, prolog_op(Op,G).
 prolog_op(is_asserted,(G:-B)):-!,clause_asserted(G,B).
 prolog_op(is_asserted,(G)):-!,clause_asserted(G,true).
 
-prolog_op(conjecture,G):-!, req(G).
-prolog_op(call,G):-!, req(G).
+prolog_op(conjecture,G):-!, call_u(G).
+prolog_op(call,G):-!, call_u(G).
 prolog_op(Op,G):- reduce_mpred_op(Op,Op2), on_x_rtrace(call(Op2,G)).
 
 
@@ -1379,7 +1379,7 @@ prolog_op(Op,G):- reduce_mpred_op(Op,Op2), on_x_rtrace(call(Op2,G)).
 %
 % Prolog Modify.
 %
-prolog_modify(_Op,(:-(G))):-!, req(G).
+prolog_modify(_Op,(:-(G))):-!, call_u(G).
 prolog_modify(change(assert,z),G):- use_if_modify_new,!,assertz_if_new(G).
 prolog_modify(change(assert,a),G):- use_if_modify_new,!,asserta_if_new(G).
 prolog_modify(change(assert,_),G):- use_if_modify_new,!,assert_if_new(G).

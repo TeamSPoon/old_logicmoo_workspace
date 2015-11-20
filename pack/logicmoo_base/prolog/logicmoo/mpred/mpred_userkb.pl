@@ -248,7 +248,7 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 :- meta_predicate logicmoo_user:t(7,?,?,?,?,?,?,?).
 :- meta_predicate logicmoo_user:t(6,?,?,?,?,?,?).
 
-:-asserta_if_new((~(G):- cwc, neg_in_code(G))).
+:-asserta_if_new((~(G):- (cwc, neg_in_code(G)))).
 
 %= 	 	 
 
@@ -376,7 +376,7 @@ baseKB:resolveConflict(C) :- cwc,
 %
 resolveConflict0(C) :- cwc, forall(must(mpred_negation_w_neg(C,N)),ignore(show_failure(why,(nop(baseKB:resolveConflict(C)),pp_why(N))))),
   ignore(show_failure(why,(nop(baseKB:resolveConflict(C)),pp_why(C)))), 
-    doall((req(resolverConflict_robot(C)),\+ is_resolved(C),!)),
+    doall((call_u(resolverConflict_robot(C)),\+ is_resolved(C),!)),
     is_resolved(C),!.
 
 
