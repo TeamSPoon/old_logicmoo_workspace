@@ -59,7 +59,7 @@
   mpred_trace_op/2,mpred_trace_msg/1,mpred_trace_msg/2,mpred_trigger_key/2,mpred_trigger_key/2,mpred_undo/1,mpred_unfwc/1,
   mpred_unfwc_check_triggers/1,mpred_union/3,mpred_unique_u/1,mpred_untrace/0,mpred_untrace/1,mpred_warn/0,mpred_warn/1,
   mpred_warn/2,mpred_watch/0,well_founded_0/2,pp_db_why/0,pp_db_why/1,mpred_whyBrouse/2,mpred_handle_why_command/3,
-  nompred_warn/0,pfcl_do/1,pp_db_DB/0,pp_db_facts/0,pp_db_facts/1,pp_db_facts/2,pp_db_items/1,
+  nompred_warn/0,pfcl_do/1,pp_DB/0,pp_db_facts/0,pp_db_facts/1,pp_db_facts/2,pp_db_items/1,
   pp_db_rules/0,pp_db_supports/0,pp_db_triggers/0,mpred_load/1,process_rule/3,
   remove_if_unsupported/1,remove_selection/1,mpred_withdraw1/2,
 
@@ -117,7 +117,8 @@ setup_mpred_support(M):-
    add_import_module(M,mpred_pfc,end),
    forall(mpred_database_term(F/A,_),
      (functor(P,F,A),must(\+ (predicate_property(M:P,imported_from(W)),
-      wdmsg(predicate_property(P,imported_from(W))))))),
+      wdmsg(predicate_property(P,imported_from(W))),
+        W\==logicmoo_user,W\==user)))),
   forall(mpred_database_term(F/A,_),(M:dynamic(M:F/A),
         M:discontiguous(M:F/A),
         M:multifile(M:F/A))),!.
@@ -154,7 +155,8 @@ setup_mpred_ops:-
 % Get Source Ref.
 %
 :- module_transparent((get_source_ref)/1).
-get_source_ref((X,X)):- get_source_ref1(X).
+get_source_ref(O):- current_why(U),(U=(_,_)->O=U;O=(U,U)),!.
+get_source_ref(O):- get_source_ref1(U),(U=(_,_)->O=U;O=(U,U)).
 
 
 %% get_source_ref1(+Mt) is semidet.
@@ -163,9 +165,9 @@ get_source_ref((X,X)):- get_source_ref1(X).
 %
 :- module_transparent((get_source_ref1)/1).
 % get_source_ref1(_):- fail,check_context_module,fail.
-get_source_ref1(M):- (get_user_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))),!.
-get_source_ref1(loading(M,F,L)):- get_user_abox(M), source_location(F,L),!.
 get_source_ref1(M):- current_why(M),!.
+get_source_ref1(loading(M,F,L)):- get_user_abox(M), source_location(F,L),!.
+get_source_ref1(M):- (get_user_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))),!.
 get_source_ref1(loading(M,F,L)):- get_user_abox(M), current_source_file(F:L),!.
 get_source_ref1(loading(M,F,_L)):- get_user_abox(M), current_source_file(F),!.
 get_source_ref1(loading(M,_,_L)):- get_user_abox(M),!.
@@ -175,9 +177,7 @@ get_source_ref1(M):-
  (atom(M)->(module_property(M,class(_)),!);
     mpred_error(no_source_ref(M)))).
 
-
-
-is_source_ref1(G):-ground(G).
+is_source_ref1(_).
 
 %% get_user_abox(-ABOXModule) is semidet.
 %
@@ -186,10 +186,10 @@ is_source_ref1(G):-ground(G).
 %
 % not just user modules
 get_user_abox(C):- t_l:user_abox(C),!.
-get_user_abox(C):- notrace((nonvar(C)->true;(('$set_source_module'(C,C),C\==user);C=baseKB))),!.
-% get_user_abox(baseKB):-!.
+get_user_abox(C):- '$set_source_module'(C,C),C\==user,C\==logicmoo_user,!.
 %get_user_abox(C):- '$set_source_module'(C,C),!,setup_mpred_support(C).
-
+get_user_abox(baseKB):-!.
+get_user_abox(_U). % implicit :-nonvar(U).
 
 
 
@@ -216,6 +216,7 @@ lookup_u(Trigger,Ref):-  clause_u(Trigger,B,Ref),call(B).
 
 call_u(G0):-
   strip_module(G0,_,G),functor(G,F,A),
+  mpred_BC_CACHE(G),
   (memberchk(F/A,[(',')/2])->
   mpred_CALL(call_u,G);
   call_uU(G0)).
@@ -588,10 +589,11 @@ mpred_ain_trigger_reprop(nt(Trigger,Test,Body),Support):-
   mpred_eval_lhs(Body,((\+Trigger),NT)).
 
 mpred_ain_trigger_reprop(BT,Support):-
-  BT = bt(Trigger,Body),!,
-  if_defined_else(attvar_op(assertz_if_new,((Trigger:-mpred_bc_only(Trigger)))),true),!,
+  BT = bt(Trigger,Body),!, trace,
+  % if_defined_else(attvar_op(assertz_if_new,((Trigger:-mpred_bc_only(Trigger)))),true),!,
+  assert_if_new((Trigger:-mpred_bc_only(Trigger))),
   mpred_mark_as(Support,p,Trigger,pfcBcTrigger),
-  if_defined_else(import_to_user(Trigger),true),
+  % if_defined_else(import_to_user(Trigger),true), 
   mpred_trace_msg('~N~n\tAdding backwards~n\t\ttrigger: ~p~n\t\tbody: ~p~n\t Support: ~p~n',[Trigger,Body,Support]),
   mpred_assert_w_support(BT,Support),
   mpred_bt_pt_combine(Trigger,Body,Support).
@@ -683,25 +685,6 @@ mpred_ain_by_type(action,_ZAction):- !.
 %  relationships it participated in removed.
 
 mpred_withdraw(Ps):- get_source_ref(UU),mpred_withdraw(Ps,UU).
- 
-/*
-mpred_withdraw(List):- 
-  % iterate down the list of facts to be withdrawn.
-  nonvar(List),
-  List=[_|_],
-  remlist(List).
-  
-mpred_withdraw(P):- 
-  % mpred_withdraw/1 is the user''s interface - it withdraws user support for P.
-  get_source_ref(UU),
-  mpred_withdraw(P,UU).
-
-remlist([H|T]):-
-  % mpred_withdraw each element in the list.
-  get_source_ref(UU),
-  mpred_withdraw(H,UU),
-  remlist(T).
-*/
 
 %%  mpred_withdraw(P,S) is det.
 % removes support S from P and checks to see if P is still supported.
@@ -941,7 +924,16 @@ mpred_define_bc_rule(Head,Body,Parent_rule):-
 % 
 
  
-mpred_eval_lhs((Test->Body),Support):-  
+mpred_eval_lhs((Test->Body),Support):- 
+
+
+
+
+
+
+
+
+
   !, 
   (call_u(Test) -> mpred_eval_lhs(Body,Support)),
   !.
@@ -1046,11 +1038,11 @@ trigger_trigger1(Trigger,Body):-
 % 
 mpred_BC(P):-mpred_CALL(mpred_BC_w_cache, P).
 mpred_BC_w_cache(P):- mpred_BC_CACHE(P),mpred_CALL(P).
-mpred_BC_CACHE(P):-
+mpred_BC_CACHE(P0):-  strip_module(P0,_,P),
  ignore((
   % trigger any bc rules.
   lookup_u(bt(P,Trigger)),
-  mpred_get_support(bt(P,Trigger),S),
+  must(mpred_get_support(bt(P,Trigger),S)),
   mpred_eval_lhs(Trigger,S),
   fail)).
 
@@ -1655,7 +1647,7 @@ mpred_reset:-
   fail.
 mpred_reset:-
   mpred_database_item(T),!,
-  mpred_warn("Couldn't full mpred_reset: ~p.~n",[T]), must(pp_db_DB),!,
+  mpred_warn("Couldn't full mpred_reset: ~p.~n",[T]), must(pp_DB),!,
   mpred_error("Pfc database not empty after mpred_reset, e.g., ~p.~n",[T]),!,fail.
 mpred_reset:- mpred_trace_msg("Reset DB complete").
 
@@ -1673,6 +1665,10 @@ mpred_database_item(P):-
 
 
 mpred_retract_i_or_warn(X):- retract_u(X), !.
+mpred_retract_i_or_warn(spft(P,T,loading(M,F,A))):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,T,loading(M,F,_))).
+mpred_retract_i_or_warn(spft(P,loading(M,F,A),T)):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,loading(M,F,_),T)).
+mpred_retract_i_or_warn(spft(P,T,loading(M,A,F))):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,T,loading(M,_,F))).
+mpred_retract_i_or_warn(spft(P,loading(M,A,F),T)):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,loading(M,_,F),T)).
 mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft(\+ _,_,_),!.
 mpred_retract_i_or_warn(X):- 
   mpred_warn("Couldn't retract_u ~p.~n",[X]),!.
@@ -2118,11 +2114,11 @@ mpred_trigger_key(X,X).
 
 %%%%%%%%%%%%%%%%%% 99999999999999999999999999999999999999999999
 
-%% pp_db_DB is semidet.
+%% pp_DB is semidet.
 %
 % Pretty Print All.
 %
-pp_db_DB:-
+pp_DB:-
  must_det_l((
   pp_db_facts,
   pp_db_rules,
@@ -2365,8 +2361,9 @@ supporters_list(F,[Fact|MoreFacts]):-
   mpred_get_support(F,(Fact,Trigger)),
   triggerSupports(Trigger,MoreFacts).
 
-triggerSupports(U,[]):- get_source_ref1(U),!.
-triggerSupports(U,[]):- is_source_ref1(U),!.
+triggerSupports(uWas(_),[]):-!.
+triggerSupports(U,[(U)]):- get_source_ref1(U),!.
+triggerSupports(U,[uWas(U)]):- get_source_ref((U1,U2)),member(U,[U1,U2]).
 triggerSupports(Trigger,[Fact|MoreFacts]):-
   mpred_get_support(Trigger,(Fact,AnotherTrigger)),
   triggerSupports(AnotherTrigger,MoreFacts).
@@ -2455,7 +2452,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((pp_db_facts)/2).
 :- module_transparent((pp_db_facts)/1).
 :- module_transparent((pp_db_facts)/0).
-:- module_transparent((pp_db_DB)/0).
+:- module_transparent((pp_DB)/0).
 :- module_transparent((mpred_trigger_key)/2).
 :- module_transparent((mpred_make_supports)/1).
 :- module_transparent((mpred_support_relation)/1).
@@ -2667,7 +2664,7 @@ end_of_file.
 
 :- mpred_test(current_ooZz(booZz)).
 
-% :- pp_db_DB.
+% :- pp_DB.
 
 :- (mpred_ain(current_ooZz(fooZz))).
 
@@ -2685,7 +2682,7 @@ end_of_file.
 
 :- mpred_ain(~ current_ooZz(fooZz)).
 
-% :- pp_db_DB.
+% :- pp_DB.
 
 :- mpred_test(~current_ooZz(fooZz)).
 

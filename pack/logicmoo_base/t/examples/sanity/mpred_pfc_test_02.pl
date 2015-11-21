@@ -44,7 +44,7 @@
 
 :- mpred_test(current_ooQ2(booQ2)).
    
-% :- pp_db_DB.
+% :- pp_DB.
 
 :- (mpred_ain(current_ooQ2(fooQ2))).
 
@@ -62,7 +62,7 @@
 
 :- mpred_ain(~ current_ooQ2(fooQ2)).
 
-% :- pp_db_DB.
+% :- pp_DB.
 
 :- mpred_test(~current_ooQ2(fooQ2)).
 
@@ -103,7 +103,7 @@
 
 :- mpred_ain(~ current_ooTt(fooTt)).
 
-:- pp_db_DB.
+:- pp_DB.
 
 :- mpred_test(~current_ooTt(fooTt)).
 

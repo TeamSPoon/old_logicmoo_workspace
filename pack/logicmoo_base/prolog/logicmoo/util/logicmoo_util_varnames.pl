@@ -1209,20 +1209,23 @@ save_file_source_vars(F,T,Vs):- put_variable_names(Vs),!,w_tl(t_l:current_why_so
 % Read Source Variables.
 %
 read_source_vars(File,In):-
+   Module = module(_),
 	repeat,
-	  catch(prolog_read_source_term(In, Term, Expanded, [ variable_names(Vs), syntax_errors(error) /*, term_position(TermPos) */ ]),
+	  catch(prolog_read_source_term(In, Term, Expanded, [ variable_names(Vs), syntax_errors(error) , term_position(TermPos)  ]),
 		E,(nop((dmsg(E),trace)),fail)),
-          % stream_position_data(line_count, TermPos, LineNo),
-	  ignore(save_file_source_vars(File /* :LineNo */,Term,Vs)),
+          arg(1,Module,M),
+          (Term = module(MM,_) -> (nb_setarg(1,Module,MM),fail);
+          ((stream_position_data(line_count, TermPos, LineNo),
+          
+	  ignore(save_file_source_vars(loading(M,File,LineNo),Term,Vs)),
 	  (   is_list(Expanded)
 	  ->  member(T, Expanded)
 	  ;   T = Expanded
 	  ),
 	(   T == end_of_file
-	->  !
-	;  ( T\==Term, save_file_source_vars(File/* :LineNo */,T,Vs)),
-	    fail
-	).
+	->  ! ; 
+           ( T\==Term, save_file_source_vars(loading(M,File,LineNo),T,Vs),
+	    fail))))).
 
 
 % new method

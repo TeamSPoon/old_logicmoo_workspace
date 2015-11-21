@@ -18,18 +18,18 @@
 :- mpred_trace_exec.
 
 
-bc_q(N) <- bc_p(N).
+:-ain((bc_q(N) <- bc_p(N))).
 
 bc_p(a).
 bc_p(b).
 
 
-?- must(bc_p(b)).
+?- must(call_u(bc_p(b))).
 
 %= nothing cached
 ?- listing(bc_q/1).
 
-?- must(bc_q(b)).
+?- must(call_u(bc_q(b))).
 
 %= something cached
 ?- listing(bc_q/1).

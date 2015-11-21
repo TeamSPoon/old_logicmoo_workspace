@@ -11,6 +11,10 @@
 
 :- dynamic(foob/1).
 
+
+:- debug(mpred).
+:- mpred_trace_exec.
+
 :- begin_pfc.
 
 % this should have been ok
@@ -23,12 +27,16 @@ if_missing(foob(_),foob(a)).
 
 :- mpred_test(foob(a)).
 
-==>foob(b).
+:- ain(foob(b)).
+
 
 :- mpred_test(\+foob(a)).
+
+
 :- mpred_test(foob(b)).
 
-~foob(b).
+:- ain(~foob(b)).
+
 
 :- mpred_test(\+foob(b)).
 :- mpred_test(foob(a)).
