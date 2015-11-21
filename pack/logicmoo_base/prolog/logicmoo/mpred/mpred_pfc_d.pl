@@ -164,9 +164,9 @@ get_source_ref((X,X)):- get_source_ref1(X).
 %
 :- module_transparent((get_source_ref1)/1).
 % get_source_ref1(_):- fail,check_context_module,fail.
-
 get_source_ref1(M):- current_why(M),!.
 get_source_ref1(loading(M,F,L)):- get_user_abox(M), source_location(F,L),!.
+get_source_ref1(M):- (get_user_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))),!.
 get_source_ref1(loading(M,F,L)):- get_user_abox(M), current_source_file(F:L),!.
 get_source_ref1(loading(M,F,_L)):- get_user_abox(M), current_source_file(F),!.
 get_source_ref1(loading(M,_,_L)):- get_user_abox(M),!.
@@ -1692,9 +1692,9 @@ mpred_retract_i_or_warn(X):-
 %   Purpose: provides predicates for examining the database and debugginh 
 %   for Pfc.
 
-:- mpred_set_default(mpred_warnings(_), mpred_warnings(true)).
+:- baseKB:mpred_set_default(mpred_warnings(_), mpred_warnings(true)).
 %  tms is one of {none,local,cycles} and controles the tms alg.
-:- mpred_set_default(tms(_), tms(cycles)).
+:- baseKB:mpred_set_default(tms(_), tms(cycles)).
 
 
 %  mpred_fact(P) is true if fact P was asserted into the database via add.

@@ -185,9 +185,16 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
       baseKB:resolveConflict0((*)),
       baseKB:resolverConflict_robot((*)))).
 
+
+:- '$set_source_module'(_,baseKB).
+
+
 :- show_call(why,source_context_module(_CM)).
 :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),baseKB:dynamic(baseKB:E)).
 :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),decl_shared(E)).
+
+:- '$set_source_module'(_,baseKB).
+
 :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),import_to_user(baseKB:E)).
 
 

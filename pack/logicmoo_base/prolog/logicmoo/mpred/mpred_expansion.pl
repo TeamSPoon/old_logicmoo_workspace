@@ -682,7 +682,7 @@ db_expand_term0(Op,SI,SentO):-
 %
 % Managed Predicate Expand.
 %
-mpred_expand(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),mpred_database_term(F/A),
+mpred_expand(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),mpred_database_term(F/A,_),
    PfcRule=[F|Args],maplist(fully_expand_goal(is_asserted),Args,ArgsO),!,Out=..[F|ArgsO].
 
 

@@ -23,6 +23,7 @@
   why_was_true/1,
   mpred_fwc0/1,
   with_no_mpred_trace_exec/1,
+  mpred_set_default/2,
   mpred_ain/1,mpred_ain/1,mpred_ain/2,ain/2,
   action_is_undoable/1,
   mpred_assumption/1,mpred_assumptions/2,mpred_axiom/1,bagof_or_nil/3,bases_union/2,brake/1,build_rhs/2,
@@ -108,15 +109,15 @@ set_user_abox(M):- wdmsg(set_user_abox(M)),
 
 :- module_transparent((setup_mpred_support)/1).
 
-:- dynamic(mpred_abox_module/1).
-setup_mpred_support(M):- mpred_abox_module(M),!.
+:- dynamic(lmcache:mpred_abox_module/1).
+setup_mpred_support(M):- lmcache:mpred_abox_module(M),!.
 setup_mpred_support(M):-
  must(atom(M)),
- asserta(mpred_abox_module(M)),
- % add_import_module(M,pfc,end),
+ asserta(lmcache:mpred_abox_module(M)),
+   add_import_module(M,mpred_pfc,end),
    forall(mpred_database_term(F/A,_),
-     (functor(P,F,A),must(\+ (predicate_property(P,imported_from(W)),
-      wdmsg(predicate_property(P,imported_from(W))) , W\==user)))),
+     (functor(P,F,A),must(\+ (predicate_property(M:P,imported_from(W)),
+      wdmsg(predicate_property(P,imported_from(W))))))),
   forall(mpred_database_term(F/A,_),(M:dynamic(M:F/A),
         M:discontiguous(M:F/A),
         M:multifile(M:F/A))),!.
@@ -163,8 +164,12 @@ get_source_ref((X,X)):- get_source_ref1(X).
 :- module_transparent((get_source_ref1)/1).
 % get_source_ref1(_):- fail,check_context_module,fail.
 get_source_ref1(M):- (get_user_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))),!.
-get_source_ref1(fact(M)):-current_why(M),!.
-get_source_ref1(fact(M)):-get_user_abox(M),!.
+get_source_ref1(loading(M,F,L)):- get_user_abox(M), source_location(F,L),!.
+get_source_ref1(M):- current_why(M),!.
+get_source_ref1(loading(M,F,L)):- get_user_abox(M), current_source_file(F:L),!.
+get_source_ref1(loading(M,F,_L)):- get_user_abox(M), current_source_file(F),!.
+get_source_ref1(loading(M,_,_L)):- get_user_abox(M),!.
+get_source_ref1(M):- (get_user_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))),!.
 get_source_ref1(M):- 
  (get_user_abox(M) -> !;
  (atom(M)->(module_property(M,class(_)),!);
@@ -181,10 +186,10 @@ is_source_ref1(G):-ground(G).
 %
 % not just user modules
 get_user_abox(C):- t_l:user_abox(C),!.
-% get_user_abox(C):- '$set_source_module'(C,C),C\==user,!.
-get_user_abox(C):- '$set_source_module'(C,C),!,setup_mpred_support(C).
-get_user_abox(baseKB):-!.
-get_user_abox(_U). % implicit :-nonvar(U).
+get_user_abox(C):- notrace((nonvar(C)->true;(('$set_source_module'(C,C),C\==user);C=baseKB))),!.
+% get_user_abox(baseKB):-!.
+%get_user_abox(C):- '$set_source_module'(C,C),!,setup_mpred_support(C).
+
 
 
 
@@ -1685,9 +1690,9 @@ mpred_retract_i_or_warn(X):-
 %   Purpose: provides predicates for examining the database and debugginh 
 %   for Pfc.
 
-:- mpred_set_default(mpred_warnings(_), mpred_warnings(true)).
+%:- mpred_set_default(baseKB:mpred_warnings(_), baseKB:mpred_warnings(true)).
 %  tms is one of {none,local,cycles} and controles the tms alg.
-:- mpred_set_default(tms(_), tms(cycles)).
+%:- baseKB:mpred_set_default(tms(_), tms(cycles)).
 
 
 %  mpred_fact(P) is true if fact P was asserted into the database via add.
@@ -2508,7 +2513,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((mpred_database_item)/1).
 :- module_transparent((mpred_reset)/0).
 :- module_transparent((mpred_database_term)/2).
-:- module_transparent((mpred_abox_module)/1).
+:- module_transparent(lmcache:(mpred_abox_module)/1).
 :- module_transparent((mpred_conjoin)/3).
 :- module_transparent((mpred_union)/3).
 :- module_transparent((mpred_assertz_w_support)/2).

@@ -18,57 +18,57 @@
 :- mpred_reset.
 
 
-:- get_user_abox(M),dynamic((M:current_ooQQ/1,M:default_ooQQ/1,M:if_mooQQ/2)).
+:- get_user_abox(M),dynamic((M:current_ooQ2/1,M:default_ooQ2/1,M:if_mooQ2/2)).
 :- mpred_trace.
 :- mpred_watch.
 :- mpred_reset.
 
 
-:- mpred_ain(default_ooQQ(booQQ)).
+:- mpred_ain(default_ooQ2(booQ2)).
 
-:- must(call_u(default_ooQQ(booQQ))).
+:- must(call_u(default_ooQ2(booQ2))).
 
-:- pp_db_why(default_ooQQ(booQQ)).
+:- pp_db_why(default_ooQ2(booQ2)).
 
-:- mpred_test(default_ooQQ(booQQ)).
+:- mpred_test(default_ooQ2(booQ2)).
 
-:- mpred_ain(\+default_ooQQ(booQQ)).
+:- mpred_ain(\+default_ooQ2(booQ2)).
 % this should have been ok
-% (if_mooQQ(Missing,Create) ==> ((\+ Missing/(Missing\==Create), \+ Create , \+ ~(Create)) ==> Create)).
-:- ((mpred_ain((if_mooQQ(Missing,Create) ==> 
+% (if_mooQ2(Missing,Create) ==> ((\+ Missing/(Missing\==Create), \+ Create , \+ ~(Create)) ==> Create)).
+:- ((mpred_ain((if_mooQ2(Missing,Create) ==> 
  ( ( \+ Missing/(Missing\=@=Create)) ==> Create))))).
 
-:- mpred_ain((default_ooQQ(X) ==> if_mooQQ(current_ooQQ(_),current_ooQQ(X)))).
+:- mpred_ain((default_ooQ2(X) ==> if_mooQ2(current_ooQ2(_),current_ooQ2(X)))).
 
-:- mpred_ain(default_ooQQ(booQQ)).
+:- mpred_ain(default_ooQ2(booQ2)).
 
-:- mpred_test(current_ooQQ(booQQ)).
+:- mpred_test(current_ooQ2(booQ2)).
    
 % :- pp_db_DB.
 
-:- (mpred_ain(current_ooQQ(fooQQ))).
+:- (mpred_ain(current_ooQ2(fooQ2))).
 
-:- mpred_test(\+current_ooQQ(booQQ)).
+:- mpred_test(\+current_ooQ2(booQ2)).
 
-:- (mpred_ain(\+ current_ooQQ(fooQQ))).
+:- (mpred_ain(\+ current_ooQ2(fooQ2))).
 
-:- mpred_test(current_ooQQ(booQQ)).
+:- mpred_test(current_ooQ2(booQ2)).
 
-:- (mpred_withdraw( default_ooQQ(booQQ) )).
+:- (mpred_withdraw( default_ooQ2(booQ2) )).
 
-:- listing([current_ooQQ,default_ooQQ]).
+:- listing([current_ooQ2,default_ooQ2]).
 
-:- mpred_test( \+current_ooQQ(booQQ)).
+:- mpred_test( \+current_ooQ2(booQ2)).
 
-:- mpred_ain(~ current_ooQQ(fooQQ)).
+:- mpred_ain(~ current_ooQ2(fooQ2)).
 
 % :- pp_db_DB.
 
-:- mpred_test(~current_ooQQ(fooQQ)).
+:- mpred_test(~current_ooQ2(fooQ2)).
 
-:- mpred_ain(default_ooQQ(booQQ)).
+:- mpred_ain(default_ooQ2(booQ2)).
  
-:- mpred_test(current_ooQQ(booQQ)).
+:- mpred_test(current_ooQ2(booQ2)).
 
 
 :- get_user_abox(M),dynamic((M:current_ooTt/1,M:default_ooTt/1,M:if_mooTt/2)).
