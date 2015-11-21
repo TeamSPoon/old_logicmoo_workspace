@@ -21,6 +21,7 @@ mpred_mark(pfcPosTrigger, S1, F, A)/ground(S1:F:A)==>marker_supported(F,A).
 mpred_mark(pfcNegTrigger, S1, F, A)/ground(S1:F:A)==>marker_supported(F,A).
 mpred_mark(pfcBcTrigger, S1, F, A)/ground(S1:F:A)==>marker_supported(F,A).
 mpred_mark(pfcRHS, S1, F, A)/ground(S1:F:A)==>marker_supported(F,A).
+mpred_mark(pfcCreates, S1, F, A)/ground(S1:F:A)==>{functor(P,F,A),make_dynamic(P)}.
 mpred_mark(pfcCreates, S1, F, A)/ground(S1:F:A)==>marker_supported(F,A).
 mpred_mark(pfcCallCode, S1, F, A)/(ground(S1:F:A), 
   predicate_is_undefined_fa(F,A))==> marker_supported(F,A).

@@ -33,7 +33,7 @@
 
 :- get_user_abox(M),M:must((default_ooQ1(booQ1))).
 
-:- pp_db_why(default_ooQ1(booQ1)).
+:- mpred_why(default_ooQ1(booQ1)).
 
 :- mpred_test(default_ooQ1(booQ1)).
 

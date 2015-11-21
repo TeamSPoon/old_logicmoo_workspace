@@ -567,7 +567,7 @@ current_source_location0(module(M)):- '$module'(M,M).
 % Current Generation Of Proof.
 %
 current_why(Why):- t_l:current_local_why(Why,_),!.
-current_why(loading(M,F,L)):- source_module(M), current_source_file(F:L).
+current_why(mfl(M,F,L)):- source_module(M), current_source_file(F:L).
 
 
 

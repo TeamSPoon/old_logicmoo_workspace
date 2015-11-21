@@ -31,6 +31,7 @@
 % Douglas Miles
 */
 
+:- autoload([verbose(false)]).
 :- include(logicmoo(mpred/'mpred_header.pi')).
 
 :- set_mpred_module(baseKB).
@@ -514,8 +515,8 @@ arity(argQuoted,1).
 
 tCol(vtDirection).
 
-disjointWith(Sub, Super) ==> disjointWith( Super, Sub).
 disjointWith(ttTemporalType,ttAbstractType).
+disjointWith(Sub, Super) ==> disjointWith( Super, Sub).
 
 (ptSymmetric(Pred) ==> ({atom(Pred),G1=..[Pred,X,Y],G2=..[Pred,Y,X]}, (G1==>G2), (~(G1)==> ~(G2)))).
 
@@ -1106,7 +1107,7 @@ specialFunctor('/').
 /*
 :- mpred_test((expand_props(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O),ain(mdefault(O)))).
 
-:- mpred_test((fully_expand(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O),pp_db_why(mdefault(O)))).
+:- mpred_test((fully_expand(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O),mpred_why(mdefault(O)))).
 */
 :- endif.
 

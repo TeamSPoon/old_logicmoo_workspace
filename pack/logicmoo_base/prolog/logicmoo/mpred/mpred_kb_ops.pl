@@ -195,7 +195,6 @@ clause_s/2,
 retractall_s/1,
 assert_s/1,
 listing_s/1,
-fix_mp/2,
 add_side_effect/2,
 record_se/0,
 mpred_is_builtin/1,
@@ -686,10 +685,6 @@ add_side_effect(Op,Data):-get_source_ref1(Why),assert(t_l:side_effect_buffer(Op,
 %
 
 
-
-fix_mp(M:P,M:P):- current_predicate(_,M:P),!.
-fix_mp(MP ,M:P):- strip_module(MP,_,P),get_user_abox(M).
-
 listing_s(P):-call_s(xlisting(P)).
 
 assert_s(H):- assertz_s(H).
@@ -810,7 +805,7 @@ is_nc_as_is(P) :- \+ compound(P),!.
 is_nc_as_is(P) :- functor(P,_,0),!.
 is_nc_as_is(P):- is_ftVar(P),!.
 
-fixed_negations(I,O):-notrace((fix_negations(I,O),!,I\=@=O)).
+fixed_negations(I,O):-notrace((fix_negations(I,O),!,I\=@=O)),!.
 fix_negations(P0,P0):- is_nc_as_is(P0),!.
 fix_negations(~(P0),~(P0)):- is_nc_as_is(P0),!.
 fix_negations(\+(P0),\+(P0)):- is_nc_as_is(P0),!.
@@ -833,9 +828,9 @@ fix_negations(C,CO):-C=..[F|CL],must_maplist(fix_negations,CL,CLO),!,CO=..[F|CLO
 %
 to_addable_form_wte(Why,I,O):-nonvar(O),!,to_addable_form_wte(Why,I,M),!,mustvv(M=O).
 to_addable_form_wte(Why,I,O):-string(I),must_det_l((input_to_forms(string(I),Wff,Vs),put_variable_names(Vs),!,sexpr_sterm_to_pterm(Wff,PTerm),
-  to_addable_form_wte(Why,PTerm,O))).
+  to_addable_form_wte(Why,PTerm,O))),!.
 to_addable_form_wte(Why,I,O):-atom(I),atom_contains(I,'('),must_det_l((input_to_forms(atom(I),Wff,Vs),put_variable_names(Vs),!,sexpr_sterm_to_pterm(Wff,PTerm),
-  to_addable_form_wte(Why,PTerm,O))).
+  to_addable_form_wte(Why,PTerm,O))),!.
 
 to_addable_form_wte(_,X,X):-mreq(as_is_term(X)),!.
 to_addable_form_wte(Why,nesc(I),O):-!,to_addable_form_wte(Why,I,O).

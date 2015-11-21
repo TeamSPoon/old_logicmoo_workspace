@@ -28,7 +28,7 @@
 
 :- must(call_u(default_ooQ2(booQ2))).
 
-:- pp_db_why(default_ooQ2(booQ2)).
+:- mpred_why(default_ooQ2(booQ2)).
 
 :- mpred_test(default_ooQ2(booQ2)).
 

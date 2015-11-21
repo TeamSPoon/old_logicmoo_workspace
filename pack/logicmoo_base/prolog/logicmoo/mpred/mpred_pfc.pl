@@ -12,14 +12,14 @@
 */
 
 :- module(mpred_pfc, [
-  call_u/1,
+  call_u/1,fix_mp/2,
   show_if_debug/1,
   set_user_abox/1,
   get_user_abox/1,
   get_source_ref/1,
   get_source_ref1/1,
   is_source_ref1/1,
-  check_never_assert/1,
+  check_never_assert/1,check_never_retract/1,
   why_was_true/1,
   mpred_fwc0/1,
   with_no_mpred_trace_exec/1,
@@ -58,7 +58,7 @@
   mpred_trace/0,mpred_trace/1,mpred_trace/2,mpred_trace_maybe_print/3,mpred_trace_maybe_break/3,mpred_trace_exec/0,mpred_trace_op/3,
   mpred_trace_op/2,mpred_trace_msg/1,mpred_trace_msg/2,mpred_trigger_key/2,mpred_trigger_key/2,mpred_undo/1,mpred_unfwc/1,
   mpred_unfwc_check_triggers/1,mpred_union/3,mpred_unique_u/1,mpred_untrace/0,mpred_untrace/1,mpred_warn/0,mpred_warn/1,
-  mpred_warn/2,mpred_watch/0,well_founded_0/2,pp_db_why/0,pp_db_why/1,mpred_whyBrouse/2,mpred_handle_why_command/3,
+  mpred_warn/2,mpred_watch/0,well_founded_0/2,mpred_why/0,mpred_why/1,mpred_whyBrouse/2,mpred_handle_why_command/3,
   nompred_warn/0,pfcl_do/1,pp_DB/0,pp_db_facts/0,pp_db_facts/1,pp_db_facts/2,pp_db_items/1,
   pp_db_rules/0,pp_db_supports/0,pp_db_triggers/0,mpred_load/1,process_rule/3,
   remove_if_unsupported/1,remove_selection/1,mpred_withdraw1/2,
@@ -156,7 +156,7 @@ setup_mpred_ops:-
 %
 :- module_transparent((get_source_ref)/1).
 get_source_ref(O):- current_why(U),(U=(_,_)->O=U;O=(U,U)),!.
-get_source_ref(O):- get_source_ref1(U),(U=(_,_)->O=U;O=(U,U)).
+get_source_ref(O):- get_source_ref1(U),(U=(_,_)->O=U;O=(U,U)),!.
 
 
 %% get_source_ref1(+Mt) is semidet.
@@ -166,11 +166,11 @@ get_source_ref(O):- get_source_ref1(U),(U=(_,_)->O=U;O=(U,U)).
 :- module_transparent((get_source_ref1)/1).
 % get_source_ref1(_):- fail,check_context_module,fail.
 get_source_ref1(M):- current_why(M),!.
-get_source_ref1(loading(M,F,L)):- get_user_abox(M), source_location(F,L),!.
+get_source_ref1(mfl(M,F,L)):- get_user_abox(M), source_location(F,L),!.
 get_source_ref1(M):- (get_user_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))),!.
-get_source_ref1(loading(M,F,L)):- get_user_abox(M), current_source_file(F:L),!.
-get_source_ref1(loading(M,F,_L)):- get_user_abox(M), current_source_file(F),!.
-get_source_ref1(loading(M,_,_L)):- get_user_abox(M),!.
+get_source_ref1(mfl(M,F,L)):- get_user_abox(M), current_source_file(F:L),!.
+get_source_ref1(mfl(M,F,_L)):- get_user_abox(M), current_source_file(F),!.
+get_source_ref1(mfl(M,_,_L)):- get_user_abox(M),!.
 get_source_ref1(M):- (get_user_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))),!.
 get_source_ref1(M):- 
  (get_user_abox(M) -> !;
@@ -193,16 +193,22 @@ get_user_abox(_U). % implicit :-nonvar(U).
 
 
 
+fix_mp(MP ,M:P):- strip_module(MP,_,P),get_user_abox(M),current_predicate(_,M:P),!.
+fix_mp(M:P,M:P):- current_predicate(_,M:P),!.
+fix_mp(MP ,M:P):- strip_module(MP,_,P),get_user_abox(M).
 
-
+body_true(true):-!.
+body_true(avar(_,AVS)):-nonvar(AVS),attr_bind(AVS).
 
 %:- if(\+ current_prolog_flag(umt_local,false)).
 
 listing_u(P):-call_u(listing(P)).
-assert_u(A0):- strip_module(A0,_,A),get_user_abox(M),assert(M:A).
-asserta_u(A0):- strip_module(A0,_,A), get_user_abox(M),asserta(M:A).
-assertz_u(A0):- strip_module(A0,_,A), get_user_abox(M),assertz(M:A).
+
+assert_u(MP):- fix_mp(MP,M:P),assert(M:P).
+asserta_u(MP):- fix_mp(MP,M:P),asserta(M:P).
+assertz_u(MP):- fix_mp(MP,M:P),assertz(M:P).
 retract_u(M:(H:-B)):- atom(M),!, clause_u(H,B,R),erase(R).
+
 retract_u((H:-B)):-!, clause_u(H,B,R),erase(R).
 retract_u(H0):- strip_module(H0,_,H),!, clause_u(H,true,R),erase(R).
 retractall_u(H):- forall(clause_u(H,_,R),erase(R)).
@@ -214,6 +220,8 @@ clause_u(H,B,R):- get_user_abox(M), M:clause(M:H,B,R).
 lookup_u(Trigger):-  clause_u(Trigger,B),call(B).
 lookup_u(Trigger,Ref):-  clause_u(Trigger,B,Ref),call(B).
 
+call_u(mpred_BC(G0)):-nonvar(G0),!,call_u(G0).
+call_u(call_u(G0)):-nonvar(G0),!,call_u(G0).
 call_u(G0):-
   strip_module(G0,_,G),functor(G,F,A),
   mpred_BC_CACHE(G),
@@ -342,7 +350,6 @@ mpred_ainz(G,S):-mpred_ain(G,S).
 mpred_aina(G):-mpred_ain(G).
 mpred_aina(G,S):-mpred_ain(G,S).
 
-
 %%  mpred_ain(P,S) 
 %
 %  asserts P into the dataBase with support from S.
@@ -350,7 +357,7 @@ mpred_aina(G,S):-mpred_ain(G,S).
 %  mpred_ain/2 and mpred_post/2 are the proper ways to add new clauses into the
 %  database and have forward reasoning done.
 %
-mpred_ain(P):- get_source_ref(UU),mpred_ain(P,UU).
+mpred_ain(P):- get_source_ref(UU),mpred_ain(P,UU),!.
 
 %%  ain(P,S) 
 %
@@ -360,7 +367,7 @@ ain(P,S):- mpred_ain(P,S).
 
 
 mpred_ain(P,S):- 
-  if_defined_else(to_addable_form_wte(assert,P,P0),P0=P),
+  if_defined_else(to_addable_form_wte(assert,P,P0),P0=P)  -> 
   each_E(mpred_post1,P0,[S]),
   mpred_run.
 %mpred_ain(_,_).
@@ -380,7 +387,7 @@ ain_fast(P,S):-
 % each fact (or the singleton) mpred_post1 is called. It always succeeds.
 %
 mpred_post(P, S):- 
-   if_defined_else(to_addable_form_wte(assert,P,P0),P=P0),
+   if_defined_else(to_addable_form_wte(assert,P,P0),P=P0), 
    each_E(mpred_post1,P0,[S]).
 
 
@@ -391,7 +398,9 @@ mpred_post(P, S):-
 % It always succeeds.
 %
 mpred_post1(    P,   S):- if_defined_else(fixed_negations(P,P0),fail),!, mpred_post1( P0,   S).
-mpred_post1(( \+P ), S):- !, must_be(nonvar,P) ->  mpred_withdraw(P, S).
+% TODO - ODD THIS WAS EVEN NEEDED?
+mpred_post1(  ~ P,   S):- nonvar(P),doall(mpred_remove(P,S)),mpred_undo(\+P),fail.
+mpred_post1( \+ P,   S):- nonvar(P),!, mpred_withdraw(P, S),!.
 mpred_post1(P,S):- 
   %  db mpred_ain_db_to_head(P,P2),
   % mpred_remove_old_version(P),
@@ -1648,7 +1657,7 @@ mpred_reset:-
 mpred_reset:-
   mpred_database_item(T),!,
   mpred_warn("Couldn't full mpred_reset: ~p.~n",[T]), must(pp_DB),!,
-  mpred_error("Pfc database not empty after mpred_reset, e.g., ~p.~n",[T]),!,fail.
+  mpred_error("Pfc database not empty after mpred_reset, e.g., ~p.~n",[T]),!.
 mpred_reset:- mpred_trace_msg("Reset DB complete").
 
 % true if there is some Pfc crud still in the database.
@@ -1665,10 +1674,10 @@ mpred_database_item(P):-
 
 
 mpred_retract_i_or_warn(X):- retract_u(X), !.
-mpred_retract_i_or_warn(spft(P,T,loading(M,F,A))):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,T,loading(M,F,_))).
-mpred_retract_i_or_warn(spft(P,loading(M,F,A),T)):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,loading(M,F,_),T)).
-mpred_retract_i_or_warn(spft(P,T,loading(M,A,F))):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,T,loading(M,_,F))).
-mpred_retract_i_or_warn(spft(P,loading(M,A,F),T)):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,loading(M,_,F),T)).
+mpred_retract_i_or_warn(spft(P,T,mfl(M,F,A))):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,T,mfl(M,F,_))).
+mpred_retract_i_or_warn(spft(P,mfl(M,F,A),T)):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,mfl(M,F,_),T)).
+mpred_retract_i_or_warn(spft(P,T,mfl(M,A,F))):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,T,mfl(M,_,F))).
+mpred_retract_i_or_warn(spft(P,mfl(M,A,F),T)):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,mfl(M,_,F),T)).
 mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft(\+ _,_,_),!.
 mpred_retract_i_or_warn(X):- 
   mpred_warn("Couldn't retract_u ~p.~n",[X]),!.
@@ -1866,7 +1875,7 @@ mpred_test(_):- (compiling; current_prolog_flag(xref,true)),!.
 mpred_test(G):- mpred_is_silient,!, with_no_mpred_trace_exec(must(mpred_test_fok(G))).
 mpred_test(G):- with_mpred_trace_exec(must(mpred_test_fok(G))).
 
-why_was_true(P):- pp_db_why(P),!.
+why_was_true(P):- mpred_why(P),!.
 why_was_true(P):- dmsg(justfied_true(P)),!.
 
 mpred_test_fok(\+ G):-!, ( \+ call_u(G) -> wdmsg(passed_mpred_test(\+ G)) ; (wdmsg(failed_mpred_test(\+ G)),!,ignore(why_was_true(G)),!,fail)).
@@ -2057,20 +2066,19 @@ bagof_or_nil(T,G,B):- (bagof(T,G,B) *-> true; B=[]).
 
 %  mpred_add_support(+Fact,+Support)
 mpred_add_support(P,(Fact,Trigger)):-
-  (Trigger= nt(F,Condition,Action) -> 
-    (mpred_trace_msg('~N~n\tAdding mpred_do_fcnt via support~n\t\ttrigger: ~p~n\t\tcond: ~p~n\t\taction: ~p~n\t from: ~p~N',
-      [F,Condition,Action,mpred_add_support(P,(Fact,Trigger))]));true),
+ % (Trigger= nt(F,Condition,Action) -> 
+ %   (mpred_trace_msg('~N~n\tAdding mpred_do_fcnt via support~n\t\ttrigger: ~p~n\t\tcond: ~p~n\t\taction: ~p~n\t from: ~p~N',
+ %     [F,Condition,Action,mpred_add_support(P,(Fact,Trigger))]));true),
   assert_u(spft(P,Fact,Trigger)).
 
 mpred_get_support(P,(Fact,Trigger)):-
       lookup_u(spft(P,Fact,Trigger)).
 
 
-
 mpred_rem_support_if_exists(P,(Fact,Trigger)):-
  SPFT = spft(P,Fact,Trigger),
   lookup_u(SPFT),
-  mpred_retract_i_or_warn(SPFT).
+  once(mpred_retract_i_or_warn(SPFT)).
 
 
 
@@ -2193,7 +2201,7 @@ pp_db_supports:-
   pp_db_items(L),!.
 pp_db_supports:- bagof_or_nil((P =< S),mpred_get_support(P,S),Bts),pp_db_items(Bts),!.
 
-%   File   : pp_db_why.pl
+%   File   : mpred_why.pl
 %   Author : Tim Finin, finin@prc.unisys.com
 %   Updated:
 %   Purpose: predicates for interactively exploring Pfc justifications.
@@ -2202,18 +2210,22 @@ pp_db_supports:- bagof_or_nil((P =< S),mpred_get_support(P,S),Bts),pp_db_items(B
 
 :- use_module(library(lists)).
 
-pp_db_why:- 
-  lookup_u(why_buffer(P,_)),
-  pp_db_why(P).
+pp_why:-mpred_why.
 
-pp_db_why(N):-
+mpred_why:- 
+  lookup_u(why_buffer(P,_)),
+  mpred_why(P).
+
+pp_why(A):-mpred_why(A).
+
+mpred_why(N):-
   number(N),
   !,
   lookup_u(why_buffer(P,Js)),
   mpred_handle_why_command(N,P,Js).
 
-pp_db_why(M:P):-atom(M),!,pp_db_why(P).
-pp_db_why(P):-
+mpred_why(M:P):-atom(M),!,mpred_why(P).
+mpred_why(P):-
   justifications(P,Js),
   retractall_u(why_buffer(_,_)),
   assert_u(why_buffer(P,Js)),
@@ -2442,8 +2454,8 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((mpred_handle_why_command)/3).
 :- module_transparent((mpred_whyBrouse)/2).
 :- module_transparent((mpred_why1)/1).
-:- module_transparent((pp_db_why)/1).
-:- module_transparent((pp_db_why)/0).
+:- module_transparent((mpred_why)/1).
+:- module_transparent((mpred_why)/0).
 :- module_transparent((pp_db_supports)/0).
 :- module_transparent((pp_db_triggers)/0).
 :- module_transparent((pp_db_rules)/0).

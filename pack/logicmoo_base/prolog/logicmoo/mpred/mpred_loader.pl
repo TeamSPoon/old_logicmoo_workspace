@@ -566,9 +566,11 @@ mpred_expander0(Type,LoaderMod,I,OO):-
   make_key(mpred_expander_key(F,L,M,UM,Type,LoaderMod,I),Key),  
   ( \+ t_l:mpred_already_in_file_expansion(Key) ),
    w_tl(t_l:mpred_already_in_file_expansion(Key),
+      w_tl(t_l:current_why_source(mfl(M,F,L)),
         (( % trace,
+  
            fully_expand(change(assert,ain),I,II),
-        w_tl(t_l:current_why_source(loading(M,F,L)),
+        
           mpred_expander_now_one_cc(F,M,II,O))))))),
     '$module'(_,UM)),
   !,I\=@=O,O=OO.

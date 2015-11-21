@@ -8,7 +8,7 @@
 
 :- module(sanity,[]).
 
-:- use_module(library(logicmoo_base)).
+:- use_module(library(logicmoo_user)).
 
 %:- dmsg(begin_abc123).
               
@@ -16,7 +16,7 @@
 %:- dynamic(singleValuedInArg/2).
 %:- dynamic(baseKB:ptReformulatorDirectivePredicate/1).
 
-% :- mpred_trace_exec.
+:- mpred_trace_exec.
 
 :- abolish(c,0).
 :- abolish(a,1).
@@ -37,7 +37,7 @@
 
 
 
-~ a(z).
+:- ain(~ a(z)).
 
 :- mpred_test(  ~(a(_))).
 :- mpred_test(\+ a(_)).
