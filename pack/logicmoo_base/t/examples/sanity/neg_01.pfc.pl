@@ -33,6 +33,6 @@ fooBar.
 
 :- mpred_test(\+fooBar).
 
-:- mpred_no_spy_all.
+:- mpred_nospy.
 
 

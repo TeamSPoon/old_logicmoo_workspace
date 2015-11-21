@@ -77,7 +77,7 @@
             kbp_t_list_1/3,
             kbp_t_list_prehook/2,
             kbp_to_mpred_0/0,
-            kbp_to_mpred_no_more/0,
+            kbp_to_mpred_nomore/0,
             kbp_to_mpred_t/0,
             link_to_holds/2,
             link_to_holds/3,
@@ -781,11 +781,11 @@ kbp_to_mpred_0:- time_call(drain_assert_next_buffer),!.
 
 %= 	 	 
 
-%% kbp_to_mpred_no_more is semidet.
+%% kbp_to_mpred_nomore is semidet.
 %
 % Knowledge Base P- Converted To Managed Predicate No More.
 %
-kbp_to_mpred_no_more:- forall((into_plist(_Call,PLIST),kbp_t(PLIST)),assert_to_db_list(_F,PLIST)),
+kbp_to_mpred_nomore:- forall((into_plist(_Call,PLIST),kbp_t(PLIST)),assert_to_db_list(_F,PLIST)),
    retractall(lmconf:use_cyc_database),tell('a.txt'),listing(t),listing('ASSERTION'),told,dmsg(done_mpred_t).
 
 

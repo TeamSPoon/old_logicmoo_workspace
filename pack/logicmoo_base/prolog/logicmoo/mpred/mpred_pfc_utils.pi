@@ -231,15 +231,15 @@ mpred_nf1/2,
 mpred_nf1_negation/2,
 mpred_nf_negation/2,
 mpred_nf_negations/2,
-mpred_no_chaining/1,
-mpred_no_spy/0,
-mpred_no_spy/1,
-mpred_no_spy/3,
-mpred_no_spy_all/0,
-mpred_no_trace/0,
-mpred_no_trace_all/0,
-mpred_no_warnings/0,
-mpred_no_watch/0,
+mpred_nochaining/1,
+mpred_nospy/0,
+mpred_nospy/1,
+mpred_nospy/3,
+mpred_nospy/0,
+mpred_notrace/0,
+mpred_notrace_all/0,
+mpred_nowarnings/0,
+mpred_nowatch/0,
 mpred_non_neg_literal/1,
 mpred_notrace_exec/0,
 mpred_pbody/5,
@@ -852,11 +852,11 @@ erase_w_attvars(Data0,Ref):- physical_side_effect(erase(Ref)),add_side_effect(er
 physical_side_effect(PSE):- is_side_effect_disabled,!,mpred_warn('no_physical_side_effects ~p',PSE).
 physical_side_effect(PSE):- PSE.
 
-%% mpred_no_chaining(+Goal) is semidet.
+%% mpred_nochaining(+Goal) is semidet.
 %
 % PFC No Chaining.
 %
-mpred_no_chaining(Goal):- w_tl(t_l:no_physical_side_effects,call(Goal)).
+mpred_nochaining(Goal):- w_tl(t_l:no_physical_side_effects,call(Goal)).
 
 
 % TODO ISSUE https://github.com/TeamSPoon/PrologMUD/issues/7
@@ -4660,17 +4660,17 @@ mpred_trace_rem(Why,P) :-
 
 
 
-%% mpred_no_spy_all is semidet.
+%% mpred_nospy is semidet.
 %
 % PFC No Spy All.
 %
-mpred_no_spy_all :- mpred_no_spy, retractall_i(mpred_is_tracing_exec).
+mpred_nospy :- mpred_nospy, retractall_i(mpred_is_tracing_exec).
 
-%% mpred_no_trace_all is semidet.
+%% mpred_notrace_all is semidet.
 %
 % PFC no  Trace all.
 %
-mpred_no_trace_all :-  retractall_i(mpred_is_tracing_exec).
+mpred_notrace_all :-  retractall_i(mpred_is_tracing_exec).
 
 %% mpred_spy_all is semidet.
 %
@@ -4695,7 +4695,7 @@ mpred_notrace_exec :- retractall_i(mpred_is_tracing_exec).
 % PFC Trace.
 %
 mpred_trace :- mpred_trace(_).
-lmconf:module_local_init:-mpred_no_trace_all.
+lmconf:module_local_init:-mpred_notrace_all.
 
 
 %% mpred_trace(+Form) is semidet.
@@ -4749,36 +4749,36 @@ mpred_spy1(Form,Mode,Condition) :-
   assert_i((mpred_is_spying(Form,Mode) :- Condition)).
 
 
-%% mpred_no_spy is semidet.
+%% mpred_nospy is semidet.
 %
 % PFC No Spy.
 %
-mpred_no_spy :- mpred_no_spy(_,_,_).
+mpred_nospy :- mpred_nospy(_,_,_).
 
 
-%% mpred_no_spy(+Form) is semidet.
+%% mpred_nospy(+Form) is semidet.
 %
 % PFC No Spy.
 %
-mpred_no_spy(Form) :- mpred_no_spy(Form,_,_).
+mpred_nospy(Form) :- mpred_nospy(Form,_,_).
 
 
-%% mpred_no_spy(+Form, ?Mode, ?Condition) is semidet.
+%% mpred_nospy(+Form, ?Mode, ?Condition) is semidet.
 %
 % PFC No Spy.
 %
-mpred_no_spy(Form,Mode,Condition) :-
+mpred_nospy(Form,Mode,Condition) :-
   clause_i(mpred_is_spying(Form,Mode), Condition, Ref),
   erase_w_attvars(clause_i(mpred_is_spying(Form,Mode), Condition, Ref),Ref),
   fail.
-mpred_no_spy(_,_,_).
+mpred_nospy(_,_,_).
 
 
-%% mpred_no_trace is semidet.
+%% mpred_notrace is semidet.
 %
 % PFC no  Trace.
 %
-mpred_no_trace :- mpred_untrace.
+mpred_notrace :- mpred_untrace.
 
 %% mpred_untrace is semidet.
 %
@@ -4839,11 +4839,11 @@ mpred_trace_msg(Msg,Args) :- ignore((mpred_is_tracing_exec, !, mmsg(Msg,Args))),
 mpred_watch :- assert_i(mpred_is_tracing_exec).
 
 
-%% mpred_no_watch is semidet.
+%% mpred_nowatch is semidet.
 %
 % PFC No Watch.
 %
-mpred_no_watch :-  retractall_i(mpred_is_tracing_exec).
+mpred_nowatch :-  retractall_i(mpred_is_tracing_exec).
 
 
 %% mpred_error(+Msg) is semidet.
@@ -4921,7 +4921,7 @@ mpred_warn(Msg,Args) :-
 
 %=
 %= mpred_warnings/0 sets flag to cause pfc warning messages to print.
-%= mpred_no_warnings/0 sets flag to cause pfc warning messages not to print.
+%= mpred_nowarnings/0 sets flag to cause pfc warning messages not to print.
 %=
 
 
@@ -4934,11 +4934,11 @@ mpred_warnings :-
   assert_i(mpred_warnings(true)).
 
 
-%% mpred_no_warnings is semidet.
+%% mpred_nowarnings is semidet.
 %
 % PFC No Warnings.
 %
-mpred_no_warnings :-
+mpred_nowarnings :-
   retractall_i(mpred_warnings(_)).
 
 

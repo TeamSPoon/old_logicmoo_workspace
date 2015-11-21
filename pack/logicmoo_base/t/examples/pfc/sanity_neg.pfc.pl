@@ -35,6 +35,6 @@ fooBar.
 :- mpred_test(\+fooBar).
 %:- nortrace.
 
-:- mpred_no_spy_all.
+:- mpred_nospy.
 
 

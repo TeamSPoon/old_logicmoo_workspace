@@ -186,7 +186,7 @@ male(skArg1ofFatherFn(trudy)).
 
 %= we can report the presence on non male though...
 %=    the ~/1 is our negation hook into the inference engine
-:- no_varnaming( mpred_no_chaining(doall((show_call(~male(Who )))))).
+:- no_varnaming( mpred_nochaining(doall((show_call(~male(Who )))))).
 
 
 %= we expect to see at least there mothers here

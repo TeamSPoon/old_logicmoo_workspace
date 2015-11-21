@@ -42,17 +42,16 @@
 
 :- mpred_why(foob(az)).
 
-:- break.
+
 :- ain(foob(b)).
 
 :- call(\+foob(az)).
 
-:- break.
 
-:- trace.
+
 :- ain(==> (\+ foob(b))).
 
-:- break.
+
 
 :- mpred_why(foob(az)).
 
@@ -60,7 +59,6 @@
 
 :- listing([foob,good]).
 
-:- trace.
 :- call( \+foob(az)).
 
 :- mpred_ain(~ foob(b)).

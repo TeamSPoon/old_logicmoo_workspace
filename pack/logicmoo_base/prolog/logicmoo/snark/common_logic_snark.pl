@@ -316,7 +316,7 @@ pfc_for_print_right(Prolog,PrintPFC):- =(Prolog,PrintPFC).
 %
 is_entailed(CLIF):- 
  cwc, mpred_run,
- mpred_no_chaining((
+ mpred_nochaining((
    kif_to_pfc(CLIF,Prolog),!, \+ \+ are_clauses_entailed(Prolog))),!.
 
 
@@ -325,7 +325,7 @@ is_entailed(CLIF):-
 % If Is A Not Entailed.
 %  A good sanity Test for required absence of specific side-effect entailments
 %
-is_not_entailed(CLIF):- cwc, mpred_no_chaining((kif_to_pfc(CLIF,Prolog), \+ are_clauses_entailed(Prolog))).
+is_not_entailed(CLIF):- cwc, mpred_nochaining((kif_to_pfc(CLIF,Prolog), \+ are_clauses_entailed(Prolog))).
 
 :- op(1190,xfx,(:-)).
 :- op(1200,fy,(is_entailed)).

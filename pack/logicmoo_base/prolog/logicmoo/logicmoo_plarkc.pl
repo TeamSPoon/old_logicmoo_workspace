@@ -36,7 +36,7 @@ cwtdl(Goal,DL,TL):- cwc,
 transfer_predicate(C,If,Q):-doall((clause(C,true,Ref),If,Q,on_x_log_throw(erase(Ref)))).
 transTiny(Template,If):-transfer_predicate(tinyK8(Template),If,once(ain(Template))).
 
-:- mpred_no_trace.
+:- mpred_notrace.
 
 
 reallyLoadTiny:- transTiny(tCol(X),ground(X)).
@@ -52,7 +52,7 @@ reallyLoadTiny:- transTiny(ttFormatType(X),ground(X)).
 %TODO_VERIFY_STILL_UNNEEDED :-mpred_withdraw(genls(ftAtomicTerm,ftClosedAtomicTerm)).
 
 %TODO_VERIFY_STILL_UNNEEDED :-retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
-reallyLoadTiny:- mpred_no_trace.
+reallyLoadTiny:- mpred_notrace.
 
 
 :- if(false).
@@ -62,7 +62,7 @@ reallyLoadTiny:- mpred_no_trace.
 
 %TODO FIX :-ain((((cycl(X),{must(cyc_to_clif(X,Y))}) ==> clif(Y)))).
 
-:- mpred_no_trace.
+:- mpred_notrace.
 :- ain((((cycl('$VAR'('X')),{must(cyc_to_clif('$VAR'('X'),'$VAR'('Y')))}) ==> clif('$VAR'('Y'))))).
 
 % ?-listing(cycl).
@@ -91,7 +91,7 @@ tHominid(iExplorer2).
 
 load_later:- notrace((transfer_predicate(tinyK8(Form),writeq(Form),ignore(on_x_log_throw(cwtdl(ain(clif(Form)),500,10)))))).
 
-:- mpred_no_trace.
+:- mpred_notrace.
 
 :- in_cmt(listing(cwtdl_failed/1)).
 

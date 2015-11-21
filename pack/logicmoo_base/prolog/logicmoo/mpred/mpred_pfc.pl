@@ -19,6 +19,7 @@
   get_source_ref/1,
   get_source_ref1/1,
   is_source_ref1/1,
+  mpred_remove1/2,
   check_never_assert/1,check_never_retract/1,
   why_was_true/1,
   mpred_fwc0/1,
@@ -72,7 +73,9 @@
   stop_trace/1,with_mpred_trace_exec/1,
   select_next_fact/1,supporters_list/2,triggerSupports/2,trigger_trigger/3,well_founded/1,well_founded_list/2,
   do_assumpts/2,mpred_do_fcnt/2,mpred_do_fcpt/2,mpred_fwc1/1,mpred_do_rule/1,mpred_descendant1/3,mpred_eval_rhs1/2,mpred_nf1/2,
-  mpred_post1/2,mpred_withdraw/1,mpred_withdraw/2,mpred_remove/1,mpred_remove/2,mpred_pp_db_justification1/2,mpred_pp_db_justifications2/3,mpred_spy1/3,
+  mpred_post1/2,mpred_withdraw/1,mpred_withdraw/2,mpred_remove/1,
+  mpred_remove/2,
+  mpred_pp_db_justification1/2,mpred_pp_db_justifications2/3,mpred_spy1/3,
   mpred_unfwc1/1,mpred_why1/1,mpred_blast/1,trigger_trigger1/2  ]).
 
  :- meta_predicate 
@@ -155,8 +158,8 @@ setup_mpred_ops:-
 % Get Source Ref.
 %
 :- module_transparent((get_source_ref)/1).
-get_source_ref(O):- current_why(U),(U=(_,_)->O=U;O=(U,U)),!.
-get_source_ref(O):- get_source_ref1(U),(U=(_,_)->O=U;O=(U,U)),!.
+get_source_ref(O):- current_why(U),(U=(_,_)->O=U;O=(U,ax)),!.
+get_source_ref(O):- get_source_ref1(U),(U=(_,_)->O=U;O=(U,ax)),!.
 
 
 %% get_source_ref1(+Mt) is semidet.
@@ -179,7 +182,7 @@ get_source_ref1(M):-
 
 is_source_ref1(_).
 
-%% get_user_abox(-ABOXModule) is semidet.
+%% get_user_abox(-Ctx) is det.
 %
 % ABox is an "assertion component" Prolog Module
 % within a knowledge base.
@@ -710,15 +713,17 @@ mpred_withdraw1(P,S):-
 %%  mpred_remove(+P) is det.
 % 
 %  mpred_remove is like mpred_withdraw, but if P is still in the DB after removing the
-%  user''s support, it is retracted by more forceful means (e.g. remove).
+%  user''s support, it is retracted by more forceful means (e.ax. remove).
 % 
 mpred_remove(P):- get_source_ref(UU), mpred_remove(P,UU).
 mpred_remove(P,S):- each_E(mpred_remove1,P,[S]).
+
 mpred_remove1(P,S):-
   mpred_withdraw(P,S),
-  mpred_BC(P)
+  call_u(P)
      -> mpred_blast(P) 
       ; true.
+
 
 % 
 %  mpred_blast(+F) retracts fact F from the DB and removes any dependent facts
@@ -1442,8 +1447,8 @@ really_mpred_mark(_  ,Type,PosNeg,F,A):- call_u(mpred_mark(Type,PosNeg,F,A)),!.
 really_mpred_mark(Sup,Type,PosNeg,F,A):- 
   MARK = mpred_mark(Type,PosNeg,F,A),
   check_never_assert(MARK),
-  with_no_mpred_trace_exec(with_search_mode(direct,ain_fast(MARK,(s(Sup),g)))).
-  % with_no_mpred_trace_exec(with_search_mode(direct,mpred_fwc1(MARK,(s(Sup),g)))),!.
+  with_no_mpred_trace_exec(with_search_mode(direct,ain_fast(MARK,(s(Sup),ax)))).
+  % with_no_mpred_trace_exec(with_search_mode(direct,mpred_fwc1(MARK,(s(Sup),ax)))),!.
    
 
 %% fa_to_p(+F, ?A, ?P) is semidet.
@@ -1605,7 +1610,7 @@ mpred_conjoin(C1,C2,(C1,C2)).
 %   Author :  Dave Matuszek, dave@prc.unisys.com
 %   Author :  Dan Corpron
 %   Updated: 10/11/87, ...
-%   Purpose: predicates to manipulate a Pfc database (e.g. save,
+%   Purpose: predicates to manipulate a Pfc database (e.ax. save,
 % 	restore, reset, etc.)
 
 %% mpred_database_term(:PI, -TYPE) is nondet.
@@ -1657,7 +1662,7 @@ mpred_reset:-
 mpred_reset:-
   mpred_database_item(T),!,
   mpred_warn("Couldn't full mpred_reset: ~p.~n",[T]), must(pp_DB),!,
-  mpred_error("Pfc database not empty after mpred_reset, e.g., ~p.~n",[T]),!.
+  mpred_error("Pfc database not empty after mpred_reset, e.ax., ~p.~n",[T]),!.
 mpred_reset:- mpred_trace_msg("Reset DB complete").
 
 % true if there is some Pfc crud still in the database.
@@ -1754,10 +1759,12 @@ mpred_trace_op(Add,P,S):-
 mpred_trace_maybe_print(Add,P,S):-
   \+ lookup_u(mpred_is_tracing_pred(P)) -> true;
   (
-   (S=(U,U)
+   (to_u(S,U)
        -> wdmsg("~NOP: ~p (~p) ~p",[Add,U,P])
         ; wdmsg("~NOP: ~p (:) ~p~N\tSupported By: ~p",[Add,P,S]))),!.
 
+to_u(S,U):-S=(U,U),!.
+to_u(S,U):-S=(U,ax),!.
 
 mpred_trace_maybe_break(Add,P,_ZS):-
   \+ lookup_u(mpred_is_spying_pred(P,Add)) -> true;
@@ -1972,7 +1979,7 @@ bases_union([X|Rest],L):-
   mpred_union(Bx,Br,L).
 	
 mpred_axiom(F):- 
-  mpred_get_support(F,(U,U)).
+  mpred_get_support(F,(_,ax)).
 
 %% mpred_assumption(P)
 % 
