@@ -22,7 +22,7 @@
             import_shared_pred/3,
             import_to_user0/3,
             import_to_user_mfa0/4,
-            set_user_abox/1,
+            set_user_abox_loader_based/1,
             predicate_is_undefined_fa/2,
             
             get_user_tbox/1,
@@ -1389,11 +1389,11 @@ user_m_check(_Out).
 
 
 
-%% set_user_abox( ?M) is semidet.
+%% set_user_abox_loader_based( ?M) is semidet.
 %
 % Set User Abox.
 %
-set_user_abox(M):- user_m_check(M), (t_l:user_abox(Prev)->true;Prev=M),
+set_user_abox_loader_based(M):- user_m_check(M), (t_l:user_abox(Prev)->true;Prev=M),
    decl_user_abox(M),assert_until_eof(t_l:user_abox(M)),onEndOfFile(reset_user_abox(Prev)),!.
 
 

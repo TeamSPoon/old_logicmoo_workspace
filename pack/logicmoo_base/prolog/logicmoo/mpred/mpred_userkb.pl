@@ -374,8 +374,8 @@ baseKB:resolveConflict(C) :- cwc,
 %
 % Resolve Conflict Primary Helper.
 %
-resolveConflict0(C) :- cwc, forall(must(mpred_negation_w_neg(C,N)),ignore(show_failure(why,(nop(baseKB:resolveConflict(C)),pp_why(N))))),
-  ignore(show_failure(why,(nop(baseKB:resolveConflict(C)),pp_why(C)))), 
+resolveConflict0(C) :- cwc, forall(must(mpred_negation_w_neg(C,N)),ignore(show_failure(why,(nop(baseKB:resolveConflict(C)),pp_cur_why(N))))),
+  ignore(show_failure(why,(nop(baseKB:resolveConflict(C)),pp_cur_why(C)))), 
     doall((call_u(resolverConflict_robot(C)),\+ is_resolved(C),!)),
     is_resolved(C),!.
 

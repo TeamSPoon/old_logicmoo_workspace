@@ -14,41 +14,30 @@
 :- module(mpred_listing,
           [ draw_line/0,
             loop_check_just/1,
-            mpred_ask/2,
-            mpred_classify_facts/4,
-            mpred_command/3,
-            mpred_contains_term/2,
-            mpred_interactive_why/0,
-            mpred_interactive_why/1,
-            mpred_list_triggers_0/1,
-            mpred_list_triggers_1/1,
-            mpred_list_triggers_nlc/1,
-            mpred_list_triggers_types/1,
-            lqu/0,
-            pp_filtered/1,
-            mpred_select_justificationNode/3,
-            mpred_trace_item/2,
-            mpred_why/0,
-            get_clause_vars_for_print/2,
-            mpred_why/1,
-            mpred_why1/1,
-            mpred_whyBrouse/2,
-            mpred_why_command/3,
-            nth_mpred_call/3,
-            pp_facts/0,
-            pp_facts/1,
-            pp_facts/2,
-            pp_item/2,
+            
             pp_items/2,
-            pp_justification1/2,
-            pp_justifications/2,
-            pp_justifications2/3,
+            pp_item/2,
+            pp_filtered/1,
+            pp_facts/2,
+            pp_facts/1,
+            pp_facts/0,
+            mpred_list_triggers_types/1,
+            mpred_list_triggers_nlc/1,
+            mpred_list_triggers_1/1,
+            mpred_list_triggers_0/1,
+            mpred_contains_term/2,
+            mpred_classify_facts/4,
+            lqu/0,
+            get_clause_vars_for_print/2,
+            %mpred_whyBrouse/2,
+            %mpred_why1/1,
+            %pp_cur_why/1,
+            %pp_cur_why/0,
+            %mpred_trace_item/2,
             pp_rules/0,
             pp_supports/0,
-            pp_triggers/0,
-            pp_why/1,
+            pp_triggers/0,            
             pp_DB/0,
-            why_buffer/2,
             print_db_items/1,
             print_db_items/2,
             print_db_items/3,
@@ -56,7 +45,6 @@
             print_db_items_and_neg/3,
             show_pred_info/1,
             show_pred_info_0/1,
-            why/1,
             mpred_listing_file/0
           ]).
 
@@ -319,239 +307,6 @@ draw_line:- (t_l:print_mode(H)->true;H=unknown),fmt("~N%%%%%%%%%%%%%%%%%%%%%%%%%
 % Loop Check Justification.
 %
 loop_check_just(G):-loop_check(G,ignore(arg(1,G,[]))).
-
-% ======================= mpred_file('pfcwhy').	% interactive exploration of justifications.
-
-%   File   : pfcwhy.pl
-%   Author : Tim Finin, finin@prc.unisys.com
-%   Updated:
-%   Purpose: predicates for interactively exploring Pfc justifications.
-
-% ***** predicates for brousing justifications *****
-
-:- thread_local(t_l:is_mpred_interactive_why/0).
-
-:- use_module(library(lists)).
-
-
-%= 	 	 
-
-%% mpred_interactive_why is semidet.
-%
-% Managed Predicate Interactive Generation Of Proof.
-%
-mpred_interactive_why:- w_tl(t_l:is_mpred_interactive_why,mpred_why).
-
-
-%= 	 	 
-
-%% mpred_why is semidet.
-%
-% Managed Predicate Generation Of Proof.
-%
-mpred_why :-
-  why_buffer(P,_),
-  mpred_why(P),!.
-mpred_why.
-
-
-%= 	 	 
-
-%% why( ?N) is semidet.
-%
-% Generation Of Proof.
-%
-why(N) :- mpred_why(N).
-
-
-%= 	 	 
-
-%% mpred_interactive_why( ?N) is semidet.
-%
-% Managed Predicate Interactive Generation Of Proof.
-%
-mpred_interactive_why(N):- w_tl(t_l:is_mpred_interactive_why,mpred_why(N)).
-
-
-%= 	 	 
-
-%% mpred_why( ?N) is semidet.
-%
-% Managed Predicate Generation Of Proof.
-%
-mpred_why(N) :-
-  number(N),
-  !,
-  why_buffer(P,Js),
-  mpred_why_command(N,P,Js).
-
-mpred_why(P) :-
-  no_repeats(justifications(P,Js)),
-  retractall_u(why_buffer(_,_)),
-  assert_u(why_buffer(P,Js)),!,
-  mpred_whyBrouse(P,Js).
-
-
-%= 	 	 
-
-%% mpred_why1( ?P) is semidet.
-%
-% Managed Predicate Generation Of Proof Secondary Helper.
-%
-mpred_why1(P) :-
-  justifications(P,Js),!,
-  mpred_whyBrouse(P,Js).
-
-
-%= 	 	 
-
-%% mpred_whyBrouse( ?P, ?Js) is semidet.
-%
-% Managed Predicate Generation Of Proof Brouse.
-%
-mpred_whyBrouse(P,Js) :-
-  pp_justifications(P,Js),!,
-  (t_l:is_mpred_interactive_why -> ((
-  mpred_ask(' >> ',Answer),
-  mpred_why_command(Answer,P,Js))); true).
-
-
-%= 	 	 
-
-%% mpred_why_command( ?N, ?P, ?Js) is semidet.
-%
-% Managed Predicate Generation Of Proof Command.
-%
-mpred_why_command(q,_,_) :- !.
-mpred_why_command(h,_,_) :-
-  !,
-  fmt("~N%
-Justification Browser Commands:
- q   quit.
- N   focus on Nth justification.
- N.MM brouse step MM of the Nth justification
- u   up a level
-",
-[]).
-
-mpred_why_command(N,_P,Js) :-
-  float(N),
-  !,
-  mpred_select_justificationNode(Js,N,Node),
-  mpred_why1(Node).
-
-mpred_why_command(u,_,_) :-
-  % u=up
-  !.
-
-
-%= 	 	 
-
-%% mpred_command( ?N, ?VALUE2, ?VALUE3) is semidet.
-%
-% Managed Predicate Command.
-%
-mpred_command(N,_,_) :-
-  integer(N),
-  !,
-  fmt("~w is a yet unimplemented command.",[N]),
-  fail.
-
-mpred_command(X,_,_) :-
- fmt("~w is an unrecognized command, enter h. for help.",[X]),
- fail.
-
-
-%= 	 	 
-
-%% pp_why( ?P) is semidet.
-%
-% Pretty Print Generation Of Proof.
-%
-pp_why(P):- is_list(P),!,maplist(pp_why,P),!.
-
-pp_why(P):-must((
-  no_repeats(P,justifications(P,Js)),
-      pp_justifications(P,Js))),!.
-
-
-%= 	 	 
-
-%% pp_justifications( ?P, ?Js) is semidet.
-%
-% Pretty Print Justifications.
-%
-pp_justifications(P,Js) :-
-  fmt("% Justifications for ~w:",[P]),
-  in_cmt(must(pp_justification1(Js,1))),
-  fmt('~N~n',[]),!.
-
-
-%= 	 	 
-
-%% pp_justification1( :TermJ, ?N) is semidet.
-%
-% Pretty Print Justification Secondary Helper.
-%
-pp_justification1([],_).
-
-pp_justification1([J|Js],N) :-
-  % show one justification and recurse.
-  nl,
-  pp_justifications2(J,N,1),
-  N2 is N+1,
-  loop_check_just(pp_justification1(Js,N2)).
-
-
-%= 	 	 
-
-%% pp_justifications2( :TermC, ?JustNo, ?StepNo) is semidet.
-%
-% Pretty Print Justifications Extended Helper.
-%
-pp_justifications2([],_,_).
-
-pp_justifications2([C|Rest],JustNo,StepNo) :-  
-  (StepNo==1->fmt('~N~n',[]);true),
-  fmt("    ~w.~w ~w",[JustNo,StepNo,C]),
-  StepNext is 1+StepNo,
-  loop_check_just(pp_justifications2(Rest,JustNo,StepNext)).
-  
-
-
-%= 	 	 
-
-%% mpred_ask( ?Msg, ?Ans) is semidet.
-%
-% Managed Predicate Complete Inference.
-%
-mpred_ask(Msg,Ans) :-
-  fmt("~w",[Msg]),
-  read(Ans).
-
-
-%= 	 	 
-
-%% mpred_select_justificationNode( ?Js, ?Index, ?Step) is semidet.
-%
-% Managed Predicate Select Justification Node.
-%
-mpred_select_justificationNode(Js,Index,Step) :-
-  JustNo is integer(Index),
-  nth_mpred_call(JustNo,Js,Justification),
-  StepNo is 1+ integer(Index*10 - JustNo*10),
-  nth_mpred_call(StepNo,Justification,Step).
-
-
-%= 	 	 
-
-%% nth_mpred_call( ?N, ?List, ?Ele) is semidet.
-%
-% Nth Managed Predicate Call.
-%
-nth_mpred_call(N,List,Ele):-N2 is N+1,lists:nth0(N2,List,Ele).
-
-
 
 
 %= 	 	 
