@@ -16,7 +16,7 @@
 % :- use_module(library(logicmoo_base)).
 %:- use_module(library(pfc)).
 
-:- use_module('mpred_pfc_test_02.pl.txt').
+:- use_module('mpred_pfc_test_02').
 
 :- mpred_reset.
 
