@@ -29,7 +29,7 @@
             bubbled_ex_check/1,
             catchv/3,
             catchvvnt/3,
-            current_source_location/1,current_source_location0/1,
+            current_source_file/1,current_source_location0/1,
             current_main_error_stream/1,
             dbgsubst/4,            
             dbgsubst0/4,
@@ -156,7 +156,7 @@
         block/2,
         bubbled_ex/1,
         bubbled_ex_check/1,
-        current_source_location/1,
+        current_source_file/1,
         current_main_error_stream/1,
         dbgsubst/4,
         dbgsubst0/4,
@@ -527,18 +527,18 @@ show_new_src_location(K,FL):- retractall(t_l:last_src_loc(K,_)),format_to_error(
 sl_to_filename(W,W):-atom(W),!.
 sl_to_filename(_:W,W):-atom(W),!.
 sl_to_filename(W,W).
-
+sl_to_filename(W,To):-nonvar(To),To=(W:_),atom(W),!.
 
 
 
 %= 	 	 
 
-%% current_source_location( ?F) is semidet.
+%% current_source_file( ?F) is semidet.
 %
 % Current Source Location.
 %
-current_source_location(F):- clause(logicmoo_util_catch:current_source_location0(W),Body),catchv(Body,_,fail),sl_to_filename(W,F),!.
-current_source_location(F):- F = unknown.
+current_source_file(F):- clause(logicmoo_util_catch:current_source_location0(W),Body),catchv(Body,_,fail),sl_to_filename(W,F),!.
+current_source_file(F):- F = unknown.
 
 
 %= 	 	 
@@ -566,8 +566,8 @@ current_source_location0(module(M)):- '$module'(M,M).
 %
 % Current Generation Of Proof.
 %
-current_why(Why):- t_l:current_local_why(Why,_).
-current_why(F):- current_source_location(F).
+current_why(Why):- t_l:current_local_why(Why,_),!.
+current_why(loading(M,F,L)):- source_module(M), current_source_file(F:L).
 
 
 % source_module(M):-!,M=u.
@@ -651,7 +651,7 @@ source_variables([]).
 % Show Source Location.
 %
 show_source_location:- source_location(F,L),!,show_new_src_location(F:L),!.
-show_source_location:- current_source_location(FL),!,show_new_src_location(FL),!.
+show_source_location:- current_source_file(FL),!,show_new_src_location(FL),!.
 show_source_location.
 
 

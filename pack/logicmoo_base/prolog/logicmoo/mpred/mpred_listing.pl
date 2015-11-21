@@ -31,13 +31,12 @@
             get_clause_vars_for_print/2,
             %mpred_whyBrouse/2,
             %mpred_why1/1,
-            %pp_cur_why/1,
-            %pp_cur_why/0,
+            %pp_db_why/1,
+            %pp_db_why/0,
             mpred_trace_item/2,
             pp_rules/0,
             pp_supports/0,
             pp_triggers/0,            
-            pp_DB/0,
             print_db_items/1,
             print_db_items/2,
             print_db_items/3,
@@ -76,22 +75,6 @@ lqu :- listing(qu/3).
 
 
  
-
-%= 	 	 
-
-%% pp_DB is semidet.
-%
-% Pretty Print All.
-%
-pp_DB :-
-  pp_facts,
-  pp_rules,
-  pp_triggers,
-  pp_supports,
-  lqu.
-
-%= pp_facts ...
-
 
 %= 	 	 
 
@@ -167,7 +150,7 @@ pp_item(_M,H):-pp_filtered(H),!.
 pp_item(MM,(H:-B)):- B ==true,pp_item(MM,H).
 pp_item(MM,H):- flag(show_asserions_offered,X,X+1),t_l:print_mode(html), ( \+ \+ if_defined(pp_item_html(MM,H))),!.
 
-pp_item(MM,spft(KB,P,F,T,W)):-!,
+pp_item(MM,spft(KB,P,F,T,W)):-!, 
    w_tl(t_l:current_why_source(W),pp_item(MM,spft(KB,P,F,T))).
 
 pp_item(MM,spft(KB,W0,U,U)):- W = (KB:W0),!,pp_item(MM,U:W).

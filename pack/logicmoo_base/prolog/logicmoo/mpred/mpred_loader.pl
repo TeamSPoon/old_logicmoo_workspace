@@ -563,13 +563,13 @@ mpred_expander0(Type,LoaderMod,I,OO):-
    
 
   call_cleanup(((
-  make_key(mpred_expander_key(F,L,M,UM,Type,LoaderMod,I),Key),
-  w_tl(t_l:current_why_source(F),((
+  make_key(mpred_expander_key(F,L,M,UM,Type,LoaderMod,I),Key),  
   ( \+ t_l:mpred_already_in_file_expansion(Key) ),
-  w_tl(t_l:mpred_already_in_file_expansion(Key),
+   w_tl(t_l:mpred_already_in_file_expansion(Key),
         (( % trace,
            fully_expand(change(assert,ain),I,II),
-           mpred_expander_now_one_cc(F,M,II,O))))))))),
+        w_tl(t_l:current_why_source(loading(M,F,L)),
+          mpred_expander_now_one_cc(F,M,II,O))))))),
     '$module'(_,UM)),
   !,I\=@=O,O=OO.
 
@@ -640,8 +640,9 @@ xfile_module_term_expansion_pass_3(How,INFO,_F,_M,AA,O,OO):-
 %
 mpred_expander_now(I,O):- 
  '$set_source_module'(M,M),
-  must(if_defined(current_source_location(F),source_location(F,_))),
-   w_tl(t_l:current_why_source(F), 
+  current_source_file(F),
+  get_source_ref1(Ref),
+   w_tl(t_l:current_why_source(Ref), 
      mpred_expander_now_one(F,M,I,O)).
 
 
@@ -2973,7 +2974,7 @@ loader_side_effect_verify_only(I,Supposed):-
    sanity(var(ActualSupposed)),
     push_predicates(t_l:side_effect_buffer/3,STATE),
     load_file_term_to_command_or_fail(I,Supposed),
-    current_source_location(Why),
+    get_source_ref1(Why),
     collect_expansions(Why,I,Actual),
     convert_side_effect(suppose(Supposed),S),
     conjoin(S, Actual,ActualSupposed),
@@ -2992,7 +2993,7 @@ loader_side_effect_capture_only(I,ActualSupposed):-
    sanity(var(ActualSupposed)),
     push_predicates(t_l:side_effect_buffer/3,STATE),
     load_file_term_to_command_or_fail(I,Supposed),
-    current_source_location(Why),
+    get_source_ref1(Why),
     collect_expansions(Why,I,Actual),
     conjoin(Actual,Supposed,ActualSupposed),
     pop_predicates(t_l:side_effect_buffer/3,STATE),!.

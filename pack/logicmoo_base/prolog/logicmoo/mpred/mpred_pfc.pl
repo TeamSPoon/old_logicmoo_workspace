@@ -43,21 +43,22 @@
   setup_mpred_ops/0,
   mpred_assert_w_support/2,mpred_asserta_w_support/2,mpred_assertz_w_support/2,mpred_basis_list/2,mpred_bt_pt_combine/3,mpred_child/2,mpred_children/2,
   mpred_classifyFacts/4,mpred_collect_supports/1,mpred_unhandled_command/3,mpred_compile_rhs_term/2,mpred_conjoin/3,mpred_connective/1,
-  mpred_database_item/1,mpred_database_term/1,mpred_db_type/2,mpred_set_default/2,mpred_define_bc_rule/3,mpred_descendant/2,
+  mpred_database_item/1,mpred_database_term/2,
+  mpred_db_type/2,mpred_set_default/2,mpred_define_bc_rule/3,mpred_descendant/2,
   mpred_descendants/2,mpred_enqueue/2,mpred_error/1,mpred_error/2,mpred_eval_lhs/2,mpred_eval_rhs/2,mpred_fact/1,
   mpred_fact/2,mpred_facts/1,mpred_facts/2,mpred_facts/3,mpred_fwc/1,mpred_get_support/2,lookup_u/1,lookup_u/2,
   mpred_literal/1,mpred_load/1,mpred_make_supports/1,mpred_ain_object/1,mpred_aina/2,mpred_ainz/2,
   mpred_negated_literal/1,mpred_negation/2,mpred_nf/2,mpred_nf1_negation/2,mpred_nf_negation/2,mpred_nf_negations/2,mpred_notrace/0,mpred_nowatch/0,
   mpred_nospy/0,mpred_nospy/1,mpred_nospy/3,mpred_positive_literal/1,mpred_post/2,pp_qu/0,mpred_undo_action/1,
   mpred_rem_support/2,mpred_remove_old_version/1,mpred_remove_supports/1,mpred_remove_supports_quietly/1,mpred_reset/0,mpred_retract/1,mpred_retract_i_or_warn/1,mpred_retract_supported_relations/1,
-  mpred_retract_type/2,mpred_select_justification_node/3,mpred_set_warnings/1,mpred_pp_cur_justifications/2,
+  mpred_retract_type/2,mpred_select_justification_node/3,mpred_set_warnings/1,mpred_pp_db_justifications/2,
   mpred_spy/1,mpred_spy/2,mpred_spy/3,mpred_step/0,mpred_support_relation/1,mpred_supported/1,mpred_supported/2,
   mpred_trace/0,mpred_trace/1,mpred_trace/2,mpred_trace_maybe_print/3,mpred_trace_maybe_break/3,mpred_trace_exec/0,mpred_trace_op/3,
   mpred_trace_op/2,mpred_trace_msg/1,mpred_trace_msg/2,mpred_trigger_key/2,mpred_trigger_key/2,mpred_undo/1,mpred_unfwc/1,
   mpred_unfwc_check_triggers/1,mpred_union/3,mpred_unique_u/1,mpred_untrace/0,mpred_untrace/1,mpred_warn/0,mpred_warn/1,
-  mpred_warn/2,mpred_watch/0,well_founded_0/2,pp_cur_why/0,pp_cur_why/1,mpred_whyBrouse/2,mpred_handle_why_command/3,
-  nompred_warn/0,pfcl_do/1,pp_cur_DB/0,pp_cur_facts/0,pp_cur_facts/1,pp_cur_facts/2,pp_cur_items/1,
-  pp_cur_rules/0,pp_cur_supports/0,pp_cur_triggers/0,mpred_load/1,process_rule/3,
+  mpred_warn/2,mpred_watch/0,well_founded_0/2,pp_db_why/0,pp_db_why/1,mpred_whyBrouse/2,mpred_handle_why_command/3,
+  nompred_warn/0,pfcl_do/1,pp_db_DB/0,pp_db_facts/0,pp_db_facts/1,pp_db_facts/2,pp_db_items/1,
+  pp_db_rules/0,pp_db_supports/0,pp_db_triggers/0,mpred_load/1,process_rule/3,
   remove_if_unsupported/1,remove_selection/1,mpred_withdraw1/2,
 
   mpred_run/0,mpred_test/1,mpred_test_fok/1,
@@ -69,7 +70,7 @@
   stop_trace/1,with_mpred_trace_exec/1,
   select_next_fact/1,supporters_list/2,triggerSupports/2,trigger_trigger/3,well_founded/1,well_founded_list/2,
   do_assumpts/2,mpred_do_fcnt/2,mpred_do_fcpt/2,mpred_fwc1/1,mpred_do_rule/1,mpred_descendant1/3,mpred_eval_rhs1/2,mpred_nf1/2,
-  mpred_post1/2,mpred_withdraw/1,mpred_withdraw/2,mpred_remove/1,mpred_remove/2,mpred_pp_cur_justification1/2,mpred_pp_cur_justifications2/3,mpred_spy1/3,
+  mpred_post1/2,mpred_withdraw/1,mpred_withdraw/2,mpred_remove/1,mpred_remove/2,mpred_pp_db_justification1/2,mpred_pp_db_justifications2/3,mpred_spy1/3,
   mpred_unfwc1/1,mpred_why1/1,mpred_blast/1,trigger_trigger1/2  ]).
 
  :- meta_predicate 
@@ -104,7 +105,7 @@ set_user_abox(M):- must(atom(M)),
  (
   '$set_source_module'(_,M),'$module'(_,M)),
     % add_import_module(M,pfc,end),
-   forall(mpred_database_term(F/A),(M:dynamic(M:F/A),M:discontiguous(M:F/A),M:multifile(M:F/A))),
+   forall(mpred_database_term(F/A,_),(M:dynamic(M:F/A),M:discontiguous(M:F/A),M:multifile(M:F/A))),
    retractall(t_l:user_abox(_M)),asserta(t_l:user_abox(M)).
 
 :- module_transparent((setup_mpred_support)/1).
@@ -1604,19 +1605,41 @@ mpred_conjoin(C1,C2,(C1,C2)).
 %   Purpose: predicates to manipulate a Pfc database (e.g. save,
 % 	restore, reset, etc.)
 
-% mpred_database_term(P/A) is true iff P/A is something that Pfc adds to
+%% mpred_database_term(:PI, -TYPE) is nondet.
+%
+% is true iff F/A is something that Pfc adds to
 % the database and should not be present in an empty Pfc database
+%
+:- dynamic(mpred_database_term/2).
+% mined from program database      
+mpred_database_term(do_and_undo/2,rule).
+mpred_database_term(('::::')/2,rule).
+mpred_database_term((<-)/2,rule).
+mpred_database_term((<==>)/2,rule).
+mpred_database_term((==>)/2,rule).
+mpred_database_term((==>)/1,fact(_)).
+mpred_database_term((~)/1,fact(_)).
+% forward/backward chaining database
+mpred_database_term(spft/3,support).
+mpred_database_term(nt/3,trigger).
+mpred_database_term(pt/2,trigger).
+mpred_database_term(bt/2,trigger).
+% transient state
+mpred_database_term(actn/1,state).
+mpred_database_term(que/1,state).
+mpred_database_term(hs/1,state).
+% forward/backward settings
+mpred_database_term(mpred_current_db/1,setting).
+mpred_database_term(mpred_select_hook/1,setting).
+mpred_database_term(tms/1,setting).
+mpred_database_term(sm/1,setting). 
+% debug settings
+mpred_database_term(mpred_is_tracing_pred/1,debug).
+mpred_database_term(mpred_is_tracing_exec/0,debug).
+mpred_database_term(mpred_is_spying_pred/2,debug).
+mpred_database_term(mpred_warnings/1,debug).
+mpred_database_term(why_buffer/2,debug).
 
-mpred_database_term(spft/3).
-mpred_database_term(pt/2).
-mpred_database_term(bt/2).
-mpred_database_term(nt/3).
-mpred_database_term(que/1).
-mpred_database_term('==>'/2).
-mpred_database_term('<==>'/2).
-mpred_database_term('<-'/2).
-mpred_database_term('==>'/1).
-mpred_database_term('~'/1).
 
 %% mpred_reset() is det.
 %
@@ -1630,19 +1653,21 @@ mpred_reset:-
   fail.
 mpred_reset:-
   mpred_database_item(T),!,
-  mpred_warn("Couldn't full mpred_reset: ~p.~n",[T]), must(pp_cur_DB),!,
+  mpred_warn("Couldn't full mpred_reset: ~p.~n",[T]), must(pp_db_DB),!,
   mpred_error("Pfc database not empty after mpred_reset, e.g., ~p.~n",[T]),!,fail.
 mpred_reset:- mpred_trace_msg("Reset DB complete").
 
 % true if there is some Pfc crud still in the database.
-mpred_database_item(TermO):-
-  mpred_database_term(P/A),
-  functor(Term,P,A),
-  clause_u(Term,B), 
+mpred_database_item(P):-
+  mpred_database_term(F/A,Type),
+  Type\=debug,
+  Type\=setting,
+  functor(H,F,A),
+  clause_u(H,B), 
   B\= _:loop_check_nr(_),
   B\=@=(cwc, neg_in_code(_G)),
-  \+ ( B= Term),
-  ((B== true)-> TermO=Term; TermO=(Term:B)).
+  \+ ( B= H),
+  ((B== true)-> P=H; P=(H:B)).
 
 
 mpred_retract_i_or_warn(X):- retract_u(X), !.
@@ -1841,7 +1866,7 @@ mpred_test(_):- (compiling; current_prolog_flag(xref,true)),!.
 mpred_test(G):- mpred_is_silient,!, with_no_mpred_trace_exec(must(mpred_test_fok(G))).
 mpred_test(G):- with_mpred_trace_exec(must(mpred_test_fok(G))).
 
-why_was_true(P):- pp_cur_why(P),!.
+why_was_true(P):- pp_db_why(P),!.
 why_was_true(P):- dmsg(justfied_true(P)),!.
 
 mpred_test_fok(\+ G):-!, ( \+ call_u(G) -> wdmsg(passed_mpred_test(\+ G)) ; (wdmsg(failed_mpred_test(\+ G)),!,ignore(why_was_true(G)),!,fail)).
@@ -2089,37 +2114,41 @@ mpred_trigger_key(X,X).
 
 %%%%%%%%%%%%%%%%%% 99999999999999999999999999999999999999999999
 
-pp_cur_DB:-
+%% pp_db_DB is semidet.
+%
+% Pretty Print All.
+%
+pp_db_DB:-
  must_det_l((
-  pp_cur_facts,
-  pp_cur_rules,
-  pp_cur_triggers,
-  pp_cur_supports)).
+  pp_db_facts,
+  pp_db_rules,
+  pp_db_triggers,
+  pp_db_supports)).
 
-%  pp_cur_facts ...
+%  pp_db_facts ...
 
-pp_cur_facts:- ignore(pp_cur_facts(_,true)).
+pp_db_facts:- ignore(pp_db_facts(_,true)).
 
-pp_cur_facts(Pattern):- pp_cur_facts(Pattern,true).
+pp_db_facts(Pattern):- pp_db_facts(Pattern,true).
 
-pp_cur_facts(P,C):-
+pp_db_facts(P,C):-
   mpred_facts(P,C,L),
   mpred_classifyFacts(L,User,Pfc,_ZRule),
   format("~N~nUser added facts:",[]),
-  pp_cur_items(User),
+  pp_db_items(User),
   format("~N~nPfc added facts:",[]),
-  pp_cur_items(Pfc).
+  pp_db_items(Pfc).
 
 %  printitems clobbers it''s arguments - beware!
 
 
-pp_cur_items(Var):-var(Var),!,format("~N  ~p",[Var]).
-pp_cur_items([]):-!.
-pp_cur_items([H|T]):- !,
+pp_db_items(Var):-var(Var),!,format("~N  ~p",[Var]).
+pp_db_items([]):-!.
+pp_db_items([H|T]):- !,
   % numbervars(H,0,_),
   format("~N  ~p",[H]),
-  nonvar(T),pp_cur_items(T).
-pp_cur_items(Var):-format("~N  ~p",[Var]).
+  nonvar(T),pp_db_items(T).
+pp_db_items(Var):-format("~N  ~p",[Var]).
 
 mpred_classifyFacts([],[],[],[]).
 
@@ -2137,34 +2166,34 @@ mpred_classifyFacts([H|T],[H|User],Pfc,Rule):-
 mpred_classifyFacts([H|T],User,[H|Pfc],Rule):-
   mpred_classifyFacts(T,User,Pfc,Rule).
 
-pp_cur_rules:-
+pp_db_rules:-
  format("~NRules...~n",[]),
   bagof_or_nil((P==>Q),clause_u((P==>Q),true),R1),
-  pp_cur_items(R1),
+  pp_db_items(R1),
   bagof_or_nil((P<==>Q),clause_u((P<==>Q),true),R2),
-  pp_cur_items(R2),
+  pp_db_items(R2),
   bagof_or_nil((P<-Q),clause_u((P<-Q),true),R3),
-  pp_cur_items(R3).
+  pp_db_items(R3).
 
-pp_cur_triggers:-
+pp_db_triggers:-
   format("~NPositive triggers...~n",[]),
   bagof_or_nil(pt(T,B),lookup_u(pt(T,B)),Pts),
-  pp_cur_items(Pts),
+  pp_db_items(Pts),
   format("~NNegative triggers...~n",[]),
   bagof_or_nil(nt(A,B,C),lookup_u(nt(A,B,C)),Nts),
-  pp_cur_items(Nts),
+  pp_db_items(Nts),
   format("~NGoal triggers...~n",[]),
   bagof_or_nil(bt(A,B),lookup_u(bt(A,B)),Bts),
-  pp_cur_items(Bts).
+  pp_db_items(Bts).
 
-pp_cur_supports:- 
+pp_db_supports:- 
   % temporary hack.
   format("~NSupports...~n",[]),
   setof((P >= S), mpred_get_support(P,S),L),
-  pp_cur_items(L),!.
-pp_cur_supports:- bagof_or_nil((P =< S),mpred_get_support(P,S),Bts),pp_cur_items(Bts),!.
+  pp_db_items(L),!.
+pp_db_supports:- bagof_or_nil((P =< S),mpred_get_support(P,S),Bts),pp_db_items(Bts),!.
 
-%   File   : pp_cur_why.pl
+%   File   : pp_db_why.pl
 %   Author : Tim Finin, finin@prc.unisys.com
 %   Updated:
 %   Purpose: predicates for interactively exploring Pfc justifications.
@@ -2173,18 +2202,18 @@ pp_cur_supports:- bagof_or_nil((P =< S),mpred_get_support(P,S),Bts),pp_cur_items
 
 :- use_module(library(lists)).
 
-pp_cur_why:- 
+pp_db_why:- 
   lookup_u(why_buffer(P,_)),
-  pp_cur_why(P).
+  pp_db_why(P).
 
-pp_cur_why(N):-
+pp_db_why(N):-
   number(N),
   !,
   lookup_u(why_buffer(P,Js)),
   mpred_handle_why_command(N,P,Js).
 
-pp_cur_why(M:P):-atom(M),!,pp_cur_why(P).
-pp_cur_why(P):-
+pp_db_why(M:P):-atom(M),!,pp_db_why(P).
+pp_db_why(P):-
   justifications(P,Js),
   retractall_u(why_buffer(_,_)),
   assert_u(why_buffer(P,Js)),
@@ -2196,11 +2225,11 @@ mpred_why1(P):-
 
 % non-interactive
 mpred_whyBrouse(P,Js):- 
-   must(notrace(in_cmt((mpred_pp_cur_justifications(P,Js))))), !.
+   must(notrace(in_cmt((mpred_pp_db_justifications(P,Js))))), !.
 
 % Interactive
 mpred_whyBrouse(P,Js):-
-  mpred_pp_cur_justifications(P,Js),
+  mpred_pp_db_justifications(P,Js),
   mpred_prompt_ask(' >> ',Answer),
   mpred_handle_why_command(Answer,P,Js).
 
@@ -2235,28 +2264,28 @@ mpred_unhandled_command(X,_,_):-
  format("~N~p is an unrecognized command, enter h. for help.",[X]),
  fail.
   
-mpred_pp_cur_justifications(P,Js):-
+mpred_pp_db_justifications(P,Js):-
  must(notrace(( format("~NJustifications for ~p:",[P]),
-  mpred_pp_cur_justification1(Js,1)))).
+  mpred_pp_db_justification1(Js,1)))).
 
-mpred_pp_cur_justification1([],_).
+mpred_pp_db_justification1([],_).
 
-mpred_pp_cur_justification1([J|Js],N):-
+mpred_pp_db_justification1([J|Js],N):-
   % show one justification and recurse.
   nl,
-  mpred_pp_cur_justifications2(J,N,1),
+  mpred_pp_db_justifications2(J,N,1),
   N2 is N+1,
-  mpred_pp_cur_justification1(Js,N2).
+  mpred_pp_db_justification1(Js,N2).
 
-mpred_pp_cur_justifications2([],_,_).
+mpred_pp_db_justifications2([],_,_).
 
-mpred_pp_cur_justifications2([C|Rest],JustNo,StepNo):- 
+mpred_pp_db_justifications2([C|Rest],JustNo,StepNo):- 
  (StepNo==1->fmt('~N~n',[]);true),
   copy_term(C,CCopy),
   numbervars(CCopy,0,_),
   format("~N    ~p.~p ~p",[JustNo,StepNo,CCopy]),
   StepNext is 1+StepNo,
-  mpred_pp_cur_justifications2(Rest,JustNo,StepNext).
+  mpred_pp_db_justifications2(Rest,JustNo,StepNext).
 
 mpred_prompt_ask(Info,Ans):-
   format("~N~p",[Info]),
@@ -2404,24 +2433,24 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((mpred_supported)/1).
 :- module_transparent((mpred_select_justification_node)/3).
 :- module_transparent((mpred_prompt_ask)/2).
-:- module_transparent((mpred_pp_cur_justifications2)/3).
-:- module_transparent((mpred_pp_cur_justification1)/2).
-:- module_transparent((mpred_pp_cur_justifications)/2).
+:- module_transparent((mpred_pp_db_justifications2)/3).
+:- module_transparent((mpred_pp_db_justification1)/2).
+:- module_transparent((mpred_pp_db_justifications)/2).
 :- module_transparent((mpred_unhandled_command)/3).
 :- module_transparent((mpred_handle_why_command)/3).
 :- module_transparent((mpred_whyBrouse)/2).
 :- module_transparent((mpred_why1)/1).
-:- module_transparent((pp_cur_why)/1).
-:- module_transparent((pp_cur_why)/0).
-:- module_transparent((pp_cur_supports)/0).
-:- module_transparent((pp_cur_triggers)/0).
-:- module_transparent((pp_cur_rules)/0).
+:- module_transparent((pp_db_why)/1).
+:- module_transparent((pp_db_why)/0).
+:- module_transparent((pp_db_supports)/0).
+:- module_transparent((pp_db_triggers)/0).
+:- module_transparent((pp_db_rules)/0).
 :- module_transparent((mpred_classifyFacts)/4).
-:- module_transparent((pp_cur_items)/1).
-:- module_transparent((pp_cur_facts)/2).
-:- module_transparent((pp_cur_facts)/1).
-:- module_transparent((pp_cur_facts)/0).
-:- module_transparent((pp_cur_DB)/0).
+:- module_transparent((pp_db_items)/1).
+:- module_transparent((pp_db_facts)/2).
+:- module_transparent((pp_db_facts)/1).
+:- module_transparent((pp_db_facts)/0).
+:- module_transparent((pp_db_DB)/0).
 :- module_transparent((mpred_trigger_key)/2).
 :- module_transparent((mpred_make_supports)/1).
 :- module_transparent((mpred_support_relation)/1).
@@ -2478,7 +2507,8 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((mpred_retract_i_or_warn)/1).
 :- module_transparent((mpred_database_item)/1).
 :- module_transparent((mpred_reset)/0).
-:- module_transparent((mpred_database_term)/1).
+:- module_transparent((mpred_database_term)/2).
+:- module_transparent((mpred_abox_module)/1).
 :- module_transparent((mpred_conjoin)/3).
 :- module_transparent((mpred_union)/3).
 :- module_transparent((mpred_assertz_w_support)/2).
@@ -2589,17 +2619,18 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 
 
 
-
-:- source_location(S,_),prolog_load_context(module,M),forall(source_file(M:H,S),ignore((functor(H,F,A),
+:- source_location(S,_),prolog_load_context(module,M),
+ forall(source_file(M:H,S),ignore((functor(H,F,A),
+   \+ mpred_database_term(F/A,_),
    F\=='$mode',
    F\=='$pldoc',
-   ignore(((\+ atom_concat('$',_,F),export(F/A)))),
+   ignore(((\+ atom_concat('$',_,F),\+ mpred_database_term(F/A,_),export(F/A)))),
    \+ predicate_property(M:H,transparent),
    format('~N:- module_transparent((~q)/~q).~n',[F,A]),
    M:module_transparent(M:F/A)))).
 
 
-
+:- forall(mpred_database_term(F/A,_),abolish(mpred_pfc:F/A)).
 
 
 %% mpred_pfc_file is det.
@@ -2632,7 +2663,7 @@ end_of_file.
 
 :- mpred_test(current_ooZz(booZz)).
 
-% :- pp_cur_DB.
+% :- pp_db_DB.
 
 :- (mpred_ain(current_ooZz(fooZz))).
 
@@ -2650,7 +2681,7 @@ end_of_file.
 
 :- mpred_ain(~ current_ooZz(fooZz)).
 
-% :- pp_cur_DB.
+% :- pp_db_DB.
 
 :- mpred_test(~current_ooZz(fooZz)).
 

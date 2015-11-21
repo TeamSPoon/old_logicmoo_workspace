@@ -803,8 +803,8 @@ write_functor(N,V):-ignore('$VAR'(N)=V),!.
 %
 % Save Clause Variables.
 %
-save_clause_vars(MHB,Vs):- maybe_record_scanned_file, current_why(Why),!,save_clause_vars(MHB,Vs,Why),!.
-save_clause_vars(MHB,Vs):- trace,current_why(Why),!,save_clause_vars(MHB,Vs,Why).
+save_clause_vars(_,_):- \+ maybe_record_scanned_file,!.
+save_clause_vars(MHB,Vs):- ignore(current_why(Why)),ignore((var(Why),loading_file(Why))),!,save_clause_vars(MHB,Vs,Why).
 
 % ?- clause(pui_help:prolog_help_topic(A),B,ClauseRef), prolog_clause:clause_info(ClauseRef, File, TermPos, NameOffset, Options).
 

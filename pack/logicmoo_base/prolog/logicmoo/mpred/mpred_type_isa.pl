@@ -322,9 +322,9 @@ type_prefix(macro,ttMacroType).
 %
 was_isa(G,I,C):- fail, \+(current_predicate(_,G)),
   is_ftCompound(G),functor(G,F,_),hotrace(((not(decided_not_was_isa(F,_)),once(was_isa0(G,I,C)-> true;((functor(G,F,1),
-  current_source_location(When),asserta_if_new(decided_not_was_isa(F,When)),!,fail)))))).
+  get_source_ref1(When),asserta_if_new(decided_not_was_isa(F,When)),!,fail)))))).
 
-% current_source_location(When)
+
 
 
 %= 	 	 

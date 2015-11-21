@@ -23,7 +23,7 @@
 
 :- debug(mpred).
 :- mpred_trace_exec.
-:- mpred_is_tracing_exec.
+
 
 :- mpred_trace_msg(beginxxxxxxxxxxxxxxxxXXXXXXXXXXXXXXXXXXXXXXXXxxxxxxxxxxxxxxxxxxxxxxxx_abc).
 

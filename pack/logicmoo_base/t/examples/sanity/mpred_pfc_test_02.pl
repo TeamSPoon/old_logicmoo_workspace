@@ -2,7 +2,6 @@
 
 :- use_module(library(logicmoo_utils)).
 :- use_listing_vars.
-:- cls.
 
 
 
@@ -29,7 +28,7 @@
 
 :- must(call_u(default_ooQQ(booQQ))).
 
-:- pp_cur_why(default_ooQQ(booQQ)).
+:- pp_db_why(default_ooQQ(booQQ)).
 
 :- mpred_test(default_ooQQ(booQQ)).
 
@@ -45,7 +44,7 @@
 
 :- mpred_test(current_ooQQ(booQQ)).
    
-% :- pp_cur_DB.
+% :- pp_db_DB.
 
 :- (mpred_ain(current_ooQQ(fooQQ))).
 
@@ -63,7 +62,7 @@
 
 :- mpred_ain(~ current_ooQQ(fooQQ)).
 
-% :- pp_cur_DB.
+% :- pp_db_DB.
 
 :- mpred_test(~current_ooQQ(fooQQ)).
 
@@ -104,7 +103,7 @@
 
 :- mpred_ain(~ current_ooTt(fooTt)).
 
-:- pp_cur_DB.
+:- pp_db_DB.
 
 :- mpred_test(~current_ooTt(fooTt)).
 

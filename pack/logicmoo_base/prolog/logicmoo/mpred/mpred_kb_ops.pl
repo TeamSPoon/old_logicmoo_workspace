@@ -677,7 +677,7 @@ record_se:- (t_l:use_side_effect_buffer ; t_l:verify_side_effect_buffer).
 % Add Side Effect.
 %
 add_side_effect(_,_):- ( \+  record_se ),!.
-add_side_effect(Op,Data):-current_why(Why),assert(t_l:side_effect_buffer(Op,Data,Why)).
+add_side_effect(Op,Data):-get_source_ref1(Why),assert(t_l:side_effect_buffer(Op,Data,Why)).
 
 
 %% attvar_op( +:PRED1, ?Data) is semidet.
@@ -1303,15 +1303,12 @@ mpred_update_literal(P,N,Q,R):-
 %
 update_single_valued_arg(P,N):-
  must_det_l((  
-  get_source_ref(U),
   arg(N,P,UPDATE),
   replace_arg(P,N,OLD,Q),
-  must(current_why(_Why)),
   get_user_abox(M), 
-  M:get_source_ref1(U),
+  get_source_ref1(U),
   must_det_l((
-     attvar_op(assert_if_new,
-     spft(umt,P,U,U /* WHY= ,Why */)),
+     attvar_op(assert_if_new,M:spft(P,U,U)),
      (call_u(P)->true;(assertz_mu(P))),
      doall((
           clause_i(Q,true,E),

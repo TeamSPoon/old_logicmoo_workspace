@@ -21,7 +21,7 @@
 
 :- debug(mpred).
 :- mpred_trace_exec.
-:- mpred_is_tracing_exec.
+
 
 a(X) ==> b(X).
 a(1).

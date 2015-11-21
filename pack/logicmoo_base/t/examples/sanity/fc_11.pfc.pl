@@ -17,7 +17,7 @@
 
 :- debug(mpred).
 :- mpred_trace_exec.
-:- mpred_is_tracing_exec.
+
 
 
 b(t).
