@@ -100,6 +100,7 @@
 :- thread_local(t_l:user_abox/1).
 
 set_user_abox(M):- must(atom(M)),
+ setup_mpred_support(M),
  (
   '$set_source_module'(_,M),'$module'(_,M)),
     % add_import_module(M,pfc,end),
@@ -108,8 +109,11 @@ set_user_abox(M):- must(atom(M)),
 
 :- module_transparent((setup_mpred_support)/1).
 
+:- dynamic(mpred_abox_module/1).
+setup_mpred_support(M):- mpred_abox_module(M),!.
 setup_mpred_support(M):-
  must(atom(M)),
+ asserta(mpred_abox_module(M)),
  PREDS = ((
 
       % mined from program database
@@ -183,10 +187,9 @@ get_source_ref1(M):-
 % within a knowledge base.
 %
 % not just user modules
-% get_user_abox(C):- !, C = fred.
-get_user_abox(C):- t_l:user_abox(C).
+get_user_abox(C):- t_l:user_abox(C),!.
 % get_user_abox(C):- '$set_source_module'(C,C),C\==user,!.
-get_user_abox(C):- '$set_source_module'(C,C),!.
+get_user_abox(C):- '$set_source_module'(C,C),!,setup_mpred_support(C).
 get_user_abox(baseKB):-!.
 get_user_abox(_U). % implicit :-nonvar(U).
 
@@ -1136,15 +1139,25 @@ mpred_nf1((P,Q),NF):-
   mpred_nf1(Q,NF2),
   append(NF1,NF2,NF).
 
+mpred_nf1([P|Q],NF):-
+  !,
+  mpred_nf1(P,NF1),
+  mpred_nf1(Q,NF2),
+  append(NF1,NF2,NF).
+
+
 %  handle a random literal.
 
 mpred_nf1(P,[P]):- 
   mpred_literal(P), 
   !.
 
+% mpred_nf1(Term,[Term]):- mpred_warn("mpred_nf Accepting ~p",[Term]),!.
+
+
 %=% shouldn''t we have something to catch the rest as errors?
 mpred_nf1(Term,[Term]):-
-  mpred_warn("mpred_nf doesn't know how to normalize ~p",[Term]),!,fail.
+  mpred_warn("mpred_nf doesn't know how to normalize ~p",[Term]),!,trace,fail.
 
 
 %% mpred_nf1_negation(+P, ?NF) is semidet.
@@ -1232,8 +1245,9 @@ mpred_compile_rhs_term(P,P).
 %  is true if N is a negated term and P is the term
 %  with the negation operator stripped.
 %
-mpred_negation((-P),P).
+mpred_negation(P,_):- is_ftVar(P),!,fail.
 mpred_negation((\+(P)),P).
+mpred_negation((-P),P).
 
 
 
@@ -1245,12 +1259,14 @@ mpred_negated_literal(P):-
   mpred_negation(P,Q),
   mpred_positive_literal(Q).
 
-mpred_literal(X):- mpred_negated_literal(X).
-mpred_literal(X):- mpred_positive_literal(X).
+mpred_literal(X):- mpred_negated_literal(X),!.
+mpred_literal(X):- mpred_positive_literal(X),!.
+mpred_literal(X):- is_ftVar(X),!.
 
 mpred_positive_literal(X):-   is_ftNonvar(X),
-  functor(X,F,_), 
-  \+ mpred_connective(F).
+  get_functor(X,F,_), 
+  \+ mpred_connective(F),
+  !.
 
 
 %% mpred_connective(+VALUE1) is semidet.
@@ -1266,7 +1282,7 @@ mpred_connective(('<-')).
 mpred_connective('<==>').
 
 mpred_connective('-').
-% mpred_connective('-').
+% mpred_connective('~').
 mpred_connective('\\+').
 
 
@@ -1630,6 +1646,7 @@ mpred_database_item(TermO):-
 
 
 mpred_retract_i_or_warn(X):- retract_u(X), !.
+mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft(\+ _,_,_),!.
 mpred_retract_i_or_warn(X):- 
   mpred_warn("Couldn't retract_u ~p.~n",[X]),!.
 mpred_retract_i_or_warn(X):- 
@@ -2377,6 +2394,198 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((why_was_true)/1).
 :- module_transparent((mpred_is_silient)/0).
 :- module_transparent((get_mpred_is_tracing)/1).
+:- module_transparent((triggerSupports)/2).
+:- module_transparent((supporters_list)/2).
+:- module_transparent((well_founded_list)/2).
+:- module_transparent((well_founded_0)/2).
+:- module_transparent((well_founded)/1).
+:- module_transparent((mpred_supported)/2).
+:- module_transparent((get_tms_mode)/2).
+:- module_transparent((mpred_supported)/1).
+:- module_transparent((mpred_select_justification_node)/3).
+:- module_transparent((mpred_prompt_ask)/2).
+:- module_transparent((mpred_pp_cur_justifications2)/3).
+:- module_transparent((mpred_pp_cur_justification1)/2).
+:- module_transparent((mpred_pp_cur_justifications)/2).
+:- module_transparent((mpred_unhandled_command)/3).
+:- module_transparent((mpred_handle_why_command)/3).
+:- module_transparent((mpred_whyBrouse)/2).
+:- module_transparent((mpred_why1)/1).
+:- module_transparent((pp_cur_why)/1).
+:- module_transparent((pp_cur_why)/0).
+:- module_transparent((pp_cur_supports)/0).
+:- module_transparent((pp_cur_triggers)/0).
+:- module_transparent((pp_cur_rules)/0).
+:- module_transparent((mpred_classifyFacts)/4).
+:- module_transparent((pp_cur_items)/1).
+:- module_transparent((pp_cur_facts)/2).
+:- module_transparent((pp_cur_facts)/1).
+:- module_transparent((pp_cur_facts)/0).
+:- module_transparent((pp_cur_DB)/0).
+:- module_transparent((mpred_trigger_key)/2).
+:- module_transparent((mpred_make_supports)/1).
+:- module_transparent((mpred_support_relation)/1).
+:- module_transparent((mpred_collect_supports)/1).
+:- module_transparent((mpred_rem_support)/2).
+:- module_transparent((mpred_rem_support_if_exists)/2).
+:- module_transparent((mpred_add_support)/2).
+:- module_transparent((mpred_descendants)/2).
+:- module_transparent((mpred_descendant1)/3).
+:- module_transparent((mpred_descendant)/2).
+:- module_transparent((mpred_children)/2).
+:- module_transparent((mpred_child)/2).
+:- module_transparent((do_assumpts)/2).
+:- module_transparent((mpred_assumptions)/2).
+:- module_transparent((mpred_assumption)/1).
+:- module_transparent((mpred_axiom)/1).
+:- module_transparent((bases_union)/2).
+:- module_transparent((mpred_basis_list)/2).
+:- module_transparent((justification)/2).
+:- module_transparent((mpred_set_warnings)/1).
+:- module_transparent((nompred_warn)/0).
+:- module_transparent((mpred_warn)/0).
+:- module_transparent((mpred_load)/1).
+:- module_transparent((mpred_nowatch)/0).
+:- module_transparent((mpred_trace_exec)/0).
+:- module_transparent((mpred_watch)/0).
+:- module_transparent((mpred_error)/2).
+:- module_transparent((mpred_error)/1).
+:- module_transparent((mpred_warn)/2).
+:- module_transparent((mpred_warn)/1).
+:- module_transparent((mpred_trace_msg)/2).
+:- module_transparent((mpred_trace_msg)/1).
+:- module_transparent((mpred_untrace)/1).
+:- module_transparent((mpred_untrace)/0).
+:- module_transparent((mpred_notrace)/0).
+:- module_transparent((mpred_nospy)/3).
+:- module_transparent((mpred_nospy)/1).
+:- module_transparent((mpred_nospy)/0).
+:- module_transparent((mpred_spy1)/3).
+:- module_transparent((mpred_spy)/3).
+:- module_transparent((mpred_spy)/2).
+:- module_transparent((mpred_spy)/1).
+:- module_transparent((mpred_trace)/2).
+:- module_transparent((mpred_trace)/1).
+:- module_transparent((mpred_trace)/0).
+:- module_transparent((mpred_trace_maybe_break)/3).
+:- module_transparent((mpred_trace_maybe_print)/3).
+:- module_transparent((mpred_trace_op)/3).
+:- module_transparent((mpred_trace_op)/2).
+:- module_transparent((mpred_facts)/3).
+:- module_transparent((mpred_facts)/2).
+:- module_transparent((mpred_facts)/1).
+:- module_transparent((mpred_fact)/1).
+:- module_transparent((mpred_retract_i_or_warn)/1).
+:- module_transparent((mpred_database_item)/1).
+:- module_transparent((mpred_reset)/0).
+:- module_transparent((mpred_database_term)/1).
+:- module_transparent((mpred_conjoin)/3).
+:- module_transparent((mpred_union)/3).
+:- module_transparent((mpred_assertz_w_support)/2).
+:- module_transparent((mpred_asserta_w_support)/2).
+:- module_transparent((mpred_assert_w_support)/2).
+:- module_transparent((mpred_db_type)/2).
+:- module_transparent(('__aux_maplist/3_build_consequent+1')/3).
+:- module_transparent((build_consequent)/3).
+:- module_transparent((all_closed)/1).
+:- module_transparent((code_sentence_op)/1).
+:- module_transparent((build_code_test)/3).
+:- module_transparent((fa_to_p)/3).
+:- module_transparent((really_mpred_mark)/5).
+:- module_transparent((mpred_mark_fa_as)/6).
+:- module_transparent((mpred_mark_as)/4).
+:- module_transparent((pos_2_neg)/2).
+:- module_transparent((mpred_mark_as_ml)/4).
+:- module_transparent((check_never_retract)/1).
+:- module_transparent((check_never_assert)/1).
+:- module_transparent((build_neg_test)/4).
+:- module_transparent((build_trigger)/4).
+:- module_transparent((build_rule)/3).
+:- module_transparent((process_rule)/3).
+:- module_transparent((mpred_connective)/1).
+:- module_transparent((mpred_positive_literal)/1).
+:- module_transparent((mpred_literal)/1).
+:- module_transparent((mpred_negated_literal)/1).
+:- module_transparent((mpred_negation)/2).
+:- module_transparent((mpred_compile_rhs_term)/2).
+:- module_transparent((mpred_compile_rhs_term)/3).
+:- module_transparent((build_rhs)/2).
+:- module_transparent((mpred_nf_negation)/2).
+:- module_transparent((mpred_nf_negations)/2).
+:- module_transparent((mpred_nf1_negation)/2).
+:- module_transparent((mpred_nf1)/2).
+:- module_transparent((mpred_nf)/2).
+:- module_transparent((action_is_undoable)/1).
+:- module_transparent((call_in_mi)/1).
+:- module_transparent((trigger_trigger1)/2).
+:- module_transparent((trigger_trigger)/3).
+:- module_transparent((mpred_eval_rhs1)/2).
+:- module_transparent((mpred_eval_rhs)/2).
+:- module_transparent((mpred_eval_lhs)/2).
+:- module_transparent((mpred_define_bc_rule)/3).
+:- module_transparent((mpred_do_fcnt)/2).
+:- module_transparent((mpred_do_fcpt)/2).
+:- module_transparent((mpred_do_rule)/1).
+:- module_transparent((mpred_fwc1)/1).
+:- module_transparent((mpred_fwc)/1).
+:- module_transparent((remove_if_unsupported)/1).
+:- module_transparent((mpred_retract_supported_relations)/1).
+:- module_transparent((mpred_unfwc_check_triggers)/1).
+:- module_transparent((mpred_unfwc1)/1).
+:- module_transparent((mpred_unfwc)/1).
+:- module_transparent((mpred_undo)/1).
+:- module_transparent((mpred_remove_supports_quietly)/1).
+:- module_transparent((mpred_remove_supports)/1).
+:- module_transparent((mpred_blast)/1).
+:- module_transparent((mpred_remove)/2).
+:- module_transparent((mpred_remove)/1).
+:- module_transparent((mpred_withdraw1)/2).
+:- module_transparent((mpred_withdraw)/2).
+:- module_transparent((mpred_withdraw)/1).
+:- module_transparent((mpred_ain_by_type)/2).
+:- module_transparent((mpred_ain_object)/1).
+:- module_transparent((mpred_retract_type)/2).
+:- module_transparent((mpred_retract)/1).
+:- module_transparent((mpred_undo_action)/1).
+:- module_transparent((mpred_ain_actiontrace)/2).
+:- module_transparent((mpred_bt_pt_combine)/3).
+:- module_transparent((mpred_ain_trigger_reprop)/2).
+:- module_transparent((stop_trace)/1).
+:- module_transparent((mpred_halt)/1).
+:- module_transparent((mpred_halt)/2).
+:- module_transparent((mpred_halt)/0).
+:- module_transparent((defaultmpred_select)/1).
+:- module_transparent((select_next_fact)/1).
+:- module_transparent((remove_selection)/1).
+:- module_transparent((get_next_fact)/1).
+:- module_transparent((mpred_step)/0).
+:- module_transparent((mpred_run)/0).
+:- module_transparent((mpred_remove_old_version)/1).
+:- module_transparent((mpred_enqueue)/2).
+:- module_transparent((get_search_mode)/3).
+:- module_transparent((mpred_unique_u)/1).
+:- module_transparent((mpred_ain_db_to_head)/2).
+:- module_transparent((mpred_post1)/2).
+:- module_transparent((mpred_post)/2).
+:- module_transparent((mpred_ain)/2).
+:- module_transparent((ain)/2).
+:- module_transparent((mpred_aina)/2).
+:- module_transparent((mpred_ainz)/2).
+:- module_transparent((mpred_set_default)/2).
+:- module_transparent((pp_qu)/0).
+:- module_transparent((lookup_u)/2).
+:- module_transparent((lookup_u)/1).
+:- module_transparent((clause_u)/2).
+:- module_transparent((retractall_u)/1).
+:- module_transparent((retract_u)/1).
+:- module_transparent((assertz_u)/1).
+:- module_transparent((asserta_u)/1).
+:- module_transparent((assert_u)/1).
+:- module_transparent((call_uU)/1).
+:- module_transparent((clause_u)/3).
+:- module_transparent((mpred_BC_CACHE)/1).
+:- module_transparent((mpred_CALL)/1).
+:- module_transparent((mpred_get_support)/2).
 
 
 

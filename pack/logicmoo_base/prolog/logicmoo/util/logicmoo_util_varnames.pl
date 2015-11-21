@@ -376,7 +376,7 @@ all_different_vars(A):-all_different_vals(v_dif_rest,A),!.
 
 
 
-%% all_different_vals(+:PRED2, +Term) is semidet.
+%% all_different_vals(:PRED2, +Term) is semidet.
 %
 % All Different Vals.
 %
@@ -384,7 +384,7 @@ all_different_vals(Pred,Term):-
  must(notrace(( (is_list(Term)-> Slots = Term ; term_slots(Term,Slots)),!,
                                  all_disjoint_in_sets(Pred,Slots,Slots)))).
 
-%% all_different_vals(+:PRED2, +SET1, +SET2) is semidet.
+%% all_different_vals(:PRED2, +SET1, +SET2) is semidet.
 %
 % All Different Vals.
 %

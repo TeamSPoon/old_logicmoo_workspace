@@ -64,8 +64,9 @@ checkKB:m1:- gripe_time(40,baseKB:ensure_loaded(baseKB:logicmoo(mpred_online/mpr
 
 mpred_load_restore_file(File):- absolute_file_name(File,AFN),AFN\=File,!,mpred_load_restore_file(AFN).
 mpred_load_restore_file(File):- \+ exists_file(File),
-  lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:logicmoo(pfc/'autoexec.pfc'))),
-  mpred_save_restore_file(File),!.
+  lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:logicmoo(pfc/'autoexec.pfc'))),!,
+  mpred_save_restore_file('some_test'),!.
+
 mpred_load_restore_file(File):-
   must_det_l((
   time_file(File,Time),
