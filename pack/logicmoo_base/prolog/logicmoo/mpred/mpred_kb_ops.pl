@@ -25,7 +25,6 @@
             whenAnd/2,
 
           to_addable_form_wte/3,
-          with_mpred_trace_exec/1,
           to_predicate_isas_each/2,
           to_addable_form/2,
           attvar_op/2,
@@ -39,10 +38,8 @@
 
 to_addable_form_wte/3,
 to_addable_form/2,
-with_mpred_trace_exec/1,
 with_umt/1,
 update_single_valued_arg/2,
-show_if_debug/1,
 ruleBackward/2,
 retract_eq_quitely_f/1,
 neg_in_code/1,
@@ -53,7 +50,6 @@ mpred_provide_storage_clauses/4,
 mpred_no_chaining/1,
 mpred_negation_w_neg/2,          
 mpred_negation_w_neg/2,
-mpred_is_silient/0,
 mpred_clause_is_asserted/2,
 fix_negations/2,
 map_first_arg/2,
@@ -65,7 +61,6 @@ is_bc_body/1,
 is_action_body/1,
 has_cl/1,
 has_body_atom/2,
-get_mpred_is_tracing/1,
 fixed_negations/2,
 fix_negations/2,
 cwc/0,
@@ -88,8 +83,6 @@ mpred_facts_and_universe/1,
 
 :- meta_predicate 
       with_umt(+),
-      with_no_mpred_trace_exec(0),
-      with_mpred_trace_exec(0),
       pred_head(1,*),
       physical_side_effect(0),
       oncely(0),
@@ -631,6 +624,7 @@ mpred_each_literal(P,P). %:-conjuncts_to_list(P,List),member(E,List).
 
 
 is_nc_as_is(P) :- \+ compound(P),!.
+is_nc_as_is(P) :- functor(P,_,0),!.
 is_nc_as_is(P):- is_ftVar(P),!.
 
 fixed_negations(I,O):-notrace((fix_negations(I,O),!,I\=@=O)).
@@ -643,7 +637,7 @@ fix_negations(~~(I),O):- functor(~~(I),~~,1),!, fix_negations(\+(~I),O).
 fix_negations(not(I),O):- !, fix_negations(\+(I),O).
 fix_negations(~(I),~(O)):- !, fix_negations(I,O).
 fix_negations(\+(I),\+(O)):- !, fix_negations(I,O).
-% fix_negations(C,C):-exact_args(C),!.
+fix_negations(C,C):- if_defined(exact_args(C),fail),!.
 fix_negations([H|T],[HH|TT]):-!,fix_negations(H,HH),fix_negations(T,TT),!.
 fix_negations(C,CO):-C=..[F|CL],must_maplist(fix_negations,CL,CLO),!,CO=..[F|CLO].
 
@@ -1109,17 +1103,6 @@ is_atom_body_pfa(WAC,P,F,2,Rest):-arg(2,P,E),E==WAC,arg(1,P,Rest),!.
 */
 
 
-:- thread_local(t_l:mpred_debug_local/0).
-
-%% mpred_is_silient is det.
-%
-% If Is A Silient.
-%
-mpred_is_silient :- ( \+ t_l:mpred_debug_local, \+ lookup_u(mpred_is_tracing_exec), \+ lookup_u(mpred_is_tracing_pred(_)), 
-  current_prolog_flag(debug,false), is_release) ,!.
-
-
-
 
 %% mpred_update_literal( +P, ?N, ?Q, ?R) is semidet.
 %
@@ -1252,27 +1235,6 @@ pfcVersion(6.6).
 correctify_support((S,T),(S,T)):-!.
 correctify_support(U,(U,U)):-atom(U),!.
 correctify_support([U],S):-correctify_support(U,S).
-
-%=% initialization of global assertons
-
-%= lmconf:mpred_set_default/1 initialized a global assertion.
-%=  lmconf:mpred_set_default(P,Q) - if there is any fact unifying with P, then do
-%=  nothing, else assert_db Q.
-
-%% with_mpred_trace_exec( +P) is semidet.
-%
-% Using Managed Predicate  Trace exec.
-%
-with_mpred_trace_exec(P):- w_tl(t_l:mpred_debug_local,w_tl(mpred_is_tracing_exec, must(show_if_debug(P)))).
-
-%% with_mpred_trace_exec( +P) is semidet.
-%
-% Without Trace exec.
-%
-with_no_mpred_trace_exec(P):- get_user_abox(M),
-   wno_tl(t_l:mpred_debug_local,wno_tl(M:mpred_is_tracing_exec, must(show_if_debug(P)))).
-
-
 
 
 %% clause_asserted_local( :TermABOX) is semidet.
@@ -2083,15 +2045,8 @@ mpred_trigger_key(X,X).
 %   Purpose: predicates to manipulate a pfc database (e.g. save,
 %	restore, reset, etc).
 
-%% mpred_is_tracing_pred( +VALUE1) is semidet.
-%
-% PFC If Is A Tracing.
-%
-get_mpred_is_tracing(_):- lookup_u(mpred_is_tracing_exec) ; t_l:mpred_debug_local.
 
 lmconf:module_local_init:- mpred_set_default(mpred_warnings(_), mpred_warnings(true)).
-
-
 
 
 %% get_fa( +PI, ?F, ?A) is semidet.
@@ -2527,18 +2482,6 @@ assertz_mu(M,X):- must((expire_tabled_list(M:X),show_call(attvar_op(assertz_i,M:
 
 
 
-
-
-:- meta_predicate(show_if_debug(0)).
-% show_if_debug(A):- !,show_call(why,A).
-
-%% show_if_debug( :GoalA) is semidet.
-%
-% Show If Debug.
-%
-show_if_debug(A):- get_mpred_is_tracing(A) -> show_call(dmiles,A) ; A.
-
-
 %% retract_mu( :TermX) is semidet.
 %
 % Retract For User Code.
@@ -2612,7 +2555,6 @@ with_umt(G0):-
 :- module_transparent((should_call_for_facts)/1).
 :- module_transparent((clause_or_call)/2).
 :- module_transparent((get_fa)/3).
-:- module_transparent((get_mpred_is_tracing)/1).
 :- module_transparent((is_relative)/1).
 :- module_transparent((mpred_non_neg_literal)/1).
 :- module_transparent((is_reprop_0)/1).
@@ -2689,7 +2631,6 @@ with_umt(G0):-
 :- module_transparent((map_literals)/2).
 :- module_transparent((update_single_valued_arg)/2).
 :- module_transparent((mpred_update_literal)/4).
-:- module_transparent((mpred_is_silient)/0).
 :- module_transparent((has_body_atom)/2).
 :- module_transparent((is_action_body)/1).
 :- module_transparent((is_bc_body)/1).
@@ -2757,7 +2698,22 @@ with_umt(G0):-
 :- module_transparent((check_context_module)/0).
 :- module_transparent((get_user_tbox)/1).
 :- module_transparent((get_user_abox)/1).
-
+:- module_transparent((call_s2)/1).
+:- module_transparent((call_s)/1).
+:- module_transparent((clauseq_s)/3).
+:- module_transparent((clause_s)/3).
+:- module_transparent((assertz_s)/1).
+:- module_transparent((asserta_s)/1).
+:- module_transparent((lookq_s)/2).
+:- module_transparent((lookq_s)/1).
+:- module_transparent((lookup_s)/2).
+:- module_transparent((lookup_s)/1).
+:- module_transparent((retract_s)/1).
+:- module_transparent((clause_s)/2).
+:- module_transparent((retractall_s)/1).
+:- module_transparent((assert_s)/1).
+:- module_transparent((listing_s)/1).
+:- module_transparent((fix_mp)/2).
 :- module_transparent((lookup_inverted_op)/3).
 :- module_transparent((how_to_op)/2).
 :- module_transparent((reduce_mpred_op)/2).

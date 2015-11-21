@@ -1406,14 +1406,7 @@ is_atom_body_pfa(WAC,P,F,2,Rest):-arg(2,P,E),E==WAC,arg(1,P,Rest),!.
 mpred_is_silient :- ( \+ t_l:mpred_debug_local, \+ mpred_is_tracing_exec, \+ mpred_is_tracing_pred(_), current_prolog_flag(debug,false), is_release) ,!.
 
 
-:- meta_predicate(show_if_debug(0)).
-% show_if_debug(A):- !,show_call(why,A).
 
-%% show_if_debug( :GoalA) is semidet.
-%
-% Show If Debug.
-%
-show_if_debug(A):- get_mpred_is_tracing(A) -> show_call(mpred_is_tracing_pred,A) ; A.
 
 % ======================= 
 % user''s program''s database

@@ -33,7 +33,7 @@
             %mpred_why1/1,
             %pp_cur_why/1,
             %pp_cur_why/0,
-            %mpred_trace_item/2,
+            mpred_trace_item/2,
             pp_rules/0,
             pp_supports/0,
             pp_triggers/0,            
