@@ -18,6 +18,7 @@
   get_user_abox/1,
   get_source_ref/1,
   get_source_ref1/1,
+  is_source_ref1/1,
   check_never_assert/1,
   why_was_true/1,
   mpred_fwc0/1,
@@ -100,12 +101,9 @@
 
 :- thread_local(t_l:user_abox/1).
 
-set_user_abox(M):- must(atom(M)),
+set_user_abox(M):- wdmsg(set_user_abox(M)),
  setup_mpred_support(M),
- (
-  '$set_source_module'(_,M),'$module'(_,M)),
-    % add_import_module(M,pfc,end),
-   forall(mpred_database_term(F/A,_),(M:dynamic(M:F/A),M:discontiguous(M:F/A),M:multifile(M:F/A))),
+ ('$set_source_module'(_,M),'$module'(_,M)),
    retractall(t_l:user_abox(_M)),asserta(t_l:user_abox(M)).
 
 :- module_transparent((setup_mpred_support)/1).
@@ -115,23 +113,14 @@ setup_mpred_support(M):- mpred_abox_module(M),!.
 setup_mpred_support(M):-
  must(atom(M)),
  asserta(mpred_abox_module(M)),
- PREDS = ((
+ % add_import_module(M,pfc,end),
+   forall(mpred_database_term(F/A,_),
+     (functor(P,F,A),must(\+ (predicate_property(P,imported_from(W)),
+      wdmsg(predicate_property(P,imported_from(W))) , W\==user)))),
+  forall(mpred_database_term(F/A,_),(M:dynamic(M:F/A),
+        M:discontiguous(M:F/A),
+        M:multifile(M:F/A))),!.
 
-      % mined from program database
-      (::::)/2, (<-)/2, (<==>)/2, (==>)/2,  (==>)/1,  (~)/1, do_and_undo/2,  
-      
-      % forward/backward chaining state
-      spft/3,nt/3,pt/2,bt/2,actn/1,que/1,hs/1,
-      
-      % forward/backward settings
-      mpred_current_db/1,mpred_select_hook/1,tms/1,sm/1,  
-      
-      % debug settings
-      mpred_is_tracing_pred/1,mpred_is_tracing_exec/0,mpred_is_spying_pred/2,mpred_warnings/1,why_buffer/2  
-
-  )),
-
-  M:dynamic(M:PREDS),M:multifile(M:PREDS).
  
 
 
@@ -181,6 +170,9 @@ get_source_ref1(M):-
  (atom(M)->(module_property(M,class(_)),!);
     mpred_error(no_source_ref(M)))).
 
+
+
+is_source_ref1(G):-ground(G).
 
 %% get_user_abox(-ABOXModule) is semidet.
 %
@@ -323,7 +315,7 @@ mpred_set_default(GeneralTerm,Default):-
   clause_u(GeneralTerm,true) -> true ; assert_u(Default).
 
 %  tms is one of {none,local,cycles} and controles the tms alg.
-:- mpred_set_default(tms(_), tms(cycles)).
+% :- mpred_set_default(tms(_),tms(cycles)).
 
 % Pfc Search strategy. sm(X) where P is one of {direct,depth,breadth}
 % :- must(mpred_set_default(sm(_), sm(direct))).
@@ -409,13 +401,14 @@ mpred_post1(_,_).
 % mpred_post1(P,S):-  mpred_warn("mpred_ain(~p,~p) failed",[P,S]).
 
  
-%% mpred_current_db(+U) is semidet.
+%% get_mpred_current_db(-Db) is semidet.
 %
 % PFC Current Database.
 %
 % (was nothing)
 %
-mpred_current_db(U):-get_source_ref1(U).
+get_mpred_current_db(Db):-lookup_u(mpred_current_db(Db)),!.
+get_mpred_current_db(true).
  
 %%  mpred_ain_db_to_head(+P,-NewP) is semidet.
 %
@@ -903,10 +896,14 @@ mpred_do_fcpt(Fact,F):-
 mpred_do_fcpt(_,_).
 
 mpred_do_fcnt(_ZFact,F):-
-  NT = nt(F,Condition,_ZBody),
-  lookup_u(spft(X,_,NT)),
-  Condition,
-  mpred_withdraw(X,(_,NT)),
+  NT = nt(F,Condition,Body),
+  SPFT = spft(X,F1,NT),
+  lookup_u(SPFT),
+   mpred_trace_msg('~N~n\tFound negative trigger: ~p~n\t\tcond: ~p~n\t\tbody: ~p~n\tSupport: ~p~n',
+                 [F,Condition,Body,SPFT]),
+  call_u(Condition),
+  mpred_withdraw(X,(F2,NT)),
+  must(F1=F2),
   fail.
 mpred_do_fcnt(_,_).
 
@@ -1689,6 +1686,8 @@ mpred_retract_i_or_warn(X):-
 %   for Pfc.
 
 :- mpred_set_default(mpred_warnings(_), mpred_warnings(true)).
+%  tms is one of {none,local,cycles} and controles the tms alg.
+:- mpred_set_default(tms(_), tms(cycles)).
 
 
 %  mpred_fact(P) is true if fact P was asserted into the database via add.
@@ -2362,6 +2361,7 @@ supporters_list(F,[Fact|MoreFacts]):-
   triggerSupports(Trigger,MoreFacts).
 
 triggerSupports(U,[]):- get_source_ref1(U),!.
+triggerSupports(U,[]):- is_source_ref1(U),!.
 triggerSupports(Trigger,[Fact|MoreFacts]):-
   mpred_get_support(Trigger,(Fact,AnotherTrigger)),
   triggerSupports(AnotherTrigger,MoreFacts).
@@ -2515,7 +2515,6 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((mpred_asserta_w_support)/2).
 :- module_transparent((mpred_assert_w_support)/2).
 :- module_transparent((mpred_db_type)/2).
-:- module_transparent(('__aux_maplist/3_build_consequent+1')/3).
 :- module_transparent((build_consequent)/3).
 :- module_transparent((all_closed)/1).
 :- module_transparent((code_sentence_op)/1).

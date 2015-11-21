@@ -46,7 +46,8 @@ end_of_file.
   setup_mpred_ops/0,
   mpred_assert_w_support/2,mpred_asserta_w_support/2,mpred_assertz_w_support/2,mpred_basis_list/2,mpred_bt_pt_combine/3,mpred_child/2,mpred_children/2,
   mpred_classifyFacts/4,mpred_collect_supports/1,mpred_unhandled_command/3,mpred_compile_rhs_term/2,mpred_conjoin/3,mpred_connective/1,
-  mpred_database_item/1,mpred_database_term/2,mpred_db_type/2,mpred_set_default/2,mpred_define_bc_rule/3,mpred_descendant/2,
+  mpred_database_item/1,mpred_database_term/2,
+  mpred_db_type/2,mpred_set_default/2,mpred_define_bc_rule/3,mpred_descendant/2,
   mpred_descendants/2,mpred_enqueue/2,mpred_error/1,mpred_error/2,mpred_eval_lhs/2,mpred_eval_rhs/2,mpred_fact/1,
   mpred_fact/2,mpred_facts/1,mpred_facts/2,mpred_facts/3,mpred_fwc/1,mpred_get_support/2,lookup_u/1,lookup_u/2,
   mpred_literal/1,mpred_load/1,mpred_make_supports/1,mpred_ain_object/1,mpred_aina/2,mpred_ainz/2,
@@ -108,16 +109,19 @@ set_user_abox(M):- wdmsg(set_user_abox(M)),
    retractall(t_l:user_abox(_M)),asserta(t_l:user_abox(M)).
 
 :- module_transparent((setup_mpred_support)/1).
+
 :- dynamic(mpred_abox_module/1).
 setup_mpred_support(M):- mpred_abox_module(M),!.
 setup_mpred_support(M):-
  must(atom(M)),
  asserta(mpred_abox_module(M)),
-   % add_import_module(M,pfc,end),
+ % add_import_module(M,pfc,end),
    forall(mpred_database_term(F/A,_),
      (functor(P,F,A),must(\+ (predicate_property(P,imported_from(W)),
-      wdmsg(predicate_property(P,imported_from(W))))))),
-  forall(mpred_database_term(F/A,_),(M:dynamic(M:F/A),M:discontiguous(M:F/A),M:multifile(M:F/A))),!.
+      wdmsg(predicate_property(P,imported_from(W))) , W\==user)))),
+  forall(mpred_database_term(F/A,_),(M:dynamic(M:F/A),
+        M:discontiguous(M:F/A),
+        M:multifile(M:F/A))),!.
   
  
 
@@ -161,12 +165,18 @@ get_source_ref((X,X)):- get_source_ref1(X).
 :- module_transparent((get_source_ref1)/1).
 % get_source_ref1(_):- fail,check_context_module,fail.
 
-get_source_ref1(M):- must(var(M)), get_source_ref11(M),must(is_source_ref1(M)).
+get_source_ref1(M):- current_why(M),!.
+get_source_ref1(loading(M,F,L)):- get_user_abox(M), source_location(F,L),!.
+get_source_ref1(loading(M,F,L)):- get_user_abox(M), current_source_file(F:L),!.
+get_source_ref1(loading(M,F,_L)):- get_user_abox(M), current_source_file(F),!.
+get_source_ref1(loading(M,_,_L)):- get_user_abox(M),!.
+get_source_ref1(M):- (get_user_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))),!.
+get_source_ref1(M):- 
+ (get_user_abox(M) -> !;
+ (atom(M)->(module_property(M,class(_)),!);
+    mpred_error(no_source_ref(M)))).
 
-get_source_ref11(loading(M,F,L)):- get_user_abox(M), source_location(F,L),!.
-get_source_ref11(loading(M,F,L)):- get_user_abox(M), current_source_file(F:L),!.
-get_source_ref11(loading(M,F,_L)):- get_user_abox(M), current_source_file(F),!.
-get_source_ref11(M):- must(current_why(M)),!.
+
 
 is_source_ref1(G):-ground(G).
 
@@ -699,8 +709,7 @@ remlist([H|T]):-
 %  If it is not, then the fact is retreactred from the database and any support
 %  relationships it participated in removed.
 mpred_withdraw(Ps,S):- each_E(mpred_withdraw1,Ps,[S]).
-mpred_withdraw1(P,S):- must(S=(F,T)), must(nonvar(F)),must(nonvar(T)),
-  trace,
+mpred_withdraw1(P,S):-
   mpred_trace_msg('~N~n\tRemoving~n\t\tsupport: ~p~n\t\tfrom: ~p~n',[S,P]),
   mpred_rem_support(P,S)
      -> remove_if_unsupported(P)
@@ -899,7 +908,8 @@ mpred_do_fcnt(_ZFact,F):-
    mpred_trace_msg('~N~n\tFound negative trigger: ~p~n\t\tcond: ~p~n\t\tbody: ~p~n\tSupport: ~p~n',
                  [F,Condition,Body,SPFT]),
   call_u(Condition),
-  mpred_withdraw(X,(F1,NT)),
+  mpred_withdraw(X,(F2,NT)),
+  must(F1=F2),
   fail.
 mpred_do_fcnt(_,_).
 
@@ -1663,7 +1673,7 @@ mpred_database_item(P):-
   \+ ( B= H),
   ((B== true)-> P=H; P=(H:B)).
 
-
+ 
 mpred_retract_i_or_warn(X):- retract_u(X), !.
 mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft(\+ _,_,_),!.
 mpred_retract_i_or_warn(X):- 
@@ -1682,7 +1692,9 @@ mpred_retract_i_or_warn(X):-
 %   Purpose: provides predicates for examining the database and debugginh 
 %   for Pfc.
 
-% :- mpred_set_default(mpred_warnings(_), mpred_warnings(true)).
+:- mpred_set_default(mpred_warnings(_), mpred_warnings(true)).
+%  tms is one of {none,local,cycles} and controles the tms alg.
+:- mpred_set_default(tms(_), tms(cycles)).
 
 
 %  mpred_fact(P) is true if fact P was asserted into the database via add.
@@ -2355,6 +2367,7 @@ supporters_list(F,[Fact|MoreFacts]):-
   mpred_get_support(F,(Fact,Trigger)),
   triggerSupports(Trigger,MoreFacts).
 
+triggerSupports(U,[]):- get_source_ref1(U),!.
 triggerSupports(U,[]):- is_source_ref1(U),!.
 triggerSupports(Trigger,[Fact|MoreFacts]):-
   mpred_get_support(Trigger,(Fact,AnotherTrigger)),
@@ -2501,13 +2514,14 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((mpred_retract_i_or_warn)/1).
 :- module_transparent((mpred_database_item)/1).
 :- module_transparent((mpred_reset)/0).
+:- module_transparent((mpred_database_term)/2).
+:- module_transparent((mpred_abox_module)/1).
 :- module_transparent((mpred_conjoin)/3).
 :- module_transparent((mpred_union)/3).
 :- module_transparent((mpred_assertz_w_support)/2).
 :- module_transparent((mpred_asserta_w_support)/2).
 :- module_transparent((mpred_assert_w_support)/2).
 :- module_transparent((mpred_db_type)/2).
-:- module_transparent(('__aux_maplist/3_build_consequent+1')/3).
 :- module_transparent((build_consequent)/3).
 :- module_transparent((all_closed)/1).
 :- module_transparent((code_sentence_op)/1).
@@ -2608,10 +2622,6 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((mpred_BC_CACHE)/1).
 :- module_transparent((mpred_CALL)/1).
 :- module_transparent((mpred_get_support)/2).
-:- module_transparent((mpred_reset)/1).
-:- module_transparent((mpred_database_term)/2).
-:- module_transparent((get_mpred_current_db)/1).
-:- module_transparent((mpred_abox_module)/1).
 
 
 
