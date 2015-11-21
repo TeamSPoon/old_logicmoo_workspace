@@ -23,6 +23,7 @@
             is_loop_checked/1,
             lco_goal_expansion/2,
             lex/0,
+            cyclic_break/1,
             loop_check/1,
             loop_check/2,
             loop_check_early/2,
@@ -154,6 +155,11 @@ memberchk_same_two(X, [Y0|Ys]) :- is_list(Ys),!,C=..[v,Y0|Ys],!, arg(_,C,Y), ( X
 memberchk_same_two(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),memberchk_same_two(X, Ys) )).
 
 
+%% cyclic_break( ?Cyclic) is semidet.
+%
+% Cyclic Break.
+%
+cyclic_break(Cyclic):-cyclic_term(Cyclic)->(writeq(cyclic_break(Cyclic)),nl,prolog);true.
 
 
 % ===================================================================

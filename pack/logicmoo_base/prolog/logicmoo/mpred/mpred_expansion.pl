@@ -79,7 +79,6 @@
             db_op_simpler/3,
             db_quf/4,
             db_quf_l/5,
-            cyclic_break/1,
             db_quf_l_0/5,
             default_te/3,
             demodulize/3,
@@ -363,14 +362,6 @@ reduce_clause(_,C,C).
 %
 to_reduced_hb(Op,HB,HH,BB):-reduce_clause(Op,HB,HHBB),expand_to_hb(HHBB,HH,BB).
 
-
-%= 	 	 
-
-%% cyclic_break( ?Cyclic) is semidet.
-%
-% Cyclic Break.
-%
-cyclic_break(Cyclic):-cyclic_term(Cyclic)->(writeq(cyclic_break(Cyclic)),nl,prolog);true.
 
 /*
 dbase_head_expansion(_,V,V ):-is_ftVar(V),!.

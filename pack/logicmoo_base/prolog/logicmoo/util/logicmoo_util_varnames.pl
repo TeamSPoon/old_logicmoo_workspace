@@ -370,6 +370,7 @@ all_different_vals(Term):-all_different_vals(dif_matrix,Term).
 % All Different Variables.
 %
 all_different_vars(_):- t_l:dont_varname,!.
+all_different_vars(A):-(notrace((all_disjoint_in_sets(dif_matrix,A,A)))),!.
 all_different_vars(A):-must(notrace((all_disjoint_in_sets(dif_matrix,A,A)))),!.
 all_different_vars(A):-all_different_vals(v_dif_rest,A),!.
 

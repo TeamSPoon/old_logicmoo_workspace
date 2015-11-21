@@ -201,6 +201,7 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 
 :- source_location(F,_),asserta(lmconf:never_registered_mpred_file(F)).
 
+:- '$set_source_module'(_,baseKB).
 
 %= 	 	 
 

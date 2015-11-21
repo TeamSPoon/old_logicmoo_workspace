@@ -12,6 +12,9 @@
 %(mpred_mark(pfcPosTrigger,_,F,A)/(fa_to_p(F,A,P), \+ predicate_property(P,_))) ==> {kb_dynamic(tbox:F/A)}.
 %(mpred_mark(pfcNegTrigger,_,F,A)/(fa_to_p(F,A,P), \+ predicate_property(P,_))) ==> {kb_dynamic(tbox:F/A)}.
 
+:- dynamic(marker_supported/2).
+:- dynamic(mpred_mark_C/1).
+:- dynamic(hybrid_support/2).
 
 mpred_mark(S1, S2, F, A)/ground(S1:S2)==>arity(F,A).
 mpred_mark(pfcPosTrigger, S1, F, A)/ground(S1:F:A)==>marker_supported(F,A).

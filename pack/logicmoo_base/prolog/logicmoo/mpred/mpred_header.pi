@@ -157,7 +157,6 @@ user:term_expansion/2,user:goal_expansion/2,system:term_expansion/2,system:goal_
 :- thread_local(t_l:user_abox/1).
 :- thread_local(t_l:mpred_run_paused/0).
 :- thread_local(t_l:no_kif_var_coroutines/0).
-:- thread_local(t_l:mpred_search_mode/1).
 
 :- style_check(-singleton).
 :- set_prolog_flag(generate_debug_info, true).

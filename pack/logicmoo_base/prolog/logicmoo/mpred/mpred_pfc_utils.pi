@@ -158,7 +158,7 @@ mpred_clause_is_asserted_hb_nonunify/2,
 mpred_cleanup/0,
 mpred_cleanup/2,
 mpred_cleanup_0/1,
-mpred_compile_rhsTerm/3,
+mpred_compile_rhs_term/3,
 mpred_connective/1,
 mpred_current/0,
 mpred_current_db/1,
@@ -623,7 +623,7 @@ check_real_context_module:- must((context_module(M),M\==mpred_pfc,M\==mpred_load
 :- style_check(+singleton).
 
 
-%% get_user_abox_umt( ?A) is semidet.
+%% get_user_abox_umt(+A) is semidet.
 %
 % Get User Abox Ignore.
 %
@@ -635,13 +635,13 @@ get_user_abox_umt(A):-ignore(get_user_abox(A)).
 :- was_module_transparent(with_umt/1).
 :- was_export(with_umt/1).
 
-%% with_umt( ?ABOX, ?G) is semidet.
+%% with_umt(+ABOX, ?G) is semidet.
 %
 % Using User Microtheory.
 %
 with_umt(ABOX,G):- w_tl(t_l:user_abox(ABOX),ABOX:call(ABOX:G)).
 
-%% with_umt( ?G) is semidet.
+%% with_umt(+G) is semidet.
 %
 % Using User Microtheory.
 %
@@ -676,7 +676,7 @@ with_search_mode(Mode,Goal):- w_tl(t_l:mpred_search_mode(Mode),Goal).
 
 
 
-%% mreq( ?G) is semidet.
+%% mreq(+G) is semidet.
 %
 % Mreq.
 %
@@ -713,7 +713,7 @@ is_side_effect_disabled:- t_l:noDBaseMODs(_),!.
 
 
 
-%% f_to_mfa( ?EF, ?R, ?F, ?A) is semidet.
+%% f_to_mfa(+EF, ?R, ?F, ?A) is semidet.
 %
 % Functor Converted To Module-functor-arity.
 %
@@ -723,7 +723,7 @@ f_to_mfa(EF,R,F,A):-w_get_fa(EF,F,A),
               current_predicate(R:F/A).
 
 
-%% w_get_fa( ?PI, ?F, ?A) is semidet.
+%% w_get_fa(+PI, ?F, ?A) is semidet.
 %
 % W Get Functor-arity.
 %
@@ -735,7 +735,7 @@ w_get_fa(Mask,F,A):-get_functor(Mask,F,A).
 
 
 
-%% set_prolog_stack_gb( ?Six) is semidet.
+%% set_prolog_stack_gb(+Six) is semidet.
 %
 % Set Prolog Stack Gb.
 %
@@ -766,7 +766,7 @@ is_mpred_action('$VAR'(_)):-!,fail.
 is_mpred_action(remove_if_unsupported(_,_)).
 is_mpred_action(P):-predicate_property(P,static).
 
-%% mpred_is_builtin( ?P) is semidet.
+%% mpred_is_builtin(+P) is semidet.
 %
 % PFC If Is A Builtin.
 %
@@ -805,7 +805,7 @@ record_se:- (t_l:use_side_effect_buffer ; t_l:verify_side_effect_buffer).
 
 
 
-%% add_side_effect( ?Op, ?Data) is semidet.
+%% add_side_effect(+Op, ?Data) is semidet.
 %
 % Add Side Effect.
 %
@@ -837,7 +837,7 @@ attvar_op(Op,Data):- strip_module(Op,_,OpA), sanity((atom(OpA))),
     
 
 
-%% erase_w_attvars( ?Data0, ?Ref) is semidet.
+%% erase_w_attvars(+Data0, ?Ref) is semidet.
 %
 % Erase W Attribute Variables.
 %
@@ -845,14 +845,14 @@ erase_w_attvars(Data0,Ref):- physical_side_effect(erase(Ref)),add_side_effect(er
 
 :- thread_local(t_l:no_physical_side_effects/0).
 
-%% physical_side_effect( ?PSE) is semidet.
+%% physical_side_effect(+PSE) is semidet.
 %
 % Physical Side Effect.
 %
 physical_side_effect(PSE):- is_side_effect_disabled,!,mpred_warn('no_physical_side_effects ~p',PSE).
 physical_side_effect(PSE):- PSE.
 
-%% mpred_no_chaining( ?Goal) is semidet.
+%% mpred_no_chaining(+Goal) is semidet.
 %
 % PFC No Chaining.
 %
@@ -877,7 +877,7 @@ make_uu_remove((U,U)):-match_source_ref1(U).
 % TODO ISSUE https://github.com/TeamSPoon/PrologMUD/issues/7
 :- was_export(get_source_ref/1).
 
-%% get_source_ref1( ?Mt) is semidet.
+%% get_source_ref1(+Mt) is semidet.
 %
 % Get Source Ref Secondary Helper.
 %
@@ -903,7 +903,7 @@ has_functor(C):- (\+ is_ftCompound(C)),!,fail.
 has_functor(C):-is_ftCompound(C),\+is_list(C).
 
 
-%% mpred_each_literal( ?P, ?E) is semidet.
+%% mpred_each_literal(+P, ?E) is semidet.
 %
 % PFC Each Literal.
 %
@@ -932,7 +932,7 @@ fix_negations(C,CO):-C=..[F|CL],must_maplist(fix_negations,CL,CLO),!,CO=..[F|CLO
 
 
 
-%% to_addable_form_wte( ?Why, :TermI, :TermO) is semidet.
+%% to_addable_form_wte(+Why, :TermI, :TermO) is semidet.
 %
 % Converted To Addable Form Wte.
 %
@@ -954,13 +954,13 @@ to_addable_form_wte(Why,P0,P):- notrace((
     ignore((((P0\=@=P,P0\=isa(_,_)),mpred_trace_msg((to_addable_form(Why):-[P0,P]))))))),!.
 
 
-%% retract_eq_quitely( ?H) is semidet.
+%% retract_eq_quitely(+H) is semidet.
 %
 % Retract Using (==/2) (or =@=/2) ) Quitely.
 %
 retract_eq_quitely(H):- with_umt(retract_eq_quitely_f(H)).
 
-%% retract_eq_quitely_f( ?H) is semidet.
+%% retract_eq_quitely_f(+H) is semidet.
 %
 % Retract Using (==/2) (or =@=/2) ) Quitely False.
 %
@@ -969,14 +969,14 @@ retract_eq_quitely_f(pfclog(H)):- retract_eq_quitely_f(H),fail.
 retract_eq_quitely_f((H)):- clause_asserted_i(H,true,Ref),erase(Ref).
 
 
-%% assert_eq_quitely( ?H) is semidet.
+%% assert_eq_quitely(+H) is semidet.
 %
 % Assert Using (==/2) (or =@=/2) ) Quitely.
 %
 assert_eq_quitely(H):- attvar_op(assert_if_new,H).
 
 
-%% reduce_clause_from_fwd( ?H, ?H) is semidet.
+%% reduce_clause_from_fwd(+H, ?H) is semidet.
 %
 % Reduce Clause Converted From Forward Repropigated.
 %
@@ -993,7 +993,7 @@ reduce_clause_from_fwd(H,H).
 
 
 
-%% to_addable_form( ?I, ?I) is semidet.
+%% to_addable_form(+I, ?I) is semidet.
 %
 % Converted To Addable Form.
 %
@@ -1010,7 +1010,7 @@ to_addable_form(I,O):- must((bagof(M,do_expand_args(isEachAF,I,M),IM))),list_to_
 
 
 
-%% to_predicate_isas_each( ?I, ?O) is semidet.
+%% to_predicate_isas_each(+I, ?O) is semidet.
 %
 % Converted To Predicate Isas Each.
 %
@@ -1028,7 +1028,7 @@ to_predicate_isas((H,T),(HH,TT)):-!,to_predicate_isas(H,HH),to_predicate_isas(T,
 to_predicate_isas(I,O):-must(to_predicate_isas0(I,O)),!.
 
 
-%% append_as_first_arg( ?C, ?I, ?V) is semidet.
+%% append_as_first_arg(+C, ?I, ?V) is semidet.
 %
 % Append Converted To First Argument.
 %
@@ -1050,7 +1050,7 @@ to_predicate_isas0(C,CO):-C=..[F|CL],must_maplist(to_predicate_isas0,CL,CLO),!,C
 
 :- source_location(F,_),asserta(absolute_source_location_pfc(F)).
 
-%% exact_args( ?Q) is semidet.
+%% exact_args(+Q) is semidet.
 %
 % Exact Arguments.
 %
@@ -1075,7 +1075,7 @@ exact_args(true).
 % exact_args(C):-source_file(C,I),absolute_source_location_pfc(I).
 
 
-%% mpred_is_tautology( ?Var) is semidet.
+%% mpred_is_tautology(+Var) is semidet.
 %
 % PFC If Is A Tautology.
 %
@@ -1098,7 +1098,7 @@ mpred_is_taut(B==>(A,_)):- mpred_is_assertable(A),mpred_is_taut(A==>B),!.
 mpred_is_taut(B==>(_,A)):- mpred_is_assertable(A),mpred_is_taut(A==>B),!.
 
 
-%% loop_check_nr( ?CL) is semidet.
+%% loop_check_nr(+CL) is semidet.
 %
 % Loop Check Nr.
 %
@@ -1107,7 +1107,7 @@ loop_check_nr(CL):- loop_check(no_repeats(CL)).
 % lmconf:decl_database_hook(Op,Hook):- loop_check_nr(pfc_provide_storage_op(Op,Hook)).
 
 
-%% is_retract_first( ?VALUE1) is semidet.
+%% is_retract_first(+VALUE1) is semidet.
 %
 % If Is A Retract First.
 %
@@ -1115,7 +1115,7 @@ is_retract_first(one).
 is_retract_first(a).
 
 
-%% pfc_provide_storage_op( ?Op, ?I1) is semidet.
+%% pfc_provide_storage_op(+Op, ?I1) is semidet.
 %
 % Prolog Forward Chaining Provide Storage Oper..
 %
@@ -1131,7 +1131,7 @@ pfc_provide_storage_op(change(retract,all),FactOrRule):- loop_check_nr(mpred_rem
 % pfc_provide_storage_op(is_asserted,FactOrRule):- is_ftNonvar(FactOrRule),!,loop_check_nr(clause_i(FactOrRule)).
 
 
-%% mpred_clause_is_asserted_hb_nonunify( ?H, :TermB) is semidet.
+%% mpred_clause_is_asserted_hb_nonunify(+H, :TermB) is semidet.
 %
 % PFC Clause If Is A Asserted Head+body Nonunify.
 %
@@ -1145,7 +1145,7 @@ mpred_clause_is_asserted_hb_nonunify(H,B):- clause_u( <-( H , B) , true).
 mpred_clause_is_asserted_hb_nonunify(H,B):- mpred_clause_is_asserted(H,B).
 
 
-%% mpred_clause_is_asserted( ?H, ?B) is semidet.
+%% mpred_clause_is_asserted(+H, ?B) is semidet.
 %
 % PFC Clause If Is A Asserted.
 %
@@ -1157,7 +1157,7 @@ mpred_clause_is_asserted(H,B):- modulize_head(H,HH), (has_cl(HH) -> clause_i(HH,
 % pfcDatabaseGoal(G):-is_ftCompound(G),get_functor(G,F,A),pfcDatabaseTerm(F/A).
 
 
-%% mpred_provide_storage_clauses( ?VALUE1, ?H, ?B, ?Proof) is semidet.
+%% mpred_provide_storage_clauses(+VALUE1, ?H, ?B, ?Proof) is semidet.
 %
 % Hook To [lmconf:mpred_provide_storage_clauses/4] For Module Mpred_pfc.
 % PFC Provide Storage Clauses.
@@ -1167,7 +1167,7 @@ lmconf:mpred_provide_storage_clauses(pfc,H,B,Proof):-mpred_clause(H,B,Proof).
 %mpred_clause('nesc'(H),B,forward(Proof)):- is_ftNonvar(H),!, lmconf:mpred_provide_storage_clauses(H,B,Proof).
 %mpred_clause(H,B,forward(R)):- R=(==>(B,H)),clause_i(R,true).
 
-%% mpred_clause( ?H, ?B, ?Why) is semidet.
+%% mpred_clause(+H, ?B, ?Why) is semidet.
 %
 % PFC Clause.
 %
@@ -1178,7 +1178,7 @@ mpred_clause(H,B,Why):-has_cl(H),clause_i(H,CL,R),mpred_pbody(H,CL,R,B,Why).
 % mpred_clause(H,true, pfcTypeFull(R)):-pfcDatabaseTerm(F/A),make_functor(R,F,A),pfcTypeFull(R,Type),Type\=rule,clause(R,true),once(pfcRuleOutcomeHead(R,H)).
 
 
-%% mpred_pbody( ?H, ?B, ?R, ?BIn, ?WHY) is semidet.
+%% mpred_pbody(+H, ?B, ?R, ?BIn, ?WHY) is semidet.
 %
 % PFC Pbody.
 %
@@ -1188,7 +1188,7 @@ mpred_pbody(H,B,R,BIn,WHY):- is_true(B),!,BIn=B,get_why(H,H,R,WHY).
 mpred_pbody(H,B,R,B,asserted(R,(H:-B))).
 
 
-%% get_why( ?VALUE1, ?CL, ?R, :TermR) is semidet.
+%% get_why(+VALUE1, ?CL, ?R, :TermR) is semidet.
 %
 % Get Generation Of Proof.
 %
@@ -1197,7 +1197,7 @@ get_why(H,CL,R,deduced(R,WHY)):- (mpred_get_support(H,WH)*->WHY=(H=WH);(mpred_ge
 
 
 
-%% mpred_pbody_f( ?H, ?CL, ?R, ?B, ?WHY) is semidet.
+%% mpred_pbody_f(+H, ?CL, ?R, ?B, ?WHY) is semidet.
 %
 % PFC Pbody False.
 %
@@ -1208,7 +1208,7 @@ mpred_pbody_f(H,CL,R,B,WHY):- CL=(B<==>HH),sub_term_eq(H,HH),!,get_why(H,CL,R,WH
 mpred_pbody_f(H,CL,R,fail,infoF(CL)):- trace_or_throw(mpred_pbody_f(H,CL,R)).
 
 
-%% sub_term_eq( ?H, ?HH) is semidet.
+%% sub_term_eq(+H, ?HH) is semidet.
 %
 % Sub Term Using (==/2) (or =@=/2) ).
 %
@@ -1216,7 +1216,7 @@ sub_term_eq(H,HH):-H==HH,!.
 sub_term_eq(H,HH):-each_subterm(HH,ST),ST==H,!.
 
 
-%% sub_term_v( ?H, ?HH) is semidet.
+%% sub_term_v(+H, ?HH) is semidet.
 %
 % Sub Term V.
 %
@@ -1246,7 +1246,7 @@ all_different_head_vals_2(H,[A]):-arg(_,H,E1),E1\==A, compound(E1), contains_var
 all_different_head_vals_2(_,_).
    	 
 
-%% mpred_rule_hb( ?Outcome, ?OutcomeO, ?AnteO) is semidet.
+%% mpred_rule_hb(+Outcome, ?OutcomeO, ?AnteO) is semidet.
 %
 % PFC Rule Head+body.
 %
@@ -1254,7 +1254,7 @@ mpred_rule_hb(Outcome,OutcomeO,AnteO):-hotrace((mpred_rule_hb_0(Outcome,OutcomeO
 :-mpred_trace_nochilds(mpred_rule_hb/3).
 
 
-%% mpred_rule_hb_0( ?Outcome, ?OutcomeO, ?VALUE3) is semidet.
+%% mpred_rule_hb_0(+Outcome, ?OutcomeO, ?VALUE3) is semidet.
 %
 % PFC rule Head+Body  Primary Helper.
 %
@@ -1286,7 +1286,7 @@ mpred_rule_hb_0((Outcome:-Ante),Outcome,Ante):-!.
 mpred_rule_hb_0(Outcome,Outcome,true).
 
 
-%% ain_minfo( ?G) is semidet.
+%% ain_minfo(+G) is semidet.
 %
 % Assert If New Metainformation.
 %
@@ -1330,7 +1330,7 @@ mpred_is_info(infoF(C)):-is_ftNonvar(C),!.
 
 %:- was_dynamic(not_not/1).
 
-%% mpred_rewrap_h( ?A, ?A) is semidet.
+%% mpred_rewrap_h(+A, ?A) is semidet.
 %
 % PFC Rewrap Head.
 %
@@ -1363,19 +1363,19 @@ bwc:-true.
 %
 wac:-true.
 
-%% is_fc_body( ?P) is semidet.
+%% is_fc_body(+P) is semidet.
 %
 % If Is A Forward Chaining Body.
 %
 is_fc_body(P):-cwc, has_body_atom(fwc,P).
 
-%% is_bc_body( ?P) is semidet.
+%% is_bc_body(+P) is semidet.
 %
 % If Is A Backchaining Body.
 %
 is_bc_body(P):-cwc, has_body_atom(bwc,P).
 
-%% is_action_body( ?P) is semidet.
+%% is_action_body(+P) is semidet.
 %
 % If Is A Action Body.
 %
@@ -1383,7 +1383,7 @@ is_action_body(P):-cwc, has_body_atom(wac,P).
 
 
 
-%% has_body_atom( ?WAC, ?P) is semidet.
+%% has_body_atom(+WAC, ?P) is semidet.
 %
 % Has Body Atom.
 %
@@ -1415,7 +1415,7 @@ mpred_is_silient :- ( \+ t_l:mpred_debug_local, \+ mpred_is_tracing_exec, \+ mpr
 % assert_u(X):- \+ (is_ftCompound(X)),!,asserta_u(X,X,0).
 
 
-%% assert_u( ?X) is semidet.
+%% assert_u(+X) is semidet.
 %
 % Assert For User Code.
 %
@@ -1423,7 +1423,7 @@ assert_u(M:X):- !,functor(X,F,A),assert_u(M,X,F,A).
 assert_u(X):- functor(X,F,A),assert_u(abox,X,F,A).
 
 
-%% assert_u( ?M, ?X, ?F, ?VALUE4) is semidet.
+%% assert_u(+M, ?X, ?F, ?VALUE4) is semidet.
 %
 % Assert For User Code.
 %
@@ -1436,14 +1436,14 @@ assert_u(M,X,_,_):- assertz_mu(M,X).
 
 
 
-%% check_never_assert( ?X) is semidet.
+%% check_never_assert(+X) is semidet.
 %
 % Check Never Assert.
 %
 check_never_assert(X):- hotrace((( copy_term_and_varnames(X,Y),call_u(never_assert_u(Y,Why)),X=@=Y,trace_or_throw(never_assert_u(X,Why))))),fail.
 check_never_assert(X):- hotrace(ignore(( copy_term_and_varnames(X,Y),call_u(never_assert_u(Y)),X=@=Y,trace_or_throw(never_assert_u(X))))).
 
-%% check_never_retract( ?X) is semidet.
+%% check_never_retract(+X) is semidet.
 %
 % Check Never Retract.
 %
@@ -1451,7 +1451,7 @@ check_never_retract(X):- hotrace(ignore(( copy_term_and_varnames(X,Y),call_u(nev
 
 
 
-%% assertz_u( ?X) is semidet.
+%% assertz_u(+X) is semidet.
 %
 % Assertz For User Code.
 %
@@ -1459,7 +1459,7 @@ assertz_u(M:X):-!,assertz_mu(M,X).
 assertz_u(X):- assertz_mu(abox,X).
 
 
-%% assertz_mu( ?M, ?X) is semidet.
+%% assertz_mu(+M, ?X) is semidet.
 %
 % Assertz Module Unit.
 %
@@ -1483,26 +1483,26 @@ retract_u((X)):-!,show_success(why,retract_eq_quitely_f((X))),must((expire_table
 retract_u(X):-show_if_debug(attvar_op(retract_eq,X)),!,must((expire_tabled_list(X))).
 
 
-%% retractall_u( ?X) is semidet.
+%% retractall_u(+X) is semidet.
 %
 % Retractall For User Code.
 %
 retractall_u(X):-retractall(X),must((expire_tabled_list(X))).
 
-%% clause_u( ?H, ?B) is semidet.
+%% clause_u(+H, ?B) is semidet.
 %
 % Clause For User Code.
 %
 clause_u(H,B):- must(H\==true),catchv(clause_i(H,B),_,fail).
 
-%% clause_u( ?H, ?B, ?Ref) is semidet.
+%% clause_u(+H, ?B, ?Ref) is semidet.
 %
 % Clause For User Code.
 %
 clause_u(H,B,Ref):-must(H\==true),catchv(clause_i(H,B,Ref),_,fail).
 
 
-%% mpred_update_literal( ?P, ?N, ?Q, ?R) is semidet.
+%% mpred_update_literal(+P, ?N, ?Q, ?R) is semidet.
 %
 % PFC Update Literal.
 %
@@ -1512,7 +1512,7 @@ mpred_update_literal(P,N,Q,R):-
     call(replace_arg(Q,N,NEW,R)).
 
 
-%% update_single_valued_arg( ?P, ?N) is semidet.
+%% update_single_valued_arg(+P, ?N) is semidet.
 %
 % Update Single Valued Argument.
 %
@@ -1547,7 +1547,7 @@ clause_prologsys(H,B):-clause_i(H,B).
 clause_prologsys(H,B,Ref):-clause_i(H,B,Ref).
 */
 
-%% call_prologsys( ?X) is semidet.
+%% call_prologsys(+X) is semidet.
 %
 % Call Prologsys.
 %
@@ -1557,37 +1557,37 @@ call_prologsys(X):-with_umt(X).
 % internal bookkeeping
 % ======================= 
 
-%% assert_i( ?X) is semidet.
+%% assert_i(+X) is semidet.
 %
 % Assert For Internal Interface.
 %
 assert_i(X):- check_never_assert(X), attvar_op(assert_if_new,X).
 
-%% asserta_i( ?X) is semidet.
+%% asserta_i(+X) is semidet.
 %
 % Asserta For Internal Interface.
 %
 asserta_i(X):- check_never_assert(X), attvar_op(asserta_if_new,X).
 
-%% assertz_i( ?X) is semidet.
+%% assertz_i(+X) is semidet.
 %
 % Assertz For Internal Interface.
 %
 assertz_i(X):- check_never_assert(X), attvar_op(assertz_if_new,X).
 
-%% retract_i( ?X) is semidet.
+%% retract_i(+X) is semidet.
 %
 % Retract For Internal Interface.
 %
 retract_i(X):- check_never_retract(X),attvar_op(retract,X).
 
-%% clause_i( ?H, ?B) is semidet.
+%% clause_i(+H, ?B) is semidet.
 %
 % Clause For Internal Interface.
 %
 clause_i(H,B):- clause_i(H,B,_).
 
-%% clause_i( ?H, ?B, ?Ref) is semidet.
+%% clause_i(+H, ?B, ?Ref) is semidet.
 %
 % Clause For Internal Interface.
 %
@@ -1604,13 +1604,13 @@ clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B
 % clause_asserted_i(H,B,Ref):- clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B).
 
 
-%% call_i( ?X) is semidet.
+%% call_i(+X) is semidet.
 %
 % Call For Internal Interface.
 %
 call_i(X):-call(X).
 
-%% retractall_i( ?X) is semidet.
+%% retractall_i(+X) is semidet.
 %
 % Retractall For Internal Interface.
 %
@@ -1620,14 +1620,14 @@ retractall_i(X):-attvar_op(retractall,X).
 % utils
 % ======================= 
 
-%% map_literals( ?P, ?G) is semidet.
+%% map_literals(+P, ?G) is semidet.
 %
 % Map Literals.
 %
 map_literals(P,G):-map_literals(P,G,[]).
 
 
-%% map_literals( ?VALUE1, :TermH, ?VALUE3) is semidet.
+%% map_literals(+VALUE1, :TermH, ?VALUE3) is semidet.
 %
 % Map Literals.
 %
@@ -1653,13 +1653,13 @@ map_unless(Test,Pred,[H|T],S):-!, apply(Pred,[H|S]), map_unless(Test,Pred,T,S).
 map_unless(Test,Pred,H,S):-H=..List,!,map_unless(Test,Pred,List,S),!.
 
 
-%% map_first_arg( ?Pred, ?List) is semidet.
+%% map_first_arg(+Pred, ?List) is semidet.
 %
 % PFC Maptree.
 %
 map_first_arg(Pred,List):-map_first_arg(Pred,List,[]).
 
-%% map_first_arg( ?Pred, :TermH, ?S) is semidet.
+%% map_first_arg(+Pred, :TermH, ?S) is semidet.
 %
 % PFC Maptree.
 %
@@ -1676,7 +1676,7 @@ map_first_arg(Pred,H,S):-apply(Pred,[H|S]).
 %example pfcVerifyMissing(mudColor(I,D), mudColor(I,C), ((mudColor(I,C), {D==C});-mudColor(I,C))). 
 
 
-%% pfcVerifyMissing( ?GC, ?GO, ?GO) is semidet.
+%% pfcVerifyMissing(+GC, ?GO, ?GO) is semidet.
 %
 % Prolog Forward Chaining Verify Missing.
 %
@@ -1685,7 +1685,7 @@ pfcVerifyMissing(GC, GO, ((GO, {D==C});\+ GO) ):-  GC=..[F,A|Args],append(Left,[
 %example mpred_freeLastArg(mpred_isa(I,C),~(mpred_isa(I,C))):-is_ftNonvar(C),!.
 %example mpred_freeLastArg(mpred_isa(I,C),(mpred_isa(I,F),C\=F)):-!.
 
-%% mpred_freeLastArg( ?G, ?GG) is semidet.
+%% mpred_freeLastArg(+G, ?GG) is semidet.
 %
 % PFC Free Last Argument.
 %
@@ -1693,14 +1693,14 @@ mpred_freeLastArg(G,GG):- G=..[F,A|Args],append(Left,[_],Args),append(Left,[_],N
 mpred_freeLastArg(_G,false).
 
 
-%% mpred_current_op_support( ?VALUE1) is semidet.
+%% mpred_current_op_support(+VALUE1) is semidet.
 %
-% PFC Current Oper. Support.
+% PFC Current Oper. WS.
 %
 mpred_current_op_support((p,p)):-!.
 
 
-%% pfcVersion( ?VALUE1) is semidet.
+%% pfcVersion(+VALUE1) is semidet.
 %
 % Prolog Forward Chaining Version.
 %
@@ -1708,9 +1708,9 @@ pfcVersion(6.6).
 
 
 
-%% correctify_support( ?S, ?S) is semidet.
+%% correctify_support(+S, ?S) is semidet.
 %
-% Correctify Support.
+% Correctify WS.
 %
 correctify_support((S,T),(S,T)):-!.
 correctify_support(U,(U,U)):-atom(U),!.
@@ -1723,7 +1723,7 @@ correctify_support([U],S):-correctify_support(U,S).
 %=  nothing, else assert_db Q.
 
 
-%% mpred_set_default( ?GeneralTerm, ?Default) is semidet.
+%% mpred_set_default(+GeneralTerm, ?Default) is semidet.
 %
 % PFC Init For Internal Interface.
 %
@@ -1739,38 +1739,38 @@ lmconf:module_local_init:- mpred_set_default(sm(_), sm(direct)).
 % aliases
 
 
-%% mpred_ain( ?G) is semidet.
+%% mpred_ain(+G) is semidet.
 %
 % PFC Assert If New.
 %
 mpred_ain(G):-pfc_add(G).
 
-%% mpred_ainz( ?G) is semidet.
+%% mpred_ainz(+G) is semidet.
 %
 % PFC Ainz.
 %
 mpred_ainz(G):-pfc_add(G).
 
-%% mpred_aina( ?G) is semidet.
+%% mpred_aina(+G) is semidet.
 %
 % PFC Aina.
 %
 mpred_aina(G):-pfc_add(G).
 
 
-%% mpred_ain( ?G, ?S) is semidet.
+%% mpred_ain(+G, ?S) is semidet.
 %
 % PFC Assert If New.
 %
 mpred_ain(G,S):- ain(G,S).
 
-%% mpred_ainz( ?G, ?S) is semidet.
+%% mpred_ainz(+G, ?S) is semidet.
 %
 % PFC Ainz.
 %
 mpred_ainz(G,S):-ain(G,S).
 
-%% mpred_aina( ?G, ?S) is semidet.
+%% mpred_aina(+G, ?S) is semidet.
 %
 % PFC Aina.
 %
@@ -1781,7 +1781,7 @@ mpred_aina(G,S):-ain(G,S).
 
 %= ain(P,S) asserts P into the user''s dataBase with support from S.
 
-%% pfc_add( ?P) is semidet.
+%% pfc_add(+P) is semidet.
 %
 % Prolog Forward Chaining Add.
 %
@@ -1789,7 +1789,7 @@ pfc_add(P) :-
   ain_fast(P),mpred_run.
 
 
-%% ain( ?P, ?S) is semidet.
+%% ain(+P, ?S) is semidet.
 %
 % Assert If New.
 %
@@ -1798,7 +1798,7 @@ ain(P,S) :-
 
 
 
-%% ain_fast( ?P0) is semidet.
+%% ain_fast(+P0) is semidet.
 %
 % Assert If New Fast.
 %
@@ -1808,7 +1808,7 @@ ain_fast(P0):-
 
 
 
-%% ain_fast( ?P0, ?S) is semidet.
+%% ain_fast(+P0, ?S) is semidet.
 %
 % Assert If New Fast.
 %
@@ -1816,7 +1816,7 @@ ain_fast(nesc(P),S) :- nonvar(P),!,ain_fast(P,S).
 ain_fast(P0,S):- gripe_time(23.6,ain_fast_timed(P0,S)).
 
 
-%% ain_fast_timed( ?P0, ?S) is semidet.
+%% ain_fast_timed(+P0, ?S) is semidet.
 %
 % Assert If New Fast Timed.
 %
@@ -1835,7 +1835,7 @@ ain_fast_timed(P000,S0):- check_context_module,
 
 % a really common example is people want unbound predicate backchaining .. that is to query the predicates witha  varaible where the predciate is 
 
-%% ain_fast_sp( ?S, ?P0) is semidet.
+%% ain_fast_sp(+S, ?P0) is semidet.
 %
 % Assert If New Fast Sp.
 %
@@ -1846,7 +1846,7 @@ ain_fast_sp(S,P0):-
 
 % ain_fast_sp(S,P->Q) :-!,ain_fast_sp(S,P==>Q).
 
-%% ain_fast_sp0( ?S, ?P) is semidet.
+%% ain_fast_sp0(+S, ?P) is semidet.
 %
 % Assert If New Fast Sp Primary Helper.
 %
@@ -1877,7 +1877,7 @@ ain(G):- !, with_umt(mpred_ain(G)).
 % each fact (or the singelton) mpred_post1 is called. It always succeeds.
 
 
-%% mpred_post( ?P, ?S) is semidet.
+%% mpred_post(+P, ?S) is semidet.
 %
 % PFC Post.
 %
@@ -1893,7 +1893,7 @@ mpred_post(P,S) :-
 % adds an entry to the pfc queue for subsequent forward chaining.
 % It always succeeds.
 
-%% mpred_post1( ?P0, ?S) is semidet.
+%% mpred_post1(+P0, ?S) is semidet.
 %
 % PFC Post Secondary Helper.
 %
@@ -1905,7 +1905,7 @@ mpred_post1(P0,S):-
        mpred_post_sp_zzz(S,P)).
 
 
-%% mpred_post_sp( ?S, ?P) is semidet.
+%% mpred_post_sp(+S, ?P) is semidet.
 %
 % PFC Post Sp.
 %
@@ -1913,7 +1913,7 @@ mpred_post_sp(S,P):- mpred_post_sp_zzz(S,P).
 
 
 
-%% mpred_post_sp_zzz( ?S, ?P) is semidet.
+%% mpred_post_sp_zzz(+S, ?P) is semidet.
 %
 % PFC Post Sp Zzz.
 %
@@ -1935,7 +1935,7 @@ mpred_post_sp_zzz(S,P):-mpred_post_sp_zzzz(S,P),!.
 
 
 
-%% mpred_post_sp_zzzz( ?S, ?P) is semidet.
+%% mpred_post_sp_zzzz(+S, ?P) is semidet.
 %
 % PFC Post Sp Zzzz.
 %
@@ -1961,7 +1961,7 @@ mpred_post_sp_zzzz(S,~(P)) :-!, mpred_post1_sp_0(S,~(P)),!,assert_u(~(P)).
 mpred_post_sp_zzzz(S,P) :- mpred_post1_sp_0(S,P).
 
 
-%% mpred_post1_sp_0( ?S, ?P) is semidet.
+%% mpred_post1_sp_0(+S, ?P) is semidet.
 %
 % PFC post Secondary Helper sp  Primary Helper.
 %
@@ -1972,7 +1972,7 @@ mpred_post1_sp_0(S,P) :-
   mpred_post1_sp_1(S,P).
 
 
-%% mpred_post1_sp_1( ?S, ?P) is semidet.
+%% mpred_post1_sp_1(+S, ?P) is semidet.
 %
 % PFC post Secondary Helper sp  Secondary Helper.
 %
@@ -1989,13 +1989,13 @@ mpred_post1_sp_1(_,_). % already added
 mpred_post1_sp_1(S,P) :-  mpred_warn("mpred_post1(~p,~p) failed",[P,S]).
 
 
-%% with_mpred_trace_exec( ?P) is semidet.
+%% with_mpred_trace_exec(+P) is semidet.
 %
 % Using Managed Predicate  Trace exec.
 %
 with_mpred_trace_exec(P):- w_tl(t_l:mpred_debug_local,w_tl(mpred_is_tracing_exec, must(show_if_debug(P)))).
 
-%% with_mpred_trace_exec( ?P) is semidet.
+%% with_mpred_trace_exec(+P) is semidet.
 %
 % Without Trace exec.
 %
@@ -2003,7 +2003,7 @@ with_no_mpred_trace_exec(P):- get_user_abox(M),
    wno_tl(t_l:mpred_debug_local,wno_tl(M:mpred_is_tracing_exec, must(show_if_debug(P)))).
 
 
-%% mpred_test( ?P) is semidet.
+%% mpred_test(+P) is semidet.
 %
 % PFC Test.
 %
@@ -2027,7 +2027,7 @@ clause_asserted_local(CL):- must(CL=spft(ABOX,P,Fact,Trigger,UOldWhy)),!,
 
 
 
-%% is_already_supported( ?P, ?S, ?UU) is semidet.
+%% is_already_supported(+P, ?S, ?UU) is semidet.
 %
 % If Is A Already Supported.
 %
@@ -2039,7 +2039,7 @@ is_already_supported(P,_S,UU):- get_user_abox_umt(ABOX),clause_asserted_local(sp
 
 
 
-%% if_missing_mask( ?Q, ?R, ?Test) is semidet.
+%% if_missing_mask(+Q, ?R, ?Test) is semidet.
 %
 % If Missing Mask.
 %
@@ -2048,7 +2048,7 @@ if_missing_mask(Q,R,Test):-
    if_missing_mask(Q,N,R,Test).
 
 
-%% if_missing_mask( ?Q, ?N, ?R, ?Test) is semidet.
+%% if_missing_mask(+Q, ?N, ?R, ?Test) is semidet.
 %
 % If Missing Mask.
 %
@@ -2068,7 +2068,7 @@ if_missing_mask(Q,N,R,dif:dif(Was,NEW)):-
 */
 
 
-%% which_missing_argnum( ?VALUE1, ?VALUE2) is semidet.
+%% which_missing_argnum(+VALUE1, ?VALUE2) is semidet.
 %
 % Which Missing Argnum.
 %
@@ -2080,7 +2080,7 @@ which_missing_argnum(Q,N):-
 
 % was nothing  mpred_current_db/1.
 
-%% mpred_current_db( ?U) is semidet.
+%% mpred_current_db(+U) is semidet.
 %
 % PFC Current Database.
 %
@@ -2099,7 +2099,7 @@ mpred_current.
 %=
 
 
-%% ain_db_to_head( ?P, ?NewP) is semidet.
+%% ain_db_to_head(+P, ?NewP) is semidet.
 %
 % Assert If New Database Converted To Head.
 %
@@ -2113,7 +2113,7 @@ ain_db_to_head(P,NewP) :-
 % mpred_unique_u(X) is true if there is no assertion X in the prolog db.
 
 
-%% mpred_unique_u( ?P) is semidet.
+%% mpred_unique_u(+P) is semidet.
 %
 % PFC Unique For User Code.
 %
@@ -2126,7 +2126,7 @@ mpred_unique_u(P) :-
 
 
 
-%% mpred_unique_i( ?P) is semidet.
+%% mpred_unique_i(+P) is semidet.
 %
 % PFC Unique For Internal Interface.
 %
@@ -2219,7 +2219,7 @@ mpred_step :-
   get_next_fact(P,S) -> pfcl_do(mpred_fwd(P,S)),!.
 
 
-%% get_next_fact( ?P, ?WS) is semidet.
+%% get_next_fact(+P, ?WS) is semidet.
 %
 % Get Next Fact.
 %
@@ -2229,7 +2229,7 @@ get_next_fact(P,WS) :-
   remove_selection(P,WS).
 
 
-%% remove_selection( ?P, ?S) is semidet.
+%% remove_selection(+P, ?S) is semidet.
 %
 % Remove Selection.
 %
@@ -2245,7 +2245,7 @@ remove_selection(P,S) :-
 % It tries the user defined predicate first and, failing that,
 %  the mdefault mechanism.
 
-%% select_next_fact( ?P, ?S) is semidet.
+%% select_next_fact(+P, ?S) is semidet.
 %
 % Select Next Fact.
 %
@@ -2258,7 +2258,7 @@ select_next_fact(P,S) :-
 
 % the mdefault selection predicate takes the item at the froint of the queue.
 
-%% defaultmpred_select( ?P, ?S) is semidet.
+%% defaultmpred_select(+P, ?S) is semidet.
 %
 % Defaultmpred Select.
 %
@@ -2275,14 +2275,14 @@ defaultmpred_select(P,S) :- get_user_abox_umt(ABOX),qu(ABOX,P,S),!.
 mpred_halt :-  mpred_halt("",[]).
 
 
-%% mpred_halt( ?Format) is semidet.
+%% mpred_halt(+Format) is semidet.
 %
 % PFC Halt.
 %
 mpred_halt(Format) :- mpred_halt(Format,[]).
 
 
-%% mpred_halt( ?Format, ?Args) is semidet.
+%% mpred_halt(+Format, ?Args) is semidet.
 %
 % PFC Halt.
 %
@@ -2300,79 +2300,79 @@ mpred_halt(Format,Args) :-
 %= predicates for manipulating triggers
 %=
 
-%% ain_trigger( ?TriggerBody, ?Support) is semidet.
+%% ain_trigger(+TriggerBody, ?WS) is semidet.
 %
 % Assert If New Trigger.
 %
-ain_trigger(TriggerBody,Support) :- mpred_had_support(TriggerBody,Support),!,mpred_trace_msg('Had Support',TriggerBody).
+ain_trigger(TriggerBody,WS) :- mpred_had_support(TriggerBody,WS),!,mpred_trace_msg('Had WS',TriggerBody).
 
-% ain_trigger(Trig,Support) :-  !,copy_term(Trig,TriggerBody), ain_trigger_0(Trig,TriggerBody,Support).
+% ain_trigger(Trig,WS) :-  !,copy_term(Trig,TriggerBody), ain_trigger_0(Trig,TriggerBody,WS).
 
-ain_trigger(Trig,Support) :-
+ain_trigger(Trig,WS) :-
    copy_term_and_varnames(Trig,Int), 
-   loop_check_term(ain_trigger_1(Int,Trig,Support),here,nop((dmsg(ain_trigger_1(Int,Trig,Support))))).
+   loop_check_term(ain_trigger_1(Int,Trig,WS),here,nop((dmsg(ain_trigger_1(Int,Trig,WS))))).
 
-% ain_trigger(_Trig,TriggerBody,Support) :- mpred_had_support(TriggerBody,Support),!,mpred_trace_msg('Had Support',TriggerBody).
+% ain_trigger(_Trig,TriggerBody,WS) :- mpred_had_support(TriggerBody,WS),!,mpred_trace_msg('Had WS',TriggerBody).
 
 
-%% ain_trigger_1( ?Trig, ?Trigger, ?Support) is semidet.
+%% ain_trigger_1(+Trig, ?Trigger, ?WS) is semidet.
 %
 % Assert If New trigger  Secondary Helper.
 %
-ain_trigger_1(Trig,Trigger,Support) :- 
-   ain_support(Trigger,Support), 
+ain_trigger_1(Trig,Trigger,WS) :- 
+   ain_support(Trigger,WS), 
    (mpred_clause_i(Trigger)-> true ; 
       ((
         mpred_trace_msg('Adding For Later',Trigger),
-        ain_trigger_0(Trig,Trigger,Support)))),!.
+        ain_trigger_0(Trig,Trigger,WS)))),!.
 
 
 
-%% ain_trigger_0( ?Trig, :TermX, ?Support) is semidet.
+%% ain_trigger_0(+Trig, :TermX, ?WS) is semidet.
 %
 % Assert If New trigger  Primary Helper.
 %
-ain_trigger_0(Trig,pt(ABOX,Trigger,Body),Support) :- !,
+ain_trigger_0(Trig,pt(ABOX,Trigger,Body),WS) :- !,
   (clause_asserted_i(pt(ABOX,Trigger,Body)) -> trace_or_throw(never_happens(clause_asserted_i(pt(ABOX,Trigger,Body)))) ;   
-     (( ain_ts(pt(ABOX,Trigger,Body),Support),
-        (must(mpred_mark_as(Support,p,Trigger,pfcPosTrigger))),
+     (( ain_ts(pt(ABOX,Trigger,Body),WS),
+        (must(mpred_mark_as(WS,p,Trigger,pfcPosTrigger))),
         add_reprop(Trig,Trigger)))).
 
-ain_trigger_0(Trig,pt(_ABOX,Trigger,_Body),Support) :-!,
-   mpred_mark_as(Support,p,Trigger,pfcPosTrigger),
+ain_trigger_0(Trig,pt(_ABOX,Trigger,_Body),WS) :-!,
+   mpred_mark_as(WS,p,Trigger,pfcPosTrigger),
    add_reprop(Trig,Trigger).
 
-ain_trigger_0(_Trig,bt(ABOX,Trigger,Body),Support) :- 
+ain_trigger_0(_Trig,bt(ABOX,Trigger,Body),WS) :- 
  must((
-   must(ain_ts(bt(ABOX,Trigger,Body),Support)),
+   must(ain_ts(bt(ABOX,Trigger,Body),WS)),
       attvar_op(assertz_if_new,((Trigger:-mpred_bc_only(Trigger)))),!,
       import_to_user(Trigger),
-      must(mpred_mark_as(Support,p,Trigger,pfcBcTrigger)),
+      must(mpred_mark_as(WS,p,Trigger,pfcBcTrigger)),
      % WAS mpred_bt_pt_combine(Trigger,Body).
-   mpred_bt_pt_combine(Trigger,Body,Support))),!.
+   mpred_bt_pt_combine(Trigger,Body,WS))),!.
 
 
-ain_trigger_0(_Trig,bt(_ABOX,Trigger,Body),Support) :- !,
+ain_trigger_0(_Trig,bt(_ABOX,Trigger,Body),WS) :- !,
   import_to_user(Trigger),
   attvar_op(assertz_if_new,((Trigger:-mpred_bc_only(Trigger)))),!,
-  must(mpred_mark_as(Support,p,Trigger,pfcBcTrigger)),
+  must(mpred_mark_as(WS,p,Trigger,pfcBcTrigger)),
      % WAS mpred_bt_pt_combine(Trigger,Body).
-  mpred_bt_pt_combine(Trigger,Body,Support).
+  mpred_bt_pt_combine(Trigger,Body,WS).
 
 
-ain_trigger_0(Trig,nt(ABOX,Trigger,Test,Body),Support) :- !,
+ain_trigger_0(Trig,nt(ABOX,Trigger,Test,Body),WS) :- !,
  get_user_abox_umt(ABOX),
-  (must(mpred_mark_as(Support,n,Trigger,pfcNegTrigger)),
+  (must(mpred_mark_as(WS,n,Trigger,pfcNegTrigger)),
          copy_term_and_varnames(Trigger,TriggerCopy),!,
-         ain_ts(nt(ABOX,TriggerCopy,Test,Body),Support)),
+         ain_ts(nt(ABOX,TriggerCopy,Test,Body),WS)),
   run_nt(ABOX,Trigger,TriggerCopy,Test,Body),
   nop(add_reprop(Trig, Trigger)).
 
-ain_trigger_0(Trig,X,Support) :- mpred_warn("Unrecognized trigger to aintrigger: ~p for ~p",[ain_trigger(X,Support),Trig]).
+ain_trigger_0(Trig,X,WS) :- mpred_warn("Unrecognized trigger to aintrigger: ~p for ~p",[ain_trigger(X,WS),Trig]).
 
 
 
-%% run_nt( ?ABOX, ?Trigger, ?TriggerCopy, ?Test, ?Body) is semidet.
+%% run_nt(+ABOX, ?Trigger, ?TriggerCopy, ?Test, ?Body) is semidet.
 %
 % Run Nt.
 %
@@ -2382,22 +2382,22 @@ run_nt(ABOX,Trigger,TriggerCopy,Test,Body):-
      mpred_eval_lhs(Body,SupportLHS).
 
 
-%% mpred_bt_pt_combine( ?Head, ?Body, ?Support) is semidet.
+%% mpred_bt_pt_combine(+Head, ?Body, ?WS) is semidet.
 %
 % PFC Bt Predicate Type Combine.
 %
-mpred_bt_pt_combine(Head,Body,Support) :-
+mpred_bt_pt_combine(Head,Body,WS) :-
  get_user_abox_umt(ABOX),
-  %= a backward trigger (bt) was just added with head and Body and support Support
+  %= a backward trigger (bt) was just added with head and Body and support WS
   %= find any pt''s with unifying heads and assert the instantied bt body.
   lookup_u(pt(ABOX,Head,_PtBody)),
-  mpred_eval_lhs(Body,Support),
+  mpred_eval_lhs(Body,WS),
   fail.
 mpred_bt_pt_combine(_,_,_) :- !.
 
 
 
-%% lookup_u( ?ABOX, ?Trigger) is semidet.
+%% lookup_u(+ABOX, ?Trigger) is semidet.
 %
 % PFC Get Trigger Incomplete, But Fast, Version.
 %
@@ -2410,16 +2410,16 @@ lookup_u(Trigger) :- ignore(get_user_abox_umt(ABOX)),
 %=
 
 
-%% ain_actiontrace( ?Action, ?Support) is semidet.
+%% ain_actiontrace(+Action, ?WS) is semidet.
 %
 % Assert If New Action Trace.
 %
-ain_actiontrace(Action,Support) :-
+ain_actiontrace(Action,WS) :-
   % adds an action trace and it''s support.
-  ain_support(mpred_action(Action),Support).
+  ain_support(mpred_action(Action),WS).
 
 
-%% mpred_rem_actiontrace( ?VALUE1, :TermARG2) is semidet.
+%% mpred_rem_actiontrace(+VALUE1, :TermARG2) is semidet.
 %
 % PFC Remove/erase Action Trace.
 %
@@ -2435,7 +2435,7 @@ mpred_rem_actiontrace(_,mpred_action(A)) :-
 %=
 %= was simply:  mpred_retract
 
-%% mpred_retract_db_type( ?X) is semidet.
+%% mpred_retract_db_type(+X) is semidet.
 %
 % PFC Retract Database Type.
 %
@@ -2447,7 +2447,7 @@ mpred_retract_db_type(X) :-
 
 
 
-%% mpred_retract_db_type( ?VALUE1, ?ABOX) is semidet.
+%% mpred_retract_db_type(+VALUE1, ?ABOX) is semidet.
 %
 % PFC Retract Database Type.
 %
@@ -2502,7 +2502,7 @@ each_in_list(P,[H|T],S) :-
   call(P,H,S),
   each_in_list(P,T,S).
 
-%% mpred_withdraw( ?List) is semidet.
+%% mpred_withdraw(+List) is semidet.
 %
 % mpred_withdraw/1 is the user''s interface - it withdraws user support for P.
 %
@@ -2511,7 +2511,7 @@ mpred_withdraw(P) :-
   mpred_withdraw(P,UU).
 
 
-%% mpred_withdraw( ?P, ?S) is semidet.
+%% mpred_withdraw(+P, ?S) is semidet.
 %
 % Removes support S from P and checks to see if P is still supported.
 % If it is not, then the fact is retracted from the database and any support
@@ -2530,7 +2530,7 @@ mpred_withdraw(P,S) :-
       ; mpred_warn("mpred_withdraw/2 Could not find support ~p to remove from fact ~p",
                 [S,P]))).
 
-%% mpred_remove( ?P) is semidet.
+%% mpred_remove(+P) is semidet.
 %
 % Ensure it is unasserted
 %
@@ -2538,7 +2538,7 @@ mpred_remove(P):- mpred_remove(P),mpred_unfwc(P).
 mpred_rem(P):- mpred_remove(P),mpred_unfwc(P).      
 
 
-%% mpred_remove( ?P) is semidet.
+%% mpred_remove(+P) is semidet.
 %
 % mpred_remove is like mpred_withdraw, but if P is still in the DB after removing the
 % user''s support, it is retracted by more forceful means (e.g. remove).
@@ -2549,7 +2549,7 @@ mpred_remove(P) :-
   mpred_remove(P,UU).
 
 
-%% mpred_remove( ?P, ?S) is semidet.
+%% mpred_remove(+P, ?S) is semidet.
 %
 % mpred_remove is like mpred_withdraw, but if P is still in the DB after removing the
 % S support, it is retracted by more forceful means (e.g. remove).
@@ -2572,7 +2572,7 @@ mpred_remove(P,S) :-
 % mpred_remove(P):-!,mpred_remove(P).
 % new way
 
-%% mpred_blast( ?F) is semidet.
+%% mpred_blast(+F) is semidet.
 %
 % retracts fact F from the DB and removes any dependent facts
 %
@@ -2581,7 +2581,7 @@ mpred_blast(F) :-
   show_if_debug(mpred_remove_supports(mpred_blast(F),F)),
   mpred_undo(mpred_blast(F),F))).
 
-%% mpred_remove_supports( ?Why, ?F) is semidet.
+%% mpred_remove_supports(+Why, ?F) is semidet.
 %
 % Will remove any remaining supports for fact F, complaining as it goes.
 %
@@ -2596,7 +2596,7 @@ mpred_remove_supports(Why,F) :- fail,
 mpred_remove_supports(_,_).
 
 
-%% mpred_remove_supports_quietly( ?F) is semidet.
+%% mpred_remove_supports_quietly(+F) is semidet.
 %
 % Will remove any remaining supports for fact F, uncomplainingly
 %
@@ -2607,7 +2607,7 @@ mpred_remove_supports_quietly(_).
 
 % mpred_undo(Why,X) undoes X.
 
-%% mpred_undo( ?Why, :TermFact) is semidet.
+%% mpred_undo(+Why, :TermFact) is semidet.
 %
 % Undose any resulting deductions
 %
@@ -2656,7 +2656,7 @@ mpred_undo(Why,   ~(~Fact)):- mpred_undo(Why, Fact),fail.
 
 mpred_undo(Why,Fact):- mpred_undo_u(Why,Fact)*->true;mpred_undo_e(Why,Fact).
 
-%% mpred_undo_u( ?Why, ?Fact) is semidet.
+%% mpred_undo_u(+Why, ?Fact) is semidet.
 %
 % PFC Undo For User Code.
 %
@@ -2667,7 +2667,7 @@ mpred_undo_u(Why,Fact) :-
      mpred_unfwc1(Fact).
 
 
-%% mpred_undo_e( ?Why, ?Fact) is semidet.
+%% mpred_undo_e(+Why, ?Fact) is semidet.
 %
 % PFC Undo E.
 %
@@ -2690,7 +2690,7 @@ mpred_unfwc(UnFact) :-
   
 
 
-%% mpred_unfwc1( ?F) is semidet.
+%% mpred_unfwc1(+F) is semidet.
 %
 % PFC Unfwc Secondary Helper.
 %
@@ -2700,7 +2700,7 @@ mpred_unfwc1(F) :-
   mpred_run.
 
 
-%% mpred_unfwc_check_triggers( ?Sup, ?Clause) is semidet.
+%% mpred_unfwc_check_triggers(+Sup, ?Clause) is semidet.
 %
 % PFC Unfwc Check Triggers.
 %
@@ -2716,9 +2716,9 @@ mpred_unfwc_check_triggers(_Sup,Clause) :-
 mpred_unfwc_check_triggers(_Sup,_).
 
 
-%% mpred_retract_support_relations( ?Why, ?Fact) is semidet.
+%% mpred_retract_support_relations(+Why, ?Fact) is semidet.
 %
-% PFC Retract Support Relations.
+% PFC Retract WS Relations.
 %
 mpred_retract_support_relations(Why,Fact) :-
   mpred_db_type(Fact,Type),
@@ -2734,7 +2734,7 @@ mpred_retract_support_relations(_,_).
 
 
 
-%% remove_if_unsupported_verbose( ?Why, ?TMS, ?P) is semidet.
+%% remove_if_unsupported_verbose(+Why, ?TMS, ?P) is semidet.
 %
 % Remove If Unsupported While Being Descriptive.
 %
@@ -2748,7 +2748,7 @@ mpred_remove_file_support(File):-
   forall(filematch(File,Match),
       forall(spft(ABOX, W, U, U, Match),forall(retract_i(spft(ABOX, W, U, U, Match)),mpred_remove(W)))).
 
-%% remove_if_unsupported( ?Why, ?P) is semidet.
+%% remove_if_unsupported(+Why, ?P) is semidet.
 %
 % Remove If Unsupported.
 %
@@ -2762,7 +2762,7 @@ remove_if_unsupported(Why,P) :- ((\+ ground(P), P \= (_:-_) , P \= ~(_) ) -> mpr
 %= depends on the TMS mode selected.
 
 
-%% mpred_tms_supported( ?P, ?How) is semidet.
+%% mpred_tms_supported(+P, ?How) is semidet.
 %
 % PFC Truth Maintainence/wff Supported.
 %
@@ -2772,7 +2772,7 @@ mpred_tms_supported(P,How) :-
 
 
 
-%% mpred_tms_supported( ?Mode, ?P, ?How) is semidet.
+%% mpred_tms_supported(+Mode, ?P, ?How) is semidet.
 %
 % PFC Truth Maintainence/wff Supported.
 %
@@ -2781,7 +2781,7 @@ mpred_tms_supported(Mode,P,How) :- mpred_tms_supported0(Mode,P,How).
 mpred_tms_supported(How,_P,unknown(How)).
 
 
-%% mpred_tms_supported0( ?UPARAM1, ?P, ?How) is semidet.
+%% mpred_tms_supported0(+UPARAM1, ?P, ?How) is semidet.
 %
 % PFC Truth Maintainence/wff Supported Primary Helper.
 %
@@ -2793,7 +2793,7 @@ mpred_tms_supported0(deep,P,How) :- mpred_deep_support(How,P).
 
 
 
-%% mpred_scan_tms( ?P) is semidet.
+%% mpred_scan_tms(+P) is semidet.
 %
 % PFC Scan Truth Maintainence/wff.
 %
@@ -2803,7 +2803,7 @@ mpred_scan_tms(P):-mpred_get_support(P,(S,SS)),
      (mpred_trace_msg(warn(now_maybe_unsupported(mpred_get_support(P,(S,SS)),fail))))))).
 
 
-%% user_atom( ?U) is semidet.
+%% user_atom(+U) is semidet.
 %
 % User Atom.
 %
@@ -2813,17 +2813,17 @@ user_atom(m).
 user_atom(d).
 
 
-%% mpred_deep_support( ?How, ?M) is semidet.
+%% mpred_deep_support(+How, ?M) is semidet.
 %
-% PFC Deep Support.
+% PFC Deep WS.
 %
 mpred_deep_support(_How,unbound):-!,fail.
 mpred_deep_support(How,M):-loop_check(mpred_deep_support0(How,M),fail).
 
 
-%% mpred_deep_support0( ?U, ?U) is semidet.
+%% mpred_deep_support0(+U, ?U) is semidet.
 %
-% PFC Deep Support Primary Helper.
+% PFC Deep WS Primary Helper.
 %
 mpred_deep_support0(user_atom(U),(U,U)):-user_atom(U),!.
 mpred_deep_support0(How,(A==>_)):-!,mpred_deep_support(How,A).
@@ -2848,7 +2848,7 @@ mpred_deep_support0(mpred_call_only_facts((P)),P):-mpred_call_only_facts(P).
 % The supports for a user-defined fact are: [u].
 
 
-%% supporters_list( ?F, :TermFact) is semidet.
+%% supporters_list(+F, :TermFact) is semidet.
 %
 % Supports Functor (list Version).
 %
@@ -2857,26 +2857,26 @@ supporters_list(F,[Fact|MoreFacts]) :-
   must(trigger_supporters_list(Trigger,MoreFacts)).
 
 
-%% mpred_get_support_precanonical_plus_more( ?P, ?Sup) is semidet.
+%% mpred_get_support_precanonical_plus_more(+P, ?Sup) is semidet.
 %
-% PFC Get Support Precanonical Plus More.
+% PFC Get WS Precanonical Plus More.
 %
 mpred_get_support_precanonical_plus_more(P,Sup):-mpred_get_support_one(P,Sup)*->true;
   ((to_addable_form_wte(mpred_get_support_precanonical_plus_more,P,PE),!,
     P\=@=PE,mpred_get_support_one(PE,Sup))).
 
-%% mpred_get_support_one( ?P, ?Sup) is semidet.
+%% mpred_get_support_one(+P, ?Sup) is semidet.
 %
-% PFC Get Support One.
+% PFC Get WS One.
 %
 mpred_get_support_one(P,Sup):- mpred_get_support(P,Sup)*->true;
   (mpred_get_support_via_clause_db(P,Sup)*->true;
      mpred_get_support_via_sentence(P,Sup)).
 
 
-%% mpred_get_support_via_sentence( ?Var, ?VALUE2) is semidet.
+%% mpred_get_support_via_sentence(+Var, ?VALUE2) is semidet.
 %
-% PFC Get Support Via Sentence.
+% PFC Get WS Via Sentence.
 %
 mpred_get_support_via_sentence(Var,_):-is_ftVar(Var),!,fail.
 mpred_get_support_via_sentence((A,B),(FC,TC)):-!, mpred_get_support_precanonical_plus_more(A,(FA,TA)),mpred_get_support_precanonical_plus_more(B,(FB,TB)),conjoin(FA,FB,FC),conjoin(TA,TB,TC).
@@ -2887,7 +2887,7 @@ mpred_get_support_via_sentence(G,call_u(G)):- call_u(G).
 
 %% mpred_get_support_via_clause_db( :TermP, ?OUT) is semidet.
 %
-% PFC Get Support Via Clause Database.
+% PFC Get WS Via Clause Database.
 %
 mpred_get_support_via_clause_db(\+ P,OUT):- mpred_get_support_via_clause_db(~(P),OUT).
 mpred_get_support_via_clause_db(\+ P,(naf(g),g)):- !, predicate_property(P,number_of_clauses(_)),\+ clause(P,_Body).
@@ -2898,17 +2898,17 @@ mpred_get_support_via_clause_db(P,OUT):- predicate_property(P,number_of_clauses(
 
 
 
-%% support_ok_via_clause_body( ?H) is semidet.
+%% support_ok_via_clause_body(+H) is semidet.
 %
-% Support Ok Via Clause Body.
+% WS Ok Via Clause Body.
 %
 support_ok_via_clause_body(_H):-!,fail.
 support_ok_via_clause_body(H):- get_functor(H,F,A),support_ok_via_clause_body(H,F,A).
 
 
-%% support_ok_via_clause_body( ?VALUE1, ?F, ?VALUE3) is semidet.
+%% support_ok_via_clause_body(+VALUE1, ?F, ?VALUE3) is semidet.
 %
-% Support Ok Via Clause Body.
+% WS Ok Via Clause Body.
 %
 support_ok_via_clause_body(_,(\+),1):-!,fail.
 support_ok_via_clause_body(_,F,_):- call_u(argsQuoted(F)),!,fail.
@@ -2917,20 +2917,20 @@ support_ok_via_clause_body(H,F,A):- should_call_for_facts(H,F,A).
 
 
 
-%% mpred_get_support_precanonical( ?F, ?Sup) is semidet.
+%% mpred_get_support_precanonical(+F, ?Sup) is semidet.
 %
-% PFC Get Support Precanonical.
+% PFC Get WS Precanonical.
 %
 mpred_get_support_precanonical(F,Sup):-to_addable_form_wte(mpred_get_support_precanonical,F,P),mpred_get_support(P,Sup).
 
-%% spft_precanonical( ?F, ?SF, ?ST) is semidet.
+%% spft_precanonical(+F, ?SF, ?ST) is semidet.
 %
 % Spft Precanonical.
 %
 spft_precanonical(F,SF,ST):- to_addable_form_wte(spft_precanonical,F,P),!,get_user_abox_umt(ABOX),spft(ABOX,P,SF,ST,_).
 
 
-%% trigger_supporters_list( ?U, :TermARG2) is semidet.
+%% trigger_supporters_list(+U, :TermARG2) is semidet.
 %
 % Trigger Supports Functor (list Version).
 %
@@ -2949,13 +2949,13 @@ trigger_supporters_list(Trigger,[Fact|MoreFacts]) :-
 % mpred_fwd(+P) forward chains for a multiple facts.
 
 
-%% mpred_fwd( ?P) is semidet.
+%% mpred_fwd(+P) is semidet.
 %
 % PFC Forward Repropigated.
 %
 mpred_fwd(P):- get_source_ref(UU), mpred_fwd(P,UU).
 
-%% mpred_fwd( ?P, ?S) is semidet.
+%% mpred_fwd(+P, ?S) is semidet.
 %
 % PFC Forward Repropigated.
 %
@@ -2966,7 +2966,7 @@ mpred_fwd(P,S) :- copy_term(P:S,P0:S0),mpred_fwd1(P0,S0),!.
 %=
 % mpred_fwd1(+P) forward chains for a single fact.
 
-%% mpred_fwd1( ?Fact, ?Sup) is semidet.
+%% mpred_fwd1(+Fact, ?Sup) is semidet.
 %
 % PFC Forward Repropigated Secondary Helper.
 %
@@ -2976,7 +2976,7 @@ mpred_fwd1(Fact,Sup) :- gripe_time(24.80,mpred_fwd2(Fact,Sup)),!.
 unnumbervars_equals(A,B):- =(A,BO),!,BO=B.
 % unnumbervars_equals(A,B):-unnumbervars(A,B).
 
-%% mpred_fwd2( ?Fact, ?Sup) is semidet.
+%% mpred_fwd2(+Fact, ?Sup) is semidet.
 %
 % PFC Forward Repropigated Extended Helper.
 %
@@ -3000,7 +3000,7 @@ mpred_fwd2(Fact0,_Sup):-
 % ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),(ground(Fact)->must(once(Fact));doall(show_if_debug(must(Fact)))),fail.
 % ain_rule_if_rule(Fact) :- cyclic_break(Fact),is_mpred_action(Fact),(ground(Fact)->must(once(Fact));doall(show_if_debug(must(Fact)))),!.
 
-%% ain_rule_if_rule( ?Fact) is semidet.
+%% ain_rule_if_rule(+Fact) is semidet.
 %
 % Assert If New Rule If Rule.
 %
@@ -3039,7 +3039,7 @@ ain_rule0(('<-'(P,Q))) :-
 ain_rule0(_).
 
 
-%% fcpt( ?Fact, ?F) is semidet.
+%% fcpt(+Fact, ?F) is semidet.
 %
 % Fcpt.
 %
@@ -3047,7 +3047,7 @@ fcpt(Fact,F):- fcpt0(Fact,F)*->fail;nop(mpred_trace_msg(no_pt(Fact,F))).
 fcpt(_,_).
 
 
-%% fcpt0( ?Fact, ?F) is semidet.
+%% fcpt0(+Fact, ?F) is semidet.
 %
 % Fcpt Primary Helper.
 %
@@ -3064,7 +3064,7 @@ fcpt0(Fact,F) :- use_presently,
   mpred_eval_lhs(Body,(presently(Fact),pt(ABOX,presently(F),Body))).
 
 
-%% fcnt( ?Fact, ?F) is semidet.
+%% fcnt(+Fact, ?F) is semidet.
 %
 % Fcnt.
 %
@@ -3072,7 +3072,7 @@ fcnt(Fact,F):- fcnt0(Fact,F)*->fail;nop(mpred_trace_msg(no_spft_nt(Fact,F))).
 fcnt(_,_).
 
 
-%% fcnt0( ?Fact, ?F) is semidet.
+%% fcnt0(+Fact, ?F) is semidet.
 %
 % Fcnt Primary Helper.
 %
@@ -3090,7 +3090,7 @@ fcnt0(_Fact,F) :-
 %=
 
 
-%% mpred_define_bc_rule( ?Head, ?Body, ?Parent_rule) is semidet.
+%% mpred_define_bc_rule(+Head, ?Body, ?Parent_rule) is semidet.
 %
 % PFC Define Backchaining Rule.
 %
@@ -3115,7 +3115,7 @@ mpred_define_bc_rule(Head,Body,Parent_rule) :-
         
 
 
-%% contains_ftVar( ?Term) is semidet.
+%% contains_ftVar(+Term) is semidet.
 %
 % Contains Format Type Variable.
 %
@@ -3127,7 +3127,7 @@ contains_ftVar(Term):- sub_term(Sub,Term),compound(Sub),Sub='$VAR'(_).
 %mpred_eval_lhs(P,S):- contains_ftVar(P),unnumbervars_equals(mpred_eval_lhs(P,S),mpred_eval_lhs(P0,S0)),P\=@=P0,!,mpred_eval_lhs(P0,S0).
 %mpred_eval_lhs(P,S):- contains_ftVar(P),trace_or_throw(contains_ftVar_mpred_eval_lhs(P,S)).
 
-%% mpred_eval_lhs( ?P, ?S) is semidet.
+%% mpred_eval_lhs(+P, ?S) is semidet.
 %
 % PFC Eval Left-hand-side.
 %
@@ -3136,33 +3136,33 @@ mpred_eval_lhs(P,S):-
     mpred_eval_lhs0(P0,S0).
 
 
-%% mpred_eval_lhs0( ?X, ?Support) is semidet.
+%% mpred_eval_lhs0(+X, ?WS) is semidet.
 %
 % PFC Eval Left-hand-side Primary Helper.
 %
-mpred_eval_lhs0((Test->Body),Support) :-
+mpred_eval_lhs0((Test->Body),WS) :-
   !,
-  % (call_prologsys(Test) -> mpred_eval_lhs(Body,Support)),
+  % (call_prologsys(Test) -> mpred_eval_lhs(Body,WS)),
    ((no_repeats(call_prologsys(Test)) , 
-       (mpred_eval_lhs(Body,Support))) *-> true ; (!,fail)).
+       (mpred_eval_lhs(Body,WS))) *-> true ; (!,fail)).
 
-mpred_eval_lhs0(rhs(X),Support) :-
+mpred_eval_lhs0(rhs(X),WS) :-
    cyclic_break(X),
   !,
-  on_x_rtrace(mpred_eval_rhs_0(+,X,Support)),
+  on_x_rtrace(mpred_eval_rhs_0(+,X,WS)),
   !.
 
-mpred_eval_lhs0(X,Support) :-
+mpred_eval_lhs0(X,WS) :-
   is_ftCompound(X),
   cyclic_break((X)),  
   mpred_db_type(X,trigger),
   !,
-  doall(show_call(ain_trigger(X,Support))),
+  doall(show_call(ain_trigger(X,WS))),
   !.
 
-%mpred_eval_lhs0(snip(X),Support) :-
-%  snip(Support),
-%  mpred_eval_lhs(X,Support).
+%mpred_eval_lhs0(snip(X),WS) :-
+%  snip(WS),
+%  mpred_eval_lhs(X,WS).
 
 mpred_eval_lhs0(X,Why) :-
   mpred_warn("Unrecognized item found in trigger body, namely ~p.",[mpred_eval_lhs0(X,Why)]),!.
@@ -3175,30 +3175,30 @@ mpred_retry(G):- fail;G.
 %=
 
 
-%% mpred_eval_rhs_0( ?DIR, :TermARG2, ?VALUE3) is semidet.
+%% mpred_eval_rhs_0(+DIR, :TermARG2, ?VALUE3) is semidet.
 %
 % PFC eval Right-Hand-Side  Primary Helper.
 %
 mpred_eval_rhs_0(_DIR,[],_) :- !.
-mpred_eval_rhs_0(DIR,[Head|Tail],Support) :-
-  mpred_eval_rhs1(DIR,Head,Support),
-  mpred_eval_rhs_0(DIR,Tail,Support).
+mpred_eval_rhs_0(DIR,[Head|Tail],WS) :-
+  mpred_eval_rhs1(DIR,Head,WS),
+  mpred_eval_rhs_0(DIR,Tail,WS).
 
 
 
-%% mpred_eval_rhs1( +DIR, ?X, ?Support) is semidet.
+%% mpred_eval_rhs1( +DIR, ?X, ?WS) is semidet.
 %
 % PFC Eval Right-hand-side Secondary Helper.
 %
-mpred_eval_rhs1(+,{Action},Support) :-
+mpred_eval_rhs1(+,{Action},WS) :-
  % evaluable Prolog code.
  !,
- fc_eval_action(Action,Support).
+ fc_eval_action(Action,WS).
 
-mpred_eval_rhs1(+,mpred_action(Action),Support) :-
+mpred_eval_rhs1(+,mpred_action(Action),WS) :-
  % evaluable Prolog code.
  !,
- fc_eval_action(Action,Support).
+ fc_eval_action(Action,WS).
 
 mpred_eval_rhs1(+,P,_Support) :-
  % predicate to remove.
@@ -3206,18 +3206,18 @@ mpred_eval_rhs1(+,P,_Support) :-
  !,
  doall(mpred_withdraw(N)),!.
 
-mpred_eval_rhs1(DIR,[X|Xrest],Support) :-
+mpred_eval_rhs1(DIR,[X|Xrest],WS) :-
  % embedded sublist.
  !,
- mpred_eval_rhs_0(DIR,[X|Xrest],Support).
+ mpred_eval_rhs_0(DIR,[X|Xrest],WS).
 
-mpred_eval_rhs1(+,added(Assertion),Support) :-
+mpred_eval_rhs1(+,added(Assertion),WS) :-
  % an assertion to be added.
- ain(Assertion,Support),!.
+ ain(Assertion,WS),!.
 
-mpred_eval_rhs1(+,Assertion,Support) :-
+mpred_eval_rhs1(+,Assertion,WS) :-
  % an assertion to be added.
- mpred_post1(Assertion,Support),!.
+ mpred_post1(Assertion,WS),!.
 
 mpred_eval_rhs1(DIR,X,_) :-
   mpred_warn("Malformed rhs of a rule: ~p",[DIR:X]).
@@ -3228,14 +3228,14 @@ mpred_eval_rhs1(DIR,X,_) :-
 %=
 
 
-%% fc_eval_action( ?Action, ?Support) is semidet.
+%% fc_eval_action(+Action, ?WS) is semidet.
 %
 % Forward Chaining Eval Action.
 %
-fc_eval_action(Action,Support) :-
+fc_eval_action(Action,WS) :-
   call_prologsys(Action),
   (undoable(Action)
-     -> ain_actiontrace(Action,Support)
+     -> ain_actiontrace(Action,WS)
       ; true).
 
 
@@ -3266,13 +3266,13 @@ trigger_trigger1(Trigger,Body) :-
 %= call_u(Why,F) is true iff F is a fact is true
 %=
 
-%% call_u( ?X) is semidet.
+%% call_u(+X) is semidet.
 %
 % Call For User Code.
 %
 call_u(X):- mpred_call_only_facts(X).
 
-%% call_u( ?Why, ?X) is semidet.
+%% call_u(+Why, ?X) is semidet.
 %
 % Call For User Code.
 %
@@ -3283,7 +3283,7 @@ call_u(Why,X):- show_call(why,(nop(Why),mpred_call_only_facts(X))).
 %=
 % not_cond(_Why,X):- show_success(why,mpred_call_0(~(X))).
 
-%% not_cond( ?Why, ?X) is semidet.
+%% not_cond(+Why, ?X) is semidet.
 %
 % Not Cond.
 %
@@ -3300,7 +3300,7 @@ not_cond(_Why,X):- \+ X.
 :- meta_predicate neg_in_code(*).
 :- export(neg_in_code/1).
 
-%% neg_in_code( ?G) is semidet.
+%% neg_in_code(+G) is semidet.
 %
 % Negated In Code.
 %
@@ -3327,20 +3327,20 @@ neg_may_naf(P):- is_ftCompound(P),predicate_property(P,static).
 %= assigning them support from God. (g,g)
 %=
 
-%% call_u( ?G) is semidet.
+%% call_u(+G) is semidet.
 %
 % Req.
 %
 call_u(G):- loop_check(mpred_call_0(G),fail).
 
 
-%% mpred_call_only_facts( ?Clause) is semidet.
+%% mpred_call_only_facts(+Clause) is semidet.
 %
 % PFC Call Only Facts.
 %
 mpred_call_only_facts(Clause) :-  strip_module(Clause,_,F), on_x_rtrace(no_repeats(loop_check(mpred_call_0(F),fail))). 
 
-%% mpred_call_only_facts( ?Why, ?F) is semidet.
+%% mpred_call_only_facts(+Why, ?F) is semidet.
 %
 % PFC Call Only Facts.
 %
@@ -3349,7 +3349,7 @@ mpred_call_only_facts(_Why,F):- on_x_rtrace(no_repeats(loop_check(mpred_call_0(F
 
 
 
-%% mpred_call_0( ?Var) is semidet.
+%% mpred_call_0(+Var) is semidet.
 %
 % PFC call  Primary Helper.
 %
@@ -3382,7 +3382,7 @@ mpred_call_0(G):- strip_module(G,M,P),sanity(nonvar(P)),functor(P,F,_),mpred_cal
 
 
 
-%% mpred_call_1( ?VALUE1, ?G, ?VALUE3) is semidet.
+%% mpred_call_1(+VALUE1, ?G, ?VALUE3) is semidet.
 %
 % PFC call  Secondary Helper.
 %
@@ -3402,7 +3402,7 @@ mpred_call_1(_,G,_):- mpred_call_with_no_triggers(G).
 :- thread_local t_l:infBackChainPrevented/1.
 
 
-%% call_with_bc_triggers( ?MP) is semidet.
+%% call_with_bc_triggers(+MP) is semidet.
 %
 % Call Using Backchaining Triggers.
 %
@@ -3413,7 +3413,7 @@ call_with_bc_triggers(MP) :- strip_module(MP,_,P), functor(P,F,A), \+ t_l:infBac
   w_tl(t_l:infBackChainPrevented(F/A),mpred_eval_lhs(Trigger,S)).
 
 
-%% mpred_call_with_no_triggers( ?Clause) is semidet.
+%% mpred_call_with_no_triggers(+Clause) is semidet.
 %
 % PFC Call Using No Triggers.
 %
@@ -3422,13 +3422,13 @@ mpred_call_with_no_triggers(Clause) :-  strip_module(Clause,_,F),
   (is_ftVar(F)    ->  mpred_facts_and_universe(F) ; mpred_call_with_no_triggers_bound(F)).
 
 
-%% mpred_call_with_no_triggers_bound( ?F) is semidet.
+%% mpred_call_with_no_triggers_bound(+F) is semidet.
 %
 % PFC Call Using No Triggers Bound.
 %
 mpred_call_with_no_triggers_bound(F):- mpred_call_with_no_triggers_uncaugth(F).
 
-%% mpred_call_with_no_triggers_uncaugth( ?Clause) is semidet.
+%% mpred_call_with_no_triggers_uncaugth(+Clause) is semidet.
 %
 % PFC Call Using No Triggers Uncaugth.
 %
@@ -3440,13 +3440,13 @@ mpred_call_with_no_triggers_uncaugth(Clause) :-  strip_module(Clause,_,F),
   %call_prologsys(F).
 
 
-%% mpred_bc_only( ?M) is semidet.
+%% mpred_bc_only(+M) is semidet.
 %
 % PFC Backchaining Only.
 %
 mpred_bc_only(M:G):- with_umt(M,mpred_bc_only0(G)).
 
-%% mpred_bc_only0( ?G) is semidet.
+%% mpred_bc_only0(+G) is semidet.
 %
 % PFC Backchaining Only Primary Helper.
 %
@@ -3461,7 +3461,7 @@ mpred_bc_only0(G):- mpred_call_only_facts(G).
 %= this Predicate should hide Facts from mpred_bc_only/1
 %%
 
-%% pfcBC_NoFacts( ?F) is semidet.
+%% pfcBC_NoFacts(+F) is semidet.
 %
 % Prolog Forward Chaining Backtackable Class No Facts.
 %
@@ -3476,14 +3476,14 @@ mpred_slow_search.
 
 
 
-%% ruleBackward( ?R, ?Condition) is semidet.
+%% ruleBackward(+R, ?Condition) is semidet.
 %
 % Rule Backward.
 %
 ruleBackward(R,Condition):- with_umt(( ruleBackward0(R,Condition),functor(Condition,F,_),\+ arg(_,v(call_prologsys,call_u),F))).
 %ruleBackward0(F,Condition):-clause_u(F,Condition),\+ (is_true(Condition);mpred_is_info(Condition)).
 
-%% ruleBackward0( ?F, ?Condition) is semidet.
+%% ruleBackward0(+F, ?Condition) is semidet.
 %
 % Rule Backward Primary Helper.
 %
@@ -3494,7 +3494,7 @@ ruleBackward0(F,Condition):- with_umt((  '<-'(F,Condition),\+ (is_true(Condition
 
 
 
-%% pfcBC_NoFacts_TRY( ?F) is semidet.
+%% pfcBC_NoFacts_TRY(+F) is semidet.
 %
 % Prolog Forward Chaining Backtackable Class No Facts Try.
 %
@@ -3505,7 +3505,7 @@ pfcBC_NoFacts_TRY(F) :- no_repeats(ruleBackward(F,Condition)),
 
 
 
-%% pfcBC_Cache( ?F) is semidet.
+%% pfcBC_Cache(+F) is semidet.
 %
 % Prolog Forward Chaining Backtackable Class Cache.
 %
@@ -3514,9 +3514,9 @@ pfcBC_Cache(F) :- mpred_call_only_facts(pfcBC_Cache,F),
 
 
 
-%% maybeSupport( ?P, ?VALUE2) is semidet.
+%% maybeSupport(+P, ?VALUE2) is semidet.
 %
-% Maybe Support.
+% Maybe WS.
 %
 maybeSupport(P,_):-mpred_ignored(P),!.
 maybeSupport(P,S):-( \+ ground(P)-> true;
@@ -3538,7 +3538,7 @@ mpred_ignored(isa(_,argIsaFn(_, _))).
 
 
 
-%% has_cl( ?H) is semidet.
+%% has_cl(+H) is semidet.
 %
 % Has Clause.
 %
@@ -3546,7 +3546,7 @@ has_cl(H):-predicate_property(H,number_of_clauses(_)).
 
 % an action is undoable if there exists a method for undoing it.
 
-%% undoable( ?A) is semidet.
+%% undoable(+A) is semidet.
 %
 % Undoable.
 %
@@ -3563,7 +3563,7 @@ undoable(A) :- call_u(mpred_do_and_undo_method(A,_)).
 
 
 
-%% mpred_nf( ?LHS, ?List) is semidet.
+%% mpred_nf(+LHS, ?List) is semidet.
 %
 % PFC Normal Form.
 %
@@ -3578,7 +3578,7 @@ mpred_nf(LHS,List) :-
 % handle a variable.
 
 
-%% mpred_nf1( ?NegTerm, ?NF) is semidet.
+%% mpred_nf1(+NegTerm, ?NF) is semidet.
 %
 % PFC Normal Form Secondary Helper.
 %
@@ -3635,7 +3635,7 @@ mpred_nf1(Term,[Term]) :-
   mpred_warn("mpred_nf doesn't know how to normalize ~p",[Term]),!,fail.
 
 
-%% mpred_negation_w_neg( ?P, ?NF) is semidet.
+%% mpred_negation_w_neg(+P, ?NF) is semidet.
 %
 % PFC Negation W Negated.
 %
@@ -3644,7 +3644,7 @@ mpred_negation_w_neg(P,NF):-mpred_nf1_negation(P,NF).
 
 %= mpred_nf1_negation(P,NF) is true if NF is the normal form of \+P.
 
-%% mpred_nf1_negation( ?P, ?P) is semidet.
+%% mpred_nf1_negation(+P, ?P) is semidet.
 %
 % PFC Normal Form Secondary Helper Negation.
 %
@@ -3686,7 +3686,7 @@ mpred_nf_negations([H1|T1],[H2|T2]) :-
   mpred_nf_negations(T1,T2).
 
 
-%% mpred_nf_negation( ?X, ?X) is semidet.
+%% mpred_nf_negation(+X, ?X) is semidet.
 %
 % PFC Normal Form Negation.
 %
@@ -3706,7 +3706,7 @@ mpred_nf_negation(X,X).
 %=
 
 
-%% build_rhs( ?Sup, :TermX, :TermX) is semidet.
+%% build_rhs(+Sup, :TermX, :TermX) is semidet.
 %
 % Build Right-hand-side.
 %
@@ -3723,32 +3723,32 @@ build_rhs(Sup,call_u(A),Rest) :- !, build_rhs(Sup,(A),Rest).
 
 build_rhs(Sup,(A,B),[A2|Rest]) :-
   !,
-  mpred_compile_rhsTerm(Sup,A,A2),
+  mpred_compile_rhs_term(Sup,A,A2),
   build_rhs(Sup,B,Rest).
 
 build_rhs(Sup,X,[X2]) :-
-   mpred_compile_rhsTerm(Sup,X,X2).
+   mpred_compile_rhs_term(Sup,X,X2).
 
 
 
-%% mpred_compile_rhsTerm( ?Sup, :TermP, :TermP) is semidet.
+%% mpred_compile_rhs_term(+Sup, :TermP, :TermP) is semidet.
 %
 % PFC Compile Right-hand-side Term.
 %
-mpred_compile_rhsTerm(_Sup,P,P):-is_ftVar(P),!.
-mpred_compile_rhsTerm(Sup,(P/C),((P0:-C0))) :- !,mpred_compile_rhsTerm(Sup,P,P0),build_code_test(Sup,C,C0),!.
-mpred_compile_rhsTerm(Sup,I,O):-to_addable_form_wte(mpred_compile_rhsTerm,I,O), must(\+ \+ mpred_mark_as(Sup,p,O,pfcRHS)),!.
+mpred_compile_rhs_term(_Sup,P,P):-is_ftVar(P),!.
+mpred_compile_rhs_term(Sup,(P/C),((P0:-C0))) :- !,mpred_compile_rhs_term(Sup,P,P0),build_code_test(Sup,C,C0),!.
+mpred_compile_rhs_term(Sup,I,O):-to_addable_form_wte(mpred_compile_rhs_term,I,O), must(\+ \+ mpred_mark_as(Sup,p,O,pfcRHS)),!.
 
 :- export(mpred_mark_as_ml/4).
 
-%% mpred_mark_as_ml( ?Sup, ?PosNeg, ?Type, ?P) is semidet.
+%% mpred_mark_as_ml(+Sup, ?PosNeg, ?Type, ?P) is semidet.
 %
 % PFC Mark Converted To Ml.
 %
 mpred_mark_as_ml(Sup,PosNeg,Type,P):- mpred_mark_as(Sup,PosNeg,P,Type).
 
 
-%% pos_2_neg( ?P, ?P) is semidet.
+%% pos_2_neg(+P, ?P) is semidet.
 %
 % pos  Extended Helper Negated.
 %
@@ -3757,7 +3757,7 @@ pos_2_neg(n,p):-!.
 pos_2_neg(P,~(P)).
 
 
-%% mpred_mark_as( ?VALUE1, ?VALUE2, :TermP, ?VALUE4) is semidet.
+%% mpred_mark_as(+VALUE1, ?VALUE2, :TermP, ?VALUE4) is semidet.
 %
 % PFC Mark Converted To.
 %
@@ -3781,7 +3781,7 @@ mpred_mark_as(Sup,PosNeg,P,Type):-get_functor(P,F,A),ignore(mpred_mark_fa_as(Sup
 
 % mpred_mark_fa_as(_,_,_,'\=',2,_):- trace.
 
-%% mpred_mark_fa_as( ?Sup, ?PosNeg, ?P, ?F, ?A, ?Type) is semidet.
+%% mpred_mark_fa_as(+Sup, ?PosNeg, ?P, ?F, ?A, ?Type) is semidet.
 %
 % PFC Mark Functor-arity Converted To.
 %
@@ -3801,7 +3801,7 @@ mpred_mark_fa_as(Sup,PosNeg,_P,F,A,Type):-
   % with_no_mpred_trace_exec(with_search_mode(direct,mpred_fwd2(MARK,(s(Sup),g)))),!.
    
 
-%% fa_to_p( ?F, ?A, ?P) is semidet.
+%% fa_to_p(+F, ?A, ?P) is semidet.
 %
 % Functor-arity Converted To Pred.
 %
@@ -3823,14 +3823,14 @@ lmconf:hook_one_minute_timer_tick:-mpred_cleanup.
 mpred_cleanup:- forall((no_repeats(F-A,(mpred_mark(pfcRHS,_,F,A),A>1))),mpred_cleanup(F,A)).
 
 
-%% mpred_cleanup( ?F, ?A) is semidet.
+%% mpred_cleanup(+F, ?A) is semidet.
 %
 % PFC Cleanup.
 %
 mpred_cleanup(F,A):-functor(P,F,A),predicate_property(P,dynamic)->mpred_cleanup_0(P);true.
 
 
-%% mpred_cleanup_0( ?P) is semidet.
+%% mpred_cleanup_0(+P) is semidet.
 %
 % PFC cleanup  Primary Helper.
 %
@@ -3844,7 +3844,7 @@ mpred_cleanup_0(P):- findall(P-B-Ref,clause(P,B,Ref),L),
 %= with the negation operator stripped.
 
 
-%% mpred_negation( ?P, ?P) is semidet.
+%% mpred_negation(+P, ?P) is semidet.
 %
 % PFC Negation.
 %
@@ -3853,13 +3853,13 @@ mpred_negation((-P),P).
 mpred_negation((\+(P)),P).
 
 
-%% mpred_negated_literal( ?P) is semidet.
+%% mpred_negated_literal(+P) is semidet.
 %
 % PFC Negated Literal.
 %
 mpred_negated_literal(P):-mpred_negated_literal(P,_).
 
-%% mpred_negated_literal( ?P, ?Q) is semidet.
+%% mpred_negated_literal(+P, ?Q) is semidet.
 %
 % PFC Negated Literal.
 %
@@ -3868,19 +3868,19 @@ mpred_negated_literal(P,Q) :- is_ftNonvar(P),
   mpred_literal(Q).
 
 
-%% mpred_is_assertable( ?X) is semidet.
+%% mpred_is_assertable(+X) is semidet.
 %
 % PFC If Is A Assertable.
 %
 mpred_is_assertable(X):- mpred_literal_nv(X),\+ functor(X,{},_).
 
-%% mpred_literal_nv( ?X) is semidet.
+%% mpred_literal_nv(+X) is semidet.
 %
 % PFC Literal Nv.
 %
 mpred_literal_nv(X):-is_ftNonvar(X),mpred_literal(X).
 
-%% mpred_literal( ?X) is semidet.
+%% mpred_literal(+X) is semidet.
 %
 % PFC Literal.
 %
@@ -3892,13 +3892,13 @@ mpred_literal(X) :- mpred_positive_literal(X),!.
 mpred_literal(X) :- is_ftVar(X),!.
 
 
-%% is_reprop( ?X) is semidet.
+%% is_reprop(+X) is semidet.
 %
 % If Is A Reprop.
 %
 is_reprop(X):- compound(X),is_reprop_0(X).
 
-%% is_reprop_0( ?X) is semidet.
+%% is_reprop_0(+X) is semidet.
 %
 % If Is A reprop  Primary Helper.
 %
@@ -3906,7 +3906,7 @@ is_reprop_0(~(X)):-!,is_reprop(X).
 is_reprop_0(X):-get_functor(X,repropagate,_).
 
 
-%% mpred_non_neg_literal( ?X) is semidet.
+%% mpred_non_neg_literal(+X) is semidet.
 %
 % PFC Not Negated Literal.
 %
@@ -3917,7 +3917,7 @@ mpred_non_neg_literal(X):- sanity(stack_check),
 
 mpred_non_neg_literal(X):-is_reprop(X),!,fail.
 
-%% mpred_positive_literal( ?X) is semidet.
+%% mpred_positive_literal(+X) is semidet.
 %
 % PFC Positive Literal.
 %
@@ -3926,7 +3926,7 @@ mpred_positive_literal(X) :- is_ftNonvar(X),
   \+ mpred_connective(F).
 
 
-%% mpred_connective( ?VALUE1) is semidet.
+%% mpred_connective(+VALUE1) is semidet.
 %
 % PFC Connective.
 %
@@ -3943,7 +3943,7 @@ mpred_connective('-').
 mpred_connective('\\+').
 
 
-%% process_rule( ?Lhs, ?Rhs, ?Parent_rule) is semidet.
+%% process_rule(+Lhs, ?Rhs, ?Parent_rule) is semidet.
 %
 % Process Rule.
 %
@@ -3955,66 +3955,66 @@ process_rule(Lhs,Rhs,Parent_rule) :-
    build_rule(Lhs2,rhs(Rhs2),(Parent_ruleCopy,u))).
 
 
-%% build_rule( ?Lhs, ?Rhs, ?Support) is semidet.
+%% build_rule(+Lhs, ?Rhs, ?WS) is semidet.
 %
 % Build Rule.
 %
-build_rule(Lhs,Rhs,Support) :-
-  build_trigger(Support,Lhs,Rhs,Trigger),
-   mpred_mark_as(Support,p,Lhs,pfcLHS),
-   cyclic_break((Lhs,Rhs,Support,Trigger)),
-  mpred_eval_lhs(Trigger,Support).
+build_rule(Lhs,Rhs,WS) :-
+  build_trigger(WS,Lhs,Rhs,Trigger),
+   mpred_mark_as(WS,p,Lhs,pfcLHS),
+   cyclic_break((Lhs,Rhs,WS,Trigger)),
+  mpred_eval_lhs(Trigger,WS).
 
 
-%% build_trigger( ?Support, :TermARG2, ?Consequent, :TermConsequentO) is semidet.
+%% build_trigger(+WS, :TermARG2, ?Consequent, :TermConsequentO) is semidet.
 %
 % Build Trigger.
 %
-build_trigger(Support,[],Consequent,ConsequentO):- 
-      build_consequent(Support,Consequent,ConsequentO).
+build_trigger(WS,[],Consequent,ConsequentO):- 
+      build_consequent(WS,Consequent,ConsequentO).
 
-build_trigger(Support,[V|Triggers],Consequent,pt(ABOX,V,X)) :- get_user_abox_umt(ABOX),
+build_trigger(WS,[V|Triggers],Consequent,pt(ABOX,V,X)) :- get_user_abox_umt(ABOX),
   is_ftVar(V),
   !,
-  build_trigger(Support,Triggers,Consequent,X).
+  build_trigger(WS,Triggers,Consequent,X).
 
-build_trigger(Support,[added(T)|Triggers],Consequent,pt(ABOX,T,X)) :- get_user_abox_umt(ABOX),
+build_trigger(WS,[added(T)|Triggers],Consequent,pt(ABOX,T,X)) :- get_user_abox_umt(ABOX),
   !,
-  build_code_test(Support,ground(T),Test2),
-  build_trigger(Support,[{Test2}|Triggers],Consequent,X).
+  build_code_test(WS,ground(T),Test2),
+  build_trigger(WS,[{Test2}|Triggers],Consequent,X).
 
-build_trigger(Support,[(T1/Test)|Triggers],Consequent,nt(ABOX,T2,Test2,X)) :- get_user_abox_umt(ABOX),
+build_trigger(WS,[(T1/Test)|Triggers],Consequent,nt(ABOX,T2,Test2,X)) :- get_user_abox_umt(ABOX),
   is_ftNonvar(T1),mpred_negation(T1,T2),
   !,
-  build_neg_test(Support,T2,Test,Test2),
-  build_trigger(Support,Triggers,Consequent,X).
+  build_neg_test(WS,T2,Test,Test2),
+  build_trigger(WS,Triggers,Consequent,X).
 
-build_trigger(Support,[(T1)|Triggers],Consequent,nt(ABOX,T2,Test,X)) :- get_user_abox_umt(ABOX),
+build_trigger(WS,[(T1)|Triggers],Consequent,nt(ABOX,T2,Test,X)) :- get_user_abox_umt(ABOX),
   mpred_negation(T1,T2),
   !,
-  build_neg_test(Support,T2,true,Test),
-  build_trigger(Support,Triggers,Consequent,X).
+  build_neg_test(WS,T2,true,Test),
+  build_trigger(WS,Triggers,Consequent,X).
 
-build_trigger(Support,[{Test}|Triggers],Consequent,(Test->X)) :-
+build_trigger(WS,[{Test}|Triggers],Consequent,(Test->X)) :-
   !,
-  build_trigger(Support,Triggers,Consequent,X).
+  build_trigger(WS,Triggers,Consequent,X).
 
-build_trigger(Support,[T/Test|Triggers],Consequent,pt(ABOX,T,X)) :- get_user_abox_umt(ABOX),
+build_trigger(WS,[T/Test|Triggers],Consequent,pt(ABOX,T,X)) :- get_user_abox_umt(ABOX),
   !,
-  build_code_test(Support,Test,Test2),
-  build_trigger(Support,[{Test2}|Triggers],Consequent,X).
+  build_code_test(WS,Test,Test2),
+  build_trigger(WS,[{Test2}|Triggers],Consequent,X).
 
 
-%build_trigger(Support,[snip|Triggers],Consequent,snip(X)) :-
+%build_trigger(WS,[snip|Triggers],Consequent,snip(X)) :-
 %  !,
-%  build_trigger(Support,Triggers,Consequent,X).
+%  build_trigger(WS,Triggers,Consequent,X).
 
-build_trigger(Support,[T|Triggers],Consequent,pt(ABOX,T,X)) :- get_user_abox_umt(ABOX),
+build_trigger(WS,[T|Triggers],Consequent,pt(ABOX,T,X)) :- get_user_abox_umt(ABOX),
   !,
-  build_trigger(Support,Triggers,Consequent,X).
+  build_trigger(WS,Triggers,Consequent,X).
 
 %=
-%= build_neg_test(Support,+,+,-).
+%= build_neg_test(WS,+,+,-).
 %=
 %= builds the test used in a negative trigger (nt/4).  This test is a
 %= conjunction of the check than no matching facts are in the db and any
@@ -4022,26 +4022,26 @@ build_trigger(Support,[T|Triggers],Consequent,pt(ABOX,T,X)) :- get_user_abox_umt
 %=
 
 
-%% build_neg_test( ?Support, ?T, ?Testin, ?Testout) is semidet.
+%% build_neg_test(+WS, ?T, ?Testin, ?Testout) is semidet.
 %
 % Build Negated Test.
 %
-build_neg_test(Support,T,Testin,Testout) :-  % must(sanity(is_ftNonvar(T))),
-  build_code_test(Support,Testin,Testmid),
+build_neg_test(WS,T,Testin,Testout) :-  % must(sanity(is_ftNonvar(T))),
+  build_code_test(WS,Testin,Testmid),
   conjoin((call_u(T)),Testmid,Testout).
 
 
 %= this just strips away any currly brackets.
 
 
-%% build_code_test( ?Support, ?Test, ?TestO) is semidet.
+%% build_code_test(+WS, ?Test, ?TestO) is semidet.
 %
 % Build Code Test.
 %
 build_code_test(_Support,Test,TestO):-is_ftVar(Test),!,must(is_ftNonvar(Test)),TestO=call_u(Test).
-build_code_test(Support,{Test},TestO) :- !,build_code_test(Support,Test,TestO).
-build_code_test(Support,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],must_maplist(build_code_test(Support),TestL,TestLO),TestO=..[F|TestLO],!.
-build_code_test(Support,Test,Test):- must(mpred_mark_as(Support,p,Test,pfcCallCode)),!.
+build_code_test(WS,{Test},TestO) :- !,build_code_test(WS,Test,TestO).
+build_code_test(WS,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],must_maplist(build_code_test(WS),TestL,TestLO),TestO=..[F|TestLO],!.
+build_code_test(WS,Test,Test):- must(mpred_mark_as(WS,p,Test,pfcCallCode)),!.
 build_code_test(_,Test,Test).
 
 
@@ -4060,7 +4060,7 @@ code_sentence_op(call_u(_,_)).
 code_sentence_op(Test):-predicate_property(Test,meta_predicate(PP)),predicate_property(Test,built_in),  \+ (( arg(_,PP,N), N\=0)).
 
 
-%% all_closed( ?C) is semidet.
+%% all_closed(+C) is semidet.
 %
 % All Closed.
 %
@@ -4069,22 +4069,22 @@ all_closed(C):- \+is_ftCompound(C)->true;(functor(C,_,A),A>1,\+((arg(_,C,Arg),is
 %=
 
 
-%% build_consequent( ?VALUE1, ?Test, ?Test) is semidet.
+%% build_consequent(+VALUE1, ?Test, ?Test) is semidet.
 %
 % Build Consequent.
 %
 build_consequent(_      ,Test,Test):- is_ftVar(Test),!.
 build_consequent(_      ,Test,TestO):-is_ftVar(Test),!,TestO=added(Test).
-build_consequent(Support,rhs(Test),rhs(TestO)) :- !,build_consequent(Support,Test,TestO).
-build_consequent(Support,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],
-   maplist(build_consequent(Support),TestL,TestLO),TestO=..[F|TestLO],!.
-build_consequent(Support,Test,Test):-must(mpred_mark_as(Support,p,Test,pfcCreates)),!.
+build_consequent(WS,rhs(Test),rhs(TestO)) :- !,build_consequent(WS,Test,TestO).
+build_consequent(WS,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],
+   maplist(build_consequent(WS),TestL,TestLO),TestO=..[F|TestLO],!.
+build_consequent(WS,Test,Test):-must(mpred_mark_as(WS,p,Test,pfcCreates)),!.
 build_consequent(_ ,Test,Test).
 
 %= simple typeing for pfc objects
 
 
-%% mpred_db_type( ?VALUE1, ?Type) is semidet.
+%% mpred_db_type(+VALUE1, ?Type) is semidet.
 %
 % PFC Database Type.
 %
@@ -4104,7 +4104,7 @@ mpred_db_type(_,fact) :-
 
 
 
-%% retract_t( ?Trigger) is semidet.
+%% retract_t(+Trigger) is semidet.
 %
 % Retract Trigger Stucture.
 %
@@ -4112,49 +4112,49 @@ retract_t(Trigger) :- arg(1,Trigger,ABOX),retract_i(spft(ABOX,Trigger,_,_,_)),ig
 
 
 
-%% ain_ts( ?P, ?Support) is semidet.
+%% ain_ts(+P, ?WS) is semidet.
 %
 % Assert If New True Structures.
 %
-ain_ts(P,Support) :- 
+ain_ts(P,WS) :- 
   (mpred_clause_i(P) ; (assert_i(P))),
   !,
-  ain_support(P,Support).
+  ain_support(P,WS).
 
 /*
 
-ain_t(P,Support) :- 
-  (mpred_clause_i(P) ; (assert_i(P),ain_trigger(P,Support))),
+ain_t(P,WS) :- 
+  (mpred_clause_i(P) ; (assert_i(P),ain_trigger(P,WS))),
   !,
-  ain_support(P,Support).
+  ain_support(P,WS).
 
 */
 
 
 
-%% aina_i( ?P, ?Support) is semidet.
+%% aina_i(+P, ?WS) is semidet.
 %
 % Aina For Internal Interface.
 %
-aina_i(P,Support) :-
+aina_i(P,WS) :-
   (mpred_clause_i(P) ; asserta_i(P)),
   !,
-  ain_support(P,Support).
+  ain_support(P,WS).
 
 
 
-%% ainz_i( ?P, ?Support) is semidet.
+%% ainz_i(+P, ?WS) is semidet.
 %
 % Ainz For Internal Interface.
 %
-ainz_i(P,Support) :-  
+ainz_i(P,WS) :-  
   (mpred_clause_i(P) ; assertz_i(P)),
   !,
-  ain_support(P,Support).
+  ain_support(P,WS).
 
 
 
-%% mpred_clause_i( ?Head) is semidet.
+%% mpred_clause_i(+Head) is semidet.
 %
 % PFC Clause For Internal Interface.
 %
@@ -4175,7 +4175,7 @@ mpred_clause_i(Head) :-
 
 
 
-%% foreachl_do( ?Binder, ?Body) is semidet.
+%% foreachl_do(+Binder, ?Body) is semidet.
 %
 % Foreachl Do.
 %
@@ -4184,7 +4184,7 @@ foreachl_do(_,_).
 
 % pfcl_do(X) executesf X once and always succeeds.
 
-%% pfcl_do( ?X) is semidet.
+%% pfcl_do(+X) is semidet.
 %
 % Pfcl Do.
 %
@@ -4218,11 +4218,11 @@ mpred_union([Head|Tail],L,[Head|Tail2]) :-
 
 % user:portray(C):-is_ftCompound(C),C=spft(ABOX,_,_,_,_),pp_item('',C).
 
-%= mpred_had_support(+Fact,+Support)
+%= mpred_had_support(+Fact,+WS)
 
-%% mpred_had_support( ?P, :TermFact) is semidet.
+%% mpred_had_support(+P, :TermFact) is semidet.
 %
-% PFC Had Support.
+% PFC Had WS.
 %
 mpred_had_support(P,(Fact,Trigger)) :- 
  get_user_abox_umt(ABOX),
@@ -4230,12 +4230,12 @@ mpred_had_support(P,(Fact,Trigger)) :-
     true ; fail).
 
 
-%= ain_support(+Fact,+Support)
+%= ain_support(+Fact,+WS)
 
 
-%% ain_support( ?P, ?FT) is semidet.
+%% ain_support(+P, ?FT) is semidet.
 %
-% Assert If New Support.
+% Assert If New WS.
 %
 ain_support(P,(Fact,Trigger)) :- 
 get_user_abox_umt(ABOX),
@@ -4257,9 +4257,9 @@ ain_support(P,(Fact,Trigger)) :-
 
 ain_support(P,FT) :- trace_or_throw(failed_ain_support(P,FT)).
 
-%% mpred_get_support( ?P, :TermFact) is semidet.
+%% mpred_get_support(+P, :TermFact) is semidet.
 %
-% PFC Get Support.
+% PFC Get WS.
 %
 mpred_get_support(not(P),(Fact,Trigger)) :- is_ftNonvar(P),!, mpred_get_support(~(P),(Fact,Trigger)).
 mpred_get_support(P,(Fact,Trigger)) :-
@@ -4268,13 +4268,13 @@ mpred_get_support(P,(Fact,Trigger)) :-
 
 %% mpred_get_support_neg( :TermP, ?S) is semidet.
 %
-% PFC Get Support Negated.
+% PFC Get WS Negated.
 %
 mpred_get_support_neg(\+ (P),S) :- !, is_ftNonvar(P), mpred_get_support(~(P),S).
 mpred_get_support_neg(- (P),S) :- !, is_ftNonvar(P), mpred_get_support(~(P),S).
 % dont mpred_get_support_neg(\+ ~(P),(Fact,Trigger)) :- sp ftY((P),Fact,Trigger).
 
-%% mpred_support_db_rem( ?WhyIn, ?P, ?S) is semidet.
+%% mpred_support_db_rem(+WhyIn, ?P, ?S) is semidet.
 %
 % There were three of these to try to efficiently handle the cases
 % where some of the arguments are not bound but at least one is.
@@ -4404,7 +4404,7 @@ mpred_reset.
 
 % true if there is some pfc crud still in the database.
 
-%% mpred_database_item( ?Term) is semidet.
+%% mpred_database_item(+Term) is semidet.
 %
 % PFC Database Item.
 %
@@ -4414,7 +4414,7 @@ mpred_database_item(Term) :-
   clause_u(Term,_).
 
 
-%% mpred_retract_or_warn_i( ?X) is semidet.
+%% mpred_retract_or_warn_i(+X) is semidet.
 %
 % PFC Retract Or Warn For Internal Interface.
 %
@@ -4436,7 +4436,7 @@ mpred_retract_or_warn_i(_).
 :- dynamic mpred_warnings/1.
 
 
-%% mpred_is_tracing_pred( ?VALUE1) is semidet.
+%% mpred_is_tracing_pred(+VALUE1) is semidet.
 %
 % PFC If Is A Tracing.
 %
@@ -4447,7 +4447,7 @@ lmconf:module_local_init:- lmconf:mpred_set_default(mpred_warnings(_), mpred_war
 
 
 
-%% get_fa( ?PI, ?F, ?A) is semidet.
+%% get_fa(+PI, ?F, ?A) is semidet.
 %
 % Get Functor-arity.
 %
@@ -4459,7 +4459,7 @@ get_fa(Mask,F,A):-get_functor(Mask,F,A).
 
 
 
-%% clause_or_call( ?H, ?B) is semidet.
+%% clause_or_call(+H, ?B) is semidet.
 %
 % Clause Or Call.
 %
@@ -4473,13 +4473,13 @@ clause_or_call(H,true):- call_u(should_call_for_facts(H)),no_repeats(on_x_log_th
 
 % as opposed to simply using clause(H,true).
 
-%% should_call_for_facts( ?H) is semidet.
+%% should_call_for_facts(+H) is semidet.
 %
 % Should Call For Facts.
 %
 should_call_for_facts(H):- get_functor(H,F,A),with_umt(should_call_for_facts(H,F,A)).
 
-%% should_call_for_facts( ?VALUE1, ?F, ?VALUE3) is semidet.
+%% should_call_for_facts(+VALUE1, ?F, ?VALUE3) is semidet.
 %
 % Should Call For Facts.
 %
@@ -4492,14 +4492,14 @@ should_call_for_facts(_,F,_):- \+ a(pfcControlled,F),!.
 
 
 
-%% no_side_effects( ?P) is semidet.
+%% no_side_effects(+P) is semidet.
 %
 % No Side Effects.
 %
 no_side_effects(P):-  (\+ is_side_effect_disabled->true;(get_functor(P,F,_),a(prologSideEffects,F))).
 
 
-%% is_disabled_clause( ?C) is semidet.
+%% is_disabled_clause(+C) is semidet.
 %
 % If Is A Disabled Clause.
 %
@@ -4508,7 +4508,7 @@ is_disabled_clause(C):-call_u(is_edited_clause(C,_,New)),memberchk((disabled),Ne
 %= mpred_fact(P) is true if fact P was asserted into the database via ain.
 
 
-%% mpred_fact( ?P) is semidet.
+%% mpred_fact(+P) is semidet.
 %
 % PFC Fact.
 %
@@ -4521,14 +4521,14 @@ mpred_fact(P) :- mpred_fact(P,true).
 %=
 
 
-%% mpred_user_fact( ?X) is semidet.
+%% mpred_user_fact(+X) is semidet.
 %
 % PFC User Fact.
 %
 mpred_user_fact(X):-get_user_abox_umt(ABOX),no_repeats(spft(ABOX,X,U,U,_)).
 
 
-%% mpred_fact( ?P, ?PrologCond) is semidet.
+%% mpred_fact(+P, ?PrologCond) is semidet.
 %
 % PFC Fact.
 %
@@ -4540,14 +4540,14 @@ mpred_fact(P,PrologCond) :-
 %= mpred_facts(-ListofPfcFacts) returns a list of facts added.
 
 
-%% mpred_facts( ?L) is semidet.
+%% mpred_facts(+L) is semidet.
 %
 % PFC Facts.
 %
 mpred_facts(L) :- mpred_facts(_,true,L).
 
 
-%% mpred_facts( ?P, ?L) is semidet.
+%% mpred_facts(+P, ?L) is semidet.
 %
 % PFC Facts.
 %
@@ -4556,14 +4556,14 @@ mpred_facts(P,L) :- mpred_facts(P,true,L).
 %= mpred_facts(Pattern,Condition,-ListofPfcFacts) returns a list of facts added.
 
 
-%% mpred_facts( ?P, ?C, ?L) is semidet.
+%% mpred_facts(+P, ?C, ?L) is semidet.
 %
 % PFC Facts.
 %
 mpred_facts(P,C,L) :- setof(P,mpred_fact(P,C),L).
 
 
-%% brake( ?X) is semidet.
+%% brake(+X) is semidet.
 %
 % Brake.
 %
@@ -4591,7 +4591,7 @@ mpred_trace_add(nt(ABOX,Head,Condition,Body)) :-
   !.
 */
 
-%% mpred_trace_add( ?P, ?S) is semidet.
+%% mpred_trace_add(+P, ?S) is semidet.
 %
 % PFC Trace add.
 %
@@ -4601,13 +4601,13 @@ mpred_trace_add(P,S) :-
 
 
 
-%% mpred_trace_add_print( ?P, ?S) is semidet.
+%% mpred_trace_add_print(+P, ?S) is semidet.
 %
 % PFC Trace add print.
 %
 mpred_trace_add_print(P,S):- (\+ \+ mpred_trace_add_print_0(P,S)).
 
-%% mpred_trace_add_print_0( ?P, ?S) is semidet.
+%% mpred_trace_add_print_0(+P, ?S) is semidet.
 %
 % PFC Trace add print  Primary Helper.
 %
@@ -4623,7 +4623,7 @@ mpred_trace_add_print_0(_,_).
 
 
 
-%% mpred_trace_break( ?P, ?S) is semidet.
+%% mpred_trace_break(+P, ?S) is semidet.
 %
 % PFC Trace break.
 %
@@ -4646,7 +4646,7 @@ mpred_trace_rem(Why,nt(ABOX,Head,Condition,Body)) :-
 */
 
 
-%% mpred_trace_rem( ?Why, ?P) is semidet.
+%% mpred_trace_rem(+Why, ?P) is semidet.
 %
 % PFC Trace Remove/Erase.
 %
@@ -4698,7 +4698,7 @@ mpred_trace :- mpred_trace(_).
 lmconf:module_local_init:-mpred_no_trace_all.
 
 
-%% mpred_trace( ?Form) is semidet.
+%% mpred_trace(+Form) is semidet.
 %
 % PFC Trace.
 %
@@ -4706,7 +4706,7 @@ mpred_trace(Form) :-
   assert_i(mpred_is_tracing_pred(Form)).
 
 
-%% mpred_trace( ?Form, ?Condition) is semidet.
+%% mpred_trace(+Form, ?Condition) is semidet.
 %
 % PFC Trace.
 %
@@ -4714,21 +4714,21 @@ mpred_trace(Form,Condition) :-
   assert_i((mpred_is_tracing_pred(Form) :- Condition)).
 
 
-%% mpred_spy( ?Form) is semidet.
+%% mpred_spy(+Form) is semidet.
 %
 % PFC Spy.
 %
 mpred_spy(Form) :- mpred_spy(Form,[add,rem],true).
 
 
-%% mpred_spy( ?Form, ?Modes) is semidet.
+%% mpred_spy(+Form, ?Modes) is semidet.
 %
 % PFC Spy.
 %
 mpred_spy(Form,Modes) :- mpred_spy(Form,Modes,true).
 
 
-%% mpred_spy( ?Form, ?Mode, ?Condition) is semidet.
+%% mpred_spy(+Form, ?Mode, ?Condition) is semidet.
 %
 % PFC Spy.
 %
@@ -4741,7 +4741,7 @@ mpred_spy(Form,Mode,Condition) :-
   mpred_spy1(Form,Mode,Condition).
 
 
-%% mpred_spy1( ?Form, ?Mode, ?Condition) is semidet.
+%% mpred_spy1(+Form, ?Mode, ?Condition) is semidet.
 %
 % PFC Spy Secondary Helper.
 %
@@ -4756,14 +4756,14 @@ mpred_spy1(Form,Mode,Condition) :-
 mpred_no_spy :- mpred_no_spy(_,_,_).
 
 
-%% mpred_no_spy( ?Form) is semidet.
+%% mpred_no_spy(+Form) is semidet.
 %
 % PFC No Spy.
 %
 mpred_no_spy(Form) :- mpred_no_spy(Form,_,_).
 
 
-%% mpred_no_spy( ?Form, ?Mode, ?Condition) is semidet.
+%% mpred_no_spy(+Form, ?Mode, ?Condition) is semidet.
 %
 % PFC No Spy.
 %
@@ -4786,7 +4786,7 @@ mpred_no_trace :- mpred_untrace.
 %
 mpred_untrace :- mpred_untrace(_).
 
-%% mpred_untrace( ?Form) is semidet.
+%% mpred_untrace(+Form) is semidet.
 %
 % PFC Un Trace.
 %
@@ -4797,14 +4797,14 @@ mpred_untrace(Form) :- retractall_i(mpred_is_tracing_pred(Form)).
 
 % if the correct flag is set, trace exection of Pfc
 
-%% mpred_trace_msg( ?Msg) is semidet.
+%% mpred_trace_msg(+Msg) is semidet.
 %
 % PFC Trace msg.
 %
 mpred_trace_msg(Msg) :- mpred_trace_msg('~p.',[Msg]),!.
 
 
-%% mmsg( ?Msg, ?Args) is semidet.
+%% mmsg(+Msg, ?Args) is semidet.
 %
 % Module Message.
 %
@@ -4812,18 +4812,18 @@ mmsg(Msg,Args):- is_list(Args) -> wdmsg(Msg, Args) ; pp_item(Msg, Args).
 
 :- was_dynamic(mpred_hide_msg/1).
 
-%% mpred_hide_msg( ?VALUE1) is semidet.
+%% mpred_hide_msg(+VALUE1) is semidet.
 %
 % PFC Hide Msg.
 %
 mpred_hide_msg('Adding For Later').
 mpred_hide_msg('Skipped Trigger').
-mpred_hide_msg('Had Support').
+mpred_hide_msg('Had WS').
 
 % mpred_trace_msg(Msg,Args) :- !, mmsg(Msg,Args).
 % mpred_trace_msg(Msg,_Args) :- mpred_hide_msg(Msg),!.
 
-%% mpred_trace_msg( ?Msg, ?Args) is semidet.
+%% mpred_trace_msg(+Msg, ?Args) is semidet.
 %
 % PFC Trace msg.
 %
@@ -4846,14 +4846,14 @@ mpred_watch :- assert_i(mpred_is_tracing_exec).
 mpred_no_watch :-  retractall_i(mpred_is_tracing_exec).
 
 
-%% mpred_error( ?Msg) is semidet.
+%% mpred_error(+Msg) is semidet.
 %
 % PFC Error.
 %
 mpred_error(Msg) :-  mpred_error(Msg,[]).
 
 
-%% mpred_error( ?Msg, ?Args) is semidet.
+%% mpred_error(+Msg, ?Args) is semidet.
 %
 % PFC Error.
 %
@@ -4890,7 +4890,7 @@ nmpred_warn :-
   assert_i(mpred_warnings(false)).
 
 
-%% mpred_warn( ?Msg) is semidet.
+%% mpred_warn(+Msg) is semidet.
 %
 % PFC Warn.
 %
@@ -4899,7 +4899,7 @@ mpred_warn(Msg) :-  mpred_warn(Msg,[]).
 lmconf:module_local_init:-mpred_warn.
 
 
-%% mpred_warn( ?Msg, ?Args) is semidet.
+%% mpred_warn(+Msg, ?Args) is semidet.
 %
 % PFC Warn.
 %
@@ -4958,21 +4958,21 @@ mpred_no_warnings :-
 :- use_module(library(lists)).
 
 
-%% justification( ?F, ?J) is semidet.
+%% justification(+F, ?J) is semidet.
 %
 % Justification.
 %
 justification(F,J) :- supporters_list(F,J).
 
 
-%% justifications( ?F, ?Js) is semidet.
+%% justifications(+F, ?Js) is semidet.
 %
 % Justifications.
 %
 justifications(F,Js) :- bagof(J,justification(F,J),Js).
 
 
-%% baseable( ?P, ?L) is semidet.
+%% baseable(+P, ?L) is semidet.
 % - is true iff L is a list of "baseable" facts which, taken
 % together, allows us to deduce P.  A baseable fact is an mpred_axiom (a fact
 % added by the user or a raw Prolog fact (i.e. one w/o any support))
@@ -4986,7 +4986,7 @@ baseable(F,L) :-
 
 
 
-%% baseable_list( ?L1, ?L2) is semidet.
+%% baseable_list(+L1, ?L2) is semidet.
 % baseable_list(L1,L2) is true if list L2 represents the union of all of the
 % facts on which some conclusion in list L1 is based.
 baseable_list([],[]).
@@ -4997,7 +4997,7 @@ baseable_list([X|Rest],L) :-
 	
 
 
-%% mpred_axiom( ?F) is semidet.
+%% mpred_axiom(+F) is semidet.
 %
 % PFC Axiom.
 %
@@ -5010,7 +5010,7 @@ mpred_axiom(F) :-
 %= prove P is a proof of not(P)
 
 
-%% assumption( ?P) is semidet.
+%% assumption(+P) is semidet.
 %
 % Assumption.
 %
@@ -5019,7 +5019,7 @@ assumption(P) :- is_ftNonvar(P),mpred_negation(P,_).
 %= assumptions(X,As) if As is a set of assumptions which underly X.
 
 
-%% assumptions( ?X, ?L) is semidet.
+%% assumptions(+X, ?L) is semidet.
 %
 % Assumptions.
 %
@@ -5053,7 +5053,7 @@ assumptions1([X|Rest],L) :-
 % mode: mpred_child(+,?)
 
 
-%% mpred_child( ?P, ?Q) is semidet.
+%% mpred_child(+P, ?Q) is semidet.
 %
 % PFC Child.
 %
@@ -5066,7 +5066,7 @@ mpred_child(P,Q) :-
   mpred_child(P,Trig).
 
 
-%% mpred_children( ?P, ?L) is semidet.
+%% mpred_children(+P, ?L) is semidet.
 %
 % PFC Children.
 %
@@ -5075,7 +5075,7 @@ mpred_children(P,L) :- bagof(C,mpred_child(P,C),L).
 % mpred_descendant(P,Q) is true iff P is a justifier for Q.
 
 
-%% mpred_descendant( ?P, ?Q) is semidet.
+%% mpred_descendant(+P, ?Q) is semidet.
 %
 % PFC Descendant.
 %
@@ -5083,7 +5083,7 @@ mpred_descendant(P,Q) :-
    mpred_descendant1(P,Q,[]).
 
 
-%% mpred_descendant1( ?P, ?Q, ?Seen) is semidet.
+%% mpred_descendant1(+P, ?Q, ?Seen) is semidet.
 %
 % PFC Descendant Secondary Helper.
 %
@@ -5093,7 +5093,7 @@ mpred_descendant1(P,Q,Seen) :-
   (P=X ; mpred_descendant1(P,X,[X|Seen])).
 
 
-%% mpred_descendants( ?P, ?L) is semidet.
+%% mpred_descendants(+P, ?L) is semidet.
 %
 % PFC Descendants.
 %
@@ -5104,7 +5104,7 @@ mpred_descendants(P,L) :-
 :- was_dynamic(baseKB:prologMacroHead/1).
 
 
-%% compute_resolve( ?NewerP, ?OlderQ, ?SU, ?SU, ?OlderQ) is semidet.
+%% compute_resolve(+NewerP, ?OlderQ, ?SU, ?SU, ?OlderQ) is semidet.
 %
 % Compute Resolve.
 %
@@ -5118,7 +5118,7 @@ compute_resolve(NewerP,OlderQ,SU,S2,(mpred_blast(OlderQ),ain(NewerP,S1),mpred_wi
 
 
 
-%% compute_resolve( ?NewerP, ?OlderQ, ?Resolve) is semidet.
+%% compute_resolve(+NewerP, ?OlderQ, ?Resolve) is semidet.
 %
 % Compute Resolve.
 %
@@ -5129,7 +5129,7 @@ compute_resolve(NewerP,OlderQ,Resolve):-
 
 
 
-%% is_resolved( ?C) is semidet.
+%% is_resolved(+C) is semidet.
 %
 % If Is A Resolved.
 %
@@ -5139,7 +5139,7 @@ is_resolved(C):- Why= is_resolved, mpred_call_only_facts(Why,~(C)),\+mpred_call_
 :- must(nop(_)).
 
 
-%% mpred_prove_neg( ?G) is semidet.
+%% mpred_prove_neg(+G) is semidet.
 %
 % PFC Prove Negated.
 %
@@ -5153,7 +5153,7 @@ mpred_prove_neg(G):-nop(trace), \+ mpred_bc_only(G), \+ mpred_fact(G).
 pred_head(Type,P):- no_repeats_u(P,(call(Type,P),\+ nonfact_metawrapper(P),is_ftCompound(P))).
 
 
-%% pred_head_all( ?P) is semidet.
+%% pred_head_all(+P) is semidet.
 %
 % Predicate Head All.
 %
@@ -5178,7 +5178,7 @@ nonfact_metawrapper(P):- get_functor(P,F,_),
 nonfact_metawrapper(P):-rewritten_metawrapper(P).
 
 
-%% rewritten_metawrapper( ?C) is semidet.
+%% rewritten_metawrapper(+C) is semidet.
 %
 % Rewritten Metawrapper.
 %
@@ -5198,7 +5198,7 @@ meta_wrapper_rule((_:-_)).
 
 
 
-%% pred_all( ?P) is semidet.
+%% pred_all(+P) is semidet.
 %
 % Predicate All.
 %
@@ -5207,14 +5207,14 @@ pred_all(P):-pred_t0(P).
 pred_all(P):-pred_r0(P).
 
 
-%% pred_u0( ?P) is semidet.
+%% pred_u0(+P) is semidet.
 %
 % Predicate For User Code Primary Helper.
 %
 pred_u0(P):-pred_u1(P),has_db_clauses(P).
 pred_u0(P):-pred_u2(P).
 
-%% pred_u1( ?VALUE1) is semidet.
+%% pred_u1(+VALUE1) is semidet.
 %
 % Predicate For User Code Secondary Helper.
 %
@@ -5222,7 +5222,7 @@ pred_u1(P):-a(pfcControlled,F),arity(F,A),functor(P,F,A).
 pred_u1(P):-a(prologHybrid,F),arity(F,A),functor(P,F,A).
 pred_u1(P):-a(prologDynamic,F),arity(F,A),functor(P,F,A).
 
-%% pred_u2( ?P) is semidet.
+%% pred_u2(+P) is semidet.
 %
 % Predicate For User Code Extended Helper.
 %
@@ -5231,14 +5231,14 @@ pred_u2(P):-clause_true(arity(F,A)),functor(P,F,A),has_db_clauses(P).
 
 
 
-%% has_db_clauses( ?PI) is semidet.
+%% has_db_clauses(+PI) is semidet.
 %
 % Has Database Clauses.
 %
 has_db_clauses(PI):-modulize_head(PI,P),predicate_property(P,number_of_clauses(NC)),\+ predicate_property(P,number_of_rules(NC)), \+ \+ clause_i(P,true).
 
 
-%% pred_t0( ?P) is semidet.
+%% pred_t0(+P) is semidet.
 %
 % Predicate True Stucture Primary Helper.
 %
@@ -5246,7 +5246,7 @@ pred_t0(P):- get_user_abox_umt(ABOX),pred_t0(ABOX,P).
 pred_t0(P):- mreq('nesc'(P)).
 
 
-%% pred_t0( ?ABOX, ?P) is semidet.
+%% pred_t0(+ABOX, ?P) is semidet.
 %
 % Predicate True Stucture Primary Helper.
 %
@@ -5268,19 +5268,19 @@ pred_r0(P<==>Q):- mreq(P<==>Q).
 pred_r0(P<-Q):- mreq(P<-Q).
 
 
-%% cnstrn( ?X) is semidet.
+%% cnstrn(+X) is semidet.
 %
 % Cnstrn.
 %
 cnstrn(X):-term_variables(X,Vs),maplist(cnstrn0(X),Vs),!.
 
-%% cnstrn( ?V, ?X) is semidet.
+%% cnstrn(+V, ?X) is semidet.
 %
 % Cnstrn.
 %
 cnstrn(V,X):-cnstrn0(X,V).
 
-%% cnstrn0( ?X, ?V) is semidet.
+%% cnstrn0(+X, ?V) is semidet.
 %
 % Cnstrn Primary Helper.
 %
@@ -5294,7 +5294,7 @@ cnstrn0(X,V):-when(is_ftNonvar(V),X).
 rescan_pfc:-forall(clause(lmconf:mpred_hook_rescan_files,Body),show_entry(rescan_pfc,Body)).
 
 
-%% mpred_facts_and_universe( ?P) is semidet.
+%% mpred_facts_and_universe(+P) is semidet.
 %
 % PFC Facts And Universe.
 %
@@ -5302,7 +5302,7 @@ mpred_facts_and_universe(P):- (is_ftVar(P)->pred_head_all(P);true),call_u(P). % 
 
 %add_reprop(_,_):-!.
 
-%% add_reprop( ?Trig, :TermVar) is semidet.
+%% add_reprop(+Trig, :TermVar) is semidet.
 %
 % Add Reprop.
 %
@@ -5349,7 +5349,7 @@ repropagate(P):-  \+ predicate_property(_:P,_),dmsg(undefined_repropagate(P)),du
 repropagate(P):-  repropagate_0(P).
 
 
-%% repropagate_0( ?P) is semidet.
+%% repropagate_0(+P) is semidet.
 %
 % repropagate  Primary Helper.
 %
@@ -5358,7 +5358,7 @@ repropagate_0(P):- loop_check(with_umt(repropagate_1(P)),true).
 :- thread_local t_l:is_repropagating/1.
 
 
-%% repropagate_1( ?P) is semidet.
+%% repropagate_1(+P) is semidet.
 %
 % repropagate  Secondary Helper.
 %
@@ -5371,7 +5371,7 @@ repropagate_1(P):- with_umt(repropagate_2(P)).
 :- export(repropagate_2/1).
 :- module_transparent(repropagate_2/1).
 
-%% repropagate_2( ?P) is semidet.
+%% repropagate_2(+P) is semidet.
 %
 % repropagate  Extended Helper.
 %
@@ -5381,7 +5381,7 @@ repropagate_2(P):-
 
 % repropagate_meta_wrapper_rule(P==>_):- !, repropagate(P).
 
-%% repropagate_meta_wrapper_rule( ?P) is semidet.
+%% repropagate_meta_wrapper_rule(+P) is semidet.
 %
 % Repropagate Meta Wrapper Rule.
 %
@@ -5402,7 +5402,7 @@ fwd_ok(X):-compound(X),arg(_,X,E),compound(E),functor(E,(:-),_),!.
 % fwd_ok(P):-must(ground(P)),!.
 
 
-%% mpred_facts_only( ?P) is semidet.
+%% mpred_facts_only(+P) is semidet.
 %
 % PFC Facts Only.
 %

@@ -91,10 +91,6 @@ arity(F,A):- atom(F), integer(A),current_predicate(F/A),A>1.
 arity(F,1):- atom(F), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
 
 
-:- ignore(show_call(mpred_is_silient)).
-:- sanity(\+mpred_is_tracing_exec).
-
-
 prologHybrid(arity/2).
 
 
