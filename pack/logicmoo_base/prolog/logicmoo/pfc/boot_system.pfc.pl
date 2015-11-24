@@ -623,7 +623,10 @@ ttPredType(Prop)==>tCol(Prop).
 
 % :-rtrace.
 
-(((((P/is_ftNonvar(P),{functor(P,F,A),\+ mpred_connective(F), A>1}) ==> {lmconf:agenda_slow_op_enqueue(must(ignore(deduceEachArgType(P))))})))).
+((((P/(nonvar(P),is_ftNonvar(P),functor(P,F,A), \+ mpred_connective(F), A>1) ==> 
+   {lmconf:agenda_slow_op_enqueue(must(ignore(deduceEachArgType(P))))})))).
+
+
 % tCol(Col) <==> isa(Col,tCol).
 
 
@@ -699,6 +702,7 @@ isa(Spec,tCol) ==> arity(Spec,1).
 
 % :-include('mpred_header.pi').
 tCol(tPred).
+
 :- mpred_test(assert_argIsa(tPred,1,tPred)).
 
 

@@ -18,6 +18,7 @@ must_is_entailed(G):- cwc, must(is_entailed(G)).
 
 show_test(G):- cwc, get_user_abox(KB),printAll(must(KB:G)).
 
+
 %= ````
 %= logic tests...
 %= ````

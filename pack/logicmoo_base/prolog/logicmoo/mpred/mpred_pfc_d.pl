@@ -65,9 +65,9 @@ end_of_file.
 
   mpred_run/0,mpred_test/1,mpred_test_fok/1,
 
-  call_u/1,call_uU/1,asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,clause_u/2,clause_u/3,get_user_abox/1,lookup_u/1,
+  call_u/1,with_umt/1,asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,clause_u/2,clause_u/3,get_user_abox/1,lookup_u/1,
 
-          call_in_mi/1,get_search_mode/3,mpred_rem_support_if_exists/2,get_tms_mode/2,call_uU/1,
+          call_in_mi/1,get_search_mode/3,mpred_rem_support_if_exists/2,get_tms_mode/2,with_umt/1,
 
   stop_trace/1,with_mpred_trace_exec/1,
   select_next_fact/1,supporters_list/2,triggerSupports/2,trigger_trigger/3,well_founded/1,well_founded_list/2,
@@ -93,7 +93,7 @@ end_of_file.
       fc_eval_action(0,-),
       clause_u(+,+,-),
       call_u(+),
-      call_uU(+),
+      with_umt(+),
       brake(0),
       with_no_mpred_trace_exec(0),
       with_mpred_trace_exec(0),
@@ -223,9 +223,9 @@ call_u(G0):-
   mpred_BC_CACHE(G),
   (memberchk(F/A,[(',')/2])->
   mpred_CALL(call_u,G);
-  call_uU(G0)).
+  with_umt(G0)).
 
-call_uU(G0):-
+with_umt(G0):-
   strip_module(G0,WM,G),
   get_user_abox(U),  
   must(current_predicate(_,U:G)->(CALL=U:G);(current_predicate(_,WM:G0)->CALL=WM:G0; fail)),
@@ -2613,7 +2613,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((assertz_u)/1).
 :- module_transparent((asserta_u)/1).
 :- module_transparent((assert_u)/1).
-:- module_transparent((call_uU)/1).
+:- module_transparent((with_umt)/1).
 :- module_transparent((clause_u)/3).
 :- module_transparent((mpred_BC_CACHE)/1).
 :- module_transparent((mpred_CALL)/1).

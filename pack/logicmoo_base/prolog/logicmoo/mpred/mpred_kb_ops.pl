@@ -215,14 +215,14 @@ assertz_mu/2,
 assertz_mu/1,
 mpred_op/2,
 mpred_retry/1,
-with_umt/1,
+
 has_functor/1,
           call_s/1,call_s2/1,asserta_s/1,assert_s/1,assertz_s/1,retract_s/1,retractall_s/1,
           clause_s/2,clause_s/3,lookup_s/1,lookup_s/2,lookq_s/2,lookq_s/1,
 
 to_addable_form_wte/3,
 to_addable_form/2,
-with_umt/1,
+
 update_single_valued_arg/2,
 ruleBackward/2,
 retract_eq_quitely_f/1,
@@ -253,7 +253,7 @@ clause_or_call/2,
 clause_or_call/2,
 check_context_module/0,
 call_with_bc_triggers/1,
-with_umt/1,
+
 attvar_op/2,
 %supporters_list/2,
 %justifications/2,
@@ -265,7 +265,6 @@ mpred_facts_and_universe/1,
           ]).
 
 :- meta_predicate 
-      with_umt(+),
       pred_head(1,*),
       physical_side_effect(0),
       oncely(0),
@@ -1689,7 +1688,7 @@ trigger_supporters_list(Trigger,[Fact|MoreFacts]) :-
   mpred_get_support_precanonical_plus_more(Trigger,(Fact,AnotherTrigger)),
   must(trigger_supporters_list(AnotherTrigger,MoreFacts)).
 
-mpred_retry(G):- fail;G.
+mpred_retry(G):- fail; notrace(G).
 
 
 %% { ?G} is semidet.
@@ -2568,6 +2567,7 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 
 
 
+/*
 with_umt(G0):-
   strip_module(G0,WM,G),
   get_user_abox(U),  
@@ -2576,7 +2576,7 @@ with_umt(G0):-
  '$module'(M,U),
   call_cleanup(CALL,
      ('$set_source_module'(_,S),'$module'(_,M))).
-
+*/
 
 
 :- retractall(t_l:mpred_debug_local).

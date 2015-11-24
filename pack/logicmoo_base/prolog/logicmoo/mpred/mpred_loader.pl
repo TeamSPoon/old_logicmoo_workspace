@@ -734,7 +734,7 @@ read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quote
 %
 % E Trace.
 %
-etrace:-leash(-all),leash(+exception),trace.
+etrace:-leash(+all),leash(+exception),trace.
 
 
 :- thread_local(t_l:on_eof/2).
@@ -3157,7 +3157,8 @@ pop_predicates(M:F/A,STATE):- functor(H,F,A),forall(member((H:-B),STATE),M:asser
 % Prolog Load File.
 %
 user:prolog_load_file(ModuleSpec, Options):- current_predicate(_,_:mpred_loader_file),
-  \+ never_load_special(ModuleSpec, Options),  catch(prolog_load_file_loop_checked(ModuleSpec, Options),E,((trace,prolog_load_file_loop_checked(ModuleSpec, Options),throw(E)))).
+  \+ never_load_special(ModuleSpec, Options),  catch(prolog_load_file_loop_checked(ModuleSpec, Options),E,
+    ((wdmsg(E),trace,prolog_load_file_loop_checked(ModuleSpec, Options),throw(E)))).
 
 
 

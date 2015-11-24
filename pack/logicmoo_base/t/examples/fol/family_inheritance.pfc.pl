@@ -15,7 +15,6 @@
 
 must_is_entailed(G):- cwc, must(is_entailed(G)).
 
-
 show_test(G):- cwc, get_user_abox(KB),printAll(must(KB:G)).
 
 %= ````
@@ -42,9 +41,9 @@ male(P) <=> ~female(P).
 
 
 
-
 % seven rules
 (((parent(C,M) & female(M)) <=> mother(C,M))).
+==> clif(((parent(C,M) & female(M)) <=> mother(C,M))).
 
 
 % ((parent(C,M) & female(M)) <=> mother(C,M)).
@@ -96,8 +95,10 @@ human(trudy).
 never_retract_u(human(trudy)).
 never_retract_u(human(eileen)).
 
-:- debug(_).
-:- mpred_trace_exec.
+:- nodebug(_).
+% :- mpred_trace_exec.
+
+% :-  debug(foo).
 
 %  
 forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f))))).
@@ -108,8 +109,11 @@ forall(c,exists([m,f], if(human(c), (mother(c,m) & father(c,f))))).
 
 :- mpred_run.
 
+:- mpred_trace_exec.
 % ((human(P1),ancestor(P1,P2))=>human(P2)).
 ((human(P1),ancestor(P2,P1))=>human(P2)).
+
+:- mpred_notrace_exec.
 
 :- (ain(mother(eileen,trudy))).
 :- printAll(must(mother(eileen,_))).

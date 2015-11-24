@@ -234,8 +234,8 @@ vn:project_attributes(QueryVars, ResidualVars):-nop(dmsg(vn:proj_attrs(vn,QueryV
 %  Hook To [dom:attribute_goals/3] For Module Logicmoo_varnames.
 %  Attribute Goals.
 %
-% vn:attribute_goals(Var) --> {variable_name(Var, Name)},[name_variable(Var,Name)],!.
-vn:attribute_goals(_Var) --> [].
+vn:attribute_goals(Var) --> {variable_name(Var, Name)},[name_variable(Var,Name)],!.
+% vn:attribute_goals(_Var) --> [].
 
 
 %:- public ((attr_unify_hook/2,attr_portray_hook/2)).

@@ -388,9 +388,9 @@ fmt(X,Y,Z):- fmt_ansi(fmt0(X,Y,Z)),!.
 
 :- module_transparent((format_to_message)/3).
 format_to_message(Format,Args,Info):- 
-   is_list(Args)-> 
+  (( must(is_list(Args))-> 
      format(string(Info),Format,Args);
-     format(string(Info),'~N~p <> ~p~n',[Format,Args]).
+     (trace,format(string(Info),'~N~n~p +++++++++++++++++ ~p~n',[Format,Args])))).
 
 %= 	 	 
 
@@ -1304,8 +1304,8 @@ contrasting_color(_,default).
 %
 % Sgr Whenever Code.
 %
-sgr_on_code(Ctrl,OnCode):-must(sgr_on_code0(Ctrl,OnCode)),!.
-sgr_on_code(Foo,7):- notrace((format_to_error('~NMISSING: ~q~n',[bad_sgr_on_code(Foo)]))),!.
+sgr_on_code(Ctrl,OnCode):- sgr_on_code0(Ctrl,OnCode),!.
+sgr_on_code(_Foo,7):-!. %  notrace((format_to_error('~NMISSING: ~q~n',[bad_sgr_on_code(Foo)]))),!.
 
 
 %= 	 	 
@@ -1314,7 +1314,7 @@ sgr_on_code(Foo,7):- notrace((format_to_error('~NMISSING: ~q~n',[bad_sgr_on_code
 %
 % If Is A Sgr Whenever Code.
 %
-is_sgr_on_code(Ctrl):-sgr_on_code0(Ctrl,_),!.
+is_sgr_on_code(Ctrl):-notrace(sgr_on_code0(Ctrl,_)),!.
 
 
 %= 	 	 
@@ -1362,6 +1362,7 @@ sgr_off_code(_,0).
 %
 sgr_code_on_off(Ctrl,OnCode,OffCode):-sgr_on_code(Ctrl,OnCode),sgr_off_code(Ctrl,OffCode),!.
 sgr_code_on_off(Ctrl,OnCode,OffCode):-sgr_on_code(Ctrl,OnCode),sgr_off_code(Ctrl,OffCode),!.
+sgr_code_on_off(_Ctrl,_OnCode,[default]):-!.
 
 
 
