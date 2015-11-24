@@ -13,6 +13,7 @@
 
 :- module(mpred_pfc, [
   call_u/1,fix_mp/2,
+  mpred_fwc/1,
   show_if_debug/1,
   set_user_abox/1,
   get_user_abox/1,
@@ -210,10 +211,12 @@ listing_u(P):-call_u(listing(P)).
 assert_u(MP):- fix_mp(MP,M:P),assert(M:P).
 asserta_u(MP):- fix_mp(MP,M:P),asserta(M:P).
 assertz_u(MP):- fix_mp(MP,M:P),assertz(M:P).
-retract_u(M:(H:-B)):- atom(M),!, clause_u(H,B,R),erase(R).
 
-retract_u((H:-B)):-!, clause_u(H,B,R),erase(R).
-retract_u(H0):- strip_module(H0,_,H),!, clause_u(H,true,R),erase(R).
+retract_u(M:(H:-B)):- atom(M),!, clause_u(H,B,R),erase(R),expire_tabled_list(H).
+retract_u((H:-B)):-!, clause_u(H,B,R),erase(R),expire_tabled_list(H).
+retract_u(H0):- strip_module(H0,_,H),(H = ( \+ _ )),!,mpred_warn(retract_u(H0)),expire_tabled_list(H).
+retract_u(H0):- strip_module(H0,_,H),!, clause_u(H,true,R),erase(R),expire_tabled_list(H).
+
 retractall_u(H):- forall(clause_u(H,_,R),erase(R)).
 clause_u(H,B):- clause_u(H,B,_).
 
@@ -403,7 +406,7 @@ mpred_post(P, S):-
 mpred_post1(    P,   S):- if_defined_else(fixed_negations(P,P0),fail),!, mpred_post1( P0,   S).
 % TODO - ODD THIS WAS EVEN NEEDED?
 mpred_post1(  ~ P,   S):- nonvar(P),doall(mpred_remove(P,S)),mpred_undo(\+P),fail.
-mpred_post1( \+ P,   S):- nonvar(P),!, mpred_withdraw(P, S),!.
+mpred_post1( \+ P,   S):- nonvar(P),!,call_uU((mpred_withdraw(P, S),!,doall(mpred_remove(P,S)),mpred_undo(\+P),retract_u(P))).
 mpred_post1(P,S):- 
   %  db mpred_ain_db_to_head(P,P2),
   % mpred_remove_old_version(P),
@@ -766,7 +769,7 @@ mpred_undo(pt(Key,Head,Body)):-
     -> mpred_unfwc(pt(Head,Body))
      ; mpred_warn("Trigger not found to undo: ~p",[pt(Head,Body)])).
 
-mpred_undo(pt(Head,Body)):- fail,
+mpred_undo(pt(Head,Body)):- 
   % undo a positive trigger.
   %
   !,
@@ -1678,7 +1681,7 @@ mpred_database_item(P):-
   ((B== true)-> P=H; P=(H:B)).
 
 
-mpred_retract_i_or_warn(X):- retract_u(X), !.
+mpred_retract_i_or_warn(X):- call_uU(X), retract_u(X), !.
 mpred_retract_i_or_warn(spft(P,T,mfl(M,F,A))):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,T,mfl(M,F,_))).
 mpred_retract_i_or_warn(spft(P,mfl(M,F,A),T)):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,mfl(M,F,_),T)).
 mpred_retract_i_or_warn(spft(P,T,mfl(M,A,F))):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,T,mfl(M,_,F))).
@@ -1763,8 +1766,8 @@ mpred_trace_maybe_print(Add,P,S):-
        -> wdmsg("~NOP: ~p (~p) ~p",[Add,U,P])
         ; wdmsg("~NOP: ~p (:) ~p~N\tSupported By: ~p",[Add,P,S]))),!.
 
-to_u(S,U):-S=(U,U),!.
 to_u(S,U):-S=(U,ax),!.
+to_u(S,U):-S=(U,U),!.
 
 mpred_trace_maybe_break(Add,P,_ZS):-
   \+ lookup_u(mpred_is_spying_pred(P,Add)) -> true;

@@ -3167,9 +3167,6 @@ mpred_eval_lhs0(X,WS) :-
 mpred_eval_lhs0(X,Why) :-
   mpred_warn("Unrecognized item found in trigger body, namely ~p.",[mpred_eval_lhs0(X,Why)]),!.
 
-
-mpred_retry(G):- fail;G.
-
 %=
 %= eval something on the RHS of a rule.
 %=

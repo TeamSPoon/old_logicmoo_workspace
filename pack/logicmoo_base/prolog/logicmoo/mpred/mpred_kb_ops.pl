@@ -214,6 +214,7 @@ assert_mu/1,
 assertz_mu/2,
 assertz_mu/1,
 mpred_op/2,
+mpred_retry/1,
 with_umt/1,
 has_functor/1,
           call_s/1,call_s2/1,asserta_s/1,assert_s/1,assertz_s/1,retract_s/1,retractall_s/1,
@@ -283,7 +284,7 @@ mpred_facts_and_universe/1,
       attvar_op(1,*),
       % clause_u(+,+,-),
       % call_u(+),
-      assertz_mu(+),
+      assertz_mu(+),      
       assertz_mu(+,+),
       assert_mu(+),
       ain_minfo_2(1,*),
@@ -301,7 +302,7 @@ mpred_facts_and_universe/1,
 :- meta_predicate(oncely(0)).
 :- was_export(oncely/1).
 
-%= 	 	 
+
 
 %% oncely( :GoalCall) is semidet.
 %
@@ -321,7 +322,7 @@ once(A,B,C,D):-trace_or_throw(once(A,B,C,D)).
 */
 
 
-%= 	 	 
+
 
 %% second_order( ?VALUE1, ?VALUE2) is semidet.
 %
@@ -332,7 +333,7 @@ second_order(_,_):-fail.
 :- meta_predicate(deducedSimply(0)).
 :- was_export(deducedSimply/1).
 
-%= 	 	 
+
 
 %% deducedSimply( :GoalCall) is semidet.
 %
@@ -344,7 +345,7 @@ deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not_asserted((Call)),
 
 :- meta_predicate(mpred_op(?,?)).
 
-%= 	 	 
+
 
 %% mpred_op( ?Op, ?H) is semidet.
 %
@@ -378,7 +379,7 @@ mpred_op(_,C):- call_u(C).
 
 :- was_export(whenAnd/2).
 
-%= 	 	 
+
 
 %% whenAnd( :GoalA, :GoalB) is semidet.
 %
@@ -392,7 +393,7 @@ whenAnd(A,B):-A,ground(B),once(B).
 % ========================================
 
 
-%= 	 	 
+
 
 %% reduce_mpred_op( ?Op, ?Op2) is semidet.
 %
@@ -402,7 +403,7 @@ reduce_mpred_op(Op,Op2):-must(hotrace(transitive(how_to_op,Op,Op2))),!.
 reduce_mpred_op(A,A).
 
 
-%= 	 	 
+
 
 %% how_to_op( ?HowOP, ?HowOP) is semidet.
 %
@@ -432,7 +433,7 @@ how_to_op(HowOP,HowOP).
 
 
 
-%= 	 	 
+
 
 %% lookup_inverted_op( ?VALUE1, ?VALUE2, +OUT3) is semidet.
 %
@@ -456,7 +457,7 @@ lookup_inverted_op(asserta_new,retract,+).
 :- meta_predicate(naf(0)).
 :- was_export(naf/1).
 
-%= 	 	 
+
 
 %% naf( :GoalGoal) is semidet.
 %
@@ -467,7 +468,7 @@ naf(Goal):- (\+ call_u(Goal)).
 :- meta_predicate(is_callable(0)).
 :- was_export(is_callable/1).
 
-%= 	 	 
+
 
 %% is_callable( :GoalC) is semidet.
 %
@@ -2431,7 +2432,7 @@ repropagate_1(P):- call_u(repropagate_2(P)).
 %
 repropagate_2(P):-
  doall((no_repeats((mpred_facts_and_universe(P))),
-    w_tl(t_l:is_repropagating(P),ignore((once(show_failure(fwd_ok(P))),show_call(mpred_fwd(P))))))).
+    w_tl(t_l:is_repropagating(P),ignore((once(show_failure(fwd_ok(P))),show_call(mpred_fwc(P))))))).
 
 % repropagate_meta_wrapper_rule(P==>_):- !, repropagate(P).
 

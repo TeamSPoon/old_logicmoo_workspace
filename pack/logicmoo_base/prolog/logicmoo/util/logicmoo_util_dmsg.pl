@@ -1304,7 +1304,7 @@ contrasting_color(_,default).
 %
 % Sgr Whenever Code.
 %
-sgr_on_code(Ctrl,OnCode):-sgr_on_code0(Ctrl,OnCode),!.
+sgr_on_code(Ctrl,OnCode):-must(sgr_on_code0(Ctrl,OnCode)),!.
 sgr_on_code(Foo,7):- notrace((format_to_error('~NMISSING: ~q~n',[bad_sgr_on_code(Foo)]))),!.
 
 

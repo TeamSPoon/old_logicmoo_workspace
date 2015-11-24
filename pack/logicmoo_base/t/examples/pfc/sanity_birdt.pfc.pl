@@ -110,14 +110,18 @@ tFly(iChilly).
 
 :- debug(_).
 :- mpred_trace_exec.
+:- debug(mpred).
 
 :- mpred_test(tBird(iChilly)).
 
 never_retract_u(tBird(iChilly)).
 
+
 \+ tPenguin(iChilly).
 
+
 :- mpred_test((tBird(iChilly))).
+
 :- mpred_test(( \+ tPenguin(iChilly))).
 
 :- dmsg("chilly is still a bird").
