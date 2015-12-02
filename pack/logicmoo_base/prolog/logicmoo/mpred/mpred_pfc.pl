@@ -2632,8 +2632,6 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((mpred_nf)/2).
 :- module_transparent((action_is_undoable)/1).
 :- module_transparent((call_in_mi)/1).
-:- module_transparent((trigger_trigger1)/2).
-:- module_transparent((trigger_trigger)/3).
 :- module_transparent((mpred_eval_rhs1)/2).
 :- module_transparent((mpred_eval_rhs)/2).
 :- module_transparent((mpred_eval_lhs)/2).
@@ -2701,6 +2699,20 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((mpred_BC_CACHE)/1).
 :- module_transparent((mpred_CALL)/1).
 :- module_transparent((mpred_get_support)/2).
+:- module_transparent((pp_why)/1).
+:- module_transparent((pp_why)/0).
+:- module_transparent((mpred_notrace_exec)/0).
+:- module_transparent((maybe_mpred_break)/0).
+:- module_transparent((to_u)/2).
+:- module_transparent((mpred_BC_CACHE0)/1).
+:- module_transparent((mpred_eval_lhs_det)/2).
+:- module_transparent((mpred_eval_lhs_nondet)/2).
+:- module_transparent((cut_c)/0).
+:- module_transparent((push_current_choice)/1).
+:- module_transparent((set_search_mode)/1).
+:- module_transparent((get_mpred_current_db)/1).
+:- module_transparent((body_true)/1).
+:- module_transparent((is_source_ref1)/1).
 
 
 
@@ -2710,9 +2722,9 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
    F\=='$mode',
    F\=='$pldoc',
    ignore(((\+ atom_concat('$',_,F),\+ mpred_database_term(F/A,_),export(F/A)))),
-   \+ predicate_property(M:H,transparent),
-   format('~N:- module_transparent((~q)/~q).~n',[F,A]),
-   M:module_transparent(M:F/A)))).
+   \+ predicate_property(M:H,transparent),M:module_transparent(M:F/A),
+   ignore(((\+ atom_concat('__aux',_,F),format('~N:- module_  transparent(~q/~q).~n',[F,A]))))
+   ))).
 
 
 :- forall(mpred_database_term(F/A,_),abolish(mpred_pfc:F/A)).

@@ -23,7 +23,7 @@
  op(300,fx,'~'),
  op(300,fx,'-')]).
 
-
+:- meta_predicate logicmoo_user: ~0.
 
 :- multifile(logicmoo_user_base:user_module_uses/2).
 :- dynamic(logicmoo_user_base:user_module_uses/2).

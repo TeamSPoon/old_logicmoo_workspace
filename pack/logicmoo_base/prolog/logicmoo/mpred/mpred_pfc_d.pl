@@ -1,4 +1,6 @@
+
 end_of_file.
+
 /* Part of LogicMOO Base Logicmoo Debug Tools
 % ===================================================================
 % File '$FILENAME.pl'

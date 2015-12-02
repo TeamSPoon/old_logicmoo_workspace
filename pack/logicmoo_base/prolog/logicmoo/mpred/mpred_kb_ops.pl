@@ -2603,7 +2603,6 @@ with_umt(G0):-
 :- module_transparent( (mpred_facts_and_universe)/1).
 :- module_transparent( (rescan_pfc)/0).
 :- module_transparent( (pred_r0)/1).
-:- module_transparent( (pred_t0)/2).
 :- module_transparent( (pred_t0)/1).
 :- module_transparent( (has_db_clauses)/1).
 :- module_transparent( (pred_u2)/1).
@@ -2782,7 +2781,7 @@ with_umt(G0):-
    F\=='$pldoc',
    ignore(((\+ atom_concat('$',_,F),export(F/A)))),
    \+ predicate_property(M:H,transparent),
-   format('~N:- module_transparent( (~q)/~q).~n',[F,A]),
+   ignore(((\+ atom_concat('__aux',_,F),format('~N:- module_  transparent(~q/~q).~n',[F,A])))),
    M:module_transparent(M:F/A)))).
 
 
