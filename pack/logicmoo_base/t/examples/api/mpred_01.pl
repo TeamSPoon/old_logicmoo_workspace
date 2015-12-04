@@ -1,8 +1,8 @@
-#!/usr/bin/env swipl
+% #!/usr/bin/env swipl
 
 :- module(myMicrotheory,[]).
 
-:- use_module(library(logicmoo_user)).
+:- use_module(logicmoo(logicmoo_user)).
 :- begin_pfc.
 
 
