@@ -266,6 +266,8 @@ context_module_of_file(CM):- source_context_module(CM),!.
 %
 % Shared Multifile.
 %
+shared_multifile(user:PI):-!, context_module_of_file(CM),with_pfa_group(make_shared_multifile,CM, baseKB, PI).
+shared_multifile(logicmoo_user:PI):- !, context_module_of_file(CM),with_pfa_group(make_shared_multifile,CM, baseKB, PI).
 shared_multifile(PI):- context_module_of_file(CM),with_pfa_group(make_shared_multifile,CM, baseKB, PI).
 
 %= 	 	 

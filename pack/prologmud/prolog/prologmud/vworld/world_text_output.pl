@@ -36,8 +36,8 @@ show_kb_preds(Agent,LOC,List):-
     must_det_l((
         ignore((once(mudAtLoc(Agent,LOC);localityOfObject(Agent,LOC)))),
         ignore((once(locationToRegion(LOC,Region);localityOfObject(Agent,Region)))),
-         once((thlocal:repl_writer(Agent,WPred);WPred=default_repl_writer)),
-         once((thlocal:repl_to_string(Agent,ToSTR);ToSTR=default_repl_obj_to_string)),!,
+         once((t_l:repl_writer(Agent,WPred);WPred=default_repl_writer)),
+         once((t_l:repl_to_string(Agent,ToSTR);ToSTR=default_repl_obj_to_string)),!,
         subst(List,vHere,Region,ListRR),
         subst(ListRR,isSelfAgent,Agent,ListR),
         show_kb_via_pred(WPred,ToSTR,ListR))),!.
@@ -75,7 +75,7 @@ show_kb_via_pred_0(WPred,ToSTR,Call):- functor(Call,F,_), show_kb_via_pred_1(WPr
 
 show_kb_via_pred_1(WPred,ToSTR,F,all(Call)):-!,show_kb_via_pred_2(WPred,ToSTR,F,Call).
 show_kb_via_pred_1(WPred,ToSTR,F,once(Call)):-!,show_kb_via_pred_2(WPred,ToSTR,F,once(Call)).
-show_kb_via_pred_1(_WPred,_ToSTR,_F,call(Call)):-!,debugOnError(req1(Call)).
+show_kb_via_pred_1(_WPred,_ToSTR,_F,call(Call)):-!,on_x_debug(req1(Call)).
 show_kb_via_pred_1(WPred,ToSTR,F,Call):-show_kb_via_pred_2(WPred,ToSTR,F,Call).
 
 
@@ -177,7 +177,7 @@ fmt_holds_tcall(WPred,ToSTR,N,Type, V):-  fmt_holds_tcall_pred(WPred,ToSTR,N,Typ
 fmt_holds_tcall_pred(WPred,ToSTR,N,Type,V0):-fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V0),!.
 
 % fmt_holds_tcall_pred_trans(_, _ ,N,_ ,V):-!, fmt(N=V).
-fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V0):-must((debugOnError(call(ToSTR,V0,Type,V)),!,debugOnError(call(WPred,_Tn,N,Type,V)))),!.
+fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V0):-must((on_x_debug(call(ToSTR,V0,Type,V)),!,on_x_debug(call(WPred,_Tn,N,Type,V)))),!.
 
 
 :- include(prologmud(mud_footer)).

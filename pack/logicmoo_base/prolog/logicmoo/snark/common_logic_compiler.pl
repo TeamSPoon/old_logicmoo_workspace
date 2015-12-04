@@ -1030,9 +1030,9 @@ pnf(KB,   poss(X,F),Vs,   poss(X,PNF)):- !, pnf(KB,F,Vs, PNF),!.
 
 pnf(KB,  exists(X,F),Vs,exists(X,PNF)):- list_to_set([X|Vs],VVs), !, pnf(KB,F, VVs, PNF),!.
 
-pnf(KB,  &(exists(X,A) , B),Vs,  exists(Y,PNF)):- !, copy_term((X,A,Vs),(Y,Ay,Vs)), pnf(KB,&(Ay,B),[Y|Vs], PNF),!.
+pnf(KB,  (&(exists(X,A) , B)),Vs,  exists(Y,PNF)):- !, copy_term((X,A,Vs),(Y,Ay,Vs)), pnf(KB,&(Ay,B),[Y|Vs], PNF),!.
 
-pnf(KB,    v(exists(X,A), B),Vs,  exists(Y,PNF)):- !, copy_term((X,A,Vs),(Y,Ay,Vs)), pnf(KB,v(Ay,B),[Y|Vs], PNF).!.
+pnf(KB,   ( v(exists(X,A)), B),Vs,  exists(Y,PNF)):- !, copy_term((X+A+Vs),(Y+Ay+Vs)), pnf(KB,(v(Ay,B)),[Y|Vs], PNF).!.
 
 pnf(KB, &(all(X,A), B),Vs, all(Y,PNF)):- !, copy_term((X,A,Vs),(Y,Ay,Vs)), pnf(KB,&(Ay , B),[Y|Vs], PNF),!.
 

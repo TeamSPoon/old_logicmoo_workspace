@@ -13,7 +13,7 @@
 % Load logicmoo REPL Base
 % ==============================
 :- asserta(user:load_mud_www).
-:- user:ensure_loaded(library(logicmoo/logicmoo_base)).
+:- user:ensure_loaded(library(logicmoo_user)).
 
 
 :- statistics.
@@ -33,14 +33,14 @@ setup_rl_read_history:-
 
 
 % [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/)
-:- if(user:exists_source(library(eggdrop))).
+:- if((fail , user:exists_source(library(eggdrop)))).
 :- ensure_loaded(library(eggdrop)).
 :- eggdrop:egg_go.
 :- initialization((current_predicate(egg_go/0)->egg_go;true),now).
 :- endif.
 
 % [Required] Load the Logicmoo Base System
-:- time(user:ensure_loaded(logicmoo(logicmoo_base))).
+:- time(user:ensure_loaded(logicmoo_user)).
 % :- meta_predicate user:testml(//).
 
 
@@ -57,9 +57,9 @@ setup_rl_read_history:-
 */
 :- endif.
 
-:- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_base)))).
+:- (if_file_exists(user:ensure_loaded(library(logicmoo_base)))).
 
-:- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_user)))).
+:- (if_file_exists(user:ensure_loaded(library(logicmoo_user)))).
 
 % ==============================
 % Load the infernce engine
@@ -68,5 +68,5 @@ setup_rl_read_history:-
 % [Required] Load the Logicmoo Backchaining Inference System
 % :- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(logicmoo_engine))))).
 
-:-  m1,m4,m1,egg_go.
+% :-  m1,m4,m1,egg_go.
 

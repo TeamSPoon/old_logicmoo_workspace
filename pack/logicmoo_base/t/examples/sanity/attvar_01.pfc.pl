@@ -2,17 +2,27 @@
 
 :- module(sanity_ks_two,[]).
 
-:- use_module(library(logicmoo_base)).
+:- use_module(library(logicmoo_utils)).
 
 :- debug(_).
-:- nodebug(http(_)).
-:- mpred_trace_exec.
-:- begin_pfc.
+% :- nodebug(http(_)).
+:- debug(mpred).
 
-argsQuoted(my_sk).
+% :- begin_file(pl).
+
+
+:- dynamic(sk_out/1).
+:- dynamic(sk_in/1).
 
 :- read_attvars(true).
-my_sk(avar([vn='Ex',sk='SKF-666'])).
-:- must((my_sk(Ex),get_attr(Ex,sk,What),What='SKF-666')).
+
+sk_in(avar([vn='Ex',sk='SKF-666'])).
+
+:- listing(sk_in).
+
+:- must((sk_in(Ex),get_attr(Ex,sk,What),What=='SKF-666')).
+
+
+
 
 

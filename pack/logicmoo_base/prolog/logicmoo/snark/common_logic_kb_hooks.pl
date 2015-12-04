@@ -151,6 +151,50 @@
       % common_logic_kb_hooks
       xcall_f(5,?,?,?,?,?).
 
+% XXXXXXXXXXXXXXXXXXXXXXXXXx
+% XXXXXXXXXXXXXXXXXXXXXXXXXx
+% XXXXXXXXXXXXXXXXXXXXXXXXXx
+% XXXXXXXXXXXXXXXXXXXXXXXXXx
+
+:- meta_predicate 
+
+        call_f(?, 1, ?),
+        call_f(?, 2, ?, ?),
+        call_f(?, 3, ?, ?, ?),
+        call_f(?, 4, ?, ?, ?, ?),
+        call_f(?, 5, ?, ?, ?, ?, ?),
+        call_f(?, 6, ?, ?, ?, ?, ?, ?),
+        call_mt_f(?, 2, ?, ?),
+        call_mt_f(?, 3, ?, ?, ?),
+        call_mt_f(?, 4, ?, ?, ?, ?),
+        call_mt_f(?, 5, ?, ?, ?, ?, ?),
+        call_mt_f(?, 6, ?, ?, ?, ?, ?, ?),
+        call_mt_t(?, 2, ?, ?),
+        call_mt_t(?, 3, ?, ?, ?),
+        call_mt_t(?, 4, ?, ?, ?, ?),
+        call_mt_t(?, 5, ?, ?, ?, ?, ?),
+        call_mt_t(?, 6, ?, ?, ?, ?, ?, ?),
+        call_which_t(?, 1, ?),
+        call_which_t(?, 2, ?, ?),
+        call_which_t(?, 3, ?, ?, ?),
+        call_which_t(?, 4, ?, ?, ?, ?),
+        call_which_t(?, 5, ?, ?, ?, ?, ?),
+        call_which_t(?, 6, ?, ?, ?, ?, ?, ?),
+        xcall_f(0),
+        xcall_f(1, ?),
+        xcall_f(2, ?, ?),
+        xcall_f(3, ?, ?, ?),
+        xcall_f(4, ?, ?, ?, ?),
+        xcall_f(5, ?, ?, ?, ?, ?),
+        xcall_f(6, ?, ?, ?, ?, ?, ?),
+        xcall_t(0),
+        xcall_t(1, ?),
+        xcall_t(2, ?, ?),
+        xcall_t(3, ?, ?, ?),
+        xcall_t(4, ?, ?, ?, ?),
+        xcall_t(5, ?, ?, ?, ?, ?),
+        xcall_t(6, ?, ?, ?, ?, ?, ?).
+
 
 :- meta_predicate xcall_f(0).
 :- meta_predicate xcall_f(1,?).

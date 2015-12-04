@@ -319,7 +319,7 @@ user:fact_always_true(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,L
 fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
 fact_maybe_deduced(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathDirLeadsTo(Region,Dir,_)).
 
-% create_and_assert_random_fact(_):- thlocal:noDBaseHOOKS(_),!.
+% create_and_assert_random_fact(_):- t_l:noDBaseHOOKS(_),!.
 create_and_assert_random_fact(Fact):- fail,must(create_random_fact(Fact)),hooked_asserta(Fact).
 
 %  suggest a random fact that is probably is not already true
@@ -507,7 +507,7 @@ user:decl_database_hook(change( retract,_),mudAtLoc(Agent,_)):-padd(Agent,mudNee
 in_world_move(LOC,Agent,DirS) :-
         string_to_atom(DirS,Dir),
         ignore(is_asserted(mudAtLoc(Agent,LOC))),
-        must_det((with_assertions(thlocal:infAssertedOnly(mudAtLoc),in_world_move0(LOC,Agent,Dir)),       
+        must_det((with_assertions(t_l:infAssertedOnly(mudAtLoc),in_world_move0(LOC,Agent,Dir)),       
          is_asserted(mudAtLoc(Agent,LOC2)),
          LOC2 \== LOC)),!.
 
@@ -516,7 +516,7 @@ can_world_move(LOC,_Agent,Dir) :- check_behind_for_ground(LOC),move_dir_target(L
 in_world_move0(LOC,Agent,Dir) :-
       any_to_dir(Dir,DirS),
         % rtrace(padd(Agent,mudFacing(DirS))),
-        pfc_assert(mudFacing(Agent,DirS)),
+        ain(mudFacing(Agent,DirS)),
         check_behind_for_ground(LOC),
 	move_dir_target(LOC,Dir,XXYY),!,
    must_det_l([

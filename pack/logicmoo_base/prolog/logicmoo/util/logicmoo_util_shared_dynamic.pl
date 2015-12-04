@@ -75,7 +75,7 @@ is_user_module :- prolog_load_context(module,user).
 %
 system_goal_expansion_safe_wrap(T,_):- \+ compound(T),!,fail.
 system_goal_expansion_safe_wrap(M:T,M:I):-!,compound(T),functor(T,F,A),wsh_w:wrap_shared(F,A,How),safe_wrap(T,How,I).
-system_goal_expansion_safe_wrap(T,I):-compound(T),functor(T,F,A),wrap_shared(F,A,How),safe_wrap(T,How,I).
+system_goal_expansion_safe_wrap(T,I):- functor(T,F,A),wrap_shared(F,A,How),safe_wrap(T,How,I).
 
 
 %% safe_wrap( Term, +How, -Wrapped) is semidet.
@@ -110,5 +110,5 @@ decl_shared(M):-atom(M),!,asserta_if_new(wsh_w:wrap_shared(M,_,ereq)).
 % Goal Expansion.
 %
 system:goal_expansion(I,O):- % source_location(_,_), 
-     system_goal_expansion_safe_wrap(I,O).
+     hotrace(system_goal_expansion_safe_wrap(I,O)).
 

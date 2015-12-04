@@ -63,7 +63,7 @@
             indent_to_spaces/2,
             is_sgr_on_code/1,
             is_tty/1,
-            keep_line_pos/2,
+            keep_line_pos_w_w/2,
             last_used_fg_color/1,
             mesg_arg1/2,
             mesg_color/2,
@@ -112,7 +112,7 @@
         if_color_debug(0),
         if_color_debug(0, 0),
         in_cmt(0),
-        keep_line_pos(?, 0),        
+        keep_line_pos_w_w(?, 0),        
         prepend_each_line(?, 0),
         to_stderror(0),
         with_all_dmsg(0),
@@ -1026,7 +1026,7 @@ ansicall(Out,Ctrl,Call):-
 %
 ansicall0(Out,[Ctrl|Set],Call):-!, ansicall0(Out,Ctrl,ansicall0(Out,Set,Call)).
 ansicall0(_,[],Call):-!,Call.
-ansicall0(Out,Ctrl,Call):-if_color_debug(ansicall1(Out,Ctrl,Call),keep_line_pos(Out, Call)).
+ansicall0(Out,Ctrl,Call):-if_color_debug(ansicall1(Out,Ctrl,Call),keep_line_pos_w_w(Out, Call)).
 
 
 %= 	 	 
@@ -1037,17 +1037,17 @@ ansicall0(Out,Ctrl,Call):-if_color_debug(ansicall1(Out,Ctrl,Call),keep_line_pos(
 %
 ansicall1(Out,Ctrl,Call):-
    must(sgr_code_on_off(Ctrl, OnCode, OffCode)),!,
-     keep_line_pos(Out, (format(Out, '\e[~wm', [OnCode]))),
+     keep_line_pos_w_w(Out, (format(Out, '\e[~wm', [OnCode]))),
 	call_cleanup(Call,
-           keep_line_pos(Out, (format(Out, '\e[~wm', [OffCode])))).
+           keep_line_pos_w_w(Out, (format(Out, '\e[~wm', [OffCode])))).
 /*
 ansicall(S,Set,Call):-
      call_cleanup((
          stream_property(S, tty(true)), current_prolog_flag(color_term, true), !,
 	(is_list(Ctrl) ->  maplist(sgr_code_on_off, Ctrl, Codes, OffCodes),
           atomic_list_concat(Codes, (';'), OnCode) atomic_list_concat(OffCodes, (';'), OffCode) ;   sgr_code_on_off(Ctrl, OnCode, OffCode)),
-        keep_line_pos(S, (format(S,'\e[~wm', [OnCode])))),
-	call_cleanup(Call,keep_line_pos(S, (format(S, '\e[~wm', [OffCode]))))).
+        keep_line_pos_w_w(S, (format(S,'\e[~wm', [OnCode])))),
+	call_cleanup(Call,keep_line_pos_w_w(S, (format(S, '\e[~wm', [OffCode]))))).
 
 
 */
@@ -1058,12 +1058,12 @@ ansicall(S,Set,Call):-
 
 %= 	 	 
 
-%% keep_line_pos( ?S, :GoalG) is semidet.
+%% keep_line_pos_w_w( ?S, :GoalG) is semidet.
 %
-% Hook To [ansi_term:keep_line_pos/2] For Module Logicmoo_util_dmsg.
+% Hook To [ansi_term:keep_line_pos_w_w/2] For Module Logicmoo_util_dmsg.
 % Keep Line Pos.
 %
-keep_line_pos(S, G) :-
+keep_line_pos_w_w(S, G) :-
        (stream_property(S, position(Pos)) ->
 	(stream_position_data(line_position, Pos, LPos),
         call_cleanup(G, set_stream(S, line_position(LPos)))) ; G).

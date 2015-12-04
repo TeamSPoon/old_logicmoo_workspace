@@ -7,13 +7,7 @@
 
 :- module(sanity_sk_02,[]).
 
-:- use_module(library(logicmoo_utils)).
 :- use_module(library(logicmoo_base)).
-
-:- mpred_pfc_file.
-
-:- debug(_).
-:- nodebug(http(_)).
 
 :- dynamic(sk_out/1).
 :- dynamic(sk_in/1).
@@ -24,8 +18,6 @@
 
 :- read_attvars(true).
 
-:- debug(mpred).
-:- mpred_trace_exec.
 
 sk_in(avar([vn='Ex',sk='SKF-666'])).
 

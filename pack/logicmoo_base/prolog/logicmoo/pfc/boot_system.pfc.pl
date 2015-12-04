@@ -202,7 +202,7 @@ prologHybrid(genls/2).
      (var(M)->t_l:user_abox(M);true),
      (var(M)->ignore(( current_predicate(F,M:G), \+ predicate_property(M:G,imported_from(_))));true),
      (var(M)->predicate_property(M:G,exported);true),
-     % mpred_test(rebuild_pred_into(G,G,ain,[+dynamic,+multifile,+discontiguous])),         
+     % must(rebuild_pred_into(G,G,ain,[+dynamic,+multifile,+discontiguous])),         
      % (predicate_property(M:G,dynamic)->true;must(convert_to_dynamic(M,F,A))),
      kb_dynamic(M:F/A),
      show_failure(hybrid_support, \+ static_predicate(F/A))}),
@@ -703,7 +703,7 @@ isa(Spec,tCol) ==> arity(Spec,1).
 % :-include('mpred_header.pi').
 tCol(tPred).
 
-:- mpred_test(assert_argIsa(tPred,1,tPred)).
+:- must(assert_argIsa(tPred,1,tPred)).
 
 
 /*
@@ -747,7 +747,7 @@ arity(typeProps,2).
 prologHybrid(isEach( tCol/1, disjointWith/2, genls/2,genlPreds/2, meta_argtypes/1)).
 
 :- ignore(show_failure(why,arity(typeProps,2))).
-:- mpred_test(call_u(arity(typeProps,2))).
+:- must(call_u(arity(typeProps,2))).
 :- ain((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,predCanHaveSingletons,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),1,tPred))).
 :- ain((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologHybrid,prologPTTP,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),2,ftListFn(ftVoprop)))).
 :- ain((isa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),functorDeclares))).
@@ -826,7 +826,7 @@ isa(vtValue,ttValueType).
 
 typeGenls(ttValueType,vtValue).
 
-:- mpred_test((vtColor(vRed))).
+:- must((vtColor(vRed))).
 
 
 :- assertz_if_new((argIsa(Prop,N,Type) :- cwc,number(N),argIsa_known(Prop,N,Type),must(ground(argIsa(Prop,N,Type))))).
@@ -1081,7 +1081,7 @@ quotedDefnIff(ftCodeIs(SomeCode),SomeCode):- cwc, is_ftNonvar(SomeCode).
 tCol(ptBinaryPredicate).
 ttPredType(ptBinaryPredicate).
 
-:- mpred_test(ain(tCol('ptUnaryPredicate'))).
+:- must(ain(tCol('ptUnaryPredicate'))).
 
 isa(arity,ptBinaryPredicate).
 
@@ -1109,9 +1109,9 @@ specialFunctor('/').
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 /*
-:- mpred_test((expand_props(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O),ain(mdefault(O)))).
+:- must((expand_props(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O),ain(mdefault(O)))).
 
-:- mpred_test((fully_expand(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O),mpred_why(mdefault(O)))).
+:- must((fully_expand(_,props(iCrackers666,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]),O),mpred_why(mdefault(O)))).
 */
 :- endif.
 

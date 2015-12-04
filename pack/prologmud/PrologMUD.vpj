@@ -28,19 +28,6 @@
 	<CustomFolders>
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
-		<Folder Name="../../">
-			<F N="../../.gitattributes"/>
-			<F N="../../.gitignore"/>
-			<F N="../../.gitmodules"/>
-			<F N="../../.hgignore"/>
-			<F N="../../LICENSE"/>
-			<F N="../../LogicMOO.vpw"/>
-			<F N="../../pack.pl"/>
-			<F N="../../prologmud.pep"/>
-			<F N="../../README.md"/>
-			<F N="../../StartMUDServer.bat"/>
-			<F N="../../startMUDServer.sh"/>
-		</Folder>
 		<Folder Name="../../games">
 			<F
 				N="../../games/*.*"
@@ -67,12 +54,32 @@
 				<F N="../MUD_ircbot/prolog/eggdrop.pl"/>
 			</Folder>
 		</Folder>
+		<Folder Name="t">
+			<F
+				N="t/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes=""/>
+		</Folder>
 		<Folder Name="prolog">
 			<F
 				N="prolog/*.*"
 				Recurse="1"
 				Refilter="0"
 				Excludes=".git/;*.*~;*~/"/>
+		</Folder>
+		<Folder Name="../../">
+			<F N="../../.gitattributes"/>
+			<F N="../../.gitignore"/>
+			<F N="../../.gitmodules"/>
+			<F N="../../.hgignore"/>
+			<F N="../../LICENSE"/>
+			<F N="../../LogicMOO.vpw"/>
+			<F N="../../pack.pl"/>
+			<F N="../../prologmud.pep"/>
+			<F N="../../README.md"/>
+			<F N="../../StartMUDServer.bat"/>
+			<F N="../../startMUDServer.sh"/>
 		</Folder>
 		<Folder Name="runtime">
 			<F

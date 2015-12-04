@@ -25,8 +25,8 @@
 	</Config>
 	<CustomFolders>
 	</CustomFolders>
-	<Files AutoFolders="DirectoryView">
-		<Folder Name="../">
+	<Files AutoFolders="PackageView">
+		<Folder Name="..">
 			<F
 				N="../*.*"
 				Recurse="0"
@@ -34,6 +34,11 @@
 				Excludes=""/>
 		</Folder>
 		<Folder Name="../t">
+			<F
+				N="../t/*.k*"
+				Recurse="1"
+				Refilter="0"
+				Excludes="*~;.*"/>
 			<F
 				N="../t/*.m**"
 				Recurse="1"
@@ -46,8 +51,14 @@
 			<F
 				N="../t/*.pl"
 				Recurse="1"
-				Refilter="0"
 				Excludes=".git"/>
+		</Folder>
+		<Folder Name="../t/examples">
+			<F
+				N="../t/examples/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes="*~;.*"/>
 		</Folder>
 		<F
 			N="*.*"

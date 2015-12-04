@@ -11,7 +11,7 @@
 isa(tHumanPlayer,ttAgentType).
 %genls(ttAgentType,tCol).
 
-:- dynamic_multifile_exported user:type_action_info/3.
+:- shared_multifile user:type_action_info/3.
 
 user:type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this help").
 

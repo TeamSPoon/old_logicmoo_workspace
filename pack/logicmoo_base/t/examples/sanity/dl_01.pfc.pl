@@ -14,22 +14,7 @@
 
 :- begin_pfc.
 
-:- dynamic(most/1).
-
-meta_argtypes(most(ftAssertable)).
-
-% most(P==>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test))  ==> ((P, \+ R/Test ) ==> Q).
-most(P==>Q)/nonvar(Q) ==> (P ==> most(Q)).
-most(P)/mpred_literal_nv(P)  ==>  (( \+ ~P ) ==> P ).
-
-
-most(Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)) ==> ( (~R/Test) ==> Q ).
-most(Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)) ==> ( ( (\+ R)/Test) ==> Q ).
-% most(Q) ==> if_missing(Q,Q).
-
-(most((Q <- P))/mpred_literal(Q)) ==> (Q <-(P, \+ ~(Q))).
-%(most(P=>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))  ==> ((P, ~R/Test) => Q).
-%(most(P=>Q)/nonvar(Q)) ==> (P => most(Q)).
+:- include('df_include.pfc').
 
 :-dynamic((a/1,b/1,c/1)).
 

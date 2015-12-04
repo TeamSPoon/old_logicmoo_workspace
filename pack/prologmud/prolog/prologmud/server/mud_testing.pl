@@ -200,7 +200,7 @@ mud_test_local:-
   forall(genls(T,tSpatialThing),check_consistent(T,1000)),
   listing(bad_instance/2).
 
-:-thread_local thlocal:is_checking_instance/1.
+:-thread_local t_l:is_checking_instance/1.
 
 :-decl_mpred_prolog(check_consistent(ftTerm,ftInt)).
 :-decl_mpred_prolog(is_instance_consistent(ftTerm,ftInt)).
@@ -209,8 +209,8 @@ mud_test_local:-
 
 check_consistent(Obj,Scope):-var(Scope),!,check_consistent(Obj,0).
 check_consistent(Obj,Scope):-is_instance_consistent(Obj,Was),!,Was>=Scope.
-check_consistent(Obj,_):- thlocal:is_checking_instance(Obj),!.
-check_consistent(Obj,Scope):- with_assertions(thlocal:is_checking_instance(Obj),doall(check_consistent_0(Obj,Scope))).
+check_consistent(Obj,_):- t_l:is_checking_instance(Obj),!.
+check_consistent(Obj,Scope):- with_assertions(t_l:is_checking_instance(Obj),doall(check_consistent_0(Obj,Scope))).
 check_consistent_0(Obj,Scope):- once((catch((doall(((clause(hook:hooked_check_consistent(Obj,AvScope),Body),once(var(AvScope); (AvScope =< Scope) ),Body))),assert_if_new(is_instance_consistent(Obj,Scope))),E,assert_if_new(bad_instance(Obj,E))))),fail.
 check_consistent_0(Type,Scope):- once(type(Type)),
  catch((forall(isa(Obj,Type),check_consistent(Obj,Scope)),

@@ -131,11 +131,11 @@ run_session:-
 run_session(In,Out):-  
   must_det_l((get_session_id(O),
   get_session_io(In,Out),
-  asserta(thlocal:telnet_prefix([isSelfAgent,wants,to])),
-  retractall(thlocal:wants_logout(O)))),!,
+  asserta(t_l:telnet_prefix([isSelfAgent,wants,to])),
+  retractall(t_l:wants_logout(O)))),!,
   repeat,     
          once(session_loop(In,Out)),
-      retract(thlocal:wants_logout(O)),!,
+      retract(t_l:wants_logout(O)),!,
       thread_self(Id),
       retractall(thglobal:session_io(_,_,_,Id)),      
       retractall(thglobal:session_io(O,_,_,_)),!.
@@ -145,7 +145,7 @@ session_loop(In,Out):-
   (current_agent(P)->true;player_connect_menu(In,Out,_,_);player_connect_menu(In,Out,_,P)),
   start_agent_action_thread,
   ignore(look_brief(P)),!,
-  (thlocal:telnet_prefix(Prefix)->(sformat(S,'~w ~w>',[P,Prefix]));sformat(S,'~w> ',[P])),
+  (t_l:telnet_prefix(Prefix)->(sformat(S,'~w ~w>',[P,Prefix]));sformat(S,'~w> ',[P])),
   prompt_read_telnet(In,Out,S,List),!,
   register_player_stream_local(P,In,Out),
   enqueue_session_action(P,List,O).
@@ -189,7 +189,7 @@ user:deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(New
 fmtevent(Out,NewEvent):-string(NewEvent),!,format(Out,'~s',[NewEvent]).
 fmtevent(Out,NewEvent):-format(Out,'~N~q.~n',[NewEvent]).
 
-:-thread_local(thlocal:telnet_prefix/1).
+:-thread_local(t_l:telnet_prefix/1).
 
 :-set_tty_control(true).
 
@@ -197,7 +197,7 @@ fmtevent(Out,NewEvent):-format(Out,'~N~q.~n',[NewEvent]).
 prompt_read_telnet(In,Out,Prompt,Atom):-
       get_session_id(O),      
       prompt_read(In,Out,Prompt,IAtom),
-      (IAtom==end_of_file -> (hooked_asserta(thlocal:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
+      (IAtom==end_of_file -> (hooked_asserta(t_l:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
 
 prompt_read(In,Out,Prompt,Atom):-         
         with_output_to(Out,ansi_format([reset,hfg(white),bold],'~w',[Prompt])),flush_output(Out),      
@@ -247,7 +247,7 @@ scan_src_updates:- ignore((thread_self(main),ignore((catch(make,E,dmsg(E)))))).
 % DEFAULT TELNET "LOOK"
 % ===========================================================
 
-telnet_repl_writer(_TL,call,ftTerm,Goal):-!,ignore(debugOnError(Goal)).
+telnet_repl_writer(_TL,call,ftTerm,Goal):-!,ignore(on_x_debug(Goal)).
 telnet_repl_writer( TL,text,Type,[V]):-telnet_repl_writer(TL,text,Type,V).
 telnet_repl_writer( TL,text,Type,V):- is_list(V),merge_elements(V,L),V\=@=L,!,telnet_repl_writer( TL,text,Type,L).
 telnet_repl_writer(_TL,text,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('text(~q).~n',[V]).

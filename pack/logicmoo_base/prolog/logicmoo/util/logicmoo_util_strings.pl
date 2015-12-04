@@ -1060,9 +1060,12 @@ any_to_string1(txtFormatFn(Fmt,Args),String):-!,sformat(String,Fmt,Args).
 any_to_string1(Atom,String):-atom(Atom),!,atom_string(Atom,String).
 any_to_string1([Atom],String):-nonvar(Atom),!,any_to_string1(Atom,String).
 any_to_string1(A,""):-nonvar(A),member(A,[[],'',"",``]),!.
-any_to_string1(List,String):- text_to_string_safe(List,String).
+any_to_string1(List,String):- text_to_string_safe(List,String),!.
 %any_to_string1(List,String):- fail, dtrace, is_list(List), (on_x_fail(atomics_to_string(List, ' ', String)); ((list_to_atomics_list0(List,AList),on_x_fail(atomics_to_string(AList, ' ', String))))),!.
-any_to_string1(List,String):-sformat(String,'~s',[List]).
+any_to_string1(List,String):- on_x_fail(format(string(String),'~s',[List])).
+any_to_string1(Term,String):- on_x_fail(term_string(Term,String)).
+any_to_string1(List,String):- on_x_fail(format(string(String),'~p',[List])).
+any_to_string1(List,String):- format(string(String),'~q',[List]).
 /*
 list_to_atomics_list0(Var,A):-var(Var),!,any_to_string(Var,A),!.
 list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-

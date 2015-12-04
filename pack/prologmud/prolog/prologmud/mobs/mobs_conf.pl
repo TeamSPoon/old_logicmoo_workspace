@@ -4,4 +4,4 @@
 
 :-swi_module(mobs_conf,[]).
 
-:- with_assertions(thlocal:pfcExpansion,ensure_loaded(affordance/simbots)).
+:- with_assertions(t_l:pfcExpansion,ensure_loaded(affordance/simbots)).

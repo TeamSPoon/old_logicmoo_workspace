@@ -12,28 +12,7 @@
 
 :- begin_pfc.
 
-:- dynamic((most/1,mostly/1)).
-
-meta_argtypes(most(ftAssertable)).
-
-% BWD chaining
-(most((Q <- P))/mpred_literal(Q)) ==> (Q <-(P, \+ ~(Q))).
-
-% FWD chaining
-most(P==>Q)/nonvar(Q) ==> (P ==> most(Q)).
-
-% NEG chaining
-most(~P)/nonvar(P)  ==>  (( \+ P ) ==> ~ P ).
-
-% POS chaining
-most(P)/mpred_positive_literal(P)  ==>  ( ~~P  ==> P ).
-
-
-
-% mostly(P) ==> (( \+ ~P ) ==> P ).
-% mostly(P)/(if_missing_mask(P,Q,Test)) ==> ( ( \+ Q/Test) ==> P ).
-
-% mostly(Q) ==> if_missing(Q,Q).
+:- include('df_include.pfc').
 
 :-dynamic((a/1,b/1,c/1)).
 
@@ -42,7 +21,7 @@ most(c(X) ==> ~b(X)) .
 a(1).
 
 
-:- listing([a/1,b/1,c/1,(==>)/2,most/1,mostly/1,pt,nt,bt]).
+:- listing([a/1,b/1,c/1,(==>)/2,most/1,pt,nt,bt]).
 
 :- mpred_test(~b(1)).
 

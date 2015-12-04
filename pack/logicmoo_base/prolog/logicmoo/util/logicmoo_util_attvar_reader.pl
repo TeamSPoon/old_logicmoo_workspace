@@ -10,54 +10,42 @@
 % ===================================================================
 */
 :- module(logicmoo_util_attvar_reader, [
-          expand_to_attvars/2,
+          deserialize_attvars/2,
           serialize_attvars/2,
           put_dyn_attrs/2,
-          read_attvars/1,read_attvars/0,
-          system_term_expansion_attvars/2,
-          expand_to_attvars/3]).
+          read_attvars/1,read_attvars/0,          
+          install_attvar_expander/1,
+          is_term_expanding_in_file/1,
+          system_expanded_attvars/2]).
+
+
+:- module_transparent((deserialize_attvars/2,
+          serialize_attvars/2,
+          put_dyn_attrs/2,
+          read_attvars/1,read_attvars/0,          
+          install_attvar_expander/1,
+          is_term_expanding_in_file/1,
+          system_expanded_attvars/2)).
+
 
 :-set_prolog_flag(read_attvars,false).
 
-%:- multifile(user:goal_expansion/2).
-%:- dynamic(user:goal_expansion/2).
-:- multifile(system:goal_expansion/2).
-:- dynamic(system:goal_expansion/2).
-:- multifile(system:term_expansion/2).
-:- dynamic(system:term_expansion/2).
+% use this module to avoid some later conflicts
+% :- use_module(library(base32)).
 
 :- use_module(logicmoo_util_dmsg).
 
-
-
-expand_to_attvars(_,I,O):- expand_to_attvars(I,O).
-
-expand_to_attvars( V,O):- nonvar(O),!,must(expand_to_attvars( V,M)),!,must(M=O).
-expand_to_attvars( V,O):- var(V), ensure_named(V),!,V=O.
-expand_to_attvars(IO,IO):- \+ compound(IO),!.
-expand_to_attvars(avar(S),V):- nonvar(S),!, show_call(put_dyn_attrs(V,S)),ignore(ensure_named(V)).
-expand_to_attvars(avar(V,_),V):- nonvar(V),!.
-expand_to_attvars(avar(V,S),V):- var(V),nonvar(S),!, show_call(put_dyn_attrs(V,S)),ignore(ensure_named(V)).
-expand_to_attvars('$VAR'(N),'$VAR'(N)):- \+ atom(N),!.
-expand_to_attvars('$VAR'(N),V):- nb_current('$variable_names',Vs),member(N=V,Vs),!,put_attr(V,vn,N),!.
-expand_to_attvars('$VAR'(N),V):- nb_current('$variable_names',Vs),put_variable_names([N=V|Vs]),!,put_attr(V,vn,N),!.
-expand_to_attvars(C,A):- compound_name_arguments(C,F,Args),maplist(expand_to_attvars,Args,OArgs),compound_name_arguments(A,F,OArgs).
-
-
-serialize_var(V,'$VAR'(Name)):- get_attrs(V, att(vn, Name, [])),!.
-serialize_var(V,avar('$VAR'(N),SO)):- variable_name_or_ref(V,N),get_attrs(V, S),!,put_attrs(TEMP,S),del_attr(TEMP,vn),!,get_attrs(TEMP, SO),!.
-serialize_var(V,'$VAR'(N)):-  variable_name_or_ref(V,N).
-serialize_var(V,avar(S)):- get_attrs(V, S),!.
-serialize_var(V,V).
-
-serialize_attvars(V,S):- var(V),serialize_var(V,S),!.
-serialize_attvars(IO,IO):- \+ compound(IO),!.
-serialize_attvars('$VAR'(N),'$VAR'(N)):- !.
-serialize_attvars(avar(N),avar(N)):-!.
-serialize_attvars(avar(N,A),avar(N,A)):-!.
-serialize_attvars(C,A):- compound_name_arguments(C,F,Args),maplist(serialize_attvars,Args,OArgs),compound_name_arguments(A,F,OArgs).
-
-
+deserialize_attvars( V,O):- nonvar(O),!,must(deserialize_attvars( V,M)),!,must(M=O).
+deserialize_attvars( V,O):- var(V), ensure_named(V),!,V=O.
+deserialize_attvars(IO,IO):- \+ compound(IO),!.
+deserialize_attvars((H:-BI),O):- split_attrs(BI,AV,BO),AV\==true,term_attvars((H:-BO),[]),must(call(AV)),!,(BO==true->(O=H);O=(H:-BO)).
+deserialize_attvars(avar(S),V):- nonvar(S),!, show_call(put_dyn_attrs(V,S)),ignore(ensure_named(V)).
+deserialize_attvars(avar(V,_),V):- nonvar(V),!.
+deserialize_attvars(avar(V,S),V):- var(V),nonvar(S),!, show_call(put_dyn_attrs(V,S)),ignore(ensure_named(V)).
+deserialize_attvars('$VAR'(N),'$VAR'(N)):- \+ atom(N),!.
+deserialize_attvars('$VAR'(N),V):- nb_current('$variable_names',Vs),member(N=V,Vs),!,put_attr(V,vn,N),!.
+deserialize_attvars('$VAR'(N),V):- nb_current('$variable_names',Vs),put_variable_names([N=V|Vs]),!,put_attr(V,vn,N),!.
+deserialize_attvars(C,A):- compound_name_arguments(C,F,Args),maplist(deserialize_attvars,Args,OArgs),compound_name_arguments(A,F,OArgs).
 
 :- meta_predicate put_dyn_attrs(*,?).
 put_dyn_attrs(V,S):- var(S),!,trace_or_throw(bad_put_dyn_attrs(V,S)),!.
@@ -73,39 +61,116 @@ ensure_attr_setup(M):- atom(M),current_predicate(attribute_goals,M:attribute_goa
 ensure_attr_setup(M):- atom(M),assert_if_new((M:attribute_goals(V,[put_attr(V,M,A)|R],R):- get_attr(V, M,A))).
 
 
-
 read_attvars:- read_attvars(true).
-read_attvars(TF):- set_prolog_flag(read_attvars,TF).
+read_attvars(TF):- set_prolog_flag(read_attvars,TF),
+  prolog_load_context(module,M),
+  install_attvar_expander(M).
+
+is_term_expanding_in_file(I):- var(I),!,fail.
+is_term_expanding_in_file(_:-_):-!.
+is_term_expanding_in_file(I):- source_file(_,_),nb_current('$term',CT),CT==I.
+
+install_attvar_expander(M):-
+  multifile(M:term_expansion/2),
+  dynamic(M:term_expansion/2),
+  asserta_if_new((
+  M:term_expansion(I,CO):- 
+   notrace((current_prolog_flag(read_attvars,true), \+ current_prolog_flag(xref,true), system_expanded_attvars(I,O),
+   (is_term_expanding_in_file(I)->clausify_attributes(O,CO);=(O,CO)),wdmsg(xform(I --> CO)))))),
+
+   system:multifile(system:goal_expansion/2),
+   system:dynamic(system:goal_expansion/2),
+   asserta_if_new((system:goal_expansion(I,O):- 
+    notrace((current_prolog_flag(read_attvars,true), 
+     \+ current_prolog_flag(xref,true), system_expanded_attvars(I,O))))).
 
 
-%% system_term_expansion_attvars( :TermT, :TermARG2) is semidet.
+
+%% serialize_attvars( +AttvarTerm, -PrintableTerm) is semidet.
+%
+% serialize attributed variables (this is for printing only currently)
+%
+serialize_attvars(I,O):- verbatum_term(I),!,O=I.
+serialize_attvars(V,S):- var(V),must(serialize_1v(V,S)),!.
+serialize_attvars(C,A):- compound_name_arguments(C,F,Args),maplist(serialize_attvars,Args,OArgs),compound_name_arguments(A,F,OArgs).
+
+serialize_1v(V,'$VAR'(Name)):- get_attrs(V, att(vn, Name, [])),!.
+serialize_1v(V,avar('$VAR'(N),SO)):- variable_name_or_ref(V,N),get_attrs(V, S),!,put_attrs(TEMP,S),del_attr(TEMP,vn),!,get_attrs(TEMP, SO),!.
+serialize_1v(V,avar(S)):- get_attrs(V, S),!.
+serialize_1v(V,'$VAR'(N)):-  variable_name_or_ref(V,N).
+serialize_1v(V,V).
+
+
+%% verbatum_term(TermT) is semidet.
 %
 % System Goal Expansion Sd.
 %
-system_term_expansion_attvars(T,O):- var(T),!,must(expand_to_attvars(T,T,O)),O\=@=T,!,debugm(xform(T --> O)).
-system_term_expansion_attvars(T,_):- \+ compound(T),!,fail.
-system_term_expansion_attvars('varname_info'(_,_,_,_),_):-!,fail.
-system_term_expansion_attvars(M:T,M:I):-!,system_term_expansion_attvars(T,I).
-system_term_expansion_attvars('$was_imported_kb_content$'(I,II),O):-!,serialize_attvars('$was_imported_kb_content$'(I,II),O),!.
-system_term_expansion_attvars(T,O):- must(expand_to_attvars(T,T,O)),O\=@=T,!,debugm(xform(T --> O)).
-%system_term_expansion_attvars(T,T,_):- debugm(sge(T)),fail.
+verbatum_term(I):- attvar(I),!,fail.
+verbatum_term(I):- \+ compound(I),!. % this is intended to include the non-attrbuted variables
+verbatum_term('$VAR'(_)).
+verbatum_term('avar'(_)).
+verbatum_term('avar'(_,_)).
+verbatum_term('$was_imported_kb_content$'(_,_)).
+verbatum_term('varname_info'(_,_,_,_)).
 
 
-%% system_goal_expansion_attvars( :TermT, :TermARG2) is semidet.
+
+
+
+%% system_expanded_attvars( :TermT, :TermARG2) is semidet.
 %
 % System Goal Expansion Sd.
 %
-system_goal_expansion_attvars(T,O):- var(T),!,must(expand_to_attvars(T,T,O)),O\=@=T,!,debugm(xform(T --> O)).
-system_goal_expansion_attvars(T,_):- \+ compound(T),!,fail.
-system_goal_expansion_attvars(M:T,M:I):-!,system_goal_expansion_attvars(T,I).
-system_goal_expansion_attvars('varname_info'(_,_,_,_),_):-!,fail.
-system_goal_expansion_attvars(T,O):-must(expand_to_attvars(T,T,O)),O\=@=T,!,debugm(xform(T --> O)).
+system_expanded_attvars(I,O):- (var(I);compound(I)),!,loop_check(deserialize_attvars(I,O)),O\=@=I,!.
 
 
-system:term_expansion(I,O):- current_prolog_flag(read_attvars,true), \+ current_prolog_flag(xref,true), system_term_expansion_attvars(I,O) -> I\=@=O.
-
-system:goal_expansion(I,O):- current_prolog_flag(read_attvars,true), \+ current_prolog_flag(xref,true), system_goal_expansion_attvars(I,O) -> I\=@=O.
+end_of_file.
 
 
+:- '$set_source_module'(_, system).
 
-:-set_prolog_flag(read_attvars,true).
+
+:- public '$store_clause'/2.
+
+'$store_clause'(A, C) :-
+        '$clause_source'(A, B, D),
+        '$store_clause'(B, _, C, D).
+
+'$store_clause'((_, _), _, _, _) :- !,
+        print_message(error, cannot_redefine_comma),
+        fail.
+'$store_clause'(A, _, B, C) :-
+        '$valid_clause'(A), !,
+        (   '$compilation_mode'(database)
+        ->  '$record_clause'(A, B, C)
+        ;   '$record_clause'(A, B, C, D),
+            '$qlf_assert_clause'(D, development)
+        ).
+
+'$compile_term'(Clause, Layout, Id, SrcLoc) :-
+	catch('$store_clause'(Clause, Layout, Id, SrcLoc), E,
+	      '$print_message'(error, E)),
+        catch((writeq(user_error,'$store_clause'(Clause,  Id)),nl(user_error)),_,true).
+
+'$compile_aux_clauses'(Clauses, File) :-
+	setup_call_cleanup(
+	    '$start_aux'(File, Context),
+	    '$store_aux_clauses'(Clauses, File),
+	    '$end_aux'(File, Context)).
+
+'$store_aux_clauses'(Clauses, File) :-
+	is_list(Clauses), !,
+	forall('$member'(C,Clauses),
+	       '$compile_term'(C, _Layout, File)).
+'$store_aux_clauses'(Clause, File) :-
+	'$compile_term'(Clause, _Layout, File).
+
+/*
+   compile_predicates(['$expand_goal'/2, '$expand_term'/4]),!.
+:-   
+   % '$set_predicate_attribute'('$expand_goal'(_,_), system, true),
+   % '$set_predicate_attribute'('$expand_term'(_,_,_,_), system, true),
+   '$set_predicate_attribute'('$expand_goal'(_,_), hide_childs, false),
+   '$set_predicate_attribute'('$expand_term'(_,_,_,_), hide_childs, false).
+   
+*/

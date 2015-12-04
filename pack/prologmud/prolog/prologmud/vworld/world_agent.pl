@@ -73,7 +73,7 @@ thread_signal_blocked(ID,Goal):- thread_self(ID),!,Goal.
 thread_signal_blocked(ID,Goal):- message_queue_property(Queue, alias(waq)),thread_self(Waiter), thread_signal(ID,(Goal,thread_send_message(Queue,done(Goal,Waiter),[]))),thread_get_message(Queue,done(Goal,Waiter)).
 
 
-do_agent_action_queues:- repeat,sleep(0.25),once(logOnError(do_agent_action_queue(_))),fail.
+do_agent_action_queues:- repeat,sleep(0.25),once(on_x_log_cont(do_agent_action_queue(_))),fail.
 
 start_agent_action_thread:- 
   (thread_property(T,alias(agent_action_queue_thread)) ->
@@ -87,7 +87,7 @@ start_agent_action_thread:-
 % restarts if it it died
 user:one_minute_timer_tick:- start_agent_action_thread.
 
-with_session(ID,CALL):-with_assertions(thlocal:session_id(ID),CALL).
+with_session(ID,CALL):-with_assertions(t_l:session_id(ID),CALL).
 
 
 % =====================================================================================================================
@@ -122,7 +122,7 @@ agent_call_words(A,PeriodAtEnd):-append(New,[(.)],PeriodAtEnd),!,agent_call_word
 agent_call_words(Ag,[A,B|REST]):- atom(A),atom(B),A=='@',atom_concat(A,B,C),!,agent_call_words(Ag,[C|REST]).
 
 agent_call_words(Agent,[VERB|ARGS]):-
-      must(debugOnError(parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD))),
+      must(on_x_debug(parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD))),
       must_ac(agent_call_command_now(NewAgent,CMD)),!.
 
 agent_call_words(A,[CMD]):- !, must_ac(agent_call_command_now(A,CMD)),!.
@@ -145,7 +145,7 @@ agent_call_command_now(Agent,CMD  ):- \+ where_atloc(Agent,_),!, agent_call_comm
 agent_call_command_now(Agent,CMD  ):- where_atloc(Agent,Where),
    % start event
    must(raise_location_event(Where,actNotice(reciever,begin(Agent,CMD)))),
-   (debugOnError(agent_call_command_now_2(Agent,CMD)) ->
+   (on_x_debug(agent_call_command_now_2(Agent,CMD)) ->
    % event done
      send_command_completed_message(Agent,Where,done,CMD);
    % event fail
@@ -154,8 +154,8 @@ agent_call_command_now(Agent,CMD  ):- where_atloc(Agent,Where),
 agent_call_command_now_2(Agent,CMD):- loop_check(agent_call_command_now_3(Agent,CMD),dmsg(looped(agent_call_command_now_2(Agent,CMD)))).
 agent_call_command_now_3(Agent,CMD):-
    with_agent(Agent,
-     with_assertions(thlocal:side_effect_ok,
-     with_assertions(thlocal:agent_current_action(Agent,CMD),
+     with_assertions(t_l:side_effect_ok,
+     with_assertions(t_l:agent_current_action(Agent,CMD),
   (user:agent_call_command(Agent,CMD)*->true;user:agent_call_command_all_fallback(Agent,CMD))))),
   padd(Agent,mudLastCommand(CMD)).
 
@@ -241,9 +241,9 @@ foc_current_agent(P):-
 get_session_id(IDIn):-guess_session_ids(ID),nonvar(ID),!,ID=IDIn.
 
 % return any thread locally set session
-guess_session_ids(ID):-thlocal:session_id(ID).
+guess_session_ids(ID):-t_l:session_id(ID).
 % irc session
-guess_session_ids(ID):-if_defined(thlocal:default_user(ID)).
+guess_session_ids(ID):-if_defined(t_l:default_user(ID)).
 % telnet session
 guess_session_ids(ID):-thread_self(TID),thglobal:session_io(ID,_,_,TID).
 % returns http sessions as well

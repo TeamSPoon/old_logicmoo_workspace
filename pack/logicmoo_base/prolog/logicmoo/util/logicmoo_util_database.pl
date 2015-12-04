@@ -5,13 +5,14 @@
             aina/1,
             ainz/1,
 
-
+            if_flag_true/2,
 
             attr_bind/1,attr_bind/2,attr_bind_complete/1,
             split_attrs/3,is_attr_bind/1,
 
             paina/1,pain/1,painz/1,
 
+            remove_term_attr_type/2,
             ainz_clause/1,ainz_clause/2,
 
             append_term/3,
@@ -127,6 +128,13 @@ my_module_sensitive_code(_E):- source_context_module(CM),writeln(source_context_
 %
 clause_safe(H,B):-predicate_property(H,number_of_clauses(C)),C>0,clause(H,B).
 
+:- meta_predicate if_flag_true(+,:).
+if_flag_true(TF,Goal):-
+  (current_predicate(_,TF)-> 
+    (TF->Goal;true);
+   (current_prolog_flag(TF,F) -> 
+     (F\=false -> Goal; true);
+     trace_or_throw(if_flag_true(TF,Goal)))).
 
 %= 	 	 
 
@@ -437,12 +445,14 @@ expand_to_hb( M:((H :- B)),M:H,B):-!.
 expand_to_hb( ((H :- B)),H,B):-!.
 expand_to_hb( H,  H,  true).
 
-
-clausify_attributes(M:Data,M:THIS):- nonvar(M),!, clausify_attributes(Data,THIS).
+clausify_attributes(V,V):- \+ compound(V),!.
 clausify_attributes((Data:-B),THIS):- B==true,!,clausify_attributes(Data,THIS).
+clausify_attributes(M:Data,M:THIS):- nonvar(M),!, clausify_attributes(Data,THIS).
 clausify_attributes((Data:-B),THIS):- !,
    copy_term((Data:-B),(Data0:-B0),Extra),   
    (Extra == [] -> (THIS = (Data:-B)) ; (hb_to_clause(Data0,(attr_bind(Extra),B0),THIS))).
+clausify_attributes([H|T],[HH|TT]):- !,clausify_attributes(H,HH),clausify_attributes(T,TT).
+clausify_attributes((H,T),(HH,TT)):- !,clausify_attributes(H,HH),clausify_attributes(T,TT).
 clausify_attributes(Data,THIS):- 
    copy_term(Data,Data0,Extra),   
    (Extra == [] -> THIS = Data ; (hb_to_clause(Data0,attr_bind(Extra),THIS))).
@@ -464,8 +474,8 @@ split_attrs((L,B),AB,(L,R)):- !,split_attrs(B,AB,R).
 split_attrs(AB,true,AB).
 
 is_attr_bind(B):- \+ compound(B),!,fail.
-is_attr_bind(B):- functor(B,attr_bind,_).
-is_attr_bind(_:B):-!,compound(B),functor(B,attr_bind,_).
+is_attr_bind(B):- functor(B,attr_bind,_),!.
+is_attr_bind(_:B):-compound(B),functor(B,attr_bind,_).
 
 :- meta_predicate attr_bind(0,0).
 :- module_transparent attr_bind/2.
@@ -545,9 +555,42 @@ clause_asserted_i(HB):- expand_to_hb(HB,H,B),clause_asserted_i(H,B,_).
 clause_asserted_i(H,B):- clause_asserted_i(H,B,_).
 % clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,
 %  clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
+/*
 clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,A,B),!, 
   clause_i(H,B,Ref), 
  (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
+*/
+
+remove_term_attr_type(Term,Mod):-term_attvars(Term,AVs),maplist(del_attr_type(Mod),AVs).
+
+clause_asserted_i(MH,B,Ref):- nonvar(MH),M:H=MH,!, clause_asserted_i_0(M:H,B,Ref).
+clause_asserted_i(H,B,Ref):- nonvar(H),(current_predicate(_,M:H) *-> clause_asserted_i_0(M:H,B,Ref) ; fail).
+clause_asserted_i(H,B,Ref):- clause_asserted_i_0(H,B,Ref).
+
+clause_asserted_i_0(H,B,Ref):- ground(H:B),clause(H,B,Ref),clause(HH,BB,Ref),ground(HH:BB),!.
+clause_asserted_i_0(H,B,Ref):- !,
+ \+ \+ 
+ ((
+  remove_term_attr_type((H:B),vn),
+  clause_i(H,B,Ref),
+  clause_i(HH,BB,Ref),
+  remove_term_attr_type((HH,BB),vn),
+   HH=@=H,
+   BB=@=B)).
+
+clause_asserted_i(H,B,Ref):-
+ \+ \+ 
+ ((
+  remove_term_attr_type((H:B),vn),
+  clause(H,BDB,Ref),
+  once((must(split_attrs(BDB,A,BS)),
+  remove_term_attr_type(BS,vn),
+  B=@=BS)),
+  clause_i(HH,BB,Ref),  
+  remove_term_attr_type((HH,BB),vn),
+   HH=@=H,
+   BB=@=B,
+   call(A))).
 
 
 %% clause_i( ?H, ?B, ?Ref) is semidet.

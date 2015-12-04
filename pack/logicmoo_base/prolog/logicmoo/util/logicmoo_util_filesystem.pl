@@ -44,6 +44,7 @@
             global_pathname/2,
             if_file_exists/1,
             if_startup_script/0,
+            in_include_file/0,
             if_startup_script/1,
             in_search_path/2,
             is_directory/1,
@@ -453,6 +454,12 @@ prolog_file_dir(Here):- working_directory(Here,Here).
 prolog_file_dir(Rel,ABSF):-prolog_file_dir(Here),absolute_file_name(Rel,ABSF,[relative_to(Here),file_type(directory),expand(true)]),!.
 prolog_file_dir(Rel,ABSF):-prolog_file_dir(Here),absolute_file_name(Rel,ABSF,[relative_to(Here),expand(true)]),!.
 
+
+%% in_include_file is semidet.
+%
+% In Include File.
+%
+in_include_file:- prolog_load_context(file,F),!, \+ prolog_load_context(source,F).
 
 %= 	 	 
 

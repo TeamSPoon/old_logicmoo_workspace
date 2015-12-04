@@ -167,12 +167,12 @@ create_instance(What,Type,Props):-
 
 create_instance_now(What,Type,Props):-
   must((var(Type);atom_concat('t',_,Type ))),!,
- with_assertions(thlocal:agenda_suspend_scans,
-  with_assertions(thlocal:deduceArgTypes(_),
-  with_no_assertions(thlocal:useOnlyExternalDBs,
-   with_no_assertions(thlocal:noRandomValues(_),
-     with_no_assertions(thlocal:infInstanceOnly(_),   
-      with_no_assertions(thlocal:infAssertedOnly(_),
+ with_assertions(t_l:agenda_suspend_scans,
+  with_assertions(t_l:deduceArgTypes(_),
+  with_no_assertions(t_l:useOnlyExternalDBs,
+   with_no_assertions(t_l:noRandomValues(_),
+     with_no_assertions(t_l:infInstanceOnly(_),   
+      with_no_assertions(t_l:infAssertedOnly(_),
         with_no_assertions(thglobal:use_cyc_database, 
      ((split_name_type(What,Inst,_WhatType),assert_isa(Inst,Type), create_instance_0(What,Type,Props)))))))))).
 
@@ -191,8 +191,8 @@ ttSpatialType(tAgent).
 genls(tActor,tAgent).
 genls(tExplorer,tAgent).
 
-:-dynamic_multifile_exported(predTypeMax/3).
-:-dynamic_multifile_exported(predInstMax/3).
+:-shared_multifile(predTypeMax/3).
+:-shared_multifile(predInstMax/3).
 
 %NEXT TODO predInstMax(I,mudEnergy,NRG):- infSecondOrder, predTypeMax(mudEnergy,AgentType,NRG),isa(I,AgentType).
 %predInstMax(I,mudHealth,Dam):- predTypeMax(mudHealth,AgentType,Dam),isa(I,AgentType).

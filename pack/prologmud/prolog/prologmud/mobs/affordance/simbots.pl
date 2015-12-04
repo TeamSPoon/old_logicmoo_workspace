@@ -851,5 +851,5 @@ verb_for_type(actThinkAbout, tLookAble).
 
 */
 
-:-pfc_assert({simbots_templates(Templ)} ==> vtActionTemplate(Templ)).
+:-ain({simbots_templates(Templ)} ==> vtActionTemplate(Templ)).
 

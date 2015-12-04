@@ -537,7 +537,8 @@ sl_to_filename(W,To):-nonvar(To),To=(W:_),atom(W),!.
 %
 % Current Source Location.
 %
-current_source_file(F):- clause(logicmoo_util_catch:current_source_location0(W),Body),catchv(Body,_,fail),sl_to_filename(W,F),!.
+current_source_file(F):- clause(current_source_location0(W),Body),catchv(Body,_,fail),
+ sl_to_filename(W,F),!.
 current_source_file(F):- F = unknown.
 
 
@@ -1445,7 +1446,7 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 %
 % Must Be Successfull.
 %
-must(Goal):- must_be(nonvar,Goal), notrace(get_must(Goal,MGoal)),!,MGoal.
+must(Goal):-  notrace((must_be(nonvar,Goal),get_must(Goal,MGoal))),!,MGoal.
 
 
 %= 	 	 

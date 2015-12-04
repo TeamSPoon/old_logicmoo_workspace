@@ -9,7 +9,7 @@
 % ==============================
 
 :- asserta(user:load_mud_www).
-:- asserta(thlocal:verify_side_effect_buffer).
+:- asserta(t_l:verify_side_effect_buffer).
 :- asserta(skip_el_assertions).
 
 
@@ -40,7 +40,7 @@
 
 :-listing(side_effect_buffer/3).
 
-:-forall(actual_side_effect(H,B),(nl,portray_clause(H:-B))).
+:-forall(t_l:actual_side_effect(H,B),(nl,portray_clause(H:-B))).
 
 :-listing(side_effect_buffer/3).
 
@@ -90,7 +90,7 @@
 :-dmsg("About to run Sanity").
 
 
-:- show_call_entry(gripe_time(40,if_startup_script(doall(user:sanity_test)))).
+:- show_entry(gripe_time(40,if_startup_script(doall(user:sanity_test)))).
 
 
 feature_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
@@ -132,7 +132,7 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 % [Optionaly] Tell the NPCs to do something every 60 seconds (instead of 90 seconds)
 % :- register_timer_thread(npc_ticker,60,npc_tick).
 
-:- show_call_entry(gripe_time(40,test_for_release(prologmud(mud_startup)))).
+:- show_entry(gripe_time(40,test_for_release(prologmud(mud_startup)))).
 
 
 :- pce_show_profile.
@@ -149,7 +149,7 @@ push_env_ctx:-!.
 
 :- test_for_release(debug_mud_game).
 
-:- asserta(thlocal:disable_mpred_term_expansions_locally).
+:- asserta(t_l:disable_mpred_term_expansions_locally).
 
 
 % :- statistics(globallimit,G),statistics(locallimit,L),statistics(traillimit,T),qsave_program(logicmoo_repl,[map('logicmoo_repl.sav'),global(G),trail(T),local(L)]).

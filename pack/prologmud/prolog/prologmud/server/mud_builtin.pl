@@ -1,6 +1,6 @@
 /** <module>
 % ===================================================================
-% File 'logicmoo_i_builtin.pl'
+% File 'mud_builtin.pl'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;
@@ -24,10 +24,12 @@
 :- assert_until_eof(infSupertypeName).
 :- onEndOfFile(dmsg(infSupertypeName)).
 
-
 :- include(prologmud(mud_header)).
+:- '$set_source_module'(_,baseKB).
 :- file_begin(pfc).
-:- retractall(thlocal:disable_mpred_term_expansions_locally).
+:- set_user_abox(baseKB).
+:- retractall(t_l:disable_mpred_term_expansions_locally).
+
 
 % baseKB:isa(iPerson99,tPerson).
 
@@ -261,7 +263,7 @@ tms_reject_why(mudAtLoc(R,_),isa(R,tRegion)):- isa(R,tRegion).
 
 %deduce_facts_forward(localityOfObject(_,Region),isa(Region,tSpatialThing)).
 deduce_facts_forward(localityOfObject(Obj,_),isa(Obj,tObj)).
-fix_argIsa(F,N,vtDirection(Val),vtDirection):-add(user:mpred_prop(F,argSingleValueDefault(N,Val))),!.
+fix_argIsa(F,N,vtDirection(Val),vtDirection):-ain(user:mpred_prop(F,argSingleValueDefault(N,Val))),!.
 
 */
 
@@ -454,7 +456,7 @@ tPred(isEach(tAgent/1, mudEnergy/2,mudHealth/2, mudAtLoc/2, failure/2, typeGrid/
 prologHybrid(mudToHitArmorClass0 / 2).
 prologHybrid(mudAtLoc/2).
 prologBuiltin((agent_call_command/2)).
-:-decl_mpred_hybrid(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
+:-shared_multifile(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
  pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completeExtentAsserted/1, ttFormatType/1, typeProps/2)).
 prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
  pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
@@ -592,8 +594,8 @@ ttTypeFacet(tChannel).
 typeGenls(tAgent,ttAgentType).
 typeGenls(tItem,ttItemType).
 typeGenls(tObj,ttObjectType).
-:-add(isa(tObj,ttTemporalType)).
-:-add(isa(tRegion,ttTemporalType)).
+:-ain(isa(tObj,ttTemporalType)).
+:-ain(isa(tRegion,ttTemporalType)).
 typeGenls(tRegion,ttRegionType).
 typeGenls(ttAgentType,tAgent).
 typeGenls(ttItemType,tItem).
@@ -641,8 +643,8 @@ bordersOn(R1,R2):-is_asserted(pathDirLeadsTo(R2,Dir,R1)),nop(Dir).
 
 ensure_some_pathBetween(R1,R2):- bordersOn(R1,R2),!.
 ensure_some_pathBetween(R1,R2):- random_path_dir(Dir), \+(is_asserted(pathDirLeadsTo(R1,Dir,_))),must(reverse_dir(Dir,Rev)),\+(is_asserted(pathDirLeadsTo(R2,Rev,_))),!, 
-   must((add(pathDirLeadsTo(R1,Dir,R2)),add(pathDirLeadsTo(R2,Rev,R1)))),!.
-ensure_some_pathBetween(R1,R2):- trace,must((add(pathDirLeadsTo(R1,aRelatedFn(vtDirection,R1,R2),R2)),add(pathDirLeadsTo(R2,aRelatedFn(vtDirection,R2,R1),R1)))),!.
+   must((ain(pathDirLeadsTo(R1,Dir,R2)),ain(pathDirLeadsTo(R2,Rev,R1)))),!.
+ensure_some_pathBetween(R1,R2):- trace,must((ain(pathDirLeadsTo(R1,aRelatedFn(vtDirection,R1,R2),R2)),ain(pathDirLeadsTo(R2,aRelatedFn(vtDirection,R2,R1),R1)))),!.
 
 bordersOn(R1,R2)/ground(bordersOn(R1,R2)) ==> isa(R1,tRegion),isa(R2,tRegion), {ensure_some_pathBetween(R2,R1),ensure_some_pathBetween(R1,R2)}.
 
@@ -668,7 +670,7 @@ tCol(genlsInheritable).
 
 genlsInheritable(tCol).
 genlsInheritable(ttPredType).
-:-must(pfc_assert((genls(ttTypeType,genlsInheritable)))).
+:-must(ain((genls(ttTypeType,genlsInheritable)))).
 
 (genls(C,SC)/ground(genls(C,SC))==>(tCol(C),tCol(SC))).
 
@@ -784,7 +786,7 @@ mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
 
 %TOO SLOW isa(I,SC)<=isa(I,C),genls(C,SC).
 
-(wearsClothing(A,I)==>{add(tAgent(A)),add(tClothing(I))}).
+(wearsClothing(A,I)==>{ain(tAgent(A)),ain(tClothing(I))}).
 
 
 genls(tBread, tFood).
@@ -807,7 +809,7 @@ user:action_info(C,_)==>vtActionTemplate(C).
 
 argsQuoted(cachedPredicate).
 
-cachedPredicate(Goal)==>{forall(Goal,pfc_add(Goal))}.
+cachedPredicate(Goal)==>{forall(Goal,ain(Goal))}.
 
 tCol(cachedPredicate).
 cachedPredicate(vtActionTemplate(_)).
@@ -988,8 +990,9 @@ prologHybrid(agentGOAL(tAgent,ftAssertable)).
 normalAgentGoal(Pred,Val) ==>  ( t(Pred,A,V)/(V<Val) ==> agentTODO(A,actImprove(Pred))).
 normalAgentGoal(Pred,Val) ==>  ( t(Pred,A,V)/(V<Val) ==> agentGOAL(A,t(Pred,A,Val))).
 
-:-pfc_fwd(normalAgentGoal(Pred,Val) ==>  ( t(Pred,A,V)/(V<Val) ==> agentGOAL(A,t(Pred,A,Val)))).
-normalAgentGoal(Pred,Val)==>  (tAgent(A)==>pfc_default(t(Pred,A,Val))).
+:-ain((normalAgentGoal(Pred,Val) ==>  ( t(Pred,A,V)/(V<Val) ==> agentGOAL(A,t(Pred,A,Val))))).
+% :-mpred_fwd((normalAgentGoal(Pred,Val) ==>  ( t(Pred,A,V)/(V<Val) ==> agentGOAL(A,t(Pred,A,Val))))).
+normalAgentGoal(Pred,Val)==>  (tAgent(A)==>mdefault(t(Pred,A,Val))).
 
 genls(tRoom,tRegion).
 
@@ -1039,21 +1042,21 @@ O = [
 
 */
 
-:- pfc_spy_all.
+:- mpred_trace_exec.
 
-:- debugOnError(pfc_add(tAgent(iExplorer1))).
+:- on_x_debug(ain(tAgent(iExplorer1))).
 
 
 
 :-must(mudFacing(iExplorer1,vNorth)).
 
-:-pfc_add(mudFacing(iExplorer1,vSouth)).
+:-ain(mudFacing(iExplorer1,vSouth)).
 
 :-must(\+ mudFacing(iExplorer1,vNorth)).
 
 :-must(mudFacing(iExplorer1,vSouth)).
 
-:-pfc_rem(mudFacing(iExplorer1,vSouth)).
+:-mpred_remove(mudFacing(iExplorer1,vSouth)).
 
 :-must(\+ mudFacing(iExplorer1,vSouth)).
 
@@ -1062,5 +1065,5 @@ O = [
 % genls(tExplorer,tHumanPlayer).
 isa(iExplorer1,tHumanPlayer).
 
-:- pfc_no_spy_all.
+:- mpred_notrace_exec.
 

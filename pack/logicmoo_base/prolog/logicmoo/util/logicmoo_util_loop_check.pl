@@ -277,7 +277,7 @@ loop_check(Call, TODO):- parent_goal(ParentCall,1)->(loop_check_term_key(Call,Ca
 %
 % Loop Check Term Key.
 %
-loop_check_term_key(Call,KeyIn,TODO):- make_key(KeyIn,Key) -> loop_check_term(Call,Key,TODO).
+loop_check_term_key(Call,KeyIn,TODO):- notrace(make_key(KeyIn,Key)) -> loop_check_term(Call,Key,TODO).
 
 
 
@@ -315,8 +315,8 @@ no_loop_check_term_key(Call,KeyIn,TODO):- make_key(KeyIn,Key) -> wno_tl(lmcache:
 %
 % Loop Check Term.
 %
-loop_check_term(Call,Key,TODO):- TT = lmcache:ilc(Key),
- ( \+(TT) -> (setup_call_cleanup(asserta(TT,REF), Call, 
+loop_check_term(Call,Key,TODO):- notrace(TT = lmcache:ilc(Key)),
+ ( notrace( \+(TT)) -> (setup_call_cleanup(notrace(asserta(TT,REF)), Call, 
    erase(REF))) ; 
    ((can_fail(TODO)->retract_can_table;true),call(TODO)) ).
 
@@ -351,7 +351,6 @@ get_where0(A:0):-current_input(S),stream_property(S,alias(A)),!.
 get_where0(M:0):-source_context_module(M),!.
 get_where0(lmconf:0):-!.
 
-% lco_goal_expansion(_,_):-!,fail.
 
 %= 	 	 
 
@@ -359,6 +358,8 @@ get_where0(lmconf:0):-!.
 %
 % Lco Goal Expansion.
 %
+
+lco_goal_expansion(_,_):-!,fail.
 lco_goal_expansion(B,A):-nonvar(A),!,lco_goal_expansion(B,M),!,M=A.
 lco_goal_expansion(V,V):- \+ compound(V),!.
 lco_goal_expansion(loop_check(G),O):-!,lco_goal_expansion(loop_check(G,fail),O).
@@ -671,7 +672,7 @@ outside_of_loop_check:- (clause(lmcache:ilc(_),B)->B=(!,fail);true).
 % Hook To [system:goal_expansion/2] For Module Logicmoo_util_loop_check.
 % Goal Expansion.
 %
-user:goal_expansion(LC,LCOO):- notrace((current_predicate(_,_:logicmoo_bugger_loaded),once(lco_goal_expansion(LC,LCOO)),LC\=@=LCOO)).
+user:goal_expansion(LC,LCOO):- notrace((source_location(_,_), current_predicate(_,_:logicmoo_bugger_loaded),lco_goal_expansion(LC,LCOO),LC\=@=LCOO)).
 
 
 

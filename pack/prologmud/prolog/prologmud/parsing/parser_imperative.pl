@@ -34,7 +34,7 @@
 :-export(get_agent_text_command/4).
 
 get_agent_text_command(Agent,VERBOrListIn,AgentR,CMD):-
-   debugOnError(loop_check(get_agent_text_command_0(Agent,VERBOrListIn,AgentR,CMD),fail)).
+   on_x_debug(loop_check(get_agent_text_command_0(Agent,VERBOrListIn,AgentR,CMD),fail)).
 
 get_agent_text_command_0(Agent,ListIn,AgentR,CMD):- 
    (is_list(ListIn) -> UseList=ListIn ; UseList=[ListIn]),
@@ -89,7 +89,7 @@ parse_for(Type,StringM,Term,LeftOver):-
    list_tail(String,LeftOver),
    HOW = phrase(parseIsa(Type,Term),String,LeftOver),
    fmt('parsing with ~q ~n.',[HOW]),
-   (debugOnError(HOW)->
+   (on_x_debug(HOW)->
       fmt('Success! parse \'~q\' "~q" = ~q   (leftover=~q) . ~n',[Type,String,Term,LeftOver]);
       fmt('No Success.~n',[])).
 
@@ -334,7 +334,7 @@ get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
    predsort(mostIdiomatic,TEMPLATES_FA,TEMPLATES).
    
 % parses a verb phrase and retuns multiple interps
-parse_vp_real(Agent,SVERB,ARGS,Sorted):- with_assertions(thlocal:infSkipFullExpand,parse_vp_real_no_arg_checking(Agent,SVERB,ARGS,Sorted)).
+parse_vp_real(Agent,SVERB,ARGS,Sorted):- with_assertions(t_l:infSkipFullExpand,parse_vp_real_no_arg_checking(Agent,SVERB,ARGS,Sorted)).
 parse_vp_real_no_arg_checking(Agent,SVERB,ARGS,Sorted):-
    get_vp_templates(Agent,SVERB,ARGS,TEMPLATES),   
    dmsg_parserm(("TEMPLATES"= (orig([SVERB|ARGS]) = TEMPLATES))),
@@ -474,7 +474,7 @@ phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- catch(phrase_parseForT
 phrase_parseForTypes_1([isOptional(_, W)|TYPEARGS], [], [W|GOODARGS], LeftOver):- phrase_parseForTypes_1(TYPEARGS,[],GOODARGS,LeftOver).
 phrase_parseForTypes_1([isOptionalStr(W)|TYPEARGS], [], [W|GOODARGS], LeftOver):- phrase_parseForTypes_1(TYPEARGS,[],GOODARGS,LeftOver).
 phrase_parseForTypes_1(TYPEARGS,In,Out,[]):- length(TYPEARGS,L),between(1,4,L),length(In,L),must(Out=In),!,nop(fmt(fake_phrase_parseForTypes_l(foreach_isa(In,TYPEARGS)))),fail.
-phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- debugOnError(phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver)).    
+phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- on_x_debug(phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver)).    
 
 phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver):- (LeftOver=[];LeftOver=_ ), phrase(parseForTypes(TYPEARGS,GOODARGS),ARGS,LeftOver).
 
@@ -646,7 +646,7 @@ naming_order(ORDER,L,R):-compare(ORDER,L,R).
 
 get_sorted_instances(Inst,Type,HOW):-findall(Inst,isa(Inst,Type),List),sort(List,NoDupes),predsort(HOW,NoDupes,Sorted),!,member(Inst,Sorted).
 
-% instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).
+% instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], on_x_log_cont(req(Term)).
 % longest_string(?Order, @Term1, @Term2)
 /*
 longest_string(Order,TStr1,TStr2):-

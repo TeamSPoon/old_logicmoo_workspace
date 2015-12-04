@@ -102,6 +102,7 @@ localityOfObject/2,
 meta_argtypes/1,
 mpred_action/1,
 mdefault/1, % pfc
+most/1, % pfc
 mpred_do_and_undo_method/2,
 mpred_isa/2,
 %mpred_manages_unknowns/0,
@@ -409,20 +410,22 @@ resolverConflict_robot(C) :- cwc, must((mpred_remove(C),wdmsg("Rem-3 with confli
 :- multifile((never_assert_u/2)).
 never_assert_u(Rule,is_var(Rule)):- cwc, is_ftVar(Rule),!.
 never_assert_u(Rule,head_singletons(Pre,Post)):- cwc, Rule \= (_:-_), once(mpred_rule_hb(Rule,Post,Pre)), head_singletons(Pre,Post).
-never_assert_u(declared(M:F/A),never_declared(M:F/A)):- M:F/A = qrTBox:p/1.
 never_assert_u(A,B):-never_assert_u0(A,B),trace,never_assert_u0(A,B).
-
-
-never_assert_u(declared(P),Why):- functor(P,F,A),F\=(:),F\=(/),never_assert_u(declared(F/A),Why).
-never_assert_u(declared(mpred_run_resume/0),cuz).
-never_assert_u(declared(decl_type/1),cuz).
-never_assert_u(declared(is_clif/1),cuz).
-
-never_assert_u(declared(_:FA),Why):-never_assert_u(declared(FA),Why).
-never_assert_u(_:declared(_:FA),Why):-never_assert_u(declared(FA),Why).
-never_assert_u(_:declared(FA),Why):-never_assert_u(declared(FA),Why).
-
 % never_assert_u(M:arity(_,_),is_support(arity/2)):- M==pqr,dumpST, trace, cwc,!.
+
+never_assert_u(A,B):-ground(A),never_declare(A,B).
+
+never_declare(declared(M:F/A),never_declared(M:F/A)):- M:F/A = qrTBox:p/1.
+never_declare(declared(P),Why):- nonvar(P),functor(P,F,A),F\=(:),F\=(/),never_declare(declared(F/A),Why).
+never_declare(declared(mpred_run_resume/0),cuz).
+never_declare(declared(decl_type/1),cuz).
+never_declare(declared(is_clif/1),cuz).
+
+never_declare(declared(_:FA),Why):-nonvar(FA),never_declare(declared(FA),Why).
+never_declare(_:declared(_:FA),Why):-nonvar(FA),never_declare(declared(FA),Why).
+never_declare(_:declared(FA),Why):-nonvar(FA),never_declare(declared(FA),Why).
+
+
 never_assert_u(M:Rule,Why):- cwc, atom(M),never_assert_u(Rule,Why).
 
 

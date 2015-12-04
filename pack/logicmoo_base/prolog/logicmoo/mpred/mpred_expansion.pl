@@ -226,7 +226,7 @@ Predicate transformer semantics to combine programming concepts in a compact way
 This simplicity makes proving the correctness of programs easier, using Hoare logic.
 
 Axiomatic semantics
-Writing in Prolog is actually really easy for a MUD is when the length's chosen
+Writing in Prolog is actually really easy for a MUD is when X is chosen
 
 %
 % Dec 13, 2035
@@ -450,13 +450,14 @@ fully_expand(X,Y):-fully_expand(_,X,Y).
 %:- mpred_trace_nochilds(fully_expand/3).
 
 
-%= 	 	 
 
 %% fully_expand( ?Op, ?Sent, ?SentO) is semidet.
 %
 % Fully Expand.
 %
-fully_expand(Op,Sent,SentO):- hotrace((cyclic_break((Sent)), with_no_kif_var_coroutines(((fully_expand0(Op,Sent,SentO)),cyclic_break((SentO)))))),!.
+fully_expand(Op,Sent,SentO):- hotrace((cyclic_break((Sent)),
+           must(hotrace((deserialize_attvars(Sent,SentI)))),
+   with_no_kif_var_coroutines(((fully_expand0(Op,SentI,SentO)),cyclic_break((SentO)))))),!.
 
 
 %= 	 	 
@@ -542,7 +543,7 @@ fully_expand_goal(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,transitive_lc(db
 %
 % Converted To If Is A Term.
 %
-as_is_term(NC):- notrace(as_is_term0(NC)).
+as_is_term(NC):- notrace(loop_check(as_is_term0(NC))),!.
 :- export(as_is_term0/1).
 
 %= 	 	 
@@ -555,6 +556,8 @@ as_is_term0(M:NC):-atom(M),is_ftVar(NC),!.
 as_is_term0(NC):- \+(is_ftCompound(NC)),!.
 as_is_term0(NC):-cyclic_term(NC),!,dmsg(cyclic_term(NC)),!.
 as_is_term0('$VAR'(_)):-!.
+as_is_term0(_:'$was_imported_kb_content$'(_,_)).
+as_is_term0('$was_imported_kb_content$'(_,_)).
 as_is_term0('wid'(_,_,_)):-!.
 
 as_is_term0(NC):-is_unit(NC),!.
@@ -652,7 +655,7 @@ as_is_term(NC):-compound(NC),functor(NC,Op,2),infix_op(Op,_).
 %
 % Database Expand Term.
 %
-db_expand_term(Op,SI,SentO):- loop_check(db_expand_term0(Op,SI,SentO),SI=SentO).
+db_expand_term(Op,SI,SentO):- loop_check(db_expand_term0(Op,SI,SentO),SI=SentO),!.
 
 
 %= 	 	 
@@ -778,7 +781,7 @@ db_expand_chain(_,('nesc'(P)),P) :- !.
 % Database Expand A.
 %
 db_expand_a(Op ,(S1,S2),SentO):-db_expand_a(Op ,S1,S1O),db_expand_a(Op ,S2,S2O),conjoin_l(S1O,S2O,SentO),!.
-db_expand_a(A,B,C):- loop_check_term(db_expand_0(A,B,C),db_expand_0(A,B,C),trace_or_throw(loop_check(db_expand_0(A,B,C)))),!.
+db_expand_a(A1,B1,C1):- loop_check_term(db_expand_0(A1,B1,C1),db_expand_0(A1,B1,C1),trace_or_throw(loop_check(db_expand_0(A1,B1,C1)))),!.
 
 %= 	 	 
 
@@ -975,7 +978,7 @@ db_expand_2(_,Sent,SentO):-is_ftNonvar(Sent),get_ruleRewrite(Sent,SentO),!.
 db_expand_2(change(_,_),Sent,SentO):-is_ftNonvar(Sent),get_ruleRewrite(Sent,SentO),!.
 db_expand_2(_,X,X):-!.
 db_expand_2(_ ,NC,NC):- as_is_term(NC),!.
-db_expand_2(Op,Sent,SentO):-loop_check(expand_term(Sent,SentO)),Sent\=@=SentO,!.
+% db_expand_2(Op,Sent,SentO):-loop_check(expand_term(Sent,SentO)),Sent\=@=SentO,!.
 
 
 
@@ -1327,7 +1330,7 @@ into_mpred_form(t(P,A),O):-atomic(P),!,O=..[P,A].
 into_mpred_form(t(P,A,B),O):-atomic(P),!,O=..[P,A,B].
 into_mpred_form(t(P,A,B,C),O):-atomic(P),!,O=..[P,A,B,C].
 into_mpred_form(Var,MPRED):- is_ftVar(Var), trace_or_throw(var_into_mpred_form(Var,MPRED)).
-into_mpred_form(I,O):-notrace(loop_check(into_mpred_form_ilc(I,O),O=I)). % trace_or_throw(into_mpred_form(I,O))).
+into_mpred_form(I,O):- hotrace(loop_check(into_mpred_form_ilc(I,O),O=I)). % trace_or_throw(into_mpred_form(I,O).
 
 %:- mpred_trace_nochilds(into_mpred_form/2).
 

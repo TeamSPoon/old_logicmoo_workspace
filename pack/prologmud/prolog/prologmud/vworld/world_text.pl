@@ -29,8 +29,8 @@ when_command_show(Agent,ActionType):-
 
 bugger:term_to_message_string(T,T):-var(T),!.
 bugger:term_to_message_string(T,T):-!.
-bugger:term_to_message_string(txtConcatFn(T),M):-debugOnError(generatePhrase_local(T,M)),!.
-bugger:term_to_message_string(fmt(T),M):-debugOnError(generatePhrase_local(T,M)),!.
+bugger:term_to_message_string(txtConcatFn(T),M):-on_x_debug(generatePhrase_local(T,M)),!.
+bugger:term_to_message_string(fmt(T),M):-on_x_debug(generatePhrase_local(T,M)),!.
 bugger:term_to_message_string(C,C):-compound(C),functor(C,F,_),is_leave_alone(F),!.
 bugger:term_to_message_string((T),M):-failOnError(generatePhrase_local(T,M)),!.
 bugger:term_to_message_string(T,T):-!.
@@ -99,7 +99,7 @@ mudTermAnglify(mudTermAnglify(Term,Text),[ftCallable(Term),is,converted,to,engli
 
 term_anglify_np_last(Obj,T,String):- local_term_anglify_np_last(Obj,T,String).
 
-generatePhrase_local(Term,String):- debugOnError(( eng_fully_expand(Term,EnglishM),!,
+generatePhrase_local(Term,String):- on_x_debug(( eng_fully_expand(Term,EnglishM),!,
           % fmt('FR0=~q~n',[eng_fully_expand(Term,EnglishM)]),
           eng_fully_expand(EnglishM,EnglishG),fix_grammar(EnglishG,English) , join_for_string(English,String))),!.
 

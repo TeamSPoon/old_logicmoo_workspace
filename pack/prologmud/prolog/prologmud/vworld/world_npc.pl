@@ -33,7 +33,7 @@ npc_tick:-
    join_npcs_long_running, 
    findall(What-Who,npc_controller(What,Who),List),!,
    my_random_member(What-Who,List),!,
-   ignore(in_thread_and_join(debugOnError(tick_controller(What,Who)))).
+   ignore(in_thread_and_join(on_x_debug(tick_controller(What,Who)))).
 
 join_npcs_long_running.
 
@@ -72,9 +72,9 @@ command_actTick(Who):- (side_effect_prone),
  
 get_world_agent_plan(W,Who,Idea):-no_repeats(with_agent(Who,call_no_cuts(world_agent_plan(W,Who,Idea)))).
 
-do_agent_call_plan_command(A,C):- thlocal:agent_current_action(A,CC),dmsg(too_busy(CC,agent_call_plan_command(A,C))),!.
+do_agent_call_plan_command(A,C):- t_l:agent_current_action(A,CC),dmsg(too_busy(CC,agent_call_plan_command(A,C))),!.
 do_agent_call_plan_command(A,C):-   
-   with_agent(A,with_assertions(thlocal:agent_current_action(A,C), do_agent_action(A,C))).
+   with_agent(A,with_assertions(t_l:agent_current_action(A,C), do_agent_action(A,C))).
 
 
 command_actIdea(Who,IdeaSO):- (var(Who)->current_agent(Who);true),
@@ -114,7 +114,7 @@ any_to_callable(C,X,Vs):- (expand_goal(C,X)),term_variables((C,X),Vs),!.
 % any_to_callable(C,X,Vs):-force_expand(expand_goal(C,X)),term_variables((C,X),Vs),!.
 
 user:agent_call_command(_Agent,actNpcTimer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
-user:agent_call_command(Who,actTick) :-  debugOnError(command_actTick(Who)).
+user:agent_call_command(Who,actTick) :-  on_x_debug(command_actTick(Who)).
 user:agent_call_command(_Agent,actIdea(Who)) :-  must(command_actIdea(Who,Idea)),fmt(result_actIdea(Who,Idea)).
 user:agent_call_command(_Agent,actTock) :- (side_effect_prone), npc_tick.
 user:agent_call_command(_Agent,actTick(Other)) :-(side_effect_prone), user:agent_call_command(Other,actTick).

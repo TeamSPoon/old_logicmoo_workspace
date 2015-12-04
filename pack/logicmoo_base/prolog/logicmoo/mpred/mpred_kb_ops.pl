@@ -868,9 +868,9 @@ reduce_clause_from_fwd(H,H).
 %
 % Converted To Addable Form.
 %
-to_addable_form(I,I):- is_ftVar(I),!.
+to_addable_form(I,O):- is_ftVar(I),!,must(I=O).
+to_addable_form(I,O):- as_is_term(I),!,must(I=O).
 to_addable_form(I,OOO):-is_list(I),!,must_maplist(to_addable_form,I,O),flatten(O,OO),!,must(reduce_clause_from_fwd(OO,OOO)).
-
 to_addable_form(I,OO):- current_predicate(_:mpred_expansion_file/0),must(fully_expand(pfc,I,II)),!,
  must((into_mpred_form(II,M),to_predicate_isas_each(M,O))),!,reduce_clause_from_fwd(O,OO).
 

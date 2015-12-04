@@ -127,15 +127,15 @@ genls(tPenguin,tBird).
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 % % % These next two have been comnbined with the two following % % %
-(((mpred_default(P)/mpred_literal(P))  ==>  (~neg(P) ==> P))).
-((mpred_default((P ==> Q))/mpred_literal(Q) ==> (P, ~neg(Q) ==> Q))).
+(((mdefault(P)/mpred_literal(P))  ==>  (~neg(P) ==> P))).
+((mdefault((P ==> Q))/mpred_literal(Q) ==> (P, ~neg(Q) ==> Q))).
 
 
-%((mpred_default(P)/mpred_literal(P), {pfcVerifyMissing(P,F)})) ==>  ((F, ~neg(P)) ==> P).
-%((mpred_default((P ==> Q))/mpred_literal(Q), {pfcVerifyMissing(Q,F)})) ==> ((P, F, ~neg(Q)) ==> Q).
+%((mdefault(P)/mpred_literal(P), {pfcVerifyMissing(P,F)})) ==>  ((F, ~neg(P)) ==> P).
+%((mdefault((P ==> Q))/mpred_literal(Q), {pfcVerifyMissing(Q,F)})) ==> ((P, F, ~neg(Q)) ==> Q).
 % % % 
-(mpred_default((Q <- P))/mpred_literal(Q)) ==> (Q <-(P, ~neg(Q))).
-%(mpred_default((P ==> Q))/mpred_literal(Q)) ==> (Q <-(P, ~neg(Q))).
+(mdefault((Q <- P))/mpred_literal(Q)) ==> (Q <-(P, ~neg(Q))).
+%(mdefault((P ==> Q))/mpred_literal(Q)) ==> (Q <-(P, ~neg(Q))).
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
 neg(P) <- {pfcVerifyMissing(P,F,Test)},Test,{F\=P}.
@@ -202,7 +202,7 @@ tCanary(iTweety).
 
 
 % birds fly by default.
-(mpred_default(( tBird(X) ==> tFly(X)))).
+(mdefault(( tBird(X) ==> tFly(X)))).
 
 
 tCol(tFly).
@@ -236,7 +236,7 @@ end_of_file.
 
 
 % birds fly by default.
-(mpred_default((bird(X) ==> fly(X)))).
+(mdefault((bird(X) ==> fly(X)))).
 
 % heres one way to do an subclass hierarchy.
 

@@ -7,17 +7,15 @@
 
 :- module(sanity_sk_02,[]).
 
-:- use_module(library(logicmoo_utils)).
 :- use_module(library(logicmoo_base)).
-
-:- mpred_pfc_file.
-
-:- debug(_).
-:- nodebug(http(_)).
 
 :- dynamic(sk_out/1).
 :- dynamic(sk_in/1).
 
+:- debug(_).
+:- nodebug(http(_)).
+:- debug(mpred).
+:- mpred_trace_exec.
 :- begin_pfc.
 
 % :- process_this_script.
@@ -26,7 +24,7 @@
 
 sk_in(Ex)==>sk_out(Ex).
 
-sk_in(avar([vn='Ex',sk='SKF-666'])).
+sk_in(avar([vn='ExIn',sk='SKF-666'])).
 
 sk_in(fl(X,Y,X,Y)).
 

@@ -35,8 +35,8 @@ with_no_kif_var_coroutines(Goal):- w_tl(t_l:no_kif_var_coroutines,Goal).
 
 form_sk(Sk, Form) :-
 	var(Sk), !,
-	put_attr(Sk, sk, Form).
-form_sk(_, _).
+	push_skolem(Sk, Form).
+form_sk(_, Form):- skolem_test(Form).
 
 
 push_skolem(X,Form2):-push_skolem(X,Form2,_Merged).
@@ -83,8 +83,7 @@ user:portray(Sk) :- get_attr(Sk, sk, Form), !, printable_variable_name(Sk,Name),
 %% sk_form:attribute_goals(@V)// is det.
 %	copy_term/3, which also determines  the   toplevel  printing  of
 %	residual constraints.
-
-sk:attribute_goals(Sk) --> {sk_form(Sk, Form)},[form_sk(Sk,Form)].
+sk:attribute_goals(Sk,[form_sk(Sk,Form)|B],B) :- sk_form(Sk, Form).
 
 skolem_test(_):- !.
 skolem_test(Form):- show_call(call_u(Form)).

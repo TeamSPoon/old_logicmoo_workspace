@@ -56,7 +56,7 @@ user:agent_call_command(Agent,actScansrc):-  once('@'(agent_call_safely(Agent,ac
 :-export(actScansrc/0).
 actScansrc :- 
  ensure_loaded(library(make)),
- debugOnError((
+ on_x_debug((
   reload_library_index,
   %remove_undef_search,
   update_changed_files,

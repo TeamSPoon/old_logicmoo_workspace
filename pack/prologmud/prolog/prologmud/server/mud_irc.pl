@@ -99,7 +99,7 @@ wotp_client(ReaderPred,HookPred, Call):-
     read(In,ServID),
     format(Out,'~N~q.~n~q.~n',[ReaderPred,HookPred]),
     flush_output(Out))),!,
-    setup_call_cleanup(tell(Out),debugOnError(Call),
+    setup_call_cleanup(tell(Out),on_x_debug(Call),
      ignore(((format(Out,'~N',[]),signal_done(ServID),told,ignore(catch(close(StreamPair, [force(true)]),_,true)))))).
 
 signal_done(ServID):- call(call,true),thread_signal(ServID,call(call,true)).

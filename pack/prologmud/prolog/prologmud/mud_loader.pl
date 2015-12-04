@@ -22,7 +22,7 @@
 
 :- include(mud_header).
 
-:- retractall(thlocal:disable_mpred_term_expansions_locally).
+:- retractall(t_l:disable_mpred_term_expansions_locally).
 
 :- set_prolog_flag(generate_debug_info, true).
 % [Optionaly] Set the Prolog optimize/debug flags
@@ -176,7 +176,7 @@ hard_work:-
    )))),!.
 
 % [Required] load the mud PFCs
-:- show_call_entry(gripe_time(40,user:ensure_loaded(prologmud(server/mud_builtin)))).
+:- show_entry(gripe_time(40,user:ensure_loaded(prologmud(server/mud_builtin)))).
 
 
 slow_work:- with_assertions( prevent_transform_moo_preds , within_user(at_start(hard_work))).
@@ -206,7 +206,7 @@ run_setup:- within_user(at_start(user:run_setup_now)).
 % commented out except on run
 
 debug_repl_w_cyc(Module,CallFirst):- !,         
-          with_assertions(thlocal:useOnlyExternalDBs,
+          with_assertions(t_l:useOnlyExternalDBs,
             with_assertions(thglobal:use_cyc_database,
                ((decl_type(person),          
                 ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.plmoo')),
@@ -215,7 +215,7 @@ debug_repl_w_cyc(Module,CallFirst):- !,
                 prolog_repl)))).
 
 debug_repl_wo_cyc(Module,CallFirst):- !,         
-          with_no_assertions(thlocal:useOnlyExternalDBs,
+          with_no_assertions(t_l:useOnlyExternalDBs,
             with_assertions(thglobal:use_cyc_database,
                ((decl_type(person),          
                 ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.plmoo')),
@@ -535,9 +535,9 @@ user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term
 %:-forall(make_tabled_perm(grab_argsIsa(F,Types)),dmsg(grab_argsIsa(F,Types))).
 
 
-:- show_call_entry(ensure_mpred_file_loaded(prologmud(server/builtin))).
+:- show_entry(ensure_mpred_file_loaded(prologmud(server/builtin))).
 % :- must(rescan_pfc).
-:- show_call_entry(forall(filematch('*/*.plmoo', X),(dmsg(ensure_mpred_file_loaded(X)),ensure_mpred_file_loaded(X)))).
+:- show_entry(forall(filematch('*/*.plmoo', X),(dmsg(ensure_mpred_file_loaded(X)),ensure_mpred_file_loaded(X)))).
 
 
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
@@ -547,10 +547,10 @@ user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term
 % Load the map file appropriate for the world being used.
 % Load the mud files appropriate for the mobs being used.
 
-:- show_call_entry(forall(filematch(prologmud('*/?*.plmoo'), X),dmsg(X))).
-:- show_call_entry(ensure_mpred_file_loaded(prologmud('*/?*.plmoo'))).
-:- show_call_entry(forall(filematch(prologmud('*/*/?*.plmoo'), X),dmsg(X))).
-:- show_call_entry(ensure_mpred_file_loaded(prologmud('*/*/?*.plmoo'))).
+:- show_entry(forall(filematch(prologmud('*/?*.plmoo'), X),dmsg(X))).
+:- show_entry(ensure_mpred_file_loaded(prologmud('*/?*.plmoo'))).
+:- show_entry(forall(filematch(prologmud('*/*/?*.plmoo'), X),dmsg(X))).
+:- show_entry(ensure_mpred_file_loaded(prologmud('*/*/?*.plmoo'))).
 
 % puts world into running state
 % :- must(old_setup).
@@ -618,5 +618,5 @@ lundef :- A = [],
 
 */
 
-:-pfc_untrace.
-:-pfc_no_spy_all.
+:-mred_untrace.
+:-mred_no_spy_all.

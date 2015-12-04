@@ -19,6 +19,36 @@ mpred_term_expansion_file.
 
 
 
+:- module_transparent( xfile_module_term_expansion_pass_3/7).
+
+
+
+%% xfile_module_term_expansion_pass_3( ?How, ?INFO, ?F, ?M, ?AA, ?O, ?OO) is semidet.
+%
+% Xfile Module Term Expansion Pass Helper Number 3..
+%
+xfile_module_term_expansion_pass_3(How,INFO,_F,_M,AA,O,OO):- 
+   (O = (:- _) -> OO = O ;
+      (How == pl -> OO = O ;
+        (add_from_file(O), OO = '$si$':'$was_imported_kb_content$'(AA,INFO)))),!.      
+
+:- thread_local((t_l:use_side_effect_buffer , t_l:verify_side_effect_buffer)).
+
+
+
+
+%% mpred_expander_now( +I, -O) is semidet.
+%
+% Managed Predicate Expander Now.
+%
+mpred_expander_now(I,O):- 
+ '$set_source_module'(M,M),
+  current_source_file(F),
+  get_source_ref1(Ref),
+   w_tl(t_l:current_why_source(Ref), 
+     mpred_expander_now_one(F,M,I,O)).
+
+
 
 :-export((force_expand_head/2,force_head_expansion/2)).
 :-export((force_expand_goal/2)).

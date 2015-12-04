@@ -339,7 +339,7 @@ printable_variable_name(Var,Name):- (nb_current('$variable_names', Vs)->true;Vs=
 printable_variable_name(Var, Name) :- format(atom(Name),'#~w',Var).
  
 
-attrs_to_list(att(sk,_,ATTRS),[sk|List]):-!,attrs_to_list(ATTRS,List).
+%attrs_to_list(att(sk,_,ATTRS),[sk|List]):-!,attrs_to_list(ATTRS,List).
 attrs_to_list(att(vn,_,ATTRS),List):-!,attrs_to_list(ATTRS,List).
 attrs_to_list(att(M,V,ATTRS),[M=V|List]):-!,attrs_to_list(ATTRS,List).
 attrs_to_list([],[]).
@@ -356,6 +356,7 @@ simplify_goal_printed(Var,Name):- is_ftVar(Var),!,printable_variable_name(Var, N
 simplify_goal_printed(setup_call_catcher_cleanup,sccc).
 simplify_goal_printed(setup_call_cleanup,scc).
 simplify_goal_printed(call_cleanup,cc).
+simplify_goal_printed(call_term_expansion(_,A,_,B,_),O):- !, simplify_goal_printed(call_term_expansion_5('...',A,'...',B,'...'),O).
 simplify_goal_printed(A,'...'(SA)):- atom(A),atom_concat('/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/',SA,A),!.
 simplify_goal_printed(A,'...'(SA)):- atom(A),atom_concat('/home/dmiles/lib/swipl/pack/logicmoo_base/prolog/logicmoo/',SA,A),!.
 simplify_goal_printed(A,'...'(SA)):- atom(A),atom_concat('/home/dmiles/lib/swipl/pack/logicmoo_base/t/',SA,A),!.

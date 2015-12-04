@@ -18,6 +18,7 @@
             assert_until_eof/1,
             decl_user_abox/1,
             set_current_module/1,
+            make_file_command/3,
             set_mpred_module/1,
             import_shared_pred/3,
             import_to_user0/3,
@@ -50,7 +51,7 @@
             clear_predicates/1,
             collect_expansions/3,
             compile_clause/1,
-            compile_this/4,
+            mpred_term_expansion_by_storage_type/3,
             convert_side_effect/2,
             convert_side_effect/3,
             convert_side_effect_buggy/2,
@@ -93,7 +94,6 @@
             gload/0,
             guess_file_type_loader/2,
             hdr_debug/2,
-            in_include_file/0,
             in_mpred_kb_module/0,
             include_mpred_files/1,
             inside_file/1,
@@ -101,20 +101,20 @@
             is_compiling/0,
             is_compiling_sourcecode/0,
             is_kif_string/1,
-            is_prolog_xform/1,
+            is_directive_form/1,
             is_mpred_file/1,
             lang_op_alias/3,
             load_file_dir/2,
             load_file_some_type/2,
-            load_file_term_to_command_or_fail/2,
-            mpred_expander_now_physically/4,
+            expand_term_to_load_calls/2,
+            mpred_expander_now_physically/3,
             load_init_world/2,
             load_language_file/1,
             load_mpred_files/0,
             load_mpred_on_file_end/2,
             loader_side_effect_capture_only/2,
             loader_side_effect_verify_only/2,
-            loader_term_expansion/2,
+            must_expand_term_to_command/2,
             loading_source_file/1,
             make_db_listing/0,
             make_dynamic/1,
@@ -126,11 +126,11 @@
             mpred_expand_inside_file_anyways/0,
             mpred_expand_inside_file_anyways/1,
             mpred_expander/4,
-            mpred_expander_now/2,
+            
             mpred_expander_now_one/4,
-            mpred_expander_now_one_cc/4,
+            mpred_expander_now_one/4,
             mpred_implode_varnames/1,
-            mpred_loader_file/0,
+            
             mpred_prolog_only_file/1,
             mpred_may_expand/0,
             mpred_may_expand_module/1,
@@ -140,7 +140,7 @@
             mpred_term_expansion/2,
             mpred_use_module/1,
             must_compile_special_clause/1,
-            must_load_file_term_to_command/2,
+            expand_term_to_load_calls/2,
             must_locate_file/2,
             myDebugOnError/1,
             onEndOfFile/1,
@@ -198,8 +198,9 @@
             user:term_expansion/2,
             mpred_loader_module_transparent/1,
             convert_side_effect_0a/2, convert_side_effect_0b/2, 
-            convert_side_effect_0c/2, is_mpred_file0/1, load_file_term_to_command_0c/2, load_file_term_to_command_1/3, 
-            load_file_term_to_command_1b/3, load_file_term_to_command_2/3, mpred_process_input_1/1, must_mpred_term_expansion_2/2, pl_to_mpred_syntax0/2, process_this_script0/1, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc_0/2, transform_opers_0/2, transform_opers_1/2, xfile_module_term_expansion_pass_3/7
+            convert_side_effect_0c/2, is_mpred_file0/1, expand_term_to_load_calls/2, load_file_term_to_command_1/3, 
+            load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, mpred_process_input_1/1, must_expand_term_to_command/2, pl_to_mpred_syntax0/2, process_this_script0/1, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc_0/2, transform_opers_0/2, transform_opers_1/2,
+            mpred_loader_file/0
           ]).
  :- meta_predicate
         kb_dynamic(?),
@@ -218,12 +219,12 @@
         ensure_mpred_file_loaded(+, :),
         force_reload_mpred_file(?),
         get_last_time_file(+, +, +),
-        load_file_term_to_command_0c(?, ?),
-        mpred_expander_now_physically(?, ?, ?, ?),
+        expand_term_to_load_calls(?, ?),
+        mpred_expander_now_physically(?, ?, ?),
         load_init_world(+, :),
         module_typed_term_expand(?, ?),
         mpred_expander(+, +, +, -),
-        mpred_expander_now(+, -),
+        
         mpred_term_expansion(?, ?),
         myDebugOnError(0),        
         with_mpred_expansions(0),
@@ -235,14 +236,14 @@
 :- (dynamic is_box_module/2, user:prolog_load_file/2, user:term_expansion/2).
 % :- (module_transparent add_from_file/1, add_term/2, assert_kif/1, assert_kif_dolce/1, assert_until_eof/1, begin_pfc/0, call_file_command/4, 
 % call_with_module/2, call_with_source_module/2, can_be_dynamic/1, cl_assert/2, clear_predicates/1, collect_expansions/3, compile_clause/1,
-%  compile_this/4, convert_side_effect/2, convert_side_effect/3, convert_side_effect_0a/2, convert_side_effect_0b/2, convert_side_effect_0c/2, 
+%  mpred_term_expansion_by_storage_type/3, convert_side_effect/2, convert_side_effect/3, convert_side_effect_0a/2, convert_side_effect_0b/2, convert_side_effect_0c/2, 
 % convert_side_effect_buggy/2, current_context_module/1, current_op_alias/2, cwc/0, decache_file_type/1, decl_user_abox/1, declare_load_dbase/1, 
-% disable_mpred_expansion/0, disable_mpreds_in_current_file/0, do_end_of_file_actions/4, do_end_of_file_actions_real/0, doall_and_fail/1, dyn_begin/0, dyn_end/0, enable_mpred_expansion/0, end_module_type/1, end_module_type/2, ensure_loaded_no_mpreds/1, ensure_mpred_file_consulted/2, ensure_mpred_file_loaded/1, ensure_mpred_file_loaded/2, ensure_prolog_file_consulted/2, etrace/0, expand_in_mpred_kb_module/2, expanded_already_functor/1, file_begin/1, file_end/1, finish_processing_world/0, force_reload_mpred_file/1, force_reload_mpred_file/2, from_kif_string/2, get_file_type/2, get_lang/1, get_last_time_file/3, get_op_alias/2, gload/0, guess_file_type_loader/2, hdr_debug/2, in_include_file/0, in_mpred_kb_module/0, include_mpred_files/1, inside_file/1, is_code_body/1, is_compiling/0, is_compiling_sourcecode/0, is_kif_string/1, is_mpred_file/1, is_mpred_file0/1, lang_op_alias/3, load_file_dir/2, load_file_some_type/2, load_file_term_to_command_0c/2, load_file_term_to_command_1/3, load_file_term_to_command_1b/3, load_file_term_to_command_2/3, load_file_term_to_command_or_fail/2, load_file_term_to_command_or_fail/4, load_init_world/2, load_language_file/1, load_mpred_files/0, load_mpred_on_file_end/2, loader_side_effect_capture_only/2, loader_side_effect_verify_only/2, loader_term_expansion/2, loading_source_file/1, make_db_listing/0, make_dynamic/1, module_typed_term_expand/2, module_typed_term_expand/5, mpred_begin/0, mpred_directive_expansion/2, mpred_expand_inside_file_anyways/0, mpred_expand_inside_file_anyways/1, mpred_expander/4, mpred_expander_now/2, mpred_expander_now_one/4, mpred_implode_varnames/1, mpred_loader_file/0, mpred_may_expand/0, mpred_may_expand_module/1, mpred_maybe_skip/1, mpred_process_input/2, mpred_process_input_1/1, lmconf:mpred_skipped_module/1, mpred_term_expansion/2, mpred_use_module/1, must_compile_special_clause/1, must_load_file_term_to_command/2, must_locate_file/2, must_mpred_term_expansion_2/2, myDebugOnError/1, onEndOfFile/1, op_alias/2, op_lang/1, pl_to_mpred_syntax/2, pl_to_mpred_syntax0/2, pl_to_mpred_syntax_h/2, pop_predicates/2, process_this_script/0, process_this_script/1, process_this_script0/1, prolog_load_file_loop_checked/2, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc/2, prolog_load_file_nlc_0/2, push_predicates/2, read_one_term/2, read_one_term/3, register_module_type/1, register_module_type/2, rsavedb/0, savedb/0, scan_updates/0, show_bool/1, show_interesting_cl/2, show_load_context/0, simplify_why/2, simplify_why_r/4, stream_pos/1, term_expand_local_each/5, transform_opers/3, transform_opers_0/2, transform_opers_1/2, use_file_type_loader/2, use_was_isa/3, was_exported_content/3, with_mpred_expansions/1, with_no_mpred_expansions/1, with_source_module/2, xfile_module_term_expansion_pass_3/7,  (~)/1, baseKB:cl_assert/2, baseKB:cwc/0, lmconf:mpred_provide_clauses/3, mpred_loader:always_expand_on_thread/1, mpred_loader:t_l:current_lang/1, mpred_loader:current_op_alias/2, mpred_loader:get_user_abox/1, mpred_loader:disable_mpred_term_expansions_globally/0, lmconf:loaded_file_world_time/3, mpred_loader:mpred_directive_value/3, mpred_loader:lmconf:mpred_skipped_module/1, 
+% disable_mpred_expansion/0, disable_mpreds_in_current_file/0, do_end_of_file_actions/4, do_end_of_file_actions_real/0, doall_and_fail/1, dyn_begin/0, dyn_end/0, enable_mpred_expansion/0, end_module_type/1, end_module_type/2, ensure_loaded_no_mpreds/1, ensure_mpred_file_consulted/2, ensure_mpred_file_loaded/1, ensure_mpred_file_loaded/2, ensure_prolog_file_consulted/2, etrace/0, expand_in_mpred_kb_module/2, expanded_already_functor/1, file_begin/1, file_end/1, finish_processing_world/0, force_reload_mpred_file/1, force_reload_mpred_file/2, from_kif_string/2, get_file_type/2, get_lang/1, get_last_time_file/3, get_op_alias/2, gload/0, guess_file_type_loader/2, hdr_debug/2, in_include_file/0, in_mpred_kb_module/0, include_mpred_files/1, inside_file/1, is_code_body/1, is_compiling/0, is_compiling_sourcecode/0, is_kif_string/1, is_mpred_file/1, is_mpred_file0/1, lang_op_alias/3, load_file_dir/2, load_file_some_type/2, expand_term_to_load_calls/2, load_file_term_to_command_1/3, load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, expand_term_to_load_calls/2, expand_term_to_load_calls/4, load_init_world/2, load_language_file/1, load_mpred_files/0, load_mpred_on_file_end/2, loader_side_effect_capture_only/2, loader_side_effect_verify_only/2, expand_term_to_command/2, loading_source_file/1, make_db_listing/0, make_dynamic/1, module_typed_term_expand/2, module_typed_term_expand/5, mpred_begin/0, mpred_directive_expansion/2, mpred_expand_inside_file_anyways/0, mpred_expand_inside_file_anyways/1, mpred_expander/4, mpred_expander_now/2, mpred_expander_now_one/4, mpred_implode_varnames/1, mpred_loader_file/0, mpred_may_expand/0, mpred_may_expand_module/1, mpred_maybe_skip/1, mpred_process_input/2, mpred_process_input_1/1, lmconf:mpred_skipped_module/1, mpred_term_expansion/2, mpred_use_module/1, must_compile_special_clause/1, expand_term_to_load_calls/2, must_locate_file/2, must_expand_term_to_command/2, myDebugOnError/1, onEndOfFile/1, op_alias/2, op_lang/1, pl_to_mpred_syntax/2, pl_to_mpred_syntax0/2, pl_to_mpred_syntax_h/2, pop_predicates/2, process_this_script/0, process_this_script/1, process_this_script0/1, prolog_load_file_loop_checked/2, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc/2, prolog_load_file_nlc_0/2, push_predicates/2, read_one_term/2, read_one_term/3, register_module_type/1, register_module_type/2, rsavedb/0, savedb/0, scan_updates/0, show_bool/1, show_interesting_cl/2, show_load_context/0, simplify_why/2, simplify_why_r/4, stream_pos/1, term_expand_local_each/5, transform_opers/3, transform_opers_0/2, transform_opers_1/2, use_file_type_loader/2, use_was_isa/3, was_exported_content/3, with_mpred_expansions/1, with_no_mpred_expansions/1, with_source_module/2, xfile_module_term_expansion_pass_3/7,  (~)/1, baseKB:cl_assert/2, baseKB:cwc/0, lmconf:mpred_provide_clauses/3, mpred_loader:always_expand_on_thread/1, mpred_loader:t_l:current_lang/1, mpred_loader:current_op_alias/2, mpred_loader:get_user_abox/1, mpred_loader:disable_mpred_term_expansions_globally/0, lmconf:loaded_file_world_time/3, mpred_loader:mpred_directive_value/3, mpred_loader:lmconf:mpred_skipped_module/1, 
 %   mpred_loader:never_reload_file/1, mpred_loader:prolog_load_file_loop_checked/2, mpred_loader:registered_module_type/2).
 :- module_transparent mpred_ops/0. % ,set_user_tbox/1.
 :- (thread_local t_l:into_form_code/0, t_l:mpred_module_expansion/1).
 %:- (volatile t_l:into_form_code/0, t_l:mpred_module_expansion/1).
-%:- was_export((convert_side_effect_0a/2, convert_side_effect_0b/2, convert_side_effect_0c/2, is_mpred_file0/1, load_file_term_to_command_0c/2, load_file_term_to_command_1/3, load_file_term_to_command_1b/3, load_file_term_to_command_2/3, mpred_process_input_1/1, must_mpred_term_expansion_2/2, pl_to_mpred_syntax0/2, process_this_script0/1, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc_0/2, transform_opers_0/2, transform_opers_1/2, xfile_module_term_expansion_pass_3/7)).
+%:- was_export((convert_side_effect_0a/2, convert_side_effect_0b/2, convert_side_effect_0c/2, is_mpred_file0/1, expand_term_to_load_calls/2, load_file_term_to_command_1/3, load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, mpred_process_input_1/1, must_expand_term_to_command/2, pl_to_mpred_syntax0/2, process_this_script0/1, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc_0/2, transform_opers_0/2, transform_opers_1/2, xfile_module_term_expansion_pass_3/7)).
 %:- dynamic((registered_module_type/2, current_op_alias/2, lmconf:mpred_skipped_module/1, prolog_load_file_loop_checked/2, lmcache:mpred_directive_value/3, get_user_abox/1, lmconf:loaded_file_world_time/3, lmconf:never_reload_file/1, mpred_loader:always_expand_on_thread/1, mpred_loader:t_l:current_lang/1, mpred_loader:current_op_alias/2, mpred_loader:get_user_abox/1, mpred_loader:disable_mpred_term_expansions_globally/0, lmconf:loaded_file_world_time/3, mpred_loader:mpred_directive_value/3, mpred_loader:lmconf:mpred_skipped_module/1, mpred_loader:never_reload_file/1, mpred_loader:prolog_load_file_loop_checked/2, mpred_loader:registered_module_type/2, t_l:disable_mpred_term_expansions_globally/0, user:prolog_load_file/2, user:term_expansion/2)).
 %:- dynamic(registered_module_type/2).        
 
@@ -275,13 +276,11 @@ kb_dynamic(P):-functor(P,F,A),!,kb_dynamic(F/A).
 
 
 
-
-
 %% chop_box( ?Chop, ?Was) is semidet.
 %
 % Chop Datalog.
 %
-chop_box(Chop,Was):-atom_concat(Was,'ABox',Chop),!.
+chop_box(Chop,Was):-sanity(atom(Chop)),atom_concat(Was,'ABox',Chop),!.
 chop_box(Chop,Was):-atom_concat(Was,'TBox',Chop),!.
 chop_box(Chop,Was):-atom_concat(Was,'SBox',Chop),!.
 chop_box(Chop,Chop).
@@ -544,12 +543,11 @@ mpred_prolog_only_file(File):- lmconf:never_registered_mpred_file(File),!.
 %
 % Managed Predicate Expander.
 %
-mpred_expander(_,_,I,_):-var(I),!,fail.
-mpred_expander(_,_,(_ --> _),_):-!,fail.
-mpred_expander(_,_,_,_):- notrace( current_prolog_flag(xref,true);t_l:disable_px),!,fail.
-mpred_expander(Type,_DefMod,_I,_O):-  (Type \== term,Type \= _:term ),!,fail.
+mpred_expander(Type,_,I,_):- hotrace((Type \== term,Type \= _:term ); var(I);I=(_ --> _);current_prolog_flag(xref,true);t_l:disable_px),!,fail.
 mpred_expander(Type,DefMod,end_of_file,O):- !,Type = term, DefMod = user, do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
-mpred_expander(Type,LoaderMod,I,OO):- \+ t_l:disable_px, on_x_debug(mpred_expander0(Type,LoaderMod,I,O)),must(nonvar(O)),O=OO.
+mpred_expander(Type,LoaderMod,I,OO):- \+ t_l:disable_px, 
+  current_predicate(_,_:mpred_loader_file),
+  loop_check_term(mpred_expander0(Type,LoaderMod,I,O),I,fail),must(nonvar(O)),O=OO.
 
 
 
@@ -558,100 +556,71 @@ mpred_expander(Type,LoaderMod,I,OO):- \+ t_l:disable_px, on_x_debug(mpred_expand
 %
 % Managed Predicate Expander Primary Helper.
 %
-mpred_expander0(Type,LoaderMod,I,OO):-
-  I\= '$si$':'$was_imported_kb_content$'(_,_),  
-   '$set_source_module'(M,M),  
-   source_location(F,L),
-   \+ mpred_prolog_only_file(F),
-   must(\+ mpred_prolog_only_module(M)),
-  '$module'(UM,M),
-   
+mpred_expander0(Type,LoaderMod,(I:-B),OO):- B==true,!,mpred_expander0(Type,LoaderMod,I,OO).
+mpred_expander0(Type,LoaderMod,I,OO):- 
+ once(( 
+  sanity((ground(Type:LoaderMod),nonvar(I),var(OO))),
+  I\= '$si$':'$was_imported_kb_content$'(_,_))),
+   '$set_source_module'(M,M),
+   \+ mpred_prolog_only_module(M),
 
+   get_source_ref1(mfl(_,F,L)),   
+   \+ mpred_prolog_only_file(F),
+   
+  '$module'(UM,M),  
   call_cleanup(((
   make_key(mpred_expander_key(F,L,M,UM,Type,LoaderMod,I),Key),  
   ( \+ t_l:mpred_already_in_file_expansion(Key) ),
    w_tl(t_l:mpred_already_in_file_expansion(Key),
       w_tl(t_l:current_why_source(mfl(M,F,L)),
         (( % trace,
-  
-           fully_expand(change(assert,ain),I,II),
-        
-          mpred_expander_now_one_cc(F,M,II,O))))))),
+           get_original_term_source(Orig),
+           b_setval('$orig_term',Orig),
+           b_setval('$term',[]),
+           must(hotrace((fully_expand(change(assert,ain),I,III)))),
+           must((nonvar(III),mpred_expander_now_one(F,M,III,O))))))))),
     '$module'(_,UM)),
   !,I\=@=O,O=OO.
 
 
 
-
-%% mpred_expander_now_one_cc( ?VALUE1, ?VALUE2, :TermA, :TermA) is semidet.
+%% mpred_expander_now_one( +File, +Module, +:Term, -:Expanded) is semidet.
 %
 % Managed Predicate Expander Now One Cc.
 %
-mpred_expander_now_one_cc(_,_,A,A):-var(A),!.
-mpred_expander_now_one_cc(_,_,(:-(G)),(:-(G))):-!.
-mpred_expander_now_one_cc(_,_,(?-(G)),(?-(G))):-!.
-mpred_expander_now_one_cc(F,M,II,O):-show_if_debug(mpred_expander_now_one(F,M,II,O)).
-  
-
-%mpred_expander_now_one(F,M,(:- G),GGG):- !, nonvar(G), once(fully_expand(call,G,GG)),G\=@=GG,GGG=(:- GG),!.
-
-
-
-%% mpred_expander_now_one( ?VALUE1, ?VALUE2, ?I, ?O) is semidet.
-%
-% Managed Predicate Expander Now One.
-%
+mpred_expander_now_one(_,_,I,O):- var(I),!,must(I=O).
+mpred_expander_now_one(_,_,(:-(G)),(:-(G))):-!.
+mpred_expander_now_one(_,_,(?-(G)),(?-(G))):-!.
 mpred_expander_now_one(_,_,I,O):- t_l:verify_side_effect_buffer,!,loader_side_effect_verify_only(I,O).
 mpred_expander_now_one(_,_,I,O):- t_l:use_side_effect_buffer,!,loader_side_effect_capture_only(I,O).
-mpred_expander_now_one(F,M,I,O):- mpred_expander_now_physically(F,M,I,O).
+mpred_expander_now_one(_,M,I,O):- mpred_expander_now_physically(M,I,O).
+  
 
 
-
-
-%% mpred_expander_now_physically( ?F, ?M, ?I, ?OO) is semidet.
+%% mpred_expander_now_physically( ?M, ?I, ?OO) is semidet.
 %
 % Managed Predicate Expander Now Physically.
 %
-mpred_expander_now_physically(_F,M,I,OO):-   
+mpred_expander_now_physically(M,I,OO):-   
  '$set_source_module'(Old,M),
  call_cleanup(M:((
    must((source_context_module(CM),CM\==mpred_pfc,CM\==mpred_loader)),
-   loop_check(must(load_file_term_to_command_or_fail(I,O))),!,
-   I\=@=O,
+   must(loop_check(expand_term_to_load_calls(I,O),trace_or_throw(in_loop(expand_term_to_load_calls(I,O))))),!,
+   must(I\=@=O),
+   must(M:make_file_command(I,O,OO)))),
+ '$set_source_module'(_,Old)).
+
+
+mpred_expander_now_physically(M,I,OO):-   
+ '$set_source_module'(Old,M),
+ call_cleanup(M:((
+   must((source_context_module(CM),CM\==mpred_pfc,CM\==mpred_loader)),
+   must(loop_check(expand_term_to_load_calls(I,O),trace_or_throw(in_loop(expand_term_to_load_calls(I,O))))),!,
+   must(I\=@=O),
   (((t_l:mpred_term_expansion_ok;mpred_expand_inside_file_anyways)-> true ; ((show_load_context,wdmsg(warning,wanted_mpred_term_expansion(I,O))),fail)),
-   ((O=(:-(CALL))) ->  M:call_file_command(I,CALL,OO,O); 
+   ((O=(:-(CALL))) ->  must((M:call_file_command(I,CALL,OO,O))); 
         (OO = O))))),'$set_source_module'(_,Old)).
     
-
-:- module_transparent( xfile_module_term_expansion_pass_3/7).
-
-
-
-%% xfile_module_term_expansion_pass_3( ?How, ?INFO, ?F, ?M, ?AA, ?O, ?OO) is semidet.
-%
-% Xfile Module Term Expansion Pass Helper Number 3..
-%
-xfile_module_term_expansion_pass_3(How,INFO,_F,_M,AA,O,OO):- 
-   (O = (:- _) -> OO = O ;
-      (How == pl -> OO = O ;
-        (add_from_file(O), OO = '$si$':'$was_imported_kb_content$'(AA,INFO)))),!.      
-
-:- thread_local((t_l:use_side_effect_buffer , t_l:verify_side_effect_buffer)).
-
-
-
-
-%% mpred_expander_now( +I, -O) is semidet.
-%
-% Managed Predicate Expander Now.
-%
-mpred_expander_now(I,O):- 
- '$set_source_module'(M,M),
-  current_source_file(F),
-  get_source_ref1(Ref),
-   w_tl(t_l:current_why_source(Ref), 
-     mpred_expander_now_one(F,M,I,O)).
-
 
 
 
@@ -857,16 +826,16 @@ hdr_debug(F,A):-'format'(F,A).
 module_typed_term_expand(X,_):-not(compound(X)),!,fail.
 module_typed_term_expand( ((':-'(_))) , _ ):-!,fail.
 module_typed_term_expand(_:B1,B2):-!,module_typed_term_expand(B1,B2),!.
-module_typed_term_expand(X,Y):- compound(X),loading_module(CM),functor_catch(X,F,A),module_typed_term_expand(CM,X,F,A,Y).
+module_typed_term_expand(X,CvtO):- compound(X),loading_module(CM),functor_catch(X,F,A),module_typed_term_expand(CM,X,F,A,CvtO).
 
 
 
 
-%% module_typed_term_expand( ?CM, ?X, ?F, ?A, ?Y) is semidet.
+%% module_typed_term_expand( ?CM, ?X, ?F, ?A, ?CvtO) is semidet.
 %
 % Module Typed Term Expand.
 %
-module_typed_term_expand(CM,X,F,A,Y):-findall(Y,term_expand_local_each(CM,X,F,A,Y),Ys), Ys == [],!,fail.  
+module_typed_term_expand(CM,X,F,A,CvtO):-findall(CvtO,term_expand_local_each(CM,X,F,A,CvtO),Ys), Ys == [],!,fail.  
 
 
 
@@ -939,36 +908,6 @@ check_term_expansions:- not(do_term_expansions).
 
 
 
-%% loader_term_expansion( ?CL, ?EXP) is semidet.
-%
-% Loader Term Expansion.
-%
-loader_term_expansion(CL,EXP):- 
- % ==== why we assert
-  inside_file(pfc),!,
-% ==== do it
-  WHY = '$si$':'$was_imported_kb_content$'(inside_file(pfc),CL),
-  %dmsg(WHY),
-  ain(CL),
-  must(EXP=lmconf:WHY).
-
-loader_term_expansion(CL,WHY):- 
-% ==== why we assert
-  requires_storage(CL,WhyRS),
-% ==== do it
-  WHY = '$si$':'$was_imported_kb_content$'(requires_storage(WhyRS),CL),
-  %dmsg(WHY),
-  add_from_file(CL),!.
-
-
-loader_term_expansion(CL,EXP):- 
- % ==== why we assert
-  inside_file(dyn),!,
-% ==== do it
-  WHY = '$si$':'$was_imported_kb_content$'(inside_file(dyn),CL),
-  %dmsg(WHY),
-  add_from_file(CL),
-  must(EXP=lmconf:WHY).
 
 
 
@@ -1037,7 +976,7 @@ with_source_module(M,CALL):- setup_call_cleanup('$set_source_module'(Old, M),CAL
 %
 % Get File Type.
 %
-get_file_type(File,Type):-var(File),!,loading_source_file(File),get_file_type(File,Type).
+get_file_type(File,Type):-var(File),!,must(loading_source_file(File)),get_file_type(File,Type).
 get_file_type(File,Type):-lmcache:mpred_directive_value(Type,_,File).
 get_file_type(File,Type):-file_name_extension(_,Type,File).
 
@@ -1048,7 +987,7 @@ get_file_type(File,Type):-file_name_extension(_,Type,File).
 %
 % If Is A Managed Predicate File.
 %
-is_mpred_file(F):- var(F),!,loading_source_file(F), is_mpred_file(F),!.
+is_mpred_file(F):- var(F),!,must(loading_source_file(F)), is_mpred_file(F),!.
 is_mpred_file(F):- file_name_extension(_,pfc,F),!.
 is_mpred_file(F):- atom_concat(_,'.pfc.pl',F),!.
 is_mpred_file(F):- file_name_extension(_,plmoo,F),!.
@@ -1057,6 +996,13 @@ is_mpred_file(F):- lmconf:never_registered_mpred_file(F),!,fail.
 is_mpred_file(F):- is_mpred_file0(F),!,asserta(lmconf:registered_mpred_file(F)),!.
 is_mpred_file(F):- asserta(lmconf:never_registered_mpred_file(F)),!,fail.
 
+%% is_mpred_file0( ?F) is semidet.
+%
+% If Is A Managed Predicate File Primary Helper.
+%
+is_mpred_file0(F):- filematch(prologmud(**/*),F),!.
+is_mpred_file0(F):- inside_file(pfc),!,loading_source_file(F).
+is_mpred_file0(F):- file_name_extension(_,WAS,F),WAS\=pl,WAS\= '',WAS\=chr,!.
 
 
 
@@ -1068,17 +1014,6 @@ decache_file_type(F):-
   retractall(lmconf:mpred_is_impl_file(F)),
   retractall(lmconf:registered_mpred_file(F)),
   retractall(lmconf:never_registered_mpred_file(F)).
-
-
-
-
-%% is_mpred_file0( ?F) is semidet.
-%
-% If Is A Managed Predicate File Primary Helper.
-%
-is_mpred_file0(F):- filematch(prologmud(**/*),F),!.
-is_mpred_file0(F):- inside_file(pfc),!,loading_source_file(F).
-is_mpred_file0(F):- file_name_extension(_,WAS,F),WAS\=pl,WAS\= '',WAS\=chr,!.
 
 
 
@@ -1110,26 +1045,6 @@ mpred_use_module(M):- must(atom(M)),retractall(lmconf:mpred_skipped_module(M)),s
 % ================================================================================
 % DETECT PREDS THAT NEED SPECIAL STORAGE 
 % ================================================================================
-
-
-
-%% compile_this( ?M, ?F, ?C, ?O) is semidet.
-%
-% Compile This.
-%
-compile_this(_,_,_,_):- t_l:disable_px,!,fail.
-compile_this(_,F,M:C,O):-atom(M),!,compile_this(M,F,C,O).
-
-compile_this(M,F,'$si$':'$was_imported_kb_content$'(_,_),pl):-!.
-compile_this(M,F,C,ain):- is_mpred_file(F), \+ lmconf:mpred_skipped_module(M),!.
-compile_this(M,F,C,dyn):- inside_file(dyn),!.
-compile_this(M,F,C,O):- (var(M);var(F);var(C)),trace_or_throw(var_compile_this(M,F,C,O)).
-compile_this(M,F,C,requires_storage(WHY)):- requires_storage(C,WHY),!.
-compile_this(M,F,C,must_compile_special):- must_compile_special_clause(C),t_l:mpred_already_inside_file_expansion(C).
-compile_this(_,_,_,pl).
-
-:- was_module_transparent(mpred_may_expand).
-
 
 
 %% mpred_may_expand is semidet.
@@ -1183,7 +1098,7 @@ mpred_expand_inside_file_anyways(F):- is_mpred_file(F),must(loading_module(M);so
 %
 % Was Exported Content.
 %
-was_exported_content(I,CALL,Output):-Output='$si$':'$was_imported_kb_content$'(I,CALL),!.
+was_exported_content(I,CALL,'$si$':'$was_imported_kb_content$'(I,CALL)).
 
 :- thread_local(t_l:mpred_term_expansion_ok/0).
 :- thread_local(t_l:mpred_already_inside_file_expansion/1).
@@ -1221,7 +1136,7 @@ show_interesting_cl(Dir,P):- loading_source_file(File),get_file_type(File,Type),
 % Clause Assert.
 %
 cl_assert(kif(Dir),P):- show_if_debug(must_det_l(( show_interesting_cl(kif(Dir),P),kif_process(P)))),!.
-cl_assert(Dir,P):- show_interesting_cl(Dir,P),ain(P).
+cl_assert(Dir,P):- show_interesting_cl(Dir,P),ain(P),!.
 cl_assert(pl,P):-  !, show_if_debug(must_det_l((source_location(F,_L), '$compile_aux_clauses'(P,F)))).
 cl_assert(_Code,P):- !, show_if_debug(ain(P)).
 
@@ -1229,22 +1144,48 @@ cl_assert(_Code,P):- !, show_if_debug(ain(P)).
 %call_file_command(_,cl_assert(pl,OO),OO,_):-!,show_interesting_cl(pl,OO).
 
 
+get_original_term_source(Orig):- nb_current('$orig_term',Orig),!.
+get_original_term_source(Orig):- must((b_getval('$term',Orig),Orig\=[])),!. 
+
+make_file_command(IN,(:- CALL),OUT):- nonvar(CALL),!, make_file_command(IN,CALL,OUT).
+
+make_file_command(IN,cl_assert(pfc(WHY),PFC),(NEWSOURCE:-true)):- 
+  current_why(CY),
+  CMD = mpred_ain(PFC,(CY,ax)),
+  get_original_term_source(Orig),
+  was_exported_content(Orig,WHY,NEWSOURCE),!,
+  show_call(must((CMD))).
+
+
+make_file_command(IN,cl_assert(pfc(WHY),PFC),[(:- CMD), NEWSOURCE]):- 
+  current_why(CY),
+  CMD = ain(PFC,CY),
+  get_original_term_source(Orig),
+  was_exported_content(Orig,WHY,NEWSOURCE),!.
+  
+
+make_file_command(IN,cl_assert(WHY,NEWISH),OUT):- inside_file(kif),is_kif_rule(NEWISH),!,make_file_command(IN,cl_assert(kif(WHY),NEWISH),OUT).
+make_file_command(IN,cl_assert(WHY,CMD2),SET):- 
+  get_original_term_source(Orig),
+  was_exported_content(Orig,WHY,NEWSOURCE),list_to_set([(:- cl_assert(WHY,CMD2)), NEWSOURCE],SET).
+ 
+make_file_command(IN,cl_assert(WHY,CMD2),[CMD2, (:- cl_assert(WHY,CMD2)), NEWSOURCE ]):- was_exported_content(WHY,IN,NEWSOURCE).
+make_file_command(IN,'$si$':'$was_imported_kb_content$'(IN2,WHY),'$si$':'$was_imported_kb_content$'(IN2,WHY)).
+
 
 %% call_file_command( ?I, ?CALL, ?OO, ?O) is semidet.
 %
 % Call File Command.
 %
 call_file_command(I,cl_assert(OTHER,OO),OO,I):- inside_file(kif),is_kif_rule(OO),!,call_file_command(I,cl_assert(kif(OTHER),OO),OO,I).
-call_file_command(I,CALL,OO,O):- (current_predicate(_,CALL) -> ((must(call(CALL)),was_exported_content(I,CALL,OO))); OO=O).
+call_file_command(I,CALL,[(:- must(CALL2)),(:- must(CALL)),OO],(:-CALL2)):- CALL2\=@=CALL, was_exported_content(I,CALL,OO),!.
+call_file_command(I,CALL,[(:- must(CALL)),OO],(:-CALL2)):- was_exported_content(I,CALL,OO),!.
+% call_file_command(I,CALL,OO,O):- (current_predicate(_,CALL) -> ((must(call(CALL)),was_exported_content(I,CALL,OO))); OO=[O,:-CALL]).
 
 
 
 
-%% in_include_file is semidet.
-%
-% In Include File.
-%
-in_include_file:- prolog_load_context(file,F),!, \+ prolog_load_context(source,F).
+
 
 % ensure we only process onEndOfFile directive at the end of the actual source files
 
@@ -1762,12 +1703,16 @@ best_module(List,ABox):-member(ABox,List),ABox\==user,not_boot_module(ABox),!.
 best_module(_List,baseKB):-!.
 
 
+correct_language_name(W,WN):-W==mpred,!,WN=pfc.
+correct_language_name(W,WN):-W==plmoo,!,WN=pfc.
+correct_language_name(W,W).
 
 
 %% file_begin( ?W) is semidet.
 %
 % File Begin.
 %
+file_begin(W) :- correct_language_name(W,WN),W\=@=WN, file_begin(WN).
 file_begin(W):-
  must_det_l((
    '$module'(CM,CM),
@@ -1808,6 +1753,7 @@ set_current_module(ABox):- module(ABox),'$module'(_,ABox),'$set_source_module'(_
 %
 % File End.
 %
+file_end(W) :- correct_language_name(W,WN),W\=@=WN, file_end(WN).
 file_end(W):- must_det(( loading_source_file(ISource),decache_file_type(ISource),ignore(retract(lmcache:mpred_directive_value(W,file,ISource))))),  
   must_det(( loading_source_file(Source),decache_file_type(Source),ignore(retract(lmcache:mpred_directive_value(W,file,Source))))).
 
@@ -1818,6 +1764,7 @@ file_end(W):- must_det(( loading_source_file(ISource),decache_file_type(ISource)
 %
 % Inside File.
 %
+inside_file(W) :- correct_language_name(W,WN),W\=@=WN, inside_file(WN).
 inside_file(W) :- prolog_load_context(file,Source),lmcache:mpred_directive_value(W,_,Source),!.
 inside_file(W) :- prolog_load_context(source,Source),lmcache:mpred_directive_value(W,_,Source),!.
 inside_file(W) :- loading_source_file(Source),!,lmcache:mpred_directive_value(W,_,Source),!.
@@ -1834,7 +1781,7 @@ inside_file(W) :- loading_source_file(Source),!,lmcache:mpred_directive_value(W,
 user:term_expansion((:- (M:DIR)),O):-atom(M),atom(DIR),with_source_module(M, ((mpred_directive_expansion(DIR,OO),!, must(O=(:- OO))))).
 user:term_expansion((:- DIR),O):- atom(DIR), mpred_directive_expansion(DIR,OO),!,must(O=(:- OO)).
 
-:- meta_predicate(load_file_term_to_command_0c(?,?)).
+:- meta_predicate(expand_term_to_load_calls(?,?)).
 :- meta_predicate(mpred_term_expansion(?,?)).
 :- meta_predicate(mpred_term_expansion(?,?)).
 
@@ -1941,7 +1888,7 @@ lang_op_alias(prolog,(<-),(<-)).
 %
 % Transform Opers.
 %
-transform_opers(LANG,PFCM,PFCO):- w_tl(t_l:current_lang(LANG),((transitive_lc(transform_opers_0,PFCM,PFC),!, subst(PFC,(not),(~),PFCO)))).
+transform_opers(LANG,PFCM,PFCO):- hotrace((w_tl(t_l:current_lang(LANG),((transitive_lc(transform_opers_0,PFCM,PFC),!, subst(PFC,(not),(~),PFCO)))))).
 
 :- op(1199,fx,('==>')).
 :- op(1190,xfx,('::::')).
@@ -2017,41 +1964,29 @@ transform_opers_1(OP,OTHER):- get_op_alias(OPO,OTHER),OPO=OP,!.
 %
 % In Managed Predicate Knowledge Base Module.
 %
-in_mpred_kb_module:- source_context_module(MT),fail,get_user_abox(MT).
+in_mpred_kb_module:- source_context_module(MT),get_user_abox(MT2),!,MT==MT2.
 
 
 
 
-%% load_file_term_to_command_or_fail( ?I, ?Y) is semidet.
+%% to_prolog_xform(+Clause,-Command) is semidet.
 %
-% Load File Term Converted To Command Or Fail.
+% Convert an input clause to a call that will have assumed it is loaded
 %
-load_file_term_to_command_or_fail(I,Y):- 
-   once(fully_expand(change(assert,ain),I,X)),
-   expand_term(X,M),!,
-   must_load_file_term_to_command(M,Y),!.
+to_prolog_xform(O,OO):-
+    ( is_directive_form(O) -> (OO = O); OO=  (:- cl_assert(pfc(to_prolog_xform),O))),!.
 
 
 
-
-%% is_prolog_xform( :TermV) is semidet.
+%% is_directive_form( :TermV) is semidet.
 %
 % If Is A Prolog Xform.
 %
-is_prolog_xform((:-(V))):-!,nonvar(V).
-is_prolog_xform((?-(V))):-!,nonvar(V).
-is_prolog_xform((:-(V,_))):-!,nonvar(V).
-is_prolog_xform(_:(:-(V,_))):-!,nonvar(V).
-
-
-
-
-%% must_load_file_term_to_command( ?I, ?O) is semidet.
-%
-% Must Be Successfull Load File Term Converted To Command.
-%
-must_load_file_term_to_command(I,O):- in_mpred_kb_module,!, must((expand_in_mpred_kb_module(I,O),is_prolog_xform(O))),!.
-must_load_file_term_to_command(I,O):- must(load_file_term_to_command_0c(I,O)),!.
+is_directive_form((:-(V))):-!,nonvar(V).
+is_directive_form((?-(V))):-!,nonvar(V).
+is_directive_form(List):-is_list(List),!,member(E,List),is_directive_form(E).
+%is_directive_form((:-(V,_))):-!,nonvar(V).
+%is_directive_form(_:(:-(V,_))):-!,nonvar(V).
 
 
 
@@ -2061,47 +1996,39 @@ must_load_file_term_to_command(I,O):- must(load_file_term_to_command_0c(I,O)),!.
 %
 % Expand In Managed Predicate Knowledge Base Module.
 %
-expand_in_mpred_kb_module(I,O):-is_prolog_xform(I),must(I=O),!.
-expand_in_mpred_kb_module(I,OO):- load_file_term_to_command_0c(I,O),!,
-   ( is_prolog_xform(O) -> (OO = O); OO=  (:- cl_assert(pfc(in_mpred_kb_module),O))),!.
+expand_in_mpred_kb_module(I,O):- is_directive_form(I),must(I=O),!.
+expand_in_mpred_kb_module(I,OO):- expand_term_to_load_calls(I,O),!,to_prolog_xform(O,OO).
 
 
 
 
-
-%% load_file_term_to_command_0c( ?I, ?OO) is semidet.
+%% expand_term_to_load_calls( ?I, ?OO) is semidet.
 %
 % Load File Term Converted To Command 0c.
 %
-load_file_term_to_command_0c(I,OO):-
-   convert_if_kif_string(I,Wff,Vs,O),
-   must(must_load_file_term_to_command(O,OO)).
+expand_term_to_load_calls(I,OO):- convert_if_kif_string(I,Wff,Vs,O),!,
+   must(expand_term_to_load_calls(O,OO)).
 
-load_file_term_to_command_0c(PI,OO):- PI=..[P,I],
-   convert_if_kif_string(I,Wff,Vs,O),
-   PO=..[P,O], must(must_load_file_term_to_command(PO,OO)).
+expand_term_to_load_calls(PI,OO):- PI=..[P,I], convert_if_kif_string(I,Wff,Vs,O),!,
+   PO=..[P,O], expand_term_to_load_calls(PO,OO).
 
-load_file_term_to_command_0c(C,O):- compound(C), get_op_alias(OP,ALIAS),
-  atom(OP),atom(ALIAS),C=..[OP|ARGS],CC=..[ALIAS|ARGS],loop_check(must_load_file_term_to_command(CC,O)),!.
+expand_term_to_load_calls((H:-B),O):- B==true,!,expand_term_to_load_calls(H,O).
 
-load_file_term_to_command_0c(C,O):- get_lang(LANG),transform_opers(LANG,C,M),C\=@=M,!,must_load_file_term_to_command(M,O).
+expand_term_to_load_calls(HB,O):- strip_module(HB,M,(H:-B)),B==true,(H:-B)\=@=HB,!,expand_term_to_load_calls(M:H,O).
 
-load_file_term_to_command_0c(C,O):- hotrace(ensure_vars_labled(C,M)), must_mpred_term_expansion_2(M,O),!.
+expand_term_to_load_calls(C,O):- fail,  hotrace((get_lang(LANG),show_success((must(transform_opers(LANG,C,M)),C\=@=M)))),!,expand_term_to_load_calls(M,O).
+
+expand_term_to_load_calls(C,O):- fail,show_success(hotrace((compound(C), get_op_alias(OP,ALIAS),
+  atom(OP),atom(ALIAS),C=..[OP|ARGS]))),CC=..[ALIAS|ARGS],must(loop_check(must_expand_term_to_command(CC,O))),!.
+
+expand_term_to_load_calls(C,O):- must_expand_term_to_command(C,O),must(is_directive_form(O)).
 
 
-
-
-%% must_mpred_term_expansion_2( ?M, ?O) is semidet.
+%% must_expand_term_to_command( ?M, ?O) is semidet.
 %
 % Must Be Successfull Managed Predicate term expansion  Extended Helper.
 %
-must_mpred_term_expansion_2(M,O):- mpred_term_expansion(M,O),!.
-must_mpred_term_expansion_2(M,(:-  cl_assert(pfc(in_mpred_kb_module),(M)))):- !. % in_mpred_kb_module,!.
-must_mpred_term_expansion_2(M,O):- must(mpred_term_expansion(M,O)),!.
-
-
-
-
+must_expand_term_to_command(C,O):- must(mpred_term_expansion(C,O)),C\=@=O,must(is_directive_form(O)),!.
 
 %% mpred_term_expansion( ?Fact, ?Output) is semidet.
 %
@@ -2133,8 +2060,6 @@ mpred_term_expansion(Fact,(:- cl_assert(pl,Fact))):- get_functor(Fact,F,_A),(a(p
 mpred_term_expansion(Fact,Output):- load_file_term_to_command_1(_Dir,Fact,C),must(mpred_term_expansion(C,Output)),!.
 
 
-
-
 %% load_file_term_to_command_1( ?Type, :TermIn, :TermOut) is semidet.
 %
 % load file term Converted To command  Secondary Helper.
@@ -2143,10 +2068,9 @@ mpred_term_expansion(Fact,Output):- load_file_term_to_command_1(_Dir,Fact,C),mus
       load_file_term_to_command_1(pfc(awc),(H:-(Chain,B)),(PH==>PFC)):-cwc, has_body_atom(twc,Chain),pl_to_mpred_syntax((Chain,B),PFC),pl_to_mpred_syntax_h(H,PH).
       load_file_term_to_command_1(pfc(fwc),(H:-(Chain,B)),(PFC==>PH)):-cwc, is_fc_body(Chain),pl_to_mpred_syntax((Chain,B),PFC),pl_to_mpred_syntax_h(H,PH),can_be_dynamic(PH),make_dynamic(PH).
       load_file_term_to_command_1(pfc(bwc),(H:-(Chain,B)),(PH<-PFC)):-cwc, is_bc_body(Chain),pl_to_mpred_syntax((Chain,B),PFC),pl_to_mpred_syntax_h(H,PH),can_be_dynamic(PH),make_dynamic(PH).
-      load_file_term_to_command_1(Type,In,Out):-load_file_term_to_command_1b(Type,In,Out),!.
 
 
-
+mpred_term_expansion(Fact,Output):- load_file_term_to_command_1b(_Dir,Fact,C),!,must(mpred_term_expansion(C,Output)),!.
 
 %% load_file_term_to_command_1b( ?VALUE1, :TermH, :TermH) is semidet.
 %
@@ -2155,11 +2079,52 @@ mpred_term_expansion(Fact,Output):- load_file_term_to_command_1(_Dir,Fact,C),mus
       load_file_term_to_command_1b(pfc(act),(H:-Chain,B),(H==>{(Chain,B)})):-cwc, is_action_body(Chain),make_dynamic(H).
       load_file_term_to_command_1b(pfc(fwc),(H:-Chain,B),((Chain,B)==>H)):-cwc, is_fc_body(Chain),make_dynamic(H).
       load_file_term_to_command_1b(pfc(bwc),(H:-Chain,B),(H<-(Chain,B))):-cwc, is_bc_body(Chain),make_dynamic(H).
-      
+
+
+% mpred_term_expansion((H:-Chain,B),(H:-(B))):- is_code_body(Chain),!,must(atom(Chain)),make_dynamic(H).
+
+
+
+  
+mpred_term_expansion_by_storage_type(M,'$si$':'$was_imported_kb_content$'(_,_),pl):-!.
+mpred_term_expansion_by_storage_type(M,C,compile_clause(static)):- predicate_property(C,static).
+mpred_term_expansion_by_storage_type(M,C,requires_storage(WHY)):- requires_storage(C,WHY),!.
+mpred_term_expansion_by_storage_type(M,C,must_compile_special):- must_compile_special_clause(C),t_l:mpred_already_inside_file_expansion(C).
+
+
+mpred_term_expansion(Fact,Fact):- get_functor(Fact,F,A),(a(prologDynamic,F)),!.
+mpred_term_expansion(Fact,(:- ((cl_assert(Dir,Fact))))):- mpred_term_expansion_by_pred_class(Dir,Fact,_Output),!.
+
+mpred_term_expansion(MC,(:- cl_assert(ct(How),MC))):- strip_module(MC,M,C),hotrace(mpred_rule_hb(C,H,_B)),
+  (mpred_term_expansion_by_storage_type(M,H,How)->true;(C \= (_:-_),mpred_term_expansion_by_storage_type(M,C,How))),!.
+
+
+%% mpred_term_expansion_by_pred_class( ?VALUE1, ?Fact, ?Output) is semidet.
+%
+% load file term Converted To command  Extended Helper.
+% Specific to the "*PREDICATE CLASS*" based default
+%
+      mpred_term_expansion_by_pred_class(pfc(pred_type),Fact,Output):- get_functor(Fact,F,A),call_u(ttPredType(F)),Output='$si$':'$was_imported_kb_content$'(Fact,ttPredType(F)),!.
+      mpred_term_expansion_by_pred_class(pfc(func_decl),Fact,Output):- get_functor(Fact,F,A),call_u(functorDeclares(F)),Output='$si$':'$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
+      mpred_term_expansion_by_pred_class(pfc(macro_head),Fact,Output):- get_functor(Fact,F,A),call_u(prologMacroHead(F)),Output='$si$':'$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
+      mpred_term_expansion_by_pred_class(pfc(mpred_ctrl),Fact,Output):- get_functor(Fact,F,A),call_u(pfcControlled(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
+      mpred_term_expansion_by_pred_class(pfc(hybrid),Fact,Output):- get_functor(Fact,F,A),call_u(prologHybrid(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
+      mpred_term_expansion_by_pred_class(pfc(pl),Fact,Output):- get_functor(Fact,F,A),(a(prologDynamic,F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
+      % mpred_term_expansion_by_pred_class(pfc(in_mpred_kb_module),Fact,Output):- in_mpred_kb_module,Output=Fact,!.
+
+
+% Specific "*FILE*" based default
+mpred_term_expansion(Fact,(:- ((cl_assert(dyn(inside_file(dyn)),Fact))))):- inside_file(dyn),!.
+mpred_term_expansion(Fact,(:- ((cl_assert(kif(inside_file(kif)),Fact))))):- inside_file(kif),!.
+mpred_term_expansion(Fact,(:- ((cl_assert(pfc(inside_file(pfc)),Fact))))):- inside_file(pfc),!.
+mpred_term_expansion(Fact,(:- ((cl_assert(pfc(in_mpred_kb_module),Fact))))):- in_mpred_kb_module,!.
+mpred_term_expansion(Fact,(:- ((cl_assert(pfc(inside_file(pl)),Fact))))):- inside_file(pl),!.
+mpred_term_expansion(Fact,Fact):- inside_file(pl),!.
 
 /*
+mpred_term_expansion(Fact,(:- ((cl_assert(pfc(expand_file),Fact))))):-
+    cnotrace(mpred_expand_inside_file_anyways(F)),!,_Output='$si$':'$was_imported_kb_content$'(Fact,mpred_expand_inside_file_anyways(F)),!.
 */
-
 
 
 
@@ -2168,6 +2133,7 @@ mpred_term_expansion(Fact,Output):- load_file_term_to_command_1(_Dir,Fact,C),mus
 %
 % Can Be Dynamic.
 %
+can_be_dynamic(H):- predicate_property(H,dynamic),!.
 can_be_dynamic(H):- \+ is_static_pred(H), \+ predicate_property(H,static),  \+ predicate_property(H,meta_predicate(_)).
 
 
@@ -2198,44 +2164,6 @@ pl_to_mpred_syntax0(A,A):-is_ftVar(A),!.
 pl_to_mpred_syntax0((A,B),PFC):-!,pl_to_mpred_syntax(A,PFC_A),pl_to_mpred_syntax(B,PFC_B),conjoin_body(PFC_A,PFC_B,PFC).
 pl_to_mpred_syntax0(pfc(A),A):-!.
 pl_to_mpred_syntax0(A,{A}):-!.
-
-% mpred_term_expansion((H:-Chain,B),(H:-(B))):- is_code_body(Chain),!,fail,must(atom(Chain)),make_dynamic(H).
-
-
-% Specific "*PREDICATE CLASS*" based default
-mpred_term_expansion(Fact,Fact):- get_functor(Fact,F,A),(a(prologDynamic,F)),!.
-mpred_term_expansion(Fact,(:- ((cl_assert(Dir,Fact))))):- load_file_term_to_command_2(Dir,Fact,_Output),!.
-
-
-      % Specific "*PREDICATE CLASS*" based default
-
-
-
-%% load_file_term_to_command_2( ?VALUE1, ?Fact, ?Output) is semidet.
-%
-% load file term Converted To command  Extended Helper.
-%
-      load_file_term_to_command_2(pfc(pred_type),Fact,Output):- get_functor(Fact,F,A),call_u(ttPredType(F)),Output='$si$':'$was_imported_kb_content$'(Fact,ttPredType(F)),!.
-      load_file_term_to_command_2(pfc(func_decl),Fact,Output):- get_functor(Fact,F,A),call_u(functorDeclares(F)),Output='$si$':'$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
-      load_file_term_to_command_2(pfc(macro_head),Fact,Output):- get_functor(Fact,F,A),call_u(prologMacroHead(F)),Output='$si$':'$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
-      load_file_term_to_command_2(pfc(mpred_ctrl),Fact,Output):- get_functor(Fact,F,A),call_u(pfcControlled(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
-      load_file_term_to_command_2(pfc(hybrid),Fact,Output):- get_functor(Fact,F,A),call_u(prologHybrid(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
-      load_file_term_to_command_2(pfc(pl),Fact,Output):- get_functor(Fact,F,A),(a(prologDynamic,F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
-      load_file_term_to_command_2(mpred(in_mpred_kb_module),Fact,Output):- in_mpred_kb_module,Output=Fact,!.
-
-
-% Specific "*FILE*" based default
-mpred_term_expansion(Fact,Fact):- inside_file(pl),!.
-mpred_term_expansion(Fact,(:- ((cl_assert(pfc(mpred_file),Fact))))):- inside_file(pfc),!.
-mpred_term_expansion(Fact,(:- ((cl_assert(dyn(dyn_file),Fact))))):- inside_file(dyn),!.
-mpred_term_expansion(Fact,(:- ((cl_assert(mpred(mpreds_file),Fact))))):- inside_file(mpreds),!.
-mpred_term_expansion(Fact,(:- ((cl_assert(mpred(in_mpred_kb_module),Fact))))):- in_mpred_kb_module,!.
-
-/*
-mpred_term_expansion(Fact,(:- ((cl_assert(pfc(expand_file),Fact))))):-
-    cnotrace(mpred_expand_inside_file_anyways(F)),!,_Output='$si$':'$was_imported_kb_content$'(Fact,mpred_expand_inside_file_anyways(F)),!.
-*/
-
 
 
 
@@ -2281,67 +2209,6 @@ make_dynamic(C):- compound(C),get_functor(C,F,A),must(F\=='$VAR'),
 
 
 
-
-
-%% mpred_process_input_1( :TermT) is semidet.
-%
-% Managed Predicate process input  Secondary Helper.
-%
-mpred_process_input_1(':-'(TT)):-!,must(TT),!.
-mpred_process_input_1('?-'(TT)):-!,doall(must(TT)),!.
-mpred_process_input_1('$si$':'$was_imported_kb_content$'(_,_)):-!.
-mpred_process_input_1(T):-try_save_vars(T),ain(T),!.
-
-
-
-%% mpred_process_input( ?T, ?Vs) is semidet.
-%
-% Managed Predicate Process Input.
-%
-mpred_process_input(':-'(T),Vs):- put_variable_names( Vs),must(T),!.
-mpred_process_input(T,Vs):- expand_term(T,TT),put_variable_names( Vs),mpred_process_input_1(TT),!.
-
-
-
-
-%% process_this_script is semidet.
-%
-% Process This Script.
-%
-process_this_script:- current_prolog_flag(xref,true),!.
-process_this_script:- ignore(show_call(why,prolog_load_context(script,_))), prolog_load_context(stream,S), !, must(process_this_script(S)).
-
-
-
-
-%% process_this_script( ?S) is semidet.
-%
-% Process This Script.
-%
-process_this_script(_):- current_prolog_flag(xref,true),!.
-process_this_script(S):- at_end_of_stream(S),!.
-process_this_script(S):- repeat,once(process_this_script0(S)),at_end_of_stream(S).
-
-
-
-
-%% process_this_script0( ?S) is semidet.
-%
-% Process This Script Primary Helper.
-%
-process_this_script0(_):- current_prolog_flag(xref,true),!.
-process_this_script0(S):- at_end_of_stream(S),!.
-process_this_script0(S):- peek_string(S,3,W), W="\n\n\n",get_code(S,_),get_code(S,_),!,process_this_script0(S).
-process_this_script0(S):- peek_string(S,2,W), W="\r\n",get_code(S,_),!,process_this_script0(S).
-process_this_script0(S):- peek_string(S,2,W), W="\n\n",get_code(S,_),!,process_this_script0(S).
-process_this_script0(S):- peek_code(S,W),member(W,`\n`),get_code(S,P),put(P),!,process_this_script0(S).
-process_this_script0(S):- peek_code(S,W),member(W,` \t\r`),get_code(S,_),!,process_this_script0(S).
-process_this_script0(S):- peek_string(S,2,W),W="%=",!,read_line_to_string(S,String),format('~N~s~n',[String]).
-process_this_script0(S):- peek_string(S,1,W),W="%",!,read_line_to_string(S,_String).
-process_this_script0(S):- read_term(S,T,[variable_names(Vs)]),put_variable_names( Vs),format('~N~n',[]),portray_one_line(T),format('~N~n',[]),!,
-  must(mpred_process_input(T,Vs)).
-
-
 :- use_module(library(shlib)).
 :- use_module(library(operators)).
 
@@ -2361,7 +2228,7 @@ process_this_script0(S):- read_term(S,T,[variable_names(Vs)]),put_variable_names
 %
 % Loading Source File.
 %
-loading_source_file(F):-once(t_l:pretend_loading_file(F);prolog_load_context(source,F);loading_file(F);'$module'(F,F)).
+loading_source_file(F):-once(t_l:pretend_loading_file(F);prolog_load_context(source,F);loading_file(F);show_success('$module'(F,F))).
 
 
 :- dynamic(lmconf:never_reload_file/1).
@@ -2379,179 +2246,6 @@ load_language_file(Name0):-
    w_tl([(user:term_expansion(_,_):-!,fail),(user:goal_expansion(_,_):-!,fail),(system:term_expansion(_,_):-!,fail),(system:goal_expansion(_,_):-!,fail)],
      gripe_time(1,(lmconf:load_files(Name,[qcompile(auto),register(false),if(not_loaded  )])->asserta(lmconf:never_reload_file(Name));retract(lmconf:never_reload_file(Name)))))))),!.
  
-
-
-
-
-
-%% never_load_special( :TermARG1, ?Options) is semidet.
-%
-% Never Load Special.
-%
-never_load_special(_, Options) :-memberchk(must_be_module(true),Options).
-never_load_special(_Module:Spec, _) :- atom(Spec), atomic_list_concat(M,'.',Spec),length(M,L),L>7.
-never_load_special(_Module:library(Atom), Options) :- atom(Atom),member(must_be_module(true),Options),member(if(not_loaded),Options).
-never_load_special(_Module:_Spec, Options) :- member(must_be_module(true),Options),member(if(not_loaded),Options),member(imports([_/_]),Options).   
-
-
-:- use_module(logicmoo(util/logicmoo_util_filesystem)).
-:- dynamic(prolog_load_file_loop_checked/2).
-
-% probably an autoload (SKIP)
-
-
-
-%% prolog_load_file_loop_checked( ?ModuleSpec, ?Options) is semidet.
-%
-% Prolog Load File Loop Checked.
-%
-prolog_load_file_loop_checked(ModuleSpec, Options) :- never_load_special(ModuleSpec, Options),!,fail.
-prolog_load_file_loop_checked(ModuleSpec, Options) :- loop_check(show_success(prolog_load_file,prolog_load_file_loop_checked_0(ModuleSpec, Options))).
-
-
-
-
-%% prolog_load_file_loop_checked_0( ?ModuleSpec, ?Options) is semidet.
-%
-% prolog load file loop checked  Primary Helper.
-%
-prolog_load_file_loop_checked_0(ModuleSpec, Options) :- current_predicate(_,_:exists_file_safe(_)),
-   catch(prolog_load_file_nlc(ModuleSpec, Options),E,(nop((trace,prolog_load_file_nlc(ModuleSpec, Options))),throw(E))).
-
-
-
-
-%% prolog_load_file_nlc( :TermModule, ?Options) is semidet.
-%
-% Prolog Load File Nlc.
-%
-prolog_load_file_nlc(Module:Spec, Options) :- 
-   filematch(Module:Spec,Where1),Where1\=Spec,!,forall(filematch(Module:Spec,Where),Module:load_files(Module:Where,Options)).
-
-prolog_load_file_nlc(Module:Spec, Options):- lmconf:never_reload_file(Spec),
-   wdmsg(warn(error(skip_prolog_load_file_nlc(lmconf:never_reload_file(Module:Spec, Options))))),!.
-
-prolog_load_file_nlc(Module:Spec, Options):- thread_self(TID), \+ is_main_thread,
-   nop(wdmsg(warn(error(skip_prolog_load_file_nlc(wrong_thread(TID):-thread(Module:Spec, Options)))))),!.
-
-prolog_load_file_nlc(Module:Spec, Options):- thread_self(TID), \+ is_main_thread,
-   nop(wdmsg(warn(error(skip_prolog_load_file_nlc(wrong_thread(TID):-thread(Module:Spec, Options)))))),!,fail,dumpST.
-
-prolog_load_file_nlc(Module:DirName, Options):-  atom(DirName), is_directory(DirName)->
-  current_predicate(_,_:'load_file_dir'/2)->loop_check(show_call(why,call(load_file_dir,Module:DirName, Options))).
-
-prolog_load_file_nlc(Module:Spec, Options):- absolute_file_name(Spec,AFN,[extensions(['pl'])]), 
-   (Spec\==AFN),exists_file_safe(AFN),!,prolog_load_file_nlc(Module:AFN, Options).
-
-prolog_load_file_nlc(Module:FileName, Options):- exists_file_safe(FileName),!,
-   prolog_load_file_nlc_0(Module:FileName, Options).
-
-prolog_load_file_nlc(Module:Spec, Options):- term_to_atom(Spec,String),member(S,['?','*']),sub_atom(String,_,1,_,S),!, 
- foreach(lmconf:filematch(Module:Spec,FileName),
-    (loop_check((prolog_load_file_nlc_0(Module:FileName, Options))),TF=true)),!,
-  nonvar(TF).
-
-
-
-
-%% prolog_load_file_nlc_0( :TermModule, ?Options) is semidet.
-%
-% prolog load file nlc  Primary Helper.
-%
-prolog_load_file_nlc_0(Module:Spec, Options):- thread_self(TID), \+ is_main_thread,
-   wdmsg(warn(error(skip_prolog_load_file_nlc(wrong_thread(TID):-thread(Module:Spec, Options))))),!.
-
-prolog_load_file_nlc_0(Module:FileName, Options):- 
-  '$set_source_module'(SM,SM),
- (source_file_property(FileName,load_context(MC,SubFile:Line)),MC\==user,SM==user),!,
-  wdmsg(skipping(prolog_load_file_nlc(Module:FileName, Options):source_file_property(FileName,load_context(MC,SubFile:Line)))),!.
-
-prolog_load_file_nlc_0(Module:FileName, Options):-  
-  file_name_extension(_Base,Ext,FileName),
-  use_file_type_loader(Ext,Loader)-> loop_check(call(Loader,Module:FileName, Options)).
-
-prolog_load_file_nlc_0(Module:FileName, Options):- fail, fail, fail, fail, fail, fail, fail, fail, fail, fail, fail, fail, 
-  file_name_extension(_Base,Ext,FileName),
-  guess_file_type_loader(Ext,Loader)-> loop_check(call(Loader,Module:FileName, Options)).
-
-
-
-
-%% guess_file_type_loader( ?Ext, ?Loader) is semidet.
-%
-% Guess File Type Loader.
-%
-guess_file_type_loader(Ext,Loader):-use_file_type_loader(Ext,Loader).
-guess_file_type_loader(Ext,Pred):- atom(Ext),
-   (Ext==''->Pred='load_file_some_type';system:atom_concat('load_file_type_,',Ext,Pred)),
-   current_predicate(Pred/2).
-
-
-
-
-%% load_file_dir( :TermModule, ?Options) is semidet.
-%
-% Load File Dir.
-%
-load_file_dir(Module:DirName, Options):- fail,
-  directory_files(DirName,Files),
-  foreach((member(F,Files),
-            file_name_extension(_,Ext,F),
-            guess_file_type_loader(Ext,Loader),
-            current_predicate(_,_:Loader/2),
-            directory_file_path(DirName,F,FileName)),
-      (user:prolog_load_file(Module:FileName, Options),TF=true)),
-     nonvar(TF).
-
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
-
-
-
-
-
-%% use_file_type_loader( ?VALUE1, ?VALUE2) is semidet.
-%
-% Use File Type Loader.
-%
-use_file_type_loader(pfc,ensure_mpred_file_consulted).
-use_file_type_loader(pddl,ensure_mpred_file_consulted).
-use_file_type_loader(plmoo,ensure_mpred_file_consulted).
-% use_file_type_loader(pl,ensure_prolog_file_consulted).
-
-
-
-
-%% ensure_prolog_file_consulted( :TermM, ?Options) is semidet.
-%
-% Ensure Prolog File Consulted.
-%
-ensure_prolog_file_consulted(M:File,Options):-must(load_files(M:File,Options)),!.
-
-
-
-
-%% ensure_mpred_file_consulted( :TermM, ?Options) is semidet.
-%
-% Ensure Managed Predicate File Consulted.
-%
-ensure_mpred_file_consulted(M:File,Options):- 
-  with_mpred_expansions(w_tl(t_l:pretend_loading_file(File),
-              must((file_begin(pfc),
-                    load_files(M:File,Options))))),!.
-
-
-
-
-%% load_file_some_type( :TermM, ?Options) is semidet.
-%
-% Load File Some Type.
-%
-load_file_some_type(M:File,Options):-must(load_files(M:File,Options)),!.
-
-
-
-
-
 
 
 %% disable_mpreds_in_current_file is semidet.
@@ -2615,8 +2309,8 @@ use_was_isa(G,I,C):-call((current_predicate(_,_:mpred_types_loaded/0),if_defined
 %
 % Current Context Module.
 %
-current_context_module(Ctx):-notrace((lmconf:loading_module(Ctx))),!.
-current_context_module(Ctx):-notrace((source_context_module(Ctx))).
+current_context_module(Ctx):-hotrace((lmconf:loading_module(Ctx))),!.
+current_context_module(Ctx):-hotrace((source_context_module(Ctx))).
 
 % ========================================
 % register_module_type/end_module_type
@@ -2980,13 +2674,14 @@ doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 loader_side_effect_verify_only(I,Supposed):-   
    sanity(var(ActualSupposed)),
     push_predicates(t_l:side_effect_buffer/3,STATE),
-    load_file_term_to_command_or_fail(I,Supposed),
+    prolog_load_context(module,M),
+    mpred_expander_now_physically(M,I,Supposed),
     get_source_ref1(Why),
     collect_expansions(Why,I,Actual),
     convert_side_effect(suppose(Supposed),S),
     conjoin(S, Actual,ActualSupposed),
     conjuncts_to_list(ActualSupposed,Readable),
-    assert(actual_side_effect(I,Readable)),
+    assert(t_l:actual_side_effect(I,Readable)),
     pop_predicates(t_l:side_effect_buffer/3,STATE),!.
 
 
@@ -2999,7 +2694,8 @@ loader_side_effect_verify_only(I,Supposed):-
 loader_side_effect_capture_only(I,ActualSupposed):-   
    sanity(var(ActualSupposed)),
     push_predicates(t_l:side_effect_buffer/3,STATE),
-    load_file_term_to_command_or_fail(I,Supposed),
+    prolog_load_context(module,M),
+    mpred_expander_now_physically(M,I,Supposed),
     get_source_ref1(Why),
     collect_expansions(Why,I,Actual),
     conjoin(Actual,Supposed,ActualSupposed),
@@ -3150,24 +2846,6 @@ pop_predicates(M:F/A,STATE):- functor(H,F,A),forall(member((H:-B),STATE),M:asser
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
-:- multifile(user:prolog_load_file/2).
-:- dynamic(user:prolog_load_file/2).
-
-
-
-
-%% prolog_load_file( ?ModuleSpec, ?Options) is semidet.
-%
-% Hook To [user:prolog_load_file/2] For Module Mpred_loader.
-% Prolog Load File.
-%
-user:prolog_load_file(ModuleSpec, Options):- current_predicate(_,_:mpred_loader_file),
-  \+ never_load_special(ModuleSpec, Options),  catch(prolog_load_file_loop_checked(ModuleSpec, Options),E,
-    ((wdmsg(E),trace,prolog_load_file_loop_checked(ModuleSpec, Options),throw(E)))).
-
-
-
-
 
 %% mpred_loader_file is semidet.
 %
@@ -3176,7 +2854,7 @@ user:prolog_load_file(ModuleSpec, Options):- current_predicate(_,_:mpred_loader_
 mpred_loader_file.
 
 :- asserta_if_new((user:term_expansion(I,O):- mpred_expander(term,user,I,O))).
-:- asserta_if_new((system:goal_expansion(I,O):- mpred_expander(goal,system,I,O))).
+:- asserta_if_new((system:goal_expansion(I,O):- hotrace(mpred_expander(goal,system,I,O)))).
 
 
 

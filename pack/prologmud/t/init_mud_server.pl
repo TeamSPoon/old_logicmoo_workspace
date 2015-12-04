@@ -22,10 +22,10 @@
 
 
 % [Required] Load the CYC Network Client and Logicmoo CycServer Emulator (currently server is disabled)
-% :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_i_cyc_api)))).
+% :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_u_cyc_api)))).
 
 % [Optional] NOT YET Load the Logicmoo RDF/OWL Browser System
-% % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(mpred_online/dbase_i_rdf_store)))).
+% % :- with_no_mpred_expansions(if_file_exists(user:ensure_loaded(logicmoo(mpred_online/mpred_rdf)))).
 
 
 % [Debugging] Normarily this set as 'true' can interfere with debugging
@@ -40,7 +40,7 @@
 % ==========================================================
 
 :- if((gethostname(ubuntu),fail)). % INFO this fail is so we can start faster
-:- show_call_entry(gripe_time(40, doall(user:regression_test))).
+:- show_entry(gripe_time(40, doall(user:regression_test))).
 :- endif.
 
 
@@ -49,7 +49,7 @@
 % ==============================
 
 % [Required] load the mud system
-:- show_call_entry(gripe_time(40,user:ensure_loaded(prologmud(mud_loader)))).
+:- show_entry(gripe_time(40,user:ensure_loaded(prologmud(mud_loader)))).
 
 
 % ==============================
@@ -114,7 +114,7 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 :- file_begin(pl).
 
 % [Optionaly] Start the telent server
-start_telnet:- logOnError(toploop_telnet:start_mud_telnet_4000).
+start_telnet:- on_x_log_cont(toploop_telnet:start_mud_telnet_4000).
 
 :- initialization(start_telnet).
 

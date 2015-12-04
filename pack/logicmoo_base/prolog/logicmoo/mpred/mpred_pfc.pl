@@ -16,6 +16,7 @@
   mpred_fwc/1,
   show_if_debug/1,
   set_user_abox/1,
+  assert_u_confirmed/1,
   mpred_notrace_exec/0,
   get_user_abox/1,
   get_source_ref/1,
@@ -81,7 +82,8 @@
   mpred_post1/2,mpred_withdraw/1,mpred_withdraw/2,mpred_remove/1,
   mpred_remove/2,
   mpred_pp_db_justification1/2,mpred_pp_db_justifications2/3,mpred_spy1/3,
-  mpred_unfwc1/1,mpred_why1/1,mpred_blast/1
+  mpred_unfwc1/1,mpred_why1/1,mpred_blast/1,
+  mpred_pfc_file/0
   % trigger_trigger1/2  , trigger_trigger/3,
   ]).
 
@@ -216,9 +218,9 @@ body_true(avar(_,AVS)):-nonvar(AVS),attr_bind(AVS).
 
 listing_u(P):-call_u(listing(P)).
 
-assert_u(MP):- fix_mp(MP,M:P),assert(M:P).
-asserta_u(MP):- fix_mp(MP,M:P),asserta(M:P).
-assertz_u(MP):- fix_mp(MP,M:P),assertz(M:P).
+assert_u(MP):- fix_mp(MP,M:P),attvar_op(assert,M:P).
+asserta_u(MP):- fix_mp(MP,M:P),attvar_op(asserta,M:P).
+assertz_u(MP):- fix_mp(MP,M:P),attvar_op(assertz,M:P).
 
 retract_u(M:(H:-B)):- atom(M),!, clause_u(H,B,R),erase(R),expire_tabled_list(H).
 retract_u((H:-B)):-!, clause_u(H,B,R),erase(R),expire_tabled_list(H).
@@ -274,7 +276,8 @@ call_u(G):- G.
 % Call P(E,S). each Element in the list.
 %
 each_E(P,HV,S):- var(HV),!,apply(P,[HV|S]).
-each_E(P,M:HT,S) :- !,must_be(atom,M),M:each_E(P,HT,S).
+each_E(P,M:HT,S) :- M=='$si$',!,apply(P,[M:HT|S]).
+each_E(P,M:HT,S) :- !, must_be(atom,M),M:each_E(P,HT,S).
 each_E(P,[H|T],S) :- !, apply(P,[H|S]), each_E(P,T,S).
 each_E(P,(H,T),S) :- !,call_u(each_E(P,H,S)), each_E(P,T,S).
 each_E(P,H,S) :- apply(P,[H|S]).
@@ -412,26 +415,31 @@ mpred_post(P, S):-
 % adds an entry to the Pfc queue for subsequent forward chaining.
 % It always succeeds.
 %
-mpred_post1(    P,   S):- if_defined_else(fixed_negations(P,P0),fail),!, mpred_post1( P0,   S).
-% TODO - ODD THIS WAS EVEN NEEDED?
-mpred_post1(  ~ P,   S):- 
-   with_no_mpred_breaks((nonvar(P),doall(mpred_remove(P,S)),mpred_undo(P))),fail.
+mpred_post1(    P,   S):- sanity(nonvar(P)),if_defined_else(fixed_negations(P,P0),fail),!, mpred_post1( P0,   S).
 mpred_post1( \+ P,   S):- 
    nonvar(P),!,with_no_mpred_breaks((with_umt((mpred_withdraw(P, S),!,doall(mpred_remove(P,S)),mpred_undo(P),retract_u(P))))),!.
+% TODO - FIGURE OUT WHY THIS IS NEEDED
+mpred_post1(  ~ P,   S):- 
+   with_no_mpred_breaks((nonvar(P),doall(mpred_remove(P,S)),mpred_undo(P))),fail.
 mpred_post1(P,S):- 
   %  db mpred_ain_db_to_head(P,P2),
   % mpred_remove_old_version(P),
-  mpred_add_support(P,S),
-  mpred_unique_u(P),
-  assert_u(P),
+  
+  (lookup_u(spft(P,_,_))->HAD_SUPPORT=true;HAD_SUPPORT=false),
+  must(mpred_add_support(P,S)),
+  ((\+ mpred_unique_u(P) -> 
+    (!,(HAD_SUPPORT==true->true;mpred_enqueue(P,S))) ;
+  must((assert_u_confirmed(P),
   mpred_trace_op(add,P,S),
   !,
   mpred_enqueue(P,S),
-  !.
+  !)))).
 
-mpred_post1(_,_).
-% mpred_post1(P,S):-  mpred_warn("mpred_ain(~p,~p) failed",[P,S]).
+mpred_post1(_,_):-!.
+% mpred_post1(P,S):-  trace_or_throw(mpred_error("mpred_post1(~p,~p) failed",[P,S])).
+mpred_post1(P,S):-  mpred_warn("mpred_post1(~p,~p) failed",[P,S]).
 
+assert_u_confirmed(P):- call_u((must((assert_u(P),copy_term(P,PP),clause_asserted_i(PP))))),!.
  
 %% get_mpred_current_db(-Db) is semidet.
 %
@@ -533,7 +541,7 @@ mpred_run.
 
 mpred_step:-  
   % if hs/1 is true, reset it and fail, thereby stopping inferencing.
-  lookup_u(hs(Was)),
+  notrace((lookup_u(hs(Was)))),
   mpred_retract(hs(Was)),
   mpred_trace_msg('Stopping on: ~p',[hs(Was)]),
   !, 
@@ -542,7 +550,7 @@ mpred_step:-
 mpred_step:-
   % draw immediate conclusions from the next fact to be considered.
   % fails iff the queue is empty.
-  get_next_fact(P),
+  notrace(get_next_fact(P)),
   pfcl_do(mpred_fwc(P)),
   !.
 
@@ -701,12 +709,12 @@ mpred_ain_object(X):-
 
 mpred_ain_by_type(fact(_FT),X):- 
   mpred_unique_u(X), 
-  assert_u(X),!.
+  assert_u_confirmed(X),!.
 mpred_ain_by_type(rule,X):- 
   mpred_unique_u(X), 
-  assert_u(X),!.
+  assert_u_confirmed(X),!.
 mpred_ain_by_type(trigger,X):- 
-  assert_u(X).
+  assert_u_confirmed(X).
 mpred_ain_by_type(action,_ZAction):- !.
 
 
@@ -914,7 +922,7 @@ mpred_do_rule(_).
 mpred_do_fcpt(Fact,F):- 
   lookup_u(pt(F,Body)),
   mpred_trace_msg('~N~n\tFound positive trigger: ~p~n\t\tbody: ~p~n',
-		[F,Body]),
+		[F,Body]),  
   mpred_eval_lhs(Body,(Fact,pt(F,Body))),
   fail.
 
@@ -1030,6 +1038,7 @@ mpred_eval_rhs1({Action},Support):-
  !,
  fc_eval_action(Action,Support).
 
+% Dmiles replaced with this
 mpred_eval_rhs1( P,Support):-
  % predicate to remove.
   mpred_negation( P , PN),
@@ -1044,7 +1053,7 @@ mpred_eval_rhs1( P,Support):-
   mpred_negated_literal( P),
   %TODO Shouldn''t we be mpred_withdrawing the Positive version?  
   % perhaps we aready negated here dirrent nf1_*
-  mpred_trace_msg('~n\t\tWithdrawing: ~p \n\tSupport: ~p~n',[P,Support]),
+  mpred_trace_msg('~N~n =pred_eval_rhs1= ~n\t\tWithdrawing: ~p \n\tSupport: ~p~n',[P,Support]),
   !,
   mpred_withdraw(P).
 
@@ -1055,9 +1064,10 @@ mpred_eval_rhs1([X|Xrest],Support):-
 
 mpred_eval_rhs1(Assertion,Support):- !,
  % an assertion to be added.
- (must(mpred_post1(Assertion,Support)) *->
+ mpred_trace_msg('~N~n =pred_eval_rhs1= ~n\tPost1: ~p \n\tSupport: ~p~n',[Assertion,Support]),!,
+ (must(mpred_post(Assertion,Support)) *->
     true;
-    mpred_warn("\n\t\t\n\t\tMalformed rhs of a rule: ~p\n\t\tSupport=~p.",[Assertion,Support])).
+    mpred_warn("\n\t\t\n\t\tMalformed rhs of a rule (mpred_post1 failed)\n\t\tPost1: ~p\n\t\tSupport=~p.",[Assertion,Support])).
 
 % mpred_eval_rhs1(X,_):-  mpred_warn("Malformed rhs of a rule: ~p",[X]).
 
@@ -1107,7 +1117,9 @@ trigger_trigger1(Trigger,Body):-
 % 
 mpred_BC(P):- mpred_CALL(mpred_BC_w_cache, P).
 mpred_BC_w_cache(P):- mpred_BC_CACHE(P),mpred_CALL(P).
-mpred_BC_CACHE(P0):-  must((\+ \+ ((strip_module(P0,_,P00),copy_term(P00,P000),loop_check(mpred_BC_CACHE0(P000),true))))).
+
+mpred_BC_CACHE(P0):-  must((\+ \+ ((strip_module(P0,_,P00),copy_term(P00,P000),loop_check_early(mpred_BC_CACHE0(P000),true))))).
+
 mpred_BC_CACHE0(P00):- var(P00),!.
 mpred_BC_CACHE0(bt(_,_)):-!.
 mpred_BC_CACHE0(P):- 
@@ -1338,17 +1350,6 @@ mpred_positive_literal(X):-   is_ftNonvar(X),
   !.
 
 
-%% mpred_connective(+VALUE1) is semidet.
-%
-% PFC Connective.
-%
-mpred_connective(';').
-mpred_connective(',').
-mpred_connective('/').
-mpred_connective('|').
-mpred_connective(('==>')).
-mpred_connective(('<-')).
-mpred_connective('<==>').
 
 mpred_connective('-').
 % mpred_connective('~').
@@ -1491,6 +1492,7 @@ mpred_mark_as(Sup,PosNeg,P,Type):-get_functor(P,F,A),ignore(mpred_mark_fa_as(Sup
 %
 % PFC Mark Functor-arity Converted To.
 %
+
 % mpred_mark_fa_as(_,_,_,'\=',2,_):- trace.
 mpred_mark_fa_as(_Sup,_PosNeg,_P,isa,_,_):- !.
 mpred_mark_fa_as(_Sup,_PosNeg,_P,t,_,_):- !.
@@ -1589,7 +1591,7 @@ mpred_db_type(_,fact(_FT)):-
   !.
 
 mpred_assert_w_support(P,Support):- 
-  (mpred_clause_u(P) ; assert_u(P)),
+  (mpred_clause_u(P) ; assert_u_confirmed(P)),
   !,
   mpred_add_support(P,Support).
 
@@ -1818,11 +1820,11 @@ mpred_trace_op(Add,P,S):-
    
 
 mpred_trace_maybe_print(Add,P,S):-
-  \+ lookup_u(mpred_is_tracing_pred(P)) -> true;
+  \+ get_mpred_is_tracing(P) -> true;
   (
-   (to_u(S,U)
+   ((to_u(S,U),atom(U))
        -> wdmsg("~NOP: ~p (~p) ~p",[Add,U,P])
-        ; wdmsg("~NOP: ~p (:) ~p~N\tSupported By: ~p",[Add,P,S]))),!.
+        ; wdmsg("~NOP: ~p (:) ~p~N\tSupported By: ~q",[Add,P,S]))),!.
 
 to_u(S,U):-S=(U,ax),!.
 to_u(S,U):-S=(U,U),!.
@@ -1844,8 +1846,9 @@ mpred_trace(Form):-
 %
 % PFC If Is A Tracing.
 %
+get_mpred_is_tracing(_):- (lookup_u(mpred_is_tracing_exec) ; t_l:mpred_debug_local),!.
 get_mpred_is_tracing(Form):- clause_u(mpred_is_tracing_pred(Form),B),!,call_u(B).
-get_mpred_is_tracing(_):- lookup_u(mpred_is_tracing_exec) ; t_l:mpred_debug_local.
+get_mpred_is_tracing(_):- (lookup_u(mpred_is_tracing_exec) ; t_l:mpred_debug_local),!.
 
 %% mpred_trace(+Form, ?Condition) is semidet.
 %
@@ -1927,7 +1930,7 @@ with_no_mpred_trace_exec(P):- get_user_abox(M),
 %
 :- meta_predicate(show_if_debug(0)).
 % show_if_debug(A):- !,show_call(why,A).
-show_if_debug(A):- get_mpred_is_tracing(A) -> show_call(A) ; A.
+show_if_debug(A):- notrace(\+ \+ get_mpred_is_tracing(A)) -> show_call(A) ; A.
 
 :- thread_local(t_l:mpred_debug_local/0).
 
@@ -2141,7 +2144,7 @@ mpred_add_support(P,(Fact,Trigger)):-
  % (Trigger= nt(F,Condition,Action) -> 
  %   (mpred_trace_msg('~N~n\tAdding mpred_do_fcnt via support~n\t\ttrigger: ~p~n\t\tcond: ~p~n\t\taction: ~p~n\t from: ~p~N',
  %     [F,Condition,Action,mpred_add_support(P,(Fact,Trigger))]));true),
-  assert_u(spft(P,Fact,Trigger)).
+  assert_u_confirmed(spft(P,Fact,Trigger)).
 
 mpred_get_support(P,(Fact,Trigger)):-
       lookup_u(spft(P,Fact,Trigger)).
@@ -2490,21 +2493,6 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((justifications)/2).
 :- module_transparent((ain_fast)/2).
 :- module_transparent((ain_fast)/1).
-:- module_transparent((call_s2)/1).
-:- module_transparent((call_s)/1).
-:- module_transparent((clauseq_s)/3).
-:- module_transparent((clause_s)/3).
-:- module_transparent((assertz_s)/1).
-:- module_transparent((asserta_s)/1).
-:- module_transparent((lookq_s)/2).
-:- module_transparent((lookq_s)/1).
-:- module_transparent((lookup_s)/2).
-:- module_transparent((lookup_s)/1).
-:- module_transparent((retract_s)/1).
-:- module_transparent((clause_s)/2).
-:- module_transparent((retractall_s)/1).
-:- module_transparent((assert_s)/1).
-:- module_transparent((listing_s)/1).
 :- module_transparent((fix_mp)/2).
 :- module_transparent((why_was_true)/1).
 :- module_transparent((mpred_is_silient)/0).
