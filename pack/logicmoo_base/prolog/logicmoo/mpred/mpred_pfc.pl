@@ -113,6 +113,8 @@
       with_search_mode(+,0),
       bagof_or_nil(?,^,-).
 
+:- module_transparent(assert_u_confirmed/1).
+
 :- thread_local(t_l:user_abox/1).
 :- thread_local(t_l:no_mpred_breaks/0).
 
@@ -218,9 +220,9 @@ body_true(avar(_,AVS)):-nonvar(AVS),attr_bind(AVS).
 
 listing_u(P):-call_u(listing(P)).
 
-assert_u(MP):- fix_mp(MP,M:P),attvar_op(assert,M:P).
-asserta_u(MP):- fix_mp(MP,M:P),attvar_op(asserta,M:P).
-assertz_u(MP):- fix_mp(MP,M:P),attvar_op(assertz,M:P).
+assert_u(MP):- notrace(fix_mp(MP,M:P)),attvar_op(assert_i,M:P).
+asserta_u(MP):- notrace(fix_mp(MP,M:P)),attvar_op(asserta_i,M:P).
+assertz_u(MP):- notrace(fix_mp(MP,M:P)),attvar_op(assertz_i,M:P).
 
 retract_u(M:(H:-B)):- atom(M),!, clause_u(H,B,R),erase(R),expire_tabled_list(H).
 retract_u((H:-B)):-!, clause_u(H,B,R),erase(R),expire_tabled_list(H).
@@ -230,11 +232,13 @@ retract_u(H0):- strip_module(H0,_,H),!, clause_u(H,true,R),erase(R),expire_table
 retractall_u(H):- forall(clause_u(H,_,R),erase(R)).
 clause_u(H,B):- clause_u(H,B,_).
 
-clause_u(_:H,B,R):- !, get_user_abox(M), M:clause(H,B,R).
-clause_u(H,B,R):- get_user_abox(M), M:clause(M:H,B,R).
+clause_u(_:H,B,R):- !, get_user_abox(M), M:clause_i(H,B,R).
+clause_u(H,B,R):- get_user_abox(M), M:clause_i(M:H,B,R).
 
-lookup_u(Trigger):-  clause_u(Trigger,B),call(B).
-lookup_u(Trigger,Ref):-  clause_u(Trigger,B,Ref),call(B).
+lookup_u(H):-lookup_u(H,_). 
+lookup_u(MP,Ref):- notrace(fix_mp(MP,M:H)), on_x_debug(clause_u(M:H,B,Ref)),
+                        (var(B)->rtrace(clause_u(M:H,_,Ref));true),
+                        on_x_debug(B).
 
 call_u(mpred_BC(G0)):-nonvar(G0),!,call_u(G0).
 call_u(call_u(G0)):-nonvar(G0),!,call_u(G0).
@@ -439,7 +443,8 @@ mpred_post1(_,_):-!.
 % mpred_post1(P,S):-  trace_or_throw(mpred_error("mpred_post1(~p,~p) failed",[P,S])).
 mpred_post1(P,S):-  mpred_warn("mpred_post1(~p,~p) failed",[P,S]).
 
-assert_u_confirmed(P):- call_u((must((assert_u(P),copy_term(P,PP),clause_asserted_i(PP))))),!.
+assert_u_confirmed(P):- copy_term(P,PP),
+  call_u((must(assert_u(P)),must(clause_asserted_i(PP)))),!.
  
 %% get_mpred_current_db(-Db) is semidet.
 %
@@ -483,7 +488,7 @@ get_search_mode(_P,_S,Mode):- must(Mode=direct),!.
 %
 % Temporariliy changes to forward chaining search mode while running the Goal
 %
-with_search_mode(Mode,Goal):- w_tl(t_l:mpred_search_mode(Mode),Goal).
+with_search_mode(Mode,Goal):- w_tl(t_l:mpred_search_mode(Mode),((Goal))).
 
 set_search_mode(Mode):- asserta(t_l:mpred_search_mode(Mode)).
 
@@ -560,8 +565,9 @@ get_next_fact(P):-
   remove_selection(P).
 
 remove_selection(P):-
-  lookup_u(que(P)),
-  must(mpred_retract(que(P))),
+  lookup_u(que(P),Ref),
+  erase(Ref),
+  % must(mpred_retract(que(P))),
   mpred_remove_supports_quietly(que(P)),
   !.
 remove_selection(P):-
@@ -1121,6 +1127,8 @@ mpred_BC_w_cache(P):- mpred_BC_CACHE(P),mpred_CALL(P).
 mpred_BC_CACHE(P0):-  must((\+ \+ ((strip_module(P0,_,P00),copy_term(P00,P000),loop_check_early(mpred_BC_CACHE0(P000),true))))).
 
 mpred_BC_CACHE0(P00):- var(P00),!.
+mpred_BC_CACHE0(must(P00)):-!,mpred_BC_CACHE0(P00).
+mpred_BC_CACHE0(P):- predicate_property(P,static),!.
 mpred_BC_CACHE0(bt(_,_)):-!.
 mpred_BC_CACHE0(P):- 
  ignore((
@@ -1444,6 +1452,7 @@ check_never_assert(Pred):- fail,notrace(ignore(( copy_term_and_varnames(Pred,Pre
 %
 % Check Never Retract.
 %
+check_never_retract(_Pred):-!.
 check_never_retract(Pred):- hotrace(ignore(( copy_term_and_varnames(Pred,Pred_2),call_u(never_retract_u(Pred_2,Why)),Pred=@=Pred_2,trace_or_throw(never_retract_u(Pred,Why))))).
 
 
@@ -1846,9 +1855,11 @@ mpred_trace(Form):-
 %
 % PFC If Is A Tracing.
 %
-get_mpred_is_tracing(_):- (lookup_u(mpred_is_tracing_exec) ; t_l:mpred_debug_local),!.
-get_mpred_is_tracing(Form):- clause_u(mpred_is_tracing_pred(Form),B),!,call_u(B).
-get_mpred_is_tracing(_):- (lookup_u(mpred_is_tracing_exec) ; t_l:mpred_debug_local),!.
+get_mpred_is_tracing(Form):- notrace(t_l:hide_mpred_trace_exec),!,
+  notrace(lookup_u(mpred_is_tracing_pred(Form))).
+get_mpred_is_tracing(Form):- 
+  once(t_l:mpred_debug_local ; tracing ; lookup_u(mpred_is_tracing_exec) ; lookup_u(mpred_is_tracing_pred(Form))).
+
 
 %% mpred_trace(+Form, ?Condition) is semidet.
 %
@@ -1910,19 +1921,22 @@ mpred_notrace_exec:- retractall_u(mpred_is_tracing_exec).
 
 mpred_nowatch:-  retractall_u(mpred_is_tracing_exec).
 
+:- thread_local(t_l:hide_mpred_trace_exec/0).
+
 %% with_mpred_trace_exec( +P) is semidet.
 %
 % Using Trace exec.
 %
 with_mpred_trace_exec(P):- get_user_abox(M),
-   w_tl(t_l:mpred_debug_local,w_tl(M:mpred_is_tracing_exec, must(show_if_debug(P)))).
+   wno_tl(t_l:hide_mpred_trace_exec,
+    w_tl(t_l:mpred_debug_local,w_tl(M:mpred_is_tracing_exec, must(show_if_debug(P))))).
 
 %% with_mpred_trace_exec( +P) is semidet.
 %
 % Without Trace exec.
 %
-with_no_mpred_trace_exec(P):- get_user_abox(M),
-   wno_tl(t_l:mpred_debug_local,wno_tl(M:mpred_is_tracing_exec, must(show_if_debug(P)))).
+with_no_mpred_trace_exec(P):- 
+   wno_tl(t_l:mpred_debug_local,w_tl(t_l:hide_mpred_trace_exec, must(show_if_debug(P)))).
 
 %% show_if_debug( :GoalA) is semidet.
 %
@@ -1930,7 +1944,7 @@ with_no_mpred_trace_exec(P):- get_user_abox(M),
 %
 :- meta_predicate(show_if_debug(0)).
 % show_if_debug(A):- !,show_call(why,A).
-show_if_debug(A):- notrace(\+ \+ get_mpred_is_tracing(A)) -> show_call(A) ; A.
+show_if_debug(A):-  get_mpred_is_tracing(A) -> show_call(A) ; A.
 
 :- thread_local(t_l:mpred_debug_local/0).
 
@@ -1938,8 +1952,9 @@ show_if_debug(A):- notrace(\+ \+ get_mpred_is_tracing(A)) -> show_call(A) ; A.
 %
 % If Is A Silient.
 %
-mpred_is_silient :- ( \+ t_l:mpred_debug_local, \+ lookup_u(mpred_is_tracing_exec), \+ lookup_u(mpred_is_tracing_pred(_)), 
-  current_prolog_flag(debug,false), is_release) ,!.
+mpred_is_silient :- t_l:hide_mpred_trace_exec,!, \+ tracing.
+mpred_is_silient :- notrace(( \+ t_l:mpred_debug_local, \+ lookup_u(mpred_is_tracing_exec), \+ lookup_u(mpred_is_tracing_pred(_)), 
+  current_prolog_flag(debug,false), is_release)) ,!.
 
 
 %% mpred_test(+P) is semidet.

@@ -169,7 +169,7 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
 % (~(P)/mpred_non_neg_literal(P) ==> ( {mpred_rem(P)}, (\+P ))).
 (~(P)/mpred_non_neg_literal(P) ==> \+P ).
 
-%:- rtrace.
+:- rtrace,trace.
 (P/mpred_non_neg_literal(P) ==> (\+ ~(P))).
 % a pretty basic conflict.
 %(~(P)/mpred_non_neg_literal(P), P) ==> conflict(~(P)).

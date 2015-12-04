@@ -123,7 +123,7 @@
         init_varname_stores(?),
         vmust(0).
 
-:- module_transparent
+:- module_transparent((
             all_different_vals/1,
             all_different_vals/2,
             set_varname/2,
@@ -186,7 +186,7 @@
             % name_variable/2, variable_name/2,
             vmust/1,            
             init_varname_stores/1
- .
+ )).
 :- meta_predicate dcall_if_verbose(0).
 
 
@@ -195,6 +195,9 @@
 %	Assign a name to a variable. Succeeds   silently if Var is not a
 %	variable (anymore).
 
+
+name_variable(Var,_Name) :- nonvar(Var),!.
+name_variable(Var,Name) :- !, put_attr(Var,vn,Name).
 
 
 name_variable(Var, Name1) :- get_attr(Var,vn,Name2), 
@@ -253,8 +256,8 @@ vn:attribute_goals(Var, [name_variable(Var,  Name)|B], B) :- variable_name(Var, 
 % Hook To [dom:attr_unify_hook/2] For Module Logicmoo_varnames.
 % Attr Unify Hook.
 %
-vn:attr_unify_hook(Name1, Var):- get_attr(Var, vn, Name2),!,Name1==Name2.
-% vn:attr_unify_hook(Name1, Var):- get_attr(Var, vn, Name2),!,combine_names(Name1,Name2,Name),(Name2==Name->true;put_attr(Var,vn,Name)).
+%vn:attr_unify_hook(Name1, Var):- get_attr(Var, vn, Name2),!,ignore(Name1=Name2).
+vn:attr_unify_hook(Name1, Var):- get_attr(Var, vn, Name2),!,combine_names(Name1,Name2,Name),(Name2==Name->true;put_attr(Var,vn,Name)).
 vn:attr_unify_hook(Name1, Var):- var(Var),!,put_attr(Var, vn, Name1).
 vn:attr_unify_hook(_Form, _OtherValue):- t_l:no_kif_var_coroutines,!,fail.
 vn:attr_unify_hook(_Form, _OtherValue):-!.
@@ -263,7 +266,7 @@ combine_names(Name1,Name2,Name1):-Name1==Name2,!.
 combine_names(Name1,Name2,Name):- 
  ((atom_concat(_,Name1,Name2);atom_concat(Name1,_,Name2)) -> Name=Name2 ; (
    ((atom_concat(Name2,_,Name1);atom_concat(_,Name2,Name1)) -> Name=Name1 ; (
-   (gtrace,atomic_list_concat([Name2,'_',Name1],Name)))))).
+   (atomic_list_concat([Name2,'_',Name1],Name)))))).
 
 
 ensure_named(V):-get_attr(V,vn,_),!.

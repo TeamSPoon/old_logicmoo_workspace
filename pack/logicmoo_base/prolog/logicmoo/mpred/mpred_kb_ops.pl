@@ -657,7 +657,7 @@ record_se:- (t_l:use_side_effect_buffer ; t_l:verify_side_effect_buffer).
 % Add Side Effect.
 %
 add_side_effect(_,_):- ( \+  record_se ),!.
-add_side_effect(Op,Data):-get_source_ref1(Why),assert(t_l:side_effect_buffer(Op,Data,Why)).
+add_side_effect(Op,Data0):-get_source_ref1(Why),serialize_attvar(Data0,Data),assert(t_l:side_effect_buffer(Op,Data,Why)).
 
 
 %% attvar_op( +:PRED1, ?Data) is semidet.
@@ -706,21 +706,23 @@ call_s2(G0):-
   call_cleanup(CALL,
      ('$set_source_module'(_,S),'$module'(_,M))).
 
+/*
+attvar_op(Op,Data):-
+   deserialize_attvars(Data,Data0),
+   attvar_op(Op,Data0).
+*/
 
-attvar_op(Op,Data):- strip_module(Op,_,OpA), sanity((atom(OpA))),
-   get_user_abox(ABOX),
-   add_side_effect(Op,Data),   
-   unnumbervars_and_save(Data,Data0),
-   all_different_head_vals(Data0),
-   clausify_attributes(Data0,DataA),
-   (==(Data0,DataA)->
-     physical_side_effect(call(Op,DataA));
+attvar_op(Op,Data):-
+   notrace((strip_module(Op,_,OpA), sanity((atom(OpA))),
+   get_user_abox(ABOX),add_side_effect(Op,Data),deserialize_attvars(Data,Data0))),
+   (==(Data,Data0)->
+     physical_side_effect(call(Op,Data0));
 
-   ((atom_concat(asse,_,OpA) -> physical_side_effect(call(Op,DataA)));
+   ((atom_concat(asse,_,OpA) -> physical_side_effect(call(Op,Data0)));
    ((
-    % nop((expand_to_hb(DataA,H,B),split_attrs(B,BA,G))),
-     
-    physical_side_effect(call(ABOX:Op,DataA))
+    % nop((expand_to_hb(Data0,H,B),split_attrs(B,BA,G))),
+    trace, 
+    physical_side_effect(call(ABOX:Op,Data0))
 
     )))).
 
