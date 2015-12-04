@@ -1,6 +1,6 @@
 :- module(red_test01,[]).
 
-:- use_module(library(logicmoo_utils)).
+:- use_module(library(logicmoo_base)).
 :- use_listing_vars.
 
 

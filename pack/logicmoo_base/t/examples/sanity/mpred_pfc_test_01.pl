@@ -1,10 +1,7 @@
 
 
-:- use_module(library(logicmoo_utils)).
+:- use_module(library(logicmoo_base)).
 :- use_listing_vars.
-
-
-
 
 
 % :- set_prolog_flag(umt_local,true).
