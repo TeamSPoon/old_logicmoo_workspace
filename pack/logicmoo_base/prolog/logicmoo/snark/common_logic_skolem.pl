@@ -34,7 +34,8 @@ with_no_kif_var_coroutines(Goal):- w_tl(t_l:no_kif_var_coroutines,Goal).
 %	sk (anymore).
 
 
-form_sk(OtherValue, Skolem):- sk:attr_unify_hook(Skolem, OtherValue).
+form_sk(OtherValue, Skolem):- sk:attr_unify_hook(Skolem, OtherValue),!.
+% form_sk(OtherValue, Skolem):- nonvar(OtherVAlue).
 
 
 push_dom(_,_):- \+ is_skolem_setting(push_skolem),!.

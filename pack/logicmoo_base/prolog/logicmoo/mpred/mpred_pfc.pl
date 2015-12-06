@@ -2379,9 +2379,7 @@ mpred_pp_db_justifications2([],_,_).
 
 mpred_pp_db_justifications2([C|Rest],JustNo,StepNo):- 
  (StepNo==1->fmt('~N~n',[]);true),
-  copy_term(C,CCopy),
-  numbervars(CCopy,0,_),
-  format("~N    ~p.~p ~p",[JustNo,StepNo,CCopy]),
+  format("~N    ~p.~p ~p",[JustNo,StepNo,C]),
   StepNext is 1+StepNo,
   mpred_pp_db_justifications2(Rest,JustNo,StepNext).
 
