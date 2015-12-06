@@ -492,14 +492,14 @@ fully_expand_now(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,fully_expand
 fully_expand_now(_,Sent,SentO):- \+ (is_ftCompound(Sent)),!,Sent=SentO.
 fully_expand_now(_,Sent,SentO):-t_l:infSkipFullExpand,!,must(Sent=SentO).
 fully_expand_now(_,(:-(Sent)),(:-(Sent))):-!.
-fully_expand_now(Op,Sent,SentO):- copy_term(Sent,NoVary),
-  cyclic_break((NoVary)),   
- w_tl(t_l:disable_px,
-   must(fully_expand_clause(Op,Sent,BO))),!,must(cnotrace((SentO=BO))),
+fully_expand_now(Op,Sent,SentO):- 
+ copy_term(Sent,NoVary),
+ cyclic_break((NoVary)),
+ dont_make_cyclic((w_tl(t_l:disable_px,must(fully_expand_clause(Op,Sent,BO))),!,SentO=BO,
     must(Sent=@=NoVary),
 
    ignore(((fail,cnotrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), 
-    (Sent \=@= lmconf:SentO), dmsg(fully_expand(Op,(Sent --> SentO)))))))),!.
+    (Sent \=@= lmconf:SentO), dmsg(fully_expand(Op,(Sent --> SentO)))))))))),!.
 
 
 %= 	 	 
@@ -543,7 +543,7 @@ fully_expand_goal(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,transitive_lc(db
 %
 % Converted To If Is A Term.
 %
-as_is_term(NC):- notrace(loop_check(as_is_term0(NC))),!.
+as_is_term(NC):- cnotrace(loop_check(as_is_term0(NC))),!.
 :- export(as_is_term0/1).
 
 %= 	 	 

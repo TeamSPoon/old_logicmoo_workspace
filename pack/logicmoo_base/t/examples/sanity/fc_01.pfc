@@ -28,7 +28,7 @@
 :- mpred_trace_msg(beginxxxxxxxxxxxxxxxxXXXXXXXXXXXXXXXXXXXXXXXXxxxxxxxxxxxxxxxxxxxxxxxx_abc).
 
 :- mpred_ain((a ==> b)).
-:- rtrace(mpred_ain(a)).
+:- mpred_ain(a).
 
 a ==> b.
 

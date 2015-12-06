@@ -23,6 +23,8 @@
  op(300,fx,'~'),
  op(300,fx,'-')]).
 
+:- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
+
 :- meta_predicate logicmoo_user: ~0.
 
 :- multifile(logicmoo_user_base:user_module_uses/2).

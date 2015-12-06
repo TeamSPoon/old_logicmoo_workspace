@@ -47,7 +47,7 @@
 
 % with_pfa(With,((pfcControlled/1,pfcRHS/1,logical_functor_pttp/1,          add_args/15,argIsa_known/3,call_mt_t/11,call_which_t/9,constrain_args_pttp/2,contract_output_proof/2,get_clause_vars_for_print/2,holds_f_p2/2,input_to_forms/2,is_wrapper_pred/1,lambda/5,mpred_f/1,pp_i2tml_now/1,pp_item_html/2,pttp1a_wid/3,pttp_builtin/2,pttp_nnf_pre_clean_functor/3,
 %          quasiQuote/1,relax_term/6,retractall_wid/1,ruleRewrite/2,search/7,support_hilog/2,svar_fixvarname/2,tNotForUnboundPredicates/1))),
- with_pfa(With,(((bt/3),(nt/4),(pk/4),(pt/3),(spft/4),(tms/1),(hs/1),(qu/3),(sm/1),
+ with_pfa(With,(((bt/2),(nt/3),(pk/3),(pt/2),(spft/3),(tms/1),(hs/1),(que/1),(pm/1),
           (('==>')/1),(('::::')/2),(('<-')/2),(('<==>')/2),(('==>')/2),(('~')/1),(('nesc')/1),((mpred_action)/1),
           (mpred_do_and_undo_method/2),
 	  prologMultiValued/1,prologOrdered/1,prologNegByFailure/1,prologPTTP/1,prologKIF/1,pfcControlled/1,ttPredType/1,
@@ -129,10 +129,31 @@ argsQuoted(second_order).
 prologBuiltin(F),arity(F,A)==>{make_builtin(F/A)}.
 
 
+/*
+:- debug(_).
+:- nodebug(http(_)).
+:- debug(mpred).
+:- mpred_trace_exec.
+:- begin_pfc.
+
+*/
+
+% remove conflicts early 
+% (~(P)/mpred_non_neg_literal(P) ==> ( {mpred_rem(P)}, (\+P ))).
+
+never_retract_u(~(X),is_ftVar(X)):- cwc,is_ftVar(X).
+
+% These next 2 might be best as builtins?
+((~(P)/(mpred_non_neg_literal(P),copy_term(P,PP))) ==> \+ PP ).
+(P/mpred_non_neg_literal(P) ==> (\+ ~(P))).
+% :- nortrace,notrace.
+% a pretty basic conflict.
+%(~(P)/mpred_non_neg_literal(P), P) ==> conflict(~(P)).
+%(P/mpred_non_neg_literal(P), ~(P)) ==> conflict(P).
 
 %:- rtrace,trace.
 prologBuiltin(mpred_select/2).
-%:- nortrace,notrace.
+% :- nortrace,notrace.
 
 :- kb_dynamic(conflict/1).
 % a conflict triggers a Prolog action to resolve it.
@@ -142,7 +163,7 @@ conflict(C) ==> {must(with_mpred_trace_exec(resolveConflict(C),\+conflict(C)))}.
 
 % meta rules to schedule inferencing.
 % resolve conflicts asap
-% mpred_select(conflict(X),W) :- qu('$ABOX',conflict(X),W).
+% mpred_select(conflict(X),W) :- que('$ABOX',conflict(X),W).
 
 
 {type_prefix(_Prefix,Type)}==>tCol(Type).
@@ -168,16 +189,6 @@ arity(pddlObjects,2).
 
 meta_argtypes(support_hilog(tRelation,ftInt)).
 
-% remove conflicts early 
-% (~(P)/mpred_non_neg_literal(P) ==> ( {mpred_rem(P)}, (\+P ))).
-(~(P)/mpred_non_neg_literal(P) ==> \+P ).
-
-% :- rtrace,trace.
-(P/mpred_non_neg_literal(P) ==> (\+ ~(P))).
-:- nortrace,notrace.
-% a pretty basic conflict.
-%(~(P)/mpred_non_neg_literal(P), P) ==> conflict(~(P)).
-%(P/mpred_non_neg_literal(P), ~(P)) ==> conflict(P).
 
 prologHybrid(genls/2).
 
@@ -247,7 +258,6 @@ never_assert_u(A,test_sanity(A)):-never_assert_u(A).
 never_retract_u(A,test_sanity(A)):-never_retract_u(A).
 
 never_retract_u(X,is_ftVar(X)):-is_ftVar(X).
-never_retract_u(~(X),is_ftVar(X)):-is_ftVar(X).
 never_retract_u(human(trudy),sanity_test).
 never_retract_u(tHumanHair(skRelationAllExistsFn(mudSubPart, skRelationAllExistsFn(mudSubPart, skRelationAllExistsFn(mudSubPart, iExplorer1, tHumanBody), tHumanHead), tHumanHair)),sanity_test).
 never_retract_u((father(skArg1ofFatherFn(trudy), trudy)),sanity_test).
@@ -307,7 +317,6 @@ completelyAssertedCollection(tSet). % existential
 completelyAssertedCollection(tRelation).
 completelyAssertedCollection(tPred).
 completelyAssertedCollection(tFunction).
-
 
 completelyAssertedCollection(prologMacroHead).  % Items read from a file might be a special Macro Head
 completelyAssertedCollection(ttPredType).  % Or they might be a predciate declarer
@@ -377,8 +386,9 @@ prologSideEffects(resolveConflict/1).
 
 
 % :- prolog.
-
-ttPredType(isEach(meta_argtypes,pfcDatabaseTerm,pfcControlled,pfcWatched,pfcMustFC,predIsFlag,tPred,prologMultiValued,pfcBcTrigger,
+% tPred
+ttPredType(isEach(meta_argtypes,pfcDatabaseTerm,pfcControlled,pfcWatched,pfcMustFC,predIsFlag,prologMultiValued,
+ pfcBcTrigger,
  prologSingleValued,prologMacroHead,notAssertable,prologBuiltin,prologDynamic,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,prologEquality,prologPTTP,
  prologSideEffects,prologHybrid,prologListValued)).
 
@@ -594,6 +604,11 @@ genls(ttSpatialType,ttTemporalType).
 genls(tSpatialThing,tTemporalThing).
 
 
+
+
+% remove conflicts early 
+% (~(P)/mpred_non_neg_literal(P) ==> ( {mpred_rem(P)}, (\+P ))).
+
 tCol(ttNonGenled).
 % genls(ttFormatType,ttNonGenled).
 isa('Thing',ttNonGenled).
@@ -601,7 +616,8 @@ isa('CycLTerm',ttNonGenled).
 ==>prologHybrid(quotedIsa(ftTerm,ttFormatType)).
 :- kb_dynamic(quotedIsa/2).
 
-isa(I,C):- cwc, mpred_univ(C,I,CI),atom(C),(current_predicate(C,M:CI),\+ predicate_property(M:CI,imported_form(_))), call_u(call(M:CI)).
+
+isa(I,C):- cwc, mpred_univ(C,I,CI),atom(C),(current_predicate(C,M:CI),\+ predicate_property(M:CI,imported_from(_))), call_u(call(M:CI)).
 isa(I,C):- isa_backchaing(I,C).
 isa(I,C):- cwc, is_asserted(ttFormatType(C)),!, quotedIsa(I,C).
 quotedIsa(I,C):- cwc, term_is_ft(I,C).
@@ -880,10 +896,10 @@ tFunction(isOptional(ftSpec,ftTerm)).
 tFunction(isOptionalStr(ftString)).
 tFunction(exactStr(ftString)).
 
-resultIsa(F,C)==>(isa(F,'tFunction'),isa(C,ftSpec)).
 resultIsa(ftDeplictsFn,ftSpec).
 
 tPred(quotedDefnIff/2,prologHybrid).
+
 
 isa(argIsa,prologHybrid).
 isa(determinerString, prologMultiValued).
@@ -903,6 +919,7 @@ tFunction(ftDeplictsFn(tCol)).
 
 completelyAssertedCollection(tAvoidForwardChain).
 completelyAssertedCollection('SententialOperator').
+
 
 tCol(tAvoidForwardChain).
 tCol('SententialOperator').
@@ -926,7 +943,8 @@ ttFormatType(ftString).
 ttFormatType(ftVar).
 ttFormatType(ftVoprop).
 
-
+resultIsa(F,C)==>(isa(F,'tFunction'),isa(C,ftSpec)).
+% % ( meta_argtypes(FT)/dif(FT,COL), genls(FT, COL),tCol(COL),{not(isa(COL,ttFormatType))}) ==> formatted_resultIsa(FT,COL).
 
 %:- mpred_trace.
 %:- pfcWatch.
@@ -963,6 +981,9 @@ prologMultiValued(genlInverse(tPred,tPred)).
 prologMultiValued(genlPreds(tPred,tPred)).
 prologMultiValued(predProxyAssert(prologMultiValued,ftTerm)).
 prologMultiValued(predProxyQuery(prologMultiValued,ftTerm)).
+
+
+
 % prologMultiValued('<==>'(ftTerm,ftTerm)).
 prologMultiValued('<-'(ftAssertable,ftAskable)).
 prologMultiValued('==>'(ftAskable,ftAssertable)).

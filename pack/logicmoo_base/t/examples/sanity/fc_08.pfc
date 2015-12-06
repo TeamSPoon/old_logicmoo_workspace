@@ -30,7 +30,6 @@ b(t).
 :- mpred_test(b(t)).
 
 
-
 \+ a(t).
 
 :- mpred_test(\+ a(t)).

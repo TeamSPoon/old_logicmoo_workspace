@@ -7,13 +7,16 @@
 
             if_flag_true/2,
             current_modules_from/2,
+            attributes_equal/3,
 
             attr_bind/2,attr_bind/1,
             split_attrs/3,
+            dont_make_cyclic/1,
 
+            hb_to_clause/3,
             paina/1,pain/1,painz/1,
             modulize_head/2,
-            clause_asserted_i/5,
+            clause_asserted_i5/5,
             remove_term_attr_type/2,
             ainz_clause/1,ainz_clause/2,
             simple_var/1,
@@ -30,7 +33,7 @@
             modulize_head_fb/4,
             attr_bind/1,
             clause_asserted/1,clause_asserted/2,clause_asserted/3,
-            clause_asserted_i/1,clause_asserted_i/2,clause_asserted_i/3,clause_asserted_i/4,
+            clause_asserted_i/1,clause_asserted_i/2,clause_asserted_i/3,clause_asserted_i4/4,
             clause_i/1,clause_i/2,clause_i/3,
             assert_i/1,asserta_i/1,assertz_i/1,
             retract_i/1,retractall_i/1,
@@ -84,10 +87,11 @@
         append_term/3,
         modulize_head/2,
         modulize_head_fb/4,
-        clause_asserted_i/5,
+        clause_asserted_i5/5,
         my_module_sensitive_code/1,
         assertz_new/1,
         call_provider/2,
+        dont_make_cyclic/1,
         clause_asserted/3,
         erase_safe/2,
         current_modules_from/2,
@@ -467,7 +471,7 @@ simple_var(Var):-var(Var),\+ attvar(Var).
 
 to_mod_if_needed(M,B,MB):- B==true-> MB=B ; MB = M:B.
 
-split_attrs(_,ATTRS,BODY):- notrace((sanity((simple_var(ATTRS),simple_var(BODY))),fail)).
+split_attrs(_,ATTRS,BODY):- ((sanity((simple_var(ATTRS),simple_var(BODY))),fail)).
 split_attrs(B,true,B):-var(B),!.
 split_attrs(attr_bind(G,Call),attr_bind(G),Call):- !.
 split_attrs(true,true,true):-!.
@@ -475,15 +479,16 @@ split_attrs(_:true,true,true):-!.
 split_attrs(M:A,M:ATTRS,M:BODY):- !,split_attrs(A,ATTRS,BODY).
 split_attrs(attr_bind(G),attr_bind(G),true):- !.
 split_attrs((A,B),ATTRS,BODY):- !,
-  split_attrs(A,AA,AB),
-  split_attrs(B,BA,BB),
-  conjoin(AA,BA,ATTRS),
-  conjoin(AB,BB,BODY).
+  split_attrs(A,AA,AAA),
+  split_attrs(B,BB,BBB),!,
+  conjoin(AA,BB,ATTRS),
+  conjoin(AAA,BBB,BODY).
+
 split_attrs(AB,true,AB).
 
 :- meta_predicate attr_bind(+).
 :- module_transparent attr_bind/1.
-attr_bind(Attribs):-maplist(call,Attribs).
+attr_bind(Attribs):- dont_make_cyclic(maplist(call,Attribs)).
 
 :- meta_predicate attr_bind(+,0).
 :- module_transparent attr_bind/2.
@@ -565,25 +570,31 @@ remove_term_attr_type(Term,Mod):- notrace((term_attvars(Term,AVs),maplist(del_at
 clause_asserted_i(HB):- expand_to_hb(HB,H,B),clause_asserted_i(H,B,_).
 clause_asserted_i(H,B):- clause_asserted_i(H,B,_).
 
-clause_asserted_i(MH,B,Ref):- modulize_head(MH,M:H), clause_asserted_i(M,H,B,Ref).
+clause_asserted_i(MH,B,Ref):- modulize_head(MH,M:H), clause_asserted_i4(M,H,B,Ref).
 
-clause_asserted_i(M,H,B,Ref):- ground(H:B),!,clause(M:H,B,Ref),clause(HH,BB,Ref),ground(HH:BB),!.
-clause_asserted_i(M,H,B,Ref):-
+clause_asserted_i4(M,H,B,Ref):- ground(H:B),!,clause(M:H,B,Ref),clause(HH,BB,Ref),ground(HH:BB),!.
+clause_asserted_i4(M,H,B,Ref):-
 
  copy_term((H,B),(HC,BC),Attribs),
  copy_term((HC,BC),(HT,BT)),
- clause_asserted_i(M,HC,BC,CAttribs,Ref),
+ clause_asserted_i5(M,HC,BC,CAttribs,Ref),
  (HC,BC)=@=(HT,BT),(HC,BC)=(HT,BT),
+ dont_make_cyclic((
  attributes_equal(Attribs,CAttribs,TODO),
- \+ \+ once(attr_bind(TODO)).
+ \+ \+ once(attr_bind(TODO)))).
 
-clause_asserted_i(M,H,B,Attribs,Ref):- 
- clause(M:H,BC,Ref), ((compound(BC),BC = attr_bind(Attribs,B)) -> true ; (BC=B -> Attribs=[])).
+dont_make_cyclic(G):-cyclic_break(G),!,copy_term(G,GG),
+  (G*-> (acyclic_term(G)->true;(dtrace,trace,GG)) ; fail).
+
+
+clause_asserted_i5(M,H,B,Attribs,Ref):- 
+ clause(M:H,BC,Ref),
+  ((compound(BC),BC = attr_bind(Attribs,B)) -> true ; (BC=B -> Attribs=[])).
 
 attribute_is_info(name_variable(_Var,  _Name)).
 attribute_is_info(put_attrs(_Var, vn, _Name)).
 
-attributes_equal(Attribs,Attribs,Attribs):-!.
+attributes_equal(R,L,Attribs):-R=@=L,!,Attribs = R.
 attributes_equal([INFO|L],R,TODO):- attribute_is_info(INFO),INFO,!,delete(R,INFO,RR),attributes_equal(L,RR,TODO).
 attributes_equal(R,[INFO|L],TODO):- attribute_is_info(INFO),INFO,!,delete(R,INFO,RR),attributes_equal(L,RR,TODO).
 
@@ -602,11 +613,24 @@ clause_i(H,B):- clause_i(H,B,_).
 % clause_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
 % clause_i(H,B,Ref):- clause(H,AB,Ref), (must(split_attrs(AB,A,B0)->A),B=B0).
 
+clause_i(H,B,R):- nonvar(R),!, dont_make_cyclic((must(clause(H0,BC,R)),must(split_attrs(BC,AV,B0)),!, B=B0 ,!,must( AV), !, must(H=H0))).
+clause_i(H0,BIn,Ref):- 
+ copy_term(H0:BIn, H:B0, Attribs),
+ dont_make_cyclic((
+    
+    (clause(H,BC,Ref) *-> 
+      ((must(split_attrs(BC,AV,B)) -> AV -> B=B0)) ; fail),
+    H0=H,BIn=B0,maplist(call,Attribs))).
+
+/*
+
 clause_i(MH,B,Ref):- 
+ dont_make_cyclic((
    % must(modulize_head(MH,M:H)),
    clause(MH,BMC,Ref),
-    ((compound(BMC),BMC = attr_bind(Attribs,B)) -> notrace(attr_bind(Attribs)) ; BMC=B).
-
+    ((compound(BMC),BMC = attr_bind(Attribs,BOUT)) -> (attr_bind(Attribs)) ; BMC=BOUT))),
+ dont_make_cyclic((BOUT=B)).
+*/
 /*
 clause_i(MH,B,Ref):- !,
  no_repeats(Ref,(must(modulize_head(MH,M:H)),clause(M:H,BMC,Ref))),

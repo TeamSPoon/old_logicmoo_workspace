@@ -57,14 +57,17 @@ checkKB:m1:- gripe_time(40,baseKB:ensure_loaded(baseKB:logicmoo(mpred_online/mpr
 %m5 :- enable_mpred_system(baseKB).
 
 
+ensure_autoexec:- lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:logicmoo(pfc/'autoexec.pfc'))).
+
 %:- use_listing_vars.
 %:- autoload([verbose(false)]).
 %:- use_listing_vars.
 %:- nop((autoload,scan_for_varnames)).
 
+mpred_load_restore_file(never):- !,ensure_autoexec,!.
 mpred_load_restore_file(File):- absolute_file_name(File,AFN),AFN\=File,!,mpred_load_restore_file(AFN).
 mpred_load_restore_file(File):- \+ exists_file(File),
-  lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:logicmoo(pfc/'autoexec.pfc'))),!,
+  ensure_autoexec, !,
   mpred_save_restore_file(File),!.
 
 mpred_load_restore_file(File):-
@@ -110,6 +113,8 @@ mpred_save_restore_file(File):-
   
 
 
-:- mpred_load_restore_file(never).
+:- mpred_load_restore_file(never). 
+
+
 
 

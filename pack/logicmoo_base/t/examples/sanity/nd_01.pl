@@ -21,7 +21,7 @@ p1.
 
 % :-asserta((mpred_pfc:functor_foo(P,F,A):- trace,ground(P),functor(P,F,A))).
 
-:- set_search_mode(depth).
+:- set_fc_mode(depth).
 
 (P0/(copy_term(P0,P),nonvar(P),writeln(start(functor(P,F,A))),functor_foo(P,F,A)) ==> {writeln(done(functor(P,F,A)))}).
 

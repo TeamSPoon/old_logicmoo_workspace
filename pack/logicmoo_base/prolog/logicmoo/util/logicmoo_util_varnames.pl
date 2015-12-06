@@ -236,6 +236,9 @@ vn:project_attributes(QueryVars, ResidualVars):-nop(dmsg(vn:proj_attrs(vn,QueryV
 %  Hook To [dom:attribute_goals/3] For Module Logicmoo_varnames.
 %  Attribute Goals.
 %
+vn:attribute_goals(Var, B, B) :- cyclic_term(Var),!.
+vn:attribute_goals(Var, [name_variable(Var,  Name)|B], B) :- get_attr(Var, vn, Name),!.
+vn:attribute_goals(_Var, B, B):-!.
 vn:attribute_goals(Var, [name_variable(Var,  Name)|B], B) :- variable_name(Var,  Name).
 % vn:attribute_goals(_Var) --> [].
 
@@ -255,7 +258,14 @@ vn:attribute_goals(Var, [name_variable(Var,  Name)|B], B) :- variable_name(Var, 
 % Hook To [dom:attr_unify_hook/2] For Module Logicmoo_varnames.
 % Attr Unify Hook.
 %
+vn:attr_unify_hook(_, Var):- nonvar(Var),!.
+vn:attr_unify_hook(_, Var):- cyclic_term(Var),!,fail.
+vn:attr_unify_hook(_, Var):- cyclic_term(Var),!.
+% vn:attr_unify_hook(_, Var):- cyclic_break(Var),!,fail.
 vn:attr_unify_hook(Name1, Var):- get_attr(Var, vn, Name2),Name1==Name2,!.
+vn:attr_unify_hook(Name1, Var):- get_attr(Var, vn, Name2),!,ignore(Name1==Name2),!.
+
+
 vn:attr_unify_hook(Name1, Var):- get_attr(Var, vn, Name2),!,combine_names(Name1,Name2,Name),(Name2==Name->true;put_attr(Var,vn,Name)).
 vn:attr_unify_hook(Name1, Var):- var(Var),!,put_attr(Var, vn, Name1).
 vn:attr_unify_hook(_Form, _OtherValue):- t_l:no_kif_var_coroutines,!,fail.

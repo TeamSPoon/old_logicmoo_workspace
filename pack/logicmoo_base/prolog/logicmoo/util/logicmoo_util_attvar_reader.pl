@@ -53,9 +53,10 @@ maybe_must(V=VV):-V==VV,!.
 maybe_must(_).
 
 
-deserialize_attvars(V,O):- nb_current('$variable_names', Vs),!,deserialize_attvars(['$variable_names'|Vs], V,O).
-deserialize_attvars(V,O):- deserialize_attvars([localvs], V,O).
+% deserialize_attvars(V,O):- nb_current('$variable_names', Vs),!,loop_check(deserialize_attvars(['$variable_names'|Vs], V,O)),!.
+deserialize_attvars(V,O):- loop_check(deserialize_attvars([localvs], V,O),V=O),!.
 
+deserialize_attvars(_Vs, V,O):- cyclic_term(V),!,O=V.
 deserialize_attvars(Vs, V,O):- nonvar(O),!,must(deserialize_attvars(Vs, V,M)),!,must(M=O).
 deserialize_attvars(Vs, V,O):- var(V), get_attr(V,vn,N),set_in_vd(Vs,N=V),!,V=O.
 deserialize_attvars(Vs, V,O):- var(V), member(N=VV,Vs),VV==V,put_attr(V,vn,N),!,V=O.
@@ -96,8 +97,9 @@ install_attvar_expander(M):-
   dynamic(M:term_expansion/2),
   asserta_if_new((
   M:term_expansion(I,CO):- 
-   notrace((current_prolog_flag(read_attvars,true), \+ current_prolog_flag(xref,true), system_expanded_attvars(I,O),
-   (is_term_expanding_in_file(I)->clausify_attributes(O,CO);=(O,CO)),wdmsg(xform(I --> CO)))))),
+   ((current_prolog_flag(read_attvars,true), \+ current_prolog_flag(xref,true), 
+   notrace((system_expanded_attvars(I,O),
+   (is_term_expanding_in_file(I)->clausify_attributes(O,CO);=(O,CO)),wdmsg(xform(I --> CO)))))))),
 
    system:multifile(system:goal_expansion/2),
    system:dynamic(system:goal_expansion/2),

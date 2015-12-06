@@ -15,7 +15,7 @@
 
 :- file_begin(pfc).
 
-:- include('df_include.pfc').
+:- include('df_include.pi').
  
 most(t(test1_2_3,1,2,3)).
 

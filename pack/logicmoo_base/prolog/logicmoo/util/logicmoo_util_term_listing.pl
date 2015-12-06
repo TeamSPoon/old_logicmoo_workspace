@@ -1006,7 +1006,7 @@ term_matches_hb(D,F/A,H,B):-atom(F),var(A),!,term_matches_hb(D,(functor(F);same(
 term_matches_hb(D,F/A,H,B):-var(F),integer(A),!,term_matches_hb(D,(arity(A);same(F/A)),H,B).
 term_matches_hb(D,HO,H,B):- \+ \+ term_matches_unify(D,HO,(H:-B)).
 
-% ?- xlisting((h(depth(0,pt/3)),same(tBird(A)))).
+% ?- xlisting((h(depth(0,pt/2)),same(tBird(A)))).
 
 :- export(term_matches_unify/3).
 

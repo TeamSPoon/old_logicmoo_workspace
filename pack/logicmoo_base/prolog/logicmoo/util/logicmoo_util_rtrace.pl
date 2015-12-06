@@ -134,10 +134,10 @@ grtrace(Trace):- hotrace(( visible(+all),thread_leash(+all))), Trace.
 %
 % Cno Trace.
 %
-cnotrace(Goal):- hotrace(Goal).
+cnotrace(Goal):- (Goal).
 :- mpred_trace_less(cnotrace/1).
 :- '$set_predicate_attribute'(cnotrace(_), hide_childs, 0).
-:- '$set_predicate_attribute'(cnotrace(_), trace, 0).
+:- '$set_predicate_attribute'(cnotrace(_), trace, 1).
 
 
 

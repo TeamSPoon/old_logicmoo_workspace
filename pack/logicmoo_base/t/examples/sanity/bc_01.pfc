@@ -10,6 +10,8 @@
 
 :- use_module(library(logicmoo_base)).
 
+:- set_prolog_IO(user_input,user_output,user_output).
+
 :- begin_pfc.
 
 :- dynamic(bc_q/1).

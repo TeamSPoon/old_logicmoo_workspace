@@ -13,19 +13,20 @@
 
 :- begin_pfc.
 
-
 % this should have been ok
 
-%(if_missing(Missing,Create) ==> ((\+ Missing/(Missing\==Create), \+ Create , \+ ~(Create)) ==> Create)).
+%(if_missing(Missing,Create) ==> (( \+ Missing/(Missing\==Create), \+ Create , \+ ~(Create)) ==> Create)).
 if_missing(Missing,Create) ==> ( ( \+ (Missing/(Missing\=@=Create))) ==> Create).
 
 
 ( good ==> if_missing(foob(_),foob(a))).
 
+good.
+
 
 :- mpred_test(foob(a)).
 
-:- break.
+% :- break.
 
 \+ good.
 

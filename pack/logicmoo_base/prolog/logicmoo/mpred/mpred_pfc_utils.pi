@@ -78,7 +78,7 @@ retract_u(X):- check_never_retract(X),fail.
 %retract_u(~(X)):-must(is_ftNonvar(X)),!,retract_eq_quitely_f(~(X)),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
 %retract_u(hs(X)):-!,retract_eq_quitely_f(hs(X)),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
 
-retract_u(qu(ABOX,X,Y)):-!,show_failure(why,retract_eq_quitely_f(qu(ABOX,X,Y))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
+retract_u(que(ABOX,X,Y)):-!,show_failure(why,retract_eq_quitely_f(que(ABOX,X,Y))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
 retract_u(~(X)):-!,show_success(why,retract_eq_quitely_f(~(X))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
 retract_u((X)):-!,show_success(why,retract_eq_quitely_f((X))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
 retract_u(X):-show_if_debug(attvar_op(retract_eq,X)),!,must((expire_tabled_list(X))).
@@ -234,8 +234,8 @@ mpred_set_default(GeneralTerm,Default) :- ((
 %= tms is one of {none,local,cycles} and controles the tms alg.
 lmconf:module_local_init:- must((mpred_set_default(tms(_), tms(cycles)))).
 
-% Pfc Search strategy. sm(X) where X is one of {direct,depth,breadth}
-lmconf:module_local_init:- mpred_set_default(sm(_), sm(direct)).
+% Pfc Search strategy. pm(X) where X is one of {direct,depth,breadth}
+lmconf:module_local_init:- mpred_set_default(pm(_), pm(direct)).
 
 % aliases
 
@@ -638,7 +638,7 @@ mpred_unique_i(P) :-
   !,
   \+ clause_i(P,true).
 
-% mpred_enqueue(P,S) :- !,get_user_abox_umt(ABOX),ainz_i(qu(ABOX,P,S),S).
+% mpred_enqueue(P,S) :- !,get_user_abox_umt(ABOX),ainz_i(que(ABOX,P,S),S).
 
 
 %% mpred_enqueue(+P,+S) is det.
@@ -646,18 +646,18 @@ mpred_unique_i(P) :-
 %  Enqueue P with support S
 %
 mpred_enqueue(P,S) :-
-   (get_search_mode(Mode,P,S),get_user_abox_umt(ABOX))
+   (get_fc_mode(Mode,P,S),get_user_abox_umt(ABOX))
     -> (Mode=direct  -> must(mpred_fwd(P,S)) ;
-	Mode=depth   -> aina_i(qu(ABOX,P,S),S) ;
-	Mode=breadth -> ainz_i(qu(ABOX,P,S),S) ;
+	Mode=depth   -> aina_i(que(ABOX,P,S),S) ;
+	Mode=breadth -> ainz_i(que(ABOX,P,S),S) ;
 	% else
-          otherwise           -> mpred_warn("Unrecognized sm mode: ~p", Mode))
-     ; mpred_warn("No sm mode").
+          otherwise           -> mpred_warn("Unrecognized pm mode: ~p", Mode))
+     ; mpred_warn("No pm mode").
 
-get_search_mode(Mode,_P,_S):- t_l:mpred_search_mode(Mode),!.
-get_search_mode(Mode,_P,_S):- Mode=direct,!.
-get_search_mode(Mode,_P,_S):- Mode=breadth,!.
-get_search_mode(Mode,_P,_S):- must(mreq(sm(Mode))),!.
+get_fc_mode(Mode,_P,_S):- t_l:mpred_fc_mode(Mode),!.
+get_fc_mode(Mode,_P,_S):- Mode=direct,!.
+get_fc_mode(Mode,_P,_S):- Mode=breadth,!.
+get_fc_mode(Mode,_P,_S):- must(mreq(pm(Mode))),!.
 
 
 %% mpred_remove_old_version( :TermIdentifier) is semidet.
@@ -691,7 +691,7 @@ without_running(G):- (t_l:mpred_run_paused->G;w_tl(t_l:mpred_run_pause,G)).
 % mpred_run computes the deductive closure of the current database.
 % How this is done depends on the searching mode:
 %    direct -  fc has already done the job.
-%    depth or breadth - use the qu mechanism.
+%    depth or breadth - use the que mechanism.
 %
 mpred_run :- repeat, \+ mpred_step, !.
 
@@ -699,7 +699,7 @@ mpred_run :- repeat, \+ mpred_step, !.
 %:-thread_property(_,alias(mpred_running_queue))-> true ; thread_create(mpred_run_queued,_,[alias(mpred_running_queue)]).
 
 
-% mpred_step removes one entry from the qu/2 and reasons from it.
+% mpred_step removes one entry from the que/2 and reasons from it.
 
 
 %% mpred_step is semidet.
@@ -736,7 +736,7 @@ get_next_fact(P,WS) :-
 %
 remove_selection(P,S) :-
  get_user_abox_umt(ABOX),
-  clause(qu(ABOX,P,S),B,Ref),must(B),erase(Ref),!.
+  clause(que(ABOX,P,S),B,Ref),must(B),erase(Ref),!.
 remove_selection(P,S) :-
   brake(wdmsg("pfc:get_next_fact - selected fact not on Queue: ~p (~p)",
                [P,S])).
@@ -763,7 +763,7 @@ select_next_fact(P,S) :-
 %
 % Defaultmpred Select.
 %
-defaultmpred_select(P,S) :- get_user_abox_umt(ABOX),qu(ABOX,P,S),!.
+defaultmpred_select(P,S) :- get_user_abox_umt(ABOX),que(ABOX,P,S),!.
 
 :- shared_multifile(hs/1).
 
@@ -952,9 +952,9 @@ mpred_retract_db_type(X) :-
 %
 % PFC Retract Database Type.
 %
-mpred_retract_db_type(_,qu(ABOX,P,S)) :-
-  doall(retract_u(qu(ABOX,P,_))),
-  ignore(mpred_unfwc(qu(ABOX,P,S))).
+mpred_retract_db_type(_,que(ABOX,P,S)) :-
+  doall(retract_u(que(ABOX,P,_))),
+  ignore(mpred_unfwc(que(ABOX,P,S))).
 
 
 mpred_retract_db_type(fact,X) :-
@@ -2078,7 +2078,7 @@ mpred_mark_fa_as(Sup,PosNeg,_P,F,A,Type):-
   MARK = mpred_mark(Type,PosNeg,F,A),
   check_never_assert(MARK),
   with_no_mpred_trace_exec(ain(MARK,(s(Sup),g))).
-  % with_no_mpred_trace_exec(with_search_mode(direct,mpred_fwd2(MARK,(s(Sup),g)))),!.
+  % with_no_mpred_trace_exec(with_fc_mode(direct,mpred_fwd2(MARK,(s(Sup),g)))),!.
    
 
 %% fa_to_p(+F, ?A, ?P) is semidet.
@@ -2642,15 +2642,15 @@ mpred_trigger_key(X,X).
 %
 % PFC Database Term.
 %
-mpred_database_term(spft/5).
-mpred_database_term(pk/4).
-mpred_database_term(pt/3).  % was 3
-mpred_database_term(bt/3).  % was 3
-mpred_database_term(nt/4). % was 4
+mpred_database_term(spft/3).
+mpred_database_term(pk/3).
+mpred_database_term(pt/2).  % was 3
+mpred_database_term(bt/2).  % was 3
+mpred_database_term(nt/3). % was 4
 mpred_database_term('<-'/2).
 mpred_database_term('==>'/2).
 mpred_database_term('<==>'/2).
-mpred_database_term(qu/3).
+mpred_database_term(que/1).
 
 :- forall(mpred_database_term(T),shared_multifile(T)).
 
@@ -3401,7 +3401,7 @@ add_reprop( Trig ,Trigger):- fail,
 add_reprop( Trig ,Trigger):- 
   w_tl(t_l:current_why_source(Trig),
     (get_user_abox_umt(ABOX),
-     show_call(attvar_op(assertz_if_new,(qu(ABOX,repropagate(Trigger),(Trig,g))))))).
+     show_call(attvar_op(assertz_if_new,(que(ABOX,repropagate(Trigger),(Trig,g))))))).
 
 
 %% repropagate( :TermP) is semidet.

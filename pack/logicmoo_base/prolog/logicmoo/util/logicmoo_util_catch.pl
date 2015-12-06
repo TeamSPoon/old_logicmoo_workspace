@@ -25,6 +25,7 @@
             badfood/1,
             block/2,
             block/3,
+            with_current_why/2,
             bubbled_ex/1,
             bubbled_ex_check/1,
             catchv/3,
@@ -169,6 +170,7 @@
         fresh_line_to_err/0,
         functor_catch/3,
         functor_safe/3,
+        with_current_why/2,
         get_must/2,
         ib_multi_transparent33/1,
         input_key/1,
@@ -301,7 +303,7 @@ format_to_error(F,A):-current_main_error_stream(Err),!,format(Err,F,A).
 %
 % Fresh Line Converted To Err.
 %
-fresh_line_to_err:- cnotrace((flush_output_safe,current_main_error_stream(Err),format(Err,'~N',[]),flush_output_safe(Err))).
+fresh_line_to_err:- notrace((flush_output_safe,current_main_error_stream(Err),format(Err,'~N',[]),flush_output_safe(Err))).
 
 :- dynamic(thread_current_input/2).
 :- dynamic(thread_current_error_stream/2).
@@ -570,6 +572,12 @@ current_source_location0(module(M)):- '$module'(M,M).
 current_why(Why):- t_l:current_local_why(Why,_),!.
 current_why(mfl(M,F,L)):- source_module(M), current_source_file(F:L).
 
+
+%% with_current_why( +Why, +:Prolog) is semidet.
+%
+% Save Well-founded Semantics Reason while executing code.
+%
+with_current_why(Why,Prolog):- w_tl(t_l:current_local_why(Why,Prolog),Prolog).
 
 
 % source_module(M):-!,M=u.

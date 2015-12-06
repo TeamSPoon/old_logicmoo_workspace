@@ -69,7 +69,7 @@ end_of_file.
 
   call_u/1,with_umt/1,asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,clause_u/2,clause_u/3,get_user_abox/1,lookup_u/1,
 
-          call_in_mi/1,get_search_mode/3,mpred_rem_support_if_exists/2,get_tms_mode/2,with_umt/1,
+          call_in_mi/1,get_fc_mode/3,mpred_rem_support_if_exists/2,get_tms_mode/2,with_umt/1,
 
   stop_trace/1,with_mpred_trace_exec/1,
   select_next_fact/1,supporters_list/2,triggerSupports/2,trigger_trigger/3,well_founded/1,well_founded_list/2,
@@ -99,7 +99,7 @@ end_of_file.
       brake(0),
       with_no_mpred_trace_exec(0),
       with_mpred_trace_exec(0),
-      with_search_mode(+,0),
+      with_fc_mode(+,0),
       bagof_or_nil(?,^,-).
 
 :- thread_local(t_l:user_abox/1).
@@ -329,8 +329,8 @@ mpred_set_default(GeneralTerm,Default):-
 %  tms is one of {none,local,cycles} and controles the tms alg.
 % :- mpred_set_default(tms(_),tms(cycles)).
 
-% Pfc Search strategy. sm(X) where P is one of {direct,depth,breadth}
-% :- must(mpred_set_default(sm(_), sm(direct))).
+% Pfc Search strategy. pm(X) where P is one of {direct,depth,breadth}
+% :- must(mpred_set_default(pm(_), pm(direct))).
 
 
 
@@ -445,30 +445,30 @@ mpred_unique_u((Head:-Tail)):- !, \+ clause_u(Head,Tail).
 mpred_unique_u(P):- !, \+ clause_u(P,true).
 
 
-get_search_mode(_P,_S,Mode):- t_l:mpred_search_mode(Mode),!.
-get_search_mode(_P,_S,Mode):- lookup_u(sm(Mode)),!.
-get_search_mode(_P,_S,Mode):- must(Mode=direct),!.
+get_fc_mode(_P,_S,Mode):- t_l:mpred_fc_mode(Mode),!.
+get_fc_mode(_P,_S,Mode):- lookup_u(pm(Mode)),!.
+get_fc_mode(_P,_S,Mode):- must(Mode=direct),!.
 
 
-:- thread_local(t_l:mpred_search_mode/1).
+:- thread_local(t_l:mpred_fc_mode/1).
 
-%% with_search_mode(+Mode,:Goal) is semidet.
+%% with_fc_mode(+Mode,:Goal) is semidet.
 %
 % Temporariliy changes to forward chaining search mode while running the Goal
 %
-with_search_mode(Mode,Goal):- w_tl(t_l:mpred_search_mode(Mode),Goal).
+with_fc_mode(Mode,Goal):- w_tl(t_l:mpred_fc_mode(Mode),Goal).
 
 %% mpred_enqueue(+P,+S) is det.
 %
 % PFC Enqueue P for forward chaining
 %
 mpred_enqueue(P,S):-
-  (get_search_mode(P,S,Mode)
+  (get_fc_mode(P,S,Mode)
     -> (Mode=direct  -> mpred_fwc(P) ;
 	Mode=depth   -> mpred_asserta_w_support(que(P),S) ;
 	Mode=breadth -> mpred_assert_w_support(que(P),S) ;
-	true         -> mpred_error("Unrecognized sm mode: ~p", Mode))
-     ; mpred_error("No sm mode")).
+	true         -> mpred_error("Unrecognized pm mode: ~p", Mode))
+     ; mpred_error("No pm mode")).
 
 
 %% mpred_remove_old_version( :TermIdentifier) is semidet.
@@ -498,10 +498,10 @@ mpred_remove_old_version(_).
 %    direct -  mpred_fwc has already done the job.
 %    depth or breadth - use the queue mechanism.
 
-% mpred_run :- lookup_u(sm(direct)),!.
+% mpred_run :- lookup_u(pm(direct)),!.
 % mpred_run :- repeat, \+ mpred_step, !.
 mpred_run:-
-%  (\+ lookup_u(sm(direct))),
+%  (\+ lookup_u(pm(direct))),
   mpred_step,
   mpred_run.
 mpred_run.
@@ -1430,8 +1430,8 @@ really_mpred_mark(_  ,Type,PosNeg,F,A):- call_u(mpred_mark(Type,PosNeg,F,A)),!.
 really_mpred_mark(Sup,Type,PosNeg,F,A):- 
   MARK = mpred_mark(Type,PosNeg,F,A),
   check_never_assert(MARK),
-  with_no_mpred_trace_exec(with_search_mode(direct,ain_fast(MARK,(s(Sup),g)))).
-  % with_no_mpred_trace_exec(with_search_mode(direct,mpred_fwc1(MARK,(s(Sup),g)))),!.
+  with_no_mpred_trace_exec(with_fc_mode(direct,ain_fast(MARK,(s(Sup),g)))).
+  % with_no_mpred_trace_exec(with_fc_mode(direct,mpred_fwc1(MARK,(s(Sup),g)))),!.
    
 
 %% fa_to_p(+F, ?A, ?P) is semidet.
@@ -1623,7 +1623,7 @@ mpred_database_term(hs/1,state).
 mpred_database_term(mpred_current_db/1,setting).
 mpred_database_term(mpred_select_hook/1,setting).
 mpred_database_term(tms/1,setting).
-mpred_database_term(sm/1,setting). 
+mpred_database_term(pm/1,setting). 
 % debug settings
 mpred_database_term(mpred_is_tracing_pred/1,debug).
 mpred_database_term(mpred_is_tracing_exec/0,debug).
@@ -2596,7 +2596,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((mpred_run)/0).
 :- module_transparent((mpred_remove_old_version)/1).
 :- module_transparent((mpred_enqueue)/2).
-:- module_transparent((get_search_mode)/3).
+:- module_transparent((get_fc_mode)/3).
 :- module_transparent((mpred_unique_u)/1).
 :- module_transparent((mpred_ain_db_to_head)/2).
 :- module_transparent((mpred_post1)/2).

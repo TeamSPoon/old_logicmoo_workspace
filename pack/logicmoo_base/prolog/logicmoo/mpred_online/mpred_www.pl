@@ -1705,11 +1705,11 @@ indent_nbsp(X,Chars):-XX is X -1,!, indent_nbsp(XX,OutP),!,sformat(Chars,'~w   '
 % Shared Hide Data.
 %
 lmconf:shared_hide_data('$si$':'$was_imported_kb_content$'/2):- !,listing_filter(hideMeta).
-lmconf:shared_hide_data(spft/5):- !,listing_filter(hideTriggers).
-lmconf:shared_hide_data(spft/4):- !,listing_filter(hideTriggers).
-lmconf:shared_hide_data(nt/4):- !,listing_filter(hideTriggers).
-lmconf:shared_hide_data(pt/3):- !, listing_filter(hideTriggers).
-lmconf:shared_hide_data(bt/3):- !, listing_filter(hideTriggers).
+lmconf:shared_hide_data(spft/3):- !,listing_filter(hideTriggers).
+lmconf:shared_hide_data(spft/3):- !,listing_filter(hideTriggers).
+lmconf:shared_hide_data(nt/3):- !,listing_filter(hideTriggers).
+lmconf:shared_hide_data(pt/2):- !, listing_filter(hideTriggers).
+lmconf:shared_hide_data(bt/2):- !, listing_filter(hideTriggers).
 lmconf:shared_hide_data((_:-
  cwc,
         second_order(_,_G19865),

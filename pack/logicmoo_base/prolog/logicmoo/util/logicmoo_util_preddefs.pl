@@ -468,7 +468,7 @@ with_pfa_group(With,CM, M, PI):- must(with_pfa_single(With,CM, M, PI)).
 % Using Pfa Single.
 %
 with_pfa_single(With,CM, M, FA):- lmconf:mpred_is_decl_called(With,CM, M, FA),!.
-% with_pfa_single(With,_CM, M, FA):- to_canonical_mpi(FA,P), \+ \+ current_predicate(_,_:P), ignore(once((must((current_predicate(_,RM:P),\+ predicate_property(RM:P,imported_form(_)), M==RM))))),fail.
+% with_pfa_single(With,_CM, M, FA):- to_canonical_mpi(FA,P), \+ \+ current_predicate(_,_:P), ignore(once((must((current_predicate(_,RM:P),\+ predicate_property(RM:P,imported_from(_)), M==RM))))),fail.
 with_pfa_single([], _CM, _M, _FA):-!.
 with_pfa_single([With|List],CM, M, FA):- is_list(List),!,with_pfa_single(With,CM, M, FA),!,with_pfa_single(List,CM, M, FA).
 with_pfa_single(With,CM, M, FA):- lmconf:mpred_is_decl_called(With,CM0, M0, FA),M0\==M, dmsg(with_pfa_single(With,CM->CM0, M->M0, FA)),!,asserta(lmconf:mpred_is_decl_called(With,CM, M, FA)),!.

@@ -71,7 +71,7 @@
 %
 % Lqu.
 %
-lqu :- listing(qu/3).
+lqu :- listing(que/1).
 
 
  

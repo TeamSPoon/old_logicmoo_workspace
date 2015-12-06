@@ -4,6 +4,8 @@
 */
 :- module(logicmoo_base,[ensure_mpred_system/0,enable_mpred_system/1,disable_mpred_system/1]).
 
+:- set_prolog_IO(user_input,user_output,user_output).
+
 :- multifile '$si$':'$was_imported_kb_content$'/2.
 :- dynamic '$si$':'$was_imported_kb_content$'/2.
 :- discontiguous('$si$':'$was_imported_kb_content$'/2).

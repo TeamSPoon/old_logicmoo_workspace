@@ -1251,9 +1251,9 @@ mpred_trigger_key(X,X).
 pfcDatabaseTerm(spft/3).
 %pfcDatabaseTerm(support2/3).
 pfcDatabaseTerm(support3/3).
-pfcDatabaseTerm(pt/3).
-pfcDatabaseTerm(bt/3).
-pfcDatabaseTerm(nt/4).
+pfcDatabaseTerm(pt/2).
+pfcDatabaseTerm(bt/2).
+pfcDatabaseTerm(nt/3).
 pfcDatabaseTerm('==>'/2).
 pfcDatabaseTerm('<==>'/2).
 pfcDatabaseTerm('<-'/2).

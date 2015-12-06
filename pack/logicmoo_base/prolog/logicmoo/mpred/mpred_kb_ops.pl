@@ -556,7 +556,7 @@ mreq(G):- if_defined_else(G,fail).
 /*
 
 LogicMOO is mixing Mark Stickel's PTTP (prolog techn theorem prover) to create horn clauses that 
- PFC forwards and helps maintain in visible states )  in prolog knowledge baseable.. We use spft/4 to track deductions
+ PFC forwards and helps maintain in visible states )  in prolog knowledge baseable.. We use spft/3 to track deductions
 Research~wise LogicMOO has a main purpose is to prove that grounded negations (of contrapostives) are of first class in importance in helping
 with Wff checking/TMS 
 Also alows an inference engine constrain search.. PFC became important since it helps memoize and close off (terminate) transitive closures
@@ -823,7 +823,7 @@ to_addable_form_wte(assert,(H:-B),(H:-B)):-B\==true,!.
 to_addable_form_wte(Why,(CUT0,P0),(CUT,P)):-to_addable_form_wte(Why,CUT0,CUT),!,to_addable_form_wte(Why,P0,P).
 % to_addable_form_wte(Why,(CUT,P0),(CUT,P)):-mpred_is_builtin(CUT),!,to_addable_form_wte(Why,P0,P).
 to_addable_form_wte(Why,P0,P):- notrace((
-    once(cnotrace(to_addable_form(P0,P));must(to_addable_form(P0,P))),
+    once(hotrace(to_addable_form(P0,P));must(to_addable_form(P0,P))),
     ignore((((P0\=@=P,P0\=isa(_,_)),mpred_trace_msg((to_addable_form(Why):-[P0,P]))))))),!.
 
 

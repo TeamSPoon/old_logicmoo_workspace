@@ -350,6 +350,7 @@ attrs_to_list(_ATTRS,[]).
 % Simplify Goal Printed.
 %
 
+simplify_goal_printed(Var,Name):-cyclic_term(Var),!,Name=Var.
 simplify_goal_printed(Var,Name):- get_attrs(Var,att(vn, _, [])),printable_variable_name(Var, Name),!.
 simplify_goal_printed(Var,'$avar'(Name,List)):- get_attrs(Var,ATTRS),must(printable_variable_name(Var,Name)),attrs_to_list(ATTRS,List).
 simplify_goal_printed(Var,Name):- is_ftVar(Var),!,printable_variable_name(Var, Name).

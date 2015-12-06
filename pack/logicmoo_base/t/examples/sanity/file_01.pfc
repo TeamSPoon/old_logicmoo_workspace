@@ -4,6 +4,8 @@
 %
 % Dec 13, 2035
 % Douglas Miles
+
+
 %  cls ; kill -9 %1 ; swipl -g "ensure_loaded(pack(logicmoo_base/t/examples/base/'sanity_abc.pfc'))."
 
 :- module(sanity,[]).
@@ -12,18 +14,11 @@
 
 :- begin_pfc.
 
-:- include('df_include.pi').
+must_is_entailed(G):- cwc, must(is_entailed(G)).
 
-:-dynamic((a/1,b/1,c/1)).
+:- listing(must_is_entailed).
 
-b(1).
-a(X) ==> c(X).
-most(c(X) ==> ~b(X)) .
-a(1).
+a.
 
-
-:- listing([a/1,b/1,c/1,(==>)/2,most/1,pt,nt,bt]).
-
-:- mpred_test( \+(~(b(1))) ).
-
+:- must_is_entailed(a).
 

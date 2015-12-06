@@ -14,7 +14,7 @@
 
 :- begin_pfc.
 
-:- include('df_include.pfc').
+:- include('df_include.pi').
 
 :-dynamic((a/1,b/1,c/1)).
 

@@ -776,6 +776,7 @@ dmsg0(V):-notrace(ignore(dmsg00(V))).
 %
 % (debug)message Primary Helper Primary Helper.
 %
+dmsg00(V):-cyclic_term(V),!,writeln(cyclic_term),flush_output,writeln(V),!.
 dmsg00(V):-simplify_goal_printed(V,VV),dmsg000(VV),!.
 
 %= 	 	 
