@@ -29,7 +29,10 @@ nearestGenls(C1,C2)==>
 
 % (genls(C,SC)==>(tCol(SC),tCol(C),{repropagate(SC)})).
 
+:- nortrace,notrace.
+:- rtrace,trace.
 ((completeIsaAsserted(I), isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}) ==> ({dif:dif(Sub, Super)}, isa(I,Super))).
+:- nortrace,notrace.
 % (isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}, \+ ~(completelyAssertedCollection(Super))) ==> ({dif:dif(Sub, Super)}, isa(I,Super)).
 
 

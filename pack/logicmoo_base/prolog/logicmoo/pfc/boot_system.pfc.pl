@@ -128,7 +128,11 @@ argsQuoted(second_order).
 
 prologBuiltin(F),arity(F,A)==>{make_builtin(F/A)}.
 
+
+
+%:- rtrace,trace.
 prologBuiltin(mpred_select/2).
+%:- nortrace,notrace.
 
 :- kb_dynamic(conflict/1).
 % a conflict triggers a Prolog action to resolve it.
@@ -139,7 +143,6 @@ conflict(C) ==> {must(with_mpred_trace_exec(resolveConflict(C),\+conflict(C)))}.
 % meta rules to schedule inferencing.
 % resolve conflicts asap
 % mpred_select(conflict(X),W) :- qu('$ABOX',conflict(X),W).
-
 
 
 {type_prefix(_Prefix,Type)}==>tCol(Type).
@@ -169,8 +172,9 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
 % (~(P)/mpred_non_neg_literal(P) ==> ( {mpred_rem(P)}, (\+P ))).
 (~(P)/mpred_non_neg_literal(P) ==> \+P ).
 
-:- rtrace,trace.
+% :- rtrace,trace.
 (P/mpred_non_neg_literal(P) ==> (\+ ~(P))).
+:- nortrace,notrace.
 % a pretty basic conflict.
 %(~(P)/mpred_non_neg_literal(P), P) ==> conflict(~(P)).
 %(P/mpred_non_neg_literal(P), ~(P)) ==> conflict(P).
@@ -714,7 +718,7 @@ equal(A,B),{ \+ (A=B}),equal(B,C),{ \+ (A=C)} ==> equal(A,C).
 notequal(A,B) ==> notequal(B,A).
 equal(A,C),notequal(A,B) ==> notequal(C,B).
 */
-
+:- dynamic(either/2).
 % is this how to define constraints?
 % either(P,Q) ==> (~(P) ==> Q), (~(Q) ==> P).
 (either(P,Q) ==> ((~(P) <==> Q), (~(Q) <==> P))).
@@ -999,6 +1003,7 @@ tCol(W)==>{guess_supertypes(W)}.
 tCol(tNewlyCreated).
 tCol(ttTypeFacet).
 
+:- dynamic(tNewlyCreated/1).
 tNewlyCreated(W)==>{guess_types(W)}.
 
 ttTypeFacet(tNewlyCreated).

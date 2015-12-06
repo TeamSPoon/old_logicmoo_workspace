@@ -16,7 +16,7 @@
 
             asserta_if_ground/1,
             atom_contains666/2,
-
+            call_count/2,
             bad_idea/0,
             beenCaught/1,
             bin_ecall/4,
@@ -477,6 +477,7 @@
 */
 
 
+call_count(C,N):-findall(C,C,L),nth1(N,L,C).
 
 
 % :- if_may_hide(mpred_trace_less(skipWrapper/0)).

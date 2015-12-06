@@ -15,7 +15,7 @@
 :- debug(_).
 :- nodebug(http(_)).
 :- debug(mpred).
-:- mpred_trace_exec.
+:- must(mpred_trace_exec).
 :- begin_pfc.
 
 % :- process_this_script.
@@ -25,6 +25,8 @@
 sk_in(fl(X,Y,X,Y)).
 sk_in(avar([vn='ExIn',sk='SKF-666'])).
 sk_in(_DUNNO).
+
+:- must((findall(clause_u(sk_in(H),B,Ref),(clause_u(sk_in(H),B,Ref),wdmsg(clause_u(sk_in(H),B,Ref))),L),length(L,COUNT),wdmsg(cOUNT=COUNT))).
 
 :- must((findall(FEx,(clause_u(sk_in(FEx),_,_),wdmsg(sk_in(FEx))),L),length(L,TWO),TWO=2)).
 

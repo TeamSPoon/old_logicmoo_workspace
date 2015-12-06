@@ -398,7 +398,7 @@ whenAnd(A,B):-A,ground(B),once(B).
 %
 % Reduce Managed Predicate Oper..
 %
-reduce_mpred_op(Op,Op2):-must(hotrace(transitive(how_to_op,Op,Op2))),!.
+reduce_mpred_op(Op,Op2):-must(notrace(transitive(how_to_op,Op,Op2))),!.
 reduce_mpred_op(A,A).
 
 

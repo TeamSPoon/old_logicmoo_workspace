@@ -25,8 +25,7 @@
             term_slots/2,
             never_bound/1,
             dif_matrix/2,
-            ensure_named/1,
-          term_singletons/2,
+            term_singletons/2,
           term_singletons/3,
           term_singletons/5,
             set_varname/2,
@@ -256,7 +255,7 @@ vn:attribute_goals(Var, [name_variable(Var,  Name)|B], B) :- variable_name(Var, 
 % Hook To [dom:attr_unify_hook/2] For Module Logicmoo_varnames.
 % Attr Unify Hook.
 %
-%vn:attr_unify_hook(Name1, Var):- get_attr(Var, vn, Name2),!,ignore(Name1=Name2).
+vn:attr_unify_hook(Name1, Var):- get_attr(Var, vn, Name2),Name1==Name2,!.
 vn:attr_unify_hook(Name1, Var):- get_attr(Var, vn, Name2),!,combine_names(Name1,Name2,Name),(Name2==Name->true;put_attr(Var,vn,Name)).
 vn:attr_unify_hook(Name1, Var):- var(Var),!,put_attr(Var, vn, Name1).
 vn:attr_unify_hook(_Form, _OtherValue):- t_l:no_kif_var_coroutines,!,fail.
@@ -269,8 +268,6 @@ combine_names(Name1,Name2,Name):-
    (atomic_list_concat([Name2,'_',Name1],Name)))))).
 
 
-ensure_named(V):-get_attr(V,vn,_),!.
-ensure_named(V):-var(V),(nb_current('$variable_names', Vs)->true;Vs=[]),member(N=NV,Vs),V==NV,!,put_attr(V,vn,N).
 
 %= 	 	 
 

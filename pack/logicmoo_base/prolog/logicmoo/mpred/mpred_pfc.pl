@@ -41,12 +41,12 @@
   justification/2,justifications/2,
   mpred_BC/1,
   mpred_BC_CACHE/1,
-  mpred_CALL/1,mpred_CALL/2,mpred_CALL/3,mpred_CALL_MI/3,
+  mpred_CALL/1,mpred_CALL/2,mpred_CALL/3,mpred_CALL/3,
   mpred_halt/0,mpred_halt/1,mpred_halt/2,
   mpred_ain_db_to_head/2,mpred_ain_actiontrace/2,mpred_trace_op/2,mpred_add_support/2,mpred_ain_trigger_reprop/2,
   mpred_ain_by_type/2,
   mpred_prompt_ask/2,
-  mpred_CALL_MI/3,mpred_BC_w_cache/1,
+  mpred_CALL/3,mpred_BC_w_cache/1,
   ain_fast/1,
   ain_fast/2,
   setup_mpred_ops/0,
@@ -70,11 +70,13 @@
   pp_db_rules/0,pp_db_supports/0,pp_db_triggers/0,mpred_load/1,process_rule/3,
   remove_if_unsupported/1,remove_selection/1,mpred_withdraw1/2,
 
+  clause_u_parents/2,
+
   mpred_run/0,mpred_test/1,mpred_test_fok/1,
 
   call_u/1,with_umt/1,asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,clause_u/2,clause_u/3,get_user_abox/1,lookup_u/1,
 
-          call_in_mi/1,get_search_mode/3,mpred_rem_support_if_exists/2,get_tms_mode/2,with_umt/1,
+          get_search_mode/3,mpred_rem_support_if_exists/2,get_tms_mode/2,with_umt/1,
 
   stop_trace/1,with_mpred_trace_exec/1,
   select_next_fact/1,supporters_list/2,triggerSupports/2,well_founded/1,well_founded_list/2,
@@ -95,7 +97,7 @@
       mpred_fact(?,0),
       mpred_test(+),
       mpred_test_fok(+),
-      mpred_CALL_MI(1,-,+),
+      mpred_CALL(1,-,+),
       mpred_CALL(1,-,+),
       mpred_CALL(1,+),
       mpred_CALL(+),
@@ -113,7 +115,7 @@
       with_search_mode(+,0),
       bagof_or_nil(?,^,-).
 
-:- module_transparent(assert_u_confirmed/1).
+:- module_transparent((assert_u_confirmed/1,mpred_trace_exec/0,clause_u_parents/2,mpred_trace_op/3)).
 
 :- thread_local(t_l:user_abox/1).
 :- thread_local(t_l:no_mpred_breaks/0).
@@ -207,11 +209,11 @@ get_user_abox(C):- '$set_source_module'(C,C),C\==user,C\==logicmoo_user,!.
 get_user_abox(baseKB):-!.
 get_user_abox(_U). % implicit :-nonvar(U).
 
+fix_mp(Cm:P,M:P):-  get_user_abox(U),modulize_head_fb(U,P,Cm,M:P).
+fix_mp(MP,M:P):-  strip_module(MP,Cm,P),get_user_abox(U),modulize_head_fb(U,P,Cm,M:P).
 
 
-fix_mp(MP ,M:P):- strip_module(MP,_,P),get_user_abox(M),current_predicate(_,M:P),!.
-fix_mp(M:P,M:P):- current_predicate(_,M:P),!.
-fix_mp(MP ,M:P):- strip_module(MP,_,P),get_user_abox(M).
+
 
 body_true(true):-!.
 body_true(avar(_,AVS)):-nonvar(AVS),attr_bind(AVS).
@@ -220,7 +222,7 @@ body_true(avar(_,AVS)):-nonvar(AVS),attr_bind(AVS).
 
 listing_u(P):-call_u(listing(P)).
 
-assert_u(MP):- notrace(fix_mp(MP,M:P)),attvar_op(assert_i,M:P).
+assert_u(MP):- must(notrace(fix_mp(MP,M:P))),attvar_op(assert_i,M:P).
 asserta_u(MP):- notrace(fix_mp(MP,M:P)),attvar_op(asserta_i,M:P).
 assertz_u(MP):- notrace(fix_mp(MP,M:P)),attvar_op(assertz_i,M:P).
 
@@ -239,16 +241,6 @@ lookup_u(H):-lookup_u(H,_).
 lookup_u(MP,Ref):- notrace(fix_mp(MP,M:H)), on_x_debug(clause_u(M:H,B,Ref)),
                         (var(B)->rtrace(clause_u(M:H,_,Ref));true),
                         on_x_debug(B).
-
-call_u(mpred_BC(G0)):-nonvar(G0),!,call_u(G0).
-call_u(call_u(G0)):-nonvar(G0),!,call_u(G0).
-call_u(G0):- strip_module(G0,_,G),var(G),!,mpred_fact(G).
-call_u(G0):-
-  strip_module(G0,_,G),functor(G,F,A),
-  mpred_BC_CACHE(G),
-  (memberchk(F/A,[(',')/2])->
-  mpred_CALL(call_u,G);
-  with_umt(G0)).
 
 with_umt(G0):-
   strip_module(G0,WM,G),
@@ -473,9 +465,12 @@ mpred_ain_db_to_head(P,NewP):-
 %
 % is true if there is no assertion P in the prolog db.
 %
-mpred_unique_u((Head:-Tail)):- !, \+ clause_u(Head,Tail).
-mpred_unique_u(P):- !, \+ clause_u(P,true).
+mpred_unique_u(P):- !, \+ clause_asserted_i(P).
+mpred_unique_u((Head:-Tail)):- !, \+ clause_u_parents(Head,Tail).
+mpred_unique_u(P):- !, \+ clause_u_parents(P,true).
 
+clause_u_parents(Head,Body):-clause_u(Head,Body,Ref),clause_i(CHead,CBody,Ref),CHead=@=Head,CBody=@=Body.
+% clause_u_parents(Head,Body):-clause_u(Head,Body,Ref),clause_i(CHead,CBody,Ref),CHead=@=Head,CBody=@=Body.
 
 get_search_mode(_P,_S,Mode):- t_l:mpred_search_mode(Mode),!.
 get_search_mode(_P,_S,Mode):- lookup_u(sm(Mode)),!.
@@ -926,7 +921,7 @@ mpred_do_rule(_).
 
 
 mpred_do_fcpt(Fact,F):- 
-  lookup_u(pt(F,Body)),
+  lookup_u(pt(F,Body)),  
   mpred_trace_msg('~N~n\tFound positive trigger: ~p~n\t\tbody: ~p~n',
 		[F,Body]),  
   mpred_eval_lhs(Body,(Fact,pt(F,Body))),
@@ -1122,9 +1117,9 @@ trigger_trigger1(Trigger,Body):-
 %  assigning them support from God.
 % 
 mpred_BC(P):- mpred_CALL(mpred_BC_w_cache, P).
-mpred_BC_w_cache(P):- mpred_BC_CACHE(P),mpred_CALL(P).
+mpred_BC_w_cache(P):- mpred_BC_CACHE(P),call_u(P).
 
-mpred_BC_CACHE(P0):-  must((\+ \+ ((strip_module(P0,_,P00),copy_term(P00,P000),loop_check_early(mpred_BC_CACHE0(P000),true))))).
+mpred_BC_CACHE(P0):-  ignore( \+ loop_check_early(mpred_BC_CACHE0(P0))).
 
 mpred_BC_CACHE0(P00):- var(P00),!.
 mpred_BC_CACHE0(must(P00)):-!,mpred_BC_CACHE0(P00).
@@ -1132,7 +1127,8 @@ mpred_BC_CACHE0(P):- predicate_property(P,static),!.
 mpred_BC_CACHE0(bt(_,_)):-!.
 mpred_BC_CACHE0(P):- 
  ignore((
- acyclic_term(P),
+  cyclic_break(P),
+ % acyclic_term(P),
  % trigger any bc rules.
   lookup_u(bt(P,Trigger)),
   copy_term(bt(P,Trigger),bt(CP,CTrigger)),
@@ -1140,32 +1136,31 @@ mpred_BC_CACHE0(P):-
   mpred_eval_lhs(CTrigger,S),
   fail)).
 
-mpred_CALL(F):- mpred_CALL(mpred_CALL, Cut, F), (var(Cut)->true;(Cut=cut(Cut)->(!,Cut);call_u(Cut))).
-mpred_CALL(How,F):- mpred_CALL(How, Cut, F), (var(Cut)->true;(Cut=cut(Cut)->(!,Cut);call_u(Cut))).
-mpred_CALL(How,SCut, F):- 
-  %  this is probably not advisable due to extreme inefficiency.
-  var(F) ->  mpred_fact(F) ;
-  predicate_property(F,built_in) -> with_umt(F) ;
-  call_in_mi(F) -> mpred_CALL_MI(How,SCut,F) ;
-  predicate_property(F,number_of_clauses(_)) -> 
-     (clause_u(F,Condition),mpred_CALL(How,Cut,Condition),(var(Cut)->true;(Cut=cut(Cut)->(!,Cut);call_u(Cut))));
-  predicate_property(F,built_in) -> with_umt(F) ;
-  mpred_CALL_MI(How,SCut,F).
+mpred_CALL(P):- call_u(P).
+call_u(M:P):- nonvar(P),current_predicate(_,M:P),!, with_umt(M:P).
+call_u(P):-  var(P),!,fail,trace,  mpred_fact(P).
+call_u(P):-  mpred_CALL(with_umt, Cut, P), (var(Cut)->true;(Cut=cut(CutCall)->(!,CutCall);call_u(Cut))).
 
-call_in_mi((_,_)).
-call_in_mi((_;_)).
-call_in_mi((_->_)).
-call_in_mi((_*->_)).
-call_in_mi((!)).
+mpred_CALL(How,P):- mpred_CALL(How, Cut, P), (var(Cut)->true;(Cut=cut(CutCall)->(!,CutCall);call_u(Cut))).
 
-mpred_CALL_MI(_How, cut(true), !):- !.
-mpred_CALL_MI(How, Cut, (P1,P2)):- !, mpred_CALL(How, Cut, P1), mpred_CALL(How, Cut, P2).
-mpred_CALL_MI(How, Cut, (P1;P2)):- !, mpred_CALL(How, Cut, P1); mpred_CALL(How, Cut, P2).
-mpred_CALL_MI(How, Cut, (P1->P2)):- !, mpred_CALL(How, Cut, P1)-> mpred_CALL(How, Cut, P2).
-mpred_CALL_MI(How, Cut, (P1*->P2)):- !, mpred_CALL(How, Cut, P1)*-> mpred_CALL(How, Cut, P2).
-mpred_CALL_MI(_How,_, F):- 
-  %  we really need to check for system predicates as well.
-  must(current_predicate(_,M:F)),!, with_umt(M:F).
+%  this is probably not advisable due to extreme inefficiency.
+mpred_CALL(How, Cut,Var):- var(Var),!,trace_or_throw(var_mpred_CALL_MI(How,Cut,Var)).
+mpred_CALL(How, Cut, mpred_CALL(G0)):- !,mpred_CALL(How, Cut, (G0)).
+mpred_CALL(How, Cut, call_u(G0)):- !,mpred_CALL(How, Cut, (G0)).
+mpred_CALL(_How, cut(true), !):- !.
+mpred_CALL(How, Cut, (P1,P2)):- !, mpred_CALL(How, Cut, P1), mpred_CALL(How, Cut, P2).
+mpred_CALL(How, Cut, (P1;P2)):- !, mpred_CALL(How, Cut, P1); mpred_CALL(How, Cut, P2).
+mpred_CALL(How, Cut, (P1->P2)):- !, mpred_CALL(How, Cut, P1)-> mpred_CALL(How, Cut, P2).
+mpred_CALL(How, Cut, (P1*->P2)):- !, mpred_CALL(How, Cut, P1)*-> mpred_CALL(How, Cut, P2).
+%  check for system predicates first
+mpred_CALL(_How, _SCut, P):- predicate_property(P,built_in),!, with_umt(P).
+mpred_CALL( How,   Cut, P) :- fail, predicate_property(P,number_of_clauses(_)),!,
+     clause_u(P,Condition),
+     mpred_CALL(How,Cut,Condition),
+       (var(Cut)->true;(Cut=cut(CutCall)->(!,CutCall);call_u(Cut))).
+
+% mpred_CALL(_How,_SCut, P):- must(current_predicate(_,M:P)),!, with_umt(M:P).
+mpred_CALL(How, _SCut, P):- call(How,P).
 
 
 
@@ -2634,7 +2629,6 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((mpred_nf1)/2).
 :- module_transparent((mpred_nf)/2).
 :- module_transparent((action_is_undoable)/1).
-:- module_transparent((call_in_mi)/1).
 :- module_transparent((mpred_eval_rhs1)/2).
 :- module_transparent((mpred_eval_rhs)/2).
 :- module_transparent((mpred_eval_lhs)/2).

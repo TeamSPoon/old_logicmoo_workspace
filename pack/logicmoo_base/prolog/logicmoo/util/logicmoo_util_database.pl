@@ -6,12 +6,14 @@
             ainz/1,
 
             if_flag_true/2,
+            current_modules_from/2,
 
-            attr_bind/1,attr_bind/2,attr_bind_complete/1,
-            split_attrs/3,is_attr_bind/1,
+            attr_bind/2,attr_bind/1,
+            split_attrs/3,
 
             paina/1,pain/1,painz/1,
-
+            modulize_head/2,
+            clause_asserted_i/5,
             remove_term_attr_type/2,
             ainz_clause/1,ainz_clause/2,
             simple_var/1,
@@ -25,10 +27,10 @@
             call_provider/1,
             call_provider/2,
             clause_true/1,
-            modulize_head/2,
-
+            modulize_head_fb/4,
+            attr_bind/1,
             clause_asserted/1,clause_asserted/2,clause_asserted/3,
-            clause_asserted_i/1,clause_asserted_i/2,clause_asserted_i/3,
+            clause_asserted_i/1,clause_asserted_i/2,clause_asserted_i/3,clause_asserted_i/4,
             clause_i/1,clause_i/2,clause_i/3,
             assert_i/1,asserta_i/1,assertz_i/1,
             retract_i/1,retractall_i/1,
@@ -80,17 +82,22 @@
 
 :- module_transparent
         append_term/3,
+        modulize_head/2,
+        modulize_head_fb/4,
+        clause_asserted_i/5,
         my_module_sensitive_code/1,
         assertz_new/1,
         call_provider/2,
         clause_asserted/3,
         erase_safe/2,
+        current_modules_from/2,
         find_and_call/1,
         lmconf:first_std_provider/3,
         std_provider/3,
         mpred_split_op_data/3,
         retract_eq/1,
         safe_univ/2,
+        clause_asserted_i/1,clause_asserted_i/2,clause_asserted_i/3,
         safe_univ0/2.
 
 
@@ -446,16 +453,14 @@ expand_to_hb( ((H :- B)),H,B):-!.
 expand_to_hb( H,  H,  true).
 
 clausify_attributes(V,V):- \+ compound(V),!.
-clausify_attributes((Data:-B),THIS):- B==true,!,clausify_attributes(Data,THIS).
-clausify_attributes(M:Data,M:THIS):- nonvar(M),!, clausify_attributes(Data,THIS).
-clausify_attributes((Data:-B),THIS):- !,
-   copy_term((Data:-B),(Data0:-B0),Extra),   
-   (Extra == [] -> (THIS = (Data:-B)) ; (hb_to_clause(Data0,(attr_bind(Extra),B0),THIS))).
+clausify_attributes(M:Data,M:THIS):- !,clausify_attributes(Data,THIS).
 clausify_attributes([H|T],[HH|TT]):- !,clausify_attributes(H,HH),clausify_attributes(T,TT).
 clausify_attributes((H,T),(HH,TT)):- !,clausify_attributes(H,HH),clausify_attributes(T,TT).
-clausify_attributes(Data,THIS):- 
-   copy_term(Data,Data0,Extra),   
-   (Extra == [] -> THIS = Data ; (hb_to_clause(Data0,attr_bind(Extra),THIS))).
+clausify_attributes(Data,THIS):- copy_term(Data,DataC,Attribs),expand_to_hb(DataC,H,B),clausify_attributes(H,B,Attribs,THIS).
+
+clausify_attributes(H,B,[],(H:-B)):-!.
+clausify_attributes(H,B,Extra,(H:-attr_bind(Extra,B))).
+
 
 
 simple_var(Var):-var(Var),\+ attvar(Var).
@@ -464,10 +469,10 @@ to_mod_if_needed(M,B,MB):- B==true-> MB=B ; MB = M:B.
 
 split_attrs(_,ATTRS,BODY):- notrace((sanity((simple_var(ATTRS),simple_var(BODY))),fail)).
 split_attrs(B,true,B):-var(B),!.
+split_attrs(attr_bind(G,Call),attr_bind(G),Call):- !.
 split_attrs(true,true,true):-!.
 split_attrs(_:true,true,true):-!.
 split_attrs(M:A,M:ATTRS,M:BODY):- !,split_attrs(A,ATTRS,BODY).
-split_attrs(attr_bind(G,Call),attr_bind(G),Call):- !.
 split_attrs(attr_bind(G),attr_bind(G),true):- !.
 split_attrs((A,B),ATTRS,BODY):- !,
   split_attrs(A,AA,AB),
@@ -476,19 +481,13 @@ split_attrs((A,B),ATTRS,BODY):- !,
   conjoin(AB,BB,BODY).
 split_attrs(AB,true,AB).
 
-is_attr_bind(B):- \+ compound(B),!,fail.
-is_attr_bind(B):- functor(B,attr_bind,_),!.
-is_attr_bind(_:B):-compound(B),functor(B,attr_bind,_).
-
-:- meta_predicate attr_bind(0,0).
-:- module_transparent attr_bind/2.
-:- meta_predicate attr_bind(0).
+:- meta_predicate attr_bind(+).
 :- module_transparent attr_bind/1.
-:- meta_predicate attr_bind_complete(0).
-:- module_transparent attr_bind_complete/1.
-attr_bind(G):-must_det_l(G).
-attr_bind_complete(G):-must_det_l(G).
-attr_bind(G,Call):-must_det_l(G),(Call==true->true;(Call,attr_bind_complete(G))).
+attr_bind(Attribs):-maplist(call,Attribs).
+
+:- meta_predicate attr_bind(+,0).
+:- module_transparent attr_bind/2.
+attr_bind(Attribs,Call):-maplist(call,Attribs),Call.
 
 
 %% hb_to_clause( ?H, ?B, ?Clause ) is semidet.
@@ -537,51 +536,61 @@ clause_asserted(M:H,B,R):- clause(M:H,B,R),clause(M:CH,CB,R),(CH:-CB)=@=(H:-B).
 
 :-meta_predicate(modulize_head(?,?)).
 
-%modulize_head(_:G,O:G):- !, no_repeats_old(O,(current_module(M),'$get_predicate_attribute'(M:G, imported, O))).
+current_modules_from(Cm,M):- default_module(Cm,M).
+current_modules_from(Cm,M):- current_module(M), \+ default_module(Cm,M).
 
-%= 	 	 
-
-%% modulize_head( ?R, ?M) is semidet.
+%% modulize_head( +HEAD, -ModulePlusHead) is semidet.
 %
 % Modulize Head.
 %
-modulize_head(R:G,M:G):- !, (M=R; (current_predicate(_,M:G),M\==R)),\+ predicate_property(M:G,imported_from(_)).
-modulize_head(G,O:G):- !, no_repeats_old(O,(current_module(M),'$get_predicate_attribute'(M:G, imported, O))).
-modulize_head(G,M:G):- current_predicate(_,M:G),\+ predicate_property(M:G,imported_from(_)).
+modulize_head(MH,M:H):- strip_module(MH,Cm,H),!,
+  modulize_head_fb(Cm,H,Cm,M:H).
+
+modulize_head_fb(From,H,Fallback,M:H):- 
+ notrace((findall(M:H,
+  ((no_repeats(M, ((current_modules_from(From,M),current_predicate(_,M:H),\+ predicate_property(M:H,imported_from(_))))))->true;
+  M=Fallback),List))),
+ member(M:H,List).
+
+
 
 
 put_clause_ref(Ref,V):- !, nop(put_clause_ref(Ref,V)).
 put_clause_ref(Ref,V):-put_attr(V,cref,Ref).
 
 
-clause_asserted_i(HB):- expand_to_hb(HB,H,B),clause_asserted_i(H,B,_).
-clause_asserted_i(H,B):- clause_asserted_i(H,B,_).
-% clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,
-%  clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
-/*
-clause_asserted_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,A,B),!, 
-  clause_i(H,B,Ref), 
- (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
-*/
-
 remove_term_attr_type(Term,Mod):- notrace((term_attvars(Term,AVs),maplist(del_attr_type(Mod),AVs))).
 :- op(700,xfx,'=@=').
 
-clause_asserted_i(MH,B,Ref):- nonvar(MH),M:H=MH,!, clause_asserted_i_0(M,H,B,Ref).
-clause_asserted_i(H,B,Ref):- nonvar(H),(current_predicate(_,M:H) *-> clause_asserted_i_0(M,H,B,Ref) ; fail).
-clause_asserted_i(H,B,Ref):- strip_module(H,M,HH), clause_asserted_i_0(M,HH,B,Ref).
+clause_asserted_i(HB):- expand_to_hb(HB,H,B),clause_asserted_i(H,B,_).
+clause_asserted_i(H,B):- clause_asserted_i(H,B,_).
 
-clause_asserted_i_0(M,H,B,Ref):- ground(H:B),clause(M:H,B,Ref),clause(HH,BB,Ref),ground(HH:BB),!.
-clause_asserted_i_0(M,H,B,Ref):- !,
- \+ \+ 
- ((
-  remove_term_attr_type((H:B),vn),
-  copy_term_nat(H:B,HNAT:BNAT),
-  clause_i(M:H,B,Ref),
-  clause(RMH,RBWA,Ref),
-  split_attrs(RBWA,_RBATTR,RBNAT),
-  strip_module(RMH,_RM,RHNAT),
-  RHNAT=@=HNAT,RBNAT=@=BNAT )).
+clause_asserted_i(MH,B,Ref):- modulize_head(MH,M:H), clause_asserted_i(M,H,B,Ref).
+
+clause_asserted_i(M,H,B,Ref):- ground(H:B),!,clause(M:H,B,Ref),clause(HH,BB,Ref),ground(HH:BB),!.
+clause_asserted_i(M,H,B,Ref):-
+
+ copy_term((H,B),(HC,BC),Attribs),
+ copy_term((HC,BC),(HT,BT)),
+ clause_asserted_i(M,HC,BC,CAttribs,Ref),
+ (HC,BC)=@=(HT,BT),(HC,BC)=(HT,BT),
+ attributes_equal(Attribs,CAttribs,TODO),
+ \+ \+ once(attr_bind(TODO)).
+
+clause_asserted_i(M,H,B,Attribs,Ref):- 
+ clause(M:H,BC,Ref), ((compound(BC),BC = attr_bind(Attribs,B)) -> true ; (BC=B -> Attribs=[])).
+
+attribute_is_info(name_variable(_Var,  _Name)).
+attribute_is_info(put_attrs(_Var, vn, _Name)).
+
+attributes_equal(Attribs,Attribs,Attribs):-!.
+attributes_equal([INFO|L],R,TODO):- attribute_is_info(INFO),INFO,!,delete(R,INFO,RR),attributes_equal(L,RR,TODO).
+attributes_equal(R,[INFO|L],TODO):- attribute_is_info(INFO),INFO,!,delete(R,INFO,RR),attributes_equal(L,RR,TODO).
+
+attributes_equal(L,R,[H|TODO]):- select(H,L,LL), select(HH,R,RR),H==HH,!,
+    delete(LL,HH,LLL),delete(RR,H,RRR),attributes_equal(LLL,RRR,TODO).
+attributes_equal(L,R,[H|TODO]):- select(H,L,LL), select(HH,R,RR),H =HH,!,
+    delete(LL,HH,LLL),delete(RR,H,RRR),attributes_equal(LLL,RRR,TODO).
 
 
 %% clause_i( ?H, ?B, ?Ref) is semidet.
@@ -592,10 +601,34 @@ clause_i(HB):- expand_to_hb(HB,H,B),clause_i(H,B,_).
 clause_i(H,B):- clause_i(H,B,_).
 % clause_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
 % clause_i(H,B,Ref):- clause(H,AB,Ref), (must(split_attrs(AB,A,B0)->A),B=B0).
+
+clause_i(MH,B,Ref):- !,
+ notrace(
+  findall(
+   c(M:H,MH,Attribs,BM,Ref),
+   ((no_repeats(Ref,(must(modulize_head(MH,M:H)),clause(M:H,BMC,Ref),
+    ((compound(BMC),BMC = attr_bind(Attribs,BM)) -> true ; (BMC=BM -> Attribs=[])))))),
+   List)),!,
+ member(c(M:H,MH,Attribs,B,Ref),List),
+ once(attr_bind(Attribs)).
+
+/*
+clause_i(MH,B,Ref):- !,
+ no_repeats(Ref,(must(modulize_head(MH,M:H)),clause(M:H,BMC,Ref))),
+   ((compound(BMC),BMC = attr_bind(Attribs,BM)) -> true ; (BMC=BM -> Attribs=[])),
+ BM = B,
+ once(attr_bind(Attribs)).
+
+  */
+/*
 clause_i(H0,BIn,Ref):- 
     copy_term_nat(H0:BIn,H:B0),
     clause(H,BC,Ref),
   (must(notrace(split_attrs(BC,AV,B))) -> ( B=B0 -> AV -> H=H0 -> BIn=B)).
+*/
+
+
+
 
 assert_i(HB):-clausify_attributes(HB,CL),assert(CL).
 asserta_i(HB):-clausify_attributes(HB,CL),asserta(CL).

@@ -10,18 +10,20 @@
 % ===================================================================
 */
 :- module(logicmoo_util_attvar_reader, [
-          deserialize_attvars/2,
+          deserialize_attvars/2,deserialize_attvars/3,
           serialize_attvars/2,
           put_dyn_attrs/2,
+          ensure_named/3,
           read_attvars/1,read_attvars/0,          
           install_attvar_expander/1,
           is_term_expanding_in_file/1,
           system_expanded_attvars/2]).
 
 
-:- module_transparent((deserialize_attvars/2,
+:- module_transparent((deserialize_attvars/2,deserialize_attvars/3,
           serialize_attvars/2,
           put_dyn_attrs/2,
+          ensure_named/3,
           read_attvars/1,read_attvars/0,          
           install_attvar_expander/1,
           is_term_expanding_in_file/1,
@@ -35,17 +37,36 @@
 
 :- use_module(logicmoo_util_dmsg).
 
-deserialize_attvars( V,O):- nonvar(O),!,must(deserialize_attvars( V,M)),!,must(M=O).
-deserialize_attvars( V,O):- var(V), ensure_named(V),!,V=O.
-deserialize_attvars(IO,IO):- \+ compound(IO),!.
-deserialize_attvars((H:-BI),O):- split_attrs(BI,AV,BO),AV\==true,term_attvars((H:-BO),[]),must(call(AV)),!,(BO==true->(O=H);O=(H:-BO)).
-deserialize_attvars(avar(S),V):- nonvar(S),!, show_call(put_dyn_attrs(V,S)),ignore(ensure_named(V)).
-deserialize_attvars(avar(V,_),V):- nonvar(V),!.
-deserialize_attvars(avar(V,S),V):- var(V),nonvar(S),!, show_call(put_dyn_attrs(V,S)),ignore(ensure_named(V)).
-deserialize_attvars('$VAR'(N),'$VAR'(N)):- \+ atom(N),!.
-deserialize_attvars('$VAR'(N),V):- nb_current('$variable_names',Vs),member(N=V,Vs),!,put_attr(V,vn,N),!.
-deserialize_attvars('$VAR'(N),V):- nb_current('$variable_names',Vs),put_variable_names([N=V|Vs]),!,put_attr(V,vn,N),!.
-deserialize_attvars(C,A):- compound_name_arguments(C,F,Args),maplist(deserialize_attvars,Args,OArgs),compound_name_arguments(A,F,OArgs).
+ensure_named(Vs,V,N):- atom(N),member(N=VV,Vs),VV==V,put_attr(V,vn,N).
+ensure_named(Vs,V,N):- atom(N),member(N=VV,Vs),put_attr(V,vn,N),!,maybe_must(VV= V).
+ensure_named(Vs,V,N):- atom(N),put_attr(V,vn,N),set_in_vd(Vs,N=V).
+ensure_named(Vs,V,N):- get_attr(V,vn,N),!,set_in_vd(Vs,N=V).
+ensure_named(Vs,V,N):- member(N=NV,Vs),V==NV,!,put_attr(V,vn,N).
+ensure_named(Vs,V,N):- nb_current('$variable_names', VsE), member(N=NV,VsE),V==NV,!,put_attr(V,vn,N),set_in_vd(Vs,N=V).
+
+set_in_vd(Vs,N=V):-member(NN=VV,Vs),NN==N,V==VV,!.
+set_in_vd(Vs,N=V):-member(NN=VV,Vs),NN==N,!,maybe_must(V=VV).
+set_in_vd(Vs,N=V):-member(NN=VV,Vs),VV==V,maybe_must(N==NN).
+set_in_vd(Vs,N=V):-Vs = [_|VT], nb_setarg(2,Vs,[N=V|VT]).
+
+maybe_must(V=VV):-V==VV,!.
+maybe_must(_).
+
+
+deserialize_attvars(V,O):- nb_current('$variable_names', Vs),!,deserialize_attvars(['$variable_names'|Vs], V,O).
+deserialize_attvars(V,O):- deserialize_attvars([localvs], V,O).
+
+deserialize_attvars(Vs, V,O):- nonvar(O),!,must(deserialize_attvars(Vs, V,M)),!,must(M=O).
+deserialize_attvars(Vs, V,O):- var(V), get_attr(V,vn,N),set_in_vd(Vs,N=V),!,V=O.
+deserialize_attvars(Vs, V,O):- var(V), member(N=VV,Vs),VV==V,put_attr(V,vn,N),!,V=O.
+deserialize_attvars(_ ,IO,IO):- \+ compound(IO),!.
+deserialize_attvars(_ ,(H:-BI),O):- split_attrs(BI,AV,BO),AV\==true,term_attvars((H:-BO),[]),must(call(AV)),!,(BO==true->(O=H);O=(H:-BO)).
+deserialize_attvars(Vs,avar(S),V):- nonvar(S),!, show_call(put_dyn_attrs(V,S)),ensure_named(Vs,V,_).
+deserialize_attvars(_ ,avar(V,_),V):- nonvar(V),!.
+deserialize_attvars(Vs,avar(V,S),V):- var(V),nonvar(S),!, show_call(put_dyn_attrs(V,S)),ensure_named(Vs,V,_N).
+deserialize_attvars(_ ,'$VAR'(N),'$VAR'(N)):- \+ atom(N),!.
+deserialize_attvars(Vs,'$VAR'(N),V):- atom(N), member(N=V,Vs), ensure_named(Vs,V,N),!.
+deserialize_attvars(Vs,C,A):- compound_name_arguments(C,F,Args),maplist(deserialize_attvars(Vs),Args,OArgs),compound_name_arguments(A,F,OArgs).
 
 :- meta_predicate put_dyn_attrs(*,?).
 put_dyn_attrs(V,S):- var(S),!,trace_or_throw(bad_put_dyn_attrs(V,S)),!.

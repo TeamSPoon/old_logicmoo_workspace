@@ -574,10 +574,10 @@ mpred_expander0(Type,LoaderMod,I,OO):-
    w_tl(t_l:mpred_already_in_file_expansion(Key),
       w_tl(t_l:current_why_source(mfl(M,F,L)),
         (( % trace,
-           get_original_term_source(Orig),
+           get_original_term_source(Orig), 
            b_setval('$orig_term',Orig),
            b_setval('$term',[]),
-           must(hotrace((fully_expand(change(assert,ain),I,III)))),
+           must(notrace((fully_expand(change(assert,ain),I,III)))),
            must((nonvar(III),mpred_expander_now_one(F,M,III,O))))))))),
     '$module'(_,UM)),
   !,I\=@=O,O=OO.

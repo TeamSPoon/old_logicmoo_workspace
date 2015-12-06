@@ -1455,7 +1455,9 @@ must(Goal):-  notrace((must_be(nonvar,Goal),get_must(Goal,MGoal))),!,MGoal.
 %
 % Get Must Be Successfull.
 %
-get_must(notrace(Goal),CGoal):- !,get_must((notrace(Goal)*->true;Goal),CGoal).
+get_must(notrace(Goal),CGoal):- !,get_must(Goal,CGoal).
+get_must(M:notrace(Goal),CGoal):- !,get_must(M:Goal,CGoal).
+% get_must(notrace(Goal),CGoal):- !,get_must((notrace(Goal)*->true;Goal),CGoal).
 get_must(Goal,CGoal):-  (is_release;tlbugger:skipMust),!,CGoal = Goal.
 get_must(Goal,CGoal):- skipWrapper,!, CGoal = (Goal *-> true ; ((ddmsg(failed_FFFFFFF(must(Goal))),dumpST,trace,Goal))).
 get_must(Goal,CGoal):- tlbugger:show_must_go_on,!,

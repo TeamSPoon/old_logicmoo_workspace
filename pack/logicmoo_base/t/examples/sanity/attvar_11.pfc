@@ -1,0 +1,51 @@
+#!/usr/bin/env swipl
+%
+%  PFC is a language extension for prolog.. there is so much that can be done in this language extension to Prolog
+%
+% Dec 13, 2035
+% Douglas Miles
+
+:- module(sanity_attvar_11,[]).
+
+:- use_module(library(logicmoo_base)).
+
+
+:- debug(_).
+:- nodebug(http(_)).
+:- debug(mpred).
+:- mpred_trace_exec.
+
+:- abolish(not_666/1).
+
+:- must(( ((dif(666,X),assert_i(not_666(X)))))).
+
+:- in_cmt(listing(not_666)).
+
+% :- dynamic sanity_attvar_11:not_666/1.
+%
+% sanity_attvar_11:not_666(A) :-
+%       attr_bind([dif(A, 666)], true).
+
+
+:- must(( ((dif(666,X),clause_asserted_i(not_666(X)))))).
+
+:- must(( ((dif(666,X),dif(666,X), clause_asserted_i(not_666(X)))))).
+
+:- must(( ((dif(5,X),dif(666,X), \+ clause_asserted_i(not_666(X)))))).
+
+:- must(( ((dif(5,X),\+ clause_asserted_i(not_666(X)))))).
+
+:- must(( ((\+ clause_asserted_i(not_666(5)))))).
+
+:- must(( ((\+ clause_asserted_i(not_666(666)))))).
+
+:- must(( ((\+ clause_asserted_i(not_666(_)))))).
+
+:- must(( not_666(5)  )).
+
+:- must(( not_666(SOME), var(SOME), SOME=5 )).
+
+:- must(( not_666(SOME), var(SOME),  \+ SOME=666)).
+
+:- must(( \+ not_666(666)  )).
+
