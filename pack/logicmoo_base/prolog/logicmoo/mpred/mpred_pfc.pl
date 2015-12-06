@@ -419,24 +419,25 @@ mpred_post1(  ~ P,   S):-
    with_no_mpred_breaks((nonvar(P),doall(mpred_remove(P,S)),mpred_undo(P))),fail.
 mpred_post1(P,S):- 
   %  db mpred_ain_db_to_head(P,P2),
-  % mpred_remove_old_version(P),
-  
-  (lookup_u(spft(P,_,_))->HAD_SUPPORT=true;HAD_SUPPORT=false),
+  % mpred_remove_old_version(P),  
+  notrace(lookup_u(spft(P,_,_))->HAD_SUPPORT=true;HAD_SUPPORT=false),
   must(mpred_add_support(P,S)),
   ((\+ mpred_unique_u(P) -> 
+
     (!,(HAD_SUPPORT==true->true;mpred_enqueue(P,S))) ;
-  must((assert_u_confirmed(P),
-  mpred_trace_op(add,P,S),
-  !,
-  mpred_enqueue(P,S),
-  !)))).
+
+     must((assert_u_confirmed(P),
+     mpred_trace_op(add,P,S),
+     !,
+     mpred_enqueue(P,S),
+     !)))).
 
 mpred_post1(_,_):-!.
 % mpred_post1(P,S):-  trace_or_throw(mpred_error("mpred_post1(~p,~p) failed",[P,S])).
 mpred_post1(P,S):-  mpred_warn("mpred_post1(~p,~p) failed",[P,S]).
 
 assert_u_confirmed(P):- copy_term(P,PP),
-  call_u((must(assert_u(P)),must(clause_asserted_i(PP)))),!.
+ with_umt((notrace(clause_asserted_i(PP))-> true ; must(assert_u(P)),must(clause_asserted_i(PP)))),!.
  
 %% get_mpred_current_db(-Db) is semidet.
 %

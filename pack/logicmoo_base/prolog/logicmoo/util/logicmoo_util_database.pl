@@ -602,15 +602,10 @@ clause_i(H,B):- clause_i(H,B,_).
 % clause_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
 % clause_i(H,B,Ref):- clause(H,AB,Ref), (must(split_attrs(AB,A,B0)->A),B=B0).
 
-clause_i(MH,B,Ref):- !,
- notrace(
-  findall(
-   c(M:H,MH,Attribs,BM,Ref),
-   ((no_repeats(Ref,(must(modulize_head(MH,M:H)),clause(M:H,BMC,Ref),
-    ((compound(BMC),BMC = attr_bind(Attribs,BM)) -> true ; (BMC=BM -> Attribs=[])))))),
-   List)),!,
- member(c(M:H,MH,Attribs,B,Ref),List),
- once(attr_bind(Attribs)).
+clause_i(MH,B,Ref):- 
+   % must(modulize_head(MH,M:H)),
+   clause(MH,BMC,Ref),
+    ((compound(BMC),BMC = attr_bind(Attribs,B)) -> notrace(attr_bind(Attribs)) ; BMC=B).
 
 /*
 clause_i(MH,B,Ref):- !,

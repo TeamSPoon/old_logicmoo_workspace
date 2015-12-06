@@ -33,10 +33,8 @@ with_no_kif_var_coroutines(Goal):- w_tl(t_l:no_kif_var_coroutines,Goal).
 %	Assign a Skolem to a Var. Succeeds   silently if Sk is not a
 %	sk (anymore).
 
-form_sk(Var, Skolem) :-
-	var(Var), !,
-	push_skolem(Var, Skolem).
-form_sk(_, Skolem):- skolem_test(Skolem).
+
+form_sk(OtherValue, Skolem):- sk:attr_unify_hook(Skolem, OtherValue).
 
 
 push_dom(_,_):- \+ is_skolem_setting(push_skolem),!.
@@ -74,8 +72,8 @@ sk_replace(_Into,_SKFINAL):-!,fail.
 sk:attr_unify_hook(Form, OtherValue):-OtherValue==Form,!.
 sk:attr_unify_hook(_Form, _OtherValue):- t_l:no_kif_var_coroutines,!,fail.
 sk:attr_unify_hook(Form, OtherValue):- var(OtherValue),!,push_skolem(OtherValue,Form),!.
-sk:attr_unify_hook(Form, OtherValue):- contains_var(OtherValue,Form),!.
-sk:attr_unify_hook(Form, OtherValue):- contains_var(Form,OtherValue),!.
+%sk:attr_unify_hook(Form, OtherValue):- contains_var(OtherValue,Form),!.
+%sk:attr_unify_hook(Form, OtherValue):- contains_var(Form,OtherValue),!.
 % sk:attr_unify_hook(Form, OtherValue):- skolem_unify(OtherValue,Form).
 
 sk:attr_portray_hook(Form, SkVar) :- writeq(sk(SkVar,Form)).

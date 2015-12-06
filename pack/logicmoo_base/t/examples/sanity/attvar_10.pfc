@@ -22,8 +22,9 @@
 
 :- read_attvars(true).
 
+:- rtrace(ain(sk_in(_DUNNO))).
 sk_in(fl(X,Y,X,Y)).
-sk_in(_DUNNO).
+:- rtrace(ain(sk_in(_DUNNO))).
 sk_in(avar([vn='ExIn',sk='SKF-666'])).
 
 :- listing([pt/2,sk_in/1,sk_out/1]).
