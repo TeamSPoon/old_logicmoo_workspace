@@ -477,6 +477,7 @@
 */
 
 
+:- meta_predicate(call_count(0,?)).
 call_count(C,N):-findall(C,C,L),nth1(N,L,C).
 
 
