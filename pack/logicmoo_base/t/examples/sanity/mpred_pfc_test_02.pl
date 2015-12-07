@@ -1,74 +1,75 @@
-:- module(red_test01,[]).
 
 :- use_module(library(logicmoo_base)).
+
 :- use_listing_vars.
-
-
-
 
 % :- set_prolog_flag(umt_local,true).
 
 
 % :- set_prolog_flag(umt_local,false).
-:- use_module(library(logicmoo/mpred/mpred_pfc)).
-% :- use_module(library(logicmoo_base)).
+ :- use_module(library(logicmoo/mpred/mpred_pfc)).
 %:- use_module(library(logicmoo_base)).
-% :- use_module(library(pfc)).
+% :- use_module(library(logicmoo_base)).
+%:- use_module(library(pfc)).
+
+:- use_module('mpred_pfc_test_04').
 
 :- mpred_reset.
 
 
-:- get_user_abox(M),dynamic((M:current_ooQ2/1,M:default_ooQ2/1,M:if_mooQ2/2)).
+:- get_user_abox(M),dynamic((M:current_ooQ1/1,M:default_ooQ1/1,M:if_mooQ1/2)).
 :- mpred_trace.
 :- mpred_watch.
 :- mpred_reset.
 
 
-:- mpred_ain(default_ooQ2(booQ2)).
+:- rtrace(mpred_ain(default_ooQ1(whenMissingQ1))).
 
-:- must(call_u(default_ooQ2(booQ2))).
+:- must(call_u(default_ooQ1(whenMissingQ1))).
 
-:- mpred_why(default_ooQ2(booQ2)).
+:- get_user_abox(M),M:must((default_ooQ1(whenMissingQ1))).
 
-:- mpred_test(default_ooQ2(booQ2)).
+:- mpred_why(default_ooQ1(whenMissingQ1)).
 
-:- mpred_ain(\+default_ooQ2(booQ2)).
+:- rtrace(mpred_test(default_ooQ1(whenMissingQ1))).
+
+:- rtrace(mpred_ain(\+default_ooQ1(whenMissingQ1))).
 % this should have been ok
-% (if_mooQ2(Missing,Create) ==> ((\+ Missing/(Missing\==Create), \+ Create , \+ ~(Create)) ==> Create)).
-:- ((mpred_ain((if_mooQ2(Missing,Create) ==> 
+% (if_mooQ1(Missing,Create) ==> ((\+ Missing/(Missing\==Create), \+ Create , \+ ~(Create)) ==> Create)).
+:- ((mpred_ain((if_mooQ1(Missing,Create) ==> 
  ( ( \+ Missing/(Missing\=@=Create)) ==> Create))))).
 
-:- mpred_ain((default_ooQ2(X) ==> if_mooQ2(current_ooQ2(_),current_ooQ2(X)))).
+:- mpred_ain((default_ooQ1(X) ==> if_mooQ1(current_ooQ1(_),current_ooQ1(X)))).
 
-:- mpred_ain(default_ooQ2(booQ2)).
+:- mpred_ain(default_ooQ1(whenMissingQ1)).
 
-:- mpred_test(current_ooQ2(booQ2)).
+:- mpred_test(current_ooQ1(whenMissingQ1)).
    
 % :- pp_DB.
 
-:- (mpred_ain(current_ooQ2(fooQ2))).
+:- (mpred_ain(current_ooQ1(fooQ1))).
 
-:- mpred_test(\+current_ooQ2(booQ2)).
+:- mpred_test(\+current_ooQ1(whenMissingQ1)).
 
-:- (mpred_ain(\+ current_ooQ2(fooQ2))).
+:- (mpred_ain(\+ current_ooQ1(fooQ1))).
 
-:- mpred_test(current_ooQ2(booQ2)).
+:- mpred_test(current_ooQ1(whenMissingQ1)).
 
-:- (mpred_withdraw( default_ooQ2(booQ2) )).
+:- (mpred_withdraw( default_ooQ1(whenMissingQ1) )).
 
-:- listing([current_ooQ2,default_ooQ2]).
+:- listing([current_ooQ1,default_ooQ1]).
 
-:- mpred_test( \+current_ooQ2(booQ2)).
+:- mpred_test( \+current_ooQ1(whenMissingQ1)).
 
-:- mpred_ain(~ current_ooQ2(fooQ2)).
+:- mpred_ain(~ current_ooQ1(fooQ1)).
 
 % :- pp_DB.
 
-:- mpred_test(~current_ooQ2(fooQ2)).
+:- mpred_test(~current_ooQ1(fooQ1)).
 
-:- mpred_ain(default_ooQ2(booQ2)).
+:- mpred_ain(default_ooQ1(whenMissingQ1)).
  
-:- mpred_test(current_ooQ2(booQ2)).
+:- mpred_test(current_ooQ1(whenMissingQ1)).
 
 
 :- get_user_abox(M),dynamic((M:current_ooTt/1,M:default_ooTt/1,M:if_mooTt/2)).
@@ -127,4 +128,5 @@
 % local_testing
 
 
+:- make,check,ensure_loaded(library(logicmoo_base)),make,check.
 

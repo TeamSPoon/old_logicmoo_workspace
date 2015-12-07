@@ -63,7 +63,7 @@ was:was(X,Y) :-
 	hotrace(was_c_c(X,Y,_)).
 
 
-% was:attr_portray_hook(varwas(L,U),_Var) :- length(L,LL),length(U,UU),write(wazzzs([LL-UU])).
+% was:attr_portray_hook(varwas(L,U),_Var) :- length(L,LL),length(U,UU ),write(wazzzs([LL-UU])).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % types of attributes?

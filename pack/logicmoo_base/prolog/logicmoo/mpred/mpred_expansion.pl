@@ -25,7 +25,7 @@
 % SOURCETYPE
 %                  source_file('/dir/foof.pl')
 %                  source_module(foom)
-%                  source_user(u)
+%                  source_user(ax)
 %                  source_filetype(pl)
 %                  source_caller(user)   % module it's being loaded for
 %                  (missing)*

@@ -1,5 +1,11 @@
 #!/usr/bin/env swipl
 
+sdf
+sdf
+sd
+fsd
+fsdfsdfsdfsdf
+      wefwr
 :- if( \+ exists_source(library(logicmoo_base))).
 :- dynamic(user:file_search_path/2).
 :- multifile(user:file_search_path/2).

@@ -40,16 +40,6 @@
 % HOOKS
 
 :- forall(member(M:F/A,[
-bt/2, %basePFC
-hs/1, %basePFC
-hs/2, %basePFC
-nt/3, %basePFC
-pk/3, %basePFC
-pt/2, %basePFC
-que/1, %basePFC
-pm/1, %basePFC
-spft/3, %basePFC
-tms/1, %basePFC
 el_assertions:el_holds/10, %el_assertions
 el_assertions:el_holds/11, %el_assertions
 el_assertions:el_holds/12, %el_assertions
@@ -82,6 +72,8 @@ lmconf:mpred_provide_storage_clauses/3,
 lmconf:mpred_provide_storage_op/2, 
 lmconf:mpred_provide_write_attributes/2, 
 lmconf:mpred_skipped_module/1, 
+lmconf:abox_for/2,
+lmcache:has_pfc_database_preds/1,
 lmconf:mud_test/2,
 lmconf:never_reload_file/1, 
 lmconf:pfcManageHybrids/0, 
@@ -89,7 +81,21 @@ lmconf:regression_test/0,
 lmconf:sanity_test/0,
 lmconf:type_action_info/3,
 mpred_online:semweb_startup/0,
+
+/*
 baseKB:argIsa/3,
+bt/2, %basePFC
+hs/1, %basePFC
+hs/1, %basePFC
+nt/3, %basePFC
+pk/3, %basePFC
+pt/2, %basePFC
+que/1, %basePFC
+pm/1, %basePFC
+spft/3, %basePFC
+tms/1, %basePFC
+*/
+
 user:portray/1,
 user:prolog_load_file/2, 
 %user:prolog_clause_name/2,

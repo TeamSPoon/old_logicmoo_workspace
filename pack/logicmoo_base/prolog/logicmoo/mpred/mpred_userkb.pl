@@ -186,11 +186,12 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
       baseKB:resolveConflict0((*)),
       baseKB:resolverConflict_robot((*)))).
 
-
 :- '$set_source_module'(_,baseKB).
+:- thread_local(t_l:user_abox/1).
+t_l:user_abox(baseKB).
 
+:- show_call(source_context_module(_CM)).
 
-:- show_call(why,source_context_module(_CM)).
 :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),baseKB:dynamic(baseKB:E)).
 :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),decl_shared(E)).
 
@@ -200,6 +201,7 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 
 
 :- import_module_to_user(logicmoo_user).
+
 :- initialization(import_module_to_user(logicmoo_user)).
 
 
@@ -265,7 +267,7 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 %
 % ~.
 %
-~(tCol('$VAR')).
+~ tCol('$VAR').
 
 % baseKB:import(I):-system:import(baseKB:I).
 
@@ -463,11 +465,20 @@ is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=
 
   
 
-%  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),u)),UN).
-%  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),u)),UN).
+%  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),ax)),UN).
+%  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),ax)),UN).
 
 
-:- source_location(S,_),forall(source_file(M:H,S),(functor(H,F,A),module_transparent(M:F/A))).
+:- source_location(S,_),prolog_load_context(module,M),
+ forall(source_file(M:H,S),ignore((functor(H,F,A),
+   \+ mpred_database_term(F/A,_),
+   F\=='$mode',
+   F\=='$pldoc',
+   ignore(((\+ atom_concat('$',_,F),\+ mpred_database_term(F/A,_),nop(export(F/A))))),
+   \+ predicate_property(M:H,transparent),M:module_transparent(M:F/A) 
+   % ,ignore(((\+ atom_concat('__aux',_,F),format('~N:- module_transparent(~q/~q).~n',[F,A]))))
+   ))).
+
 :- add_import_module(baseKB,basePFC,end).
 :- initialization(add_import_module(baseKB,basePFC,end)).
 

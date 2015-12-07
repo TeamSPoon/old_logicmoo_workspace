@@ -839,7 +839,7 @@ get_1_var_name(Var,[_|NamedVars],Name):- get_1_var_name(Var,NamedVars,Name).
 % Wdmsgl.
 %
 wdmsgl(CNF):- compound(CNF),CNF=..[NAME,NF],!,must(wdmsgl(NAME:-NF)).
-wdmsgl(CNF):- mpred_trace_item('',CNF),!.
+wdmsgl(CNF):- pp_item('',CNF),!.
 wdmsgl(NF):- must((get_functor(NF,NAME),!,must(wdmsgl_2(NAME,NF)))).
 
 

@@ -52,7 +52,7 @@
           (mpred_do_and_undo_method/2),
 	  prologMultiValued/1,prologOrdered/1,prologNegByFailure/1,prologPTTP/1,prologKIF/1,pfcControlled/1,ttPredType/1,
            prologHybrid/1,predCanHaveSingletons/1,prologDynamic/1,prologBuiltin/1,prologMacroHead/1,prologListValued/1,prologSingleValued/1,
-          (hs/2),(pfcControlled/1),(prologDynamic/2),(prologSideEffects/1),(prologSingleValued/1),(singleValuedInArg/2),(prologSideEffects/1,prologMacroHead/1,pfcControlled/1,
+          (hs/1),(pfcControlled/1),(prologDynamic/2),(prologSideEffects/1),(prologSingleValued/1),(singleValuedInArg/2),(prologSideEffects/1,prologMacroHead/1,pfcControlled/1,
            resolveConflict/1,resolverConflict_robot/1)))),
  with_pfa(With,((mpred_isa/2,arity/2,mpred_module/2))),
  with_pfa(With,((baseKB:vtColor/1))).
@@ -163,7 +163,7 @@ conflict(C) ==> {must(with_mpred_trace_exec(resolveConflict(C),\+conflict(C)))}.
 
 % meta rules to schedule inferencing.
 % resolve conflicts asap
-% mpred_select(conflict(X),W) :- que('$ABOX',conflict(X),W).
+% mpred_select(conflict(X),W) :- que(conflict(X),W).
 
 
 {type_prefix(_Prefix,Type)}==>tCol(Type).
@@ -214,7 +214,7 @@ prologHybrid(genls/2).
 ((hybrid_support(F,A)/(F\='$VAR',atom(F),integer(A), \+ prologDynamic(F),\+ static_predicate(F/A))) ==>
   ({    
     functor(G,F,A),
-     (var(M)->t_l:user_abox(M);true),
+     (var(M)->must(get_user_abox(M));true),
      (var(M)->ignore(( current_predicate(F,M:G), \+ predicate_property(M:G,imported_from(_))));true),
      (var(M)->predicate_property(M:G,exported);true),
      % must(rebuild_pred_into(G,G,ain,[+dynamic,+multifile,+discontiguous])),         
@@ -935,7 +935,7 @@ genls('EvaluatableRelation',tAvoidForwardChain).
 
 
 tCol(completeIsaAsserted).
-%completelyAssertedCollection(Ext):- fwc, arg(_,vv(tCol,vtDirection,ttFormatType,tRegion,ftString,genlPreds),Ext).
+%completelyAssertedCollection(Ext):- fwc, arg(_,vv(tCol,vtDirection,ttFormatType,tRegion,ftString, genlPreds),Ext).
 completeExtentAsserted(formatted_resultIsa).
 completeExtentAsserted(quotedDefnIff).
 completelyAssertedCollection(completelyAssertedCollection).

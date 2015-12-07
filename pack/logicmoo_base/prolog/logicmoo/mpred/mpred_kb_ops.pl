@@ -205,7 +205,6 @@ is_side_effect_disabled/0,
 mreq/1,
 check_real_context_module/0,
 check_context_module/0,
-get_user_tbox/1,
 lookup_inverted_op/3,
 how_to_op/2,
 reduce_mpred_op/2,
@@ -269,7 +268,7 @@ mpred_facts_and_universe/1,
       physical_side_effect(0),
       oncely(0),
       naf(0),
-      % get_user_abox(-),
+      
       mpred_update_literal(*,*,0,*),
       mpred_retry(0),
       mpred_op(?, ?),
@@ -487,14 +486,6 @@ is_callable(C):-current_predicate(_,C),!.
 %:- foreach(arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,pfcControlled,ttPredType,
 %     prologHybrid,predCanHaveSingletons,prologDynamic,prologBuiltin,prologMacroHead,prologListValued,prologSingleValued),P),
 
-%% get_user_tbox(-ABOX) is semidet.
-%
-% TBox statements describe a system in terms of controlled vocabularies.
-%
-get_user_tbox(A):-var(A),!,must(get_user_abox(A)).
-get_user_tbox(A):-ignore(get_user_abox(A)).
-
-
 
 % TODO ISSUE https://github.com/TeamSPoon/PrologMUD/issues/7
 
@@ -657,7 +648,7 @@ record_se:- (t_l:use_side_effect_buffer ; t_l:verify_side_effect_buffer).
 % Add Side Effect.
 %
 add_side_effect(_,_):- ( \+  record_se ),!.
-add_side_effect(Op,Data0):-get_source_ref1(Why),serialize_attvar(Data0,Data),assert(t_l:side_effect_buffer(Op,Data,Why)).
+add_side_effect(Op,Data0):-get_source_ref1(Why),serialize_attvars(Data0,Data),assert(t_l:side_effect_buffer(Op,Data,Why)).
 
 
 %% attvar_op( +:PRED1, ?Data) is semidet.
@@ -688,8 +679,8 @@ lookq_s(H,R):- clauseq_s(H,true,R).
 
 asserta_s(H):- fix_mp(H,H0),asserta_i(H0).
 assertz_s(H):- fix_mp(H,H0),assertz_i(H0).
-clause_s(H,B,R):- fix_mp(H,H0),clause_i(H0,B,R).
-clauseq_s(H,B,R):- fix_mp(H,M:H0),clause_i(M:H0,B,R),clause(M:HC,BC,R),H0=@=HC,BC=@=B.
+clause_s(H,B,R):- fix_mp(H,H0),clause_u(H0,B,R).
+clauseq_s(H,B,R):- fix_mp(H,M:H0),clause_u(M:H0,B,R),clause(M:HC,BC,R),H0=@=HC,BC=@=B.
 
 call_s(G0):-
   strip_module(G0,_,G),functor(G,F,A),
@@ -995,7 +986,7 @@ pfc_provide_storage_op(change(retract,OneOrA),FactOrRule):- is_retract_first(One
   ignore((ground(FactOrRule),mpred_remove(FactOrRule))).
 % mpred_remove should be forcefull enough
 pfc_provide_storage_op(change(retract,all),FactOrRule):- loop_check_nr(mpred_remove(FactOrRule)),!.
-% pfc_provide_storage_op(is_asserted,FactOrRule):- is_ftNonvar(FactOrRule),!,loop_check_nr(clause_i(FactOrRule)).
+% pfc_provide_storage_op(is_asserted,FactOrRule):- is_ftNonvar(FactOrRule),!,loop_check_nr(clause_u(FactOrRule)).
 
 
 %% mpred_clause_is_asserted_hb_nonunify( +H, :TermB) is semidet.
@@ -1017,7 +1008,7 @@ mpred_clause_is_asserted_hb_nonunify(H,B):- mpred_clause_is_asserted(H,B).
 % PFC Clause If Is A Asserted.
 %
 mpred_clause_is_asserted(H,B):- is_ftVar(H),is_ftNonvar(B),!,fail.
-mpred_clause_is_asserted(H,B):- modulize_head(H,HH), (has_cl(HH) -> clause_i(HH,B) ; mpred_clause_is_asserted_hb_nonunify(H,B)).
+mpred_clause_is_asserted(H,B):- modulize_head(H,HH), (has_cl(HH) -> clause_u(HH,B) ; mpred_clause_is_asserted_hb_nonunify(H,B)).
 %mpred_clause_is_asserted(H,B,Ref):- clause_u(H,B,Ref).
 
 
@@ -1032,15 +1023,15 @@ mpred_clause_is_asserted(H,B):- modulize_head(H,HH), (has_cl(HH) -> clause_i(HH,
 mpred_provide_storage_clauses(pfc,H,B,Proof):-mpred_clause(H,B,Proof).
 
 %mpred_clause('nesc'(H),B,forward(Proof)):- is_ftNonvar(H),!, mpred_provide_storage_clauses(H,B,Proof).
-%mpred_clause(H,B,forward(R)):- R=(==>(B,H)),clause_i(R,true).
+%mpred_clause(H,B,forward(R)):- R=(==>(B,H)),clause_u(R,true).
 
 %% mpred_clause( +H, ?B, ?Why) is semidet.
 %
 % PFC Clause.
 %
-mpred_clause(H,B,Why):-has_cl(H),clause_i(H,CL,R),mpred_pbody(H,CL,R,B,Why).
-%mpred_clause(H,B,backward(R)):- R=(<-(H,B)),clause_i(R,true).
-%mpred_clause(H,B,equiv(R)):- R=(<==>(LS,RS)),clause_i(R,true),(((LS=H,RS=B));((LS=B,RS=H))).
+mpred_clause(H,B,Why):-has_cl(H),clause_u(H,CL,R),mpred_pbody(H,CL,R,B,Why).
+%mpred_clause(H,B,backward(R)):- R=(<-(H,B)),clause_u(R,true).
+%mpred_clause(H,B,equiv(R)):- R=(<==>(LS,RS)),clause_u(R,true),(((LS=H,RS=B));((LS=B,RS=H))).
 % mpred_clause(H,true, pfcTypeFull(R,Type)):-is_ftNonvar(H),!,pfcDatabaseTerm(F/A),make_functor(R,F,A),pfcRuleOutcomeHead(R,H),clause(R,true),pfcTypeFull(R,Type),Type\=rule.
 % mpred_clause(H,true, pfcTypeFull(R)):-pfcDatabaseTerm(F/A),make_functor(R,F,A),pfcTypeFull(R,Type),Type\=rule,clause(R,true),once(pfcRuleOutcomeHead(R,H)).
 
@@ -1059,7 +1050,7 @@ mpred_pbody(H,B,R,B,asserted(R,(H:-B))).
 %
 % Get Generation Of Proof.
 %
-get_why(_,CL,R,asserted(R,CL:-U)):- clause_i(spft(CL, U, ax),true),!.
+get_why(_,CL,R,asserted(R,CL:-U)):- clause_u(spft(CL, U, ax),true),!.
 get_why(H,CL,R,deduced(R,WHY)):- (mpred_get_support(H,WH)*->WHY=(H=WH);(mpred_get_support(CL,WH),WHY=(CL=WH))).
 
 
@@ -1289,9 +1280,9 @@ update_single_valued_arg(P,N):-
      attvar_op(assert_if_new,M:spft(P,U,ax)),
      (call_u(P)->true;(assertz_mu(P))),
      doall((
-          clause_i(Q,true,E),
+          clause_u(Q,true,E),
           UPDATE \== OLD,
-          erase_w_attvars(clause_i(Q,true,E),E),
+          erase_w_attvars(clause_u(Q,true,E),E),
           mpred_unfwc1(Q))))))).
 
 % ======================= 
@@ -1390,8 +1381,10 @@ pfcVersion(6.6).
 %
 % Correctify Support.
 %
-correctify_support((S,T),(S,T)):-!.
+correctify_support(U,(U,ax)):-var(U),!.
 correctify_support((U,U),(U,ax)):-!.
+correctify_support((S,T),(S,T)):-!.
+correctify_support((U,_UU),(U,ax)):-!.
 correctify_support([U],S):-correctify_support(U,S).
 correctify_support(U,(U,ax)).
 
@@ -1401,8 +1394,8 @@ correctify_support(U,(U,ax)).
 % Clause Asserted Local. 
 %
 clause_asserted_local(CL):- must(CL=spft(P,Fact,Trigger )),!,
-  clause_i(spft(P,Fact,Trigger),true,Ref),
-  clause_i(spft(UP,UFact,UTrigger),true,Ref),
+  clause_u(spft(P,Fact,Trigger),true,Ref),
+  clause_u(spft(UP,UFact,UTrigger),true,Ref),
   (((UP=@=P,UFact=@=Fact,UTrigger=@=Trigger))).
 
 
@@ -1411,8 +1404,8 @@ clause_asserted_local(CL):- must(CL=spft(P,Fact,Trigger )),!,
 %
 % If Is A Already Supported.
 %
-is_already_supported(P,(S,T),(S,T)):- clause_asserted_local(spft(P,S,T,_)),!.
-is_already_supported(P,_S,UU):- clause_asserted_local(spft(P,US,UT,_)),must(get_source_ref(UU)),UU=(US,UT).
+is_already_supported(P,(S,T),(S,T)):- clause_asserted_local(spft(P,S,T)),!.
+is_already_supported(P,_S,UU):- clause_asserted_local(spft(P,US,UT)),must(get_source_ref(UU)),UU=(US,UT).
 
 % TOO UNSAFE 
 % is_already_supported(P,_S):- copy_term_and_varnames(P,PC),sp ftY(PC,_,_),P=@=PC,!.
@@ -1641,7 +1634,7 @@ mpred_get_support_via_sentence(G,call_u(G)):- call_u(G).
 mpred_get_support_via_clause_db(\+ P,OUT):- mpred_get_support_via_clause_db(~(P),OUT).
 mpred_get_support_via_clause_db(\+ P,(naf(g),g)):- !, predicate_property(P,number_of_clauses(_)),\+ clause(P,_Body).
 mpred_get_support_via_clause_db(P,OUT):- predicate_property(P,number_of_clauses(N)),N>0,
-   clause_i(P,Body),(Body==true->Sup=(g);
+   clause_u(P,Body),(Body==true->Sup=(g);
     (support_ok_via_clause_body(P),mpred_get_support_precanonical_plus_more(Body,Sup))),
    OUT=(Sup,g).
 
@@ -1720,7 +1713,7 @@ neg_in_code(G):-  is_ftNonvar(G), prologSingleValued(G),must((if_missing_mask(G,
 %
 % Negated May Negation-by-faliure.
 %
-neg_may_naf(P):- mpred_non_neg_literal(P),get_functor(P,F),clause_i(prologNegByFailure(F),true),!.
+neg_may_naf(P):- mpred_non_neg_literal(P),get_functor(P,F),clause_u(prologNegByFailure(F),true),!.
 neg_may_naf(P):- is_ftCompound(P),predicate_property(P,static).
 
 
@@ -1736,7 +1729,7 @@ call_u(ABOX,G):- w_tl(t_l:user_abox(ABOX),call_u(ABOX:G)).
 %=
 %= mpred_call_only_facts(+Why,:F) is true iff F is a fact available for forward chaining.
 %= Note that this has the side effect [maybe] of catching unsupported facts and
-%= assigning them support from God. (g,g)
+%= assigning them support from God. (g,ax)
 %=
 
 %% call_u_req( +G) is semidet.
@@ -1804,7 +1797,7 @@ mpred_call_1(_,G,_):- is_side_effect_disabled,!,mpred_call_with_no_triggers(G).
 mpred_call_1(M,G,F):- sanity(\+  is_side_effect_disabled),
                (ground(G); \+ current_predicate(_,M:G) ; \+ (predicate_property(M:G,number_of_clauses(CC)),CC>1)), 
     
-                ignore((loop_check(call_with_bc_triggers(M:G)),maybeSupport(G,(g,g)),fail)),
+                ignore((loop_check(call_with_bc_triggers(M:G)),maybeSupport(G,(g,ax)),fail)),
                  \+ current_predicate(F,M:G),\+ current_predicate(_,_:G),
                  doall(show_call(predicate_property(_UM:G,_PP))),
                  debug(mpred),
@@ -1917,7 +1910,7 @@ ruleBackward0(F,Condition):- call_u((  '<-'(F,Condition),\+ (is_true(Condition);
 pfcBC_NoFacts_TRY(F) :- no_repeats(ruleBackward(F,Condition)),
   % neck(F),
   call_u(Condition),
-  maybeSupport(F,(g,g)).
+  maybeSupport(F,(g,ax)).
 
 
 
@@ -1926,7 +1919,7 @@ pfcBC_NoFacts_TRY(F) :- no_repeats(ruleBackward(F,Condition)),
 % Prolog Forward Chaining Backtackable Class Cache.
 %
 pfcBC_Cache(F) :- mpred_call_only_facts(pfcBC_Cache,F),
-   ignore((ground(F),( (\+is_asserted_1(F)), maybeSupport(F,(g,g))))).
+   ignore((ground(F),( (\+is_asserted_1(F)), maybeSupport(F,(g,ax))))).
 
 
 
@@ -2160,7 +2153,7 @@ clause_or_call(M:H,B):-is_ftVar(M),!,no_repeats(M:F/A,(f_to_mfa(H,M,F,A))),M:cla
 clause_or_call(isa(I,C),true):-!,call_u(isa_asserted(I,C)).
 clause_or_call(genls(I,C),true):-!,on_x_log_throw(call_u(genls(I,C))).
 clause_or_call(H,B):- clause(src_edit(_Before,H),B).
-clause_or_call(H,B):- predicate_property(H,number_of_clauses(C)),predicate_property(H,number_of_rules(R)),((R*2<C) -> (clause_i(H,B)*->!;fail) ; clause_i(H,B)).
+clause_or_call(H,B):- predicate_property(H,number_of_clauses(C)),predicate_property(H,number_of_rules(R)),((R*2<C) -> (clause_u(H,B)*->!;fail) ; clause_u(H,B)).
 clause_or_call(H,true):- call_u(should_call_for_facts(H)),no_repeats(on_x_log_throw(H)).
 
 
@@ -2327,7 +2320,7 @@ pred_u2(P):-clause_true(arity(F,A)),functor(P,F,A),has_db_clauses(P).
 %
 % Has Database Clauses.
 %
-has_db_clauses(PI):-modulize_head(PI,P),predicate_property(P,number_of_clauses(NC)),\+ predicate_property(P,number_of_rules(NC)), \+ \+ clause_i(P,true).
+has_db_clauses(PI):-modulize_head(PI,P),predicate_property(P,number_of_clauses(NC)),\+ predicate_property(P,number_of_rules(NC)), \+ \+ clause_u(P,true).
 
 
 
@@ -2766,7 +2759,6 @@ with_umt(G0):-
 :- module_transparent( (mreq)/1).
 :- module_transparent( (check_real_context_module)/0).
 :- module_transparent( (check_context_module)/0).
-:- module_transparent( (get_user_tbox)/1).
 :- module_transparent( (lookup_inverted_op)/3).
 :- module_transparent( (how_to_op)/2).
 :- module_transparent( (reduce_mpred_op)/2).
@@ -2778,13 +2770,15 @@ with_umt(G0):-
 :- module_transparent( (with_umt)/1).
 
 
-:- source_location(S,_),prolog_load_context(module,M),forall(source_file(M:H,S),ignore((functor(H,F,A),
+:- source_location(S,_),prolog_load_context(module,M),
+ forall(source_file(M:H,S),ignore((functor(H,F,A),
+   \+ mpred_database_term(F/A,_),
    F\=='$mode',
    F\=='$pldoc',
-   ignore(((\+ atom_concat('$',_,F),export(F/A)))),
-   \+ predicate_property(M:H,transparent),
-   ignore(((\+ atom_concat('__aux',_,F),format('~N:- module_  transparent(~q/~q).~n',[F,A])))),
-   M:module_transparent(M:F/A)))).
+   ignore(((\+ atom_concat('$',_,F),\+ mpred_database_term(F/A,_),export(F/A)))),
+   \+ predicate_property(M:H,transparent),M:module_transparent(M:F/A),
+   ignore(((\+ atom_concat('__aux',_,F),format('~N:- module_transparent(~q/~q).~n',[F,A]))))
+   ))).
 
 
 mpred_kb_ops_file.
