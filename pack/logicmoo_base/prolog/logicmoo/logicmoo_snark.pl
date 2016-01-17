@@ -113,7 +113,7 @@ mpred_save_restore_file(File):-
   
 
 
-:- mpred_load_restore_file(never). 
+load_snark:- mpred_load_restore_file(never). 
 
 
 

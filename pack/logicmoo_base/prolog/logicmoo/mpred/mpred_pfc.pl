@@ -13,7 +13,7 @@
 
 :- module(mpred_pfc, [
   ensure_abox/1,
-  call_u/1,fix_mp/2,
+  call_uuu/1,fix_mp/2,
   mpred_fwc/1,
   show_if_debug/1,
   maybe_mpred_break/1,
@@ -28,9 +28,10 @@
   assert_u_confirmed_if_missing/1,
   assert_u_confirmed_missing/1,
   mpred_notrace_exec/0,
+  listing_u/1,
   get_source_ref/1,
   get_source_ref1/1,
-  ensure_sbox/1, 
+  ensure_abox/1, 
   is_source_ref1/1,
   set_fc_mode/1,
   with_no_mpred_breaks/1,
@@ -49,7 +50,7 @@
   defaultmpred_select/1,fc_eval_action/2,
   foreachl_do/2,get_next_fact/1,
   justification/2,justifications/2,
-  mpred_BC/1,
+  call_u/1,
   mpred_BC_CACHE/1,
   mpred_CALL/1,mpred_CALL/2,mpred_CALL/3,mpred_CALL/3,
   mpred_halt/0,mpred_halt/1,mpred_halt/2,
@@ -84,7 +85,7 @@
 
   mpred_run/0,mpred_test/1,mpred_test_fok/1,
 
-  call_u/1,with_umt/1,asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,clause_u/2,clause_u/3,
+  call_uuu/1,with_umt/1,asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,clause_u/2,clause_u/3,
   lookup_u/1,
 
           get_fc_mode/3,mpred_rem_support_if_exists/2,get_tms_mode/2,with_umt/1,
@@ -112,13 +113,13 @@
       mpred_CALL(1,-,+),
       mpred_CALL(1,+),
       mpred_CALL(+),
-      mpred_BC(+),
+      call_u(+),
       mpred_BC_CACHE(+),
       foreachl_do(+,-),
       with_no_mpred_breaks(0),
       fc_eval_action(0,-),
       clause_u(+,+,-),
-      call_u(+),
+      call_uuu(+),
       with_umt(+),
       brake(0),
       with_no_mpred_trace_exec(0),
@@ -137,12 +138,13 @@
 :- module_transparent((ensure_abox)/1).
 
 :- dynamic(lmcache:has_pfc_database_preds/1).
-ensure_abox(M):- must(atom(M)), lmcache:has_pfc_database_preds(M),!.
-ensure_abox(M):- M == user,!.
-ensure_abox(M):- asserta(lmcache:has_pfc_database_preds(M)),
-   mpred_ops(M),
+ensure_abox(M):- sanity(atom(M)), lmcache:has_pfc_database_preds(M),!.
+ensure_abox(user):- !, ensure_abox(baseKB),!.
+ensure_abox(M):- 
+   asserta(lmcache:has_pfc_database_preds(M)),
+   asserta_if_new(lmconf:is_box_module(M,abox)),
+   mpred_ops(M),   
    ensure_imports(M),
-   ensure_tbox_module(M),
    maybe_add_import_module(M,mpred_pfc,end),
    forall(mpred_database_term(F/A,_),
      (functor(P,F,A),
@@ -151,18 +153,6 @@ ensure_abox(M):- asserta(lmcache:has_pfc_database_preds(M)),
        (M:dynamic(M:F/A),
         M:discontiguous(M:F/A),
         M:multifile(M:F/A))),!.
-
- 
-
-%% ensure_sbox( ?SM) is semidet.
-%
-% Ensure Support Module.
-%
-ensure_sbox(SM):-
-   multifile(((SM:bt/2),(SM:nt/3),(SM:pk/3),(SM:pt/2),(SM:spft/3),(SM:tms/1),(SM:hs/1),(SM:que/1),(SM:pm/1))),
-     dynamic(((SM:bt/2),(SM:nt/3),(SM:pk/3),(SM:pt/2),(SM:spft/3),(SM:tms/1),(SM:hs/1),(SM:que/1),(SM:pm/1))),
-    !. %  (is_system_box(SM) -> true ; maybe_add_import_module(SM,basePFC,end)).
-
 
 
 % =================================================
@@ -232,7 +222,7 @@ body_true(avar(_,AVS)):-nonvar(AVS),attr_bind(AVS).
 
 %:- if(\+ current_prolog_flag(umt_local,false)).
 
-listing_u(P):-call_u(listing(P)).
+listing_u(P):-call_uuu(listing(P)).
 
 assert_u(MH):- must(cnotrace(fix_mp(MH,M:H))),attvar_op(assert_i,M:H),expire_tabled_list(H).
 asserta_u(MH):- must(cnotrace(fix_mp(MH,M:H))),attvar_op(asserta_i,M:H).
@@ -281,7 +271,7 @@ retract_u(H):-!, clause_u(H,true,R),erase(R).
 retractall_u(H):- forall(clause_u(H,_,R),erase(R)).
 clause_u(H,B):- clause_u(H,B,_).
 clause_u(H,B,R):- clause(H,B,R).
-call_u(G):- G.
+call_uuu(G):- G.
 */
 %:- endif.
 
@@ -293,7 +283,7 @@ each_E(P,HV,S):- var(HV),!,apply(P,[HV|S]).
 each_E(P,M:HT,S) :- M=='$si$',!,apply(P,[M:HT|S]).
 each_E(P,M:HT,S) :- !, must_be(atom,M),M:each_E(P,HT,S).
 each_E(P,[H|T],S) :- !, apply(P,[H|S]), each_E(P,T,S).
-each_E(P,(H,T),S) :- !,call_u(each_E(P,H,S)), each_E(P,T,S).
+each_E(P,(H,T),S) :- !,call_uuu(each_E(P,H,S)), each_E(P,T,S).
 each_E(P,H,S) :- apply(P,[H|S]).
 
 
@@ -336,7 +326,7 @@ mpred_te((==>P),(:- mpred_ain(P))).
 %  predicates to examine the state of mpred_
 
 
-pp_qu:- call_u(listing(que/1)).
+pp_qu:- call_uuu(listing(que/1)).
 
 %   File   : mpred_core.pl
 %   Author : Tim Finin, finin@prc.unisys.com
@@ -742,7 +732,7 @@ mpred_ain_trigger_reprop(PT,Support):-
   %  (debugging(foo)->trace;true),
   mpred_assert_w_support(PT,Support),
   copy_term(PT,Tcopy),
-  call_u(Trigger),
+  call_uuu(Trigger),
   mpred_eval_lhs(Body,(Trigger,Tcopy)),
   fail.
 
@@ -753,7 +743,7 @@ mpred_ain_trigger_reprop(nt(Trigger,Test,Body),Support):-
   mpred_trace_msg('~N~n\tAdding negative~n\t\ttrigger: ~p~n\t\ttest: ~p~n\t\tbody: ~p~n\t Support: ~p~n',[Trigger,Test,Body,Support]),  
   mpred_assert_w_support(NT,Support),
   %stop_trace(mpred_assert_w_support(NT,Support)),
-  \+ call_u(Test),
+  \+ call_uuu(Test),
   mpred_eval_lhs(Body,((\+Trigger),NT)).
 
 mpred_ain_trigger_reprop(BT,Support):-
@@ -790,7 +780,7 @@ mpred_ain_actiontrace(Action,Support):-
 
 mpred_undo_action(actn(A)):-
   lookup_u(do_and_undo(A,M)),
-  call_u(M),
+  call_uuu(M),
   !.
 
 
@@ -880,7 +870,7 @@ mpred_remove(P,S):- each_E(mpred_remove1,P,[S]).
 
 mpred_remove1(P,S):-
   mpred_withdraw(P,S),
-  call_u(P)
+  call_uuu(P)
      -> mpred_blast(P) 
       ; true.
 
@@ -895,6 +885,7 @@ mpred_post1_rem1(P,S):-
    must(mpred_remove(P,S)),
    doall(mpred_undo(P)),
    ignore(retract_u(P)).
+
 
 
 % 
@@ -993,7 +984,7 @@ mpred_unfwc_check_triggers(F):-
   mpred_db_type(F,fact(_FT)),
   copy_term(F,Fcopy),
   lookup_u(nt(Fcopy,Condition,Action)),
-  \+ call_u(Condition),
+  \+ call_uuu(Condition),
   mpred_eval_lhs(Action,((\+F),nt(F,Condition,Action))),
   fail.
 mpred_unfwc_check_triggers(_).
@@ -1093,7 +1084,7 @@ mpred_do_fcnt(_ZFact,F):-
   lookup_u(SPFT),
   mpred_trace_msg('~N~n\tFound negative trigger: ~p~n\t\tcond: ~p~n\t\tbody: ~p~n\tSupport: ~p~n',
                  [F,Condition,Body,SPFT]),
-  call_u(Condition),
+  call_uuu(Condition),
   mpred_withdraw(X,(F2,NT)),
   must(F1=F2),
   fail.
@@ -1143,7 +1134,7 @@ mpred_eval_lhs(X,S):-
 % 
 mpred_eval_lhs_nondet((Test->Body),Support):- 
   !,
-  call_u(Test),
+  call_uuu(Test),
    mpred_eval_lhs_nondet(Body,Support).
 
 mpred_eval_lhs_nondet(rhs(X),Support):- !,
@@ -1159,7 +1150,7 @@ mpred_eval_lhs_nondet(X,_):- mpred_warn("Unrecognized item found in trigger body
 % 
 mpred_eval_lhs_det((Test->Body),Support):- 
   !, 
-  (call_u(Test) -> mpred_eval_lhs_det(Body,Support)),
+  (call_uuu(Test) -> mpred_eval_lhs_det(Body,Support)),
   !.
 
 mpred_eval_lhs_det(rhs(X),Support):-
@@ -1235,7 +1226,7 @@ mpred_eval_rhs1(Assertion,Support):- !,
 % 
 
 fc_eval_action(Action,Support):-
-  call_u(Action), 
+  call_uuu(Action), 
   (action_is_undoable(Action) 
      -> mpred_ain_actiontrace(Action,Support) 
       ; true).
@@ -1253,27 +1244,27 @@ trigger_trigger(_,_,_).
 %trigger_trigger1(presently(Trigger),Body):-
 %  !,
 %  copy_term(Trigger,TriggerCopy),
-%  mpred_BC(Trigger),
+%  call_u(Trigger),
 %  mpred_eval_lhs(Body,(presently(Trigger),pt(presently(TriggerCopy),Body))),
 %  fail.
 
 trigger_trigger1(Trigger,Body):-
   copy_term(Trigger,TriggerCopy),
-  mpred_BC(Trigger),
+  call_u(Trigger),
   mpred_eval_lhs(Body,(Trigger,pt(TriggerCopy,Body))),
   fail.
 */
 
 
-%%  mpred_BC(F) is det.
+%%  call_u(F) is det.
 % 
 %  is true iff F is a fact available for forward chaining 
 %  (or from the backchaining store)
 %  Note that this has the side effect of catching unsupported facts and
 %  assigning them support from God.
 % 
-mpred_BC(P):- mpred_CALL(mpred_BC_w_cache, P).
-mpred_BC_w_cache(P):- mpred_BC_CACHE(P),call_u(P).
+call_u(P):- mpred_CALL(mpred_BC_w_cache, P).
+mpred_BC_w_cache(P):- mpred_BC_CACHE(P),call_uuu(P).
 
 mpred_BC_CACHE(P0):-  ignore( \+ loop_check_early(mpred_BC_CACHE0(P0),true)).
 
@@ -1292,17 +1283,17 @@ mpred_BC_CACHE0(P):-
   mpred_eval_lhs(CTrigger,S),
   fail)).
 
-mpred_CALL(P):- call_u(P).
-call_u(M:P):- nonvar(P),current_predicate(_,M:P),!, with_umt(M:P).
-call_u(P):-  var(P),!,fail,trace,  mpred_fact(P).
-call_u(P):-  mpred_CALL(with_umt, P).
+mpred_CALL(P):- call_uuu(P).
+call_uuu(M:P):- nonvar(P),current_predicate(_,M:P),!, with_umt(M:P).
+call_uuu(P):-  var(P),!,fail,trace,  mpred_fact(P).
+call_uuu(P):-  mpred_CALL(with_umt, P).
 
-mpred_CALL(How,P):- mpred_CALL(How, Cut, P), (var(Cut)->true;(Cut=cut(CutCall)->(!,CutCall);call_u(Cut))).
+mpred_CALL(How,P):- mpred_CALL(How, Cut, P), (var(Cut)->true;(Cut=cut(CutCall)->(!,CutCall);call_uuu(Cut))).
 
 %  this is probably not advisable due to extreme inefficiency.
 mpred_CALL(How, Cut,Var):- var(Var),!,trace_or_throw(var_mpred_CALL_MI(How,Cut,Var)).
 mpred_CALL(How, Cut, mpred_CALL(G0)):- !,mpred_CALL(How, Cut, (G0)).
-mpred_CALL(How, Cut, call_u(G0)):- !,mpred_CALL(How, Cut, (G0)).
+mpred_CALL(How, Cut, call_uuu(G0)):- !,mpred_CALL(How, Cut, (G0)).
 mpred_CALL(_How, cut(true), !):- !.
 mpred_CALL(How, Cut, (P1,P2)):- !, mpred_CALL(How, Cut, P1), mpred_CALL(How, Cut, P2).
 mpred_CALL(How, Cut, (P1;P2)):- !, mpred_CALL(How, Cut, P1); mpred_CALL(How, Cut, P2).
@@ -1313,7 +1304,7 @@ mpred_CALL(How, Cut, (P1*->P2)):- !, mpred_CALL(How, Cut, P1)*-> mpred_CALL(How,
 mpred_CALL( How,   Cut, P) :- fail, predicate_property(P,number_of_clauses(_)),!,
      clause_u(P,Condition),
      mpred_CALL(How,Cut,Condition),
-       (var(Cut)->true;(Cut=cut(CutCall)->(!,CutCall);call_u(Cut))).
+       (var(Cut)->true;(Cut=cut(CutCall)->(!,CutCall);call_uuu(Cut))).
 
 % mpred_CALL(_How,_SCut, P):- must(current_predicate(_,M:P)),!, with_umt(M:P).
 mpred_CALL(How, _SCut, P):- call(How,P).
@@ -1587,7 +1578,7 @@ build_trigger(WS,[T|Triggers],Consequent,pt(T,X)):-
 build_neg_test(WS,T,Testin,Testout):-
   build_code_test(WS,Testin,Testmid),
   %% 
-  mpred_conjoin((call_u(T)),Testmid,Testout).
+  mpred_conjoin((call_uuu(T)),Testmid,Testout).
 
 
 
@@ -1596,15 +1587,15 @@ build_neg_test(WS,T,Testin,Testout):-
 % Check Never Assert.
 %
 check_never_assert(_Pred):-!.
-check_never_assert(Pred):- fail,cnotrace((( copy_term_and_varnames(Pred,Pred_2),call_u(never_assert_u(Pred_2,Why)), Pred=@=Pred_2,trace_or_throw(never_assert_u(Pred,Why))))),fail.
-check_never_assert(Pred):- fail,cnotrace(ignore(( copy_term_and_varnames(Pred,Pred_2),call_u(never_assert_u(Pred_2)),Pred=@=Pred_2,trace_or_throw(never_assert_u(Pred))))).
+check_never_assert(Pred):- fail,cnotrace((( copy_term_and_varnames(Pred,Pred_2),call_uuu(never_assert_u(Pred_2,Why)), Pred=@=Pred_2,trace_or_throw(never_assert_u(Pred,Why))))),fail.
+check_never_assert(Pred):- fail,cnotrace(ignore(( copy_term_and_varnames(Pred,Pred_2),call_uuu(never_assert_u(Pred_2)),Pred=@=Pred_2,trace_or_throw(never_assert_u(Pred))))).
 
 %% check_never_retract(+Pred) is semidet.
 %
 % Check Never Retract.
 %
 check_never_retract(_Pred):-!.
-check_never_retract(Pred):- hotrace(ignore(( copy_term_and_varnames(Pred,Pred_2),call_u(never_retract_u(Pred_2,Why)),Pred=@=Pred_2,trace_or_throw(never_retract_u(Pred,Why))))).
+check_never_retract(Pred):- hotrace(ignore(( copy_term_and_varnames(Pred,Pred_2),call_uuu(never_retract_u(Pred_2,Why)),Pred=@=Pred_2,trace_or_throw(never_retract_u(Pred,Why))))).
 
 
 :- export(mpred_mark_as_ml/4).
@@ -1665,7 +1656,7 @@ mpred_mark_fa_as(_Sup,_PosNeg,_P,_:mpred_isa,N,_):- must(N=2).
 mpred_mark_fa_as(Sup, PosNeg,_P,F,A,Type):- really_mpred_mark(Sup,Type,PosNeg,F,A),!.
 
 really_mpred_mark(Sup,Type,PosNeg,F,A):- \+ current_predicate(_:make_declared_now/1),!,dmsg(really_mpred_mark(Sup,Type,PosNeg,F,A)),!.
-really_mpred_mark(_  ,Type,PosNeg,F,A):- call_u(mpred_mark(Type,PosNeg,F,A)),!.
+really_mpred_mark(_  ,Type,PosNeg,F,A):- call_uuu(mpred_mark(Type,PosNeg,F,A)),!.
 really_mpred_mark(Sup,Type,PosNeg,F,A):- 
   MARK = mpred_mark(Type,PosNeg,F,A),
   check_never_assert(MARK),
@@ -1677,7 +1668,7 @@ really_mpred_mark(Sup,Type,PosNeg,F,A):-
 %
 % Functor-arity Converted To Pred.
 %
-fa_to_p(F,A,P):-integer(A),atom(F),functor(P,F,A),( P \= call_u(_) ),( P \= '$VAR'(_)).
+fa_to_p(F,A,P):-integer(A),atom(F),functor(P,F,A),( P \= call_uuu(_) ),( P \= '$VAR'(_)).
   
 
 %% build_code_test(+WS, ?Test, ?TestO) is semidet.
@@ -1686,7 +1677,7 @@ fa_to_p(F,A,P):-integer(A),atom(F),functor(P,F,A),( P \= call_u(_) ),( P \= '$VA
 %
 % this just strips away any currly brackets.
 %
-build_code_test(_Support,Test,TestO):-is_ftVar(Test),!,must(is_ftNonvar(Test)),TestO=call_u(Test).
+build_code_test(_Support,Test,TestO):-is_ftVar(Test),!,must(is_ftNonvar(Test)),TestO=call_uuu(Test).
 build_code_test(WS,{Test},TestO) :- !,build_code_test(WS,Test,TestO).
 build_code_test(WS,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],must_maplist(build_code_test(WS),TestL,TestLO),TestO=..[F|TestLO],!.
 build_code_test(WS,Test,Test):- must(mpred_mark_as(WS,p,Test,pfcCallCode)),!.
@@ -1703,8 +1694,8 @@ code_sentence_op(~(_)).
 code_sentence_op(-(_)).
 code_sentence_op(-(_)).
 code_sentence_op(\+(_)).
-code_sentence_op(call_u(_)).
-code_sentence_op(call_u(_,_)).
+code_sentence_op(call_uuu(_)).
+code_sentence_op(call_uuu(_,_)).
 code_sentence_op(Test):-predicate_property(Test,meta_predicate(PP)),predicate_property(Test,built_in),  \+ (( arg(_,PP,N), N\=0)).
 
 
@@ -1933,7 +1924,7 @@ mpred_retract_i_or_warn(X):-
 %:- mpred_set_default(baseKB:mpred_warnings(_), baseKB:mpred_warnings(true)).
 %  tms is one of {none,local,cycles} and controles the tms alg.
 %:- baseKB:mpred_set_default(tms(_), tms(cycles)).
-:-dynamic(baseKB:spft(_,_,_)).
+% :-dynamic(baseKB:spft(_,_,_)).
 
 %  mpred_fact(P) is true if fact P was asserted into the database via add.
 
@@ -1948,7 +1939,7 @@ mpred_fact(P):- mpred_fact(P,true).
 mpred_fact(P,C):- 
   mpred_get_support(P,_),
   mpred_db_type(P,fact(_FT)),
-  call_u(C).
+  call_uuu(C).
 
 %  mpred_facts(-ListofPmpred_facts) returns a list of facts added.
 
@@ -2129,12 +2120,12 @@ mpred_test(G):- with_mpred_trace_exec(must(mpred_test_fok(G))).
 why_was_true(P):- mpred_why(P),!.
 why_was_true(P):- dmsg(justfied_true(P)),!.
 
-mpred_test_fok(\+ G):-!, ( \+ call_u(G) -> wdmsg(passed_mpred_test(\+ G)) ; (log_failure(failed_mpred_test(\+ G)),!,ignore(why_was_true(G)),!,fail)).
-mpred_test_fok(G):- (call_u(G) -> sanity(why_was_true(G)) ; (log_failure(failed_mpred_test(G))),!,fail).
+mpred_test_fok(\+ G):-!, ( \+ call_uuu(G) -> wdmsg(passed_mpred_test(\+ G)) ; (log_failure(failed_mpred_test(\+ G)),!,ignore(why_was_true(G)),!,fail)).
+mpred_test_fok(G):- (call_uuu(G) -> sanity(why_was_true(G)) ; (log_failure(failed_mpred_test(G))),!,fail).
 
 
-mpred_load_term(:- module(_,L)):-!, call_u(maplist(export,L)).
-mpred_load_term(:- TermO):- call_u(TermO).
+mpred_load_term(:- module(_,L)):-!, call_uuu(maplist(export,L)).
+mpred_load_term(:- TermO):- call_uuu(TermO).
 mpred_load_term(TermO):-mpred_ain_object(TermO).
 
 mpred_load(PLNAME):- % unload_file(PLNAME),
@@ -2662,8 +2653,8 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((get_source_ref)/1).
 :- module_transparent((setup_mpred_ops)/0).
 :- module_transparent((mpred_load_term)/1).
+:- module_transparent((call_uuu)/1).
 :- module_transparent((call_u)/1).
-:- module_transparent((mpred_BC)/1).
 :- module_transparent((mpred_BC_w_cache)/1).
 :- module_transparent((justifications)/2).
 :- module_transparent((ain_fast)/2).
@@ -2875,6 +2866,12 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((get_mpred_current_db)/1).
 :- module_transparent((body_true)/1).
 :- module_transparent((is_source_ref1)/1).
+:- module_transparent(log_failure/1).
+:- module_transparent(mpred_undo1/1).
+:- module_transparent(mpred_post1_rem1/2).
+:- module_transparent(mpred_post1_rem/2).
+:- module_transparent(assert_u_confirmed_if_missing/1).
+:- module_transparent(clause_asserted_u/1).
 
 
 
@@ -2890,7 +2887,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 
 
 :- forall(mpred_database_term(F/A,_),abolish(mpred_pfc:F/A)).
-:- ensure_sbox(baseKB).
+:- ensure_abox(baseKB).
 
 %% mpred_pfc_file is det.
 %

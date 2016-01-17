@@ -267,7 +267,7 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 %
 % ~.
 %
-~ tCol('$VAR').
+'~'(tCol('$VAR')).
 
 % baseKB:import(I):-system:import(baseKB:I).
 

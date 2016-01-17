@@ -37,10 +37,10 @@
 %
 % Managed Predicate process input  Secondary Helper.
 %
-mpred_process_input_1(':-'(TT)):-!,must(TT),!.
-mpred_process_input_1('?-'(TT)):-!,doall(must(TT)),!.
+mpred_process_input_1('?-'(TT)):-!,doall(printAll(TT)),!.
 mpred_process_input_1('$si$':'$was_imported_kb_content$'(_,_)):-!.
-mpred_process_input_1(T):-try_save_vars(T),ain(T),!.
+mpred_process_input_1(':-'(TT)):-!,with_umt(TT).
+mpred_process_input_1(T):-try_save_vars(T),trace,with_umt(ain(T)),!.
 
 
 
@@ -48,8 +48,7 @@ mpred_process_input_1(T):-try_save_vars(T),ain(T),!.
 %
 % Managed Predicate Process Input.
 %
-mpred_process_input(':-'(T),Vs):- put_variable_names( Vs),must(T),!.
-mpred_process_input(T,Vs):- expand_term(T,TT),put_variable_names( Vs),mpred_process_input_1(TT),!.
+mpred_process_input(T,Vs):- must(expand_term(T,TT))->put_variable_names( Vs)->mpred_process_input_1(TT),!.
 
 
 
@@ -88,8 +87,11 @@ process_this_script0(S):- peek_code(S,W),member(W,`\n`),get_code(S,P),put(P),!,p
 process_this_script0(S):- peek_code(S,W),member(W,` \t\r`),get_code(S,_),!,process_this_script0(S).
 process_this_script0(S):- peek_string(S,2,W),W="%=",!,read_line_to_string(S,String),format('~N~s~n',[String]).
 process_this_script0(S):- peek_string(S,1,W),W="%",!,read_line_to_string(S,_String).
-process_this_script0(S):- read_term(S,T,[variable_names(Vs)]),put_variable_names( Vs),format('~N~n',[]),portray_one_line(T),format('~N~n',[]),!,
-  must(mpred_process_input(T,Vs)).
+process_this_script0(S):- 
+ with_umt((
+  read_term(S,T,[variable_names(Vs)]),put_variable_names( Vs),
+  format('~N~n',[]),portray_one_line(T),format('~N~n',[]),!,
+  must(mpred_process_input(T,Vs)))).
 
 
 

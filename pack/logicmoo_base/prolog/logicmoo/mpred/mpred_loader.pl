@@ -12,25 +12,25 @@
           [ add_from_file/1,
 
           is_box_module/2,best_module/3,is_default_shared/1,
-          set_guessed_abox/2,guess_user_abox/2,set_current_file_abox/1,
+          set_guessed_abox/2,guess_user_abox/2,set_file_abox/1,
           get_user_abox/1,set_user_abox/1,get_user_tbox/1,get_user_sbox/1,
           mpred_ops/0,mpred_ops/1,set_user_tbox/2,
           set_abox_for/2, 
 
+          is_undefaulted/1,
             user_m_check/1,
             add_term/2,
             assert_kif/1,
             import_module_to_user/1,
             assert_kif_dolce/1,
             assert_until_eof/1,
-            decl_user_abox/1,
             set_current_module/1,
             make_file_command/3,
             set_mpred_module/1,
             import_shared_pred/3,
             import_to_user0/3,
             import_to_user_mfa0/4,
-            set_user_abox_loader_based/1,
+            set_file_abox/1,
             predicate_is_undefined_fa/2,
             
             
@@ -79,7 +79,6 @@
             end_module_type/1,
             end_module_type/2,
             ensure_loaded_no_mpreds/1,
-            ensure_tbox_module/1,
             ensure_mpred_file_consulted/2,
             ensure_mpred_file_loaded/1,
             ensure_mpred_file_loaded/2,
@@ -245,12 +244,12 @@
 % :- (module_transparent add_from_file/1, add_term/2, assert_kif/1, assert_kif_dolce/1, assert_until_eof/1, begin_pfc/0, call_file_command/4, 
 % call_with_module/2, call_with_source_module/2, can_be_dynamic/1, cl_assert/2, clear_predicates/1, collect_expansions/3, compile_clause/1,
 %  mpred_term_expansion_by_storage_type/3, convert_side_effect/2, convert_side_effect/3, convert_side_effect_0a/2, convert_side_effect_0b/2, convert_side_effect_0c/2, 
-% convert_side_effect_buggy/2, current_context_module/1, current_op_alias/2, cwc/0, decache_file_type/1, decl_user_abox/1, declare_load_dbase/1, 
+% convert_side_effect_buggy/2, current_context_module/1, current_op_alias/2, cwc/0, decache_file_type/1, ensure_abox/1, declare_load_dbase/1, 
 % disable_mpred_expansion/0, disable_mpreds_in_current_file/0, do_end_of_file_actions/4, do_end_of_file_actions_real/0, doall_and_fail/1, dyn_begin/0, dyn_end/0, enable_mpred_expansion/0, end_module_type/1, end_module_type/2, ensure_loaded_no_mpreds/1, ensure_mpred_file_consulted/2, ensure_mpred_file_loaded/1, ensure_mpred_file_loaded/2, ensure_prolog_file_consulted/2, etrace/0, expand_in_mpred_kb_module/2, expanded_already_functor/1, file_begin/1, file_end/1, finish_processing_world/0, force_reload_mpred_file/1, force_reload_mpred_file/2, from_kif_string/2, get_file_type/2, get_lang/1, get_last_time_file/3, get_op_alias/2, gload/0, guess_file_type_loader/2, hdr_debug/2, in_include_file/0, in_mpred_kb_module/0, include_mpred_files/1, inside_file/1, is_code_body/1, is_compiling/0, is_compiling_sourcecode/0, is_kif_string/1, is_mpred_file/1, is_mpred_file0/1, lang_op_alias/3, load_file_dir/2, load_file_some_type/2, expand_term_to_load_calls/2, load_file_term_to_command_1/3, load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, expand_term_to_load_calls/2, expand_term_to_load_calls/4, load_init_world/2, load_language_file/1, load_mpred_files/0, load_mpred_on_file_end/2, loader_side_effect_capture_only/2, loader_side_effect_verify_only/2, expand_term_to_command/2, loading_source_file/1, make_db_listing/0, make_dynamic/1, module_typed_term_expand/2, module_typed_term_expand/5, mpred_begin/0, mpred_directive_expansion/2, mpred_expand_inside_file_anyways/0, mpred_expand_inside_file_anyways/1, mpred_expander/4, mpred_expander_now/2, mpred_expander_now_one/4, mpred_implode_varnames/1, mpred_loader_file/0, mpred_may_expand/0, mpred_may_expand_module/1, mpred_maybe_skip/1, mpred_process_input/2, mpred_process_input_1/1, lmconf:mpred_skipped_module/1, mpred_term_expansion/2, mpred_use_module/1, must_compile_special_clause/1, expand_term_to_load_calls/2, must_locate_file/2, must_expand_term_to_command/2, myDebugOnError/1, onEndOfFile/1, op_alias/2, op_lang/1, pl_to_mpred_syntax/2, pl_to_mpred_syntax0/2, pl_to_mpred_syntax_h/2, pop_predicates/2, process_this_script/0, process_this_script/1, process_this_script0/1, prolog_load_file_loop_checked/2, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc/2, prolog_load_file_nlc_0/2, push_predicates/2, read_one_term/2, read_one_term/3, register_module_type/1, register_module_type/2, rsavedb/0, savedb/0, scan_updates/0, show_bool/1, show_interesting_cl/2, show_load_context/0, simplify_why/2, simplify_why_r/4, stream_pos/1, term_expand_local_each/5, transform_opers/3, transform_opers_0/2, transform_opers_1/2, use_file_type_loader/2, use_was_isa/3, was_exported_content/3, with_mpred_expansions/1, with_no_mpred_expansions/1, with_source_module/2, xfile_module_term_expansion_pass_3/7,  (~)/1, baseKB:cl_assert/2, baseKB:cwc/0, lmconf:mpred_provide_clauses/3, mpred_loader:always_expand_on_thread/1, mpred_loader:t_l:current_lang/1, mpred_loader:current_op_alias/2, mpred_loader:get_user_abox/1, mpred_loader:disable_mpred_term_expansions_globally/0, lmconf:loaded_file_world_time/3, mpred_loader:mpred_directive_value/3, mpred_loader:lmconf:mpred_skipped_module/1, 
 %   mpred_loader:never_reload_file/1, mpred_loader:prolog_load_file_loop_checked/2, mpred_loader:registered_module_type/2).
 :- module_transparent 
             is_box_module/2,best_module/3,is_default_shared/1,
-            set_guessed_abox/2,guess_user_abox/2,set_current_file_abox/1,
+            set_guessed_abox/2,guess_user_abox/2,set_file_abox/1,
             get_user_abox/1,set_user_abox/1,get_user_tbox/1,get_user_sbox/1,
             mpred_ops/0,mpred_ops/1,set_user_tbox/2,
             mpred_ops.
@@ -444,7 +443,8 @@ make_declared_now(M:P):-functor(P,F,A),!,make_declared_now(M:F/A).
 % Make Reachable.
 %
 make_reachable(_,Test):- \+ \+ ((Test= (_:F/_), is_ftVar(F))),!.
-make_reachable(CM,M:F/A):-  must(atom(CM)),must(atom(M)), make_declared(M:F/A,TT), !,import_predicate(CM,TT:F/A).
+make_reachable(CM,M:F/A):-  atom(CM),ignore(CM=M),must(atom(CM)),must(atom(M)), 
+   make_declared(M:F/A,TT), !,import_predicate(CM,TT:F/A).
 
 
 
@@ -1018,7 +1018,8 @@ must_compile_special_clause(CL):- \+ t_l:disable_px,
 %
 % Managed Predicate Use Module.
 %
-mpred_use_module(M):- must(atom(M)),retractall(lmconf:mpred_skipped_module(M)),show_call(why,asserta_if_new(t_l:mpred_module_expansion(M))).
+mpred_use_module(M):- \+ atom(M),!.
+mpred_use_module(M):- atom(M),must(atom(M)),retractall(lmconf:mpred_skipped_module(M)),show_call(why,asserta_if_new(t_l:mpred_module_expansion(M))).
 
 % ================================================================================
 % DETECT PREDS THAT NEED SPECIAL STORAGE 
@@ -1337,21 +1338,12 @@ user_m_check(_Out).
 
 
 
-%% set_user_abox_loader_based( ?M) is semidet.
-%
-% Set User ABox.
-%
-set_user_abox_loader_based(M):- user_m_check(M), (t_l:user_abox(Prev)->true;Prev=M),
-   decl_user_abox(M),assert_until_eof(t_l:user_abox(M)),onEndOfFile(reset_user_abox(Prev)),!.
-
-
-
 
 %% reset_user_abox( ?M) is semidet.
 %
 % Reset User ABox.
 %
-reset_user_abox(M):- ignore(show_failure(M\=user)),retractall(t_l:user_abox(Prev)),decl_user_abox(M),!,asserta(t_l:user_abox(M)).
+reset_user_abox(M):- ignore(show_failure(M\=user)),retractall(t_l:user_abox(Prev)),ensure_abox(M),!,asserta(t_l:user_abox(M)).
 
 
 
@@ -1359,52 +1351,9 @@ reset_user_abox(M):- ignore(show_failure(M\=user)),retractall(t_l:user_abox(Prev
 %
 % Set User Tbox.
 %
-/*set_user_tbox(TBoxM):- get_user_abox(M),ensure_sbox(TBoxM),set_user_tbox(M,TBoxM).*/
+/*set_user_tbox(TBoxM):- get_user_abox(M),ensure_abox(TBoxM),set_user_tbox(M,TBoxM).*/
 set_user_tbox(M,TBoxM):- 
    ( is_system_box(M) -> true ; maybe_add_import_module(M,TBoxM,end)).
-
-
-
-%% decl_user_abox( ?ABox) is semidet.
-%
-% Declare User ABox.
-%
-decl_user_abox(ABox):-     sanity(atom(ABox)),
-                        ensure_sbox(ABox),
-                        asserta_if_new(lmconf:is_box_module(ABox,abox)),
-                        to_tbox(ABox,TBox),
-                        asserta_if_new(lmconf:is_box_module(TBox,tbox)),
-                        ensure_tbox_module(TBox),
-                        to_sbox(ABox,SBox),
-                        must(ABox=SBox),
-                        asserta_if_new(lmconf:is_box_module(SBox,sbox)),!.
-                        
-
-%% ensure_tbox_module( ?M) is semidet.
-%
-% Ensure Tbox Module.
-%
-ensure_tbox_module(M):- sanity(atom(M)),M== logicmoo_user,!.
-ensure_tbox_module(baseKB) :- !.
-ensure_tbox_module(user)   :- !.
-ensure_tbox_module(M):-  (M==baseKB->trace_or_throw(bad_ensure_tbox_module(M));true),
-  M:((
-            multifile(M:('<-')/2),
-            multifile(M:('::::')/2),
-            multifile(M:('<==>'/2)),
-            multifile(M:(('==>')/2)),
-            multifile(M:('==>')/1),
-            multifile(M:('~')/1),
-            multifile(M:('nesc')/1),
-            dynamic(M:('<-')/2),
-            dynamic(M:('::::')/2),
-            dynamic(M:('<==>'/2)),                   
-            dynamic(M:(('==>')/2)),
-            dynamic(M:('==>')/1),
-            dynamic(M:('~')/1),
-            dynamic(M:('nesc')/1))),!.
-
-
 
 % ========================================
 % begin/end_transform_mpreds
@@ -1460,7 +1409,7 @@ dyn_begin:-file_begin(dyn).
 %
 dyn_end:-file_end(dyn).
 
-
+        
 
 
 %% enable_mpred_expansion is semidet.
@@ -1659,7 +1608,7 @@ is_undefaulted(mpred_userkb).
 %
 % Best Module.
 %
-best_module0(List,M,ABox):-member(M,List),lmconf:abox_for(ABox,M).
+best_module0(List,M,ABox):-member(M,List),get_abox_for(ABox,M).
 % best_module0(List,ABox,ABox):-member(M,List),lmcache:has_pfc_database_preds(ABox).
 
 best_module(List,M,ABox):-best_module0(List,M,ABox), \+ is_undefaulted(M), \+ is_system_box(ABox),!.
@@ -1684,54 +1633,68 @@ file_begin(W):-
    decache_file_type(Source),
    assert_until_eof(lmcache:mpred_directive_value(W,file,Source)),
    guess_user_abox(ABox,From),
-   set_current_file_abox(ABox),
-   set_abox_for(Source,ABox),
+   set_file_abox(ABox),   
    op_lang(W),
-   ensure_imports(ABox),
    enable_mpred_expansion)).
 
-set_current_file_abox(ABox):-
+
+
+%% set_file_abox( ?M) is semidet.
+%
+% Set User ABox.
+%
+set_file_abox(ABox):- 
+ must_det_l((
    ensure_abox(ABox),
-   '$module'(CM,CM),
-   '$set_source_module'(SM,SM),
-   SM:mpred_ops,
-   which_file(Source),
-   asserta_if_new(lmconf:abox_for(ABox,Source)),
+   user_m_check(ABox), 
+
+   '$module'(CM,CM),mpred_ops(CM),
+   '$set_source_module'(SM,SM),mpred_ops(SM),
+   which_file(Source),   
+   (t_l:user_abox(Prev)->true;Prev=ABox),
+   set_abox_for(Source,ABox),
+   assert_until_eof(t_l:user_abox(ABox)),
+   onEndOfFile(reset_user_abox(Prev)),
    onEndOfFile(module(CM)),
    onEndOfFile('$set_source_module'(_,SM)),
    onEndOfFile('$module'(_,CM)),
-   set_current_module(ABox),
-   !.
+   set_current_module(ABox))),
+   !. 
 
 
 make_module_name_local(Source,baseKB):-is_default_shared(Source).
 make_module_name_local(Source,Source):-lmcache:has_pfc_database_preds(Source).
 make_module_name_local(Source,FM):-make_module_name(Source,FM).
 
-% guess_user_abox(ABox):- t_l:user_abox(ABox),must(ensure_abox(ABox)).
+guess_user_abox(ABox,ABox):- t_l:user_abox(ABox),must(ensure_abox(ABox)),!.
 guess_user_abox(ABox,From):-      
   (prolog_load_context(module,Source)->true;prolog_load_context(source,Source)),
   make_module_name_local(Source,FM),
-  Source\==user -> (ABox = FM, which_file(File),set_abox_for(File,ABox),set_abox_for(Source,ABox),From=ABox,set_current_file_abox(ABox),set_user_abox(ABox));
+  Source\==user -> (ABox = FM, which_file(File),set_abox_for(File,ABox),set_abox_for(Source,ABox),From=ABox,set_file_abox(ABox),set_user_abox(ABox));
   (('$set_source_module'(SM,SM),
    '$module'(CM,CM),
    best_module([FM,SM,CM],From,ABox),
    nop(dmsg(best_module([FM,SM,CM],From,ABox))))).
 
 :- thread_local(t_l:user_abox/1).
-set_user_abox(user):-!,set_user_abox(baseKB).
+set_user_abox(User):-User==user,!,set_user_abox(baseKB).
 set_user_abox(ABox):-
+must_det_l((
  must(ensure_abox(ABox)),
- which_file(File),set_abox_for(File,ABox),
+ must((which_file(File),set_abox_for(File,ABox))),
  '$set_source_module'(SM,SM),set_abox_for(SM,ABox),
  '$module'(CM,CM),set_abox_for(CM,ABox),
  ((t_l:user_abox(Was),ABox\==Was)-> wdmsg(set_user_abox(Was=>ABox));true),
- retractall(t_l:user_abox(_M)),asserta(t_l:user_abox(ABox)).
+ retractall(t_l:user_abox(_M)),asserta(t_l:user_abox(ABox)))).
 
 :- thread_local(t_l:user_abox/1).
-set_guessed_abox(ABox,From):-  ((t_l:user_abox(Was),ABox\==Was)-> wdmsg(set_user_abox(Was=>ABox));true),
+set_guessed_abox(ABox,_From):- \+ atom(ABox),!.
+set_guessed_abox(ABox,From):-
+must_det_l((
+ sanity(atom(ABox)), 
+  ((t_l:user_abox(Was),ABox\==Was)-> wdmsg(set_user_abox(Was=>ABox));true),
  (which_file(File)->(\+ lmconf:abox_for(_,File)->set_abox_for(File,ABox);true);true),
- must(ensure_abox(ABox)), (\+ is_undefaulted(SM) -> set_abox_for(From,ABox) ; true),!.
+ must(ensure_abox(ABox)), (\+ is_undefaulted(SM) -> set_abox_for(From,ABox) ; true))).
  %'$set_source_module'(SM,SM),(is_undefaulted(SM)->true;(set_abox_for(SM,ABox),Is_Changed=1)),
  %'$module'(CM,CM),(is_undefaulted(CM)->true;(set_abox_for(CM,ABox),Is_Changed=1)),
  %!.
@@ -1743,21 +1706,17 @@ set_guessed_abox(ABox,From):-  ((t_l:user_abox(Was),ABox\==Was)-> wdmsg(set_user
 %
 % not just user modules
 
-
-
-get_user_abox(A):-'$set_source_module'(M,M),get_abox_for(A,M).
-/*
-get_user_abox(A):-'$set_source_module'(M,M),lmconf:abox_for(A,M).
-get_user_abox(A):- which_file(File),lmconf:abox_for(A,File).
-get_user_abox(A):-'$module'(M,M),lmconf:abox_for(A,M).
+get_user_abox(A):- t_l:user_abox(A),ensure_abox(A).
+get_user_abox(A):- which_file(File),get_abox_for(File,A).
+get_user_abox(A):-'$module'(M,M),get_abox_for(M,A).
+get_user_abox(A):-'$set_source_module'(M,M),get_abox_for(M,A).
 get_user_abox(A):- guess_user_abox(A,From),set_guessed_abox(A,From).
-get_user_abox(A):- t_l:user_abox(A),ensure_sbox(A).
-*/
+
 
 set_abox_for(SM,ABox):-asserta_new(lmconf:abox_for(ABox,SM)).
-
 get_abox_for(baseKB,_):-!.
 get_abox_for(SM,ABox):-lmconf:abox_for(ABox,SM).
+
 
 
 
@@ -1769,8 +1728,6 @@ set_current_module(user):- set_mpred_module(baseKB),!.
 set_current_module(ABox):- module(ABox),'$module'(_,ABox),'$set_source_module'(_,ABox).
 
 
-
-
 %% file_end( ?W) is semidet.
 %
 % File End.
@@ -1778,8 +1735,6 @@ set_current_module(ABox):- module(ABox),'$module'(_,ABox),'$set_source_module'(_
 file_end(W) :- correct_language_name(W,WN),W\=@=WN, file_end(WN).
 file_end(W):- must_det(( loading_source_file(ISource),decache_file_type(ISource),ignore(retract(lmcache:mpred_directive_value(W,file,ISource))))),  
   must_det(( loading_source_file(Source),decache_file_type(Source),ignore(retract(lmcache:mpred_directive_value(W,file,Source))))).
-
-
 
 
 %% inside_file( ?W) is semidet.
@@ -2103,7 +2058,7 @@ mpred_term_expansion(Fact,Output):- load_file_term_to_command_1b(_Dir,Fact,C),!,
       load_file_term_to_command_1b(pfc(bwc),(H:-Chain,B),(H<-(Chain,B))):-cwc, is_bc_body(Chain),make_dynamic(H).
 
 
-% mpred_term_expansion((H:-Chain,B),(H:-(B))):- is_code_body(Chain),!,must(atom(Chain)),make_dynamic(H).
+% mpred_term_expansion((H:-Chain,B),(H:-(B))):- atom(Chain),is_code_body(Chain),!,must(atom(Chain)),make_dynamic(H).
 
 
 
@@ -2590,7 +2545,7 @@ force_reload_mpred_file(World,MFileIn):- strip_module(MFileIn,NewModule,_),
 %
 % Load Managed Predicate Whenever File End.
 %
-load_mpred_on_file_end(World,File):-
+load_mpred_on_file_end(World,File):- atom(File),
    must(atom(File)),
    asserta_new(lmconf:loaded_mpred_file(World,File)),
    dmsginfo(info(load_mpred_file_complete(File))),
@@ -2877,8 +2832,18 @@ pop_predicates(M:F/A,STATE):- functor(H,F,A),forall(member((H:-B),STATE),M:asser
 %
 mpred_loader_file.
 
-:- asserta_if_new((user:term_expansion(I,O):- mpred_expander(term,user,I,O))).
-:- asserta_if_new((system:goal_expansion(I,O):- hotrace(mpred_expander(goal,system,I,O)))).
+with_umt_l(G):- 
+  current_predicate(_,_:mpred_pfc_file),
+   get_user_abox(U),
+   nonvar(U),
+   '$set_source_module'(Was,U),
+   nonvar(Was),
+   call_cleanup(
+     catch(G,E,(wdmsg(E),throw(E))),
+      '$set_source_module'(_,Was)).
+
+:- asserta_if_new((user:term_expansion(I,O):- with_umt_l(mpred_expander(term,user,I,O)))).
+:- asserta_if_new((system:goal_expansion(I,O):- hotrace(with_umt_l(mpred_expander(goal,system,I,O))))).
 
 
 

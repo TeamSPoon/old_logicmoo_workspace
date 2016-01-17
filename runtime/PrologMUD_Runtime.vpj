@@ -10,9 +10,9 @@
 		DebugCallbackName="jdwp"
 		ObjectDir="classes"
 		AppType="application"
-		Version="6"
+		Version="8"
 		OutputFile=""
-		CompilerConfigName="">
+		CompilerConfigName="Latest Version">
 		<Menu>
 			<Target
 				Name="Compile"
@@ -107,14 +107,6 @@
 				<Exec CmdLine="javamakedoc javadoc -d docs %cp %{*.java}"/>
 			</Target>
 			<Target
-				Name="GUI Builder"
-				MenuCaption="&amp;Show GUI Builder"
-				Deletable="0">
-				<Exec
-					CmdLine="javagui_editor"
-					Type="Slick-C"/>
-			</Target>
-			<Target
 				Name="dash2"
 				MenuCaption="-">
 				<Exec/>
@@ -192,9 +184,9 @@
 		DebugCallbackName="jdwp"
 		ObjectDir="classes"
 		AppType="application"
-		Version="6"
+		Version="8"
 		OutputFile=""
-		CompilerConfigName="">
+		CompilerConfigName="Latest Version">
 		<Menu>
 			<Target
 				Name="Compile"
@@ -289,14 +281,6 @@
 				<Exec CmdLine="javamakedoc javadoc -d docs %cp %{*.java}"/>
 			</Target>
 			<Target
-				Name="GUI Builder"
-				MenuCaption="&amp;Show GUI Builder"
-				Deletable="0">
-				<Exec
-					CmdLine="javagui_editor"
-					Type="Slick-C"/>
-			</Target>
-			<Target
 				Name="dash2"
 				MenuCaption="-">
 				<Exec/>
@@ -382,6 +366,13 @@
 			Filters=""/>
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
+		<Folder Name="../../bind_const">
+			<F
+				N="../../bind_const/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes="*~;.git/"/>
+		</Folder>
 		<Folder Name="../pack">
 			<Folder Name="logicmoo_base">
 				<Folder Name="prolog">
@@ -392,6 +383,12 @@
 						Excludes=""/>
 				</Folder>
 			</Folder>
+		</Folder>
+		<Folder Name="../../swipl-devel">
+			<F
+				N="../../swipl-devel/*.*"
+				Recurse="1"
+				Excludes=".git/;*~;*.o;*~"/>
 		</Folder>
 		<F
 			N="*.*"

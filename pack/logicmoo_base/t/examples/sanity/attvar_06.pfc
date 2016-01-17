@@ -9,14 +9,15 @@
 
 :- use_module(library(logicmoo_base)).
 
-:- dynamic(sk_out/1).
-:- dynamic(sk_in/1).
-
 :- debug(_).
 :- nodebug(http(_)).
 :- debug(mpred).
 :- mpred_trace_exec.
 :- begin_pfc.
+
+:- dynamic(sk_out/1).
+:- dynamic(sk_in/1).
+
 
 % :- process_this_script.
 

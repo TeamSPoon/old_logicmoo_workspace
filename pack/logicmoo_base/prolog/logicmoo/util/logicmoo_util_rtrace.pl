@@ -160,9 +160,9 @@ hotrace:-notrace.
 %
 % Thread Leash.
 %
-thread_leash(-Some):-!, notrace(thread_self(main)->leash(-Some);thread_leash(-Some)).
-thread_leash(+Some):-!, notrace(thread_self(main)->leash(+Some);thread_leash(-Some)).
-thread_leash(Some):-!, notrace(thread_self(main)->leash(Some);thread_leash(Some)).
+thread_leash(-Some):-!, notrace(thread_self(main)->leash(-Some);thread_leash(-Some)),!.
+thread_leash(+Some):-!, notrace(thread_self(main)->leash(+Some);thread_leash(-Some)),!.
+thread_leash(Some):-!, notrace(thread_self(main)->leash(Some);thread_leash(Some)),!.
 
 :- export(hotrace0/1).
 :- meta_predicate hotrace0(0).
@@ -323,7 +323,7 @@ rtrace(Goal):- tracing,notrace, '$leash'(OldL, OldL),'$visible'(OldV, OldV),
    copy_term(CC,CC2),
    RTRACE = (notrace,visible(+all),thread_leash(-all),thread_leash(+exception),trace),
    RTRACE,!,
-   call_cleanup(((Goal)*->trace;(nortrace,!,fail)),notrace(CC)),(CC2;(notrace,RTRACE,notrace(fail))).
+   (call_cleanup(((Goal)*->trace;(nortrace,!,fail)),notrace(CC)),(CC2;(notrace,RTRACE,notrace(fail)))).
 
 rtrace(Goal):- '$leash'(OldL, OldL),'$visible'(OldV, OldV),
    CC = (notrace,'$leash'(_, OldL),'$visible'(_, OldV),nortrace),

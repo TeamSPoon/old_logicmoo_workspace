@@ -5,8 +5,6 @@
 % Dec 13, 2035
 % Douglas Miles
 
-:- module(sanity_attvar_02,[]).
-
 :- use_module(library(logicmoo_base)).
 
 :- debug(_).
@@ -36,7 +34,5 @@ sk_in(Ex)==>sk_out(Ex).
 
 
 :- must((sk_out(Ex),get_attr(Ex,sk,What),What='SKF-666')).
-
-
 
 

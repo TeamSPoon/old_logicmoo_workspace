@@ -139,8 +139,11 @@
 :- endif.
 
 
-%:- set_prolog_flag(generate_debug_info, true).
+:- if(exists_source(library(filesex))).
+%:- set_prolog_flag(generate_debug_info, true).=
 :- '@'( ensure_loaded(library(filesex)), 'user').
+
+:-endif.
 
 :- meta_predicate(with_filematch(0)).
 

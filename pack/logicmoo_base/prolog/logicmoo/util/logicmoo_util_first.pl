@@ -245,8 +245,7 @@ with_unlocked_pred(M:Pred,(
 % Managed Predicate  Trace none.
 %
 mpred_trace_none(W):- (forall(match_predicates(W,M,Pred,F,A),
-with_unlocked_pred(M:Pred,(
-('$hide'(M:F/A),'$set_predicate_attribute'(M:Pred, hide_childs, 1),noprofile(M:F/A),nospy(M:Pred)))))).
+  with_unlocked_pred(M:Pred,(('$hide'(M:F/A),'$set_predicate_attribute'(M:Pred, hide_childs, 1),noprofile(M:F/A),nop(nospy(M:Pred))))))).
 
 :- export(mpred_trace_nochilds/1).
 

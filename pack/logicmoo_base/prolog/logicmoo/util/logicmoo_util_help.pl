@@ -91,6 +91,7 @@
 :- dynamic(mpred_prolog_only_module/1).
 /*
 */
+:- if(exists_source(library(pldoc))).
 
   :- use_module(library(pldoc)).
   :- use_module(library(http/thread_httpd)).
@@ -124,6 +125,7 @@
 % start a unused server
 :- use_module(library(doc_http)).
 %:- use_module(library(doc_html)).
+:- endif.
 
 :- if(exists_source(library(pldoc))).
 :- use_module(library(pldoc), []).
@@ -132,8 +134,11 @@
 :- endif.
 :- use_module(library(prolog_xref)).
 
+:- if(exists_source(library(pldoc))).
+
 :- doc_collect(true).
 
+:-endif.
 
 
 %= 	 	 
@@ -508,7 +513,11 @@ export_module_preds:- current_prolog_flag(xref,true),!.
 export_module_preds:- source_context_module(M),source_file_property(S,module(M)),export_file_preds(S),forall(source_file_property(S,includes(F,_)),export_file_preds(F)).
 
 
+:- if(exists_source(library(pldoc/doc_pack))).
+
 :- use_module(library(pldoc/doc_pack)).
+
+:-endif.
 
 
 %= 	 	 

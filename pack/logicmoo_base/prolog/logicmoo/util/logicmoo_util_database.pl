@@ -81,7 +81,8 @@
         mpred_mop(+, 1, ?),
         mpred_op_prolog(?, :),
         mpred_op_prolog0(1,?),
-        my_module_sensitive_code(?).
+        my_module_sensitive_code(?),
+        dont_make_cyclic(0).
 
 :- module_transparent
         append_term/3,

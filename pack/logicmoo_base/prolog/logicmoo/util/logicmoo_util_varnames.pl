@@ -993,35 +993,31 @@ contains_singletons(Term):-contains_singletons(Term,N),N>0.
 %
 % Contains Singletons.
 %
-contains_singletons(Term,N):-  sanity(\+contain_numbervars(Term)),
-     \+ground(Term),
+contains_singletons(Term,N):-  
+  % sanity(\+contain_numbervars(Term)),
+     \+ ground(Term),
      copy_term_nat(Term,Nat),
      term_variables(Nat,Vs), 
-     numbervars(Nat,0,_,[attvar(bind),singletons(true)]),
+     numbervars(Nat,0,_,[attvar(bind),singletons(true)]),!,
      count_members_eq('$VAR'('_'),Vs,N).
 
 
-%= 	 	 
 
-%% count_members_eq( ?Find, :TermE, ?N) is semidet.
+%% count_members_eq(+Find, +TermE, -N) is det.
 %
 % Count Members Using (==/2) (or =@=/2) ).
 %
 count_members_eq(_,[],0):-!.
 count_members_eq(Find,[E|List],N):- 
-   ( (E == Find) -> N is NN+1 ; NN=N),
-    count_members_eq(Find,List,NN).
-
-% = :- meta_predicate(call_not_not(0)).
+  count_members_eq(Find,List,NN),!,  (E == Find -> N is NN+1 ; NN=N).
+   
 
 
-%= 	 	 
-
-%% call_not_not( :GoalG) is semidet.
+%% call_not_not(:Goal) is semidet.
 %
-% Call Not Not.
+% Call \+ \+ Goal
 %
-call_not_not(G):- \+ \+ G.
+call_not_not(Goal):- \+ \+ Goal.
 
 
 %= 	 	 

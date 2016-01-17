@@ -6,7 +6,7 @@
 
 :- begin_pfc.
 
-:- process_this_script.
+% :- process_this_script.
 
 %= save compiled clauses using forward chaining storage (by default)
 %= we are using forward chaining just so any logical errors, performance and program bugs manefest
@@ -46,7 +46,7 @@ male(P) <=> ~female(P).
 ==> clif(((parent(C,M) & female(M)) <=> mother(C,M))).
 
 
-% ((parent(C,M) & female(M)) <=> mother(C,M)).
+%((parent(C,M) & female(M)) <=> mother(C,M)).
 :- must_is_entailed(((parent(C,M) & female(M)) <=> mother(C,M))).
 
 

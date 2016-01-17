@@ -68,16 +68,5 @@
 				Refilter="1"
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
-		<Folder Name="/usr">
-			<Folder Name="lib">
-				<Folder Name="swi-prolog">
-					<F
-						N="/usr/lib/swi-prolog/*.*"
-						Recurse="1"
-						Refilter="0"
-						Excludes=""/>
-				</Folder>
-			</Folder>
-		</Folder>
 	</Files>
 </Project>
