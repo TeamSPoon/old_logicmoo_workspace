@@ -84,6 +84,8 @@ a(B)==>d(B).
 
 :- mpred_test(c).
 
-?- mpred_why(c).
+?- /*rtrace*/(mpred_why(c)).
+
+% Looking for answer like: (b(_),e(q))
 
 
