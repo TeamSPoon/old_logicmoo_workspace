@@ -141,10 +141,11 @@ prolog_load_file_loop_checked(ModuleSpec, Options) :- loop_check(show_success(pr
 % prolog load file loop checked  Primary Helper.
 %
 prolog_load_file_loop_checked_0(ModuleSpec, Options) :- current_predicate(_,_:exists_file_safe(_)),
-   catch(prolog_load_file_nlc(ModuleSpec, Options),E,(nop((trace,prolog_load_file_nlc(ModuleSpec, Options))),throw(E))).
+   catch(prolog_load_file_nlc_pre(ModuleSpec, Options),E,(nop((trace,prolog_load_file_nlc(ModuleSpec, Options))),throw(E))).
 
 
-
+prolog_load_file_nlc_pre(Module:Spec, Options) :- 
+  call_with_module(Module,prolog_load_file_nlc(Module:Spec, Options)).
 
 %% prolog_load_file_nlc( :TermModule, ?Options) is semidet.
 %
@@ -260,9 +261,10 @@ ensure_prolog_file_consulted(M:File,Options):-must(load_files(M:File,Options)),!
 % Ensure Managed Predicate File Consulted.
 %
 ensure_mpred_file_consulted(M:File,Options):- 
+ call_with_module(M,
   with_mpred_expansions(w_tl(t_l:pretend_loading_file(File),
               must((file_begin(pfc),
-                    load_files(M:File,Options))))),!.
+                    load_files(M:File,Options)))))),!.
 
 
 
@@ -271,7 +273,7 @@ ensure_mpred_file_consulted(M:File,Options):-
 %
 % Load File Some Type.
 %
-load_file_some_type(M:File,Options):-must(load_files(M:File,Options)),!.
+load_file_some_type(M:File,Options):-call_with_module(M,must(load_files(M:File,Options))),!.
 
 
 

@@ -1124,7 +1124,8 @@ cl_assert(_Code,P):- !, show_if_debug(ain(P)).
 
 
 get_original_term_source(Orig):- nb_current('$orig_term',Orig),!.
-get_original_term_source(Orig):- must((b_getval('$term',Orig),Orig\=[])),!. 
+get_original_term_source(Orig):- nb_current('$term',Orig),Orig\=[],!. 
+get_original_term_source(true).
 
 make_file_command(IN,(:- CALL),OUT):- nonvar(CALL),!, make_file_command(IN,CALL,OUT).
 
