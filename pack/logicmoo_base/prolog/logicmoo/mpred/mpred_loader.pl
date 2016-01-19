@@ -33,7 +33,8 @@
             set_file_abox/1,
             predicate_is_undefined_fa/2,
             
-            
+            get_user_abox/1,
+            get_user_abox0/1,
             
             import_to_user/1,
             
@@ -1708,7 +1709,8 @@ set_guessed_abox(ABox,From):-
 %
 % not just user modules
 
-get_user_abox(A):-get_user_abox0(A),!.
+get_user_abox(A):- get_user_abox0(A),!.
+
 get_user_abox0(A):- source_module(SM),t_l:user_abox(SM,A),ensure_abox(A).
 get_user_abox0(A):- which_file(File),get_abox_for(File,A).
 get_user_abox0(A):-'$module'(M,M),get_abox_for(M,A).

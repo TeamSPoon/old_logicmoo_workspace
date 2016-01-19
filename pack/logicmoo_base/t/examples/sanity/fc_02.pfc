@@ -87,5 +87,14 @@ a(B)==>d(B).
 ?- /*rtrace*/(mpred_why(c)).
 
 % Looking for answer like: (b(_),e(q))
+%       Supported By: e(q),pt(e(q),rhs([c]))
+%       Found positive trigger: a(q)
+%               body: rhs([d(q)])
+%
+%  =pred_eval_rhs1=
+%       Post1: d(q)
+%       Support: a(q),pt(a(q),rhs([d(q)]))
+
+
 
 

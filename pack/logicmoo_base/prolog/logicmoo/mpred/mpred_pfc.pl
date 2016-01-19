@@ -31,6 +31,7 @@
   listing_u/1,
   get_source_ref/1,
   get_source_ref1/1,
+  get_source_ref10/1,
   ensure_abox/1, 
   is_source_ref1/1,
   set_fc_mode/1,
@@ -105,6 +106,7 @@
       
       each_E(:,+,+),
       pfcl_do(+),
+      lookup_u(:),
       mpred_get_support(+,-),
       mpred_fact(?,0),
       mpred_test(+),
@@ -118,7 +120,8 @@
       foreachl_do(+,-),
       with_no_mpred_breaks(0),
       fc_eval_action(0,-),
-      clause_u(+,+,-),
+      clause_u(:,+,-),
+      clause_u(:,-),
       mpred_call_no_bc(+),
       with_umt(+),
       brake(0),
@@ -192,23 +195,26 @@ get_source_ref(O):- get_source_ref1(U),(U=(_,_)->O=U;O=(U,ax)),!.
 % Get Source Ref Secondary Helper.
 %
 :- module_transparent((get_source_ref1)/1).
+:- module_transparent((get_source_ref10)/1).
+get_source_ref1(M):- atom(M),must((get_source_ref10(N),atom(N))),!,M=N.
+get_source_ref1(M):- ground(M),!.
+get_source_ref1(M):- must(get_source_ref10(M)),!.
 % get_source_ref1(_):- fail,check_context_module,fail.
-get_source_ref1(M):-nonvar(M),!,get_source_ref1(N),!,M=N.
-get_source_ref1(M):- current_why(M), nonvar(M) , M =mfl(_,_,_),!.
-get_source_ref1(mfl(M,F,L)):- get_user_abox(M), source_location(F,L),!.
-get_source_ref1(M):- (get_user_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))),!.
-get_source_ref1(mfl(M,F,L)):- get_user_abox(M), current_source_file(F:L),!.
-get_source_ref1(mfl(M,F,_L)):- get_user_abox(M), current_source_file(F),!.
-get_source_ref1(mfl(M,_,_L)):- get_user_abox(M),!.
-get_source_ref1(M):- (get_user_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))),!.
-get_source_ref1(M):- trace, 
+get_source_ref10(M):- current_why(M), nonvar(M) , M =mfl(_,_,_).
+get_source_ref10(mfl(M,F,L)):- get_user_abox(M), source_location(F,L).
+get_source_ref10(M):- (get_user_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
+get_source_ref10(mfl(M,F,L)):- get_user_abox(M), current_source_file(F:L).
+get_source_ref10(mfl(M,F,_L)):- get_user_abox(M), current_source_file(F).
+get_source_ref10(mfl(M,_,_L)):- get_user_abox(M).
+get_source_ref10(M):- (get_user_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
+get_source_ref10(M):- trace, 
  ((get_user_abox(M) -> !;
  (atom(M)->(module_property(M,class(_)),!);
     mpred_error(no_source_ref(M))))).
 
 is_source_ref1(_).
 
-
+fix_mp(M:P,M:P):-!.
 fix_mp(MP,M:P):-  strip_module(MP,Cm,P),get_user_abox(U),!,
    (((modulize_head_fb(U,P,Cm,M:P),\+ predicate_property(M:P,static)))*-> true;
       (P==MP -> M=U; M=Cm)
@@ -239,7 +245,7 @@ retractall_u(H):- forall(clause_u(H,_,R),erase(R)),expire_tabled_list(H).
 
 clause_u(H,B):- clause_u(H,B,_).
 
-clause_u(H,B,R):- nonvar(R),!,must(clause_i(H,B,R)).
+clause_u(_:H,B,R):- nonvar(R),!,must(clause_i(_:H,B,R)).
 clause_u(MH,B,R):-  cnotrace(fix_mp(MH,MH2)), clause_i(MH2,B,R).
 
 lookup_u(H):-lookup_u(H,_). 
@@ -477,7 +483,7 @@ get_mpred_assertion_status(P,PP,Was):-
 % The cyclic_break is when we have regressions arouind ~ ~ ~ ~ ~
 get_mpred_support_status(P,_S, PP,(FF,TT),Was):- 
    Simular=simular(none),
-  dont_make_cyclic((((with_umt(spft(PP,F,T)),P=@=PP)) *-> 
+  dont_make_cyclic((((with_umt(spft_mod:spft(PP,F,T)),P=@=PP)) *-> 
      ((TT=@=T,same_file_facts(F,FF)) -> (Was = exact , ! ) ; (nb_setarg(1,Simular,(FF,TT)),fail))
     ; Was = none) -> true ; ignore(Was=Simular)).
 
@@ -1080,7 +1086,7 @@ mpred_do_fcpt(_,_).
 
 mpred_do_fcnt(_ZFact,F):-
   NT = nt(F,Condition,Body),
-  SPFT = spft(X,F1,NT),
+  SPFT = spft_mod:spft(X,F1,NT),
   lookup_u(SPFT),
   mpred_trace_msg('~N~n\tFound negative trigger: ~p~n\t\tcond: ~p~n\t\tbody: ~p~n\tSupport: ~p~n',
                  [F,Condition,Body,SPFT]),
@@ -1847,7 +1853,7 @@ mpred_database_term((==>)/1,fact(_)).
 mpred_database_term((~)/1,fact(_)).
 
 % forward/backward chaining database
-mpred_database_term(spft/3,support).
+mpred_database_term(spft_mod:spft/3,support).
 mpred_database_term(nt/3,trigger).
 mpred_database_term(pt/2,trigger).
 mpred_database_term(bt/2,trigger).
@@ -1876,7 +1882,7 @@ mpred_database_term(why_buffer/2,debug).
 % removes all forward chaining rules and justifications from db.
 %
 mpred_reset:- 
-  SPFT = spft(P,_ZF,_ZTrigger),
+  SPFT = spft_mod:spft(P,_ZF,_ZTrigger),
   lookup_u(SPFT),
   mpred_retract_i_or_warn(P),
   mpred_retract_i_or_warn(SPFT),
@@ -1902,12 +1908,12 @@ mpred_database_item(P):-
 
 
 mpred_retract_i_or_warn(X):- with_umt(X), retract_u(X), !.
-mpred_retract_i_or_warn(spft(P,T,mfl(M,F,A))):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,T,mfl(M,F,_))).
-mpred_retract_i_or_warn(spft(P,mfl(M,F,A),T)):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,mfl(M,F,_),T)).
-mpred_retract_i_or_warn(spft(P,T,mfl(M,A,F))):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,T,mfl(M,_,F))).
-mpred_retract_i_or_warn(spft(P,mfl(M,A,F),T)):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,mfl(M,_,F),T)).
-mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft( ( \+ _),_,_),!.
-mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft(_,_,_),!.
+mpred_retract_i_or_warn(spft_mod:spft(P,T,mfl(M,F,A))):- nonvar(A),!,mpred_retract_i_or_warn(spft_mod:spft(P,T,mfl(M,F,_))).
+mpred_retract_i_or_warn(spft_mod:spft(P,mfl(M,F,A),T)):- nonvar(A),!,mpred_retract_i_or_warn(spft_mod:spft(P,mfl(M,F,_),T)).
+mpred_retract_i_or_warn(spft_mod:spft(P,T,mfl(M,A,F))):- nonvar(A),!,mpred_retract_i_or_warn(spft_mod:spft(P,T,mfl(M,_,F))).
+mpred_retract_i_or_warn(spft_mod:spft(P,mfl(M,A,F),T)):- nonvar(A),!,mpred_retract_i_or_warn(spft_mod:spft(P,mfl(M,_,F),T)).
+mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft_mod:spft( ( \+ _),_,_),!.
+mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft_mod:spft(_,_,_),!.
 mpred_retract_i_or_warn(X):- 
   mpred_warn("Couldn't retract_u ~p.~n",[X]),!.
 mpred_retract_i_or_warn(X):- 
@@ -1927,7 +1933,7 @@ mpred_retract_i_or_warn(X):-
 %:- mpred_set_default(baseKB:mpred_warnings(_), baseKB:mpred_warnings(true)).
 %  tms is one of {none,local,cycles} and controles the tms alg.
 %:- baseKB:mpred_set_default(tms(_), tms(cycles)).
-% :-dynamic(baseKB:spft(_,_,_)).
+% :-dynamic(baseKB:spft_mod:spft(_,_,_)).
 
 %  mpred_fact(P) is true if fact P was asserted into the database via add.
 
@@ -2314,28 +2320,28 @@ mpred_add_support(P,(Fact,Trigger)):-
  % (Trigger= nt(F,Condition,Action) -> 
  %   (mpred_trace_msg('~N~n\tAdding mpred_do_fcnt via support~n\t\ttrigger: ~p~n\t\tcond: ~p~n\t\taction: ~p~n\t from: ~p~N',
  %     [F,Condition,Action,mpred_add_support(P,(Fact,Trigger))]));true),
-  assert_u_confirmed_missing(spft(P,Fact,Trigger)).
+  assert_u_confirmed_missing(spft_mod:spft(P,Fact,Trigger)).
 
 mpred_get_support(P,(Fact,Trigger)):-
-      lookup_u(spft(P,Fact,Trigger)).
+      lookup_u(spft_mod:spft(P,Fact,Trigger)).
 
 
 mpred_rem_support_if_exists(P,(Fact,Trigger)):-
- SPFT = spft(P,Fact,Trigger),
-  lookup_u(SPFT),
+ SPFT = spft_mod:spft(P,Fact,Trigger),
+  user:lookup_u(SPFT),
   once(mpred_retract_i_or_warn(SPFT)).
 
 
 
 mpred_rem_support(P,(Fact,Trigger)):-
-  mpred_retract_i_or_warn(spft(P,Fact,Trigger)).
+  mpred_retract_i_or_warn(spft_mod:spft(P,Fact,Trigger)).
 
 
 mpred_collect_supports(Tripples):-
   bagof_or_nil(Tripple, mpred_support_relation(Tripple), Tripples).
 
 mpred_support_relation((P,F,T)):-
-  lookup_u(spft(P,F,T)).
+  user:lookup_u(spft_mod:spft(P,F,T)).
 
 mpred_make_supports((P,S1,S2)):- 
   mpred_add_support(P,(S1,S2)),
