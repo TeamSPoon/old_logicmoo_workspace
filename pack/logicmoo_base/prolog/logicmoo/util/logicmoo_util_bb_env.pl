@@ -86,7 +86,7 @@ term_expansion_add_context/5
 
 :- include('logicmoo_util_header.pi').
 
-:- thread_local(t_l:user_abox/1).
+:- thread_local(t_l:user_abox/2).
 
 :- multifile(lmconf:mpred_system_kb/1).
 :- dynamic(lmconf:mpred_system_kb/1).

@@ -119,8 +119,6 @@
 :-dynamic(lmconf:locked_baseKB/0).
 :- asserta((lmconf:locked_baseKB)).
 
-%:- retractall(t_l:user_abox(_)).
-%:- asserta(t_l:user_abox(logicmoo_user)).
 
 % :- mpred_test(ensure_loaded('pttpFWC.pfc')).
 

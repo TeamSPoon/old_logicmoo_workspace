@@ -589,7 +589,7 @@ with_current_why(Why,Prolog):- w_tl(t_l:current_local_why(Why,Prolog),Prolog).
 %
 % Source Module.
 %
-source_module(M):-nonvar(M),source_module(M0),!,M0=M.
+source_module(M):-nonvar(M),!,source_module(M0),!,M0=M.
 source_module(M):-'$set_source_module'(M,   M),!.
 source_module(M):-loading_module(M),!.
 

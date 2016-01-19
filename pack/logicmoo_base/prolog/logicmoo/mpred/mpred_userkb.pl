@@ -187,8 +187,8 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
       baseKB:resolverConflict_robot((*)))).
 
 :- '$set_source_module'(_,baseKB).
-:- thread_local(t_l:user_abox/1).
-t_l:user_abox(baseKB).
+:- thread_local(t_l:user_abox/2).
+t_l:user_abox(baseKB,baseKB).
 
 :- show_call(source_context_module(_CM)).
 

@@ -11,6 +11,8 @@
 % :- use_module(library(logicmoo_user)).
 :- use_module(library(logicmoo_base)).
 
+:- must(context_module(sanity)).
+
 %:- dmsg(begin_abc123).
               
 %:- dynamic(tCol/1).
@@ -18,6 +20,7 @@
 %:- dynamic(baseKB:ptReformulatorDirectivePredicate/1).
 
 :- mpred_trace_exec.
+:- must(context_module(sanity)).
 
 :- abolish(c,0).
 :- abolish(a,1).
@@ -25,6 +28,8 @@
 :- dynamic((a/1,b/1,c/0,f/1)).
 
 :- file_begin(pfc).
+
+:- must(context_module(sanity)).
 
 :- mpred_test(ain(a(z))).
 

@@ -8,7 +8,7 @@
 */
 :- module(logicmoo_snark,[]).
 
-:- thread_local(t_l:user_abox/1).
+:- thread_local(t_l:user_abox/2).
 
 % 	 	 
 %% with_ukb_snark( ?VALUE1, ?VALUE2) is semidet.
@@ -16,7 +16,7 @@
 % Hook To [lh:with_ukb_snark/2] For Module Logicmoo_snark.
 % Using Ukb Snark.
 %
-lh:with_ukb_snark(KB,G):-w_tl(t_l:user_abox(KB),baseKB:G).
+lh:with_ukb_snark(KB,G):- source_module(SM), w_tl(t_l:user_abox(SM,KB),baseKB:G).
 
 %:- use_module(logicmoo_utils).
 %:- system:initialization(use_listing_vars).
