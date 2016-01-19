@@ -196,9 +196,11 @@ get_source_ref(O):- get_source_ref1(U),(U=(_,_)->O=U;O=(U,ax)),!.
 %
 :- module_transparent((get_source_ref1)/1).
 :- module_transparent((get_source_ref10)/1).
-get_source_ref1(M):- atom(M),must((get_source_ref10(N),atom(N))),!,M=N.
+% get_source_ref1(M):- atom(M),must((get_source_ref10(N),atom(N))),!,M=N.
 get_source_ref1(M):- ground(M),!.
-get_source_ref1(M):- must(get_source_ref10(M)),!.
+get_source_ref1(M):- get_source_ref10(M),!.
+get_source_ref1(_).
+
 % get_source_ref1(_):- fail,check_context_module,fail.
 get_source_ref10(M):- current_why(M), nonvar(M) , M =mfl(_,_,_).
 get_source_ref10(mfl(M,F,L)):- get_user_abox(M), source_location(F,L).
@@ -207,7 +209,7 @@ get_source_ref10(mfl(M,F,L)):- get_user_abox(M), current_source_file(F:L).
 get_source_ref10(mfl(M,F,_L)):- get_user_abox(M), current_source_file(F).
 get_source_ref10(mfl(M,_,_L)):- get_user_abox(M).
 get_source_ref10(M):- (get_user_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
-get_source_ref10(M):- trace, 
+get_source_ref10(M):- fail,trace, 
  ((get_user_abox(M) -> !;
  (atom(M)->(module_property(M,class(_)),!);
     mpred_error(no_source_ref(M))))).
