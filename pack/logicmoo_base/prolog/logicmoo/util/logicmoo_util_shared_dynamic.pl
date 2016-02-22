@@ -31,6 +31,7 @@
 :- dynamic(system:term_expansion/2).
 
 :- use_module(logicmoo_util_dmsg).
+:- use_module(logicmoo_util_rtrace).
 
 
 

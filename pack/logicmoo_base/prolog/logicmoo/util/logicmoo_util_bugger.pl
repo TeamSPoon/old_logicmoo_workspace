@@ -3141,4 +3141,3 @@ logicmoo_bugger_loaded.
 %:- mpred_trace_childs(prolog_ecall_fa/5).
 %:- mpred_trace_childs(with_each/3).
 
-

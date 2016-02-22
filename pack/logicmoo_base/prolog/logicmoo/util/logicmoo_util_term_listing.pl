@@ -721,6 +721,7 @@ contains_term_unifiable(SearchThis,Find):-compound(SearchThis),functor_safe(Sear
 %
 xlisting([]):-!,listing.
 xlisting(Match):- \+ \+ t_l:no_xlisting(Match),!.
+xlisting(F/A):-integer(A),!,functor(P,F,A),xlisting(P).
 xlisting(Match):- scan_for_varnames,is_list(Match),!,maplist(xlisting,Match).
 xlisting(Match):- t_l:in_prolog_listing(Match),!,findall(PI,to_pi(Match,PI),SkipPI),!,
   mpred_match_listing_skip_pi(Match,[_:varname_info(_,_,_,_)|SkipPI]),!.

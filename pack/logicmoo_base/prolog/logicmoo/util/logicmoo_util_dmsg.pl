@@ -1445,7 +1445,7 @@ cls:- shell(cls).
 
 :- use_module(library(random)).
 :- use_module(logicmoo_util_varnames).
-:- autoload([verbose(false)]).
+% :- autoload([verbose(false)]).
 
  
 

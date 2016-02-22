@@ -316,7 +316,7 @@ enumerate_files2(Spec,Result):-sub_atom(Spec,_,1,_,'*') -> enumerate_files1(Spec
 %
 % Enumerate Files Secondary Helper.
 %
-enumerate_files1(Atom,Result):- atomic(Atom),not(is_absolute_file_name(Atom)),atomic_list_concat(List,'/',Atom),!,concat_paths(List,Result).
+enumerate_files1(Atom,Result):- atomic(Atom),\+(is_absolute_file_name(Atom)),atomic_list_concat(List,'/',Atom),!,concat_paths(List,Result).
 enumerate_files1(Spec,Result):- exists_file_or_dir(Spec),!,Result=Spec.
 enumerate_files1(P/C,Result):- !,concat_paths(P,C,Result).
 enumerate_files1(Spec,Result):- expand_file_name_safe(Spec,ResultList),member(Result,ResultList).
@@ -513,10 +513,11 @@ add_to_search_path(Alias, Abs):- add_to_search_path(add_to_search_path_last, Ali
 %
 % Add Converted To Search Path.
 %
-add_to_search_path(How, Alias, Abs) :- is_absolute_file_name(Abs) -> call(How,Alias,Abs)     
-   ; (prolog_file_dir(Abs,ABSF),call(How,Alias,ABSF)).
+add_to_search_path(How, Alias, AbsIn) :- strip_module(AbsIn,_,Abs),!,
+  ( (atom(Abs),is_absolute_file_name(Abs)) -> call(How,Alias,Abs)     
+   ; (prolog_file_dir(Abs,ABSF),call(How,Alias,ABSF))).
 
-:- add_to_search_path(logicmoo,'./../').
+:- add_to_search_path(logicmoo, './../').
 
 
 % Was this our startup file?

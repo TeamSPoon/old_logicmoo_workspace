@@ -174,7 +174,6 @@ thread_leash(Some):-!, notrace(thread_self(main)->leash(Some);thread_leash(Some)
 % Ho Trace Primary Helper.
 %
 hotrace(Goal):- 
- 
   (\+ notrace((tracing, notrace)) ->  
      (\+ tlbugger:rtracing -> Goal; 
                               call_cleanup((notrace,Goal,rtrace),rtrace));

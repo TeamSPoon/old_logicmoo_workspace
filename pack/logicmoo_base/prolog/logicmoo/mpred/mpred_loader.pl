@@ -524,7 +524,7 @@ mpred_prolog_only_file(File):- lmconf:never_registered_mpred_file(File),!.
 %
 mpred_expander(Type,_,I,_):- hotrace((Type \== term,Type \= _:term ); var(I);I=(_ --> _);current_prolog_flag(xref,true);t_l:disable_px),!,fail.
 mpred_expander(Type,DefMod,end_of_file,O):- !,Type = term, DefMod = user, do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
-mpred_expander(Type,LoaderMod,I,OO):- \+ t_l:disable_px, 
+mpred_expander(Type,LoaderMod,I,OO):- \+ t_l:disable_px,
   current_predicate(_,_:mpred_loader_file),
   loop_check_term(mpred_expander0(Type,LoaderMod,I,O),I,fail),must(nonvar(O)),O=OO.
 

@@ -1218,7 +1218,7 @@ read_source_vars(File,In):-
    Module = module(_),
 	repeat,
 	  catch(prolog_read_source_term(In, Term, Expanded, [ variable_names(Vs), syntax_errors(error) , term_position(TermPos)  ]),
-		E,(nop((dmsg(E),trace)),fail)),
+		E,(nop((dmsg(E))),fail)),
           arg(1,Module,M),
           (Term = module(MM,_) -> (nb_setarg(1,Module,MM),fail);
           ((stream_position_data(line_count, TermPos, LineNo),
