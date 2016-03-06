@@ -3101,7 +3101,16 @@ user:message_hook(Term, Kind, Lines):- (Kind= warning;Kind= error),Term\=syntax_
 % :- mpred_trace_less(dmsg/1).
 %:-mpred_trace_less(system:notrace/1). 
 
+/*
 
+must_det(Level,Goal) :- Goal,  
+  (deterministic(true) -> true ; 
+    (print_message(Level, assertion_failed(deterministic, Goal)),
+       (member(Level,[informational,warn]) -> ! ; assertion_failed(deterministic, Goal)))).
+
+
+
+*/
 
 % :- module_property(user, exports(List)),mpred_trace_childs(List).
 

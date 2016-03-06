@@ -4,15 +4,17 @@
           [ with_err_to_pred/2,
             with_input_from_pred/2,
             with_output_to_pred/2,
-            with_output_to_stream_pred/4,
-            set_error_stream/1
+            with_write_stream_pred/4,
+            set_error_stream/1,
+            on_x_fail_priv/1,
+            current_error/1
           ]).
 :- meta_predicate
         with_err_to_pred(1, 0),
         with_input_from_pred(1, 0),
         with_output_to_pred(1, 0),
         on_x_fail_priv(0),
-        with_output_to_stream_pred(1, -, 0, 0).
+        with_write_stream_pred(1, -, 0, 0).
 :- module_transparent
         buffer_chars/1,
         read_received/1,
@@ -20,7 +22,9 @@
         test1_0/1,
         test2/1.
 
+%  ?- with_err_to_pred(write,format(user_error,'~s',["ls"])).
 
+plz_set_stream(S,P):- ignore(on_x_fail_priv(set_stream(S,P))).
 
 %= 	 	 
 
@@ -79,6 +83,8 @@ on_x_fail_priv(Goal):- catch(Goal,_,fail).
 
 :- meta_predicate(with_output_to_pred(1,0)).
 
+current_error(Err):-must((thread_current_error_stream(Err); stream_property(Err,alias(current_error)); stream_property(Err,alias(user_error)))),!.
+
 %= 	 	 
 
 %% with_output_to_pred( :PRED1Callback, :GoalGoal) is semidet.
@@ -86,26 +92,31 @@ on_x_fail_priv(Goal):- catch(Goal,_,fail).
 % Using Output Converted To Predicate.
 %
 with_output_to_pred(Callback,Goal):-
-  current_output(Prev),
-    with_output_to_stream_pred(Callback,Stream,
-      (set_stream(Stream,  alias(user_output)),
-       set_stream(Stream,  alias(current_output)),
-            with_output_to(Stream,Goal)),
-       (set_stream(Prev,  alias(user_output)),
-       set_stream(Prev,  alias(current_output)))).
+  current_output(Prev), FinalClean = set_o_stream(Prev),
+    with_write_stream_pred(Callback,Out,
+      (set_o_stream(Out),Goal,FinalClean),FinalClean).
 
 
 set_error_stream(Err):- current_input(In),current_output(Out),
-      set_stream(Err,alias(user_error)),
+      % plz_set_stream(Err,alias(user_error)),
+      plz_set_stream(Err,alias(current_error)),
       set_prolog_IO(In,Out,Err).
+
+
+set_o_stream(Out):- current_input(In),current_error(Err),
+      plz_set_stream(Out,alias(user_output)),
+      plz_set_stream(Out,alias(current_output)),
+      set_prolog_IO(In,Out,Err).
+
+
 
 %% with_err_to_pred( :PRED1Callback, :Goal) is semidet.
 %
 % Using Err Converted To Predicate.
 %
 with_err_to_pred(Callback,Goal):-
-  must(thread_current_error_stream(Prev)),
-    with_output_to_stream_pred(Callback,Stream,
+  must(current_error(Prev)),
+    with_write_stream_pred(Callback,Stream,
         (set_error_stream(Stream),Goal),
           set_error_stream(Prev)).
 
@@ -121,26 +132,33 @@ some_test :- with_err_to_pred(format_to_error('~s'),ls).
 some_test :- dynamic(received_chars/1).
 
 
-
 %= 	 	 
 
-%% with_output_to_stream_pred( :PRED1Callback, -Stream, :GoalGoal, :GoalExit) is semidet.
+%% with_write_stream_pred( :PRED1Callback, -Stream, :GoalGoal, :GoalExit) is semidet.
 %
 % Using Output Converted To Stream Predicate.
 %
-with_output_to_stream_pred(Callback,Stream,Goal,Exit):- 
+% % Not decided that a with_output_to_pred/2 should call close or not (flush gets the job done equally as well as closing)
+
+with_write_stream_pred(Callback,Stream,Goal,Exit):- 
   open_prolog_stream(tl_with_prolog_streams, write, Stream, []),
-  call_cleanup((
-   asserta(((tl_with_prolog_streams:stream_write(Stream,Data):- (ignore(on_x_fail_priv(call(Callback,Data)))))),Ref),
-   asserta(((tl_with_prolog_streams:stream_close(Stream):- (ignore(on_x_fail_priv(call(Callback,end_of_file)))))),Ref2),
-   asserta(((lmconf:is_prolog_stream(Stream))),Ref3),
-    % catch so we will not exception on a closed stream
-    % set_stream(Stream, buffer(line)),
-    % set_stream(Stream, buffer(false)),
-    % set_stream(Stream, buffer_size(0)),    
-    set_stream(Stream, close_on_exec(false)),    
-    call_cleanup((call_cleanup(Goal,catch(flush_output(Stream),_,true))),(erase(Ref),erase(Ref2),erase(Ref3)))),
-  Exit). % Not decided that a with_output_to_pred/2 should call close of not (flush gets the job done equally as well as closing)
+  % catch so we will not exception on a closed stream
+  % plz_set_stream(Stream, buffer(line)),
+  % plz_set_stream(Stream, buffer(false)),
+  % plz_set_stream(Stream, buffer_size(0)),    
+  % plz_set_stream(Stream, close_on_exec(false)),
+  % plz_set_stream(Stream, close_on_abort(false)),
+
+  call_cleanup(
+   setup_call_cleanup_each(
+   ( asserta(((tl_with_prolog_streams:stream_write(Stream,Data):- (ignore(on_x_fail_priv(call(Callback,Data)))))),Ref),
+     asserta(((tl_with_prolog_streams:stream_close(Stream):- (ignore(on_x_fail_priv(call(Callback,end_of_file)))))),Ref2),
+     asserta(((lmconf:is_prolog_stream(Stream))),Ref3)),
+    Goal,
+   (catch(flush_output(Stream),_,true),erase(Ref),erase(Ref2),erase(Ref3))),
+  Exit).
+
+  
 
 
 % test predciate to receive char codes
@@ -235,14 +253,14 @@ l_prolog_streams.
 %
 with_input_from_pred(Callback,Goal):-
  current_input(Old),
- call_cleanup((
+ call_cleanup_each((
    must(var(Stream)),
     tl_with_prolog_streams:open_prolog_stream(tl_with_prolog_streams, read, StreamO, []),
     StreamO = Stream,
    asserta(((tl_with_prolog_streams:stream_read(Stream,Data):- ((call(Callback,Data))))),Ref),
    asserta(((tl_with_prolog_streams:stream_close(Stream):- (ignore(call(Callback,end_of_file))))),Ref2),
-   set_stream(Stream,  alias(current_input)),
-   set_stream(Stream,  alias(user_input)),
+   plz_set_stream(Stream,  alias(current_input)),
+   plz_set_stream(Stream,  alias(user_input)),
    setup_call_cleanup(see(Stream), Goal,(seen,erase(Ref2),erase(Ref)))),
  set_input(Old)).
 

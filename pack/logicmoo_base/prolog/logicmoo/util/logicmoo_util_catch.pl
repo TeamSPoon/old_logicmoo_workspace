@@ -214,6 +214,43 @@
 
 :- include('logicmoo_util_header.pi').
 
+
+:- if(\+ current_predicate(system:call_cleanup_each/2)).
+
+:- meta_predicate must_or_die(0),
+                  must_atomic(0),
+                  setup_call_cleanup_each(0,0,0),
+                  call_cleanup_each(0,0).
+
+:- module_transparent(must_or_die/1).
+must_or_die(G):- (G *-> true ; throw(failed_must_or_die(G))).
+
+:- module_transparent(must_atomic/1).
+must_atomic(Goal):- notrace('$sig_atomic'(must_or_die(Goal))).
+
+
+call_cleanup_each(Goal, Cleanup) :-
+	setup_call_cleanup_each(true, Goal, Cleanup).
+
+setup_call_cleanup_each(Setup,Goal,Undo):-
+   notrace(((tracing,notrace)->WasTrace=trace;WasTrace=notrace)),
+   setup_call_cleanup(true,
+   (( must_atomic(Setup),
+   catch(( 
+     call((WasTrace,Goal,notrace,deterministic(Det),true)) 
+        *-> 
+        (Det == true 
+         -> must_atomic(Undo) 
+          ; (must_atomic(Undo);(must_atomic(Setup),fail)))
+     ; (must_atomic(Undo),fail)), 
+     E, (must_atomic(Undo),throw(E))))),WasTrace).
+
+
+:- endif.
+
+
+
+
 % = :- meta_predicate(catchvvnt(0,?,0)).
 
 %= 	 	 

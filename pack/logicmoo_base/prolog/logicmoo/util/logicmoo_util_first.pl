@@ -23,7 +23,6 @@ module_predicates_are_exported/1,
 module_predicates_are_exported0/1,
 module_predicates_are_not_exported_list/2,
 quiet_all_module_predicates_are_transparent/1,
-
           export_all_preds/0,
           export_all_preds/1,
           export_if_noconflict/2,
@@ -306,6 +305,18 @@ mpred_trace_all(W) :- forall(match_predicates(W,M,Pred,_,A),(
 %
 always_show_dmsg:- thread_self(main).
 always_show_dmsg:- tlbugger:tl_always_show_dmsg.
+
+
+
+%% oncely_clean(Goal)
+%
+% throws an exception if Goal leaves choicepoints or
+% if goal fails
+oncely_clean(Goal):- 
+ '$sig_atomic'((Goal,assertion(deterministic(true))))
+  ->true;
+   throw(failed_oncely_clean(Goal)).
+
 
 
 %= 	 	 

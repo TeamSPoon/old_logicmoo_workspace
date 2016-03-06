@@ -478,7 +478,7 @@ import_predicate(CM,M:F/A):- show_call(nop(CM:z333import(M:F/A))),CM:multifile(M
 %
 % Using Ukb.
 %
-with_ukb(KB,G):-w_tl(t_l:user_abox(SM,KB),G).
+with_ukb(KB,G):-w_tl(t_l:user_abox(_SM,KB),G).
 
 % TODO uncomment the next line without breaking it all!
 % lmconf:use_cyc_database.
@@ -2213,7 +2213,7 @@ make_dynamic(C):- compound(C),get_functor(C,F,A),must(F\=='$VAR'),
 %
 % Loading Source File.
 %
-loading_source_file(F):-once(t_l:pretend_loading_file(F);prolog_load_context(source,F);loading_file(F);show_success('$module'(F,F))).
+loading_source_file(F):-once(t_l:pretend_loading_file(F);prolog_load_context(source,F);loading_file(F);call('$module'(F,F))).
 
 
 :- dynamic(lmconf:never_reload_file/1).

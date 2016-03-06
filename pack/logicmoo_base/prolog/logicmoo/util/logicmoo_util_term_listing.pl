@@ -1384,7 +1384,9 @@ use_xlisting:- use_xlisting(true).
 %
 % Use Xlisting.
 %
-use_xlisting(TF):- set_prolog_flag(xlisting,TF).
+use_xlisting(TF):-var(TF),!,(current_prolog_flag(xlisting,TF)->true;TF=false).
+use_xlisting(TF):-set_prolog_flag(xlisting,TF).
+
 
 %= 	 	 
 
@@ -1400,7 +1402,7 @@ use_listing_vars:- use_listing_vars(true),scan_for_varnames.
 %
 % Use Listing Variables.
 %
-use_listing_vars(TF):-var(TF),current_prolog_flag(listing_vars,TF).
+use_listing_vars(TF):-var(TF),!,(current_prolog_flag(listing_vars,TF)->true;TF=false).
 use_listing_vars(TF):-set_prolog_flag(listing_vars,TF).
 
 

@@ -1036,7 +1036,7 @@ ltrim(X,X).
 %
 % Any Converted To String.
 %
-any_to_string(Atom,String):- must(any_to_string1(Atom,StringS)),!,StringS=String.
+any_to_string(Atom,String):- with_err_to_pred(nop, (must(any_to_string1(Atom,StringS)),!,StringS=String)),!.
 
 
 %= 	 	 
@@ -1548,8 +1548,8 @@ replace_in_string(SepChars, PadChars,Repl, A,C):- split_string(A,SepChars,PadCha
 %
 % Replace In String.
 %
-replace_in_string(F,R,A,K):-atom(A),!,atom_string(A,S),replace_in_string(F,R,S,C),atom_string(K,C).
-replace_in_string(SepChars,Repl,A,C):- atomics_to_string(B,SepChars,A),atomics_to_string(B,Repl,C).
+replace_in_string(F,R,OriginalString,K):-atom(OriginalString),!,atom_string(OriginalString,S),replace_in_string(F,R,S,ModifiedString),atom_string(K,ModifiedString).
+replace_in_string(Find,Repl,OriginalString,ModifiedString):-  atomic_list_concat(List,Find,OriginalString),atomics_to_string(List,Repl,ModifiedString).
 
 
 %= 	 	 

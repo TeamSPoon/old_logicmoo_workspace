@@ -173,14 +173,19 @@ thread_leash(Some):-!, notrace(thread_self(main)->leash(Some);thread_leash(Some)
 %
 % Ho Trace Primary Helper.
 %
-hotrace(Goal):- 
+
+hotrace_prev(Goal):- 
   (\+ notrace((tracing, notrace)) ->  
      (\+ tlbugger:rtracing -> Goal; 
                               call_cleanup((notrace,Goal,rtrace),rtrace));
      (\+ tlbugger:rtracing -> call_cleanup((Goal,trace),trace); 
                               call_cleanup((Goal,notrace((rtrace,trace))),(rtrace,trace)))).
-   
 
+
+hotrace(Goal):- 
+ '$leash'(OldL, OldL),
+  '$visible'(OldV, OldV),
+   ((tracing,notrace )-> setup_call_cleanup_each(notrace,Goal,(('$leash'(_, OldL),'$visible'(_, OldV)),trace));Goal).
 
 
 %= 	 	 
@@ -233,7 +238,7 @@ restore_guitracer:- ignore((retract(t_l:wasguitracer(GWas)),set_prolog_flag(gui_
 %
 % R Trace.
 %
-rtrace:- notrace,visible(+all),visible(+exception),thread_leash(-all),thread_leash(+exception). % save_guitracer,noguitracer
+rtrace:- notrace,visible(+all),visible(+exception),thread_leash(-all),thread_leash(+exception),trace. % save_guitracer,noguitracer
 
 %= 	 	 
 
@@ -317,12 +322,13 @@ restore_trace(Per,Goal):-
 %
 rtrace(Goal):- notrace(tlbugger:rtracing),!, Goal.
 
-rtrace(Goal):- tracing,notrace, '$leash'(OldL, OldL),'$visible'(OldV, OldV),
-   CC = (notrace,'$leash'(_, OldL),trace,'$visible'(_, OldV)),
-   copy_term(CC,CC2),
-   RTRACE = (notrace,visible(+all),thread_leash(-all),thread_leash(+exception),trace),
-   RTRACE,!,
-   (call_cleanup(((Goal)*->trace;(nortrace,!,fail)),notrace(CC)),(CC2;(notrace,RTRACE,notrace(fail)))).
+rtrace(Goal):- 
+   ((tracing,notrace )-> Tracing = trace ;   Tracing = true),
+   '$leash'(OldL, OldL),'$visible'(OldV, OldV),
+   (Undo =   (notrace,ignore(retract(tlbugger:rtracing)),'$leash'(_, OldL),'$visible'(_, OldV),Tracing)),
+   (RTRACE = (notrace,asserta(tlbugger:rtracing),visible(+all),thread_leash(-all),thread_leash(+exception))),!,
+   setup_call_cleanup_each(RTRACE,(trace,Goal),Undo).
+
 
 rtrace(Goal):- '$leash'(OldL, OldL),'$visible'(OldV, OldV),
    CC = (notrace,'$leash'(_, OldL),'$visible'(_, OldV),nortrace),

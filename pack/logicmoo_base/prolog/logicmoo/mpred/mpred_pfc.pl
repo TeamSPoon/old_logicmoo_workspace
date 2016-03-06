@@ -2883,7 +2883,26 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent(mpred_post1_rem/2).
 :- module_transparent(assert_u_confirmed_if_missing/1).
 :- module_transparent(clause_asserted_u/1).
-
+:- module_transparent(whenAnd/2).
+/*
+:- module_transparent(neg_may_naf/1).
+:- module_transparent(ain_minfo/2).
+:- module_transparent(ain_minfo_2/2).
+:- module_transparent(attvar_op/2).
+:- module_transparent(cnstrn/2).
+:- module_transparent(cnstrn/1).
+:- module_transparent(cnstrn0/2).
+:- module_transparent(deducedSimply/1).
+:- module_transparent(is_callable/1).
+:- module_transparent(map_unless/4).
+:- module_transparent(mpred_facts_only/1).
+:- module_transparent(mpred_retry/1).
+:- module_transparent(mpred_update_literal/4).
+:- module_transparent(naf/1).
+:- module_transparent(oncely/1).
+:- module_transparent(physical_side_effect/1).
+:- module_transparent(pred_head/2).
+*/
 
 
 :- source_location(S,_),prolog_load_context(module,M),
