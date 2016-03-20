@@ -197,7 +197,7 @@ t_l:user_abox(baseKB,baseKB).
 
 :- '$set_source_module'(_,baseKB).
 
-:- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),import_to_user(baseKB:E)).
+:- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),mpred_loader:import_to_user(baseKB:E)).
 
 
 :- import_module_to_user(logicmoo_user).
@@ -452,13 +452,17 @@ never_assert_u0(mpred_mark(pfcPosTrigger,_,F,A),Why):- fail,
   is_static_why(M,P,F,A,R),
   Why = static(M:P-F/A,R).
 
+:- rtrace.
+:- trace.
+:- set_prolog_flag(access_level,system).
 defined_predicate(M:P):- (current_predicate(_,M:P),( \+ predicate_property(M:P,imported_from(_)))).
+:- nortrace.
+:- notrace.
 
-%= 	 	 
 
 %% is_static_why( ?M, ?P, ?VALUE3, ?VALUE4, ?VALUE5) is semidet.
 %
-% If Is A Static Generation Of Proof.
+% If Static Pred, Generate a Proof.
 %
 is_static_why(M,P,_,_,_):- predicate_property(M:P,dynamic),!,fail.
 is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=static(M:F/A).
@@ -481,8 +485,5 @@ is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=
 
 :- add_import_module(baseKB,basePFC,end).
 :- initialization(add_import_module(baseKB,basePFC,end)).
-
-
-
 
 

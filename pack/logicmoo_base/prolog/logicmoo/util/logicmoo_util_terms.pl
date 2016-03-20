@@ -967,6 +967,7 @@ list_retain([_|List],Pred,Retained):- list_retain(List,Pred,Retained).
 %
 % Identical Member.
 %
+identical_memberchk(_,Var):-var(Var),!,fail.
 identical_memberchk(X,[Y|_])  :-
 	X == Y,
 	!.

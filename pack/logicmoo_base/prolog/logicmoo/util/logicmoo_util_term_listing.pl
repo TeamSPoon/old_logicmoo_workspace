@@ -1496,7 +1496,6 @@ prolog_listing:portray_clause(Stream, Term, M:Options) :-
 		prolog_listing:do_portray_clause(Stream, Copy, QOptions)
 	      ).
 
-:- set_prolog_flag(gc,false).
 :- redefine_system_predicate(prolog_listing:list_clauses/2).
 :- abolish(prolog_listing:list_clauses/2).
 

@@ -1612,7 +1612,7 @@ do_gc:- do_gc0.
 %
 % Do Gc Primary Helper.
 %
-do_gc0:- current_prolog_flag(gc,true),!,do_gc0.
+do_gc0:- current_prolog_flag(gc,true),!,do_gc1.
 do_gc0:- set_prolog_flag(gc,true), do_gc1, set_prolog_flag(gc,false).
 
 %= 	 	 

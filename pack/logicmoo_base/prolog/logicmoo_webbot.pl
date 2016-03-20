@@ -80,5 +80,6 @@ fix_ops_for(CM):-
 :- sanity( \+predicate_property(baseKB:_,exported)).
 
 :- use_module(library(eggdrop)).
+:- debug(_),nodebug(_).
 :- egg_go.
 

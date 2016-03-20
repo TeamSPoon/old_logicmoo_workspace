@@ -127,7 +127,6 @@ pldoc_html:source_button(File, _Options) -->
 
 doug_debug(O):-format(user_error,'~nDOUG_DEBUG: ~q.~n',[O]),!.
 
-% :-debug(_).
 
 testml([]):-!. testml([M|L]):-!,testml(M),testml(L).
 testml(M):-atomic(M),!,format('~w',[M]).

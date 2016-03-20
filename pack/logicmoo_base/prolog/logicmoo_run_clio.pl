@@ -127,7 +127,7 @@ semweb_startup_late:- cp_server:attach_account_info.
 
 % :- asserta((user:file_search_path(A,B):-pre_file_search_path(A,B))).
  
-% :- debug(_).
+%  % :- debug(_).
 
 :- meta_predicate cpa_browse:when_true(0,//,?,?).
 :- meta_predicate rdf_describe:rdf_include_labels(3,+,+).

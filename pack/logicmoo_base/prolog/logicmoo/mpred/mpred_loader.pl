@@ -21,7 +21,7 @@
             user_m_check/1,
             add_term/2,
             assert_kif/1,
-            import_module_to_user/1,
+            system:import_module_to_user/1,
             assert_kif_dolce/1,
             assert_until_eof/1,
             set_current_module/1,
@@ -264,7 +264,6 @@
 
 :- lmconf:dynamic((lmconf:registered_mpred_file/1,lmconf:never_registered_mpred_file/1,lmconf:registered_module_type/2)).
 :- multifile((lmconf:registered_mpred_file/1,lmconf:never_registered_mpred_file/1,lmconf:registered_module_type/2)).
-
 
 
 
@@ -1503,8 +1502,8 @@ import_to_user_mfa0(_MM,_SM,_,M:F/A):- functor(P,F,A),
 %
 % Import Module Converted To User.
 %
-import_module_to_user(M):- default_module(user,M),!.
-import_module_to_user(M):- ignore(delete_import_module(M,user)),
+system:import_module_to_user(M):- default_module(user,M),!.
+system:import_module_to_user(M):- ignore(delete_import_module(M,user)),
                            add_import_module(M,system,end),
                            add_import_module(user,M,end),
                            % find system thru M

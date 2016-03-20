@@ -61,10 +61,10 @@ add_file_search_path(Name,Path):-  resolve_dir(Path,Dir),
 % ======================================================
 % Add Extra pack-ages directory
 % ======================================================
-:- initialization(attach_packs,now).
+% :- initialization(attach_packs,now).
 :- if( \+ exists_source(pack(logicmoo_base/prolog/logicmoo/logicmoo_utils))).
 :- add_file_search_path(pack,'../../').
-:- initialization(attach_packs,now).
+% :- initialization(attach_packs,now).
 :- endif.
 % ======================================================
 % Save a directory of *this* file into logicmoo(..)
@@ -127,7 +127,7 @@ lmconf:logicmoo_pre_release.
 
 :- if(current_prolog_flag(gui,true)).
 % :- guitracer.
-:- notrace(trace).
+% :- notrace(trace).
 :- notrace.
 :- endif.
 

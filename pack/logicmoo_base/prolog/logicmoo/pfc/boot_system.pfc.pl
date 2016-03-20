@@ -130,7 +130,7 @@ prologBuiltin(F),arity(F,A)==>{make_builtin(F/A)}.
 
 
 /*
-:- debug(_).
+ %  % :- debug(_).
 :- nodebug(http(_)).
 :- debug(mpred).
 :- mpred_trace_exec.

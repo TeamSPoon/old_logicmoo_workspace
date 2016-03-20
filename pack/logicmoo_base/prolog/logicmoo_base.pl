@@ -130,7 +130,7 @@ lmconf:enable_mpred_system0(Module):-
    asserta_if_new((Module:term_expansion(I,O):- mpred_expander(term,Module,I,O))),
    asserta_if_new((Module:goal_expansion(I,O):- mpred_expander(goal,Module,I,O))),
    asserta(lmconf:mpred_system_status(Module,enabled)),
-   trace,Module:w_tl(t_l:side_effect_ok,doall(Module:call_no_cuts(lmconf:module_local_init))).
+   Module:w_tl(t_l:side_effect_ok,doall(Module:call_no_cuts(lmconf:module_local_init))).
 
 
 %= 	 	 
