@@ -68,6 +68,7 @@ fix_ops_for(CM):-
 :- ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
 :- system:initialization(mpred_www:ensure_webserver(3020)).
 :- mpred_www:ensure_webserver(3020).
+:- debug(_),nodebug(_).
 
 :- baseKB:use_module(baseKB:logicmoo/logicmoo_snark).
 
@@ -80,6 +81,9 @@ fix_ops_for(CM):-
 :- sanity( \+predicate_property(baseKB:_,exported)).
 
 :- use_module(library(eggdrop)).
+:- use_module(library(debug)).
 :- debug(_),nodebug(_).
+qsp:- qsave_program(ircbot).
 :- egg_go.
+
 
