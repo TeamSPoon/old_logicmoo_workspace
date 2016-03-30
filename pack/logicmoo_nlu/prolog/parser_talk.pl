@@ -40,12 +40,12 @@ t3:- forall(must_test_talkpl(Sent),talkpl(Sent)).
 
 m :- talkpl.
 
-:- asserta(thlocal:into_form_code).
+:- asserta(t_l:into_form_code).
 
 :-export(talkpl/0).
 talkpl :- with_assertions(tracing80,
              with_no_assertions(thglobal:use_cyc_database,
-                  with_assertions(thlocal:usePlTalk, (told, repeat, prompt_read('TALKPL> ',U),  
+                  with_assertions(t_l:usePlTalk, (told, repeat, prompt_read('TALKPL> ',U),  
                             to_word_list(U,WL),(WL==[bye];WL==[end,'_',of,'_',file];talkpl(WL)))))).
 
 :-export(talkpl/1).
@@ -248,7 +248,7 @@ conc([],L,L).
 conc([H|T],L,[H|R]) :- conc(T,L,R).
 
 
-:- retract(thlocal:into_form_code).
+:- retract(t_l:into_form_code).
 
 
 :- context_module(CM),module_predicates_are_exported(CM).

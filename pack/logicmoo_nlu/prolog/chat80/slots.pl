@@ -58,11 +58,11 @@ i_np_head(np(_,Kernel,_),Y,
    no_repeats_must(i_np_head0(Kernel,X,T,Det0,Head,Pred0,Pred,Slots)),
    Type-_=Y, Type-_=T,!.
 
-i_np_head(np(Argree2B,C,MoreIn),Y,Quant,Det,Det0,X,Pred,QMods,Slots0,Id0):- thlocal:chat80_interactive,!,
+i_np_head(np(Argree2B,C,MoreIn),Y,Quant,Det,Det0,X,Pred,QMods,Slots0,Id0):- t_l:chat80_interactive,!,
   trace,pronoun_LF(Argree2B,C,MoreIn,X,Y,MoreOut,PronounType),
   i_np_head(np(Argree2B,np_head(generic,MoreOut,PronounType),MoreIn),Y,Quant,Det,Det0,X,Pred,QMods,Slots0,Id0).
 
-i_np_head(Argree2B,Y,Quant,Det,Det0,X,Pred,QMods,Slots0,Id0):- thlocal:chat80_interactive,!,
+i_np_head(Argree2B,Y,Quant,Det,Det0,X,Pred,QMods,Slots0,Id0):- t_l:chat80_interactive,!,
   trace,pronoun_LF(Argree2B,[],[],X,Y,MoreOut,PronounType),
   i_np_head(np(Argree2B,np_head(generic,MoreOut,PronounType),MoreOut),Y,Quant,Det,Det0,X,Pred,QMods,Slots0,Id0).
 

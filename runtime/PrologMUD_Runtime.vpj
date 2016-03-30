@@ -381,6 +381,11 @@
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
 		<Folder Name="../pack">
+			<Folder Name="eggdrop">
+				<Folder Name="prolog">
+					<F N="../pack/eggdrop/prolog/eggdrop.pl"/>
+				</Folder>
+			</Folder>
 			<Folder Name="logicmoo_base">
 				<Folder Name="prolog">
 					<F

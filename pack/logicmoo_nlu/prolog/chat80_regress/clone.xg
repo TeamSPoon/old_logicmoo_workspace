@@ -1,13 +1,13 @@
 :- op(1001,xfy, ... ).
 :- op(1200,xfx,'--->').
 
-:-push_def(thlocal:disable_mpred_term_expansions_locally).
+:-push_def(t_l:disable_px).
 
-:-asserta(thlocal:disable_mpred_term_expansions_locally).
+:-asserta(t_l:disable_px).
 
 
 
-:- ignore(( \+(thlocal:disable_mpred_term_expansions_locally),trace,throw((\+(thlocal:disable_mpred_term_expansions_locally))))).
+:- ignore(( \+(t_l:disable_px),trace,throw((\+(t_l:disable_px))))).
 :-asserta(tlxgproc:do_xg_process_te).
 
 /* Sentences */
@@ -60,7 +60,7 @@ whq(X,Agmt,NP,undef) --->
    int_det(X,Agmt),
    {is_s_all(SAll)},
    np(NP,Agmt,_,_,subj,SAll,_).
-whq(X,3+No,np(3+No,wh(X),[adj(lf(Case))]),Case) ---> {thlocal:useAltPOS}, int_pron(Case).
+whq(X,3+No,np(3+No,wh(X),[adj(lf(Case))]),Case) ---> {t_l:useAltPOS}, int_pron(Case).
 whq(X,3+No,np(3+No,wh(X),[]),Case) ---> int_pron(Case).
 
 int_det(X,3+Agmt) ---> whose(X,Agmt).
@@ -197,7 +197,7 @@ possessive(Kernel,Agmt,Type,PostMods,Mods,
            Kernel,Agmt,Type,PostMods,Mods) ---> noText.
 
 % this next "[the]" cannot be replaced with theText1(the)!
-gen_case, [the] ---> {thlocal:old_text},gen_marker.
+gen_case, [the] ---> {t_l:old_text},gen_marker.
 gen_case, [w(the,_)] ---> gen_marker.
 
 gen_marker ---> theText1(''''), an_s.
@@ -523,6 +523,6 @@ conj(conj(Conj,Ctx0), conj(Conj,Ctx),Left,Right, conj(Conj,Left,Right)) --->
 
 :-retract(tlxgproc:do_xg_process_te).
 
-:-pop_def(thlocal:disable_mpred_term_expansions_locally).
+:-pop_def(t_l:disable_px).
 
 end_of_file.

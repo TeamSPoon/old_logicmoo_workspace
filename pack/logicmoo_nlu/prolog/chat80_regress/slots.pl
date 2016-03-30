@@ -62,7 +62,7 @@ i_np_head(np(_,Kernel,_),Y,quant(Det,T,Head,Pred0,QMods,Y),Det,Det0,X,Pred,QMods
    Type-_=Y, Type-_=T,!.
 */
 
-i_np_head(NPKIn,YIn,QUANTIn,DetIn,Det0,X,Pred,QMods,Slots,Id) :- thlocal:useAltPOS,
+i_np_head(NPKIn,YIn,QUANTIn,DetIn,Det0,X,Pred,QMods,Slots,Id) :- t_l:useAltPOS,
    no_repeats(np_head_rewrite(NPKIn,YIn,QUANTIn,X,DetIn,NPK,Y,QUANT,Det)),
   i_np_head(NPK,Y,QUANT,Det,Det0,X,Pred,QMods,Slots,Id).
 

@@ -2830,7 +2830,7 @@ test_tl(C):-functor(C,F,A),test_tl(C,F,A).
 %
 test_tl(C,F,A):-current_predicate(lmconf:F/A),call(lmconf:C).
 test_tl(C,F,A):-current_predicate(t_l:F/A),call(t_l:C).
-test_tl(C,F,A):-current_predicate(thlocal_global:F/A),call(thlocal_global:C).
+test_tl(C,F,A):-current_predicate(t_l_global:F/A),call(t_l_global:C).
 
 
 % asserta_if_ground(_):- !.

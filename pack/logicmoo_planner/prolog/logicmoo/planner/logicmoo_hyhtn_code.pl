@@ -132,7 +132,7 @@ ttm:-asserta(testing_already), make, retractall(testing_already),fail.
 banner_party(E,BANNER):- 
   ansicall(yellow,(
       format("% xxxxxxxxxxxxxxx ~w xxxxxxxxxxxxxxxxxxx~n",[E]),            
-      forall(thlocal:doing(X),dmsg(E,doing(X))),
+      forall(t_l:doing(X),dmsg(E,doing(X))),
       dmsg5(E,BANNER), 
        format("% xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx~n",[]))).
       
@@ -166,7 +166,7 @@ tasks:-
    setof(Call,Call,List),list_to_set(List,Set),!,
    env_info(kb(dom,file)),!,
    once((ignore(forall(member(Call,Set),
-     with_assertions(thlocal:doing(tasks(N,Goal)),
+     with_assertions(t_l:doing(tasks(N,Goal)),
       ((
       must(nonvar(Goal)),must(nonvar(State)),
       ignore(N=Goal),      
@@ -269,7 +269,7 @@ run_header_tests :- run_tests(forall(clause(header_tests,G),run_tests(G))).
 
 :-export(test_ocl/1).
 test_ocl(File):- forall(filematch(File,FM),test_ocl0(FM)).
-test_ocl0(File):- time(with_assertions(thlocal:doing(test_ocl(File)), 
+test_ocl0(File):- time(with_assertions(t_l:doing(test_ocl(File)), 
    once((env_clear_doms_and_tasks,clean_problem,l_file(File),tasks)))).
 
 header_tests :-test_ocl('domains_ocl/*.ocl').
@@ -279,7 +279,7 @@ header_tests :-test_ocl('domains_ocl/*.ocl').
 :- style_check(-discontiguous).
 %:-use_module(library(system)).
 
-%:- asserta(thlocal:disable_mpred_term_expansions_locally).
+%:- asserta(t_l:disable_px).
 
 
 /* Donghong Liu */
@@ -293,7 +293,7 @@ header_tests :-test_ocl('domains_ocl/*.ocl').
 
 planner_failure(Why,Info):-dmsg(error,Why-Info),banner_party(error,'FAILURE_PLANNER'),print_message(error,'FAILURE_PLANNER'(Why,Info)),!. %sleep(2).
 
-:-thread_local thlocal:doing/1.
+:-thread_local t_l:doing/1.
 
 statistics_runtime(CP):-statistics(runtime,[_,CP0]), (CP0==0 -> CP= 0.0000000000001 ; CP is (CP0/1000)) .  % runtime WAS process_cputime
 statistics_walltime(CP):-statistics(walltime,[_,CP0]), (CP0==0 -> CP= 0.0000000000001 ; CP is (CP0/1000)) .  % runtime WAS process_cputime
@@ -495,7 +495,7 @@ merge_ss(SS,S1,Obj1,L1,SS,S1,Obj2,L2,G):-append(L1,L2,LL),G=..[SS,S1,Obj1,LL].
    
 
 init_locol_planner_interface(G,I,Node):-   
-   with_assertions(thlocal:db_spy,
+   with_assertions(t_l:db_spy,
      init_locol_planner_interface0(G,I,Node)).
 
 assert_itital_state(I0):- is_list(I0),!, must_maplist(assert_itital_state,I0),!.

@@ -15,7 +15,7 @@ end_of_file.
 
 :- user:ensure_loaded_no_mpreds(library(logicmoo/util/logicmoo_util_all)).
 :- user:ensure_loaded_no_mpreds(library(logicmoo/logicmoo_base)).
-:- asserta(thlocal:disable_mpred_term_expansions_locally).
+:- asserta(t_l:disable_px).
 
 :- multifile(user:type_action_info/3).
 :- multifile(user:agent_call_command/2).
@@ -373,10 +373,10 @@ user:regression_test:- ace_to_pkif('A person who loves all animals is loved by s
 user:regression_test:- gripe_time(5,test_chat80_sanity).
 
 
-% :- must(retract(thlocal:disable_mpred_term_expansions_locally)).
+% :- must(retract(t_l:disable_px)).
 
 
-:-asserta(thlocal:disable_mpred_term_expansions_locally).
+:-asserta(t_l:disable_px).
 
 
 % set  -/1 op 

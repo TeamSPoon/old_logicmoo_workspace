@@ -54,7 +54,7 @@
 :-retractall(nldata_BRN_WSJ_LEXICON:text_bpos(the,nn)).
 
 % :- begin_dynamic_reader.
-:- asserta((thlocal:enable_src_loop_checking)).
+:- asserta((t_l:enable_src_loop_checking)).
 
 
 deduce_subj_obj_LF(PropAttrib,Adj,Type,X,TypeY,Y,H):-subj_obj_LF(PropAttrib,Adj,Type,X,TypeY,Y,H).
@@ -77,9 +77,9 @@ terminator_db(?,?).
 terminator_db(!,!).
 
 % plt:-! ,fail.
-plt:- thlocal:usePlTalk,!.
-plt2:- thlocal:useAltPOS,!.
-% plt:- thlocal:chat80_interactive,!.
+plt:- t_l:usePlTalk,!.
+plt2:- t_l:useAltPOS,!.
+% plt:- t_l:chat80_interactive,!.
 
 loop_check_chat80(Call):-loop_check_chat80(Call,fail).
 loop_check_chat80(Call,Else):-loop_check(Call,Else).
@@ -418,7 +418,7 @@ maybe_noun_or_adj(T):- var(T)->true;(atom(T),not_ccw(T)).
 %  chat80("how are you?").
 % test_chat80("you flow").
 
-test_chat80(U):- with_assertions(thlocal:chat80_interactive, must(chat80(U))).
+test_chat80(U):- with_assertions(t_l:chat80_interactive, must(chat80(U))).
 
 t11:- 
    test_chat80("how many postures are there?"),
@@ -499,7 +499,7 @@ name_db([black,sea],black_sea).
 name_db([upper,volta],upper_volta).
 name_db([Name],Name) :-
    name_template_db(Name,_), !.
-%name_db([Name],Name) :- thlocal:useAltPOS,downcase_atom(Name,DCName),loop_check(not(cw_db(DCName,_))).
+%name_db([Name],Name) :- t_l:useAltPOS,downcase_atom(Name,DCName),loop_check(not(cw_db(DCName,_))).
 
 name_template_db(X,feature&circle) :- circle_of_latitude(X).
 name_template_db(X,feature&city) :- city(X).
@@ -1055,9 +1055,9 @@ answers([[africa, america, antarctica, asia, australasia, europe]])],[time(0.054
 
 
 :-export((t1/0,t12/0,t13/0)).
-t1:- with_no_assertions(thglobal:use_cyc_database,with_assertions(thlocal:tracing80, forall(must_test_801(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
-t12:- with_no_assertions(thglobal:use_cyc_database,with_assertions(thlocal:tracing80, forall(must_test_802(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
-t13:- with_no_assertions(thglobal:use_cyc_database,with_assertions(thlocal:tracing80, forall(must_test_803(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
+t1:- with_no_assertions(thglobal:use_cyc_database,with_assertions(t_l:tracing80, forall(must_test_801(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
+t12:- with_no_assertions(thglobal:use_cyc_database,with_assertions(t_l:tracing80, forall(must_test_802(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
+t13:- with_no_assertions(thglobal:use_cyc_database,with_assertions(t_l:tracing80, forall(must_test_803(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
 
 
 

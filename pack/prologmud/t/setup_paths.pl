@@ -45,12 +45,12 @@ fix_pwd :- (exists_directory(runtime) -> working_directory(_,runtime);(exists_di
 :-source_file(in_logicmoo_repl_source_file,F),file_directory_name(F, D),
   asserta(user:pmrt(D)),cd(D).
 
-user:pmrt_file_search_path(pack, '../../../pack').
 
 user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current_prolog_flag(unix,true).
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
 
+user:pmrt_file_search_path(pack, '../../../pack').
 user:pmrt_file_search_path(cliopatria, '../pack/ClioPatria'). % :- current_prolog_flag(unix,true).
 user:pmrt_file_search_path(user, '../pack/ClioPatria/user').
 user:pmrt_file_search_path(swish, '../pack/swish'). % :- current_prolog_flag(unix,true).

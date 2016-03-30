@@ -20,9 +20,10 @@
 
 :- set_prolog_flag(verbose_load,true).
 
+
 :- include(mud_header).
 
-:- retractall(t_l:disable_mpred_term_expansions_locally).
+:- retractall(t_l:disable_px).
 
 :- set_prolog_flag(generate_debug_info, true).
 % [Optionaly] Set the Prolog optimize/debug flags
@@ -74,15 +75,21 @@ unsafe_preds(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
 :-forall(unsafe_preds(M,F,A),bugger:remove_pred(M,F,A)).
 
 % [Optionaly] Solve the Halting problem
-:-redefine_system_predicate(system:halt).
+:-redefine_system_predicate(system:halt/0).
 :-abolish(system:halt,0).
-system:halt:- format('the halting problem is now solved!').
+:-asserta((system:halt :- format('the halting problem is now solved!'))).
 
 :- dmsg('the halting problem is now solved!').
 
+:- file_begin(prolog).
+
+:- '$set_source_module'(_,'user').
+
 add_game_dir(GAMEDIR,Else):- add_to_search_path_first(game, GAMEDIR),now_try_game_dir(Else).
 
-now_try_game_dir(Else):-  enumerate_files(game('.'), GAMEDIR) *-> 
+
+now_try_game_dir(Else):-  
+ enumerate_files(game('.'), GAMEDIR) *-> 
   ((exists_directory(GAMEDIR) -> 
     with_all_dmsg(( 
       % forall(enumerate_files(game('**/*.pl'),X),user:ensure_loaded(X)),
@@ -93,7 +100,7 @@ now_try_game_dir(Else):-  enumerate_files(game('.'), GAMEDIR) *->
 create_module(M):-context_module(CM),module(M),asserta(M:this_is_a_module(M)),writeq(switching_back_to_module(M,CM)),module(CM).
 :-create_module(user).
 :-create_module(hook).
-:-create_module(thlocal).
+:-create_module(t_l).
 :-create_module(thglobal).
 %:-create_module(moo).
 

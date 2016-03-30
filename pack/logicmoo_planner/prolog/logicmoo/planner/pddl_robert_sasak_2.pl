@@ -923,11 +923,11 @@ merge_values(_,Value,Value):-
 
 
 
-:-thread_local(thlocal:allow_sterm).
+:-thread_local(t_l:allow_sterm).
 
 domainBNF(PROPS,Output, List, R):- with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:domainBNF_dcg(PROPS,Output, List, R))),!.
-domainBNF(PROPS,Output, List, R):- with_assertions(thlocal:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:domainBNF_dcg(PROPS,Output, List, R)))),!,
-   portray_clause((domainBNF:-PROPS,thlocal:allow_sterm,Output)).
+domainBNF(PROPS,Output, List, R):- with_assertions(t_l:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:domainBNF_dcg(PROPS,Output, List, R)))),!,
+   portray_clause((domainBNF:-PROPS,t_l:allow_sterm,Output)).
 domainBNF(PROPS,P     , List, R):- must(sterm(PROPS,O, List, R)),!,must(sterm2pterm(O,P)),!,portray_clause((PROPS:-P)).
 domainBNF(PROPS,Output, List, R):- trace,domainBNF_dcg(PROPS, Output, List, R),!.
 
@@ -1067,7 +1067,7 @@ typed_list(W, [G|Ns])           --> oneOrMore(W, N), ['-'], type(T), !, typed_li
 typed_list(W, N)                --> zeroOrMore(W, N).
 
 
-allowed_sterm(Why,sterm(PROPS,Why,D))--> {thlocal:allow_sterm},sterm(PROPS,D).                                                                           
+allowed_sterm(Why,sterm(PROPS,Why,D))--> {t_l:allow_sterm},sterm(PROPS,D).                                                                           
 
 effected_typed_list(W, [G|Ns])           --> oneOrMore(W, N), ['-'], effect(T), !, effected_typed_list(W, Ns), {G =.. [T,N]}.
 effected_typed_list(W, N)                --> zeroOrMore(W, N).
@@ -1242,8 +1242,8 @@ parseProblem(F, O, R) :-
 % :- [readFile].
 
 problem(Output, List, R):- with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:problem_dcg(Output, List, R))),!.
-problem(Output, List, R):- with_assertions(thlocal:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:problem_dcg(Output, List, R)))),!,
-   portray_clause((problem:-thlocal:allow_sterm,Output)).
+problem(Output, List, R):- with_assertions(t_l:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:problem_dcg(Output, List, R)))),!,
+   portray_clause((problem:-t_l:allow_sterm,Output)).
 problem(P     , List, R):- must(sterm(PROPS,O, List, R)),!,must(sterm2pterm(O,P)),!,portray_clause((ed:-P)).
 problem(Output, List, R):- trace,problem_dcg(Output, List, R),!.
 

@@ -130,6 +130,19 @@
       with_fc_mode(+,0),
       bagof_or_nil(?,^,-).
 
+:- module_transparent(show_if_debug/1).
+:- module_transparent(bagof_or_nil/3).
+:- module_transparent(with_fc_mode/2).
+:- module_transparent(with_mpred_trace_exec/1).
+:- module_transparent(with_no_mpred_trace_exec/1).
+:- module_transparent(brake/1).
+:- module_transparent(fc_eval_action/2).
+:- module_transparent(with_no_mpred_breaks/1).
+:- module_transparent(mpred_METACALL/2).
+:- module_transparent(mpred_METACALL/3).
+:- module_transparent(mpred_fact/2).
+:- module_transparent(each_E/3).
+
 :- '$set_source_module'(_,mpred_pfc).
 
 :- module_transparent((assert_u_confirmed_missing/1,mpred_trace_exec/0,pfcl_do/1,
@@ -2658,8 +2671,6 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((listing_u)/1).
 :- module_transparent((mpred_test_fok)/1).
 :- module_transparent((mpred_test)/1).
-:- module_transparent((set_user_abox)/1).
-:- module_transparent((get_user_abox)/1).
 :- module_transparent((get_source_ref1)/1).
 :- module_transparent((get_source_ref)/1).
 :- module_transparent((setup_mpred_ops)/0).
@@ -2883,7 +2894,6 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent(mpred_post1_rem/2).
 :- module_transparent(assert_u_confirmed_if_missing/1).
 :- module_transparent(clause_asserted_u/1).
-:- module_transparent(whenAnd/2).
 /*
 :- module_transparent(neg_may_naf/1).
 :- module_transparent(ain_minfo/2).
@@ -2917,7 +2927,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 
 
 :- forall(mpred_database_term(F/A,_),abolish(mpred_pfc:F/A)).
-:- ensure_abox(baseKB).
+% :- initialization(ensure_abox(baseKB)).
 
 %% mpred_pfc_file is det.
 %

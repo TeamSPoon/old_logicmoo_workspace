@@ -452,8 +452,8 @@ never_assert_u0(mpred_mark(pfcPosTrigger,_,F,A),Why):- fail,
   is_static_why(M,P,F,A,R),
   Why = static(M:P-F/A,R).
 
-:- rtrace.
-:- trace.
+%:- rtrace.
+%:- trace.
 :- set_prolog_flag(access_level,system).
 defined_predicate(M:P):- (current_predicate(_,M:P),( \+ predicate_property(M:P,imported_from(_)))).
 :- nortrace.

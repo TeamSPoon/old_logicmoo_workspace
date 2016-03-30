@@ -50,7 +50,7 @@
 :- dynamic_multifile_exported contains/2.
 */
 :- style_check(+discontiguous).
-:- asserta((thlocal:enable_src_loop_checking)).
+:- asserta((t_l:enable_src_loop_checking)).
 
 numbervars80(Term,Start,End):- numbervars(Term,Start,End,[attvar(bind),functor_name('$VAR'),singletons(false)]).
 
@@ -106,17 +106,17 @@ moo:agent_call_command(_Gent,chat80(StringM)):- chat80(StringM).
 % ===========================================================
 % CHAT80 REPL
 % ===========================================================
-:-thread_local thlocal:chat80_interactive/0.
+:-thread_local t_l:chat80_interactive/0.
 :-export(chat80/0).
 chat80 :- with_assertions(tracing80,
-           with_assertions(thlocal:chat80_interactive,
-            with_no_assertions(thlocal:useOnlyExternalDBs,
+           with_assertions(t_l:chat80_interactive,
+            with_no_assertions(t_l:useOnlyExternalDBs,
              with_no_assertions(thglobal:use_cyc_database,
                   with_assertions(usePlTalk, (told, repeat, prompt_read('CHAT80> ',U),  
                             to_word_list(U,WL),((WL==[bye];WL==[end,'_',of,'_',file];control80(WL))))))))).
 
-:- multifile(thlocal:into_form_code/0).
-:- asserta(thlocal:into_form_code).
+:- multifile(t_l:into_form_code/0).
+:- asserta(t_l:into_form_code).
 
 
 :- include((chat80/xgproc)).	% XG generator
@@ -133,7 +133,7 @@ chat80 :- with_assertions(tracing80,
 :- include((chat80/xgrun)).	% XG runtimes
 % :- include((chat80/newg)).		% clone + lex
 
-% :- retract(thlocal:into_form_code).
+% :- retract(t_l:into_form_code).
 
 :- include((chat80/clotab)).	% attachment tables
 :- include((chat80/newdict)).	% syntactic dictionary
@@ -163,9 +163,9 @@ chat80 :- with_assertions(tracing80,
 :- include((chat80/newtop)).	% top level
 
 
-:- retract(thlocal:into_form_code).
+:- retract(t_l:into_form_code).
 
-:- retractall(thlocal:enable_src_loop_checking).
+:- retractall(t_l:enable_src_loop_checking).
 
 user:mud_test(chat80_regressions,test_chat80_regressions).
 

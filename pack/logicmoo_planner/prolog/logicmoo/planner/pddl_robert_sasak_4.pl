@@ -1028,11 +1028,11 @@ parseDomain(File, Struct, R) :-
     domain(Struct, List, R),!.
 
 
-:-thread_local(thlocal:allow_sterm).
+:-thread_local(t_l:allow_sterm).
 
 domain(Struct, List, R):- with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:domain_dcg(Struct, List, R))),!.
-domain(Struct, List, R):- with_assertions(thlocal:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:domain_dcg(Struct, List, R)))),!,
-   nop(portray_clause((domain:-thlocal:allow_sterm,Struct))),!.
+domain(Struct, List, R):- with_assertions(t_l:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:domain_dcg(Struct, List, R)))),!,
+   nop(portray_clause((domain:-t_l:allow_sterm,Struct))),!.
 %domain(Struct,P     , List, R):- trace,must(sterm(Struct,O, List, R)),!,must(sterm2pterm(O,P)),!,portray_clause((Struct:-P)).
 domain(Struct, List, R):- must(domain_dcg(Struct, List, R)),!.
 
@@ -1159,7 +1159,7 @@ typed_list(W, [G|Ns])           --> oneOrMore(W, N), ['-'], type(T), !, typed_li
 typed_list(W, N)                --> zeroOrMore(W, N).
 
 
-allowed_sterm(Why,sterm(Struct,Why,D))--> {thlocal:allow_sterm},sterm(Struct,D).                                                                           
+allowed_sterm(Why,sterm(Struct,Why,D))--> {t_l:allow_sterm},sterm(Struct,D).                                                                           
 
 effected_typed_list(W, [G|Ns])           --> oneOrMore(W, N), ['-'], effect(T), !, effected_typed_list(W, Ns), {G =.. [T,N]}.
 effected_typed_list(W, N)                --> zeroOrMore(W, N).
@@ -1336,8 +1336,8 @@ parseProblem(File, Struct, R) :-
 
 
 problem(Struct, List, R):- with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:problem_dcg(Struct, List, R))),!.
-problem(Struct, List, R):- with_assertions(thlocal:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:problem_dcg(Struct, List, R)))),!,
-   portray_clause((problem:-thlocal:allow_sterm,Struct)).
+problem(Struct, List, R):- with_assertions(t_l:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:problem_dcg(Struct, List, R)))),!,
+   portray_clause((problem:-t_l:allow_sterm,Struct)).
 %problem(Struct,P     , List, R):- trace,must(sterm(Struct,O, List, R)),!,must(sterm2pterm(O,P)),!,portray_clause((Struct:-P)).
 problem(Struct, List, R):- must(problem_dcg(Struct, List, R)),!.
 

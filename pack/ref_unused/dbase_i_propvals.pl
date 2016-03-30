@@ -28,7 +28,7 @@ assert_argIsa(Prop,N,Type):-show_call_failure(add_fast(argIsa(Prop,N,Type))).
 
 % CANT :-export(transitive_other/4).
 
-choose_val(Prop,Obj,Value):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(t(Prop,Obj,Value)).
+choose_val(Prop,Obj,Value):- t_l:useOnlyExternalDBs,!, body_call_cyckb(t(Prop,Obj,Value)).
 choose_val(Prop,Obj,Value):- var(Obj),nonvar(Value),!,mdif(Obj,Value),is_asserted(t(Prop,Obj,Value)).
 choose_val(Prop,Obj,Value):- mdif(Obj,Value),choose_right(Prop,Obj,Value).
 
@@ -40,7 +40,7 @@ generate_candidate_arg_values0(Prop,N,R):- arg(N,vv(Obj,Value),R),!,is_asserted(
 
 type_has_instances(Type):-  atom(Type),Type\=ftTerm,Type\=tCol,not_ft(Type),isa(_,Type),!.
 
-choose_right(Prop,Obj,Value):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(t(Prop,Obj,Value)).
+choose_right(Prop,Obj,Value):- t_l:useOnlyExternalDBs,!, body_call_cyckb(t(Prop,Obj,Value)).
 choose_right(Prop,Obj,Value):- nonvar(Obj),!,choose_for(Prop,Obj,RValue),RValue=Value.
 choose_right(Prop,Obj,Value):- cached_isa(Prop,completelyAssertedCollection),not(cached_isa(Prop,prologSingleValued)),!,is_asserted(t(Prop,Obj,Value)).
 choose_right(Prop,Obj,Value):- findall(Obj,generate_candidate_arg_values(Prop,1,Obj),Objs),Objs\=[],!,member(Obj,Objs),nonvar(Obj),choose_for(Prop,Obj,Value).
@@ -59,7 +59,7 @@ choose_for(Prop,Obj,Value):- no_repeats(choose_each(Prop,Obj,Value)).
 choose_one(mudAtLoc,Obj,_):-nonvar(Obj),isa_asserted(Obj,tRegion),!,fail.
 choose_one(Prop,Obj,Value):- choose_asserted(Prop,Obj,RValue),!,Value=RValue.
 % was choose_one(Prop,Obj,Value):- with_fallbacks(with_fallbacksg(fallback_value(Prop,Obj,RValue))),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,maybe_save(Obj,Prop,Value).
-choose_one(Prop,Obj,_Value):- Fact=.. [Prop,Obj,_],thlocal:infInstanceOnly(Fact),!,fail.
+choose_one(Prop,Obj,_Value):- Fact=.. [Prop,Obj,_],t_l:infInstanceOnly(Fact),!,fail.
 choose_one(Prop,Obj,Value):- with_fallbacks(fallback_value(Prop,Obj,RValue)),ground(choose_one(Prop,Obj,RValue)),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,save_fallback(Obj,Prop,Value).
 choose_one(Prop,Obj,Value):- create_someval(Prop,Obj,RValue),ground(create_someval(Prop,Obj,RValue)),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,save_fallback(Obj,Prop,Value).
 
@@ -73,21 +73,21 @@ choose_asserted(Prop,Obj,Value):- choose_asserted_mid_order(Prop,Obj,Value),!.
 
 choose_asserted_mid_order(Prop,Obj,Value):-loop_check(choose_asserted_mid_order_all(Prop,Obj,Value),fail).
 choose_asserted_mid_order_all(Prop,Obj,Value):- mpred_call(t(Prop,Obj,Value)),!.
-choose_asserted_mid_order_all(Prop,Obj,_Value):- atom(Prop), Fact=.. [Prop,Obj,_],thlocal:infInstanceOnly(Fact),!,fail.
+choose_asserted_mid_order_all(Prop,Obj,_Value):- atom(Prop), Fact=.. [Prop,Obj,_],t_l:infInstanceOnly(Fact),!,fail.
 choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlPreds(Other,Prop)),choose_asserted(Other,Obj,Value).
 % choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlInverse(Prop,Other)),choose_val(Other,Value,Obj).
 
 :-export(create_someval/3).
 create_someval(Prop,Obj,Value):- ground(Prop-Obj-Value),!,dmsg(error_create_someval(Prop,Obj,Value)).
 create_someval(Prop,Obj,Value):- into_mpred_form(t(Prop,Obj,Value),Fact),asserted_or_deduced(Fact),!.
-create_someval(Prop,Obj,Value):- into_mpred_form(t(Prop,Obj,Value),Fact),not(test_tl(thlocal:noRandomValues,Fact)),create_random_fact(Fact),!.
-create_someval(Prop,Obj,_):- Fact=.. [Prop,Obj,_],test_tl(thlocal:infAssertedOnly,Fact),!,fail.
+create_someval(Prop,Obj,Value):- into_mpred_form(t(Prop,Obj,Value),Fact),not(test_tl(t_l:noRandomValues,Fact)),create_random_fact(Fact),!.
+create_someval(Prop,Obj,_):- Fact=.. [Prop,Obj,_],test_tl(t_l:infAssertedOnly,Fact),!,fail.
 create_someval(Prop,Obj,Value):- fallback_value(Prop,Obj,DValue),!,Value=DValue.
 create_someval(Pred,_Arg1,Value):- must_det_l([arity(Pred,Last),argIsa(Pred,Last,Type),random_instance(Type,Value,nonvar(Value))]).
 
 asserted_or_deduced(Fact):- is_asserted(Fact),!.
 asserted_or_deduced(Fact):- user:fact_always_true(Fact),must_det(is_fact_consistent(Fact)),!,add(Fact).
-asserted_or_deduced(Fact):- test_tl(thlocal:infAssertedOnly,Fact),!,fail.
+asserted_or_deduced(Fact):- test_tl(t_l:infAssertedOnly,Fact),!,fail.
 asserted_or_deduced(Fact):- fact_maybe_deduced(Fact),is_fact_consistent(Fact),add(Fact).
 asserted_or_deduced(Fact):- deducedSimply(Fact),is_fact_consistent(Fact),add(Fact).
 
@@ -147,7 +147,7 @@ subft_or_subclass_or_same(S,C):-genls(S,C),!.
 checkNoArgViolationOrDeduceInstead(_Prop,_,Obj,_OType,_Type):-var(Obj),!.
 checkNoArgViolationOrDeduceInstead(_Prop,_N,_Obj,[H|T],Type):-nonvar(T),!,member(E,[H|T]),subft_or_subclass_or_same(E,Type),!.
 checkNoArgViolationOrDeduceInstead(Prop,N,[H|T],OType,Type):-!,forall(member(Obj,[H|T]),checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type)).
-checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- not(thlocal:deduceArgTypes(Prop)),!,reallyCheckArgViolation(Prop,N,Obj,OType,Type).
+checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- not(t_l:deduceArgTypes(Prop)),!,reallyCheckArgViolation(Prop,N,Obj,OType,Type).
 checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- must_det(deduce_argN(Prop,N,Obj,OType,Type)),fail.
 checkNoArgViolationOrDeduceInstead(Prop,N,Obj,_,_):- argIsa(Prop,N,Type),findall(OT,isa(Obj,OT),OType),reallyCheckArgViolation(Prop,N,Obj,OType,Type).
 
@@ -218,7 +218,7 @@ fallback_value(Prop,Obj,Value):- isa(Obj,ObjType),is_asserted(t(Prop,isTypeFn(Ob
 fallback_value(_Prop,Obj,_Value):-var(Obj),!,fail.
 fallback_value(Prop,_Obj,_Value):-no_fallback(Prop,2),!,fail.
 fallback_value(Prop,Obj,Value):-Fact=..[Prop,Obj,Value], 
-   with_assertions(thlocal:infAssertedOnly(Fact),defaultArgValue(Fact,Prop,2,ValueR)),!,
+   with_assertions(t_l:infAssertedOnly(Fact),defaultArgValue(Fact,Prop,2,ValueR)),!,
    checkNoArgViolation(Prop,Obj,ValueR),is_fact_consistent(Fact),
    Value=ValueR.
 
@@ -242,8 +242,8 @@ defaultArgValue(mudShape(Like,V1),mudShape,2,Like,[V1],_):- isa(Like,Type),V1 = 
 defaultArgValue(Fact,F,A,_P,_Args,Value):-argIsa(F,A,Type),is_fact_consistent(Fact),defaultTypeValue(Fact,Type,Value),!.
 
 
-defaultTypeValue(Fact,_,_):- thlocal:noRandomValues(Fact),!,fail.
-defaultTypeValue(_,Type,_):- thlocal:noRandomValues(Type),!,fail.
+defaultTypeValue(Fact,_,_):- t_l:noRandomValues(Fact),!,fail.
+defaultTypeValue(_,Type,_):- t_l:noRandomValues(Type),!,fail.
 defaultTypeValue(_Info,vtDirection,"n").
 defaultTypeValue(_Info,ftInt,0).
 defaultTypeValue(Fact,Type,Out):- random_instance(Type,ROut,nonvar(ROut)),dmsg(defaultArgValue(random_instance(Fact,Type,ROut=Out))),!,Out=ROut.

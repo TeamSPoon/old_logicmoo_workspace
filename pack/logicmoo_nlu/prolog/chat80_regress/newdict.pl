@@ -61,7 +61,7 @@
 
 :-retractall(nldata_BRN_WSJ_LEXICON:text_bpos(the,nn)).
 
-:- asserta((thlocal:enable_src_loop_checking)).
+:- asserta((t_l:enable_src_loop_checking)).
 
 verb_type_to_kind(Var,Var2):-(var(Var);nonvar(Var2)),!,trace_or_throw(var_verb_type_to_kind(Var,Var2)).
 verb_type_to_kind(Aux+Have,tv):-Aux == aux, Have == have.
@@ -89,9 +89,9 @@ terminator_db(.,_).
 terminator_db(?,?).
 terminator_db(!,!).
 
-plt:- thlocal:usePlTalk,!.
-plt2:- thlocal:useAltPOS,!.
-% plt:- thlocal:chat80_interactive,!.
+plt:- t_l:usePlTalk,!.
+plt2:- t_l:useAltPOS,!.
+% plt:- t_l:chat80_interactive,!.
 
 loop_check_chat80(Call):-loop_check_chat80(Call,fail).
 loop_check_chat80(Call,Else):-loop_check(Call,Else).
@@ -232,7 +232,7 @@ term_depth0(C,TDO):-is_list(C),!,findall(D,(member(T,C),term_depth0(T,D)),DL), m
 term_depth0(C,TDO):-C=..[_|LIST],findall(D,(member(T,LIST),term_depth0(T,D)),DL), max_list([0|DL],TD),TDO is TD+1,!.
 
 
-memoize_pos_to_db(WHY,_CYCPOS,W1,W1):- thlocal:old_text,!, WHY. 
+memoize_pos_to_db(WHY,_CYCPOS,W1,W1):- t_l:old_text,!, WHY. 
 memoize_pos_to_db(WHY,CYCPOS,W2,W1):- use_open_marker,!, memoize_pos_to_db_old(WHY,CYCPOS,W2,W1).
 memoize_pos_to_db(WHY,_CYCPOS,W2,W1):- W2= w(W1,_),!,WHY,must(nb_setarg(2,W2,set(WHY))).
 memoize_pos_to_db(WHY,_CYCPOS,W2,W1):- W2= w(W1,LIST),member(penn(WHY2),LIST),!,WHY2=WHY.
@@ -363,15 +363,15 @@ pers_pron_db(them,agentgroup,3,pl,compl(_)).
 how_many_db([how,many]).
 
 pronoun_LF(_Argree2B,np_head(generic,ADJS,Type),_MoreIn,_X,_Y,_ADJLIST,_OUT):-contains_var(typeOf,some(Type,ADJS)),!,fail.
-pronoun_LF(Argree2B,pronoun(FemMasc),MoreIn,X,_Y,[adj(lf(X,nlAgreement(X,Argree2B)&dbase_t(typeOf,X,FemMasc)))|MoreIn],FemMasc):-nonvar(Argree2B),nonvar(FemMasc), thlocal:useAltPOS,!.
-pronoun_LF(Argree2B,FemMasc,MoreIn,X,_Y,[adj(lf(X,nlAgreement(X,Argree2B)&dbase_t(typeOf,X,FemMasc)))|MoreIn],FemMasc):-nonvar(Argree2B),nonvar(FemMasc),thlocal:useAltPOS.
+pronoun_LF(Argree2B,pronoun(FemMasc),MoreIn,X,_Y,[adj(lf(X,nlAgreement(X,Argree2B)&dbase_t(typeOf,X,FemMasc)))|MoreIn],FemMasc):-nonvar(Argree2B),nonvar(FemMasc), t_l:useAltPOS,!.
+pronoun_LF(Argree2B,FemMasc,MoreIn,X,_Y,[adj(lf(X,nlAgreement(X,Argree2B)&dbase_t(typeOf,X,FemMasc)))|MoreIn],FemMasc):-nonvar(Argree2B),nonvar(FemMasc),t_l:useAltPOS.
 
 kyqdhq(K,Kernel,Y,Q,Det,T,Head,Pred0,QMods):-  K= np(_,Kernel,_),Y=Y, Q = quant(Det,T,Head,Pred0,QMods,Y),nop(dmsg(good_kyqdhq(K,Kernel,Y,Q,Det,T,Head,Pred0,QMods))),!.
-kyqdhq(K,Kernel,Y,Q,Det,T,Head,Pred0,QMods):-  thlocal:useAltPOS,thlocal:chat80_interactive,dmsg(unused_kyqdhq(K,Kernel,Y,Q,Det,T,Head,Pred0,QMods)),fail.
+kyqdhq(K,Kernel,Y,Q,Det,T,Head,Pred0,QMods):-  t_l:useAltPOS,t_l:chat80_interactive,dmsg(unused_kyqdhq(K,Kernel,Y,Q,Det,T,Head,Pred0,QMods)),fail.
 
 
 np_head_rewrite(np(Argree2B,C,MoreIn),Y,Quant,X,Det,np(Argree2B,np_head(generic,MoreOut,PronounTypePath),MoreIn),Y,Quant,Det):- not(contains_var(typeOf,C)),
-   thlocal:chat80_interactive,!,show_call(pronoun_LF(Argree2B,C,MoreIn,X,Y,MoreOut,PronounTypePath)).
+   t_l:chat80_interactive,!,show_call(pronoun_LF(Argree2B,C,MoreIn,X,Y,MoreOut,PronounTypePath)).
 %np_head_rewrite(np(Argree2B,pronoun(B),[]),Y,Quant,X,Det,np(Argree2B,np_head(generic,[],dbase_t(typeOf,X,Y,B,Argree2B),[]),[]),Y,Quant,Det):- !.
 
 :-dynamic(subject_LF/5).
@@ -691,7 +691,7 @@ name_db([black,sea],black_sea).
 name_db([upper,volta],upper_volta).
 name_db([Name],Name) :-
    name_template_db(Name,_), !.
-name_db([Name],Name) :- thlocal:useAltPOS,downcase_atom(Name,DCName),loop_check(not(cw_db_code(DCName,_))).
+name_db([Name],Name) :- t_l:useAltPOS,downcase_atom(Name,DCName),loop_check(not(cw_db_code(DCName,_))).
 
 name_template_db(X,feature&circle) :- circle_of_latitude(X).
 name_template_db(X,feature&city) :- city(X).
@@ -777,7 +777,7 @@ ocw_db1(W,C):- ocw_db2(W,C),not_ccw(W).
 ocw_db2(W,'Noun'):-noun_plu_db(W,_).
 ocw_db2(W,'Adjective'):-adj_db(W,_).
 ocw_db2(W,'Noun'):-noun_plu_db(_,W).
-ocw_db3(W,SPOS):-plt_call(W,POS,with_assertions(thlocal:useOnlyExternalDBs, (( 'suffixString'(CycWord,String),String\='',atom_concat(_First,String,W),'derivationalAffixResultPOS'(CycWord,POS),simplePOS(POS,SPOS))))).
+ocw_db3(W,SPOS):-plt_call(W,POS,with_assertions(t_l:useOnlyExternalDBs, (( 'suffixString'(CycWord,String),String\='',atom_concat(_First,String,W),'derivationalAffixResultPOS'(CycWord,POS),simplePOS(POS,SPOS))))).
 
 simplePOS(POS,SIMP):-posName(SIMP),atom_concat(_,SIMP,POS).
 
@@ -803,7 +803,7 @@ verb_root_db(Govern):-plt_call(Govern,'Verb',(nop(verb_root_db),fail,talk_db(_Ve
 regular_pres_db(Govern):-plt_call(Govern,'Verb',(nop(regular_pres_db),talk_db(_,Govern,_Governs,_GovernedImperfect,_Governing,_Governed))).
 regular_past_db(Governed,Govern):-plt_call(Governed,'Verb',(nop(regular_past_db),talk_db(_,Govern,_Governs,_GovernedImperfect,_Governing,Governed))).
 verb_form_db(Active,Verb,pres+part,_):-plt_call((Active),'Verb',((nop(active),talk_db(_,Verb,_VerbPL,_Imperfect,Active,_PastPart)))).
-verb_form_db(VerbPL,Verb,pres+fin,_):- thlocal:useAltPOS ,plt2_call(VerbPL,'Verb',(nop(verb_ptl),talk_db(_,Verb,VerbPL,_Imperfect,_Active,_PastPart))).
+verb_form_db(VerbPL,Verb,pres+fin,_):- t_l:useAltPOS ,plt2_call(VerbPL,'Verb',(nop(verb_ptl),talk_db(_,Verb,VerbPL,_Imperfect,_Active,_PastPart))).
 verb_form_db(Imperfect,Verb,past+fin,_):-plt_call(Imperfect,'Verb',(nop(imperfect),talk_db(_,Verb,_VerbPL,Imperfect,_Active,_PastPart))).
 verb_form_db(PastPart,Verb,past+part,_):-plt_call((PastPart),'Verb',(nop(past_part),talk_db(_,Verb,_VerbPL,_Imperfect,_Active,PastPart))).
 
@@ -1282,7 +1282,7 @@ answers([sudan])],[time(0.0)]).
 
 
 :-export((t1/0,t12/0,t13/0)).
-t1:- with_no_assertions(thglobal:use_cyc_database,with_assertions(thlocal:tracing80, forall(must_test_801(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
-t12:- with_no_assertions(thglobal:use_cyc_database,with_assertions(thlocal:tracing80, forall(must_test_802(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
-t13:- with_no_assertions(thglobal:use_cyc_database,with_assertions(thlocal:tracing80, forall(must_test_803(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
+t1:- with_no_assertions(thglobal:use_cyc_database,with_assertions(t_l:tracing80, forall(must_test_801(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
+t12:- with_no_assertions(thglobal:use_cyc_database,with_assertions(t_l:tracing80, forall(must_test_802(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
+t13:- with_no_assertions(thglobal:use_cyc_database,with_assertions(t_l:tracing80, forall(must_test_803(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
 

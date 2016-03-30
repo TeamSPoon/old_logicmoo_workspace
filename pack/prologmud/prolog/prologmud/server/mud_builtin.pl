@@ -28,7 +28,7 @@
 :- '$set_source_module'(_,baseKB).
 :- file_begin(pfc).
 :- set_user_abox(baseKB).
-:- retractall(t_l:disable_mpred_term_expansions_locally).
+:- retractall(t_l:disable_px).
 
 
 % baseKB:isa(iPerson99,tPerson).

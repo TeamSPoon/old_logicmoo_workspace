@@ -61,7 +61,7 @@
 :- dynamic_multifile_exported contains/2.
 */
 :- style_check(+discontiguous).
-:- asserta((thlocal:enable_src_loop_checking)).
+:- asserta((t_l:enable_src_loop_checking)).
 
 numbervars80(Term,Start,End):- numbervars(Term,Start,End,[attvar(bind),functor_name('$VAR'),singletons(false)]).
 
@@ -95,10 +95,10 @@ must_test_80([what, countries, are, there, in, europe, ?], [sent([what, countrie
 call_in_banner(U,Call):- p2(begin:U),call_cleanup(Call,p2(end:U)).
 
 :-export(t2/0).
-t2:- with_assertions(tracing80,with_no_assertions(thlocal:old_text,with_no_assertions(thglobal:use_cyc_database,forall(must_test_80(U,R,O),t2_process_run_diff(report,U,R,O))))).
+t2:- with_assertions(tracing80,with_no_assertions(t_l:old_text,with_no_assertions(thglobal:use_cyc_database,forall(must_test_80(U,R,O),t2_process_run_diff(report,U,R,O))))).
 
 t2_process_run_diff(report,U,R,O):- copy_term80(U,UU),
-   process_run_diff(report,U,R,O),!,nop( with_assertions(thlocal:usePlTalk,process_run_diff(report,UU,[],[]))),!.
+   process_run_diff(report,U,R,O),!,nop( with_assertions(t_l:usePlTalk,process_run_diff(report,UU,[],[]))),!.
 
 :- ensure_loaded('pldata/clex_iface').
 
@@ -114,17 +114,17 @@ user:agent_call_command(_Gent,chat80(StringM)):- chat80(StringM).
 % ===========================================================
 % CHAT80 REPL
 % ===========================================================
-:-thread_local thlocal:chat80_interactive/0.
+:-thread_local t_l:chat80_interactive/0.
 :-export(chat80/0).
 chat80 :- with_assertions(tracing80,
-           with_assertions(thlocal:chat80_interactive,
-            with_no_assertions(thlocal:useOnlyExternalDBs,
+           with_assertions(t_l:chat80_interactive,
+            with_no_assertions(t_l:useOnlyExternalDBs,
              with_no_assertions(thglobal:use_cyc_database,
               (told, repeat, prompt_read('CHAT80> ',U),  
                             to_word_list(U,WL),((WL==[bye];WL==[end,'_',of,'_',file];(mmake,once(chat80(WL)),fail)))))))).
 
-:- multifile(thlocal:into_form_code/0).
-:- asserta(thlocal:into_form_code).
+:- multifile(t_l:into_form_code/0).
+:- asserta(t_l:into_form_code).
 
 
 :- ensure_loaded((chat80/xgproc)).	% XG generator
@@ -141,7 +141,7 @@ chat80 :- with_assertions(tracing80,
 :- include((chat80/xgrun)).	% XG runtimes
 % :- include((chat80/newg)).		% clone + lex
 
-% :- retract(thlocal:into_form_code).
+% :- retract(t_l:into_form_code).
 
 :- include((chat80/clotab)).	% attachment tables
 :- include((chat80/newdict)).	% syntactic dictionary
@@ -174,9 +174,9 @@ chat80 :- with_assertions(tracing80,
 
 :-export(test_chat80_regressions/0).
 test_chat80_regressions:- time((t2,t11)).
-:- retract(thlocal:into_form_code).
+:- retract(t_l:into_form_code).
 
-:- retractall(thlocal:enable_src_loop_checking).
+:- retractall(t_l:enable_src_loop_checking).
 
 
 user:mud_test(chat80_regressions,test_chat80_regressions).

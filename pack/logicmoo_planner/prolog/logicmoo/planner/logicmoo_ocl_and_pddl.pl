@@ -121,7 +121,7 @@ min_sas(_,A,A).
 
 first_n_elements(ListR,Num,List):-length(ListR,PosNum),min_sas(PosNum,Num,MinNum),length(List,MinNum),append(List,_,ListR),!.
 
-test_domain(DP):- thlocal:loading_files,!,must(load_domain(DP)).
+test_domain(DP):- t_l:loading_files,!,must(load_domain(DP)).
 test_domain(DP):- test_domain(DP,12).
 
 test_domain(DP,Num):- \+ atom(DP),forall((filematch(DP,FOUND),exists_file(FOUND)),test_domain(FOUND,Num)),!.
@@ -230,7 +230,7 @@ solve_files_w_ocl_pt2(DD, PP):-
     term_to_ord_term(PP, P),prop_get(problem_name,P,PName),save_type_named(problem,PName,P),    
     reset_statistic)),
     !,
-   with_assertions(thlocal:other_planner(hyhtn_solve), record_time(try_solve(PName, D,P,S),SolverTime)),
+   with_assertions(t_l:other_planner(hyhtn_solve), record_time(try_solve(PName, D,P,S),SolverTime)),
     flag(time_used_other,X,X + SolverTime),
     show_statistic(P, S),
     !.
@@ -278,7 +278,7 @@ record_time(G,TimeUsed):- record_time(G,runtime,TimeUsed).
 record_time(G,Runtime,TimeUsed):- statistics(Runtime, [B,_]),G,statistics(Runtime, [E,_]),TimeUsed is E - B.
 
 
-try_solve(PN,D,P,S):- thlocal:loading_files,!,pmsg((loading_files(PN):-try_solve(D,P,S))),!.
+try_solve(PN,D,P,S):- t_l:loading_files,!,pmsg((loading_files(PN):-try_solve(D,P,S))),!.
 % try_solve(PN,D,P,S):- once(time_out(solve(PN,D, P, S), 3000, Result)), Result == time_out, portray_clause(hard_working:-try_solve(PN,D,P,S)),fail.
 try_solve(PN,D,P,S):- gripe_time(14,time_out((solve(PN,D, P, S)), 30000, Result)),!, % time limit for a planner (was 500000)
    ((\+ is_list(S)
@@ -300,8 +300,8 @@ pmsg(D):- subst(D,=,'k_===_v',SS),wdmsg(SS),wdmsg((:-SS)).
 %
 %   Set domain and problem on blackboard
 %
-:-thread_local(thlocal:other_planner/1).
-solve(PN,D,P,S):- thlocal:other_planner(C),!,logOnError(call(C,PN,D,P,S)),!.
+:-thread_local(t_l:other_planner/1).
+solve(PN,D,P,S):- t_l:other_planner(C),!,logOnError(call(C,PN,D,P,S)),!.
 
 solve(_,D, P, Solution):-
   must_det_l((
@@ -1148,11 +1148,11 @@ parseDomain(File, Output, R) :-
     domainBNF(Output, List, R),!.
 
 
-:-thread_local(thlocal:allow_sterm).
+:-thread_local(t_l:allow_sterm).
 
 domainBNF(Output, List, R):- with_assertions(tlbugger:skipMust, debugOnError0(domainBNF_dcg(Output, List, R))),!.
-domainBNF(Output, List, R):- with_assertions(thlocal:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(domainBNF_dcg(Output, List, R)))),!,
-   portray_clause((domainBNF:-thlocal:allow_sterm,Output)).
+domainBNF(Output, List, R):- with_assertions(t_l:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(domainBNF_dcg(Output, List, R)))),!,
+   portray_clause((domainBNF:-t_l:allow_sterm,Output)).
 domainBNF(Output, List, R):-  sterm(O, List, R), must_det_l((sterm2pterm(O,P),prop_put_extra_extra(Output,P),portray_clause((ed(Output):-P)))).
 domainBNF(Output, List, R):- trace,with_no_assertions(tlbugger:skipMust, debugOnError0(domainBNF_dcg(Output, List, R))),!.
 
@@ -1302,7 +1302,7 @@ typed_list0(W, GsNs)           --> oneOrMore(W, N), ['-'], type(T), !, typed_lis
 typed_list0(W, N)                --> zeroOrMore(W, N).
 
 
-allowed_sterm(Why,sterm(Why,D))--> {thlocal:allow_sterm},sterm(D).                                                                           
+allowed_sterm(Why,sterm(Why,D))--> {t_l:allow_sterm},sterm(D).                                                                           
 
 effected_typed_list(W, [G|Ns])           --> oneOrMore(W, N), ['-'], effect(T), !, effected_typed_list(W, Ns), {G =.. [T,N]}.
 effected_typed_list(W, N)                --> zeroOrMore(W, N).
@@ -1508,8 +1508,8 @@ parseProblem(F, O, R) :-
 % :- [readFile].
 
 problem(Output, List, R):- with_assertions(tlbugger:skipMust, debugOnError0(problem_dcg(Output, List, R))),!.
-problem(Output, List, R):- with_assertions(thlocal:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(problem_dcg(Output, List, R)))),!,
-   portray_clause((problem:-thlocal:allow_sterm,Output)).
+problem(Output, List, R):- with_assertions(t_l:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(problem_dcg(Output, List, R)))),!,
+   portray_clause((problem:-t_l:allow_sterm,Output)).
 % problem(P     , List, R):- dtrace,trace,must(sterm(O, List, R)),!,must(sterm2pterm(O,P)),!,portray_clause((ed:-P)).
 problem(Output, List, R):- must(problem_dcg(Output, List, R)),!.
 
@@ -2257,9 +2257,9 @@ mysame_key(M0, [M-N|T0], [N|TN], T) :-
  	mysame_key(M, T0, TN, T).
 mysame_key(_, L, [], L).
 
-:-thread_local(thlocal:loading_files).
-:-thread_local(thlocal:hyhtn_solve/1).
-% thlocal:other_planner(hyhtn_solve).
+:-thread_local(t_l:loading_files).
+:-thread_local(t_l:hyhtn_solve/1).
+% t_l:other_planner(hyhtn_solve).
 
 
 
@@ -2294,7 +2294,7 @@ mysame_key(_, L, [], L).
 :- endif.
 */
 
-:- retractall(thlocal:loading_files).
+:- retractall(t_l:loading_files).
 :- endif.
 
 
@@ -2324,7 +2324,7 @@ mysame_key(_, L, [], L).
 test_blocks:- fail, test_domain('./benchmarks/nomystery-sat11-strips/domain.pddl',RList),reverse(RList,List),
   forall(member(E,List),once(test_domain(E))).
 
-% :-asserta(thlocal:loading_files).
+% :-asserta(t_l:loading_files).
 
 :- forall(must_filematch('./rover/?*?/?*domain*.*',E),once(load_domain(E))).
 :- forall(must_filematch('./hsp-planners-master/?*?/pddl/?*?/?*domain*.*',E),once(load_domain(E))).

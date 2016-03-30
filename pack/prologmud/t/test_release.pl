@@ -149,7 +149,7 @@ push_env_ctx:-!.
 
 :- test_for_release(debug_mud_game).
 
-:- asserta(t_l:disable_mpred_term_expansions_locally).
+:- asserta(t_l:disable_px).
 
 
 % :- statistics(globallimit,G),statistics(locallimit,L),statistics(traillimit,T),qsave_program(logicmoo_repl,[map('logicmoo_repl.sav'),global(G),trail(T),local(L)]).

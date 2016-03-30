@@ -42,8 +42,8 @@ cyckb_t_e2c(P,A,B,C):- fail,cyckb_t(P,A,B,C).
 
 :- register_module_type(utility).
 
-:-thread_local thlocal:allowTT/0.
-:-thread_local thlocal:omitCycWordForms/0.
+:-thread_local t_l:allowTT/0.
+:-thread_local t_l:omitCycWordForms/0.
 
 
 %  (parse-a-question-completely "Did George W. Bush fall off a bicycle?" #$RKFParsingMt 
@@ -167,7 +167,7 @@ stringArgUC2([User],Cyc,CallWithCyc):- Cyc=User,!,CallWithCyc,atom(Cyc).
 
 cycStringToString(Cyc,User):- (atom(Cyc)->User=[Cyc];User=Cyc),!.
 
-user:term_expansion(I,O):- current_predicate(logicmoo_bugger_loaded/0),not(thlocal:into_form_code),e2c_term_expansion(I,O).
+user:term_expansion(I,O):- current_predicate(logicmoo_bugger_loaded/0),not(t_l:into_form_code),e2c_term_expansion(I,O).
 
 % ===================================================================
 
@@ -552,7 +552,7 @@ meetsPos_2(String,CycWord,POS):- reorderBody(meetsForm(String,CycWord,Form),POS^
 
 meetsPos_3([String],CycWord,POS):- atom(String),stringAtomToPOS([String],CycWord,POS).
 
-meetsPos_4(String,CycWord,POS):- with_assertions(thlocal:allowTT,meetsPos_2(String,CycWord,POS)).
+meetsPos_4(String,CycWord,POS):- with_assertions(t_l:allowTT,meetsPos_2(String,CycWord,POS)).
 
 meetsPos_5(String,CycWord,POS):-  member(POS,['Noun','Adjective','Verb','Adverb']), stringArg(String,'wnS'(CycWord, _ , String,POS, _ , _)).
 meetsPos_5(String,CycWord,'Adjective'):- 'wnS'(CycWord, _ , String, 'AdjectiveSatellite', _ , _). 
@@ -621,7 +621,7 @@ is_stringWord(String):-stringToCycWord(String,_CycWord).
 stringToCycWord([EMPTY],_CycWord):- is_blankWord(EMPTY),!,fail.
 stringToCycWord(String,CycWord):-
  not(stringToCycWord_never(String,CycWord)),
-  with_assertions(thlocal:allowTT,
+  with_assertions(t_l:allowTT,
    one_must(stringToCycWord_0(String,CycWord),
       one_must(stringToCycWord_1(String,CycWord),
          stringToCycWord_2(String,CycWord)))),notPrefixOrSuffix(CycWord).
@@ -665,7 +665,7 @@ is_speechPartPred_tt_ever(Form):- atom(Form),atom_concat(infl,_,Form),
   call_tabled_can(findall_nodupes(F,((el_holds(isa,F,'Predicate','ThoughtTreasureMt',[amt('ThoughtTreasureMt')|_]),atom(F),atom_concat(infl,_,F))),Forms)),!,member(Form,Forms).
 
 :-export(is_speechPartPred_tt/1).
-is_speechPartPred_tt(Form):- thlocal:allowTT,!,is_speechPartPred_tt_ever(Form).
+is_speechPartPred_tt(Form):- t_l:allowTT,!,is_speechPartPred_tt_ever(Form).
 
 speechPartPreds_transitive(POS,Form):-speechPartPreds_asserted(POS,Form).
 speechPartPreds_asserted(POS, Form):- is_speechPartPred_tt(Form),posName(POS),atom_contains(Form,POS).
@@ -687,7 +687,7 @@ is_speechPartPred(Form):-is_speechPartPred_tt(Form).
 is_speechPartPred_any(Form):-is_speechPartPred_nontt_ever(Form).
 is_speechPartPred_any(Form):-is_speechPartPred_tt_ever(Form).
 
-is_speechPartPred_nontt(Form):- not(thlocal:omitCycWordForms),!,is_speechPartPred_nontt_ever(Form).
+is_speechPartPred_nontt(Form):- not(t_l:omitCycWordForms),!,is_speechPartPred_nontt_ever(Form).
 is_speechPartPred_nontt_ever(Form):- call_tabled_can(no_repeats(Form,(is_speechPartPred_0(Form),not(is_speechPartPred_tt_ever(Form))))).
 
 is_speechPartPred_0('baseForm').
@@ -729,7 +729,7 @@ meetsForm_1(String,CycWord,Form):-
 meetsForm_1([String],CycWord,Form):- stringAtomToWordForm([String],CycWord,Form).
 
 
-meetsForm_2(String,CycWord,POS):- with_assertions(thlocal:allowTT,meetsForm_1(String,CycWord,POS)).
+meetsForm_2(String,CycWord,POS):- with_assertions(t_l:allowTT,meetsForm_1(String,CycWord,POS)).
 
 stringAtomToWordForm([String],CycWord,Form):- nonvar(CycWord),!,stringAtomToWordForm([String],NewCycWord,Form),!,CycWord=NewCycWord.
 stringAtomToWordForm([String],CycWord,Form):- nonvar(String),!,           
@@ -1362,17 +1362,17 @@ get_wordage(A,Props):-atom(A),!,get_wordage([A],Props).
 get_wordage(Pre,Props):-is_wordage_cache(Pre,Props),!.
 get_wordage(Pre,Props):-do_get_wordage(Pre,Props),!,ignore((usefull_wordage(Props),asserta(is_wordage_cache(Pre,Props)))).
 do_get_wordage(Pre,wordage(Pre,More)):- 
-  must_det(( with_no_assertions(thlocal:omitCycWordForms,
-     with_no_assertions(thlocal:allowTT,
-        with_assertions(thlocal:useOnlyExternalDBs,(findall(Prop,string_props(1,Pre,Prop),UProps),get_more_props(Pre,UProps,More))))))).
+  must_det(( with_no_assertions(t_l:omitCycWordForms,
+     with_no_assertions(t_l:allowTT,
+        with_assertions(t_l:useOnlyExternalDBs,(findall(Prop,string_props(1,Pre,Prop),UProps),get_more_props(Pre,UProps,More))))))).
    
 
 
 get_more_props(_,Props,Props):- memberchk(form(_,_,_),Props),memberchk(pos(_,_,_),Props),!.
 get_more_props(Pre,Props,More):-
- with_no_assertions(thlocal:omitCycWordForms,
-   with_assertions(thlocal:allowTT,
-     with_assertions(thlocal:useOnlyExternalDBs,((findall(Prop,string_props(2,Pre,Prop),UProps),
+ with_no_assertions(t_l:omitCycWordForms,
+   with_assertions(t_l:allowTT,
+     with_assertions(t_l:useOnlyExternalDBs,((findall(Prop,string_props(2,Pre,Prop),UProps),
       flatten([UProps,Props],UMore),list_to_set(UMore,More)))))).
 
 hard_words(X):-member(X,[
@@ -1516,7 +1516,7 @@ list_wordage:- listing(is_wordage_cache),retractall(is_wordage_cache(_,_)).
 % :-list_wordage.
 % string_props(Pass,String,posMeans(POS,Form,CycL)):-posMeans(String,POS,Form,CycL).
 string_props(Pass,String,tt(Pass,CycWord,Form)):- 
- with_assertions(thlocal:omitCycWordForms, with_assertions(thlocal:allowTT,(meetsForm(String,CycWord,Form),atom(Form),atom_concat(infl,_,Form),notPrefixOrSuffix(CycWord)))).
+ with_assertions(t_l:omitCycWordForms, with_assertions(t_l:allowTT,(meetsForm(String,CycWord,Form),atom(Form),atom_concat(infl,_,Form),notPrefixOrSuffix(CycWord)))).
 string_props(1,[Num],number(Num)):-number(Num).
 string_props(1,[Atom],number(Num)):-atom_number(Atom,Num).
 string_props(1,Text,txt(Text)).

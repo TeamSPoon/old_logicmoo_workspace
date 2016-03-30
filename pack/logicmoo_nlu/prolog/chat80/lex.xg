@@ -5,22 +5,22 @@
 
 /* Parts of speech */
 /*
-theTextC(W1,CYCPOS,Y=W1)  ---> {thlocal:old_text,!},[W1],{W1=Y}.
+theTextC(W1,CYCPOS,Y=W1)  ---> {t_l:old_text,!},[W1],{W1=Y}.
 theTextC(W1,CYCPOS,Y=W1)  ---> {!},[w(W1,_)],{W1=Y}.
 theTextC(W1,CYCPOS,WHY) ---> [W2],{memoize_pos_to_db(WHY,CYCPOS,W2,W1)}.
 see newdict.pl
 */
 
-theTextL(W1,_CYCPOS,Y=W1)  ---> {thlocal:old_text,!},theText(W1),{W1=Y}.
+theTextL(W1,_CYCPOS,Y=W1)  ---> {t_l:old_text,!},theText(W1),{W1=Y}.
 theTextL(W1,_CYCPOS,Y=W1)  ---> {!},theText(W1),{W1=Y}.
 theTextL(W1,_CYCPOS,WHY) ---> theText(W1),{call(WHY)}.
 
 noText ---> [].
 
-theText1(W1)---> {thlocal:old_text,!},[W1].
+theText1(W1)---> {t_l:old_text,!},[W1].
 theText1(Txt)---> [w(Txt,_)].
 
-theText1(W1,_CYCPOS)--->{thlocal:old_text,!},[W1]. % compatible_pos_db(CW,CYCPOS),cw_db(W1,CW)
+theText1(W1,_CYCPOS)--->{t_l:old_text,!},[W1]. % compatible_pos_db(CW,CYCPOS),cw_db(W1,CW)
 theText1(Txt,_CYCPOS)---> [w(Txt,_)]. 
 
 :- export(theText//1).

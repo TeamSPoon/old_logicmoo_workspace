@@ -61,7 +61,7 @@ min_sas(_,A,A).
 first_n_elements(ListR,Num,List):-length(ListR,PosNum),min_sas(PosNum,Num,MinNum),length(List,MinNum),append(List,_,ListR),!.
 
 test_domain(DP):-
-  thlocal:loading_files,!,load_domain(DP).
+  t_l:loading_files,!,load_domain(DP).
 test_domain(DP):-test_domain(DP,12).
 test_domain(DP,Num):-
    format('~q.~n',[test_domain(DP)]),
@@ -1074,11 +1074,11 @@ parseDomain(File, Output, R) :-
 set_nb_propval(_PROPS,_Name,_Value):-!.
     
 
-:-thread_local(thlocal:allow_sterm).
+:-thread_local(t_l:allow_sterm).
 
 domainBNF(Output, List, R):- with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:domainBNF_dcg(Output,Output, List, R))),!.
-domainBNF(Output, List, R):- with_assertions(thlocal:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:domainBNF_dcg(Output,Output, List, R)))),!,
-   portray_clause((domainBNF:-thlocal:allow_sterm,Output)).
+domainBNF(Output, List, R):- with_assertions(t_l:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:domainBNF_dcg(Output,Output, List, R)))),!,
+   portray_clause((domainBNF:-t_l:allow_sterm,Output)).
 domainBNF(P     , List, R):- must(sterm(O, List, R)),!,must(sterm2pterm(O,P)),!,portray_clause((ed:-P)).
 domainBNF(Output, List, R):- trace,domainBNF_dcg(Output, Output, List, R),!.
 
@@ -1218,7 +1218,7 @@ typed_list(W, [G|Ns])           --> oneOrMore(W, N), ['-'], type(T), !, typed_li
 typed_list(W, N)                --> zeroOrMore(W, N).
 
 
-allowed_sterm(Why,sterm(Why,D))--> {thlocal:allow_sterm},sterm(D).                                                                           
+allowed_sterm(Why,sterm(Why,D))--> {t_l:allow_sterm},sterm(D).                                                                           
 
 effected_typed_list(W, [G|Ns])           --> oneOrMore(W, N), ['-'], effect(T), !, effected_typed_list(W, Ns), {G =.. [T,N]}.
 effected_typed_list(W, N)                --> zeroOrMore(W, N).
@@ -1393,8 +1393,8 @@ parseProblem(F, O, R) :-
 % :- [readFile].
 
 problem(Output, List, R):- with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:problem_dcg(Output, List, R))),!.
-problem(Output, List, R):- with_assertions(thlocal:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:problem_dcg(Output, List, R)))),!,
-   portray_clause((problem:-thlocal:allow_sterm,Output)).
+problem(Output, List, R):- with_assertions(t_l:allow_sterm,with_assertions(tlbugger:skipMust, debugOnError0(pddl_robert_sasak:problem_dcg(Output, List, R)))),!,
+   portray_clause((problem:-t_l:allow_sterm,Output)).
 problem(P     , List, R):- must(sterm(O, List, R)),!,must(sterm2pterm(O,P)),!,portray_clause((ed:-P)).
 problem(Output, List, R):- trace,problem_dcg(Output, List, R),!.
 
@@ -1762,12 +1762,12 @@ my_ord_member(S, [_|T]):-
 :- module(pddl_robert_sasak).
 
 
-:-thread_local(thlocal:loading_files).
+:-thread_local(t_l:loading_files).
 
 :- debug,must(test_blocks).
 :- test_all.
 /*
-:-asserta(thlocal:loading_files).
+:-asserta(t_l:loading_files).
 
 :- forall(filematch_sas('./rover/*/*domain*.*',E),once(load_domain(E))).
 :- forall(filematch_sas('./hsp-planners-master/*/pddl/*/*domain*.*',E),once(load_domain(E))).

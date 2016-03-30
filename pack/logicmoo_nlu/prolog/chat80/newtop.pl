@@ -86,7 +86,7 @@ end(F) :-
 
 
 :-dynamic_multifile_exported(control80/1).
-control80(U):-with_assertions(thlocal:tracing80,control80(report,U)).
+control80(U):-with_assertions(t_l:tracing80,control80(report,U)).
 
 :-dynamic_multifile_exported(control80/2).
 
@@ -98,30 +98,30 @@ control80(Callback,[bye,'.']) :- !,
    display('Cheerio.'),nl.
 
 control80(Callback,[trace,'.']) :- !,
-   assert(thlocal:tracing80),
-   call(Callback,assert(thlocal:tracing80),'thlocal:tracing80',true,boolean),
+   assert(t_l:tracing80),
+   call(Callback,assert(t_l:tracing80),'t_l:tracing80',true,boolean),
    display('Tracing from now on!'), nl, fail.
 
 control80(Callback,[do,not,trace,'.']) :-
-   retract(thlocal:tracing80), !,
-   call(Callback,retract(thlocal:tracing80),'thlocal:tracing80',false,boolean),
-   display('No longer thlocal:tracing80.'), nl, fail.
+   retract(t_l:tracing80), !,
+   call(Callback,retract(t_l:tracing80),'t_l:tracing80',false,boolean),
+   display('No longer t_l:tracing80.'), nl, fail.
 
-control80(Callback,U) :- with_assertions(thlocal:tracing80, call_in_banner(U,(ignore(process_run(Callback,U,_List,_Time))))),fail.
+control80(Callback,U) :- with_assertions(t_l:tracing80, call_in_banner(U,(ignore(process_run(Callback,U,_List,_Time))))),fail.
    
 :-export(chat80/1).
 chat80(U):-
  with_assertions(tracing80,
-           with_assertions(thlocal:chat80_interactive,
-            with_no_assertions(thlocal:useOnlyExternalDBs,
+           with_assertions(t_l:chat80_interactive,
+            with_no_assertions(t_l:useOnlyExternalDBs,
              with_no_assertions(thglobal:use_cyc_database,
               ignore(control80(U)))))).
 
 :-export(test_chat80/1).
 test_chat80(U):-
  with_assertions(tracing80,
-           with_assertions(thlocal:chat80_interactive,
-            with_no_assertions(thlocal:useOnlyExternalDBs,
+           with_assertions(t_l:chat80_interactive,
+            with_no_assertions(t_l:useOnlyExternalDBs,
              with_no_assertions(thglobal:use_cyc_database,
               ignore(control80(U)))))).
    
@@ -174,13 +174,13 @@ words_to_w2(U,W2):-not(compound(U)),must(W2=U).
 words_to_w2([W|WL],[W2|W2L]):-w_to_w2(W,W2),words_to_w2(WL,W2L).
 
 
-:-thread_local thlocal:old_text/0.
+:-thread_local t_l:old_text/0.
 
-thlocal:old_text.
+t_l:old_text.
 % TODO dont use open marker use []
 use_open_marker.
 
-w_to_w2(W,W):-thlocal:old_text,!.
+w_to_w2(W,W):-t_l:old_text,!.
 
 w_to_w2(Var,Var):-var(Var),!.
 w_to_w2(w(Txt,Props),w(Txt,Props)):-!.
@@ -195,18 +195,18 @@ w_to_w2(X,w(X,[])):-!.
 w2_to_w(w(Txt,_),Txt):-!.
 w2_to_w(Txt,Txt).
 
-%theTextC(W1,CYCPOS,Y=W1)  ---> {thlocal:old_text,!},[W1],{W1=Y}.
-theTextC(A,_,F=A,B,C,D,E) :-thlocal:old_text, !,terminal(A, B, C, D, E),A=F,is_sane_nv(A).
+%theTextC(W1,CYCPOS,Y=W1)  ---> {t_l:old_text,!},[W1],{W1=Y}.
+theTextC(A,_,F=A,B,C,D,E) :-t_l:old_text, !,terminal(A, B, C, D, E),A=F,is_sane_nv(A).
 theTextC(A,_,F=A,B,C,D,E) :- !,terminal(w(A, _), B, C, D, E),A=F,is_sane_nv(A).
 %theTextC(W1,CYCPOS,Y=W1)  ---> {!},[w(W1,_)],{W1=Y}.
 %theTextC(W1,CYCPOS,WHY) ---> [W2],{memoize_pos_to_db(WHY,CYCPOS,W2,W1)}.
 theTextC(H,F,E,A,B,C,D) :- fail, is_sane(C), terminal(G, A, B, C, D),memoize_pos_to_db(E, F, G, H),is_sane_nv(H).
 
 /*
-theTextC(W1,_CYCPOS,Y=W1) ---> {thlocal:old_text,!},[W1],{W1=Y}.
+theTextC(W1,_CYCPOS,Y=W1) ---> {t_l:old_text,!},[W1],{W1=Y}.
 %theTextC(W1,_CYCPOS,Y=W1) ---> {!},[w(W1,_)],{W1=Y}.
 theTextC(A,_,F=A,B,C,D,E) :- !,terminal(w(A, _), B, C, D, E),A=F,is_sane_nv(A).
-theTextC(W1,_CYCPOS,WHY) ---> {thlocal:old_text,!},[W1],WHY.
+theTextC(W1,_CYCPOS,WHY) ---> {t_l:old_text,!},[W1],WHY.
 % theTextC(W1,CYCPOS,WHY) ---> {trace_or_throw(memoize_pos_to_db(WHY,CYCPOS,W2,W1))},[W2],{memoize_pos_to_db(WHY,CYCPOS,W2,W1)}.
 */
 
@@ -217,10 +217,10 @@ sent_to_parsed(U,E):- deepen_pos(sentence(E,U,[],[],[])).
 
 :-export(deepen_pos/1).
 :-meta_predicate(deepen_pos(0)).
-deepen_pos(Call):- one_must(deepen_pos_0(Call),with_assertions(thlocal:useAltPOS,deepen_pos_0(Call))).
+deepen_pos(Call):- one_must(deepen_pos_0(Call),with_assertions(t_l:useAltPOS,deepen_pos_0(Call))).
 :-export(deepen_pos_0/1).
 :-meta_predicate(deepen_pos_0(0)).
-deepen_pos_0(Call):-one_must(Call,with_assertions(thlocal:usePlTalk,Call)).
+deepen_pos_0(Call):-one_must(Call,with_assertions(t_l:usePlTalk,Call)).
 
 
 % any_to_string("How many countries are there?",X),splt_words(X,Y,Z),vars_to_ucase(Y,Z),maplist(call,Z)
@@ -263,7 +263,7 @@ process_run_real(Callback,StartParse,UIn,[sent=(U),parse=(E),sem=(S),qplan=(QP),
 test_quiet(_,_,_,_).
 
 :-dynamic_multifile_exported(report/4).
-report(Item,Label,Time,Mode) :- thlocal:tracing80, !,
+report(Item,Label,Time,Mode) :- t_l:tracing80, !,
    nl, write(Label), write(': '), write(Time), write('sec.'), nl,
    safely_call_ro(report_item(Mode,Item)),!.
 report(_,_,_,_).
@@ -310,7 +310,7 @@ sent_to_prelogic(S0,S) :-
    once(simplify(S2,S)),!.
 
 sent_to_prelogic(S0,S) :- 
-  thlocal:chat80_interactive,plt,
+  t_l:chat80_interactive,plt,
    must((i_sentence(S0,S1),
    clausify80(S1,S2),
    simplify(S2,S))),!.

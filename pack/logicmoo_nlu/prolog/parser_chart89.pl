@@ -28,7 +28,7 @@
 :- user:call(op(600,xfy,':')).
 :- user:call(op(400,yfx,'/')).
 
-:- asserta((thlocal:enable_src_loop_checking)).
+:- asserta((t_l:enable_src_loop_checking)).
 
 :-multifile(user:type_action_info/3).
 :-multifile(user:agent_call_command/2).
@@ -47,27 +47,27 @@ user:agent_call_command(_Gent,chart89(StringM)):-nonvar(StringM), chart89(String
 % ===========================================================
 % CHART89 REPL
 % ===========================================================
-:-thread_local thlocal:chart89_interactive/0.
+:-thread_local t_l:chart89_interactive/0.
 chart89 :- with_assertions(tracing80,
-           with_assertions(thlocal:chart89_interactive,
-            with_no_assertions(thlocal:useOnlyExternalDBs,
+           with_assertions(t_l:chart89_interactive,
+            with_no_assertions(t_l:useOnlyExternalDBs,
              with_no_assertions(thglobal:use_cyc_database,
               (told, repeat, prompt_read('CHART89> ',U),  
                             to_word_list(U,WL),((WL==[bye];WL==[end,'_',of,'_',file];(mmake,once(chart89(WL)),fail)))))))).
 
-:- multifile(thlocal:into_form_code/0).
-:- asserta(thlocal:into_form_code).
+:- multifile(t_l:into_form_code/0).
+:- asserta(t_l:into_form_code).
 
 % :- ensure_loaded(logicmoo(parsing/chart89/dcgtrans)).	%  generator
-% :- retract(thlocal:into_form_code).
+% :- retract(t_l:into_form_code).
 
 :- include(chart89/buchart2).	% toplevel
 
 %:-export(test_chart89_regressions/0).
 test_chart89_regressions:- time((test1,test2)).
-:- retract(thlocal:into_form_code).
+:- retract(t_l:into_form_code).
 
-:- retractall(thlocal:enable_src_loop_checking).
+:- retractall(t_l:enable_src_loop_checking).
 
 
 user:mud_test(chart89_regressions,test_chart89_regressions).

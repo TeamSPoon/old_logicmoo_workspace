@@ -9,7 +9,7 @@ fi
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 if [ -z ${STANFORD_JAR+x} ]; then export STANFORD_JAR="${DIR}/pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar"; fi
-if [ -z ${JAVA_HOME+x} ]; then export JAVA_HOME=`find /usr -name java-8-oracle -printf "%p/jre"`; fi
+if [ -z ${JAVA_HOME+x} ]; then export JAVA_HOME=`find /usr -fstype local -name java-8-oracle -printf "%p/jre"`; fi
 
 if [ -z `echo $LD_LIBRARY_PATH | grep 'java'` ]; then
   export LD_LIBRARY_PATH="${JAVA_HOME}/lib/amd64/server:${JAVA_HOME}/lib/amd64:${JAVA_HOME}/bin:${PATH}:${LD_LIBRARY_PATH}"
@@ -21,7 +21,7 @@ fi
 if [ $# -eq 0 ] 
  then
    echo "No arguments supplied thus this will NOT restart when crashed"
-   export RUNFILE="runtime/run_mud_server.pl"
+   export RUNFILE="./pack/prologmud/t/run_mud_game.pl"
  else
     export RUNFILE="$1"
 fi
