@@ -102,6 +102,11 @@ w_tl(_FPM:set_prolog_flag(N,XFY),MCall):- !,
 w_tl(M:before_after(Before,After),Call):-
      (M:Before -> setup_call_cleanup(true,Call,M:After);Call).
 
+w_tl(WM:THeadWM,CM:Call):- !,
+ notrace(( 
+     to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
+     setup_call_cleanup(asserta(M:HAssert,REF),CM:Call,erase(REF)).
+
 w_tl(WM:THeadWM,CM:Call):- 
  notrace(( 
      to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> copy_term(HAssert,CHAssert) ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),

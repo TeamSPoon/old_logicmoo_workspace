@@ -376,6 +376,7 @@ mpred_op(clauses(Op),  H):-!,mpred_op((Op),  H).
 mpred_op(_,C):- call_u(C).
 
 :- was_export(whenAnd/2).
+:- module_transparent(whenAnd/2).
 
 
 
@@ -702,7 +703,7 @@ attvar_op(Op,Data):-
    deserialize_attvars(Data,Data0),
    attvar_op(Op,Data0).
 */
-
+:- module_transparent(attvar_op/2).
 attvar_op(Op,Data):-
    notrace((strip_module(Op,_,OpA), sanity((atom(OpA))),
    get_user_abox(ABOX),add_side_effect(Op,Data),deserialize_attvars(Data,Data0))),
@@ -1148,12 +1149,14 @@ mpred_rule_hb_0(Outcome,Outcome,true).
 %
 % Assert If New Metainformation.
 %
+:- module_transparent(ain_minfo/1).
 ain_minfo(G):-ain_minfo(assertz_if_new,G).
 
 %% ain_minfo( :PRED1How, ?H) is semidet.
 %
 % Assert If New Metainformation.
 %
+:- module_transparent(ain_minfo/2).
 ain_minfo(How,(H:-True)):-is_true(True),must(is_ftNonvar(H)),!,ain_minfo(How,H).
 ain_minfo(How,(H<-B)):- !,ain_minfo(How,(H:-infoF(H<-B))),!,ain_minfo(How,(H:-mpred_bc_only(H))),ain_minfo_2(How,(B:-infoF(H<-B))).
 ain_minfo(How,(B==>H)):- !,ain_minfo(How,(H:-infoF(B==>H))),!,ain_minfo_2(How,(B:-infoF(B==>H))).
@@ -1176,6 +1179,7 @@ ain_minfo(_,_).
 %
 % Assert If New Metainformation  Extended Helper.
 %
+:- module_transparent(ain_minfo_2/2).
 ain_minfo_2(How,G):-ain_minfo(How,G).
 
 
@@ -1707,6 +1711,7 @@ neg_in_code(G):-  is_ftNonvar(G), prologSingleValued(G),must((if_missing_mask(G,
 
 
 :- meta_predicate neg_may_naf(0).
+:- module_transparent(neg_may_naf/1).
 :- export(neg_may_naf/1).
 
 %% neg_may_naf( :GoalP) is semidet.
@@ -2351,18 +2356,21 @@ pred_r0(P<-Q):- mreq(P<-Q).
 %
 % Cnstrn.
 %
+:- module_transparent(cnstrn/1).
 cnstrn(X):-term_variables(X,Vs),maplist(cnstrn0(X),Vs),!.
 
 %% cnstrn( +V, ?X) is semidet.
 %
 % Cnstrn.
 %
+:- module_transparent(cnstrn/2).
 cnstrn(V,X):-cnstrn0(X,V).
 
 %% cnstrn0( +X, ?V) is semidet.
 %
 % Cnstrn Primary Helper.
 %
+:- module_transparent(cnstrn0/2).
 cnstrn0(X,V):-when(is_ftNonvar(V),X).
 
 
@@ -2768,6 +2776,16 @@ with_umt(G0):-
 :- module_transparent( (assertz_mu)/1).
 :- module_transparent( (mpred_op)/2).
 :- module_transparent( (with_umt)/1).
+:- module_transparent(deducedSimply/1).
+:- module_transparent(is_callable/1).
+:- module_transparent(map_unless/4).
+:- module_transparent(mpred_facts_only/1).
+:- module_transparent(mpred_retry/1).
+:- module_transparent(mpred_update_literal/4).
+:- module_transparent(naf/1).
+:- module_transparent(oncely/1).
+:- module_transparent(physical_side_effect/1).
+:- module_transparent(pred_head/2).
 
 
 :- source_location(S,_),prolog_load_context(module,M),

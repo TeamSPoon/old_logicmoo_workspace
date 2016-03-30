@@ -135,7 +135,7 @@
         string_predicate/1,
         to_string_hook/3.
 :- meta_predicate 
-        convert_members(?, ?, ?),
+        convert_members(2, ?, ?),
         map_tree_to_list(2, ?, ?),
         toCase(2, ?, ?),
         toCaseSplit(?, 2, ?, ?).

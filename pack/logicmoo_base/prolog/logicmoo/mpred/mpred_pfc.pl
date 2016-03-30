@@ -85,7 +85,7 @@
   mpred_post2/2,get_mpred_assertion_status/3,mpred_post4/4,get_mpred_support_status/5,same_file_facts/2,clause_asserted_u/1,
 
   mpred_run/0,mpred_test/1,mpred_test_fok/1,
-
+  fa_to_p/3,
   mpred_call_no_bc/1,with_umt/1,asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,clause_u/2,clause_u/3,
   lookup_u/1,
 
@@ -103,9 +103,9 @@
   ]).
 
  :- meta_predicate 
-      
       each_E(:,+,+),
-      pfcl_do(+),
+      pfcl_do(0),
+      pfcl_do(+), % not all arg1s are callable
       lookup_u(:),
       mpred_get_support(+,-),
       mpred_fact(?,0),
@@ -117,7 +117,8 @@
       mpred_call_no_bc(+),
       call_u(+),
       mpred_BC_CACHE(+),
-      foreachl_do(+,-),
+      foreachl_do(0,?), 
+      foreachl_do(+,?), % not all arg1s are callable
       with_no_mpred_breaks(0),
       fc_eval_action(0,-),
       clause_u(:,+,-),
@@ -2894,25 +2895,6 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent(mpred_post1_rem/2).
 :- module_transparent(assert_u_confirmed_if_missing/1).
 :- module_transparent(clause_asserted_u/1).
-/*
-:- module_transparent(neg_may_naf/1).
-:- module_transparent(ain_minfo/2).
-:- module_transparent(ain_minfo_2/2).
-:- module_transparent(attvar_op/2).
-:- module_transparent(cnstrn/2).
-:- module_transparent(cnstrn/1).
-:- module_transparent(cnstrn0/2).
-:- module_transparent(deducedSimply/1).
-:- module_transparent(is_callable/1).
-:- module_transparent(map_unless/4).
-:- module_transparent(mpred_facts_only/1).
-:- module_transparent(mpred_retry/1).
-:- module_transparent(mpred_update_literal/4).
-:- module_transparent(naf/1).
-:- module_transparent(oncely/1).
-:- module_transparent(physical_side_effect/1).
-:- module_transparent(pred_head/2).
-*/
 
 
 :- source_location(S,_),prolog_load_context(module,M),

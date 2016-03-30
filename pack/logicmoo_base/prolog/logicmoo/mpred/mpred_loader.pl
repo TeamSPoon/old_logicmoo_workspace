@@ -300,6 +300,7 @@ chop_box(Chop,Was):-atom_concat(Was,'SBox',Chop),!.
 chop_box(Chop,Chop).
 
 
+maybe_hack_import_modules.
 
 %% maybe_add_import_module( ?A, ?A, ?VALUE3) is semidet.
 %
@@ -311,10 +312,10 @@ maybe_add_import_module(basePFC,_,end):-!.
 maybe_add_import_module(baseKB,_,end):-!.
 maybe_add_import_module(logicmoo_user, baseKB, end):-!.
 maybe_add_import_module(user, baseKB, end):-!.
-maybe_add_import_module(_,_,_):-!.
+maybe_add_import_module(_,_,_):- \+ maybe_hack_import_modules,!.
 maybe_add_import_module(A,B,C):- catch(add_import_module(A,B,C),_,logicmoo_util_dmsg:dmsg(failed(maybe_add_import_module(A,B,C)))),!.
 
-maybe_delete_import_module(_,_):-!.
+maybe_delete_import_module(_,_):- \+ maybe_hack_import_modules,!.
 maybe_delete_import_module(A,B):- catch(delete_import_module(A,B),_,logicmoo_util_dmsg:dmsg(failed(maybe_delete_import_module(A,B)))),!.
 
 
@@ -1480,8 +1481,10 @@ import_to_user0(user,user,M:FA):- must(M\==user),!, call_from_module(M,import_to
 import_to_user0(M,SM, user:FA):- M\==SM,dmsg(warn(import_to_user0(M,SM, user:FA))),fail.
 import_to_user0(MM,SM,M:F/A):- !,functor(P,F,A),import_to_user_mfa0(MM,SM,P,M:F/A).
 import_to_user0(MM,SM,M:P):-!,functor(P,F,A),import_to_user_mfa0(MM,SM,P,M:F/A).
-import_to_user0(MM,SM,P):- source_module(SSM),t_l:user_abox(SSM,M),import_to_user0(MM,SM,M:P).
+import_to_user0(MM,SM,P):- source_module(SSM),user_abox_or(SSM,M),import_to_user0(MM,SM,M:P),!.
 
+user_abox_or(SSM,M):- t_l:user_abox(SSM,M),!.
+user_abox_or(M,M).
 
 import_to_user_mfa0(_MM,_SM,_P,_M:F/A):- current_predicate(system:F/A),!.
 import_to_user_mfa0(_MM,_SM,P,_M:_F/_A):- predicate_property(P,static),!.
@@ -1512,7 +1515,7 @@ system:import_module_to_user(M):- ignore(maybe_delete_import_module(M,user)),
                            maybe_add_import_module(M,system,end),
                            maybe_add_import_module(user,M,end),
                            % find system thru M
-                           ignore(maybe_delete_import_module(user,system)).
+                           maybe_delete_import_module(user,system).
 
 
 
@@ -1566,12 +1569,12 @@ ensure_imports_tbox(M,BaseKB):-
    forall((prolog:current_predicate(_,BaseKB:P),\+predicate_property(BaseKB:P,imported_from(_))),mpred_loader:import_shared_pred(M,BaseKB,P)),
    % maybe_add_import_module(user,BaseKB,end),
    % maybe_add_import_module(BaseKB,system,end),
-  %= maybe_add_import_module(M,user,end),
+   maybe_add_import_module(M,user,end),
    %maybe_add_import_module(BaseKB,M,end),
    %mpred_loader:skip_user(M),
-   %=ignore(system:maybe_delete_import_module(M,user)),
-   %=system:add_import_module(user,M,end),
-   %=ignore(system:maybe_delete_import_module(user,system)), % gets from M now
+   ignore(system:maybe_delete_import_module(M,user)),
+   system:maybe_add_import_module(user,M,end),
+   ignore(system:maybe_delete_import_module(user,system)), % gets from M now
    !)).
 
 :-multifile(lmconf:locked_baseKB/0).

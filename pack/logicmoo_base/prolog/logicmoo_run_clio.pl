@@ -66,7 +66,7 @@ user_db:grant_openid_server(_,_).
 
 
 %pre_http_location(hmud_files, '/hmud', [prefix,js(true)]).
-:- http_handler('/hmud/', http_reply_from_files('../pack/hMUD/', []), [prefix]).
+:- http_handler('/hmud/', http_reply_from_files(pack(hMUD), []), [prefix]).
 %user:file_search_path(hmud_files, '../pack/hMUD')).
 
 % :- listing((pre_http_location(_, _, _))), retractall((pre_http_location(cliopatria, root('.'), []))), retractall((pre_http_location(_, root('.'), []))),!.
@@ -260,6 +260,6 @@ pre_http_location(yui_base, www('yui/2.7.0'), []).
 
 
 
-:- add_to_search_path_first(cliopatria, '../pack/ClioPatria').
-:- add_to_search_path_first(user, '../pack/ClioPatria/user').
+:- add_to_search_path_first(cliopatria, pack('ClioPatria')).
+:- add_to_search_path_first(user, pack('ClioPatria/user')).
 

@@ -54,6 +54,8 @@
 % :- make.
 %:- portray_text(true).
 
+:- asserta(t_l:disable_px).
+
 :-set_prolog_stack(global, limit(32*10**9)).
 :-set_prolog_stack(local, limit(32*10**9)).
 :-set_prolog_stack(trail, limit(32*10**9)).
@@ -84,6 +86,8 @@ unsafe_preds(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
 :- file_begin(prolog).
 
 :- '$set_source_module'(_,'user').
+
+:- asserta(t_l:disable_px).
 
 add_game_dir(GAMEDIR,Else):- add_to_search_path_first(game, GAMEDIR),now_try_game_dir(Else).
 

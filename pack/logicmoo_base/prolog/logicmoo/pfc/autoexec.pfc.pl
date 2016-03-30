@@ -99,7 +99,8 @@
       %   op(1000,xfy,(',')),
          op(700,xfx,('==')).
 
-
+:- ensure_abox(baseKB).
+:- set_user_abox(baseKB).
 :- set_mpred_module(baseKB).
 
 

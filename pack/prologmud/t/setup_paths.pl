@@ -51,9 +51,9 @@ user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog')
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
 
 user:pmrt_file_search_path(pack, '../../../pack').
-user:pmrt_file_search_path(cliopatria, '../pack/ClioPatria'). % :- current_prolog_flag(unix,true).
-user:pmrt_file_search_path(user, '../pack/ClioPatria/user').
-user:pmrt_file_search_path(swish, '../pack/swish'). % :- current_prolog_flag(unix,true).
+user:pmrt_file_search_path(cliopatria,pack('ClioPatria')). % :- current_prolog_flag(unix,true).
+user:pmrt_file_search_path(user, pack('ClioPatria/user')).
+user:pmrt_file_search_path(user, pack('swish')).
 
 user:pmrt_file_search_path(games, '../games').
 user:pmrt_file_search_path(library, LIB):- user:pmrt_file_search_path_library(LIB).

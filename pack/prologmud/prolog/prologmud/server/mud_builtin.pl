@@ -28,8 +28,11 @@
 :- '$set_source_module'(_,baseKB).
 :- file_begin(pfc).
 :- set_user_abox(baseKB).
+
+
 :- retractall(t_l:disable_px).
 
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('logicmoo/pfc/autoexec.pfc')).
 
 % baseKB:isa(iPerson99,tPerson).
 
@@ -90,7 +93,7 @@ ttUnverifiableType(vtDirection).
 ((typeGenls(TypeType,Super), genls(Type,Super)) ==> isa(Type,TypeType)).
 
 
-
+:- dynamic(disjointWith/2).
 /*
 disjointWith(A,B):- A=B,!,fail.
 disjointWith(A,B):- disjointWithT(A,B).
