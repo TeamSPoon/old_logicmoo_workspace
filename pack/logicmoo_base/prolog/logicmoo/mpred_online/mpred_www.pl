@@ -1692,6 +1692,7 @@ indent_nbsp(1,'\n         '):-!.
 indent_nbsp(X,Chars):-XX is X -1,!, indent_nbsp(XX,OutP),!,sformat(Chars,'~w   ',[OutP]),!.
 
 
+:- use_module(library(pldoc/doc_library)).
 
 
 :- multifile lmconf:shared_hide_data/1.

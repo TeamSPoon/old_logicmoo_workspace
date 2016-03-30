@@ -483,7 +483,7 @@ is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=
    % ,ignore(((\+ atom_concat('__aux',_,F),format('~N:- module_transparent(~q/~q).~n',[F,A]))))
    ))).
 
-:- add_import_module(baseKB,basePFC,end).
-:- initialization(add_import_module(baseKB,basePFC,end)).
+:- maybe_add_import_module(baseKB,basePFC,end).
+:- initialization(maybe_add_import_module(baseKB,basePFC,end)).
 
 

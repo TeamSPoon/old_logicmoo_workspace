@@ -365,11 +365,10 @@ save_streams:- thread_self(ID), save_streams(ID).
 save_streams(ID):- current_input(In),thread_current_input(ID,In),!.
 save_streams(ID):-
   current_input(In),asserta(thread_current_input(ID,In)),
-  current_output(Err),asserta(thread_current_error_stream(ID,Err)).
+  current_error(Err),asserta(thread_current_error_stream(ID,Err)).
 
-% = :- meta_predicate(with_main_input(0)).
 
-%= 	 	 
+:- meta_predicate(with_main_input(0)).
 
 %% with_main_input( :GoalGoal) is semidet.
 %
@@ -396,7 +395,7 @@ with_main_input(Goal):-
     lmcache:thread_main(user,ID),thread_current_input(ID,In),thread_current_error_stream(ID,Err),
     setup_call_cleanup(set_prolog_IO(In,Err,Err),Goal,set_prolog_IO(InPrev,OutPrev,ErrPrev)).
 
-:- save_streams.
+% :- save_streams.
 :- initialization(save_streams).
 
 :- dynamic(is_hiding_dmsgs).

@@ -1375,7 +1375,7 @@ init_varname_stores(_):- !.
 
 
 :- initialization(maybe_scan_source_files_for_varnames).
-:- maybe_scan_source_files_for_varnames.
+% :- maybe_scan_source_files_for_varnames.
 
 
 %= 	 	 

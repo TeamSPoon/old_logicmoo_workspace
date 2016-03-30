@@ -1255,7 +1255,7 @@ traceok(X):-  tlbugger:wastracing -> call_cleanup((trace,call(X)),notrace) ; cal
 set_no_debug:- 
   must_det_l((
    asserta(is_set_no_debug),
-   set_prolog_flag(generate_debug_info, false),
+   set_prolog_flag(generate_debug_info, true),
    retractall(tlbugger:ifCanTrace),
    retractall(tlbugger:ifWontTrace),
    asserta(tlbugger:ifWontTrace),   
