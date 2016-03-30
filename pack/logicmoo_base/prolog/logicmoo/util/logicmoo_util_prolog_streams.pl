@@ -83,6 +83,7 @@ on_x_fail_priv(Goal):- catch(Goal,_,fail).
 
 :- meta_predicate(with_output_to_pred(1,0)).
 
+
 current_error(Err):-must((thread_current_error_stream(Err); stream_property(Err,alias(current_error)); stream_property(Err,alias(user_error)))),!.
 
 %= 	 	 

@@ -300,6 +300,7 @@
         will_debug_else_throw(0, 0),
         with_no_term_expansions(0),
         with_skip_bugger(0).
+
 :- module_transparent
                     show_failure/1,
         asserta_if_ground/1,
@@ -1116,7 +1117,6 @@ bugger_flag(F=V):-bugger_flag(F,V).
 % Logic Moo Debugger Flag.
 %
 bugger_flag(F,V):-current_prolog_flag(F,V).
-
 
 %= 	 	 
 

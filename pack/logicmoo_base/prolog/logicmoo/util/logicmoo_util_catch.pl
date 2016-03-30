@@ -365,7 +365,10 @@ save_streams:- thread_self(ID), save_streams(ID).
 save_streams(ID):- current_input(In),thread_current_input(ID,In),!.
 save_streams(ID):-
   current_input(In),asserta(thread_current_input(ID,In)),
-  current_error(Err),asserta(thread_current_error_stream(ID,Err)).
+  thread_at_exit(retractall((thread_current_input(ID,_)))),
+  thread_at_exit(retractall((thread_current_error_stream(ID,_)))),
+  (stream_property(Err, alias(user_error));current_error(Err)),
+  asserta(thread_current_error_stream(ID,Err)).
 
 
 :- meta_predicate(with_main_input(0)).
@@ -395,8 +398,6 @@ with_main_input(Goal):-
     lmcache:thread_main(user,ID),thread_current_input(ID,In),thread_current_error_stream(ID,Err),
     setup_call_cleanup(set_prolog_IO(In,Err,Err),Goal,set_prolog_IO(InPrev,OutPrev,ErrPrev)).
 
-% :- save_streams.
-:- initialization(save_streams).
 
 :- dynamic(is_hiding_dmsgs).
 
@@ -1521,4 +1522,7 @@ get_must(Goal,CGoal):-
 :- 'mpred_trace_none'(ddmsg(_,_)).
 
 :- source_location(S,_),prolog_load_context(module,M),forall(source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A),M:export(M:F/A))).
+
+:- initialization(save_streams).
+:- save_streams.
 
