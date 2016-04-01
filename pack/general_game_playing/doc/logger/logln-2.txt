@@ -1,0 +1,23 @@
+
+logln(++LogID, +Term)
+
+   writes a term to a logfile
+
+Arguments
+   LogID               id of a log
+   Term                the term to be logged
+
+Type
+   library(logger)
+
+Description
+logln/2 appends a line consisting of a timestamp and Term to the logfile. The name of the logfile is composed of a directory (default is "logs") the log prefix (typically the id of the current match) and LogID.
+
+Fail Conditions
+   None. Always succeed.
+
+Resatisfiable
+   no
+
+See Also
+   log_printf / 3, set_log_prefix / 1

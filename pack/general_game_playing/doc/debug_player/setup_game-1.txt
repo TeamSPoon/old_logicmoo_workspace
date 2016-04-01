@@ -1,0 +1,19 @@
+
+setup_game(++GameFile)
+
+   Sets up the player as if a start message for the given game was received. Startclock and playclock are set to one day. compute_best_move/2 is not called.
+
+Arguments
+   GameFile            the name of a file containing the game rules
+
+Type
+   library(debug_player)
+
+Fail Conditions
+   GameFile does not exist.
+
+Resatisfiable
+   no
+
+See Also
+   

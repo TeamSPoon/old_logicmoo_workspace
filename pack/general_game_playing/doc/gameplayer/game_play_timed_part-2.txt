@@ -1,0 +1,23 @@
+
+game_play_timed_part(++CurrentState, ++Role)
+
+   is called after receiving a play message of a match
+
+Arguments
+   CurrentState        the current state of the match in form of a list of fluents
+   Role                the role name of this player
+
+Type
+   library(gameplayer)
+
+Description
+game_play_timed_part/2 calls the search algorithm. game_play_timed_part/2 is called with timeout/3, that means it will be stopped automatically if the play clock is over. The best move found has to be stored using match_info:set_current_best_move/1.
+
+Fail Conditions
+   None. Always succeed.
+
+Resatisfiable
+   no
+
+See Also
+   game_play / 4, match_info : set_current_best_move / 1, compute_best_move : compute_best_move / 2

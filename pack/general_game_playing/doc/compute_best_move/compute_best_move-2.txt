@@ -1,0 +1,23 @@
+
+compute_best_move(++CurrentState, ++Role)
+
+   computes the best move of the player
+
+Arguments
+   CurrentState        the current state as a list of fluents
+   Role                the role name of this player
+
+Type
+   library(compute_best_move)
+
+Description
+compute_best_move/2 should search the game tree and store the best move in the current state with set_current_best_move/1. Subsequent calls to set_current_best_move/1 will overwrite the previously stored move. compute_best_move/2 will be stopped when the time runs out. The last move stored with set_current_best_move/1 will then be send to the game master.
+
+Fail Conditions
+   None. Always succeed.
+
+Resatisfiable
+   no
+
+See Also
+   gameplayer : game_play_timed_part / 2, match_info : set_current_best_move / 1

@@ -1,0 +1,24 @@
+
+game_stop(++MatchID, ++Moves, ++MsgReceiveTime)
+
+   is called after receiving the stop message of a match
+
+Arguments
+   MatchID             string containing the identifier of the current match
+   Moves               the moves of the players in the last step
+   MsgReceiveTime      time when the message was received (in seconds since start of the process)
+
+Type
+   library(gameplayer)
+
+Description
+game_stop/3 should contain all code necessary for cleaning up such that the player is ready for the next match.
+
+Fail Conditions
+   None. Always succeed.
+
+Resatisfiable
+   no
+
+See Also
+   game_start / 6, game_play / 4

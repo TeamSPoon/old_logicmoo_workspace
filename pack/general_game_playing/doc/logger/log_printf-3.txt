@@ -1,0 +1,24 @@
+
+log_printf(++LogID, ++FormatString, +Parameters)
+
+   writes a term to a logfile
+
+Arguments
+   LogID               id of a log
+   FormatString        a printf format string
+   Parameters          a list of positional parameters for the format string
+
+Type
+   library(logger)
+
+Description
+log_printf/3 appends a line consisting of a timestamp and a string written by printf(FormatString, Parameters) to the logfile. The name of the logfile is composed of a directory (default is "logs") the log prefix (typically the id of the current match) and LogID.
+
+Fail Conditions
+   None. Always succeed.
+
+Resatisfiable
+   no
+
+See Also
+   printf / 2, logln / 2, set_log_prefix / 1

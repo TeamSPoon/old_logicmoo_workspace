@@ -1,0 +1,33 @@
+<HTML><HEAD><TITLE>game_start(++MatchID, ++Role, +Rules, ++StartClock, ++PlayClock, ++MsgReceiveTime)</TITLE>
+</HEAD><BODY>[ <A HREF="index.html">library(gameplayer)</A> | <A HREF="../index.html">General Game Player</A> | <A HREF="../fullindex.html">Alphabetic Index</A> ]
+<H1>game_start(++MatchID, ++Role, +Rules, ++StartClock, ++PlayClock, ++MsgReceiveTime)</H1>
+is called after receiving the start message of a match
+<DL>
+<DT><EM>MatchID</EM></DT>
+<DD>string containing the identifier of the current match
+</DD>
+<DT><EM>Role</EM></DT>
+<DD>the role name of this player
+</DD>
+<DT><EM>Rules</EM></DT>
+<DD>the game description as a list of prolog rules
+</DD>
+<DT><EM>StartClock</EM></DT>
+<DD>start clock in seconds
+</DD>
+<DT><EM>PlayClock</EM></DT>
+<DD>play clock in seconds
+</DD>
+<DT><EM>MsgReceiveTime</EM></DT>
+<DD>time when the message was received (in seconds since start of the process)
+</DD>
+</DL>
+<H2>Description</H2>
+game_start/6 must return before the start clock times out, i.e., before MsgReceiveTime+StartClock-{Time for sending messages}
+<H3>Fail Conditions</H3>
+None. Always succeed.
+<H3>Resatisfiable</H3>
+no
+<H2>See Also</H2>
+<A HREF="../gameplayer/game_start_timed_part-2.html">game_start_timed_part / 2</A>, <A HREF="../gameplayer/game_play-4.html">game_play / 4</A>, <A HREF="../gameplayer/game_stop-3.html">game_stop / 3</A>
+</BODY></HTML>

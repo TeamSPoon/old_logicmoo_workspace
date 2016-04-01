@@ -1,0 +1,10 @@
+:- module(logger).
+:- export set_log_prefix / 1.
+:- export logln / 2.
+:- export log_printf / 3.
+:- export closelogs / 0.
+:- comment(summary, "contains predicates for log output").
+:- comment(closelogs / 0, [summary : "closes all log files", resat : no, fail_if : "None. Always succeed.", desc : html("Closes all log files and forces them to be written to disk.")]).
+:- comment(log_printf / 3, [summary : "writes a term to a logfile", args : ["LogID" : "id of a log", "FormatString" : "a printf format string", "Parameters" : "a list of positional parameters for the format string"], amode : log_printf(++, ++, +), resat : no, fail_if : "None. Always succeed.", see_also : [printf / 2, logln / 2, set_log_prefix / 1], desc : html("log_printf/3 appends a line consisting of a timestamp and a string written by printf(FormatString, Parameters) to the logfile. The name of the logfile is composed of a directory (default is \"logs\") the log prefix (typically the id of the current match) and LogID.")]).
+:- comment(logln / 2, [summary : "writes a term to a logfile", args : ["LogID" : "id of a log", "Term" : "the term to be logged"], amode : logln(++, +), resat : no, fail_if : "None. Always succeed.", see_also : [log_printf / 3, set_log_prefix / 1], desc : html("logln/2 appends a line consisting of a timestamp and Term to the logfile. The name of the logfile is composed of a directory (default is \"logs\") the log prefix (typically the id of the current match) and LogID.")]).
+:- comment(set_log_prefix / 1, [summary : "sets the prefix for newly opened log files", args : ["LogPrefix" : "a string"], amode : set_log_prefix(++), resat : no, fail_if : "None. Always succeed.", see_also : [log_printf / 3, logln / 2], desc : html("The name of a logfile is composed of a directory (default is \"logs\") the log prefix (typically the id of the current match) and a LogID. set_log_prefix/1 sets the log prefix for all logs.")]).

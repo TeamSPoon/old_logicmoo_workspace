@@ -1,0 +1,19 @@
+:- module(game_description).
+:- export call_goal / 3.
+:- export goal / 3.
+:- export legal / 3.
+:- export terminal / 1.
+:- export next / 3.
+:- export init / 1.
+:- export role / 1.
+:- export does / 3.
+:- export true / 2.
+:- export state_update / 3.
+:- export initial_state / 1.
+:- export roles / 1.
+:- export role2index / 2.
+:- export number_of_roles / 1.
+:- export game_rule / 4.
+:- export get_rules / 1.
+:- export load_rules_from_file / 1.
+:- export load_rules / 1.

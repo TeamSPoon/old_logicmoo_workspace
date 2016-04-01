@@ -1,0 +1,19 @@
+
+start_game_player(++Port)
+
+   starts the game player on the given port
+
+Arguments
+   Port                the port to listen on
+
+Type
+   library(main)
+
+Fail Conditions
+   None. Always succeed.
+
+Resatisfiable
+   no
+
+See Also
+   start_game_player / 0

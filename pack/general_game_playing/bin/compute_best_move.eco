@@ -1,0 +1,4 @@
+:-(module(compute_best_move,[/(compute_best_move,2)],eclipse_language)).
+:-(use_module(game_description)).
+:-(use_module(match_info)).
+:-(:(sepia_kernel,store_pred(/(compute_best_move,2),[](o(136),pw(2),o(203),y(2),o(362),a(3),a(1),a(2),o(285),a(2),y(1),o(342),proc(/(legal,3)),1,'/usr/users/iki/ss177134/Arbeit/ki/gameplay/workcvs/simpleplayer/prolog_starter_code/src/compute_best_move.ecl',48,2012,2018,o(143),proc(/(legal,3)),7,o(204),y(2),pw(1),o(4),y(1),a(1),o(342),proc(/(set_current_best_move,1)),1,'/usr/users/iki/ss177134/Arbeit/ki/gameplay/workcvs/simpleplayer/prolog_starter_code/src/compute_best_move.ecl',49,2054,2076,o(145),proc(/(set_current_best_move,1)),o(0),ref(13),ref(29),0),40,37,524288,'/usr/users/iki/ss177134/Arbeit/ki/gameplay/workcvs/simpleplayer/prolog_starter_code/src/compute_best_move.ecl',42,1837))).

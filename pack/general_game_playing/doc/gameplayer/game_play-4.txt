@@ -1,0 +1,25 @@
+
+game_play(++MatchID, ++Moves, ++MsgReceiveTime, -MoveString)
+
+   is called after receiving a play message of a match
+
+Arguments
+   MatchID             string containing the identifier of the current match
+   Moves               the moves of the players in the last step
+   MsgReceiveTime      time when the message was received (in seconds since start of the process)
+   MoveString          the game description as a list of prolog rules
+
+Type
+   library(gameplayer)
+
+Description
+game_play/4 must return before the play clock times out, i.e., before MsgReceiveTime+PlayClock-{Time for sending messages}. MoveString must be instantiated to a string containing a legal move in gdl format.
+
+Fail Conditions
+   None. Always succeed.
+
+Resatisfiable
+   no
+
+See Also
+   game_start / 6, game_stop / 3, gdl_parser : convert_to_gdl_string / 2

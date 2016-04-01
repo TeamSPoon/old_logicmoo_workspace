@@ -1,0 +1,8 @@
+:- module(time_sync).
+:- export sync_time / 1.
+:- export external_time_to_local / 2.
+:- export local_time_to_external / 2.
+:- export time_to_deadline / 1.
+:- export current_time / 1.
+:- export get_deadline / 1.
+:- export set_deadline / 1.

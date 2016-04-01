@@ -1,0 +1,27 @@
+<HTML><HEAD><TITLE>game_play(++MatchID, ++Moves, ++MsgReceiveTime, -MoveString)</TITLE>
+</HEAD><BODY>[ <A HREF="index.html">library(gameplayer)</A> | <A HREF="../index.html">General Game Player</A> | <A HREF="../fullindex.html">Alphabetic Index</A> ]
+<H1>game_play(++MatchID, ++Moves, ++MsgReceiveTime, -MoveString)</H1>
+is called after receiving a play message of a match
+<DL>
+<DT><EM>MatchID</EM></DT>
+<DD>string containing the identifier of the current match
+</DD>
+<DT><EM>Moves</EM></DT>
+<DD>the moves of the players in the last step
+</DD>
+<DT><EM>MsgReceiveTime</EM></DT>
+<DD>time when the message was received (in seconds since start of the process)
+</DD>
+<DT><EM>MoveString</EM></DT>
+<DD>the game description as a list of prolog rules
+</DD>
+</DL>
+<H2>Description</H2>
+game_play/4 must return before the play clock times out, i.e., before MsgReceiveTime+PlayClock-{Time for sending messages}. MoveString must be instantiated to a string containing a legal move in gdl format.
+<H3>Fail Conditions</H3>
+None. Always succeed.
+<H3>Resatisfiable</H3>
+no
+<H2>See Also</H2>
+<A HREF="../gameplayer/game_start-6.html">game_start / 6</A>, <A HREF="../gameplayer/game_stop-3.html">game_stop / 3</A>, <A HREF="../gdl_parser/index.html">gdl_parser : convert_to_gdl_string / 2</A>
+</BODY></HTML>

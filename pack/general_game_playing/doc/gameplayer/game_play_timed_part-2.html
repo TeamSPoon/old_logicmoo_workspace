@@ -1,0 +1,21 @@
+<HTML><HEAD><TITLE>game_play_timed_part(++CurrentState, ++Role)</TITLE>
+</HEAD><BODY>[ <A HREF="index.html">library(gameplayer)</A> | <A HREF="../index.html">General Game Player</A> | <A HREF="../fullindex.html">Alphabetic Index</A> ]
+<H1>game_play_timed_part(++CurrentState, ++Role)</H1>
+is called after receiving a play message of a match
+<DL>
+<DT><EM>CurrentState</EM></DT>
+<DD>the current state of the match in form of a list of fluents
+</DD>
+<DT><EM>Role</EM></DT>
+<DD>the role name of this player
+</DD>
+</DL>
+<H2>Description</H2>
+game_play_timed_part/2 calls the search algorithm. game_play_timed_part/2 is called with timeout/3, that means it will be stopped automatically if the play clock is over. The best move found has to be stored using match_info:set_current_best_move/1.
+<H3>Fail Conditions</H3>
+None. Always succeed.
+<H3>Resatisfiable</H3>
+no
+<H2>See Also</H2>
+<A HREF="../gameplayer/game_play-4.html">game_play / 4</A>, <A HREF="../match_info/index.html">match_info : set_current_best_move / 1</A>, <A HREF="../compute_best_move/compute_best_move-2.html">compute_best_move : compute_best_move / 2</A>
+</BODY></HTML>

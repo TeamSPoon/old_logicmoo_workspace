@@ -1,0 +1,27 @@
+
+game_start(++MatchID, ++Role, +Rules, ++StartClock, ++PlayClock, ++MsgReceiveTime)
+
+   is called after receiving the start message of a match
+
+Arguments
+   MatchID             string containing the identifier of the current match
+   Role                the role name of this player
+   Rules               the game description as a list of prolog rules
+   StartClock          start clock in seconds
+   PlayClock           play clock in seconds
+   MsgReceiveTime      time when the message was received (in seconds since start of the process)
+
+Type
+   library(gameplayer)
+
+Description
+game_start/6 must return before the start clock times out, i.e., before MsgReceiveTime+StartClock-{Time for sending messages}
+
+Fail Conditions
+   None. Always succeed.
+
+Resatisfiable
+   no
+
+See Also
+   game_start_timed_part / 2, game_play / 4, game_stop / 3

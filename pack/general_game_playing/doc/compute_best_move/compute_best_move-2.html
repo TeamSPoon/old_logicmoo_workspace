@@ -1,0 +1,21 @@
+<HTML><HEAD><TITLE>compute_best_move(++CurrentState, ++Role)</TITLE>
+</HEAD><BODY>[ <A HREF="index.html">library(compute_best_move)</A> | <A HREF="../index.html">General Game Player</A> | <A HREF="../fullindex.html">Alphabetic Index</A> ]
+<H1>compute_best_move(++CurrentState, ++Role)</H1>
+computes the best move of the player
+<DL>
+<DT><EM>CurrentState</EM></DT>
+<DD>the current state as a list of fluents
+</DD>
+<DT><EM>Role</EM></DT>
+<DD>the role name of this player
+</DD>
+</DL>
+<H2>Description</H2>
+compute_best_move/2 should search the game tree and store the best move in the current state with set_current_best_move/1. Subsequent calls to set_current_best_move/1 will overwrite the previously stored move. compute_best_move/2 will be stopped when the time runs out. The last move stored with set_current_best_move/1 will then be send to the game master.
+<H3>Fail Conditions</H3>
+None. Always succeed.
+<H3>Resatisfiable</H3>
+no
+<H2>See Also</H2>
+<A HREF="../gameplayer/game_play_timed_part-2.html">gameplayer : game_play_timed_part / 2</A>, <A HREF="../match_info/index.html">match_info : set_current_best_move / 1</A>
+</BODY></HTML>

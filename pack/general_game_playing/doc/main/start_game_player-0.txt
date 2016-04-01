@@ -1,0 +1,10 @@
+
+start_game_player
+
+   short for start_game_player(8000)
+
+Type
+   library(main)
+
+See Also
+   start_game_player / 1

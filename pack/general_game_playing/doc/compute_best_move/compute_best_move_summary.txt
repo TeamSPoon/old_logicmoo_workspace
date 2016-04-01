@@ -1,0 +1,4 @@
+lib(compute_best_move)
+
+   should contain the strategy of the player
+

@@ -1,0 +1,5 @@
+:- module(http_grammar).
+:- export status / 5.
+:- export header / 3.
+:- export token_to_list / 2.
+:- export list_to_token / 2.

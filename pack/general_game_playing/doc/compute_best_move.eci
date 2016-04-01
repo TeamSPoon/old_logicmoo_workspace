@@ -1,0 +1,4 @@
+:- module(compute_best_move).
+:- export compute_best_move / 2.
+:- comment(summary, "should contain the strategy of the player").
+:- comment(compute_best_move / 2, [summary : "computes the best move of the player", args : ["CurrentState" : "the current state as a list of fluents", "Role" : "the role name of this player"], amode : compute_best_move(++, ++), resat : no, fail_if : "None. Always succeed.", see_also : [gameplayer : game_play_timed_part / 2, match_info : set_current_best_move / 1], desc : html("compute_best_move/2 should search the game tree and store the best move in the current state with set_current_best_move/1. Subsequent calls to set_current_best_move/1 will overwrite the previously stored move. compute_best_move/2 will be stopped when the time runs out. The last move stored with set_current_best_move/1 will then be send to the game master.")]).

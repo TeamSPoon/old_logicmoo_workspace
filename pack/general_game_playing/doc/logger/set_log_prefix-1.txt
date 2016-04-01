@@ -1,0 +1,22 @@
+
+set_log_prefix(++LogPrefix)
+
+   sets the prefix for newly opened log files
+
+Arguments
+   LogPrefix           a string
+
+Type
+   library(logger)
+
+Description
+The name of a logfile is composed of a directory (default is "logs") the log prefix (typically the id of the current match) and a LogID. set_log_prefix/1 sets the log prefix for all logs.
+
+Fail Conditions
+   None. Always succeed.
+
+Resatisfiable
+   no
+
+See Also
+   log_printf / 3, logln / 2

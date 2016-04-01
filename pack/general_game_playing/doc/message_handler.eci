@@ -1,0 +1,2 @@
+:- module(message_handler).
+:- export handle_message / 3.

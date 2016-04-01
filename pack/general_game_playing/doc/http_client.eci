@@ -1,0 +1,7 @@
+:- module(http_client).
+:- export http_client / 7.
+:- comment(summary, "HTTP client library").
+:- comment(author, "Ph. Bonnet, S. Bressan and M. Meier, ECRC Munich").
+:- comment(copyright, "Cisco Systems, Inc").
+:- comment(date, "$Date: 2006/09/23 01:55:19 $").
+:- comment(http_client / 7, [template : "http_client(+Method, +Uri, +ObjectBody, +HttpParams, -RespError, -RespParam, -RespObjectBody)", summary : "Used to access HTML pages, given their URI (the method GET is applied)", args : ["Method" : "A string", "Uri" : "A string", "ObjectBody" : "A string", "HttpParams" : "A list of terms as defined in the DCG grammar", "RespError" : "Outputs a term error(ErrorCode, ErrorPhrase),\n\twhere ErrorCode is he error code contained in the response\n\tand ErrorPhrase is the error phrase contained in the response", "RespParam" : "Outputs a list of terms as defined in the DCG grammar", "RespObjectBody" : "Outputs the object body of the response"], eg : "\n    [eclipse 1]: use_module(http).\n    http_grammar.pl compiled traceable 25048 bytes in 0.38 seconds\n    http_client.pl compiled traceable 5916 bytes in 0.47 seconds\n    http_server.pl compiled traceable 5304 bytes in 0.07 seconds\n    http.pl    compiled traceable 0 bytes in 0.57 seconds\n\n    yes.\n    [eclipse 2]:  http_client(\"GET\", \"http://www.ecrc.de/staff/\", \"\", [],\n\t    Status, Param, Resp).\n\n    Status = error(200, \"Document follows \")\n    Param = [date, server, contentType(mt(text, html))]\n\n    Resp = \"<HTML>...</HTML>\"\n\n    yes.\n    "]).

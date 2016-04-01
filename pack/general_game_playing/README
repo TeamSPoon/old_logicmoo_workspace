@@ -1,0 +1,33 @@
+The general game playing (GGP) starter code is a basic general game playing system (see http://www.general-game-playing.de for explanations) that only plays legal moves. It can be easily extended with an own strategy.
+
+
+Software requirements:
+----------------------
+ECLiPSe prolog 5.10 or higher (http://www.eclipse-clp.org/)
+
+
+Installation:
+-------------
+Adjust paths to the ECLiPSe executable in "Makefile" and "start_game_player.sh" to your local installation of ECLiPSe.
+Call "make" if you changed the source code and want to run the program from the command line.
+
+
+Running the program:
+--------------------
+From the command line call "start_game_player.sh" or "make run".
+From within ECLiPSe or the tkECLiPSe interface consult "src/main.ecl" and use "main:start_game_player" as query.
+Use the predicates in "src/debug_player.ecl" for easier debugging.
+
+
+Documentation:
+--------------
+Documentation for some of the prolog modules can be found at doc/index.html
+
+
+Implementing a strategy:
+------------------------
+Change the compute_best_move/2 predicate in "src/compute_best_move.ecl".
+
+
+prolog/
+ is the YAP/SWI prolog port (in progress)

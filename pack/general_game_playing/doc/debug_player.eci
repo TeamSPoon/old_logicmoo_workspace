@@ -1,0 +1,6 @@
+:- module(debug_player).
+:- export setup_game / 1.
+:- export play_game / 4.
+:- comment(summary, "contains routines to play a game with the game player without sending and receiving messages").
+:- comment(play_game / 4, [summary : "plays the given games against random players", args : ["GameFile" : "the name of a file containing the game rules", "RoleIndex" : "the index of the role of this player", "StartClock" : "the startclock", "PlayClock" : "the playclock"], amode : play_game(++, ++, ++, ++), resat : no, fail_if : "GameFile does not exist.", see_also : []]).
+:- comment(setup_game / 1, [summary : "Sets up the player as if a start message for the given game was received. Startclock and playclock are set to one day. compute_best_move/2 is not called.", args : ["GameFile" : "the name of a file containing the game rules"], amode : setup_game(++), resat : no, fail_if : "GameFile does not exist.", see_also : []]).

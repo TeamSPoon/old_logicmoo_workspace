@@ -1,0 +1,21 @@
+<HTML><HEAD><TITLE>logln(++LogID, +Term)</TITLE>
+</HEAD><BODY>[ <A HREF="index.html">library(logger)</A> | <A HREF="../index.html">General Game Player</A> | <A HREF="../fullindex.html">Alphabetic Index</A> ]
+<H1>logln(++LogID, +Term)</H1>
+writes a term to a logfile
+<DL>
+<DT><EM>LogID</EM></DT>
+<DD>id of a log
+</DD>
+<DT><EM>Term</EM></DT>
+<DD>the term to be logged
+</DD>
+</DL>
+<H2>Description</H2>
+logln/2 appends a line consisting of a timestamp and Term to the logfile. The name of the logfile is composed of a directory (default is "logs") the log prefix (typically the id of the current match) and LogID.
+<H3>Fail Conditions</H3>
+None. Always succeed.
+<H3>Resatisfiable</H3>
+no
+<H2>See Also</H2>
+<A HREF="../logger/log_printf-3.html">log_printf / 3</A>, <A HREF="../logger/set_log_prefix-1.html">set_log_prefix / 1</A>
+</BODY></HTML>

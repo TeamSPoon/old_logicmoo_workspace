@@ -1,0 +1,4 @@
+lib(debug_player)
+
+   contains routines to play a game with the game player without sending and receiving messages
+

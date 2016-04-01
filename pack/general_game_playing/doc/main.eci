@@ -1,0 +1,6 @@
+:- module(main).
+:- export start_game_player / 0.
+:- export start_game_player / 1.
+:- comment(summary, "contains the main routine to setup the game player").
+:- comment(start_game_player / 0, [summary : "short for start_game_player(8000)", see_also : [start_game_player / 1]]).
+:- comment(start_game_player / 1, [summary : "starts the game player on the given port", args : ["Port" : "the port to listen on"], amode : start_game_player(++), resat : no, fail_if : "None. Always succeed.", see_also : [start_game_player / 0]]).

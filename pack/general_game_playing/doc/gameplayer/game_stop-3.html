@@ -1,0 +1,24 @@
+<HTML><HEAD><TITLE>game_stop(++MatchID, ++Moves, ++MsgReceiveTime)</TITLE>
+</HEAD><BODY>[ <A HREF="index.html">library(gameplayer)</A> | <A HREF="../index.html">General Game Player</A> | <A HREF="../fullindex.html">Alphabetic Index</A> ]
+<H1>game_stop(++MatchID, ++Moves, ++MsgReceiveTime)</H1>
+is called after receiving the stop message of a match
+<DL>
+<DT><EM>MatchID</EM></DT>
+<DD>string containing the identifier of the current match
+</DD>
+<DT><EM>Moves</EM></DT>
+<DD>the moves of the players in the last step
+</DD>
+<DT><EM>MsgReceiveTime</EM></DT>
+<DD>time when the message was received (in seconds since start of the process)
+</DD>
+</DL>
+<H2>Description</H2>
+game_stop/3 should contain all code necessary for cleaning up such that the player is ready for the next match.
+<H3>Fail Conditions</H3>
+None. Always succeed.
+<H3>Resatisfiable</H3>
+no
+<H2>See Also</H2>
+<A HREF="../gameplayer/game_start-6.html">game_start / 6</A>, <A HREF="../gameplayer/game_play-4.html">game_play / 4</A>
+</BODY></HTML>

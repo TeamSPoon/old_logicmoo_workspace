@@ -1,0 +1,22 @@
+
+play_game(++GameFile, ++RoleIndex, ++StartClock, ++PlayClock)
+
+   plays the given games against random players
+
+Arguments
+   GameFile            the name of a file containing the game rules
+   RoleIndex           the index of the role of this player
+   StartClock          the startclock
+   PlayClock           the playclock
+
+Type
+   library(debug_player)
+
+Fail Conditions
+   GameFile does not exist.
+
+Resatisfiable
+   no
+
+See Also
+   

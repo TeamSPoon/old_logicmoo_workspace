@@ -1,0 +1,4 @@
+lib(main)
+
+   contains the main routine to setup the game player
+

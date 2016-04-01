@@ -1,0 +1,5 @@
+:- module(gdl_parser).
+:- export parse_gdl_description_string / 2.
+:- export parse_gdl_message_string / 2.
+:- export parse_gdl_term_string / 2.
+:- export convert_to_gdl_string / 2.

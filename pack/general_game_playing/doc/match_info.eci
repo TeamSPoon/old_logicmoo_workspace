@@ -1,0 +1,13 @@
+:- module(match_info).
+:- export set_match_id / 1.
+:- export get_match_id / 1.
+:- export set_our_role / 1.
+:- export get_our_role / 1.
+:- export set_startclock / 1.
+:- export get_startclock / 1.
+:- export set_playclock / 1.
+:- export get_playclock / 1.
+:- export set_current_state / 1.
+:- export get_current_state / 1.
+:- export set_current_best_move / 1.
+:- export get_current_best_move / 1.

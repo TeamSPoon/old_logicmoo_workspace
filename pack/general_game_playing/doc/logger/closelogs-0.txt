@@ -1,0 +1,18 @@
+
+closelogs
+
+   closes all log files
+
+Type
+   library(logger)
+
+Description
+Closes all log files and forces them to be written to disk.
+
+Fail Conditions
+   None. Always succeed.
+
+Resatisfiable
+   no
+
+

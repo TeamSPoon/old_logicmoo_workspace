@@ -1,0 +1,4 @@
+lib(gameplayer)
+
+   contains the basic routines of a general game player to handle start, play, and stop messages
+

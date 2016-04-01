@@ -1,0 +1,21 @@
+<HTML><HEAD><TITLE>game_start_timed_part(++InitialState, ++Role)</TITLE>
+</HEAD><BODY>[ <A HREF="index.html">library(gameplayer)</A> | <A HREF="../index.html">General Game Player</A> | <A HREF="../fullindex.html">Alphabetic Index</A> ]
+<H1>game_start_timed_part(++InitialState, ++Role)</H1>
+is called after receiving the start message of a match
+<DL>
+<DT><EM>InitialState</EM></DT>
+<DD>the initial state of the match in form of a list of fluents
+</DD>
+<DT><EM>Role</EM></DT>
+<DD>the role name of this player
+</DD>
+</DL>
+<H2>Description</H2>
+game_start_timed_part/2 should contain everything that is to be done within the start clock but that is not crucial for playing the game. game_start_timed_part/2 is called with timeout/3, that means it will be stopped automatically if the start clock is over.
+<H3>Fail Conditions</H3>
+None. Always succeed.
+<H3>Resatisfiable</H3>
+no
+<H2>See Also</H2>
+<A HREF="../gameplayer/game_start-6.html">game_start / 6</A>, timeout : timeout / 3
+</BODY></HTML>
