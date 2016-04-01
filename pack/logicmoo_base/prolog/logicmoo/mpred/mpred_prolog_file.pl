@@ -79,6 +79,7 @@ process_this_script(S):- repeat,once(process_this_script0(S)),at_end_of_stream(S
 % Process This Script Primary Helper.
 %
 process_this_script0(_):- current_prolog_flag(xref,true),!.
+process_this_script0(_):- bad_idea,!.
 process_this_script0(S):- at_end_of_stream(S),!.
 process_this_script0(S):- peek_string(S,3,W), W="\n\n\n",get_code(S,_),get_code(S,_),!,process_this_script0(S).
 process_this_script0(S):- peek_string(S,2,W), W="\r\n",get_code(S,_),!,process_this_script0(S).

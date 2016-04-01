@@ -26,6 +26,12 @@
 
 :- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
 
+:- use_module(library(eggdrop)).
+:- use_module(library(debug)).
+:- debug(_),nodebug(_).
+qsp:- qsave_program(irc_webbot).
+:- initialization(egg_go).
+:- egg_go.
 
 :- multifile(logicmoo_user_base:user_module_uses/2).
 :- dynamic(logicmoo_user_base:user_module_uses/2).
@@ -51,6 +57,8 @@ fix_ops_for(CM):-
  op(300,fx,CM:('-')).
 
 :- fix_ops_for(user).
+
+
 
 
 /*
@@ -79,11 +87,5 @@ fix_ops_for(CM):-
 :- nop((autoload,scan_for_varnames)).
 
 :- sanity( \+predicate_property(baseKB:_,exported)).
-
-:- use_module(library(eggdrop)).
-:- use_module(library(debug)).
-:- debug(_),nodebug(_).
-qsp:- qsave_program(irc_webbot).
-:- initialization(egg_go).
 
 

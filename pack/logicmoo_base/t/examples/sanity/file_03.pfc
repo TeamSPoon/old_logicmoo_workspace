@@ -14,11 +14,11 @@
 
 :- begin_pfc.
 
-:- process_this_script.
+% :- process_this_script.
 
 must_is_entailed(G):- cwc, must(is_entailed(G)).
 
-:- xlisting(must_is_entailed).
+% :- xlisting(must_is_entailed).
 
 a.
 

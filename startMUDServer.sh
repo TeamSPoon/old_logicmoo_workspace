@@ -1,8 +1,8 @@
 #!/bin/bash
 
 if [ "$(id -u)" = "0" ]; then
-   exec sudo -u prologmud  /bin/bash -c "$0 $*"
-   exit 0
+#   exec sudo -u prologmud  /bin/bash -c "$0 $*"
+#   exit 0
 fi
 
 

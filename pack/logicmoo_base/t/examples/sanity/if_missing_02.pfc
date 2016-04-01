@@ -21,7 +21,7 @@ good.
 
 :- mpred_test(foob(a)).
 
-:- break.
+% :- break.
 
 \+ good.
 

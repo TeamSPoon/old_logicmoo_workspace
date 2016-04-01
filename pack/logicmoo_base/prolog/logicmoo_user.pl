@@ -67,8 +67,8 @@ fix_ops_for(CM):-
 */
 
 :- ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
-:- system:initialization(mpred_www:ensure_webserver(3040)).
-:- mpred_www:ensure_webserver(3040).
+%:- system:initialization(mpred_www:ensure_webserver(3040)).
+%:- mpred_www:ensure_webserver(3040).
 
 :- baseKB:use_module(baseKB:logicmoo/logicmoo_snark).
 

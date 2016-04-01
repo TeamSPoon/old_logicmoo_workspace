@@ -26,7 +26,7 @@
   with_fc_mode/2,
   mpred_mark_as/4,
   assert_u_confirmed_if_missing/1,
-  assert_u_confirmed_missing/1,
+  assert_u_confirmed_was_missing/1,
   mpred_notrace_exec/0,
   listing_u/1,
   get_source_ref/1,
@@ -146,7 +146,7 @@
 
 :- '$set_source_module'(_,mpred_pfc).
 
-:- module_transparent((assert_u_confirmed_missing/1,mpred_trace_exec/0,pfcl_do/1,
+:- module_transparent((assert_u_confirmed_was_missing/1,mpred_trace_exec/0,pfcl_do/1,
   mpred_post2/2,get_mpred_assertion_status/3,mpred_post4/4,get_mpred_support_status/5,same_file_facts/2,foreachl_do/2,
   mpred_trace_op/3)).
 
@@ -462,7 +462,7 @@ mpred_post2(P,S):-
   % mpred_remove_old_version(P),  
   mpred_add_support(P,S),
   mpred_unique_u(P),
-  assert_u_confirmed_missing(P),
+  assert_u_confirmed_was_missing(P),
   mpred_trace_op(add,P,S),
   !,
   mpred_enqueue(P,S),
@@ -475,7 +475,7 @@ mpred_post2(P,S):- !,
   %  db mpred_ain_db_to_head(P,P2),
   % mpred_remove_old_version(P),  
   ( \+ \+ mpred_add_support(P,S)),
-  ( ( \+ \+ clause_asserted_u(P)) -> WasA= identical ; ( ( \+ \+ assert_u_confirmed_missing(P)),WasA = unique)),
+  ( ( \+ \+ clause_asserted_u(P)) -> WasA= identical ; ( ( \+ \+ assert_u_confirmed_was_missing(P)),WasA = unique)),
   mpred_trace_op(add,P,S),
   !,
   mpred_enqueue(P,S),
@@ -517,21 +517,21 @@ mpred_post4(identical,P,S,simular(_)):-!,mpred_add_support(P,S).
 mpred_post4(identical,P,S,none):-!,mpred_add_support(P,S),mpred_enqueue(P,S).
 
 mpred_post4(unique,P,S,none):-!,
-  mpred_add_support(P,S),assert_u_confirmed_missing(P),mpred_trace_op(add,P,S),
+  mpred_add_support(P,S),assert_u_confirmed_was_missing(P),mpred_trace_op(add,P,S),
   !,
   mpred_enqueue(P,S),
   !.
 
 mpred_post4(partial(_Other),P,S,none):-!,
   \+ \+ mpred_add_support(P,S),
-  assert_u_confirmed_missing(P),mpred_trace_op(add,P,S),
+  assert_u_confirmed_was_missing(P),mpred_trace_op(add,P,S),
   !,
   mpred_enqueue(P,S),
   !.
 
 mpred_post4(partial(_Other),P,S,exact):-!,
   \+ \+ mpred_add_support(P,S),
-  assert_u_confirmed_missing(P),mpred_trace_op(add,P,S),
+  assert_u_confirmed_was_missing(P),mpred_trace_op(add,P,S),
   !,
   mpred_enqueue(P,S),
   !.
@@ -541,14 +541,14 @@ mpred_post4(Was,P,S,What):-dmsg(mpred_post4(Was,P,S,What)),trace.
 mpred_post4(Was,P,S,What):-!,trace_or_throw(mpred_post4(Was,P,S,What)).
 
 mpred_post4(partial(_),P,S,exact):-!,
-  assert_u_confirmed_missing(P),
+  assert_u_confirmed_was_missing(P),
   mpred_trace_op(add,P,S),
    !,
    mpred_enqueue(P,S),
    !.
 
 mpred_post4(unique,P,S,exact):-!,
-  assert_u_confirmed_missing(P),
+  assert_u_confirmed_was_missing(P),
   mpred_trace_op(add,P,S),
    !,
    mpred_enqueue(P,S),
@@ -560,7 +560,7 @@ mpred_post4(unique,P,S,exact):-!,
 
 mpred_post4(partial(_),P,S,simular(_)):-
   mpred_add_support(P,S),
-  ignore((mpred_unique_u(P),assert_u_confirmed_missing(P),mpred_trace_op(add,P,S))),
+  ignore((mpred_unique_u(P),assert_u_confirmed_was_missing(P),mpred_trace_op(add,P,S))),
    !,
    mpred_enqueue(P,S),
    !.
@@ -569,13 +569,13 @@ mpred_post4(partial(_),P,S,simular(_)):-
 mpred_post4(Was,P,S,What):-!,trace_or_throw(mpred_post4(Was,P,S,What)).
 
 
-assert_u_confirmed_missing(P):- copy_term(P,PP),
+assert_u_confirmed_was_missing(P):- copy_term(P,PP),
   \+ \+ must((show_call(assert_u(P)),P=@=PP)),
-  ((P=(_ :- (cwc, _))) -> true ; \+ \+ must((show_call(clause_asserted_u(P)),P=@=PP))),!.
+  ((P=(_ :- (cwc, _))) -> true ; \+ \+ sanity((show_call(clause_asserted_u(P)),P=@=PP))),!.
 
 
 assert_u_confirmed_if_missing(P):- copy_term(P,PP),
- with_umt((hotrace(clause_asserted_u(PP))-> true ; must(assert_u(P)),must(clause_asserted_u(PP)))),!.
+ with_umt((hotrace(clause_asserted_u(PP))-> true ; assert_u_confirmed_was_missing(P))).
 
 %% get_mpred_current_db(-Db) is semidet.
 %
@@ -848,12 +848,12 @@ mpred_ain_object(X):-
 
 mpred_ain_by_type(fact(_FT),X):- 
   mpred_unique_u(X), 
-  assert_u_confirmed_missing(X),!.
+  assert_u_confirmed_was_missing(X),!.
 mpred_ain_by_type(rule,X):- 
   mpred_unique_u(X), 
-  assert_u_confirmed_missing(X),!.
+  assert_u_confirmed_was_missing(X),!.
 mpred_ain_by_type(trigger,X):- 
-  assert_u_confirmed_missing(X).
+  assert_u_confirmed_was_missing(X).
 mpred_ain_by_type(action,_ZAction):- !.
 
 
@@ -1288,6 +1288,7 @@ trigger_trigger1(Trigger,Body):-
 call_u(P):- mpred_METACALL(mpred_BC_w_cache, P).
 mpred_BC_w_cache(P):- mpred_BC_CACHE(P),mpred_call_no_bc(P).
 
+mpred_BC_CACHE(P0):- bad_idea, \+ ((is_release,trace_or_throw(bad_idea(mpred_BC_CACHE(P0))))),!.
 mpred_BC_CACHE(P0):-  ignore( \+ loop_check_early(mpred_BC_CACHE0(P0),true)).
 
 mpred_BC_CACHE0(P00):- var(P00),!.
@@ -1767,7 +1768,7 @@ mpred_db_type(_,fact(_FT)):-
   !.
 
 mpred_assert_w_support(P,Support):- 
-  (mpred_clause_u(P) ; assert_u_confirmed_missing(P)),
+  (mpred_clause_u(P) ; assert_u_confirmed_was_missing(P)),
   !,
   mpred_add_support(P,Support).
 
@@ -2336,7 +2337,7 @@ mpred_add_support(P,(Fact,Trigger)):-
  % (Trigger= nt(F,Condition,Action) -> 
  %   (mpred_trace_msg('~N~n\tAdding mpred_do_fcnt via support~n\t\ttrigger: ~p~n\t\tcond: ~p~n\t\taction: ~p~n\t from: ~p~N',
  %     [F,Condition,Action,mpred_add_support(P,(Fact,Trigger))]));true),
-  assert_u_confirmed_missing(spft_mod:spft(P,Fact,Trigger)).
+  assert_u_confirmed_if_missing(spft_mod:spft(P,Fact,Trigger)).
 
 mpred_get_support(P,(Fact,Trigger)):-
       lookup_u(spft_mod:spft(P,Fact,Trigger)).

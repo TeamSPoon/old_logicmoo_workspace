@@ -708,9 +708,9 @@ new_a2s0(List, Separator, String):-
 
 %% bad_idea is semidet.
 %
-% Bad Idea.
+% Bad Idea used to make code that shuld not be ran in release mode
 %
-bad_idea:-fail.
+bad_idea:-!.
 
 /*
 :- export(static_predicate/1).

@@ -38,6 +38,7 @@ prologHybrid(singleValuedInArgDefault(prologSingleValued,ftInt,ftTerm)).
        ==> mdefault( Q <- ({ground(P)},~R/nonvar(WAS)))).
 
 
+((singleValuedInArgDefault(P, 2, V), arity(P,2), argIsa(P,1,Most)) <==> relationMostInstance(P,Most,V)).
 
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).

@@ -79,7 +79,7 @@ argQuotedIsa(sentenceTruth,1,'CycLSentence-Assertible').
 :- ain(((expansion(F,RULE),arity(F,A),{make_kw_functor(F,A,CYCL),kw_to_vars((CYCL<==>RULE),NEWRULE)}) ==> trueSentence(NEWRULE))).
 
 nearestIsa(I,C) <- mpred_fact(isa(I,C)).
-nearestGenls(I,C) <- mpred_fact(genls(I,C)).
+% nearestGenls(I,C) <- mpred_fact(genls(I,C)).
 
 
 % meta_argtypes(ArgTypes)/is_declarations(ArgTypes) ==> {wdmsg(in_loop(meta_argtypes))},meta_argtypes(ArgTypes).

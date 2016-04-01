@@ -1,4 +1,4 @@
-#!/bin/bash
+./R	#!/bin/bash
 cls
 rm -f */*.log.html
 EXIT() {
@@ -39,7 +39,7 @@ trap 'EXIT' 1 2 3 4 5 6 7 8 9
  
  ( 
   echo -e "\n\n%=%=% Test $1 %=%=%\n\n"
-  swipl -f $1 -g "halt(7)." 
+  ~/bin/swipl -f $1 -g "halt(7)." 
   status=$?
   echostatus $status $1
   ) 2>&1 |

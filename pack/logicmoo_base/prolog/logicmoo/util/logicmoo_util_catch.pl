@@ -1413,6 +1413,7 @@ slow_sanity(Goal):- ( tlbugger:skip_use_slow_sanity ; sanity(Goal)),!.
 % Optional Sanity Checking.
 %
 sanity(_):- is_release,!.
+sanity(_):- bad_idea,!.
 sanity(Goal):- bugger_flag(release,true),!,assertion(Goal).
 sanity(Goal):- tlbugger:show_must_go_on,!,ignore(show_failure(why,Goal)).
 sanity(Goal):- ignore(must(show_failure(why,Goal))).
