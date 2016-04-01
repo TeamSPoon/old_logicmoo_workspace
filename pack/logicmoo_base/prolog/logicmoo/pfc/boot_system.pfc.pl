@@ -31,7 +31,6 @@
 % Douglas Miles
 */
 
-:- autoload([verbose(false)]).
 :- include(logicmoo(mpred/'mpred_header.pi')).
 
 :- set_mpred_module(baseKB).

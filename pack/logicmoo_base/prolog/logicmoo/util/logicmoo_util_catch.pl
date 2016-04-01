@@ -1492,6 +1492,7 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 %
 % Must Be Successfull.
 %
+must(Goal):- bad_idea,!,call(Goal).
 must(Goal):-  notrace((must_be(nonvar,Goal),get_must(Goal,MGoal))),!,MGoal.
 
 

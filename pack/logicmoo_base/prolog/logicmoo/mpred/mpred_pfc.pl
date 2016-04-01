@@ -2154,8 +2154,7 @@ mpred_load_term(:- module(_,L)):-!, mpred_call_no_bc(maplist(export,L)).
 mpred_load_term(:- TermO):- mpred_call_no_bc(TermO).
 mpred_load_term(TermO):-mpred_ain_object(TermO).
 
-mpred_load(PLNAME):- % unload_file(PLNAME),
-   open(PLNAME, read, In, []),
+mpred_load(In):- is_stream(In),!,
    repeat,
    line_count(In,_Lineno),
    % double_quotes(_DQBool)
@@ -2164,6 +2163,10 @@ mpred_load(PLNAME):- % unload_file(PLNAME),
    b_setval('$variable_names',VarNames),expand_term(Term,TermO),mpred_load_term(TermO),
    Term==end_of_file,
    close(In).
+
+mpred_load(PLNAME):- % unload_file(PLNAME),
+   open(PLNAME, read, In, []),
+   mpred_load(In).
 
 % 
 %  These control whether or not warnings are printed at all.

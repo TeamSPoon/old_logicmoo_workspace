@@ -286,7 +286,7 @@ dmsg_hides_message(C):-  tlbugger:dmsg_match(HideShow,Matcher),matches_term(Matc
 % (debug)message Hide.
 %
 dmsg_hide(isValueMissing):-!,set_prolog_flag(opt_debug,false).
-dmsg_hide(Term):-set_prolog_flag(opt_debug,filter),must(nonvar(Term)),aina( tlbugger:dmsg_match(hidden,Term)),retractall( tlbugger:dmsg_match(showing,Term)),nodebug(Term).
+dmsg_hide(Term):-set_prolog_flag(opt_debug,filter),sanity(nonvar(Term)),aina( tlbugger:dmsg_match(hidden,Term)),retractall( tlbugger:dmsg_match(showing,Term)),nodebug(Term).
 
 %= 	 	 
 
@@ -388,7 +388,7 @@ fmt(X,Y,Z):- fmt_ansi(fmt0(X,Y,Z)),!.
 
 :- module_transparent((format_to_message)/3).
 format_to_message(Format,Args,Info):- 
-  (( must(is_list(Args))-> 
+  (( sanity(is_list(Args))-> 
      format(string(Info),Format,Args);
      (trace,format(string(Info),'~N~n~p +++++++++++++++++ ~p~n',[Format,Args])))).
 

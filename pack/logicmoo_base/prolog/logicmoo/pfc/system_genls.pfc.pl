@@ -1,5 +1,7 @@
 
 
+% to load this files use  ?- ensure_mpred_file_loaded('logicmoo/pfc/system_genls.pfc').
+
 :- file_begin(pfc).
 
 :- set_mpred_module(baseKB).

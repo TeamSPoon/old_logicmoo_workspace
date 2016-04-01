@@ -710,7 +710,7 @@ new_a2s0(List, Separator, String):-
 %
 % Bad Idea used to make code that shuld not be ran in release mode
 %
-bad_idea:-!.
+bad_idea:- current_prolog_flag(bad_idea,true).
 
 /*
 :- export(static_predicate/1).

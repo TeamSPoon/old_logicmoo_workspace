@@ -57,7 +57,7 @@
           [ acceptable_xform/2,
             alt_calls/1,
             any_op_to_call_op/2,
-            as_is_term/1,as_is_term0/1,
+            as_is_term/1,as_is_term0/1,as_is_term1/1,
             compare_op/4,
             compound_all_open/1,
             conjoin_l/3,
@@ -451,14 +451,17 @@ fully_expand(X,Y):-fully_expand(_,X,Y).
 
 
 
+
 %% fully_expand( ?Op, ?Sent, ?SentO) is semidet.
 %
 % Fully Expand.
 %
-fully_expand(Op,Sent,SentO):- hotrace((cyclic_break((Sent)),
+fully_expand(Op,Sent,SentO):-
+  once((hotrace((cyclic_break((Sent)),
            must(hotrace((deserialize_attvars(Sent,SentI)))),
-   with_no_kif_var_coroutines(((fully_expand0(Op,SentI,SentO)),cyclic_break((SentO)))))),!.
+   with_no_kif_var_coroutines(((fully_expand0(Op,SentI,SentO)),cyclic_break((SentO)))))))).
 
+:- table(fully_expand/3).
 
 %= 	 	 
 
@@ -543,7 +546,9 @@ fully_expand_goal(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,transitive_lc(db
 %
 % Converted To If Is A Term.
 %
-as_is_term(NC):- cnotrace(loop_check(as_is_term0(NC))),!.
+as_is_term(NC):- as_is_term0(NC),!.
+:- mpred_trace_none(as_is_term(_)).
+:- '$set_predicate_attribute'(as_is_term(_), hide_childs, 1).
 :- export(as_is_term0/1).
 
 %= 	 	 
@@ -554,20 +559,25 @@ as_is_term(NC):- cnotrace(loop_check(as_is_term0(NC))),!.
 %
 as_is_term0(M:NC):-atom(M),is_ftVar(NC),!.
 as_is_term0(NC):- \+(is_ftCompound(NC)),!.
+
 as_is_term0(NC):-cyclic_term(NC),!,dmsg(cyclic_term(NC)),!.
 as_is_term0('$VAR'(_)):-!.
 as_is_term0(_:'$was_imported_kb_content$'(_,_)).
 as_is_term0('$was_imported_kb_content$'(_,_)).
 as_is_term0('wid'(_,_,_)):-!.
-
-as_is_term0(NC):-is_unit(NC),!.
-as_is_term0(M:NC):-atom(M),!,as_is_term(NC).
-as_is_term0(NC):-functor(NC,Op,2),infix_op(Op,_).
-%as_is_term0(NC):-is_ftVar(NC).
-%as_is_term(true).
 as_is_term0('call'(_)).
 as_is_term0('{}'(_)).
 as_is_term0('ignore'(_)).
+as_is_term0(I):- loop_check(as_is_term1(I)).
+
+:- export(as_is_term1/1).
+
+as_is_term1(M:NC):-atom(M),!,as_is_term(NC).
+as_is_term1(NC):-functor(NC,Op,2),infix_op(Op,_).
+as_is_term1(NC):-is_unit(NC),!.
+
+%as_is_term1(NC):-is_ftVar(NC).
+%as_is_term(true).
 
 %=  :- was_export(infix_op/2).
 
@@ -620,9 +630,10 @@ additiveOp((/)).
 %
 % If Is A Unit.
 %
-is_unit(C):-get_attr(C,sk,_),!.
+is_unit(C):- get_attr(C,sk,_),!.
 is_unit(C):- var(C),!,fail.
-is_unit(C):- \+ compound(C)->true;(C\='VAR'(_),C\=(_:-_),C\=ftRest(_),C\=ftListFn(_),get_functor(C,F),is_unit_functor(F)).
+is_unit(C):- \+ compound(C),!.
+is_unit(C):- C\='VAR'(_),C\='$VAR'(_),C\=(_:-_),C\=ftRest(_),C\=ftListFn(_),get_functor(C,F),is_unit_functor(F).
 
 
 

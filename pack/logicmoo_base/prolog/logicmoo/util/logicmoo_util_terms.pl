@@ -801,7 +801,7 @@ functor_h(Obj,F):- functor_h(Obj,F,_),!.
 %
 % Get Functor.
 %
-get_functor(Obj,FO):-call((must(functor_h(Obj,F,_)),!,FO=F)).
+get_functor(Obj,FO):- must(functor_h(Obj,F,_)),!,FO=F.
 
 %= 	 	 
 
@@ -809,7 +809,7 @@ get_functor(Obj,FO):-call((must(functor_h(Obj,F,_)),!,FO=F)).
 %
 % Get Functor.
 %
-get_functor(Obj,FO,AO):-call((must(functor_h(Obj,F,A)),!,FO=F,AO=A)).
+get_functor(Obj,FO,AO):- must(functor_h(Obj,F,A)),!,FO=F,AO=A.
 
 % = :- meta_predicate(functor_h(?,?,?)).
 
@@ -819,13 +819,14 @@ get_functor(Obj,FO,AO):-call((must(functor_h(Obj,F,A)),!,FO=F,AO=A)).
 %
 % Functor Head.
 %
-functor_h(Obj,F,A):-nonvar(Obj),atom(F),strip_module(Obj,_M,P),functor(P,F,A).
-functor_h(Obj,F,A):-nonvar(Obj),var(F),strip_module(Obj,_M,P),functor(P,F,A).
-functor_h(Obj,M:F,A):-nonvar(Obj),strip_module(Obj,M,P),!,functor(P,F,A).
-
 functor_h(Obj,F,A):- var(Obj),trace_or_throw(var_functor_h(Obj,F,A)).
-functor_h(Obj,F,A):-var(Obj),!,(number(A)->functor(Obj,F,A);((current_predicate(F/A);throw(var_functor_h(Obj,F,A))))).
-functor_h(Obj,F,A):- (Obj = '$VAR'(_)),trace_or_throw(var_functor_h(Obj,F,A)).
+functor_h('$VAR'(Obj),F,A):- !, trace_or_throw(var_functor_h('$VAR'(Obj),F,A)).
+% functor_h(Obj,F,A):- var(Obj),!,(number(A)->functor(Obj,F,A);((current_predicate(F/A);throw(var_functor_h(Obj,F,A))))).
+
+functor_h(Obj,F,A):-atom(F),strip_module(Obj,_M,P),functor(P,F,A).
+functor_h(Obj,F,A):-var(F),strip_module(Obj,_M,P),functor(P,F,A).
+functor_h(Obj,M:F,A):-strip_module(Obj,M,P),!,functor(P,F,A).
+
 functor_h([L|Ist],F,A):- is_list([L|Ist]),!,var(F),L=F,length(Ist,A).
 functor_h(F//A,F,Ap2):-number(A),!,Ap2 is A+2,( atom(F) ->  true ; current_predicate(F/Ap2)).
 functor_h(F/A,F,A):-number(A),!,( atom(F) ->  true ; current_predicate(F/A)).
