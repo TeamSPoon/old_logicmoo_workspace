@@ -1,4 +1,6 @@
 syntax: glob
+**/INDEX.pl
+pack/*/
 pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar
 *.bak
 *.ori
@@ -7,6 +9,7 @@ pack/logicmoo_nlu/prolog/stanford-corenlp3.5.2-ALL.jar
 *.rar
 *.vtg
 #*.zip
+*.log.html
 *lock
 *merge_me*
 *~
