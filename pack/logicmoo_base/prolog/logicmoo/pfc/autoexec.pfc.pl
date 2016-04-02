@@ -114,7 +114,8 @@
 
 :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('logicmoo/snark/common_logic_clif.pfc')).
 
-% :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('user_relationAllExists.pfc')).
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('user_relationAllExists.pfc')).
+
 
 :-multifile(lmconf:locked_baseKB/0).
 :-dynamic(lmconf:locked_baseKB/0).

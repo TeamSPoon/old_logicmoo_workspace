@@ -40,11 +40,11 @@
 				Refilter="1"
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
-		<Folder Name="general_game_playing">
+		<Folder Name="fluxplayer-prolog-engine">
 			<F
-				N="general_game_playing/*.*"
+				N="fluxplayer-prolog-engine/*.*"
 				Recurse="1"
-				Refilter="0"
+				Refilter="1"
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
 		<Folder Name="hMUD">
@@ -61,13 +61,21 @@
 				Refilter="1"
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
-		<Folder Name="tabbed-pane">
-			<F
-				N="tabbed-pane/*.*"
-				Recurse="1"
-				Refilter="1"
-				Excludes=".git/;*.*~;*~/"/>
-		</Folder>
+		<Folder Name="eggdrop">
+                        <F
+                                N="eggdrop/*.*"
+                                Recurse="1"
+                                Refilter="1"
+                                Excludes=".git/;*.*~;*~/"/>
+                </Folder>
+		<Folder Name="logtalk">
+                        <F
+                                N="logtalk/*.*"
+                                Recurse="1"
+                                Refilter="1"
+                                Excludes=".git/;*.*~;*~/"/>
+                </Folder>
+
 		<Folder Name="trill_on_swish">
 			<F
 				N="trill_on_swish/*.*"

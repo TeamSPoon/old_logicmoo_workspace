@@ -19,6 +19,8 @@
   maybe_mpred_break/1,
   each_E/3,
   mpred_post1_rem/2,
+  mpred_post2_fin/2,
+  mpred_post2_fin2/2,
   mpred_post1_rem1/2,
   mpred_mark_as_ml/4,
   mpred_mark_fa_as/6,
@@ -203,6 +205,8 @@ setup_mpred_ops:-
 get_source_ref(O):- current_why(U),(U=(_,_)->O=U;O=(U,ax)),!.
 get_source_ref(O):- get_source_ref1(U),(U=(_,_)->O=U;O=(U,ax)),!.
 
+get_source_ref_stack(O):- findall(U,current_why(U),Whys),Whys\==[],!, U=(_,_),(Whys=[U]->O=U;O=(Whys,ax)),!.
+get_source_ref_stack(O):- get_source_ref1(U),(U=(_,_)->O=U;O=(U,ax)),!.
 
 %% get_source_ref1(+Mt) is semidet.
 %
@@ -449,7 +453,7 @@ mpred_post1( \+ P,   S):- nonvar(P), !, must(mpred_post1_rem(P,S)).
 
 % TODO - FIGURE OUT WHY THIS IS NEEDED
 mpred_post1(  ~ P,   S):- 
-   with_no_mpred_breaks((nonvar(P),doall(mpred_remove(P,S)),must(mpred_undo(P)))),fail.
+   with_current_why(S,with_no_mpred_breaks((nonvar(P),doall(mpred_remove(P,S)),must(mpred_undo(P))))),fail.
 
 mpred_post1(P0,S0):-  
    copy_term(mpred_post1(P0,S0),mpred_post1(P,S)),
@@ -470,7 +474,7 @@ mpred_post2(P,S):-
 */
 
 % this would be the very inital by finnin...
-mpred_post2(P,S):- !, 
+mpred_post2(P,S):-  fail, !, 
   WasA = _,
   %  db mpred_ain_db_to_head(P,P2),
   % mpred_remove_old_version(P),  
@@ -481,6 +485,10 @@ mpred_post2(P,S):- !,
   mpred_enqueue(P,S),
   !.
 
+% this would be the very inital by finnin...
+mpred_post2(P,S):-  !, loop_check(mpred_post2_fin(P,S),true).
+
+
 % this is dmiles new version....
 mpred_post2(P,S):-
   copy_term((P,S),(PP,SS)),
@@ -488,6 +496,25 @@ mpred_post2(P,S):-
   must(get_mpred_support_status(P,S,PP,SS,Was)),
   must(get_mpred_assertion_status(P,PP,WasA)),!,
   (must(mpred_post4(WasA,P,S,Was))*-> true; mpred_warn("mpred_post2(~p,~p) failed",[P,S])).
+
+mpred_post2_fin(P,S):- 
+  %  db mpred_ain_db_to_head(P,P2),
+  % mpred_remove_old_version(P),  
+  once(must( \+ \+ mpred_add_support(P,S))),
+  findall(P-S,no_repeats(P,mpred_unique_u(P)),PL),
+  (PL==[]->sanity(clause_asserted_u(P));forall(member(P1-S1,PL),mpred_post2_fin2(P1,S1))).
+  
+
+mpred_post2_fin2(P,S):- 
+  assert_u_confirmed_if_missing(P),!,
+  mpred_trace_op(add,P,S),
+  !,
+  mpred_enqueue(P,S),
+  !,
+  mpred_enqueue_asserted(P,S).
+
+
+mpred_enqueue_asserted(P,S):- mpred_enqueue(clause_asserted_u(P),S).
 
 clause_asserted_u(P):-with_umt(clause_asserted_i(P)).
 
@@ -524,14 +551,16 @@ mpred_post4(unique,P,S,none):-!,
 
 mpred_post4(partial(_Other),P,S,none):-!,
   \+ \+ mpred_add_support(P,S),
-  assert_u_confirmed_was_missing(P),mpred_trace_op(add,P,S),
+  assert_u_confirmed_was_missing(P),!,
+  mpred_trace_op(add,P,S),
   !,
   mpred_enqueue(P,S),
   !.
 
 mpred_post4(partial(_Other),P,S,exact):-!,
   \+ \+ mpred_add_support(P,S),
-  assert_u_confirmed_was_missing(P),mpred_trace_op(add,P,S),
+  assert_u_confirmed_was_missing(P),!,
+  mpred_trace_op(add,P,S),
   !,
   mpred_enqueue(P,S),
   !.
@@ -878,7 +907,7 @@ mpred_withdraw1(P,S):-
   must(\+ is_ftVar(S)),must(nonvar(P)),
   mpred_trace_msg('~N~n\tRemoving~n\t\tsupport: ~p~n\t\tfrom: ~p~n',[S,P]),
   mpred_rem_support(P,S)
-     -> remove_if_unsupported(P)
+     -> with_current_why(S,remove_if_unsupported(P))
       ; mpred_warn("mpred_withdraw/2 Could not find support ~p to remove from fact ~p",
                 [S,P]).
 
@@ -1049,6 +1078,8 @@ mpred_fwc0(Fact):- mpred_fwc1(Fact).
 %
 % forward chains for a single fact.
 %
+mpred_fwc1(clause_asserted_u(Fact)):-!,sanity(clause_asserted_u(Fact)).
+
 mpred_fwc1(Fact):-
   mpred_do_rule(Fact),
   copy_term(Fact,F),
@@ -1994,8 +2025,7 @@ brake(X):-  X, break.
 % 
 
 % this is here for upward compat. - should go away eventually.
-mpred_trace_op(Add,P):-   
-  mpred_trace_op(Add,P,(o,o)).
+mpred_trace_op(Add,P):- get_source_ref_stack(Why), !, mpred_trace_op(Add,P,Why).
 
 
 mpred_trace_op(Add,P,S):-  

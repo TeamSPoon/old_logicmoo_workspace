@@ -1,4 +1,15 @@
 
+:- use_module(library(pce)).
+:- use_module(library(gui_tracer)).
+:- use_module(library(pce_debug)).
+:- use_module(library(pce_emacs)).
+:- use_module(library(trace/trace)).
+:- use_module(library(emacs/window)).
+:- use_module(library(emacs/emacs)).
+:- use_module(library(swi_ide)).
+:- emacs_toplevel.
+:- guitracer,leash(-all),visible(-all),trace,member(_,[_]),!,notrace,leash(+all),visible(+all).
+
 :- use_module(library(logicmoo_user)).
 
 :- file_begin(pfc).

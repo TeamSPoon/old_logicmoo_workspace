@@ -68,6 +68,7 @@
 :- kb_dynamic(ptReformulatorDirectivePredicate/1).
 :- kb_dynamic(support_hilog/2).
 :- kb_dynamic(mpred_undo_sys/3).
+:- kb_dynamic(arity/2).
 
 :- file_begin(pfc).
 
@@ -366,8 +367,8 @@ ttTypeType(C)==>completelyAssertedCollection(C).
 %overkill
 tSet(C)==>completelyAssertedCollection(C).
 
-%underkill
-ttFormatType(C)==> ~completelyAssertedCollection(C).
+%underkill - Though it is making bad things happen 
+% ttFormatType(C)==> ~completelyAssertedCollection(C).
 
 tCol(C)/(atom(C),TCI=..[C,I]) ==> {decl_type(C)},arity(C,1),mpred_univ(C,I,TCI).
 (tCol(C)/(atom(C), \+ static_predicate(C/1) )) ==> {kb_dynamic(C/1)}.
@@ -445,6 +446,7 @@ tSet(C)==>
    % (isa(I,C)/ground(I:C)==>Head),
    tCol(C)).
 
+:- mpred_trace.
 
 ttFormatType(P) ==> {get_functor(P,C), functor(Head,C,1),
   (\+(predicate_property(Head,S1))-> (kb_dynamic(C/1));true),  

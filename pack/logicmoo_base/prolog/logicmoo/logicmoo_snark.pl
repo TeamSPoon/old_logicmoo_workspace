@@ -6,7 +6,7 @@
 % Dec 13, 2035
 %
 */
-:- module(logicmoo_snark,[]).
+:- module(logicmoo_snark,[load_snark/0,mpred_load_restore_file/1,ensure_autoexec/0]).
 
 :- thread_local(t_l:user_abox/2).
 

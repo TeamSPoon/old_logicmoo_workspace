@@ -126,12 +126,15 @@
             map_f/2,
             mpred_expand/2,
             must_expand/1,
+            recommify/2,
+            recommify/3,
             reduce_clause/3,
             same_terms/2,
             show_doall/1,
             show_doall/1,
             simply_functors/3,
             to_reduced_hb/4,
+            transitive_lc_nr/3,
             transform_functor_holds/5,
             transform_holds/3,
             transform_holds_3/3,
@@ -148,6 +151,7 @@
    % mpred_expansion
    db_expand_maplist(2,*,*,*,*),
    % mpred_expansion
+   transitive_lc_nr(2,*,*),
    simply_functors(2,*,*).
           
 :- include('mpred_header.pi').
@@ -537,7 +541,46 @@ fully_expand_head(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,transitive_lc(db
 %
 % Fully Expand Goal.
 %
-fully_expand_goal(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,transitive_lc(db_expand_term(Op),Sent,SentO))),!.
+fully_expand_goal(Op,Sent,SentO):-
+ must((
+  w_tl(t_l:into_form_code,transitive_lc(db_expand_term(Op),Sent,SentM)),
+    recommify(SentM,SentO))).
+
+/*
+
+?- recommify((a,{((b,c),d)},e),O).
+O =  (a, {b, c, d}, e).
+
+?- recommify((a,{((b,c),d)},e),O).
+O =  (a, {b, c, d}, e).
+
+?- recommify((a,(b,c,d),e),O).
+O =  (a, b, c, d, e).
+
+?- recommify((a,(b,c),(d,e)),O).
+O =  (a, b, c, d, e).
+
+?- recommify((a,(b,c),(true,e)),O).
+O =  (a, b, c, e).
+
+?- recommify((((a0,a),(b,c)),(true,d,e)),O),portray_clause((h:-O)).
+O =  (a0, a, b, c, d, e).
+
+?- recommify((a,(b,c),call((true,e)),true),O).
+O =  (a, b, c, call(e)).
+
+*/
+
+recommify(A,AA):- \+ compound(A),!,AA=A.
+recommify(A,A):-!.
+recommify(A,B):- recommify(true,A,B),!.
+
+recommify(A,B,C):- \+ compound(B),!,conjoin(A,B,C).
+recommify(A,(B,C),D):- \+ compound(B),!, conjoin(A,B,AB), recommify(AB,C,D).
+recommify(A,((X,B),C),D):- !, recommify(A,X,AX),recommify(AX,(B,C),D).
+recommify(A,(B,C),D):- !, conjoin(A,B,AB), recommify(AB,C,D).
+recommify(A,PredArgs,C):- PredArgs=..[P|Args],maplist(recommify,Args,AArgs),B=..[P|AArgs],conjoin(A,B,C),!.
+
 
 
 %= 	 	 
@@ -669,6 +712,8 @@ as_is_term(NC):-compound(NC),functor(NC,Op,2),infix_op(Op,_).
 db_expand_term(Op,SI,SentO):- loop_check(db_expand_term0(Op,SI,SentO),SI=SentO),!.
 
 
+transitive_lc_nr(P,A,B):- call(P,A,B),!.
+transitive_lc_nr(_,A,A).
 %= 	 	 
 
 %% db_expand_term0( ?VALUE1, ?Sent, ?SentO) is semidet.
@@ -683,11 +728,13 @@ db_expand_term0(Op,Sent,SentO):- is_meta_functor(Sent,F,List),F\=t,!,maplist(ful
 %db_expand_term(_ ,NC,OUT):-mpred_expand(NC,OUT),NC\=@=OUT,!.
 db_expand_term0(_,A,B):- t_l:infSkipFullExpand,!,A=B.
 db_expand_term0(Op,SI,SentO):-
-       transitive_lc(db_expand_chain(Op),SI,S0),!,
-       transitive_lc(db_expand_a(Op),S0,S1),!,
-       transitive_lc(db_expand_1(Op),S1,S2),!,transitive_lc(db_expand_2(Op),S2,S3),!,
-       transitive_lc(db_expand_3(Op),S3,S4),!,transitive_lc(db_expand_4(Op),S4,S5),!,
-       transitive_lc(db_expand_5(Op),S5,SentO).
+       transitive_lc_nr(db_expand_chain(Op),SI,S0),!,
+       transitive_lc_nr(db_expand_a(Op),S0,S1),!,
+       transitive_lc_nr(db_expand_1(Op),S1,S2),!,
+       transitive_lc_nr(db_expand_2(Op),S2,S3),!,
+       transitive_lc_nr(db_expand_3(Op),S3,S4),!,
+       transitive_lc_nr(db_expand_4(Op),S4,S5),!,
+       transitive_lc_nr(db_expand_5(Op),S5,SentO).
 
 
 %= 	 	 
@@ -988,7 +1035,7 @@ db_expand_1(_,X,X).
 db_expand_2(_,Sent,SentO):-is_ftNonvar(Sent),get_ruleRewrite(Sent,SentO),!.
 db_expand_2(change(_,_),Sent,SentO):-is_ftNonvar(Sent),get_ruleRewrite(Sent,SentO),!.
 db_expand_2(_,X,X):-!.
-db_expand_2(_ ,NC,NC):- as_is_term(NC),!.
+%==SKIPPED==%  db_expand_2(_ ,NC,NC):- as_is_term(NC),!.
 % db_expand_2(Op,Sent,SentO):-loop_check(expand_term(Sent,SentO)),Sent\=@=SentO,!.
 
 
@@ -1000,10 +1047,10 @@ db_expand_2(_ ,NC,NC):- as_is_term(NC),!.
 % Database Expand Helper Number 3..
 %
 db_expand_3(_,A,B):-A=B,!.
-db_expand_3(Op ,Sent,SentO):-db_expand_final(Op ,Sent,SentO),!.
+%==SKIPPED==% db_expand_3(Op ,Sent,SentO):-db_expand_final(Op ,Sent,SentO),!.
 %db_expand_3(_Op,Sent,SentO):-once(to_predicate_isas(Sent,SentO)).
-db_expand_3(_Op,Sent,SentO):-once(into_mpred_form(Sent,SentO)).
-db_expand_3(_Op,Sent,SentO):-once(transform_holds(t,Sent,SentO)).
+%==SKIPPED==% db_expand_3(_Op,Sent,SentO):-once(into_mpred_form(Sent,SentO)).
+%==SKIPPED==% db_expand_3(_Op,Sent,SentO):-once(transform_holds(t,Sent,SentO)).
 
 
 
@@ -1014,9 +1061,9 @@ db_expand_3(_Op,Sent,SentO):-once(transform_holds(t,Sent,SentO)).
 % Database Expand Helper Number 4..
 %
 db_expand_4(_,A,B):-A=B,!.
-db_expand_4(_ ,NC,NC):- as_is_term(NC),!.
+%==SKIPPED==% db_expand_4(_ ,NC,NC):- as_is_term(NC),!.
 % db_expand_4(_,A,B):-lmconf:pfcManageHybrids,!,A=B.
-db_expand_4(Op,Sent,SentO):-db_quf(Op,Sent,Pretest,Template),(Pretest==true-> SentO = Template ; SentO = (Pretest,Template)),!.
+%==SKIPPED==% db_expand_4(Op,Sent,SentO):-db_quf(Op,Sent,Pretest,Template),(Pretest==true-> SentO = Template ; SentO = (Pretest,Template)),!.
 
 
 
