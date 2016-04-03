@@ -21,6 +21,8 @@
             adjust_kif0/5,
             adjust_kif5/5,
             alt_kif_to_boxlog/4,
+            any_to_pfc/2,
+            any_to_pfc0/2,
             as_dlog/2,
             as_prolog/2,
             as_symlog/2,
@@ -73,6 +75,8 @@
             local_sterm_to_pterm/2,
             ain_h/3,
             mpred_t_tell_kif/2,
+            map_each_clause/3,
+            map_each_clause/2,
             mudEquals/2,
             neg_b_if_neg/3,
             neg_h_if_neg/2,
@@ -160,6 +164,8 @@
    kif_add_boxes3(2,?,*),
    % common_logic_snark
    ain_h(2,?,*),
+   map_each_clause(1,+),
+   map_each_clause(2,+,-),
    % common_logic_snark
    to_nonvars(2,?,?).
 
@@ -173,7 +179,7 @@
         
 */
 
-% :- dynamic((if/2,iif/2)).
+:- dynamic(baseKB:(if/2,iif/2)).
 
 
 :- include('../mpred/mpred_header.pi').
@@ -182,7 +188,7 @@
 
 %= 	 	 
 
-%% kif_hook( :TermC) is semidet.
+%% kif_hook(+TermC) is semidet.
 %
 % Knowledge Interchange Format Hook.
 %
@@ -192,6 +198,7 @@ kif_hook(_H <- _):- !,fail.
 kif_hook(_ ==> _):- !,fail.
 kif_hook(_ <==> _):- !,fail.
 kif_hook(_=>_).
+kif_hook(_<=_).
 kif_hook(_<=>_).
 kif_hook((_ & _)).
 kif_hook((_ /\ _)).
@@ -220,16 +227,15 @@ kif_hook(C):- C=..[F,A|_],is_sentence_functor(F),!,kif_hook(A).
 %
 % 
 are_clauses_entailed(E):-var(E),!,fail.
-are_clauses_entailed([]):-!.
-are_clauses_entailed([E|List]):-!,are_clauses_entailed(E),are_clauses_entailed(List).
-are_clauses_entailed((C,L)):-!,are_clauses_entailed(C),are_clauses_entailed(L).
-are_clauses_entailed(CL):- \+ \+ (unnumbervars(CL,UCL),with_umt(is_prolog_entailed(UCL))),!.
+are_clauses_entailed(B):- unnumbervars(B,A),with_umt(map_each_clause(is_prolog_entailed,A)).
+
 
 
 %% is_prolog_entailed( ?Prolog) is semidet.
 %
 % True if the "Prolog" clause is asserted
 %
+
 is_prolog_entailed(UCL):-clause_asserted(UCL),!.
 is_prolog_entailed(UCL):-clause(UCL,B),split_attrs(B,A,BB),must(A),BB.
 is_prolog_entailed(UCL):-clause(UCL,B,Ref),(B\==true->must(B);(trace,clause(HH,BB,Ref),dmsg(BB:-(UCL,HH)))),!.
@@ -268,18 +274,35 @@ delistify_last_arg(Arg,Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARG
 % Use this to mark code and not axiomatic prolog
 
 
-%= 	 	 
+map_each_clause(P,CLIF,Prolog):- cwc,is_list(CLIF),!,map_each_clause(P,CLIF,Prolog).
+map_each_clause(P,(H,CLIF),(T,Prolog)):- cwc, sanity(nonvar(H)),!,map_each_clause(P,H,T),map_each_clause(P,CLIF,Prolog).
+map_each_clause(P,A,B):- cwc,call(P,A,B).
+
+map_each_clause(P,CLIF):- cwc,is_list(CLIF),!,map_each_clause(P,CLIF,Prolog).
+map_each_clause(P,(H,CLIF)):- cwc, sanity(nonvar(H)),!,map_each_clause(P,H,T),map_each_clause(P,CLIF,Prolog).
+map_each_clause(P,A):- cwc,call(P,A).
+
+%% any_to_pfc( :TermCLIF, ?Prolog) is semidet.
+%
+% Converted To Prolog.
+%
+any_to_pfc(B,A):- cwc, must(map_each_clause(any_to_pfc0,B,A)).
+
+any_to_pfc0(B,A):- cwc, is_kif_clause(B),!,kif_to_pfc0(B,A).
+any_to_pfc0(B,A):- cwc, is_pfc_clause(B),!,fully_expand(B,A).
+any_to_pfc0(B,A):- cwc, is_prolog_clause(B),!,boxlog_to_pfc(B,A).
+any_to_pfc0(B,A):- cwc, !, trace_or_throw(should_never_be_here(any_to_pfc0(B,A))).
+any_to_pfc0((H:-B),PrologO):- cwc,!,must((show_failure(why,boxlog_to_pfc((H:-B),Prolog)),!,=(Prolog,PrologO))),!.
+
 
 %% kif_to_pfc( :TermCLIF, ?Prolog) is semidet.
 %
 % Ieee Standard Common Logic Interchange Format Version Converted To Prolog.
 %
-kif_to_pfc(CLIF,Prolog):-cwc,is_list(CLIF),!,must_maplist(kif_to_pfc,CLIF,Prolog).
-kif_to_pfc((H,CLIF),(T,Prolog)):-cwc,sanity(must(nonvar(H))),!,kif_to_pfc(H,T),kif_to_pfc(CLIF,Prolog).
-kif_to_pfc((H<-B),(H<-B)):- cwc,!.
-kif_to_pfc((P==>Q),(P==>Q)):- cwc,!.
-kif_to_pfc((H:-B),PrologO):- cwc,!,must((show_failure(why,boxlog_to_pfc((H:-B),Prolog)),!,=(Prolog,PrologO))),!.
-kif_to_pfc(CLIF,Prolog):- cwc,
+kif_to_pfc(B,A):- cwc, must(map_each_clause(kif_to_pfc0,B,A)).
+
+kif_to_pfc0(CLIF,Prolog):- cwc,
+   sanity(is_kif_clause(CLIF)),
   % somehow integrate why_to_id(tell,Wff,Why),
      must_det_l((
       kif_to_boxlog(CLIF,BOXLOG),
@@ -317,7 +340,7 @@ pfc_for_print_right(Prolog,PrintPFC):- =(Prolog,PrintPFC).
 is_entailed(CLIF):- 
  cwc, mpred_run,
  mpred_nochaining((
-   kif_to_pfc(CLIF,Prolog),!, \+ \+ are_clauses_entailed(Prolog))),!.
+   any_to_pfc(CLIF,Prolog),!, \+ \+ are_clauses_entailed(Prolog))),!.
 
 
 %% is_not_entailed( ?CLIF) is semidet.

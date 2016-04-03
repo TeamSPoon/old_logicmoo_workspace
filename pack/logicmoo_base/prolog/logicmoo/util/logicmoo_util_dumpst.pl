@@ -14,7 +14,7 @@
           getPFA/3,getPFA1/3,getPFA2/3,get_m_opt/4,fdmsg/1,fdmsg1/1,
           neg1_numbervars/3,clauseST/2,
           dtrace/0,dtrace/1,dtrace/2,
-          dumptrace/1,dumptrace/2,
+          dumptrace/1,dumptrace/2,dumptrace0/1,
           dumptrace_ret/1,
           drain_framelist/1,
           drain_framelist_ele/1,
@@ -356,6 +356,7 @@ simplify_goal_printed(Var,'$avar'(Name,List)):- get_attrs(Var,ATTRS),must(printa
 simplify_goal_printed(Var,Name):- is_ftVar(Var),!,printable_variable_name(Var, Name).
 simplify_goal_printed(setup_call_catcher_cleanup,sccc).
 simplify_goal_printed(setup_call_cleanup,scc).
+simplify_goal_printed(setup_call_cleanup_each,scce).
 simplify_goal_printed(call_cleanup,cc).
 simplify_goal_printed(call_term_expansion(_,A,_,B,_),O):- !, simplify_goal_printed(call_term_expansion_5('...',A,'...',B,'...'),O).
 simplify_goal_printed(A,'...'(SA)):- atom(A),atom_concat('/opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/',SA,A),!.
@@ -460,7 +461,7 @@ dtrace:- dtrace(wdmsg("DUMP_TRACE/0")).
 %
 % (debug) Trace.
 %
-dtrace(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dtrace(G)),setup_call_cleanup(notrace,(leash(+call),dtrace(G)),trace).
+dtrace(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dtrace(G)),setup_call_cleanup_each(notrace,(leash(+call),dtrace(G)),trace).
 dtrace(G):- notrace((once(((G=dmsg(GG);G=_:dmsg(GG);G=GG),nonvar(GG))),wdmsg(GG),fail)).
 dtrace(G):- has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G). 
 %dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,dumpST.
@@ -509,18 +510,29 @@ with_source_module(G):-
 %
 % Dump Trace.
 %
+
+
+
 dumptrace(G):- non_user_console,!,trace_or_throw(dumptrace(G)).
-dumptrace(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dumptrace(G)),setup_call_cleanup(notrace,(leash(+call),dumptrace(G)),trace).
-dumptrace(G):- ignore((debug,
- catchv(attach_console,_,true),
- leash(+exception),visible(+exception))),fresh_line,
- (repeat,(tracing -> (!,fail) ; true)),
- to_wmsg(G,WG),
- notrace((
-  fmt(in_dumptrace(G)),
-  wdmsg(WG),
-  show_failure(why,get_single_char(C)))),
-  with_all_dmsg(with_source_module(dumptrace(G,C))),!.
+dumptrace(G):-
+    current_prolog_flag(gui_tracer, Was),
+    setup_call_cleanup_each(
+        set_prolog_flag(gui_tracer, false),
+        dumptrace0(G),
+        set_prolog_flag(gui_tracer, Was)).
+
+dumptrace0(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dumptrace(G)),setup_call_cleanup_each(notrace,(leash(+call),dumptrace0(G)),trace).
+dumptrace0(G):- 
+  ignore((debug,
+    catchv(attach_console,_,true),
+    leash(+exception),visible(+exception))),fresh_line,
+    (repeat,(tracing -> (!,fail) ; true)),
+    to_wmsg(G,WG),
+    notrace((
+     fmt(in_dumptrace(G)),
+     wdmsg(WG),
+     show_failure(why,get_single_char(C)))),
+     with_all_dmsg(with_source_module(dumptrace(G,C))),!.
 
 :-meta_predicate(dumptrace(0,+)).
 

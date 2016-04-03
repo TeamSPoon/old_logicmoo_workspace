@@ -65,7 +65,7 @@ genls(Sub, _Super) ==> tCol(Sub).
 ==>tinyPredActive(afterRemoving).
 ==>tinyPredActive(afterAdding).
 
-% argQuotedIsa(Pred, N, FT) <=  (argIsa(Pred, N, Type),genls(Type,FT),ttFormatType(FT)).
+% argQuotedIsa(Pred, N, FT) <=  (argIsa(Pred, N, Type),genls(Type,FT),ttExpressionType(FT)).
 
 % consistent(CycL) <= cycLToMpred(~(CycL),Consequent),not(pfcCall(Consequent)). 
 
@@ -85,7 +85,7 @@ nearestIsa(I,C) <- mpred_fact(isa(I,C)).
 % meta_argtypes(ArgTypes)/is_declarations(ArgTypes) ==> {wdmsg(in_loop(meta_argtypes))},meta_argtypes(ArgTypes).
 tRelation(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes).
 :- ain(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) ==> functorDeclares(F))).
-(ttFormatType(FT)/is_declarations(FT))==>meta_argtypes(FT).
+(ttExpressionType(FT)/is_declarations(FT))==>meta_argtypes(FT).
 
 :- show_call(why,source_location(_,_)).
 

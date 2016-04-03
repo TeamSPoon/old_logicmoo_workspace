@@ -182,7 +182,7 @@ clause_umt(C):-!,clause(_:C,true).
 term_is_ft(Term,Type):- is_ftVar(Term),!,member(Type,[ftVar,ftProlog]).
 term_is_ft(_ANY,Type):- Type==ftVar,!,fail.
 term_is_ft([T|Term],ftListFn(Type)):-is_list_of(Type,[T|Term]).
-term_is_ft(_ANY,Type):- nonvar(Type),(ttFormatType==Type;(\+ ttFormatType(Type))),!,fail.
+term_is_ft(_ANY,Type):- nonvar(Type),(ttExpressionType==Type;(\+ ttExpressionType(Type))),!,fail.
 term_is_ft(Term,Type):- no_repeats_old(Type,(term_is_ft_how(Term,Was),trans_subft(Was,Type))).
 
 
@@ -401,9 +401,9 @@ asserted_argIsa_known(F,N,Type):- argIsa_call_6(F,N,Type),!.
 %
 % Converted To Format Type.
 %
-to_format_type(FT,FT):-t(ttFormatType,FT),!.
+to_format_type(FT,FT):-t(ttExpressionType,FT),!.
 to_format_type(COL,FT):- clause_umt(formatted_resultIsa(FT,COL)),!.
-to_format_type(COL,FT):- clause_umt(resultIsa(FT,COL)),t(ttFormatType,FT),!.
+to_format_type(COL,FT):- clause_umt(resultIsa(FT,COL)),t(ttExpressionType,FT),!.
 to_format_type(COL,ftTerm(COL)).
 
 
@@ -437,9 +437,9 @@ argIsa_call_0(isKappaFn,2,ftAskable).
 %argIsa_call_0(isInstFn,1,tCol).
 argIsa_call_0(Col,1,Col):-t(tCol,Col).
 argIsa_call_0(Col,2,ftVoprop):-t(tCol,Col).
-argIsa_call_0(quotedDefnIff,1,ttFormatType).
+argIsa_call_0(quotedDefnIff,1,ttExpressionType).
 argIsa_call_0(quotedDefnIff,2,ftCallable).
-argIsa_call_0(meta_argtypes,1,ttFormatType).
+argIsa_call_0(meta_argtypes,1,ttExpressionType).
 
 
 argIsa_call_0(isa,1,ftID).
@@ -452,7 +452,7 @@ argIsa_call_0(mpred_isa,1,tPred).
 argIsa_call_0(mpred_isa,2,ftVoprop).
 % argIsa_call_0(mpred_isa,3,ftVoprop).
 
-argIsa_call_0(formatted_resultIsa,1,ttFormatType).
+argIsa_call_0(formatted_resultIsa,1,ttExpressionType).
 argIsa_call_0(formatted_resultIsa,2,tCol).
 
 argIsa_call_0(predicates,1,ftListFn(ftTerm)).
@@ -513,7 +513,7 @@ argIsa_call_3(disjointWith,tCol).
 argIsa_call_3(ftFormFn,ftTerm).
 argIsa_call_3(mudTermAnglify,ftTerm).
 argIsa_call_3(genls,tCol).
-argIsa_call_3(subFormat,ttFormatType).
+argIsa_call_3(subFormat,ttExpressionType).
 
 
 %= 	 	 
@@ -750,7 +750,7 @@ is_ephemeral(isOneOf(_)).
 %
 is_valuespec(G):-is_ephemeral(G).
 is_valuespec(G):-t(tCol,G).
-is_valuespec(FT):-t(ttFormatType,FT).
+is_valuespec(FT):-t(ttExpressionType,FT).
 is_valuespec(G):-evaluatableArg(G,_).
 
 
@@ -837,7 +837,7 @@ correctAnyTypeOrFail(Op,A,Type,AA):- w_tl(tlbugger:skipMust,checkAnyType(Op,A,Ty
 %
 % Correct Type Gripe.
 %
-correctType_gripe(Op,A,Fmt,AA):- a(ttFormatType,Fmt),!,trace_or_throw(correctType(is_ft_correctFormatType(Op,A,Fmt,AA))).
+correctType_gripe(Op,A,Fmt,AA):- a(ttExpressionType,Fmt),!,trace_or_throw(correctType(is_ft_correctFormatType(Op,A,Fmt,AA))).
 correctType_gripe(Op,A,Type,AA):- fail,atom(Type),must_equals(A,AA),
       dmsg(todo(isa_assert_type(Type))),
       % decl_type(Type),
@@ -968,7 +968,7 @@ correctType0(Op,Args,Types,NewArgs):-compound(Args), compound(Types),
    correctAnyType(Op,ArgsL,TypesL,NewArgsL).
 
 correctType0(Op,A,Fmt,AA):- trans_subft(Fmt,Code),Fmt\=Code,loop_check(correctType0(Op,A,Code,AA)).
-correctType0(Op,A,Super,AA):- a(ttFormatType,Super),call_u(genls(Sub,Super)),Sub\=Super,loop_check(correctType0(Op,A,Sub,AA)).
+correctType0(Op,A,Super,AA):- a(ttExpressionType,Super),call_u(genls(Sub,Super)),Sub\=Super,loop_check(correctType0(Op,A,Sub,AA)).
 
 correctType0(Op,Arg,Props,NewArg):- compound(Props),
    Props=..[F|TypesL],
@@ -979,7 +979,7 @@ correctType0(Op,Arg,Props,NewArg):- compound(Props),
    correctArgsIsa(Op,C,CC),
    CC=..[F,NewArg|_].
 
-correctType0(_ ,A,Type,AA):- not(t(ttFormatType,Type)),t(tCol,Type),isa_asserted(A,Type),!,must_equals(A,AA).
+correctType0(_ ,A,Type,AA):- not(t(ttExpressionType,Type)),t(tCol,Type),isa_asserted(A,Type),!,must_equals(A,AA).
 correctType0(_,A,_,_):- not(compound(A)),!,fail.
 correctType0(Op,A,T,AAA):- once(correctArgsIsa(Op,A,AA)),A\=AA,!,correctType0(Op,AA,T,AAA).
 correctType0(_ ,A,T,AA):- get_functor(A,F),clause_umt(resultIsa(F,T)),must_det(A=AA),!.

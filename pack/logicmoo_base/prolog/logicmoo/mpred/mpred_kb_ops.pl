@@ -2010,7 +2010,7 @@ mpred_cleanup_0(P):- findall(P-B-Ref,clause(P,B,Ref),L),
 % PFC Negation.
 %
 mpred_negation((-P),P).
-mpred_negation((-P),P).
+% mpred_negation((~P),P).
 mpred_negation((\+(P)),P).
 */
 /*
@@ -2019,6 +2019,7 @@ mpred_negation((\+(P)),P).
 %
 % PFC Negated Literal.
 %
+mpred_negated_literal(P):-is_reprop(P),!,fail.
 mpred_negated_literal(P):-mpred_negated_literal(P,_).
 
 %% mpred_negated_literal( +P, ?Q) is semidet.
@@ -2075,12 +2076,11 @@ is_reprop_0(X):-get_functor(X,repropagate,_).
 %
 % PFC Not Negated Literal.
 %
-mpred_non_neg_literal(X):-is_reprop(X),!,fail.
-mpred_non_neg_literal(X):-atom(X),!.
+mpred_non_neg_literal(X):- is_reprop(X),!,fail.
+mpred_non_neg_literal(X):- atom(X),!.
 mpred_non_neg_literal(X):- sanity(stack_check),
     mpred_positive_literal(X), X \= ~(_), X \= mpred_mark(_,_,_,_), X \= conflict(_).
 
-mpred_non_neg_literal(X):-is_reprop(X),!,fail.
 % ======================= mpred_file('pfcsupport').	% support maintenance
 
 
@@ -2325,7 +2325,8 @@ pred_u2(P):-clause_true(arity(F,A)),functor(P,F,A),has_db_clauses(P).
 %
 % Has Database Clauses.
 %
-has_db_clauses(PI):-modulize_head(PI,P),predicate_property(P,number_of_clauses(NC)),\+ predicate_property(P,number_of_rules(NC)), \+ \+ clause_u(P,true).
+has_db_clauses(PI):-modulize_head(PI,P),
+   predicate_property(P,number_of_clauses(NC)),\+ predicate_property(P,number_of_rules(NC)), \+ \+ clause_u(P,true).
 
 
 

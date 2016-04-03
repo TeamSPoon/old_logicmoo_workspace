@@ -286,7 +286,7 @@ deduceEachArgType(M):-functor(M,F,A),M=..[F|ARGS],deduceEachArgType(F,A,ARGS).
 %
 deduceEachArgType(F,_,_):-var(F),!.
 deduceEachArgType(argIsa,3,[_F,_N,_Type]):-!.
-% deduceEachArgType(argIsa,3,[F,N,Type]):- ttFormatType(Type),ain(argQuotedIsa(F,N,Type)),!.
+% deduceEachArgType(argIsa,3,[F,N,Type]):- ttExpressionType(Type),ain(argQuotedIsa(F,N,Type)),!.
 deduceEachArgType(argIsa,3,[F,N,Type]):- rescan_argIsa(F,N,Type),fail.
 deduceEachArgType(t,_,[F|_]):-var(F),!.
 deduceEachArgType(F,_,[E]):- tCol(F),deduceEachArg_WithType(E,F),!.
@@ -328,7 +328,7 @@ deduceEachArg_WithType(M,tSpatialThing):-isa(M,tSpatialThing),!.
 deduceEachArg_WithType(M,tTemporalhing):-isa(M,tTemporalhing),!.
 deduceEachArg_WithType(M,M):-!.
 deduceEachArg_WithType(M,MT):- compound(M),!, (compound(MT)->(( M =..ARGS,MT =..ARGST,maplist(deduceEachArg_WithType,ARGS,ARGST))); true).
-deduceEachArg_WithType(_,MT):- (MT=ftTerm;ttFormatType(MT)),!.
+deduceEachArg_WithType(_,MT):- (MT=ftTerm;ttExpressionType(MT)),!.
 deduceEachArg_WithType(M,MT):-isa(M,MT),!.
 deduceEachArg_WithType(M,MT):- assert_isa_safe(M,MT),!.
 
@@ -468,7 +468,8 @@ is_asserted_eq(HB):- ( \+ \+ no_loop_check(is_asserted_1(HB))).
 %% is_asserted( ?X) is semidet.
 %
 % If Is A Asserted.
-%
+% 
+% TODO Convert loop checking to a "fresh" loop_check
 is_asserted(X):- no_repeats(loop_check(call_u(X))).
 
 %= 	 	 

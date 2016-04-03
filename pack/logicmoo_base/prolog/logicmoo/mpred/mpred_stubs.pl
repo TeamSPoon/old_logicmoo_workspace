@@ -430,7 +430,7 @@ is_same_clauses(Head,HBLISTN):-
 
 /*
 
-is_asserted  checks using =@=
+is_asserted  checks using   mpred_clause_is_asserted(C).
 call(conjecture)
 call(once)  % TODO
 change(assert,a) asserts first if =@= is not first
@@ -987,7 +987,7 @@ mpred_t_storage_op(Op,(Head:-Body)):-
    must(((CALL0,mpred_t_tell_kif(Op2,(Head:-Body))))),!.
 
 % KIF RULE HOOK   
-mpred_t_storage_op(Op,RULE):- call_u(is_kif_rule(RULE)),!,
+mpred_t_storage_op(Op,RULE):- call_u(is_kif_clause(RULE)),!,
   reduce_mpred_op(Op,Op2),
   mpred_t_tell_kif(Op2,RULE),!.
 

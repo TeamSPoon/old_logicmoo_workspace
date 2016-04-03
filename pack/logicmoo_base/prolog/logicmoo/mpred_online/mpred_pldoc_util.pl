@@ -149,7 +149,7 @@ to_tclass(F,FO):- atom(F),current_predicate(F/A),!,functor(P,F,A),(real_builtin_
 to_tclass(F,FO):- string(F),!,atom_string(F,S),to_tclass(S,FO).
 
 
-to_tclass(Prop,New):- ttFormatType(Prop),ensure_starts_with_prefix(Prop,ft,New),!.
+to_tclass(Prop,New):- ttExpressionType(Prop),ensure_starts_with_prefix(Prop,ft,New),!.
 to_tclass(Prop,New):- ttValueType(Prop),ensure_starts_with_prefix(Prop,vt,New),!.
 
 to_tclass(Prop,New):- arity(Prop,1),arity(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.

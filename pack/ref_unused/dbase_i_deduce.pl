@@ -90,7 +90,7 @@ deduce_facts_forward(user:mpred_prop(F,meta_argtypes(ArgTs)),meta_argtypes(ArgTs
 deduce_facts_forward(meta_argtypes(ArgTs),argIsa(F,A,Type)):-get_functor(ArgTs,F,_),arg(A,ArgTs,Type).
 deduce_facts_forward(user:mpred_prop(F,meta_argtypes(ArgTs)),argIsa(F,A,Type)):-arg(A,ArgTs,Type).
 
-deduce_facts_forward(argIsa(F,_A,Type),[isa(Type,tCol),isa(F,tRelation)]):-atom(Type),not(t(ttFormatType,Type)).
+deduce_facts_forward(argIsa(F,_A,Type),[isa(Type,tCol),isa(F,tRelation)]):-atom(Type),not(t(ttExpressionType,Type)).
 
 %deduce_facts_forward(B,A):- is_asserted('<=>'(B,A)),not(contains_singletons(A)).
 %deduce_facts_forward(B,A):- is_asserted('<=>'(A,B)),not(contains_singletons(A)).
@@ -158,7 +158,7 @@ nonusefull_deduction_type(ftVoprop).
 nonusefull_deduction_type(vtDirection).
 nonusefull_deduction_type(Type):-ttSpatialType(Type),!,fail.
 nonusefull_deduction_type(tObj).
-nonusefull_deduction_type(Type):-is_asserted(ttFormatType(Type)).
+nonusefull_deduction_type(Type):-is_asserted(ttExpressionType(Type)).
 
 assert_deduced_arg_isa_facts(Fact):- !, ignore(((ground(Fact),forall(deduce_argIsa_facts(Fact,Arg,Type),show_call(add(isa(Arg,Type))))))).
 

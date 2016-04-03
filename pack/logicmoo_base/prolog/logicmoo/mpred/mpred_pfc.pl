@@ -19,8 +19,6 @@
   maybe_mpred_break/1,
   each_E/3,
   mpred_post1_rem/2,
-  mpred_post2_fin/2,
-  mpred_post2_fin2/2,
   mpred_post1_rem1/2,
   mpred_mark_as_ml/4,
   mpred_mark_fa_as/6,
@@ -30,12 +28,14 @@
   assert_u_confirmed_if_missing/1,
   assert_u_confirmed_was_missing/1,
   mpred_notrace_exec/0,
+  remove_negative_version/1,
   listing_u/1,
   get_source_ref/1,
   get_source_ref1/1,
   get_source_ref10/1,
   ensure_abox/1, 
   is_source_ref1/1,
+  get_source_ref_stack/1,
   set_fc_mode/1,
   with_no_mpred_breaks/1,
   mpred_remove1/2,
@@ -84,7 +84,7 @@
   pp_db_rules/0,pp_db_supports/0,pp_db_triggers/0,mpred_load/1,process_rule/3,
   remove_if_unsupported/1,remove_selection/1,mpred_withdraw1/2,
 
-  mpred_post2/2,get_mpred_assertion_status/3,mpred_post4/4,get_mpred_support_status/5,same_file_facts/2,clause_asserted_u/1,
+  mpred_post2/2,get_mpred_assertion_status/3,mpred_post_update4/4,get_mpred_support_status/5,same_file_facts/2,clause_asserted_u/1,
 
   mpred_run/0,mpred_test/1,mpred_test_fok/1,
   fa_to_p/3,
@@ -125,6 +125,7 @@
       fc_eval_action(0,-),
       clause_u(:,+,-),
       clause_u(:,-),
+      clause_u(:),
       mpred_call_no_bc(+),
       with_umt(+),
       brake(0),
@@ -149,7 +150,7 @@
 :- '$set_source_module'(_,mpred_pfc).
 
 :- module_transparent((assert_u_confirmed_was_missing/1,mpred_trace_exec/0,pfcl_do/1,
-  mpred_post2/2,get_mpred_assertion_status/3,mpred_post4/4,get_mpred_support_status/5,same_file_facts/2,foreachl_do/2,
+  mpred_post2/2,get_mpred_assertion_status/3,mpred_post_update4/4,get_mpred_support_status/5,same_file_facts/2,foreachl_do/2,
   mpred_trace_op/3)).
 
 :- thread_local(t_l:no_mpred_breaks/0).
@@ -263,6 +264,7 @@ retract_u(H):- clause_u(H,true,R),erase(R),expire_tabled_list(H).
 
 retractall_u(H):- forall(clause_u(H,_,R),erase(R)),expire_tabled_list(H).
 
+clause_u(C):- mpred_clause_is_asserted(C).
 clause_u(H,B):- clause_u(H,B,_).
 
 clause_u(_:H,B,R):- nonvar(R),!,must(clause_i(_:H,B,R)).
@@ -429,6 +431,10 @@ ain_fast(P,S):-
   each_E(mpred_post1,P,[S]),
   mpred_run.
 
+remove_negative_version(P):-
+  % TODO extract_predciates(P,Preds),trust(Preds),
+  get_source_ref_stack(S),
+  with_no_mpred_trace_exec(must(mpred_ain(\+ ~ P, S))).
 
 %% mpred_post(+Ps,+S) 
 %
@@ -460,7 +466,7 @@ mpred_post1(P0,S0):-
    (must(mpred_post2(P,S)) *-> true ; trace_or_throw(mpred_error("mpred_post1(~p,~p) failed",[P,S]))).
 
 /*
-% this would be the very inital by finnin...
+% this would be the very inital by Tim Finnin...
 mpred_post2(P,S):- 
   %  db mpred_ain_db_to_head(P,P2),
   % mpred_remove_old_version(P),  
@@ -473,51 +479,43 @@ mpred_post2(P,S):-
   !.
 */
 
-% this would be the very inital by finnin...
-mpred_post2(P,S):-  fail, !, 
-  WasA = _,
-  %  db mpred_ain_db_to_head(P,P2),
+%% mpred_post2(+Ps,+S) 
+%
+% Two version exists of this function one expects for a clean database and adds new information.
+% tries to assert a fact or set of fact to the database.
+% The other version is if the program is been running before loading this module.
+%
+
+% Expects a clean database and adds new information.
+mpred_post2(P,S):-  !,  
+  % db mpred_ain_db_to_head(P,P2),
   % mpred_remove_old_version(P),  
-  ( \+ \+ mpred_add_support(P,S)),
-  ( ( \+ \+ clause_asserted_u(P)) -> WasA= identical ; ( ( \+ \+ assert_u_confirmed_was_missing(P)),WasA = unique)),
-  mpred_trace_op(add,P,S),
-  !,
-  mpred_enqueue(P,S),
-  !.
+  must( \+ \+ mpred_add_support(P,S)),
+  ( \+ mpred_unique_u(P) 
+    -> clause_asserted_u(P) 
+    ; ( assert_u_confirmed_was_missing(P),
+        !,
+        mpred_trace_op(add,P,S),
+        !,
+        mpred_enqueue(P,S),
+        !)).
 
-% this would be the very inital by finnin...
-mpred_post2(P,S):-  !, loop_check(mpred_post2_fin(P,S),true).
-
-
-% this is dmiles new version....
-mpred_post2(P,S):-
+ 
+% Expects a *UN*clean database and adds new information.
+% (running the program is been running before loading this module)
+%
+%  (gets the status in Support and in Database)
+mpred_post2(P,S):-  !, 
   copy_term((P,S),(PP,SS)),
   b_setval('$variable_names',[]),!,
+% checks to see if we have forward chain the knowledge yet or 
   must(get_mpred_support_status(P,S,PP,SS,Was)),
+% if we''ve asserted what we''ve compiled      
   must(get_mpred_assertion_status(P,PP,WasA)),!,
-  (must(mpred_post4(WasA,P,S,Was))*-> true; mpred_warn("mpred_post2(~p,~p) failed",[P,S])).
+  (must(mpred_post_update4(WasA,P,S,Was))*-> true; mpred_warn("mpred_post2(~p,~p) failed",[P,S])).
 
-mpred_post2_fin(P,S):- 
-  %  db mpred_ain_db_to_head(P,P2),
-  % mpred_remove_old_version(P),  
-  once(must( \+ \+ mpred_add_support(P,S))),
-  findall(P-S,no_repeats(P,mpred_unique_u(P)),PL),
-  (PL==[]->sanity(clause_asserted_u(P));forall(member(P1-S1,PL),mpred_post2_fin2(P1,S1))).
-  
-
-mpred_post2_fin2(P,S):- 
-  assert_u_confirmed_if_missing(P),!,
-  mpred_trace_op(add,P,S),
-  !,
-  mpred_enqueue(P,S),
-  !,
-  mpred_enqueue_asserted(P,S).
-
-
-mpred_enqueue_asserted(P,S):- mpred_enqueue(clause_asserted_u(P),S).
 
 clause_asserted_u(P):-with_umt(clause_asserted_i(P)).
-
 
 get_mpred_assertion_status(P,PP,Was):- 
   (clause_asserted_u(P)->(Was=identical,!);
@@ -525,7 +523,7 @@ get_mpred_assertion_status(P,PP,Was):-
 
 % The cyclic_break is when we have regressions arouind ~ ~ ~ ~ ~
 get_mpred_support_status(P,_S, PP,(FF,TT),Was):- 
-   Simular=simular(none),
+  Simular=simular(none),
   dont_make_cyclic((((with_umt(spft_mod:spft(PP,F,T)),P=@=PP)) *-> 
      ((TT=@=T,same_file_facts(F,FF)) -> (Was = exact , ! ) ; (nb_setarg(1,Simular,(FF,TT)),fail))
     ; Was = none) -> true ; ignore(Was=Simular)).
@@ -533,23 +531,28 @@ get_mpred_support_status(P,_S, PP,(FF,TT),Was):-
 same_file_facts(F,FF):- FF=@=F.
 same_file_facts(mfl(M,F,_),mfl(M,FF,_)):-nonvar(M),!, FF=@=F.
 
-mpred_post4(identical,_P,_S,exact):-!.
-mpred_post4(identical,P,S,exact):-
-    (lookup_u(mpred_is_tracing_pred(P)) -> wdmsg(mpred_post4(identical,P,S,exact));true),!.
 
-mpred_post4(Was,P,S,What):- cnotrace((get_mpred_is_tracing(P), must(S=(F,T)),dmsg(call_mpred_post4:- (Was,post1=P,fact=F,T,What)),dmsg("\n"))),fail.
+%% mpred_post_update4(++AssertionStatus, +Ps, +S, ++SupportStatus) is det.
+%
+% Physically assert the Knowledge+Support Data based on statuses
+%
+mpred_post_update4(identical,_P,_S,exact):-!.
+mpred_post_update4(identical,P,S,exact):-
+    (lookup_u(mpred_is_tracing_pred(P)) -> wdmsg(mpred_post_update4(identical,P,S,exact));true),!.
 
-mpred_post4(identical,P,S,simular(_)):-!,mpred_add_support(P,S).
+mpred_post_update4(Was,P,S,What):- cnotrace((get_mpred_is_tracing(P), must(S=(F,T)),dmsg(call_mpred_post4:- (Was,post1=P,fact=F,T,What)),dmsg("\n"))),fail.
 
-mpred_post4(identical,P,S,none):-!,mpred_add_support(P,S),mpred_enqueue(P,S).
+mpred_post_update4(identical,P,S,simular(_)):-!,mpred_add_support(P,S).
 
-mpred_post4(unique,P,S,none):-!,
+mpred_post_update4(identical,P,S,none):-!,mpred_add_support(P,S),mpred_enqueue(P,S).
+
+mpred_post_update4(unique,P,S,none):-!,
   mpred_add_support(P,S),assert_u_confirmed_was_missing(P),mpred_trace_op(add,P,S),
   !,
   mpred_enqueue(P,S),
   !.
 
-mpred_post4(partial(_Other),P,S,none):-!,
+mpred_post_update4(partial(_Other),P,S,none):-!,
   \+ \+ mpred_add_support(P,S),
   assert_u_confirmed_was_missing(P),!,
   mpred_trace_op(add,P,S),
@@ -557,7 +560,7 @@ mpred_post4(partial(_Other),P,S,none):-!,
   mpred_enqueue(P,S),
   !.
 
-mpred_post4(partial(_Other),P,S,exact):-!,
+mpred_post_update4(partial(_Other),P,S,exact):-!,
   \+ \+ mpred_add_support(P,S),
   assert_u_confirmed_was_missing(P),!,
   mpred_trace_op(add,P,S),
@@ -566,17 +569,17 @@ mpred_post4(partial(_Other),P,S,exact):-!,
   !.
 
 
-mpred_post4(Was,P,S,What):-dmsg(mpred_post4(Was,P,S,What)),trace.
-mpred_post4(Was,P,S,What):-!,trace_or_throw(mpred_post4(Was,P,S,What)).
+mpred_post_update4(Was,P,S,What):-dmsg(mpred_post_update4(Was,P,S,What)),trace.
+mpred_post_update4(Was,P,S,What):-!,trace_or_throw(mpred_post_update4(Was,P,S,What)).
 
-mpred_post4(partial(_),P,S,exact):-!,
+mpred_post_update4(partial(_),P,S,exact):-!,
   assert_u_confirmed_was_missing(P),
   mpred_trace_op(add,P,S),
    !,
    mpred_enqueue(P,S),
    !.
 
-mpred_post4(unique,P,S,exact):-!,
+mpred_post_update4(unique,P,S,exact):-!,
   assert_u_confirmed_was_missing(P),
   mpred_trace_op(add,P,S),
    !,
@@ -584,10 +587,7 @@ mpred_post4(unique,P,S,exact):-!,
    !.
 
 
-
-
-
-mpred_post4(partial(_),P,S,simular(_)):-
+mpred_post_update4(partial(_),P,S,simular(_)):-
   mpred_add_support(P,S),
   ignore((mpred_unique_u(P),assert_u_confirmed_was_missing(P),mpred_trace_op(add,P,S))),
    !,
@@ -595,12 +595,16 @@ mpred_post4(partial(_),P,S,simular(_)):-
    !.
 
 
-mpred_post4(Was,P,S,What):-!,trace_or_throw(mpred_post4(Was,P,S,What)).
+mpred_post_update4(Was,P,S,What):-!,trace_or_throw(mpred_post_update4(Was,P,S,What)).
 
 
-assert_u_confirmed_was_missing(P):- copy_term(P,PP),
-  \+ \+ must((show_call(assert_u(P)),P=@=PP)),
-  ((P=(_ :- (cwc, _))) -> true ; \+ \+ sanity((show_call(clause_asserted_u(P)),P=@=PP))),!.
+
+assert_u_confirmed_was_missing(P):-
+ must((
+  copy_term(P,PP),
+  assert_u(PP),
+  P=@=PP,
+  clause_asserted_u(P))).
 
 
 assert_u_confirmed_if_missing(P):- copy_term(P,PP),
@@ -893,19 +897,19 @@ mpred_ain_by_type(action,_ZAction):- !.
 %  If it is not, then the fact is retreactred from the database and any support
 %  relationships it participated in removed.
 
-mpred_withdraw(Ps):- get_source_ref(UU),mpred_withdraw(Ps,UU).
+mpred_withdraw(Ps):- get_source_ref_stack(UU),mpred_withdraw(Ps,UU).
 
-%%  mpred_withdraw(P,S) is det.
+%%  mpred_withdraw(+P,+S) is det.
 % removes support S from P and checks to see if P is still supported.
 %  If it is not, then the fact is retreactred from the database and any support
 %  relationships it participated in removed.
-mpred_withdraw(Ps,S):-
-  must(nonvar(S)),
-  each_E(mpred_withdraw1,Ps,[S]).
+mpred_withdraw(P,S):-
+  sanity(is_ftNonvar(S)),sanity(is_ftNonvar(P)),
+  each_E(mpred_withdraw1,P,[S]).
 
 mpred_withdraw1(P,S):-
-  must(\+ is_ftVar(S)),must(nonvar(P)),
-  mpred_trace_msg('~N~n\tRemoving~n\t\tsupport: ~p~n\t\tfrom: ~p~n',[S,P]),
+  sanity(is_ftNonvar(S)),sanity(is_ftNonvar(P)),
+  mpred_trace_msg('~N~n\tRemoving~n\t\tterm: ~p~n\t\tsupport (was): ~p~n',[P,S]),
   mpred_rem_support(P,S)
      -> with_current_why(S,remove_if_unsupported(P))
       ; mpred_warn("mpred_withdraw/2 Could not find support ~p to remove from fact ~p",
@@ -1590,7 +1594,7 @@ build_trigger(WS,[],Consequent,ConsequentO):-
    build_consequent(WS,Consequent,ConsequentO).
 
 build_trigger(WS,[V|Triggers],Consequent,pt(V,X)):-
-  var(V),gtrace,
+  var(V),
   !, 
   build_trigger(WS,Triggers,Consequent,X).
 
@@ -1955,7 +1959,7 @@ mpred_database_item(P):-
   ((B== true)-> P=H; P=(H:B)).
 
 
-mpred_retract_i_or_warn(X):- with_umt(X), retract_u(X), !.
+mpred_retract_i_or_warn(X):- sanity(is_ftNonvar(X)), with_umt(X), retract_u(X), !.
 mpred_retract_i_or_warn(spft_mod:spft(P,T,mfl(M,F,A))):- nonvar(A),!,mpred_retract_i_or_warn(spft_mod:spft(P,T,mfl(M,F,_))).
 mpred_retract_i_or_warn(spft_mod:spft(P,mfl(M,F,A),T)):- nonvar(A),!,mpred_retract_i_or_warn(spft_mod:spft(P,mfl(M,F,_),T)).
 mpred_retract_i_or_warn(spft_mod:spft(P,T,mfl(M,A,F))):- nonvar(A),!,mpred_retract_i_or_warn(spft_mod:spft(P,T,mfl(M,_,F))).
@@ -2137,14 +2141,14 @@ mpred_nowatch:-  retractall_u(mpred_is_tracing_exec).
 %
 % Using Trace exec.
 %
-with_mpred_trace_exec(P):- wno_tl(t_l:hide_mpred_trace_exec,w_tl(t_l:mpred_debug_local, must(show_if_debug(P)))).
+with_mpred_trace_exec(P):- wno_tl_e(t_l:hide_mpred_trace_exec,w_tl_e(t_l:mpred_debug_local, must(show_if_debug(P)))).
 
 %% with_mpred_trace_exec( +P) is semidet.
 %
 % Without Trace exec.
 %
 with_no_mpred_trace_exec(P):- 
-   wno_tl(t_l:mpred_debug_local,w_tl(t_l:hide_mpred_trace_exec, must(show_if_debug(P)))).
+   wno_tl_e(t_l:mpred_debug_local,w_tl_e(t_l:hide_mpred_trace_exec, must(show_if_debug(P)))).
 
 %% show_if_debug( :GoalA) is semidet.
 %
@@ -2929,7 +2933,8 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent(mpred_post1_rem/2).
 :- module_transparent(assert_u_confirmed_if_missing/1).
 :- module_transparent(clause_asserted_u/1).
-
+:- module_transparent(get_source_ref_stack/1).
+:- module_transparent(remove_negative_version/1).
 
 :- source_location(S,_),prolog_load_context(module,M),
  forall(source_file(M:H,S),ignore((functor(H,F,A),

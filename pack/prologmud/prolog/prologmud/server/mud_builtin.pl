@@ -78,7 +78,7 @@ typeGenls(tObj,ttObjectType).
 typeGenls(tPred,ttPredType).
 typeGenls(tRegion,ttRegionType).
 typeGenls(ttAgentType,tAgent).
-typeGenls(ttFormatTypeType,ttFormatType).
+typeGenls(ttExpressionTypeType,ttExpressionType).
 typeGenls(ttItemType,tItem).
 typeGenls(ttObjectType,tObj).
 typeGenls(ttPredType,tPred).
@@ -121,7 +121,7 @@ relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
 % (isa(Inst,Type), tCol(Inst)) ==> isa(Type,ttTypeType).
 % (isa(TypeType,ttTypeType) , isa(Inst,TypeType), genls(SubInst,Inst)) ==> isa(SubInst,TypeType).
 
-(ttFormatType(FT),{compound(FT)})==>meta_argtypes(FT).
+(ttExpressionType(FT),{compound(FT)})==>meta_argtypes(FT).
 
 ==> tCol(vtDirection).
 
@@ -162,19 +162,19 @@ dividesBetween(tAgent,tPlayer,tNpcPlayer).
 
 % disjointWith(P1,P2) ==> ((neg(isa(C,P1))) <==> isa(C,P2)).
 
-% isa(Col1, ttObjectType) ==> neg(isa(Col1, ttFormatType)).
+% isa(Col1, ttObjectType) ==> neg(isa(Col1, ttExpressionType)).
 
 ==> tCol(tCol).
 ==> tCol(tPred).
 ==> tCol(tFunction).
 ==> tCol(tRelation).
 ==> tCol(ttSpatialType).
-==> tCol(ttFormatType).
+==> tCol(ttExpressionType).
 ==> tCol(functorDeclares).
 % tCol(ArgsIsa):-user:mpred_is_trigger(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
-==> tCol(ttFormatType).
+==> tCol(ttExpressionType).
 ==> tSpec(vtActionTemplate).
 ==> tCol(tRegion).
 ==> tCol(tContainer).
@@ -231,7 +231,7 @@ dividesBetween(tAgent,tPlayer,tNpcPlayer).
 
 ((dividesBetween(S,C1,C2),{ground(S:C1:C2)}) ==> ((disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)))).
 
-isa(Col1, ttObjectType) ==> ~isa(Col1, ttFormatType).
+isa(Col1, ttObjectType) ==> ~isa(Col1, ttExpressionType).
 
 neg(isa(I,Super)) <- {ground(isa(I,Super))}, (isa(I,Sub), disjointWith(Sub, Super)).
 % disjointWith(P1,P2) ==> {\+(isa(P1,ttNonGenled)),\+(isa(P2,ttNonGenled))},(neg(isa(C,P1)) <==> isa(C,P2)).
@@ -460,9 +460,9 @@ prologHybrid(mudToHitArmorClass0 / 2).
 prologHybrid(mudAtLoc/2).
 prologBuiltin((agent_call_command/2)).
 :-shared_multifile(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
- pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completeExtentAsserted/1, ttFormatType/1, typeProps/2)).
+ pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completeExtentAsserted/1, ttExpressionType/1, typeProps/2)).
 prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
- pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
+ pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttExpressionType/1, typeProps/2)).
 
 prologHybrid(isEach(tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, mudToHitArmorClass0/2, tThinking/1, tDeleted/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, mudCmdFailure/2, mudSpd/2, typeGrid/3, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, wearsClothing/2)).
 prologHybrid(isEach( mudArmorLevel/2, mudLevelOf/2, mudToHitArmorClass0/2, mudBareHandDamage/2, chargeCapacity/2, mudEnergy/2, tCol/1, tAgent/1, tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, tThinking/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, failure/2, gridValue/4, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, mudWearing/2)).
@@ -630,7 +630,7 @@ dividesBetween(tAgent,tPlayer,tNpcPlayer).
 isa(tRegion,ttTemporalType).
 
 completelyAssertedCollection(tCol).
-completelyAssertedCollection(ttFormatType).
+completelyAssertedCollection(ttExpressionType).
 completelyAssertedCollection(tItem).
 completelyAssertedCollection(tRegion).
 completelyAssertedCollection(tObj).
@@ -732,19 +732,19 @@ dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 
 % disjointWith(P1,P2) ==> (not(isa(C,P1)) <==> isa(C,P2)).
 
-% isa(Col1, ttObjectType) ==> ~isa(Col1, ttFormatType).
+% isa(Col1, ttObjectType) ==> ~isa(Col1, ttExpressionType).
 
 ==> tCol(tCol).
 ==> tCol(tPred).
 ==> tCol(tFunction).
 ==> tCol(tRelation).
 ==> tCol(ttSpatialType).
-==> tCol(ttFormatType).
+==> tCol(ttExpressionType).
 % ==> tCol(functorDeclares).
 % tCol(ArgsIsa):-ttPredType(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
-==> tCol(ttFormatType).
+==> tCol(ttExpressionType).
 ==> tSpec(vtActionTemplate).
 ==> tCol(tRegion).
 ==> tCol(tContainer).
@@ -1039,7 +1039,7 @@ O = [
 (((meta_argtypes(Types)/
  (functor(Types,F,A), A >1, functor(Matcher,F,A),arity(F,A)))
   ==> 
-    ((Matcher ==> {between(1,A,N),arg(N,Matcher,I),arg(N,Types,T),ground(I:T)},\+ttFormatType(T),isa(I,T),{dmsg(isa(I,T))})))).
+    ((Matcher ==> {between(1,A,N),arg(N,Matcher,I),arg(N,Types,T),ground(I:T)},\+ttExpressionType(T),isa(I,T),{dmsg(isa(I,T))})))).
 
 ((argQuotedIsa(Pred, _, 'CycLSentence') ==> 'SententialOperator'(Pred))).
 

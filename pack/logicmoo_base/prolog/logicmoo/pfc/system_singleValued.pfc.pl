@@ -8,6 +8,10 @@
 
 prologSingleValued(C):-cwc,is_ftCompound(C),functor(C,F,_),!,prologSingleValued(F).
 
+:-dynamic(baseKB:mpred_sv/2).
+arity(mpred_sv,2).
+
+
 % asserting mpred_sv(p,2) causes p/2 to be treated as a mpred_sv, i.e.
 % if p(foo,1)) is a fact and we assert_db p(foo,2), then the forrmer assertion
 % is retracted.

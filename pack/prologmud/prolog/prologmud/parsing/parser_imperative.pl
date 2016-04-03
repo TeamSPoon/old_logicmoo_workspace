@@ -202,7 +202,7 @@ object_print_details0(Print,Agent,O,DescSpecs,Skipped):-
 
 %tCol(ttTypeType).
 vtSkippedPrintNames(T):-var(T),!,fail.
-vtSkippedPrintNames(T):-ttFormatType(T).
+vtSkippedPrintNames(T):-ttExpressionType(T).
 %vtSkippedPrintNames(T):-isa(T,ttTypeType).
 vtSkippedPrintNames(E):-member(E,[tObj,isThis,the,is,tSpatialThing,ttNotSpatialType,ttSpatialType,prologHybrid,t,prologPTTP,prologKIF,prologDynamic,tRelation,tPred,'',[]]).
 
@@ -448,7 +448,7 @@ is_counted_for_parse(I):-t(tCountable,I),not(excluded_in_parse(I)),!.
 
 excluded_in_parse(apathFn(_, _)).
 excluded_in_parse(I):-tCol(I).
-excluded_in_parse(I):-ttFormatType(I).
+excluded_in_parse(I):-ttExpressionType(I).
 excluded_in_parse(I):-user:mpred_prop(_,meta_argtypes(I)).
 excluded_in_parse(apathFn(_ = _)).
 
@@ -491,7 +491,7 @@ parseIsa_Call(FT, BO, CIn, D):-ground(FT:CIn), list_tail(CIn,D), to_word_list(CI
 % this parseIsa(T)-->parseIsa(T,_).
 parseIsa(A, B, C) :- parseIsa(A, _, B, C).
 
-is_parsable_type(T):-ttFormatType(T).
+is_parsable_type(T):-ttExpressionType(T).
 is_parsable_type(T):-tCol(T).
 is_parsable_type(vp).
 
@@ -606,13 +606,13 @@ coerce0([String],Type,Inst):- nonvar(String),!,coerce0(String,Type,Inst).
 coerce0(isRandom(WhatNot),Type,Inst):- !, must((nonvar(WhatNot),to_arg_value(WhatNot,TypeR),random_instance(TypeR,Inst,isa(Inst,Type)))).
 coerce0(String,Type,Inst):- atomic(String),Type==tCol,i_name('t',String,Inst),is_asserted(tCol(Inst)),!.
 coerce0(Text,Type,Inst):- (no_repeats_old(call_no_cuts(hook_coerce(Text,Type,Inst)))).
-coerce0(String,Type,Inst):- ttFormatType(Type),!,checkAnyType(change(assert,actParse),String,Type,AAA),Inst=AAA.
+coerce0(String,Type,Inst):- ttExpressionType(Type),!,checkAnyType(change(assert,actParse),String,Type,AAA),Inst=AAA.
 %coerce0(String,Type,Longest) :- findall(Inst, (user:hook_coerce(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 coerce0(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
 coerce0(String,Type,Inst):- not(string(String)),!,text_to_string(String,StringS),!,coerce0(StringS,Type,Inst).
 coerce0(String,isOneOf(Types),Inst):-!, member(Type,Types),coerce(String,Type,Inst),!.
 coerce0(String,C,Inst):- compound(C),!,loop_check(parseIsa(C,Inst,[String],[])).
-coerce0(String,Type,Inst):- not(ttFormatType(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
+coerce0(String,Type,Inst):- not(ttExpressionType(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
 % coerce0(A,Type,AA):- correctAnyType(change(_,_),A,Type,AA).
 
 instances_of_type(Inst,Type):- no_repeats_old(instances_of_type_0(Inst,Type)).

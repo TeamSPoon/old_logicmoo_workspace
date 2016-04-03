@@ -298,7 +298,7 @@ get_tracer(Reset):-
 % restore  Trace.
 %
 restore_trace(Goal):- 
-    setup_call_cleanup(notrace((push_tracer)),(Goal*->notrace((reset_tracer));notrace((!,fail))),notrace(pop_tracer)).
+    setup_call_cleanup_each(notrace((push_tracer)),(Goal*->notrace((reset_tracer));notrace((!,fail))),notrace(pop_tracer)).
 
 
 %= 	 	 
@@ -308,7 +308,7 @@ restore_trace(Goal):-
 % restore  Trace.
 %
 restore_trace(Per,Goal):-  
-    setup_call_cleanup(notrace((push_tracer,Per)),((Goal,notrace)*->(reset_tracer,Per,trace);notrace((!,fail))),pop_tracer).
+    setup_call_cleanup_each(notrace((push_tracer,Per)),((Goal,notrace)*->(reset_tracer,Per,trace);notrace((!,fail))),pop_tracer).
 
 
 %= :- meta_predicate  rtrace(0).
@@ -346,7 +346,7 @@ rtrace(Goal):- '$leash'(OldL, OldL),'$visible'(OldV, OldV),
 rtrace(Goal):- 
  notrace(tlbugger:rtracing) -> Goal;
   (notrace((push_tracer,notrace)),assert(tlbugger:rtracing),
-    setup_call_cleanup(notrace((rtrace)),(rtrace,(Goal*->notrace((reset_tracer));notrace((!,fail))),notrace((nortrace,pop_tracer)))).
+    setup_call_cleanup_each(notrace((rtrace)),(rtrace,(Goal*->notrace((reset_tracer));notrace((!,fail))),notrace((nortrace,pop_tracer)))).
 
 rtrace(Goal):- notrace(tlbugger:rtracing) -> Goal ; (assert(tlbugger:rtracing), restore_trace((rtrace),(Goal))).
 

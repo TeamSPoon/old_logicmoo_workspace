@@ -321,7 +321,7 @@ functor_declares_instance_0(tFunction,tFunction).
 functor_declares_instance_0(P,tPred):- arg(_,s(tPred,prologMultiValued,mpred_isa,mpred_isa,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,
        predCanHaveSingletons,prologBuiltin,prologKIF,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),P).
 
-functor_declares_instance_0(P,tCol):- arg(_,s(tCol,tSpec,ttFormatType),P).
+functor_declares_instance_0(P,tCol):- arg(_,s(tCol,tSpec,ttExpressionType),P).
 %functor_declares_instance_0(P,tPred):-isa_asserted(P,ttPredType),!.
 %functor_declares_instance_0(P,tCol):-isa_asserted(P,functorDeclares),\+functor_declares_instance_0(P,tPred).
 
@@ -423,7 +423,9 @@ must_expand(G):-functor(G,_,A),!,A==1.
 %
 % Fully Expand Warn.
 %
-fully_expand_warn(A,B,O):-must(fully_expand(A,B,C)),!,sanity(ignore(show_failure(why,same_terms(B,C)))),(O=C;must(sanity(ignore(show_failure(why,same_terms(O,C)))))),!.
+fully_expand_warn(A,B,O):-
+  must(fully_expand(A,B,C)),!,
+  sanity(ignore(show_failure(why,same_terms(B,C)))),(O=C;must(sanity(ignore(show_failure(why,same_terms(O,C)))))),!.
 
 
 %= 	 	 
@@ -461,11 +463,11 @@ fully_expand(X,Y):-fully_expand(_,X,Y).
 % Fully Expand.
 %
 fully_expand(Op,Sent,SentO):-
-  once((hotrace((cyclic_break((Sent)),
+  once((/*hotrace*/((cyclic_break((Sent)),
            must(hotrace((deserialize_attvars(Sent,SentI)))),
    with_no_kif_var_coroutines(((fully_expand0(Op,SentI,SentO)),cyclic_break((SentO)))))))).
 
-:- table(fully_expand/3).
+% WISH BUT CANT :- table(fully_expand/3).
 
 %= 	 	 
 
@@ -572,7 +574,7 @@ O =  (a, b, c, call(e)).
 */
 
 recommify(A,AA):- \+ compound(A),!,AA=A.
-recommify(A,A):-!.
+% recommify(A,A):-!.
 recommify(A,B):- recommify(true,A,B),!.
 
 recommify(A,B,C):- \+ compound(B),!,conjoin(A,B,C).
@@ -856,7 +858,12 @@ db_expand_a_noloop(A,B,C):- loop_check_term(db_expand_0(A,B,C),db_expand_0(A,B,C
 %
 % Database expand  Primary Helper.
 %
-db_expand_0(Op,Sent,SentO):-must(acyclic_term(Sent)),db_expand_final(Op ,Sent,SentO),!.
+db_expand_0(Op,Sent,SentO):- cyclic_break(Sent),db_expand_final(Op ,Sent,SentO),!.
+
+db_expand_0(Op,(MetaLang/Prolog),(MetaLangOut/PrologOut)):-!,
+  gtrace,
+  db_expand_0(Op,MetaLang,MetaLangOut),
+  fully_expand_clause(Op,Prolog,PrologOut).
 
 db_expand_0(Op,(:-(CALL)),(:-(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
 db_expand_0(Op,isa(I,O),INot):-Not==not,!,INot =.. [Not,I],!,db_expand_term(Op,INot,O).

@@ -373,10 +373,11 @@ list_to_conjuncts(_,H,H).
 % Conjoin.
 %
 conjoin(A,B,C):-A==B,!,C=A.
+conjoin(True,C,C):-True==true,!.
+conjoin(C,True,C):-True==true,!.
 conjoin(A,B,(A,B)):- (var(A);var(B)),!.
 conjoin((A1,A),B,(A1,C)):-!,conjoin(A,B,C).
-conjoin(true,C,C):-!.
-conjoin(C,true,C):-!.
+conjoin(A1,(A,B),(A1,C)):-!,conjoin(A,B,C).
 conjoin(A,B,(A,B)).
 
 %= conjoin_op(OP,+Conjunct1,+Conjunct2,?Conjunction).

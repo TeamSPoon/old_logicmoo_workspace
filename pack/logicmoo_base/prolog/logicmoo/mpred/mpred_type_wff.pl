@@ -65,13 +65,15 @@
             is_holds_true/1,
             is_holds_true0/1,
             is_holds_true_not_hilog/1,
-            is_kif_rule/1,
+            is_kif_clause/1,
             is_log_op/1,
             is_log_sent/1,
             is_logical_functor0/1,
             is_modal/2,
             is_neg/1,
+            is_pfc_clause/1,
             is_pos/1,
+            is_prolog_clause/1,
             is_sentence_functor/1,
             is_svo_functor/1,
             kb_nlit/2,
@@ -101,6 +103,9 @@
 
 
 
+is_pfc_clause(B):- mpred_term_expansion(B,Out),!, Out= ((:- cl_assert(pfc(_),_))).
+
+is_prolog_clause(B):- compound(B),functor(B,F,_),arg(_,v((:-)),F).
 
 
 %% subst_except( :TermSUB, ?Var, ?VarS, :TermSUB) is semidet.
@@ -1021,19 +1026,19 @@ non_compound(InOut):- once( \+ (compound(InOut));is_ftVar(InOut)).
 %
 % If Is A Gaf.
 %
-is_gaf(Gaf):-when(nonvar(Gaf), \+ (is_kif_rule(Gaf))).
+is_gaf(Gaf):-when(nonvar(Gaf), \+ (is_kif_clause(Gaf))).
 
-%= %= :- was_export(is_kif_rule/1).
+%= %= :- was_export(is_kif_clause/1).
 
 
 
-%% is_kif_rule( ?Var) is semidet.
+%% is_kif_clause( ?Var) is semidet.
 %
 % If Is A Knowledge Interchange Format Rule.
 %
-is_kif_rule(Var):- is_ftVar(Var),!,fail.
-is_kif_rule(R):- kif_hook(R),!.
-is_kif_rule(R):- is_clif(R),!.
+is_kif_clause(Var):- is_ftVar(Var),!,fail.
+is_kif_clause(R):- kif_hook(R),!.
+is_kif_clause(R):- is_clif(R),!.
 
 
 %= %= :- was_export(term_slots/2).

@@ -14,7 +14,9 @@
           [ check_thread_local_1m/1,
             to_thread_head_1m/4,
             w_tl/2,
+            w_tl_e/2,
             wno_tl/2,
+            wno_tl_e/2,
             wtg/2,
             with_no_x/1,
             with_each_item/3
@@ -32,7 +34,7 @@
 :- include('logicmoo_util_header.pi').
 
 :- meta_predicate with_each_item(:,+,+).
-%% with_each_item(+P2,+EleList,+ArgList) is semidet.
+%% with_each_item(+P2,+EleList,+ArgList) is nondet.
 %
 % Call apply(P,[Ele|ArgList]) on each Ele(ment) in the EleList.
 %
@@ -47,7 +49,7 @@ with_each_item(P,H,S) :- apply(P,[H|S]).
 
 %= 	 	 
 
-%% with_no_x( :GoalG) is semidet.
+%% with_no_x( :GoalG) is nondet.
 %
 % Using No X.
 %
@@ -61,7 +63,7 @@ with_no_x(G):- call(G).
 
 %= 	 	 
 
-%% wtg( ?M, :GoalCall) is semidet.
+%% wtg( ?M, :GoalCall) is nondet.
 %
 % Wtg.
 %
@@ -72,7 +74,7 @@ wtg(M:With,Call):- w_tl(M:With,Call).
 
 %= 	 	 
 
-%% w_tl( ?CALL1, ?Call) is semidet.
+%% w_tl( ?CALL1, ?Call) is nondet.
 %
 % W Thread Local.
 %
@@ -107,6 +109,7 @@ w_tl(WM:THeadWM,CM:Call):- !,
      to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
      setup_call_cleanup(asserta(M:HAssert,REF),CM:Call,erase(REF)).
 
+
 w_tl(WM:THeadWM,CM:Call):- 
  notrace(( 
      to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> copy_term(HAssert,CHAssert) ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
@@ -115,13 +118,66 @@ w_tl(WM:THeadWM,CM:Call):-
 
 
 
+%% w_tl_e( ?CALL1, ?Call) is nondet.
+%
+% W Thread Local.
+%
+w_tl_e(_:[],Call):- !,Call.
+w_tl_e(M:[With|MORE],Call):- !,w_tl_e(M:With,w_tl_e(M:MORE,Call)).
+w_tl_e(M:(With,MORE),Call):- !,w_tl_e(M:With,w_tl_e(M:MORE,Call)).
+w_tl_e(M:(With;MORE),Call):- !,w_tl_e(M:With,Call);w_tl_e(M:MORE,Call).
+w_tl_e(-TL:With,Call):- !,wno_tl_e(TL:With,Call).
+w_tl_e(+TL:With,Call):- !,w_tl_e(TL:With,Call).
+w_tl_e(M:not(With),Call):- !,wno_tl_e(M:With,Call).
+w_tl_e(M:(-With),Call):- !,wno_tl_e(M:With,Call).
+w_tl_e(M:(+With),Call):- !,w_tl_e(M:With,Call).
+
+w_tl_e(OPM:op(N,XFY,OP),MCall):-!,
+     (current_op(PN,XFY,OPM:OP);PN=0),!,
+     strip_module(MCall,M,Call),
+     (PN==N -> Call ; setup_call_cleanup_each(op(N,XFY,OPM:OP),'@'(Call,M),op(PN,XFY,OPM:OP))).
+
+w_tl_e(FPM:current_prolog_flag(N,XFY),MCall):- !,w_tl_e(FPM:set_prolog_flag(N,XFY),MCall).
+
+w_tl_e(_FPM:set_prolog_flag(N,XFY),MCall):- !,
+     (current_prolog_flag(N,WAS);WAS=unUSED),
+     strip_module(MCall,M,Call),!,
+     (XFY==WAS -> Call ; 
+     (setup_call_cleanup_each(set_prolog_flag(N,XFY),'@'(Call,M),(WAS=unUSED->true;set_prolog_flag(N,WAS))))).
+
+w_tl_e(M:before_after(Before,After),Call):-
+     (M:Before -> setup_call_cleanup_each(true,Call,M:After);Call).
+
+w_tl_e(WM:THeadWM,CM:Call):- !,
+ notrace(( 
+     to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
+     setup_call_cleanup_each(asserta(M:HAssert,REF),CM:Call,erase(REF)).
+
+
+w_tl_e(WM:THeadWM,CM:Call):- 
+ notrace(( 
+     to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> copy_term(HAssert,CHAssert) ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
+     ((CM:notrace((HAssert\=(_:-_),M:CHAssert,!,HAssert=@=CHAssert))) -> ( CM:Call );
+            setup_call_cleanup_each(asserta(M:HAssert,REF),CM:Call,erase(REF))).
+
+
+
 %= 	 	 
 
-%% wno_tl( :GoalUHead, :GoalCall) is semidet.
+%% wno_tl( :GoalUHead, :GoalCall) is nondet.
 %
 % Wno Thread Local.
 %
 wno_tl(UHead,Call):- w_tl((UHead :- !,fail),Call).
+
+
+%= 	 	 
+
+%% wno_tl_e( :GoalUHead, :GoalCall) is nondet.
+%
+% Wno Thread Local.
+%
+wno_tl_e(UHead,Call):- w_tl_e((UHead :- !,fail),Call).
 
 /*
 wno_tl(UHead,Call):- 
@@ -133,7 +189,7 @@ wno_tl(UHead,Call):-
 
 %= 	 	 
 
-%% to_thread_head_1m( ?H, ?TL, ?HO, ?HH) is semidet.
+%% to_thread_head_1m( ?H, ?TL, ?HO, ?HH) is nondet.
 %
 % Converted To Thread Head 1m.
 %
@@ -148,7 +204,7 @@ to_thread_head_1m(Head,tlbugger,tlbugger:Head,Head):-check_thread_local_1m(tlbug
 
 %= 	 	 
 
-%% check_thread_local_1m( ?TLHead) is semidet.
+%% check_thread_local_1m( ?TLHead) is nondet.
 %
 % Check Thread Local 1m.
 %

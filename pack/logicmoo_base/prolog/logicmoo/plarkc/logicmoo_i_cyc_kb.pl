@@ -261,8 +261,8 @@ mpred_to_cyc(ftSentence,'icSentenceSentence').
 mpred_to_cyc(ftVar,'CycLVariable').
 mpred_to_cyc(ftVar,'Variable').
 
-mpred_to_cyc(ttFormatType,'CycLExpressionType').
-mpred_to_cyc(ttFormatType,'ExpressionType').
+mpred_to_cyc(ttExpressionType,'CycLExpressionType').
+mpred_to_cyc(ttExpressionType,'ExpressionType').
 
 mpred_to_cyc(tAgent,'Agent-Generic').
 mpred_to_cyc(tCol,'Collection').
@@ -363,7 +363,7 @@ notFormatType(tInferenceSupportedFunction).
 expT('SubLExpressionType').
 expT('SubLExpression').
 expT('CycLExpression').
-expT('ttFormatType').
+expT('ttExpressionType').
 
 
 isF(X):- atom_concat(_,'Fn',X).

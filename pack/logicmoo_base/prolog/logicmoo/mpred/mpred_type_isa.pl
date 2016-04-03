@@ -139,7 +139,7 @@ disabled a(T,I):- rdf_x(I,rdf:type,T).
 
 %= 	 	 
 
-%% assert_hasInstance( ?T, ?I) is semidet.
+%% assert_hasInstance( ?T, ?I) is nondet.
 %
 % Assert Has Instance.
 %
@@ -153,7 +153,7 @@ assert_hasInstance(T,I):-  sanity(ground(T:I)),ain(isa(I,T)),!,expire_tabled_lis
 
 %= 	 	 
 
-%% is_typef( ?C) is semidet.
+%% is_typef( ?C) is nondet.
 %
 % If Is A Typef.
 %
@@ -173,7 +173,7 @@ is_typef(F):- atom(F),current_predicate(isa_from_morphology/2),isa_from_morpholo
 
 %= 	 	 
 
-%% is_never_type( ?V) is semidet.
+%% is_never_type( ?V) is nondet.
 %
 % If Is A Never Type.
 %
@@ -183,7 +183,7 @@ is_never_type(V):-never_type_why(V,_),!.
 
 %= 	 	 
 
-%% a( ?C, ?I) is semidet.
+%% a( ?C, ?I) is nondet.
 %
 % A.
 %
@@ -192,7 +192,7 @@ a(C,I):- atom(C),G=..[C,I], no_repeats_old(clause_true(G)). % ;clause_true(isa(I
 
 %= 	 	 
 
-%% never_type_f( ?Var) is semidet.
+%% never_type_f( ?Var) is nondet.
 %
 % Never Type False.
 %
@@ -219,7 +219,7 @@ never_type_f(backchainForbidden).
 
 %= 	 	 
 
-%% noncol_type( ?VALUE1) is semidet.
+%% noncol_type( ?VALUE1) is nondet.
 %
 % Noncol Type.
 %
@@ -228,7 +228,7 @@ noncol_type('LogicalConnective').
 
 %= 	 	 
 
-%% never_type_why( ?C, ?VALUE2) is semidet.
+%% never_type_why( ?C, ?VALUE2) is nondet.
 %
 % Never Type Generation Of Proof.
 %
@@ -255,7 +255,7 @@ never_type_why(F,Why):- atom(F), arity(F,A),!,F\==isa, isa(F,_), A > 1,Why=(whyn
 
 %= 	 	 
 
-%% isa_from_morphology( ?Inst, ?Type) is semidet.
+%% isa_from_morphology( ?Inst, ?Type) is nondet.
 %
 %  (isa/2) Converted From morphology.
 %
@@ -265,7 +265,7 @@ isa_from_morphology(Inst,Type):-atom(Inst),type_prefix(Prefix,Type),atom_concat(
 
 %= 	 	 
 
-%% type_suffix( ?VALUE1, ?VALUE2) is semidet.
+%% type_suffix( ?VALUE1, ?VALUE2) is nondet.
 %
 % Type Suffix.
 %
@@ -277,7 +277,7 @@ type_suffix('Able',ttTypeByAction).
 
 %= 	 	 
 
-%% type_prefix( ?VALUE1, ?VALUE2) is semidet.
+%% type_prefix( ?VALUE1, ?VALUE2) is nondet.
 %
 % Type Prefix.
 %
@@ -303,7 +303,7 @@ type_prefix(mud,tMudPred).
 type_prefix(mud,tPred).
 type_prefix(prop,tPred).
 type_prefix(prolog,ttPredType).
-type_prefix(ft,ttFormatType).
+type_prefix(ft,ttExpressionType).
 type_prefix(pred,tPred).
 type_prefix(macro,ttMacroType).
 
@@ -316,7 +316,7 @@ type_prefix(macro,ttMacroType).
 
 %= 	 	 
 
-%% was_isa( ?VALUE1, ?VALUE2, ?VALUE3) is semidet.
+%% was_isa( ?VALUE1, ?VALUE2, ?VALUE3) is nondet.
 %
 % was  (isa/2).
 %
@@ -329,7 +329,7 @@ was_isa(G,I,C):- fail, \+(current_predicate(_,G)),
 
 %= 	 	 
 
-%% to_isa_out( ?I, ?C, ?OUT) is semidet.
+%% to_isa_out( ?I, ?C, ?OUT) is nondet.
 %
 % Converted To  (isa/2) out.
 %
@@ -339,7 +339,7 @@ to_isa_out(I,C,isa(I,C)).
 
 %= 	 	 
 
-%% new_was_isa is semidet.
+%% new_was_isa is nondet.
 %
 % new was  (isa/2).
 %
@@ -348,7 +348,7 @@ new_was_isa:-fail.
 
 %= 	 	 
 
-%% was_isa0( ?G, ?I, ?C) is semidet.
+%% was_isa0( ?G, ?I, ?C) is nondet.
 %
 % was  (isa/2) Primary Helper.
 %
@@ -374,16 +374,16 @@ was_isa0(t(C,I),I,C):- new_was_isa, atom(C),!.
 
 %= 	 	 
 
-%% not_ft( ?T) is semidet.
+%% not_ft( ?T) is nondet.
 %
 % Not Format Type.
 %
-not_ft(T):-nonvar(T),not_ft_quick(T),not(a(ttFormatType,T)).
+not_ft(T):-nonvar(T),not_ft_quick(T),not(a(ttExpressionType,T)).
 
 
 %= 	 	 
 
-%% not_ft_quick( ?T) is semidet.
+%% not_ft_quick( ?T) is nondet.
 %
 % Not Format Type Incomplete, But Fast, Version.
 %
@@ -393,7 +393,7 @@ not_ft_quick(T):-nonvar(T),(T=tItem;T=tRegion;T=tCol;T=completelyAssertedCollect
 
 %= 	 	 
 
-%% asserted_subclass( ?I, ?T) is semidet.
+%% asserted_subclass( ?I, ?T) is nondet.
 %
 % Asserted Subclass.
 %
@@ -403,21 +403,21 @@ asserted_subclass(T,ST):- t(genls,T,ST).
 
 %= 	 	 
 
-%% chk_ft( ?T) is semidet.
+%% chk_ft( ?T) is nondet.
 %
 % Checking Format Type.
 %
 chk_ft(T):- not_ft_quick(T),!,fail.
 %chk_ft(I):- t_l:infForward, a(defnSufficient,I,_),!.
 %chk_ft(I):- t_l:infForward, asserted_subclass(I,FT),I\=FT,chk_ft(FT),!.
-chk_ft(I):- t_l:infForward, !,a(ttFormatType,I).
+chk_ft(I):- t_l:infForward, !,a(ttExpressionType,I).
 
 
 
 
 %= 	 	 
 
-%% into_single_class( ?Var, ?VV) is semidet.
+%% into_single_class( ?Var, ?VV) is nondet.
 %
 % Converted To Single Class.
 %
@@ -435,7 +435,7 @@ into_single_class(A,A).
 
 %= 	 	 
 
-%% transitive_subclass_or_same( ?A, ?B) is semidet.
+%% transitive_subclass_or_same( ?A, ?B) is nondet.
 %
 % Transitive Subclass Or Same.
 %
@@ -446,7 +446,7 @@ transitive_subclass_or_same(A,B):-call_u(genls(A,B)).
 
 %= 	 	 
 
-%% transitive_P( :PRED3DB, ?P, ?L, ?R) is semidet.
+%% transitive_P( :PRED3DB, ?P, ?L, ?R) is nondet.
 %
 % Transitive P.
 %
@@ -457,7 +457,7 @@ transitive_P(DB,P,L,R):-transitive_P_l_r(DB,P,L,R).
 
 %= 	 	 
 
-%% transitive_P_l_r( :PRED3DB, ?P, ?L, ?R) is semidet.
+%% transitive_P_l_r( :PRED3DB, ?P, ?L, ?R) is nondet.
 %
 % Transitive P (list Version) R.
 %
@@ -468,7 +468,7 @@ transitive_P_l_r(DB,P,L,R):-ground(L:R),call(DB,P,L,A1),call(DB,P,A1,A2),call(DB
 
 %= 	 	 
 
-%% transitive_P_r_l( :PRED3DB, ?P, ?L, ?R) is semidet.
+%% transitive_P_r_l( :PRED3DB, ?P, ?L, ?R) is nondet.
 %
 % Transitive P R (list Version).
 %
@@ -480,7 +480,7 @@ transitive_P_r_l(DB,P,L,R):-ground(L:R),call(DB,P,A3,R),call(DB,P,A2,A3),call(DB
 
 %= 	 	 
 
-%% is_known_true( ?C) is semidet.
+%% is_known_true( ?C) is nondet.
 %
 % If Is A Known True.
 %
@@ -500,7 +500,7 @@ is_known_true(isa(_,ftID)).
 
 %= 	 	 
 
-%% is_known_trew( :TermF) is semidet.
+%% is_known_trew( :TermF) is nondet.
 %
 % If Is A Known Trew.
 %
@@ -509,8 +509,8 @@ is_known_trew(genls('MaleAnimal',tAgent)).
 is_known_trew(genls(prologSingleValued, extentDecidable)).
 is_known_trew(genls(tAgent,tChannel)).
 is_known_trew(genls(completelyAssertedCollection, extentDecidable)).
-is_known_trew(genls(ttFormatType,tCol)).
-is_known_trew(genls(ttFormatType,ttNotTemporalType)).
+is_known_trew(genls(ttExpressionType,tCol)).
+is_known_trew(genls(ttExpressionType,ttNotTemporalType)).
 is_known_trew(genls(meta_argtypes,tRelation)).
 is_known_trew(genls(tFunction,tRelation)).
 is_known_trew(genls(F,tPred)):-a(ttPredType,F).
@@ -520,7 +520,7 @@ is_known_trew(disjointWith(A,B)):-disjointWithT(A,B).
 
 %= 	 	 
 
-%% pfcNeverTrue( ?P) is semidet.
+%% pfcNeverTrue( ?P) is nondet.
 %
 % Prolog Forward Chaining Never True.
 %
@@ -529,7 +529,7 @@ pfcNeverTrue(P):-is_known_false(P).
 
 %= 	 	 
 
-%% is_known_false( ?C) is semidet.
+%% is_known_false( ?C) is nondet.
 %
 % If Is A Known False.
 %
@@ -541,18 +541,18 @@ is_known_false(F):-is_known_false0(F),!.
 
 %= 	 	 
 
-%% is_known_false0( :TermG) is semidet.
+%% is_known_false0( :TermG) is nondet.
 %
 % If Is A Known False Primary Helper.
 %
 is_known_false0(isa(G,Why)):-!,catch(not_mud_isa(G,Why),_,fail).
-% is_known_false0(genls(Type,_)):-arg(_,vv(tCol,tRelation,ttFormatType),Type).
+% is_known_false0(genls(Type,_)):-arg(_,vv(tCol,tRelation,ttExpressionType),Type).
 
 
 
 %= 	 	 
 
-%% is_non_unit( ?C) is semidet.
+%% is_non_unit( ?C) is nondet.
 %
 % If Is A Not Unit.
 %
@@ -560,7 +560,7 @@ is_non_unit(C):- \+ is_unit(C).
 
 %= 	 	 
 
-%% is_non_skolem( ?C) is semidet.
+%% is_non_skolem( ?C) is nondet.
 %
 % If Is A Not Skolem.
 %
@@ -569,7 +569,7 @@ is_non_skolem(C):- \+ is_sk_unit(C).
 
 %= 	 	 
 
-%% is_sk_unit( ?C) is semidet.
+%% is_sk_unit( ?C) is nondet.
 %
 % If Is A Skolem Unit.
 %
@@ -577,7 +577,7 @@ is_sk_unit(C):-is_ftCompound(C), C\=(_:-_),get_functor(C,F),is_sk_functor(F),!.
 
 %= 	 	 
 
-%% is_sk_functor( ?F) is semidet.
+%% is_sk_functor( ?F) is nondet.
 %
 % If Is A Skolem Functor.
 %
@@ -590,7 +590,7 @@ is_sk_functor(F):-atom_concat('sk',_,F).
 
 %= 	 	 
 
-%% has_free_args( ?C) is semidet.
+%% has_free_args( ?C) is nondet.
 %
 % Has Free Arguments.
 %
@@ -601,21 +601,21 @@ has_free_args(C):- sanity(is_ftCompound(C)),arg(_,C,E),is_ftVar(E),!.
 
 %= 	 	 
 
-%% disjointWith0( ?VALUE1, ?VALUE2) is semidet.
+%% disjointWith0( ?VALUE1, ?VALUE2) is nondet.
 %
 % Disjoint Using Primary Helper.
 %
 disjointWith0(tAgent,tItem).
 disjointWith0(tRegion,tObj).
-disjointWith0(ttFormatType,tItem).
-disjointWith0(ttFormatType,tObj).
-disjointWith0(ttFormatType,tRegion).
+disjointWith0(ttExpressionType,tItem).
+disjointWith0(ttExpressionType,tObj).
+disjointWith0(ttExpressionType,tRegion).
 disjointWith0(ttTemporalType,ttNotTemporalType).
 
 
 %= 	 	 
 
-%% disjointWithT( ?A, ?B) is semidet.
+%% disjointWithT( ?A, ?B) is nondet.
 %
 % Disjoint Using True Stucture.
 %
@@ -645,14 +645,14 @@ not_mud_isa0(_, blah):-!.
 not_mud_isa0(I,meta_argtypes):-!,not(is_ftCompound(I)).
 not_mud_isa0(I,meta_argtypes):-!,not(is_ftCompound(I)).
 not_mud_isa0(_,prologHybrid):-!,fail.
-not_mud_isa0(prologMacroHead, ttFormatType).
-not_mud_isa0(tAgent,ttFormatType).
-not_mud_isa0(tCol,ttFormatType).
-not_mud_isa0(tItem,ttFormatType).
-not_mud_isa0(tObj, ttFormatType).
+not_mud_isa0(prologMacroHead, ttExpressionType).
+not_mud_isa0(tAgent,ttExpressionType).
+not_mud_isa0(tCol,ttExpressionType).
+not_mud_isa0(tItem,ttExpressionType).
+not_mud_isa0(tObj, ttExpressionType).
 not_mud_isa0(tTemporalThing, tTemporalThing).
 not_mud_isa0(completelyAssertedCollection,ttTemporalType).
-not_mud_isa0(ttFormatType,ttFormatType).
+not_mud_isa0(ttExpressionType,ttExpressionType).
 not_mud_isa0(ttTemporalType,tTemporalThing).
 %not_mud_isa0(I,tCol):- is_ftCompound(I),!, \+ a(tCol,I).
 %not_mud_isa0(I,C):- is_ftCompound(I),!, \+ a(C,I).
@@ -669,7 +669,7 @@ not_mud_isa(I,C):-loop_check(not_mud_isa(I,C,_)).
 
 %= 	 	 
 
-%% not_mud_isa( ?F, ?CAC, ?Why) is semidet.
+%% not_mud_isa( ?F, ?CAC, ?Why) is nondet.
 %
 % not Application  (isa/2).
 %
@@ -682,7 +682,7 @@ not_mud_isa(G,tCol,Why):-never_type_why(G,Why).
 
 %= 	 	 
 
-%% tCol_gen( ?T) is semidet.
+%% tCol_gen( ?T) is nondet.
 %
 % True Structure Col Gen.
 %
@@ -693,7 +693,7 @@ tCol_gen(T):- no_repeats(T,call_u(ttTemporalType(T);completelyAssertedCollection
 
 %= 	 	 
 
-%% module_local_init is semidet.
+%% module_local_init is nondet.
 %
 % Hook To [lmconf:module_local_init/0] For Module Mpred_type_isa.
 % Module Local Init.
@@ -708,7 +708,7 @@ lmconf:module_local_init:- ain((isa(I,T):- cwc,isa_backchaing(I,T))).
 
 %= 	 	 
 
-%% isa_backchaing( ?I, ?T) is semidet.
+%% isa_backchaing( ?I, ?T) is nondet.
 %
 %  (isa/2) backchaing.
 %
@@ -724,7 +724,7 @@ isa_backchaing(I,T):- call_tabled(isa(I,T),no_repeats(loop_check(isa_backchaing_
 
 %= 	 	 
 
-%% isa_backchaing_0( ?I, ?T) is semidet.
+%% isa_backchaing_0( ?I, ?T) is nondet.
 %
 %  (isa/2) backchaing  Primary Helper.
 %
@@ -744,21 +744,21 @@ isa_backchaing_0(I,T):-  sanity(nonvar(I)),isa_asserted(I,AT),transitive_subclas
 
 %= 	 	 
 
-%% type_isa( ?Type, ?VALUE2) is semidet.
+%% type_isa( ?Type, ?VALUE2) is nondet.
 %
 % type  (isa/2).
 %
 type_isa(Type,ttTemporalType):-arg(_,vv(tAgent,tItem,tObj,tRegion),Type),!.
 type_isa(ArgIsa,ttPredType):-a(ttPredType,ArgIsa),!.
-type_isa(ftString,ttFormatType):-!.
-type_isa(Type,ttFormatType):-chk_ft(Type),!. % text
+type_isa(ftString,ttExpressionType):-!.
+type_isa(Type,ttExpressionType):-chk_ft(Type),!. % text
 %  from name
 
 
 
 %= 	 	 
 
-%% atom_prefix_other( ?Inst, ?Prefix, ?Other) is semidet.
+%% atom_prefix_other( ?Inst, ?Prefix, ?Other) is nondet.
 %
 % Atom Prefix Other.
 %
@@ -766,7 +766,7 @@ atom_prefix_other(Inst,Prefix,Other):-atom_type_prefix_other(Inst,_,Prefix,Other
 
 %= 	 	 
 
-%% atom_type_prefix_other( ?Inst, ?Type, ?Prefix, ?Other) is semidet.
+%% atom_type_prefix_other( ?Inst, ?Type, ?Prefix, ?Other) is nondet.
 %
 % Atom Type Prefix Other.
 %
@@ -777,7 +777,7 @@ atom_type_prefix_other(Inst,Type,Suffix,Other):-atom(Inst),type_suffix(Suffix,Ty
 
 %= 	 	 
 
-%% onLoadPfcRule( :TermInst) is semidet.
+%% onLoadPfcRule( :TermInst) is nondet.
 %
 % Whenever Load Prolog Forward Chaining Rule.
 %
@@ -787,7 +787,7 @@ onLoadPfcRule('=>'(a(tCol,Inst), {isa_from_morphology(Inst,Type)} , isa(Inst,Typ
 
 %= 	 	 
 
-%% callOr( :PRED1Pred, ?I, ?T) is semidet.
+%% callOr( :PRED1Pred, ?I, ?T) is nondet.
 %
 % Call Or.
 %
@@ -797,7 +797,7 @@ callOr(Pred,I,T):-(call(Pred,I);call(Pred,T)),!.
 
 %= 	 	 
 
-%% type_deduced( ?I, ?T) is semidet.
+%% type_deduced( ?I, ?T) is nondet.
 %
 % Type Deduced.
 %
@@ -806,7 +806,7 @@ type_deduced(I,T):-nonvar(I),not(number(I)),clause(a(P,_,I),true),(argIsa_known(
 
 %= 	 	 
 
-%% compound_isa( ?F, ?VALUE2, ?T) is semidet.
+%% compound_isa( ?F, ?VALUE2, ?T) is nondet.
 %
 % compound  (isa/2).
 %
@@ -817,7 +817,7 @@ compound_isa(_,I,T):- call_u(isa_asserted(I,T)).
 
 %= 	 	 
 
-%% isa_asserted( ?I, ?C) is semidet.
+%% isa_asserted( ?I, ?C) is nondet.
 %
 %  (isa/2) asserted.
 %
@@ -827,7 +827,7 @@ isa_asserted(I,C):- ((call_tabled(isa(I,C),no_repeats(loop_check(isa_asserted_0(
 
 %= 	 	 
 
-%% isa_asserted_0( ?I, ?T) is semidet.
+%% isa_asserted_0( ?I, ?T) is nondet.
 %
 %  (isa/2) asserted  Primary Helper.
 %
@@ -856,7 +856,7 @@ isa_asserted_0(I,T):- nonvar(T),!,isa_asserted_1(I,T).
 
 %= 	 	 
 
-%% isa_asserted_1( ?I, :TermT) is semidet.
+%% isa_asserted_1( ?I, :TermT) is nondet.
 %
 %  (isa/2) asserted  Secondary Helper.
 %
@@ -873,7 +873,7 @@ isa_asserted_1(I,(T1 ; T2)):-!,nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),
 
 %= 	 	 
 
-%% isa_w_type_atom( ?I, ?T) is semidet.
+%% isa_w_type_atom( ?I, ?T) is nondet.
 %
 %  (isa/2) w type atom.
 %
@@ -884,20 +884,20 @@ isa_w_type_atom(I,T):- G=..[T,I],once_if_ground(isa_atom_call(T,G),_).
 
 %= 	 	 
 
-%% dont_call_type_arity_one( ?VALUE1) is semidet.
+%% dont_call_type_arity_one( ?VALUE1) is nondet.
 %
 % Dont Call Type Arity One.
 %
 dont_call_type_arity_one(_):-!,fail.
 dont_call_type_arity_one(tCol).
-dont_call_type_arity_one(ttFormatType).
+dont_call_type_arity_one(ttExpressionType).
 dont_call_type_arity_one(ttAgentType).
 dont_call_type_arity_one(F):-isa(F,prologHybrid),!.
 
 
 %= 	 	 
 
-%% isa_atom_call( ?T, ?G) is semidet.
+%% isa_atom_call( ?T, ?G) is nondet.
 %
 %  (isa/2) atom call.
 %
@@ -906,7 +906,7 @@ isa_atom_call(T,G):-loop_check(isa_atom_call_ilc(T,G)).
 
 %= 	 	 
 
-%% isa_atom_call_ilc( ?VALUE1, ?G) is semidet.
+%% isa_atom_call_ilc( ?VALUE1, ?G) is nondet.
 %
 %  (isa/2) atom call Inside Of Loop Checking.
 %
@@ -918,7 +918,7 @@ isa_atom_call_ilc(_,G):- predicate_property(G,number_of_rules(R)),R>0,!,G.
 
 %= 	 	 
 
-%% cached_isa( ?I, ?T) is semidet.
+%% cached_isa( ?I, ?T) is nondet.
 %
 % cached  (isa/2).
 %
@@ -935,7 +935,7 @@ cached_isa(I,T):-hotrace(isa_backchaing(I,T)).
 
 %= 	 	 
 
-%% decl_type_safe( ?T) is semidet.
+%% decl_type_safe( ?T) is nondet.
 %
 % Declare Type Safely Paying Attention To Corner Cases.
 %
@@ -947,7 +947,7 @@ decl_type_safe(T):- ignore((atom(T),not(never_type_why(T,_)),not(number(T)),decl
 
 %= 	 	 
 
-%% decl_type( :TermVar) is semidet.
+%% decl_type( :TermVar) is nondet.
 %
 % Declare Type.
 %
@@ -962,7 +962,7 @@ decl_type(Spec):- decl_type_unsafe(Spec),!.
 
 %= 	 	 
 
-%% decl_type_unsafe( ?Spec) is semidet.
+%% decl_type_unsafe( ?Spec) is nondet.
 %
 % Declare Type Unsafe.
 %
@@ -982,7 +982,7 @@ decl_type_unsafe(Spec):- call_u(tCol(Spec))->true;(show_call(why,ain(tCol(Spec))
 
 %= 	 	 
 
-%% define_ft( :TermSpec) is semidet.
+%% define_ft( :TermSpec) is nondet.
 %
 % Define Format Type.
 %
@@ -996,20 +996,20 @@ define_ft(Spec):- loop_check(define_ft_0(Spec),true).
 
 %= 	 	 
 
-%% define_ft_0( ?Spec) is semidet.
+%% define_ft_0( ?Spec) is nondet.
 %
 % define Format Type  Primary Helper.
 %
 define_ft_0(xyzFn):-!.
-define_ft_0(Spec):- a(ttFormatType,Spec),!.
+define_ft_0(Spec):- a(ttExpressionType,Spec),!.
 define_ft_0(Spec):- a(tCol,Spec),dmsg(once(maybe_coierting_plain_type_to_formattype(Spec))),fail.
-define_ft_0(Spec):- hooked_asserta(isa(Spec,ttFormatType)),(is_ftCompound(Spec)->hooked_asserta(isa(Spec,meta_argtypes));true).
+define_ft_0(Spec):- hooked_asserta(isa(Spec,ttExpressionType)),(is_ftCompound(Spec)->hooked_asserta(isa(Spec,meta_argtypes));true).
 
 :- was_export(assert_subclass/2).
 
 %= 	 	 
 
-%% assert_subclass( ?O, ?T) is semidet.
+%% assert_subclass( ?O, ?T) is nondet.
 %
 % Assert Subclass.
 %
@@ -1019,7 +1019,7 @@ assert_subclass(O,T):-assert_subclass_safe(O,T).
 
 %= 	 	 
 
-%% assert_p_safe( ?P, ?O, ?T) is semidet.
+%% assert_p_safe( ?P, ?O, ?T) is nondet.
 %
 % Assert Pred Safely Paying Attention To Corner Cases.
 %
@@ -1030,7 +1030,7 @@ assert_p_safe(P,O,T):-
 
 %= 	 	 
 
-%% assert_subclass_safe( ?O, ?T) is semidet.
+%% assert_subclass_safe( ?O, ?T) is nondet.
 %
 % Assert Subclass Safely Paying Attention To Corner Cases.
 %
@@ -1041,7 +1041,7 @@ assert_subclass_safe(O,T):-
 
 %= 	 	 
 
-%% assert_isa_safe( ?O, ?T) is semidet.
+%% assert_isa_safe( ?O, ?T) is nondet.
 %
 % assert  (isa/2) Safely Paying Attention To Corner Cases.
 %
@@ -1059,7 +1059,7 @@ assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(
 
 %= 	 	 
 
-%% guess_types( ?W) is semidet.
+%% guess_types( ?W) is nondet.
 %
 % guess  Types.
 %
@@ -1069,7 +1069,7 @@ guess_types(W):- isa_from_morphology(W,What),!,ignore(guess_types(W,What)).
 
 %= 	 	 
 
-%% guess_types( ?W, ?What) is semidet.
+%% guess_types( ?W, ?What) is nondet.
 %
 % guess  Types.
 %
@@ -1078,7 +1078,7 @@ guess_types(W,What):- ain(tried_guess_types_from_name(W)),ignore((atom(W),guess_
 
 %= 	 	 
 
-%% guess_types_0( ?VALUE1, ?VALUE2) is semidet.
+%% guess_types_0( ?VALUE1, ?VALUE2) is nondet.
 %
 % guess  Types  Primary Helper.
 %
@@ -1090,7 +1090,7 @@ guess_types_0(W,ftID):-hotrace((atom(W),atom_concat(i,T,W),
 
 %= 	 	 
 
-%% guess_supertypes( ?W) is semidet.
+%% guess_supertypes( ?W) is nondet.
 %
 % Guess Super Types.
 %
@@ -1100,7 +1100,7 @@ guess_supertypes(W):- ain(tried_guess_types_from_name(W)),ignore((atom(W),guess_
 
 %= 	 	 
 
-%% guess_supertypes_0( ?W) is semidet.
+%% guess_supertypes_0( ?W) is nondet.
 %
 % guess super Types  Primary Helper.
 %
@@ -1113,7 +1113,7 @@ guess_supertypes_0(W):-T=t,to_first_break(W,lower,T,All,upper),to_first_break(Al
 
 %= 	 	 
 
-%% ain_guess( ?G) is semidet.
+%% ain_guess( ?G) is nondet.
 %
 % Assert If New Guess.
 %
@@ -1122,7 +1122,7 @@ ain_guess(G):-show_call(ain_guess,mpred_ain(G,(d,d))).
 
 %= 	 	 
 
-%% guess_typetypes( ?W) is semidet.
+%% guess_typetypes( ?W) is nondet.
 %
 % Guess Type Types.
 %
@@ -1132,7 +1132,7 @@ guess_typetypes(W):- ain(tried_guess_types_from_name(W)),ignore((atom(W),guess_t
 
 %= 	 	 
 
-%% guess_typetypes_0( ?TtTypeType) is semidet.
+%% guess_typetypes_0( ?TtTypeType) is nondet.
 %
 % guess type Types  Primary Helper.
 %
@@ -1149,7 +1149,7 @@ system:term_expansion(isa(Compound,PredArgTypes),
 
 %= 	 	 
 
-%% mpred_provide_storage_op( :TermOp, ?G) is semidet.
+%% mpred_provide_storage_op( :TermOp, ?G) is nondet.
 %
 % Hook To [isa_lmconf:mpred_provide_storage_op/2] For Module Mpred_type_isa.
 % Managed Predicate Provide Storage Oper..
@@ -1165,7 +1165,7 @@ isa_lmconf:mpred_provide_storage_op(call(_),G):- was_isa(G,I,C),!, (isa_backchai
 
 %= 	 	 
 
-%% mpred_provide_storage_clauses( ?H, ?B, ?What) is semidet.
+%% mpred_provide_storage_clauses( ?H, ?B, ?What) is nondet.
 %
 % Hook To [isa_lmconf:mpred_provide_storage_clauses/3] For Module Mpred_type_isa.
 % Managed Predicate Provide Storage Clauses.
@@ -1193,7 +1193,7 @@ lmconf:mpred_provide_storage_clauses(H,B,(What)):-fail,isa_lmconf:mpred_provide_
 
 %= 	 	 
 
-%% assert_isa( +I, +T) is semidet.
+%% assert_isa( +I, +T) is nondet.
 %
 % assert  (isa/2).
 %
@@ -1204,7 +1204,7 @@ assert_isa(I,T):-sanity(nonvar(I)),sanity(nonvar(T)),assert_isa_i(I,T),must(sani
 
 %= 	 	 
 
-%% assert_isa_i( ?I, ?T) is semidet.
+%% assert_isa_i( ?I, ?T) is nondet.
 %
 % assert  (isa/2) For Internal Interface.
 %
@@ -1218,7 +1218,7 @@ assert_isa_i(I,T):- skipped_table_call(loop_check(assert_isa_ilc(I,T),loop_check
 
 %= 	 	 
 
-%% assert_isa_ilc( ?I, ?T) is semidet.
+%% assert_isa_ilc( ?I, ?T) is nondet.
 %
 % assert  (isa/2) Inside Of Loop Checking.
 %
@@ -1235,20 +1235,20 @@ assert_isa_ilc(I,T):-
 
 %= 	 	 
 
-%% assert_isa_ilc_unchecked( ?I, ?T) is semidet.
+%% assert_isa_ilc_unchecked( ?I, ?T) is nondet.
 %
 % assert  (isa/2) Inside Of Loop Checking unchecked.
 %
 assert_isa_ilc_unchecked(I,T):- is_ftCompound(I),is_non_skolem(I),!,must((get_functor(I,F),assert_compound_isa(I,T,F))),!.
 assert_isa_ilc_unchecked(I,tCol):- must(show_call(why,decl_type(I))).
-assert_isa_ilc_unchecked(I,ttFormatType):- must(show_call(why,define_ft(I))).
+assert_isa_ilc_unchecked(I,ttExpressionType):- must(show_call(why,define_ft(I))).
 assert_isa_ilc_unchecked(I,T):-   (( \+(isa(I,_)),\+(a(tCol,I))) -> ain(tCountable(I)) ; true),
   w_tl([t_l:infSkipArgIsa,t_l:infSkipFullExpand],assert_hasInstance(T,I)).
 
 
 %= 	 	 
 
-%% assert_compound_isa( ?I, ?VALUE2, ?VALUE3) is semidet.
+%% assert_compound_isa( ?I, ?VALUE2, ?VALUE3) is nondet.
 %
 % assert compound  (isa/2).
 %
@@ -1262,7 +1262,7 @@ assert_compound_isa(I,T,F):- ignore((is_Template(I),w_tl(infConfidence(vWeak),as
 
 %= 	 	 
 
-%% get_mpred_arg( ?N, ?C, ?E) is semidet.
+%% get_mpred_arg( ?N, ?C, ?E) is nondet.
 %
 % Get Managed Predicate Argument.
 %
@@ -1272,7 +1272,7 @@ get_mpred_arg(N,C,E):-!,is_ftCompound(C),arg(N,C,E).
 
 %= 	 	 
 
-%% is_Template( ?I) is semidet.
+%% is_Template( ?I) is nondet.
 %
 % If Is A Template.
 %
@@ -1282,7 +1282,7 @@ is_Template(I):- get_mpred_arg(_,I,Arg1),a(tCol,Arg1).
 
 %= 	 	 
 
-%% assert_isa_reversed( ?T, ?I) is semidet.
+%% assert_isa_reversed( ?T, ?I) is nondet.
 %
 % assert  (isa/2) reversed.
 %
@@ -1300,7 +1300,7 @@ assert_isa_reversed(T,I):-assert_isa(I,T).
 
 %= 	 	 
 
-%% assert_isa_hooked( ?A, ?VALUE2) is semidet.
+%% assert_isa_hooked( ?A, ?VALUE2) is nondet.
 %
 % assert  (isa/2) hooked.
 %
@@ -1311,7 +1311,7 @@ assert_isa_hooked(I,T):- not(ground(assert_isa(T))),!, trace_or_throw(not(ground
 assert_isa_hooked(I,T):- assert_hasInstance(T,I),fail.
 
 assert_isa_hooked(T,tCol):-!,decl_type(T),!.
-assert_isa_hooked(T,ttFormatType):-!,define_ft(T),!.
+assert_isa_hooked(T,ttExpressionType):-!,define_ft(T),!.
 assert_isa_hooked(Term,tPred):-!,decl_mpred(Term).
 assert_isa_hooked(Term,prologHybrid):-!,decl_mpred_hybrid(Term).
 % assert_isa_hooked(Term,prologDynamic):-!,export(Term).
@@ -1330,13 +1330,13 @@ assert_isa_hooked(food5,tWeapon):-trace_or_throw(assert_isa(food5,tWeapon)).
 
 %= 	 	 
 
-%% assert_isa_hooked_after( ?F, ?T) is semidet.
+%% assert_isa_hooked_after( ?F, ?T) is nondet.
 %
 % assert  (isa/2) hooked after.
 %
 assert_isa_hooked_after(F,T):-a(ttPredType,T),!,decl_mpred(F,T).
 assert_isa_hooked_after(_,tCol):-!.
-assert_isa_hooked_after(_,ttFormatType):-!.
+assert_isa_hooked_after(_,ttExpressionType):-!.
 %assert_isa_hooked_after(I,T):- ttTemporalType(T),!,assert_isa_hooked_creation(I,T).
 
 %assert_isa_hooked_after(I,T):- assert_isa_hooked_creation(I,T).
@@ -1360,7 +1360,7 @@ impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_ta
 
 %= 	 	 
 
-%% mpred_types_loaded is semidet.
+%% mpred_types_loaded is nondet.
 %
 % Managed Predicate  Types loaded.
 %

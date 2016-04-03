@@ -1150,7 +1150,7 @@ make_file_command(_IN,cl_assert(pfc(WHY),PFC),[(:- CMD), NEWSOURCE]):-
   was_exported_content(Orig,WHY,NEWSOURCE),!.
   
 
-make_file_command(IN,cl_assert(WHY,NEWISH),OUT):- inside_file(kif),is_kif_rule(NEWISH),!,make_file_command(IN,cl_assert(kif(WHY),NEWISH),OUT).
+make_file_command(IN,cl_assert(WHY,NEWISH),OUT):- inside_file(kif),is_kif_clause(NEWISH),!,make_file_command(IN,cl_assert(kif(WHY),NEWISH),OUT).
 make_file_command(_IN,cl_assert(WHY,CMD2),SET):- 
   get_original_term_source(Orig),
   was_exported_content(Orig,WHY,NEWSOURCE),list_to_set([(:- cl_assert(WHY,CMD2)), NEWSOURCE],SET).
@@ -1163,7 +1163,7 @@ make_file_command(_IN,'$si$':'$was_imported_kb_content$'(IN2,WHY),'$si$':'$was_i
 %
 % Call File Command.
 %
-call_file_command(I,cl_assert(OTHER,OO),OO,I):- inside_file(kif),is_kif_rule(OO),!,call_file_command(I,cl_assert(kif(OTHER),OO),OO,I).
+call_file_command(I,cl_assert(OTHER,OO),OO,I):- inside_file(kif),is_kif_clause(OO),!,call_file_command(I,cl_assert(kif(OTHER),OO),OO,I).
 call_file_command(I,CALL,[(:- must(CALL2)),(:- must(CALL)),OO],(:-CALL2)):- CALL2\=@=CALL, was_exported_content(I,CALL,OO),!.
 call_file_command(I,CALL,[(:- must(CALL)),OO],(:-CALL)):- was_exported_content(I,CALL,OO),!.
 % call_file_command(I,CALL,OO,O):- (current_predicate(_,CALL) -> ((must(call(CALL)),was_exported_content(I,CALL,OO))); OO=[O,:-CALL]).
@@ -2024,15 +2024,17 @@ must_expand_term_to_command(C,O):- must(mpred_term_expansion(C,O)),C\=@=O,must(i
 %
 % Managed Predicate Term Expansion.
 %
-mpred_term_expansion((<=(Q,P)),(:- cl_assert(pfc(bwc),(Q<-P)))).
+
 mpred_term_expansion(((P==>Q)),(:- cl_assert(pfc(fwc),(P==>Q)))).
 mpred_term_expansion((('=>'(Q))),(:- cl_assert(pfc(fwc),('=>'(Q))))).
 mpred_term_expansion((('==>'(Q))),(:- cl_assert(pfc(fwc),('=>'(Q))))).
 mpred_term_expansion(((nesc(Q))),(:- cl_assert(pfc(fwc),nesc(Q)))).
+mpred_term_expansion(~(Q),(:- cl_assert(pfc(fwc),~(Q)))).
 mpred_term_expansion(('<-'(P,Q)),(:- cl_assert(pfc(bwc),('<-'(P,Q))))).
 mpred_term_expansion(('<==>'(P,Q)),(:- cl_assert(pfc(bwc),(P<==>Q)))).
-mpred_term_expansion(~(Q),(:- cl_assert(pfc(fwc),~(Q)))).
-mpred_term_expansion(~(Q),(:- cl_assert(pfc(fwc),~(Q)))).
+mpred_term_expansion((<=(Q,P)),(:- cl_assert(pfc(bwc),(Q<-P)))).
+
+
 
 mpred_term_expansion(if(P,Q),(:- cl_assert(kif(fwc),if(P,Q)))).
 mpred_term_expansion(iff(P,Q),(:- cl_assert(kif(fwc),iff(P,Q)))).

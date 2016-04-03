@@ -10,11 +10,11 @@
             current_error/1
           ]).
 :- meta_predicate
-        with_err_to_pred(1, 0),
-        with_input_from_pred(1, 0),
-        with_output_to_pred(1, 0),
+        with_err_to_pred(:, 0),
+        with_input_from_pred(:, 0),
+        with_output_to_pred(:, 0),
         on_x_fail_priv(0),
-        with_write_stream_pred(1, -, 0, 0).
+        with_write_stream_pred(:, -, 0, 0).
 :- module_transparent
         buffer_chars/1,
         read_received/1,
@@ -24,7 +24,7 @@
 
 %  ?- with_err_to_pred(write,format(user_error,'~s',["ls"])).
 
-plz_set_stream(S,P):- ignore(on_x_fail_priv(set_stream(S,P))).
+plz_set_stream(S,P):- ignore(logicmoo_util_prolog_streams:on_x_fail_priv(set_stream(S,P))).
 
 %= 	 	 
 
@@ -152,8 +152,8 @@ with_write_stream_pred(Callback,Stream,Goal,Exit):-
 
   call_cleanup(
    setup_call_cleanup_each(
-   ( asserta(((tl_with_prolog_streams:stream_write(Stream,Data):- (ignore(on_x_fail_priv(call(Callback,Data)))))),Ref),
-     asserta(((tl_with_prolog_streams:stream_close(Stream):- (ignore(on_x_fail_priv(call(Callback,end_of_file)))))),Ref2),
+   ( asserta(((tl_with_prolog_streams:stream_write(Stream,Data):- (ignore(logicmoo_util_prolog_streams:on_x_fail_priv(call(Callback,Data)))))),Ref),
+     asserta(((tl_with_prolog_streams:stream_close(Stream):- (ignore(logicmoo_util_prolog_streams:on_x_fail_priv(call(Callback,end_of_file)))))),Ref2),
      asserta(((lmconf:is_prolog_stream(Stream))),Ref3)),
     Goal,
    (catch(flush_output(Stream),_,true),erase(Ref),erase(Ref2),erase(Ref3))),

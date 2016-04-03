@@ -8,7 +8,7 @@
 :- use_module(library(emacs/emacs)).
 :- use_module(library(swi_ide)).
 :- emacs_toplevel.
-:- guitracer,leash(-all),visible(-all),trace,member(_,[_]),!,notrace,leash(+all),visible(+all).
+% :- guitracer,leash(-all),visible(-all),trace,member(_,[_]),!,notrace,leash(+all),visible(+all).
 
 :- use_module(library(logicmoo_user)).
 

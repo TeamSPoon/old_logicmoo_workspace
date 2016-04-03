@@ -1245,7 +1245,7 @@ read_source_vars(File,In):-
 read_source_file_vars_1(File):-
    once(current_prolog_flag(xref, Was);Was=false),
    w_tl(set_prolog_flag(xref, true),
-	setup_call_cleanup(
+	setup_call_cleanup_each(
 	    prolog_open_source(File, In),
 	    read_source_vars(File,In),
 	    (prolog_close_source(In),

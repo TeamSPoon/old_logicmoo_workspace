@@ -74,11 +74,11 @@ pfclog(PROLOG) ==> PROLOG.
 ({is_clif(CLIF)} ==>
   (CLIF/is_clif(CLIF) ==> clif(CLIF))).
 
-(CLIF/is_kif_rule(CLIF) ==> clif(CLIF)).
+(CLIF/is_kif_clause(CLIF) ==> clif(CLIF)).
 
 
 /*
-(CLIF/is_kif_rule(CLIF) ==> 
+(CLIF/is_kif_clause(CLIF) ==> 
    ({ kif_to_pfc(CLIF,PROLOG)},
       % this consequent asserts the new rules
       PROLOG,{slow_sanity(is_entailed(CLIF))})).

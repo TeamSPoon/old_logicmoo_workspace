@@ -413,19 +413,19 @@ dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 
 disjointWith(P1,P2) ==> (neg(isa(C,P1)) <==> isa(C,P2)).
 
-isa(Col1, ttObjectType) ==> ~isa(Col1, ttFormatType).
+isa(Col1, ttObjectType) ==> ~isa(Col1, ttExpressionType).
 
 ==> tCol(tCol).
 ==> tCol(tPred).
 ==> tCol(tFunction).
 ==> tCol(tRelation).
 ==> tCol(ttSpatialType).
-==> tCol(ttFormatType).
+==> tCol(ttExpressionType).
 ==> tCol(functorDeclares).
 % tCol(ArgsIsa):-mpred_is_trigger(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
-==> tCol(ttFormatType).
+==> tCol(ttExpressionType).
 ==> tSpec(vtActionTemplate).
 ==> tCol(tRegion).
 ==> tCol(tContainer).
