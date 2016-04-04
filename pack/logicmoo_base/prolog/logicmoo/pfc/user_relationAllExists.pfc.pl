@@ -39,15 +39,16 @@ ptTransitiveBinaryPredicate(genls).
 
 (ptTransitiveBinaryPredicate(P)/ground(P)) ==>
     ((t(P,A,B),t(P,B,C))/(ground(v(A,B,C)),A\==C,B\==C,A\==B) ==> t(P,A,C)).
-
+/*
 :- sanity(( 
    fully_expand(((t(foo,a)/bar)=>baz),OUT),
    OUT = (((foo(a))/bar)=>baz))).
 
-:- sanity((
-   fully_expand(((t(P,A,B),t(P,B,C))/(ground(v(A,B,C)),A\==C,B\==C,A\==B) ==> t(P,A,C)),OUT),
+:- show_failure((
+           P= genls,
+           fully_expand(((t(P,A,B),t(P,B,C))/(ground(v(A,B,C)),A\==C,B\==C,A\==B) ==> t(P,A,C)),OUT),
    OUT= (((genls(A,B),genls(B,C)) /(ground(v(A,B,C)),A\==C,B\==C,A\==B))==> genls(A,C)))).
-
+*/
 
 :- sanity(is_entailed(((t(genls,A,B),t(genls,B,C)) ==> t(genls,A,C)))).
 

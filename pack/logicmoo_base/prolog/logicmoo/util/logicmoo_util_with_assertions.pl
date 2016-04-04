@@ -24,7 +24,9 @@
 
 :- meta_predicate
         w_tl(:, :),
+        w_tl_e(:, :),
         wno_tl(0, 0),
+        wno_tl_e(0, 0),
         with_no_x(0),
         wtg(:, 0).
 :- module_transparent
@@ -151,16 +153,22 @@ w_tl_e(M:before_after(Before,After),Call):-
 w_tl_e(WM:THeadWM,CM:Call):- !,
  notrace(( 
      to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
-     setup_call_cleanup_each(asserta(M:HAssert,REF),CM:Call,erase(REF)).
-
+     make_lkey(w_tl_e(M:HAssert),Key),
+     setup_call_cleanup_each(key_asserta(M:HAssert,Key),CM:Call,key_erase(Key)).
 
 w_tl_e(WM:THeadWM,CM:Call):- 
  notrace(( 
      to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> copy_term(HAssert,CHAssert) ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
      ((CM:notrace((HAssert\=(_:-_),M:CHAssert,!,HAssert=@=CHAssert))) -> ( CM:Call );
-            setup_call_cleanup_each(asserta(M:HAssert,REF),CM:Call,erase(REF))).
+            (make_lkey(w_tl_e(M:HAssert),Key),setup_call_cleanup_each(key_asserta(M:HAssert,Key),CM:Call,key_erase(Key)))).
 
 
+
+key_erase(Key):- must((nb_current(Key,[REF|Was]),nb_setval(Key,Was),erase(REF))).
+key_asserta(HAssert,Key):- asserta(HAssert,REF),(nb_current(Key,Was)->nb_setval(Key,[REF|Was]);nb_setval(Key,[REF])).
+
+
+make_lkey(Goal,Key):- format(atom(Key),'~q',[Goal]).
 
 %= 	 	 
 

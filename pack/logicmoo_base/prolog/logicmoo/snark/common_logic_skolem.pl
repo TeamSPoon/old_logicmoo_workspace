@@ -23,7 +23,7 @@
 
 :- module_transparent with_no_kif_var_coroutines/1.
 
-with_no_kif_var_coroutines(Goal):- w_tl(t_l:no_kif_var_coroutines,Goal).
+with_no_kif_var_coroutines(Goal):- w_tl_e(t_l:no_kif_var_coroutines,Goal).
 
 /** <module> Form Prolog sks (debugging)
 */

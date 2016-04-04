@@ -146,7 +146,8 @@ never_retract_u(~(X),is_ftVar(X)):- cwc,is_ftVar(X).
 
 % These next 2 might be best as builtins?
 ((~(P)/(mpred_non_neg_literal(P),copy_term(P,PP))) ==> \+ PP ).
-(P/mpred_non_neg_literal(P) ==> { remove_negative_version(P) } ).
+% (P/mpred_non_neg_literal(P) ==> { remove_negative_version(P) } ).
+% ((P/(mpred_non_neg_literal(P),copy_term(P,PP))) ==> (~ ~ PP )).
 
 % :- nortrace,notrace.
 % a pretty basic conflict (disabled for now)

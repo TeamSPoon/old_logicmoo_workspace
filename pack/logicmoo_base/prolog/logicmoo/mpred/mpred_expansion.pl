@@ -501,10 +501,17 @@ fully_expand_now(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,fully_expand
 fully_expand_now(_,Sent,SentO):- \+ (is_ftCompound(Sent)),!,Sent=SentO.
 fully_expand_now(_,Sent,SentO):-t_l:infSkipFullExpand,!,must(Sent=SentO).
 fully_expand_now(_,(:-(Sent)),(:-(Sent))):-!.
+fully_expand_now(Op,PFC,Next):- 
+  compound(PFC),
+  compound_name_arguments(PFC,Name,Args),
+  arg(_,v('/',':'),Name),
+  must_maplist(fully_expand_now(Op),Args,ArgsO),
+  compound_name_arguments(Next,Name,ArgsO),!.
 fully_expand_now(Op,Sent,SentO):- 
  copy_term(Sent,NoVary),
  cyclic_break((NoVary)),
- dont_make_cyclic((w_tl(t_l:disable_px,must(fully_expand_clause(Op,Sent,BO))),!,SentO=BO,
+ dont_make_cyclic((w_tl(t_l:disable_px,must(fully_expand_clause(Op,Sent,BO))),!,
+    SentO=BO,
     must(Sent=@=NoVary),
 
    ignore(((fail,cnotrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), 
@@ -519,6 +526,9 @@ fully_expand_now(Op,Sent,SentO):-
 %
 fully_expand_clause(_,Sent,SentO):- \+ (is_ftCompound(Sent)),!,must(SentO=Sent).
 fully_expand_clause(Op,Sent,SentO):-is_ftVar(Op),!,fully_expand_clause(is_asserted,Sent,SentO),!.
+
+fully_expand_clause(Op,PFC,Next):- is_ftVar(PFC),!,PFC=Next.
+
 fully_expand_clause(_ ,NC,NC):- as_is_term(NC),!.
 fully_expand_clause(_ ,arity(F,A),arity(F,A)):-!.
 fully_expand_clause(Op ,NC,NCO):- db_expand_final(Op,NC,NCO),!.
@@ -526,8 +536,9 @@ fully_expand_clause(Op,'==>'(Sent),(SentO)):-!,fully_expand_clause(Op,Sent,SentO
 fully_expand_clause(Op,'=>'(Sent),(SentO)):-!,fully_expand_clause(Op,Sent,SentO),!.
 fully_expand_clause(Op,':-'(Sent),Out):-!,fully_expand_goal(Op,Sent,SentO),!,must(Out=':-'(SentO)).
 fully_expand_clause(Op,(H:-B),Out):- !,fully_expand_head(Op,H,HH),fully_expand_goal(Op,B,BB),!,must(Out=(HH:-BB)).
+fully_expand_clause(Op,(B/H),Out):- !,fully_expand_head(Op,H,HH),fully_expand_goal(Op,B,BB),!,must(Out=(BB/HHHH)).
 fully_expand_clause(Op, HB,HHBB):- must((to_reduced_hb(Op,HB,H,B),fully_expand_head(Op,H,HH),!,fully_expand_goal(Op,B,BB),!,reduce_clause(Op,(HH:-BB),HHBB))),!.
-
+fully_expand_clause(_ ,NC,NC).
 
 %= 	 	 
 
@@ -604,7 +615,7 @@ as_is_term(NC):- as_is_term0(NC),!.
 %
 as_is_term0(M:NC):-atom(M),is_ftVar(NC),!.
 as_is_term0(NC):- \+(is_ftCompound(NC)),!.
-
+as_is_term0(P):-var(P),!.
 as_is_term0(NC):-cyclic_term(NC),!,dmsg(cyclic_term(NC)),!.
 as_is_term0('$VAR'(_)):-!.
 as_is_term0(_:'$was_imported_kb_content$'(_,_)).
@@ -858,12 +869,9 @@ db_expand_a_noloop(A,B,C):- loop_check_term(db_expand_0(A,B,C),db_expand_0(A,B,C
 %
 % Database expand  Primary Helper.
 %
+
 db_expand_0(Op,Sent,SentO):- cyclic_break(Sent),db_expand_final(Op ,Sent,SentO),!.
 
-db_expand_0(Op,(MetaLang/Prolog),(MetaLangOut/PrologOut)):-!,
-  gtrace,
-  db_expand_0(Op,MetaLang,MetaLangOut),
-  fully_expand_clause(Op,Prolog,PrologOut).
 
 db_expand_0(Op,(:-(CALL)),(:-(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
 db_expand_0(Op,isa(I,O),INot):-Not==not,!,INot =.. [Not,I],!,db_expand_term(Op,INot,O).
@@ -1390,6 +1398,7 @@ into_mpred_form((H:-B),(HH:-BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H:-B),(HH:-BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H,B),(HH,BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H;B),(HH;BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
+into_mpred_form((H/B),(HH/BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form(WAS,isa(I,C)):-was_isa_syntax(WAS,I,C),!.
 into_mpred_form(t(P,A),O):-atomic(P),!,O=..[P,A].
 into_mpred_form(t(P,A,B),O):-atomic(P),!,O=..[P,A,B].

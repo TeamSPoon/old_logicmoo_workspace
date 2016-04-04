@@ -407,7 +407,7 @@ mpred_aina(G,S):-mpred_ain(G,S).
 %  mpred_ain/2 and mpred_post/2 are the proper ways to add new clauses into the
 %  database and have forward reasoning done.
 %
-mpred_ain(P):- with_umt((get_source_ref(UU),mpred_ain(P,UU))),!.
+mpred_ain(P):- must((with_umt((get_source_ref(UU),mpred_ain(P,UU))))),!.
 
 %%  ain(P,S) 
 %
@@ -434,7 +434,7 @@ ain_fast(P,S):-
 remove_negative_version(P):-
   % TODO extract_predciates(P,Preds),trust(Preds),
   get_source_ref_stack(S),
-  with_no_mpred_trace_exec(must(mpred_ain(\+ ~ P, S))).
+  with_no_mpred_trace_exec(must(mpred_ain(\+ (~(P)), S))).
 
 %% mpred_post(+Ps,+S) 
 %

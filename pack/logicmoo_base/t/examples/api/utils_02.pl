@@ -79,7 +79,7 @@ no_profile_meta_preds:-
    predicate_property(M:P,meta_predicate(P)), 
    ((arg(_,P,E),number(E)) ->(functor(P,F,A),noprofile(M:F/A)) ; true)),fail)).
 
-:- set_prolog_flag(bad_idea,true).
+% :- set_prolog_flag(bad_idea,true).
 
 :- profiler(_Old, cputime).
 :- no_profile_meta_preds.

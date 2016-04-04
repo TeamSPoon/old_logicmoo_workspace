@@ -33,7 +33,7 @@
 				N="../../games/*.*"
 				Recurse="1"
 				Refilter="0"
-				Excludes=""/>
+				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
 		<Folder Name="../logicmoo_base">
 			<Folder Name="prolog">
@@ -41,7 +41,7 @@
 					N="../logicmoo_base/prolog/*.*"
 					Recurse="1"
 					Refilter="0"
-					Excludes=""/>
+					Excludes=".git/;*.*~;*~/"/>
 			</Folder>
 		</Folder>
 		<Folder Name="../logicmoo_nlu">
@@ -54,19 +54,19 @@
 				<F N="../MUD_ircbot/prolog/eggdrop.pl"/>
 			</Folder>
 		</Folder>
-		<Folder Name="t">
-			<F
-				N="t/*.*"
-				Recurse="1"
-				Refilter="0"
-				Excludes=""/>
-		</Folder>
 		<Folder Name="prolog">
 			<F
 				N="prolog/*.*"
 				Recurse="1"
 				Refilter="0"
 				Excludes=".git/;*.*~;*~/"/>
+		</Folder>
+		<Folder Name="t">
+			<F
+				N="t/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes="git/;*.*~;*~/"/>
 		</Folder>
 		<Folder Name="../../">
 			<F N="../../.gitattributes"/>
@@ -89,7 +89,6 @@
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
 		<Folder Name="../../runtime">
-			<F N="../../runtime/logicmoo_repl.pl"/>
 			<F N="../../runtime/README.md"/>
 		</Folder>
 		<F
