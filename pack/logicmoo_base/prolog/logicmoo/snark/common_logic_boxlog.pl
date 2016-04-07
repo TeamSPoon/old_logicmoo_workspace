@@ -498,8 +498,8 @@ body_for_mpred_2(_Mode,Head,Head,A,A).
 %
 % Reduce Literal.
 %
-reduce_literal(A,A):-is_ftVar(A).
-reduce_literal(~A,~A):-is_ftVar(A).
+reduce_literal(A,A):-is_ftVar(A),!.
+reduce_literal(~A,~A):-is_ftVar(A),!.
 reduce_literal(~(different(P3, R3)),not_different(P3, R3)).
 reduce_literal(~(mudEquals(P3, R3)),different(P3, R3)).
 reduce_literal(~(skolem(P3, R3)),different(P3, R3)).

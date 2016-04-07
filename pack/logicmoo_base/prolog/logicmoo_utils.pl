@@ -200,8 +200,8 @@ lmconf:logicmoo_scan_autoloads:-false.
  lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_varnames). 
  lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_strings). 
 
-:- use_module(library(logicmoo/util/logicmoo_util_bugger)).
-:- use_module(library(logicmoo/util/logicmoo_util_first)).
+%:- use_module(library(logicmoo/util/logicmoo_util_bugger)).
+%:- use_module(library(logicmoo/util/logicmoo_util_first)).
 %:- use_module(library(logicmoo/util/logicmoo_util_catch)).
 
 :- thread_local logicmoo_utils_test_tl/0.

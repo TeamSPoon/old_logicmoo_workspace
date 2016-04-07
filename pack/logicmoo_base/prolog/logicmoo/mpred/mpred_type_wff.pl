@@ -916,9 +916,6 @@ is_colection_name(IT,T,TT):- atom_length(T,TL),TL>2,not(atom_contains(T,'_')),no
 
 
 
-
-
-
 %% leave_as_is( :TermV) is semidet.
 %
 % Leave Converted To If Is A.

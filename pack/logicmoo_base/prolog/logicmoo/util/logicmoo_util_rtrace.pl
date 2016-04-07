@@ -174,6 +174,7 @@ thread_leash(Some):-!, notrace(thread_self(main)->leash(Some);thread_leash(Some)
 % Ho Trace Primary Helper.
 %
 
+:- meta_predicate hotrace_prev(0).
 hotrace_prev(Goal):- 
   (\+ notrace((tracing, notrace)) ->  
      (\+ tlbugger:rtracing -> Goal; 
@@ -322,7 +323,8 @@ restore_trace(Per,Goal):-
 %
 rtrace(Goal):- notrace(tlbugger:rtracing),!, Goal.
 
-rtrace(Goal):- 
+rtrace(Goal):- !, 
+
    ((tracing,notrace )-> Tracing = trace ;   Tracing = true),
    '$leash'(OldL, OldL),'$visible'(OldV, OldV),
    (Undo =   (notrace,ignore(retract(tlbugger:rtracing)),'$leash'(_, OldL),'$visible'(_, OldV),Tracing)),
@@ -333,7 +335,7 @@ rtrace(Goal):-
 rtrace(Goal):- '$leash'(OldL, OldL),'$visible'(OldV, OldV),
    CC = (notrace,'$leash'(_, OldL),'$visible'(_, OldV),nortrace),
    RTRACE = (notrace,visible(+all),thread_leash(-all),thread_leash(+exception),trace),
-   call_cleanup(((RTRACE,Goal)*->(notrace,deterministic(DET));(!,notrace,fail)),CC), (notrace(DET==yes)->notrace;(notrace;(RTRACE,notrace(fail)))).
+   call_cleanup(((RTRACE,(Goal,deterministic(DET),true))*->(notrace);(!,notrace,fail)),CC), (notrace(DET==yes)->notrace;(notrace;(RTRACE,notrace(fail)))).
 
 % rtrace(Goal):- notrace(tracing),trace,!,(notrace(tlbugger:rtracing) -> Goal ; (notrace(asserta(tlbugger:rtracing_traced)), restore_trace(rtrace,(trace,Goal)))).
 % rtrace(Goal):- tracing,!, setup_call_cleanup(rtrace,((trace,Goal,notrace)*->(trace)),pop_tracer).

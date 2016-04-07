@@ -14,7 +14,11 @@
           serialize_attvars/2,
           put_dyn_attrs/2,
           ensure_named/3,
-          read_attvars/1,read_attvars/0,          
+          read_attvars/1,read_attvars/0,
+          mpred_get_attr/3,
+          mpred_put_attr/3,
+          mpred_get_attrs/2,
+          mpred_put_attrs/2,
           install_attvar_expander/1,
           is_term_expanding_in_file/1,
           system_expanded_attvars/2]).
@@ -30,12 +34,43 @@
           system_expanded_attvars/2)).
 
 
-:-set_prolog_flag(read_attvars,false).
+:- use_module(logicmoo_util_dmsg).
+
+:- current_prolog_flag(read_attvars,Was)->asserta(restore_attvar_reader(Was));asserta(restore_attvar_reader(false)).
+:- set_prolog_flag(read_attvars,false).
 
 % use this module to avoid some later conflicts
-% :- use_module(library(base32)).
+:- if(exists_source(library(base32))).
+:- use_module(library(base32)).
+:- endif.
 
-:- use_module(logicmoo_util_dmsg).
+mpred_get_attr(V,_,_):- is_ftNonvar(V),!,fail.
+mpred_get_attr(V,A,Value):- var(V),!,get_attr(V,A,Value),!.
+mpred_get_attr('$VAR'(Name),_,_):- atom(Name),!,fail.
+mpred_get_attr('$VAR'(Att3),A,Value):- put_attrs(NewVar,Att3),get_attr(NewVar,A,Value).
+mpred_get_attr('avar'(Att3),A,Value):- put_attrs(NewVar,Att3),get_attr(NewVar,A,Value).
+mpred_get_attr('avar'(_,Att3),A,Value):- put_attrs(NewVar,Att3),get_attr(NewVar,A,Value).
+
+mpred_put_attrs(V,Att3s):- is_ftNonvar(V),!,trace_or_throw(mpred_put_attrs(V,Att3s)).
+mpred_put_attrs(V,Att3s):- var(V),!,put_attrs(V,Att3s),!.
+mpred_put_attrs(VAR,Att3s):- VAR='$VAR'(Name), atom(Name),!,setarg(1,VAR, att(vn, Name, Att3s)).
+mpred_put_attrs(VAR,Att3s):- VAR='$VAR'(_Att3),setarg(1,VAR, Att3s).
+mpred_put_attrs(VAR,Att3s):- VAR='avar'(_Att3),setarg(1,VAR, Att3s).
+mpred_put_attrs(VAR,Att3s):- VAR='avar'(_,_),setarg(2,VAR, Att3s).
+
+mpred_get_attrs(V,Att3s):- var(V),!,get_attrs(V,Att3s),!.
+mpred_get_attrs('$VAR'(Name),_):- atom(Name),!,fail.
+mpred_get_attrs('$VAR'(Att3s),Att3):-!,Att3s=Att3.
+mpred_get_attrs('avar'(Att3s),Att3):-!,Att3s=Att3.
+mpred_get_attrs('avar'(_,Att3s),Att3):-!,Att3s=Att3.
+
+mpred_put_attr(V,A,Value):- is_ftNonvar(V),!,trace_or_throw(mpred_put_attr(V,A,Value)).
+mpred_put_attr(V,A,Value):- var(V),!,put_attr(V,A,Value),!.
+mpred_put_attr(VAR,A,Value):- VAR='$VAR'(Name), atom(Name),!,setarg(1,VAR, att(vn, Name, att(A,Value, []))).
+mpred_put_attr(VAR,A,Value):- VAR='$VAR'(Att3),setarg(1,VAR, att(A,Value,Att3)).
+mpred_put_attr(VAR,A,Value):- VAR='avar'(Att3),setarg(1,VAR, att(A,Value,Att3)).
+mpred_put_attr(VAR,A,Value):- VAR='avar'(_,Att3),setarg(2,VAR, att(A,Value,Att3)).
+
 
 ensure_named(Vs,V,N):- atom(N),member(N=VV,Vs),VV==V,put_attr(V,vn,N).
 ensure_named(Vs,V,N):- atom(N),member(N=VV,Vs),put_attr(V,vn,N),!,maybe_must(VV= V).
@@ -139,13 +174,14 @@ verbatum_term('varname_info'(_,_,_,_)).
 
 
 
-
 %% system_expanded_attvars( :TermT, :TermARG2) is semidet.
 %
 % System Goal Expansion Sd.
 %
 system_expanded_attvars(I,O):- (var(I);compound(I)),!,loop_check(deserialize_attvars(I,O)),O\=@=I,!.
 
+
+:- retract(restore_attvar_reader(Was)),set_prolog_flag(read_attvars,Was).
 
 end_of_file.
 
@@ -197,3 +233,5 @@ end_of_file.
    '$set_predicate_attribute'('$expand_term'(_,_,_,_), hide_childs, false).
    
 */
+
+

@@ -10,7 +10,7 @@
 % ===================================================================
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_varnames.pl
-:- module(vn,
+:- module(logicmoo_util_varnames,
           [ ain00/1,
             contains_ftVar/1,
             count_members_eq/3,
@@ -34,8 +34,6 @@
             atom_subst_frak_0/4,
             arg_varname/3,
             variable_name_or_ref/2,
-            attr_portray_hook/2,
-            attr_unify_hook/2,
             renumbervars/3,
             b_implode_varnames/1,
             b_implode_varnames0/1,
@@ -128,8 +126,6 @@
             set_varname/2,
             set_varname/3,
             atom_subst_frak_0/4,
-            attr_portray_hook/2,
-            attr_unify_hook/2,
             b_implode_varnames/1,
             b_implode_varnames0/1,
             bad_varnamez/1,
@@ -285,7 +281,7 @@ combine_names(Name1,Name2,Name):-
 %
 % Attr Portray Hook.
 %
-attr_portray_hook(Name, _) :- write('???'), write(Name),!.
+vn:attr_portray_hook(Name, _) :- write('???'), write(Name),!.
 
 
 /*
@@ -767,6 +763,9 @@ try_get_body_vars(_).
 %
 % Set Varname.
 %
+:- meta_predicate set_varname(:,*,*).
+:- meta_predicate set_varname(:,*).
+
 set_varname(How,B):-var(B),writeq(set_varname(How,B)),nl,trace,trace_or_throw(var_assign_varname_vars(How,B)).
 set_varname(How,N=V):-must(set_varname(How,N,V)),!.
 
@@ -787,9 +786,9 @@ set_varname(How,N,V):- number(N),!,format(atom(VN),'~w',[N]),set_varname(How,VN,
 set_varname(How,N,V):- atom(N),atom_concat('"?',LS,N),atom_concat(NN,'"',LS),fix_varcase_name(NN,VN),!,set_varname(How,VN,V).
 set_varname(write_functor,N,V):- !,ignore('$VAR'(N)=V),!.
 set_varname(write_attribute,N,V):-!,put_attr(V,vn,N).
-set_varname(Nb_setval,N,V):-nb_current('$variable_names',Vs),!,register_var(N=V,Vs,NewVs),call(Nb_setval,'$variable_names',NewVs).
-set_varname(Nb_setval,N,V):-call(Nb_setval,'$variable_names',[N=V]).
-set_varname(Nb_setval,N,V):- must(call(Nb_setval,N,V)).
+set_varname(Nb_setval,N,V):-nb_current('$variable_names',Vs),!,register_var(N=V,Vs,NewVs),call(call,Nb_setval,'$variable_names',NewVs).
+set_varname(Nb_setval,N,V):-call(call,Nb_setval,'$variable_names',[N=V]).
+set_varname(Nb_setval,N,V):- must(call(call,Nb_setval,N,V)).
 set_varname(_How,_,_).
 
 
@@ -945,7 +944,9 @@ copy_term_and_varnames(Term,Named):-
 % Renumbervars.
 %
 renumbervars(How,Term,Named):- 
-   notrace((ignore((source_variables_lv(AllS))), copy_term(Term+AllS,Named+CAllS),maplist(set_varname(How),CAllS))).
+   notrace((ignore((source_variables_lv(AllS))), 
+   copy_term(Term+AllS,Named+CAllS),
+   maplist(set_varname(How),CAllS))).
 
 
 

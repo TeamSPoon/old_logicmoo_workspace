@@ -277,6 +277,12 @@
         showProfilerStatistics(0),
         show_and_do(0),        
         dcall0(0),
+        bugger_t_expansion(:,0,*),
+        bugger_goal_expansion(:,0,*),
+       prolog_must_l(0),
+       test_tl(0,*,*),
+       bugger_term_expansion(:,0,*),
+
 
    show_call(+,0),
    show_entry(+,0),
@@ -291,6 +297,7 @@
         test_tl(+),
         test_tl(1, +),
         test_tl(+, +, +),
+        test_tl(0, +, +),
         on_f_throw(0),
         time_call(0),
         traceIf(0),
@@ -734,7 +741,8 @@ static_predicate(FA):-once(predicate_property(FA,_)),not(predicate_property(FA,d
 %
 % Wdmsg.
 %
-wdmsg(X):- notrace(ignore(hotrace(with_all_dmsg(dmsg(X))))).
+wdmsg(X):- show_source_location,
+   notrace(ignore(hotrace(with_all_dmsg(dmsg(X))))).
 
 %= 	 	 
 
@@ -969,8 +977,6 @@ thread_local_leaks:-!.
 % (debug) Trace Msg.
 %
 dtrace_msg(E):- dumpST,wdmsg(E),dtrace(wdmsg(E)),!.
-dtrace_msg(E):- trace,E.
-
 
 %= 	 	 
 

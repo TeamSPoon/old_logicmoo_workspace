@@ -301,11 +301,12 @@ nnf0(KB,Fml,NNF):-
 %
 
 % is_skolem_setting_default(push_skolem).
-is_skolem_setting_default(in_nnf).
+is_skolem_setting_default(in_nnf_implies).
 is_skolem_setting(S):- t_l:skolem_setting(SS)->S=SS;is_skolem_setting_default(S).
 %t_l:skolem_setting(push_skolem).
 %t_l:skolem_setting(attvar).
 %t_l:skolem_setting(in_nnf).
+%t_l:skolem_setting(in_nnf_implies).
 %t_l:skolem_setting(combine(=>)).
 %t_l:skolem_setting(shared).
 %t_l:skolem_setting(label).
@@ -677,7 +678,7 @@ nnf_args(Sent,F,N,KB,[A|RGS],FreeV,[FA|ARGS],N3):-
  push_dom(A,argIsaFn(F,N)),
  must((nnf(KB,A,FreeV,FA,N1),number(N1))),
  push_dom(FA,argIsaFn(F,N)),
- annote(lit,FA,Sent),
+ % annote(lit,FA,Sent),
   NPlus1 is N + 1,
   nnf_args(Sent,F,NPlus1,KB,RGS,FreeV,ARGS,N2),
   must(N3 is (N1 + N2 -1)).
@@ -1658,7 +1659,7 @@ skolem_f(KB, F, X, FreeVIn, SkF):-
         gensym(SKU,SKN),
         concat_atom(['sk',SKN,'Fn'],Fun),
 	SkF =..[Fun|FreeVSet])),
-        put_attr(X,sk,SkF).
+        mpred_put_attr(X,sk,SkF).
 
 
 %= 	 	 

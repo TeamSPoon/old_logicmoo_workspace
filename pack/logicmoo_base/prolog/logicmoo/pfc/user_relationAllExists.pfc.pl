@@ -19,7 +19,6 @@ predInterArgIsa(mudSubPart(tBodyPart,tBodyPart)).
 
 relationAllOnly(mudSubPart,tHumanBody,tBodyPart).
 
-:- mpred_trace_exec.
 tSet(tHumanBody).
 
 ((relationAllOnly(Pred,Col1,Col2)/(G=..[Pred,VAL,Value])) ==> 
@@ -50,12 +49,13 @@ ptTransitiveBinaryPredicate(genls).
    OUT= (((genls(A,B),genls(B,C)) /(ground(v(A,B,C)),A\==C,B\==C,A\==B))==> genls(A,C)))).
 */
 
-:- sanity(is_entailed(((t(genls,A,B),t(genls,B,C)) ==> t(genls,A,C)))).
+:- sanity(is_entailed(
+  (((t(genls,A,B),t(genls,B,C))/( ground(v(A,B,C)),A\==C,B\==C,A\==B) ) ==> t(genls,A,C)))).
 
 
 ((t(isa,A,B),t(genls,B,C)) ==> t(isa,A,C)).
-ptTransitiveBinaryPredicate(mudSubPart).
 
+ptTransitiveBinaryPredicate(mudSubPart).
 
 
 ((transitiveViaArg(PRED,BPRED,2),arity(PRED,2)) /ground(PRED:BPRED)) ==> clif((t(PRED,A,B) , t(BPRED,B,C)) => t(PRED,A,C)).
@@ -181,17 +181,29 @@ isa(iExplorer1,tHominid).
 tCol(tHumanBody).
 genls(tHumanBody,tBodyPart).
 
+
 :- mpred_trace_exec.
 :- mpred_trace.
 :- mpred_warn.
 
 :- cls.
 
-:-dmsg("-------------------------------------SDFDFSDFSDFSDFSDFSDDDDDDDDDDDDDDDDDDDD")
+:- noguitracer.
+
+:- printAll(tHominid(_)).
+:- printAll(tHumanBody(_)).
+
+:-dmsg("-------------------------------------SDFDFSDFSDFSDFSDFSDDDDDDDDDDDDDDDDDDDD").
+
 
 relationAllExists(mudSubPart,tHominid,tHumanBody).
 
-:- break,read(_),read(_),dmsg("SDFDFSDFSDFSDFSDFSDDDDDDDDDDDDDDDDDDDD-------------------------------------")
+:- break,read(_),read(_).
+
+:- break,read(_),read(_),dmsg("SDFDFSDFSDFSDFSDFSDDDDDDDDDDDDDDDDDDDD-------------------------------------").
+
+
+
 
 relationAllExists(mudSubPart,tHumanBody,isEach(tHumanHead,tHumanNeck,tHumanUpperTorso,tHumanLowerTorso,tHumanPelvis,tHumanArms,tHumanLegs)).
 relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
@@ -212,6 +224,12 @@ have to confirm how *most* works
      (=> 
        (isa ?THING ?COL1)        
        (relationExistsMost ?BINPRED ?COL1 ?COL2)))'.
+
+
+(relationInstanceMost ?BINPRED ?THING ?COL2) <==> 
+   (most :ARG3 
+   (SubcollectionOfWithRelationFromFn :ARG3 :ARG1 :ARG2))
+
 */
 
 

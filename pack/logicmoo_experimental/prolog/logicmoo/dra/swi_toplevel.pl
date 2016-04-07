@@ -212,6 +212,7 @@ user:dra_execute_goal22(Goal, Bindings) :-
    	'$toplevel':restore_debug,
 	user:residue_vars(Goal, Vars),
 	deterministic(Det),
+        true,
 	(   '$toplevel':save_debug
 	;   '$toplevel':restore_debug, fail
 	),

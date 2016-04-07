@@ -361,7 +361,7 @@ no_repeats_findall5(Vs,Call,ExitDET,USE,NEW):-
        USE=true;
        ((USE=false,CONS=NEW))
        )),
-   deterministic(ExitDET)))
+   deterministic(ExitDET),true))
     *-> true;
      (NEW=[],ExitDET=true,USE=false)).
 

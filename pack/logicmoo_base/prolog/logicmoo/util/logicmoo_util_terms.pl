@@ -120,7 +120,7 @@ wsubst/4
         in_thread_and_join(0, +),
         list_retain(?, 1, ?),
         load_dirrective(0, ?),
-        maptree(2, +, -),
+        maptree(2, +, ?),
         nd_predsubst(?, 2, ?),
         nd_predsubst1(2, ?, ?, ?),
         nd_predsubst2(2, ?, ?),
@@ -248,8 +248,9 @@ is_proof(P):-compound(P),functor(P,ftProofFn,_).
 maptree(Pred,I,O):- call(Pred,I,O),!.
 maptree(_ ,I,O):- ( \+ compound(I) ),!, must(I=O).
 maptree(Pred,[F|IL],LIST):- is_list([F|IL]), (maplist(maptree(Pred),[F|IL],LIST)),!.
-maptree(Pred,I,O):- I=..[F|IL], (maplist(maptree(Pred),[F|IL],[FO|OL])),
-   (atom(FO)-> O=..[FO|OL] ; must((nop(maptree(I)),O=..[F,FO|OL]))).
+maptree(Pred,I,O):- I=..[F|IL], 
+ (maplist(maptree(Pred),[F|IL],[FO|OL])),
+   (atom(FO)-> O=..[FO|OL] ; must((nop(maptree(Pred,I,O)),O=..[F,FO|OL]))).
 
 :- export(disjuncts_to_list/2).
 

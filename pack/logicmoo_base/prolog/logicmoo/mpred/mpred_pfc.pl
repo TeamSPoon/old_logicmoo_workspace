@@ -407,7 +407,7 @@ mpred_aina(G,S):-mpred_ain(G,S).
 %  mpred_ain/2 and mpred_post/2 are the proper ways to add new clauses into the
 %  database and have forward reasoning done.
 %
-mpred_ain(P):- must((with_umt((get_source_ref(UU),mpred_ain(P,UU))))),!.
+mpred_ain(P):- must((with_umt((get_source_ref(UU),mpred_ain(P,UU))))).
 
 %%  ain(P,S) 
 %
@@ -417,10 +417,10 @@ ain(P,S):- mpred_ain(P,S).
 
 
 mpred_ain(P,S):- 
- with_umt((
+ must(with_umt((
   if_defined_else(to_addable_form_wte(assert,P,P0),P0=P)  -> 
   each_E(mpred_post1,P0,[S]),
-  mpred_run)).
+  mpred_run))),!.
 %mpred_ain(_,_).
 mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]).
 
@@ -433,7 +433,7 @@ ain_fast(P,S):-
 
 remove_negative_version(P):-
   % TODO extract_predciates(P,Preds),trust(Preds),
-  get_source_ref_stack(S),
+  get_source_ref_stack(S),!,
   with_no_mpred_trace_exec(must(mpred_ain(\+ (~(P)), S))).
 
 %% mpred_post(+Ps,+S) 
@@ -600,11 +600,9 @@ mpred_post_update4(Was,P,S,What):-!,trace_or_throw(mpred_post_update4(Was,P,S,Wh
 
 
 assert_u_confirmed_was_missing(P):-
- must((
-  copy_term(P,PP),
-  assert_u(PP),
-  P=@=PP,
-  clause_asserted_u(P))).
+ copy_term(P,PP),copy_term(P,PPP),
+ must((assert_u(PP),P=@=PP)),
+ must((clause_asserted_u(PPP),P=@=PPP)).
 
 
 assert_u_confirmed_if_missing(P):- copy_term(P,PP),
@@ -2033,8 +2031,8 @@ mpred_trace_op(Add,P):- get_source_ref_stack(Why), !, mpred_trace_op(Add,P,Why).
 
 
 mpred_trace_op(Add,P,S):-  
-   mpred_trace_maybe_print(Add,P,S),
-   mpred_trace_maybe_break(Add,P,S).
+   hotrace((mpred_trace_maybe_print(Add,P,S),
+      mpred_trace_maybe_break(Add,P,S))).
    
 
 mpred_trace_maybe_print(Add,P,S):-
@@ -2127,7 +2125,6 @@ mpred_warn(Format,Args):- cnotrace((format_to_message(Format,Args,Info),mpred_wa
 
 mpred_error(Info):- \+ \+  cnotrace(tracing -> wdmsg(error(pfc,Info)) ; mpred_warn(error(Info))).
 mpred_error(Format,Args):- \+ \+  cnotrace((format_to_message(Format,Args,Info),mpred_error(Info))).
-
 
 mpred_watch:- assert_u(mpred_is_tracing_exec).
 mpred_trace_exec:- assert_u(mpred_is_tracing_exec).

@@ -135,7 +135,6 @@
         string_predicate/1,
         to_string_hook/3.
 :- meta_predicate 
-        convert_members(2, ?, ?),
         map_tree_to_list(2, ?, ?),
         toCase(2, ?, ?),
         toCaseSplit(?, 2, ?, ?).
@@ -1530,7 +1529,7 @@ convert_members(ico(In,Call,Out), In,Out):-  Call=..[P|MID],CallOut=..[P,In|MID]
 convert_members(cio(In,Call,Out), In,Out):-  call(Call,In,Out).
 convert_members(ic(InOut,Call), InOut,InOut):-  call(Call).
 convert_members(call(Call), InOut,InOut):-  call(Call).
-convert_members(Call, In,Out):- call(Call,In,Out).
+convert_members(Call, In,Out):- call(call,Call,In,Out).
 
 
 %= 	 	 

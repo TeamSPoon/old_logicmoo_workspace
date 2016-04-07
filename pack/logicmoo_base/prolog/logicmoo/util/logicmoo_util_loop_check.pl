@@ -79,6 +79,10 @@
 :- meta_predicate loop_check(0).
 :- meta_predicate loop_check(0,0).
 
+:- meta_predicate call_tabled1(*,?,0,-).
+:- meta_predicate call_tabled0(*,?,0,-).
+
+
 :- export(go_as_last/2).
 :- thread_local lmcache:going_last/1.
 % go_as_last(Call1,Call2):- \+ lmcache:going_last(Call1),w_tl(lmcache:going_last(Call1), (Call1->true;(must(catch(Call2,_,fail))))),!.

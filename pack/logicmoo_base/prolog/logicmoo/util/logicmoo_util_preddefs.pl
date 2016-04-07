@@ -630,6 +630,8 @@ get_pi(Mask,PI):-get_functor(Mask,F,A),functor(PI,F,A),!.
 
 
 :- meta_predicate get_module_of_4(0,+,+,-).
+:- meta_predicate with_pi_selected(+,+,*,0).
+:- meta_predicate dynamic_safe(0).
 
 %= 	 	 
 

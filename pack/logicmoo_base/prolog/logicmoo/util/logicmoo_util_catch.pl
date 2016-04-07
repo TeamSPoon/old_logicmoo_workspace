@@ -698,8 +698,8 @@ source_variables([]).
 % Show Source Location.
 %
 show_source_location:- source_location(F,L),!,show_new_src_location(F:L),!.
-show_source_location:- current_source_file(FL),!,show_new_src_location(FL),!.
-show_source_location.
+show_source_location:- current_source_file(FL),sanity(nonvar(FL)),!,show_new_src_location(FL),!.
+show_source_location:- dumpST,trace.
 
 
 % % :- use_module(logicmoo_util_database).
@@ -750,6 +750,9 @@ is_ftCompound(Goal):-compound(Goal),Goal\='$VAR'(_).
 %
 is_ftVar(V):-var(V),!.
 is_ftVar('$VAR'(_)).
+is_ftVar('$VAR'(_,_)).
+is_ftVar('avar'(_)).
+is_ftVar('avar'(_,_)).
 
 :- export(is_ftNonvar/1).
 
@@ -1145,7 +1148,6 @@ for obvious reasons.
 :- meta_predicate with_preds(?,?,?,?,?,0).
 
 
-:- export(nop/1).
 
 %= 	 	 
 
@@ -1153,7 +1155,11 @@ for obvious reasons.
 %
 % Nop.
 %
+:- if( \+ current_predicate(system:nop/1)).
+:- export(nop/1).
 nop(_).
+:- endif.
+
 %set_prolog_flag(N,V):-!,nop(set_prolog_flag(N,V)).
 
 
@@ -1187,7 +1193,7 @@ nop(_).
 %  Trace or throw.
 %
 trace_or_throw(E):- non_user_console,notrace((thread_self(Self),wdmsg(thread_trace_or_throw(Self+E)),!,throw(abort),thread_exit(trace_or_throw(E)))).
-trace_or_throw(E):- wdmsg(E),dtrace_msg(throw:-E).
+trace_or_throw(E):- wdmsg(E),trace,throw(E).
 
  %:-interactor.
 
@@ -1378,7 +1384,7 @@ det_lm(M,Goal):-M:Goal,!.
 %
 must_l(Goal):-var(Goal),trace_or_throw(var_must_l(Goal)),!.
 must_l((A,!,B)):-!,must(A),!,must_l(B).
-must_l((A,B)):-!,must((A,(deterministic(true)->(!,must_l(B));B))).
+must_l((A,B)):-!,must((A,deterministic(Det),true,(Det==true->(!,must_l(B));B))).
 must_l(Goal):- must(Goal).
 
 

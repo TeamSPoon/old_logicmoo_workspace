@@ -31,7 +31,12 @@
 
 :-  meta_predicate dumptrace_ret(?),
   neg1_numbervars(?, ?, 0),
-  with_source_module(0).
+  with_source_module(0),
+  dumptrace_ret(0),
+  dumptrace0(0),
+  dumptrace(0),
+  dtrace(*,0).
+
 
 
 
@@ -470,7 +475,7 @@ dtrace(G):- nop(current_predicate(_:logicmoo_bugger_loaded/0)),!,dumptrace(G).
 dtrace(G):- G. 
 
 
-:-meta_predicate(dtrace(+,?)).
+% :-meta_predicate(dtrace(+,?)).
 
 %= 	 	 
 
@@ -502,7 +507,7 @@ with_source_module(G):-
 % =====================
 % dumptrace/1/2
 % =====================
-:-meta_predicate(dumptrace(?)).
+% :-meta_predicate(dumptrace(?)).
 
 %= 	 	 
 
