@@ -752,7 +752,9 @@ call_last_is_var(MCall):- strip_module(MCall,M,Call),
 %
 % Defunctionalize.
 %
-defunctionalize(Wff,WffO):- w_tl(t_l:dont_use_mudEquals,defunctionalize(',',Wff,WffO)).
+defunctionalize(Wff,WffO):- 
+  w_tl(t_l:dont_use_mudEquals,
+      defunctionalize(',',Wff,WffO)).
 
 
 

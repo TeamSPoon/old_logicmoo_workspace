@@ -249,8 +249,9 @@ Writing in Prolog is actually really easy for a MUD is when X is chosen
 alt_calls(call).
 alt_calls(call_u).
 alt_calls(is_asserted).
+alt_calls(clause_u).
 alt_calls(t).
-alt_calls(call_u).
+alt_calls(is_entailed).
 alt_calls(call_u).
 alt_calls(ireq).
 

@@ -176,8 +176,6 @@ isa(iExplorer1,tHominid).
 %isa(iHumanBody1,tHumanBody).
 
 
-:- endif.
-
 tCol(tHumanBody).
 genls(tHumanBody,tBodyPart).
 
@@ -209,6 +207,8 @@ relationAllExists(mudSubPart,tHumanBody,isEach(tHumanHead,tHumanNeck,tHumanUpper
 relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
 
 
+:- endif.
+
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 
@@ -237,14 +237,14 @@ isa(skRelationAllExistsFn(P,A,C),C):- nonvar(P),nonvar(A),nonvar(C).
 
 :- if(lmconf:startup_option(datalog,sanity);lmconf:startup_option(clif,sanity)).
 
-?- listing(mudSubPart).
+:- listing(mudSubPart).
 %:-rtrace((isa(Inst,tHumanNeck),mudSubPart(iExplorer1,Inst))).
 %:-rtrace((mudSubPart(iExplorer1,Inst),isa(Inst,tHumanNeck))).
 %:- must((isa(Inst,tHumanHair),mudSubPart(iExplorer1,Inst))).
 %:- must((mudSubPart(iExplorer1,Inst),isa(Inst,tHumanNeck))).
 %:- must((mudSubPart(iExplorer1,Inst),isa(Inst,tHumanHair))).
 
-?- listing(mudSubPart).
+:- listing(mudSubPart).
 
 
 :- endif.

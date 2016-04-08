@@ -430,7 +430,7 @@ is_same_clauses(Head,HBLISTN):-
 
 /*
 
-is_asserted  checks using   mpred_clause_is_asserted(C).
+is_asserted  checks using  TODO  mpred_clause_is_asserted(C).
 call(conjecture)
 call(once)  % TODO
 change(assert,a) asserts first if =@= is not first

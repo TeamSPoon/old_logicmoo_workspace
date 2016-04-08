@@ -52,6 +52,7 @@
             samef/2,
             to_functor/2,
             type_size/2,
+            extract_conditions/2,
 
             dom_lbl/1, dom_member/1,
 
@@ -76,7 +77,14 @@
 :- include('mpred_header.pi').
 
 
-
+%% extract_conditions( +PFCSentence, -Conds) is semidet.
+%
+% Datalog Preconditional Expansion.
+%
+extract_conditions(Sentence,Conds):- 
+ term_attvars(Sentence,AVars),
+ maplist(gather_goals,AVars,Goals),
+ list_to_conjuncts(Goals,Conds),!.
 
 
 

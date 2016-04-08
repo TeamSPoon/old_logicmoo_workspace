@@ -60,6 +60,7 @@
 % :-  dynamic((disjointWith/2,genls/2,isa/2,argIsa/3)).
 % :- baseKB:discontiguous((disjointWith/2,genls/2,isa/2,argIsa/3,typeGenls/2)).
 
+:- autoload.
 
 
 :- kb_dynamic(tCol/1).

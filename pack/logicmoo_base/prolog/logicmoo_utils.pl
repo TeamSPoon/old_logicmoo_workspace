@@ -186,9 +186,9 @@ lmconf:logicmoo_scan_autoloads:-false.
  lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_with_assertions).
  lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_loop_check).
  lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_dmsg).
- lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_bugger).
  lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_ctx_frame).
  lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_filestreams).
+ lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_bugger).
  lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_filesystem).
  lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_multivar).
  lmconf:mpred_is_impl_file(logicmoo/util/logicmoo_util_no_repeats).
@@ -211,6 +211,7 @@ lmconf:logicmoo_scan_autoloads:-false.
 
 % ?- list_undefined.
 
+:- autoload.
 
 /*
 :- 'mpred_trace_none'(tlbugger:dont_skip_bugger/0).

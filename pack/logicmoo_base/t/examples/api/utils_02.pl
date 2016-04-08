@@ -1,6 +1,6 @@
 
 % TODO
-:- guitracer.
+% :- guitracer.
 
 
 :- use_module(library(logicmoo_user)).

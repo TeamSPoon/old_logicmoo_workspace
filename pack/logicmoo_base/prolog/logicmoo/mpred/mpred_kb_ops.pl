@@ -14,24 +14,25 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_kb_ops.pl
 :- module(mpred_kb_ops,
           [ deducedSimply/1,
-            how_to_op/2,
-            is_callable/1,
-            lookup_inverted_op/3,
-            mpred_op/2,
-            naf/1,
-            oncely/1,
-            reduce_mpred_op/2,
-            second_order/2,
-            whenAnd/2,
 
-          to_addable_form_wte/3,
-          to_predicate_isas_each/2,
-          to_addable_form/2,
-          attvar_op/2,
-          no_side_effects/1,
-          mpred_non_neg_literal/1,
-          to_predicate_isas0/2,
-          % get_user_abox/1,
+how_to_op/2,
+is_callable/1,
+lookup_inverted_op/3,
+mpred_op/2,
+naf/1,
+oncely/1,
+reduce_mpred_op/2,
+second_order/2,
+whenAnd/2,
+
+to_addable_form_wte/3,
+to_predicate_isas_each/2,
+to_addable_form/2,
+attvar_op/2,
+no_side_effects/1,
+mpred_non_neg_literal/1,
+to_predicate_isas0/2,
+% get_user_abox/1,
 retract_mu/1,
 assert_mu/4,
 asserta_mu/1,
@@ -153,6 +154,7 @@ get_why/4,
 mpred_pbody/5,
 mpred_clause/3,
 mpred_provide_storage_clauses/4,
+mpred_clause_is_asserted/1,
 mpred_clause_is_asserted/2,
 mpred_clause_is_asserted_hb_nonunify/2,
 pfc_provide_storage_op/2,
@@ -233,6 +235,7 @@ mpred_provide_storage_clauses/4,
 mpred_nochaining/1,
 mpred_negation_w_neg/2,          
 mpred_negation_w_neg/2,
+mpred_clause_is_asserted/1,
 mpred_clause_is_asserted/2,
 fix_negations/2,
 map_first_arg/2,
@@ -1008,6 +1011,9 @@ mpred_clause_is_asserted_hb_nonunify(H,B):- mpred_clause_is_asserted(H,B).
 %
 % PFC Clause If Is A Asserted.
 %
+
+mpred_clause_is_asserted(HB):- expand_to_hb(HB,H,B), mpred_clause_is_asserted(H,B).
+
 mpred_clause_is_asserted(H,B):- is_ftVar(H),is_ftNonvar(B),!,fail.
 mpred_clause_is_asserted(H,B):- modulize_head(H,HH), (has_cl(HH) -> clause_u(HH,B) ; mpred_clause_is_asserted_hb_nonunify(H,B)).
 %mpred_clause_is_asserted(H,B,Ref):- clause_u(H,B,Ref).

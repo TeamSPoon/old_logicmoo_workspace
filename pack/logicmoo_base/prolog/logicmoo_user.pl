@@ -9,6 +9,7 @@
 :- module(logicmoo_user_base,
  [
  fix_ops_for/1,
+ user_module_uses/2,
  op(1199,fx,('==>')), 
  op(1190,xfx,('::::')),
  op(1180,xfx,('==>')),
@@ -24,9 +25,6 @@
  op(300,fx,'-')]).
 
 :- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
-
-:- meta_predicate logicmoo_user: ~0.
-
 :- multifile(logicmoo_user_base:user_module_uses/2).
 :- dynamic(logicmoo_user_base:user_module_uses/2).
 
@@ -52,8 +50,6 @@ fix_ops_for(CM):-
 
 :- fix_ops_for(user).
 
-:- prolog_ide(debug_monitor).
-
 /*
 :- set_prolog_flag(report_error,true).
 :- set_prolog_flag(fileerrors,false).
@@ -76,8 +72,73 @@ fix_ops_for(CM):-
 :- logicmoo_user_base:user_module_uses(M,CM),!,fix_ops_for(M),fix_ops_for(CM),dmsg(user_module_uses(M,CM)).
 :- system:((logicmoo_user_base:user_module_uses(M,CM)->(('$module'(_,M),'$set_source_module'(_,CM)));true)).
 
+:- autoload.
+
 :- logicmoo_snark:load_snark.
 
 :- sanity( \+predicate_property(baseKB:_,exported)).
 
+end_of_file.
+
+% Found new meta-predicates in iteration 1 (14.395 sec)
+% :- meta_predicate mpred_pfc:foreachl_do(0,*).
+% :- meta_predicate mpred_pfc:pfcl_do(0).
+% :- meta_predicate mpred_props:decl_mpred(0).
+% :- meta_predicate mpred_props:decl_mpred_prolog(0).
+% :- meta_predicate mpred_props:decl_mpred_hybrid(0).
+% :- meta_predicate mpred_props:decl_mpred_pi(0).
+% :- meta_predicate mpred_props:decl_mpred(?,0).
+% :- meta_predicate mpred_props:decl_mpred_prolog(?,0).
+% :- meta_predicate mpred_props:decl_mpred_hybrid(?,0).
+% :- meta_predicate mpred_kb_ops:'__aux_maplist/2_cnstrn0+1'(*,0).
+% :- meta_predicate mpred_kb_ops:neg_in_code(0).
+% :- meta_predicate baseKB:t(2,?,?).
+% :- meta_predicate baseKB:resolverConflict_robot(0).
+% :- meta_predicate baseKB:t(4,?,?,?,?).
+% :- meta_predicate baseKB:t(3,?,?,?).
+% :- meta_predicate mpred_type_constraints:'__aux_maplist/3_map_subterms+1'(*,*,2).
+% :- meta_predicate mpred_type_constraints:boxlog_goal_expansion(*,0).
+% :- meta_predicate mpred_type_constraints:thaw(0).
+% :- meta_predicate logicmoo_util_strings:'__aux_maplist/3_toCase+1'(*,*,2).
+% :- meta_predicate logicmoo_util_strings:'__aux_maplist/3_toCaseSplit+2'(*,*,?,2).
+% :- meta_predicate mpred_stubs:call_wdmsg(*,*,?,0).
+% :- meta_predicate mpred_stubs:ensure_universal_stub_2(*,:,?,0,*).
+% :- meta_predicate mpred_stubs:call_for_literal_db(?,0,:).
+% :- meta_predicate mpred_stubs:call_for_literal(?,0,:).
+% :- meta_predicate mpred_loader:with_umt_l(0).
+% :- meta_predicate mpred_type_isa:assert_isa_hooked(0,0).
+% :- meta_predicate logicmoo_util_terms:'__aux_maplist/3_maptree+1'(*,*,2).
+% Restarting analysis ...
+% Found new meta-predicates in iteration 2 (8.853 sec)
+% :- meta_predicate mpred_props:decl_mpred(*,?,0).
+% :- meta_predicate mpred_props:decl_mpred_hybrid_ilc_0(*,*,0,*).
+% :- meta_predicate mpred_props:add_mpred_prop_gleaned_4(?,*,*,0).
+% :- meta_predicate mpred_props:decl_mpred_0(*,0).
+% :- meta_predicate logicmoo_user:t(2,?,?).
+% :- meta_predicate logicmoo_user:resolverConflict_robot(0).
+% :- meta_predicate logicmoo_user:t(4,?,?,?,?).
+% :- meta_predicate logicmoo_user:t(3,?,?,?).
+% :- meta_predicate mpred_stubs:ensure_universal_stub_1(*,:,?,0).
+% :- meta_predicate mpred_stubs:ensure_universal_stub_plus_HIDE(?,0).
+% :- meta_predicate mpred_type_isa:assert_isa_hooked_after(?,0).
+% Restarting analysis ...
+% Found new meta-predicates in iteration 3 (8.775 sec)
+% :- meta_predicate mpred_props:add_mpred_prop_gleaned(?,0).
+% Restarting analysis ...
+Warning: The predicates below are not defined. If these are defined
+Warning: at runtime using assert/1, use :- dynamic Name/Arity.
+Warning:
+Warning: common_logic_snark:neq/2, which is referenced by
+Warning:        /root/lib/swipl/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_snark.pl:462:21: 1-st clause of common_logic_snark:not_mudEquals/2
+Warning: mpred_kb_ops:mpred_CALL/2, which is referenced by
+Warning:        /root/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_kb_ops.pl:689:2: 1-st clause of mpred_kb_ops:call_s/1
+Warning: mpred_pfc:mpred_clause_is_asserted/1, which is referenced by
+Warning:        /root/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl:267:14: 1-st clause of mpred_pfc:clause_u/1v
+% Checking trivial failures ...
+% Checking redefined system and global predicates ...
+% version/1                    Redefined system predicate
+% copy_file/2                  Redefined global predicate
+% Checking predicates with declarations but without clauses ...
+% Checking predicates that need autoloading ...
+true.
 

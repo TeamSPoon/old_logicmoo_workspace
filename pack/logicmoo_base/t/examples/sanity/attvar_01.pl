@@ -4,6 +4,7 @@
 
 :- use_module(library(logicmoo_utils)).
 
+
 :-export(demo_nb_linkval/1).
 demo_nb_linkval(T) :-
         T = nice(N),

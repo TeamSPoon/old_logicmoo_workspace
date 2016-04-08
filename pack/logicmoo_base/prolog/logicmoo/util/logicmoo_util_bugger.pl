@@ -446,6 +446,34 @@
       op(1150,fx,thread_local).
 
 
+
+%= 	 	 
+
+%% bugger_flag( :TermF) is semidet.
+%
+% Logic Moo Debugger Flag.
+%
+bugger_flag(F=V):-bugger_flag(F,V).
+
+%= 	 	 
+
+%% bugger_flag( ?F, ?V) is semidet.
+%
+% Logic Moo Debugger Flag.
+%
+bugger_flag(F,V):-current_prolog_flag(F,V).
+
+%= 	 	 
+
+%% set_bugger_flag( ?F, ?V) is semidet.
+%
+% Set Logic Moo Debugger Flag.
+%
+set_bugger_flag(F,V):-current_prolog_flag(F,_Old),!,set_prolog_flag(F,V).
+set_bugger_flag(F,V):-create_prolog_flag(F,V,[keep(true),tCol(ftTerm)]),!.
+
+
+
 %= 	 	 
 
 %% writeSTDERR0( ?A) is semidet.
@@ -1018,26 +1046,6 @@ nodebugx(X):-
 
 
 
-%= 	 	 
-
-%% shrink_clause( ?P, ?Body, ?Prop) is semidet.
-%
-% Shrink Clause.
-%
-shrink_clause(P,Body,Prop):- (Body==true-> Prop=P ; (Prop= (P:-Body))).
-
-
-
-%= 	 	 
-
-%% shrink_clause( ?HB, ?HB) is semidet.
-%
-% Shrink Clause.
-%
-shrink_clause( (H:-true),H):-!.
-shrink_clause( HB,HB).
-
-
 % - 	list_difference_eq(+List, -Subtract, -Rest)
 %
 %	Delete all elements of Subtract from List and unify the result
@@ -1106,33 +1114,6 @@ meta_interp(CE,A):- show_call(why,call(CE,meta_call(A))).
 
 
 % was_module(Mod,Exports) :- nop(was_module(Mod,Exports)).
-
-
-%= 	 	 
-
-%% bugger_flag( :TermF) is semidet.
-%
-% Logic Moo Debugger Flag.
-%
-bugger_flag(F=V):-bugger_flag(F,V).
-
-%= 	 	 
-
-%% bugger_flag( ?F, ?V) is semidet.
-%
-% Logic Moo Debugger Flag.
-%
-bugger_flag(F,V):-current_prolog_flag(F,V).
-
-%= 	 	 
-
-%% set_bugger_flag( ?F, ?V) is semidet.
-%
-% Set Logic Moo Debugger Flag.
-%
-set_bugger_flag(F,V):-current_prolog_flag(F,_Old),!,set_prolog_flag(F,V).
-set_bugger_flag(F,V):-create_prolog_flag(F,V,[keep(true),tCol(ftTerm)]),!.
-
 
 
 
@@ -1233,6 +1214,26 @@ traceok(X):-  tlbugger:wastracing -> call_cleanup((trace,call(X)),notrace) ; cal
 % ==========================================================
 % can/will Tracer.
 % ==========================================================
+
+%= 	 	 
+
+%% shrink_clause( ?P, ?Body, ?Prop) is semidet.
+%
+% Shrink Clause.
+%
+shrink_clause(P,Body,Prop):- (Body ==true -> Prop=P ; (Prop= (P:-Body))).
+
+
+
+%= 	 	 
+
+%% shrink_clause( ?HB, ?HB) is semidet.
+%
+% Shrink Clause.
+%
+shrink_clause( (H:-true),H):-!.
+shrink_clause( HB,HB).
+
 
 :- thread_local(tlbugger:ifCanTrace/0).
 :- asserta((tlbugger:ifCanTrace:-!)).
@@ -3155,4 +3156,5 @@ logicmoo_bugger_loaded.
 
 %:- mpred_trace_childs(prolog_ecall_fa/5).
 %:- mpred_trace_childs(with_each/3).
+
 

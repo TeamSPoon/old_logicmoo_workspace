@@ -1,4 +1,5 @@
 
+/*
 :- use_module(library(pce)).
 :- use_module(library(gui_tracer)).
 :- use_module(library(pce_debug)).
@@ -9,6 +10,7 @@
 :- use_module(library(swi_ide)).
 :- emacs_toplevel.
 % :- guitracer,leash(-all),visible(-all),trace,member(_,[_]),!,notrace,leash(+all),visible(+all).
+*/
 
 :- use_module(library(logicmoo_user)).
 

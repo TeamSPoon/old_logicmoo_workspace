@@ -80,7 +80,7 @@ mreq_old(Call):-
            (is_callable(Call)-> findallCall(Call,call,CallL,CallLL) ; (CallL=[];CallLL=[])),
                  findallCall(Call,call_u,MCallL,MCallLL),
                  findallCall(Call,t,DCallL,DCallLL),
-                 findallCall(Call,is_asserted,ACallL,ACallLL),
+                 findallCall(Call,clause_u,ACallL,ACallLL),
                  findallCall(Call,call_u,RCallL,RCallLL),
                  findallCall(Call,ireq,ICallL,ICallLL))),
    flatten([CallL,MCallL,DCallL,ACallL,RCallL,ICallL],ALL),
@@ -89,7 +89,7 @@ mreq_old(Call):-
                  showDif(SET,call,CallL,WITHFUNCTOR),
                  showDif(SET,call_u,MCallL,WITHFUNCTOR),
                  showDif(SET,t,DCallL,WITHFUNCTOR),
-                 showDif(SET,is_asserted,ACallL,WITHFUNCTOR),
+                 showDif(SET,clause_u,ACallL,WITHFUNCTOR),
                  showDif(SET,call_u,RCallL,WITHFUNCTOR),
                  showDif(SET,ireq,ICallL,WITHFUNCTOR).
 

@@ -575,7 +575,6 @@ clause_asserted_i(MH,B,Ref):- modulize_head(MH,M:H), clause_asserted_i4(M,H,B,Re
 
 clause_asserted_i4(M,H,B,Ref):- ground(H:B),!,clause(M:H,B,Ref),clause(HH,BB,Ref),ground(HH:BB),!.
 clause_asserted_i4(M,H,B,Ref):-
-
  copy_term((H,B),(HC,BC),Attribs),
  copy_term((HC,BC),(HT,BT)),
  clause_asserted_i5(M,HC,BC,CAttribs,Ref),

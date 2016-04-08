@@ -1094,7 +1094,9 @@ cf(Why,KB,_Original,PNF, FlattenedO):-
   correct_boxlog(FlattenedM,KB,Why,FlattenedO),
   pfc_for_print_left(FlattenedO,PrintPFC),wdmsg(boxlog:-PrintPFC),
   boxlog_to_pfc(FlattenedO,PFCPreview),
-  pfc_for_print_right(PFCPreview,PrintPFCPreview),wdmsg(preview:-PrintPFCPreview))),!.
+  pfc_for_print_right(PFCPreview,PrintPFCPreview),wdmsg(preview:-PrintPFCPreview))),!,
+  extract_conditions(PFCPreview,Conds),
+  dmsg(conds= (Conds=>PFCPreview)).
 
 check_kif_varnames(KIF):-check_varnames(KIF),fail.
 check_kif_varnames(KIF):-ground(KIF),!.
@@ -1755,7 +1757,7 @@ mk_skolem_name(KB,Var,Fml,SIn,SOut):- Fml=..[F|_],!,mk_skolem_name(KB,Var,['ArgN
 %
 % Same Variable.
 %
-same_var(Var,Fml):- Var==Fml,!.
+same_var(Var,Fml):- Var=@=Fml,!.
 
 
 
