@@ -1512,34 +1512,34 @@ mpred_db_type(_,fact(_FT)):-
   !.
 
 mpred_assert_w_support(P,Support):- 
-  (mpred_clause_u(P) ; assert_u(P)),
+  (clause_asserted_u(P) ; assert_u(P)),
   !,
   mpred_add_support(P,Support).
 
 mpred_asserta_w_support(P,Support):-
-  (mpred_clause_u(P) ; asserta_u(P)),
+  (clause_asserted_u(P) ; asserta_u(P)),
   !,
   mpred_add_support(P,Support).
 
 mpred_assertz_w_support(P,Support):-
-  (mpred_clause_u(P) ; assertz_u(P)),
+  (clause_asserted_u(P) ; assertz_u(P)),
   !,
   mpred_add_support(P,Support).
 
 
 
-%% mpred_clause_u(+Head) is semidet.
+%% clause_asserted_u(+Head) is semidet.
 %
 % PFC Clause For Internal Interface.
 %
-mpred_clause_u((Head:- Body)):-
+clause_asserted_u((Head:- Body)):-
   !,
   copy_term((Head:-Body),(Head_copy:-Body_copy)),
   clause_u(Head,Body),
   variant(Head,Head_copy),
   variant(Body,Body_copy).
 
-mpred_clause_u(Head):-
+clause_asserted_u(Head):-
   % find a unit clause identical to Head by finding one which unifies,
   % and then checking to see if it is identical
   copy_term(Head,Head_copy),
@@ -2388,7 +2388,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- asserta_new(mpred_warnings(true)).
 
 
-:- module_transparent((mpred_clause_u)/1).
+:- module_transparent((clause_asserted_u)/1).
 :- module_transparent((mpred_remove1)/2).
 :- module_transparent((mpred_te)/2).
 :- module_transparent((mpred_te)/0).
