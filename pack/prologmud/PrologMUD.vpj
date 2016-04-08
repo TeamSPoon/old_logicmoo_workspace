@@ -3,8 +3,8 @@
 	Version="10.0"
 	VendorName="SlickEdit"
 	WorkingDir="."
-	BuildSystem="automakefile"
-	BuildMakeFile="Makefile.mk">
+	BuildSystem="vsbuild"
+	BuildMakeFile="">
 	<Config
 		Name="Release"
 		OutputFile=""
@@ -19,7 +19,7 @@
 				ClearProcessBuffer="1"
 				Verbose="1"
 				Beep="1">
-				<Exec CmdLine='make -f "Makefile.mk" CFG=%b'/>
+				<Exec CmdLine='"%(VSLICKBIN1)vsbuild" build "%w" "%r"'/>
 			</Target>
 		</Menu>
 		<PreBuildCommands StopOnError="1"/>
@@ -36,17 +36,10 @@
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
 		<Folder Name="../logicmoo_base">
-			<Folder Name="prolog">
-				<F
-					N="../logicmoo_base/prolog/*.*"
-					Recurse="1"
-					Refilter="0"
-					Excludes=".git/;*.*~;*~/"/>
-			</Folder>
 			<F
 				N="../logicmoo_base/*.*"
 				Recurse="1"
-				Excludes=".git/;*.*~;*~/;*.html"/>
+				Excludes=".git/;*.*~;*~/;*.html;*.unused;*.bak"/>
 		</Folder>
 		<Folder Name="../logicmoo_nlu">
 			<Folder Name="prolog">
@@ -95,8 +88,5 @@
 		<Folder Name="../../runtime">
 			<F N="../../runtime/README.md"/>
 		</Folder>
-		<F
-			N="Makefile.mk"
-			Type="Makefile"/>
 	</Files>
 </Project>

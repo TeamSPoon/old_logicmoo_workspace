@@ -42,7 +42,8 @@ form_sk(OtherValue, Skolem):- sk:attr_unify_hook(Skolem, OtherValue),!.
 
 % push_dom(_,_):- \+ is_skolem_setting(push_skolem),!.
 % push_dom(X,Form2):-annote(dom, X,Form2,_Merged).
-push_dom(X,Form2):- annote(cond,X,isa(X,Form2),_Merged).
+push_dom(X,Dom):- push_cond(X,isa(X,Dom)).
+
 
 annote(Dom,X,Form2):-annote(Dom,X,Form2,_).
 
@@ -60,6 +61,8 @@ annote(Dom,X,Form2,Form2):- mpred_put_attr(X,Dom,Form2).
 sk_form(Sk, Form) :- mpred_get_attr(Sk, sk, Form),!.
 sk_form(Var,Form):- var(Var),!,gensym(sk_other_,Form), trace, mpred_put_attr(Var, sk, Form).
 sk_form(sk(Value),Value):-!.
+
+push_cond(X,Form):- annote(cond,X,Form,_Merged).
 
 
 push_skolem(Onto,SK_ADD):-push_skolem(Onto,SK_ADD,_).

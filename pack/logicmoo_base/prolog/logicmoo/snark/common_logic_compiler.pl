@@ -675,9 +675,10 @@ nnf_lit(KB,Fml,FreeV,FmlO,N3):-
 nnf_args(_Sent,_F,_N,_KB,[],_FreeV,[],0):- !.
 
 nnf_args(Sent,F,N,KB,[A|RGS],FreeV,[FA|ARGS],N3):-  
- push_dom(A,argIsaFn(F,N)),
+ push_cond(FA,admittedArgument(FA,N,F)),
+ % push_dom(A,argIsaFn(F,N)),
  must((nnf(KB,A,FreeV,FA,N1),number(N1))),
- push_dom(FA,argIsaFn(F,N)),
+ % push_dom(FA,argIsaFn(F,N)),
  % annote(lit,FA,Sent),
   NPlus1 is N + 1,
   nnf_args(Sent,F,NPlus1,KB,RGS,FreeV,ARGS,N2),

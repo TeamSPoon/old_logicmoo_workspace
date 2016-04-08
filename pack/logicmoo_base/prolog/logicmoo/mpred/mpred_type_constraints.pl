@@ -82,11 +82,8 @@
 % Datalog Preconditional Expansion.
 %
 extract_conditions(Sentence,Conds):- 
- term_attvars(Sentence,AVars),
- maplist(gather_goals,AVars,Goals),
+ copy_term(Sentence,Sentence,Goals),
  list_to_conjuncts(Goals,Conds),!.
-
-
 
 %% boxlog_goal_expansion( ?G, ?GG) is semidet.
 %

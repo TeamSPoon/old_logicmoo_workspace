@@ -111,8 +111,8 @@ continue
 [401] [system] compound(true)
 [400] [baseKB] logicmoo_util_database:clause_asserted_i5(spft_mod,spft(pt(arity(prologPTTP,_G24608),rhs([hybrid_support(prologPTTP,_G24608)])),prologHybrid(prologPTTP),pt(prologHybrid(prologPTTP),pt(arity(prologPTTP,_G24608),rhs([hybrid_support(prologPTTP,_G24608)])))),true,_G24723,<clause>(0x2822400))
 [399] [baseKB] logicmoo_util_database:clause_asserted_i4(spft_mod,spft(pt(arity(prologPTTP,_G24124),rhs([hybrid_support(prologPTTP,_G24124)])),prologHybrid(prologPTTP),pt(prologHybrid(prologPTTP),pt(arity(prologPTTP,_G24124),rhs([hybrid_support(prologPTTP,_G24124)])))),true,<clause>(0x2822400))
-[398] [baseKB] logicmoo_util_database:clause_asserted_i(spft_mod:spft(pt(arity(prologPTTP,_G24124),rhs([hybrid_support(prologPTTP,_G24124)])),prologHybrid(prologPTTP),pt(prologHybrid(prologPTTP),pt(arity(prologPTTP,_G24124),rhs([hybrid_support(prologPTTP,_G24124)])))),true,<clause>(0x2822400))
-[397] [baseKB] logicmoo_util_database:clause_asserted_i(spft_mod:spft(pt(arity(prologPTTP,_G24124),rhs([hybrid_support(prologPTTP,_G24124)])),prologHybrid(prologPTTP),pt(prologHybrid(prologPTTP),pt(arity(prologPTTP,_G24124),rhs([hybrid_support(prologPTTP,_G24124)])))))
+[398] [baseKB] logicmoo_util_database:clause_asserted_i(spft(pt(arity(prologPTTP,_G24124),rhs([hybrid_support(prologPTTP,_G24124)])),prologHybrid(prologPTTP),pt(prologHybrid(prologPTTP),pt(arity(prologPTTP,_G24124),rhs([hybrid_support(prologPTTP,_G24124)])))),true,<clause>(0x2822400))
+[397] [baseKB] logicmoo_util_database:clause_asserted_i(spft(pt(arity(prologPTTP,_G24124),rhs([hybrid_support(prologPTTP,_G24124)])),prologHybrid(prologPTTP),pt(prologHybrid(prologPTTP),pt(arity(prologPTTP,_G24124),rhs([hybrid_support(prologPTTP,_G24124)])))))
 Action (h for help) ?
 continue
 ^CAction (h for help) ? goals

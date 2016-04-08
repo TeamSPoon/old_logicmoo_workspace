@@ -249,7 +249,7 @@ Writing in Prolog is actually really easy for a MUD is when X is chosen
 alt_calls(call).
 alt_calls(call_u).
 alt_calls(clause_u).
-alt_calls(clause_asserted_u).
+alt_calls(clause_asserted_i).
 alt_calls(t).
 alt_calls(is_entailed_u).
 alt_calls(call_u).
@@ -526,7 +526,7 @@ fully_expand_now(Op,Sent,SentO):-
 % Fully Expand Clause.
 %
 fully_expand_clause(_,Sent,SentO):- \+ (is_ftCompound(Sent)),!,must(SentO=Sent).
-fully_expand_clause(Op,Sent,SentO):-is_ftVar(Op),!,fully_expand_clause(clause_u,Sent,SentO),!.
+fully_expand_clause(Op,Sent,SentO):-is_ftVar(Op),!,fully_expand_clause(assert,Sent,SentO),!.
 
 fully_expand_clause(Op,PFC,Next):- is_ftVar(PFC),!,PFC=Next.
 
@@ -759,7 +759,7 @@ db_expand_term0(Op,SI,SentO):-
 % Managed Predicate Expand.
 %
 mpred_expand(PfcRule,Out):-is_ftCompound(PfcRule),functor(PfcRule,F,A),mpred_database_term(F/A,_),
-   PfcRule=[F|Args],maplist(fully_expand_goal(clause_u),Args,ArgsO),!,Out=..[F|ArgsO].
+   PfcRule=[F|Args],maplist(fully_expand_goal(assert),Args,ArgsO),!,Out=..[F|ArgsO].
 
 
 
@@ -1443,7 +1443,7 @@ was_isa_syntax(G,I,C):-was_isa(G,I,C).
 % Converted To Managed Predicate Form6.
 %
 into_mpred_form6(C,_,_,2,_,C):-!.
-% into_mpred_form6(H,_,_,_,_,G0):- once(w_tl(t_l:into_form_code,(expand_term( (H :- true) , C ), reduce_clause(clause_u,C,G)))),expanded_different(H,G),!,into_mpred_form(G,G0),!.
+% into_mpred_form6(H,_,_,_,_,G0):- once(w_tl(t_l:into_form_code,(expand_term( (H :- true) , C ), reduce_clause(assert,C,G)))),expanded_different(H,G),!,into_mpred_form(G,G0),!.
 into_mpred_form6(_,F,_,1,[C],O):-alt_calls(F),!,into_mpred_form(C,O),!.
 into_mpred_form6(_,':-',C,1,_,':-'(O)):-!,into_mpred_form_ilc(C,O).
 into_mpred_form6(_,not,C,1,_,not(O)):-into_mpred_form(C,O),!.

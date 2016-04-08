@@ -769,7 +769,7 @@ static_predicate(FA):-once(predicate_property(FA,_)),not(predicate_property(FA,d
 %
 % Wdmsg.
 %
-wdmsg(X):- show_source_location,
+wdmsg(X):- notrace(show_source_location),
    notrace(ignore(hotrace(with_all_dmsg(dmsg(X))))).
 
 %= 	 	 

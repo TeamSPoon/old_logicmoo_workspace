@@ -1499,7 +1499,7 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 % Must Be Successfull.
 %
 % must(Goal):- bad_idea,!,call(Goal).
-must(Goal):-  notrace((must_be(nonvar,Goal),get_must(Goal,MGoal))),!,MGoal.
+must(Goal):-  ((must_be(nonvar,Goal),get_must(Goal,MGoal))),!,MGoal.
 
 
 %= 	 	 
@@ -1508,18 +1508,19 @@ must(Goal):-  notrace((must_be(nonvar,Goal),get_must(Goal,MGoal))),!,MGoal.
 %
 % Get Must Be Successfull.
 %
-get_must(notrace(Goal),CGoal):- !,get_must(Goal,CGoal).
+get_must(notrace(Goal),CGoal):-  fail, !,get_must(Goal,CGoal).
 get_must(M:notrace(Goal),CGoal):- !,get_must(M:Goal,CGoal).
 % get_must(notrace(Goal),CGoal):- !,get_must((notrace(Goal)*->true;Goal),CGoal).
-get_must(Goal,CGoal):-  (is_release;tlbugger:skipMust),!,CGoal = Goal.
-get_must(Goal,CGoal):- skipWrapper,!, CGoal = (Goal *-> true ; ((ddmsg(failed_FFFFFFF(must(Goal))),dumpST,trace,Goal))).
-get_must(Goal,CGoal):- tlbugger:show_must_go_on,!,
+% get_must(Goal,CGoal):-  (is_release;tlbugger:skipMust),!,CGoal = Goal.
+get_must(Goal,CGoal):- fail, skipWrapper,!, CGoal = (Goal *-> true ;
+   ((ddmsg(failed_FFFFFFF(must(Goal))),dumpST,trace,Goal))).
+get_must(Goal,CGoal):-  fail, tlbugger:show_must_go_on,!,
  CGoal = ((catchv(Goal,E,
      notrace(((dumpST,ddmsg(error,sHOW_MUST_go_on_xI__xI__xI__xI__xI_(E,Goal))),badfood(Goal))))
             *-> true ; notrace((dumpST,wdmsg(error,sHOW_MUST_go_on_failed_F__A__I__L_(Goal)),badfood(Goal))))).
 
-get_must(Goal,CGoal):- !, (CGoal = (on_x_rtrace(Goal) *-> true; debugCallWhy(failed(on_f_debug(Goal)),Goal))).
-get_must(Goal,CGoal):- !, CGoal = (catchv(Goal,E,(notrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),trace,!,throw(E))) *-> true ; ((ddmsg(failed(must(Goal))),trace,Goal))).
+%get_must(Goal,CGoal):- !, (CGoal = (on_x_rtrace(Goal) *-> true; debugCallWhy(failed(on_f_debug(Goal)),Goal))).
+%get_must(Goal,CGoal):- !, CGoal = (catchv(Goal,E,(notrace,ddmsg(eXXX(E,must(Goal))),rtrace(Goal),trace,!,throw(E))) *-> true ; ((ddmsg(failed(must(Goal))),trace,Goal))).
 get_must(Goal,CGoal):-    
    (CGoal = (catchv(Goal,E,
      (dumpST,ddmsg(error,must_xI_(E,Goal)),set_prolog_flag(debug_on_error,true),
