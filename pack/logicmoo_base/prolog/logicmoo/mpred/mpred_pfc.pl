@@ -88,7 +88,7 @@
 
   mpred_run/0,mpred_test/1,mpred_test_fok/1,
   fa_to_p/3,
-  mpred_call_no_bc/1,with_umt/1,asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,clause_u/2,clause_u/3,
+  mpred_call_no_bc/1,with_umt/1,asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,clause_u/1,clause_u/2,clause_u/3,
   lookup_u/1,
 
           get_fc_mode/3,mpred_rem_support_if_exists/2,get_tms_mode/2,with_umt/1,
@@ -264,19 +264,49 @@ retract_u(H):- clause_u(H,true,R),erase(R),expire_tabled_list(H).
 
 retractall_u(H):- forall(clause_u(H,_,R),erase(R)),expire_tabled_list(H).
 
-clause_u(C):- mpred_clause_is_asserted(C).
+
+
+clause_u(C):- expand_to_hb(C,H,B),!,clause_u(H,B).
+
+
+%% clause_u( ?H, ?B) is semidet.
 clause_u(H,B):- clause_u(H,B,_).
+%clause_u(H,B):- clause_true( ==>( B , H) ).
+%clause_u(H,B):- clause_true( <-( H , B) ).
 
+%% clause_u( +H, ?B, ?Why) is semidet.
+%
+% PFC Clause.
+%
+clause_u((H:-BB),B,Ref):- is_true(B),!,clause_u(H,BB,Ref).
 clause_u(_:H,B,R):- nonvar(R),!,must(clause_i(_:H,B,R)).
-clause_u(MH,B,R):-  cnotrace(fix_mp(MH,MH2)), clause_i(MH2,B,R).
+clause_u(MH,B,R):-  cnotrace(fix_mp(MH,MH2)),!, clause_i(MH2,B,R).
+% clause_u(H,B,Why):- has_cl(H),clause_u(H,CL,R),mpred_pbody(H,CL,R,B,Why).
+%clause_u(H,B,backward(R)):- R=(<-(H,B)),clause_u(R,true).
+%clause_u(H,B,equiv(R)):- R=(<==>(LS,RS)),clause_u(R,true),(((LS=H,RS=B));((LS=B,RS=H))).
+%clause_u(H,true, pfcTypeFull(R,Type)):-is_ftNonvar(H),!,pfcDatabaseTerm(F/A),make_functor(R,F,A),pfcRuleOutcomeHead(R,H),clause(R,true),pfcTypeFull(R,Type),Type\=rule.
+%clause_u(H,true, pfcTypeFull(R)):-pfcDatabaseTerm(F/A),make_functor(R,F,A),pfcTypeFull(R,Type),Type\=rule,clause(R,true),once(pfcRuleOutcomeHead(R,H)).
+%clause_u('nesc'(H),B,forward(Proof)):- is_ftNonvar(H),!, clause_u(H,B,Proof).
+%clause_u(H,B,forward(R)):- R=(==>(B,H)),clause_u(R,true).
 
-lookup_u(H):-lookup_u(H,_). 
+%% clause_u( +VALUE1, ?H, ?B, ?Proof) is semidet.
+%
+% Hook To [lmconf:clause_u/4] For Module Mpred_pfc.
+% PFC Provide Storage Clauses.
+%
+%clause_u(pfc,H,B,Proof):-clause_u(H,B,Proof).
+
+
+lookup_u(H):-lookup_u(H,_).
 
 lookup_u(MH,Ref):- nonvar(Ref),!,must((clause_u(H,B,Ref),hb_to_clause(H,B,MH))).
+lookup_u(MH,Ref):- clause_u(MH,true,Ref).
+/*
 lookup_u(MH,Ref):- must(cnotrace(fix_mp(MH,M:H))), 
                     on_x_debug(clause_u(M:H,B,Ref)),
                         (var(B)->rtrace(clause_u(M:H,_,Ref));true),
                         on_x_debug(B).
+*/
 
 with_umt(G0):-   
   strip_module(G0,WM,G),
@@ -298,7 +328,7 @@ retract_u((H:-B)):-!, clause_u(H,B,R),erase(R).
 retract_u(H):-!, clause_u(H,true,R),erase(R).
 retractall_u(H):- forall(clause_u(H,_,R),erase(R)).
 clause_u(H,B):- clause_u(H,B,_).
-clause_u(H,B,R):- clause(H,B,R).
+clause_u(H,B,R):- clause_i(H,B,R).
 mpred_call_no_bc(G):- G.
 */
 %:- endif.
@@ -515,7 +545,6 @@ mpred_post2(P,S):-  !,
   (must(mpred_post_update4(WasA,P,S,Was))*-> true; mpred_warn("mpred_post2(~p,~p) failed",[P,S])).
 
 
-clause_asserted_u(P):-with_umt(clause_asserted_i(P)).
 
 get_mpred_assertion_status(P,PP,Was):- 
   (clause_asserted_u(P)->(Was=identical,!);
@@ -1349,7 +1378,7 @@ mpred_call_no_bc(P):-  mpred_METACALL(with_umt, P).
 mpred_METACALL(How,P):- mpred_METACALL(How, Cut, P), (var(Cut)->true;(Cut=cut(CutCall)->(!,CutCall);mpred_call_no_bc(Cut))).
 
 %  this is probably not advisable due to extreme inefficiency.
-mpred_METACALL(How, Cut,Var):- var(Var),!,trace_or_throw(var_mpred_CALL_MI(How,Cut,Var)).
+mpred_METACALL(How, Cut,Var):- var(Var),!,trace_or_throw(var_mpred_METACALL_MI(How,Cut,Var)).
 mpred_METACALL(How, Cut, mpred_call_no_bc(G0)):- !,mpred_METACALL(How, Cut, (G0)).
 mpred_METACALL(How, Cut, mpred_METACALL(G0)):- !,mpred_METACALL(How, Cut, (G0)).
 mpred_METACALL(How, Cut, mpred_call_no_bc(G0)):- !,mpred_METACALL(How, Cut, (G0)).
@@ -1801,34 +1830,34 @@ mpred_db_type(_,fact(_FT)):-
   !.
 
 mpred_assert_w_support(P,Support):- 
-  (mpred_clause_u(P) ; assert_u_confirmed_was_missing(P)),
+  (clause_asserted_u(P) ; assert_u_confirmed_was_missing(P)),
   !,
   mpred_add_support(P,Support).
 
 mpred_asserta_w_support(P,Support):-
-  (mpred_clause_u(P) ; asserta_u(P)),
+  (clause_asserted_u(P) ; asserta_u(P)),
   !,
   mpred_add_support(P,Support).
 
 mpred_assertz_w_support(P,Support):-
-  (mpred_clause_u(P) ; assertz_u(P)),
+  (clause_asserted_u(P) ; assertz_u(P)),
   !,
   mpred_add_support(P,Support).
 
 
 
-%% mpred_clause_u(+Head) is semidet.
+%% clause_asserted_u(+Head) is semidet.
 %
-% PFC Clause For Internal Interface.
+% PFC Clause For User Interface.
 %
-mpred_clause_u((Head:- Body)):-
+clause_asserted_u((Head:- Body)):-
   !,
   copy_term((Head:-Body),(Head_copy:-Body_copy)),
   clause_u(Head,Body),
   variant(Head,Head_copy),
   variant(Body,Body_copy).
 
-mpred_clause_u(Head):-
+clause_asserted_u(Head):-
   % find a unit clause identical to Head by finding one which unifies,
   % and then checking to see if it is identical
   copy_term(Head,Head_copy),
@@ -2699,7 +2728,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- asserta_new(mpred_warnings(true)).
 
 
-:- module_transparent((mpred_clause_u)/1).
+:- module_transparent((clause_asserted_u)/1).
 :- module_transparent((mpred_remove1)/2).
 :- module_transparent((mpred_te)/2).
 :- module_transparent((mpred_te)/0).
@@ -2900,6 +2929,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((lookup_u)/2).
 :- module_transparent((lookup_u)/1).
 :- module_transparent((clause_u)/2).
+:- module_transparent(clause_u/1).
 :- module_transparent((retractall_u)/1).
 :- module_transparent((retract_u)/1).
 :- module_transparent((assertz_u)/1).

@@ -927,8 +927,8 @@ correctType0(_ ,A,Type,AA):- compound(Type),contains_var(Type,isThis),
       show_call(why,(Call2)),ignore(AA=A).
 
 correctType0(_ ,A,Type,AA):- functor(Type,F,A),
-   (A2 is A+2,current_predicate(F/A2)->show_call(why,is_asserted(t(Type,A,AA)));
-   (A1 is A+1,current_predicate(F/A1)->show_call(why,is_asserted(t(Type,A))));
+   (A2 is A+2,current_predicate(F/A2)->show_call(why,clause_u(t(Type,A,AA)));
+   (A1 is A+1,current_predicate(F/A1)->show_call(why,clause_u(t(Type,A))));
    fail),ignore(AA=A).
 
 

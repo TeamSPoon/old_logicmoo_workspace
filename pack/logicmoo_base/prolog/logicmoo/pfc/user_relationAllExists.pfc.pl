@@ -49,7 +49,7 @@ ptTransitiveBinaryPredicate(genls).
    OUT= (((genls(A,B),genls(B,C)) /(ground(v(A,B,C)),A\==C,B\==C,A\==B))==> genls(A,C)))).
 */
 
-:- sanity(is_entailed(
+:- sanity(is_entailed_u(
   (((t(genls,A,B),t(genls,B,C))/( ground(v(A,B,C)),A\==C,B\==C,A\==B) ) ==> t(genls,A,C)))).
 
 

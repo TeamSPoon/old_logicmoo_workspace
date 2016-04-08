@@ -1211,6 +1211,100 @@ traceok(X):-  tlbugger:wastracing -> call_cleanup((trace,call(X)),notrace) ; cal
 % =========================================================================
 
 
+% = %= :- meta_predicate (show_entry(Why,0)).
+
+%= 	 	 
+
+%% show_entry( +Why, :GoalCall) is semidet.
+%
+% Show Entry.
+%
+show_entry(Why,Call):-debugm(Why,show_entry(Call)),show_call(Why,Call).
+
+%= 	 	 
+
+%% show_entry( :GoalCall) is semidet.
+%
+% Show Entry.
+%
+show_entry(Call):-show_entry(mpred,Call).
+
+%= :- meta_predicate  dcall0(0).
+
+%= 	 	 
+
+%% dcall0( :GoalGoal) is semidet.
+%
+% Dirrectly Call Primary Helper.
+%
+dcall0(Goal):- Goal. % on_x_debug(Goal). % dmsg(show_call(why,Goal)),Goal.      
+
+%= :- meta_predicate  show_call(+,0).
+
+%= 	 	 
+
+%% show_call( +Why, :GoalGoal) is semidet.
+%
+% Show Call.
+%
+show_call(Why,Goal):- show_success(Why,Goal)*->true;(dmsg(show_failure(Why,Goal)),!,fail).
+
+
+%% show_call( :Goal) is semidet.
+%
+% Show Call.
+%
+show_call(Goal):- strip_module(Goal,Why,_),show_call(Why,Goal).
+
+%= :- meta_predicate  show_failure(+,0).
+
+%= 	 	 
+
+%% show_failure( +Why, :GoalGoal) is semidet.
+%
+% Show Failure.
+%
+show_failure(Why,Goal):-one_must(dcall0(Goal),(debugm(Why,sc_failed(Why,Goal)),!,fail)).
+
+%= 	 	 
+
+%% show_failure( :GoalGoal) is semidet.
+%
+% Show Failure.
+%
+show_failure(Goal):- show_failure(mpred,Goal).
+
+%= :- meta_predicate  show_success(why,0).
+
+%= 	 	 
+
+%% show_success( +Why, :GoalGoal) is semidet.
+%
+% Show Success.
+%
+show_success(Why,Goal):- dcall0(Goal),debugm(Why,sc_success(Why,Goal)).
+
+%= 	 	 
+
+%% show_success( :GoalGoal) is semidet.
+%
+% Show Success.
+%
+show_success(Goal):- show_success(mpred,Goal).
+
+%= :- meta_predicate  on_f_log_fail(0).
+:- export(on_f_log_fail/1).
+
+%= 	 	 
+
+%% on_f_log_fail( :GoalGoal) is semidet.
+%
+% Whenever Functor Log Fail.
+%
+on_f_log_fail(Goal):-one_must(Goal,notrace((dmsg(on_f_log_fail(Goal)),cleanup_strings,!,fail))).
+
+
+
 % ==========================================================
 % can/will Tracer.
 % ==========================================================
@@ -2379,99 +2473,6 @@ gripe_time(TooLong,Goal):-statistics(cputime,Start),
 %
 cleanup_strings:-!.
 cleanup_strings:-garbage_collect_atoms.
-
-% = %= :- meta_predicate (show_entry(Why,0)).
-
-%= 	 	 
-
-%% show_entry( +Why, :GoalCall) is semidet.
-%
-% Show Entry.
-%
-show_entry(Why,Call):-debugm(Why,show_entry(Call)),show_call(Why,Call).
-
-%= 	 	 
-
-%% show_entry( :GoalCall) is semidet.
-%
-% Show Entry.
-%
-show_entry(Call):-show_entry(mpred,Call).
-
-%= :- meta_predicate  dcall0(0).
-
-%= 	 	 
-
-%% dcall0( :GoalGoal) is semidet.
-%
-% Dirrectly Call Primary Helper.
-%
-dcall0(Goal):- Goal. % on_x_debug(Goal). % dmsg(show_call(why,Goal)),Goal.      
-
-%= :- meta_predicate  show_call(+,0).
-
-%= 	 	 
-
-%% show_call( +Why, :GoalGoal) is semidet.
-%
-% Show Call.
-%
-show_call(Why,Goal):- show_success(Why,Goal)*->true;(dmsg(show_failure(Why,Goal)),!,fail).
-
-
-%% show_call( :Goal) is semidet.
-%
-% Show Call.
-%
-show_call(Goal):- strip_module(Goal,Why,_),show_call(Why,Goal).
-
-%= :- meta_predicate  show_failure(+,0).
-
-%= 	 	 
-
-%% show_failure( +Why, :GoalGoal) is semidet.
-%
-% Show Failure.
-%
-show_failure(Why,Goal):-one_must(dcall0(Goal),(debugm(Why,sc_failed(Why,Goal)),!,fail)).
-
-%= 	 	 
-
-%% show_failure( :GoalGoal) is semidet.
-%
-% Show Failure.
-%
-show_failure(Goal):- show_failure(mpred,Goal).
-
-%= :- meta_predicate  show_success(why,0).
-
-%= 	 	 
-
-%% show_success( +Why, :GoalGoal) is semidet.
-%
-% Show Success.
-%
-show_success(Why,Goal):- dcall0(Goal),debugm(Why,sc_success(Why,Goal)).
-
-%= 	 	 
-
-%% show_success( :GoalGoal) is semidet.
-%
-% Show Success.
-%
-show_success(Goal):- show_success(mpred,Goal).
-
-%= :- meta_predicate  on_f_log_fail(0).
-:- export(on_f_log_fail/1).
-
-%= 	 	 
-
-%% on_f_log_fail( :GoalGoal) is semidet.
-%
-% Whenever Functor Log Fail.
-%
-on_f_log_fail(Goal):-one_must(Goal,notrace((dmsg(on_f_log_fail(Goal)),cleanup_strings,!,fail))).
-
 
 :- dynamic(logLevel/2).
 :- module_transparent(logLevel/2).

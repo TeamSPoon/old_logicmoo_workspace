@@ -1231,7 +1231,7 @@ pttp_builtin(integer,1).
 pttp_builtin(number,1).
 pttp_builtin(F,_):-is_p_or_not(F),!,fail.
 pttp_builtin(not_asserted_t,_):-!,fail.
-pttp_builtin(is_asserted,1).
+pttp_builtin(clause_u,1).
 pttp_builtin(atomic,1).
 pttp_builtin(constant,1).
 pttp_builtin(functor,3).

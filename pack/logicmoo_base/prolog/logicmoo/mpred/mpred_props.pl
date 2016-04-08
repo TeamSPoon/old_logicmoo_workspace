@@ -63,8 +63,19 @@
 
 :- include('mpred_header.pi').
 
-
-
+/*
+ :- meta_predicate mpred_props:decl_mpred_prolog(?,1).
+ :- meta_predicate mpred_props:decl_mpred_hybrid(?,1).
+ :- meta_predicate mpred_props:decl_mpred(?,1).
+ :- meta_predicate mpred_props:decl_mpred_0(?,1).
+ :- meta_predicate mpred_props:decl_mpred(+,+,+).
+*/
+%: mpred_props:meta_argtypes/2, which is referenced by
+% Warning: mpred_props:mt/2, which is referenced by
+% Warning: mpred_stubs:cycPlus2/2, which is referenced by
+% Warning: mpred_stubs:cycPred/2, which is referenced by
+% Warning: mpred_type_constraints:completeExtentKnown/1, which is referenced by
+% Warning: mpred_type_constraints:gather_goals/2, which is referenced by
 
 % ========================================
 % mpred_isa/1/2/3

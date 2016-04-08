@@ -112,7 +112,7 @@
             wdmsgl_4/3,
             why_to_id/3,
             write_list/1,
-            is_entailed/1,
+            is_entailed_u/1,
             is_not_entailed/1,
             % if/2,iif/2,
           op(300,fx,'-'),
@@ -331,13 +331,13 @@ pfc_for_print_right(Prolog,PrintPFC):- =(Prolog,PrintPFC).
 
 
 
-%% is_entailed( ?CLIF) is semidet.
+%% is_entailed_u( ?CLIF) is semidet.
 %
 % If Is A Entailed.
 %   A good sanity Test for expected side-effect entailments
 %   
 %
-is_entailed(CLIF):- 
+is_entailed_u(CLIF):- 
  cwc, mpred_run,
  mpred_nochaining((
    any_to_pfc(CLIF,Prolog),!, \+ \+ are_clauses_entailed(Prolog))),!.
@@ -351,7 +351,7 @@ is_entailed(CLIF):-
 is_not_entailed(CLIF):- cwc, mpred_nochaining((kif_to_pfc(CLIF,Prolog), \+ are_clauses_entailed(Prolog))).
 
 :- op(1190,xfx,(:-)).
-:- op(1200,fy,(is_entailed)).
+:- op(1200,fy,(is_entailed_u)).
 
 % this defines a recogniser for clif syntax (well stuff that might be safe to send in thru kif_to_boxlog)
 
@@ -459,7 +459,7 @@ skolem_in_code(X,_,Fml):- when('?='(X,_),skolem_in_code(X,Fml)).
 %
 % Not Application Equals.
 %
-not_mudEquals(X,Y):- neq(X,Y).
+not_mudEquals(X,Y):- dif:dif(X,Y).
 
 :- public(type_of_var/3).
 

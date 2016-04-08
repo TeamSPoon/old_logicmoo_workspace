@@ -116,7 +116,8 @@ process_this_script0(S):-
 %
 never_load_special(_, Options) :-memberchk(must_be_module(true),Options).
 never_load_special(_Module:Spec, _) :- atom(Spec), atomic_list_concat(M,'.',Spec),length(M,L),L>7.
-never_load_special(_Module:library(Atom), Options) :- atom(Atom),member(must_be_module(true),Options),member(if(not_loaded),Options).
+never_load_special(_Module:library(Atom), Options) :- atom(Atom),member(must_be_module(true),Options),member(if(_),Options).
+% [if(true),imports([mpred_database_term/2]),register(false),silent(false)]
 never_load_special(_Module:_Spec, Options) :- member(must_be_module(true),Options),member(if(not_loaded),Options),member(imports([_/_]),Options).   
 
 
@@ -287,6 +288,8 @@ load_file_some_type(M:File,Options):-call_with_module(M,must(load_files(M:File,O
 % Hook To [user:prolog_load_file/2] For Module Mpred_loader.
 % Prolog Load File.
 %
+
+
 user:prolog_load_file(ModuleSpec, Options):- current_predicate(_,_:mpred_loader_file),
   \+ never_load_special(ModuleSpec, Options),  catch(prolog_load_file_loop_checked(ModuleSpec, Options),E,
     ((wdmsg(E),trace,prolog_load_file_loop_checked(ModuleSpec, Options),throw(E)))).

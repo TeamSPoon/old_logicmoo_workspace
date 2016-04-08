@@ -5,8 +5,9 @@
 :- module(logicmoo_base,[ensure_mpred_system/0,enable_mpred_system/1,disable_mpred_system/1]).
 
 :- use_module(library(logicmoo_utils)).
-:- autoload.
-:- set_prolog_IO(user_input,user_output,user_output).
+
+%:- autoload.
+%:- set_prolog_IO(user_input,user_output,user_output).
 
 :- multifile '$si$':'$was_imported_kb_content$'/2.
 :- dynamic '$si$':'$was_imported_kb_content$'/2.

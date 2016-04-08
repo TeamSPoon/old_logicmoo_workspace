@@ -36,12 +36,12 @@ end_of_file.
   justification/2,justifications/2,
   mpred_BC/1,
   mpred_BC_CACHE/1,
-  mpred_CALL/1,mpred_CALL/2,mpred_CALL/3,mpred_CALL_MI/3,
+  mpred_METACALL/1,mpred_METACALL/2,mpred_METACALL/3,mpred_METACALL_MI/3,
   mpred_halt/0,mpred_halt/1,mpred_halt/2,
   mpred_ain_db_to_head/2,mpred_ain_actiontrace/2,mpred_trace_op/2,mpred_add_support/2,mpred_ain_trigger_reprop/2,
   mpred_ain_by_type/2,
   mpred_prompt_ask/2,
-  mpred_CALL_MI/3,mpred_BC_w_cache/1,
+  mpred_METACALL_MI/3,mpred_BC_w_cache/1,
   ain_fast/1,
   ain_fast/2,
   setup_mpred_ops/0,
@@ -85,10 +85,10 @@ end_of_file.
       mpred_fact(?,0),
       mpred_test(+),
       mpred_test_fok(+),
-      mpred_CALL_MI(1,-,+),
-      mpred_CALL(1,-,+),
-      mpred_CALL(1,+),
-      mpred_CALL(+),
+      mpred_METACALL_MI(1,-,+),
+      mpred_METACALL(1,-,+),
+      mpred_METACALL(1,+),
+      mpred_METACALL(+),
       mpred_BC(+),
       mpred_BC_CACHE(+),
       foreachl_do(0,-),
@@ -224,7 +224,7 @@ call_u(G0):-
   strip_module(G0,_,G),functor(G,F,A),
   mpred_BC_CACHE(G),
   (memberchk(F/A,[(',')/2])->
-  mpred_CALL(call_u,G);
+  mpred_METACALL(call_u,G);
   with_umt(G0)).
 
 with_umt(G0):-
@@ -1033,8 +1033,8 @@ trigger_trigger1(Trigger,Body):-
 %  Note that this has the side effect of catching unsupported facts and
 %  assigning them support from God.
 % 
-mpred_BC(P):-mpred_CALL(mpred_BC_w_cache, P).
-mpred_BC_w_cache(P):- mpred_BC_CACHE(P),mpred_CALL(P).
+mpred_BC(P):-mpred_METACALL(mpred_BC_w_cache, P).
+mpred_BC_w_cache(P):- mpred_BC_CACHE(P),mpred_METACALL(P).
 mpred_BC_CACHE(P0):-  strip_module(P0,_,P),
  ignore((
   % trigger any bc rules.
@@ -1043,17 +1043,17 @@ mpred_BC_CACHE(P0):-  strip_module(P0,_,P),
   mpred_eval_lhs(Trigger,S),
   fail)).
  
-mpred_CALL(F):- mpred_CALL(mpred_CALL, Cut, F), (var(Cut)->true;(Cut=cut(Cut)->(!,Cut);call_u(Cut))).
-mpred_CALL(How,F):- mpred_CALL(How, Cut, F), (var(Cut)->true;(Cut=cut(Cut)->(!,Cut);call_u(Cut))).
-mpred_CALL(How,SCut, F):- 
+mpred_METACALL(F):- mpred_METACALL(mpred_METACALL, Cut, F), (var(Cut)->true;(Cut=cut(Cut)->(!,Cut);call_u(Cut))).
+mpred_METACALL(How,F):- mpred_METACALL(How, Cut, F), (var(Cut)->true;(Cut=cut(Cut)->(!,Cut);call_u(Cut))).
+mpred_METACALL(How,SCut, F):- 
   %  this is probably not advisable due to extreme inefficiency.
   var(F) ->  mpred_fact(F) ;
   predicate_property(F,built_in) -> F ;
-  call_in_mi(F) -> mpred_CALL_MI(How,SCut,F) ;
+  call_in_mi(F) -> mpred_METACALL_MI(How,SCut,F) ;
   predicate_property(F,number_of_clauses(_)) -> 
-     (clause_u(F,Condition),mpred_CALL(How,Cut,Condition),(var(Cut)->true;(Cut=cut(Cut)->(!,Cut);call_u(Cut))));
+     (clause_u(F,Condition),mpred_METACALL(How,Cut,Condition),(var(Cut)->true;(Cut=cut(Cut)->(!,Cut);call_u(Cut))));
   predicate_property(F,built_in) -> F ;
-  mpred_CALL_MI(How,SCut,F).
+  mpred_METACALL_MI(How,SCut,F).
 
 call_in_mi((_,_)).
 call_in_mi((_;_)).
@@ -1061,12 +1061,12 @@ call_in_mi((_->_)).
 call_in_mi((_*->_)).
 call_in_mi((!)).
 
-mpred_CALL_MI(_How, cut(true), !):- !.
-mpred_CALL_MI(How, Cut, (P1,P2)):- !, mpred_CALL(How, Cut, P1), mpred_CALL(How, Cut, P2).
-mpred_CALL_MI(How, Cut, (P1;P2)):- !, mpred_CALL(How, Cut, P1); mpred_CALL(How, Cut, P2).
-mpred_CALL_MI(How, Cut, (P1->P2)):- !, mpred_CALL(How, Cut, P1)-> mpred_CALL(How, Cut, P2).
-mpred_CALL_MI(How, Cut, (P1*->P2)):- !, mpred_CALL(How, Cut, P1)*-> mpred_CALL(How, Cut, P2).
-mpred_CALL_MI(_How,_, F):- 
+mpred_METACALL_MI(_How, cut(true), !):- !.
+mpred_METACALL_MI(How, Cut, (P1,P2)):- !, mpred_METACALL(How, Cut, P1), mpred_METACALL(How, Cut, P2).
+mpred_METACALL_MI(How, Cut, (P1;P2)):- !, mpred_METACALL(How, Cut, P1); mpred_METACALL(How, Cut, P2).
+mpred_METACALL_MI(How, Cut, (P1->P2)):- !, mpred_METACALL(How, Cut, P1)-> mpred_METACALL(How, Cut, P2).
+mpred_METACALL_MI(How, Cut, (P1*->P2)):- !, mpred_METACALL(How, Cut, P1)*-> mpred_METACALL(How, Cut, P2).
+mpred_METACALL_MI(_How,_, F):- 
   %  we really need to check for system predicates as well.
   must(current_predicate(_,M:F)),!, M:F.
 
@@ -2618,7 +2618,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((with_umt)/1).
 :- module_transparent((clause_u)/3).
 :- module_transparent((mpred_BC_CACHE)/1).
-:- module_transparent((mpred_CALL)/1).
+:- module_transparent((mpred_METACALL)/1).
 :- module_transparent((mpred_get_support)/2).
 
 

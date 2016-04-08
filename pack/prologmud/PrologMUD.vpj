@@ -43,6 +43,10 @@
 					Refilter="0"
 					Excludes=".git/;*.*~;*~/"/>
 			</Folder>
+			<F
+				N="../logicmoo_base/*.*"
+				Recurse="1"
+				Excludes=".git/;*.*~;*~/;*.html"/>
 		</Folder>
 		<Folder Name="../logicmoo_nlu">
 			<Folder Name="prolog">

@@ -16,7 +16,7 @@
 
 % :- process_this_script.
 
-must_is_entailed(G):- cwc, must(is_entailed(G)).
+must_is_entailed(G):- cwc, must(is_entailed_u(G)).
 
 % :- xlisting(must_is_entailed).
 

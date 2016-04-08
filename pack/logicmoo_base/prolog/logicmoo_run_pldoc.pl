@@ -281,7 +281,6 @@ lmconf:startup_option(clif,sanity). %  Run datalog sanity tests while starting
 /*
 :- meta_predicate call_mpred_body(*,0).
 :- meta_predicate decl_mpred_hybrid_ilc_0(*,*,0,*).
-:- meta_predicate assert_isa_hooked(0,*).
 */
 :- meta_predicate t(7,?,?,?,?,?,?,?).
 :- meta_predicate t(6,?,?,?,?,?,?).

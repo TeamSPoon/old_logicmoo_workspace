@@ -3548,7 +3548,7 @@ clause_u(H,B,R):- get_user_abox(M), M:clause(M:H,B,R).
 call_u(G0):-
   strip_module(G0,_,G),functor(G,F,A),
   (memberchk(F/A,[(',')/2])->
-  mpred_CALL(call_u,G);
+  mpred_METACALL(call_u,G);
   with_umt(G0)).
 
 with_umt(G0):-

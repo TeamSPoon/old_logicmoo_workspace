@@ -13,7 +13,7 @@
 %= immediately
 :- set_clause_compile(fwc).
 
-must_is_entailed(G):- cwc, must(is_entailed(G)).
+must_is_entailed(G):- cwc, must(is_entailed_u(G)).
 
 show_test(G):- cwc, get_user_abox(KB),printAll(must(KB:G)).
 

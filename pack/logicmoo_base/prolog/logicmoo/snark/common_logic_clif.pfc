@@ -29,7 +29,7 @@ vim: set filetype=md:
 (clif(CLIF) ==> 
    ({ kif_to_pfc(CLIF,PROLOG)},
       % this consequent asserts the new rules
-      PROLOG,{slow_sanity(is_entailed(CLIF))})).
+      PROLOG,{slow_sanity(is_entailed_u(CLIF))})).
 */
 
 
@@ -44,9 +44,9 @@ arity(pfclog,1).
 
 
 
-%((clif(CLIF)) ==> ({delistify_last_arg(CLIF,kif_to_boxlog,BOXLOG),mpred_run_pause},boxlog(BOXLOG),{mpred_run_resume,deterministic(true),mpred_run,slow_sanity(is_entailed(CLIF))})).
-%((clif(CLIF),{delistify_last_arg(CLIF,kif_to_boxlog,BOXLOG)}) ==> (boxlog(BOXLOG),{mpred_run,mpred_retry(must(is_entailed(CLIF)))})). % slow_sanity
-((clif(CLIF)) ==> ({delistify_last_arg(CLIF,kif_to_boxlog,BOXLOG)},boxlog(BOXLOG),{must(is_entailed(BOXLOG))})).
+%((clif(CLIF)) ==> ({delistify_last_arg(CLIF,kif_to_boxlog,BOXLOG),mpred_run_pause},boxlog(BOXLOG),{mpred_run_resume,deterministic(true),mpred_run,slow_sanity(is_entailed_u(CLIF))})).
+%((clif(CLIF),{delistify_last_arg(CLIF,kif_to_boxlog,BOXLOG)}) ==> (boxlog(BOXLOG),{mpred_run,mpred_retry(must(is_entailed_u(CLIF)))})). % slow_sanity
+((clif(CLIF)) ==> ({delistify_last_arg(CLIF,kif_to_boxlog,BOXLOG)},boxlog(BOXLOG),{must(is_entailed_u(BOXLOG))})).
 
 (boxlog(BOXLOG),{delistify_last_arg(BOXLOG,boxlog_to_pfc,PROLOG)}) ==> pfclog(PROLOG).
 % pfclog(PROLOG) ==> {without_running(ain(PROLOG,(pfclog(PROLOG),ax)))}.
@@ -65,7 +65,7 @@ pfclog(PROLOG) ==> PROLOG.
 (boxlog1(CLIF),{boxlog_to_pfc(CLIF,PROLOG)}) ==> pfclog(PROLOG).
 
 (pfclog(CLIF),{member_ele(CLIF,E)}) ==> pfclog1(E).
-(pfclog1(PROLOG)==>(PROLOG,{is_entailed(PROLOG)})).
+(pfclog1(PROLOG)==>(PROLOG,{is_entailed_u(PROLOG)})).
 
 */
 
@@ -81,7 +81,7 @@ pfclog(PROLOG) ==> PROLOG.
 (CLIF/is_kif_clause(CLIF) ==> 
    ({ kif_to_pfc(CLIF,PROLOG)},
       % this consequent asserts the new rules
-      PROLOG,{slow_sanity(is_entailed(CLIF))})).
+      PROLOG,{slow_sanity(is_entailed_u(CLIF))})).
 */
 
 

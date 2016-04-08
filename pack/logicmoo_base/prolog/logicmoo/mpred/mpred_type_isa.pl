@@ -187,6 +187,7 @@ is_never_type(V):-never_type_why(V,_),!.
 %
 % A.
 %
+:- meta_predicate a(1,?).
 a(C,I):- atom(C),G=..[C,I], no_repeats_old(clause_true(G)). % ;clause_true(isa(I,C))).
 
 
@@ -1165,7 +1166,7 @@ isa_lmconf:mpred_provide_storage_op(call(_),G):- was_isa(G,I,C),!, (isa_backchai
 
 %= 	 	 
 
-%% mpred_provide_storage_clauses( ?H, ?B, ?What) is nondet.
+%% clause_u( ?H, ?B, ?What) is nondet.
 %
 % Hook To [isa_lmconf:mpred_provide_storage_clauses/3] For Module Mpred_type_isa.
 % Managed Predicate Provide Storage Clauses.
@@ -1181,6 +1182,7 @@ isa_lmconf:mpred_provide_storage_clauses(H,true,hasInstanceCI):-
 
 
 lmconf:mpred_provide_storage_clauses(H,B,(What)):-fail,isa_lmconf:mpred_provide_storage_clauses(H,B,What).
+
 
 % isa_backchaing(I,T):- stack_depth(Level),Level>650,trace_or_throw(skip_dmsg_nope(failing_stack_overflow(isa_backchaing(I,T)))),!,fail.
 
@@ -1198,7 +1200,7 @@ lmconf:mpred_provide_storage_clauses(H,B,(What)):-fail,isa_lmconf:mpred_provide_
 % assert  (isa/2).
 %
 assert_isa([I],T):-nonvar(I),!,assert_isa(I,T).
-assert_isa(I,T):-sanity(nonvar(I)),sanity(nonvar(T)),assert_isa_i(I,T),must(sanity((must(is_asserted(isa(I,T)));must(isa_asserted(I,T))))).
+assert_isa(I,T):-sanity(nonvar(I)),sanity(nonvar(T)),assert_isa_i(I,T),must(sanity((must(clause_u(isa(I,T)));must(isa_asserted(I,T))))).
 
 %assert_isa_i(I,T):- once(sanity(not(singletons_throw_else_fail(assert_isa(I,T))))),fail.
 
@@ -1304,6 +1306,8 @@ assert_isa_reversed(T,I):-assert_isa(I,T).
 %
 % assert  (isa/2) hooked.
 %
+:- meta_predicate mpred_type_isa:assert_isa_hooked(?,1).
+
 assert_isa_hooked(A,_):-retractall(a(cache_I_L,isa,A,_)),fail.
 assert_isa_hooked(F,T):- a(ttPredType,T),decl_mpred(F,T),fail.
 assert_isa_hooked(I,T):- assert_isa(I,T).

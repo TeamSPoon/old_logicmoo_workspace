@@ -21,6 +21,8 @@
 	  ]).
 
 
+% :- ensure_loaded(library(util/logicmoo_util_attvar_reader)).
+
 :- module_transparent with_no_kif_var_coroutines/1.
 
 with_no_kif_var_coroutines(Goal):- w_tl_e(t_l:no_kif_var_coroutines,Goal).

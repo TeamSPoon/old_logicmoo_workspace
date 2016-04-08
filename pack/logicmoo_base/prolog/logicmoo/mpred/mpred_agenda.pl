@@ -614,7 +614,7 @@ rescan_duplicated_facts(M,H):-findall(H,(clause_safe(M:H,B),B==true),CF1), once(
 %
 % Rescan Duplicated Facts.
 %
-rescan_duplicated_facts(M,H,BB):-hotrace(doall((gather_fact_heads(M,H),BB=true,once((findall(C,(clause_safe(H,B),B=@=BB,reduce_clause(is_asserted,(H:-B),C)),CF1),
+rescan_duplicated_facts(M,H,BB):-hotrace(doall((gather_fact_heads(M,H),BB=true,once((findall(C,(clause_safe(H,B),B=@=BB,reduce_clause(clause_u,(H:-B),C)),CF1),
                                                                      list_to_set(CF1,CF2),once(reduce_fact_heads(M,H,CF1,CF2))))))).
 
 %= 	 	 
@@ -624,8 +624,8 @@ rescan_duplicated_facts(M,H,BB):-hotrace(doall((gather_fact_heads(M,H),BB=true,o
 % Rerun Database Hooks.
 %
 rerun_database_hooks:-!.
-rerun_database_hooks:-time_call(doall((gather_fact_heads(_M,H),forall(is_asserted(H),run_database_hooks(change(assert,z),H))))),fail.
-rerun_database_hooks:-time_call(doall((is_asserted(genls(I,C)),run_database_hooks(change(assert,z),genls(I,C))))),fail.
+rerun_database_hooks:-time_call(doall((gather_fact_heads(_M,H),forall(clause_u(H),run_database_hooks(change(assert,z),H))))),fail.
+rerun_database_hooks:-time_call(doall((clause_u(genls(I,C)),run_database_hooks(change(assert,z),genls(I,C))))),fail.
 rerun_database_hooks:-time_call(doall((isa_asserted(I,C),run_database_hooks(change(assert,z),isa(I,C))))),fail.
 
 

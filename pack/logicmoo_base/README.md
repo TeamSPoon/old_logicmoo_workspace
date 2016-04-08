@@ -374,7 +374,7 @@ We are no longer restricted to CWA and the limitations imposed by modern theorem
 Since LogicMOO can infer the limits it's theoretical knowledge, so it can help guide the user to understand what types of knowledge it is missing.  That also provides a portal through which
 other modules (e.g., a plan recognition system or a modules for NL reference resolution) can enter information. When such modules are not available, the user may simulate this capacity. ("ask the user")
 
-is_entailed/1: Detects if an Horn Clause (or fact) is holograpically existing. Example: assert a=>b. this will result in the following two clauses:   is_entailed(( ~a :- ~b )) and   is_entailed((  b :- a ) ).
+is_entailed_u/1: Detects if an Horn Clause (or fact) is holograpically existing. Example: assert a=>b. this will result in the following two clauses:   is_entailed_u(( ~a :- ~b )) and   is_entailed_u((  b :- a ) ).
 
 
 # Backward-Chaining Rules

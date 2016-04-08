@@ -62,9 +62,11 @@ fix_ops_for(CM):-
 :- debug.
 */
 
-:- ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
+:- ensure_loaded(library(logicmoo_base)).
+
+%:- mpred_www:ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
 %:- system:initialization(mpred_www:ensure_webserver(3040)).
-%:- mpred_www:ensure_webserver(3040).
+ws_0:- mpred_www:ensure_loaded(library(logicmoo/mpred_online/mpred_www)), mpred_www:ensure_webserver(3040).
 
 :- baseKB:use_module(baseKB:logicmoo/logicmoo_snark).
 
@@ -72,11 +74,12 @@ fix_ops_for(CM):-
 :- logicmoo_user_base:user_module_uses(M,CM),!,fix_ops_for(M),fix_ops_for(CM),dmsg(user_module_uses(M,CM)).
 :- system:((logicmoo_user_base:user_module_uses(M,CM)->(('$module'(_,M),'$set_source_module'(_,CM)));true)).
 
-:- autoload.
+%:- autoload.
 
-:- logicmoo_snark:load_snark.
 
 :- sanity( \+predicate_property(baseKB:_,exported)).
+
+:- logicmoo_snark:load_snark.
 
 end_of_file.
 
@@ -130,10 +133,10 @@ Warning: at runtime using assert/1, use :- dynamic Name/Arity.
 Warning:
 Warning: common_logic_snark:neq/2, which is referenced by
 Warning:        /root/lib/swipl/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_snark.pl:462:21: 1-st clause of common_logic_snark:not_mudEquals/2
-Warning: mpred_kb_ops:mpred_CALL/2, which is referenced by
+Warning: mpred_kb_ops:mpred_METACALL/2, which is referenced by
 Warning:        /root/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_kb_ops.pl:689:2: 1-st clause of mpred_kb_ops:call_s/1
-Warning: mpred_pfc:mpred_clause_is_asserted/1, which is referenced by
-Warning:        /root/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl:267:14: 1-st clause of mpred_pfc:clause_u/1v
+Warning: mpred_pfc:mpred_provide_storage_clauses/1, which is referenced by
+Warning:        /root/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl:267:14: 1-st clause of mpred_pfc:mpred_provide_storage_clauses/1v
 % Checking trivial failures ...
 % Checking redefined system and global predicates ...
 % version/1                    Redefined system predicate

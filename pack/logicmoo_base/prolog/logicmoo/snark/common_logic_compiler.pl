@@ -1942,4 +1942,4 @@ cf_to_flattened_clauses_0(KB,Why,NCFsI,FlattenedO):-
    list_to_set(FlattenedL,FlattenedS),
    must_maplist(demodal_sents(KB),FlattenedS,FlattenedO))),!.
   
-:- autoload([verbose(false)]).
+% :- autoload([verbose(false)]).

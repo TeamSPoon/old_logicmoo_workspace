@@ -152,11 +152,6 @@ sub_term_eq/2,
 mpred_pbody_f/5,
 get_why/4,
 mpred_pbody/5,
-mpred_clause/3,
-mpred_provide_storage_clauses/4,
-mpred_clause_is_asserted/1,
-mpred_clause_is_asserted/2,
-mpred_clause_is_asserted_hb_nonunify/2,
 pfc_provide_storage_op/2,
 is_retract_first/1,
 mpred_is_taut/1,
@@ -231,12 +226,9 @@ neg_in_code/1,
 mreq/1,
 mpred_rule_hb/3,
 mpred_remove_file_support/1,
-mpred_provide_storage_clauses/4,
 mpred_nochaining/1,
 mpred_negation_w_neg/2,          
 mpred_negation_w_neg/2,
-mpred_clause_is_asserted/1,
-mpred_clause_is_asserted/2,
 fix_negations/2,
 map_first_arg/2,
 mpred_rule_hb/3,mpred_rule_hb_0/3,
@@ -340,9 +332,9 @@ second_order(_,_):-fail.
 %
 % Deduced Simply.
 %
-deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not_asserted((Call)),nonvar(Fact),Body,dmsg((deducedSimply2(Call):-Fact)),!,show_call(why,(is_asserted(Fact),ground(Call))).
+deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),\+ clause_u((Call)),nonvar(Fact),Body,dmsg((deducedSimply2(Call):-Fact)),!,show_call(why,(clause_u(Fact),ground(Call))).
 
-% deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),nonvar(Fact),Body,ground(Call),dmsg((deducedSimply1(Call):-Fact)),show_call(why,(is_asserted(Fact),ground(Call))).
+% deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),nonvar(Fact),Body,ground(Call),dmsg((deducedSimply1(Call):-Fact)),show_call(why,(clause_u(Fact),ground(Call))).
 
 :- meta_predicate(mpred_op(?,?)).
 
@@ -353,7 +345,7 @@ deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not_asserted((Call)),
 % Managed Predicate Oper..
 %
 mpred_op(Op,     H ):- (var(Op);var(H)),!,trace_or_throw(var_database_call(Op,  H )).
-mpred_op(is_asserted,H):-!,is_asserted(H).
+mpred_op(clause_u,H):-!,clause_u(H).
 mpred_op(Op,     H ):- once(fully_expand(Op,H,HH)),H\=@=HH,!,mpred_op(Op, HH).
 mpred_op(~(_,Op),  H ):- !, show_call(why,not(mpred_op(Op,  H ))).
 mpred_op(change(assert,Op),H):-!,must(mpred_modify(change(assert,Op),H)),!.
@@ -372,9 +364,9 @@ mpred_op(must,Call):- !,must(mpred_op(call_u,Call)).
 mpred_op(once,Call):- !,once(mpred_op(call_u,Call)).
 
 mpred_op(assertedOnly,Call):- !,w_tl(t_l:infInstanceOnly(Call),mpred_op(call_u,Call)).
-mpred_op(_ , clause(H,B) ):- !, is_asserted(H,B).
-mpred_op(_ , clause(H,B,Ref) ):- !,  is_asserted(H,B,Ref).
-mpred_op(_ , (H :- B) ):- !, is_asserted(H,B).
+mpred_op(_ , clause(H,B) ):- !, clause_u(H,B).
+mpred_op(_ , clause(H,B,Ref) ):- !,  clause_u(H,B,Ref).
+mpred_op(_ , (H :- B) ):- !, clause_u(H,B).
 mpred_op(clauses(Op),  H):-!,mpred_op((Op),  H).
 mpred_op(_,C):- call_u(C).
 
@@ -689,7 +681,7 @@ clauseq_s(H,B,R):- fix_mp(H,M:H0),clause_u(M:H0,B,R),clause(M:HC,BC,R),H0=@=HC,B
 call_s(G0):-
   strip_module(G0,_,G),functor(G,F,A),
   (memberchk(F/A,[(',')/2])->
-  mpred_CALL(call_s,G);
+  mpred_METACALL(call_s,G);
   call_s2(G0)).
 
 call_s2(G0):-
@@ -990,57 +982,12 @@ pfc_provide_storage_op(change(retract,OneOrA),FactOrRule):- is_retract_first(One
   ignore((ground(FactOrRule),mpred_remove(FactOrRule))).
 % mpred_remove should be forcefull enough
 pfc_provide_storage_op(change(retract,all),FactOrRule):- loop_check_nr(mpred_remove(FactOrRule)),!.
-% pfc_provide_storage_op(is_asserted,FactOrRule):- is_ftNonvar(FactOrRule),!,loop_check_nr(clause_u(FactOrRule)).
-
-
-%% mpred_clause_is_asserted_hb_nonunify( +H, :TermB) is semidet.
-%
-% PFC Clause If Is A Asserted Head+body Nonunify.
-%
-mpred_clause_is_asserted_hb_nonunify(H,B):- clause_true( ==>( B , H) ).
-mpred_clause_is_asserted_hb_nonunify(H,B):- clause_true( <-( H , B) ).
-mpred_clause_is_asserted_hb_nonunify(_,_):-!,fail.
-mpred_clause_is_asserted_hb_nonunify(G, T   ):- T==true,!,hotrace(mpred_rule_hb(G,H,B)),G\=@=H,!,mpred_clause_is_asserted(H,B).
-mpred_clause_is_asserted_hb_nonunify(H,(T,B)):- T==true,!,mpred_clause_is_asserted_hb_nonunify(H,B).
-mpred_clause_is_asserted_hb_nonunify(H,(B,T)):- T==true,!,mpred_clause_is_asserted_hb_nonunify(H,B).
-mpred_clause_is_asserted_hb_nonunify(H,B):- clause_u( <-( H , B) , true).
-mpred_clause_is_asserted_hb_nonunify(H,B):- mpred_clause_is_asserted(H,B).
-
-
-%% mpred_clause_is_asserted( +H, ?B) is semidet.
-%
-% PFC Clause If Is A Asserted.
-%
-
-mpred_clause_is_asserted(HB):- expand_to_hb(HB,H,B), mpred_clause_is_asserted(H,B).
-
-mpred_clause_is_asserted(H,B):- is_ftVar(H),is_ftNonvar(B),!,fail.
-mpred_clause_is_asserted(H,B):- modulize_head(H,HH), (has_cl(HH) -> clause_u(HH,B) ; mpred_clause_is_asserted_hb_nonunify(H,B)).
-%mpred_clause_is_asserted(H,B,Ref):- clause_u(H,B,Ref).
+% pfc_provide_storage_op(clause_u,FactOrRule):- is_ftNonvar(FactOrRule),!,loop_check_nr(clause_u(FactOrRule)).
 
 
 % pfcDatabaseGoal(G):-is_ftCompound(G),get_functor(G,F,A),pfcDatabaseTerm(F/A).
 
 
-%% mpred_provide_storage_clauses( +VALUE1, ?H, ?B, ?Proof) is semidet.
-%
-% Hook To [lmconf:mpred_provide_storage_clauses/4] For Module Mpred_pfc.
-% PFC Provide Storage Clauses.
-%
-mpred_provide_storage_clauses(pfc,H,B,Proof):-mpred_clause(H,B,Proof).
-
-%mpred_clause('nesc'(H),B,forward(Proof)):- is_ftNonvar(H),!, mpred_provide_storage_clauses(H,B,Proof).
-%mpred_clause(H,B,forward(R)):- R=(==>(B,H)),clause_u(R,true).
-
-%% mpred_clause( +H, ?B, ?Why) is semidet.
-%
-% PFC Clause.
-%
-mpred_clause(H,B,Why):-has_cl(H),clause_u(H,CL,R),mpred_pbody(H,CL,R,B,Why).
-%mpred_clause(H,B,backward(R)):- R=(<-(H,B)),clause_u(R,true).
-%mpred_clause(H,B,equiv(R)):- R=(<==>(LS,RS)),clause_u(R,true),(((LS=H,RS=B));((LS=B,RS=H))).
-% mpred_clause(H,true, pfcTypeFull(R,Type)):-is_ftNonvar(H),!,pfcDatabaseTerm(F/A),make_functor(R,F,A),pfcRuleOutcomeHead(R,H),clause(R,true),pfcTypeFull(R,Type),Type\=rule.
-% mpred_clause(H,true, pfcTypeFull(R)):-pfcDatabaseTerm(F/A),make_functor(R,F,A),pfcTypeFull(R,Type),Type\=rule,clause(R,true),once(pfcRuleOutcomeHead(R,H)).
 
 
 %% mpred_pbody( +H, ?B, ?R, ?BIn, ?WHY) is semidet.
@@ -1789,10 +1736,23 @@ mpred_call_0(call(X)):- !, mpred_call_0(X).
 mpred_call_0(call_u(X)):- !, mpred_call_0(X).
 mpred_call_0(\+(X)):- !, \+ mpred_call_0(X).
 mpred_call_0(call_u(X)):- !, mpred_call_0(X).
+mpred_call_0(clause(H,B,Ref)):-!,clause_u(H,B,Ref).
+mpred_call_0(clause(H,B)):-!,clause_u(H,B).
+mpred_call_0(clause(HB)):-expand_to_hb(HB,H,B),!,clause_u(H,B).
 mpred_call_0(asserta(X)):- !, aina(X).
 mpred_call_0(assertz(X)):- !, ainz(X).
 mpred_call_0(assert(X)):- !, mpred_ain(X).
 mpred_call_0(retract(X)):- !, mpred_remove(X).
+% TODO: test removal
+%mpred_call_0(prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
+mpred_call_0((H)):- is_static_pred(H),!,show_pred_info(H),dtrace(mpred_call_0((H))).
+%mpred_call_0(HB):-hotrace((fully_expand_warn(mpred_call_0,HB,HHBB))),!,mpred_call_0(HHBB).
+mpred_call_0(H):- !, w_tl(t_l:infAssertedOnly(H),call_u(H)).
+%mpred_call_0(argIsa(mpred_isa,2,mpred_isa/2)):-  trace_or_throw(mpred_call_0(argIsa(mpred_isa,2,mpred_isa/2))),!,fail.
+% TODO: test removal
+% mpred_call_0(isa(H,B)):-!,isa_asserted(H,B).
+
+
 
 mpred_call_0(M:P):-!,sanity(nonvar(P)),functor(P,F,_),mpred_call_1(M,P,F).
 mpred_call_0(G):- strip_module(G,M,P),sanity(nonvar(P)),functor(P,F,_),mpred_call_1(M,P,F).
@@ -1930,7 +1890,7 @@ pfcBC_NoFacts_TRY(F) :- no_repeats(ruleBackward(F,Condition)),
 % Prolog Forward Chaining Backtackable Class Cache.
 %
 pfcBC_Cache(F) :- mpred_call_only_facts(pfcBC_Cache,F),
-   ignore((ground(F),( (\+is_asserted_1(F)), maybeSupport(F,(g,ax))))).
+   ignore((ground(F),( (\+mpred_call_0(F)), maybeSupport(F,(g,ax))))).
 
 
 
@@ -2719,10 +2679,6 @@ with_umt(G0):-
 :- module_transparent( (mpred_pbody_f)/5).
 :- module_transparent( (get_why)/4).
 :- module_transparent( (mpred_pbody)/5).
-:- module_transparent( (mpred_clause)/3).
-:- module_transparent( (mpred_provide_storage_clauses)/4).
-:- module_transparent( (mpred_clause_is_asserted)/2).
-:- module_transparent( (mpred_clause_is_asserted_hb_nonunify)/2).
 :- module_transparent( (pfc_provide_storage_op)/2).
 :- module_transparent( (is_retract_first)/1).
 :- module_transparent( (mpred_is_taut)/1).

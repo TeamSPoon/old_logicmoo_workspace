@@ -43,7 +43,6 @@ first_mpred_props/1,
 get_cc/2,
 has_storage_stub/1,
 hybrid_tPredStubImpl/1,
-is_asserted_mpred_t/1,
 is_call_op/1,
 is_mpred_change_op/1,
 is_mpred_op/1,
@@ -136,7 +135,6 @@ first_mpred_props/1,
 get_cc/2,
 has_storage_stub/1,
 hybrid_tPredStubImpl/1,
-is_asserted_mpred_t/1,
 is_call_op/1,
 is_mpred_change_op/1,
 is_mpred_op/1,
@@ -430,7 +428,7 @@ is_same_clauses(Head,HBLISTN):-
 
 /*
 
-is_asserted  checks using  TODO  mpred_clause_is_asserted(C).
+clause_u  checks using  TODO  clause_u(C).
 call(conjecture)
 call(once)  % TODO
 change(assert,a) asserts first if =@= is not first
@@ -542,7 +540,7 @@ last_arg_ground(_,A,HEAD):-arg(A,HEAD,Arg),!,ground(Arg).
 % Call Provided Managed Predicate Storage Oper..
 %
 call_provided_mpred_storage_op(call(_),H,true):-was_isa(H,I,C),!,isa_asserted(I,C).
-call_provided_mpred_storage_op(Op,H,true):-!,no_repeats_old(loop_check(may_storage_op(Op,H),is_asserted(H))).
+call_provided_mpred_storage_op(Op,H,true):-!,no_repeats_old(loop_check(may_storage_op(Op,H),clause_u(H))).
 
 
 
@@ -904,7 +902,7 @@ lmconf:hook_mpred_listing(Match):- fail,
 
 %= 	 	 
 
-%% mpred_provide_storage_clauses( ?H, ?B, ?What) is semidet.
+%% clause_u( ?H, ?B, ?What) is semidet.
 %
 % Hook To [isa_lmconf:mpred_provide_storage_clauses/3] For Module Mpred_stubs.
 % Managed Predicate Provide Storage Clauses.
@@ -1112,20 +1110,13 @@ call_for_literal_db0(F,A,HEAD):-no_repeats(HEAD,call_for_literal_db2(F,A,HEAD)).
 %
 % Call For Literal Database Extended Helper.
 %
-call_for_literal_db2(_,_,HEAD):- is_asserted_mpred_t(HEAD).
+call_for_literal_db2(_,_,HEAD):- clause_u(HEAD).
 call_for_literal_db2(F,_,   _):- (isa(F,completelyAssertedCollection);t(completeExtentAsserted,F)),!,fail.
 call_for_literal_db2(F,A,HEAD):- loop_check(call_rule_db(F,A,HEAD)).
-call_for_literal_db2(F,A,HEAD):- not(use_kif(HEAD,true)),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(is_asserted_mpred_t(genlPreds(P2,P1)),gp(P1),fail),
+call_for_literal_db2(F,A,HEAD):- not(use_kif(HEAD,true)),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(clause_u(genlPreds(P2,P1)),gp(P1),fail),
    call(t,P2,A1,A2).
 
 
-%= 	 	 
-
-%% is_asserted_mpred_t( ?VALUE1) is semidet.
-%
-% If Is A Asserted Managed Predicate True Stucture.
-%
-is_asserted_mpred_t(HEAD):-t(HEAD)*->true;((show_success(why,out_of_mpred_t(HEAD)))).
 
 %= 	 	 
 
@@ -1349,7 +1340,7 @@ ensure_universal_stub_plus_HIDE(F,AMinus2):-
 %
 % Ensure Universal Stub Plus.
 %
-ensure_universal_stub_plus(F,AMinus2):- decl_mpred(F,arity(AMinus2)), decl_mpred_mfa(user,F,AMinus2).
+ensure_universal_stub_plus(F,AMinus2):- /*decl_mpred(F,arity(F,AMinus2)), */ decl_mpred_mfa(user,F,AMinus2).
    
 
 %= 	 	 

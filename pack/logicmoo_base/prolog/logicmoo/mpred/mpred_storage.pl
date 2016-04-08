@@ -54,26 +54,18 @@
             infThirdOrderCheck/0,
             iprops/2,
             ireq/1,
-            is_asserted/1,
-            is_asserted/2,
-            is_asserted/3,
-            is_asserted_1/1,
-            is_asserted_2/2,
-            is_asserted_2a/2,
-            is_asserted_3/3,
-            is_asserted_3a/3,
-            is_asserted_eq/1,
             is_source_proof/1,
             is_static_pred/1,
+            is_asserted/1,
+            is_asserted_eq/1,
+            not_asserted/1,
             make_body_clause/3,
             may_storage_op/2,
             mdel/1,
             mpred_modify/2,
             lmconf:mpred_provide_storage_op/4,
-           % call_u/1,
             must_storage_op/2,
             nonground_throw_else_fail/1,
-            not_asserted/1,
             not_variant/2,
             padd/2,
             padd/3,
@@ -124,10 +116,6 @@
         hooked_assertz(+),
         hooked_retract(+),
         hooked_retractall(+),
-        is_asserted_1(?),
-        is_asserted_eq(?),
-        not_asserted(?),
-        %call_u(-),
         with_fallbacks(0),
         with_fallbacksg(0),
         with_no_db_hooks(0),
@@ -144,8 +132,6 @@
    forall_setof(0,0),
    % mpred_storage
    if_main(0),
-   % mpred_storage
-   is_asserted(:),
    % mpred_storage
    singletons_throw_else_fail(0),
    % mpred_storage
@@ -168,6 +154,32 @@
   % use_term_listing/2,  
   world_clear/1,  
    with_kb_assertions/2)).
+
+:- meta_predicate is_asserted(?).
+:- meta_predicate is_asserted_eq(?).
+:- meta_predicate not_asserted(?).
+
+
+%% not_asserted( ?X) is semidet.
+%
+% Not Asserted.
+%
+not_asserted(X):- \+ is_asserted(X).
+
+%% is_asserted_eq( ?HB) is semidet.
+%
+% If Is A Asserted Using (==/2) (or =@=/2) ).
+%
+is_asserted_eq(HB):- copy_term(HB,HBC), is_asserted(HBC), HBC=@=HB.
+
+
+%% is_asserted( ?X) is semidet.
+%
+% If Is A Asserted.
+%
+% TODO Convert loop checking to a "fresh" loop_check
+is_asserted(X):- no_repeats(loop_check(call_u(X))).
+
 
 
 %= 	 	 
@@ -425,9 +437,6 @@ infThirdOrderCheck:- t_l:infThirdOrder,!.
 infThirdOrderCheck :- fail, infSecondOrderCheck, not(t_l:noRandomValues(_)).
 
 
-% ================================================
-% is_asserted/1/2/3
-% ================================================
 :- thread_local t_l:fail_is_asserted/1.
 
 
@@ -440,77 +449,6 @@ infThirdOrderCheck :- fail, infSecondOrderCheck, not(t_l:noRandomValues(_)).
 with_fail_is_asserted(Temp,Goal):-ground(Temp),!,Goal.
 with_fail_is_asserted(Temp,Goal):-w_tl(t_l:fail_is_asserted(Temp),Goal).
 
-:- meta_predicate is_asserted_1(?).
-:- meta_predicate is_asserted_eq(?).
-:- meta_predicate not_asserted(?).
-
-
-%= 	 	 
-
-%% not_asserted( ?X) is semidet.
-%
-% Not Asserted.
-%
-not_asserted(X):- !,(\+ clause(X,true)).
-not_asserted(X):- not(no_loop_check(is_asserted_1(X))).
-
-%= 	 	 
-
-%% is_asserted_eq( ?HB) is semidet.
-%
-% If Is A Asserted Using (==/2) (or =@=/2) ).
-%
-is_asserted_eq(HB):- ( \+ \+ no_loop_check(is_asserted_1(HB))).
-
-
-%= 	 	 
-
-%% is_asserted( ?X) is semidet.
-%
-% If Is A Asserted.
-% 
-% TODO Convert loop checking to a "fresh" loop_check
-is_asserted(X):- no_repeats(loop_check(call_u(X))).
-
-%= 	 	 
-
-%% is_asserted( ?X, ?Y) is semidet.
-%
-% If Is A Asserted.
-%
-is_asserted(X,Y):- no_repeats(loop_check(is_asserted_2(X,Y))).
-
-%= 	 	 
-
-%% is_asserted( ?X, ?Y, ?Z) is semidet.
-%
-% If Is A Asserted.
-%
-is_asserted(X,Y,Z):- no_repeats(loop_check(is_asserted_3(X,Y,Z))).
-
-
-%= 	 	 
-
-%% is_asserted_1( ?V) is semidet.
-%
-% If Is A asserted  Secondary Helper.
-%
-is_asserted_1(V):-var(V),!,trace_or_throw(var_is_asserted(V)).
-% TODO: test removal
-%is_asserted_1(prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
-is_asserted_1((H)):- is_static_pred(H),!,show_pred_info(H),dtrace(is_asserted_1((H))).
-%is_asserted_1(HB):-hotrace((fully_expand_warn(is_asserted_1,HB,HHBB))),!,is_asserted_1(HHBB).
-
-is_asserted_1(H):- !, w_tl(t_l:infAssertedOnly(H),call_u(H)).
-
-%is_asserted_1(argIsa(mpred_isa,2,mpred_isa/2)):-  trace_or_throw(is_asserted_1(argIsa(mpred_isa,2,mpred_isa/2))),!,fail.
-is_asserted_1(clause(H,B,Ref)):-!,is_asserted_3(H,B,Ref).
-is_asserted_1(clause(H,B)):-!,is_asserted_2(H,B).
-is_asserted_1((H1,H2)):-!,is_asserted_1(H1),is_asserted_1(H2).
-is_asserted_1((H1;H2)):-!,is_asserted_1(H1);is_asserted_1(H2).
-% TODO: test removal
-% is_asserted_1(isa(H,B)):-!,isa_asserted(H,B).
-is_asserted_1(HB):-expand_to_hb(HB,H,B),!,is_asserted_2(H,B).
 
 
 %= 	 	 
@@ -520,48 +458,6 @@ is_asserted_1(HB):-expand_to_hb(HB,H,B),!,is_asserted_2(H,B).
 % Skip If Is A Asserted Expansion.
 %
 skip_is_asserted_expansion(_).
-
-
-
-%= 	 	 
-
-%% is_asserted_2( ?H, ?B) is semidet.
-%
-% If Is A asserted  Extended Helper.
-%
-is_asserted_2((H:-BB),B):- is_true(B),!,is_asserted_2(H,BB).
-is_asserted_2(H,B):-  skip_is_asserted_expansion(H),!,is_asserted_2a(H,B).
-is_asserted_2(H,B):-hotrace((fully_expand_warn(is_asserted_2,(H:-B),CL),expand_to_hb(CL,HH,BB))),!,is_asserted_2a(HH,BB).
-
-
-%= 	 	 
-
-%% is_asserted_2a( ?H, ?B) is semidet.
-%
-% If Is A Asserted 2a.
-%
-is_asserted_2a(H,B):-lmconf:pfcManageHybrids,!,mpred_clause_is_asserted(H,B).
-is_asserted_2a(H,B):-call_no_cuts(lmconf:mpred_provide_storage_clauses(H,B,_Ref)),not(hotrace(special_wrapper_body(B,_))).
-
-
-%= 	 	 
-
-%% is_asserted_3( ?H, ?B, ?Ref) is semidet.
-%
-% If Is A Asserted Helper Number 3..
-%
-is_asserted_3((H:-BB),B,Ref):- is_true(B),!,is_asserted_3(H,BB,Ref).
-is_asserted_3(H,B,Ref):- skip_is_asserted_expansion(H), !,is_asserted_3a(H,B,Ref).
-is_asserted_3(H,B,Ref):-hotrace((fully_expand_warn(is_asserted_3,(H:-B),CL),expand_to_hb(CL,HH,BB))),is_asserted_3a(HH,BB,Ref).
-
-
-%= 	 	 
-
-%% is_asserted_3a( ?H, ?B, ?Ref) is semidet.
-%
-% If Is A Asserted 3a.
-%
-is_asserted_3a(H,B,Ref):-call_no_cuts(lmconf:mpred_provide_storage_clauses(H,B,Ref)),not(hotrace(special_wrapper_body(B,_))).
 
 
 %= 	 	 
@@ -585,10 +481,10 @@ is_source_proof(_).
 %
 % Fact Checked.
 %
-fact_checked(Fact,Call):- not(ground(Fact)),!,no_loop_check(call_tabled(Call),is_asserted(Fact)).
+fact_checked(Fact,Call):- not(ground(Fact)),!,no_loop_check(call_tabled(Call),clause_u(Fact)).
 fact_checked(Fact,_):- is_known_false0(Fact),!,fail.
 fact_checked(Fact,_):- is_known_trew(Fact),!.
-fact_checked(Fact,Call):- no_loop_check(call_tabled(Call),is_asserted(Fact)).
+fact_checked(Fact,Call):- no_loop_check(call_tabled(Call),clause_u(Fact)).
 
 :- meta_predicate(fact_loop_checked(+,0)).
 
@@ -933,7 +829,7 @@ add_0(A):-trace_or_throw(fmt('ain/1 is failing ~q.',[A])).
 implied_skipped(genls(C0,C0)).
 implied_skipped(props(_,[])).
 implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (t(Skipped);out_of_mpred_t(Skipped)).
-%implied_skipped(Skipped):-lmconf:already_added_this_round(Skipped),(is_asserted(Skipped)).
+%implied_skipped(Skipped):-lmconf:already_added_this_round(Skipped),(clause_u(Skipped)).
 
 
 :- was_export(add_fast/1).
@@ -1184,7 +1080,7 @@ database_modify_0(change(assert,AZ),          G):- singletons_throw_else_fail(as
 database_modify_0(change(assert,AZ),          G):- database_modify_assert(change(assert,AZ),G).
 
 
-% database_modify_assert(change(assert,_),        G):- ( \+ \+ is_asserted(G)),must(variant(G,GG)),!.
+% database_modify_assert(change(assert,_),        G):- ( \+ \+ clause_u(G)),must(variant(G,GG)),!.
 % database_modify_assert(change(assert,AZ),       G):- expire_pre_change(AZ,GG),fail.
 
 %= 	 	 
@@ -1232,11 +1128,11 @@ hooked_assertz(G):- loop_check(mpred_modify(change(assert,z),G),ainz(G)).
 % Hooked Retract.
 %
 hooked_retract(G):-  Op = change(retract,a),
-                   ignore(slow_sanity(ignore(show_failure(why,(mpred_op(is_asserted,G)))))),
+                   ignore(slow_sanity(ignore(show_failure(why,(mpred_op(clause_u,G)))))),
                    slow_sanity(not(singletons_throw_else_fail(hooked_retract(G)))),
-                   slow_sanity(ignore(((ground(G), once(show_failure(why,(is_asserted(G)))))))),
+                   slow_sanity(ignore(((ground(G), once(show_failure(why,(clause_u(G)))))))),
                    must_storage_op(Op,G),expire_post_change( Op,G),
-                   sanity(ignore(show_failure(why,not_asserted((G))))),
+                   sanity(ignore(show_failure(why,\+ clause_u((G))))),
                    loop_check(run_database_hooks_depth_1(change(retract,a),G),true).
 
 
@@ -1247,9 +1143,9 @@ hooked_retract(G):-  Op = change(retract,a),
 % Hooked Retractall.
 %
 hooked_retractall(G):- Op = change(retract,all),
-                   slow_sanity(ignore(((ground(G), once(show_failure(why,(is_asserted(G)))))))),
+                   slow_sanity(ignore(((ground(G), once(show_failure(why,(clause_u(G)))))))),
                    must_storage_op(Op,G),expire_post_change( Op,G),
-                   sanity(ignore(show_failure(why,not_asserted((G))))),
+                   sanity(ignore(show_failure(why,\+ clause_u((G))))),
                    loop_check(run_database_hooks_depth_1(change(retract,all),G),true).
 
 
@@ -1364,8 +1260,8 @@ prolog_op(_,clause(G,B,Ref)):-!,clause(G,B,Ref).
 prolog_op(query(_,Op),G):-!,prolog_op(Op,G).
 prolog_op(call(Op),G):-!, prolog_op(Op,G).
 prolog_op(clauses(Op),G):-!, prolog_op(Op,G).
-prolog_op(is_asserted,(G:-B)):-!,clause_asserted(G,B).
-prolog_op(is_asserted,(G)):-!,clause_asserted(G,true).
+prolog_op(clause_u,(G:-B)):-!,clause_asserted(G,B).
+prolog_op(clause_u,(G)):-!,clause_asserted(G,true).
 
 prolog_op(conjecture,G):-!, call_u(G).
 prolog_op(call,G):-!, call_u(G).

@@ -27,7 +27,7 @@ THE CAVEAT:  Left hand side rules may actually need the same level of analysis?!
 Another key feature of LogicMOO infering about what it doesnt yet know, is it can be set to "ask the user" or help guide the user into what types of knowledge it is missing.  That also provides a port through which
 other modules (e.g., a plan recognition system or a modules for NL reference resolution) can enter information. When such modules are not available, the user may simulate this capacity.
 
-is_entailed/1: Detects if an Horn Clause (or fact) is true.   if someone asserts a=>b. this will result in the following two is_entailed(( ~a :- ~b )) and   is_entailed((  b :- a ) ).
+is_entailed_u/1: Detects if an Horn Clause (or fact) is true.   if someone asserts a=>b. this will result in the following two is_entailed_u(( ~a :- ~b )) and   is_entailed_u((  b :- a ) ).
 According to classically trained logicians horn clauses cannot start with a negated literal (so to not offend them)  PTTP papers claim we can store "( ~a :- ~b )" as "( not_a :- not_b )" 
 If we obeyed the limitations set forth upon Horn clauses only being "positive" that would remove the unique ability for LogicMOO to deduce what things are impossible. (We couldn''t tell the difference between missing data and true negation)
 
@@ -120,16 +120,16 @@ male(P) <=> ~female(P).
 :- kif_add(((parent(M,C) & female(M)) <=> mother(M,C))).
 
 % ((parent(M,C) & female(M)) <=> mother(M,C)).
-:- is_entailed(((parent(M,C) & female(M)) <=> mother(M,C))).
+:- is_entailed_u(((parent(M,C) & female(M)) <=> mother(M,C))).
 
 
-:- is_entailed(((parent(M,C) & female(M)) => mother(M,C))).
+:- is_entailed_u(((parent(M,C) & female(M)) => mother(M,C))).
 %       [ (not(female(M)):-not(mother(M, C)), parent(M, C)),
 %         (not(parent(M, C)):-not(mother(M, C)), female(M)),
 %         (mother(M, C):-parent(M, C), female(M))
 %       ].
 
-:- is_entailed((mother(M,C) => (parent(M,C) & female(M)))).
+:- is_entailed_u((mother(M,C) => (parent(M,C) & female(M)))).
 %       [ (female(M):-mother(M, _C)),
 %         (not(mother(M, _C)):-not(female(M))),
 %         (not(mother(M, C)):-not(parent(M, C))),
@@ -137,10 +137,10 @@ male(P) <=> ~female(P).
 %       ].
 
 
-:- is_entailed(not(mother(M,C)):- not(parent(M,C))).
-:- is_entailed(not(mother(M,_Anyone)):- not(female(M))).
-:- is_entailed((parent(M,C):- mother(M,C))).
-:- is_entailed((female(M):- mother(M,_))).
+:- is_entailed_u(not(mother(M,C)):- not(parent(M,C))).
+:- is_entailed_u(not(mother(M,_Anyone)):- not(female(M))).
+:- is_entailed_u((parent(M,C):- mother(M,C))).
+:- is_entailed_u((female(M):- mother(M,_))).
 
 
 
@@ -192,7 +192,7 @@ mother(trudy,pam).
 
 
 %= human(trudy) supports anscesteral rule that her decendants are humans as well .. therefore ..
-:- is_entailed(human(douglas)).
+:- is_entailed_u(human(douglas)).
 
 /*
 
@@ -263,7 +263,7 @@ father(douglas,skylar).
 father(douglas,sophiaWisdom).
 father(douglas,zaltana).
 
-:- is_entailed(human(douglas)).
+:- is_entailed_u(human(douglas)).
 
 :- mpred_why(human(douglas)).
 

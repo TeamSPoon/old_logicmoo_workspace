@@ -148,7 +148,7 @@ lmconf:logicmoo_scan_autoloads:-false.
 
 :- if(lmconf:logicmoo_scan_autoloads).
 :- set_prolog_flag(verbose_autoload, false).
-:- autoload([verbose(false)]).
+%:- autoload([verbose(false)]).
 :- set_prolog_flag(verbose_autoload, true).
 :- endif.
 
@@ -211,7 +211,6 @@ lmconf:logicmoo_scan_autoloads:-false.
 
 % ?- list_undefined.
 
-:- autoload.
 
 /*
 :- 'mpred_trace_none'(tlbugger:dont_skip_bugger/0).
