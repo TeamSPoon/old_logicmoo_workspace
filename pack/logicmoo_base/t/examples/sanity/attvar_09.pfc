@@ -12,27 +12,24 @@
 :- debug(_).
 :- nodebug(http(_)).
 :- debug(mpred).
-:- must(mpred_trace_exec).
-:- begin_pfc.
 
 :- dynamic(sk_out/1).
 :- dynamic(sk_in/1).
 
 % :- process_this_script.
 
+
+:- must(mpred_trace_exec).
+:- begin_pfc.
 :- read_attvars(true).
 
-sk_in(good).
 sk_in(fl(X,Y,X,Y)).
-
-:- ain(sk_in(avar([vn='ExIn',sk='SKF-777']))).
-
-:- break.
 sk_in(avar([vn='ExIn',sk='SKF-666'])).
-:- break.
+:- listing([sk_in/1,spft/3]).
+%:- break.
 sk_in(_DUNNO).
-:- break.
-
+:- listing([sk_in/1,spft/3]).
+%:- break.
 
 :- must((findall(clause_u(sk_in(H),B,Ref),(clause_u(sk_in(H),B,Ref),wdmsg(clause_u(sk_in(H),B,Ref))),L),length(L,COUNT),wdmsg(cOUNT=COUNT))).
 

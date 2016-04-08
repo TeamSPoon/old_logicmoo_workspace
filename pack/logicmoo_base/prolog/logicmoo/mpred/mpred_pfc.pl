@@ -1869,6 +1869,9 @@ mpred_assertz_w_support(P,Support):-
 %
 % PFC Clause For User Interface.
 %   
+clause_asserted_u(MH):- must(cnotrace(fix_mp(MH,M:H))),
+   clause_asserted_i(M:H).
+/*
 clause_asserted_u(Head):- 
   % to_addable_form_wte(assert,Head,HeadC),
   Head=HeadC,
@@ -1877,7 +1880,7 @@ clause_asserted_u(Head):-
   lookup_u(Head_copy),
   % and then checking to see if it is identical
   variant_u(HeadC,Head_copy),!.
-
+*/
 
 variant_u(HeadC,Head_copy):-variant_i(HeadC,Head_copy).
 

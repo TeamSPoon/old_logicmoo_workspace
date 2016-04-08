@@ -542,8 +542,6 @@ clause_asserted(H,B):-clause_asserted(H,B,_).
 %
 clause_asserted(M:H,B,R):- copy_term(M:H:B,MHB),clause(M:H,B,R),variant(M:H:B,MHB).
 
-clause_asserted_i(H,B):-clause_asserted_i(H,B,_).
-clause_asserted_i(M:H,B,R):- copy_term(M:H:B,MHB),clause_i(M:H,B,R),variant_i(M:H:B,MHB).
 
 :-meta_predicate(modulize_head(?,?)).
 
@@ -572,12 +570,17 @@ modulize_head_fb(From,H,Fallback,M:H):-
 %
 clause_asserted_i(Head):- 
   % to_addable_form_wte(assert,Head,HeadC),
-  Head=HeadC,
-  copy_term_nat(HeadC,Head_copy),  
+  copy_term(Head,HC),
+  copy_term_nat(Head,Head_copy),  
   % find a unit clause identical to Head by finding one which unifies,
   clause_i(Head_copy),
   % and then checking to see if it is identical
-  variant_i(HeadC,Head_copy),!.
+  =@=(Head,HC),
+  variant(Head,Head_copy),!.
+
+clause_asserted_i(H,B):- clause_asserted_i(H,B,_).
+clause_asserted_i(MH,B,R):- copy_term(MH:B,MHB),clause_i(MH,B,R),variant(MH:B,MHB).
+
 
 variant_i(A,B):- A=@=B,!.
 variant_i(A,B):- copy_term_nat(A:B,AA:BB), \+(AA=@=BB),!,fail.
