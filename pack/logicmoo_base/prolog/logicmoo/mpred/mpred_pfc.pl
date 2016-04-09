@@ -15,7 +15,7 @@
   ensure_abox/1,
   mpred_call_no_bc/1,fix_mp/2,
   mpred_fwc/1,
-  
+  get_mpred_is_tracing/1,
   show_if_debug/1,
   maybe_mpred_break/1,
   each_E/3,
@@ -31,6 +31,8 @@
   mpred_notrace_exec/0,
   remove_negative_version/1,
   listing_u/1,
+  '=@@='/2,
+  op(700,xfx,'=@@='),
   get_source_ref/1,
   get_source_ref1/1,
   get_source_ref10/1,
@@ -1869,8 +1871,8 @@ mpred_assertz_w_support(P,Support):-
 %
 % PFC Clause For User Interface.
 %   
-clause_asserted_u(MH):- must(cnotrace(fix_mp(MH,M:H))),
-   clause_asserted_i(M:H).
+clause_asserted_u(MH):- !, clause_asserted_i(MH).
+clause_asserted_u(MH):- must(cnotrace(fix_mp(MH,M:H))), clause_asserted_i(M:H).
 /*
 clause_asserted_u(Head):- 
   % to_addable_form_wte(assert,Head,HeadC),

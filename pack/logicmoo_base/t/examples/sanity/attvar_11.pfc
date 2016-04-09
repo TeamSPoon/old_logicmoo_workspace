@@ -5,9 +5,10 @@
 % Dec 13, 2035
 % Douglas Miles
 
-:- module(sanity_attvar_11,[]).
+:- module(sanity_attvar_11,[printAll/1]).
 
 :- use_module(library(logicmoo_base)).
+
 
 
 :- debug(_).
@@ -16,8 +17,10 @@
 :- mpred_trace_exec.
 
 :- abolish(not_666/1).
+:- dynamic(not_666/1).
 
-:- must(( ((dif(666,X),assert_i(not_666(X)))))).
+
+:- printAll(( ((dif(666,X),assert_i(not_666(X)))))).
 
 :- in_cmt(listing(not_666)).
 
@@ -27,25 +30,28 @@
 %       attr_bind([dif(A, 666)], true).
 
 
-:- must(( ((dif(666,X),clause_asserted_i(not_666(X)))))).
+:- printAll(( ((dif(666,X),clause_asserted_i(not_666(X)))))).
 
-:- must(( ((dif(666,X),dif(666,X), clause_asserted_i(not_666(X)))))).
+:- printAll(( ((dif(666,X),dif(666,X), assert_i(not_666x2(X)))))).
 
-:- must(( ((dif(5,X),dif(666,X), \+ clause_asserted_i(not_666(X)))))).
+:- printAll(( ((dif(666,X),dif(666,X), clause_asserted_i(not_666x2(X)))))).
 
-:- must(( ((dif(5,X),\+ clause_asserted_i(not_666(X)))))).
+:- printAll(( ((dif(5,X),dif(666,X), \+ clause_asserted_i(not_666(X)))))).
 
-:- must(( ((\+ clause_asserted_i(not_666(5)))))).
+:- printAll(( ((dif(5,X),\+ clause_asserted_i(not_666(X))))  )).
 
-:- must(( ((\+ clause_asserted_i(not_666(666)))))).
+:- printAll(( ((\+ clause_asserted_i(not_666(666)))))).
 
-:- must(( ((\+ clause_asserted_i(not_666(_)))))).
+:- printAll(( ((\+ clause_asserted_i(not_666(_)))))).
 
-:- must(( not_666(5)  )).
+:- printAll(( not_666(5)  )).
 
-:- must(( not_666(SOME), var(SOME), SOME=5 )).
+:- printAll(call(( not_666(SOME), var(SOME), SOME=5 ))).
 
-:- must(( not_666(SOME), var(SOME),  \+ SOME=666)).
+:- printAll(( not_666(SOME), var(SOME),  \+ SOME=666)).
 
-:- must(( \+ not_666(666)  )).
+:- printAll(( \+ not_666(666)  )).
+
+:- printAll(( ((\+ clause_asserted_i(not_666(5)))))).
+
 
