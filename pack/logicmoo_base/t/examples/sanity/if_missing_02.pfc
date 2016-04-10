@@ -25,6 +25,10 @@ good.
 
 \+ good.
 
+:- sanity(\+ good).
+
+:- listing(foob/1).
+
 :- mpred_test(\+foob(a)).
 
 

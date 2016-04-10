@@ -1,18 +1,12 @@
 #!/usr/bin/env swipl
 
-sdf
-sdf
-sd
-fsd
-fsdfsdfsdfsdf
-      wefwr
 :- if( \+ exists_source(library(logicmoo_base))).
 :- dynamic(user:file_search_path/2).
 :- multifile(user:file_search_path/2).
 :- absolute_file_name('../../prolog',Dir),asserta(user:file_search_path(library,Dir)).
 :- endif.
 
-:- ensure_loaded(library(logicmoo/logicmoo_utils)).
+:- ensure_loaded(library(logicmoo_utils)).
 :- thread_local(t_l:user_abox/1).
 :- (t_l:user_abox(M)->true;(context_module_of_file(M),asserta(t_l:user_abox(M)))),!,writeln(user_abox=M).
 

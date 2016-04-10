@@ -217,7 +217,7 @@ assert_text_now(Ctx,CtxISA,String):-
  to_word_list(String,WL),!,to_icase_strs(WL,IC),!,   
    ((phrase(translation_dbg_on_fail(Ctx,CtxISA,Prolog),IC),
    assertz_if_new(asserted_text(Ctx,String,PrologO)),
-     fully_expand(Prolog,PrologO),
+     fully_expand(clause(assert_text_now,assert_text_now),Prolog,PrologO),
      show_call(onSpawn(PrologO)))))).
 
 :-dynamic(asserted_text/3).

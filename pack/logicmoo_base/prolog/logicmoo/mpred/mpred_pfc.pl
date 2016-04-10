@@ -113,6 +113,7 @@
       pfcl_do(0),
       pfcl_do(+), % not all arg1s are callable
       lookup_u(:),
+      clause_asserted_u(+),
       mpred_get_support(+,-),
       mpred_fact(?,0),
       mpred_test(+),
@@ -138,6 +139,7 @@
       with_fc_mode(+,0),
       bagof_or_nil(?,^,-).
 
+:- module_transparent(clause_asserted_u/1).
 :- module_transparent(show_if_debug/1).
 :- module_transparent(bagof_or_nil/3).
 :- module_transparent(with_fc_mode/2).
@@ -634,25 +636,30 @@ mpred_post_update4(partial(_),P,S,exact):-!,
    !.
 
 mpred_post_update4(partial(_),P,S,simular(_)):-
-  mpred_add_support(P,S),
+  mpred_add_support(P,S),!,
   ignore((mpred_unique_u(P),assert_u_confirmed_was_missing(P),mpred_trace_op(add,P,S))),
    !,
    mpred_enqueue(P,S),
    !.
 
 
-mpred_post_update4(Was,P,S,What):-!,trace_or_throw(mpred_post_update4(Was,P,S,What)).
-mpred_post_update4(Was,P,S,What):-!,trace_or_throw(mpred_post_update4(Was,P,S,What)).
+mpred_post_update4(unique,P,S,simular(_)):-
+  mpred_add_support(P,S),!,
+  assert_u_confirmed_was_missing(P),
+  mpred_trace_op(add,P,S),
+   !,
+   mpred_enqueue(P,S),
+   !.
 
 mpred_post_update4(Was,P,S,What):-dmsg(mpred_post_update4(Was,P,S,What)),trace,fail.
 
+mpred_post_update4(Was,P,S,What):-!,trace_or_throw(mpred_post_update4(Was,P,S,What)).
 
 
 assert_u_confirmed_was_missing(P):-
  copy_term(P,PP),
  must((assert_u(PP),P=@@=PP)),!,
- copy_term(P,PPP),
- must((clause_asserted_u(PPP),must(P=@@=PPP))),!.
+ sanity((copy_term(P,PPP),clause_asserted_u(PPP),must(P=@@=PPP))),!.
 
 
 assert_u_confirmed_if_missing(P):- copy_term(P,PP),
@@ -1871,9 +1878,11 @@ mpred_assertz_w_support(P,Support):-
 %
 % PFC Clause For User Interface.
 %   
-clause_asserted_u(MH):- !, clause_asserted_i(MH).
-clause_asserted_u(MH):- must(cnotrace(fix_mp(MH,M:H))), clause_asserted_i(M:H).
+clause_asserted_u(MH):- notrace(must(fully_expand(change(assert,assert_u),MH,MA))),!,clause_asserted_i(MA).
 /*
+
+clause_asserted_u(MH):- must(cnotrace(fix_mp(MH,M:H))), clause_asserted_i(M:H).
+
 clause_asserted_u(Head):- 
   % to_addable_form_wte(assert,Head,HeadC),
   Head=HeadC,
@@ -1887,7 +1896,7 @@ clause_asserted_u(Head):-
 variant_u(HeadC,Head_copy):-variant_i(HeadC,Head_copy).
 
 
-%% foreachl_do(+Binder, ?Body) is semidet.
+%% foreachl_do(+Binder, ?Body) is det.
 %
 % Foreachl Do.
 %

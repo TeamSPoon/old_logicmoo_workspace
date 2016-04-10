@@ -474,12 +474,13 @@ simple_var(Var):-var(Var),\+ attvar(Var).
 
 to_mod_if_needed(M,B,MB):- B==true-> MB=B ; MB = M:B.
 
-split_attrs(_,ATTRS,BODY):- ((sanity((simple_var(ATTRS),simple_var(BODY))),fail)).
+split_attrs(Other,true,call(Other)):-is_ftVar(Other),!.
 split_attrs(B,true,B):-var(B),!.
-split_attrs(M:attr_bind(G,Call),M:attr_bind(G),Call):- !.
+split_attrs(M:Other,M:ATTRS,M:BODY):-atom(M),!,split_attrs(Other,ATTRS,BODY).
+split_attrs(M:Other,true,M:call(Other)):-is_ftVar(Other),!.
+split_attrs(_,ATTRS,BODY):- ((sanity((simple_var(ATTRS),simple_var(BODY))),fail)).
 split_attrs(attr_bind(G,Call),attr_bind(G),Call):- !.
-split_attrs(true,true,true):-!.
-split_attrs(_:true,true,true):-!.
+split_attrs(_:_,true,true):-!.
 split_attrs(M:A,M:ATTRS,M:BODY):- !,split_attrs(A,ATTRS,BODY).
 split_attrs(attr_bind(G),attr_bind(G),true):- !.
 split_attrs((A,B),ATTRS,BODY):- !,

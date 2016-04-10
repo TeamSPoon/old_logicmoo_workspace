@@ -4,7 +4,7 @@
 
 
 :- use_module(library(logicmoo_user)).
-:- autoload.
+% :- autoload.
 
 % :- meta_predicate logicmoo_util_terms:'__aux_maplist/3_maptree+1'(*,*,2).
 % :- meta_predicate logicmoo_util_strings:'__aux_maplist/3_toCaseSplit+2'(*,*,?,2).

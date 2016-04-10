@@ -289,7 +289,7 @@ map_each_clause(P,A):- cwc,call(P,A).
 any_to_pfc(B,A):- cwc, must(map_each_clause(any_to_pfc0,B,A)).
 
 any_to_pfc0(B,A):- cwc, is_kif_clause(B),!,kif_to_pfc0(B,A).
-any_to_pfc0(B,A):- cwc, is_pfc_clause(B),!,fully_expand(B,A).
+any_to_pfc0(B,A):- cwc, is_pfc_clause(B),!,fully_expand(clause(any_to_pfc,any_to_pfc),B,A).
 any_to_pfc0(B,A):- cwc, is_prolog_clause(B),!,boxlog_to_pfc(B,A).
 any_to_pfc0(B,A):- cwc, !, trace_or_throw(should_never_be_here(any_to_pfc0(B,A))).
 any_to_pfc0((H:-B),PrologO):- cwc,!,must((show_failure(why,boxlog_to_pfc((H:-B),Prolog)),!,=(Prolog,PrologO))),!.

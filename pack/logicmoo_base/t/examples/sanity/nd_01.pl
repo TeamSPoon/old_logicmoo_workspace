@@ -2,7 +2,7 @@
 :- module(nd_01,[]).
 
 :- use_module(library(logicmoo_base)).
-:- use_listing_vars.
+% :- use_listing_vars.
 
 :- nd_01:dynamic((nd_01:p/0,nd_01:px/0,nd_01:py/0,nd_01:pz/0,p1/0,p1x/0,p1y/0,p1z/0,p2/0,p2x/0,p2y/0,p2z/0)).
 

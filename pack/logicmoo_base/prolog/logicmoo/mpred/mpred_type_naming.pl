@@ -294,7 +294,7 @@ modality(~,[never],[]).
 %
 onSpawn(A):-A==true,!.
 onSpawn((A,B)):-!,onSpawn(A),onSpawn(B).
-onSpawn(ClassFact):-fully_expand(ClassFact,ClassFactO),!,onSpawn_0(t,ClassFactO).
+onSpawn(ClassFact):-fully_expand(clause(assert,onSpawn),ClassFact,ClassFactO),!,onSpawn_0(t,ClassFactO).
 
 
 %= 	 	 
@@ -312,7 +312,7 @@ onSpawn_0(Modality,ClassFact):- ClassFact=..[FunctArgType,Name],
  assert_isa(TypeA,tCol),
  assert_isa(Inst,FunctArgType),
  assert_isa(Inst,TypeA),
- fully_expand(t(Modality,genls(TypeA,FunctArgType)),TO),
+ fully_expand(clause(assert,onSpawn),t(Modality,genls(TypeA,FunctArgType)),TO),
  ain(TO),!.
 
 onSpawn_0(Modality,ClassFact):- ClassFact=..[Funct|InstADeclB],
@@ -328,7 +328,7 @@ onSpawn_0(Modality,ClassFact):- ClassFact=..[Funct|InstADeclB],
 onSpawn_f_args(Modality,Funct,List):-
   must(convertSpawnArgs(Funct,1,List,NewList)),
    Later =.. [Funct|NewList],
-   fully_expand(t(Modality,Later),TO),
+   fully_expand(clause(assert,onSpawn),t(Modality,Later),TO),
    ain(TO),!. 
   % call_after_mpred_load_slow(w_tl(deduceArgTypes(Funct), ain(Later))))),!.
 

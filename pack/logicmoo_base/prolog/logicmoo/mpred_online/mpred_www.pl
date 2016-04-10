@@ -1987,7 +1987,7 @@ pp_i2tml_0(is_edited_clause(H,B,A)):- pp_i2tml_0(proplst([(clause)=H,before=B,af
 pp_i2tml_0(is_disabled_clause(H)):- pp_i2tml_0((disabled)=H).
 
 
-% pp_i2tml_0(FET):-fully_expand(assert,FET,NEWFET),FET\=@=NEWFET,!,pp_i2tml_0(NEWFET).
+% pp_i2tml_0(FET):-fully_expand(change(assert,html_gen),FET,NEWFET),FET\=@=NEWFET,!,pp_i2tml_0(NEWFET).
 
 pp_i2tml_0(spft(P,F,T,W)):-!,
    w_tl(t_l:current_why_source(W),pp_i2tml_0(spft(P,F,T))).

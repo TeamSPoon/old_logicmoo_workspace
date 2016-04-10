@@ -739,7 +739,9 @@ put_singles(Wff,Exists,[S|Singles],NewWff):-
 call_last_is_var(MCall):- strip_module(MCall,M,Call),
    must((compound(Call),functor(Call,_,A))),
    arg(A,Call,Last),nonvar(Last),Call=..FArgs,
-   append(Left,[Last],FArgs),append(Left,[IsVar],NFArgs),NewCall=..NFArgs,!,M:NewCall*->IsVar=Last;fail.
+   append(Left,[Last],FArgs),
+   append(Left,[IsVar],NFArgs),NewCall=..NFArgs,!,
+     M:NewCall*->IsVar=Last;fail.
 
    
 

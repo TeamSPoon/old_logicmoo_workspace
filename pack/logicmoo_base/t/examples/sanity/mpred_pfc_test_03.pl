@@ -1,7 +1,7 @@
 :- module(red_test01,[]).
 
 :- use_module(library(logicmoo_base)).
-:- use_listing_vars.
+% :- use_listing_vars.
 
 
 % :- (( must((get_user_abox(M)->M==red_test01)))).
