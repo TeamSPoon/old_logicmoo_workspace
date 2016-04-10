@@ -5,11 +5,12 @@
 % Dec 13, 2035
 % Douglas Miles
 
-:- module(sanity_if_missong_01,[]).
+:- module(sanity_if_missong_01a,[]).
 
 :- use_module(library(logicmoo_base)).
 
 :- dynamic(foob/1).
+:- dynamic(good/0).
 
 
 :- debug(mpred).
@@ -21,11 +22,21 @@
 % (if_missing(Missing,Create) ==> ((\+ Missing/(Missing\==Create), \+ Create , \+ ~(Create)) ==> Create)).
 
 if_missing(Missing,Create) ==>  
-   ( ( \+ Missing/(Missing\=@=Create)) ==> Create).
+   ( ( \+ Missing/(nonvar(Missing),nonvar(Create),Missing\=@=Create)) ==> Create).
 
-if_missing(foob(_),foob(a)).
+(good ==> if_missing(foob(_),foob(a))).
+
+(good ==> aa).
+
+:- mpred_test(\+ foob(a)).
+
+good.
+
+:- break.
+
 
 :- mpred_test(foob(a)).
+
 
 :- ain(foob(b)).
 
@@ -38,6 +49,47 @@ if_missing(foob(_),foob(a)).
 :- mpred_test(\+foob(b)).
 
 :- mpred_test(foob(a)).
+
+:- break.
+
+(\+ good).
+
+:- mpred_test(\+ ~good).
+
+:- mpred_test(\+ good).
+
+:- break.
+
+:- mpred_test(\+ foob(a)).
+
+~good.
+
+:- mpred_test( ~ good).
+
+:- mpred_test( \+ good).
+
+:- mpred_test(\+ foob(a)).
+
+:- break.
+
+end_of_file.
+
+:- ain(foob(b)).
+
+
+:- mpred_test(\+foob(a)).
+
+
+:- mpred_test(foob(b)).
+
+:- ain(~foob(b)).
+
+
+:- mpred_test(\+foob(b)).
+:- mpred_test(foob(a)).
+
+
+
 
 
 
