@@ -2135,7 +2135,7 @@ mpred_trace(Form):-
 % PFC If Is A Tracing.
 %
 get_mpred_is_tracing(Form):- cnotrace(t_l:hide_mpred_trace_exec),!,
-  cnotrace(lookup_u(mpred_is_tracing_pred(Form))).
+  \+ \+ ((cnotrace(lookup_u(mpred_is_tracing_pred(Form))))).
 get_mpred_is_tracing(Form):- 
   once(t_l:mpred_debug_local ; tracing ; lookup_u(mpred_is_tracing_exec) ; lookup_u(mpred_is_tracing_pred(Form))).
 
@@ -2176,6 +2176,9 @@ mpred_notrace:- mpred_untrace.
 mpred_untrace:- mpred_untrace(_).
 mpred_untrace(Form):- retractall_u(mpred_is_tracing_pred(Form)).
 
+
+not_not_ignore_cnotrace(G):- ignore(cnotrace(\+ \+ G)).
+
 % needed:  mpred_trace_rule(Name)  ...
 
 log_failure(_):- between(1,3,_),wdmsg(red,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"),fail.
@@ -2185,17 +2188,17 @@ log_failure(_):- between(1,3,_),wdmsg(red,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 maybe_mpred_break(Info):- (t_l:no_mpred_breaks->true;(debugging(mpred)->dtrace(dmsg(Info));(dmsg(Info)))).
 
 % if the correct flag is set, trace exection of Pfc
-mpred_trace_msg(Info):- \+ \+ cnotrace(((lookup_u(mpred_is_tracing_exec);tracing)->in_cmt(wdmsg(Info));true)).
-mpred_trace_msg(Format,Args):- \+ \+  cnotrace((format_to_message(Format,Args,Info),mpred_trace_msg(Info))).
+mpred_trace_msg(Info):- not_not_ignore_cnotrace(((((lookup_u(mpred_is_tracing_exec);tracing)->in_cmt(wdmsg(Info));true)))).
+mpred_trace_msg(Format,Args):- not_not_ignore_cnotrace((((format_to_message(Format,Args,Info),mpred_trace_msg(Info))))).
 
-mpred_warn(Info):- ignore((\+ \+ cnotrace((lookup_u(mpred_warnings(true));tracing) -> 
+mpred_warn(Info):- not_not_ignore_cnotrace((((lookup_u(mpred_warnings(true));tracing) -> 
   wdmsg(warn(mpred,Info)) ; mpred_trace_msg('WARNING/PFC:  ~p ',[Info])),
   maybe_mpred_break(Info))).
 
-mpred_warn(Format,Args):- ignore((cnotrace((format_to_message(Format,Args,Info),mpred_warn(Info))))).
+mpred_warn(Format,Args):- not_not_ignore_cnotrace((((format_to_message(Format,Args,Info),mpred_warn(Info))))).
 
-mpred_error(Info):- \+ \+  cnotrace(tracing -> wdmsg(error(pfc,Info)) ; mpred_warn(error(Info))).
-mpred_error(Format,Args):- \+ \+  cnotrace((format_to_message(Format,Args,Info),mpred_error(Info))).
+mpred_error(Info):- not_not_ignore_cnotrace(((tracing -> wdmsg(error(pfc,Info)) ; mpred_warn(error(Info))))).
+mpred_error(Format,Args):- not_not_ignore_cnotrace((((format_to_message(Format,Args,Info),mpred_error(Info))))).
 
 mpred_watch:- assert_u(mpred_is_tracing_exec).
 mpred_trace_exec:- assert_u(mpred_is_tracing_exec).
