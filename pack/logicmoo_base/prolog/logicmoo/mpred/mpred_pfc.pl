@@ -589,7 +589,7 @@ same_file_facts(mfl(M,F,_),mfl(M,FF,_)):-nonvar(M),!, FF=@=F.
 % Physically assert the Knowledge+Support Data based on statuses
 %
 mpred_post_update4(Was,P,S,What):- 
- notrace(((get_mpred_is_tracing(P);get_mpred_is_tracing(S)),
+ not_not_ignore_cnotrace(((get_mpred_is_tracing(P);get_mpred_is_tracing(S)),
   must(S=(F,T)),wdmsg(call_mpred_post4:- (Was,post1=P,fact=F,T,What)))),
   fail.
 mpred_post_update4(identical,_P,_S,exact):-!.
@@ -2098,20 +2098,21 @@ brake(X):-  X, break.
 % 
 
 % this is here for upward compat. - should go away eventually.
-mpred_trace_op(Add,P):- get_source_ref_stack(Why), !, mpred_trace_op(Add,P,Why).
+mpred_trace_op(Add,P):- not_not_ignore_cnotrace((get_source_ref_stack(Why), !, mpred_trace_op(Add,P,Why))).
 
 
 mpred_trace_op(Add,P,S):-  
-   hotrace((mpred_trace_maybe_print(Add,P,S),
+   not_not_ignore_cnotrace((mpred_trace_maybe_print(Add,P,S),
       mpred_trace_maybe_break(Add,P,S))).
    
 
 mpred_trace_maybe_print(Add,P,S):-
+  not_not_ignore_cnotrace((
   \+ get_mpred_is_tracing(P) -> true;
   (
    ((to_u(S,U),atom(U))
        -> wdmsg("~NOP: ~p (~p) ~p",[Add,U,P])
-        ; wdmsg("~NOP: ~p (:) ~p~N\tSupported By: ~q",[Add,P,S]))),!.
+        ; wdmsg("~NOP: ~p (:) ~p~N\tSupported By: ~q",[Add,P,S]))))),!.
 
 to_u(S,U):-S=(U,ax),!.
 to_u(S,U):-S=(U,_),!.
