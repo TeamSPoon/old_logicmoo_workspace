@@ -5,6 +5,7 @@
 % Dec 13, 2035
 % Douglas Miles
 
+:- module(sanity,[]).
 
 
 :- use_module(library(logicmoo_base)).
@@ -17,7 +18,7 @@
 
 :- debug(mpred).
 :- mpred_trace_exec.
-
+:- mpred_warn.
 
 
 a(X) ==> b(X).

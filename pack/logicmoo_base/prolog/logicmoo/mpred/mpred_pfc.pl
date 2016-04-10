@@ -965,10 +965,11 @@ mpred_withdraw(P,S):-
 mpred_withdraw1(P,S):-
   sanity(is_ftNonvar(S)),sanity(is_ftNonvar(P)),
   mpred_trace_msg('~N~n\tRemoving~n\t\tterm: ~p~n\t\tsupport (was): ~p~n',[P,S]),
-  mpred_rem_support(P,S)
-     -> with_current_why(S,remove_if_unsupported(P))
+  must((
+   mpred_rem_support(P,S)
+     -> with_current_why(S,must(remove_if_unsupported(P)))
       ; mpred_warn("mpred_withdraw/2 Could not find support ~p to remove from fact ~p",
-                [S,P]).
+                [S,P]))).
 
 %%  mpred_remove(+P) is det.
 % 
@@ -1113,7 +1114,7 @@ mpred_retract_supported_relations(_).
 %  remove_if_unsupported(+Ps) checks to see if all Ps are supported and removes
 %  it from the DB if they are not.
 remove_if_unsupported(P):- 
-   mpred_supported(P) -> true ;  must(mpred_undo(P)).
+   mpred_supported(P) -> mpred_trace_msg('~p',[still_supported(P)]) ;  must(mpred_undo(P)).
 
 
 
@@ -2018,18 +2019,27 @@ mpred_database_item(P):-
   ((B== true)-> P=H; P=(H:B)).
 
 
-mpred_retract_i_or_warn(X):- sanity(is_ftNonvar(X)), with_umt(X), retract_u(X), !.
-mpred_retract_i_or_warn(spft(P,T,mfl(M,F,A))):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,T,mfl(M,F,_))).
-mpred_retract_i_or_warn(spft(P,mfl(M,F,A),T)):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,mfl(M,F,_),T)).
-mpred_retract_i_or_warn(spft(P,T,mfl(M,A,F))):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,T,mfl(M,_,F))).
-mpred_retract_i_or_warn(spft(P,mfl(M,A,F),T)):- nonvar(A),!,mpred_retract_i_or_warn(spft(P,mfl(M,_,F),T)).
-mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft( ( \+ _),_,_),!.
-mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft(_,_,_),!.
-mpred_retract_i_or_warn(X):- 
-  mpred_warn("Couldn't retract_u ~p.~n",[X]),!.
-mpred_retract_i_or_warn(X):- 
+mpred_retract_i_or_warn_1(X):- sanity(is_ftNonvar(X)), with_umt(X), retract_u(X), !, mpred_trace_msg('~NSUCCESS: ~p~n',[retract_u(X)]).
+
+
+mpred_retract_i_or_warn_0(X):- mpred_retract_i_or_warn_1(X),!.
+mpred_retract_i_or_warn_0(spft(P,T,mfl(M,F,A))):- nonvar(A),mpred_retract_i_or_warn_1(spft(P,T,mfl(M,F,_))).
+mpred_retract_i_or_warn_0(spft(P,mfl(M,F,A),T)):- nonvar(A),mpred_retract_i_or_warn_1(spft(P,mfl(M,F,_),T)).
+mpred_retract_i_or_warn_0(spft(P,T,mfl(M,A,F))):- nonvar(A),mpred_retract_i_or_warn_1(spft(P,T,mfl(M,_,F))).
+mpred_retract_i_or_warn_0(spft(P,mfl(M,A,F),T)):- nonvar(A),mpred_retract_i_or_warn_1(spft(P,mfl(M,_,F),T)).
+mpred_retract_i_or_warn_0(spft(P,F,A)):- nonvar(A),mpred_retract_i_or_warn_1(spft(P,F,_)).
+mpred_retract_i_or_warn_0(spft(P,A,T)):- nonvar(A),mpred_retract_i_or_warn_1(spft(P,_,T)).
+mpred_retract_i_or_warn_0(spft(P,_,_)):- mpred_retract_i_or_warn_1(spft(P,_,_)).
+
+
+mpred_retract_i_or_warn(X):- mpred_retract_i_or_warn_0(X),!.
+%mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft( ( \+ _),_,_),!.
+%mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft(_,_,_),!.
+mpred_retract_i_or_warn(X):- fail,
   mpred_warn("Couldn't retract_u ~p.~n",[X]),
   (debugging(dmiles)->rtrace(retract_u(X));true),!.
+mpred_retract_i_or_warn(X):- 
+  mpred_warn("Couldn't retract_u ~p.~n",[X]),!.
 
 
 
@@ -2178,11 +2188,11 @@ maybe_mpred_break(Info):- (t_l:no_mpred_breaks->true;(debugging(mpred)->dtrace(d
 mpred_trace_msg(Info):- \+ \+ cnotrace(((lookup_u(mpred_is_tracing_exec);tracing)->in_cmt(wdmsg(Info));true)).
 mpred_trace_msg(Format,Args):- \+ \+  cnotrace((format_to_message(Format,Args,Info),mpred_trace_msg(Info))).
 
-mpred_warn(Info):- \+ \+ cnotrace((lookup_u(mpred_warnings(true));tracing) -> 
+mpred_warn(Info):- ignore((\+ \+ cnotrace((lookup_u(mpred_warnings(true));tracing) -> 
   wdmsg(warn(mpred,Info)) ; mpred_trace_msg('WARNING/PFC:  ~p ',[Info])),
-  maybe_mpred_break(Info).
+  maybe_mpred_break(Info))).
 
-mpred_warn(Format,Args):- cnotrace((format_to_message(Format,Args,Info),mpred_warn(Info))).
+mpred_warn(Format,Args):- ignore((cnotrace((format_to_message(Format,Args,Info),mpred_warn(Info))))).
 
 mpred_error(Info):- \+ \+  cnotrace(tracing -> wdmsg(error(pfc,Info)) ; mpred_warn(error(Info))).
 mpred_error(Format,Args):- \+ \+  cnotrace((format_to_message(Format,Args,Info),mpred_error(Info))).
@@ -2440,14 +2450,20 @@ mpred_get_support(P,(Fact,Trigger)):-
 
 mpred_rem_support_if_exists(P,(Fact,Trigger)):-
  SPFT = spft(P,Fact,Trigger),
-  user:lookup_u(SPFT),
+  lookup_u(SPFT),
   once(mpred_retract_i_or_warn(SPFT)).
 
 
-
 mpred_rem_support(P,(Fact,Trigger)):-
-  mpred_retract_i_or_warn(spft(P,Fact,Trigger)).
+  closest_u(spft(P,Fact,Trigger),spft(P,FactO,TriggerO)),
+  mpred_retract_i_or_warn_1(spft(P,FactO,TriggerO)),!.
+mpred_rem_support(P,_):-
+  mpred_retract_i_or_warn(spft(P,_Fact,_Trigger)),!.
 
+
+closest_u(Was,WasO):-clause_asserted_u(Was),!,Was=WasO.
+closest_u(Was,WasO):-lookup_u(Was),Was=WasO,!.
+closest_u(_Was,WasO):-lookup_u(WasO),!.
 
 mpred_collect_supports(Tripples):-
   bagof_or_nil(Tripple, mpred_support_relation(Tripple), Tripples).
@@ -2990,6 +3006,10 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((is_source_ref1)/1).
 :- module_transparent(log_failure/1).
 :- module_transparent(mpred_undo1/1).
+:- module_transparent(closest_u/2).
+:- module_transparent(mpred_retract_i_or_warn_0/1).
+:- module_transparent(mpred_retract_i_or_warn_1/1).
+:- module_transparent('$exported_op'/3).
 :- module_transparent(mpred_post1_rem1/2).
 :- module_transparent(mpred_post1_rem/2).
 :- module_transparent(assert_u_confirmed_if_missing/1).
@@ -3001,6 +3021,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
    \+ mpred_database_term(F/A,_),
    F\=='$mode',
    F\=='$pldoc',
+   F\=='$exported_op',
    ignore(((\+ atom_concat('$',_,F),\+ mpred_database_term(F/A,_),export(F/A)))),
    \+ predicate_property(M:H,transparent),M:module_transparent(M:F/A),
    ignore(((\+ atom_concat('__aux',_,F),format('~N:- module_transparent(~q/~q).~n',[F,A]))))

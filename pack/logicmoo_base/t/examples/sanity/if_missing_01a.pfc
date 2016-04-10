@@ -32,8 +32,6 @@ if_missing(Missing,Create) ==>
 
 good.
 
-:- break.
-
 
 :- mpred_test(foob(a)).
 
@@ -50,15 +48,12 @@ good.
 
 :- mpred_test(foob(a)).
 
-:- break.
 
 (\+ good).
 
 :- mpred_test(\+ ~good).
 
 :- mpred_test(\+ good).
-
-:- break.
 
 :- mpred_test(\+ foob(a)).
 
@@ -70,9 +65,6 @@ good.
 
 :- mpred_test(\+ foob(a)).
 
-:- break.
-
-end_of_file.
 
 :- ain(foob(b)).
 
@@ -86,7 +78,7 @@ end_of_file.
 
 
 :- mpred_test(\+foob(b)).
-:- mpred_test(foob(a)).
+:- mpred_test(\+foob(a)).
 
 
 
