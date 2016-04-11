@@ -57,7 +57,8 @@
           [ acceptable_xform/2,
             alt_calls/1,
             any_op_to_call_op/2,
-            as_is_term/1,as_is_term0/1,as_is_term1/1,
+            as_is_term/1,as_is_term0/1,
+            as_list/2,
             compare_op/4,
             compound_all_open/1,
             conjoin_l/3,
@@ -75,6 +76,7 @@
             db_expand_term/3,
             db_expand_term0/3,
             db_expand_up/4,
+            fully_expand11/3,
             db_op_sentence/4,
             db_op_simpler/3,
             db_quf/4,
@@ -353,7 +355,7 @@ instTypePropsToType(instTypeProps,ttSpatialType).
 %
 % Reduce Clause.
 %
-reduce_clause(Op,C,HB):-demodulize(Op,C,CB),CB\=@=C,!,reduce_clause(Op,CB,HB).
+reduce_clause(Op,C,HB):-must(nonvar(C)),demodulize(Op,C,CB),CB\=@=C,!,reduce_clause(Op,CB,HB).
 reduce_clause(Op,clause(C, B),HB):-!,reduce_clause(Op,(C :- B),HB).
 reduce_clause(Op,(C:- B),HB):- is_true(B),!,reduce_clause(Op,C,HB).
 reduce_clause(_,C,C).
@@ -468,6 +470,9 @@ fully_expand(X,Y):-fully_expand(clause(unknown,cuz),X,Y).
 %  query(_,_) - for call/ask that is dirrectly runnable
 %  pfc(_,_) - for salient language based analysis at a human level
 %
+
+fully_expand11(Op,Sent,SentO):-must(functor(Op,_,2)),must((copy_term(Sent,SentM),fully_expand(Op,Sent,SentO),Sent=@=SentM)),!.
+
 fully_expand(Op,Sent,SentO):-
   once((/*hotrace*/((cyclic_break((Sent)),
            must(hotrace((deserialize_attvars(Sent,SentI)))),
@@ -562,7 +567,7 @@ fully_expand_head(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,
 %
 % Fully Expand Goal.
 %
-fully_expand_goal(Op,Sent,SentO):-
+fully_expand_goal(Op,Sent,SentO):- must(functor(Op,_,2)),
  must((
   w_tl(t_l:into_form_code,transitive_lc(db_expand_term(Op),Sent,SentM)),
     recommify(SentM,SentO))).
@@ -610,7 +615,7 @@ recommify(A,PredArgs,C):- PredArgs=..[P|Args],maplist(recommify,Args,AArgs),B=..
 %
 % Converted To If Is A Term.
 %
-as_is_term(NC):- as_is_term0(NC),!.
+as_is_term(NC):- \+ \+ as_is_term0(NC),!.
 
 :- mpred_trace_none(as_is_term(_)).
 :- '$set_predicate_attribute'(as_is_term(_), hide_childs, 1).
@@ -622,27 +627,17 @@ as_is_term(NC):- as_is_term0(NC),!.
 %
 % Converted To If Is A Term Primary Helper.
 %
-as_is_term0(M:NC):-atom(M),is_ftVar(NC),!.
+as_is_term0(NC):-cyclic_term(NC),!,wdmsg(cyclic_term(NC)),!.
 as_is_term0(NC):- \+(is_ftCompound(NC)),!.
-as_is_term0(P):-var(P),!.
-as_is_term0(NC):-cyclic_term(NC),!,dmsg(cyclic_term(NC)),!.
-as_is_term0('$VAR'(_)):-!.
-as_is_term0(_:'$was_imported_kb_content$'(_,_)).
-as_is_term0('$was_imported_kb_content$'(_,_)).
-as_is_term0('wid'(_,_,_)):-!.
+as_is_term0('$VAR'(_)).
+as_is_term0('$was_imported_kb_content$'(_,_)):-dtrace.
+as_is_term0('wid'(_,_,_)).
 as_is_term0('call'(_)).
 as_is_term0('{}'(_)).
 as_is_term0('ignore'(_)).
-as_is_term0(I):- loop_check(as_is_term1(I)).
-
-:- export(as_is_term1/1).
-
-as_is_term1(M:NC):-atom(M),!,as_is_term(NC).
-as_is_term1(NC):-functor(NC,Op,2),infix_op(Op,_).
-as_is_term1(NC):-is_unit(NC),!.
-
-%as_is_term1(NC):-is_ftVar(NC).
-%as_is_term(true).
+as_is_term0(_:NC):-!,as_is_term0(NC).
+as_is_term0(NC):-functor(NC,Op,2),infix_op(Op,_).
+as_is_term0(NC):-loop_check(is_unit(NC)),!.
 
 %=  :- was_export(infix_op/2).
 
@@ -897,6 +892,7 @@ db_expand_0(Op,Sent,SentO):- cyclic_break(Sent),db_expand_final(Op ,Sent,SentO),
 
 db_expand_0(Op,Sent,SentO):- call_last_is_var(db_expand_0(Op,Sent,SentO)).
 
+db_expand_0(Op,EL,O):- is_list(EL),!,must_maplist(db_expand_0(Op),EL,O).
 db_expand_0(Op,(H:-B),OUT):-temp_comp(H,B,db_expand_0(Op),OUT).
 
 db_expand_0(Op,(:-(CALL)),(:-(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
@@ -1053,6 +1049,7 @@ db_expand_0(Op,KB:Term,KB:O):- atom(KB),!,w_tl(t_l:caller_module(prolog,KB),db_e
 %
 demodulize(Op,H,HH):-as_is_term(H),!,HH=H.
 demodulize(Op,H,HHH):-once(strip_module(H,_,HH)),H\==HH,!,demodulize(Op,HH,HHH).
+demodulize(Op,H,HH):-is_list(H),!,must_maplist(demodulize(Op),H,HH),!.
 demodulize(Op,H,HH):-is_ftCompound(H),H=..[F|HL],!,must_maplist(demodulize(Op),HL,HHL),HH=..[F|HHL],!.
 demodulize(_ ,HB,HB).
 

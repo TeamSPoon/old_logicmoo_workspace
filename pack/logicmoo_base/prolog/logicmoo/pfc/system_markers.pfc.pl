@@ -16,7 +16,7 @@
 :- dynamic(mpred_mark_C/1).
 :- dynamic(hybrid_support/2).
 
-mpred_mark(S1, S2, F, A)/ground(S1:S2)==>arity(F,A).
+mpred_mark(S1, S2, F, A)/ground(S1:S2:F:A)==>arity(F,A).
 mpred_mark(pfcPosTrigger, S1, F, A)/ground(S1:F:A)==>marker_supported(F,A).
 mpred_mark(pfcNegTrigger, S1, F, A)/ground(S1:F:A)==>marker_supported(F,A).
 mpred_mark(pfcBcTrigger, S1, F, A)/ground(S1:F:A)==>marker_supported(F,A).

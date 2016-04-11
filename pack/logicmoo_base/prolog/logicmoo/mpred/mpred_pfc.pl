@@ -25,6 +25,7 @@
   mpred_mark_fa_as/6,
   log_failure/1,
   with_fc_mode/2,
+  to_u/2,
   mpred_mark_as/4,
   assert_u_confirmed_if_missing/1,
   assert_u_confirmed_was_missing/1,
@@ -92,7 +93,10 @@
 
   mpred_run/0,mpred_test/1,mpred_test_fok/1,
   fa_to_p/3,
-  mpred_call_no_bc/1,with_umt/1,asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,clause_u/1,clause_u/2,clause_u/3,
+  mpred_call_no_bc/1,with_umt/1,
+          asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,
+          retract_u0/1,retractall_u0/1,
+  clause_u/1,clause_u/2,clause_u/3,
   lookup_u/1,
 
           get_fc_mode/3,mpred_rem_support_if_exists/2,get_tms_mode/2,with_umt/1,
@@ -103,7 +107,7 @@
   mpred_post1/2,mpred_withdraw/1,mpred_withdraw/2,mpred_remove/1,
   mpred_remove/2,
   mpred_pp_db_justification1/2,mpred_pp_db_justifications2/3,mpred_spy1/3,
-  mpred_unfwc1/1,mpred_why1/1,mpred_blast/1,
+  mpred_unfwc_check_triggers0/1,mpred_unfwc1/1,mpred_why1/1,mpred_blast/1,
   mpred_pfc_file/0
   % trigger_trigger1/2  , trigger_trigger/3,
   ]).
@@ -167,6 +171,8 @@
 
 :- module_transparent((assert_u_confirmed_was_missing/1,mpred_trace_exec/0,pfcl_do/1,
   mpred_post2/2,get_mpred_assertion_status/3,mpred_post_update4/4,get_mpred_support_status/5,same_file_facts/2,foreachl_do/2,
+                       asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,
+                       retract_u0/1,retractall_u0/1,
   mpred_trace_op/3)).
 
 :- thread_local(t_l:no_mpred_breaks/0).
@@ -268,18 +274,22 @@ body_true(avar(_,AVS)):-nonvar(AVS),attr_bind(AVS).
 
 listing_u(P):-mpred_call_no_bc(listing(P)).
 
-assert_u(MH):- must(cnotrace(fix_mp(MH,M:H))),attvar_op(assert_i,M:H),expire_tabled_list(H).
-asserta_u(MH):- must(cnotrace(fix_mp(MH,M:H))),attvar_op(asserta_i,M:H).
-assertz_u(MH):- must(cnotrace(fix_mp(MH,M:H))),attvar_op(assertz_i,M:H).
+attvar_op_fully(Why,MH):- !, attvar_op(Why,MH).
+attvar_op_fully(Why,M:H):-fully_expand(change(Why,attvar_op_fully),H,HH),!,each_E(attvar_op(Why),M:HH,[]).
+
+assert_u(MH):- must(cnotrace(fix_mp(MH,M:H))),attvar_op_fully(assert_i,M:H),expire_tabled_list(H).
+asserta_u(MH):- must(cnotrace(fix_mp(MH,M:H))),attvar_op_fully(asserta_i,M:H).
+assertz_u(MH):- must(cnotrace(fix_mp(MH,M:H))),attvar_op_fully(assertz_i,M:H).
+retract_u(H):- retract_u0(H) *-> true; attvar_op_fully(retract_u0,H).
+
+retract_u0(H0):- strip_module(H0,_,H),(H = ( \+ _ )),!,trace_or_throw(mpred_warn(retract_u(H0))),expire_tabled_list(H).
+retract_u0(M:(H:-B)):- atom(M),!, clause_u(H,B,R),erase(R),expire_tabled_list(H).
+retract_u0((H:-B)):-!,clause_u(H,B,R),erase(R),expire_tabled_list(H).
+retract_u0(H):- clause_u(H,true,R),erase(R),expire_tabled_list(H).
 
 
-retract_u(H0):- strip_module(H0,_,H),(H = ( \+ _ )),!,trace_or_throw(mpred_warn(retract_u(H0))),expire_tabled_list(H).
-retract_u(M:(H:-B)):- atom(M),!, clause_u(H,B,R),erase(R),expire_tabled_list(H).
-retract_u((H:-B)):-!,clause_u(H,B,R),erase(R),expire_tabled_list(H).
-retract_u(H):- clause_u(H,true,R),erase(R),expire_tabled_list(H).
-
-
-retractall_u(H):- forall(clause_u(H,_,R),erase(R)),expire_tabled_list(H).
+retractall_u(H):- attvar_op_fully(retractall_u0,H).
+retractall_u0(H):- forall(clause_u(H,_,R),erase(R)),expire_tabled_list(H).
 
 
 
@@ -655,11 +665,14 @@ mpred_post_update4(Was,P,S,What):-dmsg(mpred_post_update4(Was,P,S,What)),trace,f
 
 mpred_post_update4(Was,P,S,What):-!,trace_or_throw(mpred_post_update4(Was,P,S,What)).
 
+assert_u_confirmed_was_missing(P):-
+ \+ \+ must((assert_u(P))),
+ \+ \+ sanity((clause_asserted_u(P))),!.
 
 assert_u_confirmed_was_missing(P):-
  copy_term(P,PP),
- must((assert_u(PP),P=@@=PP)),!,
- sanity((copy_term(P,PPP),clause_asserted_u(PPP),must(P=@@=PPP))),!.
+ must((assert_u(PP),P=@=PP)),!,
+ sanity((copy_term(P,PPP),clause_asserted_u(PPP),must(P=@=PPP))),!.
 
 
 assert_u_confirmed_if_missing(P):- copy_term(P,PP),
@@ -1091,14 +1104,17 @@ mpred_unfwc1(F):-
   mpred_run.
 
 
-mpred_unfwc_check_triggers(F):-
+mpred_unfwc_check_triggers(F):- loop_check(mpred_unfwc_check_triggers0(F),mpred_run).
+
+mpred_unfwc_check_triggers0(F):-
   mpred_db_type(F,fact(_FT)),
   copy_term(F,Fcopy),
   lookup_u(nt(Fcopy,Condition,Action)),
   \+ mpred_call_no_bc(Condition),
   mpred_eval_lhs(Action,((\+F),nt(F,Condition,Action))),
   fail.
-mpred_unfwc_check_triggers(_).
+mpred_unfwc_check_triggers0(_).
+
 
 mpred_retract_supported_relations(Fact):-
   mpred_db_type(Fact,Type),
@@ -1879,8 +1895,9 @@ mpred_assertz_w_support(P,Support):-
 %
 % PFC Clause For User Interface.
 %   
-clause_asserted_u(MH):- notrace(must(fully_expand(change(assert,assert_u),MH,MA))),!,clause_asserted_i(MA).
+clause_asserted_u(MH):- clause_asserted_i(MH).
 /*
+clause_asserted_u(MH):- must(fully_expand(change(assert,assert_u),MH,MA)),!,clause_asserted_i(MA).
 
 clause_asserted_u(MH):- must(cnotrace(fix_mp(MH,M:H))), clause_asserted_i(M:H).
 
@@ -2033,7 +2050,7 @@ mpred_retract_i_or_warn_0(spft(P,_,_)):- mpred_retract_i_or_warn_1(spft(P,_,_)).
 
 
 mpred_retract_i_or_warn(X):- mpred_retract_i_or_warn_0(X),!.
-%mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft( ( \+ _),_,_),!.
+mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft(_,a,a),!.
 %mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft(_,_,_),!.
 mpred_retract_i_or_warn(X):- fail,
   mpred_warn("Couldn't retract_u ~p.~n",[X]),
@@ -3019,6 +3036,10 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent(assert_u_confirmed_if_missing/1).
 :- module_transparent(get_source_ref_stack/1).
 :- module_transparent(remove_negative_version/1).
+:- module_transparent(not_not_ignore_cnotrace/1).
+:- module_transparent(retractall_u0/1).
+:- module_transparent(retract_u0/1).
+:- module_transparent(attvar_op_fully/2).
 
 :- source_location(S,_),prolog_load_context(module,M),
  forall(source_file(M:H,S),ignore((functor(H,F,A),

@@ -17,6 +17,8 @@
 
 :- include('df_include.pi').
  
+:-ain(most(t(test1_2_3,1,2,3))).
+
 most(t(test1_2_3,1,2,3)).
 
 

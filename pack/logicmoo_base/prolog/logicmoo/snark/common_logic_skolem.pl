@@ -17,6 +17,7 @@
             push_dom/2,annote/4,
             annote/3,
             skolem_unify/2,
+            push_cond/2,
             with_no_kif_var_coroutines/1
 	  ]).
 

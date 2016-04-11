@@ -55,7 +55,7 @@
 
 :- mpred_why(foob(az)).
 
-:- rtrace(mpred_withdraw( good(az) )).
+:-  (mpred_withdraw( good(az) )).
 
 :- listing([foob,good]).
 

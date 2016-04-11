@@ -16,9 +16,8 @@
 :- begin_pfc.
 
 % this should have been ok
-(if_missing(Missing,Create) ==> ((\+ Missing/(Missing\==Create), \+ Create , \+ ~(Create)) ==> Create)).
-if_missing(Missing,Create) ==> 
- ( ( \+ Missing/(Missing\=@=Create)) ==> Create).
+(if_missing(Missing,Create) ==> (( (\+ Missing/(Missing\=@=Create)), \+ ~(Create)) ==> Create)).
+% and is now is OK !
 
 :- ain((good(X) ==> if_missing(foob(_),foob(X)))).
 
@@ -34,21 +33,19 @@ if_missing(Missing,Create) ==>
 
 :- mpred_test(foob(az)).
 
-:- rtrace(rem( good(az) )).
+:- (mpred_blast( good(az) )).
 
 :- listing([foob,good]).
 
-:- break.
-
 :- mpred_test( \+foob(az)).
-
-
-
-:- mpred_test(foob(b)).
 
 ~ foob(b).
 
 :- mpred_test(\+foob(b)).
+
+
+:- ain(good(az)).
+
 :- mpred_test(foob(az)).
 
 

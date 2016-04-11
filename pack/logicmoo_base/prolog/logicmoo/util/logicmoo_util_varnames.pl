@@ -780,18 +780,21 @@ set_varname(How,N=V):-must(set_varname(How,N,V)),!.
 set_varname(How,N,V):- (var(How);var(N)),trace_or_throw(var_var_set_varname(How,N,V)).
 set_varname(_,_,NV):-nonvar(NV),ignore((NV='$VAR'(N),must(number(N);atom(N)))).
 set_varname(How,'$VAR'(Name),V):- !, set_varname(How,Name,V).
-set_varname([How],N,V):- !, set_varname(How,N,V).
-set_varname([How|List],N,V):- !, set_varname(How,N,V),set_varname(List,N,V).
+set_varname(_:[How],N,V):- !, set_varname(How,N,V).
+set_varname(_:[How|List],N,V):- !, set_varname(How,N,V),set_varname(List,N,V).
 set_varname(How,N,V):- number(N),!,format(atom(VN),'~w',[N]),set_varname(How,VN,V).
 set_varname(How,N,V):- atom(N),atom_concat('"?',LS,N),atom_concat(NN,'"',LS),fix_varcase_name(NN,VN),!,set_varname(How,VN,V).
-set_varname(write_functor,N,V):- !,ignore('$VAR'(N)=V),!.
-set_varname(write_attribute,N,V):-!,put_attr(V,vn,N).
-set_varname(Nb_setval,N,V):-nb_current('$variable_names',Vs),!,register_var(N=V,Vs,NewVs),call(call,Nb_setval,'$variable_names',NewVs).
-set_varname(Nb_setval,N,V):-call(call,Nb_setval,'$variable_names',[N=V]).
-set_varname(Nb_setval,N,V):- must(call(call,Nb_setval,N,V)).
-set_varname(_How,_,_).
+set_varname(_M:write_functor,N,V):- !,ignore('$VAR'(N)=V),!.
+set_varname(_M:write_attribute,N,V):-!,put_attr(V,vn,N).
+set_varname(_M:put_attr,N,V):-!,put_attr(V,vn,N).
+set_varname(Nb_setval,N,V):- nb_current('$variable_names',Vs),!,register_var(N,Vs,V,NewVs),call(call,Nb_setval,'$variable_names',NewVs).
+set_varname(Nb_setval,N,V):- call(call,Nb_setval,'$variable_names',[N=V]).
+%set_varname(Nb_setval,N,V):- must(call(call,Nb_setval,N,V)).
+%set_varname(_How,_,_).
 
 
+
+write_functor(N=V):-write_functor(N,V).
 
 %= 	 	 
 
@@ -915,7 +918,7 @@ ensure_vars_labled_r(I,I):-!.
 ensure_vars_labled_r(I,O):- 
   once((((nb_current('$variable_names',Vs),Vs\==[])),
    copy_term(I:Vs,O:OVs),
-    must_maplist(set_varname(write_functor),OVs))),
+    must_maplist(write_functor,OVs))),
    (O \=@= I ;  ground(O)),!.
 
 ensure_vars_labled_r(I,O):- 
