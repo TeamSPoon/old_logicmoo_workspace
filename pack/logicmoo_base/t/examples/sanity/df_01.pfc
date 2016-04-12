@@ -12,19 +12,17 @@
 
 :- begin_pfc.
 
-:- dynamic(sanity:meta_argtypes/1).
+:- dynamic(meta_argtypes/1).
 
 :- include('df_include.pi').
-
-:- break.
 
 :-dynamic((a/1,b/1,c/1)).
 
 a(X) ==> c(X).
-most(c(X) ==> b(X)) .
+mmost(c(X) ==> b(X)) .
 a(1).
 
-:- listing([a/1,b/1,c/1,(==>)/2,most/1,pt,nt,bt]).
+:- listing([a/1,b/1,c/1,(==>)/2,mmost/1,pt,nt,bt]).
 
 :- mpred_test(b(1)).
 

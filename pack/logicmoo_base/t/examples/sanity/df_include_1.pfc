@@ -6,9 +6,19 @@
 % Douglas Miles
 %  cls ; kill -9 %1 ; fg ; swipl -g "ensure_loaded(pack(logicmoo_base/t/examples/base/'sanity_abc.pfc'))."
  
+:- module(sanity,[]).
+
+:- use_module(library(logicmoo_base)).
+
+:- asserta((was_missing(Q):- mpred_literal_nv(Q), \+ ~Q, if_missing_mask(Q,R,Test),!, lookup_u(R), Test)).
+
 :- dynamic(mmost/1).
 
 :- begin_pfc.
+
+:-debug(mpred).
+:-mpred_trace_exec.
+:-mpred_trace.
 
 meta_argtypes(mmost(ftAssertable)).
 
@@ -23,17 +33,38 @@ mmost(P==>Q)/nonvar(Q) ==> (((P ==> mmost(Q)))).
 mmost(~Q)/nonvar(Q)  ==>  (( \+ Q ) ==> ~ Q ).
 
 % POS chaining
-mmost(Q)/mpred_positive_literal(Q)  ==>  ( \+(~Q)  ==> Q ).
-mmost(Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)) ==> ( ( \+R /Test ) ==> Q ).
+% mmost(Q)/mpred_positive_literal(Q)  ==>  ( \+(~Q)  ==> Q ).
 
-:-debug(mpred).
-:-mpred_trace_exec.
-:-mpred_trace.
+mmost(Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test ) ==> Q ) ,((R/( \+(R=Q), Test)) ==> (\+ Q))).
+% (((mmost(Q)/was_missing(Q)) ==> Q)).
 
-mmost(c(X) ==> b(X)) .
+% undoes the above POS chaining?
+% ((mmost(Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))==>  ((R/( \+(R=Q), Test)) ==> (\+ Q))).
+
 % mmost(Q) ==> if_missing(Q,Q).
 
 %(mmost(P=>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))  ==> ((P, \+ R/Test) => Q).
 %(mmost(P=>Q)/nonvar(Q)) ==> (P => mmost(Q)).
 
+
+:- dynamic(c/1).
+:- dynamic(b/1).
+
+
+% :- rtrace,trace.
+mmost(c(X) ==> b(X)) .
+
+c(1).
+
+:- mpred_test(mmost(b(1))).
+
+:- mpred_test(b(1)).
+
+b(2).
+
+:- listing(b/1).
+
 :- break.
+ 
+:- mpred_test(\+ b(1)).
+

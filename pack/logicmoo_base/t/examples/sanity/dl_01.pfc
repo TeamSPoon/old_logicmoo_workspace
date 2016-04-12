@@ -10,7 +10,7 @@
 
 :- module(sanity,[]).
 
-:- dynamic(sanity:meta_argtypes/1).
+:- dynamic(meta_argtypes/1).
 
 :- use_module(library(logicmoo_base)).
 

@@ -489,8 +489,8 @@ is_callable(C):-current_predicate(_,C),!.
 %
 % Check Context Module. (throws if it turns out wrong)
 %
+check_context_module:- !.
 check_context_module:- is_release,!.
-check_context_module:-!.
 check_context_module:- sanity((source_context_module(M1),get_user_abox(M2),must(M1==M2))).
 
 %% check_real_context_module is semidet.
@@ -1350,7 +1350,9 @@ correctify_support(U,(U,ax)).
 %
 % Clause Asserted Local. 
 %
-clause_asserted_local(CL):- must(CL=spft(P,Fact,Trigger )),!,
+clause_asserted_local(MCL):-
+  strip_module(MCL,_,CL),
+  must(CL=spft(P,Fact,Trigger )),!,
   clause_u(spft(P,Fact,Trigger),true,Ref),
   clause_u(spft(UP,UFact,UTrigger),true,Ref),
   (((UP=@=P,UFact=@=Fact,UTrigger=@=Trigger))).
@@ -1373,6 +1375,8 @@ is_already_supported(P,_S,UU):- clause_asserted_local(spft(P,US,UT)),must(get_so
 %
 % If Missing Mask.
 %
+if_missing_mask(Q,~Q,\+Q):- \+ is_ftCompound(Q),!.
+if_missing_mask(PQ,RO,TestO):- once(mpred_rule_hb(PQ,Q,P)),P\==true,PQ\==Q,!,if_missing_mask(Q,R,TestO),subst(PQ,Q,R,RO).
 if_missing_mask(Q,R,Test):-
    which_missing_argnum(Q,N),
    if_missing_mask(Q,N,R,Test).

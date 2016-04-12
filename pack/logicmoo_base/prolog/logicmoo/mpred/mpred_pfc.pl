@@ -1895,7 +1895,8 @@ mpred_assertz_w_support(P,Support):-
 %
 % PFC Clause For User Interface.
 %   
-clause_asserted_u(MH):- clause_asserted_i(MH).
+clause_asserted_u(MH):- must(cnotrace(fix_mp(MH,M:H))),clause_asserted_i(M:H).
+
 /*
 clause_asserted_u(MH):- must(fully_expand(change(assert,assert_u),MH,MA)),!,clause_asserted_i(MA).
 

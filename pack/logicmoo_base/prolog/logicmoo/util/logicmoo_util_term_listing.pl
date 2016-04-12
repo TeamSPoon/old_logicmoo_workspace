@@ -96,6 +96,7 @@
             update_changed_files0/0,
             update_changed_files1/0,
             xlisting/1,
+            xlisting/0,
             xlisting_inner/3
           ]).
 :- multifile     
@@ -712,6 +713,8 @@ contains_term_unifiable(SearchThis,Find):-compound(SearchThis),functor_safe(Sear
 % terms listing and varnames
 :- export(xlisting/1).
 :- module_transparent(xlisting/1).
+
+xlisting:- !,listing.
 
 %= 	 	 
 
