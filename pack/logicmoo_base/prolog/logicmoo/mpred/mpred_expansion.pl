@@ -101,6 +101,7 @@
             fully_expand/3,
             fully_expand/2,            
             fully_expand0/3,
+            fully_expand00/3,
             fully_expand_clause/3,
             fully_expand_goal/3,
             fully_expand_head/3,
@@ -473,7 +474,11 @@ fully_expand(X,Y):-fully_expand(clause(unknown,cuz),X,Y).
 
 fully_expand11(Op,Sent,SentO):-must(functor(Op,_,2)),must((copy_term(Sent,SentM),fully_expand(Op,Sent,SentO),Sent=@=SentM)),!.
 
-fully_expand(Op,Sent,SentO):-
+
+fully_expand(Op,needsExpansionFn(Sent),SentO):-!, fully_expand00(Op,Sent,SentO).
+fully_expand(Op,Sent,SentO):-!, show_call(uneeded_warn,fully_expand00(Op,Sent,SentO)),!.
+
+fully_expand00(Op,Sent,SentO):-
   once((/*hotrace*/((cyclic_break((Sent)),
            must(hotrace((deserialize_attvars(Sent,SentI)))),
    with_no_kif_var_coroutines(((fully_expand0(Op,SentI,SentO)),cyclic_break((SentO)))))))).

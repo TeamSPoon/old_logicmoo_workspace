@@ -2452,15 +2452,18 @@ matches_term0(Filter,Term):- sub_term(STerm,Term),nonvar(STerm),matches_term0(Fi
 
 %= 	 	 
 
-%% gripe_time( +TooLong, :GoalGoal) is semidet.
+%% gripe_time( +TooLong, :Goal) is nondet.
 %
 % Gripe Time.
 %
-gripe_time(TooLong,Goal):-statistics(cputime,Start),
+gripe_time(TooLong,Goal):- statistics(cputime,StartCPU),
+  statistics(walltime,[StartWALL,_]),
   (Goal*->Success=true;Success=fail),
-  once((statistics(cputime,End),
-   Elapse is End-Start,
-(Elapse>TooLong -> dmsg(gripe_time(warn(Elapse>TooLong),Goal)); true))),
+  once((statistics(walltime,[EndWALL,_]),statistics(cputime,EndCPU),
+  ElapseCPU is EndCPU-StartCPU,
+  (ElapseCPU>TooLong -> wdmsg(gripe_timeCPU(warn(ElapseCPU>TooLong),Goal)); true),
+  ElapseWALL is (EndWALL-StartWALL)/1000,
+  (ElapseWALL>TooLong -> wdmsg(gripe_timeWALL(warn(ElapseWALL>TooLong),Goal)); true))),
   Success.
 
 
