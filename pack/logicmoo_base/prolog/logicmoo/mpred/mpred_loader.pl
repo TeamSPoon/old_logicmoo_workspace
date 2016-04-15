@@ -16,6 +16,7 @@
           get_user_abox/1,set_user_abox/1,get_user_tbox/1,get_user_sbox/1,
           mpred_ops/0,mpred_ops/1,set_user_tbox/2,
           set_abox_for/2, 
+          make_module_name_local/2,
 
           is_undefaulted/1,
             user_m_check/1,
@@ -1675,14 +1676,15 @@ make_module_name_local(Source,Source):-lmcache:has_pfc_database_preds(Source).
 make_module_name_local(Source,FM):-make_module_name(Source,FM).
 
 guess_user_abox(ABox,From):- source_module(From),t_l:user_abox(From,ABox),must(ensure_abox(ABox)),!.
-guess_user_abox(ABox,From):-      
+guess_user_abox(ABox,From):-  
+ hide_trace((
   (prolog_load_context(module,Source)->true;prolog_load_context(source,Source)),
   make_module_name_local(Source,FM),
   Source\==user -> (ABox = FM, which_file(File),set_abox_for(File,ABox),set_abox_for(Source,ABox),From=ABox,set_file_abox(ABox),set_user_abox(ABox));
   (('$set_source_module'(SM,SM),
    '$module'(CM,CM),
    best_module([FM,SM,CM],From,ABox),
-   nop(dmsg(best_module([FM,SM,CM],From,ABox))))).
+   nop(dmsg(best_module([FM,SM,CM],From,ABox))))))),!.
 
 :- thread_local(t_l:user_abox/2).
 set_user_abox(User):-User==user,!,set_user_abox(baseKB).
@@ -1715,7 +1717,8 @@ set_guessed_abox(ABox,From):-
 %
 % not just user modules
 
-get_user_abox(A):- get_user_abox0(A),!.
+get_user_abox(A):-nonvar(A),!.
+get_user_abox(A):- must(quietly((get_user_abox0(A)))),!.
 
 get_user_abox0(A):- source_module(SM),t_l:user_abox(SM,A),ensure_abox(A).
 get_user_abox0(A):- which_file(File),get_abox_for(File,A).

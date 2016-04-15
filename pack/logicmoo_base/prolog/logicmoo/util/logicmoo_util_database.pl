@@ -470,11 +470,12 @@ clausify_attributes(H,B,Extra,(H:-attr_bind(Extra,B))).
 
 
 
-simple_var(Var):-var(Var),\+ attvar(Var).
+simple_var(Var):- var(Var),\+ attvar(Var).
 
 to_mod_if_needed(M,B,MB):- B==true-> MB=B ; MB = M:B.
 
-split_attrs(_,ATTRS,BODY):- ((sanity((simple_var(ATTRS),simple_var(BODY))),fail)).
+split_attrs(B,ATTRS,BODY):- \+ sanity((simple_var(ATTRS),simple_var(BODY))),
+    dumpST,dtrace(split_attrs(B,ATTRS,BODY)).
 split_attrs(B,true,B):-is_ftVar(B),!.
 split_attrs(B,true,call(B)):-is_ftVar(B),!.
 split_attrs(M:attr_bind(G,Call),M:attr_bind(G),Call):- !.
@@ -580,6 +581,7 @@ clause_asserted_i(Head):-
   variant(Head,Head_copy),!.
 
 clause_asserted_i(H,B):- clause_asserted_i(H,B,_).
+clause_asserted_i(MH,B,R):- ground(MH:B),!,clause_i(MH,B,R),clause(MHR,BR,R),!,ground(MHR,BR).
 clause_asserted_i(MH,B,R):- copy_term(MH:B,MHB),clause_i(MH,B,R),variant(MH:B,MHB).
 
 
@@ -596,7 +598,6 @@ av_comp(_A,_B):-!.
 
 put_clause_ref(Ref,V):- !, nop(put_clause_ref(Ref,V)).
 put_clause_ref(Ref,V):-put_attr(V,cref,Ref).
-
 
 remove_term_attr_type(Term,Mod):- notrace((term_attvars(Term,AVs),maplist(del_attr_type(Mod),AVs))).
 

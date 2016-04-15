@@ -332,6 +332,7 @@ xtreme_debug(P):- is_release,!,nop(P).
 xtreme_debug(P):- not_is_release, sanity(P).
 xtreme_debug(_).
 
+
 :- meta_predicate sanity(0).
 sanity(P):- \+ is_recompile, (true; is_release),!,nop(P).
 sanity(P):- on_x_rtrace(hotrace(P)),!.

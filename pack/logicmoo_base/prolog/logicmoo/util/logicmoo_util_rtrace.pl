@@ -299,7 +299,10 @@ get_tracer(Reset):-
 % restore  Trace.
 %
 restore_trace(Goal):- 
-    setup_call_cleanup_each(notrace((push_tracer)),(Goal*->notrace((reset_tracer));notrace((!,fail))),notrace(pop_tracer)).
+  setup_call_cleanup_each(
+    notrace(push_tracer),
+    (Goal*->notrace((reset_tracer));notrace((!,fail))),
+    notrace(pop_tracer)).
 
 
 %= 	 	 

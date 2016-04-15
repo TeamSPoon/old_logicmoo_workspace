@@ -121,7 +121,7 @@ never_load_special(_Module:library(Atom), Options) :- atom(Atom),member(must_be_
 never_load_special(_Module:_Spec, Options) :- member(must_be_module(true),Options),member(if(not_loaded),Options),member(imports([_/_]),Options).   
 
 
-:- use_module(logicmoo(util/logicmoo_util_filesystem)).
+% :- use_module(library(logicmoo/util/logicmoo_util_filesystem)).
 :- dynamic(prolog_load_file_loop_checked/2).
 
 % probably an autoload (SKIP)

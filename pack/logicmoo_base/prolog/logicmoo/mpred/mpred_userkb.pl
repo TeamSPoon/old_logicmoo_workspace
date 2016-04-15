@@ -16,7 +16,9 @@
 % Douglas Miles
 */
 
-% DW> ... but is there a reason why "Absurdity" is the word used for something that doesn't exist?  SOWA> It's stronger than that.  The absurd type is defined by axioms that are contradictory.  Therefore, by definition, nothing of that type can exist. 
+% DWhitten> ... but is there a reason why "Absurdity" is the word used for something that doesn't exist?  
+% SOWA> It's stronger than that.  The absurd type is defined by axioms that are contradictory. 
+%  Therefore, by definition, nothing of that type can exist. 
 :- module(mpred_userkb, [mpred_userkb_file/0]).
 
 :- include('mpred_header.pi').

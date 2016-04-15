@@ -23,6 +23,9 @@
             bad_functor/1,
             current_why/1,
             badfood/1,
+            quietly/1,
+            on_x_f/3,
+            hide_trace/1,
             block/2,
             block/3,
             with_current_why/2,
@@ -145,7 +148,8 @@
         with_preds(?, ?, ?, ?, ?, 0),
         without_must(0),
         %on_x_log_throwEach(0),
-        y_must(?, 0). 
+        y_must(?, 0).
+
 :- module_transparent
         !/1,
         addLibraryDir/0,
@@ -214,6 +218,19 @@
 
 :- include('logicmoo_util_header.pi').
 
+/** <module> logicmoo_util_catch - catch-like bocks
+
+   Tracer modes:
+
+   quietly/1 - turn off tracer if already on but still trace on failure
+   must/1 - trace on failure
+   rtrace/1 - non interactive debug
+   sanity/1 - run in quietly/1 when problems were detected previously otherwise skippable slow_sanity/1+hide_trace/1
+   assertion/1 - throw on failure
+   hide_trace/1 - hide trace temporarily
+   slow_sanity/1 - skip unless in developer mode
+
+*/
 
 :- if(\+ current_predicate(system:call_cleanup_each/2)).
 
@@ -1400,7 +1417,25 @@ must_l(Goal):- must(Goal).
 %
 % Slow Optional Sanity Checking.
 %
-slow_sanity(Goal):- ( tlbugger:skip_use_slow_sanity ; sanity(Goal)),!.
+slow_sanity(Goal):- ( tlbugger:skip_use_slow_sanity ; must(Goal)),!.
+
+
+:- meta_predicate(hide_trace(0)).
+hide_trace(G):- 
+ restore_trace((
+   notrace(
+      ignore((tracing,
+      visible(-all),
+      visible(-unify),
+      visible(+exception),
+      thread_leash(-all),
+      thread_leash(+exception)))),G)).
+
+:- meta_predicate(on_x_f(0,0,0)).
+on_x_f(G,X,F):-catchv(G,E,(dumpST,wdmsg(E),X)) *-> true ; F .
+
+:- meta_predicate quietly(0).
+quietly(G):- on_x_f(hide_trace(G),rtrace(G),rtrace(G)).
 
 
 % -- CODEBLOCK
@@ -1409,20 +1444,14 @@ slow_sanity(Goal):- ( tlbugger:skip_use_slow_sanity ; sanity(Goal)),!.
 
 % sanity is used for type checking (is not required)
 % sanity(Goal):-!.
-
-% sanity(_):-skipWrapper,!.
-
-%= 	 	 
-
 %% sanity( :GoalGoal) is semidet.
 %
 % Optional Sanity Checking.
 %
-sanity(_):- is_release,!.
-sanity(_):- bad_idea,!.
-sanity(Goal):- bugger_flag(release,true),!,assertion(Goal).
+sanity(_):- notrace((is_release;bad_idea)),!.
 sanity(Goal):- tlbugger:show_must_go_on,!,ignore(show_failure(why,Goal)).
-sanity(Goal):- ignore(must(show_failure(why,Goal))).
+sanity(Goal):- bugger_flag(release,true),!,assertion(Goal).
+sanity(Goal):- quietly(Goal).
 
 
 :- export(is_release/0).
@@ -1526,9 +1555,6 @@ get_must(Goal,CGoal):-
      (dumpST,ddmsg(error,must_xI_(E,Goal)),set_prolog_flag(debug_on_error,true),
          ignore_each((rtrace(Goal),nortrace,trace,dtrace(Goal),badfood(Goal)))))
          *-> true ; (dumpST,ignore_each(((trace,dtrace(must_failed_F__A__I__L_(Goal),Goal),badfood(Goal))))))).
-
-:- 'mpred_trace_none'(ddmsg(_)).
-:- 'mpred_trace_none'(ddmsg(_,_)).
 
 :- source_location(S,_),prolog_load_context(module,M),forall(source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A),M:export(M:F/A))).
 

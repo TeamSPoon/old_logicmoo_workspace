@@ -1,6 +1,11 @@
-./R	#!/bin/bash
-cls
-rm -f */*.log.html
+#!/bin/bash
+
+
+
+cls  || true
+
+rm -f */*.log.html  || true
+
 EXIT() {
   kill -9 $(jobs -p) %2 %3
   fg
@@ -10,9 +15,8 @@ EXIT() {
 
 set -o pipefail
 
-rm ./ALL.log.html
-rm ./sanity/ALL.log.html
-
+rm -f ./ALL.log.html || true
+rm -f ./sanity/ALL.log.html || true
 
 
 echostatus(){
@@ -39,7 +43,7 @@ trap 'EXIT' 1 2 3 4 5 6 7 8 9
  
  ( 
   echo -e "\n\n%=%=% Test $1 %=%=%\n\n"
-  ~/bin/swipl -f $1 -g "halt(7)." 
+  /usr/local/bin/swipl -f $1 -g "halt(7)." 
   status=$?
   echostatus $status $1
   ) 2>&1 |
@@ -54,50 +58,58 @@ trap 'EXIT' 1 2 3 4 5 6 7 8 9
     EXIT 666
     exit 666
   fi
-
-  # run_test_file $1
+ 
 }
 
+export -f run_test_file echostatus EXIT
+
+if [ "$1" != "" ]; then
+
+   find ./*/ -name "*.p*" -name "$1" -and \( -not -name "*htm*" \) -print -exec  bash -c 'run_test_file $0' '{}' \;
+
+else
+
+
 PASS01() {
-run_test_file ./sanity/attvar_01.pl 
-run_test_file ./sanity/attvar_02.pfc 
-run_test_file ./sanity/attvar_03.pfc 
-run_test_file ./sanity/attvar_05.pfc 
-run_test_file ./sanity/attvar_06.pfc 
-run_test_file ./sanity/attvar_07.pfc 
-run_test_file ./sanity/attvar_08.pfc 
-run_test_file ./sanity/attvar_09.pfc 
-run_test_file ./sanity/attvar_10.pfc 
-run_test_file ./sanity/attvar_11.pfc 
-run_test_file ./sanity/chr_01.pl 
+	run_test_file ./sanity/attvar_01.pl 
+	run_test_file ./sanity/attvar_02.pfc 
+	run_test_file ./sanity/attvar_03.pfc 
+	run_test_file ./sanity/attvar_05.pfc 
+	run_test_file ./sanity/attvar_06.pfc 
+	run_test_file ./sanity/attvar_07.pfc 
+	run_test_file ./sanity/attvar_08.pfc 
+	run_test_file ./sanity/attvar_09.pfc 
+	run_test_file ./sanity/attvar_10.pfc 
+	run_test_file ./sanity/attvar_11.pfc 
+	run_test_file ./sanity/chr_01.pl 
 	run_test_file ./sanity/fc_03.pfc
 	run_test_file ./sanity/fc_01.pfc
-
-run_test_file ./sanity/fc_04.pfc 
-run_test_file ./sanity/fc_05.pfc 
-run_test_file ./sanity/fc_06.pfc 
-run_test_file ./sanity/fc_07.pfc 
-run_test_file ./sanity/fc_08.pfc 
-run_test_file ./sanity/fc_09.pfc 
-run_test_file ./sanity/fc_10.pfc 
-run_test_file ./sanity/file_01.pfc 
-run_test_file ./sanity/file_02.pfc 
-run_test_file ./sanity/file_03.pfc 
-run_test_file ./sanity/if_missing_01.pfc 
-run_test_file ./sanity/if_missing_02.pfc 
-run_test_file ./sanity/if_missing_03.pfc 
-run_test_file ./sanity/nd_01.pl 
-run_test_file ./sanity/pl_01.pfc 
-run_test_file ./api/mpred_01.pl 
-run_test_file ./api/mpred_02.pl 
-run_test_file ./api/utils_01.pl 
-run_test_file ./api/utils_02.pl 
-run_test_file ./fol/zenls.pfc 
-run_test_file ./sanity/df_01.pfc 
-run_test_file ./sanity/df_03.pfc 
-run_test_file ./sanity/df_04.pfc 
-run_test_file ./sanity/df_05.pfc 
-run_test_file ./sanity/dl_01.pfc 
+	
+	run_test_file ./sanity/fc_04.pfc 
+	run_test_file ./sanity/fc_05.pfc 
+	run_test_file ./sanity/fc_06.pfc 
+	run_test_file ./sanity/fc_07.pfc 
+	run_test_file ./sanity/fc_08.pfc 
+	run_test_file ./sanity/fc_09.pfc 
+	run_test_file ./sanity/fc_10.pfc 
+	run_test_file ./sanity/file_01.pfc 
+	run_test_file ./sanity/file_02.pfc 
+	run_test_file ./sanity/file_03.pfc 
+	run_test_file ./sanity/if_missing_01.pfc 
+	run_test_file ./sanity/if_missing_02.pfc 
+	run_test_file ./sanity/if_missing_03.pfc 
+	run_test_file ./sanity/nd_01.pl 
+	run_test_file ./sanity/pl_01.pfc 
+	run_test_file ./api/mpred_01.pl 
+	run_test_file ./api/mpred_02.pl 
+	run_test_file ./api/utils_01.pl 
+	run_test_file ./api/utils_02.pl 
+	run_test_file ./fol/zenls.pfc 
+	run_test_file ./sanity/df_01.pfc 
+	run_test_file ./sanity/df_03.pfc 
+	run_test_file ./sanity/df_04.pfc 
+	run_test_file ./sanity/df_05.pfc 
+	run_test_file ./sanity/dl_01.pfc 
 
 }
 
@@ -183,4 +195,5 @@ HARD_PASS04() {
     run_test_file ./pfc/tmsex.pfc
 }
 
+fi
 

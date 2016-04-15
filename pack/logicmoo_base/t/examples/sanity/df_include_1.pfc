@@ -5,66 +5,39 @@
 % Dec 13, 2035
 % Douglas Miles
 %  cls ; kill -9 %1 ; fg ; swipl -g "ensure_loaded(pack(logicmoo_base/t/examples/base/'sanity_abc.pfc'))."
- 
+
 :- module(sanity,[]).
 
 :- use_module(library(logicmoo_base)).
 
-:- asserta((was_missing(Q):- mpred_literal_nv(Q), \+ ~Q, if_missing_mask(Q,R,Test),!, lookup_u(R), Test)).
-
-:- dynamic(mmost/1).
+:- module(sanity).
 
 :- begin_pfc.
 
-:-debug(mpred).
-:-mpred_trace_exec.
-:-mpred_trace.
+:- dynamic(meta_argtypes/1).
 
-meta_argtypes(mmost(ftAssertable)).
+:- include('df_include.pi').
 
-% BWD chaining
-mmost((Q <- P))/mpred_literal(Q) ==> (Q <-(P, \+ ~(Q))).
+:- module(sanity).
 
-% FWD chaining
-mmost(P==>Q)/nonvar(Q) ==> (((P ==> mmost(Q)))).
-% mmost(P==>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test))  ==> ((P, (\+ R)/Test ) ==> Q).
+:- dynamic((a/1,b/1,c/1)).
 
-% NEG chaining
-mmost(~Q)/nonvar(Q)  ==>  (( \+ Q ) ==> ~ Q ).
+a(X) ==> c(X).
+most(c(X) ==> b(X)) .
+a(1).
 
-% POS chaining
-% mmost(Q)/mpred_positive_literal(Q)  ==>  ( \+(~Q)  ==> Q ).
-
-mmost(Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test ) ==> Q ) ,((R/( \+(R=Q), Test)) ==> (\+ Q))).
-% (((mmost(Q)/was_missing(Q)) ==> Q)).
-
-% undoes the above POS chaining?
-% ((mmost(Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))==>  ((R/( \+(R=Q), Test)) ==> (\+ Q))).
-
-% mmost(Q) ==> if_missing(Q,Q).
-
-%(mmost(P=>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))  ==> ((P, \+ R/Test) => Q).
-%(mmost(P=>Q)/nonvar(Q)) ==> (P => mmost(Q)).
-
-
-:- dynamic(c/1).
-:- dynamic(b/1).
-
-
-% :- rtrace,trace.
-mmost(c(X) ==> b(X)) .
-
-c(1).
-
-:- mpred_test(mmost(b(1))).
+:- listing([a/1,b/1,c/1,(==>)/2,most/1,pt,nt,bt]).
 
 :- mpred_test(b(1)).
 
-b(2).
+:- mpred_why(b(1)).
 
-:- listing(b/1).
+% Justifications for b(1):
+%     1.1 \+ ~(b(1))
+%     1.2 ==>(\+ ~(b(1)),b(1))
 
-:- break.
- 
+
+~b(1).
+
 :- mpred_test(\+ b(1)).
 

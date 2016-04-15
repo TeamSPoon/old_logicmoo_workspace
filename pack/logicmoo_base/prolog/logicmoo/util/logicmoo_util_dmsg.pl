@@ -1442,6 +1442,8 @@ cls:- shell(cls).
 :- 'mpred_trace_none'(dfmt(_,_)).
 :- 'mpred_trace_none'(dmsg(_)).
 :- 'mpred_trace_none'(dmsg(_,_)).
+:- 'mpred_trace_none'(ddmsg(_)).
+:- 'mpred_trace_none'(ddmsg(_,_)).
 
 :- use_module(library(random)).
 :- use_module(logicmoo_util_varnames).

@@ -22,7 +22,7 @@
 	  ]).
 
 
-% :- ensure_loaded(library(util/logicmoo_util_attvar_reader)).
+:- ensure_loaded(library(logicmoo/util/logicmoo_util_attvar_reader)).
 
 :- module_transparent with_no_kif_var_coroutines/1.
 

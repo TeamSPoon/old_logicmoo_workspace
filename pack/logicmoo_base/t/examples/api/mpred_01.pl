@@ -9,7 +9,7 @@
 
 :- mpred_trace_exec.
 
-clif(exists(P,tPerson(P))).
+:- ain(clif(exists(P,tPerson(P)))).
 
 end_of_file.
 
@@ -23,7 +23,7 @@ genlMt(myMicrotheory,baseKB).
 
 :- mpred_trace_exec.
 
-clif(exists(P,tPerson(P))).
+:-ain(clif(exists(P,tPerson(P)))).
 
 % ?- pp_facts.
 

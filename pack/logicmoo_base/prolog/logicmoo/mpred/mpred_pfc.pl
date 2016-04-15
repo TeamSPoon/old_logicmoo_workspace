@@ -27,6 +27,7 @@
   with_fc_mode/2,
   to_u/2,
   mpred_mark_as/4,
+  get_first_user_reason/2,
   assert_u_confirmed_if_missing/1,
   assert_u_confirmed_was_missing/1,
   mpred_notrace_exec/0,
@@ -125,8 +126,8 @@
       mpred_METACALL(1,-,+),
       mpred_METACALL(1,-,+),
       mpred_METACALL(1,+),
-      mpred_call_no_bc(+),
-      call_u(+),
+      mpred_call_no_bc(0),
+      call_u(0),
       mpred_BC_CACHE(+),
       foreachl_do(0,?), 
       foreachl_do(+,?), % not all arg1s are callable
@@ -220,16 +221,21 @@ setup_mpred_ops:-
 :- setup_mpred_ops.
 
 
-%% get_source_ref( :TermU) is semidet.
+%% get_source_ref( :TermU) is det.
 %
-% Get Source Ref.
+% Get Source Ref (Current file or User)
 %
 :- module_transparent((get_source_ref)/1).
-get_source_ref(O):- current_why(U),(U=(_,_)->O=U;O=(U,ax)),!.
-get_source_ref(O):- get_source_ref1(U),(U=(_,_)->O=U;O=(U,ax)),!.
+get_source_ref(O):- notrace((current_why(U),(U=(_,_)->O=U;O=(U,ax)))),!.
+get_source_ref(O):- notrace((get_source_ref1(U),(U=(_,_)->O=U;O=(U,ax)))),!.
 
 get_source_ref_stack(O):- findall(U,current_why(U),Whys),Whys\==[],!, U=(_,_),(Whys=[U]->O=U;O=(Whys,ax)),!.
 get_source_ref_stack(O):- get_source_ref1(U),(U=(_,_)->O=U;O=(U,ax)),!.
+
+is_user_fact((_,U)):-atomic(U).
+get_first_user_reason(P,(F,T)):-with_umt(lookup_u(spft(P,F,T))),UU=(F,T),is_user_fact(UU).
+get_first_user_reason(_,UU):- get_source_ref(UU),is_user_fact(UU).
+get_first_user_reason(_,UU):- ignore(get_source_ref(UU)).
 
 %% get_source_ref1(+Mt) is semidet.
 %
@@ -495,8 +501,9 @@ ain_fast(P,S):-
 
 remove_negative_version(P):-
   % TODO extract_predciates(P,Preds),trust(Preds),
-  get_source_ref_stack(S),!,
-  with_no_mpred_trace_exec(must(mpred_ain(\+ (~(P)), S))).
+  with_no_mpred_trace_exec((
+  once((get_source_ref_stack(S),!,
+  must(mpred_ain(\+ (~(P)), S)))))),!.
 
 %% mpred_post(+Ps,+S) 
 %
@@ -958,25 +965,27 @@ mpred_ain_by_type(trigger,X):-
 mpred_ain_by_type(action,_ZAction):- !.
 
 
-  
-
 %%  mpred_withdraw(P).
 %  removes support S from P and checks to see if P is still supported.
-%  If it is not, then the fact is retreactred from the database and any support
+%  If it is not, then the fact is retracted from the database and any support
 %  relationships it participated in removed.
 
-mpred_withdraw(Ps):- get_source_ref_stack(UU),mpred_withdraw(Ps,UU).
+mpred_withdraw(Ps):- 
+  % TODO this is for idiomatic withdrawls: get_source_ref_stack(UU),
+   mpred_withdraw(Ps,_UU).
 
 %%  mpred_withdraw(+P,+S) is det.
 % removes support S from P and checks to see if P is still supported.
-%  If it is not, then the fact is retreactred from the database and any support
+%  If it is not, then the fact is retreacted from the database and any support
 %  relationships it participated in removed.
 mpred_withdraw(P,S):-
-  sanity(is_ftNonvar(S)),sanity(is_ftNonvar(P)),
+  sanity(is_ftNonvar(P)),
   each_E(mpred_withdraw1,P,[S]).
 
 mpred_withdraw1(P,S):-
-  sanity(is_ftNonvar(S)),sanity(is_ftNonvar(P)),
+  % TODO this is for idiomatic withdrawls sanity(is_ftNonvar(S)),
+  ignore(get_first_user_reason(P,S)),
+  sanity(is_ftNonvar(P)),
   mpred_trace_msg('~N~n\tRemoving~n\t\tterm: ~p~n\t\tsupport (was): ~p~n',[P,S]),
   must((
    mpred_rem_support(P,S)
@@ -989,7 +998,7 @@ mpred_withdraw1(P,S):-
 %  mpred_remove is like mpred_withdraw, but if P is still in the DB after removing the
 %  user''s support, it is retracted by more forceful means (e.ax. remove).
 % 
-mpred_remove(P):- get_source_ref(UU), mpred_remove(P,UU).
+mpred_remove(P):- get_first_user_reason(P,UU), mpred_remove(P,UU).
 mpred_remove(P,S):- each_E(mpred_remove1,P,[S]).
 
 mpred_remove1(P,S):-
@@ -1104,7 +1113,8 @@ mpred_unfwc1(F):-
   mpred_run.
 
 
-mpred_unfwc_check_triggers(F):- loop_check(mpred_unfwc_check_triggers0(F),mpred_run).
+mpred_unfwc_check_triggers(F):- loop_check(mpred_unfwc_check_triggers0(F),
+  (mpred_warn(looped_mpred_unfwc_check_triggers0(F)), mpred_run)).
 
 mpred_unfwc_check_triggers0(F):-
   mpred_db_type(F,fact(_FT)),
@@ -1233,7 +1243,7 @@ mpred_define_bc_rule(Head,_ZBody,Parent_rule):-
   fail.
 
 mpred_define_bc_rule(Head,Body,Parent_rule):-
-  get_source_ref1(U),
+  quietly(get_source_ref1(U)),
   copy_term(Parent_rule,Parent_ruleCopy),
   build_rhs(Head,Rhs),
   foreachl_do(mpred_nf(Body,Lhs),
@@ -1401,16 +1411,19 @@ mpred_BC_CACHE(P0):-  ignore( \+ loop_check_early(mpred_BC_CACHE0(P0),true)).
 mpred_BC_CACHE0(P00):- var(P00),!.
 mpred_BC_CACHE0(must(P00)):-!,mpred_BC_CACHE0(P00).
 mpred_BC_CACHE0(P):- predicate_property(P,static),!.
-mpred_BC_CACHE0(bt(_,_)):-!.
-mpred_BC_CACHE0(P):- 
+
+mpred_BC_CACHE0(MP):-strip_module(MP,M,P),mpred_BC_CACHE0(M,P).
+
+mpred_BC_CACHE0(_,bt(_,_)):-!.
+mpred_BC_CACHE0(M,P):- 
  ignore((
   cyclic_break(P),
  % acyclic_term(P),
  % trigger any bc rules.
-  lookup_u(bt(P,Trigger)),
+  M:lookup_u(bt(P,Trigger)),
   copy_term(bt(P,Trigger),bt(CP,CTrigger)),
-  must(mpred_get_support(bt(CP,Trigger),S)),
-  mpred_eval_lhs(CTrigger,S),
+  must(M:mpred_get_support(bt(CP,Trigger),S)),
+  M:mpred_eval_lhs(CTrigger,S),
   fail)).
 
 
@@ -1644,9 +1657,9 @@ mpred_connective('\\+').
 % Process Rule.
 %
 process_rule(Lhs,Rhs,Parent_rule):-
-  get_source_ref1(U),
+  quietly(get_source_ref1(U)),
   copy_term(Parent_rule,Parent_ruleCopy),
-  build_rhs(Rhs,Rhs2),
+  quietly(build_rhs(Rhs,Rhs2)),
   foreachl_do(mpred_nf(Lhs,Lhs2), 
           build_rule(Lhs2,rhs(Rhs2),(Parent_ruleCopy,U))).
 
@@ -2040,7 +2053,7 @@ mpred_database_item(P):-
 mpred_retract_i_or_warn_1(X):- sanity(is_ftNonvar(X)), with_umt(X), retract_u(X), !, mpred_trace_msg('~NSUCCESS: ~p~n',[retract_u(X)]).
 
 
-mpred_retract_i_or_warn_0(X):- mpred_retract_i_or_warn_1(X),!.
+mpred_retract_i_or_warn_0(X):- mpred_retract_i_or_warn_1(X).
 mpred_retract_i_or_warn_0(spft(P,T,mfl(M,F,A))):- nonvar(A),mpred_retract_i_or_warn_1(spft(P,T,mfl(M,F,_))).
 mpred_retract_i_or_warn_0(spft(P,mfl(M,F,A),T)):- nonvar(A),mpred_retract_i_or_warn_1(spft(P,mfl(M,F,_),T)).
 mpred_retract_i_or_warn_0(spft(P,T,mfl(M,A,F))):- nonvar(A),mpred_retract_i_or_warn_1(spft(P,T,mfl(M,_,F))).
@@ -2050,9 +2063,8 @@ mpred_retract_i_or_warn_0(spft(P,A,T)):- nonvar(A),mpred_retract_i_or_warn_1(spf
 mpred_retract_i_or_warn_0(spft(P,_,_)):- mpred_retract_i_or_warn_1(spft(P,_,_)).
 
 
-mpred_retract_i_or_warn(X):- mpred_retract_i_or_warn_0(X),!.
-mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft(_,a,a),!.
-%mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft(_,_,_),!.
+mpred_retract_i_or_warn(X):- mpred_retract_i_or_warn_0(X).
+mpred_retract_i_or_warn(SPFT):- \+ \+ SPFT = spft(_,a,a),!,fail.
 mpred_retract_i_or_warn(X):- fail,
   mpred_warn("Couldn't retract_u ~p.~n",[X]),
   (debugging(dmiles)->rtrace(retract_u(X));true),!.
@@ -2156,7 +2168,7 @@ mpred_trace(Form):-
 get_mpred_is_tracing(Form):- cnotrace(t_l:hide_mpred_trace_exec),!,
   \+ \+ ((cnotrace(lookup_u(mpred_is_tracing_pred(Form))))).
 get_mpred_is_tracing(Form):- 
-  once(t_l:mpred_debug_local ; tracing ; lookup_u(mpred_is_tracing_exec) ; lookup_u(mpred_is_tracing_pred(Form))).
+  once(t_l:mpred_debug_local ; tracing ; clause_asserted_u(mpred_is_tracing_exec) ; lookup_u(mpred_is_tracing_pred(Form))).
 
 
 %% mpred_trace(+Form, ?Condition) is semidet.
@@ -2207,7 +2219,7 @@ log_failure(_):- between(1,3,_),wdmsg(red,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 maybe_mpred_break(Info):- (t_l:no_mpred_breaks->true;(debugging(mpred)->dtrace(dmsg(Info));(dmsg(Info)))).
 
 % if the correct flag is set, trace exection of Pfc
-mpred_trace_msg(Info):- not_not_ignore_cnotrace(((((lookup_u(mpred_is_tracing_exec);tracing)->in_cmt(wdmsg(Info));true)))).
+mpred_trace_msg(Info):- not_not_ignore_cnotrace(((((clause_asserted_u(mpred_is_tracing_exec);tracing)->in_cmt(wdmsg(Info));true)))).
 mpred_trace_msg(Format,Args):- not_not_ignore_cnotrace((((format_to_message(Format,Args,Info),mpred_trace_msg(Info))))).
 
 mpred_warn(Info):- not_not_ignore_cnotrace((((lookup_u(mpred_warnings(true));tracing) -> 
@@ -2238,7 +2250,7 @@ with_mpred_trace_exec(P):- wno_tl_e(t_l:hide_mpred_trace_exec,w_tl_e(t_l:mpred_d
 % Without Trace exec.
 %
 with_no_mpred_trace_exec(P):- 
-   wno_tl_e(t_l:mpred_debug_local,w_tl_e(t_l:hide_mpred_trace_exec, must(show_if_debug(P)))).
+   wno_tl_e(t_l:mpred_debug_local,w_tl_e(t_l:hide_mpred_trace_exec, must(/*show_if_debug*/(P)))).
 
 %% show_if_debug( :GoalA) is semidet.
 %
@@ -2255,7 +2267,7 @@ show_if_debug(A):-  get_mpred_is_tracing(A) -> show_call(A) ; A.
 % If Is A Silient.
 %
 mpred_is_silient :- t_l:hide_mpred_trace_exec,!, \+ tracing.
-mpred_is_silient :- cnotrace(( \+ t_l:mpred_debug_local, \+ lookup_u(mpred_is_tracing_exec), \+ lookup_u(mpred_is_tracing_pred(_)), 
+mpred_is_silient :- cnotrace(( \+ t_l:mpred_debug_local, \+ clause_asserted_u(mpred_is_tracing_exec), \+ lookup_u(mpred_is_tracing_pred(_)), 
   current_prolog_flag(debug,false), is_release)) ,!.
 
 
@@ -2478,9 +2490,10 @@ mpred_rem_support_if_exists(P,(Fact,Trigger)):-
 
 mpred_rem_support(P,(Fact,Trigger)):-
   closest_u(spft(P,Fact,Trigger),spft(P,FactO,TriggerO)),
-  mpred_retract_i_or_warn_1(spft(P,FactO,TriggerO)),!.
-mpred_rem_support(P,_):-
-  mpred_retract_i_or_warn(spft(P,_Fact,_Trigger)),!.
+  mpred_retract_i_or_warn_1(spft(P,FactO,TriggerO)).
+mpred_rem_support(P,S):-
+  mpred_retract_i_or_warn(spft(P,Fact,Trigger)),
+  ignore((Fact,Trigger)=S).
 
 
 closest_u(Was,WasO):-clause_asserted_u(Was),!,Was=WasO.
@@ -2567,8 +2580,8 @@ mpred_classifyFacts([H|T],User,Pfc,[H|Rule]):-
   mpred_classifyFacts(T,User,Pfc,Rule).
 
 mpred_classifyFacts([H|T],[H|User],Pfc,Rule):-
-  get_source_ref(UU),
-  mpred_get_support(H,UU),
+  % get_source_ref(UU),
+  get_first_user_reason(H,_UU),
   !,
   mpred_classifyFacts(T,User,Pfc,Rule).
 

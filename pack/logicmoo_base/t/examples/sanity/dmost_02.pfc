@@ -12,9 +12,11 @@
 
 :- asserta((was_missing(Q):- mpred_literal_nv(Q), \+ ~Q, if_missing_mask(Q,R,Test),!, lookup_u(R), Test)).
 
-:- module_transparent(most/1).
-:- dynamic(most/1).
-
+:- debug(_).
+:- nodebug(http(_)).
+:- debug(mpred).
+:- mpred_trace_exec.
+:- mpred_trace.
 :- begin_pfc.
 
 meta_argtypes(most(ftAssertable)).
@@ -26,12 +28,16 @@ most((Q <- P))/mpred_literal(Q) ==> (Q <-(P, \+ ~(Q))).
 most(P==>Q)/nonvar(Q) ==> (((P ==> most(Q)))).
 
 % NEG chaining
-most(~Q)/nonvar(Q)  ==>  (( \+ Q ) ==> ~ Q ).
+most(~Q)/mpred_positive_literal(Q)  ==>  (( \+ Q ) ==> ~ Q ).
 
-% POS chaining
-most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test))
-  ==> (  ( ( \+R /Test ) ==> Q ) ,((R/( \+(R=Q), Test)) ==> (\+ Q))).
+% POS chaining 1
+most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test ) ==> Q )).
 
+% POS chaining 2
+most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> ( ((R/( \+(R=Q), Test)) ==> (\+ Q))).
+
+% POS chaining 1+2
+% most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test ) ==> Q ) ,((R/( \+(R=Q), Test)) ==> (\+ Q))).
 
 :- dynamic(b/1).
 :- dynamic(c/1).
@@ -42,14 +48,23 @@ c(1).
 
 :- mpred_test(most(b(1))).
 
-end_of_file.
-
 :- mpred_test(b(1)).
 
-b(2).
+% to start in correct module (for debugging).
+:- initialization(module(sanity)).
+
+end_of_file.
+
+:- break.
+
+:- rtrace(ain(b(2))).
+
+% test breaks here
 
 :- mpred_test(\+ b(1)).
 :- mpred_test( b(2)).
+
+end_of_file.
 
 \+ b(2).
 
@@ -58,5 +73,7 @@ b(2).
 :- mpred_test(\+ b(2)).
 :- mpred_test( b(1)).
 
+
+ 
 
 
