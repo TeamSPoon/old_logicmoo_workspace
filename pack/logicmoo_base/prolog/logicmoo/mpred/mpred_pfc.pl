@@ -1408,12 +1408,12 @@ mpred_BC_w_cache(P):- mpred_BC_CACHE(P),mpred_call_no_bc(P).
 mpred_BC_CACHE(P0):- bad_idea, \+ ((is_release,trace_or_throw(bad_idea(mpred_BC_CACHE(P0))))),!.
 mpred_BC_CACHE(P0):-  ignore( \+ loop_check_early(mpred_BC_CACHE0(P0),true)).
 
-mpred_BC_CACHE0(P00):- var(P00),!.
-mpred_BC_CACHE0(must(P00)):-!,mpred_BC_CACHE0(P00).
-mpred_BC_CACHE0(P):- predicate_property(P,static),!.
 
-mpred_BC_CACHE0(MP):-strip_module(MP,M,P),mpred_BC_CACHE0(M,P).
+mpred_BC_CACHE0(MP):- strip_module(MP,M,P),mpred_BC_CACHE0(M,P).
 
+mpred_BC_CACHE0(_,P00):- var(P00),!.
+mpred_BC_CACHE0(M,must(P00)):-!,mpred_BC_CACHE0(M,P00).
+mpred_BC_CACHE0(M,P):- predicate_property(M:P,static),!.
 mpred_BC_CACHE0(_,bt(_,_)):-!.
 mpred_BC_CACHE0(M,P):- 
  ignore((
