@@ -3054,6 +3054,11 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent(retractall_u0/1).
 :- module_transparent(retract_u0/1).
 :- module_transparent(attvar_op_fully/2).
+:- module_transparent(mpred_BC_CACHE0/2).
+:- module_transparent(mpred_unfwc_check_triggers0/1).
+:- module_transparent(get_first_user_reason/2).
+:- module_transparent(is_user_fact/1).
+
 
 :- source_location(S,_),prolog_load_context(module,M),
  forall(source_file(M:H,S),ignore((functor(H,F,A),

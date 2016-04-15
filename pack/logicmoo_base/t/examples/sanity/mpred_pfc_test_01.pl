@@ -5,8 +5,8 @@
 
 :- begin_pfc.
 
-?- listing(abox_for).
-?- listing(user_abox).
+?- listing(lmconf:abox_for/2).
+?- listing(t_l:user_abox/2).
 
 :- show_call(get_user_abox(_)).
 
