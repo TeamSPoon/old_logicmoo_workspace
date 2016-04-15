@@ -38,9 +38,10 @@
 % Managed Predicate process input  Secondary Helper.
 %
 mpred_process_input_1('?-'(TT)):-!,doall(printAll(TT)),!.
+mpred_process_input_1(':-'(TT)):-!,with_umt(TT),!.
+mpred_process_input_1(':-'(TT,TRUE)):- TRUE==true,!,with_umt(TT).
 mpred_process_input_1('$si$':'$was_imported_kb_content$'(_,_)):-!.
-mpred_process_input_1(':-'(TT)):-!,with_umt(TT).
-mpred_process_input_1(T):-try_save_vars(T),trace,with_umt(ain(T)),!.
+mpred_process_input_1(T):- must(try_save_vars(T)),with_umt(ain(T)),!.
 
 
 
@@ -48,7 +49,7 @@ mpred_process_input_1(T):-try_save_vars(T),trace,with_umt(ain(T)),!.
 %
 % Managed Predicate Process Input.
 %
-mpred_process_input(T,Vs):- must(expand_term(T,TT))->put_variable_names( Vs)->mpred_process_input_1(TT),!.
+mpred_process_input(T,Vs):- must(notrace(expand_term(T,TT)))->put_variable_names( Vs)->mpred_process_input_1(TT)->!.
 
 
 
@@ -72,27 +73,29 @@ process_this_script(S):- at_end_of_stream(S),!.
 process_this_script(S):- repeat,once(process_this_script0(S)),at_end_of_stream(S).
 
 
+consume_stream(In) :-
+        repeat,
+            (   at_end_of_stream(In)
+            ->  !
+            ;   read_pending_codes(In, Chars, []),
+                fail
+            ).
 
 
 %% process_this_script0( ?S) is semidet.
 %
 % Process This Script Primary Helper.
 %
-process_this_script0(_):- current_prolog_flag(xref,true),!.
-process_this_script0(_):- bad_idea,!.
 process_this_script0(S):- at_end_of_stream(S),!.
-process_this_script0(S):- peek_string(S,3,W), W="\n\n\n",get_code(S,_),get_code(S,_),!,process_this_script0(S).
-process_this_script0(S):- peek_string(S,2,W), W="\r\n",get_code(S,_),!,process_this_script0(S).
-process_this_script0(S):- peek_string(S,2,W), W="\n\n",get_code(S,_),!,process_this_script0(S).
-process_this_script0(S):- peek_code(S,W),member(W,`\n`),get_code(S,P),put(P),!,process_this_script0(S).
-process_this_script0(S):- peek_code(S,W),member(W,` \t\r`),get_code(S,_),!,process_this_script0(S).
+process_this_script0(S):- current_prolog_flag(xref,true),!,consume_stream(S).
+process_this_script0(S):- peek_code(S,W),member(W,` \n\r\t `),get_code(S,P),put(P),!,process_this_script0(S).
 process_this_script0(S):- peek_string(S,2,W),W="%=",!,read_line_to_string(S,String),format('~N~s~n',[String]).
 process_this_script0(S):- peek_string(S,1,W),W="%",!,read_line_to_string(S,_String).
 process_this_script0(S):- 
  with_umt((
   read_term(S,T,[variable_names(Vs)]),put_variable_names( Vs),
-  format('~N~n',[]),portray_one_line(T),format('~N~n',[]),!,
-  must(mpred_process_input(T,Vs)))).
+  format('~N~n>',[]),portray_one_line(T),format('~N~n',[]),!,
+  must(mpred_process_input(T,Vs)),!,format('~N<~n',[]))),!.
 
 
 

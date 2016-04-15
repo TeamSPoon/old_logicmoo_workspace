@@ -11,7 +11,7 @@
 
 :- begin_pfc.
 
-% :- process_this_script.
+:- process_this_script.
 
 :- dynamic(fooBar/0).
 

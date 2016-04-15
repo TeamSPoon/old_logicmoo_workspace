@@ -10,7 +10,7 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_loader.pl
 :- module(mpred_loader,
           [ add_from_file/1,
-
+          % unused_assertion/1,
           is_box_module/2,best_module/3,is_default_shared/1,
           set_guessed_abox/2,guess_user_abox/2,set_file_abox/1,
           get_user_abox/1,set_user_abox/1,get_user_tbox/1,get_user_sbox/1,
@@ -211,6 +211,9 @@
             load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, mpred_process_input_1/1, must_expand_term_to_command/2, pl_to_mpred_syntax0/2, process_this_script0/1, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc_0/2, transform_opers_0/2, transform_opers_1/2,
             mpred_loader_file/0
           ]).
+
+ :- module_transparent((load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, mpred_process_input_1/1, must_expand_term_to_command/2, pl_to_mpred_syntax0/2, process_this_script0/1, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc_0/2, transform_opers_0/2, transform_opers_1/2)).
+
  :- meta_predicate
         kb_dynamic(?),
         make_declared(?,-),
@@ -511,6 +514,7 @@ mpred_loader_module_transparent(F/A):-!, mpred_loader:module_transparent(F/A).
 %
 % Managed Predicate Prolog Only File.
 %
+mpred_prolog_only_file(File):- var(File),!,fail.
 mpred_prolog_only_file(File):- \+ (lmcache:mpred_directive_value(pfc,file,File)),!.
 mpred_prolog_only_file(File):- file_name_extension(_,pfc,File),!,fail.
 mpred_prolog_only_file(File):- lmconf:never_registered_mpred_file(File),!.
@@ -2791,6 +2795,7 @@ convert_side_effect_0b(assert_if_new(Data),Result):-!,convert_side_effect_0a(ass
 convert_side_effect_0b(assert(Data),Result):-!,convert_side_effect_0a(assertz(Data),Result).
 
 
+% unused_assertion('$was_imported_kb_content$'([], A)):-atom(A).
 
 
 %% convert_side_effect_0c( ?OpData, ?Reproduce) is semidet.
