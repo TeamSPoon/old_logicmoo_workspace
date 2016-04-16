@@ -35,6 +35,7 @@
             catchvvnt/3,
             current_source_file/1,current_source_location0/1,
             current_main_error_stream/1,
+            thread_current_input/2,
             dbgsubst/4,            
             dbgsubst0/4,
             ddmsg/1,

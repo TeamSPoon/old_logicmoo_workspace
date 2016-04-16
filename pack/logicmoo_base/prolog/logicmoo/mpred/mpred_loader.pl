@@ -304,7 +304,7 @@ chop_box(Chop,Was):-atom_concat(Was,'SBox',Chop),!.
 chop_box(Chop,Chop).
 
 
-maybe_hack_import_modules.
+maybe_hack_import_modules :- fail.
 
 %% maybe_add_import_module( ?A, ?A, ?VALUE3) is semidet.
 %

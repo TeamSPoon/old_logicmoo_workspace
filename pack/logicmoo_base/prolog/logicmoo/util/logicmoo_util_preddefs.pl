@@ -112,13 +112,6 @@
 :- module_transparent(with_pi/2).
 % = :- meta_predicate(with_pi(0,4)).
 
-%= 	 	 
-
-%% with_pi( ?VALUE1) is semidet.
-%
-% Using Predicate Indicator.
-%
-with_pi(_:[]):-!.
 
 %= 	 	 
 
@@ -853,13 +846,5 @@ rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
-
-%= 	 	 
-
-%% logicmoo_util_preddefs is semidet.
-%
-% Logicmoo Util Preddefs.
-%
-logicmoo_util_preddefs.
 
 

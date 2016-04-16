@@ -475,7 +475,7 @@ fully_expand(X,Y):-fully_expand(clause(unknown,cuz),X,Y).
 fully_expand11(Op,Sent,SentO):-must(functor(Op,_,2)),must((copy_term(Sent,SentM),fully_expand(Op,Sent,SentO),Sent=@=SentM)),!.
 
 
-fully_expand(Op,needsExpansionFn(Sent),SentO):-!, fully_expand00(Op,Sent,SentO).
+fully_expand(Op,(Sent),SentO):-!, fully_expand00(Op,Sent,SentO).
 fully_expand(Op,Sent,SentO):-!, show_call(uneeded_warn,fully_expand00(Op,Sent,SentO)),!.
 
 fully_expand00(Op,Sent,SentO):-
@@ -492,8 +492,8 @@ fully_expand00(Op,Sent,SentO):-
 % Fully Expand Primary Helper.
 %
 fully_expand0(_,Sent,SentO):- \+(is_ftCompound(Sent)),!,Sent=SentO.
-fully_expand0(Op,Sent,SentO):-must_expand(Sent),!,fully_expand_now(Op,Sent,SentO),!.
-fully_expand0(_,Sent,SentO):-get_functor(Sent,_,A),A\==1,!,Sent=SentO.
+fully_expand0(Op,Sent,SentO):- must_expand(Sent),!,fully_expand_now(Op,Sent,SentO),!.
+fully_expand0(_,Sent,SentO):- get_functor(Sent,_,A),A\==1,!,Sent=SentO.
 fully_expand0(Op,Sent,SentO):-fully_expand_now(Op,Sent,SentO),!.
 
 
@@ -505,7 +505,13 @@ fully_expand0(Op,Sent,SentO):-fully_expand_now(Op,Sent,SentO),!.
 %
 is_stripped_module(user).
 is_stripped_module(baseKB).
-
+/*
+is_stripped_module(A):-var(A),!,fail.
+is_stripped_module(system).
+is_stripped_module(Inherited):-'$current_source_module'(E), default_module(E,Inherited).
+is_stripped_module(Inherited):-'$current_typein_module'(E), default_module(E,Inherited).
+is_stripped_module(A):- get_user_abox(A),!.
+*/
 
 %= 	 	 
 

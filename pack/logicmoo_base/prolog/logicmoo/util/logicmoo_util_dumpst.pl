@@ -51,7 +51,7 @@
           dumptrace/1,dumptrace/2,
           dumptrace_ret/1,
           dump_st/0,
-          dumpST/0,dumpST/1,dumpST/2,
+          dumpST/0,dumpST/1,
           dumpST0/0,dumpST0/1,dumpST0/2,
           dumpST9/0,dumpST9/1,dumpST9/2,dumpST9/3,dumpST9/4.
 

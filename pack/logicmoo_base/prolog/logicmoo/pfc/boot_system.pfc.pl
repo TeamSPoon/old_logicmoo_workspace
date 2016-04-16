@@ -767,12 +767,9 @@ tCol(completeExtentAsserted).
 tCol(ttExpressionType).
 tCol(functorDeclares).
 
-
 ((prologHybrid(C),{get_functor(C,F,A),C\=F}) ==> arity(F,A)).
 prologHybrid(typeProps/2).
 arity(typeProps,2).
-
-
 
 % :- decl_mpred_pfc ~/1.
 prologHybrid(isEach( tCol/1, disjointWith/2, genls/2,genlPreds/2, meta_argtypes/1)).

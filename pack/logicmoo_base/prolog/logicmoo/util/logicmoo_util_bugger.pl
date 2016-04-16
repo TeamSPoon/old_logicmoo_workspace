@@ -3048,7 +3048,7 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
     prolog_frame_attribute(PFrame,goal,Goal),
     format_to_error( 'Error ST-Begin: ~p', [Term]), nl(ERR),
     ignore((thread_current_input(main,In),see(In))),
-    dumpST(Frame,20),
+    dumpST9(Frame,20),
 
     dtrace(Goal),
     format_to_error( 'Error ST-End: ~p', [Term]), nl(ERR),

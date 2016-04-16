@@ -481,12 +481,12 @@ mpred_ain(P):- must((with_umt((get_source_ref(UU),mpred_ain(P,UU))))).
 %
 %  asserts P into the dataBase with support from S.
 %
-ain(P,S):- mpred_ain(needsExpansionFn(P),S).
+ain(P,S):- mpred_ain((P),S).
 
 
 mpred_ain(P,S):- 
-  gripe_time(1.0, must(with_umt((
-  if_defined_else(to_addable_form_wte(assert,needsExpansionFn(P),P0),P0=P)  -> 
+  gripe_time(0.6, must(with_umt((
+  if_defined_else(to_addable_form_wte(assert,(P),P0),P0=P)  -> 
   each_E(mpred_post1,P0,[S]),
   mpred_run)))),!.
 %mpred_ain(_,_).
@@ -511,7 +511,7 @@ remove_negative_version(P):-
 % each fact (or the singleton) mpred_post1 is called. It always succeeds.
 %
 mpred_post(P, S):- 
-   if_defined_else(to_addable_form_wte(assert,needsExpansionFn(P),P0),P=P0), 
+   if_defined_else(to_addable_form_wte(assert,(P),P0),P=P0), 
    each_E(mpred_post1,P0,[S]).
 
 
@@ -1101,7 +1101,7 @@ mpred_undo1(Fact):-
 % "un-forward-chains" from fact P.  That is, fact P has just
 %  been removed from the database, so remove all support relations it
 %  participates in and check the things that they support to see if they
-%  should stayuser in the database or should also be removed.
+%  should stay in the database or should also be removed.
 %
 mpred_unfwc(F):- 
   show_call(mpred_retract_supported_relations(F)),
@@ -1610,7 +1610,7 @@ build_rhs(X,[X2]):-
 
 mpred_compile_rhs_term(_Sup,P,P):-is_ftVar(P),!.
 mpred_compile_rhs_term(Sup,(P/C),((P0:-C0))) :- !,mpred_compile_rhs_term(Sup,P,P0),build_code_test(Sup,C,C0),!.
-mpred_compile_rhs_term(Sup,I,O):- if_defined_else(to_addable_form_wte(mpred_compile_rhs_term,needsExpansionFn(I),O),I=O), must(\+ \+ mpred_mark_as(Sup,p,O,pfcRHS)),!.
+mpred_compile_rhs_term(Sup,I,O):- if_defined_else(to_addable_form_wte(mpred_compile_rhs_term,(I),O),I=O), must(\+ \+ mpred_mark_as(Sup,p,O,pfcRHS)),!.
 
 mpred_compile_rhs_term((P/C),((P:-C))):- !.
 mpred_compile_rhs_term(P,P).

@@ -18,7 +18,6 @@
             hb_to_clause/3,
             paina/1,pain/1,painz/1,
             modulize_head/2,
-            clause_asserted5/5,
             remove_term_attr_type/2,
             ainz_clause/1,ainz_clause/2,
             simple_var/1,
@@ -34,7 +33,7 @@
             clause_true/1,
             modulize_head_fb/4,
             attr_bind/1,
-            clause_asserted/1,clause_asserted/2,clause_asserted/3,clause_asserted4/4,
+            clause_asserted/1,clause_asserted/2,clause_asserted/3,
             clause_asserted_i/1,clause_asserted_i/2,clause_asserted_i/3,
             clause_i/1,clause_i/2,clause_i/3,
             assert_i/1,asserta_i/1,assertz_i/1,
@@ -90,7 +89,6 @@
         append_term/3,
         modulize_head/2,
         modulize_head_fb/4,
-        clause_asserted5/5,
         my_module_sensitive_code/1,
         assertz_new/1,
         call_provider/2,
@@ -604,25 +602,9 @@ remove_term_attr_type(Term,Mod):- notrace((term_attvars(Term,AVs),maplist(del_at
 :- op(700,xfx,'=@=').
 
 
-% clause_asserted(MH,B,Ref):- modulize_head(MH,M:H), clause_asserted4(M,H,B,Ref).
-
-clause_asserted4(M,H,B,Ref):- ground(H:B),!,clause(M:H,B,Ref),clause(HH,BB,Ref),ground(HH:BB),!.
-clause_asserted4(M,H,B,Ref):-
- copy_term((H,B),(HC,BC),Attribs),
- copy_term((HC,BC),(HT,BT)),
- clause_asserted5(M,HC,BC,CAttribs,Ref),
- (HC,BC)=@=(HT,BT),(HC,BC)=(HT,BT),
- dont_make_cyclic((
- attributes_equal(Attribs,CAttribs,TODO),
- \+ \+ once(attr_bind(TODO)))).
-
 dont_make_cyclic(G):-cyclic_break(G),!,copy_term(G,GG),
   (G*-> (acyclic_term(G)->true;(dtrace,trace,GG)) ; fail).
 
-
-clause_asserted5(M,H,B,Attribs,Ref):- 
- clause(M:H,BC,Ref),
-  ((compound(BC),BC = attr_bind(Attribs,B)) -> true ; (BC=B -> Attribs=[])).
 
 attribute_is_info(name_variable(_Var,  _Name)).
 attribute_is_info(put_attrs(_Var, vn, _Name)).
