@@ -45,15 +45,18 @@ mdefault((Q <- P))/mpred_literal(Q) ==> (Q <-(P, \+ ~(Q))).
 
 % FWD chaining
 mdefault(P==>Q)/nonvar(Q) ==> (((P ==> mdefault(Q)))).
-% mdefault(P==>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test))  ==> ((P, (\+ R)/Test ) ==> Q).
 
 % NEG chaining
-mdefault(~Q)/nonvar(Q)  ==>  (( \+ Q ) ==> ~ Q ).
+mdefault(~Q)/mpred_positive_literal(Q)  ==>  (( \+ Q ) ==> ~ Q ).
 
-% POS chaining
-mdefault(Q)/mpred_positive_literal(Q)  ==>  ( \+(~Q)  ==> Q ).
-mdefault(Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)) ==> ( ( \+R /Test ) ==> Q ).
+% POS chaining 1
+mdefault(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test ) ==> Q )).
 
+% POS chaining 2
+mdefault(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> ( ((R/( \+(R=Q), Test)) ==> (\+ Q))).
+
+% POS chaining 1+2
+% mdefault(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test ) ==> Q ) ,((R/( \+(R=Q), Test)) ==> (\+ Q))).
 
 % mdefault(Q) ==> if_missing(Q,Q).
 
