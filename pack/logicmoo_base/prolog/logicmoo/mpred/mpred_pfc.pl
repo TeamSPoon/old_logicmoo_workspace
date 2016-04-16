@@ -26,9 +26,10 @@
   log_failure/1,
   with_fc_mode/2,
   to_u/2,
+  fresh_mode/0,
   mpred_mark_as/4,
   get_first_user_reason/2,
-  assert_u_confirmed_if_missing/1,
+  assert_u_confirm_if_missing/1,
   assert_u_confirmed_was_missing/1,
   mpred_notrace_exec/0,
   remove_negative_version/1,
@@ -530,10 +531,31 @@ mpred_post1( \+ P,   S):- nonvar(P), !, must(mpred_post1_rem(P,S)).
 mpred_post1(  ~ P,   S):- 
    with_current_why(S,with_no_mpred_breaks((nonvar(P),doall(mpred_remove(P,S)),must(mpred_undo(P))))),fail.
 
-mpred_post1(P0,S0):-  
-   copy_term(mpred_post1(P0,S0),mpred_post1(P,S)),
-   must(mpred_post2(P,S)),!.
+mpred_post1(P,S):-  
+   \+ \+ must(mpred_post2(P,S)),
+   mpred_fwc(P).
+   
+fresh_mode.
 
+%% mpred_post2(+Ps,+S) 
+%
+% Two version exists of this function one expects for a clean database and adds new information.
+% tries to assert a fact or set of fact to the database.
+% The other version is if the program is been running before loading this module.
+%
+mpred_post2(P,S):- 
+  fresh_mode,!,
+  % db mpred_ain_db_to_head(P,P2),
+  % mpred_remove_old_version(P),  
+ \+ \+ mpred_add_support(P,S),
+  (\+ mpred_unique_u(P) -> mpred_fwc(P) ;
+  ( assert_u_confirm_if_missing(P),
+     !,
+     mpred_trace_op(add,P,S),
+     !,
+     mpred_enqueue(P,S),
+     !)).
+  
 /*
 % this would be the very inital by Tim Finnin...
 mpred_post2(P,S):- 
@@ -548,12 +570,6 @@ mpred_post2(P,S):-
   !.
 */
 
-%% mpred_post2(+Ps,+S) 
-%
-% Two version exists of this function one expects for a clean database and adds new information.
-% tries to assert a fact or set of fact to the database.
-% The other version is if the program is been running before loading this module.
-%
 /*
 % Expects a clean database and adds new information.
 mpred_post2(P,S):-  fail,!,  
@@ -574,7 +590,7 @@ mpred_post2(P,S):-  fail,!,
 % (running the program is been running before loading this module)
 %
 %  (gets the status in Support and in Database)
-mpred_post2(P,S):-  !, 
+mpred_post2(P,S):- !,
   copy_term((P,S),(PP,SS)),
   b_setval('$variable_names',[]),!,
 % checks to see if we have forward chain the knowledge yet or 
@@ -682,7 +698,7 @@ assert_u_confirmed_was_missing(P):-
  sanity((copy_term(P,PPP),clause_asserted_u(PPP),must(P=@=PPP))),!.
 
 
-assert_u_confirmed_if_missing(P):- copy_term(P,PP),
+assert_u_confirm_if_missing(P):- copy_term(P,PP),
  with_umt((hotrace(clause_asserted_u(PP))-> true ; assert_u_confirmed_was_missing(P))).
 
 %% get_mpred_current_db(-Db) is semidet.
@@ -2476,7 +2492,7 @@ mpred_add_support(P,(Fact,Trigger)):-
  % (Trigger= nt(F,Condition,Action) -> 
  %   (mpred_trace_msg('~N~n\tAdding mpred_do_fcnt via support~n\t\ttrigger: ~p~n\t\tcond: ~p~n\t\taction: ~p~n\t from: ~p~N',
  %     [F,Condition,Action,mpred_add_support(P,(Fact,Trigger))]));true),
-  assert_u_confirmed_if_missing(spft(P,Fact,Trigger)).
+  assert_u_confirm_if_missing(spft(P,Fact,Trigger)).
 
 mpred_get_support(P,(Fact,Trigger)):-
       lookup_u(spft(P,Fact,Trigger)).
@@ -3047,7 +3063,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent('$exported_op'/3).
 :- module_transparent(mpred_post1_rem1/2).
 :- module_transparent(mpred_post1_rem/2).
-:- module_transparent(assert_u_confirmed_if_missing/1).
+:- module_transparent(assert_u_confirm_if_missing/1).
 :- module_transparent(get_source_ref_stack/1).
 :- module_transparent(remove_negative_version/1).
 :- module_transparent(not_not_ignore_cnotrace/1).

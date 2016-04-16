@@ -31,7 +31,7 @@ most(P==>Q)/nonvar(Q) ==> (((P ==> most(Q)))).
 most(~Q)/mpred_positive_literal(Q)  ==>  (( \+ Q ) ==> ~ Q ).
 
 % POS chaining 1
-most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test ) ==> Q )).
+most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test, (\+ ~Q )) ==> Q )).
 
 % POS chaining 2
 most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> ( ((R/( \+(R=Q), Test)) ==> (\+ Q))).
@@ -42,8 +42,6 @@ most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> ( ((R/( \+(R=Q
 :- dynamic(b/1).
 
 most(b(1)).
-
-:- break.
 
 :- mpred_test(most(b(1))).
 

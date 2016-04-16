@@ -4,8 +4,8 @@
 :- set_mpred_module(baseKB).
 
 % catching of misinterpreations
-(mpred_mark(pfcPosTrigger,_,F,A)/(fa_to_p(F,A,P), predicate_property(P,static))) ==> {trace_or_throw(warn(pfcPosTrigger,P,static))}.
-(mpred_mark(pfcNegTrigger,_,F,A)/(fa_to_p(F,A,P), predicate_property(P,static))) ==> {dmsg(warn(pfcNegTrigger,P,static))}.
+(mpred_mark(pfcPosTrigger,_,F,A)/(fa_to_p(F,A,P), P\={_}, predicate_property(P,static))) ==> {trace_or_throw(warn(pfcPosTrigger,P,static))}.
+(mpred_mark(pfcNegTrigger,_,F,A)/(fa_to_p(F,A,P),  P\={_}, predicate_property(P,static))) ==> {dmsg(warn(pfcNegTrigger,P,static))}.
 (mpred_mark(pfcBcTrigger,_,F,A)/(fa_to_p(F,A,P), predicate_property(P,static))) ==> {dmsg(warn(pfcNegTrigger,P,static))}.
 
 

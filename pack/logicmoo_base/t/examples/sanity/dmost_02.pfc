@@ -31,10 +31,10 @@ most(P==>Q)/nonvar(Q) ==> (((P ==> most(Q)))).
 most(~Q)/mpred_positive_literal(Q)  ==>  (( \+ Q ) ==> ~ Q ).
 
 % POS chaining 1
-most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test ) ==> Q )).
+most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test, (\+ ~Q )) ==> Q )).
 
 % POS chaining 2
-most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> ( ((R/( \+(R=Q), Test)) ==> (\+ Q))).
+most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> ( ((R/( Test, \+(R=Q))) ==> (\+ Q))).
 
 % POS chaining 1+2
 % most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test ) ==> Q ) ,((R/( \+(R=Q), Test)) ==> (\+ Q))).
@@ -53,18 +53,15 @@ c(1).
 % to start in correct module (for debugging).
 :- initialization(module(sanity)).
 
-end_of_file.
+:- ain(b(2)).
 
-:- break.
-
-:- rtrace(ain(b(2))).
 
 % test breaks here
+:- listing(b/1).
 
 :- mpred_test(\+ b(1)).
 :- mpred_test( b(2)).
 
-end_of_file.
 
 \+ b(2).
 

@@ -2,14 +2,14 @@
 
 :- module(myMicrotheory,[]).
 
-:- use_module(library(logicmoo_user)).
+:- use_module(library(logicmoo_base)).
 
 :- begin_pfc.
 
 
 :- mpred_trace_exec.
 
-:- ain(clif(exists(P,tPerson(P)))).
+%:- ain(clif(exists(P,tPerson(P)))).
 
 end_of_file.
 
