@@ -85,7 +85,7 @@ unsafe_preds(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
 
 :- file_begin(prolog).
 
-:- '$set_source_module'(_,'user').
+:- '$set_source_module'('user').
 
 :- asserta(t_l:disable_px).
 

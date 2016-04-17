@@ -25,7 +25,7 @@
 :- onEndOfFile(dmsg(infSupertypeName)).
 
 :- include(prologmud(mud_header)).
-:- '$set_source_module'(_,baseKB).
+:- '$set_source_module'(baseKB).
 :- file_begin(pfc).
 :- set_user_abox(baseKB).
 

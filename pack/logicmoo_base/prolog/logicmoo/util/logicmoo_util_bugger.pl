@@ -609,7 +609,7 @@ throw_safe(Exc):-trace_or_throw(Exc).
 test_for_release(File):-  source_file(File), \+ make:modified_file(File), !.
 test_for_release(File):-  
  G = test_for_release(File),
- setup_call_cleanup(dmsg('~N~nPress Ctrl-D to begin ~n~n  :- ~q. ~n~n',[G]),
+ setup_call_cleanup_each(dmsg('~N~nPress Ctrl-D to begin ~n~n  :- ~q. ~n~n',[G]),
   if_interactive(prolog),
    setup_call_cleanup(dmsg('~N~nStarting ~q...~n',[G]),
       w_tl(t_l:testing_for_release(File),ensure_loaded(File)),
@@ -1684,8 +1684,8 @@ singletons(_).
 :- set_prolog_flag(debugger_show_context,true).
 :- set_prolog_flag(trace_gc,true).
 :- set_prolog_flag(debug,true).
-*/
 :- set_prolog_flag(gc,true).
+*/
 
 %= 	 	 
 
@@ -2603,8 +2603,7 @@ caller_module(Module,Skipped):- module_stack(Module,_), \+ arg(_,Skipped,Module)
 % Module Stack.
 %
 module_stack(M,prolog_load_context):- prolog_load_context(module, M).
-module_stack(M,'$module'):- '$module'(M,M).
-module_stack(M,'$set_source_module'):- '$set_source_module'(M,M).
+module_stack(M,'$current_typein_module'):- '$current_typein_module'(M).
 module_stack(M,of):- predicate_property(M:of(_,_),imported_from(func)).
 module_stack(M,frame):- prolog_current_frames(Each), prolog_frame_attribute(Each,context_module,M).
 

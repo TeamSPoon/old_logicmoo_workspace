@@ -329,7 +329,7 @@ simplify_m(G,G).
 % Fdmsg.
 %
 fdmsg(fr(List)):-is_list(List),!,must((fresh_line,ignore(forall(member(E,List),fdmsg1(E))),nl)).
-fdmsg(M):-ddmsg(failed_fdmsg(M)).
+fdmsg(M):- logicmoo_util_catch:ddmsg(failed_fdmsg(M)).
 
 :-export(simplify_goal_printed/2).
 
@@ -500,8 +500,9 @@ to_wmsg(G,WG):- (G=WG).
 
 
 with_source_module(G):-
-  '$set_source_module'(M,M),'$module'(WM,M),
-  call_cleanup(G,'$module'(_,WM)).
+  '$current_source_module'(M),
+  '$current_typein_module'(WM),
+  setup_call_cleanup_each('$set_typein_module'(M),G,'$set_typein_module'(WM)).
    
 
 % =====================

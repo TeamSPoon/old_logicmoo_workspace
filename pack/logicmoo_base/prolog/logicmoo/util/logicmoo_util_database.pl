@@ -579,7 +579,7 @@ clause_asserted_i(Head):-
   variant(Head,Head_copy),!.
 
 clause_asserted_i(H,B):- clause_asserted_i(H,B,_).
-clause_asserted_i(MH,B,R):- ground(MH:B),!,clause_i(MH,B,R),clause(MHR,BR,R),!,ground(MHR,BR).
+clause_asserted_i(MH,B,R):- ground(MH:B),!,clause(MH,B,R),clause(MHR,BR,R),ground(MHR:BR).
 clause_asserted_i(MH,B,R):- copy_term(MH:B,MHB),clause_i(MH,B,R),variant(MH:B,MHB).
 
 
@@ -768,7 +768,7 @@ erase_safe_now(M,clause(A,B),REF):-!,
    show_success(erase_safe_now, \+ nth_clause(A, _Index, REF));   
    show_success(erase_safe_now, clause_property(REF,erased));
    show_success(erase_safe_now, \+ clause_property(REF,_))))
-   -> ddmsg(warn(var_erase_safe(clause(A,B),REF))) ; 
+   -> logicmoo_util_catch:ddmsg(warn(var_erase_safe(clause(A,B),REF))) ; 
        erase(REF)).
 */
 

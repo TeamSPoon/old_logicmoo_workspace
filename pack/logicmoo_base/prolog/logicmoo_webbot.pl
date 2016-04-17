@@ -4,7 +4,8 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- if(('$set_source_module'(CM,CM),'$module'(M,M),asserta(logicmoo_webbot:user_module_uses(M,CM)))).
+:- if(('$current_source_module'(CM),'$current_typein_module'(M),
+  asserta(logicmoo_webbot:user_module_uses(M,CM)))).
 :- endif.
 :- module(logicmoo_webbot,
  [qsp/0]).

@@ -68,6 +68,7 @@
             not_member_eq/2,            
    print_numbervars_maybe/1,
    print_numbervars/1,
+   que_read_source_file_vars/1,
             read_source_file_vars/1,
             read_source_file_vars_1/1,
             read_source_vars/2,
@@ -815,8 +816,8 @@ write_functor(N,V):-ignore('$VAR'(N)=V),!.
 %
 % Save Clause Variables.
 %
-save_clause_vars(_,_):- \+ maybe_record_scanned_file,!.
-save_clause_vars(MHB,Vs):- ignore(current_why(Why)),ignore((var(Why),loading_file(Why))),!,save_clause_vars(MHB,Vs,Why).
+save_clause_vars(MHB,Vs):- ignore(maybe_record_scanned_file),ignore(current_why(Why)),
+  ignore((var(Why),loading_file(Why))),!,save_clause_vars(MHB,Vs,Why).
 
 % ?- clause(pui_help:prolog_help_topic(A),B,ClauseRef), prolog_clause:clause_info(ClauseRef, File, TermPos, NameOffset, Options).
 
@@ -1172,9 +1173,15 @@ scan_for_varnames:-
  set_prolog_flag(mpred_vars, true),
  ensure_loaded(library(make)),
  doall((make:modified_file(F),retractall(varname_cache:varname_info_file(F)))),
- doall((filematch(swi('boot/*.pl'),F),read_source_file_vars(F))),
- doall((source_file(F),read_source_file_vars(F))),!.
+ doall((filematch(swi('boot/*.pl'),F),que_read_source_file_vars(F))),
+ doall((source_file(F),que_read_source_file_vars(F))),!,
+ ignore((
+   ( \+ \+ varname_cache:queued_read_source_file_vars(_)),
+   gripe_time(1.0,doall((retract(varname_cache:queued_read_source_file_vars(F)),
+     read_source_file_vars(F)))))).
 
+que_read_source_file_vars(F):-varname_cache:varname_info_file(F),!.
+que_read_source_file_vars(F):-ain00(varname_cache:queued_read_source_file_vars(F)).
 
 %= 	 	 
 
@@ -1187,6 +1194,7 @@ dcall_if_verbose(G):-show_call(why,G).
 
 %  list_undefined([module_class([user,system,library,test,development])]).
 :- dynamic(varname_cache:varname_info_file/1).
+:- dynamic(varname_cache:queued_read_source_file_vars/1).
 
 %= 	 	 
 
@@ -1365,7 +1373,7 @@ term_expansion_save_vars(HB):- \+ ground(HB),  \+ t_l:dont_varname_te,\+ t_l:don
 %
 % Maybe Record Scanned File.
 %
-maybe_record_scanned_file:-ignore((  fail,source_location(F,_), \+ varname_cache:varname_info_file(F), asserta(varname_cache:varname_info_file(F)))).
+maybe_record_scanned_file:-ignore((  source_location(F,_), \+ varname_cache:varname_info_file(F), asserta(varname_cache:varname_info_file(F)))).
 
 
 %= 	 	 
@@ -1399,7 +1407,7 @@ logicmoo_util_varnames_file.
 % Make Hook.
 %
 prolog:make_hook(before, Files):-forall(member(File,Files),retractall(varname_cache:varname_info_file(File))).
-prolog:make_hook(after, Files):-forall(member(File,Files),show_call(why,ain00(varname_cache:varname_info_file(File)))).
+% prolog:make_hook(after, Files):- forall(member(File,Files),show_call(why,ain00(varname_cache:varname_info_file(File)))).
 
 %= 	 	 
 

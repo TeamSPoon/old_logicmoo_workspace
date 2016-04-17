@@ -306,7 +306,7 @@ no_repeats_av(AVar,Call):- var(AVar),!,
 no_repeats_av_l([],Call):-!,Call,!.
 no_repeats_av_l([AVar],Call):-!,
    no_repeats_av(AVar,Call).
-no_repeats_av_l([AVar|List],Call):-   setup_call_cleanup(
+no_repeats_av_l([AVar|List],Call):-   setup_call_cleanup_each(
        (was(AVar,iNEVER),asserta(tlbugger:cannot_save_table,Ref),get_attr(AVar,waz,varwaz(CONS,_))),
         (Call,copy_term_nat(AVar,C),nb_linkarg(2, CONS, [_-C|CONS])),
         (del_attr(AVar,was),erase_safe(tlbugger:cannot_save_table,Ref))).

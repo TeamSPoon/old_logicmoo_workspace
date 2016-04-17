@@ -374,3 +374,5 @@ test2(In) :-
 some_test :- writeln(done).
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
+
+

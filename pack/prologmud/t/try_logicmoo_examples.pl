@@ -34,8 +34,8 @@ If we obeyed the limitations set forth upon Horn clauses only being "positive" t
 */
 
 :- module(kb).
-:- '$set_source_module'(_,kb).
-:- '$module'(_,kb).
+:- '$set_source_module'(kb).
+:- '$set_typein_module'(kb).
 
 
 :- if(gethostname(ubuntu)).
@@ -49,7 +49,7 @@ If we obeyed the limitations set forth upon Horn clauses only being "positive" t
 :- ensure_loaded(logicmoo('snark/common_logic_clif.pfc')).
 
 :- debug(mpred).
-:- set_prolog_flag(gc,true).
+% :- set_prolog_flag(gc,true).
 
 
 

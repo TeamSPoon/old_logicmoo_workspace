@@ -229,7 +229,7 @@ prologHybrid(genls/2).
      prologHybrid(F),
     arity(F,A)).
 
-((prologHybrid(F),arity(F,A))<==>hybrid_support(F,A)).
+((prologHybrid(F),arity(F,A))/ground(v(F,A))<==>hybrid_support(F,A))/ground(v(F,A)).
 
 :- ensure_loaded('system_markers.pfc').
 
@@ -376,8 +376,10 @@ tSet(C)==>completelyAssertedCollection(C).
 % ttExpressionType(C)==> ~completelyAssertedCollection(C).
 
 tCol(C)/(atom(C),TCI=..[C,I]) ==> {decl_type(C)},arity(C,1),{mpred_univ(C,I,TCI)}.
+
 (tCol(C)/(atom(C), \+ static_predicate(C/1) )) ==> {kb_dynamic(C/1)}.
-(tCol(C)/(atom(C),TCI=..[C,I],\+ static_predicate(C/1), \+completelyAssertedCollection(C))) 
+
+(tCol(C)/(atom(C),TCI=..[C,I],\+ static_predicate(C/1), \+ completelyAssertedCollection(C))) 
   ==> ((TCI:- 
     ((cwc,
     lazy(( \+ ~(TCI))),

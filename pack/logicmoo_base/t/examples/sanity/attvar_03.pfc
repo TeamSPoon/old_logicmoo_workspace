@@ -8,7 +8,7 @@
 :- module(sanity_attvar_03,[]).
 
 :- use_module(library(logicmoo_base)).
-% :- '$set_source_module'(_,ABox),'$module'(_,ABox).
+% :- '$set_source_module'(ABox),'$set_typein_module'(ABox).
 
 
 :- debug(_).

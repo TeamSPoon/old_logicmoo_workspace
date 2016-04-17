@@ -550,8 +550,7 @@ fully_expand_now(Op,Sent,SentO):-
 
 fully_expand_clause(Op,_Sent,_SentO):- sanity(is_ftNonvar(Op)),fail.
 
-fully_expand_clause(Op,PFC,Next):- is_ftVar(PFC),!,PFC=Next.
-fully_expand_clause(_ ,NC,NC):- as_is_term(NC),!.
+fully_expand_clause(_, PFC,Next):- as_is_term(PFC),!,PFC=Next.
 fully_expand_clause(_ ,arity(F,A),arity(F,A)):-!.
 fully_expand_clause(Op ,NC,NCO):- db_expand_final(Op,NC,NCO),!.
 fully_expand_clause(Op,'==>'(Sent),(SentO)):-!,fully_expand_clause(Op,Sent,SentO),!.
@@ -559,7 +558,7 @@ fully_expand_clause(Op,'=>'(Sent),(SentO)):-!,fully_expand_clause(Op,Sent,SentO)
 fully_expand_clause(Op,':-'(Sent),Out):-!,fully_expand_goal(Op,Sent,SentO),!,must(Out=':-'(SentO)).
 fully_expand_clause(Op,(H:-B),OUT):- temp_comp(H,B,fully_expand_clause(Op),OUT).
 fully_expand_clause(Op,(H:-B),Out):- !,fully_expand_head(Op,H,HH),fully_expand_goal(Op,B,BB),!,must(Out=(HH:-BB)).
-fully_expand_clause(Op,(B/H),Out):- !,fully_expand_head(Op,H,HH),fully_expand_goal(Op,B,BB),!,must(Out=(BB/HHHH)).
+fully_expand_clause(Op,(B/H),Out):- !,fully_expand_head(Op,H,HH),fully_expand_goal(Op,B,BB),!,must(Out=(BB/HH)).
 fully_expand_clause(Op, HB,HHBB):- must((to_reduced_hb(Op,HB,H,B),fully_expand_head(Op,H,HH),!,fully_expand_goal(Op,B,BB),!,reduce_clause(Op,(HH:-BB),HHBB))),!.
 fully_expand_clause(_ ,NC,NC).
 
@@ -639,7 +638,7 @@ as_is_term(NC):- \+ \+ as_is_term0(NC),!.
 % Converted To If Is A Term Primary Helper.
 %
 as_is_term0(NC):-cyclic_term(NC),!,wdmsg(cyclic_term(NC)),!.
-as_is_term0(NC):- \+(is_ftCompound(NC)),!.
+as_is_term0(NC):- \+ (is_ftCompound(NC)),!.
 as_is_term0('$VAR'(_)).
 as_is_term0('$was_imported_kb_content$'(_,_)):-dtrace.
 as_is_term0('wid'(_,_,_)).

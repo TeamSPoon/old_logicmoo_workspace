@@ -4,7 +4,7 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- if(('$set_source_module'(CM,CM),'$module'(M,M),logicmoo_user_base:asserta(user_module_uses(M,CM)))).
+:- if(('$set_source_module'(CM,CM),'$current_typein_module'(M),logicmoo_user_base:asserta(user_module_uses(M,CM)))).
 :- endif.
 :- module(logicmoo_user_base,
  [
@@ -72,7 +72,7 @@ ws_0:- mpred_www:ensure_loaded(library(logicmoo/mpred_online/mpred_www)), mpred_
 
 % in case something changed
 :- logicmoo_user_base:user_module_uses(M,CM),!,fix_ops_for(M),fix_ops_for(CM),dmsg(user_module_uses(M,CM)).
-:- system:((logicmoo_user_base:user_module_uses(M,CM)->(('$module'(_,M),'$set_source_module'(_,CM)));true)).
+:- system:((logicmoo_user_base:user_module_uses(M,CM)->(('$set_typein_module'(M),'$set_source_module'(CM)));true)).
 
 %:- autoload.
 

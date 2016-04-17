@@ -274,12 +274,12 @@ delistify_last_arg(Arg,Pred,Last):- Pred=..[F|ARGS],append([Arg|ARGS],[NEW],NARG
 % Use this to mark code and not axiomatic prolog
 
 
-map_each_clause(P,CLIF,Prolog):- cwc,is_list(CLIF),!,map_each_clause(P,CLIF,Prolog).
+map_each_clause(P,CLIF,Prolog):- cwc,is_list(CLIF),!,maplist(map_each_clause(P),CLIF,Prolog).
 map_each_clause(P,(H,CLIF),(T,Prolog)):- cwc, sanity(nonvar(H)),!,map_each_clause(P,H,T),map_each_clause(P,CLIF,Prolog).
 map_each_clause(P,A,B):- cwc,call(P,A,B).
 
-map_each_clause(P,CLIF):- cwc,is_list(CLIF),!,map_each_clause(P,CLIF,Prolog).
-map_each_clause(P,(H,CLIF)):- cwc, sanity(nonvar(H)),!,map_each_clause(P,H,T),map_each_clause(P,CLIF,Prolog).
+map_each_clause(P,CLIF):-  cwc,is_list(CLIF),!,maplist(map_each_clause(P),CLIF).
+map_each_clause(P,(H,CLIF)):- cwc, sanity(nonvar(H)),!,map_each_clause(P,H),map_each_clause(P,CLIF).
 map_each_clause(P,A):- cwc,call(P,A).
 
 %% any_to_pfc( :TermCLIF, ?Prolog) is semidet.
@@ -558,8 +558,6 @@ to_nonvars(Type,IN,OUT):- is_list(IN),!,must_maplist(to_nonvars(Type),IN,OUT),!.
 to_nonvars(Type,IN,OUT):- call(Type,IN,OUT),!.
 
 
-
-%= 	 	 
 
 %% convertAndCall( ?Type, :GoalCall) is semidet.
 %

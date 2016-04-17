@@ -578,7 +578,7 @@ autodoc_file(File):- ( \+ atom(File) ; \+ exists_file(File) ), !,
 autodoc_file(File):- 
   scan_for_varnames,
   use_listing_vars,
-  setup_call_cleanup(
+  setup_call_cleanup_each(
    tell(user_error),
   (( show_call(_,autodoc_output_path(File,PlDocFile)),
    read_source_file_vars(File),

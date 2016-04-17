@@ -16,6 +16,7 @@
 % ===================================================================
 */
 :- module(logicmoo_utils,[add_file_search_path/2,add_library_search_path/2]).
+:- set_prolog_flag(gc, false).
 
 :- dynamic(lmconf:logicmoo_utils_separate/0).
 :- retractall(lmconf:logicmoo_utils_separate).

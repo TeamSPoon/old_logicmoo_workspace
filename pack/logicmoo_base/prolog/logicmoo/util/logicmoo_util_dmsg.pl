@@ -13,6 +13,7 @@
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_dmsg.pl
 :- module(logicmoo_util_dmsg,
           [ ansi_control_conv/2,
+            with_output_to_each/2,
             ansicall/2,
             ansicall/3,
             ansicall0/3,
@@ -24,7 +25,7 @@
             defined_message_color/2,
 
             format_to_message/3, 
-            
+            scce/3,
             dfmt/1,dfmt/2,
             debugm/1,debugm/2,
             dmsg/1,dmsg/2,dmsg/3,
@@ -130,6 +131,7 @@
         ansifmt/2,
         ansifmt/3,
         colormsg/2,
+        scce/3,
         contrasting_color/2,
         defined_message_color/2,
         dfmt/1,
@@ -150,6 +152,7 @@
         dmsg_text_to_string_safe/2,
         dmsginfo/1,
 
+        with_output_to_each/2,
         f_word/2,
         fg_color/2,
         flush_output_safe/0,
@@ -211,8 +214,38 @@
 :- include('logicmoo_util_header.pi').
 :- endif.
 
+scce(S,G,C):-
+     scce_key(scce(S,G,C),Key),
+     setup_call_cleanup_each(key_call(Key,1),key_call(Key,2),key_call(Key,3)).
 
+key_call(Key,Arg):- nb_current(Key,In),arg(Arg,In,Goal),Goal,nb_setval(Key,In).
+scce_key(In,Key):- format(atom(Key),'~q',[In]),nb_setval(Key,In).
 
+:- meta_predicate with_output_to_each(+,0).
+
+with_output_to_each(Output,Goal):- Output= atom(A),!,
+   current_output(Was),
+   nb_setarg(1,Output,""),
+   new_memory_file(Handle),
+   open_memory_file(Handle,write,Stream,[free_on_close(true)]),
+     setup_call_cleanup_each(set_output(Stream),
+      setup_call_cleanup(true,Goal,
+        (close(Stream),memory_file_to_atom(Handle,Atom),nb_setarg(1,Output,Atom),ignore(A=Atom))),
+      (set_output(Was))).
+
+with_output_to_each(Output,Goal):- Output= string(A),!,
+   current_output(Was),
+   nb_setarg(1,Output,""),
+   new_memory_file(Handle),
+   open_memory_file(Handle,write,Stream,[free_on_close(true)]),
+     setup_call_cleanup_each(set_output(Stream),
+      setup_call_cleanup(true,Goal,
+        (close(Stream),memory_file_to_string(Handle,Atom),nb_setarg(1,Output,Atom),ignore(A=Atom))),
+      (set_output(Was))).
+
+with_output_to_each(Output,Goal):- 
+   current_output(Was), setup_call_cleanup_each(set_output(Output),Goal,set_output(Was)).
+    
 
 % ==========================================================
 % Sending Notes
@@ -498,7 +531,7 @@ dfmt(X,Y):- thread_current_error_stream(Err), with_output_to_stream(Err,fmt(X,Y)
 %
 with_output_to_stream(Stream,Goal):-
     current_output(Saved),
-   setup_call_cleanup(set_output(Stream),
+   setup_call_cleanup_each(set_output(Stream),
          Goal,
          set_output(Saved)).
 
@@ -538,8 +571,8 @@ with_dmsg(Functor,Goal):-
 %
 % Sformat.
 %
-sformat(Str,Msg,Vs,Opts):- nonvar(Msg),functor_safe(Msg,':-',_),!,with_output_to(string(Str),portray_clause_w_vars(user_output,Msg,Vs,Opts)).
-sformat(Str,Msg,Vs,Opts):- with_output_to(chars(Codes),(current_output(CO),portray_clause_w_vars(CO,':-'(Msg),Vs,Opts))),append([_,_,_],PrintCodes,Codes),'sformat'(Str,'   ~s',[PrintCodes]),!.
+sformat(Str,Msg,Vs,Opts):- nonvar(Msg),functor_safe(Msg,':-',_),!,with_output_to_each(string(Str),portray_clause_w_vars(user_output,Msg,Vs,Opts)).
+sformat(Str,Msg,Vs,Opts):- with_output_to_each(chars(Codes),(current_output(CO),portray_clause_w_vars(CO,':-'(Msg),Vs,Opts))),append([_,_,_],PrintCodes,Codes),'sformat'(Str,'   ~s',[PrintCodes]),!.
 
 
 
@@ -636,7 +669,10 @@ in_cmt(Call):- call_cleanup(prepend_each_line('% ',Call),format('~N',[])).
 %
 % Using Current Indent.
 %
-with_current_indent(Call):- get_indent_level(Indent), indent_to_spaces(Indent,Space),prepend_each_line(Space,Call).
+with_current_indent(Call):- 
+   get_indent_level(Indent), 
+   indent_to_spaces(Indent,Space),
+   prepend_each_line(Space,Call).
 
 
 %= 	 	 
@@ -659,7 +695,8 @@ indent_to_spaces(N,Out):- N2 is N div 2, indent_to_spaces(N2,Spaces),atom_concat
 %
 % Prepend Each Line.
 %
-prepend_each_line(Pre,Call):-with_output_to(string(Str),Call)*->once(print_prepended(Pre,Str)).
+prepend_each_line(Pre,Call):-
+  with_output_to_each(string(Str),Call)*->once(print_prepended(Pre,Str)).
 
 :- meta_predicate if_color_debug(0).
 :- meta_predicate if_color_debug(0,0).
@@ -710,7 +747,7 @@ if_color_debug(Call,UnColor):- if_color_debug->Call;UnColor.
 % (debug)message.
 %
 dmsg(C):- notrace((tlbugger:no_slow_io,!,writeln(dmsg(C)))).
-dmsg(V):- if_defined_else(dmsg0(V),ddmsg(V)).
+dmsg(V):- if_defined_else(dmsg0(V),logicmoo_util_catch:ddmsg(V)).
 %dmsg(F,A):- notrace((tlbugger:no_slow_io,on_x_fail(format(atom(S),F,A))->writeln(dmsg(S));writeln(dmsg_fail(F,A)))),!.
 
 %= 	 	 
@@ -719,7 +756,7 @@ dmsg(V):- if_defined_else(dmsg0(V),ddmsg(V)).
 %
 % (debug)message.
 %
-dmsg(F,A):- if_defined_else(dmsg0(F,A),ddmsg(F,A)).
+dmsg(F,A):- if_defined_else(dmsg0(F,A),logicmoo_util_catch:ddmsg(F,A)).
 
 
 
@@ -1374,7 +1411,7 @@ sgr_code_on_off(_Ctrl,_OnCode,[default]):-!.
 % Msg Converted To String.
 %
 msg_to_string(Var,Str):-var(Var),!,sformat(Str,'~q',[Var]),!.
-msg_to_string(portray(Msg),Str):- with_output_to(string(Str),portray_clause_w_vars(user_output,Msg,[],[])),!.
+msg_to_string(portray(Msg),Str):- with_output_to_each(string(Str),portray_clause_w_vars(user_output,Msg,[],[])),!.
 msg_to_string(pp(Msg),Str):- sformat(Str,Msg,[],[]),!.
 msg_to_string(fmt(F,A),Str):-sformat(Str,F,A),!.
 msg_to_string(format(F,A),Str):-sformat(Str,F,A),!.
@@ -1442,8 +1479,8 @@ cls:- shell(cls).
 :- 'mpred_trace_none'(dfmt(_,_)).
 :- 'mpred_trace_none'(dmsg(_)).
 :- 'mpred_trace_none'(dmsg(_,_)).
-:- 'mpred_trace_none'(ddmsg(_)).
-:- 'mpred_trace_none'(ddmsg(_,_)).
+:- 'mpred_trace_none'(logicmoo_util_catch:ddmsg(_)).
+:- 'mpred_trace_none'(logicmoo_util_catch:ddmsg(_,_)).
 
 :- use_module(library(random)).
 :- use_module(logicmoo_util_varnames).

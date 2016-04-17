@@ -137,7 +137,7 @@ mud_asserted_expansion_0(G1,G2):- ((get_asserted_wrappers(If_mud_asserted, Asser
 attempt_clause_expansion(B,BR):- is_ftCompound(B), copy_term(B,BC),snumbervars(BC),!, attempt_clause_expansion(B,BC,BR).
 attempt_clause_expansion(_,BC,_):-inside_clause_expansion(BC),!,fail.
 attempt_clause_expansion(B,BC,BR):- 
-    setup_call_cleanup(asserta(inside_clause_expansion(BC)),
+    setup_call_cleanup_each(asserta(inside_clause_expansion(BC)),
     force_clause_expansion(B,BR),
     ignore(retract(inside_clause_expansion(BC)))).
 

@@ -24,9 +24,12 @@
   mpred_mark_as_ml/4,
   mpred_mark_fa_as/6,
   log_failure/1,
+  code_sentence_op/1,
   mnotrace/1,
+  build_consequent/3,
   with_fc_mode/2,
   plus_fwc/0,
+  cut_c/0,
   to_u/2,
   fresh_mode/0,
   mpred_mark_as/4,
@@ -54,7 +57,7 @@
   mpred_set_default/2,
   mpred_ain/1,mpred_ain/1,mpred_ain/2,ain/2,
   action_is_undoable/1,
-  mpred_assumption/1,mpred_assumptions/2,mpred_axiom/1,bagof_or_nil/3,bases_union/2,brake/1,build_rhs/2,
+  mpred_assumption/1,mpred_assumptions/2,mpred_axiom/1,bagof_or_nil/3,bases_union/2,brake/1,build_rhs/3,
   mpred_BC_CACHE0/1,
   build_neg_test/4,build_rule/3,build_code_test/3,
   build_trigger/4,
@@ -74,7 +77,7 @@
   ain_fast/2,
   setup_mpred_ops/0,
   mpred_assert_w_support/2,mpred_asserta_w_support/2,mpred_assertz_w_support/2,mpred_basis_list/2,mpred_bt_pt_combine/3,mpred_child/2,mpred_children/2,
-  mpred_classifyFacts/4,mpred_collect_supports/1,mpred_unhandled_command/3,mpred_compile_rhs_term/2,mpred_conjoin/3,mpred_connective/1,
+  mpred_classifyFacts/4,mpred_collect_supports/1,mpred_unhandled_command/3,mpred_compile_rhs_term/3,mpred_conjoin/3,mpred_connective/1,
   mpred_database_item/1,mpred_database_term/2,
   mpred_db_type/2,mpred_set_default/2,mpred_define_bc_rule/3,mpred_descendant/2,
   mpred_descendants/2,mpred_enqueue/2,mpred_error/1,mpred_error/2,mpred_eval_lhs/2,mpred_eval_lhs_nondet/2,mpred_eval_lhs_det/2,mpred_eval_rhs/2,mpred_fact/1,
@@ -173,6 +176,8 @@
 :- op(700,xfx,'=@@=').
 
 '=@@='(A,B):-variant_u(A,B).
+
+:- use_module(library(logicmoo_utils)).
 
 :- module_transparent((assert_u_confirmed_was_missing/1,mpred_trace_exec/0,pfcl_do/1,
   mpred_post1/2,get_mpred_assertion_status/3,mpred_post_update4/4,get_mpred_support_status/5,same_file_facts/2,foreachl_do/2,
@@ -757,6 +762,7 @@ set_fc_mode(Mode):- asserta(t_l:mpred_fc_mode(Mode)).
 %
 % PFC Enqueue P for forward chaining
 %
+mpred_enqueue(P,S):- get_fc_mode(P,S,Mode),must(Mode=direct),fail.
 mpred_enqueue(P,S):-
   (get_fc_mode(P,S,Mode)
     -> (Mode=direct  -> loop_check_term(mpred_fwc(P),plus_fwc(P),true) ;
@@ -793,7 +799,7 @@ mpred_remove_old_version(_).
 %    direct -  mpred_fwc has already done the job.
 %    depth or breadth - use the queue mechanism.
 
-% mpred_run :- lookup_u(pm(direct)),!.
+mpred_run :- lookup_u(pm(Mode)),Mode=direct,!.
 % mpred_run :- repeat, \+ mpred_step, !.
 mpred_run:-
 %  (\+ lookup_u(pm(direct))),
@@ -806,7 +812,7 @@ mpred_run.
 
 
 mpred_step:-  
-  % if hs/1 is true, reset it and fail, thereby stopping inferencing.
+  % if hs/1 is true, reset it and fail, thereby stopping inferencing. (hs=halt_signal)
   mnotrace((lookup_u(hs(Was)))),
   mpred_retract(hs(Was)),
   mpred_trace_msg('Stopping on: ~p',[hs(Was)]),
@@ -1176,8 +1182,7 @@ mpred_fwc(Ps):- each_E(mpred_fwc0,Ps,[]).
 %
 %  Avoid loop while calling mpred_fwc1(P)
 % 
-mpred_fwc0(Fact):- copy_term(Fact,FactC),mpred_fwc1(FactC).
-%mpred_fwc0(Fact):- loop_check(mpred_fwc1(Fact),true).
+mpred_fwc0(Fact):- copy_term(Fact,FactC),loop_check(mpred_fwc1(FactC),true).
 
 
 %% mpred_fwc1(+P) is det.
@@ -1265,7 +1270,7 @@ mpred_define_bc_rule(Head,_ZBody,Parent_rule):-
 mpred_define_bc_rule(Head,Body,Parent_rule):-
   quietly(get_source_ref1(U)),
   copy_term(Parent_rule,Parent_ruleCopy),
-  build_rhs(Head,Rhs),
+  build_rhs(U,Head,Rhs),
   foreachl_do(mpred_nf(Body,Lhs),
           (build_trigger(Parent_ruleCopy,Lhs,rhs(Rhs),Trigger),
            mpred_ain(bt(Head,Trigger),(Parent_ruleCopy,U)))).
@@ -1612,28 +1617,32 @@ mpred_nf_negation(X,X).
 
 
  
-%%  build_rhs(+Conjunction,-Rhs)
+%%  build_rhs(+Sup,+Conjunction,-Rhs)
 % 
 
-build_rhs(X,[X]):- 
+build_rhs(_Sup,X,[X]):- 
   var(X),
   !.
 
-build_rhs((A,B),[A2|Rest]):- 
+build_rhs(Sup,(A,B),[A2|Rest]):- 
   !, 
-  mpred_compile_rhs_term(A,A2),
-  build_rhs(B,Rest).
+  mpred_compile_rhs_term(Sup,A,A2),
+  build_rhs(Sup,B,Rest).
 
-build_rhs(X,[X2]):-
-   mpred_compile_rhs_term(X,X2).
+build_rhs(Sup,X,[X2]):-
+   mpred_compile_rhs_term(Sup,X,X2).
 
 
 mpred_compile_rhs_term(_Sup,P,P):-is_ftVar(P),!.
-mpred_compile_rhs_term(Sup,(P/C),((P0:-C0))) :- !,mpred_compile_rhs_term(Sup,P,P0),build_code_test(Sup,C,C0),!.
-mpred_compile_rhs_term(Sup,I,O):- if_defined_else(to_addable_form_wte(mpred_compile_rhs_term,(I),O),I=O), must(\+ \+ mpred_mark_as(Sup,p,O,pfcRHS)),!.
 
-mpred_compile_rhs_term((P/C),((P:-C))):- !.
-mpred_compile_rhs_term(P,P).
+mpred_compile_rhs_term(Sup,(P/C),((P0:-C0))) :- !,mpred_compile_rhs_term(Sup,P,P0),
+   build_code_test(Sup,C,C0),!.
+
+mpred_compile_rhs_term(Sup,I,OO):- 
+  if_defined_else(to_addable_form_wte(mpred_compile_rhs_term,(I),O),I=O),
+  must(\+ \+ mpred_mark_as(Sup,p,O,pfcRHS)),!,build_consequent(Sup,O,OO).
+
+mpred_compile_rhs_term(Sup,I,O):- build_consequent(Sup,I,O).
 
 
 
@@ -1679,7 +1688,7 @@ mpred_connective('\\+').
 process_rule(Lhs,Rhs,Parent_rule):-
   quietly(get_source_ref1(U)),
   copy_term(Parent_rule,Parent_ruleCopy),
-  quietly(build_rhs(Rhs,Rhs2)),
+  quietly(build_rhs(U,Rhs,Rhs2)),
   foreachl_do(mpred_nf(Lhs,Lhs2), 
           build_rule(Lhs2,rhs(Rhs2),(Parent_ruleCopy,U))).
 
@@ -1841,13 +1850,36 @@ fa_to_p(F,A,P):-integer(A),atom(F),functor(P,F,A),( P \= mpred_call_no_bc(_) ),(
 %
 % Build Code Test.
 %
-% this just strips away any currly brackets.
+% what this does...
+%
+%   strips away any currly brackets
+%   converts cuts to cut_c/0
+%   converts variable Ps to mpred_call_no_bc(P)
 %
 build_code_test(_Support,Test,TestO):-is_ftVar(Test),!,must(is_ftNonvar(Test)),TestO=mpred_call_no_bc(Test).
 build_code_test(WS,{Test},TestO) :- !,build_code_test(WS,Test,TestO).
+build_code_test(_Sup,!,cut_c):-!.
+build_code_test(WS,rhs(Test),rhs(TestO)) :- !,build_code_test(WS,Test,TestO).
+build_code_test(WS,Test,TestO):- is_list(Test),must_maplist(build_code_test(WS),Test,TestO).
 build_code_test(WS,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],must_maplist(build_code_test(WS),TestL,TestLO),TestO=..[F|TestLO],!.
 build_code_test(WS,Test,Test):- must(mpred_mark_as(WS,p,Test,pfcCallCode)),!.
 build_code_test(_,Test,Test).
+
+
+%% build_consequent(+Support, +TestIn, -TestOut) is semidet.
+%
+% Build Consequent.
+%
+build_consequent(_      ,Test,Test):- is_ftVar(Test),!.
+build_consequent(_      ,Test,TestO):-is_ftVar(Test),!,TestO=added(Test).
+build_consequent(_Sup,!,cut_c):-!.
+build_consequent(WS,'{}'(Test),'{}'(TestO)) :- !,build_code_test(WS,Test,TestO).
+build_consequent(WS,rhs(Test),rhs(TestO)) :- !,build_consequent(WS,Test,TestO).
+build_consequent(WS,Test,TestO):- is_list(Test),must_maplist(build_consequent(WS),Test,TestO).
+build_consequent(WS,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],
+   must_maplist(build_consequent(WS),TestL,TestLO),TestO=..[F|TestLO],!.
+build_consequent(WS,Test,Test):-must(mpred_mark_as(WS,p,Test,pfcCreates)),!.
+build_consequent(_ ,Test,Test).
 
 
 %% code_sentence_op( :TermVar) is semidet.
@@ -1859,10 +1891,13 @@ code_sentence_op(rhs(_)).
 code_sentence_op(~(_)).
 code_sentence_op(-(_)).
 code_sentence_op(-(_)).
+code_sentence_op((_,_)).
+code_sentence_op((_;_)).
 code_sentence_op(\+(_)).
 code_sentence_op(mpred_call_no_bc(_)).
 code_sentence_op(mpred_call_no_bc(_,_)).
-code_sentence_op(Test):-predicate_property(Test,meta_predicate(PP)),predicate_property(Test,built_in),  \+ (( arg(_,PP,N), N\=0)).
+code_sentence_op(Test):-predicate_property(Test,meta_predicate(PP)),predicate_property(Test,built_in),  
+  \+ (( arg(_,PP,N), N \= 0)).
 
 
 %% all_closed(+C) is semidet.
@@ -1871,18 +1906,6 @@ code_sentence_op(Test):-predicate_property(Test,meta_predicate(PP)),predicate_pr
 %
 all_closed(C):- \+is_ftCompound(C)->true;(functor(C,_,A),A>1,\+((arg(_,C,Arg),is_ftVar(Arg)))),!.
 
-
-%% build_consequent(+Support, +TestIn, -TestOut) is semidet.
-%
-% Build Consequent.
-%
-build_consequent(_      ,Test,Test):- is_ftVar(Test),!.
-build_consequent(_      ,Test,TestO):-is_ftVar(Test),!,TestO=added(Test).
-build_consequent(WS,rhs(Test),rhs(TestO)) :- !,build_consequent(WS,Test,TestO).
-build_consequent(WS,Test,TestO):- code_sentence_op(Test),Test=..[F|TestL],
-   maplist(build_consequent(WS),TestL,TestLO),TestO=..[F|TestLO],!.
-build_consequent(WS,Test,Test):-must(mpred_mark_as(WS,p,Test,pfcCreates)),!.
-build_consequent(_ ,Test,Test).
 
 
 %% mpred_db_type(+VALUE1, ?Type) is semidet.
@@ -2518,7 +2541,7 @@ mpred_rem_support(P,S):-
 
 closest_u(Was,WasO):-clause_asserted_u(Was),!,Was=WasO.
 closest_u(Was,WasO):-lookup_u(Was),Was=WasO,!.
-closest_u(_Was,WasO):-lookup_u(WasO),!.
+closest_u(Was,WasO):-lookup_u(WasO),ignore(Was=WasO),!.
 
 mpred_collect_supports(Tripples):-
   bagof_or_nil(Tripple, mpred_support_relation(Tripple), Tripples).
@@ -2658,7 +2681,7 @@ mpred_why(N):-
   lookup_u(why_buffer(P,Js)),
   mpred_handle_why_command(N,P,Js).
 
-mpred_why(M:P):-atom(M),!,mpred_why(P).
+mpred_why(M:P):-atom(M),!,call_from_module(M,mpred_why(P)).
 mpred_why(P):-
   justifications(P,Js),
   retractall_u(why_buffer(_,_)),
@@ -2966,9 +2989,8 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((mpred_literal)/1).
 :- module_transparent((mpred_negated_literal)/1).
 :- module_transparent((mpred_negation)/2).
-:- module_transparent((mpred_compile_rhs_term)/2).
 :- module_transparent((mpred_compile_rhs_term)/3).
-:- module_transparent((build_rhs)/2).
+:- module_transparent((build_rhs)/3).
 :- module_transparent((mpred_nf_negation)/2).
 :- module_transparent((mpred_nf_negations)/2).
 :- module_transparent((mpred_nf1_negation)/2).

@@ -32,7 +32,7 @@
 :- multifile(lmconf:mpred_system_kb/1).
 :- dynamic(lmconf:mpred_system_kb/1).
 :- endif.
-% :- lmconf:mpred_system_kb(_)->true;('$module'(M,M),asserta(lmconf:mpred_system_kb(M))).
+% :- lmconf:mpred_system_kb(_)->true;('$current_typein_module'(M),asserta(lmconf:mpred_system_kb(M))).
 
 
 :- dynamic(lmconf:mpred_is_impl_file/1).

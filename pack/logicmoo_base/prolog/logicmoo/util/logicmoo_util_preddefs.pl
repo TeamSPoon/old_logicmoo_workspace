@@ -815,7 +815,7 @@ rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
       must_pi(show_failure(why,predicate_property(OMC,number_of_clauses(_)))),
       forall(predicate_property(OC,PP),asserta(tlbugger:rbuild_pred_impl_cache_pp(NC,PP))),
       findall((OC:-B),((clause(OC,B),assertz(pp_clauses((OC:-B))))),List),
-      '$set_source_module'(_, NM),
+      '$set_source_module'( NM),
       forall(member(-PP,OtherTraits),retractall(tlbugger:rbuild_pred_impl_cache_pp(NC,PP))),
       forall(member(+PP,OtherTraits),asserta(tlbugger:rbuild_pred_impl_cache_pp(NC,PP))),
       once(tlbugger:rbuild_pred_impl_cache_pp(NC,(built_in))->(redefine_system_predicate(NF/A),unlock_predicate(NF/A));true),
@@ -839,7 +839,7 @@ rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
 
       retractall(tlbugger:rbuild_pred_impl_cache(NMC,_)),
       asserta(tlbugger:rbuild_pred_impl_cache(NMC,AssertZ)),
-      '$set_source_module'(_, Before),
+      '$set_source_module'( Before),
       listing(NMC),
       retractall(tlbugger:rbuild_pred_impl_cache_pp(NC,_))
       )).

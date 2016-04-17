@@ -240,7 +240,7 @@ source_to_txt(S):- source_to_txt(S,stream(current_output),[]).
 
 source_to_txt(S,Out,Opts):- 
   asserta(nohtml),
-   setup_call_cleanup(
+   setup_call_cleanup_each(
      true,
      s_to_html(S,Out,[header(false),format_comments(false)|Opts]),
      retract(nohtml)).
