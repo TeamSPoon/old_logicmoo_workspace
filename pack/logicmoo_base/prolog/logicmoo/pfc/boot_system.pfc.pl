@@ -375,12 +375,13 @@ tSet(C)==>completelyAssertedCollection(C).
 %underkill - Though it is making bad things happen 
 % ttExpressionType(C)==> ~completelyAssertedCollection(C).
 
-tCol(C)/(atom(C),TCI=..[C,I]) ==> {decl_type(C)},arity(C,1),mpred_univ(C,I,TCI).
+tCol(C)/(atom(C),TCI=..[C,I]) ==> {decl_type(C)},arity(C,1),{mpred_univ(C,I,TCI)}.
 (tCol(C)/(atom(C), \+ static_predicate(C/1) )) ==> {kb_dynamic(C/1)}.
 (tCol(C)/(atom(C),TCI=..[C,I],\+ static_predicate(C/1), \+completelyAssertedCollection(C))) 
-  ==> ((TCI:-cwc,
+  ==> ((TCI:- 
+    ((cwc,
     lazy(( \+ ~(TCI))),
-    isa_backchaing(I,C))).
+    isa_backchaing(I,C))))).
 
 % (tInferInstanceFromArgType(Col),tCol(Col)/i_name('',Col,ColName),tPred(Prop)/i_name('',Prop,PropName),{ColName=PropName}==> tInferInstanceFromArgType(Prop)).
 

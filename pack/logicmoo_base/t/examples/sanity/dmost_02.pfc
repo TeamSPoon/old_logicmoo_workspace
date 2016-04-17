@@ -53,11 +53,14 @@ c(1).
 % to start in correct module (for debugging).
 :- initialization(module(sanity)).
 
+:- mpred_trace.
+:- mpred_trace_exec.
 :- ain(b(2)).
-
 
 % test breaks here
 :- listing(b/1).
+
+:- clause(b(1),_)->break;true.
 
 :- mpred_test(\+ b(1)).
 :- mpred_test( b(2)).

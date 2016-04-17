@@ -24,7 +24,9 @@
   mpred_mark_as_ml/4,
   mpred_mark_fa_as/6,
   log_failure/1,
+  mnotrace/1,
   with_fc_mode/2,
+  plus_fwc/0,
   to_u/2,
   fresh_mode/0,
   mpred_mark_as/4,
@@ -91,7 +93,7 @@
   pp_db_rules/0,pp_db_supports/0,pp_db_triggers/0,mpred_load/1,process_rule/3,
   remove_if_unsupported/1,remove_selection/1,mpred_withdraw1/2,
 
-  mpred_post2/2,get_mpred_assertion_status/3,mpred_post_update4/4,get_mpred_support_status/5,same_file_facts/2,clause_asserted_u/1,
+  mpred_post1/2,get_mpred_assertion_status/3,mpred_post_update4/4,get_mpred_support_status/5,same_file_facts/2,clause_asserted_u/1,
 
   mpred_run/0,mpred_test/1,mpred_test_fok/1,
   fa_to_p/3,
@@ -107,7 +109,7 @@
   select_next_fact/1,supporters_list/2,triggerSupports/2,well_founded/1,well_founded_list/2,
   do_assumpts/2,mpred_do_fcnt/2,mpred_do_fcpt/2,mpred_fwc1/1,mpred_do_rule/1,mpred_descendant1/3,mpred_eval_rhs1/2,mpred_nf1/2,
   mpred_post1/2,mpred_withdraw/1,mpred_withdraw/2,mpred_remove/1,
-  mpred_remove/2,
+  mpred_remove/2,mpred_post1/2,
   mpred_pp_db_justification1/2,mpred_pp_db_justifications2/3,mpred_spy1/3,
   mpred_unfwc_check_triggers0/1,mpred_unfwc1/1,mpred_why1/1,mpred_blast/1,
   mpred_pfc_file/0
@@ -119,6 +121,7 @@
       pfcl_do(0),
       pfcl_do(+), % not all arg1s are callable
       lookup_u(:),
+      mnotrace(0),
       clause_asserted_u(+),
       mpred_get_support(+,-),
       mpred_fact(?,0),
@@ -172,7 +175,7 @@
 '=@@='(A,B):-variant_u(A,B).
 
 :- module_transparent((assert_u_confirmed_was_missing/1,mpred_trace_exec/0,pfcl_do/1,
-  mpred_post2/2,get_mpred_assertion_status/3,mpred_post_update4/4,get_mpred_support_status/5,same_file_facts/2,foreachl_do/2,
+  mpred_post1/2,get_mpred_assertion_status/3,mpred_post_update4/4,get_mpred_support_status/5,same_file_facts/2,foreachl_do/2,
                        asserta_u/1,assert_u/1,assertz_u/1,retract_u/1,retractall_u/1,
                        retract_u0/1,retractall_u0/1,
   mpred_trace_op/3)).
@@ -198,6 +201,7 @@ ensure_abox(M):-
         M:discontiguous(M:F/A),
         M:multifile(M:F/A))),!.
 
+mnotrace(G):-notrace(G).
 
 % =================================================
 % ==============  UTILS BEGIN        ==============
@@ -284,9 +288,9 @@ listing_u(P):-mpred_call_no_bc(listing(P)).
 attvar_op_fully(Why,MH):- !, attvar_op(Why,MH).
 attvar_op_fully(Why,M:H):-fully_expand(change(Why,attvar_op_fully),H,HH),!,each_E(attvar_op(Why),M:HH,[]).
 
-assert_u(MH):- must(cnotrace(fix_mp(MH,M:H))),attvar_op_fully(assert_i,M:H),expire_tabled_list(H).
-asserta_u(MH):- must(cnotrace(fix_mp(MH,M:H))),attvar_op_fully(asserta_i,M:H).
-assertz_u(MH):- must(cnotrace(fix_mp(MH,M:H))),attvar_op_fully(assertz_i,M:H).
+assert_u(MH):- must(mnotrace(fix_mp(MH,M:H))),attvar_op_fully(assert_i,M:H),expire_tabled_list(H).
+asserta_u(MH):- must(mnotrace(fix_mp(MH,M:H))),attvar_op_fully(asserta_i,M:H).
+assertz_u(MH):- must(mnotrace(fix_mp(MH,M:H))),attvar_op_fully(assertz_i,M:H).
 retract_u(H):- retract_u0(H) *-> true; attvar_op_fully(retract_u0,H).
 
 retract_u0(H0):- strip_module(H0,_,H),(H = ( \+ _ )),!,trace_or_throw(mpred_warn(retract_u(H0))),expire_tabled_list(H).
@@ -313,7 +317,7 @@ clause_u(H,B):- clause_u(H,B,_).
 % PFC Clause.
 %
 clause_u(_:H,B,R):- nonvar(R),!,must(clause_i(_:H,B,R)).
-clause_u(MH,B,R):-  cnotrace(fix_mp(MH,MH2)),!, clause_i(MH2,B,R).
+clause_u(MH,B,R):-  mnotrace(fix_mp(MH,MH2)),!, clause_i(MH2,B,R).
 clause_u((H:-BB),B,Ref):- is_true(B),!,clause_u(H,BB,Ref).
 % clause_u(H,B,Why):- has_cl(H),clause_u(H,CL,R),mpred_pbody(H,CL,R,B,Why).
 %clause_u(H,B,backward(R)):- R=(<-(H,B)),clause_u(R,true).
@@ -336,7 +340,7 @@ lookup_u(H):-lookup_u(H,_).
 lookup_u(MH,Ref):- nonvar(Ref),!,must((clause_u(H,B,Ref),hb_to_clause(H,B,MH))).
 lookup_u(MH,Ref):- clause_u(MH,true,Ref).
 /*
-lookup_u(MH,Ref):- must(cnotrace(fix_mp(MH,M:H))), 
+lookup_u(MH,Ref):- must(mnotrace(fix_mp(MH,M:H))), 
                     on_x_debug(clause_u(M:H,B,Ref)),
                         (var(B)->rtrace(clause_u(M:H,_,Ref));true),
                         on_x_debug(B).
@@ -344,7 +348,7 @@ lookup_u(MH,Ref):- must(cnotrace(fix_mp(MH,M:H))),
 
 with_umt(G0):-   
   strip_module(G0,WM,G), 
-  must((get_user_abox(U),atom(U))),!, % nop(cnotrace(fix_mp(G0,U:G))),
+  must((get_user_abox(U),atom(U))),!, % nop(mnotrace(fix_mp(G0,U:G))),
   on_f_debug((current_predicate(_,U:G)->
     CALL=U:G ;
       (current_predicate(_,WM:G)->CALL=WM:G; fail))),
@@ -486,17 +490,15 @@ ain(P,S):- mpred_ain((P),S).
 
 
 mpred_ain(P,S):- 
-  gripe_time(0.6, must(with_umt((
-  if_defined_else(to_addable_form_wte(assert,(P),P0),P0=P)  -> 
-  each_E(mpred_post1,P0,[S]),
-  mpred_run)))),!.
-%mpred_ain(_,_).
+  gripe_time(0.6,
+   with_umt((if_defined_else(to_addable_form_wte(assert,(P),P0),P0=P)
+  -> ain_fast(P0,S)))),!.
 mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]).
 
 
 
 ain_fast(P):- get_source_ref(UU), ain_fast(P,UU).
-ain_fast(P,S):- 
+ain_fast(P,S):-
   each_E(mpred_post1,P,[S]),
   mpred_run.
 
@@ -505,6 +507,12 @@ remove_negative_version(P):-
   with_no_mpred_trace_exec((
   once((get_source_ref_stack(S),!,
   must(mpred_ain(\+ (~(P)), S)))))),!.
+
+     
+fresh_mode :- fail.
+plus_fwc.
+
+plus_fwc(P):- gripe_time(0.6,(plus_fwc->loop_check_term(mpred_fwc(P),plus_fwc(P),true);true)).
 
 %% mpred_post(+Ps,+S) 
 %
@@ -526,39 +534,31 @@ mpred_post1(    P,   S):- sanity(nonvar(P)),if_defined_else(fixed_negations(P,P0
 
 mpred_post1( \+ P,   S):- nonvar(P), !, must(mpred_post1_rem(P,S)).
 
-
 % TODO - FIGURE OUT WHY THIS IS NEEDED
 mpred_post1(  ~ P,   S):- 
    with_current_why(S,with_no_mpred_breaks((nonvar(P),doall(mpred_remove(P,S)),must(mpred_undo(P))))),fail.
 
-mpred_post1(P,S):-  
-   \+ \+ must(mpred_post2(P,S)),
-   mpred_fwc(P).
-   
-fresh_mode.
-
-%% mpred_post2(+Ps,+S) 
-%
 % Two version exists of this function one expects for a clean database and adds new information.
 % tries to assert a fact or set of fact to the database.
 % The other version is if the program is been running before loading this module.
 %
-mpred_post2(P,S):- 
+mpred_post1(P,S):- 
   fresh_mode,!,
   % db mpred_ain_db_to_head(P,P2),
   % mpred_remove_old_version(P),  
  \+ \+ mpred_add_support(P,S),
-  (\+ mpred_unique_u(P) -> mpred_fwc(P) ;
+  (\+ mpred_unique_u(P) -> true ;
   ( assert_u_confirm_if_missing(P),
      !,
      mpred_trace_op(add,P,S),
      !,
      mpred_enqueue(P,S),
-     !)).
+     !)),
+  (plus_fwc->loop_check_term(mpred_fwc(P),plus_fwc(P),true);true).
   
 /*
 % this would be the very inital by Tim Finnin...
-mpred_post2(P,S):- 
+mpred_post1(P,S):- 
   %  db mpred_ain_db_to_head(P,P2),
   % mpred_remove_old_version(P),  
   mpred_add_support(P,S),
@@ -572,7 +572,7 @@ mpred_post2(P,S):-
 
 /*
 % Expects a clean database and adds new information.
-mpred_post2(P,S):-  fail,!,  
+mpred_post1(P,S):-  fail,!,  
   % db mpred_ain_db_to_head(P,P2),
   % mpred_remove_old_version(P),  
   must( \+ \+ mpred_add_support(P,S)),
@@ -590,14 +590,15 @@ mpred_post2(P,S):-  fail,!,
 % (running the program is been running before loading this module)
 %
 %  (gets the status in Support and in Database)
-mpred_post2(P,S):- !,
+mpred_post1(P,S):- !,
   copy_term((P,S),(PP,SS)),
   b_setval('$variable_names',[]),!,
 % checks to see if we have forward chain the knowledge yet or 
-  must(get_mpred_support_status(P,S,PP,SS,Was)),!,
+ gripe_time(0.6, must(get_mpred_support_status(P,S,PP,SS,Was))),!,
 % if we''ve asserted what we''ve compiled      
-  must(get_mpred_assertion_status(P,PP,WasA)),!,
-  must(mpred_post_update4(WasA,P,S,Was)).
+  gripe_time(0.6, must(get_mpred_assertion_status(P,PP,WasA))),!,
+  gripe_time(0.6, must(mpred_post_update4(WasA,P,S,Was))),!.
+  
 
 
 
@@ -622,7 +623,7 @@ same_file_facts(mfl(M,F,_),mfl(M,FF,_)):-nonvar(M),!, FF=@=F.
 % Physically assert the Knowledge+Support Data based on statuses
 %
 mpred_post_update4(Was,P,S,What):- 
- not_not_ignore_cnotrace(((get_mpred_is_tracing(P);get_mpred_is_tracing(S)),
+ not_not_ignore_mnotrace(((get_mpred_is_tracing(P);get_mpred_is_tracing(S)),
   must(S=(F,T)),wdmsg(call_mpred_post4:- (Was,post1=P,fact=F,T,What)))),
   fail.
 mpred_post_update4(identical,_P,_S,exact):-!.
@@ -632,10 +633,13 @@ mpred_post_update4(identical,P,S,simular(_)):-!,mpred_add_support(P,S).
 mpred_post_update4(identical,P,S,none):-!,mpred_add_support(P,S),mpred_enqueue(P,S).
 
 mpred_post_update4(unique,P,S,none):-!,
-  mpred_add_support(P,S),assert_u_confirmed_was_missing(P),mpred_trace_op(add,P,S),
+  must((mpred_add_support(P,S),
+  assert_u_confirmed_was_missing(P),
+  mpred_trace_op(add,P,S),
   !,
   mpred_enqueue(P,S),
-  !.
+  !)),
+  plus_fwc(P).
 
 mpred_post_update4(partial(_Other),P,S,none):-!,
  must( \+ \+ mpred_add_support(P,S)),
@@ -755,7 +759,7 @@ set_fc_mode(Mode):- asserta(t_l:mpred_fc_mode(Mode)).
 %
 mpred_enqueue(P,S):-
   (get_fc_mode(P,S,Mode)
-    -> (Mode=direct  -> mpred_fwc(P) ;
+    -> (Mode=direct  -> loop_check_term(mpred_fwc(P),plus_fwc(P),true) ;
 	Mode=depth   -> mpred_asserta_w_support(que(P),S) ;
 	Mode=breadth -> mpred_assert_w_support(que(P),S) ;
 	true         -> mpred_error("Unrecognized pm mode: ~p", Mode))
@@ -803,7 +807,7 @@ mpred_run.
 
 mpred_step:-  
   % if hs/1 is true, reset it and fail, thereby stopping inferencing.
-  cnotrace((lookup_u(hs(Was)))),
+  mnotrace((lookup_u(hs(Was)))),
   mpred_retract(hs(Was)),
   mpred_trace_msg('Stopping on: ~p',[hs(Was)]),
   !, 
@@ -812,7 +816,7 @@ mpred_step:-
 mpred_step:-
   % draw immediate conclusions from the next fact to be considered.
   % fails iff the queue is empty.
-  cnotrace(get_next_fact(P)),
+  mnotrace(get_next_fact(P)),
   pfcl_do(mpred_fwc(P)),
   !.
 
@@ -858,7 +862,7 @@ mpred_halt(Now):-
      ; assert_u(hs(Now))).
 
 
-stop_trace(Info):- cnotrace((tracing,leash(+all),dtrace(dmsg(Info)))),!,rtrace.
+stop_trace(Info):- mnotrace((tracing,leash(+all),dtrace(dmsg(Info)))),!,rtrace.
 stop_trace(Info):- dtrace(dmsg(Info)).
 
 with_no_mpred_breaks(G):-
@@ -1172,7 +1176,7 @@ mpred_fwc(Ps):- each_E(mpred_fwc0,Ps,[]).
 %
 %  Avoid loop while calling mpred_fwc1(P)
 % 
-mpred_fwc0(Fact):- mpred_fwc1(Fact).
+mpred_fwc0(Fact):- copy_term(Fact,FactC),mpred_fwc1(FactC).
 %mpred_fwc0(Fact):- loop_check(mpred_fwc1(Fact),true).
 
 
@@ -1749,8 +1753,8 @@ build_neg_test(WS,T,Testin,Testout):-
 % Check Never Assert.
 %
 check_never_assert(_Pred):-!.
-check_never_assert(Pred):- fail,cnotrace((( copy_term_and_varnames(Pred,Pred_2),mpred_call_no_bc(never_assert_u(Pred_2,Why)), Pred=@@=Pred_2,trace_or_throw(never_assert_u(Pred,Why))))),fail.
-check_never_assert(Pred):- fail,cnotrace(ignore(( copy_term_and_varnames(Pred,Pred_2),mpred_call_no_bc(never_assert_u(Pred_2)),Pred=@@=Pred_2,trace_or_throw(never_assert_u(Pred))))).
+check_never_assert(Pred):- fail,mnotrace((( copy_term_and_varnames(Pred,Pred_2),mpred_call_no_bc(never_assert_u(Pred_2,Why)), Pred=@@=Pred_2,trace_or_throw(never_assert_u(Pred,Why))))),fail.
+check_never_assert(Pred):- fail,mnotrace(ignore(( copy_term_and_varnames(Pred,Pred_2),mpred_call_no_bc(never_assert_u(Pred_2)),Pred=@@=Pred_2,trace_or_throw(never_assert_u(Pred))))).
 
 %% check_never_retract(+Pred) is semidet.
 %
@@ -1924,12 +1928,12 @@ mpred_assertz_w_support(P,Support):-
 %
 % PFC Clause For User Interface.
 %   
-clause_asserted_u(MH):- must(cnotrace(fix_mp(MH,M:H))),clause_asserted_i(M:H).
+clause_asserted_u(MH):- must(mnotrace(fix_mp(MH,M:H))),clause_asserted_i(M:H).
 
 /*
 clause_asserted_u(MH):- must(fully_expand(change(assert,assert_u),MH,MA)),!,clause_asserted_i(MA).
 
-clause_asserted_u(MH):- must(cnotrace(fix_mp(MH,M:H))), clause_asserted_i(M:H).
+clause_asserted_u(MH):- must(mnotrace(fix_mp(MH,M:H))), clause_asserted_i(M:H).
 
 clause_asserted_u(Head):- 
   % to_addable_form_wte(assert,Head,HeadC),
@@ -2144,16 +2148,16 @@ brake(X):-  X, break.
 % 
 
 % this is here for upward compat. - should go away eventually.
-mpred_trace_op(Add,P):- not_not_ignore_cnotrace((get_source_ref_stack(Why), !, mpred_trace_op(Add,P,Why))).
+mpred_trace_op(Add,P):- not_not_ignore_mnotrace((get_source_ref_stack(Why), !, mpred_trace_op(Add,P,Why))).
 
 
 mpred_trace_op(Add,P,S):-  
-   not_not_ignore_cnotrace((mpred_trace_maybe_print(Add,P,S),
+   not_not_ignore_mnotrace((mpred_trace_maybe_print(Add,P,S),
       mpred_trace_maybe_break(Add,P,S))).
    
 
 mpred_trace_maybe_print(Add,P,S):-
-  not_not_ignore_cnotrace((
+  not_not_ignore_mnotrace((
   \+ get_mpred_is_tracing(P) -> true;
   (
    ((to_u(S,U),atom(U))
@@ -2181,8 +2185,8 @@ mpred_trace(Form):-
 %
 % PFC If Is A Tracing.
 %
-get_mpred_is_tracing(Form):- cnotrace(t_l:hide_mpred_trace_exec),!,
-  \+ \+ ((cnotrace(lookup_u(mpred_is_tracing_pred(Form))))).
+get_mpred_is_tracing(Form):- mnotrace(t_l:hide_mpred_trace_exec),!,
+  \+ \+ ((mnotrace(lookup_u(mpred_is_tracing_pred(Form))))).
 get_mpred_is_tracing(Form):- 
   once(t_l:mpred_debug_local ; tracing ; clause_asserted_u(mpred_is_tracing_exec) ; lookup_u(mpred_is_tracing_pred(Form))).
 
@@ -2224,7 +2228,7 @@ mpred_untrace:- mpred_untrace(_).
 mpred_untrace(Form):- retractall_u(mpred_is_tracing_pred(Form)).
 
 
-not_not_ignore_cnotrace(G):- ignore(cnotrace(\+ \+ G)).
+not_not_ignore_mnotrace(G):- ignore(mnotrace(\+ \+ G)).
 
 % needed:  mpred_trace_rule(Name)  ...
 
@@ -2235,17 +2239,17 @@ log_failure(_):- between(1,3,_),wdmsg(red,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 maybe_mpred_break(Info):- (t_l:no_mpred_breaks->true;(debugging(mpred)->dtrace(dmsg(Info));(dmsg(Info)))).
 
 % if the correct flag is set, trace exection of Pfc
-mpred_trace_msg(Info):- not_not_ignore_cnotrace(((((clause_asserted_u(mpred_is_tracing_exec);tracing)->in_cmt(wdmsg(Info));true)))).
-mpred_trace_msg(Format,Args):- not_not_ignore_cnotrace((((format_to_message(Format,Args,Info),mpred_trace_msg(Info))))).
+mpred_trace_msg(Info):- not_not_ignore_mnotrace(((((clause_asserted_u(mpred_is_tracing_exec);tracing)->in_cmt(wdmsg(Info));true)))).
+mpred_trace_msg(Format,Args):- not_not_ignore_mnotrace((((format_to_message(Format,Args,Info),mpred_trace_msg(Info))))).
 
-mpred_warn(Info):- not_not_ignore_cnotrace((((lookup_u(mpred_warnings(true));tracing) -> 
+mpred_warn(Info):- not_not_ignore_mnotrace((((lookup_u(mpred_warnings(true));tracing) -> 
   wdmsg(warn(mpred,Info)) ; mpred_trace_msg('WARNING/PFC:  ~p ',[Info])),
   maybe_mpred_break(Info))).
 
-mpred_warn(Format,Args):- not_not_ignore_cnotrace((((format_to_message(Format,Args,Info),mpred_warn(Info))))).
+mpred_warn(Format,Args):- not_not_ignore_mnotrace((((format_to_message(Format,Args,Info),mpred_warn(Info))))).
 
-mpred_error(Info):- not_not_ignore_cnotrace(((tracing -> wdmsg(error(pfc,Info)) ; mpred_warn(error(Info))))).
-mpred_error(Format,Args):- not_not_ignore_cnotrace((((format_to_message(Format,Args,Info),mpred_error(Info))))).
+mpred_error(Info):- not_not_ignore_mnotrace(((tracing -> wdmsg(error(pfc,Info)) ; mpred_warn(error(Info))))).
+mpred_error(Format,Args):- not_not_ignore_mnotrace((((format_to_message(Format,Args,Info),mpred_error(Info))))).
 
 mpred_watch:- assert_u(mpred_is_tracing_exec).
 mpred_trace_exec:- assert_u(mpred_is_tracing_exec).
@@ -2283,7 +2287,7 @@ show_if_debug(A):-  get_mpred_is_tracing(A) -> show_call(A) ; A.
 % If Is A Silient.
 %
 mpred_is_silient :- t_l:hide_mpred_trace_exec,!, \+ tracing.
-mpred_is_silient :- cnotrace(( \+ t_l:mpred_debug_local, \+ clause_asserted_u(mpred_is_tracing_exec), \+ lookup_u(mpred_is_tracing_pred(_)), 
+mpred_is_silient :- mnotrace(( \+ t_l:mpred_debug_local, \+ clause_asserted_u(mpred_is_tracing_exec), \+ lookup_u(mpred_is_tracing_pred(_)), 
   current_prolog_flag(debug,false), is_release)) ,!.
 
 
@@ -2667,7 +2671,7 @@ mpred_why1(P):-
 
 % non-interactive
 mpred_whyBrouse(P,Js):- 
-   must(cnotrace(in_cmt((mpred_pp_db_justifications(P,Js))))), !.
+   must(mnotrace(in_cmt((mpred_pp_db_justifications(P,Js))))), !.
 
 % Interactive
 mpred_whyBrouse(P,Js):-
@@ -2707,7 +2711,7 @@ mpred_unhandled_command(X,_,_):-
  fail.
   
 mpred_pp_db_justifications(P,Js):-
- must(cnotrace(( format("~NJustifications for ~p:",[P]),
+ must(mnotrace(( format("~NJustifications for ~p:",[P]),
   mpred_pp_db_justification1(Js,1)))).
 
 mpred_pp_db_justification1([],_).
@@ -3066,7 +3070,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent(assert_u_confirm_if_missing/1).
 :- module_transparent(get_source_ref_stack/1).
 :- module_transparent(remove_negative_version/1).
-:- module_transparent(not_not_ignore_cnotrace/1).
+:- module_transparent(not_not_ignore_mnotrace/1).
 :- module_transparent(retractall_u0/1).
 :- module_transparent(retract_u0/1).
 :- module_transparent(attvar_op_fully/2).
@@ -3074,6 +3078,11 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent(mpred_unfwc_check_triggers0/1).
 :- module_transparent(get_first_user_reason/2).
 :- module_transparent(is_user_fact/1).
+:- module_transparent(mpred_post1/2).
+:- module_transparent(plus_fwc/0).
+:- module_transparent(plus_fwc/1).
+:- module_transparent(fresh_mode/0).
+:- module_transparent(mnotrace/1).
 
 
 :- source_location(S,_),prolog_load_context(module,M),
