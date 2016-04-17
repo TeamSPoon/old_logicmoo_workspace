@@ -46,12 +46,12 @@ form_sk(OtherValue, Skolem):- sk:attr_unify_hook(Skolem, OtherValue),!.
 push_dom(X,Dom):- push_cond(X,isa(X,Dom)).
 
 
-annote(Dom,X,Form2):-annote(Dom,X,Form2,_).
+annote(Dom,X,Form2):- must(annote(Dom,X,Form2,_)).
 
-annote(_,X,IO,IO):- is_ftNonvar(X),!.
 % annote(_,_,IO,IO):- \+ is_skolem_setting(push_skolem),!.
 % annote(_,X,Form2,Form2):- var(X), freeze(X,(ground(X)->show_call(for(X),lazy(call_u(Form2)));true)).
 annote(Dom,X,Form2,SK_FINAL):- mpred_get_attr(X,Dom,Form1),merge_forms(Form1,Form2,SK_FINAL),mpred_put_attr(X,Dom,SK_FINAL),!.
+annote(_,X,IO,IO):- is_ftNonvar(X),!.
 annote(Dom,X,Form2,Form2):- mpred_put_attr(X,Dom,Form2).
 
 

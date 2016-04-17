@@ -106,7 +106,7 @@ end_of_file.
 
 set_user_abox(M):- wdmsg(set_user_abox(M)),
  setup_mpred_support(M),
- ('$set_source_module'(_,M),'$module'(_,M)),
+ ('$set_source_module'(_,M),'$set_typein_module'(M)),
    retractall(t_l:user_abox(_M)),asserta(t_l:user_abox(M)).
 
 :- module_transparent((setup_mpred_support)/1).
@@ -234,7 +234,7 @@ with_umt(G0):-
  '$set_source_module'(S,U),
  '$module'(M,U),
   call_cleanup(CALL,
-     ('$set_source_module'(_,S),'$module'(_,M))).
+     ('$set_source_module'(_,S),'$set_typein_module'(M))).
 
 
 %:- else.

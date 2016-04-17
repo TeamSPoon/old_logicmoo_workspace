@@ -25,7 +25,7 @@
 
 mpred_userkb_file.
 
-:- '$set_source_module'(_,baseKB).
+:- '$set_source_module'(baseKB).
 
 :- dynamic(base_kb_pred_list/1).
 
@@ -186,9 +186,10 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
 :- meta_predicate((
       baseKB:resolveConflict((*)),
       baseKB:resolveConflict0((*)),
+      baseKB:mpred_isa(?,1),
       baseKB:resolverConflict_robot((*)))).
 
-:- '$set_source_module'(_,baseKB).
+:- '$set_source_module'(baseKB).
 :- thread_local(t_l:user_abox/2).
 t_l:user_abox(baseKB,baseKB).
 
@@ -197,7 +198,7 @@ t_l:user_abox(baseKB,baseKB).
 :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),baseKB:dynamic(baseKB:E)).
 :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),decl_shared(E)).
 
-:- '$set_source_module'(_,baseKB).
+:- '$set_source_module'(baseKB).
 
 :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),mpred_loader:import_to_user(baseKB:E)).
 
@@ -213,7 +214,7 @@ t_l:user_abox(baseKB,baseKB).
 
 :- source_location(F,_),asserta(lmconf:never_registered_mpred_file(F)).
 
-:- '$set_source_module'(_,baseKB).
+:- '$set_source_module'(baseKB).
 
 %= 	 	 
 

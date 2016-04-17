@@ -595,7 +595,7 @@ isac(X, Domain) :-
 %
 % Type Size.
 %
-type_size(C,S):-a(completeExtentKnown,C),!,setof(E,isa(E,C),L),length(L,S).
+type_size(C,S):-a(completeExtentEnumerable,C),!,setof(E,isa(E,C),L),length(L,S).
 type_size(C,1000000):-isa(C,ttExpressionType),!.
 type_size(_,1000).
 

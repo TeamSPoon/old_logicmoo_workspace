@@ -13,7 +13,7 @@
 
 :- module(mpred_pfc, [
   ensure_abox/1,
-  mpred_call_no_bc/1,fix_mp/2,
+  mpred_call_no_bc/1,fix_mp/2,fix_mp_abox/3,
   mpred_fwc/1,
   get_mpred_is_tracing/1,
   show_if_debug/1,
@@ -171,7 +171,7 @@
   asserta_u(IN),clause_asserted_u(OUT),!. % ,nl,writeq(A=@=B).
 */
 
-:- '$set_source_module'(_,mpred_pfc).
+:- '$set_source_module'(mpred_pfc).
 
 :- op(700,xfx,'=@@=').
 
@@ -280,6 +280,12 @@ fix_mp(MP,M:P):-  strip_module(MP,Cm,P),get_user_abox(U),!,
       (P==MP -> M=U; M=Cm)
      ).
 
+fix_mp_abox(G0,U,CALL):-
+  strip_module(G0,WM,G), 
+  must((get_user_abox(U),atom(U))),!, % nop(mnotrace(fix_mp(G0,U:G))),
+  on_f_debug((current_predicate(_,U:G)->
+    CALL=U:G ;
+      (current_predicate(_,WM:G)->CALL=WM:G; fail))).
 
 
 
@@ -350,20 +356,21 @@ lookup_u(MH,Ref):- must(mnotrace(fix_mp(MH,M:H))),
                         (var(B)->rtrace(clause_u(M:H,_,Ref));true),
                         on_x_debug(B).
 */
+/*
+with_umt(G0):-
+  strip_module(G0,WM,G),
+  get_user_abox(U),  
+  must(current_predicate(_,U:G)->(CALL=U:G);(current_predicate(_,WM:G0)->CALL=WM:G0; fail)),
+ '$set_source_module'(S,U),
+ '$module'(M,U),
+  call_cleanup(CALL,
+     ('$set_source_module'(S),'$set_typein_module'(M))).
+*/
 
-with_umt(G0):-   
-  strip_module(G0,WM,G), 
-  must((get_user_abox(U),atom(U))),!, % nop(mnotrace(fix_mp(G0,U:G))),
-  on_f_debug((current_predicate(_,U:G)->
-    CALL=U:G ;
-      (current_predicate(_,WM:G)->CALL=WM:G; fail))),
+with_umt(G):-
+  fix_mp_abox(G,U,CALL),
+  call_from_module(U,CALL).
 
-  ('$set_source_module'(S,S),'$module'(M,M)),!,
-
-  setup_call_cleanup_each(
-     ('$set_source_module'(_,U),'$module'(_,U)),
-     CALL,
-     ('$set_source_module'(_,S),'$module'(_,M))).
 
 
 %:- else
@@ -2873,6 +2880,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((ain_fast)/2).
 :- module_transparent((ain_fast)/1).
 :- module_transparent((fix_mp)/2).
+:- module_transparent((fix_mp_abox)/3).
 :- module_transparent((why_was_true)/1).
 :- module_transparent((mpred_is_silient)/0).
 :- module_transparent((get_mpred_is_tracing)/1).

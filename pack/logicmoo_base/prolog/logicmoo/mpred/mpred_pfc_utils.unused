@@ -323,7 +323,7 @@ ain_fast(P0,S):- gripe_time(23.6,ain_fast_timed(P0,S)).
 %
 ain_fast_timed(P0,S):- '$module'(user,user),'$set_source_module'(user,user),!,
   '$module'(WM,baseKB),'$set_source_module'(WS,baseKB),
-   call_cleanup(ain_fast_timed(P0,S),('$module'(_,WM),'$set_source_module'(_,WS))).
+   call_cleanup(ain_fast_timed(P0,S),('$set_typein_module'(WM),'$set_source_module'(_,WS))).
 
 ain_fast_timed(P000,S0):- check_context_module,
   unnumbervars(P000:S0,P00:S),
@@ -3558,7 +3558,7 @@ with_umt(G0):-
  '$set_source_module'(S,U),
  '$module'(M,U),
   call_cleanup(CALL,
-     ('$set_source_module'(_,S),'$module'(_,M))).
+     ('$set_source_module'(_,S),'$set_typein_module'(M))).
 
 listing_u(P):-call_u(xlisting(P)).
 

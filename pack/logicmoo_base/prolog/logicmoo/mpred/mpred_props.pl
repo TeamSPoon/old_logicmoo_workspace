@@ -70,11 +70,12 @@
  :- meta_predicate mpred_props:decl_mpred_0(?,1).
  :- meta_predicate mpred_props:decl_mpred(+,+,+).
 */
+:- meta_predicate decl_mpred_0(?,1).
 %: mpred_props:meta_argtypes/2, which is referenced by
 % Warning: mpred_props:mt/2, which is referenced by
 % Warning: mpred_stubs:cycPlus2/2, which is referenced by
 % Warning: mpred_stubs:cycPred/2, which is referenced by
-% Warning: mpred_type_constraints:completeExtentKnown/1, which is referenced by
+% Warning: mpred_type_constraints:completeExtentEnumerable/1, which is referenced by
 % Warning: mpred_type_constraints:gather_goals/2, which is referenced by
 
 % ========================================

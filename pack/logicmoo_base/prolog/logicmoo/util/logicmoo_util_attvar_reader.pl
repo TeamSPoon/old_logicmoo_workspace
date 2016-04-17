@@ -48,32 +48,33 @@
 :- use_module(library(base32)).
 :- endif.
 
-mpred_get_attr(V,_,_):- is_ftNonvar(V),!,fail.
 mpred_get_attr(V,A,Value):- var(V),!,get_attr(V,A,Value),!.
 mpred_get_attr('$VAR'(Name),_,_):- atom(Name),!,fail.
 mpred_get_attr('$VAR'(Att3),A,Value):- put_attrs(NewVar,Att3),get_attr(NewVar,A,Value).
 mpred_get_attr('avar'(Att3),A,Value):- put_attrs(NewVar,Att3),get_attr(NewVar,A,Value).
 mpred_get_attr('avar'(_,Att3),A,Value):- put_attrs(NewVar,Att3),get_attr(NewVar,A,Value).
+% mpred_get_attr(V,A,Value):- trace_or_throw(mpred_get_attr(V,A,Value)).
 
-mpred_put_attrs(V,Att3s):- is_ftNonvar(V),!,trace_or_throw(mpred_put_attrs(V,Att3s)).
 mpred_put_attrs(V,Att3s):- var(V),!,put_attrs(V,Att3s),!.
 mpred_put_attrs(VAR,Att3s):- VAR='$VAR'(Name), atom(Name),!,setarg(1,VAR, att(vn, Name, Att3s)).
-mpred_put_attrs(VAR,Att3s):- VAR='$VAR'(_Att3),setarg(1,VAR, Att3s).
-mpred_put_attrs(VAR,Att3s):- VAR='avar'(_Att3),setarg(1,VAR, Att3s).
-mpred_put_attrs(VAR,Att3s):- VAR='avar'(_,_),setarg(2,VAR, Att3s).
+mpred_put_attrs(VAR,Att3s):- VAR='$VAR'(_Att3),!,setarg(1,VAR, Att3s).
+mpred_put_attrs(VAR,Att3s):- VAR='avar'(_Att3),!,setarg(1,VAR, Att3s).
+mpred_put_attrs(VAR,Att3s):- VAR='avar'(_,_),!,setarg(2,VAR, Att3s).
+mpred_put_attrs(V,Att3s):- trace_or_throw(mpred_put_attrs(V,Att3s)).
 
 mpred_get_attrs(V,Att3s):- var(V),!,get_attrs(V,Att3s),!.
 mpred_get_attrs('$VAR'(Name),_):- atom(Name),!,fail.
 mpred_get_attrs('$VAR'(Att3s),Att3):-!,Att3s=Att3.
 mpred_get_attrs('avar'(Att3s),Att3):-!,Att3s=Att3.
 mpred_get_attrs('avar'(_,Att3s),Att3):-!,Att3s=Att3.
+% mpred_get_attrs(V,Value):- trace_or_throw(mpred_get_attrs(V,Value)).
 
-mpred_put_attr(V,A,Value):- is_ftNonvar(V),!,trace_or_throw(mpred_put_attr(V,A,Value)).
 mpred_put_attr(V,A,Value):- var(V),!,put_attr(V,A,Value),!.
 mpred_put_attr(VAR,A,Value):- VAR='$VAR'(Name), atom(Name),!,setarg(1,VAR, att(vn, Name, att(A,Value, []))).
-mpred_put_attr(VAR,A,Value):- VAR='$VAR'(Att3),setarg(1,VAR, att(A,Value,Att3)).
-mpred_put_attr(VAR,A,Value):- VAR='avar'(Att3),setarg(1,VAR, att(A,Value,Att3)).
-mpred_put_attr(VAR,A,Value):- VAR='avar'(_,Att3),setarg(2,VAR, att(A,Value,Att3)).
+mpred_put_attr(VAR,A,Value):- VAR='$VAR'(Att3),!,setarg(1,VAR, att(A,Value,Att3)).
+mpred_put_attr(VAR,A,Value):- VAR='avar'(Att3),!,setarg(1,VAR, att(A,Value,Att3)).
+mpred_put_attr(VAR,A,Value):- VAR='avar'(_,Att3),!,setarg(2,VAR, att(A,Value,Att3)).
+mpred_put_attr(V,A,Value):- trace_or_throw(mpred_put_attr(V,A,Value)).
 
 
 ensure_named(Vs,V,N):- atom(N),member(N=VV,Vs),VV==V,put_attr(V,vn,N).

@@ -714,7 +714,7 @@ mpred_prop_ordered(Pred,Prop):-mpred_isa(Pred,Prop),not(first_mpred_props(Prop))
 %
 provide_clauses_list(Head,HBLISTO):- get_pifunctor(Head,PHead,_),  
   findall((PHead :- B),
-   no_repeats_old([PHead:B],((call_no_cuts(lmconf:mpred_provide_storage_clauses(_,PHead,B,Proof)),is_source_proof(Proof)))),
+   no_repeats_old([PHead:B],((call_no_cuts(lmconf:mpred_provide_storage_clauses(PHead,B,Proof)),is_source_proof(Proof)))),
    HBLIST),
    create_stub_body(PHead,Stub),
    delete(HBLIST,Stub,HBLISTO),!.

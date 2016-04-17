@@ -141,7 +141,7 @@ bwc/0,
 fwc/0,
 cwc/0,
 mpred_rewrap_h/2,
-mpred_is_minfo/1,
+mpred_is_info/1,
 ain_minfo/1,
 mpred_rule_hb_0/3,
 mpred_rule_hb/3,
@@ -251,7 +251,7 @@ call_with_bc_triggers/1,
 attvar_op/2,
 %supporters_list/2,
 %justifications/2,
-% lmconf:mpred_provide_storage_clauses/4,
+% lmconf:mpred_provide_storage_clauses/3,
 % justification/2,
 
 mpred_facts_and_universe/1,
@@ -691,7 +691,7 @@ call_s2(G0):-
  '$set_source_module'(S,U),
  '$module'(M,U),
   call_cleanup(CALL,
-     ('$set_source_module'(_,S),'$module'(_,M))).
+     ('$set_source_module'(S),'$set_typein_module'(M))).
 
 /*
 attvar_op(Op,Data):-
@@ -1119,15 +1119,15 @@ ain_minfo(How,(H:-True)):-is_true(True),must(is_ftNonvar(H)),!,ain_minfo(How,H).
 ain_minfo(How,(H<-B)):- !,ain_minfo(How,(H:-infoF(H<-B))),!,ain_minfo(How,(H:-mpred_bc_only(H))),ain_minfo_2(How,(B:-infoF(H<-B))).
 ain_minfo(How,(B==>H)):- !,ain_minfo(How,(H:-infoF(B==>H))),!,ain_minfo_2(How,(B:-infoF(B==>H))).
 ain_minfo(How,(B<==>H)):- !,ain_minfo(How,(H:-infoF(B<==>H))),!,ain_minfo(How,(B:-infoF(B<==>H))),!.
-ain_minfo(How,((A,B):-INFOC)):-mpred_is_minfo(INFOC),(is_ftNonvar(A);is_ftNonvar(B)),!,ain_minfo(How,((A):-INFOC)),ain_minfo(How,((B):-INFOC)),!.
-ain_minfo(How,((A;B):-INFOC)):-mpred_is_minfo(INFOC),(is_ftNonvar(A);is_ftNonvar(B)),!,ain_minfo(How,((A):-INFOC)),ain_minfo(How,((B):-INFOC)),!.
+ain_minfo(How,((A,B):-INFOC)):-mpred_is_info(INFOC),(is_ftNonvar(A);is_ftNonvar(B)),!,ain_minfo(How,((A):-INFOC)),ain_minfo(How,((B):-INFOC)),!.
+ain_minfo(How,((A;B):-INFOC)):-mpred_is_info(INFOC),(is_ftNonvar(A);is_ftNonvar(B)),!,ain_minfo(How,((A):-INFOC)),ain_minfo(How,((B):-INFOC)),!.
 ain_minfo(How,(-(A):-infoF(C))):-is_ftNonvar(C),is_ftNonvar(A),!,ain_minfo(How,((A):-infoF((C)))). % attvar_op(How,(-(A):-infoF(C))).
 ain_minfo(How,(~(A):-infoF(C))):-is_ftNonvar(C),is_ftNonvar(A),!,ain_minfo(How,((A):-infoF((C)))). % attvar_op(How,(-(A):-infoF(C))).
 ain_minfo(How,(A:-INFOC)):-is_ftNonvar(INFOC),INFOC= mpred_bc_only(A),!,attvar_op(How,(A:-INFOC)),!.
 ain_minfo(How,bt(_ABOX,H,_)):-!,attvar_op(How,(H:-mpred_bc_only(H))).
 ain_minfo(How,nt(H,Test,Body)):-!,attvar_op(How,(H:-fail,nt(H,Test,Body))).
 ain_minfo(How,pt(H,Body)):-!,attvar_op(How,(H:-fail,pt(H,Body))).
-ain_minfo(How,(A0:-INFOC0)):- mpred_is_minfo(INFOC0), copy_term_and_varnames((A0:-INFOC0),(A:-INFOC)),!,must((mpred_rewrap_h(A,AA),imploded_copyvars((AA:-INFOC),ALLINFO), attvar_op(How,(ALLINFO)))),!.
+ain_minfo(How,(A0:-INFOC0)):- mpred_is_info(INFOC0), copy_term_and_varnames((A0:-INFOC0),(A:-INFOC)),!,must((mpred_rewrap_h(A,AA),imploded_copyvars((AA:-INFOC),ALLINFO), attvar_op(How,(ALLINFO)))),!.
 %ain_minfo(How,G):-mpred_trace_msg(skipped_add_meta_facts(How,G)).
 ain_minfo(_,_).
 
@@ -1141,12 +1141,14 @@ ain_minfo(_,_).
 ain_minfo_2(How,G):-ain_minfo(How,G).
 
 
-%% mpred_is_minfo( :TermC) is semidet.
+%% mpred_is_info( :TermC) is semidet.
 %
 % PFC If Is A Info.
 %
-mpred_is_minfo(mpred_bc_only(C)):-is_ftNonvar(C),!.
-mpred_is_minfo(infoF(C)):-is_ftNonvar(C),!.
+mpred_is_info(mpred_bc_only(C)):-is_ftNonvar(C),!.
+mpred_is_info(infoF(C)):-is_ftNonvar(C),!.
+mpred_is_info((Fail,_)):-Fail==fail.
+
 
 %:- was_dynamic(not_not/1).
 
@@ -1871,13 +1873,13 @@ mpred_slow_search.
 % Rule Backward.
 %
 ruleBackward(R,Condition):- call_u(( ruleBackward0(R,Condition),functor(Condition,F,_),\+ arg(_,v(call_u,call_u),F))).
-%ruleBackward0(F,Condition):-clause_u(F,Condition),\+ (is_true(Condition);mpred_is_minfo(Condition)).
+%ruleBackward0(F,Condition):-clause_u(F,Condition),\+ (is_true(Condition);mpred_is_info(Condition)).
 
 %% ruleBackward0( +F, ?Condition) is semidet.
 %
 % Rule Backward Primary Helper.
 %
-ruleBackward0(F,Condition):- call_u((  '<-'(F,Condition),\+ (is_true(Condition);mpred_is_minfo(Condition)) )).
+ruleBackward0(F,Condition):- call_u((  '<-'(F,Condition),\+ (is_true(Condition);mpred_is_info(Condition)) )).
 
 %:- was_dynamic('{}'/1).
 %{X}:-dmsg(legacy({X})),call_u(X).
@@ -2547,16 +2549,7 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 
 
 
-/*
-with_umt(G0):-
-  strip_module(G0,WM,G),
-  get_user_abox(U),  
-  must(current_predicate(_,U:G)->(CALL=U:G);(current_predicate(_,WM:G0)->CALL=WM:G0; fail)),
- '$set_source_module'(S,U),
- '$module'(M,U),
-  call_cleanup(CALL,
-     ('$set_source_module'(_,S),'$module'(_,M))).
-*/
+
 
 
 :- retractall(t_l:mpred_debug_local).
@@ -2678,7 +2671,7 @@ with_umt(G0):-
 :- module_transparent( (fwc)/0).
 :- module_transparent( (cwc)/0).
 :- module_transparent( (mpred_rewrap_h)/2).
-:- module_transparent( (mpred_is_minfo)/1).
+:- module_transparent( (mpred_is_info)/1).
 :- module_transparent( (ain_minfo)/1).
 :- module_transparent( (mpred_rule_hb_0)/3).
 :- module_transparent( (mpred_rule_hb)/3).
@@ -2728,7 +2721,6 @@ with_umt(G0):-
 :- module_transparent( (retractall_s)/1).
 :- module_transparent( (assert_s)/1).
 :- module_transparent( (listing_s)/1).
-:- module_transparent( (fix_mp)/2).
 :- module_transparent( (add_side_effect)/2).
 :- module_transparent( (record_se)/0).
 :- module_transparent( (mpred_is_builtin)/1).
@@ -2748,7 +2740,6 @@ with_umt(G0):-
 :- module_transparent( (assertz_mu)/2).
 :- module_transparent( (assertz_mu)/1).
 :- module_transparent( (mpred_op)/2).
-:- module_transparent( (with_umt)/1).
 :- module_transparent(deducedSimply/1).
 :- module_transparent(is_callable/1).
 :- module_transparent(map_unless/4).

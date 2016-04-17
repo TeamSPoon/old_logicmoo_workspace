@@ -133,10 +133,6 @@ Warning: at runtime using assert/1, use :- dynamic Name/Arity.
 Warning:
 Warning: common_logic_snark:neq/2, which is referenced by
 Warning:        /root/lib/swipl/pack/logicmoo_base/prolog/logicmoo/snark/common_logic_snark.pl:462:21: 1-st clause of common_logic_snark:not_mudEquals/2
-Warning: mpred_kb_ops:mpred_METACALL/2, which is referenced by
-Warning:        /root/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_kb_ops.pl:689:2: 1-st clause of mpred_kb_ops:call_s/1
-Warning: mpred_pfc:mpred_provide_storage_clauses/1, which is referenced by
-Warning:        /root/lib/swipl/pack/logicmoo_base/prolog/logicmoo/mpred/mpred_pfc.pl:267:14: 1-st clause of mpred_pfc:mpred_provide_storage_clauses/1v
 % Checking trivial failures ...
 % Checking redefined system and global predicates ...
 % version/1                    Redefined system predicate

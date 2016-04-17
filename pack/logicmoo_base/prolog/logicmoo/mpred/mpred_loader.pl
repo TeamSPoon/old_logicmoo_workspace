@@ -18,6 +18,7 @@
           set_abox_for/2, 
           make_module_name_local/2,
            get_abox_for/2,
+           call_from_module/2,
           is_undefaulted/1,
             user_m_check/1,
             add_term/2,
@@ -596,7 +597,7 @@ mpred_expander_now_physically(M,I,OO):-
    must(loop_check(expand_term_to_load_calls(I,O),trace_or_throw(in_loop(expand_term_to_load_calls(I,O))))),!,
    must(I\=@=O),
    must(M:make_file_command(I,O,OO)))),
- '$set_source_module'(_,Old)).
+ '$set_source_module'(Old)).
 
 
 mpred_expander_now_physically(M,I,OO):-   
@@ -607,7 +608,7 @@ mpred_expander_now_physically(M,I,OO):-
    must(I\=@=O),
   (((t_l:mpred_term_expansion_ok;mpred_expand_inside_file_anyways)-> true ; ((show_load_context,wdmsg(warning,wanted_mpred_term_expansion(I,O))),fail)),
    ((O=(:-(CALL))) ->  must((M:call_file_command(I,CALL,OO,O))); 
-        (OO = O))))),'$set_source_module'(_,Old)).
+        (OO = O))))),'$set_source_module'(Old)).
     
 
 
@@ -1300,7 +1301,7 @@ mpred_directive_expansion(mpred_module,(asserta(lmcache:mpred_directive_value(pf
 mpred_directive_expansion(mpred_multifile,include(logicmoo(mpred/'mpred_header.pi'))):- context_module_of_file(M),set_mpred_multifle(M).
 
 
-set_mpred_module(M):- asserta(lmcache:mpred_directive_value(pfc,module,M)),'$set_source_module'(_,M).
+set_mpred_module(M):- asserta(lmcache:mpred_directive_value(pfc,module,M)),'$set_source_module'(M).
 
 
 %% set_mpred_multifle( ?M) is semidet.
