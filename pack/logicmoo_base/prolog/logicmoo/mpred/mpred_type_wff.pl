@@ -83,7 +83,6 @@
             leave_as_is_functor/1,
             logical_functor_ft/1,            
             non_assertable/2,
-            non_compound/1,
             not_log_op/1,
             prequent/1,
             put_singles/4,
@@ -765,9 +764,8 @@ defunctionalize(Wff,WffO):-
 % Defunctionalize.
 %
 defunctionalize(OP,Wff,WffO):- call_last_is_var(defunctionalize(OP,Wff,WffO)).
-defunctionalize(_ ,Wff,Wff):- \+ compound(Wff),!.
-defunctionalize(_ ,Wff,Wff):- non_compound(Wff),!.
 defunctionalize(_ ,Wff,Wff):- leave_as_is(Wff),!.
+defunctionalize(_ ,Wff,Wff):- not_ftCompound(Wff),!.
 
 defunctionalize(OP,(H:-B),WffO):- t_l:dont_use_mudEquals,!,
  wno_tl(t_l:dont_use_mudEquals,defunctionalize(OP,(H:-B),WffO)).
@@ -1013,12 +1011,6 @@ set_is_lit(A):-when(nonvar(A),\+ is_ftVar(A)),!.
 
 
 
-
-%% non_compound( ?InOut) is semidet.
-%
-% Not Compound.
-%
-non_compound(InOut):- once( \+ (compound(InOut));is_ftVar(InOut)).
 
 
 

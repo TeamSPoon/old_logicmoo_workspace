@@ -34,10 +34,7 @@ cycl('
 
 
 
-ptTransitiveBinaryPredicate(genls).
 
-(ptTransitiveBinaryPredicate(P)/ground(P)) ==>
-    ((t(P,A,B),t(P,B,C))/(ground(v(A,B,C)),A\==C,B\==C,A\==B) ==> t(P,A,C)).
 /*
 :- sanity(( 
    fully_expand(((t(foo,a)/bar)=>baz),OUT),
@@ -49,13 +46,18 @@ ptTransitiveBinaryPredicate(genls).
    OUT= (((genls(A,B),genls(B,C)) /(ground(v(A,B,C)),A\==C,B\==C,A\==B))==> genls(A,C)))).
 */
 
-:- sanity(is_entailed_u(
-  (((t(genls,A,B),t(genls,B,C))/( ground(v(A,B,C)),A\==C,B\==C,A\==B) ) ==> t(genls,A,C)))).
-
-
-((t(isa,A,B),t(genls,B,C)) ==> t(isa,A,C)).
 
 ptTransitiveBinaryPredicate(mudSubPart).
+
+(ptTransitiveBinaryPredicate(P)/ground(P)) ==>
+    ((t(P,A,B),t(P,B,C))/(ground(v(A,B,C)),A\==C,B\==C,A\==B) ==> t(P,A,C)).
+
+/*
+ptTransitiveBinaryPredicate(genls).
+:- sanity(is_entailed_u(
+  (((t(genls,A,B),t(genls,B,C))/( ground(v(A,B,C)),A\==C,B\==C,A\==B) ) ==> t(genls,A,C)))).
+*/
+% ((t(isa,A,B),t(genls,B,C)) ==> t(isa,A,C)).
 
 
 ((transitiveViaArg(PRED,BPRED,2),arity(PRED,2)) /ground(PRED:BPRED)) ==> clif((t(PRED,A,B) , t(BPRED,B,C)) => t(PRED,A,C)).
@@ -115,6 +117,12 @@ relationExistsInstance(Pred,D_COL,VAL) ==>
   (( ~ (G1/(isa(Missing,D_COL),is_non_skolem(Missing)))) ==> (G2,ISA))).
 
 
+
+relationMostInstance(BP,_,_)==>(ptBinaryPredicate(BP),tRolePredicate(BP)).
+prologHybrid(relationAllInstance(ptBinaryPredicate,tCol,vtValue)).
+relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
+
+
 prologHybrid(relationMostInstance(ptBinaryPredicate,tCol,vtValue)).
 relationMostInstance(BP,_,_)==>ptBinaryPredicate(BP).
 (relationMostInstance(Pred,_,Value),{\+number(Value)},argIsa(Pred,2,Type))==> isa(Value,Type).
@@ -122,7 +130,7 @@ relationMostInstance(BP,_,_)==>ptBinaryPredicate(BP).
 relationMostInstance(Pred,Type,Value) ==> mdefault(isa(Inst,Type) ==> t(Pred,Inst,Value)).
 % relationMostInstance(Pred,Type,Value) ==> mdefault( isa(Inst,Type) ==> ?Pred(Inst,Value) ).
 
-
+ptBinaryPredicate(P)<==>(tPred(P),arity(P,2)).
 
 prologHybrid(relationAllInstance(ptBinaryPredicate,tCol,vtValue)).
 relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
@@ -184,7 +192,7 @@ genls(tHumanBody,tBodyPart).
 :- mpred_trace.
 :- mpred_warn.
 
-:- cls.
+% :- cls.
 
 :- noguitracer.
 

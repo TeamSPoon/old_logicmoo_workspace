@@ -192,7 +192,7 @@
 %
 % Knowledge Interchange Format Hook.
 %
-kif_hook(C):- non_compound(C),!,fail.
+kif_hook(C):- not_ftCompound(C),!,fail.
 kif_hook(_H :- _):- !,fail.
 kif_hook(_H <- _):- !,fail.
 kif_hook(_ ==> _):- !,fail.

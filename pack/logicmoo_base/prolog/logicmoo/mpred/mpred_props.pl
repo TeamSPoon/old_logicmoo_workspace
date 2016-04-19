@@ -71,10 +71,8 @@
  :- meta_predicate mpred_props:decl_mpred(+,+,+).
 */
 :- meta_predicate decl_mpred_0(?,1).
+:- meta_predicate decl_mpred_hybrid(?,1).
 %: mpred_props:meta_argtypes/2, which is referenced by
-% Warning: mpred_props:mt/2, which is referenced by
-% Warning: mpred_stubs:cycPlus2/2, which is referenced by
-% Warning: mpred_stubs:cycPred/2, which is referenced by
 % Warning: mpred_type_constraints:completeExtentEnumerable/1, which is referenced by
 % Warning: mpred_type_constraints:gather_goals/2, which is referenced by
 
@@ -460,7 +458,7 @@ decl_mpred_4(user,prologSingleValued(ARGS),prologSingleValued/1):- compound(ARGS
 decl_mpred_4(_,F,F/0):-!,assert_hasInstance(tPred,F).
 decl_mpred_4(M,PI,F/A):-
    decl_mpred(F,A),
-   ignore((ground(PI),compound(PI),decl_mpred(F,meta_argtypes(PI)))),
+   ignore((ground(PI),compound(PI),call(call,GG=meta_argtypes(PI)),decl_mpred(F,GG))),
    decl_mpred(F,[mpred_module(M)]).
 
 :- was_export((decl_mpred)/2).
@@ -489,9 +487,10 @@ decl_mpred_0(F,tPred):-!,assert_hasInstance(tPred,F).
 decl_mpred_0(C,More):-string(C),!,dmsg(trace_or_throw(var_string_decl_mpred(C,More))).
 decl_mpred_0(mudDescription, predProxyRetract):- trace_or_throw(decl_mpred_0(mudDescription, predProxyRetract)).
 decl_mpred_0(_,meta_argtypes):-!.
-decl_mpred_0(F,meta_argtypes(ArgTypes)):-!,decl_mpred_2(F,meta_argtypes(ArgTypes)).
+decl_mpred_0(F,GG):- call(call,GG=meta_argtypes(ArgTypes)),!,decl_mpred_2(F,meta_argtypes(ArgTypes)).
 decl_mpred_0(C,More):-compound(C),C=..[F,Arg1|PROPS],ttPredType(F),!,ground(Arg1),decl_mpred(Arg1,[F,PROPS,More]).
-decl_mpred_0(C,More):-compound(C),!,functor(C,F,A),assert_arity(F,A),decl_mpred_0(F,More),!,ignore((ground(C),decl_mpred(F,meta_argtypes(C)))),!.
+decl_mpred_0(C,More):-compound(C),!,functor(C,F,A),assert_arity(F,A),decl_mpred_0(F,More),!,ignore((ground(C),
+  call(call,GG=meta_argtypes(C)),decl_mpred(F,GG))),!.
 decl_mpred_0(_,[]):-!.
 decl_mpred_0(F,[Prop|Types]):-!,decl_mpred_0(F,Prop),!,decl_mpred_0(F,Types),!.
 
@@ -521,7 +520,7 @@ decl_mpred_2(F,Prop):-ain(mpred_isa(F,Prop)).
 %
 % Declare Managed Predicate.
 %
-decl_mpred(Mt,F,A):-decl_mpred(F,A),ignore((nonvar(Mt),decl_mpred(F,mt(Mt)))).
+decl_mpred(Mt,F,A):-decl_mpred(F,A),ignore((nonvar(Mt),decl_mpred(F,definingMt(Mt)))).
 
 %= 	 	 
 

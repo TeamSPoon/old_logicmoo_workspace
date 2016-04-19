@@ -104,7 +104,7 @@
 :- set_mpred_module(baseKB).
 
 
-:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('boot_system.pfc')).
+:- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('system_base.pfc')).
 
 :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded('system_if_missing.pfc')).
 

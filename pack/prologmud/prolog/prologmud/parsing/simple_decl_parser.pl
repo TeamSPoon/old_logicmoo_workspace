@@ -45,7 +45,7 @@ completelyAssertedCollection(vtValue).
 
 
 isa(vtColor,ttValueType).
-:- pfc_add('==>'(isa(X,ttValueType),(genls(X,vtValue),completelyAssertedCollection(X)))).
+:- ain('==>'(isa(X,ttValueType),(genls(X,vtValue),completelyAssertedCollection(X)))).
 
 isa(vtValue,ttValueType).
 

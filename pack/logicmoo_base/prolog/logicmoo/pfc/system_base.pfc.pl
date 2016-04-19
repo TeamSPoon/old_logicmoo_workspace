@@ -89,8 +89,8 @@ arity(arity,2).
 arity(is_never_type,1).
 arity(prologSingleValued,1).
 arity('<=>',2).
-arity(F,A):- atom(F), integer(A),current_predicate(F/A),A>1.
-arity(F,1):- atom(F), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
+arity(F,A):- is_ftNameArity(F,A),current_predicate(F/A),A>1.
+arity(F,1):- is_ftNameArity(F,1), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
 
 
 prologHybrid(arity/2).
@@ -197,14 +197,14 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
 
 prologHybrid(genls/2).
 
-((tPred(F),arity(F,A)/(integer(A),A>1), ~prologBuiltin(F)) ==> (~(tCol(F)),support_hilog(F,A))).
+((tPred(F),arity(F,A)/(is_ftNameArity(F,A),A>1), ~prologBuiltin(F)) ==> (~(tCol(F)),support_hilog(F,A))).
 
 
 ~(tCol(C))/completelyAssertedCollection(C)==> \+ completelyAssertedCollection(C).
 
 :- kb_dynamic(support_hilog/2).
 
-(((support_hilog(F,A)/(F\='$VAR',atom(F),integer(A),\+ static_predicate(F/A), \+ prologDynamic(F)))) ==>
+(((support_hilog(F,A)/(F\='$VAR',is_ftNameArity(F,A),\+ static_predicate(F/A), \+ prologDynamic(F)))) ==>
    (hybrid_support(F,A), 
     {% functor(Head,F,A) ,Head=..[F|TTs], TT=..[t,F|TTs],
     %  (CL = (Head :- cwc, call(second_order(TT,CuttedCall)), ((CuttedCall=(C1,!,C2)) -> (C1,!,C2);CuttedCall)))
@@ -216,7 +216,7 @@ prologHybrid(genls/2).
 %:- kb_dynamic(hybrid_support/2).
 %prologBuiltin(resolveConflict/1).
 
-((hybrid_support(F,A)/(F\='$VAR',atom(F),integer(A), \+ prologDynamic(F),\+ static_predicate(F/A))) ==>
+((hybrid_support(F,A)/(is_ftNameArity(F,A), \+ prologDynamic(F),\+ static_predicate(F/A))) ==>
   ({    
     functor(G,F,A),
      (var(M)->must(get_user_abox(M));true),
@@ -229,12 +229,13 @@ prologHybrid(genls/2).
      prologHybrid(F),
     arity(F,A)).
 
-((prologHybrid(F),arity(F,A))/ground(v(F,A))<==>hybrid_support(F,A))/ground(v(F,A)).
+
+(prologHybrid(F),arity(F,A)/is_ftNameArity(F,A))==>hybrid_support(F,A).
+(hybrid_support(F,A)/is_ftNameArity(F,A))==>prologHybrid(F),arity(F,A).
 
 :- ensure_loaded('system_markers.pfc').
 
 arity(genlPreds,2).
-
 
 
 %= 	 	 
@@ -302,8 +303,8 @@ arity(arity,2).
 arity(is_never_type,1).
 arity(prologSingleValued,1).
 arity('<=>',2).
-arity(F,A):- atom(F), integer(A),current_predicate(F/A),A>1.
-arity(F,1):- atom(F), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
+arity(F,A):- is_ftNameArity(F,A), current_predicate(F/A),A>1.
+arity(F,1):- is_ftNameArity(F,1), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
 
 
 pfcControlled(P),arity(P,A)==>hybrid_support(P,A).
@@ -528,6 +529,8 @@ ttNotTemporalType(T)==>tCol(T).
 ttTemporalType(T)==>tCol(T).
 
 arity(argQuoted,1).
+
+
 
 
 ((isa(Inst,ttTemporalType), tCol(Inst)) ==> genls(Inst,tTemporalThing)).
@@ -865,6 +868,8 @@ typeGenls(ttValueType,vtValue).
 argIsa(Prop,N,Type),{number(N)},ttExpressionType(Type) ==> argQuotedIsa(Prop,N,Type).
 
 :- discontiguous(prologSingleValued/1).
+
+
 :- do_gc.
 
 :- kb_dynamic(mudLabelTypeProps/3).
@@ -1124,6 +1129,10 @@ quotedDefnIff(ftCodeIs(SomeCode),SomeCode):- cwc, is_ftNonvar(SomeCode).
 tCol(ptBinaryPredicate).
 ttPredType(ptBinaryPredicate).
 
+isa(arity,ptBinaryPredicate).
+
+(arity(Pred,2),tPred(Pred)) <==> isa(Pred,ptBinaryPredicate).
+
 :- must(ain(tCol('ptUnaryPredicate'))).
 
 isa(arity,ptBinaryPredicate).
@@ -1139,7 +1148,7 @@ isa(F,pfcMustFC) ==> pfcControlled(F).
 prologHybrid(X)/has_functor(X)==>{kb_dynamic(X)}.
 prologDynamic(X)/has_functor(X)==>{decl_mpred_prolog(X)}.
 prologBuiltin(X)/has_functor(X)==>{decl_mpred_prolog(X)}.
-pfcControlled(X)/is_ftCompound(X)==>{once(X=(F/A);get_functor(X,F,A)),kb_dynamic(F/A)}.
+pfcControlled(X)/is_ftCompound(X)==>{once(X=(F/A);get_functor(X,F,A)),pfcControlled(F),kb_dynamic(F/A)}.
 
 
 pfcControlled(C)==>prologHybrid(C).
@@ -1185,3 +1194,4 @@ prologHybrid(isa/2).
 tCol(predIsFlag).
 tCol(prologDynamic).
 prologHybrid(formatted_resultIsa/2).
+

@@ -2541,7 +2541,7 @@ force_reload_mpred_file(World,MFileIn):- strip_module(MFileIn,NewModule,_),
    must_det_l((
    once(show_success(prolog_load_file,get_user_abox(DBASE));DBASE=NewModule),
    sanity(exists_file(File)),sanity(get_user_abox(World)),
-   mpred_remove_file_support(File),
+   nop(mpred_remove_file_support(File)),
    assert_if_new(lmconf:registered_mpred_file(File)),
    must(time_file_safe(File,NewTime)),
    retractall(lmconf:loaded_file_world_time(File,World,_)),

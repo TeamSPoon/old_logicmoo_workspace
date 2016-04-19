@@ -725,7 +725,8 @@ xlisting:- !,listing.
 xlisting([]):-!,listing.
 xlisting(Match):- \+ \+ t_l:no_xlisting(Match),!.
 xlisting(F/A):-integer(A),!,functor(P,F,A),xlisting(P).
-xlisting(Match):- scan_for_varnames,is_list(Match),!,maplist(xlisting,Match).
+xlisting(M:F/A):-integer(A),!,functor(P,F,A),xlisting(M:P).
+xlisting(Match):- maybe_scan_for_varnames,is_list(Match),!,maplist(xlisting,Match).
 xlisting(Match):- t_l:in_prolog_listing(Match),!,findall(PI,to_pi(Match,PI),SkipPI),!,
   mpred_match_listing_skip_pi(Match,[_:varname_info(_,_,_,_)|SkipPI]),!.
 xlisting(f(Match)):- !,xlisting_inner(portray_hbr,Match,[_:varname_info(_,_,_,_)]),!.

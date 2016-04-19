@@ -11,6 +11,7 @@
 :-module(mud_telnet, [                  
                   telnet_server/2,
                   setup_streams/2,
+                  set_tty_control/1,
                   player_connect_menu/4,
                   look_brief/1,
                   cmdShowRoomGrid/1,
@@ -87,7 +88,8 @@ service_client_call(Call, Slave, In, Out, Host, Peer, Options):-
    call(Call).
 
 get_session_io(In,Out):-
-   current_input(In),current_output(Out),
+   current_input(In),
+   current_output(Out),
    setup_streams(In, Out),
    set_tty_control(true).
 

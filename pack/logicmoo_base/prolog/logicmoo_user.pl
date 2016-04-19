@@ -66,9 +66,10 @@ fix_ops_for(CM):-
 
 %:- mpred_www:ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
 %:- system:initialization(mpred_www:ensure_webserver(3040)).
-ws_0:- mpred_www:ensure_loaded(library(logicmoo/mpred_online/mpred_www)), mpred_www:ensure_webserver(3040).
+ws_0:- mpred_www:ensure_loaded(library(logicmoo/mpred_online/mpred_www)), call(mpred_www:call,ensure_webserver(3040)).
 
-:- baseKB:use_module(baseKB:logicmoo/logicmoo_snark).
+:- baseKB:use_module(baseKB:library(logicmoo/logicmoo_snark)).
+:- baseKB:ensure_loaded(library(logicmoo/pfc/'system_markers.pfc')).
 
 % in case something changed
 :- logicmoo_user_base:user_module_uses(M,CM),!,fix_ops_for(M),fix_ops_for(CM),dmsg(user_module_uses(M,CM)).

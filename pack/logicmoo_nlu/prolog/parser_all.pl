@@ -307,16 +307,16 @@ remove_punctuation(W2,NP):-  (was_punct(Remove),delete(W2,Remove,W3),W2 \=@= W3)
 :- dynamic is_cyckb_t_pred_rename/2.
 
 :- dmsg("Scanning el_assertions.pl for programatic definations (This may take 10-30 seconds)").
-%:- pfc_add(cyckb_t(A, _, _) ==> is_cyckb_t_pred(A,2)).
+%:- ain(cyckb_t(A, _, _) ==> is_cyckb_t_pred(A,2)).
 :- with_el_holds_enabled(gripe_time(10,forall(cyckb_t(A, _, _) , assert_if_new(is_cyckb_t_pred(A,2))))).
-%:- pfc_add(cyckb_t(A, _, _, _ ) ==> is_cyckb_t_pred(A,3)).
+%:- ain(cyckb_t(A, _, _, _ ) ==> is_cyckb_t_pred(A,3)).
 :- with_el_holds_enabled(gripe_time(2,forall(cyckb_t(A, _, _, _) , assert_if_new(is_cyckb_t_pred(A,3))))).
-%:- pfc_add(cyckb_t(A, _, _, _, _ ) ==> is_cyckb_t_pred(A,4)).
+%:- ain(cyckb_t(A, _, _, _, _ ) ==> is_cyckb_t_pred(A,4)).
 :- with_el_holds_enabled(gripe_time(2,forall(cyckb_t(A, _, _,_ ,_ ) , assert_if_new(is_cyckb_t_pred(A,4))))).
 :- with_el_holds_enabled(gripe_time(2,forall(cyckb_t(A, _, _,_ ,_,_ ) , assert_if_new(is_cyckb_t_pred(A,5))))).
 
 :- dmsg("Implementing programatic definations (This shoiuld take less than 2 seconds)").
-% :- pfc_add((is_cyckb_t_pred(F,A) ==> {functor(H,F,A),H=..[F|ARGS],KB=..[cyckb_t,F|ARGS],assert_if_new((H:-KB))})).
+% :- ain((is_cyckb_t_pred(F,A) ==> {functor(H,F,A),H=..[F|ARGS],KB=..[cyckb_t,F|ARGS],assert_if_new((H:-KB))})).
 :- gripe_time(2,forall(is_cyckb_t_pred(F,A) , ignore((atom(F),functor(H,F,A),H=..[F|ARGS],KB=..[cyckb_t,F|ARGS],logOnErrorIgnore(assert_if_new((H:- \+(el_holds_DISABLED_KB), KB))))))).
 
 

@@ -12,8 +12,8 @@
 :- include(prologmud(mud_header)).
 
 
-:-pfc_add(( prologHybrid(irc_user_plays(tAgent,ftAtom,ftAtom)))).
-:-pfc_add(( prologOrdered(agent_action_queue(tAgent,ftTerm,ftTerm)))).
+:-ain(( prologHybrid(irc_user_plays(tAgent,ftAtom,ftAtom)))).
+:-ain(( prologOrdered(agent_action_queue(tAgent,ftTerm,ftTerm)))).
 
 user:deliver_event_hooks(Agent,Event):- fail,ignore(once(deliver_to_irc(Agent,Event))).
 user:irc_event_hooks(Channel,User,Stuff):- fail,ignore(once(irc_mud_event_hook(Channel,User,Stuff))).
@@ -52,12 +52,12 @@ irc_action_queue(Agent,TODO,Channel):-  get_session_id(ID), enqueue_session_acti
 
 
 
-:-pfc_add(( (irc_user_plays(Agent,User,Channel)/
+:-ain(( (irc_user_plays(Agent,User,Channel)/
   ( irc_user_plays(OAgent,User,Other), (Other\=Channel;OAgent\=Agent) ))
    ==> \+ irc_user_plays(OAgent,User,Other))).
 
 
-:-pfc_add(( ~irc_user_plays(Agent,User,_) ==> {retractall(thglobal:agent_session(Agent,User)),retractall(thglobal:session_agent(User,Agent))} )).
+:-ain(( ~irc_user_plays(Agent,User,_) ==> {retractall(thglobal:agent_session(Agent,User)),retractall(thglobal:session_agent(User,Agent))} )).
 
 end_of_file.
 

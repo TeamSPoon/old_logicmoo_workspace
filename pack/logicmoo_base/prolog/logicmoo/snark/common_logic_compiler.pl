@@ -1523,7 +1523,7 @@ mpred_quf(In,Out):- transitive(mpred_quf_0,In,Out).
 %
 % Managed Predicate quf  Primary Helper.
 %
-mpred_quf_0(InOut,InOut):- non_compound(InOut),!.
+mpred_quf_0(InOut,InOut):- not_ftCompound(InOut),!.
 % mpred_quf_0(In,Out):- current_predicate(db_quf/4),db_quf(change(assert,_Must),In,U,C),conjoin(U,C,Out).
 mpred_quf_0(In,In).
 

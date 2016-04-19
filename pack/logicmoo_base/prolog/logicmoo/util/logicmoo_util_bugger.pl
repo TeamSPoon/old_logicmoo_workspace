@@ -102,6 +102,7 @@
             loading_module/2,
             local_predicate/2,
             on_f_log_fail/1,
+            logOnFailure/1,
             logOnFailure0/1,
             logOnFailureEach/1,
             on_f_log_ignore/1,
@@ -249,6 +250,7 @@
         on_f_log_fail(0),
         on_f_debug_ignore(0),
         logOnFailure0(0),
+        logOnFailure(0),
         on_f_log_ignore(0),
         meta_interp(:, +),
         must_each(0),
@@ -1931,6 +1933,8 @@ debugOnFailureEach(Goal):-with_each(1,on_f_debug,Goal).
 %
 on_f_debug_ignore(Goal):-ignore(on_f_debug(Goal)).
 
+
+logOnFailure(Goal):-on_f_log_fail(Goal).
 
 %= 	 	 
 

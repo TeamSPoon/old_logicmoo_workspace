@@ -56,8 +56,11 @@
             if_defined_else/2,
             input_key/1,
             is_ftCompound/1,
+            not_ftCompound/1,
+            is_ftNameArity/2,
             is_ftNonvar/1,
             is_ftVar/1,
+            
             is_hiding_dmsgs/0,
             is_main_thread/0,
             is_pdt_like/0,
@@ -180,6 +183,8 @@
         ib_multi_transparent33/1,
         input_key/1,
         is_ftCompound/1,
+        not_ftCompound/1,
+        is_ftNameArity/2,
         is_ftNonvar/1,
         is_ftVar/1,
         is_hiding_dmsgs/0,
@@ -749,13 +754,23 @@ as_clause_w_m(MHB, M1H, H, B, M2B):-  expand_to_hb( MHB,  MH, MB),strip_module(M
 
 :- export(is_ftCompound/1).
 
-%= 	 	 
+%% is_ftNameArity(+F,+A) is semidet.
+%
+% If Is A Format Type of a Compound specifier
+%
+is_ftNameArity(F,A):-atom(F),integer(A),A>=0.      
 
 %% is_ftCompound( ?Goal) is semidet.
 %
 % If Is A Format Type Compound.
 %
-is_ftCompound(Goal):-compound(Goal),Goal\='$VAR'(_).
+is_ftCompound(Goal):-compound(Goal),\+ is_ftVar(Goal).
+
+%% not_ftCompound( ?InOut) is semidet.
+%
+% Not Compound.
+%
+not_ftCompound(A):- is_ftVar(A) -> true ; \+ is_ftCompound(A).
 
 :- export(is_ftVar/1).
 

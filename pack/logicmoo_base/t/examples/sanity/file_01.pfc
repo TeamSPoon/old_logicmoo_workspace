@@ -14,6 +14,9 @@
 
 :- begin_pfc.
 
+:-ain(sanity:(must_is_entailed(G):- cwc, must(is_entailed_u(G)))).
+:-ain((must_is_entailed(G):- cwc, must(is_entailed_u(G)))).
+
 must_is_entailed(G):- cwc, must(is_entailed_u(G)).
 
 :- listing(must_is_entailed).

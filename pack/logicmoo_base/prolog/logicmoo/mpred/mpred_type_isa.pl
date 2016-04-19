@@ -304,6 +304,8 @@ type_prefix(mud,tMudPred).
 type_prefix(mud,tPred).
 type_prefix(prop,tPred).
 type_prefix(prolog,ttPredType).
+type_prefix(pfc,ttPredType).
+type_prefix(pt,ttPredType).
 type_prefix(ft,ttExpressionType).
 type_prefix(pred,tPred).
 type_prefix(macro,ttMacroType).
@@ -1306,7 +1308,7 @@ assert_isa_reversed(T,I):-assert_isa(I,T).
 %
 % assert  (isa/2) hooked.
 %
-:- meta_predicate mpred_type_isa:assert_isa_hooked(?,1).
+:- meta_predicate assert_isa_hooked(?,1).
 
 assert_isa_hooked(A,_):-retractall(a(cache_I_L,isa,A,_)),fail.
 assert_isa_hooked(F,T):- a(ttPredType,T),decl_mpred(F,T),fail.

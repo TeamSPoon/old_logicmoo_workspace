@@ -55,6 +55,7 @@ c(1).
 
 :- mpred_trace.
 :- mpred_trace_exec.
+
 :- ain(b(2)).
 
 % test breaks here

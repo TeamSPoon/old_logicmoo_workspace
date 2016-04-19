@@ -14,7 +14,7 @@
             dont_make_cyclic/1,
 
             variant_i/2,av_comp/2,
-
+            is_visible_module/1,
             hb_to_clause/3,
             paina/1,pain/1,painz/1,
             modulize_head/2,
@@ -32,6 +32,7 @@
             call_provider/2,
             clause_true/1,
             modulize_head_fb/4,
+            unify_bodies/2,
             attr_bind/1,
             clause_asserted/1,clause_asserted/2,clause_asserted/3,
             clause_asserted_i/1,clause_asserted_i/2,clause_asserted_i/3,
@@ -93,6 +94,7 @@
         assertz_new/1,
         call_provider/2,
         dont_make_cyclic/1,
+        is_visible_module/1,
         clause_asserted/3,
         erase_safe/2,
         current_modules_from/2,
@@ -468,6 +470,18 @@ clausify_attributes(H,B,Extra,(H:-attr_bind(Extra,B))).
 
 
 
+%% is_visible_module( +Op) is semidet.
+%
+%  Is a stripped Module (Meaning it will be found via inheritance)
+%
+is_visible_module(A):-var(A),!,fail.
+is_visible_module(user).
+is_visible_module(system).
+is_visible_module(Inherited):-'$current_source_module'(E), default_module(E,Inherited).
+is_visible_module(Inherited):-'$current_typein_module'(E), default_module(E,Inherited).
+is_visible_module(baseKB).
+
+
 simple_var(Var):- var(Var),\+ attvar(Var).
 
 to_mod_if_needed(M,B,MB):- B==true-> MB=B ; MB = M:B.
@@ -476,6 +490,7 @@ split_attrs(B,ATTRS,BODY):- \+ sanity((simple_var(ATTRS),simple_var(BODY))),
     dumpST,dtrace(split_attrs(B,ATTRS,BODY)).
 split_attrs(B,true,B):-is_ftVar(B),!.
 split_attrs(B,true,call(B)):-is_ftVar(B),!.
+split_attrs(M:B,ATTRS,BODY):- is_visible_module(M),!, split_attrs(B,ATTRS,BODY).
 split_attrs(M:attr_bind(G,Call),M:attr_bind(G),Call):- !.
 split_attrs(attr_bind(G,Call),attr_bind(G),Call):- !.
 split_attrs(true,true,true):-!.
@@ -635,8 +650,13 @@ clause_i(H0,B0,Ref):-
  copy_term(H0:B0, H:B, Attribs),
  dont_make_cyclic((    
     (clause(H,BC,Ref) *-> 
-      must(split_attrs(BC,AV,BB)) -> B=BB -> AV -> H0=H,B0=B,
+      must(split_attrs(BC,AV,BB)) -> unify_bodies(B,BB) -> AV -> H0=H,B0=B,
         maplist(call,Attribs)))).
+
+
+unify_bodies(B,B):-!.
+unify_bodies(_:B,B):-!.
+unify_bodies(B,_:B):-!.
 
 /*
 

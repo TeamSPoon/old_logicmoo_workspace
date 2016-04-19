@@ -112,7 +112,7 @@ isa(arity,ptBinaryPredicate).
 
 (arity(Pred,2),tPred(Pred)) <==> isa(Pred,ptBinaryPredicate).
 prologHybrid(relationMostInstance(ptBinaryPredicate,tCol,vtValue)).
-relationMostInstance(BP,_,_)==>(ptBinaryPredicate(BP),tRolePredciate(BP)).
+relationMostInstance(BP,_,_)==>(ptBinaryPredicate(BP),tRolePredicate(BP)).
 prologHybrid(relationAllInstance(ptBinaryPredicate,tCol,vtValue)).
 relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
 
@@ -134,32 +134,23 @@ genls(tPartofObj,tItem).
 
 tSet(tPlayer).
 
-% dividesBetween(tItem,tPathway).
-dividesBetween(tObj,tItem,tAgent).
-dividesBetween(tTemporalThing,tObj,tRegion).
-dividesBetween(tAgent,tPlayer,tNpcPlayer).
-%:-export(repl_to_string(tAgent,ftTerm)).
-%:-export(repl_writer/2).
-%:-export(repl_writer(tAgent,ftTerm)).
-%prologHybrid(typeProps(tCol,ftVoprop)).
 
 % defined more correctly below dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
-dividesBetween(tItem,tMassfull,tMassless).
-dividesBetween(tObj,tItem,tAgent).
-dividesBetween(tObj,tMassfull,tMassless).
-dividesBetween(tSpatialThing,tObj,tRegion).
-formatted_resultIsa(ftDice(ftInt,ftInt,ftInt),ftInt).
-(dividesBetween(tAgent,tMale,tFemale)).
-
-% dividesBetween(tItem,tPathways).
-dividesBetween(tItem,tMassfull,tMassless).
-dividesBetween(tObj,tItem,tAgent).
-dividesBetween(tObj,tMassfull,tMassless).
-dividesBetween(tSpatialThing,tObj,tRegion).
-dividesBetween(tAgent,tPlayer,tNpcPlayer).
-
 % dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
-
+% dividesBetween(tItem,tPathway).
+% dividesBetween(tItem,tPathways).
+%:-export(repl_to_string(tAgent,ftTerm)).
+%:-export(repl_writer(tAgent,ftTerm)).
+%:-export(repl_writer/2).
+%prologHybrid(typeProps(tCol,ftVoprop)).
+(dividesBetween(tAgent,tMale,tFemale)).
+dividesBetween(tAgent,tPlayer,tNpcPlayer).
+dividesBetween(tItem,tMassfull,tMassless).
+dividesBetween(tObj,tItem,tAgent).
+dividesBetween(tObj,tMassfull,tMassless).
+dividesBetween(tSpatialThing,tObj,tRegion).
+dividesBetween(tTemporalThing,tObj,tRegion).
+formatted_resultIsa(ftDice(ftInt,ftInt,ftInt),ftInt).
 % disjointWith(P1,P2) ==> ((neg(isa(C,P1))) <==> isa(C,P2)).
 
 % isa(Col1, ttObjectType) ==> neg(isa(Col1, ttExpressionType)).
@@ -613,20 +604,15 @@ typeGenls(ttRegionType,tRegion).
 prologHybrid(dividesBetween(tCol,tCol,tCol)).
 
 % defined more correctly below dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
+% dividesBetween(tItem,tPathways).
+(dividesBetween(tAgent,tMale,tFemale)).
+dividesBetween(tAgent,tPlayer,tNpcPlayer).
 dividesBetween(tItem,tMassfull,tMassless).
 dividesBetween(tObj,tItem,tAgent).
 dividesBetween(tObj,tMassfull,tMassless).
+dividesBetween(tSpatialThing,tObj,tRegion).
 dividesBetween(tTemporalThing,tObj,tRegion).
 formatted_resultIsa(ftDice(ftInt,ftInt,ftInt),ftInt).
-(dividesBetween(tAgent,tMale,tFemale)).
-
-% dividesBetween(tItem,tPathways).
-dividesBetween(tItem,tMassfull,tMassless).
-dividesBetween(tObj,tItem,tAgent).
-dividesBetween(tObj,tMassfull,tMassless).
-dividesBetween(tTemporalThing,tObj,tRegion).
-dividesBetween(tAgent,tPlayer,tNpcPlayer).
-
 
 isa(tRegion,ttTemporalType).
 
@@ -722,14 +708,8 @@ genls(tPartofFurnature,tPartofObj).
 
 genls(tPartofObj,tItem).
 
-% dividesBetween(tItem,tPathways).
-dividesBetween(tItem,tMassfull,tMassless).
-dividesBetween(tObj,tItem,tAgent).
-dividesBetween(tObj,tMassfull,tMassless).
-dividesBetween(tSpatialThing,tObj,tRegion).
-dividesBetween(tAgent,tPlayer,tNpcPlayer).
 
-dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
+dividesBetween(S,C1,C2)/ground(v(S,C1,C2)) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 
 % disjointWith(P1,P2) ==> (not(isa(C,P1)) <==> isa(C,P2)).
 
@@ -813,7 +793,7 @@ user:action_info(C,_)==>vtActionTemplate(C).
 
 argsQuoted(cachedPredicate).
 
-cachedPredicate(Goal)==>{forall(Goal,ain(Goal))}.
+cachedPredicate(Goal)==>{forall(call_u(Goal),ain(Goal))}.
 
 tCol(cachedPredicate).
 cachedPredicate(vtActionTemplate(_)).
@@ -1050,11 +1030,9 @@ O = [
 
 :- on_x_debug(ain(tAgent(iExplorer1))).
 
-
-
 :-must(mudFacing(iExplorer1,vNorth)).
 
-:-ain(mudFacing(iExplorer1,vSouth)).
+:- ain(mudFacing(iExplorer1,vSouth)).
 
 :-must(\+ mudFacing(iExplorer1,vNorth)).
 

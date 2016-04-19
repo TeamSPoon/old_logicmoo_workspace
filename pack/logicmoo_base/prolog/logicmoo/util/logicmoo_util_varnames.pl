@@ -95,7 +95,7 @@
             vmust/1,
             name_variable/2, variable_name/2,
             init_varname_stores/1,
-            maybe_scan_source_files_for_varnames/0
+            maybe_scan_for_varnames/0
           ]).
 
 
@@ -1151,15 +1151,15 @@ snumbervars5(Term,Start,End,List):-must_det_l((integer(Start),is_list(List), num
 try_save_vars(_):- t_l:dont_varname,!.
 try_save_vars(HB):-ignore((nb_current('$variable_names',Vs),Vs\==[],save_clause_vars(HB,Vs))),!.
 
-:-export(maybe_scan_source_files_for_varnames/0).
+:-export(maybe_scan_for_varnames/0).
 
 %= 	 	 
 
-%% maybe_scan_source_files_for_varnames is semidet.
+%% maybe_scan_for_varnames is semidet.
 %
 % Maybe Scan Source Files For Varnames.
 %
-maybe_scan_source_files_for_varnames:- current_prolog_flag(mpred_vars, true)->scan_for_varnames;true.
+maybe_scan_for_varnames:- current_prolog_flag(mpred_vars, true)->scan_for_varnames;true.
 
 :-export(scan_for_varnames/0).
 
@@ -1386,8 +1386,8 @@ init_varname_stores(_):- !.
 % init_varname_stores(M):- M:use_module(logicmoo_util_with_assertions), M:use_module(logicmoo_util_varnames).
 
 
-:- initialization(maybe_scan_source_files_for_varnames).
-% :- maybe_scan_source_files_for_varnames.
+:- initialization(maybe_scan_for_varnames).
+% :- maybe_scan_for_varnames.
 
 
 %= 	 	 

@@ -772,10 +772,10 @@ ensure_universal_stub(HeadIn):-
 % ensure universal stub  Secondary Helper.
 %
 ensure_universal_stub_1(HeadIn,Head,F,A):- lmconf:pfcManageHybrids,!,
-   ensure_universal_stub_2(HeadIn,Head,F,A,[]).
+   must(ensure_universal_stub_2(HeadIn,Head,F,A,[])).
 
 ensure_universal_stub_1(HeadIn,Head,F,A):-
-   provide_clauses_list(Head,HBLIST),
+   must(provide_clauses_list(Head,HBLIST)),
    must(ensure_universal_stub_2(HeadIn,Head,F,A,HBLIST)).
 
 

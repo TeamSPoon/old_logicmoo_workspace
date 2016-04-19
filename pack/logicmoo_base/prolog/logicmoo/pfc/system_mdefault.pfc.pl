@@ -56,9 +56,6 @@ mdefault(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R
 % POS chaining 2
 mdefault(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> ( ((R/( Test, \+(R=Q))) ==> (\+ Q))).
 
-% POS chaining 1+2
-% mdefault(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test ) ==> Q ) ,((R/( \+(R=Q), Test)) ==> (\+ Q))).
-
 % mdefault(Q) ==> if_missing(Q,Q).
 
 %(mdefault(P=>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))  ==> ((P, \+ R/Test) => Q).

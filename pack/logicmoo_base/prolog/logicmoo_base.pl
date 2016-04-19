@@ -168,7 +168,19 @@ ensure_mpred_system:- source_context_module(M),enable_mpred_system(M).
 
 :- lmconf:mpred_system_kb(M),dmsg(system_kb=M).
 
+logicmoo_base_module(mpred_kb_ops).
+logicmoo_base_module(mpred_props).
+logicmoo_base_module(mpred_pfc).
+logicmoo_base_module(mpred_stubs).
+logicmoo_base_module(mpred_type_isa).
+
+:-forall(logicmoo_base_module(M),
+  (add_import_module(M,logicmoo_user,end),
+  add_import_module(M,baseKB,end))).
+
+
 :- baseKB:use_module(library(logicmoo/mpred/mpred_userkb)).
+:-  baseKB:ensure_loaded(library(logicmoo/pfc/'system_markers.pfc')).
 
 
 

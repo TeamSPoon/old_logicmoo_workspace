@@ -387,7 +387,7 @@ Proof end.
 
 % logicmoo vworld mud server
 
-:- user:ensure_loaded(logicmoo(logicmoo_base)).
+:- user:ensure_loaded(library(logicmoo_base)).
 :- user:ensure_loaded_no_mpreds(prologmud(server/mud_telnet)).
 :- user:ensure_loaded(prologmud(server/mud_irc)).
 :- user:ensure_loaded(prologmud(vworld/world)).

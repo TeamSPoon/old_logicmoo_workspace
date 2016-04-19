@@ -77,6 +77,7 @@ constrain_args_pttp/2,
 contract_output_proof/2,
 current_world/1,
 cyc_to_plarkc/2,
+definingMt/2, 
 %cyckb_t/3,
 cycPrepending/2,
 decided_not_was_isa/2,
@@ -110,7 +111,7 @@ most/1, % pfc
 mpred_do_and_undo_method/2,
 mpred_isa/2,
 %mpred_manages_unknowns/0,
-mpred_mark/4,
+mpred_mark/3,
 mpred_module/2,
 mpred_univ/1,
 mpred_univ/3,
@@ -139,6 +140,10 @@ resolverConflict_robot/1,
 retractall_wid/1,
 search/7,
 skolem/2,skolem/3,
+completeExtentEnumerable/1,
+cycPred/2,
+predStub/2,
+cycPlus2/2,
 singleValuedInArg/2,
 subFormat/2,
 support_hilog/2,
@@ -448,7 +453,7 @@ never_assert_u(pt(_,
 %
 % Never Assert For User Code Primary Helper.
 %
-never_assert_u0(mpred_mark(pfcPosTrigger,_,F,A),Why):- fail,
+never_assert_u0(mpred_mark(pfcPosTrigger,F,A),Why):- fail,
   functor(P,F,A),
   ignore(predicate_property(M:P,exported)),
   defined_predicate(M:P),  
@@ -486,7 +491,7 @@ is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=
    % ,ignore(((\+ atom_concat('__aux',_,F),format('~N:- module_transparent(~q/~q).~n',[F,A]))))
    ))).
 
-:- maybe_add_import_module(baseKB,basePFC,end).
-:- initialization(maybe_add_import_module(baseKB,basePFC,end)).
+:- add_import_module(baseKB,basePFC,end).
+:- initialization(add_import_module(baseKB,basePFC,end)).
 
 

@@ -6,7 +6,7 @@
 
 :- set_mpred_module(baseKB).
 
-((genls(X,Y),genls(Y,X),{X\==Y}) ==> {mpred_withdraw(genls(X,Y))}).
+((genls(X,Y),genls(Y,X),{X\==Y}) ==> {mpred_withdraw(genls(Y,X))}).
 
 %:-rtrace.
 %genls(X,tPred) <==> ttPredType(X).

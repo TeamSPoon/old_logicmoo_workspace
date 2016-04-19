@@ -165,8 +165,8 @@ is_at(Obj,Where):-localityOfObject(Obj,Where).
 is_at(Obj,Where):-mudAtLoc(Obj,Where).
 is_at(Obj,Where):-mudSubPart(What,Obj),is_at(What,Where).
 
-% ((tObj(Obj), ~(mudPossess(_,Obj)))=>spatialInRegion(Obj)).
-tPathway(Obj)=>spatialInRegion(Obj).
+% ((tObj(Obj), ~(mudPossess(_,Obj)))==>spatialInRegion(Obj)).
+tPathway(Obj)==>spatialInRegion(Obj).
 
 
 localityOfObject(Obj,Region),tRegion(Region)==> inRegion(Obj,Region).
@@ -188,7 +188,7 @@ mudLocOnSurface(Clothes,Agent):-loop_check(wearsClothing(Agent,Clothes),fail).
 :-export(same_regions/2).
 same_regions(Agent,Obj):-inRegion(Agent,Where1),dif(Agent,Obj),inRegion(Obj,Where2),Where1=Where2.
 
-:-add(prologHybrid(inRegion(tObj,tRegion))).
+:-ain(prologHybrid(inRegion(tObj,tRegion))).
 %prologPTTP(localityOfObject(tObj,tSpatialthing)).
 
 %:- ensure_universal_stub(prologPTTP,inRegion/2).

@@ -24,6 +24,7 @@ oncely/1,
 reduce_mpred_op/2,
 second_order/2,
 whenAnd/2,
+if_missing/1,
 
 to_addable_form_wte/3,
 to_predicate_isas_each/2,
@@ -757,7 +758,7 @@ make_uu_remove((_,ax)).
 % Has Functor.
 %
 has_functor(_):-!,fail.
-has_functor(F/A):-!,atom(F),integer(A),!.
+has_functor(F/A):-!,is_ftNameArity(F,A),!.
 has_functor(C):- (\+ is_ftCompound(C)),!,fail.
 has_functor(C):-is_ftCompound(C),\+is_list(C).
 
@@ -1377,6 +1378,7 @@ is_already_supported(P,_S,UU):- clause_asserted_local(spft(P,US,UT)),must(get_so
 % is_already_supported(P,_S):- copy_term_and_varnames(P,PC),sp ftY(PC,_,_),P=@=PC,!.
 
 
+if_missing(Q):- mpred_literal_nv(Q), \+ ~Q, if_missing_mask(Q,R,Test),!, lookup_u(R), Test.
 
 %% if_missing_mask( +Q, ?R, ?Test) is semidet.
 %
@@ -1424,14 +1426,10 @@ mpred_run_resume:- retractall(t_l:mpred_run_paused).
 without_running(G):- (t_l:mpred_run_paused->G;w_tl(t_l:mpred_run_pause,G)).
 
 mpred_remove_file_support(_File):- !.
-
-/*
-
 mpred_remove_file_support(File):- 
   forall((filematch(File,File0),freeze(Match,contains_var(File0,Match))),
       forall(lookup_u(spft( W, Match, ax)),forall(retract_u(spft( W, Match, ax)),mpred_remove(W)))).
 
-*/
 /*
 
 %% remove_if_unsupported( +Why, ?P) is semidet.
@@ -1638,7 +1636,8 @@ mpred_get_support_precanonical(F,Sup):-to_addable_form_wte(mpred_get_support_pre
 %
 % Spft Precanonical.
 %
-spft_precanonical(F,SF,ST):- to_addable_form_wte(spft_precanonical,F,P),!,call_u(spft(P,SF,ST)).
+
+spft_precanonical(F,SF,ST):- to_addable_form_wte(spft_precanonical,F,P),!,mpred_get_support(P,(SF,ST)).
 
 
 %% trigger_supporters_list( +U, :TermARG2) is semidet.
@@ -1959,7 +1958,7 @@ lmconf:hook_one_minute_timer_tick:-mpred_cleanup.
 %
 % PFC Cleanup.
 %
-mpred_cleanup:- forall((no_repeats(F-A,(mpred_mark(pfcRHS,_,F,A),A>1))),mpred_cleanup(F,A)).
+mpred_cleanup:- forall((no_repeats(F-A,(mpred_mark(pfcRHS,F,A),A>1))),mpred_cleanup(F,A)).
 
 
 %% mpred_cleanup( +F, ?A) is semidet.
@@ -2057,7 +2056,7 @@ is_reprop_0(X):-get_functor(X,repropagate,_).
 mpred_non_neg_literal(X):- is_reprop(X),!,fail.
 mpred_non_neg_literal(X):- atom(X),!.
 mpred_non_neg_literal(X):- sanity(stack_check),
-    mpred_positive_literal(X), X \= ~(_), X \= mpred_mark(_,_,_,_), X \= conflict(_).
+    mpred_positive_literal(X), X \= ~(_), X \= mpred_mark(_,_,_), X \= conflict(_).
 
 % ======================= mpred_file('pfcsupport').	% support maintenance
 
@@ -2154,8 +2153,8 @@ should_call_for_facts(H):- get_functor(H,F,A),call_u(should_call_for_facts(H,F,A
 %
 should_call_for_facts(_,F,_):- a(prologSideEffects,F),!,fail.
 should_call_for_facts(H,_,_):- modulize_head(H,HH), \+ predicate_property(HH,number_of_clauses(_)),!.
-should_call_for_facts(_,F,A):- clause_true(mpred_mark(pfcRHS,_,F,A)),!,fail.
-should_call_for_facts(_,F,A):- clause_true(mpred_mark(pfcMustFC,_,F,A)),!,fail.
+should_call_for_facts(_,F,A):- clause_true(mpred_mark(pfcRHS,F,A)),!,fail.
+should_call_for_facts(_,F,A):- clause_true(mpred_mark(pfcMustFC,F,A)),!,fail.
 should_call_for_facts(_,F,_):- a(prologDynamic,F),!.
 should_call_for_facts(_,F,_):- \+ a(pfcControlled,F),!.
 
@@ -2378,7 +2377,7 @@ repropagate(P):-  is_ftVar(P),!.
 repropagate(P):-  meta_wrapper_rule(P),!,call_u(repropagate_meta_wrapper_rule(P)).
 repropagate(P):-  \+ predicate_property(P,_),'$find_predicate'(P,PP),PP\=[],!,forall(member(M:F/A,PP),
                                                           must((functor(Q,F,A),repropagate_1(M:Q)))).
-repropagate(F/A):- atom(F),integer(A),!,functor(P,F,A),!,repropagate(P).
+repropagate(F/A):- is_ftNameArity(F,A),!,functor(P,F,A),!,repropagate(P).
 repropagate(F/A):- atom(F),is_ftVar(A),!,repropagate(F).
 
 repropagate(P):-  \+ predicate_property(_:P,_),dmsg(undefined_repropagate(P)),dumpST,dtrace,!,fail.
@@ -2750,6 +2749,7 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 :- module_transparent(oncely/1).
 :- module_transparent(physical_side_effect/1).
 :- module_transparent(pred_head/2).
+:- module_transparent(if_missing/1).
 
 
 :- source_location(S,_),prolog_load_context(module,M),

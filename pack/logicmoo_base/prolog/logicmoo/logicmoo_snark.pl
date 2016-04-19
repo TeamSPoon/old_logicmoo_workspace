@@ -48,7 +48,7 @@ checkKB:m1:- gripe_time(40,baseKB:ensure_loaded(baseKB:logicmoo(mpred_online/mpr
 %:-export(m2/0).
 % m2:- ensure_mpred_file_loaded(logicmoo(pfc/relationAllExists)).
 
-% :-pfc_add(((P,Q,z(_))==>(p(P),q(Q)))).
+% :-ain(((P,Q,z(_))==>(p(P),q(Q)))).
 %:-export(m3/0).
 % m3:- put_variable_names( ['P'=P,'Q'=Q]), R = (==>((P,Q,z(_)),(p(P),q(Q)))),  renumbervars(write_functor,R,O), writeq(O).
 %   put_variable_names( ['P'=P,'Q'=Q]), R = (==>((P,Q,z(_)),(p(P),q(Q)))), write_term(R,[numbervars(true),protray(_)]),renumbervars_prev(R,O).
