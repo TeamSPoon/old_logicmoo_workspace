@@ -514,7 +514,7 @@ is_stripped_module(user).
 is_stripped_module(system).
 is_stripped_module(Inherited):-'$current_source_module'(E), default_module(E,Inherited).
 is_stripped_module(Inherited):-'$current_typein_module'(E), default_module(E,Inherited).
-is_stripped_module(baseKB).
+% is_stripped_module(baseKB).
 is_stripped_module(A):- get_user_abox(AB),!,AB=A.
 
 %= 	 	 

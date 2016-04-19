@@ -488,7 +488,7 @@ import_predicate(CM,M:F/A):- show_call(nop(CM:z333import(M:F/A))),CM:multifile(M
 %
 % Using Ukb.
 %
-with_ukb(KB,G):-w_tl(t_l:user_abox(_SM,KB),G).
+with_ukb(KB,G):- must(KB\==user),w_tl(t_l:user_abox(_SM,KB),G).
 
 % TODO uncomment the next line without breaking it all!
 % lmconf:use_cyc_database.
@@ -1714,12 +1714,12 @@ set_guessed_abox(ABox,From):-
 % not just user modules
 
 get_user_abox(A):-nonvar(A),!.
-get_user_abox(A):- must(quietly((get_user_abox0(A)))),!.
+get_user_abox(A):- must(quietly(((get_user_abox0(A),A\=user);get_user_abox0(A)))),!.
 
 get_user_abox0(A):- source_module(SM),t_l:user_abox(SM,A),ensure_abox(A).
+get_user_abox0(A):-'$current_source_module'(M),get_abox_for(M,A).
 get_user_abox0(A):- which_file(File),get_abox_for(File,A).
 get_user_abox0(A):-'$current_typein_module'(M),get_abox_for(M,A).
-get_user_abox0(A):-'$current_source_module'(M),get_abox_for(M,A).
 get_user_abox0(A):- guess_user_abox(A,From),set_guessed_abox(A,From).
 
 

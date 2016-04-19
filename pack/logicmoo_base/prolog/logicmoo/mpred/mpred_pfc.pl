@@ -13,7 +13,7 @@
 
 :- module(mpred_pfc, [
   ensure_abox/1,
-  mpred_call_no_bc/1,fix_mp/2,fix_mp_abox/3,
+  mpred_call_no_bc/1,fix_mp/2,fix_mp_abox/3,fix_mp_abox0/3,
   mpred_fwc/1,
   get_mpred_is_tracing/1,
   show_if_debug/1,
@@ -280,21 +280,25 @@ get_source_ref10(M):- fail,trace,
 
 is_source_ref1(_).
 
-fix_mp(M:P,M:P):- current_predicate(_,M:P),!.
 fix_mp(M:P,M:P):-!.
 fix_mp(MP,M:P):-  strip_module(MP,Cm,P),get_user_abox(U),!,
    (((modulize_head_fb(U,P,Cm,M:P),\+ predicate_property(M:P,static)))*-> true;
       (P==MP -> M=U; M=Cm)
-     ).
+     ),!.
+% fix_mp(M:P,M:P):- current_predicate(_,M:P), predicate_property(M:P,dynamic),!.
 
-fix_mp_abox(G0,U,CALL):-
+fix_mp_abox(G0,U,CALL):-must(fix_mp_abox0(G0,U,CALL)).
+
+fix_mp_abox0(M:(G0:-B),U,(CALL:-B)):-nonvar(G0),!,fix_mp_abox0(M:G0,U,CALL).
+fix_mp_abox0((G0:-B),U,(CALL:-B)):-nonvar(G0),!,fix_mp_abox0(G0,U,CALL).
+fix_mp_abox0(G0,U,CALL):-
   strip_module(G0,WM,G),
   must((get_user_abox(U),atom(U))),!, % nop(mnotrace(fix_mp(G0,U:G))),
-  must((current_predicate(_,U:G)->CALL=U:G;
-       (current_predicate(_,WM:G)->CALL=WM:G; 
-       (current_predicate(_,baseKB:G)->CALL=baseKB:G;
+       (current_predicate(_,U:G)->CALL=U:G;
+       (current_predicate(_,WM:G)->CALL=WM:G;
        (current_predicate(_,logicmoo_user:G)->CALL=logicmoo_user:G;
-        fail))))),!.
+       (current_predicate(_,baseKB:G)->CALL=baseKB:G;
+        fail)))),!.
   
 
 
@@ -336,9 +340,9 @@ clause_u(H,B):- clause_u(H,B,_).
 %
 % PFC Clause.
 %
-clause_u(_:H,B,R):- nonvar(R),!,must(clause_i(_:H,B,R)).
-clause_u(MH,B,R):-  mnotrace(fix_mp(MH,MH2)),!, clause_i(MH2,B,R).
+clause_u(MH,B,R):- nonvar(R),!,must(clause_i(M:H,B,R)),(MH=(M:H);MH=(H)),!.
 clause_u((H:-BB),B,Ref):- is_true(B),!,clause_u(H,BB,Ref).
+clause_u(MH,B,R):-  (mnotrace(fix_mp(MH,M:H)),clause_i(M:H,B,R))*->true;(fix_mp_abox0(MH,_,CALL),clause_i(CALL,B,R)).
 % clause_u(H,B,Why):- has_cl(H),clause_u(H,CL,R),mpred_pbody(H,CL,R,B,Why).
 %clause_u(H,B,backward(R)):- R=(<-(H,B)),clause_u(R,true).
 %clause_u(H,B,equiv(R)):- R=(<==>(LS,RS)),clause_u(R,true),(((LS=H,RS=B));((LS=B,RS=H))).
@@ -2926,6 +2930,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((ain_fast)/1).
 :- module_transparent((fix_mp)/2).
 :- module_transparent((fix_mp_abox)/3).
+:- module_transparent((fix_mp_abox0)/3).
 :- module_transparent((why_was_true)/1).
 :- module_transparent((mpred_is_silient)/0).
 :- module_transparent((get_mpred_is_tracing)/1).
