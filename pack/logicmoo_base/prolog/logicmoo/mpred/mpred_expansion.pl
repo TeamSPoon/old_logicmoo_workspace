@@ -102,6 +102,7 @@
             fully_expand/2,            
             fully_expand0/3,
             fully_expand00/3,
+			cheaply_u/1,
             fully_expand_clause/3,
             fully_expand_goal/3,
             fully_expand_head/3,
@@ -153,6 +154,7 @@
 
 :- meta_predicate 
    % mpred_expansion
+   cheaply_u(0),
    db_expand_maplist(2,*,*,*,*),
    % mpred_expansion
    transitive_lc_nr(2,*,*),
@@ -278,6 +280,7 @@ alt_calls(ireq).
 %
 show_doall(Call):- doall(show_call(why,Call)).
 
+cheaply_u(G):-lookup_u(G).
 
 %= 	 	 
 
@@ -334,7 +337,7 @@ functor_declares_instance_0(P,tCol):- arg(_,s(tCol,tSpec,ttExpressionType),P).
 %functor_declares_instance_0(P,tPred):-isa_asserted(P,ttPredType),!.
 %functor_declares_instance_0(P,tCol):-isa_asserted(P,functorDeclares),\+functor_declares_instance_0(P,tPred).
 
-functor_declares_instance_0(P,P):- call_u(functorDeclares(P)). % arity(P,1),\+((arity(P,N),N>1)).
+functor_declares_instance_0(P,P):- cheaply_u(functorDeclares(P)). % arity(P,1),\+((arity(P,N),N>1)).
 
 
 %= 	 	 
@@ -404,7 +407,7 @@ any_op_to_call_op(_,call(conjecture)).
 %
 db_expand_maplist(FE,[E],E,G,O):- !,call(FE,G,O).
 db_expand_maplist(FE,[E|List],T,G,O):- copy_term(T+G,CT+CG),E=CT,!,call(FE,CG,O1),db_expand_maplist(FE,List,T,G,O2),conjoin_l(O1,O2,O).
-db_expand_maplist(FE,List,T,G,O):-findall(M, (member(T,List),call(FE,G,M)), ML),list_to_conjuncts(ML,O).
+db_expand_maplist(FE,List,T,G,O):-bagof(M, (member(T,List),call(FE,G,M)), ML),list_to_conjuncts(ML,O).
 
 
 % ================================================
@@ -477,9 +480,10 @@ fully_expand(X,Y):-fully_expand(clause(unknown,cuz),X,Y).
 %  pfc(_,_) - for salient language based analysis at a human level
 %
 
-fully_expand11(Op,Sent,SentO):-must(functor(Op,_,2)),must((copy_term(Sent,SentM),fully_expand(Op,Sent,SentO),Sent=@=SentM)),!.
+fully_expand11(Op,Sent,SentO):- must((copy_term(Sent,SentM),fully_expand(Op,Sent,SentO),Sent=@=SentM)),!.
 
 
+fully_expand(Op,Sent,SentO):- findall(O,do_expand_args(isEach,Sent,O),L),L\=@=[Sent],!,list_to_conjuncts(L,CL),fully_expand(Op,CL,SentO).
 fully_expand(Op,Sent,SentO):-!, fully_expand00(Op,Sent,SentO).
 fully_expand(Op,Sent,SentO):-!, show_call(uneeded_warn,fully_expand00(Op,Sent,SentO)),!.
 
@@ -555,7 +559,6 @@ fully_expand_now(Op,Sent,SentO):-
 fully_expand_clause(Op,_Sent,_SentO):- sanity(is_ftNonvar(Op)),fail.
 
 fully_expand_clause(_, PFC,Next):- as_is_term(PFC),!,PFC=Next.
-fully_expand_clause(_ ,arity(F,A),arity(F,A)):-!.
 fully_expand_clause(Op ,NC,NCO):- db_expand_final(Op,NC,NCO),!.
 fully_expand_clause(Op,'==>'(Sent),(SentO)):-!,fully_expand_clause(Op,Sent,SentO),!.
 fully_expand_clause(Op,'=>'(Sent),(SentO)):-!,fully_expand_clause(Op,Sent,SentO),!.
@@ -581,7 +584,7 @@ fully_expand_head(Op,Sent,SentO):- must(w_tl(t_l:into_form_code,
 %
 % Fully Expand Goal.
 %
-fully_expand_goal(Op,Sent,SentO):- must(functor(Op,_,2)),
+fully_expand_goal(Op,Sent,SentO):- % must(functor(Op,_,2)),
  must((
   w_tl(t_l:into_form_code,transitive_lc(db_expand_term(Op),Sent,SentM)),
     recommify(SentM,SentO))).
@@ -791,7 +794,7 @@ db_expand_final(Op,Sent,SentO):- call_last_is_var(db_expand_final(Op,Sent,SentO)
 db_expand_final(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,db_expand_final(Op,Sent,SentO).
 db_expand_final(_ ,NC,NC):-as_is_term(NC),!.
 db_expand_final(_, Sent,true):-is_true(Sent).
-db_expand_final(_,Term,Term):- is_ftCompound(Term),functor(Term,F,_),call_u(argsQuoted(F)),!.
+db_expand_final(_,Term,Term):- is_ftCompound(Term),functor(Term,F,_),cheaply_u(argsQuoted(F)),!.
 db_expand_final(_, arity(F,A),arity(F,A)):- not_ftCompound(V),not_ftCompound(A),!.
 db_expand_final(_, tPred(V),tPred(V)):-!,fail, not_ftCompound(V),!.
 db_expand_final(_ ,NC,NC):-functor(NC,_,1),arg(1,NC,T),(not_ftCompound(T)),!.
@@ -1574,7 +1577,7 @@ transform_holds_3(Op,[Fogical|ARGS],OUT):-
 
 transform_holds_3(_,[props,Obj,Props],props(Obj,Props)).
 transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[isa(Type)|PROPS])):- 
-                  is_ftNonvar(Inst), not(Type=props), call_u(tCol(Type)), must_det(not(is_never_type(Type))),!.
+                  is_ftNonvar(Inst), not(Type=props), cheaply_u(tCol(Type)), must_det(not(is_never_type(Type))),!.
 transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[isa(Type)|PROPS])):- 
                   is_ftNonvar(Inst), not(Type=props), t(functorDeclares,Type), must_det(not(is_never_type(Type))),!.
 
@@ -1605,7 +1608,7 @@ holds_args(HOFDS,FIST):- is_ftCompound(HOFDS),HOFDS=..[H|FIST],is_holds_true(H),
 % Do Expand Arguments.
 %
 do_expand_args(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,do_expand_args(Op,Sent,SentO).
-do_expand_args(_,Term,Term):- compound(Term),functor(Term,F,_),if_defined_else(argsQuoted(F),fail),!.
+do_expand_args(_,Term,Term):- compound(Term),functor(Term,F,_),cheaply_u(argsQuoted(F)),!.
 do_expand_args(Exp,Term,Out):- compound(Term),!,must(do_expand_args_c(Exp,Term,Out)).
 do_expand_args(_,Term,Term).
 

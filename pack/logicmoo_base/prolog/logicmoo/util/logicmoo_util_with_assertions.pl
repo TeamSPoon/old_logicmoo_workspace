@@ -19,8 +19,12 @@
             wno_tl_e/2,
             wtg/2,
             with_no_x/1,
-            with_each_item/3
-          ]).
+            with_each_item/3,
+            gather_nb_setargs_goals/3,
+            nb_setargs_1var/3,
+            nb_setargs_goals/3,
+            scce9/3,
+            scce8/3]).
 
 :- meta_predicate
         w_tl(:, :),
@@ -31,7 +35,8 @@
         wtg(:, 0).
 :- module_transparent
         check_thread_local_1m/1,
-        to_thread_head_1m/4.
+        to_thread_head_1m/4,
+        scce9/3.
 
 :- include('logicmoo_util_header.pi').
 
@@ -150,6 +155,7 @@ w_tl_e(_FPM:set_prolog_flag(N,XFY),MCall):- !,
 w_tl_e(M:before_after(Before,After),Call):-
      (M:Before -> setup_call_cleanup_each(true,Call,M:After);Call).
 
+% w_tl_e(WM:THeadWM,CM:Call):- is_release,(WM:THeadWM),!,CM:Call.
 w_tl_e(WM:THeadWM,CM:Call):- !,
  notrace(( 
      to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
@@ -223,3 +229,32 @@ check_thread_local_1m(tlbugger:_):-!.
 %check_thread_local_1m(lmconf:_):-!.
 check_thread_local_1m(TLHead):- slow_sanity(( must_det(predicate_property(TLHead,(thread_local))))),!.
 
+% My last ditch would be to 
+
+
+scce8(Setup0,Goal0,Undo0):-
+    Setup = (\+ \+ ((Setup0,nb_setarg(1,Goal,Goal0),nb_setarg(1,Undo,Undo0)))),
+    Goal = call(throw(ggg)),
+    Undo = call(throw(uuu)),
+    setup_call_cleanup_each(Setup,Goal,Undo).
+
+
+scce9(Setup,Goal,Undo):-
+       term_variables(v(Setup,Goal,Undo),Vs),
+       duplicate_term(v(Setup,Goal,Undo),v(SetupD,GoalD,UndoD)),
+       gather_nb_setargs_goals(Vs,v(SetupD,GoalD,UndoD),NBSetargClosure),
+       SetupEach = (\+ \+ ((SetupD,NBSetargClosure))),
+       setup_call_cleanup_each(SetupEach,GoalD,UndoD).
+
+gather_nb_setargs_goals(Vs,Term, maplist(call,SubGoals)):-
+        maplist(nb_setargs_1var(Term), Vs, SubGoals).
+
+
+nb_setargs_1var(Term, X, maplist(call,NBSetargClosure)):-
+        findall(How, nb_setargs_goals(X,Term,How),NBSetargClosure).
+
+nb_setargs_goals(X,Term,How) :-
+        compound(Term),
+        arg(N, Term, Arg),
+        (Arg ==X -> How=nb_setarg(N,Term,X) ;
+           nb_setargs_goals(X,Arg,How)).

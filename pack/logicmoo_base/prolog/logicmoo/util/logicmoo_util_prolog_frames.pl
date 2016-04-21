@@ -186,3 +186,6 @@ current_next_frames(Attrib,Nth,Frame,NextList):-
          NextList=[]).
 current_next_frames(_,_,_,[]).
 
+
+
+

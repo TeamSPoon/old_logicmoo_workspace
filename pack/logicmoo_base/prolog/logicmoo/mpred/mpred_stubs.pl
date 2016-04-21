@@ -757,6 +757,9 @@ lmconf:mpred_provide_setup(Op,HeadIn,StubType,OUT):- StubType \== prologDynamic,
 %
 % Ensure Universal Stub.
 %
+ensure_universal_stub(HeadIn):- compound(HeadIn),(HeadIn=(F/A)),!,
+   functor(NewHead,F,A),ensure_universal_stub(NewHead).
+
 ensure_universal_stub(HeadIn):- has_storage_stub(HeadIn),!.
 ensure_universal_stub(HeadIn):-
   must_det_l(( get_pifunctor(HeadIn,Head,F,A),  

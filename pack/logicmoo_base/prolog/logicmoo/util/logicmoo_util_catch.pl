@@ -254,6 +254,7 @@ must_atomic(Goal):- notrace('$sig_atomic'(must_or_die(Goal))).
 call_cleanup_each(Goal, Cleanup) :-
 	setup_call_cleanup_each(true, Goal, Cleanup).
 
+setup_call_cleanup_each(Setup,Goal,Undo):-!,setup_call_cleanup(Setup,Goal,Undo).
 setup_call_cleanup_each(Setup,Goal,Undo):-
    notrace(((tracing,notrace)->WasTrace=trace;WasTrace=notrace)),
    setup_call_cleanup(true,
@@ -1315,6 +1316,7 @@ errx:-on_x_debug((ain(tlbugger:dont_skip_bugger),do_gc,dumpST(10))),!.
 %
 skipWrapper:- tracing, \+ tlbugger:rtracing,!.
 skipWrapper:- tlbugger:dont_skip_bugger,!,fail.
+skipWrapper:- is_release,!.
 skipWrapper:- tlbugger:skip_bugger,!.
 %skipWrapper:- 0 is random(5),!.
 %skipWrapper:- tlbugger:skipMust,!.
@@ -1414,6 +1416,7 @@ det_lm(M,Goal):-M:Goal,!.
 %
 % Must Be Successfull (list Version).
 %
+must_l(Goal):- is_release,!,call(Goal).
 must_l(Goal):-var(Goal),trace_or_throw(var_must_l(Goal)),!.
 must_l((A,!,B)):-!,must(A),!,must_l(B).
 must_l((A,B)):-!,must((A,deterministic(Det),true,(Det==true->(!,must_l(B));B))).
@@ -1436,6 +1439,7 @@ slow_sanity(Goal):- ( tlbugger:skip_use_slow_sanity ; must(Goal)),!.
 
 
 :- meta_predicate(hide_trace(0)).
+hide_trace(G):- is_release,!,call(G).
 hide_trace(G):- 
  restore_trace((
    notrace(
@@ -1450,6 +1454,7 @@ hide_trace(G):-
 on_x_f(G,X,F):-catchv(G,E,(dumpST,wdmsg(E),X)) *-> true ; F .
 
 :- meta_predicate quietly(0).
+quietly(G):- is_release,call(G).
 quietly(G):- on_x_f(hide_trace(G),rtrace(G),rtrace(G)).
 
 
@@ -1477,6 +1482,7 @@ sanity(Goal):- quietly(Goal).
 %
 % If Is A Release.
 %
+% is_release:-!.
 is_release:- !,fail.
 is_release :- \+ not_is_release.
 :- export(not_is_release/0).
@@ -1487,7 +1493,7 @@ is_release :- \+ not_is_release.
 %
 % Not If Is A Release.
 %
-not_is_release:- 1 is random(4).
+% not_is_release:- 1 is random(4).
 not_is_release:- \+ is_release.
 
 
@@ -1542,7 +1548,7 @@ y_must(Y,Goal):- catchv(Goal,E,(wdmsg(E:must_xI__xI__xI__xI__xI_(Y,Goal)),fail))
 %
 % Must Be Successfull.
 %
-% must(Goal):- bad_idea,!,call(Goal).
+must(Goal):-  is_release,!,call(Goal).
 must(Goal):-  ((must_be(nonvar,Goal),get_must(Goal,MGoal))),!,MGoal.
 
 

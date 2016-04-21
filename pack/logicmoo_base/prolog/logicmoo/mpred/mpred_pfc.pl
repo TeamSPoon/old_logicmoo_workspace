@@ -516,7 +516,7 @@ ain(P,S):- mpred_ain((P),S).
 
 mpred_ain(P,S):- 
   gripe_time(0.6,
-   with_umt((if_defined_else(to_addable_form_wte(assert,(P),P0),P0=P)
+   with_umt((if_defined_else(to_addable_form_wte(assert,(P),P0),if_defined_else(fully_expand(assert,(P),P0),P0=P))
   -> ain_fast(P0,S)))),!.
 mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]).
 
@@ -524,7 +524,8 @@ mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]).
 
 ain_fast(P):- get_source_ref(UU), ain_fast(P,UU).
 ain_fast(P,S):- 
-  filter_buffer_trim('$last_mpred_fwc0s',2),
+  filter_buffer_trim('$last_mpred_fwc1s',2),
+  filter_buffer_trim('$last_mpred_post1s',2),
   each_E(mpred_post1,P,[S]),
   mpred_run.
 
@@ -549,7 +550,7 @@ plus_fwc(P):- gripe_time(0.6,(plus_fwc->loop_check_term(mpred_fwc(P),plus_fwc(P)
 % each fact (or the singleton) mpred_post1 is called. It always succeeds.
 %
 mpred_post(P, S):- 
-   if_defined_else(to_addable_form_wte(assert,(P),P0),P=P0), 
+   if_defined_else(to_addable_form_wte(assert,(P),P0),if_defined_else(fully_expand(assert,(P),P0),P0=P)), 
    each_E(mpred_post1,P0,[S]).
 
 
@@ -566,6 +567,8 @@ mpred_post1( \+ P,   S):- nonvar(P), !, must(mpred_post1_rem(P,S)).
 % TODO - FIGURE OUT WHY THIS IS NEEDED
 mpred_post1(  ~ P,   S):- 
    with_current_why(S,with_no_mpred_breaks((nonvar(P),doall(mpred_remove(P,S)),must(mpred_undo(P))))),fail.
+
+% mpred_post1(Fact, _):- filter_buffer_n_test('$last_mpred_post1s',3,Fact),!.
 
 % Two version exists of this function one expects for a clean database (fresh_mode) and adds new information.
 % tries to assert a fact or set of fact to the database.
@@ -1209,7 +1212,7 @@ mpred_fwc(Ps):- each_E(mpred_fwc0,Ps,[]).
 %  Avoid loop while calling mpred_fwc1(P)
 % 
 % this line filters sequential (and secondary) dupes
-mpred_fwc0(Fact):- filter_buffer_n_test('$last_mpred_fwc0s',6,Fact),!.
+mpred_fwc0(Fact):- filter_buffer_n_test('$last_mpred_fwc1s',6,Fact),!.
 mpred_fwc0(Fact):- copy_term(Fact,FactC),mpred_fwc1(FactC).
 
 
@@ -1694,7 +1697,7 @@ mpred_compile_rhs_term(Sup,(P/C),((P0:-C0))) :- !,mpred_compile_rhs_term(Sup,P,P
    build_code_test(Sup,C,C0),!.
 
 mpred_compile_rhs_term(Sup,I,OO):- 
-  if_defined_else(to_addable_form_wte(mpred_compile_rhs_term,(I),O),I=O),
+  if_defined_else(to_addable_form_wte(mpred_compile_rhs_term,(I),O),if_defined_else(fully_expand(mpred_compile_rhs_term,(I),O),I=O)),
   must(\+ \+ mpred_mark_as(Sup,O,pfcRHS)),!,build_consequent(Sup,O,OO).
 
 mpred_compile_rhs_term(Sup,I,O):- build_consequent(Sup,I,O).
@@ -2006,7 +2009,8 @@ mpred_assertz_w_support(P,Support):-
 %
 % PFC Clause For User Interface.
 %   
-clause_asserted_u((MH:-B)):- must_be(nonvar,B),must(mnotrace(fix_mp(MH,M:H))),clause_asserted_i(M:H-B).
+%clause_asserted_u(MH):- \+ ground(MH),must(fully_expand(change(assert,assert_u),MH,MA)),MA\=@=MH,!,clause_asserted_u(MA).
+clause_asserted_u((MH:-B)):- must(mnotrace(fix_mp(MH,M:H))),!,clause_asserted_i((M:H :-B )).
 clause_asserted_u(MH):- must(mnotrace(fix_mp(MH,M:H))),clause_asserted_i(M:H).
 
 /*
@@ -2914,7 +2918,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((mpred_remove1)/2).
 :- module_transparent((mpred_te)/2).
 :- module_transparent((mpred_te)/0).
-:- module_transparent((mpred_current_db)/1).
+%:- module_transparent((mpred_current_db)/1).
 :- module_transparent((listing_u)/1).
 :- module_transparent((mpred_test_fok)/1).
 :- module_transparent((mpred_test)/1).

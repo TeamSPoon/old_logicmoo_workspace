@@ -113,7 +113,7 @@ smoke(P, blend) => (next_door_neighbours(P,PB) /\ pet(PB, cat)).
 % 11. The owner who keeps the horse lives next to the one who smokes Dunhill. 
 pet(P, horse) => (next_door_neighbours(P,PB)  /\ smoke(PB, dunhill)).
 
-:- prolog.
+% :- prolog.
 
 % 12. The owner who smokes Bluemasters drinks beer. 
 smoke(P, bluemasters) => drink(P, beer).

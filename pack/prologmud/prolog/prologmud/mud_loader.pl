@@ -77,9 +77,11 @@ unsafe_preds(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
 :-forall(unsafe_preds(M,F,A),bugger:remove_pred(M,F,A)).
 
 % [Optionaly] Solve the Halting problem
+:-unlock_predicate(system:halt/0).
 :-redefine_system_predicate(system:halt/0).
 :-abolish(system:halt,0).
 :-asserta((system:halt :- format('the halting problem is now solved!'))).
+:-lock_predicate(system:halt/0).
 
 :- dmsg('the halting problem is now solved!').
 
@@ -147,9 +149,9 @@ within_user(Call):- '@'(Call,'user').
 
 :- user_use_module(library(settings)).
 
-:- user:file_search_path(cliopatria,SP),
+:- ignore((user:file_search_path(cliopatria,SP),
    exists_directory(SP),!,
-   writeq(user:file_search_path(cliopatria,SP)),nl.
+   writeq(user:file_search_path(cliopatria,SP)),nl)).
    %set_setting_default(cliopatria_binding:path, SP).
    %save_settings('moo_settings.db').
    %%setting(cliopatria_binding:path, atom, SP, 'Path to root of cliopatria install'),!.
@@ -388,7 +390,8 @@ Proof end.
 % logicmoo vworld mud server
 
 :- user:ensure_loaded(library(logicmoo_base)).
-:- user:ensure_loaded_no_mpreds(prologmud(server/mud_telnet)).
+:- user:ensure_loaded(prologmud(server/mud_telnet)).
+% :- user:ensure_loaded_no_mpreds(prologmud(server/mud_telnet)).
 :- user:ensure_loaded(prologmud(server/mud_irc)).
 :- user:ensure_loaded(prologmud(vworld/world)).
 

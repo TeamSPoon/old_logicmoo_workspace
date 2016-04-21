@@ -10,7 +10,7 @@
 %
 */
 
-:- include(logicmoo(mpred/'mpred_header.pi')).
+% :- include(logicmoo(mpred/'mpred_header.pi')).
 
 :- '$set_source_module'(baseKB).
 

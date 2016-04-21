@@ -233,7 +233,7 @@ prologHybrid(genls/2).
 (prologHybrid(F),arity(F,A)/is_ftNameArity(F,A))==>hybrid_support(F,A).
 (hybrid_support(F,A)/is_ftNameArity(F,A))==>prologHybrid(F),arity(F,A).
 
-:- ensure_loaded('system_markers.pfc').
+% :- ensure_loaded('system_markers.pfc').
 
 arity(genlPreds,2).
 
@@ -962,7 +962,7 @@ ttExpressionType(ftVoprop).
 tCol(ftSpec).
 :- asserta(baseKB:ftSpec(ftSpec)).
 
-resultIsa(F,C)/ground(C)==>ftSpec(C).
+resultIsa(_F,C)/ground(C)==>ftSpec(C).
 
 % resultIsa(F,C)==>(ftSpec(C),'tFunction'(F)).
 % % ( meta_argtypes(FT)/dif(FT,COL), genls(FT, COL),tCol(COL),{not(isa(COL,ttExpressionType))}) ==> formatted_resultIsa(FT,COL).

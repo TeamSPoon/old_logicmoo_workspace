@@ -12,6 +12,7 @@
 
 :- begin_pfc.
 
+:- dynamic(test1_2_3/3).
 :- dynamic(meta_argtypes/1).
 
 %

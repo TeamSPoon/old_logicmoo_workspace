@@ -489,7 +489,7 @@ to_mod_if_needed(M,B,MB):- B==true-> MB=B ; MB = M:B.
 split_attrs(B,ATTRS,BODY):- \+ sanity((simple_var(ATTRS),simple_var(BODY))),
     dumpST,dtrace(split_attrs(B,ATTRS,BODY)).
 split_attrs(B,true,B):-is_ftVar(B),!.
-split_attrs(B,true,call(B)):-is_ftVar(B),!.
+split_attrs(call(C),A,B):-!,split_attrs(C,A,B).
 split_attrs(M:B,ATTRS,BODY):- is_visible_module(M),!, split_attrs(B,ATTRS,BODY).
 split_attrs(M:attr_bind(G,Call),M:attr_bind(G),Call):- !.
 split_attrs(attr_bind(G,Call),attr_bind(G),Call):- !.
@@ -584,7 +584,7 @@ modulize_head_fb(From,H,Fallback,M:H):-
 % PFC Clause For User Interface.
 %
 clause_asserted_i(Head):- 
-  % to_addable_form_wte(assert,Head,HeadC),
+  % fully_expand_now_wte(assert,Head,HeadC),
   copy_term(Head,HC),
   copy_term_nat(Head,Head_copy),  
   % find a unit clause identical to Head by finding one which unifies,
@@ -616,9 +616,8 @@ remove_term_attr_type(Term,Mod):- notrace((term_attvars(Term,AVs),maplist(del_at
 
 :- op(700,xfx,'=@=').
 
-
-dont_make_cyclic(G):-cyclic_break(G),!,copy_term(G,GG),
-  (G*-> (acyclic_term(G)->true;(dtrace,trace,GG)) ; fail).
+dont_make_cyclic(G):-is_release,!,call(G).
+dont_make_cyclic(G):-cyclic_break(G),!,G,cyclic_break(G).
 
 
 attribute_is_info(name_variable(_Var,  _Name)).
@@ -644,19 +643,18 @@ clause_i(H,B):- clause_i(H,B,_).
 % clause_i(H,B,Ref):- clause(H,AB,Ref), (must(split_attrs(AB,A,B0)->A),B=B0).
 
 clause_i(H,B,R):- nonvar(R),!, 
-  dont_make_cyclic((must(clause(H0,BC,R)),must(split_attrs(BC,AV,B0)),!, B=B0 ,!,must( AV), !, must(H=H0))).
+  dont_make_cyclic((must(clause(H0,BC,R)),must(split_attrs(BC,AV,B0)),!,must((AV,!,B=B0,H=H0)))).
 
-clause_i(H0,B0,Ref):- 
+clause_i(H0,B0,Ref):-clause(H0,B0,Ref).
+clause_i(H0,B0,Ref):-
  copy_term(H0:B0, H:B, Attribs),
  dont_make_cyclic((    
     (clause(H,BC,Ref) *-> 
-      must(split_attrs(BC,AV,BB)) -> unify_bodies(B,BB) -> AV -> H0=H,B0=B,
-        maplist(call,Attribs)))).
-
+      must(split_attrs(BC,AV,BB)) -> unify_bodies(B,BB) -> AV -> (H0=H,B0=B,
+        maplist(call,Attribs))))).
 
 unify_bodies(B,B):-!.
-unify_bodies(_:B,B):-!.
-unify_bodies(B,_:B):-!.
+unify_bodies(B1,B2):-strip_module(B1,_,BB1),strip_module(B2,_,BB2),!,BB1=BB2.
 
 /*
 

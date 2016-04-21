@@ -5,9 +5,9 @@
 % ==========================================================
 % Sanity tests that first run whenever a person stats the MUD to see if there are regressions in the system
 % ==========================================================
-:-multifile(user:sanity_test/0).
-:-multifile(user:regression_test/0).
-:-multifile(user:feature_test/0).
+:-multifile(lmconf:sanity_test/0).
+:-multifile(lmconf:regression_test/0).
+:-multifile(lmconf:feature_test/0).
 
 
 :- user:ensure_loaded(logicmoo_repl).

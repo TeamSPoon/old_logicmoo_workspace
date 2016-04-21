@@ -256,8 +256,6 @@ genls(tHumanBody,tBodyPart).
 predInterArgIsa(mudSubPart(tBodyPart,tBodyPart)).
 
 
-relationAllExists(Pred,Col1,Col2), isa(Inst,Col1) ==> ({G=..[Pred,Inst,Value]},( ~G ==> ({Value=skPredArg2InstFn(Pred,Col2)},isa(Value,Col2), G))).
-
 relationAllExists(mudSubPart,tHominid,tHumanBody).
 relationAllExists(mudSubPart,tHumanBody,tBodyPart).
 relationAllExists(mudSubPart,tHumanBody,isEach(tHumanHead,tHumanNeck,tHumanUpperTorso,tHumanLowerTorso,tHumanPelvis,tHumanArms,tHumanLegs)).

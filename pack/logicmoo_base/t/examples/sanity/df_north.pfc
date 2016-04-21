@@ -1,0 +1,53 @@
+#!/usr/bin/env swipl
+%
+%  PFC is a language extension for prolog.. there is so much that can be done in this language extension to Prolog
+%
+% Dec 13, 2035
+% Douglas Miles
+%  cls ; kill -9 %1 ; fg ; swipl -g "ensure_loaded(pack(logicmoo_base/t/examples/base/'sanity_abc.pfc'))."
+ 
+:- module(sanity,[]).
+
+:- use_module(library(logicmoo_user)).
+
+:- debug(_).
+:- nodebug(http(_)).
+:- debug(mpred).
+:- mpred_trace_exec.
+:- mpred_trace.
+:- begin_pfc.
+
+meta_argtypes(most(ftAssertable)).
+
+% BWD chaining
+most((Q <- P))/mpred_literal(Q) ==> (Q <-(P, \+ ~(Q))).
+
+% FWD chaining
+most(P==>Q)/nonvar(Q) ==> (((P ==> most(Q)))).
+
+% NEG chaining
+most(~Q)/mpred_positive_literal(Q)  ==>  (( \+ Q ) ==> ~ Q ).
+
+% POS chaining 1
+most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test, (\+ ~Q )) ==> Q )).
+
+% POS chaining 2
+most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> ( ((R/( Test, \+(R=Q))) ==> (\+ Q))).
+
+% POS chaining 1+2
+% most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> (  ( ( \+R /Test ) ==> Q ) ,((R/( \+(R=Q), Test)) ==> (\+ Q))).
+
+:- dynamic(mudFacing/2).
+
+:- ain(prologSingleValued(mudFacing(tObj,vtDirection),[argSingleValueDefault(2,vNorth)],prologHybrid)).
+
+:- ain(typeProps(tAgent,[ mudFacing(vNorth)])).
+
+
+:- ain(tObj(iThing777)).
+
+:- must((mpred_test(mudFacing(iThing777,Dir)),Dir=vNorth)).
+
+:- ain(tAgent(iAgent777)).
+
+:- must(mpred_test(mudFacing(iAgent777,Dir)),Dir=vNorth).

@@ -12,7 +12,6 @@
 
 :- begin_pfc.
 
-:- dynamic(test1_2_3/3).
 :- dynamic(meta_argtypes/1).
 
 %
@@ -51,14 +50,21 @@ most(Q)/(mpred_positive_literal(Q),if_missing_mask(Q,R,Test)) ==> ( ((R/( \+(R=Q
 %(most(P=>Q)/(mpred_literal_nv(Q),if_missing_mask(Q,R,Test)))  ==> ((P, \+ R/Test) => Q).
 %(most(P=>Q)/nonvar(Q)) ==> (P => most(Q)).
 
- 
-:-ain(most(t(test1_2_3,1,2,3))).
 
-most(t(test1_2_3,1,2,3)).
+:-dynamic((a/1,b/1,c/1)).
 
+b(1).
+a(X) ==> c(X).
+most(c(X) ==> ~b(X)) .
+a(1).
 
-?- listing(test1_2_3).
+:- mpred_test( ~ b(1) ).
 
-:- mpred_test(test1_2_3(1,2,3)).
+b(1).
+
+:- listing([(==>)/2,most/1,pt,nt,bt,a/1,b/1,c/1,(~)/1]).
+
+:- mpred_test( \+ ~ b(1) ).
+
 
 
