@@ -1482,7 +1482,7 @@ sanity(Goal):- quietly(Goal).
 %
 % If Is A Release.
 %
-% is_release:-!.
+is_release:-!.
 is_release:- !,fail.
 is_release :- \+ not_is_release.
 :- export(not_is_release/0).

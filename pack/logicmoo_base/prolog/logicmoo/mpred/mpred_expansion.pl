@@ -837,10 +837,11 @@ try_expand_head(Op,Sent,SentO):- transitive_lc(db_expand_0(Op),Sent,SentO).
 
 
 
-temp_comp(H,B,PRED,OUT):- 
+temp_comp(H,B,PRED,OUT):- term_attvars(B,AVs1), AVs1==[],
+   term_variables(B,Vs1),
    nonvar(H),asserta(('$temp_comp'(H):-B),Ref),clause('$temp_comp'(H),BO,Ref),
    erase(Ref),B\=@=BO,!,
-   must((term_variables(B,Vs1),term_variables(BO,Vs2),must_maplist(=,Vs1,Vs2),
+   must((term_variables(BO,Vs2),must_maplist(=,Vs1,Vs2),
             call(PRED,(H:-BO),OUT))).
 
 
@@ -975,9 +976,9 @@ db_expand_0(Op,ClassTemplate,OUT):- ClassTemplate=..[props,Inst,Second,Third|Pro
 
 db_expand_0(Op,IN,OUT):- IN=..[F|Args],F==t,!,must(from_univ(_,Op,Args,OUT)).
 db_expand_0(Op,isa(A,F),OO):-atom(F),O=..[F,A],!,db_expand_0(Op,O,OO).
-db_expand_0(Op,isa(A,F),OO):-is_ftNonvar(A),is_ftNonvar(F),expand_props(_Prefix,Op,props(A,F),OO).
+db_expand_0(Op,isa(A,F),OO):-is_ftNonvar(A),is_ftNonvar(F),expand_props(_Prefix,Op,props(A,F),OO),!.
 db_expand_0(_Op,isa(A,F),isa(A,F)):-!.
-db_expand_0(Op,props(A,F),OO):-expand_props(_Prefix,Op,props(A,F),OO).
+db_expand_0(Op,props(A,F),OO):-expand_props(_Prefix,Op,props(A,F),OO),!.
 
 db_expand_0(_,arity(F,A),arity(F,A)):-atom(F),!.
 db_expand_0(Op,arity(F,A),O):-expand_props(_Prefix,Op,props(F,arity(A)),O),!.
