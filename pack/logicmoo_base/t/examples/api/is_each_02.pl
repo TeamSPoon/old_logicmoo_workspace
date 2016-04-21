@@ -16,7 +16,6 @@
 
 % :- fully_expand( (isEach(aa(X),bb(Y)) :- related(X,Y)), _O).
 
-:- mpred_trace_exec.
 
 
 :- must(( 
@@ -25,6 +24,8 @@
    fully_expand(change(assert,assert_u),Code,Compiled),
   (Compiled = 
      (example_known_is_success(G):- call(G))))).
+
+% end_of_file.
 
 :- assert_u((example_known_is_successF(G):- G)).
 :- must(clause_asserted_u((example_known_is_successF(G):- call(G)))).
@@ -52,9 +53,12 @@ isEach(aa(X),bb(Y)) :- related(X,Y).
 :-  time((baseKB:ensure_loaded(baseKB:library(logicmoo/pfc/'system_markers.pfc')))).
 
 /*
-?- fully_expand(arity(isEach(X,TY),4),O).
+?- fully_expand(arity(isEach(X,TY),4),O). 
 O =  (arity(X, 4), arity(TY, 4)).
-*/
+*/  
 
 % before:  436,431,078 inferences, 496.191 CPU in 496.916 seconds (100% CPU, 879562 Lips)
+% before:  261.117
+
+% :- mpred_trace_exec.
 

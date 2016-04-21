@@ -560,7 +560,8 @@ mpred_post(P, S):-
 % adds an entry to the Pfc queue for subsequent forward chaining.
 % It always succeeds.
 %
-mpred_post1(    P,   S):- sanity(nonvar(P)),if_defined_else(fixed_negations(P,P0),fail),!, mpred_post1( P0,   S).
+
+mpred_post1(    P,   S):- sanity(nonvar(P)),fixed_negations(P,P0),!, mpred_post1( P0,   S).
 
 mpred_post1( \+ P,   S):- nonvar(P), !, must(mpred_post1_rem(P,S)).
 
@@ -2018,9 +2019,7 @@ clause_asserted_u(MH):- must(fully_expand(change(assert,assert_u),MH,MA)),!,clau
 
 clause_asserted_u(MH):- must(mnotrace(fix_mp(MH,M:H))), clause_asserted_i(M:H).
 
-clause_asserted_u(Head):- 
-  % to_addable_form_wte(assert,Head,HeadC),
-  Head=HeadC,
+clause_asserted_u(HeadC):- 
   copy_term_nat(HeadC,Head_copy),  
   % find a unit clause identical to Head by finding one which unifies,
   lookup_u(Head_copy),

@@ -26,13 +26,9 @@ second_order/2,
 whenAnd/2,
 if_missing/1,
 
-to_addable_form_wte/3,
-to_predicate_isas_each/2,
-to_addable_form/2,
 attvar_op/2,
 no_side_effects/1,
 mpred_non_neg_literal/1,
-to_predicate_isas0/2,
 % get_user_abox/1,
 retract_mu/1,
 assert_mu/4,
@@ -157,20 +153,9 @@ pfc_provide_storage_op/2,
 is_retract_first/1,
 mpred_is_taut/1,
 mpred_is_tautology/1,
-exact_args/1,
-to_predicate_isas0/2,
-append_as_first_arg/3,
-to_predicate_isas/2,
-to_predicate_isas_each/2,
-to_addable_form/2,
-reduce_clause_from_fwd/2,
 assert_eq_quitely/1,
 retract_eq_quitely_f/1,
 retract_eq_quitely/1,
-to_addable_form_wte/3,
-fix_negations/2,
-fixed_negations/2,
-is_nc_as_is/1,
 mpred_each_literal/2,
 has_functor/1,
 make_uu_remove/1,
@@ -217,8 +202,7 @@ has_functor/1,
           call_s/1,call_s2/1,asserta_s/1,assert_s/1,assertz_s/1,retract_s/1,retractall_s/1,
           clause_s/2,clause_s/3,lookup_s/1,lookup_s/2,lookq_s/2,lookq_s/1,
 
-to_addable_form_wte/3,
-to_addable_form/2,
+
 
 update_single_valued_arg/2,
 ruleBackward/2,
@@ -230,7 +214,6 @@ mpred_remove_file_support/1,
 mpred_nochaining/1,
 mpred_negation_w_neg/2,          
 mpred_negation_w_neg/2,
-fix_negations/2,
 map_first_arg/2,
 mpred_rule_hb/3,mpred_rule_hb_0/3,
 is_side_effect_disabled/0,
@@ -240,8 +223,6 @@ is_bc_body/1,
 is_action_body/1,
 has_cl/1,
 has_body_atom/2,
-fixed_negations/2,
-fix_negations/2,
 cwc/0,
 compute_resolve/3,
 clause_or_call/2,          
@@ -772,54 +753,6 @@ mpred_each_literal(P,P). %:-conjuncts_to_list(P,List),member(E,List).
 
 
 
-is_nc_as_is(P) :- \+ compound(P),!.
-is_nc_as_is(P) :- functor(P,_,0),!.
-is_nc_as_is(P):- is_ftVar(P),!.
-
-fixed_negations(I,O):-notrace((fix_negations(I,O),!,I\=@=O)),!.
-fix_negations(P0,P0):- is_nc_as_is(P0),!.
-fix_negations(~(P0),~(P0)):- is_nc_as_is(P0),!.
-fix_negations(\+(P0),\+(P0)):- is_nc_as_is(P0),!.
-fix_negations(~(~I),O):- !, fix_negations(\+(~I),O).
-fix_negations(~not(I),O):- !, fix_negations(\+(~I),O).
-fix_negations(~~(I),O):- functor(~~(I),~~,1),!, fix_negations(\+(~I),O).
-fix_negations(not(I),O):- !, fix_negations(\+(I),O).
-fix_negations(~(I),~(O)):- !, fix_negations(I,O).
-fix_negations(\+(I),\+(O)):- !, fix_negations(I,O).
-fix_negations(C,C):- if_defined(exact_args(C),fail),!.
-fix_negations([H|T],[HH|TT]):-!,fix_negations(H,HH),fix_negations(T,TT),!.
-fix_negations(C,CO):-C=..[F|CL],must_maplist(fix_negations,CL,CLO),!,CO=..[F|CLO].
-
-
-
-
-%% to_addable_form_wte( +Why, :TermI, :TermO) is semidet.
-%
-% Converted To Addable Form Wte.
-%
-to_addable_form_wte(Why,I,O):-nonvar(O),!,to_addable_form_wte(Why,I,M),!,mustvv(M=O).
-
-to_addable_form_wte(Why,I,O):-string(I),
-  must_det_l((input_to_forms(string(I),Wff,Vs),
-  put_variable_names(Vs),!,
-  sexpr_sterm_to_pterm(Wff,PTerm),
-  to_addable_form_wte(Why,PTerm,O))),!.
-
-to_addable_form_wte(Why,I,O):-atom(I),atom_contains(I,'('),must_det_l((input_to_forms(atom(I),Wff,Vs),put_variable_names(Vs),!,sexpr_sterm_to_pterm(Wff,PTerm),
-  to_addable_form_wte(Why,PTerm,O))),!.
-
-to_addable_form_wte(_,X,X):-mreq(as_is_term(X)),!.
-to_addable_form_wte(Why,nesc(I),O):-!,to_addable_form_wte(Why,I,O).
-to_addable_form_wte(Why,USER:I,O):-USER==user,!,to_addable_form_wte(Why,I,O).
-to_addable_form_wte(Why,I,O):- fixed_negations(I,M),I\=@=M,to_addable_form_wte(Why,M,O).
-to_addable_form_wte(assert,(H:-B),(H:-B)):-B\==true,!.
-to_addable_form_wte(Why,(CUT0,P0),(CUT,P)):-to_addable_form_wte(Why,CUT0,CUT),!,to_addable_form_wte(Why,P0,P).
-% to_addable_form_wte(Why,(CUT,P0),(CUT,P)):-mpred_is_builtin(CUT),!,to_addable_form_wte(Why,P0,P).
-to_addable_form_wte(Why,P0,P):- notrace((
-    once(hotrace(to_addable_form(P0,P));must(to_addable_form(P0,P))),
-    ignore((((P0\=@=P,P0\=isa(_,_)),mpred_trace_msg((to_addable_form(Why):-[P0,P]))))))),!.
-
-
 %% retract_eq_quitely( +H) is semidet.
 %
 % Retract Using (==/2) (or =@=/2) ) Quitely.
@@ -840,105 +773,6 @@ retract_eq_quitely_f((H)):- clause_asserted_i(H,true,Ref),erase(Ref).
 % Assert Using (==/2) (or =@=/2) ) Quitely.
 %
 assert_eq_quitely(H):- attvar_op(assert_if_new,H).
-
-
-%% reduce_clause_from_fwd( +H, ?H) is semidet.
-%
-% Reduce Clause Converted From Forward Repropigated.
-%
-reduce_clause_from_fwd(H,H):- (\+is_ftCompound(H)),!.
-reduce_clause_from_fwd((H:-B),HH):-B==true,reduce_clause_from_fwd(H,HH).
-reduce_clause_from_fwd((B==>H),HH):-B==true,reduce_clause_from_fwd(H,HH).
-reduce_clause_from_fwd(I,O):- fixed_negations(I,M),reduce_clause_from_fwd(M,O).
-reduce_clause_from_fwd((==>H),HH):-!,reduce_clause_from_fwd(H,HH).
-reduce_clause_from_fwd((H<- B),HH):-B==true,reduce_clause_from_fwd(H,HH).
-reduce_clause_from_fwd((B<==> H),HH):-B==true,reduce_clause_from_fwd(H,HH).
-reduce_clause_from_fwd((H<==> B),HH):-B==true,reduce_clause_from_fwd(H,HH).
-reduce_clause_from_fwd((H,B),(HH,BB)):-!,reduce_clause_from_fwd(H,HH),reduce_clause_from_fwd(B,BB).
-reduce_clause_from_fwd(H,H).
-
-
-
-%% to_addable_form( +I, ?I) is semidet.
-%
-% Converted To Addable Form.
-%
-to_addable_form(I,O):- is_ftVar(I),!,must(I=O).
-to_addable_form(I,O):- as_is_term(I),!,must(I=O).
-to_addable_form(I,OOO):-is_list(I),!,must_maplist(to_addable_form,I,O),flatten(O,OO),!,must(reduce_clause_from_fwd(OO,OOO)).
-to_addable_form(I,OO):- current_predicate(_:mpred_expansion_file/0),must(fully_expand(pfc(to_addable_form,to_addable_form),I,II)),!,
- must((into_mpred_form(II,M),to_predicate_isas_each(M,O))),!,reduce_clause_from_fwd(O,OO).
-
-to_addable_form(I,O):- must((bagof(M,do_expand_args(isEachAF,I,M),IM))),list_to_conjuncts(IM,M),to_predicate_isas_each(M,O),!.
-
-% :-mpred_expansion_file.
-% I =((P,Q)==>(p(P),q(Q))) , findall(O,do_expand_args(isEachAF,I,O),L).
-
-
-
-%% to_predicate_isas_each( +I, ?O) is semidet.
-%
-% Converted To Predicate Isas Each.
-%
-to_predicate_isas_each(I,O):-to_predicate_isas(I,O).
-
-
-%% to_predicate_isas( :TermV, :TermV) is semidet.
-%
-% Converted To Predicate Isas.
-%
-to_predicate_isas(V,V):- (\+is_ftCompound(V)),!.
-to_predicate_isas([H|T],[HH|TT]):-!,to_predicate_isas(H,HH),to_predicate_isas(T,TT),!.
-to_predicate_isas((H,T),(HH,TT)):-!,to_predicate_isas(H,HH),to_predicate_isas(T,TT),!.
-%to_predicate_isas(I,I):-contains_term(S,I),is_ftNonvar(S),exact_args(S),!.
-to_predicate_isas(I,O):-must(to_predicate_isas0(I,O)),!.
-
-
-%% append_as_first_arg( +C, ?I, ?V) is semidet.
-%
-% Append Converted To First Argument.
-%
-append_as_first_arg(C,I,V):-C=..[F|ARGS],V=..[F,I|ARGS].
-
-
-%% to_predicate_isas0( :TermV, :TermV) is semidet.
-%
-% Converted To Predicate Isas Primary Helper.
-%
-to_predicate_isas0(V,V):- (\+is_ftCompound(V)),!.
-to_predicate_isas0({V},{V}):-!.
-to_predicate_isas0(eXact(V),V):-!.
-to_predicate_isas0(t(C,I),V):-atom(C)->V=..[C,I];(is_ftVar(C)->V=t(C,I);append_as_first_arg(C,I,V)).
-to_predicate_isas0(isa(I,C),V):-!,atom(C)->V=..[C,I];(is_ftVar(C)->V=isa(I,C);append_as_first_arg(C,I,V)).
-to_predicate_isas0(C,C):-exact_args(C),!.
-to_predicate_isas0([H|T],[HH|TT]):-!,to_predicate_isas0(H,HH),to_predicate_isas0(T,TT),!.
-to_predicate_isas0(C,CO):-C=..[F|CL],must_maplist(to_predicate_isas0,CL,CLO),!,CO=..[F|CLO].
-
-:- source_location(F,_),asserta(absolute_source_location_pfc(F)).
-
-%% exact_args( +Q) is semidet.
-%
-% Exact Arguments.
-%
-exact_args(Q):-is_ftVar(Q),!,fail.
-exact_args(argsQuoted(_)):-!,fail.
-exact_args(Q):- call_u(argsQuoted(Q)).
-exact_args(Q):-is_ftCompound(Q),functor(Q,F,_),call_u(argsQuoted(F)).
-exact_args(second_order(_,_)).
-exact_args(call(_)).
-exact_args(asserted(_)).
-exact_args(retract_eq_quitely(_)).
-exact_args(asserts_eq_quitely(_)).
-exact_args(assertz_if_new(_)).
-exact_args((_:-_)).
-exact_args((_ =.. _)).
-exact_args((:-( _))).
-exact_args((A/B)):- (is_ftVar(A);is_ftVar(B)).
-exact_args(mpred_ain(_)).
-exact_args(dynamic(_)).
-exact_args(cwc).
-exact_args(true).
-% exact_args(C):-source_file(C,I),absolute_source_location_pfc(I).
 
 
 %% mpred_is_tautology( +Var) is semidet.
@@ -1571,7 +1405,7 @@ mpred_deep_support0(mpred_call_only_facts((P)),P):-mpred_call_only_facts(P).
 %
 mpred_get_support_precanonical_plus_more(P,Sup):- 
   mpred_get_support_one(P,Sup)*->true;
-  ((to_addable_form_wte(mpred_get_support_precanonical_plus_more,P,PE),!,
+  ((fully_expand(mpred_get_support_precanonical_plus_more,P,PE),!,
     P\=@=PE,mpred_get_support_one(PE,Sup))).
 
 %% mpred_get_support_one( +P, ?Sup) is semidet.
@@ -1630,14 +1464,14 @@ support_ok_via_clause_body(H,F,A):- should_call_for_facts(H,F,A).
 %
 % PFC Get Support Precanonical.
 %
-mpred_get_support_precanonical(F,Sup):-to_addable_form_wte(mpred_get_support_precanonical,F,P),mpred_get_support(P,Sup).
+mpred_get_support_precanonical(F,Sup):-fully_expand(mpred_get_support_precanonical,F,P),mpred_get_support(P,Sup).
 
 %% spft_precanonical( +F, ?SF, ?ST) is semidet.
 %
 % Spft Precanonical.
 %
 
-spft_precanonical(F,SF,ST):- to_addable_form_wte(spft_precanonical,F,P),!,mpred_get_support(P,(SF,ST)).
+spft_precanonical(F,SF,ST):- fully_expand(spft_precanonical,F,P),!,mpred_get_support(P,(SF,ST)).
 
 
 %% trigger_supporters_list( +U, :TermARG2) is semidet.
@@ -2685,20 +2519,13 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 :- module_transparent( (is_retract_first)/1).
 :- module_transparent( (mpred_is_taut)/1).
 :- module_transparent( (mpred_is_tautology)/1).
-:- module_transparent( (exact_args)/1).
-:- module_transparent( (to_predicate_isas0)/2).
-:- module_transparent( (append_as_first_arg)/3).
-:- module_transparent( (to_predicate_isas)/2).
-:- module_transparent( (to_predicate_isas_each)/2).
-:- module_transparent( (to_addable_form)/2).
-:- module_transparent( (reduce_clause_from_fwd)/2).
 :- module_transparent( (assert_eq_quitely)/1).
 :- module_transparent( (retract_eq_quitely_f)/1).
 :- module_transparent( (retract_eq_quitely)/1).
-:- module_transparent( (to_addable_form_wte)/3).
-:- module_transparent( (fix_negations)/2).
-:- module_transparent( (fixed_negations)/2).
-:- module_transparent( (is_nc_as_is)/1).
+
+
+
+
 :- module_transparent( (mpred_each_literal)/2).
 :- module_transparent( (has_functor)/1).
 :- module_transparent( (make_uu_remove)/1).
