@@ -109,7 +109,7 @@
 %%%
 %%%     pttp_prove(formula) - tries to pttp prove a formula
 %%%
-%%%   Look at the mudDescription of these functions
+%%%   Look at the description of these functions
 %%%   and the examples for more details on how
 %%%   pttp_assert and pttp_prove should be used.
 %%%   For more information on PTTP, consult

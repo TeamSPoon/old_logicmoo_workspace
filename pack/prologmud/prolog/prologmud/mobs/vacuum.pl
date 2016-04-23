@@ -20,7 +20,7 @@
 tCol(tVacuum).
 tCol(tVacuum).
 
-user:world_agent_plan(_World,Agent,Act):-
+world_agent_plan(_World,Agent,Act):-
    isa(Agent,tVacuum),
    vacuum_idea(Agent,Act).
 

@@ -85,7 +85,7 @@ start_agent_action_thread:-
    
 
 % restarts if it it died
-user:one_minute_timer_tick:- start_agent_action_thread.
+one_minute_timer_tick:- start_agent_action_thread.
 
 with_session(ID,CALL):-with_assertions(t_l:session_id(ID),CALL).
 
@@ -156,11 +156,11 @@ agent_call_command_now_3(Agent,CMD):-
    with_agent(Agent,
      with_assertions(t_l:side_effect_ok,
      with_assertions(t_l:agent_current_action(Agent,CMD),
-  (user:agent_call_command(Agent,CMD)*->true;user:agent_call_command_all_fallback(Agent,CMD))))),
+  (agent_call_command(Agent,CMD)*->true;agent_call_command_all_fallback(Agent,CMD))))),
   padd(Agent,mudLastCommand(CMD)).
 
-user:agent_call_command_all_fallback(Agent,CMD):- user:agent_call_command_fallback(Agent,CMD),!.
-% user:agent_call_command_all_fallback(Agent,CMD):-term_listing(CMD).
+agent_call_command_all_fallback(Agent,CMD):- agent_call_command_fallback(Agent,CMD),!.
+% agent_call_command_all_fallback(Agent,CMD):-term_listing(CMD).
 
 :-export(send_command_completed_message/4).
 send_command_completed_message(Agent,Where,Done,CMD):-
@@ -204,7 +204,7 @@ interesting_to_player(Type,Agent,C):- contains_var(C,Agent),dmsg(agent_database_
 interesting_to_player(Type,Agent,C):-is_asserted(localityOfObject(Agent,Region)),contains_var(C,Region),dmsg(region_database_hook(Type,C)),!.
 interesting_to_player(Type,Agent,C):-is_asserted(localityOfObject(Agent,Region)),is_asserted(localityOfObject(Other,Region)),contains_var(C,Other),!,dmsg(other_database_hook(Type,C)),!.
 
-user:decl_database_hook(Type,C):- current_agent(Agent),interesting_to_player(Type,Agent,C).
+decl_database_hook(Type,C):- current_agent(Agent),interesting_to_player(Type,Agent,C).
 
 get_agent_input_stream(P,In):-no_repeats(P-In,(get_agent_session(P,O),thglobal:session_io(O,In,_,_))).
 

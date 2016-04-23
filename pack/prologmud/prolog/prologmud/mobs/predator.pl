@@ -23,7 +23,7 @@
 
 
 tCol(tPredator).
-user:world_agent_plan(_World,Agent,Act):-
+world_agent_plan(_World,Agent,Act):-
    isa(Agent,tPredator),
    predator_idea(Agent,Act).
 

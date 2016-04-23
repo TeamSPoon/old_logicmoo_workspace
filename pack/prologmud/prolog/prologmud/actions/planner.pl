@@ -25,10 +25,10 @@ end_of_file.
 on_command_show(Agent,actLook,goals=SHOW):- findall(Value,agentGOAL(Agent,Value),SHOW),SHOW\==[].
 on_command_show(Agent,actLook,todo=SHOW):- findall(Value,agentTODO(Agent,Value),SHOW),SHOW\==[].
 
-user:action_info(actPlan(ftTerm),"carry out a plan").
+action_info(actPlan(ftTerm),"carry out a plan").
 
 % Plan something
-user:agent_call_command(Agent,actPlan(Goal)) :-
+agent_call_command(Agent,actPlan(Goal)) :-
    add(agentGOAL(Agent,Goal)),
    listing(agentGOAL(Agent,_)),
    pddl_idea(Agent,Act),

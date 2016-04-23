@@ -29,7 +29,7 @@ pddl_vette_idea(Agent,Act,Act):-dmsg(pddl_vette_idea(Agent,Act)).
 
 mudLabelTypeProps('oP',tPddlAgent,[]).
 
-user:world_agent_plan(_World,Agent,ActV):-
+world_agent_plan(_World,Agent,ActV):-
    tAgent(Agent),
    % isa(Agent,tPddlAgent),
    pddl_idea(Agent,Act),

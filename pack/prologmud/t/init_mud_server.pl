@@ -12,6 +12,7 @@
 
 :- user:ensure_loaded(logicmoo_repl).
 
+:- set_prolog_flag(gc,true).
 
 % [Mostly Required] Load the Logicmoo Parser/Generator System
 :- gripe_time(40,user:ensure_loaded(library(parser_all))).
@@ -34,13 +35,14 @@
 
 :- doall(show_call(current_prolog_flag(_N,_V))).
 
+:- break.
 
 % ==========================================================
 % Regression tests that first run whenever a person stats the MUD on the public server
 % ==========================================================
 
 :- if((gethostname(ubuntu),fail)). % INFO this fail is so we can start faster
-:- show_entry(gripe_time(40, doall(user:regression_test))).
+:- show_entry(gripe_time(40, doall(regression_test))).
 :- endif.
 
 
@@ -113,8 +115,8 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 
 :- file_begin(pl).
 
-% [Optionaly] Start the telent server
-start_telnet:- on_x_log_cont(toploop_telnet:start_mud_telnet_4000).
+% [Optionaly] Start the telent server % iCommanderdata66
+start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 
 :- initialization(start_telnet).
 
@@ -123,5 +125,5 @@ start_telnet:- on_x_log_cont(toploop_telnet:start_mud_telnet_4000).
 
 % :-  statistics(globallimit,G),statistics(locallimit,L),statistics(traillimit,T), qsave_program(run_mud_server,[map('run_mud_server.sav'),global(G),trail(T),local(L)]).
 
-:- write('\n?- user:ensure_loaded(start_mud_server). % to begin loading mud worlds').
+:- write('\n?- user:ensure_loaded(run_mud_game). % to begin loading mud worlds').
 % :- user:ensure_loaded(start_mud_server).

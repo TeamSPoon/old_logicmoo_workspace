@@ -17,10 +17,10 @@
 
 % orderedBy(tDropAble,tNearestReachableItem).
 
-user:action_info(actDrop(isOneOf([tDropAble,tNearestReachableItem,tObj,ftID])),"Drop an item").
+action_info(actDrop(isOneOf([tDropAble,tNearestReachableItem,tObj,ftID])),"Drop an item").
 
 % Drop something
-user:agent_call_command(Agent,actDrop(Obj)) :-
+agent_call_command(Agent,actDrop(Obj)) :-
 	mudPossess(Agent,Obj),
         mudAtLoc(Agent,LOC),
         clr(mudPossess(Agent,Obj)),
@@ -29,14 +29,14 @@ user:agent_call_command(Agent,actDrop(Obj)) :-
 	must(call_update_charge(Agent,actDrop)).
 
 %Nothing to drop
-user:agent_call_command(Agent,actDrop(_)) :-
+agent_call_command(Agent,actDrop(_)) :-
 	call_update_charge(Agent,actDrop),
 	(add_cmdfailure(Agent,actDrop)).
 
 % Record keeping
 update_charge(Agent,actDrop) :- add(mudEnergy(Agent, + -1)).
 
-% user:agent_text_command(Agent,[actDrop,X],Agent,actDrop(X)).
+% agent_text_command(Agent,[actDrop,X],Agent,actDrop(X)).
 
 %:-must_det(show_call(get_agent_text_command(agent1,[drop,item1],_R,_CMD))).
 

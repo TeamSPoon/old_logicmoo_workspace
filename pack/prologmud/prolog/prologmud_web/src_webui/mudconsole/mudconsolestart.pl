@@ -40,9 +40,9 @@ http_mud_server(Options) :-
 :- http_handler(mudconsole(game), game_handler, []).
 
 :- multifile
-        user:body//2.
+        body//2.
 
-user:body(game, Body) -->
+body(game, Body) -->
         html(body([ \html_requires(webfonts),
 		    \html_requires('/css/mudconsole.css'),
 		    div(id(top), h1('Logicmoo Game')),

@@ -92,6 +92,7 @@ mpred_call_only_facts/1,
 call_u_req/1,
 call_u/2,
 neg_in_code/1,
+neg_in_code/0,
 {}/1,
 trigger_supporters_list/2,
 spft_precanonical/3,
@@ -208,6 +209,7 @@ update_single_valued_arg/2,
 ruleBackward/2,
 retract_eq_quitely_f/1,
 neg_in_code/1,
+neg_in_code0/1,
 mreq/1,
 mpred_rule_hb/3,
 mpred_remove_file_support/1,
@@ -1501,11 +1503,11 @@ mpred_retry(G):- fail; notrace(G).
 %
 % Negated In Code.
 %
-neg_in_code(G):-var(G),!,fail.
-neg_in_code(call_u(G)):- !,~G.
-neg_in_code(~(G)):- nonvar(G),!, \+ ~G.
-neg_in_code(G):-   neg_may_naf(G), \+ call_u(G).
-neg_in_code(G):-  is_ftNonvar(G), prologSingleValued(G),must((if_missing_mask(G,R,Test),nonvar(R))),call_u(R),call_u(Test).
+neg_in_code(G):-nonvar(G),loop_check(neg_in_code0(G)).
+neg_in_code0(call_u(G)):- !,~G.
+neg_in_code0(~(G)):- nonvar(G),!,  \+ ~G .
+neg_in_code0(G):-   neg_may_naf(G), \+ call_u(G).
+neg_in_code0(G):-  is_ftNonvar(G), prologSingleValued(G),must((if_missing_mask(G,R,Test),nonvar(R))),call_u(R),call_u(Test).
 
 
 :- meta_predicate neg_may_naf(0).

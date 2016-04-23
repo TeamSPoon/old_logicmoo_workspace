@@ -12,7 +12,7 @@
 % ==============================
 % Load logicmoo REPL Base
 % ==============================
-:- asserta(user:load_mud_www).
+:- asserta(load_mud_www).
 :- user:ensure_loaded(library(logicmoo_user)).
 
 
@@ -27,13 +27,13 @@ setup_rl_read_history:-
 % Default Daemons
 % ==============================
 
-% :- user:use_module(library(persistency)).
+% :- use_module(library(persistency)).
 
-:- asserta(user:load_mud_www).
+:- asserta(load_mud_www).
 
 
 % [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/)
-:- if((fail , user:exists_source(library(eggdrop)))).
+:- if((fail , exists_source(library(eggdrop)))).
 :- ensure_loaded(library(eggdrop)).
 :- eggdrop:egg_go.
 :- initialization((current_predicate(egg_go/0)->egg_go;true),now).
@@ -41,12 +41,12 @@ setup_rl_read_history:-
 
 % [Required] Load the Logicmoo Base System
 :- time(user:ensure_loaded(logicmoo_user)).
-% :- meta_predicate user:testml(//).
+% :- meta_predicate testml(//).
 
 
 
 % [Optionaly] Load the Logicmoo WWW System
-:- if(if_defined(user:load_mud_www)).
+:- if(if_defined(load_mud_www)).
 /*
 :- (if_file_exists(user:ensure_loaded(logicmoo(mpred_online/logicmoo_i_www)))).
 :- (if_file_exists(user:ensure_loaded(library(logicmoo/logicmoo_run_pldoc)))).

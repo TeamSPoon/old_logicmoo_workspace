@@ -272,7 +272,7 @@
 :- multifile((lmconf:registered_mpred_file/1,lmconf:never_registered_mpred_file/1,lmconf:registered_module_type/2)).
 
 
-:- use_module(library(logicmoo_utils)).
+% :- use_module(library(logicmoo_utils)).
 
 
 
@@ -566,7 +566,7 @@ mpred_expander0(Type,LoaderMod,I,OO):-
            get_original_term_source(Orig), 
            b_setval('$orig_term',Orig),
            b_setval('$term',[]),
-           must(notrace((fully_expand(change(assert,ain),I,III)))),
+           must(((fully_expand(change(assert,ain),I,III)))),
            must((nonvar(III),mpred_expander_now_one(F,M,III,O))))))))),
     '$set_typein_module'(UM)),
   !,I\=@=O,O=OO.

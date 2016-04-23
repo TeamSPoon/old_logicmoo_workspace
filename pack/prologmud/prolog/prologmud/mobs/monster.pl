@@ -22,7 +22,7 @@
 
 tCol(tMonster).
 
-user:world_agent_plan(_World,Agent,Act):-
+world_agent_plan(_World,Agent,Act):-
    isa(Agent,tMonster),
    monster_idea(Agent,Act).
    

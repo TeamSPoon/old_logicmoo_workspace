@@ -20,9 +20,9 @@
 :- include(prologmud(mud_header)).
 
 :- thread_local was_test_name/1.
-:- multifile(user:mud_regression_test/0).
-:- multifile(user:mud_test_local/0).
-:- multifile(user:mud_test_full/0).
+:- multifile(mud_regression_test/0).
+:- multifile(mud_test_local/0).
+:- multifile(mud_test_full/0).
 
 :- meta_predicate test_call(+).
 :- meta_predicate run_mud_test(+,+).
@@ -40,14 +40,14 @@
 run_mud_tests:-
   forall(mud_test(Name,Test),run_mud_test(Name,Test)).
 
-user:action_info(actTests,"run run_mud_tests").
+action_info(actTests,"run run_mud_tests").
 
-user:agent_call_command(_Agent,actTests) :- scan_updates, run_mud_tests.
+a_command(_Agent,actTests) :- scan_updates, run_mud_tests.
 
 
-user:action_info(actTest(ftTerm),"run tests containing term").
+action_info(actTest(ftTerm),"run tests containing term").
 
-user:agent_call_command(Agent,actTest(Obj)):-foc_current_agent(Agent),run_mud_test(Obj).
+a_command(Agent,actTest(Obj)):-foc_current_agent(Agent),run_mud_test(Obj).
 
 
 test_name(String):-fmt(start_moo_test(mudNamed(String))),asserta(was_test_name(String)).
@@ -84,10 +84,11 @@ run_mud_test(Filter):-
    once(run_mud_test_clause(M:H,B)),
    fail)).
 
+:- (rtrace,trace).
 run_mud_test_clause(M:mud_test,B):- must((contains_term(test_name(Name),nonvar(Name)))),!, M:run_mud_test(Name,B).
 run_mud_test_clause(M:mud_test(Name),B):- !, M:run_mud_test(Name,B).
 run_mud_test_clause(M:mud_test(Name,Test),B):- forall(B,M:run_mud_test(Name,Test)).
-
+:- (notrace,nortrace).
 run_mud_test(Name,Test):-
    fmt(begin_mud_test(Name)),
    once(ccatch((test_call(Test),fmt(completed_mud_test(Name))),E,fmt(error_mud_test(E, Name)));fmt(actTests(incomplet_mud_test(Name)))).
@@ -223,7 +224,7 @@ hook:hooked_check_consistent(Obj,20):-must(object_string(_,Obj,0-5,String)),dmsg
 % mud_test("local sanity tests",  do_mud_test_locals).
 
 
-:- moo_hide_childs(dbase:record_on_thread/2).
+:- 'mpred_hide_childs'(dbase:record_on_thread/2).
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_flag_true(was_runs_tests_pl, at_start(run_setup)).
@@ -260,7 +261,7 @@ must_test("tests to see if poorly canonicalized code (unrestricted quantificatio
 mud_test_local :- at_start(must_det(run_mud_tests)).
 
 
-% :- forall(clause(user:mud_regression_test,Call),must(Call)).
+% :- forall(clause(mud_regression_test,Call),must(Call)).
 
 
 

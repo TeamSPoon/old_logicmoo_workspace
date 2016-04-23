@@ -22,7 +22,7 @@
 % ==============================
 
 %%% ON :- initialization( profiler(_,walltime) ).
-%%% ON :- initialization(user:use_module(library(swi/pce_profile))).
+%%% ON :- initialization(use_module(library(swi/pce_profile))).
 
 % [Required] Load the Logicmoo Library Utils
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).

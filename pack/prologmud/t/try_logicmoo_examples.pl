@@ -244,10 +244,10 @@ male(skArg1ofFatherFn(trudy)).
 
 
 %= we expect to see at least there mothers here
-%=  succeed(user: ~male(liana)).
-%=  succeed(user: ~male(trudy)).
-%=            succeed(user: ~male(skArg1ofMotherFn(trudy))).
-%=  succeed(user: ~male(eileen)).
+%=  succeed( ~male(liana)).
+%=  succeed( ~male(trudy)).
+%=            succeed( ~male(skArg1ofMotherFn(trudy))).
+%=  succeed( ~male(eileen)).
 
 %= thus ~/1 is tnot/1 of XSB ?!?
 

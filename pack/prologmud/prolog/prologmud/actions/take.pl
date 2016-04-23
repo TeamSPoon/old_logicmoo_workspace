@@ -18,7 +18,7 @@
 vtActionTemplate(actTake(tCarryAble)).
 
 % Command Hook
-user:agent_call_command(Agent,actTake(Obj)) :- 
+agent_call_command(Agent,actTake(Obj)) :- 
   not(action_verb_useable(actTake,_,_,_,_)),
   must(agent_call_take(Agent,Obj)).
 

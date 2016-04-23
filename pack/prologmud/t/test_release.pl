@@ -8,7 +8,7 @@
 % Setup Testing Options
 % ==============================
 
-:- asserta(user:load_mud_www).
+:- asserta(load_mud_www).
 :- asserta(t_l:verify_side_effect_buffer).
 :- asserta(skip_el_assertions).
 
@@ -84,13 +84,13 @@
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_startup_script(finish_processing_world).
 
-% user:sanity_test:- rescan_pfc.
+% sanity_test:- rescan_pfc.
 
 %:- rescan_pfc. 
 :-dmsg("About to run Sanity").
 
 
-:- show_entry(gripe_time(40,if_startup_script(doall(user:sanity_test)))).
+:- show_entry(gripe_time(40,if_startup_script(doall(sanity_test)))).
 
 
 feature_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
@@ -103,7 +103,7 @@ feature_testp1:- forall(parserTest(Where,String),assert_text(Where,String)).
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 
 % [Optionaly] Run a battery of tests
-% :- if_startup_script( doall(user:regression_test)).
+% :- if_startup_script( doall(regression_test)).
 
 
 sanity_test0a:- enqueue_agent_action("hide").
@@ -141,8 +141,8 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 
 
 
-:- multifile(user:push_env_ctx/0).
-:- dynamic(user:push_env_ctx/0).
+:- multifile(push_env_ctx/0).
+:- dynamic(push_env_ctx/0).
 
 push_env_ctx:-!,fail.
 push_env_ctx:-!.

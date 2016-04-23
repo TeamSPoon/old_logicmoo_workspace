@@ -22,14 +22,14 @@ vtActionTemplate(actAttack(vtDirection)).
 
 % Attack
 % Successful Attack
-user:agent_call_command(Agent,actAttack(Dir)) :-	
+agent_call_command(Agent,actAttack(Dir)) :-	
 	from_dir_target(Agent,Dir,XXYY),
 	mudAtLoc(What,XXYY),
 	damage_foe(Agent,What,hit),
 	call_update_charge(Agent,actAttack).
 
 % Destroy small objects (food, etc.)
-user:agent_call_command(Agent,actAttack(Dir)) :-	
+agent_call_command(Agent,actAttack(Dir)) :-	
 	from_dir_target(Agent,Dir,XXYY),
 	mudAtLoc(What,XXYY),	
 	props(What,mudWeight(1)),
@@ -37,7 +37,7 @@ user:agent_call_command(Agent,actAttack(Dir)) :-
 	call_update_charge(Agent,actAttack).
 
 % Hit a big object... causes damage to agent attacking
-user:agent_call_command(Agent,actAttack(Dir)) :-	
+agent_call_command(Agent,actAttack(Dir)) :-	
 	from_dir_target(Agent,Dir,XXYY),
 	mudAtLoc(What,XXYY),
 	props(What,mudWeight(_)),
@@ -45,7 +45,7 @@ user:agent_call_command(Agent,actAttack(Dir)) :-
 	call_update_charge(Agent,actAttack).
 
 % Hit nothing (empty space)... causes a little damage
-user:agent_call_command(Agent,actAttack(Dir)) :-
+agent_call_command(Agent,actAttack(Dir)) :-
 	from_dir_target(Agent,Dir,XXYY),
 	not(mudAtLoc(_,XXYY)),
 	call_update_stats(Agent,wiff),

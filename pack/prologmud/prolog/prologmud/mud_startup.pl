@@ -12,5 +12,5 @@
 %
 */
 
-:-pfc_untrace.
-:-pfc_no_spy_all.
+%:-pfc_untrace.
+%:-pfc_no_spy_all.

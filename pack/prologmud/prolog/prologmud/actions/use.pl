@@ -69,13 +69,13 @@ action_verb_useable(actStow,tStowAble,mudStowing,mudPossess,mudWielding).
 % action_verb_useable(actUse,mudUsing,tUseAble,mudPossess,mudPossess).
 
 
-user:action_info(Syntax,String):-
+action_info(Syntax,String):-
  no_repeats([Syntax],(
   action_verb_useable(ActUse,Wieldable,NowWielding,Possessing,Unstowed),
   Syntax=..[ActUse,isAnd([tNearestReachableItem,call(Possessing,isSelfAgent,isThis),Wieldable])])),
    sformat(String,'~w a ~w that you ~w so it will be ~w and not be ~w afterwards.',[ActUse,Wieldable,Possessing,NowWielding,Unstowed]).
 
-user:agent_call_command(Agent,Syntax) :- 
+agent_call_command(Agent,Syntax) :- 
     call((action_verb_useable(ActUse,_Wieldable,_NowWielding,_Possessing,_Unstowed),Syntax=..[ActUse,Obj])),
     agent_call_command_use(Agent,ActUse,Obj),!.
 

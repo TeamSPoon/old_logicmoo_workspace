@@ -28,7 +28,7 @@ tCol(tPrey).
 % :- dynamic memory/2. 
 %:- dynamic agent_list/1.
 
-user:world_agent_plan(_World,Self,Act):-
+world_agent_plan(_World,Self,Act):-
    isa(Self,tPrey),
    prey_idea(Self,Act).
    
@@ -64,7 +64,7 @@ prey_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tNut]).
 
 vtActionTemplate(actSpawn(tCol)).
 
-user:agent_call_command(_Agent,actSpawn(tPrey)):-actSpawn.
+a_command(_Agent,actSpawn(tPrey)):-actSpawn.
 
 actSpawn :-
 	maybe(10),

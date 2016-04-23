@@ -16,7 +16,7 @@
 :- file_begin(prolog).
 
 when_command_show(Agent,ActionType):- 
-  findall(Show,user:on_command_show(Agent,ActionType,Show),MORELOOK),
+  findall(Show,on_command_show(Agent,ActionType,Show),MORELOOK),
   (MORELOOK==[] -> true;
  (must(mudAtLoc(Agent,LOC)),show_kb_preds(Agent,LOC,MORELOOK))).
  
@@ -60,7 +60,7 @@ term_anglify_last(Head,English):-compound(Head),
 mudTermAnglify(A,B):-local_term_anglify(A,B).
 
 mudTermAnglify(Head,EnglishO):- compound(Head), 
-   Head=..[F|ARGS],user:mpred_prop(F,Info),
+   Head=..[F|ARGS],mpred_prop(F,Info),
    member(Info,[prologSingleValued,predArgMulti(_)]),   
    term_anglify_args(Head,F,1,ARGS,Info,English),eng_fully_expand(English,EnglishO),!.
 

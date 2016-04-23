@@ -30,6 +30,7 @@
 :- shared_multifile   thglobal:session_io/4, thglobal:session_agent/2, thglobal:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
 :- shared_multifile thglobal:session_io/4, thglobal:session_agent/2, thglobal:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
 
+:- shared_multifile   mudDescription/1.
 :- shared_multifile   term_specifier_text/2.
 :- shared_multifile   type_action_info/3.
 :- shared_multifile   update_charge/2.
@@ -47,8 +48,8 @@
 :- shared_multifile   action_info/2.
 :- shared_multifile   action_rules/4.
 :- shared_multifile   action_verb_useable/4.
-:- shared_multifile   agent_call_command/2.
-:- shared_multifile   agent_call_command_fallback/2.
+:- shared_multifile   a_command/2.
+:- shared_multifile   a_command_fallback/2.
 :- shared_multifile   agent_text_command/4.
 :- shared_multifile   check_permanence/4.
 
@@ -180,11 +181,11 @@
 :- shared_multifile   action_info/2.
 :- shared_multifile   action_rules/4.
 :- shared_multifile   action_verb_useable/4.
-:- shared_multifile   agent_call_command/2.
+:- shared_multifile   a_command/2.
 :- shared_multifile   agent_text_command/4.
 :- shared_multifile   check_permanence/4.
 
-:- file_begin(pfc).
+% :- file_begin(pfc).
 :- enable_mpred_expansion.
 
 

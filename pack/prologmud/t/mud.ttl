@@ -3497,7 +3497,7 @@ mud:agent
 mud:agentRoute
 	mud:mpred_arity 3 .
 
-mud:agent_call_command
+mud:a_command
 	mud:mpred_arity 2 ;
 	mud:mpred_prop mud:argsIsaInList .
 

@@ -20,12 +20,12 @@
 % :- register_module_type (mtCommand).
 
 % teleport
-user:action_info(actTeleport(isOptional(isAnd([tObj,isNot(tRegion)]),isSelfAgent),isOptionalStr("to"),isOptional(tRegion,isRandom(tRegion))),"teleport [obj] [to] [somewhere]").
+action_info(actTeleport(isOptional(isAnd([tObj,isNot(tRegion)]),isSelfAgent),isOptionalStr("to"),isOptional(tRegion,isRandom(tRegion))),"teleport [obj] [to] [somewhere]").
 
-user:verb_alias(tp,actTeleport).
+verb_alias(tp,actTeleport).
 
 %targeted
-user:agent_call_command(_Agent,actTeleport(Other,_TO,Where)):-
+agent_call_command(_Agent,actTeleport(Other,_TO,Where)):-
    coerce(Other,tObj,Target),
    coerce(Where,tRegion,Location),
    detatch_object(Target),

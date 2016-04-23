@@ -15,7 +15,7 @@
 
 %:-swi_module(world, [
 :-export((
-        agent_call_unparsed/2,
+        a_unparsed/2,
        % call_agent_action/2,
             %mud_isa/2,
             isa_any/2,
@@ -77,7 +77,7 @@
           create_agent/2)).
 
 :- dynamic  agent_list/1.
-:- dynamic mudDescription/2.
+:- import_to_user(mudDescription/2).
 
 :- include(prologmud(mud_header)).
 % :- register_module_type (utility).
@@ -117,7 +117,7 @@ anyInst(O):-exisitingThing(O).
 
 % meta_argtypes(typeGenls(col,metaclass)).
 
-%OLD user:decl_database_hook(change(assert,_),typeGenls(_,MC)):-assert_isa(MC,ttTypeType).
+%OLD decl_database_hook(change(assert,_),typeGenls(_,MC)):-assert_isa(MC,ttTypeType).
 
 % deduce_facts(typeGenls(T,MC),deduce_facts(genls(S,T),isa(S,MC))).
 
@@ -160,7 +160,7 @@ create_agent(P,List):-must_det(create_instance(P,tAgent,List)).
 create_instance(P):- must_det((isa(P,What),ttSpatialType(What))),must_det(create_instance(P,What,[])).
 :-export(create_instance/2).
 create_instance(Name,Type):-create_instance(Name,Type,[]).
-user:create_instance(Name,Type):-create_instance(Name,Type,[]).
+create_instance(Name,Type):-create_instance(Name,Type,[]).
 :-export(create_instance/3).
 create_instance(What,Type,Props):- 
   loop_check(time_call(create_instance_now(What,Type,Props)),dmsg(already_create_instance(What,Type,Props))).

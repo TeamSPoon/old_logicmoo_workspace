@@ -236,7 +236,7 @@ decl_mpred_prolog_ilc_0(_CM,M,PI,F/A):-
 %
 decl_mpred_hybrid(A):-not(compound(A)),!.
 decl_mpred_hybrid(M):-M=..[isEach|List],!,maplist(decl_mpred_hybrid,List).
-decl_mpred_hybrid(A):-!, must((with_pfa(m_fa_to_m_p_fa(decl_mpred_hybrid),A))),!.
+% decl_mpred_hybrid(A):-!, must((with_pfa(m_fa_to_m_p_fa(decl_mpred_hybrid),A))),!.
 decl_mpred_hybrid(P):- with_pi(P,decl_mpred_hybrid).
 
 :- was_export((decl_mpred_hybrid)/3).

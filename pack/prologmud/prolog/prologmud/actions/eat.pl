@@ -23,12 +23,12 @@
 % :- register_module_type (mtCommand).
 
 genls(tFood,tEatAble).
-user:action_info(actEat(tEatAble),"nourish oneself").
+action_info(actEat(tEatAble),"nourish oneself").
 
 % Eat something held
 % Check to make sure it's in the agents possession... 
 % if it is, process it's worth, then destroy it
-user:agent_call_command(Agent,actEat(Obj)) :-
+agent_call_command(Agent,actEat(Obj)) :-
 	mudPossess(Agent,Obj),
 	must((do_act_affect(Agent,actEat,Obj))),
         dmsg_show(_),

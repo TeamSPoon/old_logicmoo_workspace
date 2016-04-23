@@ -702,7 +702,8 @@ is_unit_functor(F):-atom_concat(_,'Fn',F).
 %
 % Get Rule Rewrite.
 %
-get_ruleRewrite(Sent,SentM):- cheaply_u(ruleRewrite(Sent,SentM)).
+% TODO - remove the fail (added just to speed up testing and initial debugging)
+get_ruleRewrite(Sent,SentM):- fail, cheaply_u(ruleRewrite(Sent,SentM)).
 
 
 
@@ -1365,7 +1366,7 @@ into_mpred_form(I,O):- hotrace(loop_check(into_mpred_form_ilc(I,O),O=I)). % trac
 %
 % Converted To Managed Predicate Form Inside Of Loop Checking.
 %
-into_mpred_form_ilc([F|Fist],O):-!,G=..[t|[F|Fist]], into_mpred_form(G,O).
+into_mpred_form_ilc([F|Fist],O):- is_list([F|Fist]),!,G=..[t|[F|Fist]], into_mpred_form(G,O).
 into_mpred_form_ilc(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form6(G,F,P,A,ARGS,O),!.
 
 % TODO confirm negations

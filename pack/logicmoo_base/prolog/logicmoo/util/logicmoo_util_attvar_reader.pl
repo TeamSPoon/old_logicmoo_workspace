@@ -101,7 +101,9 @@ deserialize_attvars(Vs, V,O):- nonvar(O),!,must(deserialize_attvars(Vs, V,M)),!,
 deserialize_attvars(Vs, V,O):- var(V), get_attr(V,vn,N),set_in_vd(Vs,N=V),!,V=O.
 deserialize_attvars(Vs, V,O):- var(V), member(N=VV,Vs),VV==V,put_attr(V,vn,N),!,V=O.
 deserialize_attvars(_ ,IO,IO):- \+ compound(IO),!.
-deserialize_attvars(_ ,(H:-BI),O):- split_attrs(BI,AV,BO),AV\==true,term_attvars((H:-BO),[]),must(call(AV)),!,(BO==true->(O=H);O=(H:-BO)).
+deserialize_attvars(_ ,(H:-BI),O):- 
+  split_attrs(BI,AV,BO),AV\==true,AV\=bad:_,term_attvars((H:-BO),[]),
+   must(call(AV)),!,(BO==true->(O=H);O=(H:-BO)).
 deserialize_attvars(Vs,avar(S),V):- nonvar(S),!, show_call(put_dyn_attrs(V,S)),ensure_named(Vs,V,_).
 deserialize_attvars(_ ,avar(V,_),V):- nonvar(V),!.
 deserialize_attvars(Vs,avar(V,S),V):- var(V),nonvar(S),!, show_call(put_dyn_attrs(V,S)),ensure_named(Vs,V,_N).

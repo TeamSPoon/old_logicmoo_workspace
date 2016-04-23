@@ -30,6 +30,7 @@ argIsa_call_or_undressed/4,
 compute_value/2,
 compute_value_no_dice/2,
 create_random_fact/1,
+swi_module/2,
 deduce_facts/2,
 fact_always_true/1,
 fact_is_false/2,
@@ -241,7 +242,7 @@ never_mpred_tcall(arity).
 
 
 :- shared_multifile create_random_fact/1.
-% :- shared_multifile decl_database_hook/2.
+% :- shared_multifile lmconf:decl_database_hook/2.
 :- shared_multifile deduce_facts/2.
 :- shared_multifile default_type_props/3.
 :- shared_multifile fact_always_true/1.
@@ -254,7 +255,7 @@ never_mpred_tcall(arity).
 
 :- shared_multifile session_io/4, session_agent/2, agent_session/2, telnet_fmt_shown/3, agent_action_queue/3.
 
-
+swi_module(M,Preds):- forall(member(P,Preds),export(P)),dmsg(swi_module(M)).
 
 
 :- shared_multifile(lmconf:startup_option/2).

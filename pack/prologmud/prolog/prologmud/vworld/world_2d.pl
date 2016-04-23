@@ -6,7 +6,7 @@
 % Dec 13,2035
 %
 */
-% :-swi_module(world_2d,[]).
+:-swi_module(world_2d,[]).
 
 :-export(((
          check_for_fall/3,
@@ -255,11 +255,12 @@ genls(tHumanBody,tBodyPart).
 
 predInterArgIsa(mudSubPart(tBodyPart,tBodyPart)).
 
-
+/* TODO Re-Enable 
 relationAllExists(mudSubPart,tHominid,tHumanBody).
 relationAllExists(mudSubPart,tHumanBody,tBodyPart).
 relationAllExists(mudSubPart,tHumanBody,isEach(tHumanHead,tHumanNeck,tHumanUpperTorso,tHumanLowerTorso,tHumanPelvis,tHumanArms,tHumanLegs)).
 relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
+*/
 
 predPredicateToFunction(Pred,SubjT,ObjT,FullNameFnO):- 
   is_asserted(predPredicateToFunction(Pred,SubjT,ObjT,FullNameFn)) *-> FullNameFnO=FullNameFn ; 
@@ -291,13 +292,13 @@ put_in_world(Obj):-random_xyzFn(LOC),add_fast(mudAtLoc(Obj,LOC)).
 
 
 
-% :-export user:decl_database_hook/2.
-:-export deduce_facts/2.
-:-export create_random_fact/1.
-:-export hooked_random_instance/3.
+% :-export decl_database_hook/2.  action_info
+:-export(deduce_facts/2).
+:-export(create_random_fact/1).
+:-export( hooked_random_instance/3).
 %:-export fact_always_true/1.
-:-export fact_maybe_deduced/1.
-:-export fact_is_false/2.
+:-export( fact_maybe_deduced/1).
+:-export( fact_is_false/2).
 :-dynamic fact_is_false/2.
 
 prologHybrid(mudInsideOf(tObj,tObj)).
@@ -310,8 +311,8 @@ prologHybrid(mudInsideOf(tObj,tObj)).
 
 % facts that must be true 
 %  suggest a deducable fact that is always defiantely true but not maybe asserted
-user:fact_always_true(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathDirLeadsTo(Region,Dir,_)).
-user:fact_always_true(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
+fact_always_true(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathDirLeadsTo(Region,Dir,_)).
+fact_always_true(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
 
 %  suggest a deducable fact that is probably true but not already asserted
 fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
@@ -460,7 +461,7 @@ any_to_dir(D,D):-pathDirLeadsTo(_,D,_),!.
 % prologHybrid(dir_offset(term,int,int,int,int)).
 
 
-:-pfc_spy_all.
+% :-mpred_trace_all.
 
 prologBuiltin(dir_offset/5).
 dir_offset(vUp,F,0,0,F).
@@ -475,7 +476,7 @@ dir_offset(vSE,F,F,F,0).
 dir_offset(vNW,F,-F,-F,0).
 dir_offset(vHere,_,0,0,0).
 
-:-pfc_no_spy_all.
+% :-mpred_no_spy_all. with_pfa
 
 % MergedNess -1,0,1 = contacting_at,inside,outside_near_on
 with_offset(detatched,F,X,Y,Z):-dir_offset(vHere,F,X,Y,Z).
@@ -495,7 +496,7 @@ facing_offset(behind,F,X,Y,Z):-dir_offset(vSouth,F,X,Y,Z).
 facing_offset(front,F,X,Y,Z):-dir_offset(vNorth,F,X,Y,Z).
 
 
-user:decl_database_hook(change( retract,_),mudAtLoc(Agent,_)):-padd(Agent,mudNeedsLook(vTrue)).
+lmconf:decl_database_hook(change( retract,_),mudAtLoc(Agent,_)):-padd(Agent,mudNeedsLook(vTrue)).
 
 % dir_mult(X,Y,Z,X1,Y1,Z1,X2,Y2,Z2):- X2 is X * X1,Y2 is Y * Y1,Z2 is Z * Z1.
 

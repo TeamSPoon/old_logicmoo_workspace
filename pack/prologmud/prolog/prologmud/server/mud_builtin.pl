@@ -68,7 +68,7 @@ isa(iWorld7,tWorld).
 
 % ==> neg(arity(bordersOn,1)).
 
-%user:ruleRewrite(isa(isInstFn(Sub),Super),genls(Sub,Super)):-ground(Sub:Super),!.
+%ruleRewrite(isa(isInstFn(Sub),Super),genls(Sub,Super)):-ground(Sub:Super),!.
 
 
 
@@ -162,7 +162,7 @@ formatted_resultIsa(ftDice(ftInt,ftInt,ftInt),ftInt).
 ==> tCol(ttSpatialType).
 ==> tCol(ttExpressionType).
 ==> tCol(functorDeclares).
-% tCol(ArgsIsa):-user:mpred_is_trigger(ArgsIsa).
+% tCol(ArgsIsa):-mpred_is_trigger(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
 ==> tCol(ttExpressionType).
@@ -257,7 +257,7 @@ tms_reject_why(mudAtLoc(R,_),isa(R,tRegion)):- isa(R,tRegion).
 
 %deduce_facts_forward(localityOfObject(_,Region),isa(Region,tSpatialThing)).
 deduce_facts_forward(localityOfObject(Obj,_),isa(Obj,tObj)).
-fix_argIsa(F,N,vtDirection(Val),vtDirection):-ain(user:mpred_prop(F,argSingleValueDefault(N,Val))),!.
+fix_argIsa(F,N,vtDirection(Val),vtDirection):-ain(mpred_prop(F,argSingleValueDefault(N,Val))),!.
 
 */
 
@@ -377,7 +377,7 @@ ttValueType(vtColor).
 
 ttValueType(VT)==>tInferInstanceFromArgType(VT).
 
-prologDynamic(user:verb_alias(ftString,vtVerb)).
+prologDynamic(verb_alias(ftString,vtVerb)).
 prologHybrid(typeHasGlyph(tCol,ftString)).
 prologHybrid(mudMaxHitPoints(tAgent,ftInt)).
 prologHybrid(mudStowing(tAgent,tItem)).
@@ -408,9 +408,9 @@ tCol(vtVerb).
 :- dynamic stat_total/2.
 :- dynamic(spawn_rate/2).
 tCol(tMonster).
-%prologDynamic(user:action_info(vtActionTemplate,ftText)).
-prologDynamic(agent_call_command(tAgent,ftAction)).
-prologSideEffects(agent_call_command(tAgent,ftAction)).
+%prologDynamic(action_info(vtActionTemplate,ftText)).
+prologDynamic(a_command(tAgent,ftAction)).
+prologSideEffects(a_command(tAgent,ftAction)).
 %prologBuiltin(member(ftTerm,ftTerm)).
 prologDynamic(mud_test(ftTerm,ftCallable)).
 prologDynamic(use_action_templates(ftTerm)).
@@ -449,7 +449,7 @@ prologMultiValued(mudCmdFailure(tAgent,ftAction)).
 tPred(isEach(tAgent/1, mudEnergy/2,mudHealth/2, mudAtLoc/2, failure/2, typeGrid/3, gridValue/4, isa/2, tItem/1, mudMemory/2, pathName/3, mudPossess/2, tRegion/1, mudScore/2, mudStm/2, mudFacing/2, localityOfObject/2, tThinking/1, mudWearing/2, mudFacing/2, mudHeight/2, act_term/2, nameStrings/2, mudDescription/2, pathDirLeadsTo/3, mudAgentTurnnum/2)).
 prologHybrid(mudToHitArmorClass0 / 2).
 prologHybrid(mudAtLoc/2).
-prologBuiltin((agent_call_command/2)).
+prologBuiltin((a_command/2)).
 :-shared_multifile(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
  pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completeExtentAsserted/1, ttExpressionType/1, typeProps/2)).
 prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
@@ -547,7 +547,7 @@ vtBasicDirPlusUpDown(vUp).
 %localityOfObject(Above,HasSurface):- mudLocOnSurface(Above,HasSurface).
 %localityOfObject(Clothes,Agent):- mudSubPart(Agent,Clothes).
 %localityOfObject(Inner,Container):- mudInsideOf(Inner,Container).
-%localityOfObject(Inner,Outer):- user:only_if_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
+%localityOfObject(Inner,Outer):- only_if_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
 nameStrings(apathFn(Region,Dir),Text):- pathName(Region,Dir,Text).
 meta_argtypes(mudMaterial(tSpatialThing,vtMaterial)).
 meta_argtypes(mudSize(tSpatialThing,vtSize)).
@@ -566,7 +566,7 @@ prologHybrid(pathDirLeadsTo(tRegion,vtDirection,tRegion)).
 prologHybrid(bordersOn(tRegion,tRegion),tSymmetricRelation).
 
 ttAgentType(tMonster).
-% user:instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
+% instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
 
 
 ==> tSpec(vtActionTemplate).
@@ -789,7 +789,7 @@ nonvar_must_be(V,G):- (var(V);G),!.
 pfc_slow((mudKeyword(Type,Str),tSet(Type),isa(I,Type)/(atom(I),ftID(I)) ==> mudKeyword(I,Str))).
 
 
-user:action_info(C,_)==>vtActionTemplate(C).
+action_info(C,_)==>vtActionTemplate(C).
 
 argsQuoted(cachedPredicate).
 

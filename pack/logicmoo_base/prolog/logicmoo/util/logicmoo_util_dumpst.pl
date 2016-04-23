@@ -331,6 +331,8 @@ simplify_m(G,G).
 fdmsg(fr(List)):-is_list(List),!,must((fresh_line,ignore(forall(member(E,List),fdmsg1(E))),nl)).
 fdmsg(M):- logicmoo_util_catch:ddmsg(failed_fdmsg(M)).
 
+:- thread_local(tlbugger:plain_attvars/0).
+
 :-export(simplify_goal_printed/2).
 
 %= 	 	 
@@ -346,7 +348,7 @@ printable_variable_name(Var, Name) :- format(atom(Name),'#~w',Var).
 
 %attrs_to_list(att(sk,_,ATTRS),[sk|List]):-!,attrs_to_list(ATTRS,List).
 attrs_to_list(att(vn,_,ATTRS),List):-!,attrs_to_list(ATTRS,List).
-attrs_to_list(att(M,V,ATTRS),[M=V|List]):-!,attrs_to_list(ATTRS,List).
+attrs_to_list(att(M,V,ATTRS),[M=VV|List]):- w_tl(tlbugger:plain_attvars,simplify_goal_printed(V,VV)),!,attrs_to_list(ATTRS,List).
 attrs_to_list([],[]).
 attrs_to_list(_ATTRS,[]).
 
@@ -357,6 +359,8 @@ attrs_to_list(_ATTRS,[]).
 
 simplify_goal_printed(Var,Name):-cyclic_term(Var),!,Name=Var.
 simplify_goal_printed(Var,Name):- get_attrs(Var,att(vn, _, [])),printable_variable_name(Var, Name),!.
+
+simplify_goal_printed(Var,'$avar'(Name)):- tlbugger:plain_attvars,must(printable_variable_name(Var,Name)),!.
 simplify_goal_printed(Var,'$avar'(Name,List)):- get_attrs(Var,ATTRS),must(printable_variable_name(Var,Name)),attrs_to_list(ATTRS,List).
 simplify_goal_printed(Var,Name):- is_ftVar(Var),!,printable_variable_name(Var, Name).
 simplify_goal_printed(setup_call_catcher_cleanup,sccc).

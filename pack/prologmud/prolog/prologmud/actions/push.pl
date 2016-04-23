@@ -22,7 +22,7 @@ vtActionTemplate(actPush(vtDirection)).
 % Push a box
 % Nothing to push... agent moves and takes a little damage.
 %Plus it still costs the same charge as if the agent did push something
-user:agent_call_command(Agent,actPush(Dir)) :-	
+agent_call_command(Agent,actPush(Dir)) :-	
 	mudAtLoc(Agent,LOC),
 	from_dir_target(LOC,Dir,XXYY),
 	mudAtLoc(What,XXYY),
@@ -33,7 +33,7 @@ user:agent_call_command(Agent,actPush(Dir)) :-
 
 % Pushing what cannot be pushed
 % Some damage and loss of charge (same as normal push)
-user:agent_call_command(Agent,actPush(Dir)) :-	
+agent_call_command(Agent,actPush(Dir)) :-	
 	mudAtLoc(Agent,LOC),
 	from_dir_target(LOC,Dir,XXYY),
 	mudAtLoc(What,XXYY),
@@ -42,7 +42,7 @@ user:agent_call_command(Agent,actPush(Dir)) :-
 	call_update_charge(Agent,actPush).
 
 % A successful PUSH
-user:agent_call_command(Agent,actPush(Dir)) :-	
+agent_call_command(Agent,actPush(Dir)) :-	
 	mudAtLoc(Agent,LOC),
 	from_dir_target(LOC,Dir,XXYY),
 	mudAtLoc(What,XXYY),

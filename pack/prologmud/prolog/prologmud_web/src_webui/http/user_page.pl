@@ -103,15 +103,15 @@ mud_page(_Request) :-
 actual_style(Style) :- style(name(Style)),!.
 actual_style(logicmoo).
 
-:- multifile user:head/4, user:body/4.
+:- multifile head/4, body/4.
 
 % fallback style
-user:head(logicmoo, Head) -->
+head(logicmoo, Head) -->
 	html(head([
 		 title('LogicMOO'),
 		 Head
 	     ])).
-user:body(logicmoo, Body) -->
+body(logicmoo, Body) -->
 	html(body([
 		 h1('LogicMOO MUD'),
 		 div(id(content), Body)

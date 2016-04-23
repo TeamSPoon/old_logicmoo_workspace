@@ -170,15 +170,16 @@ not_asserted(X):- \+ is_asserted(X).
 %
 % If Is A Asserted Using (==/2) (or =@=/2) ).
 %
-is_asserted_eq(HB):- copy_term(HB,HBC), is_asserted(HBC), HBC=@=HB.
+is_asserted_eq(HB):- copy_term(HB,HBC), is_asserted(HBC), HBC=@=HB,!.
 
 
 %% is_asserted( ?X) is semidet.
 %
-% If Is A Asserted.
+% If Is An Assertion
 %
 % TODO Convert loop checking to a "fresh" loop_check
-is_asserted(X):- no_repeats(loop_check(call_u(X))).
+is_asserted(X):- fully_expand(change(assert,is_asserted),X,Y),
+  no_repeats(loop_check(lookup_u(X))).
 
 
 

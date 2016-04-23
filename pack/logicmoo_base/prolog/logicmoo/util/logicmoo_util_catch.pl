@@ -237,7 +237,7 @@
 
 */
 
-:- if(\+ current_predicate(system:call_cleanup_each/2)).
+:- if(\+ current_predicate(system:must_or_die/1)).
 
 :- meta_predicate must_or_die(0),
                   must_atomic(0),

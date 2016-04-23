@@ -38,23 +38,23 @@ get_agent_text_command(Agent,VERBOrListIn,AgentR,CMD):-
 
 get_agent_text_command_0(Agent,ListIn,AgentR,CMD):- 
    (is_list(ListIn) -> UseList=ListIn ; UseList=[ListIn]),
-       call_no_cuts(user:agent_text_command(Agent,UseList,AgentR,CMD)).
+       call_no_cuts(agent_text_command(Agent,UseList,AgentR,CMD)).
 
 
 % ===========================================================
 % PARSE command
 % ===========================================================
-user:type_action_info(tHumanPlayer,actParse(ftProlog,ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
+type_action_info(tHumanPlayer,actParse(ftProlog,ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
 
-user:agent_call_command(_Gent,actParse(Type,StringM)):-
+a_command(_Gent,actParse(Type,StringM)):-
    parse_for(Type,StringM,_Term,_LeftOver).
 
 % ===========================================================
 % CMDPARSE command
 % ===========================================================
-user:type_action_info(tHumanPlayer,actCmdparse(ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: cmdparse take the blue backpack").
+type_action_info(tHumanPlayer,actCmdparse(ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: cmdparse take the blue backpack").
 
-user:agent_call_command(_Gent,actCmdparse(StringM)):- parse_for(ftAction,StringM,Term,LeftOver),fmt('=>'(parse_for(StringM) , [Term,LeftOver])).
+a_command(_Gent,actCmdparse(StringM)):- parse_for(ftAction,StringM,Term,LeftOver),fmt('==>'(parse_for(StringM) , [Term,LeftOver])).
 
 % mud_test("cmdparse test",...)
   
@@ -62,11 +62,11 @@ user:agent_call_command(_Gent,actCmdparse(StringM)):- parse_for(ftAction,StringM
 % ===========================================================
 % parsetempl command
 % ===========================================================
-user:type_action_info(tHumanPlayer,actParsetempl(ftListFn(ftTerm)),"Development test to see what verb phrase heads are found. (uses get_vp_templates/4)  Usage: parsetempl who").
+type_action_info(tHumanPlayer,actParsetempl(ftListFn(ftTerm)),"Development test to see what verb phrase heads are found. (uses get_vp_templates/4)  Usage: parsetempl who").
 
-user:agent_text_command(Agent,[actParsetempl|List],Agent,actParsetempl(List)).
+agent_text_command(Agent,[actParsetempl|List],Agent,actParsetempl(List)).
 
-user:agent_call_command(Agent,actParsetempl(StringM)):-
+a_command(Agent,actParsetempl(StringM)):-
   to_word_list(StringM,[SVERB|ARGS]),
   get_vp_templates(Agent,SVERB,ARGS,TEMPLATES),fmt(templates=TEMPLATES),
   ignore((
@@ -273,11 +273,11 @@ parse_agent_text_command(Agent,IVERB,ARGS,Agent,GOAL):-
 
 % try directly parsing first
 parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):- 
-   call_no_cuts(user:agent_text_command(Agent,[SVERB|ARGS],NewAgent,GOAL)),nonvar(NewAgent),nonvar(GOAL),!.   
+   call_no_cuts(agent_text_command(Agent,[SVERB|ARGS],NewAgent,GOAL)),nonvar(NewAgent),nonvar(GOAL),!.   
 
 % try indirectly parsing
 parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):- 
-   call_no_cuts(user:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)),ground(GOAL),nonvar(VERB),
+   call_no_cuts(agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)),ground(GOAL),nonvar(VERB),
    verb_matches(SVERB,VERB).
 
 parse_agent_text_command_0(Agent,SVERB,ARGS,Agent,GOAL):-
@@ -287,7 +287,7 @@ parse_agent_text_command_0(Agent,IVERB,ARGS,NewAgent,GOAL):-
    verb_alias_to_verb(IVERB,SVERB), IVERB\=SVERB,!,
    parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL).
 
-parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,actProlog(mpred_call(PROLOGTERM))):- compound(PROLOGTERM),functor(PROLOGTERM,F,_),user:mpred_prop(F,_),!.
+parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,actProlog(mpred_call(PROLOGTERM))):- compound(PROLOGTERM),functor(PROLOGTERM,F,_),mpred_prop(F,_),!.
 parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,actProlog(req(PROLOGTERM))):- compound(PROLOGTERM),is_callable(PROLOGTERM),!.
 
 :-export(parse_agent_text_command_1/5).
@@ -301,16 +301,16 @@ parse_agent_text_command_1(Agent,SVERB,ARGS,Agent,GOAL):-
    dmsg_parserm(parserm("chooseBestGoal"=GOAL)).
 
 
-user:verb_alias('i',actInventory).
-user:verb_alias('l',actLook).
-user:verb_alias('lo',actLook).
-user:verb_alias('s',actMove(vSouth)).
-% user:verb_alias('go','go').
-user:verb_alias('where is',actWhere).
+verb_alias('i',actInventory).
+verb_alias('l',actLook).
+verb_alias('lo',actLook).
+verb_alias('s',actMove(vSouth)).
+% verb_alias('go','go').
+verb_alias('where is',actWhere).
 
 % pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G183), 'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
 
-verb_alias_to_verb(IVERB,SVERB):- user:verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
+verb_alias_to_verb(IVERB,SVERB):- verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
 verb_alias_to_verb(IVERB,SVERB):- coerce(IVERB,vtVerb,SVERB), IVERB \= SVERB.
 
 subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R):- subst(TYPEARGS,isSelfAgent,Agent,S1),where_atloc(Agent,Here),subst(S1,vHere,Here,TYPEARGS_R).
@@ -326,7 +326,7 @@ get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
     ((
       get_all_templates(TEMPL),
      %isa(Agent,What),
-     %user:action_info(What,TEMPL,_),
+     %action_info(What,TEMPL,_),
      TEMPL=..[VERB|TYPEARGS],
      (verb_matches(SVERB,VERB)))),
      TEMPLATES_FA),
@@ -393,7 +393,7 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 
 
-=>pfcControlled(name_text_now(ftTerm,ftString)).
+'==>'(pfcControlled(name_text_now(ftTerm,ftString))).
 
 name_text(Name,Text):- nonvar(Text),!,name_text_now(Name,TextS),equals_icase(Text,TextS),!.
 name_text(Name,Text):- var(Name),!,mudKeyword(Name,Text).
@@ -402,9 +402,9 @@ name_text(Name,Text):- name_text_now(Name,Text).
 
 name_text_now_lc(I,O):-nonvar(I),name_text_now(I,M),!,toLowercase(M,O).
 
-:-ain((vtActionTemplate(AT)/(get_functor(AT,F))) => vtVerb(F)).
-:-ain(vtVerb(F)/name_text_now_lc(F,Txt)=>mudKeyword(F,Txt)).
-:-ain(tCol(F)/name_text_now_lc(F,Txt)=>mudKeyword(F,Txt)).
+:-ain((vtActionTemplate(AT)/(get_functor(AT,F))) ==> vtVerb(F)).
+:-ain(vtVerb(F)/name_text_now_lc(F,Txt)==>mudKeyword(F,Txt)).
+:-ain(tCol(F)/name_text_now_lc(F,Txt)==>mudKeyword(F,Txt)).
 
 :-dynamic(name_text_now/2).
 :-multifile(name_text_now/2).
@@ -425,16 +425,16 @@ name_text_atomic(Name,Text):-i_name_lc(Name,TextN),atom_string(TextN,Text).
 name_text_atomic(Name,Text):-atom_string(Name,Text).
 
 
-user:hook_coerce(TextS,vtDirection,Dir):-
+hook_coerce(TextS,vtDirection,Dir):-
   member(Dir-Text,[vNorth-"n",vSouth-"s",vEast-"e",vWest-"w",vNE-"ne",vNW-"nw",vSE-"se",vSW-"sw",vUp-"u",vDown-"d"]),
   (name_text(Dir,TextS);TextS=Text;atom_string(TextS,Text)).
 
-user:hook_coerce(Text,Subclass,X):- 
+hook_coerce(Text,Subclass,X):- 
    not(memberchk(Subclass,[vtDirection,tSpatialThing])),
    once((isa_asserted(X,Subclass),
    arg_to_var(ftText,Text,TextVar),
    req(mudKeyword(X,TextVar)),   
-   same_arg(ftText,TextVar,Text))). % dmsg(todo(user:hook_coerce(Text,Subclass))),impliedSubClass(Subclass,tSpatialThing).
+   same_arg(ftText,TextVar,Text))). % dmsg(todo(hook_coerce(Text,Subclass))),impliedSubClass(Subclass,tSpatialThing).
 
 
 phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):- % length(TYPEARGS,N),length(GOODARGS,N),!,
@@ -449,7 +449,7 @@ is_counted_for_parse(I):-t(tCountable,I),not(excluded_in_parse(I)),!.
 excluded_in_parse(apathFn(_, _)).
 excluded_in_parse(I):-tCol(I).
 excluded_in_parse(I):-ttExpressionType(I).
-excluded_in_parse(I):-user:mpred_prop(_,meta_argtypes(I)).
+excluded_in_parse(I):-mpred_prop(_,meta_argtypes(I)).
 excluded_in_parse(apathFn(_ = _)).
 
 instance_for_parse(I):-is_counted_for_parse(I).
@@ -607,7 +607,7 @@ coerce0(isRandom(WhatNot),Type,Inst):- !, must((nonvar(WhatNot),to_arg_value(Wha
 coerce0(String,Type,Inst):- atomic(String),Type==tCol,i_name('t',String,Inst),is_asserted(tCol(Inst)),!.
 coerce0(Text,Type,Inst):- (no_repeats_old(call_no_cuts(hook_coerce(Text,Type,Inst)))).
 coerce0(String,Type,Inst):- ttExpressionType(Type),!,checkAnyType(change(assert,actParse),String,Type,AAA),Inst=AAA.
-%coerce0(String,Type,Longest) :- findall(Inst, (user:hook_coerce(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
+%coerce0(String,Type,Longest) :- findall(Inst, (hook_coerce(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 coerce0(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
 coerce0(String,Type,Inst):- not(string(String)),!,text_to_string(String,StringS),!,coerce0(StringS,Type,Inst).
 coerce0(String,isOneOf(Types),Inst):-!, member(Type,Types),coerce(String,Type,Inst),!.

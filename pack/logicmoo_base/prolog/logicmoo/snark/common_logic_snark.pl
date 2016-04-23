@@ -237,10 +237,11 @@ are_clauses_entailed(B):- unnumbervars(B,A),with_umt(map_each_clause(is_prolog_e
 %
 
 is_prolog_entailed(UCL):-clause_asserted(UCL),!.
+is_prolog_entailed(UCL):-clause_asserted_i(UCL),!.
+is_prolog_entailed(UCL):-show_failure(clause_asserted_u(UCL)),!.
 is_prolog_entailed(UCL):-clause(UCL,B),split_attrs(B,A,BB),must(A),BB.
 is_prolog_entailed(UCL):-clause(UCL,B,Ref),(B\==true->must(B);(trace,clause(HH,BB,Ref),dmsg(BB:-(UCL,HH)))),!.
-is_prolog_entailed(UCL):-show_failure(clause_asserted(UCL)),!.
-is_prolog_entailed(UCL):-trace,call_u(UCL),!.
+is_prolog_entailed(UCL):- wdmsg(warn(not_is_prolog_entailed(UCL))),!.
 
 
 %= 	 	 

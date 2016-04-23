@@ -10,7 +10,7 @@
 
 :- include(prologmud(mud_header)).
 
-:- user:use_module(logicmoo/util/logicmoo_util_dcg).
+:- use_module(logicmoo/util/logicmoo_util_dcg).
 
 :-discontiguous((translation_spo/6,parserTest/2,parserTest/3,translation_w//1)).
 :-dynamic((translation_spo/6,parserTest/2,parserTest/3,translation_w//1)).
@@ -209,7 +209,7 @@ assert_text(CtxIn,String):- get_ctx_isa(CtxIn,Ctx,CtxISA),!,assert_text(Ctx,CtxI
 assert_text(Ctx,CtxISA,String):-  
                             % context changed   and not the tWorld?                                                  % v this is for when there was no prior context
   (parserVars(context,Ctx0,_) -> (((Ctx0 \==Ctx),CtxISA\==tWorld) -> (asserta_parserVars(isThis,Ctx,CtxISA)); true) ; (asserta_parserVars(isThis,Ctx,CtxISA))), 
-    with_assertions(parserVars(context,Ctx,CtxISA),assert_text_now(Ctx,CtxISA,String)).
+    w_tl(parserVars(context,Ctx,CtxISA),assert_text_now(Ctx,CtxISA,String)).
 
 assert_text_now(Ctx,CtxISA,String):-   
  logOnFailureIgnore(( 
@@ -241,11 +241,11 @@ translation_for(Ctx,CtxISA,t(M,Prolog),WS,WE):- once((append(LeftSide,RightSide,
    append(Left,RightSide,NewWS))),
    translation_w(Prolog,NewWS,WE),!.
 translation_for(Ctx,CtxISA,Prolog) --> translation_w(Prolog).
-translation_for(Ctx,CtxISA,Prolog,WS,WE):-with_assertions(loosePass,translation_w(Prolog,WS,WE)).
+translation_for(Ctx,CtxISA,Prolog,WS,WE):-w_tl(loosePass,translation_w(Prolog,WS,WE)).
 
 
 translation_dbg_on_fail(Ctx,CtxISA,Prolog)-->translation_for(Ctx,CtxISA,Prolog),!.
-translation_dbg_on_fail(Ctx,CtxISA,Prolog,WS,WE):-with_assertions(debugPass,translation_for(Ctx,CtxISA,Prolog,WS,WE)).
+translation_dbg_on_fail(Ctx,CtxISA,Prolog,WS,WE):-w_tl(debugPass,translation_for(Ctx,CtxISA,Prolog,WS,WE)).
 
 %:-assertz_if_new(parserTest(iWorld7,"Buffy the Labrador retriever is lounging here, shedding hair all over the place.")).
 %:-assertz_if_new(parserTest(iWorld7,"You can also see a sugar candy doll house here.")).
@@ -254,12 +254,12 @@ mudKeyword(tItem,"thing").
 mudKeyword(isSelfRegion,"here").
 mudKeyword(tThing,"object").
 
-user:type_action_info(tHumanPlayer,actAddText(isOptional(tTemporalThing,isThis),ftText),"Development add some Text to a room.  Usage: addtext a sofa is in here").
+type_action_info(tHumanPlayer,actAddText(isOptional(tTemporalThing,isThis),ftText),"Development add some Text to a room.  Usage: addtext a sofa is in here").
 
 
-user:agent_call_command(Agent,actAddText(What,StringM)):- ground(What:StringM),
- with_assertions(parserVars(isThis,What,ftTerm),
-   with_assertions(parserVars(isSelfAgent,Agent,tAgent),   
+a_command(Agent,actAddText(What,StringM)):- ground(What:StringM),
+ w_tl(parserVars(isThis,What,ftTerm),
+   w_tl(parserVars(isSelfAgent,Agent,tAgent),   
        must(assert_text(What,StringM)))).
 
 

@@ -1,3 +1,29 @@
+
+:- module(mud_telnet, [
+         telnet_server/2,
+         setup_streams/2,
+         set_tty_control/1,
+         player_connect_menu/4,
+         look_brief/1,
+         cmdShowRoomGrid/1,
+         inst_label/2,
+         display_grid_labels/0,
+         telnet_repl_writer/4,
+         telnet_repl_obj_to_string/3,
+         start_mud_telnet_4000/0,
+         start_mud_telnet/1,
+         run_session/0,
+         run_session/2,
+         login_and_run/0,
+         login_and_run/2,
+         session_loop/2,
+         get_session_io/2,
+         kill_naughty_threads/0,
+         set_player_telnet_options/1,
+         register_player_stream_local/3,
+         login_and_run_nodebug/0
+      ]).
+
 /** <module>  
 % Initial Telnet/Text console 
 % ALL telnet client business logic is here (removed from everywhere else!)
@@ -6,38 +32,17 @@
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
-*/
+*/ 
 
-:-module(mud_telnet, [                  
-                  telnet_server/2,
-                  setup_streams/2,
-                  set_tty_control/1,
-                  player_connect_menu/4,
-                  look_brief/1,
-                  cmdShowRoomGrid/1,
-                  inst_label/2,
-                  display_grid_labels/0,
-                  telnet_repl_writer/4,
-                  telnet_repl_obj_to_string/3,
-                  start_mud_telnet/1,
-                  run_session/0,
-                  run_session/2,
-                  login_and_run/0,
-                  login_and_run/2,
-                  session_loop/2,
-                  get_session_io/2,
-                  kill_naughty_threads/0,
-                  set_player_telnet_options/1,
-                  register_player_stream_local/3,
-                  login_and_run_nodebug/0]).
-
+:- '$set_source_module'(mud_telnet).
+:- '$set_typein_module'(mud_telnet).
 
 % learnLaterWhenToCallProceedure(What):- ... code ...
 
-%:-add(learnLaterWhenToCallProceedure(kill_naughty_threads)).
+%:-ain(learnLaterWhenToCallProceedure(kill_naughty_threads)).
 
-%:-add(unimpledTODO(learnLaterWhenToCallProceedure)).
-%:-add(unimpledTODO(codeWithTODONextToIt)).
+%:-ain(unimpledTODO(learnLaterWhenToCallProceedure)).
+%:-ain(unimpledTODO(codeWithTODONextToIt)).
 
 % instanceRecognizedBy(codeWithTODONextToIt,grovelSourceCodeLookingForComment).
 
@@ -54,11 +59,11 @@ sanify_thread(ID):-
      dmsg(killing_big_thread(ID,local,Size)), thread_exit(ID) )).
 
 
-:- meta_predicate toploop_telnet:show_room_grid_single(*,*,0).
+:- meta_predicate show_room_grid_single(*,*,0).
 
-:- include(prologmud(mud_header)).
+% :- include(prologmud(mud_header)).
 
-:- disable_mpreds_in_current_file.
+% :- disable_mpreds_in_current_file.
 
 % :- register_module_type (utility).
 
@@ -119,8 +124,8 @@ login_and_run(In,Out):-
   run_session(In,Out).
 
 set_player_telnet_options(P):-
-     add(repl_writer(P,telnet_repl_writer)),
-     add(repl_to_string(P,telnet_repl_obj_to_string)).
+     ain(repl_writer(P,telnet_repl_writer)),
+     ain(repl_to_string(P,telnet_repl_obj_to_string)).
 
 goodbye_player:- 
      foc_current_agent(P3),
@@ -183,7 +188,7 @@ set_tty_control(TF):-
    set_stream(user_input, tty(TF)),
    set_prolog_flag(tty_control, TF))))),!.
 
-user:deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
+deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
       foreach(no_repeats(get_agent_sessions(A,O)),
          foreach(no_repeats(thglobal:session_io(O,In,Out,Id)),
           fmtevent(Out,NewEvent))).
@@ -421,7 +426,7 @@ display_grid_labels :-
 :- source_location(S,_),forall(source_file(H,S),ignore((  \+ (predicate_property(H,PP),member(PP,[(multifile),built_in])),  
  functor(H,F,A),module_transparent(F/A),export(F/A)))).
   
-:- include(prologmud(mud_footer)).
+% :- include(prologmud(mud_footer)).
 
 
 
@@ -572,5 +577,4 @@ call_pred(Call, Options) :-
 	    !
 	;   Call = prolog
 	).
-
 

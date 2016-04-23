@@ -34,8 +34,8 @@
 mudCanSense(_Agent,visual,InList,InList,[]).
 
 
-user:action_info(actExamine(tItem), "view details of item (see also @ftListFn)").
-user:agent_call_command(_Gent,actExamine(SObj)):- term_listing(SObj).
+action_info(actExamine(tItem), "view details of item (see also @ftListFn)").
+agent_call_command(_Gent,actExamine(SObj)):- term_listing(SObj).
 
 visibleTo(Agent,Agent).
 visibleTo(Agent,Obj):-mudPossess(Agent,Obj).
@@ -44,26 +44,26 @@ visibleTo(Agent,Obj):-same_regions(Agent,Obj).
 
 tCol(txtPrepOf).
 tCol(txtPrepSpatial).
-user:hook_coerce(StrIn,txtPrepSpatial,Str):-member(Prep,[in,on,north_of,inside,onto,ontop]),name_text(Prep,StrIn),name_text(Prep,Str).
-user:hook_coerce(Prep,txtPrepSpatial,Inst):-user:hook_coerce(Prep,txtPrepOf,Inst).
-user:hook_coerce([SDir,of],txtPrepOf,vDirFn(Dir)):-user:hook_coerce(SDir,vtDirection,Dir).
+hook_coerce(StrIn,txtPrepSpatial,Str):-member(Prep,[in,on,north_of,inside,onto,ontop]),name_text(Prep,StrIn),name_text(Prep,Str).
+hook_coerce(Prep,txtPrepSpatial,Inst):-hook_coerce(Prep,txtPrepOf,Inst).
+hook_coerce([SDir,of],txtPrepOf,vDirFn(Dir)):-hook_coerce(SDir,vtDirection,Dir).
 
 ==> vtVerb(actLook).
 
-user:action_info(actLook, "generalized look in region").
-user:action_info(actLook(isOptionalStr("in"),isOptionalStr("here")), "generalized look in region").
-user:action_info(actLook(txtPrepOf,isOptionalStr("self")), "Look in a direction (TODO: look north of vHere)").
-user:action_info(actLook(isOptional(txtPrepSpatial,"at"),tObj),"look [in|at|on|under|at] somewhere").
-%user:action_info(look(obj), "Look at a speficific item").
-%user:action_info(look_at(isOptional(call(visibleTo(vHere,value)),call(visibleTo(vHere,value)))), "Look at a speficific item").
+action_info(actLook, "generalized look in region").
+action_info(actLook(isOptionalStr("in"),isOptionalStr("here")), "generalized look in region").
+action_info(actLook(txtPrepOf,isOptionalStr("self")), "Look in a direction (TODO: look north of vHere)").
+action_info(actLook(isOptional(txtPrepSpatial,"at"),tObj),"look [in|at|on|under|at] somewhere").
+%action_info(look(obj), "Look at a speficific item").
+%action_info(look_at(isOptional(call(visibleTo(vHere,value)),call(visibleTo(vHere,value)))), "Look at a speficific item").
 
-user:agent_call_command(Agent,actLook):- look_as(Agent),!.
-user:agent_call_command(Agent,actLook("here")):- look_as(Agent),!.
-user:agent_call_command(Agent,actLook(_,"here")):- look_as(Agent),!.
-user:agent_call_command(Agent,actLook(DirS,"self")):- coerce(DirS,vtDirection,Dir),!,
+agent_call_command(Agent,actLook):- look_as(Agent),!.
+agent_call_command(Agent,actLook("here")):- look_as(Agent),!.
+agent_call_command(Agent,actLook(_,"here")):- look_as(Agent),!.
+agent_call_command(Agent,actLook(DirS,"self")):- coerce(DirS,vtDirection,Dir),!,
    view_dirs(Agent,[[Dir,vHere],[Dir,Dir],[Dir,Dir,vAdjacent]],Percepts),
    forall_member(P,Percepts,agent_call_command_now(Agent,actExamine(P))).
-user:agent_call_command(Agent,actLook(_Dir,SObj)):-
+agent_call_command(Agent,actLook(_Dir,SObj)):-
    objects_match_for_agent(Agent,SObj,tObj,Percepts),
    forall_member(P,Percepts,agent_call_command_now(Agent,actExamine(P))).
 
@@ -75,9 +75,9 @@ cmdLook(Agent,LOC):- garbage_collect_atoms, call(cmdLook_proc,Agent,LOC),!.
 
 :-export(cmdLook_proc/3).
 cmdLook_proc(Agent,LOC):- 
-   with_no_modifications(with_assertions(user:mpred_prop(nameStrings,prologListValued),cmdLook_proc_0(Agent,LOC))).
+   with_no_modifications(with_assertions(mpred_prop(nameStrings,prologListValued),cmdLook_proc_0(Agent,LOC))).
 cmdLook_proc_0(Agent,LOC):-
- findall(Show,user:on_command_show(Agent,actLook,Show),MORELOOK),
+ findall(Show,on_command_show(Agent,actLook,Show),MORELOOK),
   % implicit in next command clr(props(Agent,mudNeedsLook(_))),
    add(props(Agent,mudNeedsLook(vFalse))),
      show_kb_preds(Agent,LOC,

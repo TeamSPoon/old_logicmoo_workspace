@@ -15,7 +15,7 @@
 % ====================================================
 % show the stats system
 % ====================================================
-user:action_info(actStats(isOptional(tObj,isSelfAgent)), "Examine MUD stats of something").
+action_info(actStats(isOptional(tObj,isSelfAgent)), "Examine MUD stats of something").
 
 tCol(tStatPred).
 tStatPred(isEach(
@@ -27,7 +27,7 @@ tStatPred(isEach(
          mudHeight)).
 
 
-user:agent_call_command(Agent,actStats(What)):-
+agent_call_command(Agent,actStats(What)):-
   findall(Pred, (tStatPred(Stat),Pred=..[Stat,Agent,value]),Stats),
    sort(Stats,StatsS),
    show_kb_preds(Agent,StatsS),!.
@@ -64,7 +64,7 @@ endurance, and sustained positioning and motion.
 your ability to command your own destiny.
 */
 
-user:action_info(actGrep(isOptional(ftTerm,isSelfAgent)), "Examine MUD listing of something").
-user:agent_call_command(_Gent,actGrep(Obj)):- term_listing(Obj).
+action_info(actGrep(isOptional(ftTerm,isSelfAgent)), "Examine MUD listing of something").
+agent_call_command(_Gent,actGrep(Obj)):- term_listing(Obj).
 
 :- include(prologmud(mud_footer)).

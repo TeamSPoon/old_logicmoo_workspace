@@ -344,14 +344,16 @@ make_shared_multifile(CM, M, F/A):-
 make_shared_multifile(CM, M, PI):- functor(PI,F,A),make_shared_multifile(CM, M, F/A).
 
 :-module_transparent(with_pfa/2).
+:-export(with_pfa/2).
 
-%= 	 	 
+%= 	 	 mudDescription decl_mpred_hybrid
 
 %% with_pfa( :PRED1With, +PI) is semidet.
 %
 % Using Pfa.
 %
-with_pfa(With, PI):- context_module_of_file(CM),with_pfa_group(only_3rd(With),CM, user, PI).
+with_pfa(With, PI):- 
+  context_module_of_file(CM),with_pfa_group(only_3rd(With),CM, user, PI).
 
 :-module_transparent(with_pfa/4).
 

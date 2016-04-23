@@ -68,7 +68,7 @@ defined_affordance([ subjType=tAgent, actionVerb= "LiveAtLeastAMinute",
    'Sad_To_Happy'= 0 * -2,
    'Comfort'= 0 * -2 ]).
 
-% TODO user:hook_one_minute_timer_tick:- \+ suspend_timers, forall(no_repeats(tAgent(X)),agent_call_command_now(X,actLiveAtLeastAMinute(X))).
+% TODO hook_one_minute_timer_tick:- \+ suspend_timers, forall(no_repeats(tAgent(X)),a_command_now(X,actLiveAtLeastAMinute(X))).
 
 defined_affordance([subjType= "Shower",
 actionVerb= "Operate",
@@ -507,7 +507,7 @@ to_rel_value( - Val,- Val):-!.
 to_rel_value( + Val,+ Val):-!.
 to_rel_value(Val,+ Val).
 
-user:world_agent_plan(_World,Agent,Act):-
+world_agent_plan(_World,Agent,Act):-
    (isa(Agent,tSimian);isa(Agent,tAgent)),
    simian_idea(Agent,Act).
 
@@ -531,19 +531,19 @@ args_match_types(TemplIn,Templ):-compound(TemplIn),!,TemplIn=..TemplInL, Templ=.
 args_match_types(Templ,Templ):-!.
 args_match_types(Obj,Type):-!,isa(Obj,Type).
 
-user:agent_call_command_fallback(Agent,TemplIn):-agent_call_command_simbots_real(Agent,TemplIn).
+a_command_fallback(Agent,TemplIn):-a_command_simbots_real(Agent,TemplIn).
 
-agent_call_command_simbots_real(Agent,actImprove(Trait)):- nonvar(Trait),
+a_command_simbots_real(Agent,actImprove(Trait)):- nonvar(Trait),
       findall(agentTODO(Agent,actDo(ActVerb,Types)),
         (verb_affordance(ActVerb,Types,Trait,+ Think,_Real),ThinkN is Think,ThinkN>0), NewAdds),
       show_call(forall(member(Add,NewAdds),add(Add))).
 
-agent_call_command_simbots_real(Agent,TemplIn):- nonvar(TemplIn), 
+a_command_simbots_real(Agent,TemplIn):- nonvar(TemplIn), 
    simbots_templates(Templ),
    args_match_types(TemplIn,Templ),
     must_det_l((
     affordance_side_effects(Agent,Templ,Template),
-    fmt(agent_call_command_simbots_real(Agent,Templ,Template)),
+    fmt(a_command_simbots_real(Agent,Templ,Template)),
     ignore(affordance_message(Agent,Templ,Template)))),!.
   
 
@@ -562,19 +562,19 @@ affordance_message(Agent,Templ,Template):- Templ=..[ActVerb|ARGS],
 verb_desc_or_else(ActVerb,Types,Mesg):-verb_desc(ActVerb,Types,Mesg).
 verb_desc_or_else(ActVerb,Types,verb_desc(ActVerb,Types)):-nonvar(ActVerb),nonvar(Types),not(verb_desc(ActVerb,Types,_)).
 
-user:agent_call_command(Agent,Templ):- simbots_templates(Templ), (fmt(agent_call_command_simbots_real_3(Agent,Templ)),fail).
+a_command(Agent,Templ):- simbots_templates(Templ), (fmt(a_command_simbots_real_3(Agent,Templ)),fail).
 
-user:action_info(actDo(vtVerb,ftListFn(ftTerm)),"reinterps a action").
-user:agent_call_command(Agent,actDo(A)):-CMD=..[A],!,user:agent_call_command(Agent,CMD).
-user:agent_call_command(Agent,actDo(A,B)):-CMD=..[A,B],!,user:agent_call_command(Agent,CMD).
-user:agent_call_command(Agent,actDo(A,B,C)):- CMD=..[A,B,C],!,user:agent_call_command(Agent,CMD).
-user:agent_call_command(Agent,actDo(A,B,C,D)):- CMD=..[A,B,C,D],!,user:agent_call_command(Agent,CMD).
-user:agent_call_command(Agent,actDo(A,B,C,D,E)):- CMD=..[A,B,C,D,E],!,user:agent_call_command(Agent,CMD).
+action_info(actDo(vtVerb,ftListFn(ftTerm)),"reinterps a action").
+a_command(Agent,actDo(A)):-CMD=..[A],!,a_command(Agent,CMD).
+a_command(Agent,actDo(A,B)):-CMD=..[A,B],!,a_command(Agent,CMD).
+a_command(Agent,actDo(A,B,C)):- CMD=..[A,B,C],!,a_command(Agent,CMD).
+a_command(Agent,actDo(A,B,C,D)):- CMD=..[A,B,C,D],!,a_command(Agent,CMD).
+a_command(Agent,actDo(A,B,C,D,E)):- CMD=..[A,B,C,D,E],!,a_command(Agent,CMD).
 
-user:action_info(actTextcmd(ftString),"reinterps a term as text").
-user:agent_call_command(Agent,actTextcmd(A)):-sformat(CMD,'~w',[A]),!,do_agent_action(Agent,CMD).
-user:agent_call_command(Agent,actTextcmd(A,B)):-sformat(CMD,'~w ~w',[A,B]),!,do_agent_action(Agent,CMD).
-user:agent_call_command(Agent,actTextcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,do_agent_action(Agent,CMD).
+action_info(actTextcmd(ftString),"reinterps a term as text").
+a_command(Agent,actTextcmd(A)):-sformat(CMD,'~w',[A]),!,do_agent_action(Agent,CMD).
+a_command(Agent,actTextcmd(A,B)):-sformat(CMD,'~w ~w',[A,B]),!,do_agent_action(Agent,CMD).
+a_command(Agent,actTextcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,do_agent_action(Agent,CMD).
 
 
 genls(tShelf,tHasSurface).
@@ -607,12 +607,12 @@ genls(tBathTub,tFurniture).
 genls(tFurniture,tUseAble).
 genls(tFurniture,tObj).
 
-user:verb_alias("observe",actUse).
-user:verb_alias("operate",actUse).
+verb_alias("observe",actUse).
+verb_alias("operate",actUse).
 
 
-user:action_info(Templ,DESC):-verb_desc(V,O,DESC),Templ=..[V,O].
-user:action_info(Templ,text([verb_for_type,V,O,DOC])):- no_repeats([V,O],verb_affordance(V,O,_,_,_)),Templ=..[V,O], 
+action_info(Templ,DESC):-verb_desc(V,O,DESC),Templ=..[V,O].
+action_info(Templ,text([verb_for_type,V,O,DOC])):- no_repeats([V,O],verb_affordance(V,O,_,_,_)),Templ=..[V,O], 
                   findall(pir(P,I,R),((verb_affordance(V, O,P,I,R))),DOC).
 
 simbots_templates(Templ):-no_repeats(simbots_templates0(Templ)).

@@ -12,12 +12,12 @@
 
 % :- register_module_type (mtCommand).
 
-user:action_info(actDrink(tDrinkAble),"Drink a Drinkable Item").
+action_info(actDrink(tDrinkAble),"Drink a Drinkable Item").
 
 % Drink something held
 % Check to make sure it's in the agents possession... 
 % if it is, process it's worth, then destroy it
-user:agent_call_command(Agent,actDrink(Obj)) :-
+agent_call_command(Agent,actDrink(Obj)) :-
 	mudPossess(Agent,Obj),
 	do_act_affect(Agent,actDrink,Obj),
 	clr(mudPossess(Agent,Obj)),

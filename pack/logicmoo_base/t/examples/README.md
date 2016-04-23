@@ -43,7 +43,7 @@ trap 'EXIT' 1 2 3 4 5 6 7 8 9
  
  ( 
   echo -e "\n\n%=%=% Test $1 %=%=%\n\n"
-  /usr/local/bin/swipl -f $1 -g "halt(7)." 
+  swipl -x lm_user -f $1 -g "halt(7)." 
   status=$?
   echostatus $status $1
   ) 2>&1 |

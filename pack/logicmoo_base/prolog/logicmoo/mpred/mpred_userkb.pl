@@ -116,6 +116,7 @@ mpred_module/2,
 mpred_univ/1,
 mpred_univ/3,
 mudKeyword/2,
+mudDescription/2,
 never_assert_u/2,
 never_assert_u0/2,
 never_retract_u/2,
@@ -200,11 +201,11 @@ t_l:user_abox(baseKB,baseKB).
 
 :- show_call(source_context_module(_CM)).
 
-:- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),baseKB:dynamic(baseKB:E)).
-:- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),decl_shared(E)).
 
 :- '$set_source_module'(baseKB).
 
+:- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),baseKB:dynamic(baseKB:E)).
+:- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),decl_shared(E)).
 :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),mpred_loader:import_to_user(baseKB:E)).
 
 
