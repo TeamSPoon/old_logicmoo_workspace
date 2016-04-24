@@ -21,6 +21,7 @@
          kill_naughty_threads/0,
          set_player_telnet_options/1,
          register_player_stream_local/3,
+         fmtevent/2,
          login_and_run_nodebug/0
       ]).
 
@@ -178,7 +179,8 @@ register_player_stream_local(P,In,Out):-
 
 %enqueue_session_action(A,[+, Text],S):- string(Text), must(assert_text(tWorld,Text)).
 %enqueue_session_action(A,[W0,W1|WL],S):- string(Text),!,enqueue_session_action(A,[actSay,[W0,W1|WL]],S).
-enqueue_session_action(A,L,S):- show_call(enqueue_agent_action(A,L,S)).
+enqueue_session_action(A,L,S):- show_call(enqueue_agent_action(A,L,S)),!.
+enqueue_session_action(A,L,S):- rtrace(enqueue_agent_action(A,L,S)),!.
 
 
 set_tty_control(TF):- 

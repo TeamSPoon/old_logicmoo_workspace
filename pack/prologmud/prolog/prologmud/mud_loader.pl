@@ -105,7 +105,6 @@ now_try_game_dir(Else):-
 :-context_module(CM),assert(loading_from_cm(CM)).
 create_module(M):-context_module(CM),module(M),asserta(M:this_is_a_module(M)),writeq(switching_back_to_module(M,CM)),module(CM).
 :-create_module(user).
-:-create_module(hook).
 :-create_module(t_l).
 :-create_module(thglobal).
 %:-create_module(moo).

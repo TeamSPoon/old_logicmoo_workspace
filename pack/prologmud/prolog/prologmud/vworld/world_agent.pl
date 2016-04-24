@@ -164,7 +164,7 @@ agent_call_command_all_fallback(Agent,CMD):- xlisting(CMD).
 
 :-export(send_command_completed_message/4).
 send_command_completed_message(Agent,Where,Done,CMD):-
-     ignore((must_det_l([flush_output,renumbervars(CMD,SCMD),Message =..[Done,Agent,SCMD],
+     ignore((must_det_l([flush_output,renumbervars_prev(CMD,SCMD),Message =..[Done,Agent,SCMD],
                 raise_location_event(Where,actNotice(reciever,Message)),flush_output]))),!.
 
 
@@ -244,7 +244,7 @@ get_session_id(IDIn):-guess_session_ids(ID),nonvar(ID),!,ID=IDIn.
 % return any thread locally set session
 guess_session_ids(ID):-t_l:session_id(ID).
 % irc session
-guess_session_ids(ID):-if_defined(chat_config:chat_isWith(_,ID)).
+guess_session_ids(ID):-if_defined_else(chat_config:chat_isWith(_,ID),true).
 % telnet session
 guess_session_ids(ID):-thread_self(TID),thglobal:session_io(ID,_,_,TID).
 % returns http sessions as well

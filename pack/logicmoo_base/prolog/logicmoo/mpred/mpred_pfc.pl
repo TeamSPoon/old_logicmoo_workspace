@@ -280,6 +280,7 @@ get_source_ref10(M):- fail,trace,
 
 is_source_ref1(_).
 
+fix_mp('~'(G0), M: '~'(CALL)):-nonvar(G0),!,fix_mp(G0,M:CALL).
 fix_mp(M:P,M:P):-!.
 fix_mp(MP,M:P):-  strip_module(MP,Cm,P),get_user_abox(U),!,
    (((modulize_head_fb(U,P,Cm,M:P),\+ predicate_property(M:P,static)))*-> true;
@@ -289,6 +290,7 @@ fix_mp(MP,M:P):-  strip_module(MP,Cm,P),get_user_abox(U),!,
 
 fix_mp_abox(G0,U,CALL):-must(fix_mp_abox0(G0,U,CALL)).
 
+fix_mp_abox0(~G0,U,~CALL):-nonvar(G0),!,fix_mp_abox0(G0,U,CALL).
 fix_mp_abox0(M:(G0:-B),U,(CALL:-B)):-nonvar(G0),!,fix_mp_abox0(M:G0,U,CALL).
 fix_mp_abox0((G0:-B),U,(CALL:-B)):-nonvar(G0),!,fix_mp_abox0(G0,U,CALL).
 fix_mp_abox0(G0,U,CALL):-

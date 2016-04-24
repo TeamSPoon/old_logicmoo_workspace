@@ -236,7 +236,7 @@ noncol_type('LogicalConnective').
 %
 never_type_why(V,ftVar(isThis)):-is_ftVar(V),!.
 never_type_why(M:C,Why):-atomic(M),!,never_type_why(C,Why).
-never_type_why(call_u,call_u(isThis)):-!.
+never_type_why(is_asserted,is_asserted(isThis)):-!.
 never_type_why(C,_):-a(tCol,C),!,fail. % already declared to be a type
 never_type_why(C,_):-isa(C,tCol),!,fail.
 never_type_why(C,noncol_type(T)):- noncol_type(T),a(T,C),!.
@@ -444,7 +444,7 @@ into_single_class(A,A).
 %
 transitive_subclass_or_same(A,B):- (is_ftVar(A),is_ftVar(B)),!,A=B.
 transitive_subclass_or_same(A,A):-nonvar(A).
-transitive_subclass_or_same(A,B):-call_u(genls(A,B)).
+transitive_subclass_or_same(A,B):-is_asserted(genls(A,B)).
 
 
 %= 	 	 
@@ -676,7 +676,7 @@ not_mud_isa(I,C):-loop_check(not_mud_isa(I,C,_)).
 %
 % not Application  (isa/2).
 %
-not_mud_isa(F, CAC,Why):- call_u(completelyAssertedCollection(CAC)),!,atom(CAC),current_predicate(_:CAC/1),G=..[CAC,F],\+((G)),!,Why=completelyAssertedCollection(CAC).
+not_mud_isa(F, CAC,Why):- is_asserted(completelyAssertedCollection(CAC)),!,atom(CAC),current_predicate(_:CAC/1),G=..[CAC,F],\+((G)),!,Why=completelyAssertedCollection(CAC).
 not_mud_isa(I,C,Why):-not_mud_isa0(I,C),Why=not_mud_isa0(I,C).
 not_mud_isa(G,tTemporalThing,Why):- ((a(tCol,G),Why=a(tCol,G));(tPred(G),Why=tPred(G))).
 not_mud_isa(G,tCol,Why):-never_type_why(G,Why).
@@ -732,7 +732,7 @@ isa_backchaing(I,T):- call_tabled(isa(I,T),no_repeats(loop_check(isa_backchaing_
 %  (isa/2) backchaing  Primary Helper.
 %
 isa_backchaing_0(I,T):- nonvar(T),is_ftVar(T),!,trace_or_throw(var_isa_backchaing(I,T)).
-isa_backchaing_0(I,T):-  nonvar(T),call_u(completelyAssertedCollection(T)),!,isa_asserted(I,T).
+isa_backchaing_0(I,T):-  nonvar(T),is_asserted(completelyAssertedCollection(T)),!,isa_asserted(I,T).
 isa_backchaing_0(I,T):-  nonvar(I),nonvar(T),!,no_repeats_old(transitive_subclass_or_same(AT,T)),isa_asserted(I,AT).
 isa_backchaing_0(I,T):-  is_ftVar(I),nonvar(T),!,no_repeats_old(transitive_subclass_or_same(AT,T)),isa_asserted(I,AT).
 isa_backchaing_0(I,T):-  sanity(nonvar(I)),isa_asserted(I,AT),transitive_subclass_or_same(AT,T).
@@ -813,9 +813,9 @@ type_deduced(I,T):-nonvar(I),not(number(I)),clause(a(P,_,I),true),(argIsa_known(
 %
 % compound  (isa/2).
 %
-compound_isa(F,_,T):- call_u(resultIsa(F,T)).
-compound_isa(_,I,T):- call_u(formatted_resultIsa(I,T)).
-compound_isa(_,I,T):- call_u(isa_asserted(I,T)).
+compound_isa(F,_,T):- is_asserted(resultIsa(F,T)).
+compound_isa(_,I,T):- is_asserted(formatted_resultIsa(I,T)).
+compound_isa(_,I,T):- is_asserted(isa_asserted(I,T)).
 
 
 %= 	 	 
@@ -880,7 +880,7 @@ isa_asserted_1(I,(T1 ; T2)):-!,nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),
 %
 %  (isa/2) w type atom.
 %
-isa_w_type_atom(I,T):- a(ttPredType,T),!,call_u(isa(I,T)).
+isa_w_type_atom(I,T):- a(ttPredType,T),!,is_asserted(isa(I,T)).
 isa_w_type_atom(_,T):- dont_call_type_arity_one(T),!,fail.
 isa_w_type_atom(I,T):- G=..[T,I],once_if_ground(isa_atom_call(T,G),_).
 
@@ -970,7 +970,7 @@ decl_type(Spec):- decl_type_unsafe(Spec),!.
 % Declare Type Unsafe.
 %
 decl_type_unsafe(Spec):- never_type_why(Spec,Why),!,trace_or_throw(never_type_why(Spec,Why)).
-decl_type_unsafe(Spec):- call_u(tCol(Spec))->true;(show_call(why,ain(tCol(Spec))),guess_supertypes(Spec)).
+decl_type_unsafe(Spec):- is_asserted(tCol(Spec))->true;(show_call(why,ain(tCol(Spec))),guess_supertypes(Spec)).
 
 
 
@@ -1066,7 +1066,7 @@ assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(
 %
 % guess  Types.
 %
-guess_types(W):- call_u(tried_guess_types_from_name(W)),!.
+guess_types(W):- is_asserted(tried_guess_types_from_name(W)),!.
 guess_types(W):- isa_from_morphology(W,What),!,ignore(guess_types(W,What)).
 
 
@@ -1097,7 +1097,7 @@ guess_types_0(W,ftID):-hotrace((atom(W),atom_concat(i,T,W),
 %
 % Guess Super Types.
 %
-guess_supertypes(W):- call_u(tried_guess_types_from_name(W)),!.
+guess_supertypes(W):- is_asserted(tried_guess_types_from_name(W)),!.
 guess_supertypes(W):- ain(tried_guess_types_from_name(W)),ignore((atom(W),guess_supertypes_0(W))).
 
 
@@ -1129,7 +1129,7 @@ ain_guess(G):-show_call(ain_guess,mpred_ain(G,(d,d))).
 %
 % Guess Type Types.
 %
-guess_typetypes(W):- call_u(tried_guess_types_from_name(W)),!.
+guess_typetypes(W):- is_asserted(tried_guess_types_from_name(W)),!.
 guess_typetypes(W):- ain(tried_guess_types_from_name(W)),ignore((atom(W),guess_typetypes_0(W))).
 
 

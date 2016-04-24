@@ -793,9 +793,9 @@ action_info(C,_)==>vtActionTemplate(C).
 
 argsQuoted(cachedPredicate).
 
-cachedPredicate(Goal)==>{forall(req1(Goal),ain(Goal))}.
+ttPredType(cachedPredicate).
+cachedPredicate(Goal)/predicate_to_goal(P,Goal)==>{forall(req1(Goal),ain(Goal))}.
 
-tCol(cachedPredicate).
 cachedPredicate(vtActionTemplate(_)).
 
 % from inform7

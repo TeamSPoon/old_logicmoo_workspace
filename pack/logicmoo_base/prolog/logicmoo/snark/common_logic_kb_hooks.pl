@@ -75,7 +75,7 @@
             kbp_t_list/3,
             kbp_t_list_0/3,
             kbp_t_list_1/3,
-            kbp_t_list_prehook/2,
+            % kbp_t_list_prehook/2,
             kbp_to_mpred_0/0,
             kbp_to_mpred_nomore/0,
             kbp_to_mpred_t/0,
@@ -666,6 +666,7 @@ cyckb_t_implies(ANTE,CONSEQ):- nop(cyckb_t_implies(ANTE,CONSEQ)),!,fail.
 %
 % Knowledge Base P- True Structure List Prehook.
 %
+:- decl_mpred_hybrid(kbp_t_list_prehook/2).
 kbp_t_list_prehook(PLIST,PLIST).
 
 :- was_export(kbp_t_list/1). 

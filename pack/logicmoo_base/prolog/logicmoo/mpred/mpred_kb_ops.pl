@@ -2216,6 +2216,9 @@ repropagate(F/A):- atom(F),is_ftVar(A),!,repropagate(F).
 repropagate(P):-  \+ predicate_property(_:P,_),dmsg(undefined_repropagate(P)),dumpST,dtrace,!,fail.
 repropagate(P):-  repropagate_0(P).
 
+predicate_to_goal(F,Goal):-atom(F),guess_arity(F,A),functor(Goal,F,A).
+predicate_to_goal(F/A,Goal):-atom(F),guess_arity(F,A),functor(Goal,F,A).
+predicate_to_goal(G,G):-compound(G),!.
 
 %% repropagate_0( +P) is semidet.
 %

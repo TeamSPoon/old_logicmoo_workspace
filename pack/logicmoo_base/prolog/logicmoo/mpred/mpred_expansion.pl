@@ -274,7 +274,8 @@ alt_calls(ireq).
 %
 show_doall(Call):- doall(show_call(why,Call)).
 
-cheaply_u(G):-lookup_u(G).
+cheaply_u(argsQuoted(G)):-!,lookup_u(argsQuoted(G)).
+cheaply_u(G):- (lookup_u(G)*->true;(call_with_depth_limit(call_u(G),30,N),number(N))).
 
 %= 	 	 
 
@@ -616,6 +617,7 @@ recommify(A,PredArgs,C):- PredArgs=..[P|Args],maplist(recommify,Args,AArgs),B=..
 % Converted To If Is A Term Primary Helper.
 %
 as_is_term(NC):- cyclic_break(NC), var(NC),!.
+as_is_term(A):-atomic(A),!.
 as_is_term('$VAR'(_)).
 as_is_term('$was_imported_kb_content$'(_,_)):-dtrace.
 as_is_term('wid'(_,_,_)).
@@ -678,6 +680,7 @@ additiveOp((/)).
 %
 % If Is A Unit.
 %
+is_unit(A):- atomic(A),!.
 is_unit(C):- mpred_get_attr(C,sk,_),!.
 is_unit(C):- var(C),!,fail.
 is_unit(C):- \+ compound(C),!.
@@ -1709,7 +1712,7 @@ exact_args(Q):-is_ftVar(Q),!,fail.
 exact_args(argsQuoted(_)):-!,fail.
 exact_args(==>(_,_)):-!,fail.
 exact_args(Q):- cheaply_u(argsQuoted(Q)).
-exact_args(Q):-is_ftCompound(Q),functor(Q,F,_),cheaply_u(argsQuoted(F)).
+exact_args(Q):-is_ftCompound(Q),functor(Q,F,_),lookup_u(argsQuoted(F)).
 exact_args(second_order(_,_)).
 exact_args(call(_)).
 exact_args(asserted(_)).

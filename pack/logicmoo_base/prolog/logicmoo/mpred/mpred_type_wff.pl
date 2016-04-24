@@ -1199,7 +1199,7 @@ function_to_predicate(Function,NewVar,PredifiedFunction):-
 
 function_to_predicate(Function,NewVar,PredifiedFunction):- 
   Function=..[F|ARGS],
-  call_u(function_corisponding_predicate(F,P)),
+  cheaply_u(function_corisponding_predicate(F,P)),
   fresh_varname(Function,NewVar),
   PredifiedFunction=..[P,NewVar|ARGS],!.
 

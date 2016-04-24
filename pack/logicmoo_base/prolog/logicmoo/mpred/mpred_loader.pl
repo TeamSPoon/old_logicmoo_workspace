@@ -539,8 +539,23 @@ mpred_prolog_only_file(File):- file_name_extension(_,pfc,File),!,fail.
 %
 % Managed Predicate Expander.
 %
-mpred_expander(Type,_,I,_):- notrace((\+ current_predicate(_,_:mpred_loader_file); Type \== term,Type \= _:term ); var(I);I=(_ --> _);current_prolog_flag(xref,true);t_l:disable_px),!,fail.
+mpred_expander(Type,_,I,_):- 
+ notrace(( 
+   var(I); I=(_ --> _) ; 
+   \+ current_predicate(_,_:mpred_loader_file); 
+   I= '$si$':'$was_imported_kb_content$'(_,_); 
+   (Type \== term , Type \= _:term ) ; 
+  current_prolog_flag(xref,true);
+  t_l:disable_px)),!,fail.
 mpred_expander(Type,DefMod,end_of_file,O):- !,Type = term, DefMod = user, do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
+
+/*
+mpred_expander(Type,LoaderMod,I,OO):- 
+  once(fully_expand(change(assert,ain),I,III)), 
+  III \=@=I, III=(_,_),
+  must(show_call(conjuncts_to_list(III,OO))),!.
+*/
+
 mpred_expander(Type,LoaderMod,I,OO):- 
   loop_check_term(mpred_expander0(Type,LoaderMod,I,O),I,fail),must(nonvar(O)),O=OO.
 
@@ -553,14 +568,12 @@ mpred_expander(Type,LoaderMod,I,OO):-
 %
 mpred_expander0(Type,LoaderMod,(I:-B),OO):- B==true,!,mpred_expander0(Type,LoaderMod,I,OO).
 mpred_expander0(Type,LoaderMod,I,OO):- 
- once(( 
- %  current_predicate(_:mpred_expansion_file/0),
   sanity((ground(Type:LoaderMod),nonvar(I),var(OO))),
-  I\= '$si$':'$was_imported_kb_content$'(_,_))),
+  
    '$set_source_module'(M,M),
   %   \+ mpred_prolog_only_module(M),
 
-   get_source_ref1(mfl(_,F,L)),   
+   must(get_source_ref1(mfl(_,F,L))),!,
    \+ mpred_prolog_only_file(F),
   
   '$module'(UM,M),  
@@ -2101,16 +2114,20 @@ mpred_term_expansion(MC,(:- cl_assert(ct(How),MC))):- strip_module(MC,M,C),hotra
 mpred_term_expansion((Fact:- BODY),(:- ((cl_assert(Dir,Fact:- BODY))))):- nonvar(Fact),
    mpred_term_expansion_by_pred_class(Dir,Fact,_Output),!.
 
+mpred_term_expansion((M:Fact:- BODY),(:- ((cl_assert(Dir,M:Fact:- BODY))))):- nonvar(Fact),
+   mpred_term_expansion_by_pred_class(Dir,Fact,_Output),!.
+
 %% mpred_term_expansion_by_pred_class( ?VALUE1, ?Fact, ?Output) is semidet.
 %
 % load file term Converted To command  Extended Helper.
 % Specific to the "*PREDICATE CLASS*" based default
 %
-      mpred_term_expansion_by_pred_class(pfc(pred_type),Fact,Output):- get_functor(Fact,F,_A),call_u(ttPredType(F)),Output='$si$':'$was_imported_kb_content$'(Fact,ttPredType(F)),!.
-      mpred_term_expansion_by_pred_class(pfc(func_decl),Fact,Output):- get_functor(Fact,F,_A),call_u(functorDeclares(F)),Output='$si$':'$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
-      mpred_term_expansion_by_pred_class(pfc(macro_head),Fact,Output):- get_functor(Fact,F,_A),call_u(prologMacroHead(F)),Output='$si$':'$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
-      mpred_term_expansion_by_pred_class(pfc(mpred_ctrl),Fact,Output):- get_functor(Fact,F,_A),call_u(pfcControlled(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
-      mpred_term_expansion_by_pred_class(pfc(hybrid),Fact,Output):- get_functor(Fact,F,_A),call_u(prologHybrid(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
+      mpred_term_expansion_by_pred_class(_,Fact,Output):- get_functor(Fact,F,_A),lookup_u(prologOnly(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!,fail.
+      mpred_term_expansion_by_pred_class(pfc(pred_type),Fact,Output):- get_functor(Fact,F,_A),lookup_u(ttPredType(F)),Output='$si$':'$was_imported_kb_content$'(Fact,ttPredType(F)),!.
+      mpred_term_expansion_by_pred_class(pfc(func_decl),Fact,Output):- get_functor(Fact,F,_A),lookup_u(functorDeclares(F)),Output='$si$':'$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
+      mpred_term_expansion_by_pred_class(pfc(macro_head),Fact,Output):- get_functor(Fact,F,_A),lookup_u(prologMacroHead(F)),Output='$si$':'$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
+      mpred_term_expansion_by_pred_class(pfc(mpred_ctrl),Fact,Output):- get_functor(Fact,F,_A),lookup_u(pfcControlled(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
+      mpred_term_expansion_by_pred_class(pfc(hybrid),Fact,Output):- get_functor(Fact,F,_A),lookup_u(prologHybrid(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
       mpred_term_expansion_by_pred_class(pfc(pl),Fact,Output):- get_functor(Fact,F,_A),(a(prologDynamic,F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
       % mpred_term_expansion_by_pred_class(pfc(in_mpred_kb_module),Fact,Output):- in_mpred_kb_module,Output=Fact,!.
 

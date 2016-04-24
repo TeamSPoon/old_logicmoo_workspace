@@ -148,7 +148,7 @@
 :- decl_mpred_hybrid thglobal:use_cyc_database/0.
 
 :- decl_mpred_hybrid   fact_is_false/2.
-:- decl_mpred_hybrid   kbp_t_list_prehook/2.
+:- decl_mpred_hybrid(kbp_t_list_prehook/2).
 
 
 % DYN KB
