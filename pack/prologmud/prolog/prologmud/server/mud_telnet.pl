@@ -239,7 +239,7 @@ code_list_to_next_command(end_of_file,end_of_file).
 code_list_to_next_command(NewCodes,Atom):-append(Left,[EOL],NewCodes),EOL<33,!,code_list_to_next_command(Left,Atom).
 code_list_to_next_command( [EOL|NewCodes],Atom):-EOL<33,!,code_list_to_next_command(NewCodes,Atom).
 code_list_to_next_command( [],actLook).
-code_list_to_next_command( [91|REST],TERM):- failOnError((atom_codes(A,[91|REST]),atom_to_term(A,TERM,[]))),!.
+code_list_to_next_command( [91|REST],TERM):- on_x_fail((atom_codes(A,[91|REST]),atom_to_term(A,TERM,[]))),!.
 code_list_to_next_command(NewCodes,Atom):-atom_codes(Atom,NewCodes),!.
 
 :-export(scan_src_updates/0).

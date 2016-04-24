@@ -14,7 +14,7 @@ tCol(vtOnOff).
 isa(vOn,vtOnOff).
 isa(vOff,vtOnOff).
 
-hook_coerce(Text,vtOnOff,ON_OFF):-text_to_string(Text,FLAG),to_on_off(FLAG,vOn,vOff,ON_OFF).
+impl_coerce_hook(Text,vtOnOff,ON_OFF):-text_to_string(Text,FLAG),to_on_off(FLAG,vOn,vOff,ON_OFF).
 
 t_f("vOn","vOff").
 t_f("t","f").

@@ -48,7 +48,7 @@ show_kb_preds(Agent,LOC,List):-
 show_kb_via_pred(_,_,[]).
 show_kb_via_pred(WPred,ToSTR,[L|List]):-!,must(show_kb_via_pred(WPred,ToSTR,L)),show_kb_via_pred(WPred,ToSTR,List),!.
 show_kb_via_pred(WPred,ToSTR,L):-!,no_loop_check( 
-   catch((ignore(show_call_failure(show_kb_via_pred_0(WPred,ToSTR,L)))),
+   catch((ignore(show_failure(show_kb_via_pred_0(WPred,ToSTR,L)))),
    E,dmsg(error_failed(E,show_kb_via_pred_0(WPred,L))))),!.
 
 

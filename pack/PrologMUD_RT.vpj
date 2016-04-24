@@ -62,20 +62,19 @@
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
 		<Folder Name="eggdrop">
-                        <F
-                                N="eggdrop/*.*"
-                                Recurse="1"
-                                Refilter="1"
-                                Excludes=".git/;*.*~;*~/"/>
-                </Folder>
+			<F
+				N="eggdrop/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes=".git/;*.*~;*~/"/>
+		</Folder>
 		<Folder Name="logtalk">
-                        <F
-                                N="logtalk/*.*"
-                                Recurse="1"
-                                Refilter="1"
-                                Excludes=".git/;*.*~;*~/"/>
-                </Folder>
-
+			<F
+				N="logtalk/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes=".git/;*.*~;*~/"/>
+		</Folder>
 		<Folder Name="trill_on_swish">
 			<F
 				N="trill_on_swish/*.*"

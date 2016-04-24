@@ -52,7 +52,7 @@ move_or_sit_memory_idea(Agent,actMove(Dir),[Outlet]) :-
 	(What == [];
 	What == [Outlet]).
 move_or_sit_memory_idea(Agent,actSit,_) :-
-        call_u(mudMemory(Agent,aDirectionsFn(Old))),
+        req1(mudMemory(Agent,aDirectionsFn(Old))),
 	del(mudMemory(Agent,aDirectionsFn(Old))),
 	random_permutation(Old,New),
 	ain(mudMemory(Agent,aDirectionsFn(New))).
@@ -63,7 +63,7 @@ command_actTick(Who):- (side_effect_prone),
    must(nonvar(Who)),
    with_agent(Who,
      must_det_l((
-      show_call_failure(current_agent(Who)),
+      show_failure(current_agent(Who)),
       command_actIdea(Who,IdeaS),
       my_random_member(Idea,IdeaS),!,
       do_agent_call_plan_command(Who,Idea)))).

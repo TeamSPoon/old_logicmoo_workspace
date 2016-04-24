@@ -42,14 +42,14 @@ move_command(Agent,actMove(Dir)):-!,move_command(Agent,actMove(1,Dir)).
 move_command(Agent,actMove(Dist,Dir)) :-
             move_command(Agent,Dir,Dist).
 
-get_move_dist(Agent,Dist):-call_u(mudMoveDist(Agent,Dist)),!.
+get_move_dist(Agent,Dist):-req1(mudMoveDist(Agent,Dist)),!.
 get_move_dist(_Gent,1).
 
 % Move thy agent
 move_command(Agent,DirS,DistS) :- 
    string_to_atom(DirS,Dir),
    any_to_number(DistS,Dist),
-   ccatch(doall((between(1,Dist,_),move_command_1(Agent,Dir))),giveup(_),true).
+   catch(doall((between(1,Dist,_),move_command_1(Agent,Dir))),giveup(_),true).
 
 
 

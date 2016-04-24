@@ -64,7 +64,7 @@ prey_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tNut]).
 
 vtActionTemplate(actSpawn(tCol)).
 
-a_command(_Agent,actSpawn(tPrey)):-actSpawn.
+agent_command(_Agent,actSpawn(tPrey)):-actSpawn.
 
 actSpawn :-
 	maybe(10),
@@ -84,8 +84,8 @@ spawn_prey(N) :-
        assert_isa(Prey,tPrey),
        get_instance_default_props(Prey,Traits),
 	\+ mudAgentTurnnum(Prey,_),
-         call_u(predInstMax(Prey,mudEnergy,NRG)),
-         call_u(predInstMax(Prey,mudHealth,Dam)),
+         req1(predInstMax(Prey,mudEnergy,NRG)),
+         req1(predInstMax(Prey,mudHealth,Dam)),
          clr(mudEnergy(Prey,_)),
          clr(mudHealth(Prey,_)),
          ain(mudEnergy(Prey,NRG)),

@@ -40,7 +40,7 @@ agent_call_take(Agent,_Obj) :-
 % or in the agent's possession.
 do_act_for_take(Agent,Obj) :-
 	do_change_for_take(Agent,Obj),!,
-        term_listing(Obj).
+        xlisting(Obj).
 
 do_change_for_take(_,Obj):-
         props(Obj,mudPermanence(actTake,Disappears)), 

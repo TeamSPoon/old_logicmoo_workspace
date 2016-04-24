@@ -288,7 +288,7 @@ was_runs_tests_pl:-is_startup_file('run_tests.pl').
 /*
 
 explorer(player1)> prolog statistics
-notice(you,begin(you,call_u(statistics)))
+notice(you,begin(you,req1(statistics)))
 statistics.
 188.523 seconds cpu time for 282,024,744 inferences
 1,004,265 atoms, 14,959 functors, 11,578 predicates, 176 modules, 268,104,937 VM-codes

@@ -50,7 +50,7 @@
 :- decl_mpred_hybrid   action_rules/4.
 :- decl_mpred_hybrid   action_verb_useable/4.
 :- decl_mpred_hybrid   agent_command/2.
-:- decl_mpred_hybrid   a_command_fallback/2.
+:- decl_mpred_hybrid   agent_command_fallback/2.
 :- decl_mpred_hybrid   agent_text_command/4.
 :- decl_mpred_hybrid   check_permanence/4.
 
@@ -123,7 +123,7 @@
 :- decl_mpred_hybrid   fact_is_false/2.
 :- decl_mpred_hybrid   fact_maybe_deduced/1.
 :- decl_mpred_hybrid   tms_reject_why/2.
-:- decl_mpred_hybrid   hook_coerce/3.
+:- decl_mpred_hybrid   impl_coerce_hook/3.
 
 :- decl_mpred_hybrid   create_random_fact/1.
 :- decl_mpred_hybrid   local_term_anglify/2.

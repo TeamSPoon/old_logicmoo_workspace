@@ -28,9 +28,9 @@
 	<CustomFolders>
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
-		<Folder Name="../../games">
+		<Folder Name="../games">
 			<F
-				N="../../games/*.*"
+				N="../games/*.*"
 				Recurse="1"
 				Refilter="0"
 				Excludes=".git/;*.*~;*~/"/>
@@ -85,8 +85,8 @@
 				Refilter="0"
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
-		<Folder Name="../../runtime">
-			<F N="../../runtime/README.md"/>
+		<Folder Name="runtime">
+			<F N="runtime/README.md"/>
 		</Folder>
 	</Files>
 </Project>

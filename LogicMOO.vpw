@@ -8,6 +8,5 @@
 		<Project File="pack/logicmoo_nlu/prolog/MUD_DeepParsing.vpj"/>
 		<Project File="pack/prologmud/PrologMUD.vpj"/>
 		<Project File="pack/PrologMUD_RT.vpj"/>
-		<Project File="runtime/PrologMUD_Runtime.vpj"/>
 	</Projects>
 </Workspace>

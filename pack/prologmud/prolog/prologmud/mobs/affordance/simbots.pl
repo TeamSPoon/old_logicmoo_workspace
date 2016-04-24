@@ -13,6 +13,8 @@
 :- include(prologmud(mud_header)).
 :- include(improve).
 
+tCol(tSimian).
+
 :- discontiguous(defined_affordance/1).
 
 % See the the seemingly white (not dirrectly usable) in some tUsefull way
@@ -68,7 +70,7 @@ defined_affordance([ subjType=tAgent, actionVerb= "LiveAtLeastAMinute",
    'Sad_To_Happy'= 0 * -2,
    'Comfort'= 0 * -2 ]).
 
-% TODO hook_one_minute_timer_tick:- \+ suspend_timers, forall(no_repeats(tAgent(X)),a_command_now(X,actLiveAtLeastAMinute(X))).
+% TODO hook_one_minute_timer_tick:- \+ suspend_timers, forall(no_repeats(tAgent(X)),agent_command_now(X,actLiveAtLeastAMinute(X))).
 
 defined_affordance([subjType= "Shower",
 actionVerb= "Operate",
@@ -521,7 +523,7 @@ simian_idea(Agent,Act):-
 % verb_affordance(Verb,Type,APred,Wants,Gets)
 choose_best(_Agent,CMDS,Act):-random_permutation(CMDS,[Act|_]).
 
-show_call_fmt(Call):-show_call_failure(Call),fmt(Call).
+show_call_fmt(Call):-show_failure(Call),fmt(Call).
 
 % args_match_types(ARGS,Types).
 args_match_types(In,Out):-In==[],!,Out=[].
@@ -531,19 +533,19 @@ args_match_types(TemplIn,Templ):-compound(TemplIn),!,TemplIn=..TemplInL, Templ=.
 args_match_types(Templ,Templ):-!.
 args_match_types(Obj,Type):-!,isa(Obj,Type).
 
-a_command_fallback(Agent,TemplIn):-a_command_simbots_real(Agent,TemplIn).
+agent_command_fallback(Agent,TemplIn):-agent_command_simbots_real(Agent,TemplIn).
 
-a_command_simbots_real(Agent,actImprove(Trait)):- nonvar(Trait),
+agent_command_simbots_real(Agent,actImprove(Trait)):- nonvar(Trait),
       findall(agentTODO(Agent,actDo(ActVerb,Types)),
         (verb_affordance(ActVerb,Types,Trait,+ Think,_Real),ThinkN is Think,ThinkN>0), NewAdds),
       show_call(forall(member(Add,NewAdds),ain(Add))).
 
-a_command_simbots_real(Agent,TemplIn):- nonvar(TemplIn), 
+agent_command_simbots_real(Agent,TemplIn):- nonvar(TemplIn), 
    simbots_templates(Templ),
    args_match_types(TemplIn,Templ),
     must_det_l((
     affordance_side_effects(Agent,Templ,Template),
-    fmt(a_command_simbots_real(Agent,Templ,Template)),
+    fmt(agent_command_simbots_real(Agent,Templ,Template)),
     ignore(affordance_message(Agent,Templ,Template)))),!.
   
 
@@ -562,19 +564,19 @@ affordance_message(Agent,Templ,Template):- Templ=..[ActVerb|ARGS],
 verb_desc_or_else(ActVerb,Types,Mesg):-verb_desc(ActVerb,Types,Mesg).
 verb_desc_or_else(ActVerb,Types,verb_desc(ActVerb,Types)):-nonvar(ActVerb),nonvar(Types),not(verb_desc(ActVerb,Types,_)).
 
-a_command(Agent,Templ):- simbots_templates(Templ), (fmt(a_command_simbots_real_3(Agent,Templ)),fail).
+agent_command(Agent,Templ):- simbots_templates(Templ), (fmt(agent_command_simbots_real_3(Agent,Templ)),fail).
 
 action_info(actDo(vtVerb,ftListFn(ftTerm)),"reinterps a action").
-a_command(Agent,actDo(A)):-CMD=..[A],!,a_command(Agent,CMD).
-a_command(Agent,actDo(A,B)):-CMD=..[A,B],!,a_command(Agent,CMD).
-a_command(Agent,actDo(A,B,C)):- CMD=..[A,B,C],!,a_command(Agent,CMD).
-a_command(Agent,actDo(A,B,C,D)):- CMD=..[A,B,C,D],!,a_command(Agent,CMD).
-a_command(Agent,actDo(A,B,C,D,E)):- CMD=..[A,B,C,D,E],!,a_command(Agent,CMD).
+agent_command(Agent,actDo(A)):-CMD=..[A],!,agent_command(Agent,CMD).
+agent_command(Agent,actDo(A,B)):-CMD=..[A,B],!,agent_command(Agent,CMD).
+agent_command(Agent,actDo(A,B,C)):- CMD=..[A,B,C],!,agent_command(Agent,CMD).
+agent_command(Agent,actDo(A,B,C,D)):- CMD=..[A,B,C,D],!,agent_command(Agent,CMD).
+agent_command(Agent,actDo(A,B,C,D,E)):- CMD=..[A,B,C,D,E],!,agent_command(Agent,CMD).
 
 action_info(actTextcmd(ftString),"reinterps a term as text").
-a_command(Agent,actTextcmd(A)):-sformat(CMD,'~w',[A]),!,do_agent_action(Agent,CMD).
-a_command(Agent,actTextcmd(A,B)):-sformat(CMD,'~w ~w',[A,B]),!,do_agent_action(Agent,CMD).
-a_command(Agent,actTextcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,do_agent_action(Agent,CMD).
+agent_command(Agent,actTextcmd(A)):-sformat(CMD,'~w',[A]),!,do_agent_action(Agent,CMD).
+agent_command(Agent,actTextcmd(A,B)):-sformat(CMD,'~w ~w',[A,B]),!,do_agent_action(Agent,CMD).
+agent_command(Agent,actTextcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,do_agent_action(Agent,CMD).
 
 
 genls(tShelf,tHasSurface).

@@ -41,7 +41,7 @@ enqueue_agent_action(P,C):-foc_current_agent(P),get_agent_session(P,O),enqueue_a
 :-export(enqueue_agent_action/3).
 :-dynamic(enqueue_agent_action/3).
 enqueue_agent_action(P,C,O):- immediate_session(P,C,O),!, do_agent_action(P,C,O).
-enqueue_agent_action(P,C,O):- assertz(agent_action_queue(P,C,O)),must(once(pfc_ain(agent_action_queue(P,C,O)))),!.
+enqueue_agent_action(P,C,O):- assertz(agent_action_queue(P,C,O)),must(once(ain(agent_action_queue(P,C,O)))),!.
 
 :-export(do_agent_action/1).
 do_agent_action(C):-enqueue_agent_action(C).
@@ -50,8 +50,8 @@ do_agent_action(P,C):-enqueue_agent_action(P,C).
 :-export(do_agent_action/2).
 do_agent_action(P,C,O):- \+ immediate_session(P,C,O), !, enqueue_agent_action(P,C,O).
 do_agent_action(P,C,_):- var(C),!,fmt('unknown_var_command(~q,~q).',[P,C]).
-do_agent_action(_,EOF,_):- end_of_file == EOF, !, tick_tock.
-do_agent_action(_,'',_):-!, tick_tock.
+do_agent_action(_,EOF,_):- end_of_file == EOF, !, npc_tick_tock.
+do_agent_action(_,'',_):-!, npc_tick_tock.
 do_agent_action(P,C,O):- do_gc,with_session(O,agent_call_unparsed(P, C)),!.
 do_agent_action(P,C,O):-wdmsg('skipping_unknown_player_action(~q,~q).~n',[P,C]),!.
 
@@ -65,7 +65,7 @@ parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):-
 parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- 
    debugging(parser), parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD).
 
-must_ac(G):- show_call_failure(must(G)).
+must_ac(G):- show_failure(must(G)).
 
 :-  message_queue_property(Queue, alias(waq)) -> true;message_queue_create(_,[alias(waq)]).
 
@@ -102,7 +102,7 @@ agent_call_unparsed_0(Agent,Var):-var(Var),trace_or_throw(var_agent_call_unparse
 
 % execute a prolog command including prolog/0
 agent_call_unparsed_0(_Gent,Atom):- atomic(Atom), catch((
-   (once((failOnError(read_term_from_atom(Atom,OneCmd,[variables(VARS)])),
+   (once((on_x_fail(read_term_from_atom(Atom,OneCmd,[variables(VARS)])),
       predicate_property(OneCmd,_),
       fmt('doing command ~q~n',[OneCmd]))),!, doall((OneCmd,fmt('Yes: ~w',[VARS]))))),E,(dmsg(E),fail)).
 
@@ -159,8 +159,8 @@ agent_call_command_now_3(Agent,CMD):-
   (agent_call_command(Agent,CMD)*->true;agent_call_command_all_fallback(Agent,CMD))))),
   padd(Agent,mudLastCommand(CMD)).
 
-agent_call_command_all_fallback(Agent,CMD):- agent_call_command_fallback(Agent,CMD),!.
-% agent_call_command_all_fallback(Agent,CMD):-term_listing(CMD).
+agent_call_command_all_fallback(Agent,CMD):- if_defined(agent_call_command_fallback(Agent,CMD)),!.
+agent_call_command_all_fallback(Agent,CMD):- xlisting(CMD).
 
 :-export(send_command_completed_message/4).
 send_command_completed_message(Agent,Where,Done,CMD):-
@@ -179,13 +179,13 @@ correctCommand_0(Who,CMD,OUT):-
    OUT=..[F|NEWS],!.
 
 correctCommand(_,CMD,CMD):-!.
-correctCommand(Who,CMD,OUT):-compound(CMD),show_call_failure(correctCommand_0(Who,CMD,OUT)),!.
+correctCommand(Who,CMD,OUT):-compound(CMD),show_failure(correctCommand_0(Who,CMD,OUT)),!.
 correctCommand(_,CMD,CMD).
 
 correctEachTypeOrFail( Who, F, Q,ARGS,TYPES,NEWS):- is_list(TYPES),!,maplist(correctEachTypeOrFail(Who,F,Q),ARGS,TYPES,NEWS).
 correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- not(is_ephemeral(Arg)),not(is_ephemeral(Type)),isa(Arg,Type),!,Inst = Arg.
 correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- not(is_ephemeral(Arg)),not(is_ephemeral(Type)), must(coerce(Arg,Type,Inst)),not(is_ephemeral(Inst)),!.
-correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- not(is_ephemeral(Arg)), show_call_failure(coerce(Arg,Type,Inst)),not(is_ephemeral(Inst)),!.
+correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- not(is_ephemeral(Arg)), show_failure(coerce(Arg,Type,Inst)),not(is_ephemeral(Inst)),!.
 correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- (coerce(Arg,Type,Inst)),not(is_ephemeral(Inst)),!.
 correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- !,acceptableArg(Arg,Type),!,Inst = Arg.
 
@@ -244,7 +244,7 @@ get_session_id(IDIn):-guess_session_ids(ID),nonvar(ID),!,ID=IDIn.
 % return any thread locally set session
 guess_session_ids(ID):-t_l:session_id(ID).
 % irc session
-guess_session_ids(ID):-if_defined(t_l:default_user(ID)).
+guess_session_ids(ID):-if_defined(chat_config:chat_isWith(_,ID)).
 % telnet session
 guess_session_ids(ID):-thread_self(TID),thglobal:session_io(ID,_,_,TID).
 % returns http sessions as well
@@ -303,10 +303,12 @@ become_player(_Old,NewName):-become_player(NewName).
 % Lists all the agents in the run. Except for other monsters.
 list_agents(Agents) :- agent_list(Agents), !.
 list_agents(Agents) :- % build cache
-	findall(NearAgent,call_u(tAgent(NearAgent)),Agents),
+	findall(NearAgent,req1(tAgent(NearAgent)),Agents),
 	assert(agent_list(Agents)),!.
 
 :-export((agent_into_corpse/1, display_stats/1)).
+
+tSet(tCorpse).
 
 % When an agent dies, it turns into a tCorpse.
 % corpse is defined as an object in the *.objects.pl files

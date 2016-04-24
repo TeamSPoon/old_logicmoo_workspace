@@ -87,7 +87,7 @@ write_string_if_contains(Must,E):-ignore((with_output_to(string(Str),show_templ_
 
 (vtActionTemplate(A),{nonvar(A),get_functor(A,Inst)} ==> isa(Inst,vtVerb)).
 
-hook_coerce(Text,vtVerb,Inst):- isa(Inst,vtVerb),name_text(Inst,Text).
+impl_coerce_hook(Text,vtVerb,Inst):- isa(Inst,vtVerb),name_text(Inst,Text).
 
 %agent_text_command(Agent,[Who],Agent,Cmd):- nonvar(Who), get_all_templates(Syntax),Syntax=..[Who,isOptional(_,Default)],Cmd=..[Who,Default].
 %agent_text_command(Agent,[Who,Type],Agent,Cmd):- get_all_templates(Syntax),nonvar(Who),Syntax=..[Who,isOptional(Type,_)],Cmd=..[Who,Type].

@@ -65,8 +65,8 @@ mudTermAnglify(Head,EnglishO):- compound(Head),
    term_anglify_args(Head,F,1,ARGS,Info,English),eng_fully_expand(English,EnglishO),!.
 
 
-term_anglify_args(Head,F,A,ARGS,predArgMulti(Which),English):- !,replace_nth(ARGS,Which,_OldVar,NewVar,NEWARGS),!,
-   NewHead=..[F|NEWARGS], findall(NewVar,call_u(NewHead),ListNewVar),list_to_set_safe(ListNewVar,SetNewVar),NewVar=ftListFn(SetNewVar),
+term_anglify_args(Head,F,A,ARGS,predArgMulti(Which),English):- !,replace_nth_arglist(ARGS,Which,_OldVar,NewVar,NEWARGS),!,
+   NewHead=..[F|NEWARGS], findall(NewVar,req1(NewHead),ListNewVar),list_to_set_safe(ListNewVar,SetNewVar),NewVar=ftListFn(SetNewVar),
    term_anglify_args(Head,F,A,NewHead,prologSingleValued,English).
 
 
@@ -82,11 +82,11 @@ term_anglify_args(_Head,F,A,ARGS0,prologSingleValued,English):- add_arg_parts_of
                eng_fully_expand(NEWARGS,English),!.
 
 /*
+*/
 unCamelCase(S,String):-any_to_string(S,Str),S\=Str,!,unCamelCase(Str,String),!.
 unCamelCase("",""):-!.
 unCamelCase(S,String):-sub_string(S,0,1,_,Char),sub_string(S,1,_,0,Rest),unCamelCase(Rest,RestString),string_lower(Char,NewChar),
 (Char\=NewChar->atomics_to_string(['_',NewChar,RestString],String);atomics_to_string([Char,RestString],String)),!.
-*/
 
 mudTermAnglify(verbFn(isa),[is,a]):-!.
 mudTermAnglify(verbFn(F),[is|UL]):-not(string_lower(F,F)),unCamelCase(F,U),atomics_to_string(UL,"_",U).
@@ -143,8 +143,8 @@ list_to_atomics_list0([],[]):-!.
 eng_fully_expand(I,O):-loop_check(transitive(eng_fully_expand_ilc,I,O),I=O).
 eng_fully_expand_ilc(I,O):-copy_term(I,C),flatten([C],FC),eng_fully_expand_0(FC,O).
 
-eng_fully_expand_0(FC,O):-ccatch(eng_fully_expand_1(FC,O),E,(trace,dmsg(exact_message(error_m(E,eng_fully_expand_1(FC,O)))),fail)),!.
-%eng_fully_expand_0(FC,O):-ccatch((trace,eng_fully_expand_1(FC,O)),_,fail).
+eng_fully_expand_0(FC,O):-catch(eng_fully_expand_1(FC,O),E,(trace,dmsg(exact_message(error_m(E,eng_fully_expand_1(FC,O)))),fail)),!.
+%eng_fully_expand_0(FC,O):-catch((trace,eng_fully_expand_1(FC,O)),_,fail).
 
 eng_fully_expand_1(A,B):-loop_check(eng_fully_expand_1_ilc(A,B),A=B).
 
@@ -286,7 +286,7 @@ local_term_anglify_np_last(Obj,_,["the",noun,with,token,Obj]):-!.
 anglify_noun_known(Obj,FT,String):- ttExpressionType(FT),correctFormatType(change(assert,_),Obj,FT,String),!.
 anglify_noun_known(StringO,_Hint, [StringO]).
 anglify_noun_known(Obj,_Hint,["right","here"]):- current_agent(Self),mudAtLoc(Self,Obj),!.
-anglify_noun_known(Obj,_Hint,["here"]):- current_agent(Self),call_u(localityOfObject(Self,Obj)),!.
+anglify_noun_known(Obj,_Hint,["here"]):- current_agent(Self),req1(localityOfObject(Self,Obj)),!.
 anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameStrings,Obj,String),List),List\=[],sort_by_strlen(List,[StringO|_]),!.
 %anglify_noun_known(Obj,_Hint,String):-
 %nameStrings(X,Y,_,_)
@@ -313,9 +313,9 @@ remove_description(mudDescription(I,S)):- dmsg(trace_or_throw(remove_description
 add_description(mudDescription(I,S)):-add_description(I,S).
 
 :-export(add_description/2).
-add_description(A,S0):-hooked_assertz(mudDescription(A,S0)),fail.
+add_description(A,S0):-ainz(mudDescription(A,S0)),fail.
 add_description(A,S0):- atomic(S0),string_concat('#$PunchingSomething ',S,S0),!,add_description(A,S).
-% add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),ain(determinerString(A,String)).
+% add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),ainz(determinerString(A,String)).
 add_description(A,S0):-
    any_to_string(S0,S),
    atomic_list_concat(Words,' ',S),
@@ -335,9 +335,9 @@ add_description(A,_S,_S0,1,_,[Word]):-add_description_word(A,Word),!.
 
 %#$PunchingSomething ..
 add_description(A,S,S0,Ws,Sents,['#$PunchingSomething',B|C]):-add_description(A,S,S0,Ws,Sents,[B|C]).
-add_description(A,S,S0,Ws,Sents,[Det,B|C]):-ddeterminer(Det,L),add_description(A,S,S0,Ws,Sents,[B|C]),hooked_assertz(determinerString(A,L)).
-add_description(A,S,S0,Ws,_Sents,_Words):-Ws>3,is_here_String(S),text_to_string(S0,String),!,hooked_assertz(descriptionHere(A,String)).
-add_description(A,_S,S0,_Ws,_Sents,_Words):- any_to_string(S0,String),hooked_assertz(mudDescription(A,String)).
+add_description(A,S,S0,Ws,Sents,[Det,B|C]):-ddeterminer(Det,L),add_description(A,S,S0,Ws,Sents,[B|C]),ainz(determinerString(A,L)).
+add_description(A,S,S0,Ws,_Sents,_Words):-Ws>3,is_here_String(S),text_to_string(S0,String),!,ainz(descriptionHere(A,String)).
+add_description(A,_S,S0,_Ws,_Sents,_Words):- any_to_string(S0,String),ainz(mudDescription(A,String)).
 
 is_here_String(S):- atomic_list_concat_safe([_,is,_,"here",_],S).
 is_here_String(S):- atomic_list_concat_safe([_,"here"],S).
@@ -353,12 +353,12 @@ ddeterminer0("the").
 ddeterminer(L,L):-ddeterminer0(L).
 ddeterminer(U,L):-string_lower(U,L),U\=L,!,ddeterminer0(L).
 
-add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),atom_concat(flagged_,Atom,FAtom),ain((isa(A,FAtom))).
-add_description_word(A,Word):- string_lower(Word,Word),ain((mudKeyword(A,Word))).
-add_description_word(A,Word):- string_lower(Word,Lower),ain((mudKeyword(A,Lower))).
+add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),atom_concat(flagged_,Atom,FAtom),ainz((isa(A,FAtom))).
+add_description_word(A,Word):- string_lower(Word,Word),ainz((mudKeyword(A,Word))).
+add_description_word(A,Word):- string_lower(Word,Lower),ainz((mudKeyword(A,Lower))).
 
 
 add_description_kv(A,K,V):- atom_concat('#$PunchingSomething ',Key,K),!,add_description_kv(A,Key,V).
 add_description_kv(A,K,V):- atom_concat('+',Key,K),!,add_description_kv(A,Key,V).
-add_description_kv(A,K,V):-atom_to_value(V,Term),C=..[K,A,Term],show_load_call(ain(C)).
+add_description_kv(A,K,V):-atom_to_value(V,Term),C=..[K,A,Term],show_load_call(ainz(C)).
 

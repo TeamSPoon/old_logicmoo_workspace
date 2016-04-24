@@ -107,10 +107,10 @@ do_act_use(ActUse,Agent,Obj) :-
 get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed):-     
  must_det_l([
      action_verb_useable(ActUse,Wieldable,NowWielding,Possessing,Unstowed),
-      show_call_failure(isa(Obj,Wieldable)),
-  %   show_call_failure(ireq(t(Unstowed,Agent,Obj))),
-  %   show_call_failure(not(ireq(t(NowWielding,Agent,Obj)))),
-     show_call_failure(ireq(t(Possessing,Agent,Obj)))]).
+      show_failure(isa(Obj,Wieldable)),
+  %   show_failure(ireq(t(Unstowed,Agent,Obj))),
+  %   show_failure(not(ireq(t(NowWielding,Agent,Obj)))),
+     show_failure(ireq(t(Possessing,Agent,Obj)))]).
 
 % Is the obect going to stick around after use-ing, either as is or in the agent's possession.
 do_change_use(ActUse,Agent,Obj,vTakenDeletes):-

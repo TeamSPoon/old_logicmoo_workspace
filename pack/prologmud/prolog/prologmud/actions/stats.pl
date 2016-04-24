@@ -31,7 +31,7 @@ agent_call_command(Agent,actStats(What)):-
   findall(Pred, (tStatPred(Stat),Pred=..[Stat,Agent,value]),Stats),
    sort(Stats,StatsS),
    show_kb_preds(Agent,StatsS),!.
-   %term_listing(What),!.
+   %xlisting(What),!.
 
 
 
@@ -65,6 +65,6 @@ your ability to command your own destiny.
 */
 
 action_info(actGrep(isOptional(ftTerm,isSelfAgent)), "Examine MUD listing of something").
-agent_call_command(_Gent,actGrep(Obj)):- term_listing(Obj).
+agent_call_command(_Gent,actGrep(Obj)):- xlisting(Obj).
 
 :- include(prologmud(mud_footer)).

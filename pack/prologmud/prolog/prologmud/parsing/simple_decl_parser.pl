@@ -55,7 +55,7 @@ typeGenls(ttValueType,vtValue).
 :-must(vtColor(vRed)).
 % :-must((isa(vRed,REDISA),genls(REDISA,vtValue))).
 
-toCol(Txt,I,TCOL):-member(TCOL,[tCol,tObj,tSpatialThing,vtValue,ttTypeType]),show_call_success(toCol_0(Txt,I,TCOL)),!.
+toCol(Txt,I,TCOL):-member(TCOL,[tCol,tObj,tSpatialThing,vtValue,ttTypeType]),show_success(toCol_0(Txt,I,TCOL)),!.
 
 toCol_0(Txt,O,TCOL):-member(Pfx-Sfx-ISACISA, 
          [

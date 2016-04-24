@@ -96,7 +96,7 @@ isaOrSame(A,B):-A==B,!.
 isaOrSame(A,B):-isa(A,B).
 
 intersect(A,EF,B,LF,Tests,Results):-findall( A-B, ((member(A,EF),member(B,LF),once(Tests))), Results),[A-B|_]=Results.
-% is_property(P,_A),PROP=..[P|ARGS],CALL=..[P,Obj|ARGS],call_u(CALL).
+% is_property(P,_A),PROP=..[P|ARGS],CALL=..[P,Obj|ARGS],req1(CALL).
 obj_memb(E,L):-is_list(L)->member(E,L);E=L.
 isa_any(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(A,B),_Results).
 prop_memb(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(A,B),_Results).
@@ -127,7 +127,7 @@ anyInst(O):-existingThing(O).
 
 %genls(SubType,formattype):-isa(SubType,formattype).
 
-%cached(G):-ccatch(G,_,fail).
+%cached(G):-catch(G,_,fail).
 
 
 tCol(ttNotSpatialType).
@@ -149,8 +149,8 @@ genls(tFood,tItem).
 % ttSpatialType(SubType):-member(SubType,[tAgent,tItem,tRegion]).
 %ttSpatialType(S):- is_asserted(ttSpatialType(T)), impliedSubClass(S,T).
 
-%createableSubclassType(S,T):-call_u(  ttSpatialType(T)),is_asserted(genls(S,T)).
-%createableSubclassType(T,tSpatialThing):-call_u( ttSpatialType(T)).
+%createableSubclassType(S,T):-req1(  ttSpatialType(T)),is_asserted(genls(S,T)).
+%createableSubclassType(T,tSpatialThing):-req1( ttSpatialType(T)).
 
 create_agent(P):-functor(P,isKappaFn,_),!.
 create_agent(P):-create_agent(P,[]).
@@ -170,11 +170,11 @@ create_instance_now(What,Type,Props):-
   must((var(Type);atom_concat('t',_,Type ))),!,
  w_tl(t_l:agenda_suspend_scans,
   w_tl(t_l:deduceArgTypes(_),
-  with_no_assertions(t_l:useOnlyExternalDBs,
-   with_no_assertions(t_l:noRandomValues(_),
-     with_no_assertions(t_l:infInstanceOnly(_),   
-      with_no_assertions(t_l:infAssertedOnly(_),
-        with_no_assertions(thglobal:use_cyc_database, 
+  wno_tl(t_l:useOnlyExternalDBs,
+   wno_tl(t_l:noRandomValues(_),
+     wno_tl(t_l:infInstanceOnly(_),   
+      wno_tl(t_l:infAssertedOnly(_),
+        wno_tl(thglobal:use_cyc_database, 
      ((split_name_type(What,Inst,_WhatType),assert_isa(Inst,Type), create_instance_0(What,Type,Props)))))))))).
 
 :-discontiguous create_instance_0/3.
@@ -277,8 +277,8 @@ create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dm
 
 
 
-% already convered mudPossess(Who,Thing):-genlInverse(W,mudPossess),into_mpred_form(t(W,Thing,Who),Call),call_u(Call).
-% already convered mudPossess(Who,Thing):-genlPreds(mudPossess,W),into_mpred_form(t(W,Who,Thing),Call),call_u(Call).
+% already convered mudPossess(Who,Thing):-genlInverse(W,mudPossess),into_mpred_form(t(W,Thing,Who),Call),req1(Call).
+% already convered mudPossess(Who,Thing):-genlPreds(mudPossess,W),into_mpred_form(t(W,Who,Thing),Call),req1(Call).
 
 
 % :- include(prologmud(mud_footer)).

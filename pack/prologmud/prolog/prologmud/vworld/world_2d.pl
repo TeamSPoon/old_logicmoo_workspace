@@ -270,7 +270,7 @@ predPredicateToFunction(Pred,SubjT,ObjT,FullNameFnO):-
 simplifyFullName(FullNameFn,FullNameFn).
 
 find_instance_of(Pred,Subj,Obj):- relationAllExists(Pred,SubjT,ObjT), isa(Subj,SubjT), 
- (is_asserted(t(Pred,Subj,Obj),isa(Obj,ObjT)) *-> true ; (predPredicateToFunction(Pred,SubjT,ObjT,PredFn), Obj =.. [PredFn,Subj])).
+ (is_asserted(t(Pred,Subj,Obj)),isa(Obj,ObjT)) *-> true ; (predPredicateToFunction(Pred,SubjT,ObjT,PredFn), Obj =.. [PredFn,Subj]).
 
 mudSubPart(Outer,Inner):-mudInsideOf(Inner,Outer).
 mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).
@@ -325,7 +325,8 @@ create_and_assert_random_fact(Fact):- fail,must(create_random_fact(Fact)),hooked
 create_random_fact(G) :- into_functor_form(t,G,MPred),G\=@=MPred,!,create_random_fact(MPred).
 create_random_fact(G) :- is_asserted(G),!,dmsg((create_random_fact(G) :- is_asserted(G))).
 create_random_fact(t(mudAtLoc,Obj,LOC)) :- !,nonvar(Obj),is_asserted(localityOfObject(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(mudAtLoc(Obj,LOC)))).
-create_random_fact(t(localityOfObject,Obj,Region)) :- !, nonvar(Obj),not_asserted((localityOfObject(Obj,_))),asserted_or_deduced(localityOfObject(Obj,Region)).
+create_random_fact(t(localityOfObject,Obj,Region)) :- !, nonvar(Obj),not_asserted((localityOfObject(Obj,_))),
+  if_defined(asserted_or_deduced(localityOfObject(Obj,Region))).
 create_random_fact(t(Other,Obj,Default)) :- nonvar(Obj),argIsa(Other,2,Type),random_instance_no_throw(Type,Default,ground(Default)),!.
 
 

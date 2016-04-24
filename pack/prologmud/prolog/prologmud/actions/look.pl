@@ -35,7 +35,7 @@ mudCanSense(_Agent,visual,InList,InList,[]).
 
 
 action_info(actExamine(tItem), "view details of item (see also @ftListFn)").
-agent_call_command(_Gent,actExamine(SObj)):- term_listing(SObj).
+agent_call_command(_Gent,actExamine(SObj)):- xlisting(SObj).
 
 visibleTo(Agent,Agent).
 visibleTo(Agent,Obj):-mudPossess(Agent,Obj).
@@ -44,9 +44,9 @@ visibleTo(Agent,Obj):-same_regions(Agent,Obj).
 
 tCol(txtPrepOf).
 tCol(txtPrepSpatial).
-hook_coerce(StrIn,txtPrepSpatial,Str):-member(Prep,[in,on,north_of,inside,onto,ontop]),name_text(Prep,StrIn),name_text(Prep,Str).
-hook_coerce(Prep,txtPrepSpatial,Inst):-hook_coerce(Prep,txtPrepOf,Inst).
-hook_coerce([SDir,of],txtPrepOf,vDirFn(Dir)):-hook_coerce(SDir,vtDirection,Dir).
+impl_coerce_hook(StrIn,txtPrepSpatial,Str):-member(Prep,[in,on,north_of,inside,onto,ontop]),name_text(Prep,StrIn),name_text(Prep,Str).
+impl_coerce_hook(Prep,txtPrepSpatial,Inst):-impl_coerce_hook(Prep,txtPrepOf,Inst).
+impl_coerce_hook([SDir,of],txtPrepOf,vDirFn(Dir)):-impl_coerce_hook(SDir,vtDirection,Dir).
 
 ==> vtVerb(actLook).
 

@@ -25,8 +25,8 @@ do_act_affect(Agent,Action,Obj) :-
 % Charge up those batteries
 do_act_affect(Agent,Action,Obj) :-
           props(Obj,mudActAffect(Action,mudEnergy(NRG))),
-	call_u(mudEnergy(Agent,Chg)),
-	call_u(mudStm(Agent,Stm)),
+	req1(mudEnergy(Agent,Chg)),
+	req1(mudStm(Agent,Stm)),
 	predInstMax(Agent,mudEnergy,Max),
 	(Chg + NRG) < (((Stm * 10) -20) + Max),
 	ain(mudEnergy(Agent,+NRG)),
@@ -34,10 +34,10 @@ do_act_affect(Agent,Action,Obj) :-
 % Heal
 do_act_affect(Agent,Action,Obj) :-
            props(Obj,mudActAffect(Action,heal(Hl))),
-	call_u((mudHealth(Agent,Dam),
+	req1((mudHealth(Agent,Dam),
              mudStm(Agent,Stm),
              mudStr(Agent,Str))),
-	call_u(predInstMax(Agent,mudHealth,Max)),
+	req1(predInstMax(Agent,mudHealth,Max)),
 	(Dam + Hl) < ((((Stm * 10) -20) + ((Str * 5) - 10)) + Max),
 	ain(mudEnergy(Agent,+Hl)),
 	!.
@@ -91,10 +91,10 @@ process_stats(Agent,mudHeight(Ht)) :-
 
 process_stats(Agent,mudStm(Stm)) :-
 	ain(mudStm(Agent,Stm)),
-	call_u(mudHealth(Agent,Dam)),
+	req1(mudHealth(Agent,Dam)),
 	NewDam is (((Stm * 10) - 20) + Dam),
 	ain(mudHealth(Agent,NewDam)),
-	call_u(mudEnergy(Agent,NRG)),
+	req1(mudEnergy(Agent,NRG)),
 	Charge is (((Stm * 10) - 20) + NRG),
 	ain(mudEnergy(Agent,Charge)),
 	ain(stat_total(Agent,+Stm)).
@@ -106,7 +106,7 @@ process_stats(Agent,mudSpd(Spd)) :-
 process_stats(Agent,Stat) :- ain(props(Agent,[Stat])).
 
 check_stat_total(Agent) :-
-	call_u(stat_total(Agent,Total)),
+	req1(stat_total(Agent,Total)),
 	Total > 12,!,
 	nl,
 	write('Agent '),

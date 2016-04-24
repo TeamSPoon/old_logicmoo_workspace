@@ -21,7 +21,7 @@ agent_text_command(Agent,["@_get",Prop0],Agent,actGet(Agent,Prop0)).
 agent_call_command(Agent,actSet(Obj0,Prop0,Value0)) :- coerce(Prop0,tPred,Prop,Prop0),subst(ain(t(Prop,Obj0,Value0)),isSelfAgent,Agent,K),dmsg(K),on_x_debug(K).
 
 agent_call_command(Agent,actGet(Obj0,Prop0)) :- subst(t(Prop0,Obj0,Value),isSelfAgent,Agent,K), 
-                                                        ccatch((findall(Value,(call_u(K),fmt(K)),L),
+                                                        catch((findall(Value,(req1(K),fmt(K)),L),
                                                           (L==[_|_]->true;fmt(wasMissing(K)))),E,fmt('@get Error ~q',[E:K])).
 
 :- include(prologmud(mud_footer)).
