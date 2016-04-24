@@ -15,7 +15,7 @@
 
 %
 % props(Obj,height(ObjHt))  == svo(Obj,height,ObjHt) == p(height,Obj,ObjHt) == height(Obj,ObjHt)
-% padd(Obj,height(ObjHt))  == add(p(height,Obj,ObjHt)) == add(p(height,Obj,ObjHt)) == add(height(Obj,ObjHt))
+% padd(Obj,height(ObjHt))  == ain(p(height,Obj,ObjHt)) == ain(p(height,Obj,ObjHt)) == ain(height(Obj,ObjHt))
 */
 
 % :-swi_module(user). 
@@ -75,11 +75,11 @@ cmdLook(Agent,LOC):- garbage_collect_atoms, call(cmdLook_proc,Agent,LOC),!.
 
 :-export(cmdLook_proc/3).
 cmdLook_proc(Agent,LOC):- 
-   with_no_modifications(with_assertions(mpred_prop(nameStrings,prologListValued),cmdLook_proc_0(Agent,LOC))).
+   with_no_modifications(w_tl(mpred_prop(nameStrings,prologListValued),cmdLook_proc_0(Agent,LOC))).
 cmdLook_proc_0(Agent,LOC):-
  findall(Show,on_command_show(Agent,actLook,Show),MORELOOK),
   % implicit in next command clr(props(Agent,mudNeedsLook(_))),
-   add(props(Agent,mudNeedsLook(vFalse))),
+   ain(props(Agent,mudNeedsLook(vFalse))),
      show_kb_preds(Agent,LOC,
          [
          location= nop(LOC),
@@ -213,7 +213,7 @@ check_for_blocks(Agent) :-
 	[vNE,vHere],[vNW,vHere],[vSE,vHere],[vSW,vHere]],
 	view_dirs(Agent,Dirs,Percepts),
 	blocked_percepts(Ht,Dirs,Percepts,[],Blocked_Percepts),
-	add(visually_blocked(Agent,Blocked_Percepts)).
+	ain(visually_blocked(Agent,Blocked_Percepts)).
 check_for_blocks(_,[]).
 
 meta_argtypes(mudSize(tSpatialThing,ftTerm)).

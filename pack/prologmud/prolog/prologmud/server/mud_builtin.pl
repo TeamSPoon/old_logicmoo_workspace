@@ -410,7 +410,7 @@ tCol(vtVerb).
 tCol(tMonster).
 %prologDynamic(action_info(vtActionTemplate,ftText)).
 prologDynamic(a_command(tAgent,ftAction)).
-prologSideEffects(a_command(tAgent,ftAction)).
+:- ain(prologSideEffects(a_command(tAgent,ftAction))).
 %prologBuiltin(member(ftTerm,ftTerm)).
 prologDynamic(mud_test(ftTerm,ftCallable)).
 prologDynamic(use_action_templates(ftTerm)).
@@ -450,7 +450,7 @@ tPred(isEach(tAgent/1, mudEnergy/2,mudHealth/2, mudAtLoc/2, failure/2, typeGrid/
 prologHybrid(mudToHitArmorClass0 / 2).
 prologHybrid(mudAtLoc/2).
 prologBuiltin((a_command/2)).
-:-shared_multifile(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
+prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
  pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completeExtentAsserted/1, ttExpressionType/1, typeProps/2)).
 prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
  pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttExpressionType/1, typeProps/2)).

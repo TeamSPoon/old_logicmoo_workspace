@@ -789,7 +789,7 @@ ensure_universal_stub_1(HeadIn,Head,F,A):-
 %
 % ensure universal stub  Extended Helper.
 %
-ensure_universal_stub_2(HeadIn,Head,F,A,_HBLIST):- lmconf:pfcManageHybrids,!,
+ensure_universal_stub_2(HeadIn,Head,F,A,_HBLIST):- (true;lmconf:pfcManageHybrids),!,
     must((StubType = prologHybrid)),
    tf_result(predicate_property(Head,dynamic),WasDynamic),
    tf_result(predicate_property(Head,multifile),WasMulifile),      

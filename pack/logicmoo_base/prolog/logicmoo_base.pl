@@ -16,7 +16,7 @@
 :- multifile(lmconf:mpred_is_impl_file/1).
 :- dynamic(lmconf:mpred_is_impl_file/1).
 
-:- source_location(F,_),asserta(lmconf:never_registered_mpred_file(F)).
+:- source_location(F,_),asserta(lmconf:ignore_file_mpreds(F)).
 
 :- multifile lmconf:startup_option/2. 
 :- dynamic lmconf:startup_option/2. 
@@ -170,6 +170,7 @@ ensure_mpred_system:- source_context_module(M),enable_mpred_system(M).
 
 
 :-  baseKB:use_module(library(logicmoo/mpred/mpred_userkb)).
+:- time((baseKB:ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_markers.pfc')))).
 
 logicmoo_base_module(mpred_kb_ops).
 logicmoo_base_module(mpred_props).
@@ -181,6 +182,10 @@ logicmoo_base_module(mpred_type_isa).
   (add_import_module(M,logicmoo_user,end),
   add_import_module(M,baseKB,end))).
 
+:- autoload.
+
+:- asserta_if_new((user:term_expansion(I,O):- with_umt_l(mpred_expander(term,user,I,O)))).
+:- asserta_if_new((system:goal_expansion(I,O):- hotrace(with_umt_l(mpred_expander(goal,system,I,O))))).
 
 
 

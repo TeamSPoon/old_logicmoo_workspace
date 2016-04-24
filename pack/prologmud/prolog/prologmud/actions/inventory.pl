@@ -50,9 +50,9 @@ farthest_reachable_object0(Agent,Obj):-
   mudPossess(Agent,Obj).
 
 detatch_object(Obj):-  
-  (req(mudPossess(Agent,Obj))->clr(mudPossess(Agent,Obj));true),
-  (req(mudAtLoc(Obj,LOC))-> clr(mudAtLoc(Obj,LOC));true),
-  (req(localityOfObject(Obj,R))-> clr(localityOfObject(Obj,R));true),
+  (call_u(mudPossess(Agent,Obj))->clr(mudPossess(Agent,Obj));true),
+  (call_u(mudAtLoc(Obj,LOC))-> clr(mudAtLoc(Obj,LOC));true),
+  (call_u(localityOfObject(Obj,R))-> clr(localityOfObject(Obj,R));true),
   (clr(inRegion(Obj,_))),!.
    
 

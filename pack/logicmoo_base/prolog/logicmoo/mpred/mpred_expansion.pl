@@ -1487,9 +1487,9 @@ transform_holds_3(Op,[Fogical|ARGS],OUT):-
 
 transform_holds_3(_,[props,Obj,Props],props(Obj,Props)).
 transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[isa(Type)|PROPS])):- 
-                  is_ftNonvar(Inst), not(Type=props), cheaply_u(tCol(Type)), must_det(not(is_never_type(Type))),!.
+                  is_ftNonvar(Inst), not(Type=props), cheaply_u(tCol(Type)), must_det(\+(is_never_type(Type))),!.
 transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[isa(Type)|PROPS])):- 
-                  is_ftNonvar(Inst), not(Type=props), t(functorDeclares,Type), must_det(not(is_never_type(Type))),!.
+                  is_ftNonvar(Inst), not(Type=props), t(functorDeclares,Type), must_det(\+(is_never_type(Type))),!.
 
 transform_holds_3(_,[P,A|ARGS],DBASE):- atom(P),!,DBASE=..[P,A|ARGS].
 transform_holds_3(Op,[P,A|ARGS],DBASE):- !, is_ftNonvar(P),dumpST,trace_or_throw(transform_holds_3(Op,[P,A|ARGS],DBASE)), DBASE=..[P,A|ARGS].
@@ -1730,11 +1730,23 @@ exact_args(true).
 
 :- module_transparent(is_stripped_module/1).
 
-% these do not get defined!?
-% %= :- shared_multifile user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
+% these do not get defined!?%= :- shared_multifile user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
+
+:- export(mpred_expansion_file/0).
+mpred_expansion_file.
+
+
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),
   module_transparent(F/A))).
 
+with_umt_l2(G):-
+  notrace(current_predicate(_,_:mpred_pfc_file)),
+   get_user_abox(U),
+   nonvar(U),
+   '$set_source_module'(Was,U),
+   nonvar(Was),
+   call_cleanup(
+     catch(G,E,(wdmsg(E),throw(E))),
+      '$set_source_module'(Was)).
 
-mpred_expansion_file.

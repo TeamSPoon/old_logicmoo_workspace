@@ -46,28 +46,28 @@ do_change_for_take(_,Obj):-
         props(Obj,mudPermanence(actTake,Disappears)), 
 		member(Disappears,[0,vTakenDeletes]),
         detatch_object(Obj),
-        add(mudStowing(Agent,Obj)),    
+        ain(mudStowing(Agent,Obj)),    
         must_post_for_take(Agent,Obj),
         detatch_object(Obj).
 do_change_for_take(Agent,Source) :-
 	props(Source,mudPermanence(actTake,vTakenCopyFn(What))),
         create_new_object([What],Obj),
         detatch_object(Obj),
-        add(mudStowing(Agent,Obj)),        
+        ain(mudStowing(Agent,Obj)),        
         must_post_for_take(Agent,Obj).
 do_change_for_take(Agent,Obj) :-        
         props(Obj,mudPermanence(actTake,vTakenStays)),!,
         mudAtLoc(Obj,Was),
         detatch_object(Obj),
-        add(mudStowing(Agent,Obj)),
+        ain(mudStowing(Agent,Obj)),
         must_post_for_take(Agent,Obj),
         detatch_object(Obj),
-        add(mudAtLoc(Obj,Was)).
+        ain(mudAtLoc(Obj,Was)).
 % default is same as vTakenMoves
 do_change_for_take(Agent,Obj) :-
 	ignore((props(Obj,mudPermanence(actTake,Held)),member(Held,[1,vTakenMoves]))),
         detatch_object(Obj),
-	add(mudStowing(Agent,Obj)),
+	ain(mudStowing(Agent,Obj)),
         must_post_for_take(Agent,Obj).
 
 must_post_for_take(Agent,Obj):-

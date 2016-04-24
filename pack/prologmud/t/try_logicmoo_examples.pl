@@ -117,7 +117,7 @@ male(P) <=> ~female(P).
 
 
 % seven rules
-:- kif_add(((parent(M,C) & female(M)) <=> mother(M,C))).
+:- kif_ain(((parent(M,C) & female(M)) <=> mother(M,C))).
 
 % ((parent(M,C) & female(M)) <=> mother(M,C)).
 :- is_entailed_u(((parent(M,C) & female(M)) <=> mother(M,C))).
@@ -170,7 +170,7 @@ human(trudy).
 %= catch a regression bug that may couse trudy to lose human assertion
 never_retract_u(human(trudy)).
 
-:- kif_add(forall(p,exists([m,f], if(human(p), (mother(m,p) & father(f,p)))))).
+:- kif_ain(forall(p,exists([m,f], if(human(p), (mother(m,p) & father(f,p)))))).
 
 
 :- doall(dcall(father(_,trudy))).
@@ -280,7 +280,7 @@ father(douglas,zaltana).
 :- doall(dcall_test(siblings(Who,AndWho))).
 
 %= human(P) => (female(P) v male(P)).
-:- kif_add(if(gendered_human(P), (female(P) v male(P)))).
+:- kif_ain(if(gendered_human(P), (female(P) v male(P)))).
 
 
 

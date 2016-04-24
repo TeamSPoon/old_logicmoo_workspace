@@ -32,7 +32,7 @@ bugger:term_to_message_string(T,T):-!.
 bugger:term_to_message_string(txtConcatFn(T),M):-on_x_debug(generatePhrase_local(T,M)),!.
 bugger:term_to_message_string(fmt(T),M):-on_x_debug(generatePhrase_local(T,M)),!.
 bugger:term_to_message_string(C,C):-compound(C),functor(C,F,_),is_leave_alone(F),!.
-bugger:term_to_message_string((T),M):-failOnError(generatePhrase_local(T,M)),!.
+bugger:term_to_message_string((T),M):-on_x_fail(generatePhrase_local(T,M)),!.
 bugger:term_to_message_string(T,T):-!.
 
 is_leave_alone(exact_message).
@@ -40,7 +40,7 @@ is_leave_alone(todo).
 is_leave_alone((error)).
 is_leave_alone(parserm).
 % is_leave_alone(F):- is_db_prop(F,_,_),!,fail.
-is_leave_alone(A):-failOnError((sub_atom(A,_,1,0,S),atom_number(S,_))),!.
+is_leave_alone(A):-on_x_fail((sub_atom(A,_,1,0,S),atom_number(S,_))),!.
 
 :- discontiguous(mudTermAnglify/2).
 
@@ -66,7 +66,7 @@ mudTermAnglify(Head,EnglishO):- compound(Head),
 
 
 term_anglify_args(Head,F,A,ARGS,predArgMulti(Which),English):- !,replace_nth(ARGS,Which,_OldVar,NewVar,NEWARGS),!,
-   NewHead=..[F|NEWARGS], findall(NewVar,req(NewHead),ListNewVar),list_to_set_safe(ListNewVar,SetNewVar),NewVar=ftListFn(SetNewVar),
+   NewHead=..[F|NEWARGS], findall(NewVar,call_u(NewHead),ListNewVar),list_to_set_safe(ListNewVar,SetNewVar),NewVar=ftListFn(SetNewVar),
    term_anglify_args(Head,F,A,NewHead,prologSingleValued,English).
 
 
@@ -127,7 +127,7 @@ fix_grammar_0(EnglishG,English):-
 fix_grammar_0([Carry|EnglishG],[Carry|English]):-
    fix_grammar_0(EnglishG,English),!.
 
-join_for_string(English,EnglishS):-failOnError(( flatten([English],EnglishF),list_to_atomics_list(EnglishF,EnglishA),atomics_to_string(EnglishA," ",EnglishS))),!.
+join_for_string(English,EnglishS):-on_x_fail(( flatten([English],EnglishF),list_to_atomics_list(EnglishF,EnglishA),atomics_to_string(EnglishA," ",EnglishS))),!.
 join_for_string(English,English).
 
 /*
@@ -240,8 +240,8 @@ local_term_anglify(NPO,String):-NPO=..[NP,Obj],is_phrase_type(NP),!,enter_term_a
 
 local_term_anglify(fN(Obj,argIsaFn(_PathName,_NumTwo)),String):- enter_term_anglify(Obj,String),!.
 local_term_anglify(cmdresult(Cmd,Whatnot),["the","command","result","of",Cmd,"is",Whatnot]):-!.
-local_term_anglify(string(Obj),[String]):-failOnError(any_to_string(Obj,StringUQ)),atomics_to_string(['"',StringUQ,'"'],"",String).
-% enter_term_anglify(ftCallable(Obj),string(String)):-failOnError(any_to_string(Obj,StringUQ)),atomics_to_string(['(',StringUQ,')'],"",String).
+local_term_anglify(string(Obj),[String]):-on_x_fail(any_to_string(Obj,StringUQ)),atomics_to_string(['"',StringUQ,'"'],"",String).
+% enter_term_anglify(ftCallable(Obj),string(String)):-on_x_fail(any_to_string(Obj,StringUQ)),atomics_to_string(['(',StringUQ,')'],"",String).
 local_term_anglify(mudAtLoc(Obj,LOC),String):-eng_fully_expand( [fN(Obj,posNP),is,at,fN(LOC,posNP)],String).
 local_term_anglify(mudDescription(Obj,Term),[fN(Obj,posNP),"description","contains",":",string(Term)]).
 local_term_anglify(fN(Obj,X),String):- locationToRegion(Obj,Region), Obj \= Region, enter_term_anglify(fN(Region,X),String),!.
@@ -286,7 +286,7 @@ local_term_anglify_np_last(Obj,_,["the",noun,with,token,Obj]):-!.
 anglify_noun_known(Obj,FT,String):- ttExpressionType(FT),correctFormatType(change(assert,_),Obj,FT,String),!.
 anglify_noun_known(StringO,_Hint, [StringO]).
 anglify_noun_known(Obj,_Hint,["right","here"]):- current_agent(Self),mudAtLoc(Self,Obj),!.
-anglify_noun_known(Obj,_Hint,["here"]):- current_agent(Self),req(localityOfObject(Self,Obj)),!.
+anglify_noun_known(Obj,_Hint,["here"]):- current_agent(Self),call_u(localityOfObject(Self,Obj)),!.
 anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameStrings,Obj,String),List),List\=[],sort_by_strlen(List,[StringO|_]),!.
 %anglify_noun_known(Obj,_Hint,String):-
 %nameStrings(X,Y,_,_)
@@ -315,7 +315,7 @@ add_description(mudDescription(I,S)):-add_description(I,S).
 :-export(add_description/2).
 add_description(A,S0):-hooked_assertz(mudDescription(A,S0)),fail.
 add_description(A,S0):- atomic(S0),string_concat('#$PunchingSomething ',S,S0),!,add_description(A,S).
-% add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),add(determinerString(A,String)).
+% add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),ain(determinerString(A,String)).
 add_description(A,S0):-
    any_to_string(S0,S),
    atomic_list_concat(Words,' ',S),
@@ -353,12 +353,12 @@ ddeterminer0("the").
 ddeterminer(L,L):-ddeterminer0(L).
 ddeterminer(U,L):-string_lower(U,L),U\=L,!,ddeterminer0(L).
 
-add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),atom_concat(flagged_,Atom,FAtom),add((isa(A,FAtom))).
-add_description_word(A,Word):- string_lower(Word,Word),add((mudKeyword(A,Word))).
-add_description_word(A,Word):- string_lower(Word,Lower),add((mudKeyword(A,Lower))).
+add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),atom_concat(flagged_,Atom,FAtom),ain((isa(A,FAtom))).
+add_description_word(A,Word):- string_lower(Word,Word),ain((mudKeyword(A,Word))).
+add_description_word(A,Word):- string_lower(Word,Lower),ain((mudKeyword(A,Lower))).
 
 
 add_description_kv(A,K,V):- atom_concat('#$PunchingSomething ',Key,K),!,add_description_kv(A,Key,V).
 add_description_kv(A,K,V):- atom_concat('+',Key,K),!,add_description_kv(A,Key,V).
-add_description_kv(A,K,V):-atom_to_value(V,Term),C=..[K,A,Term],show_load_call(add(C)).
+add_description_kv(A,K,V):-atom_to_value(V,Term),C=..[K,A,Term],show_load_call(ain(C)).
 

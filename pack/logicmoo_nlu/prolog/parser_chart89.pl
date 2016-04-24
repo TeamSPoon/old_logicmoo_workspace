@@ -48,8 +48,8 @@ user:agent_call_command(_Gent,chart89(StringM)):-nonvar(StringM), chart89(String
 % CHART89 REPL
 % ===========================================================
 :-thread_local t_l:chart89_interactive/0.
-chart89 :- with_assertions(tracing80,
-           with_assertions(t_l:chart89_interactive,
+chart89 :- w_tl(tracing80,
+           w_tl(t_l:chart89_interactive,
             with_no_assertions(t_l:useOnlyExternalDBs,
              with_no_assertions(thglobal:use_cyc_database,
               (told, repeat, prompt_read('CHART89> ',U),  

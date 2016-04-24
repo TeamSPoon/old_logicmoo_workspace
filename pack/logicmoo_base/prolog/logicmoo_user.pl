@@ -76,10 +76,18 @@ ws_0:- mpred_www:ensure_loaded(library(logicmoo/mpred_online/mpred_www)), call(m
 :- system:((logicmoo_user_base:user_module_uses(M,CM)->(('$set_typein_module'(M),'$set_source_module'(CM)));true)).
 
 %:- autoload.
-:- time((baseKB:ensure_mpred_file_loaded(baseKB:library(logicmoo/pfc/'system_markers.pfc')))).
+
+:- set_prolog_flag(gc,true).
+:- garbage_collect.
 
 :- sanity( \+predicate_property(baseKB:_,exported)).
 :- time(logicmoo_snark:load_snark).
+
+:- set_prolog_flag(gc,true).
+:- garbage_collect.
+
+:- forall(retract(wsh_w:wrap_shared(F,A,ereq)),ain((arity(F,A),pfcControlled(F),prologHybrid(F)))).
+
 
 end_of_file.
 

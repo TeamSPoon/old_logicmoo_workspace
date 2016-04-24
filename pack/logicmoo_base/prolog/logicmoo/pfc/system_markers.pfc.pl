@@ -18,7 +18,7 @@
 :- dynamic(mpred_mark_C/1).
 :- dynamic(hybrid_support/2).
 
-mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>arity(F,A).
+mpred_mark(S1, F, A)/(ground(S1),is_ftNameArity(F,A))==>(tSet(S1),arity(F,A),isa(F,S1)).
 mpred_mark(pfcPosTrigger,F, A)/(is_ftNameArity(F,A))==>marker_supported(F,A).
 mpred_mark(pfcNegTrigger,F, A)/(is_ftNameArity(F,A))==>marker_supported(F,A).
 mpred_mark(pfcBcTrigger,F, A)/(is_ftNameArity(F,A))==>marker_supported(F,A).

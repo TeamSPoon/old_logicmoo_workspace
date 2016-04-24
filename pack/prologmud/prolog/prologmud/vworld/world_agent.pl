@@ -41,7 +41,7 @@ enqueue_agent_action(P,C):-foc_current_agent(P),get_agent_session(P,O),enqueue_a
 :-export(enqueue_agent_action/3).
 :-dynamic(enqueue_agent_action/3).
 enqueue_agent_action(P,C,O):- immediate_session(P,C,O),!, do_agent_action(P,C,O).
-enqueue_agent_action(P,C,O):- assertz(agent_action_queue(P,C,O)),must(once(pfc_add(agent_action_queue(P,C,O)))),!.
+enqueue_agent_action(P,C,O):- assertz(agent_action_queue(P,C,O)),must(once(pfc_ain(agent_action_queue(P,C,O)))),!.
 
 :-export(do_agent_action/1).
 do_agent_action(C):-enqueue_agent_action(C).
@@ -87,7 +87,7 @@ start_agent_action_thread:-
 % restarts if it it died
 one_minute_timer_tick:- start_agent_action_thread.
 
-with_session(ID,CALL):-with_assertions(t_l:session_id(ID),CALL).
+with_session(ID,CALL):-w_tl(t_l:session_id(ID),CALL).
 
 
 % =====================================================================================================================
@@ -96,7 +96,7 @@ with_session(ID,CALL):-with_assertions(t_l:session_id(ID),CALL).
 
 agent_call_unparsed(C):-foc_current_agent(A),!,agent_call_unparsed(A,C).
 
-agent_call_unparsed(A,C):-  with_assertions(tlbugger:old_no_repeats, agent_call_unparsed_0(A,C)).
+agent_call_unparsed(A,C):-  w_tl(tlbugger:old_no_repeats, agent_call_unparsed_0(A,C)).
 
 agent_call_unparsed_0(Agent,Var):-var(Var),trace_or_throw(var_agent_call_unparsed(Agent,Var)).
 
@@ -154,8 +154,8 @@ agent_call_command_now(Agent,CMD  ):- where_atloc(Agent,Where),
 agent_call_command_now_2(Agent,CMD):- loop_check(agent_call_command_now_3(Agent,CMD),dmsg(looped(agent_call_command_now_2(Agent,CMD)))).
 agent_call_command_now_3(Agent,CMD):-
    with_agent(Agent,
-     with_assertions(t_l:side_effect_ok,
-     with_assertions(t_l:agent_current_action(Agent,CMD),
+     w_tl(t_l:side_effect_ok,
+     w_tl(t_l:agent_current_action(Agent,CMD),
   (agent_call_command(Agent,CMD)*->true;agent_call_command_all_fallback(Agent,CMD))))),
   padd(Agent,mudLastCommand(CMD)).
 
@@ -216,7 +216,7 @@ with_agent0(P,CALL):-
  thread_self(Self),
  ((get_agent_session(P,O),thglobal:session_io(O,In,Out,Id),Id\=Self)->Wrap=thread_signal_blocked(Id);Wrap=call),!,
   call(Wrap, 
-    with_assertions([put_server_no_max,thglobal:session_agent(TS,P),thglobal:agent_session(P,TS)],
+    w_tl([put_server_no_max,thglobal:session_agent(TS,P),thglobal:agent_session(P,TS)],
       with_output_to_pred(deliver_event(P),CALL))).
 
 has_tty(O):-no_repeats(O,thglobal:session_io(O,_,_,_)).
@@ -238,6 +238,7 @@ foc_current_agent(P):-
 
 :-user:ensure_loaded(library(http/http_session)).
 
+:-export(get_session_id/1).
 get_session_id(IDIn):-guess_session_ids(ID),nonvar(ID),!,ID=IDIn.
 
 % return any thread locally set session
@@ -302,7 +303,7 @@ become_player(_Old,NewName):-become_player(NewName).
 % Lists all the agents in the run. Except for other monsters.
 list_agents(Agents) :- agent_list(Agents), !.
 list_agents(Agents) :- % build cache
-	findall(NearAgent,req(tAgent(NearAgent)),Agents),
+	findall(NearAgent,call_u(tAgent(NearAgent)),Agents),
 	assert(agent_list(Agents)),!.
 
 :-export((agent_into_corpse/1, display_stats/1)).
@@ -317,7 +318,7 @@ agent_into_corpse(Agent) :-
 	clr(mudSpd(Agent,_)),
         Newthing = iCorpseFn(Agent),
         assert_isa(Newthing,tCorpse),
-	add(mudAtLoc(Newthing,LOC)).
+	ain(mudAtLoc(Newthing,LOC)).
 
 % Displays all the agents stats. Used at end of a run.
 display_stats(Agents) :-

@@ -117,11 +117,11 @@ text_means(_Agent,_Text,_Value):-fail.
 relates(Agent,Relation,Obj):-loop_check(relates_ilc(Agent,Relation,Obj),fail).
 relates_ilc(Agent,Relation,Obj):-text_means(Agent,Relation,Obj),!.
 relates_ilc(_    ,Relation,Obj):- atom(Relation),tCol(Relation),!,isa(Obj,Relation).
-relates_ilc(_    ,Relation,Obj):-contains_var(Relation,isThis),subst(Relation,isThis,Obj,Call),!,req(Call).
+relates_ilc(_    ,Relation,Obj):-contains_var(Relation,isThis),subst(Relation,isThis,Obj,Call),!,call_u(Call).
 relates_ilc(Agent,isSame(Relation),Obj):- !, relates(Agent,Relation,Value),relates(Obj,Relation,Value).
 relates_ilc(Agent,Relation,Obj):- atom(Relation),!, prop(Agent,Relation,Obj).
-relates_ilc(_    ,Relation,Obj):-contains_var(Relation,Obj),!,req(Relation).
-relates_ilc(Agent,Relation,Obj):-contains_var(Relation,Agent),append_term(Relation,Obj,Call),!,req(Call).
+relates_ilc(_    ,Relation,Obj):-contains_var(Relation,Obj),!,call_u(Relation).
+relates_ilc(Agent,Relation,Obj):-contains_var(Relation,Agent),append_term(Relation,Obj,Call),!,call_u(Call).
 relates_ilc(Agent,Relation,Obj):-objects_for_agent(Agent,Relation,MatchList),MatchList\=[],!,member(MatchList,Obj).
 
 
@@ -287,8 +287,8 @@ parse_agent_text_command_0(Agent,IVERB,ARGS,NewAgent,GOAL):-
    verb_alias_to_verb(IVERB,SVERB), IVERB\=SVERB,!,
    parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL).
 
-parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,actProlog(mpred_call(PROLOGTERM))):- compound(PROLOGTERM),functor(PROLOGTERM,F,_),mpred_prop(F,_),!.
-parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,actProlog(req(PROLOGTERM))):- compound(PROLOGTERM),is_callable(PROLOGTERM),!.
+parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,actProlog(call_u(PROLOGTERM))):- compound(PROLOGTERM),functor(PROLOGTERM,F,_),mpred_prop(F,_),!.
+parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,actProlog(call_u(PROLOGTERM))):- compound(PROLOGTERM),is_callable(PROLOGTERM),!.
 
 :-export(parse_agent_text_command_1/5).
 % parses a verb phrase and retuns one interpretation (action)
@@ -334,7 +334,7 @@ get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
    predsort(mostIdiomatic,TEMPLATES_FA,TEMPLATES).
    
 % parses a verb phrase and retuns multiple interps
-parse_vp_real(Agent,SVERB,ARGS,Sorted):- with_assertions(t_l:infSkipFullExpand,parse_vp_real_no_arg_checking(Agent,SVERB,ARGS,Sorted)).
+parse_vp_real(Agent,SVERB,ARGS,Sorted):- w_tl(t_l:infSkipFullExpand,parse_vp_real_no_arg_checking(Agent,SVERB,ARGS,Sorted)).
 parse_vp_real_no_arg_checking(Agent,SVERB,ARGS,Sorted):-
    get_vp_templates(Agent,SVERB,ARGS,TEMPLATES),   
    dmsg_parserm(("TEMPLATES"= (orig([SVERB|ARGS]) = TEMPLATES))),
@@ -433,7 +433,7 @@ hook_coerce(Text,Subclass,X):-
    not(memberchk(Subclass,[vtDirection,tSpatialThing])),
    once((isa_asserted(X,Subclass),
    arg_to_var(ftText,Text,TextVar),
-   req(mudKeyword(X,TextVar)),   
+   call_u(mudKeyword(X,TextVar)),   
    same_arg(ftText,TextVar,Text))). % dmsg(todo(hook_coerce(Text,Subclass))),impliedSubClass(Subclass,tSpatialThing).
 
 
@@ -523,7 +523,7 @@ to_arg_value(Val,What):-parserVars((Val;isParserVar(Val)),What,_),!.
 to_arg_value(vHere,Here):-must((current_agent(Who),where_atloc(Who,Here))).
 to_arg_value(isSelfAgent,Who):-must((current_agent(Who))).
 to_arg_value(isRandom(Type),Term):- nonvar(Type),!,must((to_arg_value(Type,TypeR),random_instance(TypeR,Term,true))).
-to_arg_value(Call,TermO):-compound(Call),Call=..[call|CALLARGS],must((subst(CALLARGS,isThis,Term,CALLARGS2),maplist(to_arg_value,CALLARGS2,CALLARGS3),NewCall=..[call|CALLARGS3],must(req(NewCall)),to_arg_value(Term,TermO))).
+to_arg_value(Call,TermO):-compound(Call),Call=..[call|CALLARGS],must((subst(CALLARGS,isThis,Term,CALLARGS2),maplist(to_arg_value,CALLARGS2,CALLARGS3),NewCall=..[call|CALLARGS3],must(call_u(NewCall)),to_arg_value(Term,TermO))).
 to_arg_value(Term,TermO):-must((map_term(to_arg_value,Term,TermO))).
 
 map_term(Pred,Term,TermO):-var(Term),!,must(call(Pred,Term,TermO)).
@@ -557,7 +557,7 @@ parseIsa(isNot(Type), Term, C, D) :- !, dcgAnd(dcgNot(parseIsa(Type)), theText(T
 parseIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(isSelfAgent,Goal,Left,Right),parseFmt_vp2(isSelfAgent,Goal,Left,Right)).
 
 parseIsa(t(P,S,O),TermV) -->{!},parseIsa(call(t(P,S,O)),TermV).
-parseIsa(call(Call),TermV) --> {!,subst(Call,isThis,TermV,NewCall)},theText(TermT), {req(NewCall),match_object(TermT,TermV)}.
+parseIsa(call(Call),TermV) --> {!,subst(Call,isThis,TermV,NewCall)},theText(TermT), {call_u(NewCall),match_object(TermT,TermV)}.
 parseIsa(exactStr(Str),Str) --> {!},[Atom],{equals_icase(Atom,Str),!}.
 parseIsa(isOptionalStr(Str),Str) --> {not(optional_strings_opt)},[Atom],{equals_icase(Atom,Str),!}.
 parseIsa(isOptionalStr(_),isMissing) --> {!},[].
@@ -646,7 +646,7 @@ naming_order(ORDER,L,R):-compare(ORDER,L,R).
 
 get_sorted_instances(Inst,Type,HOW):-findall(Inst,isa(Inst,Type),List),sort(List,NoDupes),predsort(HOW,NoDupes,Sorted),!,member(Inst,Sorted).
 
-% instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], on_x_log_cont(req(Term)).
+% instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], on_x_log_cont(call_u(Term)).
 % longest_string(?Order, @Term1, @Term2)
 /*
 longest_string(Order,TStr1,TStr2):-

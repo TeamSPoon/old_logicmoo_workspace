@@ -35,7 +35,8 @@
 */ 
 
 :- '$set_source_module'(mud_telnet).
-:- '$set_typein_module'(mud_telnet).
+:- add_import_module(mud_telnet,baseKB,start).
+:- add_import_module(mud_telnet,logicmoo_user,start).
 
 % learnLaterWhenToCallProceedure(What):- ... code ...
 
@@ -188,10 +189,10 @@ set_tty_control(TF):-
    set_stream(user_input, tty(TF)),
    set_prolog_flag(tty_control, TF))))),!.
 
-deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
+:-ain(( deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
       foreach(no_repeats(get_agent_sessions(A,O)),
          foreach(no_repeats(thglobal:session_io(O,In,Out,Id)),
-          fmtevent(Out,NewEvent))).
+          fmtevent(Out,NewEvent))))).
 
 fmtevent(Out,NewEvent):-string(NewEvent),!,format(Out,'~s',[NewEvent]).
 fmtevent(Out,NewEvent):-format(Out,'~N~q.~n',[NewEvent]).

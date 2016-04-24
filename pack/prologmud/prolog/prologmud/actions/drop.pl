@@ -25,7 +25,7 @@ agent_call_command(Agent,actDrop(Obj)) :-
         mudAtLoc(Agent,LOC),
         clr(mudPossess(Agent,Obj)),
         must(\+((mudPossess(Agent,Obj)))),
-        add(mudAtLoc(Obj,LOC)),
+        ain(mudAtLoc(Obj,LOC)),
 	must(call_update_charge(Agent,actDrop)).
 
 %Nothing to drop
@@ -34,7 +34,7 @@ agent_call_command(Agent,actDrop(_)) :-
 	(add_cmdfailure(Agent,actDrop)).
 
 % Record keeping
-update_charge(Agent,actDrop) :- add(mudEnergy(Agent, + -1)).
+update_charge(Agent,actDrop) :- ain(mudEnergy(Agent, + -1)).
 
 % agent_text_command(Agent,[actDrop,X],Agent,actDrop(X)).
 

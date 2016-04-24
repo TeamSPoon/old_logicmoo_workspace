@@ -95,10 +95,10 @@ must_test_80([what, countries, are, there, in, europe, ?], [sent([what, countrie
 call_in_banner(U,Call):- p2(begin:U),call_cleanup(Call,p2(end:U)).
 
 :-export(t2/0).
-t2:- with_assertions(tracing80,with_no_assertions(t_l:old_text,with_no_assertions(thglobal:use_cyc_database,forall(must_test_80(U,R,O),t2_process_run_diff(report,U,R,O))))).
+t2:- w_tl(tracing80,with_no_assertions(t_l:old_text,with_no_assertions(thglobal:use_cyc_database,forall(must_test_80(U,R,O),t2_process_run_diff(report,U,R,O))))).
 
 t2_process_run_diff(report,U,R,O):- copy_term80(U,UU),
-   process_run_diff(report,U,R,O),!,nop( with_assertions(t_l:usePlTalk,process_run_diff(report,UU,[],[]))),!.
+   process_run_diff(report,U,R,O),!,nop( w_tl(t_l:usePlTalk,process_run_diff(report,UU,[],[]))),!.
 
 :- ensure_loaded('pldata/clex_iface').
 
@@ -116,8 +116,8 @@ user:agent_call_command(_Gent,chat80(StringM)):- chat80(StringM).
 % ===========================================================
 :-thread_local t_l:chat80_interactive/0.
 :-export(chat80/0).
-chat80 :- with_assertions(tracing80,
-           with_assertions(t_l:chat80_interactive,
+chat80 :- w_tl(tracing80,
+           w_tl(t_l:chat80_interactive,
             with_no_assertions(t_l:useOnlyExternalDBs,
              with_no_assertions(thglobal:use_cyc_database,
               (told, repeat, prompt_read('CHAT80> ',U),  

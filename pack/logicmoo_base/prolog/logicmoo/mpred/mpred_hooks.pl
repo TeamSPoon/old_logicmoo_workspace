@@ -296,7 +296,7 @@ swi_module(M,Preds):- forall(member(P,Preds),export(P)),dmsg(swi_module(M)).
 
 :- shared_multifile loaded_external_kbs/0.
 
-:- shared_multifile loading_module/1.
+% :- shared_multifile loading_module/1.
 :- shared_multifile local_term_anglify/2.
 
 

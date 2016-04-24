@@ -42,6 +42,8 @@ first_pl((BODY,_),PL):-!,
  first_pl(BODY,PL).
 first_pl(PL,PL).
 
+:- decl_mpred_hybrid(action_info_db/3).
+
 action_info_db(TEMPL,INFO,WAS):- (PRED=agent_call_command(_,WAS);PRED=agent_text_command(_,_,_,WAS)) ,
    clause(PRED,BODY,REF),clause_property(REF,file(S)),
    (ground(WAS)->true;once(( ignore((nop(S=S),first_pl(BODY,PL),ignore(catch(((true;hotrace(PL)),!),_,true)))),ground(WAS)))),
@@ -92,7 +94,7 @@ hook_coerce(Text,vtVerb,Inst):- isa(Inst,vtVerb),name_text(Inst,Text).
 
 :- include(prologmud(mud_footer)).
 
-% :-add(((get_all_templates(Templ))==>vtActionTemplate(Templ))).
+% :-ain(((get_all_templates(Templ))==>vtActionTemplate(Templ))).
 
 (type_action_info(_,TEMPL,Help) ==> action_info(TEMPL,Help)).
 (action_info(TEMPL,_Help) ==> vtActionTemplate(TEMPL)).

@@ -79,7 +79,7 @@ damage_foe(Agent,What,hit) :-
 	check_for_weapon(Agent,Wpn),
 	Atk is (Wpn + BaseAtk),
 	NewDam is (OldDam - (Atk - Def)),
-	add(mudHealth(What,NewDam)).
+	ain(mudHealth(What,NewDam)).
 
 % Record keeping
 update_charge(Agent,actAttack) :- upprop(Agent,mudEnergy(+ -5)).
@@ -88,7 +88,7 @@ update_stats(Agent,bash) :-  upprop(Agent,mudHealth(+ -2)),
 update_stats(Agent,wiff) :- 
 	del(mudHealth(Agent,Old)),
 	New is Old - 1,
-	add(mudHealth(Agent,New)),
+	ain(mudHealth(Agent,New)),
 	(add_cmdfailure(Agent,bash)).
 
 

@@ -45,17 +45,17 @@ chat80_term_expansion((L ---> R),((P :- Q))) :- must(xg_process_te_clone(L,R,+,P
 system:term_expansion(H,O):- processing_xg,current_predicate(logicmoo_bugger_loaded/0),chat80_term_expansion(H,O).
 
 
-load_plus_xg_file(CM,F) :- with_assertions(tlxgproc:current_xg_module(CM),with_assertions(tlxgproc:do_xg_process_te,ensure_loaded(F))),!.
+load_plus_xg_file(CM,F) :- w_tl(tlxgproc:current_xg_module(CM),w_tl(tlxgproc:do_xg_process_te,ensure_loaded(F))),!.
 % was +(F).
 load_plus_xg_file(CM,F) :-
    see(user),
-   with_assertions(tlxgproc:current_xg_module(CM),consume0(F,+)),
+   w_tl(tlxgproc:current_xg_module(CM),consume0(F,+)),
    seen.
 
 % was -(F).
 load_minus_xg_file(CM,F) :-
    see(user),
-   with_assertions(tlxgproc:current_xg_module(CM),consume0(F,-)),
+   w_tl(tlxgproc:current_xg_module(CM),consume0(F,-)),
    seen.
 
 
@@ -67,7 +67,7 @@ consume0(F0,Mode) :-
     absolute_file_name(F0,F),
    see(F),
    abolish_xg(xg_source=F),
-   with_assertions(tlxgproc:current_xg_filename(F),tidy_consume(F,Mode)),
+   w_tl(tlxgproc:current_xg_filename(F),tidy_consume(F,Mode)),
  ( (seeing(User2),User2=user), !; seen ),
    see(Old),
 %   statistics(heap,[H,Hf]),

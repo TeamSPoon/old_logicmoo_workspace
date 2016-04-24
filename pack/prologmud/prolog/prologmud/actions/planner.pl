@@ -29,7 +29,7 @@ action_info(actPlan(ftTerm),"carry out a plan").
 
 % Plan something
 agent_call_command(Agent,actPlan(Goal)) :-
-   add(agentGOAL(Agent,Goal)),
+   ain(agentGOAL(Agent,Goal)),
    listing(agentGOAL(Agent,_)),
    pddl_idea(Agent,Act),
    listing(agentTODO(Agent,_)),

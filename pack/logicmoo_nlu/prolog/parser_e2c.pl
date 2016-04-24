@@ -330,7 +330,7 @@ posMeans(String,POS,Form,CycL):-
 :-export(cache_the_posms/0).
 cache_the_posms:-!.
 cache_the_posms:- noreorder,
- with_assertions(thglobal:use_cyc_database,
+ w_tl(thglobal:use_cyc_database,
      (retractall(posm_cached(_CW, _Phrase,POS, _Form, _CycL)),
       posm_c_gen( String,POS,Form,CycL),
       push_to_cache(posm_c_gen( String,POS,Form,CycL)), 
@@ -552,7 +552,7 @@ meetsPos_2(String,CycWord,POS):- reorderBody(meetsForm(String,CycWord,Form),POS^
 
 meetsPos_3([String],CycWord,POS):- atom(String),stringAtomToPOS([String],CycWord,POS).
 
-meetsPos_4(String,CycWord,POS):- with_assertions(t_l:allowTT,meetsPos_2(String,CycWord,POS)).
+meetsPos_4(String,CycWord,POS):- w_tl(t_l:allowTT,meetsPos_2(String,CycWord,POS)).
 
 meetsPos_5(String,CycWord,POS):-  member(POS,['Noun','Adjective','Verb','Adverb']), stringArg(String,'wnS'(CycWord, _ , String,POS, _ , _)).
 meetsPos_5(String,CycWord,'Adjective'):- 'wnS'(CycWord, _ , String, 'AdjectiveSatellite', _ , _). 
@@ -621,7 +621,7 @@ is_stringWord(String):-stringToCycWord(String,_CycWord).
 stringToCycWord([EMPTY],_CycWord):- is_blankWord(EMPTY),!,fail.
 stringToCycWord(String,CycWord):-
  not(stringToCycWord_never(String,CycWord)),
-  with_assertions(t_l:allowTT,
+  w_tl(t_l:allowTT,
    one_must(stringToCycWord_0(String,CycWord),
       one_must(stringToCycWord_1(String,CycWord),
          stringToCycWord_2(String,CycWord)))),notPrefixOrSuffix(CycWord).
@@ -729,7 +729,7 @@ meetsForm_1(String,CycWord,Form):-
 meetsForm_1([String],CycWord,Form):- stringAtomToWordForm([String],CycWord,Form).
 
 
-meetsForm_2(String,CycWord,POS):- with_assertions(t_l:allowTT,meetsForm_1(String,CycWord,POS)).
+meetsForm_2(String,CycWord,POS):- w_tl(t_l:allowTT,meetsForm_1(String,CycWord,POS)).
 
 stringAtomToWordForm([String],CycWord,Form):- nonvar(CycWord),!,stringAtomToWordForm([String],NewCycWord,Form),!,CycWord=NewCycWord.
 stringAtomToWordForm([String],CycWord,Form):- nonvar(String),!,           
@@ -1225,12 +1225,12 @@ english2Kif(Sentence):- noreorder, english2Kif(Sentence,Kif),fmt(Kif).
 english2Obj(Sentence):-english2Obj(Sentence,Kif),portray_clause(Kif).
 
 english2Kif(Sentence,Kif):-
-  with_assertions(thglobal:use_cyc_database,
+  w_tl(thglobal:use_cyc_database,
       (notrace(convertToWordage(Sentence,Words)),
         wordageToKif(Words,Kif))).
 
 english2Obj(Sentence,noun_phrase(A,C)):-
-  with_assertions(thglobal:use_cyc_database,
+  w_tl(thglobal:use_cyc_database,
       (notrace(convertToWordage(Sentence,Words)),
          phrase(noun_phrase(A, _ ,C),Words))).
 
@@ -1364,15 +1364,15 @@ get_wordage(Pre,Props):-do_get_wordage(Pre,Props),!,ignore((usefull_wordage(Prop
 do_get_wordage(Pre,wordage(Pre,More)):- 
   must_det(( with_no_assertions(t_l:omitCycWordForms,
      with_no_assertions(t_l:allowTT,
-        with_assertions(t_l:useOnlyExternalDBs,(findall(Prop,string_props(1,Pre,Prop),UProps),get_more_props(Pre,UProps,More))))))).
+        w_tl(t_l:useOnlyExternalDBs,(findall(Prop,string_props(1,Pre,Prop),UProps),get_more_props(Pre,UProps,More))))))).
    
 
 
 get_more_props(_,Props,Props):- memberchk(form(_,_,_),Props),memberchk(pos(_,_,_),Props),!.
 get_more_props(Pre,Props,More):-
  with_no_assertions(t_l:omitCycWordForms,
-   with_assertions(t_l:allowTT,
-     with_assertions(t_l:useOnlyExternalDBs,((findall(Prop,string_props(2,Pre,Prop),UProps),
+   w_tl(t_l:allowTT,
+     w_tl(t_l:useOnlyExternalDBs,((findall(Prop,string_props(2,Pre,Prop),UProps),
       flatten([UProps,Props],UMore),list_to_set(UMore,More)))))).
 
 hard_words(X):-member(X,[
@@ -1516,7 +1516,7 @@ list_wordage:- listing(is_wordage_cache),retractall(is_wordage_cache(_,_)).
 % :-list_wordage.
 % string_props(Pass,String,posMeans(POS,Form,CycL)):-posMeans(String,POS,Form,CycL).
 string_props(Pass,String,tt(Pass,CycWord,Form)):- 
- with_assertions(t_l:omitCycWordForms, with_assertions(t_l:allowTT,(meetsForm(String,CycWord,Form),atom(Form),atom_concat(infl,_,Form),notPrefixOrSuffix(CycWord)))).
+ w_tl(t_l:omitCycWordForms, w_tl(t_l:allowTT,(meetsForm(String,CycWord,Form),atom(Form),atom_concat(infl,_,Form),notPrefixOrSuffix(CycWord)))).
 string_props(1,[Num],number(Num)):-number(Num).
 string_props(1,[Atom],number(Num)):-atom_number(Atom,Num).
 string_props(1,Text,txt(Text)).

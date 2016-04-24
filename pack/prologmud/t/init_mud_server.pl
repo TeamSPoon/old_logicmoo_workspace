@@ -35,8 +35,6 @@
 
 :- doall(show_call(current_prolog_flag(_N,_V))).
 
-:- break.
-
 % ==========================================================
 % Regression tests that first run whenever a person stats the MUD on the public server
 % ==========================================================

@@ -123,7 +123,7 @@ rez_loc_object(XY,Type):-
            gensym(Type,Name2),
            Name = xyN(XY,Name2),          
            assert_isa(Name,Type),
-           add(mudAtLoc(Name,XY)),!,
+           ain(mudAtLoc(Name,XY)),!,
            add_missing_instance_defaults(Name).
 
 
@@ -506,7 +506,7 @@ lmconf:decl_database_hook(change( retract,_),mudAtLoc(Agent,_)):-padd(Agent,mudN
 in_world_move(LOC,Agent,DirS) :-
         string_to_atom(DirS,Dir),
         ignore(is_asserted(mudAtLoc(Agent,LOC))),
-        must_det((with_assertions(t_l:infAssertedOnly(mudAtLoc),in_world_move0(LOC,Agent,Dir)),       
+        must_det((w_tl(t_l:infAssertedOnly(mudAtLoc),in_world_move0(LOC,Agent,Dir)),       
          is_asserted(mudAtLoc(Agent,LOC2)),
          LOC2 \== LOC)),!.
 
@@ -523,7 +523,7 @@ in_world_move0(LOC,Agent,Dir) :-
         locationToRegion(LOC,Region1),
         locationToRegion(XXYY,Region2),
               ((expire_dont_add, clr(mudAtLoc(Agent,LOC)))),
-        ((expire_dont_add, add(mudAtLoc(Agent,XXYY)),
+        ((expire_dont_add, ain(mudAtLoc(Agent,XXYY)),
         sanity((is_asserted(mudAtLoc(Agent,LOC2)),LOC2 \== LOC)))),         
    ifThen(( Region1\==Region2) ,raise_location_event(LOC,actNotice(reciever,actLeave(Agent,Region1,to(Dir))))),
         reverse_dir(Dir,Rev),

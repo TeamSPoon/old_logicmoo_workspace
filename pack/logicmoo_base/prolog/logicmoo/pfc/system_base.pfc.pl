@@ -485,6 +485,11 @@ prologBuiltin(A) :- cwc,is_ftCompound(A),get_functor(A, B),prologBuiltin(B).
 prologBuiltin(P) :- cwc,is_ftCompound(P),!,get_functor(P,F,A),functor(C,F,A),(predicate_property(C,built_in)). % predicate_property(P,static)).
 ttPredType(PT)==> {atom(PT),H=..[PT,I]}, (H:-cwc,is_ftCompound(I),get_functor(I,F),call(PT,F)).
 
+
+
+
+
+
 isa(pddlSomethingIsa/2, prologHybrid).
 
 arity(argIsa,3).

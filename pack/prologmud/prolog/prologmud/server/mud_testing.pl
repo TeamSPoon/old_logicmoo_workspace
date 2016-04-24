@@ -42,12 +42,12 @@ run_mud_tests:-
 
 action_info(actTests,"run run_mud_tests").
 
-a_command(_Agent,actTests) :- scan_updates, run_mud_tests.
+agent_command(_Agent,actTests) :- scan_updates, run_mud_tests.
 
 
 action_info(actTest(ftTerm),"run tests containing term").
 
-a_command(Agent,actTest(Obj)):-foc_current_agent(Agent),run_mud_test(Obj).
+agent_command(Agent,actTest(Obj)):-foc_current_agent(Agent),run_mud_test(Obj).
 
 
 test_name(String):-fmt(start_moo_test(mudNamed(String))),asserta(was_test_name(String)).
@@ -66,10 +66,10 @@ test_call(meta_callable(String,test_name(String))):-!,string(String).
 test_call(meta_call(X)):- show_call(test_call0(X)).
 test_call(Goal):-  meta_interp(test_call,Goal).
 
-test_call0(SomeGoal):- from_here(SomeGoal),!,req(SomeGoal).
-test_call0(SomeGoal):- dmsg(req(SomeGoal)), catch(SomeGoal,E,(test_result(error(E),SomeGoal),!,fail)).
+test_call0(SomeGoal):- from_here(SomeGoal),!,call_u(SomeGoal).
+test_call0(SomeGoal):- dmsg(call_u(SomeGoal)), catch(SomeGoal,E,(test_result(error(E),SomeGoal),!,fail)).
 
-test_true_req(Req):- test_true(req(Req)).
+test_true_req(Req):- test_true(call_u(Req)).
 test_true(SomeGoal):- test_call(SomeGoal) *-> test_result(passed,SomeGoal) ;  test_result(failed,SomeGoal).
 test_false(SomeGoal):- test_true(not(SomeGoal)).
 
@@ -84,11 +84,9 @@ run_mud_test(Filter):-
    once(run_mud_test_clause(M:H,B)),
    fail)).
 
-:- (rtrace,trace).
 run_mud_test_clause(M:mud_test,B):- must((contains_term(test_name(Name),nonvar(Name)))),!, M:run_mud_test(Name,B).
 run_mud_test_clause(M:mud_test(Name),B):- !, M:run_mud_test(Name,B).
 run_mud_test_clause(M:mud_test(Name,Test),B):- forall(B,M:run_mud_test(Name,Test)).
-:- (notrace,nortrace).
 run_mud_test(Name,Test):-
    fmt(begin_mud_test(Name)),
    once(ccatch((test_call(Test),fmt(completed_mud_test(Name))),E,fmt(error_mud_test(E, Name)));fmt(actTests(incomplet_mud_test(Name)))).
@@ -105,9 +103,9 @@ mud_test(test_movedist,
    test_name("teleport to main enginering"),
    do_agent_action('tp self to Area1000'),
   test_name("now we are really somewhere"),
-   test_true(req(mudAtLoc(P,_Somewhere))),
+   test_true(call_u(mudAtLoc(P,_Somewhere))),
   test_name("in main engineering?"),
-   test_true(req(localityOfObject(P,'Area1000'))),
+   test_true(call_u(localityOfObject(P,'Area1000'))),
    test_name("set the move dist to 5 meters"),
    do_agent_action('@set mudMoveDist 5'),
    test_name("going 5 meters"),
@@ -115,17 +113,17 @@ mud_test(test_movedist,
    do_agent_action('move e'),
    do_agent_action('move n'),
    test_name("must be now be in corridor"),
-   test_true(req(localityOfObject(P,'Area1002'))),
+   test_true(call_u(localityOfObject(P,'Area1002'))),
    do_agent_action('@set mudMoveDist 1'),
    call_n_times(5, do_agent_action('s')),
    do_agent_action('move s'),
    test_name("must be now be back in engineering"),
-   test_true(req(localityOfObject(P,'Area1000'))))).
+   test_true(call_u(localityOfObject(P,'Area1000'))))).
 
 mud_test_level2(create_gensym_named,
   with_all_dmsg(((do_agent_action('create food999'),
   foc_current_agent(P),
-  must(( req(( mudPossess(P,Item),isa(Item,food))))))))) .
+  must(( call_u(( mudPossess(P,Item),isa(Item,food))))))))) .
 
 mud_test_level2(drop_take,
   with_all_dmsg(((do_agent_action('create food'),
@@ -166,7 +164,7 @@ mud_test_local:-
 mud_test_local:- 
    test_name("tests to see if we have: singleValued on mudMoveDist"),
    foc_current_agent(Agent),
-   must(add(mudMoveDist(Agent,3))),
+   must(ain(mudMoveDist(Agent,3))),
    test_true(must((findall(X,mudMoveDist(Agent,X),L),length(L,1)))).
 
 mud_test_local:- 
@@ -186,7 +184,7 @@ mud_test_local:-
    test_name("tests to see if 'food' can be an item"),
       test_true(parseIsa(tItem, _, [food], [])).
 
-mud_test_local:-mpred_call(cmdShowRoomGrid('Area1000')).
+mud_test_local:-call_u(cmdShowRoomGrid('Area1000')).
 
 
 % more tests even
@@ -211,7 +209,7 @@ mud_test_local:-
 check_consistent(Obj,Scope):-var(Scope),!,check_consistent(Obj,0).
 check_consistent(Obj,Scope):-is_instance_consistent(Obj,Was),!,Was>=Scope.
 check_consistent(Obj,_):- t_l:is_checking_instance(Obj),!.
-check_consistent(Obj,Scope):- with_assertions(t_l:is_checking_instance(Obj),doall(check_consistent_0(Obj,Scope))).
+check_consistent(Obj,Scope):- w_tl(t_l:is_checking_instance(Obj),doall(check_consistent_0(Obj,Scope))).
 check_consistent_0(Obj,Scope):- once((catch((doall(((clause(hook:hooked_check_consistent(Obj,AvScope),Body),once(var(AvScope); (AvScope =< Scope) ),Body))),assert_if_new(is_instance_consistent(Obj,Scope))),E,assert_if_new(bad_instance(Obj,E))))),fail.
 check_consistent_0(Type,Scope):- once(type(Type)),
  catch((forall(isa(Obj,Type),check_consistent(Obj,Scope)),
@@ -223,8 +221,9 @@ hook:hooked_check_consistent(Obj,20):-must(object_string(_,Obj,0-5,String)),dmsg
 
 % mud_test("local sanity tests",  do_mud_test_locals).
 
+% w_tl/2
 
-:- 'mpred_hide_childs'(dbase:record_on_thread/2).
+% :- 'mpred_hide_childs'(dbase:record_on_thread/2).
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_flag_true(was_runs_tests_pl, at_start(run_setup)).

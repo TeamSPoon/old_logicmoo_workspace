@@ -22,9 +22,9 @@
 rez_to_inventory(Agent,NameOrType,NewObj):-
   gensym('_rez',SS),
   must_det_l([
-  with_assertions(thglobal:current_source_suffix(SS),show_call(createByNameMangle(NameOrType,NewObj,Clz))),
+  w_tl(thglobal:current_source_suffix(SS),show_call(createByNameMangle(NameOrType,NewObj,Clz))),
    padd(NewObj,authorWas(rez_to_inventory(Agent,NameOrType,NewObj))),
-   add(genls(Clz,tItem)),
+   ain(genls(Clz,tItem)),
    padd(Agent,mudStowing(NewObj)),
    add_missing_instance_defaults(NewObj),
    mudStowing(Agent,NewObj),
@@ -57,7 +57,7 @@ create_new_object(Agent,[tCol,NameOfType|DefaultParams]):-!,create_new_type(Agen
 create_new_object(Agent,[NameOrType|Params]):-
     create_meta(NameOrType,NewType,tSpatialThing,NewObj),
    assert_isa(NewObj,NewType),
-   add(genls(NewType,tItem)),
+   ain(genls(NewType,tItem)),
    padd(NewObj,authorWas(create_new_object(Agent,[NameOrType|Params]))),
    padd(Agent,current_pronoun("it",NewObj)),   
    getPropInfo(Agent,NewObj,Params,2,PropList),!,
@@ -71,7 +71,7 @@ create_new_type(Agent,[NewObj|DefaultParams]):-
    padd(NewObj,authorWas(create_new_type(Agent,[NewObj|DefaultParams]))),
    padd(Agent,current_pronoun("it",NewObj)),
    getPropInfo(Agent,NewObj,DefaultParams,2,PropList),!,
-   add(typeProps(NewObj,PropList)).
+   ain(typeProps(NewObj,PropList)).
 
 
 getPropInfo(_Agent,_NewName,PropsIn,N,[mudDescription(ftText(need,to,actParse,PropsIn,N))]).

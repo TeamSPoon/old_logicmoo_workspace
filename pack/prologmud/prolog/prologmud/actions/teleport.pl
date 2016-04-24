@@ -30,7 +30,7 @@ agent_call_command(_Agent,actTeleport(Other,_TO,Where)):-
    coerce(Where,tRegion,Location),
    detatch_object(Target),
    to_3d(Location,Where3D),
-   add(mudAtLoc(Target,Where3D)).
+   ain(mudAtLoc(Target,Where3D)).
 
 
 :- include(prologmud(mud_footer)).

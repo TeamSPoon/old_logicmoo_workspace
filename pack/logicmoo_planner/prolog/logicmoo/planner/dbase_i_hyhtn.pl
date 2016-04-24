@@ -93,7 +93,7 @@ tasks:-
    setof(Call,Call,List),list_to_set(List,Set),!,
    env_info(domfile),!,
    once((ignore(forall(member(Call,Set),
-     with_assertions(t_l:doing(tasks(N,Goal)),
+     w_tl(t_l:doing(tasks(N,Goal)),
       ((
       must(nonvar(Goal)),must(nonvar(State)),
       ignore(N=Goal),      
@@ -182,7 +182,7 @@ post_header:- dmsg(post_header),fail, forall(clause(post_header_hook,G),G).
 
 run_tests(Call) :- 
   statistics_runtime(InTime),  
-  with_assertions(doing(run_tests(Call)),
+  w_tl(doing(run_tests(Call)),
    call_cleanup(Call, 
   ((
  statistics_runtime(OutTime),
@@ -194,7 +194,7 @@ run_header_tests :- run_tests(forall(clause(header_tests,G),run_tests(G))).
 
    
 test_ocl(File):- \+ exists_file(File),!,forall(filematch(File,FM),test_ocl(FM)).
-test_ocl(File):- time(with_assertions(t_l:doing(test_ocl(File)), 
+test_ocl(File):- time(w_tl(t_l:doing(test_ocl(File)), 
    once((env_clear_doms_and_tasks,clean,l_file(File),tasks)))).
 
 header_tests :-test_ocl('domains_ocl/*.ocl').
@@ -452,7 +452,7 @@ clean:-
 
 
 init_locl_planner_interface(G,I,Node):-   
-  with_assertions(t_l:db_spy,
+  w_tl(t_l:db_spy,
      init_locl_planner_interface0(G,I,Node)).
 
 :-export(init_locl_planner_interface0/3).

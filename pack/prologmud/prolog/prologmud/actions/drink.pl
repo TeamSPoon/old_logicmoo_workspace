@@ -23,6 +23,6 @@ agent_call_command(Agent,actDrink(Obj)) :-
 	clr(mudPossess(Agent,Obj)),
 	call_update_charge(Agent,actDrink).
 
-update_charge(Agent,actDrink) :- add(mudEnergy(Agent,+ -1)).
+update_charge(Agent,actDrink) :- ain(mudEnergy(Agent,+ -1)).
 
 :- include(prologmud(mud_footer)).

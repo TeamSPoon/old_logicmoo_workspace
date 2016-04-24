@@ -11,15 +11,18 @@
 :- module(mpred_loader,
           [ add_from_file/1,
           % unused_assertion/1,
+          with_umt_l/1,
           is_box_module/2,best_module/3,is_default_shared/1,
           set_guessed_abox/2,guess_user_abox/2,set_file_abox/1,
           get_user_abox/1,set_user_abox/1,get_user_tbox/1,get_user_sbox/1,
           mpred_ops/0,mpred_ops/1,set_user_tbox/2,
           set_abox_for/2, 
           make_module_name_local/2,
+          get_original_term_source/1,
            get_abox_for/2,
            call_from_module/2,
           is_undefaulted/1,
+          reset_user_abox/1,
             user_m_check/1,
             add_term/2,
             assert_kif/1,
@@ -136,6 +139,7 @@
             mpred_expand_inside_file_anyways/0,
             mpred_expand_inside_file_anyways/1,
             mpred_expander/4,
+            mpred_expander0/4,
             
             mpred_expander_now_one/4,
             mpred_expander_now_one/4,
@@ -213,7 +217,7 @@
             mpred_loader_file/0
           ]).
 
- :- module_transparent((load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, mpred_process_input_1/1, must_expand_term_to_command/2, pl_to_mpred_syntax0/2, process_this_script0/1, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc_0/2, transform_opers_0/2, transform_opers_1/2)).
+ :- module_transparent((with_umt_l/1,load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, mpred_process_input_1/1, must_expand_term_to_command/2, pl_to_mpred_syntax0/2, process_this_script0/1, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc_0/2, transform_opers_0/2, transform_opers_1/2)).
 
  :- meta_predicate
         kb_dynamic(?),
@@ -258,7 +262,7 @@
             is_box_module/2,best_module/3,is_default_shared/1,import_to_user0/3,import_to_user/1,
             set_guessed_abox/2,guess_user_abox/2,set_file_abox/1,
             get_user_abox/1,set_user_abox/1,get_user_tbox/1,get_user_sbox/1,
-            mpred_ops/0,mpred_ops/1,set_user_tbox/2,
+            mpred_ops/0,mpred_ops/1,set_user_tbox/2,reset_user_abox/1,
             mpred_ops.
 
 :- (thread_local t_l:into_form_code/0, t_l:mpred_module_expansion/1).
@@ -268,11 +272,10 @@
 %:- dynamic(registered_module_type/2).        
 
 
-:- lmconf:dynamic((lmconf:registered_mpred_file/1,lmconf:never_registered_mpred_file/1,lmconf:registered_module_type/2)).
-:- multifile((lmconf:registered_mpred_file/1,lmconf:never_registered_mpred_file/1,lmconf:registered_module_type/2)).
+:- lmconf:dynamic((lmconf:registered_mpred_file/1,lmconf:ignore_file_mpreds/1,lmconf:registered_module_type/2)).
+:- multifile((lmconf:registered_mpred_file/1,lmconf:ignore_file_mpreds/1,lmconf:registered_module_type/2)).
 
 
-% :- use_module(library(logicmoo_utils)).
 
 
 
@@ -516,11 +519,14 @@ mpred_loader_module_transparent(F/A):-!, mpred_loader:module_transparent(F/A).
 % Managed Predicate Prolog Only File.
 %
 mpred_prolog_only_file(File):- var(File),!,fail.
-mpred_prolog_only_file(File):- \+ (lmcache:mpred_directive_value(pfc,file,File)),!.
+mpred_prolog_only_file(File):- lmconf:ignore_file_mpreds(File),!.
+mpred_prolog_only_file(File):- lmcache:mpred_directive_value(prolog,file,File),!.
 mpred_prolog_only_file(File):- file_name_extension(_,pfc,File),!,fail.
-mpred_prolog_only_file(File):- lmconf:never_registered_mpred_file(File),!.
 
-%:- use_module(library(logicmoo/util/logicmoo_util_help)).
+
+% :- use_module(library(logicmoo_utils)).
+%:- use_module(mpred_expansion).
+%:- use_module(library(logicmoo/util/logicmoo_util_attvar_reader)).
 %:- use_module(library(logicmoo/util/logicmoo_util_varnames)).
 
 :- meta_predicate mpred_expander(+,+,+,-).
@@ -548,14 +554,15 @@ mpred_expander(Type,LoaderMod,I,OO):-
 mpred_expander0(Type,LoaderMod,(I:-B),OO):- B==true,!,mpred_expander0(Type,LoaderMod,I,OO).
 mpred_expander0(Type,LoaderMod,I,OO):- 
  once(( 
+ %  current_predicate(_:mpred_expansion_file/0),
   sanity((ground(Type:LoaderMod),nonvar(I),var(OO))),
   I\= '$si$':'$was_imported_kb_content$'(_,_))),
    '$set_source_module'(M,M),
-   \+ mpred_prolog_only_module(M),
+  %   \+ mpred_prolog_only_module(M),
 
    get_source_ref1(mfl(_,F,L)),   
    \+ mpred_prolog_only_file(F),
-   
+  
   '$module'(UM,M),  
   call_cleanup(((
   make_key(mpred_expander_key(F,L,M,UM,Type,LoaderMod,I),Key),  
@@ -563,10 +570,11 @@ mpred_expander0(Type,LoaderMod,I,OO):-
    w_tl(t_l:mpred_already_in_file_expansion(Key),
       w_tl(t_l:current_why_source(mfl(M,F,L)),
         (( % trace,
+           
            get_original_term_source(Orig), 
            b_setval('$orig_term',Orig),
            b_setval('$term',[]),
-           must(((fully_expand(change(assert,ain),I,III)))),
+           once(fully_expand(change(assert,ain),I,III)),
            must((nonvar(III),mpred_expander_now_one(F,M,III,O))))))))),
     '$set_typein_module'(UM)),
   !,I\=@=O,O=OO.
@@ -971,9 +979,9 @@ is_mpred_file(F):- file_name_extension(_,pfc,F),!.
 is_mpred_file(F):- atom_concat(_,'.pfc.pl',F),!.
 is_mpred_file(F):- file_name_extension(_,plmoo,F),!.
 is_mpred_file(F):- lmconf:registered_mpred_file(F),!.
-is_mpred_file(F):- lmconf:never_registered_mpred_file(F),!,fail.
+is_mpred_file(F):- lmconf:ignore_file_mpreds(F),!,fail.
 is_mpred_file(F):- is_mpred_file0(F),!,asserta(lmconf:registered_mpred_file(F)),!.
-is_mpred_file(F):- asserta(lmconf:never_registered_mpred_file(F)),!,fail.
+is_mpred_file(F):- asserta(lmconf:ignore_file_mpreds(F)),!,fail.
 
 %% is_mpred_file0( ?F) is semidet.
 %
@@ -992,7 +1000,7 @@ is_mpred_file0(F):- file_name_extension(_,WAS,F),WAS\=pl,WAS\= '',WAS\=chr,!.
 decache_file_type(F):- 
   retractall(lmconf:mpred_is_impl_file(F)),
   retractall(lmconf:registered_mpred_file(F)),
-  retractall(lmconf:never_registered_mpred_file(F)).
+  retractall(lmconf:ignore_file_mpreds(F)).
 
 
 
@@ -2090,6 +2098,9 @@ mpred_term_expansion(MC,(:- cl_assert(ct(How),MC))):- strip_module(MC,M,C),hotra
   (mpred_term_expansion_by_storage_type(M,H,How)->true;(C \= (_:-_),mpred_term_expansion_by_storage_type(M,C,How))),!.
 
 
+mpred_term_expansion((Fact:- BODY),(:- ((cl_assert(Dir,Fact:- BODY))))):- nonvar(Fact),
+   mpred_term_expansion_by_pred_class(Dir,Fact,_Output),!.
+
 %% mpred_term_expansion_by_pred_class( ?VALUE1, ?Fact, ?Output) is semidet.
 %
 % load file term Converted To command  Extended Helper.
@@ -2108,8 +2119,8 @@ mpred_term_expansion(MC,(:- cl_assert(ct(How),MC))):- strip_module(MC,M,C),hotra
 mpred_term_expansion(Fact,(:- ((cl_assert(dyn(inside_file(dyn)),Fact))))):- inside_file(dyn),!.
 mpred_term_expansion(Fact,(:- ((cl_assert(kif(inside_file(kif)),Fact))))):- inside_file(kif),!.
 mpred_term_expansion(Fact,(:- ((cl_assert(pfc(inside_file(pfc)),Fact))))):- inside_file(pfc),!.
-mpred_term_expansion(Fact,(:- ((cl_assert(pfc(in_mpred_kb_module),Fact))))):- in_mpred_kb_module,!.
-mpred_term_expansion(Fact,(:- ((cl_assert(pfc(inside_file(pl)),Fact))))):- inside_file(pl),!.
+%mpred_term_expansion(Fact,(:- ((cl_assert(pfc(in_mpred_kb_module),Fact))))):- in_mpred_kb_module,!.
+%mpred_term_expansion(Fact,(:- ((cl_assert(pfc(inside_file(pl)),Fact))))):- inside_file(pl),!.
 mpred_term_expansion(Fact,Fact):- inside_file(pl),!.
 
 /*
@@ -2204,7 +2215,7 @@ make_dynamic(C):- compound(C),get_functor(C,F,A),must(F\=='$VAR'),
 :- use_module(library(shlib)).
 :- use_module(library(operators)).
 
-:- source_location(F,_),asserta(lmconf:never_registered_mpred_file(F)).
+:- source_location(F,_),asserta(lmconf:ignore_file_mpreds(F)).
 % filetypes 
 %
 %  pfc - all terms are sent to ain/1 (the the execeptions previously defined)
@@ -2301,7 +2312,7 @@ use_was_isa(G,I,C):-call((current_predicate(_,_:mpred_types_loaded/0),if_defined
 %
 % Current Context Module.
 %
-current_context_module(Ctx):-hotrace((lmconf:loading_module(Ctx))),!.
+current_context_module(Ctx):-hotrace((loading_module(Ctx))),!.
 current_context_module(Ctx):-hotrace((source_context_module(Ctx))).
 
 % ========================================
@@ -2860,9 +2871,6 @@ with_umt_l(G):-
    call_cleanup(
      catch(G,E,(wdmsg(E),throw(E))),
       '$set_source_module'(Was)).
-
-:- asserta_if_new((user:term_expansion(I,O):- with_umt_l(mpred_expander(term,user,I,O)))).
-:- asserta_if_new((system:goal_expansion(I,O):- hotrace(with_umt_l(mpred_expander(goal,system,I,O))))).
 
 
 

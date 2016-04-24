@@ -4,4 +4,6 @@
 
 :-swi_module(mobs_conf,[]).
 
-:- with_assertions(t_l:pfcExpansion,ensure_loaded(affordance/simbots)).
+:- w_tl(t_l:pfcExpansion,ensure_loaded(affordance/simbots)).
+
+% action_info_db

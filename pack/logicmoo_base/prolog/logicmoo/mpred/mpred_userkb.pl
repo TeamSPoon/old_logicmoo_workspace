@@ -78,6 +78,7 @@ contract_output_proof/2,
 current_world/1,
 cyc_to_plarkc/2,
 definingMt/2, 
+is_never_type/1,
 %cyckb_t/3,
 cycPrepending/2,
 decided_not_was_isa/2,
@@ -218,7 +219,7 @@ t_l:user_abox(baseKB,baseKB).
 
 % :- use_module(mpred_pfc).
 
-:- source_location(F,_),asserta(lmconf:never_registered_mpred_file(F)).
+:- source_location(F,_),asserta(lmconf:ignore_file_mpreds(F)).
 
 :- '$set_source_module'(baseKB).
 

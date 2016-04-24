@@ -110,6 +110,7 @@
             op(1150,fx,(was_export)),
             op(1150,fx,(shared_multifile)).
 
+:- dynamic(is_never_type/1).
 % autoloading user:portray_clause_pi/2 from /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first
 :- meta_predicate callOr(1,?,?),
 transitive_P(3,?,?,?),
@@ -310,7 +311,6 @@ type_prefix(ft,ttExpressionType).
 type_prefix(pred,tPred).
 type_prefix(macro,ttMacroType).
 
-:- decl_shared(foo).
 % ========================================
 % was_isa(Goal,I,C) recognises isa/2 and its many alternative forms
 % ========================================

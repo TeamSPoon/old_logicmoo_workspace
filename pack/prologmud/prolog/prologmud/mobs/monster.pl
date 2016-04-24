@@ -58,7 +58,7 @@ prologHybrid(wearsClothing/2).
 %:-wdmsg(wearsClothing/2).
 %:-prolog.
 %:-visible(+all),leash(+all),trace.
-:-add(meta_argtypes(wearsClothing(tObj,tClothing))).
+:-ain(meta_argtypes(wearsClothing(tObj,tClothing))).
 %:-notrace.
 %:- prolog.
 

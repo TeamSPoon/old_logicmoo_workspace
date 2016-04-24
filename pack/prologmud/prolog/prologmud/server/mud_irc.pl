@@ -15,7 +15,7 @@
 :-ain(( prologHybrid(irc_user_plays(tAgent,ftAtom,ftAtom)))).
 :-ain(( prologOrdered(agent_action_queue(tAgent,ftTerm,ftTerm)))).
 
-deliver_event_hooks(Agent,Event):- fail,ignore(once(deliver_to_irc(Agent,Event))).
+:-ain(( deliver_event_hooks(Agent,Event):- fail,ignore(once(deliver_to_irc(Agent,Event))))).
 irc_event_hooks(Channel,User,Stuff):- fail,ignore(once(irc_mud_event_hook(Channel,User,Stuff))).
 
 invite_to_mud(Nick):-eggdrop:to_egg('.tcl putserv "PRIVMSG ~w :DCC CHAT chat 73.37.100.94 4000"',[Nick]).
@@ -37,7 +37,7 @@ irc_mud_event_hook(Channel,User,call('?-'(foc_current_agent(Agent)),_Vs)):-
  get_session_id(ID),
  retractall(thglobal:agent_session(_,ID)),
  retractall(thglobal:session_agent(ID,_)),
- add(irc_user_plays(Agent,User,Channel)),
+ ain(irc_user_plays(Agent,User,Channel)),
    asserta_if_new(thglobal:agent_session(Agent,ID)),
    asserta_if_new(thglobal:session_agent(ID,Agent)),!.
 

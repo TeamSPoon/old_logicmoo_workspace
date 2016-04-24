@@ -26,7 +26,7 @@ prologHybrid(mudWielding/2).
 prologHybrid(mudStowing/2).
 prologHybrid(mudPossess/2).
 
-:-add((mudStowing(A,O) ==> mudPossess(A,O))).
+:-ain((mudStowing(A,O) ==> mudPossess(A,O))).
 mudWielding(A,O) ==> mudPossess(A,O).
 wearsClothing(A,O) ==> mudPossess(A,O).
 
@@ -117,7 +117,7 @@ do_change_use(ActUse,Agent,Obj,vTakenDeletes):-
         get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed),
         detatch_object(Obj),
         clr(t(Unstowed,Agent,Obj)),
-        add(t(NowWielding,Agent,Obj)),    
+        ain(t(NowWielding,Agent,Obj)),    
         must_post_use(ActUse,Agent,Obj),
         detatch_object(Obj).
 do_change_use(ActUse,Agent,_Source,vTakenCopyFn(What)) :-
@@ -125,24 +125,24 @@ do_change_use(ActUse,Agent,_Source,vTakenCopyFn(What)) :-
         create_new_object([What],Obj),
         detatch_object(Obj),
         clr(t(Unstowed,Agent,Obj)),
-        add(t(NowWielding,Agent,Obj)),        
+        ain(t(NowWielding,Agent,Obj)),        
         must_post_use(ActUse,Agent,Obj).
 do_change_use(ActUse,Agent,Obj,vTakenStays) :-        
         get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed),
         mudAtLoc(Obj,Was),
         detatch_object(Obj),
         clr(t(Unstowed,Agent,Obj)),
-        add(t(NowWielding,Agent,Obj)),
+        ain(t(NowWielding,Agent,Obj)),
         must_post_use(ActUse,Agent,Obj),
         detatch_object(Obj),
-        add(mudAtLoc(Obj,Was)).
+        ain(mudAtLoc(Obj,Was)).
 % default is same as vTakenMoves
 do_change_use(ActUse,Agent,Obj,vTakenMoves) :-
  must_det_l([
         get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed),        
         detatch_object(Obj),
         clr(t(Unstowed,Agent,Obj)),
-	add(t(NowWielding,Agent,Obj)),
+	ain(t(NowWielding,Agent,Obj)),
         must_post_use(ActUse,Agent,Obj)]).
 
 must_post_use(ActUse,Agent,Obj):-

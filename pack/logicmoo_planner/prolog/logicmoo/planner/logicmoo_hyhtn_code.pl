@@ -166,7 +166,7 @@ tasks:-
    setof(Call,Call,List),list_to_set(List,Set),!,
    env_info(kb(dom,file)),!,
    once((ignore(forall(member(Call,Set),
-     with_assertions(t_l:doing(tasks(N,Goal)),
+     w_tl(t_l:doing(tasks(N,Goal)),
       ((
       must(nonvar(Goal)),must(nonvar(State)),
       ignore(N=Goal),      
@@ -257,7 +257,7 @@ post_header:- dmsg(post_header),fail, forall(clause(post_header_hook,G),G).
 
 run_tests(Call) :- 
   statistics_runtime(InTime),  
-  with_assertions(doing(run_tests(Call)),
+  w_tl(doing(run_tests(Call)),
    call_cleanup(Call, 
   ((
  statistics_runtime(OutTime),
@@ -269,7 +269,7 @@ run_header_tests :- run_tests(forall(clause(header_tests,G),run_tests(G))).
 
 :-export(test_ocl/1).
 test_ocl(File):- forall(filematch(File,FM),test_ocl0(FM)).
-test_ocl0(File):- time(with_assertions(t_l:doing(test_ocl(File)), 
+test_ocl0(File):- time(w_tl(t_l:doing(test_ocl(File)), 
    once((env_clear_doms_and_tasks,clean_problem,l_file(File),tasks)))).
 
 header_tests :-test_ocl('domains_ocl/*.ocl').
@@ -495,7 +495,7 @@ merge_ss(SS,S1,Obj1,L1,SS,S1,Obj2,L2,G):-append(L1,L2,LL),G=..[SS,S1,Obj1,LL].
    
 
 init_locol_planner_interface(G,I,Node):-   
-   with_assertions(t_l:db_spy,
+   w_tl(t_l:db_spy,
      init_locol_planner_interface0(G,I,Node)).
 
 assert_itital_state(I0):- is_list(I0),!, must_maplist(assert_itital_state,I0),!.

@@ -308,7 +308,7 @@ might_be_clause_meta( Goal ):- compound(Goal), \+ \+ (arg(_,Goal,[_|_])),!.
 %:-use_module(boot('$toplevel'),[]).
 % '$query_loop'/0 
 (tprolog) :-   \+ lp_system( eclipse ),!,
-    user:with_assertions(op(0,fy,(traced)),   
+    user:w_tl(op(0,fy,(traced)),   
 	(((   current_prolog_flag(break_level, BreakLev)
 	->  true
 	;   BreakLev = -1

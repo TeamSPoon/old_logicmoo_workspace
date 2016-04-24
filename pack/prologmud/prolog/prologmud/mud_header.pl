@@ -15,43 +15,44 @@
 :- '$set_source_module'(baseKB).
 
 :- file_begin(code).
+:- op(1150,fx,decl_mpred_hybrid).
 
-:-shared_multifile(  irc_event_hooks/3).
-:-shared_multifile(  irc_event_hooks/3).
+:- decl_mpred_hybrid(  irc_event_hooks/3).
+:- decl_mpred_hybrid(  irc_event_hooks/3).
 
-:-shared_multifile(  deliver_event_hooks/2).
-:-shared_multifile(  deliver_event_hooks/2).
+:- decl_mpred_hybrid(  deliver_event_hooks/2).
+:- decl_mpred_hybrid(  deliver_event_hooks/2).
 
-:- shared_multifile   irc_user_plays/3.
+:- decl_mpred_hybrid   irc_user_plays/3.
 
 :- thread_local t_l:wants_logout/1.
-:- shared_multifile t_l:wants_logout/1.
+:- decl_mpred_hybrid t_l:wants_logout/1.
 
-:- shared_multifile   thglobal:session_io/4, thglobal:session_agent/2, thglobal:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
-:- shared_multifile thglobal:session_io/4, thglobal:session_agent/2, thglobal:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
+:- decl_mpred_hybrid   thglobal:session_io/4, thglobal:session_agent/2, thglobal:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
+:- decl_mpred_hybrid thglobal:session_io/4, thglobal:session_agent/2, thglobal:agent_session/2,   telnet_fmt_shown/3,   agent_action_queue/3.
 
-:- shared_multifile   mudDescription/1.
-:- shared_multifile   term_specifier_text/2.
-:- shared_multifile   type_action_info/3.
-:- shared_multifile   update_charge/2.
-:- shared_multifile   update_stats/2.
-:- shared_multifile   use_usable/4.
-:- shared_multifile   verb_alias/2.
-:- shared_multifile   vtActionTemplate/1.
-:- shared_multifile   mud_test/0.
-:- shared_multifile   mud_test/1.
-:- shared_multifile   mud_test/2.
-:- shared_multifile   mud_test_local/0.
-:- shared_multifile   mud_test_local/1.
-:- shared_multifile   mud_test_local/2.
-:- shared_multifile   world_agent_plan/3.
-:- shared_multifile   action_info/2.
-:- shared_multifile   action_rules/4.
-:- shared_multifile   action_verb_useable/4.
-:- shared_multifile   a_command/2.
-:- shared_multifile   a_command_fallback/2.
-:- shared_multifile   agent_text_command/4.
-:- shared_multifile   check_permanence/4.
+:- decl_mpred_hybrid   mudDescription/1.
+:- decl_mpred_hybrid   term_specifier_text/2.
+:- decl_mpred_hybrid   type_action_info/3.
+:- decl_mpred_hybrid   update_charge/2.
+:- decl_mpred_hybrid   update_stats/2.
+:- decl_mpred_hybrid   use_usable/4.
+:- decl_mpred_hybrid   verb_alias/2.
+:- decl_mpred_hybrid   vtActionTemplate/1.
+:- decl_mpred_hybrid   mud_test/0.
+:- decl_mpred_hybrid   mud_test/1.
+:- decl_mpred_hybrid   mud_test/2.
+:- decl_mpred_hybrid   mud_test_local/0.
+:- decl_mpred_hybrid   mud_test_local/1.
+:- decl_mpred_hybrid   mud_test_local/2.
+:- decl_mpred_hybrid   world_agent_plan/3.
+:- decl_mpred_hybrid   action_info/2.
+:- decl_mpred_hybrid   action_rules/4.
+:- decl_mpred_hybrid   action_verb_useable/4.
+:- decl_mpred_hybrid   agent_command/2.
+:- decl_mpred_hybrid   a_command_fallback/2.
+:- decl_mpred_hybrid   agent_text_command/4.
+:- decl_mpred_hybrid   check_permanence/4.
 
 
 
@@ -61,22 +62,22 @@
 :-op(0,fy,  ('enabled')).
 :- '@'(ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),user).
 
-:-shared_multifile(user_db:grant_openid_server/2).
-:-shared_multifile(user_db:grant_openid_server/2).
-:- shared_multifile '$was_imported_kb_content$'/2.
+:- decl_mpred_hybrid(user_db:grant_openid_server/2).
+:- decl_mpred_hybrid(user_db:grant_openid_server/2).
+:- decl_mpred_hybrid '$was_imported_kb_content$'/2.
 :- discontiguous('$was_imported_kb_content$'/2).
-:- shared_multifile(  disabled/1).
+:- decl_mpred_hybrid(  disabled/1).
 :- discontiguous(  disabled/1).
-:- shared_multifile(  enabled/1).
+:- decl_mpred_hybrid(  enabled/1).
 :- discontiguous(  enabled/1).
-:- shared_multifile   was_enabled/1.
+:- decl_mpred_hybrid   was_enabled/1.
 :- discontiguous(  was_enabled/1).
-:- shared_multifile   listing_mpred_hook/1.
-:- shared_multifile   listing_mpred_hook/1.
+:- decl_mpred_hybrid   listing_mpred_hook/1.
+:- decl_mpred_hybrid   listing_mpred_hook/1.
 
 
-:- shared_multifile   genls/2.
-:- shared_multifile(  isa/2).
+:- decl_mpred_hybrid   genls/2.
+:- decl_mpred_hybrid(  isa/2).
 
 :- style_check((-(singleton))).
 
@@ -86,7 +87,7 @@
 :-op(1190,fy,  (disabled)).
 :-op(1190,fy,  (enabled)).
 :-op(1120,fx,  (export)).
-:-op(1120,fx,  (shared_multifile)).
+:-op(1120,fx,  (decl_mpred_hybrid)).
 */
 
 :- set_prolog_flag(double_quotes, atom).
@@ -94,96 +95,96 @@
 :- set_prolog_flag(generate_debug_info, true).
 
 % these do not get defined!?
-% :-shared_multifile user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
+% :- decl_mpred_hybrid user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
-:- shared_multifile(mpred_online:semweb_startup).
+:- decl_mpred_hybrid(mpred_online:semweb_startup).
 
-:-shared_multifile(  tChannel/1).
+:- decl_mpred_hybrid(  tChannel/1).
 
 
-:- shared_multifile thglobal:pfcManageHybrids/0.
-:- shared_multifile t_l:infMustArgIsa/0.
+:- decl_mpred_hybrid thglobal:pfcManageHybrids/0.
+:- decl_mpred_hybrid t_l:infMustArgIsa/0.
 :- thread_local t_l:into_form_code/0.
 :- thread_local t_l:current_local_why/2.
-:- shared_multifile   defnSufficient/2.
+:- decl_mpred_hybrid   defnSufficient/2.
 :- thread_local   t_l:repl_to_string/2.
 :- thread_local   t_l:repl_writer/2.
-:- shared_multifile   loaded_external_kbs/0.
-:- shared_multifile   loading_module_h/1.
-:- shared_multifile   registered_module_type/2.
-:- shared_multifile   must_compile_special_clause_file/1.
+:- decl_mpred_hybrid   loaded_external_kbs/0.
+:- decl_mpred_hybrid   loading_module_h/1.
+:- decl_mpred_hybrid   registered_module_type/2.
+:- decl_mpred_hybrid   must_compile_special_clause_file/1.
 
 % HOOKS
-:- shared_multifile   decl_coerce/3.
-:- shared_multifile   listen_to_ops/2.
-:- shared_multifile   deduce_facts/2.
-:- shared_multifile   default_type_props/3.
-:- shared_multifile   fact_always_true/1.
-:- shared_multifile   fact_is_false/2.
-:- shared_multifile   fact_maybe_deduced/1.
-:- shared_multifile   tms_reject_why/2.
-:- shared_multifile   hook_coerce/3.
+:- decl_mpred_hybrid   decl_coerce/3.
+:- decl_mpred_hybrid   listen_to_ops/2.
+:- decl_mpred_hybrid   deduce_facts/2.
+:- decl_mpred_hybrid   default_type_props/3.
+:- decl_mpred_hybrid   fact_always_true/1.
+:- decl_mpred_hybrid   fact_is_false/2.
+:- decl_mpred_hybrid   fact_maybe_deduced/1.
+:- decl_mpred_hybrid   tms_reject_why/2.
+:- decl_mpred_hybrid   hook_coerce/3.
 
-:- shared_multifile   create_random_fact/1.
-:- shared_multifile   local_term_anglify/2.
-:- shared_multifile   term_anglify_last/2.
-:- shared_multifile   term_anglify_np/3.
-:- shared_multifile   term_anglify_np_last/3.
+:- decl_mpred_hybrid   create_random_fact/1.
+:- decl_mpred_hybrid   local_term_anglify/2.
+:- decl_mpred_hybrid   term_anglify_last/2.
+:- decl_mpred_hybrid   term_anglify_np/3.
+:- decl_mpred_hybrid   term_anglify_np_last/3.
 
-:- shared_multifile   hooked_random_instance/3.
+:- decl_mpred_hybrid   hooked_random_instance/3.
 
-:- shared_multifile   now_unused/1.
-:- shared_multifile   provide_mpred_read_attributes/3.
-:- shared_multifile   provide_mpred_setup/4.
-:- shared_multifile   provide_mpred_clauses/3.
-:- shared_multifile   provide_mpred_op/2.
-:- shared_multifile   provide_mpred_write_attributes/2.
+:- decl_mpred_hybrid   now_unused/1.
+:- decl_mpred_hybrid   provide_mpred_read_attributes/3.
+:- decl_mpred_hybrid   provide_mpred_setup/4.
+:- decl_mpred_hybrid   provide_mpred_clauses/3.
+:- decl_mpred_hybrid   provide_mpred_op/2.
+:- decl_mpred_hybrid   provide_mpred_write_attributes/2.
 
 % DYN HOOKS
-:- shared_multifile   is_never_type/1.
+:- decl_mpred_hybrid   is_never_type/1.
 
 % DYN FOR CODE
-:- shared_multifile thglobal:after_mpred_load/0.
-:- shared_multifile thglobal:use_cyc_database/0.
+:- decl_mpred_hybrid thglobal:after_mpred_load/0.
+:- decl_mpred_hybrid thglobal:use_cyc_database/0.
 
-:- shared_multifile   fact_is_false/2.
-:- shared_multifile   kbp_t_list_prehook/2.
+:- decl_mpred_hybrid   fact_is_false/2.
+:- decl_mpred_hybrid   kbp_t_list_prehook/2.
 
 
 % DYN KB
-:- shared_multifile   only_if_pttp/0.
-:- shared_multifile   use_kif/2.
-:- shared_multifile   is_mpred_prop/2.
-%:- shared_multifile   hasInstance_dyn/2.
-:- shared_multifile   arity/2.
-:- shared_multifile   mpred_prop/2.
-:- shared_multifile   '<=>'/2.
-% :- shared_multifile   ruleForward/2.
-:- shared_multifile   ruleRewrite/2.
-% :- shared_multifile   ruleBackward/2.
+:- decl_mpred_hybrid   only_if_pttp/0.
+:- decl_mpred_hybrid   use_kif/2.
+:- decl_mpred_hybrid   is_mpred_prop/2.
+%:- decl_mpred_hybrid   hasInstance_dyn/2.
+:- decl_mpred_hybrid   arity/2.
+:- decl_mpred_hybrid   mpred_prop/2.
+:- decl_mpred_hybrid   '<=>'/2.
+% :- decl_mpred_hybrid   ruleForward/2.
+:- decl_mpred_hybrid   ruleRewrite/2.
+% :- decl_mpred_hybrid   ruleBackward/2.
 
 % :-must(not(  mpred_prop(t,prologHybrid))).
 
 
-:- shared_multifile   term_specifier_text/2.
-:- shared_multifile   update_charge/2.
-:- shared_multifile   update_stats/2.
-:- shared_multifile   use_usable/4.
-:- shared_multifile   verb_alias/2.
-:- shared_multifile   vtActionTemplate/1.
-:- shared_multifile   mud_test/0.
-:- shared_multifile   mud_test/1.
-:- shared_multifile   mud_test/2.
-:- shared_multifile   mud_test_local/0.
-:- shared_multifile   mud_test_local/1.
-:- shared_multifile   mud_test_local/2.
-:- shared_multifile   world_agent_plan/3.
-:- shared_multifile   action_info/2.
-:- shared_multifile   action_rules/4.
-:- shared_multifile   action_verb_useable/4.
-:- shared_multifile   a_command/2.
-:- shared_multifile   agent_text_command/4.
-:- shared_multifile   check_permanence/4.
+:- decl_mpred_hybrid   term_specifier_text/2.
+:- decl_mpred_hybrid   update_charge/2.
+:- decl_mpred_hybrid   update_stats/2.
+:- decl_mpred_hybrid   use_usable/4.
+:- decl_mpred_hybrid   verb_alias/2.
+:- decl_mpred_hybrid   vtActionTemplate/1.
+:- decl_mpred_hybrid   mud_test/0.
+:- decl_mpred_hybrid   mud_test/1.
+:- decl_mpred_hybrid   mud_test/2.
+:- decl_mpred_hybrid   mud_test_local/0.
+:- decl_mpred_hybrid   mud_test_local/1.
+:- decl_mpred_hybrid   mud_test_local/2.
+:- decl_mpred_hybrid   world_agent_plan/3.
+:- decl_mpred_hybrid   action_info/2.
+:- decl_mpred_hybrid   action_rules/4.
+:- decl_mpred_hybrid   action_verb_useable/4.
+:- decl_mpred_hybrid   agent_command/2.
+:- decl_mpred_hybrid   agent_text_command/4.
+:- decl_mpred_hybrid   check_permanence/4.
 
 % :- file_begin(pfc).
 :- enable_mpred_expansion.

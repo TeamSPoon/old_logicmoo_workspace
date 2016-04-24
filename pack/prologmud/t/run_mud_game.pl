@@ -97,7 +97,7 @@ Warning: baseKB:to_egg/2, which is referenced by
 Warning:        1-st clause of baseKB:invite_to_mud/1: 1-st clause of baseKB:invite_to_mud/1
 Warning: kellerStorage:kellerStorageTestSuite/0, which is referenced by
 Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/mud_loader.pl:275:93: 1-st clause of mud_test_local/0
-Warning: with_assertions/2, which is referenced by
+Warning: w_tl/2, which is referenced by
 Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/mud_loader.pl:222:10: 1-st clause of debug_repl_w_cyc/2
 Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/mud_loader.pl:182:28: 2-nd clause of hard_work/0
 Warning:        /root/lib/swipl/pack/prologmud/prolog/prologmud/mud_loader.pl:195:12: 1-st clause of slow_work/0

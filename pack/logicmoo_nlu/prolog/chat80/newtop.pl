@@ -86,7 +86,7 @@ end(F) :-
 
 
 :-dynamic_multifile_exported(control80/1).
-control80(U):-with_assertions(t_l:tracing80,control80(report,U)).
+control80(U):-w_tl(t_l:tracing80,control80(report,U)).
 
 :-dynamic_multifile_exported(control80/2).
 
@@ -107,20 +107,20 @@ control80(Callback,[do,not,trace,'.']) :-
    call(Callback,retract(t_l:tracing80),'t_l:tracing80',false,boolean),
    display('No longer t_l:tracing80.'), nl, fail.
 
-control80(Callback,U) :- with_assertions(t_l:tracing80, call_in_banner(U,(ignore(process_run(Callback,U,_List,_Time))))),fail.
+control80(Callback,U) :- w_tl(t_l:tracing80, call_in_banner(U,(ignore(process_run(Callback,U,_List,_Time))))),fail.
    
 :-export(chat80/1).
 chat80(U):-
- with_assertions(tracing80,
-           with_assertions(t_l:chat80_interactive,
+ w_tl(tracing80,
+           w_tl(t_l:chat80_interactive,
             with_no_assertions(t_l:useOnlyExternalDBs,
              with_no_assertions(thglobal:use_cyc_database,
               ignore(control80(U)))))).
 
 :-export(test_chat80/1).
 test_chat80(U):-
- with_assertions(tracing80,
-           with_assertions(t_l:chat80_interactive,
+ w_tl(tracing80,
+           w_tl(t_l:chat80_interactive,
             with_no_assertions(t_l:useOnlyExternalDBs,
              with_no_assertions(thglobal:use_cyc_database,
               ignore(control80(U)))))).
@@ -217,10 +217,10 @@ sent_to_parsed(U,E):- deepen_pos(sentence(E,U,[],[],[])).
 
 :-export(deepen_pos/1).
 :-meta_predicate(deepen_pos(0)).
-deepen_pos(Call):- one_must(deepen_pos_0(Call),with_assertions(t_l:useAltPOS,deepen_pos_0(Call))).
+deepen_pos(Call):- one_must(deepen_pos_0(Call),w_tl(t_l:useAltPOS,deepen_pos_0(Call))).
 :-export(deepen_pos_0/1).
 :-meta_predicate(deepen_pos_0(0)).
-deepen_pos_0(Call):-one_must(Call,with_assertions(t_l:usePlTalk,Call)).
+deepen_pos_0(Call):-one_must(Call,w_tl(t_l:usePlTalk,Call)).
 
 
 % any_to_string("How many countries are there?",X),splt_words(X,Y,Z),vars_to_ucase(Y,Z),maplist(call,Z)

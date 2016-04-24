@@ -418,7 +418,7 @@ maybe_noun_or_adj(T):- var(T)->true;(atom(T),not_ccw(T)).
 %  chat80("how are you?").
 % test_chat80("you flow").
 
-test_chat80(U):- with_assertions(t_l:chat80_interactive, must(chat80(U))).
+test_chat80(U):- w_tl(t_l:chat80_interactive, must(chat80(U))).
 
 t11:- 
    test_chat80("how many postures are there?"),
@@ -1055,9 +1055,9 @@ answers([[africa, america, antarctica, asia, australasia, europe]])],[time(0.054
 
 
 :-export((t1/0,t12/0,t13/0)).
-t1:- with_no_assertions(thglobal:use_cyc_database,with_assertions(t_l:tracing80, forall(must_test_801(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
-t12:- with_no_assertions(thglobal:use_cyc_database,with_assertions(t_l:tracing80, forall(must_test_802(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
-t13:- with_no_assertions(thglobal:use_cyc_database,with_assertions(t_l:tracing80, forall(must_test_803(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
+t1:- with_no_assertions(thglobal:use_cyc_database,w_tl(t_l:tracing80, forall(must_test_801(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
+t12:- with_no_assertions(thglobal:use_cyc_database,w_tl(t_l:tracing80, forall(must_test_802(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
+t13:- with_no_assertions(thglobal:use_cyc_database,w_tl(t_l:tracing80, forall(must_test_803(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
 
 
 

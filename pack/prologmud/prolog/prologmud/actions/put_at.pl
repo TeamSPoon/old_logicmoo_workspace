@@ -36,7 +36,7 @@ agent_call_command(_Agent,actPut(Other,_Prep,Where)):-
    clr(localityOfObject(Target,_)),
    clr(mudAtLoc(Target,_)),
    to_3d(Location,Where3D),
-   add(mudAtLoc(Where3D,Location)).
+   ain(mudAtLoc(Where3D,Location)).
 
 
 :- include(prologmud(mud_footer)).

@@ -474,11 +474,11 @@ do_define_affordance(LIST):-(member(subjType= SType,LIST);member(alsoType= SType
   decl_type(Type),do_define_type_affordance(Type,LIST).
 
 do_define_type_affordance1(Type,_= Type):-!.
-do_define_type_affordance1(Type,subjType= String):- add(nameStrings(Type,String)).
+do_define_type_affordance1(Type,subjType= String):- ain(nameStrings(Type,String)).
 
 
-do_define_type_affordance1(Type,alsoType= TWhat):-i_name(t,TWhat,ParentType),add(genls(Type,ParentType)).
-do_define_type_affordance1(Type,superType= TWhat):-i_name(t,TWhat,ParentType),add(genls(Type,ParentType)).
+do_define_type_affordance1(Type,alsoType= TWhat):-i_name(t,TWhat,ParentType),ain(genls(Type,ParentType)).
+do_define_type_affordance1(Type,superType= TWhat):-i_name(t,TWhat,ParentType),ain(genls(Type,ParentType)).
 do_define_type_affordance1(Type,actionVerb= SVerb):-i_name(act,SVerb,Verb),nb_setval(actionVerb,Verb),!,assert_if_new(verb_for_type(Verb,Type)).
 do_define_type_affordance1(Type,actionVerb(2)= SVerb):-i_name(act,SVerb,Verb),nb_setval(actionVerb,Verb),
   (nb_current(acceptsChild,ChildType)->true;ChildType=tCarryAble),
@@ -490,7 +490,7 @@ do_define_type_affordance1(Type,SPred= Wants * Gets):-i_name(mud,SPred,Pred),nb_
   to_rel_value(Wants,WantsR),
   to_rel_value(Gets,GetsR),
   assert_if_new(verb_affordance(Verb,Type,APred,WantsR,GetsR)).
-do_define_type_affordance1(Type,mudActionMaxDistance= Distance):-nb_getval(actionVerb,Verb),add(mudActionMaxDistance(Verb,Type,Distance)).
+do_define_type_affordance1(Type,mudActionMaxDistance= Distance):-nb_getval(actionVerb,Verb),ain(mudActionMaxDistance(Verb,Type,Distance)).
 do_define_type_affordance1(Type,textSitName= String):-do_define_type_affordance1(Type,textName= String).
 do_define_type_affordance1(Type,textName= String):-nb_getval(actionVerb,Verb),assert_if_new(verb_desc(Verb,Type,String)).
 do_define_type_affordance1(Type,stringMatch= String):-assert_if_new(type_desc(Type,String)).
@@ -536,7 +536,7 @@ a_command_fallback(Agent,TemplIn):-a_command_simbots_real(Agent,TemplIn).
 a_command_simbots_real(Agent,actImprove(Trait)):- nonvar(Trait),
       findall(agentTODO(Agent,actDo(ActVerb,Types)),
         (verb_affordance(ActVerb,Types,Trait,+ Think,_Real),ThinkN is Think,ThinkN>0), NewAdds),
-      show_call(forall(member(Add,NewAdds),add(Add))).
+      show_call(forall(member(Add,NewAdds),ain(Add))).
 
 a_command_simbots_real(Agent,TemplIn):- nonvar(TemplIn), 
    simbots_templates(Templ),

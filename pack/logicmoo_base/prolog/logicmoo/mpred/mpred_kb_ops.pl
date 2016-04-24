@@ -92,7 +92,7 @@ mpred_call_only_facts/1,
 call_u_req/1,
 call_u/2,
 neg_in_code/1,
-neg_in_code/0,
+neg_in_code0/1,
 {}/1,
 trigger_supporters_list/2,
 spft_precanonical/3,
@@ -583,9 +583,6 @@ lmconf:module_local_init:-set_prolog_stack_gb(16).
 :- was_dynamic(lmconf:mpred_hook_rescan_files/0).
 %:- was_dynamic(use_presently/0).
 % used to annotate a predciate to indicate PFC support
-:- shared_multifile(infoF/1).
-:- was_dynamic(infoF/1).
-:- was_export(infoF/1).
 
 % :- set_prolog_flag(access_level,system).
 
@@ -2580,6 +2577,9 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 :- module_transparent(pred_head/2).
 :- module_transparent(if_missing/1).
 
+:- shared_multifile(infoF/1).
+:- was_dynamic(infoF/1).
+:- was_export(infoF/1).
 
 :- source_location(S,_),prolog_load_context(module,M),
  forall(source_file(M:H,S),ignore((functor(H,F,A),

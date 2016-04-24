@@ -92,10 +92,10 @@ pddl_idea(Agent,actAttack(Dir)) :-
 	list_object_dir_near(List,tMonster,Dir).
 
 pddl_idea(Agent,actLook) :-
-        req(mudMemory(Agent,aDirectionsFn(Old))),
+        call_u(mudMemory(Agent,aDirectionsFn(Old))),
 	del(mudMemory(Agent,aDirectionsFn(Old))),
 	random_permutation(Old,New),
-	add(mudMemory(Agent,aDirectionsFn(New))).
+	ain(mudMemory(Agent,aDirectionsFn(New))).
 
 
 :- include(prologmud(mud_footer)).

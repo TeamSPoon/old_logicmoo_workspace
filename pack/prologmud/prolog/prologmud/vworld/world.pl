@@ -96,21 +96,22 @@ isaOrSame(A,B):-A==B,!.
 isaOrSame(A,B):-isa(A,B).
 
 intersect(A,EF,B,LF,Tests,Results):-findall( A-B, ((member(A,EF),member(B,LF),once(Tests))), Results),[A-B|_]=Results.
-% is_property(P,_A),PROP=..[P|ARGS],CALL=..[P,Obj|ARGS],req(CALL).
+% is_property(P,_A),PROP=..[P|ARGS],CALL=..[P,Obj|ARGS],call_u(CALL).
 obj_memb(E,L):-is_list(L)->member(E,L);E=L.
 isa_any(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(A,B),_Results).
 prop_memb(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(A,B),_Results).
+
 
 tCol(tItem).
 tCol(tAgent).
 tCol(tRegion).
 tCol(tItem).
 tCol(tItem).
-exisitingThing(O):-tItem(O).
-exisitingThing(O):-tAgent(O).
-exisitingThing(O):-tRegion(O).
+existingThing(O):-tItem(O).
+existingThing(O):-tAgent(O).
+existingThing(O):-tRegion(O).
 anyInst(O):-tCol(O).
-anyInst(O):-exisitingThing(O).
+anyInst(O):-existingThing(O).
 
 /*
 
@@ -148,12 +149,12 @@ genls(tFood,tItem).
 % ttSpatialType(SubType):-member(SubType,[tAgent,tItem,tRegion]).
 %ttSpatialType(S):- is_asserted(ttSpatialType(T)), impliedSubClass(S,T).
 
-%createableSubclassType(S,T):-mpred_call(  ttSpatialType(T)),is_asserted(genls(S,T)).
-%createableSubclassType(T,tSpatialThing):-mpred_call( ttSpatialType(T)).
+%createableSubclassType(S,T):-call_u(  ttSpatialType(T)),is_asserted(genls(S,T)).
+%createableSubclassType(T,tSpatialThing):-call_u( ttSpatialType(T)).
 
 create_agent(P):-functor(P,isKappaFn,_),!.
 create_agent(P):-create_agent(P,[]).
-create_agent(P,List):-must_det(create_instance(P,tAgent,List)).
+create_agent(P,List):- must_det(create_instance(P,tAgent,List)).
 
 
 :-export(create_instance/1).
@@ -167,8 +168,8 @@ create_instance(What,Type,Props):-
 
 create_instance_now(What,Type,Props):-
   must((var(Type);atom_concat('t',_,Type ))),!,
- with_assertions(t_l:agenda_suspend_scans,
-  with_assertions(t_l:deduceArgTypes(_),
+ w_tl(t_l:agenda_suspend_scans,
+  w_tl(t_l:deduceArgTypes(_),
   with_no_assertions(t_l:useOnlyExternalDBs,
    with_no_assertions(t_l:noRandomValues(_),
      with_no_assertions(t_l:infInstanceOnly(_),   
@@ -185,14 +186,14 @@ create_instance_0(What,Type,List):- (var(What);var(Type);var(List)),trace_or_thr
 create_instance_0(I,_,_):-is_creating_now(I),!.
 create_instance_0(I,_,_):-asserta_if_new(is_creating_now(I)),fail.
 create_instance_0(What,FormatType,List):- FormatType\==tCol, ttExpressionType(FormatType),!,trace_or_throw(ttExpressionType(FormatType,create_instance(What,FormatType,List))).
-create_instance_0(SubType,tCol,List):-add(tCol(SubType)),padd(SubType,List).
+create_instance_0(SubType,tCol,List):-ain(tCol(SubType)),padd(SubType,List).
 
 ttSpatialType(tAgent).
 genls(tActor,tAgent).
 genls(tExplorer,tAgent).
 
-:-shared_multifile(predTypeMax/3).
-:-shared_multifile(predInstMax/3).
+:-decl_mpred_hybrid(predTypeMax/3).
+:-decl_mpred_hybrid(predInstMax/3).
 
 %NEXT TODO predInstMax(I,mudEnergy,NRG):- infSecondOrder, predTypeMax(mudEnergy,AgentType,NRG),isa(I,AgentType).
 %predInstMax(I,mudHealth,Dam):- predTypeMax(mudHealth,AgentType,Dam),isa(I,AgentType).
@@ -218,7 +219,7 @@ create_instance_0(T,tAgent,List):-
    put_in_world(P),
    add_missing_instance_defaults(P)]).
 
-add_missing_instance_defaults(P):- add(tNewlyCreated(P)).
+add_missing_instance_defaults(P):- ain(tNewlyCreated(P)).
    
 /*
 reset_values(I):- forall(valueReset(To,From),reset_value(I,To,From)).
@@ -276,8 +277,8 @@ create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dm
 
 
 
-% already convered mudPossess(Who,Thing):-genlInverse(W,mudPossess),into_mpred_form(t(W,Thing,Who),Call),mpred_call(Call).
-% already convered mudPossess(Who,Thing):-genlPreds(mudPossess,W),into_mpred_form(t(W,Who,Thing),Call),mpred_call(Call).
+% already convered mudPossess(Who,Thing):-genlInverse(W,mudPossess),into_mpred_form(t(W,Thing,Who),Call),call_u(Call).
+% already convered mudPossess(Who,Thing):-genlPreds(mudPossess,W),into_mpred_form(t(W,Who,Thing),Call),call_u(Call).
 
 
 % :- include(prologmud(mud_footer)).

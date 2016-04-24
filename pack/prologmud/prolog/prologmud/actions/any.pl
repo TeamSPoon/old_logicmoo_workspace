@@ -47,9 +47,9 @@ agent_call_command(Agent,ACT) :-
       action_adds_states(Agent,[VERB|SENT],ADDS),
      call_update_charge(Agent,VERB),
      ((
-         req(REQS)) ->
+         call_u(REQS)) ->
          ((clr(REMS),
-         add(ADDS),
+         ain(ADDS),
          call_update_charge(Agent,VERB)));	
 %Nothing to use
       (add_cmdfailure(Agent,SENT))).
