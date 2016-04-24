@@ -540,7 +540,7 @@ if_startup_script:- prolog_load_context(source, HereF),file_base_name(HereF,Here
 %
 % If Startup Script.
 %
-if_startup_script(Call):-if_startup_script->Call;true.
+if_startup_script(Call):-if_startup_script->Call;dmsg(\+ if_startup_script(Call)).
 
 :- export(normalize_path/2).
 

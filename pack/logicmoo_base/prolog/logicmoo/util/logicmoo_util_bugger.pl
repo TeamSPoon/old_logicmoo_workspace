@@ -1386,7 +1386,7 @@ set_no_debug_thread:-
    retractall(tlbugger:ifWontTrace),
    asserta(tlbugger:ifWontTrace))),!.
 
-:- if(exists_source(library(gui_tracer))).
+:- if(prolog_dialect:exists_source(library(gui_tracer))).
 %= :- meta_predicate  set_gui_debug(0).
 
 %= 	 	 

@@ -5,21 +5,29 @@
 % Douglas Miles
 */
 :- if(('$current_source_module'(CM),'$current_typein_module'(M),
-  asserta(logicmoo_webbot:user_module_uses(M,CM)))).
+  asserta(logicmoo_webbot_user_module_uses(M,CM)))).
 :- endif.
 :- module(logicmoo_webbot,
  [qsp/0]).
 
 
-
+:- autoload.
+:- use_module(library(logicmoo_utils)).
+:- autoload.
 :- use_module(library(eggdrop)).
 :- use_module(library(debug)).
-:- debug(_),nodebug(_).
+:- debug(logicmoo_webbot),nodebug(logicmoo_webbot).
 qsp:- qsave_program(irc_webbot).
+:- autoload. % system_markers
 :- initialization(egg_go).
 :- egg_go.
 
 :- use_module(library(logicmoo_user)).
 
+:- mpred_www:ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
+
 :- mpred_www:ensure_webserver(3020).
 :- logicmoo_snark:load_snark.
+:- threads.
+:- statistics.
+

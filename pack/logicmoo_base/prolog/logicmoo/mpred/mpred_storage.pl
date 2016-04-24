@@ -179,7 +179,7 @@ is_asserted_eq(HB):- copy_term(HB,HBC), is_asserted(HBC), HBC=@=HB,!.
 %
 % TODO Convert loop checking to a "fresh" loop_check
 is_asserted(X):- fully_expand(change(assert,is_asserted),X,Y),
-  no_repeats(loop_check(lookup_u(X))).
+  no_repeats(loop_check(lookup_u(Y))).
 
 
 

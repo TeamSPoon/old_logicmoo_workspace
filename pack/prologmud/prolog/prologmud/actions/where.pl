@@ -31,7 +31,7 @@ agent_call_command(_Agent,actWhere(SObj)) :-
 action_info(actWho(isOptional(tAgent,isMissing)),"Lists who is online (where they are at least)").
 
 agent_call_command(_Gent,actWho(W)) :- must(mud_cmd_who(W)),!.
-agent_call_command(_Gent,actWho) :- must(mud_cmd_who(W)),!.
+agent_call_command(_Gent,actWho) :- must(mud_cmd_who(_W)),!.
 
 mud_cmd_who(isMissing):- mud_cmd_who_1(_),!.
 mud_cmd_who(Who):- mud_cmd_who_1(Who),!.

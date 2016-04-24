@@ -53,7 +53,7 @@ do_agent_action(P,C,_):- var(C),!,fmt('unknown_var_command(~q,~q).',[P,C]).
 do_agent_action(_,EOF,_):- end_of_file == EOF, !, npc_tick_tock.
 do_agent_action(_,'',_):-!, npc_tick_tock.
 do_agent_action(P,C,O):- do_gc,with_session(O,agent_call_unparsed(P, C)),!.
-do_agent_action(P,C,O):-wdmsg('skipping_unknown_player_action(~q,~q).~n',[P,C]),!.
+do_agent_action(P,C,_):-wdmsg('skipping_unknown_player_action(~q,~q).~n',[P,C]),!.
 
 
 :-export(parse_agent_text_command_checked/5).
@@ -67,7 +67,7 @@ parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):-
 
 must_ac(G):- show_failure(must(G)).
 
-:-  message_queue_property(Queue, alias(waq)) -> true;message_queue_create(_,[alias(waq)]).
+:-  message_queue_property(_Queue, alias(waq)) -> true;message_queue_create(_,[alias(waq)]).
 
 thread_signal_blocked(ID,Goal):- thread_self(ID),!,Goal.
 thread_signal_blocked(ID,Goal):- message_queue_property(Queue, alias(waq)),thread_self(Waiter), thread_signal(ID,(Goal,thread_send_message(Queue,done(Goal,Waiter),[]))),thread_get_message(Queue,done(Goal,Waiter)).
@@ -160,7 +160,7 @@ agent_call_command_now_3(Agent,CMD):-
   padd(Agent,mudLastCommand(CMD)).
 
 agent_call_command_all_fallback(Agent,CMD):- if_defined(agent_call_command_fallback(Agent,CMD)),!.
-agent_call_command_all_fallback(Agent,CMD):- xlisting(CMD).
+agent_call_command_all_fallback(_Agent,CMD):- xlisting(CMD).
 
 :-export(send_command_completed_message/4).
 send_command_completed_message(Agent,Where,Done,CMD):-
@@ -208,13 +208,13 @@ decl_database_hook(Type,C):- current_agent(Agent),interesting_to_player(Type,Age
 
 get_agent_input_stream(P,In):-no_repeats(P-In,(get_agent_session(P,O),thglobal:session_io(O,In,_,_))).
 
-get_agent_input_thread(P,Id):-no_repeats(P-Id,(get_agent_input_stream(P,O),thglobal:session_io(_,In,_,Id))).
+get_agent_input_thread(P,Id):-no_repeats(P-Id,(get_agent_input_stream(P,In),thglobal:session_io(_,In,_,Id))).
 
 with_agent(P,CALL):-with_agent0(P,CALL).
 with_agent0(P,CALL):-
  get_session_id(TS),must(nonvar(TS)),
  thread_self(Self),
- ((get_agent_session(P,O),thglobal:session_io(O,In,Out,Id),Id\=Self)->Wrap=thread_signal_blocked(Id);Wrap=call),!,
+ ((get_agent_session(P,O),thglobal:session_io(O,_In,_Out,Id),Id\=Self)->Wrap=thread_signal_blocked(Id);Wrap=call),!,
   call(Wrap, 
     w_tl([put_server_no_max,thglobal:session_agent(TS,P),thglobal:agent_session(P,TS)],
       with_output_to_pred(deliver_event(P),CALL))).
@@ -254,7 +254,7 @@ guess_session_ids(ID):-thread_self(TID),thread_property(TID,alias(ID)).
 % anonymous sessions
 guess_session_ids(ID):-thread_self(ID), \+ thread_property(ID,alias(ID)).
 % anonymous sessions
-guess_session_ids(In):-thread_self(ID),thread_util:has_console(ID,In,Out,Err).
+guess_session_ids(In):-thread_self(ID),thread_util:has_console(ID,In,_Out,_Err).
 
 
 :-export(my_random_member/2).

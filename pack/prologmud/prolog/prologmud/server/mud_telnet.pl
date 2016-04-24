@@ -177,7 +177,7 @@ register_player_stream_local(P,In,Out):-
 
 :-export(enqueue_session_action/3).
 
-%enqueue_session_action(A,[+, Text],S):- string(Text), must(assert_text(tWorld,Text)).
+enqueue_session_action(_A,[+, Text],_S):- string(Text), must(assert_text(tWorld,Text)).
 %enqueue_session_action(A,[W0,W1|WL],S):- string(Text),!,enqueue_session_action(A,[actSay,[W0,W1|WL]],S).
 enqueue_session_action(A,L,S):- show_call(enqueue_agent_action(A,L,S)),!.
 enqueue_session_action(A,L,S):- rtrace(enqueue_agent_action(A,L,S)),!.
@@ -193,7 +193,7 @@ set_tty_control(TF):-
 
 :-ain(( deliver_event_hooks(A,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,A,you,NewEvent),
       foreach(no_repeats(get_agent_sessions(A,O)),
-         foreach(no_repeats(thglobal:session_io(O,In,Out,Id)),
+         foreach(no_repeats(thglobal:session_io(O,_In,Out,_Id)),
           fmtevent(Out,NewEvent))))).
 
 fmtevent(Out,NewEvent):-string(NewEvent),!,format(Out,'~s',[NewEvent]).
@@ -537,7 +537,7 @@ setup_streams(In, Out):-
 setup_streams_pt2(In, Out):-
       set_stream(In,  alias(user_input)),
       set_stream(Out, alias(user_output)),
-      set_stream(Err, alias(user_error)),
+      % set_stream(Err, alias(user_error)),
       set_stream(In,  alias(current_input)),
       set_stream(Out, alias(current_output)),!.
 
@@ -559,6 +559,7 @@ service_client(Slave, In, Out, Host, Peer, Options) :-
    allow(Peer, Options), !,
    call_pred(Call, Options), !,
    setup_streams(In, Out),
+   thread_self(Id),
    format(user_error,'% Welcome ~q to the SWI-Prolog LogicMOO server on thread ~w~n~n', [Peer,service_client(Slave, In, Out, Host, Peer, call(Call,Options))]),
    call_close_and_detatch(In, Out, Id, service_client_call(Call, Slave, In, Out, Host, Peer, Options)).
 

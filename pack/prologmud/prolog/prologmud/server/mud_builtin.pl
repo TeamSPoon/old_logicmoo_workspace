@@ -21,6 +21,9 @@
 % Douglas Miles
 */
 
+:- load_files(library(prolog_stack)).
+:- ain((prolog_stack:stack_guard(none))).
+
 :- assert_until_eof(infSupertypeName).
 :- onEndOfFile(dmsg(infSupertypeName)).
 
@@ -794,7 +797,7 @@ action_info(C,_)==>vtActionTemplate(C).
 argsQuoted(cachedPredicate).
 
 ttPredType(cachedPredicate).
-cachedPredicate(Goal)/predicate_to_goal(P,Goal)==>{forall(req1(Goal),ain(Goal))}.
+cachedPredicate(P)/predicate_to_goal(P,Goal)==>{forall(req1(Goal),ain(Goal))}.
 
 cachedPredicate(vtActionTemplate(_)).
 

@@ -288,8 +288,8 @@ predicate_named(Pred) --> dcgAnd(theText(Text),dcgLenBetween(1,5)),
 assumed_isa(I,C):-isa(I,C),!.
 assumed_isa(I,C):-loosePass,assert_isa(I,C),!.
 
-:- must(dcgAnd(dcgLenBetween(5,1),theText(T),[a,b,c],[])).
-:- must(predicate_named(P,[proper,-,named],[])).
+:- must(dcgAnd(dcgLenBetween(5,1),theText(_Text),[a,b,c],[])).
+:- must(predicate_named(_P,[proper,-,named],[])).
 
 
 :-assertz_if_new(parserTest(iWorld7,"An object can be proper-named or improper-named.",partitionedInto(tObj,tProperNamed,tImproperNamed))).

@@ -1501,10 +1501,12 @@ mpred_retry(G):- fail; notrace(G).
 % Negated In Code.
 %
 neg_in_code(G):-nonvar(G),loop_check(neg_in_code0(G)).
+:- meta_predicate neg_in_code0(*).
+:- export(neg_in_code0/1).
 neg_in_code0(call_u(G)):- !,~G.
-neg_in_code0(~(G)):- nonvar(G),!,  \+ ~G .
-neg_in_code0(G):-   neg_may_naf(G), \+ call_u(G).
-neg_in_code0(G):-  is_ftNonvar(G), prologSingleValued(G),must((if_missing_mask(G,R,Test),nonvar(R))),call_u(R),call_u(Test).
+neg_in_code0(~(G)):- nonvar(G),!,  \+ ~G ,!.
+neg_in_code0(G):-   neg_may_naf(G), \+ call_u(G),!.
+neg_in_code0(G):-  is_ftNonvar(G), prologSingleValued(G),must((if_missing_mask(G,R,Test),nonvar(R))),call_u(R),!,call_u(Test).
 
 
 :- meta_predicate neg_may_naf(0).
@@ -2216,8 +2218,8 @@ repropagate(F/A):- atom(F),is_ftVar(A),!,repropagate(F).
 repropagate(P):-  \+ predicate_property(_:P,_),dmsg(undefined_repropagate(P)),dumpST,dtrace,!,fail.
 repropagate(P):-  repropagate_0(P).
 
-predicate_to_goal(F,Goal):-atom(F),guess_arity(F,A),functor(Goal,F,A).
-predicate_to_goal(F/A,Goal):-atom(F),guess_arity(F,A),functor(Goal,F,A).
+predicate_to_goal(P,Goal):-atom(P),guess_arity(P,F,A),functor(Goal,F,A).
+predicate_to_goal(P/A,Goal):-atom(P),guess_arity(P,F,A),functor(Goal,F,A).
 predicate_to_goal(G,G):-compound(G),!.
 
 %% repropagate_0( +P) is semidet.

@@ -42,6 +42,7 @@
 :- module(logicmoo_util_terms,
         [
 at_start/1,
+remember_at_start/2,
 call_n_times/2,
 call_no_cuts/1,
 conjoin/3,
@@ -856,7 +857,9 @@ call_n_times(N,Goal):-doall((between(2,N,_),once(Goal))),Goal.
 
 
 :- meta_predicate at_start(0).
+:- meta_predicate remember_at_start(0).
 :- dynamic(at_started/1).
+:- dynamic(needs_started/2).
 
 %= 	 	 
 
@@ -866,17 +869,16 @@ call_n_times(N,Goal):-doall((between(2,N,_),once(Goal))),Goal.
 %
 at_start(Goal):-
 	copy_term(Goal,Named),
-	numbervars(Named,0,_,[attvar(bind),singletons(true)]),
-	copy_term(Named,Named2),
-        (    at_started(Named)
-	->
-	     true
-	;
-	     catchv(
-		 (assert(at_started(Named2)),on_f_debug((Goal))),
+	numbervars(Named,0,_,[attvar(bind),singletons(true)]),	
+        remember_at_start(Named,Goal).
+
+remember_at_start(Named,_):- at_started(Named),!.
+remember_at_start(Named,Goal):- compiling,!,ain(needs_started(Named,Goal)).
+remember_at_start(Named,Goal):-
+	 catchv(
+		 (ain(at_started(Named)),on_f_debug((Goal))),
 		 E,
-		 (retractall(at_started(Named2)),trace_or_throw(E)))
-	).
+		 (retractall(at_started(Named)),ain(needs_started(Named,Goal)),trace_or_throw(E))).
 
 
 :- export(list_to_set_safe/2).

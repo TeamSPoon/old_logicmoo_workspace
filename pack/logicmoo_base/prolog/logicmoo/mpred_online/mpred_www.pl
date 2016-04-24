@@ -959,7 +959,7 @@ as_ftVars(_).
 % Search4term.
 %
 search4term:- must_det_l((
-  maybe_scan_source_files_for_varnames,
+  maybe_scan_for_varnames,
   get_param_sess(term,Term,"tHumanHead"),
   get_param_sess(find,SObj,Term),
   cvt_param_to_term(SObj,Obj),

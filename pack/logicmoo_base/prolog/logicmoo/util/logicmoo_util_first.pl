@@ -262,7 +262,7 @@ with_unlocked_pred(M:Pred,(
 
 :- export(mpred_trace_childs/1).
 
-%= 	 	 
+
 
 %% mpred_trace_childs( ?W) is semidet.
 %

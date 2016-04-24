@@ -31,16 +31,16 @@ action_rules(Agent,actTestWield,[Obj],[?mudPossess(Agent,Obj),?isa(Obj,tUseAble)
 action_rules(Agent,actTestStow,[Obj],[?mudPossess(Agent,Obj),?isa(Obj,tStowAble),?genlPreds(Using,'mudControls'),- t(Using,Agent,Obj),+mudStowing(Agent,Obj)]).
 
 guess_verb_template(Action):-
-       action_rules(Agent,Verb,Args,ListA),
+       action_rules(_Agent,Verb,Args,ListA),
        once((to_verb_args(Action,[Verb|Args]),
-            must(attempt_attribute_args(AndOr,ftAskable,ListA)),
+            must(attempt_attribute_args(_AndOr,ftAskable,ListA)),
             must(term_variables(ListA,Vars)),
             must(attribs_to_atoms(Vars,Vars)))). 
          
 
 % Use something
 agent_call_command(Agent,ACT) :-
-   call((action_rules(Agent,VERB,SENT,StateRules),safe_univ(ACT,[VERB|SENT]))),
+   call((action_rules(Agent,VERB,SENT,_StateRules),safe_univ(ACT,[VERB|SENT]))),
    
       action_requires_states(Agent,[VERB|SENT],REQS),
       action_removes_states(Agent,[VERB|SENT],REMS),

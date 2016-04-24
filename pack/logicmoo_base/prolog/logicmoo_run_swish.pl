@@ -118,10 +118,11 @@ assert_sv(P):-!,functor(P,_,A),duplicate_term(P,R),setarg(A,R,_),ignore(retract(
 
 :- endif.
 
-:- meta_predicate swish_svgtree:'__aux_maplist/3_filtered_tree+2'(*,*,3,+).
 
 
 /*
+:- meta_predicate swish_svgtree:'__aux_maplist/3_filtered_tree+2'(*,*,3,+).
+
 % Hack: auto-loading this does not work.
 :- [library(charsio)].
 :- [charsio:library(memfile)].

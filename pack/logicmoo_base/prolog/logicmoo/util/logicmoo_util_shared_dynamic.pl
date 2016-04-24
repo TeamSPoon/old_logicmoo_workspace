@@ -43,27 +43,27 @@ ereq(C):- find_and_call(C).
 :- module_transparent(dbreq/1).
 dbreq(C):- ereq(C).
 
-%% wrap_shared( ?VALUE1, :Wrapper, ?VALUE3) is semidet.
+%% wsh_w:wrap_shared( ?VALUE1, :Wrapper, ?VALUE3) is semidet.
 %
 % Wrap Shared.
 %
 
-% wrap_shared(_,_,_):-!,fail.
-wrap_shared(isa,2,ereq).
-wrap_shared(t,_,ereq).
-%wrap_shared(call,_,ereq).
-%wrap_shared(apply,_,ereq).
+% wsh_w:wrap_shared(_,_,_):-!,fail.
+wsh_w:wrap_shared(isa,2,ereq).
+wsh_w:wrap_shared(t,_,ereq).
+%wsh_w:wrap_shared(call,_,ereq).
+%wsh_w:wrap_shared(apply,_,ereq).
 
-wrap_shared(assert,1,dbreq):- is_user_module.
-wrap_shared(assert,2,dbreq):- is_user_module.
-wrap_shared(asserta,1,dbreq):- is_user_module.
-wrap_shared(asserta,2,dbreq):- is_user_module.
-wrap_shared(assertz,1,dbreq):- is_user_module.
-wrap_shared(assertz,2,dbreq):- is_user_module.
-wrap_shared(clause,2,dbreq):- is_user_module.
-wrap_shared(clause,3,dbreq):- is_user_module.
-wrap_shared(retract,1,dbreq):- is_user_module.
-wrap_shared(retractall,1,dbreq):- is_user_module.
+wsh_w:wrap_shared(assert,1,dbreq):- is_user_module.
+wsh_w:wrap_shared(assert,2,dbreq):- is_user_module.
+wsh_w:wrap_shared(asserta,1,dbreq):- is_user_module.
+wsh_w:wrap_shared(asserta,2,dbreq):- is_user_module.
+wsh_w:wrap_shared(assertz,1,dbreq):- is_user_module.
+wsh_w:wrap_shared(assertz,2,dbreq):- is_user_module.
+wsh_w:wrap_shared(clause,2,dbreq):- is_user_module.
+wsh_w:wrap_shared(clause,3,dbreq):- is_user_module.
+wsh_w:wrap_shared(retract,1,dbreq):- is_user_module.
+wsh_w:wrap_shared(retractall,1,dbreq):- is_user_module.
 
 is_user_module :- prolog_load_context(source,F), lmconf:mpred_is_impl_file(F),!,fail.
 is_user_module :- prolog_load_context(module,M), module_property(M,class(L)),L=library,!,fail.
@@ -76,7 +76,7 @@ is_user_module :- prolog_load_context(module,user).
 %
 system_goal_expansion_safe_wrap(T,_):- \+ compound(T),!,fail.
 system_goal_expansion_safe_wrap(M:T,M:I):-!,compound(T),functor(T,F,A),wsh_w:wrap_shared(F,A,How),safe_wrap(T,How,I).
-system_goal_expansion_safe_wrap(T,I):- functor(T,F,A),wrap_shared(F,A,How),safe_wrap(T,How,I).
+system_goal_expansion_safe_wrap(T,I):- functor(T,F,A),wsh_w:wrap_shared(F,A,How),safe_wrap(T,How,I).
 
 
 %% safe_wrap( Term, +How, -Wrapped) is semidet.

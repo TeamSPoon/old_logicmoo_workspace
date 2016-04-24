@@ -28,9 +28,9 @@ tStatPred(isEach(
 
 
 agent_call_command(Agent,actStats(What)):-
-  findall(Pred, (tStatPred(Stat),Pred=..[Stat,Agent,value]),Stats),
+  findall(Pred, (tStatPred(Stat),Pred=..[Stat,What,value]),Stats),
    sort(Stats,StatsS),
-   show_kb_preds(Agent,StatsS),!.
+   show_kb_preds(What,StatsS),!.
    %xlisting(What),!.
 
 

@@ -23,6 +23,7 @@
   mpred_post1_rem1/2,
   mpred_mark_as_ml/3,
   mpred_mark_fa_as/5,
+  '__aux_maplist/2_call+0'/1,
   log_failure/1,
   code_sentence_op/1,
   mnotrace/1,
@@ -180,7 +181,7 @@
 
 '=@@='(A,B):-variant_u(A,B).
 
-:- use_module(library(logicmoo_utils)).
+% :- use_module(library(logicmoo_utils)).
 
 :- module_transparent((assert_u_confirmed_was_missing/1,mpred_trace_exec/0,pfcl_do/1,
   mpred_post1/2,get_mpred_assertion_status/3,mpred_post_update4/4,get_mpred_support_status/5,same_file_facts/2,foreachl_do/2,
@@ -363,7 +364,10 @@ clause_u(MH,B,R):-  (mnotrace(fix_mp(MH,M:H)),clause_i(M:H,B,R))*->true;(fix_mp_
 
 lookup_u(H):-lookup_u(H,_).
 
+
 lookup_u(MH,Ref):- nonvar(Ref),!,must((clause_u(H,B,Ref),hb_to_clause(H,B,MH))).
+
+lookup_u((MH,H),Ref):- nonvar(MH),!,lookup_u(MH),lookup_u(H,Ref).
 lookup_u(MH,Ref):- clause_u(MH,true,Ref).
 /*
 lookup_u(MH,Ref):- must(mnotrace(fix_mp(MH,M:H))), 
@@ -432,6 +436,12 @@ each_E(P,H,S) :- apply(P,[H|S]).
 :- op(1100,fx,('==>')).
 :- op(1150,xfx,('::::')).
 
+:- export('__aux_maplist/2_call+0'/1).
+:- meta_predicate('__aux_maplist/2_call+0'(0)).
+'__aux_maplist/2_call+0'([]).
+'__aux_maplist/2_call+0'([A|B]) :-
+        call(A),
+        '__aux_maplist/2_call+0'(B).
 
 
 :- use_module(library(lists)).
@@ -1246,7 +1256,7 @@ mpred_fwc1(clause_asserted_u(Fact)):-!,sanity(clause_asserted_u(Fact)).
 mpred_fwc1((Fact:- BODY)):- compound(Body),arg(1,Body,Cwc),Cwc\==cwc,ground(BODY),!, mpred_fwc1({BODY}==>Fact).
 mpred_fwc1(support_hilog(_,_)):-!.
 mpred_fwc1(Fact):- 
-  dmsg(mpred_fwc1(Fact)),
+  % dmsg(mpred_fwc1(Fact)),
   mpred_do_rule(Fact),
   copy_term(Fact,F),
   % check positive triggers

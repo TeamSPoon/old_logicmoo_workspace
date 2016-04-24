@@ -116,8 +116,8 @@ mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 % [Optionaly] Start the telent server % iCommanderdata66
 start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 
-:- initialization(start_telnet).
-
+:- if_startup_script(initialization(start_telnet)).
+:- rl_add_history( 'start_telnet.' ).
 :- rl_add_history( 'user:ensure_loaded(start_mud_server).' ).
 :- rl_add_history( 'login_and_run.' ).
 

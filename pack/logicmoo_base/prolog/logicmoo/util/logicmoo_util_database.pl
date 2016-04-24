@@ -609,7 +609,8 @@ av_comp(A,B):-mpred_get_attrs(A,attr(_,_,AB)),!,AB\==[],mpred_get_attrs(B,attr(_
 av_comp(_A,_B):-!.
 
 
-put_clause_ref(Ref,V):- !, nop(put_clause_ref(Ref,V)).
+put_clause_ref(_Ref,_V):- !.
+put_clause_ref(Ref,V):- !, nop(dmsg(put_clause_ref(Ref,V))).
 put_clause_ref(Ref,V):-put_attr(V,cref,Ref).
 
 remove_term_attr_type(Term,Mod):- notrace((term_attvars(Term,AVs),maplist(del_attr_type(Mod),AVs))).

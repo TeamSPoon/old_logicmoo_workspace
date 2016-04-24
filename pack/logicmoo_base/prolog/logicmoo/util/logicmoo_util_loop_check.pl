@@ -193,8 +193,6 @@ call_t(C):- call(C).
 %
 reduce_make_key(call(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(call_u(C),O):-!,reduce_make_key(C,O).
-reduce_make_key(call_u(C),O):-!,reduce_make_key(C,O).
-reduce_make_key(call_u(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(must(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(no_repeats(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(no_repeats(_,C),O):-!,reduce_make_key(C,O).
@@ -262,6 +260,7 @@ loop_check_early(Call, TODO):- loop_check_term_key(Call,Call, TODO).
 %
 % Loop Check.
 %
+% loop_check(Call):- current_predicate(dra_call_tabled/1),!, dra_call_tabled(Call).
 loop_check(Call):- loop_check(Call, fail).
 
 :- export(loop_check/2).

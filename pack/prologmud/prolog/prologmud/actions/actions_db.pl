@@ -388,7 +388,7 @@ kiss(agent(Agent),entity(Entity)) , [
 % <action name="kill">
 %	<params>Killer,Victim</params>
 actionDef(
-kill(killer(Killer),victim(Victim),instrument(Instrument)) , [
+kill(killer(Killer),victim(Victim),instrument(_Instrument)) , [
 %	<preconds>
 	k(tThinking(Victim)),
 	k(easytokill(Killer,Victim)),
