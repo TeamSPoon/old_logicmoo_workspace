@@ -19,8 +19,20 @@
     call_diff/3,
     shared_vars/3,
     next_solution/0,    
-    call_goal_in_thread/1
+    call_goal_in_thread/1,
+    collecting_list/4,
+    shared_vars/3
   ]).
+
+:- meta_predicate
+   collecting_list(0,+,+,+),
+   result_check(0,+,+),
+   call_goal_in_thread(0),
+   on_diff_throw(0,0),
+   on_diff_fail(0,0),
+   call_diff(0,0,0).
+   
+   
 
 result_check(Call,N+NVs,O+OVs):-
    NVs=@=OVs -> true; Call.
