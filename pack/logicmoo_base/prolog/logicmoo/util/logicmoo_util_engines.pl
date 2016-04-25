@@ -1,6 +1,6 @@
 % ===================================================================
 % File 'logicmoo_util_engines.pl'
-% Purpose: An Implementation in SWI-Prolog of Unwindable context frames
+% Purpose: An Implementation in SWI-Prolog of Comparable context frames
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;
 % Version: 'logicmoo_util_ctx_frame.pl' 1.1.1
