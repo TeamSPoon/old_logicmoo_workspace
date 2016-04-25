@@ -1435,9 +1435,11 @@ sanity(Goal):- quietly(Goal).
 compare_results(N+NVs,O+OVs):-
    NVs=@=OVs -> true; trace_or_throw(compare_results(N,O)).
 
-unsafe_safe(_,O):- \+ allow_unsafe_code, !, call(O).
-unsafe_safe(N,O):- call_diff(N,O,compare_results).
 allow_unsafe_code.
+
+unsafe_safe(_,O):- \+ allow_unsafe_code, !, call(O).
+unsafe_safe(N,O):- on_diff_throw(N,O,compare_results).
+
 
 :- export(is_release/0).
 %% is_release is semidet.
