@@ -13,46 +13,52 @@
 %
 
 :- module(logicmoo_util_engines,
-  [on_diff/3,
-    on_call_diff_throw/2,
+  [ result_check/3,
+    on_diff_fail/2,
+    on_diff_throw/2,
     call_diff/3,
     shared_vars/3,
-    next_solution/0,
-    on_diff/3,
+    next_solution/0,    
     call_goal_in_thread/1
   ]).
 
-on_diff(Call,N+NVs,O+OVs):-
+result_check(Call,N+NVs,O+OVs):-
    NVs=@=OVs -> true; Call.
-
-on_call_diff_throw(N,O):- 
- call_diff(on_diff(trace_or_throw(different(N,O))),N,O).
-
 
 
 /*
 
-  % I'd like these two to run at the same time (Do I need to start a thread with send_messages)
+  % I'd like these two to run at the same time (Did I really 
+  need to start a thread with send_messages)
  
- ?- call_diff(member(X,[1,2,3]),member(X,[1,2,4])). 
+ ?- on_diff_fail(member(X,[1,2,3]),member(X,[1,2,4])). 
    X = 1 ;
    X = 2 ;
    No.
 */
 
-call_diff(N,O):- call_diff(on_diff(fail),N,O).
+on_diff_fail(N,O):- 
+  call_diff(result_check(fail),N,O).
 
-call_diff(WhenDif, N,O):- 
+on_diff_throw(N,O):- 
+  call_diff(result_check(trace_or_throw(different(N,O))),N,O).
+
+call_diff(Check, N,O):- 
    shared_vars(N,O,Vs),
+ % O must be able to diverge
    copy_term(O+Vs,CO+CVs),
-   NOL = saved_in([],[]),
+ % Later on we''ll allow different result orders
+   NOL = saved_in([],[]), 
+   collecting_list(call(CO),CVs,1,NOL),
+   collecting_list(call(N),Vs,2,NOL),
+   call(Check,N+Vs,O+CVs).
 
-  ( collecting_list(call(CO),CVs,1,NOL),
-    collecting_list(call(N),Vs,2,NOL),
-   NOL = saved_in([N+Vs|_],[O+Vs|_]).
+collecting_list(G,Vs,At,S):- 
+   call(G),copy_term(Vs,CVs),
+   arg(At,S,Was),nb_setarg(At,S,[CVs|Was]).
 
 
-% :- nb_setval(query_result,sol(0,1,false,false)).
+:- nb_setval(query_result,sol(0,1,false,false)).
 
 shared_vars(S9,G9,SVG):-notrace(( term_variables(S9,Vs1),term_variables(G9,Vs2),intersect_eq0(Vs2,Vs1,SVG))).
 
@@ -92,10 +98,6 @@ react_message(sol(_,G,true,true),G,(!,true)):- !.
 
 call_goal_in_thread_saved_nd:- start_goal_saved1, fail.
 call_goal_in_thread_saved_nd:- next_solution.
-
-collecting_list(G,Vs,At,S):- 
-   call(G),copy_term(Vs,CVs),
-   arg(At,S,Was),nb_setarg(At,S,[CVs|Was]).
 
 memberchk_eq0(X, [Y|Ys]) :- X==Y;memberchk_eq0(X,Ys).
 
