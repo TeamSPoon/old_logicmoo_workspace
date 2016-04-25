@@ -16,6 +16,7 @@
           [ !/1,
             addLibraryDir/0,
             source_variables_l/1,
+            shared_vars/3,
             as_clause_no_m/3,
             as_clause_w_m/4,
             as_clause_w_m/5,
@@ -23,6 +24,8 @@
             bad_functor/1,
             current_why/1,
             badfood/1,
+            collecting_list/3,
+            unsafe_safe/2,
             quietly/1,
             on_x_f/3,
             hide_trace/1,
@@ -65,6 +68,7 @@
             is_main_thread/0,
             is_pdt_like/0,
             is_release/0,
+            allow_unsafe_code/0,
             keep/2,
             loading_file/1,
             on_x_log_throw/1,
@@ -142,6 +146,8 @@
         must_l(0),
         one_must(0, 0),
         one_must_det(0, 0),
+        unsafe_safe(0,0),
+        collecting_list(0,++,+),
         sanity(0),
         slow_sanity(0),
         to_pi(?, ?),
@@ -1426,15 +1432,18 @@ sanity(Goal):- tlbugger:show_must_go_on,!,ignore(show_failure(why,Goal)).
 sanity(Goal):- bugger_flag(release,true),!,assertion(Goal).
 sanity(Goal):- quietly(Goal).
 
+compare_results(N+NVs,O+OVs):-
+   NVs=@=OVs -> true; trace_or_throw(compare_results(N,O)).
+
+unsafe_safe(_,O):- \+ allow_unsafe_code, !, call(O).
+unsafe_safe(N,O):- call_diff(N,O,compare_results).
+allow_unsafe_code.
 
 :- export(is_release/0).
-
-%= 	 	 
-
 %% is_release is semidet.
 %
 % If Is A Release.
-%
+
 is_release:-!.
 is_release:- !,fail.
 is_release :- \+ not_is_release.

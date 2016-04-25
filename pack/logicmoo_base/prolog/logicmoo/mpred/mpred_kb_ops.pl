@@ -1453,7 +1453,7 @@ support_ok_via_clause_body(H):- get_functor(H,F,A),support_ok_via_clause_body(H,
 % Support Ok Via Clause Body.
 %
 support_ok_via_clause_body(_,(\+),1):-!,fail.
-support_ok_via_clause_body(_,F,_):- call_u(argsQuoted(F)),!,fail.
+support_ok_via_clause_body(_,F,_):- lookup_u(argsQuoted(F)),!,fail.
 support_ok_via_clause_body(H,F,A):- should_call_for_facts(H,F,A).
 
 
@@ -1706,7 +1706,7 @@ mpred_slow_search.
 %
 % Rule Backward.
 %
-ruleBackward(R,Condition):- call_u(( ruleBackward0(R,Condition),functor(Condition,F,_),\+ arg(_,v(call_u,call_u),F))).
+ruleBackward(R,Condition):- call_u(( ruleBackward0(R,Condition),functor(Condition,F,_),\+ arg(_,v(mpred_call_no_bc,call,call_u),F))).
 %ruleBackward0(F,Condition):-clause_u(F,Condition),\+ (is_true(Condition);mpred_is_info(Condition)).
 
 %% ruleBackward0( +F, ?Condition) is semidet.

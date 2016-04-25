@@ -1735,6 +1735,7 @@ set_guessed_abox(ABox,From):-
 % not just user modules
 
 get_user_abox(A):-nonvar(A),!.
+get_user_abox(baseKB):-!.
 get_user_abox(A):- must(quietly(((get_user_abox0(A),A\=user);get_user_abox0(A)))),!.
 
 get_user_abox0(A):- source_module(SM),t_l:user_abox(SM,A),ensure_abox(A).

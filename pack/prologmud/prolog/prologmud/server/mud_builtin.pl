@@ -942,8 +942,8 @@ random_path_dir(Dir):-random_instance(vtDirection,Dir,true).
 prologBuiltin(ensure_some_pathBetween(tRegion,tRegion)).
 
 prologBuiltin(onEachLoad/0).
-argsQuoted(onEachLoad/1).
-argsQuoted(must/1).
+argsQuoted(onEachLoad).
+argsQuoted(must).
 
 tCol(tStatPred).
 

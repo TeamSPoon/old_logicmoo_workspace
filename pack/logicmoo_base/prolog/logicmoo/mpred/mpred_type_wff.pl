@@ -570,7 +570,7 @@ logical_functor_ft((',')).
 %
 non_assertable(WW,isVar(WW)):- var(WW),!.
 non_assertable(_:WW,Why):- !,non_assertable(WW,Why).
-non_assertable(W,notAssertable(F)):- compound(W),get_functor(W,F),a(notAssertable,F).
+non_assertable(W,notAssertable(F)):- compound(W),get_functor(W,F),cheaply_u(notAssertable(F)).
 % non_assertable(WW,Why):- db_prop_add
 
 % ===============================================================================================
@@ -972,8 +972,8 @@ leave_as_is_functor('kbMark').
 leave_as_is_functor('z_unused').
 leave_as_is_functor('genlMt').
 leave_as_is_functor('{}').
-leave_as_is_functor(F):-loop_check(a(argsQuoted,F)).
-leave_as_is_functor(F):-loop_check(a(ptReformulatorDirectivePredicate,F)).
+leave_as_is_functor(F):-cheaply_u(argsQuoted(F)).
+leave_as_is_functor(F):-loop_check(cheaply_u(ptReformulatorDirectivePredicate(F))).
 
 
 
@@ -1134,7 +1134,7 @@ is_function(_,F,_):- atom_concat('sk',_Was,F),!,fail.
 is_function(P,_,_):- loop_check(leave_as_is(P)),!,fail.
 is_function(_,F,_):- loop_check(is_log_op(F)),!,fail.
 is_function(_,F,_):- atom_concat(_Was,'Fn',F).
-is_function(_,F,_):- loop_check(a(tFunction,F)).
+is_function(_,F,_):- cheaply_u(tFunction(F)).
 % is_function(_,F,A):- A2 is A+1, current_predicate(F/A2), \+ current_predicate(F/A).
 
 %:- ain(isa(I,C)<=(ttPredType(C),lmconf:isa(I,C))).

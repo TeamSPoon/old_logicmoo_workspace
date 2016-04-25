@@ -388,8 +388,8 @@ assert_arity(typeProps,0):- trace_or_throw(assert_arity(typeProps,0)).
 assert_arity(argsIsa,2):- trace_or_throw(assert_arity_argsIsa(error,2)).
 assert_arity(F,A):- must_det(good_pred_relation_name(F,A)),fail.
 assert_arity(F,A):- arity(F,A),!.
-assert_arity(F,A):- arity(F,AA), A\=AA,dmsg(trace_or_throw(assert_arity_switched(F,AA->A))),fail.
-assert_arity(F,A):- ain_fast(arity(F,A)).
+assert_arity(F,A):- arity(F,AA), A\=AA,dmsg(trace_or_throw(assert_arity_switched(F,AA->A))),!,ain_fast(arity(F,A)).
+assert_arity(F,A):- ain_fast(arity(F,A)),!.
 
 
 

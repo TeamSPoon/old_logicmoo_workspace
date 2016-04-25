@@ -274,8 +274,12 @@ alt_calls(ireq).
 %
 show_doall(Call):- doall(show_call(why,Call)).
 
+
 cheaply_u(argsQuoted(G)):-!,lookup_u(argsQuoted(G)).
-cheaply_u(G):- (lookup_u(G)*->true;(call_with_depth_limit(call_u(G),30,N),number(N))).
+cheaply_u(G):- unsafe_safe(lookup_u(G),cheaply_u_old(G)).
+% cheaply_u(P):- predicate_property(P,number_of_rules(N)),N=0,!,lookup_u(P).
+cheaply_u_old(G):- ground(G),!,(lookup_u(G)*->true;(call_with_depth_limit(call_u(G),30,N),number(N))),!.
+cheaply_u_old(G):- (lookup_u(G)*->true;(call_with_depth_limit(call_u(G),30,N),number(N))).
 
 %= 	 	 
 
