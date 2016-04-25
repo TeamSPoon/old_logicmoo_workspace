@@ -13,20 +13,34 @@
 %
 
 :- module(logicmoo_util_engines,
-  [compare_results/3,
+  [on_diff/3,
     on_call_diff_throw/2,
     call_diff/3,
     shared_vars/3,
     next_solution/0,
+    on_diff/3,
     call_goal_in_thread/1
   ]).
 
-compare_results(Call,N+NVs,O+OVs):-
+on_diff(Call,N+NVs,O+OVs):-
    NVs=@=OVs -> true; Call.
 
 on_call_diff_throw(N,O):- 
- call_diff(compare_results(trace_or_throw(different(N,O))),N,O).
+ call_diff(on_diff(trace_or_throw(different(N,O))),N,O).
 
+
+
+/*
+
+  % I'd like these two to run at the same time (Do I need to start a thread with send_messages)
+ 
+ ?- call_diff(member(X,[1,2,3]),member(X,[1,2,4])). 
+   X = 1 ;
+   X = 2 ;
+   No.
+*/
+
+call_diff(N,O):- call_diff(on_diff(fail),N,O).
 
 call_diff(WhenDif, N,O):- 
    shared_vars(N,O,Vs),
@@ -78,17 +92,6 @@ react_message(sol(_,G,true,true),G,(!,true)):- !.
 
 call_goal_in_thread_saved_nd:- start_goal_saved1, fail.
 call_goal_in_thread_saved_nd:- next_solution.
-
-
-/*
-
-  % I'd like these two to run at the same time (Do I need to start a thread with send_messages)
- 
- ?- call_diff(member(X,[1,2,3]),member(X,[1,2,4])). 
-   X = 1 ;
-   X = 2 ;
-   No.
-*/
 
 collecting_list(G,Vs,At,S):- 
    call(G),copy_term(Vs,CVs),
