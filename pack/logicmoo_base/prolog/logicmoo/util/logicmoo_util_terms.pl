@@ -857,7 +857,7 @@ call_n_times(N,Goal):-doall((between(2,N,_),once(Goal))),Goal.
 
 
 :- meta_predicate at_start(0).
-:- meta_predicate remember_at_start(0).
+:- meta_predicate remember_at_start(+,0).
 :- dynamic(at_started/1).
 :- dynamic(needs_started/2).
 

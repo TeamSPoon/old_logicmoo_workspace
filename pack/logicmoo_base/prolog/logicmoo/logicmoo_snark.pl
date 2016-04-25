@@ -6,26 +6,32 @@
 % Dec 13, 2035
 %
 */
-:- module(logicmoo_snark,[load_snark/0,mpred_load_restore_file/1,ensure_autoexec/0]).
+:- module(logicmoo_snark,[
+  load_snark/0,mpred_load_restore_file/1,mpred_load_restore_file/1,mpred_save_restore_file/1,ensure_autoexec/0,
+  with_ukb_snark/2]).
+
+:- module_transparent((
+  load_snark/0,mpred_load_restore_file/1,mpred_load_restore_file/1,mpred_save_restore_file/1,ensure_autoexec/0,
+  with_ukb_snark/2)).
 
 :- thread_local(t_l:user_abox/2).
 
 % 	 	 
 %% with_ukb_snark( ?VALUE1, ?VALUE2) is semidet.
 %
-% Hook To [lh:with_ukb_snark/2] For Module Logicmoo_snark.
+% Hook To [with_ukb_snark/2] For Module Logicmoo_snark.
 % Using Ukb Snark.
 %
-lh:with_ukb_snark(KB,G):- source_module(SM), w_tl(t_l:user_abox(SM,KB),baseKB:G).
+with_ukb_snark(KB,G):- source_module(SM), w_tl(t_l:user_abox(SM,KB),baseKB:G).
 
 %:- use_module(logicmoo_utils).
 %:- system:initialization(use_listing_vars).
 
-:- ensure_loaded(library(logicmoo_base)).
+% :- ensure_loaded(library(logicmoo_base)).
 
 :- maybe_add_import_module(baseKB,system,end).
 :- initialization(maybe_add_import_module(baseKB,system,end)).
-% :- lh:with_ukb_snark(baseKB,baseKB:use_module(baseKB:logicmoo_base)).
+% :- with_ukb_snark(baseKB,baseKB:use_module(baseKB:logicmoo_base)).
 
 :-export(checkKB:m1/0).
 
@@ -35,7 +41,8 @@ lh:with_ukb_snark(KB,G):- source_module(SM), w_tl(t_l:user_abox(SM,KB),baseKB:G)
 % Hook To [checkkb:m1/0] For Module Logicmoo_snark.
 % Module Secondary Helper.
 %
-checkKB:m1:- gripe_time(40,baseKB:ensure_loaded(baseKB:logicmoo(mpred_online/mpred_www))),if_defined(mpred_www:ensure_webserver), make,list_undefined.
+:- add_library_search_path('./mpred_online/',[ '*.pl']).
+checkKB:m1:- gripe_time(40,baseKB:ensure_loaded(baseKB:logicmoo(mpred_online/mpred_www))),if_defined(ensure_webserver), make,list_undefined.
 
 % :- hook_message_hook.
 % :- set_prolog_flag(verbose_autoload,false).
@@ -59,7 +66,7 @@ checkKB:m1:- gripe_time(40,baseKB:ensure_loaded(baseKB:logicmoo(mpred_online/mpr
 %m5 :- enable_mpred_system(baseKB).
 
 
-ensure_autoexec:- lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:logicmoo(pfc/'autoexec.pfc'))).
+ensure_autoexec:- with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:logicmoo(pfc/'autoexec.pfc'))).
 
 %:- use_listing_vars.
 %:- autoload([verbose(false)]).
@@ -79,7 +86,7 @@ mpred_load_restore_file(File):-
   ensure_loaded(File),
    ((\+ (lmconf:loaded_file_world_time(N,_,NewTime),NewTime>=Time)) ->true ;
     (
-    ignore((lmconf:loaded_file_world_time(N,_,NewTime),NewTime>Time,lh:with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:N)),fail)),
+    ignore((lmconf:loaded_file_world_time(N,_,NewTime),NewTime>Time,with_ukb_snark(baseKB,baseKB:ensure_mpred_file_loaded(baseKB:N)),fail)),
     mpred_save_restore_file('some_test.pl~'))))),!.
 
 mpred_save_resore_predicate(M:H,AFN):-
@@ -116,6 +123,8 @@ mpred_save_restore_file(File):-
 
 
 load_snark:- mpred_load_restore_file(never). 
+
+
 
 
 

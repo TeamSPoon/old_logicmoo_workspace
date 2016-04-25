@@ -49,7 +49,6 @@ If we obeyed the limitations set forth upon Horn clauses only being "positive" t
 :- ensure_loaded(logicmoo('snark/common_logic_clif.pfc')).
 
 :- debug(mpred).
-% :- set_prolog_flag(gc,true).
 
 
 

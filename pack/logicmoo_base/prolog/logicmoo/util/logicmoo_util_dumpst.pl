@@ -338,7 +338,7 @@ fdmsg(M):- logicmoo_util_catch:ddmsg(failed_fdmsg(M)).
 %= 	 	 
 printable_variable_name(Var, Name) :- nonvar(Name),!,must(printable_variable_name(Var, NameO)),!,Name=NameO.
 printable_variable_name(Var, Name) :- nonvar(Var),Var='$VAR'(_),format(atom(Name),"'$Var'(~q)",Var).
-printable_variable_name(Var, Name) :- nonvar(Var),format(atom(Name),"'$NONVAR'(~q)",Var).
+printable_variable_name(Var, Name) :- nonvar(Var),format(atom(Name),"(_~q_)",Var).
 printable_variable_name(Var,Name):- (get_attr(Var, vn, Name1);get_attr(Var, varnames, Name1)),
  (var_property(Var,name(Name2))-> (Name1==Name2-> atom_concat('?$',Name1,Name) ; Name=(Name1:Name2)); (atom(Name1)->atom_concat('?',Name1,Name);format(atom(Name),"'$VaR'(~q)",Var))),!.
 printable_variable_name(Var,Name):- var_property(Var,name(Name1)),!,atom_concat('$',Name1,Name).

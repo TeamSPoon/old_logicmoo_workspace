@@ -15,8 +15,9 @@
     License:       Lesser GNU Public License
 % ===================================================================
 */
-:- module(logicmoo_utils,[add_file_search_path/2,add_library_search_path/2]).
-:- set_prolog_flag(gc, false).
+:- module(logicmoo_utils,[]).
+
+:- ensure_loaded('./logicmoo/util/logicmoo_util_filesystem').
 
 :- dynamic(lmconf:logicmoo_utils_separate/0).
 :- retractall(lmconf:logicmoo_utils_separate).
@@ -30,35 +31,6 @@
 :- multifile(user:file_search_path/2).
 
 
-%= 	 	 
-
-%% resolve_dir( ?Dir, ?Dir) is semidet.
-%
-% Resolve Dir.
-%
-resolve_dir(Dir,Dir):- is_absolute_file_name(Dir),!,exists_directory(Dir),!.
-resolve_dir(Path,Dir):- (prolog_load_context(directory,SDir);(prolog_load_context(file,File),file_directory_name(File,SDir)),working_directory(SDir,SDir)),
-   absolute_file_name(Path,Dir,[relative_to(SDir),file_type(directory)]),exists_directory(Dir).
-
-
-%%	add_file_search_path(+Alias, +WildCard) is det.
-%
-%	Create an alias when it is missing
-%
-%	  ==
-%	  :- add_file_search_path(all_utils, '../*/util/').
-%	  ==
-%
-
-%= 	 	 
-
-%% add_file_search_path( ?Name, ?Path) is semidet.
-%
-% Add File Search Path.
-%
-add_file_search_path(Name,Path):-  resolve_dir(Path,Dir),
-   is_absolute_file_name(Dir), (( \+ user:file_search_path(Name,Dir)) ->asserta(user:file_search_path(Name,Dir));true).
-   
 % ======================================================
 % Add Extra pack-ages directory
 % ======================================================
@@ -75,27 +47,6 @@ add_file_search_path(Name,Path):-  resolve_dir(Path,Dir),
 :- add_file_search_path(logicmoo,'./logicmoo/').
 :- endif.
 
-%%	add_library_search_path(+Dir, +Patterns:list(atom)) is det.
-%
-%	Create an autoload index INDEX.pl for  Dir by scanning all files
-%	that match any of the file-patterns in Patterns. Typically, this
-%	appears as a directive in MKINDEX.pl.  For example:
-%
-%	  ==
-%	  :- add_library_search_path('../*/util/',[ 'logicmoo_util_*.pl']).
-%	  ==
-%
-
-%= 	 	 
-
-%% add_library_search_path( ?Path, ?Masks) is semidet.
-%
-% Add Library Search Path.
-%
-add_library_search_path(Path,Masks):- 
-      forall(resolve_dir(Path,Dir), 
-      (make_library_index(Dir, Masks), 
-      (user:library_directory(Dir) -> true ; (asserta(user:library_directory(Dir)), reload_library_index)))).
 
 % ======================================================
 % Add Utils files to autoloads

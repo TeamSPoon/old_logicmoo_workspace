@@ -100,6 +100,7 @@ agent_call_unparsed(A,C):-  w_tl(tlbugger:old_no_repeats, agent_call_unparsed_0(
 
 agent_call_unparsed_0(Agent,Var):-var(Var),trace_or_throw(var_agent_call_unparsed(Agent,Var)).
 
+agent_call_unparsed_0(_Gent,Atom):- Atom='[]' ;Atom='''' ;Atom='""' ; (atomic(Atom);atom_length(Atom,0)),!.
 % execute a prolog command including prolog/0
 agent_call_unparsed_0(_Gent,Atom):- atomic(Atom), catch((
    (once((on_x_fail(read_term_from_atom(Atom,OneCmd,[variables(VARS)])),
@@ -110,7 +111,7 @@ agent_call_unparsed_0(_Gent,Atom):- atomic(Atom), catch((
 % lists
 agent_call_unparsed_0(A,Atom):-to_word_list(Atom,List),must(is_list(List)),!,agent_call_words(A,List).
 
-
+agent_call_words(_,Words):- Words==[],!.
 agent_call_words(A,Words):- (\+ is_list(Words)),must(agent_call_unparsed(A,Words)),!.
 agent_call_words(Agent,Text):- text_to_string_safe(Text,String),Text\=@=String,!,agent_call_unparsed(Agent,String).
 

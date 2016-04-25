@@ -24,10 +24,8 @@ qsp:- qsave_program(irc_webbot).
 
 :- use_module(library(logicmoo_user)).
 
-:- mpred_www:ensure_loaded(library(logicmoo/mpred_online/mpred_www)).
-
-:- mpred_www:ensure_webserver(3020).
-:- logicmoo_snark:load_snark.
+:- ensure_webserver(3020).
+:- load_snark.
 :- threads.
 :- statistics.
 

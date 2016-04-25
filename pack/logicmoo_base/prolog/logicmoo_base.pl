@@ -3,7 +3,6 @@
 % Douglas Miles
 */
 :- module(logicmoo_base,[ensure_mpred_system/0,enable_mpred_system/1,disable_mpred_system/1]).
-
 :- use_module(library(logicmoo_utils)).
 
 %:- autoload.
@@ -33,6 +32,7 @@
 :- dmsg("Adding logicmoo/[mpred,snark] to autoload path",[]).
 :- add_library_search_path('./logicmoo/mpred/',[ '*.pl']).
 :- add_library_search_path('./logicmoo/snark/',[ '*.pl']).
+:- add_library_search_path('./logicmoo/',[ '*.pl']).
 % :- add_library_search_path('./plarkc/',[ '*.pl']).
 % :- add_library_search_path('./pttp/',[ 'dbase_i_mpred_*.pl']).
 
@@ -186,6 +186,4 @@ logicmoo_base_module(mpred_type_isa).
 
 :- asserta_if_new((user:term_expansion(I,O):- with_umt_l(mpred_expander(term,user,I,O)))).
 :- asserta_if_new((system:goal_expansion(I,O):- hotrace(with_umt_l(mpred_expander(goal,system,I,O))))).
-
-
 

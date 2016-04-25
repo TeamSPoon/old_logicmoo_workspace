@@ -42,6 +42,7 @@
             callsc/1,
             cli_ntrace/1,
             contains_atom/2,
+            cleanup_strings/0,
             debugFmt/1,
             debugFmtList/1,
             debugFmtList0/2,
@@ -1705,8 +1706,8 @@ set_optimize(TF):- set_prolog_flag(gc,TF),set_prolog_flag(last_call_optimisation
 %
 % Do Gc.
 %
-do_gc:- !.
-do_gc:- do_gc0.
+% do_gc:- !.
+do_gc:- do_gc0,!.
 
 
 %= 	 	 

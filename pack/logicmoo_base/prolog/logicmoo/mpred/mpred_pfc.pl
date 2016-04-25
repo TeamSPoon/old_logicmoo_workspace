@@ -439,9 +439,13 @@ each_E(P,H,S) :- apply(P,[H|S]).
 :- export('__aux_maplist/2_call+0'/1).
 :- meta_predicate('__aux_maplist/2_call+0'(0)).
 '__aux_maplist/2_call+0'([]).
-'__aux_maplist/2_call+0'([A|B]) :-
+'__aux_maplist/2_call+0'([A|B]) :-!,
         call(A),
         '__aux_maplist/2_call+0'(B).
+'__aux_maplist/2_call+0'(_:[]).
+'__aux_maplist/2_call+0'(M:[A|B]) :-
+        M:call(A),
+        '__aux_maplist/2_call+0'(M:B).
 
 
 :- use_module(library(lists)).
@@ -2198,7 +2202,9 @@ mpred_retract_i_or_warn(X):-
 %:- mpred_set_default(baseKB:mpred_warnings(_), baseKB:mpred_warnings(true)).
 %  tms is one of {none,local,cycles} and controles the tms alg.
 %:- baseKB:mpred_set_default(tms(_), tms(cycles)).
-% :-dynamic(baseKB:spft(_,_,_)).
+:-dynamic(baseKB:spft/3).
+:-asserta(baseKB:spft(a,b,c)).
+:-retractall(baseKB:spft(a,b,c)).
 
 %  mpred_fact(P) is true if fact P was asserted into the database via add.
 
@@ -2618,7 +2624,7 @@ mpred_collect_supports(Tripples):-
   bagof_or_nil(Tripple, mpred_support_relation(Tripple), Tripples).
 
 mpred_support_relation((P,F,T)):-
-  user:lookup_u(spft(P,F,T)).
+  lookup_u(spft(P,F,T)).
 
 mpred_make_supports((P,S1,S2)):- 
   mpred_add_support(P,(S1,S2)),
@@ -3184,7 +3190,8 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 
 
 :- source_location(S,_),prolog_load_context(module,M),
- forall(source_file(M:H,S),ignore((functor(H,F,A),
+ forall(source_file(M:H,S),
+ ignore((functor(H,F,A),
    \+ mpred_database_term(F/A,_),
    F\=='$mode',
    F\=='$pldoc',
@@ -3196,6 +3203,7 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 
 
 :- forall(mpred_database_term(F/A,_),abolish(mpred_pfc:F/A)).
+:- '$current_source_module'(M),add_import_module(M,baseKB,end).
 % :- initialization(ensure_abox(baseKB)).
 
 %% mpred_pfc_file is det.

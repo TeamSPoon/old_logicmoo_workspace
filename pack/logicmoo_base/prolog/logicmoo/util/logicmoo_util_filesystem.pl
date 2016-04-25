@@ -12,7 +12,9 @@
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_filesystem.pl
 :- module(logicmoo_util_filesystem,
-          [ add_to_search_path/2,
+          [ add_library_search_path/2,
+            add_file_search_path/2,
+            add_to_search_path/2,
             add_to_search_path/3,
             add_to_search_path_first/2,
             add_to_search_path_last/2,
@@ -60,6 +62,7 @@
             prolog_file_dir/2,
             relative_pathname/2,
             remove_search_path/2,
+            resolve_dir/2,
             time_file_safe/2,
             to_filename/2,
             upcase_atom_safe/2,
@@ -77,6 +80,8 @@
         if_startup_script(0),
         with_filematch(0).
 :- module_transparent
+        add_library_search_path/2,
+        add_file_search_path/2,
         add_to_search_path/2,
         add_to_search_path_first/2,
         add_to_search_path_last/2,
@@ -144,9 +149,46 @@
 :- '@'( ensure_loaded(library(filesex)), 'user').
 
 :-endif.
+      
+
+%% resolve_dir( ?Dir, ?Dir) is semidet.
+%
+% Resolve Dir.
+%
+resolve_dir(Dir,Dir):- is_absolute_file_name(Dir),!,exists_directory(Dir),!.
+resolve_dir(Path,Dir):- (prolog_load_context(directory,SDir);(prolog_load_context(file,File),file_directory_name(File,SDir)),working_directory(SDir,SDir)),
+   absolute_file_name(Path,Dir,[relative_to(SDir),file_type(directory)]),exists_directory(Dir).
+
+
+%%	add_file_search_path(+Alias, +WildCard) is det.
+%
+%	Create an alias when it is missing
+%
+%	  ==
+%	  :- add_file_search_path(all_utils, '../*/util/').
+%	  ==
+
+add_file_search_path(Name,Path):-  resolve_dir(Path,Dir),
+   is_absolute_file_name(Dir), (( \+ user:file_search_path(Name,Dir)) ->asserta(user:file_search_path(Name,Dir));true).
+   
+%%	add_library_search_path(+Dir, +Patterns:list(atom)) is det.
+%
+%	Create an autoload index INDEX.pl for  Dir by scanning all files
+%	that match any of the file-patterns in Patterns. Typically, this
+%	appears as a directive in MKINDEX.pl.  For example:
+%
+%	  ==
+%	  :- add_library_search_path('../*/util/',[ 'logicmoo_util_*.pl']).
+%	  ==
+%
+
+add_library_search_path(Path,Masks):- 
+      forall(resolve_dir(Path,Dir), 
+      (make_library_index(Dir, Masks), 
+      (user:library_directory(Dir) -> true ; (asserta(user:library_directory(Dir)), reload_library_index)))).
+
 
 :- meta_predicate(with_filematch(0)).
-
 %= 	 	 
 
 %% with_filematch( :GoalG) is semidet.

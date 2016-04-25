@@ -488,7 +488,7 @@ decl_mpred_0(C,More):-string(C),!,dmsg(trace_or_throw(var_string_decl_mpred(C,Mo
 decl_mpred_0(mudDescription, predProxyRetract):- trace_or_throw(decl_mpred_0(mudDescription, predProxyRetract)).
 decl_mpred_0(_,meta_argtypes):-!.
 decl_mpred_0(F,GG):- call(call,GG=meta_argtypes(ArgTypes)),!,decl_mpred_2(F,meta_argtypes(ArgTypes)).
-decl_mpred_0(C,More):-compound(C),C=..[F,Arg1|PROPS],ttPredType(F),!,ground(Arg1),decl_mpred(Arg1,[F,PROPS,More]).
+decl_mpred_0(C,More):-compound(C),C=..[F,Arg1|PROPS],ttPredType(F),!,ground(Arg1),call(call,decl_mpred(Arg1,[F,PROPS,More])).
 decl_mpred_0(C,More):-compound(C),!,functor(C,F,A),assert_arity(F,A),decl_mpred_0(F,More),!,ignore((ground(C),
   call(call,GG=meta_argtypes(C)),decl_mpred(F,GG))),!.
 decl_mpred_0(_,[]):-!.
@@ -560,7 +560,7 @@ glean_pred_props_maybe(G):-compound(G),w_tl(infConfidence(vWeak),forall(glean_pr
 %
 % Glean Predicate Props Maybe Some.
 %
-glean_pred_props_maybe_some(G):-compound(G),G=..[F,Arg1|RGS],ttPredType(F),add_mpred_prop_gleaned(Arg1,[F|RGS]).
+glean_pred_props_maybe_some(G):-compound(G),G=..[F,Arg1|RGS],ttPredType(F),call(call,add_mpred_prop_gleaned(Arg1,[F|RGS])).
 % glean_pred_props_maybe_some(G):-arg(_,G,Arg1),compound(Arg1),arg(_,Arg1,Col),t(tCol,Col),w_tl(infConfidence(vWeak),assert_predArgTypes(Arg1)).
 
 
