@@ -14,29 +14,21 @@
           [ check_thread_local_1m/1,
             to_thread_head_1m/4,
             w_tl/2,
-            w_tl_e/2,
+            w_tl/2,
             wno_tl/2,
-            wno_tl_e/2,
+            wno_tl/2,
             wtg/2,
             with_no_x/1,
-            with_each_item/3,
-            gather_nb_setargs_goals/3,
-            nb_setargs_1var/3,
-            nb_setargs_goals/3,
-            scce9/3,
-            scce8/3]).
+            with_each_item/3]).
 
 :- meta_predicate
         w_tl(:, :),
-        w_tl_e(:, :),
-        wno_tl(0, 0),
-        wno_tl_e(0, 0),
+        wno_tl(0, 0),        
         with_no_x(0),
         wtg(:, 0).
 :- module_transparent
         check_thread_local_1m/1,
-        to_thread_head_1m/4,
-        scce9/3.
+        to_thread_head_1m/4.
 
 :- include('logicmoo_util_header.pi').
 
@@ -65,15 +57,12 @@ with_no_x(G):- current_prolog_flag(gui,true),!,call_cleanup((set_prolog_flag(gui
 with_no_x(G):- current_prolog_flag(gui_tracer,true),!,call_cleanup((noguitracer,with_no_x(G)),guitracer).
 with_no_x(G):- call(G).
 
-% maybe this one wont use thread local checking
-% = :- meta_predicate(wtg(:,0)).
-
-%= 	 	 
 
 %% wtg( ?M, :GoalCall) is nondet.
 %
-% Wtg.
+% maybe this one wont use thread local checking
 %
+:- meta_predicate(wtg(:,0)).
 wtg(M:With,Call):- w_tl(M:With,Call).
 
 % = :- meta_predicate(w_tl(:,0)).
@@ -111,72 +100,32 @@ w_tl(_FPM:set_prolog_flag(N,XFY),MCall):- !,
 w_tl(M:before_after(Before,After),Call):-
      (M:Before -> setup_call_cleanup(true,Call,M:After);Call).
 
-w_tl(WM:THeadWM,CM:Call):- !,
- notrace(( 
-     to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
-     setup_call_cleanup(asserta(M:HAssert,REF),CM:Call,erase(REF)).
-
-
-w_tl(WM:THeadWM,CM:Call):- 
+w_tl(_:ensure(WM:THeadWM),CM:Call):- !,
  notrace(( 
      to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> copy_term(HAssert,CHAssert) ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
      ((CM:notrace((HAssert\=(_:-_),M:CHAssert,!,HAssert=@=CHAssert))) -> ( CM:Call );
             setup_call_cleanup(asserta(M:HAssert,REF),CM:Call,erase(REF))).
 
+w_tl(_:scc(WM:THeadWM),CM:Call):- !,
+   notrace(( 
+       to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
+       setup_call_cleanup(asserta(M:HAssert,REF),CM:Call,erase(REF)).
 
-
-%% w_tl_e( ?CALL1, ?Call) is nondet.
-%
-% W Thread Local.
-%
-w_tl_e(_:[],Call):- !,Call.
-w_tl_e(M:[With|MORE],Call):- !,w_tl_e(M:With,w_tl_e(M:MORE,Call)).
-w_tl_e(M:(With,MORE),Call):- !,w_tl_e(M:With,w_tl_e(M:MORE,Call)).
-w_tl_e(M:(With;MORE),Call):- !,w_tl_e(M:With,Call);w_tl_e(M:MORE,Call).
-w_tl_e(-TL:With,Call):- !,wno_tl_e(TL:With,Call).
-w_tl_e(+TL:With,Call):- !,w_tl_e(TL:With,Call).
-w_tl_e(M:not(With),Call):- !,wno_tl_e(M:With,Call).
-w_tl_e(M:(-With),Call):- !,wno_tl_e(M:With,Call).
-w_tl_e(M:(+With),Call):- !,w_tl_e(M:With,Call).
-
-w_tl_e(OPM:op(N,XFY,OP),MCall):-!,
-     (current_op(PN,XFY,OPM:OP);PN=0),!,
-     strip_module(MCall,M,Call),
-     (PN==N -> Call ; setup_call_cleanup_each(op(N,XFY,OPM:OP),'@'(Call,M),op(PN,XFY,OPM:OP))).
-
-w_tl_e(FPM:current_prolog_flag(N,XFY),MCall):- !,w_tl_e(FPM:set_prolog_flag(N,XFY),MCall).
-
-w_tl_e(_FPM:set_prolog_flag(N,XFY),MCall):- !,
-     (current_prolog_flag(N,WAS);WAS=unUSED),
-     strip_module(MCall,M,Call),!,
-     (XFY==WAS -> Call ; 
-     (setup_call_cleanup_each(set_prolog_flag(N,XFY),'@'(Call,M),(WAS=unUSED->true;set_prolog_flag(N,WAS))))).
-
-w_tl_e(M:before_after(Before,After),Call):-
-     (M:Before -> setup_call_cleanup_each(true,Call,M:After);Call).
-
-% w_tl_e(WM:THeadWM,CM:Call):- is_release,(WM:THeadWM),!,CM:Call.
-w_tl_e(WM:THeadWM,CM:Call):- !,
+w_tl(_:scce(WM:THeadWM),CM:Call):- !,
  notrace(( 
      to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
-     make_lkey(w_tl_e(M:HAssert),Key),
-     setup_call_cleanup_each(key_asserta(M:HAssert,Key),CM:Call,key_erase(Key)).
+     scce_orig(key_asserta(M:HAssert),CM:Call,key_erase).
 
-w_tl_e(WM:THeadWM,CM:Call):- 
+w_tl(WM:THeadWM,CM:Call):-
  notrace(( 
-     to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> copy_term(HAssert,CHAssert) ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
-     ((CM:notrace((HAssert\=(_:-_),M:CHAssert,!,HAssert=@=CHAssert))) -> ( CM:Call );
-            (make_lkey(w_tl_e(M:HAssert),Key),setup_call_cleanup_each(key_asserta(M:HAssert,Key),CM:Call,key_erase(Key)))).
+     to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
+     scce_orig(key_asserta(M:HAssert),CM:Call,key_erase).
 
 
+key_asserta(HAssert):- asserta(HAssert,REF),(nb_current('$w_tl_e',Was)->nb_setval('$w_tl_e',[REF|Was]);nb_setval('$w_tl_e',[REF])).
+key_erase:- must((nb_current('$w_tl_e',[REF|Was]),nb_setval('$w_tl_e',Was),erase(REF))).
 
-key_erase(Key):- must((nb_current(Key,[REF|Was]),nb_setval(Key,Was),erase(REF))).
-key_asserta(HAssert,Key):- asserta(HAssert,REF),(nb_current(Key,Was)->nb_setval(Key,[REF|Was]);nb_setval(Key,[REF])).
-
-
-make_lkey(Goal,Key):- format(atom(Key),'~q',[Goal]).
-
-%= 	 	 
+   	 
 
 %% wno_tl( :GoalUHead, :GoalCall) is nondet.
 %
@@ -184,14 +133,6 @@ make_lkey(Goal,Key):- format(atom(Key),'~q',[Goal]).
 %
 wno_tl(UHead,Call):- w_tl((UHead :- !,fail),Call).
 
-
-%= 	 	 
-
-%% wno_tl_e( :GoalUHead, :GoalCall) is nondet.
-%
-% Wno Thread Local.
-%
-wno_tl_e(UHead,Call):- w_tl_e((UHead :- !,fail),Call).
 
 /*
 wno_tl(UHead,Call):- 
@@ -222,39 +163,10 @@ to_thread_head_1m(Head,tlbugger,tlbugger:Head,Head):-check_thread_local_1m(tlbug
 %
 % Check Thread Local 1m.
 %
-check_thread_local_1m(_):-!.
+check_thread_local_1m(_):- is_release,!.
 check_thread_local_1m(t_l:_):-!.
 check_thread_local_1m(tlbugger:_):-!.
 %check_thread_local_1m(_):-!.
 %check_thread_local_1m(lmconf:_):-!.
 check_thread_local_1m(TLHead):- slow_sanity(( must_det(predicate_property(TLHead,(thread_local))))),!.
 
-% My last ditch would be to 
-
-
-scce8(Setup0,Goal0,Undo0):-
-    Setup = (\+ \+ ((Setup0,nb_setarg(1,Goal,Goal0),nb_setarg(1,Undo,Undo0)))),
-    Goal = call(throw(ggg)),
-    Undo = call(throw(uuu)),
-    setup_call_cleanup_each(Setup,Goal,Undo).
-
-
-scce9(Setup,Goal,Undo):-
-       term_variables(v(Setup,Goal,Undo),Vs),
-       duplicate_term(v(Setup,Goal,Undo),v(SetupD,GoalD,UndoD)),
-       gather_nb_setargs_goals(Vs,v(SetupD,GoalD,UndoD),NBSetargClosure),
-       SetupEach = (\+ \+ ((SetupD,NBSetargClosure))),
-       setup_call_cleanup_each(SetupEach,GoalD,UndoD).
-
-gather_nb_setargs_goals(Vs,Term, maplist(call,SubGoals)):-
-        maplist(nb_setargs_1var(Term), Vs, SubGoals).
-
-
-nb_setargs_1var(Term, X, maplist(call,NBSetargClosure)):-
-        findall(How, nb_setargs_goals(X,Term,How),NBSetargClosure).
-
-nb_setargs_goals(X,Term,How) :-
-        compound(Term),
-        arg(N, Term, Arg),
-        (Arg ==X -> How=nb_setarg(N,Term,X) ;
-           nb_setargs_goals(X,Arg,How)).

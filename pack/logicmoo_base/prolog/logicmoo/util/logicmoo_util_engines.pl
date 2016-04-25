@@ -9,7 +9,7 @@
 % ===================================================================
 % ===================================================================
 %  
-%   Run goals separately 
+%   Run multiple goals (in separate thread/engines)
 %
 
 :- module(logicmoo_util_engines,
@@ -18,23 +18,28 @@
     on_diff_throw/2,
     call_diff/3,
     shared_vars/3,
-    next_solution/0,    
-    call_goal_in_thread/1,
     collecting_list/4,
-    shared_vars/3
+
+    start_listening/1,
+    call_in_engine/1,
+    shared_vars/3,
+    start_goal_saved1/0,
+    wait_until_next_request/0,
+    next_solution/0,
+    next_solution/1
   ]).
 
 :- meta_predicate
    collecting_list(0,+,+,+),
    result_check(0,+,+),
-   call_goal_in_thread(0),
+   call_in_engine(0),
    on_diff_throw(0,0),
    on_diff_fail(0,0),
-   call_diff(0,0,0).
+   call_diff(2,0,0).
    
    
 
-result_check(Call,N+NVs,O+OVs):-
+result_check(Call, _ + NVs, _ + OVs):-
    NVs=@=OVs -> true; Call.
 
 
@@ -43,27 +48,28 @@ result_check(Call,N+NVs,O+OVs):-
   % I'd like these two to run at the same time (Did I really 
   need to start a thread with send_messages)
  
- ?- on_diff_fail(member(X,[1,2,3]),member(X,[1,2,4])). 
+ ?- on_diff_fail(member(X,[1,2,3,4]),member(X,[1,2,x,4])). 
    X = 1 ;
    X = 2 ;
+   X = 4 ;
    No.
 */
 
-on_diff_fail(N,O):- 
-  call_diff(result_check(fail),N,O).
+on_diff_fail(Left,Right):- 
+  call_diff(result_check(fail),Left,Right).
 
-on_diff_throw(N,O):- 
-  call_diff(result_check(trace_or_throw(different(N,O))),N,O).
+on_diff_throw(Left,Right):- 
+  call_diff(result_check(trace_or_throw(different(Left,Right))),Left,Right).
 
-call_diff(Check, N,O):- 
-   shared_vars(N,O,Vs),
- % O must be able to diverge
-   copy_term(O+Vs,CO+CVs),
+call_diff(Check,Left,Right):- 
+   shared_vars(Left,Right,Vs),
+ % Right must be able to diverge
+   copy_term(Right+Vs,CO+CVs),
  % Later on we''ll allow different result orders
    NOL = saved_in([],[]), 
    collecting_list(call(CO),CVs,1,NOL),
-   collecting_list(call(N),Vs,2,NOL),
-   call(Check,N+Vs,O+CVs).
+   collecting_list(call(Left),Vs,2,NOL),
+   call(Check,Left+Vs,Right+CVs).
 
 collecting_list(G,Vs,At,S):- 
    call(G),copy_term(Vs,CVs),
@@ -72,7 +78,7 @@ collecting_list(G,Vs,At,S):-
 
 :- nb_setval(query_result,sol(0,1,false,false)).
 
-shared_vars(S9,G9,SVG):-notrace(( term_variables(S9,Vs1),term_variables(G9,Vs2),intersect_eq0(Vs2,Vs1,SVG))).
+shared_vars(Left,Right,SVG):-notrace(( term_variables(Left,Vs1),term_variables(Right,Vs2),intersect_eq0(Vs2,Vs1,SVG))).
 
 % sol(number,G,successfull,done)
 next_solution:- notrace(next_solution(How)),call(How).
@@ -85,12 +91,12 @@ next_solution(nop(unknown(QR))) :- nb_getval(query_result,QR),!.
 
 request_next0 :- 
   notrace((thread_send_message(ask1,please(next_sol)), !, 
-  thread_get_message(answer1,M),w(rn(M)),nb_setval(query_result,M))),!.
+  thread_get_message(answer1,M),wdmsg(rn(M)),nb_setval(query_result,M))),!.
 
-call_goal_in_thread(G):- 
+call_in_engine(G):- 
   once((nb_setval(in,v(_,G,_)), 
     start_goal_saved1)),fail.
-call_goal_in_thread(G):- next_solution, get_sol(G).
+call_in_engine(G):- next_solution, get_sol(G).
 
 
 get_sol(G):-
@@ -110,6 +116,33 @@ react_message(sol(_,G,true,true),G,(!,true)):- !.
 
 call_goal_in_thread_saved_nd:- start_goal_saved1, fail.
 call_goal_in_thread_saved_nd:- next_solution.
+
+:-  message_queue_property(_Queue, alias(answer1)) -> true;message_queue_create(_,[alias(answer1)]).
+:-  message_queue_property(_Queue, alias(ask1)) -> true;message_queue_create(_,[alias(ask1)]).
+
+
+start_goal_saved1:- 
+  notrace((nb_getval(in,v(_,G,_,_)),
+  thread_create(start_listening(G),_ID,[detached(true)]))),
+  nb_setval(query_result,sol(0,G,unknown,false)),!.
+
+wait_until_next_request:-
+   thread_get_message(ask1,please(C),[]),
+   (C == more_sols -> true; (C == completed -> (!,fail) ; (true))).
+
+thread_send_answer(Left,G,TF,Done):- wdmsg(next_________sol(Left,G,TF,Done)), thread_send_message(answer1,sol(Left,G,TF,Done)).
+
+:- meta_predicate start_listening(0).
+start_listening(G):-
+  notrace((flag(sol,_,0),
+  ((thread_send_answer(0,G,unknown,false)),
+  thread_get_message(ask1,please(next_sol),[]),  
+  ignore(((
+  ((G,deterministic(Det),flag(sol,I,I+1))
+    *-> (flag(sol,X,X),thread_send_answer(X,G,true,Det),wait_until_next_request) ; 
+    flag(sol,X,X),thread_send_answer(X,G,false,true))
+    ),fail))))).
+  
 
 memberchk_eq0(X, [Y|Ys]) :- X==Y;memberchk_eq0(X,Ys).
 

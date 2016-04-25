@@ -1432,7 +1432,7 @@ sanity(Goal):- quietly(Goal).
 compare_results(N+NVs,O+OVs):-
    NVs=@=OVs -> true; trace_or_throw(compare_results(N,O)).
 
-allow_unsafe_code.
+allow_unsafe_code :- fail.
 
 unsafe_safe(_,O):- \+ allow_unsafe_code, !, call(O).
 unsafe_safe(N,O):- on_diff_throw(N,O).

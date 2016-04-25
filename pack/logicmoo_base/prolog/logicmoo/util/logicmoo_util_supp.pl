@@ -27,53 +27,6 @@
       call_cleanup_each(0,0).
 
 
-:- set_prolog_flag(scce,pure).
-	 
-:- dynamic(scce0/0).
-:- retractall(scce0).
-r0(X):- scce4(writeln(start),(between(1,3,X),writeln(X)), writeln(end)).
-
-r0(REF,X):-
- scce4(
-         (asserta(scce0,REF),nl,nl,w(enter(REF:X))),
-         (between(1,3,X),w(goal(REF:X))),
-         (erase(REF),w(cleanup(REF:X)),nl)),
- \+ call(scce0),
- w(success(REF:X)),nl,nl.
-
-
-w(G):-notrace(dmsg(G)).
-
-
-
-:- use_module(library(logicmoo_utils)).
-
-:- meta_predicate scce_orig(0,0,0).
-:- meta_predicate scce3(0,0,0).
-
-
-scce4(S,G,C):-
-  b_setval(setup4,v(S,G,C)),
-  nb_linkval(setup4,v(S,G,C)),
-  setup_call_cleanup(setup3,
-   (((G,deterministic(Det),true) *->
-     (Det == true -> ! ; (cleanup4;(setup4,fail))))),
-   cleanup4), 
-   (exit_4(S,G,C)).
-  
-exit_4(S,G,C):-nb_getval(cleanup4,v(S1,G1,C1)),ignore(S=S1),ignore(G=G1),ignore(C=C1).
-
-cleanup4:- nb_getval(cleanup4,v(_S1,_G1,C1)),call(C1).
-setup3:- 
-  nb_getval(setup4,Orig),Orig=v(S,_G,_C),
-  copy_term(Orig,Copy),Copy=v(S0,G0,C0),  
-  call(S0),nb_setval(cleanup4,v(S,G0,C0)).
-setup4:- 
-  nb_getval(setup4,Orig),
-  copy_term(Orig,v(S0,G0,C0)),
-  call(S0),nb_setval(cleanup4,v(S0,G0,C0)).
-
-
 :- if(\+ current_predicate(system:must_or_die/1)).
 
 :- module_transparent(must_or_die/1).
@@ -82,7 +35,12 @@ must_or_die(G):- (G *-> true ; throw(failed_must_or_die(G))).
 :- module_transparent(must_atomic/1).
 must_atomic(Goal):- notrace('$sig_atomic'(must_or_die(Goal))).
 
+:- module_transparent(must_atomic/1).
+must_notrace(Goal):- notrace('$sig_atomic'(must_or_die(Goal))).
 
+:- endif.
+
+:- if(\+ current_predicate(system:call_cleanup_each/2)).
 call_cleanup_each(Goal, Cleanup) :-
 	setup_call_cleanup_each(true, Goal, Cleanup).
 
@@ -99,16 +57,8 @@ nop(_).
 :- if( \+ current_predicate(setup_call_cleanup_each/3)).
 :- export(setup_call_cleanup_each/3).
 :- meta_predicate(setup_call_cleanup_each(0,0,0)).
-setup_call_cleanup_each(Setup,Goal,Cleanup):-  \+ current_prolog_flag(scce,pure), !, setup_call_cleanup(Setup,Goal,Cleanup).
-setup_call_cleanup_each(Setup,Goal,Cleanup):-
-     catch((
-        call((must_atomic(Setup),Goal,deterministic(Det),true))
-        *->
-        (Det == true
-          -> (must_atomic(Cleanup),!)
-          ; (must_atomic(Cleanup);(must_atomic(Setup),fail)))
-     ; (must_atomic(Cleanup),!,fail)),
-     E, (ignore(must_atomic(Cleanup)),throw(E))).
+setup_call_cleanup_each(Setup,Goal,Cleanup):- current_prolog_flag(scce,Pred), !, call(Pred,Setup,Goal,Cleanup).
+setup_call_cleanup_each(Setup,Goal,Cleanup):- setup_call_cleanup(Setup,Goal,Cleanup).
 
 :- endif.
 

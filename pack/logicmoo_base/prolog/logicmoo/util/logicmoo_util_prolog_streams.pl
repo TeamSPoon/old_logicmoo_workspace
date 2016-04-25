@@ -254,7 +254,8 @@ l_prolog_streams.
 %
 with_input_from_pred(Callback,Goal):-
  current_input(Old),
- call_cleanup_each((
+ setup_call_cleanup_each(true,
+ ((
    must(var(Stream)),
     tl_with_prolog_streams:open_prolog_stream(tl_with_prolog_streams, read, StreamO, []),
     StreamO = Stream,
@@ -262,7 +263,7 @@ with_input_from_pred(Callback,Goal):-
    asserta(((tl_with_prolog_streams:stream_close(Stream):- (ignore(call(Callback,end_of_file))))),Ref2),
    plz_set_stream(Stream,  alias(current_input)),
    plz_set_stream(Stream,  alias(user_input)),
-   setup_call_cleanup(see(Stream), Goal,(seen,erase(Ref2),erase(Ref)))),
+   setup_call_cleanup(see(Stream), Goal,(seen,erase(Ref2),erase(Ref))))),
  set_input(Old)).
 
 % our test callback

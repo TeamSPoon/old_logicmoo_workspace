@@ -3,6 +3,61 @@
 
 
 
+/*
+colen syntax and Mts
+
+ist(mt1,isa(foo,bar)) == mt1:isa(foo,bar).
+
+
+
+*/
+
+/*
+
+isa(foo,bar):-mt1.  % 5
+isa(baz,bar):-mt1.  % 5
+isa(X,Y,mt1):-with_assertion(mt1,isa(X,Y)). % 11
+
+% x50 = 261
+
+
+vs
+
+mt1_isa(foo,bar).  % 4
+mt1_isa(baz,bar). % 4
+isa(X,Y,mt1):-mt1_isa(X,Y).  % 8
+
+mung(mt1_isa(_,_),mt1). % 6 
+mung(mt1_genls(_,_),mt1). % 6 
+
+% x50 = 208 + 6 = 214
+
+mt1_genls(_,_):-mt1_isa(_,_),mt1_genls(_,_).
+
+
+vs.
+
+
+mt1:isa(foo,bar). % 4
+mt1:isa(baz,bar). % 4 
+isa(X,Y,mt1):-mt1:isa(X,Y). % 8
+
+% x50 = 208
+
+vs.
+
+isa(foo,bar,mt1). % 5
+isa(baz,bar,mt1). % 5
+
+
+genls(_,_,MT):-isa(_,_,MT),genls(_,_,MT).
+
+% x50 = 250
+
+*/
+
+
+
 :- op(500,fx,'~').
 :- op(1050,xfx,('==>')).
 :- op(1050,xfx,'<==>').

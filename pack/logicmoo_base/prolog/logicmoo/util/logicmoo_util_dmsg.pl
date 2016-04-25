@@ -25,7 +25,6 @@
             defined_message_color/2,
 
             format_to_message/3, 
-            scce/3,
             dfmt/1,dfmt/2,
             debugm/1,debugm/2,
             dmsg/1,dmsg/2,dmsg/3,
@@ -131,7 +130,6 @@
         ansifmt/2,
         ansifmt/3,
         colormsg/2,
-        scce/3,
         contrasting_color/2,
         defined_message_color/2,
         dfmt/1,
@@ -214,56 +212,6 @@
 :- include('logicmoo_util_header.pi').
 :- endif.
 
-
-%% nop( ?VALUE1) is semidet.
-%
-% Nop.
-%
-:- if( \+ current_predicate(nop/1)).
-:- export(nop/1).
-nop(_).
-:- endif.
-:- if( \+ current_predicate(setup_call_cleanup_each/3)).
-:- export(setup_call_cleanup_each/3).
-:- meta_predicate(setup_call_cleanup_each(0,0,0)).
-setup_call_cleanup_each(Setup,Goal,Cleanup):-  \+ current_prolog_flag(scce,pure), !, setup_call_cleanup(Setup,Goal,Cleanup).
-setup_call_cleanup_each(Setup,Goal,Cleanup):-
-     catch((
-        call((must_atomic(Setup),Goal,deterministic(Det),true))
-        *->
-        (Det == true
-          -> (must_atomic(Cleanup),!)
-          ; (must_atomic(Cleanup);(must_atomic(Setup),fail)))
-     ; (must_atomic(Cleanup),!,fail)),
-     E, (ignore(must_atomic(Cleanup)),throw(E))).
-
-:- endif.
-
-:- if(\+ current_predicate(system:must_or_die/1)).
-
-:- meta_predicate must_or_die(0),
-                  must_atomic(0),
-                  setup_call_cleanup_each(0,0,0),
-                  call_cleanup_each(0,0).
-
-:- module_transparent(must_or_die/1).
-must_or_die(G):- (G *-> true ; throw(failed_must_or_die(G))).
-
-:- module_transparent(must_atomic/1).
-must_atomic(Goal):- notrace('$sig_atomic'(must_or_die(Goal))).
-
-
-call_cleanup_each(Goal, Cleanup) :-
-	setup_call_cleanup_each(true, Goal, Cleanup).
-
-:- endif.
-
-scce(S,G,C):-
-     scce_key(scce(S,G,C),Key),
-     setup_call_cleanup_each(key_call(Key,1),key_call(Key,2),key_call(Key,3)).
-
-key_call(Key,Arg):- nb_current(Key,In),arg(Arg,In,Goal),Goal,nb_setval(Key,In).
-scce_key(In,Key):- format(atom(Key),'~q',[In]),nb_setval(Key,In).
 
 :- meta_predicate with_output_to_each(+,0).
 
@@ -1178,7 +1126,7 @@ tlbugger:term_color0(mpred_op,hfg(blue)).
 % Mesg Color.
 %
 mesg_color(_,[reset]):-tlbugger:no_slow_io,!.
-mesg_color(T,C):-var(T),!,nop(dumpST),!,C=[blink(slow),fg(red),hbg(black)],!.
+mesg_color(T,C):-var(T),!,C=[blink(slow),fg(red),hbg(black)],!.
 mesg_color(T,C):-is_sgr_on_code(T),!,C=T.
 mesg_color(T,C):-cyclic_term(T),!,C=reset.
 mesg_color("",C):- !,C=[blink(slow),fg(red),hbg(black)],!.
