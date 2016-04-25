@@ -147,7 +147,7 @@
         one_must(0, 0),
         one_must_det(0, 0),
         unsafe_safe(0,0),
-        collecting_list(0,++,+),
+        collecting_list(0,+,+,+),
         sanity(0),
         slow_sanity(0),
         to_pi(?, ?),
@@ -1438,7 +1438,7 @@ compare_results(N+NVs,O+OVs):-
 allow_unsafe_code.
 
 unsafe_safe(_,O):- \+ allow_unsafe_code, !, call(O).
-unsafe_safe(N,O):- on_diff_throw(N,O,compare_results).
+unsafe_safe(N,O):- on_diff_throw(N,O).
 
 
 :- export(is_release/0).
