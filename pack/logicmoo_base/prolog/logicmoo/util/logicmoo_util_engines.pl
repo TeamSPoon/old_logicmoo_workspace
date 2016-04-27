@@ -17,6 +17,8 @@
     on_diff_fail/2,
     on_diff_throw/2,
     call_diff/3,
+    intersect_eq0/3,
+    member_eq0/2,
     shared_vars/3,
     collecting_list/4,
 
@@ -144,11 +146,11 @@ start_listening(G):-
     ),fail))))).
   
 
-memberchk_eq0(X, [Y|Ys]) :- X==Y;memberchk_eq0(X,Ys).
+member_eq0(X, [Y|Ys]) :- X==Y;member_eq0(X,Ys).
 
 intersect_eq0([], _, []).
 intersect_eq0([X|Xs], Ys, L) :-
- 	(   memberchk_eq0(X, Ys)
+ 	(   member_eq0(X, Ys)
  	->  L = [X|T],
  	    intersect_eq0(Xs, Ys, T)
  	;   intersect_eq0(Xs, Ys, L)

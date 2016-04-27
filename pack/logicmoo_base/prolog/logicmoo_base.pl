@@ -2,7 +2,7 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- module(logicmoo_base,[ensure_mpred_system/0,enable_mpred_system/1,disable_mpred_system/1]).
+:- module(logicmoo_base,[ensure_mpred_system/0,enable_mpred_system/1,disable_mpred_system/1,fix_ops_for/1]).
 :- use_module(library(logicmoo_utils)).
 
 %:- autoload.
@@ -11,7 +11,6 @@
 :- multifile '$si$':'$was_imported_kb_content$'/2.
 :- dynamic '$si$':'$was_imported_kb_content$'/2.
 :- discontiguous('$si$':'$was_imported_kb_content$'/2).
-
 :- multifile(lmconf:mpred_is_impl_file/1).
 :- dynamic(lmconf:mpred_is_impl_file/1).
 
@@ -35,6 +34,7 @@
 :- add_library_search_path('./logicmoo/',[ '*.pl']).
 % :- add_library_search_path('./plarkc/',[ '*.pl']).
 % :- add_library_search_path('./pttp/',[ 'dbase_i_mpred_*.pl']).
+
 
 
 % ========================================
@@ -178,11 +178,58 @@ logicmoo_base_module(mpred_pfc).
 logicmoo_base_module(mpred_stubs).
 logicmoo_base_module(mpred_type_isa).
 
+/*
 :-forall(logicmoo_base_module(M),
-  (add_import_module(M,logicmoo_user,end),
-  add_import_module(M,baseKB,end))).
+  (add_import_module(baseKB,M,end),
+   add_import_module(logicmoo_user,M,end))).
+*/
 
-:- autoload.
+:- autoload([verbose(false)]).
+
+% 	 	 
+%% fix_ops_for( ?VALUE1) is semidet.
+%
+% Fix Oper.s For.
+%
+fix_ops_for(CM):-
+ op(1199,fx,CM:('==>')), 
+ op(1190,xfx,CM:('::::')),
+ op(1180,xfx,CM:('==>')),
+ op(1170,xfx,CM:('<==>')),  
+ op(1160,xfx,CM:('<-')),
+ op(1150,xfx,CM:('=>')),
+ op(1140,xfx,CM:('<=')),
+ op(1130,xfx,CM:('<=>')), 
+ op(600,yfx,CM:('&')), 
+ op(600,yfx,CM:('v')),
+ op(350,xfx,CM:('xor')),
+ op(300,fx,CM:('~')),
+ op(300,fx,CM:('-')).
+
+
+/*
+:- set_prolog_flag(report_error,true).
+:- set_prolog_flag(fileerrors,false).
+:- set_prolog_flag(access_level,system).
+:- set_prolog_flag(debug_on_error,true).
+:- set_prolog_flag(debug,true).
+:- set_prolog_flag(gc,false).
+:- set_prolog_flag(gc,true).
+:- set_prolog_flag(optimise,false).
+:- set_prolog_flag(last_call_optimisation,false).
+:- debug.
+:- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
+*/
+
+:- must(add_library_search_path('./logicmoo/mpred_online/',[ '*.pl'])).
+
+
+:- sanity( \+predicate_property(baseKB:_,exported)).
+% :- sanity( \+predicate_property(logicmoo_user:_,exported)).
+
+:- do_gc.
+
+:- forall(retract(wsh_w:wrap_shared(F,A,ereq)),ain((arity(F,A),pfcControlled(F),prologHybrid(F)))).
 
 :- asserta_if_new((user:term_expansion(I,O):- with_umt_l(mpred_expander(term,user,I,O)))).
 :- asserta_if_new((system:goal_expansion(I,O):- hotrace(with_umt_l(mpred_expander(goal,system,I,O))))).

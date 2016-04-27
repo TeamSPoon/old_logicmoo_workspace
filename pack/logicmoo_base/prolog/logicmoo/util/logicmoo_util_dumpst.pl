@@ -19,9 +19,12 @@
           drain_framelist/1,
           drain_framelist_ele/1,
           printable_variable_name/2,
+          v_name1/2,
+          v_name2/2,
           dump_st/0,
           with_source_module/1,
           to_wmsg/2,
+          fmsg_rout/1,
           simplify_goal_printed/2,
           dumpST/0,dumpST/1,dumpST1/0,
           dumpST0/0,dumpST0/1,dumpST0/2,
@@ -53,7 +56,7 @@
           dump_st/0,
           dumpST/0,dumpST/1,
           dumpST0/0,dumpST0/1,dumpST0/2,
-          dumpST9/0,dumpST9/1,dumpST9/2,dumpST9/3,dumpST9/4.
+          dumpST9/0,dumpST9/1,dumpST9/2.
 
 
 
@@ -81,7 +84,7 @@ dumpST0:-notrace(dumpST0(800)),!.
 %
 % Dump S True Stucture Primary Helper.
 %
-dumpST0(Opts):- prolog_current_frame(Frame),dumpST0(Frame,Opts).
+dumpST0(Opts):- once(nb_current('$dump_frame',Frame);prolog_current_frame(Frame)),dumpST0(Frame,Opts).
 
 %= 	 	 
 
@@ -91,7 +94,7 @@ dumpST0(Opts):- prolog_current_frame(Frame),dumpST0(Frame,Opts).
 %
 dumpST0(_,_):- tlbugger:ifHideTrace,!.
 dumpST0(Frame,MaxDepth):- ignore(MaxDepth=5000),Term = dumpST(MaxDepth),
-   (var(Frame)->prolog_current_frame(Frame);true),
+   (var(Frame)->once(nb_current('$dump_frame',Frame);prolog_current_frame(Frame));true),
    ignore(( get_prolog_backtrace(MaxDepth, Trace,[frame(Frame),goal_depth(100)]),
     format(user_error, '% dumpST ~p', [Term]), nl(user_error),
     print_prolog_backtrace(user_error, Trace,[subgoal_positions(true)]), nl(user_error), fail)),!.
@@ -106,7 +109,7 @@ dumpST0(Frame,MaxDepth):- ignore(MaxDepth=5000),Term = dumpST(MaxDepth),
 %
 % Dump S True Stucture.
 %
-dumpST:- notrace(dumpST1).
+dumpST:- notrace((prolog_current_frame(Frame),b_setval('$dump_frame',Frame),dumpST1)).
 
 %= 	 	 
 
@@ -125,7 +128,7 @@ dumpST1:- loop_check_early(dumpST9,dumpST0).
 %
 % Dump S True Stucture.
 %
-dumpST(Depth):- loop_check_early(dumpST9(Depth),dumpST0(Depth)).
+dumpST(Depth):- notrace((prolog_current_frame(Frame),b_setval('$dump_frame',Frame))),loop_check_early(dumpST9(Depth),dumpST0(Depth)).
 
 
 %= 	 	 
@@ -144,7 +147,7 @@ get_m_opt(Opts,Max_depth,D100,RetVal):-E=..[Max_depth,V],(((member(E,Opts),nonva
 %
 % Dump S T9.
 %
-dumpST9:- notrace((prolog_current_frame(Frame), dumpST9(Frame,5000))).
+dumpST9:- notrace((once(nb_current('$dump_frame',Frame);prolog_current_frame(Frame)), dumpST9(Frame,5000))).
 
 %= 	 	 
 
@@ -152,7 +155,7 @@ dumpST9:- notrace((prolog_current_frame(Frame), dumpST9(Frame,5000))).
 %
 % Dump S T9.
 %
-dumpST9(Depth):- prolog_current_frame(Frame), dumpST9(Frame,Depth).
+dumpST9(Depth):- once(nb_current('$dump_frame',Frame);prolog_current_frame(Frame)), dumpST9(Frame,Depth).
 
 
 %= 	 	 
@@ -337,13 +340,21 @@ fdmsg(M):- logicmoo_util_catch:ddmsg(failed_fdmsg(M)).
 
 %= 	 	 
 printable_variable_name(Var, Name) :- nonvar(Name),!,must(printable_variable_name(Var, NameO)),!,Name=NameO.
-printable_variable_name(Var, Name) :- nonvar(Var),Var='$VAR'(_),format(atom(Name),"'$Var'(~q)",Var).
+printable_variable_name(Var, Name) :- nonvar(Var),Var='$VAR'(_),format(atom(Name),"~w_VAR",Var).
 printable_variable_name(Var, Name) :- nonvar(Var),format(atom(Name),"(_~q_)",Var).
-printable_variable_name(Var,Name):- (get_attr(Var, vn, Name1);get_attr(Var, varnames, Name1)),
- (var_property(Var,name(Name2))-> (Name1==Name2-> atom_concat('?$',Name1,Name) ; Name=(Name1:Name2)); (atom(Name1)->atom_concat('?',Name1,Name);format(atom(Name),"'$VaR'(~q)",Var))),!.
-printable_variable_name(Var,Name):- var_property(Var,name(Name1)),!,atom_concat('$',Name1,Name).
-printable_variable_name(Var,Name):- (nb_current('$variable_names', Vs)->true;Vs=[]),member(Name1=V,Vs),V==Var,!,atom_concat('$',Name1,Name).
-printable_variable_name(Var, Name) :- format(atom(Name),'#~w',Var).
+printable_variable_name(Var,Name):- (get_attr(Var, vn, Name1);
+  get_attr(Var, varnames, Name1)),
+ (var_property(Var,name(Name2))-> 
+   (Name1==Name2-> atom_concat(Name1,'_VN',Name) ; Name=(Name1:Name2)); 
+    (atom(Name1)->atom_concat('?',Name1,Name);
+   format(atom(Name),"'$VaR'(~q)",Var))),!.
+printable_variable_name(Var,Name):- v_name1(Var,Name),!.
+printable_variable_name(Var,Name):- v_name2(Var,Name),!. % ,atom_concat(Name1,'_TL',Name).
+
+v_name1(Var,Name):- var_property(Var,name(Name)),!.
+v_name1(Var,Name):- nb_current('$variable_names', Vs),member(Name=V,Vs),V==Var,!.
+v_name1(Var,Name):- nb_current('$old_variable_names', Vs),member(Name=V,Vs),V==Var,!.
+v_name2(Var,Name):- nb_current('$variable_names', Vs),format(atom(Name),'~W',[Var, [variable_names(Vs)]]).
  
 
 %attrs_to_list(att(sk,_,ATTRS),[sk|List]):-!,attrs_to_list(ATTRS,List).
@@ -357,14 +368,20 @@ attrs_to_list(_ATTRS,[]).
 % Simplify Goal Printed.
 %
 
-simplify_goal_printed(Var,Name):-cyclic_term(Var),!,Name=Var.
-simplify_goal_printed(Var,Name):- get_attrs(Var,att(vn, _, [])),printable_variable_name(Var, Name),!.
+simplify_var_printed(Var,'$avar'('$VAR'(Name))):- tlbugger:plain_attvars,must(printable_variable_name(Var,Name)),!.
+simplify_var_printed(Var,'$VAR'(Name)):- get_attrs(Var,att(vn, _, [])),printable_variable_name(Var, Name),!.
+simplify_var_printed(Var,'$avar'('$VAR'(Name))):- tlbugger:plain_attvars,must(printable_variable_name(Var,Name)),!.
+simplify_var_printed(Var,'$avar'(Dict)):- get_attrs(Var,ATTRS),must(printable_variable_name(Var,Name)),attrs_to_list(ATTRS,List),
+                         dict_create(Dict,'$VAR'(Name),List).
+simplify_var_printed(Var,'$VAR'(Name)):- is_ftVar(Var),!,printable_variable_name(Var, Name).
 
-simplify_goal_printed(Var,'$avar'(Name)):- tlbugger:plain_attvars,must(printable_variable_name(Var,Name)),!.
-simplify_goal_printed(Var,'$avar'(Name,List)):- get_attrs(Var,ATTRS),must(printable_variable_name(Var,Name)),attrs_to_list(ATTRS,List).
-simplify_goal_printed(Var,Name):- is_ftVar(Var),!,printable_variable_name(Var, Name).
+
+simplify_goal_printed(Var,Name):-cyclic_term(Var),!,Name=Var.
+simplify_goal_printed(Var,Name):-is_ftVar(Var),simplify_var_printed(Var,Name),!.
 simplify_goal_printed(setup_call_catcher_cleanup,sccc).
+simplify_goal_printed(existence_error(X,Y),_):-nl,writeq(existence_error(X,Y)),nl,fail.
 simplify_goal_printed(setup_call_cleanup,scc).
+simplify_goal_printed(existence_error,'existence_error_XXXXXXXXX__\e[0m\e[1;34m%-6s\e[m\'This is text\e[0mRED__existence_error_existence_error').
 simplify_goal_printed(setup_call_cleanup_each,scce).
 simplify_goal_printed(call_cleanup,cc).
 simplify_goal_printed(call_term_expansion(_,A,_,B,_),O):- !, simplify_goal_printed(call_term_expansion_5('...',A,'...',B,'...'),O).
@@ -459,7 +476,7 @@ end_dump(GG):-compound(GG),functor(GG,F,_),atom_concat(dump,_,F).
 %
 % (debug) Trace.
 %
-dtrace:- dtrace(wdmsg("DUMP_TRACE/0")).
+dtrace:- wdmsg("DUMP_TRACE_BREAK/0"), break,dtrace(trace).
 
 :- thread_local(has_auto_trace/1).
 :-meta_predicate(dtrace(0)).
@@ -470,13 +487,14 @@ dtrace:- dtrace(wdmsg("DUMP_TRACE/0")).
 %
 % (debug) Trace.
 %
-dtrace(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dtrace(G)),setup_call_cleanup_each(notrace,(leash(+call),dtrace(G)),trace).
+
+dtrace(G):- notrace((tracing,notrace)),!,wdmsg(tracing_dtrace(G)),break,dumptrace(G). % setup_call_cleanup_each(notrace,(leash(+call),dtrace(G)),trace).
+
 dtrace(G):- notrace((once(((G=dmsg(GG);G=_:dmsg(GG);G=GG),nonvar(GG))),wdmsg(GG),fail)).
 dtrace(G):- has_auto_trace(C),wdmsg(has_auto_trace(C,G)),!,call(C,G). 
 %dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,dumpST.
 %dtrace(G):- \+ tlbugger:ifCanTrace,!,hotrace((wdmsg((not(tlbugger:ifCanTrace(G)))))),!,badfood(G),!,dumpST.
-dtrace(G):- nop(current_predicate(_:logicmoo_bugger_loaded/0)),!,dumptrace(G).
-dtrace(G):- G. 
+dtrace(G):- dumptrace(G).
 
 
 % :-meta_predicate(dtrace(+,?)).

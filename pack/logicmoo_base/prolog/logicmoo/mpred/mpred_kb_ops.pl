@@ -238,8 +238,8 @@ attvar_op/2,
 % lmconf:mpred_provide_storage_clauses/3,
 % justification/2,
 
-mpred_facts_and_universe/1,
-            mpred_kb_ops_file/0
+mpred_facts_and_universe/1
+            
           ]).
 
 :- meta_predicate 
@@ -1174,6 +1174,7 @@ mpred_current_op_support((p,p)):-!.
 pfcVersion(6.6).
 
 
+:- '$set_source_module'(mpred_kb_ops).
 
 %% correctify_support( +S, ?S) is semidet.
 %
@@ -1671,6 +1672,8 @@ mpred_call_with_no_triggers_uncaugth(Clause) :-  strip_module(Clause,_,F),
 % PFC Backchaining Only.
 %
 mpred_bc_only(M:G):- call_u(M,mpred_bc_only0(G)).
+
+:- '$set_source_module'(mpred_kb_ops).
 
 %% mpred_bc_only0( +G) is semidet.
 %
@@ -2315,8 +2318,6 @@ ruleBackward(R,Condition):- call_u(( ruleBackward0(R,Condition),functor(Conditio
 %
 ruleBackward0(F,Condition):- call_u((  '<-'(F,Condition),\+ (is_true(Condition);mpred_is_info(Condition)) )).
 
-:- setup_mpred_ops.
-
 
 % ======================= 
 % user''s program''s database
@@ -2586,17 +2587,11 @@ retract_mu((H:-B)):-!, clause_u(H,B,R),erase(R).
 :- was_dynamic(infoF/1).
 :- was_export(infoF/1).
 
-:- source_location(S,_),prolog_load_context(module,M),
- forall(source_file(M:H,S),ignore((functor(H,F,A),
-   \+ mpred_database_term(F/A,_),
-   F\=='$mode',
-   F\=='$pldoc',
-   ignore(((\+ atom_concat('$',_,F),\+ mpred_database_term(F/A,_),export(F/A)))),
-   \+ predicate_property(M:H,transparent),M:module_transparent(M:F/A),
-   ignore(((\+ atom_concat('__aux',_,F),format('~N:- module_transparent(~q/~q).~n',[F,A]))))
-   ))).
-
 
 mpred_kb_ops_file.
+
+:- '$set_source_module'(mpred_kb_ops).
+
+
 
 

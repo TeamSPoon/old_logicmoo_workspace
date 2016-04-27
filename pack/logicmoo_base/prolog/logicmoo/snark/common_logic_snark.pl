@@ -678,7 +678,7 @@ adjust_kif0(KB,Int_P,ARGS,O):-atom_concat('int_',P,Int_P),!,append(LARGS,[_, _, 
 adjust_kif0(KB,P,ARGS,O):-atom_concat(_,'_t',P),!,append(LARGS,[_, _, _, _, _, _],ARGS),
    PARGS=..[P|LARGS],adjust_kif0(KB,PARGS,O).
 
-adjust_kif0(KB,W,[P,A,R|GS],O):-is_wrapper_pred(W),PARGS=..[P,A,R|GS],adjust_kif0(KB,t(PARGS),O).
+adjust_kif0(KB,W,[P,A,R|GS],O):- call(call_u(is_wrapper_pred(W))),PARGS=..[P,A,R|GS],adjust_kif0(KB,t(PARGS),O).
 adjust_kif0(KB,F,ARGS,O):-KIF=..[F|ARGS],length(ARGS,L),L>2,adjust_kif0(KB,KIF,F,ARGS,Conj),KIF\=@=Conj,!,adjust_kif0(KB,Conj,O).
 % adjust_kif0(KB,W,[A],O):-is_wrapper_pred(W),adjust_kif(KB,A,O),!.
 
@@ -1396,7 +1396,7 @@ kif_ask((P & Q)):- kif_ask_sent((P & Q)).
 kif_ask(Goal0):-  logical_pos(_KB,Goal0,Goal),
     no_repeats(lmconf:(
 	if_defined(add_args(Goal0,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],_ProofOut1,Goal1,_)),!,
-        search(Goal1,60,0,1,3,DepthIn,DepthOut))).
+        call(call,search(Goal1,60,0,1,3,DepthIn,DepthOut)))).
 
 :- public(kif_ask/2).
 
@@ -1409,8 +1409,8 @@ kif_ask(Goal0):-  logical_pos(_KB,Goal0,Goal),
 kif_ask(Goal0,ProofOut):- logical_pos(_KB,Goal0,Goal),
     no_repeats(lmconf:(
 	if_defined(add_args(Goal0,Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],ProofOut1,Goal1,_)),!,
-        search(Goal1,60,0,1,3,DepthIn,DepthOut),
-        contract_output_proof(ProofOut1,ProofOut))).
+        call(call,search(Goal1,60,0,1,3,DepthIn,DepthOut)),
+        call(call,contract_output_proof(ProofOut1,ProofOut)))).
 
 
 %= 	 	 

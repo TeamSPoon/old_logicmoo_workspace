@@ -95,7 +95,7 @@ must_test_80([what, countries, are, there, in, europe, ?], [sent([what, countrie
 call_in_banner(U,Call):- p2(begin:U),call_cleanup(Call,p2(end:U)).
 
 :-export(t2/0).
-t2:- w_tl(tracing80,with_no_assertions(t_l:old_text,with_no_assertions(thglobal:use_cyc_database,forall(must_test_80(U,R,O),t2_process_run_diff(report,U,R,O))))).
+t2:- w_tl(tracing80,with_no_assertions(t_l:old_text,with_no_assertions(lmconf:use_cyc_database,forall(must_test_80(U,R,O),t2_process_run_diff(report,U,R,O))))).
 
 t2_process_run_diff(report,U,R,O):- copy_term80(U,UU),
    process_run_diff(report,U,R,O),!,nop( w_tl(t_l:usePlTalk,process_run_diff(report,UU,[],[]))),!.
@@ -119,7 +119,7 @@ user:agent_call_command(_Gent,chat80(StringM)):- chat80(StringM).
 chat80 :- w_tl(tracing80,
            w_tl(t_l:chat80_interactive,
             with_no_assertions(t_l:useOnlyExternalDBs,
-             with_no_assertions(thglobal:use_cyc_database,
+             with_no_assertions(lmconf:use_cyc_database,
               (told, repeat, prompt_read('CHAT80> ',U),  
                             to_word_list(U,WL),((WL==[bye];WL==[end,'_',of,'_',file];(mmake,once(chat80(WL)),fail)))))))).
 

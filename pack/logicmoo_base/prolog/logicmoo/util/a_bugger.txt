@@ -755,7 +755,7 @@ wno_tl(THead,Call):-
 
 
 to_thread_head((H:-B),TL,(HO:-B),(HH:-B)):-!,to_thread_head(H,TL,HO,HH),!.
-to_thread_head(thglobal:Head,thglobal,thglobal:Head,Head):- slow_sanity((predicate_property(thglobal:Head,(dynamic)),not(predicate_property(thglobal:Head,(thread_local))))).
+to_thread_head(lmconf:Head,lmconf,lmconf:Head,Head):- slow_sanity((predicate_property(lmconf:Head,(dynamic)),not(predicate_property(lmconf:Head,(thread_local))))).
 to_thread_head(TL:Head,TL,TL:Head,Head):-!, slow_sanity(( predicate_property(TL:Head,(dynamic)),must(predicate_property(TL:Head,(thread_local))))).
 to_thread_head(Head,t_l,t_l:Head,Head):-!, slow_sanity(( predicate_property(t_l:Head,(dynamic)),must(predicate_property(t_l:Head,(thread_local))))).
 to_thread_head(Head,tlbugger,tlbugger:Head,Head):- slow_sanity(( predicate_property(tlbugger:Head,(dynamic)),predicate_property(tlbugger:Head,(thread_local)))).

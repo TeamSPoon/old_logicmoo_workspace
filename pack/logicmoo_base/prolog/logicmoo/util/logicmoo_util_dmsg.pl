@@ -30,7 +30,7 @@
             dmsg/1,dmsg/2,dmsg/3,
           
             cls/0,
-            dmsg0/1,dmsg0/2,
+            dmsg0/1,dmsg0/2,dmsg00/1,
             dmsg1/1,
             dmsg2/1,
             dmsg3/1,
@@ -619,7 +619,6 @@ source_variables_lwv(AllS):-
 % Portray Clause W Variables.
 %
 portray_clause_w_vars(Msg):- portray_clause_w_vars(Msg,[]),!.
-:- 'mpred_trace_none'(portray_clause_w_vars(_)).
 
 
 %= 	 	 
@@ -1465,19 +1464,8 @@ writeFailureLog(E,X):-
 %
 cls:- shell(cls).
 
-:- 'mpred_trace_none'(fmt(_)).
-:- 'mpred_trace_none'(fmt(_,_)).
-:- 'mpred_trace_none'(dfmt(_)).
-:- 'mpred_trace_none'(dfmt(_,_)).
-:- 'mpred_trace_none'(dmsg(_)).
-:- 'mpred_trace_none'(dmsg(_,_)).
-:- 'mpred_trace_none'(logicmoo_util_catch:ddmsg(_)).
-:- 'mpred_trace_none'(logicmoo_util_catch:ddmsg(_,_)).
-
 :- use_module(library(random)).
 :- use_module(logicmoo_util_varnames).
 % :- autoload([verbose(false)]).
-
- 
 
 

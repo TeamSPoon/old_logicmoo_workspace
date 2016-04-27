@@ -96,6 +96,7 @@
             name_variable/2, variable_name/2,
             init_varname_stores/1,
             maybe_scan_for_varnames/0
+
           ]).
 
 
@@ -248,7 +249,7 @@ vn:attribute_goals(Var, [name_variable(Var,  Name)|B], B) :- variable_name(Var, 
 %:- export(attribute_goals/3).
 
  	 
-:- thread_local(t_l:no_kif_var_coroutines/0).
+:- thread_local(t_l:no_kif_var_coroutines/1).
 
 %% attr_unify_hook( ?X, ?Other) is semidet.
 %
@@ -265,7 +266,7 @@ vn:attr_unify_hook(Name1, Var):- get_attr(Var, vn, Name2),!,ignore(Name1==Name2)
 
 vn:attr_unify_hook(Name1, Var):- get_attr(Var, vn, Name2),!,combine_names(Name1,Name2,Name),(Name2==Name->true;put_attr(Var,vn,Name)).
 vn:attr_unify_hook(Name1, Var):- var(Var),!,put_attr(Var, vn, Name1).
-vn:attr_unify_hook(_Form, _OtherValue):- t_l:no_kif_var_coroutines,!,fail.
+vn:attr_unify_hook(_Form, _OtherValue):- t_l:no_kif_var_coroutines(G),!,call(G).
 vn:attr_unify_hook(_Form, _OtherValue):-!.
 
 combine_names(Name1,Name2,Name1):-Name1==Name2,!.
@@ -807,7 +808,7 @@ write_functor(N,V):-!,put_attr(V,vn,N).
 write_functor(N,V):-ignore('$VAR'(N)=V),!.
 
 :-export(save_clause_vars/2).
-:-module_transparent(save_clause_vars/1).
+:-module_transparent(save_clause_vars/2).
 % save_clause_vars(_,[]):-!.
 
 %= 	 	 
@@ -1099,7 +1100,16 @@ b_implode_varnames0([N=V|Vs]):- ignore((V='$VAR'(N);V=N)),b_implode_varnames0(Vs
 %
 % Imploded Copyvars.
 %
-imploded_copyvars(C,CT):-vmust((logicmoo_util_catch:source_variables(Vs),copy_term(C-Vs,CT-VVs),b_implode_varnames(VVs))),!.
+imploded_copyvars(C,CT):-vmust((source_variables(Vs),copy_term(C-Vs,CT-VVs),b_implode_varnames(VVs))),!.
+
+%% source_variables( ?Vs) is semidet.
+%
+% Source Variables.
+%
+source_variables(Vs):- (((prolog_load_context(variable_names,Vs),Vs\==[]);
+   (nb_current('$variable_names', Vs),Vs\==[]))),!.
+source_variables(Vars):-var(Vars),parent_goal('$toplevel':'$execute_goal2'(_, Vars),_),!.
+source_variables([]).
 
 
 
@@ -1296,8 +1306,6 @@ ensure_vars_labled(I,OO):- acyclic_term(O),term_variables(I,Vs),all_different_va
 ensure_vars_labled(I,OO):- vmust(acyclic_term(I)),term_variables(I,Vs),all_different_vars(Vs),ensure_vars_labled_r(I,O),vmust(acyclic_term(O)),!,OO=O.
 ensure_vars_labled(I,I).
 
-% :- prolog_load_context(module,M),source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),'$set_predicate_attribute'(M:H, hide_childs, 1),module_transparent(F/A))).
-
 
 :- multifile(user:portray/1).
 
@@ -1417,7 +1425,5 @@ prolog:make_hook(before, Files):-forall(member(File,Files),retractall(varname_ca
 % Term Expansion.
 %
 user:term_expansion(HB,_):- current_prolog_flag(mpred_vars,true),term_expansion_save_vars(HB),fail.
-
-
 
 

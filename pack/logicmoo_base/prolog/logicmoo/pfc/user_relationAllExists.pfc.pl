@@ -114,6 +114,7 @@ ptTransitiveBinaryPredicate(genls).
 */
 % ((t(isa,A,B),t(genls,B,C)) ==> t(isa,A,C)).
 
+:- dynamic(transitiveViaArgInverse/3).
 
 ((transitiveViaArg(PRED,BPRED,2),arity(PRED,2)) /ground(PRED:BPRED)) ==> clif((t(PRED,A,B) , t(BPRED,B,C)) => t(PRED,A,C)).
 ((transitiveViaArgInverse(PRED,BPRED,2),arity(PRED,2))/ground(PRED:BPRED)) ==> clif((t(PRED,A,B) & t(BPRED,C,B)) => t(PRED,A,C)).

@@ -658,7 +658,6 @@ isac:attribute_goals(X) -->
       { get_attr(X, isac, List) },
       [isac(X, List)].
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
 mpred_type_constraints_file.
 

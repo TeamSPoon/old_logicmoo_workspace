@@ -93,46 +93,46 @@
 */
 :- if(exists_source(library(pldoc))).
 
-  :- use_module(library(pldoc)).
-  :- use_module(library(http/thread_httpd)).
-  :- use_module(library(http/http_parameters)).
-  :- use_module(library(http/html_write)).
-  :- use_module(library(http/mimetype)).
-  :- use_module(library(dcg/basics)).
-  :- use_module(library(http/http_dispatch)).
-  :- use_module(library(http/http_hook)).
-  :- use_module(library(http/http_path)).
-  :- use_module(library(http/http_wrapper)).
-  :- use_module(library(uri)).
-  :- use_module(library(debug)).
-  :- use_module(library(lists)).
-  :- use_module(library(url)).
-  :- use_module(library(socket)).
-  :- use_module(library(option)).
-  :- use_module(library(error)).
-  :- use_module(library(www_browser)).
-  :- use_module(library(pldoc/doc_process)).
-  :- use_module(library(pldoc/doc_htmlsrc)).
-  :- use_module(library(pldoc/doc_html)).
-  :- use_module(library(pldoc/doc_index)).
-  :- use_module(library(pldoc/doc_search)).
-  :- use_module(library(pldoc/doc_man)).
-  :- use_module(library(pldoc/doc_wiki)).
-  :- use_module(library(pldoc/doc_util)).
-  :- use_module(library(pldoc/doc_access)).
-  :- use_module(library(pldoc/doc_pack)).
+  :- user:use_module(library(pldoc)).
+  :- user:use_module(library(http/thread_httpd)).
+  :- user:use_module(library(http/http_parameters)).
+  :- user:use_module(library(http/html_write)).
+  :- user:use_module(library(http/mimetype)).
+  :- user:use_module(library(dcg/basics)).
+  :- user:use_module(library(http/http_dispatch)).
+  :- user:use_module(library(http/http_hook)).
+  :- user:use_module(library(http/http_path)).
+  :- user:use_module(library(http/http_wrapper)).
+  :- user:use_module(library(uri)).
+  :- user:use_module(library(debug)).
+  :- user:use_module(library(lists)).
+  :- user:use_module(library(url)).
+  :- user:use_module(library(socket)).
+  :- user:use_module(library(option)).
+  :- user:use_module(library(error)).
+  :- user:use_module(library(www_browser)).
+  :- user:use_module(library(pldoc/doc_process)).
+  :- user:use_module(library(pldoc/doc_htmlsrc)).
+  :- user:use_module(library(pldoc/doc_html)).
+  :- user:use_module(library(pldoc/doc_index)).
+  :- user:use_module(library(pldoc/doc_search)).
+  :- user:use_module(library(pldoc/doc_man)).
+  :- user:use_module(library(pldoc/doc_wiki)).
+  :- user:use_module(library(pldoc/doc_util)).
+  :- user:use_module(library(pldoc/doc_access)).
+  :- user:use_module(library(pldoc/doc_pack)).
 
 % start a unused server
-:- use_module(library(doc_http)).
-%:- use_module(library(doc_html)).
+:- user:use_module(library(doc_http)).
+%:- user:use_module(library(doc_html)).
 :- endif.
 
 :- if(exists_source(library(pldoc))).
-:- use_module(library(pldoc), []).
+:- user:use_module(library(pldoc), []).
 	% Must be loaded before doc_process
-:- use_module(library(pldoc/doc_process)).
+:- user:use_module(library(pldoc/doc_process)).
 :- endif.
-:- use_module(library(prolog_xref)).
+:- user:use_module(library(prolog_xref)).
 
 :- if(exists_source(library(pldoc))).
 
@@ -515,7 +515,7 @@ export_module_preds:- source_context_module(M),source_file_property(S,module(M))
 
 :- if(exists_source(library(pldoc/doc_pack))).
 
-:- use_module(library(pldoc/doc_pack)).
+:- user:use_module(library(pldoc/doc_pack)).
 
 :-endif.
 
@@ -739,10 +739,10 @@ autodoc_stream_pred(FromLine,File,P):-!,get_functor(P,F,A),autodoc_stream_pred(F
 %
 % Autodoc Predicate.
 %
+autodoc_pred(M,M:P0):- t_l:last_predicate_help_shown(M,_,P0),!.
 autodoc_pred(M,M:P0):- once(to_comparable_name_arity(P0,F,A)),functor(P,F,A), M\==baseKB , (predicate_property(baseKB:P,_),\+predicate_property(baseKB:P,imported_from(_))),!.
 autodoc_pred(M,M:P0):- once(to_comparable_name_arity(P0,F,A)), clause(M:'$pldoc'(F/A, _, S, D),true),S\==D,!.
-autodoc_pred(_,_:end_of_file):-!.
-autodoc_pred(M,M:P0):- t_l:last_predicate_help_shown(M,_,P0),!.
+autodoc_pred(_,MP):- MP = _:end_of_file, !.
 autodoc_pred(M,M:P0):- 
  asserta(t_l:last_predicate_help_shown(M,M,P0)),
  must_det_l((
@@ -1341,24 +1341,24 @@ mpred_type_module(A):- \+ atom(A),!,fail.
 %
 % Managed Predicate Prolog Only Module.
 %
+mpred_prolog_only_module(M):- var(M), !, current_module(M),mpred_prolog_only_module(M).
+mpred_prolog_only_module(user):-!,fail.
 mpred_prolog_only_module(mpred_type_wff).
 mpred_prolog_only_module(logicmoo_varnames).
 mpred_prolog_only_module(common_logic_compiler).
 mpred_prolog_only_module(common_logic_snark).
 mpred_prolog_only_module(common_logic_sexpr).
-mpred_prolog_only_module(M):-atom_concat(mpred_,_,M).
-mpred_prolog_only_module(M):-atom_concat(logicmoo_util,_,M).
-mpred_prolog_only_module(M):-atom_concat(common_logic_,_,M).
 mpred_prolog_only_module(logicmoo_utils).
 mpred_prolog_only_module(t_l).
 mpred_prolog_only_module(tlbugger).
 mpred_prolog_only_module(lmcache).
 mpred_prolog_only_module(lmconf).
+mpred_prolog_only_module(M):-atom_concat(mpred_,_,M).
+mpred_prolog_only_module(M):-atom_concat(logicmoo_util,_,M).
+mpred_prolog_only_module(M):-atom_concat(common_logic_,_,M).
 
-mpred_prolog_only_module(M):- current_module(M),atom_concat(logicmoo_utils_,_,M).
 % mpred_prolog_only_module(M):- lmconf:mpred_is_impl_file(F),make_module_name(F,M).
 % mpred_prolog_only_module(user). 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
 
 

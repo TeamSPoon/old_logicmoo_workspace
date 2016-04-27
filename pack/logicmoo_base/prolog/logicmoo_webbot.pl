@@ -11,9 +11,9 @@
  [qsp/0]).
 
 
-:- autoload.
+:- autoload([verbose(false)]).
 :- use_module(library(logicmoo_utils)).
-:- autoload.
+:- autoload([verbose(false)]).
 :- use_module(library(eggdrop)).
 :- use_module(library(debug)).
 :- debug(logicmoo_webbot),nodebug(logicmoo_webbot).

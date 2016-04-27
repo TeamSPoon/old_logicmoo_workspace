@@ -12,7 +12,10 @@
 */
 % File: /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_filesystem.pl
 :- module(logicmoo_util_filesystem,
-          [ add_library_search_path/2,
+          [ 
+          swi_module/2,
+           
+            add_library_search_path/2,
             add_file_search_path/2,
             add_to_search_path/2,
             add_to_search_path/3,
@@ -67,8 +70,16 @@
             to_filename/2,
             upcase_atom_safe/2,
             with_filematch/1,
-            with_filematches/1
+            with_filematches/1,
+
+            add_prolog_predicate/6,
+            glean_prolog_impl_file/4,
+            add_genlMt/2
+            
           ]).
+
+swi_module(M,Preds):- forall(member(P,Preds),M:export(P)). % ,dmsg(swi_module(M)).
+
 :- multifile
         local_directory_search/1.
 :- meta_predicate
@@ -156,8 +167,14 @@
 % Resolve Dir.
 %
 resolve_dir(Dir,Dir):- is_absolute_file_name(Dir),!,exists_directory(Dir),!.
-resolve_dir(Path,Dir):- (prolog_load_context(directory,SDir);(prolog_load_context(file,File),file_directory_name(File,SDir)),working_directory(SDir,SDir)),
-   absolute_file_name(Path,Dir,[relative_to(SDir),file_type(directory)]),exists_directory(Dir).
+resolve_dir(Path,Dir):- 
+  (prolog_load_context(directory,SDir);
+   (prolog_load_context(file,File),file_directory_name(File,SDir));
+   (prolog_load_context(source,File),file_directory_name(File,SDir));
+   (catch((call(call,current_source_file(F)),to_filename(F,File),atom(File)),_,fail),file_directory_name(File,SDir));
+    working_directory(SDir,SDir)),exists_directory(SDir),
+    catch(absolute_file_name(Path,Dir,[relative_to(SDir),access(read),file_errors(fail),file_type(directory)]),_,fail),
+    exists_directory(Dir).
 
 
 %%	add_file_search_path(+Alias, +WildCard) is det.
@@ -183,9 +200,9 @@ add_file_search_path(Name,Path):-  resolve_dir(Path,Dir),
 %
 
 add_library_search_path(Path,Masks):- 
-      forall(resolve_dir(Path,Dir), 
+   forall(resolve_dir(Path,Dir), 
       (make_library_index(Dir, Masks), 
-      (user:library_directory(Dir) -> true ; (asserta(user:library_directory(Dir)), reload_library_index)))).
+        (user:library_directory(Dir) -> true ; (asserta(user:library_directory(Dir)), reload_library_index)))).
 
 
 :- meta_predicate(with_filematch(0)).
@@ -853,4 +870,75 @@ os_to_prolog_filename(OS,PL):-atom(OS),atomic_list_concat([X,Y|Z],'\\',OS),atomi
 os_to_prolog_filename(OS,PL):-atom_concat_safe(BeforeSlash,'/',OS),os_to_prolog_filename(BeforeSlash,PL).
 os_to_prolog_filename(OS,PL):-absolute_file_name(OS,OSP),OS \== OSP,!,os_to_prolog_filename(OSP,PL).
 
+% ===========================================================================
+% add_prolog_predicate/6,glean_prolog_impl_file/2,complete_prolog_impl_file/2
+% ===========================================================================
+
+:- multifile(lmconf:known_prolog_file_prop/2).
+:- dynamic(lmconf:known_prolog_file_prop/2).
+
+add_genlMt(From,Prop):-atom(Prop),!,add_genlMt(From,imports(Prop)).
+add_genlMt(From,CTo):-arg(1,CTo,To),From==To,!.
+add_genlMt(From,imports(To)):- (arg(_,v(user,system),From);arg(_,v(user,system),To)),!.
+add_genlMt(From,maybe(To)):- (arg(_,v(user,system),From);arg(_,v(user,system),To)),!.
+add_genlMt(baseKB,imports(logicmoo_user)):-!.
+
+% add_genlMt(_From,imports(To)):-arg(_,v(baseKB,logicmoo_user),To),!.
+% add_genlMt(logicmoo_user,imports(baseKB)):-!.
+add_genlMt(From,Prop):-lmconf:known_prolog_file_prop(From,Prop),!.
+add_genlMt(From,Prop):-assertz(lmconf:known_prolog_file_prop(From,Prop)),fail.
+add_genlMt(_,file(_)):-!.
+add_genlMt(_,uses(_)):-!.
+add_genlMt(From,Prop):-write('% '), writeln(add_genlMt(From,Prop)),fail.
+
+add_genlMt(From,imports(To)):-
+   catch(add_import_module(From,To,start),E,writeln(E=add_import_module(From,To))).
+
+:- meta_predicate
+        glean_prolog_impl_file(+,+,+,+).
+
+:- export(glean_prolog_impl_file/4).
+:- module_transparent(glean_prolog_impl_file/4).
+
+glean_prolog_impl_file(_,_,_,_):-current_prolog_flag(xref,true),!.
+glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- !,
+   assertz(lmconf:known_complete_prolog_impl_file(SM,File,TypeIn)),
+   add_genlMt(logicmoo_user,imports(baseKB)),
+   add_genlMt(SM,maybe(TypeIn)),
+   add_genlMt(logicmoo_utils,imports(SM)),
+   add_genlMt(SM,imports(logicmoo_user)),
+   add_genlMt(SM,uses(baseKB)),
+   forall(source_file(SM:H,File),
+       ignore((functor(H,F,A),
+         (predicate_property(SM:H,imported_from(Where))
+           -> add_prolog_predicate(skip,Where,H,F,A,File)
+          ; add_prolog_predicate(TypeIn,SM,H,F,A,File))))),
+         fail.
+
+glean_prolog_impl_file((:- module(Want,_PubList)),File,SM,TypeIn):-!,
+    add_genlMt(TypeIn, uses(SM)),
+    add_genlMt(logicmoo_utils, uses(SM)),
+    add_genlMt(logicmoo_utils, uses(Want)),
+    add_genlMt(SM, uses(Want)),
+    add_genlMt(Want, file(File)).
+    
+
+glean_prolog_impl_file(_,File,SM,_TypeIn):-
+   add_genlMt(SM,  file(File)),
+   add_genlMt(SM, imports(logicmoo_user)).
+
+
+:- export(add_prolog_predicate/6).
+:- module_transparent(add_prolog_predicate/6).
+add_prolog_predicate(skip,_M,_H,_F,_A,_S):-!.
+add_prolog_predicate(_CM,M,H,F,A,_S):-
+  ignore((
+       F\=='$mode',
+       F\=='$pldoc',
+       F\=='$exported_op',
+       ignore(((\+ atom_concat('$',_,F),export(F/A)))),
+       \+ predicate_property(M:H,transparent),
+       M:module_transparent(M:F/A),
+       ignore(((\+ atom_concat('__aux',_,F),call(call,nop(format('~N:- module_transparent(~q/~q).~n',[F,A])))))))).
+      
 

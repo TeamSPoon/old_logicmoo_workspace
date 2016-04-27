@@ -48,10 +48,6 @@ stack_depth(Level):-hotrace((prolog_current_frame(Frame),prolog_frame_attribute(
 
 :-  module_transparent stack_check/0.
 :-  module_transparent stack_check/1.
-:-  module_transparent stack_check_else/3.
-  % st ack_check:-!.
-
-%= 	 	 
 
 %% stack_check is semidet.
 %

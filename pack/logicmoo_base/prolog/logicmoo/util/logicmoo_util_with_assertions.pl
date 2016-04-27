@@ -14,9 +14,11 @@
           [ check_thread_local_1m/1,
             to_thread_head_1m/4,
             w_tl/2,
-            w_tl/2,
+            w_tl_e/2,
             wno_tl/2,
-            wno_tl/2,
+            wno_tl_e/2,
+            key_asserta/1,
+            key_erase/0,
             wtg/2,
             with_no_x/1,
             with_each_item/3]).
@@ -24,6 +26,8 @@
 :- meta_predicate
         w_tl(:, :),
         wno_tl(0, 0),        
+        w_tl_e(:, :),
+        wno_tl_e(0, 0),        
         with_no_x(0),
         wtg(:, 0).
 :- module_transparent
@@ -111,18 +115,17 @@ w_tl(_:scc(WM:THeadWM),CM:Call):- !,
        to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
        setup_call_cleanup(asserta(M:HAssert,REF),CM:Call,erase(REF)).
 
-w_tl(_:scce(WM:THeadWM),CM:Call):- !,
+w_tl(_:scce(WM:THeadWM),CM:Call):- !,w_tl_e(WM:THeadWM,CM:Call).
+
+w_tl(WM:THeadWM,CM:Call):-w_tl_e(WM:THeadWM,CM:Call).
+
+w_tl_e(WM:THeadWM,CM:Call):-
  notrace(( 
      to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
      scce_orig(key_asserta(M:HAssert),CM:Call,key_erase).
 
-w_tl(WM:THeadWM,CM:Call):-
- notrace(( 
-     to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
-     scce_orig(key_asserta(M:HAssert),CM:Call,key_erase).
 
-
-key_asserta(HAssert):- asserta(HAssert,REF),(nb_current('$w_tl_e',Was)->nb_setval('$w_tl_e',[REF|Was]);nb_setval('$w_tl_e',[REF])).
+key_asserta(M:HAssert):- asserta(M:HAssert,REF),(nb_current('$w_tl_e',Was)->nb_setval('$w_tl_e',[REF|Was]);nb_setval('$w_tl_e',[REF])).
 key_erase:- must((nb_current('$w_tl_e',[REF|Was]),nb_setval('$w_tl_e',Was),erase(REF))).
 
    	 
@@ -132,6 +135,8 @@ key_erase:- must((nb_current('$w_tl_e',[REF|Was]),nb_setval('$w_tl_e',Was),erase
 % Wno Thread Local.
 %
 wno_tl(UHead,Call):- w_tl((UHead :- !,fail),Call).
+
+wno_tl_e(UHead,Call):- w_tl_e((UHead :- !,fail),Call).
 
 
 /*
@@ -148,12 +153,12 @@ wno_tl(UHead,Call):-
 %
 % Converted To Thread Head 1m.
 %
-to_thread_head_1m((H:-B),TL,HO,(HH:-B)):-!,to_thread_head_1m(H,TL,HO,HH),!.
-to_thread_head_1m(lmconf:Head,lmconf,lmconf:Head,Head):- !.
-to_thread_head_1m(TL:Head,TL,TL:Head,Head):-!, check_thread_local_1m(TL:Head).
-% to_thread_head_1m(Head,Module,Module:Head,Head):-Head \= (_:_), predicate_module(Head,Module),!.
-to_thread_head_1m(lmconf:Head,user,lmconf:Head,Head):- !.
-to_thread_head_1m(Head,t_l,t_l:Head,Head):-!,check_thread_local_1m(t_l:Head).
+to_thread_head_1m((H:-B),TL,HO,(HH:-B)):-to_thread_head_1m(H,TL,HO,HH).
+to_thread_head_1m(lmconf:Head,lmconf,lmconf:Head,Head).
+to_thread_head_1m(TL:Head,TL,TL:Head,Head):- check_thread_local_1m(TL:Head).
+% to_thread_head_1m(Head,Module,Module:Head,Head):-Head \= (_:_), predicate_module(Head,Module).
+to_thread_head_1m(lmconf:Head,user,lmconf:Head,Head).
+to_thread_head_1m(Head,t_l,t_l:Head,Head):-check_thread_local_1m(t_l:Head).
 to_thread_head_1m(Head,tlbugger,tlbugger:Head,Head):-check_thread_local_1m(tlbugger:Head).
 
 
@@ -165,8 +170,8 @@ to_thread_head_1m(Head,tlbugger,tlbugger:Head,Head):-check_thread_local_1m(tlbug
 %
 check_thread_local_1m(_):- is_release,!.
 check_thread_local_1m(t_l:_):-!.
+check_thread_local_1m((H:-_)):-!,check_thread_local_1m(H).
 check_thread_local_1m(tlbugger:_):-!.
-%check_thread_local_1m(_):-!.
 %check_thread_local_1m(lmconf:_):-!.
-check_thread_local_1m(TLHead):- slow_sanity(( must_det(predicate_property(TLHead,(thread_local))))),!.
+check_thread_local_1m(TLHead):- slow_sanity(predicate_property(TLHead,(thread_local))).
 

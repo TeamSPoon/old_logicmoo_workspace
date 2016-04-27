@@ -1042,7 +1042,7 @@ is_kif_clause(R):- is_clif(R),!.
 %
 % Term Slots.
 %
-term_slots(Term,Slots):-term_singletons(Term, [],NS, [],S),append(NS,S,Slots).
+% term_slots(Term,Slots):-term_singletons(Term, [],NS, [],S),append(NS,S,Slots).
 
 
 :- export(head_singletons/2).
@@ -1206,6 +1206,5 @@ function_to_predicate(Function,NewVar,PredifiedFunction):-
 function_to_predicate(Function,NewVar,mudEquals(NewVar,Function)):- \+ t_l:dont_use_mudEquals, fresh_varname(Function,NewVar),!.
 
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
 mpred_type_wff_file.

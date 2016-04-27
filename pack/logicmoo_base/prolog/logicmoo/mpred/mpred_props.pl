@@ -234,10 +234,10 @@ decl_mpred_prolog_ilc_0(_CM,M,PI,F/A):-
 %
 % Declare Managed Predicate Hybrid.
 %
-decl_mpred_hybrid(A):-not(compound(A)),!.
+decl_mpred_hybrid(A):-not(compound(A)),!,ain00(prologHybrid(A)).
 decl_mpred_hybrid(M):-M=..[isEach|List],!,maplist(decl_mpred_hybrid,List).
 % decl_mpred_hybrid(A):-!, must((with_pfa(m_fa_to_m_p_fa(decl_mpred_hybrid),A))),!.
-decl_mpred_hybrid(P):- with_pi(P,decl_mpred_hybrid).
+decl_mpred_hybrid(P):- with_umt(with_pi(P,decl_mpred_hybrid)).
 
 :- was_export((decl_mpred_hybrid)/3).
 
@@ -280,7 +280,7 @@ decl_mpred_hybrid(CM,M,PIN,FA):- unnumbervars(PIN,PI),loop_check(must(decl_mpred
 %
 % Declare Managed Predicate Hybrid Inside Of Loop Checking.
 %
-decl_mpred_hybrid_ilc(CM,M,PI,F/A):-atom(PI),A==0,must(arity(F,_)),not(current_predicate(F/A)),!,
+decl_mpred_hybrid_ilc(CM,M,PI,F/A):-atom(PI),A==0,get_arity(PI,F,A),not(current_predicate(F/A)),!,
    forall((arity(F,AA),AA\=0),(functor(PIA,F,AA),decl_mpred_hybrid_ilc(CM,M,PIA,F/AA))).
 
 decl_mpred_hybrid_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),loop_check_term(decl_mpred_hybrid_ilc_0(CM,M,PI,F/A),decl_mpred_hybrid_ilc(CM,M,F),true).
@@ -296,7 +296,7 @@ decl_mpred_hybrid_ilc_0(_CM,M,PI,F/A):-
       ain(mpred_module(F,M)),
       ain(prologHybrid(F)),
       get_cc(PI,NC),
-      sanity(show_failure(why,M==baseKB)),
+      sanity(ignore(show_failure(why,M==baseKB))),
       decl_mpred_mfa(M,F,A),
       decl_mpred_pi(PI),
       must(lmconf:mpred_provide_setup(call(conjecture),F/A,prologHybrid,_OUT)),
@@ -583,7 +583,6 @@ add_mpred_prop_gleaned_4(Arg1,_F,[ARG|_],FRGS):-nonvar(ARG),!,decl_mpred(Arg1,[m
 add_mpred_prop_gleaned_4(Arg1,_F,_,FRGS):-decl_mpred(Arg1,FRGS).
 
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
 % user:term_expansion(G,_):- current_predicate(logicmoo_bugger_loaded/0),\+ t_l:disable_px, not(t_l:into_form_code),hotrace((once(glean_pred_props_maybe(G)),fail)).
 

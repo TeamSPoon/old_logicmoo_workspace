@@ -26,7 +26,7 @@
 
 :- module_transparent with_no_kif_var_coroutines/1.
 
-with_no_kif_var_coroutines(Goal):- w_tl_e(t_l:no_kif_var_coroutines,Goal).
+with_no_kif_var_coroutines(Goal):- w_tl_e(t_l:no_kif_var_coroutines(true),Goal).
 
 /** <module> Form Prolog sks (debugging)
 */
@@ -79,7 +79,7 @@ sk_replace(_Into,_SKFINAL):-!,fail.
 
 
 sk:attr_unify_hook(Form, OtherValue):-OtherValue==Form,!.
-sk:attr_unify_hook(_Form, _OtherValue):- t_l:no_kif_var_coroutines,!,fail.
+sk:attr_unify_hook(_Form, _OtherValue):- t_l:no_kif_var_coroutines(G),!,call(G).
 sk:attr_unify_hook(Form, OtherValue):- var(OtherValue),!,push_skolem(OtherValue,Form),!.
 %sk:attr_unify_hook(Form, OtherValue):- contains_var(OtherValue,Form),!.
 %sk:attr_unify_hook(Form, OtherValue):- contains_var(Form,OtherValue),!.

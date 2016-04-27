@@ -741,6 +741,5 @@ do_call_OnEachLoad:-forall(call_OnEachLoad(C),doall(C)).
 %
 wfAssert(X):-ain(X). % add_later(X).
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
 mpred_agenda_file.

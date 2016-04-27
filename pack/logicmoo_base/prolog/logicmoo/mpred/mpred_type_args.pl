@@ -13,7 +13,7 @@
           [ any_to_number/2,
             any_to_relation/2,
             any_to_value/2,
-           argIsa_call_0/3,
+            argIsa_call_0/3,
             argIsa_call_3/2,
             argIsa_call_6/3,
             argIsa_call_7/3,
@@ -83,9 +83,11 @@
             mpred_type_args_file/0
           ]).
 % autoloading user:portray_clause_pi/2 from /opt/PrologMUD/pack/logicmoo_base/prolog/logicmoo/util/logicmoo_util_first
-:- shared_multifile((         
-        
-        coerce/3)).
+:- '$set_source_module'(mpred_type_args).
+
+:- shared_multifile(coerce/3).
+
+
 /*
 :- dynamic((
         argIsa_known/3,
@@ -104,11 +106,12 @@
 %
 % assert Argument  (isa/2).
 %
+:- '$set_source_module'(mpred_type_args).
 assert_argIsa(Prop,N,Type):-show_failure(why,ain_fast(argIsa(Prop,N,Type))).
 
 
 
-%= 	 	 
+:- '$set_source_module'(mpred_type_args).
 
 %% assert_predArgTypes( ?ArgTs) is semidet.
 %
@@ -131,7 +134,8 @@ assert_predArgTypes_fa(F,ArgsList):- length(ArgsList,L),assert_predArgTypes_l(F,
 
 %assert_predArgTypes_l(F,L,ArgsList):- arity(F,A),!,must( (A>=L) -> assert_predArgTypes_from_right(F,A,ArgsList);true).
 
-%= 	 	 
+:- '$set_source_module'(mpred_type_args).
+
 
 %% assert_predArgTypes_l( ?F, ?L, ?ArgsList) is semidet.
 %
@@ -251,7 +255,7 @@ is_declarations(C):-compound(C),ground(C),!, (\+ (arg(_,C,T), \+ is_spec(T))).
 is_spec(T):- call_u(tCol(T))->true;is_declarations(T).
 
 
-%= 	 	 
+:- '$set_source_module'(mpred_type_args).
 
 %% is_rest( :TermARG1) is semidet.
 %
@@ -308,7 +312,7 @@ pl_arg_type(Arg,Type):-
 
 
 
-%= 	 	 
+:- '$set_source_module'(mpred_type_args).
 
 %% is_ftText( ?Arg) is semidet.
 %
@@ -320,7 +324,6 @@ is_ftText(Arg):- text_to_string_safe(Arg,_),!.
 is_ftText(Arg):- functor(Arg,S,_),resultIsa(S,ftText).
 
 :- was_dynamic(coerce/3).
-:- shared_multifile(coerce/3).
 :- was_export(coerce/4).
 
 %= 	 	 
@@ -444,7 +447,7 @@ argIsa_call_0(meta_argtypes,1,ttExpressionType).
 
 argIsa_call_0(isa,1,ftID).
 argIsa_call_0(export,_,ftTerm).
-argIsa_call_0(decl_mpred_hybrid,_,ftTerm).
+argIsa_call_0(shared_multifile,_,ftTerm).
 
 
 argIsa_call_0(isa,2,tCol).
@@ -1105,5 +1108,4 @@ roll_dice(Rolls,Sided,Bonus,Result):- LessRolls is Rolls-1, roll_dice(LessRolls,
 lmconf:module_local_init:- ain_fast(prologHybrid(formatted_resultIsa/2)).
 lmconf:module_local_init:- ain_fast(prologHybrid(resultIsa/2)).
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 mpred_type_args_file.

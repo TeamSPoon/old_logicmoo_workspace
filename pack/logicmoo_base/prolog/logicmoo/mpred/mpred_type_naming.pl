@@ -383,6 +383,5 @@ convertToInstance(Name,FunctArgType,Inst):- createByNameMangle(Name,Inst,TypeA),
   %  assert_isa(Inst,FunctArgType),
     ain(genls(TypeA,FunctArgType)),!.
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
 mpred_type_naming_file.

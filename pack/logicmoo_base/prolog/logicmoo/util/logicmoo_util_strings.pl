@@ -1761,5 +1761,4 @@ longest_string(Order,TStr1,TStr2):-
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 :- retract(double_quotes_was_strings(WAS)),set_prolog_flag(double_quotes,WAS).
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),'$set_predicate_attribute'(logicmoo_util_strings:H, hide_childs, 1),module_transparent(F/A))).
 

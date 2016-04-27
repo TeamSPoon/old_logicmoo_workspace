@@ -477,20 +477,24 @@ clausify_attributes(H,B,Extra,(H:-attr_bind(Extra,B))).
 is_visible_module(A):-var(A),!,fail.
 is_visible_module(user).
 is_visible_module(system).
-is_visible_module(Inherited):-'$current_source_module'(E), default_module(E,Inherited).
-is_visible_module(Inherited):-'$current_typein_module'(E), default_module(E,Inherited).
-is_visible_module(baseKB).
+%is_visible_module(Inherited):-'$current_source_module'(E), default_module(E,Inherited).
+%is_visible_module(Inherited):-'$current_typein_module'(E), default_module(E,Inherited).
+%is_visible_module(baseKB).
 
 
 simple_var(Var):- var(Var),\+ attvar(Var).
 
 to_mod_if_needed(M,B,MB):- B==true-> MB=B ; MB = M:B.
 
-split_attrs(B,ATTRS,BODY):- \+ sanity((simple_var(ATTRS),simple_var(BODY))),
-    dumpST,dtrace(split_attrs(B,ATTRS,BODY)).
-split_attrs(B,true,B):-is_ftVar(B),!.
+split_attrs(B,true,B0):-var(B),!,B0=call(B).
 split_attrs(call(C),A,B):-!,split_attrs(C,A,B).
 split_attrs(M:B,ATTRS,BODY):- is_visible_module(M),!, split_attrs(B,ATTRS,BODY).
+split_attrs(B,true,B0):-ground(B),!,B0=B.
+
+/*
+split_attrs(B,ATTRS,BODY):- \+ sanity((simple_var(ATTRS),simple_var(BODY))),
+    dtrace,dumpST,dtrace(split_attrs(B,ATTRS,BODY)).
+*/
 split_attrs(M:attr_bind(G,Call),M:attr_bind(G),Call):- !.
 split_attrs(attr_bind(G,Call),attr_bind(G),Call):- !.
 split_attrs(true,true,true):-!.
@@ -791,20 +795,4 @@ erase_safe_now(M,clause(A,B),REF):-!,
        erase(REF)).
 */
 
-:- source_location(S,_),prolog_load_context(module,M),!,ignore((source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A)),M:export(M:F/A),fail)).
-
-:- source_location(S,_),prolog_load_context(module,M),
- forall(source_file(M:H,S),
- ignore((functor(H,F,A),
- %   \+ mpred_database_term(F/A,_),
-   F\=='$mode',
-   F\=='$pldoc',
-   ignore(((
-     % \+ atom_concat('$',_,F),
-     % \+ mpred_database_term(F/A,_),
-     export(F/A)))),
-   % \+ predicate_property(M:H,transparent),
-   M:module_transparent(M:F/A)
-   % ignore(((\+ atom_concat('__aux',_,F),format('~N:- module_transparent(~q/~q).~n',[F,A]))))
-   ))).
 

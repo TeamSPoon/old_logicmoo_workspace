@@ -25,7 +25,7 @@
 
 mpred_userkb_file.
 
-:- '$set_source_module'(baseKB).
+:- '$set_source_module'(mpred_userkb).
 
 :- dynamic(base_kb_pred_list/1).
 
@@ -55,6 +55,7 @@ agent_call_command/2,
 argGenl/3,
 argIsa/3,
 argQuotedIsa/3,
+loaded_external_kbs/0,
 argsQuoted/1,
 arity/2,
 asserted_mpred_f/2,
@@ -75,10 +76,11 @@ completelyAssertedCollection/1,
 conflict/1,
 constrain_args_pttp/2,
 contract_output_proof/2,
+transitiveViaArg/3,
 current_world/1,
 cyc_to_plarkc/2,
 definingMt/2, 
-is_never_type/1,
+%is_never_type/1,
 %cyckb_t/3,
 cycPrepending/2,
 decided_not_was_isa/2,
@@ -91,9 +93,11 @@ feature_test/0,
 formatted_resultIsa/2,
 function_corisponding_predicate/2,
 functorDeclares/1,
+transitiveViaArgInverse/3,
 genls/2,
 grid_key/1,
 hybrid_support/2,
+transitiveViaArgInverse/2,
 if_missing/2, % pfc
 is_edited_clause/3,
 is_wrapper_pred/1,
@@ -196,32 +200,31 @@ prologEquality/1,pfcBcTrigger/1,meta_argtypes/1,pfcDatabaseTerm/1,pfcControlled/
       baseKB:mpred_isa(?,1),
       baseKB:resolverConflict_robot((*)))).
 
-:- '$set_source_module'(baseKB).
+% MAYBE :- :- '$set_source_module'(baseKB).
 :- thread_local(t_l:user_abox/2).
 t_l:user_abox(baseKB,baseKB).
 
 :- show_call(source_context_module(_CM)).
 
 
-:- '$set_source_module'(baseKB).
+% MAYBE :- :- '$set_source_module'(baseKB).
 
-:- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),baseKB:dynamic(baseKB:E)).
-:- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),decl_shared(E)).
-:- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),mpred_loader:import_to_user(baseKB:E)).
+:- base_kb_pred_list(List),mpred_loader:forall((member(E,List),E\='$pldoc'/4),must(mpred_loader:split_into_mts(E))).
+% :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),decl_shared(E)).
 
 
-:- import_module_to_user(logicmoo_user).
+% MAYBE :- import_module_to_user(logicmoo_user).
 
-:- initialization(import_module_to_user(logicmoo_user)).
+% MAYBE :- initialization(import_module_to_user(logicmoo_user)).
 
 
 % :- module_property(baseKB, exports(List)),forall(member(E,List),kb_dynamic(E)).
 
 % :- use_module(mpred_pfc).
 
-:- source_location(F,_),asserta(lmconf:ignore_file_mpreds(F)).
+% MAYBE :- source_location(F,_),asserta(lmconf:ignore_file_mpreds(F)).
 
-:- '$set_source_module'(baseKB).
+% MAYBE :- '$set_source_module'(baseKB).
 
 %= 	 	 
 
@@ -229,7 +232,7 @@ t_l:user_abox(baseKB,baseKB).
 %
 % Prolog Negated By Failure.
 %
-prologNegByFailure(prologNegByFailure).
+baseKB:prologNegByFailure(prologNegByFailure).
 
 %= 	 	 
 
@@ -237,10 +240,10 @@ prologNegByFailure(prologNegByFailure).
 %
 % Completely Asserted Collection.
 %
-completelyAssertedCollection(prologNegByFailure).
+baseKB:completelyAssertedCollection(prologNegByFailure).
 
-:- dynamic(t/2).
-:- dynamic(t/1).
+:- dynamic(baseKB:t/2).
+:- dynamic(baseKB:t/1).
 % t(C,I):- trace_or_throw(t(C,I)),t(C,I). % ,fail,loop_check_term(isa_backchaing(I,C),t(C,I),fail).
 
 %t([P|LIST]):- !,mpred_plist_t(P,LIST).
@@ -253,7 +256,7 @@ completelyAssertedCollection(prologNegByFailure).
 %
 % True Structure.
 %
-t(X,Y):- cwc, isa(Y,X).
+baseKB:t(X,Y):- cwc, isa(Y,X).
 
 %= 	 	 
 
@@ -261,7 +264,7 @@ t(X,Y):- cwc, isa(Y,X).
 %
 % True Structure.
 %
-t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST).
+logicmoo_user:t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST).
 :- meta_predicate(t(?,?,?,?,?)).
 :- meta_predicate(t(?,?,?,?)).
 :- meta_predicate(t(?,?,?)).
@@ -269,7 +272,7 @@ t(CALL):- cwc, call(into_plist_arities(3,10,CALL,[P|LIST])),mpred_plist_t(P,LIST
 :- meta_predicate logicmoo_user:t(7,?,?,?,?,?,?,?).
 :- meta_predicate logicmoo_user:t(6,?,?,?,?,?,?).
 
-:-asserta_if_new((~(G):- (cwc, neg_in_code(G)))).
+:-asserta_if_new(logicmoo_user:(~(G):- (cwc, neg_in_code(G)))).
 
 %= 	 	 
 
@@ -482,16 +485,6 @@ is_static_why(M,P,F,A,WHY):- show_success(predicate_property(M:P,static)),!,WHY=
 %  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),ax)),UN).
 %  Pred='$VAR'('Pred'),unnumbervars(mpred_eval_lhs(pt(UMT,singleValuedInArg(Pred,_G8263654),(trace->rhs([{trace},prologSingleValued(Pred)]))),(singleValuedInArg(Pred,_G8263679),{trace}==>{trace},prologSingleValued(Pred),ax)),UN).
 
-
-:- source_location(S,_),prolog_load_context(module,M),
- forall(source_file(M:H,S),ignore((functor(H,F,A),
-   \+ mpred_database_term(F/A,_),
-   F\=='$mode',
-   F\=='$pldoc',
-   ignore(((\+ atom_concat('$',_,F),\+ mpred_database_term(F/A,_),nop(export(F/A))))),
-   \+ predicate_property(M:H,transparent),M:module_transparent(M:F/A) 
-   % ,ignore(((\+ atom_concat('__aux',_,F),format('~N:- module_transparent(~q/~q).~n',[F,A]))))
-   ))).
 
 :- add_import_module(baseKB,basePFC,end).
 :- initialization(add_import_module(baseKB,basePFC,end)).

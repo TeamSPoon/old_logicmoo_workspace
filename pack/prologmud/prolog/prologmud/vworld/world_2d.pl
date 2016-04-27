@@ -291,7 +291,7 @@ put_in_world(Obj):-is_in_world(Obj),!.
 put_in_world(Obj):-random_xyzFn(LOC),add_fast(mudAtLoc(Obj,LOC)).
 
 
-
+/*
 % :-export decl_database_hook/2.  action_info
 :-export(deduce_facts/2).
 :-export(create_random_fact/1).
@@ -300,6 +300,7 @@ put_in_world(Obj):-random_xyzFn(LOC),add_fast(mudAtLoc(Obj,LOC)).
 :-export( fact_maybe_deduced/1).
 :-export( fact_is_false/2).
 :-dynamic fact_is_false/2.
+*/
 
 prologHybrid(mudInsideOf(tObj,tObj)).
 

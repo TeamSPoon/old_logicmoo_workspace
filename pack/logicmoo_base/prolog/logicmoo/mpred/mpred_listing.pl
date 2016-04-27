@@ -60,7 +60,7 @@
 :- dynamic
   	user:portray/1.
 
-:- dynamic(why_buffer/2).
+% :- dynamic(why_buffer/2).
 
 
 
@@ -477,6 +477,5 @@ mpred_list_triggers_1(What):-
    !.     
 
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
 mpred_listing_file.

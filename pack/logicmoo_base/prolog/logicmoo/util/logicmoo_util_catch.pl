@@ -25,6 +25,8 @@
             badfood/1,
             unsafe_safe/2,
             quietly/1,
+            doall_and_fail/1,
+            quietly_must/1,
             on_x_f/3,
             hide_trace/1,
             block/2,
@@ -66,6 +68,7 @@
             is_main_thread/0,
             is_pdt_like/0,
             is_release/0,
+            need_speed/0,
             allow_unsafe_code/0,
             keep/2,
             loading_file/1,
@@ -118,8 +121,12 @@
             with_preds/6,
             without_must/1,
             y_must/2
+
+
           ]).
 :- meta_predicate
+
+
 		block(+, :, ?),
 		catchv(0, ?, 0),
 		catchvvnt(0, ?, 0),
@@ -223,6 +230,11 @@
         warn_bad_functor/1.
 :- dynamic
         is_hiding_dmsgs/0.
+
+:- meta_predicate
+   doall_and_fail(0),
+   quietly_must(0).
+
 
 :- include('logicmoo_util_header.pi').
 
@@ -432,6 +444,15 @@ ddmsg_call(D):- ( (logicmoo_util_catch:ddmsg(ddmsg_call(D)),call(D),logicmoo_uti
 
 
 
+%% doall_and_fail( :GoalCall) is semidet.
+%
+% Doall And Fail.
+%
+doall_and_fail(Call):- time_call(once(doall(Call))),fail.
+
+quietly_must(G):- no_trace(must(G)).
+
+
 :- meta_predicate if_defined(:).
 :- export(if_defined/1).
 
@@ -553,8 +574,10 @@ show_new_src_location(K,FL):- retractall(t_l:last_src_loc(K,_)),format_to_error(
 %
 % Sl Converted To Filename.
 %
+sl_to_filename(W,W):-atom(W),exists_file(W),!.
 sl_to_filename(W,W):-atom(W),!.
 sl_to_filename(_:W,W):-atom(W),!.
+sl_to_filename(mfl(_,F,_),F):-atom(F),!.
 sl_to_filename(W,W).
 sl_to_filename(W,To):-nonvar(To),To=(W:_),atom(W),!.
 
@@ -666,15 +689,6 @@ source_variables_l(AllS):-
 
 
 %= 	 	 
-
-%% source_variables( ?Vs) is semidet.
-%
-% Source Variables.
-%
-source_variables(Vs):- (((prolog_load_context(variable_names,Vs),Vs\==[]);
-   (nb_current('$variable_names', Vs),Vs\==[]))),!.
-source_variables(Vars):-var(Vars),parent_goal('$toplevel':'$execute_goal2'(_, Vars),_),!.
-source_variables([]).
 
 
 :-export( show_source_location/0).
@@ -1410,7 +1424,7 @@ hide_trace(G):-
 on_x_f(G,X,F):-catchv(G,E,(dumpST,wdmsg(E),X)) *-> true ; F .
 
 :- meta_predicate quietly(0).
-quietly(G):- is_release,call(G).
+quietly(G):- is_release,!,call(G).
 quietly(G):- on_x_f(hide_trace(G),rtrace(G),rtrace(G)).
 
 
@@ -1437,13 +1451,16 @@ allow_unsafe_code :- fail.
 unsafe_safe(_,O):- \+ allow_unsafe_code, !, call(O).
 unsafe_safe(N,O):- on_diff_throw(N,O).
 
+:- export(need_speed/0).
+need_speed.
 
 :- export(is_release/0).
 %% is_release is semidet.
 %
 % If Is A Release.
 
-is_release:-!.
+% is_release:-!.
+% is_release:- 1 is random(4),!.
 is_release:- !,fail.
 is_release :- \+ not_is_release.
 :- export(not_is_release/0).
@@ -1537,8 +1554,6 @@ get_must(Goal,CGoal):-
      (dumpST,logicmoo_util_catch:ddmsg(error,must_xI_(E,Goal)),set_prolog_flag(debug_on_error,true),
          ignore_each((rtrace(Goal),nortrace,trace,dtrace(Goal),badfood(Goal)))))
          *-> true ; (dumpST,ignore_each(((trace,dtrace(must_failed_F__A__I__L_(Goal),Goal),badfood(Goal))))))).
-
-:- source_location(S,_),prolog_load_context(module,M),forall(source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A),M:export(M:F/A))).
 
 :- initialization(save_streams).
 :- save_streams.

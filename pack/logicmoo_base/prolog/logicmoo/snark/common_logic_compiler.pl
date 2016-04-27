@@ -143,6 +143,8 @@
             variants_are_equal/3
           ]).
 
+:- '$set_source_module'(common_logic_compiler).
+
 % :- use_module(logicmoo(util/logicmoo_util_preddefs)).
 :-
             op(1150,fx,(was_dynamic)),
@@ -161,6 +163,7 @@
         type_action_info/3.
 
 :- include('../mpred/mpred_header.pi').
+:- '$set_source_module'(common_logic_compiler).
 
 
 % :- use_module(logicmoo(snark/common_logic_sexpr)).

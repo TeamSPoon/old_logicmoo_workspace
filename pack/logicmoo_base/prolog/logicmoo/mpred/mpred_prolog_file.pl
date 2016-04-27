@@ -150,7 +150,7 @@ prolog_load_file_loop_checked_0(ModuleSpec, Options) :- current_predicate(_,_:ex
 
 
 prolog_load_file_nlc_pre(Module:Spec, Options) :- 
-  call_with_module(Module,prolog_load_file_nlc(Module:Spec, Options)).
+  call_from_module(Module,prolog_load_file_nlc(Module:Spec, Options)).
 
 %% prolog_load_file_nlc( :TermModule, ?Options) is semidet.
 %
@@ -234,8 +234,6 @@ load_file_dir(Module:DirName, Options):- fail,
       (user:prolog_load_file(Module:FileName, Options),TF=true)),
      nonvar(TF).
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
-
 
 
 
@@ -266,7 +264,7 @@ ensure_prolog_file_consulted(M:File,Options):-must(load_files(M:File,Options)),!
 % Ensure Managed Predicate File Consulted.
 %
 ensure_mpred_file_consulted(M:File,Options):- 
- call_with_module(M,
+ call_from_module(M,
   with_mpred_expansions(w_tl(t_l:pretend_loading_file(File),
               must((file_begin(pfc),
                     load_files(M:File,Options)))))),!.
@@ -278,7 +276,7 @@ ensure_mpred_file_consulted(M:File,Options):-
 %
 % Load File Some Type.
 %
-load_file_some_type(M:File,Options):-call_with_module(M,must(load_files(M:File,Options))),!.
+load_file_some_type(M:File,Options):-call_from_module(M,must(load_files(M:File,Options))),!.
 
 
 

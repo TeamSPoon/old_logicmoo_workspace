@@ -177,8 +177,8 @@
 :- multifile((last_item_offered/1, http:location/3, http_dispatch:handler/4, http_session:session_data/2, http_session:urandom_handle/1, mpred_www:foobar/1, mpred_www:http_last_request/1, mpred_www:last_item_offered/1, system:'$init_goal'/3, user:file_search_path/2)).
 
 
-:- use_module(library(http/http_server_files)).
-:- use_module(library(logicmoo_base)).
+:- user:use_module(library(http/http_server_files)).
+:- user:use_module(library(logicmoo_base)).
 :- include(logicmoo(mpred/'mpred_header.pi')).
 
 
@@ -212,9 +212,9 @@
  op(300,fx,'-'))).
 
 
-:- use_module(library(pldoc)).
-:- use_module(library(pldoc/doc_access)).
-:- use_module(library(pldoc/doc_pack)).
+:- user:use_module(library(pldoc)).
+:- user:use_module(library(pldoc/doc_access)).
+:- user:use_module(library(pldoc/doc_pack)).
 
 
 :- meta_predicate hmust(0).
@@ -282,7 +282,7 @@ hmust_l(G):-G.
 :- attach_packs.
 :- initialization(attach_packs).
 % [Required] Load the Logicmoo Library Utils
-% :- use_module(logicmoo(logicmoo_utils)).
+% :- user:use_module(logicmoo(logicmoo_utils)).
  
 
 % :- module(mpred_www,[ html_print_term/2  ]).  % +Term, +Options
@@ -294,70 +294,70 @@ hmust_l(G):-G.
 :- dynamic http:location/3.
 :- multifile http:location/3.
 
-:- use_module(library(debug), [debug/3]).
-:- use_module(library(lists), [append/3, member/2, select/3]).
-:- use_module(library(operators), [push_op/3]).
-:- use_module(library(shlib), [current_foreign_library/2]).
-:- use_module(library(prolog_source)).
-:- use_module(library(option)).
-:- use_module(library(error)).
-:- use_module(library(apply)).
-:- use_module(library(debug)).
+:- user:use_module(library(debug), [debug/3]).
+:- user:use_module(library(lists), [append/3, member/2, select/3]).
+:- user:use_module(library(operators), [push_op/3]).
+:- user:use_module(library(shlib), [current_foreign_library/2]).
+:- user:use_module(library(prolog_source)).
+:- user:use_module(library(option)).
+:- user:use_module(library(error)).
+:- user:use_module(library(apply)).
+:- user:use_module(library(debug)).
 
 :- if(exists_source(library(unix))).
-:- use_module(library(unix)).
+:- user:use_module(library(unix)).
 :- endif.
 
-:- use_module(library(rdf_ntriples),[rdf_ntriple_part/4]).
-:- use_module(library(tty),[menu/3]).
-:- use_module(library(solution_sequences),[distinct/1]).
+:- user:use_module(library(rdf_ntriples),[rdf_ntriple_part/4]).
+:- user:use_module(library(tty),[menu/3]).
+:- user:use_module(library(solution_sequences),[distinct/1]).
 
 :- if(exists_source(library(pldoc))).
-:- use_module(library(pldoc), []).
+:- user:use_module(library(pldoc), []).
 	% Must be loaded before doc_process
-:- use_module(library(pldoc/doc_process)).
+:- user:use_module(library(pldoc/doc_process)).
 :- endif.
-:- use_module(library(prolog_xref)).
+:- user:use_module(library(prolog_xref)).
 
 
 % WANT 
 :- initialization(doc_collect(true)).
 
-%:- use_module(library(pldoc/doc_library)).
+%:- user:use_module(library(pldoc/doc_library)).
 %:- doc_load_library.
 
-:- use_module(library(option)).
+:- user:use_module(library(option)).
 %:- style_check(-discontiguous). 
 %:- style_check(-singleton).
 
 
 :- thread_local(t_l:omit_full_stop).
 
-:- use_module(library(http/thread_httpd)).
-:- use_module(library(http/http_error)).
-:- use_module(library(http/http_client)).
+:- user:use_module(library(http/thread_httpd)).
+:- user:use_module(library(http/http_error)).
+:- user:use_module(library(http/http_client)).
 
 :- include(library(pldoc/hooks)).
 % http_reply_from_files is here
-:- use_module(library(http/http_files)).
+:- user:use_module(library(http/http_files)).
 % http_404 is in here
-:- use_module(library(http/http_dispatch)).
-:- use_module(library(pldoc/doc_process)).
+:- user:use_module(library(http/http_dispatch)).
+:- user:use_module(library(pldoc/doc_process)).
 :- reexport(library(pldoc/doc_html)).
-:- use_module(library(pldoc/doc_wiki)).
-:- use_module(library(pldoc/doc_search)).
-:- use_module(library(pldoc/doc_util)).
-:- use_module(library(http/http_dispatch)).
-:- use_module(library(http/html_write)).
+:- user:use_module(library(pldoc/doc_wiki)).
+:- user:use_module(library(pldoc/doc_search)).
+:- user:use_module(library(pldoc/doc_util)).
+:- user:use_module(library(http/http_dispatch)).
+:- user:use_module(library(http/html_write)).
 
-:- use_module(library(http/html_head)).
-:- use_module(library(readutil)).
-:- use_module(library(url)).
-:- use_module(library(option)).
-:- use_module(library(lists)).
-:- use_module(library(doc_http)).
+:- user:use_module(library(http/html_head)).
+:- user:use_module(library(readutil)).
+:- user:use_module(library(url)).
+:- user:use_module(library(option)).
+:- user:use_module(library(lists)).
+:- user:use_module(library(doc_http)).
 
-:- use_module(library(http/http_session)).
+:- user:use_module(library(http/http_session)).
 
 :- M=pldoc_process,ignore((module_property(M,file(S)),source_file(PI,S),
    \+ ((predicate_property(M:PI,imported_from(U)),U\==M)),
@@ -365,7 +365,7 @@ hmust_l(G):-G.
 
 
 :- portray_text(false).  % Enable portray of strings
-:- use_module(library(http/http_parameters)).
+:- user:use_module(library(http/http_parameters)).
 
 %:- thread_property(_,alias('http@3020'))->true; http_server(http_dispatch, [port(3020)]).
 
@@ -552,7 +552,7 @@ reset_assertion_display:-
 %
 get_param_sess(N,V):- must(param_default_value(N,D)),!,get_param_sess(N,V,D),!.
 
-:- use_module(library(http/http_wrapper)).
+:- user:use_module(library(http/http_wrapper)).
 :- dynamic(http_last_request/1).
 
 %= 	 	 
@@ -949,7 +949,7 @@ as_ftVars(N='$VAR'(N)):-atomic(N),!.
 as_ftVars(_N=_V).
 as_ftVars(_).
 
-:- use_module(library(logicmoo/util/logicmoo_util_varnames)).
+:- user:use_module(library(logicmoo/util/logicmoo_util_varnames)).
     
 
 %= 	 	 
@@ -1692,7 +1692,7 @@ indent_nbsp(1,'\n         '):-!.
 indent_nbsp(X,Chars):-XX is X -1,!, indent_nbsp(XX,OutP),!,sformat(Chars,'~w   ',[OutP]),!.
 
 
-:- use_module(library(pldoc/doc_library)).
+:- user:use_module(library(pldoc/doc_library)).
 
 
 :- multifile lmconf:shared_hide_data/1.
@@ -2946,7 +2946,6 @@ pkif :-
         ])),nl,nl,nl.
 
 
-:- prolog_load_context(source,File),forall(source_file(M:X,File),(functor(X,F,A),export(M:F/A))).
 
 mpred_www_file.
 % :- ensure_webserver(6767).

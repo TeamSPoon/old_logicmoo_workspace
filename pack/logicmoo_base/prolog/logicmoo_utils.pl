@@ -18,10 +18,26 @@
 :- module(logicmoo_utils,[]).
 
 :- ensure_loaded('./logicmoo/util/logicmoo_util_filesystem').
+:- module_transparent(user:term_expansion/1).
+user:term_expansion(EOF,_):-
+ nonvar(EOF),
+ prolog_load_context(module,M),
+ M\==logicmoo_utils, 
+ ignore((
+    source_location(S,_),
+    '$current_typein_module'(TM),
+    glean_prolog_impl_file(EOF,S,M,TM))),fail.
 
 :- dynamic(lmconf:logicmoo_utils_separate/0).
 :- retractall(lmconf:logicmoo_utils_separate).
 :- set_prolog_flag(generate_debug_info, true).
+
+/*
+:- ensure_loaded('./logicmoo/util/logicmoo_util_catch').
+:- ensure_loaded('./logicmoo/util/logicmoo_util_varnames').
+:- ensure_loaded('./logicmoo/util/logicmoo_util_dumpst').
+:- ensure_loaded('./logicmoo/util/logicmoo_util_dmsg').
+*/
 
 
 % ======================================================
@@ -72,10 +88,10 @@ lmconf:logicmoo_pre_release.
 /*
 :- set_prolog_flag(report_error,true),set_prolog_flag(debug_on_error,true),set_prolog_flag(debug, true).
 :- set_prolog_flag(debugger_write_options,[quoted(true), portray(true), max_depth(100000)]).
-:- set_prolog_flag(backtrace_show_lines, true).
-:- set_prolog_flag(debugger_show_context,true).
 :- set_prolog_flag(verbose_load,true).
 */
+:- set_prolog_flag(backtrace_show_lines, true).
+:- set_prolog_flag(debugger_show_context,true).
 
 :- if(current_prolog_flag(gui,true)).
 % :- guitracer.
@@ -99,9 +115,9 @@ lmconf:logicmoo_scan_autoloads:-false.
 % ======================================================
 
 :- if(lmconf:logicmoo_scan_autoloads).
-:- set_prolog_flag(verbose_autoload, false).
+%:- set_prolog_flag(verbose_autoload, false).
 %:- autoload([verbose(false)]).
-:- set_prolog_flag(verbose_autoload, true).
+%:- set_prolog_flag(verbose_autoload, true).
 :- endif.
 
 % ======================================================

@@ -200,10 +200,14 @@ hybrid_tPredStubImpl(prologEquality).
 %
 % Make Builtin.
 %
-make_builtin(F/A):- show_failure(why,(atom(F),integer(A))),
-  w_tl(set_prolog_flag(access_level,system),lock_predicate(F/A)),
+make_builtin(P):- 
+ get_arity(P,F,A),
+  show_failure(why,(atom(F),integer(A))),
+  functor(B,F,A),
+  (predicate_property(B,built_in) -> true ;
+  (w_tl(set_prolog_flag(access_level,system),lock_predicate(F/A)),
   check_context_module,
-    ain(prologBuiltin(F)),ain(arity(F,A)).
+    ain(prologBuiltin(F)),ain(arity(F,A)))).
 
 
 /*
@@ -1369,6 +1373,5 @@ ensure_universal_stub_plus_mt_why(F,A2):-
    decl_mpred_hybrid(M,F,AMinus2).
 
 
-:- source_location(S,_),prolog_load_context(module,M),forall(source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A),M:export(M:F/A))).
 
 mpred_stubs_file.

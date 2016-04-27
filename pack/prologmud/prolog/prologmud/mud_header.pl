@@ -18,11 +18,7 @@
 :- op(1150,fx,decl_mpred_hybrid).
 
 :- decl_mpred_hybrid(  irc_event_hooks/3).
-:- decl_mpred_hybrid(  irc_event_hooks/3).
-
 :- decl_mpred_hybrid(  deliver_event_hooks/2).
-:- decl_mpred_hybrid(  deliver_event_hooks/2).
-
 :- decl_mpred_hybrid   irc_user_plays/3.
 
 :- thread_local t_l:wants_logout/1.
@@ -72,7 +68,6 @@
 :- discontiguous(  enabled/1).
 :- decl_mpred_hybrid   was_enabled/1.
 :- discontiguous(  was_enabled/1).
-:- decl_mpred_hybrid   listing_mpred_hook/1.
 :- decl_mpred_hybrid   listing_mpred_hook/1.
 
 
@@ -145,10 +140,10 @@
 
 % DYN FOR CODE
 :- decl_mpred_hybrid thglobal:after_mpred_load/0.
-:- decl_mpred_hybrid thglobal:use_cyc_database/0.
+:- decl_mpred_hybrid lmconf:use_cyc_database/0.
 
 :- decl_mpred_hybrid   fact_is_false/2.
-:- decl_mpred_hybrid(kbp_t_list_prehook/2).
+% :- decl_mpred_hybrid(kbp_t_list_prehook/2).
 
 
 % DYN KB

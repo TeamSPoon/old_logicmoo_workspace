@@ -1029,7 +1029,7 @@ has_gui_debug :- getenv('DISPLAY',NV),NV\==''.
 % Nodebugx.
 %
 nodebugx(X):- 
-  wno_tl(tlbugger:ifCanTrace,
+  wno_tl_e(tlbugger:ifCanTrace,
    w_tl(tlbugger:ifWontTrace,
     w_tl(tlbugger:show_must_go_on,
        w_tl(tlbugger:ifHideTrace,hotrace(X))))).
@@ -3155,8 +3155,8 @@ must_det(Level,Goal) :- Goal,
 %
 logicmoo_bugger_loaded.
 
-:- source_location(S,_),prolog_load_context(module,M),forall(source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A),M:export(M:F/A))).
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),logicmoo_util_bugger:export(logicmoo_util_bugger:F/A),logicmoo_util_bugger:module_transparent(logicmoo_util_bugger:F/A))).
+%:- source_location(S,_),prolog_load_context(module,M),forall(source_file(M:H,S),(functor(H,F,A),M:module_transparent(M:F/A),M:export(M:F/A))).
+%:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),logicmoo_util_bugger:export(logicmoo_util_bugger:F/A),logicmoo_util_bugger:module_transparent(logicmoo_util_bugger:F/A))).
 
 
 %:- all_module_predicates_are_transparent.

@@ -12,7 +12,6 @@
 
 :- user:ensure_loaded(logicmoo_repl).
 
-:- set_prolog_flag(gc,true).
 
 % [Mostly Required] Load the Logicmoo Parser/Generator System
 :- gripe_time(40,user:ensure_loaded(library(parser_all))).

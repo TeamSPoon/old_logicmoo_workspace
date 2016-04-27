@@ -126,8 +126,9 @@ argsQuoted(second_order).
 
 % ~(tCol({})).
 
+:- unload_file(library(yall)).
 
-prologBuiltin(F),arity(F,A)==>{make_builtin(F/A)}.
+((prologBuiltin(P)/get_arity(P,F,A),arity(F,A))==>{make_builtin(F/A)}).
 
 
 /*
@@ -142,7 +143,7 @@ prologBuiltin(F),arity(F,A)==>{make_builtin(F/A)}.
 % remove conflicts early 
 % (~(P)/mpred_non_neg_literal(P) ==> ( {mpred_rem(P)}, (\+P ))).
 
-never_retract_u(~(X),is_ftVar(X)):- cwc,is_ftVar(X).
+:- assertz((never_retract_u(~(X),is_ftVar(X)):- cwc,is_ftVar(X))).
 
 
 % These next 2 might be best as builtins?

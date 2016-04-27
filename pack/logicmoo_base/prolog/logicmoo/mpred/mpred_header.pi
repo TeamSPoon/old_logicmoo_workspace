@@ -16,7 +16,10 @@
 :- multifile '$si$':'$was_imported_kb_content$'/2.
 :- dynamic '$si$':'$was_imported_kb_content$'/2.
 :- discontiguous('$si$':'$was_imported_kb_content$'/2).
-:- use_module(library(logicmoo_utils)).
+:- multifile(lmconf:mpred_is_impl_file/1).
+:- dynamic(lmconf:mpred_is_impl_file/1).
+
+% :- use_module(library(logicmoo_utils)).
 :-
  op(1199,fx,('==>')), 
  op(1190,xfx,('::::')),
@@ -104,7 +107,7 @@ user:prolog_load_file/2,
 user:term_expansion/2,user:goal_expansion/2,system:term_expansion/2,system:goal_expansion/2]),
   (multifile(M:F/A),dynamic(M:F/A),discontiguous(M:F/A))).
 
-:- use_module(library(logicmoo_utils)).
+%:- use_module(library(logicmoo_utils)).
 
 % :- use_module(library(logicmoo/util/logicmoo_util_catch)).
 % :- use_module(library(logicmoo/util/logicmoo_util_first)).
@@ -113,7 +116,7 @@ user:term_expansion/2,user:goal_expansion/2,system:term_expansion/2,system:goal_
    (prolog_load_context(source,F),
    initialization((
    (if_defined(lmconf:ignore_file_mpreds(F),fail)->true;assertz(lmconf:ignore_file_mpreds(F))),
-   (lmconf:mpred_is_impl_file(F)->true;assertz(lmconf:mpred_is_impl_file(F)))),now))).
+   ((lmconf:mpred_is_impl_file(F))->true;assertz(lmconf:mpred_is_impl_file(F)))),now))).
 
 % ================================================
 % Thread Locals

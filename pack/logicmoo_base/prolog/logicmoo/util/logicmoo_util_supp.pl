@@ -30,19 +30,49 @@
 :- if(\+ current_predicate(system:must_or_die/1)).
 
 :- module_transparent(must_or_die/1).
-must_or_die(G):- (G *-> true ; throw(failed_must_or_die(G))).
+:- '$hide'(must_or_die/1).
+% must_or_die(Goal):- (catch(Goal,E,(writeq(e_xxXXXXXX_xxxxxxxx_failed_must_or_die(E)),nl,fail)) *-> true ; (trace,Goal*->true;throw(failed_must_or_die(Goal)))).
+must_or_die(Goal):- (Goal *-> true ; throw(failed_must_or_die(Goal))).
 
 :- module_transparent(must_atomic/1).
-must_atomic(Goal):- notrace('$sig_atomic'(must_or_die(Goal))).
+:- '$hide'(must_atomic/1).
+must_atomic(Goal):- notrace(must_or_die('$sig_atomic'(Goal))).
 
-:- module_transparent(must_atomic/1).
-must_notrace(Goal):- notrace('$sig_atomic'(must_or_die(Goal))).
+:- module_transparent(must_notrace/1).
+:- '$hide'(must_notrace/1).
+must_notrace(Goal):- no_trace(must_or_die(Goal)).
+
+:- module_transparent(no_trace/1).
+:- '$hide'(no_trace/1).
+no_trace(G):- notrace((tracing,notrace))->
+   setup_call_cleanup_each(notrace(notrace),G,notrace(trace)); G.
+
+:- module_transparent(call_cleanup_each/2).
+:- '$hide'(call_cleanup_each/2).
+call_cleanup_each(Goal, Cleanup) :-
+  setup_call_cleanup_each(true, Goal, Cleanup).
+
+:- module_transparent(setup_call_cleanup_each/3).
+:- '$hide'(setup_call_cleanup_each/3).
 
 :- endif.
 
-:- if(\+ current_predicate(system:call_cleanup_each/2)).
-call_cleanup_each(Goal, Cleanup) :-
-	setup_call_cleanup_each(true, Goal, Cleanup).
+:- if( \+ current_predicate(setup_call_cleanup_each/3)).
+:- export(setup_call_cleanup_each/3).
+:- meta_predicate(setup_call_cleanup_each(0,0,0)).
+setup_call_cleanup_each(Setup,Goal,Cleanup):- 
+   (current_prolog_flag(scce,Pred) ->
+    (Pred==pure ->
+     catch((
+        call((must_atomic(Setup),Goal,deterministic(Det),true))
+        *->
+        (Det == true
+          -> (must_atomic(Cleanup),!)
+          ; (must_atomic(Cleanup);(must_atomic(Setup),fail)))
+     ; (must_atomic(Cleanup),!,fail)),
+     E, (ignore(must_atomic(Cleanup)),throw(E)));
+     call(Pred,Setup,Goal,Cleanup))
+    ;setup_call_cleanup(Setup,Goal,Cleanup)).
 
 :- endif.
 
@@ -53,12 +83,5 @@ call_cleanup_each(Goal, Cleanup) :-
 :- if( \+ current_predicate(nop/1)).
 :- export(nop/1).
 nop(_).
-:- endif.
-:- if( \+ current_predicate(setup_call_cleanup_each/3)).
-:- export(setup_call_cleanup_each/3).
-:- meta_predicate(setup_call_cleanup_each(0,0,0)).
-setup_call_cleanup_each(Setup,Goal,Cleanup):- current_prolog_flag(scce,Pred), !, call(Pred,Setup,Goal,Cleanup).
-setup_call_cleanup_each(Setup,Goal,Cleanup):- setup_call_cleanup(Setup,Goal,Cleanup).
-
 :- endif.
 

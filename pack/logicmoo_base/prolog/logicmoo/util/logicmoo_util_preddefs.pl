@@ -846,7 +846,6 @@ rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
       retractall(tlbugger:rbuild_pred_impl_cache_pp(NC,_))
       )).
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
 
 

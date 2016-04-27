@@ -937,3 +937,15 @@ quiet_all_module_predicates_are_transparent(ModuleName):-
 % % :- use_module(logicmoo_util_varnames).
 
 :- mpred_trace_nochilds(is_ftVar/1).
+
+
+:- 'mpred_trace_none'(fmt(_)).
+:- 'mpred_trace_none'(fmt(_,_)).
+:- 'mpred_trace_none'(dfmt(_)).
+:- 'mpred_trace_none'(dfmt(_,_)).
+:- 'mpred_trace_none'(dmsg(_)).
+:- 'mpred_trace_none'(dmsg(_,_)).
+:- 'mpred_trace_none'(ddmsg(_)).
+:- 'mpred_trace_none'(ddmsg(_,_)).
+:- 'mpred_trace_none'(portray_clause_w_vars(_)).
+

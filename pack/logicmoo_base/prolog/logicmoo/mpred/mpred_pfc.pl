@@ -13,7 +13,7 @@
 
 :- module(mpred_pfc, [
   ensure_abox/1,
-  mpred_call_no_bc/1,fix_mp/2,fix_mp_abox/3,fix_mp_abox0/3,fix_mp_abox_new/3,
+  mpred_call_no_bc/1,fix_mp/2,fix_mp_abox/3,fix_mp_abox0/3,
   mpred_fwc/1,
   get_mpred_is_tracing/1,
   show_if_debug/1,
@@ -121,8 +121,7 @@
   mpred_post1/2,mpred_withdraw/1,mpred_withdraw/2,mpred_remove/1,
   mpred_remove/2,mpred_post1/2,
   mpred_pp_db_justification1/2,mpred_pp_db_justifications2/3,mpred_spy1/3,
-  mpred_unfwc_check_triggers0/1,mpred_unfwc1/1,mpred_why1/1,mpred_blast/1,
-  mpred_pfc_file/0
+  mpred_unfwc_check_triggers0/1,mpred_unfwc1/1,mpred_why1/1,mpred_blast/1
   % trigger_trigger1/2  , trigger_trigger/3,
   ]).
 
@@ -174,7 +173,7 @@
 /*
 
   ?- dynamic(f2/2),gensym(nnn,N),sanity_attvar_08:attr_bind([name_variable(A, 'ExIn'), form_sk(A, 'SKF-66')], true),
-   IN=f2(N,A),OUT=f2(N,B),copy_term(IN,OUT),
+   IN=f2(N,A),OUT=f2(N,B),copy_term_vn(IN,OUT),
   asserta_u(IN),clause_asserted_u(OUT),!. % ,nl,writeq(A=@=B).
 */
 
@@ -202,7 +201,7 @@ ensure_abox(user):- !, ensure_abox(baseKB),!.
 ensure_abox(M):- 
    asserta(lmcache:has_pfc_database_preds(M)),
    asserta_if_new(lmconf:is_box_module(M,abox)),
-   mpred_ops(M),   
+   mpred_ops(M), 
    ensure_imports(M),
    maybe_add_import_module(M,mpred_pfc,end),
    forall(mpred_database_term(F/A,_),
@@ -213,12 +212,17 @@ ensure_abox(M):-
         M:discontiguous(M:F/A),
         M:multifile(M:F/A))),!.
 
-mnotrace(G):-notrace(G).
+mnotrace(G):- no_trace(G),!.
 
 % =================================================
 % ==============  UTILS BEGIN        ==============
 % =================================================
-
+copy_term_vn(B,A):- need_speed,copy_term(B,A).
+copy_term_vn(B,A):- ground(B),!,A=B.
+% copy_term_vn(A,A):-!.
+copy_term_vn(B,A):- nb_current('$variable_names',Vs),length(Vs,L),L<30, shared_vars(B,Vs,Shared),Shared\==[],!,copy_term(B+Vs,A+Vs2),append(Vs,Vs2,Vs3),b_setval('$variable_names',Vs3).
+copy_term_vn(B,A):- nb_current('$old_variable_names',Vs),length(Vs,L),L<30, shared_vars(B,Vs,Shared),Shared\==[],!,copy_term(B+Vs,A+Vs2),append(Vs,Vs2,Vs3),b_setval('$old_variable_names',Vs3).
+copy_term_vn(B,A):- copy_term(B,A).
 
 setup_mpred_ops:-
           op(500,fx,'-'),
@@ -284,12 +288,17 @@ get_source_ref10(M):- fail,trace,
 
 is_source_ref1(_).
 
+fix_mp('~'(G0), M: '~'(CALL)):-nonvar(G0),!,fix_mp(G0,M:CALL).
+fix_mp(_:P,baseKB:P):-!.
+fix_mp(P,baseKB:P):-!.
+fix_mp(P,P).
+/*
+fix_mp(P,P):-var(P),!.
 fix_mp(M:P,M:P):-atom(M),sanity(nonvar(P)),!.
 fix_mp(P,P):-var(P),!.
-fix_mp(P,baseKB:P):-var(P),!.
-fix_mp('~'(G0), M: '~'(CALL)):-nonvar(G0),!,fix_mp(G0,M:CALL).
 fix_mp((A,B),U:(A,B)):-!,get_user_abox(U).
 fix_mp(I,O):- unsafe_safe(fix_mp_new(I,O),fix_mp_old(I,O)).
+*/
 
 fix_mp_new(P,baseKB:P0):-strip_module(P,_,P0).
 
@@ -301,12 +310,12 @@ fix_mp_old(MP,M:P):-  strip_module(MP,Cm,P),get_user_abox(U),!,
 % fix_mp(M:P,M:P):- current_predicate(_,M:P), predicate_property(M:P,dynamic),!.
 
 
-fix_mp_abox(G0,U,CALL):-must(unsafe_safe(fix_mp_abox_new(G0,U,CALL),fix_mp_abox0(G0,U,CALL))).
-
-fix_mp_abox_new(G0,baseKB,baseKB:G):- strip_module(G0,_,G).
+fix_mp_abox(~G0,baseKB,~G):- sanity(nonvar(G0)),!,strip_module(G0,_,G),!.
+fix_mp_abox(G0,baseKB,G):- strip_module(G0,_,G),!.
 
 fix_mp_abox0(G0,U,CALL):-var(G0),!,trace_or_throw(var_fix_mp_abox0(G0,U,CALL)).
 fix_mp_abox0(~G0,U,~CALL):-!,fix_mp_abox0(G0,U,CALL).
+fix_mp_abox0(G0,U,CALL):- !, fix_mp(G0,U:CALL).
 fix_mp_abox0(M:(G0:-B),U,(CALL:-B)):-must(nonvar(G0)),!,fix_mp_abox0(M:G0,U,CALL).
 fix_mp_abox0(M:(G0,B),U,(CALL,B)):-!,fix_mp_abox0(M:G0,U,CALL).
 fix_mp_abox0((G0:-B),U,(CALL:-B)):-must(nonvar(G0)),!,fix_mp_abox0(G0,U,CALL).
@@ -430,10 +439,12 @@ mpred_call_no_bc(G):- G.
 % Call P(E,S). each Element in the list.
 %
 each_E(P,HV,S):- var(HV),!,apply(P,[HV|S]).
+each_E(P,M:(H,T),S) :- must_be(atom,M),!,each_E(P,M:H,S), each_E(P,M:T,S).
+each_E(P,M:[H|T],S) :- must_be(atom,M),!,each_E(P,M:H,S), each_E(P,M:T,S).
 each_E(P,M:HT,S) :- M=='$si$',!,apply(P,[M:HT|S]).
 each_E(P,M:HT,S) :- !, must_be(atom,M),M:each_E(P,HT,S).
-each_E(P,[H|T],S) :- !, apply(P,[H|S]), each_E(P,T,S).
-each_E(P,(H,T),S) :- !,mpred_call_no_bc(each_E(P,H,S)), each_E(P,T,S).
+each_E(P,[H|T],S) :- !, each_E(P,H,S), each_E(P,T,S).
+each_E(P,(H,T),S) :- !, each_E(P,H,S), each_E(P,T,S).
 each_E(P,H,S) :- apply(P,[H|S]).
 
 
@@ -550,7 +561,7 @@ ain(P,S):- mpred_ain((P),S).
 
 mpred_ain(P,S):- 
   gripe_time(0.6,
-   with_umt((if_defined_else(fully_expand(assert,(P),P0),P0=P) -> ain_fast(P0,S)))),!.
+   with_umt((if_defined_else(fully_expand(clause(assert,ain),P,P0),P0=P) -> ain_fast(P0,S)))),!.
 mpred_ain(P,S):- mpred_warn("mpred_ain(~p,~p) failed",[P,S]).
 
 
@@ -570,12 +581,12 @@ remove_negative_version(P):-
 
      
 fresh_mode :- fail.
-plus_fwc.
+mpred_pfc:plus_fwc:-true.
 
-plus_fwc(P):- is_ftVar(P),!,trace_or_throw(var_plus_fwc(P)).
-plus_fwc(support_hilog(_,_)):-!.
-plus_fwc('==>'(_,_)):-!.
-plus_fwc(P):- gripe_time(0.6,(plus_fwc->loop_check_term(mpred_fwc(P),plus_fwc(P),true);true)).
+mpred_pfc:plus_fwc(P):- is_ftVar(P),!,trace_or_throw(var_plus_fwc(P)).
+mpred_pfc:plus_fwc(support_hilog(_,_)):-!.
+% mpred_pfc:plus_fwc('==>'(_,_)):-!.
+mpred_pfc:plus_fwc(P):- gripe_time(0.6,(mpred_pfc:plus_fwc->loop_check_term(mpred_fwc(P),mpred_pfc:plus_fwc(P),true);true)).
 
 %% mpred_post(+Ps,+S) 
 %
@@ -583,7 +594,7 @@ plus_fwc(P):- gripe_time(0.6,(plus_fwc->loop_check_term(mpred_fwc(P),plus_fwc(P)
 % each fact (or the singleton) mpred_post1 is called. It always succeeds.
 %
 mpred_post(P, S):- 
-   if_defined_else(fully_expand(assert,(P),P0),P0=P), 
+   if_defined_else(fully_expand(clause(assert,post),P,P0),P0=P), 
    each_E(mpred_post1,P0,[S]).
 
 
@@ -620,7 +631,7 @@ mpred_post1(P,S):-
      !,
      mpred_enqueue(P,S),
      !)),
-  (plus_fwc->loop_check_term(mpred_fwc(P),plus_fwc(P),true);true).
+  (mpred_pfc:plus_fwc->loop_check_term(mpred_fwc(P),mpred_pfc:plus_fwc(P),true);true).
   
 /*
 % this would be the very inital by Tim Finnin...
@@ -657,8 +668,11 @@ mpred_post1(P,S):-  fail,!,
 %
 %  (gets the status in Support and in Database)
 mpred_post1(P,S):- !,
-  copy_term((P,S),(PP,SS)),
-  b_setval('$variable_names',[]),!,
+
+% b_setval('$variable_names',[]),!,
+
+  copy_term_vn((P,S),(PP,SS)),
+  
 % checks to see if we have forward chain the knowledge yet or 
  gripe_time(0.6, must(get_mpred_support_status(P,S,PP,SS,Was))),!,
 % if we''ve asserted what we''ve compiled      
@@ -668,9 +682,10 @@ mpred_post1(P,S):- !,
 
 
 
-get_mpred_assertion_status(P,PP,Was):- 
+get_mpred_assertion_status(P,PP,WasO):- 
   (clause_asserted_u(P)->(Was=identical,!);
-   (lookup_u(PP,Ref)*->(lookup_u(HB,Ref),Was= partial(HB));Was= unique)).
+   (lookup_u(PP,Ref)*->must((lookup_u(HB,Ref),Was= partial(HB)));Was= unique)),
+  !,WasO=Was.
 
 % The cyclic_break is when we have regressions arouind ~ ~ ~ ~ ~
 get_mpred_support_status(P,_S, PP,(FF,TT),Was):- 
@@ -699,13 +714,13 @@ mpred_post_update4(identical,P,S,simular(_)):-!,mpred_add_support(P,S).
 mpred_post_update4(identical,P,S,none):-!,mpred_add_support(P,S),mpred_enqueue(P,S).
 
 mpred_post_update4(unique,P,S,none):-!,
-  must((mpred_add_support(P,S),
-  assert_u_confirmed_was_missing(P),
-  mpred_trace_op(add,P,S),
+  must(mpred_add_support(P,S)),
+  must(assert_u_confirmed_was_missing(P)),
+  must(mpred_trace_op(add,P,S)),
   !,
-  mpred_enqueue(P,S),
-  !)),
-  plus_fwc(P).
+  must(mpred_enqueue(P,S)),
+  !,
+  must(mpred_pfc:plus_fwc(P)).
 
 mpred_post_update4(partial(_Other),P,S,none):-!,
  must( \+ \+ mpred_add_support(P,S)),
@@ -763,13 +778,12 @@ assert_u_confirmed_was_missing(P):-
  \+ \+ sanity((clause_asserted_u(P))),!.
 
 assert_u_confirmed_was_missing(P):-
- copy_term(P,PP),
- must((assert_u(PP),P=@=PP)),!,
- sanity((copy_term(P,PPP),clause_asserted_u(PPP),must(P=@=PPP))),!.
+ must((sanity(copy_term_vn(P,PP)),assert_u(P),sanity(P=@=PP))),!,
+ sanity((clause_asserted_u(PP),P=@=PP)),!.
 
 
-assert_u_confirm_if_missing(P):- copy_term(P,PP),
- (notrace(clause_asserted_u(PP))-> true ; assert_u_confirmed_was_missing(P)).
+assert_u_confirm_if_missing(P):- copy_term_vn(P,PP),
+ quietly(clause_asserted_u(PP)-> true ; assert_u_confirmed_was_missing(P)).
 
 %% get_mpred_current_db(-Db) is semidet.
 %
@@ -827,7 +841,7 @@ set_fc_mode(Mode):- asserta(t_l:mpred_fc_mode(Mode)).
 % mpred_enqueue(P,S):- get_fc_mode(P,S,Mode), must(Mode=direct),fail.
 mpred_enqueue(P,S):-
   (get_fc_mode(P,S,Mode)
-    -> (Mode=direct  -> loop_check_term(mpred_fwc(P),plus_fwc(P),true) ;
+    -> (Mode=direct  -> loop_check_term(mpred_fwc(P),mpred_pfc:plus_fwc(P),true) ;
 	Mode=depth   -> mpred_asserta_w_support(que(P),S) ;
 	Mode=breadth -> mpred_assert_w_support(que(P),S) ;
 	true         -> mpred_error("Unrecognized pm mode: ~p", Mode))
@@ -955,7 +969,7 @@ mpred_ain_trigger_reprop(PT,Support):-
   fail.
 
 mpred_ain_trigger_reprop(nt(Trigger,Test,Body),Support):-
-  copy_term(Trigger,TriggerCopy),
+  copy_term_vn(Trigger,TriggerCopy),
   NT = nt(TriggerCopy,Test,Body),!,
   mpred_mark_as(Support,Trigger,pfcNegTrigger),
   mpred_trace_msg('~N~n\tAdding negative~n\t\ttrigger: ~p~n\t\ttest: ~p~n\t\tbody: ~p~n\t Support: ~p~n',[Trigger,Test,Body,Support]),  
@@ -1207,7 +1221,7 @@ mpred_unfwc_check_triggers(F):- loop_check(mpred_unfwc_check_triggers0(F),
 
 mpred_unfwc_check_triggers0(F):-
   mpred_db_type(F,fact(_FT)),
-  copy_term(F,Fcopy),
+  copy_term_vn(F,Fcopy),
   lookup_u(nt(Fcopy,Condition,Action)),
   \+ mpred_call_no_bc(Condition),
   mpred_eval_lhs(Action,((\+F),nt(F,Condition,Action))),
@@ -1247,7 +1261,8 @@ mpred_fwc(Ps):- each_E(mpred_fwc0,Ps,[]).
 % 
 % this line filters sequential (and secondary) dupes
 mpred_fwc0(Fact):- filter_buffer_n_test('$last_mpred_fwc1s',6,Fact),!.
-mpred_fwc0(Fact):- copy_term(Fact,FactC),mpred_fwc1(FactC).
+mpred_fwc0(Fact):- copy_term_vn(Fact,FactC),
+      mpred_fwc1(FactC).
 
 
 filter_buffer_trim(Name,N):-
@@ -1277,9 +1292,9 @@ mpred_fwc1(clause_asserted_u(Fact)):-!,sanity(clause_asserted_u(Fact)).
 mpred_fwc1((Fact:- BODY)):- compound(Body),arg(1,Body,Cwc),Cwc\==cwc,ground(BODY),!, mpred_fwc1({BODY}==>Fact).
 mpred_fwc1(support_hilog(_,_)):-!.
 mpred_fwc1(Fact):- 
-  % dmsg(mpred_fwc1(Fact)),
+  dmsg(mpred_fwc1(Fact)),
   mpred_do_rule(Fact),
-  copy_term(Fact,F),
+  copy_term_vn(Fact,F),
   % check positive triggers
   functor(Fact,MF,MA),
   loop_check_term(mpred_do_fcpt(Fact,F),MF/MA,true),
@@ -1497,13 +1512,13 @@ trigger_trigger(_,_,_).
 
 %trigger_trigger1(presently(Trigger),Body):-
 %  !,
-%  copy_term(Trigger,TriggerCopy),
+%  copy_term_vn(Trigger,TriggerCopy),
 %  call_u(Trigger),
 %  mpred_eval_lhs(Body,(presently(Trigger),pt(presently(TriggerCopy),Body))),
 %  fail.
 
 trigger_trigger1(Trigger,Body):-
-  copy_term(Trigger,TriggerCopy),
+  copy_term_vn(Trigger,TriggerCopy),
   call_u(Trigger),
   mpred_eval_lhs(Body,(Trigger,pt(TriggerCopy,Body))),
   fail.
@@ -1538,7 +1553,7 @@ mpred_BC_CACHE0(M,P):-
  % acyclic_term(P),
  % trigger any bc rules.
   M:lookup_u(bt(P,Trigger)),
-  copy_term(bt(P,Trigger),bt(CP,CTrigger)),
+  copy_term_vn(bt(P,Trigger),bt(CP,CTrigger)),
   must(M:mpred_get_support(bt(CP,Trigger),S)),
   M:mpred_eval_lhs(CTrigger,S),
   fail)).
@@ -1791,7 +1806,7 @@ process_rule(Lhs,Rhs,Parent_rule):-
 % Build Rule.
 %
 build_rule(Lhs,Rhs,Support):-
-  copy_term(Support,WS),
+  copy_term_vn(Support,WS),
   mpred_mark_as(WS,Lhs,pfcLHS),
   build_trigger(WS,Lhs,Rhs,Trigger),
   cyclic_break((Lhs,Rhs,WS,Trigger)),
@@ -2043,7 +2058,11 @@ mpred_assertz_w_support(P,Support):-
 %% clause_asserted_u(+Head) is semidet.
 %
 % PFC Clause For User Interface.
-%   
+%
+
+clause_asserted_u(MH):-must_be(nonvar,MH),fail.
+clause_asserted_u(_:H):-must_be(nonvar,H),fail.
+
 %clause_asserted_u(MH):- \+ ground(MH),must(fully_expand(change(assert,assert_u),MH,MA)),MA\=@=MH,!,clause_asserted_u(MA).
 clause_asserted_u((MH:-B)):- must(mnotrace(fix_mp(MH,M:H))),!,clause_asserted_i((M:H :-B )).
 clause_asserted_u(MH):- must(mnotrace(fix_mp(MH,M:H))),clause_asserted_i(M:H).
@@ -2611,9 +2630,9 @@ bagof_or_nil(T,G,B):- (bagof(T,G,B) *-> true; B=[]).
 
 %  mpred_add_support(+Fact,+Support)
 mpred_add_support(P,(Fact,Trigger)):-
- % (Trigger= nt(F,Condition,Action) -> 
- %   (mpred_trace_msg('~N~n\tAdding mpred_do_fcnt via support~n\t\ttrigger: ~p~n\t\tcond: ~p~n\t\taction: ~p~n\t from: ~p~N',
- %     [F,Condition,Action,mpred_add_support(P,(Fact,Trigger))]));true),
+  (Trigger= nt(F,Condition,Action) -> 
+    (mpred_trace_msg('~N~n\tAdding NEG mpred_do_fcnt via support~n\t\ttrigger: ~p~n\t\tcond: ~p~n\t\taction: ~p~n\t from: ~p~N',
+      [F,Condition,Action,mpred_add_support(P,(Fact,Trigger))]));true),
   assert_u_confirm_if_missing(spft(P,Fact,Trigger)).
 
 mpred_get_support(P,(Fact,Trigger)):-
@@ -3198,40 +3217,21 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent(get_first_user_reason/2).
 :- module_transparent(is_user_fact/1).
 :- module_transparent(mpred_post1/2).
-:- module_transparent(plus_fwc/0).
-:- module_transparent(plus_fwc/1).
+:- module_transparent(mpred_pfc:plus_fwc/0).
+:- module_transparent(mpred_pfc:plus_fwc/1).
 :- module_transparent(fresh_mode/0).
 :- module_transparent(mnotrace/1).
 :- module_transparent(filter_buffer_n_test/3).
 :- module_transparent(filter_buffer_get_n/3).
 :- module_transparent(filter_buffer_trim/2).
 
-
-:- source_location(S,_),prolog_load_context(module,M),
- forall(source_file(M:H,S),
- ignore((functor(H,F,A),
-   \+ mpred_database_term(F/A,_),
-   F\=='$mode',
-   F\=='$pldoc',
-   F\=='$exported_op',
-   ignore(((\+ atom_concat('$',_,F),\+ mpred_database_term(F/A,_),export(F/A)))),
-   \+ predicate_property(M:H,transparent),M:module_transparent(M:F/A),
-   ignore(((\+ atom_concat('__aux',_,F),format('~N:- module_transparent(~q/~q).~n',[F,A]))))
-   ))).
-
-
-:- forall(mpred_database_term(F/A,_),abolish(mpred_pfc:F/A)).
+:- forall(mpred_database_term(F/A,_),(abolish(mpred_pfc:F/A),mpred_userkb:split_into_mts(F/A))).
 :- '$current_source_module'(M),add_import_module(M,baseKB,end).
 % :- initialization(ensure_abox(baseKB)).
 
-%% mpred_pfc_file is det.
-%
-% PFC Forward Chaining File.
-%
-mpred_pfc_file. 
 
 
-
+:- set_prolog_flag(mpred_pfc_file,true).
 % local_testing
 
 end_of_file.

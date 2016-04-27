@@ -106,7 +106,7 @@ now_try_game_dir(Else):-
 create_module(M):-context_module(CM),module(M),asserta(M:this_is_a_module(M)),writeq(switching_back_to_module(M,CM)),module(CM).
 :-create_module(user).
 :-create_module(t_l).
-:-create_module(thglobal).
+:-create_module(lmconf).
 %:-create_module(moo).
 
 
@@ -219,7 +219,7 @@ run_setup:- within_user(at_start(run_setup_now)).
 
 debug_repl_w_cyc(Module,CallFirst):- !,         
           wno_tl(t_l:useOnlyExternalDBs,
-            w_tl(thglobal:use_cyc_database,
+            w_tl(lmconf:use_cyc_database,
                ((decl_type(person),          
                 ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.plmoo')),
                 module(Module),
@@ -228,7 +228,7 @@ debug_repl_w_cyc(Module,CallFirst):- !,
 
 debug_repl_wo_cyc(Module,CallFirst):- !,         
           w_tl(t_l:useOnlyExternalDBs,
-            wno_tl(thglobal:use_cyc_database,
+            wno_tl(lmconf:use_cyc_database,
                ((decl_type(person),          
                 ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.plmoo')),
                 module(Module),

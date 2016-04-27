@@ -1684,19 +1684,19 @@ pfcDescendants(P,L) :-
 :- use_module(library(lists)).
 
 pfcWhy :- 
-  why_buffer(P,_),
+  lookup_u(why_buffer(P,_)),
   pfcWhy(P).
 
 pfcWhy(N) :-
   number(N),
   !,
-  why_buffer(P,Js),
+  lookup_u(why_buffer(P,Js)),
   pfcWhyCommand(N,P,Js).
 
 pfcWhy(P) :-
   justifications(P,Js),
-  db_retractall(why_buffer(_,_)),
-  db_assert(why_buffer(P,Js)),
+  retractall_u(why_buffer(_,_)),
+  assert_u(why_buffer(P,Js)),
   pfcWhyBrouse(P,Js).
 
 pfcWhy1(P) :-

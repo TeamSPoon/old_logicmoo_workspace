@@ -144,8 +144,6 @@ wotp_io_setup(In, Out):-
 
 wotp_create_server:- (wotp_server_port(Port)->wotp_create_server(Port);wotp_create_server(61996)).
 
-:- source_location(S,_),forall(source_file(H,S),ignore((  \+ (predicate_property(H,PP),member(PP,[(multifile),built_in])),  
- functor(H,F,A),module_transparent(F/A),export(F/A)))).
 
 :- wotp_create_server.
 

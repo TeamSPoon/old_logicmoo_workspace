@@ -79,7 +79,7 @@
             default_te/3,
             demodulize/3,
             do_expand_args/3,
-            do_expand_args_c/3,
+            do_expand_args/3,
             do_expand_args_l/3,
             do_expand_args_pa/4,
             ex_argIsa/3,
@@ -275,7 +275,8 @@ alt_calls(ireq).
 show_doall(Call):- doall(show_call(why,Call)).
 
 cheaply_u(argsQuoted(G)):- !,lookup_u(argsQuoted(G)).
-cheaply_u(_:call(ereq,(G))):- !,cheaply_u((G)).
+cheaply_u(M:argsQuoted(G)):- !,lookup_u(M:argsQuoted(G)).
+cheaply_u(M:call(ereq,G)):- !,cheaply_u(M:G).
 cheaply_u(G):- unsafe_safe(lookup_u(G),cheaply_u_old(G)).
 % cheaply_u(P):- predicate_property(P,number_of_rules(N)),N=0,!,lookup_u(P).
 cheaply_u_old(G):- ground(G),!,(lookup_u(G)*->true;(call_with_depth_limit(call_u(G),30,N),number(N))),!.
@@ -505,28 +506,28 @@ fully_expand_now(Op,Sent,SentO):-
 %  Is a stripped Module (Meaning it will be found via inheritance)
 %
 is_stripped_module(A):-var(A),!,fail.
-is_stripped_module(user).
+is_stripped_module(lmconf):-!,fail.
+% is_stripped_module(user).
+is_stripped_module(logicmoo_user).
+is_stripped_module(umt).
 is_stripped_module(system).
-is_stripped_module(Inherited):-'$current_source_module'(E), default_module(E,Inherited).
-is_stripped_module(Inherited):-'$current_typein_module'(E), default_module(E,Inherited).
+%is_stripped_module(Inherited):-'$current_source_module'(E), default_module(E,Inherited).
+%is_stripped_module(Inherited):-'$current_typein_module'(E), default_module(E,Inherited).
 % is_stripped_module(baseKB).
-is_stripped_module(A):- get_user_abox(AB),!,AB=A.
-
-  	 
+% is_stripped_module(A):- get_user_abox(AB),!,AB=A.
 
 
-%% expand_isEach(^Sent, --SentO) is det.
+
+%% expand_isEach_or_fail(^Sent, --SentO) is det.
 %
 % Expand isEach/Ns.
 
-expand_isEach(Sent,SentO):- 
-   bagof(O,do_expand_args(isEach,Sent,O),L),
-   (L\=@=[Sent]->list_to_conjuncts(L,SentO);SentO=Sent).
+expand_isEach_or_fail(Sent,SentO):- bagof(O,do_expand_args(isEach,Sent,O),L),!,L\=@=[Sent],SentO=L.
 
-%% expand_kif_string( ++Op, ++Sent, --SentO) is semidet.
+%% expand_kif_string_or_fail( ++Op, ++Sent, --SentO) is semidet.
 %
 % Expand if String of KIF.
-expand_kif_string(Why,I,O):-string(I), atom_contains(I,'('),
+expand_kif_string_or_fail(Why,I,O):- string(I), atom_contains(I,'('),
   input_to_forms(string(I),Wff,Vs)->
   put_variable_names(Vs)->
   must(sexpr_sterm_to_pterm(Wff,PTerm))->
@@ -540,11 +541,15 @@ expand_kif_string(Why,I,O):-string(I), atom_contains(I,'('),
 %
 
 fully_expand_clause(Op,Sent,SentO):- sanity(is_ftNonvar(Op)),sanity(var(SentO)),var(Sent),!,Sent=SentO.
-fully_expand_clause(Op,Sent,SentO):- expand_isEach(Sent,SentM),SentM\=@=Sent,!,fully_expand_clause(Op,SentM,SentO).
+fully_expand_clause(Op,Sent,SentO):- expand_kif_string_or_fail(Op,Sent,SentM),SentM\=@=Sent,!,must(fully_expand_clause(Op,SentM,SentO)).
+fully_expand_clause(Op,Sent,SentO):- expand_isEach_or_fail(Sent,SentM),SentM\=@=Sent,!,must(fully_expand_clause(Op,SentM,SentO)).
+fully_expand_clause(_,(:-(Sent)),(:-(Sent))):-!.
+fully_expand_clause(Op,Sent,SentO):- is_list(Sent),!,must_maplist(fully_expand_clause(Op),Sent,SentO).
+fully_expand_clause(Op,(B,H),Out):- !,fully_expand_clause(Op,H,HH),fully_expand_clause(Op,B,BB),!,must(Out=(BB,HH)).
+fully_expand_clause(Op,':-'(Sent),Out):-!,fully_expand_goal(Op,Sent,SentO),!,must(Out=':-'(SentO)).
+
 fully_expand_clause(_,Sent,SentO):- t_l:infSkipFullExpand,!,must(Sent=SentO).
 
-fully_expand_clause(_,(:-(Sent)),(:-(Sent))):-!.
-fully_expand_clause(Op,':-'(Sent),Out):-!,fully_expand_goal(Op,Sent,SentO),!,must(Out=':-'(SentO)).
 
 fully_expand_clause(Op,Sent,SentO):- (not_ftCompound(Sent)),!,fully_expand_head(Op,Sent,SentO).
 
@@ -866,7 +871,7 @@ temp_comp(H,B,PRED,OUT):- nonvar(H),term_variables(B,Vs1),Vs1\==[], term_attvars
 % :- mode(term_expansion(+,--)).
 
 db_expand_0(Op,Sent,SentO):- sanity(is_ftNonvar(Op)),sanity(var(SentO)),var(Sent),!,Sent=SentO.
-db_expand_0(Op,Sent,SentO):- expand_kif_string(Op,Sent,SentM),SentM\=@=Sent,!,fully_expand_clause(Op,SentM,SentO).
+db_expand_0(Op,Sent,SentO):- expand_kif_string_or_fail(Op,Sent,SentM),SentM\=@=Sent,!,fully_expand_clause(Op,SentM,SentO).
 db_expand_0(Op,M:Sent,SentO):- is_stripped_module(M),!,db_expand_0(Op,Sent,SentO).
 db_expand_0(Op,Sent,SentO):- cyclic_break(Sent),db_expand_final(Op ,Sent,SentO),!.
 
@@ -876,7 +881,7 @@ db_expand_0(Op,Sent,SentO):- cyclic_break(Sent),db_expand_final(Op ,Sent,SentO),
 % Database expand  Extended Helper.
 %
 db_expand_0(_,Sent,SentO):-is_ftNonvar(Sent),get_ruleRewrite(Sent,SentO),!.
-db_expand_0(Op,Sent,SentO):-current_predicate(correctArgsIsa/3),arg(2,Sent,Arg),is_ftNonvar(Arg),get_functor(Sent,F),asserted_argIsa_known(F,2,_),!,
+db_expand_0(Op,Sent,SentO):- arg(2,Sent,Arg),is_ftNonvar(Arg),get_functor(Sent,F),fail,asserted_argIsa_known(F,2,_),!,
   correctArgsIsa(Op,Sent,SentO),!.
 db_expand_0(Op,t(Sent),SentO):- is_ftNonvar(Sent),fully_expand_head(Op,Sent,SentO).
 db_expand_0(Op,{Sent},{SentO}):-!, fully_expand_goal(Op,Sent,SentO).
@@ -900,7 +905,7 @@ db_expand_0(Op,G,OUT):- G=..[Pred,InstFn,VO],InstFn=isInstFn(Type),is_ftNonvar(T
 db_expand_0(Op,G,OUT):- G=..[Pred,InstFn|VO],InstFn=isInstFn(Type),is_ftNonvar(Type),GO=..[Pred,Type|VO],db_expand_0(Op,GO,OUT).
 
 db_expand_0(Op,(call_u(CALL)),(call_u(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
-db_expand_0(_ ,include(CALL),(load_data_file_now(CALL))):-!.
+db_expand_0(_ ,include(CALL),(load_data_file_now(CALL))):- dtrace, !.
 
 db_expand_0(Op,=>(G),(GG)):-!,db_expand_0(Op,(G),(GG)).
 db_expand_0(Op,(G,B),(GGBB)):-!,db_expand_0(Op,G,GG),db_expand_0(Op,B,BB),conjoin_l(GG,BB,GGBB).
@@ -1512,30 +1517,16 @@ holds_args([H|FIST],FISTO):- !, is_holds_true(H),!,FIST=FISTO.
 holds_args(HOFDS,FIST):- is_ftCompound(HOFDS),HOFDS=..[H|FIST],is_holds_true(H),!.
 
 
-
-%=  :- was_export((do_expand_args/3)).
-
-
-%= 	 	 
-
 %% do_expand_args( ?Op, ?Term, ?Term) is semidet.
 %
 % Do Expand Arguments.
 %
-do_expand_args(Op,M:Sent,SentO):- atom(M),is_stripped_module(M),!,do_expand_args(Op,Sent,SentO).
-do_expand_args(_,Term,Term):- compound(Term),functor(Term,F,_),cheaply_u(argsQuoted(F)),!.
-do_expand_args(Exp,Term,Out):- compound(Term),!,must(do_expand_args_c(Exp,Term,Out)).
-do_expand_args(_,Term,Term).
-
-
-%= 	 	 
-
-%% do_expand_args_c( ?Exp, ?Term, ?Out) is semidet.
-%
-% Do Expand Arguments Class.
-%
-do_expand_args_c(Exp,[L|IST],Out):- !,must(do_expand_args_l(Exp,[L|IST],Out)).
-do_expand_args_c(Exp,Term,Out):- Term=..[P|ARGS],do_expand_args_pa(Exp,P,ARGS,Out).
+:- was_export((do_expand_args/3)).
+do_expand_args(Exp,M:Sent,M:SentO):- atom(M),!,do_expand_args(Exp,Sent,SentO).
+do_expand_args(_,Term,Term):- \+ compound(Term),!.
+do_expand_args(_,Term,Term):- functor(Term,F,_),cheaply_u(argsQuoted(F)),!.
+do_expand_args(Exp,[L|IST],Out):- !,must(do_expand_args_l(Exp,[L|IST],Out)).
+do_expand_args(Exp,Term,Out):- Term=..[P|ARGS],do_expand_args_pa(Exp,P,ARGS,Out).
 
 
 %= 	 	 
@@ -1742,11 +1733,9 @@ mpred_expansion_file.
 
 
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),
-  module_transparent(F/A))).
 
 with_umt_l2(G):-
-  notrace(current_predicate(_,_:mpred_pfc_file)),
+  notrace(current_prolog_flag(mpred_pfc_file,true)),
    get_user_abox(U),
    nonvar(U),
    '$set_source_module'(Was,U),

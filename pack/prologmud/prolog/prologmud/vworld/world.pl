@@ -174,7 +174,7 @@ create_instance_now(What,Type,Props):-
    wno_tl(t_l:noRandomValues(_),
      wno_tl(t_l:infInstanceOnly(_),   
       wno_tl(t_l:infAssertedOnly(_),
-        wno_tl(thglobal:use_cyc_database, 
+        wno_tl(lmconf:use_cyc_database, 
      ((split_name_type(What,Inst,_WhatType),assert_isa(Inst,Type), create_instance_0(What,Type,Props)))))))))).
 
 :-discontiguous create_instance_0/3.

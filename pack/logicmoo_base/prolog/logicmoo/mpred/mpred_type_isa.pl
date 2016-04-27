@@ -1384,7 +1384,6 @@ lmconf:module_local_init:-ain(tCol(tCol)).
 lmconf:module_local_init:-ain(tCol(ttPredType)).
 
 
-:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
 mpred_type_isa_file.
 

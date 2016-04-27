@@ -302,18 +302,4 @@ A = 3.
 
 :-export(((::)/2)).
 
-:- source_location(S,_),prolog_load_context(module,M),
- forall(source_file(M:H,S),
- ignore((functor(H,F,A),
- %   \+ mpred_database_term(F/A,_),
-   F\=='$mode',
-   F\=='$pldoc',
-   ignore(((
-     % \+ atom_concat('$',_,F),
-     % \+ mpred_database_term(F/A,_),
-     export(F/A)))),
-   % \+ predicate_property(M:H,transparent),
-   M:module_transparent(M:F/A)
-   % ignore(((\+ atom_concat('__aux',_,F),format('~N:- module_transparent(~q/~q).~n',[F,A]))))
-   ))).
 

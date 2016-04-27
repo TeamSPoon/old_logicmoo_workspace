@@ -1,41 +1,9 @@
-:- module(common_logic_kb_hooks,[kbp_t/1,with_el_holds_disabled/1,noGenlPreds/1,cyckb_t/3,link_to_holds2/2,
+
+:- module(common_logic_kb_hooks,
+ [kbp_t/1,with_el_holds_disabled/1,noGenlPreds/1,cyckb_t/3,link_to_holds2/2,
            assert_next_queue/1,
             assert_to_db_list/2,
-            assertion_f/1,
-            assertion_t/1,
             big_kb_ASSERTION/2,
-            call_f/3,
-            call_f/4,
-            call_f/5,
-            call_f/6,
-            call_f/7,
-            call_f/8,
-            call_f/9,
-            call_mt_f/4,
-            call_mt_f/5,
-            call_mt_f/6,
-            call_mt_f/7,
-            call_mt_f/8,
-            call_mt_f/9,
-            call_mt_f/10,
-            call_mt_f/11,
-            call_mt_t/4,
-            call_mt_t/5,
-            call_mt_t/6,
-            call_mt_t/7,
-            call_mt_t/8,
-            call_mt_t/9,
-            call_mt_t/10,
-            call_mt_t/11,
-            call_which_t/3,
-            call_which_t/4,
-            call_which_t/5,
-            call_which_t/6,
-            call_which_t/7,
-            call_which_t/8,
-            call_which_t/9,
-            call_whichlist_t/3,
-            callable_tf/2,
             convert_easy_strings/0,
             convert_easy_strings2/0,
             cyckb_t/1,
@@ -46,39 +14,28 @@
             cyckb_t_via_implies/1,
             drain_assert_next_buffer/0,
             el_holds_DISABLED_KB/0,
-            fix_sentence/2,
-            get_assertions/2,
-            get_b_dnf/2,
-            get_dnf_props/6,
-            get_props/4,
-            get_varsp/2,
-            hide_empty_strings/0,
-            hide_term_rewrites/0,
-            holds_f/1,
-            holds_f/2,
-            holds_f/3,
-            holds_f/4,
-            holds_f/5,
-            holds_f/6,
-            holds_f/7,
-            holds_f/8,
-            holds_f_p2/2,
-            holds_relaxed_0_f/4,
-            holds_relaxed_f/3,
-            kb_f/1,
-            kb_mt/2,
-            kb_t/1,
-            kb_t/3,
-            kbp_t/1,
-            kbp_t_list/1,
-            kbp_t_list/2,
-            kbp_t_list/3,
-            kbp_t_list_0/3,
-            kbp_t_list_1/3,
-            % kbp_t_list_prehook/2,
-            kbp_to_mpred_0/0,
-            kbp_to_mpred_nomore/0,
-            kbp_to_mpred_t/0,
+          get_assertions/2,
+          get_b_dnf/2,
+          get_dnf_props/6,
+          get_props/4,
+          get_varsp/2,
+          hide_empty_strings/0,
+          hide_term_rewrites/0,
+
+      kb_f/1,
+      kb_mt/2,
+      kb_t/1,
+      kb_t/3,
+      kbp_t/1,
+      kbp_t_list/1,
+      kbp_t_list/2,
+      kbp_t_list/3,
+      kbp_t_list_0/3,
+      kbp_t_list_1/3,
+      kbp_t_list_prehook/2,
+      kbp_to_mpred_0/0,
+      kbp_to_mpred_nomore/0,
+      kbp_to_mpred_t/0,
             link_to_holds/2,
             link_to_holds/3,
             link_to_holds2/2,
@@ -88,156 +45,19 @@
             
             move_implied/0,
             move_kb_assertions_matching/4,
-            mpred_f/1,
-            noGenlPreds/1,
+noGenlPreds/1,
             nv1000/1,
-            print_sentence/1,
             proof_from_clause/3,
             prove_calllist/3,
-            relax_term/6,
             tiny_kb_ASSERTION/2,
-            which_f/1,
             with_el_holds_disabled/1,
             with_el_holds_enabled/1,
             with_kb_assertions_matching/3,
-            write_assertions/0,
-            xcall_f/1,
-            xcall_f/2,
-            xcall_f/3,
-            xcall_f/4,
-            xcall_f/5,
-            xcall_f/6,
-            xcall_f/7,
-            xcall_f/8,
-            xcall_f/9,
-            xcall_f/10,
-            xcall_t/1,
-            xcall_t/2,
-            xcall_t/3,
-            xcall_t/4,
-            xcall_t/5,
-            xcall_t/6,
-            xcall_t/7,
-            xcall_t/8,
-            xcall_t/9,
-            xcall_t/10
+            write_assertions/0
           ]).
-% :- use_module(logicmoo(util/logicmoo_util_preddefs)).
-:- meta_predicate 
-      % common_logic_kb_hooks
-      call_f(*,1,?),
-      % common_logic_kb_hooks
-      call_f(*,4,?,?,?,?),
-      % common_logic_kb_hooks
-      call_f(*,6,?,?,?,?,?,?),
-      % common_logic_kb_hooks
-      call_mt_f(*,4,?,?,?,?),
-      % common_logic_kb_hooks
-      call_mt_f(*,6,?,?,?,?,?,?),
-      % common_logic_kb_hooks
-      call_mt_t(*,2,?,?),
-      % common_logic_kb_hooks
-      call_mt_t(*,3,?,?,?),
-      % common_logic_kb_hooks
-      call_mt_t(*,4,?,?,?,?),
-      % common_logic_kb_hooks
-      call_mt_t(*,5,?,?,?,?,?),
-      % common_logic_kb_hooks
-      call_mt_t(*,6,?,?,?,?,?,?),
-      % common_logic_kb_hooks
-      xcall_f(2,?,?),
-      % common_logic_kb_hooks
-      xcall_f(3,?,?,?),
-      % common_logic_kb_hooks
-      xcall_f(5,?,?,?,?,?).
 
-% XXXXXXXXXXXXXXXXXXXXXXXXXx
-% XXXXXXXXXXXXXXXXXXXXXXXXXx
-% XXXXXXXXXXXXXXXXXXXXXXXXXx
-% XXXXXXXXXXXXXXXXXXXXXXXXXx
-
-:- meta_predicate 
-
-        call_f(?, 1, ?),
-        call_f(?, 2, ?, ?),
-        call_f(?, 3, ?, ?, ?),
-        call_f(?, 4, ?, ?, ?, ?),
-        call_f(?, 5, ?, ?, ?, ?, ?),
-        call_f(?, 6, ?, ?, ?, ?, ?, ?),
-        call_mt_f(?, 2, ?, ?),
-        call_mt_f(?, 3, ?, ?, ?),
-        call_mt_f(?, 4, ?, ?, ?, ?),
-        call_mt_f(?, 5, ?, ?, ?, ?, ?),
-        call_mt_f(?, 6, ?, ?, ?, ?, ?, ?),
-        call_mt_t(?, 2, ?, ?),
-        call_mt_t(?, 3, ?, ?, ?),
-        call_mt_t(?, 4, ?, ?, ?, ?),
-        call_mt_t(?, 5, ?, ?, ?, ?, ?),
-        call_mt_t(?, 6, ?, ?, ?, ?, ?, ?),
-        call_which_t(?, 1, ?),
-        call_which_t(?, 2, ?, ?),
-        call_which_t(?, 3, ?, ?, ?),
-        call_which_t(?, 4, ?, ?, ?, ?),
-        call_which_t(?, 5, ?, ?, ?, ?, ?),
-        call_which_t(?, 6, ?, ?, ?, ?, ?, ?),
-        xcall_f(0),
-        xcall_f(1, ?),
-        xcall_f(2, ?, ?),
-        xcall_f(3, ?, ?, ?),
-        xcall_f(4, ?, ?, ?, ?),
-        xcall_f(5, ?, ?, ?, ?, ?),
-        xcall_f(6, ?, ?, ?, ?, ?, ?),
-        xcall_t(0),
-        xcall_t(1, ?),
-        xcall_t(2, ?, ?),
-        xcall_t(3, ?, ?, ?),
-        xcall_t(4, ?, ?, ?, ?),
-        xcall_t(5, ?, ?, ?, ?, ?),
-        xcall_t(6, ?, ?, ?, ?, ?, ?).
-
-
-:- meta_predicate xcall_f(0).
-:- meta_predicate xcall_f(1,?).
-:- meta_predicate xcall_f(2,?,?).
-:- meta_predicate xcall_f(3,?,?,?).
-:- meta_predicate xcall_f(4,?,?,?,?).
-:- meta_predicate xcall_f(5,?,?,?,?,?).
-:- meta_predicate xcall_f(6,?,?,?,?,?,?).
-:- meta_predicate xcall_t(0).
-:- meta_predicate xcall_t(1,?).
-:- meta_predicate xcall_t(2,?,?).
-:- meta_predicate xcall_t(3,?,?,?).
-:- meta_predicate xcall_t(4,?,?,?,?).
-:- meta_predicate xcall_t(5,?,?,?,?,?).
-:- meta_predicate xcall_t(6,?,?,?,?,?,?).
-:- meta_predicate call_f(?,1,?).
-:- meta_predicate call_f(?,2,?,?).
-:- meta_predicate call_f(?,3,?,?,?).
-:- meta_predicate call_f(?,4,?,?,?,?).
-:- meta_predicate call_f(?,5,?,?,?,?,?).
-:- meta_predicate call_f(?,6,?,?,?,?,?,?).
-:- meta_predicate call_mt_f(?,2,?,?).
-:- meta_predicate call_mt_f(?,3,?,?,?).
-:- meta_predicate call_mt_f(?,4,?,?,?,?).
-:- meta_predicate call_mt_f(?,5,?,?,?,?,?).
-:- meta_predicate call_mt_f(?,6,?,?,?,?,?,?).
-:- meta_predicate call_mt_t(?,2,?,?).
-:- meta_predicate call_mt_t(?,3,?,?,?).
-:- meta_predicate call_mt_t(?,4,?,?,?,?).
-:- meta_predicate call_mt_t(?,5,?,?,?,?,?).
-:- meta_predicate call_mt_t(?,6,?,?,?,?,?,?).
-:- meta_predicate call_which_t(?,1,?).
-:- meta_predicate call_which_t(?,2,?,?).
-:- meta_predicate call_which_t(?,3,?,?,?).
-:- meta_predicate call_which_t(?,4,?,?,?,?).
-:- meta_predicate call_which_t(?,5,?,?,?,?,?).
-:- meta_predicate call_which_t(?,6,?,?,?,?,?,?).
-
-:- meta_predicate holds_f(5,?,?,?,?,?).
-:- meta_predicate holds_f(6,?,?,?,?,?,?).
-:- meta_predicate holds_t(5,?,?,?,?,?).
-:- meta_predicate holds_t(6,?,?,?,?,?,?).
-
+% :- shared_multifile kbp_t_list_prehook/2.
+:- '$set_source_module'(common_logic_kb_hooks).
 :- include('../mpred/mpred_header.pi').
 :-
             op(1150,fx,(was_dynamic)),
@@ -278,32 +98,6 @@
 
 */
 
-
-:- meta_predicate call_f(*,2,?,?).
-:- meta_predicate call_f(*,3,?,?,?).
-:- meta_predicate call_f(*,5,?,?,?,?,?).
-:- meta_predicate call_mt_f(*,2,?,?).
-:- meta_predicate call_mt_f(*,3,?,?,?).
-:- meta_predicate call_mt_f(*,5,?,?,?,?,?).
-:- meta_predicate call_which_t(*,5,?,?,?,?,?).
-:- meta_predicate call_which_t(*,6,?,?,?,?,?,?).
-:- meta_predicate holds_f(1,?).
-:- meta_predicate holds_f(5,?,?,?,?,?).
-:- meta_predicate holds_f(6,?,?,?,?,?,?).
-:- meta_predicate holds_relaxed_0_f(*,4,?,?).
-:- meta_predicate xcall_f(0).
-:- meta_predicate xcall_f(1,?).
-:- meta_predicate xcall_f(4,?,?,?,?).
-:- meta_predicate xcall_f(6,?,?,?,?,?,?).
-:- meta_predicate xcall_t(0).
-:- meta_predicate xcall_t(1,?).
-:- meta_predicate xcall_t(2,?,?).
-:- meta_predicate xcall_t(3,?,?,?).
-:- meta_predicate xcall_t(4,?,?,?,?).
-:- meta_predicate xcall_t(5,?,?,?,?,?).
-:- meta_predicate xcall_t(6,?,?,?,?,?,?).
-
-
 :- was_dynamic el_assertions:el_holds/4.
 :- was_dynamic el_assertions:el_holds/5.
 :- was_dynamic el_assertions:el_holds/6.
@@ -316,7 +110,6 @@
 :- was_dynamic el_assertions:el_holds/13.
 :- was_dynamic el_assertions:el_holds/14.
 
-:- meta_predicate call_whichlist_t(?,0,?).
 :- meta_predicate with_kb_assertions_matching(?,?,0).
 
 :- shared_multifile el_assertions:el_holds_pred_impl/1.
@@ -666,7 +459,7 @@ cyckb_t_implies(ANTE,CONSEQ):- nop(cyckb_t_implies(ANTE,CONSEQ)),!,fail.
 %
 % Knowledge Base P- True Structure List Prehook.
 %
-:- decl_mpred_hybrid(kbp_t_list_prehook/2).
+%:- decl_mpred_hybrid(kbp_t_list_prehook/2).
 kbp_t_list_prehook(PLIST,PLIST).
 
 :- was_export(kbp_t_list/1). 
@@ -677,6 +470,7 @@ kbp_t_list_prehook(PLIST,PLIST).
 %
 % Knowledge Base P- True Structure List.
 %
+:- '$set_source_module'(common_logic_kb_hooks).
 kbp_t_list(PLIST):- t_l:useDbase_t, t(PLIST).
 kbp_t_list(PLIST):- apply(cyckb_t,PLIST).
 
@@ -750,6 +544,7 @@ kb_mt(C,MT):- into_plist(C,PLIST),!,  append([el_assertions:el_holds|PLIST],[MT,
 kb_mt(C,t):- t_l:useDbase_t, t(C).
 
 
+:- '$set_source_module'(common_logic_kb_hooks).
 
 %= 	 	 
 
@@ -933,666 +728,6 @@ write_assertions:-
    told.
 
 
-
-%= 	 	 
-
-%% print_sentence( ?Proof) is semidet.
-%
-% Print Sentence.
-%
-print_sentence(Proof):- fix_sentence(Proof,New),!,ignore((Proof\=New,!,must_det(retract(Proof)),assert(assert_next_queue(New)))),!.
-
-
-
-%= 	 	 
-
-%% fix_sentence( ?X, ?X) is semidet.
-%
-% Fix Sentence.
-%
-fix_sentence(X,X).
-
-
-%= 	 	 
-
-%% relax_term( ?P, ?P, ?Aic, ?Aic, ?Bic, ?Bic) is semidet.
-%
-% Relax Term.
-%
-relax_term(P,P,Aic,Aic,Bic,Bic):- !.
-/*
-relax_term(P,P,A,A,Bi,Bc):- arg(_,v(genls,isa),P),!,fail.
-relax_term(P,P,Ai,Ac,Bic,Bic):- when_met(nonvar(Ac), same_arg(same_or(isa),Ac,Ai)),!.
-relax_term(P,P,Ai,Ac,Bi,Bc):- is_type(Ai),!,when_met(pred(nonvar,Ac), (same_arg(same_or(genls),Ac,Ai),same_arg(same_or(equals),Bc,Bi))),!.
-relax_term(P,P,Ai,Ac,Bi,Bc):- when_met(pred(nonvar,Ac),when_met(pred(nonvar,Bc), (same_arg(same_or(genls),Ac,Ai),same_arg(same_or(equals),Bc,Bi)))).
-*/
-
-% ?- member(R,[a,b,c]),when_met(nonvar(Re), dbase:same_arg(same_or(termOfUnit),n,Re)),Re=R,write(chose(R)).
-
-
-
-%= 	 	 
-
-%% callable_tf( ?F, ?A) is semidet.
-%
-% Callable True/false.
-%
-callable_tf(P,2):- mpred_arity_pred(P),!,fail.
-callable_tf(F,A):- functor_safe(P,F,A),predicate_property(P,_),!.
-
-
-
-%= 	 	 
-
-%% call_whichlist_t( ?UPARAM1, :GoalGOAL2, ?List) is semidet.
-%
-% Call Whichlist True Stucture.
-%
-call_whichlist_t(dac(d,_,_,_),CALL,_):- t(CALL).
-call_whichlist_t(dac(_,a,_,_),_,List):- assertion_t(List).
-call_whichlist_t(dac(_,_,c,_),CALL,_):- xcall_t(CALL).
-call_whichlist_t(dac(_,_,_,holds_t),CALL,_):- holds_t(CALL).
-
-
-%= 	 	 
-
-%% call_which_t( ?DBS, ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7) is semidet.
-%
-% Call Which True Stucture.
-%
-call_which_t(DBS,P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),List= [P,A1,A2,A3,A4,A5,A6,A7], CALL=..List, call_whichlist_t(DBS,CALL,List).
-call_which_t(dac(_,_,_,h),P,A1,A2,A3,A4,A5,A6,A7):- holds_t(P,A1,A2,A3,A4,A5,A6,A7).
-
-
-%= 	 	 
-
-%% call_which_t( ?UPARAM1, :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
-%
-% Call Which True Stucture.
-%
-call_which_t(dac(d,_,_,_),P,A1,A2,A3,A4,A5,A6):- t(P,A1,A2,A3,A4,A5,A6).
-call_which_t(dac(_,a,_,_),P,A1,A2,A3,A4,A5,A6):- assertion_t([P,A1,A2,A3,A4,A5,A6]).
-call_which_t(dac(_,_,c,_),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_t(P,A1,A2,A3,A4,A5,A6).
-call_which_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4,A5,A6):- holds_t(P,A1,A2,A3,A4,A5,A6).
-
-
-%= 	 	 
-
-%% call_which_t( ?UPARAM1, :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
-%
-% Call Which True Stucture.
-%
-call_which_t(dac(d,_,_,_),P,A1,A2,A3,A4,A5):- t(P,A1,A2,A3,A4,A5).
-call_which_t(dac(_,a,_,_),P,A1,A2,A3,A4,A5):- assertion_t([P,A1,A2,A3,A4,A5]).
-call_which_t(dac(_,_,c,_),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_t(P,A1,A2,A3,A4,A5).
-call_which_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4,A5):- holds_t(P,A1,A2,A3,A4,A5).
-
-
-%= 	 	 
-
-%% call_which_t( ?UPARAM1, :PRED4P, ?A1, ?A2, ?A3, ?A4) is semidet.
-%
-% Call Which True Stucture.
-%
-call_which_t(dac(d,_,c,_),P,A1,A2,A3,A4):- t(P,A1,A2,A3,A4).
-call_which_t(dac(_,a,_,_),P,A1,A2,A3,A4):- assertion_t([P,A1,A2,A3,A4]).
-call_which_t(dac(_,_,c,_),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_t(P,A1,A2,A3,A4).
-call_which_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4):- holds_t(P,A1,A2,A3,A4).
-
-
-%= 	 	 
-
-%% call_which_t( ?UPARAM1, :PRED3P, ?A1, ?A2, ?A3) is semidet.
-%
-% Call Which True Stucture.
-%
-call_which_t(dac(d,_,_,_),P,A1,A2,A3):- t(P,A1,A2,A3).
-call_which_t(dac(_,a,_,_),P,A1,A2,A3):- assertion_t([P,A1,A2,A3]).
-call_which_t(dac(_,_,c,_),P,A1,A2,A3):- callable_tf(P,3),xcall_t(P,A1,A2,A3).
-call_which_t(dac(_,_,_,holds_t),P,A1,A2,A3):- holds_t(P,A1,A2,A3).
-
-
-%= 	 	 
-
-%% call_which_t( ?UPARAM1, :PRED2P, ?A1, ?A2) is semidet.
-%
-% Call Which True Stucture.
-%
-call_which_t(dac(d,_,_,_),P,A1,A2):- t(P,A1,A2).
-call_which_t(dac(_,a,_,_),P,A1,A2):- assertion_t([P,A1,A2]).
-call_which_t(dac(_,_,c,_),P,A1,A2):- callable_tf(P,2),xcall_t(P,A1,A2).
-call_which_t(dac(_,_,_,holds_t),P,A1,A2):- holds_t(P,A1,A2).
-
-
-%= 	 	 
-
-%% call_which_t( ?UPARAM1, :PRED1P, ?A1) is semidet.
-%
-% Call Which True Stucture.
-%
-call_which_t(dac(d,_,_,_),P,A1):- t(P,A1).
-call_which_t(dac(_,a,_,_),P,A1):- assertion_t([P,A1]).
-call_which_t(dac(_,_,c,_),P,A1):- callable_tf(P,1),xcall_t(P,A1).
-call_which_t(dac(_,_,_,holds_t),P,A1):- holds_t(P,A1).
-
-
-%= 	 	 
-
-%% call_mt_t( ?VALUE1, ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7, ?A8, ?A9) is semidet.
-%
-% Call User Microtheory True Stucture.
-%
-call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable_tf(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],xcall_t(CALL).
-
-%= 	 	 
-
-%% call_mt_t( ?VALUE1, ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7, ?A8) is semidet.
-%
-% Call User Microtheory True Stucture.
-%
-call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8):- callable_tf(P,8),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],xcall_t(CALL).
-
-%= 	 	 
-
-%% call_mt_t( ?VALUE1, ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7) is semidet.
-%
-% Call User Microtheory True Stucture.
-%
-call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],xcall_t(CALL).
-
-%= 	 	 
-
-%% call_mt_t( ?UPARAM1, :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
-%
-% Call User Microtheory True Stucture.
-%
-call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_t(P,A1,A2,A3,A4,A5,A6).
-
-%= 	 	 
-
-%% call_mt_t( ?UPARAM1, :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
-%
-% Call User Microtheory True Stucture.
-%
-call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_t(P,A1,A2,A3,A4,A5).
-
-%= 	 	 
-
-%% call_mt_t( ?UPARAM1, :PRED4P, ?A1, ?A2, ?A3, ?A4) is semidet.
-%
-% Call User Microtheory True Stucture.
-%
-call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_t(P,A1,A2,A3,A4).
-
-%= 	 	 
-
-%% call_mt_t( ?UPARAM1, :PRED3P, ?A1, ?A2, ?A3) is semidet.
-%
-% Call User Microtheory True Stucture.
-%
-call_mt_t(dac(_,_,_,mt),P,A1,A2,A3):- callable_tf(P,3),xcall_t(P,A1,A2,A3).
-
-%= 	 	 
-
-%% call_mt_t( ?UPARAM1, :PRED2P, ?A1, ?A2) is semidet.
-%
-% Call User Microtheory True Stucture.
-%
-call_mt_t(dac(_,_,_,mt),P,A1,A2):- callable_tf(P,3),xcall_t(P,A1,A2).
-
-
-%= 	 	 
-
-%% xcall_t( ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7, ?A8, ?A9) is semidet.
-%
-% Extended Call True Stucture.
-%
-xcall_t(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],call(CALL).
-
-%= 	 	 
-
-%% xcall_t( ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7, ?A8) is semidet.
-%
-% Extended Call True Stucture.
-%
-xcall_t(P,A1,A2,A3,A4,A5,A6,A7,A8):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],call(CALL).
-
-%= 	 	 
-
-%% xcall_t( ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7) is semidet.
-%
-% Extended Call True Stucture.
-%
-xcall_t(P,A1,A2,A3,A4,A5,A6,A7):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7],call(CALL).
-
-%= 	 	 
-
-%% xcall_t( :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
-%
-% Extended Call True Stucture.
-%
-xcall_t(P,A1,A2,A3,A4,A5,A6):- call(P,A1,A2,A3,A4,A5,A6).
-
-%= 	 	 
-
-%% xcall_t( :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
-%
-% Extended Call True Stucture.
-%
-xcall_t(P,A1,A2,A3,A4,A5):- call(P,A1,A2,A3,A4,A5).
-
-%= 	 	 
-
-%% xcall_t( :PRED4P, ?A1, ?A2, ?A3, ?A4) is semidet.
-%
-% Extended Call True Stucture.
-%
-xcall_t(P,A1,A2,A3,A4):- call(P,A1,A2,A3,A4).
-
-%= 	 	 
-
-%% xcall_t( :PRED3P, ?A1, ?A2, ?A3) is semidet.
-%
-% Extended Call True Stucture.
-%
-xcall_t(P,A1,A2,A3):- call(P,A1,A2,A3).
-
-%= 	 	 
-
-%% xcall_t( :PRED2P, ?A1, ?A2) is semidet.
-%
-% Extended Call True Stucture.
-%
-xcall_t(P,A1,A2):- call(P,A1,A2).
-
-%= 	 	 
-
-%% xcall_t( :PRED1P, ?A1) is semidet.
-%
-% Extended Call True Stucture.
-%
-xcall_t(P,A1):- call(P,A1).
-
-%= 	 	 
-
-%% xcall_t( :GoalP) is semidet.
-%
-% Extended Call True Stucture.
-%
-xcall_t(P):- call(P).
-
-% todo hook into loaded files!
-:- was_export(assertion_t/1).
-
-% assertion_t(Call):- t_l:useOnlyExternalDBs,!,lmconf:use_cyc_database,wno_tl(t_l:useOnlyExternalDBs,kb_t(Call)).
-
-%= 	 	 
-
-%% assertion_t( ?Call) is semidet.
-%
-% Assertion True Stucture.
-%
-assertion_t(Call):- lmconf:use_cyc_database,!,w_tl(t_l:useOnlyExternalDBs,kb_t(Call)).
-% assertion_t(Call):- w_tl(t_l:useOnlyExternalDBs,loop_check(call_u(Call))).
-
-% ================================================================================
-% end holds_t
-% ================================================================================
-
-% % :- use_module(logicmoo(plarkc/mpred_cyc_kb)).
-
-% ================================================================================
-% begin holds_f
-% ================================================================================
-
-%= 	 	 
-
-%% which_f( ?VALUE1) is semidet.
-%
-% Which False.
-%
-which_f(dac(d,no_a,no_c,no_mt)).
-
-
-%= 	 	 
-
-%% holds_f( ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7) is semidet.
-%
-% Holds False.
-%
-holds_f(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),which_f(DBS),(call_f(DBS,P,A1,A2,A3,A4,A5,A6,A7);call_mt_f(DBS,P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_f([P,A1,A2,A3,A4,A5,A6,A7])).
-
-%= 	 	 
-
-%% holds_f( :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
-%
-% Holds False.
-%
-holds_f(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),which_f(DBS),(call_f(DBS,P,A1,A2,A3,A4,A5,A6);call_mt_f(DBS,P,A1,A2,A3,A4,A5,A6,_,_)).
-
-%= 	 	 
-
-%% holds_f( :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
-%
-% Holds False.
-%
-holds_f(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),which_f(DBS),(call_f(DBS,P,A1,A2,A3,A4,A5);call_mt_f(DBS,P,A1,A2,A3,A4,A5,_,_)).
-
-%= 	 	 
-
-%% holds_f( ?P, ?A1, ?A2, ?A3, ?A4) is semidet.
-%
-% Holds False.
-%
-holds_f(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),which_f(DBS),(call_f(DBS,P,A1,A2,A3,A4);call_mt_f(DBS,P,A1,A2,A3,A4,_,_)).
-
-%= 	 	 
-
-%% holds_f( ?P, ?A1, ?A2, ?A3) is semidet.
-%
-% Holds False.
-%
-holds_f(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),which_f(DBS),(call_f(DBS,P,A1,A2,A3);call_mt_f(DBS,P,A1,A2,A3,_,_)).
-
-%= 	 	 
-
-%% holds_f( ?P, ?A1, ?A2) is semidet.
-%
-% Holds False.
-%
-holds_f(P,A1,A2):- holds_relaxed_f(P,A1,A2).
-
-%= 	 	 
-
-%% holds_f( :PRED1P, ?A1) is semidet.
-%
-% Holds False.
-%
-holds_f(P,A1):- isCycPredArity_ignoreable(P,1),which_f(DBS),(call_f(DBS,P,A1);call_mt_f(DBS,P,A1,_,_)).
-
-
-
-%= 	 	 
-
-%% holds_relaxed_f( ?P, ?A1, ?A2) is semidet.
-%
-% Holds Relaxed False.
-%
-holds_relaxed_f(P,A1,A2):- isCycPredArity_ignoreable(P,2),which_f(DBS),!,relax_term(P,PR,A1,R1,A2,R2),holds_relaxed_0_f(DBS,PR,R1,R2).
-
-%= 	 	 
-
-%% holds_relaxed_0_f( ?DBS, :PRED4P, ?A1, ?A2) is semidet.
-%
-% holds relaxed  Primary Helper False.
-%
-holds_relaxed_0_f(DBS,P,A1,A2):- call_f(DBS,P,A1,A2).
-holds_relaxed_0_f(DBS,P,A1,A2):- call_mt_f(DBS,P,A1,A2,_,_).
-
-
-
-%= 	 	 
-
-%% holds_f( :TermCALL) is semidet.
-%
-% Holds False.
-%
-holds_f([AH,P|LIST]):- is_holds_true(AH),!,holds_f_p2(P,LIST).
-holds_f([AH,P|LIST]):- is_holds_false(AH),!,holds_plist_t(P,LIST).
-holds_f([P|LIST]):- !, holds_f_p2(P,LIST).
-holds_f(CALL):- CALL=..[P|LIST],holds_f([P|LIST]).
-
-%= 	 	 
-
-%% holds_f_p2( ?P, ?LIST) is semidet.
-%
-% Holds Functor Pred Extended Helper.
-%
-holds_f_p2(P,LIST):- CALL=..[holds_f,P|LIST],call(CALL).
-
-
-%= 	 	 
-
-%% mpred_f( ?List) is semidet.
-%
-% Managed Predicate False.
-%
-mpred_f(List):- is_list(List),!,Call=..[mpred_f|List],Call.
-mpred_f(List):- holds_f(List).
-
-
-
-%= 	 	 
-
-%% call_f( ?VALUE1, ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7) is semidet.
-%
-% Call False.
-%
-call_f(_,P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),List= [P,A1,A2,A3,A4,A5,A6,A7], CALL=..List,(assertion_f(List);mpred_f(CALL);xcall_f(CALL)).
-
-%= 	 	 
-
-%% call_f( ?UPARAM1, :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
-%
-% Call False.
-%
-call_f(dac(d,_,_,_),P,A1,A2,A3,A4,A5,A6):- mpred_f(P,A1,A2,A3,A4,A5,A6).
-call_f(dac(_,a,_,_),P,A1,A2,A3,A4,A5,A6):- assertion_f([P,A1,A2,A3,A4,A5,A6]).
-call_f(dac(_,_,c,_),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_f(P,A1,A2,A3,A4,A5,A6).
-
-%= 	 	 
-
-%% call_f( ?UPARAM1, :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
-%
-% Call False.
-%
-call_f(dac(d,_,_,_),P,A1,A2,A3,A4,A5):- mpred_f(P,A1,A2,A3,A4,A5).
-call_f(dac(_,a,_,_),P,A1,A2,A3,A4,A5):- assertion_f([P,A1,A2,A3,A4,A5]).
-call_f(dac(_,_,c,_),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_f(P,A1,A2,A3,A4,A5).
-
-%= 	 	 
-
-%% call_f( ?UPARAM1, :PRED4P, ?A1, ?A2, ?A3, ?A4) is semidet.
-%
-% Call False.
-%
-call_f(dac(d,_,_,_),P,A1,A2,A3,A4):- mpred_f(P,A1,A2,A3,A4).
-call_f(dac(_,a,_,_),P,A1,A2,A3,A4):- assertion_f([P,A1,A2,A3,A4]).
-call_f(dac(_,_,c,_),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_f(P,A1,A2,A3,A4).
-
-%= 	 	 
-
-%% call_f( ?UPARAM1, :PRED3P, ?A1, ?A2, ?A3) is semidet.
-%
-% Call False.
-%
-call_f(dac(d,_,_,_),P,A1,A2,A3):- mpred_f(P,A1,A2,A3).
-call_f(dac(_,a,_,_),P,A1,A2,A3):- assertion_f([P,A1,A2,A3]).
-call_f(dac(_,_,c,_),P,A1,A2,A3):- callable_tf(P,3),xcall_f(P,A1,A2,A3).
-
-%= 	 	 
-
-%% call_f( ?UPARAM1, :PRED2P, ?A1, ?A2) is semidet.
-%
-% Call False.
-%
-call_f(dac(d,_,_,_),P,A1,A2):- mpred_f(P,A1,A2).
-call_f(dac(_,a,_,_),P,A1,A2):- assertion_f([P,A1,A2]).
-call_f(dac(_,_,c,_),P,A1,A2):- callable_tf(P,2),xcall_f(P,A1,A2).
-
-%= 	 	 
-
-%% call_f( ?UPARAM1, :PRED1P, ?A1) is semidet.
-%
-% Call False.
-%
-call_f(dac(d,_,_,_),P,A1):- mpred_f(P,A1).
-call_f(dac(_,a,_,_),P,A1):- assertion_f([P,A1]).
-call_f(dac(_,_,c,_),P,A1):- callable_tf(P,1),xcall_f(P,A1).
-
-
-%= 	 	 
-
-%% call_mt_f( ?VALUE1, ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7, ?A8, ?A9) is semidet.
-%
-% Call User Microtheory False.
-%
-call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable_tf(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],xcall_f(CALL).
-
-%= 	 	 
-
-%% call_mt_f( ?VALUE1, ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7, ?A8) is semidet.
-%
-% Call User Microtheory False.
-%
-call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8):- callable_tf(P,8),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],xcall_f(CALL).
-
-%= 	 	 
-
-%% call_mt_f( ?VALUE1, ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7) is semidet.
-%
-% Call User Microtheory False.
-%
-call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],xcall_f(CALL).
-
-%= 	 	 
-
-%% call_mt_f( ?UPARAM1, :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
-%
-% Call User Microtheory False.
-%
-call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_f(P,A1,A2,A3,A4,A5,A6).
-
-%= 	 	 
-
-%% call_mt_f( ?UPARAM1, :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
-%
-% Call User Microtheory False.
-%
-call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_f(P,A1,A2,A3,A4,A5).
-
-%= 	 	 
-
-%% call_mt_f( ?UPARAM1, :PRED4P, ?A1, ?A2, ?A3, ?A4) is semidet.
-%
-% Call User Microtheory False.
-%
-call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_f(P,A1,A2,A3,A4).
-
-%= 	 	 
-
-%% call_mt_f( ?UPARAM1, :PRED3P, ?A1, ?A2, ?A3) is semidet.
-%
-% Call User Microtheory False.
-%
-call_mt_f(dac(_,_,_,mt),P,A1,A2,A3):- callable_tf(P,3),xcall_f(P,A1,A2,A3).
-
-%= 	 	 
-
-%% call_mt_f( ?UPARAM1, :PRED2P, ?A1, ?A2) is semidet.
-%
-% Call User Microtheory False.
-%
-call_mt_f(dac(_,_,_,mt),P,A1,A2):- callable_tf(P,2),xcall_f(P,A1,A2).
-
-
-%= 	 	 
-
-%% xcall_f( ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7, ?A8, ?A9) is semidet.
-%
-% Extended Call False.
-%
-xcall_f(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],\+ xcall_t(CALL).
-
-%= 	 	 
-
-%% xcall_f( ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7, ?A8) is semidet.
-%
-% Extended Call False.
-%
-xcall_f(P,A1,A2,A3,A4,A5,A6,A7,A8):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],\+ xcall_t(CALL).
-
-%= 	 	 
-
-%% xcall_f( ?P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6, ?A7) is semidet.
-%
-% Extended Call False.
-%
-xcall_f(P,A1,A2,A3,A4,A5,A6,A7):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7],\+ xcall_t(CALL).
-
-%= 	 	 
-
-%% xcall_f( :PRED6P, ?A1, ?A2, ?A3, ?A4, ?A5, ?A6) is semidet.
-%
-% Extended Call False.
-%
-xcall_f(P,A1,A2,A3,A4,A5,A6):- \+ xcall_t(P,A1,A2,A3,A4,A5,A6).
-
-%= 	 	 
-
-%% xcall_f( :PRED5P, ?A1, ?A2, ?A3, ?A4, ?A5) is semidet.
-%
-% Extended Call False.
-%
-xcall_f(P,A1,A2,A3,A4,A5):- \+ xcall_t(P,A1,A2,A3,A4,A5).
-
-%= 	 	 
-
-%% xcall_f( :PRED4P, ?A1, ?A2, ?A3, ?A4) is semidet.
-%
-% Extended Call False.
-%
-xcall_f(P,A1,A2,A3,A4):- \+ xcall_t(P,A1,A2,A3,A4).
-
-%= 	 	 
-
-%% xcall_f( :PRED3P, ?A1, ?A2, ?A3) is semidet.
-%
-% Extended Call False.
-%
-xcall_f(P,A1,A2,A3):- \+ xcall_t(P,A1,A2,A3).
-
-%= 	 	 
-
-%% xcall_f( :PRED2P, ?A1, ?A2) is semidet.
-%
-% Extended Call False.
-%
-xcall_f(P,A1,A2):- \+ xcall_t(P,A1,A2).
-
-%= 	 	 
-
-%% xcall_f( :PRED1P, ?A1) is semidet.
-%
-% Extended Call False.
-%
-xcall_f(P,A1):- \+ xcall_t(P,A1).
-
-%= 	 	 
-
-%% xcall_f( :GoalP) is semidet.
-%
-% Extended Call False.
-%
-xcall_f(P):- \+ xcall_t(P).
-
-
-%= 	 	 
-
-%% assertion_f( :TermAH) is semidet.
-%
-% Assertion False.
-%
-assertion_f([AH,P|LIST]):- is_holds_true(AH),!,assertion_f([P|LIST]).
-assertion_f([AH,P|LIST]):- is_holds_false(AH),!,assertion_f([P|LIST]).
-% todo hook into loaded files!
-assertion_f(_):- not(loaded_external_kbs),!,fail.
-%MAYBE LATER assertion_f([P|LIST]):- 'TINYKB-ASSERTION'(':FALSE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
-%MAYBE LATER assertion_f([P|LIST]):- 'TINYKB-ASSERTION'(':FALSE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
-
-
-% ================================================================================
-% end holds_f 
-% ================================================================================
+:- '$set_source_module'(common_logic_kb_hooks).
 
 

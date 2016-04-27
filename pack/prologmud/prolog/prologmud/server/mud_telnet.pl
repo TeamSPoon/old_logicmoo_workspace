@@ -37,7 +37,7 @@
 
 :- '$set_source_module'(mud_telnet).
 :- add_import_module(mud_telnet,baseKB,start).
-:- add_import_module(mud_telnet,logicmoo_user,start).
+:- add_import_module(logicmoo_user,mud_telnet,start).
 
 % learnLaterWhenToCallProceedure(What):- ... code ...
 
@@ -426,8 +426,6 @@ display_grid_labels :-
 
 
 
-:- source_location(S,_),forall(source_file(H,S),ignore((  \+ (predicate_property(H,PP),member(PP,[(multifile),built_in])),  
- functor(H,F,A),module_transparent(F/A),export(F/A)))).
   
 % :- include(prologmud(mud_footer)).
 

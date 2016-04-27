@@ -24,6 +24,7 @@
             nb_setargs_1var/5,
             nb_setargs_goals/5,
             scce_orig/3,
+            scce_orig2/3,
             scce_test/1,
             scce_idea/3]).
 
@@ -43,6 +44,10 @@ scce_orig(Setup,Goal,Cleanup):-
      E, (ignore(must_atomic(Cleanup)),throw(E))).
 
 
+:- meta_predicate scce_orig2(0,0,0).
+scce_orig2(Setup,Goal,Cleanup):- 
+  setup_call_cleanup(Setup, (call((Goal,deterministic(Det),true))
+     *-> (Det == true -> ! ; (Cleanup;((must_atomic(Setup),fail)))) ; fail),Cleanup).
 
 make_nb_setter(Term,G):-make_nb_setter(Term,_Copy,nb_setarg,G).
 
@@ -136,7 +141,9 @@ setup_e_4:-
   copy_term(Orig,v(S0,G0,C0)),
   call(S0),nb_setval(cleanup_4,v(S0,G0,C0)).
 
-:- set_prolog_flag(scce,scce_idea).
+% :- set_prolog_flag(scce,pure).
+% :- set_prolog_flag(scce,scce_orig).
+% :- set_prolog_flag(scce,setup_call_cleanup).
 
 
 
@@ -493,8 +500,6 @@ setup2:-  nb_getval(setup2,v(S1,G1,C1)),call(S1),nb_setval(in,v(S1,G1,C1)).
      C = call(C1),
      S1,!,     
     
-
-
 
 
 scce(S,G,C):-
