@@ -321,7 +321,7 @@ add_description(A,S0):-
    atomic_list_concat(Words,' ',S),
    atomic_list_concat(Sents,'.',S),!,
    length(Words,Ws),
-   must_det(add_description(A,S,S0,Ws,Sents,Words)).
+   must(add_description(A,S,S0,Ws,Sents,Words)),!.
 
 % mudBareHandDamage: 10d10+75
 add_description(A,S,_S0,Ws,_Sents,_Words):- Ws<3,  

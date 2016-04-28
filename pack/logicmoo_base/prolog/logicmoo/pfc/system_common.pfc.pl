@@ -258,7 +258,7 @@ ttPredType(pfcMustFC).
 
 ((ttPredType(X)/atom(X)) ==>support_hilog(X,1)).
 
-:- set_user_abox(baseKB).
+:- set_abox(baseKB).
 
 ttPredType(P)==>(tSet(P),completelyAssertedCollection(P)).
 ttTypeType(C)==>completelyAssertedCollection(C).
@@ -645,7 +645,7 @@ equal(A,B),{ \+ (A=B}),equal(B,C),{ \+ (A=C)} ==> equal(A,C).
 notequal(A,B) ==> notequal(B,A).
 equal(A,C),notequal(A,B) ==> notequal(C,B).
 */
-:- set_user_abox(baseKB).
+:- set_abox(baseKB).
 
 :- dynamic(either/2).
 % is this how to define constraints?

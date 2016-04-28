@@ -295,8 +295,8 @@ detach_player(_).
 :-export(become_player/1).
 become_player(P):- once(current_agent(Was)),Was=P,!.
 become_player(P):- get_session_id(O),retractall(thglobal:agent_session(_,O)),
-  assert_isa(P,tHumanPlayer),must_det(create_agent(P)),
-  detach_player(P),asserta_new(thglobal:agent_session(P,O)).
+  assert_isa(P,tHumanPlayer),must(create_agent(P))->
+  detach_player(P),asserta_new(thglobal:agent_session(P,O)),!.
 
 :-export(become_player/2).
 become_player(_Old,NewName):-become_player(NewName).

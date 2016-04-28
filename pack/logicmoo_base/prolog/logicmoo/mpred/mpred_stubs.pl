@@ -1375,7 +1375,7 @@ ensure_universal_stub_plus_mt_why(F,A2):-
    AMinus2 is A2 -2,
    assert_if_new((HEAD:-HEADMinus2)),!,
   % compile_predicates([HEAD]),
-   get_user_abox(M),
+   get_abox(M),
    decl_mpred_hybrid(M,F,AMinus2).
 
 

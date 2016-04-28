@@ -14,7 +14,7 @@
 :- if(current_prolog_flag(xref,true)).
 :- module(mpred_pfc, [
   ensure_abox/1,
-  mpred_call_no_bc/1,fix_mp/2,fix_mp_abox/3,fix_mp_abox0/3,
+  mpred_call_no_bc/1,fix_mp/2,fix_mp_abox/3,
   mpred_fwc/1,
   get_mpred_is_tracing/1,
   show_if_debug/1,
@@ -195,11 +195,12 @@
 
 :- thread_local(t_l:no_mpred_breaks/0).
 
-:- module_transparent((ensure_abox)/1).
 
+
+:- module_transparent((ensure_abox)/1).
 :- dynamic(lmcache:has_pfc_database_preds/1).
 ensure_abox(M):- sanity(atom(M)), lmcache:has_pfc_database_preds(M),!.
-ensure_abox(user):- !, ensure_abox(baseKB),!.
+ensure_abox(user):- !, ensure_abox(logicmoo_user),!.
 ensure_abox(M):- 
    asserta(lmcache:has_pfc_database_preds(M)),
    asserta_if_new(lmconf:is_box_module(M,abox)),
@@ -277,59 +278,39 @@ get_source_ref1(_).
 
 % get_source_ref1(_):- fail,check_context_module,fail.
 get_source_ref10(M):- current_why(M), nonvar(M) , M =mfl(_,_,_).
-get_source_ref10(mfl(M,F,L)):- get_user_abox(M), source_location(F,L).
-get_source_ref10(M):- (get_user_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
-get_source_ref10(mfl(M,F,L)):- get_user_abox(M), current_source_file(F:L).
-get_source_ref10(mfl(M,F,_L)):- get_user_abox(M), current_source_file(F).
-get_source_ref10(mfl(M,_,_L)):- get_user_abox(M).
-get_source_ref10(M):- (get_user_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
+get_source_ref10(mfl(M,F,L)):- get_abox(M), source_location(F,L).
+get_source_ref10(M):- (get_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
+get_source_ref10(mfl(M,F,L)):- get_abox(M), current_source_file(F:L).
+get_source_ref10(mfl(M,F,_L)):- get_abox(M), current_source_file(F).
+get_source_ref10(mfl(M,_,_L)):- get_abox(M).
+get_source_ref10(M):- (get_abox(M)->true;(atom(M)->(module_property(M,class(_)),!);(var(M),module_property(M,class(_))))).
 get_source_ref10(M):- fail,trace, 
- ((get_user_abox(M) -> !;
+ ((get_abox(M) -> !;
  (atom(M)->(module_property(M,class(_)),!);
     mpred_error(no_source_ref(M))))).
 
 is_source_ref1(_).
 
 fix_mp('~'(G0), M: '~'(CALL)):-nonvar(G0),!,fix_mp(G0,M:CALL).
-fix_mp(_:P,baseKB:P):-!.
-fix_mp(P,baseKB:P):-!.
-fix_mp(P,P).
-/*
-fix_mp(P,P):-var(P),!.
-fix_mp(M:P,M:P):-atom(M),sanity(nonvar(P)),!.
-fix_mp(P,P):-var(P),!.
-fix_mp((A,B),U:(A,B)):-!,get_user_abox(U).
-fix_mp(I,O):- unsafe_safe(fix_mp_new(I,O),fix_mp_old(I,O)).
-*/
-
-fix_mp_new(P,baseKB:P0):-strip_module(P,_,P0).
-
-fix_mp_old(M:P,M:P):-!.
-fix_mp_old(MP,M:P):-  strip_module(MP,Cm,P),get_user_abox(U),!,
+fix_mp(_:P,ABOX:P):- get_abox(ABOX),!.
+fix_mp(P,ABOX:P):- get_abox(ABOX),!.
+% probably never makes it past the above
+fix_mp(MP,M:P):-  strip_module(MP,Cm,P),get_abox(U),!,
    (((modulize_head_fb(U,P,Cm,M:P),\+ predicate_property(M:P,static)))*-> true;
       (P==MP -> M=U; M=Cm)
      ),!.
-% fix_mp(M:P,M:P):- current_predicate(_,M:P), predicate_property(M:P,dynamic),!.
-
-
-fix_mp_abox(~G0,baseKB,~G):- sanity(nonvar(G0)),!,strip_module(G0,_,G),!.
-fix_mp_abox(G0,baseKB,G):- strip_module(G0,_,G),!.
-
-fix_mp_abox0(G0,U,CALL):-var(G0),!,trace_or_throw(var_fix_mp_abox0(G0,U,CALL)).
-fix_mp_abox0(~G0,U,~CALL):-!,fix_mp_abox0(G0,U,CALL).
-fix_mp_abox0(G0,U,CALL):- !, fix_mp(G0,U:CALL).
-fix_mp_abox0(M:(G0:-B),U,(CALL:-B)):-must(nonvar(G0)),!,fix_mp_abox0(M:G0,U,CALL).
-fix_mp_abox0(M:(G0,B),U,(CALL,B)):-!,fix_mp_abox0(M:G0,U,CALL).
-fix_mp_abox0((G0:-B),U,(CALL:-B)):-must(nonvar(G0)),!,fix_mp_abox0(G0,U,CALL).
-fix_mp_abox0((G0,B),U,(CALL,B)):-!,fix_mp_abox0(G0,U,CALL).
-fix_mp_abox0(G0,U,CALL):-
+fix_mp(M:P,M:P):- current_predicate(_,M:P), predicate_property(M:P,dynamic),!.
+fix_mp(G0,CALL):-
   strip_module(G0,WM,G),
-  must((get_user_abox(U),atom(U))),!, % nop(mnotrace(fix_mp(G0,U:G))),
+  must((get_abox(U),atom(U))),!,
        (current_predicate(_,U:G)->CALL=U:G;
        (current_predicate(_,WM:G)->CALL=WM:G;
        (current_predicate(_,logicmoo_user:G)->CALL=logicmoo_user:G;
        (current_predicate(_,baseKB:G)->CALL=baseKB:G;
         fail)))),!.
+
+fix_mp_abox(G0,U,G):-fix_mp(G0,U:G).
+
   
 
 
@@ -373,8 +354,9 @@ clause_u(H,B):- clause_u(H,B,_).
 %
 clause_u(MH,B,R):- nonvar(R),!,must(clause_i(M:H,B,R)),(MH=(M:H);MH=(H)),!.
 clause_u((H:-BB),B,Ref):- is_true(B),!,clause_u(H,BB,Ref).
+clause_u((H:-B),BB,Ref):- is_true(B),!,clause_u(H,BB,Ref).
 clause_u(MH,B,R):-  (mnotrace(fix_mp(MH,M:H)),clause_i(M:H,B,R))*->true;
-   (fix_mp_abox0(MH,_,CALL),clause_i(CALL,B,R)).
+   (fix_mp_abox(MH,_,CALL),clause_i(CALL,B,R)).
 % clause_u(H,B,Why):- has_cl(H),clause_u(H,CL,R),mpred_pbody(H,CL,R,B,Why).
 %clause_u(H,B,backward(R)):- R=(<-(H,B)),clause_u(R,true).
 %clause_u(H,B,equiv(R)):- R=(<==>(LS,RS)),clause_u(R,true),(((LS=H,RS=B));((LS=B,RS=H))).
@@ -407,7 +389,7 @@ lookup_u(MH,Ref):- must(mnotrace(fix_mp(MH,M:H))),
 /*
 with_umt(G0):-
   strip_module(G0,WM,G),
-  get_user_abox(U),  
+  get_abox(U),  
   must(current_predicate(_,U:G)->(CALL=U:G);(current_predicate(_,WM:G0)->CALL=WM:G0; fail)),
  '$set_source_module'(S,U),
  '$module'(M,U),
@@ -2989,7 +2971,6 @@ triggerSupports(Trigger,[Fact|MoreFacts]):-
 :- module_transparent((ain_fast)/1).
 :- module_transparent((fix_mp)/2).
 :- module_transparent((fix_mp_abox)/3).
-:- module_transparent((fix_mp_abox0)/3).
 :- module_transparent((why_was_true)/1).
 :- module_transparent((mpred_is_silient)/0).
 :- module_transparent((get_mpred_is_tracing)/1).
@@ -3241,7 +3222,7 @@ end_of_file.
 
 :- must(mpred_reset).
 
-:- get_user_abox(M),dynamic((M:current_ooZz/1,M:default_ooZz/1,M:if_mooZz/2)).
+:- get_abox(M),dynamic((M:current_ooZz/1,M:default_ooZz/1,M:if_mooZz/2)).
 
 :- mpred_trace.
 :- mpred_watch.

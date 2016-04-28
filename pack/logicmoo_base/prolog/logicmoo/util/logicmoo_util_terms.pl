@@ -629,7 +629,7 @@ pred_subst(_Pred ,P,       _, _,       P     ).
 %
 % Univ Safely Paying Attention To Corner Cases.
 %
-univ_safe(P,[L|L1]):- nonvar(P), must_det((var(L);atom(L))),!,on_x_debug(( P=..[L|L1] )).
+univ_safe(P,[L|L1]):- nonvar(P), must((var(L);atom(L))),!,on_x_debug(( P=..[L|L1] )).
 univ_safe(P,L):- must_det(is_list(L)),on_x_debug((P=..L)).
 
 % ===================================================================

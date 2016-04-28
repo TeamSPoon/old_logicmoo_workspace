@@ -205,7 +205,8 @@ decl_mpred_prolog(CM,M,PI,FA):- loop_check(must(decl_mpred_prolog_ilc(CM,M,PI,FA
 %
 % Declare Managed Predicate Prolog Inside Of Loop Checking.
 %
-decl_mpred_prolog_ilc(CM,M,PI,F/A):-atom(PI),A==0,not(current_predicate(F/A)),!,must(arity(F,_)),forall((arity(F,AA),AA\=0),(functor(PIA,F,AA),decl_mpred_prolog_ilc(CM,M,PIA,F/AA))).
+decl_mpred_prolog_ilc(CM,M,PI,F/A):-atom(PI),A==0,not(current_predicate(F/A)),!,
+  must(arity(F,_)),forall((arity(F,AA),AA\=0),(functor(PIA,F,AA),decl_mpred_prolog_ilc(CM,M,PIA,F/AA))).
 decl_mpred_prolog_ilc(CM,M,PI,F/A):-loop_check_term(decl_mpred_prolog_ilc_0(CM,M,PI,F/A),decl_mpred_prolog_ilc(CM,M,F),true).
 
 %= 	 	 
@@ -214,10 +215,17 @@ decl_mpred_prolog_ilc(CM,M,PI,F/A):-loop_check_term(decl_mpred_prolog_ilc_0(CM,M
 %
 % Declare Managed Predicate prolog Inside Of Loop Checking  Primary Helper.
 %
+
+decl_mpred_prolog_ilc_0(CM,M,PI,F/A):- 
+    (\+ predicate_property(M:PI,_); predicate_property(M:PI,imported_from(OM))),
+    ((OM=system;current_module(OM)),predicate_property(OM:PI,_),\+ predicate_property(OM:PI,imported_from(_))),!,
+    decl_mpred_prolog_ilc_0(CM,OM,PI,F/A).
+
 decl_mpred_prolog_ilc_0(_CM,M,PI,F/A):-
       assert_arity(F,A),
       ain(mpred_module(PI,M)),
-      ain(mpred_isa(PI,prologDynamic)),
+      ain(~prologHybrid(F)),
+      (\+ static_predicate(M,F,A)->ain(prologDynamic(F));true),
       ain(mpred_isa(PI,predCanHaveSingletons)),!.
 
 

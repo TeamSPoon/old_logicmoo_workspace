@@ -30,7 +30,7 @@ if_missing/1,
 attvar_op/2,
 no_side_effects/1,
 mpred_non_neg_literal/1,
-% get_user_abox/1,
+% get_abox/1,
 retract_mu/1,
 assert_mu/4,
 asserta_mu/1,
@@ -477,7 +477,7 @@ is_callable(C):-current_predicate(_,C),!.
 %
 check_context_module:- !.
 check_context_module:- is_release,!.
-check_context_module:- sanity((source_context_module(M1),get_user_abox(M2),must(M1==M2))).
+check_context_module:- sanity((source_context_module(M1),get_abox(M2),must(M1==M2))).
 
 %% check_real_context_module is semidet.
 %
@@ -485,7 +485,7 @@ check_context_module:- sanity((source_context_module(M1),get_user_abox(M2),must(
 %
 check_real_context_module:- is_release,!.
 check_real_context_module:-!.
-check_real_context_module:- sanity((context_module(M1),get_user_abox(M2),must(M1==M2))).
+check_real_context_module:- sanity((context_module(M1),get_abox(M2),must(M1==M2))).
 
 
 % ======================= mpred_file('pfcsyntax').	% operator declarations.
@@ -669,7 +669,7 @@ call_s(G0):-
 
 call_s2(G0):-
   strip_module(G0,WM,G),
-  get_user_abox(U),  
+  get_abox(U),  
   must(current_predicate(_,U:G)->(CALL=U:G);(current_predicate(_,WM:G0)->CALL=WM:G0; fail)),
  '$set_source_module'(S,U),
  '$module'(M,U),
@@ -684,7 +684,7 @@ attvar_op(Op,Data):-
 :- module_transparent(attvar_op/2).
 attvar_op(Op,Data):-
    notrace((strip_module(Op,_,OpA), sanity((atom(OpA))),
-   get_user_abox(ABOX),add_side_effect(Op,Data),deserialize_attvars(Data,Data0))),
+   get_abox(ABOX),add_side_effect(Op,Data),deserialize_attvars(Data,Data0))),
    (==(Data,Data0)->
      physical_side_effect(call(Op,Data0));
 
@@ -1074,7 +1074,7 @@ update_single_valued_arg(P,N):-
  must_det_l((  
   arg(N,P,UPDATE),
   replace_arg(P,N,OLD,Q),
-  get_user_abox(M), 
+  get_abox(M), 
   get_source_ref1(U),
   must_det_l((
      attvar_op(assert_if_new,M:spft(P,U,ax)),
@@ -2334,16 +2334,16 @@ assert_mu(M:X):- !,functor(X,F,A),assert_mu(M,X,F,A).
 % assert_mu(arity(prologHybrid,0)):-trace_or_throw(assert_mu(arity(prologHybrid,0))).
 % assert_mu(X):- \+ (is_ftCompound(X)),!,asserta_mu(X,X,0).
 assert_mu(X):- functor(X,F,A),assert_mu(abox,X,F,A).
-assert_mu(A0):- strip_module(A0,_,A),get_user_abox(M),assert_i(M:A).
+assert_mu(A0):- strip_module(A0,_,A),get_abox(M),assert_i(M:A).
 
-asserta_mu(A0):- strip_module(A0,_,A), get_user_abox(M),asserta_i(M:A).
+asserta_mu(A0):- strip_module(A0,_,A), get_abox(M),asserta_i(M:A).
 
 %% assertz_mu( +Pred) is semidet.
 %
 % Assertz For User Code.
 %
 assertz_mu(M:Pred):-!,assertz_mu(M,Pred).
-assertz_mu(Pred0):- strip_module(Pred0,_,Pred), get_user_abox(M),assertz_mu(M,Pred).
+assertz_mu(Pred0):- strip_module(Pred0,_,Pred), get_abox(M),assertz_mu(M,Pred).
 assertz_mu(Pred):- assertz_mu(abox,Pred).
 
 
@@ -2364,10 +2364,10 @@ assert_mu(M,Pred,_,_):- assertz_mu(M,Pred).
 %
 % Assertz Module Unit.
 %
-assertz_mu(abox,X):-!,get_user_abox(M),!,assertz_mu(M,X).
+assertz_mu(abox,X):-!,get_abox(M),!,assertz_mu(M,X).
 assertz_mu(M,X):- check_never_assert(M:X), clause_asserted_i(M:X),!.
 % assertz_mu(M,X):- correct_module(M,X,T),T\==M,!,assertz_mu(T,X).
-assertz_mu(_,X):- must(get_user_abox(M)),!,must((expire_tabled_list(M:X),show_call(attvar_op(assertz_i,M:X)))).
+assertz_mu(_,X):- must(get_abox(M)),!,must((expire_tabled_list(M:X),show_call(attvar_op(assertz_i,M:X)))).
 assertz_mu(M,X):- must((expire_tabled_list(M:X),show_call(attvar_op(assertz_i,M:X)))).
 
 
@@ -2378,7 +2378,7 @@ assertz_mu(M,X):- must((expire_tabled_list(M:X),show_call(attvar_op(assertz_i,M:
 % Retract For User Code.
 %
 % retract_mu(que(X,Y)):-!,show_failure(why,retract_eq_quitely_f(que(X,Y))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
-retract_mu(H0):- strip_module(H0,_,H),get_user_abox(M),show_if_debug(attvar_op(retract_i,M:H)),!,must((expire_tabled_list(H))).
+retract_mu(H0):- strip_module(H0,_,H),get_abox(M),show_if_debug(attvar_op(retract_i,M:H)),!,must((expire_tabled_list(H))).
 retract_mu(X):- check_never_retract(X),fail.
 retract_mu(~(X)):-!,show_success(why,retract_eq_quitely_f(~(X))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).
 retract_mu((X)):-!,show_success(why,retract_eq_quitely_f((X))),must((expire_tabled_list(~(X)))),must((expire_tabled_list((X)))).

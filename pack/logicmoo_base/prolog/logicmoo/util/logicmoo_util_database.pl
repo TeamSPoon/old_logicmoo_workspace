@@ -28,6 +28,8 @@
             asserta_new/1,
             assertz_if_new/1,
             assertz_new/1,
+            assert_setting/1,
+            assert_setting_if_missing/1,
             call_provider/1,
             call_provider/2,
             clause_true/1,
@@ -131,8 +133,8 @@
 my_module_sensitive_code(_E):- source_context_module(CM),writeln(source_context_module=CM).
 
 
-% clause_safe(M:H,B):-!,predicate_property(M:H,number_of_clauses(_)),clause(H,B).
-% clause_safe(H,B):-predicate_property(_:H,number_of_clauses(_)),clause(H,B).
+% clause_safe(M:H,B):-!,predicate_property(M:H,number_of_clauses(_)),system:clause(H,B).
+% clause_safe(H,B):-predicate_property(_:H,number_of_clauses(_)),system:clause(H,B).
 
 %= 	 	 
 
@@ -140,7 +142,7 @@ my_module_sensitive_code(_E):- source_context_module(CM),writeln(source_context_
 %
 % Clause Safely Paying Attention To Corner Cases.
 %
-clause_safe(H,B):-predicate_property(H,number_of_clauses(C)),C>0,clause(H,B).
+clause_safe(H,B):-predicate_property(H,number_of_clauses(C)),C>0,system:clause(H,B).
 
 :- meta_predicate if_flag_true(+,:).
 if_flag_true(TF,Goal):-
@@ -238,11 +240,11 @@ ain0(N):-notrace(clause_asserted(N))->true;mpred_op_prolog(assert,N).
 % Managed Predicate Oper. Prolog.
 %
 mpred_op_prolog(ain0,N):- !,(notrace(clause_asserted(N))->true;mpred_op_prolog0(assert,N)).
-mpred_op_prolog(paina,N):-!,(notrace(clause_asserted(N))->true;mpred_op_prolog0(asserta,N)).
-mpred_op_prolog(painz,N):-!,(notrace(clause_asserted(N))->true;mpred_op_prolog0(assertz,N)).
+mpred_op_prolog(paina,N):-!,(notrace(clause_asserted(N))->true;mpred_op_prolog0(system:asserta,N)).
+mpred_op_prolog(painz,N):-!,(notrace(clause_asserted(N))->true;mpred_op_prolog0(system:assertz,N)).
 mpred_op_prolog(pain,N):- !,(notrace(clause_asserted(N))->true;mpred_op_prolog0(assert,N)).
-mpred_op_prolog(aina,N):- !,(clause_asserted(N)->true;mpred_op_prolog0(asserta,N)).
-mpred_op_prolog(ainz,N):- !,(clause_asserted(N)->true;mpred_op_prolog0(assertz,N)).
+mpred_op_prolog(aina,N):- !,(clause_asserted(N)->true;mpred_op_prolog0(system:asserta,N)).
+mpred_op_prolog(ainz,N):- !,(clause_asserted(N)->true;mpred_op_prolog0(system:assertz,N)).
 mpred_op_prolog(ain,N):-  !,(clause_asserted(N)->true;mpred_op_prolog0(assert,N)).
 % mpred_op_prolog(OP,M:Term):- unnumbervars(Term,Unumbered),Term \=@= Unumbered,!,trace,mpred_mop(M,OP,Unumbered).
 mpred_op_prolog(OP,M:Term):-  trace,!,mpred_mop(M, OP,Term).
@@ -268,9 +270,9 @@ mpred_op_prolog0(OP,MTerm):- call(OP,MTerm).
 :- meta_predicate paina(:),pain(:),painz(:),ain0(:),ainz_clause(:),ainz_clause(:,?).
 :- meta_predicate clause_asserted(:,?),expand_to_hb(?,?,?),clause_asserted(:),eraseall(+,+).
 
-% aina(NEW):-ignore((retract(NEW),fail)),asserta(NEW).
-% ainz(NEW):-ignore((retract(NEW),fail)),assertz(NEW).
-% aina(_Ctx,NEW):-ignore((retract(NEW),fail)),asserta(NEW).
+% aina(NEW):-ignore((system:retract(NEW),fail)),system:asserta(NEW).
+% ainz(NEW):-ignore((system:retract(NEW),fail)),system:assertz(NEW).
+% aina(_Ctx,NEW):-ignore((system:retract(NEW),fail)),system:asserta(NEW).
 % writeqnl(_Ctx,NEW):- fmt('~q.~n',[NEW]),!.
 
 
@@ -280,8 +282,8 @@ mpred_op_prolog0(OP,MTerm):- call(OP,MTerm).
 %
 % Eraseall.
 %
-eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,B,X),erase_safe(clause(M:C,B,X),X))).
-eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,B,X),erase_safe(clause(M:C,B,X),X))).
+eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(system:clause(M:C,B,X),erase_safe(system:clause(M:C,B,X),X))).
+eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(system:clause(M:C,B,X),erase_safe(system:clause(M:C,B,X),X))).
 
 
 :-thread_local(t_l:std_provider/3).
@@ -327,9 +329,15 @@ call_provider(OP,Term):- must(std_provider(OP,Term,PROVIDER)),!,
    (loop_check_early(call(PROVIDER,OP,Term),fail)*->true;
    (loop_check_early(must(lmconf:next_std_provider(PROVIDER,NEXT)),NEXT=mpred_op_prolog),!,PROVIDER\=NEXT,call(NEXT,OP,Term))).
 
-:- meta_predicate assert_if_new(:).
 
-%= 	 	 
+
+:- meta_predicate assert_setting(:).
+%% assert_setting( ?X) is semidet.
+assert_setting(M:P):-functor(P,_,A),duplicate_term(P,DP),setarg(A,DP,_),system:retractall(M:DP),system:asserta(M:P).
+:- meta_predicate assert_setting_if_missing(:).
+assert_setting_if_missing(M:P):-functor(P,_,A),duplicate_term(P,DP),setarg(A,DP,_),(system:clause(M:DP,_)->true;system:asserta(M:P)).
+
+:- meta_predicate assert_if_new(:).
 
 %% assert_if_new( ?X) is semidet.
 %
@@ -446,7 +454,7 @@ ainz_clause(C):- expand_to_hb(C,H,B),ainz_clause(H,B).
 %
 % Ainz Clause.
 %
-ainz_clause(H,B):- clause_asserted(H,B)->true;call_provider(assertz((H:-B))).
+ainz_clause(H,B):- clause_asserted(H,B)->true;call_provider(system:assertz((H:-B))).
 
 
 
@@ -559,7 +567,7 @@ clause_asserted(H,B):-clause_asserted(H,B,_).
 %
 % Clause Asserted.
 %
-clause_asserted(M:H,B,R):- copy_term(M:H:B,MHB),clause(M:H,B,R),variant(M:H:B,MHB).
+clause_asserted(M:H,B,R):- copy_term(M:H:B,MHB),system:clause(M:H,B,R),variant(M:H:B,MHB).
 
 
 :-meta_predicate(modulize_head(?,?)).
@@ -591,14 +599,14 @@ clause_asserted_i(Head):-
   % fully_expand_now_wte(assert,Head,HeadC),
   copy_term(Head,HC),
   copy_term_nat(Head,Head_copy),  
-  % find a unit clause identical to Head by finding one which unifies,
+  % find a unit system:clause identical to Head by finding one which unifies,
   clause_i(Head_copy),
   % and then checking to see if it is identical
   =@=(Head,HC),
   variant(Head,Head_copy),!.
 
 clause_asserted_i(H,B):- clause_asserted_i(H,B,_).
-clause_asserted_i(MH,B,R):- ground(MH:B),!,clause(MH,B,R),clause(MHR,BR,R),ground(MHR:BR).
+clause_asserted_i(MH,B,R):- ground(MH:B),!,system:clause(MH,B,R),system:clause(MHR,BR,R),ground(MHR:BR).
 clause_asserted_i(MH,B,R):- copy_term(MH:B,MHB),clause_i(MH,B,R),variant(MH:B,MHB).
 
 
@@ -645,16 +653,16 @@ attributes_equal(L,R,[H|TODO]):- select(H,L,LL), select(HH,R,RR),H =HH,!,
 clause_i(HB):- expand_to_hb(HB,H,B),clause_i(H,B,_).
 clause_i(H,B):- clause_i(H,B,_).
 % clause_i(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
-% clause_i(H,B,Ref):- clause(H,AB,Ref), (must(split_attrs(AB,A,B0)->A),B=B0).
+% clause_i(H,B,Ref):- system:clause(H,AB,Ref), (must(split_attrs(AB,A,B0)->A),B=B0).
 
 clause_i(H,B,R):- nonvar(R),!, 
-  dont_make_cyclic((must(clause(H0,BC,R)),must(split_attrs(BC,AV,B0)),!,must((AV,!,B=B0,H=H0)))).
+  dont_make_cyclic((must(system:clause(H0,BC,R)),must(split_attrs(BC,AV,B0)),!,must((AV,!,B=B0,H=H0)))).
 
-clause_i(H0,B0,Ref):-clause(H0,B0,Ref).
+clause_i(H0,B0,Ref):-system:clause(H0,B0,Ref).
 clause_i(H0,B0,Ref):-
  copy_term(H0:B0, H:B, Attribs),
  dont_make_cyclic((    
-    (clause(H,BC,Ref) *-> 
+    (system:clause(H,BC,Ref) *-> 
       must(split_attrs(BC,AV,BB)) -> unify_bodies(B,BB) -> AV -> (H0=H,B0=B,
         maplist(call,Attribs))))).
 
@@ -666,13 +674,13 @@ unify_bodies(B1,B2):-strip_module(B1,_,BB1),strip_module(B2,_,BB2),!,BB1=BB2.
 clause_i(MH,B,Ref):- 
  dont_make_cyclic((
    % must(modulize_head(MH,M:H)),
-   clause(MH,BMC,Ref),
+   system:clause(MH,BMC,Ref),
     ((compound(BMC),BMC = attr_bind(Attribs,BOUT)) -> (attr_bind(Attribs)) ; BMC=BOUT))),
  dont_make_cyclic((BOUT=B)).
 */
 /*
 clause_i(MH,B,Ref):- !,
- no_repeats(Ref,(must(modulize_head(MH,M:H)),clause(M:H,BMC,Ref))),
+ no_repeats(Ref,(must(modulize_head(MH,M:H)),system:clause(M:H,BMC,Ref))),
    ((compound(BMC),BMC = attr_bind(Attribs,BM)) -> true ; (BMC=BM -> Attribs=[])),
  BM = B,
  once(attr_bind(Attribs)).
@@ -681,7 +689,7 @@ clause_i(MH,B,Ref):- !,
 /*
 clause_i(H0,BIn,Ref):- 
     copy_term_nat(H0:BIn,H:B0),
-    clause(H,BC,Ref),
+    system:clause(H,BC,Ref),
   (must(notrace(split_attrs(BC,AV,B))) -> ( B=B0 -> AV -> H=H0 -> BIn=B)).
 */
 
@@ -689,8 +697,8 @@ clause_i(H0,BIn,Ref):-
 
 
 assert_i(HB):-clausify_attributes(HB,CL),assert(CL).
-asserta_i(HB):-clausify_attributes(HB,CL),asserta(CL).
-assertz_i(HB):-clausify_attributes(HB,CL),assertz(CL).
+asserta_i(HB):-clausify_attributes(HB,CL),system:asserta(CL).
+assertz_i(HB):-clausify_attributes(HB,CL),system:assertz(CL).
 retract_i(HB):-expand_to_hb(HB,H,B),(clause_i(H,B,Ref)*->erase(Ref)).
 retractall_i(H):-expand_to_hb(H,HH,_),forall(clause_i(HH,_,Ref),erase(Ref)).
 
@@ -706,11 +714,11 @@ retractall_i(H):-expand_to_hb(H,HH,_),forall(clause_i(HH,_,Ref),erase(Ref)).
 %
 % Clause True.
 %
-clause_true(M:G):-!,clause(M:G,true)*->true;(current_module(M2),clause(M2:G,true)).
-clause_true(G):- !, notrace((current_module(M), \+ \+  clause(M:G,_,_))),!, clause(M:G,true).
-clause_true(M:G):-predicate_property(M:G,number_of_clauses(_)),!,clause(M:G,true).
-clause_true(_:G):-!,predicate_property(M:G,number_of_clauses(_)),clause(M:G,true).
-clause_true(G):-!,predicate_property(M:G,number_of_clauses(_)),clause(M:G,true).
+clause_true(M:G):-!,system:clause(M:G,true)*->true;(current_module(M2),system:clause(M2:G,true)).
+clause_true(G):- !, notrace((current_module(M), \+ \+  system:clause(M:G,_,_))),!, system:clause(M:G,true).
+clause_true(M:G):-predicate_property(M:G,number_of_clauses(_)),!,system:clause(M:G,true).
+clause_true(_:G):-!,predicate_property(M:G,number_of_clauses(_)),system:clause(M:G,true).
+clause_true(G):-!,predicate_property(M:G,number_of_clauses(_)),system:clause(M:G,true).
 
 :-export(retract_eq/1).
 
@@ -771,27 +779,27 @@ append_term(Call,E,CallE):-must(compound(Call)), Call=..List, append(List,[E],Li
 %
 erase_safe(_,REF):-erase(REF).
 /*
-erase_safe(((M:A):-B),REF):-!,erase_safe(clause(M:A,B),REF).
-erase_safe(clause(U:A,B),REF):-U=user,!, erase_safe(clause(A,B),REF).
-%erase_safe(clause(A,U:B),REF):-U=user,!, erase_safe(clause(A,B),REF).
-%erase_safe(clause(M:A,B),REF):-!, erase_safe_now(M,clause(A,B),REF).
-erase_safe(clause(A,B),REF):-!, erase_safe_now(_,clause(A,B),REF).
-erase_safe(M:(A:-B),REF):-!,erase_safe(clause(M:A,B),REF).
-erase_safe((A:-B),REF):-!,erase_safe(clause(A,B),REF).
-erase_safe(clause(A,B,_),REF):-!,erase_safe(clause(A,B),REF).
-erase_safe(asserta(A,_),REF):-!,erase_safe(clause(A,true),REF).
+erase_safe(((M:A):-B),REF):-!,erase_safe(system:clause(M:A,B),REF).
+erase_safe(system:clause(U:A,B),REF):-U=user,!, erase_safe(system:clause(A,B),REF).
+%erase_safe(system:clause(A,U:B),REF):-U=user,!, erase_safe(system:clause(A,B),REF).
+%erase_safe(system:clause(M:A,B),REF):-!, erase_safe_now(M,system:clause(A,B),REF).
+erase_safe(system:clause(A,B),REF):-!, erase_safe_now(_,system:clause(A,B),REF).
+erase_safe(M:(A:-B),REF):-!,erase_safe(system:clause(M:A,B),REF).
+erase_safe((A:-B),REF):-!,erase_safe(system:clause(A,B),REF).
+erase_safe(system:clause(A,B,_),REF):-!,erase_safe(system:clause(A,B),REF).
+erase_safe(system:asserta(A,_),REF):-!,erase_safe(system:clause(A,true),REF).
 erase_safe(M:A,REF):-M==user,!,erase_safe(A,REF).
-erase_safe(A,REF):-!,erase_safe(clause(A,true),REF).
+erase_safe(A,REF):-!,erase_safe(system:clause(A,true),REF).
 
 
-erase_safe_now(_,clause(M:A,B),REF):-!,erase_safe_now(M,clause(A,B),REF).
-erase_safe_now(M,clause(A,B),REF):-!,
-   ignore((show_success(erase_safe_now, \+ clause(M:A,B, REF)))),
+erase_safe_now(_,system:clause(M:A,B),REF):-!,erase_safe_now(M,system:clause(A,B),REF).
+erase_safe_now(M,system:clause(A,B),REF):-!,
+   ignore((show_success(erase_safe_now, \+ system:clause(M:A,B, REF)))),
    (((var(REF);
    show_success(erase_safe_now, \+ nth_clause(A, _Index, REF));   
    show_success(erase_safe_now, clause_property(REF,erased));
    show_success(erase_safe_now, \+ clause_property(REF,_))))
-   -> logicmoo_util_catch:ddmsg(warn(var_erase_safe(clause(A,B),REF))) ; 
+   -> logicmoo_util_catch:ddmsg(warn(var_erase_safe(system:clause(A,B),REF))) ; 
        erase(REF)).
 */
 

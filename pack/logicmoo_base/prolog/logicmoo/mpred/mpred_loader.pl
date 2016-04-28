@@ -13,17 +13,15 @@
           [ add_from_file/1,
           % unused_assertion/1,
           with_umt_l/1,
-          is_box_module/2,best_module/3,is_default_shared/1,
-          set_guessed_abox/2,guess_user_abox/2,set_file_abox/1,
-          get_user_abox/1,set_user_abox/1,get_user_tbox/1,get_user_sbox/1,
-          mpred_ops/0,mpred_ops/1,set_user_tbox/2,
-          set_abox_for/2, 
-          make_module_name_local/2,
+          make_declared/2,
+          mpred_ops/0,mpred_ops/1,
+          
+          
           get_original_term_source/1,
-           get_abox_for/2,
+           
            simplify_language_name/2,
            is_undefaulted/1,
-          reset_user_abox/1,
+          
             user_m_check/1,
             split_into_mts/1,
             add_term/2,
@@ -31,30 +29,16 @@
             % system:import_module_to_user/1,
             assert_kif_dolce/1,
             assert_until_eof/1,
-            set_current_module/1,
             make_file_command/3,
             set_mpred_module/1,
             import_shared_pred/3,
             import_to_user0/3,
             import_to_user_mfa0/4,
-            set_file_abox/1,
+
             predicate_is_undefined_fa/2,
             
-            get_user_abox/1,
-            get_user_abox0/1,
             
-            import_to_user/1,
-            
-            maybe_add_import_module/3,
-            maybe_delete_import_module/2,
-            to_sbox/2,
-            to_tbox/2,
-            to_abox/2,
-            ensure_imports/1,
-            correct_module/3,
-            correct_module/4,
-            is_system_box/1,
-            which_file/1,
+
             begin_pfc/0,
             call_file_command/4,
             call_from_module/2,
@@ -108,7 +92,6 @@
             gload/0,
             guess_file_type_loader/2,
             hdr_debug/2,
-            in_mpred_kb_module/0,
             include_mpred_files/1,
             get_lang0/1,
             is_code_body/1,
@@ -202,7 +185,6 @@
             always_expand_on_thread/1,
             t_l:current_lang/1,
             kb_dynamic/1,
-            make_declared/2,
             make_reachable/2,
             import_predicate/2,
             lmconf:mpred_skipped_module/1,
@@ -225,8 +207,7 @@
  :- module_transparent((with_umt_l/1,load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, mpred_process_input_1/1, must_expand_term_to_command/2, pl_to_mpred_syntax0/2, process_this_script0/1, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc_0/2, transform_opers_0/2, transform_opers_1/2)).
 
  :- meta_predicate
-        kb_dynamic(?),
-        make_declared(?,-),
+        kb_dynamic(?),       
         make_reachable(?,?),
         call_file_command(?, ?, ?, ?),
         call_from_module(+, 0),
@@ -246,7 +227,6 @@
         load_init_world(+, :),
         module_typed_term_expand(?, ?),
         mpred_expander(+, +, +,+, -,-),
-        get_user_abox(-),
         mpred_op_each(3),
         mpred_term_expansion(?, ?),
         myDebugOnError(0),        
@@ -255,24 +235,20 @@
         mpred_loader_module_transparent(?),
         lmconf:loaded_file_world_time(+, +, +).
 :- (multifile t_l:into_form_code/0, t_l:mpred_module_expansion/1, user:prolog_load_file/2, user:term_expansion/2).
-:- (dynamic is_box_module/2, user:prolog_load_file/2, user:term_expansion/2).
+:- (dynamic lmconf:is_box_module/2, user:prolog_load_file/2, user:term_expansion/2).
 % :- (module_transparent add_from_file/1, add_term/2, assert_kif/1, assert_kif_dolce/1, assert_until_eof/1, begin_pfc/0, call_file_command/4, 
 % call_from_module/2, with_source_module/2, can_be_dynamic/1, cl_assert/2, clear_predicates/1, collect_expansions/3, compile_clause/1,
 %  mpred_term_expansion_by_storage_type/3, convert_side_effect/2, convert_side_effect/3, convert_side_effect_0a/2, convert_side_effect_0b/2, convert_side_effect_0c/2, 
 % convert_side_effect_buggy/2, current_context_module/1, current_op_alias/2, cwc/0, decache_file_type/1, ensure_abox/1, declare_load_dbase/1, 
-% disable_mpred_expansion/0, disable_mpreds_in_current_file/0, do_end_of_file_actions/4, do_end_of_file_actions_real/0, dyn_begin/0, dyn_end/0, enable_mpred_expansion/0, end_module_type/1, end_module_type/2, ensure_loaded_no_mpreds/1, ensure_mpred_file_consulted/2, ensure_mpred_file_loaded/1, ensure_mpred_file_loaded/2, ensure_prolog_file_consulted/2, etrace/0, expand_in_mpred_kb_module/2, expanded_already_functor/1, file_begin/1, file_end/1, finish_processing_world/0, force_reload_mpred_file/1, force_reload_mpred_file/2, from_kif_string/2, get_file_type/2, get_lang/1, get_last_time_file/3, get_op_alias/2, gload/0, guess_file_type_loader/2, hdr_debug/2, in_include_file/0, in_mpred_kb_module/0, include_mpred_files/1, get_lang/1, is_code_body/1, is_compiling/0, is_compiling_sourcecode/0, is_kif_string/1, is_mpred_file/1, guess_if_mpred_file0/1, lang_op_alias/3, load_file_dir/2, load_file_some_type/2, expand_term_to_load_calls/2, load_file_term_to_command_1/3, load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, expand_term_to_load_calls/2, expand_term_to_load_calls/4, load_init_world/2, load_language_file/1, load_mpred_files/0, load_mpred_on_file_end/2, loader_side_effect_capture_only/2, loader_side_effect_verify_only/2, expand_term_to_command/2, loading_source_file/1, make_db_listing/0, make_dynamic/1, module_typed_term_expand/2, module_typed_term_expand/5, mpred_begin/0, mpred_directive_expansion/2, mpred_expand_inside_file_anyways/0, mpred_expand_inside_file_anyways/1, mpred_expander/4, mpred_expander_now/2, mpred_expand_file_module_clause/4, mpred_implode_varnames/1, mpred_loader_file/0, mpred_may_expand/0, mpred_may_expand_module/1, mpred_maybe_skip/1, mpred_process_input/2, mpred_process_input_1/1, lmconf:mpred_skipped_module/1, mpred_term_expansion/2, mpred_use_module/1, must_compile_special_clause/1, expand_term_to_load_calls/2, must_locate_file/2, must_expand_term_to_command/2, myDebugOnError/1, onEndOfFile/1, op_alias/2, op_lang/1, pl_to_mpred_syntax/2, pl_to_mpred_syntax0/2, pl_to_mpred_syntax_h/2, pop_predicates/2, process_this_script/0, process_this_script/1, process_this_script0/1, prolog_load_file_loop_checked/2, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc/2, prolog_load_file_nlc_0/2, push_predicates/2, read_one_term/2, read_one_term/3, register_module_type/1, register_module_type/2, rsavedb/0, savedb/0, scan_updates/0, show_bool/1, show_interesting_cl/2, show_load_context/0, simplify_why/2, simplify_why_r/4, stream_pos/1, term_expand_local_each/5, transform_opers/3, transform_opers_0/2, transform_opers_1/2, use_file_type_loader/2, use_was_isa/3, was_exported_content/3, with_mpred_expansions/1, with_no_mpred_expansions/1, with_source_module/2, xfile_module_term_expansion_pass_3/7,  (~)/1, baseKB:cl_assert/2, baseKB:cwc/0, lmconf:mpred_provide_clauses/3, always_expand_on_thread/1, t_l:current_lang/1, current_op_alias/2, get_user_abox/1, disable_mpred_term_expansions_globally/0, lmconf:loaded_file_world_time/3, mpred_directive_value/3, lmconf:mpred_skipped_module/1, 
+% disable_mpred_expansion/0, disable_mpreds_in_current_file/0, do_end_of_file_actions/4, do_end_of_file_actions_real/0, dyn_begin/0, dyn_end/0, enable_mpred_expansion/0, end_module_type/1, end_module_type/2, ensure_loaded_no_mpreds/1, ensure_mpred_file_consulted/2, ensure_mpred_file_loaded/1, ensure_mpred_file_loaded/2, ensure_prolog_file_consulted/2, etrace/0, expand_in_mpred_kb_module/2, expanded_already_functor/1, file_begin/1, file_end/1, finish_processing_world/0, force_reload_mpred_file/1, force_reload_mpred_file/2, from_kif_string/2, get_file_type/2, get_lang/1, get_last_time_file/3, get_op_alias/2, gload/0, guess_file_type_loader/2, hdr_debug/2, in_include_file/0, in_mpred_kb_module/0, include_mpred_files/1, get_lang/1, is_code_body/1, is_compiling/0, is_compiling_sourcecode/0, is_kif_string/1, is_mpred_file/1, guess_if_mpred_file0/1, lang_op_alias/3, load_file_dir/2, load_file_some_type/2, expand_term_to_load_calls/2, load_file_term_to_command_1/3, load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, expand_term_to_load_calls/2, expand_term_to_load_calls/4, load_init_world/2, load_language_file/1, load_mpred_files/0, load_mpred_on_file_end/2, loader_side_effect_capture_only/2, loader_side_effect_verify_only/2, expand_term_to_command/2, loading_source_file/1, make_db_listing/0, make_dynamic/1, module_typed_term_expand/2, module_typed_term_expand/5, mpred_begin/0, mpred_directive_expansion/2, mpred_expand_inside_file_anyways/0, mpred_expand_inside_file_anyways/1, mpred_expander/4, mpred_expander_now/2, mpred_expand_file_module_clause/4, mpred_implode_varnames/1, mpred_loader_file/0, mpred_may_expand/0, mpred_may_expand_module/1, mpred_maybe_skip/1, mpred_process_input/2, mpred_process_input_1/1, lmconf:mpred_skipped_module/1, mpred_term_expansion/2, mpred_use_module/1, must_compile_special_clause/1, expand_term_to_load_calls/2, must_locate_file/2, must_expand_term_to_command/2, myDebugOnError/1, onEndOfFile/1, op_alias/2, op_lang/1, pl_to_mpred_syntax/2, pl_to_mpred_syntax0/2, pl_to_mpred_syntax_h/2, pop_predicates/2, process_this_script/0, process_this_script/1, process_this_script0/1, prolog_load_file_loop_checked/2, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc/2, prolog_load_file_nlc_0/2, push_predicates/2, read_one_term/2, read_one_term/3, register_module_type/1, register_module_type/2, rsavedb/0, savedb/0, scan_updates/0, show_bool/1, show_interesting_cl/2, show_load_context/0, simplify_why/2, simplify_why_r/4, stream_pos/1, term_expand_local_each/5, transform_opers/3, transform_opers_0/2, transform_opers_1/2, use_file_type_loader/2, use_was_isa/3, was_exported_content/3, with_mpred_expansions/1, with_no_mpred_expansions/1, with_source_module/2, xfile_module_term_expansion_pass_3/7,  (~)/1, baseKB:cl_assert/2, baseKB:cwc/0, lmconf:mpred_provide_clauses/3, always_expand_on_thread/1, t_l:current_lang/1, current_op_alias/2, get_abox/1, disable_mpred_term_expansions_globally/0, lmconf:loaded_file_world_time/3, mpred_directive_value/3, lmconf:mpred_skipped_module/1, 
 %   never_reload_file/1, prolog_load_file_loop_checked/2, registered_module_type/2).
 :- module_transparent 
-            is_box_module/2,best_module/3,is_default_shared/1,import_to_user0/3,import_to_user/1,
-            set_guessed_abox/2,guess_user_abox/2,set_file_abox/1,
-            get_user_abox/1,set_user_abox/1,get_user_tbox/1,get_user_sbox/1,
-            mpred_ops/0,mpred_ops/1,set_user_tbox/2,reset_user_abox/1,
-            mpred_ops.
+            mpred_ops/0,mpred_ops/1,mpred_ops.
 
 :- (thread_local t_l:into_form_code/0, t_l:mpred_module_expansion/1).
 %:- (volatile t_l:into_form_code/0, t_l:mpred_module_expansion/1).
 %:- was_export((convert_side_effect_0a/2, convert_side_effect_0b/2, convert_side_effect_0c/2, guess_if_mpred_file0/1, expand_term_to_load_calls/2, load_file_term_to_command_1/3, load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, mpred_process_input_1/1, must_expand_term_to_command/2, pl_to_mpred_syntax0/2, process_this_script0/1, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc_0/2, transform_opers_0/2, transform_opers_1/2, xfile_module_term_expansion_pass_3/7)).
-%:- dynamic((registered_module_type/2, current_op_alias/2, lmconf:mpred_skipped_module/1, prolog_load_file_loop_checked/2, lmcache:mpred_directive_value/3, get_user_abox/1, lmconf:loaded_file_world_time/3, lmconf:never_reload_file/1, always_expand_on_thread/1, t_l:current_lang/1, current_op_alias/2, get_user_abox/1, disable_mpred_term_expansions_globally/0, lmconf:loaded_file_world_time/3, mpred_directive_value/3, lmconf:mpred_skipped_module/1, never_reload_file/1, prolog_load_file_loop_checked/2, registered_module_type/2, t_l:disable_mpred_term_expansions_globally/0, user:prolog_load_file/2, user:term_expansion/2)).
+%:- dynamic((registered_module_type/2, current_op_alias/2, lmconf:mpred_skipped_module/1, prolog_load_file_loop_checked/2, lmcache:mpred_directive_value/3, get_abox/1, lmconf:loaded_file_world_time/3, lmconf:never_reload_file/1, always_expand_on_thread/1, t_l:current_lang/1, current_op_alias/2, get_abox/1, disable_mpred_term_expansions_globally/0, lmconf:loaded_file_world_time/3, mpred_directive_value/3, lmconf:mpred_skipped_module/1, never_reload_file/1, prolog_load_file_loop_checked/2, registered_module_type/2, t_l:disable_mpred_term_expansions_globally/0, user:prolog_load_file/2, user:term_expansion/2)).
 %:- dynamic(registered_module_type/2).        
 
 
@@ -287,140 +263,16 @@ kb_dynamic(FA):- is_ftVar(FA),!,fail.
 kb_dynamic(P):-atom(P),get_arity(P,F,A),!,kb_dynamic(F/A).
 kb_dynamic(_:FA):- is_ftVar(FA),!,fail.
 kb_dynamic(_:F/_):- is_ftVar(F),!,fail.
-kb_dynamic(F/A):- !, get_user_abox(KB),!,kb_dynamic(KB:F/A).
+kb_dynamic(F/A):- !, get_abox(KB),!,kb_dynamic(KB:F/A).
 kb_dynamic([FA1|FA2]):-!,kb_dynamic(FA1),kb_dynamic(FA2).
 kb_dynamic((FA1,FA2)):-!,kb_dynamic(FA1),kb_dynamic(FA2).
 % kb_dynamic(CM:M:FA):- atom(CM),atom(M),!,(CM==M -> kb_dynamic(M:FA);(CM:kb_dynamic(M:FA))).
 % kb_dynamic(CM:M:F/A):- atom(CM),atom(M),!,(CM==M -> kb_dynamic(M:FA);(CM:kb_dynamic(M:F/A))).
 kb_dynamic(M:(FA1,FA2)):-!,kb_dynamic(M:FA1),kb_dynamic(M:FA2).
 kb_dynamic(M:[FA1|FA2]):-!,kb_dynamic(M:FA1),kb_dynamic(M:FA2).
-kb_dynamic(M:F/A):-!,quietly_must((make_declared(M:F/A,T),get_user_abox(CM),make_reachable(CM,T:F/A))).
+kb_dynamic(M:F/A):-!,quietly_must((make_declared(M:F/A,T),get_abox(CM),make_reachable(CM,T:F/A))).
 kb_dynamic(M:P):-functor(P,F,A),!,kb_dynamic(M:F/A).
 kb_dynamic(P):-compound(P),functor(P,F,A),!,kb_dynamic(F/A).
-
-
-
-%% chop_box( ?Chop, ?Was) is semidet.
-%
-% Chop Datalog.
-%
-chop_box(Chop,Was):-sanity(atom(Chop)),atom_concat(Was,'ABox',Chop),!.
-chop_box(Chop,Was):-atom_concat(Was,'TBox',Chop),!.
-chop_box(Chop,Was):-atom_concat(Was,'SBox',Chop),!.
-chop_box(Chop,Chop).
-
-
-maybe_hack_import_modules :- fail.
-
-%% maybe_add_import_module( ?A, ?A, ?VALUE3) is semidet.
-%
-% Maybe Add Import Module.
-%
-maybe_add_import_module(_,baseKBTBox,end):-!,dumpST,dtrace,fail.
-maybe_add_import_module(A,A,_):-!.
-maybe_add_import_module(basePFC,_,end):-!.
-maybe_add_import_module(baseKB,_,end):-!.
-maybe_add_import_module(logicmoo_user, baseKB, end):-!.
-maybe_add_import_module(user, baseKB, end):-!.
-maybe_add_import_module(_,_,_):- \+ maybe_hack_import_modules,!.
-maybe_add_import_module(A,B,C):- catch(add_import_module(A,B,C),_,logicmoo_util_dmsg:dmsg(failed(maybe_add_import_module(A,B,C)))),!.
-
-maybe_delete_import_module(_,_):- \+ maybe_hack_import_modules,!.
-maybe_delete_import_module(A,B):- catch(delete_import_module(A,B),_,logicmoo_util_dmsg:dmsg(failed(maybe_delete_import_module(A,B)))),!.
-
-
-
-
-
-%% no_separate_boxes is semidet.
-%
-% No Separate Boxes.
-%
-no_separate_boxes.
-
-
-%% to_tbox( ?A, ?T) is semidet.
-%
-% Converted To Tbox.
-%
-to_tbox(ABox,T):-sanity((nonvar(ABox),var(T))),is_system_box(ABox),!,T=baseKB.
-to_tbox(Chop,TBox):- no_separate_boxes,!,quietly_must(Chop=TBox).
-to_tbox(Chop,Add):-chop_box(Chop,Was),atom_concat(Was,'TBox',Add).
-
-
-%% to_sbox( ?A, ?T) is semidet.
-%
-% Converted To Sbox.
-%
-to_sbox(A,T):-sanity((nonvar(A),var(T))),is_system_box(A),!,T=baseKB.
-to_sbox(ABox,SBox):- no_separate_boxes,!,quietly_must(ABox=SBox).
-to_sbox(Chop,Add):-chop_box(Chop,Was),atom_concat(Was,'SBox',Add).
-
-
-
-
-
-%% to_abox( ?A, ?A) is semidet.
-%
-% Converted To ABox.
-%
-to_abox(A,T):-sanity((nonvar(A),var(T))),is_system_box(A),!,T=baseKB.
-to_abox(A,T):-no_separate_boxes,!,T=A.
-to_abox(Chop,Add):-chop_box(Chop,Add),!.
-to_abox(Chop,Add):-chop_box(Chop,Was),atom_concat(Was,'ABox',Add).
-
-:- export(to_box_type0/3).
-
-
-
-%% to_box_type( ?M, ?B, ?T) is semidet.
-%
-% Converted To Datalog Type.
-%
-to_box_type(M,B,T):-quietly_must(to_box_type0(M,B,TT)),!,T=TT.
-
-
-
-%% to_box_type0( ?M, ?VALUE2, ?T) is semidet.
-%
-% Converted To Datalog Type Primary Helper.
-%
-to_box_type0(M,abox,T):-!,to_abox(M,T).
-to_box_type0(M,tbox,T):-!,to_tbox(M,T).
-to_box_type0(M,sbox,T):-!,to_sbox(M,T).
-
-
-
-
-%% correct_module( ?M, ?X, ?T) is semidet.
-%
-% Correct Module.
-%
-correct_module(M,X,T):-functor(X,F,A),quietly_must(correct_module(M,F,A,T)),!.
-
-
-
-
-%% correct_module( ?M, ?F, ?A, ?T) is semidet.
-%
-% Correct Module.
-%
-correct_module(abox,F,A,T):- !,get_user_abox(M),!,correct_module(M,F,A,T).
-correct_module(tbox,F,A,T):- !,get_user_tbox(M),!,correct_module(M,F,A,T).
-correct_module(sbox,F,A,T):- !,get_user_sbox(M),!,correct_module(M,F,A,T).
-correct_module(M,F,A,T):- box_type(F,A,Type),!,to_box_type(M,Type,T).
-correct_module(MT,_,_,MT):-!.
-
-
-
-
-
-%% box_type( ?F, ?A, ?VALUE3) is semidet.
-%
-% Datalog Type.
-%
-box_type(F,A,tbox):-current_predicate(baseKB:F/A).
-% box_type(F,A,sbox):-current_predicate(F/A).
 
 
 
@@ -433,8 +285,6 @@ make_declared(Test,_):- \+ \+ ((Test= (_:F/_), is_ftVar(F))),!.
 make_declared(F/_,_):- is_ftVar(F),!.
 make_declared(M:F/A,T):- !,correct_module(M,F,A,T),!,make_declared_now(T:F/A).
 make_declared(F/A,T):- !,correct_module(abox,F,A,T),!,make_declared_now(T:F/A).
-
-
 
 
 %% make_declared_now( :TermM) is semidet.
@@ -734,16 +584,6 @@ etrace:-leash(+all),leash(+exception),trace.
 
 
 
-%% which_file( ?F) is semidet.
-%
-% Which File.
-%
-which_file(F):- prolog_load_context(source,F) -> true; once(loading_source_file(F)).
-
-:- export(onEndOfFile/1).
-
-
-
 %% onEndOfFile( ?Call) is semidet.
 %
 % Whenever End Of File.
@@ -807,7 +647,7 @@ rsavedb:-
 % Make Database Listing.
 %
 make_db_listing:-
- % get_user_abox(DBM),
+ % get_abox(DBM),
 %   listing(t),
  %  listing(mpred_f),
      listing(_),
@@ -1334,54 +1174,13 @@ set_mpred_module(M):- asserta(lmcache:mpred_directive_value(pfc,module,M)),'$set
 %
 % Set Managed Predicate Multifle.
 %
-set_mpred_multifle(M):- set_user_abox(M), asserta(lmcache:mpred_directive_value(pfc,multifile,M)).
+set_mpred_multifle(M):- set_abox(M), asserta(lmcache:mpred_directive_value(pfc,multifile,M)).
   
 
 
 
-% ========================================
-% get_user_abox/1
-% ========================================
 
 
-%% get_user_tbox(-ABOX) is semidet.
-%
-% TBox statements describe a system in terms of controlled vocabularies.
-%
-get_user_tbox(T):-get_user_abox(M),to_tbox(M,T).
-
-
-
-%% get_user_sbox( ?T) is semidet.
-%
-% Get User Sbox.
-%
-get_user_sbox(T):-get_user_abox(M),to_sbox(M,T).
-
-:- thread_local(t_l:user_abox/2).
-
-
-
-user_m_check(_Out).
-
-
-
-
-%% reset_user_abox( ?M) is semidet.
-%
-% Reset User ABox.
-%
-reset_user_abox(M):- source_module(SM), ignore(show_failure(M\=user)),retractall(t_l:user_abox(SM,_Prev)),ensure_abox(M),!,asserta(t_l:user_abox(SM,M)).
-
-
-
-%% set_user_tbox( ?M, ?TBoxM) is semidet.
-%
-% Set User Tbox.
-%
-/*set_user_tbox(TBoxM):- get_user_abox(M),ensure_abox(TBoxM),set_user_tbox(M,TBoxM).*/
-set_user_tbox(M,TBoxM):- 
-   ( is_system_box(M) -> true ; maybe_add_import_module(M,TBoxM,end)).
 
 % ========================================
 % begin/end_transform_mpreds
@@ -1461,192 +1260,14 @@ disable_mpred_expansion:- (( t_l:disable_px) -> true ;
 
 
 
-
-%% is_box_module( ?M, ?VALUE2) is semidet.
-%
-% If Is A Datalog Module.
-%
-is_box_module(M,tbox):- is_system_box(M).
-is_box_module(user,abox).
-
-
-
-
-
-%% import_shared_pred( ?M, ?BaseKB, ?P) is semidet.
-%
-% Import Shared Predicate.
-%
-import_shared_pred(baseKB,_,_):-!.
-import_shared_pred(M,BaseKB,P):- 
-  functor(P,F,A),
-  %dynamic(BaseKB:F/A),
-  user:catch(mpred_op_prolog(pain,((M:P:- user:BaseKB:P))),E,dmsg(import_shared_pred(M:F/A:-BaseKB:F/A)=E)),
-  quietly_must(ignore(show_failure( \+ predicate_property(BaseKB:P,exported)))),
-  import_to_user(M:P).
-
-
 predicate_is_undefined_fa(F,A):-
   \+ current_predicate(_:F/A),
   \+ predicate_property(_:F/A,exported),
   \+ predicate_property(_:F/A,static).
 
 
-%% import_to_user( ?P) is semidet.
-%
-% Import Converted To User.
-%
-import_to_user(P):- '$current_typein_module'(MM),'$current_source_module'(SM),
-   quietly_must(import_to_user0(MM,SM,P)).
-
-import_to_user0(user,user,M:FA):- quietly_must(M\==user),!, call_from_module(M,import_to_user(M:FA)).
-import_to_user0(M,SM, user:FA):- M\==SM,dmsg(warn(import_to_user0(M,SM, user:FA))),fail.
-import_to_user0(MM,SM,M:F/A):- !,functor(P,F,A),import_to_user_mfa0(MM,SM,P,M:F/A).
-import_to_user0(MM,SM,M:P):-!,functor(P,F,A),import_to_user_mfa0(MM,SM,P,M:F/A).
-import_to_user0(MM,SM,P):- source_module(SSM),user_abox_or(SSM,M),import_to_user0(MM,SM,M:P),!.
-
-user_abox_or(SSM,M):- t_l:user_abox(SSM,M),!.
-user_abox_or(M,M).
-
-import_to_user_mfa0(_MM,_SM,_P,_M:F/A):- current_predicate(system:F/A),!.
-import_to_user_mfa0(_MM,_SM,P,_M:_F/_A):- predicate_property(P,static),!.
-import_to_user_mfa0(_MM,_SM,P,_M:_F/_A):- predicate_property(P,exported),!.
-import_to_user_mfa0(_MM,_SM,P,_M:_F/_A):- predicate_property(P,imported_from(_)),!.
-import_to_user_mfa0(_MM,_SM,_P,M:F/A):- current_predicate(check_never_assert/1),check_never_assert(declared(M:F/A)),fail.
-import_to_user_mfa0(_MM,_SM,decl_type(A),baseKB:decl_type/1):-trace_or_throw(basd_import_to_user_mfa0(baseKB:decl_type(A))).
-
-
-
-import_to_user_mfa0(_MM,_SM,_,M:F/A):- functor(P,F,A), 
- U=logicmoo_user,
- Rule = ((U:P:- user:loop_check_nr(M:P))),
- (clause_asserted(Rule)-> true; 
-  must((
-   user:catch(mpred_op_prolog(pain,Rule),E,dmsg(import_shared_pred(U:F/A:-M:F/A)=E)),
-   user:export(U:F/A),
-   catch(user:import(U:F/A),_,true)))).
-
-
-
-%% import_module_to_user( ?M) is semidet.
-%
-% Import Module Converted To User.
-%
-system:import_module_to_user(M):- default_module(user,M),!.
-system:import_module_to_user(M):- ignore(maybe_delete_import_module(M,user)),
-                           maybe_add_import_module(M,system,end),
-                           maybe_add_import_module(user,M,end),
-                           % find system thru M
-                           maybe_delete_import_module(user,system).
-
-
-
-
-%% ensure_imports( ?M) is semidet.
-%
-% Ensure Imports.
-%
-ensure_imports(baseKB):-!.
-ensure_imports(M):-ensure_imports_tbox(M,baseKB).
-
-:-multifile(lmcache:is_ensured_imports_tbox/2).
-:-dynamic(lmcache:is_ensured_imports_tbox/2).
-
-
-
-
-%% skip_user( ?M) is semidet.
-%
-% Skip User.
-%
-skip_user(M):-
-  maybe_add_import_module(M,system,end),  
-  ignore(maybe_delete_import_module(M,user)).
-  %ignore(maybe_delete_import_module(user,system)).
-  %asserta((M:import(P):-system:import(P))),
-  
-
-
-
-%% ensure_imports_tbox( ?M, ?BaseKB) is semidet.
-%
-% Ensure Imports Tbox.
-%
-ensure_imports_tbox(M,BaseKB):-M==BaseKB,!.
-ensure_imports_tbox(M,BaseKB):-
-  lmcache:is_ensured_imports_tbox(M,BaseKB),!.
-ensure_imports_tbox(M,BaseKB):-
-  asserta(lmcache:is_ensured_imports_tbox(M,BaseKB)),
-  
-  must_det((
-   %maybe_add_import_module(BaseKB,mpred_loader,end),
-   %maybe_add_import_module(M,mpred_loader,end),
-   forall((system:current_module(IM), \+ lmconf:is_box_module(IM,_)),maybe_add_import_module(M,IM,end)),
-   forall((system:current_module(IM),\+ lmconf:is_box_module(IM,_)),maybe_add_import_module(BaseKB,IM,end)),
-   % skip_user(BaseKB),
-   %ignore(maybe_delete_import_module(user,BaseKB)),
-   %ignore(maybe_delete_import_module(BaseKB,user)),
-   ignore(maybe_delete_import_module(M,BaseKB)),
-   ignore(maybe_delete_import_module(BaseKB,M)),
-   forall((prolog:current_predicate(_,BaseKB:P),\+predicate_property(BaseKB:P,imported_from(_))),import_shared_pred(M,BaseKB,P)),
-   % maybe_add_import_module(user,BaseKB,end),
-   % maybe_add_import_module(BaseKB,system,end),
-   maybe_add_import_module(M,user,end),
-   %maybe_add_import_module(BaseKB,M,end),
-   %skip_user(M),
-   ignore(maybe_delete_import_module(M,user)),
-   maybe_add_import_module(user,M,end),
-   ignore(maybe_delete_import_module(user,system)), % gets from M now
-   !)).
-
 :-multifile(lmconf:locked_baseKB/0).
 :-dynamic(lmconf:locked_baseKB/0).
-
-
-
-
-%% is_system_box( ?VALUE1) is semidet.
-%
-% If Is A System Datalog.
-%
-is_system_box(baseKB).
-
-
-%% abox_for(M,Box).
-%
-% Not Boot Module.
-%
-%is_default_shared(mpred_loader).
-is_default_shared(baseKB).
-is_default_shared(boot_system).
-is_default_shared(system_markers).
-is_default_shared(system_singleValued).
-is_default_shared(system_genls).
-is_default_shared(system_if_missing).
-is_default_shared(common_logic_clif).
-is_default_shared(system_mdefault).
-is_default_shared(user).
-
-is_undefaulted(user).
-is_undefaulted(logicmoo_user).
-is_undefaulted(mpred_userkb).
-
-:-forall(is_default_shared(M),assert_if_new(lmconf:abox_for(baseKB,M))).
-
-
-
-%% best_module( ?List, ?ABox) is semidet.
-%
-% Best Module.
-%
-best_module0(List,M,ABox):-member(M,List),get_abox_for(ABox,M).
-% best_module0(List,ABox,ABox):-member(M,List),lmcache:has_pfc_database_preds(ABox).
-
-best_module(List,M,ABox):-best_module0(List,M,ABox), \+ is_undefaulted(M), \+ is_system_box(ABox),!.
-best_module(List,M,ABox):-best_module0(List,M,ABox), \+ is_default_shared(M), \+ is_system_box(ABox),!.
-best_module(List,M,ABox):-best_module0(List,M,ABox), \+ is_undefaulted(M),\+ is_undefaulted(ABox).
-best_module(List,M,M):-member(M,List).
-best_module(_List,baseKB,baseKB):-!.
 
 
 simplify_language_name(W,WN):-W==mpred,!,WN=pfc.
@@ -1664,106 +1285,10 @@ file_begin(W):-
    which_file(Source),
    decache_file_type(Source),
    assert_until_eof(lmcache:mpred_directive_value(W,file,Source)),
-   guess_user_abox(ABox,From),
+   guess_abox(ABox,From),
    set_file_abox(ABox),   
    op_lang(W),
    enable_mpred_expansion)).
-
-
-
-%% set_file_abox( ?M) is semidet.
-%
-% Set User ABox.
-%
-set_file_abox(ABox):- 
- must_det_l((
-   ensure_abox(ABox),
-   user_m_check(ABox), 
-   '$current_typein_module'(CM),mpred_ops(CM),
-   '$current_source_module'(SM),mpred_ops(SM),
-   which_file(Source),   
-   (t_l:user_abox(SM,Prev)->true;Prev=ABox),
-   set_abox_for(Source,ABox),
-   assert_until_eof(t_l:user_abox(SM,ABox)),
-   onEndOfFile(reset_user_abox(Prev)),
-   onEndOfFile(module(CM)),
-   onEndOfFile('$set_source_module'(SM)),
-   onEndOfFile('$set_typein_module'(CM)),
-   set_current_module(ABox))),
-   !. 
-
-
-make_module_name_local(Source,baseKB):-is_default_shared(Source).
-make_module_name_local(Source,Source):-lmcache:has_pfc_database_preds(Source).
-make_module_name_local(Source,FM):-make_module_name(Source,FM).
-
-guess_user_abox(ABox,From):- source_module(From),t_l:user_abox(From,ABox),quietly_must(ensure_abox(ABox)),!.
-guess_user_abox(ABox,From):-  
- hide_trace((
-  (prolog_load_context(module,Source)->true;prolog_load_context(source,Source)),
-  make_module_name_local(Source,FM),
-  Source\==user -> (ABox = FM, which_file(File),set_abox_for(File,ABox),set_abox_for(Source,ABox),From=ABox,set_file_abox(ABox),set_user_abox(ABox));
-  (('$set_source_module'(SM,SM),
-   '$current_typein_module'(CM),
-   best_module([FM,SM,CM],From,ABox),
-   nop(dmsg(best_module([FM,SM,CM],From,ABox))))))),!.
-
-:- thread_local(t_l:user_abox/2).
-set_user_abox(User):-User==user,!,set_user_abox(baseKB).
-set_user_abox(ABox):-
-must_det_l((
- quietly_must(ensure_abox(ABox)),
- quietly_must((which_file(File),set_abox_for(File,ABox))),
- '$current_source_module'(SM),set_abox_for(SM,ABox),
- '$current_typein_module'(CM),set_abox_for(CM,ABox),
- ((t_l:user_abox(SM,Was),ABox\==Was)-> wdmsg(set_user_abox(Was=>ABox));true),
- retractall(t_l:user_abox(SM,_M)),
- asserta(t_l:user_abox(SM,ABox)))).
-
-:- thread_local(t_l:user_abox/2).
-set_guessed_abox(ABox,_From):- \+ atom(ABox),!.
-set_guessed_abox(ABox,From):-
- must_det_l((
- sanity(atom(ABox)), 
-  ((t_l:user_abox(SM,Was),ABox\==Was)-> wdmsg(set_user_abox(Was=>ABox));true),
- (which_file(File)->(\+ lmconf:abox_for(_,File)->set_abox_for(File,ABox);true);true),
- quietly_must(ensure_abox(ABox)), (\+ is_undefaulted(SM) -> set_abox_for(From,ABox) ; true))).
- %'$set_source_module'(SM,SM),(is_undefaulted(SM)->true;(set_abox_for(SM,ABox),Is_Changed=1)),
- %'$module'(CM,CM),(is_undefaulted(CM)->true;(set_abox_for(CM,ABox),Is_Changed=1)),
- %!.
-
-%% get_user_abox(-Ctx) is det.
-%
-% ABox is an "assertion component" Prolog Module
-% within a knowledge base.
-%
-% not just user modules
-
-get_user_abox(A):-nonvar(A),!.
-get_user_abox(baseKB):-!.
-get_user_abox(A):- quietly_must(quietly(((get_user_abox0(A),A\=user);get_user_abox0(A)))),!.
-
-get_user_abox0(A):- source_module(SM),t_l:user_abox(SM,A),ensure_abox(A).
-get_user_abox0(A):-'$current_source_module'(M),get_abox_for(M,A).
-get_user_abox0(A):- which_file(File),get_abox_for(File,A).
-get_user_abox0(A):-'$current_typein_module'(M),get_abox_for(M,A).
-get_user_abox0(A):- guess_user_abox(A,From),set_guessed_abox(A,From).
-
-
-set_abox_for(SM,ABox):-asserta_new(lmconf:abox_for(ABox,SM)).
-
-% get_abox_for(baseKB,_):-!.
-get_abox_for(SM,ABox):-lmconf:abox_for(ABox,SM).
-
-
-
-
-%% set_current_module( ?ABox) is semidet.
-%
-% Set Current Module.
-%
-set_current_module(user):- set_mpred_module(baseKB),!.
-set_current_module(ABox):- '$set_typein_module'(ABox),'$set_source_module'(ABox).
 
 
 %% file_end( ?W) is semidet.
@@ -1971,15 +1496,6 @@ transform_opers_1((AB),(RESULT)):- get_op_alias(OP,(OTHER)),atom(OP), atom(OTHER
 transform_opers_1(OP,OTHER):- get_op_alias(OPO,OTHER),OPO=OP,!.
 
 %% Possibly should term expand since we are in the userKb modules
-
-
-
-%% in_mpred_kb_module is semidet.
-%
-% In Managed Predicate Knowledge Base Module.
-%
-in_mpred_kb_module:- source_context_module(MT),get_user_abox(MT2),!,MT==MT2.
-
 
 
 
@@ -2500,7 +2016,7 @@ ensure_mpred_file_loaded(MFileIn):- strip_module(MFileIn,M,_),
 % Ensure Managed Predicate File Loaded.
 %
 ensure_mpred_file_loaded(World,FileIn):- 
-  w_tl(get_user_abox(World),ensure_mpred_file_loaded(FileIn)).
+  w_tl(get_abox(World),ensure_mpred_file_loaded(FileIn)).
 
 
 
@@ -2550,7 +2066,7 @@ call_from_module(NewModule,Goal):-
 % Force Reload Managed Predicate File.
 %
 force_reload_mpred_file(FileIn):- 
-  quietly_must((get_user_abox(World),force_reload_mpred_file(World,FileIn))).
+  quietly_must((get_abox(World),force_reload_mpred_file(World,FileIn))).
 
 
 
@@ -2564,8 +2080,8 @@ force_reload_mpred_file(World,MFileIn):- strip_module(MFileIn,NewModule,_),
  NewModule:ensure_loaded(logicmoo(mpred/mpred_userkb)),
  forall(must_locate_file(MFileIn,File),
    must_det_l((
-   once(show_success(prolog_load_file,get_user_abox(DBASE));DBASE=NewModule),
-   sanity(exists_file(File)),sanity(get_user_abox(World)),
+   once(show_success(prolog_load_file,get_abox(DBASE));DBASE=NewModule),
+   sanity(exists_file(File)),sanity(get_abox(World)),
    nop(mpred_remove_file_support(File)),
    assert_if_new(lmconf:registered_mpred_file(File)),
    quietly_must(time_file_safe(File,NewTime)),
@@ -2857,7 +2373,7 @@ pop_predicates(M:F/A,STATE):- functor(H,F,A),forall(member((H:-B),STATE),M:asser
 
 with_umt_l(G):- 
   notrace(current_prolog_flag(mpred_pfc_file,true)),
-   get_user_abox(U),
+   get_abox(U),
    nonvar(U),
    '$set_source_module'(Was,U),
    nonvar(Was),

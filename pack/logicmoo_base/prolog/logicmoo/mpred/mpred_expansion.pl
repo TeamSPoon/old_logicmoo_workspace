@@ -513,7 +513,7 @@ is_stripped_module(system).
 %is_stripped_module(Inherited):-'$current_source_module'(E), default_module(E,Inherited).
 %is_stripped_module(Inherited):-'$current_typein_module'(E), default_module(E,Inherited).
 % is_stripped_module(baseKB).
-% is_stripped_module(A):- get_user_abox(AB),!,AB=A.
+% is_stripped_module(A):- get_abox(AB),!,AB=A.
 
 
 
@@ -1040,7 +1040,7 @@ compound_all_open(C):-compound(C),functor(C,_,A),A>1,\+((arg(_,C,Arg),is_ftNonva
 
 /*
 db_expand_0(Op,MT:Term,MT:O):- is_kb_module(MT),!,w_tl(t_l:caller_module(baseKB,MT),db_expand_0(Op,Term,O)).
-db_expand_0(Op,DB:Term,DB:O):- get_user_abox(DB),!,w_tl(t_l:caller_module(db,DB),db_expand_0(Op,Term,O)).
+db_expand_0(Op,DB:Term,DB:O):- get_abox(DB),!,w_tl(t_l:caller_module(db,DB),db_expand_0(Op,Term,O)).
 db_expand_0(Op,KB:Term,KB:O):- atom(KB),!,w_tl(t_l:caller_module(prolog,KB),db_expand_0(Op,Term,O)).
 */
 
@@ -1736,7 +1736,7 @@ mpred_expansion_file.
 
 with_umt_l2(G):-
   notrace(current_prolog_flag(mpred_pfc_file,true)),
-   get_user_abox(U),
+   get_abox(U),
    nonvar(U),
    '$set_source_module'(Was,U),
    nonvar(Was),

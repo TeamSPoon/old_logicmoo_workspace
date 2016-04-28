@@ -11,8 +11,10 @@
 :- module(sanity,[]).
 
 :- use_module(library(logicmoo_base)).
+:- show_kb_structure.
 
 :- file_begin(pfc).
+:- show_kb_structure.
 
 % :- autoload.
 
@@ -26,11 +28,16 @@
 
 :- mpred_trace_msg(beginxxxxxxxxxxxxxxxxXXXXXXXXXXXXXXXXXXXXXXXXxxxxxxxxxxxxxxxxxxxxxxxx_abc).
 
+:- dynamic(baseKB:a/0).
+:- dynamic(sanity:a/0).
+
+/*
 :- mpred_ain((a ==> b)).
+:- break.
 :- mpred_ain(a).
-
+*/
 a ==> b.
-
+a.
 :- pp_DB.
 
 :- mpred_test(a).

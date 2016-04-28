@@ -30,7 +30,7 @@
 :- include(prologmud(mud_header)).
 :- '$set_source_module'(baseKB).
 :- file_begin(pfc).
-:- set_user_abox(baseKB).
+:- set_abox(baseKB).
 
 
 :- retractall(t_l:disable_px).

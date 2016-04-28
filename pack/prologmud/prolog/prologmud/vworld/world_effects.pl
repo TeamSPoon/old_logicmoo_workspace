@@ -80,7 +80,7 @@ set_stats(Agent,Traits):-dmsg(warn(failed(set_stats(Agent,Traits)))).
 
 process_stats(Agent,mudStr(Y)) :-
 	ain(mudStr(Agent,Y)),
-	must_det((mudHealth(Agent,Dam),number(Dam))),
+	must((mudHealth(Agent,Dam),number(Dam)))->
 	NewDam is (Dam + ((Y * 5) - 10)),
 	ain(mudHealth(Agent,NewDam)),
 	ain(stat_total(Agent,+Y)).

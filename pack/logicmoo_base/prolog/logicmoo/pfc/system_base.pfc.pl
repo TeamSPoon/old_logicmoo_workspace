@@ -42,6 +42,7 @@
 (mpred_mark(pfcBcTrigger,F,A)/(fa_to_p(F,A,P), predicate_property(P,static))) ==> {dmsg(warn(pfcNegTrigger,P,static))}.
 
 
+
 %(mpred_mark(pfcPosTrigger,F,A)/(fa_to_p(F,A,P), \+ predicate_property(P,_))) ==> {kb_dynamic(tbox:F/A)}.
 %(mpred_mark(pfcNegTrigger,F,A)/(fa_to_p(F,A,P), \+ predicate_property(P,_))) ==> {kb_dynamic(tbox:F/A)}.
 
@@ -138,6 +139,7 @@ meta_argtypes(support_hilog(tRelation,ftInt)).
 ((prologHybrid(F),arity(F,A)/is_ftNameArity(F,A))==>hybrid_support(F,A)).
 (hybrid_support(F,A)/is_ftNameArity(F,A))==>prologHybrid(F),arity(F,A).
 
+((mpred_mark(_,F,A)/(A==0)) ==> {kb_dynamic(F/A)}).
 
 pfcControlled(X)/get_pifunctor(X,C)==>({kb_dynamic(C),get_functor(C,F,A)},arity(F,A),pfcControlled(F),support_hilog(F,A)).
 prologHybrid(X)/get_pifunctor(X,C)==>({\+ static_predicate(C), kb_dynamic(C),get_functor(C,F,A)},arity(F,A),prologHybrid(F)).
@@ -164,9 +166,7 @@ mpred_mark(pfcCallCode,F, A)/((is_ftNameArity(F,A)),
   predicate_is_undefined_fa(F,A))==> marker_supported(F,A).
 
 
-(marker_supported(F,A)/is_ftNameArity(F,A))==>(prologHybrid(F),hybrid_support(F,A)).
-
-
+% (marker_supported(F,A)/is_ftNameArity(F,A))==>(prologHybrid(F),hybrid_support(F,A)).
 %mpred_mark(pfcPosTrigger,F,A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A),afterAdding(F,lambda(P,mpred_enqueue(P,(m,m)))).
 %mpred_mark(pfcNegTrigger,F,A)/(integer(A),functor(P,F,A)) ==> pfcTriggered(F/A), afterRemoving(F,lambda(P,mpred_enqueue(~P,(m,m)))).
 
@@ -199,7 +199,7 @@ mpred_mark(pfcRHS,F,A)/(is_ftNameArity(F,A),F\==arity)==>tPred(F),arity(F,A),pfc
 ((hybrid_support(F,A)/(is_ftNameArity(F,A), \+ prologDynamic(F),\+ static_predicate(F/A))) ==>
   ({    
     functor(G,F,A),
-     (var(M)->must(get_user_abox(M));true),
+     (var(M)->must(get_abox(M));true),
      (var(M)->ignore(( current_predicate(F,M:G), \+ predicate_property(M:G,imported_from(_))));true),
      (var(M)->predicate_property(M:G,exported);true),
      % must(rebuild_pred_into(G,G,ain,[+dynamic,+multifile,+discontiguous])),         

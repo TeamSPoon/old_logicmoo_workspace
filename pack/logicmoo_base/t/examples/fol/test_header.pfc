@@ -19,8 +19,8 @@
 
 :- with_ukb(baseKB,baseKB:ensure_mpred_file_loaded(logicmoo(snark/'common_logic_clif.pfc'))).
 
-show_test(G):- get_user_abox(KB),must(show_call(KB:G)).
-show_call_test(G):- get_user_abox(KB),must(show_call(KB:G)).
+show_test(G):- get_abox(KB),must(show_call(KB:G)).
+show_call_test(G):- get_abox(KB),must(show_call(KB:G)).
 
 
 %= define the example language

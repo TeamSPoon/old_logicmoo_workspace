@@ -13,7 +13,7 @@
 
 end_of_file.
 
-:- set_user_abox(myMicrotheory).
+:- set_abox(myMicrotheory).
 
 :- import_to_user(genlMt/2).
 

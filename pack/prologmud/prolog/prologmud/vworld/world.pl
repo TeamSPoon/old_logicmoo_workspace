@@ -154,11 +154,11 @@ genls(tFood,tItem).
 
 create_agent(P):-functor(P,isKappaFn,_),!.
 create_agent(P):-create_agent(P,[]).
-create_agent(P,List):- must_det(create_instance(P,tAgent,List)).
+create_agent(P,List):- must(create_instance(P,tAgent,List)),!.
 
 
 :-export(create_instance/1).
-create_instance(P):- must_det((isa(P,What),ttSpatialType(What))),must_det(create_instance(P,What,[])).
+create_instance(P):- must((isa(P,What),ttSpatialType(What))),must(create_instance(P,What,[])),!.
 :-export(create_instance/2).
 create_instance(Name,Type):-create_instance(Name,Type,[]).
 create_instance(Name,Type):-create_instance(Name,Type,[]).

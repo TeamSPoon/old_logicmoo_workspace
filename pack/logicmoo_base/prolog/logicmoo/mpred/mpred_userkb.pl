@@ -219,9 +219,9 @@ t_l:user_abox(baseKB,baseKB).
 % :- base_kb_pred_list(List),forall((member(E,List),E\='$pldoc'/4),decl_shared(E)).
 
 
-:- import_module_to_user(logicmoo_user).
+%:- import_module_to_user(logicmoo_user).
 
-:- initialization(import_module_to_user(logicmoo_user)).
+%:- initialization(import_module_to_user(logicmoo_user)).
 
 
 % :- module_property(baseKB, exports(List)),forall(member(E,List),kb_dynamic(E)).

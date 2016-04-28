@@ -16,11 +16,13 @@
    enable_mpred_system/0,
    config_mpred_system/2,
    enable_mpred_system/2,
+   show_kb_structure/0,
   user_module_uses_base/2,
   disable_mpred_system/2,
   fix_ops_for/1]).
 
-assert_setting(M:P):-functor(P,_,A),duplicate_term(P,DP),setarg(A,DP,_),retractall(M:DP),asserta(M:P).
+:- ensure_loaded('./logicmoo/util/logicmoo_util_filesystem').
+
 % ========================================
 % lmconf:mpred_system_kb/1
 % ========================================
@@ -29,27 +31,29 @@ assert_setting(M:P):-functor(P,_,A),duplicate_term(P,DP),setarg(A,DP,_),retracta
 % Hook To [lmconf:mpred_system_kb/1] For Usr Logicmoo_base.
 % Managed Predicate System Knowledge Base.
 %
-:- dynamic(lmconf:mpred_system_kb/1).
-:- dynamic(lmconf:mpred_user_kb/1).
-lmconf:mpred_system_kb(baseKB).
-lmconf:mpred_user_kb(logicmoo_user).
+:- multifile(lmconf:tbox_for/2).
+:- multifile(lmconf:abox_for/2).
+:- dynamic(lmconf:tbox_for/2).
+:- dynamic(lmconf:abox_for/2).
+lmconf:tbox_for(user,baseKB).
+lmconf:abox_for(user,logicmoo_user).
 
 config_mpred_system:- 
   logicmoo_base:user_module_uses_base(SM,M),
   config_mpred_system(SM,M).
 
 config_mpred_system(SM,M):-
-  ignore((M \== user, M \==logicmoo_user, assert_setting(lmconf:mpred_system_kb(M)))),
-  ignore((SM\== user,SM\==M, SM\==baseKB, assert_setting(lmconf:mpred_user_kb(SM)))),
+  get_abox_for(SM,_),
+  get_tbox_for(M,_), 
   show_kb_structure.
 
 
-show_kb_structure:- 
-   lmconf:mpred_system_kb(Sys),
-   Sys:ensure_loaded(library(logicmoo_utils)),
+show_kb_structure:-
    logicmoo_base:user_module_uses_base(SM,M),
-   lmconf:mpred_user_kb(Usr),
-   wdmsg((source/typein=SM/M-->abox/tbox=Usr/Sys)).
+   get_tbox_for(M,Sys),
+   Sys:ensure_loaded(library(logicmoo_utils)),   
+   get_abox_for(SM,Usr),
+   wdmsg((source/typein=SM/M-->abox/tbox=Usr/Sys)),!.
 
 /*
 % lmconf:startup_option(datalog,sanity). %  Run datalog sanity tests while starting
@@ -127,6 +131,7 @@ fix_ops_for(CM):-
 % Managed Predicate If Is A Implimentation File.
 %
 lmconf:mpred_is_impl_file(mpred/A):-nonvar(A).
+lmconf:mpred_is_impl_file(library('logicmoo/mpred/mpred_at_box.pl')).
 lmconf:mpred_is_impl_file(library('logicmoo/mpred/mpred_type_args.pl')).
 lmconf:mpred_is_impl_file(library('logicmoo/mpred/mpred_type_wff.pl')).
 lmconf:mpred_is_impl_file(library('logicmoo/mpred/mpred_type_isa.pl')).
@@ -139,14 +144,15 @@ lmconf:mpred_is_impl_file(library('logicmoo/mpred/mpred_kb_ops.pl')).
 lmconf:mpred_is_impl_file(library('logicmoo/mpred/mpred_userkb.pl')).
 lmconf:mpred_is_impl_file(library('logicmoo/mpred/mpred_*.pl')).
 
- 
+%% assert_setting00( ?X) is semidet.
+assert_setting00(M:P):-functor(P,_,A),duplicate_term(P,DP),setarg(A,DP,_),system:retractall(M:DP),system:asserta(M:P).
 
 %% load_mpred_system( ?Usr) is semidet.
 %
 % Load Managed Predicate System.
 %
 load_mpred_system(Sys):-
- assert_setting(lmconf:mpred_system_kb(Sys)),
+ assert_setting00(lmconf:tbox_for(user,Sys)),
  with_mutex(mpred_system_mutex,
    (Sys:use_module(logicmoo_utils), 
     forall(
@@ -156,14 +162,17 @@ load_mpred_system(Sys):-
           call((w_tl(t_l:disable_px,
                       ensure_loaded(Sys:File)))))))))).
 
+current_smt(SM,M):-
+ '$current_source_module'(SM),'$current_typein_module'(M).
 
 %% enable_mpred_system is det.
 %
 % Ensure the "managed predicate" system and subsystems are available
 %
-enable_mpred_system:- 
-   lmconf:mpred_user_kb(Usr),
-   lmconf:mpred_system_kb(Sys),
+enable_mpred_system:-
+   current_smt(SM,M),
+   get_abox_for(SM,Usr),
+   get_tbox_for(M,Sys),
    enable_mpred_system(Usr,Sys).
 
 %% enable_mpred_system(+Usr,+Sys) is det.
@@ -195,16 +204,18 @@ disable_mpred_system(Usr,Sys):- with_mutex(mpred_system_mutex,lmconf:disable_mpr
 %
 lmconf:enable_mpred_system0(Usr,_):- lmconf:mpred_system_status(Usr,enabled),!.
 lmconf:enable_mpred_system0(Usr,_):- lmconf:mpred_system_status(Usr,loading),!.
-lmconf:enable_mpred_system0(Usr,Sys):- assert_setting(lmconf:mpred_system_status(Usr,loading)),
-   assert_setting(lmconf:mpred_user_kb(Usr)),
+lmconf:enable_mpred_system0(Usr,Sys):- assert_setting00(lmconf:mpred_system_status(Usr,loading)),
+   current_smt(SM,M),
+   assert_setting00(lmconf:abox_for(SM,Usr)),
+   assert_setting00(lmconf:tbox_for(SM,Sys)),
+   assert_setting00(lmconf:tbox_for(M,Sys)),
    load_mpred_system(Sys),
    must(current_predicate(_,Sys:mpred_expander(_,_,_,_,_,_))),
-   meta_predicate(mpred_expander(+,+,+,+,-,-)),   
-   asserta_if_new((Sys:term_expansion(I,P1,O,P2):- mpred_expander(term,Sys,I,P1,O,P2))),
-   asserta_if_new((Sys:goal_expansion(I,P1,O,P2):- mpred_expander(goal,Sys,I,P1,O,P2))),
-   asserta_if_new((Usr:term_expansion(I,P1,O,P2):- mpred_expander(term,Usr,I,P1,O,P2))),
-   asserta_if_new((Usr:goal_expansion(I,P1,O,P2):- mpred_expander(goal,Usr,I,P1,O,P2))),
-   assert_setting(lmconf:mpred_system_status(Usr,enabled)),
+   asserta_if_new((Sys:term_expansion(I,P1,O,P2):- Sys:mpred_expander(term,Sys,I,P1,O,P2))),
+   asserta_if_new((Sys:goal_expansion(I,P1,O,P2):- Sys:mpred_expander(goal,Sys,I,P1,O,P2))),
+   asserta_if_new((Usr:term_expansion(I,P1,O,P2):- Sys:mpred_expander(term,Usr,I,P1,O,P2))),
+   asserta_if_new((Usr:goal_expansion(I,P1,O,P2):- Sys:mpred_expander(goal,Usr,I,P1,O,P2))),
+   assert_setting00(lmconf:mpred_system_status(Usr,enabled)),
    w_tl(t_l:side_effect_ok,doall(Usr:call_no_cuts(lmconf:module_local_init(Usr,Sys)))).
 
 
@@ -227,6 +238,8 @@ lmconf:disable_mpred_system0(Usr):-
    
 :- module_transparent config_mpred_system/2.
 
+% :- dmsg("Adding logicmoo/[snark|mpred_online] to autoload path",[]).
+:- add_library_search_path('./logicmoo/snark/',[ '*.pl']).
 
 % Config System
 :- config_mpred_system.
@@ -235,15 +248,15 @@ lmconf:disable_mpred_system0(Usr):-
 :- user_module_uses_base(SM,M),M:use_module(SM:library(logicmoo_utils)).
 
 % Load System
-:- lmconf:mpred_system_kb(M),dmsg(system_kb=M),load_mpred_system(M).
+:- user_module_uses_base(_,M),get_tbox_for(M,T),dmsg(system_kb=T),load_mpred_system(T).
 
 :- autoload([verbose(false)]).
 
 :- user_module_uses_base(SM,M),fix_ops_for(M),(SM==M->true;fix_ops_for(SM)).
 
 :- user_module_uses_base(SM,M),
-   lmconf:mpred_user_kb(Usr),
-   lmconf:mpred_system_kb(Sys),
+   get_abox_for(SM,Usr),
+   get_tbox_for(M,Sys),
    add_import_module(SM,Usr,start),
    add_import_module(M,Sys,start),
    add_import_module(M,baseKB,start),
@@ -258,9 +271,7 @@ lmconf:disable_mpred_system0(Usr):-
 :- asserta_new((logicmoo_util_database:aina(G):- !, call(mpred_aina,G))).
 
 
-:- dmsg("Adding logicmoo/[snark|mpred_online] to autoload path",[]).
 :- must(add_library_search_path('./logicmoo/mpred_online/',[ '*.pl'])).
-:- add_library_search_path('./logicmoo/snark/',[ '*.pl']).
 :- add_library_search_path('./logicmoo/',[ '*.pl']).
 % :- add_library_search_path('./plarkc/',[ '*.pl']).
 % :- add_library_search_path('./pttp/',[ 'dbase_i_mpred_*.pl']).
