@@ -245,7 +245,7 @@
         mpred_expander_now_physically(?, ?, ?),
         load_init_world(+, :),
         module_typed_term_expand(?, ?),
-        mpred_expander(+, +, +, -),
+        mpred_expander(+, +, +,+, -,-),
         get_user_abox(-),
         mpred_op_each(3),
         mpred_term_expansion(?, ?),
@@ -537,7 +537,6 @@ mpred_prolog_only_file(File):- file_name_extension(_,pfc,File),!,fail.
 %:- use_module(library(logicmoo/util/logicmoo_util_attvar_reader)).
 %:- use_module(library(logicmoo/util/logicmoo_util_varnames)).
 
-:- meta_predicate mpred_expander(+,+,+,-).
 % mpred_expander(_,_,I,OO):-thread_self(X),X\==main,!,I=OO.
 % not actual function
 
@@ -566,6 +565,7 @@ dont_term_expansion(Type,I):-
    (Type \== term , Type \= _:term ) ; 
    t_l:disable_px.
 
+:- meta_predicate mpred_file_term_expansion(+,+,+,-).
 mpred_file_term_expansion(_,_,_,_):- \+ current_predicate(_,_:mpred_loader_file),!,fail.
 mpred_file_term_expansion(Type,DefMod,end_of_file,O):- !,Type = term, DefMod = user, do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
 mpred_file_term_expansion(Type,LoaderMod,I,OO):- loop_check(mpred_expander0(Type,LoaderMod,I,O)),quietly_must(nonvar(O)),O=OO.
@@ -1279,7 +1279,7 @@ mpred_ops:-  prolog_load_context(module,M),mpred_ops(M).
 
 mpred_ops(M):- mpred_op_each(mpred_op_unless(M)).
 
-mpred_op_unless(M,A,B,C):- current_op(_,B,M:C)->true;op(A,B,M:C).
+mpred_op_unless(M,A,B,C):- op_safe(A,B,M:C).
 
 mpred_op_each(OpEach):-
             call(OpEach,1199,fx,('==>')), % assert
@@ -1482,7 +1482,7 @@ import_shared_pred(M,BaseKB,P):-
   functor(P,F,A),
   %dynamic(BaseKB:F/A),
   user:catch(mpred_op_prolog(pain,((M:P:- user:BaseKB:P))),E,dmsg(import_shared_pred(M:F/A:-BaseKB:F/A)=E)),
-  quietly_must( \+ predicate_property(BaseKB:P,exported)),
+  quietly_must(ignore(show_failure( \+ predicate_property(BaseKB:P,exported)))),
   import_to_user(M:P).
 
 

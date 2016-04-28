@@ -740,7 +740,8 @@ autodoc_stream_pred(FromLine,File,P):-!,get_functor(P,F,A),autodoc_stream_pred(F
 % Autodoc Predicate.
 %
 autodoc_pred(M,M:P0):- t_l:last_predicate_help_shown(M,_,P0),!.
-autodoc_pred(M,M:P0):- once(to_comparable_name_arity(P0,F,A)),functor(P,F,A), M\==baseKB , (predicate_property(baseKB:P,_),\+predicate_property(baseKB:P,imported_from(_))),!.
+autodoc_pred(M,M:P0):- once(to_comparable_name_arity(P0,F,A)),functor(P,F,A), M\==baseKB , (predicate_property(baseKB:P,_),
+   \+predicate_property(baseKB:P,imported_from(_))),!.
 autodoc_pred(M,M:P0):- once(to_comparable_name_arity(P0,F,A)), clause(M:'$pldoc'(F/A, _, S, D),true),S\==D,!.
 autodoc_pred(_,MP):- MP = _:end_of_file, !.
 autodoc_pred(M,M:P0):- 

@@ -12,7 +12,6 @@
 
 :- use_module(library(logicmoo_base)).
 
-              
 :- file_begin(pfc).
 
 % :- autoload.

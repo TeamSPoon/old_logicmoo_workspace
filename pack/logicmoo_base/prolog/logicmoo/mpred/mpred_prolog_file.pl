@@ -147,7 +147,7 @@ prolog_load_file_nlc_pre(Module:Spec, Options) :-
 %
 % Prolog Load File Nlc.
 %
-:- export(baseKB:prolog_load_file_nlc/2).
+% :- export(baseKB:prolog_load_file_nlc/2).
 baseKB:prolog_load_file_nlc(Module:Spec, Options) :- 
    filematch(Module:Spec,Where1),Where1\=Spec,!,forall(filematch(Module:Spec,Where),Module:load_files(Module:Where,Options)).
 

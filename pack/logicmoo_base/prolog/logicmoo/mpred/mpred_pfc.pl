@@ -1280,7 +1280,7 @@ filter_buffer_get_n(Name,FactS,N):-
 filter_buffer_get_n(_,[],_).
 
 
-filter_buffer_n_test(_Name,_,_Fact):- \+ need_speed, !,fail.
+% filter_buffer_n_test(_Name,_,_Fact):- \+ need_speed, !,fail.
 filter_buffer_n_test(Name,_,Fact):- 
    nb_current(Name,Fact1s),
    member(FF,Fact1s),Fact=@=FF,!.
@@ -1296,7 +1296,7 @@ mpred_fwc1(clause_asserted_u(Fact)):-!,sanity(clause_asserted_u(Fact)).
 mpred_fwc1((Fact:- BODY)):- compound(Body),arg(1,Body,Cwc),Cwc\==cwc,ground(BODY),!, mpred_fwc1({BODY}==>Fact).
 % mpred_fwc1(support_hilog(_,_)):-!.
 mpred_fwc1(Fact):- 
-  dmsg(mpred_fwc1(Fact)),
+  % dmsg(mpred_fwc1(Fact)),
   mpred_do_rule(Fact),
   copy_term_vn(Fact,F),
   % check positive triggers

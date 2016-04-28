@@ -1375,15 +1375,16 @@ impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_ta
 mpred_types_loaded.
 
 % ISA QUERY
-lmconf:module_local_init:- asserta_if_new((system:goal_expansion(ISA,GO) :- \+ t_l:disable_px, \+current_predicate(_,ISA),
+lmconf:module_local_init(_UserModule,_SystemModule):- 
+  asserta_if_new((system:goal_expansion(ISA,GO) :- \+ t_l:disable_px, \+current_predicate(_,ISA),
   once((is_ftCompound(ISA),was_isa(ISA,I,C))),t_l:is_calling,show_call(why,GO=no_repeats(isa(I,C))))).
 % ISA GOAL
 % mpred_system_goal_expansion(G,GO):-G\=isa(_,_),was_isa(G,I,C),GO=isa(I,C).
 % ISA EVER
 %mpred_term_expansion(G,GO):-  \+ t_l:disable_px,was_isa(G,I,C),GO=isa(I,C).
 
-lmconf:module_local_init:-ain(tCol(tCol)).
-lmconf:module_local_init:-ain(tCol(ttPredType)).
+lmconf:module_local_init(_UserModule,SystemModule):-ain(SystemModule:tCol(tCol)).
+lmconf:module_local_init(_UserModule,SystemModule):-ain(SystemModule:tCol(ttPredType)).
 
 
 

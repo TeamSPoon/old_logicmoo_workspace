@@ -23,6 +23,7 @@
             (shared_multifile)/1,            
             (dynamic_safe)/1,
             (dynamic_safe)/3,
+            op_safe/3,
             dynamic_transparent/1,
             fill_args/2,
             get_module_of/2,
@@ -109,6 +110,9 @@
 :- meta_predicate only_3rd(1,*,*,*).
 :- meta_predicate with_pfa(1,+).
 :- meta_predicate with_pfa(1,+,+,+).
+
+
+op_safe(A,B,C):-!, (current_op(_,B,C)->true;op(A,B,C)).
 
 
 % ----------

@@ -801,7 +801,7 @@ extract_struct_parameter(Def,Name,Name,Def).
 % Hook To [lmconf:module_local_init/0] For Module Logicmoo_util_structs.
 % Module Local Init.
 %
-lmconf:module_local_init:- ain('==>'(struct_decl(StructDecl),decl_struct(StructDecl))).
+lmconf:module_local_init(_UserModule,SystemModule):- ain(SystemModule:'==>'(struct_decl(StructDecl),decl_struct(StructDecl))).
 
 
 
